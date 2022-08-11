@@ -402,16 +402,6 @@ function TtsModelViewPage(props: Props) {
       </span>
     );
 
-  let defaultVocoder = "not set (defaults to HiFi-GAN)";
-  switch (ttsModel?.maybe_default_pretrained_vocoder) {
-    case "hifigan-superres":
-      defaultVocoder = "HiFi-GAN";
-      break;
-    case "waveglow":
-      defaultVocoder = "WaveGlow";
-      break;
-  }
-
   const language = LanguageCodeToDescriptionWithDefault(
     ttsModel?.ietf_language_tag
   );
@@ -513,17 +503,27 @@ function TtsModelViewPage(props: Props) {
     );
   }
 
-  let vocoderRow = (
-    <tr>
-      <th>Default vocoder</th>
-      <td>{defaultVocoder}</td>
-    </tr>
-  );
+  let defaultOrFallbackVocoderLabel = "Default vocoder";
+  let defaultOrFallbackVocoderName = "vocoder not set (defaults to HiFi-GAN)";
+
+  switch (ttsModel?.maybe_default_pretrained_vocoder) {
+    case "hifigan-superres":
+      defaultOrFallbackVocoderName = "HiFi-GAN";
+      break;
+    case "waveglow":
+      defaultOrFallbackVocoderName = "WaveGlow";
+      break;
+  }
+
+  let customVocoderRows = [];
 
   if (!!ttsModel.maybe_custom_vocoder) {
+    defaultOrFallbackVocoderLabel = "Fallback vocoder";
+
     const vocoderCreatorUrl = FrontendUrlConfig.userProfilePage(
       ttsModel.maybe_custom_vocoder.creator_username
     );
+
     const vocoderCreatorLink = (
       <span>
         <Gravatar
@@ -535,14 +535,21 @@ function TtsModelViewPage(props: Props) {
         <Link to={vocoderCreatorUrl}>{ttsModel.maybe_custom_vocoder.creator_display_name}</Link>
       </span>
     );
-    vocoderRow = (
+
+    customVocoderRows.push(
       <tr>
         <th>Custom tuned vocoder</th>
-        <td>{ttsModel.maybe_custom_vocoder.vocoder_title} by {vocoderCreatorLink}</td>
+        <td>{ttsModel.maybe_custom_vocoder.vocoder_title}</td>
       </tr>
-    );
-  }
+    )
 
+    customVocoderRows.push(
+      <tr>
+        <th>Vocoder created by</th>
+        <td>{vocoderCreatorLink}</td>
+      </tr>
+    )
+  }
 
   return (
     <motion.div initial="hidden" animate="visible" variants={container}>
@@ -563,7 +570,7 @@ function TtsModelViewPage(props: Props) {
 
       <motion.div className="container-panel pt-3 pb-5" variants={panel}>
         <div className="panel p-3 p-lg-4">
-          <h2 className="panel-title fw-bold">Model Details</h2>
+          <h2 className="panel-title fw-bold">TTS Model Details</h2>
           <div className="py-6">
             <table className="table">
               <tbody>
@@ -587,7 +594,6 @@ function TtsModelViewPage(props: Props) {
                   <th>Model type</th>
                   <td>{ttsModel?.tts_model_type}</td>
                 </tr>
-                {vocoderRow}
                 <tr>
                   <th>Text pipeline</th>
                   <td>{textPipelineName}</td>
@@ -606,6 +612,23 @@ function TtsModelViewPage(props: Props) {
                     <FontAwesomeIcon icon={faTwitch} />
                   </th>
                   <td>{discordCommand}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </motion.div>
+
+      <motion.div className="container-panel pt-3 pb-5" variants={panel}>
+        <div className="panel p-3 p-lg-4">
+          <h2 className="panel-title fw-bold">Vocoder Details</h2>
+          <div className="py-6">
+            <table className="table">
+              <tbody>
+                {customVocoderRows}
+                <tr>
+                  <th>{defaultOrFallbackVocoderLabel}</th>
+                  <td>{defaultOrFallbackVocoderName}</td>
                 </tr>
               </tbody>
             </table>
