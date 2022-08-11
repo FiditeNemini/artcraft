@@ -503,52 +503,55 @@ function TtsModelViewPage(props: Props) {
     );
   }
 
-  let defaultOrFallbackVocoderLabel = "Default vocoder";
-  let defaultOrFallbackVocoderName = "vocoder not set (defaults to HiFi-GAN)";
-
-  switch (ttsModel?.maybe_default_pretrained_vocoder) {
-    case "hifigan-superres":
-      defaultOrFallbackVocoderName = "HiFi-GAN";
-      break;
-    case "waveglow":
-      defaultOrFallbackVocoderName = "WaveGlow";
-      break;
-  }
-
-  let customVocoderRows = [];
+  // Custom vocoder vs. legacy default pretrained vocoders
+  let vocoderRows = undefined;
 
   if (!!ttsModel.maybe_custom_vocoder) {
-    defaultOrFallbackVocoderLabel = "Fallback vocoder";
-
     const vocoderCreatorUrl = FrontendUrlConfig.userProfilePage(
       ttsModel.maybe_custom_vocoder.creator_username
     );
 
-    const vocoderCreatorLink = (
-      <span>
-        <Gravatar
-          size={15}
-          username={ttsModel.maybe_custom_vocoder.creator_display_name}
-          email_hash={ttsModel.maybe_custom_vocoder.creator_gravatar_hash}
-        />
-        &nbsp;
-        <Link to={vocoderCreatorUrl}>{ttsModel.maybe_custom_vocoder.creator_display_name}</Link>
-      </span>
+    vocoderRows = (
+      <>
+        <tr>
+          <th>Custom tuned vocoder</th>
+          <td>{ttsModel.maybe_custom_vocoder.vocoder_title}</td>
+        </tr>
+        <tr>
+          <th>Vocoder created by</th>
+          <td>
+            <Gravatar
+              size={15}
+              username={ttsModel.maybe_custom_vocoder.creator_display_name}
+              email_hash={ttsModel.maybe_custom_vocoder.creator_gravatar_hash}
+            />
+            &nbsp;
+            <Link to={vocoderCreatorUrl}>{ttsModel.maybe_custom_vocoder.creator_display_name}</Link>
+          </td>
+        </tr>
+      </>
     );
+  } else {
+    let legacyVocoderName = "vocoder not set (defaults to HiFi-GAN)";
 
-    customVocoderRows.push(
-      <tr>
-        <th>Custom tuned vocoder</th>
-        <td>{ttsModel.maybe_custom_vocoder.vocoder_title}</td>
-      </tr>
-    )
+    switch (ttsModel?.maybe_default_pretrained_vocoder) {
+      case "hifigan-superres":
+        legacyVocoderName = "HiFi-GAN";
+        break;
+      case "waveglow":
+        legacyVocoderName = "WaveGlow";
+        break;
+    }
 
-    customVocoderRows.push(
-      <tr>
-        <th>Vocoder created by</th>
-        <td>{vocoderCreatorLink}</td>
-      </tr>
-    )
+
+    vocoderRows = (
+      <>
+        <tr>
+          <th>Legacy pretrained vocoder</th>
+          <td>{legacyVocoderName}</td>
+        </tr>
+      </>
+    );
   }
 
   return (
@@ -625,11 +628,7 @@ function TtsModelViewPage(props: Props) {
           <div className="py-6">
             <table className="table">
               <tbody>
-                {customVocoderRows}
-                <tr>
-                  <th>{defaultOrFallbackVocoderLabel}</th>
-                  <td>{defaultOrFallbackVocoderName}</td>
-                </tr>
+                {vocoderRows}
               </tbody>
             </table>
           </div>
