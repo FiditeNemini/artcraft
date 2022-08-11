@@ -66,23 +66,31 @@ function ContributeIndexPage(props: Props) {
                 to learn how.
               </Trans>
             </p>
-            <div className="d-flex flex-column flex-lg-row gap-3">
-              <Link to="/upload/tts" className="btn btn-primary w-100">
-                <FontAwesomeIcon icon={faVolumeHigh} className="me-3" />
-                {t("pages.contributeIndex.buttonUploadVoice")}
-              </Link>
-              <Link to="/upload/vocoder" className="btn btn-primary w-100">
-                <FontAwesomeIcon icon={faChartArea} className="me-3" />
-                Upload Vocoder
-              </Link>
-              <Link to="/upload/w2l_video" className="btn btn-primary w-100">
-                <FontAwesomeIcon icon={faVideo} className="me-3" />
-                {t("pages.contributeIndex.buttonUploadW2lVideo")}
-              </Link>
-              <Link to="/upload/w2l_photo" className="btn btn-primary w-100">
-                <FontAwesomeIcon icon={faImage} className="me-3" />
-                {t("pages.contributeIndex.buttonUploadW2lPhoto")}
-              </Link>
+            <div className="row gx-3 gy-3">
+              <div className="col-12 col-md-6">
+                <Link to="/upload/tts" className="btn btn-primary w-100">
+                  <FontAwesomeIcon icon={faVolumeHigh} className="me-3" />
+                  {t("pages.contributeIndex.buttonUploadVoice")}
+                </Link>
+              </div>
+              <div className="col-12 col-md-6">
+                <Link to="/upload/vocoder" className="btn btn-primary w-100">
+                  <FontAwesomeIcon icon={faChartArea} className="me-3" />
+                  Upload Vocoder
+                </Link>
+              </div>
+              <div className="col-12 col-md-6">
+                <Link to="/upload/w2l_video" className="btn btn-primary w-100">
+                  <FontAwesomeIcon icon={faVideo} className="me-3" />
+                  {t("pages.contributeIndex.buttonUploadW2lVideo")}
+                </Link>
+              </div>
+              <div className="col-12 col-md-6">
+                <Link to="/upload/w2l_photo" className="btn btn-primary w-100">
+                  <FontAwesomeIcon icon={faImage} className="me-3" />
+                  {t("pages.contributeIndex.buttonUploadW2lPhoto")}
+                </Link>
+              </div>
             </div>
           </div>
         </div>
