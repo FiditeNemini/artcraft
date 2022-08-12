@@ -167,7 +167,7 @@ function ProfileTtsInferenceResultsListFc(props: Props) {
                   <FontAwesomeIcon icon={faEye} />
                 </abbr>
               </th>
-              <th>
+              <th className="table-mw">
                 <abbr title="Download">Download &amp; Play Link</abbr>
               </th>
               <th>

@@ -171,7 +171,7 @@ function ProfileW2lInferenceResultsListFc(props: Props) {
               <th>
                 <abbr title="Result View">Result Link</abbr>
               </th>
-              <th>
+              <th className="table-mw">
                 <abbr title="Template">Template</abbr>
               </th>
               <th>
