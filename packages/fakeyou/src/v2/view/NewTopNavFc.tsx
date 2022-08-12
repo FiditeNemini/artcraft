@@ -18,7 +18,11 @@ import {
 import { faPatreon } from "@fortawesome/free-brands-svg-icons";
 import { Logout } from "@storyteller/components/src/api/session/Logout";
 import { Gravatar } from "@storyteller/components/src/elements/Gravatar";
-import { GetPendingTtsJobCount, GetPendingTtsJobCountIsOk, GetPendingTtsJobCountSuccessResponse } from "@storyteller/components/src/api/tts/GetPendingTtsJobCount";
+import {
+  GetPendingTtsJobCount,
+  GetPendingTtsJobCountIsOk,
+  GetPendingTtsJobCountSuccessResponse,
+} from "@storyteller/components/src/api/tts/GetPendingTtsJobCount";
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -38,18 +42,21 @@ function NewTopNavFc(props: Props) {
 
   // NB: The responses from the "job count" endpoint are cached in a distributed manner.
   // We use the timestamp as a vector clock to know when to update our view.
-  const [pendingTtsJobs, setPendingTtsJobs] = useState<GetPendingTtsJobCountSuccessResponse>({ 
-    success: true,
-    pending_job_count: 0,
-    cache_time: new Date(0), // NB: Epoch
-  });
+  const [pendingTtsJobs, setPendingTtsJobs] =
+    useState<GetPendingTtsJobCountSuccessResponse>({
+      success: true,
+      pending_job_count: 0,
+      cache_time: new Date(0), // NB: Epoch
+    });
 
   useEffect(() => {
     const fetch = async () => {
       const response = await GetPendingTtsJobCount();
       if (GetPendingTtsJobCountIsOk(response)) {
         console.log(response);
-        if (response.cache_time.getTime() > pendingTtsJobs.cache_time.getTime()) {
+        if (
+          response.cache_time.getTime() > pendingTtsJobs.cache_time.getTime()
+        ) {
           setPendingTtsJobs(response);
         }
       }
@@ -149,7 +156,10 @@ function NewTopNavFc(props: Props) {
               Online Users: <span className="fw-bold text-red">1,204</span>
             </p> */}
             <p className="top-bar-text">
-              TTS Queued: <span className="fw-bold text-red">{pendingTtsJobs.pending_job_count}</span>
+              TTS Queued:{" "}
+              <span className="fw-bold text-red">
+                {pendingTtsJobs.pending_job_count}
+              </span>
             </p>
           </div>
         </div>
@@ -163,7 +173,7 @@ function NewTopNavFc(props: Props) {
             <img
               src="/fakeyou/FakeYou-Logo.png"
               alt="FakeYou: Cartoon and Celebrity Text to Speech"
-              height="34"
+              height="38"
             />
           </Link>
           <button
@@ -190,7 +200,7 @@ function NewTopNavFc(props: Props) {
                 <img
                   src="/fakeyou/FakeYou-Logo.png"
                   alt="FakeYou: Cartoon and Celebrity Text to Speech"
-                  height="34"
+                  height="38"
                 />
               </Link>
 
@@ -311,7 +321,11 @@ function NewTopNavFc(props: Props) {
 
                 <li className="nav-item d-lg-none">
                   {/* TODO(echelon): Fix the build warnings about href not being accessible. */}
-                  <a className="nav-link" aria-current="page" href={FrontendUrlConfig.developerDocs()}>
+                  <a
+                    className="nav-link"
+                    aria-current="page"
+                    href={FrontendUrlConfig.developerDocs()}
+                  >
                     Developers
                   </a>
                 </li>
@@ -325,7 +339,10 @@ function NewTopNavFc(props: Props) {
                       Online: <span className="fw-bold text-red">1,204</span>
                     </p> */}
                     <div className="top-bar-text mobile">
-                      TTS Queued: <span className="fw-bold text-red ">{pendingTtsJobs.pending_job_count}</span>
+                      TTS Queued:{" "}
+                      <span className="fw-bold text-red ">
+                        {pendingTtsJobs.pending_job_count}
+                      </span>
                     </div>
                   </div>
                 </li>
