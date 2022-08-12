@@ -630,6 +630,7 @@ class App extends React.Component<Props, State> {
     mainClassNames = mainClassNames + (this.state.darkMode ? '' : 'dark-mode')
     mainClassNames = mainClassNames + mainClassNames + (this.state.LowSpec ? '' : 'low-spec')
     const DarkModeOff = () =>{
+      
       const currentValue = this.state.darkMode // true or false
 
        window.localStorage.setItem("darkMode", (currentValue ? "true" : "false"))
@@ -667,17 +668,9 @@ class App extends React.Component<Props, State> {
       sessionItem.hidden.opacity = 0
     }
 
-    }
+  }
     return (
       <BrowserRouter>
-  <div className="form-check form-switch">
-  <input className="form-check-input" type="checkbox" id="DarkModeToggle" onClick={DarkModeOff}></input>
-  <label className="form-check-label">Dark Mode</label>
-</div>
-<div className="form-check form-switch">
-  <input className="form-check-input" type="checkbox" id="LowSpec" onClick={LowSpec}></input>
-  <label className="form-check-label">Low Spec</label>
-</div>
 
         <div id="main" className={mainClassNames}>
           <div className="dark-mode"></div>

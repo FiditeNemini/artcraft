@@ -330,6 +330,15 @@ function NewTopNavFc(props: Props) {
   return (
     <div>
       <div className="top-bar d-none d-lg-flex">
+      <div className="form-check form-switch">
+  <input className="form-check-input" type="checkbox" id="DarkModeToggle" ></input>
+  <label className="form-check-label">Dark Mode</label>
+</div>
+<div> ‏‏‎ ‎ </div>
+<div className="form-check form-switch">
+  <input className="form-check-input" type="checkbox" id="LowSpec" ></input>
+  <label className="form-check-label">Low Spec</label>
+</div>
         <div className="container d-flex">
           <div className="d-flex gap-4 flex-grow-1">
             <Link className="top-bar-text" to="/about">
@@ -352,9 +361,13 @@ function NewTopNavFc(props: Props) {
             <p className="top-bar-text">
               TTS Queued: <span className="fw-bold text-red">{pendingTtsJobs.pending_job_count}</span>
             </p>
+            
           </div>
+          
         </div>
+        
       </div>
+  
       <nav
         className="navbar navbar-expand-lg navbar-dark py-3"
         aria-label="Offcanvas navbar large"
