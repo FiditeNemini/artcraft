@@ -23,6 +23,8 @@ use sqlx::error::Error::Database;
 use sqlx::mysql::MySqlDatabaseError;
 use std::fmt;
 use std::sync::Arc;
+use time::Instant;
+use http_server_common::util::timer::time_section;
 
 // TODO: This is duplicated in query_user_profile
 // TODO: This handler has embedded queries.
@@ -126,25 +128,39 @@ impl fmt::Display for ProfileError {
   }
 }
 
+
+struct Timing {
+
+}
+
 pub async fn get_profile_handler(
   http_request: HttpRequest,
   path: Path<GetProfilePathInfo>,
   server_state: web::Data<Arc<ServerState>>) -> Result<HttpResponse, ProfileError>
 {
-  let maybe_user_session = server_state
-      .session_checker
-      .maybe_get_user_session(&http_request, &server_state.mysql_pool)
-      .await
-      .map_err(|e| {
-        warn!("Session checker error: {:?}", e);
-        ProfileError::ServerError
-      })?;
+  let time_at_request_start = Instant::now();
+
+  let maybe_user_session = time_section(|| async {
+    server_state
+        .session_checker
+        .maybe_get_user_session(&http_request, &server_state.mysql_pool)
+        .await
+        .map_err(|e| {
+          warn!("Session checker error: {:?}", e);
+          ProfileError::ServerError
+        })
+    }
+  ).await?;
+
+  let time_after_session_check = Instant::now();
 
   let mut is_mod = false;
 
   if let Some(user_session) = &maybe_user_session {
     is_mod = user_session.can_ban_users;
   }
+
+  let time_before_profile_query = Instant::now();
 
   // NB: Lookup failure is Err(RowNotFound).
   // NB: Since this is publicly exposed, we don't query sensitive data.
@@ -184,6 +200,8 @@ WHERE
     .fetch_one(&server_state.mysql_pool)
     .await; // TODO: This will return error if it doesn't exist
 
+  let time_after_profile_query = Instant::now();
+
   let profile_record : RawUserProfileRecord = match maybe_profile_record {
     Ok(profile_record) => profile_record,
     Err(err) => {
@@ -207,12 +225,16 @@ WHERE
     return Err(ProfileError::NotFound);
   }
 
+  let time_before_badges_list = Instant::now();
+
   let badges = list_user_badges(&server_state.mysql_pool, &profile_record.user_token)
       .await
       .unwrap_or_else(|err| {
         warn!("Error querying badges: {:?}", err);
         return Vec::new(); // NB: Fine if this fails. Not sure why it would.
       });
+
+  let time_after_badges_list = Instant::now();
 
   let maybe_mod_fields = if is_mod {
     Some(UserProfileModeratorFields {
@@ -251,6 +273,8 @@ WHERE
     success: true,
     user: Some(profile_for_response),
   };
+
+  let time_at_request_end = Instant::now();
 
   let body = serde_json::to_string(&response)
     .map_err(|e| ProfileError::ServerError)?;
