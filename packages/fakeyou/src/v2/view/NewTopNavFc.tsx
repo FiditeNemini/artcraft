@@ -27,6 +27,7 @@ import { USE_REFRESH } from "../../Refresh";
 import { Logout } from "@storyteller/components/src/api/session/Logout";
 import { Gravatar } from "@storyteller/components/src/elements/Gravatar";
 import { GetPendingTtsJobCount, GetPendingTtsJobCountIsOk, GetPendingTtsJobCountSuccessResponse } from "@storyteller/components/src/api/tts/GetPendingTtsJobCount";
+import { container, item, panel, image, sessionItem } from "@storyteller/fakeyou/src/data/animation";
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -103,12 +104,44 @@ function NewTopNavFc(props: Props) {
     window.localStorage.setItem("lowSpec", (lowSpecView ? "true" : "false"))
 
     toggleLowSpecs(!lowSpecView)
+
+    if (lowSpecView == true) {
+      image.hidden.opacity = 1
+      image.hidden.x = 0
+      panel.hidden.y = 0
+      item.hidden.y = 0
+      sessionItem.hidden.x = 0
+      panel.hidden.opacity = 1
+      item.hidden.opacity = 1
+      container.hidden.opacity = 1
+      sessionItem.hidden.opacity = 1
+    }
+    else {
+      image.hidden.opacity = 0
+      image.hidden.x = 100
+      panel.hidden.y = 50
+      item.hidden.y = 50
+      sessionItem.hidden.x = 50
+      panel.hidden.opacity = 0
+      item.hidden.opacity = 0
+      container.hidden.opacity = 0
+      sessionItem.hidden.opacity = 0
+    }
+  }
+
+  const LowSpec = () => {
+
+
   }
 
   useEffect(() => {
     // Logic for dark mode toggle
     if (darkModes) document.getElementById('main')!.classList.add('dark-mode')
     else document.getElementById('main')!.classList.remove('dark-mode')
+
+    // Logic for the animation toggle
+    if (lowSpecView) document.getElementById('main')!.classList.add('low-spec')
+    else document.getElementById('main')!.classList.remove('low-spec')
   })
 
   if (!USE_REFRESH) {

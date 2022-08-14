@@ -31,8 +31,6 @@ import { FAKEYOU_MERGED_TRANSLATIONS } from "./_i18n/FakeYouTranslations";
 import i18n from "i18next";
 import { initReactI18next } from "react-i18next";
 import { USE_REFRESH } from "./Refresh";
-import { DragControls } from "framer-motion";
-import { container, item, panel, image, sessionItem } from "../src/data/animation";
 
 i18n
   .use(initReactI18next) // passes i18n down to react-i18next
@@ -113,9 +111,6 @@ interface State {
 
   // Current text entered
   textBuffer: string;
-
-
-  LowSpec: boolean;
 }
 
 function newVocodes() {
@@ -171,9 +166,6 @@ class App extends React.Component<Props, State> {
 
       textBuffer: "",
 
-
-      LowSpec: true
-
     };
   }
 
@@ -187,18 +179,9 @@ class App extends React.Component<Props, State> {
       window.localStorage.setItem('darkMode', 'false')
     }
 
-    if (!window.localStorage.getItem('LowSpec')) {
+    if (!window.localStorage.getItem('lowSpec')) {
       // if not, set one to false to ensure we are defualting to dark mode.
-      window.localStorage.setItem('LowSpec', 'false')
-    } else {
-      // otherwise, make sure our state matches the users preference
-      const currentView = window.localStorage.getItem('LowSpec') === 'true' ? true : false
-
-      this.setState({
-        // darkMode: currentView
-        LowSpec: true
-      })
-
+      window.localStorage.setItem('lowSpec', 'false')
     }
 
 
@@ -619,53 +602,8 @@ class App extends React.Component<Props, State> {
 
     mainClassNames = USE_REFRESH ? "bg-gradient " : "";
 
-    mainClassNames = mainClassNames + mainClassNames + (this.state.LowSpec ? '' : 'low-spec')
-    // const DarkModeOff = () => {
-
-    //const currentValue = this.state.darkMode // true or false
-
-    // window.localStorage.setItem("darkMode", (currentValue ? "true" : "false"))
-
-    // this.setState({ darkMode: !currentValue })
-
-
-    // }
-    const LowSpec = () => {
-      const currentValue2 = this.state.LowSpec // true or false
-
-      window.localStorage.setItem("LowSpec", (currentValue2 ? "true" : "false"))
-
-      this.setState({ LowSpec: !currentValue2 })
-      if (currentValue2 == true) {
-        image.hidden.opacity = 1
-        image.hidden.x = 0
-        panel.hidden.y = 0
-        item.hidden.y = 0
-        sessionItem.hidden.x = 0
-        panel.hidden.opacity = 1
-        item.hidden.opacity = 1
-        container.hidden.opacity = 1
-        sessionItem.hidden.opacity = 1
-      }
-      else {
-        image.hidden.opacity = 0
-        image.hidden.x = 100
-        panel.hidden.y = 50
-        item.hidden.y = 50
-        sessionItem.hidden.x = 50
-        panel.hidden.opacity = 0
-        item.hidden.opacity = 0
-        container.hidden.opacity = 0
-        sessionItem.hidden.opacity = 0
-      }
-
-    }
     return (
       <BrowserRouter>
-        {/* <div className="form-check form-switch">
-  <input className="form-check-input" type="checkbox" id="LowSpec" onClick={LowSpec} ></input>
-  <label className="form-check-label">Low Spec</label>
-</div> */}
         <div id="main" className={mainClassNames}>
           <div className="dark-mode"></div>
 
