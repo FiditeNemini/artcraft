@@ -17,10 +17,6 @@ import {
   faUpload,
   faUser,
   faSignOutAlt,
-  faMoon,
-  faSun,
-  faSunPlantWilt
-
 } from "@fortawesome/free-solid-svg-icons";
 import { faPatreon } from "@fortawesome/free-brands-svg-icons";
 import { t } from "i18next";
@@ -28,6 +24,7 @@ import { USE_REFRESH } from "../../Refresh";
 import { Logout } from "@storyteller/components/src/api/session/Logout";
 import { Gravatar } from "@storyteller/components/src/elements/Gravatar";
 import { GetPendingTtsJobCount, GetPendingTtsJobCountIsOk, GetPendingTtsJobCountSuccessResponse } from "@storyteller/components/src/api/tts/GetPendingTtsJobCount";
+import { container, item, panel, image, sessionItem } from "../src/data/animation";
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -36,10 +33,6 @@ interface Props {
 }
 
 function NewTopNavFc(props: Props) {
-  const defaultColourView = window.localStorage.getItem('darkMode')
-
-  const [darkModes, toggleDarkModes] = useState(defaultColourView === 'true' ? true : false)
-
   let history = useHistory();
 
   let myDataLink = "/signup";
@@ -91,18 +84,6 @@ function NewTopNavFc(props: Props) {
   const navbarBurgerClasses = mobileHamburgerIsActive
     ? "navbar-burger is-active"
     : "navbar-burger";
-
-  const toggleDarkMode = () => {
-    window.localStorage.setItem("darkMode", (darkModes ? "true" : "false"))
-
-    toggleDarkModes(!darkModes)
-  }
-
-  useEffect(() => {
-    // Logic for dark mode toggle
-    if (darkModes) document.getElementById('main')!.classList.add('dark-mode')
-    else document.getElementById('main')!.classList.remove('dark-mode')
-  })
 
   if (!USE_REFRESH) {
     return (
@@ -279,7 +260,36 @@ function NewTopNavFc(props: Props) {
       </>
     );
   }
+  const LowSpec = () => {
+    const currentValue2 = this.state.LowSpec // true or false
 
+    window.localStorage.setItem("LowSpec", (currentValue2 ? "true" : "false"))
+
+    this.setState({ LowSpec: !currentValue2 })
+    if (currentValue2 == true) {
+      image.hidden.opacity = 1
+      image.hidden.x = 0
+      panel.hidden.y = 0
+      item.hidden.y = 0
+      sessionItem.hidden.x = 0
+      panel.hidden.opacity = 1
+      item.hidden.opacity = 1
+      container.hidden.opacity = 1
+      sessionItem.hidden.opacity = 1
+    }
+    else {
+      image.hidden.opacity = 0
+      image.hidden.x = 100
+      panel.hidden.y = 50
+      item.hidden.y = 50
+      sessionItem.hidden.x = 50
+      panel.hidden.opacity = 0
+      item.hidden.opacity = 0
+      container.hidden.opacity = 0
+      sessionItem.hidden.opacity = 0
+    }
+
+  }
   const logoutHandler = async () => {
     await Logout();
     props.querySessionCallback();
@@ -350,26 +360,15 @@ function NewTopNavFc(props: Props) {
   return (
     <div>
       <div className="top-bar d-none d-lg-flex">
-        <div className="form-check form-switch">
-          {/* <input className="form-check-input" type="checkbox" id="DarkModeToggle" onClick={() => toggleDarkMode()} />
-          <label className="form-check-label">
-            Dark Mode
-          </label> */}
-          <button
-            className={`btn text-light ${darkModes ? 'btn-primary' : 'btn-primary-outline'}`}
-            onClick={() => toggleDarkMode()}
-          >
-            <FontAwesomeIcon
-              icon={darkModes ? faMoon : faSun}
-            />
-
-          </button>
-        </div>
-        <div> ‏‏‎ ‎ </div>
-        <div className="form-check form-switch">
-          <input className="form-check-input" type="checkbox" id="LowSpec" ></input>
-          <label className="form-check-label">Low Spec</label>
-        </div>
+      <div className="form-check form-switch">
+  <input className="form-check-input" type="checkbox" id="DarkModeToggle" ></input>
+  <label className="form-check-label">Dark Mode</label>
+</div>
+<div> ‏‏‎ ‎ </div>
+<div className="form-check form-switch">
+  <input className="form-check-input" type="checkbox" id="LowSpec" ></input>
+  <label className="form-check-label">Low Spec</label>
+</div>
         <div className="container d-flex">
           <div className="d-flex gap-4 flex-grow-1">
             <Link className="top-bar-text" to="/about">
@@ -392,13 +391,13 @@ function NewTopNavFc(props: Props) {
             <p className="top-bar-text">
               TTS Queued: <span className="fw-bold text-red">{pendingTtsJobs.pending_job_count}</span>
             </p>
-
+            
           </div>
-
+          
         </div>
-
+        
       </div>
-
+  
       <nav
         className="navbar navbar-expand-lg navbar-dark py-3"
         aria-label="Offcanvas navbar large"
@@ -601,7 +600,7 @@ function NewTopNavFc(props: Props) {
           </div>
         </div>
       </nav>
-    </div >
+    </div>
   );
 }
 
