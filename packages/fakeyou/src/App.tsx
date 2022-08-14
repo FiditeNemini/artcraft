@@ -1,4 +1,4 @@
-import React, { useEffect} from "react";
+import React, { useEffect } from "react";
 import { ApiConfig } from "@storyteller/components";
 import {
   DetectLocale,
@@ -114,7 +114,7 @@ interface State {
   // Current text entered
   textBuffer: string;
 
-  darkMode: boolean;
+
   LowSpec: boolean;
 }
 
@@ -171,9 +171,9 @@ class App extends React.Component<Props, State> {
 
       textBuffer: "",
 
-      darkMode: true,
-      LowSpec : true
-      
+
+      LowSpec: true
+
     };
   }
 
@@ -185,16 +185,8 @@ class App extends React.Component<Props, State> {
     if (!window.localStorage.getItem('darkMode')) {
       // if not, set one to false to ensure we are defualting to dark mode.
       window.localStorage.setItem('darkMode', 'false')
-    } else {
-      // otherwise, make sure our state matches the users preference
-      const currentView = window.localStorage.getItem('darkMode') === 'true' ? true : false
-
-      this.setState({
-        // darkMode: currentView
-        darkMode: true
-      })
-      
     }
+
     if (!window.localStorage.getItem('LowSpec')) {
       // if not, set one to false to ensure we are defualting to dark mode.
       window.localStorage.setItem('LowSpec', 'false')
@@ -206,7 +198,7 @@ class App extends React.Component<Props, State> {
         // darkMode: currentView
         LowSpec: true
       })
-      
+
     }
 
 
@@ -622,53 +614,53 @@ class App extends React.Component<Props, State> {
 
 
   public render() {
-    
+
     // Redesign features
     let mainClassNames;
 
     mainClassNames = USE_REFRESH ? "bg-gradient " : "";
-    mainClassNames = mainClassNames + (this.state.darkMode ? '' : 'dark-mode')
+
     mainClassNames = mainClassNames + mainClassNames + (this.state.LowSpec ? '' : 'low-spec')
-    const DarkModeOff = () =>{
-      
-      const currentValue = this.state.darkMode // true or false
+    // const DarkModeOff = () => {
 
-       window.localStorage.setItem("darkMode", (currentValue ? "true" : "false"))
-       
-       this.setState({darkMode: !currentValue})
-       
+    //const currentValue = this.state.darkMode // true or false
 
-    }
-     const LowSpec = () =>{
+    // window.localStorage.setItem("darkMode", (currentValue ? "true" : "false"))
+
+    // this.setState({ darkMode: !currentValue })
+
+
+    // }
+    const LowSpec = () => {
       const currentValue2 = this.state.LowSpec // true or false
 
-       window.localStorage.setItem("LowSpec", (currentValue2 ? "true" : "false"))
-       
-       this.setState({LowSpec: !currentValue2})
-       if (currentValue2 == true){
-      image.hidden.opacity = 1
-      image.hidden.x = 0
-      panel.hidden.y = 0
-      item.hidden.y = 0
-      sessionItem.hidden.x = 0
-      panel.hidden.opacity = 1
-      item.hidden.opacity = 1
-      container.hidden.opacity = 1
-      sessionItem.hidden.opacity = 1
-    }
-    else{
-      image.hidden.opacity = 0
-      image.hidden.x = 100
-      panel.hidden.y = 50
-      item.hidden.y = 50
-      sessionItem.hidden.x = 50
-      panel.hidden.opacity = 0
-      item.hidden.opacity = 0
-      container.hidden.opacity = 0
-      sessionItem.hidden.opacity = 0
-    }
+      window.localStorage.setItem("LowSpec", (currentValue2 ? "true" : "false"))
 
-  }
+      this.setState({ LowSpec: !currentValue2 })
+      if (currentValue2 == true) {
+        image.hidden.opacity = 1
+        image.hidden.x = 0
+        panel.hidden.y = 0
+        item.hidden.y = 0
+        sessionItem.hidden.x = 0
+        panel.hidden.opacity = 1
+        item.hidden.opacity = 1
+        container.hidden.opacity = 1
+        sessionItem.hidden.opacity = 1
+      }
+      else {
+        image.hidden.opacity = 0
+        image.hidden.x = 100
+        panel.hidden.y = 50
+        item.hidden.y = 50
+        sessionItem.hidden.x = 50
+        panel.hidden.opacity = 0
+        item.hidden.opacity = 0
+        container.hidden.opacity = 0
+        sessionItem.hidden.opacity = 0
+      }
+
+    }
     return (
       <BrowserRouter>
 
@@ -681,10 +673,10 @@ class App extends React.Component<Props, State> {
             <div className="particle particle-3"></div>
             <div className="particle particle-4"></div>
           </div>
-          
+
 
           <div id="viewable">
-            
+
             {/* This is the old vocodes1.0-compatible username and version switch
             <MigrationTopNav
               enableAlpha={this.state.enableAlpha}
@@ -694,12 +686,12 @@ class App extends React.Component<Props, State> {
             */}
 
             <div className="migrationComponentWrapper dark-mode">
-              
+
               <Switch>
                 <Route path="/">
-        
+
                   <NewVocodesContainer
-                  
+
                     sessionWrapper={this.state.sessionWrapper}
                     querySessionAction={this.querySession}
                     isShowingVocodesNotice={this.state.isShowingVocodesNotice}
@@ -752,16 +744,15 @@ class App extends React.Component<Props, State> {
                     setMaybeSelectedTtsModel={
                       this.props.setMaybeSelectedTtsModel
                     }
-                    dark-mode={this.state.darkMode}
-                    
+
                   />
                 </Route>
               </Switch>
-            </div> 
+            </div>
           </div>
         </div>
-        
-        
+
+
       </BrowserRouter>
     );
   }
