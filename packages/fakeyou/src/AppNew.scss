@@ -104,13 +104,6 @@ $headings-font-family: "Merriweather", serif;
     }
 
     &.dark-mode {
-      background-color: white !important;
-      background: linear-gradient(325deg,
-          rgba(255, 255, 255, 1) 0%,
-          rgba(255, 255, 255, 1) 55%,
-          rgba(255, 255, 255, 1) 100%) !important;
-      background-repeat: no-repeat;
-      background-attachment: fixed;
 
       .panel {
         background-color: #261924 !important;

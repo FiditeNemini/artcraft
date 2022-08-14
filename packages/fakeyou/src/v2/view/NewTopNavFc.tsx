@@ -19,7 +19,8 @@ import {
   faSignOutAlt,
   faMoon,
   faSun,
-  faCircle
+  faComputer,
+  faLaptop
 } from "@fortawesome/free-solid-svg-icons";
 import { faPatreon } from "@fortawesome/free-brands-svg-icons";
 import { t } from "i18next";
@@ -105,7 +106,7 @@ function NewTopNavFc(props: Props) {
 
     toggleLowSpecs(!lowSpecView)
 
-    if (lowSpecView == true) {
+    if (lowSpecView == false) {
       image.hidden.opacity = 1
       image.hidden.x = 0
       panel.hidden.y = 0
@@ -391,18 +392,17 @@ function NewTopNavFc(props: Props) {
           onClick={() => toggleDarkMode()}
         >
           <FontAwesomeIcon
-            icon={darkModes ? faMoon : faSun}
+            icon={darkModes ? faSun : faMoon}
           />
 
         </button>
-        <div> ‏‏‎ ‎ </div>
         <button
           className={`btn  ${darkModes ? '' : 'text-light'}`}
           title={`${lowSpecView ? 'Turn on animations' : 'Turn off animations'}`}
           onClick={() => toggleLowSpec()}
         >
           <FontAwesomeIcon
-            icon={faCircle}
+            icon={lowSpecView ? faLaptop : faComputer}
             className={`${lowSpecView ? '' : 'fa-beat-fade'}`}
           />
         </button>
