@@ -38,7 +38,7 @@ $headings-font-family: "Merriweather", serif;
       h4,
       h5,
       h6 {
-        color: #fff  ;
+        color: #fff;
       }
     }
   }
@@ -52,7 +52,8 @@ $headings-font-family: "Merriweather", serif;
         rgba(16, 14, 26, 1) 100%) !important;
     background-repeat: no-repeat;
     background-attachment: fixed;
-    &.low-spec{
+
+    &.low-spec {
 
       .particle-1 {
         animation: animParticle $time-1 linear infinite;
@@ -60,62 +61,70 @@ $headings-font-family: "Merriweather", serif;
         height: 7px;
         width: 7px;
       }
-      
+
       .particle-1:after {
         @include particles(0);
         height: 8px;
         width: 8px;
       }
-      
+
       .particle-2 {
         animation: animParticle $time-2 linear infinite;
         @include particles(0);
         height: 5px;
         width: 5px;
       }
-      
+
       .particle-2:after {
         @include particles(0);
         height: 5px;
         width: 5px;
       }
-      
+
       // .particle-3:after {
       //   @include particles(800);
       //   height: 10px;
       //   width: 10px;
       //   border-radius: 50%;
       // }
-      
+
       .particle-4 {
         animation: animParticle $time-4 linear infinite;
         @include particles(0);
         height: 1px;
         width: 1px;
       }
-      
+
       .particle-4:after {
         @include particles(0);
         height: 1px;
         width: 1px;
       }
-    
-    }
-    &.dark-mode {
 
-      .panel{
-       background-color: #261924 !important;
+    }
+
+    &.dark-mode {
+      background-color: white !important;
+      background: linear-gradient(325deg,
+          rgba(255, 255, 255, 1) 0%,
+          rgba(255, 255, 255, 1) 55%,
+          rgba(255, 255, 255, 1) 100%) !important;
+      background-repeat: no-repeat;
+      background-attachment: fixed;
+
+      .panel {
+        background-color: #261924 !important;
 
       }
-     select
-    {
-      border-color: #372C34 !important;
-      background-color: #372C34 !important;
 
-    }
-      
-      .btn-destructive{
-        
+      select {
+        border-color: #372C34 !important;
+        background-color: #372C34 !important;
+
+      }
+
+      .btn-destructive {
+
         background-color: #FFCFCE !important;
 
       }
@@ -123,54 +132,65 @@ $headings-font-family: "Merriweather", serif;
       .video-card-title,
       .video-card-text {
 
-      color: #ffffff !important;
+        color: #ffffff !important;
 
       }
-      textarea{
 
-      background-color: #372C34 !important;
-      border-color: #372C34 !important;
-      
+      textarea {
+
+        background-color: #372C34 !important;
+        border-color: #372C34 !important;
+
 
       }
+
       .form-select {
-        color:#fff;
-        }
-        ::placeholder{
+        color: #fff;
+      }
 
-          color: #fff !important;
-        }
-        .input-icon .form-control-feedback{
+      ::placeholder {
 
-          color: #fff !important
-        }
-        input{
-          background-color: #372C34 !important;
-          border-color: #372C34 !important;
-        }
-      menu.item{
+        color: #fff !important;
+      }
+
+      .input-icon .form-control-feedback {
+
+        color: #fff !important
+      }
+
+      input {
+        background-color: #372C34 !important;
+        border-color: #372C34 !important;
+      }
+
+      menu.item {
 
         background: #372C34;
       }
-      .btn-secondary{
+
+      .btn-secondary {
         color: #fff;
         border-color: #46343F;
         background-color: #46343F;
       }
-      .btn-destructive{
+
+      .btn-destructive {
         background-color: #FC6B68;
         border-color: #FFCFCE;
       }
-      .dropdown-menu{
+
+      .dropdown-menu {
         background-color: #261924;
       }
-      .dropdown-item{
+
+      .dropdown-item {
         color: #fff;
       }
-      a.btn.btn-secondary{
+
+      a.btn.btn-secondary {
         color: #fff;
       }
-       
+
 
 
 
