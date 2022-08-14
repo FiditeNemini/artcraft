@@ -234,7 +234,6 @@ class App extends React.Component<Props, State> {
 
     let DOM = document.getElementsByClassName('fakeyou-refresh')[0].className
 
-    console.log()
   }
 
   querySession = async () => {
