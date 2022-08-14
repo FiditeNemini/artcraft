@@ -17,6 +17,10 @@ import {
   faUpload,
   faUser,
   faSignOutAlt,
+  faMoon,
+  faSun,
+  faSunPlantWilt
+
 } from "@fortawesome/free-solid-svg-icons";
 import { faPatreon } from "@fortawesome/free-brands-svg-icons";
 import { t } from "i18next";
@@ -347,10 +351,19 @@ function NewTopNavFc(props: Props) {
     <div>
       <div className="top-bar d-none d-lg-flex">
         <div className="form-check form-switch">
-          <input className="form-check-input" type="checkbox" id="DarkModeToggle" onClick={() => toggleDarkMode()} />
+          {/* <input className="form-check-input" type="checkbox" id="DarkModeToggle" onClick={() => toggleDarkMode()} />
           <label className="form-check-label">
             Dark Mode
-          </label>
+          </label> */}
+          <button
+            className={`btn text-light ${darkModes ? 'btn-primary' : 'btn-primary-outline'}`}
+            onClick={() => toggleDarkMode()}
+          >
+            <FontAwesomeIcon
+              icon={darkModes ? faMoon : faSun}
+            />
+
+          </button>
         </div>
         <div> ‏‏‎ ‎ </div>
         <div className="form-check form-switch">
@@ -588,7 +601,7 @@ function NewTopNavFc(props: Props) {
           </div>
         </div>
       </nav>
-    </div>
+    </div >
   );
 }
 
