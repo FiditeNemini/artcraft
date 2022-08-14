@@ -129,11 +129,6 @@ function NewTopNavFc(props: Props) {
     }
   }
 
-  const LowSpec = () => {
-
-
-  }
-
   useEffect(() => {
     // Logic for dark mode toggle
     if (darkModes) document.getElementById('main')!.classList.add('dark-mode')
@@ -319,7 +314,36 @@ function NewTopNavFc(props: Props) {
       </>
     );
   }
+  const LowSpec = () => {
+    const currentValue2 = this.state.LowSpec // true or false
 
+    window.localStorage.setItem("LowSpec", (currentValue2 ? "true" : "false"))
+
+    this.setState({ LowSpec: !currentValue2 })
+    if (currentValue2 == true) {
+      image.hidden.opacity = 1
+      image.hidden.x = 0
+      panel.hidden.y = 0
+      item.hidden.y = 0
+      sessionItem.hidden.x = 0
+      panel.hidden.opacity = 1
+      item.hidden.opacity = 1
+      container.hidden.opacity = 1
+      sessionItem.hidden.opacity = 1
+    }
+    else {
+      image.hidden.opacity = 0
+      image.hidden.x = 100
+      panel.hidden.y = 50
+      item.hidden.y = 50
+      sessionItem.hidden.x = 50
+      panel.hidden.opacity = 0
+      item.hidden.opacity = 0
+      container.hidden.opacity = 0
+      sessionItem.hidden.opacity = 0
+    }
+
+  }
   const logoutHandler = async () => {
     await Logout();
     props.querySessionCallback();
@@ -643,7 +667,7 @@ function NewTopNavFc(props: Props) {
           </div>
         </div>
       </nav>
-    </div >
+    </div>
   );
 }
 
