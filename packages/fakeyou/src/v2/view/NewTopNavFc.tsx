@@ -19,8 +19,7 @@ import {
   faSignOutAlt,
   faMoon,
   faSun,
-  faSunPlantWilt
-
+  faCircle
 } from "@fortawesome/free-solid-svg-icons";
 import { faPatreon } from "@fortawesome/free-brands-svg-icons";
 import { t } from "i18next";
@@ -37,8 +36,10 @@ interface Props {
 
 function NewTopNavFc(props: Props) {
   const defaultColourView = window.localStorage.getItem('darkMode')
+  const defaultLowSpecView = window.localStorage.getItem('lowSpec')
 
   const [darkModes, toggleDarkModes] = useState(defaultColourView === 'true' ? true : false)
+  const [lowSpecView, toggleLowSpecs] = useState(defaultLowSpecView === 'true' ? true : false)
 
   let history = useHistory();
 
@@ -96,6 +97,12 @@ function NewTopNavFc(props: Props) {
     window.localStorage.setItem("darkMode", (darkModes ? "true" : "false"))
 
     toggleDarkModes(!darkModes)
+  }
+
+  const toggleLowSpec = () => {
+    window.localStorage.setItem("lowSpec", (lowSpecView ? "true" : "false"))
+
+    toggleLowSpecs(!lowSpecView)
   }
 
   useEffect(() => {
@@ -350,26 +357,28 @@ function NewTopNavFc(props: Props) {
   return (
     <div>
       <div className="top-bar d-none d-lg-flex">
-        <div className="form-check form-switch">
-          {/* <input className="form-check-input" type="checkbox" id="DarkModeToggle" onClick={() => toggleDarkMode()} />
-          <label className="form-check-label">
-            Dark Mode
-          </label> */}
-          <button
-            className={`btn text-light ${darkModes ? 'btn-primary' : 'btn-primary-outline'}`}
-            onClick={() => toggleDarkMode()}
-          >
-            <FontAwesomeIcon
-              icon={darkModes ? faMoon : faSun}
-            />
+        <button
+          className={`btn ${darkModes ? '' : 'text-light'}`}
+          title={`${darkModes ? 'Turn on Dark mode' : 'Turn on Light Mode'}`}
+          onClick={() => toggleDarkMode()}
+        >
+          <FontAwesomeIcon
+            icon={darkModes ? faMoon : faSun}
+          />
 
-          </button>
-        </div>
+        </button>
         <div> ‏‏‎ ‎ </div>
-        <div className="form-check form-switch">
-          <input className="form-check-input" type="checkbox" id="LowSpec" ></input>
-          <label className="form-check-label">Low Spec</label>
-        </div>
+        <button
+          className={`btn  ${darkModes ? '' : 'text-light'}`}
+          title={`${lowSpecView ? 'Turn on animations' : 'Turn off animations'}`}
+          onClick={() => toggleLowSpec()}
+        >
+          <FontAwesomeIcon
+            icon={faCircle}
+            className={`${lowSpecView ? '' : 'fa-beat-fade'}`}
+          />
+        </button>
+
         <div className="container d-flex">
           <div className="d-flex gap-4 flex-grow-1">
             <Link className="top-bar-text" to="/about">

@@ -662,7 +662,10 @@ class App extends React.Component<Props, State> {
     }
     return (
       <BrowserRouter>
-
+        {/* <div className="form-check form-switch">
+  <input className="form-check-input" type="checkbox" id="LowSpec" onClick={LowSpec} ></input>
+  <label className="form-check-label">Low Spec</label>
+</div> */}
         <div id="main" className={mainClassNames}>
           <div className="dark-mode"></div>
 
