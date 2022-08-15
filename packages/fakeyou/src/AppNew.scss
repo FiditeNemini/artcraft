@@ -195,6 +195,21 @@ $headings-font-family: "Merriweather", serif;
         }
       }
 
+      .menu-item {
+        color: $white;
+        background-color: $input-dark;
+        border-bottom: 1px solid;
+        border-color: rgba($white, 0.05);
+
+        &:hover {
+          background-color: lighten($input-dark, 10%);
+        }
+
+        &:last-child {
+          border-bottom: none;
+        }
+      }
+
       .form-control::placeholder {
         /* Chrome, Firefox, Opera, Safari 10.1+ */
         color: rgba($white, 0.5) !important;
