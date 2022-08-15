@@ -77,7 +77,6 @@ function PatronPage(props: Props) {
   }
 
   return (
-    
     <motion.div initial="hidden" animate="visible" variants={container}>
       <div className="container py-5 pt-lg-0">
         <div className="row">
@@ -93,7 +92,7 @@ function PatronPage(props: Props) {
               expensive server bills.
             </motion.p>
 
-            <motion.div variants={item}>
+            <motion.div className="d-flex" variants={item}>
               <a
                 href="https://www.patreon.com/fakeyou"
                 target="_blank"
@@ -104,7 +103,8 @@ function PatronPage(props: Props) {
                 Support us on Patreon
               </a>
             </motion.div>
-          </div>          <div className="col-12 col-lg-5 d-flex flex-column align-items-center">
+          </div>
+          <div className="col-12 col-lg-5 d-flex flex-column align-items-center">
             <motion.img
               className="img-fluid mt-5 mw-50"
               src="/mascot/kitsune_pose7.webp"
