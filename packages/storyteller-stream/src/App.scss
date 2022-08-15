@@ -88,6 +88,10 @@ p {
   color: rgba(255, 255, 255, 0.8);
 }
 
+.fw-semibold {
+  font-weight: 500;
+}
+
 .pre-heading {
   font-size: 18px;
   color: #fc6b68;
@@ -291,7 +295,7 @@ span.word:after {
 .btn-secondary:focus,
 .btn-secondary:active {
   background-color: #fff;
-  color: #443a40;
+  color: #212529;
   border: 2.5px solid;
   border-color: #fff;
   transition: 0.2s;
@@ -299,7 +303,7 @@ span.word:after {
 
 .btn-secondary:hover {
   background-color: #ccc;
-  color: #443a40;
+  color: #212529;
   border: 2.5px solid;
   border-color: #ccc;
 }
@@ -418,7 +422,7 @@ span.word:after {
   opacity: 15%;
   width: 115%;
   min-height: 150px;
-  // background-image: url("assets/hero-audio-wave.png");
+  background-image: url("../public/assets/hero-audio-wave.png");
   background-repeat: repeat-x;
   animation: animatedBackground 20s linear infinite;
   mix-blend-mode: screen;
@@ -511,6 +515,13 @@ span.word:after {
 .insights-bg,
 .community-bg {
   background-size: cover;
+}
+
+.voices-section {
+  width: 100%;
+  text-align: center;
+  margin-top: 50px;
+  margin-bottom: -60px;
 }
 
 .insights-section {
@@ -757,6 +768,18 @@ span.word:after {
 
 .modal-close-btn:hover {
   color: rgba(255, 255, 255, 0.4);
+}
+
+.voice-preview-text {
+  font-size: 14px;
+}
+
+.btn-voice-preview {
+  padding: 0;
+  margin: 0;
+  height: 30px;
+  width: 30px;
+  min-width: 30px;
 }
 
 @media (min-width: 992px) {
