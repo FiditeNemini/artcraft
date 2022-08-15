@@ -43,6 +43,10 @@ styles with important tags:
     cursor: pointer;
   }
 
+  .no-wrap {
+    white-space: nowrap;
+  }
+
   button:focus,
   button:active,
   button:hover,
@@ -68,6 +72,10 @@ styles with important tags:
   td {
     color: rgba($white, 0.8);
     font-weight: 400;
+  }
+
+  .table-mw {
+    min-width: 200px;
   }
 
   .rounded {

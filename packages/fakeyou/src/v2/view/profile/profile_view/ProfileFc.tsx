@@ -35,7 +35,6 @@ import {
 } from "../../../api/user/GetUserByUsername";
 import { format } from "date-fns";
 import { FrontendUrlConfig } from "../../../../common/FrontendUrlConfig";
-import { USE_REFRESH } from "../../../../Refresh";
 import { container, item, panel } from "../../../../data/animation";
 import Tippy from "@tippyjs/react";
 import "tippy.js/dist/tippy.css";
@@ -94,7 +93,29 @@ function ProfileFc(props: Props) {
 
   let userEmailHash = userData.email_gravatar_hash;
 
-  let editProfileButton = <span />;
+  let editProfileButton = undefined;
+
+  let banUserButton = undefined;
+
+  if (props.sessionWrapper.canBanUsers()) {
+    const currentlyBanned = userData.maybe_moderator_fields?.is_banned;
+    const banLinkUrl = FrontendUrlConfig.userProfileBanPage(userData.username);
+    const buttonLabel = currentlyBanned ? "Unban User" : "Ban User";
+    const banButtonCss = currentlyBanned
+      ? "btn btn-secondary"
+      : "btn btn-destructive";
+
+    banUserButton = (
+      <>
+        <Link className={banButtonCss} to={banLinkUrl}>
+          <FontAwesomeIcon icon={faBan} className="me-2" />
+          {buttonLabel}
+        </Link>
+      </>
+    );
+  }
+
+  let profileButtonsMobile = <span />;
 
   if (props.sessionWrapper.canEditUserProfile(userData.username)) {
     const editLinkUrl = FrontendUrlConfig.userProfileEditPage(
@@ -116,25 +137,28 @@ function ProfileFc(props: Props) {
         </Link>
       </>
     );
+
+    profileButtonsMobile = (
+      <div className="container d-flex d-lg-none mb-4">
+        <div className="d-flex w-100 gap-3 justify-content-center flex-column flex-md-row">
+          {editProfileButton}
+          {banUserButton}
+        </div>
+      </div>
+    );
   }
 
-  let banUserButton = <span />;
+  let profileDesc = undefined;
 
-  if (props.sessionWrapper.canBanUsers()) {
-    const currentlyBanned = userData.maybe_moderator_fields?.is_banned;
-    const banLinkUrl = FrontendUrlConfig.userProfileBanPage(userData.username);
-    const buttonLabel = currentlyBanned ? "Unban User" : "Ban User";
-    const banButtonCss = currentlyBanned
-      ? "btn btn-secondary"
-      : "btn btn-destructive";
-
-    banUserButton = (
-      <>
-        <Link className={banButtonCss} to={banLinkUrl}>
-          <FontAwesomeIcon icon={faBan} className="me-2" />
-          {buttonLabel}
-        </Link>
-      </>
+  if (!!userData.profile_rendered_html) {
+    profileDesc = (
+      <motion.div
+        className="container content mb-5 mb-lg-5 text-center text-lg-start px-4 px-md-5 px-lg-5 px-xl-3"
+        variants={item}
+        dangerouslySetInnerHTML={{
+          __html: userData.profile_rendered_html || "",
+        }}
+      />
     );
   }
 
@@ -260,50 +284,6 @@ function ProfileFc(props: Props) {
     badges = <ul>{badgeList}</ul>;
   }
 
-  if (!USE_REFRESH) {
-    return (
-      <div className="content">
-        <h1 className="title is-1">
-          <Gravatar
-            size={45}
-            username={userData.display_name}
-            email_hash={userEmailHash}
-          />
-          {userData.display_name}
-        </h1>
-
-        {editProfileButton}
-        {banUserButton}
-
-        <div
-          className="profile content is-medium"
-          dangerouslySetInnerHTML={{
-            __html: userData.profile_rendered_html || "",
-          }}
-        />
-
-        <table className="table">
-          <tbody>{profileRows}</tbody>
-        </table>
-
-        <h3 className="title is-3"> Badges (images coming soon) </h3>
-        {badges}
-
-        <h3 className="title is-3"> TTS Results </h3>
-        <ProfileTtsInferenceResultsListFc username={userData.username} />
-
-        <h3 className="title is-3"> Lipsync Results </h3>
-        <ProfileW2lInferenceResultsListFc username={userData.username} />
-
-        <h3 className="title is-3"> Uploaded TTS Models </h3>
-        <ProfileTtsModelListFc username={userData.username} />
-
-        <h3 className="title is-3"> Uploaded Templates </h3>
-        <ProfileW2lTemplateListFc username={userData.username} />
-      </div>
-    );
-  }
-
   return (
     <motion.div initial="hidden" animate="visible" variants={container}>
       <div className="container pt-5 pb-4 px-lg-5 px-xl-3">
@@ -339,19 +319,9 @@ function ProfileFc(props: Props) {
         </motion.div>
       </div>
 
-      <motion.div
-        className="container content mb-4 mb-lg-5 text-center text-lg-start px-4 px-md-5 px-lg-5 px-xl-3"
-        variants={item}
-        dangerouslySetInnerHTML={{
-          __html: userData.profile_rendered_html || "",
-        }}
-      />
-      <div className="container d-flex d-lg-none my-5">
-        <div className="d-flex w-100 gap-3 justify-content-center flex-column flex-md-row">
-          {editProfileButton}
-          {banUserButton}
-        </div>
-      </div>
+      {profileDesc}
+
+      {profileButtonsMobile}
 
       <motion.div className="container-panel py-5" variants={panel}>
         <div className="panel p-3 p-lg-4">

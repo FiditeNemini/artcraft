@@ -1,3 +1,5 @@
+import "./AppNew.scss";
+
 import React from "react";
 import { ApiConfig } from "@storyteller/components";
 import {
@@ -30,7 +32,8 @@ import { TtsCategoryType } from "./AppWrapper";
 import { FAKEYOU_MERGED_TRANSLATIONS } from "./_i18n/FakeYouTranslations";
 import i18n from "i18next";
 import { initReactI18next } from "react-i18next";
-import { USE_REFRESH } from "./Refresh";
+import { VocoderUploadJob } from "@storyteller/components/src/jobs/VocoderUploadJobs";
+import { GetRetrievalJobStatus, GetRetrievalJobStatusIsOk } from "@storyteller/components/src/api/retrieval/GetRetrievalJobStatus";
 
 i18n
   .use(initReactI18next) // passes i18n down to react-i18next
@@ -108,6 +111,7 @@ interface State {
   w2lInferenceJobs: Array<W2lInferenceJob>;
   ttsModelUploadJobs: Array<TtsModelUploadJob>;
   w2lTemplateUploadJobs: Array<W2lTemplateUploadJob>;
+  vocoderUploadJobs: Array<VocoderUploadJob>;
 
   // Current text entered
   textBuffer: string;
@@ -163,10 +167,12 @@ class App extends React.Component<Props, State> {
       w2lInferenceJobs: [],
       ttsModelUploadJobs: [],
       w2lTemplateUploadJobs: [],
+      vocoderUploadJobs: [],
 
       textBuffer: "",
     };
   }
+
 
   componentWillMount() {
     // Handle redesign
@@ -200,6 +206,7 @@ class App extends React.Component<Props, State> {
       require("./v2/view/_css/footer.scss");
     }
   }
+
 
   async componentDidMount() {
     await this.querySession();
@@ -555,6 +562,42 @@ class App extends React.Component<Props, State> {
       });
   };
 
+  enqueueVocoderUploadJob = (jobToken: string) => {
+    const newJob = new VocoderUploadJob(jobToken);
+    let uploadJobs = this.state.vocoderUploadJobs.concat([newJob]);
+
+    this.setState({
+      vocoderUploadJobs: uploadJobs,
+    });
+  };
+
+  checkVocoderUploadJob = async (jobToken: string) => {
+    const lookupResult = await GetRetrievalJobStatus(jobToken);
+
+    if (GetRetrievalJobStatusIsOk(lookupResult)) {
+      let updatedJobs: Array<VocoderUploadJob> = [];
+
+      this.state.vocoderUploadJobs.forEach((existingJob) => {
+        if (
+          existingJob.jobToken !== lookupResult.state!.job_token ||
+          !jobStateCanChange(existingJob.jobState)
+        ) {
+          updatedJobs.push(existingJob);
+          return;
+        }
+
+        let updatedJob = VocoderUploadJob.fromResponse(
+          lookupResult.state!
+        );
+        updatedJobs.push(updatedJob);
+      });
+
+      this.setState({
+        vocoderUploadJobs: updatedJobs,
+      });
+    }
+  };
+
   pollJobs = () => {
     this.state.ttsInferenceJobs.forEach((job) => {
       if (jobStateCanChange(job.jobState)) {
@@ -576,6 +619,11 @@ class App extends React.Component<Props, State> {
         this.checkW2lTemplateUploadJob(job.jobToken);
       }
     });
+    this.state.vocoderUploadJobs.forEach((job) => {
+      if (jobStateCanChange(job.jobState)) {
+        this.checkVocoderUploadJob(job.jobToken);
+      }
+    });
   };
 
   setMigrationMode = (mode: MigrationMode) => {
@@ -591,6 +639,7 @@ class App extends React.Component<Props, State> {
   };
 
   public render() {
+
     // Redesign features
     let mainClassNames;
 
@@ -605,6 +654,7 @@ class App extends React.Component<Props, State> {
             <div className="particle particle-3"></div>
             <div className="particle particle-4"></div>
           </div>
+
 
           <div id="viewable">
             {/* This is the old vocodes1.0-compatible username and version switch
@@ -651,6 +701,8 @@ class App extends React.Component<Props, State> {
                       this.enqueueW2lTemplateUploadJob
                     }
                     w2lTemplateUploadJobs={this.state.w2lTemplateUploadJobs}
+                    enqueueVocoderUploadJob={this.enqueueVocoderUploadJob}
+                    vocoderUploadJobs={this.state.vocoderUploadJobs}
                     textBuffer={this.state.textBuffer}
                     setTextBuffer={this.setTextBuffer}
                     clearTextBuffer={this.clearTextBuffer}

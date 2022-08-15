@@ -350,7 +350,7 @@ function TtsModelListPage(props: Props) {
           <div className="col-lg-6 px-md-2 px-lg-5 px-xl-2">
             <div>
               <motion.h1
-                className="display-3 fw-bold lh-1 mb-3 text-center text-lg-start"
+                className="display-2 fw-bold lh-1 mb-3 text-center text-lg-start no-wrap"
                 variants={item}
               >
                 {t("tts.TtsModelListPage.heroSection.title")}

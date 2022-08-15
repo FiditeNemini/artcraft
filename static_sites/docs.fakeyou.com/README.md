@@ -408,6 +408,10 @@ https://storage.googleapis.com/vocodes-public/tts_inference_output/9/c/d/vocodes
 * [shards-7 / fakeyou.py](https://github.com/shards-7/fakeyou.py) - 
   Python client library by thedemonicat#9335
 
+* [rmcpantoja / FakeYouTools](https://github.com/rmcpantoja/FakeYouTools) - 
+  AutoIt toolkit by TCF#0969
+  
+
 **FakeYou Training Notebooks**
 
 * [justinjohn0306 / FakeYou-Tacotron2-Notebook](https://github.com/justinjohn0306/FakeYou-Tacotron2-Notebook) - 

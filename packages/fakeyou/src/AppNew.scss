@@ -28,18 +28,6 @@ $headings-font-family: "Merriweather", serif;
     font-family: $body-font-family;
     font-weight: 300; // For Fira Sans
     color: $white;
-
-    &.dark-mode {
-      p,
-      h1,
-      h2,
-      h3,
-      h4,
-      h5,
-      h6 {
-        color: $white;
-      }
-    }
   }
 
   .bg-gradient {
@@ -350,6 +338,7 @@ $headings-font-family: "Merriweather", serif;
 
     .navbar-brand {
       padding-top: 0;
+      margin-bottom: 4px;
     }
 
     .dropdown-item {

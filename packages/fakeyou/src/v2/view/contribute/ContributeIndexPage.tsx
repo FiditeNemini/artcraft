@@ -13,8 +13,8 @@ import {
   faImage,
   faTags,
   faHandsHelping,
+  faChartArea,
 } from "@fortawesome/free-solid-svg-icons";
-import { USE_REFRESH } from "../../../Refresh";
 import { motion } from "framer-motion";
 import { container, item, panel } from "../../../data/animation";
 
@@ -30,96 +30,6 @@ function ContributeIndexPage(props: Props) {
   const categoryButton = props.sessionWrapper.canEditCategories()
     ? t("pages.contributeIndex.buttonCreateCategory")
     : t("pages.contributeIndex.buttonSuggestCategory");
-
-  if (!USE_REFRESH) {
-    return (
-      <div>
-        <div>
-          <h1 className="title is-1">
-            {" "}
-            {t("pages.contributeIndex.heroTitle")}{" "}
-          </h1>
-          <h1 className="subtitle is-3">
-            <Trans i18nKey="pages.contributeIndex.heroSubtitle">
-              You make FakeYou <strong>better</strong> by contributing
-            </Trans>
-          </h1>
-        </div>
-
-        <br />
-
-        <div className="content is-medium">
-          <p>{t("pages.contributeIndex.introText")}</p>
-
-          <h3 className="title is-3">
-            {t("pages.contributeIndex.headingUploadModels")}
-          </h3>
-
-          <p>
-            <Trans i18nKey="pages.contributeIndex.describeUploadModels">
-              Create new voices and video templates for FakeYou.
-              <DiscordLink
-                text={t("pages.contributeIndex.discordLink1")}
-                iconAfterText={true}
-              />
-              to learn how.
-            </Trans>
-          </p>
-
-          <Link
-            to="/upload/tts"
-            className="button is-link is-large is-fullwidth "
-          >
-            {t("pages.contributeIndex.buttonUploadVoice")}
-          </Link>
-
-          <br />
-
-          <Link
-            to="/upload/w2l_video"
-            className="button is-link is-large is-fullwidth "
-          >
-            {t("pages.contributeIndex.buttonUploadW2lVideo")}
-          </Link>
-
-          <br />
-
-          <Link
-            to="/upload/w2l_photo"
-            className="button is-link is-large is-fullwidth"
-          >
-            {t("pages.contributeIndex.buttonUploadW2lPhoto")}
-          </Link>
-
-          <h3 className="title is-3">{categoryHeading}</h3>
-
-          <p>{t("pages.contributeIndex.describeSuggest")}</p>
-
-          <Link
-            to={FrontendUrlConfig.createCategoryPage()}
-            className="button is-info is-large is-fullwidth"
-          >
-            {categoryButton}
-          </Link>
-
-          <h3 className="title is-3">
-            {t("pages.contributeIndex.headingMore")}
-          </h3>
-
-          <p>
-            <Trans i18nKey="pages.contributeIndex.describeMore">
-              Want to contribute code, design, or data science?
-              <DiscordLink
-                text={t("pages.contributeIndex.discordLink2")}
-                iconAfterText={true}
-              />
-              !
-            </Trans>
-          </p>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <motion.div initial="hidden" animate="visible" variants={container}>
@@ -156,19 +66,31 @@ function ContributeIndexPage(props: Props) {
                 to learn how.
               </Trans>
             </p>
-            <div className="d-flex flex-column flex-lg-row gap-3">
-              <Link to="/upload/tts" className="btn btn-primary w-100">
-                <FontAwesomeIcon icon={faVolumeHigh} className="me-3" />
-                {t("pages.contributeIndex.buttonUploadVoice")}
-              </Link>
-              <Link to="/upload/w2l_video" className="btn btn-primary w-100">
-                <FontAwesomeIcon icon={faVideo} className="me-3" />
-                {t("pages.contributeIndex.buttonUploadW2lVideo")}
-              </Link>
-              <Link to="/upload/w2l_photo" className="btn btn-primary w-100">
-                <FontAwesomeIcon icon={faImage} className="me-3" />
-                {t("pages.contributeIndex.buttonUploadW2lPhoto")}
-              </Link>
+            <div className="row gx-3 gy-3">
+              <div className="col-12 col-md-6">
+                <Link to="/upload/tts" className="btn btn-primary w-100">
+                  <FontAwesomeIcon icon={faVolumeHigh} className="me-3" />
+                  {t("pages.contributeIndex.buttonUploadVoice")}
+                </Link>
+              </div>
+              <div className="col-12 col-md-6">
+                <Link to="/upload/vocoder" className="btn btn-primary w-100">
+                  <FontAwesomeIcon icon={faChartArea} className="me-3" />
+                  Upload Vocoder
+                </Link>
+              </div>
+              <div className="col-12 col-md-6">
+                <Link to="/upload/w2l_video" className="btn btn-primary w-100">
+                  <FontAwesomeIcon icon={faVideo} className="me-3" />
+                  {t("pages.contributeIndex.buttonUploadW2lVideo")}
+                </Link>
+              </div>
+              <div className="col-12 col-md-6">
+                <Link to="/upload/w2l_photo" className="btn btn-primary w-100">
+                  <FontAwesomeIcon icon={faImage} className="me-3" />
+                  {t("pages.contributeIndex.buttonUploadW2lPhoto")}
+                </Link>
+              </div>
             </div>
           </div>
         </div>

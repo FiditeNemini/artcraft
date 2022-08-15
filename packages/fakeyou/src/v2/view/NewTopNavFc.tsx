@@ -1,12 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
 import { Link, useHistory } from "react-router-dom";
-import { MigrationTopNavSession } from "../../migration/MigrationTopNav_Session";
 import { FrontendUrlConfig } from "../../common/FrontendUrlConfig";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
-  faGavel,
-  faGrinBeamSweat,
   faMicrophone,
   faVolumeUp,
   faPlus,
@@ -23,8 +20,6 @@ import {
   faLaptop,
 } from "@fortawesome/free-solid-svg-icons";
 import { faPatreon } from "@fortawesome/free-brands-svg-icons";
-import { t } from "i18next";
-import { USE_REFRESH } from "../../Refresh";
 import { Logout } from "@storyteller/components/src/api/session/Logout";
 import { Gravatar } from "@storyteller/components/src/elements/Gravatar";
 import {
@@ -424,6 +419,7 @@ function NewTopNavFc(props: Props) {
             {/* <p className="top-bar-text">
               Online Users: <span className="fw-bold text-red">1,204</span>
             </p> */}
+
             <Tippy
               content={`${
                 darkModes ? "Toggle Light Mode" : "Toggle Dark Mode"
@@ -470,7 +466,7 @@ function NewTopNavFc(props: Props) {
             <img
               src="/fakeyou/FakeYou-Logo.png"
               alt="FakeYou: Cartoon and Celebrity Text to Speech"
-              height="34"
+              height="38"
             />
           </Link>
           <button
@@ -497,7 +493,7 @@ function NewTopNavFc(props: Props) {
                 <img
                   src="/fakeyou/FakeYou-Logo.png"
                   alt="FakeYou: Cartoon and Celebrity Text to Speech"
-                  height="34"
+                  height="38"
                 />
               </Link>
 

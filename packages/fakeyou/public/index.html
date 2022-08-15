@@ -20,9 +20,35 @@
       href="%PUBLIC_URL%/favicon-16x16.png"
     />
 
+    <!-- Preload important images on index so they don't load late. -->
+    <link
+      rel="preload"
+      as="image"
+      href="%PUBLIC_URL%/fakeyou/FakeYou-Logo.png"
+    />
+    <link
+      rel="preload"
+      as="image"
+      href="%PUBLIC_URL%/mascot/kitsune_pose2.webp"
+    />
+    <!-- Preload images on other pages. -->
+    <link
+      rel="preload"
+      as="image"
+      href="%PUBLIC_URL%/mascot/kitsune_pose7.webp"
+    />
+    <link
+      rel="preload"
+      as="image"
+      href="%PUBLIC_URL%/mascot/kitsune_pose3.webp"
+    />
+
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="theme-color" content="#209cee" />
-    <meta name="description" content="FakeYou is a text to speech wonderland where all of your dreams come true." />
+    <meta name="theme-color" content="#1a111d" />
+    <meta
+      name="description"
+      content="FakeYou is a text to speech wonderland where all of your dreams come true."
+    />
     <!--
       manifest.json provides metadata used when your web app is installed on a
       user's mobile device or desktop. See https://developers.google.com/web/fundamentals/web-app-manifest/
@@ -70,8 +96,8 @@
     </script>
 
     <!-- OLD FakeYou; TODO(echelon): Remove when done. -->
-    <link 
-      href="https://fonts.googleapis.com/css2?family=Fira+Sans+Condensed:ital,wght@0,300;0,400;1,300&family=Fugaz+One&family=Merriweather:wght@300&family=Fira+Sans:ital,wght@0,200;0,300;0,400;1,200;1,300;1,400&display=swap" 
+    <link
+      href="https://fonts.googleapis.com/css2?family=Fira+Sans+Condensed:ital,wght@0,300;0,400;1,300&family=Fugaz+One&family=Merriweather:wght@300&family=Fira+Sans:ital,wght@0,200;0,300;0,400;1,200;1,300;1,400&display=swap"
       rel="stylesheet"
     />
 

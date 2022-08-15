@@ -402,16 +402,6 @@ function TtsModelViewPage(props: Props) {
       </span>
     );
 
-  let defaultVocoder = "not set (defaults to HiFi-GAN)";
-  switch (ttsModel?.maybe_default_pretrained_vocoder) {
-    case "hifigan-superres":
-      defaultVocoder = "HiFi-GAN";
-      break;
-    case "waveglow":
-      defaultVocoder = "WaveGlow";
-      break;
-  }
-
   const language = LanguageCodeToDescriptionWithDefault(
     ttsModel?.ietf_language_tag
   );
@@ -513,6 +503,57 @@ function TtsModelViewPage(props: Props) {
     );
   }
 
+  // Custom vocoder vs. legacy default pretrained vocoders
+  let vocoderRows = undefined;
+
+  if (!!ttsModel.maybe_custom_vocoder) {
+    const vocoderCreatorUrl = FrontendUrlConfig.userProfilePage(
+      ttsModel.maybe_custom_vocoder.creator_username
+    );
+
+    vocoderRows = (
+      <>
+        <tr>
+          <th>Custom tuned vocoder</th>
+          <td>{ttsModel.maybe_custom_vocoder.vocoder_title}</td>
+        </tr>
+        <tr>
+          <th>Vocoder created by</th>
+          <td>
+            <Gravatar
+              size={15}
+              username={ttsModel.maybe_custom_vocoder.creator_display_name}
+              email_hash={ttsModel.maybe_custom_vocoder.creator_gravatar_hash}
+            />
+            &nbsp;
+            <Link to={vocoderCreatorUrl}>{ttsModel.maybe_custom_vocoder.creator_display_name}</Link>
+          </td>
+        </tr>
+      </>
+    );
+  } else {
+    let legacyVocoderName = "vocoder not set (defaults to HiFi-GAN)";
+
+    switch (ttsModel?.maybe_default_pretrained_vocoder) {
+      case "hifigan-superres":
+        legacyVocoderName = "HiFi-GAN";
+        break;
+      case "waveglow":
+        legacyVocoderName = "WaveGlow";
+        break;
+    }
+
+
+    vocoderRows = (
+      <>
+        <tr>
+          <th>Legacy pretrained vocoder</th>
+          <td>{legacyVocoderName}</td>
+        </tr>
+      </>
+    );
+  }
+
   return (
     <motion.div initial="hidden" animate="visible" variants={container}>
       <div className="container py-5">
@@ -532,7 +573,7 @@ function TtsModelViewPage(props: Props) {
 
       <motion.div className="container-panel pt-3 pb-5" variants={panel}>
         <div className="panel p-3 p-lg-4">
-          <h2 className="panel-title fw-bold">Model Details</h2>
+          <h2 className="panel-title fw-bold">TTS Model Details</h2>
           <div className="py-6">
             <table className="table">
               <tbody>
@@ -557,10 +598,6 @@ function TtsModelViewPage(props: Props) {
                   <td>{ttsModel?.tts_model_type}</td>
                 </tr>
                 <tr>
-                  <th>Default vocoder</th>
-                  <td>{defaultVocoder}</td>
-                </tr>
-                <tr>
                   <th>Text pipeline</th>
                   <td>{textPipelineName}</td>
                 </tr>
@@ -579,6 +616,19 @@ function TtsModelViewPage(props: Props) {
                   </th>
                   <td>{discordCommand}</td>
                 </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </motion.div>
+
+      <motion.div className="container-panel pt-3 pb-5" variants={panel}>
+        <div className="panel p-3 p-lg-4">
+          <h2 className="panel-title fw-bold">Vocoder Details</h2>
+          <div className="py-6">
+            <table className="table">
+              <tbody>
+                {vocoderRows}
               </tbody>
             </table>
           </div>
