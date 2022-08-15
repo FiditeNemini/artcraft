@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { ApiConfig } from "@storyteller/components";
 import {
   DetectLocale,
@@ -165,38 +165,36 @@ class App extends React.Component<Props, State> {
       w2lTemplateUploadJobs: [],
 
       textBuffer: "",
-
     };
   }
 
   componentWillMount() {
     // Handle redesign
-    console.log('componentWillMount', 'useRefresh?', USE_REFRESH);
+    console.log("componentWillMount", "useRefresh?", USE_REFRESH);
 
-    // Check to see if there is a cookie for darkMode; 
-    if (!window.localStorage.getItem('darkMode')) {
+    // Check to see if there is a cookie for darkMode;
+    if (!window.localStorage.getItem("darkMode")) {
       // if not, set one to false to ensure we are defualting to dark mode.
-      window.localStorage.setItem('darkMode', 'false')
+      window.localStorage.setItem("darkMode", "false");
     }
 
-    if (!window.localStorage.getItem('lowSpec')) {
+    if (!window.localStorage.getItem("lowSpec")) {
       // if not, set one to false to ensure we are defualting to dark mode.
-      window.localStorage.setItem('lowSpec', 'false')
+      window.localStorage.setItem("lowSpec", "false");
     }
-
 
     if (USE_REFRESH) {
       // Redesign-specific CSS
-      // NB(echelon): Despite the branches here, scss is all combined together at compile time 
-      // in staging and production (not development). To handle those environments, styles are 
-      // additionally applied based on the root "fakeyou-refresh" class, which may have changed 
+      // NB(echelon): Despite the branches here, scss is all combined together at compile time
+      // in staging and production (not development). To handle those environments, styles are
+      // additionally applied based on the root "fakeyou-refresh" class, which may have changed
       // some of the specificity rules of Bootstrap.
       require("./AppNew.scss");
     } else {
       // Old design CSS
       // NB(echelon): Despite the branches here, scss is all combined together at compile time
-      // in staging and production (not development). To handle those environments, styles are 
-      // additionally applied based on the root "fakeyou-old" class, which may have changed some 
+      // in staging and production (not development). To handle those environments, styles are
+      // additionally applied based on the root "fakeyou-old" class, which may have changed some
       // of the specificity rules of Bulma.
       require("./AppOld.scss");
       require("./v2/view/_css/footer.scss");
@@ -215,8 +213,7 @@ class App extends React.Component<Props, State> {
       this.pollJobs();
     }, 1000);
 
-    let DOM = document.getElementsByClassName('fakeyou-refresh')[0].className
-
+    let DOM = document.getElementsByClassName("fakeyou-refresh")[0].className;
   }
 
   querySession = async () => {
@@ -287,18 +284,17 @@ class App extends React.Component<Props, State> {
       const showNotice = hasSpanish || hasPortuguese || hasTurkish;
       const showPleaseFollowNotice = hasSpanish || hasPortuguese;
 
-      const showBootstrapLanguageNotice = (
-        hasJapanese
-        || hasChineseSimplified
-        || hasFrench
-        || hasGerman
-        || hasHindi
-        || hasIndonesian
-        || hasItalian
-        || hasKorean
-        || hasTurkish
-        || hasVietnamese
-      );
+      const showBootstrapLanguageNotice =
+        hasJapanese ||
+        hasChineseSimplified ||
+        hasFrench ||
+        hasGerman ||
+        hasHindi ||
+        hasIndonesian ||
+        hasItalian ||
+        hasKorean ||
+        hasTurkish ||
+        hasVietnamese;
 
       this.setState({
         isShowingLanguageNotice: showNotice,
@@ -594,9 +590,7 @@ class App extends React.Component<Props, State> {
     this.setState({ textBuffer: "" });
   };
 
-
   public render() {
-
     // Redesign features
     let mainClassNames;
 
@@ -605,8 +599,6 @@ class App extends React.Component<Props, State> {
     return (
       <BrowserRouter>
         <div id="main" className={mainClassNames}>
-          <div className="dark-mode"></div>
-
           <div className="animation-wrapper">
             <div className="particle particle-1"></div>
             <div className="particle particle-2"></div>
@@ -614,9 +606,7 @@ class App extends React.Component<Props, State> {
             <div className="particle particle-4"></div>
           </div>
 
-
           <div id="viewable">
-
             {/* This is the old vocodes1.0-compatible username and version switch
             <MigrationTopNav
               enableAlpha={this.state.enableAlpha}
@@ -625,13 +615,10 @@ class App extends React.Component<Props, State> {
               />
             */}
 
-            <div className="migrationComponentWrapper dark-mode">
-
+            <div className="migrationComponentWrapper">
               <Switch>
                 <Route path="/">
-
                   <NewVocodesContainer
-
                     sessionWrapper={this.state.sessionWrapper}
                     querySessionAction={this.querySession}
                     isShowingVocodesNotice={this.state.isShowingVocodesNotice}
@@ -651,7 +638,9 @@ class App extends React.Component<Props, State> {
                     isShowingBootstrapLanguageNotice={
                       this.state.isShowingBootstrapLanguageNotice
                     }
-                    clearBootstrapLanguageNotice={this.clearBootstrapLanguageNotice}
+                    clearBootstrapLanguageNotice={
+                      this.clearBootstrapLanguageNotice
+                    }
                     enqueueTtsJob={this.enqueueTtsJob}
                     ttsInferenceJobs={this.state.ttsInferenceJobs}
                     enqueueW2lJob={this.enqueueW2lJob}
@@ -684,15 +673,12 @@ class App extends React.Component<Props, State> {
                     setMaybeSelectedTtsModel={
                       this.props.setMaybeSelectedTtsModel
                     }
-
                   />
                 </Route>
               </Switch>
             </div>
           </div>
         </div>
-
-
       </BrowserRouter>
     );
   }
