@@ -30,7 +30,6 @@ $headings-font-family: "Merriweather", serif;
     color: $white;
 
     &.dark-mode {
-
       p,
       h1,
       h2,
@@ -38,7 +37,7 @@ $headings-font-family: "Merriweather", serif;
       h4,
       h5,
       h6 {
-        color: #fff;
+        color: $white;
       }
     }
   }
@@ -46,15 +45,16 @@ $headings-font-family: "Merriweather", serif;
   .bg-gradient {
     background: rgb(13, 16, 25) !important;
 
-    background: linear-gradient(325deg,
-        rgba(13, 16, 25, 1) 0%,
-        rgba(42, 21, 34, 1) 55%,
-        rgba(16, 14, 26, 1) 100%) !important;
+    background: linear-gradient(
+      325deg,
+      rgba(13, 16, 25, 1) 0%,
+      rgba(42, 21, 34, 1) 55%,
+      rgba(16, 14, 26, 1) 100%
+    ) !important;
     background-repeat: no-repeat;
     background-attachment: fixed;
 
     &.low-spec {
-
       .particle-1 {
         animation: animParticle $time-1 linear infinite;
         @include particles(0);
@@ -100,93 +100,116 @@ $headings-font-family: "Merriweather", serif;
         height: 1px;
         width: 1px;
       }
-
     }
 
     &.dark-mode {
+      .top-bar {
+        background-color: rgba($white, 0.02);
+      }
 
       .panel {
-        background-color: #261924 !important;
-
+        background-color: rgba(#353535, 0.25);
       }
 
       select {
-        border-color: #372C34 !important;
-        background-color: #372C34 !important;
-
+        border-color: #372c34 !important;
+        background-color: #372c34 !important;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='white' class='bi bi-chevron-down' viewBox='0 0 16 16'%3E%3Cpath fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3E%3C/svg%3E");
       }
 
       .btn-destructive {
-
-        background-color: #FFCFCE !important;
-
+        background-color: #ffcfce !important;
       }
 
       .video-card-title,
       .video-card-text {
-
-        color: #ffffff !important;
-
+        color: $white !important;
       }
 
       textarea {
-
-        background-color: #372C34 !important;
-        border-color: #372C34 !important;
-
-
+        background-color: #372c34 !important;
+        border-color: #372c34 !important;
+        color: $white;
       }
 
       .form-select {
-        color: #fff;
+        color: $white;
       }
 
       ::placeholder {
-
-        color: #fff !important;
+        color: $white !important;
       }
 
       .input-icon .form-control-feedback {
-
-        color: #fff !important
+        color: $white !important;
       }
 
       input {
-        background-color: #372C34 !important;
-        border-color: #372C34 !important;
-      }
-
-      menu.item {
-
-        background: #372C34;
+        background-color: #372c34 !important;
+        border-color: #372c34 !important;
+        color: $white;
       }
 
       .btn-secondary {
-        color: #fff;
-        border-color: #46343F;
-        background-color: #46343F;
+        color: $white !important;
+        border-color: #5a4a54;
+        background-color: #5a4a54;
+
+        &:hover {
+          border-color: lighten(#5a4a54, 5%);
+          background-color: lighten(#5a4a54, 5%);
+        }
       }
 
       .btn-destructive {
-        background-color: #FC6B68;
-        border-color: #FFCFCE;
+        background-color: #5a3d47 !important;
+        border-color: #5a3d47;
+        color: $white;
+
+        &:hover {
+          border-color: lighten(#5a3d47, 6%);
+          background-color: lighten(#5a3d47, 6%) !important;
+        }
+      }
+
+      .btn-inform svg {
+        filter: invert(98%) sepia(2%) saturate(0%) hue-rotate(196deg)
+          brightness(200%) contrast(103%);
       }
 
       .dropdown-menu {
-        background-color: #261924;
+        background-color: #281b25;
       }
 
       .dropdown-item {
-        color: #fff;
+        color: $white;
+
+        &:hover {
+          background-color: lighten(#271e25, 8%);
+        }
+        &:focus {
+          background-color: lighten(#271e25, 8%);
+        }
+        &:active {
+          background-color: $primary;
+        }
       }
 
-      a.btn.btn-secondary {
-        color: #fff;
+      .form-control::placeholder {
+        /* Chrome, Firefox, Opera, Safari 10.1+ */
+        color: rgba($white, 0.5) !important;
+        opacity: 1; /* Firefox */
       }
 
+      .form-control:-ms-input-placeholder {
+        /* Internet Explorer 10-11 */
+        color: rgba($white, 0.5) !important;
+      }
 
-
-
+      .form-control::-ms-input-placeholder {
+        /* Microsoft Edge */
+        color: rgba($white, 0.5) !important;
+      }
     }
   }
 
@@ -335,7 +358,7 @@ $headings-font-family: "Merriweather", serif;
     .nav-login {
       font-size: 15px;
       font-weight: 600;
-      color: #fff;
+      color: $white;
       text-decoration: none;
       transition: 0.2s;
 
@@ -347,7 +370,7 @@ $headings-font-family: "Merriweather", serif;
   }
 
   a.top-bar-text:hover {
-    color: $primary  !important;
+    color: $primary !important;
   }
 
   .top-bar {

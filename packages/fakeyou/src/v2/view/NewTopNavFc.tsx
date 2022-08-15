@@ -20,15 +20,28 @@ import {
   faMoon,
   faSun,
   faComputer,
-  faLaptop
+  faLaptop,
 } from "@fortawesome/free-solid-svg-icons";
 import { faPatreon } from "@fortawesome/free-brands-svg-icons";
 import { t } from "i18next";
 import { USE_REFRESH } from "../../Refresh";
 import { Logout } from "@storyteller/components/src/api/session/Logout";
 import { Gravatar } from "@storyteller/components/src/elements/Gravatar";
-import { GetPendingTtsJobCount, GetPendingTtsJobCountIsOk, GetPendingTtsJobCountSuccessResponse } from "@storyteller/components/src/api/tts/GetPendingTtsJobCount";
-import { container, item, panel, image, sessionItem } from "@storyteller/fakeyou/src/data/animation";
+import {
+  GetPendingTtsJobCount,
+  GetPendingTtsJobCountIsOk,
+  GetPendingTtsJobCountSuccessResponse,
+} from "@storyteller/components/src/api/tts/GetPendingTtsJobCount";
+import {
+  container,
+  item,
+  panel,
+  image,
+  sessionItem,
+} from "@storyteller/fakeyou/src/data/animation";
+import Tippy from "@tippyjs/react";
+import "tippy.js/dist/tippy.css";
+import "tippy.js/animations/shift-away.css";
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -37,11 +50,15 @@ interface Props {
 }
 
 function NewTopNavFc(props: Props) {
-  const defaultColourView = window.localStorage.getItem('darkMode')
-  const defaultLowSpecView = window.localStorage.getItem('lowSpec')
+  const defaultColourView = window.localStorage.getItem("darkMode");
+  const defaultLowSpecView = window.localStorage.getItem("lowSpec");
 
-  const [darkModes, toggleDarkModes] = useState(defaultColourView === 'true' ? true : false)
-  const [lowSpecView, toggleLowSpecs] = useState(defaultLowSpecView === 'true' ? true : false)
+  const [darkModes, toggleDarkModes] = useState(
+    defaultColourView === "true" ? true : false
+  );
+  const [lowSpecView, toggleLowSpecs] = useState(
+    defaultLowSpecView === "true" ? true : false
+  );
 
   let history = useHistory();
 
@@ -54,18 +71,21 @@ function NewTopNavFc(props: Props) {
 
   // NB: The responses from the "job count" endpoint are cached in a distributed manner.
   // We use the timestamp as a vector clock to know when to update our view.
-  const [pendingTtsJobs, setPendingTtsJobs] = useState<GetPendingTtsJobCountSuccessResponse>({
-    success: true,
-    pending_job_count: 0,
-    cache_time: new Date(0), // NB: Epoch
-  });
+  const [pendingTtsJobs, setPendingTtsJobs] =
+    useState<GetPendingTtsJobCountSuccessResponse>({
+      success: true,
+      pending_job_count: 0,
+      cache_time: new Date(0), // NB: Epoch
+    });
 
   useEffect(() => {
     const fetch = async () => {
       const response = await GetPendingTtsJobCount();
       if (GetPendingTtsJobCountIsOk(response)) {
         console.log(response);
-        if (response.cache_time.getTime() > pendingTtsJobs.cache_time.getTime()) {
+        if (
+          response.cache_time.getTime() > pendingTtsJobs.cache_time.getTime()
+        ) {
           setPendingTtsJobs(response);
         }
       }
@@ -96,49 +116,48 @@ function NewTopNavFc(props: Props) {
     : "navbar-burger";
 
   const toggleDarkMode = () => {
-    window.localStorage.setItem("darkMode", (darkModes ? "true" : "false"))
+    window.localStorage.setItem("darkMode", darkModes ? "true" : "false");
 
-    toggleDarkModes(!darkModes)
-  }
+    toggleDarkModes(!darkModes);
+  };
 
   const toggleLowSpec = () => {
-    window.localStorage.setItem("lowSpec", (lowSpecView ? "true" : "false"))
+    window.localStorage.setItem("lowSpec", lowSpecView ? "true" : "false");
 
-    toggleLowSpecs(!lowSpecView)
+    toggleLowSpecs(!lowSpecView);
 
-    if (lowSpecView == false) {
-      image.hidden.opacity = 1
-      image.hidden.x = 0
-      panel.hidden.y = 0
-      item.hidden.y = 0
-      sessionItem.hidden.x = 0
-      panel.hidden.opacity = 1
-      item.hidden.opacity = 1
-      container.hidden.opacity = 1
-      sessionItem.hidden.opacity = 1
+    if (lowSpecView === false) {
+      image.hidden.opacity = 1;
+      image.hidden.x = 0;
+      panel.hidden.y = 0;
+      item.hidden.y = 0;
+      sessionItem.hidden.x = 0;
+      panel.hidden.opacity = 1;
+      item.hidden.opacity = 1;
+      container.hidden.opacity = 1;
+      sessionItem.hidden.opacity = 1;
+    } else {
+      image.hidden.opacity = 0;
+      image.hidden.x = 100;
+      panel.hidden.y = 50;
+      item.hidden.y = 50;
+      sessionItem.hidden.x = 50;
+      panel.hidden.opacity = 0;
+      item.hidden.opacity = 0;
+      container.hidden.opacity = 0;
+      sessionItem.hidden.opacity = 0;
     }
-    else {
-      image.hidden.opacity = 0
-      image.hidden.x = 100
-      panel.hidden.y = 50
-      item.hidden.y = 50
-      sessionItem.hidden.x = 50
-      panel.hidden.opacity = 0
-      item.hidden.opacity = 0
-      container.hidden.opacity = 0
-      sessionItem.hidden.opacity = 0
-    }
-  }
+  };
 
   useEffect(() => {
     // Logic for dark mode toggle
-    if (darkModes) document.getElementById('main')!.classList.add('dark-mode')
-    else document.getElementById('main')!.classList.remove('dark-mode')
+    if (darkModes) document.getElementById("main")!.classList.add("dark-mode");
+    else document.getElementById("main")!.classList.remove("dark-mode");
 
     // Logic for the animation toggle
-    if (lowSpecView) document.getElementById('main')!.classList.add('low-spec')
-    else document.getElementById('main')!.classList.remove('low-spec')
-  })
+    if (lowSpecView) document.getElementById("main")!.classList.add("low-spec");
+    else document.getElementById("main")!.classList.remove("low-spec");
+  });
 
   if (!USE_REFRESH) {
     return (
@@ -386,28 +405,7 @@ function NewTopNavFc(props: Props) {
   return (
     <div>
       <div className="top-bar d-none d-lg-flex">
-        <button
-          className={`btn ${darkModes ? '' : 'text-light'}`}
-          title={`${darkModes ? 'Turn on Dark mode' : 'Turn on Light Mode'}`}
-          onClick={() => toggleDarkMode()}
-        >
-          <FontAwesomeIcon
-            icon={darkModes ? faSun : faMoon}
-          />
-
-        </button>
-        <button
-          className={`btn  ${darkModes ? '' : 'text-light'}`}
-          title={`${lowSpecView ? 'Turn on animations' : 'Turn off animations'}`}
-          onClick={() => toggleLowSpec()}
-        >
-          <FontAwesomeIcon
-            icon={lowSpecView ? faLaptop : faComputer}
-            className={`${lowSpecView ? '' : 'fa-beat-fade'}`}
-          />
-        </button>
-
-        <div className="container d-flex">
+        <div className="container d-flex align-items-center">
           <div className="d-flex gap-4 flex-grow-1">
             <Link className="top-bar-text" to="/about">
               About
@@ -422,18 +420,45 @@ function NewTopNavFc(props: Props) {
               Developers
             </a>
           </div>
-          <div className="d-flex gap-4">
+          <div className="d-flex gap-3 align-items-center">
             {/* <p className="top-bar-text">
               Online Users: <span className="fw-bold text-red">1,204</span>
             </p> */}
-            <p className="top-bar-text">
-              TTS Queued: <span className="fw-bold text-red">{pendingTtsJobs.pending_job_count}</span>
+            <Tippy
+              content={`${
+                darkModes ? "Toggle Light Mode" : "Toggle Dark Mode"
+              }`}
+            >
+              <button
+                className={`btn btn-toggle ${darkModes ? "dark" : ""}`}
+                onClick={() => toggleDarkMode()}
+              >
+                <FontAwesomeIcon icon={darkModes ? faSun : faMoon} />
+              </button>
+            </Tippy>
+            <Tippy
+              content={`${
+                lowSpecView ? "Turn on animations" : "Turn off animations"
+              }`}
+            >
+              <button
+                className={`btn btn-toggle  ${darkModes ? "dark" : ""}`}
+                onClick={() => toggleLowSpec()}
+              >
+                <FontAwesomeIcon
+                  icon={lowSpecView ? faLaptop : faComputer}
+                  className={`${lowSpecView ? "" : ""}`}
+                />
+              </button>
+            </Tippy>
+            <p className="top-bar-text ms-2">
+              TTS Queued:{" "}
+              <span className="fw-bold text-red">
+                {pendingTtsJobs.pending_job_count}
+              </span>
             </p>
-
           </div>
-
         </div>
-
       </div>
 
       <nav
@@ -593,7 +618,11 @@ function NewTopNavFc(props: Props) {
 
                 <li className="nav-item d-lg-none">
                   {/* TODO(echelon): Fix the build warnings about href not being accessible. */}
-                  <a className="nav-link" aria-current="page" href={FrontendUrlConfig.developerDocs()}>
+                  <a
+                    className="nav-link"
+                    aria-current="page"
+                    href={FrontendUrlConfig.developerDocs()}
+                  >
                     Developers
                   </a>
                 </li>
@@ -607,7 +636,10 @@ function NewTopNavFc(props: Props) {
                       Online: <span className="fw-bold text-red">1,204</span>
                     </p> */}
                     <div className="top-bar-text mobile">
-                      TTS Queued: <span className="fw-bold text-red ">{pendingTtsJobs.pending_job_count}</span>
+                      TTS Queued:{" "}
+                      <span className="fw-bold text-red ">
+                        {pendingTtsJobs.pending_job_count}
+                      </span>
                     </div>
                   </div>
                 </li>
