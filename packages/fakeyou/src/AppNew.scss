@@ -53,6 +53,56 @@ $headings-font-family: "Merriweather", serif;
     ) !important;
     background-repeat: no-repeat;
     background-attachment: fixed;
+  }
+
+  // Style for user text input that overflows
+  .overflow-fix {
+    overflow-wrap: anywhere;
+  }
+
+  //old wrapper
+  // .mainwrap {
+  //   max-width: 800px;
+  //   margin: auto;
+  // }
+
+  canvas#spectrogram {
+    margin: 0.5em 0;
+    transform: scaleY(-1);
+    /* Spectrograms are flipped */
+    height: 300px;
+    width: 100%;
+    cursor: pointer;
+  }
+
+  .btn:focus {
+    outline: none;
+    box-shadow: none;
+  }
+
+  /*p {
+    a:link, 
+    a:visited {
+      color: rgb(119, 165, 235);
+      font-weight: bold;
+    }
+    a:hover, 
+    a:active{
+      color: rgb(85, 133, 204);
+      font-weight: bold;
+    }
+  }*/
+
+  // p {
+  //   a:before {
+  //     content: " ";
+  //   }
+  // }
+
+  #main {
+    position: relative; // Footer attachment.
+    min-height: 100vh;
+    overflow: hidden;
 
     &.low-spec {
       .particle-1 {
@@ -103,12 +153,25 @@ $headings-font-family: "Merriweather", serif;
     }
 
     &.dark-mode {
+      &.bg-gradient {
+        background: darken(rgb(13, 16, 25), 3%) !important;
+
+        background: linear-gradient(
+          325deg,
+          darken(rgba(13, 16, 25, 1), 3%) 0%,
+          darken(rgba(42, 21, 34, 1), 3%) 55%,
+          darken(rgba(16, 14, 26, 1), 3%) 100%
+        ) !important;
+        background-repeat: no-repeat;
+        background-attachment: fixed;
+      }
+
       .top-bar {
-        background-color: rgba($white, 0.02);
+        background-color: rgba($white, 0.03);
       }
 
       .panel {
-        background-color: rgba(#353535, 0.25);
+        background-color: rgba(#353535, 0.3);
       }
 
       select {
@@ -226,56 +289,6 @@ $headings-font-family: "Merriweather", serif;
         color: rgba($white, 0.5) !important;
       }
     }
-  }
-
-  // Style for user text input that overflows
-  .overflow-fix {
-    overflow-wrap: anywhere;
-  }
-
-  //old wrapper
-  // .mainwrap {
-  //   max-width: 800px;
-  //   margin: auto;
-  // }
-
-  canvas#spectrogram {
-    margin: 0.5em 0;
-    transform: scaleY(-1);
-    /* Spectrograms are flipped */
-    height: 300px;
-    width: 100%;
-    cursor: pointer;
-  }
-
-  .btn:focus {
-    outline: none;
-    box-shadow: none;
-  }
-
-  /*p {
-    a:link, 
-    a:visited {
-      color: rgb(119, 165, 235);
-      font-weight: bold;
-    }
-    a:hover, 
-    a:active{
-      color: rgb(85, 133, 204);
-      font-weight: bold;
-    }
-  }*/
-
-  // p {
-  //   a:before {
-  //     content: " ";
-  //   }
-  // }
-
-  #main {
-    position: relative; // Footer attachment.
-    min-height: 100vh;
-    overflow: hidden;
   }
 
   $footer-height: 2rem;
