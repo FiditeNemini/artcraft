@@ -255,6 +255,7 @@ styles with important tags:
     background-color: $white;
     border-bottom: 1px solid;
     border-color: rgba(#000, 0.06);
+    transition: 0.1s;
 
     &:hover {
       background-color: darken($white, 10%);
