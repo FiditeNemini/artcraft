@@ -154,16 +154,20 @@ $headings-font-family: "Merriweather", serif;
 
     &.dark-mode {
       &.bg-gradient {
-        background: darken(rgb(13, 16, 25), 3%) !important;
+        background: darken(rgb(13, 16, 25), 2%) !important;
 
         background: linear-gradient(
           325deg,
-          darken(rgba(13, 16, 25, 1), 3%) 0%,
+          darken(rgba(13, 16, 25, 1), 2%) 0%,
           darken(rgba(42, 21, 34, 1), 3%) 55%,
-          darken(rgba(16, 14, 26, 1), 3%) 100%
+          darken(rgba(16, 14, 26, 1), 2%) 100%
         ) !important;
         background-repeat: no-repeat;
         background-attachment: fixed;
+      }
+
+      .nav-bg-dark {
+        background-color: darken(#17101c, 2%);
       }
 
       .top-bar {
@@ -376,7 +380,7 @@ $headings-font-family: "Merriweather", serif;
     }
 
     .nav-bg-dark {
-      background-color: #17101c !important;
+      background-color: #17101c;
     }
 
     .offcanvas {
