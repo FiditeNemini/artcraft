@@ -446,7 +446,7 @@ function NewTopNavFc(props: Props) {
                 onClick={() => toggleLowSpec()}
               >
                 <FontAwesomeIcon
-                  icon={lowSpecView ? faLaptop : faComputer}
+                  icon={lowSpecView ? faComputer : faLaptop}
                   className={`${lowSpecView ? "" : ""}`}
                 />
               </button>
@@ -641,6 +641,45 @@ function NewTopNavFc(props: Props) {
                         {pendingTtsJobs.pending_job_count}
                       </span>
                     </div>
+                  </div>
+                </li>
+
+                <li className="d-lg-none">
+                  <div className="dropdown-divider dropdown-divider-white mt-3"></div>
+                </li>
+
+                <li className="ps-3 d-lg-none">
+                  <div className="d-flex gap-4 py-2">
+                    <div className="top-bar-text mobile">Options:</div>
+                    <Tippy
+                      content={`${
+                        darkModes ? "Toggle Light Mode" : "Toggle Dark Mode"
+                      }`}
+                    >
+                      <button
+                        className={`btn btn-toggle ${darkModes ? "dark" : ""}`}
+                        onClick={() => toggleDarkMode()}
+                      >
+                        <FontAwesomeIcon icon={darkModes ? faSun : faMoon} />
+                      </button>
+                    </Tippy>
+                    <Tippy
+                      content={`${
+                        lowSpecView
+                          ? "Turn on animations"
+                          : "Turn off animations"
+                      }`}
+                    >
+                      <button
+                        className={`btn btn-toggle  ${darkModes ? "dark" : ""}`}
+                        onClick={() => toggleLowSpec()}
+                      >
+                        <FontAwesomeIcon
+                          icon={lowSpecView ? faComputer : faLaptop}
+                          className={`${lowSpecView ? "" : ""}`}
+                        />
+                      </button>
+                    </Tippy>
                   </div>
                 </li>
 
