@@ -1,7 +1,15 @@
-import React from "react";
+import React, { useState } from "react";
 import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
-import { LoggedInIndex } from "./subpages/LoggedInIndex";
-import { LoggedOutIndex } from "./subpages/LoggedOutIndex";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+  faArrowRight,
+  faLongArrowAltRight,
+  faMicrophone,
+  faPlay,
+  faVolumeUp,
+} from "@fortawesome/free-solid-svg-icons";
+import { faDiscord } from "@fortawesome/free-brands-svg-icons";
+import VoicePreviewPlayer from "./VoicePreviewPlayer";
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -23,15 +31,17 @@ function IndexPage(props: Props) {
             <div className="panel-ani mt-4 d-flex gap-3 flex-column flex-md-row">
               <button
                 type="button"
-                className="btn btn-primary btn-hero load-hidden"
+                className="btn btn-primary btn-hero d-flex align-items-center"
               >
-                Sign Up Now<i className="fa-solid fa-arrow-right-long ms-2"></i>
+                Sign Up Now
+                <FontAwesomeIcon icon={faArrowRight} className="ms-2" />
               </button>
               <button
                 type="button"
-                className="btn btn-secondary btn-hero load-hidden"
+                className="btn btn-secondary btn-hero d-flex align-items-center"
               >
-                <i className="fa-brands fa-discord me-2"></i>Join Discord
+                <FontAwesomeIcon icon={faDiscord} className="me-2" />
+                Join Discord
               </button>
             </div>
           </div>
@@ -133,6 +143,36 @@ function IndexPage(props: Props) {
                   </a>
                 </div>
               </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="voices-bg" id="voices">
+        <div className="container section d-flex flex-column align-items-center">
+          <div className="d-flex justify-content-center align-items-center gap-4">
+            <img className="rotateimg180" src="assets/title-shape.png" alt="" />
+            <h6 className="pre-heading text-center fw-bold pt-2">
+              Our TTS Voices
+            </h6>
+            <img src="assets/title-shape.png" alt="" />
+          </div>
+          <h1 className="display-5 fw-bold mt-3">
+            <span className="word">Voice Previews</span>
+          </h1>
+          <div className="voices-section">
+            <VoicePreviewPlayer />
+            <div className="mt-5 pt-4">
+              <a
+                className="btn btn-secondary"
+                href="https://fakeyou.com"
+                rel="noreferrer"
+                target="_blank"
+              >
+                <FontAwesomeIcon icon={faVolumeUp} className="me-3" />
+                Listen to all 2000+ usable voices on FakeYou
+                <FontAwesomeIcon icon={faLongArrowAltRight} className="ms-2" />
+              </a>
             </div>
           </div>
         </div>
@@ -336,7 +376,12 @@ function IndexPage(props: Props) {
               <h1 className="display-5 fw-bold mb-5">
                 Get started with Storyteller Stream!
               </h1>
-              <button className="btn btn-secondary w-100">Sign Up</button>
+              <div className="d-flex gap-3">
+                <button className="btn btn-secondary w-100">Sign Up</button>
+                <button className="btn btn-secondary w-100">
+                  Join Discord
+                </button>
+              </div>
             </div>
           </div>
         </div>
