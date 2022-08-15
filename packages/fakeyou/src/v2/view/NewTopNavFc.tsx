@@ -54,7 +54,7 @@ function NewTopNavFc(props: Props) {
   const defaultLowSpecView = window.localStorage.getItem("lowSpec");
 
   const [darkModes, toggleDarkModes] = useState(
-    defaultColourView === "true" ? true : false
+    defaultColourView === "false" ? true : false
   );
   const [lowSpecView, toggleLowSpecs] = useState(
     defaultLowSpecView === "true" ? true : false
