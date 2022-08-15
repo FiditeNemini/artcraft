@@ -22,13 +22,12 @@ $headings-font-family: "Merriweather", serif;
 // makes it impossible to dynamically change styles.
 //
 // Once the rollout is complete, this outer wrapper class can be removed.
+
 .fakeyou-refresh {
   body {
     font-family: $body-font-family;
     font-weight: 300; // For Fira Sans
     color: $white;
-    //background gradient
-    background-color: #120e1a !important;
   }
 
   .bg-gradient {
@@ -92,6 +91,196 @@ $headings-font-family: "Merriweather", serif;
     position: relative; // Footer attachment.
     min-height: 100vh;
     overflow: hidden;
+
+    &.low-spec {
+      .particle-1 {
+        animation: animParticle $time-1 linear infinite;
+        @include particles(0);
+        height: 7px;
+        width: 7px;
+      }
+
+      .particle-1:after {
+        @include particles(0);
+        height: 8px;
+        width: 8px;
+      }
+
+      .particle-2 {
+        animation: animParticle $time-2 linear infinite;
+        @include particles(0);
+        height: 5px;
+        width: 5px;
+      }
+
+      .particle-2:after {
+        @include particles(0);
+        height: 5px;
+        width: 5px;
+      }
+
+      // .particle-3:after {
+      //   @include particles(800);
+      //   height: 10px;
+      //   width: 10px;
+      //   border-radius: 50%;
+      // }
+
+      .particle-4 {
+        animation: animParticle $time-4 linear infinite;
+        @include particles(0);
+        height: 1px;
+        width: 1px;
+      }
+
+      .particle-4:after {
+        @include particles(0);
+        height: 1px;
+        width: 1px;
+      }
+    }
+
+    &.dark-mode {
+      &.bg-gradient {
+        background: darken(rgb(13, 16, 25), 2%) !important;
+
+        background: linear-gradient(
+          325deg,
+          darken(rgba(13, 16, 25, 1), 2%) 0%,
+          darken(rgba(42, 21, 34, 1), 3%) 55%,
+          darken(rgba(16, 14, 26, 1), 2%) 100%
+        ) !important;
+        background-repeat: no-repeat;
+        background-attachment: fixed;
+      }
+
+      .nav-bg-dark {
+        background-color: darken(#17101c, 2%);
+      }
+
+      .top-bar {
+        background-color: rgba($white, 0.05);
+      }
+
+      .panel {
+        background-color: rgba($white, 0.05);
+      }
+
+      select {
+        border-color: $input-dark !important;
+        background-color: $input-dark !important;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='white' class='bi bi-chevron-down' viewBox='0 0 16 16'%3E%3Cpath fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3E%3C/svg%3E");
+      }
+
+      .btn-destructive {
+        background-color: #ffcfce !important;
+      }
+
+      .video-card-title,
+      .video-card-text {
+        color: $white !important;
+      }
+
+      textarea {
+        background-color: $input-dark !important;
+        border-color: $input-dark !important;
+        color: $white;
+      }
+
+      .form-select {
+        color: $white;
+      }
+
+      ::placeholder {
+        color: $white !important;
+      }
+
+      .input-icon .form-control-feedback {
+        color: $white !important;
+      }
+
+      input {
+        background-color: $input-dark !important;
+        border-color: $input-dark !important;
+        color: $white;
+      }
+
+      .btn-secondary {
+        color: $white !important;
+        border-color: #5a4a54;
+        background-color: #5a4a54;
+
+        &:hover {
+          border-color: lighten(#5a4a54, 5%);
+          background-color: lighten(#5a4a54, 5%);
+        }
+      }
+
+      .btn-destructive {
+        background-color: #5a3d47 !important;
+        border-color: #5a3d47;
+        color: $white;
+
+        &:hover {
+          border-color: lighten(#5a3d47, 6%);
+          background-color: lighten(#5a3d47, 6%) !important;
+        }
+      }
+
+      .btn-inform svg {
+        filter: invert(98%) sepia(2%) saturate(0%) hue-rotate(196deg)
+          brightness(200%) contrast(103%);
+      }
+
+      .dropdown-menu {
+        background-color: #281b25;
+      }
+
+      .dropdown-item {
+        color: $white;
+
+        &:hover {
+          background-color: lighten(#271e25, 8%);
+        }
+        &:focus {
+          background-color: lighten(#271e25, 8%);
+        }
+        &:active {
+          background-color: $primary;
+        }
+      }
+
+      .menu-item {
+        color: $white;
+        background-color: $input-dark;
+        border-bottom: 1px solid;
+        border-color: rgba($white, 0.05);
+
+        &:hover {
+          background-color: lighten($input-dark, 10%);
+        }
+
+        &:last-child {
+          border-bottom: none;
+        }
+      }
+
+      .form-control::placeholder {
+        /* Chrome, Firefox, Opera, Safari 10.1+ */
+        color: rgba($white, 0.5) !important;
+        opacity: 1; /* Firefox */
+      }
+
+      .form-control:-ms-input-placeholder {
+        /* Internet Explorer 10-11 */
+        color: rgba($white, 0.5) !important;
+      }
+
+      .form-control::-ms-input-placeholder {
+        /* Microsoft Edge */
+        color: rgba($white, 0.5) !important;
+      }
+    }
   }
 
   $footer-height: 2rem;
@@ -151,6 +340,7 @@ $headings-font-family: "Merriweather", serif;
       padding-top: 0;
       margin-bottom: 4px;
     }
+
     .dropdown-item {
       font-size: 15px;
       font-weight: 600;
@@ -160,6 +350,7 @@ $headings-font-family: "Merriweather", serif;
       &:hover {
         color: $secondary;
       }
+
       &:focus {
         background-color: $white;
       }
@@ -178,7 +369,7 @@ $headings-font-family: "Merriweather", serif;
     }
 
     .nav-bg-dark {
-      background-color: #17101c !important;
+      background-color: #17101c;
     }
 
     .offcanvas {
@@ -188,7 +379,7 @@ $headings-font-family: "Merriweather", serif;
     .nav-login {
       font-size: 15px;
       font-weight: 600;
-      color: #fff;
+      color: $white;
       text-decoration: none;
       transition: 0.2s;
 

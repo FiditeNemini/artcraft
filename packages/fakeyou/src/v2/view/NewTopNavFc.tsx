@@ -14,6 +14,10 @@ import {
   faUpload,
   faUser,
   faSignOutAlt,
+  faMoon,
+  faSun,
+  faComputer,
+  faLaptop,
 } from "@fortawesome/free-solid-svg-icons";
 import { faPatreon } from "@fortawesome/free-brands-svg-icons";
 import { Logout } from "@storyteller/components/src/api/session/Logout";
@@ -23,6 +27,16 @@ import {
   GetPendingTtsJobCountIsOk,
   GetPendingTtsJobCountSuccessResponse,
 } from "@storyteller/components/src/api/tts/GetPendingTtsJobCount";
+import {
+  container,
+  item,
+  panel,
+  image,
+  sessionItem,
+} from "@storyteller/fakeyou/src/data/animation";
+import Tippy from "@tippyjs/react";
+import "tippy.js/dist/tippy.css";
+import "tippy.js/animations/shift-away.css";
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -31,6 +45,16 @@ interface Props {
 }
 
 function NewTopNavFc(props: Props) {
+  const defaultColourView = window.localStorage.getItem("darkMode");
+  const defaultLowSpecView = window.localStorage.getItem("lowSpec");
+
+  const [darkModes, toggleDarkModes] = useState(
+    defaultColourView === "false" ? true : false
+  );
+  const [lowSpecView, toggleLowSpecs] = useState(
+    defaultLowSpecView === "true" ? true : false
+  );
+
   let history = useHistory();
 
   let myDataLink = "/signup";
@@ -65,6 +89,50 @@ function NewTopNavFc(props: Props) {
     fetch();
     return () => clearInterval(interval);
   }, [pendingTtsJobs]);
+
+  const toggleDarkMode = () => {
+    window.localStorage.setItem("darkMode", darkModes ? "true" : "false");
+
+    toggleDarkModes(!darkModes);
+  };
+
+  const toggleLowSpec = () => {
+    window.localStorage.setItem("lowSpec", lowSpecView ? "true" : "false");
+
+    toggleLowSpecs(!lowSpecView);
+
+    if (lowSpecView === false) {
+      image.hidden.opacity = 1;
+      image.hidden.x = 0;
+      panel.hidden.y = 0;
+      item.hidden.y = 0;
+      sessionItem.hidden.x = 0;
+      panel.hidden.opacity = 1;
+      item.hidden.opacity = 1;
+      container.hidden.opacity = 1;
+      sessionItem.hidden.opacity = 1;
+    } else {
+      image.hidden.opacity = 0;
+      image.hidden.x = 100;
+      panel.hidden.y = 50;
+      item.hidden.y = 50;
+      sessionItem.hidden.x = 50;
+      panel.hidden.opacity = 0;
+      item.hidden.opacity = 0;
+      container.hidden.opacity = 0;
+      sessionItem.hidden.opacity = 0;
+    }
+  };
+
+  useEffect(() => {
+    // Logic for dark mode toggle
+    if (darkModes) document.getElementById("main")!.classList.add("dark-mode");
+    else document.getElementById("main")!.classList.remove("dark-mode");
+
+    // Logic for the animation toggle
+    if (lowSpecView) document.getElementById("main")!.classList.add("low-spec");
+    else document.getElementById("main")!.classList.remove("low-spec");
+  });
 
   const logoutHandler = async () => {
     await Logout();
@@ -136,7 +204,7 @@ function NewTopNavFc(props: Props) {
   return (
     <div>
       <div className="top-bar d-none d-lg-flex">
-        <div className="container d-flex">
+        <div className="container d-flex align-items-center">
           <div className="d-flex gap-4 flex-grow-1">
             <Link className="top-bar-text" to="/about">
               About
@@ -151,11 +219,39 @@ function NewTopNavFc(props: Props) {
               Developers
             </a>
           </div>
-          <div className="d-flex gap-4">
+          <div className="d-flex gap-3 align-items-center">
             {/* <p className="top-bar-text">
               Online Users: <span className="fw-bold text-red">1,204</span>
             </p> */}
-            <p className="top-bar-text">
+
+            <Tippy
+              content={`${
+                darkModes ? "Toggle Light Mode" : "Toggle Dark Mode"
+              }`}
+            >
+              <button
+                className={`btn btn-toggle ${darkModes ? "dark" : ""}`}
+                onClick={() => toggleDarkMode()}
+              >
+                <FontAwesomeIcon icon={darkModes ? faSun : faMoon} />
+              </button>
+            </Tippy>
+            <Tippy
+              content={`${
+                lowSpecView ? "Turn on animations" : "Turn off animations"
+              }`}
+            >
+              <button
+                className={`btn btn-toggle  ${darkModes ? "dark" : ""}`}
+                onClick={() => toggleLowSpec()}
+              >
+                <FontAwesomeIcon
+                  icon={lowSpecView ? faComputer : faLaptop}
+                  className={`${lowSpecView ? "" : ""}`}
+                />
+              </button>
+            </Tippy>
+            <p className="top-bar-text ms-2">
               TTS Queued:{" "}
               <span className="fw-bold text-red">
                 {pendingTtsJobs.pending_job_count}
@@ -164,6 +260,7 @@ function NewTopNavFc(props: Props) {
           </div>
         </div>
       </div>
+
       <nav
         className="navbar navbar-expand-lg navbar-dark py-3"
         aria-label="Offcanvas navbar large"
@@ -216,7 +313,7 @@ function NewTopNavFc(props: Props) {
                 <li data-bs-toggle="offcanvas" className="nav-item">
                   <Link
                     to={FrontendUrlConfig.cloneRequestPage()}
-                    className="nav-link"
+                    className="nav-link "
                   >
                     <FontAwesomeIcon icon={faMicrophone} className="me-2" />
                     Clone My Voice!
@@ -348,6 +445,45 @@ function NewTopNavFc(props: Props) {
                 </li>
 
                 <li className="d-lg-none">
+                  <div className="dropdown-divider dropdown-divider-white mt-3"></div>
+                </li>
+
+                <li className="ps-3 d-lg-none">
+                  <div className="d-flex gap-4 py-2">
+                    <div className="top-bar-text mobile">Options:</div>
+                    <Tippy
+                      content={`${
+                        darkModes ? "Toggle Light Mode" : "Toggle Dark Mode"
+                      }`}
+                    >
+                      <button
+                        className={`btn btn-toggle ${darkModes ? "dark" : ""}`}
+                        onClick={() => toggleDarkMode()}
+                      >
+                        <FontAwesomeIcon icon={darkModes ? faSun : faMoon} />
+                      </button>
+                    </Tippy>
+                    <Tippy
+                      content={`${
+                        lowSpecView
+                          ? "Turn on animations"
+                          : "Turn off animations"
+                      }`}
+                    >
+                      <button
+                        className={`btn btn-toggle  ${darkModes ? "dark" : ""}`}
+                        onClick={() => toggleLowSpec()}
+                      >
+                        <FontAwesomeIcon
+                          icon={lowSpecView ? faComputer : faLaptop}
+                          className={`${lowSpecView ? "" : ""}`}
+                        />
+                      </button>
+                    </Tippy>
+                  </div>
+                </li>
+
+                <li className="d-lg-none">
                   <div className="dropdown-divider dropdown-divider-white"></div>
                 </li>
               </ul>
@@ -355,20 +491,6 @@ function NewTopNavFc(props: Props) {
                 {userOrLoginButton}
                 {signupOrLogOutButton}
               </div>
-              {/* <div className="navbar-end">
-                <div className="navbar-item">
-                  <div className="field is-grouped">
-                    <p className="control">
-                      <MigrationTopNavSession
-                        sessionWrapper={props.sessionWrapper}
-                        enableAlpha={true}
-                        querySessionAction={props.querySessionCallback}
-                        closeHamburgerAction={() => closeHamburger()}
-                      />
-                    </p>
-                  </div>
-                </div>
-              </div> */}
             </div>
           </div>
         </div>

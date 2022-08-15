@@ -33,7 +33,10 @@ import { FAKEYOU_MERGED_TRANSLATIONS } from "./_i18n/FakeYouTranslations";
 import i18n from "i18next";
 import { initReactI18next } from "react-i18next";
 import { VocoderUploadJob } from "@storyteller/components/src/jobs/VocoderUploadJobs";
-import { GetRetrievalJobStatus, GetRetrievalJobStatusIsOk } from "@storyteller/components/src/api/retrieval/GetRetrievalJobStatus";
+import {
+  GetRetrievalJobStatus,
+  GetRetrievalJobStatusIsOk,
+} from "@storyteller/components/src/api/retrieval/GetRetrievalJobStatus";
 
 i18n
   .use(initReactI18next) // passes i18n down to react-i18next
@@ -173,6 +176,24 @@ class App extends React.Component<Props, State> {
     };
   }
 
+  componentWillMount() {
+    // Handle redesign
+    console.log("componentWillMount");
+
+    // Check to see if there is a cookie for darkMode;
+    if (!window.localStorage.getItem("darkMode")) {
+      // if not, set one to false to ensure we are defualting to dark mode.
+      window.localStorage.setItem("darkMode", "false");
+    }
+
+    if (!window.localStorage.getItem("lowSpec")) {
+      // if not, set one to false to ensure we are defualting to dark mode.
+      window.localStorage.setItem("lowSpec", "false");
+    }
+    require("./AppOld.scss");
+    require("./v2/view/_css/footer.scss");
+  }
+
   async componentDidMount() {
     await this.querySession();
     await this.queryLanguage();
@@ -200,7 +221,7 @@ class App extends React.Component<Props, State> {
       const hasChineseSimplified = locale.language_codes.indexOf("zh") > -1;
       const hasFrench = locale.language_codes.indexOf("fr") > -1;
       const hasGerman = locale.language_codes.indexOf("de") > -1;
-      const hasHindi= locale.language_codes.indexOf("hi") > -1;
+      const hasHindi = locale.language_codes.indexOf("hi") > -1;
       const hasIndonesian = locale.language_codes.indexOf("id") > -1;
       const hasItalian = locale.language_codes.indexOf("it") > -1;
       const hasJapanese = locale.language_codes.indexOf("ja") > -1;
@@ -254,18 +275,17 @@ class App extends React.Component<Props, State> {
       const showNotice = hasSpanish || hasPortuguese || hasTurkish;
       const showPleaseFollowNotice = hasSpanish || hasPortuguese;
 
-      const showBootstrapLanguageNotice = (
-        hasJapanese 
-        || hasChineseSimplified
-        || hasFrench 
-        || hasGerman 
-        || hasHindi 
-        || hasIndonesian 
-        || hasItalian 
-        || hasKorean 
-        || hasTurkish 
-        || hasVietnamese 
-      );
+      const showBootstrapLanguageNotice =
+        hasJapanese ||
+        hasChineseSimplified ||
+        hasFrench ||
+        hasGerman ||
+        hasHindi ||
+        hasIndonesian ||
+        hasItalian ||
+        hasKorean ||
+        hasTurkish ||
+        hasVietnamese;
 
       this.setState({
         isShowingLanguageNotice: showNotice,
@@ -550,9 +570,7 @@ class App extends React.Component<Props, State> {
           return;
         }
 
-        let updatedJob = VocoderUploadJob.fromResponse(
-          lookupResult.state!
-        );
+        let updatedJob = VocoderUploadJob.fromResponse(lookupResult.state!);
         updatedJobs.push(updatedJob);
       });
 
@@ -605,19 +623,13 @@ class App extends React.Component<Props, State> {
   public render() {
     return (
       <BrowserRouter>
-
         <div id="main" className="bg-gradient">
-        <div className="page-bg"></div>
-
-<div className="animation-wrapper">
-  <div className="particle particle-1"></div>
-  <div className="particle particle-2"></div>
-  <div className="particle particle-3"></div>
-  <div className="particle particle-4"></div>
-</div>
-<div className="page-wrapper"> 
-</div>
-
+          <div className="animation-wrapper">
+            <div className="particle particle-1"></div>
+            <div className="particle particle-2"></div>
+            <div className="particle particle-3"></div>
+            <div className="particle particle-4"></div>
+          </div>
 
           <div id="viewable">
             {/* This is the old vocodes1.0-compatible username and version switch
@@ -651,7 +663,9 @@ class App extends React.Component<Props, State> {
                     isShowingBootstrapLanguageNotice={
                       this.state.isShowingBootstrapLanguageNotice
                     }
-                    clearBootstrapLanguageNotice={this.clearBootstrapLanguageNotice}
+                    clearBootstrapLanguageNotice={
+                      this.clearBootstrapLanguageNotice
+                    }
                     enqueueTtsJob={this.enqueueTtsJob}
                     ttsInferenceJobs={this.state.ttsInferenceJobs}
                     enqueueW2lJob={this.enqueueW2lJob}

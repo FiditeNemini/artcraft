@@ -31,12 +31,14 @@ export function AutocompleteSearch(props: Props) {
 
   // NB: Hack to constrain number of matches.
   // It would be nice if the library stopped searching.
-  const maxMenuItems = 15;
+  const maxMenuItems = 14;
 
   return (
     <>
       <div>
-        <label className="sub-title">{t("tts.TtsModelListPage.form.searchLabel")}</label>
+        <label className="sub-title">
+          {t("tts.TtsModelListPage.form.searchLabel")}
+        </label>
         <div className="form-group input-icon">
           {/* NB: See note above about this library. */}
           <span className="form-control-feedback">
@@ -61,12 +63,7 @@ export function AutocompleteSearch(props: Props) {
               </div>
             )}
             renderItem={(item: TtsModelListItem, isHighlighted: boolean) => (
-              <div
-                className="menu-item"
-                style={{ background: isHighlighted ? "lightgray" : "white" }}
-              >
-                {item.title}
-              </div>
+              <div className="menu-item">{item.title}</div>
             )}
             value={searchValue}
             onChange={(e: any) => setSearchValue(e.target.value)}

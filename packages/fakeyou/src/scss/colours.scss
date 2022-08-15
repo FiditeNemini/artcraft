@@ -1,11 +1,17 @@
+// Default colours
 $primary: #fc6b68;
 $secondary: #212529;
+$input-dark: #3c3139;
 $info: #252d43;
 $success: #40ad48;
 $danger: #e51c23;
 $warning: darken(#f7941c, 5%);
 $accent: #80cfd3;
-$workflow: $primary; // Used to be accent-dark
+$workflow: $primary;
+
+// Light mode colours
+
+$primary-lm: #000;
 
 // Darken some of the grays, since the default bootswatch grays are almost impossible to see against white
 $gray-100: #ecf0f1;

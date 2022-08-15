@@ -6,7 +6,6 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPatreon } from "@fortawesome/free-brands-svg-icons";
 import { motion } from "framer-motion";
 import { container, item, image, panel } from "../../../data/animation";
-
 interface Props {
   sessionWrapper: SessionWrapper;
 }
@@ -28,7 +27,7 @@ function PatronPage(props: Props) {
               expensive server bills.
             </motion.p>
 
-            <motion.div variants={item}>
+            <motion.div className="d-flex" variants={item}>
               <a
                 href="https://www.patreon.com/fakeyou"
                 target="_blank"
