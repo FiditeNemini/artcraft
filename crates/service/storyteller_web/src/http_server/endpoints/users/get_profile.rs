@@ -13,8 +13,9 @@ use crate::server_state::ServerState;
 use database_queries::queries::users::get_user_profile_by_username::{get_user_profile_by_username, UserProfileResult};
 use database_queries::queries::users::user_badges::list_user_badges::UserBadgeForList;
 use database_queries::queries::users::user_badges::list_user_badges::list_user_badges;
+use http_server_common::request::get_request_header_optional::get_request_header_optional;
 use http_server_common::util::timer::MultiBenchmarkingTimer;
-use log::{info, warn, log};
+use log::{info, warn, log, error};
 use md5::{Md5, Digest};
 use regex::Regex;
 use reusable_types::entity_visibility::EntityVisibility;
@@ -24,7 +25,6 @@ use sqlx::error::Error::Database;
 use sqlx::mysql::MySqlDatabaseError;
 use std::fmt;
 use std::sync::Arc;
-use time::Instant;
 
 // TODO: This is duplicated in query_user_profile
 // TODO: This handler has embedded queries.
@@ -113,7 +113,7 @@ pub async fn get_profile_handler(
   path: Path<GetProfilePathInfo>,
   server_state: web::Data<Arc<ServerState>>) -> Result<HttpResponse, ProfileError>
 {
-  let mut benchmark = MultiBenchmarkingTimer::new();
+  let mut benchmark = MultiBenchmarkingTimer::new_started();
 
   let maybe_user_session =
       benchmark.time_async_section("session checker", || async {
@@ -135,7 +135,9 @@ pub async fn get_profile_handler(
   }
 
   let maybe_user_profile =
-      get_user_profile_by_username(&path.username, &server_state.mysql_pool).await;
+      benchmark.time_async_section("profile query", || async {
+        get_user_profile_by_username(&path.username, &server_state.mysql_pool).await
+      }).await;
 
   let mut user_profile = match maybe_user_profile {
     Ok(Some(user_profile)) => user_profile,
@@ -159,16 +161,16 @@ pub async fn get_profile_handler(
     return Err(ProfileError::NotFound);
   }
 
-  let time_before_badges_list = Instant::now();
-
-  let badges = list_user_badges(&server_state.mysql_pool, &user_profile.user_token)
-      .await
-      .unwrap_or_else(|err| {
-        warn!("Error querying badges: {:?}", err);
-        return Vec::new(); // NB: Fine if this fails. Not sure why it would.
-      });
-
-  let time_after_badges_list = Instant::now();
+  let badges =
+      benchmark.time_async_section("badges query", || async {
+        list_user_badges(&server_state.mysql_pool, &user_profile.user_token)
+            .await
+      })
+          .await
+          .unwrap_or_else(|err| {
+            warn!("Error querying badges: {:?}", err);
+            return Vec::new(); // NB: Fine if this fails. Not sure why it would.
+          });
 
   let mut profile_for_response = UserProfileRecordForResponse {
     user_token: user_profile.user_token,
@@ -203,17 +205,30 @@ pub async fn get_profile_handler(
     profile_for_response.maybe_moderator_fields = None;
   }
 
+  benchmark.mark_end();
+
   let response = ProfileSuccessResponse {
     success: true,
     user: Some(profile_for_response),
   };
 
-  let time_at_request_end = Instant::now();
-
   let body = serde_json::to_string(&response)
     .map_err(|e| ProfileError::ServerError)?;
 
-  Ok(HttpResponse::Ok()
-    .content_type("application/json")
-    .body(body))
+  let mut http_response = HttpResponse::Ok();
+
+  http_response.content_type("application/json");
+
+  let has_debug_header = get_request_header_optional(&http_request, "debug-timing")
+      .is_some();
+
+  if has_debug_header {
+    for header in benchmark.section_timings_as_headers() {
+      http_response.insert_header(header);
+    }
+  }
+
+  let http_response = http_response.body(body);
+
+  Ok(http_response)
 }
