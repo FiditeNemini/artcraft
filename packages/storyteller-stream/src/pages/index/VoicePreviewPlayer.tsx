@@ -1,84 +1,82 @@
-import React from "react";
+import React, { useState, useCallback } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faMicrophone, faPlay } from "@fortawesome/free-solid-svg-icons";
+import {
+  faMicrophone,
+  faPause,
+  faPlay,
+} from "@fortawesome/free-solid-svg-icons";
 import Wavesurfer from "react-wavesurfer.js";
-import AudioSampleButton from "./AudioSampleButton";
 
-export default class MyComponent extends React.Component<any, any> {
-  constructor(props: any) {
-    super(props);
-
-    this.state = {
-      playing: false,
-      pos: 0,
-    };
-    this.handleTogglePlay = this.handleTogglePlay.bind(this);
-    this.handlePosChange = this.handlePosChange.bind(this);
-  }
-  handleTogglePlay() {
-    this.setState({
-      playing: !this.state.playing,
-    });
-  }
-  handlePosChange(e: any) {
-    this.setState({
-      pos: e.originalArgs[0],
-    });
-  }
-
-  render() {
-    let wavesurferConfigs = [
-      {
-        filename: "/assets/preview/tracer.wav",
-        title: "Tracer (Overwatch)",
-      },
-      {
-        filename: "/assets/preview/son-goku.wav",
-        title: "Son Goku (Sean Schemmel)",
-      },
-      {
-        filename: "/assets/preview/stan-lee.wav",
-        title: "Stan Lee",
-      },
-    ];
-
-    let wavesurfers = wavesurferConfigs.map((config) => {
-      let ws = (
-        <div className="col-12 col-lg-4">
-          <div className="panel p-3">
-            <div className="d-flex gap-3 align-items-center mb-4">
-              <button
-                className="btn btn-primary btn-voice-preview align-items-center justify-content-center"
-                onClick={() => this.handleTogglePlay()}
-              >
-                <FontAwesomeIcon icon={faPlay} />
-              </button>
-              <span className="fw-semibold voice-preview-text">
-                <FontAwesomeIcon icon={faMicrophone} className="me-2" />
-                {config.title}
-              </span>
-            </div>
-            <div className="w-100 h-100 my-2">
-              <Wavesurfer
-                src={config.filename}
-                barWidth={2}
-                barRadius={1}
-                barGap={2}
-                barMinHeight={1}
-                barHeight={2}
-                height={20}
-                progressColor="#fc8481"
-                waveColor="#b09e9e"
-                cursorColor="transparent"
-                playing={this.state.playing}
-                responsive={true}
-              />
-            </div>
-          </div>
-        </div>
-      );
-      return ws;
-    });
-    return <div className="row gx-4 gy-4">{wavesurfers}</div>;
-  }
+interface Props {
+  filename: string;
+  title: string;
 }
+
+function VoicePreviewPlayer(props: Props) {
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [position, setPosition] = useState(0);
+
+  const handleTogglePlay = useCallback(() => {
+    if (!isPlaying) {
+      setIsPlaying(true);
+    } else {
+      setIsPlaying(false);
+    }
+  }, [isPlaying]);
+
+  const handleFinish = useCallback(() => {
+    setIsPlaying(false);
+    setPosition(0);
+    return [setIsPlaying, setPosition];
+  }, []);
+
+  let playButtonText = <FontAwesomeIcon icon={faPlay} />;
+
+  if (isPlaying) {
+    playButtonText = (
+      <>
+        <FontAwesomeIcon icon={faPause} />
+      </>
+    );
+  }
+
+  return (
+    <div className="col-6 col-md-3">
+      <div className="panel p-2 p-lg-3">
+        <div className="d-flex gap-2 gap-md-3 align-items-center">
+          <button
+            className="btn btn-primary btn-voice-preview align-items-center justify-content-center"
+            onClick={() => handleTogglePlay()}
+          >
+            {playButtonText}
+          </button>
+          <span className="fw-semibold voice-preview-text">
+            <FontAwesomeIcon icon={faMicrophone} className="me-2" />
+            {props.title}
+          </span>
+        </div>
+        <div className="w-100 h-100 mt-4 pb-1 d-none d-lg-block">
+          <Wavesurfer
+            onFinish={handleFinish}
+            pos={position}
+            src={props.filename}
+            barWidth={2}
+            barRadius={1}
+            barGap={2}
+            barMinHeight={1}
+            barHeight={2}
+            height={20}
+            progressColor="#fc8481"
+            waveColor="#b09e9e"
+            cursorColor="transparent"
+            playing={isPlaying}
+            responsive={true}
+            normalize={true}
+          />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export { VoicePreviewPlayer };
