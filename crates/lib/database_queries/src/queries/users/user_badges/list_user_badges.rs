@@ -2,7 +2,8 @@ use anyhow::anyhow;
 use chrono::{DateTime, Utc};
 use container_common::anyhow_result::AnyhowResult;
 use log::{warn, info};
-use sqlx::MySqlPool;
+use sqlx::{MySql, MySqlPool};
+use sqlx::pool::PoolConnection;
 
 #[derive(Serialize)]
 pub struct UserBadgeForList {
@@ -22,7 +23,7 @@ struct RawDbUserBadgeForList {
 }
 
 pub async fn list_user_badges(
-  mysql_pool: &MySqlPool,
+  mysql_connector: &mut PoolConnection<MySql>,
   user_token: &str,
 ) -> AnyhowResult<Vec<UserBadgeForList>> {
   info!("listing user badges");
@@ -45,7 +46,7 @@ WHERE
         "#,
         user_token
       )
-      .fetch_all(mysql_pool)
+      .fetch_all(mysql_connector)
       .await;
 
   let user_badges : Vec<RawDbUserBadgeForList> = match maybe_user_badges {

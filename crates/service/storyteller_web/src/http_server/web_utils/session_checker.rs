@@ -5,8 +5,9 @@ use crate::http_server::web_utils::cookie_manager::CookieManager;
 use database_queries::column_types::record_visibility::RecordVisibility;
 use database_queries::helpers::boolean_converters::{nullable_i8_to_optional_bool, i8_to_bool};
 use log::{info, warn};
-use sqlx::MySqlPool;
+use sqlx::{MySqlPool, MySql};
 use sqlx::error::Error::RowNotFound;
+use sqlx::pool::PoolConnection;
 
 #[derive(Clone)]
 pub struct SessionChecker {
@@ -164,7 +165,17 @@ AND deleted_at IS NULL
     }
   }
 
-  pub async fn maybe_get_user_session(&self, request: &HttpRequest, pool: &MySqlPool)
+  //#[deprecated = "Use the PoolConnection method"]
+  pub async fn maybe_get_user_session(
+    &self,
+    request: &HttpRequest,
+    pool: &MySqlPool) -> AnyhowResult<Option<SessionUserRecord>>
+  {
+    let mut connection = pool.acquire().await?;
+    self.maybe_get_user_session_from_connection(request, &mut connection).await
+  }
+
+  pub async fn maybe_get_user_session_from_connection(&self, request: &HttpRequest, pool: &mut PoolConnection<MySql>)
     -> AnyhowResult<Option<SessionUserRecord>>
   {
 

@@ -85,6 +85,8 @@ impl MultiBenchmarkingTimer {
     }
   }
 
+  /// Time an async function that does not require moving args.
+  /// An example of this is an async section that takes a `MySqlPool`, which is Sync/Send.
   pub async fn time_async_section<F, Fut, T>(
     &mut self,
     section_name: &str,
@@ -103,5 +105,30 @@ impl MultiBenchmarkingTimer {
     });
 
     result
+  }
+
+  /// Time an async function, passing ownership of arguments before returning them.
+  /// This avoids the use of mutexes.
+  /// An example of this is an async section that takes an `&mut PoolConnection<MySql>`, which is
+  /// not Sync/Send safe, so we instead send the entire `PoolConnection<MySql>` until we're done.
+  pub async fn time_async_section_moving_args<F, Fut, Arg, Ret>(
+    &mut self,
+    section_name: &str,
+    mut arg: Arg,
+    callback: F
+  ) -> (Arg, Ret)
+    where F: FnOnce(Arg) -> Fut,
+          Fut: Future<Output = (Arg, Ret)>,
+  {
+    let before = Instant::now();
+    let (mut arg, result) = callback(arg).await;
+    let after = Instant::now();
+
+    self.recorded_sections.push(SectionTime {
+      section_name: section_name.to_string(),
+      duration: after.duration_since(before),
+    });
+
+    (arg, result)
   }
 }
