@@ -3,14 +3,14 @@ use chrono::{DateTime, Utc};
 use container_common::anyhow_result::AnyhowResult;
 use crate::helpers::boolean_converters::i8_to_bool;
 use log::{info, warn, log};
+use reusable_types::entity_visibility::EntityVisibility;
 use sqlx::MySqlPool;
 use sqlx::error::DatabaseError;
 use sqlx::error::Error::Database;
 use sqlx::mysql::MySqlDatabaseError;
 use std::sync::Arc;
 
-// TODO: This duplicates the get_profile_handler.
-
+// TODO: Make non-`Serialize` and make the HTTP endpoints do the work
 #[derive(Serialize)]
 pub struct UserProfileResult {
   pub user_token: String,
@@ -20,33 +20,66 @@ pub struct UserProfileResult {
   pub profile_markdown: String,
   pub profile_rendered_html: String,
   pub user_role_slug: String,
-  pub is_banned: bool,
   pub disable_gravatar: bool,
+
+  // NB: Legacy top-level moderator field
+  #[deprecated = "use moderator fields instead"]
+  pub is_banned: bool,
+
+  // Social
   pub discord_username: Option<String>,
   pub twitch_username: Option<String>,
   pub twitter_username: Option<String>,
   pub patreon_username: Option<String>,
   pub github_username: Option<String>,
+  pub cashapp_username: Option<String>,
+  pub website_url: Option<String>,
+
+  // Preferences; NB: included for get_profile_handler legacy reasons
+  pub preferred_tts_result_visibility: EntityVisibility,
+  pub preferred_w2l_result_visibility: EntityVisibility,
+
   pub created_at: DateTime<Utc>,
+
+  // NB: Moderator fields must be cleared by HTTP handlers for non-mods
+  #[serde(skip_serializing_if = "Option::is_none")]
+  pub maybe_moderator_fields: Option<UserProfileModeratorFields>,
 }
 
+// TODO: Make non-`Serialize` and make the HTTP endpoints do the work
 #[derive(Serialize)]
+pub struct UserProfileModeratorFields {
+  pub is_banned: bool,
+  pub maybe_mod_comments: Option<String>,
+  pub maybe_mod_user_token: Option<String>,
+}
+
 struct RawUserProfileRecord {
-  pub user_token: String,
-  pub username: String,
-  pub email_gravatar_hash: String,
-  pub display_name: String,
-  pub profile_markdown: String,
-  pub profile_rendered_html: String,
-  pub user_role_slug: String,
-  pub is_banned: i8,
-  pub disable_gravatar: i8,
-  pub discord_username: Option<String>,
-  pub twitch_username: Option<String>,
-  pub twitter_username: Option<String>,
-  pub patreon_username: Option<String>,
-  pub github_username: Option<String>,
-  pub created_at: DateTime<Utc>,
+  user_token: String,
+  username: String,
+  email_gravatar_hash: String,
+  display_name: String,
+  profile_markdown: String,
+  profile_rendered_html: String,
+  user_role_slug: String,
+  disable_gravatar: i8,
+  discord_username: Option<String>,
+  twitch_username: Option<String>,
+  twitter_username: Option<String>,
+  patreon_username: Option<String>,
+  github_username: Option<String>,
+  cashapp_username: Option<String>,
+  website_url: Option<String>,
+  created_at: DateTime<Utc>,
+
+  // Preferences; NB: included for get_profile_handler legacy reasons
+  preferred_tts_result_visibility: EntityVisibility,
+  preferred_w2l_result_visibility: EntityVisibility,
+
+  // Mod fields
+  is_banned: i8,
+  maybe_mod_comments: Option<String>,
+  maybe_mod_user_token: Option<String>,
 }
 
 pub async fn get_user_profile_by_username(
@@ -64,13 +97,19 @@ SELECT
     profile_markdown,
     profile_rendered_html,
     user_role_slug,
-    is_banned,
     disable_gravatar,
+    preferred_tts_result_visibility as `preferred_tts_result_visibility: reusable_types::entity_visibility::EntityVisibility`,
+    preferred_w2l_result_visibility as `preferred_w2l_result_visibility: reusable_types::entity_visibility::EntityVisibility`,
     discord_username,
     twitch_username,
     twitter_username,
     patreon_username,
     github_username,
+    cashapp_username,
+    website_url,
+    is_banned,
+    maybe_mod_comments,
+    maybe_mod_user_token,
     created_at
 FROM users
 WHERE
@@ -99,21 +138,30 @@ WHERE
   };
 
   let profile_for_response = UserProfileResult {
-    user_token: profile_record.user_token.clone(),
-    username: profile_record.username.clone(),
-    display_name: profile_record.display_name.clone(),
-    email_gravatar_hash: profile_record.email_gravatar_hash.clone(),
-    profile_markdown: profile_record.profile_markdown.clone(),
-    profile_rendered_html: profile_record.profile_rendered_html.clone(),
-    user_role_slug: profile_record.user_role_slug.clone(),
+    user_token: profile_record.user_token,
+    username: profile_record.username,
+    display_name: profile_record.display_name,
+    email_gravatar_hash: profile_record.email_gravatar_hash,
+    profile_markdown: profile_record.profile_markdown,
+    profile_rendered_html: profile_record.profile_rendered_html,
+    user_role_slug: profile_record.user_role_slug,
     is_banned: i8_to_bool(profile_record.is_banned),
     disable_gravatar: i8_to_bool(profile_record.disable_gravatar),
-    discord_username: profile_record.discord_username.clone(),
-    twitch_username: profile_record.twitch_username.clone(),
-    twitter_username: profile_record.twitter_username.clone(),
-    patreon_username: profile_record.patreon_username.clone(),
-    github_username: profile_record.github_username.clone(),
-    created_at: profile_record.created_at.clone(),
+    discord_username: profile_record.discord_username,
+    twitch_username: profile_record.twitch_username,
+    twitter_username: profile_record.twitter_username,
+    patreon_username: profile_record.patreon_username,
+    github_username: profile_record.github_username,
+    cashapp_username: profile_record.cashapp_username,
+    website_url: profile_record.website_url,
+    preferred_tts_result_visibility: profile_record.preferred_tts_result_visibility,
+    preferred_w2l_result_visibility: profile_record.preferred_w2l_result_visibility,
+    created_at: profile_record.created_at,
+    maybe_moderator_fields: Some(UserProfileModeratorFields {
+      is_banned: i8_to_bool(profile_record.is_banned),
+      maybe_mod_comments: profile_record.maybe_mod_comments,
+      maybe_mod_user_token: profile_record.maybe_mod_user_token,
+    })
   };
 
   Ok(Some(profile_for_response))
