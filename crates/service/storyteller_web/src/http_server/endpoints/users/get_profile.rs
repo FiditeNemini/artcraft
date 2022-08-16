@@ -10,7 +10,7 @@ use anyhow::anyhow;
 use chrono::{DateTime, Utc};
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::server_state::ServerState;
-use database_queries::queries::users::get_user_profile_by_username::{get_user_profile_by_username, UserProfileResult};
+use database_queries::queries::users::get_user_profile_by_username::{get_user_profile_by_username, UserProfileResult, get_user_profile_by_username_from_connection};
 use database_queries::queries::users::user_badges::list_user_badges::UserBadgeForList;
 use database_queries::queries::users::user_badges::list_user_badges::list_user_badges;
 use http_server_common::request::get_request_header_optional::get_request_header_optional;
@@ -103,11 +103,6 @@ impl fmt::Display for ProfileError {
   }
 }
 
-
-struct Timing {
-
-}
-
 pub async fn get_profile_handler(
   http_request: HttpRequest,
   path: Path<GetProfilePathInfo>,
@@ -115,18 +110,28 @@ pub async fn get_profile_handler(
 {
   let mut benchmark = MultiBenchmarkingTimer::new_started();
 
-  let maybe_user_session =
-      benchmark.time_async_section("session checker", || async {
-        server_state
+  let mut pool_connection = server_state.mysql_pool.acquire()
+      .await
+      .map_err(|e| {
+        warn!("Could not acquire DB pool: {:?}", e);
+        ProfileError::ServerError
+      })?;
+
+  let (mut pool_connection, maybe_user_session_fut) =
+      benchmark.time_async_section_moving_args("session checker", pool_connection, |mut pc| async {
+        let ret = server_state
             .session_checker
-            .maybe_get_user_session(&http_request, &server_state.mysql_pool)
+            .maybe_get_user_session_from_connection(&http_request, &mut pc)
             .await
             .map_err(|e| {
               warn!("Session checker error: {:?}", e);
               ProfileError::ServerError
-            })
+            });
+        (pc, ret)
         }
-      ).await?;
+      ).await;
+
+  let maybe_user_session = maybe_user_session_fut?;
 
   let mut is_mod = false;
 
@@ -134,9 +139,10 @@ pub async fn get_profile_handler(
     is_mod = user_session.can_ban_users;
   }
 
-  let maybe_user_profile =
-      benchmark.time_async_section("profile query", || async {
-        get_user_profile_by_username(&path.username, &server_state.mysql_pool).await
+  let (mut pool_connection, maybe_user_profile) =
+      benchmark.time_async_section_moving_args("profile query", pool_connection, |mut pc| async {
+        let ret = get_user_profile_by_username_from_connection(&path.username, &mut pc).await;
+        (pc, ret)
       }).await;
 
   let mut user_profile = match maybe_user_profile {
@@ -161,16 +167,18 @@ pub async fn get_profile_handler(
     return Err(ProfileError::NotFound);
   }
 
-  let badges =
-      benchmark.time_async_section("badges query", || async {
-        list_user_badges(&server_state.mysql_pool, &user_profile.user_token)
-            .await
-      })
-          .await
-          .unwrap_or_else(|err| {
-            warn!("Error querying badges: {:?}", err);
-            return Vec::new(); // NB: Fine if this fails. Not sure why it would.
-          });
+  let (_pool_connection, maybe_badges) =
+      benchmark.time_async_section_moving_args("badges query", pool_connection, |mut pc| async {
+        let ret = list_user_badges(&mut pc, &user_profile.user_token)
+            .await;
+        (pc, ret)
+      }).await;
+
+  let badges = maybe_badges
+      .unwrap_or_else(|err| {
+        warn!("Error querying badges: {:?}", err);
+        return Vec::new(); // NB: Fine if this fails. Not sure why it would.
+      });
 
   let mut profile_for_response = UserProfileRecordForResponse {
     user_token: user_profile.user_token,

@@ -4,11 +4,12 @@ use container_common::anyhow_result::AnyhowResult;
 use crate::helpers::boolean_converters::i8_to_bool;
 use log::{info, warn, log};
 use reusable_types::entity_visibility::EntityVisibility;
-use sqlx::MySqlPool;
+use sqlx::{MySqlPool, MySql};
 use sqlx::error::DatabaseError;
 use sqlx::error::Error::Database;
 use sqlx::mysql::MySqlDatabaseError;
 use std::sync::Arc;
+use sqlx::pool::PoolConnection;
 
 // TODO: Make non-`Serialize` and make the HTTP endpoints do the work
 #[derive(Serialize)]
@@ -82,9 +83,18 @@ struct RawUserProfileRecord {
   maybe_mod_user_token: Option<String>,
 }
 
+//#[deprecated = "Use the PoolConnection method"]
 pub async fn get_user_profile_by_username(
   username: &str,
   mysql_pool: &MySqlPool
+) -> AnyhowResult<Option<UserProfileResult>> {
+  let mut connection = mysql_pool.acquire().await?;
+  get_user_profile_by_username_from_connection(username, &mut connection).await
+}
+
+pub async fn get_user_profile_by_username_from_connection<'a>(
+  username: &str,
+  connection: &'a mut PoolConnection<MySql>
 ) -> AnyhowResult<Option<UserProfileResult>> {
   let maybe_profile_record = sqlx::query_as!(
       RawUserProfileRecord,
@@ -119,7 +129,7 @@ WHERE
         "#,
         username,
     )
-      .fetch_one(mysql_pool)
+      .fetch_one(connection)
       .await;
 
   let profile_record : RawUserProfileRecord = match maybe_profile_record {
