@@ -1,19 +1,27 @@
-import React, { useState } from "react";
+import React from "react";
 import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faArrowRight,
+  faHeadphones,
   faLongArrowAltRight,
   faMicrophone,
-  faPlay,
   faVolumeUp,
 } from "@fortawesome/free-solid-svg-icons";
 import { faDiscord } from "@fortawesome/free-brands-svg-icons";
-import VoicePreviewPlayer from "./VoicePreviewPlayer";
+import { VoicePreviewPlayer } from "./VoicePreviewPlayer";
+import { wavesurferConfigs } from "./wsConfig";
 
 interface Props {
   sessionWrapper: SessionWrapper;
 }
+
+let wavesurfers = wavesurferConfigs.map((config) => {
+  let ws = (
+    <VoicePreviewPlayer filename={config.filename} title={config.title} />
+  );
+  return ws;
+});
 
 function IndexPage(props: Props) {
   return (
@@ -55,19 +63,21 @@ function IndexPage(props: Props) {
               alt=""
             />
 
-            <div className="panel hero-floating-panel hero-floating-panel-left d-none d-lg-block">
-              <h6 className="pb-0">
-                <i className="fa-solid fa-volume-high me-2"></i>Tracer
-                (Overwatch)
-              </h6>
-              <p className="hero-floating-panel-text">
-                “Look out world! Tracer's here.”
-              </p>
-            </div>
+            {
+              <div className="panel hero-floating-panel hero-floating-panel-left d-none d-lg-block">
+                <h6 className="pb-0">
+                  <FontAwesomeIcon icon={faMicrophone} className="me-2" />
+                  Tracer (Overwatch)
+                </h6>
+                <p className="hero-floating-panel-text">
+                  “Look out world! Tracer's here.”
+                </p>
+              </div>
+            }
             <div className="panel hero-floating-panel hero-floating-panel-right d-none d-lg-block">
               <h6 className="pb-0">
-                <i className="fa-solid fa-volume-high me-2"></i>Sonic the
-                Hedgehog
+                <FontAwesomeIcon icon={faMicrophone} className="me-2" />
+                Sonic the Hedgehog
               </h6>
               <p className="hero-floating-panel-text">
                 "This is what speed looks like."
@@ -104,6 +114,7 @@ function IndexPage(props: Props) {
                   </p>
                   <a className="fw-bold" href="">
                     Sign up now
+                    <FontAwesomeIcon icon={faArrowRight} className="ms-2" />
                   </a>
                 </div>
               </div>
@@ -115,13 +126,14 @@ function IndexPage(props: Props) {
                     alt=""
                     width="80"
                   />
-                  <h4 className="features-title mb-3">Over 1700 voices!</h4>
+                  <h4 className="features-title mb-3">Over 2000 voices!</h4>
                   <p className="mb-4">
                     Morbi dapibus commodo porta. Sed faucibus tristique orci in
                     tristique. Praesent quam nunc, fermentum eu feugiat sit.
                   </p>
                   <a className="fw-bold" href="">
                     See all the voices on FakeYou
+                    <FontAwesomeIcon icon={faArrowRight} className="ms-2" />
                   </a>
                 </div>
               </div>
@@ -140,6 +152,7 @@ function IndexPage(props: Props) {
                   </p>
                   <a className="fw-bold" href="">
                     Sign up now
+                    <FontAwesomeIcon icon={faArrowRight} className="ms-2" />
                   </a>
                 </div>
               </div>
@@ -152,27 +165,31 @@ function IndexPage(props: Props) {
         <div className="container section d-flex flex-column align-items-center">
           <div className="d-flex justify-content-center align-items-center gap-4">
             <img className="rotateimg180" src="assets/title-shape.png" alt="" />
-            <h6 className="pre-heading text-center fw-bold pt-2">
-              Our TTS Voices
-            </h6>
+            <h6 className="pre-heading text-center fw-bold pt-2">TTS Voices</h6>
             <img src="assets/title-shape.png" alt="" />
           </div>
           <h1 className="display-5 fw-bold mt-3">
             <span className="word">Voice Previews</span>
           </h1>
           <div className="voices-section">
-            <VoicePreviewPlayer />
-            <div className="mt-5 pt-4">
-              <a
-                className="btn btn-secondary"
-                href="https://fakeyou.com"
-                rel="noreferrer"
-                target="_blank"
-              >
-                <FontAwesomeIcon icon={faVolumeUp} className="me-3" />
-                Listen to all 2000+ usable voices on FakeYou
-                <FontAwesomeIcon icon={faLongArrowAltRight} className="ms-2" />
-              </a>
+            <div className="row gx-3 gy-3 gx-lg-4 gy-lg-4">{wavesurfers}</div>
+            <div className="mt-5 pt-2 d-flex flex-column gap-4">
+              <p className="lead">
+                These are just a few samples of the voices available! Listen to
+                <span className="fw-bold"> 2000+</span> more usable voices on
+                our TTS platform FakeYou.
+              </p>
+              <div>
+                <a
+                  className="btn btn-primary"
+                  href="https://fakeyou.com"
+                  rel="noreferrer"
+                  target="_blank"
+                >
+                  <FontAwesomeIcon icon={faHeadphones} className="me-3" />
+                  Listen to 2000+ more voices!
+                </a>
+              </div>
             </div>
           </div>
         </div>
@@ -201,7 +218,7 @@ function IndexPage(props: Props) {
             </div>
             <div className="col-md-6">
               <div className="panel insights-panel h-100 panel-ani">
-                <h2 className="fw-bold mb-1">+1700</h2>
+                <h2 className="fw-bold mb-1">+2000</h2>
                 <p>TTS Voices in the library (and growing)</p>
                 <hr />
                 <h2 className="fw-bold mb-1">+10K</h2>
