@@ -170,7 +170,7 @@ AND deleted_at IS NULL
     }
   }
 
-  #[deprecated = "Use the PoolConnection method"]
+  #[deprecated = "Use the PoolConnection<MySql> method instead of the MySqlPool one."]
   pub async fn maybe_get_user_session(
     &self,
     request: &HttpRequest,
