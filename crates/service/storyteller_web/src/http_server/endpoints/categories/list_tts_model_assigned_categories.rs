@@ -1,23 +1,17 @@
-use actix_http::Error;
-use actix_http::http::header;
-use actix_web::HttpResponseBuilder;
-use actix_web::cookie::Cookie;
+// NB: Incrementally getting rid of build warnings...
+#![forbid(unused_imports)]
+#![forbid(unused_mut)]
+#![forbid(unused_variables)]
+
 use actix_web::error::ResponseError;
 use actix_web::http::StatusCode;
-use actix_web::web::{Path, Json};
-use actix_web::{Responder, web, HttpResponse, error, HttpRequest};
+use actix_web::web::Path;
+use actix_web::{web, HttpResponse, HttpRequest};
 use chrono::{DateTime, Utc};
-use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
-use crate::http_server::web_utils::response_success_helpers::simple_json_success;
 use crate::server_state::ServerState;
 use database_queries::queries::tts::tts_category_assignments::list_assigned_tts_categories_query_builder::ListAssignedTtsCategoriesQueryBuilder;
 use http_server_common::response::serialize_as_json_error::serialize_as_json_error;
-use log::{info, warn, log};
-use regex::Regex;
-use sqlx::MySqlPool;
-use sqlx::error::DatabaseError;
-use sqlx::error::Error::Database;
-use sqlx::mysql::MySqlDatabaseError;
+use log::warn;
 use std::fmt;
 use std::sync::Arc;
 
@@ -100,9 +94,16 @@ pub async fn list_tts_model_assigned_categories_handler(
   path: Path<ListTtsModelAssignedCategoriesPathInfo>,
   server_state: web::Data<Arc<ServerState>>) -> Result<HttpResponse, ListTtsModelAssignedCategoriesError>
 {
+  let mut mysql_connection = server_state.mysql_pool.acquire()
+      .await
+      .map_err(|e| {
+        warn!("Could not acquire DB pool: {:?}", e);
+        ListTtsModelAssignedCategoriesError::ServerError
+      })?;
+
   let maybe_user_session = server_state
       .session_checker
-      .maybe_get_user_session(&http_request, &server_state.mysql_pool)
+      .maybe_get_user_session_from_connection(&http_request, &mut mysql_connection)
       .await
       .map_err(|e| {
         warn!("Session checker error: {:?}", e);
@@ -120,7 +121,7 @@ pub async fn list_tts_model_assigned_categories_handler(
       .show_unapproved(is_mod);
 
   let query_result =
-      query_builder.perform_query(&server_state.mysql_pool).await;
+      query_builder.perform_query_by_connection(&mut mysql_connection).await;
 
   let results = match query_result {
     Ok(results) => results,
@@ -130,21 +131,21 @@ pub async fn list_tts_model_assigned_categories_handler(
     }
   };
 
-  let mut categories = results.categories.iter()
+  let mut categories = results.categories.into_iter()
       .map(|c| {
         DisplayCategory {
-          category_token: c.category_token.clone(),
-          model_type: c.model_type.clone(),
-          maybe_super_category_token: c.maybe_super_category_token.clone(),
+          category_token: c.category_token,
+          model_type: c.model_type,
+          maybe_super_category_token: c.maybe_super_category_token,
           can_directly_have_models: c.can_directly_have_models,
           can_have_subcategories: c.can_have_subcategories,
           can_only_mods_apply: c.can_only_mods_apply,
           name: c.name.clone(),
-          maybe_dropdown_name:c.maybe_dropdown_name.clone(),
-          is_mod_approved: c.is_mod_approved.clone(),
-          category_created_at: c.category_created_at.clone(),
-          category_updated_at: c.category_updated_at.clone(),
-          category_deleted_at: c.category_deleted_at.clone(),
+          maybe_dropdown_name:c.maybe_dropdown_name,
+          is_mod_approved: c.is_mod_approved,
+          category_created_at: c.category_created_at,
+          category_updated_at: c.category_updated_at,
+          category_deleted_at: c.category_deleted_at,
         }
       })
       .collect::<Vec<DisplayCategory>>();
@@ -158,7 +159,7 @@ pub async fn list_tts_model_assigned_categories_handler(
   };
 
   let body = serde_json::to_string(&response)
-      .map_err(|e| ListTtsModelAssignedCategoriesError::ServerError)?;
+      .map_err(|_e| ListTtsModelAssignedCategoriesError::ServerError)?;
 
   Ok(HttpResponse::Ok()
       .content_type("application/json")

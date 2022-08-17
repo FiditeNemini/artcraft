@@ -3,7 +3,8 @@ use chrono::{DateTime, Utc};
 use container_common::anyhow_result::AnyhowResult;
 use crate::helpers::boolean_converters::{i8_to_bool, nullable_i8_to_optional_bool};
 use log::{warn, info};
-use sqlx::MySqlPool;
+use sqlx::{MySql, MySqlPool};
+use sqlx::pool::PoolConnection;
 
 /// List of assigned categories for a TTS model
 /// This is *NOT* paginated, as that defeats the purpose of having a category system.
@@ -94,12 +95,22 @@ impl ListAssignedTtsCategoriesQueryBuilder {
   }
 
   /// Perform the query based on the set predicates.
+  #[deprecated = "Use the PoolConnection<MySql> method instead of the MySqlPool one."]
   pub async fn perform_query(
     &self,
     mysql_pool: &MySqlPool
   ) -> AnyhowResult<AssignedCategoryList> {
+    let mut mysql_connection = mysql_pool.acquire().await?;
+    self.perform_query_by_connection(&mut mysql_connection).await
+  }
 
-    let internal_results = self.perform_internal_query(mysql_pool).await?;
+  /// Perform the query based on the set predicates.
+  pub async fn perform_query_by_connection(
+    &self,
+    mysql_connection: &mut PoolConnection<MySql>
+  ) -> AnyhowResult<AssignedCategoryList> {
+
+    let internal_results = self.perform_internal_query(mysql_connection).await?;
 
     let categories = internal_results
         .into_iter()
@@ -137,7 +148,7 @@ impl ListAssignedTtsCategoriesQueryBuilder {
   /// Perform the query based on the set predicates.
   async fn perform_internal_query(
     &self,
-    mysql_pool: &MySqlPool
+    mysql_connection: &mut PoolConnection<MySql>
   ) -> AnyhowResult<Vec<RawInternalCategoryRecord>> {
 
     let query = self.build_query_string();
@@ -148,7 +159,7 @@ impl ListAssignedTtsCategoriesQueryBuilder {
     // NB: Model token is always used for scoping.
     query = query.bind(&self.scope_tts_model_token);
 
-    let mut results = query.fetch_all(mysql_pool)
+    let mut results = query.fetch_all(mysql_connection)
         .await?;
 
     Ok(results)
