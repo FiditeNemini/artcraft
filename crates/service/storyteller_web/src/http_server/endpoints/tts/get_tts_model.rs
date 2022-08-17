@@ -12,7 +12,7 @@ use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::server_state::ServerState;
 use database_queries::column_types::record_visibility::RecordVisibility;
 use database_queries::column_types::vocoder_type::VocoderType;
-use database_queries::queries::tts::tts_models::get_tts_model::get_tts_model_by_token;
+use database_queries::queries::tts::tts_models::get_tts_model::get_tts_model_by_token_using_connection;
 use log::warn;
 use std::fmt;
 use std::sync::Arc;
@@ -154,9 +154,16 @@ pub async fn get_tts_model_handler(
   path: Path<GetTtsModelPathInfo>,
   server_state: web::Data<Arc<ServerState>>) -> Result<HttpResponse, GetTtsModelError>
 {
+  let mut mysql_connection = server_state.mysql_pool.acquire()
+      .await
+      .map_err(|e| {
+        warn!("Could not acquire DB pool: {:?}", e);
+        GetTtsModelError::ServerError
+      })?;
+
   let maybe_user_session = server_state
       .session_checker
-      .maybe_get_user_session(&http_request, &server_state.mysql_pool)
+      .maybe_get_user_session_from_connection(&http_request, &mut mysql_connection)
       .await
       .map_err(|e| {
         warn!("Session checker error: {:?}", e);
@@ -176,10 +183,10 @@ pub async fn get_tts_model_handler(
         || user_session.can_edit_other_users_tts_models;
   }
 
-  let model_query_result = get_tts_model_by_token(
+  let model_query_result = get_tts_model_by_token_using_connection(
     &path.token,
     show_deleted_models,
-    &server_state.mysql_pool
+    &mut mysql_connection,
   ).await;
 
   let mut model = match model_query_result {

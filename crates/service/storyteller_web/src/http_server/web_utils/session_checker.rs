@@ -1,13 +1,18 @@
+// NB: Incrementally getting rid of build warnings...
+#![forbid(unused_imports)]
+#![forbid(unused_mut)]
+#![forbid(unused_variables)]
+
 use actix_web::HttpRequest;
 use anyhow::anyhow;
 use crate::AnyhowResult;
 use crate::http_server::web_utils::cookie_manager::CookieManager;
 use database_queries::column_types::record_visibility::RecordVisibility;
 use database_queries::helpers::boolean_converters::{nullable_i8_to_optional_bool, i8_to_bool};
-use log::{info, warn};
-use sqlx::{MySqlPool, MySql};
+use log::warn;
 use sqlx::error::Error::RowNotFound;
 use sqlx::pool::PoolConnection;
+use sqlx::{MySqlPool, MySql};
 
 #[derive(Clone)]
 pub struct SessionChecker {
@@ -169,14 +174,18 @@ AND deleted_at IS NULL
   pub async fn maybe_get_user_session(
     &self,
     request: &HttpRequest,
-    pool: &MySqlPool) -> AnyhowResult<Option<SessionUserRecord>>
+    pool: &MySqlPool,
+  ) -> AnyhowResult<Option<SessionUserRecord>>
   {
     let mut connection = pool.acquire().await?;
     self.maybe_get_user_session_from_connection(request, &mut connection).await
   }
 
-  pub async fn maybe_get_user_session_from_connection(&self, request: &HttpRequest, pool: &mut PoolConnection<MySql>)
-    -> AnyhowResult<Option<SessionUserRecord>>
+  pub async fn maybe_get_user_session_from_connection(
+    &self,
+    request: &HttpRequest,
+    mysql_connection: &mut PoolConnection<MySql>,
+  ) -> AnyhowResult<Option<SessionUserRecord>>
   {
 
     let session_token = match self.cookie_manager.decode_session_token_from_request(request)? {
@@ -240,7 +249,7 @@ WHERE user_sessions.token = ?
         "#,
         session_token.to_string(),
     )
-      .fetch_one(pool)
+      .fetch_one(mysql_connection)
       .await; // TODO: This will return error if it doesn't exist
 
     match maybe_user_record {
