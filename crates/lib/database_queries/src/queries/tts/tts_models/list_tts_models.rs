@@ -3,7 +3,8 @@ use chrono::{DateTime, Utc};
 use container_common::anyhow_result::AnyhowResult;
 use crate::helpers::boolean_converters::i8_to_bool;
 use log::{warn, info};
-use sqlx::MySqlPool;
+use sqlx::pool::PoolConnection;
+use sqlx::{MySql, MySqlPool};
 
 // FIXME: This is the old style of query scoping and shouldn't be copied.
 
@@ -41,14 +42,23 @@ pub async fn list_tts_models(
   scope_creator_username: Option<&str>,
   require_mod_approved: bool
 ) -> AnyhowResult<Vec<TtsModelRecordForList>> {
+  let mut connection = mysql_pool.acquire().await?;
+  list_tts_models_with_connection(&mut connection, scope_creator_username, require_mod_approved).await
+}
+
+pub async fn list_tts_models_with_connection(
+  mysql_connection: &mut PoolConnection<MySql>,
+  scope_creator_username: Option<&str>,
+  require_mod_approved: bool
+) -> AnyhowResult<Vec<TtsModelRecordForList>> {
 
   let maybe_models = match scope_creator_username {
     Some(username) => {
-      list_tts_models_creator_scoped(mysql_pool, username, require_mod_approved)
+      list_tts_models_creator_scoped(mysql_connection, username, require_mod_approved)
         .await
     },
     None => {
-      list_tts_models_for_all_creators(mysql_pool, require_mod_approved)
+      list_tts_models_for_all_creators(mysql_connection, require_mod_approved)
         .await
     },
   };
@@ -92,7 +102,7 @@ pub async fn list_tts_models(
 }
 
 async fn list_tts_models_for_all_creators(
-  mysql_pool: &MySqlPool,
+  mysql_connection: &mut PoolConnection<MySql>,
   allow_mod_disabled: bool
 ) -> AnyhowResult<Vec<InternalRawTtsModelRecordForList>> {
   // TODO: There has to be a better way.
@@ -126,7 +136,7 @@ WHERE
     AND tts.user_deleted_at IS NULL
     AND tts.mod_deleted_at IS NULL
         "#)
-      .fetch_all(mysql_pool)
+      .fetch_all(mysql_connection)
       .await?
   } else {
     info!("listing tts models for everyone; all");
@@ -156,7 +166,7 @@ WHERE
     tts.user_deleted_at IS NULL
     AND tts.mod_deleted_at IS NULL
         "#)
-      .fetch_all(mysql_pool)
+      .fetch_all(mysql_connection)
       .await?
   };
 
@@ -164,7 +174,7 @@ WHERE
 }
 
 async fn list_tts_models_creator_scoped(
-  mysql_pool: &MySqlPool,
+  mysql_connection: &mut PoolConnection<MySql>,
   scope_creator_username: &str,
   allow_mod_disabled: bool
 ) -> AnyhowResult<Vec<InternalRawTtsModelRecordForList>> {
@@ -202,7 +212,7 @@ WHERE
     AND tts.mod_deleted_at IS NULL
         "#,
       scope_creator_username)
-      .fetch_all(mysql_pool)
+      .fetch_all(mysql_connection)
       .await?
   } else {
     info!("listing tts models for user; all");
@@ -235,7 +245,7 @@ WHERE
     AND tts.mod_deleted_at IS NULL
         "#,
       scope_creator_username)
-      .fetch_all(mysql_pool)
+      .fetch_all(mysql_connection)
       .await?
   };
 
@@ -266,4 +276,3 @@ struct InternalRawTtsModelRecordForList {
   pub created_at: DateTime<Utc>,
   pub updated_at: DateTime<Utc>,
 }
-

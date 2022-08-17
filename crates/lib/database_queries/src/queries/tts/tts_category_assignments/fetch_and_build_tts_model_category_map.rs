@@ -1,7 +1,13 @@
+// NB: Incrementally getting rid of build warnings...
+#![forbid(unused_imports)]
+#![forbid(unused_mut)]
+#![forbid(unused_variables)]
+
 use anyhow::anyhow;
 use container_common::anyhow_result::AnyhowResult;
 use log::warn;
-use sqlx::MySqlPool;
+use sqlx::pool::PoolConnection;
+use sqlx::{MySql, MySqlPool};
 use std::collections::{HashSet, HashMap};
 
 /// Map of model_token => vec<category tokens>
@@ -14,7 +20,15 @@ pub struct TtsModelCategoryMap {
 pub async fn fetch_and_build_tts_model_category_map(
   mysql_pool: &MySqlPool
 ) -> AnyhowResult<TtsModelCategoryMap> {
-  let assignments = list_tts_model_category_assignments(mysql_pool).await?;
+  let mut connection = mysql_pool.acquire().await?;
+  fetch_and_build_tts_model_category_map_with_connection(&mut connection).await
+}
+
+/// Fetch a map of every model to all of its categories.
+pub async fn fetch_and_build_tts_model_category_map_with_connection(
+  mysql_connection: &mut PoolConnection<MySql>
+) -> AnyhowResult<TtsModelCategoryMap> {
+  let assignments = list_tts_model_category_assignments(mysql_connection).await?;
 
   let mut map : HashMap<String, HashSet<String>> = HashMap::new();
 
@@ -39,7 +53,7 @@ pub struct CategoryAssignment {
   pub category_token: String,
 }
 
-async fn list_tts_model_category_assignments(mysql_pool: &MySqlPool) -> AnyhowResult<Vec<CategoryAssignment>> {
+async fn list_tts_model_category_assignments(mysql_connection: &mut PoolConnection<MySql>) -> AnyhowResult<Vec<CategoryAssignment>> {
   let maybe_results = sqlx::query_as!(
       CategoryAssignment,
         r#"
@@ -59,7 +73,7 @@ WHERE
 
         "#,
     )
-      .fetch_all(mysql_pool)
+      .fetch_all(mysql_connection)
       .await;
 
   match maybe_results {
