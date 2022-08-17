@@ -1,23 +1,21 @@
-use actix_http::http::header;
-use actix_web::HttpResponseBuilder;
-use actix_web::cookie::Cookie;
+// NB: Incrementally getting rid of build warnings...
+#![forbid(unused_imports)]
+#![forbid(unused_mut)]
+#![forbid(unused_variables)]
+
 use actix_web::error::ResponseError;
 use actix_web::http::StatusCode;
-use actix_web::{Responder, web, HttpResponse, error, HttpRequest, HttpMessage};
+use actix_web::{web, HttpResponse, HttpRequest};
 use chrono::{DateTime, Utc};
 use container_common::anyhow_result::AnyhowResult;
-use crate::http_server::web_utils::ip_address::get_request_ip;
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::server_state::ServerState;
-use database_queries::queries::tts::tts_category_assignments::fetch_and_build_tts_model_category_map::fetch_and_build_tts_model_category_map;
-use database_queries::queries::tts::tts_models::list_tts_models::list_tts_models;
+use database_queries::queries::tts::tts_category_assignments::fetch_and_build_tts_model_category_map::fetch_and_build_tts_model_category_map_with_connection;
+use database_queries::queries::tts::tts_models::list_tts_models::list_tts_models_with_connection;
 use lexical_sort::natural_lexical_cmp;
-use log::{info, warn, log, error};
-use regex::Regex;
-use sqlx::MySqlPool;
-use sqlx::error::DatabaseError;
-use sqlx::error::Error::Database;
-use sqlx::mysql::MySqlDatabaseError;
+use log::{info, warn, error};
+use sqlx::MySql;
+use sqlx::pool::PoolConnection;
 use std::collections::HashSet;
 use std::fmt;
 use std::sync::Arc;
@@ -80,7 +78,7 @@ impl fmt::Display for ListTtsModelsError {
 }
 
 pub async fn list_tts_models_handler(
-  http_request: HttpRequest,
+  _http_request: HttpRequest,
   server_state: web::Data<Arc<ServerState>>) -> Result<HttpResponse, ListTtsModelsError>
 {
   let maybe_models = server_state.caches.voice_list.copy_without_bump_if_unexpired()
@@ -96,7 +94,15 @@ pub async fn list_tts_models_handler(
     },
     None => {
       info!("Populating TTS models from database");
-      let models = get_all_models(&server_state.mysql_pool)
+
+      let mut mysql_connection = server_state.mysql_pool.acquire()
+          .await
+          .map_err(|e| {
+            warn!("Could not acquire DB pool: {:?}", e);
+            ListTtsModelsError::ServerError
+          })?;
+
+      let models = get_all_models(&mut mysql_connection)
           .await
           .map_err(|e| {
             error!("Error querying database: {:?}", e);
@@ -118,22 +124,22 @@ pub async fn list_tts_models_handler(
   };
 
   let body = serde_json::to_string(&response)
-    .map_err(|e| ListTtsModelsError::ServerError)?;
+    .map_err(|_e| ListTtsModelsError::ServerError)?;
 
   Ok(HttpResponse::Ok()
     .content_type("application/json")
     .body(body))
 }
 
-async fn get_all_models(mysql_pool: &MySqlPool) -> AnyhowResult<Vec<TtsModelRecordForResponse>> {
-  let mut models = list_tts_models(
-    mysql_pool,
+async fn get_all_models(mysql_connection: &mut PoolConnection<MySql>) -> AnyhowResult<Vec<TtsModelRecordForResponse>> {
+  let mut models = list_tts_models_with_connection(
+    mysql_connection,
     None,
     false
   ).await?;
 
   let model_categories_map
-      = fetch_and_build_tts_model_category_map(mysql_pool).await?;
+      = fetch_and_build_tts_model_category_map_with_connection(mysql_connection).await?;
 
   // Make the list nice for human readers.
   models.sort_by(|a, b|
