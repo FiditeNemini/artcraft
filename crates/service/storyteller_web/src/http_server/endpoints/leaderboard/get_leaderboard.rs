@@ -1,24 +1,18 @@
-use actix_http::Error;
-use actix_http::http::header;
-use actix_web::HttpResponseBuilder;
-use actix_web::cookie::Cookie;
+// NB: Incrementally getting rid of build warnings...
+#![forbid(unused_imports)]
+#![forbid(unused_mut)]
+#![forbid(unused_variables)]
+
 use actix_web::error::ResponseError;
 use actix_web::http::StatusCode;
-use actix_web::{Responder, web, HttpResponse, error, HttpRequest, HttpMessage};
-use chrono::{DateTime, Utc};
-use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
+use actix_web::{web, HttpResponse, HttpRequest};
 use crate::http_server::web_utils::serialize_as_json_error::serialize_as_json_error;
 use crate::server_state::ServerState;
 use database_queries::queries::tts::stats::calculate_tts_model_leaderboard::TtsLeaderboardRecordForList;
 use database_queries::queries::tts::stats::calculate_tts_model_leaderboard::calculate_tts_model_leaderboard;
 use database_queries::queries::w2l::stats::calculate_w2l_template_leaderboard::W2lLeaderboardRecordForList;
 use database_queries::queries::w2l::stats::calculate_w2l_template_leaderboard::calculate_w2l_template_leaderboard;
-use log::{info, warn, log};
-use regex::Regex;
-use sqlx::MySqlPool;
-use sqlx::error::DatabaseError;
-use sqlx::error::Error::Database;
-use sqlx::mysql::MySqlDatabaseError;
+use log::warn;
 use std::fmt;
 use std::sync::Arc;
 
@@ -71,15 +65,34 @@ impl fmt::Display for LeaderboardErrorResponse {
 }
 
 pub async fn leaderboard_handler(
-  http_request: HttpRequest,
+  _http_request: HttpRequest,
   server_state: web::Data<Arc<ServerState>>
 ) -> Result<HttpResponse, LeaderboardErrorResponse> {
 
+  // TODO: There has to be a better way of doing this in parallel.
+  //  Some more intelligent DB connection pool. (What did jOOQ in Java do? Surely not this insanity!)
+  let mysql_connection_1 = server_state.mysql_pool.acquire();
+  let mysql_connection_2 = server_state.mysql_pool.acquire();
+
+  let mut mysql_connection_1 = mysql_connection_1
+      .await
+      .map_err(|e| {
+        warn!("Could not acquire DB pool: {:?}", e);
+        LeaderboardErrorResponse::server_error()
+      })?;
+
+  let mut mysql_connection_2 = mysql_connection_2
+      .await
+      .map_err(|e| {
+        warn!("Could not acquire DB pool: {:?}", e);
+        LeaderboardErrorResponse::server_error()
+      })?;
+
   let maybe_tts_results =
-      calculate_tts_model_leaderboard(&server_state.mysql_pool);
+      calculate_tts_model_leaderboard(&mut mysql_connection_1);
 
   let maybe_w2l_results =
-      calculate_w2l_template_leaderboard(&server_state.mysql_pool);
+      calculate_w2l_template_leaderboard(&mut mysql_connection_2);
 
   let tts_results = match maybe_tts_results.await {
     Ok(results) => results,
@@ -104,7 +117,7 @@ pub async fn leaderboard_handler(
   };
 
   let body = serde_json::to_string(&response)
-      .map_err(|e| LeaderboardErrorResponse::server_error())?;
+      .map_err(|_e| LeaderboardErrorResponse::server_error())?;
 
   Ok(HttpResponse::Ok()
       .content_type("application/json")

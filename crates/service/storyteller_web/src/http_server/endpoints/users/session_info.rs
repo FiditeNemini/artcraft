@@ -1,20 +1,15 @@
-use actix_http::Error;
-use actix_http::http::header;
-use actix_web::cookie::Cookie;
-use actix_web::HttpResponseBuilder;
+// NB: Incrementally getting rid of build warnings...
+#![forbid(unused_imports)]
+#![forbid(unused_mut)]
+#![forbid(unused_variables)]
+
 use actix_web::error::ResponseError;
 use actix_web::http::StatusCode;
-use actix_web::{Responder, web, HttpResponse, error, HttpRequest, HttpMessage};
-use crate::AnyhowResult;
+use actix_web::{web, HttpResponse, HttpRequest};
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::server_state::ServerState;
-use derive_more::{Display, Error};
-use log::{info, warn, log};
-use regex::Regex;
-use sqlx::MySqlPool;
-use sqlx::error::DatabaseError;
-use sqlx::error::Error::Database;
-use sqlx::mysql::MySqlDatabaseError;
+use log::warn;
+use std::fmt;
 use std::sync::Arc;
 
 #[derive(Serialize, Copy, Clone)]
@@ -79,7 +74,7 @@ pub struct SessionInfoSuccessResponse {
   pub user: Option<UserInfo>,
 }
 
-#[derive(Debug, Display)]
+#[derive(Debug)]
 pub enum SessionInfoError {
   ServerError,
 }
@@ -100,13 +95,27 @@ impl ResponseError for SessionInfoError {
   }
 }
 
+// NB: Not using derive_more::Display since Clion doesn't understand it.
+impl fmt::Display for SessionInfoError {
+  fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+    write!(f, "{:?}", self)
+  }
+}
+
 pub async fn session_info_handler(
   http_request: HttpRequest,
   server_state: web::Data<Arc<ServerState>>) -> Result<HttpResponse, SessionInfoError>
 {
+  let mut mysql_connection = server_state.mysql_pool.acquire()
+      .await
+      .map_err(|e| {
+        warn!("Could not acquire DB pool: {:?}", e);
+        SessionInfoError::ServerError
+      })?;
+
   let maybe_user_session = server_state
     .session_checker
-    .maybe_get_user_session(&http_request, &server_state.mysql_pool)
+    .maybe_get_user_session_from_connection(&http_request, &mut mysql_connection)
     .await
     .map_err(|e| {
       warn!("Session checker error: {:?}", e);
@@ -168,7 +177,7 @@ pub async fn session_info_handler(
   };
 
   let body = serde_json::to_string(&response)
-    .map_err(|e| SessionInfoError::ServerError)?;
+    .map_err(|_e| SessionInfoError::ServerError)?;
 
   Ok(HttpResponse::Ok()
     .content_type("application/json")

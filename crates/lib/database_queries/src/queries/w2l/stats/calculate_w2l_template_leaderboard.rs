@@ -1,7 +1,8 @@
 use anyhow::anyhow;
 use container_common::anyhow_result::AnyhowResult;
 use log::warn;
-use sqlx::MySqlPool;
+use sqlx::{MySql, MySqlPool};
+use sqlx::pool::PoolConnection;
 
 #[derive(Serialize)]
 pub struct W2lLeaderboardRecordForList {
@@ -23,7 +24,7 @@ struct W2lLeaderboardRecordForListRaw {
 
 // NB: This may need to become an offline query if it is expensive.
 pub async fn calculate_w2l_template_leaderboard(
-  mysql_pool: &MySqlPool
+  mysql_pool: &mut PoolConnection<MySql>
 ) -> AnyhowResult<Vec<W2lLeaderboardRecordForList>> {
 
   // NB: We're requiring "is_public_listing_approved IS TRUE" for W2L templates!

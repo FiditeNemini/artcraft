@@ -10,7 +10,8 @@ use crate::column_types::record_visibility::RecordVisibility;
 use crate::column_types::vocoder_type::VocoderType;
 use crate::helpers::boolean_converters::i8_to_bool;
 use log::warn;
-use sqlx::MySqlPool;
+use sqlx::pool::PoolConnection;
+use sqlx::{MySql, MySqlPool};
 
 // FIXME: This is the old style of query scoping and shouldn't be copied.
 //  The moderator-only fields are good practice, though.
@@ -76,16 +77,26 @@ pub struct TtsModelModeratorFields {
 // FIXME: This is the old style of query scoping and shouldn't be copied.
 //  The moderator-only fields are good practice, though.
 
+
 pub async fn get_tts_model_by_token(
   tts_model_token: &str,
   can_see_deleted: bool,
   mysql_pool: &MySqlPool
 ) -> AnyhowResult<Option<TtsModelRecord>> {
+  let mut connection = mysql_pool.acquire().await?;
+  get_tts_model_by_token_using_connection(tts_model_token, can_see_deleted, &mut connection).await
+}
+
+pub async fn get_tts_model_by_token_using_connection(
+  tts_model_token: &str,
+  can_see_deleted: bool,
+  mysql_connection: &mut PoolConnection<MySql>
+) -> AnyhowResult<Option<TtsModelRecord>> {
 
   let maybe_record = if can_see_deleted {
-    select_including_deleted(tts_model_token, mysql_pool).await
+    select_including_deleted(tts_model_token, mysql_connection).await
   } else {
-    select_without_deleted(tts_model_token, mysql_pool).await
+    select_without_deleted(tts_model_token, mysql_connection).await
   };
 
   let model : InternalTtsModelRecordRaw = match maybe_record {
@@ -161,7 +172,7 @@ pub async fn get_tts_model_by_token(
 
 async fn select_including_deleted(
   tts_model_token: &str,
-  mysql_pool: &MySqlPool
+  mysql_connection: &mut PoolConnection<MySql>
 ) -> Result<InternalTtsModelRecordRaw, sqlx::Error> {
   sqlx::query_as!(
       InternalTtsModelRecordRaw,
@@ -224,13 +235,13 @@ WHERE tts.token = ?
         "#,
       tts_model_token
     )
-    .fetch_one(mysql_pool)
+    .fetch_one(mysql_connection)
     .await // TODO: This will return error if it doesn't exist
 }
 
 async fn select_without_deleted(
   tts_model_token: &str,
-  mysql_pool: &MySqlPool
+  mysql_connection: &mut PoolConnection<MySql>
 ) -> Result<InternalTtsModelRecordRaw, sqlx::Error> {
   sqlx::query_as!(
       InternalTtsModelRecordRaw,
@@ -296,7 +307,7 @@ WHERE
         "#,
       tts_model_token
     )
-    .fetch_one(mysql_pool)
+    .fetch_one(mysql_connection)
     .await // TODO: This will return error if it doesn't exist
 }
 
