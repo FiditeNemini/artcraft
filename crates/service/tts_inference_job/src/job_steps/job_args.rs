@@ -93,8 +93,11 @@ pub struct JobWorkerDetails {
   // The worker is "on-premises".
   pub is_on_prem: bool,
 
-  // Hostname of the worker.
+  // Hostname, node name, pod name, etc. for the worker.
+  // These might have fallback values and aren't guaranteed to be exact.
   pub worker_hostname: String,
+  pub k8s_node_name: Option<String>,
+  pub k8s_pod_name: Option<String>,
 }
 
 pub struct JobCaches {

@@ -364,7 +364,15 @@ pub async fn process_single_job(
   let text_hash = hash_string_sha2(&cleaned_inference_text)
       .map_err(|e| ProcessSingleJobError::Other(e))?;
 
+  // Default to showing the k8s node (machine) name, if possible, as this benefits
+  // debugging on-prem workloads.
+  let worker_name = inferencer.worker_details.k8s_node_name.as_deref()
+      .or(inferencer.worker_details.k8s_pod_name.as_deref())
+      .map(|name| name.to_string())
+      .unwrap_or_else(|| inferencer.worker_details.worker_hostname.clone());
+
   info!("Saving tts inference record...");
+
   let (id, inference_result_token) = insert_tts_result(
     &inferencer.mysql_pool,
     job,
@@ -375,7 +383,7 @@ pub async fn process_single_job(
     file_metadata.file_size_bytes,
     file_metadata.duration_millis.unwrap_or(0),
     inferencer.worker_details.is_on_prem,
-    &inferencer.worker_details.worker_hostname,
+    &worker_name,
     inferencer.worker_details.is_debug_worker)
       .await
       .map_err(|e| ProcessSingleJobError::Other(e))?;

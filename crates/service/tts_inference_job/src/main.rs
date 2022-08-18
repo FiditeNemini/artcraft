@@ -107,6 +107,10 @@ async fn main() -> AnyhowResult<()> {
       .and_then(|h| h.into_string().ok())
       .unwrap_or("tts-inference-job".to_string());
 
+  // NB: These are non-standard env vars we're injecting ourselves.
+  let k8s_node_name = easyenv::get_env_string_optional("K8S_NODE_NAME");
+  let k8s_pod_name = easyenv::get_env_string_optional("K8S_POD_NAME");
+
   // NB: It'll be worthwhile to see how much compute is happening at our local on-premises cluster
   // Only our local workers will set this to true.
   let is_on_prem = easyenv::get_env_bool_or_default("IS_ON_PREM", false);
@@ -290,6 +294,8 @@ async fn main() -> AnyhowResult<()> {
     worker_details: JobWorkerDetails {
       is_on_prem,
       worker_hostname: server_hostname.clone(),
+      k8s_node_name,
+      k8s_pod_name,
       is_debug_worker,
     },
     caches: JobCaches {
