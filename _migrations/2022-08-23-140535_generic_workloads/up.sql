@@ -38,7 +38,11 @@ CREATE TABLE generic_workloads (
   -- ========== CREATOR DETAILS AND PREFERENCES ==========
 
   -- Foreign key to user
-  creator_user_token VARCHAR(32) NOT NULL,
+  maybe_creator_user_token VARCHAR(32) DEFAULT NULL,
+
+  -- Based on a cookie sent by the frontend.
+  -- We'll save this even if the user is logged in.
+  maybe_creator_anonymous_visitor_token VARCHAR(32) DEFAULT NULL,
 
   -- For abuse tracking.
   -- Wide enough for IPv4/6
@@ -96,8 +100,8 @@ CREATE TABLE generic_workloads (
   PRIMARY KEY (id),
   UNIQUE KEY (token),
   UNIQUE KEY (uuid_idempotency_token),
-  KEY fk_on_workload_type (workload_type),
-  KEY fk_creator_user_token (creator_user_token),
+  KEY index_on_workload_type (workload_type),
+  KEY fk_maybe_creator_user_token (maybe_creator_user_token),
   KEY index_status (status),
   KEY index_creator_ip_address (creator_ip_address)
 
