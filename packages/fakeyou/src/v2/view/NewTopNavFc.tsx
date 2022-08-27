@@ -225,9 +225,8 @@ function NewTopNavFc(props: Props) {
             </p> */}
 
             <Tippy
-              content={`${
-                darkModes ? "Toggle Light Mode" : "Toggle Dark Mode"
-              }`}
+              content={`${darkModes ? "Toggle Light Mode" : "Toggle Dark Mode"
+                }`}
             >
               <button
                 className={`btn btn-toggle ${darkModes ? "dark" : ""}`}
@@ -237,9 +236,8 @@ function NewTopNavFc(props: Props) {
               </button>
             </Tippy>
             <Tippy
-              content={`${
-                lowSpecView ? "Turn on animations" : "Turn off animations"
-              }`}
+              content={`${lowSpecView ? "Turn on animations" : "Turn off animations"
+                }`}
             >
               <button
                 className={`btn btn-toggle  ${darkModes ? "dark" : ""}`}
@@ -325,7 +323,7 @@ function NewTopNavFc(props: Props) {
                   <a
                     className="nav-link dropdown-toggle"
                     href="/"
-                    id="offcanvasNavbarLgDropdown"
+                    id="offcanvasNavbarLgDropdown-tts"
                     role="button"
                     data-bs-toggle="dropdown"
                     aria-expanded="false"
@@ -335,7 +333,7 @@ function NewTopNavFc(props: Props) {
                   </a>
                   <ul
                     className="dropdown-menu"
-                    aria-labelledby="offcanvasNavbarLgDropdown"
+                    aria-labelledby="offcanvasNavbarLgDropdown-tts"
                   >
                     <li data-bs-toggle="offcanvas">
                       <Link className="dropdown-item" to="/">
@@ -357,7 +355,7 @@ function NewTopNavFc(props: Props) {
                   <a
                     className="nav-link dropdown-toggle"
                     href="/"
-                    id="offcanvasNavbarLgDropdown"
+                    id="offcanvasNavbarLgDropdown-community"
                     role="button"
                     data-bs-toggle="dropdown"
                   >
@@ -366,7 +364,7 @@ function NewTopNavFc(props: Props) {
                   </a>
                   <ul
                     className="dropdown-menu"
-                    aria-labelledby="offcanvasNavbarLgDropdown"
+                    aria-labelledby="offcanvasNavbarLgDropdown-community"
                   >
                     <li data-bs-toggle="offcanvas">
                       <Link className="dropdown-item" to="/contribute">
@@ -452,9 +450,8 @@ function NewTopNavFc(props: Props) {
                   <div className="d-flex gap-4 py-2">
                     <div className="top-bar-text mobile">Options:</div>
                     <Tippy
-                      content={`${
-                        darkModes ? "Toggle Light Mode" : "Toggle Dark Mode"
-                      }`}
+                      content={`${darkModes ? "Toggle Light Mode" : "Toggle Dark Mode"
+                        }`}
                     >
                       <button
                         className={`btn btn-toggle ${darkModes ? "dark" : ""}`}
@@ -464,11 +461,10 @@ function NewTopNavFc(props: Props) {
                       </button>
                     </Tippy>
                     <Tippy
-                      content={`${
-                        lowSpecView
-                          ? "Turn on animations"
-                          : "Turn off animations"
-                      }`}
+                      content={`${lowSpecView
+                        ? "Turn on animations"
+                        : "Turn off animations"
+                        }`}
                     >
                       <button
                         className={`btn btn-toggle  ${darkModes ? "dark" : ""}`}
