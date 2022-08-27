@@ -30,6 +30,7 @@ function TopNav(props: Props) {
             data-bs-target="#offcanvasNavbar2"
             aria-controls="offcanvasNavbar2"
           >
+            <span className="sr-only">Navbar toggle</span>
             <span className="navbar-toggler-icon"></span>
           </button>
           <div
