@@ -1,7 +1,6 @@
 use crate::StaticApiTokenSet;
 use crate::http_server::endpoints::categories::list_tts_categories::DisplayCategory;
 use crate::http_server::endpoints::tts::list_tts_models::TtsModelRecordForResponse;
-use crate::http_server::web_utils::cookie_manager::CookieManager;
 use crate::http_server::web_utils::redis_rate_limiter::RedisRateLimiter;
 use crate::http_server::web_utils::session_checker::SessionChecker;
 use crate::threads::db_health_checker_thread::db_health_check_status::HealthCheckStatus;
@@ -9,12 +8,13 @@ use crate::threads::ip_banlist_set::IpBanlistSet;
 use crate::util::encrypted_sort_id::SortKeyCrypto;
 use database_queries::mediators::badge_granter::BadgeGranter;
 use database_queries::mediators::firehose_publisher::FirehosePublisher;
+use database_queries::queries::tts::tts_inference_jobs::get_pending_tts_inference_job_count::TtsQueueLengthResult;
+use database_queries::queries::w2l::w2l_templates::list_w2l_templates::W2lTemplateRecordForList;
 use memory_caching::single_item_ttl_cache::SingleItemTtlCache;
 use r2d2_redis::{r2d2, RedisConnectionManager};
 use sqlx::MySqlPool;
-use database_queries::queries::tts::tts_inference_jobs::get_pending_tts_inference_job_count::TtsQueueLengthResult;
-use database_queries::queries::w2l::w2l_templates::list_w2l_templates::W2lTemplateRecordForList;
 use storage_buckets_common::bucket_client::BucketClient;
+use users_component::utils::session_cookie_manager::SessionCookieManager;
 
 /// State that is injected into every endpoint.
 pub struct ServerState {
@@ -31,7 +31,7 @@ pub struct ServerState {
 
   pub redis_rate_limiters: RedisRateLimiters,
 
-  pub cookie_manager: CookieManager,
+  pub cookie_manager: SessionCookieManager,
 
   pub session_checker: SessionChecker,
 

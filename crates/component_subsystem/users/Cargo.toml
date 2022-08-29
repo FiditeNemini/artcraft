@@ -1,6 +1,6 @@
 [package]
 publish = false
-name = "component_subsystem_users"
+name = "users_component"
 edition = "2018"
 version = "0.0.1"
 authors = [
@@ -9,7 +9,7 @@ authors = [
 ]
 
 [lib]
-name = "component_subsystem_users"
+name = "users_component"
 path = "src/lib.rs"
 
 [dependencies]
@@ -25,11 +25,15 @@ dotenv = "0.15.0"
 log = "0.4.14"
 once_cell = "1.9.0"
 regex = "1.5.4"
+time = "0.2.26"
 
 # Web
-actix-cors = "0.6.0-beta.3"
-actix-http = "3.0.0-beta.11"
 actix-web = "4.0.0-beta.10"
+jwt = "0.13.0"
+
+# Crypto
+hmac = "0.10.0" # cookies
+sha2 = "0.9.5" # file hashes, inference text hashes, etc.
 
 # Serialization
 serde = "1.0.125"

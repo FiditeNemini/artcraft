@@ -6,17 +6,17 @@
 use actix_web::HttpRequest;
 use anyhow::anyhow;
 use crate::AnyhowResult;
-use crate::http_server::web_utils::cookie_manager::CookieManager;
 use database_queries::column_types::record_visibility::RecordVisibility;
 use database_queries::helpers::boolean_converters::{nullable_i8_to_optional_bool, i8_to_bool};
 use log::warn;
 use sqlx::error::Error::RowNotFound;
 use sqlx::pool::PoolConnection;
 use sqlx::{MySqlPool, MySql};
+use users_component::utils::session_cookie_manager::SessionCookieManager;
 
 #[derive(Clone)]
 pub struct SessionChecker {
-  cookie_manager: CookieManager,
+  cookie_manager: SessionCookieManager,
 }
 
 pub struct SessionRecord {
@@ -121,7 +121,7 @@ pub struct SessionUserRawDbRecord {
 
 impl SessionChecker {
 
-  pub fn new(cookie_manager: &CookieManager) -> Self {
+  pub fn new(cookie_manager: &SessionCookieManager) -> Self {
     Self {
       cookie_manager: cookie_manager.clone(),
     }

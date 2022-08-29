@@ -102,7 +102,6 @@ use crate::http_server::endpoints::w2l::get_w2l_upload_template_job_status::get_
 use crate::http_server::endpoints::w2l::list_w2l_templates::list_w2l_templates_handler;
 use crate::http_server::endpoints::w2l::set_w2l_template_mod_approval::set_w2l_template_mod_approval_handler;
 use crate::http_server::middleware::ip_filter_middleware::IpFilter;
-use crate::http_server::web_utils::cookie_manager::CookieManager;
 use crate::http_server::web_utils::redis_rate_limiter::RedisRateLimiter;
 use crate::http_server::web_utils::session_checker::SessionChecker;
 use crate::routes::add_routes;
@@ -129,6 +128,7 @@ use std::time::Duration;
 use storage_buckets_common::bucket_client::BucketClient;
 use tokio::runtime::Runtime;
 use twitch_common::twitch_secrets::TwitchSecrets;
+use users_component::utils::session_cookie_manager::SessionCookieManager;
 
 // TODO TODO TODO TODO
 // TODO TODO TODO TODO
@@ -275,7 +275,7 @@ async fn main() -> AnyhowResult<()> {
   let website_homepage_redirect =
       easyenv::get_env_string_or_default("WEBSITE_HOMEPAGE_REDIRECT", "https://vo.codes/");
 
-  let cookie_manager = CookieManager::new(&cookie_domain, &hmac_secret);
+  let cookie_manager = SessionCookieManager::new(&cookie_domain, &hmac_secret);
   let session_checker = SessionChecker::new(&cookie_manager);
 
   let access_key = easyenv::get_env_string_required(ENV_ACCESS_KEY)?;

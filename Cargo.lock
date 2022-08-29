@@ -1098,27 +1098,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "component_subsystem_users"
-version = "0.0.1"
-dependencies = [
- "actix-cors 0.6.0-beta.3",
- "actix-http 3.0.0-beta.11",
- "actix-web 4.0.0-beta.10",
- "anyhow",
- "base64 0.13.0",
- "chrono",
- "container_common",
- "dotenv",
- "log",
- "once_cell",
- "regex",
- "serde",
- "serde_derive",
- "serde_json",
- "toml",
-]
-
-[[package]]
 name = "config"
 version = "0.0.1"
 dependencies = [
@@ -4062,6 +4041,7 @@ dependencies = [
  "twitch_common",
  "twitch_oauth2",
  "user_input_common",
+ "users_component",
  "uuid",
 ]
 
@@ -4953,6 +4933,29 @@ dependencies = [
  "once_cell",
  "regex",
  "unicode-segmentation",
+]
+
+[[package]]
+name = "users_component"
+version = "0.0.1"
+dependencies = [
+ "actix-web 4.0.0-beta.10",
+ "anyhow",
+ "base64 0.13.0",
+ "chrono",
+ "container_common",
+ "dotenv",
+ "hmac 0.10.1",
+ "jwt",
+ "log",
+ "once_cell",
+ "regex",
+ "serde",
+ "serde_derive",
+ "serde_json",
+ "sha2",
+ "time 0.2.26",
+ "toml",
 ]
 
 [[package]]

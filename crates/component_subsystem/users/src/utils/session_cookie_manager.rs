@@ -1,29 +1,35 @@
-use actix_web::cookie::{Cookie, SameSite};
-use actix_web::{HttpRequest, HttpMessage};
+// NB: Incrementally getting rid of build warnings...
+#![forbid(unused_imports)]
+#![forbid(unused_mut)]
+#![forbid(unused_variables)]
+
+use actix_web::HttpRequest;
+use actix_web::cookie::Cookie;
 use anyhow::anyhow;
-use crate::AnyhowResult;
+use container_common::anyhow_result::AnyhowResult;
 use hmac::Hmac;
 use hmac::NewMac;
 use jwt::SignWithKey;
 use jwt::VerifyWithKey;
-use log::LevelFilter::Off;
-use log::{info, warn};
+use log::warn;
 use sha2::Sha256;
 use std::collections::BTreeMap;
-use std::ops::Sub;
 use time::OffsetDateTime;
 
 const COOKIE_VERSION : u32 = 1;
 
 const SESSION_COOKIE_NAME : &'static str = "session";
 
+// TODO(echelon,2022-08-29): Make a CryptedCookieManager that this uses.
+// TODO(echelon,2022-08-29): Fix how domains and "secure" cookies are handled
+
 #[derive(Clone)]
-pub struct CookieManager {
+pub struct SessionCookieManager {
   cookie_domain: String,
   hmac_secret: String,
 }
 
-impl CookieManager {
+impl SessionCookieManager {
   pub fn new(cookie_domain: &str, hmac_secret: &str) -> Self {
     Self {
       cookie_domain: cookie_domain.to_string(),
