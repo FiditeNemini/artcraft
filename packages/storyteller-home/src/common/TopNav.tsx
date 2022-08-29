@@ -1,97 +1,65 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link } from "react-router-dom";
 
-interface Props {
-}
+interface Props {}
 
 function TopNav(props: Props) {
-
-  const [mobileHamburgerIsActive, setMobileHamburgerIsActive] = useState<boolean>(false);
-
-  const toggleHamburger = () => { 
-    setMobileHamburgerIsActive(!mobileHamburgerIsActive);
+  const navbar = document.getElementById("navbar");
+  if (navbar) {
+    console.log(navbar);
   }
 
-  const closeHamburger = () => { 
-    // TODO: This is an ergonomic hack. 
-    // The hamburger ideally should close whenever it is no longer active.
-    setMobileHamburgerIsActive(false);
-  }
-
-  const navbarClasses = mobileHamburgerIsActive ? "navbar-menu is-active" : "navbar-menu";
-  const navbarBurgerClasses = mobileHamburgerIsActive ? "navbar-burger is-active" : "navbar-burger";
+  let prevScrollpos = window.pageYOffset;
+  window.onscroll = function () {
+    const currentScrollPos = window.pageYOffset;
+    if (prevScrollpos > currentScrollPos) {
+      navbar!.style.top = "0";
+    } else {
+      navbar!.style.top = "-50";
+    }
+    prevScrollpos = currentScrollPos;
+  };
 
   return (
-    <>
-      <nav className="navbar is-transparent padding-bottom-1em">
-        <div className="navbar-brand">
-          <Link className="navbar-item" to="/">
-            <img src="/storyteller-nav-logo-mascot-pink.png" alt="Storyteller: Stream tech" />
-          </Link>
-          <div className={navbarBurgerClasses} data-target="navbarExampleTransparentExample" onClick={() => toggleHamburger()}>
-            <span></span>
-            <span></span>
-            <span></span>
-          </div>
+    <nav id="navbar" className="container-fluid">
+      <header className="d-flex flex-wrap align-items-center justify-content-center justify-content-md-between py-3 topnav px-3">
+        <a
+          href="/"
+          className="d-flex align-items-center col-md-3 mb-2 mb-md-0 text-dark text-decoration-none"
+        >
+          <img
+            src="/logo/Storyteller-Logo.png"
+            alt="Storyteller Logo"
+            height="36"
+            className="mb-2"
+          />
+        </a>
+
+        <ul className="nav col-12 col-md-auto mb-2 justify-content-center mb-md-0">
+          <li>
+            <a href="/" className="nav-link active">
+              Home
+            </a>
+          </li>
+          <li>
+            <a href="/" className="nav-link">
+              About
+            </a>
+          </li>
+          <li>
+            <a href="/" className="nav-link">
+              What We Do
+            </a>
+          </li>
+        </ul>
+
+        <div className="col-md-3 text-end">
+          <button type="button" className="btn btn-primary">
+            Contact
+          </button>
         </div>
-
-        <div id="navbarExampleTransparentExample" className={navbarClasses}>
-          <div className="navbar-start">
-
-            <Link to="/"
-              className="navbar-item"
-              onClick={() => closeHamburger()}
-              >Foo</Link>
-
-            <Link to="/"
-              className="navbar-item"
-              onClick={() => closeHamburger()}
-              >Bar</Link>
-
-            {/* 
-            <div className="navbar-item has-dropdown is-hoverable">
-              <Link to="/"
-                className="navbar-link"
-                onClick={() => closeHamburger()}
-                >Community</Link>
-
-              <div className="navbar-dropdown is-boxed">
-                {/* NB: There's an "is-active" class that looks nice. * /}
-
-                <Link to="/contribute"
-                  className="navbar-item"
-                  onClick={() => closeHamburger()}
-                  ><FontAwesomeIcon icon={faUpload} />&nbsp;&nbsp;Contribute / Upload</Link>
-
-              </div>
-            </div>
-            */}
-          </div>
-
-
-          <div className="navbar-end">
-            <div className="navbar-item">
-              <div className="field is-grouped">
-                <p className="control">
-                </p>
-              </div>
-            </div>
-          </div>
-          {/*<div className="navbar-end">
-            <div className="navbar-item">
-              <div className="field is-grouped">
-                <p className="control">
-                  TODO
-                </p>
-              </div>
-            </div>
-          </div>*/}
-        </div>
-      </nav>
-    </>
-  )
-
-
+      </header>
+    </nav>
+  );
 }
 
-export { TopNav }
+export { TopNav };
