@@ -1,6 +1,6 @@
 [package]
 publish = false
-name = "http_endpoints_common_inference_workloads"
+name = "component_subsystem_users"
 edition = "2018"
 version = "0.0.1"
 authors = [
@@ -9,13 +9,13 @@ authors = [
 ]
 
 [lib]
-name = "http_endpoints_common_inference_workloads"
+name = "component_subsystem_users"
 path = "src/lib.rs"
 
 [dependencies]
 
 # Internal
-container_common = { path = "../../container_common" }
+container_common = { path = "../../lib/container_common" }
 
 # External
 anyhow = "1.0.40"

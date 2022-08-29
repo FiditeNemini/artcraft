@@ -1056,6 +1056,69 @@ dependencies = [
 ]
 
 [[package]]
+name = "component_subsystem_billing"
+version = "0.0.1"
+dependencies = [
+ "actix-cors 0.6.0-beta.3",
+ "actix-http 3.0.0-beta.11",
+ "actix-web 4.0.0-beta.10",
+ "anyhow",
+ "base64 0.13.0",
+ "chrono",
+ "container_common",
+ "dotenv",
+ "log",
+ "once_cell",
+ "regex",
+ "serde",
+ "serde_derive",
+ "serde_json",
+ "toml",
+]
+
+[[package]]
+name = "component_subsystem_inference_workloads"
+version = "0.0.1"
+dependencies = [
+ "actix-cors 0.6.0-beta.3",
+ "actix-http 3.0.0-beta.11",
+ "actix-web 4.0.0-beta.10",
+ "anyhow",
+ "base64 0.13.0",
+ "chrono",
+ "container_common",
+ "dotenv",
+ "log",
+ "once_cell",
+ "regex",
+ "serde",
+ "serde_derive",
+ "serde_json",
+ "toml",
+]
+
+[[package]]
+name = "component_subsystem_users"
+version = "0.0.1"
+dependencies = [
+ "actix-cors 0.6.0-beta.3",
+ "actix-http 3.0.0-beta.11",
+ "actix-web 4.0.0-beta.10",
+ "anyhow",
+ "base64 0.13.0",
+ "chrono",
+ "container_common",
+ "dotenv",
+ "log",
+ "once_cell",
+ "regex",
+ "serde",
+ "serde_derive",
+ "serde_json",
+ "toml",
+]
+
+[[package]]
 name = "config"
 version = "0.0.1"
 dependencies = [
@@ -1932,69 +1995,6 @@ name = "http-range"
 version = "0.1.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "eee9694f83d9b7c09682fdb32213682939507884e5bcf227be9aff5d644b90dc"
-
-[[package]]
-name = "http_endpoints_common_billing"
-version = "0.0.1"
-dependencies = [
- "actix-cors 0.6.0-beta.3",
- "actix-http 3.0.0-beta.11",
- "actix-web 4.0.0-beta.10",
- "anyhow",
- "base64 0.13.0",
- "chrono",
- "container_common",
- "dotenv",
- "log",
- "once_cell",
- "regex",
- "serde",
- "serde_derive",
- "serde_json",
- "toml",
-]
-
-[[package]]
-name = "http_endpoints_common_inference_workloads"
-version = "0.0.1"
-dependencies = [
- "actix-cors 0.6.0-beta.3",
- "actix-http 3.0.0-beta.11",
- "actix-web 4.0.0-beta.10",
- "anyhow",
- "base64 0.13.0",
- "chrono",
- "container_common",
- "dotenv",
- "log",
- "once_cell",
- "regex",
- "serde",
- "serde_derive",
- "serde_json",
- "toml",
-]
-
-[[package]]
-name = "http_endpoints_common_users"
-version = "0.0.1"
-dependencies = [
- "actix-cors 0.6.0-beta.3",
- "actix-http 3.0.0-beta.11",
- "actix-web 4.0.0-beta.10",
- "anyhow",
- "base64 0.13.0",
- "chrono",
- "container_common",
- "dotenv",
- "log",
- "once_cell",
- "regex",
- "serde",
- "serde_derive",
- "serde_json",
- "toml",
-]
 
 [[package]]
 name = "http_server_common"

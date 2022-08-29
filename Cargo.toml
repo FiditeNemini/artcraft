@@ -1,14 +1,16 @@
 [workspace]
 
 members = [
+  # Complete subsystems that can be plugged into services
+  "crates/component_subsystem/billing",
+  "crates/component_subsystem/inference_workloads",
+  "crates/component_subsystem/users",
+
   # Shared libraries
   "crates/lib/config",
   "crates/lib/container_common",
   "crates/lib/database_queries",
   "crates/lib/google_drive_common",
-  "crates/lib/http_endpoints_common/billing",
-  "crates/lib/http_endpoints_common/inference_workloads",
-  "crates/lib/http_endpoints_common/users",
   "crates/lib/http_server_common",
   "crates/lib/jobs_common",
   "crates/lib/memory_caching",
@@ -19,7 +21,7 @@ members = [
   "crates/lib/twitch_common",
   "crates/lib/user_input_common",
 
-  # Application 
+  # Services: API servers, jobs, workers, etc.
   "crates/service/generic_download_job",
   "crates/service/image_generation_service",
   "crates/service/storyteller_web",
