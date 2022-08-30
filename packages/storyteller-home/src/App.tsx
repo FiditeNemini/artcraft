@@ -17,7 +17,7 @@ function App() {
       <LocomotiveScrollProvider
         options={{
           smooth: true,
-          multiplier: 0.7,
+          multiplier: 0.8,
           // ... all available Locomotive Scroll instance options
         }}
         watch={

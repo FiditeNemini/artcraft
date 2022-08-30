@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import {
   faApple,
   faDiscord,
@@ -9,7 +9,6 @@ import {
 } from "@fortawesome/free-brands-svg-icons";
 import { faArrowRightArrowLeft } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { TopNav } from "../../common/TopNav";
 
 import { Link } from "react-router-dom";
 
