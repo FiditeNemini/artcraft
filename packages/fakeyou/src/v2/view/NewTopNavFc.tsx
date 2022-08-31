@@ -51,8 +51,9 @@ function NewTopNavFc(props: Props) {
   const [darkModes, toggleDarkModes] = useState(
     defaultColourView === "false" ? true : false
   );
+
   const [lowSpecView, toggleLowSpecs] = useState(
-    defaultLowSpecView === "true" ? true : false
+    defaultLowSpecView === "false" ? true : false
   );
 
   let history = useHistory();
@@ -225,9 +226,8 @@ function NewTopNavFc(props: Props) {
             </p> */}
 
             <Tippy
-              content={`${
-                darkModes ? "Toggle Light Mode" : "Toggle Dark Mode"
-              }`}
+              content={`${darkModes ? "Toggle Light Mode" : "Toggle Dark Mode"
+                }`}
             >
               <button
                 className={`btn btn-toggle ${darkModes ? "dark" : ""}`}
@@ -237,9 +237,8 @@ function NewTopNavFc(props: Props) {
               </button>
             </Tippy>
             <Tippy
-              content={`${
-                lowSpecView ? "Turn on animations" : "Turn off animations"
-              }`}
+              content={`${lowSpecView ? "Turn on animations" : "Turn off animations"
+                }`}
             >
               <button
                 className={`btn btn-toggle  ${darkModes ? "dark" : ""}`}
@@ -452,9 +451,8 @@ function NewTopNavFc(props: Props) {
                   <div className="d-flex gap-4 py-2">
                     <div className="top-bar-text mobile">Options:</div>
                     <Tippy
-                      content={`${
-                        darkModes ? "Toggle Light Mode" : "Toggle Dark Mode"
-                      }`}
+                      content={`${darkModes ? "Toggle Light Mode" : "Toggle Dark Mode"
+                        }`}
                     >
                       <button
                         className={`btn btn-toggle ${darkModes ? "dark" : ""}`}
@@ -464,11 +462,10 @@ function NewTopNavFc(props: Props) {
                       </button>
                     </Tippy>
                     <Tippy
-                      content={`${
-                        lowSpecView
-                          ? "Turn on animations"
-                          : "Turn off animations"
-                      }`}
+                      content={`${lowSpecView
+                        ? "Turn on animations"
+                        : "Turn off animations"
+                        }`}
                     >
                       <button
                         className={`btn btn-toggle  ${darkModes ? "dark" : ""}`}
