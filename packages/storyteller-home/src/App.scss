@@ -18,6 +18,10 @@ body {
   color: $white;
 }
 
+p {
+  line-height: 1.6;
+}
+
 ::-moz-selection {
   /* Code for Firefox */
   color: $white;
@@ -197,6 +201,25 @@ body {
     background-color: transparent;
     border: none;
   }
+}
+
+.btn-secondary,
+.btn-secondary:focus,
+.btn-secondary:active {
+  background-color: $white;
+  color: #2c2c40;
+  border: 2.5px solid;
+  border-color: $white;
+  transition: 0.2s;
+  outline: none;
+  box-shadow: none;
+}
+
+.btn-secondary:hover {
+  background-color: #ccc;
+  color: #2c2c40;
+  border: 2.5px solid;
+  border-color: #ccc;
 }
 
 .btn span {
@@ -402,7 +425,7 @@ body {
 
     &:hover {
       color: lighten(#7676a0, 10%);
-      transform: translateX(5px);
+      transform: translateX(2px);
     }
   }
 }
@@ -463,7 +486,7 @@ body {
   height: 100%;
   padding: 28px;
   border-radius: 12px;
-  border: 3px solid;
+  border: 2px solid;
   border-color: rgba(#4d4d66, 0.6);
   display: flex;
   align-items: center;
@@ -488,11 +511,16 @@ body {
   height: 220px;
   margin-top: 80px;
   position: absolute;
+  transition: 0.3s;
+
+  &:hover {
+    transform: scale(1.2);
+  }
 }
 
 .marquee-title {
   font-size: 7.5rem;
-  font-weight: 800;
+  font-weight: 900;
   text-transform: uppercase;
   margin-top: 7.5rem;
 
@@ -552,5 +580,43 @@ body {
     color: $white;
     background: lighten(rgb(47, 47, 75), 10%);
     transform: rotate(45deg);
+  }
+}
+
+.bg-light-solid {
+  background: #2f2f4b;
+}
+
+.bg-dark-solid {
+  background: rgb(24, 24, 39);
+}
+
+.shape-bg {
+  position: absolute;
+  width: 220px;
+  height: 220px;
+  background: #2c2c40;
+  opacity: 0.6;
+  border-radius: 24px;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) rotate(45deg);
+}
+
+.tts-demo {
+  max-width: 800px;
+}
+
+.form-control,
+.form-select {
+  border-width: 1px;
+  border-color: $white;
+  border-radius: 5px;
+  padding: 0.5rem 0.75rem;
+
+  &:focus {
+    border-color: $primary;
+    outline: 0;
+    box-shadow: 0 0 0 0.1rem $primary;
   }
 }

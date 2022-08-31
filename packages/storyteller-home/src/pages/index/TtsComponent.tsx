@@ -154,47 +154,48 @@ function TtsComponent(props: Props) {
   });
 
   return (
-    <div className="w-100">
-      <form onSubmit={handleFormSubmit} className="main-form">
-        <div className="field">
-          <div className="control">
-            <div className="select is-fullwidth">
-              <select onChange={handleVoiceChange}>{voiceOptions}</select>
+    <div className="container d-flex justify-content-center pb-5">
+      <div className="card bg-light-solid tts-demo w-100 mb-5">
+        <form onSubmit={handleFormSubmit} className="w-100">
+          <div className="d-flex flex-column gap-3">
+            <div className="field">
+              <div className="control">
+                <div className="select">
+                  <select className="form-select" onChange={handleVoiceChange}>
+                    {voiceOptions}
+                  </select>
+                </div>
+              </div>
             </div>
-          </div>
-        </div>
 
-        <div className="field">
-          <div className="control">
-            <textarea
-              onChange={handleChangeText}
-              className="textarea is-normal"
-              value={inferenceText}
-              placeholder="Type something fun..."
-            ></textarea>
-          </div>
-        </div>
+            <div className="field">
+              <div className="control">
+                <textarea
+                  onChange={handleChangeText}
+                  className="form-control"
+                  value={inferenceText}
+                  placeholder="Type something fun..."
+                  rows={4}
+                ></textarea>
+              </div>
+            </div>
 
-        <div className="button-group">
-          <div className="columns is-mobile">
-            <div className="column has-text-centered">
-              <button className="button is-info is-large" disabled={false}>
+            <div className="d-flex justify-content-center gap-3">
+              <button className="btn btn-primary w-100" disabled={false}>
                 Generate
               </button>
-            </div>
-            <div className="column has-text-centered">
               <button
-                className="button is-info is-light is-large"
+                className="btn btn-secondary w-100"
                 onClick={() => setInferenceText("")}
               >
                 Clear
               </button>
             </div>
           </div>
-        </div>
-      </form>
+        </form>
 
-      <TtsResultsList ttsInferenceJobs={jobs} />
+        <TtsResultsList ttsInferenceJobs={jobs} />
+      </div>
     </div>
   );
 }

@@ -15,7 +15,7 @@ function Footer(props: Props) {
   return (
     <>
       <footer data-scroll-section>
-        <div className="bg-dark">
+        <div className="bg-dark-solid">
           <div className="container footer-top text-center">
             <div className="d-flex gap-4 justify-content-center p-4">
               <a href="https://google.com" className="footer-social-icon">

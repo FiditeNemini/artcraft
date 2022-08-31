@@ -5,10 +5,18 @@ import {
   faTwitch,
   faTwitter,
 } from "@fortawesome/free-brands-svg-icons";
-import { faArrowRightArrowLeft } from "@fortawesome/free-solid-svg-icons";
+import {
+  faArrowRight,
+  faArrowRightArrowLeft,
+  faMicrophone,
+  faVolumeHigh,
+} from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Marquee from "react-fast-marquee";
 import { TtsComponent } from "./TtsComponent";
+import Tippy from "@tippyjs/react";
+import "tippy.js/dist/tippy.css";
+import AudioSample from "./AudioSample";
 
 function IndexPage() {
   return (
@@ -127,21 +135,31 @@ function IndexPage() {
             data-scroll-direction="horizontal"
             data-scroll-position="top"
           >
-            <a href="/">
-              <FontAwesomeIcon icon={faDiscord} />
-            </a>
-            <a href="/">
-              <FontAwesomeIcon icon={faTwitch} />
-            </a>
-            <a href="/">
-              <FontAwesomeIcon icon={faFacebook} />
-            </a>
-            <a href="/">
-              <FontAwesomeIcon icon={faTwitter} />
-            </a>
-            <a href="/">
-              <FontAwesomeIcon icon={faPatreon} />
-            </a>
+            <Tippy content="Discord" placement="right">
+              <a href="https://discorg">
+                <FontAwesomeIcon icon={faDiscord} />
+              </a>
+            </Tippy>
+            <Tippy content="Twitch" placement="right">
+              <a href="/">
+                <FontAwesomeIcon icon={faTwitch} />
+              </a>
+            </Tippy>
+            <Tippy content="Facebook" placement="right">
+              <a href="/">
+                <FontAwesomeIcon icon={faFacebook} />
+              </a>
+            </Tippy>
+            <Tippy content="Twitter" placement="right">
+              <a href="/">
+                <FontAwesomeIcon icon={faTwitter} />
+              </a>
+            </Tippy>
+            <Tippy content="Patreon" placement="right">
+              <a href="/">
+                <FontAwesomeIcon icon={faPatreon} />
+              </a>
+            </Tippy>
           </div>
         </div>
         <div id="about" className="bg-light section section-pb-extra">
@@ -158,20 +176,22 @@ function IndexPage() {
             </div>
             <div className="row gx-4 gy-4 pt-4">
               <div className="col-12 col-lg-3">
-                <p className="fw-normal card bg-dark">
+                <p className="fw-normal card bg-dark-solid">
                   Music generation - vocals, instrumentals, and more
                 </p>
               </div>
               <div className="col-12 col-lg-3">
-                <p className="fw-normal card bg-dark">
+                <p className="fw-normal card bg-dark-solid">
                   Audio dubbing and transformation
                 </p>
               </div>
               <div className="col-12 col-lg-3">
-                <p className="fw-normal card bg-dark">Real time animation</p>
+                <p className="fw-normal card bg-dark-solid">
+                  Real time animation
+                </p>
               </div>
               <div className="col-12 col-lg-3">
-                <p className="fw-normal card bg-dark">
+                <p className="fw-normal card bg-dark-solid">
                   Real time Hollywood VFX without going to set
                 </p>
               </div>
@@ -230,13 +250,49 @@ function IndexPage() {
                     target="_blank"
                     className="btn btn-primary mt-4"
                   >
-                    <span>Visit FakeYou.com</span>
+                    <span>Go to FakeYou.com</span>
                   </a>
                 </div>
               </div>
             </div>
-
-            {/* <TtsComponent /> */}
+            <div className="mt-5 pt-4 text-center">
+              <h2 className="text-center mt-5 fw-bold">
+                <FontAwesomeIcon icon={faVolumeHigh} className="me-3" />
+                Try our text to speech!
+              </h2>
+              <p className="mb-5">
+                We have over 2,000 voices (with more added every day), but we've
+                selected a few to show off.
+              </p>
+              <TtsComponent />
+            </div>
+          </div>
+          <div className="text-center position-relative">
+            <div className="position-relative zi-2">
+              <h2 className="text-center mt-5 fw-bold">Want to hear more?</h2>
+              <p className="mb-4">
+                Listen to all of the 2,000+ available voices on FakeYou.
+              </p>
+              <div className="d-flex gap-3 justify-content-center">
+                <a
+                  href="https://fakeyou.com/"
+                  rel="noreferrer"
+                  target="_blank"
+                  className="btn btn-primary mt-3 d-flex"
+                >
+                  <span>Go to FakeYou.com</span>
+                </a>
+                <a
+                  href="https://fakeyou.com/clone"
+                  rel="noreferrer"
+                  target="_blank"
+                  className="btn btn-secondary mt-3 d-flex"
+                >
+                  <span>Clone my voice</span>
+                </a>
+              </div>
+            </div>
+            <div className="shape-bg"></div>
           </div>
         </div>
         <div className="bg-light section-2">
@@ -300,15 +356,82 @@ function IndexPage() {
                 </p>
                 <div>
                   <a
-                    href="https://fakeyou.com"
+                    href="https://fakeyou.com/clone"
                     rel="noreferrer"
                     target="_blank"
                     className="btn btn-primary mt-4"
                   >
-                    <span>Visit Storyteller.stream</span>
+                    <span>Transform my voice</span>
                   </a>
                 </div>
               </div>
+            </div>
+            <div className="mt-5 pt-4 text-center">
+              <h2 className="text-center mt-5 fw-bold">
+                <FontAwesomeIcon icon={faMicrophone} className="me-3" />
+                Voice Changing Demo
+              </h2>
+              <p className="mb-5">
+                This is still an early beta. Voice quality will change and
+                improve substantially over time.
+              </p>
+              <div className="row gx-4 gy-4 text-center">
+                <div className="col-12 col-lg-6">
+                  <div className="card bg-light-solid justify-content-start">
+                    <AudioSample sampleUrl="/audio-samples/voice-conversion-1.mp3" />
+                    <p className="mb-0">
+                      <em className="fs-6">
+                        &ldquo;I've got a huge announcement. This just sounds
+                        really, really great. And other than some phase
+                        distortion, artifacts, this is just sounding really
+                        great. And it's good for America. And voice synthesis is
+                        amazing.&rdquo;
+                      </em>
+                    </p>
+                  </div>
+                </div>
+                <div className="col-12 col-lg-6">
+                  <div className="card bg-light-solid justify-content-start">
+                    <AudioSample sampleUrl="/audio-samples/voice-conversion-2.mp3" />
+                    <p className="mb-0">
+                      <em className="fs-6">
+                        &ldquo;My favorite game is Super Smash Bros Ultimate.
+                        It's a really, really great game. It's huge. There's so
+                        many characters.&rdquo;
+                      </em>
+                    </p>
+                  </div>
+                </div>
+                <p className="text-center my-5 pb-5">
+                  <strong className="fw-semibold fs-5">Brandon</strong>
+                  <FontAwesomeIcon icon={faArrowRight} className="mx-2" />
+                  <strong className="fw-semibold fs-5">Donald Trump</strong>
+                  <br />
+                  Real time voice to voice conversion.
+                </p>
+              </div>
+            </div>
+            <div className="text-center position-relative">
+              <div className="position-relative zi-2">
+                <h2 className="text-center mt-5 fw-bold">
+                  Sign up for your very own voice changer
+                </h2>
+                <p className="mb-4">
+                  We'll be rolling this out shortly. Get on the list! Tell us
+                  who you want to be.
+                </p>
+                <div>
+                  <a
+                    href="https://fakeyou.com/clone"
+                    rel="noreferrer"
+                    target="_blank"
+                    className="btn btn-primary mt-3"
+                  >
+                    <span>Transform my voice</span>
+                  </a>
+                </div>
+              </div>
+              <div className="shape-bg"></div>
             </div>
           </div>
         </div>
