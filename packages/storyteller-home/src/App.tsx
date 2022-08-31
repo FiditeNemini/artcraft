@@ -8,6 +8,7 @@ import VoxelCamPage from "./pages/voxelcam/VoxelCamPage";
 import JobsPage from "./pages/jobs/JobsPage";
 import { LocomotiveScrollProvider } from "react-locomotive-scroll";
 import { TopNav } from "./common/TopNav";
+import { Footer } from "./common/Footer";
 
 function App() {
   const containerRef = useRef(null);
@@ -17,7 +18,7 @@ function App() {
       <LocomotiveScrollProvider
         options={{
           smooth: true,
-          multiplier: 0.8,
+          multiplier: 0.9,
           getDirection: true,
           // ... all available Locomotive Scroll instance options
         }}
@@ -45,6 +46,7 @@ function App() {
                   <IndexPage />
                 </Route>
               </Switch>
+              <Footer />
             </div>
           </div>
         </BrowserRouter>

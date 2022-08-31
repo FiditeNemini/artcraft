@@ -51,7 +51,7 @@ function TopNav(props: Props) {
 
   return (
     <>
-      <nav id="navbar" className={navClassNames}>
+      <nav id="navbar" className={navClassNames} data-scroll-section>
         <div className="d-flex flex-wrap align-items-center justify-content-center justify-content-md-between py-3 topnav px-3">
           <a
             href="/"
@@ -78,7 +78,7 @@ function TopNav(props: Props) {
               </a>
             </li>
             <li>
-              <a href="#works" className="nav-link" data-scroll-to>
+              <a href="#products" className="nav-link" data-scroll-to>
                 What We Do
               </a>
             </li>
