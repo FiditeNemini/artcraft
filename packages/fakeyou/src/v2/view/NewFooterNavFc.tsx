@@ -86,6 +86,7 @@ function NewFooterNavFc(props: Props) {
             href="https://discord.gg/fakeyou"
             target="_blank"
             rel="noopener noreferrer"
+            title="Join our Discord Server"
           >
             <FontAwesomeIcon icon={faDiscord} className="me-2" />
           </a>
@@ -94,6 +95,7 @@ function NewFooterNavFc(props: Props) {
             href="https://twitch.tv/FakeYouLabs"
             target="_blank"
             rel="noopener noreferrer"
+            title="Subscribe to our Twitch Channel"
           >
             <FontAwesomeIcon icon={faTwitch} className="me-2" />
           </a>
@@ -102,6 +104,7 @@ function NewFooterNavFc(props: Props) {
             href="https://twitter.com/intent/follow?screen_name=FakeYouApp"
             target="_blank"
             rel="noopener noreferrer"
+            title="Follow us on Twitter"
           >
             <FontAwesomeIcon icon={faTwitter} className="me-2" />
           </a>
@@ -110,6 +113,7 @@ function NewFooterNavFc(props: Props) {
             href="https://facebook.com/vocodes"
             target="_blank"
             rel="noopener noreferrer"
+            title="Like us on Facebook"
           >
             <FontAwesomeIcon icon={faFacebook} className="me-2" />
           </a>
@@ -118,6 +122,7 @@ function NewFooterNavFc(props: Props) {
             href="https://www.patreon.com/FakeYou"
             target="_blank"
             rel="noopener noreferrer"
+            title="Support us by becoming a patreon"
           >
             <FontAwesomeIcon icon={faPatreon} className="me-2" />
           </a>
