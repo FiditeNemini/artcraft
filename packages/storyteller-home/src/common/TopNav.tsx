@@ -1,23 +1,57 @@
 import { Link } from "react-router-dom";
 import { useLocomotiveScroll } from "react-locomotive-scroll";
+import React, { useState } from "react";
 
 interface Props {}
 
 function TopNav(props: Props) {
   const { scroll } = useLocomotiveScroll();
-  const navBar = document.querySelector("nav");
+  const [isScrolling, setIsScrolling] = useState(false);
+  const [showTopBtn, setTopBtn] = useState(false);
 
-  scroll.on("scroll", (position: { scroll: { y: number } }) => {
-    if (position.scroll.y > 50) {
-      navBar!.classList.add("nav-scroll");
-    } else {
-      navBar!.classList.remove("nav-scroll");
-    }
-  });
+  if (!!scroll) {
+    scroll.on(
+      "scroll",
+      (position: { scroll: { y: number } }, direction: string) => {
+        if (position.scroll.y > 50) {
+          // console.log(">> scroll > 50");
+          if (!isScrolling) {
+            setIsScrolling(true);
+          }
+        } else {
+          // console.log(">> scroll < 50 ");
+          if (isScrolling) {
+            setIsScrolling(false);
+            setTopBtn(false);
+          }
+        }
+
+        if (position.scroll.y > 400) {
+          // console.log(">> scroll > 50");
+          if (!showTopBtn) {
+            setTopBtn(true);
+          }
+        } else {
+          // console.log(">> scroll < 50 ");
+          if (showTopBtn) {
+            setTopBtn(false);
+          }
+        }
+      }
+    );
+  }
+
+  const navClassNames = isScrolling
+    ? "container-fluid nav-scroll"
+    : "container-fluid";
+
+  const backToTop = showTopBtn
+    ? "btn-to-top nav-link show"
+    : "btn-to-top nav-link";
 
   return (
     <>
-      <nav id="navbar" className="container-fluid">
+      <nav id="navbar" className={navClassNames}>
         <div className="d-flex flex-wrap align-items-center justify-content-center justify-content-md-between py-3 topnav px-3">
           <a
             href="/"
@@ -34,29 +68,37 @@ function TopNav(props: Props) {
 
           <ul className="nav col-12 col-md-auto mb-2 justify-content-center mb-md-0">
             <li>
-              <a href="/" className="nav-link active">
+              <a href="#root" className="nav-link active" data-scroll-to>
                 Home
               </a>
             </li>
             <li>
-              <a href="/" className="nav-link">
+              <a href="#about" className="nav-link" data-scroll-to>
                 About
               </a>
             </li>
             <li>
-              <a href="/" className="nav-link">
+              <a href="#works" className="nav-link" data-scroll-to>
                 What We Do
               </a>
             </li>
           </ul>
 
           <div className="col-md-3 text-end">
-            <button type="button" className="btn btn-primary">
+            <a
+              className="btn btn-primary small fs-6"
+              href="#about"
+              data-scroll-to
+            >
               Contact
-            </button>
+            </a>
           </div>
         </div>
       </nav>
+      <a href="#home" className={backToTop} data-scroll-to>
+        <div className="btt-shape"></div>
+        Back to Top
+      </a>
     </>
   );
 }
