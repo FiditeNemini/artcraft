@@ -20,6 +20,9 @@ function App() {
           smooth: true,
           multiplier: 0.9,
           getDirection: true,
+          mobile: {
+            smooth: false,
+          },
           // ... all available Locomotive Scroll instance options
         }}
         watch={

@@ -7328,6 +7328,11 @@ graceful-fs@^4.1.11, graceful-fs@^4.1.15, graceful-fs@^4.1.2, graceful-fs@^4.1.6
   resolved "https://registry.yarnpkg.com/graceful-fs/-/graceful-fs-4.2.9.tgz#041b05df45755e587a24942279b9d113146e1c96"
   integrity sha512-NtNxqUcXgpW2iMrfqSfR73Glt39K+BLwWsPs94yR63v45T0Wbej7eRmL5cWfwEgqXnmjQp3zaJTshdRW/qC2ZQ==
 
+gsap@^3.11.0:
+  version "3.11.0"
+  resolved "https://registry.yarnpkg.com/gsap/-/gsap-3.11.0.tgz#5a45da0f35b49e2c479e1e274feb6ac51e86478b"
+  integrity sha512-TV5aFGqXht+0o/CelnhCikSe3QGeG+q1XA/fyFFsMzesILHgWgFWIz0NuXIgcMaL5h7MG2l+j0BTupS5YyYkrw==
+
 gzip-size@^6.0.0:
   version "6.0.0"
   resolved "https://registry.yarnpkg.com/gzip-size/-/gzip-size-6.0.0.tgz#065367fd50c239c0671cbcbad5be3e2eeb10e462"
@@ -12835,6 +12840,11 @@ split-string@^3.0.1, split-string@^3.0.2:
   integrity sha512-NzNVhJDYpwceVVii8/Hu6DKfD2G+NrQHlS/V/qgv763EYudVwEcMQNxd2lh+0VrUByXN/oJkl5grOhYWvQUYiw==
   dependencies:
     extend-shallow "^3.0.0"
+
+split-type@^0.3.2:
+  version "0.3.2"
+  resolved "https://registry.yarnpkg.com/split-type/-/split-type-0.3.2.tgz#b33eb8a62b9d7797bed680b21cc178fd297e44e1"
+  integrity sha512-lriNiO/Z9Uwnn/PL3PEfbRqkESQ5BlPqt0RjiRPQGY/tsfmmpIyITqw312Y5IoxW0l7etA1iHSAVrWUM2GeRhg==
 
 split2@^3.0.0:
   version "3.2.2"

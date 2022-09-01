@@ -17,8 +17,44 @@ import { TtsComponent } from "./TtsComponent";
 import Tippy from "@tippyjs/react";
 import "tippy.js/dist/tippy.css";
 import AudioSample from "./AudioSample";
+import { useRef, useEffect, useState } from "react";
+import gsap from "gsap";
+import SplitType from "split-type";
 
 function IndexPage() {
+  useEffect(() => {
+    const splitTitle = new SplitType("#hero-title", {
+      types: "chars",
+      charClass: "title-split",
+    });
+
+    gsap.to(splitTitle.chars, {
+      delay: 0.2,
+      duration: 0.4,
+      y: 0,
+      opacity: 1,
+      stagger: 0.03,
+      ease: "expo",
+    });
+
+    const splitTitleOutline = new SplitType("#hero-title-outline", {
+      types: "words",
+      wordClass: "title-outline-split",
+    });
+
+    console.log(splitTitleOutline);
+
+    gsap.to(splitTitleOutline.words, {
+      delay: 0.25,
+      duration: 0.8,
+      y: 0,
+      scale: 1,
+      opacity: 1,
+      stagger: 0,
+      ease: "expo",
+    });
+  }, []);
+
   return (
     <>
       <div id="home" data-scroll-section>
@@ -50,8 +86,11 @@ function IndexPage() {
           </div>
           <div className="container">
             <div className="hero-title-container">
-              <h1 className="hero-title d-flex flex-column text-center">
-                <div
+              <h1
+                id="hero-title"
+                className="hero-title d-flex flex-column text-center"
+              >
+                <span
                   className="hero-title-one align-items-center zi-2"
                   data-scroll
                   data-scroll-speed="3"
@@ -59,8 +98,8 @@ function IndexPage() {
                   data-scroll-position="top"
                 >
                   The <span>Future</span>
-                </div>
-                <div
+                </span>
+                <span
                   className="hero-title-two zi-2"
                   data-scroll
                   data-scroll-speed="-3"
@@ -68,12 +107,12 @@ function IndexPage() {
                   data-scroll-position="top"
                 >
                   of Production
-                </div>
+                </span>
               </h1>
 
-              <div className="d-flex flex-column align-items-end">
+              <div className="d-flex flex-column align-items-center align-items-xl-end">
                 <p
-                  className="lead text-end w-50 hero-sub-title fw-normal opacity-75"
+                  className="lead hero-sub-title fw-normal opacity-75"
                   data-scroll
                   data-scroll-speed="-4"
                   data-scroll-direction="horizontal"
@@ -96,8 +135,11 @@ function IndexPage() {
               </div>
 
               <div className="hero-title-outline noselect">
-                <h1 className="hero-title d-flex flex-column text-center">
-                  <div
+                <h1
+                  id="hero-title-outline"
+                  className="hero-title d-flex flex-column text-center"
+                >
+                  <span
                     className="hero-title-one align-items-center text-outline"
                     data-scroll
                     data-scroll-speed="-4"
@@ -105,8 +147,8 @@ function IndexPage() {
                     data-scroll-position="top"
                   >
                     The Future
-                  </div>
-                  <div
+                  </span>
+                  <span
                     className="hero-title-two text-outline"
                     data-scroll
                     data-scroll-speed="4"
@@ -114,7 +156,7 @@ function IndexPage() {
                     data-scroll-position="top"
                   >
                     of Production
-                  </div>
+                  </span>
                 </h1>
               </div>
             </div>
@@ -129,14 +171,14 @@ function IndexPage() {
           </div>
 
           <div
-            className="d-flex social-icons flex-column gap-4 align-items-center"
+            className="d-none d-lg-flex social-icons flex-column gap-4 align-items-center"
             data-scroll
             data-scroll-speed="8"
             data-scroll-direction="horizontal"
             data-scroll-position="top"
           >
             <Tippy content="Discord" placement="right">
-              <a href="https://discorg">
+              <a href="https://discord.gg/fakeyou">
                 <FontAwesomeIcon icon={faDiscord} />
               </a>
             </Tippy>
@@ -208,7 +250,7 @@ function IndexPage() {
         <div className="bg-dark section-2">
           <div id="products">
             <Marquee gradient={false} speed={100}>
-              <h1 className="marquee-title d-flex gap-5">
+              <h1 className="marquee-title d-flex gap-3 gap-md-4 gap-lg-5">
                 <span>What we do</span>
                 <span className="text-red">\\</span>
                 <span className="text-outline">What we do</span>
@@ -216,13 +258,13 @@ function IndexPage() {
                 <span>What we do</span>
                 <span className="text-red">\\</span>
                 <span className="text-outline">What we do</span>
-                <span className="text-red me-5">\\</span>
+                <span className="text-red me-3 me-md-4 me-lg-5">\\</span>
               </h1>
             </Marquee>
           </div>
           <div className="container pt-10">
             <div className="row gx-5">
-              <div className="col-lg-5">
+              <div className="col-lg-5 text-center text-lg-start">
                 <img
                   src="/images/FakeYou-img.webp"
                   alt="FakeYou"
@@ -267,18 +309,18 @@ function IndexPage() {
               <TtsComponent />
             </div>
           </div>
-          <div className="text-center position-relative">
+          <div className="container text-center position-relative">
             <div className="position-relative zi-2">
               <h2 className="text-center mt-5 fw-bold">Want to hear more?</h2>
               <p className="mb-4">
                 Listen to all of the 2,000+ available voices on FakeYou.
               </p>
-              <div className="d-flex gap-3 justify-content-center">
+              <div className="d-flex flex-column flex-md-row gap-3 justify-content-center">
                 <a
                   href="https://fakeyou.com/"
                   rel="noreferrer"
                   target="_blank"
-                  className="btn btn-primary mt-3 d-flex"
+                  className="btn btn-primary"
                 >
                   <span>Go to FakeYou.com</span>
                 </a>
@@ -286,7 +328,7 @@ function IndexPage() {
                   href="https://fakeyou.com/clone"
                   rel="noreferrer"
                   target="_blank"
-                  className="btn btn-secondary mt-3 d-flex"
+                  className="btn btn-secondary"
                 >
                   <span>Clone my voice</span>
                 </a>
@@ -298,7 +340,7 @@ function IndexPage() {
         <div className="bg-light section-2">
           <div className="container">
             <div className="row gx-5 flex-row-reverse">
-              <div className="col-lg-5">
+              <div className="col-lg-5 text-center text-lg-start">
                 <img
                   src="/images/Stream-img.webp"
                   alt="FakeYou"
@@ -337,7 +379,7 @@ function IndexPage() {
         <div className="bg-dark section-2">
           <div className="container">
             <div className="row gx-5">
-              <div className="col-lg-5">
+              <div className="col-lg-5 text-center text-lg-start">
                 <img
                   src="/images/VC-img.webp"
                   alt="FakeYou"
@@ -438,7 +480,7 @@ function IndexPage() {
         <div className="bg-light section-2">
           <div className="container">
             <div className="row gx-5 flex-row-reverse">
-              <div className="col-lg-5">
+              <div className="col-lg-5 text-center text-lg-start">
                 <img
                   src="/images/Engine-img.webp"
                   alt="FakeYou"
@@ -468,12 +510,72 @@ function IndexPage() {
                 </div> */}
               </div>
             </div>
+            <div className="d-flex bg-dark-solid video-card mt-5">
+              <div className="row gx-0">
+                <div className="col-12 col-lg-7 overflow-hidden position-relative">
+                  <video
+                    src="/video/webpage-demo-1-640.mp4"
+                    autoPlay={true}
+                    playsInline={true}
+                    loop={true}
+                    muted={true}
+                    className="video"
+                  ></video>
+                </div>
+                <div className="col-12 col-lg-5 d-flex flex-column justify-content-center p-4">
+                  <h3 className="pb-3">Volumetric Capture</h3>
+                  <p>
+                    Use one or more cameras to build a 3D volumetric capture of
+                    your actors. In the future, we'll be upscaling from
+                    VGA-resolution depth maps to full 4K.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div className="col-12 col-md-5 d-flex flex-column justify-content-center mt-0">
+              <h3 className="pb-3">Motion Capture</h3>
+              <p>
+                Community-contributed models, sets, and scenarios can be
+                controlled with webcam, Kinect, or motion capture systems and
+                directed remotely from the web.
+              </p>
+            </div>
+            <div className="col-12 col-md-7 mt-0">
+              <video
+                src="/video/webpage-demo-2-640.mp4"
+                autoPlay={true}
+                playsInline={true}
+                loop={true}
+                muted={true}
+                className="img-fluid video"
+              ></video>
+            </div>
+            <div className="col-12 col-md-7 mt-0">
+              <video
+                src="/video/webpage-demo-3-640.mp4"
+                autoPlay={true}
+                playsInline={true}
+                loop={true}
+                muted={true}
+                className="img-fluid video"
+              ></video>
+            </div>
+            <div className="col-12 col-md-5 d-flex flex-column justify-content-center mt-0">
+              <h3 className="pb-3">Fake Faces, Voices, and Corrected Motion</h3>
+              <p>
+                We couldn't hire Elon Musk, but that didn't stop us and it won't
+                stop you. Change your actors faces and voices to fit your needs.
+                Tweak their movements and posture &mdash; even the location and
+                lighting &mdash; all post capture.
+              </p>
+            </div>
           </div>
         </div>
         <div className="bg-dark section-2">
           <div className="container">
             <div className="row gx-5">
-              <div className="col-lg-5">
+              <div className="col-lg-5 text-center text-lg-start">
                 <img
                   src="/images/VoxelCam-img.webp"
                   alt="FakeYou"

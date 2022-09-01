@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { useLocomotiveScroll } from "react-locomotive-scroll";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 interface Props {}
 
@@ -22,7 +22,6 @@ function TopNav(props: Props) {
           // console.log(">> scroll < 50 ");
           if (isScrolling) {
             setIsScrolling(false);
-            setTopBtn(false);
           }
         }
 
@@ -49,10 +48,30 @@ function TopNav(props: Props) {
     ? "btn-to-top nav-link show"
     : "btn-to-top nav-link";
 
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  const menuToggle = () => {
+    setMobileMenuOpen(!mobileMenuOpen);
+  };
+
+  const hamburgerClassNames = mobileMenuOpen
+    ? "button_container active"
+    : "button_container";
+
+  const menuClassNames = mobileMenuOpen ? "overlay open" : "overlay";
+
+  useEffect(() => {
+    if (mobileMenuOpen) {
+      document.body.classList.add("lock-scroll");
+    } else {
+      document.body.classList.remove("lock-scroll");
+    }
+  }, [mobileMenuOpen]);
+
   return (
     <>
       <nav id="navbar" className={navClassNames} data-scroll-section>
-        <div className="d-flex flex-wrap align-items-center justify-content-center justify-content-md-between py-3 topnav px-3">
+        <div className="d-none d-md-flex flex-wrap align-items-center justify-content-center justify-content-md-between mt-3 topnav">
           <a
             href="/"
             className="d-flex align-items-center col-md-3 mb-2 mb-md-0 text-dark text-decoration-none"
@@ -85,16 +104,59 @@ function TopNav(props: Props) {
           </ul>
 
           <div className="col-md-3 text-end">
-            <a
-              className="btn btn-primary small fs-6"
-              href="#about"
-              data-scroll-to
-            >
+            <a className="btn btn-primary fs-6" href="#about" data-scroll-to>
               Contact
             </a>
           </div>
         </div>
+
+        <div className="d-flex d-md-none justify-content-between p-3">
+          <a
+            href="/"
+            className="d-flex align-items-center text-dark text-decoration-none"
+          >
+            <img
+              id="logo"
+              src="/logo/Storyteller-Logo.png"
+              alt="Storyteller Logo"
+              height="36"
+              className="mb-2"
+            />
+          </a>
+          <button
+            onClick={menuToggle}
+            className={hamburgerClassNames}
+            id="toggle"
+            aria-controls="primary-menu"
+            aria-expanded="false"
+          >
+            <span className="top"></span>
+            <span className="middle"></span>
+            <span className="bottom"></span>
+          </button>
+        </div>
       </nav>
+      <div className={menuClassNames}>
+        <div className="overlay-menu">
+          <ul>
+            <li className="nav-link active">
+              <a onClick={menuToggle} href="#root" data-scroll-to>
+                Home
+              </a>
+            </li>
+            <li>
+              <a onClick={menuToggle} href="#about" data-scroll-to>
+                About
+              </a>
+            </li>
+            <li>
+              <a onClick={menuToggle} href="#products" data-scroll-to>
+                What We Do
+              </a>
+            </li>
+          </ul>
+        </div>
+      </div>
       <a href="#home" className={backToTop} data-scroll-to>
         <div className="btt-shape"></div>
         Back to Top
