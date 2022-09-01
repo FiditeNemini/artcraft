@@ -76,7 +76,6 @@ use crate::http_server::endpoints::users::list_user_w2l_inference_results::list_
 use crate::http_server::endpoints::users::list_user_w2l_templates::list_user_w2l_templates_handler;
 use crate::http_server::endpoints::users::login::login_handler;
 use crate::http_server::endpoints::users::logout::logout_handler;
-use crate::http_server::endpoints::users::session_info::session_info_handler;
 use crate::http_server::endpoints::vocoders::get_vocoder::get_vocoder_handler;
 use crate::http_server::endpoints::vocoders::list_vocoders::list_vocoders_handler;
 use crate::http_server::endpoints::voice_clone_requests::check_if_voice_clone_request_submitted::check_if_voice_clone_request_submitted_handler;
@@ -95,6 +94,7 @@ use crate::http_server::endpoints::w2l::get_w2l_template_use_count::get_w2l_temp
 use crate::http_server::endpoints::w2l::get_w2l_upload_template_job_status::get_w2l_upload_template_job_status_handler;
 use crate::http_server::endpoints::w2l::list_w2l_templates::list_w2l_templates_handler;
 use crate::http_server::endpoints::w2l::set_w2l_template_mod_approval::set_w2l_template_mod_approval_handler;
+use users_component::endpoints::session_info::session_info_handler;
 
 pub fn add_routes<T, B> (app: App<T, B>) -> App<T, B>
   where

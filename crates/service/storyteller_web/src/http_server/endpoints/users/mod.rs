@@ -8,4 +8,3 @@ pub mod list_user_w2l_inference_results;
 pub mod list_user_w2l_templates;
 pub mod login;
 pub mod logout;
-pub mod session_info;

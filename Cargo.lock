@@ -4944,8 +4944,10 @@ dependencies = [
  "base64 0.13.0",
  "chrono",
  "container_common",
+ "database_queries",
  "dotenv",
  "hmac 0.10.1",
+ "http_server_common",
  "jwt",
  "log",
  "once_cell",
@@ -4954,6 +4956,7 @@ dependencies = [
  "serde_derive",
  "serde_json",
  "sha2",
+ "sqlx",
  "time 0.2.26",
  "toml",
 ]

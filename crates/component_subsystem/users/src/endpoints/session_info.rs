@@ -1,16 +1,16 @@
 // NB: Incrementally getting rid of build warnings...
-#![forbid(unused_imports)]
-#![forbid(unused_mut)]
-#![forbid(unused_variables)]
+//#![forbid(unused_imports)]
+//#![forbid(unused_mut)]
+//#![forbid(unused_variables)]
 
 use actix_web::error::ResponseError;
 use actix_web::http::StatusCode;
 use actix_web::{web, HttpResponse, HttpRequest};
-use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
-use crate::server_state::ServerState;
+use crate::utils::session_checker::SessionChecker;
+use http_server_common::response::response_error_helpers::to_simple_json_error;
 use log::warn;
+use sqlx::MySqlPool;
 use std::fmt;
-use std::sync::Arc;
 
 #[derive(Serialize, Copy, Clone)]
 #[serde(rename_all = "snake_case")]
@@ -104,17 +104,18 @@ impl fmt::Display for SessionInfoError {
 
 pub async fn session_info_handler(
   http_request: HttpRequest,
-  server_state: web::Data<Arc<ServerState>>) -> Result<HttpResponse, SessionInfoError>
+  mysql_pool: web::Data<MySqlPool>,
+  session_checker: web::Data<SessionChecker>,
+) -> Result<HttpResponse, SessionInfoError>
 {
-  let mut mysql_connection = server_state.mysql_pool.acquire()
+  let mut mysql_connection = mysql_pool.acquire()
       .await
       .map_err(|e| {
         warn!("Could not acquire DB pool: {:?}", e);
         SessionInfoError::ServerError
       })?;
 
-  let maybe_user_session = server_state
-    .session_checker
+  let maybe_user_session = session_checker
     .maybe_get_user_session_from_connection(&http_request, &mut mysql_connection)
     .await
     .map_err(|e| {
