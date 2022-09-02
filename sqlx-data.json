@@ -1700,6 +1700,16 @@
       ]
     }
   },
+  "1cc62e5cdc8de18969d7e8018d91c38794e5a7d23f117e5b0a4126845f300e60": {
+    "query": "\nUPDATE user_sessions\nSET deleted_at = CURRENT_TIMESTAMP()\nWHERE\n    token = ?\n    AND deleted_at IS NULL\n        ",
+    "describe": {
+      "columns": [],
+      "parameters": {
+        "Right": 1
+      },
+      "nullable": []
+    }
+  },
   "28cf5843d68d6cb0e67eb316ef9e7e5fb05a6be2433f86c081576b279167508d": {
     "query": "\nINSERT INTO tts_result_synthetic_ids\nSET\n  user_token = ?,\n  next_id = 1\nON DUPLICATE KEY UPDATE\n  user_token = ?,\n  next_id = next_id + 1\n        ",
     "describe": {
@@ -2216,6 +2226,16 @@
       ]
     }
   },
+  "34364f9bc851971f8291f5f9942dd23d10718ccb210a93a236d96d0591f65f35": {
+    "query": "\nINSERT INTO users (\n  token,\n  username,\n  display_name,\n  email_address,\n  email_gravatar_hash,\n  profile_markdown,\n  profile_rendered_html,\n  user_role_slug,\n  password_hash,\n  ip_address_creation,\n  ip_address_last_login,\n  ip_address_last_update\n)\nVALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? )\n        ",
+    "describe": {
+      "columns": [],
+      "parameters": {
+        "Right": 12
+      },
+      "nullable": []
+    }
+  },
   "345cbabbe69652c89ccd384ed7db44f70c53791488cf63721f9563291b45db3e": {
     "query": "\nINSERT INTO user_sessions (\n  token,\n  user_token,\n  ip_address_creation,\n  expires_at\n)\nVALUES ( ?, ?, ?, NOW() + interval 1 year )\n        ",
     "describe": {
@@ -2252,6 +2272,16 @@
       "columns": [],
       "parameters": {
         "Right": 2
+      },
+      "nullable": []
+    }
+  },
+  "3a2dc0a7e41dcbdf21f91d1a1e54e813f74b0bac7aea052302089cae195eeb53": {
+    "query": "\nUPDATE users\nSET\n    profile_markdown = ?,\n    profile_rendered_html = ?,\n    discord_username = ?,\n    twitter_username = ?,\n    twitch_username = ?,\n    github_username = ?,\n    cashapp_username = ?,\n    website_url = ?,\n    version = version + 1\n\nWHERE users.token = ?\nLIMIT 1\n        ",
+    "describe": {
+      "columns": [],
+      "parameters": {
+        "Right": 9
       },
       "nullable": []
     }
@@ -4230,6 +4260,83 @@
         "Right": 3
       },
       "nullable": []
+    }
+  },
+  "7490dcb8de10b1eda2c857e53ebc5c0465cdb589d3df4c5549859f7919acac77": {
+    "query": "\nSELECT token, username, email_address, password_hash, is_banned\nFROM users\nWHERE email_address = ?\nLIMIT 1\n        ",
+    "describe": {
+      "columns": [
+        {
+          "ordinal": 0,
+          "name": "token",
+          "type_info": {
+            "type": "VarString",
+            "flags": {
+              "bits": 4229
+            },
+            "char_set": 224,
+            "max_size": 128
+          }
+        },
+        {
+          "ordinal": 1,
+          "name": "username",
+          "type_info": {
+            "type": "VarString",
+            "flags": {
+              "bits": 4229
+            },
+            "char_set": 224,
+            "max_size": 80
+          }
+        },
+        {
+          "ordinal": 2,
+          "name": "email_address",
+          "type_info": {
+            "type": "VarString",
+            "flags": {
+              "bits": 4229
+            },
+            "char_set": 224,
+            "max_size": 1020
+          }
+        },
+        {
+          "ordinal": 3,
+          "name": "password_hash",
+          "type_info": {
+            "type": "String",
+            "flags": {
+              "bits": 4225
+            },
+            "char_set": 63,
+            "max_size": 60
+          }
+        },
+        {
+          "ordinal": 4,
+          "name": "is_banned",
+          "type_info": {
+            "type": "Tiny",
+            "flags": {
+              "bits": 1
+            },
+            "char_set": 63,
+            "max_size": 1
+          }
+        }
+      ],
+      "parameters": {
+        "Right": 1
+      },
+      "nullable": [
+        false,
+        false,
+        false,
+        false,
+        false
+      ]
     }
   },
   "764c8dc4fc9b021b58a618b5f9ee6e0c9c08ac6d58b1f4c05455e951a0d01708": {
@@ -9603,6 +9710,434 @@
       ]
     }
   },
+  "c3f3792382c648d554c406e03d5109bc0257a619627aec96100a85b3ee503493": {
+    "query": "\nSELECT\n    users.token as user_token,\n    users.username,\n    users.display_name,\n\n    users.email_address,\n    users.email_confirmed,\n    users.email_gravatar_hash,\n\n    users.disable_gravatar,\n    users.auto_play_audio_preference,\n    users.auto_play_video_preference,\n    users.preferred_tts_result_visibility as `preferred_tts_result_visibility: crate::column_types::record_visibility::RecordVisibility`,\n    users.preferred_w2l_result_visibility as `preferred_w2l_result_visibility: crate::column_types::record_visibility::RecordVisibility`,\n\n    users.user_role_slug,\n    users.is_banned,\n\n    user_roles.can_use_tts,\n    user_roles.can_use_w2l,\n    user_roles.can_delete_own_tts_results,\n    user_roles.can_delete_own_w2l_results,\n    user_roles.can_delete_own_account,\n\n    user_roles.can_upload_tts_models,\n    user_roles.can_upload_w2l_templates,\n    user_roles.can_delete_own_tts_models,\n    user_roles.can_delete_own_w2l_templates,\n\n    user_roles.can_approve_w2l_templates,\n    user_roles.can_edit_other_users_profiles,\n    user_roles.can_edit_other_users_tts_models,\n    user_roles.can_edit_other_users_w2l_templates,\n    user_roles.can_delete_other_users_tts_models,\n    user_roles.can_delete_other_users_tts_results,\n    user_roles.can_delete_other_users_w2l_templates,\n    user_roles.can_delete_other_users_w2l_results,\n    user_roles.can_ban_users,\n    user_roles.can_delete_users\n\nFROM users\nLEFT OUTER JOIN user_sessions\n    ON users.token = user_sessions.user_token\nLEFT OUTER JOIN user_roles\n    ON users.user_role_slug = user_roles.slug\nWHERE user_sessions.token = ?\n    AND user_sessions.deleted_at IS NULL\n    AND users.user_deleted_at IS NULL\n    AND users.mod_deleted_at IS NULL\n        ",
+    "describe": {
+      "columns": [
+        {
+          "ordinal": 0,
+          "name": "user_token",
+          "type_info": {
+            "type": "VarString",
+            "flags": {
+              "bits": 4229
+            },
+            "char_set": 224,
+            "max_size": 128
+          }
+        },
+        {
+          "ordinal": 1,
+          "name": "username",
+          "type_info": {
+            "type": "VarString",
+            "flags": {
+              "bits": 4229
+            },
+            "char_set": 224,
+            "max_size": 80
+          }
+        },
+        {
+          "ordinal": 2,
+          "name": "display_name",
+          "type_info": {
+            "type": "VarString",
+            "flags": {
+              "bits": 4225
+            },
+            "char_set": 224,
+            "max_size": 80
+          }
+        },
+        {
+          "ordinal": 3,
+          "name": "email_address",
+          "type_info": {
+            "type": "VarString",
+            "flags": {
+              "bits": 4229
+            },
+            "char_set": 224,
+            "max_size": 1020
+          }
+        },
+        {
+          "ordinal": 4,
+          "name": "email_confirmed",
+          "type_info": {
+            "type": "Tiny",
+            "flags": {
+              "bits": 1
+            },
+            "char_set": 63,
+            "max_size": 1
+          }
+        },
+        {
+          "ordinal": 5,
+          "name": "email_gravatar_hash",
+          "type_info": {
+            "type": "String",
+            "flags": {
+              "bits": 4225
+            },
+            "char_set": 224,
+            "max_size": 128
+          }
+        },
+        {
+          "ordinal": 6,
+          "name": "disable_gravatar",
+          "type_info": {
+            "type": "Tiny",
+            "flags": {
+              "bits": 1
+            },
+            "char_set": 63,
+            "max_size": 1
+          }
+        },
+        {
+          "ordinal": 7,
+          "name": "auto_play_audio_preference",
+          "type_info": {
+            "type": "Tiny",
+            "flags": {
+              "bits": 0
+            },
+            "char_set": 63,
+            "max_size": 1
+          }
+        },
+        {
+          "ordinal": 8,
+          "name": "auto_play_video_preference",
+          "type_info": {
+            "type": "Tiny",
+            "flags": {
+              "bits": 0
+            },
+            "char_set": 63,
+            "max_size": 1
+          }
+        },
+        {
+          "ordinal": 9,
+          "name": "preferred_tts_result_visibility: crate::column_types::record_visibility::RecordVisibility",
+          "type_info": {
+            "type": "String",
+            "flags": {
+              "bits": 385
+            },
+            "char_set": 224,
+            "max_size": 28
+          }
+        },
+        {
+          "ordinal": 10,
+          "name": "preferred_w2l_result_visibility: crate::column_types::record_visibility::RecordVisibility",
+          "type_info": {
+            "type": "String",
+            "flags": {
+              "bits": 385
+            },
+            "char_set": 224,
+            "max_size": 28
+          }
+        },
+        {
+          "ordinal": 11,
+          "name": "user_role_slug",
+          "type_info": {
+            "type": "VarString",
+            "flags": {
+              "bits": 4233
+            },
+            "char_set": 224,
+            "max_size": 64
+          }
+        },
+        {
+          "ordinal": 12,
+          "name": "is_banned",
+          "type_info": {
+            "type": "Tiny",
+            "flags": {
+              "bits": 1
+            },
+            "char_set": 63,
+            "max_size": 1
+          }
+        },
+        {
+          "ordinal": 13,
+          "name": "can_use_tts",
+          "type_info": {
+            "type": "Tiny",
+            "flags": {
+              "bits": 0
+            },
+            "char_set": 63,
+            "max_size": 1
+          }
+        },
+        {
+          "ordinal": 14,
+          "name": "can_use_w2l",
+          "type_info": {
+            "type": "Tiny",
+            "flags": {
+              "bits": 0
+            },
+            "char_set": 63,
+            "max_size": 1
+          }
+        },
+        {
+          "ordinal": 15,
+          "name": "can_delete_own_tts_results",
+          "type_info": {
+            "type": "Tiny",
+            "flags": {
+              "bits": 0
+            },
+            "char_set": 63,
+            "max_size": 1
+          }
+        },
+        {
+          "ordinal": 16,
+          "name": "can_delete_own_w2l_results",
+          "type_info": {
+            "type": "Tiny",
+            "flags": {
+              "bits": 0
+            },
+            "char_set": 63,
+            "max_size": 1
+          }
+        },
+        {
+          "ordinal": 17,
+          "name": "can_delete_own_account",
+          "type_info": {
+            "type": "Tiny",
+            "flags": {
+              "bits": 0
+            },
+            "char_set": 63,
+            "max_size": 1
+          }
+        },
+        {
+          "ordinal": 18,
+          "name": "can_upload_tts_models",
+          "type_info": {
+            "type": "Tiny",
+            "flags": {
+              "bits": 0
+            },
+            "char_set": 63,
+            "max_size": 1
+          }
+        },
+        {
+          "ordinal": 19,
+          "name": "can_upload_w2l_templates",
+          "type_info": {
+            "type": "Tiny",
+            "flags": {
+              "bits": 0
+            },
+            "char_set": 63,
+            "max_size": 1
+          }
+        },
+        {
+          "ordinal": 20,
+          "name": "can_delete_own_tts_models",
+          "type_info": {
+            "type": "Tiny",
+            "flags": {
+              "bits": 0
+            },
+            "char_set": 63,
+            "max_size": 1
+          }
+        },
+        {
+          "ordinal": 21,
+          "name": "can_delete_own_w2l_templates",
+          "type_info": {
+            "type": "Tiny",
+            "flags": {
+              "bits": 0
+            },
+            "char_set": 63,
+            "max_size": 1
+          }
+        },
+        {
+          "ordinal": 22,
+          "name": "can_approve_w2l_templates",
+          "type_info": {
+            "type": "Tiny",
+            "flags": {
+              "bits": 0
+            },
+            "char_set": 63,
+            "max_size": 1
+          }
+        },
+        {
+          "ordinal": 23,
+          "name": "can_edit_other_users_profiles",
+          "type_info": {
+            "type": "Tiny",
+            "flags": {
+              "bits": 0
+            },
+            "char_set": 63,
+            "max_size": 1
+          }
+        },
+        {
+          "ordinal": 24,
+          "name": "can_edit_other_users_tts_models",
+          "type_info": {
+            "type": "Tiny",
+            "flags": {
+              "bits": 0
+            },
+            "char_set": 63,
+            "max_size": 1
+          }
+        },
+        {
+          "ordinal": 25,
+          "name": "can_edit_other_users_w2l_templates",
+          "type_info": {
+            "type": "Tiny",
+            "flags": {
+              "bits": 0
+            },
+            "char_set": 63,
+            "max_size": 1
+          }
+        },
+        {
+          "ordinal": 26,
+          "name": "can_delete_other_users_tts_models",
+          "type_info": {
+            "type": "Tiny",
+            "flags": {
+              "bits": 0
+            },
+            "char_set": 63,
+            "max_size": 1
+          }
+        },
+        {
+          "ordinal": 27,
+          "name": "can_delete_other_users_tts_results",
+          "type_info": {
+            "type": "Tiny",
+            "flags": {
+              "bits": 0
+            },
+            "char_set": 63,
+            "max_size": 1
+          }
+        },
+        {
+          "ordinal": 28,
+          "name": "can_delete_other_users_w2l_templates",
+          "type_info": {
+            "type": "Tiny",
+            "flags": {
+              "bits": 0
+            },
+            "char_set": 63,
+            "max_size": 1
+          }
+        },
+        {
+          "ordinal": 29,
+          "name": "can_delete_other_users_w2l_results",
+          "type_info": {
+            "type": "Tiny",
+            "flags": {
+              "bits": 0
+            },
+            "char_set": 63,
+            "max_size": 1
+          }
+        },
+        {
+          "ordinal": 30,
+          "name": "can_ban_users",
+          "type_info": {
+            "type": "Tiny",
+            "flags": {
+              "bits": 0
+            },
+            "char_set": 63,
+            "max_size": 1
+          }
+        },
+        {
+          "ordinal": 31,
+          "name": "can_delete_users",
+          "type_info": {
+            "type": "Tiny",
+            "flags": {
+              "bits": 0
+            },
+            "char_set": 63,
+            "max_size": 1
+          }
+        }
+      ],
+      "parameters": {
+        "Right": 1
+      },
+      "nullable": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        true,
+        true,
+        false,
+        false,
+        false,
+        false,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true
+      ]
+    }
+  },
   "c4640a618e1d179fa95adce67a329818f8b1626ac88fa76dbb871b8788136191": {
     "query": "\nUPDATE w2l_templates\nSET\n  maybe_mod_user_token = ?,\n  mod_deleted_at = NULL\nWHERE\n  token = ?\nLIMIT 1\n        ",
     "describe": {
@@ -10874,6 +11409,44 @@
       ]
     }
   },
+  "e73192a3e763a287d5737821443c5a81649f17e39978497b99c52e1e896a75f6": {
+    "query": "\nSELECT\n    token as session_token,\n    user_token\nFROM user_sessions\nWHERE token = ?\nAND deleted_at IS NULL\n        ",
+    "describe": {
+      "columns": [
+        {
+          "ordinal": 0,
+          "name": "session_token",
+          "type_info": {
+            "type": "VarString",
+            "flags": {
+              "bits": 4229
+            },
+            "char_set": 224,
+            "max_size": 128
+          }
+        },
+        {
+          "ordinal": 1,
+          "name": "user_token",
+          "type_info": {
+            "type": "VarString",
+            "flags": {
+              "bits": 4233
+            },
+            "char_set": 224,
+            "max_size": 128
+          }
+        }
+      ],
+      "parameters": {
+        "Right": 1
+      },
+      "nullable": [
+        false,
+        false
+      ]
+    }
+  },
   "e89d571f95a4fad69c5531eab5d5cae425d351ee8303ca25084ece84e5a02949": {
     "query": "\nSELECT\n    vocoder.token as vocoder_token,\n    vocoder.vocoder_type as `vocoder_type: reusable_types::vocoder_type::VocoderType`,\n    vocoder.creator_user_token,\n    users.username as creator_username,\n    users.display_name as creator_display_name,\n    users.email_gravatar_hash as creator_gravatar_hash,\n    vocoder.title,\n    vocoder.is_staff_recommended,\n    vocoder.is_mod_disabled_from_public_use,\n    vocoder.is_mod_disabled_from_author_use,\n    vocoder.is_mod_author_editing_locked,\n    vocoder.created_at,\n    vocoder.updated_at,\n    vocoder.user_deleted_at,\n    vocoder.mod_deleted_at\nFROM vocoder_models as vocoder\nJOIN users\n    ON users.token = vocoder.creator_user_token\nWHERE\n    users.username = ?\n    AND vocoder.is_mod_disabled_from_public_use IS FALSE\n    AND vocoder.is_mod_disabled_from_author_use IS FALSE\n    AND vocoder.user_deleted_at IS NULL\n    AND vocoder.mod_deleted_at IS NULL\n        ",
     "describe": {
@@ -11356,6 +11929,16 @@
       "nullable": []
     }
   },
+  "f75b713d166398ebea2bdbde4e416dc8eb2c48dba4aa9bd164bcf5bc77237ce1": {
+    "query": "\nUPDATE users\nSET\n    profile_markdown = ?,\n    profile_rendered_html = ?,\n    preferred_tts_result_visibility = ?,\n    preferred_w2l_result_visibility = ?,\n    discord_username = ?,\n    twitter_username = ?,\n    twitch_username = ?,\n    github_username = ?,\n    cashapp_username = ?,\n    website_url = ?,\n    ip_address_last_update = ?,\n    version = version + 1\n\nWHERE users.token = ?\nLIMIT 1\n        ",
+    "describe": {
+      "columns": [],
+      "parameters": {
+        "Right": 12
+      },
+      "nullable": []
+    }
+  },
   "fb3b4c13ef5ef662e808c85fbdf28a98de14af5390c206e074aa8a4ac67a90fe": {
     "query": "\nINSERT INTO tts_results\nSET\n  token = ?,\n\n  model_token = ?,\n  maybe_pretrained_vocoder_used = ?,\n  raw_inference_text = ?,\n  raw_inference_text_hash_sha2 = ?,\n  normalized_inference_text = ?,\n\n  maybe_creator_user_token = ?,\n  maybe_creator_synthetic_id = ?,\n\n  creator_ip_address = ?,\n  creator_set_visibility = ?,\n\n  public_bucket_wav_audio_path = ?,\n  public_bucket_spectrogram_path = ?,\n\n  file_size_bytes = ?,\n  duration_millis = ?,\n\n  is_generated_on_prem = ?,\n  generated_by_worker = ?,\n\n  is_debug_request = ?\n        ",
     "describe": {
@@ -11391,6 +11974,83 @@
       ]
     }
   },
+  "feb0dae816a5701707a76e15011ea6cb262b10c663abf2cf1fb46bd9b1cebe09": {
+    "query": "\nSELECT token, username, email_address, password_hash, is_banned\nFROM users\nWHERE username = ?\nLIMIT 1\n        ",
+    "describe": {
+      "columns": [
+        {
+          "ordinal": 0,
+          "name": "token",
+          "type_info": {
+            "type": "VarString",
+            "flags": {
+              "bits": 4229
+            },
+            "char_set": 224,
+            "max_size": 128
+          }
+        },
+        {
+          "ordinal": 1,
+          "name": "username",
+          "type_info": {
+            "type": "VarString",
+            "flags": {
+              "bits": 4229
+            },
+            "char_set": 224,
+            "max_size": 80
+          }
+        },
+        {
+          "ordinal": 2,
+          "name": "email_address",
+          "type_info": {
+            "type": "VarString",
+            "flags": {
+              "bits": 4229
+            },
+            "char_set": 224,
+            "max_size": 1020
+          }
+        },
+        {
+          "ordinal": 3,
+          "name": "password_hash",
+          "type_info": {
+            "type": "String",
+            "flags": {
+              "bits": 4225
+            },
+            "char_set": 63,
+            "max_size": 60
+          }
+        },
+        {
+          "ordinal": 4,
+          "name": "is_banned",
+          "type_info": {
+            "type": "Tiny",
+            "flags": {
+              "bits": 1
+            },
+            "char_set": 63,
+            "max_size": 1
+          }
+        }
+      ],
+      "parameters": {
+        "Right": 1
+      },
+      "nullable": [
+        false,
+        false,
+        false,
+        false,
+        false
+      ]
+    }
+  },
   "ffa85f7c65101a43653c724479ee080e0a74577d2ae37863b039f3a452493d1e": {
     "query": "\nUPDATE w2l_results\nSET\n  user_deleted_at = CURRENT_TIMESTAMP\nWHERE\n  token = ?\nLIMIT 1\n        ",
     "describe": {
@@ -11417,16 +12077,6 @@
       "columns": [],
       "parameters": {
         "Right": 6
-      },
-      "nullable": []
-    }
-  },
-  "1cc62e5cdc8de18969d7e8018d91c38794e5a7d23f117e5b0a4126845f300e60": {
-    "query": "\nUPDATE user_sessions\nSET deleted_at = CURRENT_TIMESTAMP()\nWHERE\n    token = ?\n    AND deleted_at IS NULL\n        ",
-    "describe": {
-      "columns": [],
-      "parameters": {
-        "Right": 1
       },
       "nullable": []
     }
@@ -11499,32 +12149,12 @@
       "nullable": []
     }
   },
-  "34364f9bc851971f8291f5f9942dd23d10718ccb210a93a236d96d0591f65f35": {
-    "query": "\nINSERT INTO users (\n  token,\n  username,\n  display_name,\n  email_address,\n  email_gravatar_hash,\n  profile_markdown,\n  profile_rendered_html,\n  user_role_slug,\n  password_hash,\n  ip_address_creation,\n  ip_address_last_login,\n  ip_address_last_update\n)\nVALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? )\n        ",
-    "describe": {
-      "columns": [],
-      "parameters": {
-        "Right": 12
-      },
-      "nullable": []
-    }
-  },
   "346c02b215cb35efaa35fe96d866a8c9056ac46e987b4e01f64222259dccdcbf": {
     "query": "\nUPDATE\n    ip_address_bans\nSET\n    mod_user_token = ?,\n    deleted_at = NULL\nWHERE\n    ip_address = ?\nLIMIT 1\n        ",
     "describe": {
       "columns": [],
       "parameters": {
         "Right": 2
-      },
-      "nullable": []
-    }
-  },
-  "3a2dc0a7e41dcbdf21f91d1a1e54e813f74b0bac7aea052302089cae195eeb53": {
-    "query": "\nUPDATE users\nSET\n    profile_markdown = ?,\n    profile_rendered_html = ?,\n    discord_username = ?,\n    twitter_username = ?,\n    twitch_username = ?,\n    github_username = ?,\n    cashapp_username = ?,\n    website_url = ?,\n    version = version + 1\n\nWHERE users.token = ?\nLIMIT 1\n        ",
-    "describe": {
-      "columns": [],
-      "parameters": {
-        "Right": 9
       },
       "nullable": []
     }
@@ -11954,83 +12584,6 @@
         "Right": 1
       },
       "nullable": []
-    }
-  },
-  "7490dcb8de10b1eda2c857e53ebc5c0465cdb589d3df4c5549859f7919acac77": {
-    "query": "\nSELECT token, username, email_address, password_hash, is_banned\nFROM users\nWHERE email_address = ?\nLIMIT 1\n        ",
-    "describe": {
-      "columns": [
-        {
-          "ordinal": 0,
-          "name": "token",
-          "type_info": {
-            "type": "VarString",
-            "flags": {
-              "bits": 4229
-            },
-            "char_set": 224,
-            "max_size": 128
-          }
-        },
-        {
-          "ordinal": 1,
-          "name": "username",
-          "type_info": {
-            "type": "VarString",
-            "flags": {
-              "bits": 4229
-            },
-            "char_set": 224,
-            "max_size": 80
-          }
-        },
-        {
-          "ordinal": 2,
-          "name": "email_address",
-          "type_info": {
-            "type": "VarString",
-            "flags": {
-              "bits": 4229
-            },
-            "char_set": 224,
-            "max_size": 1020
-          }
-        },
-        {
-          "ordinal": 3,
-          "name": "password_hash",
-          "type_info": {
-            "type": "String",
-            "flags": {
-              "bits": 4225
-            },
-            "char_set": 63,
-            "max_size": 60
-          }
-        },
-        {
-          "ordinal": 4,
-          "name": "is_banned",
-          "type_info": {
-            "type": "Tiny",
-            "flags": {
-              "bits": 1
-            },
-            "char_set": 63,
-            "max_size": 1
-          }
-        }
-      ],
-      "parameters": {
-        "Right": 1
-      },
-      "nullable": [
-        false,
-        false,
-        false,
-        false,
-        false
-      ]
     }
   },
   "7622292c05fe1b5832136762042780a12a02048166bb1b4492dfd627c48c8968": {
@@ -12680,44 +13233,6 @@
       ]
     }
   },
-  "e73192a3e763a287d5737821443c5a81649f17e39978497b99c52e1e896a75f6": {
-    "query": "\nSELECT\n    token as session_token,\n    user_token\nFROM user_sessions\nWHERE token = ?\nAND deleted_at IS NULL\n        ",
-    "describe": {
-      "columns": [
-        {
-          "ordinal": 0,
-          "name": "session_token",
-          "type_info": {
-            "type": "VarString",
-            "flags": {
-              "bits": 4229
-            },
-            "char_set": 224,
-            "max_size": 128
-          }
-        },
-        {
-          "ordinal": 1,
-          "name": "user_token",
-          "type_info": {
-            "type": "VarString",
-            "flags": {
-              "bits": 4233
-            },
-            "char_set": 224,
-            "max_size": 128
-          }
-        }
-      ],
-      "parameters": {
-        "Right": 1
-      },
-      "nullable": [
-        false,
-        false
-      ]
-    }
-  },
   "eab69a8d679b2dcfb06a9ccc79851f6c693d0c372142ff0e7ded89c95e4bcf44": {
     "query": "\nUPDATE users\nSET\n    is_banned = ?,\n    maybe_mod_comments = ?,\n    maybe_mod_user_token  = ?,\n    version = version + 1\n\nWHERE users.token = ?\nLIMIT 1\n        ",
     "describe": {
@@ -12934,444 +13449,6 @@
       ]
     }
   },
-  "f70bd775718829cd10f508dfe09286020467cc34fb54daf0758dba2545b164f8": {
-    "query": "\nSELECT\n    users.token as user_token,\n    users.username,\n    users.display_name,\n\n    users.email_address,\n    users.email_confirmed,\n    users.email_gravatar_hash,\n\n    users.disable_gravatar,\n    users.auto_play_audio_preference,\n    users.auto_play_video_preference,\n    users.preferred_tts_result_visibility as `preferred_tts_result_visibility: database_queries::column_types::record_visibility::RecordVisibility`,\n    users.preferred_w2l_result_visibility as `preferred_w2l_result_visibility: database_queries::column_types::record_visibility::RecordVisibility`,\n\n    users.user_role_slug,\n    users.is_banned,\n\n    user_roles.can_use_tts,\n    user_roles.can_use_w2l,\n    user_roles.can_delete_own_tts_results,\n    user_roles.can_delete_own_w2l_results,\n    user_roles.can_delete_own_account,\n\n    user_roles.can_upload_tts_models,\n    user_roles.can_upload_w2l_templates,\n    user_roles.can_delete_own_tts_models,\n    user_roles.can_delete_own_w2l_templates,\n\n    user_roles.can_approve_w2l_templates,\n    user_roles.can_edit_other_users_profiles,\n    user_roles.can_edit_other_users_tts_models,\n    user_roles.can_edit_other_users_w2l_templates,\n    user_roles.can_delete_other_users_tts_models,\n    user_roles.can_delete_other_users_tts_results,\n    user_roles.can_delete_other_users_w2l_templates,\n    user_roles.can_delete_other_users_w2l_results,\n    user_roles.can_ban_users,\n    user_roles.can_delete_users\n\nFROM users\nLEFT OUTER JOIN user_sessions\n    ON users.token = user_sessions.user_token\nLEFT OUTER JOIN user_roles\n    ON users.user_role_slug = user_roles.slug\nWHERE user_sessions.token = ?\n    AND user_sessions.deleted_at IS NULL\n    AND users.user_deleted_at IS NULL\n    AND users.mod_deleted_at IS NULL\n        ",
-    "describe": {
-      "columns": [
-        {
-          "ordinal": 0,
-          "name": "user_token",
-          "type_info": {
-            "type": "VarString",
-            "flags": {
-              "bits": 4229
-            },
-            "char_set": 224,
-            "max_size": 128
-          }
-        },
-        {
-          "ordinal": 1,
-          "name": "username",
-          "type_info": {
-            "type": "VarString",
-            "flags": {
-              "bits": 4229
-            },
-            "char_set": 224,
-            "max_size": 80
-          }
-        },
-        {
-          "ordinal": 2,
-          "name": "display_name",
-          "type_info": {
-            "type": "VarString",
-            "flags": {
-              "bits": 4225
-            },
-            "char_set": 224,
-            "max_size": 80
-          }
-        },
-        {
-          "ordinal": 3,
-          "name": "email_address",
-          "type_info": {
-            "type": "VarString",
-            "flags": {
-              "bits": 4229
-            },
-            "char_set": 224,
-            "max_size": 1020
-          }
-        },
-        {
-          "ordinal": 4,
-          "name": "email_confirmed",
-          "type_info": {
-            "type": "Tiny",
-            "flags": {
-              "bits": 1
-            },
-            "char_set": 63,
-            "max_size": 1
-          }
-        },
-        {
-          "ordinal": 5,
-          "name": "email_gravatar_hash",
-          "type_info": {
-            "type": "String",
-            "flags": {
-              "bits": 4225
-            },
-            "char_set": 224,
-            "max_size": 128
-          }
-        },
-        {
-          "ordinal": 6,
-          "name": "disable_gravatar",
-          "type_info": {
-            "type": "Tiny",
-            "flags": {
-              "bits": 1
-            },
-            "char_set": 63,
-            "max_size": 1
-          }
-        },
-        {
-          "ordinal": 7,
-          "name": "auto_play_audio_preference",
-          "type_info": {
-            "type": "Tiny",
-            "flags": {
-              "bits": 0
-            },
-            "char_set": 63,
-            "max_size": 1
-          }
-        },
-        {
-          "ordinal": 8,
-          "name": "auto_play_video_preference",
-          "type_info": {
-            "type": "Tiny",
-            "flags": {
-              "bits": 0
-            },
-            "char_set": 63,
-            "max_size": 1
-          }
-        },
-        {
-          "ordinal": 9,
-          "name": "preferred_tts_result_visibility: database_queries::column_types::record_visibility::RecordVisibility",
-          "type_info": {
-            "type": "String",
-            "flags": {
-              "bits": 385
-            },
-            "char_set": 224,
-            "max_size": 28
-          }
-        },
-        {
-          "ordinal": 10,
-          "name": "preferred_w2l_result_visibility: database_queries::column_types::record_visibility::RecordVisibility",
-          "type_info": {
-            "type": "String",
-            "flags": {
-              "bits": 385
-            },
-            "char_set": 224,
-            "max_size": 28
-          }
-        },
-        {
-          "ordinal": 11,
-          "name": "user_role_slug",
-          "type_info": {
-            "type": "VarString",
-            "flags": {
-              "bits": 4233
-            },
-            "char_set": 224,
-            "max_size": 64
-          }
-        },
-        {
-          "ordinal": 12,
-          "name": "is_banned",
-          "type_info": {
-            "type": "Tiny",
-            "flags": {
-              "bits": 1
-            },
-            "char_set": 63,
-            "max_size": 1
-          }
-        },
-        {
-          "ordinal": 13,
-          "name": "can_use_tts",
-          "type_info": {
-            "type": "Tiny",
-            "flags": {
-              "bits": 0
-            },
-            "char_set": 63,
-            "max_size": 1
-          }
-        },
-        {
-          "ordinal": 14,
-          "name": "can_use_w2l",
-          "type_info": {
-            "type": "Tiny",
-            "flags": {
-              "bits": 0
-            },
-            "char_set": 63,
-            "max_size": 1
-          }
-        },
-        {
-          "ordinal": 15,
-          "name": "can_delete_own_tts_results",
-          "type_info": {
-            "type": "Tiny",
-            "flags": {
-              "bits": 0
-            },
-            "char_set": 63,
-            "max_size": 1
-          }
-        },
-        {
-          "ordinal": 16,
-          "name": "can_delete_own_w2l_results",
-          "type_info": {
-            "type": "Tiny",
-            "flags": {
-              "bits": 0
-            },
-            "char_set": 63,
-            "max_size": 1
-          }
-        },
-        {
-          "ordinal": 17,
-          "name": "can_delete_own_account",
-          "type_info": {
-            "type": "Tiny",
-            "flags": {
-              "bits": 0
-            },
-            "char_set": 63,
-            "max_size": 1
-          }
-        },
-        {
-          "ordinal": 18,
-          "name": "can_upload_tts_models",
-          "type_info": {
-            "type": "Tiny",
-            "flags": {
-              "bits": 0
-            },
-            "char_set": 63,
-            "max_size": 1
-          }
-        },
-        {
-          "ordinal": 19,
-          "name": "can_upload_w2l_templates",
-          "type_info": {
-            "type": "Tiny",
-            "flags": {
-              "bits": 0
-            },
-            "char_set": 63,
-            "max_size": 1
-          }
-        },
-        {
-          "ordinal": 20,
-          "name": "can_delete_own_tts_models",
-          "type_info": {
-            "type": "Tiny",
-            "flags": {
-              "bits": 0
-            },
-            "char_set": 63,
-            "max_size": 1
-          }
-        },
-        {
-          "ordinal": 21,
-          "name": "can_delete_own_w2l_templates",
-          "type_info": {
-            "type": "Tiny",
-            "flags": {
-              "bits": 0
-            },
-            "char_set": 63,
-            "max_size": 1
-          }
-        },
-        {
-          "ordinal": 22,
-          "name": "can_approve_w2l_templates",
-          "type_info": {
-            "type": "Tiny",
-            "flags": {
-              "bits": 0
-            },
-            "char_set": 63,
-            "max_size": 1
-          }
-        },
-        {
-          "ordinal": 23,
-          "name": "can_edit_other_users_profiles",
-          "type_info": {
-            "type": "Tiny",
-            "flags": {
-              "bits": 0
-            },
-            "char_set": 63,
-            "max_size": 1
-          }
-        },
-        {
-          "ordinal": 24,
-          "name": "can_edit_other_users_tts_models",
-          "type_info": {
-            "type": "Tiny",
-            "flags": {
-              "bits": 0
-            },
-            "char_set": 63,
-            "max_size": 1
-          }
-        },
-        {
-          "ordinal": 25,
-          "name": "can_edit_other_users_w2l_templates",
-          "type_info": {
-            "type": "Tiny",
-            "flags": {
-              "bits": 0
-            },
-            "char_set": 63,
-            "max_size": 1
-          }
-        },
-        {
-          "ordinal": 26,
-          "name": "can_delete_other_users_tts_models",
-          "type_info": {
-            "type": "Tiny",
-            "flags": {
-              "bits": 0
-            },
-            "char_set": 63,
-            "max_size": 1
-          }
-        },
-        {
-          "ordinal": 27,
-          "name": "can_delete_other_users_tts_results",
-          "type_info": {
-            "type": "Tiny",
-            "flags": {
-              "bits": 0
-            },
-            "char_set": 63,
-            "max_size": 1
-          }
-        },
-        {
-          "ordinal": 28,
-          "name": "can_delete_other_users_w2l_templates",
-          "type_info": {
-            "type": "Tiny",
-            "flags": {
-              "bits": 0
-            },
-            "char_set": 63,
-            "max_size": 1
-          }
-        },
-        {
-          "ordinal": 29,
-          "name": "can_delete_other_users_w2l_results",
-          "type_info": {
-            "type": "Tiny",
-            "flags": {
-              "bits": 0
-            },
-            "char_set": 63,
-            "max_size": 1
-          }
-        },
-        {
-          "ordinal": 30,
-          "name": "can_ban_users",
-          "type_info": {
-            "type": "Tiny",
-            "flags": {
-              "bits": 0
-            },
-            "char_set": 63,
-            "max_size": 1
-          }
-        },
-        {
-          "ordinal": 31,
-          "name": "can_delete_users",
-          "type_info": {
-            "type": "Tiny",
-            "flags": {
-              "bits": 0
-            },
-            "char_set": 63,
-            "max_size": 1
-          }
-        }
-      ],
-      "parameters": {
-        "Right": 1
-      },
-      "nullable": [
-        false,
-        false,
-        false,
-        false,
-        false,
-        false,
-        false,
-        true,
-        true,
-        false,
-        false,
-        false,
-        false,
-        true,
-        true,
-        true,
-        true,
-        true,
-        true,
-        true,
-        true,
-        true,
-        true,
-        true,
-        true,
-        true,
-        true,
-        true,
-        true,
-        true,
-        true,
-        true
-      ]
-    }
-  },
-  "f75b713d166398ebea2bdbde4e416dc8eb2c48dba4aa9bd164bcf5bc77237ce1": {
-    "query": "\nUPDATE users\nSET\n    profile_markdown = ?,\n    profile_rendered_html = ?,\n    preferred_tts_result_visibility = ?,\n    preferred_w2l_result_visibility = ?,\n    discord_username = ?,\n    twitter_username = ?,\n    twitch_username = ?,\n    github_username = ?,\n    cashapp_username = ?,\n    website_url = ?,\n    ip_address_last_update = ?,\n    version = version + 1\n\nWHERE users.token = ?\nLIMIT 1\n        ",
-    "describe": {
-      "columns": [],
-      "parameters": {
-        "Right": 12
-      },
-      "nullable": []
-    }
-  },
   "fd31f7abe386147c07f862d668c9e56eb3d809c4f0a61b7debf9b2e3785a4c83": {
     "query": "\nINSERT INTO model_categories\nSET\n    token = ?,\n    uuid_idempotency_token = ?,\n    model_type = ?,\n    name = ?,\n\n    creator_user_token = ?,\n    creator_ip_address_creation = ?,\n    creator_ip_address_last_update = ?,\n\n    is_mod_approved = ?,\n    maybe_mod_user_token = ?,\n    can_directly_have_models = ?,\n    can_have_subcategories = ?,\n    can_only_mods_apply = ?\n        ",
     "describe": {
@@ -13380,83 +13457,6 @@
         "Right": 12
       },
       "nullable": []
-    }
-  },
-  "feb0dae816a5701707a76e15011ea6cb262b10c663abf2cf1fb46bd9b1cebe09": {
-    "query": "\nSELECT token, username, email_address, password_hash, is_banned\nFROM users\nWHERE username = ?\nLIMIT 1\n        ",
-    "describe": {
-      "columns": [
-        {
-          "ordinal": 0,
-          "name": "token",
-          "type_info": {
-            "type": "VarString",
-            "flags": {
-              "bits": 4229
-            },
-            "char_set": 224,
-            "max_size": 128
-          }
-        },
-        {
-          "ordinal": 1,
-          "name": "username",
-          "type_info": {
-            "type": "VarString",
-            "flags": {
-              "bits": 4229
-            },
-            "char_set": 224,
-            "max_size": 80
-          }
-        },
-        {
-          "ordinal": 2,
-          "name": "email_address",
-          "type_info": {
-            "type": "VarString",
-            "flags": {
-              "bits": 4229
-            },
-            "char_set": 224,
-            "max_size": 1020
-          }
-        },
-        {
-          "ordinal": 3,
-          "name": "password_hash",
-          "type_info": {
-            "type": "String",
-            "flags": {
-              "bits": 4225
-            },
-            "char_set": 63,
-            "max_size": 60
-          }
-        },
-        {
-          "ordinal": 4,
-          "name": "is_banned",
-          "type_info": {
-            "type": "Tiny",
-            "flags": {
-              "bits": 1
-            },
-            "char_set": 63,
-            "max_size": 1
-          }
-        }
-      ],
-      "parameters": {
-        "Right": 1
-      },
-      "nullable": [
-        false,
-        false,
-        false,
-        false,
-        false
-      ]
     }
   }
 }
