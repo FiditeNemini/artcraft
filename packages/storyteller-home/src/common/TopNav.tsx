@@ -1,4 +1,3 @@
-import { Link } from "react-router-dom";
 import { useLocomotiveScroll } from "react-locomotive-scroll";
 import React, { useState, useEffect } from "react";
 

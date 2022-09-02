@@ -7,7 +7,6 @@ import {
 } from "@fortawesome/free-brands-svg-icons";
 import {
   faArrowRight,
-  faArrowRightArrowLeft,
   faMicrophone,
   faVolumeHigh,
 } from "@fortawesome/free-solid-svg-icons";
@@ -17,7 +16,7 @@ import { TtsComponent } from "./TtsComponent";
 import Tippy from "@tippyjs/react";
 import "tippy.js/dist/tippy.css";
 import AudioSample from "./AudioSample";
-import { useRef, useEffect, useState } from "react";
+import { useEffect } from "react";
 import gsap from "gsap";
 import SplitType from "split-type";
 
