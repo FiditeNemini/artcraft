@@ -118,8 +118,8 @@ function IndexPage() {
                   data-scroll-direction="horizontal"
                   data-scroll-position="top"
                 >
-                  We’re streamers and filmmakers building the components of the
-                  future Hollywood studio.
+                  We’re scientists, engineers, and creatives building the future
+                  AI cloud production studio.
                 </p>
                 <div
                   data-scroll
@@ -205,11 +205,11 @@ function IndexPage() {
           </div>
         </div>
         <div id="about" className="bg-light section section-pb-extra">
-          <div className="container py-5 text-center">
-            <h1 className="fw-bold display-4">
-              We're the new Hollywood and Nashville
+          <div className="container py-5 text-center d-flex flex-column align-items-center">
+            <h1 className="fw-bold display-4 about-title">
+              You can run the new Hollywood and top the Billboard Hot 100
             </h1>
-            <h4 className="fw-normal opacity-75 mb-5 lead">
+            <h4 className="fw-normal opacity-75 mb-5 lead mt-3">
               Our technology can turn anyone into a director, musician, or movie
               star.
             </h4>

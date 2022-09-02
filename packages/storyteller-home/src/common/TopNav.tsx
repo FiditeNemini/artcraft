@@ -110,7 +110,7 @@ function TopNav(props: Props) {
           </div>
         </div>
 
-        <div className="d-flex d-md-none justify-content-between p-3">
+        <div className="d-flex d-md-none justify-content-between pt-3">
           <a
             href="/"
             className="d-flex align-items-center text-dark text-decoration-none"
