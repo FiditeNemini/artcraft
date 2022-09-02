@@ -1,33 +1,28 @@
-use actix_http::Error;
-use actix_http::http::header;
-use actix_web::HttpResponseBuilder;
-use actix_web::cookie::Cookie;
+// NB: Incrementally getting rid of build warnings...
+#![forbid(unused_imports)]
+#![forbid(unused_mut)]
+#![forbid(unused_variables)]
+
 use actix_web::error::ResponseError;
 use actix_web::http::StatusCode;
-use actix_web::{Responder, web, HttpResponse, error, HttpRequest};
-use crate::http_server::endpoints::users::create_account::CreateAccountErrorType::{BadInput, ServerError, UsernameTaken, EmailTaken};
-use crate::http_server::web_utils::ip_address::get_request_ip;
-use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
-use crate::http_server::web_utils::serialize_as_json_error::serialize_as_json_error;
-use crate::server_state::ServerState;
-use crate::util::email_to_gravatar::email_to_gravatar;
-use crate::validations::passwords::validate_passwords;
-use crate::validations::username::validate_username;
-use crate::validations::username_reservations::is_reserved_username;
-use database_queries::tokens::Tokens;
+use actix_web::{web, HttpResponse, HttpRequest};
+use crate::utils::email_to_gravatar::email_to_gravatar;
+use crate::utils::session_cookie_manager::SessionCookieManager;
+use crate::validations::is_reserved_username::is_reserved_username;
+use crate::validations::validate_passwords::validate_passwords;
+use crate::validations::validate_username::validate_username;
+use database_queries::mediators::firehose_publisher::FirehosePublisher;
+use database_queries::queries::users::create_account::{create_account, CreateAccountArgs, CreateAccountError};
 use database_queries::queries::users::user_sessions::create_session::create_session_for_user;
-use log::{info, warn, log};
-use regex::Regex;
-use sqlx::error::DatabaseError;
-use sqlx::error::Error::Database;
-use sqlx::mysql::MySqlDatabaseError;
+use database_queries::tokens::Tokens;
+use http_server_common::request::get_request_ip::get_request_ip;
+use http_server_common::response::serialize_as_json_error::serialize_as_json_error;
+use log::{info, warn};
+use sqlx::MySqlPool;
 use std::collections::HashMap;
 use std::fmt::Formatter;
 use std::fmt;
-use std::sync::Arc;
 use user_input_common::check_for_slurs::contains_slurs;
-
-const NEW_USER_ROLE: &'static str = "user";
 
 #[derive(Deserialize)]
 pub struct CreateAccountRequest {
@@ -94,7 +89,10 @@ impl ResponseError for CreateAccountErrorResponse {
 pub async fn create_account_handler(
   http_request: HttpRequest,
   request: web::Json<CreateAccountRequest>,
-  server_state: web::Data<Arc<ServerState>>) -> Result<HttpResponse, CreateAccountErrorResponse>
+  mysql_pool: web::Data<MySqlPool>,
+  session_cookie_manager: web::Data<SessionCookieManager>,
+  firehose_publisher: web::Data<FirehosePublisher>,
+) -> Result<HttpResponse, CreateAccountErrorResponse>
 {
   let mut error_fields = HashMap::new();
 
@@ -147,106 +145,62 @@ pub async fn create_account_handler(
   };
 
   let username = request.username.trim().to_lowercase();
+
   let display_name = request.username.trim().to_string();
 
   let email_address = request.email_address.trim().to_lowercase();
 
   let email_gravatar_hash = email_to_gravatar(&email_address);
 
-  let profile_markdown = "";
-  let profile_rendered_html = "";
-
   let ip_address = get_request_ip(&http_request);
 
-  let query_result = sqlx::query!(
-        r#"
-INSERT INTO users (
-  token,
-  username,
-  display_name,
-  email_address,
-  email_gravatar_hash,
-  profile_markdown,
-  profile_rendered_html,
-  user_role_slug,
-  password_hash,
-  ip_address_creation,
-  ip_address_last_login,
-  ip_address_last_update
-)
-VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? )
-        "#,
-        user_token.to_string(),
-        username,
-        display_name,
-        email_address,
-        email_gravatar_hash,
-        profile_markdown,
-        profile_rendered_html,
-        NEW_USER_ROLE,
-        password_hash,
-        ip_address.to_string(),
-        ip_address.to_string(),
-        ip_address.to_string(),
-    )
-    .execute(&server_state.mysql_pool)
-    .await;
+  let create_account_result = create_account(
+    &mysql_pool,
+    CreateAccountArgs {
+      username: &username,
+      display_name: &display_name,
+      email_address: &email_address,
+      email_gravatar_hash: &email_gravatar_hash,
+      password_hash: &password_hash,
+      ip_address: &ip_address,
+    }
+  ).await;
 
-  let record_id = match query_result {
-    Ok(res) => {
-      res.last_insert_id()
-    },
+  let new_user_data = match create_account_result {
+    Ok(success) => success,
     Err(err) => {
-      warn!("New user creation DB error: {:?}", err);
+      let mut error_fields = HashMap::new();
+      let error_type;
 
-      // NB: SQLSTATE[23000]: Integrity constraint violation
-      // NB: MySQL Error Code 1062: Duplicate key insertion (this is harder to access)
       match err {
-        Database(err) => {
-          let maybe_code = err.code().map(|c| c.into_owned());
-          let mut error_fields = HashMap::new();
-          let mut maybe_error_type = None;
-
-          match maybe_code.as_deref() {
-            Some("23000") => {
-              if err.message().contains("username") {
-                maybe_error_type = Some(CreateAccountErrorType::UsernameTaken);
-                error_fields.insert("username".to_string(), "username is taken".to_string());
-              } else if err.message().contains("email_address") {
-                maybe_error_type = Some(CreateAccountErrorType::EmailTaken);
-                error_fields.insert("email_address".to_string(), "email is taken".to_string());
-              }
-            }
-            _ => {},
-          }
-
-          if let Some(error_type) = maybe_error_type {
-            return Err(CreateAccountErrorResponse {
-              success: false,
-              error_type,
-              error_fields
-            })
-          }
-        },
-        _ => {},
+        CreateAccountError::EmailIsTaken => {
+          error_type = CreateAccountErrorType::EmailTaken;
+          error_fields.insert("email_address".to_string(), "email is taken".to_string());
+        }
+        CreateAccountError::UsernameIsTaken => {
+          error_type = CreateAccountErrorType::UsernameTaken;
+          error_fields.insert("username".to_string(), "username is taken".to_string());
+        }
+        CreateAccountError::DatabaseError | CreateAccountError::OtherError => {
+          error_type = CreateAccountErrorType::ServerError;
+        }
       }
-      return Err(CreateAccountErrorResponse::server_error());
+
+      return Err(CreateAccountErrorResponse {
+        success: false,
+        error_type,
+        error_fields
+      });
     }
   };
 
-  info!("new user id: {}", record_id);
+  info!("new user id: {}", new_user_data.user_id);
 
-  //// TODO: Remove me in the future. Too lazy to check the date, plus this will
-  ////  vary with adoption rate.
-  //server_state.badge_granter.grant_early_user_badge(&user_token)
-  //    .await
-  //    .map_err(|e| {
-  //      warn!("error creating badge: {:?}", e);
-  //      CreateAccountErrorResponse::server_error()
-  //    })?;
-
-  let create_session_result =
-    create_session_for_user(&user_token, &ip_address, &server_state.mysql_pool).await;
+  let create_session_result = create_session_for_user(
+    &new_user_data.user_token,
+    &ip_address,
+    &mysql_pool
+  ).await;
 
   let session_token = match create_session_result {
     Ok(token) => token,
@@ -258,14 +212,14 @@ VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? )
 
   info!("new user session created");
 
-  server_state.firehose_publisher.publish_user_sign_up(&user_token)
+  firehose_publisher.publish_user_sign_up(&user_token)
     .await
     .map_err(|e| {
       warn!("error publishing event: {:?}", e);
       CreateAccountErrorResponse::server_error()
     })?;
 
-  let session_cookie = match server_state.cookie_manager.create_cookie(&session_token) {
+  let session_cookie = match session_cookie_manager.create_cookie(&session_token) {
     Ok(cookie) => cookie,
     Err(_) => return Err(CreateAccountErrorResponse::server_error()),
   };
@@ -275,7 +229,7 @@ VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? )
   };
 
   let body = serde_json::to_string(&response)
-    .map_err(|e| CreateAccountErrorResponse::server_error())?;
+    .map_err(|_e| CreateAccountErrorResponse::server_error())?;
 
   Ok(HttpResponse::Ok()
     .cookie(session_cookie)

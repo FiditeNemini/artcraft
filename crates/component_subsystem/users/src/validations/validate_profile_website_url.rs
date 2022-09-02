@@ -1,7 +1,6 @@
-use crate::AnyhowResult;
 use regex::Regex;
 
-pub fn validate_website_url(website_url: &str) -> Result<(), String> {
+pub fn validate_profile_website_url(website_url: &str) -> Result<(), String> {
   lazy_static! {
     static ref WEBSITE_URL_REGEX: Regex = {
       Regex::new(r"^(https?:\\/\\/)?.*$").expect("should be valid regex")
@@ -25,17 +24,17 @@ pub fn validate_website_url(website_url: &str) -> Result<(), String> {
 
 #[cfg(test)]
 mod tests {
-  use crate::validations::website_url::validate_website_url;
+  use crate::validations::validate_profile_website_url::validate_profile_website_url;
 
   #[test]
   fn valid_cases() {
-    assert!(validate_website_url("http://vo.codes").is_ok());
-    assert!(validate_website_url("https://vocodes.com").is_ok());
-    assert!(validate_website_url("www.zombo.com").is_ok());
+    assert!(validate_profile_website_url("http://vo.codes").is_ok());
+    assert!(validate_profile_website_url("https://vocodes.com").is_ok());
+    assert!(validate_profile_website_url("www.zombo.com").is_ok());
   }
 
   #[test]
   fn invalid_cases() {
-    assert!(validate_website_url("a").is_err());
+    assert!(validate_profile_website_url("a").is_err());
   }
 }

@@ -11,8 +11,6 @@ use crate::AnyhowResult;
 use crate::http_server::web_utils::ip_address::get_request_ip;
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::server_state::ServerState;
-use crate::validations::passwords::validate_passwords;
-use crate::validations::username::validate_username;
 use database_queries::queries::tts::tts_results::query_tts_result::TtsResultRecordForResponse;
 use database_queries::queries::tts::tts_results::query_tts_result::select_tts_result_by_token;
 use log::{info, warn, log};

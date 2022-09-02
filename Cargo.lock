@@ -4931,6 +4931,7 @@ dependencies = [
  "container_common",
  "log",
  "once_cell",
+ "pulldown-cmark",
  "regex",
  "unicode-segmentation",
 ]
@@ -4942,6 +4943,7 @@ dependencies = [
  "actix-web 4.0.0-beta.10",
  "anyhow",
  "base64 0.13.0",
+ "bcrypt",
  "chrono",
  "container_common",
  "database_queries",
@@ -4949,9 +4951,12 @@ dependencies = [
  "hmac 0.10.1",
  "http_server_common",
  "jwt",
+ "lazy_static",
  "log",
+ "md-5",
  "once_cell",
  "regex",
+ "reusable_types",
  "serde",
  "serde_derive",
  "serde_json",
@@ -4959,6 +4964,7 @@ dependencies = [
  "sqlx",
  "time 0.2.26",
  "toml",
+ "user_input_common",
 ]
 
 [[package]]

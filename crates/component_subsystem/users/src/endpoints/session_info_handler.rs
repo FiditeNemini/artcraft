@@ -1,7 +1,7 @@
 // NB: Incrementally getting rid of build warnings...
-//#![forbid(unused_imports)]
-//#![forbid(unused_mut)]
-//#![forbid(unused_variables)]
+#![forbid(unused_imports)]
+#![forbid(unused_mut)]
+#![forbid(unused_variables)]
 
 use actix_web::error::ResponseError;
 use actix_web::http::StatusCode;

@@ -1,6 +1,6 @@
-use std::collections::HashSet;
 use crate::RESERVED_SUBSTRINGS;
 use crate::RESERVED_USERNAMES;
+use std::collections::HashSet;
 
 pub fn is_reserved_username(username: &str) -> bool {
   lazy_static! {
@@ -40,7 +40,7 @@ fn is_reserved_substring(username: &str) -> bool {
 
 #[cfg(test)]
 mod tests {
-  use crate::validations::username_reservations::{is_reserved_username};
+  use crate::validations::is_reserved_username::is_reserved_username;
 
   #[test]
   fn reserved_usernames() {
@@ -62,11 +62,13 @@ mod tests {
     assert_eq!(is_reserved_username("12345test"), true);
     assert_eq!(is_reserved_username("test"), true);
     assert_eq!(is_reserved_username("111vocodes111"), true);
+    assert_eq!(is_reserved_username("thefakeyousite"), true);
   }
 
   #[test]
   fn reserved_substrings_with_dashes() {
     assert_eq!(is_reserved_username("t_e_s_t"), true);
     assert_eq!(is_reserved_username("-vo-co-de-s--"), true);
+    assert_eq!(is_reserved_username("fake_you"), true);
   }
 }

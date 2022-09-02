@@ -77,15 +77,6 @@ use crate::http_server::endpoints::tts::get_tts_model_use_count::get_tts_model_u
 use crate::http_server::endpoints::tts::get_tts_result::get_tts_inference_result_handler;
 use crate::http_server::endpoints::tts::get_tts_upload_model_job_status::get_tts_upload_model_job_status_handler;
 use crate::http_server::endpoints::tts::list_tts_models::list_tts_models_handler;
-use crate::http_server::endpoints::users::create_account::create_account_handler;
-use crate::http_server::endpoints::users::edit_profile::edit_profile_handler;
-use crate::http_server::endpoints::users::get_profile::get_profile_handler;
-use crate::http_server::endpoints::users::list_user_tts_inference_results::list_user_tts_inference_results_handler;
-use crate::http_server::endpoints::users::list_user_tts_models::list_user_tts_models_handler;
-use crate::http_server::endpoints::users::list_user_w2l_inference_results::list_user_w2l_inference_results_handler;
-use crate::http_server::endpoints::users::list_user_w2l_templates::list_user_w2l_templates_handler;
-use crate::http_server::endpoints::users::login::login_handler;
-use crate::http_server::endpoints::users::logout::logout_handler;
 use crate::http_server::endpoints::w2l::delete_w2l_result::delete_w2l_inference_result_handler;
 use crate::http_server::endpoints::w2l::delete_w2l_template::delete_w2l_template_handler;
 use crate::http_server::endpoints::w2l::edit_w2l_result::edit_w2l_inference_result_handler;
@@ -434,9 +425,12 @@ pub async fn serve(server_state: ServerState) -> AnyhowResult<()>
     let ip_banlist = server_state_arc.ip_banlist.clone();
     let build_sha = std::fs::read_to_string("/GIT_SHA").unwrap_or(String::from("unknown"));
 
+    // NB: app_data being clone()'d below should all be safe (dependencies included)
     let app = App::new()
+      .app_data(web::Data::new(server_state_arc.firehose_publisher.clone()))
       .app_data(web::Data::new(server_state_arc.mysql_pool.clone()))
       .app_data(web::Data::new(server_state_arc.session_checker.clone()))
+      .app_data(web::Data::new(server_state_arc.cookie_manager.clone()))
       .app_data(server_state_arc.clone())
       .wrap(build_common_cors_config())
       .wrap(DefaultHeaders::new()

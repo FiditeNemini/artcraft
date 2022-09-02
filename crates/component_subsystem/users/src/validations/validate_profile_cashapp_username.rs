@@ -1,7 +1,6 @@
-use crate::AnyhowResult;
 use regex::Regex;
 
-pub fn validate_cashapp_username(username: &str) -> Result<(), String> {
+pub fn validate_profile_cashapp_username(username: &str) -> Result<(), String> {
   lazy_static! {
     static ref CASHAPP_USERNAME_REGEX: Regex = {
       Regex::new(r"^\$?.{1,20}$").expect("should be valid regex")
@@ -38,22 +37,22 @@ pub fn normalize_cashapp_username_for_storage(username: &str) -> String {
 
 #[cfg(test)]
 mod tests {
-  use crate::validations::cashapp_username::{validate_cashapp_username, normalize_cashapp_username_for_storage};
+  use crate::validations::validate_profile_cashapp_username::{validate_profile_cashapp_username, normalize_cashapp_username_for_storage};
 
   #[test]
   fn valid_cases() {
-    assert!(validate_cashapp_username("echelon").is_ok());
-    assert!(validate_cashapp_username("$echelon").is_ok());
-    assert!(validate_cashapp_username("a").is_ok());
-    assert!(validate_cashapp_username("12345678901234567890").is_ok());
-    assert!(validate_cashapp_username("$12345678901234567890").is_ok());
+    assert!(validate_profile_cashapp_username("echelon").is_ok());
+    assert!(validate_profile_cashapp_username("$echelon").is_ok());
+    assert!(validate_profile_cashapp_username("a").is_ok());
+    assert!(validate_profile_cashapp_username("12345678901234567890").is_ok());
+    assert!(validate_profile_cashapp_username("$12345678901234567890").is_ok());
   }
 
   #[test]
   fn invalid_cases() {
-    assert!(validate_cashapp_username("").is_err());
-    assert!(validate_cashapp_username("$").is_err());
-    assert!(validate_cashapp_username("123456789012345678901").is_err());
+    assert!(validate_profile_cashapp_username("").is_err());
+    assert!(validate_profile_cashapp_username("$").is_err());
+    assert!(validate_profile_cashapp_username("123456789012345678901").is_err());
   }
 
   #[test]

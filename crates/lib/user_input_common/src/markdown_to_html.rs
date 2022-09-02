@@ -1,4 +1,3 @@
-use container_common::anyhow_result::AnyhowResult;
 use pulldown_cmark::{Options, Parser, html};
 
 pub fn markdown_to_html(markdown_input: &str) -> String {
@@ -27,7 +26,7 @@ pub fn markdown_to_html(markdown_input: &str) -> String {
 
 #[cfg(test)]
 mod tests {
-  use crate::util::markdown_to_html::markdown_to_html;
+  use crate::markdown_to_html::markdown_to_html;
 
   #[test]
   fn handles_markdown() {
@@ -56,5 +55,4 @@ mod tests {
     assert_eq!(&markdown_to_html("<script>alert();</script>"),
       "<p>&lt;script&gt;alert();&lt;/script&gt;</p>\n");
   }
-
 }

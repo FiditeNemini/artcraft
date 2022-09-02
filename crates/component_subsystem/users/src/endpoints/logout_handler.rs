@@ -1,17 +1,17 @@
-use actix_http::http::header;
-use actix_web::HttpResponseBuilder;
-use actix_web::cookie::Cookie;
+// NB: Incrementally getting rid of build warnings...
+#![forbid(unused_imports)]
+#![forbid(unused_mut)]
+#![forbid(unused_variables)]
+
 use actix_web::error::ResponseError;
 use actix_web::http::StatusCode;
-use actix_web::{Responder, web, HttpResponse, error, HttpRequest, HttpMessage};
-use container_common::anyhow_result::AnyhowResult;
-use crate::server_state::ServerState;
+use actix_web::{web, HttpResponse, HttpRequest};
+use crate::utils::session_cookie_manager::SessionCookieManager;
+use database_queries::queries::users::user_sessions::delete_session::delete_session;
 use http_server_common::response::response_error_helpers::to_simple_json_error;
-use log::{info, warn, log};
-use regex::Regex;
+use log::warn;
 use sqlx::MySqlPool;
 use std::fmt;
-use std::sync::Arc;
 
 #[derive(Serialize)]
 pub struct LogoutSuccessResponse {
@@ -48,23 +48,25 @@ impl fmt::Display for LogoutError {
 
 pub async fn logout_handler(
   http_request: HttpRequest,
-  server_state: web::Data<Arc<ServerState>>) -> Result<HttpResponse, LogoutError>
+  session_cookie_manager: web::Data<SessionCookieManager>,
+  mysql_pool: web::Data<MySqlPool>,
+) -> Result<HttpResponse, LogoutError>
 {
   let delete_cookie = match http_request.cookie("session") {
     Some(cookie) => {
-      match server_state.cookie_manager.decode_session_token(&cookie) {
+      match session_cookie_manager.decode_session_token(&cookie) {
         Err(e) => {
           warn!("Session cookie decode error: {:?}", e);
         },
         Ok(session_token) => {
-          let _r = delete_session(&session_token, &server_state.mysql_pool).await;
+          let _r = delete_session(&session_token, &mysql_pool).await;
         }
       }
 
       cookie // delete this cookie
     },
     None => {
-      server_state.cookie_manager.delete_cookie()
+      session_cookie_manager.delete_cookie()
     }
   };
 
@@ -73,27 +75,10 @@ pub async fn logout_handler(
   };
 
   let body = serde_json::to_string(&response)
-    .map_err(|e| LogoutError::ServerError)?;
+    .map_err(|_e| LogoutError::ServerError)?;
 
   Ok(HttpResponse::Ok()
     .del_cookie(&delete_cookie)
     .content_type("application/json")
     .body(body))
-}
-
-async fn delete_session(session_token: &str, mysql_pool: &MySqlPool) -> AnyhowResult<()> {
-  let query_result = sqlx::query!(
-        r#"
-UPDATE user_sessions
-SET deleted_at = CURRENT_TIMESTAMP()
-WHERE
-    token = ?
-    AND deleted_at IS NULL
-        "#,
-        session_token.to_string(),
-    )
-    .execute(mysql_pool)
-    .await;
-
-  Ok(())
 }

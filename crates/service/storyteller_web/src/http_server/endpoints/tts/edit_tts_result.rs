@@ -10,8 +10,6 @@ use crate::http_server::web_utils::ip_address::get_request_ip;
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::http_server::web_utils::response_success_helpers::simple_json_success;
 use crate::server_state::ServerState;
-use crate::util::email_to_gravatar::email_to_gravatar;
-use crate::util::markdown_to_html::markdown_to_html;
 use database_queries::column_types::record_visibility::RecordVisibility;
 use database_queries::queries::tts::tts_results::query_tts_result::select_tts_result_by_token;
 use log::{info, warn, log};

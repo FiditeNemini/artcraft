@@ -1,35 +1,31 @@
-use actix_http::Error;
-use actix_http::http::header;
-use actix_web::HttpResponseBuilder;
-use actix_web::cookie::Cookie;
+// NB: Incrementally getting rid of build warnings...
+#![forbid(unused_imports)]
+#![forbid(unused_mut)]
+#![forbid(unused_variables)]
+
 use actix_web::error::ResponseError;
 use actix_web::http::StatusCode;
 use actix_web::web::Path;
-use actix_web::{Responder, web, HttpResponse, error, HttpRequest};
-use crate::http_server::web_utils::ip_address::get_request_ip;
-use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
-use crate::server_state::ServerState;
-use crate::util::email_to_gravatar::email_to_gravatar;
-use crate::util::markdown_to_html::markdown_to_html;
-use crate::validations::cashapp_username::{validate_cashapp_username, normalize_cashapp_username_for_storage};
-use crate::validations::discord_username::validate_discord_username;
-use crate::validations::github_username::validate_github_username;
-use crate::validations::passwords::validate_passwords;
-use crate::validations::twitch_username::validate_twitch_username;
-use crate::validations::twitter_username::{validate_twitter_username, normalize_twitter_username_for_storage};
-use crate::validations::username::validate_username;
-use crate::validations::username_reservations::is_reserved_username;
-use crate::validations::website_url::validate_website_url;
+use actix_web::{web, HttpResponse, HttpRequest};
+use crate::utils::session_checker::SessionChecker;
+use crate::validations::validate_profile_cashapp_username::{normalize_cashapp_username_for_storage, validate_profile_cashapp_username};
+use crate::validations::validate_profile_discord_username::validate_profile_discord_username;
+use crate::validations::validate_profile_github_username::validate_profile_github_username;
+use crate::validations::validate_profile_twitch_username::validate_profile_twitch_username;
+use crate::validations::validate_profile_twitter_username::{normalize_twitter_username_for_storage, validate_profile_twitter_username};
+use crate::validations::validate_profile_website_url::validate_profile_website_url;
 use database_queries::column_types::record_visibility::RecordVisibility;
-use database_queries::queries::users::get_user_profile_by_username::get_user_profile_by_username;
-use log::{info, warn, log};
-use regex::Regex;
-use sqlx::error::DatabaseError;
-use sqlx::error::Error::Database;
-use sqlx::mysql::MySqlDatabaseError;
+use database_queries::queries::users::user_profiles::edit_user_profile_as_account_holder::edit_user_profile_as_account_holder;
+use database_queries::queries::users::user_profiles::edit_user_profile_as_mod::edit_user_profile_as_mod;
+use database_queries::queries::users::user_profiles::get_user_profile_by_username::get_user_profile_by_username;
+use database_queries::queries::users::user_profiles::{edit_user_profile_as_account_holder, edit_user_profile_as_mod};
+use http_server_common::request::get_request_ip::get_request_ip;
+use http_server_common::response::serialize_as_json_error::serialize_as_json_error;
+use log::warn;
+use sqlx::MySqlPool;
 use std::fmt;
-use std::sync::Arc;
 use user_input_common::check_for_slurs::contains_slurs;
+use user_input_common::markdown_to_html::markdown_to_html;
 
 /// For the URL PathInfo
 #[derive(Deserialize)]
@@ -60,7 +56,7 @@ pub struct EditProfileSuccessResponse {
   pub success: bool,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Serialize)]
 pub enum EditProfileError {
   BadInput(String),
   NotAuthorized,
@@ -79,14 +75,7 @@ impl ResponseError for EditProfileError {
   }
 
   fn error_response(&self) -> HttpResponse {
-    let error_reason = match self {
-      EditProfileError::BadInput(reason) => reason.to_string(),
-      EditProfileError::NotAuthorized=> "unauthorized".to_string(),
-      EditProfileError::UserNotFound => "user not found".to_string(),
-      EditProfileError::ServerError => "server error".to_string(),
-    };
-
-    to_simple_json_error(&error_reason, self.status_code())
+    serialize_as_json_error(self)
   }
 }
 
@@ -101,11 +90,12 @@ pub async fn edit_profile_handler(
   http_request: HttpRequest,
   path: Path<EditProfilePathInfo>,
   request: web::Json<EditProfileRequest>,
-  server_state: web::Data<Arc<ServerState>>) -> Result<HttpResponse, EditProfileError>
+  mysql_pool: web::Data<MySqlPool>,
+  session_checker: web::Data<SessionChecker>,
+) -> Result<HttpResponse, EditProfileError>
 {
-  let maybe_user_session = server_state
-      .session_checker
-      .maybe_get_user_session(&http_request, &server_state.mysql_pool)
+  let maybe_user_session = session_checker
+      .maybe_get_user_session(&http_request, &mysql_pool)
       .await
       .map_err(|e| {
         warn!("Session checker error: {:?}", e);
@@ -126,7 +116,7 @@ pub async fn edit_profile_handler(
   }
 
   let user_lookup_result =
-      get_user_profile_by_username(&path.username, &server_state.mysql_pool)
+      get_user_profile_by_username(&path.username, &mysql_pool)
       .await;
 
   let user_record = match user_lookup_result {
@@ -168,7 +158,7 @@ pub async fn edit_profile_handler(
     if trimmed.is_empty() {
       twitter_username = None;
     } else {
-      if let Err(reason) = validate_twitter_username(trimmed) {
+      if let Err(reason) = validate_profile_twitter_username(trimmed) {
         return Err(EditProfileError::BadInput(reason));
       }
       let normalized = normalize_twitter_username_for_storage(trimmed);
@@ -181,7 +171,7 @@ pub async fn edit_profile_handler(
     if trimmed.is_empty() {
       twitch_username = None;
     } else {
-      if let Err(reason) = validate_twitch_username(trimmed) {
+      if let Err(reason) = validate_profile_twitch_username(trimmed) {
         return Err(EditProfileError::BadInput(reason));
       }
       twitch_username = Some(trimmed);
@@ -193,7 +183,7 @@ pub async fn edit_profile_handler(
     if trimmed.is_empty() {
       discord_username = None;
     } else {
-      if let Err(reason) = validate_discord_username(trimmed) {
+      if let Err(reason) = validate_profile_discord_username(trimmed) {
         return Err(EditProfileError::BadInput(reason));
       }
       discord_username = Some(trimmed);
@@ -205,7 +195,7 @@ pub async fn edit_profile_handler(
     if trimmed.is_empty() {
       github_username = None;
     } else {
-      if let Err(reason) = validate_github_username(trimmed) {
+      if let Err(reason) = validate_profile_github_username(trimmed) {
         return Err(EditProfileError::BadInput(reason));
       }
       github_username = Some(trimmed);
@@ -217,7 +207,7 @@ pub async fn edit_profile_handler(
     if trimmed.is_empty() {
       cashapp_username = None;
     } else {
-      if let Err(reason) = validate_cashapp_username(trimmed) {
+      if let Err(reason) = validate_profile_cashapp_username(trimmed) {
         return Err(EditProfileError::BadInput(reason));
       }
       let normalized = normalize_cashapp_username_for_storage(trimmed);
@@ -230,7 +220,7 @@ pub async fn edit_profile_handler(
     if trimmed.is_empty() {
       website_url = None;
     } else {
-      if let Err(reason) = validate_website_url(trimmed) {
+      if let Err(reason) = validate_profile_website_url(trimmed) {
         return Err(EditProfileError::BadInput(reason));
       }
       website_url = Some(trimmed);
@@ -258,74 +248,40 @@ pub async fn edit_profile_handler(
       .unwrap_or(RecordVisibility::Hidden);
 
   let query_result = if editor_is_original_user {
-    // We need to store the IP address details.
-    sqlx::query!(
-        r#"
-UPDATE users
-SET
-    profile_markdown = ?,
-    profile_rendered_html = ?,
-    preferred_tts_result_visibility = ?,
-    preferred_w2l_result_visibility = ?,
-    discord_username = ?,
-    twitter_username = ?,
-    twitch_username = ?,
-    github_username = ?,
-    cashapp_username = ?,
-    website_url = ?,
-    ip_address_last_update = ?,
-    version = version + 1
-
-WHERE users.token = ?
-LIMIT 1
-        "#,
-      profile_markdown,
-      profile_html,
-      preferred_tts_result_visibility.to_str(),
-      preferred_w2l_result_visibility.to_str(),
-      discord_username,
-      twitter_username,
-      twitch_username,
-      github_username,
-      cashapp_username,
-      website_url,
-      ip_address.clone(),
-      user_record.user_token.clone(),
-    )
-    .execute(&server_state.mysql_pool)
-    .await
+    edit_user_profile_as_account_holder(
+      &mysql_pool,
+      edit_user_profile_as_account_holder::Args {
+        user_token: &user_record.user_token,
+        profile_markdown: profile_markdown.as_deref(),
+        profile_html: profile_html.as_deref(),
+        discord_username: discord_username.as_deref(),
+        twitter_username: twitter_username.as_deref(),
+        cashapp_username: cashapp_username.as_deref(),
+        github_username: github_username.as_deref(),
+        twitch_username: twitch_username.as_deref(),
+        website_url: website_url.as_deref(),
+        preferred_tts_result_visibility: preferred_tts_result_visibility.to_str(),
+        preferred_w2l_result_visibility: preferred_w2l_result_visibility.to_str(),
+        ip_address: &ip_address,
+      }
+    ).await
   } else {
-    // We need to store the moderator details.
+    // TODO(2022-09-01): We need to store the moderator details or have an audit log.
     // Also, mods shouldn't change user preferences.
-    sqlx::query!(
-        r#"
-UPDATE users
-SET
-    profile_markdown = ?,
-    profile_rendered_html = ?,
-    discord_username = ?,
-    twitter_username = ?,
-    twitch_username = ?,
-    github_username = ?,
-    cashapp_username = ?,
-    website_url = ?,
-    version = version + 1
-
-WHERE users.token = ?
-LIMIT 1
-        "#,
-      profile_markdown,
-      profile_html,
-      discord_username,
-      twitter_username,
-      twitch_username,
-      github_username,
-      cashapp_username,
-      website_url,
-      user_record.user_token.clone(),
-    )
-    .execute(&server_state.mysql_pool)
-    .await
+    edit_user_profile_as_mod(
+      &mysql_pool,
+      edit_user_profile_as_mod::Args {
+        user_token: &user_record.user_token,
+        profile_markdown: profile_markdown.as_deref(),
+        profile_html: profile_html.as_deref(),
+        discord_username: discord_username.as_deref(),
+        twitter_username: twitter_username.as_deref(),
+        cashapp_username: cashapp_username.as_deref(),
+        github_username: github_username.as_deref(),
+        twitch_username: twitch_username.as_deref(),
+        website_url: website_url.as_deref(),
+      }
+    ).await
   };
 
   match query_result {
@@ -341,7 +297,7 @@ LIMIT 1
   };
 
   let body = serde_json::to_string(&response)
-      .map_err(|e| EditProfileError::BadInput("".to_string()))?;
+      .map_err(|_e| EditProfileError::BadInput("".to_string()))?;
 
   Ok(HttpResponse::Ok()
       .content_type("application/json")

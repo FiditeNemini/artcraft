@@ -7,8 +7,11 @@
 
 # Stuff we care about
 fake_you
+fakeu
 fakeyou
 hanashi
+hyper_jail
+hyperjail
 monogatari
 storied
 stories
@@ -23,14 +26,25 @@ vocodes
 voxelcam
 
 # Types of models
+diffusion
 first_order_model
 fom
 hifigan
 melgan
+stable_diffusion
+stablediffusion
 tacotron
 tt2
 tts
 w2l
+
+# Competitors
+15_ai
+15ai
+fifteen_ai
+fifteenai
+uber_duck
+uberduck
 
 # Companies we'd love to have use our service
 # so we'll reserve them to be safe

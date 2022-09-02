@@ -1,7 +1,7 @@
 use actix_http::Error;
 use actix_http::http::header;
-use actix_web::cookie::Cookie;
 use actix_web::HttpResponseBuilder;
+use actix_web::cookie::Cookie;
 use actix_web::error::ResponseError;
 use actix_web::http::StatusCode;
 use actix_web::{Responder, web, HttpResponse, error, HttpRequest};
@@ -9,17 +9,15 @@ use crate::http_server::web_utils::ip_address::get_request_ip;
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::http_server::web_utils::response_success_helpers::simple_json_success;
 use crate::server_state::ServerState;
-use crate::validations::ip_addresses::validate_moderator_provided_ip_address;
 use crate::validations::model_uploads::validate_model_title;
-use crate::validations::passwords::validate_passwords;
-use crate::validations::username::validate_username;
-use derive_more::{Display, Error};
 use log::{info, warn, log};
 use regex::Regex;
 use sqlx::error::DatabaseError;
 use sqlx::error::Error::Database;
 use sqlx::mysql::MySqlDatabaseError;
+use std::fmt;
 use std::sync::Arc;
+use user_input_common::validate_user_provided_ip_address::validate_user_provided_ip_address;
 
 #[derive(Deserialize)]
 pub struct AddIpBanRequest {
@@ -28,7 +26,7 @@ pub struct AddIpBanRequest {
   maybe_target_user_token: Option<String>,
 }
 
-#[derive(Debug, Display)]
+#[derive(Debug)]
 pub enum AddIpBanError {
   BadInput(String),
   ServerError,
@@ -52,6 +50,13 @@ impl ResponseError for AddIpBanError {
     };
 
     to_simple_json_error(&error_reason, self.status_code())
+  }
+}
+
+// NB: Not using derive_more::Display since Clion doesn't understand it.
+impl fmt::Display for AddIpBanError {
+  fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+    write!(f, "{:?}", self)
   }
 }
 
@@ -85,7 +90,7 @@ pub async fn add_ip_ban_handler(
 
   let ip_address = request.ip_address.trim();
 
-  if let Err(e) = validate_moderator_provided_ip_address(&ip_address) {
+  if let Err(e) = validate_user_provided_ip_address(&ip_address) {
     warn!("Bad ip address: {}", e);
     return Err(AddIpBanError::BadInput(e.to_string()));
   }

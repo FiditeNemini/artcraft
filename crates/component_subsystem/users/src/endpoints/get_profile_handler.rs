@@ -1,30 +1,24 @@
-use actix_http::Error;
-use actix_http::http::header;
-use actix_web::HttpResponseBuilder;
-use actix_web::cookie::Cookie;
+// NB: Incrementally getting rid of build warnings...
+#![forbid(unused_imports)]
+#![forbid(unused_mut)]
+#![forbid(unused_variables)]
+
 use actix_web::error::ResponseError;
 use actix_web::http::StatusCode;
 use actix_web::web::Path;
-use actix_web::{Responder, web, HttpResponse, error, HttpRequest, HttpMessage};
-use anyhow::anyhow;
+use actix_web::{web, HttpResponse, HttpRequest};
 use chrono::{DateTime, Utc};
-use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
-use crate::server_state::ServerState;
-use database_queries::queries::users::get_user_profile_by_username::{get_user_profile_by_username, UserProfileResult, get_user_profile_by_username_from_connection};
+use crate::utils::session_checker::SessionChecker;
 use database_queries::queries::users::user_badges::list_user_badges::UserBadgeForList;
 use database_queries::queries::users::user_badges::list_user_badges::list_user_badges;
+use database_queries::queries::users::user_profiles::get_user_profile_by_username::get_user_profile_by_username_from_connection;
 use http_server_common::request::get_request_header_optional::get_request_header_optional;
+use http_server_common::response::serialize_as_json_error::serialize_as_json_error;
 use http_server_common::util::timer::MultiBenchmarkingTimer;
-use log::{info, warn, log, error};
-use md5::{Md5, Digest};
-use regex::Regex;
+use log::warn;
 use reusable_types::entity_visibility::EntityVisibility;
 use sqlx::MySqlPool;
-use sqlx::error::DatabaseError;
-use sqlx::error::Error::Database;
-use sqlx::mysql::MySqlDatabaseError;
 use std::fmt;
-use std::sync::Arc;
 
 // TODO: This is duplicated in query_user_profile
 // TODO: This handler has embedded queries.
@@ -66,7 +60,7 @@ pub struct ProfileSuccessResponse {
   pub user: Option<UserProfileRecordForResponse>,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Serialize)]
 pub enum ProfileError {
   ServerError,
   NotFound,
@@ -87,12 +81,7 @@ impl ResponseError for ProfileError {
   }
 
   fn error_response(&self) -> HttpResponse {
-    let error_reason = match self {
-      ProfileError::ServerError => "server error".to_string(),
-      ProfileError::NotFound => "not found error".to_string(),
-    };
-
-    to_simple_json_error(&error_reason, self.status_code())
+    serialize_as_json_error(self)
   }
 }
 
@@ -106,21 +95,22 @@ impl fmt::Display for ProfileError {
 pub async fn get_profile_handler(
   http_request: HttpRequest,
   path: Path<GetProfilePathInfo>,
-  server_state: web::Data<Arc<ServerState>>) -> Result<HttpResponse, ProfileError>
+  mysql_pool: web::Data<MySqlPool>,
+  session_checker: web::Data<SessionChecker>,
+) -> Result<HttpResponse, ProfileError>
 {
   let mut benchmark = MultiBenchmarkingTimer::new_started();
 
-  let mut pool_connection = server_state.mysql_pool.acquire()
+  let pool_connection = mysql_pool.acquire()
       .await
       .map_err(|e| {
         warn!("Could not acquire DB pool: {:?}", e);
         ProfileError::ServerError
       })?;
 
-  let (mut pool_connection, maybe_user_session_fut) =
+  let (pool_connection, maybe_user_session_fut) =
       benchmark.time_async_section_moving_args("session checker", pool_connection, |mut pc| async {
-        let ret = server_state
-            .session_checker
+        let ret = session_checker
             .maybe_get_user_session_from_connection(&http_request, &mut pc)
             .await
             .map_err(|e| {
@@ -139,13 +129,13 @@ pub async fn get_profile_handler(
     is_mod = user_session.can_ban_users;
   }
 
-  let (mut pool_connection, maybe_user_profile) =
+  let (pool_connection, maybe_user_profile) =
       benchmark.time_async_section_moving_args("profile query", pool_connection, |mut pc| async {
         let ret = get_user_profile_by_username_from_connection(&path.username, &mut pc).await;
         (pc, ret)
       }).await;
 
-  let mut user_profile = match maybe_user_profile {
+  let user_profile = match maybe_user_profile {
     Ok(Some(user_profile)) => user_profile,
     Ok(None) => {
       warn!("Invalid user");
@@ -221,7 +211,7 @@ pub async fn get_profile_handler(
   };
 
   let body = serde_json::to_string(&response)
-    .map_err(|e| ProfileError::ServerError)?;
+    .map_err(|_e| ProfileError::ServerError)?;
 
   let mut http_response = HttpResponse::Ok();
 

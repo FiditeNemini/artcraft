@@ -10,5 +10,7 @@ pub mod get_w2l_result;
 pub mod get_w2l_template;
 pub mod get_w2l_template_use_count;
 pub mod get_w2l_upload_template_job_status;
+pub mod list_user_w2l_inference_results;
+pub mod list_user_w2l_templates;
 pub mod list_w2l_templates;
 pub mod set_w2l_template_mod_approval;
