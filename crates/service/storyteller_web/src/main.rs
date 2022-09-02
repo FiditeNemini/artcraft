@@ -77,16 +77,6 @@ use crate::http_server::endpoints::tts::get_tts_model_use_count::get_tts_model_u
 use crate::http_server::endpoints::tts::get_tts_result::get_tts_inference_result_handler;
 use crate::http_server::endpoints::tts::get_tts_upload_model_job_status::get_tts_upload_model_job_status_handler;
 use crate::http_server::endpoints::tts::list_tts_models::list_tts_models_handler;
-use crate::http_server::endpoints::users::create_account::create_account_handler;
-use crate::http_server::endpoints::users::edit_profile::edit_profile_handler;
-use crate::http_server::endpoints::users::get_profile::get_profile_handler;
-use crate::http_server::endpoints::users::list_user_tts_inference_results::list_user_tts_inference_results_handler;
-use crate::http_server::endpoints::users::list_user_tts_models::list_user_tts_models_handler;
-use crate::http_server::endpoints::users::list_user_w2l_inference_results::list_user_w2l_inference_results_handler;
-use crate::http_server::endpoints::users::list_user_w2l_templates::list_user_w2l_templates_handler;
-use crate::http_server::endpoints::users::login::login_handler;
-use crate::http_server::endpoints::users::logout::logout_handler;
-use crate::http_server::endpoints::users::session_info::session_info_handler;
 use crate::http_server::endpoints::w2l::delete_w2l_result::delete_w2l_inference_result_handler;
 use crate::http_server::endpoints::w2l::delete_w2l_template::delete_w2l_template_handler;
 use crate::http_server::endpoints::w2l::edit_w2l_result::edit_w2l_inference_result_handler;
@@ -102,9 +92,7 @@ use crate::http_server::endpoints::w2l::get_w2l_upload_template_job_status::get_
 use crate::http_server::endpoints::w2l::list_w2l_templates::list_w2l_templates_handler;
 use crate::http_server::endpoints::w2l::set_w2l_template_mod_approval::set_w2l_template_mod_approval_handler;
 use crate::http_server::middleware::ip_filter_middleware::IpFilter;
-use crate::http_server::web_utils::cookie_manager::CookieManager;
 use crate::http_server::web_utils::redis_rate_limiter::RedisRateLimiter;
-use crate::http_server::web_utils::session_checker::SessionChecker;
 use crate::routes::add_routes;
 use crate::server_state::{ServerState, EnvConfig, TwitchOauthSecrets, TwitchOauth, RedisRateLimiters, InMemoryCaches};
 use crate::threads::db_health_checker_thread::db_health_check_status::HealthCheckStatus;
@@ -129,6 +117,8 @@ use std::time::Duration;
 use storage_buckets_common::bucket_client::BucketClient;
 use tokio::runtime::Runtime;
 use twitch_common::twitch_secrets::TwitchSecrets;
+use users_component::utils::session_checker::SessionChecker;
+use users_component::utils::session_cookie_manager::SessionCookieManager;
 
 // TODO TODO TODO TODO
 // TODO TODO TODO TODO
@@ -275,7 +265,7 @@ async fn main() -> AnyhowResult<()> {
   let website_homepage_redirect =
       easyenv::get_env_string_or_default("WEBSITE_HOMEPAGE_REDIRECT", "https://vo.codes/");
 
-  let cookie_manager = CookieManager::new(&cookie_domain, &hmac_secret);
+  let cookie_manager = SessionCookieManager::new(&cookie_domain, &hmac_secret);
   let session_checker = SessionChecker::new(&cookie_manager);
 
   let access_key = easyenv::get_env_string_required(ENV_ACCESS_KEY)?;
@@ -435,7 +425,12 @@ pub async fn serve(server_state: ServerState) -> AnyhowResult<()>
     let ip_banlist = server_state_arc.ip_banlist.clone();
     let build_sha = std::fs::read_to_string("/GIT_SHA").unwrap_or(String::from("unknown"));
 
+    // NB: app_data being clone()'d below should all be safe (dependencies included)
     let app = App::new()
+      .app_data(web::Data::new(server_state_arc.firehose_publisher.clone()))
+      .app_data(web::Data::new(server_state_arc.mysql_pool.clone()))
+      .app_data(web::Data::new(server_state_arc.session_checker.clone()))
+      .app_data(web::Data::new(server_state_arc.cookie_manager.clone()))
       .app_data(server_state_arc.clone())
       .wrap(build_common_cors_config())
       .wrap(DefaultHeaders::new()

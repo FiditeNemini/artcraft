@@ -12,7 +12,6 @@ use crate::http_server::web_utils::ip_address::get_request_ip;
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::http_server::web_utils::response_success_helpers::simple_json_success;
 use crate::server_state::ServerState;
-use crate::util::markdown_to_html::markdown_to_html;
 use database_queries::column_types::record_visibility::RecordVisibility;
 use database_queries::column_types::vocoder_type::VocoderType;
 use database_queries::queries::tts::tts_models::edit_tts_model_details::{edit_tts_model_details_as_author, edit_tts_model_details_as_mod};
@@ -25,6 +24,7 @@ use std::fmt;
 use std::sync::Arc;
 use tts_common::text_pipelines::text_pipeline_type::TextPipelineType;
 use user_input_common::check_for_slurs::contains_slurs;
+use user_input_common::markdown_to_html::markdown_to_html;
 
 const DEFAULT_IETF_LANGUAGE_TAG : &'static str = "en-US";
 const DEFAULT_IETF_PRIMARY_LANGUAGE_SUBTAG : &'static str = "en";

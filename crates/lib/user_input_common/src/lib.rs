@@ -11,3 +11,5 @@ pub (crate) const BANNED_SLURS : &'static str = include_str!("../../../../db/ban
 
 pub mod check_for_slurs;
 pub mod latin_alphabet;
+pub mod markdown_to_html;
+pub mod validate_user_provided_ip_address;

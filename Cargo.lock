@@ -1056,6 +1056,48 @@ dependencies = [
 ]
 
 [[package]]
+name = "component_subsystem_billing"
+version = "0.0.1"
+dependencies = [
+ "actix-cors 0.6.0-beta.3",
+ "actix-http 3.0.0-beta.11",
+ "actix-web 4.0.0-beta.10",
+ "anyhow",
+ "base64 0.13.0",
+ "chrono",
+ "container_common",
+ "dotenv",
+ "log",
+ "once_cell",
+ "regex",
+ "serde",
+ "serde_derive",
+ "serde_json",
+ "toml",
+]
+
+[[package]]
+name = "component_subsystem_inference_workloads"
+version = "0.0.1"
+dependencies = [
+ "actix-cors 0.6.0-beta.3",
+ "actix-http 3.0.0-beta.11",
+ "actix-web 4.0.0-beta.10",
+ "anyhow",
+ "base64 0.13.0",
+ "chrono",
+ "container_common",
+ "dotenv",
+ "log",
+ "once_cell",
+ "regex",
+ "serde",
+ "serde_derive",
+ "serde_json",
+ "toml",
+]
+
+[[package]]
 name = "config"
 version = "0.0.1"
 dependencies = [
@@ -2063,6 +2105,82 @@ dependencies = [
  "matches",
  "unicode-bidi",
  "unicode-normalization",
+]
+
+[[package]]
+name = "image-generation-service"
+version = "0.0.1"
+dependencies = [
+ "actix",
+ "actix-cors 0.6.0-beta.3",
+ "actix-files",
+ "actix-http 3.0.0-beta.11",
+ "actix-multipart",
+ "actix-rt 2.4.0",
+ "actix-service 2.0.1",
+ "actix-utils 3.0.0",
+ "actix-web 4.0.0-beta.10",
+ "actix-web-actors",
+ "anyhow",
+ "base64 0.13.0",
+ "bcrypt",
+ "chrono",
+ "config",
+ "container_common",
+ "data-encoding",
+ "database_queries",
+ "derive_more",
+ "diesel",
+ "dotenv",
+ "easyenv",
+ "futures 0.1.31",
+ "futures 0.3.17",
+ "futures-util",
+ "google_drive_common",
+ "hex",
+ "hmac 0.10.1",
+ "hostname",
+ "http_server_common",
+ "hyper 0.14.14",
+ "infer",
+ "jobs_common",
+ "jwt",
+ "language-tags 0.3.2",
+ "lazy_static",
+ "lexical-sort",
+ "lfu",
+ "limitation",
+ "log",
+ "lru_time_cache",
+ "magic-crypt",
+ "md-5",
+ "memory_caching",
+ "native-tls",
+ "once_cell",
+ "pulldown-cmark",
+ "r2d2_redis",
+ "rand 0.8.4",
+ "redis_common",
+ "regex",
+ "reqwest",
+ "reusable_types",
+ "ring 0.17.0-alpha.10",
+ "rust-s3",
+ "serde",
+ "serde_derive",
+ "serde_json",
+ "sha2",
+ "sqlx",
+ "storage_buckets_common",
+ "subprocess",
+ "tempdir",
+ "time 0.2.26",
+ "tokio 1.13.0",
+ "toml",
+ "tts_common",
+ "twitch_common",
+ "user_input_common",
+ "uuid",
 ]
 
 [[package]]
@@ -3923,6 +4041,7 @@ dependencies = [
  "twitch_common",
  "twitch_oauth2",
  "user_input_common",
+ "users_component",
  "uuid",
 ]
 
@@ -4812,8 +4931,40 @@ dependencies = [
  "container_common",
  "log",
  "once_cell",
+ "pulldown-cmark",
  "regex",
  "unicode-segmentation",
+]
+
+[[package]]
+name = "users_component"
+version = "0.0.1"
+dependencies = [
+ "actix-web 4.0.0-beta.10",
+ "anyhow",
+ "base64 0.13.0",
+ "bcrypt",
+ "chrono",
+ "container_common",
+ "database_queries",
+ "dotenv",
+ "hmac 0.10.1",
+ "http_server_common",
+ "jwt",
+ "lazy_static",
+ "log",
+ "md-5",
+ "once_cell",
+ "regex",
+ "reusable_types",
+ "serde",
+ "serde_derive",
+ "serde_json",
+ "sha2",
+ "sqlx",
+ "time 0.2.26",
+ "toml",
+ "user_input_common",
 ]
 
 [[package]]

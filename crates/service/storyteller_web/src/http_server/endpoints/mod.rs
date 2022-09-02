@@ -10,7 +10,6 @@ pub mod moderation;
 pub mod service;
 pub mod tts;
 pub mod twitch;
-pub mod users;
 pub mod vocoders;
 pub mod voice_clone_requests;
 pub mod w2l;

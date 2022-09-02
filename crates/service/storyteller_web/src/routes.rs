@@ -57,6 +57,8 @@ use crate::http_server::endpoints::tts::get_tts_model_use_count::get_tts_model_u
 use crate::http_server::endpoints::tts::get_tts_result::get_tts_inference_result_handler;
 use crate::http_server::endpoints::tts::get_tts_upload_model_job_status::get_tts_upload_model_job_status_handler;
 use crate::http_server::endpoints::tts::list_tts_models::list_tts_models_handler;
+use crate::http_server::endpoints::tts::list_user_tts_inference_results::list_user_tts_inference_results_handler;
+use crate::http_server::endpoints::tts::list_user_tts_models::list_user_tts_models_handler;
 use crate::http_server::endpoints::twitch::event_rules::create_event_rule::create_twitch_event_rule_handler;
 use crate::http_server::endpoints::twitch::event_rules::delete_event_rule::delete_twitch_event_rule_handler;
 use crate::http_server::endpoints::twitch::event_rules::edit_event_rule::edit_twitch_event_rule_handler;
@@ -67,16 +69,6 @@ use crate::http_server::endpoints::twitch::oauth::check_oauth_status::check_oaut
 use crate::http_server::endpoints::twitch::oauth::oauth_begin_json::oauth_begin_enroll_json;
 use crate::http_server::endpoints::twitch::oauth::oauth_begin_redirect::oauth_begin_enroll_redirect;
 use crate::http_server::endpoints::twitch::oauth::oauth_end::oauth_end_enroll_from_redirect;
-use crate::http_server::endpoints::users::create_account::create_account_handler;
-use crate::http_server::endpoints::users::edit_profile::edit_profile_handler;
-use crate::http_server::endpoints::users::get_profile::get_profile_handler;
-use crate::http_server::endpoints::users::list_user_tts_inference_results::list_user_tts_inference_results_handler;
-use crate::http_server::endpoints::users::list_user_tts_models::list_user_tts_models_handler;
-use crate::http_server::endpoints::users::list_user_w2l_inference_results::list_user_w2l_inference_results_handler;
-use crate::http_server::endpoints::users::list_user_w2l_templates::list_user_w2l_templates_handler;
-use crate::http_server::endpoints::users::login::login_handler;
-use crate::http_server::endpoints::users::logout::logout_handler;
-use crate::http_server::endpoints::users::session_info::session_info_handler;
 use crate::http_server::endpoints::vocoders::get_vocoder::get_vocoder_handler;
 use crate::http_server::endpoints::vocoders::list_vocoders::list_vocoders_handler;
 use crate::http_server::endpoints::voice_clone_requests::check_if_voice_clone_request_submitted::check_if_voice_clone_request_submitted_handler;
@@ -93,8 +85,13 @@ use crate::http_server::endpoints::w2l::get_w2l_result::get_w2l_inference_result
 use crate::http_server::endpoints::w2l::get_w2l_template::get_w2l_template_handler;
 use crate::http_server::endpoints::w2l::get_w2l_template_use_count::get_w2l_template_use_count_handler;
 use crate::http_server::endpoints::w2l::get_w2l_upload_template_job_status::get_w2l_upload_template_job_status_handler;
+use crate::http_server::endpoints::w2l::list_user_w2l_inference_results::list_user_w2l_inference_results_handler;
+use crate::http_server::endpoints::w2l::list_user_w2l_templates::list_user_w2l_templates_handler;
 use crate::http_server::endpoints::w2l::list_w2l_templates::list_w2l_templates_handler;
 use crate::http_server::endpoints::w2l::set_w2l_template_mod_approval::set_w2l_template_mod_approval_handler;
+use users_component::default_routes::add_suggested_api_v1_account_creation_and_session_routes;
+use users_component::endpoints::edit_profile_handler::edit_profile_handler;
+use users_component::endpoints::get_profile_handler::get_profile_handler;
 
 pub fn add_routes<T, B> (app: App<T, B>) -> App<T, B>
   where
@@ -120,31 +117,13 @@ pub fn add_routes<T, B> (app: App<T, B>) -> App<T, B>
   app = add_investor_demo_routes(app); /* /demo_mode */ // TODO: DEFINITELY TEMPORARY
   app = add_flag_routes(app); /* /flag */
 
+  // From components
+  app = add_suggested_api_v1_account_creation_and_session_routes(app); // /create_account, /session, /login, /logout
+
   // ==================== SERVICE ====================
   app.service(
     web::resource("/_status")
         .route(web::get().to(get_health_check_handler))
-        .route(web::head().to(|| HttpResponse::Ok()))
-  )
-  // ==================== ACCOUNT CREATION / SESSION MANAGEMENT ====================
-  .service(
-    web::resource("/create_account")
-        .route(web::post().to(create_account_handler))
-        .route(web::head().to(|| HttpResponse::Ok()))
-  )
-  .service(
-    web::resource("/login")
-        .route(web::post().to(login_handler))
-        .route(web::head().to(|| HttpResponse::Ok()))
-  )
-  .service(
-    web::resource("/logout")
-        .route(web::post().to(logout_handler))
-        .route(web::head().to(|| HttpResponse::Ok()))
-  )
-  .service(
-    web::resource("/session")
-        .route(web::get().to(session_info_handler))
         .route(web::head().to(|| HttpResponse::Ok()))
   )
   // ==================== MISC ====================

@@ -30,6 +30,9 @@ tts_common = { path = "../../lib/tts_common" }
 twitch_common = { path = "../../lib/twitch_common" }
 user_input_common = { path = "../../lib/user_input_common" }
 
+# Internal Components
+users_component = { path = "../../component_subsystem/users" }
+
 # Vendored code
 newrelic-telemetry = { path = "../../vendor/newrelic-telemetry-sdk-rust" }
 
