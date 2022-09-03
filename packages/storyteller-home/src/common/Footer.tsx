@@ -4,7 +4,6 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faDiscord,
   faFacebook,
-  faPatreon,
   faTwitch,
   faTwitter,
 } from "@fortawesome/free-brands-svg-icons";
@@ -29,9 +28,6 @@ function Footer(props: Props) {
               </a>
               <a href="https://google.com" className="footer-social-icon">
                 <FontAwesomeIcon icon={faTwitter} />
-              </a>
-              <a href="https://google.com" className="footer-social-icon">
-                <FontAwesomeIcon icon={faPatreon} />
               </a>
             </div>
           </div>

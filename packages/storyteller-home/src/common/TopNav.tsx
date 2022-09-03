@@ -100,6 +100,11 @@ function TopNav(props: Props) {
                 What We Do
               </a>
             </li>
+            <li>
+              <a href="#mentions" className="nav-link" data-scroll-to>
+                Mentions
+              </a>
+            </li>
           </ul>
 
           <div className="col-md-3 text-end">
@@ -109,7 +114,7 @@ function TopNav(props: Props) {
           </div>
         </div>
 
-        <div className="d-flex d-md-none justify-content-between pt-3">
+        <div className="d-flex d-md-none justify-content-between pt-2">
           <a
             href="/"
             className="d-flex align-items-center text-dark text-decoration-none"

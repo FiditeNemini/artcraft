@@ -155,7 +155,7 @@ function TtsComponent(props: Props) {
 
   return (
     <div className="d-flex justify-content-center pb-5">
-      <div className="card bg-light-solid tts-demo w-100 mb-5">
+      <div className="card bg-dark-solid tts-demo w-100 mb-5">
         <form onSubmit={handleFormSubmit} className="w-100">
           <div className="d-flex flex-column gap-3">
             <div className="field">
