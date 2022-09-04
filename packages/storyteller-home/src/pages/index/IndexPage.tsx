@@ -1,612 +1,965 @@
-import React from 'react';
-import { faApple, faLinux, faTwitch, faWindows } from '@fortawesome/free-brands-svg-icons';
-import { faArrowRight, faFlask, faMicrophone, faQuoteLeft, faUserCircle } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import AudioSample from './AudioSample';
-import Scene from './Scene';
-import { TtsComponent } from './TtsComponent';
-import { Link } from 'react-router-dom';
+import {
+  faDiscord,
+  faFacebook,
+  faTwitch,
+  faTwitter,
+} from "@fortawesome/free-brands-svg-icons";
+import {
+  faArrowRight,
+  faBookOpen,
+  faClapperboard,
+  faDrum,
+  faFilm,
+  faMicrophone,
+  faMicrophoneLines,
+  faMusic,
+  faPaintbrush,
+  faPersonWalkingArrowRight,
+  faVolumeHigh,
+} from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import Marquee from "react-fast-marquee";
+import { TtsComponent } from "./TtsComponent";
+import Tippy from "@tippyjs/react";
+import "tippy.js/dist/tippy.css";
+import AudioSample from "./AudioSample";
+import { useEffect } from "react";
+import gsap from "gsap";
+import SplitType from "split-type";
+import Scene from "./Scene";
+import { Swiper, SwiperSlide } from "swiper/react";
+import "swiper/css";
+import "swiper/css/pagination";
+import { Autoplay, Pagination } from "swiper";
 
-function IndexPage () {
+function IndexPage() {
+  useEffect(() => {
+    const splitTitle = new SplitType("#hero-title", {
+      types: "chars",
+      charClass: "title-split",
+    });
+
+    gsap.to(splitTitle.chars, {
+      delay: 0.2,
+      duration: 0.4,
+      y: 0,
+      opacity: 1,
+      stagger: 0.03,
+      ease: "expo",
+    });
+
+    const splitTitleOutline = new SplitType("#hero-title-outline", {
+      types: "words",
+      wordClass: "title-outline-split",
+    });
+
+    console.log(splitTitleOutline);
+
+    gsap.to(splitTitleOutline.words, {
+      delay: 0.25,
+      duration: 0.8,
+      y: 0,
+      scale: 1,
+      opacity: 1,
+      stagger: 0,
+      ease: "expo",
+    });
+  }, []);
+
   return (
-    <div>
+    <>
+      <div id="home" data-scroll-section>
+        <div className="bg-hero">
+          <div className="container">
+            <div className="hero-title-container">
+              <h1
+                id="hero-title"
+                className="hero-title d-flex flex-column text-center"
+              >
+                <span
+                  className="hero-title-one align-items-center zi-2"
+                  data-scroll
+                  data-scroll-speed="3"
+                  data-scroll-direction="horizontal"
+                  data-scroll-position="top"
+                >
+                  The <span>Future</span>
+                </span>
+                <span
+                  className="hero-title-two zi-2"
+                  data-scroll
+                  data-scroll-speed="-3"
+                  data-scroll-direction="horizontal"
+                  data-scroll-position="top"
+                >
+                  of Production
+                </span>
+              </h1>
 
-      <section className="section is-small">
-        <h1 className="title is-1">
-          Storyteller&nbsp;
-          <figure className="image is-64x64 is-inline-block">
-            <img src="/logo/storyteller_kitsune_logo_3000.png" alt="FakeYou's mascot!" />
-          </figure>
-        </h1>
-        <h2 className="subtitle is-3">
-          The future of production
-        </h2>
-        <p>We&rsquo;re streamers and filmmakers building the components of the future Hollywood studio.</p>
-      </section>
-
-      <section className="hero is-small">
-        <div className="hero-body">
-          <div className="columns is-vcentered">
-            <div className="column is-one-third">
-              <div className="mascot">
-                <img src="/mascot/kitsune_pose2_black_2000.webp" alt="FakeYou's mascot!" />
+              <div className="d-flex flex-column align-items-center align-items-xl-end">
+                <p
+                  className="lead hero-sub-title fw-normal opacity-75"
+                  data-scroll
+                  data-scroll-speed="-4"
+                  data-scroll-direction="horizontal"
+                  data-scroll-position="top"
+                >
+                  We’re scientists, engineers, and creatives building the future
+                  AI cloud production studio.
+                </p>
+                <div
+                  data-scroll
+                  data-scroll-speed="-5"
+                  data-scroll-direction="horizontal"
+                  data-scroll-position="top"
+                  className="zi-10 mt-2"
+                >
+                  <a className="btn btn-primary" href="#about" data-scroll-to>
+                    <span>Explore</span>
+                  </a>
+                </div>
               </div>
-            </div>
-            <div className="column">
-              <p className="title is-3">
-                1) <em>FakeYou</em> Social Deep Learning 
-              </p>
-              <p className="subtitle is-5">
-                FakeYou is used by millions of people every month.
-              </p>
-              <p>
-                We've built a social platform for deep learning and generative models. 
-                <br />
-                <br />
-                
-                <em>FakeYou</em> is a place where creators can upload and 
-                manage a variety of deep fake models: speech, music, lipsyncing, and more.
-                Every day, artists and musicians use our tools to their to dub their 
-                creative work.
-                We offer paid voice cloning services, an API with free 
-                and paid tiers, and in the future, 
-                our users will be able to monetize their own voices.
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
 
-      <section className="section is-small">
-        <h1 className="title is-4">Try It!</h1>
-        <h2 className="subtitle is-6">
-        </h2>
-
-        <p>
-          We have nearly 1,500 voices (with more added every day), but we've selected 
-          a few to show off.
-        </p>
-
-        <br />
-
-        <TtsComponent />
-
-      </section>
-
-      <section className="hero is-small">
-        <div className="hero-body">
-
-          <h1 className="title is-4">Want to hear more?</h1>
-
-          <br />
-
-          <div className="columns">
-            <div className="column">
-              <a 
-                className="button is-fullwidth is-large is-info is-inverted"
-                href="https://api.fakeyou.com/demo_mode/enable?redirect_to=https://fakeyou.com/"
+              <div className="hero-title-outline noselect">
+                <h1
+                  id="hero-title-outline"
+                  className="hero-title d-flex flex-column text-center"
                 >
-                Check out our 1,500 other voices
-              </a>
-            </div>
-
-            <div className="column">
-              <a 
-                className="button is-fullwidth is-large is-link is-info "
-                href="https://api.fakeyou.com/demo_mode/enable?redirect_to=https://fakeyou.com/clone"
-                >
-                Then Clone&nbsp;<em>Your</em>&nbsp;Voice&nbsp;<FontAwesomeIcon icon={faUserCircle} />
-              </a>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section className="hero is-small">
-        <div className="hero-body">
-          &nbsp;
-        </div>
-      </section>
-
-      <section className="hero is-small is-link">
-        <div className="hero-body">
-          <div className="columns is-vcentered">
-
-            <div className="column">
-              <p className="title is-3">
-                2) <em>Storyteller TTS for Twitch</em>
-              </p>
-              <p className="subtitle is-5">
-                Twitch Streamers and Creators can engage and monetize
-              </p>
-              <p>
-                It&rsquo;s tough to build an audience on Twitch. It's even tougher to earn an
-                income. We've built the most comprehensive and engaging donation system 
-                for Twitch to date, letting audience members pay to use Deep Fake voices 
-                and emotes in their favorite streamers' live broadcasts. 
-              </p>
-            </div>
-
-            <div className="column is-one-third">
-              <div className="mascot">
-                <img src="/mascot/kitsune_pose6_black_2000.webp" alt="FakeYou's mascot!" />
+                  <span
+                    className="hero-title-one align-items-center text-outline"
+                    data-scroll
+                    data-scroll-speed="-4"
+                    data-scroll-direction="horizontal"
+                    data-scroll-position="top"
+                  >
+                    The Future
+                  </span>
+                  <span
+                    className="hero-title-two text-outline"
+                    data-scroll
+                    data-scroll-speed="4"
+                    data-scroll-direction="horizontal"
+                    data-scroll-position="top"
+                  >
+                    of Production
+                  </span>
+                </h1>
               </div>
             </div>
           </div>
 
-          <h1 className="title is-4">Get started with your channel!</h1>
-          <h2 className="subtitle is-6">
-            There's nothing to install. It's the easiest, most engaging, most fun system for Twitch yet.
-            &nbsp;
-            <em><u>And it earns you money!</u></em>
-          </h2>
-          <a 
-            className="button is-fullwidth is-large is-info is-inverted"
-            href="https://create.storyteller.io"
+          <div className="d-flex justify-content-center">
+            <img
+              className="hero-img"
+              src="/hero/hero-img.webp"
+              alt="Storyteller HyperJail"
+            />
+          </div>
+
+          <div
+            className="d-none d-lg-flex social-icons flex-column gap-4 align-items-center"
+            data-scroll
+            data-scroll-speed="8"
+            data-scroll-direction="horizontal"
+            data-scroll-position="top"
+          >
+            <Tippy content="Discord" placement="right">
+              <a href="https://discord.gg/fakeyou">
+                <FontAwesomeIcon icon={faDiscord} />
+              </a>
+            </Tippy>
+            <Tippy content="Twitch" placement="right">
+              <a href="/">
+                <FontAwesomeIcon icon={faTwitch} />
+              </a>
+            </Tippy>
+            <Tippy content="Facebook" placement="right">
+              <a href="/">
+                <FontAwesomeIcon icon={faFacebook} />
+              </a>
+            </Tippy>
+            <Tippy content="Twitter" placement="right">
+              <a href="/">
+                <FontAwesomeIcon icon={faTwitter} />
+              </a>
+            </Tippy>
+          </div>
+
+          <div
+            className="shape-1-container"
+            data-scroll
+            data-scroll-speed="4"
+            data-scroll-position="top"
+          >
+            <div className="shape-1"></div>
+          </div>
+          <div className="shape-2"></div>
+          <div
+            className="shape-3-container"
+            data-scroll
+            data-scroll-speed="3"
+            data-scroll-position="top"
+          >
+            <div className="shape-3"></div>
+          </div>
+          <div
+            className="shape-4-container"
+            data-scroll
+            data-scroll-speed="2"
+            data-scroll-position="top"
+          >
+            <div className="shape-4"></div>
+          </div>
+        </div>
+        <div
+          id="about"
+          className="bg-light section section-pb-extra about-section"
+        >
+          <Marquee gradient={false} speed={100}>
+            <h1 className="marquee-title d-flex gap-3 gap-md-4 gap-lg-5">
+              <span className="text-outline">Storyteller</span>
+              <span className="text-red">\\</span>
+              <span>Storyteller</span>
+              <span className="text-red">\\</span>
+              <span className="text-outline">Storyteller</span>
+              <span className="text-red">\\</span>
+              <span>Storyteller</span>
+              <span className="text-red me-3 me-md-4 me-lg-5">\\</span>
+            </h1>
+          </Marquee>
+
+          <div className="container py-5 text-center d-flex flex-column align-items-center mt-3">
+            <h1 className="fw-bold display-4 about-title mt-5">
+              You can run the new Hollywood and top the Billboard Hot 100
+            </h1>
+            <h4 className="fw-normal opacity-75 mt-3">
+              Our technology can turn anyone into a director, musician, or movie
+              star.
+            </h4>
+          </div>
+
+          <div className="about-cards-container mt-4 mb-5">
+            <div className="container text-center d-flex flex-column align-items-center">
+              <div className="row gx-4 gy-5 pt-4 position-relative">
+                <div
+                  className="shape-5-container"
+                  data-scroll
+                  data-scroll-speed="4"
+                  data-scroll-position="top"
+                >
+                  <div className="shape-5"></div>
+                </div>
+                <div
+                  className="shape-6-container"
+                  data-scroll
+                  data-scroll-speed="4"
+                  data-scroll-position="top"
+                >
+                  <div className="shape-6"></div>
+                </div>
+                <div
+                  className="shape-7-container"
+                  data-scroll
+                  data-scroll-speed="3"
+                  data-scroll-position="top"
+                >
+                  <div className="shape-7"></div>
+                </div>
+                <div className="col-12 col-md-6 col-lg-3">
+                  <p className="fw-normal card bg-dark-solid pt-5 about-card">
+                    <FontAwesomeIcon icon={faMusic} className="about-icon" />
+                    Music generation - vocals, instrumentals, and more
+                  </p>
+                </div>
+                <div className="col-12 col-md-6 col-lg-3">
+                  <p className="fw-normal card bg-dark-solid pt-5 about-card">
+                    <FontAwesomeIcon
+                      icon={faMicrophoneLines}
+                      className="about-icon"
+                    />
+                    Audio dubbing and transformation
+                  </p>
+                </div>
+                <div className="col-12 col-md-6 col-lg-3">
+                  <p className="fw-normal card bg-dark-solid pt-5 about-card">
+                    <FontAwesomeIcon
+                      icon={faPersonWalkingArrowRight}
+                      className="about-icon"
+                    />
+                    Real time animation
+                  </p>
+                </div>
+                <div className="col-12 col-md-6 col-lg-3">
+                  <p className="fw-normal card bg-dark-solid pt-5 about-card">
+                    <FontAwesomeIcon icon={faFilm} className="about-icon" />
+                    Real time Hollywood VFX without going to set
+                  </p>
+                </div>
+                <div className="col-12 col-md-6 col-lg-3">
+                  <p className="fw-normal card bg-dark-solid pt-5 about-card">
+                    <FontAwesomeIcon icon={faBookOpen} className="about-icon" />
+                    World building, character arc development, narrative
+                    creation
+                  </p>
+                </div>
+                <div className="col-12 col-md-6 col-lg-3">
+                  <p className="fw-normal card bg-dark-solid pt-5 about-card">
+                    <FontAwesomeIcon
+                      icon={faPaintbrush}
+                      className="about-icon"
+                    />
+                    Concept art generation
+                  </p>
+                </div>
+                <div className="col-12 col-md-6 col-lg-3">
+                  <p className="fw-normal card bg-dark-solid pt-5 about-card">
+                    <FontAwesomeIcon icon={faDrum} className="about-icon" />
+                    BG music generator, automatic foley
+                  </p>
+                </div>
+                <div className="col-12 col-md-6 col-lg-3">
+                  <p className="fw-normal card bg-dark-solid pt-5 about-card">
+                    <FontAwesomeIcon
+                      icon={faClapperboard}
+                      className="about-icon"
+                    />
+                    No more editing. Shots automatically populate the timeline.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="w-100 d-flex justify-content-center">
+            <img
+              src="/logo/Storyteller-Icon-Logo.png"
+              alt="Storyteller Logo Icon"
+              className="divider-logo"
+            />
+          </div>
+        </div>
+        <div className="bg-dark section-2">
+          <div id="products">
+            <Marquee gradient={false} speed={100}>
+              <h1 className="marquee-title d-flex gap-3 gap-md-4 gap-lg-5">
+                <span>What we do</span>
+                <span className="text-red">\\</span>
+                <span className="text-outline">What we do</span>
+                <span className="text-red">\\</span>
+                <span>What we do</span>
+                <span className="text-red">\\</span>
+                <span className="text-outline">What we do</span>
+                <span className="text-red me-3 me-md-4 me-lg-5">\\</span>
+              </h1>
+            </Marquee>
+          </div>
+          <div className="container pt-10">
+            <div className="row gx-5">
+              <div className="col-lg-5 text-center text-lg-start">
+                <img
+                  src="/images/VC-img.webp"
+                  alt="FakeYou"
+                  className="img-fluid"
+                />
+              </div>
+              <div className="col-lg-7 d-flex flex-column justify-content-center">
+                <h1 className="fw-bold display-5">Voice Changing</h1>
+                <h6 className="fw-semibold fs-5 opacity-75 mb-4">
+                  Now you can sound like someone else
+                </h6>
+                <p className="mt-3">
+                  Use offline (studio quality) or real time voice changing to
+                  re-dub your film or give your live performers a new character.
+                </p>
+                <div>
+                  <a
+                    href="https://fakeyou.com/clone"
+                    rel="noreferrer"
+                    target="_blank"
+                    className="btn btn-primary mt-4"
+                  >
+                    <span>Transform my voice</span>
+                  </a>
+                </div>
+              </div>
+            </div>
+            <div className="mt-5 pt-4 text-center">
+              <h2 className="text-center mt-5 fw-bold">
+                <FontAwesomeIcon icon={faMicrophone} className="me-3" />
+                Voice Changing Demo
+              </h2>
+              <p className="mb-5">
+                This is still an early beta. Voice quality will change and
+                improve substantially over time.
+              </p>
+              <div className="row gx-4 gy-4 text-center">
+                <div className="col-12 col-lg-6">
+                  <div className="card bg-light-solid justify-content-start">
+                    <AudioSample sampleUrl="/audio-samples/voice-conversion-1.mp3" />
+                    <p className="mb-0">
+                      <em className="fs-6">
+                        &ldquo;I've got a huge announcement. This just sounds
+                        really, really great. And other than some phase
+                        distortion, artifacts, this is just sounding really
+                        great. And it's good for America. And voice synthesis is
+                        amazing.&rdquo;
+                      </em>
+                    </p>
+                  </div>
+                </div>
+                <div className="col-12 col-lg-6">
+                  <div className="card bg-light-solid justify-content-start">
+                    <AudioSample sampleUrl="/audio-samples/voice-conversion-2.mp3" />
+                    <p className="mb-0">
+                      <em className="fs-6">
+                        &ldquo;My favorite game is Super Smash Bros Ultimate.
+                        It's a really, really great game. It's huge. There's so
+                        many characters.&rdquo;
+                      </em>
+                    </p>
+                  </div>
+                </div>
+                <p className="text-center my-5 pb-5">
+                  <strong className="fw-semibold fs-5">Brandon</strong>
+                  <FontAwesomeIcon icon={faArrowRight} className="mx-2" />
+                  <strong className="fw-semibold fs-5">Donald Trump</strong>
+                  <br />
+                  Real time voice to voice conversion.
+                </p>
+              </div>
+            </div>
+            <div className="text-center position-relative">
+              <div className="position-relative zi-2">
+                <h2 className="text-center mt-5 fw-bold">
+                  Sign up for your very own voice changer
+                </h2>
+                <p className="mb-4">
+                  We'll be rolling this out shortly. Get on the list! Tell us
+                  who you want to be.
+                </p>
+                <div>
+                  <a
+                    href="https://fakeyou.com/clone"
+                    rel="noreferrer"
+                    target="_blank"
+                    className="btn btn-primary mt-3"
+                  >
+                    <span>Transform my voice</span>
+                  </a>
+                </div>
+              </div>
+              <div className="shape-bg"></div>
+            </div>
+          </div>
+        </div>
+        <div className="bg-light section-2">
+          <div className="container">
+            <div className="row gx-5 flex-row-reverse">
+              <div className="col-lg-5 text-center text-lg-start">
+                <img
+                  src="/images/FakeYou-img.webp"
+                  alt="FakeYou"
+                  className="img-fluid"
+                />
+              </div>
+              <div className="col-lg-7 d-flex flex-column justify-content-center">
+                <h1 className="fw-bold display-5">FakeYou</h1>
+                <h6 className="fw-semibold fs-5 opacity-75 mb-4">
+                  Used by millions of people every month
+                </h6>
+                <p className="mt-3">
+                  We've built a social platform for deep learning and generative
+                  models. FakeYou is a place where creators can upload and
+                  manage a variety of deep fake models: speech, music,
+                  lipsyncing, and more. Every day, artists and musicians use our
+                  tools to their to dub their creative work. We offer paid voice
+                  cloning services, an API with free and paid tiers, and in the
+                  future, our users will be able to monetize their own voices.
+                </p>
+                <div>
+                  <a
+                    href="https://fakeyou.com"
+                    rel="noreferrer"
+                    target="_blank"
+                    className="btn btn-primary mt-4"
+                  >
+                    <span>Go to FakeYou.com</span>
+                  </a>
+                </div>
+              </div>
+            </div>
+            <div className="mt-5 pt-4 text-center">
+              <h2 className="text-center mt-5 fw-bold">
+                <FontAwesomeIcon icon={faVolumeHigh} className="me-3" />
+                Try our text to speech!
+              </h2>
+              <p className="mb-5">
+                We have over 2,000 voices (with more added every day), but we've
+                selected a few to show off.
+              </p>
+              <TtsComponent />
+            </div>
+          </div>
+          <div className="container text-center position-relative">
+            <div className="position-relative zi-2">
+              <h2 className="text-center mt-5 fw-bold">Want to hear more?</h2>
+              <p className="mb-4">
+                Listen to all of the 2,000+ available voices on FakeYou.
+              </p>
+              <div className="d-flex flex-column flex-md-row gap-3 justify-content-center pt-3">
+                <a
+                  href="https://fakeyou.com/"
+                  rel="noreferrer"
+                  target="_blank"
+                  className="btn btn-primary"
+                >
+                  <span>Go to FakeYou.com</span>
+                </a>
+                <a
+                  href="https://fakeyou.com/clone"
+                  rel="noreferrer"
+                  target="_blank"
+                  className="btn btn-secondary"
+                >
+                  <span>Clone my voice</span>
+                </a>
+              </div>
+            </div>
+            <div className="shape-bg dark"></div>
+          </div>
+        </div>
+        <div className="bg-dark section-2">
+          <div className="container">
+            <div className="row gx-5">
+              <div className="col-lg-5 text-center text-lg-start">
+                <img
+                  src="/images/Stream-img.webp"
+                  alt="Storyteller Stream"
+                  className="img-fluid"
+                />
+              </div>
+              <div className="col-lg-7 d-flex flex-column justify-content-center">
+                <h1 className="fw-bold display-5">Storyteller Stream</h1>
+                <h6 className="fw-semibold fs-5 opacity-75 mb-4">
+                  Twitch Streamers and Creators can engage and monetize
+                </h6>
+                <p className="mt-3">
+                  It’s tough to build an audience on Twitch. It's even tougher
+                  to earn an income. We've built the most comprehensive and
+                  engaging donation system for Twitch to date, letting audience
+                  members pay to use Deep Fake voices and emotes in their
+                  favorite streamers' live broadcasts.Get started with your
+                  channel! There's nothing to install. It's the easiest, most
+                  engaging, most fun system for Twitch yet. And it earns you
+                  money!
+                </p>
+                <div>
+                  <a
+                    href="https://storyteller.stream"
+                    rel="noreferrer"
+                    target="_blank"
+                    className="btn btn-primary mt-4"
+                  >
+                    <span>Add to your stream now!</span>
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-light section-2">
+          <div className="container">
+            <div className="row gx-5 flex-row-reverse">
+              <div className="col-lg-5 text-center text-lg-start">
+                <img
+                  src="/images/Engine-img.webp"
+                  alt="FakeYou"
+                  className="img-fluid"
+                />
+              </div>
+              <div className="col-lg-7 d-flex flex-column justify-content-center">
+                <h1 className="fw-bold display-5">Storyteller Engine</h1>
+                <h6 className="fw-semibold fs-5 opacity-75 mb-4">
+                  A fully 3D virtual set for your stream or film
+                </h6>
+                <p className="mt-3">
+                  Our community contributes sets, character models, props,
+                  events, and more. Use motion or volumetric capture. Your
+                  audience can control everything. Ideal for improv, news casts,
+                  interviews, gaming, fast virtual filmmaking, and much more!
+                </p>
+                <div>
+                  <a
+                    href="https://discord.gg/fakeyou"
+                    rel="noreferrer"
+                    target="_blank"
+                    className="btn btn-primary mt-4"
+                  >
+                    <span>Ask us in Discord</span>
+                  </a>
+                </div>
+              </div>
+            </div>
+
+            <div className="row gx-4 gy-4 gx-lg-5 gy-lg-5 mb-5 mt-5">
+              <div className="col-12 col-md-6 d-flex flex-column justify-content-center">
+                <video
+                  src="/video/webpage-demo-1-640.mp4"
+                  autoPlay={true}
+                  playsInline={true}
+                  loop={true}
+                  muted={true}
+                  className="img-fluid img-border"
+                ></video>
+              </div>
+              <div className="col-12 col-md-6 d-flex flex-column justify-content-center">
+                <div className="card bg-dark-solid align-items-start justify-content-center fs-6 h-auto">
+                  <h3 className="pb-3">Volumetric Capture</h3>
+                  <p className="mb-0">
+                    Use one or more cameras to build a 3D volumetric capture of
+                    your actors. In the future, we'll be upscaling from
+                    VGA-resolution depth maps to full 4K.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div className="row gx-4 gy-4 gx-lg-5 gy-lg-5 flex-row-reverse mb-5">
+              <div className="col-12 col-md-6 d-flex flex-column justify-content-center">
+                <video
+                  src="/video/webpage-demo-2-640.mp4"
+                  autoPlay={true}
+                  playsInline={true}
+                  loop={true}
+                  muted={true}
+                  className="img-fluid img-border"
+                ></video>
+              </div>
+              <div className="col-12 col-md-6 d-flex flex-column justify-content-center">
+                <div className="card bg-dark-solid align-items-start justify-content-center fs-6 h-auto">
+                  <h3 className="pb-3">Motion Capture</h3>
+                  <p className="mb-0">
+                    Community-contributed models, sets, and scenarios can be
+                    controlled with webcam, Kinect, or motion capture systems
+                    and directed remotely from the web.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div className="row gx-4 gy-4 gx-lg-5 gy-lg-5 pb-5">
+              <div className="col-12 col-md-6 d-flex flex-column justify-content-center">
+                <video
+                  src="/video/webpage-demo-3-640.mp4"
+                  autoPlay={true}
+                  playsInline={true}
+                  loop={true}
+                  muted={true}
+                  className="img-fluid img-border"
+                ></video>
+              </div>
+              <div className="col-12 col-md-6 d-flex flex-column justify-content-center">
+                <div className="card bg-dark-solid align-items-start justify-content-center fs-6 h-auto">
+                  <h3 className="pb-3">
+                    Fake Faces, Voices, and Corrected Motion
+                  </h3>
+                  <p className="mb-0">
+                    We couldn't hire Elon Musk, but that didn't stop us and it
+                    won't stop you. Change your actors faces and voices to fit
+                    your needs. Tweak their movements and posture &mdash; even
+                    the location and lighting &mdash; all post capture.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div className="pt-5 mt-5">
+              <div className="text-center position-relative">
+                <div className="position-relative zi-2 d-flex flex-column align-items-center">
+                  <h2 className="text-center fw-bold">
+                    Apply for our beta program
+                  </h2>
+                  <p className="mb-4 mw-text">
+                    Are you a streamer or filmmaker? Want to help us test and
+                    develop Storyteller Engine into the best tool ever created
+                    for making narrative content?
+                  </p>
+                  <div>
+                    <a
+                      href="https://discord.gg/fakeyou"
+                      rel="noreferrer"
+                      target="_blank"
+                      className="btn btn-primary mt-3"
+                    >
+                      <span>Ask us in Discord</span>
+                    </a>
+                  </div>
+                </div>
+                <div className="shape-bg"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div className="bg-dark section-2">
+          <div className="container">
+            <div className="row gx-5">
+              <div className="col-lg-5 text-center text-lg-start">
+                <img
+                  src="/images/VoxelCam-img.webp"
+                  alt="FakeYou"
+                  className="img-fluid"
+                />
+              </div>
+              <div className="col-lg-7 d-flex flex-column justify-content-center">
+                <h1 className="fw-bold display-5">Storyteller VoxelCam</h1>
+                <h6 className="fw-semibold fs-5 opacity-75 mb-4">
+                  Volumetric capture for your stream, and soon for your film
+                  set.
+                </h6>
+                <p className="mt-3">
+                  Webcams are boring and flat. You can use our volumetric camera
+                  in-stream to make your personality come to life. This system
+                  can also be integrated into our no-cinema camera virtual set.
+                </p>
+                <div>
+                  <a
+                    href="https://fakeyou.com"
+                    rel="noreferrer"
+                    target="_blank"
+                    className="btn btn-primary mt-4"
+                  >
+                    <span>Visit Storyteller.stream</span>
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="container pt-5">
+            <h2 className="text-center my-5 fw-bold">
+              Volumetric cameras aren't limited to two dimensions
+            </h2>
+
+            <div className="rounded overflow-hidden">
+              <Scene />
+            </div>
+
+            <h2 className="text-center mt-5 pt-5 fw-bold">Screenshots</h2>
+
+            <div className="row gx-4 gy-4 my-5 text-center">
+              <div className="col-12 col-sm-4">
+                <div>
+                  <img
+                    className="img-fluid img-border img-hover"
+                    src="/screenshots/engine-fuji.png"
+                    alt="screenshot"
+                  />
+                </div>
+              </div>
+
+              <div className="col-12 col-sm-4">
+                <img
+                  className="img-fluid img-border"
+                  src="/screenshots/engine-zelda-monsters.png"
+                  alt="screenshot"
+                />
+              </div>
+
+              <div className="col-12 col-sm-4">
+                <img
+                  className="img-fluid img-border"
+                  src="/screenshots/engine-point-cloud.png"
+                  alt="screenshot"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div id="mentions" className="bg-light section-2">
+          <div>
+            <Marquee gradient={false} speed={120}>
+              <h1 className="marquee-title d-flex gap-3 gap-md-4 gap-lg-5 mt-0">
+                <span className="text-outline">Press and mentions</span>
+                <span className="text-red">\\</span>
+                <span>Press and mentions</span>
+                <span className="text-red">\\</span>
+                <span className="text-outline">Press and mentions</span>
+                <span className="text-red">\\</span>
+                <span>Press and mentions</span>
+                <span className="text-red me-3 me-md-4 me-lg-5">\\</span>
+              </h1>
+            </Marquee>
+          </div>
+
+          <div className="swiper">
+            <Swiper
+              loop={true}
+              autoplay={{
+                delay: 5000,
+                disableOnInteraction: false,
+              }}
+              slidesPerView={1.1}
+              centeredSlides={true}
+              spaceBetween={50}
+              grabCursor={true}
+              breakpoints={{
+                640: {
+                  slidesPerView: 1.5,
+                  spaceBetween: 10,
+                },
+                768: {
+                  slidesPerView: 2,
+                  spaceBetween: 40,
+                },
+                1024: {
+                  slidesPerView: 2.5,
+                  spaceBetween: 40,
+                },
+                1600: {
+                  slidesPerView: 4,
+                  spaceBetween: 50,
+                },
+              }}
+              pagination={{
+                clickable: true,
+              }}
+              modules={[Autoplay, Pagination]}
             >
-            Add to your stream now!&nbsp;<FontAwesomeIcon icon={faTwitch} />
-          </a>
-        </div>
-      </section>
-
-      <section className="hero is-small">
-        <div className="hero-body">
-          &nbsp;
-        </div>
-      </section>
-
-      <section className="hero is-small">
-        <div className="hero-body">
-          <div className="columns is-vcentered">
-            <div className="column is-one-third">
-              <div className="mascot">
-                <img src="/mascot/kitsune_pose4_black_2000.webp" alt="FakeYou's mascot!" />
-              </div>
-            </div>
-            <div className="column">
-              <p className="title is-3">
-                3) <em>FakeYou Voice Changer</em>
-              </p>
-              <p className="subtitle is-5">
-                Now you can sound like someone else
-              </p>
-              <p>
-                Change how you sound in <em>real time</em>. Choose your next voice.
-                Great for your stream, hanging out in VR, or filming that historical drama.
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section className="hero is-small">
-        <div className="hero-body">
-          &nbsp;
-        </div>
-      </section>
-
-      <section className="section is-small">
-        <h1 className="title is-4">Voice changing demo</h1>
-        <h2 className="subtitle is-6">
-        </h2>
-
-        This is still an early beta. Voice quality will change and improve substantially over time.
-
-        <br />
-        <br />
-
-        <div className="columns is-mobile has-text-centered">
-          <div className="column">
-            <AudioSample sampleUrl="/audio-samples/voice-conversion-1.mp3" />
-            <br />
-            <br />
-            <p>
-              <em>
-                &ldquo;I've got a huge announcement. 
-                This just sounds really, really great.
-                And other than some phase distortion, artifacts, 
-                this is just sounding really great. 
-                And it's good for America. 
-                And voice synthesis is amazing.&rdquo;
-              </em>
-            </p>
-          </div>
-          <div className="column">
-            <AudioSample sampleUrl="/audio-samples/voice-conversion-2.mp3" />
-            <br />
-            <br />
-            <p>
-              <em>
-                &ldquo;My favorite game is Super Smash Bros Ultimate. 
-                It's a really, really great game. 
-                It's huge. There's so many characters.&rdquo;
-              </em>
-            </p>
-          </div>
-        </div>
-
-        <p className="has-text-centered">
-          Brandon <FontAwesomeIcon icon={faArrowRight} /> Donald Trump<br />
-          Real time voice to voice conversion.
-        </p>
-
-      </section>
-
-      <section className="section is-small">
-        <h1 className="title is-4">Sign up for your very own voice changer</h1>
-        <h2 className="subtitle is-6">
-          We'll be rolling this out shortly. Get on the list! Tell us who you want to be.
-        </h2>
-        <a 
-          className="button is-fullwidth is-large is-info"
-          href="https://api.fakeyou.com/demo_mode/enable?redirect_to=https://fakeyou.com/clone"
-          >
-          Transform my voice!&nbsp;<FontAwesomeIcon icon={faMicrophone} />
-        </a>
-      </section>
-
-      <section className="hero is-small">
-        <div className="hero-body">
-          &nbsp;
-        </div>
-      </section>
-
-      <section className="hero is-small is-link">
-        <div className="hero-body">
-          <div className="columns is-vcentered">
-            <div className="column">
-              <p className="title is-3">
-                4) <em>Storyteller VoxelCam</em>
-              </p>
-              <p className="subtitle is-5">
-                Volumetric capture for your stream, and soon for your film set.
-              </p>
-              <p>
-                Webcams are boring and flat. You can use our volumetric camera in-stream to make
-                your personality come to life. This system can also be integrated into our
-                no-cinema camera virtual set.
-              </p>
-            </div>
-
-            <div className="column is-one-third">
-              <div className="mascot">
-                <img src="/mascot/kitsune_pose5_black_2000.webp" alt="FakeYou's mascot!" />
-              </div>
-            </div>
-          </div>
-
-        <h1 className="title is-4">Volumetric cameras aren't limited to two dimensions</h1>
-        <h2 className="subtitle is-6">
-        </h2>
-
-        <p>
-          <Scene />
-        </p>
-        <br />
-
-        <h1 className="title is-4">Screenshots</h1>
-        <h2 className="subtitle is-6">
-        </h2>
-
-        <div className="columns">
-          <div className="column">
-            <figure className="image is-square">
-              <img src="/screenshots/engine-fuji.png" alt="screenshot" />
-            </figure>
-          </div>
-
-          <div className="column">
-            <figure className="image is-square">
-              <img src="/screenshots/engine-zelda-monsters.png" alt="screenshot" />
-            </figure>
-          </div>
-
-          <div className="column">
-            <figure className="image is-square">
-              <img src="/screenshots/engine-point-cloud.png" alt="screenshot" />
-            </figure>
-          </div>
-        </div>
-
-        <h1 className="title is-4">Downloads coming soon</h1>
-        <h2 className="subtitle is-6">
-          For Windows, Mac, and Linux
-        </h2>
-
-        <p>
-          You'll need a Microsoft Kinect (v1, v2, Azure Kinect) or Intel RealSense camera. 
-          We plan to support ordinary webcams too!
-        </p>
-        <br />
-        
-        <article className="message is-danger">
-          <div className="message-body">
-            Downloads coming April 16th, 2022!
-          </div>
-        </article>
-
-
-        <div className="columns">
-          <div className="column">
-            <button 
-              className="button is-fullwidth is-large is-info is-inverted"
-              >
-              Windows&nbsp;<FontAwesomeIcon icon={faWindows} />
-            </button>
-          </div>
-
-          <div className="column">
-            <button 
-              className="button is-fullwidth is-large is-info is-inverted"
-              >
-              Mac&nbsp;<FontAwesomeIcon icon={faApple} />
-            </button>
-          </div>
-
-          <div className="column">
-            <button
-              className="button is-fullwidth is-large is-info is-inverted"
-              >
-              Linux&nbsp;<FontAwesomeIcon icon={faLinux} />
-            </button>
-          </div>
-        </div>
-        </div>
-      </section>
-      
-      <section className="hero is-small">
-        <div className="hero-body">
-          &nbsp;
-        </div>
-      </section>
-
-      <section className="hero is-small">
-        <div className="hero-body">
-          <div className="columns is-vcentered">
-            <div className="column is-one-third">
-              <div className="mascot">
-                <img src="/mascot/kitsune_pose9_black_2000.webp" alt="FakeYou's mascot!" />
-              </div>
-            </div>
-
-            <div className="column">
-              <p className="title is-3">
-                5) <em>Storyteller Engine</em>
-              </p>
-              <p className="subtitle is-5">
-                A fully 3D virtual set for your stream or film
-              </p>
-              <p>
-                Our community contributes sets, character models, props, events, and more.
-                Use motion or volumetric capture.
-                Your audience can control everything. 
-                Ideal for improv, news casts, interviews, gaming, fast virtual filmmaking, 
-                and much more!
-              </p>
-            </div>
-
-          </div>
-        </div>
-      </section>
-
-      <section className="section is-small">
-        <div className="columns is-vcentered">
-          <div className="column is-8">
-            <video src="/video/webpage-demo-1-640.mp4" autoPlay={true} playsInline={true} loop={true} muted={true}></video>
-          </div>
-          <div className="column">
-            <h3 className="title is-5">Volumetric Capture</h3>
-            <p className="bd-notification is-primary">Use one or more cameras to build a 3D volumetric capture of your actors. In the future, 
-            we'll be upscaling from VGA-resolution depth maps to full 4K.</p>
-          </div>
-        </div>
-
-        <div className="columns is-vcentered">
-          <div className="column is-8">
-            <video src="/video/webpage-demo-2-640.mp4" autoPlay={true} playsInline={true} loop={true} muted={true}></video>
-          </div>
-          <div className="column">
-            <h3 className="title is-5">Motion Capture</h3>
-            <p className="bd-notification is-primary">Community-contributed models, sets, and scenarios can be controlled with webcam, 
-              Kinect, or motion capture systems and directed remotely from the web.</p>
-          </div>
-        </div>
-
-        <div className="columns is-vcentered">
-          <div className="column is-8">
-            <video src="/video/webpage-demo-3-640.mp4" autoPlay={true} playsInline={true} loop={true} muted={true}></video>
-          </div>
-          <div className="column">
-            <h3 className="title is-5">Fake Faces, Voices, and Corrected Motion</h3>
-            <p className="bd-notification is-primary">We couldn't hire Elon Musk, but that didn't stop us and it won't stop you. 
-              Change your actors faces and voices to fit your needs. Tweak their movements and posture &mdash; even the location 
-              and lighting &mdash; all post capture.</p>
-          </div>
-        </div>
-      </section>
-
-      <section className="section is-small">
-        <h1 className="title is-4">Apply for our beta program</h1>
-        <h2 className="subtitle is-6">
-          We need early testers and contributors
-        </h2>
-        <p>
-          Are you a streamer or filmmaker? Want to help us test 
-          and develop Storyteller Engine into the best tool ever 
-          created for making narrative content? 
-        </p>
-        <br />
-        <a 
-          className="button is-fullwidth is-large is-info"
-          href="https://discord.gg/H72KFXm"
-          >
-          Ask us in Discord!&nbsp;<FontAwesomeIcon icon={faFlask} />
-        </a>
-      </section>
-
-      <section className="hero is-small">
-        <div className="hero-body">
-          &nbsp;
-        </div>
-      </section>
-
-      <section className="hero is-small">
-        <div className="hero-body">
-          <p className="title is-3">
-            Press and social media mentions
-          </p>
-          <p className="subtitle is-5">
-            This is only a sample of our hundreds of mentions across the web
-          </p>
-
-          <div className="columns is-vcentered has-text-centered">
-
-            <div className="column is-one-third">
-              <div className="card">
-                <div className="card-content">
-                  <div className="content">
-                    <p>
-                      <FontAwesomeIcon icon={faQuoteLeft} />&nbsp;
-                      Tool of the Week: AI voice generator | [FakeYou ...] is a window into 
-                      the future [...]. Play with it with a number of celebrity voices, including Judi Dench, 
-                      Neil DeGrasse Tyson, and Bill Gates.</p>
-                    
-                    <p>Techstars</p>
-
-                    <figure className="image is-64x64 is-inline-block">
-                      <img src="/press-logos/techstars_logo.png" className="is-rounded" alt="logo" />
-                    </figure>
+              <SwiperSlide className="card swiper-card bg-dark-solid">
+                <div className="d-flex flex-column gap-4 w-100">
+                  <div>
+                    <img
+                      className="mb-3"
+                      src="/press-logos/techstars.png"
+                      alt="Techstars Logo"
+                      height="34"
+                    />
                   </div>
+
+                  <p className="swiper-text">
+                    "Tool of the Week: AI voice generator | [FakeYou ...] is a
+                    window into the future [...]. Play with it with a number of
+                    celebrity voices, including Judi Dench, Neil DeGrasse Tyson,
+                    and Bill Gates."
+                    <br />
+                    <br />— <b>Techstars</b>
+                  </p>
                 </div>
-              </div>
-            </div>
-
-            <div className="column is-one-third">
-              <div className="card">
-                <div className="card-content">
-                  <div className="content">
-                    <p>
-                      <FontAwesomeIcon icon={faQuoteLeft} />&nbsp;
-                      無料でビル・ゲイツやアーノルド・シュワルツネッガーなど有名人に好きな台詞をしゃべらせることができる「Vocodes」レビュー</p>
-                    <p>
-                      ("Vocodes" [now FakeYou] allows users to use celebrities such as Bill Gates and 
-                      Arnold Schwarzenegger to speak their favorite lines for free.)</p>
-
-                    <p>Gigazine</p>
-
-                    <figure className="image is-64x64 is-inline-block">
-                      <img src="/press-logos/gigazine_g.jpg" className="is-rounded" alt="logo" />
-                    </figure>
-
+              </SwiperSlide>
+              <SwiperSlide className="card swiper-card bg-dark-solid">
+                <div className="d-flex flex-column gap-4 w-100 align-items-start">
+                  <div>
+                    <img
+                      className="mb-2"
+                      src="/press-logos/gigazine.png"
+                      alt="Gigazine Logo"
+                      height="40"
+                    />
                   </div>
+
+                  <p className="swiper-text">
+                    "無料でビル・ゲイツやアーノルド・シュワルツネッガーなど有名人に好きな台詞をしゃべらせることができる「Vocodes」レビュー"
+                    <br />
+                    <br />
+                    ("Vocodes" [now FakeYou] allows users to use celebrities
+                    such as Bill Gates and Arnold Schwarzenegger to speak their
+                    favorite lines for free.)
+                    <br />
+                    <br />— <b>Gigazine</b>
+                  </p>
                 </div>
-              </div>
-            </div>
-
-            <div className="column is-one-third">
-              <div className="card">
-                <div className="card-content">
-                  <div className="content">
-                    <p>
-                      <FontAwesomeIcon icon={faQuoteLeft} />&nbsp;
-								      Have you ever wanted David Attenborough to narrate your audiobook? 
-									    Judi Dench to read your shopping list? Gilbert Gottfried to... well... some things are better left unsaid.
-                    </p>
-
-                    <p>Shots</p>
-
-                    <figure className="image is-64x64 is-inline-block">
-                      <img src="/press-logos/shots.png" className="is-rounded" alt="logo" />
-                    </figure>
+              </SwiperSlide>
+              <SwiperSlide className="card swiper-card bg-dark-solid">
+                <div className="d-flex flex-column gap-4 w-100">
+                  <div>
+                    <img
+                      className="mb-2"
+                      src="/press-logos/shots.png"
+                      alt="Shots Logo"
+                      height="60"
+                    />
                   </div>
-                </div>
-              </div>
-            </div>
 
+                  <p className="swiper-text">
+                    "Have you ever wanted David Attenborough to narrate your
+                    audiobook? Judi Dench to read your shopping list? Gilbert
+                    Gottfried to... well... some things are better left unsaid."
+                    <br />
+                    <br />— <b>Shots</b>
+                  </p>
+                </div>
+              </SwiperSlide>
+              <SwiperSlide className="card swiper-card bg-dark-solid">
+                <div className="d-flex flex-column gap-4 w-100">
+                  <div>
+                    <img
+                      className="mb-2"
+                      src="/press-logos/larepublica.png"
+                      alt="La Republica Logo"
+                      height="34"
+                    />
+                  </div>
+
+                  <p className="swiper-text">
+                    "Un truco secreto de WhatsApp se acaba de volver tendencia
+                    en las redes sociales, sobre todo entre los fanáticos de
+                    Dragon Ball Super, debido a que permite que los usuarios
+                    puedan enviar audios con la voz de Gokú"
+                    <br />
+                    <br />
+                    (A secret WhatsApp trick has just become a trend on social
+                    networks , especially among Dragon Ball Super fans , because
+                    it allows users to send audios with the voice of Goku"
+                    <br />
+                    <br />— <b>La República</b>
+                  </p>
+                </div>
+              </SwiperSlide>
+              <SwiperSlide className="card swiper-card bg-dark-solid">
+                <div className="d-flex flex-column gap-4 w-100">
+                  <div>
+                    <img
+                      className="mb-2"
+                      src="/press-logos/tnw.png"
+                      alt="TNW Logo"
+                      height="40"
+                    />
+                  </div>
+
+                  <p className="swiper-text">
+                    We’ve previously seen apps like this, but Vocodes [now
+                    FakeYou] impresses with the sheer volume of voices available
+                    to test out.
+                    <br />
+                    <br />— <b>TheNextWeb</b>
+                  </p>
+                </div>
+              </SwiperSlide>
+              <SwiperSlide className="card swiper-card bg-dark-solid">
+                <div className="d-flex flex-column gap-4 w-100">
+                  <p className="swiper-text">
+                    "[Digital artist Glenn Marshall's recent project employs] a
+                    classic 19th-century poem as AI-imaging fuel alongside an
+                    uncanny narration from an artificial Christopher Lee. To
+                    make "In the Bleak Midwinter" even more, uh, bleak, Marshall
+                    then employed software called vo.codes [now FakeYou] to
+                    approximate a poetic narration in the voice of the late Sir
+                    Christopher Lee. [...] to be honest with you, we initially
+                    thought Marshall simply dubbed an old audio recording of Lee
+                    actually reading the poem, that's how convincing the result
+                    is."
+                    <br />
+                    <br />— <b>Input</b>
+                  </p>
+                </div>
+              </SwiperSlide>
+            </Swiper>
           </div>
-
-          <div className="columns is-vcentered has-text-centered">
-
-            <div className="column is-one-third">
-              <div className="card">
-                <div className="card-content">
-                  <div className="content">
-                    <p>
-                      <FontAwesomeIcon icon={faQuoteLeft} />&nbsp;
-                      Un truco secreto de WhatsApp se acaba de volver tendencia en las redes sociales, 
-                      sobre todo entre los fanáticos de Dragon Ball Super, debido a que permite que los 
-                      usuarios puedan enviar audios con la voz de Gokú, 
-                    </p>
-                    <p>(A secret WhatsApp trick has just become a trend on social networks , especially 
-                      among Dragon Ball Super fans , because it allows users to send audios with the 
-                      voice of Goku</p>
-
-                    <p>La República</p>
-
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div className="column is-one-third">
-              <div className="card">
-                <div className="card-content">
-                  <div className="content">
-                    <p>
-                      <FontAwesomeIcon icon={faQuoteLeft} />&nbsp;
-                      We’ve previously seen apps like this, but Vocodes [now FakeYou] impresses with the sheer 
-                      volume of voices available to test out.
-                    </p>
-                    <p>TheNextWeb</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div className="column is-one-third">
-              <div className="card">
-                <div className="card-content">
-                  <div className="content">
-                    <p>
-                      <FontAwesomeIcon icon={faQuoteLeft} />&nbsp;
-                      [Digital artist Glenn Marshall's recent project employs]
-                      a classic 19th-century 
-                      poem as AI-imaging fuel alongside an uncanny narration from an artificial Christopher Lee.
-                      To make "In the Bleak Midwinter" even more, uh, bleak, Marshall then employed software called 
-                      vo.codes [now FakeYou] to approximate a poetic narration in the voice of the late Sir Christopher Lee. 
-                      [...] to be honest with you, we initially thought Marshall simply dubbed an old audio recording of 
-                      Lee actually reading the poem, that's how convincing the result is.</p>
-
-                    <p>Input</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-          </div>
-
         </div>
-      </section>
-
-      <section className="section is-small">
-        <h1 className="title is-4">We're hiring!</h1>
-        <h2 className="subtitle is-6">
-          Fun and challenging tech. World-changing mission.
-        </h2>
-        <p>
-          We already have incredible traction, but there's 
-          no better time to help us make an impact.
-        </p>
-        <br />
-        <Link
-          className="button is-fullwidth is-large is-info"
-          to="/jobs"
-          >
-          Learn More and Apply 
-        </Link>
-      </section>
-
-    </div>
+      </div>
+    </>
   );
 }
 

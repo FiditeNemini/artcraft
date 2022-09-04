@@ -1,12 +1,20 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { v4 as uuidv4 } from 'uuid';
-import { GenerateTtsAudio, GenerateTtsAudioRequest, GenerateTtsAudioIsError, GenerateTtsAudioIsOk } from '@storyteller/components/src/api/tts/GenerateTtsAudio';
+import React, { useCallback, useEffect, useRef, useState } from "react";
+import { v4 as uuidv4 } from "uuid";
+import {
+  GenerateTtsAudio,
+  GenerateTtsAudioRequest,
+  GenerateTtsAudioIsError,
+  GenerateTtsAudioIsOk,
+} from "@storyteller/components/src/api/tts/GenerateTtsAudio";
 import { jobStateCanChange } from "@storyteller/components/src/jobs/JobStates";
-import { TtsInferenceJob, TtsInferenceJobStateResponsePayload } from "@storyteller/components/src/jobs/TtsInferenceJobs";
-import { ApiConfig } from '@storyteller/components';
-import { TtsResultsList } from './TtsResultsList'
+import {
+  TtsInferenceJob,
+  TtsInferenceJobStateResponsePayload,
+} from "@storyteller/components/src/jobs/TtsInferenceJobs";
+import { ApiConfig } from "@storyteller/components";
+import { TtsResultsList } from "./TtsResultsList";
 
-const DEFAULT_MODEL_TOKEN = "TM:7wbtjphx8h8v"; 
+const DEFAULT_MODEL_TOKEN = "TM:7wbtjphx8h8v";
 
 // We're only going to allow a limited selection of voices.
 const DEMO_VOICES_TOKEN_TO_NAME = new Map<string, string>([
@@ -19,12 +27,12 @@ const DEMO_VOICES_TOKEN_TO_NAME = new Map<string, string>([
   ["TM:7ryawppwcnkv", "Stan Lee"],
 ]);
 
-interface Props {
-}
+interface Props {}
 
 function TtsComponent(props: Props) {
-  const [selectedModelToken, setSelectedModelToken] = useState(DEFAULT_MODEL_TOKEN);
-  const [inferenceText, setInferenceText] = useState('');
+  const [selectedModelToken, setSelectedModelToken] =
+    useState(DEFAULT_MODEL_TOKEN);
+  const [inferenceText, setInferenceText] = useState("");
   //const [maybeTtsError, setMaybeTtsError] = useState<GenerateTtsAudioErrorType|undefined>(undefined);
   const [jobs, setJobs] = useState<TtsInferenceJob[]>([]);
 
@@ -33,52 +41,56 @@ function TtsComponent(props: Props) {
   const enqueueTtsJob = (jobToken: string) => {
     const newJob = new TtsInferenceJob(jobToken);
     const newJobs = ttsInferenceJobs.current.concat([newJob]);
-    console.log('new jobs', newJobs);
+    console.log("new jobs", newJobs);
     //setTtsInferenceJobs(newJobs);
     ttsInferenceJobs.current = newJobs;
-  }
+  };
 
   const checkTtsJob = (jobToken: string) => {
     const endpointUrl = new ApiConfig().getTtsInferenceJobState(jobToken);
 
     fetch(endpointUrl, {
-      method: 'GET',
-      credentials: 'include',
+      method: "GET",
+      credentials: "include",
       headers: {
-        'Accept': 'application/json',
+        Accept: "application/json",
       },
     })
-    .then(res => res.json())
-    .then(response => {
-      const jobResponse : TtsInferenceJobStateResponsePayload = response;
+      .then((res) => res.json())
+      .then((response) => {
+        const jobResponse: TtsInferenceJobStateResponsePayload = response;
 
-      if (jobResponse === undefined || jobResponse.state === undefined) {
-        return;
-      }
-
-      let updatedJobs : Array<TtsInferenceJob> = [];
-
-      ttsInferenceJobs.current.forEach(existingJob => {
-        if (existingJob.jobToken !== jobResponse.state!.job_token ||
-            !jobStateCanChange(existingJob.jobState)) {
-          updatedJobs.push(existingJob);
+        if (jobResponse === undefined || jobResponse.state === undefined) {
           return;
         }
 
-        let updatedJob = TtsInferenceJob.fromResponse(jobResponse.state!);
-        updatedJobs.push(updatedJob);
+        let updatedJobs: Array<TtsInferenceJob> = [];
+
+        ttsInferenceJobs.current.forEach((existingJob) => {
+          if (
+            existingJob.jobToken !== jobResponse.state!.job_token ||
+            !jobStateCanChange(existingJob.jobState)
+          ) {
+            updatedJobs.push(existingJob);
+            return;
+          }
+
+          let updatedJob = TtsInferenceJob.fromResponse(jobResponse.state!);
+          updatedJobs.push(updatedJob);
+        });
+
+        ttsInferenceJobs.current = updatedJobs;
+        //setTtsInferenceJobs(updatedJobs);
+        setJobs(updatedJobs);
+      })
+      .catch((e) => {
+        /* Ignore. */
       });
- 
-      ttsInferenceJobs.current = updatedJobs;
-      //setTtsInferenceJobs(updatedJobs);
-      setJobs(updatedJobs);
-    })
-    .catch(e => { /* Ignore. */ });
-  }
+  };
 
   const pollJobs = useCallback(() => {
-    console.log('pollJob')
-    ttsInferenceJobs.current.forEach(job => {
+    console.log("pollJob");
+    ttsInferenceJobs.current.forEach((job) => {
       if (jobStateCanChange(job.jobState)) {
         checkTtsJob(job.jobToken);
       }
@@ -86,11 +98,13 @@ function TtsComponent(props: Props) {
   }, []);
 
   useEffect(() => {
-    console.log('useEffect')
-    setInterval(() => { pollJobs() }, 2000);
-  }, [pollJobs])
+    console.log("useEffect");
+    setInterval(() => {
+      pollJobs();
+    }, 2000);
+  }, [pollJobs]);
 
-  const handleChangeText = (ev: React.FormEvent<HTMLTextAreaElement>) => { 
+  const handleChangeText = (ev: React.FormEvent<HTMLTextAreaElement>) => {
     const textValue = (ev.target as HTMLTextAreaElement).value;
     setInferenceText(textValue);
   };
@@ -100,7 +114,7 @@ function TtsComponent(props: Props) {
     setSelectedModelToken(token);
   };
 
-  const handleFormSubmit = async (ev: React.FormEvent<HTMLFormElement>) => { 
+  const handleFormSubmit = async (ev: React.FormEvent<HTMLFormElement>) => {
     ev.preventDefault();
 
     if (!selectedModelToken) {
@@ -111,14 +125,14 @@ function TtsComponent(props: Props) {
       return false;
     }
 
-    const request : GenerateTtsAudioRequest = {
+    const request: GenerateTtsAudioRequest = {
       uuid_idempotency_token: uuidv4(),
       tts_model_token: selectedModelToken,
       inference_text: inferenceText,
       is_storyteller_demo: true, // TODO(2022-03): Temporary.
-    }
+    };
 
-    const response = await GenerateTtsAudio(request)
+    const response = await GenerateTtsAudio(request);
 
     if (GenerateTtsAudioIsOk(response)) {
       //setMaybeTtsError(undefined);
@@ -130,57 +144,60 @@ function TtsComponent(props: Props) {
     return false;
   };
 
-  let voiceOptions : any = [];
+  let voiceOptions: any = [];
   DEMO_VOICES_TOKEN_TO_NAME.forEach((name, token) => {
-    voiceOptions.push(<option key={token} value={token}>{name}</option>)
-  })
+    voiceOptions.push(
+      <option key={token} value={token}>
+        {name}
+      </option>
+    );
+  });
 
   return (
-    <>
-      <form onSubmit={handleFormSubmit} className="main-form">
+    <div className="d-flex justify-content-center pb-5">
+      <div className="card bg-dark-solid tts-demo w-100 mb-5">
+        <form onSubmit={handleFormSubmit} className="w-100">
+          <div className="d-flex flex-column gap-3">
+            <div className="field">
+              <div className="control">
+                <div className="select">
+                  <select className="form-select" onChange={handleVoiceChange}>
+                    {voiceOptions}
+                  </select>
+                </div>
+              </div>
+            </div>
 
-        <div className="field">
-          <div className="control">
-            <div className="select is-fullwidth">
-              <select
-                onChange={handleVoiceChange}
-                >
-                {voiceOptions}
-              </select>
+            <div className="field">
+              <div className="control">
+                <textarea
+                  onChange={handleChangeText}
+                  className="form-control"
+                  value={inferenceText}
+                  placeholder="Type something fun..."
+                  rows={4}
+                ></textarea>
+              </div>
+            </div>
+
+            <div className="d-flex justify-content-center gap-3">
+              <button className="btn btn-primary w-100" disabled={false}>
+                Generate
+              </button>
+              <button
+                className="btn btn-secondary w-100"
+                onClick={() => setInferenceText("")}
+              >
+                Clear
+              </button>
             </div>
           </div>
-        </div>
+        </form>
 
-        <div className="field">
-          <div className="control">
-            <textarea 
-              onChange={handleChangeText}
-              className="textarea is-normal" 
-              value={inferenceText}
-              placeholder="Type something fun..."></textarea>
-          </div>
-        </div>
-
-        <div className="button-group">
-          <div className="columns is-mobile">
-            <div className="column has-text-centered">
-              <button 
-                className="button is-info is-large" 
-                disabled={false}>Generate</button>
-            </div>
-            <div className="column has-text-centered">
-              <button 
-                className="button is-info is-light is-large" 
-                onClick={() => setInferenceText('')}>Clear</button>
-            </div>
-          </div>
-        </div>
-
-      </form>
-
-      <TtsResultsList ttsInferenceJobs={jobs} />
-    </>
-  )
+        <TtsResultsList ttsInferenceJobs={jobs} />
+      </div>
+    </div>
+  );
 }
 
-export { TtsComponent }
+export { TtsComponent };

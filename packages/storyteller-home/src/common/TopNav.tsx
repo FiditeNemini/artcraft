@@ -1,97 +1,177 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { useLocomotiveScroll } from "react-locomotive-scroll";
+import React, { useState, useEffect } from "react";
 
-interface Props {
-}
+interface Props {}
 
 function TopNav(props: Props) {
+  const { scroll } = useLocomotiveScroll();
+  const [isScrolling, setIsScrolling] = useState(false);
+  const [showTopBtn, setTopBtn] = useState(false);
 
-  const [mobileHamburgerIsActive, setMobileHamburgerIsActive] = useState<boolean>(false);
+  if (!!scroll) {
+    scroll.on(
+      "scroll",
+      (position: { scroll: { y: number } }, direction: string) => {
+        if (position.scroll.y > 50) {
+          // console.log(">> scroll > 50");
+          if (!isScrolling) {
+            setIsScrolling(true);
+          }
+        } else {
+          // console.log(">> scroll < 50 ");
+          if (isScrolling) {
+            setIsScrolling(false);
+          }
+        }
 
-  const toggleHamburger = () => { 
-    setMobileHamburgerIsActive(!mobileHamburgerIsActive);
+        if (position.scroll.y > 400) {
+          // console.log(">> scroll > 50");
+          if (!showTopBtn) {
+            setTopBtn(true);
+          }
+        } else {
+          // console.log(">> scroll < 50 ");
+          if (showTopBtn) {
+            setTopBtn(false);
+          }
+        }
+      }
+    );
   }
 
-  const closeHamburger = () => { 
-    // TODO: This is an ergonomic hack. 
-    // The hamburger ideally should close whenever it is no longer active.
-    setMobileHamburgerIsActive(false);
-  }
+  const navClassNames = isScrolling
+    ? "container-fluid nav-scroll"
+    : "container-fluid";
 
-  const navbarClasses = mobileHamburgerIsActive ? "navbar-menu is-active" : "navbar-menu";
-  const navbarBurgerClasses = mobileHamburgerIsActive ? "navbar-burger is-active" : "navbar-burger";
+  const backToTop = showTopBtn
+    ? "btn-to-top nav-link show"
+    : "btn-to-top nav-link";
+
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  const menuToggle = () => {
+    setMobileMenuOpen(!mobileMenuOpen);
+  };
+
+  const hamburgerClassNames = mobileMenuOpen
+    ? "button_container active"
+    : "button_container";
+
+  const menuClassNames = mobileMenuOpen ? "overlay open" : "overlay";
+
+  useEffect(() => {
+    if (mobileMenuOpen) {
+      document.body.classList.add("lock-scroll");
+    } else {
+      document.body.classList.remove("lock-scroll");
+    }
+  }, [mobileMenuOpen]);
 
   return (
     <>
-      <nav className="navbar is-transparent padding-bottom-1em">
-        <div className="navbar-brand">
-          <Link className="navbar-item" to="/">
-            <img src="/storyteller-nav-logo-mascot-pink.png" alt="Storyteller: Stream tech" />
-          </Link>
-          <div className={navbarBurgerClasses} data-target="navbarExampleTransparentExample" onClick={() => toggleHamburger()}>
-            <span></span>
-            <span></span>
-            <span></span>
+      <nav id="navbar" className={navClassNames} data-scroll-section>
+        <div className="d-none d-lg-flex flex-wrap align-items-center justify-content-center justify-content-md-between mt-3 topnav">
+          <a
+            href="/"
+            className="d-flex align-items-center col-md-3 mb-2 mb-md-0 text-dark text-decoration-none"
+          >
+            <img
+              id="logo"
+              src="/logo/Storyteller-Logo.png"
+              alt="Storyteller Logo"
+              height="36"
+              className="mb-2"
+            />
+          </a>
+
+          <ul className="nav col-12 col-md-auto mb-2 justify-content-center mb-md-0">
+            <li>
+              <a href="#root" className="nav-link active" data-scroll-to>
+                Home
+              </a>
+            </li>
+            <li>
+              <a href="#about" className="nav-link" data-scroll-to>
+                About
+              </a>
+            </li>
+            <li>
+              <a href="#products" className="nav-link" data-scroll-to>
+                What We Do
+              </a>
+            </li>
+            <li>
+              <a href="#mentions" className="nav-link" data-scroll-to>
+                Mentions
+              </a>
+            </li>
+          </ul>
+
+          <div className="col-md-3 text-end">
+            <a className="btn btn-primary fs-6" href="#about" data-scroll-to>
+              Contact
+            </a>
           </div>
         </div>
 
-        <div id="navbarExampleTransparentExample" className={navbarClasses}>
-          <div className="navbar-start">
-
-            <Link to="/"
-              className="navbar-item"
-              onClick={() => closeHamburger()}
-              >Foo</Link>
-
-            <Link to="/"
-              className="navbar-item"
-              onClick={() => closeHamburger()}
-              >Bar</Link>
-
-            {/* 
-            <div className="navbar-item has-dropdown is-hoverable">
-              <Link to="/"
-                className="navbar-link"
-                onClick={() => closeHamburger()}
-                >Community</Link>
-
-              <div className="navbar-dropdown is-boxed">
-                {/* NB: There's an "is-active" class that looks nice. * /}
-
-                <Link to="/contribute"
-                  className="navbar-item"
-                  onClick={() => closeHamburger()}
-                  ><FontAwesomeIcon icon={faUpload} />&nbsp;&nbsp;Contribute / Upload</Link>
-
-              </div>
-            </div>
-            */}
-          </div>
-
-
-          <div className="navbar-end">
-            <div className="navbar-item">
-              <div className="field is-grouped">
-                <p className="control">
-                </p>
-              </div>
-            </div>
-          </div>
-          {/*<div className="navbar-end">
-            <div className="navbar-item">
-              <div className="field is-grouped">
-                <p className="control">
-                  TODO
-                </p>
-              </div>
-            </div>
-          </div>*/}
+        <div className="d-flex d-lg-none justify-content-between pt-2">
+          <a
+            href="/"
+            className="d-flex align-items-center text-dark text-decoration-none"
+          >
+            <img
+              id="logo"
+              src="/logo/Storyteller-Logo.png"
+              alt="Storyteller Logo"
+              height="36"
+              className="mb-2"
+            />
+          </a>
+          <button
+            onClick={menuToggle}
+            className={hamburgerClassNames}
+            id="toggle"
+            aria-controls="primary-menu"
+            aria-expanded="false"
+          >
+            <span className="top"></span>
+            <span className="middle"></span>
+            <span className="bottom"></span>
+          </button>
         </div>
       </nav>
+      <div className={menuClassNames}>
+        <div className="overlay-menu">
+          <ul>
+            <li className="nav-link active">
+              <a onClick={menuToggle} href="#root" data-scroll-to>
+                Home
+              </a>
+            </li>
+            <li>
+              <a onClick={menuToggle} href="#about" data-scroll-to>
+                About
+              </a>
+            </li>
+            <li>
+              <a onClick={menuToggle} href="#products" data-scroll-to>
+                What We Do
+              </a>
+            </li>
+            <li>
+              <a onClick={menuToggle} href="#mentions" data-scroll-to>
+                Mentions
+              </a>
+            </li>
+          </ul>
+        </div>
+      </div>
+      <a href="#home" className={backToTop} data-scroll-to>
+        <div className="btt-shape"></div>
+        Back to Top
+      </a>
     </>
-  )
-
-
+  );
 }
 
-export { TopNav }
+export { TopNav };

@@ -1,14 +1,13 @@
-import React, { useRef, useState } from 'react';
-import { Howl } from 'howler';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faPause, faPlay } from '@fortawesome/free-solid-svg-icons';
+import React, { useRef, useState } from "react";
+import { Howl } from "howler";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faPause, faPlay } from "@fortawesome/free-solid-svg-icons";
 
 interface Props {
-  sampleUrl: string,
+  sampleUrl: string;
 }
 
 function AudioSample(props: Props) {
-
   const [isPlaying, setIsPlaying] = useState(false);
 
   const howlPlayer = useRef(
@@ -16,9 +15,15 @@ function AudioSample(props: Props) {
       src: [props.sampleUrl],
       autoplay: false,
       loop: false,
-      onplay: function() { setIsPlaying(true) },
-      onpause: function() { setIsPlaying(false) },
-      onend: function() { setIsPlaying(false) },
+      onplay: function () {
+        setIsPlaying(true);
+      },
+      onpause: function () {
+        setIsPlaying(false);
+      },
+      onend: function () {
+        setIsPlaying(false);
+      },
     })
   );
 
@@ -31,17 +36,18 @@ function AudioSample(props: Props) {
       player.play();
       setIsPlaying(true);
     }
-  }
+  };
 
-  const playIcon = isPlaying ? 
-    <FontAwesomeIcon icon={faPause} /> :
-    <FontAwesomeIcon icon={faPlay} /> ;
+  const playIcon = isPlaying ? (
+    <FontAwesomeIcon className="fs-5" icon={faPause} />
+  ) : (
+    <FontAwesomeIcon className="fs-5" icon={faPlay} />
+  );
 
   return (
-    <button 
-      className="button is-info is-rounded is-outlined"
-      onClick={onClickToggle}
-      >{playIcon}</button>
+    <button className="btn btn-secondary mb-4 d-flex" onClick={onClickToggle}>
+      {playIcon}
+    </button>
   );
 }
 

@@ -12,6 +12,7 @@
     "start-fakeyou-w": "set PORT=7000 && lerna exec --scope @storyteller/fakeyou -- yarn start-w",
     "build-fakeyou": "lerna exec --scope @storyteller/fakeyou -- yarn build",
     "start-storyteller-home": "PORT=7008 BROWSER=none lerna exec --scope @storyteller/storyteller-home -- yarn start",
+    "start-storyteller-home-w": "set PORT=7008 && lerna exec --scope @storyteller/storyteller-home -- yarn start-w",
     "build-storyteller-home": "lerna exec --scope @storyteller/storyteller-home -- yarn build",
     "start-storyteller-obs": "PORT=7007 BROWSER=none lerna exec --scope @storyteller/storyteller-obs -- yarn start",
     "build-storyteller-obs": "lerna exec --scope @storyteller/storyteller-obs -- yarn build",

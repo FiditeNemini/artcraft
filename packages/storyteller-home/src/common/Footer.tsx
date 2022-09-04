@@ -1,24 +1,50 @@
-import React from 'react';
-import { GitSha } from '@storyteller/components/src/elements/GitSha';
+import React from "react";
+import { GitSha } from "@storyteller/components/src/elements/GitSha";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+  faDiscord,
+  faFacebook,
+  faTwitch,
+  faTwitter,
+} from "@fortawesome/free-brands-svg-icons";
 
-interface Props {
-}
+interface Props {}
 
 function Footer(props: Props) {
   return (
     <>
-      <footer className="footer">
-        <div className="content has-text-centered">
-          <p>
-            Copyright &copy; 2020 &mdash; 2022 Learning Machines, Inc. (makers of FakeYou and Storyteller)
-          </p>
-          <p>
+      <footer data-scroll-section>
+        <div className="bg-dark-solid">
+          <div className="container footer-top text-center">
+            <div className="d-flex gap-4 justify-content-center p-4">
+              <a href="https://google.com" className="footer-social-icon">
+                <FontAwesomeIcon icon={faDiscord} />
+              </a>
+              <a href="https://google.com" className="footer-social-icon">
+                <FontAwesomeIcon icon={faTwitch} />
+              </a>
+              <a href="https://google.com" className="footer-social-icon">
+                <FontAwesomeIcon icon={faFacebook} />
+              </a>
+              <a href="https://google.com" className="footer-social-icon">
+                <FontAwesomeIcon icon={faTwitter} />
+              </a>
+            </div>
+          </div>
+        </div>
+        <div className="footer-bottom">
+          <div className="container d-flex flex-column flex-md-row text-center text-md-start gap-3">
+            <div className="flex-grow-1">
+              Copyright &copy; 2020 &mdash; 2022 Learning Machines, Inc. (makers
+              of FakeYou and Storyteller)
+            </div>
+
             <GitSha />
-          </p>
+          </div>
         </div>
       </footer>
     </>
-  )
+  );
 }
 
-export { Footer }
+export { Footer };
