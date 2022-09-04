@@ -937,15 +937,16 @@ $font: montserrat, sans-serif;
   margin-top: 4.5rem;
 
   .swiper-card {
-    margin-bottom: 7rem;
+    margin-bottom: 4.5rem;
     transition: 0.3s;
     height: auto;
-    padding: 50px;
+    padding: 40px 40px;
   }
 
   .swiper-text {
     font-size: 16px;
     font-weight: 400;
+    margin-bottom: 0;
   }
 
   .press-logo {
@@ -969,8 +970,12 @@ $font: montserrat, sans-serif;
     --swiper-pagination-bullet-height,
     var(--swiper-pagination-bullet-size, 12px)
   ) !important;
-  background: var(--swiper-pagination-bullet-inactive-color, #fff);
-  opacity: var(--swiper-pagination-bullet-inactive-opacity, 0.2);
+  background: rgba($white, 0.6) !important;
+}
+
+span.swiper-pagination-bullet.swiper-pagination-bullet-active {
+  background-color: $primary !important;
+  opacity: 1;
 }
 
 :root {
@@ -1081,5 +1086,13 @@ $font: montserrat, sans-serif;
 
   .btn {
     display: flex;
+  }
+
+  .swiper {
+    margin-top: 2rem;
+
+    .swiper-card {
+      padding: 2rem;
+    }
   }
 }

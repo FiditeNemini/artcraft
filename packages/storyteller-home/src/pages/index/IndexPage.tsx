@@ -265,13 +265,13 @@ function IndexPage() {
                 >
                   <div className="shape-7"></div>
                 </div>
-                <div className="col-12 col-lg-3">
+                <div className="col-12 col-md-6 col-lg-3">
                   <p className="fw-normal card bg-dark-solid pt-5 about-card">
                     <FontAwesomeIcon icon={faMusic} className="about-icon" />
                     Music generation - vocals, instrumentals, and more
                   </p>
                 </div>
-                <div className="col-12 col-lg-3">
+                <div className="col-12 col-md-6 col-lg-3">
                   <p className="fw-normal card bg-dark-solid pt-5 about-card">
                     <FontAwesomeIcon
                       icon={faMicrophoneLines}
@@ -280,7 +280,7 @@ function IndexPage() {
                     Audio dubbing and transformation
                   </p>
                 </div>
-                <div className="col-12 col-lg-3">
+                <div className="col-12 col-md-6 col-lg-3">
                   <p className="fw-normal card bg-dark-solid pt-5 about-card">
                     <FontAwesomeIcon
                       icon={faPersonWalkingArrowRight}
@@ -289,20 +289,20 @@ function IndexPage() {
                     Real time animation
                   </p>
                 </div>
-                <div className="col-12 col-lg-3">
+                <div className="col-12 col-md-6 col-lg-3">
                   <p className="fw-normal card bg-dark-solid pt-5 about-card">
                     <FontAwesomeIcon icon={faFilm} className="about-icon" />
                     Real time Hollywood VFX without going to set
                   </p>
                 </div>
-                <div className="col-12 col-lg-3">
+                <div className="col-12 col-md-6 col-lg-3">
                   <p className="fw-normal card bg-dark-solid pt-5 about-card">
                     <FontAwesomeIcon icon={faBookOpen} className="about-icon" />
                     World building, character arc development, narrative
                     creation
                   </p>
                 </div>
-                <div className="col-12 col-lg-3">
+                <div className="col-12 col-md-6 col-lg-3">
                   <p className="fw-normal card bg-dark-solid pt-5 about-card">
                     <FontAwesomeIcon
                       icon={faPaintbrush}
@@ -311,13 +311,13 @@ function IndexPage() {
                     Concept art generation
                   </p>
                 </div>
-                <div className="col-12 col-lg-3">
+                <div className="col-12 col-md-6 col-lg-3">
                   <p className="fw-normal card bg-dark-solid pt-5 about-card">
                     <FontAwesomeIcon icon={faDrum} className="about-icon" />
                     BG music generator, automatic foley
                   </p>
                 </div>
-                <div className="col-12 col-lg-3">
+                <div className="col-12 col-md-6 col-lg-3">
                   <p className="fw-normal card bg-dark-solid pt-5 about-card">
                     <FontAwesomeIcon
                       icon={faClapperboard}
@@ -364,9 +364,9 @@ function IndexPage() {
               </div>
               <div className="col-lg-7 d-flex flex-column justify-content-center">
                 <h1 className="fw-bold display-5">Voice Changing</h1>
-                <p className="fw-normal fs-5 opacity-75">
+                <h6 className="fw-semibold fs-5 opacity-75 mb-4">
                   Now you can sound like someone else
-                </p>
+                </h6>
                 <p className="mt-3">
                   Use offline (studio quality) or real time voice changing to
                   re-dub your film or give your live performers a new character.
@@ -464,9 +464,9 @@ function IndexPage() {
               </div>
               <div className="col-lg-7 d-flex flex-column justify-content-center">
                 <h1 className="fw-bold display-5">FakeYou</h1>
-                <p className="fw-normal fs-5 opacity-75">
+                <h6 className="fw-semibold fs-5 opacity-75 mb-4">
                   Used by millions of people every month
-                </p>
+                </h6>
                 <p className="mt-3">
                   We've built a social platform for deep learning and generative
                   models. FakeYou is a place where creators can upload and
@@ -540,9 +540,9 @@ function IndexPage() {
               </div>
               <div className="col-lg-7 d-flex flex-column justify-content-center">
                 <h1 className="fw-bold display-5">Storyteller Stream</h1>
-                <p className="fw-normal fs-5 opacity-75">
+                <h6 className="fw-semibold fs-5 opacity-75 mb-4">
                   Twitch Streamers and Creators can engage and monetize
-                </p>
+                </h6>
                 <p className="mt-3">
                   It’s tough to build an audience on Twitch. It's even tougher
                   to earn an income. We've built the most comprehensive and
@@ -580,9 +580,9 @@ function IndexPage() {
               </div>
               <div className="col-lg-7 d-flex flex-column justify-content-center">
                 <h1 className="fw-bold display-5">Storyteller Engine</h1>
-                <p className="fw-normal fs-5 opacity-75">
+                <h6 className="fw-semibold fs-5 opacity-75 mb-4">
                   A fully 3D virtual set for your stream or film
-                </p>
+                </h6>
                 <p className="mt-3">
                   Our community contributes sets, character models, props,
                   events, and more. Use motion or volumetric capture. Your
@@ -713,10 +713,10 @@ function IndexPage() {
               </div>
               <div className="col-lg-7 d-flex flex-column justify-content-center">
                 <h1 className="fw-bold display-5">Storyteller VoxelCam</h1>
-                <p className="fw-normal fs-5 opacity-75">
+                <h6 className="fw-semibold fs-5 opacity-75 mb-4">
                   Volumetric capture for your stream, and soon for your film
                   set.
-                </p>
+                </h6>
                 <p className="mt-3">
                   Webcams are boring and flat. You can use our volumetric camera
                   in-stream to make your personality come to life. This system
@@ -747,8 +747,8 @@ function IndexPage() {
 
             <h2 className="text-center mt-5 pt-5 fw-bold">Screenshots</h2>
 
-            <div className="row gx-4 my-5">
-              <div className="col-12 col-lg-4">
+            <div className="row gx-4 gy-4 my-5 text-center">
+              <div className="col-12 col-sm-4">
                 <div>
                   <img
                     className="img-fluid img-border img-hover"
@@ -758,7 +758,7 @@ function IndexPage() {
                 </div>
               </div>
 
-              <div className="col-12 col-lg-4">
+              <div className="col-12 col-sm-4">
                 <img
                   className="img-fluid img-border"
                   src="/screenshots/engine-zelda-monsters.png"
@@ -766,7 +766,7 @@ function IndexPage() {
                 />
               </div>
 
-              <div className="col-12 col-lg-4">
+              <div className="col-12 col-sm-4">
                 <img
                   className="img-fluid img-border"
                   src="/screenshots/engine-point-cloud.png"
@@ -800,10 +800,28 @@ function IndexPage() {
                 delay: 5000,
                 disableOnInteraction: false,
               }}
-              slidesPerView={2.5}
+              slidesPerView={1.1}
               centeredSlides={true}
               spaceBetween={50}
               grabCursor={true}
+              breakpoints={{
+                640: {
+                  slidesPerView: 1.5,
+                  spaceBetween: 10,
+                },
+                768: {
+                  slidesPerView: 2,
+                  spaceBetween: 40,
+                },
+                1024: {
+                  slidesPerView: 2.5,
+                  spaceBetween: 40,
+                },
+                1600: {
+                  slidesPerView: 4,
+                  spaceBetween: 50,
+                },
+              }}
               pagination={{
                 clickable: true,
               }}
@@ -813,9 +831,10 @@ function IndexPage() {
                 <div className="d-flex flex-column gap-4 w-100">
                   <div>
                     <img
-                      className="press-logo mb-3"
+                      className="mb-3"
                       src="/press-logos/techstars.png"
                       alt="Techstars Logo"
+                      height="34"
                     />
                   </div>
 
@@ -833,9 +852,10 @@ function IndexPage() {
                 <div className="d-flex flex-column gap-4 w-100 align-items-start">
                   <div>
                     <img
-                      className="press-logo mb-2"
+                      className="mb-2"
                       src="/press-logos/gigazine.png"
                       alt="Gigazine Logo"
+                      height="40"
                     />
                   </div>
 
@@ -855,9 +875,10 @@ function IndexPage() {
                 <div className="d-flex flex-column gap-4 w-100">
                   <div>
                     <img
-                      className="press-logo mb-2"
+                      className="mb-2"
                       src="/press-logos/shots.png"
                       alt="Shots Logo"
+                      height="60"
                     />
                   </div>
 
@@ -874,9 +895,10 @@ function IndexPage() {
                 <div className="d-flex flex-column gap-4 w-100">
                   <div>
                     <img
-                      className="press-logo mb-2"
+                      className="mb-2"
                       src="/press-logos/larepublica.png"
-                      alt="Shots Logo"
+                      alt="La Republica Logo"
+                      height="34"
                     />
                   </div>
 
@@ -899,9 +921,10 @@ function IndexPage() {
                 <div className="d-flex flex-column gap-4 w-100">
                   <div>
                     <img
-                      className="press-logo mb-3"
+                      className="mb-2"
                       src="/press-logos/tnw.png"
-                      alt="TNW Logo Logo"
+                      alt="TNW Logo"
+                      height="40"
                     />
                   </div>
 

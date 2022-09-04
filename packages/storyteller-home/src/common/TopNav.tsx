@@ -70,7 +70,7 @@ function TopNav(props: Props) {
   return (
     <>
       <nav id="navbar" className={navClassNames} data-scroll-section>
-        <div className="d-none d-md-flex flex-wrap align-items-center justify-content-center justify-content-md-between mt-3 topnav">
+        <div className="d-none d-lg-flex flex-wrap align-items-center justify-content-center justify-content-md-between mt-3 topnav">
           <a
             href="/"
             className="d-flex align-items-center col-md-3 mb-2 mb-md-0 text-dark text-decoration-none"
@@ -114,7 +114,7 @@ function TopNav(props: Props) {
           </div>
         </div>
 
-        <div className="d-flex d-md-none justify-content-between pt-2">
+        <div className="d-flex d-lg-none justify-content-between pt-2">
           <a
             href="/"
             className="d-flex align-items-center text-dark text-decoration-none"
@@ -156,6 +156,11 @@ function TopNav(props: Props) {
             <li>
               <a onClick={menuToggle} href="#products" data-scroll-to>
                 What We Do
+              </a>
+            </li>
+            <li>
+              <a onClick={menuToggle} href="#mentions" data-scroll-to>
+                Mentions
               </a>
             </li>
           </ul>
