@@ -92,6 +92,7 @@ use crate::http_server::endpoints::w2l::set_w2l_template_mod_approval::set_w2l_t
 use users_component::default_routes::add_suggested_api_v1_account_creation_and_session_routes;
 use users_component::endpoints::edit_profile_handler::edit_profile_handler;
 use users_component::endpoints::get_profile_handler::get_profile_handler;
+use crate::http_server::endpoints::stripe::stripe_create_checkout_session_handler::stripe_create_checkout_session_handler;
 
 pub fn add_routes<T, B> (app: App<T, B>) -> App<T, B>
   where
@@ -116,6 +117,7 @@ pub fn add_routes<T, B> (app: App<T, B>) -> App<T, B>
   app = add_twitch_routes(app); /* /twitch */ // TODO: MAYBE TEMPORARY
   app = add_investor_demo_routes(app); /* /demo_mode */ // TODO: DEFINITELY TEMPORARY
   app = add_flag_routes(app); /* /flag */
+  app = add_stripe_routes(app); /* /flag */
 
   // From components
   app = add_suggested_api_v1_account_creation_and_session_routes(app); // /create_account, /session, /login, /logout
@@ -729,6 +731,34 @@ fn add_flag_routes<T, B> (app: App<T, B>) -> App<T, B>
       )
   )
 }
+
+// ==================== STRIPE ROUTES ====================
+
+fn add_stripe_routes<T, B> (app: App<T, B>) -> App<T, B>
+  where
+      B: MessageBody,
+      T: ServiceFactory<
+        ServiceRequest,
+        Config = (),
+        Response = ServiceResponse<B>,
+        Error = Error,
+        InitError = (),
+      >,
+{
+  app.service(web::scope("/stripe")
+      .service(web::scope("/checkout")
+          .service(web::resource("/begin")
+              .route(web::get().to(stripe_create_checkout_session_handler))
+              .route(web::head().to(|| HttpResponse::Ok()))
+          )
+          //.service(web::resource("/webhook")
+          //    .route(web::get().to())
+          //    .route(web::head().to(|| HttpResponse::Ok()))
+          //)
+      )
+  )
+}
+
 
 // ==================== TWITCH ROUTES ====================
 
