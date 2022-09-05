@@ -2,6 +2,9 @@
 -- noinspection SqlNoDataSourceInspectionForFile
 -- noinspection SqlResolveForFile
 
+-- Kill pending jobs
+update tts_inference_jobs set status = 'dead' where status = 'pending';
+
 -- Total pending jobs
 select count(*)
 from tts_inference_jobs
