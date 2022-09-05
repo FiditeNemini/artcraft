@@ -92,7 +92,9 @@ use crate::http_server::endpoints::w2l::set_w2l_template_mod_approval::set_w2l_t
 use users_component::default_routes::add_suggested_api_v1_account_creation_and_session_routes;
 use users_component::endpoints::edit_profile_handler::edit_profile_handler;
 use users_component::endpoints::get_profile_handler::get_profile_handler;
+use crate::http_server::endpoints::stripe::stripe_checkout_success_handler::stripe_checkout_success_handler;
 use crate::http_server::endpoints::stripe::stripe_create_checkout_session_handler::stripe_create_checkout_session_handler;
+use crate::http_server::endpoints::stripe::stripe_webhook_handler::stripe_webhook_handler;
 
 pub fn add_routes<T, B> (app: App<T, B>) -> App<T, B>
   where
@@ -746,9 +748,17 @@ fn add_stripe_routes<T, B> (app: App<T, B>) -> App<T, B>
       >,
 {
   app.service(web::scope("/stripe")
+      .service(web::resource("/webhook")
+          .route(web::post().to(stripe_webhook_handler))
+          .route(web::head().to(|| HttpResponse::Ok()))
+      )
       .service(web::scope("/checkout")
           .service(web::resource("/begin")
               .route(web::get().to(stripe_create_checkout_session_handler))
+              .route(web::head().to(|| HttpResponse::Ok()))
+          )
+          .service(web::resource("/success")
+              .route(web::get().to(stripe_checkout_success_handler))
               .route(web::head().to(|| HttpResponse::Ok()))
           )
           //.service(web::resource("/webhook")
