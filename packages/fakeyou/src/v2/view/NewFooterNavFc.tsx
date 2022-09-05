@@ -15,6 +15,7 @@ import {
   faTwitter,
   faFacebook,
 } from "@fortawesome/free-brands-svg-icons";
+import { ThirdPartyLinks } from "@storyteller/components/src/constants/ThirdPartyLinks";
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -83,7 +84,7 @@ function NewFooterNavFc(props: Props) {
         <div className="d-flex justify-content-center gap-4">
           <a
             className="social-icon"
-            href="https://discord.gg/fakeyou"
+            href={ThirdPartyLinks.FAKEYOU_DISCORD}
             target="_blank"
             rel="noopener noreferrer"
             title="Join our Discord Server"
@@ -101,7 +102,7 @@ function NewFooterNavFc(props: Props) {
           </a>
           <a
             className="social-icon"
-            href="https://twitter.com/intent/follow?screen_name=FakeYouApp"
+            href={ThirdPartyLinks.FAKEYOU_TWITTER_WITH_FOLLOW_INTENT}
             target="_blank"
             rel="noopener noreferrer"
             title="Follow us on Twitter"
@@ -119,7 +120,7 @@ function NewFooterNavFc(props: Props) {
           </a>
           <a
             className="social-icon"
-            href="https://www.patreon.com/FakeYou"
+            href={ThirdPartyLinks.FAKEYOU_PATREON}
             target="_blank"
             rel="noopener noreferrer"
             title="Support us by becoming a patreon"

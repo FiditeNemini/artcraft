@@ -2,6 +2,7 @@ import React from "react";
 import { faTwitter } from "@fortawesome/free-brands-svg-icons";
 import { IconProp } from "@fortawesome/fontawesome-svg-core";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { ThirdPartyLinks } from "../constants/ThirdPartyLinks";
 
 interface Props {
   hideIcon?: boolean;
@@ -35,7 +36,7 @@ function TwitterLink(props: Props) {
 
   return (
     <a
-      href="https://twitter.com/intent/follow?screen_name=FakeYouApp"
+      href={ThirdPartyLinks.FAKEYOU_TWITTER_WITH_FOLLOW_INTENT}
       target="_blank"
       rel="noopener noreferrer"
     >

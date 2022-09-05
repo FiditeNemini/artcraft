@@ -6,6 +6,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPatreon } from "@fortawesome/free-brands-svg-icons";
 import { motion } from "framer-motion";
 import { container, item, image, panel } from "../../../data/animation";
+import { ThirdPartyLinks } from "@storyteller/components/src/constants/ThirdPartyLinks";
 interface Props {
   sessionWrapper: SessionWrapper;
 }
@@ -29,7 +30,7 @@ function PatronPage(props: Props) {
 
             <motion.div className="d-flex" variants={item}>
               <a
-                href="https://www.patreon.com/fakeyou"
+                href={ThirdPartyLinks.FAKEYOU_PATREON}
                 target="_blank"
                 rel="noreferrer"
                 className="btn btn-primary"

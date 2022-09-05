@@ -27,6 +27,7 @@ import { useEffect } from "react";
 import gsap from "gsap";
 import SplitType from "split-type";
 import Scene from "./Scene";
+import { ThirdPartyLinks } from "@storyteller/components/src/constants/ThirdPartyLinks"
 import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/css";
 import "swiper/css/pagination";
@@ -164,7 +165,7 @@ function IndexPage() {
             data-scroll-position="top"
           >
             <Tippy content="Discord" placement="right">
-              <a href="https://discord.gg/fakeyou">
+              <a href={ThirdPartyLinks.FAKEYOU_DISCORD}>
                 <FontAwesomeIcon icon={faDiscord} />
               </a>
             </Tippy>
@@ -591,7 +592,7 @@ function IndexPage() {
                 </p>
                 <div>
                   <a
-                    href="https://discord.gg/fakeyou"
+                    href={ThirdPartyLinks.FAKEYOU_DISCORD}
                     rel="noreferrer"
                     target="_blank"
                     className="btn btn-primary mt-4"
@@ -687,7 +688,7 @@ function IndexPage() {
                   </p>
                   <div>
                     <a
-                      href="https://discord.gg/fakeyou"
+                      href={ThirdPartyLinks.FAKEYOU_DISCORD}
                       rel="noreferrer"
                       target="_blank"
                       className="btn btn-primary mt-3"

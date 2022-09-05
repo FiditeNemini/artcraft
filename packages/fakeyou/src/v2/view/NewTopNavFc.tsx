@@ -19,7 +19,7 @@ import {
   faComputer,
   faLaptop,
 } from "@fortawesome/free-solid-svg-icons";
-import { faPatreon } from "@fortawesome/free-brands-svg-icons";
+import { faDiscord, faPatreon } from "@fortawesome/free-brands-svg-icons";
 import { Logout } from "@storyteller/components/src/api/session/Logout";
 import { Gravatar } from "@storyteller/components/src/elements/Gravatar";
 import {
@@ -37,6 +37,7 @@ import {
 import Tippy from "@tippyjs/react";
 import "tippy.js/dist/tippy.css";
 import "tippy.js/animations/shift-away.css";
+import { ThirdPartyLinks } from "@storyteller/components/src/constants/ThirdPartyLinks";
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -379,6 +380,16 @@ function NewTopNavFc(props: Props) {
                         <FontAwesomeIcon icon={faTrophy} className="me-2" />
                         Leaderboard
                       </Link>
+                    </li>
+                    <li data-bs-toggle="offcanvas">
+                      <a className="dropdown-item" 
+                          href={ThirdPartyLinks.FAKEYOU_DISCORD} 
+                          title="discord chat" 
+                          target="_blank" 
+                          rel="noopener noreferrer">
+                        <FontAwesomeIcon icon={faDiscord} className="me-2" />
+                        Discord Chat
+                      </a>
                     </li>
                     <li data-bs-toggle="offcanvas">
                       <Link className="dropdown-item" to="/patrons" title="to patron list">
