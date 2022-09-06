@@ -31,6 +31,7 @@ twitch_common = { path = "../../lib/twitch_common" }
 user_input_common = { path = "../../lib/user_input_common" }
 
 # Internal Components
+billing_component = { path = "../../component_subsystem/billing" }
 users_component = { path = "../../component_subsystem/users" }
 
 # Vendored code
@@ -122,8 +123,6 @@ hyper = { version = "0.14.14" }
 
 # Money
 async-stripe = { version = "0.15.0", features = ["runtime-tokio-hyper"] }
-#async-stripe = { version = "0.15.0", features = ["runtime-blocking"] } # TODO: Determine proper runtime to use
-#dolladollabills = "0.2.0" # money from stripe
 
 # Crypto
 bcrypt = "0.8" # password hashes

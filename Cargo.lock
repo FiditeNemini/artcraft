@@ -818,6 +818,30 @@ dependencies = [
 ]
 
 [[package]]
+name = "billing_component"
+version = "0.0.1"
+dependencies = [
+ "actix-cors 0.6.0-beta.3",
+ "actix-http 3.0.0-beta.11",
+ "actix-web 4.0.0-beta.10",
+ "anyhow",
+ "async-stripe",
+ "base64 0.13.0",
+ "chrono",
+ "container_common",
+ "dotenv",
+ "http_server_common",
+ "log",
+ "once_cell",
+ "regex",
+ "serde",
+ "serde_derive",
+ "serde_json",
+ "sqlx",
+ "toml",
+]
+
+[[package]]
 name = "bitflags"
 version = "1.2.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1056,27 +1080,6 @@ dependencies = [
  "pin-project-lite 0.2.6",
  "tokio 1.13.0",
  "tokio-util 0.6.9",
-]
-
-[[package]]
-name = "component_subsystem_billing"
-version = "0.0.1"
-dependencies = [
- "actix-cors 0.6.0-beta.3",
- "actix-http 3.0.0-beta.11",
- "actix-web 4.0.0-beta.10",
- "anyhow",
- "base64 0.13.0",
- "chrono",
- "container_common",
- "dotenv",
- "log",
- "once_cell",
- "regex",
- "serde",
- "serde_derive",
- "serde_json",
- "toml",
 ]
 
 [[package]]
@@ -4052,6 +4055,7 @@ dependencies = [
  "anyhow",
  "base64 0.13.0",
  "bcrypt",
+ "billing_component",
  "chrono",
  "config",
  "container_common",

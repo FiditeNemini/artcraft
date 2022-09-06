@@ -1,0 +1,43 @@
+//! These routes are recommended, but do not have to be used by consumers of the billing system.
+
+use actix_web::body::MessageBody;
+use actix_web::dev::{ServiceRequest, ServiceResponse, ServiceFactory};
+use actix_web::error::Error;
+use actix_web::{App, web, HttpResponse};
+use crate::stripe::http_endpoints::checkout::stripe_checkout_success_handler::stripe_checkout_success_handler;
+use crate::stripe::http_endpoints::checkout::stripe_create_checkout_session_json_handler::stripe_create_checkout_session_json_handler;
+use crate::stripe::http_endpoints::checkout::stripe_create_checkout_session_redirect_handler::stripe_create_checkout_session_redirect_handler;
+use crate::stripe::http_endpoints::stripe_webhook_handler::stripe_webhook_handler;
+
+pub fn add_suggested_stripe_billing_routes<T, B> (app: App<T, B>) -> App<T, B>
+  where
+      B: MessageBody,
+      T: ServiceFactory<
+        ServiceRequest,
+        Config = (),
+        Response = ServiceResponse<B>,
+        Error = Error,
+        InitError = (),
+      >,
+{
+  app.service(web::scope("/stripe")
+      .service(web::resource("/webhook")
+          .route(web::post().to(stripe_webhook_handler))
+          .route(web::head().to(|| HttpResponse::Ok()))
+      )
+      .service(web::scope("/checkout")
+          .service(web::resource("/begin_redirect")
+              .route(web::get().to(stripe_create_checkout_session_redirect_handler))
+              .route(web::head().to(|| HttpResponse::Ok()))
+          )
+          .service(web::resource("/begin_json")
+              .route(web::get().to(stripe_create_checkout_session_json_handler))
+              .route(web::head().to(|| HttpResponse::Ok()))
+          )
+          .service(web::resource("/success")
+              .route(web::get().to(stripe_checkout_success_handler))
+              .route(web::head().to(|| HttpResponse::Ok()))
+          )
+      )
+  )
+}

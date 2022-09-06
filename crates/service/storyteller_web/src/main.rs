@@ -39,58 +39,13 @@ use actix_cors::Cors;
 use actix_http::http;
 use actix_web::middleware::{Logger, DefaultHeaders};
 use actix_web::{HttpServer, web, HttpResponse, App};
+use billing_component::stripe::stripe_config::{StripeCheckout, StripeConfig, StripeSecrets};
 use config::common_env::CommonEnv;
 use config::shared_constants::DEFAULT_MYSQL_CONNECTION_STRING;
 use config::shared_constants::DEFAULT_RUST_LOG;
 use container_common::anyhow_result::AnyhowResult;
 use container_common::files::read_toml_file_to_struct::read_toml_file_to_struct;
 use crate::configs::static_api_tokens::{StaticApiTokenConfig, StaticApiTokens, StaticApiTokenSet};
-use crate::http_server::endpoints::events::list_events::list_events_handler;
-use crate::http_server::endpoints::leaderboard::get_leaderboard::leaderboard_handler;
-use crate::http_server::endpoints::misc::default_route_404::default_route_404;
-use crate::http_server::endpoints::misc::enable_alpha_easy_handler::enable_alpha_easy_handler;
-use crate::http_server::endpoints::misc::enable_alpha_handler::enable_alpha_handler;
-use crate::http_server::endpoints::misc::root_index::get_root_index;
-use crate::http_server::endpoints::moderation::approval::pending_w2l_templates::get_pending_w2l_templates_handler;
-use crate::http_server::endpoints::moderation::ip_bans::add_ip_ban::add_ip_ban_handler;
-use crate::http_server::endpoints::moderation::ip_bans::delete_ip_ban::delete_ip_ban_handler;
-use crate::http_server::endpoints::moderation::ip_bans::get_ip_ban::get_ip_ban_handler;
-use crate::http_server::endpoints::moderation::ip_bans::list_ip_bans::list_ip_bans_handler;
-use crate::http_server::endpoints::moderation::jobs::get_tts_inference_queue_count::get_tts_inference_queue_count_handler;
-use crate::http_server::endpoints::moderation::jobs::get_w2l_inference_queue_count::get_w2l_inference_queue_count_handler;
-use crate::http_server::endpoints::moderation::stats::get_voice_count_stats::get_voice_count_stats_handler;
-use crate::http_server::endpoints::moderation::user_bans::ban_user::ban_user_handler;
-use crate::http_server::endpoints::moderation::user_bans::list_banned_users::list_banned_users_handler;
-use crate::http_server::endpoints::moderation::user_roles::list_roles::list_user_roles_handler;
-use crate::http_server::endpoints::moderation::user_roles::list_staff::list_staff_handler;
-use crate::http_server::endpoints::moderation::user_roles::set_user_role::set_user_role_handler;
-use crate::http_server::endpoints::moderation::users::list_users::list_users_handler;
-use crate::http_server::endpoints::tts::delete_tts_model::delete_tts_model_handler;
-use crate::http_server::endpoints::tts::delete_tts_result::delete_tts_inference_result_handler;
-use crate::http_server::endpoints::tts::edit_tts_model::edit_tts_model_handler;
-use crate::http_server::endpoints::tts::edit_tts_result::edit_tts_inference_result_handler;
-use crate::http_server::endpoints::tts::enqueue_infer_tts::infer_tts_handler;
-use crate::http_server::endpoints::tts::enqueue_upload_tts_model::upload_tts_model_handler;
-use crate::http_server::endpoints::tts::get_tts_inference_job_status::get_tts_inference_job_status_handler;
-use crate::http_server::endpoints::tts::get_tts_model::get_tts_model_handler;
-use crate::http_server::endpoints::tts::get_tts_model_use_count::get_tts_model_use_count_handler;
-use crate::http_server::endpoints::tts::get_tts_result::get_tts_inference_result_handler;
-use crate::http_server::endpoints::tts::get_tts_upload_model_job_status::get_tts_upload_model_job_status_handler;
-use crate::http_server::endpoints::tts::list_tts_models::list_tts_models_handler;
-use crate::http_server::endpoints::w2l::delete_w2l_result::delete_w2l_inference_result_handler;
-use crate::http_server::endpoints::w2l::delete_w2l_template::delete_w2l_template_handler;
-use crate::http_server::endpoints::w2l::edit_w2l_result::edit_w2l_inference_result_handler;
-use crate::http_server::endpoints::w2l::edit_w2l_template::edit_w2l_template_handler;
-use crate::http_server::endpoints::w2l::enqueue_infer_w2l::infer_w2l_handler;
-use crate::http_server::endpoints::w2l::enqueue_infer_w2l_with_uploads::enqueue_infer_w2l_with_uploads;
-use crate::http_server::endpoints::w2l::enqueue_upload_w2l_template::upload_w2l_template_handler;
-use crate::http_server::endpoints::w2l::get_w2l_inference_job_status::get_w2l_inference_job_status_handler;
-use crate::http_server::endpoints::w2l::get_w2l_result::get_w2l_inference_result_handler;
-use crate::http_server::endpoints::w2l::get_w2l_template::get_w2l_template_handler;
-use crate::http_server::endpoints::w2l::get_w2l_template_use_count::get_w2l_template_use_count_handler;
-use crate::http_server::endpoints::w2l::get_w2l_upload_template_job_status::get_w2l_upload_template_job_status_handler;
-use crate::http_server::endpoints::w2l::list_w2l_templates::list_w2l_templates_handler;
-use crate::http_server::endpoints::w2l::set_w2l_template_mod_approval::set_w2l_template_mod_approval_handler;
 use crate::http_server::middleware::ip_filter_middleware::IpFilter;
 use crate::http_server::web_utils::redis_rate_limiter::RedisRateLimiter;
 use crate::routes::add_routes;
@@ -355,6 +310,18 @@ async fn main() -> AnyhowResult<()> {
     poll_ip_bans(ip_banlist2, mysql_pool4).await;
   });
 
+  let stripe_configs = StripeConfig {
+    checkout: StripeCheckout {
+      success_url: easyenv::get_env_string_optional("STRIPE_CHECKOUT_SUCCESS_URL"),
+      cancel_url: easyenv::get_env_string_optional("STRIPE_CHECKOUT_CANCEL_URL"),
+    },
+    secrets: StripeSecrets {
+      publishable_key: easyenv::get_env_string_optional("STRIPE_PUBLISHABLE_KEY"),
+      secret_key: easyenv::get_env_string_optional("STRIPE_SECRET_KEY"),
+      secret_webhook_signing_key: easyenv::get_env_string_optional("STRIPE_SECRET_WEBHOOK_SIGNING_KEY"),
+    },
+  };
+
   let server_state = ServerState {
     env_config: EnvConfig {
       num_workers,
@@ -364,6 +331,7 @@ async fn main() -> AnyhowResult<()> {
       cookie_http_only,
       website_homepage_redirect,
     },
+    stripe_configs,
     hostname: server_hostname,
     health_check_status,
     mysql_pool: pool,
@@ -436,6 +404,7 @@ pub async fn serve(server_state: ServerState) -> AnyhowResult<()>
       .app_data(web::Data::new(server_state_arc.mysql_pool.clone()))
       .app_data(web::Data::new(server_state_arc.session_checker.clone()))
       .app_data(web::Data::new(server_state_arc.cookie_manager.clone()))
+      .app_data(web::Data::new(server_state_arc.stripe_configs.clone()))
       .app_data(server_state_arc.clone())
       .wrap(build_common_cors_config())
       .wrap(DefaultHeaders::new()
