@@ -4,7 +4,6 @@ use actix_web::http::{header, StatusCode};
 use actix_web::web::Path;
 use actix_web::{web, HttpResponse, HttpRequest};
 use chrono::{DateTime, Utc};
-use crate::http_server::endpoints::stripe::stripe_common::{PRODUCT_FAKEYOU_BASIC_PRICE_ID, STRIPE_SECRET_KEY};
 use http_server_common::request::get_request_header_optional::get_request_header_optional;
 use http_server_common::response::serialize_as_json_error::serialize_as_json_error;
 use http_server_common::util::timer::MultiBenchmarkingTimer;
@@ -14,6 +13,7 @@ use sqlx::MySqlPool;
 use std::collections::HashMap;
 use std::fmt;
 use stripe::{CheckoutSession, CheckoutSessionMode, CreateCheckoutSession, CreateCheckoutSessionLineItems};
+use crate::http_server::endpoints::stripe::stripe_common::{PRODUCT_FAKEYOU_BASIC_PRICE_ID, STRIPE_SECRET_KEY};
 
 #[derive(Serialize)]
 pub struct CreateCheckoutSessionSuccessResponse {
