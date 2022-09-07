@@ -6,6 +6,8 @@ use actix_web::{web, HttpResponse, HttpRequest};
 use chrono::{DateTime, Utc};
 use crate::stripe::stripe_config::StripeConfig;
 use crate::stripe::webhook_event_handlers::checkout_session_completed_handler::checkout_session_completed_handler;
+use crate::stripe::webhook_event_handlers::customer_subscription::customer_subscription_created_handler::customer_subscription_created_handler;
+use crate::stripe::webhook_event_handlers::customer_subscription::customer_subscription_updated_handler::customer_subscription_updated_handler;
 use crate::stripe::webhook_event_handlers::invoice_paid_handler::invoice_paid_handler;
 use crate::stripe::webhook_event_handlers::stripe_webhook_error::StripeWebhookError;
 use http_server_common::request::get_request_header_optional::get_request_header_optional;
@@ -16,6 +18,7 @@ use sqlx::MySqlPool;
 use std::collections::HashMap;
 use std::fmt;
 use stripe::{EventObject, EventType, PaymentIntentStatus, Webhook};
+use crate::stripe::webhook_event_handlers::customer_subscription::customer_subscription_deleted_handler::customer_subscription_deleted_handler;
 
 #[derive(Serialize)]
 pub struct StripeWebhookSuccessResponse {
@@ -51,6 +54,13 @@ pub async fn stripe_webhook_handler(
 
   warn!("Event type: {:?}", webhook_payload.event_type);
 
+  // Events seen (handled):
+  //
+  // CustomerSubscriptionCreated ------
+  // CustomerSubscriptionUpdated -------
+  //
+  // Events seen (not yet handled):
+  //
   // CheckoutSessionCompleted
   // ChargeSucceeded
   // PaymentMethodAttached
@@ -58,9 +68,7 @@ pub async fn stripe_webhook_handler(
   // CustomerUpdated
   // InvoiceCreated
   // InvoiceFinalized
-  // CustomerSubscriptionCreated ------
   // InvoiceUpdated
-  // CustomerSubscriptionUpdated -------
   // InvoicePaymentSucceeded
   // PaymentIntentSucceeded
   // PaymentIntentCreated
@@ -71,6 +79,9 @@ pub async fn stripe_webhook_handler(
   // NB: Whether this was test data or live data
   let is_production = webhook_payload.livemode;
 
+  // NB:
+  // - "Webhook endpoints might occasionally receive the same event more than once."
+  // - "Stripe does not guarantee delivery of events in the order in which they are generated."
   match webhook_payload.event_type {
     EventType::SubscriptionScheduleAborted => {}
     EventType::SubscriptionScheduleCanceled => {}
@@ -80,11 +91,38 @@ pub async fn stripe_webhook_handler(
     EventType::SubscriptionScheduleReleased => {}
     EventType::SubscriptionScheduleUpdated => {}
 
+    // =============== CHECKOUT SESSIONS ===============
+
     EventType::CheckoutSessionCompleted => {
       if let EventObject::CheckoutSession(checkout_session) = webhook_payload.data.object {
         let _r = checkout_session_completed_handler(checkout_session)?;
       }
     }
+
+    // =============== CUSTOMER SUBSCRIPTIONS ===============
+
+    EventType::CustomerSubscriptionCreated => {
+      if let EventObject::Subscription(subscription) = webhook_payload.data.object {
+        let _r = customer_subscription_created_handler(&subscription)?;
+      }
+    }
+    EventType::CustomerSubscriptionUpdated => {
+      if let EventObject::Subscription(subscription) = webhook_payload.data.object {
+        let _r = customer_subscription_updated_handler(&subscription)?;
+      }
+    }
+    EventType::CustomerSubscriptionDeleted => {
+      if let EventObject::Subscription(subscription) = webhook_payload.data.object {
+        let _r = customer_subscription_deleted_handler(&subscription)?;
+      }
+    }
+    EventType::CustomerSubscriptionPendingUpdateApplied => {
+    }
+    EventType::CustomerSubscriptionPendingUpdateExpired => {
+    }
+
+    // =============== INVOICES ===============
+
     EventType::InvoiceCreated => {
       // TODO: We need to respond to this so we don't hold payments up by 72 hours!
       //  See: https://stripe.com/docs/billing/subscriptions/webhooks
@@ -94,11 +132,11 @@ pub async fn stripe_webhook_handler(
         let _r = invoice_paid_handler(&invoice)?;
       }
     }
-    EventType::InvoicePaymentFailed => {
-    }
     EventType::PaymentIntentSucceeded => {
       if let EventObject::PaymentIntent(payment_intent) = webhook_payload.data.object {
       }
+    }
+    EventType::InvoicePaymentFailed => {
     }
     _ => {},
   }

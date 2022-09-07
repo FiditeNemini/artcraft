@@ -2,6 +2,7 @@ use container_common::anyhow_result::AnyhowResult;
 use crate::stripe::helpers::expand_customer_id::expand_customer_id;
 use log::warn;
 use stripe::Invoice;
+use crate::stripe::helpers::common_metadata_keys::METADATA_USER_TOKEN;
 use crate::stripe::webhook_event_handlers::stripe_webhook_error::StripeWebhookError;
 
 // https://stripe.com/docs/billing/subscriptions/webhooks :
@@ -29,11 +30,10 @@ pub fn invoice_paid_handler(invoice: &Invoice) -> Result<(), StripeWebhookError>
       .map(|c| expand_customer_id(c));
 
   // NB: Our internal user token.
-  let maybe_user_token = invoice.metadata.get("user_token")
+  let maybe_user_token = invoice.metadata.get(METADATA_USER_TOKEN)
       .map(|t| t.to_string());
 
-
-  warn!("invoice_paid: {:?}, {:?}, {:?}", paid_status, maybe_stripe_customer_id, maybe_user_token);
+  warn!(">>> invoice.paid: {:?}, {:?}, {:?}", paid_status, maybe_stripe_customer_id, maybe_user_token);
 
   Ok(())
 }

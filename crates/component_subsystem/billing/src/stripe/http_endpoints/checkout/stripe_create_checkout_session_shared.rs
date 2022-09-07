@@ -3,9 +3,12 @@ use container_common::anyhow_result::AnyhowResult;
 use crate::stripe::stripe_config::StripeConfig;
 use log::error;
 use std::collections::HashMap;
-use stripe::{CheckoutSession, CheckoutSessionMode, CreateCheckoutSession, CreateCheckoutSessionLineItems};
+use stripe::{CheckoutSession, CheckoutSessionMode, CreateCheckoutSession, CreateCheckoutSessionLineItems, CreateCheckoutSessionPaymentIntentData, CreateCheckoutSessionSubscriptionData};
+use crate::stripe::helpers::common_metadata_keys::{METADATA_EMAIL, METADATA_USER_TOKEN, METADATA_USERNAME};
 
 // NB: These are "test" product IDs.
+// TODO: Pass these in via request; validate via a dynamically dispatched trait callable that can do
+//  whatever the calling codebase needs
 pub const PRODUCT_FAKEYOU_BASIC_ID : &'static str = "prod_MMxi2J5y69VPbO";
 pub const PRODUCT_FAKEYOU_BASIC_PRICE_ID : &'static str = "price_1LeDnKEU5se17MekVr1iYYNf";
 
@@ -31,12 +34,6 @@ pub async fn stripe_create_checkout_session_shared(
       .as_deref()
       .ok_or(anyhow!("Checkout Cancel URL not configured"))?;
 
-  let mut metadata = HashMap::new();
-
-  if let Some(token) = user_token {
-    metadata.insert("user_token".to_string(), token.to_string());
-  }
-
   let checkout_session = {
     let mut params = CreateCheckoutSession::new(
       cancel_url,
@@ -44,6 +41,27 @@ pub async fn stripe_create_checkout_session_shared(
     );
 
     params.mode = Some(CheckoutSessionMode::Subscription);
+
+    let mut metadata = HashMap::new();
+
+    if let Some(token) = user_token {
+      metadata.insert(METADATA_USER_TOKEN.to_string(), token.to_string());
+      metadata.insert(METADATA_USERNAME.to_string(), token.to_string());
+      metadata.insert(METADATA_EMAIL.to_string(), token.to_string());
+    }
+
+    // NB: This metadata attaches to the subscription entity itself.
+    // https://support.stripe.com/questions/using-metadata-with-checkout-sessions
+    params.subscription_data = Some(CreateCheckoutSessionSubscriptionData {
+      metadata,
+      ..Default::default()
+    });
+
+    // If not a subscription -
+    //params.payment_intent_data = Some(CreateCheckoutSessionPaymentIntentData {
+    //  metadata: metadata.clone(),
+    //  ..Default::default()
+    //});
 
     params.line_items = Some(vec![
       CreateCheckoutSessionLineItems {
