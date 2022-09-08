@@ -17,6 +17,12 @@ pub struct RedisJobProgressReporter {
 }
 
 impl RedisJobProgressReporterBuilder {
+  pub fn from_redis_pool(redis_pool: r2d2::Pool<RedisConnectionManager>) -> Self {
+    Self {
+      redis_pool,
+    }
+  }
+
   /// Create a new instance. The backing Redis pool is Sync/Send behind an Arc.
   fn create_instance(redis_pool: r2d2::Pool<RedisConnectionManager>, redis_key: String) -> AnyhowResult<Box<dyn JobProgressReporter>> {
     let redis = redis_pool.get()?;

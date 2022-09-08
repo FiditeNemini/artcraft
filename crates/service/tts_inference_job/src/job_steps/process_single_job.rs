@@ -19,7 +19,6 @@ use database_queries::queries::tts::tts_inference_jobs::mark_tts_inference_job_d
 use database_queries::queries::tts::tts_inference_jobs::mark_tts_inference_job_pending_and_grab_lock::mark_tts_inference_job_pending_and_grab_lock;
 use database_queries::queries::tts::tts_models::get_tts_model_for_inference::TtsModelForInferenceRecord;
 use database_queries::queries::tts::tts_results::insert_tts_result::insert_tts_result;
-use jobs_common::redis_job_status_logger::RedisJobStatusLogger;
 use log::{warn, info, error};
 use newrelic_telemetry::Span;
 use std::fs::File;
@@ -72,12 +71,10 @@ pub async fn process_single_job(
       .attribute("user_token", maybe_user_token)
       .service_name("tts-inference-job");
 
-  let mut redis = inferencer.redis_pool.get()
+  let mut job_progress_reporter = inferencer
+      .job_progress_reporter
+      .new_tts_inference(&job.inference_job_token)
       .map_err(|e| ProcessSingleJobError::Other(anyhow!(e)))?;
-
-  let mut redis_logger = RedisJobStatusLogger::new_tts_inference(
-    &mut redis,
-    &job.inference_job_token);
 
   // ==================== ATTEMPT TO GRAB JOB LOCK ==================== //
 
@@ -115,7 +112,7 @@ pub async fn process_single_job(
       &waveglow_vocoder_model_fs_path,
       &waveglow_vocoder_model_object_path,
       &inferencer.private_bucket_client,
-      &mut redis_logger,
+      &mut job_progress_reporter,
       "downloading vocoder (1 of 3)",
       job.id.0,
       &inferencer.scoped_temp_dir_creator,
@@ -136,7 +133,7 @@ pub async fn process_single_job(
       &hifigan_vocoder_model_fs_path,
       &hifigan_vocoder_model_object_path,
       &inferencer.private_bucket_client,
-      &mut redis_logger,
+      &mut job_progress_reporter,
       "downloading vocoder (2 of 3)",
       job.id.0,
       &inferencer.scoped_temp_dir_creator,
@@ -157,7 +154,7 @@ pub async fn process_single_job(
       &hifigan_superres_vocoder_model_fs_path,
       &hifigan_superres_vocoder_model_object_path,
       &inferencer.private_bucket_client,
-      &mut redis_logger,
+      &mut job_progress_reporter,
       "downloading vocoder (3 of 3)",
       job.id.0,
       &inferencer.scoped_temp_dir_creator,
@@ -179,7 +176,7 @@ pub async fn process_single_job(
         &custom_vocoder_fs_path,
         &custom_vocoder_object_path,
         &inferencer.private_bucket_client,
-        &mut redis_logger,
+        &mut job_progress_reporter,
         "downloading user vocoder",
         job.id.0,
         &inferencer.scoped_temp_dir_creator,
@@ -200,7 +197,7 @@ pub async fn process_single_job(
       &tts_synthesizer_fs_path,
       &tts_synthesizer_object_path,
       &inferencer.private_bucket_client,
-      &mut redis_logger,
+      &mut job_progress_reporter,
       "downloading synthesizer",
       job.id.0,
       &inferencer.scoped_temp_dir_creator,
@@ -230,7 +227,7 @@ pub async fn process_single_job(
 
   // ==================== RUN INFERENCE ==================== //
 
-  redis_logger.log_status("running inference")
+  job_progress_reporter.log_status("running inference")
       .map_err(|e| ProcessSingleJobError::Other(e))?;
 
   // TODO: Fix this.
@@ -317,7 +314,7 @@ pub async fn process_single_job(
 
   // ==================== UPLOAD AUDIO TO BUCKET ==================== //
 
-  redis_logger.log_status("uploading result")
+  job_progress_reporter.log_status("uploading result")
       .map_err(|e| ProcessSingleJobError::Other(e))?;
 
   let audio_result_object_path = inferencer.bucket_path_unifier.tts_inference_wav_audio_output_path(
@@ -409,7 +406,7 @@ pub async fn process_single_job(
         ProcessSingleJobError::Other(anyhow!("error publishing event"))
       })?;
 
-  redis_logger.log_status("done")
+  job_progress_reporter.log_status("done")
       .map_err(|e| ProcessSingleJobError::Other(e))?;
 
   info!("Job {:?} complete success! Downloaded, ran inference, and uploaded. Saved model record: {}, Result Token: {}",

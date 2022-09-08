@@ -1,20 +1,19 @@
 use crate::caching::cache_miss_strategizer_multi::SyncMultiCacheMissStrategizer;
 use crate::caching::virtual_lfu_cache::SyncVirtualLfuCache;
 use crate::http_clients::tts_inference_sidecar_client::TtsInferenceSidecarClient;
+use crate::http_clients::tts_sidecar_health_check_client::TtsSidecarHealthCheckClient;
 use crate::script_execution::tacotron_inference_command::TacotronInferenceCommand;
+use crate::util::scoped_temp_dir_creator::ScopedTempDirCreator;
 use database_queries::mediators::firehose_publisher::FirehosePublisher;
+use database_queries::queries::tts::tts_models::get_tts_model_for_inference::TtsModelForInferenceRecord;
+use jobs_common::job_progress_reporter::job_progress_reporter::JobProgressReporterBuilder;
 use jobs_common::semi_persistent_cache_dir::SemiPersistentCacheDir;
+use memory_caching::multi_item_ttl_cache::MultiItemTtlCache;
 use newrelic_telemetry::Client as NewRelicClient;
-use r2d2_redis::RedisConnectionManager;
-use r2d2_redis::r2d2;
 use sqlx::MySqlPool;
 use std::path::PathBuf;
-use database_queries::queries::tts::tts_models::get_tts_model_for_inference::TtsModelForInferenceRecord;
-use memory_caching::multi_item_ttl_cache::MultiItemTtlCache;
 use storage_buckets_common::bucket_client::BucketClient;
 use storage_buckets_common::bucket_path_unifier::BucketPathUnifier;
-use crate::http_clients::tts_sidecar_health_check_client::TtsSidecarHealthCheckClient;
-use crate::util::scoped_temp_dir_creator::ScopedTempDirCreator;
 
 pub struct JobArgs {
   pub download_temp_directory: PathBuf,
@@ -22,7 +21,7 @@ pub struct JobArgs {
 
   pub mysql_pool: MySqlPool,
 
-  pub redis_pool: r2d2::Pool<RedisConnectionManager>,
+  pub job_progress_reporter: Box<dyn JobProgressReporterBuilder>,
 
   pub private_bucket_client: BucketClient,
   pub public_bucket_client: BucketClient,

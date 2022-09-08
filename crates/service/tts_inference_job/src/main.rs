@@ -39,13 +39,16 @@ use crate::job_steps::job_args::{JobArgs, JobCaches, JobHttpClients};
 use crate::job_steps::process_single_job::process_single_job;
 use crate::job_steps::process_single_job_error::ProcessSingleJobError;
 use crate::script_execution::tacotron_inference_command::TacotronInferenceCommand;
+use crate::util::scoped_temp_dir_creator::ScopedTempDirCreator;
 use database_queries::mediators::firehose_publisher::FirehosePublisher;
 use database_queries::queries::tts::tts_inference_jobs::list_available_tts_inference_jobs::{AvailableTtsInferenceJob, list_available_tts_inference_jobs, list_available_tts_inference_jobs_with_minimum_priority};
 use database_queries::queries::tts::tts_inference_jobs::mark_tts_inference_job_failure::mark_tts_inference_job_failure;
 use database_queries::queries::tts::tts_inference_jobs::mark_tts_inference_job_permanently_dead::mark_tts_inference_job_permanently_dead;
 use database_queries::queries::tts::tts_models::get_tts_model_for_inference::{get_tts_model_for_inference, TtsModelForInferenceError, TtsModelForInferenceRecord};
+use jobs_common::job_progress_reporter::job_progress_reporter::JobProgressReporterBuilder;
+use jobs_common::job_progress_reporter::noop_job_progress_reporter::NoOpJobProgressReporterBuilder;
+use jobs_common::job_progress_reporter::redis_job_progress_reporter::RedisJobProgressReporterBuilder;
 use jobs_common::noop_logger::NoOpLogger;
-use jobs_common::redis_job_status_logger::RedisJobStatusLogger;
 use jobs_common::semi_persistent_cache_dir::SemiPersistentCacheDir;
 use log::{warn, info, error};
 use memory_caching::multi_item_ttl_cache::MultiItemTtlCache;
@@ -55,12 +58,10 @@ use r2d2_redis::RedisConnectionManager;
 use r2d2_redis::r2d2;
 use sqlx::MySqlPool;
 use sqlx::mysql::MySqlPoolOptions;
-use std::ops::Deref;
 use std::path::PathBuf;
 use std::time::Duration;
 use storage_buckets_common::bucket_client::BucketClient;
 use storage_buckets_common::bucket_path_unifier::BucketPathUnifier;
-use crate::util::scoped_temp_dir_creator::ScopedTempDirCreator;
 
 // Buckets (shared config)
 const ENV_ACCESS_KEY : &'static str = "ACCESS_KEY";
@@ -188,13 +189,6 @@ async fn main() -> AnyhowResult<()> {
 
   let common_env = CommonEnv::read_from_env()?;
 
-  info!("Connecting to redis...");
-
-  let redis_manager =
-      RedisConnectionManager::new(common_env.redis_0_connection_string.deref())?;
-
-  let redis_pool = r2d2::Pool::builder()
-      .build(redis_manager)?;
 
   let persistent_cache_path = easyenv::get_env_string_or_default(
     ENV_SEMIPERSISTENT_CACHE_DIR,
@@ -277,11 +271,29 @@ async fn main() -> AnyhowResult<()> {
 
   info!("Is debug worker? {}", is_debug_worker);
 
+  // Optionally report job progress to the user via Redis (for now)
+  // We want to turn this off in the on-premises workers since we're not tunneling to the production Redis.
+  let job_progress_reporter : Box<dyn JobProgressReporterBuilder>;
+
+  job_progress_reporter = match easyenv::get_env_string_optional("REDIS_FOR_JOB_PROGRESS") {
+    None => {
+      warn!("Redis for job progress status reports is DISABLED! Users will not see in-flight details of inference progress.");
+      Box::new(NoOpJobProgressReporterBuilder {})
+    },
+    Some(redis_connection_string) => {
+      info!("Connecting to Redis to use for reporting job progress... {}", redis_connection_string);
+      let redis_manager = RedisConnectionManager::new(redis_connection_string)?;
+      let redis_pool = r2d2::Pool::builder().build(redis_manager)?;
+
+      Box::new(RedisJobProgressReporterBuilder::from_redis_pool(redis_pool))
+    }
+  };
+
   let inferencer = JobArgs {
     scoped_temp_dir_creator: ScopedTempDirCreator::for_directory(&temp_directory),
     download_temp_directory: temp_directory,
     mysql_pool,
-    redis_pool,
+    job_progress_reporter,
     public_bucket_client,
     private_bucket_client,
     tts_inference_command,
@@ -460,12 +472,11 @@ async fn process_jobs(
           ModelStateError::DatabaseError { .. } => ("unknown database error", false),
         };
 
-        let mut redis = inferencer.redis_pool.get()?;
-        let mut redis_logger = RedisJobStatusLogger::new_tts_inference(
-          &mut redis,
-          &job.inference_job_token);
+        let mut job_progress_reporter = inferencer
+            .job_progress_reporter
+            .new_tts_inference(&job.inference_job_token)?;
 
-        redis_logger.log_status(failure_reason)?;
+        job_progress_reporter.log_status(failure_reason)?;
 
         if permanent_failure {
           warn!("Marking job permanently dead: {} because: {:?}", job.inference_job_token, &e);
