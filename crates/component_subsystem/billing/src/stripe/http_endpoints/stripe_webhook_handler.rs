@@ -6,9 +6,14 @@ use actix_web::{web, HttpResponse, HttpRequest};
 use chrono::{DateTime, Utc};
 use crate::stripe::stripe_config::StripeConfig;
 use crate::stripe::webhook_event_handlers::checkout_session_completed_handler::checkout_session_completed_handler;
+use crate::stripe::webhook_event_handlers::customer::customer_created_handler::customer_created_handler;
+use crate::stripe::webhook_event_handlers::customer::customer_updated_handler::customer_updated_handler;
 use crate::stripe::webhook_event_handlers::customer_subscription::customer_subscription_created_handler::customer_subscription_created_handler;
+use crate::stripe::webhook_event_handlers::customer_subscription::customer_subscription_deleted_handler::customer_subscription_deleted_handler;
 use crate::stripe::webhook_event_handlers::customer_subscription::customer_subscription_updated_handler::customer_subscription_updated_handler;
-use crate::stripe::webhook_event_handlers::invoice_paid_handler::invoice_paid_handler;
+use crate::stripe::webhook_event_handlers::invoice::invoice_paid_handler::invoice_paid_handler;
+use crate::stripe::webhook_event_handlers::invoice::invoice_payment_failed::invoice_payment_failed_handler;
+use crate::stripe::webhook_event_handlers::invoice::invoice_payment_succeeded_handler::invoice_payment_succeeded_handler;
 use crate::stripe::webhook_event_handlers::stripe_webhook_error::StripeWebhookError;
 use http_server_common::request::get_request_header_optional::get_request_header_optional;
 use http_server_common::response::serialize_as_json_error::serialize_as_json_error;
@@ -18,7 +23,7 @@ use sqlx::MySqlPool;
 use std::collections::HashMap;
 use std::fmt;
 use stripe::{EventObject, EventType, PaymentIntentStatus, Webhook};
-use crate::stripe::webhook_event_handlers::customer_subscription::customer_subscription_deleted_handler::customer_subscription_deleted_handler;
+use crate::stripe::webhook_event_handlers::customer::customer_deleted_handler::customer_deleted_handler;
 
 #[derive(Serialize)]
 pub struct StripeWebhookSuccessResponse {
@@ -58,18 +63,18 @@ pub async fn stripe_webhook_handler(
   //
   // CustomerSubscriptionCreated ------
   // CustomerSubscriptionUpdated -------
+  // InvoicePaymentSucceeded
+  // CustomerCreated
+  // CustomerUpdated
   //
   // Events seen (not yet handled):
   //
   // CheckoutSessionCompleted
   // ChargeSucceeded
   // PaymentMethodAttached
-  // CustomerCreated
-  // CustomerUpdated
   // InvoiceCreated
   // InvoiceFinalized
   // InvoiceUpdated
-  // InvoicePaymentSucceeded
   // PaymentIntentSucceeded
   // PaymentIntentCreated
 
@@ -99,6 +104,28 @@ pub async fn stripe_webhook_handler(
       }
     }
 
+    // EventType::CheckoutSessionExpired
+    // EventType::CheckoutSessionAsyncPaymentFailed
+    // EventType::CheckoutSessionAsyncPaymentSucceeded
+
+    // =============== CUSTOMERS ===============
+
+    EventType::CustomerCreated => {
+      if let EventObject::Customer(customer) = webhook_payload.data.object {
+        let _r = customer_created_handler(&customer)?;
+      }
+    }
+    EventType::CustomerUpdated => {
+      if let EventObject::Customer(customer) = webhook_payload.data.object {
+        let _r = customer_updated_handler(&customer)?;
+      }
+    }
+    EventType::CustomerDeleted => {
+      if let EventObject::Customer(customer) = webhook_payload.data.object {
+        let _r = customer_deleted_handler(&customer)?;
+      }
+    }
+
     // =============== CUSTOMER SUBSCRIPTIONS ===============
 
     EventType::CustomerSubscriptionCreated => {
@@ -116,10 +143,9 @@ pub async fn stripe_webhook_handler(
         let _r = customer_subscription_deleted_handler(&subscription)?;
       }
     }
-    EventType::CustomerSubscriptionPendingUpdateApplied => {
-    }
-    EventType::CustomerSubscriptionPendingUpdateExpired => {
-    }
+    // EventType::CustomerSubscriptionPendingUpdateApplied
+    // EventType::CustomerSubscriptionPendingUpdateExpired
+    // EventType::CustomerSubscriptionTrialWillEnd
 
     // =============== INVOICES ===============
 
@@ -127,16 +153,40 @@ pub async fn stripe_webhook_handler(
       // TODO: We need to respond to this so we don't hold payments up by 72 hours!
       //  See: https://stripe.com/docs/billing/subscriptions/webhooks
     }
+    EventType::InvoicePaymentSucceeded => {
+      if let EventObject::Invoice(invoice) = webhook_payload.data.object {
+        let _r = invoice_payment_succeeded_handler(&invoice)?;
+      }
+    }
     EventType::InvoicePaid => {
       if let EventObject::Invoice(invoice) = webhook_payload.data.object {
         let _r = invoice_paid_handler(&invoice)?;
       }
     }
+    EventType::InvoicePaymentFailed => {
+      if let EventObject::Invoice(invoice) = webhook_payload.data.object {
+        let _r = invoice_payment_failed_handler(&invoice)?;
+      }
+    }
+
+    // EventType::InvoiceDeleted
+    // EventType::InvoiceFinalizationFailed
+    // EventType::InvoiceFinalized
+    // EventType::InvoiceItemCreated
+    // EventType::InvoiceItemDeleted
+    // EventType::InvoiceItemUpdated
+    // EventType::InvoiceMarkedUncollectible
+    // EventType::InvoicePaymentActionRequired
+    // EventType::InvoiceSent
+    // EventType::InvoiceUpcoming
+    // EventType::InvoiceUpdated
+    // EventType::InvoiceVoided
+
+    // =============== PAYMENT INTENTS ===============
+
     EventType::PaymentIntentSucceeded => {
       if let EventObject::PaymentIntent(payment_intent) = webhook_payload.data.object {
       }
-    }
-    EventType::InvoicePaymentFailed => {
     }
     _ => {},
   }

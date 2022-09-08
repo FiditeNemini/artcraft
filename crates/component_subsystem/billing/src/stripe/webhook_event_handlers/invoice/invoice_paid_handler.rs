@@ -5,10 +5,12 @@ use stripe::Invoice;
 use crate::stripe::helpers::common_metadata_keys::METADATA_USER_TOKEN;
 use crate::stripe::webhook_event_handlers::stripe_webhook_error::StripeWebhookError;
 
+// Handle event type: 'invoice.paid'
+//
 // https://stripe.com/docs/billing/subscriptions/webhooks :
 //
 // Sent when the invoice is successfully paid. You can provision access to your product when you
-// receive this event and the subscription status is active.
+// receive this event and the subscription `status` is `active`.
 //
 // https://stripe.com/docs/billing/subscriptions/webhooks#active-subscriptions :
 //
