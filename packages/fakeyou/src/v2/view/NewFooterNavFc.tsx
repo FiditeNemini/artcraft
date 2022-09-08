@@ -15,6 +15,7 @@ import {
   faTwitter,
   faFacebook,
 } from "@fortawesome/free-brands-svg-icons";
+import { ThirdPartyLinks } from "@storyteller/components/src/constants/ThirdPartyLinks";
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -83,9 +84,10 @@ function NewFooterNavFc(props: Props) {
         <div className="d-flex justify-content-center gap-4">
           <a
             className="social-icon"
-            href="https://discord.gg/fakeyou"
+            href={ThirdPartyLinks.FAKEYOU_DISCORD}
             target="_blank"
             rel="noopener noreferrer"
+            title="Join our Discord Server"
           >
             <FontAwesomeIcon icon={faDiscord} className="me-2" />
           </a>
@@ -94,14 +96,16 @@ function NewFooterNavFc(props: Props) {
             href="https://twitch.tv/FakeYouLabs"
             target="_blank"
             rel="noopener noreferrer"
+            title="Subscribe to our Twitch Channel"
           >
             <FontAwesomeIcon icon={faTwitch} className="me-2" />
           </a>
           <a
             className="social-icon"
-            href="https://twitter.com/intent/follow?screen_name=FakeYouApp"
+            href={ThirdPartyLinks.FAKEYOU_TWITTER_WITH_FOLLOW_INTENT}
             target="_blank"
             rel="noopener noreferrer"
+            title="Follow us on Twitter"
           >
             <FontAwesomeIcon icon={faTwitter} className="me-2" />
           </a>
@@ -110,14 +114,16 @@ function NewFooterNavFc(props: Props) {
             href="https://facebook.com/vocodes"
             target="_blank"
             rel="noopener noreferrer"
+            title="Like us on Facebook"
           >
             <FontAwesomeIcon icon={faFacebook} className="me-2" />
           </a>
           <a
             className="social-icon"
-            href="https://www.patreon.com/FakeYou"
+            href={ThirdPartyLinks.FAKEYOU_PATREON}
             target="_blank"
             rel="noopener noreferrer"
+            title="Support us by becoming a patreon"
           >
             <FontAwesomeIcon icon={faPatreon} className="me-2" />
           </a>

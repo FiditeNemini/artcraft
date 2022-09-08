@@ -177,19 +177,18 @@ class App extends React.Component<Props, State> {
   }
 
   componentWillMount() {
-    // Handle redesign
-    console.log("componentWillMount");
-
     // Check to see if there is a cookie for darkMode;
     if (!window.localStorage.getItem("darkMode")) {
       // if not, set one to false to ensure we are defualting to dark mode.
       window.localStorage.setItem("darkMode", "false");
     }
 
+    // Check to see if there is a cookie for lowSpec;
     if (!window.localStorage.getItem("lowSpec")) {
-      // if not, set one to false to ensure we are defualting to dark mode.
-      window.localStorage.setItem("lowSpec", "false");
+      // if not, set one to true to ensure we are defualting to low spec mode.
+      window.localStorage.setItem("lowSpec", "true");
     }
+
     require("./AppOld.scss");
     require("./v2/view/_css/footer.scss");
   }

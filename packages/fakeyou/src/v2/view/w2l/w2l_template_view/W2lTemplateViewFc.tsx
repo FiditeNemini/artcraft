@@ -25,6 +25,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEdit, faTrash } from "@fortawesome/free-solid-svg-icons";
 import { motion } from "framer-motion";
 import { container, item, panel } from "../../../../data/animation";
+import { ThirdPartyLinks } from "@storyteller/components/src/constants/ThirdPartyLinks";
 
 interface EnqueueJobResponsePayload {
   success: boolean;
@@ -190,7 +191,7 @@ function W2lTemplateViewFc(props: Props) {
         <span>
           Not yet (ask for approval in our&nbsp;
           <a
-            href="https://discord.gg/H72KFXm"
+            href={ThirdPartyLinks.FAKEYOU_DISCORD}
             target="_blank"
             rel="noopener noreferrer"
           >

@@ -1,6 +1,7 @@
 import React from "react";
 import { motion } from "framer-motion";
 import { container, item, panel } from "../../../../data/animation";
+import { ThirdPartyLinks } from "@storyteller/components/src/constants/ThirdPartyLinks";
 
 interface Props {}
 
@@ -28,7 +29,7 @@ function TermsPage(props: Props) {
               We do not condone the use of FakeYou for any type of deception,
               slur, abuse, or mistreatment of any individual or group. Please
               report such abuses to our{" "}
-              <a href="https://discord.gg/H72KFXm">
+              <a href={ThirdPartyLinks.FAKEYOU_DISCORD}>
                 community staff on Discord
               </a>
               . Bad actors will have their access revoked and materials deleted.

@@ -2,6 +2,7 @@ import React from "react";
 import { faDiscord } from "@fortawesome/free-brands-svg-icons";
 import { IconProp } from "@fortawesome/fontawesome-svg-core";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { ThirdPartyLinks } from "../constants/ThirdPartyLinks";
 
 interface Props {
   text?: string;
@@ -24,7 +25,7 @@ function DiscordLink(props: Props) {
   );
   return (
     <a
-      href="https://discord.gg/fakeyou"
+      href={ThirdPartyLinks.FAKEYOU_DISCORD}
       target="_blank"
       rel="noopener noreferrer"
     >

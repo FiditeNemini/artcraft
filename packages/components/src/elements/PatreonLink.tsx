@@ -2,6 +2,7 @@ import React from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { IconProp } from "@fortawesome/fontawesome-svg-core";
 import { faPatreon } from "@fortawesome/free-brands-svg-icons";
+import { ThirdPartyLinks } from "../constants/ThirdPartyLinks";
 
 interface Props {
   text?: string;
@@ -24,7 +25,7 @@ function PatreonLink(props: Props) {
   );
   return (
     <a
-      href="https://www.patreon.com/FakeYou"
+      href={ThirdPartyLinks.FAKEYOU_PATREON}
       target="_blank"
       rel="noopener noreferrer"
     >
