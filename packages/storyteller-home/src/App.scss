@@ -313,7 +313,7 @@ p {
   border-radius: 12px;
   transform: translate3d(0px, 0px, 0px) rotate(45deg);
   z-index: 5;
-  opacity: 0.6;
+  opacity: 0;
 }
 
 .shape-2 {
@@ -326,7 +326,7 @@ p {
   top: -10%;
   right: 18%;
   z-index: 1;
-  opacity: 0.6;
+  opacity: 0;
 }
 
 .shape-3-container {
@@ -342,7 +342,7 @@ p {
   border-radius: 12px;
   transform: translate3d(0px, 0px, 0px) rotate(45deg);
   z-index: 5;
-  opacity: 0.6;
+  opacity: 0;
 }
 
 .shape-4-container {
@@ -358,7 +358,7 @@ p {
   border-radius: 10px;
   transform: translate3d(0px, 0px, 0px) rotate(45deg);
   z-index: 5;
-  opacity: 0.6;
+  opacity: 0;
 }
 
 .zi-1 {
@@ -980,6 +980,16 @@ span.swiper-pagination-bullet.swiper-pagination-bullet-active {
 
 :root {
   --swiper-theme-color: #fa6b68 !important;
+}
+
+#sub-title {
+  opacity: 0;
+  transform: translate(8rem, 0);
+}
+
+#hero-img {
+  opacity: 0;
+  transform: translate(0, 200px);
 }
 
 @media (max-width: 1199.98px) {

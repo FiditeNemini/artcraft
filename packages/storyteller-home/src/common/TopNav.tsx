@@ -52,11 +52,9 @@ function TopNav(props: Props) {
   const menuToggle = () => {
     setMobileMenuOpen(!mobileMenuOpen);
   };
-
   const hamburgerClassNames = mobileMenuOpen
     ? "button_container active"
     : "button_container";
-
   const menuClassNames = mobileMenuOpen ? "overlay open" : "overlay";
 
   useEffect(() => {
@@ -108,9 +106,7 @@ function TopNav(props: Props) {
           </ul>
 
           <div className="col-md-3 text-end">
-            <a className="btn btn-primary fs-6" href="#about" data-scroll-to>
-              Contact
-            </a>
+            <button className="btn btn-primary fs-6">Contact</button>
           </div>
         </div>
 
@@ -166,6 +162,7 @@ function TopNav(props: Props) {
           </ul>
         </div>
       </div>
+
       <a href="#home" className={backToTop} data-scroll-to>
         <div className="btt-shape"></div>
         Back to Top

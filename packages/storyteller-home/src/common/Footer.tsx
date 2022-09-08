@@ -17,16 +17,36 @@ function Footer(props: Props) {
         <div className="bg-dark-solid">
           <div className="container footer-top text-center">
             <div className="d-flex gap-4 justify-content-center p-4">
-              <a href="https://google.com" className="footer-social-icon">
+              <a
+                href="https://discord.gg/fakeyou"
+                className="footer-social-icon"
+                rel="noreferrer"
+                target="_blank"
+              >
                 <FontAwesomeIcon icon={faDiscord} />
               </a>
-              <a href="https://google.com" className="footer-social-icon">
+              <a
+                href="https://twitch.tv/FakeYouLabs"
+                className="footer-social-icon"
+                rel="noreferrer"
+                target="_blank"
+              >
                 <FontAwesomeIcon icon={faTwitch} />
               </a>
-              <a href="https://google.com" className="footer-social-icon">
+              <a
+                href="https://facebook.com/vocodes"
+                className="footer-social-icon"
+                rel="noreferrer"
+                target="_blank"
+              >
                 <FontAwesomeIcon icon={faFacebook} />
               </a>
-              <a href="https://google.com" className="footer-social-icon">
+              <a
+                href="https://twitter.com/intent/follow?screen_name=FakeYouApp"
+                className="footer-social-icon"
+                rel="noreferrer"
+                target="_blank"
+              >
                 <FontAwesomeIcon icon={faTwitter} />
               </a>
             </div>
