@@ -20,7 +20,7 @@ use crate::stripe::webhook_event_handlers::stripe_webhook_error::StripeWebhookEr
 use http_server_common::request::get_request_header_optional::get_request_header_optional;
 use http_server_common::response::serialize_as_json_error::serialize_as_json_error;
 use http_server_common::util::timer::MultiBenchmarkingTimer;
-use log::{error, warn};
+use log::{error, info, warn};
 use sqlx::MySqlPool;
 use std::collections::HashMap;
 use std::fmt;
@@ -58,7 +58,6 @@ pub async fn stripe_webhook_handler(
         StripeWebhookError::BadRequest
       })?;
 
-  warn!("Event type: {:?}", webhook_payload.event_type);
 
   // Events seen (handled):
   //
@@ -84,6 +83,10 @@ pub async fn stripe_webhook_handler(
 
   // NB: Whether this was test data or live data
   let is_production = webhook_payload.livemode;
+
+  info!("Stripe webhook event type: {:?}", webhook_payload.event_type);
+
+  let mut unhandled_event_type = false;
 
   // NB:
   // - "Webhook endpoints might occasionally receive the same event more than once."
@@ -255,7 +258,13 @@ pub async fn stripe_webhook_handler(
     //   Topup* (5),
     //   Transfer* (5),
 
-    _ => {},
+    _ => {
+      unhandled_event_type = true;
+    },
+  }
+
+  if unhandled_event_type {
+    warn!("UNHANDLED STRIPE WEBHOOK EVENT TYPE: {:?}", webhook_payload.event_type);
   }
 
   // let stripe_client = stripe::Client::new(STRIPE_SECRET_KEY);
