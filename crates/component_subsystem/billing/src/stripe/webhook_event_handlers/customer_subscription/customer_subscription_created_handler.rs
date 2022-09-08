@@ -5,22 +5,25 @@ use log::{error, warn};
 use stripe::Subscription;
 
 /// Handle event type: 'customer.subscription.created'
+/// Sent when the subscription is created. The subscription status may be incomplete if customer
+/// authentication is required to complete the payment or if you set payment_behavior to
+/// default_incomplete. For more details, read about subscription payment behavior.
 pub fn customer_subscription_created_handler(subscription: &Subscription) -> Result<(), StripeWebhookError> {
 
   let stripe_subscription_id = subscription.id.to_string();
+  let stripe_subscription_status = subscription.status.to_string();
 
   // NB: We'll need this to send them to the "customer portal", which is how they can modify or
   // cancel their subscriptions.
-  let maybe_stripe_customer_id = subscription.customer
-      .as_ref()
-      .map(|c| expand_customer_id(c));
+  let maybe_stripe_customer_id = expand_customer_id(&subscription.customer);
 
   // NB: Our internal user token.
+  // NB: This *should* be present if checkout flow attached metadata to the subscription.
   let maybe_user_token = subscription.metadata.get(METADATA_USER_TOKEN)
       .map(|t| t.to_string());
 
-  error!(">>> customer.subscription.created: {:?}, {:?}, {:?}",
-    stripe_subscription_id, maybe_stripe_customer_id, maybe_user_token);
+  error!(">>> customer.subscription.created: {:?}, {:?}, {:?}, {:?}",
+    stripe_subscription_id, maybe_stripe_customer_id, maybe_user_token, stripe_subscription_status);
 
   Ok(())
 }

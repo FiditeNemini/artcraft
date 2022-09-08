@@ -5,15 +5,14 @@ use log::{error, warn};
 use stripe::Subscription;
 
 /// Handle event type: 'customer.subscription.deleted'
+/// Sent when a customer’s subscription ends.
 pub fn customer_subscription_deleted_handler(subscription: &Subscription) -> Result<(), StripeWebhookError> {
 
   let stripe_subscription_id = subscription.id.to_string();
 
   // NB: We'll need this to send them to the "customer portal", which is how they can modify or
   // cancel their subscriptions.
-  let maybe_stripe_customer_id = subscription.customer
-      .as_ref()
-      .map(|c| expand_customer_id(c));
+  let maybe_stripe_customer_id = expand_customer_id(&subscription.customer);
 
   // NB: Our internal user token.
   let maybe_user_token = subscription.metadata.get(METADATA_USER_TOKEN)

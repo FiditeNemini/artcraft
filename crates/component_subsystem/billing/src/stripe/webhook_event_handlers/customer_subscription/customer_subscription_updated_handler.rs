@@ -8,19 +8,18 @@ use stripe::Subscription;
 pub fn customer_subscription_updated_handler(subscription: &Subscription) -> Result<(), StripeWebhookError> {
 
   let stripe_subscription_id = subscription.id.to_string();
+  let stripe_subscription_status = subscription.status.to_string();
 
   // NB: We'll need this to send them to the "customer portal", which is how they can modify or
   // cancel their subscriptions.
-  let maybe_stripe_customer_id = subscription.customer
-      .as_ref()
-      .map(|c| expand_customer_id(c));
+  let maybe_stripe_customer_id = expand_customer_id(&subscription.customer);
 
   // NB: Our internal user token.
   let maybe_user_token = subscription.metadata.get(METADATA_USER_TOKEN)
       .map(|t| t.to_string());
 
-  error!(">>> customer.subscription.updated: {:?}, {:?}, {:?}",
-    stripe_subscription_id, maybe_stripe_customer_id, maybe_user_token);
+  error!(">>> customer.subscription.updated: {:?}, {:?}, {:?}, {:?}",
+    stripe_subscription_id, maybe_stripe_customer_id, maybe_user_token, stripe_subscription_status);
 
   Ok(())
 }

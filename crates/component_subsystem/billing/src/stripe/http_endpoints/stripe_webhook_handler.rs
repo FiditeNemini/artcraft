@@ -5,8 +5,9 @@ use actix_web::web::{Bytes, Path};
 use actix_web::{web, HttpResponse, HttpRequest};
 use chrono::{DateTime, Utc};
 use crate::stripe::stripe_config::StripeConfig;
-use crate::stripe::webhook_event_handlers::checkout_session_completed_handler::checkout_session_completed_handler;
+use crate::stripe::webhook_event_handlers::checkout_session::checkout_session_completed_handler::checkout_session_completed_handler;
 use crate::stripe::webhook_event_handlers::customer::customer_created_handler::customer_created_handler;
+use crate::stripe::webhook_event_handlers::customer::customer_deleted_handler::customer_deleted_handler;
 use crate::stripe::webhook_event_handlers::customer::customer_updated_handler::customer_updated_handler;
 use crate::stripe::webhook_event_handlers::customer_subscription::customer_subscription_created_handler::customer_subscription_created_handler;
 use crate::stripe::webhook_event_handlers::customer_subscription::customer_subscription_deleted_handler::customer_subscription_deleted_handler;
@@ -14,6 +15,7 @@ use crate::stripe::webhook_event_handlers::customer_subscription::customer_subsc
 use crate::stripe::webhook_event_handlers::invoice::invoice_paid_handler::invoice_paid_handler;
 use crate::stripe::webhook_event_handlers::invoice::invoice_payment_failed::invoice_payment_failed_handler;
 use crate::stripe::webhook_event_handlers::invoice::invoice_payment_succeeded_handler::invoice_payment_succeeded_handler;
+use crate::stripe::webhook_event_handlers::invoice::invoice_updated_handler::invoice_updated_handler;
 use crate::stripe::webhook_event_handlers::stripe_webhook_error::StripeWebhookError;
 use http_server_common::request::get_request_header_optional::get_request_header_optional;
 use http_server_common::response::serialize_as_json_error::serialize_as_json_error;
@@ -23,7 +25,6 @@ use sqlx::MySqlPool;
 use std::collections::HashMap;
 use std::fmt;
 use stripe::{EventObject, EventType, PaymentIntentStatus, Webhook};
-use crate::stripe::webhook_event_handlers::customer::customer_deleted_handler::customer_deleted_handler;
 
 #[derive(Serialize)]
 pub struct StripeWebhookSuccessResponse {
@@ -104,9 +105,9 @@ pub async fn stripe_webhook_handler(
       }
     }
 
-    // EventType::CheckoutSessionExpired
-    // EventType::CheckoutSessionAsyncPaymentFailed
-    // EventType::CheckoutSessionAsyncPaymentSucceeded
+    // EventType::CheckoutSessionExpired => {}
+    // EventType::CheckoutSessionAsyncPaymentFailed => {}
+    // EventType::CheckoutSessionAsyncPaymentSucceeded => {}
 
     // =============== CUSTOMERS ===============
 
@@ -143,9 +144,10 @@ pub async fn stripe_webhook_handler(
         let _r = customer_subscription_deleted_handler(&subscription)?;
       }
     }
-    // EventType::CustomerSubscriptionPendingUpdateApplied
-    // EventType::CustomerSubscriptionPendingUpdateExpired
-    // EventType::CustomerSubscriptionTrialWillEnd
+
+    // EventType::CustomerSubscriptionPendingUpdateApplied => {}
+    // EventType::CustomerSubscriptionPendingUpdateExpired => {}
+    // EventType::CustomerSubscriptionTrialWillEnd => {}
 
     // =============== INVOICES ===============
 
@@ -153,14 +155,19 @@ pub async fn stripe_webhook_handler(
       // TODO: We need to respond to this so we don't hold payments up by 72 hours!
       //  See: https://stripe.com/docs/billing/subscriptions/webhooks
     }
-    EventType::InvoicePaymentSucceeded => {
+    EventType::InvoiceUpdated => {
       if let EventObject::Invoice(invoice) = webhook_payload.data.object {
-        let _r = invoice_payment_succeeded_handler(&invoice)?;
+        let _r = invoice_updated_handler(&invoice)?;
       }
     }
     EventType::InvoicePaid => {
       if let EventObject::Invoice(invoice) = webhook_payload.data.object {
         let _r = invoice_paid_handler(&invoice)?;
+      }
+    }
+    EventType::InvoicePaymentSucceeded => {
+      if let EventObject::Invoice(invoice) = webhook_payload.data.object {
+        let _r = invoice_payment_succeeded_handler(&invoice)?;
       }
     }
     EventType::InvoicePaymentFailed => {
@@ -169,18 +176,18 @@ pub async fn stripe_webhook_handler(
       }
     }
 
-    // EventType::InvoiceDeleted
-    // EventType::InvoiceFinalizationFailed
-    // EventType::InvoiceFinalized
-    // EventType::InvoiceItemCreated
-    // EventType::InvoiceItemDeleted
-    // EventType::InvoiceItemUpdated
-    // EventType::InvoiceMarkedUncollectible
-    // EventType::InvoicePaymentActionRequired
-    // EventType::InvoiceSent
-    // EventType::InvoiceUpcoming
-    // EventType::InvoiceUpdated
-    // EventType::InvoiceVoided
+    // EventType::InvoiceDeleted => {}
+    // EventType::InvoiceFinalizationFailed => {}
+    // EventType::InvoiceFinalized => {}
+    // EventType::InvoiceItemCreated => {}
+    // EventType::InvoiceItemDeleted => {}
+    // EventType::InvoiceItemUpdated => {}
+    // EventType::InvoiceMarkedUncollectible => {}
+    // EventType::InvoicePaymentActionRequired => {}
+    // EventType::InvoiceSent => {}
+    // EventType::InvoiceUpcoming => {}
+    // EventType::InvoiceUpdated => {}
+    // EventType::InvoiceVoided => {}
 
     // =============== PAYMENT INTENTS ===============
 
@@ -188,6 +195,66 @@ pub async fn stripe_webhook_handler(
       if let EventObject::PaymentIntent(payment_intent) = webhook_payload.data.object {
       }
     }
+
+    // EventType::PaymentIntentAmountCapturableUpdated => {}
+    // EventType::PaymentIntentCanceled => {}
+    // EventType::PaymentIntentCreated => {}
+    // EventType::PaymentIntentPartiallyFunded => {}
+    // EventType::PaymentIntentPaymentFailed => {}
+    // EventType::PaymentIntentProcessing => {}
+    // EventType::PaymentIntentRequiresAction => {}
+    // EventType::PaymentIntentRequiresCapture => {}
+
+    // =============== Ignored ===============
+
+    // Ignoring these types:
+    //   Account* (6),
+    //   ApplicationFee* (2),
+    //   BalanceAvailable (1),
+    //   BillingPortal* (2),
+    //   CapabilityCreated (1),
+    //   Charge* (13),
+    //   [CheckoutSession* handled above],
+    //   Coupon* (3),
+    //   CreditNote* (3),
+    //   CustomerDiscount* (3),
+    //   CustomerSource* (4),
+    //   [CustomerSubscription* handled above],
+    //   CreditTax* (3),
+    //   FileCreated (1),
+    //   IdentityVerification* (6),
+    //   [Invoice* handled above],
+    //   IssuingAuthorization* (3),
+    //   IssuingCard* (2),
+    //   IssuingCardholder* (2),
+    //   IssuingDispute* (2),
+    //   IssuingTransaction* (2),
+    //   MandateUpdated (1),
+    //   Order* (6),
+    //   [PaymentIntent* handled above],
+    //   PaymentLink* (2),
+    //   PaymentMethod* (4),
+    //   Payout* (5),
+    //   Person* (3),
+    //   Plan* (3),
+    //   Price* (3),
+    //   Product* (3),
+    //   PromotionCode* (2),
+    //   Quote* (4),
+    //   RadarEarlyFraudWarning* (2),
+    //   Recipient* (3),
+    //   ReportingReport* (3),
+    //   Review* (2),
+    //   SetupIntent* (5),
+    //   SigmaScheduledQueryRunCreated (1),
+    //   Sku (3),
+    //   Source* (7),
+    //   TaxRate* (2),
+    //   TerminalReader* (2),
+    //   TestHelpersTestClock* (5),
+    //   Topup* (5),
+    //   Transfer* (5),
+
     _ => {},
   }
 
