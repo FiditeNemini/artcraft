@@ -34,19 +34,11 @@ import "swiper/css/pagination";
 import { Autoplay, Pagination } from "swiper";
 
 function IndexPage() {
+  // Title Animation
   useEffect(() => {
     const splitTitle = new SplitType("#hero-title", {
       types: "chars",
       charClass: "title-split",
-    });
-
-    gsap.to(splitTitle.chars, {
-      delay: 0.2,
-      duration: 0.4,
-      y: 0,
-      opacity: 1,
-      stagger: 0.03,
-      ease: "expo",
     });
 
     const splitTitleOutline = new SplitType("#hero-title-outline", {
@@ -56,15 +48,60 @@ function IndexPage() {
 
     console.log(splitTitleOutline);
 
-    gsap.to(splitTitleOutline.words, {
-      delay: 0.25,
-      duration: 0.8,
+    var tl = gsap.timeline({ delay: 0.2 });
+    tl.to(splitTitle.chars, {
+      delay: 0.2,
+      duration: 0.4,
       y: 0,
-      scale: 1,
       opacity: 1,
-      stagger: 0,
+      stagger: 0.03,
       ease: "expo",
     });
+    tl.to(
+      splitTitleOutline.words,
+      {
+        delay: 0,
+        duration: 0.8,
+        y: 0,
+        scale: 1,
+        opacity: 1,
+        ease: "expo",
+      },
+      "<"
+    );
+    tl.to(
+      "#sub-title",
+      {
+        delay: 0.4,
+        duration: 0.8,
+        x: 0,
+        scale: 1,
+        opacity: 1,
+        ease: "expo",
+      },
+      "<"
+    );
+    tl.to(
+      "#hero-img",
+      {
+        duration: 1,
+        y: 0,
+        opacity: 1,
+        ease: "expo",
+      },
+      0.2
+    );
+    tl.to(
+      ".shape-2, .shape-1, .shape-3, .shape-4",
+      {
+        duration: 0.4,
+        y: 0,
+        scale: 1,
+        opacity: 0.6,
+        ease: "expo",
+      },
+      0.4
+    );
   }, []);
 
   return (
@@ -97,7 +134,10 @@ function IndexPage() {
                 </span>
               </h1>
 
-              <div className="d-flex flex-column align-items-center align-items-xl-end">
+              <div
+                className="d-flex flex-column align-items-center align-items-xl-end"
+                id="sub-title"
+              >
                 <p
                   className="lead hero-sub-title fw-normal opacity-75"
                   data-scroll
@@ -109,6 +149,7 @@ function IndexPage() {
                   AI cloud production studio.
                 </p>
                 <div
+                  id="hero-btn"
                   data-scroll
                   data-scroll-speed="-5"
                   data-scroll-direction="horizontal"
@@ -151,6 +192,7 @@ function IndexPage() {
 
           <div className="d-flex justify-content-center">
             <img
+              id="hero-img"
               className="hero-img"
               src="/hero/hero-img.webp"
               alt="Storyteller HyperJail"
@@ -165,35 +207,43 @@ function IndexPage() {
             data-scroll-position="top"
           >
             <Tippy content="Discord" placement="right">
-              <a href={ThirdPartyLinks.FAKEYOU_DISCORD}>
+              <a
+                href={ThirdPartyLinks.FAKEYOU_DISCORD}
+                rel="noreferrer"
+                target="_blank"
+              >
                 <FontAwesomeIcon icon={faDiscord} />
               </a>
             </Tippy>
             <Tippy content="Twitch" placement="right">
-              <a href="/">
+              <a
+                href="https://twitch.tv/FakeYouLabs"
+                rel="noreferrer"
+                target="_blank"
+              >
                 <FontAwesomeIcon icon={faTwitch} />
               </a>
             </Tippy>
             <Tippy content="Facebook" placement="right">
-              <a href="/">
+              <a
+                href="https://facebook.com/vocodes"
+                rel="noreferrer"
+                target="_blank"
+              >
                 <FontAwesomeIcon icon={faFacebook} />
               </a>
             </Tippy>
             <Tippy content="Twitter" placement="right">
-              <a href="/">
+              <a
+                href="https://twitter.com/intent/follow?screen_name=FakeYouApp"
+                rel="noreferrer"
+                target="_blank"
+              >
                 <FontAwesomeIcon icon={faTwitter} />
               </a>
             </Tippy>
           </div>
 
-          <div
-            className="shape-1-container"
-            data-scroll
-            data-scroll-speed="4"
-            data-scroll-position="top"
-          >
-            <div className="shape-1"></div>
-          </div>
           <div className="shape-2"></div>
           <div
             className="shape-3-container"
@@ -203,6 +253,15 @@ function IndexPage() {
           >
             <div className="shape-3"></div>
           </div>
+          <div
+            className="shape-1-container"
+            data-scroll
+            data-scroll-speed="4"
+            data-scroll-position="top"
+          >
+            <div className="shape-1"></div>
+          </div>
+
           <div
             className="shape-4-container"
             data-scroll
@@ -233,7 +292,7 @@ function IndexPage() {
             <h1 className="fw-bold display-4 about-title mt-5">
               You can run the new Hollywood and top the Billboard Hot 100
             </h1>
-            <h4 className="fw-normal opacity-75 mt-3">
+            <h4 className="fw-semibold opacity-75 mt-4">
               Our technology can turn anyone into a director, musician, or movie
               star.
             </h4>
@@ -365,9 +424,9 @@ function IndexPage() {
               </div>
               <div className="col-lg-7 d-flex flex-column justify-content-center">
                 <h1 className="fw-bold display-5">Voice Changing</h1>
-                <h6 className="fw-semibold fs-5 opacity-75 mb-4">
+                <h4 className="fw-semibold opacity-75 mb-4">
                   Now you can sound like someone else
-                </h6>
+                </h4>
                 <p className="mt-3">
                   Use offline (studio quality) or real time voice changing to
                   re-dub your film or give your live performers a new character.
@@ -465,9 +524,9 @@ function IndexPage() {
               </div>
               <div className="col-lg-7 d-flex flex-column justify-content-center">
                 <h1 className="fw-bold display-5">FakeYou</h1>
-                <h6 className="fw-semibold fs-5 opacity-75 mb-4">
+                <h4 className="fw-semibold opacity-75 mb-4">
                   Used by millions of people every month
-                </h6>
+                </h4>
                 <p className="mt-3">
                   We've built a social platform for deep learning and generative
                   models. FakeYou is a place where creators can upload and
@@ -541,9 +600,9 @@ function IndexPage() {
               </div>
               <div className="col-lg-7 d-flex flex-column justify-content-center">
                 <h1 className="fw-bold display-5">Storyteller Stream</h1>
-                <h6 className="fw-semibold fs-5 opacity-75 mb-4">
+                <h4 className="fw-semibold opacity-75 mb-4">
                   Twitch Streamers and Creators can engage and monetize
-                </h6>
+                </h4>
                 <p className="mt-3">
                   It’s tough to build an audience on Twitch. It's even tougher
                   to earn an income. We've built the most comprehensive and
@@ -581,9 +640,9 @@ function IndexPage() {
               </div>
               <div className="col-lg-7 d-flex flex-column justify-content-center">
                 <h1 className="fw-bold display-5">Storyteller Engine</h1>
-                <h6 className="fw-semibold fs-5 opacity-75 mb-4">
+                <h4 className="fw-semibold opacity-75 mb-4">
                   A fully 3D virtual set for your stream or film
-                </h6>
+                </h4>
                 <p className="mt-3">
                   Our community contributes sets, character models, props,
                   events, and more. Use motion or volumetric capture. Your
@@ -714,10 +773,9 @@ function IndexPage() {
               </div>
               <div className="col-lg-7 d-flex flex-column justify-content-center">
                 <h1 className="fw-bold display-5">Storyteller VoxelCam</h1>
-                <h6 className="fw-semibold fs-5 opacity-75 mb-4">
-                  Volumetric capture for your stream, and soon for your film
-                  set.
-                </h6>
+                <h4 className="fw-semibold opacity-75 mb-4">
+                  Volumetric capture for your stream, and for your film set.
+                </h4>
                 <p className="mt-3">
                   Webcams are boring and flat. You can use our volumetric camera
                   in-stream to make your personality come to life. This system
@@ -725,12 +783,12 @@ function IndexPage() {
                 </p>
                 <div>
                   <a
-                    href="https://fakeyou.com"
+                    href="https://discord.gg/fakeyou"
                     rel="noreferrer"
                     target="_blank"
                     className="btn btn-primary mt-4"
                   >
-                    <span>Visit Storyteller.stream</span>
+                    <span>Ask us in Discord</span>
                   </a>
                 </div>
               </div>
@@ -748,7 +806,7 @@ function IndexPage() {
 
             <h2 className="text-center mt-5 pt-5 fw-bold">Screenshots</h2>
 
-            <div className="row gx-4 gy-4 my-5 text-center">
+            <div className="row gx-4 gy-4 my-4 text-center">
               <div className="col-12 col-sm-4">
                 <div>
                   <img
@@ -798,7 +856,7 @@ function IndexPage() {
             <Swiper
               loop={true}
               autoplay={{
-                delay: 5000,
+                delay: 6000,
                 disableOnInteraction: false,
               }}
               slidesPerView={1.1}
