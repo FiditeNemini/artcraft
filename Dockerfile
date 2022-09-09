@@ -47,7 +47,7 @@ RUN . python/bin/activate \
 # Custom base image
 # Make sure to add this repository so it has read acces to the base image:
 # https://github.com/orgs/storytold/packages/container/docker-base-images-rust-ssl/settings/actions_access
-FROM ghcr.io/storytold/docker-base-images-rust-ssl:ab46bb751890 as rust-build
+FROM ghcr.io/storytold/docker-base-images-rust-ssl:d94ce4350c3b as rust-build
 WORKDIR /tmp
 
 COPY Cargo.lock . 
