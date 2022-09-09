@@ -143,6 +143,7 @@ RUN apt-key del 7fa2af80
 # NB: We need to remove all sources
 RUN rm $(find /etc/apt | grep cuda)
 
+# NB: This key seems to be required for Ubuntu 20.04. The rust image was previously 16.04! (Yikes!)
 # https://askubuntu.com/a/831535
 RUN wget -qO - https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2004/x86_64/7fa2af80.pub | apt-key add -
 
