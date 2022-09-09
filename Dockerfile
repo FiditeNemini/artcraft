@@ -56,6 +56,10 @@ COPY sqlx-data.json .
 COPY crates/ ./crates
 COPY db/ ./db
 
+RUN $HOME/.cargo/bin/rustup show
+RUN $HOME/.cargo/bin/rustc --version
+RUN $HOME/.cargo/bin/cargo --version
+
 RUN $HOME/.cargo/bin/cargo fetch
 
 ARG GIT_SHA
