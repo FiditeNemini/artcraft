@@ -143,6 +143,9 @@ RUN apt-key del 7fa2af80
 # NB: We need to remove all sources
 RUN rm $(find /etc/apt | grep cuda)
 
+# https://askubuntu.com/a/831535
+RUN wget -qO - https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2004/x86_64/7fa2af80.pub | apt-key add -
+
 #RUN wget https://developer.download.nvidia.com/compute/cuda/repos/$distro/$arch/cuda-keyring_1.0-1_all.deb
 RUN wget https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2004/x86_64/cuda-keyring_1.0-1_all.deb
 RUN dpkg -i cuda-keyring_1.0-1_all.deb
@@ -177,8 +180,8 @@ COPY --from=rust-build /tmp/GIT_SHA /
 COPY --from=rust-build /etc/ssl /etc/ssl
 
 # Required dynamically linked libraries
-COPY --from=rust-build /lib/x86_64-linux-gnu/libssl.*             /lib/x86_64-linux-gnu/
-COPY --from=rust-build /lib/x86_64-linux-gnu/libcrypto.*          /lib/x86_64-linux-gnu/
+COPY --from=rust-build /usr/lib/x86_64-linux-gnu/libssl.*             /lib/x86_64-linux-gnu/
+COPY --from=rust-build /usr/lib/x86_64-linux-gnu/libcrypto.*          /lib/x86_64-linux-gnu/
 
 # Make sure all the links resolve
 RUN ldd storyteller-web
