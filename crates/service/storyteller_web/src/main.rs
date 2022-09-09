@@ -279,12 +279,16 @@ async fn main() -> AnyhowResult<()> {
   // Bucket roots
   let audio_uploads_bucket_root= easyenv::get_env_string_required(ENV_AUDIO_UPLOADS_BUCKET_ROOT)?;
 
+  let bucket_timeout = easyenv::get_env_duration_seconds_or_default("BUCKET_TIMEOUT_SECONDS",
+    Duration::from_secs(60 * 5));
+
   let private_bucket_client = BucketClient::create(
     &access_key,
     &secret_key,
     &region_name,
     &private_bucket_name,
     None,
+    Some(bucket_timeout),
   )?;
 
   let public_bucket_client = BucketClient::create(
@@ -293,6 +297,7 @@ async fn main() -> AnyhowResult<()> {
     &region_name,
     &public_bucket_name,
     None,
+    Some(bucket_timeout),
   )?;
 
   // In-Memory Cache

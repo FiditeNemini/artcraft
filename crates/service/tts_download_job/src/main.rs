@@ -117,12 +117,16 @@ async fn main() -> AnyhowResult<()> {
   let bucket_name = easyenv::get_env_string_required(ENV_BUCKET_NAME)?;
   let bucket_root = easyenv::get_env_string_required(ENV_BUCKET_ROOT)?;
 
+  let bucket_timeout = easyenv::get_env_duration_seconds_or_default("BUCKET_TIMEOUT_SECONDS",
+    Duration::from_secs(60 * 5));
+
   let bucket_client = BucketClient::create(
     &access_key,
     &secret_key,
     &region_name,
     &bucket_name,
     None,
+    Some(bucket_timeout),
   )?;
 
   let temp_directory = easyenv::get_env_string_or_default(

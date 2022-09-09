@@ -128,12 +128,16 @@ async fn main() -> AnyhowResult<()> {
   let private_bucket_name = easyenv::get_env_string_required(ENV_PRIVATE_BUCKET_NAME)?;
   let public_bucket_name = easyenv::get_env_string_required(ENV_PUBLIC_BUCKET_NAME)?;
 
+  let bucket_timeout = easyenv::get_env_duration_seconds_or_default("BUCKET_TIMEOUT_SECONDS",
+    Duration::from_secs(60 * 5));
+
   let private_bucket_client = BucketClient::create(
     &access_key,
     &secret_key,
     &region_name,
     &private_bucket_name,
     None,
+    Some(bucket_timeout),
   )?;
 
   let public_bucket_client = BucketClient::create(
@@ -142,6 +146,7 @@ async fn main() -> AnyhowResult<()> {
     &region_name,
     &public_bucket_name,
     None,
+    Some(bucket_timeout),
   )?;
 
   let py_code_directory = easyenv::get_env_string_required(ENV_CODE_DIRECTORY)?;

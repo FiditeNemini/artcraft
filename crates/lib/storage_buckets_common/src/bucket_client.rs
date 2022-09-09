@@ -8,6 +8,7 @@ use s3::region::Region;
 use std::io::Read;
 use std::path::{PathBuf, Path};
 use std::str::FromStr;
+use std::time::Duration;
 use tokio::fs::File;
 use tokio::io::AsyncBufReadExt;
 use tokio::io::{AsyncBufRead, BufReader, AsyncReadExt};
@@ -27,13 +28,17 @@ impl BucketClient {
     secret_key: &str,
     region_name: &str,
     bucket_name: &str,
-    optional_bucket_root: Option<&str>) -> anyhow::Result<Self>
+    optional_bucket_root: Option<&str>,
+    // See underlying docs for timeout details.
+    bucket_request_timeout: Option<Duration>,
+  ) -> anyhow::Result<Self>
   {
     let credentials = Credentials {
       access_key: Some(access_key.to_string()),
       secret_key: Some(secret_key.to_string()),
       security_token: None,
       session_token: None,
+      expiration: None
     };
 
     // NB: The GCS buckets aren't supported by default.
@@ -41,8 +46,10 @@ impl BucketClient {
       region: region_name.to_owned(),
       endpoint: "https://storage.googleapis.com".to_owned(),
     };
+
     let mut bucket = Bucket::new(&bucket_name, region, credentials)?;
 
+    bucket.set_request_timeout(bucket_request_timeout);
     bucket.set_path_style();
     bucket.set_subdomain_style();
 
@@ -67,12 +74,15 @@ impl BucketClient {
     let object_name = self.get_rooted_object_name(object_name);
     info!("Rooted filename for bucket: {}", object_name);
 
-    let (body_bytes, code) = self.bucket.put_object(&object_name, bytes).await?;
+    let response = self.bucket.put_object(&object_name, bytes).await?;
+
+    let body_bytes = response.bytes();
+    let code = response.status_code();
 
     info!("upload code: {}", code);
 
     if code != 200 {
-      let body = String::from_utf8(body_bytes)?;
+      let body = String::from_utf8_lossy(body_bytes);
       warn!("upload body: {}", body);
     }
 
@@ -85,12 +95,15 @@ impl BucketClient {
     let object_name = self.get_rooted_object_name(object_name);
     info!("Rooted filename for bucket: {}", object_name);
 
-    let (body_bytes, code) = self.bucket.put_object_with_content_type(&object_name, bytes, content_type).await?;
+    let response = self.bucket.put_object_with_content_type(&object_name, bytes, content_type).await?;
+
+    let body_bytes = response.bytes();
+    let code = response.status_code();
 
     info!("upload code: {}", code);
 
     if code != 200 {
-      let body = String::from_utf8(body_bytes)?;
+      let body = String::from_utf8_lossy(body_bytes);
       warn!("upload body: {}", body);
     }
 
@@ -161,7 +174,11 @@ impl BucketClient {
 
   pub async fn download_file(&self, path: &str) -> anyhow::Result<Vec<u8>> {
     info!("downloading from bucket: {}", path);
-    let (bytes, code) = self.bucket.get_object(path).await?;
+
+    let response = self.bucket.get_object(path).await?;
+
+    let bytes = response.bytes();
+    let code = response.status_code();
 
     match code {
       404 => bail!("File not found in bucket: {}", path),
@@ -169,7 +186,7 @@ impl BucketClient {
     }
 
     info!("download code: {}", code);
-    Ok(bytes)
+    Ok(bytes.to_vec())
   }
 
   pub async fn download_file_to_disk<P: AsRef<Path>, Q: AsRef<Path>>(

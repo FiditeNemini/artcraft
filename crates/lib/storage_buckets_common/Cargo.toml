@@ -20,7 +20,10 @@ container_common = { path = "../container_common" }
 # External
 anyhow = "1.0.40"
 log = "0.4.14"
-rust-s3 = { version = "0.28", features = ["never-encode-slash"] }
+
+# The "never-encode-slash" feature seems to have been removed:
+# https://github.com/durch/rust-s3/pull/254
+rust-s3 = { version = "0.32.3" }
 
 # Runtime
 # NB: We switched to Tokio from `async-std` for broader ecosystem support.

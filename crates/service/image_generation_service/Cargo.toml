@@ -83,8 +83,11 @@ lru_time_cache = "0.11.11"
 # Files
 data-encoding = "2.3.2"
 ring = "0.17.0-alpha.10"
-rust-s3 = { version = "0.28", features = ["never-encode-slash"] }
 infer = "0.5.0"
+
+# The "never-encode-slash" feature seems to have been removed:
+# https://github.com/durch/rust-s3/pull/254
+rust-s3 = { version = "0.32.3" }
 
 subprocess = "0.2.6"
 tempdir = "0.3.7"
