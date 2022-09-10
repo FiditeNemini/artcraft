@@ -26,6 +26,7 @@ use sqlx::MySqlPool;
 use std::collections::HashMap;
 use std::fmt;
 use stripe::{EventObject, EventType, PaymentIntentStatus, Webhook};
+use crate::stripe::webhook_event_handlers::payment_intent::payment_intent_succeeded_handler::payment_intent_succeeded_handler;
 
 #[derive(Serialize)]
 pub struct StripeWebhookSuccessResponse {
@@ -217,6 +218,7 @@ pub async fn stripe_webhook_handler(
 
     EventType::PaymentIntentSucceeded => {
       if let EventObject::PaymentIntent(payment_intent) = webhook_payload.data.object {
+        let _r = payment_intent_succeeded_handler(&payment_intent)?;
       }
     }
 

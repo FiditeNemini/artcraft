@@ -50,6 +50,38 @@ pub async fn stripe_create_checkout_session_shared(
       success_url,
     );
 
+    /*
+
+     Stripe webhook event type: PaymentIntentCreated
+      UNHANDLED STRIPE WEBHOOK EVENT TYPE: PaymentIntentCreated
+
+      [-] 127.0.0.1:54490 "POST /stripe/webhook HTTP/1.1" 200 16 "-" "Stripe/1.0 (+https://stripe.com/docs/webhooks)" 0.003373
+
+      Stripe webhook event type: CustomerCreated
+
+      >>> customer.created: "cus_MPQxICCzeD8wKm", None
+      [-] 127.0.0.1:54492 "POST /stripe/webhook HTTP/1.1" 200 16 "-" "Stripe/1.0 (+https://stripe.com/docs/webhooks)" 0.002464
+      Stripe webhook event type: PaymentIntentSucceeded
+
+      [-] 127.0.0.1:54492 "POST /stripe/webhook HTTP/1.1" 200 16 "-" "Stripe/1.0 (+https://stripe.com/docs/webhooks)" 0.003981
+      Stripe webhook event type: ChargeSucceeded
+      UNHANDLED STRIPE WEBHOOK EVENT TYPE: ChargeSucceeded
+
+      [-] 127.0.0.1:54492 "POST /stripe/webhook HTTP/1.1" 200 16 "-" "Stripe/1.0 (+https://stripe.com/docs/webhooks)" 0.002594
+      Stripe webhook event type: CheckoutSessionCompleted
+
+      >>> checkout.session.completed: Some("cus_MPQxICCzeD8wKm"), None
+      [-] 127.0.0.1:54492 "POST /stripe/webhook HTTP/1.1" 200 16 "-" "Stripe/1.0 (+https://stripe.com/docs/webhooks)" 0.002465
+      [-] 127.0.0.1:54494 "GET /stripe/checkout/success HTTP/1.1" 200 16 "-" "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:104.0) Gecko/20100101 Firefox/104.0" 0.000522
+
+
+
+     */
+
+
+
+
+
 
     let mut metadata = HashMap::new();
 
@@ -74,6 +106,9 @@ pub async fn stripe_create_checkout_session_shared(
       // Payment mode: Accept one-time payments for cards, iDEAL, and more.
       params.mode = Some(CheckoutSessionMode::Payment);
 
+      // TODO: Should this also be on subscriptions (?)
+      // NB: This metadata attaches to the payment_intent entity itself.
+      // https://support.stripe.com/questions/using-metadata-with-checkout-sessions
       params.payment_intent_data = Some(CreateCheckoutSessionPaymentIntentData {
         metadata: metadata.clone(),
         ..Default::default()
