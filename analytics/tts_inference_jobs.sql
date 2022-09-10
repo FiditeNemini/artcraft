@@ -44,19 +44,28 @@ set status = 'dead'
 where status IN ('pending', 'started', 'attempt_failed');
 
 -- Sample the pending inference text
-select creator_ip_address, maybe_creator_user_token, raw_inference_text
+select creator_ip_address,
+       model_token,
+       maybe_creator_user_token,
+       raw_inference_text
 from tts_inference_jobs
 where status = 'pending';
 
 -- Sample the pending inference text (truncated)
 select creator_ip_address,
+       model_token,
        maybe_creator_user_token,
        TRIM(REPLACE(SUBSTRING(raw_inference_text, 1, 50), '\n', ''))
 from tts_inference_jobs
-where status = 'pending';
+where status = 'pending'
+limit 100;
 
 -- Sample long pending texts
-select creator_ip_address, maybe_creator_user_token, raw_inference_text
+select creator_ip_address,
+       model_token,
+       maybe_creator_user_token,
+       raw_inference_text
 from tts_inference_jobs
 where status = 'pending'
-and length(raw_inference_text) > 100;
+and length(raw_inference_text) > 100
+limit 100;
