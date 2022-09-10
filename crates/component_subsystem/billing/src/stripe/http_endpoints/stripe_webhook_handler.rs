@@ -32,6 +32,27 @@ pub struct StripeWebhookSuccessResponse {
   pub success: bool,
 }
 
+/*
+
+[2022-09-10T09:41:16Z WARN  billing_component::stripe::http_endpoints::stripe_webhook_handler] UNHANDLED STRIPE WEBHOOK EVENT TYPE: ChargeSucceeded
+[2022-09-10T09:41:16Z WARN  billing_component::stripe::http_endpoints::stripe_webhook_handler] UNHANDLED STRIPE WEBHOOK EVENT TYPE: PaymentMethodAttached
+[2022-09-10T09:41:16Z WARN  billing_component::stripe::http_endpoints::stripe_webhook_handler] UNHANDLED STRIPE WEBHOOK EVENT TYPE: InvoiceFinalized
+[2022-09-10T09:41:17Z WARN  billing_component::stripe::http_endpoints::stripe_webhook_handler] UNHANDLED STRIPE WEBHOOK EVENT TYPE: PaymentIntentCreated
+
+
+[2022-09-10T09:41:16Z INFO  billing_component::stripe::http_endpoints::stripe_webhook_handler] Stripe webhook event type: InvoiceCreated
+
+[2022-09-10T09:41:16Z WARN  billing_component::stripe::webhook_event_handlers::customer::customer_created_handler] >>> customer.created: "cus_MPEexz47x94d3X", None
+[2022-09-10T09:41:16Z ERROR billing_component::stripe::webhook_event_handlers::checkout_session::checkout_session_completed_handler] >>> checkout.session.completed: Some("cus_MPEexz47x94d3X"), None
+[2022-09-10T09:41:16Z WARN  billing_component::stripe::webhook_event_handlers::customer::customer_updated_handler] >>> customer.updated: "cus_MPEexz47x94d3X", None
+[2022-09-10T09:41:16Z ERROR billing_component::stripe::webhook_event_handlers::customer_subscription::customer_subscription_created_handler] >>> customer.subscription.created: "sub_1LgQBZEU5se17MeksLCPvfcq", "cus_MPEexz47x94d3X", Some("U:TEST"), "incomplete"
+[2022-09-10T09:41:17Z WARN  billing_component::stripe::webhook_event_handlers::invoice::invoice_updated_handler] >>> invoice.updated: Some(true), Some(Paid), Some("cus_MPEexz47x94d3X"), None
+[2022-09-10T09:41:17Z ERROR billing_component::stripe::webhook_event_handlers::customer_subscription::customer_subscription_updated_handler] >>> customer.subscription.updated: "sub_1LgQBZEU5se17MeksLCPvfcq", "cus_MPEexz47x94d3X", Some("U:TEST"), "active"
+[2022-09-10T09:41:17Z WARN  billing_component::stripe::webhook_event_handlers::invoice::invoice_paid_handler] >>> invoice.paid: Some(Paid), Some("cus_MPEexz47x94d3X"), None
+[2022-09-10T09:41:17Z WARN  billing_component::stripe::webhook_event_handlers::invoice::invoice_payment_succeeded_handler] >>> invoice.payment_succeeded: Some(Paid), Some("cus_MPEexz47x94d3X"), None
+
+
+ */
 pub async fn stripe_webhook_handler(
   http_request: HttpRequest,
   request_body_bytes: Bytes,

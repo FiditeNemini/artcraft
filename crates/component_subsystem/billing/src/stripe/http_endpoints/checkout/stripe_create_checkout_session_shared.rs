@@ -12,10 +12,14 @@ use crate::stripe::helpers::common_metadata_keys::{METADATA_EMAIL, METADATA_USER
 pub const PRODUCT_FAKEYOU_BASIC_ID : &'static str = "prod_MMxi2J5y69VPbO";
 pub const PRODUCT_FAKEYOU_BASIC_PRICE_ID : &'static str = "price_1LeDnKEU5se17MekVr1iYYNf";
 
+pub const PRODUCT_ONE_TIME_PURCHASE_ID : &'static str = "prod_MPQ6nWJ4k6lJmw";
+pub const PRODUCT_ONE_TIME_PURCHASE_PRICE_ID : &'static str = "price_1LgbG9EU5se17MekZIw95gEO";
+
 /// Create a checkout session and return the URL
 /// If anything fails, treat it as a 500 server error.
 pub async fn stripe_create_checkout_session_shared(
   stripe_config: &StripeConfig,
+  price_key: &str,
   user_token: Option<&str>,
 ) -> AnyhowResult<String> {
 
@@ -33,6 +37,12 @@ pub async fn stripe_create_checkout_session_shared(
   let cancel_url = stripe_config.checkout.cancel_url
       .as_deref()
       .ok_or(anyhow!("Checkout Cancel URL not configured"))?;
+
+  let price_id = match price_key {
+    "subscription" => PRODUCT_FAKEYOU_BASIC_PRICE_ID,
+    "one-time" => PRODUCT_ONE_TIME_PURCHASE_PRICE_ID,
+    _ => return Err(anyhow!("wrong price key!")),
+  };
 
   let checkout_session = {
     let mut params = CreateCheckoutSession::new(
@@ -65,7 +75,7 @@ pub async fn stripe_create_checkout_session_shared(
 
     params.line_items = Some(vec![
       CreateCheckoutSessionLineItems {
-        price: Some(PRODUCT_FAKEYOU_BASIC_PRICE_ID.to_string()),
+        price: Some(price_id.to_string()),
         quantity: Some(1),
         ..Default::default()
       }
