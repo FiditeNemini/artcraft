@@ -38,9 +38,9 @@ pub async fn stripe_create_checkout_session_shared(
       .as_deref()
       .ok_or(anyhow!("Checkout Cancel URL not configured"))?;
 
-  let price_id = match price_key {
-    "subscription" => PRODUCT_FAKEYOU_BASIC_PRICE_ID,
-    "one-time" => PRODUCT_ONE_TIME_PURCHASE_PRICE_ID,
+  let (price_id, is_subscription) = match price_key {
+    "subscription" => (PRODUCT_FAKEYOU_BASIC_PRICE_ID, true),
+    "one-time" => (PRODUCT_ONE_TIME_PURCHASE_PRICE_ID, false),
     _ => return Err(anyhow!("wrong price key!")),
   };
 
@@ -50,7 +50,6 @@ pub async fn stripe_create_checkout_session_shared(
       success_url,
     );
 
-    params.mode = Some(CheckoutSessionMode::Subscription);
 
     let mut metadata = HashMap::new();
 
@@ -60,18 +59,26 @@ pub async fn stripe_create_checkout_session_shared(
       metadata.insert(METADATA_EMAIL.to_string(), token.to_string());
     }
 
-    // NB: This metadata attaches to the subscription entity itself.
-    // https://support.stripe.com/questions/using-metadata-with-checkout-sessions
-    params.subscription_data = Some(CreateCheckoutSessionSubscriptionData {
-      metadata,
-      ..Default::default()
-    });
+    if is_subscription {
+      // Subscription mode: Use Stripe Billing to set up fixed-price subscriptions.
+      params.mode = Some(CheckoutSessionMode::Subscription);
 
-    // If not a subscription -
-    //params.payment_intent_data = Some(CreateCheckoutSessionPaymentIntentData {
-    //  metadata: metadata.clone(),
-    //  ..Default::default()
-    //});
+      // NB: This metadata attaches to the subscription entity itself.
+      // https://support.stripe.com/questions/using-metadata-with-checkout-sessions
+      params.subscription_data = Some(CreateCheckoutSessionSubscriptionData {
+        metadata,
+        ..Default::default()
+      });
+
+    } else {
+      // Payment mode: Accept one-time payments for cards, iDEAL, and more.
+      params.mode = Some(CheckoutSessionMode::Payment);
+
+      params.payment_intent_data = Some(CreateCheckoutSessionPaymentIntentData {
+        metadata: metadata.clone(),
+        ..Default::default()
+      });
+    }
 
     params.line_items = Some(vec![
       CreateCheckoutSessionLineItems {
