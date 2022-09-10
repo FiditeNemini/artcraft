@@ -5,11 +5,12 @@ use actix_web::cookie::Cookie;
 use actix_web::error::ResponseError;
 use actix_web::http::StatusCode;
 use actix_web::{Responder, web, HttpResponse, error, HttpRequest};
-use crate::http_server::web_utils::ip_address::get_request_ip;
+use config::bad_urls::is_bad_tts_model_download_url;
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::server_state::ServerState;
 use crate::validations::model_uploads::validate_model_title;
 use database_queries::tokens::Tokens;
+use http_server_common::request::get_request_ip::get_request_ip;
 use log::{info, warn, log};
 use regex::Regex;
 use sqlx::error::DatabaseError;
@@ -17,7 +18,6 @@ use sqlx::error::Error::Database;
 use sqlx::mysql::MySqlDatabaseError;
 use std::fmt;
 use std::sync::Arc;
-use config::bad_urls::is_bad_tts_model_download_url;
 
 #[derive(Deserialize)]
 pub enum TtsModelType {

@@ -4,6 +4,7 @@ use actix_web::http::{header, StatusCode};
 use actix_web::web::{Bytes, Path};
 use actix_web::{web, HttpResponse, HttpRequest};
 use chrono::{DateTime, Utc};
+use crate::stripe::helpers::verify_stripe_webhook_ip_address::verify_stripe_webhook_ip_address;
 use crate::stripe::stripe_config::StripeConfig;
 use crate::stripe::webhook_event_handlers::checkout_session::checkout_session_completed_handler::checkout_session_completed_handler;
 use crate::stripe::webhook_event_handlers::customer::customer_created_handler::customer_created_handler;
@@ -38,6 +39,12 @@ pub async fn stripe_webhook_handler(
   stripe_config: web::Data<StripeConfig>,
 ) -> Result<HttpResponse, StripeWebhookError>
 {
+  verify_stripe_webhook_ip_address(&http_request)
+      .map_err(|e| {
+        error!("Improper client IP address. Error: {:?}", e);
+        StripeWebhookError::BadRequest
+      })?;
+
   let secret_signing_key = stripe_config.secrets.secret_webhook_signing_key
       .as_deref()
       .ok_or(StripeWebhookError::ServerError)?;
@@ -92,13 +99,6 @@ pub async fn stripe_webhook_handler(
   // - "Webhook endpoints might occasionally receive the same event more than once."
   // - "Stripe does not guarantee delivery of events in the order in which they are generated."
   match webhook_payload.event_type {
-    EventType::SubscriptionScheduleAborted => {}
-    EventType::SubscriptionScheduleCanceled => {}
-    EventType::SubscriptionScheduleCompleted => {}
-    EventType::SubscriptionScheduleCreated => {}
-    EventType::SubscriptionScheduleExpiring => {}
-    EventType::SubscriptionScheduleReleased => {}
-    EventType::SubscriptionScheduleUpdated => {}
 
     // =============== CHECKOUT SESSIONS ===============
 
@@ -248,7 +248,8 @@ pub async fn stripe_webhook_handler(
     //   Recipient* (3),
     //   ReportingReport* (3),
     //   Review* (2),
-    //   SetupIntent* (5),
+    //   SetupIntent* (5), -- N/A; collecting payments in the future we don't yet have information for (eg. crowdfunding, rental car, utility bill)
+    //   SubscriptionSchedule* (7), -- N/A; backdate subscriptions or schedule one to start later (eg. for physical goods, like a newspaper)
     //   SigmaScheduledQueryRunCreated (1),
     //   Sku (3),
     //   Source* (7),

@@ -11,10 +11,10 @@ use actix_web::dev::{ServiceRequest, ServiceResponse};
 use actix_web::web::{BytesMut, Buf, BufMut};
 use actix_web::{Error, HttpResponse};
 use actix_web::{ResponseError, HttpMessage, HttpRequest, HttpResponseBuilder};
-use crate::http_server::web_utils::ip_address::get_service_request_ip;
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::threads::ip_banlist_set::IpBanlistSet;
 use futures_util::future::{err, ok, Either, Ready};
+use http_server_common::request::get_request_ip::get_service_request_ip;
 use std::io::Write;
 use std::task::{Context, Poll};
 

@@ -1,6 +1,6 @@
 use actix_web::HttpRequest;
 use actix_web::dev::ServiceRequest;
-use log::{info};
+use log::{debug, info};
 use actix_web::http::{HeaderMap, HeaderName};
 use std::str::FromStr;
 
@@ -9,7 +9,7 @@ pub fn get_request_ip(request: &HttpRequest) -> String {
   let maybe_x_forwarded = get_ip_from_header(headers, "x-forwarded-for");
   let maybe_forwarded = get_ip_from_header(headers, "forwarded");
 
-  info!("(1) x-forwarded-for: {:?}, forwarded: {:?}", maybe_x_forwarded, maybe_forwarded);
+  debug!("(1) x-forwarded-for: {:?}, forwarded: {:?}", maybe_x_forwarded, maybe_forwarded);
 
   let maybe_ip = maybe_x_forwarded.or(maybe_forwarded);
 
@@ -28,7 +28,7 @@ pub fn get_request_ip(request: &HttpRequest) -> String {
         .copied()
         .unwrap_or("")
         .to_string();
-      info!("Forwarded IP address (1): {}", &ip_address);
+      debug!("Forwarded IP address (1): {}", &ip_address);
       ip_address
     },
   }
@@ -40,7 +40,7 @@ pub fn get_service_request_ip(request: &ServiceRequest) -> String {
   let maybe_x_forwarded = get_ip_from_header(headers, "x-forwarded-for");
   let maybe_forwarded = get_ip_from_header(headers, "forwarded");
 
-  info!("(2) x-forwarded-for: {:?}, forwarded: {:?}", maybe_x_forwarded, maybe_forwarded);
+  debug!("(2) x-forwarded-for: {:?}, forwarded: {:?}", maybe_x_forwarded, maybe_forwarded);
 
   let maybe_ip = maybe_x_forwarded.or(maybe_forwarded);
 
@@ -59,7 +59,7 @@ pub fn get_service_request_ip(request: &ServiceRequest) -> String {
           .copied()
           .unwrap_or("")
           .to_string();
-      info!("(2) Forwarded IP address: {}", &ip_address);
+      debug!("(2) Forwarded IP address: {}", &ip_address);
       ip_address
     },
   }
