@@ -50,34 +50,26 @@ pub async fn stripe_create_checkout_session_shared(
       success_url,
     );
 
+
+
     /*
 
-     Stripe webhook event type: PaymentIntentCreated
-      UNHANDLED STRIPE WEBHOOK EVENT TYPE: PaymentIntentCreated
 
-      [-] 127.0.0.1:54490 "POST /stripe/webhook HTTP/1.1" 200 16 "-" "Stripe/1.0 (+https://stripe.com/docs/webhooks)" 0.003373
+    Bind these:
 
-      Stripe webhook event type: CustomerCreated
+    - customer.subscription.updated  - Sent when the subscription is successfully started, after the payment is confirmed.
+                                       Also sent whenever a subscription is changed. For example, adding a coupon, applying a
+                                       discount, adding an invoice item, and changing plans all trigger this event.
 
-      >>> customer.created: "cus_MPQxICCzeD8wKm", None
-      [-] 127.0.0.1:54492 "POST /stripe/webhook HTTP/1.1" 200 16 "-" "Stripe/1.0 (+https://stripe.com/docs/webhooks)" 0.002464
-      Stripe webhook event type: PaymentIntentSucceeded
+    - customer.subscription.deleted  - Sent when a customer’s subscription ends.
 
-      [-] 127.0.0.1:54492 "POST /stripe/webhook HTTP/1.1" 200 16 "-" "Stripe/1.0 (+https://stripe.com/docs/webhooks)" 0.003981
-      Stripe webhook event type: ChargeSucceeded
-      UNHANDLED STRIPE WEBHOOK EVENT TYPE: ChargeSucceeded
-
-      [-] 127.0.0.1:54492 "POST /stripe/webhook HTTP/1.1" 200 16 "-" "Stripe/1.0 (+https://stripe.com/docs/webhooks)" 0.002594
-      Stripe webhook event type: CheckoutSessionCompleted
-
-      >>> checkout.session.completed: Some("cus_MPQxICCzeD8wKm"), None
-      [-] 127.0.0.1:54492 "POST /stripe/webhook HTTP/1.1" 200 16 "-" "Stripe/1.0 (+https://stripe.com/docs/webhooks)" 0.002465
-      [-] 127.0.0.1:54494 "GET /stripe/checkout/success HTTP/1.1" 200 16 "-" "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:104.0) Gecko/20100101 Firefox/104.0" 0.000522
+    - invoice.created  - Do I need to do anything !?
 
 
-
+    - invoice.paid	  - Sent when the invoice is successfully paid.
+                        You can provision access to your product when you receive this event and the
+                        subscription status is active.
      */
-
 
     // `client_reference_id`
     // Stripe Docs:
@@ -89,7 +81,8 @@ pub async fn stripe_create_checkout_session_shared(
     //   This gets reported back in the Checkout Session (and related webhooks) as
     //   `client_reference_id`. Passing the same ID on multiple checkouts does not unify or
     //   cross-correlate customers and only seems to be metadata for the checkout session itself.
-    params.client_reference_id = Some("U:SOME_INTERNAL_REFERENCE_ID");
+    //   This is probably only useful for tracking checkout session engagement.
+    //params.client_reference_id = Some("SOME_INTERNAL_ID");
 
     // `customer_email`
     // Stripe Docs:
@@ -102,8 +95,7 @@ pub async fn stripe_create_checkout_session_shared(
     //   This does not look up previous customers with the same email and will not unify or
     //   cross-correlate customers. By default the field will be un-editable in the checkout flow
     //   if this is specified.
-    params.customer_email = Some("customer@someinternalemail.com");
-    // TODO ^ This makes it un-editable. (maybe it can be changed?)
+    //params.customer_email = Some("email@example.com");
 
     let mut metadata = HashMap::new();
 
@@ -113,14 +105,25 @@ pub async fn stripe_create_checkout_session_shared(
       metadata.insert(METADATA_EMAIL.to_string(), token.to_string());
     }
 
-    // TODO: What does this attach to?
+    // NB: This metadata attaches to Stripe's Checkout Session object.
+    // This does not attach to the subscription or payment intent, which have their own metadata
+    // objects. (TODO: Confirm this.)
     params.metadata = Some(metadata.clone());
+
+    let mut metadata = HashMap::new();
+
+    if let Some(token) = user_token {
+      metadata.insert(METADATA_USER_TOKEN.to_string(), "U:SECOND_ID".to_string());
+      metadata.insert(METADATA_USERNAME.to_string(), "U:SECOND_ID".to_string());
+      metadata.insert(METADATA_EMAIL.to_string(), "U:SECOND_ID".to_string());
+    }
 
     if is_subscription {
       // Subscription mode: Use Stripe Billing to set up fixed-price subscriptions.
       params.mode = Some(CheckoutSessionMode::Subscription);
 
       // NB: This metadata attaches to the subscription entity itself.
+      // This cannot be used for non-subscription, one-off payments.
       // https://support.stripe.com/questions/using-metadata-with-checkout-sessions
       params.subscription_data = Some(CreateCheckoutSessionSubscriptionData {
         metadata,
@@ -131,8 +134,8 @@ pub async fn stripe_create_checkout_session_shared(
       // Payment mode: Accept one-time payments for cards, iDEAL, and more.
       params.mode = Some(CheckoutSessionMode::Payment);
 
-      // TODO: Should this also be on subscriptions (?)
       // NB: This metadata attaches to the payment_intent entity itself.
+      // This cannot be used for subscriptions.
       // https://support.stripe.com/questions/using-metadata-with-checkout-sessions
       params.payment_intent_data = Some(CreateCheckoutSessionPaymentIntentData {
         metadata: metadata.clone(),
@@ -147,9 +150,6 @@ pub async fn stripe_create_checkout_session_shared(
         ..Default::default()
       }
     ]);
-
-    // TODO: Is this necessary?
-    //params.expand = &["line_items", "line_items.data.price.product"];
 
     CheckoutSession::create(&stripe_client, params)
         .await

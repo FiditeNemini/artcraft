@@ -6,6 +6,7 @@ use actix_web::{web, HttpResponse, HttpRequest};
 use chrono::{DateTime, Utc};
 use crate::stripe::helpers::verify_stripe_webhook_ip_address::verify_stripe_webhook_ip_address;
 use crate::stripe::stripe_config::StripeConfig;
+use crate::stripe::webhook_event_handlers::charge::charge_succeeded_handler::charge_succeeded_handler;
 use crate::stripe::webhook_event_handlers::checkout_session::checkout_session_completed_handler::checkout_session_completed_handler;
 use crate::stripe::webhook_event_handlers::customer::customer_created_handler::customer_created_handler;
 use crate::stripe::webhook_event_handlers::customer::customer_deleted_handler::customer_deleted_handler;
@@ -17,6 +18,7 @@ use crate::stripe::webhook_event_handlers::invoice::invoice_paid_handler::invoic
 use crate::stripe::webhook_event_handlers::invoice::invoice_payment_failed::invoice_payment_failed_handler;
 use crate::stripe::webhook_event_handlers::invoice::invoice_payment_succeeded_handler::invoice_payment_succeeded_handler;
 use crate::stripe::webhook_event_handlers::invoice::invoice_updated_handler::invoice_updated_handler;
+use crate::stripe::webhook_event_handlers::payment_intent::payment_intent_succeeded_handler::payment_intent_succeeded_handler;
 use crate::stripe::webhook_event_handlers::stripe_webhook_error::StripeWebhookError;
 use http_server_common::request::get_request_header_optional::get_request_header_optional;
 use http_server_common::response::serialize_as_json_error::serialize_as_json_error;
@@ -26,7 +28,6 @@ use sqlx::MySqlPool;
 use std::collections::HashMap;
 use std::fmt;
 use stripe::{EventObject, EventType, PaymentIntentStatus, Webhook};
-use crate::stripe::webhook_event_handlers::payment_intent::payment_intent_succeeded_handler::payment_intent_succeeded_handler;
 
 #[derive(Serialize)]
 pub struct StripeWebhookSuccessResponse {
@@ -230,6 +231,15 @@ pub async fn stripe_webhook_handler(
     // EventType::PaymentIntentProcessing => {}
     // EventType::PaymentIntentRequiresAction => {}
     // EventType::PaymentIntentRequiresCapture => {}
+
+    // =============== CHARGES ===============
+
+    EventType::ChargeSucceeded => {
+      if let EventObject::Charge(charge) = webhook_payload.data.object {
+        let _r = charge_succeeded_handler(&charge)?;
+      }
+    }
+
 
     // =============== Ignored ===============
 
