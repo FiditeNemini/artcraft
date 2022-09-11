@@ -79,9 +79,31 @@ pub async fn stripe_create_checkout_session_shared(
      */
 
 
+    // `client_reference_id`
+    // Stripe Docs:
+    //   A unique string to reference the Checkout Session.
+    //   This can be a customer ID, a cart ID, or similar, and can be used to reconcile the session
+    //   with your internal systems.
+    //
+    // Our Notes:
+    //   This gets reported back in the Checkout Session (and related webhooks) as
+    //   `client_reference_id`. Passing the same ID on multiple checkouts does not unify or
+    //   cross-correlate customers and only seems to be metadata for the checkout session itself.
+    params.client_reference_id = Some("U:SOME_INTERNAL_REFERENCE_ID");
 
-
-
+    // `customer_email`
+    // Stripe Docs:
+    //   If provided, this value will be used when the Customer object is created. If not provided,
+    //   customers will be asked to enter their email address. Use this parameter to prefill
+    //   customer data if you already have an email on file. To access information about the
+    //   customer once a session is complete, use the customer field.
+    //
+    // Our Notes:
+    //   This does not look up previous customers with the same email and will not unify or
+    //   cross-correlate customers. By default the field will be un-editable in the checkout flow
+    //   if this is specified.
+    params.customer_email = Some("customer@someinternalemail.com");
+    // TODO ^ This makes it un-editable. (maybe it can be changed?)
 
     let mut metadata = HashMap::new();
 
@@ -90,6 +112,9 @@ pub async fn stripe_create_checkout_session_shared(
       metadata.insert(METADATA_USERNAME.to_string(), token.to_string());
       metadata.insert(METADATA_EMAIL.to_string(), token.to_string());
     }
+
+    // TODO: What does this attach to?
+    params.metadata = Some(metadata.clone());
 
     if is_subscription {
       // Subscription mode: Use Stripe Billing to set up fixed-price subscriptions.
@@ -123,7 +148,8 @@ pub async fn stripe_create_checkout_session_shared(
       }
     ]);
 
-    params.expand = &["line_items", "line_items.data.price.product"];
+    // TODO: Is this necessary?
+    //params.expand = &["line_items", "line_items.data.price.product"];
 
     CheckoutSession::create(&stripe_client, params)
         .await
