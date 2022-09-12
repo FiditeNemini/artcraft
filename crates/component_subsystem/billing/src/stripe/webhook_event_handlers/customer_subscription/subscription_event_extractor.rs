@@ -1,6 +1,6 @@
 use anyhow::anyhow;
-use chrono::{DateTime, Utc};
-use stripe::{Price, Subscription, SubscriptionInterval, SubscriptionStatus};
+use chrono::{DateTime, NaiveDateTime, Utc};
+use stripe::{Price, RecurringInterval, Subscription, SubscriptionInterval, SubscriptionStatus};
 use container_common::anyhow_result::AnyhowResult;
 use crate::stripe::helpers::common_metadata_keys::METADATA_USER_TOKEN;
 use crate::stripe::helpers::expand_customer_id::expand_customer_id;
@@ -19,12 +19,10 @@ pub struct SubscriptionSummary {
   pub stripe_price_id: String,
 
   pub subscription_is_active: bool,
-  pub billed_at: DateTime<Utc>,
+  pub subscription_interval: RecurringInterval,
 
-  /// Tell the update handler how many days in the future to set the plan.
-  pub subscription_interval: SubscriptionInterval,
-  /// Calculated from interval
-  pub subscription_expires_at: DateTime<Utc>,
+  pub subscription_period_start: NaiveDateTime,
+  pub subscription_period_end: NaiveDateTime,
 }
 
 /// Extract only the subscription details we care about
@@ -55,6 +53,17 @@ pub fn subscription_summary_extractor(subscription: &Subscription) -> AnyhowResu
     Some(product) => product,
   };
 
+  let recurring = match &price.recurring {
+    None => return Err(anyhow!("Could not get interval in subscription {}", subscription_id)),
+    Some(recurring) => recurring,
+  };
+
+  //subscription.current_period_start;
+  //subscription.current_period_end;
+
+  let period_start = NaiveDateTime::from_timestamp(subscription.current_period_start, 0);
+  let period_end = NaiveDateTime::from_timestamp(subscription.current_period_end, 0);
+
   Ok(SubscriptionSummary {
     user_token: maybe_user_token,
     stripe_subscription_id: subscription_id,
@@ -64,15 +73,15 @@ pub fn subscription_summary_extractor(subscription: &Subscription) -> AnyhowResu
     stripe_product_id: expand_product_id(product),
     stripe_price_id: price.id.to_string(),
     subscription_is_active: subscription.status == SubscriptionStatus::Active,
-    billed_at: Utc::now(),
-    subscription_interval: Default::default(),
-    subscription_expires_at: Utc::now(),
+    subscription_interval: recurring.interval,
+    subscription_period_start: period_start,
+    subscription_period_end: period_end,
   })
 }
 
 #[cfg(test)]
 mod tests {
-  use stripe::{Subscription, SubscriptionStatus};
+  use stripe::{RecurringInterval, Subscription, SubscriptionStatus};
   use crate::stripe::webhook_event_handlers::customer_subscription::subscription_event_extractor::subscription_summary_extractor;
 
   #[test]
@@ -110,6 +119,9 @@ mod tests {
     assert_eq!(summary.stripe_customer_id, "cus_MPrgIen5Wh6QKG".to_string());
     assert_eq!(summary.stripe_product_id, "prod_MMxi2J5y69VPbO".to_string());
     assert_eq!(summary.stripe_price_id, "price_1LeDnKEU5se17MekVr1iYYNf".to_string());
+    assert_eq!(summary.subscription_interval, RecurringInterval::Month);
     assert_eq!(summary.stripe_is_production, false);
+    assert_eq!(summary.subscription_period_start.to_string(), "2022-09-12 02:00:37".to_string());
+    assert_eq!(summary.subscription_period_end.to_string(), "2022-10-12 02:00:37".to_string());
   }
 }
