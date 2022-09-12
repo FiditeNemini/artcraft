@@ -6,6 +6,7 @@ use crate::stripe::helpers::common_metadata_keys::METADATA_USER_TOKEN;
 use crate::stripe::helpers::expand_customer_id::expand_customer_id;
 use crate::stripe::helpers::expand_product_id::expand_product_id;
 
+#[derive(Clone, Debug)]
 pub struct SubscriptionSummary {
   pub user_token: Option<String>,
 
@@ -85,7 +86,46 @@ mod tests {
   use crate::stripe::webhook_event_handlers::customer_subscription::subscription_event_extractor::subscription_summary_extractor;
 
   #[test]
-  fn test_subscription_summary_extractor() {
+  fn test_subscription_summary_extractor_on_create_event() {
+    // NB: Actual raw test data from Stripe to our webhook
+    let json = r#"
+      {"id":"sub_1LhA3MEU5se17MekeWvmTNyk","automatic_tax":{"enabled":false},
+      "billing_cycle_anchor":1662979188,"cancel_at_period_end":false,
+      "collection_method":"charge_automatically","created":1662979188,"current_period_end":1665571188,
+      "current_period_start":1662979188,"customer":"cus_MQ03py0gWUh0Ox","default_tax_rates":[],
+      "items":{"data":[{"id":"si_MQ03hadVNfRnaS","created":1662979188,"deleted":false,"metadata":{},
+      "price":{"id":"price_1LeDnKEU5se17MekVr1iYYNf","active":true,"billing_scheme":"per_unit",
+      "created":1662278586,"currency":"usd","deleted":false,"livemode":false,"metadata":{},
+      "product":"prod_MMxi2J5y69VPbO","recurring":{"interval":"month","interval_count":1,
+      "usage_type":"licensed"},"tax_behavior":"exclusive","type":"recurring","unit_amount":700,
+      "unit_amount_decimal":"700"},"quantity":1,"subscription":"sub_1LhA3MEU5se17MekeWvmTNyk",
+      "tax_rates":[]}],"has_more":false,"total_count":1,
+      "url":"/v1/subscription_items?subscription=sub_1LhA3MEU5se17MekeWvmTNyk"},
+      "latest_invoice":"in_1LhA3MEU5se17MekUqOhZ9cu","livemode":false,
+      "metadata":{"email":"email@email.com","username":"username","user_token":"U:TOKEN"},
+      "payment_settings":{"save_default_payment_method":"off"},"start_date":1662979188,
+      "status":"incomplete"}
+    "#;
+
+    let subscription = serde_json::from_str::<Subscription>(json).unwrap();
+
+    let summary= subscription_summary_extractor(&subscription).unwrap();
+
+    assert_eq!(summary.user_token, Some("U:TOKEN".to_string()));
+    assert_eq!(summary.stripe_subscription_id, "sub_1LhA3MEU5se17MekeWvmTNyk".to_string());
+    assert_eq!(summary.stripe_subscription_status, SubscriptionStatus::Incomplete);
+    assert_eq!(summary.subscription_is_active, false);
+    assert_eq!(summary.stripe_customer_id, "cus_MQ03py0gWUh0Ox".to_string());
+    assert_eq!(summary.stripe_product_id, "prod_MMxi2J5y69VPbO".to_string());
+    assert_eq!(summary.stripe_price_id, "price_1LeDnKEU5se17MekVr1iYYNf".to_string());
+    assert_eq!(summary.subscription_interval, RecurringInterval::Month);
+    assert_eq!(summary.stripe_is_production, false);
+    assert_eq!(summary.subscription_period_start.to_string(), "2022-09-12 10:39:48".to_string());
+    assert_eq!(summary.subscription_period_end.to_string(), "2022-10-12 10:39:48".to_string());
+  }
+
+  #[test]
+  fn test_subscription_summary_extractor_on_update_event() {
     // NB: Actual raw test data from Stripe to our webhook
     let json = r#"
       {"id":"sub_1Lh1wvEU5se17Mekx72OzAzs","automatic_tax":{"enabled":false},
@@ -123,5 +163,46 @@ mod tests {
     assert_eq!(summary.stripe_is_production, false);
     assert_eq!(summary.subscription_period_start.to_string(), "2022-09-12 02:00:37".to_string());
     assert_eq!(summary.subscription_period_end.to_string(), "2022-10-12 02:00:37".to_string());
+  }
+
+  #[test]
+  fn test_subscription_summary_extractor_on_control_panel_immediate_delete_event() {
+    // NB: Actual raw test data from Stripe to our webhook
+    let json = r#"
+      {"id":"sub_1LhA3MEU5se17MekeWvmTNyk","automatic_tax":{"enabled":false},
+      "billing_cycle_anchor":1662979188,"cancel_at_period_end":false,"canceled_at":1662979740,
+      "collection_method":"charge_automatically","created":1662979188,"current_period_end":1665571188,
+      "current_period_start":1662979188,"customer":"cus_MQ03py0gWUh0Ox",
+      "default_payment_method":"pm_1LhA3LEU5se17MekViNvoYAx","default_tax_rates":[],
+      "ended_at":1662979740,"items":{"data":[{"id":"si_MQ03hadVNfRnaS","created":1662979188,
+      "deleted":false,"metadata":{},"price":{"id":"price_1LeDnKEU5se17MekVr1iYYNf","active":true,
+      "billing_scheme":"per_unit","created":1662278586,"currency":"usd","deleted":false,
+      "livemode":false,"metadata":{},"product":"prod_MMxi2J5y69VPbO",
+      "recurring":{"interval":"month","interval_count":1,"usage_type":"licensed"},
+      "tax_behavior":"exclusive","type":"recurring","unit_amount":700,"unit_amount_decimal":"700"},
+      "quantity":1,"subscription":"sub_1LhA3MEU5se17MekeWvmTNyk","tax_rates":[]}],"has_more":false,
+      "total_count":1,
+      "url":"/v1/subscription_items?subscription=sub_1LhA3MEU5se17MekeWvmTNyk"},
+      "latest_invoice":"in_1LhA3MEU5se17MekUqOhZ9cu","livemode":false,
+      "metadata":{"email":"email@email.com","username":"username","user_token":"U:TOKEN"},
+      "payment_settings":{"save_default_payment_method":"off"},"start_date":1662979188,
+      "status":"canceled"}
+    "#;
+
+    let subscription = serde_json::from_str::<Subscription>(json).unwrap();
+
+    let summary= subscription_summary_extractor(&subscription).unwrap();
+
+    assert_eq!(summary.user_token, Some("U:TOKEN".to_string()));
+    assert_eq!(summary.stripe_subscription_id, "sub_1LhA3MEU5se17MekeWvmTNyk".to_string());
+    assert_eq!(summary.stripe_subscription_status, SubscriptionStatus::Canceled);
+    assert_eq!(summary.subscription_is_active, false);
+    assert_eq!(summary.stripe_customer_id, "cus_MQ03py0gWUh0Ox".to_string());
+    assert_eq!(summary.stripe_product_id, "prod_MMxi2J5y69VPbO".to_string());
+    assert_eq!(summary.stripe_price_id, "price_1LeDnKEU5se17MekVr1iYYNf".to_string());
+    assert_eq!(summary.subscription_interval, RecurringInterval::Month);
+    assert_eq!(summary.stripe_is_production, false);
+    assert_eq!(summary.subscription_period_start.to_string(), "2022-09-12 10:39:48".to_string());
+    assert_eq!(summary.subscription_period_end.to_string(), "2022-10-12 10:39:48".to_string());
   }
 }
