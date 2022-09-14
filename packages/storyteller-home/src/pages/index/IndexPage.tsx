@@ -27,7 +27,7 @@ import { useEffect } from "react";
 import gsap from "gsap";
 import SplitType from "split-type";
 import Scene from "./Scene";
-import { ThirdPartyLinks } from "@storyteller/components/src/constants/ThirdPartyLinks"
+import { ThirdPartyLinks } from "@storyteller/components/src/constants/ThirdPartyLinks";
 import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/css";
 import "swiper/css/pagination";
@@ -49,14 +49,24 @@ function IndexPage() {
     console.log(splitTitleOutline);
 
     var tl = gsap.timeline({ delay: 0.2 });
-    tl.to(splitTitle.chars, {
+    tl.to("#hero-img", {
       delay: 0.2,
-      duration: 0.4,
+      duration: 0.7,
       y: 0,
       opacity: 1,
-      stagger: 0.03,
-      ease: "expo",
     });
+    tl.to(
+      splitTitle.chars,
+      {
+        delay: 0.3,
+        duration: 0.4,
+        y: 0,
+        opacity: 1,
+        stagger: 0.03,
+        ease: "expo",
+      },
+      "<"
+    );
     tl.to(
       splitTitleOutline.words,
       {
@@ -81,20 +91,11 @@ function IndexPage() {
       },
       "<"
     );
-    tl.to(
-      "#hero-img",
-      {
-        duration: 1,
-        y: 0,
-        opacity: 1,
-        ease: "expo",
-      },
-      0.2
-    );
+
     tl.to(
       ".shape-2, .shape-1, .shape-3, .shape-4",
       {
-        duration: 0.4,
+        duration: 1,
         y: 0,
         scale: 1,
         opacity: 0.6,

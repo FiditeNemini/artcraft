@@ -374,8 +374,7 @@ p {
 }
 
 .hero-img {
-  width: 100%;
-  min-width: 1920px;
+  max-width: 4000px;
   position: absolute;
   bottom: 0;
   z-index: 5;
@@ -994,7 +993,7 @@ span.swiper-pagination-bullet.swiper-pagination-bullet-active {
 
 @media (max-width: 1199.98px) {
   .hero-img {
-    min-width: 1550px;
+    max-width: 3300px;
   }
 
   .hero-title {
@@ -1053,7 +1052,7 @@ span.swiper-pagination-bullet.swiper-pagination-bullet-active {
   }
 
   .hero-img {
-    min-width: 1500px;
+    max-width: 3100px;
   }
 
   .hero-sub-title {
