@@ -23,3 +23,9 @@
 /upload*   /index.html   200
 /video*   /index.html   200
 /w2l*   /index.html   200
+
+# This is for YCombinator. 
+# This is the *OLD* video for Summer 2022. We'll re-edit.
+# PLEASE DO NOT ACECSS THIS URL OR WATCH. IT WILL CHANGE THE 
+# VIEW STATISTICS AND WE WON'T BE ABLE TO TELL IF THEY SAW IT
+/demo   https://www.youtube.com/watch?v=wfFpi-Mv3fY   302
