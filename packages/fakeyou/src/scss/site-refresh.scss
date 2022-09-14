@@ -312,6 +312,21 @@ styles with important tags:
   .alert {
     border-radius: 5px;
     font-weight: 400;
+    font-size: 12px;
+    margin-bottom: 1rem;
+    padding: 0.75rem 1rem;
+
+    a {
+      color: darken($primary, 3%);
+
+      &:hover {
+        opacity: 0.85;
+      }
+    }
+
+    &.alert-dismissible {
+      padding-right: 2.75rem;
+    }
   }
 
   .input-icon {
@@ -517,10 +532,6 @@ styles with important tags:
     }
   }
 
-  .alert {
-    font-size: 14px;
-  }
-
   .rounded-circle {
     border-radius: 50px;
   }
@@ -537,6 +548,10 @@ styles with important tags:
     &:hover {
       color: rgba($white, 0.6);
     }
+  }
+
+  .btn-close {
+    transition: 0.2s;
   }
 }
 
@@ -562,6 +577,10 @@ styles with important tags:
     .lead {
       font-size: 20px;
     }
+
+    .alert {
+      font-size: 13px;
+    }
   }
 }
 
@@ -584,10 +603,6 @@ styles with important tags:
 
     ul.patrons-list {
       columns: 3;
-    }
-
-    .alert {
-      font-size: 16px;
     }
 
     .video-card {
