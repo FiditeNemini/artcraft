@@ -7,9 +7,9 @@ interface Props {
 function TwitchTtsNotice(props: Props) {
   return (
     <>
-      <div className="container pt-3">
+      <div className="container">
         <div
-          className="alert alert-primary alert-dismissible fade show"
+          className="alert alert-secondary alert-dismissible fade show"
           role="alert"
         >
           <button

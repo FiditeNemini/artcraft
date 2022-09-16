@@ -9,9 +9,9 @@ interface Props {
 function GenericNotice(props: Props) {
   return (
     <>
-      <div className="container pt-3">
+      <div className="container">
         <div
-          className="alert alert-primary alert-dismissible fade show"
+          className="alert alert-secondary alert-dismissible fade show"
           role="alert"
         >
           <button
@@ -20,10 +20,7 @@ function GenericNotice(props: Props) {
             data-bs-dismiss="alert"
             aria-label="Close"
           ></button>
-          <h2>
-            {props.title}
-          </h2>
-          {props.body}
+          <strong>{props.title}</strong> {props.body}
         </div>
       </div>
     </>

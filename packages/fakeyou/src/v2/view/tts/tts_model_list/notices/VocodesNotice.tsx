@@ -16,9 +16,9 @@ function VocodesNotice(props: Props) {
           production and deepfake tools, so stay tuned.
         </div>
       </article>*/}
-      <div className="container pt-3">
+      <div className="container">
         <div
-          className="alert alert-primary alert-dismissible fade show"
+          className="alert alert-secondary alert-dismissible fade show"
           role="alert"
         >
           <button

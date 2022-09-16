@@ -11,9 +11,9 @@ interface Props {
 function PleaseFollowNotice(props: Props) {
   return (
     <>
-      <div className="container pt-3">
+      <div className="container">
         <div
-          className="alert alert-primary alert-dismissible fade show"
+          className="alert alert-secondary alert-dismissible fade show"
           role="alert"
         >
           <button
@@ -26,8 +26,7 @@ function PleaseFollowNotice(props: Props) {
             <Trans i18nKey="notices.pleaseFollow.title">
               Sorry our site is so slow!
             </Trans>
-          </strong>
-          <br />
+          </strong>{" "}
           <Trans i18nKey="notices.pleaseFollow.body">
             I am so sorry the website is slow. We're getting millions of
             requests. <TwitterLink>Please follow us on Twitter</TwitterLink> and
@@ -39,8 +38,7 @@ function PleaseFollowNotice(props: Props) {
               video deepfake technology will debut on Twitch
             </TwitchLabsLink>
             , so please follow us there too.
-          </Trans>
-          <br />
+          </Trans>{" "}
           <DiscordLink2 /> | <TwitterLink /> | <TwitchLabsLink />
         </div>
       </div>

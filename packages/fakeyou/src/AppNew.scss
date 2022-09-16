@@ -207,23 +207,23 @@ $headings-font-family: "Merriweather", serif;
 
       .btn-secondary {
         color: $white !important;
-        border-color: #5a4a54;
-        background-color: #5a4a54;
+        border-color: #974e4c;
+        background-color: #974e4c;
 
         &:hover {
-          border-color: lighten(#5a4a54, 5%);
-          background-color: lighten(#5a4a54, 5%);
+          border-color: lighten(#974e4c, 6%);
+          background-color: lighten(#974e4c, 6%);
         }
       }
 
       .btn-destructive {
-        background-color: #5a3d47 !important;
-        border-color: #5a3d47;
+        background-color: #6d353b !important;
+        border-color: #6d353b;
         color: $white;
 
         &:hover {
-          border-color: lighten(#5a3d47, 6%);
-          background-color: lighten(#5a3d47, 6%) !important;
+          border-color: lighten(#6d353b, 6%);
+          background-color: lighten(#6d353b, 6%) !important;
         }
       }
 
