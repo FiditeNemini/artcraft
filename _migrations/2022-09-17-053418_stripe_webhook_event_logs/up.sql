@@ -21,7 +21,11 @@ CREATE TABLE stripe_webhook_event_logs (
 
   -- The id of the entity that was the subject of the event.
   -- We don't always extract this.
-  stripe_maybe_event_entity_id VARCHAR(255) DEFAULT NULL,
+  maybe_stripe_event_entity_id VARCHAR(255) DEFAULT NULL,
+
+  -- The id of the entity that was the subject of the event.
+  -- We don't always extract this.
+  maybe_stripe_customer_id VARCHAR(255) DEFAULT NULL,
 
   -- Whether this is in production or test mode in Stripe.
   -- This is controlled by which API keys are used.

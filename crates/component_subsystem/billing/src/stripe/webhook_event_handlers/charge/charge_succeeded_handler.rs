@@ -2,11 +2,13 @@ use container_common::anyhow_result::AnyhowResult;
 use crate::stripe::helpers::common_metadata_keys::METADATA_USER_TOKEN;
 use crate::stripe::helpers::expand_customer_id::expand_customer_id;
 use crate::stripe::webhook_event_handlers::stripe_webhook_error::StripeWebhookError;
+use crate::stripe::webhook_event_handlers::stripe_webhook_summary::StripeWebhookSummary;
 use log::error;
 use stripe::{Charge, Invoice, PaymentIntent};
 
 // Handle event type: 'charge.succeeded'
-pub fn charge_succeeded_handler(charge: &Charge) -> Result<(), StripeWebhookError> {
+pub fn charge_succeeded_handler(charge: &Charge) -> Result<StripeWebhookSummary, StripeWebhookError> {
+  let charge_id = charge.id.to_string();
 
   let charge_status = charge.status;
 
@@ -20,8 +22,10 @@ pub fn charge_succeeded_handler(charge: &Charge) -> Result<(), StripeWebhookErro
   let maybe_user_token = charge.metadata.get(METADATA_USER_TOKEN)
       .map(|t| t.to_string());
 
-  error!(">>> charge.succeeded: {:?}, {:?}, {:?}",
-    charge_status, maybe_stripe_customer_id, maybe_user_token);
-
-  Ok(())
+  Ok(StripeWebhookSummary {
+    maybe_user_token: maybe_user_token,
+    maybe_event_entity_id: Some(charge_id),
+    maybe_stripe_customer_id: maybe_stripe_customer_id,
+    event_was_handled: false,
+  })
 }

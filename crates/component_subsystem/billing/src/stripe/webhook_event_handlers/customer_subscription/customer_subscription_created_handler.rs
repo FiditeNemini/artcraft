@@ -17,7 +17,8 @@ pub fn customer_subscription_created_handler(subscription: &Subscription) -> Res
 
   Ok(StripeWebhookSummary {
     maybe_user_token: summary.user_token,
-    maybe_event_id: Some(summary.stripe_subscription_id),
+    maybe_event_entity_id: Some(summary.stripe_subscription_id),
+    maybe_stripe_customer_id: Some(summary.stripe_customer_id),
     event_was_handled: false,
   })
 }

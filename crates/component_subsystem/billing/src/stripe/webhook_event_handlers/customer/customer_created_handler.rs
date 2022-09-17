@@ -1,12 +1,12 @@
 use container_common::anyhow_result::AnyhowResult;
 use crate::stripe::helpers::common_metadata_keys::METADATA_USER_TOKEN;
-use crate::stripe::helpers::expand_customer_id::expand_customer_id;
 use crate::stripe::webhook_event_handlers::stripe_webhook_error::StripeWebhookError;
+use crate::stripe::webhook_event_handlers::stripe_webhook_summary::StripeWebhookSummary;
 use log::error;
 use stripe::Customer;
 
 // Handle event type: 'customer.created'
-pub fn customer_created_handler(customer: &Customer) -> Result<(), StripeWebhookError> {
+pub fn customer_created_handler(customer: &Customer) -> Result<StripeWebhookSummary, StripeWebhookError> {
 
   // NB: We'll need this to send them to the "customer portal", which is how they can modify
   // or cancel their subscriptions.
@@ -16,7 +16,10 @@ pub fn customer_created_handler(customer: &Customer) -> Result<(), StripeWebhook
   let maybe_user_token = customer.metadata.get(METADATA_USER_TOKEN)
       .map(|t| t.to_string());
 
-  error!(">>> customer.created: {:?}, {:?}", customer_id, maybe_user_token);
-
-  Ok(())
+  Ok(StripeWebhookSummary {
+    maybe_user_token: maybe_user_token,
+    maybe_event_entity_id: Some(customer_id.clone()),
+    maybe_stripe_customer_id: Some(customer_id.clone()),
+    event_was_handled: false,
+  })
 }

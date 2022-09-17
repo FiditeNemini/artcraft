@@ -7,6 +7,7 @@ use crate::stripe::helpers::expand_subscription_id::expand_subscription_id;
 use crate::stripe::webhook_event_handlers::stripe_webhook_error::StripeWebhookError;
 use log::error;
 use stripe::{Invoice, InvoiceLineItemType, InvoiceStatus, SubscriptionInterval};
+use crate::stripe::webhook_event_handlers::stripe_webhook_summary::StripeWebhookSummary;
 
 /// If we determine a subscription needs update, this is the struct we produce.
 /// This should be easily unit testable.
@@ -65,8 +66,20 @@ pub enum InvoicePaidDetails {
 // 4. Your webhook endpoint updates the customer’s access expiration date in your database to the
 //    appropriate date in the future (plus a day or two for leeway).
 //
-pub fn invoice_paid_handler(invoice: &Invoice) -> Result<(), StripeWebhookError> {
-  Ok(())
+pub fn invoice_paid_handler(invoice: &Invoice) -> Result<StripeWebhookSummary, StripeWebhookError> {
+  let maybe_invoice_details = invoice_paid_extractor(invoice)
+      .map_err(|err| {
+        error!("Error processing invoice: {:?}", err);
+        StripeWebhookError::ServerError
+      })?;
+
+  // TODO
+  Ok(StripeWebhookSummary {
+    maybe_user_token: None,
+    maybe_event_entity_id: None,
+    maybe_stripe_customer_id: None,
+    event_was_handled: false
+  })
 }
 
 fn invoice_paid_extractor(invoice: &Invoice) -> AnyhowResult<Option<InvoicePaidDetails>> {

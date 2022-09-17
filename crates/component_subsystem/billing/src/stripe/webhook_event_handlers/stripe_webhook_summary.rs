@@ -6,7 +6,10 @@ pub struct StripeWebhookSummary {
 
   /// This is the core entity type associated with the webhook event.
   /// We pass this upstream so we can record it and look it up later for debugging.
-  pub maybe_event_id: Option<String>,
+  pub maybe_event_entity_id: Option<String>,
+
+  /// This is the stripe customer ID, if it was associated with the event.
+  pub maybe_stripe_customer_id: Option<String>,
 
   /// Whether we took action in response to the webhook.
   /// Not all event types have handlers yet.

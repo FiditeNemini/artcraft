@@ -20,6 +20,8 @@ use crate::stripe::webhook_event_handlers::invoice::invoice_payment_succeeded_ha
 use crate::stripe::webhook_event_handlers::invoice::invoice_updated_handler::invoice_updated_handler;
 use crate::stripe::webhook_event_handlers::payment_intent::payment_intent_succeeded_handler::payment_intent_succeeded_handler;
 use crate::stripe::webhook_event_handlers::stripe_webhook_error::StripeWebhookError;
+use crate::stripe::webhook_event_handlers::stripe_webhook_summary::StripeWebhookSummary;
+use database_queries::queries::billing::stripe::insert_stripe_webhook_event_log::InsertStripeWebhookEventLog;
 use http_server_common::request::get_request_header_optional::get_request_header_optional;
 use http_server_common::response::serialize_as_json_error::serialize_as_json_error;
 use http_server_common::util::timer::MultiBenchmarkingTimer;
@@ -28,8 +30,6 @@ use sqlx::MySqlPool;
 use std::collections::HashMap;
 use std::fmt;
 use stripe::{EventObject, EventType, PaymentIntentStatus, Webhook};
-use database_queries::queries::billing::stripe::insert_stripe_webhook_event_log::InsertStripeWebhookEventLog;
-use crate::stripe::webhook_event_handlers::stripe_webhook_summary::StripeWebhookSummary;
 
 #[derive(Serialize)]
 pub struct StripeWebhookSuccessResponse {
@@ -96,7 +96,8 @@ pub async fn stripe_webhook_handler(
 
   let mut webhook_summary = StripeWebhookSummary {
     maybe_user_token: None,
-    maybe_event_id: None,
+    maybe_event_entity_id: None,
+    maybe_stripe_customer_id: None,
     event_was_handled: false
   };
 
@@ -109,7 +110,7 @@ pub async fn stripe_webhook_handler(
 
     EventType::CheckoutSessionCompleted => {
       if let EventObject::CheckoutSession(checkout_session) = webhook_payload.data.object {
-        let _r = checkout_session_completed_handler(checkout_session)?;
+        webhook_summary = checkout_session_completed_handler(checkout_session)?;
       }
     }
 
@@ -121,17 +122,17 @@ pub async fn stripe_webhook_handler(
 
     EventType::CustomerCreated => {
       if let EventObject::Customer(customer) = webhook_payload.data.object {
-        let _r = customer_created_handler(&customer)?;
+        webhook_summary = customer_created_handler(&customer)?;
       }
     }
     EventType::CustomerUpdated => {
       if let EventObject::Customer(customer) = webhook_payload.data.object {
-        let _r = customer_updated_handler(&customer)?;
+        webhook_summary = customer_updated_handler(&customer)?;
       }
     }
     EventType::CustomerDeleted => {
       if let EventObject::Customer(customer) = webhook_payload.data.object {
-        let _r = customer_deleted_handler(&customer)?;
+        webhook_summary = customer_deleted_handler(&customer)?;
       }
     }
 
@@ -165,22 +166,22 @@ pub async fn stripe_webhook_handler(
     }
     EventType::InvoiceUpdated => {
       if let EventObject::Invoice(invoice) = webhook_payload.data.object {
-        let _r = invoice_updated_handler(&invoice)?;
+        webhook_summary = invoice_updated_handler(&invoice)?;
       }
     }
     EventType::InvoicePaid => {
       if let EventObject::Invoice(invoice) = webhook_payload.data.object {
-        let _r = invoice_paid_handler(&invoice)?;
+        webhook_summary = invoice_paid_handler(&invoice)?;
       }
     }
     EventType::InvoicePaymentSucceeded => {
       if let EventObject::Invoice(invoice) = webhook_payload.data.object {
-        let _r = invoice_payment_succeeded_handler(&invoice)?;
+        webhook_summary = invoice_payment_succeeded_handler(&invoice)?;
       }
     }
     EventType::InvoicePaymentFailed => {
       if let EventObject::Invoice(invoice) = webhook_payload.data.object {
-        let _r = invoice_payment_failed_handler(&invoice)?;
+        webhook_summary = invoice_payment_failed_handler(&invoice)?;
       }
     }
 
@@ -292,7 +293,8 @@ pub async fn stripe_webhook_handler(
   let query = InsertStripeWebhookEventLog {
     stripe_event_id,
     stripe_event_type,
-    stripe_maybe_event_entity_id: webhook_summary.maybe_event_id,
+    maybe_stripe_event_entity_id: webhook_summary.maybe_event_entity_id,
+    maybe_stripe_customer_id: webhook_summary.maybe_stripe_customer_id,
     stripe_event_created_at,
     stripe_is_production,
     maybe_user_token: webhook_summary.maybe_user_token,

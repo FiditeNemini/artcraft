@@ -4,13 +4,15 @@ use crate::stripe::helpers::expand_customer_id::expand_customer_id;
 use crate::stripe::webhook_event_handlers::stripe_webhook_error::StripeWebhookError;
 use log::warn;
 use stripe::Invoice;
+use crate::stripe::webhook_event_handlers::stripe_webhook_summary::StripeWebhookSummary;
 
 // Handle event type: 'invoice.updated'
 // Sent when a payment succeeds or fails.
 // If payment is successful the `paid` attribute is set to true and the `status` is `paid`.
 // If payment fails, `paid` is set to false and the `status` remains `open`.
 // Payment failures also trigger a invoice.payment_failed event.
-pub fn invoice_updated_handler(invoice: &Invoice) -> Result<(), StripeWebhookError> {
+pub fn invoice_updated_handler(invoice: &Invoice) -> Result<StripeWebhookSummary, StripeWebhookError> {
+  let invoice_id = invoice.id.to_string();
 
   let is_paid = invoice.paid;
   let invoice_status = invoice.status;
@@ -25,7 +27,10 @@ pub fn invoice_updated_handler(invoice: &Invoice) -> Result<(), StripeWebhookErr
   let maybe_user_token = invoice.metadata.get(METADATA_USER_TOKEN)
       .map(|t| t.to_string());
 
-  warn!(">>> invoice.updated: {:?}, {:?}, {:?}, {:?}", is_paid, invoice_status, maybe_stripe_customer_id, maybe_user_token);
-
-  Ok(())
+  Ok(StripeWebhookSummary {
+    maybe_user_token: maybe_user_token,
+    maybe_event_entity_id: Some(invoice_id),
+    maybe_stripe_customer_id: maybe_stripe_customer_id,
+    event_was_handled: false,
+  })
 }
