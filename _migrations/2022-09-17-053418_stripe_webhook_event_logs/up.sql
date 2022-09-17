@@ -23,15 +23,15 @@ CREATE TABLE stripe_webhook_event_logs (
   -- We don't always extract this.
   stripe_maybe_event_entity_id VARCHAR(255) DEFAULT NULL,
 
-  -- When the event was created on Stripe's end
-  stripe_event_created_at TIMESTAMP NOT NULL,
-
   -- Whether this is in production or test mode in Stripe.
   -- This is controlled by which API keys are used.
   -- "livemode"=true in production.
   stripe_is_production BOOLEAN NOT NULL DEFAULT FALSE,
 
-  -- ========== INTERNAL USER / METADATA ==========
+  -- ========== INTERNAL SYSTEM METADATA ==========
+
+  -- Whether we handled the event
+  event_was_handled BOOLEAN NOT NULL DEFAULT FALSE,
 
   -- Some event types may attach a user token
   maybe_user_token VARCHAR(32) DEFAULT NULL,
@@ -41,8 +41,13 @@ CREATE TABLE stripe_webhook_event_logs (
   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 
+  -- When the event was created on Stripe's end
+  stripe_event_created_at TIMESTAMP NOT NULL,
+
   -- ========== INDICES ==========
   PRIMARY KEY (id),
-  KEY fk_maybe_user_token (maybe_user_token),
+  UNIQUE KEY (stripe_event_id),
+  KEY index_stripe_event_type (stripe_event_type),
+  KEY fk_maybe_user_token (maybe_user_token)
 
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;

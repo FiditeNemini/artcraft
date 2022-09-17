@@ -1,4 +1,5 @@
 pub mod api_tokens;
+pub mod billing;
 pub mod generic_download;
 pub mod health_check;
 pub mod ip_bans;

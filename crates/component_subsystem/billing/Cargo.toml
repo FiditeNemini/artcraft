@@ -16,6 +16,7 @@ path = "src/lib.rs"
 
 # Internal
 container_common = { path = "../../lib/container_common" }
+database_queries = { path = "../../lib/database_queries" }
 http_server_common = { path = "../../lib/http_server_common" }
 
 # External

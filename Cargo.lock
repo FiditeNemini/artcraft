@@ -864,6 +864,7 @@ dependencies = [
  "base64 0.13.0",
  "chrono",
  "container_common",
+ "database_queries",
  "dotenv",
  "http_server_common",
  "log",

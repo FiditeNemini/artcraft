@@ -28,6 +28,8 @@ use sqlx::MySqlPool;
 use std::collections::HashMap;
 use std::fmt;
 use stripe::{EventObject, EventType, PaymentIntentStatus, Webhook};
+use database_queries::queries::billing::stripe::insert_stripe_webhook_event_log::InsertStripeWebhookEventLog;
+use crate::stripe::webhook_event_handlers::stripe_webhook_summary::StripeWebhookSummary;
 
 #[derive(Serialize)]
 pub struct StripeWebhookSuccessResponse {
@@ -92,6 +94,12 @@ pub async fn stripe_webhook_handler(
 
   let mut unhandled_event_type = false;
 
+  let mut webhook_summary = StripeWebhookSummary {
+    maybe_user_token: None,
+    maybe_event_id: None,
+    event_was_handled: false
+  };
+
   // NB:
   // - "Webhook endpoints might occasionally receive the same event more than once."
   // - "Stripe does not guarantee delivery of events in the order in which they are generated."
@@ -131,17 +139,17 @@ pub async fn stripe_webhook_handler(
 
     EventType::CustomerSubscriptionCreated => {
       if let EventObject::Subscription(subscription) = webhook_payload.data.object {
-        let _r = customer_subscription_created_handler(&subscription)?;
+        webhook_summary = customer_subscription_created_handler(&subscription)?;
       }
     }
     EventType::CustomerSubscriptionUpdated => {
       if let EventObject::Subscription(subscription) = webhook_payload.data.object {
-        let _r = customer_subscription_updated_handler(&subscription)?;
+        webhook_summary = customer_subscription_updated_handler(&subscription)?;
       }
     }
     EventType::CustomerSubscriptionDeleted => {
       if let EventObject::Subscription(subscription) = webhook_payload.data.object {
-        let _r = customer_subscription_deleted_handler(&subscription)?;
+        webhook_summary = customer_subscription_deleted_handler(&subscription)?;
       }
     }
 
@@ -271,11 +279,32 @@ pub async fn stripe_webhook_handler(
     },
   }
 
+  // To play with the payload contents as JSON:
+  // let json = serde_json::ser::to_string(&event_payload).unwrap();
+  // info!("event payload as json: {}", json);
+
   if unhandled_event_type {
-    warn!("UNHANDLED STRIPE WEBHOOK EVENT TYPE: {:?}", webhook_payload.event_type);
+    warn!("Unhandled Stripe webhook event type: {} ({:?})",
+      &stripe_event_type,
+      &webhook_payload.event_type);
   }
 
-  // let stripe_client = stripe::Client::new(STRIPE_SECRET_KEY);
+  let query = InsertStripeWebhookEventLog {
+    stripe_event_id,
+    stripe_event_type,
+    stripe_maybe_event_entity_id: webhook_summary.maybe_event_id,
+    stripe_event_created_at,
+    stripe_is_production,
+    maybe_user_token: webhook_summary.maybe_user_token,
+    event_was_handled: webhook_summary.event_was_handled,
+  };
+
+  query.insert(&mysql_pool)
+      .await
+      .map_err(|err| {
+        error!("Failure to record event: {:?}", err);
+        StripeWebhookError::ServerError
+      })?;
 
   let response = StripeWebhookSuccessResponse {
     success: true,
