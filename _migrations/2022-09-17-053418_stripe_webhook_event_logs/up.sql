@@ -1,0 +1,48 @@
+-- noinspection SqlDialectInspectionForFile
+-- noinspection SqlNoDataSourceInspectionForFile
+-- noinspection SqlResolveForFile
+-- Current credit balances
+
+CREATE TABLE stripe_webhook_event_logs (
+  -- Not used for anything except replication.
+  id BIGINT(20) NOT NULL AUTO_INCREMENT,
+
+  -- ========== STRIPE DATA ==========
+
+  -- You can safely assume object IDs we generate will never exceed 255 characters,
+  -- but you should be able to handle IDs of up to that length. If for example you’re using MySQL,
+  -- you should store IDs in a VARCHAR(255) COLLATE utf8_bin column (the COLLATE configuration ensures
+  -- case-sensitivity in lookups).
+  -- https://stackoverflow.com/a/61809494
+  stripe_event_id VARCHAR(255) NOT NULL,
+
+  -- The type of webhook event
+  stripe_event_type VARCHAR(255) NOT NULL,
+
+  -- The id of the entity that was the subject of the event.
+  -- We don't always extract this.
+  stripe_maybe_event_entity_id VARCHAR(255) DEFAULT NULL,
+
+  -- When the event was created on Stripe's end
+  stripe_event_created_at TIMESTAMP NOT NULL,
+
+  -- Whether this is in production or test mode in Stripe.
+  -- This is controlled by which API keys are used.
+  -- "livemode"=true in production.
+  stripe_is_production BOOLEAN NOT NULL DEFAULT FALSE,
+
+  -- ========== INTERNAL USER / METADATA ==========
+
+  -- Some event types may attach a user token
+  maybe_user_token VARCHAR(32) DEFAULT NULL,
+
+  -- ========== TIMESTAMPS ==========
+
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+
+  -- ========== INDICES ==========
+  PRIMARY KEY (id),
+  KEY fk_maybe_user_token (maybe_user_token),
+
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;

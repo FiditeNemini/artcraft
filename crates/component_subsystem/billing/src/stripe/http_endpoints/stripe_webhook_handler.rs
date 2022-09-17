@@ -3,7 +3,7 @@ use actix_web::error::UrlencodedError::ContentType;
 use actix_web::http::{header, StatusCode};
 use actix_web::web::{Bytes, Path};
 use actix_web::{web, HttpResponse, HttpRequest};
-use chrono::{DateTime, Utc};
+use chrono::{DateTime, NaiveDateTime, Utc};
 use crate::stripe::helpers::verify_stripe_webhook_ip_address::verify_stripe_webhook_ip_address;
 use crate::stripe::stripe_config::StripeConfig;
 use crate::stripe::webhook_event_handlers::charge::charge_succeeded_handler::charge_succeeded_handler;
@@ -34,27 +34,6 @@ pub struct StripeWebhookSuccessResponse {
   pub success: bool,
 }
 
-/*
-
-[2022-09-10T09:41:16Z WARN  billing_component::stripe::http_endpoints::stripe_webhook_handler] UNHANDLED STRIPE WEBHOOK EVENT TYPE: ChargeSucceeded
-[2022-09-10T09:41:16Z WARN  billing_component::stripe::http_endpoints::stripe_webhook_handler] UNHANDLED STRIPE WEBHOOK EVENT TYPE: PaymentMethodAttached
-[2022-09-10T09:41:16Z WARN  billing_component::stripe::http_endpoints::stripe_webhook_handler] UNHANDLED STRIPE WEBHOOK EVENT TYPE: InvoiceFinalized
-[2022-09-10T09:41:17Z WARN  billing_component::stripe::http_endpoints::stripe_webhook_handler] UNHANDLED STRIPE WEBHOOK EVENT TYPE: PaymentIntentCreated
-
-
-[2022-09-10T09:41:16Z INFO  billing_component::stripe::http_endpoints::stripe_webhook_handler] Stripe webhook event type: InvoiceCreated
-
-[2022-09-10T09:41:16Z WARN  billing_component::stripe::webhook_event_handlers::customer::customer_created_handler] >>> customer.created: "cus_MPEexz47x94d3X", None
-[2022-09-10T09:41:16Z ERROR billing_component::stripe::webhook_event_handlers::checkout_session::checkout_session_completed_handler] >>> checkout.session.completed: Some("cus_MPEexz47x94d3X"), None
-[2022-09-10T09:41:16Z WARN  billing_component::stripe::webhook_event_handlers::customer::customer_updated_handler] >>> customer.updated: "cus_MPEexz47x94d3X", None
-[2022-09-10T09:41:16Z ERROR billing_component::stripe::webhook_event_handlers::customer_subscription::customer_subscription_created_handler] >>> customer.subscription.created: "sub_1LgQBZEU5se17MeksLCPvfcq", "cus_MPEexz47x94d3X", Some("U:TEST"), "incomplete"
-[2022-09-10T09:41:17Z WARN  billing_component::stripe::webhook_event_handlers::invoice::invoice_updated_handler] >>> invoice.updated: Some(true), Some(Paid), Some("cus_MPEexz47x94d3X"), None
-[2022-09-10T09:41:17Z ERROR billing_component::stripe::webhook_event_handlers::customer_subscription::customer_subscription_updated_handler] >>> customer.subscription.updated: "sub_1LgQBZEU5se17MeksLCPvfcq", "cus_MPEexz47x94d3X", Some("U:TEST"), "active"
-[2022-09-10T09:41:17Z WARN  billing_component::stripe::webhook_event_handlers::invoice::invoice_paid_handler] >>> invoice.paid: Some(Paid), Some("cus_MPEexz47x94d3X"), None
-[2022-09-10T09:41:17Z WARN  billing_component::stripe::webhook_event_handlers::invoice::invoice_payment_succeeded_handler] >>> invoice.payment_succeeded: Some(Paid), Some("cus_MPEexz47x94d3X"), None
-
-
- */
 pub async fn stripe_webhook_handler(
   http_request: HttpRequest,
   request_body_bytes: Bytes,
@@ -89,32 +68,27 @@ pub async fn stripe_webhook_handler(
       })?;
 
 
-  // Events seen (handled):
-  //
-  // CustomerSubscriptionCreated ------
-  // CustomerSubscriptionUpdated -------
-  // InvoicePaymentSucceeded
-  // CustomerCreated
-  // CustomerUpdated
-  //
-  // Events seen (not yet handled):
-  //
-  // CheckoutSessionCompleted
-  // ChargeSucceeded
-  // PaymentMethodAttached
-  // InvoiceCreated
-  // InvoiceFinalized
-  // InvoiceUpdated
-  // PaymentIntentSucceeded
-  // PaymentIntentCreated
-
   // Events can be re-sent, so we need to make handling them idempotent.
   let stripe_event_id = webhook_payload.id.to_string();
 
-  // NB: Whether this was test data or live data
-  let is_production = webhook_payload.livemode;
+  let stripe_event_created_at = NaiveDateTime::from_timestamp(webhook_payload.created, 0);
 
-  info!("Stripe webhook event type: {:?}", webhook_payload.event_type);
+  let stripe_event_type = serde_json::to_string(&webhook_payload.event_type)
+      .map(|s| s.replace("\"", ""))
+      .map_err(|err| {
+        error!("Could not deserialize webhook type: {:?}", err);
+        StripeWebhookError::BadRequest
+      })?;
+
+  // NB: Whether this was test data or live data
+  let stripe_is_production = webhook_payload.livemode;
+
+  info!("Stripe webhook event type: {} ({:?}); is production: {}, created at: {}, pending events to be handled: {}",
+    &stripe_event_type,
+    &webhook_payload.event_type,
+    stripe_is_production,
+    &stripe_event_created_at,
+    webhook_payload.pending_webhooks);
 
   let mut unhandled_event_type = false;
 

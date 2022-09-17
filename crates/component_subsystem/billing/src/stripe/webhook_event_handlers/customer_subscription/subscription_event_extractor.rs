@@ -8,20 +8,20 @@ use crate::stripe::helpers::expand_product_id::expand_product_id;
 
 #[derive(Clone, Debug)]
 pub struct SubscriptionSummary {
+  /// Our own internal user token.
   pub user_token: Option<String>,
 
+  /// Stripe production flag.
   pub stripe_is_production: bool,
 
   pub stripe_subscription_id: String,
-  pub stripe_subscription_status: SubscriptionStatus,
-
   pub stripe_customer_id: String,
   pub stripe_product_id: String,
   pub stripe_price_id: String,
 
+  pub stripe_subscription_status: SubscriptionStatus,
   pub subscription_is_active: bool,
   pub subscription_interval: RecurringInterval,
-
   pub subscription_period_start: NaiveDateTime,
   pub subscription_period_end: NaiveDateTime,
 }
