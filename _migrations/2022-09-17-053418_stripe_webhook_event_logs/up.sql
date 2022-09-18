@@ -1,7 +1,6 @@
 -- noinspection SqlDialectInspectionForFile
 -- noinspection SqlNoDataSourceInspectionForFile
 -- noinspection SqlResolveForFile
--- Current credit balances
 
 CREATE TABLE stripe_webhook_event_logs (
   -- Not used for anything except replication.
@@ -52,6 +51,8 @@ CREATE TABLE stripe_webhook_event_logs (
   PRIMARY KEY (id),
   UNIQUE KEY (stripe_event_id),
   KEY index_stripe_event_type (stripe_event_type),
+  KEY index_maybe_stripe_event_entity_id (maybe_stripe_event_entity_id),
+  KEY index_maybe_stripe_customer_id (maybe_stripe_customer_id),
   KEY fk_maybe_user_token (maybe_user_token)
 
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;
