@@ -45,8 +45,6 @@ pub async fn customer_subscription_updated_handler(
     }
   }
 
-  // TODO: record cancel_at (future_cancel_at), canceled_at, ended_at (if subscription ended, when it ended), start_date
-
   if should_process_update {
     let upsert = UpsertSubscriptionByStripeId {
       stripe_subscription_id: &summary.stripe_subscription_id,
