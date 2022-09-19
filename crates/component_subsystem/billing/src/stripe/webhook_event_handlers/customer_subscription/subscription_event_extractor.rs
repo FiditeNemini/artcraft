@@ -24,8 +24,12 @@ pub struct SubscriptionSummary {
   pub stripe_subscription_status: StripeSubscriptionStatus,
   pub subscription_is_active: bool,
   pub subscription_interval: RecurringInterval,
-  pub subscription_period_start: NaiveDateTime,
-  pub subscription_period_end: NaiveDateTime,
+
+  /// When the subscription was "created" in Stripe (including any backdating)
+  pub subscription_start_date: NaiveDateTime,
+
+  pub current_billing_period_start: NaiveDateTime,
+  pub current_billing_period_end: NaiveDateTime,
 }
 
 /// Extract only the subscription details we care about
@@ -61,26 +65,23 @@ pub fn subscription_summary_extractor(subscription: &Subscription) -> AnyhowResu
     Some(recurring) => recurring,
   };
 
-  //subscription.current_period_start;
-  //subscription.current_period_end;
-
+  let start_date = NaiveDateTime::from_timestamp(subscription.start_date, 0);
   let period_start = NaiveDateTime::from_timestamp(subscription.current_period_start, 0);
   let period_end = NaiveDateTime::from_timestamp(subscription.current_period_end, 0);
-
-  let subscription_status = subscription_status_to_reusable_type(subscription.status);
 
   Ok(SubscriptionSummary {
     user_token: maybe_user_token,
     stripe_subscription_id: subscription_id,
     stripe_is_production: subscription.livemode,
     stripe_customer_id: expand_customer_id(&subscription.customer),
-    stripe_subscription_status: subscription_status,
+    stripe_subscription_status: subscription_status_to_reusable_type(subscription.status),
     stripe_product_id: expand_product_id(product),
     stripe_price_id: price.id.to_string(),
     subscription_is_active: subscription.status == SubscriptionStatus::Active,
     subscription_interval: recurring.interval,
-    subscription_period_start: period_start,
-    subscription_period_end: period_end,
+    subscription_start_date: start_date,
+    current_billing_period_start: period_start,
+    current_billing_period_end: period_end,
   })
 }
 
@@ -125,8 +126,9 @@ mod tests {
     assert_eq!(summary.stripe_price_id, "price_1LeDnKEU5se17MekVr1iYYNf".to_string());
     assert_eq!(summary.subscription_interval, RecurringInterval::Month);
     assert_eq!(summary.stripe_is_production, false);
-    assert_eq!(summary.subscription_period_start.to_string(), "2022-09-12 10:39:48".to_string());
-    assert_eq!(summary.subscription_period_end.to_string(), "2022-10-12 10:39:48".to_string());
+    assert_eq!(summary.subscription_start_date.to_string(), "2022-09-12 10:39:48".to_string());
+    assert_eq!(summary.current_billing_period_start.to_string(), "2022-09-12 10:39:48".to_string());
+    assert_eq!(summary.current_billing_period_end.to_string(), "2022-10-12 10:39:48".to_string());
   }
 
   #[test]
@@ -166,8 +168,9 @@ mod tests {
     assert_eq!(summary.stripe_price_id, "price_1LeDnKEU5se17MekVr1iYYNf".to_string());
     assert_eq!(summary.subscription_interval, RecurringInterval::Month);
     assert_eq!(summary.stripe_is_production, false);
-    assert_eq!(summary.subscription_period_start.to_string(), "2022-09-12 02:00:37".to_string());
-    assert_eq!(summary.subscription_period_end.to_string(), "2022-10-12 02:00:37".to_string());
+    assert_eq!(summary.subscription_start_date.to_string(), "2022-09-12 02:00:37".to_string());
+    assert_eq!(summary.current_billing_period_start.to_string(), "2022-09-12 02:00:37".to_string());
+    assert_eq!(summary.current_billing_period_end.to_string(), "2022-10-12 02:00:37".to_string());
   }
 
   #[test]
@@ -207,7 +210,8 @@ mod tests {
     assert_eq!(summary.stripe_price_id, "price_1LeDnKEU5se17MekVr1iYYNf".to_string());
     assert_eq!(summary.subscription_interval, RecurringInterval::Month);
     assert_eq!(summary.stripe_is_production, false);
-    assert_eq!(summary.subscription_period_start.to_string(), "2022-09-12 10:39:48".to_string());
-    assert_eq!(summary.subscription_period_end.to_string(), "2022-10-12 10:39:48".to_string());
+    assert_eq!(summary.subscription_start_date.to_string(), "2022-09-12 10:39:48".to_string());
+    assert_eq!(summary.current_billing_period_start.to_string(), "2022-09-12 10:39:48".to_string());
+    assert_eq!(summary.current_billing_period_end.to_string(), "2022-10-12 10:39:48".to_string());
   }
 }

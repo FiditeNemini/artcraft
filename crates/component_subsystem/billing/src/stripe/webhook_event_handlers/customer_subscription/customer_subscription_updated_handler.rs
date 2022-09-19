@@ -41,7 +41,7 @@ pub async fn customer_subscription_updated_handler(
     }
   }
 
-  // TODO: record canceled_at/ended_at
+  // TODO: record cancel_at (future_cancel_at), canceled_at, ended_at (if subscription ended, when it ended), start_date
 
   if !skip_update {
     let upsert = UpsertSubscriptionByStripeId {
@@ -53,8 +53,10 @@ pub async fn customer_subscription_updated_handler(
       maybe_stripe_customer_id: Some(&summary.stripe_customer_id),
       maybe_stripe_subscription_status: Some(summary.stripe_subscription_status),
       maybe_stripe_is_production: Some(summary.stripe_is_production),
-      subscription_created_at: summary.subscription_period_start,
-      subscription_expires_at: summary.subscription_period_end,
+      subscription_start_at: summary.subscription_start_date,
+      current_billing_period_start_at: summary.current_billing_period_start,
+      current_billing_period_end_at: summary.current_billing_period_end,
+      subscription_expires_at: summary.current_billing_period_end, // TODO: Add extra days.
     };
 
     let _r = upsert.upsert(mysql_pool)

@@ -16,9 +16,13 @@ pub struct UserSubscription {
   pub maybe_stripe_customer_id: Option<String>,
   pub maybe_stripe_subscription_status: Option<StripeSubscriptionStatus>,
   pub maybe_stripe_is_production: Option<bool>,
+
+  // Timestamps for the record updates, NOT stripe !!!
   pub created_at: DateTime<Utc>,
   pub updated_at: DateTime<Utc>,
-  pub subscription_created_at: DateTime<Utc>,
+
+  // Stripe timestamps (which also control subscription status)
+  pub subscription_start_at: DateTime<Utc>,
   pub subscription_expires_at: DateTime<Utc>,
 }
 
@@ -42,7 +46,7 @@ SELECT
   maybe_stripe_is_production,
   created_at,
   updated_at,
-  subscription_created_at,
+  subscription_start_at,
   subscription_expires_at
 FROM user_subscriptions
 WHERE
@@ -71,7 +75,7 @@ WHERE
         maybe_stripe_is_production: nullable_i8_to_optional_bool(r.maybe_stripe_is_production),
         created_at: r.created_at,
         updated_at: r.updated_at,
-        subscription_created_at: r.subscription_created_at,
+        subscription_start_at: r.subscription_start_at,
         subscription_expires_at: r.subscription_expires_at,
       }))
     },
@@ -90,6 +94,6 @@ struct RawUserSubscriptionFromDb {
   pub maybe_stripe_is_production: Option<i8>,
   pub created_at: DateTime<Utc>,
   pub updated_at: DateTime<Utc>,
-  pub subscription_created_at: DateTime<Utc>,
+  pub subscription_start_at: DateTime<Utc>,
   pub subscription_expires_at: DateTime<Utc>,
 }

@@ -59,7 +59,9 @@ CREATE TABLE user_subscriptions (
 
   -- ========== SUBSCRIPTION TIMESTAMPS ==========
 
-  subscription_created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  -- When the subscription was first created (Stripe's subscription "start_date").
+  -- This may predate the Stripe object `created` timestamp due to backdating.
+  subscription_start_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
   -- We'll use this to determine if the subscription is active.
   --
@@ -70,13 +72,19 @@ CREATE TABLE user_subscriptions (
   -- try to prevent creation of new subscriptions of the same type.
   subscription_expires_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
-  -- ========== INDICES ==========
+  -- Billing periods.
+  -- Maybe useful for debugging.
+  current_billing_period_start_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  current_billing_period_end_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    -- ========== INDICES ==========
   PRIMARY KEY (id),
   UNIQUE KEY (token),
   UNIQUE KEY (maybe_stripe_subscription_id),
   KEY index_subscription_category (subscription_category),
   KEY index_subscription_product_key (subscription_product_key),
   KEY index_maybe_stripe_subscription_status (maybe_stripe_subscription_status),
-  KEY fk_maybe_user_token (maybe_user_token)
+  KEY fk_maybe_user_token (maybe_user_token),
+  KEY index_subscription_expires_at (subscription_expires_at)
 
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;

@@ -26,7 +26,14 @@ pub struct UpsertSubscriptionByStripeId <'a> {
   pub maybe_stripe_subscription_status: Option<StripeSubscriptionStatus>,
   pub maybe_stripe_is_production: Option<bool>,
 
-  pub subscription_created_at: NaiveDateTime,
+  /// When the subscription was created in Stripe.
+  /// This may predate Stripe's subscription object `created` field due to backdating.
+  pub subscription_start_at: NaiveDateTime,
+
+  // Billing periods for the subscription...
+
+  pub current_billing_period_start_at: NaiveDateTime,
+  pub current_billing_period_end_at: NaiveDateTime,
 
   /// When the subscription is set to expire.
   /// This controls whether it is active or not.
@@ -59,15 +66,20 @@ SET
   maybe_stripe_subscription_status = ?,
   maybe_stripe_is_production = ?,
 
-  subscription_created_at = ?,
+  subscription_start_at = ?,
+  current_billing_period_start_at = ?,
+  current_billing_period_end_at = ?,
   subscription_expires_at = ?,
 
   version = version + 1
 
 ON DUPLICATE KEY UPDATE
-  subscription_expires_at = ?,
-  maybe_stripe_subscription_status = ?,
   maybe_user_token = COALESCE(NULLIF(?, ''), maybe_user_token),
+  maybe_stripe_subscription_status = ?,
+
+  current_billing_period_start_at = ?,
+  current_billing_period_end_at = ?,
+  subscription_expires_at = ?,
 
   version = version + 1
         "#,
@@ -84,13 +96,18 @@ ON DUPLICATE KEY UPDATE
       self.maybe_stripe_subscription_status.as_deref(),
       self.maybe_stripe_is_production,
 
-      self.subscription_created_at,
+      self.subscription_start_at,
+      self.current_billing_period_start_at,
+      self.current_billing_period_end_at,
       self.subscription_expires_at,
 
       // Upsert
-      self.subscription_expires_at,
-      self.maybe_stripe_subscription_status.as_deref(),
       self.maybe_user_token,
+      self.maybe_stripe_subscription_status.as_deref(),
+
+      self.current_billing_period_start_at,
+      self.current_billing_period_end_at,
+      self.subscription_expires_at,
     );
 
     let query_result = query.execute(mysql_pool).await;
