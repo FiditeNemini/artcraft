@@ -1,8 +1,9 @@
 use anyhow::anyhow;
 use chrono::NaiveDateTime;
 use container_common::anyhow_result::AnyhowResult;
-use sqlx::MySqlPool;
 use crate::tokens::Tokens;
+use reusable_types::stripe::stripe_subscription_status::StripeSubscriptionStatus;
+use sqlx::MySqlPool;
 
 // TODO: Make a trait with default impls to handle common query concerns.
 
@@ -22,7 +23,7 @@ pub struct UpsertSubscriptionByStripeId <'a> {
 
   pub maybe_stripe_product_id: Option<&'a str>,
   pub maybe_stripe_customer_id: Option<&'a str>,
-  pub maybe_stripe_subscription_status: Option<&'a str>,
+  pub maybe_stripe_subscription_status: Option<StripeSubscriptionStatus>,
   pub maybe_stripe_is_production: Option<bool>,
 
   pub subscription_created_at: NaiveDateTime,
@@ -80,7 +81,7 @@ ON DUPLICATE KEY UPDATE
 
       self.maybe_stripe_product_id,
       self.maybe_stripe_customer_id,
-      self.maybe_stripe_subscription_status,
+      self.maybe_stripe_subscription_status.as_deref(),
       self.maybe_stripe_is_production,
 
       self.subscription_created_at,
@@ -88,7 +89,7 @@ ON DUPLICATE KEY UPDATE
 
       // Upsert
       self.subscription_expires_at,
-      self.maybe_stripe_subscription_status,
+      self.maybe_stripe_subscription_status.as_deref(),
       self.maybe_user_token,
     );
 

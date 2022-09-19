@@ -5,6 +5,8 @@ use database_queries::queries::billing::subscriptions::upsert_subscription_by_st
 use log::{error, warn};
 use sqlx::MySqlPool;
 use stripe::Subscription;
+use database_queries::queries::billing::subscriptions::get_subscription_by_stripe_id::get_subscription_by_stripe_id;
+use reusable_types::stripe::stripe_subscription_status::StripeSubscriptionStatus;
 
 /// Handle event type: 'customer.subscription.updated'
 pub async fn customer_subscription_updated_handler(
@@ -18,6 +20,30 @@ pub async fn customer_subscription_updated_handler(
         StripeWebhookError::ServerError // NB: This was probably *our* fault.
       })?;
 
+
+  let mut skip_update = false;
+
+  // NB: It's possible to receive events out of order.
+  let maybe_existing_subscription = get_subscription_by_stripe_id(&summary.stripe_subscription_id, &mysql_pool)
+      .await
+      .map_err(|err| {
+        error!("Mysql error: {:?}", err);
+        StripeWebhookError::ServerError
+      })?;
+
+  if let Some(existing_subscription) = maybe_existing_subscription {
+    match existing_subscription.maybe_stripe_subscription_status {
+      Some(StripeSubscriptionStatus::Canceled) => {
+        // NB: This is a terminal status and the subscription cannot be updated any further.
+        skip_update = true;
+      }
+      _ => {}
+    }
+  }
+
+  // TODO: record canceled_at/ended_at
+
+  if !skip_update {
     let upsert = UpsertSubscriptionByStripeId {
       stripe_subscription_id: &summary.stripe_subscription_id,
       maybe_user_token: summary.user_token.as_deref(),
@@ -25,7 +51,7 @@ pub async fn customer_subscription_updated_handler(
       subscription_product_key: "todo",
       maybe_stripe_product_id: Some(&summary.stripe_product_id),
       maybe_stripe_customer_id: Some(&summary.stripe_customer_id),
-      maybe_stripe_subscription_status: Some(summary.stripe_subscription_status.as_str()),
+      maybe_stripe_subscription_status: Some(summary.stripe_subscription_status),
       maybe_stripe_is_production: Some(summary.stripe_is_production),
       subscription_created_at: summary.subscription_period_start,
       subscription_expires_at: summary.subscription_period_end,
@@ -37,6 +63,7 @@ pub async fn customer_subscription_updated_handler(
           error!("Mysql error: {:?}", err);
           StripeWebhookError::ServerError
         })?;
+  }
 
   Ok(StripeWebhookSummary {
     maybe_user_token: summary.user_token,

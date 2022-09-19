@@ -3,6 +3,7 @@ use chrono::{DateTime, NaiveDateTime, Utc};
 use container_common::anyhow_result::AnyhowResult;
 use crate::helpers::boolean_converters::nullable_i8_to_optional_bool;
 use log::warn;
+use reusable_types::stripe::stripe_subscription_status::StripeSubscriptionStatus;
 use sqlx::MySqlPool;
 
 pub struct UserSubscription {
@@ -13,6 +14,7 @@ pub struct UserSubscription {
   pub maybe_stripe_subscription_id: Option<String>,
   pub maybe_stripe_product_id: Option<String>,
   pub maybe_stripe_customer_id: Option<String>,
+  pub maybe_stripe_subscription_status: Option<StripeSubscriptionStatus>,
   pub maybe_stripe_is_production: Option<bool>,
   pub created_at: DateTime<Utc>,
   pub updated_at: DateTime<Utc>,
@@ -36,6 +38,7 @@ SELECT
   maybe_stripe_subscription_id,
   maybe_stripe_customer_id,
   maybe_stripe_product_id,
+  maybe_stripe_subscription_status as `maybe_stripe_subscription_status: reusable_types::stripe::stripe_subscription_status::StripeSubscriptionStatus`,
   maybe_stripe_is_production,
   created_at,
   updated_at,
@@ -64,6 +67,7 @@ WHERE
         maybe_stripe_subscription_id: r.maybe_stripe_subscription_id,
         maybe_stripe_product_id: r.maybe_stripe_product_id,
         maybe_stripe_customer_id: r.maybe_stripe_customer_id,
+        maybe_stripe_subscription_status: r.maybe_stripe_subscription_status,
         maybe_stripe_is_production: nullable_i8_to_optional_bool(r.maybe_stripe_is_production),
         created_at: r.created_at,
         updated_at: r.updated_at,
@@ -82,6 +86,7 @@ struct RawUserSubscriptionFromDb {
   pub maybe_stripe_subscription_id: Option<String>,
   pub maybe_stripe_product_id: Option<String>,
   pub maybe_stripe_customer_id: Option<String>,
+  pub maybe_stripe_subscription_status: Option<StripeSubscriptionStatus>,
   pub maybe_stripe_is_production: Option<i8>,
   pub created_at: DateTime<Utc>,
   pub updated_at: DateTime<Utc>,

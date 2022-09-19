@@ -1,10 +1,12 @@
 use anyhow::anyhow;
 use chrono::{DateTime, NaiveDateTime, Utc};
-use stripe::{Price, RecurringInterval, Subscription, SubscriptionInterval, SubscriptionStatus};
 use container_common::anyhow_result::AnyhowResult;
 use crate::stripe::helpers::common_metadata_keys::METADATA_USER_TOKEN;
 use crate::stripe::helpers::expand_customer_id::expand_customer_id;
 use crate::stripe::helpers::expand_product_id::expand_product_id;
+use reusable_types::stripe::stripe_subscription_status::StripeSubscriptionStatus;
+use stripe::{Price, RecurringInterval, Subscription, SubscriptionInterval, SubscriptionStatus};
+use crate::stripe::helpers::enums::subscription_status_to_reusable_type::subscription_status_to_reusable_type;
 
 #[derive(Clone, Debug)]
 pub struct SubscriptionSummary {
@@ -19,7 +21,7 @@ pub struct SubscriptionSummary {
   pub stripe_product_id: String,
   pub stripe_price_id: String,
 
-  pub stripe_subscription_status: SubscriptionStatus,
+  pub stripe_subscription_status: StripeSubscriptionStatus,
   pub subscription_is_active: bool,
   pub subscription_interval: RecurringInterval,
   pub subscription_period_start: NaiveDateTime,
@@ -65,12 +67,14 @@ pub fn subscription_summary_extractor(subscription: &Subscription) -> AnyhowResu
   let period_start = NaiveDateTime::from_timestamp(subscription.current_period_start, 0);
   let period_end = NaiveDateTime::from_timestamp(subscription.current_period_end, 0);
 
+  let subscription_status = subscription_status_to_reusable_type(subscription.status);
+
   Ok(SubscriptionSummary {
     user_token: maybe_user_token,
     stripe_subscription_id: subscription_id,
     stripe_is_production: subscription.livemode,
     stripe_customer_id: expand_customer_id(&subscription.customer),
-    stripe_subscription_status: subscription.status,
+    stripe_subscription_status: subscription_status,
     stripe_product_id: expand_product_id(product),
     stripe_price_id: price.id.to_string(),
     subscription_is_active: subscription.status == SubscriptionStatus::Active,
@@ -83,6 +87,7 @@ pub fn subscription_summary_extractor(subscription: &Subscription) -> AnyhowResu
 #[cfg(test)]
 mod tests {
   use stripe::{RecurringInterval, Subscription, SubscriptionStatus};
+  use reusable_types::stripe::stripe_subscription_status::StripeSubscriptionStatus;
   use crate::stripe::webhook_event_handlers::customer_subscription::subscription_event_extractor::subscription_summary_extractor;
 
   #[test]
@@ -113,7 +118,7 @@ mod tests {
 
     assert_eq!(summary.user_token, Some("U:TOKEN".to_string()));
     assert_eq!(summary.stripe_subscription_id, "sub_1LhA3MEU5se17MekeWvmTNyk".to_string());
-    assert_eq!(summary.stripe_subscription_status, SubscriptionStatus::Incomplete);
+    assert_eq!(summary.stripe_subscription_status, StripeSubscriptionStatus::Incomplete);
     assert_eq!(summary.subscription_is_active, false);
     assert_eq!(summary.stripe_customer_id, "cus_MQ03py0gWUh0Ox".to_string());
     assert_eq!(summary.stripe_product_id, "prod_MMxi2J5y69VPbO".to_string());
@@ -154,7 +159,7 @@ mod tests {
 
     assert_eq!(summary.user_token, Some("U:token".to_string()));
     assert_eq!(summary.stripe_subscription_id, "sub_1Lh1wvEU5se17Mekx72OzAzs".to_string());
-    assert_eq!(summary.stripe_subscription_status, SubscriptionStatus::Active);
+    assert_eq!(summary.stripe_subscription_status, StripeSubscriptionStatus::Active);
     assert_eq!(summary.subscription_is_active, true);
     assert_eq!(summary.stripe_customer_id, "cus_MPrgIen5Wh6QKG".to_string());
     assert_eq!(summary.stripe_product_id, "prod_MMxi2J5y69VPbO".to_string());
@@ -195,7 +200,7 @@ mod tests {
 
     assert_eq!(summary.user_token, Some("U:TOKEN".to_string()));
     assert_eq!(summary.stripe_subscription_id, "sub_1LhA3MEU5se17MekeWvmTNyk".to_string());
-    assert_eq!(summary.stripe_subscription_status, SubscriptionStatus::Canceled);
+    assert_eq!(summary.stripe_subscription_status, StripeSubscriptionStatus::Canceled);
     assert_eq!(summary.subscription_is_active, false);
     assert_eq!(summary.stripe_customer_id, "cus_MQ03py0gWUh0Ox".to_string());
     assert_eq!(summary.stripe_product_id, "prod_MMxi2J5y69VPbO".to_string());

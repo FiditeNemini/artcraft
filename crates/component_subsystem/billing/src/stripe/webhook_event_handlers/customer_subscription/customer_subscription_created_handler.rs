@@ -49,7 +49,7 @@ pub async fn customer_subscription_created_handler(
     subscription_product_key: "todo",
     maybe_stripe_product_id: Some(&summary.stripe_product_id),
     maybe_stripe_customer_id: Some(&summary.stripe_customer_id),
-    maybe_stripe_subscription_status: Some(summary.stripe_subscription_status.as_str()),
+    maybe_stripe_subscription_status: Some(summary.stripe_subscription_status),
     maybe_stripe_is_production: Some(summary.stripe_is_production),
     subscription_created_at: summary.subscription_period_start,
     subscription_expires_at: summary.subscription_period_end,
