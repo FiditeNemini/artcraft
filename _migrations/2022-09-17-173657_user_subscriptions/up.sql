@@ -41,6 +41,9 @@ CREATE TABLE user_subscriptions (
 
   maybe_stripe_customer_id VARCHAR(255) DEFAULT NULL,
 
+  -- Subscription object status enum as string
+  maybe_stripe_subscription_status VARCHAR(32) DEFAULT NULL,
+
   maybe_stripe_is_production BOOLEAN DEFAULT NULL,
 
   -- ========== VECTOR CLOCK ==========
@@ -73,6 +76,7 @@ CREATE TABLE user_subscriptions (
   UNIQUE KEY (maybe_stripe_subscription_id),
   KEY index_subscription_category (subscription_category),
   KEY index_subscription_product_key (subscription_product_key),
+  KEY index_maybe_stripe_subscription_status (maybe_stripe_subscription_status),
   KEY fk_maybe_user_token (maybe_user_token)
 
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;

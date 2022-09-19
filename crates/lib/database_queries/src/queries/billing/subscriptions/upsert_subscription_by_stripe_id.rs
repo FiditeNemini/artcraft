@@ -22,6 +22,7 @@ pub struct UpsertSubscriptionByStripeId <'a> {
 
   pub maybe_stripe_product_id: Option<&'a str>,
   pub maybe_stripe_customer_id: Option<&'a str>,
+  pub maybe_stripe_subscription_status: Option<&'a str>,
   pub maybe_stripe_is_production: Option<bool>,
 
   pub subscription_created_at: NaiveDateTime,
@@ -54,6 +55,7 @@ SET
 
   maybe_stripe_product_id = ?,
   maybe_stripe_customer_id = ?,
+  maybe_stripe_subscription_status = ?,
   maybe_stripe_is_production = ?,
 
   subscription_created_at = ?,
@@ -63,6 +65,7 @@ SET
 
 ON DUPLICATE KEY UPDATE
   subscription_expires_at = ?,
+  maybe_stripe_subscription_status = ?,
   maybe_user_token = COALESCE(NULLIF(?, ''), maybe_user_token),
 
   version = version + 1
@@ -77,6 +80,7 @@ ON DUPLICATE KEY UPDATE
 
       self.maybe_stripe_product_id,
       self.maybe_stripe_customer_id,
+      self.maybe_stripe_subscription_status,
       self.maybe_stripe_is_production,
 
       self.subscription_created_at,
@@ -84,6 +88,7 @@ ON DUPLICATE KEY UPDATE
 
       // Upsert
       self.subscription_expires_at,
+      self.maybe_stripe_subscription_status,
       self.maybe_user_token,
     );
 
