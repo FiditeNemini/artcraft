@@ -31,6 +31,7 @@ pub fn invoice_updated_handler(invoice: &Invoice) -> Result<StripeWebhookSummary
     maybe_user_token: maybe_user_token,
     maybe_event_entity_id: Some(invoice_id),
     maybe_stripe_customer_id: maybe_stripe_customer_id,
-    event_was_handled: false,
+    action_was_taken: false,
+    should_ignore_retry: false,
   })
 }

@@ -21,6 +21,7 @@ pub async fn customer_subscription_deleted_handler(
     maybe_user_token: summary.user_token,
     maybe_event_entity_id: Some(summary.stripe_subscription_id),
     maybe_stripe_customer_id: Some(summary.stripe_customer_id),
-    event_was_handled: false,
+    action_was_taken: false,
+    should_ignore_retry: false,
   })
 }

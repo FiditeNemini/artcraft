@@ -78,7 +78,8 @@ pub fn invoice_paid_handler(invoice: &Invoice) -> Result<StripeWebhookSummary, S
     maybe_user_token: None,
     maybe_event_entity_id: None,
     maybe_stripe_customer_id: None,
-    event_was_handled: false
+    action_was_taken: false,
+    should_ignore_retry: false,
   })
 }
 

@@ -98,7 +98,8 @@ pub async fn stripe_webhook_handler(
     maybe_user_token: None,
     maybe_event_entity_id: None,
     maybe_stripe_customer_id: None,
-    event_was_handled: false
+    action_was_taken: false,
+    should_ignore_retry: false,
   };
 
   // NB:
@@ -298,7 +299,8 @@ pub async fn stripe_webhook_handler(
     stripe_event_created_at,
     stripe_is_production,
     maybe_user_token: webhook_summary.maybe_user_token,
-    event_was_handled: webhook_summary.event_was_handled,
+    action_was_taken: webhook_summary.action_was_taken,
+    should_ignore_retry: webhook_summary.should_ignore_retry,
   };
 
   query.insert(&mysql_pool)

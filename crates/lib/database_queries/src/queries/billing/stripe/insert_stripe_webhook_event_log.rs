@@ -13,7 +13,8 @@ pub struct InsertStripeWebhookEventLog {
   pub stripe_event_created_at: NaiveDateTime,
   pub stripe_is_production: bool,
   pub maybe_user_token: Option<String>,
-  pub event_was_handled: bool,
+  pub action_was_taken: bool,
+  pub should_ignore_retry: bool,
 }
 
 impl InsertStripeWebhookEventLog {
@@ -31,7 +32,8 @@ SET
   stripe_event_created_at = ?,
   stripe_is_production = ?,
   maybe_user_token = ?,
-  event_was_handled = ?
+  action_was_taken = ?,
+  should_ignore_retry = ?
         "#,
       &self.stripe_event_id,
       &self.stripe_event_type,
@@ -40,7 +42,8 @@ SET
       &self.stripe_event_created_at,
       self.stripe_is_production,
       &self.maybe_user_token,
-      self.event_was_handled,
+      self.action_was_taken,
+      self.should_ignore_retry,
     );
 
     let query_result = query.execute(mysql_pool).await;

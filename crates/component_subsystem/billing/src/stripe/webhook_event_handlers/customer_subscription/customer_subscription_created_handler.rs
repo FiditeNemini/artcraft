@@ -27,7 +27,8 @@ pub async fn customer_subscription_created_handler(
     maybe_user_token: summary.user_token.clone(),
     maybe_event_entity_id: Some(summary.stripe_subscription_id.clone()),
     maybe_stripe_customer_id: Some(summary.stripe_customer_id.clone()),
-    event_was_handled: false,
+    action_was_taken: false,
+    should_ignore_retry: false,
   };
 
   // NB: It's possible to receive events out of order.
@@ -40,6 +41,7 @@ pub async fn customer_subscription_created_handler(
       })?;
 
   if maybe_existing_subscription.is_some() {
+    result.should_ignore_retry = true;
     return Ok(result);
   }
 
@@ -70,6 +72,8 @@ pub async fn customer_subscription_created_handler(
         StripeWebhookError::ServerError
       })?;
 
-  result.event_was_handled = true;
+  result.action_was_taken = true;
+  result.should_ignore_retry = true;
+
   Ok(result)
 }

@@ -21,8 +21,10 @@ pub async fn customer_subscription_updated_handler(
         StripeWebhookError::ServerError // NB: This was probably *our* fault.
       })?;
 
+  let mut should_process_update = true;
 
-  let mut skip_update = false;
+  let mut action_was_taken = false;
+  let mut should_ignore_retry = false;
 
   // NB: It's possible to receive events out of order.
   let maybe_existing_subscription = get_subscription_by_stripe_id(&summary.stripe_subscription_id, &mysql_pool)
@@ -36,7 +38,8 @@ pub async fn customer_subscription_updated_handler(
     match existing_subscription.maybe_stripe_subscription_status {
       Some(StripeSubscriptionStatus::Canceled) => {
         // NB: This is a terminal status and the subscription cannot be updated any further.
-        skip_update = true;
+        should_process_update = false;
+        should_ignore_retry = true;
       }
       _ => {}
     }
@@ -44,7 +47,7 @@ pub async fn customer_subscription_updated_handler(
 
   // TODO: record cancel_at (future_cancel_at), canceled_at, ended_at (if subscription ended, when it ended), start_date
 
-  if !skip_update {
+  if should_process_update {
     let upsert = UpsertSubscriptionByStripeId {
       stripe_subscription_id: &summary.stripe_subscription_id,
       maybe_user_token: summary.user_token.as_deref(),
@@ -69,12 +72,16 @@ pub async fn customer_subscription_updated_handler(
           error!("Mysql error: {:?}", err);
           StripeWebhookError::ServerError
         })?;
+
+    action_was_taken = true;
+    should_ignore_retry = true;
   }
 
   Ok(StripeWebhookSummary {
     maybe_user_token: summary.user_token,
     maybe_event_entity_id: Some(summary.stripe_subscription_id),
     maybe_stripe_customer_id: Some(summary.stripe_customer_id),
-    event_was_handled: true,
+    action_was_taken,
+    should_ignore_retry,
   })
 }

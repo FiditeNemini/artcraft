@@ -33,8 +33,12 @@ CREATE TABLE stripe_webhook_event_logs (
 
   -- ========== INTERNAL SYSTEM METADATA ==========
 
-  -- Whether we handled the event
-  event_was_handled BOOLEAN NOT NULL DEFAULT FALSE,
+  -- Whether we handled the event with any sort of action
+  action_was_taken BOOLEAN NOT NULL DEFAULT FALSE,
+
+  -- Whether we should ignore any future retries by Stripe replaying the event.
+  -- This helps us treat events with idempotency.
+  should_ignore_retry BOOLEAN NOT NULL DEFAULT FALSE,
 
   -- Some event types may attach a user token
   maybe_user_token VARCHAR(32) DEFAULT NULL,

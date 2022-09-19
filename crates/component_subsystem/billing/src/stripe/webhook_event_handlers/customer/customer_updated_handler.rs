@@ -19,6 +19,7 @@ pub fn customer_updated_handler(customer: &Customer) -> Result<StripeWebhookSumm
     maybe_user_token: maybe_user_token,
     maybe_event_entity_id: Some(customer_id.clone()),
     maybe_stripe_customer_id: Some(customer_id.clone()),
-    event_was_handled: false,
+    action_was_taken: false,
+    should_ignore_retry: false,
   })
 }
