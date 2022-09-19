@@ -4,6 +4,7 @@ use crate::stripe::webhook_event_handlers::stripe_webhook_summary::StripeWebhook
 use log::{error, warn};
 use sqlx::MySqlPool;
 use stripe::Subscription;
+use database_queries::queries::billing::subscriptions::get_subscription_by_stripe_id::get_subscription_by_stripe_id;
 use database_queries::queries::billing::subscriptions::upsert_subscription_by_stripe_id::UpsertSubscriptionByStripeId;
 
 /// Handle event type: 'customer.subscription.created'
@@ -21,37 +22,45 @@ pub async fn customer_subscription_created_handler(
         StripeWebhookError::ServerError // NB: This was probably *our* fault.
       })?;
 
-  match summary.user_token.as_deref() {
-    None => {
-      error!("Subscription does not have a user token associated with it: {}",
-        &summary.stripe_subscription_id);
-    }
-    Some(user_token) => {
-      let upsert = UpsertSubscriptionByStripeId {
-        stripe_subscription_id: &summary.stripe_subscription_id,
-        user_token: user_token,
-        subscription_category: "todo",
-        subscription_product_key: "todo",
-        maybe_stripe_product_id: Some(&summary.stripe_product_id),
-        maybe_stripe_customer_id: Some(&summary.stripe_customer_id),
-        maybe_stripe_is_production: Some(summary.stripe_is_production),
-        subscription_created_at: summary.subscription_period_start,
-        subscription_expires_at: summary.subscription_period_end,
-      };
+  let mut result = StripeWebhookSummary {
+    maybe_user_token: summary.user_token.clone(),
+    maybe_event_entity_id: Some(summary.stripe_subscription_id.clone()),
+    maybe_stripe_customer_id: Some(summary.stripe_customer_id.clone()),
+    event_was_handled: false,
+  };
 
-      let _r = upsert.upsert(mysql_pool)
-          .await
-          .map_err(|err| {
-            error!("Mysql error: {:?}", err);
-            StripeWebhookError::ServerError
-          })?;
-    }
+  // NB: It's possible to receive events out of order.
+  // We won't want to play a `create` event on top.
+  let maybe_existing_subscription = get_subscription_by_stripe_id(&summary.stripe_subscription_id, &mysql_pool)
+      .await
+      .map_err(|err| {
+        error!("Mysql error: {:?}", err);
+        StripeWebhookError::ServerError
+      })?;
+
+  if maybe_existing_subscription.is_some() {
+    return Ok(result);
   }
 
-  Ok(StripeWebhookSummary {
-    maybe_user_token: summary.user_token,
-    maybe_event_entity_id: Some(summary.stripe_subscription_id),
-    maybe_stripe_customer_id: Some(summary.stripe_customer_id),
-    event_was_handled: true,
-  })
+  let upsert = UpsertSubscriptionByStripeId {
+    stripe_subscription_id: &summary.stripe_subscription_id,
+    maybe_user_token: summary.user_token.as_deref(),
+    subscription_category: "todo",
+    subscription_product_key: "todo",
+    maybe_stripe_product_id: Some(&summary.stripe_product_id),
+    maybe_stripe_customer_id: Some(&summary.stripe_customer_id),
+    maybe_stripe_is_production: Some(summary.stripe_is_production),
+    subscription_created_at: summary.subscription_period_start,
+    subscription_expires_at: summary.subscription_period_end,
+  };
+
+  let _r = upsert.upsert(mysql_pool)
+      .await
+      .map_err(|err| {
+        error!("Mysql error: {:?}", err);
+        StripeWebhookError::ServerError
+      })?;
+
+  result.event_was_handled = true;
+  Ok(result)
 }

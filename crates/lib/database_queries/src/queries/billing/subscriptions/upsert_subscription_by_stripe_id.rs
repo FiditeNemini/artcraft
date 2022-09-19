@@ -12,7 +12,7 @@ pub struct UpsertSubscriptionByStripeId <'a> {
   pub stripe_subscription_id: &'a str,
 
   /// Internal user token
-  pub user_token: &'a str,
+  pub maybe_user_token: Option<&'a str>,
 
   /// The platform key, eg. "fakeyou", "storyteller_stream", "symphonia", etc.
   pub subscription_category: &'a str,
@@ -46,7 +46,7 @@ impl <'a> UpsertSubscriptionByStripeId <'a> {
 INSERT INTO user_subscriptions
 SET
   token = ?,
-  user_token = ?,
+  maybe_user_token = ?,
   subscription_category = ?,
   subscription_product_key = ?,
 
@@ -67,7 +67,7 @@ ON DUPLICATE KEY UPDATE
   version = version + 1
         "#,
       token,
-      self.user_token,
+      self.maybe_user_token,
       self.subscription_category,
       self.subscription_product_key,
 

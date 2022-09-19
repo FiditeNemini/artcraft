@@ -12,7 +12,9 @@ CREATE TABLE user_subscriptions (
   -- ========== INTERNAL SUBSCRIPTION DETAILS ==========
 
   -- The internal user associated with the subscription.
-  user_token VARCHAR(32) DEFAULT NULL,
+  -- This is nullable since it's possible we mess up and don't set it on the Stripe objects.
+  -- We want the latitude to correct mistakes in the future. (Hopefully this doesn't bite me later.)
+  maybe_user_token VARCHAR(32) DEFAULT NULL,
 
   -- If we host multiple sites with distinct categories, this will enable us to segregate subscriptions.
   subscription_category VARCHAR(32) NOT NULL,
@@ -71,6 +73,6 @@ CREATE TABLE user_subscriptions (
   UNIQUE KEY (maybe_stripe_subscription_id),
   KEY index_subscription_category (subscription_category),
   KEY index_subscription_product_key (subscription_product_key),
-  KEY fk_user_token (user_token)
+  KEY fk_maybe_user_token (maybe_user_token)
 
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;

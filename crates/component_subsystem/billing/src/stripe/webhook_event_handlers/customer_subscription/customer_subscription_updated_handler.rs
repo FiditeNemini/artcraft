@@ -18,32 +18,24 @@ pub async fn customer_subscription_updated_handler(
         StripeWebhookError::ServerError // NB: This was probably *our* fault.
       })?;
 
-  match summary.user_token.as_deref() {
-    None => {
-      error!("Subscription does not have a user token associated with it: {}",
-        &summary.stripe_subscription_id);
-    }
-    Some(user_token) => {
-      let upsert = UpsertSubscriptionByStripeId {
-        stripe_subscription_id: &summary.stripe_subscription_id,
-        user_token: user_token,
-        subscription_category: "todo",
-        subscription_product_key: "todo",
-        maybe_stripe_product_id: Some(&summary.stripe_product_id),
-        maybe_stripe_customer_id: Some(&summary.stripe_customer_id),
-        maybe_stripe_is_production: Some(summary.stripe_is_production),
-        subscription_created_at: summary.subscription_period_start,
-        subscription_expires_at: summary.subscription_period_end,
-      };
+    let upsert = UpsertSubscriptionByStripeId {
+      stripe_subscription_id: &summary.stripe_subscription_id,
+      maybe_user_token: summary.user_token.as_deref(),
+      subscription_category: "todo",
+      subscription_product_key: "todo",
+      maybe_stripe_product_id: Some(&summary.stripe_product_id),
+      maybe_stripe_customer_id: Some(&summary.stripe_customer_id),
+      maybe_stripe_is_production: Some(summary.stripe_is_production),
+      subscription_created_at: summary.subscription_period_start,
+      subscription_expires_at: summary.subscription_period_end,
+    };
 
-      let _r = upsert.upsert(mysql_pool)
-          .await
-          .map_err(|err| {
-            error!("Mysql error: {:?}", err);
-            StripeWebhookError::ServerError
-          })?;
-    }
-  }
+    let _r = upsert.upsert(mysql_pool)
+        .await
+        .map_err(|err| {
+          error!("Mysql error: {:?}", err);
+          StripeWebhookError::ServerError
+        })?;
 
   Ok(StripeWebhookSummary {
     maybe_user_token: summary.user_token,
