@@ -23,6 +23,7 @@ pub mod configs;
 pub mod http_server;
 pub mod routes;
 pub mod server_state;
+pub mod subscriptions;
 pub mod threads;
 pub mod util;
 pub mod validations;

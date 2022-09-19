@@ -2,11 +2,15 @@ use crate::stripe::webhook_event_handlers::customer_subscription::subscription_e
 use crate::stripe::webhook_event_handlers::stripe_webhook_error::StripeWebhookError;
 use crate::stripe::webhook_event_handlers::stripe_webhook_summary::StripeWebhookSummary;
 use log::{error, warn};
+use sqlx::MySqlPool;
 use stripe::Subscription;
 
 /// Handle event type: 'customer.subscription.deleted'
 /// Sent when a customer’s subscription ends.
-pub fn customer_subscription_deleted_handler(subscription: &Subscription) -> Result<StripeWebhookSummary, StripeWebhookError> {
+pub async fn customer_subscription_deleted_handler(
+  subscription: &Subscription,
+  mysql_pool: &MySqlPool,
+) -> Result<StripeWebhookSummary, StripeWebhookError> {
   let summary = subscription_summary_extractor(subscription)
       .map_err(|err| {
         error!("Error extracting subscription from 'customer.subscription.deleted' payload: {:?}", err);

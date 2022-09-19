@@ -140,17 +140,17 @@ pub async fn stripe_webhook_handler(
 
     EventType::CustomerSubscriptionCreated => {
       if let EventObject::Subscription(subscription) = webhook_payload.data.object {
-        webhook_summary = customer_subscription_created_handler(&subscription)?;
+        webhook_summary = customer_subscription_created_handler(&subscription, &mysql_pool).await?;
       }
     }
     EventType::CustomerSubscriptionUpdated => {
       if let EventObject::Subscription(subscription) = webhook_payload.data.object {
-        webhook_summary = customer_subscription_updated_handler(&subscription)?;
+        webhook_summary = customer_subscription_updated_handler(&subscription, &mysql_pool).await?;
       }
     }
     EventType::CustomerSubscriptionDeleted => {
       if let EventObject::Subscription(subscription) = webhook_payload.data.object {
-        webhook_summary = customer_subscription_deleted_handler(&subscription)?;
+        webhook_summary = customer_subscription_deleted_handler(&subscription, &mysql_pool).await?;
       }
     }
 
@@ -202,7 +202,7 @@ pub async fn stripe_webhook_handler(
 
     EventType::PaymentIntentSucceeded => {
       if let EventObject::PaymentIntent(payment_intent) = webhook_payload.data.object {
-        let _r = payment_intent_succeeded_handler(&payment_intent)?;
+        webhook_summary = payment_intent_succeeded_handler(&payment_intent)?;
       }
     }
 
@@ -219,7 +219,7 @@ pub async fn stripe_webhook_handler(
 
     EventType::ChargeSucceeded => {
       if let EventObject::Charge(charge) = webhook_payload.data.object {
-        let _r = charge_succeeded_handler(&charge)?;
+        webhook_summary = charge_succeeded_handler(&charge)?;
       }
     }
 
