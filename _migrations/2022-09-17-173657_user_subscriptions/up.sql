@@ -37,9 +37,11 @@ CREATE TABLE user_subscriptions (
   -- This has a UNIQUE index.
   maybe_stripe_subscription_id VARCHAR(255) DEFAULT NULL,
 
+  maybe_stripe_customer_id VARCHAR(255) DEFAULT NULL,
+
   maybe_stripe_product_id VARCHAR(255) DEFAULT NULL,
 
-  maybe_stripe_customer_id VARCHAR(255) DEFAULT NULL,
+  maybe_stripe_price_id VARCHAR(255) DEFAULT NULL,
 
   -- How frequently the subscription is billed and updated
   maybe_stripe_recurring_interval VARCHAR(32) DEFAULT NULL,
@@ -90,6 +92,8 @@ CREATE TABLE user_subscriptions (
   UNIQUE KEY (maybe_stripe_subscription_id),
   KEY index_subscription_category (subscription_category),
   KEY index_subscription_product_key (subscription_product_key),
+  KEY index_maybe_stripe_customer_id (maybe_stripe_customer_id),
+  KEY index_maybe_stripe_product_id (maybe_stripe_product_id),
   KEY index_maybe_stripe_subscription_status (maybe_stripe_subscription_status),
   KEY fk_maybe_user_token (maybe_user_token),
   KEY index_subscription_expires_at (subscription_expires_at)

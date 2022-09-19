@@ -22,8 +22,11 @@ pub struct UpsertSubscriptionByStripeId <'a> {
   /// The name of the product the user is subscribing to within the category.
   pub subscription_product_key: &'a str,
 
-  pub maybe_stripe_product_id: Option<&'a str>,
   pub maybe_stripe_customer_id: Option<&'a str>,
+
+  pub maybe_stripe_product_id: Option<&'a str>,
+  pub maybe_stripe_price_id: Option<&'a str>,
+
   pub maybe_stripe_recurring_interval : Option<StripeRecurringInterval>,
   pub maybe_stripe_subscription_status: Option<StripeSubscriptionStatus>,
   pub maybe_stripe_is_production: Option<bool>,
@@ -52,10 +55,13 @@ impl <'a> UpsertSubscriptionByStripeId <'a> {
     let token = Tokens::new_subscription_token()?;
 
     // NB: The following behaviors are intentional
-    //  - We only set the token initially; changing it obviously breaks.
-    //  - Other "static" fields do not need to change on update, either.
+    //  - We only set the "token" initially.
+    //  - Likewise, the stripe_subscription_id will remain constant.
     //  - The user token is updated to the new value so long as we don't
     //    attempt to set it to null or empty.
+    //  - The various subscription dates, expiry, and statuses can change.
+    //  - The product and price can change (eg. upgrades, downgrades).
+    //  - Other "static" fields do not need to change on update, either.
     let query = sqlx::query!(
         r#"
 INSERT INTO user_subscriptions
@@ -66,9 +72,11 @@ SET
   subscription_product_key = ?,
 
   maybe_stripe_subscription_id = ?,
+  maybe_stripe_customer_id = ?,
 
   maybe_stripe_product_id = ?,
-  maybe_stripe_customer_id = ?,
+  maybe_stripe_price_id = ?,
+
   maybe_stripe_recurring_interval = ?,
   maybe_stripe_subscription_status = ?,
   maybe_stripe_is_production = ?,
@@ -84,6 +92,10 @@ SET
 
 ON DUPLICATE KEY UPDATE
   maybe_user_token = COALESCE(NULLIF(?, ''), maybe_user_token),
+
+  maybe_stripe_product_id = ?,
+  maybe_stripe_price_id = ?,
+
   maybe_stripe_recurring_interval = ?,
   maybe_stripe_subscription_status = ?,
 
@@ -102,9 +114,11 @@ ON DUPLICATE KEY UPDATE
       self.subscription_product_key,
 
       self.stripe_subscription_id,
+      self.maybe_stripe_customer_id,
 
       self.maybe_stripe_product_id,
-      self.maybe_stripe_customer_id,
+      self.maybe_stripe_price_id,
+
       self.maybe_stripe_recurring_interval.as_deref(),
       self.maybe_stripe_subscription_status.as_deref(),
       self.maybe_stripe_is_production,
@@ -118,6 +132,10 @@ ON DUPLICATE KEY UPDATE
 
       // Upsert
       self.maybe_user_token,
+
+      self.maybe_stripe_product_id,
+      self.maybe_stripe_price_id,
+
       self.maybe_stripe_recurring_interval.as_deref(),
       self.maybe_stripe_subscription_status.as_deref(),
 
