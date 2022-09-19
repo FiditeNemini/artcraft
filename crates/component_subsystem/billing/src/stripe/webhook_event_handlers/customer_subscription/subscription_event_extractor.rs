@@ -2,11 +2,13 @@ use anyhow::anyhow;
 use chrono::{DateTime, NaiveDateTime, Utc};
 use container_common::anyhow_result::AnyhowResult;
 use crate::stripe::helpers::common_metadata_keys::METADATA_USER_TOKEN;
+use crate::stripe::helpers::enums::subscription_status_to_reusable_type::subscription_status_to_reusable_type;
 use crate::stripe::helpers::expand_customer_id::expand_customer_id;
 use crate::stripe::helpers::expand_product_id::expand_product_id;
+use reusable_types::stripe::stripe_recurring_interval::StripeRecurringInterval;
 use reusable_types::stripe::stripe_subscription_status::StripeSubscriptionStatus;
 use stripe::{Price, RecurringInterval, Subscription, SubscriptionInterval, SubscriptionStatus};
-use crate::stripe::helpers::enums::subscription_status_to_reusable_type::subscription_status_to_reusable_type;
+use crate::stripe::helpers::enums::recurring_interval_to_reusable_type::recurring_interval_to_reusable_type;
 
 #[derive(Clone, Debug)]
 pub struct SubscriptionSummary {
@@ -23,13 +25,18 @@ pub struct SubscriptionSummary {
 
   pub stripe_subscription_status: StripeSubscriptionStatus,
   pub subscription_is_active: bool,
-  pub subscription_interval: RecurringInterval,
+  pub subscription_interval: StripeRecurringInterval,
 
   /// When the subscription was "created" in Stripe (including any backdating)
   pub subscription_start_date: NaiveDateTime,
 
+  // The updated billing period for the subscription
   pub current_billing_period_start: NaiveDateTime,
   pub current_billing_period_end: NaiveDateTime,
+
+  // When the subscription will be (or was) canceled
+  pub maybe_cancel_at: Option<NaiveDateTime>,
+  pub maybe_canceled_at: Option<NaiveDateTime>,
 }
 
 /// Extract only the subscription details we care about
@@ -69,6 +76,9 @@ pub fn subscription_summary_extractor(subscription: &Subscription) -> AnyhowResu
   let period_start = NaiveDateTime::from_timestamp(subscription.current_period_start, 0);
   let period_end = NaiveDateTime::from_timestamp(subscription.current_period_end, 0);
 
+  let maybe_cancel_at = subscription.cancel_at.map(|t| NaiveDateTime::from_timestamp(t, 0));
+  let maybe_canceled_at = subscription.canceled_at.map(|t| NaiveDateTime::from_timestamp(t, 0));
+
   Ok(SubscriptionSummary {
     user_token: maybe_user_token,
     stripe_subscription_id: subscription_id,
@@ -78,18 +88,21 @@ pub fn subscription_summary_extractor(subscription: &Subscription) -> AnyhowResu
     stripe_product_id: expand_product_id(product),
     stripe_price_id: price.id.to_string(),
     subscription_is_active: subscription.status == SubscriptionStatus::Active,
-    subscription_interval: recurring.interval,
+    subscription_interval: recurring_interval_to_reusable_type(recurring.interval),
     subscription_start_date: start_date,
     current_billing_period_start: period_start,
     current_billing_period_end: period_end,
+    maybe_cancel_at: maybe_cancel_at,
+    maybe_canceled_at: maybe_canceled_at,
   })
 }
 
 #[cfg(test)]
 mod tests {
-  use stripe::{RecurringInterval, Subscription, SubscriptionStatus};
-  use reusable_types::stripe::stripe_subscription_status::StripeSubscriptionStatus;
   use crate::stripe::webhook_event_handlers::customer_subscription::subscription_event_extractor::subscription_summary_extractor;
+  use reusable_types::stripe::stripe_recurring_interval::StripeRecurringInterval;
+  use reusable_types::stripe::stripe_subscription_status::StripeSubscriptionStatus;
+  use stripe::Subscription;
 
   #[test]
   fn test_subscription_summary_extractor_on_create_event() {
@@ -124,11 +137,13 @@ mod tests {
     assert_eq!(summary.stripe_customer_id, "cus_MQ03py0gWUh0Ox".to_string());
     assert_eq!(summary.stripe_product_id, "prod_MMxi2J5y69VPbO".to_string());
     assert_eq!(summary.stripe_price_id, "price_1LeDnKEU5se17MekVr1iYYNf".to_string());
-    assert_eq!(summary.subscription_interval, RecurringInterval::Month);
+    assert_eq!(summary.subscription_interval, StripeRecurringInterval::Month);
     assert_eq!(summary.stripe_is_production, false);
     assert_eq!(summary.subscription_start_date.to_string(), "2022-09-12 10:39:48".to_string());
     assert_eq!(summary.current_billing_period_start.to_string(), "2022-09-12 10:39:48".to_string());
     assert_eq!(summary.current_billing_period_end.to_string(), "2022-10-12 10:39:48".to_string());
+    assert_eq!(summary.maybe_cancel_at, None);
+    assert_eq!(summary.maybe_canceled_at, None);
   }
 
   #[test]
@@ -166,11 +181,13 @@ mod tests {
     assert_eq!(summary.stripe_customer_id, "cus_MPrgIen5Wh6QKG".to_string());
     assert_eq!(summary.stripe_product_id, "prod_MMxi2J5y69VPbO".to_string());
     assert_eq!(summary.stripe_price_id, "price_1LeDnKEU5se17MekVr1iYYNf".to_string());
-    assert_eq!(summary.subscription_interval, RecurringInterval::Month);
+    assert_eq!(summary.subscription_interval, StripeRecurringInterval::Month);
     assert_eq!(summary.stripe_is_production, false);
     assert_eq!(summary.subscription_start_date.to_string(), "2022-09-12 02:00:37".to_string());
     assert_eq!(summary.current_billing_period_start.to_string(), "2022-09-12 02:00:37".to_string());
     assert_eq!(summary.current_billing_period_end.to_string(), "2022-10-12 02:00:37".to_string());
+    assert_eq!(summary.maybe_cancel_at, None);
+    assert_eq!(summary.maybe_canceled_at, None);
   }
 
   #[test]
@@ -208,10 +225,12 @@ mod tests {
     assert_eq!(summary.stripe_customer_id, "cus_MQ03py0gWUh0Ox".to_string());
     assert_eq!(summary.stripe_product_id, "prod_MMxi2J5y69VPbO".to_string());
     assert_eq!(summary.stripe_price_id, "price_1LeDnKEU5se17MekVr1iYYNf".to_string());
-    assert_eq!(summary.subscription_interval, RecurringInterval::Month);
+    assert_eq!(summary.subscription_interval, StripeRecurringInterval::Month);
     assert_eq!(summary.stripe_is_production, false);
     assert_eq!(summary.subscription_start_date.to_string(), "2022-09-12 10:39:48".to_string());
     assert_eq!(summary.current_billing_period_start.to_string(), "2022-09-12 10:39:48".to_string());
     assert_eq!(summary.current_billing_period_end.to_string(), "2022-10-12 10:39:48".to_string());
+    assert_eq!(summary.maybe_cancel_at, None);
+    assert_eq!(summary.maybe_canceled_at.map(|t| t.to_string()), Some("2022-09-12 10:49:00".to_string()));
   }
 }

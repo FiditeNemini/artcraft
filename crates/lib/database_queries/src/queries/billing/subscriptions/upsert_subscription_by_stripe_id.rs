@@ -2,6 +2,7 @@ use anyhow::anyhow;
 use chrono::NaiveDateTime;
 use container_common::anyhow_result::AnyhowResult;
 use crate::tokens::Tokens;
+use reusable_types::stripe::stripe_recurring_interval::StripeRecurringInterval;
 use reusable_types::stripe::stripe_subscription_status::StripeSubscriptionStatus;
 use sqlx::MySqlPool;
 
@@ -23,6 +24,7 @@ pub struct UpsertSubscriptionByStripeId <'a> {
 
   pub maybe_stripe_product_id: Option<&'a str>,
   pub maybe_stripe_customer_id: Option<&'a str>,
+  pub maybe_stripe_recurring_interval : Option<StripeRecurringInterval>,
   pub maybe_stripe_subscription_status: Option<StripeSubscriptionStatus>,
   pub maybe_stripe_is_production: Option<bool>,
 
@@ -38,6 +40,10 @@ pub struct UpsertSubscriptionByStripeId <'a> {
   /// When the subscription is set to expire.
   /// This controls whether it is active or not.
   pub subscription_expires_at: NaiveDateTime,
+
+  // Subscription cancellation (future and past)
+  pub maybe_cancel_at: Option<NaiveDateTime>,
+  pub maybe_canceled_at: Option<NaiveDateTime>,
 }
 
 impl <'a> UpsertSubscriptionByStripeId <'a> {
@@ -63,6 +69,7 @@ SET
 
   maybe_stripe_product_id = ?,
   maybe_stripe_customer_id = ?,
+  maybe_stripe_recurring_interval = ?,
   maybe_stripe_subscription_status = ?,
   maybe_stripe_is_production = ?,
 
@@ -70,16 +77,21 @@ SET
   current_billing_period_start_at = ?,
   current_billing_period_end_at = ?,
   subscription_expires_at = ?,
+  maybe_cancel_at = ?,
+  maybe_canceled_at = ?,
 
   version = version + 1
 
 ON DUPLICATE KEY UPDATE
   maybe_user_token = COALESCE(NULLIF(?, ''), maybe_user_token),
+  maybe_stripe_recurring_interval = ?,
   maybe_stripe_subscription_status = ?,
 
   current_billing_period_start_at = ?,
   current_billing_period_end_at = ?,
   subscription_expires_at = ?,
+  maybe_cancel_at = ?,
+  maybe_canceled_at = ?,
 
   version = version + 1
         "#,
@@ -93,6 +105,7 @@ ON DUPLICATE KEY UPDATE
 
       self.maybe_stripe_product_id,
       self.maybe_stripe_customer_id,
+      self.maybe_stripe_recurring_interval.as_deref(),
       self.maybe_stripe_subscription_status.as_deref(),
       self.maybe_stripe_is_production,
 
@@ -100,14 +113,19 @@ ON DUPLICATE KEY UPDATE
       self.current_billing_period_start_at,
       self.current_billing_period_end_at,
       self.subscription_expires_at,
+      self.maybe_cancel_at,
+      self.maybe_canceled_at,
 
       // Upsert
       self.maybe_user_token,
+      self.maybe_stripe_recurring_interval.as_deref(),
       self.maybe_stripe_subscription_status.as_deref(),
 
       self.current_billing_period_start_at,
       self.current_billing_period_end_at,
       self.subscription_expires_at,
+      self.maybe_cancel_at,
+      self.maybe_canceled_at,
     );
 
     let query_result = query.execute(mysql_pool).await;

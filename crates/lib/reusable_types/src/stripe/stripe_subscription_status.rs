@@ -8,8 +8,6 @@
 //   - Added Deref impl
 //   - Added tests
 
-use std::ops::Deref;
-
 // NB: Added "sqlx::Type".
 #[derive(Copy, Clone, Debug, Deserialize, Serialize, Eq, PartialEq, sqlx::Type)]
 #[serde(rename_all = "snake_case")]
@@ -59,7 +57,7 @@ impl AsRef<str> for StripeSubscriptionStatus {
 }
 
 // NB: Added by us.
-impl Deref for StripeSubscriptionStatus {
+impl std::ops::Deref for StripeSubscriptionStatus {
   type Target = str;
 
   fn deref(&self) -> &Self::Target {
@@ -72,6 +70,7 @@ impl std::fmt::Display for StripeSubscriptionStatus {
     self.as_str().fmt(f)
   }
 }
+
 impl std::default::Default for StripeSubscriptionStatus {
   fn default() -> Self {
     Self::Active

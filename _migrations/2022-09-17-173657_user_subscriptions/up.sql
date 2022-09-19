@@ -41,6 +41,9 @@ CREATE TABLE user_subscriptions (
 
   maybe_stripe_customer_id VARCHAR(255) DEFAULT NULL,
 
+  -- How frequently the subscription is billed and updated
+  maybe_stripe_recurring_interval VARCHAR(32) DEFAULT NULL,
+
   -- Subscription object status enum as string
   maybe_stripe_subscription_status VARCHAR(32) DEFAULT NULL,
 
@@ -76,6 +79,10 @@ CREATE TABLE user_subscriptions (
   -- Maybe useful for debugging.
   current_billing_period_start_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   current_billing_period_end_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+  -- Subscription cancellation (future and past)
+  maybe_cancel_at TIMESTAMP DEFAULT NULL,
+  maybe_canceled_at TIMESTAMP DEFAULT NULL,
 
     -- ========== INDICES ==========
   PRIMARY KEY (id),

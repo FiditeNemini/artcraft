@@ -1,10 +1,10 @@
 use anyhow::anyhow;
 use container_common::anyhow_result::AnyhowResult;
+use crate::stripe::helpers::common_metadata_keys::{METADATA_EMAIL, METADATA_USER_TOKEN, METADATA_USERNAME};
 use crate::stripe::stripe_config::StripeConfig;
 use log::error;
 use std::collections::HashMap;
-use stripe::{CheckoutSession, CheckoutSessionMode, CreateCheckoutSession, CreateCheckoutSessionLineItems, CreateCheckoutSessionPaymentIntentData, CreateCheckoutSessionSubscriptionData};
-use crate::stripe::helpers::common_metadata_keys::{METADATA_EMAIL, METADATA_USER_TOKEN, METADATA_USERNAME};
+use stripe::{CheckoutSession, CheckoutSessionMode, CreateCheckoutSession, CreateCheckoutSessionAutomaticTax, CreateCheckoutSessionLineItems, CreateCheckoutSessionPaymentIntentData, CreateCheckoutSessionSubscriptionData};
 
 // NB: These are "test" product IDs.
 // TODO: Pass these in via request; validate via a dynamically dispatched trait callable that can do
@@ -49,27 +49,6 @@ pub async fn stripe_create_checkout_session_shared(
       cancel_url,
       success_url,
     );
-
-
-
-    /*
-
-
-    Bind these:
-
-    - customer.subscription.updated  - Sent when the subscription is successfully started, after the payment is confirmed.
-                                       Also sent whenever a subscription is changed. For example, adding a coupon, applying a
-                                       discount, adding an invoice item, and changing plans all trigger this event.
-
-    - customer.subscription.deleted  - Sent when a customer’s subscription ends.
-
-    - invoice.created  - Do I need to do anything !?
-
-
-    - invoice.paid	  - Sent when the invoice is successfully paid.
-                        You can provision access to your product when you receive this event and the
-                        subscription status is active.
-     */
 
     // `client_reference_id`
     // Stripe Docs:
@@ -142,6 +121,8 @@ pub async fn stripe_create_checkout_session_shared(
         ..Default::default()
       });
     }
+
+    params.automatic_tax = Some(CreateCheckoutSessionAutomaticTax { enabled: true });
 
     params.line_items = Some(vec![
       CreateCheckoutSessionLineItems {

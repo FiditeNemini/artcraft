@@ -1,12 +1,13 @@
+use crate::stripe::webhook_event_handlers::customer_subscription::calculate_subscription_end_date::calculate_subscription_end_date;
 use crate::stripe::webhook_event_handlers::customer_subscription::subscription_event_extractor::subscription_summary_extractor;
 use crate::stripe::webhook_event_handlers::stripe_webhook_error::StripeWebhookError;
 use crate::stripe::webhook_event_handlers::stripe_webhook_summary::StripeWebhookSummary;
+use database_queries::queries::billing::subscriptions::get_subscription_by_stripe_id::get_subscription_by_stripe_id;
 use database_queries::queries::billing::subscriptions::upsert_subscription_by_stripe_id::UpsertSubscriptionByStripeId;
 use log::{error, warn};
+use reusable_types::stripe::stripe_subscription_status::StripeSubscriptionStatus;
 use sqlx::MySqlPool;
 use stripe::Subscription;
-use database_queries::queries::billing::subscriptions::get_subscription_by_stripe_id::get_subscription_by_stripe_id;
-use reusable_types::stripe::stripe_subscription_status::StripeSubscriptionStatus;
 
 /// Handle event type: 'customer.subscription.updated'
 pub async fn customer_subscription_updated_handler(
@@ -51,12 +52,15 @@ pub async fn customer_subscription_updated_handler(
       subscription_product_key: "todo",
       maybe_stripe_product_id: Some(&summary.stripe_product_id),
       maybe_stripe_customer_id: Some(&summary.stripe_customer_id),
+      maybe_stripe_recurring_interval: Some(summary.subscription_interval),
       maybe_stripe_subscription_status: Some(summary.stripe_subscription_status),
       maybe_stripe_is_production: Some(summary.stripe_is_production),
       subscription_start_at: summary.subscription_start_date,
       current_billing_period_start_at: summary.current_billing_period_start,
       current_billing_period_end_at: summary.current_billing_period_end,
-      subscription_expires_at: summary.current_billing_period_end, // TODO: Add extra days.
+      subscription_expires_at: calculate_subscription_end_date(&summary),
+      maybe_cancel_at: summary.maybe_cancel_at,
+      maybe_canceled_at: summary.maybe_canceled_at,
     };
 
     let _r = upsert.upsert(mysql_pool)
