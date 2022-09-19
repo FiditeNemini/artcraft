@@ -38,9 +38,9 @@ impl <'a> UpsertSubscriptionByStripeId <'a> {
 
     // NB: The following behaviors are intentional
     //  - We only set the token initially; changing it obviously breaks.
-    //  - We only set the user token the first time. Stripe entities may remain coherent,
-    //    but it isn't our business to attempt changes on webhooks.
     //  - Other "static" fields do not need to change on update, either.
+    //  - The user token is updated to the new value so long as we don't
+    //    attempt to set it to null or empty.
     let query = sqlx::query!(
         r#"
 INSERT INTO user_subscriptions
@@ -63,9 +63,11 @@ SET
 
 ON DUPLICATE KEY UPDATE
   subscription_expires_at = ?,
+  maybe_user_token = COALESCE(NULLIF(?, ''), maybe_user_token),
 
   version = version + 1
         "#,
+      // Insert
       token,
       self.maybe_user_token,
       self.subscription_category,
@@ -82,6 +84,7 @@ ON DUPLICATE KEY UPDATE
 
       // Upsert
       self.subscription_expires_at,
+      self.maybe_user_token,
     );
 
     let query_result = query.execute(mysql_pool).await;
