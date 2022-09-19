@@ -49,12 +49,37 @@ function IndexPage() {
     console.log(splitTitleOutline);
 
     var tl = gsap.timeline({ delay: 0.2 });
-    tl.to("#hero-img", {
-      delay: 0.2,
-      duration: 0.7,
-      y: 0,
-      opacity: 1,
-    });
+    tl.to(
+      "#pascal",
+      {
+        delay: 0.2,
+        duration: 1.2,
+        y: 0,
+        opacity: 1,
+        ease: "expo",
+      },
+      "<"
+    );
+    tl.to(
+      "#roko",
+      {
+        duration: 1.2,
+        x: 0,
+        opacity: 1,
+        ease: "expo",
+      },
+      "<"
+    );
+    tl.to(
+      "#basilisk",
+      {
+        duration: 1.2,
+        x: 0,
+        opacity: 1,
+        ease: "expo",
+      },
+      "<"
+    );
     tl.to(
       splitTitle.chars,
       {
@@ -192,12 +217,52 @@ function IndexPage() {
           </div>
 
           <div className="d-flex justify-content-center">
-            <img
+            {/* <img
               id="hero-img"
               className="hero-img"
               src="/hero/hero-img.webp"
               alt="Storyteller HyperJail"
-            />
+            /> */}
+
+            <div
+              className="hero-img roko"
+              data-scroll
+              data-scroll-speed="1"
+              data-scroll-direction="horizontal"
+              data-scroll-position="top"
+            >
+              <img id="roko" src="/hero/hyperjail_IsolatedRoko.webp" alt="" />
+            </div>
+
+            <div
+              className="hero-img basilisk"
+              data-scroll
+              data-scroll-speed="-1"
+              data-scroll-direction="horizontal"
+              data-scroll-position="top"
+            >
+              <img
+                id="basilisk"
+                src="/hero/hyperjail_IsolatedBasilisk.webp"
+                alt=""
+              />
+            </div>
+
+            <div
+              className="hero-img pascal"
+              data-scroll
+              data-scroll-speed="1"
+              data-scroll-direction="vertical"
+              data-scroll-position="top"
+            >
+              <img
+                id="pascal"
+                src="/hero/hyperjail_IsolatedPascal.webp"
+                alt=""
+              />
+            </div>
+
+            <div className="bg-floor"></div>
           </div>
 
           <div
