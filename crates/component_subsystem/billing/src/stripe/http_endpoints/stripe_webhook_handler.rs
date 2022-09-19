@@ -30,6 +30,7 @@ use sqlx::MySqlPool;
 use std::collections::HashMap;
 use std::fmt;
 use stripe::{EventObject, EventType, PaymentIntentStatus, Webhook};
+use database_queries::queries::billing::stripe::get_stripe_webhook_event_log_by_id::get_stripe_webhook_event_log_by_id;
 
 #[derive(Serialize)]
 pub struct StripeWebhookSuccessResponse {
@@ -91,6 +92,23 @@ pub async fn stripe_webhook_handler(
     stripe_is_production,
     &stripe_event_created_at,
     webhook_payload.pending_webhooks);
+
+  let maybe_previously_played_event = get_stripe_webhook_event_log_by_id(&stripe_event_id, &mysql_pool)
+      .await
+      .map_err(|err| {
+        error!("Could not query previous event by ID ({}): {:?}", &stripe_event_id, err);
+        StripeWebhookError::ServerError
+      })?;
+
+  if let Some(event) = maybe_previously_played_event {
+    // The event is being replayed by Stripe, and we've already handled it.
+    // We'll ignore it so that we remain idempotent.
+    if event.should_ignore_retry {
+      warn!("Stripe is replying event with ID={}. Ignoring it since we have previously handled it.",
+        &stripe_event_id);
+      return report_success();
+    }
+  }
 
   let mut unhandled_event_type = false;
 
@@ -310,6 +328,11 @@ pub async fn stripe_webhook_handler(
         StripeWebhookError::ServerError
       })?;
 
+  report_success()
+}
+
+#[inline]
+fn report_success() -> Result<HttpResponse, StripeWebhookError> {
   let response = StripeWebhookSuccessResponse {
     success: true,
   };
