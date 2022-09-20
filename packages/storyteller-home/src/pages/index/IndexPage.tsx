@@ -231,7 +231,11 @@ function IndexPage() {
               data-scroll-direction="horizontal"
               data-scroll-position="top"
             >
-              <img id="roko" src="/hero/hyperjail_IsolatedRoko.webp" alt="" />
+              <img
+                id="roko"
+                src="/hero/hyperjail_IsolatedRoko_RimWEB.png"
+                alt=""
+              />
             </div>
 
             <div
@@ -243,7 +247,7 @@ function IndexPage() {
             >
               <img
                 id="basilisk"
-                src="/hero/hyperjail_IsolatedBasilisk.webp"
+                src="/hero/hyperjail_IsolatedBasilisk_RimWEB.png"
                 alt=""
               />
             </div>
@@ -257,7 +261,7 @@ function IndexPage() {
             >
               <img
                 id="pascal"
-                src="/hero/hyperjail_IsolatedPascal.webp"
+                src="/hero/hyperjail_IsolatedPascal_RimWEB.png"
                 alt=""
               />
             </div>
