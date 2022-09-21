@@ -381,6 +381,8 @@ p {
   pointer-events: none;
   max-height: 680px;
   display: flex;
+  align-items: cemter;
+  justify-content: center;
 
   &.roko {
     margin-left: -450px;
@@ -1020,21 +1022,23 @@ span.swiper-pagination-bullet.swiper-pagination-bullet-active {
 
 @media (max-width: 1199.98px) {
   .hero-img {
+    padding-top: 100px;
+
     &.roko {
       margin: 0;
       margin-bottom: 60px;
       margin-left: -310px;
-      height: 48%;
+      height: 100%;
     }
     &.basilisk {
       margin: 0;
       margin-bottom: 30px;
       margin-right: -300px;
-      height: 50%;
+      height: 100%;
     }
     &.pascal {
       // margin-bottom: 40px;
-      height: 50%;
+      height: 100%;
     }
   }
 
@@ -1096,22 +1100,21 @@ span.swiper-pagination-bullet.swiper-pagination-bullet-active {
 
 @media (max-width: 767.98px) {
   .hero-img {
+    padding-top: 60px;
+
     &.roko {
       margin: 0;
       margin-bottom: 60px;
-      margin-left: -290px;
-      height: 48%;
+      margin-left: -310px;
     }
     &.basilisk {
       margin: 0;
       margin-bottom: 30px;
-      margin-right: -270px;
-      height: 50%;
+      margin-right: -300px;
     }
-    &.pascal {
-      // margin-bottom: 40px;
-      height: 50%;
-    }
+    // &.pascal {
+    //   margin-bottom: 40px;
+    // }
   }
 
   .hero-title {
@@ -1120,10 +1123,6 @@ span.swiper-pagination-bullet.swiper-pagination-bullet-active {
 
   .hero-sub-title {
     max-width: 90%;
-  }
-
-  .bg-hero {
-    min-height: 920px;
   }
 
   .shape-1-container {
