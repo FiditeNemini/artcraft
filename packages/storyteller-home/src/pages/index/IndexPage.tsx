@@ -513,16 +513,23 @@ function IndexPage() {
                 </div>
               </div>
             </div>
-            <div className="mt-5 pt-4 text-center">
+            <div className="mt-5 pt-4 pb-5 text-center">
               <h2 className="text-center mt-5 fw-bold">
                 <FontAwesomeIcon icon={faMicrophone} className="me-3" />
                 Voice Changing Demo
               </h2>
-              <p className="mb-5">
+              <p className="mb-4">
                 This is still an early beta. Voice quality will change and
                 improve substantially over time.
               </p>
-              <div className="row gx-4 gy-4 text-center">
+              <p className="text-center my-4 pt-5">
+                <strong className="fw-semibold fs-5">Brandon</strong>
+                <FontAwesomeIcon icon={faArrowRight} className="mx-2" />
+                <strong className="fw-semibold fs-5">Donald Trump</strong>
+                <br />
+                Real time voice to voice conversion.
+              </p>
+              <div className="row gx-4 gy-4 text-center pb-5">
                 <div className="col-12 col-lg-6">
                   <div className="card bg-light-solid justify-content-start">
                     <AudioSample sampleUrl="/audio-samples/voice-conversion-1.mp3" />
@@ -549,13 +556,6 @@ function IndexPage() {
                     </p>
                   </div>
                 </div>
-                <p className="text-center my-5 pb-5">
-                  <strong className="fw-semibold fs-5">Brandon</strong>
-                  <FontAwesomeIcon icon={faArrowRight} className="mx-2" />
-                  <strong className="fw-semibold fs-5">Donald Trump</strong>
-                  <br />
-                  Real time voice to voice conversion.
-                </p>
               </div>
             </div>
             <div className="text-center position-relative">
@@ -627,9 +627,13 @@ function IndexPage() {
                 We have over 2,000 voices (with more added every day), but we've
                 selected a few to show off.
               </p>
-              <TtsComponent />
             </div>
           </div>
+
+          <div className="d-flex flex-column align-items-center container tts-demo pb-5">
+            <TtsComponent />
+          </div>
+
           <div className="container text-center position-relative">
             <div className="position-relative zi-2">
               <h2 className="text-center mt-5 fw-bold">Want to hear more?</h2>
