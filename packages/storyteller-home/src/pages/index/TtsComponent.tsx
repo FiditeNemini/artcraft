@@ -154,8 +154,8 @@ function TtsComponent(props: Props) {
   });
 
   return (
-    <div className="d-flex justify-content-center pb-5">
-      <div className="card bg-dark-solid tts-demo w-100 mb-5">
+    <div className="w-100">
+      <div className="card bg-dark-solid w-100 mb-5 p-3 p-lg-4">
         <form onSubmit={handleFormSubmit} className="w-100">
           <div className="d-flex flex-column gap-3">
             <div className="field">
@@ -193,9 +193,8 @@ function TtsComponent(props: Props) {
             </div>
           </div>
         </form>
-
-        <TtsResultsList ttsInferenceJobs={jobs} />
       </div>
+      <TtsResultsList ttsInferenceJobs={jobs} />
     </div>
   );
 }
