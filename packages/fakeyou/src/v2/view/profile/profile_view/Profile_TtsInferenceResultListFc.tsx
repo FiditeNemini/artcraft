@@ -60,7 +60,7 @@ function ProfileTtsInferenceResultsListFc(props: Props) {
     (cursor: string | null, reverse: boolean) => {
       let args: ListTtsInferenceResultsForUserArgs = {
         username: props.username,
-        limit: 25,
+        limit: 10,
       };
 
       if (cursor !== null) {
