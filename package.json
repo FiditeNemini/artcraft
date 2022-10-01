@@ -27,6 +27,6 @@
     "lerna": "^4.0.0"
   },
   "dependencies": {
-    "@formspree/react": "^2.4.0",
+    "@formspree/react": "^2.4.0"
   }
 }
