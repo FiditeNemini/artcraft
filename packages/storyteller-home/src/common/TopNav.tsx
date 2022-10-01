@@ -1,7 +1,7 @@
 import { useLocomotiveScroll } from "react-locomotive-scroll";
 import React, { useState, useEffect } from "react";
 
-interface Props { }
+interface Props {}
 
 function TopNav(props: Props) {
   const { scroll } = useLocomotiveScroll();
@@ -106,7 +106,9 @@ function TopNav(props: Props) {
           </ul>
 
           <div className="col-md-3 text-end">
-            <a href="#contact" className="btn btn-primary fs-6" data-scroll-to>Contact</a>
+            <a href="#contact" className="btn btn-primary fs-6" data-scroll-to>
+              Contact
+            </a>
           </div>
         </div>
 
@@ -157,6 +159,16 @@ function TopNav(props: Props) {
             <li>
               <a onClick={menuToggle} href="#mentions" data-scroll-to>
                 Mentions
+              </a>
+            </li>
+            <li className="mt-4">
+              <a
+                onClick={menuToggle}
+                href="#contact"
+                data-scroll-to
+                className="btn btn-primary"
+              >
+                Contact
               </a>
             </li>
           </ul>
