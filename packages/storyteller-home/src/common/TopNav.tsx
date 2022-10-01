@@ -1,7 +1,7 @@
 import { useLocomotiveScroll } from "react-locomotive-scroll";
 import React, { useState, useEffect } from "react";
 
-interface Props {}
+interface Props { }
 
 function TopNav(props: Props) {
   const { scroll } = useLocomotiveScroll();
@@ -106,7 +106,7 @@ function TopNav(props: Props) {
           </ul>
 
           <div className="col-md-3 text-end">
-            <button className="btn btn-primary fs-6">Contact</button>
+            <a href="#contact" className="btn btn-primary fs-6" data-scroll-to>Contact</a>
           </div>
         </div>
 

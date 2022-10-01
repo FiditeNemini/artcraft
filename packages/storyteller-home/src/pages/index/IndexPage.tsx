@@ -32,6 +32,9 @@ import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/css";
 import "swiper/css/pagination";
 import { Autoplay, Pagination } from "swiper";
+import { useForm, ValidationError } from '@formspree/react';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 function IndexPage() {
   // Title Animation
@@ -129,6 +132,22 @@ function IndexPage() {
       0.4
     );
   }, []);
+
+  const [state, handleSubmit] = useForm("xnqrvjbo");
+  if (state.succeeded) {
+    const reset = document.getElementById("reset")
+    const success = document.getElementById('success_message')
+
+    if (reset) reset.click()
+
+    setTimeout(function () {
+      if (success) success.innerHTML = '<h4 >Thank you for your message!</h4>'
+    }, 500)
+
+    setTimeout(function () {
+      if (success) success.innerHTML = ''
+    }, 5000)
+  }
 
   return (
     <>
@@ -1091,9 +1110,66 @@ function IndexPage() {
             </Swiper>
           </div>
         </div>
+
+        <div id="contact" className="bg-light section-2">
+          <h3 className="text-center fw-bold display-5 mb-5">Contact Us</h3>
+          <div id="success_message" className="fw-semibold opacity-75 mb-4 text-center"></div>
+          <form id="contact_form" onSubmit={handleSubmit} className="col-12 col-md-6 mx-auto">
+            <fieldset className="">
+              <input
+                id="name"
+                type="text"
+                name="name"
+                placeholder='Name *'
+                required
+                className="col-12"
+              />
+              <ValidationError
+                prefix="Name"
+                field="name"
+                errors={state.errors}
+              />
+              <input
+                id="email"
+                type="email"
+                name="email"
+                placeholder='Email *'
+                required
+                className="col-12 mt-2"
+              />
+              <ValidationError
+                prefix="Email"
+                field="email"
+                errors={state.errors}
+              />
+            </fieldset>
+            <fieldset>
+              <textarea
+                id="message"
+                name="message"
+                placeholder='Say "hi" here!'
+                required
+                className="col-12 mt-2"
+                cols={40}
+                rows={4}
+                style={{ resize: 'none' }}
+              />
+              <ValidationError
+                prefix="Message"
+                field="message"
+                errors={state.errors}
+              />
+            </fieldset>
+            <button type="submit" className="btn btn-primary mt-4 col-12" disabled={state.submitting}>
+              Submit
+            </button>
+            <input type="reset" id="reset" className="d-none" />
+          </form>
+        </div>
       </div>
     </>
   );
 }
+
 
 export default IndexPage;
