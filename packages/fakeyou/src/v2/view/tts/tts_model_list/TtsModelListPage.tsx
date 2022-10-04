@@ -338,7 +338,7 @@ function TtsModelListPage(props: Props) {
           <div className="col-lg-6">
             <div className="d-flex justify-content-center">
               <motion.img
-                src="mascot/kitsune_pose2.webp"
+                src="mascot/Halloween-Hanashi.webp"
                 className="img-fluid"
                 width="516"
                 height="508"
