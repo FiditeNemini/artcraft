@@ -5,6 +5,7 @@ use crate::http_server::web_utils::redis_rate_limiter::RedisRateLimiter;
 use crate::threads::db_health_checker_thread::db_health_check_status::HealthCheckStatus;
 use crate::threads::ip_banlist_set::IpBanlistSet;
 use crate::util::encrypted_sort_id::SortKeyCrypto;
+use billing_component::stripe::stripe_config::StripeConfig;
 use database_queries::mediators::badge_granter::BadgeGranter;
 use database_queries::mediators::firehose_publisher::FirehosePublisher;
 use database_queries::queries::tts::tts_inference_jobs::get_pending_tts_inference_job_count::TtsQueueLengthResult;
@@ -20,6 +21,8 @@ use users_component::utils::session_cookie_manager::SessionCookieManager;
 pub struct ServerState {
   /// Configuration from ENV vars.
   pub env_config: EnvConfig,
+
+  pub stripe_configs: StripeConfig,
 
   pub hostname: String,
 

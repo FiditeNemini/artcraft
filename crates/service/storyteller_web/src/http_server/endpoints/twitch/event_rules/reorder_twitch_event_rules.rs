@@ -8,7 +8,6 @@ use actix_web::web::{Path, Json};
 use actix_web::{Responder, web, HttpResponse, error, HttpRequest};
 use crate::http_server::endpoints::twitch::event_rules::validations::validate_event_match_predicate::validate_event_match_predicate;
 use crate::http_server::endpoints::twitch::event_rules::validations::validate_event_response::validate_event_response;
-use crate::http_server::web_utils::ip_address::get_request_ip;
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::http_server::web_utils::response_success_helpers::simple_json_success;
 use crate::server_state::ServerState;
@@ -18,6 +17,7 @@ use database_queries::queries::twitch::twitch_event_rules::get_twitch_event_rule
 use database_queries::queries::twitch::twitch_event_rules::list_twitch_event_rules_for_user::list_twitch_event_rules_for_user;
 use database_queries::queries::twitch::twitch_event_rules::reorder_twitch_event_rules::reorder_twitch_event_rules;
 use database_queries::queries::twitch::twitch_event_rules::update_twitch_event_rule_builder::UpdateTwitchEventRuleBuilder;
+use http_server_common::request::get_request_ip::get_request_ip;
 use http_server_common::response::serialize_as_json_error::serialize_as_json_error;
 use log::{info, warn, log, error};
 use sqlx::MySqlPool;

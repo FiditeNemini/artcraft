@@ -15,6 +15,7 @@
 
 pub mod entity_visibility;
 pub mod generic_download_type;
+pub mod stripe;
 pub mod vocoder_type;
 
 #[cfg(test)] pub mod test_helpers;

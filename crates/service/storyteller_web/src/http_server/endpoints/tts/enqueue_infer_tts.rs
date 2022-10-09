@@ -6,12 +6,14 @@ use actix_web::error::ResponseError;
 use actix_web::http::StatusCode;
 use actix_web::{Responder, web, HttpResponse, error, HttpRequest};
 use crate::http_server::endpoints::investor_demo::demo_cookie::request_has_demo_cookie;
-use crate::http_server::web_utils::ip_address::get_request_ip;
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::server_state::ServerState;
 use crate::validations::model_uploads::validate_model_title;
 use database_queries::column_types::record_visibility::RecordVisibility;
 use database_queries::tokens::Tokens;
+use http_server_common::request::get_request_api_token::get_request_api_token;
+use http_server_common::request::get_request_header_optional::get_request_header_optional;
+use http_server_common::request::get_request_ip::get_request_ip;
 use log::{info, warn, log};
 use r2d2_redis::redis::Commands;
 use redis_common::redis_keys::RedisKeys;
@@ -21,10 +23,8 @@ use sqlx::error::Error::Database;
 use sqlx::mysql::MySqlDatabaseError;
 use std::fmt;
 use std::sync::Arc;
-use http_server_common::request::get_request_api_token::get_request_api_token;
 use tts_common::priority::{FAKEYOU_LOGGED_IN_PRIORITY_LEVEL, FAKEYOU_ANONYMOUS_PRIORITY_LEVEL, FAKEYOU_INVESTOR_PRIORITY_LEVEL, FAKEYOU_DEFAULT_VALID_API_TOKEN_PRIORITY_LEVEL};
 use user_input_common::check_for_slurs::contains_slurs;
-use http_server_common::request::get_request_header_optional::get_request_header_optional;
 
 // TODO: Temporary for investor demo
 const STORYTELLER_DEMO_COOKIE_NAME : &'static str = "storyteller_demo";

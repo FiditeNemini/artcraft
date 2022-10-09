@@ -31,6 +31,7 @@ twitch_common = { path = "../../lib/twitch_common" }
 user_input_common = { path = "../../lib/user_input_common" }
 
 # Internal Components
+billing_component = { path = "../../component_subsystem/billing" }
 users_component = { path = "../../component_subsystem/users" }
 
 # Vendored code
@@ -104,7 +105,7 @@ rust-s3 = { version = "0.32.3" }
 subprocess = "0.2.6"
 tempdir = "0.3.7"
 
-actix = "0.12.0"
+#actix = "0.12.0"
 actix-cors = "0.6.0-beta.3"
 actix-files= "0.6.0-beta.8"
 actix-http = "3.0.0-beta.11"
@@ -119,6 +120,9 @@ jwt = "0.13.0"
 # NB: Hyper is just for HTTP client use in jobs. I'd use Actix client, but I need tokio runtime
 # NB: Furthermore, the Tokio runtime is old, so I have to use an older Hyper.
 hyper = { version = "0.14.14" }
+
+# Money
+async-stripe = { version = "0.15.0", features = ["runtime-tokio-hyper"] }
 
 # Crypto
 bcrypt = "0.8" # password hashes

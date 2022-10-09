@@ -8,7 +8,6 @@ use actix_web::web::{Path, Query};
 use actix_web::{Responder, web, HttpResponse, error, HttpRequest, HttpMessage};
 use chrono::{DateTime, Utc};
 use crate::AnyhowResult;
-use crate::http_server::web_utils::ip_address::get_request_ip;
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::server_state::ServerState;
 use database_queries::queries::tts::tts_results::list_tts_results_query_builder::{ListTtsResultsQueryBuilder, TtsInferenceRecordForList};

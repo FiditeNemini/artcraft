@@ -92,4 +92,10 @@ impl Tokens {
   pub fn new_twitch_event_rule() -> AnyhowResult<String> {
     random_prefix_crockford_token("TER:", 32, false)
   }
+
+  // ========== [Billing] Tokens not typically visible to users ==========
+
+  pub fn new_subscription_token() -> AnyhowResult<String> {
+    random_prefix_crockford_token("SUB:", 32, false)
+  }
 }

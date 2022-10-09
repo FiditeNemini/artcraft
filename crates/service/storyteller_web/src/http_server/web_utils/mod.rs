@@ -1,5 +1,4 @@
 pub mod get_host_header;
-pub mod ip_address;
 pub mod read_multipart_field_bytes;
 pub mod redis_rate_limiter;
 pub mod response_error_helpers;

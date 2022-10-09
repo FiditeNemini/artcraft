@@ -3,6 +3,7 @@ use actix_service::ServiceFactory;
 use actix_web::dev::{ServiceRequest, ServiceResponse};
 use actix_web::error::Error;
 use actix_web::{App, web, HttpResponse};
+use billing_component::default_routes::add_suggested_stripe_billing_routes;
 use crate::http_server::endpoints::api_tokens::create_api_token::create_api_token_handler;
 use crate::http_server::endpoints::api_tokens::delete_api_token::delete_api_token_handler;
 use crate::http_server::endpoints::api_tokens::edit_api_token::edit_api_token_handler;
@@ -119,6 +120,7 @@ pub fn add_routes<T, B> (app: App<T, B>) -> App<T, B>
 
   // From components
   app = add_suggested_api_v1_account_creation_and_session_routes(app); // /create_account, /session, /login, /logout
+  app = add_suggested_stripe_billing_routes(app); // /stripe, billing, webhooks, etc.
 
   // ==================== SERVICE ====================
   app.service(

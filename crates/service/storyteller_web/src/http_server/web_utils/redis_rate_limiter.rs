@@ -3,8 +3,8 @@
 
 use actix_http::http::{HeaderName, HeaderMap};
 use actix_web::HttpRequest;
-use crate::http_server::web_utils::ip_address::get_request_ip;
 use futures_old_for_limiter::Future;
+use http_server_common::request::get_request_ip::get_request_ip;
 use limitation::{Limiter, Error};
 use log::info;
 
