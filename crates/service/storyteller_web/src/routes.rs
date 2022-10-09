@@ -45,6 +45,10 @@ use crate::http_server::endpoints::moderation::user_roles::list_staff::list_staf
 use crate::http_server::endpoints::moderation::user_roles::set_user_role::set_user_role_handler;
 use crate::http_server::endpoints::moderation::users::list_users::list_users_handler;
 use crate::http_server::endpoints::service::health_check_handler::get_health_check_handler;
+use crate::http_server::endpoints::stubs::app_model_downloads::get_app_model_downloads_handler;
+use crate::http_server::endpoints::stubs::app_news::get_app_news_handler;
+use crate::http_server::endpoints::stubs::app_plans::get_app_plans_handler;
+use crate::http_server::endpoints::stubs::post_app_analytics::post_app_analytics_handler;
 use crate::http_server::endpoints::tts::delete_tts_model::delete_tts_model_handler;
 use crate::http_server::endpoints::tts::delete_tts_result::delete_tts_inference_result_handler;
 use crate::http_server::endpoints::tts::edit_tts_model::edit_tts_model_handler;
@@ -117,6 +121,7 @@ pub fn add_routes<T, B> (app: App<T, B>) -> App<T, B>
   app = add_twitch_routes(app); /* /twitch */ // TODO: MAYBE TEMPORARY
   app = add_investor_demo_routes(app); /* /demo_mode */ // TODO: DEFINITELY TEMPORARY
   app = add_flag_routes(app); /* /flag */
+  app = add_desktop_app_routes(app); /* /api/v1/vc/... */
 
   // From components
   app = add_suggested_api_v1_account_creation_and_session_routes(app); // /create_account, /session, /login, /logout
@@ -730,6 +735,39 @@ fn add_flag_routes<T, B> (app: App<T, B>) -> App<T, B>
           )
       )
   )
+}
+
+// ==================== DESKTOP APP ROUTES ====================
+
+fn add_desktop_app_routes<T, B> (app: App<T, B>) -> App<T, B>
+    where
+        B: MessageBody,
+        T: ServiceFactory<
+            ServiceRequest,
+            Config = (),
+            Response = ServiceResponse<B>,
+            Error = Error,
+            InitError = (),
+        >,
+{
+    app.service(web::scope("/api/v1/vc")
+        .service(web::resource("/report_analytics")
+            .route(web::post().to(post_app_analytics_handler))
+            .route(web::head().to(|| HttpResponse::Ok()))
+        )
+        .service(web::resource("/news")
+            .route(web::get().to(get_app_news_handler))
+            .route(web::head().to(|| HttpResponse::Ok()))
+        )
+        .service(web::resource("/features")
+            .route(web::get().to(get_app_plans_handler))
+            .route(web::head().to(|| HttpResponse::Ok()))
+        )
+        .service(web::resource("/downloads")
+            .route(web::get().to(get_app_model_downloads_handler))
+            .route(web::head().to(|| HttpResponse::Ok()))
+        )
+    )
 }
 
 // ==================== TWITCH ROUTES ====================
