@@ -2171,6 +2171,16 @@
       ]
     }
   },
+  "2955f8a79205187f4984159e4f926305e019b8607f8f4684523a4571dbb929f5": {
+    "query": "\nINSERT INTO user_subscriptions\nSET\n  token = ?,\n  maybe_user_token = ?,\n  subscription_category = ?,\n  subscription_product_key = ?,\n\n  maybe_stripe_subscription_id = ?,\n  maybe_stripe_customer_id = ?,\n\n  maybe_stripe_product_id = ?,\n  maybe_stripe_price_id = ?,\n\n  maybe_stripe_recurring_interval = ?,\n  maybe_stripe_subscription_status = ?,\n  maybe_stripe_is_production = ?,\n\n  subscription_start_at = ?,\n  current_billing_period_start_at = ?,\n  current_billing_period_end_at = ?,\n  subscription_expires_at = ?,\n  maybe_cancel_at = ?,\n  maybe_canceled_at = ?,\n\n  version = version + 1\n\nON DUPLICATE KEY UPDATE\n  maybe_user_token = COALESCE(NULLIF(?, ''), maybe_user_token),\n\n  maybe_stripe_product_id = ?,\n  maybe_stripe_price_id = ?,\n\n  maybe_stripe_recurring_interval = ?,\n  maybe_stripe_subscription_status = ?,\n\n  current_billing_period_start_at = ?,\n  current_billing_period_end_at = ?,\n  subscription_expires_at = ?,\n  maybe_cancel_at = ?,\n  maybe_canceled_at = ?,\n\n  version = version + 1\n        ",
+    "describe": {
+      "columns": [],
+      "parameters": {
+        "Right": 27
+      },
+      "nullable": []
+    }
+  },
   "2b04dd7db52ef3a97a6f420a22a4dbee7416ae58697438df69e87ffd47bbf350": {
     "query": "\nUPDATE w2l_inference_jobs\nSET\n  status = ?,\n  failure_reason = ?,\n  retry_at = NOW() + interval 2 minute\nWHERE id = ?\n        ",
     "describe": {
@@ -2214,7 +2224,7 @@
               "bits": 129
             },
             "char_set": 63,
-            "max_size": 2
+            "max_size": 1
           }
         }
       ],
@@ -4252,6 +4262,225 @@
       "nullable": []
     }
   },
+  "6fea7dfa85de250af4aa2e93a47705d5f789eac688f1b2a87717f22c2114fbb0": {
+    "query": "\nSELECT\n  stripe_event_id,\n  should_ignore_retry\nFROM stripe_webhook_event_logs\nWHERE\n  stripe_event_id = ?\n        ",
+    "describe": {
+      "columns": [
+        {
+          "ordinal": 0,
+          "name": "stripe_event_id",
+          "type_info": {
+            "type": "VarString",
+            "flags": {
+              "bits": 4229
+            },
+            "char_set": 224,
+            "max_size": 1020
+          }
+        },
+        {
+          "ordinal": 1,
+          "name": "should_ignore_retry",
+          "type_info": {
+            "type": "Tiny",
+            "flags": {
+              "bits": 1
+            },
+            "char_set": 63,
+            "max_size": 1
+          }
+        }
+      ],
+      "parameters": {
+        "Right": 1
+      },
+      "nullable": [
+        false,
+        false
+      ]
+    }
+  },
+  "7181a46615728e9c605ec272f5e8be518efd2c0d7dae22828d186611c2f3d7d8": {
+    "query": "\nSELECT\n  token,\n  maybe_user_token,\n  subscription_category,\n  subscription_product_key,\n  maybe_stripe_subscription_id,\n  maybe_stripe_customer_id,\n  maybe_stripe_product_id,\n  maybe_stripe_subscription_status as `maybe_stripe_subscription_status: reusable_types::stripe::stripe_subscription_status::StripeSubscriptionStatus`,\n  maybe_stripe_is_production,\n  created_at,\n  updated_at,\n  subscription_start_at,\n  subscription_expires_at\nFROM user_subscriptions\nWHERE\n  maybe_stripe_subscription_id = ?\n        ",
+    "describe": {
+      "columns": [
+        {
+          "ordinal": 0,
+          "name": "token",
+          "type_info": {
+            "type": "VarString",
+            "flags": {
+              "bits": 4229
+            },
+            "char_set": 224,
+            "max_size": 128
+          }
+        },
+        {
+          "ordinal": 1,
+          "name": "maybe_user_token",
+          "type_info": {
+            "type": "VarString",
+            "flags": {
+              "bits": 136
+            },
+            "char_set": 224,
+            "max_size": 128
+          }
+        },
+        {
+          "ordinal": 2,
+          "name": "subscription_category",
+          "type_info": {
+            "type": "VarString",
+            "flags": {
+              "bits": 4233
+            },
+            "char_set": 224,
+            "max_size": 128
+          }
+        },
+        {
+          "ordinal": 3,
+          "name": "subscription_product_key",
+          "type_info": {
+            "type": "VarString",
+            "flags": {
+              "bits": 4233
+            },
+            "char_set": 224,
+            "max_size": 128
+          }
+        },
+        {
+          "ordinal": 4,
+          "name": "maybe_stripe_subscription_id",
+          "type_info": {
+            "type": "VarString",
+            "flags": {
+              "bits": 132
+            },
+            "char_set": 224,
+            "max_size": 1020
+          }
+        },
+        {
+          "ordinal": 5,
+          "name": "maybe_stripe_customer_id",
+          "type_info": {
+            "type": "VarString",
+            "flags": {
+              "bits": 136
+            },
+            "char_set": 224,
+            "max_size": 1020
+          }
+        },
+        {
+          "ordinal": 6,
+          "name": "maybe_stripe_product_id",
+          "type_info": {
+            "type": "VarString",
+            "flags": {
+              "bits": 136
+            },
+            "char_set": 224,
+            "max_size": 1020
+          }
+        },
+        {
+          "ordinal": 7,
+          "name": "maybe_stripe_subscription_status: reusable_types::stripe::stripe_subscription_status::StripeSubscriptionStatus",
+          "type_info": {
+            "type": "VarString",
+            "flags": {
+              "bits": 136
+            },
+            "char_set": 224,
+            "max_size": 128
+          }
+        },
+        {
+          "ordinal": 8,
+          "name": "maybe_stripe_is_production",
+          "type_info": {
+            "type": "Tiny",
+            "flags": {
+              "bits": 0
+            },
+            "char_set": 63,
+            "max_size": 1
+          }
+        },
+        {
+          "ordinal": 9,
+          "name": "created_at",
+          "type_info": {
+            "type": "Timestamp",
+            "flags": {
+              "bits": 1153
+            },
+            "char_set": 63,
+            "max_size": 19
+          }
+        },
+        {
+          "ordinal": 10,
+          "name": "updated_at",
+          "type_info": {
+            "type": "Timestamp",
+            "flags": {
+              "bits": 9345
+            },
+            "char_set": 63,
+            "max_size": 19
+          }
+        },
+        {
+          "ordinal": 11,
+          "name": "subscription_start_at",
+          "type_info": {
+            "type": "Timestamp",
+            "flags": {
+              "bits": 1153
+            },
+            "char_set": 63,
+            "max_size": 19
+          }
+        },
+        {
+          "ordinal": 12,
+          "name": "subscription_expires_at",
+          "type_info": {
+            "type": "Timestamp",
+            "flags": {
+              "bits": 1161
+            },
+            "char_set": 63,
+            "max_size": 19
+          }
+        }
+      ],
+      "parameters": {
+        "Right": 1
+      },
+      "nullable": [
+        false,
+        true,
+        false,
+        false,
+        true,
+        true,
+        true,
+        true,
+        true,
+        false,
+        false,
+        false,
+        false
+      ]
+    }
+  },
   "73558104936aab6add2d9c789b368b5f155f1fe01d32e7314f2f120422866f54": {
     "query": "\nUPDATE w2l_template_upload_jobs\nSET\n  status = ?,\n  on_success_result_token = ?,\n  failure_reason = NULL,\n  retry_at = NULL\nWHERE id = ?\n        ",
     "describe": {
@@ -5845,6 +6074,16 @@
         false,
         true
       ]
+    }
+  },
+  "8941bb25b6cca668296d12fc95e1004e43cac23fa1f52c11ecff4cc56a43b956": {
+    "query": "\nINSERT INTO stripe_webhook_event_logs\nSET\n  stripe_event_id = ?,\n  stripe_event_type = ?,\n  maybe_stripe_event_entity_id = ?,\n  maybe_stripe_customer_id = ?,\n  stripe_event_created_at = ?,\n  stripe_is_production = ?,\n  maybe_user_token = ?,\n  action_was_taken = ?,\n  should_ignore_retry = ?\n        ",
+    "describe": {
+      "columns": [],
+      "parameters": {
+        "Right": 9
+      },
+      "nullable": []
     }
   },
   "89b66d91d1f2cd5c9871671b21a90e77d9041572a90cc6be6dd49845424677fa": {
