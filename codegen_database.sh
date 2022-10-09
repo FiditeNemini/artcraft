@@ -11,6 +11,13 @@
 # NB: This format can be used without changing directory:
 # SQLX_OFFLINE=true cargo sqlx prepare -- --bin storyteller-web --manifest-path crates/service/storyteller_web/Cargo.toml
 
+set -euxo pipefail
+
+# NB: OpenSSL is broken on Ubuntu 22.04 (this is documented elsewhere)
+# See https://askubuntu.com/a/1403961
+# For some reason, the choice of "rustls" or the vendored openssl is not persistent between calls.
+#cargo install sqlx-cli --features openssl-vendored,mysql
+
 build_shared_database_library() {
   pushd crates/lib/database_queries
   SQLX_OFFLINE=true cargo sqlx prepare
