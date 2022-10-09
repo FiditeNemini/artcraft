@@ -27,11 +27,20 @@ Diesel is an ORM, which is dumb, so we use sqlx as at-compile-time typesafe SQL.
 
 ```
 sudo apt-get install libmysqlclient-dev
-cargo install sqlx-cli --no-default-features --features mysql [2022-01-16: is this needed?]
+cargo install sqlx-cli --no-default-features --features rustls,mysql [2022-01-16: is this needed?]
 ```
 
-To install a more modern version of Diesel (unreleased) that 
-supports the "migrations_dir" toml config option:
+Diesel now supports configuring the migration directory via an environment variable,
+so we can install the currently published version:
+
+```
+cargo install diesel_cli \
+  --no-default-features \
+  --features mysql
+```
+
+If the modern version fails, try installing a cherry-picked version with a 
+TOML-based migration directory configuration:
 
 ```
 cargo install diesel_cli \
@@ -59,6 +68,21 @@ I haven't found the cause (it doesn't happen on Mac), but the migrations appear 
 If MySql in local dev can't be connected to, reset the accounts:
 
 https://linuxconfig.org/how-to-reset-root-mysql-mariadb-password-on-ubuntu-20-04-focal-fossa-linux
+
+#### MySql on Ubuntu 22.04
+
+Should work largely out of the box. We'll need a dev account:
+
+```
+# Connect to mysql:
+# sudo mysql -u root -p (password is "root")
+
+use mysql;
+CREATE USER 'storyteller'@'localhost' IDENTIFIED BY 'password';
+GRANT ALL PRIVILEGES ON storyteller.* TO 'storyteller'@'localhost';
+```
+
+Then verify with `./dev_mysql_connect.sh`
 
 #### Fixing dev MySql on Ubuntu 20.04
 
