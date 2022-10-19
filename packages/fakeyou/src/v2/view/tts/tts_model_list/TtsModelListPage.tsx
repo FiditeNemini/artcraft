@@ -1,4 +1,4 @@
-import React, { useEffect, useCallback, useState } from "react";
+import React, { useEffect, useCallback, useState, useMemo } from "react";
 import { Link } from "react-router-dom";
 import { SessionTtsInferenceResultListFc } from "../../_common/SessionTtsInferenceResultsListFc";
 import { SessionTtsModelUploadResultListFc } from "../../_common/SessionTtsModelUploadResultsListFc";
@@ -108,6 +108,15 @@ function TtsModelListPage(props: Props) {
     maybeSelectedTtsModel,
     setMaybeSelectedTtsModel,
   } = props;
+
+  const images = [
+    "mascot/halloween_1.webp",
+    "mascot/halloween_2.webp",
+    "mascot/halloween_3.webp",
+    "mascot/kitsune_pose2.webp",
+  ];
+
+  const randomImage = useMemo(() => images[Math.floor(Math.random() * images.length)], []);
 
   const [maybeTtsError, setMaybeTtsError] = useState<
     GenerateTtsAudioErrorType | undefined
@@ -320,15 +329,6 @@ function TtsModelListPage(props: Props) {
       </>
     );
   }
-
-  const images = [
-    "mascot/halloween_1.webp",
-    "mascot/halloween_2.webp",
-    "mascot/halloween_3.webp",
-    "mascot/kitsune_pose2.webp",
-  ];
-
-  const randomImage = images[Math.floor(Math.random() * images.length)];
 
   return (
     <motion.div initial="hidden" animate="visible" variants={container}>
