@@ -325,7 +325,7 @@ function TtsModelListPage(props: Props) {
     "mascot/halloween_1.webp",
     "mascot/halloween_2.webp",
     "mascot/halloween_3.webp",
-    "mascot/main.webp",
+    "mascot/kitsune_pose2.webp",
   ];
 
   const randomImage = images[Math.floor(Math.random() * images.length)];
