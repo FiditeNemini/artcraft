@@ -16,6 +16,7 @@ import {
   faSignOutAlt,
   faComputer,
   faLaptop,
+  faBook,
 } from "@fortawesome/free-solid-svg-icons";
 import { faDiscord, faPatreon } from "@fortawesome/free-brands-svg-icons";
 import { Logout } from "@storyteller/components/src/api/session/Logout";
@@ -409,6 +410,16 @@ function NewTopNavFc(props: Props) {
                       >
                         <FontAwesomeIcon icon={faPatreon} className="me-2" />
                         Patrons
+                      </Link>
+                    </li>
+                    <li data-bs-toggle="offcanvas">
+                      <Link
+                        className="dropdown-item"
+                        to="/guide"
+                        title="to guide"
+                      >
+                        <FontAwesomeIcon icon={faBook} className="me-2" />
+                        Guide
                       </Link>
                     </li>
                     <li data-bs-toggle="offcanvas">
