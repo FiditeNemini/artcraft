@@ -223,7 +223,7 @@ export function MultiDropdownSearch(props: Props) {
                 <FontAwesomeIcon
                   icon={faTimes}
                   title="remove"
-                  color="#f14668"
+                  color="#ffffff"
                 />
               </span>
             </button>
@@ -293,12 +293,17 @@ export function MultiDropdownSearch(props: Props) {
   return (
     <div>
       {/* Category Dropdowns */}
-      <label className="sub-title">{t("tts.TtsModelListPage.form.categoryFiltersLabel")}</label>
+      <label className="sub-title">
+        {t("tts.TtsModelListPage.form.categoryFiltersLabel")}
+      </label>
       {categoryFieldGroups}
 
       {/* Model Dropdown */}
       <label className="sub-title">
-        <Trans i18nKey="tts.TtsModelListPage.form.voicesLabel" count={voiceCount}>
+        <Trans
+          i18nKey="tts.TtsModelListPage.form.voicesLabel"
+          count={voiceCount}
+        >
           Voice ({voiceCount} to choose from)
         </Trans>
       </label>
