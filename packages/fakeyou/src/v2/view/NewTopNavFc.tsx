@@ -46,12 +46,12 @@ interface Props {
 }
 
 function NewTopNavFc(props: Props) {
-  const defaultColourView = window.localStorage.getItem("darkMode");
+  // const defaultColourView = window.localStorage.getItem("darkMode");
   const defaultLowSpecView = window.localStorage.getItem("lowSpec");
 
-  const [darkModes, toggleDarkModes] = useState(
-    defaultColourView === "false" ? true : false
-  );
+  // const [darkModes, toggleDarkModes] = useState(
+  //   defaultColourView === "false" ? true : false
+  // );
 
   const [lowSpecView, toggleLowSpecs] = useState(
     defaultLowSpecView === "false" ? true : false
@@ -92,11 +92,11 @@ function NewTopNavFc(props: Props) {
     return () => clearInterval(interval);
   }, [pendingTtsJobs]);
 
-  const toggleDarkMode = () => {
-    window.localStorage.setItem("darkMode", darkModes ? "true" : "false");
+  // const toggleDarkMode = () => {
+  //   window.localStorage.setItem("darkMode", darkModes ? "true" : "false");
 
-    toggleDarkModes(!darkModes);
-  };
+  //   toggleDarkModes(!darkModes);
+  // };
 
   const toggleLowSpec = () => {
     window.localStorage.setItem("lowSpec", lowSpecView ? "true" : "false");
@@ -128,8 +128,8 @@ function NewTopNavFc(props: Props) {
 
   useEffect(() => {
     // Logic for dark mode toggle
-    if (darkModes) document.getElementById("main")!.classList.add("dark-mode");
-    else document.getElementById("main")!.classList.remove("dark-mode");
+    // if (darkModes) document.getElementById("main")!.classList.add("dark-mode");
+    // else document.getElementById("main")!.classList.remove("dark-mode");
 
     // Logic for the animation toggle
     if (lowSpecView) document.getElementById("main")!.classList.add("low-spec");
@@ -226,9 +226,10 @@ function NewTopNavFc(props: Props) {
               Online Users: <span className="fw-bold text-red">1,204</span>
             </p> */}
 
-            <Tippy
-              content={`${darkModes ? "Toggle Light Mode" : "Toggle Dark Mode"
-                }`}
+            {/* <Tippy
+              content={`${
+                darkModes ? "Toggle Light Mode" : "Toggle Dark Mode"
+              }`}
             >
               <button
                 className={`btn btn-toggle ${darkModes ? "dark" : ""}`}
@@ -236,13 +237,14 @@ function NewTopNavFc(props: Props) {
               >
                 <FontAwesomeIcon icon={darkModes ? faSun : faMoon} />
               </button>
-            </Tippy>
+            </Tippy> */}
             <Tippy
-              content={`${lowSpecView ? "Turn on animations" : "Turn off animations"
-                }`}
+              content={`${
+                lowSpecView ? "Turn on animations" : "Turn off animations"
+              }`}
             >
               <button
-                className={`btn btn-toggle  ${darkModes ? "dark" : ""}`}
+                className="btn btn-toggle"
                 onClick={() => toggleLowSpec()}
               >
                 <FontAwesomeIcon
@@ -370,42 +372,64 @@ function NewTopNavFc(props: Props) {
                     aria-labelledby="offcanvasNavbarLgDropdown-community"
                   >
                     <li data-bs-toggle="offcanvas">
-                      <Link className="dropdown-item" to="/contribute" title="to Upload page">
+                      <Link
+                        className="dropdown-item"
+                        to="/contribute"
+                        title="to Upload page"
+                      >
                         <FontAwesomeIcon icon={faUpload} className="me-2" />
                         Contribute/Upload
                       </Link>
                     </li>
                     <li data-bs-toggle="offcanvas">
-                      <Link className="dropdown-item" to="/leaderboard" title="to leaderboard">
+                      <Link
+                        className="dropdown-item"
+                        to="/leaderboard"
+                        title="to leaderboard"
+                      >
                         <FontAwesomeIcon icon={faTrophy} className="me-2" />
                         Leaderboard
                       </Link>
                     </li>
                     <li data-bs-toggle="offcanvas">
-                      <a className="dropdown-item" 
-                          href={ThirdPartyLinks.FAKEYOU_DISCORD} 
-                          title="discord chat" 
-                          target="_blank" 
-                          rel="noopener noreferrer">
+                      <a
+                        className="dropdown-item"
+                        href={ThirdPartyLinks.FAKEYOU_DISCORD}
+                        title="discord chat"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
                         <FontAwesomeIcon icon={faDiscord} className="me-2" />
                         Discord Chat
                       </a>
                     </li>
                     <li data-bs-toggle="offcanvas">
-                      <Link className="dropdown-item" to="/patrons" title="to patron list">
+                      <Link
+                        className="dropdown-item"
+                        to="/patrons"
+                        title="to patron list"
+                      >
                         <FontAwesomeIcon icon={faPatreon} className="me-2" />
                         Patrons
                       </Link>
                     </li>
                     <li data-bs-toggle="offcanvas">
-                      <Link className="dropdown-item" to="/firehose" title="to feed">
+                      <Link
+                        className="dropdown-item"
+                        to="/firehose"
+                        title="to feed"
+                      >
                         <FontAwesomeIcon icon={faList} className="me-2" />
                         Feed
                       </Link>
                     </li>
-                    <hr className='dropdown-divider' />
+                    <hr className="dropdown-divider" />
                     <li data-bs-toggle="offcanvas">
-                      <Link className="dropdown-item" to={myDataLink} title="my profile">
+                      <Link
+                        className="dropdown-item"
+                        to={myDataLink}
+                        title="my profile"
+                      >
                         <FontAwesomeIcon icon={faUser} className="me-2" />
                         My Data
                       </Link>
@@ -414,13 +438,23 @@ function NewTopNavFc(props: Props) {
                 </li>
 
                 <li data-bs-toggle="offcanvas" className="nav-item d-lg-none">
-                  <Link className="nav-link" aria-current="page" to="/about" title="About Us">
+                  <Link
+                    className="nav-link"
+                    aria-current="page"
+                    to="/about"
+                    title="About Us"
+                  >
                     About
                   </Link>
                 </li>
 
                 <li data-bs-toggle="offcanvas" className="nav-item d-lg-none">
-                  <Link className="nav-link" aria-current="page" title="Terms of Use" to="/terms">
+                  <Link
+                    className="nav-link"
+                    aria-current="page"
+                    title="Terms of Use"
+                    to="/terms"
+                  >
                     Terms of Use
                   </Link>
                 </li>
@@ -461,9 +495,10 @@ function NewTopNavFc(props: Props) {
                 <li className="ps-3 d-lg-none">
                   <div className="d-flex gap-4 py-2">
                     <div className="top-bar-text mobile">Options:</div>
-                    <Tippy
-                      content={`${darkModes ? "Toggle Light Mode" : "Toggle Dark Mode"
-                        }`}
+                    {/* <Tippy
+                      content={`${
+                        darkModes ? "Toggle Light Mode" : "Toggle Dark Mode"
+                      }`}
                     >
                       <button
                         className={`btn btn-toggle ${darkModes ? "dark" : ""}`}
@@ -471,15 +506,16 @@ function NewTopNavFc(props: Props) {
                       >
                         <FontAwesomeIcon icon={darkModes ? faSun : faMoon} />
                       </button>
-                    </Tippy>
+                    </Tippy> */}
                     <Tippy
-                      content={`${lowSpecView
-                        ? "Turn on animations"
-                        : "Turn off animations"
-                        }`}
+                      content={`${
+                        lowSpecView
+                          ? "Turn on animations"
+                          : "Turn off animations"
+                      }`}
                     >
                       <button
-                        className={`btn btn-toggle  ${darkModes ? "dark" : ""}`}
+                        className="btn btn-toggle"
                         onClick={() => toggleLowSpec()}
                       >
                         <FontAwesomeIcon
