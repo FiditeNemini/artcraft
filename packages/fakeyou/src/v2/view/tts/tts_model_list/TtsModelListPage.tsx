@@ -321,6 +321,15 @@ function TtsModelListPage(props: Props) {
     );
   }
 
+  const images = [
+    "mascot/halloween_1.webp",
+    "mascot/halloween_2.webp",
+    "mascot/halloween_3.webp",
+    "mascot/main.webp",
+  ];
+
+  const randomImage = images[Math.floor(Math.random() * images.length)];
+
   return (
     <motion.div initial="hidden" animate="visible" variants={container}>
       {bootstrapLanguageNotice}
@@ -338,8 +347,8 @@ function TtsModelListPage(props: Props) {
           <div className="col-lg-6">
             <div className="d-flex justify-content-center">
               <motion.img
-                src="mascot/Halloween-Hanashi.webp"
-                className="img-fluid py-4"
+                src={randomImage}
+                className="img-fluid"
                 width="516"
                 height="508"
                 alt="FakeYou Mascot"
