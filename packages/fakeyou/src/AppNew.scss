@@ -248,7 +248,7 @@ $headings-font-family: "Merriweather", serif;
   .top-bar {
     display: flex;
     align-items: center;
-    background-color: rgba($white, 0.04);
+    background-color: $panel;
     margin-bottom: 5px;
     padding: 10px 0;
     backdrop-filter: blur(5px);
