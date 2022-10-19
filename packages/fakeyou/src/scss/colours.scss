@@ -1,10 +1,15 @@
 // Default colours
 $primary: #fc6b68;
-$secondary: #212529;
-$input-dark: darken(#55434e, 7%);
+$secondary: #3c3c49;
+$bg: #1c1c25;
+$panel: #272731;
+$input: #3c3c49;
+$input-placeholder: #aeaeb3;
+$danger: #8f4951;
+
+$input-dark: #3c3c49;
 $info: #252d43;
 $success: #40ad48;
-$danger: #e51c23;
 $warning: darken(#f7941c, 5%);
 $accent: #80cfd3;
 $workflow: $primary;

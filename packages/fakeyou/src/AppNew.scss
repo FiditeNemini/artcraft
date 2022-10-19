@@ -31,16 +31,7 @@ $headings-font-family: "Merriweather", serif;
   }
 
   .bg-gradient {
-    background: rgb(13, 16, 25) !important;
-
-    background: linear-gradient(
-      325deg,
-      rgba(13, 16, 25, 1) 0%,
-      rgba(42, 21, 34, 1) 55%,
-      rgba(16, 14, 26, 1) 100%
-    ) !important;
-    background-repeat: no-repeat;
-    background-attachment: fixed;
+    background: $bg !important;
   }
 
   // Style for user text input that overflows
@@ -139,148 +130,6 @@ $headings-font-family: "Merriweather", serif;
         width: 1px;
       }
     }
-
-    &.dark-mode {
-      &.bg-gradient {
-        background: darken(rgb(13, 16, 25), 2%) !important;
-
-        background: linear-gradient(
-          325deg,
-          darken(rgba(13, 16, 25, 1), 2%) 0%,
-          darken(rgba(42, 21, 34, 1), 3%) 55%,
-          darken(rgba(16, 14, 26, 1), 2%) 100%
-        ) !important;
-        background-repeat: no-repeat;
-        background-attachment: fixed;
-      }
-
-      .nav-bg-dark {
-        background-color: darken(#17101c, 2%);
-      }
-
-      .top-bar {
-        background-color: rgba($white, 0.05);
-      }
-
-      .panel {
-        background-color: rgba($white, 0.05);
-      }
-
-      select {
-        border-color: $input-dark !important;
-        background-color: $input-dark !important;
-        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='white' class='bi bi-chevron-down' viewBox='0 0 16 16'%3E%3Cpath fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3E%3C/svg%3E");
-      }
-
-      .btn-destructive {
-        background-color: #ffcfce !important;
-      }
-
-      .video-card-title,
-      .video-card-text {
-        color: $white !important;
-      }
-
-      textarea {
-        background-color: $input-dark !important;
-        border-color: $input-dark !important;
-        color: $white;
-      }
-
-      .form-select {
-        color: $white;
-      }
-
-      ::placeholder {
-        color: $white !important;
-      }
-
-      .input-icon .form-control-feedback {
-        color: $white !important;
-      }
-
-      input {
-        background-color: $input-dark !important;
-        border-color: $input-dark !important;
-        color: $white;
-      }
-
-      .btn-secondary {
-        color: $white !important;
-        border-color: #974e4c;
-        background-color: #974e4c;
-
-        &:hover {
-          border-color: lighten(#974e4c, 6%);
-          background-color: lighten(#974e4c, 6%);
-        }
-      }
-
-      .btn-destructive {
-        background-color: #6d353b !important;
-        border-color: #6d353b;
-        color: $white;
-
-        &:hover {
-          border-color: lighten(#6d353b, 6%);
-          background-color: lighten(#6d353b, 6%) !important;
-        }
-      }
-
-      .btn-inform svg {
-        filter: invert(98%) sepia(2%) saturate(0%) hue-rotate(196deg)
-          brightness(200%) contrast(103%);
-      }
-
-      .dropdown-menu {
-        background-color: #281b25;
-      }
-
-      .dropdown-item {
-        color: $white;
-
-        &:hover {
-          background-color: lighten(#271e25, 8%);
-        }
-        &:focus {
-          background-color: lighten(#271e25, 8%);
-        }
-        &:active {
-          background-color: $primary;
-        }
-      }
-
-      .menu-item {
-        color: $white;
-        background-color: $input-dark;
-        border-bottom: 1px solid;
-        border-color: rgba($white, 0.05);
-
-        &:hover {
-          background-color: lighten($input-dark, 10%);
-        }
-
-        &:last-child {
-          border-bottom: none;
-        }
-      }
-
-      .form-control::placeholder {
-        /* Chrome, Firefox, Opera, Safari 10.1+ */
-        color: rgba($white, 0.5) !important;
-        opacity: 1; /* Firefox */
-      }
-
-      .form-control:-ms-input-placeholder {
-        /* Internet Explorer 10-11 */
-        color: rgba($white, 0.5) !important;
-      }
-
-      .form-control::-ms-input-placeholder {
-        /* Microsoft Edge */
-        color: rgba($white, 0.5) !important;
-      }
-    }
   }
 
   $footer-height: 2rem;
@@ -345,23 +194,25 @@ $headings-font-family: "Merriweather", serif;
       font-size: 15px;
       font-weight: 600;
       padding: 0.5rem 1rem;
-      color: $secondary;
+      color: $white;
 
       &:hover {
-        color: $secondary;
+        color: $white;
+        background-color: $secondary;
       }
 
       &:focus {
-        background-color: $white;
+        background-color: $secondary;
       }
 
       &:active {
-        background-color: $primary;
+        background-color: lighten($secondary, 10%);
         color: $white;
       }
     }
 
     .dropdown-menu {
+      background-color: $panel;
       border-color: rgba($white, 0.12) !important;
       border: 1px solid;
       border-radius: 8px;
@@ -397,7 +248,7 @@ $headings-font-family: "Merriweather", serif;
   .top-bar {
     display: flex;
     align-items: center;
-    background-color: rgba($white, 0.04);
+    background-color: $panel;
     margin-bottom: 5px;
     padding: 10px 0;
     backdrop-filter: blur(5px);
