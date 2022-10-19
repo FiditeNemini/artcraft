@@ -14,8 +14,6 @@ import {
   faUpload,
   faUser,
   faSignOutAlt,
-  faMoon,
-  faSun,
   faComputer,
   faLaptop,
 } from "@fortawesome/free-solid-svg-icons";
