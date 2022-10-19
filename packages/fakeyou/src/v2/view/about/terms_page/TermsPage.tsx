@@ -1,6 +1,6 @@
 import React from "react";
 import { motion } from "framer-motion";
-import { container, item, panel } from "../../../../data/animation";
+import { container, item, panel, image } from "../../../../data/animation";
 import { ThirdPartyLinks } from "@storyteller/components/src/constants/ThirdPartyLinks";
 
 interface Props {}
@@ -8,15 +8,36 @@ interface Props {}
 function TermsPage(props: Props) {
   return (
     <motion.div initial="hidden" animate="visible" variants={container}>
-      <div className="container pt-5 pb-0 pb-lg-5 text-center text-lg-start">
-        <div className="d-flex flex-column">
-          <div>
-            <motion.h1 className="display-5 fw-bold" variants={item}>
-              Terms and Conditions
-            </motion.h1>
-            <motion.h4 className="mb-4 text-light" variants={item}>
-              Please use this technology responsibly.
-            </motion.h4>
+      <div className="container">
+        <div className="row gx-3 flex-lg-row-reverse align-items-center">
+          <div className="col-lg-6">
+            <div className="d-flex justify-content-center">
+              <motion.img
+                src="/mascot/tou.webp"
+                className="img-fluid"
+                width="516"
+                height="444"
+                alt="FakeYou Kitsune Mascot!"
+                variants={image}
+              />
+            </div>
+          </div>
+          <div className="col-lg-6 px-md-2 ps-lg-5 ps-xl-2">
+            <div className="text-center text-lg-start">
+              <div>
+                <motion.h1
+                  className="display-5 fw-bold lh-1 mb-3"
+                  variants={item}
+                >
+                  Terms and Conditions
+                </motion.h1>
+              </div>
+              <div>
+                <motion.p className="lead" variants={item}>
+                  <h4>Please use this technology responsibly.</h4>
+                </motion.p>
+              </div>
+            </div>
           </div>
         </div>
       </div>
