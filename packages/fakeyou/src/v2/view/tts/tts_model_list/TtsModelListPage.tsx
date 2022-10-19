@@ -109,14 +109,16 @@ function TtsModelListPage(props: Props) {
     setMaybeSelectedTtsModel,
   } = props;
 
-  const images = [
-    "mascot/halloween_1.webp",
-    "mascot/halloween_2.webp",
-    "mascot/halloween_3.webp",
-    "mascot/kitsune_pose2.webp",
-  ];
+  const randomImage = useMemo(() => {
+    const images = [
+      "mascot/halloween_1.webp",
+      "mascot/halloween_2.webp",
+      "mascot/halloween_3.webp",
+      "mascot/kitsune_pose2.webp",
+    ];
 
-  const randomImage = useMemo(() => images[Math.floor(Math.random() * images.length)], []);
+    return images[Math.floor(Math.random() * images.length)];
+  }, []);
 
   const [maybeTtsError, setMaybeTtsError] = useState<
     GenerateTtsAudioErrorType | undefined
