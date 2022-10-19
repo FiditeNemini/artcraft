@@ -220,7 +220,7 @@ $headings-font-family: "Merriweather", serif;
     }
 
     .nav-bg-dark {
-      background-color: #17101c;
+      background-color: $bg;
     }
 
     .offcanvas {
@@ -448,7 +448,7 @@ $headings-font-family: "Merriweather", serif;
   .fakeyou-refresh {
     nav {
       .nav-bg-dark {
-        background-color: #17101c00 !important;
+        background-color: $bg !important;
       }
 
       // hover nav dropdown on desktop
