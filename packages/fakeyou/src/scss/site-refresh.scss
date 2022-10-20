@@ -259,11 +259,11 @@ styles with important tags:
     padding-left: 2.375rem;
     padding-right: 2.375rem;
     cursor: pointer;
-    background-color: $panel;
+    background-color: $secondary;
     transition: 0.1s;
 
     &:hover {
-      background-color: $secondary;
+      background-color: darken($secondary, 6%);
     }
   }
 
