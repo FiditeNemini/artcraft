@@ -243,7 +243,7 @@ styles with important tags:
 
   .menu {
     border-radius: 8px !important;
-    color: #000;
+    color: $white;
     font-weight: 400;
     position: absolute;
     border-color: rgba($white, 0.12) !important;
@@ -259,13 +259,11 @@ styles with important tags:
     padding-left: 2.375rem;
     padding-right: 2.375rem;
     cursor: pointer;
-    background-color: $white;
-    border-bottom: 1px solid;
-    border-color: rgba(#000, 0.06);
+    background-color: $panel;
     transition: 0.1s;
 
     &:hover {
-      background-color: darken($white, 10%);
+      background-color: $secondary;
     }
   }
 
