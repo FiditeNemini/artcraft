@@ -1,5 +1,5 @@
-use std::sync::{Arc, LockResult, RwLock};
-use log::error;
+use std::sync::{Arc, RwLock};
+use anyhow::anyhow;
 use container_common::anyhow_result::AnyhowResult;
 
 /// Job stats uses interior mutability to be easy to copy around.
@@ -34,7 +34,9 @@ impl JobStats {
    }
    
    pub fn increment_failure_count(&self) -> AnyhowResult<SuccessAndFailureStats> {
-      let mut lock = self.inner.write()?;
+      // NB: lock errors can't be moved between threads, so we change their type
+      let mut lock = self.inner.write()
+          .map_err(|e| anyhow!("lock error: {:?}", e))?;
 
       lock.total_failure_count = lock.total_failure_count.saturating_add(1);
       lock.consecutive_success_count = 0;
@@ -49,7 +51,9 @@ impl JobStats {
    }
 
    pub fn increment_success_count(&self) -> AnyhowResult<SuccessAndFailureStats> {
-      let mut lock = self.inner.write()?;
+      // NB: lock errors can't be moved between threads, so we change their type
+      let mut lock = self.inner.write()
+          .map_err(|e| anyhow!("lock error: {:?}", e))?;
 
       lock.total_success_count = lock.total_success_count.saturating_add(1);
       lock.consecutive_success_count = lock.consecutive_success_count.saturating_add(1);
