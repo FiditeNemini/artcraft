@@ -36,6 +36,7 @@ use crate::http_clients::tts_sidecar_health_check_client::TtsSidecarHealthCheckC
 use crate::job_steps::health_check_trap::maybe_block_on_sidecar_health_check;
 use crate::job_steps::job_args::JobWorkerDetails;
 use crate::job_steps::job_args::{JobArgs, JobCaches, JobHttpClients};
+use crate::job_steps::job_stats::JobStats;
 use crate::job_steps::process_single_job::process_single_job;
 use crate::job_steps::process_single_job_error::ProcessSingleJobError;
 use crate::script_execution::tacotron_inference_command::TacotronInferenceCommand;
@@ -306,6 +307,7 @@ async fn main() -> AnyhowResult<()> {
       tts_inference_sidecar_client,
       tts_sidecar_health_check_client,
     },
+    job_stats: JobStats::new(),
     newrelic_client,
     newrelic_disabled,
     worker_details: JobWorkerDetails {
@@ -344,10 +346,10 @@ async fn main() -> AnyhowResult<()> {
 const START_TIMEOUT_MILLIS : u64 = 500;
 const INCREASE_TIMEOUT_MILLIS : u64 = 1000;
 
-async fn main_loop(inferencer: JobArgs) {
+async fn main_loop(job_args: JobArgs) {
   let mut error_timeout_millis = START_TIMEOUT_MILLIS;
 
-  let mut noop_logger = NoOpLogger::new(inferencer.no_op_logger_millis as i64);
+  let mut noop_logger = NoOpLogger::new(job_args.no_op_logger_millis as i64);
 
   let mut span_batch = Vec::new();
 
@@ -357,30 +359,30 @@ async fn main_loop(inferencer: JobArgs) {
   let mut needs_health_check_at_start = true; // Run health check at startup.
 
   loop {
-    let num_records = inferencer.job_batch_size;
+    let num_records = job_args.job_batch_size;
 
     // Don't completely starve low-priority jobs
-    if sort_by_priority_count >= inferencer.low_priority_starvation_prevention_every_nth {
+    if sort_by_priority_count >= job_args.low_priority_starvation_prevention_every_nth {
       sort_by_priority_count = 0;
       sort_by_priority = false;
     }
 
     let maybe_available_jobs =
-        if let Some(minimum_priority) = inferencer.maybe_minimum_priority {
+        if let Some(minimum_priority) = job_args.maybe_minimum_priority {
           // Special high-priority workers
           list_available_tts_inference_jobs_with_minimum_priority(
-            &inferencer.mysql_pool,
+            &job_args.mysql_pool,
             minimum_priority,
             num_records,
-            inferencer.worker_details.is_debug_worker
+            job_args.worker_details.is_debug_worker
           ).await
         } else {
           // Normal path
           list_available_tts_inference_jobs(
-            &inferencer.mysql_pool,
+            &job_args.mysql_pool,
             sort_by_priority,
             num_records,
-            inferencer.worker_details.is_debug_worker
+            job_args.worker_details.is_debug_worker
           ).await
         };
 
@@ -400,14 +402,14 @@ async fn main_loop(inferencer: JobArgs) {
     if jobs.is_empty() {
       noop_logger.log_message_after_awhile("No TTS jobs picked up from database!");
 
-      std::thread::sleep(Duration::from_millis(inferencer.job_batch_wait_millis));
+      std::thread::sleep(Duration::from_millis(job_args.job_batch_wait_millis));
       continue;
     }
 
     info!("Queried {} jobs from database", jobs.len());
 
     let batch_result = process_jobs(
-      &inferencer,
+      &job_args,
       jobs,
       needs_health_check_at_start,
     ).await;
@@ -426,18 +428,18 @@ async fn main_loop(inferencer: JobArgs) {
       }
     };
 
-    if !inferencer.newrelic_disabled {
+    if !job_args.newrelic_disabled {
       span_batch.append(&mut spans);
 
       if span_batch.len() > 50 {
         let spans_to_send = span_batch.split_off(0).into();
-        inferencer.newrelic_client.send_spans(spans_to_send).await;
+        job_args.newrelic_client.send_spans(spans_to_send).await;
       }
     }
 
     error_timeout_millis = START_TIMEOUT_MILLIS; // reset
 
-    std::thread::sleep(Duration::from_millis(inferencer.job_batch_wait_millis));
+    std::thread::sleep(Duration::from_millis(job_args.job_batch_wait_millis));
   }
 }
 
@@ -557,6 +559,8 @@ async fn process_jobs(
       Err(e) => {
         warn!("Failure to process job: {:?}", e);
 
+        record_failure_and_maybe_slow_down(&inferencer.job_stats);
+
         maybe_sidecar_health_issue = true;
 
         let failure_reason = "";
@@ -576,11 +580,37 @@ async fn process_jobs(
             delete_tts_synthesizers_from_cache(&inferencer.semi_persistent_cache)?;
           }
         }
+
       }
     }
   }
 
   Ok(batch_spans)
+}
+
+fn record_failure_and_maybe_slow_down(job_stats: &JobStats) {
+  let stats = match job_stats.increment_failure_count() {
+    Ok(stats) => stats,
+    Err(e) => {
+      warn!("Error recording stats and reacting to repeated failures: {:?}", e);
+      return; // Can't really do anything.
+    }
+  };
+
+  let seconds_timeout = match stats.consecutive_failure_count {
+    t if t > 100 => 180,
+    t if t > 50 => 60,
+    t if t > 20 => 30,
+    t if t > 10 => 10,
+    t if t > 5 => 5,
+    _ => return, // No timeout
+  };
+
+  info!("Slowing down {} seconds due to significant repeated failures: {:?}",
+    seconds_timeout,
+    stats);
+
+  std::thread::sleep(Duration::from_secs(seconds_timeout));
 }
 
 /// Hack to delete locally cached TTS synthesizers to free up space from a full filesystem.

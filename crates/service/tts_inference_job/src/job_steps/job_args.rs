@@ -2,6 +2,7 @@ use crate::caching::cache_miss_strategizer_multi::SyncMultiCacheMissStrategizer;
 use crate::caching::virtual_lfu_cache::SyncVirtualLfuCache;
 use crate::http_clients::tts_inference_sidecar_client::TtsInferenceSidecarClient;
 use crate::http_clients::tts_sidecar_health_check_client::TtsSidecarHealthCheckClient;
+use crate::job_steps::job_stats::JobStats;
 use crate::script_execution::tacotron_inference_command::TacotronInferenceCommand;
 use crate::util::scoped_temp_dir_creator::ScopedTempDirCreator;
 use database_queries::mediators::firehose_publisher::FirehosePublisher;
@@ -32,6 +33,8 @@ pub struct JobArgs {
   pub semi_persistent_cache: SemiPersistentCacheDir,
 
   pub http_clients: JobHttpClients,
+
+  pub job_stats: JobStats,
 
   pub tts_inference_command: TacotronInferenceCommand,
 
