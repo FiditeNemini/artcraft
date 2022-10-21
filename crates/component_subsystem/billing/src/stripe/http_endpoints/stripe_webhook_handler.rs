@@ -70,7 +70,6 @@ pub async fn stripe_webhook_handler(
         StripeWebhookError::BadRequest
       })?;
 
-
   // Events can be re-sent, so we need to make handling them idempotent.
   let stripe_event_id = webhook_payload.id.to_string();
 
