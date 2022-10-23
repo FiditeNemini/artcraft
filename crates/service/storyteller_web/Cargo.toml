@@ -143,3 +143,6 @@ pulldown-cmark = "0.8.0"
 [build-dependencies]
 # NB: Only using diesel for migrations support
 diesel = { version = "1.4.6", features = ["mysql"] }
+
+[dev-dependencies]
+speculoos = "0.9.0" # Fluent assertions
