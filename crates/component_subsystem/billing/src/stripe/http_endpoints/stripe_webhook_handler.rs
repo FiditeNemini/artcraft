@@ -6,6 +6,7 @@ use actix_web::{web, HttpResponse, HttpRequest};
 use chrono::{DateTime, NaiveDateTime, Utc};
 use crate::stripe::helpers::verify_stripe_webhook_ip_address::verify_stripe_webhook_ip_address;
 use crate::stripe::stripe_config::StripeConfig;
+use crate::stripe::traits::internal_subscription_product_lookup::InternalSubscriptionProductLookup;
 use crate::stripe::webhook_event_handlers::charge::charge_succeeded_handler::charge_succeeded_handler;
 use crate::stripe::webhook_event_handlers::checkout_session::checkout_session_completed_handler::checkout_session_completed_handler;
 use crate::stripe::webhook_event_handlers::customer::customer_created_handler::customer_created_handler;
@@ -21,6 +22,7 @@ use crate::stripe::webhook_event_handlers::invoice::invoice_updated_handler::inv
 use crate::stripe::webhook_event_handlers::payment_intent::payment_intent_succeeded_handler::payment_intent_succeeded_handler;
 use crate::stripe::webhook_event_handlers::stripe_webhook_error::StripeWebhookError;
 use crate::stripe::webhook_event_handlers::stripe_webhook_summary::StripeWebhookSummary;
+use database_queries::queries::billing::stripe::get_stripe_webhook_event_log_by_id::get_stripe_webhook_event_log_by_id;
 use database_queries::queries::billing::stripe::insert_stripe_webhook_event_log::InsertStripeWebhookEventLog;
 use http_server_common::request::get_request_header_optional::get_request_header_optional;
 use http_server_common::response::serialize_as_json_error::serialize_as_json_error;
@@ -30,7 +32,6 @@ use sqlx::MySqlPool;
 use std::collections::HashMap;
 use std::fmt;
 use stripe::{EventObject, EventType, PaymentIntentStatus, Webhook};
-use database_queries::queries::billing::stripe::get_stripe_webhook_event_log_by_id::get_stripe_webhook_event_log_by_id;
 
 #[derive(Serialize)]
 pub struct StripeWebhookSuccessResponse {
@@ -42,6 +43,7 @@ pub async fn stripe_webhook_handler(
   request_body_bytes: Bytes,
   mysql_pool: web::Data<MySqlPool>,
   stripe_config: web::Data<StripeConfig>,
+  internal_subscription_product_lookup: web::Data<dyn InternalSubscriptionProductLookup>,
 ) -> Result<HttpResponse, StripeWebhookError>
 {
   verify_stripe_webhook_ip_address(&http_request)
@@ -158,17 +160,26 @@ pub async fn stripe_webhook_handler(
 
     EventType::CustomerSubscriptionCreated => {
       if let EventObject::Subscription(subscription) = webhook_payload.data.object {
-        webhook_summary = customer_subscription_created_handler(&subscription, &mysql_pool).await?;
+        webhook_summary = customer_subscription_created_handler(
+          &subscription,
+          internal_subscription_product_lookup.get_ref(),
+          &mysql_pool).await?;
       }
     }
     EventType::CustomerSubscriptionUpdated => {
       if let EventObject::Subscription(subscription) = webhook_payload.data.object {
-        webhook_summary = customer_subscription_updated_handler(&subscription, &mysql_pool).await?;
+        webhook_summary = customer_subscription_updated_handler(
+          &subscription,
+          internal_subscription_product_lookup.get_ref(),
+          &mysql_pool).await?;
       }
     }
     EventType::CustomerSubscriptionDeleted => {
       if let EventObject::Subscription(subscription) = webhook_payload.data.object {
-        webhook_summary = customer_subscription_deleted_handler(&subscription, &mysql_pool).await?;
+        webhook_summary = customer_subscription_deleted_handler(
+          &subscription,
+          internal_subscription_product_lookup.get_ref(),
+          &mysql_pool).await?;
       }
     }
 

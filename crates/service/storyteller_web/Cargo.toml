@@ -140,6 +140,12 @@ toml = "0.5.8"
 # Text processing
 pulldown-cmark = "0.8.0"
 
+# Async traits
+# NB: note: `async` trait functions are not currently supported
+# The initial round of stabilizations for the async/await language feature in Rust 1.39 did not
+# include support for async fn in traits.
+async-trait = "0.1.58"
+
 [build-dependencies]
 # NB: Only using diesel for migrations support
 diesel = { version = "1.4.6", features = ["mysql"] }

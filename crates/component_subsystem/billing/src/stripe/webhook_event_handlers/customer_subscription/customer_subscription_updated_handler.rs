@@ -1,4 +1,6 @@
+use crate::stripe::traits::internal_subscription_product_lookup::InternalSubscriptionProductLookup;
 use crate::stripe::webhook_event_handlers::customer_subscription::calculate_subscription_end_date::calculate_subscription_end_date;
+use crate::stripe::webhook_event_handlers::customer_subscription::common::{UNKNOWN_SUBSCRIPTION_CATEGORY, UNKNOWN_SUBSCRIPTION_PRODUCT_KEY};
 use crate::stripe::webhook_event_handlers::customer_subscription::subscription_event_extractor::subscription_summary_extractor;
 use crate::stripe::webhook_event_handlers::stripe_webhook_error::StripeWebhookError;
 use crate::stripe::webhook_event_handlers::stripe_webhook_summary::StripeWebhookSummary;
@@ -12,6 +14,7 @@ use stripe::Subscription;
 /// Handle event type: 'customer.subscription.updated'
 pub async fn customer_subscription_updated_handler(
   subscription: &Subscription,
+  internal_subscription_product_lookup: &dyn InternalSubscriptionProductLookup,
   mysql_pool: &MySqlPool,
 ) -> Result<StripeWebhookSummary, StripeWebhookError> {
 
@@ -25,6 +28,21 @@ pub async fn customer_subscription_updated_handler(
 
   let mut action_was_taken = false;
   let mut should_ignore_retry = false;
+
+  let maybe_internal_subscription_product =
+      internal_subscription_product_lookup.lookup_internal_product_from_stripe_product_id(&summary.stripe_product_id)
+          .map_err(|err| {
+            error!("Error mapping to internal product: {:?}", err);
+            StripeWebhookError::ServerError // NB: This was probably *our* fault.
+          })?;
+
+  let mut subscription_category = UNKNOWN_SUBSCRIPTION_CATEGORY;
+  let mut subscription_product_key = UNKNOWN_SUBSCRIPTION_PRODUCT_KEY;
+
+  if let Some(ref internal_product) = maybe_internal_subscription_product {
+    subscription_category = &internal_product.subscription_category;
+    subscription_product_key = &internal_product.subscription_product_key;
+  }
 
   // NB: It's possible to receive events out of order.
   let maybe_existing_subscription = get_subscription_by_stripe_id(&summary.stripe_subscription_id, &mysql_pool)
@@ -49,8 +67,8 @@ pub async fn customer_subscription_updated_handler(
     let upsert = UpsertSubscriptionByStripeId {
       stripe_subscription_id: &summary.stripe_subscription_id,
       maybe_user_token: summary.user_token.as_deref(),
-      subscription_category: "todo",
-      subscription_product_key: "todo",
+      subscription_category,
+      subscription_product_key,
       maybe_stripe_customer_id: Some(&summary.stripe_customer_id),
       maybe_stripe_product_id: Some(&summary.stripe_product_id),
       maybe_stripe_price_id: Some(&summary.stripe_price_id),

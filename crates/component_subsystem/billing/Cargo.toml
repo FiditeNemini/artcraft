@@ -43,6 +43,12 @@ toml = "0.5.8"
 # Money
 async-stripe = { version = "0.15.0", features = ["runtime-tokio-hyper"] }
 
+# Async traits
+# NB: note: `async` trait functions are not currently supported
+# The initial round of stabilizations for the async/await language feature in Rust 1.39 did not
+# include support for async fn in traits.
+async-trait = "0.1.58"
+
 # MySql Database
 # "offline" supports typesafe builds without a live database
 # "rustls" doesn't appear to work with IP addresses, per:
