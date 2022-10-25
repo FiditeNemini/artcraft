@@ -12,6 +12,7 @@ use sqlx::MySqlPool;
 use std::collections::HashMap;
 use std::fmt;
 use stripe::{CheckoutSession, CheckoutSessionMode, CreateCheckoutSession, CreateCheckoutSessionLineItems};
+use crate::stripe::traits::internal_user_lookup::InternalUserLookup;
 
 // =============== Request ===============
 
@@ -24,13 +25,15 @@ pub struct CreateCheckoutSessionRequest {
 
 #[derive(Debug, Serialize)]
 pub enum CreateCheckoutSessionError {
+  NotAuthorizedError,
   ServerError,
 }
 
 impl ResponseError for CreateCheckoutSessionError {
   fn status_code(&self) -> StatusCode {
     match *self {
-      CreateCheckoutSessionError::ServerError=> StatusCode::INTERNAL_SERVER_ERROR,
+      CreateCheckoutSessionError::NotAuthorizedError => StatusCode::UNAUTHORIZED,
+      CreateCheckoutSessionError::ServerError => StatusCode::INTERNAL_SERVER_ERROR,
     }
   }
 
@@ -47,17 +50,37 @@ impl fmt::Display for CreateCheckoutSessionError {
 }
 
 pub async fn stripe_create_checkout_session_redirect_handler(
-  _http_request: HttpRequest,
-  _mysql_pool: web::Data<MySqlPool>,
+  http_request: HttpRequest,
   request: Query<CreateCheckoutSessionRequest>,
   stripe_config: web::Data<StripeConfig>,
+  mysql_pool: web::Data<MySqlPool>,
+  internal_user_lookup: web::Data<dyn InternalUserLookup>,
 ) -> Result<HttpResponse, CreateCheckoutSessionError>
 {
   let price_key = request.price_key.as_deref().unwrap_or("unknown");
 
-  let user_token = Some("U:TEST");
+  let maybe_user_metadata  = internal_user_lookup
+      .lookup_user_from_http_request(&http_request, &mysql_pool)
+      .await
+      .map_err(|err| {
+        error!("Error looking up user: {:?}", err);
+        CreateCheckoutSessionError::ServerError // NB: This was probably *our* fault.
+      })?;
 
-  let url = stripe_create_checkout_session_shared(&stripe_config, price_key, user_token)
+  // NB: Our integration relies on an internal user token being present.
+  let user_metadata = match maybe_user_metadata {
+    None => return Err(CreateCheckoutSessionError::NotAuthorizedError),
+    Some(user_metadata) => user_metadata,
+  };
+
+  if user_metadata.user_token.is_none() {
+    return Err(CreateCheckoutSessionError::NotAuthorizedError);
+  }
+
+  let url = stripe_create_checkout_session_shared(
+    &stripe_config,
+    price_key,
+    Some(&user_metadata))
       .await
       .map_err(|err| {
         error!("Error creating Stripe checkout session: {:?}", err);

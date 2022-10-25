@@ -19,6 +19,7 @@
 pub const RESERVED_USERNAMES : &'static str = include_str!("../../../../db/reserved_usernames.txt");
 pub const RESERVED_SUBSTRINGS : &'static str = include_str!("../../../../db/reserved_usernames_including.txt");
 
+pub mod billing;
 pub mod configs;
 pub mod http_server;
 pub mod routes;
@@ -46,6 +47,7 @@ use config::shared_constants::DEFAULT_MYSQL_CONNECTION_STRING;
 use config::shared_constants::DEFAULT_RUST_LOG;
 use container_common::anyhow_result::AnyhowResult;
 use container_common::files::read_toml_file_to_struct::read_toml_file_to_struct;
+use crate::billing::stripe_internal_subscription_product_lookup_impl::StripeInternalSubscriptionProductLookupImpl;
 use crate::configs::static_api_tokens::{StaticApiTokenConfig, StaticApiTokens, StaticApiTokenSet};
 use crate::http_server::middleware::ip_filter_middleware::IpFilter;
 use crate::http_server::web_utils::redis_rate_limiter::RedisRateLimiter;
@@ -72,9 +74,12 @@ use std::sync::Arc;
 use std::time::Duration;
 use storage_buckets_common::bucket_client::BucketClient;
 use tokio::runtime::Runtime;
+use billing_component::stripe::traits::internal_subscription_product_lookup::InternalSubscriptionProductLookup;
+use billing_component::stripe::traits::internal_user_lookup::InternalUserLookup;
 use twitch_common::twitch_secrets::TwitchSecrets;
 use users_component::utils::session_checker::SessionChecker;
 use users_component::utils::session_cookie_manager::SessionCookieManager;
+use crate::billing::stripe_internal_user_lookup::StripeInternalUserLookupImpl;
 
 // TODO TODO TODO TODO
 // TODO TODO TODO TODO
@@ -399,6 +404,10 @@ pub async fn serve(server_state: ServerState) -> AnyhowResult<()>
     let ip_banlist = server_state_arc.ip_banlist.clone();
     let build_sha = std::fs::read_to_string("/GIT_SHA").unwrap_or(String::from("unknown"));
 
+    // NB: Dynamic dispatch needs to be wrapped with Arc.
+    let product_lookup : Arc<dyn InternalSubscriptionProductLookup> = Arc::new(StripeInternalSubscriptionProductLookupImpl {});
+    let user_lookup : Arc<dyn InternalUserLookup> = Arc::new(StripeInternalUserLookupImpl::new(server_state_arc.session_checker.clone()));
+
     // NB: app_data being clone()'d below should all be safe (dependencies included)
     let app = App::new()
       .app_data(web::Data::new(server_state_arc.firehose_publisher.clone()))
@@ -406,6 +415,8 @@ pub async fn serve(server_state: ServerState) -> AnyhowResult<()>
       .app_data(web::Data::new(server_state_arc.session_checker.clone()))
       .app_data(web::Data::new(server_state_arc.cookie_manager.clone()))
       .app_data(web::Data::new(server_state_arc.stripe_configs.clone()))
+      .app_data(web::Data::from(product_lookup)) // NB: Data::from(Arc<T>) for dynamic dispatch
+      .app_data(web::Data::from(user_lookup)) // NB: Data::from(Arc<T>) for dynamic dispatch
       .app_data(server_state_arc.clone())
       .wrap(build_common_cors_config())
       .wrap(DefaultHeaders::new()

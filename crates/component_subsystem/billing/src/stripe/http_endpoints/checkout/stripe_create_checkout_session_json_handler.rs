@@ -13,6 +13,7 @@ use sqlx::MySqlPool;
 use std::collections::HashMap;
 use std::fmt;
 use stripe::{CheckoutSession, CheckoutSessionMode, CreateCheckoutSession, CreateCheckoutSessionLineItems};
+use crate::stripe::traits::internal_user_lookup::UserMetadata;
 
 // =============== Request ===============
 
@@ -64,9 +65,12 @@ pub async fn stripe_create_checkout_session_json_handler(
 {
   let price_key = request.price_key.as_deref().unwrap_or("unknown");
 
-  let user_token = Some("U:TEST");
+  let user_metadata = UserMetadata::default();
 
-  let url = stripe_create_checkout_session_shared(&stripe_config, price_key, user_token)
+  let url = stripe_create_checkout_session_shared(
+    &stripe_config,
+    price_key,
+    Some(&user_metadata))
       .await
       .map_err(|err| {
         error!("Error creating Stripe checkout session: {:?}", err);

@@ -2,6 +2,7 @@ use anyhow::anyhow;
 use container_common::anyhow_result::AnyhowResult;
 use crate::stripe::helpers::common_metadata_keys::{METADATA_EMAIL, METADATA_USER_TOKEN, METADATA_USERNAME};
 use crate::stripe::stripe_config::StripeConfig;
+use crate::stripe::traits::internal_user_lookup::UserMetadata;
 use log::error;
 use std::collections::HashMap;
 use stripe::{CheckoutSession, CheckoutSessionMode, CreateCheckoutSession, CreateCheckoutSessionAutomaticTax, CreateCheckoutSessionLineItems, CreateCheckoutSessionPaymentIntentData, CreateCheckoutSessionSubscriptionData};
@@ -20,7 +21,7 @@ pub const PRODUCT_ONE_TIME_PURCHASE_PRICE_ID : &'static str = "price_1LgbG9EU5se
 pub async fn stripe_create_checkout_session_shared(
   stripe_config: &StripeConfig,
   price_key: &str,
-  user_token: Option<&str>,
+  maybe_user_metadata: Option<&UserMetadata>,
 ) -> AnyhowResult<String> {
 
   let stripe_client = {
@@ -78,24 +79,22 @@ pub async fn stripe_create_checkout_session_shared(
 
     let mut metadata = HashMap::new();
 
-    if let Some(token) = user_token {
-      metadata.insert(METADATA_USER_TOKEN.to_string(), token.to_string());
-      metadata.insert(METADATA_USERNAME.to_string(), token.to_string());
-      metadata.insert(METADATA_EMAIL.to_string(), token.to_string());
+    if let Some(user_metadata) = maybe_user_metadata {
+      if let Some(user_token) = user_metadata.user_token.as_deref() {
+        metadata.insert(METADATA_USER_TOKEN.to_string(), user_token.to_string());
+      }
+      if let Some(username) = user_metadata.username.as_deref() {
+        metadata.insert(METADATA_USERNAME.to_string(), username.to_string());
+      }
+      if let Some(user_email) = user_metadata.user_email.as_deref() {
+        metadata.insert(METADATA_EMAIL.to_string(), user_email.to_string());
+      }
     }
 
     // NB: This metadata attaches to Stripe's Checkout Session object.
     // This does not attach to the subscription or payment intent, which have their own metadata
     // objects. (TODO: Confirm this.)
     params.metadata = Some(metadata.clone());
-
-    let mut metadata = HashMap::new();
-
-    if let Some(token) = user_token {
-      metadata.insert(METADATA_USER_TOKEN.to_string(), "U:SECOND_ID".to_string());
-      metadata.insert(METADATA_USERNAME.to_string(), "U:SECOND_ID".to_string());
-      metadata.insert(METADATA_EMAIL.to_string(), "U:SECOND_ID".to_string());
-    }
 
     if is_subscription {
       // Subscription mode: Use Stripe Billing to set up fixed-price subscriptions.
