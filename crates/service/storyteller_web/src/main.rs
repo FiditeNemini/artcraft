@@ -52,7 +52,7 @@ use crate::configs::static_api_tokens::{StaticApiTokenConfig, StaticApiTokens, S
 use crate::http_server::middleware::ip_filter_middleware::IpFilter;
 use crate::http_server::web_utils::redis_rate_limiter::RedisRateLimiter;
 use crate::routes::add_routes;
-use crate::server_state::{ServerState, EnvConfig, TwitchOauthSecrets, TwitchOauth, RedisRateLimiters, InMemoryCaches};
+use crate::server_state::{ServerState, EnvConfig, TwitchOauthSecrets, TwitchOauth, RedisRateLimiters, InMemoryCaches, StripeSettings};
 use crate::threads::db_health_checker_thread::db_health_check_status::HealthCheckStatus;
 use crate::threads::db_health_checker_thread::db_health_checker_thread::db_health_checker_thread;
 use crate::threads::ip_banlist_set::IpBanlistSet;
@@ -72,14 +72,17 @@ use sqlx::MySqlPool;
 use sqlx::mysql::MySqlPoolOptions;
 use std::sync::Arc;
 use std::time::Duration;
+use anyhow::anyhow;
 use storage_buckets_common::bucket_client::BucketClient;
 use tokio::runtime::Runtime;
+use billing_component::stripe::traits::internal_product_to_stripe_lookup::InternalProductToStripeLookup;
 use billing_component::stripe::traits::internal_subscription_product_lookup::InternalSubscriptionProductLookup;
 use billing_component::stripe::traits::internal_user_lookup::InternalUserLookup;
 use twitch_common::twitch_secrets::TwitchSecrets;
 use users_component::utils::session_checker::SessionChecker;
 use users_component::utils::session_cookie_manager::SessionCookieManager;
-use crate::billing::stripe_internal_user_lookup::StripeInternalUserLookupImpl;
+use crate::billing::internal_product_to_stripe_lookup_impl::InternalProductToStripeLookupImpl;
+use crate::billing::stripe_internal_user_lookup_impl::StripeInternalUserLookupImpl;
 
 // TODO TODO TODO TODO
 // TODO TODO TODO TODO
@@ -328,6 +331,16 @@ async fn main() -> AnyhowResult<()> {
     },
   };
 
+  let stripe_client = {
+    let api_secret = stripe_configs
+      .secrets
+      .secret_key
+      .clone()
+      .ok_or(anyhow!("stripe secret key not configured"))?;
+
+    stripe::Client::new(api_secret)
+  };
+
   let server_state = ServerState {
     env_config: EnvConfig {
       num_workers,
@@ -337,7 +350,10 @@ async fn main() -> AnyhowResult<()> {
       cookie_http_only,
       website_homepage_redirect,
     },
-    stripe_configs,
+    stripe: StripeSettings {
+      config: stripe_configs,
+      client: stripe_client,
+    },
     hostname: server_hostname,
     health_check_status,
     mysql_pool: pool,
@@ -406,7 +422,11 @@ pub async fn serve(server_state: ServerState) -> AnyhowResult<()>
 
     // NB: Dynamic dispatch needs to be wrapped with Arc.
     let product_lookup : Arc<dyn InternalSubscriptionProductLookup> = Arc::new(StripeInternalSubscriptionProductLookupImpl {});
-    let user_lookup : Arc<dyn InternalUserLookup> = Arc::new(StripeInternalUserLookupImpl::new(server_state_arc.session_checker.clone()));
+    let stripe_lookup : Arc<dyn InternalProductToStripeLookup> = Arc::new(InternalProductToStripeLookupImpl{});
+    let user_lookup : Arc<dyn InternalUserLookup> = Arc::new(StripeInternalUserLookupImpl::new(
+      server_state_arc.session_checker.clone(),
+      server_state_arc.mysql_pool.clone(),
+    ));
 
     // NB: app_data being clone()'d below should all be safe (dependencies included)
     let app = App::new()
@@ -414,8 +434,10 @@ pub async fn serve(server_state: ServerState) -> AnyhowResult<()>
       .app_data(web::Data::new(server_state_arc.mysql_pool.clone()))
       .app_data(web::Data::new(server_state_arc.session_checker.clone()))
       .app_data(web::Data::new(server_state_arc.cookie_manager.clone()))
-      .app_data(web::Data::new(server_state_arc.stripe_configs.clone()))
+      .app_data(web::Data::new(server_state_arc.stripe.clone().config.clone()))
+      .app_data(web::Data::new(server_state_arc.stripe.clone().client.clone()))
       .app_data(web::Data::from(product_lookup)) // NB: Data::from(Arc<T>) for dynamic dispatch
+      .app_data(web::Data::from(stripe_lookup)) // NB: Data::from(Arc<T>) for dynamic dispatch
       .app_data(web::Data::from(user_lookup)) // NB: Data::from(Arc<T>) for dynamic dispatch
       .app_data(server_state_arc.clone())
       .wrap(build_common_cors_config())

@@ -1,3 +1,6 @@
+#[cfg(test)]
+use mockall::{automock, mock, predicate::*};
+
 use actix_web::HttpRequest;
 use async_trait::async_trait;
 use sqlx::MySqlPool;
@@ -47,10 +50,11 @@ pub struct UserMetadata {
 
 /// Allows us to inject a user lookup from the HTTP request's session info and database backend,
 /// then translate these into the pieces we need for the billing component.
+#[cfg_attr(test, automock)]
 #[async_trait(?Send)] // NB: Marking async_trait as not needing Sync/Send. Hopefully this doesn't blow up on us.
 pub trait InternalUserLookup {
 
     /// Lookup a user's session details from an HTTP request, then return the
     /// relevant pieces for the Stripe integration.
-    async fn lookup_user_from_http_request(&self, http_request: &HttpRequest, mysql_pool: &MySqlPool) -> Result<Option<UserMetadata>, InternalUserLookupError>;
+    async fn lookup_user_from_http_request(&self, http_request: &HttpRequest) -> Result<Option<UserMetadata>, InternalUserLookupError>;
 }
