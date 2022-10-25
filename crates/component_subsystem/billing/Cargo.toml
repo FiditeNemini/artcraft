@@ -54,3 +54,9 @@ async-trait = "0.1.58"
 # "rustls" doesn't appear to work with IP addresses, per:
 # https://github.com/launchbadge/sqlx/issues/1095#issuecomment-798050828
 sqlx = { version = "0.5", features = [ "mysql", "runtime-actix-native-tls", "offline", "chrono" ] }
+
+[dev-dependencies]
+mockall = "0.11.3"
+
+# NB: Tokio version matches `async-stripe` transitive dep; features are for testing
+tokio = { version = "1.13.0", features = ["rt", "macros"] }

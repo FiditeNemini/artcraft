@@ -4,8 +4,11 @@ use actix_web::http::{header, StatusCode};
 use actix_web::web::{Path, Query};
 use actix_web::{web, HttpResponse, HttpRequest};
 use chrono::{DateTime, Utc};
+use crate::stripe::http_endpoints::checkout::stripe_create_checkout_session_error::CreateCheckoutSessionError;
 use crate::stripe::http_endpoints::checkout::stripe_create_checkout_session_shared::stripe_create_checkout_session_shared;
 use crate::stripe::stripe_config::StripeConfig;
+use crate::stripe::traits::internal_product_to_stripe_lookup::InternalProductToStripeLookup;
+use crate::stripe::traits::internal_user_lookup::{InternalUserLookup, UserMetadata};
 use http_server_common::request::get_request_header_optional::get_request_header_optional;
 use http_server_common::response::serialize_as_json_error::serialize_as_json_error;
 use log::{error, warn};
@@ -13,13 +16,14 @@ use sqlx::MySqlPool;
 use std::collections::HashMap;
 use std::fmt;
 use stripe::{CheckoutSession, CheckoutSessionMode, CreateCheckoutSession, CreateCheckoutSessionLineItems};
-use crate::stripe::traits::internal_user_lookup::UserMetadata;
 
 // =============== Request ===============
 
 #[derive(Deserialize)]
 pub struct CreateCheckoutSessionRequest {
-  price_key: Option<String>,
+  /// The (non-Stripe) internal identifier for the product or subscription.
+  /// This will be translated into a Stripe identifier.
+  internal_plan_key: Option<String>,
 }
 
 // =============== Success Response ===============
@@ -30,52 +34,25 @@ pub struct CreateCheckoutSessionSuccessResponse {
   pub stripe_checkout_redirect_url: String,
 }
 
-// =============== Error Response ===============
-
-#[derive(Debug, Serialize)]
-pub enum CreateCheckoutSessionError {
-  ServerError,
-}
-
-impl ResponseError for CreateCheckoutSessionError {
-  fn status_code(&self) -> StatusCode {
-    match *self {
-      CreateCheckoutSessionError::ServerError=> StatusCode::INTERNAL_SERVER_ERROR,
-    }
-  }
-
-  fn error_response(&self) -> HttpResponse {
-    serialize_as_json_error(self)
-  }
-}
-
-// NB: Not using derive_more::Display since Clion doesn't understand it.
-impl fmt::Display for CreateCheckoutSessionError {
-  fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-    write!(f, "{:?}", self)
-  }
-}
-
 pub async fn stripe_create_checkout_session_json_handler(
-  _http_request: HttpRequest,
-  _mysql_pool: web::Data<MySqlPool>,
+  http_request: HttpRequest,
   request: Query<CreateCheckoutSessionRequest>,
   stripe_config: web::Data<StripeConfig>,
+  stripe_client: web::Data<stripe::Client>,
+  internal_product_to_stripe_lookup: web::Data<dyn InternalProductToStripeLookup>,
+  internal_user_lookup: web::Data<dyn InternalUserLookup>,
 ) -> Result<HttpResponse, CreateCheckoutSessionError>
 {
-  let price_key = request.price_key.as_deref().unwrap_or("unknown");
-
-  let user_metadata = UserMetadata::default();
+  let maybe_internal_product_key = request.internal_plan_key.as_deref();
 
   let url = stripe_create_checkout_session_shared(
+    maybe_internal_product_key,
+    &http_request,
     &stripe_config,
-    price_key,
-    Some(&user_metadata))
-      .await
-      .map_err(|err| {
-        error!("Error creating Stripe checkout session: {:?}", err);
-        CreateCheckoutSessionError::ServerError
-      })?;
+    &stripe_client,
+    internal_product_to_stripe_lookup.get_ref(),
+    internal_user_lookup.get_ref(),
+  ).await?;
 
   let response = CreateCheckoutSessionSuccessResponse {
     success: true,

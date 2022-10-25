@@ -10,12 +10,14 @@ use users_component::utils::session_checker::SessionChecker;
 #[derive(Clone)]
 pub struct StripeInternalUserLookupImpl {
     session_checker: SessionChecker,
+    mysql_pool: MySqlPool,
 }
 
 impl StripeInternalUserLookupImpl {
-    pub fn new(session_checker: SessionChecker) -> Self {
+    pub fn new(session_checker: SessionChecker, mysql_pool: MySqlPool) -> Self {
         Self {
             session_checker,
+            mysql_pool,
         }
     }
 }
@@ -23,8 +25,8 @@ impl StripeInternalUserLookupImpl {
 // NB: Marking async_trait as not needing Sync/Send. Hopefully this doesn't blow up on us.
 #[async_trait(?Send)]
 impl InternalUserLookup for StripeInternalUserLookupImpl {
-    async fn lookup_user_from_http_request(&self, http_request: &HttpRequest, mysql_pool: &MySqlPool) -> Result<Option<UserMetadata>, InternalUserLookupError> {
-        let mut mysql_connection = mysql_pool.acquire()
+    async fn lookup_user_from_http_request(&self, http_request: &HttpRequest) -> Result<Option<UserMetadata>, InternalUserLookupError> {
+        let mut mysql_connection = self.mysql_pool.acquire()
             .await
             .map_err(|e| {
                 warn!("Could not acquire DB pool: {:?}", e);

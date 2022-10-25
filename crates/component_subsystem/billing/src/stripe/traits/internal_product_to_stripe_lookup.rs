@@ -1,3 +1,6 @@
+#[cfg(test)]
+use mockall::{automock, mock, predicate::*};
+
 use std::error::Error;
 use std::fmt::{Display, Formatter};
 
@@ -31,6 +34,7 @@ pub struct StripeProduct {
 }
 
 /// Allows external systems to map internal product keys to stripe information.
+#[cfg_attr(test, automock)]
 pub trait InternalProductToStripeLookup {
     /// Look up stripe product information from an internal system identifier.
     fn lookup_stripe_product_from_internal_product_key(&self, internal_product_key: &str)

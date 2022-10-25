@@ -22,7 +22,7 @@ pub struct ServerState {
   /// Configuration from ENV vars.
   pub env_config: EnvConfig,
 
-  pub stripe_configs: StripeConfig,
+  pub stripe: StripeSettings,
 
   pub hostname: String,
 
@@ -119,4 +119,10 @@ pub struct InMemoryCaches {
   /// The frontend will consult a distributed cache and use the monotonic DB time as a
   /// vector clock.
   pub tts_queue_length: SingleItemTtlCache<TtsQueueLengthResult>,
+}
+
+#[derive(Clone)]
+pub struct StripeSettings {
+  pub config: StripeConfig,
+  pub client: stripe::Client,
 }

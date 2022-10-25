@@ -1,49 +1,65 @@
+use actix_web::{HttpRequest, web};
 use anyhow::anyhow;
 use container_common::anyhow_result::AnyhowResult;
 use crate::stripe::helpers::common_metadata_keys::{METADATA_EMAIL, METADATA_USER_TOKEN, METADATA_USERNAME};
+use crate::stripe::http_endpoints::checkout::stripe_create_checkout_session_error::CreateCheckoutSessionError;
 use crate::stripe::stripe_config::StripeConfig;
-use crate::stripe::traits::internal_user_lookup::UserMetadata;
+use crate::stripe::traits::internal_product_to_stripe_lookup::{InternalProductToStripeLookup, StripeProduct};
+use crate::stripe::traits::internal_user_lookup::{InternalUserLookup, UserMetadata};
 use log::error;
+use sqlx::MySqlPool;
 use std::collections::HashMap;
 use stripe::{CheckoutSession, CheckoutSessionMode, CreateCheckoutSession, CreateCheckoutSessionAutomaticTax, CreateCheckoutSessionLineItems, CreateCheckoutSessionPaymentIntentData, CreateCheckoutSessionSubscriptionData};
-
-// NB: These are "test" product IDs.
-// TODO: Pass these in via request; validate via a dynamically dispatched trait callable that can do
-//  whatever the calling codebase needs
-pub const PRODUCT_FAKEYOU_BASIC_ID : &'static str = "prod_MMxi2J5y69VPbO";
-pub const PRODUCT_FAKEYOU_BASIC_PRICE_ID : &'static str = "price_1LeDnKEU5se17MekVr1iYYNf";
-
-pub const PRODUCT_ONE_TIME_PURCHASE_ID : &'static str = "prod_MPQ6nWJ4k6lJmw";
-pub const PRODUCT_ONE_TIME_PURCHASE_PRICE_ID : &'static str = "price_1LgbG9EU5se17MekZIw95gEO";
 
 /// Create a checkout session and return the URL
 /// If anything fails, treat it as a 500 server error.
 pub async fn stripe_create_checkout_session_shared(
+  maybe_internal_product_key: Option<&str>,
+  http_request: &HttpRequest,
   stripe_config: &StripeConfig,
-  price_key: &str,
-  maybe_user_metadata: Option<&UserMetadata>,
-) -> AnyhowResult<String> {
+  stripe_client: &stripe::Client,
+  internal_product_to_stripe_lookup: &dyn InternalProductToStripeLookup,
+  internal_user_lookup: &dyn InternalUserLookup,
 
-  let stripe_client = {
-    let api_secret = stripe_config.secrets.secret_key
-        .as_deref()
-        .ok_or(anyhow!("API key not configured"))?;
-    stripe::Client::new(api_secret)
+) -> Result<String, CreateCheckoutSessionError> {
+  let internal_product_key = match maybe_internal_product_key {
+    None => return Err(CreateCheckoutSessionError::BadRequest),
+    Some(internal_product_key) => internal_product_key,
   };
+
+  let stripe_product = internal_product_to_stripe_lookup
+      .lookup_stripe_product_from_internal_product_key(internal_product_key)
+      .map_err(|err| {
+        error!("Error looking up product: {:?}", err);
+        CreateCheckoutSessionError::ServerError // NB: This was probably *our* fault.
+      })?
+      .ok_or(CreateCheckoutSessionError::PlanNotFound)?; // Non-existing product
+
+  let maybe_user_metadata = internal_user_lookup
+      .lookup_user_from_http_request(http_request)
+      .await
+      .map_err(|err| {
+        error!("Error looking up user: {:?}", err);
+        CreateCheckoutSessionError::ServerError // NB: This was probably *our* fault.
+      })?;
+
+  // NB: Our integration relies on an internal user token being present.
+  let user_metadata = match maybe_user_metadata {
+    None => return Err(CreateCheckoutSessionError::InvalidSession),
+    Some(user_metadata) => user_metadata,
+  };
+
+  if user_metadata.user_token.is_none() {
+    return Err(CreateCheckoutSessionError::InvalidSession);
+  }
 
   let success_url  = stripe_config.checkout.success_url
       .as_deref()
-      .ok_or(anyhow!("Checkout Success URL not configured"))?;
+      .ok_or(CreateCheckoutSessionError::ServerError)?;
 
   let cancel_url = stripe_config.checkout.cancel_url
       .as_deref()
-      .ok_or(anyhow!("Checkout Cancel URL not configured"))?;
-
-  let (price_id, is_subscription) = match price_key {
-    "subscription" => (PRODUCT_FAKEYOU_BASIC_PRICE_ID, true),
-    "one-time" => (PRODUCT_ONE_TIME_PURCHASE_PRICE_ID, false),
-    _ => return Err(anyhow!("wrong price key!")),
-  };
+      .ok_or(CreateCheckoutSessionError::ServerError)?;
 
   let checkout_session = {
     let mut params = CreateCheckoutSession::new(
@@ -79,16 +95,14 @@ pub async fn stripe_create_checkout_session_shared(
 
     let mut metadata = HashMap::new();
 
-    if let Some(user_metadata) = maybe_user_metadata {
-      if let Some(user_token) = user_metadata.user_token.as_deref() {
-        metadata.insert(METADATA_USER_TOKEN.to_string(), user_token.to_string());
-      }
-      if let Some(username) = user_metadata.username.as_deref() {
-        metadata.insert(METADATA_USERNAME.to_string(), username.to_string());
-      }
-      if let Some(user_email) = user_metadata.user_email.as_deref() {
-        metadata.insert(METADATA_EMAIL.to_string(), user_email.to_string());
-      }
+    if let Some(user_token) = user_metadata.user_token.as_deref() {
+      metadata.insert(METADATA_USER_TOKEN.to_string(), user_token.to_string());
+    }
+    if let Some(username) = user_metadata.username.as_deref() {
+      metadata.insert(METADATA_USERNAME.to_string(), username.to_string());
+    }
+    if let Some(user_email) = user_metadata.user_email.as_deref() {
+      metadata.insert(METADATA_EMAIL.to_string(), user_email.to_string());
     }
 
     // NB: This metadata attaches to Stripe's Checkout Session object.
@@ -96,7 +110,7 @@ pub async fn stripe_create_checkout_session_shared(
     // objects. (TODO: Confirm this.)
     params.metadata = Some(metadata.clone());
 
-    if is_subscription {
+    if stripe_product.is_subscription_product {
       // Subscription mode: Use Stripe Billing to set up fixed-price subscriptions.
       params.mode = Some(CheckoutSessionMode::Subscription);
 
@@ -125,7 +139,7 @@ pub async fn stripe_create_checkout_session_shared(
 
     params.line_items = Some(vec![
       CreateCheckoutSessionLineItems {
-        price: Some(price_id.to_string()),
+        price: Some(stripe_product.stripe_price_id.to_string()),
         quantity: Some(1),
         ..Default::default()
       }
@@ -135,9 +149,78 @@ pub async fn stripe_create_checkout_session_shared(
         .await
         .map_err(|e| {
           error!("Error: {:?}", e);
-          anyhow!("error creating checkout session against Stripe")
+          CreateCheckoutSessionError::StripeError
         })?
   };
 
-  checkout_session.url.ok_or(anyhow!("checkout session does not contain a URL"))
+  checkout_session.url.ok_or(CreateCheckoutSessionError::ServerError)
+}
+
+#[cfg(test)]
+mod tests {
+  use actix_web::error::UrlencodedError::ContentType;
+  use crate::stripe::http_endpoints::checkout::stripe_create_checkout_session_shared::stripe_create_checkout_session_shared;
+  use crate::stripe::stripe_config::{StripeCheckout, StripeConfig, StripeSecrets};
+  use crate::stripe::traits::internal_product_to_stripe_lookup::{MockInternalProductToStripeLookup, StripeProduct};
+  use crate::stripe::traits::internal_user_lookup::{MockInternalUserLookup, UserMetadata};
+  use mockall::predicate::*;
+  use tokio;
+  use crate::stripe::http_endpoints::checkout::stripe_create_checkout_session_error::CreateCheckoutSessionError;
+
+  #[tokio::test]
+  async fn test_success_case() {
+    let http_request = actix_web::test::TestRequest::default()
+        .insert_header(actix_web::http::header::ContentType::json())
+        .to_http_request();
+
+    let maybe_internal_product_key = Some("TEST_FAKEYOU_PRODUCT");
+
+    let stripe_config = StripeConfig {
+      checkout: StripeCheckout {
+        success_url: Some("http://example.com/success".to_string()),
+        cancel_url: Some("http://example.com/cancel".to_string()),
+      },
+      secrets: StripeSecrets {
+        publishable_key: None,
+        secret_key: Some("sk_test_12345".to_string()), // NB: Expected key format
+        secret_webhook_signing_key: Some("fake_test_signing".to_string()),
+      }
+    };
+
+    // TODO: Mock this somehow? We can't really test this library unless we can get inside it.
+    //  Note that this might also fail in CI if the client tries to actually talk to Stripe.com.
+    let mut stripe_client= stripe::Client::new("sk_test_12345");
+
+    let mut internal_product_to_stripe_lookup_mock = MockInternalProductToStripeLookup::new();
+
+    internal_product_to_stripe_lookup_mock.expect_lookup_stripe_product_from_internal_product_key()
+        .with(eq("TEST_FAKEYOU_PRODUCT"))
+        .returning(|_| Ok(Some(StripeProduct {
+          stripe_product_id: "TEST_PRODUCT_ID".to_string(),
+          stripe_price_id: "TEST_PRICE_ID".to_string(),
+          is_subscription_product: true,
+        })));
+
+    let mut internal_user_lookup_mock = MockInternalUserLookup::new();
+
+    internal_user_lookup_mock.expect_lookup_user_from_http_request()
+        .returning(|_| Ok(Some(UserMetadata {
+          user_token: Some("U:USER".to_string()),
+          username: Some("vegito".to_string()),
+          user_email: Some("vegito@fakeyou.com".to_string()),
+        })));
+
+    let result = stripe_create_checkout_session_shared(
+      maybe_internal_product_key,
+      &http_request,
+      &stripe_config,
+      &stripe_client,
+      &internal_product_to_stripe_lookup_mock,
+      &internal_user_lookup_mock,
+    ).await;
+
+    // TODO: Sort of throwing my hands up over testing this.
+    //  There's no convenient way to test which arguments get sent.
+    assert_eq!(result, Err(CreateCheckoutSessionError::StripeError));
+  }
 }
