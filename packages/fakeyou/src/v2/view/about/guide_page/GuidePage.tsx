@@ -2,6 +2,7 @@ import React from "react";
 import { motion } from "framer-motion";
 import { container, item, panel, image } from "../../../../data/animation";
 import { Link } from "react-router-dom";
+import { DiscordLink2 } from "@storyteller/components/src/elements/DiscordLink2";
 
 interface Props {}
 
@@ -59,57 +60,81 @@ function GuidePage(props: Props) {
           <h1 className="panel-title fw-bold">Quick Tips</h1>
           <div className="py-6 d-flex flex-column gap-4">
             <p>
-              These are some tips to generate the best sounding text-to-speech.
+              Here are some quick tips to generate the best sounding text-to-speech.
             </p>
             <div>
-              <h2 className="mb-4">Preventing TTS strokes</h2>
+              <h2 className="mb-4">Fixing nonsense &ldquo;babbling&rdquo;</h2>
               <p>
-                A TTS stroke is when the generated audio becomes garbled and
-                incoherent.
+                (This is not a typical problem.)
               </p>
+              <br />
               <p>
-                This can be fixed by adding an ending punctuation as without
-                one, this will happen frequently. If the message still messes
-                up, add a comma at the start and end so the program can take a
-                brief pause and usually corrects it.
+                Some of our very earliest models were built using a limited amount of data 
+                and are sometimes prone to producing speech that sounds like &ldquo;babbling&rdquo;
+                or incoherent vocal convulsions. 
+              </p>
+              <br />
+              <p>
+                This problem can typically be fixed by 
+                {" "}
+                <strong><em>adding ending punctuation to your sentence</em></strong>. 
+                If the audio still has problems, 
+                {" "}
+                <strong><em>add a comma at the start and end of your text</em></strong>
+                {" "}
+                so that the program can add brief pauses. This usually corrects the problem.
+              </p>
+              <br />
+              <p>
+                If the incoherent audio is at the end, you can always edit it with software 
+                such as Audacity.
               </p>
             </div>
             <div>
               <h2 className="mb-4">
-                Purposefully misspelling words to get correct
-                pronunciation/manner of speech
+                Getting the correct pronunciation
               </h2>
               <p>
-                Sometimes the TTS program cannot accurately read the word or you
-                want a word pronounced a certain way. You can experiment with
-                it. For example, to say the word "ass" with a certain hit, spell
-                it as "asz". Or another example, Games = Gaymes.
+                Sometimes a TTS model will not pronounce words correctly or in the 
+                way you like.
+                You can <strong><em>experiment with misspellings</em></strong> of words until you get something 
+                that sounds better. For example <em>&ldquo;peekahchuu&rdquo;</em> might sound different 
+                than <em>&ldquo;pikachu&rdquo;</em>.
+              </p>
+              <br />
+              <p>
+                Many of our models also support Arpabet phonetic annotation. It's an advanced feature you can 
+                learn to use by joining our <DiscordLink2 />.
               </p>
             </div>
             <div>
-              <h2 className="mb-4">Fluffing</h2>
+              <h2 className="mb-4">Emotional conditioning</h2>
               <p>
                 To get a certain emotion and personality in the message you
-                want, add fluff. To do this, add the first sentence with words
-                that you have no intention of using. Like bunch of cursing and
-                such. "
-                <span style={{ textDecoration: "line-through" }}>
-                  Fuck you bitch! I hate you!
-                </span>{" "}
-                I cant believe you said that to me!". You can remove the first
-                sentence you had no intention of using in an audio editor of
-                your choice like Audacity.
+                want, add some extra emotional &ldquo;conditioning&rdquo;. 
+              </p>
+              <br />
+              <p>
+                To do this, think of a strong emotional sentence or two you could start with. 
+                Then add this to the very beginning of your text.
+                For example, to add some anger to <em>&ldquo;I can't believe you said that to me!&rdquo;</em>, 
+                you could input the following instead:
+              </p>
+              <br />
+              <p>
+                <em>&ldquo;<strong>Darn it! I hate you!</strong> I can't believe you said that to me!&rdquo;</em>
+              </p>
+              <br />
+              <p>
+                You can later remove these extra leading sentences with an audio editor such as Audacity, leaving 
+                just the speech you want.
               </p>
             </div>
             <div>
-              <h2 className="mb-4">Yelling</h2>
+              <h2 className="mb-4">Yelling emotions</h2>
               <p>
-                This only works if the dataset has yelling and transcript
-                properly. When you do the transcript of a character that yells,
-                add an exclamation mark on the transcript clip that has yelling
-                and periods for normal speech. This will easier trigger angry
-                emotions. But the yelling will likely not happen with smaller
-                datasets or if the yelling is not at all in the dataset.
+                While not all models support it, some of our models incorporate rich emotional samples 
+                that were transcripted with an emphasis mark &ndash; typically an exclamation mark (!).
               </p>
             </div>
           </div>
