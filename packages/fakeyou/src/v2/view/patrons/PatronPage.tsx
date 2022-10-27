@@ -28,7 +28,10 @@ function PatronPage(props: Props) {
               expensive server bills.
             </motion.p>
 
-            <motion.div className="d-flex" variants={item}>
+            <motion.div
+              className="d-flex justify-content-center justify-content-lg-start"
+              variants={item}
+            >
               <a
                 href={ThirdPartyLinks.FAKEYOU_PATREON}
                 target="_blank"

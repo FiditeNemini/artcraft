@@ -1,7 +1,6 @@
 import React from "react";
 import { motion } from "framer-motion";
 import { container, item, panel, image } from "../../../../data/animation";
-import { ThirdPartyLinks } from "@storyteller/components/src/constants/ThirdPartyLinks";
 import { Link } from "react-router-dom";
 
 interface Props {}
@@ -34,14 +33,21 @@ function GuidePage(props: Props) {
                 </motion.h1>
               </div>
               <div className="mb-5">
-                <motion.p className="lead" variants={item}>
+                <motion.p className="lead px-5 px-lg-0" variants={item}>
                   <h4>How to generate the best sounding TTS</h4>
                 </motion.p>
               </div>
               <div>
-                <Link to="/">
-                  <button className="btn btn-primary">Generate your TTS</button>
-                </Link>
+                <motion.div
+                  variants={item}
+                  className="d-flex justify-content-center justify-content-lg-start mb-5 mb-lg-0"
+                >
+                  <Link to="/">
+                    <button className="btn btn-primary">
+                      Generate your TTS
+                    </button>
+                  </Link>
+                </motion.div>
               </div>
             </div>
           </div>
