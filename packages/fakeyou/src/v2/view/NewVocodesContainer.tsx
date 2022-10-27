@@ -1,140 +1,136 @@
-import React from 'react';
-import { AboutPage } from './about/about_page/AboutPage';
-import { FirehoseEventListFc } from './firehose/FirehoseEventListFc';
-import { LoginPage } from './login/LoginPage';
-import { ModerationFc } from './moderation/moderation_main/ModerationFc';
-import { ModerationIpBanListFc } from './moderation/moderation_ip_ban_list/ModerationIpBanListFc';
-import { ModerationViewIpBanFc } from './moderation/moderation_view_ip_ban/ModerationViewIpBanFc';
-import { NewFooterNavFc } from './NewFooterNavFc';
-import { NewTopNavFc } from './NewTopNavFc';
-import { ProfileEditFc } from './profile/profile_edit/ProfileEditFc';
-import { ProfileFc } from './profile/profile_view/ProfileFc';
-import { SessionWrapper } from '@storyteller/components/src/session/SessionWrapper';
-import { SignupPage } from './signup/SignupPage';
-import { Switch, Route } from 'react-router-dom';
-import { TermsPage } from './about/terms_page/TermsPage';
-import { TtsInferenceJob, W2lInferenceJob } from '../../App';
-import { TtsModelDeletePage } from './tts/tts_model_delete/TtsModelDeletePage';
-import { TtsModelEditPage } from './tts/tts_model_edit/TtsModelEditPage';
-import { TtsModelUploadJob } from '@storyteller/components/src/jobs/TtsModelUploadJobs';
-import { VocoderUploadJob } from '@storyteller/components/src/jobs/VocoderUploadJobs';
-import { TtsModelViewPage } from './tts/tts_model_view/TtsModelViewPage';
-import { TtsResultDeletePage } from './tts/tts_result_delete/TtsResultDeletePage';
-import { TtsResultViewPage } from './tts/tts_result_view/TtsResultViewPage';
-import { ContributeIndexPage } from './contribute/ContributeIndexPage';
-import { UploadTtsModelPage } from './upload/UploadTtsModelPage';
-import { UploadW2lPhotoPage } from './upload/UploadW2lPhotoPage';
-import { UploadW2lVideoPage } from './upload/UploadW2lVideoPage';
-import { W2lResultViewFc } from './w2l/w2l_result_view/W2lResultViewFc';
-import { W2lTemplateListFc } from './w2l/w2l_template_list/W2lTemplateListFc';
-import { W2lTemplateUploadJob } from '@storyteller/components/src/jobs/W2lTemplateUploadJobs';
-import { W2lTemplateViewFc } from './w2l/w2l_template_view/W2lTemplateViewFc';
-import { TtsResultEditPage } from './tts/tts_result_edit/TtsResultEditPage';
-import { W2lResultEditFc } from './w2l/w2l_result_edit/W2lResultEditFc';
-import { W2lTemplateDeleteFc } from './w2l/w2l_template_delete/W2lTemplateDeleteFc';
-import { W2lTemplateEditFc } from './w2l/w2l_template_edit/W2lTemplateEditFc';
-import { W2lResultDeleteFc } from './w2l/w2l_result_delete/W2lResultDeleteFc';
-import { W2lTemplateApproveFc } from './w2l/w2l_template_approve/W2lTemplateApproveFc';
-import { TtsModelListPage } from './tts/tts_model_list/TtsModelListPage';
-import { TtsModelListItem } from '@storyteller/components/src/api/tts/ListTtsModels';
-import { ProfileBanFc } from './profile/profile_ban/ProfileBanFc';
-import { ModerationUserListFc } from './moderation/moderation_user_list/ModerationUserList';
-import { LeaderboardFc } from './leaderboard/LeaderboardFc';
-import { ModerationJobStatsFc } from './moderation/moderation_job_stats/ModerationJobStatsFc';
-import { ModerationPendingW2lTemplatesFc } from './moderation/moderation_pending_w2l_templates/ModerationPendingW2lTemplatesFc';
-import { ModerationVoiceStatsFc } from './moderation/moderation_voice_stats/ModerationVoiceStatsFc';
-import { CreateCategoryPage } from './category/CreateCategoryPage';
-import { TtsEditCategoriesPage } from './tts/tts_edit_categories/TtsEditCategoriesPage';
-import { ModerationTtsCategoryListPage } from './moderation/categories/ModerationTtsCategoryListPage';
-import { ModerationTtsCategoryEditPage } from './moderation/categories/ModerationTtsCategoryEditPage';
-import { ModerationCategoryDeletePage } from './moderation/categories/ModerationCategoryDeletePage';
-import { TtsCategoryType } from '../../AppWrapper';
-import { PatronPage } from './patrons/PatronPage';
-import ScrollToTop from './_common/ScrollToTop';
-import { Language } from '@storyteller/components/src/i18n/Language';
-import { VoiceCloneRequestPage } from './clone_voice_requests/VoiceCloneRequestPage';
-import { VocodesPage } from './vocodes/VocodesPage';
-import { UploadVocoderPage } from './upload/UploadVocoderPage';
+import React from "react";
+import { AboutPage } from "./about/about_page/AboutPage";
+import { GuidePage } from "./about/guide_page/GuidePage";
+import { FirehoseEventListFc } from "./firehose/FirehoseEventListFc";
+import { LoginPage } from "./login/LoginPage";
+import { ModerationFc } from "./moderation/moderation_main/ModerationFc";
+import { ModerationIpBanListFc } from "./moderation/moderation_ip_ban_list/ModerationIpBanListFc";
+import { ModerationViewIpBanFc } from "./moderation/moderation_view_ip_ban/ModerationViewIpBanFc";
+import { NewFooterNavFc } from "./NewFooterNavFc";
+import { NewTopNavFc } from "./NewTopNavFc";
+import { ProfileEditFc } from "./profile/profile_edit/ProfileEditFc";
+import { ProfileFc } from "./profile/profile_view/ProfileFc";
+import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
+import { SignupPage } from "./signup/SignupPage";
+import { Switch, Route } from "react-router-dom";
+import { TermsPage } from "./about/terms_page/TermsPage";
+import { TtsInferenceJob, W2lInferenceJob } from "../../App";
+import { TtsModelDeletePage } from "./tts/tts_model_delete/TtsModelDeletePage";
+import { TtsModelEditPage } from "./tts/tts_model_edit/TtsModelEditPage";
+import { TtsModelUploadJob } from "@storyteller/components/src/jobs/TtsModelUploadJobs";
+import { VocoderUploadJob } from "@storyteller/components/src/jobs/VocoderUploadJobs";
+import { TtsModelViewPage } from "./tts/tts_model_view/TtsModelViewPage";
+import { TtsResultDeletePage } from "./tts/tts_result_delete/TtsResultDeletePage";
+import { TtsResultViewPage } from "./tts/tts_result_view/TtsResultViewPage";
+import { ContributeIndexPage } from "./contribute/ContributeIndexPage";
+import { UploadTtsModelPage } from "./upload/UploadTtsModelPage";
+import { UploadW2lPhotoPage } from "./upload/UploadW2lPhotoPage";
+import { UploadW2lVideoPage } from "./upload/UploadW2lVideoPage";
+import { W2lResultViewFc } from "./w2l/w2l_result_view/W2lResultViewFc";
+import { W2lTemplateListFc } from "./w2l/w2l_template_list/W2lTemplateListFc";
+import { W2lTemplateUploadJob } from "@storyteller/components/src/jobs/W2lTemplateUploadJobs";
+import { W2lTemplateViewFc } from "./w2l/w2l_template_view/W2lTemplateViewFc";
+import { TtsResultEditPage } from "./tts/tts_result_edit/TtsResultEditPage";
+import { W2lResultEditFc } from "./w2l/w2l_result_edit/W2lResultEditFc";
+import { W2lTemplateDeleteFc } from "./w2l/w2l_template_delete/W2lTemplateDeleteFc";
+import { W2lTemplateEditFc } from "./w2l/w2l_template_edit/W2lTemplateEditFc";
+import { W2lResultDeleteFc } from "./w2l/w2l_result_delete/W2lResultDeleteFc";
+import { W2lTemplateApproveFc } from "./w2l/w2l_template_approve/W2lTemplateApproveFc";
+import { TtsModelListPage } from "./tts/tts_model_list/TtsModelListPage";
+import { TtsModelListItem } from "@storyteller/components/src/api/tts/ListTtsModels";
+import { ProfileBanFc } from "./profile/profile_ban/ProfileBanFc";
+import { ModerationUserListFc } from "./moderation/moderation_user_list/ModerationUserList";
+import { LeaderboardFc } from "./leaderboard/LeaderboardFc";
+import { ModerationJobStatsFc } from "./moderation/moderation_job_stats/ModerationJobStatsFc";
+import { ModerationPendingW2lTemplatesFc } from "./moderation/moderation_pending_w2l_templates/ModerationPendingW2lTemplatesFc";
+import { ModerationVoiceStatsFc } from "./moderation/moderation_voice_stats/ModerationVoiceStatsFc";
+import { CreateCategoryPage } from "./category/CreateCategoryPage";
+import { TtsEditCategoriesPage } from "./tts/tts_edit_categories/TtsEditCategoriesPage";
+import { ModerationTtsCategoryListPage } from "./moderation/categories/ModerationTtsCategoryListPage";
+import { ModerationTtsCategoryEditPage } from "./moderation/categories/ModerationTtsCategoryEditPage";
+import { ModerationCategoryDeletePage } from "./moderation/categories/ModerationCategoryDeletePage";
+import { TtsCategoryType } from "../../AppWrapper";
+import { PatronPage } from "./patrons/PatronPage";
+import ScrollToTop from "./_common/ScrollToTop";
+import { Language } from "@storyteller/components/src/i18n/Language";
+import { VoiceCloneRequestPage } from "./clone_voice_requests/VoiceCloneRequestPage";
+import { VocodesPage } from "./vocodes/VocodesPage";
+import { UploadVocoderPage } from "./upload/UploadVocoderPage";
 
 interface Props {
-  sessionWrapper: SessionWrapper,
-  querySessionAction: () => void,
+  sessionWrapper: SessionWrapper;
+  querySessionAction: () => void;
 
-  isShowingVocodesNotice: boolean,
-  clearVocodesNotice: () => void,
+  isShowingVocodesNotice: boolean;
+  clearVocodesNotice: () => void;
 
-  isShowingLangaugeNotice: boolean,
-  clearLanguageNotice: () => void,
-  displayLanguage: Language,
-  primaryLanguageCode: string,
+  isShowingLangaugeNotice: boolean;
+  clearLanguageNotice: () => void;
+  displayLanguage: Language;
+  primaryLanguageCode: string;
 
-  isShowingTwitchTtsNotice: boolean,
-  clearTwitchTtsNotice: () => void,
+  isShowingTwitchTtsNotice: boolean;
+  clearTwitchTtsNotice: () => void;
 
-  isShowingPleaseFollowNotice: boolean,
-  clearPleaseFollowNotice: () => void,
+  isShowingPleaseFollowNotice: boolean;
+  clearPleaseFollowNotice: () => void;
 
-  isShowingBootstrapLanguageNotice: boolean,
-  clearBootstrapLanguageNotice: () => void,
+  isShowingBootstrapLanguageNotice: boolean;
+  clearBootstrapLanguageNotice: () => void;
 
-  enqueueTtsJob: (jobToken: string) => void,
-  ttsInferenceJobs: Array<TtsInferenceJob>,
+  enqueueTtsJob: (jobToken: string) => void;
+  ttsInferenceJobs: Array<TtsInferenceJob>;
 
-  enqueueW2lJob: (jobToken: string) => void,
-  w2lInferenceJobs: Array<W2lInferenceJob>,
+  enqueueW2lJob: (jobToken: string) => void;
+  w2lInferenceJobs: Array<W2lInferenceJob>;
 
-  enqueueTtsModelUploadJob: (jobToken: string) => void,
-  ttsModelUploadJobs: Array<TtsModelUploadJob>,
+  enqueueTtsModelUploadJob: (jobToken: string) => void;
+  ttsModelUploadJobs: Array<TtsModelUploadJob>;
 
-  enqueueW2lTemplateUploadJob: (jobToken: string) => void,
-  w2lTemplateUploadJobs: Array<W2lTemplateUploadJob>,
+  enqueueW2lTemplateUploadJob: (jobToken: string) => void;
+  w2lTemplateUploadJobs: Array<W2lTemplateUploadJob>;
 
-  enqueueVocoderUploadJob: (jobToken: string) => void,
-  vocoderUploadJobs: Array<VocoderUploadJob>,
+  enqueueVocoderUploadJob: (jobToken: string) => void;
+  vocoderUploadJobs: Array<VocoderUploadJob>;
 
-  textBuffer: string,
-  setTextBuffer: (textBuffer: string) => void,
-  clearTextBuffer: () => void,
+  textBuffer: string;
+  setTextBuffer: (textBuffer: string) => void;
+  clearTextBuffer: () => void;
 
-  ttsModels: Array<TtsModelListItem>,
-  setTtsModels: (ttsVoices: Array<TtsModelListItem>) => void,
+  ttsModels: Array<TtsModelListItem>;
+  setTtsModels: (ttsVoices: Array<TtsModelListItem>) => void;
 
-  allTtsCategories: TtsCategoryType[],
-  setAllTtsCategories: (allTtsCategories: TtsCategoryType[]) => void,
+  allTtsCategories: TtsCategoryType[];
+  setAllTtsCategories: (allTtsCategories: TtsCategoryType[]) => void;
 
-  allTtsCategoriesByTokenMap: Map<string, TtsCategoryType>,
-  allTtsModelsByTokenMap: Map<string, TtsModelListItem>,
-  ttsModelsByCategoryToken: Map<string, Set<TtsModelListItem>>,
+  allTtsCategoriesByTokenMap: Map<string, TtsCategoryType>;
+  allTtsModelsByTokenMap: Map<string, TtsModelListItem>;
+  ttsModelsByCategoryToken: Map<string, Set<TtsModelListItem>>;
 
-  dropdownCategories: TtsCategoryType[][],
-  setDropdownCategories: (dropdownCategories: TtsCategoryType[][]) => void,
-  selectedCategories: TtsCategoryType[],
-  setSelectedCategories: (selectedCategories: TtsCategoryType[]) => void,
+  dropdownCategories: TtsCategoryType[][];
+  setDropdownCategories: (dropdownCategories: TtsCategoryType[][]) => void;
+  selectedCategories: TtsCategoryType[];
+  setSelectedCategories: (selectedCategories: TtsCategoryType[]) => void;
 
-  maybeSelectedTtsModel?: TtsModelListItem,
-  setMaybeSelectedTtsModel: (maybeSelectedTtsModel: TtsModelListItem) => void,
+  maybeSelectedTtsModel?: TtsModelListItem;
+  setMaybeSelectedTtsModel: (maybeSelectedTtsModel: TtsModelListItem) => void;
 }
 
-interface State {
-}
+interface State {}
 
 class NewVocodesContainer extends React.Component<Props, State> {
-
   constructor(props: Props) {
     super(props);
 
-    this.state = {
-    }
+    this.state = {};
   }
 
-  logout = () => {
-  }
+  logout = () => {};
 
   public render() {
     return (
       <div id="main" className="mainwrap">
         <div id="viewable">
-
           <NewTopNavFc
             logoutHandler={this.logout}
             sessionWrapper={this.props.sessionWrapper}
@@ -145,15 +141,11 @@ class NewVocodesContainer extends React.Component<Props, State> {
 
           <Switch>
             <Route path="/firehose">
-              <FirehoseEventListFc
-                sessionWrapper={this.props.sessionWrapper}
-              />
+              <FirehoseEventListFc sessionWrapper={this.props.sessionWrapper} />
             </Route>
 
             <Route path="/leaderboard">
-              <LeaderboardFc
-                sessionWrapper={this.props.sessionWrapper}
-              />
+              <LeaderboardFc sessionWrapper={this.props.sessionWrapper} />
             </Route>
 
             <Route path="/login">
@@ -163,28 +155,21 @@ class NewVocodesContainer extends React.Component<Props, State> {
               />
             </Route>
 
-
             <Route path="/profile/:username/edit">
-              <ProfileEditFc
-                sessionWrapper={this.props.sessionWrapper}
-              />
+              <ProfileEditFc sessionWrapper={this.props.sessionWrapper} />
             </Route>
 
             <Route path="/profile/:username/ban">
-              <ProfileBanFc
-                sessionWrapper={this.props.sessionWrapper}
-              />
+              <ProfileBanFc sessionWrapper={this.props.sessionWrapper} />
             </Route>
 
             <Route path="/profile/:username">
-              <ProfileFc
-                sessionWrapper={this.props.sessionWrapper}
-              />
+              <ProfileFc sessionWrapper={this.props.sessionWrapper} />
             </Route>
 
             <Route path="/signup">
               <SignupPage
-                querySessionCallback={() => { }}
+                querySessionCallback={() => {}}
                 sessionWrapper={this.props.sessionWrapper}
               />
             </Route>
@@ -199,21 +184,15 @@ class NewVocodesContainer extends React.Component<Props, State> {
             */}
 
             <Route path="/tts/result/:token/edit">
-              <TtsResultEditPage
-                sessionWrapper={this.props.sessionWrapper}
-              />
+              <TtsResultEditPage sessionWrapper={this.props.sessionWrapper} />
             </Route>
 
             <Route path="/tts/result/:token/delete">
-              <TtsResultDeletePage
-                sessionWrapper={this.props.sessionWrapper}
-              />
+              <TtsResultDeletePage sessionWrapper={this.props.sessionWrapper} />
             </Route>
 
             <Route path="/tts/result/:token">
-              <TtsResultViewPage
-                sessionWrapper={this.props.sessionWrapper}
-              />
+              <TtsResultViewPage sessionWrapper={this.props.sessionWrapper} />
             </Route>
 
             <Route path="/tts/:token/edit">
@@ -225,9 +204,7 @@ class NewVocodesContainer extends React.Component<Props, State> {
             </Route>
 
             <Route path="/tts/:token/delete">
-              <TtsModelDeletePage
-                sessionWrapper={this.props.sessionWrapper}
-              />
+              <TtsModelDeletePage sessionWrapper={this.props.sessionWrapper} />
             </Route>
 
             <Route path="/tts/:token/categories">
@@ -248,27 +225,19 @@ class NewVocodesContainer extends React.Component<Props, State> {
             </Route>
 
             <Route path="/w2l/result/:token/edit">
-              <W2lResultEditFc
-                sessionWrapper={this.props.sessionWrapper}
-              />
+              <W2lResultEditFc sessionWrapper={this.props.sessionWrapper} />
             </Route>
 
             <Route path="/w2l/result/:token/delete">
-              <W2lResultDeleteFc
-                sessionWrapper={this.props.sessionWrapper}
-              />
+              <W2lResultDeleteFc sessionWrapper={this.props.sessionWrapper} />
             </Route>
 
             <Route path="/w2l/result/:token">
-              <W2lResultViewFc
-                sessionWrapper={this.props.sessionWrapper}
-              />
+              <W2lResultViewFc sessionWrapper={this.props.sessionWrapper} />
             </Route>
 
             <Route path="/w2l/:templateToken/edit">
-              <W2lTemplateEditFc
-                sessionWrapper={this.props.sessionWrapper}
-              />
+              <W2lTemplateEditFc sessionWrapper={this.props.sessionWrapper} />
             </Route>
 
             <Route path="/w2l/:templateToken/approval">
@@ -278,9 +247,7 @@ class NewVocodesContainer extends React.Component<Props, State> {
             </Route>
 
             <Route path="/w2l/:templateToken/delete">
-              <W2lTemplateDeleteFc
-                sessionWrapper={this.props.sessionWrapper}
-              />
+              <W2lTemplateDeleteFc sessionWrapper={this.props.sessionWrapper} />
             </Route>
 
             <Route path="/w2l/:templateSlug">
@@ -292,16 +259,16 @@ class NewVocodesContainer extends React.Component<Props, State> {
             </Route>
 
             <Route path="/video">
-              <W2lTemplateListFc
-                sessionWrapper={this.props.sessionWrapper}
-              />
+              <W2lTemplateListFc sessionWrapper={this.props.sessionWrapper} />
             </Route>
 
             <Route path="/upload/w2l_photo">
               <UploadW2lPhotoPage
                 sessionWrapper={this.props.sessionWrapper}
                 w2lTemplateUploadJobs={this.props.w2lTemplateUploadJobs}
-                enqueueW2lTemplateUploadJob={this.props.enqueueW2lTemplateUploadJob}
+                enqueueW2lTemplateUploadJob={
+                  this.props.enqueueW2lTemplateUploadJob
+                }
               />
             </Route>
 
@@ -309,7 +276,9 @@ class NewVocodesContainer extends React.Component<Props, State> {
               <UploadW2lVideoPage
                 sessionWrapper={this.props.sessionWrapper}
                 w2lTemplateUploadJobs={this.props.w2lTemplateUploadJobs}
-                enqueueW2lTemplateUploadJob={this.props.enqueueW2lTemplateUploadJob}
+                enqueueW2lTemplateUploadJob={
+                  this.props.enqueueW2lTemplateUploadJob
+                }
               />
             </Route>
 
@@ -330,15 +299,11 @@ class NewVocodesContainer extends React.Component<Props, State> {
             </Route>
 
             <Route path="/contribute">
-              <ContributeIndexPage
-                sessionWrapper={this.props.sessionWrapper}
-              />
+              <ContributeIndexPage sessionWrapper={this.props.sessionWrapper} />
             </Route>
 
             <Route path="/category/create">
-              <CreateCategoryPage
-                sessionWrapper={this.props.sessionWrapper}
-              />
+              <CreateCategoryPage sessionWrapper={this.props.sessionWrapper} />
             </Route>
 
             <Route path="/moderation/user/list">
@@ -396,9 +361,7 @@ class NewVocodesContainer extends React.Component<Props, State> {
             </Route>
 
             <Route path="/moderation">
-              <ModerationFc
-                sessionWrapper={this.props.sessionWrapper}
-              />
+              <ModerationFc sessionWrapper={this.props.sessionWrapper} />
             </Route>
 
             <Route exact={true} path="/clone">
@@ -406,9 +369,7 @@ class NewVocodesContainer extends React.Component<Props, State> {
             </Route>
 
             <Route path="/patrons">
-              <PatronPage
-                sessionWrapper={this.props.sessionWrapper}
-              />
+              <PatronPage sessionWrapper={this.props.sessionWrapper} />
             </Route>
 
             <Route path="/about">
@@ -419,8 +380,12 @@ class NewVocodesContainer extends React.Component<Props, State> {
               <TermsPage />
             </Route>
 
+            <Route path="/guide">
+              <GuidePage />
+            </Route>
+
             <Route path="/old">
-              <VocodesPage/>
+              <VocodesPage />
             </Route>
 
             <Route path="/">
@@ -433,10 +398,16 @@ class NewVocodesContainer extends React.Component<Props, State> {
                 displayLanguage={this.props.displayLanguage}
                 isShowingTwitchTtsNotice={this.props.isShowingTwitchTtsNotice}
                 clearTwitchTtsNotice={this.props.clearTwitchTtsNotice}
-                isShowingPleaseFollowNotice={this.props.isShowingPleaseFollowNotice}
+                isShowingPleaseFollowNotice={
+                  this.props.isShowingPleaseFollowNotice
+                }
                 clearPleaseFollowNotice={this.props.clearPleaseFollowNotice}
-                isShowingBootstrapLanguageNotice={this.props.isShowingBootstrapLanguageNotice}
-                clearBootstrapLanguageNotice={this.props.clearBootstrapLanguageNotice}
+                isShowingBootstrapLanguageNotice={
+                  this.props.isShowingBootstrapLanguageNotice
+                }
+                clearBootstrapLanguageNotice={
+                  this.props.clearBootstrapLanguageNotice
+                }
                 enqueueTtsJob={this.props.enqueueTtsJob}
                 ttsInferenceJobs={this.props.ttsInferenceJobs}
                 ttsModelUploadJobs={this.props.ttsModelUploadJobs}
@@ -449,7 +420,9 @@ class NewVocodesContainer extends React.Component<Props, State> {
                 setTtsModels={this.props.setTtsModels}
                 allTtsCategories={this.props.allTtsCategories}
                 setAllTtsCategories={this.props.setAllTtsCategories}
-                allTtsCategoriesByTokenMap={this.props.allTtsCategoriesByTokenMap}
+                allTtsCategoriesByTokenMap={
+                  this.props.allTtsCategoriesByTokenMap
+                }
                 allTtsModelsByTokenMap={this.props.allTtsModelsByTokenMap}
                 ttsModelsByCategoryToken={this.props.ttsModelsByCategoryToken}
                 dropdownCategories={this.props.dropdownCategories}
@@ -460,17 +433,13 @@ class NewVocodesContainer extends React.Component<Props, State> {
                 setMaybeSelectedTtsModel={this.props.setMaybeSelectedTtsModel}
               />
             </Route>
-
           </Switch>
 
-          <NewFooterNavFc
-            sessionWrapper={this.props.sessionWrapper}
-          />
-
+          <NewFooterNavFc sessionWrapper={this.props.sessionWrapper} />
         </div>
       </div>
-    )
+    );
   }
 }
 
-export { NewVocodesContainer }
+export { NewVocodesContainer };
