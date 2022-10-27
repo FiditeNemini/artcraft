@@ -1,2 +1,2 @@
 pub mod checkout;
-pub mod stripe_webhook_handler;
+pub mod webhook;

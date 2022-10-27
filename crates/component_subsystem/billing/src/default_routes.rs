@@ -4,10 +4,10 @@ use actix_web::body::MessageBody;
 use actix_web::dev::{ServiceRequest, ServiceResponse, ServiceFactory};
 use actix_web::error::Error;
 use actix_web::{App, web, HttpResponse};
+use crate::stripe::http_endpoints::checkout::create::stripe_create_checkout_session_json_handler::stripe_create_checkout_session_json_handler;
+use crate::stripe::http_endpoints::checkout::create::stripe_create_checkout_session_redirect_handler::stripe_create_checkout_session_redirect_handler;
 use crate::stripe::http_endpoints::checkout::stripe_checkout_success_handler::stripe_checkout_success_handler;
-use crate::stripe::http_endpoints::checkout::stripe_create_checkout_session_json_handler::stripe_create_checkout_session_json_handler;
-use crate::stripe::http_endpoints::checkout::stripe_create_checkout_session_redirect_handler::stripe_create_checkout_session_redirect_handler;
-use crate::stripe::http_endpoints::stripe_webhook_handler::stripe_webhook_handler;
+use crate::stripe::http_endpoints::webhook::stripe_webhook_handler::stripe_webhook_handler;
 
 pub fn add_suggested_stripe_billing_routes<T, B> (app: App<T, B>) -> App<T, B>
   where
