@@ -1,6 +1,9 @@
 [workspace]
 
 members = [
+  # CLI tools for operations, etc.
+  "crates/cli/stripe_tools",
+
   # Complete subsystems that can be plugged into services
   "crates/component_subsystem/billing",
   "crates/component_subsystem/inference_workloads",
