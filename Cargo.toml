@@ -22,6 +22,7 @@ members = [
   "crates/lib/storage_buckets_common",
   "crates/lib/tts_common",
   "crates/lib/twitch_common",
+  "crates/lib/url_config",
   "crates/lib/user_input_common",
 
   # Services: API servers, jobs, workers, etc.

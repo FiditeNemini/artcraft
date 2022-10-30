@@ -4,6 +4,7 @@
 
 // Okay to toggle
 //#![forbid(warnings)]
+#![allow(unreachable_patterns)]
 #![allow(unused_imports)]
 #![allow(unused_mut)]
 #![allow(unused_variables)]
@@ -41,13 +42,19 @@ use actix_cors::Cors;
 use actix_http::http;
 use actix_web::middleware::{Logger, DefaultHeaders};
 use actix_web::{HttpServer, web, HttpResponse, App};
-use billing_component::stripe::stripe_config::{StripeCheckout, StripeConfig, StripeSecrets};
+use anyhow::anyhow;
+use billing_component::stripe::stripe_config::{FullUrlOrPath, StripeCheckoutConfigs, StripeConfig, StripeCustomerPortalConfigs, StripeSecrets};
+use billing_component::stripe::traits::internal_product_to_stripe_lookup::InternalProductToStripeLookup;
+use billing_component::stripe::traits::internal_subscription_product_lookup::InternalSubscriptionProductLookup;
+use billing_component::stripe::traits::internal_user_lookup::InternalUserLookup;
 use config::common_env::CommonEnv;
 use config::shared_constants::DEFAULT_MYSQL_CONNECTION_STRING;
 use config::shared_constants::DEFAULT_RUST_LOG;
 use container_common::anyhow_result::AnyhowResult;
 use container_common::files::read_toml_file_to_struct::read_toml_file_to_struct;
+use crate::billing::internal_product_to_stripe_lookup_impl::InternalProductToStripeLookupImpl;
 use crate::billing::stripe_internal_subscription_product_lookup_impl::StripeInternalSubscriptionProductLookupImpl;
+use crate::billing::stripe_internal_user_lookup_impl::StripeInternalUserLookupImpl;
 use crate::configs::static_api_tokens::{StaticApiTokenConfig, StaticApiTokens, StaticApiTokenSet};
 use crate::http_server::middleware::ip_filter_middleware::IpFilter;
 use crate::http_server::web_utils::redis_rate_limiter::RedisRateLimiter;
@@ -72,30 +79,13 @@ use sqlx::MySqlPool;
 use sqlx::mysql::MySqlPoolOptions;
 use std::sync::Arc;
 use std::time::Duration;
-use anyhow::anyhow;
 use storage_buckets_common::bucket_client::BucketClient;
 use tokio::runtime::Runtime;
-use billing_component::stripe::traits::internal_product_to_stripe_lookup::InternalProductToStripeLookup;
-use billing_component::stripe::traits::internal_subscription_product_lookup::InternalSubscriptionProductLookup;
-use billing_component::stripe::traits::internal_user_lookup::InternalUserLookup;
 use twitch_common::twitch_secrets::TwitchSecrets;
+use url_config::server_environment::ServerEnvironment;
+use url_config::third_party_url_redirector::ThirdPartyUrlRedirector;
 use users_component::utils::session_checker::SessionChecker;
 use users_component::utils::session_cookie_manager::SessionCookieManager;
-use crate::billing::internal_product_to_stripe_lookup_impl::InternalProductToStripeLookupImpl;
-use crate::billing::stripe_internal_user_lookup_impl::StripeInternalUserLookupImpl;
-
-// TODO TODO TODO TODO
-// TODO TODO TODO TODO
-// TODO TODO TODO TODO
-// https://github.com/TensorSpeech/TensorFlowTTS (MAYBE USE THIS)
-// TODO TODO TODO TODO
-// TODO TODO TODO TODO
-// TODO TODO TODO TODO
-
-// TODO TODO TODO -- ON signup, add an "early adopter" badge. And a tool for making it easy to add badges.
-// TODO - badge for uploading template, badge for uploading model, etc.
-
-// TODO TODO -- also this: https://material-ui.com
 
 const DEFAULT_BIND_ADDRESS : &'static str = "0.0.0.0:12345";
 
@@ -320,24 +310,28 @@ async fn main() -> AnyhowResult<()> {
   });
 
   let stripe_configs = StripeConfig {
-    checkout: StripeCheckout {
-      success_url: easyenv::get_env_string_optional("STRIPE_CHECKOUT_SUCCESS_URL"),
-      cancel_url: easyenv::get_env_string_optional("STRIPE_CHECKOUT_CANCEL_URL"),
+    checkout: StripeCheckoutConfigs {
+      success_url: FullUrlOrPath::Path(easyenv::get_env_string_required("STRIPE_CHECKOUT_SUCCESS_URL_PATH")?),
+      cancel_url: FullUrlOrPath::Path(easyenv::get_env_string_required("STRIPE_CHECKOUT_CANCEL_URL_PATH")?),
+    },
+    portal: StripeCustomerPortalConfigs {
+      return_url: FullUrlOrPath::Path(easyenv::get_env_string_required("STRIPE_PORTAL_RETURN_URL_PATH")?),
+      portal_config_id: easyenv::get_env_string_required("STRIPE_PORTAL_CONFIG_ID")?,
     },
     secrets: StripeSecrets {
       publishable_key: easyenv::get_env_string_optional("STRIPE_PUBLISHABLE_KEY"),
-      secret_key: easyenv::get_env_string_optional("STRIPE_SECRET_KEY"),
-      secret_webhook_signing_key: easyenv::get_env_string_optional("STRIPE_SECRET_WEBHOOK_SIGNING_KEY"),
+      secret_key: easyenv::get_env_string_required("STRIPE_SECRET_KEY")?,
+      secret_webhook_signing_key: easyenv::get_env_string_required("STRIPE_SECRET_WEBHOOK_SIGNING_KEY")?,
     },
   };
 
-  let stripe_client = {
-    let api_secret = stripe_configs
-      .secrets
-      .secret_key
-      .clone()
-      .ok_or(anyhow!("stripe secret key not configured"))?;
+  let server_environment = ServerEnvironment::from_str(&easyenv::get_env_string_required("SERVER_ENVIRONMENT")?)
+      .ok_or(anyhow!("invalid server environment"))?;
 
+  let third_party_url_redirector = ThirdPartyUrlRedirector::new(server_environment);
+
+  let stripe_client = {
+    let api_secret = stripe_configs.secrets.secret_key.clone();
     stripe::Client::new(api_secret)
   };
 
@@ -355,6 +349,7 @@ async fn main() -> AnyhowResult<()> {
       client: stripe_client,
     },
     hostname: server_hostname,
+    third_party_url_redirector,
     health_check_status,
     mysql_pool: pool,
     redis_pool,
@@ -436,6 +431,7 @@ pub async fn serve(server_state: ServerState) -> AnyhowResult<()>
       .app_data(web::Data::new(server_state_arc.cookie_manager.clone()))
       .app_data(web::Data::new(server_state_arc.stripe.clone().config.clone()))
       .app_data(web::Data::new(server_state_arc.stripe.clone().client.clone()))
+      .app_data(web::Data::new(server_state_arc.third_party_url_redirector.clone()))
       .app_data(web::Data::from(product_lookup)) // NB: Data::from(Arc<T>) for dynamic dispatch
       .app_data(web::Data::from(stripe_lookup)) // NB: Data::from(Arc<T>) for dynamic dispatch
       .app_data(web::Data::from(user_lookup)) // NB: Data::from(Arc<T>) for dynamic dispatch

@@ -3,7 +3,7 @@ use anyhow::anyhow;
 use container_common::anyhow_result::AnyhowResult;
 use crate::stripe::helpers::common_metadata_keys::{METADATA_EMAIL, METADATA_USER_TOKEN, METADATA_USERNAME};
 use crate::stripe::http_endpoints::checkout::create::stripe_create_checkout_session_error::CreateCheckoutSessionError;
-use crate::stripe::stripe_config::StripeConfig;
+use crate::stripe::stripe_config::{FullUrlOrPath, StripeConfig};
 use crate::stripe::traits::internal_product_to_stripe_lookup::{InternalProductToStripeLookup, StripeProduct};
 use crate::stripe::traits::internal_user_lookup::{InternalUserLookup, UserMetadata};
 use log::{error, warn};
@@ -11,6 +11,7 @@ use sqlx::MySqlPool;
 use std::collections::HashMap;
 use std::str::FromStr;
 use stripe::{CheckoutSession, CheckoutSessionMode, CreateCheckoutSession, CreateCheckoutSessionAutomaticTax, CreateCheckoutSessionLineItems, CreateCheckoutSessionPaymentIntentData, CreateCheckoutSessionSubscriptionData, CustomerId, ParseIdError};
+use url_config::third_party_url_redirector::ThirdPartyUrlRedirector;
 
 /// Create a checkout session and return the URL
 /// If anything fails, treat it as a 500 server error.
@@ -19,6 +20,7 @@ pub async fn stripe_create_checkout_session_shared(
   http_request: &HttpRequest,
   stripe_config: &StripeConfig,
   stripe_client: &stripe::Client,
+  url_redirector: &ThirdPartyUrlRedirector,
   internal_product_to_stripe_lookup: &dyn InternalProductToStripeLookup,
   internal_user_lookup: &dyn InternalUserLookup,
 
@@ -50,19 +52,20 @@ pub async fn stripe_create_checkout_session_shared(
     Some(user_metadata) => user_metadata,
   };
 
-  let success_url  = stripe_config.checkout.success_url
-      .as_deref()
-      .ok_or(CreateCheckoutSessionError::ServerError)?;
+  let success_url = match &stripe_config.checkout.success_url {
+    FullUrlOrPath::FullUrl(url) => url.to_string(),
+    FullUrlOrPath::Path(path) => url_redirector.redirect_url_for_path(http_request, &path)
+        .map_err(|_e| CreateCheckoutSessionError::ServerError)?,
+  };
 
-  let cancel_url = stripe_config.checkout.cancel_url
-      .as_deref()
-      .ok_or(CreateCheckoutSessionError::ServerError)?;
+  let cancel_url = match &stripe_config.checkout.cancel_url {
+    FullUrlOrPath::FullUrl(url) => url.to_string(),
+    FullUrlOrPath::Path(path) => url_redirector.redirect_url_for_path(http_request, &path)
+        .map_err(|_e| CreateCheckoutSessionError::ServerError)?,
+  };
 
   let checkout_session = {
-    let mut params = CreateCheckoutSession::new(
-      cancel_url,
-      success_url,
-    );
+    let mut params = CreateCheckoutSession::new(&cancel_url, &success_url);
 
     // `client_reference_id`
     // Stripe Docs:
@@ -172,11 +175,13 @@ mod tests {
   use actix_web::error::UrlencodedError::ContentType;
   use crate::stripe::http_endpoints::checkout::create::stripe_create_checkout_session_error::CreateCheckoutSessionError;
   use crate::stripe::http_endpoints::checkout::create::stripe_create_checkout_session_shared::stripe_create_checkout_session_shared;
-  use crate::stripe::stripe_config::{StripeCheckout, StripeConfig, StripeSecrets};
+  use crate::stripe::stripe_config::{FullUrlOrPath, StripeCheckoutConfigs, StripeConfig, StripeCustomerPortalConfigs, StripeSecrets};
   use crate::stripe::traits::internal_product_to_stripe_lookup::{MockInternalProductToStripeLookup, StripeProduct};
   use crate::stripe::traits::internal_user_lookup::{MockInternalUserLookup, UserMetadata};
   use mockall::predicate::*;
   use tokio;
+  use url_config::server_environment::ServerEnvironment;
+  use url_config::third_party_url_redirector::ThirdPartyUrlRedirector;
 
   #[tokio::test]
   async fn test_success_case() {
@@ -187,16 +192,22 @@ mod tests {
     let maybe_internal_product_key = Some("TEST_FAKEYOU_PRODUCT");
 
     let stripe_config = StripeConfig {
-      checkout: StripeCheckout {
-        success_url: Some("http://example.com/success".to_string()),
-        cancel_url: Some("http://example.com/cancel".to_string()),
+      checkout: StripeCheckoutConfigs {
+        success_url: FullUrlOrPath::FullUrl("http://example.com/success".to_string()),
+        cancel_url: FullUrlOrPath::FullUrl("http://example.com/cancel".to_string()),
+      },
+      portal: StripeCustomerPortalConfigs {
+        return_url: FullUrlOrPath::Path("/N/A".to_string()),
+        portal_config_id: "N/A".to_string()
       },
       secrets: StripeSecrets {
         publishable_key: None,
-        secret_key: Some("sk_test_12345".to_string()), // NB: Expected key format
-        secret_webhook_signing_key: Some("fake_test_signing".to_string()),
+        secret_key: "sk_test_12345".to_string(), // NB: Expected key format
+        secret_webhook_signing_key: "fake_test_signing".to_string(),
       }
     };
+
+    let url_redirector = ThirdPartyUrlRedirector::new(ServerEnvironment::Development);
 
     // TODO: Mock this somehow? We can't really test this library unless we can get inside it.
     //  Note that this might also fail in CI if the client tries to actually talk to Stripe.com.
@@ -227,6 +238,7 @@ mod tests {
       &http_request,
       &stripe_config,
       &stripe_client,
+      &url_redirector,
       &internal_product_to_stripe_lookup_mock,
       &internal_user_lookup_mock,
     ).await;

@@ -28,6 +28,7 @@ reusable_types = { path = "../../lib/reusable_types" }
 storage_buckets_common = { path = "../../lib/storage_buckets_common" }
 tts_common = { path = "../../lib/tts_common" }
 twitch_common = { path = "../../lib/twitch_common" }
+url_config = { path = "../../lib/url_config" }
 user_input_common = { path = "../../lib/user_input_common" }
 
 # Internal Components

@@ -3,6 +3,7 @@
 #![forbid(unused_must_use)] // NB: It's unsafe to not close/check some things
 
 // Okay to toggle
+#![forbid(unreachable_patterns)]
 #![forbid(unused_imports)]
 #![forbid(unused_mut)]
 #![forbid(unused_variables)]

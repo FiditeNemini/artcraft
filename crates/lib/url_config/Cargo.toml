@@ -1,0 +1,22 @@
+[package]
+name = "url_config"
+edition = "2018"
+version = "0.0.1"
+authors = [
+    "Brandon Thomas <bt@brand.io>",
+    "Brandon Thomas <echelon@gmail.com>",
+]
+publish = false
+
+[lib]
+name = "url_config"
+path = "src/lib.rs"
+
+[dependencies]
+
+# Internal
+http_server_common = { path = "../../lib/http_server_common" }
+
+# External
+actix-web = "4.0.0-beta.10"
+anyhow = "1.0.40"

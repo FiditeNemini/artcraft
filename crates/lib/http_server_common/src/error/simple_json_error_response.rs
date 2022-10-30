@@ -1,4 +1,4 @@
-use actix_web::http::{StatusCode, header};
+use actix_web::http::StatusCode;
 use actix_web::{HttpResponse, HttpResponseBuilder};
 
 /// Convert a string and status code to a JSON error response.
