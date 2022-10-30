@@ -2,7 +2,7 @@
 
 members = [
   # CLI tools for operations, etc.
-  "crates/cli/stripe_tools",
+  "crates/cli/database_backup",
 
   # Complete subsystems that can be plugged into services
   "crates/component_subsystem/billing",

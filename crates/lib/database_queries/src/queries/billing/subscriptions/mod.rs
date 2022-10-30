@@ -1,2 +1,3 @@
-pub mod upsert_subscription_by_stripe_id;
 pub mod get_subscription_by_stripe_id;
+pub mod update_user_record_with_new_stripe_customer_id;
+pub mod upsert_subscription_by_stripe_id;

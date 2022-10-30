@@ -1419,6 +1419,25 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "3ee2393c4a91429dffb4bedf19f4d6abf27d8a732c8ce4980305d782e5426d57"
 
 [[package]]
+name = "database-backup"
+version = "0.0.1"
+dependencies = [
+ "anyhow",
+ "chrono",
+ "clap 2.34.0",
+ "clap 4.0.18",
+ "config",
+ "container_common",
+ "dotenv",
+ "easyenv",
+ "hostname",
+ "log",
+ "serde",
+ "serde_derive",
+ "serde_json",
+]
+
+[[package]]
 name = "database_queries"
 version = "0.0.1"
 dependencies = [
@@ -4471,26 +4490,6 @@ checksum = "8ee348cb74b87454fff4b551cbf727025810a004f88aeacae7f85b87f4e9a1c1"
 dependencies = [
  "unicode-bidi",
  "unicode-normalization",
-]
-
-[[package]]
-name = "stripe-tools"
-version = "0.0.1"
-dependencies = [
- "anyhow",
- "async-stripe",
- "chrono",
- "clap 2.34.0",
- "clap 4.0.18",
- "config",
- "container_common",
- "dotenv",
- "easyenv",
- "hostname",
- "log",
- "serde",
- "serde_derive",
- "serde_json",
 ]
 
 [[package]]

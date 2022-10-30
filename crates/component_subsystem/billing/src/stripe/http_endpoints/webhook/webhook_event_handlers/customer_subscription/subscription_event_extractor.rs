@@ -1,5 +1,6 @@
 use anyhow::anyhow;
 use chrono::{DateTime, NaiveDateTime, Utc};
+use log::error;
 use container_common::anyhow_result::AnyhowResult;
 use crate::stripe::helpers::common_metadata_keys::METADATA_USER_TOKEN;
 use crate::stripe::helpers::enums::recurring_interval_to_reusable_type::recurring_interval_to_reusable_type;
@@ -54,6 +55,8 @@ pub fn subscription_summary_extractor(subscription: &Subscription) -> AnyhowResu
   // NB: Our internal user token.
   let maybe_user_token = subscription.metadata.get(METADATA_USER_TOKEN)
       .map(|t| t.to_string());
+
+  error!("SUBSCRIPTION EVENT USER TOKEN: {:?}", maybe_user_token);
 
   if subscription.items.data.len() != 1 {
     return Err(anyhow!("Too many items in subscription {} : {}",

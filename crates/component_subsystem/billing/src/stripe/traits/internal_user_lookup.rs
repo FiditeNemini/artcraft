@@ -36,8 +36,7 @@ impl Error for InternalUserLookupError {}
 #[derive(Clone, Default)]
 pub struct UserMetadata {
     /// Internal system primary key identifier of the user.
-    /// We will associate this to Stripe objects if available.
-    pub user_token: Option<String>,
+    pub user_token: String,
 
     /// Internal system username for the user.
     /// We will associate this to Stripe objects if available.
@@ -46,6 +45,9 @@ pub struct UserMetadata {
     /// Internal system email for the user.
     /// We will associate this to Stripe objects if available.
     pub user_email: Option<String>,
+
+    /// Possible existing Stripe customer ID for the user.
+    pub maybe_existing_stripe_customer_id: Option<String>,
 }
 
 /// Allows us to inject a user lookup from the HTTP request's session info and database backend,

@@ -9,6 +9,7 @@ use database_queries::queries::billing::subscriptions::upsert_subscription_by_st
 use log::{error, warn};
 use sqlx::MySqlPool;
 use stripe::Subscription;
+use database_queries::queries::billing::subscriptions::update_user_record_with_new_stripe_customer_id::update_user_record_with_new_stripe_customer_id;
 
 /// Handle event type: 'customer.subscription.created'
 /// Sent when the subscription is created. The subscription status may be incomplete if customer
@@ -90,6 +91,20 @@ pub async fn customer_subscription_created_handler(
         error!("Mysql error: {:?}", err);
         StripeWebhookError::ServerError
       })?;
+
+    if let Some(user_token) = summary.user_token.as_deref() {
+      // TODO: Should we care if a user accidentally gets two stripe customer IDs and this
+      //  overwrites one of them?
+      update_user_record_with_new_stripe_customer_id(
+        mysql_pool,
+        user_token,
+        Some(&summary.stripe_customer_id))
+          .await
+          .map_err(|err| {
+            error!("Mysql error: {:?}", err);
+            StripeWebhookError::ServerError
+          })?;
+    }
 
   result.action_was_taken = true;
   result.should_ignore_retry = true;

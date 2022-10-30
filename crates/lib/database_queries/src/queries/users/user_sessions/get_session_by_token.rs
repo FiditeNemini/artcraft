@@ -19,6 +19,11 @@ pub struct SessionUserRecord {
   pub email_confirmed: bool,
   pub email_gravatar_hash: String,
 
+  // ===== PREMIUM FEATURES ===== //
+
+  pub maybe_stripe_customer_id: Option<String>,
+  pub maybe_loyalty_program_key: Option<String>,
+
   // ===== PREFERENCES ===== //
 
   pub disable_gravatar: bool,
@@ -78,6 +83,9 @@ SELECT
     users.email_confirmed,
     users.email_gravatar_hash,
 
+    users.maybe_stripe_customer_id,
+    users.maybe_loyalty_program_key,
+
     users.disable_gravatar,
     users.auto_play_audio_preference,
     users.auto_play_video_preference,
@@ -133,6 +141,9 @@ WHERE user_sessions.token = ?
         email_address: raw_user_record.email_address,
         email_confirmed: i8_to_bool(raw_user_record.email_confirmed),
         email_gravatar_hash: raw_user_record.email_gravatar_hash,
+        // Premium features
+        maybe_stripe_customer_id: raw_user_record.maybe_stripe_customer_id,
+        maybe_loyalty_program_key: raw_user_record.maybe_loyalty_program_key,
         // Preference
         disable_gravatar: i8_to_bool(raw_user_record.disable_gravatar),
         auto_play_audio_preference: nullable_i8_to_optional_bool(raw_user_record.auto_play_audio_preference),
@@ -193,6 +204,9 @@ struct SessionUserRawDbRecord {
   email_address: String,
   email_confirmed: i8,
   email_gravatar_hash: String,
+
+  maybe_stripe_customer_id: Option<String>,
+  maybe_loyalty_program_key: Option<String>,
 
   disable_gravatar: i8,
   auto_play_audio_preference: Option<i8>,
