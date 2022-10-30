@@ -93,6 +93,9 @@ SET
 ON DUPLICATE KEY UPDATE
   maybe_user_token = COALESCE(NULLIF(?, ''), maybe_user_token),
 
+  subscription_category = ?,
+  subscription_product_key = ?,
+
   maybe_stripe_product_id = ?,
   maybe_stripe_price_id = ?,
 
@@ -132,6 +135,9 @@ ON DUPLICATE KEY UPDATE
 
       // Upsert
       self.maybe_user_token,
+      
+      self.subscription_category,
+      self.subscription_product_key,
 
       self.maybe_stripe_product_id,
       self.maybe_stripe_price_id,
