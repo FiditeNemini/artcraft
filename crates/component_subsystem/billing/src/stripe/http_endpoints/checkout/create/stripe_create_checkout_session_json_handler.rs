@@ -8,7 +8,7 @@ use crate::stripe::http_endpoints::checkout::create::stripe_create_checkout_sess
 use crate::stripe::http_endpoints::checkout::create::stripe_create_checkout_session_shared::stripe_create_checkout_session_shared;
 use crate::stripe::stripe_config::StripeConfig;
 use crate::stripe::traits::internal_product_to_stripe_lookup::InternalProductToStripeLookup;
-use crate::stripe::traits::internal_user_lookup::{InternalUserLookup, UserMetadata};
+use crate::stripe::traits::internal_user_lookup::InternalUserLookup;
 use http_server_common::request::get_request_header_optional::get_request_header_optional;
 use http_server_common::response::serialize_as_json_error::serialize_as_json_error;
 use log::{error, warn};

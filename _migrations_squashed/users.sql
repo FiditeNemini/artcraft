@@ -1,9 +1,9 @@
+-- NB: This is a manually squashed view of all the CREATE and ALTER statements,
+-- with comments attached to the fields for centralized documentation.
+
 -- noinspection SqlDialectInspectionForFile
 -- noinspection SqlNoDataSourceInspectionForFile
 -- noinspection SqlResolveForFile
-
--- NB: See the "squashed" copy of this for better documentation
--- and the current state of the table.
 
 CREATE TABLE users (
   -- Not used for anything except replication.
@@ -21,6 +21,17 @@ CREATE TABLE users (
 
   -- The role assigned to the user confers permissions.
   user_role_slug VARCHAR(16) NOT NULL,
+
+  -- ========== PREMIUM FEATURES ==========
+
+  -- If the user has a Stripe subscription (or has had one), we link it to the user here.
+  -- Will never exceed 255 characters: https://groups.google.com/a/lists.stripe.com/g/api-discuss/c/1F5Wb4HRnNQ
+  maybe_stripe_customer_id VARCHAR(255) DEFAULT NULL,
+
+  -- If a user is a known-good contributor, we can assign them premium service for free.
+  -- Internally, our system statically maps keys to zero or more premium products.
+  -- The business logic can live in the plans code.
+  maybe_loyalty_program_key VARCHAR(32) DEFAULT NULL,
 
   -- ========== CREDENTIALS ==========
 
@@ -155,84 +166,3 @@ CREATE TABLE users (
 
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;
 
-CREATE TABLE user_roles (
-  -- Not used for anything except replication.
-  id BIGINT(20) NOT NULL AUTO_INCREMENT,
-
-  -- Effective "primary key"
-  slug CHAR(16) NOT NULL,
-
-  name VARCHAR(255) NOT NULL,
-
-  -- Usage
-  can_use_tts BOOLEAN NOT NULL DEFAULT FALSE,
-  can_use_w2l BOOLEAN NOT NULL DEFAULT FALSE,
-  can_delete_own_tts_results BOOLEAN NOT NULL DEFAULT FALSE,
-  can_delete_own_w2l_results BOOLEAN NOT NULL DEFAULT FALSE,
-  can_delete_own_account BOOLEAN NOT NULL DEFAULT FALSE,
-
-  -- Contribution
-  can_upload_tts_models BOOLEAN NOT NULL DEFAULT FALSE,
-  can_upload_w2l_templates BOOLEAN NOT NULL DEFAULT FALSE,
-  can_delete_own_tts_models BOOLEAN NOT NULL DEFAULT FALSE,
-  can_delete_own_w2l_templates BOOLEAN NOT NULL DEFAULT FALSE,
-
-  -- Moderation
-  can_approve_w2l_templates BOOLEAN NOT NULL DEFAULT FALSE,
-  -- Edit includes "lock_from_use" and "lock_from_modification"
-  can_edit_other_users_profiles BOOLEAN NOT NULL DEFAULT FALSE,
-  can_edit_other_users_tts_models BOOLEAN NOT NULL DEFAULT FALSE,
-  can_edit_other_users_w2l_templates BOOLEAN NOT NULL DEFAULT FALSE,
-  can_delete_other_users_tts_models BOOLEAN NOT NULL DEFAULT FALSE,
-  can_delete_other_users_tts_results BOOLEAN NOT NULL DEFAULT FALSE,
-  can_delete_other_users_w2l_templates BOOLEAN NOT NULL DEFAULT FALSE,
-  can_delete_other_users_w2l_results BOOLEAN NOT NULL DEFAULT FALSE,
-  can_ban_users BOOLEAN NOT NULL DEFAULT FALSE,
-  can_delete_users BOOLEAN NOT NULL DEFAULT FALSE,
-
-  -- Incremented with every update.
-  version INT NOT NULL DEFAULT 0,
-
-  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-
-  -- INDICES --
-  PRIMARY KEY (id),
-  UNIQUE KEY (slug)
-
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;
-
-CREATE TABLE user_sessions (
-  -- Not used for anything except replication.
-  id BIGINT(20) NOT NULL AUTO_INCREMENT,
-
-  -- Session entropy
-  token VARCHAR(32) NOT NULL,
-
-  -- Foreign key to user
-  user_token VARCHAR(32) NOT NULL,
-
-  -- Track each session's creation IP.
-  -- Wide enough for IPv4/6
-  ip_address_creation VARCHAR(40) NOT NULL,
-
-  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-
-  -- Session termination time.
-  -- This must be set by the server code, or the session is invalid
-  expires_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-
-  -- deletion = session termination
-  -- Typically these are destroyed by users, but if in the future we allow mods to
-  -- delete them, it doesn't really matter who did the deletion: sessions are not
-  -- designed to be recoverable.
-  deleted_at TIMESTAMP NULL,
-
-  -- INDICES --
-  PRIMARY KEY (id),
-  UNIQUE KEY (token),
-  KEY fk_user_token (user_token),
-  KEY index_ip_address_creation (ip_address_creation)
-
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;

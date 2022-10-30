@@ -6,10 +6,11 @@ use crate::stripe::http_endpoints::checkout::create::stripe_create_checkout_sess
 use crate::stripe::stripe_config::StripeConfig;
 use crate::stripe::traits::internal_product_to_stripe_lookup::{InternalProductToStripeLookup, StripeProduct};
 use crate::stripe::traits::internal_user_lookup::{InternalUserLookup, UserMetadata};
-use log::error;
+use log::{error, warn};
 use sqlx::MySqlPool;
 use std::collections::HashMap;
-use stripe::{CheckoutSession, CheckoutSessionMode, CreateCheckoutSession, CreateCheckoutSessionAutomaticTax, CreateCheckoutSessionLineItems, CreateCheckoutSessionPaymentIntentData, CreateCheckoutSessionSubscriptionData};
+use std::str::FromStr;
+use stripe::{CheckoutSession, CheckoutSessionMode, CreateCheckoutSession, CreateCheckoutSessionAutomaticTax, CreateCheckoutSessionLineItems, CreateCheckoutSessionPaymentIntentData, CreateCheckoutSessionSubscriptionData, CustomerId, ParseIdError};
 
 /// Create a checkout session and return the URL
 /// If anything fails, treat it as a 500 server error.
@@ -48,10 +49,6 @@ pub async fn stripe_create_checkout_session_shared(
     None => return Err(CreateCheckoutSessionError::InvalidSession),
     Some(user_metadata) => user_metadata,
   };
-
-  if user_metadata.user_token.is_none() {
-    return Err(CreateCheckoutSessionError::InvalidSession);
-  }
 
   let success_url  = stripe_config.checkout.success_url
       .as_deref()
@@ -95,9 +92,8 @@ pub async fn stripe_create_checkout_session_shared(
 
     let mut metadata = HashMap::new();
 
-    if let Some(user_token) = user_metadata.user_token.as_deref() {
-      metadata.insert(METADATA_USER_TOKEN.to_string(), user_token.to_string());
-    }
+    metadata.insert(METADATA_USER_TOKEN.to_string(), user_metadata.user_token.to_string());
+
     if let Some(username) = user_metadata.username.as_deref() {
       metadata.insert(METADATA_USERNAME.to_string(), username.to_string());
     }
@@ -145,6 +141,21 @@ pub async fn stripe_create_checkout_session_shared(
       }
     ]);
 
+    // If we already have a Stripe customer associated with the user account, we'll reuse it.
+    if let Some(existing_stripe_customer_id) = user_metadata.maybe_existing_stripe_customer_id.as_deref() {
+      match CustomerId::from_str(existing_stripe_customer_id) {
+        Ok(customer_id) => {
+          params.customer = Some(customer_id);
+        }
+        Err(err) => {
+          // NB: Don't block checkout.
+          warn!("Error parsing user's ({}) supposed existing stripe customer id: {:?}",
+            &user_metadata.user_token,
+            err);
+        }
+      }
+    }
+
     CheckoutSession::create(&stripe_client, params)
         .await
         .map_err(|e| {
@@ -159,13 +170,13 @@ pub async fn stripe_create_checkout_session_shared(
 #[cfg(test)]
 mod tests {
   use actix_web::error::UrlencodedError::ContentType;
-  use crate::stripe::http_endpoints::checkout::stripe_create_checkout_session_shared::stripe_create_checkout_session_shared;
+  use crate::stripe::http_endpoints::checkout::create::stripe_create_checkout_session_error::CreateCheckoutSessionError;
+  use crate::stripe::http_endpoints::checkout::create::stripe_create_checkout_session_shared::stripe_create_checkout_session_shared;
   use crate::stripe::stripe_config::{StripeCheckout, StripeConfig, StripeSecrets};
   use crate::stripe::traits::internal_product_to_stripe_lookup::{MockInternalProductToStripeLookup, StripeProduct};
   use crate::stripe::traits::internal_user_lookup::{MockInternalUserLookup, UserMetadata};
   use mockall::predicate::*;
   use tokio;
-  use crate::stripe::http_endpoints::checkout::stripe_create_checkout_session_error::CreateCheckoutSessionError;
 
   #[tokio::test]
   async fn test_success_case() {
@@ -205,9 +216,10 @@ mod tests {
 
     internal_user_lookup_mock.expect_lookup_user_from_http_request()
         .returning(|_| Ok(Some(UserMetadata {
-          user_token: Some("U:USER".to_string()),
+          user_token: "U:USER".to_string(),
           username: Some("vegito".to_string()),
           user_email: Some("vegito@fakeyou.com".to_string()),
+          maybe_existing_stripe_customer_id: None,
         })));
 
     let result = stripe_create_checkout_session_shared(

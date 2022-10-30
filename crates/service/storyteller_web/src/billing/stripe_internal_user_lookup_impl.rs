@@ -44,9 +44,10 @@ impl InternalUserLookup for StripeInternalUserLookupImpl {
         match maybe_user_session {
             None => Ok(None),
             Some(user_session) => Ok(Some(UserMetadata {
-                user_token: Some(user_session.user_token),
+                user_token: user_session.user_token,
                 username: Some(user_session.username),
                 user_email: Some(user_session.email_address),
+                maybe_existing_stripe_customer_id: user_session.maybe_stripe_customer_id,
             })),
         }
     }
