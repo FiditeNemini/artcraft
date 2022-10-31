@@ -114,14 +114,14 @@ impl MultiBenchmarkingTimer {
   pub async fn time_async_section_moving_args<F, Fut, Arg, Ret>(
     &mut self,
     section_name: &str,
-    mut arg: Arg,
+    arg: Arg,
     callback: F
   ) -> (Arg, Ret)
     where F: FnOnce(Arg) -> Fut,
           Fut: Future<Output = (Arg, Ret)>,
   {
     let before = Instant::now();
-    let (mut arg, result) = callback(arg).await;
+    let (arg, result) = callback(arg).await;
     let after = Instant::now();
 
     self.recorded_sections.push(SectionTime {

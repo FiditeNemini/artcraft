@@ -4,7 +4,7 @@ use actix_web::http::{header, StatusCode};
 use actix_web::web::{Path, Query};
 use actix_web::{web, HttpResponse, HttpRequest};
 use chrono::{DateTime, Utc};
-use crate::stripe::stripe_config::StripeConfig;
+use crate::stripe::stripe_config::{FullUrlOrPath, StripeConfig};
 use crate::stripe::traits::internal_product_to_stripe_lookup::InternalProductToStripeLookup;
 use crate::stripe::traits::internal_user_lookup::InternalUserLookup;
 use http_server_common::response::serialize_as_json_error::serialize_as_json_error;
@@ -14,6 +14,7 @@ use std::collections::HashMap;
 use std::fmt;
 use std::str::FromStr;
 use stripe::{BillingPortalSession, CheckoutSession, CheckoutSessionMode, CreateBillingPortalSession, CreateCheckoutSession, CreateCheckoutSessionLineItems, CustomerId};
+use url_config::third_party_url_redirector::ThirdPartyUrlRedirector;
 
 // =============== Error ===============
 
@@ -51,6 +52,7 @@ pub async fn stripe_create_customer_portal_session_redirect_handler(
     http_request: HttpRequest,
     stripe_config: web::Data<StripeConfig>,
     stripe_client: web::Data<stripe::Client>,
+    url_redirector: web::Data<ThirdPartyUrlRedirector>,
     internal_product_to_stripe_lookup: web::Data<dyn InternalProductToStripeLookup>,
     internal_user_lookup: web::Data<dyn InternalUserLookup>,
 ) -> Result<HttpResponse, CreateCustomerPortalSessionError>
@@ -85,8 +87,14 @@ pub async fn stripe_create_customer_portal_session_redirect_handler(
 
     let mut params = CreateBillingPortalSession::new(stripe_customer_id);
 
-    params.return_url = Some("http://localhost/return"); // TODO: Proper redirect
-    params.configuration = Some("bpc_1LyPPREU5se17MekYiViZF12"); // TODO: Production portal configs
+    let return_url = match &stripe_config.portal.return_url {
+        FullUrlOrPath::FullUrl(url) => url.to_string(),
+        FullUrlOrPath::Path(path) => url_redirector.redirect_url_for_path(&http_request, path)
+            .map_err(|_| CreateCustomerPortalSessionError::ServerError)?,
+    };
+
+    params.return_url = Some(&return_url);
+    params.configuration = Some(&stripe_config.portal.portal_config_id);
 
     let response = BillingPortalSession::create(stripe_client.as_ref(), params)
         .await

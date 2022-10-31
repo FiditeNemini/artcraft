@@ -1,4 +1,4 @@
-use language_tags::{LanguageTag, ParseError};
+use language_tags::LanguageTag;
 use log::warn;
 
 /// Parse out accept languages

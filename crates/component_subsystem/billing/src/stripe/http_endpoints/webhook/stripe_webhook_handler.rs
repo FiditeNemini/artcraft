@@ -52,9 +52,7 @@ pub async fn stripe_webhook_handler(
         StripeWebhookError::BadRequest
       })?;
 
-  let secret_signing_key = stripe_config.secrets.secret_webhook_signing_key
-      .as_deref()
-      .ok_or(StripeWebhookError::ServerError)?;
+  let secret_signing_key = &stripe_config.secrets.secret_webhook_signing_key;
 
   let stripe_signature = get_request_header_optional(&http_request, "Stripe-Signature")
       .unwrap_or_default();

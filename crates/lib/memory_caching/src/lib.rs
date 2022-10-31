@@ -4,6 +4,7 @@
 
 // Okay to toggle
 //#![forbid(warnings)]
+#![forbid(unreachable_patterns)]
 #![forbid(unused_imports)]
 #![forbid(unused_mut)]
 #![forbid(unused_variables)]

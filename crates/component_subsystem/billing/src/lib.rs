@@ -7,6 +7,7 @@
 #![allow(unused_imports)]
 #![allow(unused_mut)]
 #![allow(unused_variables)]
+#![forbid(unreachable_patterns)]
 
 // Always allow
 #![allow(dead_code)]

@@ -10,6 +10,5 @@ pub fn get_request_header_optional(request: &HttpRequest, header_name: &str) -> 
     Some(Ok(header)) => Some(header.to_string()),
     Some(Err(_)) => None,
     None => None,
-    _ => None,
   }
 }

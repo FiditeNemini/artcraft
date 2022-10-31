@@ -31,6 +31,11 @@
 #
 #     ^ most fields can be blank, but the "Common Name" should be `*.jungle.horse`
 #
+#     sudo openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout /etc/ssl/private/devfakeyou.key -out /etc/ssl/certs/devfakeyou.crt
+#     sudo openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout /etc/ssl/private/devstoryteller.key -out /etc/ssl/certs/devstoryteller.crt
+#
+#     ^ most fields can be blank, but the "Common Name" should be `*.dev.fakeyou.com` and `*.dev.storyteller.io` respectively.
+#
 # For more: https://www.cloudsavvyit.com/1306/how-to-create-and-use-self-signed-ssl-on-nginx/
 #
 # To create self-signed certs on Mac,
@@ -51,63 +56,14 @@
 #
 #
 
-# API backend over plain HTTP
+# ========================================================
+#                      FAKEYOU
+# ========================================================
+
+# FakeYou javascript frontend over plain HTTP (launched by Yarn)
 server {
     listen 80;
-    server_name api.jungle.horse;
-    location / {
-        proxy_set_header Host $host;
-        proxy_pass http://127.0.0.1:12345;
-        proxy_redirect off;
-    }
-}
-
-# API backend over SSL
-server {
-    listen 443 ssl;
-    listen [::]:443 ssl;
-    ssl_certificate /etc/ssl/certs/localhost.crt;
-    ssl_certificate_key /etc/ssl/private/localhost.key;
-    ssl_protocols TLSv1.2 TLSv1.1 TLSv1;
-    server_name api.jungle.horse;
-    location / {
-        proxy_set_header Host $host;
-        proxy_pass http://127.0.0.1:12345;
-        proxy_redirect off;
-    }
-}
-
-# TODO(2022-02-13): This is new and untested
-# WebSocket API backend over plain HTTP
-server {
-    listen 80;
-    server_name ws.jungle.horse;
-    location / {
-        proxy_set_header Host $host;
-        proxy_pass http://127.0.0.1:54321;
-        proxy_redirect off;
-    }
-}
-
-# Websocket API backend over SSL
-server {
-    listen 443 ssl;
-    listen [::]:443 ssl;
-    ssl_certificate /etc/ssl/certs/localhost.crt;
-    ssl_certificate_key /etc/ssl/private/localhost.key;
-    ssl_protocols TLSv1.2 TLSv1.1 TLSv1;
-    server_name ws.jungle.horse;
-    location / {
-        proxy_set_header Host $host;
-        proxy_pass http://127.0.0.1:54321;
-        proxy_redirect off;
-    }
-}
-
-# Javascript frontend over plain HTTP
-server {
-    listen 80;
-    server_name jungle.horse;
+    server_name dev.fakeyou.com;
     location / {
         proxy_set_header Host $host;
         proxy_pass http://127.0.0.1:7000;
@@ -115,26 +71,25 @@ server {
     }
 }
 
-# TODO(2022-02-13): This is new and untested
-# Javascript frontend (OBS Layer) over plain HTTP
+# FakeYou API backend over plain HTTP (Rust app)
 server {
     listen 80;
-    server_name obs.jungle.horse;
+    server_name api.dev.fakeyou.com;
     location / {
         proxy_set_header Host $host;
-        proxy_pass http://127.0.0.1:7007;
+        proxy_pass http://127.0.0.1:12345;
         proxy_redirect off;
     }
 }
 
-# Javascript frontend over SSL
+# FakeYou javascript frontend over SSL (launched by Yarn)
 server {
     listen 443 ssl;
     listen [::]:443 ssl;
-    ssl_certificate /etc/ssl/certs/localhost.crt;
-    ssl_certificate_key /etc/ssl/private/localhost.key;
+    ssl_certificate /etc/ssl/certs/devfakeyou.crt;
+    ssl_certificate_key /etc/ssl/private/devfakeyou.key;
     ssl_protocols TLSv1.2 TLSv1.1 TLSv1;
-    server_name jungle.horse;
+    server_name dev.fakeyou.com;
     location / {
         proxy_set_header Host $host;
         proxy_pass http://127.0.0.1:7000;
@@ -142,17 +97,158 @@ server {
     }
 }
 
-# Javascript frontend over SSL (OBS Layer)
+# FakeYou API backend over SSL (Rust app)
 server {
     listen 443 ssl;
     listen [::]:443 ssl;
-    ssl_certificate /etc/ssl/certs/localhost.crt;
-    ssl_certificate_key /etc/ssl/private/localhost.key;
+    ssl_certificate /etc/ssl/certs/devfakeyou.crt;
+    ssl_certificate_key /etc/ssl/private/devfakeyou.key;
     ssl_protocols TLSv1.2 TLSv1.1 TLSv1;
-    server_name obs.jungle.horse;
+    server_name api.dev.fakeyou.com;
     location / {
         proxy_set_header Host $host;
-        proxy_pass http://127.0.0.1:7007;
+        proxy_pass http://127.0.0.1:12345;
         proxy_redirect off;
     }
 }
+
+# ========================================================
+#                      STORYTELLER
+# ========================================================
+
+# Storyteller javascript frontend over plain HTTP (launched by Yarn)
+server {
+    listen 80;
+    server_name dev.storyteller.io;
+    location / {
+        proxy_set_header Host $host;
+        proxy_pass http://127.0.0.1:7000;
+        proxy_redirect off;
+    }
+}
+
+# Storyteller API backend over plain HTTP
+server {
+    listen 80;
+    server_name api.dev.storyteller.io;
+    location / {
+        proxy_set_header Host $host;
+        proxy_pass http://127.0.0.1:12345;
+        proxy_redirect off;
+    }
+}
+
+# Storyteller javascript frontend over SSL (launched by Yarn)
+server {
+    listen 443 ssl;
+    listen [::]:443 ssl;
+    ssl_certificate /etc/ssl/certs/devstoryteller.crt;
+    ssl_certificate_key /etc/ssl/private/devstoryteller.key;
+    ssl_protocols TLSv1.2 TLSv1.1 TLSv1;
+    server_name dev.storyteller.io;
+    location / {
+        proxy_set_header Host $host;
+        proxy_pass http://127.0.0.1:7000;
+        proxy_redirect off;
+    }
+}
+
+# Storyteller API backend over SSL
+server {
+    listen 443 ssl;
+    listen [::]:443 ssl;
+    ssl_certificate /etc/ssl/certs/devstoryteller.crt;
+    ssl_certificate_key /etc/ssl/private/devstoryteller.key;
+    ssl_protocols TLSv1.2 TLSv1.1 TLSv1;
+    server_name api.dev.storyteller.io;
+    location / {
+        proxy_set_header Host $host;
+        proxy_pass http://127.0.0.1:12345;
+        proxy_redirect off;
+    }
+}
+
+# ========================================================
+#            OLD PRODUCTS THAT NEED UPDATING
+# ========================================================
+
+#     ## TODO(2022-02-13): This is new and untested
+#     # WebSocket API backend over plain HTTP
+#     server {
+#         listen 80;
+#         server_name ws.jungle.horse;
+#         location / {
+#             proxy_set_header Host $host;
+#             proxy_pass http://127.0.0.1:54321;
+#             proxy_redirect off;
+#         }
+#     }
+#
+#     # Websocket API backend over SSL
+#     server {
+#         listen 443 ssl;
+#         listen [::]:443 ssl;
+#         ssl_certificate /etc/ssl/certs/localhost.crt;
+#         ssl_certificate_key /etc/ssl/private/localhost.key;
+#         ssl_protocols TLSv1.2 TLSv1.1 TLSv1;
+#         server_name ws.jungle.horse;
+#         location / {
+#             proxy_set_header Host $host;
+#             proxy_pass http://127.0.0.1:54321;
+#             proxy_redirect off;
+#         }
+#     }
+#
+#     # Javascript frontend over plain HTTP
+#     server {
+#         listen 80;
+#         server_name jungle.horse;
+#         location / {
+#             proxy_set_header Host $host;
+#             proxy_pass http://127.0.0.1:7000;
+#             proxy_redirect off;
+#         }
+#     }
+#
+#     # TODO(2022-02-13): This is new and untested
+#     # Javascript frontend (OBS Layer) over plain HTTP
+#     server {
+#         listen 80;
+#         server_name obs.jungle.horse;
+#         location / {
+#             proxy_set_header Host $host;
+#             proxy_pass http://127.0.0.1:7007;
+#             proxy_redirect off;
+#         }
+#     }
+#
+#     # Javascript frontend over SSL
+#     server {
+#         listen 443 ssl;
+#         listen [::]:443 ssl;
+#         ssl_certificate /etc/ssl/certs/localhost.crt;
+#         ssl_certificate_key /etc/ssl/private/localhost.key;
+#         ssl_protocols TLSv1.2 TLSv1.1 TLSv1;
+#         server_name jungle.horse;
+#         location / {
+#             proxy_set_header Host $host;
+#             proxy_pass http://127.0.0.1:7000;
+#             proxy_redirect off;
+#         }
+#     }
+#
+#     # Javascript frontend over SSL (OBS Layer)
+#     server {
+#         listen 443 ssl;
+#         listen [::]:443 ssl;
+#         ssl_certificate /etc/ssl/certs/localhost.crt;
+#         ssl_certificate_key /etc/ssl/private/localhost.key;
+#         ssl_protocols TLSv1.2 TLSv1.1 TLSv1;
+#         server_name obs.jungle.horse;
+#         location / {
+#             proxy_set_header Host $host;
+#             proxy_pass http://127.0.0.1:7007;
+#             proxy_redirect off;
+#         }
+#     }
+#

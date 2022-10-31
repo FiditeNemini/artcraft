@@ -1,7 +1,7 @@
 use actix_web::HttpRequest;
 use actix_web::dev::ServiceRequest;
-use log::{debug, info};
 use actix_web::http::{HeaderMap, HeaderName};
+use log::debug;
 use std::str::FromStr;
 
 pub fn get_request_ip(request: &HttpRequest) -> String {

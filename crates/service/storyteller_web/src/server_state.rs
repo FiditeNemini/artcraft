@@ -1,3 +1,4 @@
+use billing_component::stripe::stripe_config::StripeConfig;
 use crate::StaticApiTokenSet;
 use crate::http_server::endpoints::categories::list_tts_categories::DisplayCategory;
 use crate::http_server::endpoints::tts::list_tts_models::TtsModelRecordForResponse;
@@ -5,7 +6,6 @@ use crate::http_server::web_utils::redis_rate_limiter::RedisRateLimiter;
 use crate::threads::db_health_checker_thread::db_health_check_status::HealthCheckStatus;
 use crate::threads::ip_banlist_set::IpBanlistSet;
 use crate::util::encrypted_sort_id::SortKeyCrypto;
-use billing_component::stripe::stripe_config::StripeConfig;
 use database_queries::mediators::badge_granter::BadgeGranter;
 use database_queries::mediators::firehose_publisher::FirehosePublisher;
 use database_queries::queries::tts::tts_inference_jobs::get_pending_tts_inference_job_count::TtsQueueLengthResult;
@@ -14,6 +14,7 @@ use memory_caching::single_item_ttl_cache::SingleItemTtlCache;
 use r2d2_redis::{r2d2, RedisConnectionManager};
 use sqlx::MySqlPool;
 use storage_buckets_common::bucket_client::BucketClient;
+use url_config::third_party_url_redirector::ThirdPartyUrlRedirector;
 use users_component::utils::session_checker::SessionChecker;
 use users_component::utils::session_cookie_manager::SessionCookieManager;
 
@@ -25,6 +26,8 @@ pub struct ServerState {
   pub stripe: StripeSettings,
 
   pub hostname: String,
+
+  pub third_party_url_redirector: ThirdPartyUrlRedirector,
 
   pub health_check_status: HealthCheckStatus,
 
