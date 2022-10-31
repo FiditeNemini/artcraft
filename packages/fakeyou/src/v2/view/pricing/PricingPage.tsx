@@ -61,71 +61,139 @@ function PricingPage(props: Props) {
     <div>
       <div className="container py-5 text-center">
         <h1 className="display-5 fw-bold">Pricing</h1>
+        <p className="fs-5">
+          Some kind of description here, idk haven't thought of it.
+        </p>
       </div>
       <div className="container mt-3">
         <div className="row gx-3 gy-4">
-          <div className="col-12 col-lg-3">
+          <div className="col-12 col-sm-6 col-lg-3">
             <div className="rounded panel p-4 h-100">
-              <h2 className="text-center my-2 fw-bold mb-4">Free</h2>
-              <Link to="/" className="btn btn-secondary w-100 fs-5">
-                Use free
+              <h2 className="text-center my-2 fw-bold mb-4">Starter</h2>
+              <Link to="/" className="btn btn-secondary w-100 fs-6">
+                Use for free
               </Link>
               <h2 className="display-5 fw-bold text-center my-5">
                 ${current_list.free.price}
                 <span className="fs-5 opacity-75 fw-normal"> /month</span>
               </h2>
-              <ul className="pricing-list d-flex flex-column gap-3">
+              <ul className="pricing-list d-flex flex-column gap-2">
+                <li className="fw-semibold">TTS</li>
                 <li>
                   <FontAwesomeIcon icon={faCheck} className="text-red me-3" />
-                  Unlimited TTS Generation
+                  Unlimited generation
                 </li>
                 <li>
                   <FontAwesomeIcon icon={faCheck} className="text-red me-3" />
-                  Up to 10 seconds audio
+                  Up to 12 seconds audio
+                </li>
+                <li className="fw-semibold">VC Web</li>
+                <li>
+                  <FontAwesomeIcon icon={faCheck} className="text-red me-3" />
+                  Up to 12 seconds audio
+                </li>
+                <li className="fw-semibold">
+                  VC App <span className="small-text">(registered users)</span>
+                </li>
+                <li>
+                  <FontAwesomeIcon icon={faCheck} className="text-red me-3" />5
+                  model downloads
+                </li>
+                <li>
+                  <FontAwesomeIcon icon={faCheck} className="text-red me-3" />
+                  Up to 12 secs prerecorded
+                </li>
+                <li>
+                  <FontAwesomeIcon icon={faCheck} className="text-red me-3" />
+                  Up to 2 mins realtime
+                </li>
+                <li className="fw-semibold">Wav2Lip</li>
+                <li>
+                  <FontAwesomeIcon icon={faCheck} className="text-red me-3" />
+                  Up to 12 seconds video
+                </li>
+                <li className="fw-semibold">Processing Priority</li>
+                <li>
+                  <FontAwesomeIcon icon={faCheck} className="me-3" />
+                  Level 0
+                </li>
+                <li>
+                  <FontAwesomeIcon icon={faCheck} className="text-red me-3" />
+                  Level 1 <span className="small-text">(registered users)</span>
                 </li>
               </ul>
             </div>
           </div>
-          <div className="col-12 col-lg-3">
+          <div className="col-12 col-sm-6 col-lg-3">
             <div className="rounded panel p-4 panel-border h-100">
               <h2 className="text-center my-2 fw-bold mb-4">Plus</h2>
-              <Link to="/" className="btn btn-primary w-100 fs-5">
+              <Link to="/" className="btn btn-primary w-100 fs-6">
                 Buy Plus
               </Link>
               <h2 className="display-5 fw-bold text-center my-5">
                 ${current_list.plus.price}
                 <span className="fs-5 opacity-75 fw-normal"> /month</span>
               </h2>
-              <ul className="pricing-list d-flex flex-column gap-3">
+              <ul className="pricing-list d-flex flex-column gap-2">
+                <li className="fw-semibold">TTS</li>
                 <li>
                   <FontAwesomeIcon icon={faCheck} className="text-red me-3" />
-                  Unlimited TTS Generation
+                  Unlimited generation
                 </li>
+                <li>
+                  <FontAwesomeIcon icon={faCheck} className="text-red me-3" />
+                  Up to 30 seconds audio
+                </li>
+                <li className="fw-semibold">VC Web</li>
                 <li>
                   <FontAwesomeIcon icon={faCheck} className="text-red me-3" />
                   Up to 30 seconds audio
                 </li>
                 <li>
                   <FontAwesomeIcon icon={faCheck} className="text-red me-3" />
-                  Priority processing
+                  Push to play
+                </li>
+                <li className="fw-semibold">VC App</li>
+                <li>
+                  <FontAwesomeIcon icon={faCheck} className="text-red me-3" />
+                  10 model downloads
+                </li>
+                <li>
+                  <FontAwesomeIcon icon={faCheck} className="text-red me-3" />
+                  Up to 30 secs prerecorded
+                </li>
+                <li>
+                  <FontAwesomeIcon icon={faCheck} className="text-red me-3" />
+                  Up to 7 mins realtime
+                </li>
+                <li className="fw-semibold">Wav2Lip</li>
+                <li>
+                  <FontAwesomeIcon icon={faCheck} className="text-red me-3" />
+                  Up to 1 minute video
+                </li>
+                <li className="fw-semibold">Processing Priority</li>
+                <li>
+                  <FontAwesomeIcon icon={faCheck} className="text-red me-3" />
+                  Level 20
                 </li>
               </ul>
             </div>
           </div>
-          <div className="col-12 col-lg-3">
+          <div className="col-12 col-sm-6 col-lg-3">
             <div className="rounded panel p-4 h-100">
               <h2 className="text-center my-2 fw-bold mb-4">Pro</h2>
-              <Link to="/" className="btn btn-primary w-100 fs-5">
+              <Link to="/" className="btn btn-primary w-100 fs-6">
                 Buy Pro
               </Link>
               <h2 className="display-5 fw-bold text-center my-5">
                 ${current_list.pro.price}
                 <span className="fs-5 opacity-75 fw-normal"> /month</span>
               </h2>
-              <ul className="pricing-list d-flex flex-column gap-3">
+              <ul className="pricing-list d-flex flex-column gap-2">
+                <li className="fw-semibold">TTS</li>
                 <li>
                   <FontAwesomeIcon icon={faCheck} className="text-red me-3" />
-                  Unlimited TTS Generation
+                  Unlimited generation
                 </li>
                 <li>
                   <FontAwesomeIcon icon={faCheck} className="text-red me-3" />
@@ -133,49 +201,137 @@ function PricingPage(props: Props) {
                 </li>
                 <li>
                   <FontAwesomeIcon icon={faCheck} className="text-red me-3" />
-                  Priority processing
+                  Generate MP3 file
                 </li>
                 <li>
                   <FontAwesomeIcon icon={faCheck} className="text-red me-3" />
-                  Generate mp3 file
+                  Upload private models
+                </li>
+                <li className="fw-semibold">VC Web</li>
+                <li>
+                  <FontAwesomeIcon icon={faCheck} className="text-red me-3" />
+                  Up to 2 minutes audio
                 </li>
                 <li>
                   <FontAwesomeIcon icon={faCheck} className="text-red me-3" />
-                  For Commercial Use
+                  Push to play
+                </li>
+                <li>
+                  <FontAwesomeIcon icon={faCheck} className="text-red me-3" />
+                  Generate MP3 file
+                </li>
+                <li className="fw-semibold">VC App</li>
+                <li>
+                  <FontAwesomeIcon icon={faCheck} className="text-red me-3" />
+                  20 model downloads
+                </li>
+                <li>
+                  <FontAwesomeIcon icon={faCheck} className="text-red me-3" />
+                  Up to 5 mins prerecorded
+                </li>
+                <li>
+                  <FontAwesomeIcon icon={faCheck} className="text-red me-3" />
+                  Up to 15 mins realtime
+                </li>
+                <li className="fw-semibold">Wav2Lip</li>
+                <li>
+                  <FontAwesomeIcon icon={faCheck} className="text-red me-3" />
+                  Up to 2 minutes video
+                </li>
+                <li className="fw-semibold">Processing Priority</li>
+                <li>
+                  <FontAwesomeIcon icon={faCheck} className="text-red me-3" />
+                  Level 30
+                </li>
+                <li className="fw-semibold">API Access</li>
+                <li>
+                  <FontAwesomeIcon icon={faCheck} className="text-red me-3" />
+                  Full API access
                 </li>
               </ul>
             </div>
           </div>
-          <div className="col-12 col-lg-3">
+          <div className="col-12 col-sm-6 col-lg-3">
             <div className="rounded panel p-4 h-100">
               <h2 className="text-center my-2 fw-bold mb-4">Elite</h2>
-              <Link to="/" className="btn btn-primary w-100 fs-5">
+              <Link to="/" className="btn btn-primary w-100 fs-6">
                 Buy Elite
               </Link>
               <h2 className="display-5 fw-bold text-center my-5">
                 ${current_list.elite.price}
                 <span className="fs-5 opacity-75 fw-normal"> /month</span>
               </h2>
-              <ul className="pricing-list d-flex flex-column gap-3">
+              <ul className="pricing-list d-flex flex-column gap-2">
+                <li className="fw-semibold">TTS</li>
                 <li>
                   <FontAwesomeIcon icon={faCheck} className="text-red me-3" />
-                  Unlimited TTS Generation
+                  Unlimited generation
                 </li>
                 <li>
                   <FontAwesomeIcon icon={faCheck} className="text-red me-3" />
-                  Up to 1 minute audio
+                  Up to 5 minutes audio
                 </li>
                 <li>
                   <FontAwesomeIcon icon={faCheck} className="text-red me-3" />
-                  Priority processing
+                  Generate MP3 file
                 </li>
                 <li>
                   <FontAwesomeIcon icon={faCheck} className="text-red me-3" />
-                  Generate mp3 file
+                  Upload private models
                 </li>
                 <li>
                   <FontAwesomeIcon icon={faCheck} className="text-red me-3" />
-                  For Commercial Use
+                  Share private models
+                </li>
+                <li className="fw-semibold">VC Web</li>
+                <li>
+                  <FontAwesomeIcon icon={faCheck} className="text-red me-3" />
+                  Up to 7 minutes audio
+                </li>
+                <li>
+                  <FontAwesomeIcon icon={faCheck} className="text-red me-3" />
+                  Push to play
+                </li>
+                <li>
+                  <FontAwesomeIcon icon={faCheck} className="text-red me-3" />
+                  Generate MP3 file
+                </li>
+                <li className="fw-semibold">VC App</li>
+                <li>
+                  <FontAwesomeIcon icon={faCheck} className="text-red me-3" />
+                  Unlimited models
+                </li>
+                <li>
+                  <FontAwesomeIcon icon={faCheck} className="text-red me-3" />
+                  Unlimited prerecorded
+                </li>
+                <li>
+                  <FontAwesomeIcon icon={faCheck} className="text-red me-3" />
+                  Unlimited realtime
+                </li>
+                <li className="fw-semibold">Wav2Lip</li>
+                <li>
+                  <FontAwesomeIcon icon={faCheck} className="text-red me-3" />
+                  Up to 5 minutes video
+                </li>
+                <li>
+                  <FontAwesomeIcon icon={faCheck} className="text-red me-3" />
+                  Turn off watermark
+                </li>
+                <li className="fw-semibold">Processing Priority</li>
+                <li>
+                  <FontAwesomeIcon icon={faCheck} className="text-red me-3" />
+                  Level 40
+                </li>
+                <li className="fw-semibold">API Access</li>
+                <li>
+                  <FontAwesomeIcon icon={faCheck} className="text-red me-3" />
+                  Full API access
+                </li>
+                <li className="fw-semibold">Commercial Voices</li>
+                <li>
+                  <FontAwesomeIcon icon={faCheck} className="text-red me-3" />
+                  Usable commercial voices
                 </li>
               </ul>
             </div>
