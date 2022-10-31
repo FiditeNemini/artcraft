@@ -56,6 +56,7 @@ import { Language } from "@storyteller/components/src/i18n/Language";
 import { VoiceCloneRequestPage } from "./clone_voice_requests/VoiceCloneRequestPage";
 import { VocodesPage } from "./vocodes/VocodesPage";
 import { UploadVocoderPage } from "./upload/UploadVocoderPage";
+import { PricingPage } from "./pricing/PricingPage";
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -174,14 +175,12 @@ class NewVocodesContainer extends React.Component<Props, State> {
               />
             </Route>
 
-            {/*
             <Route path="/pricing">
               <PricingPage
-                querySessionCallback={() => { }}
+                querySessionCallback={() => {}}
                 sessionWrapper={this.props.sessionWrapper}
               />
             </Route>
-            */}
 
             <Route path="/tts/result/:token/edit">
               <TtsResultEditPage sessionWrapper={this.props.sessionWrapper} />
