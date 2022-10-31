@@ -396,6 +396,17 @@ styles with important tags:
   ul.pricing-list {
     list-style: none;
     padding: 0;
+
+    li {
+      font-size: 14px;
+    }
+
+    .small-text {
+      font-size: 12px;
+      font-weight: 400;
+      opacity: 0.8;
+      color: lighten($primary, 10%);
+    }
   }
 
   ul li {
