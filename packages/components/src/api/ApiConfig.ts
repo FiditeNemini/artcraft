@@ -21,6 +21,8 @@ enum Domain {
   FakeYou,
   Storyteller,
   StorytellerStream,
+  DevFakeYou, // dev.fakeyou.com
+  DevStoryteller, // dev.storyteller.io
   Unknown,
 }
 
@@ -32,41 +34,60 @@ class ApiConfig {
   constructor() {
     let useSsl = true;
     let domain = Domain.Unknown;
-
-    if (document.location.host.includes("localhost")) {
-      // NB: `localhost` seems to have problems with cookies.
-      // I've added jungle.horse as a localhost mapped domain in /etc/hosts,
-      // This should be the preferred mechanism for local testing.
-      domain = Domain.Localhost;
-      useSsl = false;
-    } else if (document.location.host.includes("jungle.horse")) {
-      // NB: Local dev.
-      domain = Domain.JungleHorse;
-      useSsl = document.location.protocol === "https:";
-    } else if (document.location.host.includes("vo.codes")) {
-      domain = Domain.Vocodes;
-    } else if (document.location.host.includes("fakeyou.com")) {
-      domain = Domain.FakeYou;
-    } else if (document.location.host.includes("storyteller.io")) {
-      domain = Domain.Storyteller;
-    } else if (document.location.host.includes("storyteller.stream")) {
-      domain = Domain.StorytellerStream;
-    }
-
     let v2ApiHost = "api.fakeyou.com";
-    if (domain === Domain.Storyteller) {
-      v2ApiHost = "api.storyteller.io";
-    } else if (domain === Domain.StorytellerStream) {
-      v2ApiHost = "api.storyteller.stream";
-    } else if (
-      !useSsl &&
-      (domain === Domain.Localhost || domain === Domain.JungleHorse)
-    ) {
-      // NB: Lack of SSL means use local development.
-      v2ApiHost = "api.jungle.horse";
-    } else if (domain === Domain.JungleHorse) {
-      // TODO: Clean up these branches
-      v2ApiHost = "api.jungle.horse";
+
+    switch (document.location.host) {
+      case 'fakeyou.com':
+        domain = Domain.FakeYou;
+        v2ApiHost = "api.fakeyou.com";
+        break;
+      case 'storyteller.io':
+        domain = Domain.Storyteller;
+        v2ApiHost = "api.storyteller.io";
+        break;
+      case 'dev.fakeyou.com':
+        domain = Domain.DevFakeYou;
+        v2ApiHost = "api.dev.fakeyou.com";
+        break;
+      case 'dev.storyteller.io':
+        domain = Domain.DevStoryteller;
+        v2ApiHost = "api.dev.storyteller.io";
+        break;
+      default: 
+        if (document.location.host.includes("localhost")) {
+          // NB: `localhost` seems to have problems with cookies.
+          // I've added jungle.horse as a localhost mapped domain in /etc/hosts,
+          // This should be the preferred mechanism for local testing.
+          domain = Domain.Localhost;
+          useSsl = false;
+        } else if (document.location.host.includes("jungle.horse")) {
+          // NB: Local dev.
+          domain = Domain.JungleHorse;
+          useSsl = document.location.protocol === "https:";
+        } else if (document.location.host.includes("vo.codes")) {
+          domain = Domain.Vocodes;
+        } else if (document.location.host.includes("fakeyou.com")) {
+          domain = Domain.FakeYou;
+        } else if (document.location.host.includes("storyteller.io")) {
+          domain = Domain.Storyteller;
+        } else if (document.location.host.includes("storyteller.stream")) {
+          domain = Domain.StorytellerStream;
+        }
+
+        if (domain === Domain.Storyteller) {
+          v2ApiHost = "api.storyteller.io";
+        } else if (domain === Domain.StorytellerStream) {
+          v2ApiHost = "api.storyteller.stream";
+        } else if (
+          !useSsl &&
+          (domain === Domain.Localhost || domain === Domain.JungleHorse)
+        ) {
+          // NB: Lack of SSL means use local development.
+          v2ApiHost = "api.jungle.horse";
+        } else if (domain === Domain.JungleHorse) {
+          // TODO: Clean up these branches
+          v2ApiHost = "api.jungle.horse";
+        }
     }
 
     this.domain = domain;
