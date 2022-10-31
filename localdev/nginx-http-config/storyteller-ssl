@@ -23,6 +23,10 @@
 #           SSL Instructions
 #           ================
 #
+# You can launch Chrome in a way it disregards self-signed certs and CORS:
+#
+#     chromium  --disable-web-security --ignore-certificate-errors --user-data-dir=~/chromeTemp
+#
 # To create self-signed certs on Ubuntu Linux,
 #
 #     sudo apt-get install openssl
