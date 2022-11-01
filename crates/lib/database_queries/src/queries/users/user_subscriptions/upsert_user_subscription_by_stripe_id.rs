@@ -8,7 +8,7 @@ use sqlx::MySqlPool;
 
 // TODO: Make a trait with default impls to handle common query concerns.
 
-pub struct UpsertSubscriptionByStripeId <'a> {
+pub struct UpsertUserSubscription<'a> {
   /// Stripe's assigned ID for the subscription
   /// This acts as an externally-provided unique key for records in this table.
   pub stripe_subscription_id: &'a str,
@@ -49,7 +49,7 @@ pub struct UpsertSubscriptionByStripeId <'a> {
   pub maybe_canceled_at: Option<NaiveDateTime>,
 }
 
-impl <'a> UpsertSubscriptionByStripeId <'a> {
+impl <'a> UpsertUserSubscription<'a> {
 
   pub async fn upsert(&'a self, mysql_pool: &MySqlPool) -> AnyhowResult<()> {
     let token = Tokens::new_subscription_token()?;

@@ -4,8 +4,8 @@ use crate::tokens::Tokens;
 use log::{info, warn};
 use sqlx::MySqlPool;
 
-pub async fn create_session_for_user(user_token: &str, ip_address: &str, mysql_pool: &MySqlPool)
-  -> AnyhowResult<String>
+pub async fn create_user_session(user_token: &str, ip_address: &str, mysql_pool: &MySqlPool)
+    -> AnyhowResult<String>
 {
   let session_token = Tokens::new_session()?;
 

@@ -26,7 +26,7 @@ pub struct UserSubscription {
   pub subscription_expires_at: DateTime<Utc>,
 }
 
-pub async fn get_subscription_by_stripe_id(
+pub async fn get_user_subscription_by_stripe_subscription_id(
   stripe_subscription_id: &str,
   mysql_pool: &MySqlPool
 ) -> AnyhowResult<Option<UserSubscription>> {

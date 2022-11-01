@@ -65,7 +65,7 @@ pub struct SessionUserRecord {
   pub can_delete_users: bool,
 }
 
-pub async fn get_session_by_token(
+pub async fn get_user_session_by_token(
   mysql_connection: &mut PoolConnection<MySql>,
   session_token: &str,
 ) -> AnyhowResult<Option<SessionUserRecord>> {

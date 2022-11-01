@@ -16,11 +16,14 @@ CREATE TABLE user_subscriptions (
   -- We want the latitude to correct mistakes in the future. (Hopefully this doesn't bite me later.)
   maybe_user_token VARCHAR(32) DEFAULT NULL,
 
-  -- If we host multiple sites with distinct categories, this will enable us to segregate subscriptions.
+  -- If we host multiple sites with distinct categories, this will enable us to segregate
+  -- subscriptions. This is effectively a subscriptions namespace.
+  -- TODO: Rename 'namespace'
   subscription_category VARCHAR(32) NOT NULL,
 
   -- This is the identifier for the actual type of subscription.
   -- These will not be defined in the database, but rather the source code.
+  -- TODO: Rename 'slug'
   subscription_product_key VARCHAR(32) NOT NULL,
 
   -- ========== STRIPE DATA ==========

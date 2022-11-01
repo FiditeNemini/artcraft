@@ -9,7 +9,7 @@ use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::http_server::web_utils::response_success_helpers::simple_json_success;
 use crate::http_server::web_utils::serialize_as_json_error::serialize_as_json_error;
 use crate::server_state::ServerState;
-use database_queries::queries::users::list_users_query_builder::{UserForList, ListUsersQueryBuilder};
+use database_queries::queries::users::user::list_users_query_builder::{UserForList, ListUsersQueryBuilder};
 use log::{info, warn, log};
 use regex::Regex;
 use sqlx::error::DatabaseError;

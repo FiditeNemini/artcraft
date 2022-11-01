@@ -12,7 +12,7 @@ pub struct SessionRecord {
   pub session_token: String,
   pub user_token: String,
 }
-pub async fn get_session_by_token_light(
+pub async fn get_user_session_by_token_light(
   mysql_connection: &mut PoolConnection<MySql>,
   session_token: &str,
 ) -> AnyhowResult<Option<SessionRecord>> {
