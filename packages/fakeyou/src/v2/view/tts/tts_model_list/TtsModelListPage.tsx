@@ -111,9 +111,9 @@ function TtsModelListPage(props: Props) {
 
   const randomImage = useMemo(() => {
     const images = [
-      "mascot/halloween_1.webp",
-      "mascot/halloween_2.webp",
-      "mascot/halloween_3.webp",
+      // "mascot/halloween_1.webp",
+      // "mascot/halloween_2.webp",
+      // "mascot/halloween_3.webp",
       "mascot/kitsune_pose2.webp",
     ];
 
