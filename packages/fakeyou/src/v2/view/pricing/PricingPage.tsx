@@ -331,7 +331,7 @@ function PricingPage(props: Props) {
                 <li className="fw-semibold">Commercial Voices</li>
                 <li>
                   <FontAwesomeIcon icon={faCheck} className="text-red me-3" />
-                  Usable commercial voices
+                  FakeYou commercial voices
                 </li>
               </ul>
             </div>
