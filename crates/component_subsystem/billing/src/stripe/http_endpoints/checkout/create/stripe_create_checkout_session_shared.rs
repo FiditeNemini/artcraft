@@ -231,6 +231,7 @@ mod tests {
           username: Some("vegito".to_string()),
           user_email: Some("vegito@fakeyou.com".to_string()),
           maybe_existing_stripe_customer_id: None,
+          existing_subscription_keys: vec![],
         })));
 
     let result = stripe_create_checkout_session_shared(

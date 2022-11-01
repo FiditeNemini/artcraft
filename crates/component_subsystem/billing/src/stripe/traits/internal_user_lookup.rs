@@ -53,6 +53,7 @@ pub struct UserMetadata {
     pub existing_subscription_keys: Vec<SubscriptionKey>,
 }
 
+#[derive(Clone, Default)]
 pub struct SubscriptionKey {
     /// The category or namespace for the product, eg "fakeyou" or "powerstream".
     /// TODO: Rename "namespace"

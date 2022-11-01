@@ -8,9 +8,9 @@ use actix_web::http::StatusCode;
 use actix_web::{web, HttpResponse, HttpRequest};
 use crate::utils::session_cookie_manager::SessionCookieManager;
 use database_queries::helpers::boolean_converters::i8_to_bool;
-use database_queries::queries::users::user_sessions::create_session::create_session_for_user;
-use database_queries::queries::users::user_sessions::lookup_user_for_login_by_email::lookup_user_for_login_by_email;
-use database_queries::queries::users::user_sessions::lookup_user_for_login_by_username::lookup_user_for_login_by_username;
+use database_queries::queries::users::user_sessions::create_user_session::create_user_session;
+use database_queries::queries::users::user::lookup_user_for_login_by_email::lookup_user_for_login_by_email;
+use database_queries::queries::users::user::lookup_user_for_login_by_username::lookup_user_for_login_by_username;
 use http_server_common::request::get_request_ip::get_request_ip;
 use http_server_common::response::serialize_as_json_error::serialize_as_json_error;
 use log::{info, warn};
@@ -137,7 +137,7 @@ pub async fn login_handler(
   let ip_address = get_request_ip(&http_request);
 
   let create_session_result =
-    create_session_for_user(&user.token, &ip_address, &mysql_pool).await;
+    create_user_session(&user.token, &ip_address, &mysql_pool).await;
 
   let session_token = match create_session_result {
     Ok(token) => token,
@@ -149,7 +149,7 @@ pub async fn login_handler(
 
   info!("login session created");
 
-  let session_cookie = match session_cookie_manager.create_cookie(&session_token) {
+  let session_cookie = match session_cookie_manager.create_cookie(&session_token, &user.token) {
     Ok(cookie) => cookie,
     Err(_) => return Err(LoginErrorResponse::server_error()),
   };

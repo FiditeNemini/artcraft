@@ -1,5 +1,5 @@
 use container_common::anyhow_result::AnyhowResult;
-use crate::queries::users::user_sessions::lookup_user_for_login_result::UserRecordForLogin;
+use crate::queries::users::user::lookup_user_for_login_result::UserRecordForLogin;
 use sqlx::MySqlPool;
 
 pub async fn lookup_user_for_login_by_email(email: &str, pool: &MySqlPool) -> AnyhowResult<UserRecordForLogin> {

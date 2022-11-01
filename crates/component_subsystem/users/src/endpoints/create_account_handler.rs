@@ -12,8 +12,8 @@ use crate::validations::is_reserved_username::is_reserved_username;
 use crate::validations::validate_passwords::validate_passwords;
 use crate::validations::validate_username::validate_username;
 use database_queries::mediators::firehose_publisher::FirehosePublisher;
-use database_queries::queries::users::create_account::{create_account, CreateAccountArgs, CreateAccountError};
-use database_queries::queries::users::user_sessions::create_session::create_session_for_user;
+use database_queries::queries::users::user::create_account::{create_account, CreateAccountArgs, CreateAccountError};
+use database_queries::queries::users::user_sessions::create_user_session::create_user_session;
 use database_queries::tokens::Tokens;
 use http_server_common::request::get_request_ip::get_request_ip;
 use http_server_common::response::serialize_as_json_error::serialize_as_json_error;
@@ -196,7 +196,7 @@ pub async fn create_account_handler(
 
   info!("new user id: {}", new_user_data.user_id);
 
-  let create_session_result = create_session_for_user(
+  let create_session_result = create_user_session(
     &new_user_data.user_token,
     &ip_address,
     &mysql_pool
@@ -219,7 +219,7 @@ pub async fn create_account_handler(
       CreateAccountErrorResponse::server_error()
     })?;
 
-  let session_cookie = match session_cookie_manager.create_cookie(&session_token) {
+  let session_cookie = match session_cookie_manager.create_cookie(&session_token, &user_token) {
     Ok(cookie) => cookie,
     Err(_) => return Err(CreateAccountErrorResponse::server_error()),
   };

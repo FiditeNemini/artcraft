@@ -81,7 +81,7 @@ pub async fn infer_w2l_handler(
 
   let maybe_session = server_state
     .session_checker
-    .maybe_get_session(&http_request, &server_state.mysql_pool)
+    .maybe_get_session_light(&http_request, &server_state.mysql_pool)
     .await
     .map_err(|e| {
       warn!("Session checker error: {:?}", e);

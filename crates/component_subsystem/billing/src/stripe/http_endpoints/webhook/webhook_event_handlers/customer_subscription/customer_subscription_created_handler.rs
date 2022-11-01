@@ -4,12 +4,12 @@ use crate::stripe::http_endpoints::webhook::webhook_event_handlers::customer_sub
 use crate::stripe::http_endpoints::webhook::webhook_event_handlers::stripe_webhook_error::StripeWebhookError;
 use crate::stripe::http_endpoints::webhook::webhook_event_handlers::stripe_webhook_summary::StripeWebhookSummary;
 use crate::stripe::traits::internal_subscription_product_lookup::InternalSubscriptionProductLookup;
-use database_queries::queries::billing::subscriptions::get_subscription_by_stripe_id::get_subscription_by_stripe_id;
-use database_queries::queries::billing::subscriptions::upsert_subscription_by_stripe_id::UpsertSubscriptionByStripeId;
+use database_queries::queries::users::user::update_user_record_with_new_stripe_customer_id::update_user_record_with_new_stripe_customer_id;
+use database_queries::queries::users::user_subscriptions::get_user_subscription_by_stripe_subscription_id::get_user_subscription_by_stripe_subscription_id;
+use database_queries::queries::users::user_subscriptions::upsert_user_subscription_by_stripe_id::UpsertUserSubscription;
 use log::{error, warn};
 use sqlx::MySqlPool;
 use stripe::Subscription;
-use database_queries::queries::billing::subscriptions::update_user_record_with_new_stripe_customer_id::update_user_record_with_new_stripe_customer_id;
 
 /// Handle event type: 'customer.subscription.created'
 /// Sent when the subscription is created. The subscription status may be incomplete if customer
@@ -37,7 +37,7 @@ pub async fn customer_subscription_created_handler(
 
   // NB: It's possible to receive events out of order.
   // We won't want to play a `create` event on top.
-  let maybe_existing_subscription = get_subscription_by_stripe_id(&summary.stripe_subscription_id, &mysql_pool)
+  let maybe_existing_subscription = get_user_subscription_by_stripe_subscription_id(&summary.stripe_subscription_id, &mysql_pool)
       .await
       .map_err(|err| {
         error!("Mysql error: {:?}", err);
@@ -66,7 +66,7 @@ pub async fn customer_subscription_created_handler(
 
   // TODO: record cancel_at (future_cancel_at), canceled_at, ended_at (if subscription ended, when it ended), start_date
 
-  let upsert = UpsertSubscriptionByStripeId {
+  let upsert = UpsertUserSubscription {
     stripe_subscription_id: &summary.stripe_subscription_id,
     maybe_user_token: summary.user_token.as_deref(),
     subscription_category,

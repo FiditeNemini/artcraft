@@ -4,8 +4,8 @@ use crate::stripe::http_endpoints::webhook::webhook_event_handlers::customer_sub
 use crate::stripe::http_endpoints::webhook::webhook_event_handlers::stripe_webhook_error::StripeWebhookError;
 use crate::stripe::http_endpoints::webhook::webhook_event_handlers::stripe_webhook_summary::StripeWebhookSummary;
 use crate::stripe::traits::internal_subscription_product_lookup::InternalSubscriptionProductLookup;
-use database_queries::queries::billing::subscriptions::get_subscription_by_stripe_id::get_subscription_by_stripe_id;
-use database_queries::queries::billing::subscriptions::upsert_subscription_by_stripe_id::UpsertSubscriptionByStripeId;
+use database_queries::queries::users::user_subscriptions::get_user_subscription_by_stripe_subscription_id::get_user_subscription_by_stripe_subscription_id;
+use database_queries::queries::users::user_subscriptions::upsert_user_subscription_by_stripe_id::UpsertUserSubscription;
 use log::{error, warn};
 use reusable_types::stripe::stripe_subscription_status::StripeSubscriptionStatus;
 use sqlx::MySqlPool;
@@ -45,7 +45,7 @@ pub async fn customer_subscription_deleted_handler(
   }
 
   // NB: It's possible to receive events out of order.
-  let maybe_existing_subscription = get_subscription_by_stripe_id(&summary.stripe_subscription_id, &mysql_pool)
+  let maybe_existing_subscription = get_user_subscription_by_stripe_subscription_id(&summary.stripe_subscription_id, &mysql_pool)
       .await
       .map_err(|err| {
         error!("Mysql error: {:?}", err);
@@ -66,7 +66,7 @@ pub async fn customer_subscription_deleted_handler(
   // NB: Even if we haven't received a record before, we should still be able to "tombstone" it
   // once we detect the deletion.
   if should_process_update {
-    let upsert = UpsertSubscriptionByStripeId {
+    let upsert = UpsertUserSubscription {
       stripe_subscription_id: &summary.stripe_subscription_id,
       maybe_user_token: summary.user_token.as_deref(),
       subscription_category,

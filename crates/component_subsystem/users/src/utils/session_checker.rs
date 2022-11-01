@@ -6,8 +6,8 @@
 use actix_web::HttpRequest;
 use container_common::anyhow_result::AnyhowResult;
 use crate::utils::session_cookie_manager::SessionCookieManager;
-use database_queries::queries::users::user_sessions::get_session_by_token::{get_session_by_token, SessionUserRecord};
-use database_queries::queries::users::user_sessions::get_session_by_token_light::{get_session_by_token_light, SessionRecord};
+use database_queries::queries::users::user_sessions::get_user_session_by_token::{get_user_session_by_token, SessionUserRecord};
+use database_queries::queries::users::user_sessions::get_user_session_by_token_light::{get_user_session_by_token_light, SessionRecord};
 use sqlx::pool::PoolConnection;
 use sqlx::{MySqlPool, MySql};
 
@@ -25,17 +25,17 @@ impl SessionChecker {
   }
 
   #[deprecated = "Use the PoolConnection<MySql> method instead of the MySqlPool one."]
-  pub async fn maybe_get_session(
+  pub async fn maybe_get_session_light(
     &self,
     request: &HttpRequest,
     pool: &MySqlPool
   ) -> AnyhowResult<Option<SessionRecord>>
   {
     let mut connection = pool.acquire().await?;
-    self.maybe_get_session_from_connection(request, &mut connection).await
+    self.maybe_get_session_light_from_connection(request, &mut connection).await
   }
 
-  pub async fn maybe_get_session_from_connection(
+  pub async fn maybe_get_session_light_from_connection(
     &self,
     request: &HttpRequest,
     mysql_connection: &mut PoolConnection<MySql>,
@@ -46,7 +46,7 @@ impl SessionChecker {
       Some(session_token) => session_token,
     };
 
-    get_session_by_token_light(mysql_connection, &session_token).await
+    get_user_session_by_token_light(mysql_connection, &session_token).await
   }
 
 
@@ -72,7 +72,7 @@ impl SessionChecker {
       Some(session_token) => session_token,
     };
 
-    get_session_by_token(mysql_connection, &session_token).await
+    get_user_session_by_token(mysql_connection, &session_token).await
   }
 }
 

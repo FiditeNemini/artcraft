@@ -2,7 +2,7 @@ use actix_web::HttpRequest;
 use async_trait::async_trait;
 use billing_component::stripe::traits::internal_user_lookup::{InternalUserLookup, InternalUserLookupError, UserMetadata};
 use crate::MySqlPool;
-use database_queries::queries::users::user_sessions::get_session_by_token::SessionUserRecord;
+use database_queries::queries::users::user_sessions::get_user_session_by_token::SessionUserRecord;
 use log::warn;
 use users_component::utils::session_checker::SessionChecker;
 

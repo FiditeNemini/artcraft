@@ -155,8 +155,8 @@ mod tests {
   use anyhow::bail;
   use stripe::Invoice;
   use container_common::anyhow_result::AnyhowResult;
-  use crate::stripe::webhook_event_handlers::invoice::invoice_paid_handler::invoice_paid_extractor;
-  use crate::stripe::webhook_event_handlers::invoice::invoice_paid_handler::InvoicePaidDetails;
+  use crate::stripe::http_endpoints::webhook::webhook_event_handlers::invoice::invoice_paid_handler::invoice_paid_extractor;
+  use crate::stripe::http_endpoints::webhook::webhook_event_handlers::invoice::invoice_paid_handler::InvoicePaidDetails;
 
   #[test]
   fn test_invoice_paid_extractor() -> AnyhowResult<()> {
