@@ -50,19 +50,20 @@ pub struct UserMetadata {
     pub maybe_existing_stripe_customer_id: Option<String>,
 
     /// Existing subscriptions that the user has.
+    /// The list contains only active subscriptions and old
+    /// subscriptions will not be reported if they have already
+    /// expired.
     pub existing_subscription_keys: Vec<SubscriptionKey>,
 }
 
-#[derive(Clone, Default)]
+#[derive(Clone, Default, Debug)]
 pub struct SubscriptionKey {
     /// The category or namespace for the product, eg "fakeyou" or "powerstream".
-    /// TODO: Rename "namespace"
-    pub internal_subscription_category: String,
+    pub internal_subscription_namespace: String,
 
     /// The key for the product in our internal system (not a stripe id),
     /// eg. "fakeyou_en_pro" or "stream_package_plus".
-    /// TODO: Rename "slug"
-    pub internal_subscription_product_key: String,
+    pub internal_subscription_product_slug: String,
 }
 
 /// Allows us to inject a user lookup from the HTTP request's session info and database backend,

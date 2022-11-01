@@ -52,6 +52,14 @@ pub async fn stripe_create_checkout_session_shared(
     Some(user_metadata) => user_metadata,
   };
 
+  error!("Subscriptions: {:?}", &user_metadata.existing_subscription_keys);
+
+  // TODO: This will not handle a future where we have multiple "namespaces" or can offer users more than one subscription.
+  //  It will actively block users from subscribing to two or more websites.
+  if !user_metadata.existing_subscription_keys.is_empty() {
+    return Err(CreateCheckoutSessionError::UserAlreadyHasPlan)
+  }
+
   let success_url = match &stripe_config.checkout.success_url {
     FullUrlOrPath::FullUrl(url) => url.to_string(),
     FullUrlOrPath::Path(path) => url_redirector.redirect_url_for_path(http_request, &path)

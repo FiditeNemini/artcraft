@@ -1,6 +1,7 @@
 use actix_web::HttpRequest;
 use async_trait::async_trait;
-use billing_component::stripe::traits::internal_user_lookup::{InternalUserLookup, InternalUserLookupError, UserMetadata};
+use chrono::Utc;
+use billing_component::stripe::traits::internal_user_lookup::{InternalUserLookup, InternalUserLookupError, SubscriptionKey, UserMetadata};
 use crate::MySqlPool;
 use database_queries::queries::users::user_sessions::get_user_session_by_token::SessionUserRecord;
 use log::warn;
@@ -34,23 +35,34 @@ impl InternalUserLookup for StripeInternalUserLookupImpl {
             })?;
 
         let maybe_user_session = self.session_checker
-            .maybe_get_user_session_from_connection(&http_request, &mut mysql_connection)
+            .maybe_get_user_session_extended_from_connection(&http_request, &mut mysql_connection)
             .await
             .map_err(|e| {
                 warn!("Session checker error: {:?}", e);
                 InternalUserLookupError::ServerError
             })?;
 
+        let now = Utc::now();
+
         match maybe_user_session {
             None => Ok(None),
             Some(user_session) => Ok(Some(UserMetadata {
                 user_token: user_session.user_token,
-                username: Some(user_session.username),
-                user_email: Some(user_session.email_address),
-                maybe_existing_stripe_customer_id: user_session.maybe_stripe_customer_id,
-                existing_subscription_keys: vec![]
+                username: Some(user_session.user.username),
+                user_email: Some(user_session.user.email_address),
+                maybe_existing_stripe_customer_id: user_session.premium.maybe_stripe_customer_id,
+                existing_subscription_keys: user_session.premium.subscription_plans.into_iter()
+                    .filter(|sub| {
+                        sub.subscription_expires_at.gt(&now)
+                    })
+                    .map(|sub| {
+                        SubscriptionKey {
+                            internal_subscription_namespace: sub.subscription_namespace,
+                            internal_subscription_product_slug: sub.subscription_product_slug,
+                        }
+                    })
+                    .collect::<Vec<SubscriptionKey>>()
             })),
         }
     }
 }
-

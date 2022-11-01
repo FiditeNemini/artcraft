@@ -105,6 +105,23 @@ impl SessionCookieManager {
     })
   }
 
+  pub fn decode_session_payload_from_request(&self, request: &HttpRequest)
+    -> AnyhowResult<Option<SessionCookiePayload>>
+  {
+    let cookie = match request.cookie(SESSION_COOKIE_NAME) {
+      None => return Ok(None),
+      Some(cookie) => cookie,
+    };
+
+    match self.decode_session_cookie_payload(&cookie) {
+      Err(e) => {
+        warn!("Session cookie decode error: {:?}", e);
+        Err(anyhow!("Could not decode session cookie: {:?}", e))
+      },
+      Ok(payload) => Ok(Some(payload)),
+    }
+  }
+
   pub fn decode_session_token(&self, session_cookie: &Cookie) -> AnyhowResult<String> {
     let cookie_payload =
         self.decode_session_cookie_payload(session_cookie)?;
@@ -124,7 +141,7 @@ impl SessionCookieManager {
         warn!("Session cookie decode error: {:?}", e);
         Err(anyhow!("Could not decode session cookie: {:?}", e))
       },
-      Ok(payload) => Ok(Some(payload)),
+      Ok(session_token) => Ok(Some(session_token)),
     }
   }
 }

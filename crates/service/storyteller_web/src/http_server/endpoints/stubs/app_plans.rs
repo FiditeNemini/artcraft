@@ -24,6 +24,24 @@ use std::sync::Arc;
 // =============== Success Response ===============
 
 #[derive(Serialize)]
+pub struct AppPlansResponse {
+    pub success: bool,
+
+    /// Subscriptions the user has
+    pub subscriptions: Vec<AppSubscription>,
+
+    /// Actual features of the product, like "unlimited_models", "max_duration", etc.
+    pub features: Vec<AppFeature>,
+}
+
+#[derive(Serialize)]
+pub struct AppSubscription {
+    pub subscription_namespace: String,
+    pub subscription_product_slug: String,
+    pub subscription_expires_at: DateTime<Utc>,
+}
+
+#[derive(Serialize)]
 pub struct AppFeature {
     /// Required.
     /// The identifier for the feature,
@@ -43,15 +61,6 @@ pub struct AppFeature {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub quantity: Option<u64>,
 }
-
-#[derive(Serialize)]
-pub struct AppPlansResponse {
-    pub success: bool,
-
-    // News items will be sorted in reverse chronological order.
-    pub features: Vec<AppFeature>,
-}
-
 
 // =============== Error Response ===============
 
@@ -87,7 +96,7 @@ pub async fn get_app_plans_handler(
 {
     let maybe_user = server_state
         .session_checker
-        .maybe_get_user_session(&http_request, &server_state.mysql_pool)
+        .maybe_get_user_session_extended(&http_request, &server_state.mysql_pool)
         .await
         .map_err(|e| {
             warn!("Session checker error: {:?}", e);
@@ -96,13 +105,13 @@ pub async fn get_app_plans_handler(
 
     let unlimited_time = maybe_user
         .as_ref()
-        .map(|user| user.username.to_lowercase().starts_with("time"))
+        .map(|user| user.user.username.to_lowercase().starts_with("time"))
         .unwrap_or(false);
 
     let model_count = maybe_user
         .as_ref()
         .map(|user| {
-            let name = user.username.to_lowercase();
+            let name = user.user.username.to_lowercase();
             if name.ends_with("some") {
                 10
             } else if name.ends_with("more") {
@@ -114,7 +123,6 @@ pub async fn get_app_plans_handler(
             }
         })
         .unwrap_or(0);
-
 
     let mut features = Vec::new();
 
@@ -136,9 +144,24 @@ pub async fn get_app_plans_handler(
         });
     }
 
+    let mut subscriptions = Vec::new();
+
+    if let Some(user) = maybe_user {
+        subscriptions = user.premium.subscription_plans.into_iter()
+            .map(|subscription| {
+                AppSubscription {
+                    subscription_namespace: subscription.subscription_namespace,
+                    subscription_product_slug: subscription.subscription_product_slug,
+                    subscription_expires_at: subscription.subscription_expires_at,
+                }
+            })
+            .collect::<Vec<AppSubscription>>();
+    }
+
     let response = AppPlansResponse {
         success: true,
         features,
+        subscriptions,
     };
 
     let body = serde_json::to_string(&response)
