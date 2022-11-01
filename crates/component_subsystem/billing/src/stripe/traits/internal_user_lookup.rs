@@ -48,6 +48,20 @@ pub struct UserMetadata {
 
     /// Possible existing Stripe customer ID for the user.
     pub maybe_existing_stripe_customer_id: Option<String>,
+
+    /// Existing subscriptions that the user has.
+    pub existing_subscription_keys: Vec<SubscriptionKey>,
+}
+
+pub struct SubscriptionKey {
+    /// The category or namespace for the product, eg "fakeyou" or "powerstream".
+    /// TODO: Rename "namespace"
+    pub internal_subscription_category: String,
+
+    /// The key for the product in our internal system (not a stripe id),
+    /// eg. "fakeyou_en_pro" or "stream_package_plus".
+    /// TODO: Rename "slug"
+    pub internal_subscription_product_key: String,
 }
 
 /// Allows us to inject a user lookup from the HTTP request's session info and database backend,

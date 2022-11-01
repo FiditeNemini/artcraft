@@ -48,6 +48,7 @@ impl InternalUserLookup for StripeInternalUserLookupImpl {
                 username: Some(user_session.username),
                 user_email: Some(user_session.email_address),
                 maybe_existing_stripe_customer_id: user_session.maybe_stripe_customer_id,
+                existing_subscription_keys: vec![]
             })),
         }
     }
