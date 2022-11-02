@@ -1535,6 +1535,16 @@
       ]
     }
   },
+  "0ee578c7a7be5c818c85178a2992c7978165b2659ccbb0996c8a809bef827037": {
+    "query": "\nINSERT INTO tts_inference_jobs\nSET\n  token = ?,\n  uuid_idempotency_token = ?,\n  model_token = ?,\n  raw_inference_text = ?,\n  maybe_creator_user_token = ?,\n  creator_ip_address = ?,\n  creator_set_visibility = ?,\n  is_from_api = ?,\n  is_for_twitch = ?,\n  is_debug_request = ?,\n  priority_level = ?,\n  max_duration_seconds = ?,\n  status = \"pending\"\n        ",
+    "describe": {
+      "columns": [],
+      "parameters": {
+        "Right": 12
+      },
+      "nullable": []
+    }
+  },
   "10d93ef1350115742d8dddb951f98dfebabf7df3e44577b97b52343f0650eba1": {
     "query": "\nSELECT\n    badges.slug,\n    badges.title,\n    badges.description,\n    badges.image_url,\n    user_badges.created_at as user_created_at\n\nFROM badges\nJOIN user_badges\nON\n    badges.slug = user_badges.badge_slug\nWHERE\n    user_badges.user_token = ?\n        ",
     "describe": {
@@ -2171,16 +2181,6 @@
       ]
     }
   },
-  "2955f8a79205187f4984159e4f926305e019b8607f8f4684523a4571dbb929f5": {
-    "query": "\nINSERT INTO user_subscriptions\nSET\n  token = ?,\n  maybe_user_token = ?,\n  subscription_category = ?,\n  subscription_product_key = ?,\n\n  maybe_stripe_subscription_id = ?,\n  maybe_stripe_customer_id = ?,\n\n  maybe_stripe_product_id = ?,\n  maybe_stripe_price_id = ?,\n\n  maybe_stripe_recurring_interval = ?,\n  maybe_stripe_subscription_status = ?,\n  maybe_stripe_is_production = ?,\n\n  subscription_start_at = ?,\n  current_billing_period_start_at = ?,\n  current_billing_period_end_at = ?,\n  subscription_expires_at = ?,\n  maybe_cancel_at = ?,\n  maybe_canceled_at = ?,\n\n  version = version + 1\n\nON DUPLICATE KEY UPDATE\n  maybe_user_token = COALESCE(NULLIF(?, ''), maybe_user_token),\n\n  maybe_stripe_product_id = ?,\n  maybe_stripe_price_id = ?,\n\n  maybe_stripe_recurring_interval = ?,\n  maybe_stripe_subscription_status = ?,\n\n  current_billing_period_start_at = ?,\n  current_billing_period_end_at = ?,\n  subscription_expires_at = ?,\n  maybe_cancel_at = ?,\n  maybe_canceled_at = ?,\n\n  version = version + 1\n        ",
-    "describe": {
-      "columns": [],
-      "parameters": {
-        "Right": 27
-      },
-      "nullable": []
-    }
-  },
   "2b04dd7db52ef3a97a6f420a22a4dbee7416ae58697438df69e87ffd47bbf350": {
     "query": "\nUPDATE w2l_inference_jobs\nSET\n  status = ?,\n  failure_reason = ?,\n  retry_at = NOW() + interval 2 minute\nWHERE id = ?\n        ",
     "describe": {
@@ -2495,6 +2495,70 @@
         true,
         true,
         true,
+        false,
+        false
+      ]
+    }
+  },
+  "46e1cb058bffbea5a5d3ffa5dd904416d6f34ccefdb394030f19cc762b507d68": {
+    "query": "\nSELECT\n  user_token,\n  subscription_namespace,\n  subscription_product_slug,\n  subscription_expires_at\n\nFROM user_subscriptions\n\nWHERE\n  user_token = ?\n  AND subscription_expires_at > CURRENT_TIMESTAMP\n  ORDER BY id ASC\n        ",
+    "describe": {
+      "columns": [
+        {
+          "ordinal": 0,
+          "name": "user_token",
+          "type_info": {
+            "type": "VarString",
+            "flags": {
+              "bits": 4233
+            },
+            "char_set": 224,
+            "max_size": 1020
+          }
+        },
+        {
+          "ordinal": 1,
+          "name": "subscription_namespace",
+          "type_info": {
+            "type": "VarString",
+            "flags": {
+              "bits": 4233
+            },
+            "char_set": 224,
+            "max_size": 128
+          }
+        },
+        {
+          "ordinal": 2,
+          "name": "subscription_product_slug",
+          "type_info": {
+            "type": "VarString",
+            "flags": {
+              "bits": 4233
+            },
+            "char_set": 224,
+            "max_size": 128
+          }
+        },
+        {
+          "ordinal": 3,
+          "name": "subscription_expires_at",
+          "type_info": {
+            "type": "Timestamp",
+            "flags": {
+              "bits": 1161
+            },
+            "char_set": 63,
+            "max_size": 19
+          }
+        }
+      ],
+      "parameters": {
+        "Right": 1
+      },
+      "nullable": [
+        false,
+        false,
         false,
         false
       ]
@@ -4262,6 +4326,16 @@
       "nullable": []
     }
   },
+  "6f59b1708e1ef55911b273287ecaba91bfa7639bd0b3f0438f34c6a31dfe21d1": {
+    "query": "\nUPDATE users\nSET\n  maybe_stripe_customer_id = ?,\n  version = version + 1\nWHERE\n  token = ?\nLIMIT 1\n        ",
+    "describe": {
+      "columns": [],
+      "parameters": {
+        "Right": 2
+      },
+      "nullable": []
+    }
+  },
   "6fea7dfa85de250af4aa2e93a47705d5f789eac688f1b2a87717f22c2114fbb0": {
     "query": "\nSELECT\n  stripe_event_id,\n  should_ignore_retry\nFROM stripe_webhook_event_logs\nWHERE\n  stripe_event_id = ?\n        ",
     "describe": {
@@ -4295,187 +4369,6 @@
         "Right": 1
       },
       "nullable": [
-        false,
-        false
-      ]
-    }
-  },
-  "7181a46615728e9c605ec272f5e8be518efd2c0d7dae22828d186611c2f3d7d8": {
-    "query": "\nSELECT\n  token,\n  maybe_user_token,\n  subscription_category,\n  subscription_product_key,\n  maybe_stripe_subscription_id,\n  maybe_stripe_customer_id,\n  maybe_stripe_product_id,\n  maybe_stripe_subscription_status as `maybe_stripe_subscription_status: reusable_types::stripe::stripe_subscription_status::StripeSubscriptionStatus`,\n  maybe_stripe_is_production,\n  created_at,\n  updated_at,\n  subscription_start_at,\n  subscription_expires_at\nFROM user_subscriptions\nWHERE\n  maybe_stripe_subscription_id = ?\n        ",
-    "describe": {
-      "columns": [
-        {
-          "ordinal": 0,
-          "name": "token",
-          "type_info": {
-            "type": "VarString",
-            "flags": {
-              "bits": 4229
-            },
-            "char_set": 224,
-            "max_size": 128
-          }
-        },
-        {
-          "ordinal": 1,
-          "name": "maybe_user_token",
-          "type_info": {
-            "type": "VarString",
-            "flags": {
-              "bits": 136
-            },
-            "char_set": 224,
-            "max_size": 128
-          }
-        },
-        {
-          "ordinal": 2,
-          "name": "subscription_category",
-          "type_info": {
-            "type": "VarString",
-            "flags": {
-              "bits": 4233
-            },
-            "char_set": 224,
-            "max_size": 128
-          }
-        },
-        {
-          "ordinal": 3,
-          "name": "subscription_product_key",
-          "type_info": {
-            "type": "VarString",
-            "flags": {
-              "bits": 4233
-            },
-            "char_set": 224,
-            "max_size": 128
-          }
-        },
-        {
-          "ordinal": 4,
-          "name": "maybe_stripe_subscription_id",
-          "type_info": {
-            "type": "VarString",
-            "flags": {
-              "bits": 132
-            },
-            "char_set": 224,
-            "max_size": 1020
-          }
-        },
-        {
-          "ordinal": 5,
-          "name": "maybe_stripe_customer_id",
-          "type_info": {
-            "type": "VarString",
-            "flags": {
-              "bits": 136
-            },
-            "char_set": 224,
-            "max_size": 1020
-          }
-        },
-        {
-          "ordinal": 6,
-          "name": "maybe_stripe_product_id",
-          "type_info": {
-            "type": "VarString",
-            "flags": {
-              "bits": 136
-            },
-            "char_set": 224,
-            "max_size": 1020
-          }
-        },
-        {
-          "ordinal": 7,
-          "name": "maybe_stripe_subscription_status: reusable_types::stripe::stripe_subscription_status::StripeSubscriptionStatus",
-          "type_info": {
-            "type": "VarString",
-            "flags": {
-              "bits": 136
-            },
-            "char_set": 224,
-            "max_size": 128
-          }
-        },
-        {
-          "ordinal": 8,
-          "name": "maybe_stripe_is_production",
-          "type_info": {
-            "type": "Tiny",
-            "flags": {
-              "bits": 0
-            },
-            "char_set": 63,
-            "max_size": 1
-          }
-        },
-        {
-          "ordinal": 9,
-          "name": "created_at",
-          "type_info": {
-            "type": "Timestamp",
-            "flags": {
-              "bits": 1153
-            },
-            "char_set": 63,
-            "max_size": 19
-          }
-        },
-        {
-          "ordinal": 10,
-          "name": "updated_at",
-          "type_info": {
-            "type": "Timestamp",
-            "flags": {
-              "bits": 9345
-            },
-            "char_set": 63,
-            "max_size": 19
-          }
-        },
-        {
-          "ordinal": 11,
-          "name": "subscription_start_at",
-          "type_info": {
-            "type": "Timestamp",
-            "flags": {
-              "bits": 1153
-            },
-            "char_set": 63,
-            "max_size": 19
-          }
-        },
-        {
-          "ordinal": 12,
-          "name": "subscription_expires_at",
-          "type_info": {
-            "type": "Timestamp",
-            "flags": {
-              "bits": 1161
-            },
-            "char_set": 63,
-            "max_size": 19
-          }
-        }
-      ],
-      "parameters": {
-        "Right": 1
-      },
-      "nullable": [
-        false,
-        true,
-        false,
-        false,
-        true,
-        true,
-        true,
-        true,
-        true,
-        false,
-        false,
         false,
         false
       ]
@@ -5794,6 +5687,187 @@
       "nullable": []
     }
   },
+  "841bc537a29ef871056edc136231ebbeea65c83b5ee7eab769da275842a0fbb7": {
+    "query": "\nSELECT\n  token,\n  user_token,\n  subscription_namespace,\n  subscription_product_slug,\n  maybe_stripe_subscription_id,\n  maybe_stripe_customer_id,\n  maybe_stripe_product_id,\n  maybe_stripe_subscription_status as `maybe_stripe_subscription_status: reusable_types::stripe::stripe_subscription_status::StripeSubscriptionStatus`,\n  maybe_stripe_is_production,\n  created_at,\n  updated_at,\n  subscription_start_at,\n  subscription_expires_at\nFROM user_subscriptions\nWHERE\n  maybe_stripe_subscription_id = ?\n        ",
+    "describe": {
+      "columns": [
+        {
+          "ordinal": 0,
+          "name": "token",
+          "type_info": {
+            "type": "VarString",
+            "flags": {
+              "bits": 4229
+            },
+            "char_set": 224,
+            "max_size": 128
+          }
+        },
+        {
+          "ordinal": 1,
+          "name": "user_token",
+          "type_info": {
+            "type": "VarString",
+            "flags": {
+              "bits": 4233
+            },
+            "char_set": 224,
+            "max_size": 1020
+          }
+        },
+        {
+          "ordinal": 2,
+          "name": "subscription_namespace",
+          "type_info": {
+            "type": "VarString",
+            "flags": {
+              "bits": 4233
+            },
+            "char_set": 224,
+            "max_size": 128
+          }
+        },
+        {
+          "ordinal": 3,
+          "name": "subscription_product_slug",
+          "type_info": {
+            "type": "VarString",
+            "flags": {
+              "bits": 4233
+            },
+            "char_set": 224,
+            "max_size": 128
+          }
+        },
+        {
+          "ordinal": 4,
+          "name": "maybe_stripe_subscription_id",
+          "type_info": {
+            "type": "VarString",
+            "flags": {
+              "bits": 132
+            },
+            "char_set": 224,
+            "max_size": 1020
+          }
+        },
+        {
+          "ordinal": 5,
+          "name": "maybe_stripe_customer_id",
+          "type_info": {
+            "type": "VarString",
+            "flags": {
+              "bits": 136
+            },
+            "char_set": 224,
+            "max_size": 1020
+          }
+        },
+        {
+          "ordinal": 6,
+          "name": "maybe_stripe_product_id",
+          "type_info": {
+            "type": "VarString",
+            "flags": {
+              "bits": 136
+            },
+            "char_set": 224,
+            "max_size": 1020
+          }
+        },
+        {
+          "ordinal": 7,
+          "name": "maybe_stripe_subscription_status: reusable_types::stripe::stripe_subscription_status::StripeSubscriptionStatus",
+          "type_info": {
+            "type": "VarString",
+            "flags": {
+              "bits": 136
+            },
+            "char_set": 224,
+            "max_size": 128
+          }
+        },
+        {
+          "ordinal": 8,
+          "name": "maybe_stripe_is_production",
+          "type_info": {
+            "type": "Tiny",
+            "flags": {
+              "bits": 0
+            },
+            "char_set": 63,
+            "max_size": 1
+          }
+        },
+        {
+          "ordinal": 9,
+          "name": "created_at",
+          "type_info": {
+            "type": "Timestamp",
+            "flags": {
+              "bits": 1153
+            },
+            "char_set": 63,
+            "max_size": 19
+          }
+        },
+        {
+          "ordinal": 10,
+          "name": "updated_at",
+          "type_info": {
+            "type": "Timestamp",
+            "flags": {
+              "bits": 9345
+            },
+            "char_set": 63,
+            "max_size": 19
+          }
+        },
+        {
+          "ordinal": 11,
+          "name": "subscription_start_at",
+          "type_info": {
+            "type": "Timestamp",
+            "flags": {
+              "bits": 1153
+            },
+            "char_set": 63,
+            "max_size": 19
+          }
+        },
+        {
+          "ordinal": 12,
+          "name": "subscription_expires_at",
+          "type_info": {
+            "type": "Timestamp",
+            "flags": {
+              "bits": 1161
+            },
+            "char_set": 63,
+            "max_size": 19
+          }
+        }
+      ],
+      "parameters": {
+        "Right": 1
+      },
+      "nullable": [
+        false,
+        false,
+        false,
+        false,
+        true,
+        true,
+        true,
+        true,
+        true,
+        false,
+        false,
+        false,
+        false
+      ]
+    }
+  },
   "865ce236444a36d597939660b14eb4b0cee05c70fdb73f31c2fb8cddddfef42c": {
     "query": "\nINSERT INTO firehose_entries\nSET\n  token = ?,\n  event_type = ?,\n  maybe_target_user_token = ?,\n  maybe_target_entity_token = ?,\n  maybe_created_entity_token = ?\n        ",
     "describe": {
@@ -6526,6 +6600,16 @@
       "columns": [],
       "parameters": {
         "Right": 5
+      },
+      "nullable": []
+    }
+  },
+  "8d267a609157e6459393ffa32ea83996dcf135c52ee8a930d5be628802d97371": {
+    "query": "\nINSERT INTO user_subscriptions\nSET\n  token = ?,\n  user_token = ?,\n  subscription_namespace = ?,\n  subscription_product_slug = ?,\n\n  maybe_stripe_subscription_id = ?,\n  maybe_stripe_customer_id = ?,\n\n  maybe_stripe_product_id = ?,\n  maybe_stripe_price_id = ?,\n\n  maybe_stripe_recurring_interval = ?,\n  maybe_stripe_subscription_status = ?,\n  maybe_stripe_is_production = ?,\n\n  subscription_start_at = ?,\n  current_billing_period_start_at = ?,\n  current_billing_period_end_at = ?,\n  subscription_expires_at = ?,\n  maybe_cancel_at = ?,\n  maybe_canceled_at = ?,\n\n  version = version + 1\n\nON DUPLICATE KEY UPDATE\n  subscription_namespace = ?,\n  subscription_product_slug= ?,\n\n  maybe_stripe_product_id = ?,\n  maybe_stripe_price_id = ?,\n\n  maybe_stripe_recurring_interval = ?,\n  maybe_stripe_subscription_status = ?,\n\n  current_billing_period_start_at = ?,\n  current_billing_period_end_at = ?,\n  subscription_expires_at = ?,\n  maybe_cancel_at = ?,\n  maybe_canceled_at = ?,\n\n  version = version + 1\n        ",
+    "describe": {
+      "columns": [],
+      "parameters": {
+        "Right": 28
       },
       "nullable": []
     }
@@ -9949,434 +10033,6 @@
       ]
     }
   },
-  "c3f3792382c648d554c406e03d5109bc0257a619627aec96100a85b3ee503493": {
-    "query": "\nSELECT\n    users.token as user_token,\n    users.username,\n    users.display_name,\n\n    users.email_address,\n    users.email_confirmed,\n    users.email_gravatar_hash,\n\n    users.disable_gravatar,\n    users.auto_play_audio_preference,\n    users.auto_play_video_preference,\n    users.preferred_tts_result_visibility as `preferred_tts_result_visibility: crate::column_types::record_visibility::RecordVisibility`,\n    users.preferred_w2l_result_visibility as `preferred_w2l_result_visibility: crate::column_types::record_visibility::RecordVisibility`,\n\n    users.user_role_slug,\n    users.is_banned,\n\n    user_roles.can_use_tts,\n    user_roles.can_use_w2l,\n    user_roles.can_delete_own_tts_results,\n    user_roles.can_delete_own_w2l_results,\n    user_roles.can_delete_own_account,\n\n    user_roles.can_upload_tts_models,\n    user_roles.can_upload_w2l_templates,\n    user_roles.can_delete_own_tts_models,\n    user_roles.can_delete_own_w2l_templates,\n\n    user_roles.can_approve_w2l_templates,\n    user_roles.can_edit_other_users_profiles,\n    user_roles.can_edit_other_users_tts_models,\n    user_roles.can_edit_other_users_w2l_templates,\n    user_roles.can_delete_other_users_tts_models,\n    user_roles.can_delete_other_users_tts_results,\n    user_roles.can_delete_other_users_w2l_templates,\n    user_roles.can_delete_other_users_w2l_results,\n    user_roles.can_ban_users,\n    user_roles.can_delete_users\n\nFROM users\nLEFT OUTER JOIN user_sessions\n    ON users.token = user_sessions.user_token\nLEFT OUTER JOIN user_roles\n    ON users.user_role_slug = user_roles.slug\nWHERE user_sessions.token = ?\n    AND user_sessions.deleted_at IS NULL\n    AND users.user_deleted_at IS NULL\n    AND users.mod_deleted_at IS NULL\n        ",
-    "describe": {
-      "columns": [
-        {
-          "ordinal": 0,
-          "name": "user_token",
-          "type_info": {
-            "type": "VarString",
-            "flags": {
-              "bits": 4229
-            },
-            "char_set": 224,
-            "max_size": 128
-          }
-        },
-        {
-          "ordinal": 1,
-          "name": "username",
-          "type_info": {
-            "type": "VarString",
-            "flags": {
-              "bits": 4229
-            },
-            "char_set": 224,
-            "max_size": 80
-          }
-        },
-        {
-          "ordinal": 2,
-          "name": "display_name",
-          "type_info": {
-            "type": "VarString",
-            "flags": {
-              "bits": 4225
-            },
-            "char_set": 224,
-            "max_size": 80
-          }
-        },
-        {
-          "ordinal": 3,
-          "name": "email_address",
-          "type_info": {
-            "type": "VarString",
-            "flags": {
-              "bits": 4229
-            },
-            "char_set": 224,
-            "max_size": 1020
-          }
-        },
-        {
-          "ordinal": 4,
-          "name": "email_confirmed",
-          "type_info": {
-            "type": "Tiny",
-            "flags": {
-              "bits": 1
-            },
-            "char_set": 63,
-            "max_size": 1
-          }
-        },
-        {
-          "ordinal": 5,
-          "name": "email_gravatar_hash",
-          "type_info": {
-            "type": "String",
-            "flags": {
-              "bits": 4225
-            },
-            "char_set": 224,
-            "max_size": 128
-          }
-        },
-        {
-          "ordinal": 6,
-          "name": "disable_gravatar",
-          "type_info": {
-            "type": "Tiny",
-            "flags": {
-              "bits": 1
-            },
-            "char_set": 63,
-            "max_size": 1
-          }
-        },
-        {
-          "ordinal": 7,
-          "name": "auto_play_audio_preference",
-          "type_info": {
-            "type": "Tiny",
-            "flags": {
-              "bits": 0
-            },
-            "char_set": 63,
-            "max_size": 1
-          }
-        },
-        {
-          "ordinal": 8,
-          "name": "auto_play_video_preference",
-          "type_info": {
-            "type": "Tiny",
-            "flags": {
-              "bits": 0
-            },
-            "char_set": 63,
-            "max_size": 1
-          }
-        },
-        {
-          "ordinal": 9,
-          "name": "preferred_tts_result_visibility: crate::column_types::record_visibility::RecordVisibility",
-          "type_info": {
-            "type": "String",
-            "flags": {
-              "bits": 385
-            },
-            "char_set": 224,
-            "max_size": 28
-          }
-        },
-        {
-          "ordinal": 10,
-          "name": "preferred_w2l_result_visibility: crate::column_types::record_visibility::RecordVisibility",
-          "type_info": {
-            "type": "String",
-            "flags": {
-              "bits": 385
-            },
-            "char_set": 224,
-            "max_size": 28
-          }
-        },
-        {
-          "ordinal": 11,
-          "name": "user_role_slug",
-          "type_info": {
-            "type": "VarString",
-            "flags": {
-              "bits": 4233
-            },
-            "char_set": 224,
-            "max_size": 64
-          }
-        },
-        {
-          "ordinal": 12,
-          "name": "is_banned",
-          "type_info": {
-            "type": "Tiny",
-            "flags": {
-              "bits": 1
-            },
-            "char_set": 63,
-            "max_size": 1
-          }
-        },
-        {
-          "ordinal": 13,
-          "name": "can_use_tts",
-          "type_info": {
-            "type": "Tiny",
-            "flags": {
-              "bits": 0
-            },
-            "char_set": 63,
-            "max_size": 1
-          }
-        },
-        {
-          "ordinal": 14,
-          "name": "can_use_w2l",
-          "type_info": {
-            "type": "Tiny",
-            "flags": {
-              "bits": 0
-            },
-            "char_set": 63,
-            "max_size": 1
-          }
-        },
-        {
-          "ordinal": 15,
-          "name": "can_delete_own_tts_results",
-          "type_info": {
-            "type": "Tiny",
-            "flags": {
-              "bits": 0
-            },
-            "char_set": 63,
-            "max_size": 1
-          }
-        },
-        {
-          "ordinal": 16,
-          "name": "can_delete_own_w2l_results",
-          "type_info": {
-            "type": "Tiny",
-            "flags": {
-              "bits": 0
-            },
-            "char_set": 63,
-            "max_size": 1
-          }
-        },
-        {
-          "ordinal": 17,
-          "name": "can_delete_own_account",
-          "type_info": {
-            "type": "Tiny",
-            "flags": {
-              "bits": 0
-            },
-            "char_set": 63,
-            "max_size": 1
-          }
-        },
-        {
-          "ordinal": 18,
-          "name": "can_upload_tts_models",
-          "type_info": {
-            "type": "Tiny",
-            "flags": {
-              "bits": 0
-            },
-            "char_set": 63,
-            "max_size": 1
-          }
-        },
-        {
-          "ordinal": 19,
-          "name": "can_upload_w2l_templates",
-          "type_info": {
-            "type": "Tiny",
-            "flags": {
-              "bits": 0
-            },
-            "char_set": 63,
-            "max_size": 1
-          }
-        },
-        {
-          "ordinal": 20,
-          "name": "can_delete_own_tts_models",
-          "type_info": {
-            "type": "Tiny",
-            "flags": {
-              "bits": 0
-            },
-            "char_set": 63,
-            "max_size": 1
-          }
-        },
-        {
-          "ordinal": 21,
-          "name": "can_delete_own_w2l_templates",
-          "type_info": {
-            "type": "Tiny",
-            "flags": {
-              "bits": 0
-            },
-            "char_set": 63,
-            "max_size": 1
-          }
-        },
-        {
-          "ordinal": 22,
-          "name": "can_approve_w2l_templates",
-          "type_info": {
-            "type": "Tiny",
-            "flags": {
-              "bits": 0
-            },
-            "char_set": 63,
-            "max_size": 1
-          }
-        },
-        {
-          "ordinal": 23,
-          "name": "can_edit_other_users_profiles",
-          "type_info": {
-            "type": "Tiny",
-            "flags": {
-              "bits": 0
-            },
-            "char_set": 63,
-            "max_size": 1
-          }
-        },
-        {
-          "ordinal": 24,
-          "name": "can_edit_other_users_tts_models",
-          "type_info": {
-            "type": "Tiny",
-            "flags": {
-              "bits": 0
-            },
-            "char_set": 63,
-            "max_size": 1
-          }
-        },
-        {
-          "ordinal": 25,
-          "name": "can_edit_other_users_w2l_templates",
-          "type_info": {
-            "type": "Tiny",
-            "flags": {
-              "bits": 0
-            },
-            "char_set": 63,
-            "max_size": 1
-          }
-        },
-        {
-          "ordinal": 26,
-          "name": "can_delete_other_users_tts_models",
-          "type_info": {
-            "type": "Tiny",
-            "flags": {
-              "bits": 0
-            },
-            "char_set": 63,
-            "max_size": 1
-          }
-        },
-        {
-          "ordinal": 27,
-          "name": "can_delete_other_users_tts_results",
-          "type_info": {
-            "type": "Tiny",
-            "flags": {
-              "bits": 0
-            },
-            "char_set": 63,
-            "max_size": 1
-          }
-        },
-        {
-          "ordinal": 28,
-          "name": "can_delete_other_users_w2l_templates",
-          "type_info": {
-            "type": "Tiny",
-            "flags": {
-              "bits": 0
-            },
-            "char_set": 63,
-            "max_size": 1
-          }
-        },
-        {
-          "ordinal": 29,
-          "name": "can_delete_other_users_w2l_results",
-          "type_info": {
-            "type": "Tiny",
-            "flags": {
-              "bits": 0
-            },
-            "char_set": 63,
-            "max_size": 1
-          }
-        },
-        {
-          "ordinal": 30,
-          "name": "can_ban_users",
-          "type_info": {
-            "type": "Tiny",
-            "flags": {
-              "bits": 0
-            },
-            "char_set": 63,
-            "max_size": 1
-          }
-        },
-        {
-          "ordinal": 31,
-          "name": "can_delete_users",
-          "type_info": {
-            "type": "Tiny",
-            "flags": {
-              "bits": 0
-            },
-            "char_set": 63,
-            "max_size": 1
-          }
-        }
-      ],
-      "parameters": {
-        "Right": 1
-      },
-      "nullable": [
-        false,
-        false,
-        false,
-        false,
-        false,
-        false,
-        false,
-        true,
-        true,
-        false,
-        false,
-        false,
-        false,
-        true,
-        true,
-        true,
-        true,
-        true,
-        true,
-        true,
-        true,
-        true,
-        true,
-        true,
-        true,
-        true,
-        true,
-        true,
-        true,
-        true,
-        true,
-        true
-      ]
-    }
-  },
   "c4640a618e1d179fa95adce67a329818f8b1626ac88fa76dbb871b8788136191": {
     "query": "\nUPDATE w2l_templates\nSET\n  maybe_mod_user_token = ?,\n  mod_deleted_at = NULL\nWHERE\n  token = ?\nLIMIT 1\n        ",
     "describe": {
@@ -11077,16 +10733,6 @@
       "columns": [],
       "parameters": {
         "Right": 1
-      },
-      "nullable": []
-    }
-  },
-  "def4202f63874e7b04d8f8a5da028a9aacc4dfe19b8898d3d6820d393a633cf3": {
-    "query": "\nINSERT INTO tts_inference_jobs\nSET\n  token = ?,\n  uuid_idempotency_token = ?,\n  model_token = ?,\n  raw_inference_text = ?,\n  maybe_creator_user_token = ?,\n  creator_ip_address = ?,\n  creator_set_visibility = ?,\n  is_from_api = ?,\n  is_for_twitch = ?,\n  priority_level = ?,\n  status = \"pending\"\n        ",
-    "describe": {
-      "columns": [],
-      "parameters": {
-        "Right": 10
       },
       "nullable": []
     }
@@ -12148,6 +11794,460 @@
       ]
     }
   },
+  "ed8b90cfdc14a92b18df9f5c71e10a41eb6f9fc074a2f19a866c10fcd0b12d82": {
+    "query": "\nSELECT\n    users.token as user_token,\n    users.username,\n    users.display_name,\n\n    users.email_address,\n    users.email_confirmed,\n    users.email_gravatar_hash,\n\n    users.maybe_stripe_customer_id,\n    users.maybe_loyalty_program_key,\n\n    users.disable_gravatar,\n    users.auto_play_audio_preference,\n    users.auto_play_video_preference,\n    users.preferred_tts_result_visibility as `preferred_tts_result_visibility: crate::column_types::record_visibility::RecordVisibility`,\n    users.preferred_w2l_result_visibility as `preferred_w2l_result_visibility: crate::column_types::record_visibility::RecordVisibility`,\n\n    users.user_role_slug,\n    users.is_banned,\n\n    user_roles.can_use_tts,\n    user_roles.can_use_w2l,\n    user_roles.can_delete_own_tts_results,\n    user_roles.can_delete_own_w2l_results,\n    user_roles.can_delete_own_account,\n\n    user_roles.can_upload_tts_models,\n    user_roles.can_upload_w2l_templates,\n    user_roles.can_delete_own_tts_models,\n    user_roles.can_delete_own_w2l_templates,\n\n    user_roles.can_approve_w2l_templates,\n    user_roles.can_edit_other_users_profiles,\n    user_roles.can_edit_other_users_tts_models,\n    user_roles.can_edit_other_users_w2l_templates,\n    user_roles.can_delete_other_users_tts_models,\n    user_roles.can_delete_other_users_tts_results,\n    user_roles.can_delete_other_users_w2l_templates,\n    user_roles.can_delete_other_users_w2l_results,\n    user_roles.can_ban_users,\n    user_roles.can_delete_users\n\nFROM users\nLEFT OUTER JOIN user_sessions\n    ON users.token = user_sessions.user_token\nLEFT OUTER JOIN user_roles\n    ON users.user_role_slug = user_roles.slug\nWHERE user_sessions.token = ?\n    AND user_sessions.deleted_at IS NULL\n    AND users.user_deleted_at IS NULL\n    AND users.mod_deleted_at IS NULL\n        ",
+    "describe": {
+      "columns": [
+        {
+          "ordinal": 0,
+          "name": "user_token",
+          "type_info": {
+            "type": "VarString",
+            "flags": {
+              "bits": 4229
+            },
+            "char_set": 224,
+            "max_size": 128
+          }
+        },
+        {
+          "ordinal": 1,
+          "name": "username",
+          "type_info": {
+            "type": "VarString",
+            "flags": {
+              "bits": 4229
+            },
+            "char_set": 224,
+            "max_size": 80
+          }
+        },
+        {
+          "ordinal": 2,
+          "name": "display_name",
+          "type_info": {
+            "type": "VarString",
+            "flags": {
+              "bits": 4225
+            },
+            "char_set": 224,
+            "max_size": 80
+          }
+        },
+        {
+          "ordinal": 3,
+          "name": "email_address",
+          "type_info": {
+            "type": "VarString",
+            "flags": {
+              "bits": 4229
+            },
+            "char_set": 224,
+            "max_size": 1020
+          }
+        },
+        {
+          "ordinal": 4,
+          "name": "email_confirmed",
+          "type_info": {
+            "type": "Tiny",
+            "flags": {
+              "bits": 1
+            },
+            "char_set": 63,
+            "max_size": 1
+          }
+        },
+        {
+          "ordinal": 5,
+          "name": "email_gravatar_hash",
+          "type_info": {
+            "type": "String",
+            "flags": {
+              "bits": 4225
+            },
+            "char_set": 224,
+            "max_size": 128
+          }
+        },
+        {
+          "ordinal": 6,
+          "name": "maybe_stripe_customer_id",
+          "type_info": {
+            "type": "VarString",
+            "flags": {
+              "bits": 128
+            },
+            "char_set": 224,
+            "max_size": 1020
+          }
+        },
+        {
+          "ordinal": 7,
+          "name": "maybe_loyalty_program_key",
+          "type_info": {
+            "type": "VarString",
+            "flags": {
+              "bits": 128
+            },
+            "char_set": 224,
+            "max_size": 128
+          }
+        },
+        {
+          "ordinal": 8,
+          "name": "disable_gravatar",
+          "type_info": {
+            "type": "Tiny",
+            "flags": {
+              "bits": 1
+            },
+            "char_set": 63,
+            "max_size": 1
+          }
+        },
+        {
+          "ordinal": 9,
+          "name": "auto_play_audio_preference",
+          "type_info": {
+            "type": "Tiny",
+            "flags": {
+              "bits": 0
+            },
+            "char_set": 63,
+            "max_size": 1
+          }
+        },
+        {
+          "ordinal": 10,
+          "name": "auto_play_video_preference",
+          "type_info": {
+            "type": "Tiny",
+            "flags": {
+              "bits": 0
+            },
+            "char_set": 63,
+            "max_size": 1
+          }
+        },
+        {
+          "ordinal": 11,
+          "name": "preferred_tts_result_visibility: crate::column_types::record_visibility::RecordVisibility",
+          "type_info": {
+            "type": "String",
+            "flags": {
+              "bits": 385
+            },
+            "char_set": 224,
+            "max_size": 28
+          }
+        },
+        {
+          "ordinal": 12,
+          "name": "preferred_w2l_result_visibility: crate::column_types::record_visibility::RecordVisibility",
+          "type_info": {
+            "type": "String",
+            "flags": {
+              "bits": 385
+            },
+            "char_set": 224,
+            "max_size": 28
+          }
+        },
+        {
+          "ordinal": 13,
+          "name": "user_role_slug",
+          "type_info": {
+            "type": "VarString",
+            "flags": {
+              "bits": 4233
+            },
+            "char_set": 224,
+            "max_size": 64
+          }
+        },
+        {
+          "ordinal": 14,
+          "name": "is_banned",
+          "type_info": {
+            "type": "Tiny",
+            "flags": {
+              "bits": 1
+            },
+            "char_set": 63,
+            "max_size": 1
+          }
+        },
+        {
+          "ordinal": 15,
+          "name": "can_use_tts",
+          "type_info": {
+            "type": "Tiny",
+            "flags": {
+              "bits": 0
+            },
+            "char_set": 63,
+            "max_size": 1
+          }
+        },
+        {
+          "ordinal": 16,
+          "name": "can_use_w2l",
+          "type_info": {
+            "type": "Tiny",
+            "flags": {
+              "bits": 0
+            },
+            "char_set": 63,
+            "max_size": 1
+          }
+        },
+        {
+          "ordinal": 17,
+          "name": "can_delete_own_tts_results",
+          "type_info": {
+            "type": "Tiny",
+            "flags": {
+              "bits": 0
+            },
+            "char_set": 63,
+            "max_size": 1
+          }
+        },
+        {
+          "ordinal": 18,
+          "name": "can_delete_own_w2l_results",
+          "type_info": {
+            "type": "Tiny",
+            "flags": {
+              "bits": 0
+            },
+            "char_set": 63,
+            "max_size": 1
+          }
+        },
+        {
+          "ordinal": 19,
+          "name": "can_delete_own_account",
+          "type_info": {
+            "type": "Tiny",
+            "flags": {
+              "bits": 0
+            },
+            "char_set": 63,
+            "max_size": 1
+          }
+        },
+        {
+          "ordinal": 20,
+          "name": "can_upload_tts_models",
+          "type_info": {
+            "type": "Tiny",
+            "flags": {
+              "bits": 0
+            },
+            "char_set": 63,
+            "max_size": 1
+          }
+        },
+        {
+          "ordinal": 21,
+          "name": "can_upload_w2l_templates",
+          "type_info": {
+            "type": "Tiny",
+            "flags": {
+              "bits": 0
+            },
+            "char_set": 63,
+            "max_size": 1
+          }
+        },
+        {
+          "ordinal": 22,
+          "name": "can_delete_own_tts_models",
+          "type_info": {
+            "type": "Tiny",
+            "flags": {
+              "bits": 0
+            },
+            "char_set": 63,
+            "max_size": 1
+          }
+        },
+        {
+          "ordinal": 23,
+          "name": "can_delete_own_w2l_templates",
+          "type_info": {
+            "type": "Tiny",
+            "flags": {
+              "bits": 0
+            },
+            "char_set": 63,
+            "max_size": 1
+          }
+        },
+        {
+          "ordinal": 24,
+          "name": "can_approve_w2l_templates",
+          "type_info": {
+            "type": "Tiny",
+            "flags": {
+              "bits": 0
+            },
+            "char_set": 63,
+            "max_size": 1
+          }
+        },
+        {
+          "ordinal": 25,
+          "name": "can_edit_other_users_profiles",
+          "type_info": {
+            "type": "Tiny",
+            "flags": {
+              "bits": 0
+            },
+            "char_set": 63,
+            "max_size": 1
+          }
+        },
+        {
+          "ordinal": 26,
+          "name": "can_edit_other_users_tts_models",
+          "type_info": {
+            "type": "Tiny",
+            "flags": {
+              "bits": 0
+            },
+            "char_set": 63,
+            "max_size": 1
+          }
+        },
+        {
+          "ordinal": 27,
+          "name": "can_edit_other_users_w2l_templates",
+          "type_info": {
+            "type": "Tiny",
+            "flags": {
+              "bits": 0
+            },
+            "char_set": 63,
+            "max_size": 1
+          }
+        },
+        {
+          "ordinal": 28,
+          "name": "can_delete_other_users_tts_models",
+          "type_info": {
+            "type": "Tiny",
+            "flags": {
+              "bits": 0
+            },
+            "char_set": 63,
+            "max_size": 1
+          }
+        },
+        {
+          "ordinal": 29,
+          "name": "can_delete_other_users_tts_results",
+          "type_info": {
+            "type": "Tiny",
+            "flags": {
+              "bits": 0
+            },
+            "char_set": 63,
+            "max_size": 1
+          }
+        },
+        {
+          "ordinal": 30,
+          "name": "can_delete_other_users_w2l_templates",
+          "type_info": {
+            "type": "Tiny",
+            "flags": {
+              "bits": 0
+            },
+            "char_set": 63,
+            "max_size": 1
+          }
+        },
+        {
+          "ordinal": 31,
+          "name": "can_delete_other_users_w2l_results",
+          "type_info": {
+            "type": "Tiny",
+            "flags": {
+              "bits": 0
+            },
+            "char_set": 63,
+            "max_size": 1
+          }
+        },
+        {
+          "ordinal": 32,
+          "name": "can_ban_users",
+          "type_info": {
+            "type": "Tiny",
+            "flags": {
+              "bits": 0
+            },
+            "char_set": 63,
+            "max_size": 1
+          }
+        },
+        {
+          "ordinal": 33,
+          "name": "can_delete_users",
+          "type_info": {
+            "type": "Tiny",
+            "flags": {
+              "bits": 0
+            },
+            "char_set": 63,
+            "max_size": 1
+          }
+        }
+      ],
+      "parameters": {
+        "Right": 1
+      },
+      "nullable": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        true,
+        true,
+        false,
+        true,
+        true,
+        false,
+        false,
+        false,
+        false,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true
+      ]
+    }
+  },
   "ee05f95e45f7aaa5811d70b1f00d3f40a361536dfc6451affcad97586dc3338f": {
     "query": "\nUPDATE w2l_inference_jobs\nSET\n  status = 'started',\n  attempt_count = attempt_count + 1,\n  retry_at = NOW() + interval 2 minute\nWHERE id = ?\n        ",
     "describe": {
@@ -12995,16 +13095,6 @@
       "columns": [],
       "parameters": {
         "Right": 1
-      },
-      "nullable": []
-    }
-  },
-  "99f9fcf43556a9c6e45c29075d620f48094121f0075c2f3b06e0c91cab63eb02": {
-    "query": "\nINSERT INTO tts_inference_jobs\nSET\n  token = ?,\n  uuid_idempotency_token = ?,\n\n  model_token = ?,\n  raw_inference_text = ?,\n  maybe_creator_user_token = ?,\n  creator_ip_address = ?,\n  creator_set_visibility = ?,\n  priority_level = ?,\n  is_from_api = ?,\n  is_debug_request = ?,\n  status = \"pending\"\n        ",
-    "describe": {
-      "columns": [],
-      "parameters": {
-        "Right": 10
       },
       "nullable": []
     }
