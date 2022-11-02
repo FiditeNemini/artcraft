@@ -25,16 +25,15 @@ pub async fn list_active_user_subscriptions(
       RawActiveUserSubscription,
         r#"
 SELECT
-  maybe_user_token as user_token,
-  subscription_category as subscription_namespace,
-  subscription_product_key as subscription_product_slug,
+  user_token,
+  subscription_namespace,
+  subscription_product_slug,
   subscription_expires_at
 
 FROM user_subscriptions
 
 WHERE
-  maybe_user_token IS NOT NULL
-  AND maybe_user_token = ?
+  user_token = ?
   AND subscription_expires_at > CURRENT_TIMESTAMP
   ORDER BY id ASC
         "#,
@@ -46,9 +45,7 @@ WHERE
     let records = records.into_iter()
         .map(|record : RawActiveUserSubscription | {
             ActiveUserSubscription {
-                user_token: record.user_token.unwrap_or("".to_string()),
-
-
+                user_token: record.user_token,
                 subscription_namespace: record.subscription_namespace,
                 subscription_product_slug: record.subscription_product_slug,
                 subscription_expires_at: record.subscription_expires_at,
@@ -60,7 +57,7 @@ WHERE
 }
 
 struct RawActiveUserSubscription {
-    user_token: Option<String>,
+    user_token: String,
     subscription_namespace: String,
     subscription_product_slug: String,
     subscription_expires_at: DateTime<Utc>,

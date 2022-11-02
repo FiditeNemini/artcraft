@@ -8,9 +8,9 @@ use sqlx::MySqlPool;
 
 pub struct UserSubscription {
   pub token: String,
-  pub maybe_user_token: Option<String>,
-  pub subscription_category: String,
-  pub subscription_product_key: String,
+  pub user_token: String,
+  pub subscription_namespace: String,
+  pub subscription_product_slug: String,
   pub maybe_stripe_subscription_id: Option<String>,
   pub maybe_stripe_product_id: Option<String>,
   pub maybe_stripe_customer_id: Option<String>,
@@ -36,9 +36,9 @@ pub async fn get_user_subscription_by_stripe_subscription_id(
         r#"
 SELECT
   token,
-  maybe_user_token,
-  subscription_category,
-  subscription_product_key,
+  user_token,
+  subscription_namespace,
+  subscription_product_slug,
   maybe_stripe_subscription_id,
   maybe_stripe_customer_id,
   maybe_stripe_product_id,
@@ -65,9 +65,9 @@ WHERE
     Ok(r) => {
       Ok(Some(UserSubscription {
         token: r.token,
-        maybe_user_token: r.maybe_user_token,
-        subscription_category: r.subscription_category,
-        subscription_product_key: r.subscription_product_key,
+        user_token: r.user_token,
+        subscription_namespace: r.subscription_namespace,
+        subscription_product_slug: r.subscription_product_slug,
         maybe_stripe_subscription_id: r.maybe_stripe_subscription_id,
         maybe_stripe_product_id: r.maybe_stripe_product_id,
         maybe_stripe_customer_id: r.maybe_stripe_customer_id,
@@ -84,9 +84,9 @@ WHERE
 
 struct RawUserSubscriptionFromDb {
   pub token: String,
-  pub maybe_user_token: Option<String>,
-  pub subscription_category: String,
-  pub subscription_product_key: String,
+  pub user_token: String,
+  pub subscription_namespace: String,
+  pub subscription_product_slug: String,
   pub maybe_stripe_subscription_id: Option<String>,
   pub maybe_stripe_product_id: Option<String>,
   pub maybe_stripe_customer_id: Option<String>,

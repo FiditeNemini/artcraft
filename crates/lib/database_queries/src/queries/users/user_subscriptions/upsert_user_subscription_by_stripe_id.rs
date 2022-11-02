@@ -14,13 +14,13 @@ pub struct UpsertUserSubscription<'a> {
   pub stripe_subscription_id: &'a str,
 
   /// Internal user token
-  pub maybe_user_token: Option<&'a str>,
+  pub user_token: &'a str,
 
   /// The platform key, eg. "fakeyou", "storyteller_stream", "symphonia", etc.
-  pub subscription_category: &'a str,
+  pub subscription_namespace: &'a str,
 
   /// The name of the product the user is subscribing to within the category.
-  pub subscription_product_key: &'a str,
+  pub subscription_product_slug: &'a str,
 
   pub maybe_stripe_customer_id: Option<&'a str>,
 
@@ -67,9 +67,9 @@ impl <'a> UpsertUserSubscription<'a> {
 INSERT INTO user_subscriptions
 SET
   token = ?,
-  maybe_user_token = ?,
-  subscription_category = ?,
-  subscription_product_key = ?,
+  user_token = ?,
+  subscription_namespace = ?,
+  subscription_product_slug = ?,
 
   maybe_stripe_subscription_id = ?,
   maybe_stripe_customer_id = ?,
@@ -91,10 +91,8 @@ SET
   version = version + 1
 
 ON DUPLICATE KEY UPDATE
-  maybe_user_token = COALESCE(NULLIF(?, ''), maybe_user_token),
-
-  subscription_category = ?,
-  subscription_product_key = ?,
+  subscription_namespace = ?,
+  subscription_product_slug= ?,
 
   maybe_stripe_product_id = ?,
   maybe_stripe_price_id = ?,
@@ -112,9 +110,9 @@ ON DUPLICATE KEY UPDATE
         "#,
       // Insert
       token,
-      self.maybe_user_token,
-      self.subscription_category,
-      self.subscription_product_key,
+      self.user_token,
+      self.subscription_namespace,
+      self.subscription_product_slug,
 
       self.stripe_subscription_id,
       self.maybe_stripe_customer_id,
@@ -134,10 +132,8 @@ ON DUPLICATE KEY UPDATE
       self.maybe_canceled_at,
 
       // Upsert
-      self.maybe_user_token,
-      
-      self.subscription_category,
-      self.subscription_product_key,
+      self.subscription_namespace,
+      self.subscription_product_slug,
 
       self.maybe_stripe_product_id,
       self.maybe_stripe_price_id,

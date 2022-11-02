@@ -1,5 +1,5 @@
 use crate::stripe::http_endpoints::webhook::webhook_event_handlers::customer_subscription::calculate_subscription_end_date::calculate_subscription_end_date;
-use crate::stripe::http_endpoints::webhook::webhook_event_handlers::customer_subscription::common::{UNKNOWN_SUBSCRIPTION_CATEGORY, UNKNOWN_SUBSCRIPTION_PRODUCT_KEY};
+use crate::stripe::http_endpoints::webhook::webhook_event_handlers::customer_subscription::common::{UNKNOWN_SUBSCRIPTION_NAMESPACE, UNKNOWN_SUBSCRIPTION_PRODUCT_SLUG};
 use crate::stripe::http_endpoints::webhook::webhook_event_handlers::customer_subscription::subscription_event_extractor::subscription_summary_extractor;
 use crate::stripe::http_endpoints::webhook::webhook_event_handlers::stripe_webhook_error::StripeWebhookError;
 use crate::stripe::http_endpoints::webhook::webhook_event_handlers::stripe_webhook_summary::StripeWebhookSummary;
@@ -36,12 +36,12 @@ pub async fn customer_subscription_deleted_handler(
           StripeWebhookError::ServerError // NB: This was probably *our* fault.
         })?;
 
-  let mut subscription_category = UNKNOWN_SUBSCRIPTION_CATEGORY;
-  let mut subscription_product_key = UNKNOWN_SUBSCRIPTION_PRODUCT_KEY;
+  let mut subscription_namespace = UNKNOWN_SUBSCRIPTION_NAMESPACE;
+  let mut subscription_product_slug = UNKNOWN_SUBSCRIPTION_PRODUCT_SLUG;
 
   if let Some(ref internal_product) = maybe_internal_subscription_product {
-    subscription_category = &internal_product.subscription_category;
-    subscription_product_key = &internal_product.subscription_product_key;
+    subscription_namespace = &internal_product.subscription_category;
+    subscription_product_slug = &internal_product.subscription_product_key;
   }
 
   // NB: It's possible to receive events out of order.
@@ -66,33 +66,37 @@ pub async fn customer_subscription_deleted_handler(
   // NB: Even if we haven't received a record before, we should still be able to "tombstone" it
   // once we detect the deletion.
   if should_process_update {
-    let upsert = UpsertUserSubscription {
-      stripe_subscription_id: &summary.stripe_subscription_id,
-      maybe_user_token: summary.user_token.as_deref(),
-      subscription_category,
-      subscription_product_key,
-      maybe_stripe_customer_id: Some(&summary.stripe_customer_id),
-      maybe_stripe_product_id: Some(&summary.stripe_product_id),
-      maybe_stripe_price_id: Some(&summary.stripe_price_id),
-      maybe_stripe_recurring_interval: Some(summary.subscription_interval),
-      maybe_stripe_subscription_status: Some(summary.stripe_subscription_status),
-      maybe_stripe_is_production: Some(summary.stripe_is_production),
-      subscription_start_at: summary.subscription_start_date,
-      current_billing_period_start_at: summary.current_billing_period_start,
-      current_billing_period_end_at: summary.current_billing_period_end,
-      subscription_expires_at: calculate_subscription_end_date(&summary),
-      maybe_cancel_at: summary.maybe_cancel_at,
-      maybe_canceled_at: summary.maybe_canceled_at,
-    };
+    if let Some(user_token) = summary.user_token.as_deref() {
 
-    let _r = upsert.upsert(mysql_pool)
-        .await
-        .map_err(|err| {
-          error!("Mysql error: {:?}", err);
-          StripeWebhookError::ServerError
-        })?;
+      let upsert = UpsertUserSubscription {
+        stripe_subscription_id: &summary.stripe_subscription_id,
+        user_token,
+        subscription_namespace,
+        subscription_product_slug,
+        maybe_stripe_customer_id: Some(&summary.stripe_customer_id),
+        maybe_stripe_product_id: Some(&summary.stripe_product_id),
+        maybe_stripe_price_id: Some(&summary.stripe_price_id),
+        maybe_stripe_recurring_interval: Some(summary.subscription_interval),
+        maybe_stripe_subscription_status: Some(summary.stripe_subscription_status),
+        maybe_stripe_is_production: Some(summary.stripe_is_production),
+        subscription_start_at: summary.subscription_start_date,
+        current_billing_period_start_at: summary.current_billing_period_start,
+        current_billing_period_end_at: summary.current_billing_period_end,
+        subscription_expires_at: calculate_subscription_end_date(&summary),
+        maybe_cancel_at: summary.maybe_cancel_at,
+        maybe_canceled_at: summary.maybe_canceled_at,
+      };
 
-    action_was_taken = true;
+      let _r = upsert.upsert(mysql_pool)
+          .await
+          .map_err(|err| {
+            error!("Mysql error: {:?}", err);
+            StripeWebhookError::ServerError
+          })?;
+
+      action_was_taken = true;
+    }
+
     should_ignore_retry = true;
   }
 
