@@ -451,7 +451,7 @@ function PricingPage(props: Props) {
         </div>
 
         {/* Starter Tier (to show for Latin American countries) */}
-        <div className="w-100 mt-4">
+        {/* <div className="w-100 mt-4">
           <div className="rounded panel p-4 h-100">
             <div className="d-flex w-100">
               <h2 className="my-2 fw-bold mb-4 flex-grow-1">
@@ -553,7 +553,7 @@ function PricingPage(props: Props) {
               </div>
             </div>
           </div>
-        </div>
+        </div> */}
       </div>
     </div>
   );
