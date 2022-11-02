@@ -9,6 +9,7 @@ use tts_common::priority::{FAKEYOU_ANONYMOUS_PRIORITY_LEVEL, FAKEYOU_LOGGED_IN_P
 /// This is declared at the top level because it may need to be referenced directly.
 pub static FREE_LOGGED_OUT_PLAN : Lazy<Plan> = Lazy::new(|| {
     PlanBuilder::new("free_logged_out")
+        .is_synthetic_plan(true)
         .plan_category(PlanCategory::Free)
         .tts_base_priority_level(FAKEYOU_ANONYMOUS_PRIORITY_LEVEL)
         .build()
@@ -18,6 +19,7 @@ pub static FREE_LOGGED_OUT_PLAN : Lazy<Plan> = Lazy::new(|| {
 /// This is declared at the top level because it may need to be referenced directly.
 pub static FREE_LOGGED_OUT_FIRST_TRY_PLAN : Lazy<Plan> = Lazy::new(|| {
     PlanBuilder::new("free_logged_out_first_try")
+        .is_synthetic_plan(true)
         .plan_category(PlanCategory::Free)
         .tts_base_priority_level(FAKEYOU_LOGGED_IN_PRIORITY_LEVEL) // NB: Same as logged-in free users.
         .build()
@@ -27,24 +29,28 @@ pub static FREE_LOGGED_OUT_FIRST_TRY_PLAN : Lazy<Plan> = Lazy::new(|| {
 /// This is declared at the top level because it may need to be referenced directly.
 pub static FREE_LOGGED_IN_PLAN : Lazy<Plan> = Lazy::new(|| {
     PlanBuilder::new("free_logged_in")
+        .is_synthetic_plan(true)
         .plan_category(PlanCategory::Free)
         .tts_base_priority_level(FAKEYOU_LOGGED_IN_PRIORITY_LEVEL)
         .build()
 });
 
-/// This plan is for users that create models for us but don't pay.
-/// This is declared at the top level because it may need to be referenced directly.
-pub static LOYALTY_PLAN : Lazy<Plan> = Lazy::new(|| {
-    PlanBuilder::new("loyalty_plan")
+/// These plans are for users that create models for us but don't pay.
+pub static LOYALTY_PLANS : Lazy<HashSet<Plan>> = Lazy::new(|| {
+    let mut plans = HashSet::new();
+
+    plans.insert(PlanBuilder::new("loyalty_plan")
+        .is_synthetic_plan(true)
         .plan_category(PlanCategory::LoyaltyReward)
         .tts_base_priority_level(2)
         .tts_max_duration_seconds(30)
-        .build()
+        .build());
+
+    plans
 });
 
-// TODO: Add by-[stripe-product] lookup HashSets.
-
-pub static DEVELOPMENT_PLANS : Lazy<HashSet<Plan>> = Lazy::new(|| {
+/// These plans do not exist in production!
+pub static DEVELOPMENT_PREMIUM_PLANS: Lazy<HashSet<Plan>> = Lazy::new(|| {
     let mut plans = HashSet::new();
 
     // ========== English plans ==========
@@ -72,8 +78,8 @@ pub static DEVELOPMENT_PLANS : Lazy<HashSet<Plan>> = Lazy::new(|| {
     plans
 });
 
-/// All premium / paid-for plans in the system.
-pub static PREMIUM_PLANS : Lazy<HashSet<Plan>> = Lazy::new(|| {
+/// All paid-for production premium plans in the system.
+pub static PRODUCTION_PREMIUM_PLANS: Lazy<HashSet<Plan>> = Lazy::new(|| {
     let mut plans = HashSet::new();
 
     // ========== English plans ==========
@@ -111,6 +117,45 @@ pub static PREMIUM_PLANS : Lazy<HashSet<Plan>> = Lazy::new(|| {
     plans
 });
 
+/// Only loyalty premium plans (non-Stripe, non-PayPal, etc. - internally defined)
+pub static LOYALTY_PLANS_BY_SLUG : Lazy<HashMap<String, Plan>> = Lazy::new(|| {
+    let mut plans = HashMap::new();
+
+    fn add_plan(plans: &mut HashMap<String, Plan>, plan: &Plan) {
+        plans.insert(plan.plan_slug().to_string(), plan.clone());
+    }
+
+    LOYALTY_PLANS.iter().for_each(|plan| add_plan(&mut plans, plan));
+
+    plans
+});
+
+/// Only development premium plans
+pub static DEVELOPMENT_PREMIUM_PLANS_BY_SLUG : Lazy<HashMap<String, Plan>> = Lazy::new(|| {
+    let mut plans = HashMap::new();
+
+    fn add_plan(plans: &mut HashMap<String, Plan>, plan: &Plan) {
+        plans.insert(plan.plan_slug().to_string(), plan.clone());
+    }
+
+    DEVELOPMENT_PREMIUM_PLANS.iter().for_each(|plan| add_plan(&mut plans, plan));
+
+    plans
+});
+
+/// Only production premium plans
+pub static PRODUCTION_PREMIUM_PLANS_BY_SLUG : Lazy<HashMap<String, Plan>> = Lazy::new(|| {
+    let mut plans = HashMap::new();
+
+    fn add_plan(plans: &mut HashMap<String, Plan>, plan: &Plan) {
+        plans.insert(plan.plan_slug().to_string(), plan.clone());
+    }
+
+    PRODUCTION_PREMIUM_PLANS.iter().for_each(|plan| add_plan(&mut plans, plan));
+
+    plans
+});
+
 /// Every single plan in the system: free, paid, loyalty-based, and Stripe development plans.
 pub static ALL_PLANS_BY_SLUG : Lazy<HashMap<String, Plan>> = Lazy::new(|| {
     let mut plans = HashMap::new();
@@ -122,10 +167,10 @@ pub static ALL_PLANS_BY_SLUG : Lazy<HashMap<String, Plan>> = Lazy::new(|| {
     add_plan(&mut plans, &FREE_LOGGED_OUT_PLAN);
     add_plan(&mut plans, &FREE_LOGGED_OUT_FIRST_TRY_PLAN);
     add_plan(&mut plans, &FREE_LOGGED_IN_PLAN);
-    add_plan(&mut plans, &LOYALTY_PLAN);
 
-    PREMIUM_PLANS.iter().for_each(|plan| add_plan(&mut plans, plan));
-    DEVELOPMENT_PLANS .iter().for_each(|plan| add_plan(&mut plans, plan));
+    LOYALTY_PLANS.iter().for_each(|plan| add_plan(&mut plans, plan));
+    PRODUCTION_PREMIUM_PLANS.iter().for_each(|plan| add_plan(&mut plans, plan));
+    DEVELOPMENT_PREMIUM_PLANS.iter().for_each(|plan| add_plan(&mut plans, plan));
 
     plans
 });
@@ -158,13 +203,11 @@ pub static PLANS_BY_STRIPE_PRICE_ID : Lazy<HashMap<String, Plan>> = Lazy::new(||
     plans
 });
 
-// TODO: Add tests to assert our expectations of each plan.
-
 #[cfg(test)]
 mod test {
     use crate::configs::plans::plan::Plan;
     use crate::configs::plans::plan_category::PlanCategory;
-    use crate::configs::plans::plan_list::{ALL_PLANS_BY_SLUG, DEVELOPMENT_PLANS, PLANS_BY_STRIPE_PRICE_ID, PLANS_BY_STRIPE_PRODUCT_ID, PREMIUM_PLANS};
+    use crate::configs::plans::plan_list::{ALL_PLANS_BY_SLUG, DEVELOPMENT_PREMIUM_PLANS, DEVELOPMENT_PREMIUM_PLANS_BY_SLUG, LOYALTY_PLANS, LOYALTY_PLANS_BY_SLUG, PLANS_BY_STRIPE_PRICE_ID, PLANS_BY_STRIPE_PRODUCT_ID, PRODUCTION_PREMIUM_PLANS, PRODUCTION_PREMIUM_PLANS_BY_SLUG};
     use speculoos::prelude::*;
 
     // NB: We're being extremely careful in this test and all those that follow, essentially
@@ -175,22 +218,40 @@ mod test {
     }
 
     #[test]
-    fn test_number_of_production_plans_is_expected() {
+    fn test_number_of_stripe_production_plans_is_expected() {
         let production_plans = ALL_PLANS_BY_SLUG.values()
             .filter(|plan| !plan.is_development_plan())
+            .filter(|plan| !plan.is_synthetic_plan()) // NB: Synthetic plans are production!
             .collect::<Vec<&Plan>>();
 
-        assert_eq!(8, production_plans.len());
+        let expected = 4;
+
+        assert_eq!(expected, production_plans.len());
+        assert_eq!(expected, PRODUCTION_PREMIUM_PLANS.len());
+        assert_eq!(expected, PRODUCTION_PREMIUM_PLANS_BY_SLUG.len());
     }
 
     #[test]
-    fn test_number_of_development_plans_is_expected() {
+    fn test_number_of_stripe_development_plans_is_expected() {
         let development_plans = ALL_PLANS_BY_SLUG.values()
             .filter(|plan| plan.is_development_plan())
             .collect::<Vec<&Plan>>();
 
-        assert_eq!(2, development_plans.len());
+        let expected = 2;
+
+        assert_eq!(expected, development_plans.len());
+        assert_eq!(expected, DEVELOPMENT_PREMIUM_PLANS.len());
+        assert_eq!(expected, DEVELOPMENT_PREMIUM_PLANS_BY_SLUG.len());
     }
+
+    #[test]
+    fn test_number_of_loyalty_plans_is_expected() {
+        let expected = 1;
+
+        assert_eq!(expected, LOYALTY_PLANS.len());
+        assert_eq!(expected, LOYALTY_PLANS_BY_SLUG.len());
+    }
+
 
     #[test]
     fn test_plans_by_stripe_product_id_are_expected() {
@@ -256,65 +317,92 @@ mod test {
         assert_eq!(120, ALL_PLANS_BY_SLUG.get("fakeyou_en_pro").unwrap().tts_max_duration().num_seconds());
     }
 
-    // The following tests should not need to change much
+    // =================== THE FOLLOWING TESTS SHOULD NOT NEED TO CHANGE MUCH =================== //
 
     #[test]
-    fn test_assert_all_premium_plans_are_paid() {
-        let mut test_count = 0;
-
-        PREMIUM_PLANS.iter().for_each(|plan| {
+    fn test_assert_all_production_stripe_plans_are_paid() {
+        PRODUCTION_PREMIUM_PLANS.iter().for_each(|plan| {
             assert_eq!(plan.plan_category(), PlanCategory::Paid);
-            test_count += 1;
         });
+        PRODUCTION_PREMIUM_PLANS_BY_SLUG.iter().for_each(|(_, plan)| {
+            assert_eq!(plan.plan_category(), PlanCategory::Paid);
+        });
+    }
 
-        assert!(test_count > 1);
+    #[test]
+    fn test_assert_all_production_stripe_plans_are_non_synthetic() {
+        PRODUCTION_PREMIUM_PLANS.iter().for_each(|plan| {
+            assert!(!plan.is_synthetic_plan());
+        });
+        PRODUCTION_PREMIUM_PLANS_BY_SLUG.iter().for_each(|(_, plan)| {
+            assert!(!plan.is_synthetic_plan());
+        });
     }
 
     #[test]
     fn test_assert_all_development_stripe_plans_are_marked_development() {
-        let mut test_count = 0;
-
-        DEVELOPMENT_PLANS.iter().for_each(|plan| {
+        DEVELOPMENT_PREMIUM_PLANS.iter().for_each(|plan| {
             assert!(plan.is_development_plan());
-            test_count += 1;
         });
-
-        assert!(test_count > 1);
+        DEVELOPMENT_PREMIUM_PLANS_BY_SLUG.iter().for_each(|(_, plan)| {
+            assert!(plan.is_development_plan());
+        });
     }
 
     #[test]
-    fn test_assert_correct_key_for_plans_indexed_by_slug() {
-        let mut test_count = 0;
+    fn test_assert_all_development_stripe_plans_are_non_synthetic() {
+        DEVELOPMENT_PREMIUM_PLANS.iter().for_each(|plan| {
+            assert!(!plan.is_synthetic_plan());
+        });
+        DEVELOPMENT_PREMIUM_PLANS_BY_SLUG.iter().for_each(|(_, plan)| {
+            assert!(!plan.is_synthetic_plan());
+        });
+    }
 
+    #[test]
+    fn test_assert_all_loyalty_plans_are_synthetic() {
+        LOYALTY_PLANS.iter().for_each(|plan| {
+            assert!(plan.is_synthetic_plan());
+        });
+    }
+
+    #[test]
+    fn test_assert_correct_key_used_for_plans_indexed_by_slug() {
         ALL_PLANS_BY_SLUG.iter().for_each(|(slug, plan)| {
             assert_eq!(slug, plan.plan_slug());
-            test_count += 1;
         });
-
-        assert!(test_count > 1);
+        PRODUCTION_PREMIUM_PLANS_BY_SLUG.iter().for_each(|(slug, plan)| {
+            assert_eq!(slug, plan.plan_slug());
+        });
+        DEVELOPMENT_PREMIUM_PLANS_BY_SLUG.iter().for_each(|(slug, plan)| {
+            assert_eq!(slug, plan.plan_slug());
+        });
+        LOYALTY_PLANS_BY_SLUG.iter().for_each(|(slug, plan)| {
+            assert_eq!(slug, plan.plan_slug());
+        });
     }
 
     #[test]
     fn test_assert_correct_key_for_plans_indexed_by_product_id() {
-        let mut test_count = 0;
-
         PLANS_BY_STRIPE_PRODUCT_ID.iter().for_each(|(product_id, plan)| {
             assert_eq!(product_id, plan.stripe_product_id().unwrap());
-            test_count += 1;
         });
-
-        assert!(test_count > 1);
     }
 
     #[test]
     fn test_assert_correct_key_for_plans_indexed_by_price_id() {
-        let mut test_count = 0;
-
         PLANS_BY_STRIPE_PRICE_ID.iter().for_each(|(price_id, plan)| {
             assert_eq!(price_id, plan.stripe_price_id().unwrap());
-            test_count += 1;
         });
+    }
 
-        assert!(test_count > 1);
+    #[test]
+    fn test_assert_stripe_plans_are_non_synthetic() {
+        PLANS_BY_STRIPE_PRICE_ID.iter().for_each(|(price_id, plan)| {
+            assert!(!plan.is_synthetic_plan());
+        });
+        PLANS_BY_STRIPE_PRODUCT_ID.iter().for_each(|(price_id, plan)| {
+            assert!(!plan.is_synthetic_plan());
+        });
     }
 }

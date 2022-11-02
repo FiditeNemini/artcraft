@@ -21,7 +21,14 @@ pub struct TtsInferenceJobInsertBuilder {
   creator_set_visibility: Option<String>,
   is_from_api: bool,
   is_for_twitch: bool,
+  is_debug_request: bool, // Route the request to a special host with this flag
   priority_level: u8, // Priority is 0 by default and optionally increases
+
+  /// Premium feature controlling TTS max duration.
+  ///  - Negative values imply unlimited duration
+  ///  - 0 is "use default" (typically 12 seconds)
+  ///  - Positive values are that value in seconds up to some max.
+  max_duration_seconds: i32,
 }
 
 impl TtsInferenceJobInsertBuilder {
@@ -38,7 +45,9 @@ impl TtsInferenceJobInsertBuilder {
       creator_set_visibility: None,
       is_from_api: false,
       is_for_twitch: false,
+      is_debug_request: false,
       priority_level: 0,
+      max_duration_seconds: 0,
     }
   }
 
@@ -57,7 +66,9 @@ impl TtsInferenceJobInsertBuilder {
       creator_set_visibility: Some("hidden".to_string()),
       is_from_api: false,
       is_for_twitch: false,
+      is_debug_request: false,
       priority_level: 0,
+      max_duration_seconds: 0,
     }
   }
 
@@ -106,8 +117,18 @@ impl TtsInferenceJobInsertBuilder {
     self
   }
 
+  pub fn set_is_debug_request(mut self, value: bool) -> Self {
+    self.is_debug_request = value;
+    self
+  }
+
   pub fn set_priority_level(mut self, value: u8) -> Self {
     self.priority_level = value;
+    self
+  }
+
+  pub fn set_max_duration_seconds(mut self, value: i32) -> Self {
+    self.max_duration_seconds = value;
     self
   }
 
@@ -150,7 +171,9 @@ SET
   creator_set_visibility = ?,
   is_from_api = ?,
   is_for_twitch = ?,
+  is_debug_request = ?,
   priority_level = ?,
+  max_duration_seconds = ?,
   status = "pending"
         "#,
       job_token,
@@ -162,7 +185,9 @@ SET
       creator_set_visibility,
       self.is_from_api,
       self.is_for_twitch,
+      self.is_debug_request,
       self.priority_level,
+      self.max_duration_seconds,
     );
 
     let query_result = query.execute(mysql_pool)
@@ -173,7 +198,7 @@ SET
         res.last_insert_id()
       },
       Err(err) => {
-        return Err(anyhow!("Twitch pubsub bits insert DB error: {:?}", err));
+        return Err(anyhow!("MySQL tts_inference_job record insert error: {:?}", err));
       }
     };
 

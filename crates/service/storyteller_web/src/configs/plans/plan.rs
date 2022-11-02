@@ -14,7 +14,7 @@ const W2L_DEFAULT_TIME_LIMIT_SECONDS : i64 = 20;
 
 /// A Plan is either a free or premium plan.
 /// Each plan corresponds to a certain level of service.
-#[derive(Clone, Eq, PartialEq, Hash)]
+#[derive(Clone, Eq, PartialEq, Hash, Debug)]
 pub struct Plan {
     /// Name of the plan in URL-friendly "slug" form (human readable, no spaces, underscores),
     /// eg. "plan_1", "en_basic", etc.
@@ -36,6 +36,9 @@ pub struct Plan {
 
     /// Whether this plan is only active in development
     is_development_plan: bool,
+
+    /// Whether this plan does not exist in Stripe and only exists as defined by this server.
+    is_synthetic_plan: bool,
 
     // ========== Features for TTS ==========
 
@@ -70,6 +73,7 @@ impl Plan {
             stripe_product_id: builder.stripe_product_id.clone(),
             stripe_price_id: builder.stripe_price_id.clone(),
             is_development_plan: builder.is_development_plan,
+            is_synthetic_plan: builder.is_synthetic_plan,
             tts_base_priority_level: builder.tts_base_priority_level,
             tts_max_duration: builder.tts_max_duration,
             tts_can_generate_mp3: builder.tts_can_generate_mp3,
@@ -101,8 +105,20 @@ impl Plan {
         self.stripe_price_id.as_deref()
     }
 
+    /// The plan is only valid in "development" Stripe.
+    /// These plans should never be used on the production cluster.
     pub fn is_development_plan(&self) -> bool {
         self.is_development_plan
+    }
+
+    /// The plan is a valid Stripe plan in production (not test/development).
+    pub fn is_production_plan(&self) -> bool {
+        !self.is_development_plan
+    }
+
+    /// The plan is "synthetic", ie. does not exist in Stripe.
+    pub fn is_synthetic_plan(&self) -> bool {
+        self.is_synthetic_plan
     }
 
     pub fn tts_base_priority_level(&self) -> u8 {
@@ -111,6 +127,10 @@ impl Plan {
 
     pub fn tts_max_duration(&self) -> Duration {
         self.tts_max_duration
+    }
+
+    pub fn tts_max_duration_seconds(&self) -> i32 {
+        self.tts_max_duration.num_seconds() as i32
     }
 }
 
@@ -123,6 +143,7 @@ pub struct PlanBuilder {
     stripe_product_id: Option<String>,
     stripe_price_id: Option<String>,
     is_development_plan: bool,
+    is_synthetic_plan: bool,
 
     // ========== Features for TTS ==========
 
@@ -158,6 +179,7 @@ impl PlanBuilder {
             stripe_product_id: None,
             stripe_price_id: None,
             is_development_plan: false,
+            is_synthetic_plan: false,
 
             // TTS
             tts_base_priority_level : TTS_DEFAULT_PRIORITY_LEVEL,
@@ -205,6 +227,11 @@ impl PlanBuilder {
 
     pub fn is_development_plan(mut self, value: bool) -> Self {
         self.is_development_plan = value;
+        self
+    }
+
+    pub fn is_synthetic_plan(mut self, value: bool) -> Self {
+        self.is_synthetic_plan = value;
         self
     }
 

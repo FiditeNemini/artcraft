@@ -349,6 +349,7 @@ async fn main() -> AnyhowResult<()> {
       client: stripe_client,
     },
     hostname: server_hostname,
+    server_environment,
     third_party_url_redirector,
     health_check_status,
     mysql_pool: pool,
