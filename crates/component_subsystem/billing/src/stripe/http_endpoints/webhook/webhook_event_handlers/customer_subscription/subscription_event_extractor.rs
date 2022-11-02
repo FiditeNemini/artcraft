@@ -104,8 +104,8 @@ pub fn subscription_summary_extractor(subscription: &Subscription) -> AnyhowResu
     subscription_start_date: start_date,
     current_billing_period_start: period_start,
     current_billing_period_end: period_end,
-    maybe_cancel_at: maybe_cancel_at,
-    maybe_canceled_at: maybe_canceled_at,
+    maybe_cancel_at,
+    maybe_canceled_at,
   })
 }
 

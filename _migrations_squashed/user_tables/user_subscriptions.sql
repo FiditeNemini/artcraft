@@ -14,18 +14,15 @@ CREATE TABLE user_subscriptions (
   -- The internal user associated with the subscription.
   -- This is nullable since it's possible we mess up and don't set it on the Stripe objects.
   -- We want the latitude to correct mistakes in the future. (Hopefully this doesn't bite me later.)
-  -- **** NB/NOTE: THIS COLUMN WAS RENAMED TO `user_token` and made NON NULLABLE. ****
-  maybe_user_token VARCHAR(32) DEFAULT NULL,
+  user_token VARCHAR(32) DEFAULT NULL,
 
   -- If we host multiple sites with distinct categories, this will enable us to segregate
   -- subscriptions. This is effectively a subscriptions namespace.
-  -- **** NB/NOTE: THIS COLUMN WAS RENAMED TO `subscription_namespace` ****
-  subscription_category VARCHAR(32) NOT NULL,
+  subscription_namespace VARCHAR(32) NOT NULL,
 
   -- This is the identifier for the actual type of subscription.
   -- These will not be defined in the database, but rather the source code.
-  -- **** NB/NOTE: THIS COLUMN WAS RENAMED TO `subscription_product_slug` ****
-  subscription_product_key VARCHAR(32) NOT NULL,
+  subscription_product_slug VARCHAR(32) NOT NULL,
 
   -- ========== STRIPE DATA ==========
 
@@ -90,16 +87,16 @@ CREATE TABLE user_subscriptions (
   maybe_cancel_at TIMESTAMP DEFAULT NULL,
   maybe_canceled_at TIMESTAMP DEFAULT NULL,
 
-    -- ========== INDICES ==========
+  -- ========== INDICES ==========
   PRIMARY KEY (id),
   UNIQUE KEY (token),
   UNIQUE KEY (maybe_stripe_subscription_id),
-  KEY index_subscription_category (subscription_category),
-  KEY index_subscription_product_key (subscription_product_key),
+  KEY index_subscription_namespace (subscription_namespace),
+  KEY index_subscription_product_slug (subscription_product_slug),
   KEY index_maybe_stripe_customer_id (maybe_stripe_customer_id),
   KEY index_maybe_stripe_product_id (maybe_stripe_product_id),
   KEY index_maybe_stripe_subscription_status (maybe_stripe_subscription_status),
-  KEY fk_maybe_user_token (maybe_user_token),
+  KEY fk_user_token (user_token),
   KEY index_subscription_expires_at (subscription_expires_at)
 
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;
