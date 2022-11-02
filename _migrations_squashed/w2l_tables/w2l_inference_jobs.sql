@@ -5,7 +5,7 @@
 -- noinspection SqlNoDataSourceInspectionForFile
 -- noinspection SqlResolveForFile
 
-CREATE TABLE tts_inference_jobs (
+CREATE TABLE w2l_inference_jobs (
   id BIGINT(20) NOT NULL AUTO_INCREMENT,
 
   -- Effective "primary key" (PUBLIC)
@@ -22,19 +22,35 @@ CREATE TABLE tts_inference_jobs (
   -- This is only populated on a successful result.
   on_success_result_token VARCHAR(32) DEFAULT NULL,
 
-  -- ========== INFERENCE DETAILS ==========
+  -- ========== INFERENCE DETAILS : FACE TEMPLATE ==========
 
-  -- The model to use.
-  -- This also determines which architecture we're using.
-  model_token VARCHAR(32) NOT NULL,
+  -- The W2L template to use
+  -- Can be an image or video.
+  -- This is null if we're using a custom uploaded image.
+  maybe_w2l_template_token VARCHAR(32) DEFAULT NULL,
 
-  -- If set, use a different pretrained vocoder.
-  maybe_override_pretrained_vocoder VARCHAR(64) DEFAULT NULL,
+  -- If we're using a custom uploaded image, this will be present.
+  -- NOTE: This may never be supported.
+  maybe_public_image_bucket_location VARCHAR(255) DEFAULT NULL,
 
-  -- The raw, unprocessed user input.
-  raw_inference_text TEXT NOT NULL,
+  -- ========== INFERENCE DETAILS : AUDIO SOURCE ==========
 
-  -- ========== CREATOR DETAILS ==========
+  -- If we're using TTS results, this will be present
+  maybe_tts_inference_result_token VARCHAR(32) DEFAULT NULL,
+
+  -- If we're using custom uploaded audio, this will be present.
+  maybe_public_audio_bucket_hash VARCHAR(64) DEFAULT NULL,
+  maybe_public_audio_bucket_location VARCHAR(255) DEFAULT NULL,
+
+  -- The filename that was used at upload time (if available)
+  maybe_original_audio_filename CHAR(255) DEFAULT NULL,
+
+  -- Where the audio file was originally downloaded (if it was downloaded)
+  maybe_original_audio_download_url VARCHAR(512) DEFAULT NULL,
+
+  maybe_audio_mime_type VARCHAR(32) DEFAULT NULL,
+
+  -- ========== CREATOR DETAILS AND PREFERENCES ==========
 
   -- Foreign key to user
   -- If no user is logged in, this is null.
@@ -57,20 +73,16 @@ CREATE TABLE tts_inference_jobs (
     'private'
   ) NOT NULL DEFAULT 'public',
 
-  -- ========== SOURCE METADATA ==========
-
-  is_from_api BOOLEAN NOT NULL DEFAULT FALSE,
-  is_for_twitch BOOLEAN NOT NULL DEFAULT FALSE,
-
-  -- If true, the request gets routed to a special "debug" worker.
-  is_debug_request BOOLEAN NOT NULL DEFAULT FALSE,
-
   -- ========== PREMIUM FEATURES METADATA ==========
 
   -- The maximum duration for generated audio in seconds.
   -- Zero is implied to be the default value, which is typically 12 seconds.
   -- A negative value implies "unlimited".
   max_duration_seconds INTEGER NOT NULL DEFAULT 0,
+
+  -- Flags to disable branding
+  disable_end_bump BOOL NOT NULL DEFAULT false,
+  disable_watermark BOOL NOT NULL DEFAULT false,
 
   -- ========== JOB SYSTEM DETAILS ==========
 
@@ -87,20 +99,12 @@ CREATE TABLE tts_inference_jobs (
   --                    |-> Complete_Failure
   --                    \-> Attempt_Failed -> Started -> { Complete, Failed, Dead }
   status ENUM(
-      'pending',
-      'started',
-      'complete_success',
-      'complete_failure',
-      'attempt_failed',
-      'dead') NOT NULL DEFAULT 'pending',
-
-  -- Priority *increases*, so a level of 2 will be higher than 1.
-  -- These are the level semantics currently:
-  --   - All jobs from anonymous FakeYou users have level 0.
-  --   - All jobs from logged in FakeYou users have level 1.
-  --   - All jobs from Twitch TTS (unpaid) have level 10 (ten).
-  --   - (There will be future levels for paid Twitch and social FakeYou rewards.)
-  priority_level TINYINT UNSIGNED NOT NULL DEFAULT 0,
+    'pending',
+    'started',
+    'complete_success',
+    'complete_failure',
+    'attempt_failed',
+    'dead') NOT NULL DEFAULT 'pending',
 
   -- We can track this against a "max_attempt_count"
   attempt_count INT(3) NOT NULL DEFAULT 0,
@@ -122,10 +126,10 @@ CREATE TABLE tts_inference_jobs (
   UNIQUE KEY (token),
   UNIQUE KEY (uuid_idempotency_token),
   KEY fk_on_success_result_token (on_success_result_token),
-  KEY fk_model_token (model_token),
+  KEY fk_maybe_w2l_template_token (maybe_w2l_template_token),
+  KEY fk_maybe_tts_inference_result_token (maybe_tts_inference_result_token),
   KEY fk_maybe_creator_user_token (maybe_creator_user_token),
   KEY index_status (status),
-  KEY index_creator_ip_address (creator_ip_address),
-  KEY index_is_debug_request (is_debug_request)
+  KEY index_creator_ip_address (creator_ip_address)
 
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;

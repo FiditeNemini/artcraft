@@ -1,3 +1,6 @@
+-- NB: This is a manually squashed view of all the CREATE and ALTER statements,
+-- with comments attached to the fields for centralized documentation.
+
 -- noinspection SqlDialectInspectionForFile
 -- noinspection SqlNoDataSourceInspectionForFile
 -- noinspection SqlResolveForFile
