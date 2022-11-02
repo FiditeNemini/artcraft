@@ -750,7 +750,7 @@ fn add_desktop_app_routes<T, B> (app: App<T, B>) -> App<T, B>
             InitError = (),
         >,
 {
-    app.service(web::scope("/api/v1/vc")
+    app.service(web::scope("/v1/vc")
         .service(web::resource("/report_analytics")
             .route(web::post().to(post_app_analytics_handler))
             .route(web::head().to(|| HttpResponse::Ok()))

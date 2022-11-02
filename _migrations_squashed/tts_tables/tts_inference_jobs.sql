@@ -106,7 +106,14 @@ CREATE TABLE tts_inference_jobs (
   attempt_count INT(3) NOT NULL DEFAULT 0,
 
   -- If there is a failure, tell the user why.
+  -- This is user-facing, so keep it sanitized and reasonable.
   failure_reason VARCHAR(512) DEFAULT NULL,
+
+  -- Optional internal-only debugging information in the case of failure.
+  internal_debugging_failure_reason VARCHAR(512) DEFAULT NULL,
+
+  -- The last worker (hostname or pod name) to touch the job, either in the case of success or failure.
+  last_assigned_worker VARCHAR(255) DEFAULT NULL,
 
   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
