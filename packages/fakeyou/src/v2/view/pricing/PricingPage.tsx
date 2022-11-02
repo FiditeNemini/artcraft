@@ -22,7 +22,7 @@ function PricingPage(props: Props) {
       <div className="container mt-3 mb-5">
         <div className="row gx-3 gy-4">
           {/* Starter Tier */}
-          {/* <div className="col-12 col-sm-6 col-lg-3">
+          <div className="col-12 col-sm-6 col-lg-3">
             <div className="rounded panel p-4 h-100">
               <h2 className="text-center my-2 fw-bold mb-4">
                 {FYP.starter.tier}
@@ -103,10 +103,10 @@ function PricingPage(props: Props) {
                 })}
               </ul>
             </div>
-          </div> */}
+          </div>
 
-          {/* Basic Tier */}
-          <div className="col-12 col-sm-6 col-lg-3">
+          {/* Basic Tier (For Latin American countries) */}
+          {/* <div className="col-12 col-sm-6 col-lg-3">
             <div className="rounded panel p-4 h-100">
               <h2 className="text-center my-2 fw-bold mb-4">
                 {FYP.basic.tier}
@@ -181,7 +181,7 @@ function PricingPage(props: Props) {
                 })}
               </ul>
             </div>
-          </div>
+          </div> */}
 
           {/* Plus Tier */}
           <div className="col-12 col-sm-6 col-lg-3">
@@ -450,6 +450,7 @@ function PricingPage(props: Props) {
           </div>
         </div>
 
+        {/* Starter Tier (to show for Latin American countries) */}
         <div className="w-100 mt-4">
           <div className="rounded panel p-4 h-100">
             <div className="d-flex w-100">
