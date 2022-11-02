@@ -1,71 +1,176 @@
 const FAKEYOU_PRICES = {
-  free: {
-    tier: "free",
+  //Starter Tier
+  starter: {
+    tier: "Starter",
     price: 0,
-    features: {
-      "Extended Audio": false,
-      mp3: false,
-      "Priority Processing": false,
-      "Commercial Voices": false,
+    tts: {
+      title: "TTS",
+      features: ["Unlimited generation", "Up to 12 seconds audio"],
+    },
+    vcweb: {
+      title: "VC Web",
+      features: ["Up to 12 seconds audio"],
+    },
+    vcapp: {
+      title: "VC App",
+      features: [
+        "5 model downloads",
+        "Up to 12 secs prerecorded",
+        "Up to 2 mins realtime",
+      ],
+    },
+    w2l: {
+      title: "Wav2Lip",
+      features: ["Up to 12 seconds video"],
+    },
+    priority: {
+      title: "Processing Priority",
+      features: ["Level 1"],
     },
   },
-  plus: {
-    tier: "plus",
-    price: 7,
-    features: {
-      "Extended Audio": true,
-      mp3: false,
-      "Priority Processing": false,
-      "Commercial Voices": false,
-    },
-  },
-  pro: {
-    tier: "pro",
-    price: 15,
-    features: {
-      "Extended Audio": true,
-      mp3: true,
-      "Priority Processing": true,
-      "Commercial Voices": true,
-    },
-  },
-  elite: {
-    tier: "elite",
-    price: 25,
-    features: {
-      "Extended Audio": true,
-      mp3: true,
-      "Priority Processing": true,
-      "Commercial Voices": true,
-    },
-  },
-};
 
-const STORYTELLER_PRICES = {
-  free: {
-    tier: "free",
-    price: 0,
-    features: {
-      "Priority Processing": false,
-      "Stream Labs": false,
-    },
-  },
+  //Basic Tier
   basic: {
-    tier: "basic",
-    price: 5,
-    features: {
-      "Priority Processing": false,
-      "Stream Labs": false,
+    tier: "Basic",
+    price: 3,
+    tts: {
+      title: "TTS",
+      features: ["Unlimited generation", "Up to 20 seconds audio"],
+    },
+    vcweb: {
+      title: "VC Web",
+      features: ["Up to 20 seconds audio", "Push to play"],
+    },
+    vcapp: {
+      title: "VC App",
+      features: [
+        "7 model downloads",
+        "Up to 20 secs prerecorded",
+        "Up to 5 mins realtime",
+      ],
+    },
+    w2l: {
+      title: "Wav2Lip",
+      features: ["Up to 30 seconds video"],
+    },
+    priority: {
+      title: "Processing Priority",
+      features: ["Level 10"],
     },
   },
+
+  //Plus Tier
+  plus: {
+    tier: "Plus",
+    price: 7,
+    tts: {
+      title: "TTS",
+      features: ["Unlimited generation", "Up to 30 seconds audio"],
+    },
+    vcweb: {
+      title: "VC Web",
+      features: ["Up to 30 seconds audio", "Push to play"],
+    },
+    vcapp: {
+      title: "VC App",
+      features: [
+        "10 model downloads",
+        "Up to 30 secs prerecorded",
+        "Up to 7 mins realtime",
+      ],
+    },
+    w2l: {
+      title: "Wav2Lip",
+      features: ["Up to 1 minute video"],
+    },
+    priority: {
+      title: "Processing Priority",
+      features: ["Level 20"],
+    },
+  },
+
+  //Pro Tier
   pro: {
-    tier: "premium",
-    price: 50,
-    features: {
-      "Priority Processing": true,
-      "Stream Labs": true,
+    tier: "Pro",
+    price: 15,
+    tts: {
+      title: "TTS",
+      features: [
+        "Unlimited generation",
+        "Up to 1 minute audio",
+        "Generate MP3 file",
+        "Upload private models",
+      ],
+    },
+    vcweb: {
+      title: "VC Web",
+      features: ["Up to 30 seconds audio", "Push to play", "Generate MP3 file"],
+    },
+    vcapp: {
+      title: "VC App",
+      features: [
+        "20 model downloads",
+        "Up to 5 mins prerecorded",
+        "Up to 15 mins realtime",
+      ],
+    },
+    w2l: {
+      title: "Wav2Lip",
+      features: ["Up to 2 minutes video"],
+    },
+    priority: {
+      title: "Processing Priority",
+      features: ["Level 30"],
+    },
+    api: {
+      title: "API Access",
+      features: ["Full API access"],
+    },
+  },
+
+  //Elite Tier
+  elite: {
+    tier: "Elite",
+    price: 25,
+    tts: {
+      title: "TTS",
+      features: [
+        "Unlimited generation",
+        "Up to 5 minutes audio",
+        "Generate MP3 file",
+        "Upload private models",
+        "Share private models",
+      ],
+    },
+    vcweb: {
+      title: "VC Web",
+      features: ["Up to 7 minutes audio", "Push to play", "Generate MP3 file"],
+    },
+    vcapp: {
+      title: "VC App",
+      features: [
+        "Unlimited models",
+        "Unlimited prerecorded",
+        "Unlimited realtime",
+      ],
+    },
+    w2l: {
+      title: "Wav2Lip",
+      features: ["Up to 2 minutes video"],
+    },
+    priority: {
+      title: "Processing Priority",
+      features: ["Level 40"],
+    },
+    api: {
+      title: "API Access",
+      features: ["Full API access"],
+    },
+    commercial: {
+      title: "Commercial Voices",
+      features: ["FakeYou commercial voices"],
     },
   },
 };
 
-export { FAKEYOU_PRICES, STORYTELLER_PRICES };
+export { FAKEYOU_PRICES };
