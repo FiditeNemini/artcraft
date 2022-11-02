@@ -15,6 +15,10 @@ pub enum RecordVisibility {
   Private,
 }
 
+impl Default for RecordVisibility {
+  fn default() -> Self { Self::Public }
+}
+
 impl RecordVisibility {
   pub fn to_str(&self) -> &'static str {
     match self {

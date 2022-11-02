@@ -10,6 +10,7 @@ use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::server_state::ServerState;
 use crate::validations::model_uploads::validate_model_title;
 use database_queries::column_types::record_visibility::RecordVisibility;
+use database_queries::queries::tts::tts_inference_jobs::insert_tts_inference_job::TtsInferenceJobInsertBuilder;
 use database_queries::tokens::Tokens;
 use http_server_common::request::get_request_api_token::get_request_api_token;
 use http_server_common::request::get_request_header_optional::get_request_header_optional;
@@ -18,13 +19,11 @@ use log::{info, warn, log};
 use r2d2_redis::redis::Commands;
 use redis_common::redis_keys::RedisKeys;
 use regex::Regex;
-use sqlx::error::DatabaseError;
-use sqlx::error::Error::Database;
-use sqlx::mysql::MySqlDatabaseError;
 use std::fmt;
 use std::sync::Arc;
 use tts_common::priority::{FAKEYOU_LOGGED_IN_PRIORITY_LEVEL, FAKEYOU_ANONYMOUS_PRIORITY_LEVEL, FAKEYOU_INVESTOR_PRIORITY_LEVEL, FAKEYOU_DEFAULT_VALID_API_TOKEN_PRIORITY_LEVEL};
 use user_input_common::check_for_slurs::contains_slurs;
+use crate::configs::plans::get_correct_plan_for_session::get_correct_plan_for_session;
 
 // TODO: Temporary for investor demo
 const STORYTELLER_DEMO_COOKIE_NAME : &'static str = "storyteller_demo";
@@ -92,15 +91,23 @@ pub async fn infer_tts_handler(
 {
   let mut is_from_api = false;
   let mut maybe_user_token : Option<String> = None;
-  let mut priority_level = FAKEYOU_ANONYMOUS_PRIORITY_LEVEL;
+  let mut priority_level ;
   let mut use_high_priority_rate_limiter = false; // NB: Careful!
   let mut disable_rate_limiter = false; // NB: Careful!
+
+  let mut mysql_connection = server_state.mysql_pool
+      .acquire()
+      .await
+      .map_err(|err| {
+        warn!("MySql pool error: {:?}", err);
+        InferTtsError::ServerError
+      })?;
 
   // ==================== USER SESSION ==================== //
 
   let maybe_user_session = server_state
     .session_checker
-    .maybe_get_user_session(&http_request, &server_state.mysql_pool)
+    .maybe_get_user_session_extended_from_connection(&http_request, &mut mysql_connection)
     .await
     .map_err(|e| {
       warn!("Session checker error: {:?}", e);
@@ -109,8 +116,14 @@ pub async fn infer_tts_handler(
 
   if let Some(user_session) = maybe_user_session.as_ref() {
     maybe_user_token = Some(user_session.user_token.to_string());
-    priority_level = FAKEYOU_LOGGED_IN_PRIORITY_LEVEL; // Give logged in users execution priority.
   }
+
+  // TODO: Plan should handle "first anonymous use" and "investor" cases.
+  let plan = get_correct_plan_for_session(
+    server_state.server_environment,
+    maybe_user_session.as_ref());
+
+  priority_level = plan.tts_base_priority_level();
 
   // ==================== API TOKENS ==================== //
 
@@ -171,7 +184,7 @@ pub async fn infer_tts_handler(
     let mut rate_limiter = match maybe_user_session {
       None => &server_state.redis_rate_limiters.logged_out,
       Some(ref user) => {
-        if user.is_banned {
+        if user.role.is_banned {
           return Err(InferTtsError::NotAuthorized);
         }
         &server_state.redis_rate_limiters.logged_in
@@ -227,7 +240,7 @@ pub async fn infer_tts_handler(
 
   let maybe_user_preferred_visibility : Option<RecordVisibility> = maybe_user_session
       .as_ref()
-      .map(|user_session| user_session.preferred_tts_result_visibility);
+      .map(|user_session| user_session.preferences.preferred_tts_result_visibility);
 
   let set_visibility = request.creator_set_visibility
       .or(maybe_user_preferred_visibility)
@@ -240,69 +253,30 @@ pub async fn infer_tts_handler(
         InferTtsError::ServerError
       })?;
 
-  info!("Creating w2l inference job record...");
+  info!("Creating tts inference job record...");
 
-  let query_result = sqlx::query!(
-        r#"
-INSERT INTO tts_inference_jobs
-SET
-  token = ?,
-  uuid_idempotency_token = ?,
+  let query_result = TtsInferenceJobInsertBuilder::new_for_fakeyou_request()
+      .set_job_token(&job_token)
+      .set_uuid_idempotency_token(&request.uuid_idempotency_token)
+      .set_model_token(&model_token)
+      .set_raw_inference_text(&inference_text)
+      .set_maybe_creator_user_token(maybe_user_token.as_deref())
+      .set_creator_ip_address(&ip_address)
+      .set_creator_set_visibility(set_visibility.to_str())
+      .set_priority_level(priority_level)
+      .set_max_duration_seconds(plan.tts_max_duration_seconds())
+      .set_is_from_api(is_from_api)
+      .set_is_debug_request(is_debug_request)
+      .insert(&server_state.mysql_pool)
+      .await;
 
-  model_token = ?,
-  raw_inference_text = ?,
-  maybe_creator_user_token = ?,
-  creator_ip_address = ?,
-  creator_set_visibility = ?,
-  priority_level = ?,
-  is_from_api = ?,
-  is_debug_request = ?,
-  status = "pending"
-        "#,
-      &job_token,
-      request.uuid_idempotency_token.clone(),
-      model_token,
-      inference_text,
-      maybe_user_token,
-      ip_address,
-      set_visibility.to_str(),
-      priority_level,
-      is_from_api,
-      is_debug_request,
-    )
-    .execute(&server_state.mysql_pool)
-    .await;
-
-  let record_id = match query_result {
-    Ok(res) => {
-      res.last_insert_id()
-    },
+  match query_result {
+    Ok(_) => {},
     Err(err) => {
-      warn!("New w2l inference job creation DB error: {:?}", err);
-
-      // NB: SQLSTATE[23000]: Integrity constraint violation
-      // NB: MySQL Error Code 1062: Duplicate key insertion (this is harder to access)
-      match err {
-        Database(err) => {
-          let maybe_code = err.code().map(|c| c.into_owned());
-          /*match maybe_code.as_deref() {
-            Some("23000") => {
-              if err.message().contains("username") {
-                return Err(UsernameTaken);
-              } else if err.message().contains("email_address") {
-                return Err(EmailTaken);
-              }
-            }
-            _ => {},
-          }*/
-        },
-        _ => {},
-      }
+      warn!("New tts inference job creation DB error: {:?}", err);
       return Err(InferTtsError::ServerError);
     }
-  };
-
-  info!("new w2l inference job id: {}", record_id);
+  }
 
   server_state.firehose_publisher.enqueue_tts_inference(maybe_user_token.as_deref(), &job_token, &model_token)
       .await

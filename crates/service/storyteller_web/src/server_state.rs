@@ -14,6 +14,7 @@ use memory_caching::single_item_ttl_cache::SingleItemTtlCache;
 use r2d2_redis::{r2d2, RedisConnectionManager};
 use sqlx::MySqlPool;
 use storage_buckets_common::bucket_client::BucketClient;
+use url_config::server_environment::ServerEnvironment;
 use url_config::third_party_url_redirector::ThirdPartyUrlRedirector;
 use users_component::utils::session_checker::SessionChecker;
 use users_component::utils::session_cookie_manager::SessionCookieManager;
@@ -26,6 +27,9 @@ pub struct ServerState {
   pub stripe: StripeSettings,
 
   pub hostname: String,
+
+  /// Knowing if we're in production will allow us to turn off development-only functionalities.
+  pub server_environment: ServerEnvironment,
 
   pub third_party_url_redirector: ThirdPartyUrlRedirector,
 

@@ -1,7 +1,7 @@
 use chrono::{DateTime, Utc};
 use database_queries::column_types::record_visibility::RecordVisibility;
 
-#[derive(Clone)]
+#[derive(Clone, Default)]
 pub struct UserSessionExtended {
     pub user_token: String,
     pub user: UserSessionUserDetails,
@@ -10,7 +10,7 @@ pub struct UserSessionExtended {
     pub role: UserSessionRoleAndPermissions,
 }
 
-#[derive(Clone)]
+#[derive(Clone, Default)]
 pub struct UserSessionUserDetails {
     pub username: String,
     pub display_name: String,
@@ -19,7 +19,7 @@ pub struct UserSessionUserDetails {
     pub email_gravatar_hash: String,
 }
 
-#[derive(Clone)]
+#[derive(Clone, Default)]
 pub struct UserSessionPremiumPlanInfo {
     pub maybe_stripe_customer_id: Option<String>,
     pub maybe_loyalty_program_key: Option<String>,
@@ -41,7 +41,16 @@ pub struct UserSessionSubscriptionPlan {
     pub subscription_expires_at: DateTime<Utc>,
 }
 
-#[derive(Clone)]
+impl Default for UserSessionSubscriptionPlan {
+    fn default() -> Self {
+        Self {
+            subscription_expires_at: chrono::MIN_DATETIME,
+            ..Default::default()
+        }
+    }
+}
+
+#[derive(Clone, Default)]
 pub struct UserSessionPreferences {
     pub disable_gravatar: bool,
     pub auto_play_audio_preference: Option<bool>,
@@ -50,7 +59,7 @@ pub struct UserSessionPreferences {
     pub auto_play_video_preference: Option<bool>,
 }
 
-#[derive(Clone)]
+#[derive(Clone, Default)]
 pub struct UserSessionRoleAndPermissions {
     // ===== ROLE ===== //
     pub user_role_slug: String,
