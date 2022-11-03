@@ -69,3 +69,14 @@ from tts_inference_jobs
 where status = 'pending'
 and length(raw_inference_text) > 100
 limit 100;
+
+-- Delete old TTS inference jobs (1)
+DELETE FROM tts_inference_jobs
+WHERE status IN ('dead', 'complete_success', 'complete_failure')
+LIMIT 100000;
+
+-- Delete old TTS inference jobs (2)
+-- Roughly 20 seconds to delete 100k,
+DELETE FROM tts_inference_jobs
+WHERE created_at < ( CURDATE() - INTERVAL 1 DAY )
+LIMIT 1000000;
