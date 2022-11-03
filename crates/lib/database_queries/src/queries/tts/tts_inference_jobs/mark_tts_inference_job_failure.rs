@@ -11,7 +11,9 @@ pub async fn mark_tts_inference_job_failure(
   pool: &MySqlPool,
   job: &AvailableTtsInferenceJob,
   failure_reason: &str,
-  max_attempts: i32
+  internal_debugging_failure_reason: &str,
+  max_attempts: i32,
+  last_assigned_worker: &str,
 ) -> AnyhowResult<()> {
 
   // statuses: "attempt_failed", "complete_failure", "dead"
@@ -22,17 +24,24 @@ pub async fn mark_tts_inference_job_failure(
     next_status = "dead";
   }
 
+  let mut internal_debugging_failure_reason = internal_debugging_failure_reason.to_string();
+  internal_debugging_failure_reason.truncate(255); // Field is VARCHAR(255)
+
   let query_result = sqlx::query!(
         r#"
 UPDATE tts_inference_jobs
 SET
   status = ?,
   failure_reason = ?,
+  internal_debugging_failure_reason = ?,
+  last_assigned_worker = ?,
   retry_at = NOW() + interval 1 minute
 WHERE id = ?
         "#,
         next_status,
-        failure_reason.to_string(),
+        failure_reason,
+        internal_debugging_failure_reason,
+        last_assigned_worker,
         job.id.0,
     )
       .execute(pool)
