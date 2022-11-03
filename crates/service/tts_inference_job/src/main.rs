@@ -480,6 +480,8 @@ async fn process_jobs(
           ModelStateError::DatabaseError { .. } => ("unknown database error", false),
         };
 
+        let internal_debugging_failure_reason = format!("model error: {:?}", e);
+
         let mut job_progress_reporter = inferencer
             .job_progress_reporter
             .new_tts_inference(&job.inference_job_token)?;
@@ -492,14 +494,18 @@ async fn process_jobs(
           let _r = mark_tts_inference_job_permanently_dead(
             &inferencer.mysql_pool,
             job.id,
-            failure_reason
+            failure_reason,
+            &internal_debugging_failure_reason,
+            &inferencer.get_worker_name(),
           ).await;
         } else {
           let _r = mark_tts_inference_job_failure(
             &inferencer.mysql_pool,
             &job,
             failure_reason,
-            inferencer.job_max_attempts
+            &internal_debugging_failure_reason,
+            inferencer.job_max_attempts,
+            &inferencer.get_worker_name(),
           ).await;
         }
 
@@ -522,12 +528,17 @@ async fn process_jobs(
       match maybe_strategy {
         Err(err) => {
           warn!("Unable to process job: {:?}", err);
-          let failure_reason = "";
+
+          let failure_reason = "cache error";
+          let internal_debugging_failure_reason = format!("cache error: {:?}", err);
+
           let _r = mark_tts_inference_job_failure(
             &inferencer.mysql_pool,
             &job,
             failure_reason,
-            inferencer.job_max_attempts
+            &internal_debugging_failure_reason,
+            inferencer.job_max_attempts,
+            &inferencer.get_worker_name(),
           ).await;
           continue;
         },
@@ -564,12 +575,16 @@ async fn process_jobs(
 
         maybe_sidecar_health_issue = true;
 
-        let failure_reason = "";
+        let failure_reason = "failure processing job";
+        let internal_debugging_failure_reason = format!("job error: {:?}", e);
+
         let _r = mark_tts_inference_job_failure(
           &inferencer.mysql_pool,
           &job,
           failure_reason,
-          inferencer.job_max_attempts
+          &internal_debugging_failure_reason,
+          inferencer.job_max_attempts,
+          &inferencer.get_worker_name(),
         ).await;
 
         match e {
@@ -581,7 +596,6 @@ async fn process_jobs(
             delete_tts_synthesizers_from_cache(&inferencer.semi_persistent_cache)?;
           }
         }
-
       }
     }
   }
