@@ -1439,6 +1439,24 @@ dependencies = [
 ]
 
 [[package]]
+name = "database-cleanup"
+version = "0.0.1"
+dependencies = [
+ "anyhow",
+ "chrono",
+ "clap 4.0.18",
+ "config",
+ "container_common",
+ "dotenv",
+ "easyenv",
+ "hostname",
+ "log",
+ "serde",
+ "serde_derive",
+ "serde_json",
+]
+
+[[package]]
 name = "database_queries"
 version = "0.0.1"
 dependencies = [

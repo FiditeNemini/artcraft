@@ -76,7 +76,7 @@ WHERE status IN ('dead', 'complete_success', 'complete_failure')
 LIMIT 100000;
 
 -- Delete old TTS inference jobs (2)
--- Roughly 20 seconds to delete 100k,
+-- Roughly 20 seconds to delete 100k, 4 minutes for 1M.
 DELETE FROM tts_inference_jobs
 WHERE created_at < ( CURDATE() - INTERVAL 1 DAY )
-LIMIT 1000000;
+LIMIT 100000;

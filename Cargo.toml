@@ -3,6 +3,7 @@
 members = [
   # CLI tools for operations, etc.
   "crates/cli/database_backup",
+  "crates/cli/database_cleanup",
 
   # Complete subsystems that can be plugged into services
   "crates/component_subsystem/billing",
@@ -36,4 +37,3 @@ members = [
   "crates/service/w2l_inference_job",
   "crates/service/websocket_gateway",
 ]
-
