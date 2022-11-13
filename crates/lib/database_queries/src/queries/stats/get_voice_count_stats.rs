@@ -39,8 +39,8 @@ SELECT public_count, all_count FROM (
   let result : VoiceStats = match maybe_result {
     Ok(result) => result,
     Err(sqlx::Error::RowNotFound) => NO_RESULTS_SENTINEL.clone(),
-    Err(_) => {
-      warn!("get voice count stats error: {:?}", err);
+    Err(e) => {
+      warn!("get voice count stats error: {:?}", e);
       return Err(anyhow!("couldn't fetch voice count stats"));
     }
   };

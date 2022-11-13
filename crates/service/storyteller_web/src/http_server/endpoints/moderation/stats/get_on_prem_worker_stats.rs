@@ -95,7 +95,7 @@ pub async fn get_on_prem_worker_stats_handler(
   )
       .await
       .map_err(|e| {
-        return Err(GetOnPremWorkerStatsError::ServerError)
+        GetOnPremWorkerStatsError::ServerError
       })?;
 
   let response = GetOnPremWorkerStatsResponse {

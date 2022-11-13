@@ -48,8 +48,8 @@ where sample.is_generated_on_prem IS TRUE;
       cloud_count: sample_size_wide.saturating_sub(result.on_prem_count),
     },
     Err(sqlx::Error::RowNotFound) => NO_RESULTS_SENTINEL.clone(),
-    Err(_) => {
-      warn!("get on prem worker stats error: {:?}", err);
+    Err(e) => {
+      warn!("get on prem worker stats error: {:?}", e);
       return Err(anyhow!("couldn't fetch on prem worker stats"));
     }
   };

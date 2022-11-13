@@ -82,7 +82,7 @@ pub async fn get_voice_count_stats_handler(
   let result = get_voice_count_stats(&server_state.mysql_pool)
       .await
       .map_err(|e| {
-        return Err(GetVoiceCountStatsError::ServerError)
+        GetVoiceCountStatsError::ServerError
       })?;
 
   let response = GetVoiceCountStatsResponse {
