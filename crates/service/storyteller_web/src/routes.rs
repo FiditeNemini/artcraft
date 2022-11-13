@@ -97,6 +97,7 @@ use crate::http_server::endpoints::w2l::set_w2l_template_mod_approval::set_w2l_t
 use users_component::default_routes::add_suggested_api_v1_account_creation_and_session_routes;
 use users_component::endpoints::edit_profile_handler::edit_profile_handler;
 use users_component::endpoints::get_profile_handler::get_profile_handler;
+use crate::http_server::endpoints::moderation::stats::get_on_prem_worker_stats::get_on_prem_worker_stats_handler;
 
 pub fn add_routes<T, B> (app: App<T, B>) -> App<T, B>
   where
@@ -271,6 +272,11 @@ fn add_moderator_routes<T, B> (app: App<T, B>) -> App<T, B>
             .service(
               web::resource("/tts_voices")
                   .route(web::get().to(get_voice_count_stats_handler))
+                  .route(web::head().to(|| HttpResponse::Ok()))
+            )
+            .service(
+              web::resource("/on_prem_workers")
+                  .route(web::get().to(get_on_prem_worker_stats_handler))
                   .route(web::head().to(|| HttpResponse::Ok()))
             )
       )

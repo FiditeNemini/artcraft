@@ -4,6 +4,7 @@ pub mod generic_download;
 pub mod health_check;
 pub mod ip_bans;
 pub mod model_categories;
+pub mod stats;
 pub mod tts;
 pub mod twitch;
 pub mod users;

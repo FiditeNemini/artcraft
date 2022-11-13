@@ -1,7 +1,7 @@
 use actix_http::Error;
 use actix_http::http::header;
-use actix_web::cookie::Cookie;
 use actix_web::HttpResponseBuilder;
+use actix_web::cookie::Cookie;
 use actix_web::error::ResponseError;
 use actix_web::http::StatusCode;
 use actix_web::web::Path;
@@ -10,12 +10,12 @@ use chrono::{DateTime, Utc};
 use crate::http_server::web_utils::response_success_helpers::simple_json_success;
 use crate::http_server::web_utils::serialize_as_json_error::serialize_as_json_error;
 use crate::server_state::ServerState;
+use database_queries::queries::stats::get_voice_count_stats::get_voice_count_stats;
 use log::{info, warn, log};
 use regex::Regex;
 use sqlx::error::DatabaseError;
 use sqlx::error::Error::Database;
 use sqlx::mysql::MySqlDatabaseError;
-use std::fmt;
 use std::sync::Arc;
 
 #[derive(Serialize)]
@@ -45,8 +45,8 @@ impl ResponseError for GetVoiceCountStatsError {
 }
 
 // NB: Not using DeriveMore since Clion doesn't understand it.
-impl fmt::Display for GetVoiceCountStatsError {
-  fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+impl std::fmt::Display for GetVoiceCountStatsError {
+  fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
     write!(f, "{:?}", self)
   }
 }
@@ -79,41 +79,11 @@ pub async fn get_voice_count_stats_handler(
     return Err(GetVoiceCountStatsError::Unauthorized);
   }
 
-  // NB: Lookup failure is Err(RowNotFound).
-  let maybe_result = sqlx::query_as!(
-      VoiceStats,
-        r#"
-SELECT public_count, all_count FROM (
-  (SELECT count(*) as public_count 
-   FROM tts_models 
-   WHERE user_deleted_at IS NULL 
-   AND mod_deleted_at IS NULL) as pc,
-  (SELECT count(*) as all_count 
-   FROM tts_models) as ac
-)
-      "#,
-    )
-      .fetch_one(&server_state.mysql_pool)
-      .await;
-
-  let result : VoiceStats = match maybe_result {
-    Ok(result) => result,
-    Err(err) => {
-      match err {
-        sqlx::Error::RowNotFound => {
-          // NB: Not Found for null results means nothing is pending in the queue
-          VoiceStats {
-            all_count: -1,
-            public_count: -1,
-          }
-        },
-        _ => {
-          warn!("get tts pending count error: {:?}", err);
-          return Err(GetVoiceCountStatsError::ServerError)
-        }
-      }
-    },
-  };
+  let result = get_voice_count_stats(&server_state.mysql_pool)
+      .await
+      .map_err(|e| {
+        return Err(GetVoiceCountStatsError::ServerError)
+      })?;
 
   let response = GetVoiceCountStatsResponse {
     success: true,
@@ -129,8 +99,3 @@ SELECT public_count, all_count FROM (
       .body(body))
 }
 
-#[derive(Serialize)]
-pub struct VoiceStats {
-  pub public_count: i64,
-  pub all_count: i64,
-}
