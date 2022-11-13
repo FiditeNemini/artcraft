@@ -40,7 +40,7 @@ fags
 greaser
 groid
 guidette
-guido
+# guido # NB(2022.11.12) - Not a slur for Italian models https://discord.com/channels/963507819011768370/963812062939709471/1041106464867094528
 haole
 hebe
 heeb
