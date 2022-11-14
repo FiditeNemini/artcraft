@@ -1,9 +1,11 @@
 *secret*sh
 *~
+.dockerignore
 .env
 .env-secrets
 .git
 .idea/
+Dockerfile
 __pycache__/
 _ignored_schema.rs
 models/Wav2Lip/python/
