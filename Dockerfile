@@ -1,3 +1,7 @@
+# ================================================================
+# =============== (1) set up core rust build image ===============
+# ================================================================
+
 # Custom base image
 # Make sure to add this repository so it has read acces to the base image:
 # https://github.com/orgs/storytold/packages/container/docker-base-images-rust-ssl/settings/actions_access
@@ -27,11 +31,19 @@ RUN $HOME/.cargo/bin/cargo --version
 # Cargo Chef does Rust build caching: https://github.com/LukeMathWalker/cargo-chef
 RUN $HOME/.cargo/bin/cargo install cargo-chef --locked
 
+# ======================================================================
+# =============== (2) use cargo-chef to "plan" the build ===============
+# ======================================================================
 
 FROM rust-base AS planner
 
+# NB: Copying in everything does not appear to impact cached builds if irrelevant files are changed (at least at this step)
 COPY . .
 RUN $HOME/.cargo/bin/cargo chef prepare --recipe-path recipe.json
+
+# ======================================================================================================
+# =============== (3) "cook" the libraries (cacheable), then run the app build and tests ===============
+# ======================================================================================================
 
 FROM rust-base AS builder
 
@@ -41,7 +53,11 @@ COPY --from=planner /tmp/recipe.json recipe.json
 RUN $HOME/.cargo/bin/cargo chef cook --release --recipe-path recipe.json
 
 # NB: Now we build and test our code.
-COPY . .
+COPY Cargo.lock .
+COPY Cargo.toml .
+COPY sqlx-data.json .
+COPY crates/ ./crates
+COPY db/ ./db
 
 # Run all of the tests
 RUN SQLX_OFFLINE=true \
@@ -97,8 +113,13 @@ RUN SQLX_OFFLINE=true \
   --release \
   --bin twitch-pubsub-subscriber
 
+# =============================================================
+# =============== (4) construct the final image ===============
+# =============================================================
+
 # Final image
 FROM ubuntu:jammy as final
+RUN echo "===================================== BUILD FINAL IMAGE ====================================="
 
 # See: https://github.com/opencontainers/image-spec/blob/master/annotations.md
 LABEL org.opencontainers.image.authors='bt@brand.io, echelon@gmail.com'
@@ -138,4 +159,3 @@ RUN touch .env-secrets
 
 EXPOSE 8080
 CMD LD_LIBRARY_PATH=/usr/lib /storyteller-web
-
