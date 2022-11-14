@@ -8,155 +8,155 @@
 # FROM ghcr.io/storytold/docker-base-images-rust-ssl:d94ce4350c3b as rust-build
 FROM ubuntu:jammy as rust-base
 
-#     # NB: This can be "stable" or another version.
-#     ARG RUST_TOOLCHAIN="1.65.0"
-#
-#     WORKDIR /tmp
-#
-#     # NB: pkg-config and libssl are for container TLS; we may switch to rustls in the future.
-#     RUN apt-get update \
-#         && DEBIAN_FRONTEND=noninteractive TZ=Etc/UTC apt-get install -y \
-#             build-essential \
-#             curl \
-#             libssl-dev \
-#             pkg-config
-#
-#     # Install Rust
-#     RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs \
-#         | sh  -s -- --default-toolchain $RUST_TOOLCHAIN -y
-#
-#     # Install correct Rust version
-#     #RUN $HOME/.cargo/bin/rustup install $RUST_VERSION
-#     #RUN $HOME/.cargo/bin/rustup default $RUST_VERSION
-#
-#     # Report Rust version for build debugging
-#     RUN $HOME/.cargo/bin/rustup show
-#     RUN $HOME/.cargo/bin/rustc --version
-#     RUN $HOME/.cargo/bin/cargo --version
-#
-#     # Cargo Chef does Rust build caching: https://github.com/LukeMathWalker/cargo-chef
-#     RUN $HOME/.cargo/bin/cargo install cargo-chef --locked
-#
-#     # ======================================================================
-#     # =============== (2) use cargo-chef to "plan" the build ===============
-#     # ======================================================================
-#
-#     FROM rust-base AS planner
-#
-#     # NB: Copying in everything does not appear to impact cached builds if irrelevant files are changed (at least at this step)
-#     COPY . .
-#     RUN $HOME/.cargo/bin/cargo chef prepare --recipe-path recipe.json
-#
-#     # ======================================================================================================
-#     # =============== (3) "cook" the libraries (cacheable), then run the app build and tests ===============
-#     # ======================================================================================================
-#
-#     FROM rust-base AS builder
-#
-#     COPY --from=planner /tmp/recipe.json recipe.json
-#
-#     # NB: This step builds and caches the dependencies as its own layer.
-#     RUN $HOME/.cargo/bin/cargo chef cook --release --recipe-path recipe.json
-#
-#     # NB: Now we build and test our code.
-#     COPY Cargo.lock .
-#     COPY Cargo.toml .
-#     COPY sqlx-data.json .
-#     COPY crates/ ./crates
-#     COPY db/ ./db
-#
-#     # Run all of the tests
-#     RUN SQLX_OFFLINE=true \
-#       LD_LIBRARY_PATH=/usr/lib:${LD_LIBRARY_PATH} \
-#       $HOME/.cargo/bin/cargo test
-#
-#     # Build all the binaries.
-#     RUN SQLX_OFFLINE=true \
-#       LD_LIBRARY_PATH=/usr/lib:${LD_LIBRARY_PATH} \
-#       $HOME/.cargo/bin/cargo build \
-#       --release \
-#       --bin storyteller-web
-#
-#     RUN SQLX_OFFLINE=true \
-#       LD_LIBRARY_PATH=/usr/lib:${LD_LIBRARY_PATH} \
-#       $HOME/.cargo/bin/cargo build \
-#       --release \
-#       --bin tts-download-job
-#
-#     RUN SQLX_OFFLINE=true \
-#       LD_LIBRARY_PATH=/usr/lib:${LD_LIBRARY_PATH} \
-#       $HOME/.cargo/bin/cargo build \
-#       --release \
-#       --bin w2l-download-job
-#
-#     RUN SQLX_OFFLINE=true \
-#       LD_LIBRARY_PATH=/usr/lib:${LD_LIBRARY_PATH} \
-#       $HOME/.cargo/bin/cargo build \
-#       --release \
-#       --bin generic-download-job
-#
-#     RUN SQLX_OFFLINE=true \
-#       LD_LIBRARY_PATH=/usr/lib:${LD_LIBRARY_PATH} \
-#       $HOME/.cargo/bin/cargo build \
-#       --release \
-#       --bin tts-inference-job
-#
-#     RUN SQLX_OFFLINE=true \
-#       LD_LIBRARY_PATH=/usr/lib:${LD_LIBRARY_PATH} \
-#       $HOME/.cargo/bin/cargo build \
-#       --release \
-#       --bin w2l-inference-job
-#
-#     RUN SQLX_OFFLINE=true \
-#       LD_LIBRARY_PATH=/usr/lib:${LD_LIBRARY_PATH} \
-#       $HOME/.cargo/bin/cargo build \
-#       --release \
-#       --bin websocket-gateway
-#
-#     RUN SQLX_OFFLINE=true \
-#       LD_LIBRARY_PATH=/usr/lib:${LD_LIBRARY_PATH} \
-#       $HOME/.cargo/bin/cargo build \
-#       --release \
-#       --bin twitch-pubsub-subscriber
-#
-#     # =============================================================
-#     # =============== (4) construct the final image ===============
-#     # =============================================================
-#
-#     # Final image
-#     FROM ubuntu:jammy as final
-#
-#     # See: https://github.com/opencontainers/image-spec/blob/master/annotations.md
-#     LABEL org.opencontainers.image.authors='bt@brand.io, echelon@gmail.com'
-#     LABEL org.opencontainers.image.url='https://github.com/storytold/storyteller-web'
-#     LABEL org.opencontainers.image.documentation='https://github.com/storytold/storyteller-web'
-#     LABEL org.opencontainers.image.source='https://github.com/storytold/storyteller-web'
-#
-#     WORKDIR /
-#
-#     # Give the container its version so it can report over HTTP.
-#     ARG GIT_SHA
-#     RUN echo -n ${GIT_SHA} > GIT_SHA
-#
-#     # Copy all the binaries.
-#     COPY --from=builder /tmp/target/release/storyteller-web /
-#     COPY --from=builder /tmp/target/release/tts-download-job /
-#     COPY --from=builder /tmp/target/release/tts-inference-job /
-#     COPY --from=builder /tmp/target/release/w2l-download-job /
-#     COPY --from=builder /tmp/target/release/w2l-inference-job /
-#     COPY --from=builder /tmp/target/release/websocket-gateway /
-#     COPY --from=builder /tmp/target/release/twitch-pubsub-subscriber /
-#     COPY --from=builder /tmp/target/release/generic-download-job /
-#
-#     # SSL certs are required for crypto
-#     COPY --from=builder /etc/ssl /etc/ssl
-#
-#     # Required dynamically linked libraries
-#     COPY --from=builder /usr/lib/x86_64-linux-gnu/libssl.*             /lib/x86_64-linux-gnu/
-#     COPY --from=builder /usr/lib/x86_64-linux-gnu/libcrypto.*          /lib/x86_64-linux-gnu/
-#
-#     # Make sure all the links resolve
-#     RUN ldd storyteller-web
+# NB: This can be "stable" or another version.
+ARG RUST_TOOLCHAIN="1.65.0"
+
+WORKDIR /tmp
+
+# NB: pkg-config and libssl are for container TLS; we may switch to rustls in the future.
+RUN apt-get update \
+    && DEBIAN_FRONTEND=noninteractive TZ=Etc/UTC apt-get install -y \
+        build-essential \
+        curl \
+        libssl-dev \
+        pkg-config
+
+# Install Rust
+RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs \
+    | sh  -s -- --default-toolchain $RUST_TOOLCHAIN -y
+
+# Install correct Rust version
+#RUN $HOME/.cargo/bin/rustup install $RUST_VERSION
+#RUN $HOME/.cargo/bin/rustup default $RUST_VERSION
+
+# Report Rust version for build debugging
+RUN $HOME/.cargo/bin/rustup show
+RUN $HOME/.cargo/bin/rustc --version
+RUN $HOME/.cargo/bin/cargo --version
+
+# Cargo Chef does Rust build caching: https://github.com/LukeMathWalker/cargo-chef
+RUN $HOME/.cargo/bin/cargo install cargo-chef --locked
+
+# ======================================================================
+# =============== (2) use cargo-chef to "plan" the build ===============
+# ======================================================================
+
+FROM rust-base AS planner
+
+# NB: Copying in everything does not appear to impact cached builds if irrelevant files are changed (at least at this step)
+COPY . .
+RUN $HOME/.cargo/bin/cargo chef prepare --recipe-path recipe.json
+
+# ======================================================================================================
+# =============== (3) "cook" the libraries (cacheable), then run the app build and tests ===============
+# ======================================================================================================
+
+FROM rust-base AS builder
+
+COPY --from=planner /tmp/recipe.json recipe.json
+
+# NB: This step builds and caches the dependencies as its own layer.
+RUN $HOME/.cargo/bin/cargo chef cook --release --recipe-path recipe.json
+
+# NB: Now we build and test our code.
+COPY Cargo.lock .
+COPY Cargo.toml .
+COPY sqlx-data.json .
+COPY crates/ ./crates
+COPY db/ ./db
+
+# Run all of the tests
+RUN SQLX_OFFLINE=true \
+  LD_LIBRARY_PATH=/usr/lib:${LD_LIBRARY_PATH} \
+  $HOME/.cargo/bin/cargo test
+
+# Build all the binaries.
+RUN SQLX_OFFLINE=true \
+  LD_LIBRARY_PATH=/usr/lib:${LD_LIBRARY_PATH} \
+  $HOME/.cargo/bin/cargo build \
+  --release \
+  --bin storyteller-web
+
+RUN SQLX_OFFLINE=true \
+  LD_LIBRARY_PATH=/usr/lib:${LD_LIBRARY_PATH} \
+  $HOME/.cargo/bin/cargo build \
+  --release \
+  --bin tts-download-job
+
+RUN SQLX_OFFLINE=true \
+  LD_LIBRARY_PATH=/usr/lib:${LD_LIBRARY_PATH} \
+  $HOME/.cargo/bin/cargo build \
+  --release \
+  --bin w2l-download-job
+
+RUN SQLX_OFFLINE=true \
+  LD_LIBRARY_PATH=/usr/lib:${LD_LIBRARY_PATH} \
+  $HOME/.cargo/bin/cargo build \
+  --release \
+  --bin generic-download-job
+
+RUN SQLX_OFFLINE=true \
+  LD_LIBRARY_PATH=/usr/lib:${LD_LIBRARY_PATH} \
+  $HOME/.cargo/bin/cargo build \
+  --release \
+  --bin tts-inference-job
+
+RUN SQLX_OFFLINE=true \
+  LD_LIBRARY_PATH=/usr/lib:${LD_LIBRARY_PATH} \
+  $HOME/.cargo/bin/cargo build \
+  --release \
+  --bin w2l-inference-job
+
+RUN SQLX_OFFLINE=true \
+  LD_LIBRARY_PATH=/usr/lib:${LD_LIBRARY_PATH} \
+  $HOME/.cargo/bin/cargo build \
+  --release \
+  --bin websocket-gateway
+
+RUN SQLX_OFFLINE=true \
+  LD_LIBRARY_PATH=/usr/lib:${LD_LIBRARY_PATH} \
+  $HOME/.cargo/bin/cargo build \
+  --release \
+  --bin twitch-pubsub-subscriber
+
+# =============================================================
+# =============== (4) construct the final image ===============
+# =============================================================
+
+# Final image
+FROM ubuntu:jammy as final
+
+# See: https://github.com/opencontainers/image-spec/blob/master/annotations.md
+LABEL org.opencontainers.image.authors='bt@brand.io, echelon@gmail.com'
+LABEL org.opencontainers.image.url='https://github.com/storytold/storyteller-web'
+LABEL org.opencontainers.image.documentation='https://github.com/storytold/storyteller-web'
+LABEL org.opencontainers.image.source='https://github.com/storytold/storyteller-web'
+
+WORKDIR /
+
+# Give the container its version so it can report over HTTP.
+ARG GIT_SHA
+RUN echo -n ${GIT_SHA} > GIT_SHA
+
+# Copy all the binaries.
+COPY --from=builder /tmp/target/release/storyteller-web /
+COPY --from=builder /tmp/target/release/tts-download-job /
+COPY --from=builder /tmp/target/release/tts-inference-job /
+COPY --from=builder /tmp/target/release/w2l-download-job /
+COPY --from=builder /tmp/target/release/w2l-inference-job /
+COPY --from=builder /tmp/target/release/websocket-gateway /
+COPY --from=builder /tmp/target/release/twitch-pubsub-subscriber /
+COPY --from=builder /tmp/target/release/generic-download-job /
+
+# SSL certs are required for crypto
+COPY --from=builder /etc/ssl /etc/ssl
+
+# Required dynamically linked libraries
+COPY --from=builder /usr/lib/x86_64-linux-gnu/libssl.*             /lib/x86_64-linux-gnu/
+COPY --from=builder /usr/lib/x86_64-linux-gnu/libcrypto.*          /lib/x86_64-linux-gnu/
+
+# Make sure all the links resolve
+RUN ldd storyteller-web
 
 # Without a .env file, Rust crashes "mysteriously" (ugh)
 RUN touch .env
