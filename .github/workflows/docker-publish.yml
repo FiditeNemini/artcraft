@@ -53,8 +53,7 @@ jobs:
           username: ${{ github.actor }} # username: ${{ github.repository_owner }}
           password: ${{ secrets.GITHUB_TOKEN }}
           image_name: storytold/storyteller-rust
-          image_tag: "test,foo,latest"
-          push_git_tag: true
+          image_tag: latest,${{ github.sha }} # NB: The `git_push_tag` option does not work as expected. https://github.com/whoan/docker-build-with-cache-action/issues/72
 
       # - name: Build image
       #   run: |
