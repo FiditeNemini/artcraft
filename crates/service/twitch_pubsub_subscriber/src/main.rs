@@ -40,7 +40,7 @@ use twitch_oauth2::{ClientId, ClientSecret, RefreshToken, AccessToken};
 
 #[tokio::main]
 pub async fn main() -> AnyhowResult<()> {
-  
+
   easyenv::init_all_with_default_logging(Some(DEFAULT_RUST_LOG));
 
   // NB: Do not check this secrets-containing dotenv file into VCS.
