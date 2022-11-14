@@ -52,7 +52,7 @@ jobs:
           registry: ghcr.io
           username: ${{ github.actor }} # username: ${{ github.repository_owner }}
           password: ${{ secrets.GITHUB_TOKEN }}
-          image_name: storyteller-rust
+          image_name: storytold/storyteller-rust
 
       # - name: Build image
       #   run: |
