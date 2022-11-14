@@ -53,6 +53,7 @@ jobs:
           username: ${{ github.actor }} # username: ${{ github.repository_owner }}
           password: ${{ secrets.GITHUB_TOKEN }}
           image_name: storytold/storyteller-rust
+          push_git_tag: true
 
       # - name: Build image
       #   run: |
