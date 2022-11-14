@@ -2296,6 +2296,44 @@
       "nullable": []
     }
   },
+  "3a079cf76bcdfeb2c6f11e54c4afe1054fa39e6a7cf1c45254fd12d2b691f6c4": {
+    "query": "\nSELECT public_count, all_count FROM (\n  (SELECT count(*) as public_count\n   FROM tts_models\n   WHERE user_deleted_at IS NULL\n   AND mod_deleted_at IS NULL) as pc,\n  (SELECT count(*) as all_count\n   FROM tts_models) as ac\n)\n      ",
+    "describe": {
+      "columns": [
+        {
+          "ordinal": 0,
+          "name": "public_count",
+          "type_info": {
+            "type": "LongLong",
+            "flags": {
+              "bits": 1
+            },
+            "char_set": 63,
+            "max_size": 21
+          }
+        },
+        {
+          "ordinal": 1,
+          "name": "all_count",
+          "type_info": {
+            "type": "LongLong",
+            "flags": {
+              "bits": 1
+            },
+            "char_set": 63,
+            "max_size": 21
+          }
+        }
+      ],
+      "parameters": {
+        "Right": 0
+      },
+      "nullable": [
+        false,
+        false
+      ]
+    }
+  },
   "3a2dc0a7e41dcbdf21f91d1a1e54e813f74b0bac7aea052302089cae195eeb53": {
     "query": "\nUPDATE users\nSET\n    profile_markdown = ?,\n    profile_rendered_html = ?,\n    discord_username = ?,\n    twitter_username = ?,\n    twitch_username = ?,\n    github_username = ?,\n    cashapp_username = ?,\n    website_url = ?,\n    version = version + 1\n\nWHERE users.token = ?\nLIMIT 1\n        ",
     "describe": {
@@ -10707,6 +10745,31 @@
       ]
     }
   },
+  "d296305a192f3c5b55c65ee6b55b068a12b99f2d705ba36d3d34da8e1ef46e6e": {
+    "query": "\nselect count(*) as on_prem_count\nfrom (\n  select is_generated_on_prem\n  from tts_results\n  order by id desc limit ?\n) as sample\nwhere sample.is_generated_on_prem IS TRUE;\n      ",
+    "describe": {
+      "columns": [
+        {
+          "ordinal": 0,
+          "name": "on_prem_count",
+          "type_info": {
+            "type": "LongLong",
+            "flags": {
+              "bits": 129
+            },
+            "char_set": 63,
+            "max_size": 21
+          }
+        }
+      ],
+      "parameters": {
+        "Right": 1
+      },
+      "nullable": [
+        false
+      ]
+    }
+  },
   "d51e6e901cc8641b7b076f42b0fc507dad2168617c33c615ef97417f3a78ccc1": {
     "query": "\nUPDATE api_tokens\nSET\n  deleted_at = CURRENT_TIMESTAMP,\n  ip_address_last_update = ?\nWHERE\n  user_token = ?\nAND api_token NOT IN (?, ?, ?, ?, ?)\n        ",
     "describe": {
@@ -12418,44 +12481,6 @@
         "Right": 6
       },
       "nullable": []
-    }
-  },
-  "1d0f302c0b7c4301000c024d6bbae4d3b7370ed7c944e4c557c64b0bd2f31c14": {
-    "query": "\nSELECT public_count, all_count FROM (\n  (SELECT count(*) as public_count \n   FROM tts_models \n   WHERE user_deleted_at IS NULL \n   AND mod_deleted_at IS NULL) as pc,\n  (SELECT count(*) as all_count \n   FROM tts_models) as ac\n)\n      ",
-    "describe": {
-      "columns": [
-        {
-          "ordinal": 0,
-          "name": "public_count",
-          "type_info": {
-            "type": "LongLong",
-            "flags": {
-              "bits": 1
-            },
-            "char_set": 63,
-            "max_size": 21
-          }
-        },
-        {
-          "ordinal": 1,
-          "name": "all_count",
-          "type_info": {
-            "type": "LongLong",
-            "flags": {
-              "bits": 1
-            },
-            "char_set": 63,
-            "max_size": 21
-          }
-        }
-      ],
-      "parameters": {
-        "Right": 0
-      },
-      "nullable": [
-        false,
-        false
-      ]
     }
   },
   "218b3fe667b34bfa158bb7d4f600a3b91a22460adf566dcdf6ce540006e6c684": {
