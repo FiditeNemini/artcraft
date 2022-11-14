@@ -8,22 +8,28 @@
 # FROM ghcr.io/storytold/docker-base-images-rust-ssl:d94ce4350c3b as rust-build
 FROM ubuntu:jammy as rust-base
 
+# NB: This can be "stable" or another version.
+ARG RUST_TOOLCHAIN="1.65.0"
+
 WORKDIR /tmp
 
+# NB: pkg-config and libssl are for container TLS; we may switch to rustls in the future.
 RUN apt-get update \
     && DEBIAN_FRONTEND=noninteractive TZ=Etc/UTC apt-get install -y \
         build-essential \
         curl \
         libssl-dev \
-        pkg-config \
-        unzip \
-        wget
+        pkg-config
 
 # Install Rust
 RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs \
-    | sh  -s -- --default-toolchain stable -y
+    | sh  -s -- --default-toolchain $RUST_TOOLCHAIN -y
 
-# Report Rust version for debugging
+# Install correct Rust version
+#RUN $HOME/.cargo/bin/rustup install $RUST_VERSION
+#RUN $HOME/.cargo/bin/rustup default $RUST_VERSION
+
+# Report Rust version for build debugging
 RUN $HOME/.cargo/bin/rustup show
 RUN $HOME/.cargo/bin/rustc --version
 RUN $HOME/.cargo/bin/cargo --version
@@ -119,7 +125,6 @@ RUN SQLX_OFFLINE=true \
 
 # Final image
 FROM ubuntu:jammy as final
-RUN echo "===================================== BUILD FINAL IMAGE ====================================="
 
 # See: https://github.com/opencontainers/image-spec/blob/master/annotations.md
 LABEL org.opencontainers.image.authors='bt@brand.io, echelon@gmail.com'
