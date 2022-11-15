@@ -5,10 +5,10 @@ members = [
   "crates/cli/database_backup",
   "crates/cli/database_cleanup",
 
-  # Complete subsystems that can be plugged into services
-  "crates/component_subsystem/billing",
-  "crates/component_subsystem/inference_workloads",
-  "crates/component_subsystem/users",
+  # Plugins are complete subsystems that can be plugged into services (users, billing, etc.)
+  "crates/plugins/billing",
+  "crates/plugins/inference_workloads",
+  "crates/plugins/users",
 
   # Shared libraries
   "crates/lib/config",
