@@ -355,13 +355,13 @@ span.word:after {
 }
 
 .red-line {
-  border-left: 3px solid #fc6b68;
+  border-left: 3px solid $primary;
   height: 100%;
   top: 0;
 }
 
 .icon-red {
-  color: #fc6b68;
+  color: $primary;
 }
 
 .alert {
@@ -792,6 +792,31 @@ span.word:after {
   height: 30px;
   width: 30px;
   min-width: 30px;
+}
+
+.twitch-color {
+  color: #9146ff;
+}
+
+.purple-glow {
+  filter: drop-shadow(0px 10px 30px #9046ff9f);
+  -webkit-filter: drop-shadow(0px 10px 30px #9046ff9f);
+}
+
+.twitch-btn,
+.twitch-btn:focus,
+.twitch-btn:active {
+  background-color: #9146ff;
+  border-color: #9146ff;
+
+  &:hover {
+    background-color: lighten(#9146ff, 5%);
+    border-color: lighten(#9146ff, 5%);
+  }
+}
+
+.dashboard-icon {
+  font-size: 50px;
 }
 
 @media (min-width: 768px) {

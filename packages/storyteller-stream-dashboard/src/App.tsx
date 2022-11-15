@@ -3,7 +3,7 @@ import "./App.scss";
 
 import React from "react";
 import { BrowserRouter, Route, Switch } from "react-router-dom";
-import { GitSha } from "@storyteller/components/src/elements/GitSha";
+// import { GitSha } from "@storyteller/components/src/elements/GitSha";
 import {
   ListTtsModels,
   TtsModelListItem,
@@ -18,7 +18,7 @@ import {
   DetectLocale,
   DetectLocaleIsOk,
 } from "@storyteller/components/src/api/locale/DetectLocale";
-import { IndexPage } from "./pages/index/IndexPage";
+import { DashboardPage } from "./pages/dashboard/DashboardPage";
 import { STORYTELLER_MERGED_TRANSLATIONS } from "./_i18n/StorytellerTranslations";
 import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
 import { TopNav } from "./layout/TopNav";
@@ -182,7 +182,7 @@ class App extends React.Component<Props, State> {
                 <ObsConfigsPage sessionWrapper={this.state.sessionWrapper} />
               </Route>
               <Route exact={true} path="/">
-                <IndexPage sessionWrapper={this.state.sessionWrapper} />
+                <DashboardPage sessionWrapper={this.state.sessionWrapper} />
               </Route>
             </Switch>
 
