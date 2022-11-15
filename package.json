@@ -18,8 +18,8 @@
     "build-storyteller-obs": "lerna exec --scope @storyteller/storyteller-obs -- yarn build",
     "start-storyteller-stream": "PORT=7001 BROWSER=none lerna exec --scope @storyteller/storyteller-stream -- yarn start",
     "start-storyteller-stream-w": "set PORT=7001 && lerna exec --scope @storyteller/storyteller-stream -- yarn start-w",
-    "start-powerstream-dashboard": "PORT=7002 BROWSER=none lerna exec --scope @storyteller/dashboard.power.stream -- yarn start",
-    "start-powerstream-dashboard-w": "set PORT=7002 && lerna exec --scope @storyteller/dashboard.power.stream -- yarn start-w",
+    "start-storyteller-stream-dashboard": "PORT=7002 BROWSER=none lerna exec --scope @storyteller/storyteller-stream-dashboard -- yarn start",
+    "start-storyteller-stream-dashboard-w": "set PORT=7002 && lerna exec --scope @storyteller/storyteller-stream-dashboard -- yarn start-w",
     "build-storyteller-stream": "lerna exec --scope @storyteller/storyteller-stream -- yarn build"
   },
   "devDependencies": {

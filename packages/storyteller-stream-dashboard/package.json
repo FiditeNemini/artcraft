@@ -1,0 +1,56 @@
+{
+  "name": "@storyteller/storyteller-stream-dashboard",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "@storyteller/components": "0.1.0",
+    "@craco/craco": "^6.4.3",
+    "@fortawesome/fontawesome-svg-core": "^6.1.1",
+    "@fortawesome/free-brands-svg-icons": "^6.1.1",
+    "@fortawesome/free-solid-svg-icons": "^6.1.1",
+    "@fortawesome/react-fontawesome": "^0.2.0",
+    "@testing-library/jest-dom": "^5.16.1",
+    "@testing-library/react": "^9.5.0",
+    "@testing-library/user-event": "^13.5.0",
+    "@types/jest": "^27.4.0",
+    "@types/node": "^16.11.21",
+    "@types/react": "^16.9.36",
+    "@types/react-dom": "^16.9.8",
+    "bulma": "^0.9.0",
+    "craco": "^0.0.3",
+    "react": "^16.13.1",
+    "react-autocomplete": "^1.8.1",
+    "react-dom": "^16.13.1",
+    "react-router-dom": "^5.2.0",
+    "react-scripts": "5.0.0",
+    "typescript": "^4.5.5",
+    "web-vitals": "^2.1.4",
+    "react-wavesurfer.js": "^0.0.5",
+    "wavesurfer.js": "^6.2.0"
+  },
+  "scripts": {
+    "start": "craco start",
+    "start-w": "set BROWSER=none && craco start",
+    "build": "craco build",
+    "test": "craco test",
+    "eject": "craco eject"
+  },
+  "eslintConfig": {
+    "extends": [
+      "react-app",
+      "react-app/jest"
+    ]
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  }
+}
