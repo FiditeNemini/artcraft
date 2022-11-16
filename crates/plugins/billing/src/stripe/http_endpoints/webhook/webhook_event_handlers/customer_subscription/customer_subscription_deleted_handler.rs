@@ -55,7 +55,7 @@ pub async fn customer_subscription_deleted_handler(
   if let Some(existing_subscription) = maybe_existing_subscription {
     match existing_subscription.maybe_stripe_subscription_status {
       Some(StripeSubscriptionStatus::Canceled) => {
-        // NB: This is a terminal status and the subscription cannot be updated any further.
+        // NB: The stored subscription already had a terminal status and the subscription cannot be updated any further.
         should_process_update = false;
         should_ignore_retry = true;
       }

@@ -240,6 +240,7 @@ mod tests {
           user_email: Some("vegito@fakeyou.com".to_string()),
           maybe_existing_stripe_customer_id: None,
           existing_subscription_keys: vec![],
+          maybe_loyalty_program_key: None,
         })));
 
     let result = stripe_create_checkout_session_shared(

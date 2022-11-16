@@ -7,7 +7,7 @@ use crate::stripe::traits::internal_subscription_product_lookup::InternalSubscri
 use database_queries::queries::users::user::update_user_record_with_new_stripe_customer_id::update_user_record_with_new_stripe_customer_id;
 use database_queries::queries::users::user_subscriptions::get_user_subscription_by_stripe_subscription_id::get_user_subscription_by_stripe_subscription_id;
 use database_queries::queries::users::user_subscriptions::upsert_user_subscription_by_stripe_id::UpsertUserSubscription;
-use log::{error, warn};
+use log::{error, info, warn};
 use reusable_types::stripe::stripe_subscription_status::StripeSubscriptionStatus;
 use sqlx::MySqlPool;
 use stripe::Subscription;
@@ -56,7 +56,7 @@ pub async fn customer_subscription_updated_handler(
   if let Some(existing_subscription) = maybe_existing_subscription {
     match existing_subscription.maybe_stripe_subscription_status {
       Some(StripeSubscriptionStatus::Canceled) => {
-        // NB: This is a terminal status and the subscription cannot be updated any further.
+        // NB: The stored subscription already had a terminal status and the subscription cannot be updated any further.
         should_process_update = false;
         should_ignore_retry = true;
       }
@@ -66,6 +66,7 @@ pub async fn customer_subscription_updated_handler(
 
   if should_process_update {
     if let Some(user_token) = summary.user_token.as_deref() {
+      info!("Upserting subscription");
 
       let upsert = UpsertUserSubscription {
         stripe_subscription_id: &summary.stripe_subscription_id,
@@ -92,6 +93,8 @@ pub async fn customer_subscription_updated_handler(
             error!("Mysql error: {:?}", err);
             StripeWebhookError::ServerError
           })?;
+
+      info!("Updating user record with stripe customer ID");
 
       // TODO: Should we care if a user accidentally gets two stripe customer IDs and this
       //  overwrites one of them?
