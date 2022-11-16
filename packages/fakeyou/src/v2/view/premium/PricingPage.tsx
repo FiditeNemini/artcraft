@@ -15,6 +15,7 @@ import {
   CreateStripePortalRedirectIsError,
   CreateStripePortalRedirectIsSuccess,
 } from "@storyteller/components/src/api/premium/CreateStripePortalRedirect";
+import { FrontendEnvironment } from "../_common/FrontendEnvironment";
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -54,14 +55,17 @@ function PricingPage(props: Props) {
     }
   };
 
-  const hasPaidPremium = props.sessionSubscriptionsWrapper.hasPaidFeatures();
+  const environment = FrontendEnvironment.getInstance();
+  const planKey = environment.useProductionStripePlans() ? "production" : "development";
+
+  const userHasPaidPremium = props.sessionSubscriptionsWrapper.hasPaidFeatures();
 
   let freeButtonText = "Use for free";
   let plusButtonText = "Buy Plus";
   let proButtonText = "Buy Pro";
   let eliteButtonText = "Buy Elite";
 
-  if (hasPaidPremium) {
+  if (userHasPaidPremium) {
     freeButtonText = "Unsubscribe";
     plusButtonText = "Switch to Plus";
     proButtonText = "Switch to Pro";
@@ -251,7 +255,7 @@ function PricingPage(props: Props) {
             <div className="rounded panel p-4 h-100 panel-border">
               <h2 className="text-center my-2 fw-bold mb-4">{FYP.plus.tier}</h2>
               <button
-                onClick={() => beginStripeFlow(FYP.plus.internal_plan_key)}
+                onClick={() => beginStripeFlow(FYP.plus.internal_plan_key[planKey])}
                 className="btn btn-primary w-100 fs-6"
               >
                 {plusButtonText}
@@ -347,7 +351,7 @@ function PricingPage(props: Props) {
             <div className="rounded panel p-4 h-100">
               <h2 className="text-center my-2 fw-bold mb-4">{FYP.pro.tier}</h2>
               <button
-                onClick={() => beginStripeFlow(FYP.pro.internal_plan_key)}
+                onClick={() => beginStripeFlow(FYP.pro.internal_plan_key[planKey])}
                 className="btn btn-primary w-100 fs-6"
               >
                 {proButtonText}
@@ -457,7 +461,7 @@ function PricingPage(props: Props) {
                 {FYP.elite.tier}
               </h2>
               <button
-                onClick={() => beginStripeFlow(FYP.elite.internal_plan_key)}
+                onClick={() => beginStripeFlow(FYP.elite.internal_plan_key[planKey])}
                 className="btn btn-primary w-100 fs-6"
               >
                 {eliteButtonText}

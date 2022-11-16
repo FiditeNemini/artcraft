@@ -1,7 +1,10 @@
 const FAKEYOU_PRICES = {
   //Starter Tier
   starter: {
-    internal_plan_key: null,
+    internal_plan_key: {
+      development: null,
+      production: null,
+    },
     tier: "Starter",
     price: 0,
     tts: {
@@ -32,7 +35,10 @@ const FAKEYOU_PRICES = {
 
   //Basic Tier
   basic: {
-    internal_plan_key: null, // TODO
+    internal_plan_key: {
+      development: null, // TODO
+      production: null, // TODO
+    },
     tier: "Basic",
     price: 3,
     tts: {
@@ -63,7 +69,10 @@ const FAKEYOU_PRICES = {
 
   //Plus Tier
   plus: {
-    internal_plan_key: "development_fakeyou_plus",
+    internal_plan_key: {
+      development: "development_fakeyou_plus",
+      production: "fakeyou_plus",
+    },
     tier: "Plus",
     price: 7,
     tts: {
@@ -94,7 +103,10 @@ const FAKEYOU_PRICES = {
 
   //Pro Tier
   pro: {
-    internal_plan_key: "development_fakeyou_pro",
+    internal_plan_key: {
+      development: "development_fakeyou_pro",
+      production: "fakeyou_pro",
+    },
     tier: "Pro",
     price: 15,
     tts: {
@@ -134,7 +146,10 @@ const FAKEYOU_PRICES = {
 
   //Elite Tier
   elite: {
-    internal_plan_key: "development_fakeyou_elite",
+    internal_plan_key: {
+      development: "development_fakeyou_elite",
+      production: "fakeyou_elite",
+    },
     tier: "Elite",
     price: 25,
     tts: {
