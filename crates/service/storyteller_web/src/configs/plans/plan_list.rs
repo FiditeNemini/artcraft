@@ -55,24 +55,34 @@ pub static DEVELOPMENT_PREMIUM_PLANS: Lazy<HashSet<Plan>> = Lazy::new(|| {
 
     // ========== English plans ==========
 
-    plans.insert(PlanBuilder::new("development_fakeyou_en_plus")
+    plans.insert(PlanBuilder::new("development_fakeyou_plus")
         .is_development_plan(true)
         .plan_category(PlanCategory::Paid)
         .stripe_product_id("prod_MMxi2J5y69VPbO")
         .stripe_price_id("price_1LeDnKEU5se17MekVr1iYYNf")
         .cost_per_month_dollars(5)
-        .tts_base_priority_level(10)
+        .tts_base_priority_level(20)
         .tts_max_duration_seconds(30)
         .build());
 
-    plans.insert(PlanBuilder::new("development_fakeyou_en_pro")
+    plans.insert(PlanBuilder::new("development_fakeyou_pro")
         .is_development_plan(true)
         .plan_category(PlanCategory::Paid)
         .stripe_product_id("prod_MScAZa5uk5TfDY")
         .stripe_price_id("price_1LjgwIEU5se17MekzQZUHl9W")
         .cost_per_month_dollars(15)
-        .tts_base_priority_level(20)
-        .tts_max_duration_seconds(120)
+        .tts_base_priority_level(30)
+        .tts_max_duration_seconds(60 * 2)
+        .build());
+
+    plans.insert(PlanBuilder::new("development_fakeyou_elite")
+        .is_development_plan(true)
+        .plan_category(PlanCategory::Paid)
+        .stripe_product_id("prod_MoFffbqBPt2NG5")
+        .stripe_price_id("price_1M4dAbEU5se17MekEmwnee41")
+        .cost_per_month_dollars(25)
+        .tts_base_priority_level(40)
+        .tts_max_duration_seconds(60 * 5)
         .build());
 
     plans
@@ -214,7 +224,7 @@ mod test {
     // making ourselves check twice when we make additions, removals, or other changes.
     #[test]
     fn test_number_of_plans_is_expected() {
-        assert_eq!(10, ALL_PLANS_BY_SLUG.len());
+        assert_eq!(11, ALL_PLANS_BY_SLUG.len());
     }
 
     #[test]
@@ -237,7 +247,7 @@ mod test {
             .filter(|plan| plan.is_development_plan())
             .collect::<Vec<&Plan>>();
 
-        let expected = 2;
+        let expected = 3;
 
         assert_eq!(expected, development_plans.len());
         assert_eq!(expected, DEVELOPMENT_PREMIUM_PLANS.len());
@@ -262,6 +272,7 @@ mod test {
         let expected_product_ids = vec![
             "prod_MMxi2J5y69VPbO".to_string(), // NB: Development
             "prod_MScAZa5uk5TfDY".to_string(), // NB: Development
+            "prod_MoFffbqBPt2NG5".to_string(), // NB: Development
         ];
 
         assert_that(&product_ids).contains_all_of(&expected_product_ids.iter());
@@ -277,6 +288,7 @@ mod test {
         let expected_price_ids = vec![
             "price_1LjgwIEU5se17MekzQZUHl9W".to_string(), // NB: Development
             "price_1LeDnKEU5se17MekVr1iYYNf".to_string(), // NB: Development
+            "price_1M4dAbEU5se17MekEmwnee41".to_string(), // NB: Development
         ];
 
         assert_that(&price_ids).contains_all_of(&expected_price_ids.iter());
@@ -293,11 +305,16 @@ mod test {
         // Loyalty-based
         assert_eq!(2, ALL_PLANS_BY_SLUG.get("loyalty_plan").unwrap().tts_base_priority_level());
 
-        // Premium
+        // Premium (Production)
         assert_eq!(5, ALL_PLANS_BY_SLUG.get("fakeyou_es_plus").unwrap().tts_base_priority_level());
         assert_eq!(10, ALL_PLANS_BY_SLUG.get("fakeyou_en_plus").unwrap().tts_base_priority_level());
         assert_eq!(15, ALL_PLANS_BY_SLUG.get("fakeyou_es_pro").unwrap().tts_base_priority_level());
         assert_eq!(20, ALL_PLANS_BY_SLUG.get("fakeyou_en_pro").unwrap().tts_base_priority_level());
+
+        // Premium (Development/Test)
+        assert_eq!(20, ALL_PLANS_BY_SLUG.get("development_fakeyou_plus").unwrap().tts_base_priority_level());
+        assert_eq!(30, ALL_PLANS_BY_SLUG.get("development_fakeyou_pro").unwrap().tts_base_priority_level());
+        assert_eq!(40, ALL_PLANS_BY_SLUG.get("development_fakeyou_elite").unwrap().tts_base_priority_level());
     }
 
     #[test]
@@ -310,11 +327,16 @@ mod test {
         // Loyalty-based
         assert_eq!(30, ALL_PLANS_BY_SLUG.get("loyalty_plan").unwrap().tts_max_duration().num_seconds());
 
-        // Premium
+        // Premium (Production)
         assert_eq!(30, ALL_PLANS_BY_SLUG.get("fakeyou_es_plus").unwrap().tts_max_duration().num_seconds());
         assert_eq!(30, ALL_PLANS_BY_SLUG.get("fakeyou_en_plus").unwrap().tts_max_duration().num_seconds());
         assert_eq!(45, ALL_PLANS_BY_SLUG.get("fakeyou_es_pro").unwrap().tts_max_duration().num_seconds());
         assert_eq!(120, ALL_PLANS_BY_SLUG.get("fakeyou_en_pro").unwrap().tts_max_duration().num_seconds());
+
+        // Premium (Development/Test)
+        assert_eq!(30, ALL_PLANS_BY_SLUG.get("development_fakeyou_plus").unwrap().tts_max_duration().num_seconds());
+        assert_eq!(120, ALL_PLANS_BY_SLUG.get("development_fakeyou_pro").unwrap().tts_max_duration().num_seconds());
+        assert_eq!(300, ALL_PLANS_BY_SLUG.get("development_fakeyou_elite").unwrap().tts_max_duration().num_seconds());
     }
 
     // =================== THE FOLLOWING TESTS SHOULD NOT NEED TO CHANGE MUCH =================== //

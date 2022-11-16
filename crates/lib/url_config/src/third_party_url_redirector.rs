@@ -25,7 +25,7 @@ impl ThirdPartyUrlRedirector {
 
     /// Determine the appropriate frontend redirect to send to a 3rd party gateway (OAuth, Payments, etc.)
     /// based on the local server hostname according to the inbound HTTP request.
-    pub fn redirect_url_for_path(&self, http_request: &HttpRequest, path: &str) -> anyhow::Result<String> {
+    pub fn frontend_redirect_url_for_path(&self, http_request: &HttpRequest, path: &str) -> anyhow::Result<String> {
         let request_hostname = get_request_host(http_request)
             .ok_or(anyhow!("request did not have host header"))?;
 
@@ -92,7 +92,7 @@ mod tests {
     fn test_development_fakeyou_redirect() {
         let redirector = ThirdPartyUrlRedirector::new(ServerEnvironment::Development);
         let http_request  = request_with_host("api.dev.fakeyou.com");
-        let result = redirector.redirect_url_for_path(&http_request, "/foo/bar/baz");
+        let result = redirector.frontend_redirect_url_for_path(&http_request, "/foo/bar/baz");
         assert_eq!("https://dev.fakeyou.com/foo/bar/baz", result.unwrap());
     }
 
@@ -100,7 +100,7 @@ mod tests {
     fn test_development_storyteller_redirect() {
         let redirector = ThirdPartyUrlRedirector::new(ServerEnvironment::Development);
         let http_request  = request_with_host("api.dev.storyteller.io");
-        let result = redirector.redirect_url_for_path(&http_request, "/something");
+        let result = redirector.frontend_redirect_url_for_path(&http_request, "/something");
         assert_eq!("https://dev.storyteller.io/something", result.unwrap());
     }
 
@@ -108,7 +108,7 @@ mod tests {
     fn test_development_localhost_redirect() {
         let redirector = ThirdPartyUrlRedirector::new(ServerEnvironment::Development);
         let http_request  = request_with_host("localhost:8000");
-        let result = redirector.redirect_url_for_path(&http_request, "/a/b/c");
+        let result = redirector.frontend_redirect_url_for_path(&http_request, "/a/b/c");
         assert_eq!("http://localhost:9000/a/b/c", result.unwrap());
     }
 
@@ -116,7 +116,7 @@ mod tests {
     fn test_production_fakeyou_redirect() {
         let redirector = ThirdPartyUrlRedirector::new(ServerEnvironment::Production);
         let http_request  = request_with_host("api.fakeyou.com");
-        let result = redirector.redirect_url_for_path(&http_request, "/profile/bob");
+        let result = redirector.frontend_redirect_url_for_path(&http_request, "/profile/bob");
         assert_eq!("https://fakeyou.com/profile/bob", result.unwrap());
     }
 
@@ -124,20 +124,20 @@ mod tests {
     fn test_production_storyteller_redirect() {
         let redirector = ThirdPartyUrlRedirector::new(ServerEnvironment::Production);
         let http_request  = request_with_host("api.storyteller.io");
-        let result = redirector.redirect_url_for_path(&http_request, "/account");
+        let result = redirector.frontend_redirect_url_for_path(&http_request, "/account");
         assert_eq!("https://storyteller.io/account", result.unwrap());
     }
 
     #[test]
     fn test_wrong_environment_development_hostnames() {
         let redirector = ThirdPartyUrlRedirector::new(ServerEnvironment::Development);
-        assert!(redirector.redirect_url_for_path(
+        assert!(redirector.frontend_redirect_url_for_path(
             &request_with_host("api.storyteller.io"), "/foo")
             .is_err());
-        assert!(redirector.redirect_url_for_path(
+        assert!(redirector.frontend_redirect_url_for_path(
             &request_with_host("api.fakeyou.com"), "/foo")
             .is_err());
-        assert!(redirector.redirect_url_for_path(
+        assert!(redirector.frontend_redirect_url_for_path(
             &request_with_host("unrelated.com"), "/foo")
             .is_err());
     }
@@ -145,19 +145,19 @@ mod tests {
     #[test]
     fn test_wrong_environment_production_hostnames() {
         let redirector = ThirdPartyUrlRedirector::new(ServerEnvironment::Production);
-        assert!(redirector.redirect_url_for_path(
+        assert!(redirector.frontend_redirect_url_for_path(
             &request_with_host("dev.api.storyteller.io"), "/foo")
             .is_err());
-        assert!(redirector.redirect_url_for_path(
+        assert!(redirector.frontend_redirect_url_for_path(
             &request_with_host("dev.api.fakeyou.com"), "/foo")
             .is_err());
-        assert!(redirector.redirect_url_for_path(
+        assert!(redirector.frontend_redirect_url_for_path(
             &request_with_host("localhost"), "/foo")
             .is_err());
-        assert!(redirector.redirect_url_for_path(
+        assert!(redirector.frontend_redirect_url_for_path(
             &request_with_host("localhost:1000"), "/foo")
             .is_err());
-        assert!(redirector.redirect_url_for_path(
+        assert!(redirector.frontend_redirect_url_for_path(
             &request_with_host("unrelated.com"), "/foo")
             .is_err());
     }

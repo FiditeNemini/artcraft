@@ -51,7 +51,7 @@ pub async fn stripe_create_customer_portal_session_shared(
 
   let return_url = match &stripe_config.portal.return_url {
     FullUrlOrPath::FullUrl(url) => url.to_string(),
-    FullUrlOrPath::Path(path) => url_redirector.redirect_url_for_path(&http_request, path)
+    FullUrlOrPath::Path(path) => url_redirector.frontend_redirect_url_for_path(&http_request, path)
         .map_err(|_| CreateCustomerPortalSessionError::ServerError)?,
   };
 

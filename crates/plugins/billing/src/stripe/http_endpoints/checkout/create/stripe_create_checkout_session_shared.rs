@@ -62,13 +62,13 @@ pub async fn stripe_create_checkout_session_shared(
 
   let success_url = match &stripe_config.checkout.success_url {
     FullUrlOrPath::FullUrl(url) => url.to_string(),
-    FullUrlOrPath::Path(path) => url_redirector.redirect_url_for_path(http_request, &path)
+    FullUrlOrPath::Path(path) => url_redirector.frontend_redirect_url_for_path(http_request, &path)
         .map_err(|_e| CreateCheckoutSessionError::ServerError)?,
   };
 
   let cancel_url = match &stripe_config.checkout.cancel_url {
     FullUrlOrPath::FullUrl(url) => url.to_string(),
-    FullUrlOrPath::Path(path) => url_redirector.redirect_url_for_path(http_request, &path)
+    FullUrlOrPath::Path(path) => url_redirector.frontend_redirect_url_for_path(http_request, &path)
         .map_err(|_e| CreateCheckoutSessionError::ServerError)?,
   };
 
