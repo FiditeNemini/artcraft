@@ -59,6 +59,10 @@ const FAKEYOU_PRICES = {
       title: "Processing Priority",
       features: ["Level 10"],
     },
+    // support: {
+    //   title: "Support Us",
+    //   features: ["You help support FakeYou!"],
+    // },
   },
 
   //Plus Tier
@@ -90,6 +94,10 @@ const FAKEYOU_PRICES = {
       title: "Processing Priority",
       features: ["Level 20"],
     },
+    // support: {
+    //   title: "Support Us",
+    //   features: ["You help support FakeYou!"],
+    // },
   },
 
   //Pro Tier
@@ -130,6 +138,10 @@ const FAKEYOU_PRICES = {
       title: "API Access",
       features: ["Full API access"],
     },
+    // support: {
+    //   title: "Support Us",
+    //   features: ["You help support FakeYou!"],
+    // },
   },
 
   //Elite Tier
@@ -175,6 +187,10 @@ const FAKEYOU_PRICES = {
       title: "Commercial Voices",
       features: ["FakeYou commercial voices"],
     },
+    // support: {
+    //   title: "Support Us",
+    //   features: ["You help support FakeYou!"],
+    // },
   },
 };
 

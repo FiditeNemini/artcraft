@@ -129,6 +129,19 @@ styles with important tags:
     color: $primary;
   }
 
+  .text-yellow {
+    color: #ffe600;
+  }
+
+  .alert-pricing {
+    font-weight: 500 !important;
+    font-size: 18px !important;
+    color: $white;
+    background-color: $secondary;
+    border-color: $secondary;
+    padding: 1.2rem !important;
+  }
+
   .btn {
     border-radius: 5px;
     outline: none;
