@@ -1,7 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { container, item, image, panel } from "../../../data/animation";
+import { container, item, image } from "../../../data/animation";
 import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
 
 interface Props {
