@@ -3,20 +3,74 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Link } from "react-router-dom";
 import { faCheck } from "@fortawesome/free-solid-svg-icons";
 import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
+import { SessionSubscriptionsWrapper } from "@storyteller/components/src/session/SessionSubscriptionsWrapper";
 import { FAKEYOU_PRICES as FYP } from "@storyteller/fakeyou/src/data/PriceTiers";
+import {
+  CreateStripeCheckoutRedirect,
+  CreateStripeCheckoutRedirectIsError,
+  CreateStripeCheckoutRedirectIsSuccess,
+} from "@storyteller/components/src/api/premium/CreateStripeCheckoutRedirect";
+import { 
+  CreateStripePortalRedirect, 
+  CreateStripePortalRedirectIsError, 
+  CreateStripePortalRedirectIsSuccess,
+} from "@storyteller/components/src/api/premium/CreateStripePortalRedirect";
 
 interface Props {
   sessionWrapper: SessionWrapper;
-  querySessionCallback: () => void;
+  sessionSubscriptionsWrapper: SessionSubscriptionsWrapper;
 }
 
 function PricingPage(props: Props) {
+
+  const beginStripeCheckoutFlow = async (internal_plan_key: string) : Promise<boolean> => {
+    const response = await CreateStripeCheckoutRedirect(internal_plan_key);
+    if (CreateStripeCheckoutRedirectIsSuccess(response)) {
+      window.location.href = response.stripe_checkout_redirect_url;
+    } else if (CreateStripeCheckoutRedirectIsError(response)) {
+      // TODO
+    }
+    return false;
+  }
+
+  const beginStripePortalFlow = async () : Promise<boolean> => {
+    const response = await CreateStripePortalRedirect();
+    if (CreateStripePortalRedirectIsSuccess(response)) {
+      window.location.href = response.stripe_portal_redirect_url;
+    } else if (CreateStripePortalRedirectIsError(response)) {
+      // TODO
+    }
+    return false;
+  }
+
+  const beginStripeFlow = async (internal_plan_key: string) : Promise<boolean> => {
+    if (props.sessionSubscriptionsWrapper.hasPaidFeatures()) {
+      return await beginStripePortalFlow();
+    } else {
+      return await beginStripeCheckoutFlow(internal_plan_key);
+    }
+  };
+
+  const hasPaidPremium = props.sessionSubscriptionsWrapper.hasPaidFeatures();
+
+  let freeButtonText = 'Use for free';
+  let plusButtonText = 'Buy Plus';
+  let proButtonText = 'Buy Pro';
+  let eliteButtonText = 'Buy Elite';
+
+  if (hasPaidPremium) {
+    freeButtonText = 'Unsubscribe';
+    plusButtonText = 'Switch to Plus';
+    proButtonText = 'Switch to Pro';
+    eliteButtonText = 'Switch to Elite';
+  }
+
   return (
     <div>
       <div className="container py-5 text-center">
         <h1 className="display-5 fw-bold">Pricing</h1>
         <p className="fs-5">
-          Some kind of description here, idk haven't thought of it.
+          By purchasing FakeYou premium, you help us build more!
         </p>
       </div>
       <div className="container mt-3 mb-5">
@@ -28,13 +82,31 @@ function PricingPage(props: Props) {
                 {FYP.starter.tier}
               </h2>
               <Link to="/" className="btn btn-secondary w-100 fs-6">
-                Use for free
+                {freeButtonText}
               </Link>
               <h2 className="display-5 fw-bold text-center my-5">
                 ${FYP.starter.price}
                 <span className="fs-5 opacity-75 fw-normal"> /month</span>
               </h2>
               <ul className="pricing-list d-flex flex-column gap-2">
+
+                <li className="fw-semibold">
+                  {FYP.starter.priority.title}
+                </li>
+                {FYP.starter.priority.features.map((e: any) => {
+                  return (
+                    <li key={e}>
+                      <FontAwesomeIcon
+                        icon={faCheck}
+                        className="text-red me-3"
+                      />
+                      {e}
+                      {" "}
+                      <span className="small-text">(registered users)</span>
+                    </li>
+                  );
+                })}
+
                 <li className="fw-semibold">{FYP.starter.tts.title}</li>
                 {FYP.starter.tts.features.map((e: any) => {
                   return (
@@ -47,7 +119,7 @@ function PricingPage(props: Props) {
                     </li>
                   );
                 })}
-                <li className="fw-semibold">{FYP.starter.vcweb.title}</li>
+                {/*<li className="fw-semibold">{FYP.starter.vcweb.title}</li>
                 {FYP.starter.vcweb.features.map((e: any) => {
                   return (
                     <li key={e}>
@@ -73,24 +145,9 @@ function PricingPage(props: Props) {
                       {e}
                     </li>
                   );
-                })}
+                })}*/}
                 <li className="fw-semibold">{FYP.starter.w2l.title}</li>
                 {FYP.starter.w2l.features.map((e: any) => {
-                  return (
-                    <li key={e}>
-                      <FontAwesomeIcon
-                        icon={faCheck}
-                        className="text-red me-3"
-                      />
-                      {e}
-                    </li>
-                  );
-                })}
-                <li className="fw-semibold">
-                  {FYP.starter.priority.title}{" "}
-                  <span className="small-text">(registered users)</span>
-                </li>
-                {FYP.starter.priority.features.map((e: any) => {
                   return (
                     <li key={e}>
                       <FontAwesomeIcon
@@ -187,14 +244,32 @@ function PricingPage(props: Props) {
           <div className="col-12 col-sm-6 col-lg-3">
             <div className="rounded panel p-4 h-100">
               <h2 className="text-center my-2 fw-bold mb-4">{FYP.plus.tier}</h2>
-              <Link to="/" className="btn btn-primary w-100 fs-6">
-                Buy {FYP.plus.tier}
-              </Link>
+              <button 
+                onClick={() => beginStripeFlow(FYP.plus.internal_plan_key)}
+                className="btn btn-primary w-100 fs-6"
+                >
+                  {plusButtonText}
+              </button>
               <h2 className="display-5 fw-bold text-center my-5">
                 ${FYP.plus.price}
                 <span className="fs-5 opacity-75 fw-normal"> /month</span>
               </h2>
               <ul className="pricing-list d-flex flex-column gap-2">
+
+                <li className="fw-semibold">{FYP.plus.priority.title}</li>
+                {FYP.plus.priority.features.map((e: any) => {
+                  return (
+                    <li key={e}>
+                      <FontAwesomeIcon
+                        icon={faCheck}
+                        className="text-red me-3"
+                      />
+                      {e}
+                    </li>
+                  );
+                })}
+
+
                 <li className="fw-semibold">{FYP.plus.tts.title}</li>
                 {FYP.plus.tts.features.map((e: any) => {
                   return (
@@ -207,7 +282,7 @@ function PricingPage(props: Props) {
                     </li>
                   );
                 })}
-                <li className="fw-semibold">{FYP.plus.vcweb.title}</li>
+                {/*<li className="fw-semibold">{FYP.plus.vcweb.title}</li>
                 {FYP.plus.vcweb.features.map((e: any) => {
                   return (
                     <li key={e}>
@@ -230,21 +305,9 @@ function PricingPage(props: Props) {
                       {e}
                     </li>
                   );
-                })}
+                })}*/}
                 <li className="fw-semibold">{FYP.plus.w2l.title}</li>
                 {FYP.plus.w2l.features.map((e: any) => {
-                  return (
-                    <li key={e}>
-                      <FontAwesomeIcon
-                        icon={faCheck}
-                        className="text-red me-3"
-                      />
-                      {e}
-                    </li>
-                  );
-                })}
-                <li className="fw-semibold">{FYP.plus.priority.title}</li>
-                {FYP.plus.priority.features.map((e: any) => {
                   return (
                     <li key={e}>
                       <FontAwesomeIcon
@@ -263,14 +326,32 @@ function PricingPage(props: Props) {
           <div className="col-12 col-sm-6 col-lg-3">
             <div className="rounded panel p-4 h-100">
               <h2 className="text-center my-2 fw-bold mb-4">{FYP.pro.tier}</h2>
-              <Link to="/" className="btn btn-primary w-100 fs-6">
-                Buy {FYP.pro.tier}
-              </Link>
+              <button 
+                onClick={() => beginStripeFlow(FYP.pro.internal_plan_key)}
+                className="btn btn-primary w-100 fs-6"
+                >
+                  {proButtonText}
+              </button>
               <h2 className="display-5 fw-bold text-center my-5">
                 ${FYP.pro.price}
                 <span className="fs-5 opacity-75 fw-normal"> /month</span>
               </h2>
               <ul className="pricing-list d-flex flex-column gap-2">
+
+                <li className="fw-semibold">{FYP.pro.priority.title}</li>
+                {FYP.pro.priority.features.map((e: any) => {
+                  return (
+                    <li key={e}>
+                      <FontAwesomeIcon
+                        icon={faCheck}
+                        className="text-red me-3"
+                      />
+                      {e}
+                    </li>
+                  );
+                })}
+
+
                 <li className="fw-semibold">{FYP.pro.tts.title}</li>
                 {FYP.pro.tts.features.map((e: any) => {
                   return (
@@ -283,7 +364,7 @@ function PricingPage(props: Props) {
                     </li>
                   );
                 })}
-                <li className="fw-semibold">{FYP.pro.vcweb.title}</li>
+                {/*<li className="fw-semibold">{FYP.pro.vcweb.title}</li>
                 {FYP.pro.vcweb.features.map((e: any) => {
                   return (
                     <li key={e}>
@@ -306,7 +387,7 @@ function PricingPage(props: Props) {
                       {e}
                     </li>
                   );
-                })}
+                })}*/}
                 <li className="fw-semibold">{FYP.pro.w2l.title}</li>
                 {FYP.pro.w2l.features.map((e: any) => {
                   return (
@@ -319,19 +400,7 @@ function PricingPage(props: Props) {
                     </li>
                   );
                 })}
-                <li className="fw-semibold">{FYP.pro.priority.title}</li>
-                {FYP.pro.priority.features.map((e: any) => {
-                  return (
-                    <li key={e}>
-                      <FontAwesomeIcon
-                        icon={faCheck}
-                        className="text-red me-3"
-                      />
-                      {e}
-                    </li>
-                  );
-                })}
-                <li className="fw-semibold">{FYP.pro.api.title}</li>
+                {/*<li className="fw-semibold">{FYP.pro.api.title}</li>
                 {FYP.pro.api.features.map((e: any) => {
                   return (
                     <li key={e}>
@@ -342,7 +411,7 @@ function PricingPage(props: Props) {
                       {e}
                     </li>
                   );
-                })}
+                })}*/}
               </ul>
             </div>
           </div>
@@ -353,14 +422,31 @@ function PricingPage(props: Props) {
               <h2 className="text-center my-2 fw-bold mb-4">
                 {FYP.elite.tier}
               </h2>
-              <Link to="/" className="btn btn-primary w-100 fs-6">
-                Buy {FYP.elite.tier}
-              </Link>
+              <button 
+                onClick={() => beginStripeFlow(FYP.elite.internal_plan_key)}
+                className="btn btn-primary w-100 fs-6"
+                >
+                  {eliteButtonText}
+              </button>
               <h2 className="display-5 fw-bold text-center my-5">
                 ${FYP.elite.price}
                 <span className="fs-5 opacity-75 fw-normal"> /month</span>
               </h2>
               <ul className="pricing-list d-flex flex-column gap-2">
+
+                <li className="fw-semibold">{FYP.elite.priority.title}</li>
+                {FYP.elite.priority.features.map((e: any) => {
+                  return (
+                    <li key={e}>
+                      <FontAwesomeIcon
+                        icon={faCheck}
+                        className="text-red me-3"
+                      />
+                      {e}
+                    </li>
+                  );
+                })}
+
                 <li className="fw-semibold">{FYP.elite.tts.title}</li>
                 {FYP.elite.tts.features.map((e: any) => {
                   return (
@@ -373,7 +459,7 @@ function PricingPage(props: Props) {
                     </li>
                   );
                 })}
-                <li className="fw-semibold">{FYP.elite.vcweb.title}</li>
+                {/*<li className="fw-semibold">{FYP.elite.vcweb.title}</li>
                 {FYP.elite.vcweb.features.map((e: any) => {
                   return (
                     <li key={e}>
@@ -396,7 +482,7 @@ function PricingPage(props: Props) {
                       {e}
                     </li>
                   );
-                })}
+                })}*/}
                 <li className="fw-semibold">{FYP.elite.w2l.title}</li>
                 {FYP.elite.w2l.features.map((e: any) => {
                   return (
@@ -409,19 +495,7 @@ function PricingPage(props: Props) {
                     </li>
                   );
                 })}
-                <li className="fw-semibold">{FYP.elite.priority.title}</li>
-                {FYP.elite.priority.features.map((e: any) => {
-                  return (
-                    <li key={e}>
-                      <FontAwesomeIcon
-                        icon={faCheck}
-                        className="text-red me-3"
-                      />
-                      {e}
-                    </li>
-                  );
-                })}
-                <li className="fw-semibold">{FYP.elite.api.title}</li>
+                {/*<li className="fw-semibold">{FYP.elite.api.title}</li>
                 {FYP.elite.api.features.map((e: any) => {
                   return (
                     <li key={e}>
@@ -432,7 +506,7 @@ function PricingPage(props: Props) {
                       {e}
                     </li>
                   );
-                })}
+                })}*/}
                 <li className="fw-semibold">{FYP.elite.commercial.title}</li>
                 {FYP.elite.commercial.features.map((e: any) => {
                   return (
