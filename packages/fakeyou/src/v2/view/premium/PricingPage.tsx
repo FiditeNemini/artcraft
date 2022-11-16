@@ -1,7 +1,7 @@
 import React from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Link } from "react-router-dom";
-import { faCheck } from "@fortawesome/free-solid-svg-icons";
+import { faCheck, faHeart, faSmile } from "@fortawesome/free-solid-svg-icons";
 import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
 import { SessionSubscriptionsWrapper } from "@storyteller/components/src/session/SessionSubscriptionsWrapper";
 import { FAKEYOU_PRICES as FYP } from "@storyteller/fakeyou/src/data/PriceTiers";
@@ -10,9 +10,9 @@ import {
   CreateStripeCheckoutRedirectIsError,
   CreateStripeCheckoutRedirectIsSuccess,
 } from "@storyteller/components/src/api/premium/CreateStripeCheckoutRedirect";
-import { 
-  CreateStripePortalRedirect, 
-  CreateStripePortalRedirectIsError, 
+import {
+  CreateStripePortalRedirect,
+  CreateStripePortalRedirectIsError,
   CreateStripePortalRedirectIsSuccess,
 } from "@storyteller/components/src/api/premium/CreateStripePortalRedirect";
 
@@ -22,8 +22,9 @@ interface Props {
 }
 
 function PricingPage(props: Props) {
-
-  const beginStripeCheckoutFlow = async (internal_plan_key: string) : Promise<boolean> => {
+  const beginStripeCheckoutFlow = async (
+    internal_plan_key: string
+  ): Promise<boolean> => {
     const response = await CreateStripeCheckoutRedirect(internal_plan_key);
     if (CreateStripeCheckoutRedirectIsSuccess(response)) {
       window.location.href = response.stripe_checkout_redirect_url;
@@ -31,9 +32,9 @@ function PricingPage(props: Props) {
       // TODO
     }
     return false;
-  }
+  };
 
-  const beginStripePortalFlow = async () : Promise<boolean> => {
+  const beginStripePortalFlow = async (): Promise<boolean> => {
     const response = await CreateStripePortalRedirect();
     if (CreateStripePortalRedirectIsSuccess(response)) {
       window.location.href = response.stripe_portal_redirect_url;
@@ -41,9 +42,11 @@ function PricingPage(props: Props) {
       // TODO
     }
     return false;
-  }
+  };
 
-  const beginStripeFlow = async (internal_plan_key: string) : Promise<boolean> => {
+  const beginStripeFlow = async (
+    internal_plan_key: string
+  ): Promise<boolean> => {
     if (props.sessionSubscriptionsWrapper.hasPaidFeatures()) {
       return await beginStripePortalFlow();
     } else {
@@ -53,25 +56,29 @@ function PricingPage(props: Props) {
 
   const hasPaidPremium = props.sessionSubscriptionsWrapper.hasPaidFeatures();
 
-  let freeButtonText = 'Use for free';
-  let plusButtonText = 'Buy Plus';
-  let proButtonText = 'Buy Pro';
-  let eliteButtonText = 'Buy Elite';
+  let freeButtonText = "Use for free";
+  let plusButtonText = "Buy Plus";
+  let proButtonText = "Buy Pro";
+  let eliteButtonText = "Buy Elite";
 
   if (hasPaidPremium) {
-    freeButtonText = 'Unsubscribe';
-    plusButtonText = 'Switch to Plus';
-    proButtonText = 'Switch to Pro';
-    eliteButtonText = 'Switch to Elite';
+    freeButtonText = "Unsubscribe";
+    plusButtonText = "Switch to Plus";
+    proButtonText = "Switch to Pro";
+    eliteButtonText = "Switch to Elite";
   }
 
   return (
     <div>
-      <div className="container py-5 text-center">
+      <div className="container pt-5 pb-3 text-center">
         <h1 className="display-5 fw-bold">Pricing</h1>
-        <p className="fs-5">
+        {/* <p className="fs-5">
           By purchasing FakeYou premium, you help us build more!
-        </p>
+        </p> */}
+        <div className="alert alert-warning mt-4 alert-pricing">
+          <FontAwesomeIcon icon={faHeart} className="text-red me-3" />
+          By purchasing FakeYou premium, you help us build more!
+        </div>
       </div>
       <div className="container mt-3 mb-5">
         <div className="row gx-3 gy-4">
@@ -89,10 +96,7 @@ function PricingPage(props: Props) {
                 <span className="fs-5 opacity-75 fw-normal"> /month</span>
               </h2>
               <ul className="pricing-list d-flex flex-column gap-2">
-
-                <li className="fw-semibold">
-                  {FYP.starter.priority.title}
-                </li>
+                <li className="fw-semibold">{FYP.starter.priority.title}</li>
                 {FYP.starter.priority.features.map((e: any) => {
                   return (
                     <li key={e}>
@@ -100,9 +104,7 @@ function PricingPage(props: Props) {
                         icon={faCheck}
                         className="text-red me-3"
                       />
-                      {e}
-                      {" "}
-                      <span className="small-text">(registered users)</span>
+                      {e} <span className="small-text">(registered users)</span>
                     </li>
                   );
                 })}
@@ -237,25 +239,28 @@ function PricingPage(props: Props) {
                   );
                 })}
               </ul>
+              <hr className="my-4" />
+              <h6 className="text-center fw-normal">
+                + Many more features coming soon!
+              </h6>
             </div>
           </div> */}
 
           {/* Plus Tier */}
           <div className="col-12 col-sm-6 col-lg-3">
-            <div className="rounded panel p-4 h-100">
+            <div className="rounded panel p-4 h-100 panel-border">
               <h2 className="text-center my-2 fw-bold mb-4">{FYP.plus.tier}</h2>
-              <button 
+              <button
                 onClick={() => beginStripeFlow(FYP.plus.internal_plan_key)}
                 className="btn btn-primary w-100 fs-6"
-                >
-                  {plusButtonText}
+              >
+                {plusButtonText}
               </button>
               <h2 className="display-5 fw-bold text-center my-5">
                 ${FYP.plus.price}
                 <span className="fs-5 opacity-75 fw-normal"> /month</span>
               </h2>
               <ul className="pricing-list d-flex flex-column gap-2">
-
                 <li className="fw-semibold">{FYP.plus.priority.title}</li>
                 {FYP.plus.priority.features.map((e: any) => {
                   return (
@@ -268,7 +273,6 @@ function PricingPage(props: Props) {
                     </li>
                   );
                 })}
-
 
                 <li className="fw-semibold">{FYP.plus.tts.title}</li>
                 {FYP.plus.tts.features.map((e: any) => {
@@ -318,7 +322,23 @@ function PricingPage(props: Props) {
                     </li>
                   );
                 })}
+                {/* <li className="fw-semibold">{FYP.plus.support.title}</li>
+                {FYP.plus.support.features.map((e: any) => {
+                  return (
+                    <li key={e}>
+                      <FontAwesomeIcon
+                        icon={faHeart}
+                        className="text-red me-3"
+                      />
+                      {e}
+                    </li>
+                  );
+                })} */}
               </ul>
+              <hr className="my-4" />
+              <h6 className="text-center fw-normal">
+                + Many more features coming soon!
+              </h6>
             </div>
           </div>
 
@@ -326,18 +346,17 @@ function PricingPage(props: Props) {
           <div className="col-12 col-sm-6 col-lg-3">
             <div className="rounded panel p-4 h-100">
               <h2 className="text-center my-2 fw-bold mb-4">{FYP.pro.tier}</h2>
-              <button 
+              <button
                 onClick={() => beginStripeFlow(FYP.pro.internal_plan_key)}
                 className="btn btn-primary w-100 fs-6"
-                >
-                  {proButtonText}
+              >
+                {proButtonText}
               </button>
               <h2 className="display-5 fw-bold text-center my-5">
                 ${FYP.pro.price}
                 <span className="fs-5 opacity-75 fw-normal"> /month</span>
               </h2>
               <ul className="pricing-list d-flex flex-column gap-2">
-
                 <li className="fw-semibold">{FYP.pro.priority.title}</li>
                 {FYP.pro.priority.features.map((e: any) => {
                   return (
@@ -350,7 +369,6 @@ function PricingPage(props: Props) {
                     </li>
                   );
                 })}
-
 
                 <li className="fw-semibold">{FYP.pro.tts.title}</li>
                 {FYP.pro.tts.features.map((e: any) => {
@@ -412,7 +430,23 @@ function PricingPage(props: Props) {
                     </li>
                   );
                 })}*/}
+                {/* <li className="fw-semibold">{FYP.pro.support.title}</li>
+                {FYP.pro.support.features.map((e: any) => {
+                  return (
+                    <li key={e}>
+                      <FontAwesomeIcon
+                        icon={faHeart}
+                        className="text-red me-3"
+                      />
+                      {e}
+                    </li>
+                  );
+                })} */}
               </ul>
+              <hr className="my-4" />
+              <h6 className="text-center fw-normal">
+                + Many more features coming soon!
+              </h6>
             </div>
           </div>
 
@@ -422,18 +456,17 @@ function PricingPage(props: Props) {
               <h2 className="text-center my-2 fw-bold mb-4">
                 {FYP.elite.tier}
               </h2>
-              <button 
+              <button
                 onClick={() => beginStripeFlow(FYP.elite.internal_plan_key)}
                 className="btn btn-primary w-100 fs-6"
-                >
-                  {eliteButtonText}
+              >
+                {eliteButtonText}
               </button>
               <h2 className="display-5 fw-bold text-center my-5">
                 ${FYP.elite.price}
                 <span className="fs-5 opacity-75 fw-normal"> /month</span>
               </h2>
               <ul className="pricing-list d-flex flex-column gap-2">
-
                 <li className="fw-semibold">{FYP.elite.priority.title}</li>
                 {FYP.elite.priority.features.map((e: any) => {
                   return (
@@ -519,7 +552,23 @@ function PricingPage(props: Props) {
                     </li>
                   );
                 })}
+                {/* <li className="fw-semibold">{FYP.elite.support.title}</li>
+                {FYP.elite.support.features.map((e: any) => {
+                  return (
+                    <li key={e}>
+                      <FontAwesomeIcon
+                        icon={faHeart}
+                        className="text-red me-3"
+                      />
+                      {e}
+                    </li>
+                  );
+                })} */}
               </ul>
+              <hr className="my-4" />
+              <h6 className="text-center fw-normal">
+                + Many more features coming soon!
+              </h6>
             </div>
           </div>
         </div>
