@@ -10,6 +10,7 @@ import { Language } from "@storyteller/components/src/i18n/Language";
 import { BrowserRouter, Route, Switch } from "react-router-dom";
 import { NewVocodesContainer } from "./v2/view/NewVocodesContainer";
 import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
+import { SessionSubscriptionsWrapper } from "@storyteller/components/src/session/SessionSubscriptionsWrapper";
 import {
   TtsInferenceJob,
   TtsInferenceJobStateResponsePayload,
@@ -92,6 +93,7 @@ interface State {
   // Rollout of vocodes 2.0
   enableAlpha: boolean;
   sessionWrapper: SessionWrapper;
+  sessionSubscriptionsWrapper: SessionSubscriptionsWrapper;
 
   // Show flash notice of vocodes name change
   isShowingVocodesNotice: boolean;
@@ -154,7 +156,9 @@ class App extends React.Component<Props, State> {
     this.state = {
       enableAlpha: enableAlpha,
       migrationMode: migrationMode,
+
       sessionWrapper: SessionWrapper.emptySession(),
+      sessionSubscriptionsWrapper: SessionSubscriptionsWrapper.emptySubscriptions(),
 
       isShowingVocodesNotice: props.flashVocodesNotice,
 
@@ -194,11 +198,13 @@ class App extends React.Component<Props, State> {
   }
 
   async componentDidMount() {
-    await this.querySession();
     await this.queryLanguage();
+    await this.querySession();
+    await this.querySessionSubscriptions();
 
     setInterval(async () => {
       await this.querySession();
+      await this.querySessionSubscriptions();
     }, 60000);
     // TODO: Use websockets, this is dumb
     setInterval(() => {
@@ -210,6 +216,13 @@ class App extends React.Component<Props, State> {
     const sessionWrapper = await SessionWrapper.lookupSession();
     this.setState({
       sessionWrapper: sessionWrapper,
+    });
+  };
+
+  querySessionSubscriptions = async () => {
+    const sessionSubscriptionsWrapper = await SessionSubscriptionsWrapper.lookupActiveSubscriptions();
+    this.setState({
+      sessionSubscriptionsWrapper: sessionSubscriptionsWrapper,
     });
   };
 
@@ -645,6 +658,7 @@ class App extends React.Component<Props, State> {
                   <NewVocodesContainer
                     sessionWrapper={this.state.sessionWrapper}
                     querySessionAction={this.querySession}
+                    sessionSubscriptionsWrapper={this.state.sessionSubscriptionsWrapper}
                     isShowingVocodesNotice={this.state.isShowingVocodesNotice}
                     clearVocodesNotice={this.clearVocodesNotice}
                     isShowingLangaugeNotice={this.state.isShowingLanguageNotice}

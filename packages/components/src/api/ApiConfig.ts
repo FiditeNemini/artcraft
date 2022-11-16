@@ -461,6 +461,22 @@ class ApiConfig {
     //return `wss://obs.storyteller.io/obs/${twitchUsername}`;
   }
 
+  // =============== Premium ===============
+
+  listActiveSubscriptions(): string {
+    return `${this.getScheme()}://${this.getNewApiHost()}/v1/billing/active_subscriptions`;
+  }
+
+  createStripeCheckoutRedirect(): string {
+    return `${this.getScheme()}://${this.getNewApiHost()}/v1/stripe/checkout/create_redirect`;
+  }
+
+  createStripePortalRedirect(): string {
+    return `${this.getScheme()}://${this.getNewApiHost()}/v1/stripe/portal/create_redirect`;
+  }
+
+  // =============== Helper ===============
+
   private getScheme(): string {
     return this.useSsl ? "https" : "http";
   }

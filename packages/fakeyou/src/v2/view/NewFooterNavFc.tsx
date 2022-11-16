@@ -16,6 +16,7 @@ import {
   faFacebook,
 } from "@fortawesome/free-brands-svg-icons";
 import { ThirdPartyLinks } from "@storyteller/components/src/constants/ThirdPartyLinks";
+import { EchelonTwitterLink } from "@storyteller/components/src/elements/EchelonTwitterLink";
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -132,7 +133,7 @@ function NewFooterNavFc(props: Props) {
         <div className="d-flex flex-column align-items-center gap-4">
           <div>
             <Trans i18nKey="coreUi.footerNav.builtBy">
-              Built by <Link to="/profile/echelon">echelon</Link> in Atlanta.
+              Built by <EchelonTwitterLink hideIcon={true} /> in Atlanta.
             </Trans>
           </div>
 

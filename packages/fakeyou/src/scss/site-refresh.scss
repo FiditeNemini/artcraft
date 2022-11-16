@@ -390,11 +390,23 @@ styles with important tags:
 
   .panel-border {
     box-sizing: border-box;
-    box-shadow: inset 0px 0px 0px 4px lighten($primary, 5%);
+    box-shadow: inset 0px 0px 0px 3px $primary;
   }
 
   ul.pricing-list {
     list-style: none;
+    padding: 0;
+
+    li {
+      font-size: 14px;
+    }
+
+    .small-text {
+      font-size: 12px;
+      font-weight: 400;
+      opacity: 0.8;
+      color: lighten($primary, 10%);
+    }
   }
 
   ul li {

@@ -1,6 +1,8 @@
 # We can't redirect everything until legacy vocodes is dead
 /about*   /index.html   200
 /category*   /index.html   200
+/checkout_cancel*   /index.html   200
+/checkout_success*   /index.html   200
 /clone*   /index.html   200
 /coming-soon*   /index.html   200
 /contribute*   /index.html   200
@@ -14,6 +16,7 @@
 /old*   /index.html   200
 /patrons*   /index.html   200
 /pending*   /index.html   200
+/portal_success*   /index.html   200
 /profile*   /index.html   200
 /signup*   /index.html   200
 /stream*   /index.html   200

@@ -11,6 +11,7 @@ import { NewTopNavFc } from "./NewTopNavFc";
 import { ProfileEditFc } from "./profile/profile_edit/ProfileEditFc";
 import { ProfileFc } from "./profile/profile_view/ProfileFc";
 import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
+import { SessionSubscriptionsWrapper } from "@storyteller/components/src/session/SessionSubscriptionsWrapper";
 import { SignupPage } from "./signup/SignupPage";
 import { Switch, Route } from "react-router-dom";
 import { TermsPage } from "./about/terms_page/TermsPage";
@@ -56,10 +57,16 @@ import { Language } from "@storyteller/components/src/i18n/Language";
 import { VoiceCloneRequestPage } from "./clone_voice_requests/VoiceCloneRequestPage";
 import { VocodesPage } from "./vocodes/VocodesPage";
 import { UploadVocoderPage } from "./upload/UploadVocoderPage";
+import { PricingPage } from "./premium/PricingPage";
+import { CheckoutSuccessPage } from "./premium/CheckoutSuccessPage";
+import { CheckoutCancelPage } from "./premium/CheckoutCancelPage";
+import { PortalSuccessPage } from "./premium/PortalSuccessPage";
 
 interface Props {
   sessionWrapper: SessionWrapper;
   querySessionAction: () => void;
+
+  sessionSubscriptionsWrapper: SessionSubscriptionsWrapper;
 
   isShowingVocodesNotice: boolean;
   clearVocodesNotice: () => void;
@@ -174,14 +181,31 @@ class NewVocodesContainer extends React.Component<Props, State> {
               />
             </Route>
 
-            {/*
-            <Route path="/pricing">
+            <Route path="/pricing" exact={true}>
               <PricingPage
-                querySessionCallback={() => { }}
+                sessionWrapper={this.props.sessionWrapper}
+                sessionSubscriptionsWrapper={this.props.sessionSubscriptionsWrapper}
+              />
+            </Route>
+
+            <Route path="/checkout_success" exact={true}>
+              <CheckoutSuccessPage
+                querySessionCallback={() => {}}
                 sessionWrapper={this.props.sessionWrapper}
               />
             </Route>
-            */}
+            <Route path="/checkout_cancel" exact={true}>
+              <CheckoutCancelPage
+                querySessionCallback={() => {}}
+                sessionWrapper={this.props.sessionWrapper}
+              />
+            </Route>
+            <Route path="/portal_success" exact={true}>
+              <PortalSuccessPage
+                querySessionCallback={() => {}}
+                sessionWrapper={this.props.sessionWrapper}
+              />
+            </Route>
 
             <Route path="/tts/result/:token/edit">
               <TtsResultEditPage sessionWrapper={this.props.sessionWrapper} />
