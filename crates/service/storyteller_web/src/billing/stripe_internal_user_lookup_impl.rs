@@ -61,7 +61,8 @@ impl InternalUserLookup for StripeInternalUserLookupImpl {
                             internal_subscription_product_slug: sub.subscription_product_slug,
                         }
                     })
-                    .collect::<Vec<SubscriptionKey>>()
+                    .collect::<Vec<SubscriptionKey>>(),
+                maybe_loyalty_program_key: user_session.premium.maybe_loyalty_program_key,
             })),
         }
     }

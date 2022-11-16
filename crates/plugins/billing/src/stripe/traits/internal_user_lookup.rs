@@ -50,10 +50,14 @@ pub struct UserMetadata {
     pub maybe_existing_stripe_customer_id: Option<String>,
 
     /// Existing subscriptions that the user has.
-    /// The list contains only active subscriptions and old
+    /// The list contains *only active* subscriptions and old
     /// subscriptions will not be reported if they have already
     /// expired.
     pub existing_subscription_keys: Vec<SubscriptionKey>,
+
+    /// If the user has a loyalty premium plan (not paid for),
+    /// it will be listed here.
+    pub maybe_loyalty_program_key: Option<String>,
 }
 
 #[derive(Clone, Default, Debug)]

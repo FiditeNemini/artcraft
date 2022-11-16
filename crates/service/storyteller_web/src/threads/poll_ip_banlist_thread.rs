@@ -39,6 +39,4 @@ pub async fn poll_ip_bans(
 
     thread::sleep(Duration::from_millis(20_000));
   }
-
-  warn!("Should never happen: IP poller exits");
 }
