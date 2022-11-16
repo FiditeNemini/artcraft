@@ -89,14 +89,14 @@ function TtsConfigsIndexPage(props: Props) {
         <div className="d-flex flex-column gap-3 mb-5 mt-4">
           <Link to="/tts_configs/create/bits" className="btn btn-primary w-100">
             <FontAwesomeIcon icon={faPlus} className="me-2" />
-            &nbsp;Create New Bits / Cheer Rule
+            Create New Bits / Cheer Rule
           </Link>
           <Link
             to="/tts_configs/reorder/bits"
             className="btn btn-secondary w-100"
           >
             <FontAwesomeIcon icon={faSort} className="me-2" />
-            &nbsp;Reorder Rules
+            Reorder Rules
           </Link>
         </div>
         {cheerEventRules.map((rule) => {
@@ -110,67 +110,40 @@ function TtsConfigsIndexPage(props: Props) {
         })}
       </div>
 
-      <div className="container">
-        <Link
-          to="/tts_configs/create/bits"
-          className="button is-large is-fullwidth is-primary"
-        >
-          <FontAwesomeIcon icon={faPlus} />
-          &nbsp;Create New Bits / Cheer Rule
-        </Link>
+      <div className="container pt-5">
+        <h2 className="fw-bold">
+          <FontAwesomeIcon icon={faBox} className="text-red me-3" />
+          Channel Points / Rewards
+        </h2>
+        <p className="fs-5">These settings are best for small channels.</p>
 
-        <br />
+        <div className="d-flex flex-column gap-3 mb-5 mt-4">
+          <Link
+            to="/tts_configs/create/channel_points"
+            className="btn btn-primary w-100"
+          >
+            <FontAwesomeIcon icon={faPlus} className="me-2" />
+            Create Channel Points Rule
+          </Link>
 
-        <Link
-          to="/tts_configs/reorder/bits"
-          className="button is-large is-fullwidth is-primary is-outlined"
-        >
-          <FontAwesomeIcon icon={faSort} />
-          &nbsp;Reorder Rules
-        </Link>
-
-        <br />
-        <br />
-
-        <div className="content">
-          <h1 className="title is-3">
-            {" "}
-            <FontAwesomeIcon icon={faBox} /> Channel Points / Rewards{" "}
-          </h1>
-          <h2 className="subtitle is-5">
-            These settings are best for small channels.
-          </h2>
-          {channelPointsEventRules.map((rule) => {
-            return (
-              <TwitchEventRuleElement
-                key={rule.token}
-                rule={rule}
-                allTtsModelsByToken={props.allTtsModelsByToken}
-              />
-            );
-          })}
+          <Link
+            to="/tts_configs/reorder/channel_points"
+            className="btn btn-secondary w-100"
+          >
+            <FontAwesomeIcon icon={faSort} className="me-2" />
+            Reorder Rules
+          </Link>
         </div>
 
-        <Link
-          to="/tts_configs/create/channel_points"
-          className="button is-large is-fullwidth is-primary"
-        >
-          <FontAwesomeIcon icon={faPlus} />
-          &nbsp;Create Channel Points Rule
-        </Link>
-
-        <br />
-
-        <Link
-          to="/tts_configs/reorder/channel_points"
-          className="button is-large is-fullwidth is-primary is-outlined"
-        >
-          <FontAwesomeIcon icon={faSort} />
-          &nbsp;Reorder Rules
-        </Link>
-
-        <br />
-        <br />
+        {channelPointsEventRules.map((rule) => {
+          return (
+            <TwitchEventRuleElement
+              key={rule.token}
+              rule={rule}
+              allTtsModelsByToken={props.allTtsModelsByToken}
+            />
+          );
+        })}
 
         {/* <div className="content">
           <h1 className="title is-1">
