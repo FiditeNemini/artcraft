@@ -44,41 +44,47 @@ function NewFooterNavFc(props: Props) {
       <div className="d-flex flex-column container py-5 gap-4">
         <div className="text-center align-items-center justify-content-center gap-2 d-flex flex-wrap">
           <div>
+            <Link to="/">Pricing</Link>
+          </div>
+          |
+          <div>
             <Link to="/">Text to Speech</Link>
           </div>
           {/*
           &nbsp;|
           <Link to="/pricing">{t('coreUi.footerNav.pricing')}</Link>
           */}
-          &nbsp;|
-          <Link to="/video">{t("coreUi.footerNav.video")}</Link>
-          &nbsp;|
+          |<Link to="/video">{t("coreUi.footerNav.video")}</Link>|
           <div>
             <Link to="/contribute">Upload</Link>
           </div>
-          &nbsp;|
+          |
           <div>
             <Link to="/leaderboard">Leaderboard</Link>
           </div>
-          &nbsp;|
+          |
           <div>
             <Link to={FrontendUrlConfig.patronsPage()}>Patrons</Link>
           </div>
-          &nbsp;|
+          |
           <div>
             <Link to="/firehose">Feed</Link>
           </div>
-          &nbsp;|
+          |
           <div>
             <a href={FrontendUrlConfig.developerDocs()}>API Docs</a>
           </div>
-          &nbsp;|
+          |
           <div>
-            <Link to="/about">About Us</Link>
+            <Link to="/about">About</Link>
           </div>
-          &nbsp;|
+          |
           <div>
             <Link to="/terms">Terms of Use</Link>
+          </div>
+          |
+          <div>
+            <Link to="/privacy">Privacy Policy</Link>
           </div>
         </div>
 

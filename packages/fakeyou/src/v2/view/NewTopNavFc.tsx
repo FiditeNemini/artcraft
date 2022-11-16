@@ -17,6 +17,7 @@ import {
   faComputer,
   faLaptop,
   faBook,
+  faStar,
 } from "@fortawesome/free-solid-svg-icons";
 import { faDiscord, faPatreon } from "@fortawesome/free-brands-svg-icons";
 import { Logout } from "@storyteller/components/src/api/session/Logout";
@@ -213,6 +214,9 @@ function NewTopNavFc(props: Props) {
             <Link className="top-bar-text" to="/terms">
               Terms of Use
             </Link>
+            <Link className="top-bar-text" to="/privacy">
+              Privacy Policy
+            </Link>
             <a
               className="top-bar-text"
               href={FrontendUrlConfig.developerDocs()}
@@ -267,7 +271,7 @@ function NewTopNavFc(props: Props) {
         aria-label="Offcanvas navbar large"
       >
         <div className="container">
-          <Link className="navbar-brand me-5 pr-8" to="/">
+          <Link className="navbar-brand me-3 pr-8" to="/">
             <img
               src="/fakeyou/FakeYou-Logo.png"
               alt="FakeYou: Cartoon and Celebrity Text to Speech"
@@ -313,11 +317,21 @@ function NewTopNavFc(props: Props) {
               <ul className="navbar-nav justify-content-start align-items-lg-center flex-grow-1 gap-2 gap-lg-0">
                 <li data-bs-toggle="offcanvas" className="nav-item">
                   <Link
+                    to={FrontendUrlConfig.pricingPage()}
+                    className="nav-link"
+                  >
+                    <FontAwesomeIcon icon={faStar} className="me-2" />
+                    Pricing
+                  </Link>
+                </li>
+
+                <li data-bs-toggle="offcanvas" className="nav-item">
+                  <Link
                     to={FrontendUrlConfig.cloneRequestPage()}
-                    className="nav-link "
+                    className="nav-link"
                   >
                     <FontAwesomeIcon icon={faMicrophone} className="me-2" />
-                    Clone My Voice!
+                    Voice Clone
                   </Link>
                 </li>
 
@@ -465,6 +479,17 @@ function NewTopNavFc(props: Props) {
                     to="/terms"
                   >
                     Terms of Use
+                  </Link>
+                </li>
+
+                <li data-bs-toggle="offcanvas" className="nav-item d-lg-none">
+                  <Link
+                    className="nav-link"
+                    aria-current="page"
+                    title="Privacy Policy"
+                    to="/privacy"
+                  >
+                    Privacy Policy
                   </Link>
                 </li>
 

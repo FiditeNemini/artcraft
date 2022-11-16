@@ -15,6 +15,8 @@ import {
   CreateStripePortalRedirectIsError,
   CreateStripePortalRedirectIsSuccess,
 } from "@storyteller/components/src/api/premium/CreateStripePortalRedirect";
+import { motion } from "framer-motion";
+import { container, item, panel } from "../../../data/animation";
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -69,21 +71,26 @@ function PricingPage(props: Props) {
   }
 
   return (
-    <div>
+    <motion.div initial="hidden" animate="visible" variants={container}>
       <div className="container pt-5 pb-3 text-center">
-        <h1 className="display-5 fw-bold">Pricing</h1>
+        <motion.h1 className="display-5 fw-bold" variants={item}>
+          Pricing
+        </motion.h1>
         {/* <p className="fs-5">
           By purchasing FakeYou premium, you help us build more!
         </p> */}
-        <div className="alert alert-warning mt-4 alert-pricing">
+        <motion.div
+          className="alert alert-warning mt-4 alert-pricing"
+          variants={item}
+        >
           <FontAwesomeIcon icon={faHeart} className="text-red me-3" />
           By purchasing FakeYou premium, you help us build more!
-        </div>
+        </motion.div>
       </div>
       <div className="container mt-3 mb-5">
         <div className="row gx-3 gy-4">
           {/* Starter Tier */}
-          <div className="col-12 col-sm-6 col-lg-3">
+          <motion.div className="col-12 col-sm-6 col-lg-3" variants={panel}>
             <div className="rounded panel p-4 h-100">
               <h2 className="text-center my-2 fw-bold mb-4">
                 {FYP.starter.tier}
@@ -162,7 +169,7 @@ function PricingPage(props: Props) {
                 })}
               </ul>
             </div>
-          </div>
+          </motion.div>
 
           {/* Basic Tier (For Latin American countries) */}
           {/* <div className="col-12 col-sm-6 col-lg-3">
@@ -247,7 +254,7 @@ function PricingPage(props: Props) {
           </div> */}
 
           {/* Plus Tier */}
-          <div className="col-12 col-sm-6 col-lg-3">
+          <motion.div className="col-12 col-sm-6 col-lg-3" variants={panel}>
             <div className="rounded panel p-4 h-100 panel-border">
               <h2 className="text-center my-2 fw-bold mb-4">{FYP.plus.tier}</h2>
               <button
@@ -340,10 +347,10 @@ function PricingPage(props: Props) {
                 + Many more features coming soon!
               </h6>
             </div>
-          </div>
+          </motion.div>
 
           {/* Pro Tier */}
-          <div className="col-12 col-sm-6 col-lg-3">
+          <motion.div className="col-12 col-sm-6 col-lg-3" variants={panel}>
             <div className="rounded panel p-4 h-100">
               <h2 className="text-center my-2 fw-bold mb-4">{FYP.pro.tier}</h2>
               <button
@@ -448,10 +455,10 @@ function PricingPage(props: Props) {
                 + Many more features coming soon!
               </h6>
             </div>
-          </div>
+          </motion.div>
 
           {/* Elite Tier */}
-          <div className="col-12 col-sm-6 col-lg-3">
+          <motion.div className="col-12 col-sm-6 col-lg-3" variants={panel}>
             <div className="rounded panel p-4 h-100">
               <h2 className="text-center my-2 fw-bold mb-4">
                 {FYP.elite.tier}
@@ -570,7 +577,7 @@ function PricingPage(props: Props) {
                 + Many more features coming soon!
               </h6>
             </div>
-          </div>
+          </motion.div>
         </div>
 
         {/* Starter Tier (to show for Latin American countries) */}
@@ -678,7 +685,7 @@ function PricingPage(props: Props) {
           </div>
         </div> */}
       </div>
-    </div>
+    </motion.div>
   );
 }
 
