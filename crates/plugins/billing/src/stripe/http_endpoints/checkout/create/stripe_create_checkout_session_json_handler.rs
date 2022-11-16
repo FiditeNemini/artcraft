@@ -1,7 +1,7 @@
 use actix_web::error::ResponseError;
 use actix_web::error::UrlencodedError::ContentType;
 use actix_web::http::{header, StatusCode};
-use actix_web::web::{Path, Query};
+use actix_web::web::{Json, Path, Query};
 use actix_web::{web, HttpResponse, HttpRequest};
 use chrono::{DateTime, Utc};
 use crate::stripe::http_endpoints::checkout::create::stripe_create_checkout_session_error::CreateCheckoutSessionError;
@@ -37,7 +37,7 @@ pub struct CreateCheckoutSessionSuccessResponse {
 
 pub async fn stripe_create_checkout_session_json_handler(
   http_request: HttpRequest,
-  request: Query<CreateCheckoutSessionRequest>,
+  request: Json<CreateCheckoutSessionRequest>,
   stripe_config: web::Data<StripeConfig>,
   stripe_client: web::Data<stripe::Client>,
   url_redirector: web::Data<ThirdPartyUrlRedirector>,

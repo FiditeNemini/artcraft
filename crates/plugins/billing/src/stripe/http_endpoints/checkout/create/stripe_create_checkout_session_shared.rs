@@ -26,7 +26,7 @@ pub async fn stripe_create_checkout_session_shared(
 
 ) -> Result<String, CreateCheckoutSessionError> {
   let internal_product_key = match maybe_internal_product_key {
-    None => return Err(CreateCheckoutSessionError::BadRequest),
+    None => return Err(CreateCheckoutSessionError::BadRequest { reason: "no product key supplied".to_string() }),
     Some(internal_product_key) => internal_product_key,
   };
 

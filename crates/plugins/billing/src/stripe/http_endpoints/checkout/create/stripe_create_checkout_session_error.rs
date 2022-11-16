@@ -5,7 +5,7 @@ use std::fmt;
 
 #[derive(Debug, Serialize, Eq, PartialEq)]
 pub enum CreateCheckoutSessionError {
-    BadRequest,
+    BadRequest { reason: String },
     InvalidSession,
     PlanNotFound,
     ServerError,
@@ -17,7 +17,7 @@ pub enum CreateCheckoutSessionError {
 impl ResponseError for CreateCheckoutSessionError {
     fn status_code(&self) -> StatusCode {
         match *self {
-            CreateCheckoutSessionError::BadRequest => StatusCode::BAD_REQUEST,
+            CreateCheckoutSessionError::BadRequest { .. } => StatusCode::BAD_REQUEST,
             CreateCheckoutSessionError::InvalidSession => StatusCode::UNAUTHORIZED,
             CreateCheckoutSessionError::PlanNotFound => StatusCode::NOT_FOUND,
             CreateCheckoutSessionError::ServerError => StatusCode::INTERNAL_SERVER_ERROR,
