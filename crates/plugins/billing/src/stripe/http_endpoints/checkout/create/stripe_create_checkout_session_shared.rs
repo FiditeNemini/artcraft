@@ -206,7 +206,7 @@ mod tests {
       },
       portal: StripeCustomerPortalConfigs {
         return_url: FullUrlOrPath::Path("/N/A".to_string()),
-        portal_config_id: "N/A".to_string()
+        default_portal_config_id: "N/A".to_string()
       },
       secrets: StripeSecrets {
         publishable_key: None,

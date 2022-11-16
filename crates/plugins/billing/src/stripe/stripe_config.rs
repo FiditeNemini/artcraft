@@ -26,7 +26,9 @@ pub struct StripeCheckoutConfigs {
 #[derive(Clone)]
 pub struct StripeCustomerPortalConfigs {
   pub return_url: FullUrlOrPath,
-  pub portal_config_id: String, // TODO: This should be dynamic. Some locales will see different.
+
+  /// The portal config id to use as a fallback.
+  pub default_portal_config_id: String,
 }
 
 #[derive(Clone)]

@@ -316,7 +316,7 @@ async fn main() -> AnyhowResult<()> {
     },
     portal: StripeCustomerPortalConfigs {
       return_url: FullUrlOrPath::Path(easyenv::get_env_string_required("STRIPE_PORTAL_RETURN_URL_PATH")?),
-      portal_config_id: easyenv::get_env_string_required("STRIPE_PORTAL_CONFIG_ID")?,
+      default_portal_config_id: easyenv::get_env_string_required("STRIPE_PORTAL_CONFIG_ID")?,
     },
     secrets: StripeSecrets {
       publishable_key: easyenv::get_env_string_optional("STRIPE_PUBLISHABLE_KEY"),

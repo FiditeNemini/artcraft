@@ -6,7 +6,7 @@ use actix_web::error::Error;
 use actix_web::{App, web, HttpResponse};
 use crate::stripe::http_endpoints::checkout::create::stripe_create_checkout_session_json_handler::stripe_create_checkout_session_json_handler;
 use crate::stripe::http_endpoints::checkout::create::stripe_create_checkout_session_redirect_handler::stripe_create_checkout_session_redirect_handler;
-use crate::stripe::http_endpoints::checkout::stripe_checkout_success_handler::stripe_checkout_success_handler;
+use crate::stripe::http_endpoints::customer_portal::stripe_create_customer_portal_session_json_handler::stripe_create_customer_portal_session_json_handler;
 use crate::stripe::http_endpoints::customer_portal::stripe_create_customer_portal_session_redirect_handler::stripe_create_customer_portal_session_redirect_handler;
 use crate::stripe::http_endpoints::webhook::stripe_webhook_handler::stripe_webhook_handler;
 
@@ -21,38 +21,30 @@ pub fn add_suggested_stripe_billing_routes<T, B> (app: App<T, B>) -> App<T, B>
         InitError = (),
       >,
 {
-  app.service(web::scope("/stripe")
+  app.service(web::scope("/v1/stripe")
       .service(web::resource("/webhook")
           .route(web::post().to(stripe_webhook_handler))
           .route(web::head().to(|| HttpResponse::Ok()))
       )
       .service(web::scope("/checkout")
-          .service(web::resource("/begin")
+          .service(web::resource("/create_redirect")
               .route(web::get().to(stripe_create_checkout_session_json_handler))
               .route(web::head().to(|| HttpResponse::Ok()))
           )
-          .service(web::resource("/begin_redirect")
+          .service(web::resource("/redirect")
               .route(web::get().to(stripe_create_checkout_session_redirect_handler))
-              .route(web::head().to(|| HttpResponse::Ok()))
-          )
-          .service(web::resource("/success")
-              .route(web::get().to(stripe_checkout_success_handler))
               .route(web::head().to(|| HttpResponse::Ok()))
           )
       )
       .service(web::scope("/portal")
           .service(web::resource("/create_redirect")
+              .route(web::get().to(stripe_create_customer_portal_session_json_handler))
+              .route(web::head().to(|| HttpResponse::Ok()))
+          )
+          .service(web::resource("/redirect")
               .route(web::get().to(stripe_create_customer_portal_session_redirect_handler))
               .route(web::head().to(|| HttpResponse::Ok()))
           )
-          //.service(web::resource("/create")
-          //    .route(web::get().to(stripe_create_checkout_session_json_handler))
-          //    .route(web::head().to(|| HttpResponse::Ok()))
-          //)
-          //.service(web::resource("/success")
-          //    .route(web::get().to(stripe_checkout_success_handler))
-          //    .route(web::head().to(|| HttpResponse::Ok()))
-          //)
       )
   )
 }
