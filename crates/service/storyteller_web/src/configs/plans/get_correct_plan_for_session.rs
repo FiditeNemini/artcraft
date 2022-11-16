@@ -127,7 +127,7 @@ pub mod tests {
     user_session.premium.subscription_plans = vec![
       UserSessionSubscriptionPlan {
         subscription_namespace: "fakeyou".to_string(),
-        subscription_product_slug: "fakeyou_en_plus".to_string(),
+        subscription_product_slug: "fakeyou_plus".to_string(),
         subscription_expires_at: future_expiry,
       }
     ];
@@ -144,7 +144,7 @@ pub mod tests {
       Some(&user_session));
 
     // In production, however, we see the correct plan
-    assert_eq!(&plan, ALL_PLANS_BY_SLUG.get("fakeyou_en_plus").unwrap());
+    assert_eq!(&plan, ALL_PLANS_BY_SLUG.get("fakeyou_plus").unwrap());
   }
 
   #[test]
@@ -189,7 +189,7 @@ pub mod tests {
     user_session.premium.subscription_plans = vec![
       UserSessionSubscriptionPlan {
         subscription_namespace: "fakeyou".to_string(),
-        subscription_product_slug: "fakeyou_en_plus".to_string(),
+        subscription_product_slug: "fakeyou_plus".to_string(),
         subscription_expires_at: already_expired,
       }
     ];
@@ -217,7 +217,7 @@ pub mod tests {
       Some(&user_session));
 
     // NB: Now it isn't expired!
-    assert_eq!(&plan, ALL_PLANS_BY_SLUG.get("fakeyou_en_plus").unwrap());
+    assert_eq!(&plan, ALL_PLANS_BY_SLUG.get("fakeyou_plus").unwrap());
   }
 
   #[test]
@@ -231,7 +231,7 @@ pub mod tests {
     user_session.premium.subscription_plans = vec![
       UserSessionSubscriptionPlan {
         subscription_namespace: "fakeyou".to_string(),
-        subscription_product_slug: "fakeyou_en_plus".to_string(),
+        subscription_product_slug: "fakeyou_plus".to_string(),
         subscription_expires_at: future_expiry,
       }
     ];
@@ -241,7 +241,7 @@ pub mod tests {
       Some(&user_session));
 
     // In production we see the premium plan
-    assert_eq!(&plan, ALL_PLANS_BY_SLUG.get("fakeyou_en_plus").unwrap());
+    assert_eq!(&plan, ALL_PLANS_BY_SLUG.get("fakeyou_plus").unwrap());
 
     let plan = get_correct_plan_for_session(
       ServerEnvironment::Development,

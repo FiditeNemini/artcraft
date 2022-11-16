@@ -60,7 +60,7 @@ pub static DEVELOPMENT_PREMIUM_PLANS: Lazy<HashSet<Plan>> = Lazy::new(|| {
         .plan_category(PlanCategory::Paid)
         .stripe_product_id("prod_MMxi2J5y69VPbO")
         .stripe_price_id("price_1LeDnKEU5se17MekVr1iYYNf")
-        .cost_per_month_dollars(5)
+        .cost_per_month_dollars(7)
         .tts_base_priority_level(20)
         .tts_max_duration_seconds(30)
         .build());
@@ -92,36 +92,44 @@ pub static DEVELOPMENT_PREMIUM_PLANS: Lazy<HashSet<Plan>> = Lazy::new(|| {
 pub static PRODUCTION_PREMIUM_PLANS: Lazy<HashSet<Plan>> = Lazy::new(|| {
     let mut plans = HashSet::new();
 
-    // ========== English plans ==========
+    // ========== All-locale plans ==========
 
-    plans.insert(PlanBuilder::new("fakeyou_en_plus")
+    plans.insert(PlanBuilder::new("fakeyou_plus")
         .plan_category(PlanCategory::Paid)
+        .stripe_product_id("prod_MoLv23HrxPiY7D")
+        .stripe_price_id("price_1M4jDCEU5se17MekOaJ92HYX")
         .cost_per_month_dollars(7)
-        .tts_base_priority_level(10)
+        .tts_base_priority_level(20)
         .tts_max_duration_seconds(30)
         .build());
 
-    plans.insert(PlanBuilder::new("fakeyou_en_pro")
+    plans.insert(PlanBuilder::new("fakeyou_pro")
         .plan_category(PlanCategory::Paid)
+        .stripe_product_id("prod_MoLw8nA6eFxHzc")
+        .stripe_price_id("price_1M4jEQEU5se17MeksNfA0EKm")
         .cost_per_month_dollars(15)
-        .tts_base_priority_level(20)
-        .tts_max_duration_seconds(120)
+        .tts_base_priority_level(30)
+        .tts_max_duration_seconds(60 * 2)
+        .build());
+
+    plans.insert(PlanBuilder::new("fakeyou_elite")
+        .plan_category(PlanCategory::Paid)
+        .stripe_product_id("prod_MoLxQmLA4R24fv")
+        .stripe_price_id("price_1M4jFREU5se17Mekc8pQaSKB")
+        .cost_per_month_dollars(25)
+        .tts_base_priority_level(40)
+        .tts_max_duration_seconds(60 * 5)
         .build());
 
     // ========== Spanish plans ==========
 
-    plans.insert(PlanBuilder::new("fakeyou_es_plus")
+    plans.insert(PlanBuilder::new("fakeyou_basic")
         .plan_category(PlanCategory::Paid)
+        .stripe_product_id("prod_MoLyt8qMDmscjr")
+        .stripe_price_id("price_1M4jGPEU5se17Mek2FiztNE5")
         .cost_per_month_dollars(3)
-        .tts_base_priority_level(5)
+        .tts_base_priority_level(10)
         .tts_max_duration_seconds(30)
-        .build());
-
-    plans.insert(PlanBuilder::new("fakeyou_es_pro")
-        .plan_category(PlanCategory::Paid)
-        .cost_per_month_dollars(7)
-        .tts_base_priority_level(15)
-        .tts_max_duration_seconds(45)
         .build());
 
     plans
@@ -273,6 +281,10 @@ mod test {
             "prod_MMxi2J5y69VPbO".to_string(), // NB: Development
             "prod_MScAZa5uk5TfDY".to_string(), // NB: Development
             "prod_MoFffbqBPt2NG5".to_string(), // NB: Development
+            "prod_MoLv23HrxPiY7D".to_string(), // NB: Production
+            "prod_MoLw8nA6eFxHzc".to_string(), // NB: Production
+            "prod_MoLxQmLA4R24fv".to_string(), // NB: Production
+            "prod_MoLyt8qMDmscjr".to_string(), // NB: Production
         ];
 
         assert_that(&product_ids).contains_all_of(&expected_product_ids.iter());
@@ -289,6 +301,10 @@ mod test {
             "price_1LjgwIEU5se17MekzQZUHl9W".to_string(), // NB: Development
             "price_1LeDnKEU5se17MekVr1iYYNf".to_string(), // NB: Development
             "price_1M4dAbEU5se17MekEmwnee41".to_string(), // NB: Development
+            "price_1M4jDCEU5se17MekOaJ92HYX".to_string(), // NB: Production
+            "price_1M4jEQEU5se17MeksNfA0EKm".to_string(), // NB: Production
+            "price_1M4jFREU5se17Mekc8pQaSKB".to_string(), // NB: Production
+            "price_1M4jGPEU5se17Mek2FiztNE5".to_string(), // NB: Production
         ];
 
         assert_that(&price_ids).contains_all_of(&expected_price_ids.iter());
@@ -306,10 +322,10 @@ mod test {
         assert_eq!(2, ALL_PLANS_BY_SLUG.get("loyalty_plan").unwrap().tts_base_priority_level());
 
         // Premium (Production)
-        assert_eq!(5, ALL_PLANS_BY_SLUG.get("fakeyou_es_plus").unwrap().tts_base_priority_level());
-        assert_eq!(10, ALL_PLANS_BY_SLUG.get("fakeyou_en_plus").unwrap().tts_base_priority_level());
-        assert_eq!(15, ALL_PLANS_BY_SLUG.get("fakeyou_es_pro").unwrap().tts_base_priority_level());
-        assert_eq!(20, ALL_PLANS_BY_SLUG.get("fakeyou_en_pro").unwrap().tts_base_priority_level());
+        assert_eq!(10, ALL_PLANS_BY_SLUG.get("fakeyou_basic").unwrap().tts_base_priority_level());
+        assert_eq!(20, ALL_PLANS_BY_SLUG.get("fakeyou_plus").unwrap().tts_base_priority_level());
+        assert_eq!(30, ALL_PLANS_BY_SLUG.get("fakeyou_pro").unwrap().tts_base_priority_level());
+        assert_eq!(40, ALL_PLANS_BY_SLUG.get("fakeyou_elite").unwrap().tts_base_priority_level());
 
         // Premium (Development/Test)
         assert_eq!(20, ALL_PLANS_BY_SLUG.get("development_fakeyou_plus").unwrap().tts_base_priority_level());
@@ -328,10 +344,10 @@ mod test {
         assert_eq!(30, ALL_PLANS_BY_SLUG.get("loyalty_plan").unwrap().tts_max_duration().num_seconds());
 
         // Premium (Production)
-        assert_eq!(30, ALL_PLANS_BY_SLUG.get("fakeyou_es_plus").unwrap().tts_max_duration().num_seconds());
-        assert_eq!(30, ALL_PLANS_BY_SLUG.get("fakeyou_en_plus").unwrap().tts_max_duration().num_seconds());
-        assert_eq!(45, ALL_PLANS_BY_SLUG.get("fakeyou_es_pro").unwrap().tts_max_duration().num_seconds());
-        assert_eq!(120, ALL_PLANS_BY_SLUG.get("fakeyou_en_pro").unwrap().tts_max_duration().num_seconds());
+        assert_eq!(30, ALL_PLANS_BY_SLUG.get("fakeyou_basic").unwrap().tts_max_duration().num_seconds());
+        assert_eq!(30, ALL_PLANS_BY_SLUG.get("fakeyou_plus").unwrap().tts_max_duration().num_seconds());
+        assert_eq!(120, ALL_PLANS_BY_SLUG.get("fakeyou_pro").unwrap().tts_max_duration().num_seconds());
+        assert_eq!(300, ALL_PLANS_BY_SLUG.get("fakeyou_elite").unwrap().tts_max_duration().num_seconds());
 
         // Premium (Development/Test)
         assert_eq!(30, ALL_PLANS_BY_SLUG.get("development_fakeyou_plus").unwrap().tts_max_duration().num_seconds());
