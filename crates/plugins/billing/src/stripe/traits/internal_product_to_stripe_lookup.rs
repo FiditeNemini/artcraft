@@ -3,6 +3,7 @@ use mockall::{automock, mock, predicate::*};
 
 use std::error::Error;
 use std::fmt::{Display, Formatter};
+use url_config::server_environment::ServerEnvironment;
 
 /// Errors for this component are not strongly typed.
 #[derive(Debug)]
@@ -37,6 +38,6 @@ pub struct StripeProduct {
 #[cfg_attr(test, automock)]
 pub trait InternalProductToStripeLookup {
     /// Look up stripe product information from an internal system identifier.
-    fn lookup_stripe_product_from_internal_product_key(&self, internal_product_key: &str)
+    fn lookup_stripe_product_from_internal_product_key(&self, server_environment: ServerEnvironment, internal_product_key: &str)
         -> Result<Option<StripeProduct>, StripeProductLookupError>;
 }

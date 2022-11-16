@@ -15,6 +15,7 @@ use sqlx::MySqlPool;
 use std::collections::HashMap;
 use std::fmt;
 use stripe::{CheckoutSession, CheckoutSessionMode, CreateCheckoutSession, CreateCheckoutSessionLineItems};
+use url_config::server_environment::ServerEnvironment;
 use url_config::third_party_url_redirector::ThirdPartyUrlRedirector;
 
 // =============== Request ===============
@@ -29,6 +30,7 @@ pub async fn stripe_create_checkout_session_redirect_handler(
   request: Query<CreateCheckoutSessionRequest>,
   stripe_config: web::Data<StripeConfig>,
   stripe_client: web::Data<stripe::Client>,
+  server_environment: web::Data<ServerEnvironment>,
   url_redirector: web::Data<ThirdPartyUrlRedirector>,
   internal_product_to_stripe_lookup: web::Data<dyn InternalProductToStripeLookup>,
   internal_user_lookup: web::Data<dyn InternalUserLookup>,
@@ -40,6 +42,7 @@ pub async fn stripe_create_checkout_session_redirect_handler(
     maybe_internal_product_key,
     &http_request,
     &stripe_config,
+    server_environment.get_ref().clone(),
     &stripe_client,
     &url_redirector,
     internal_product_to_stripe_lookup.get_ref(),

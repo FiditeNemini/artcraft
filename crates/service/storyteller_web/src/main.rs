@@ -433,6 +433,7 @@ pub async fn serve(server_state: ServerState) -> AnyhowResult<()>
       .app_data(web::Data::new(server_state_arc.stripe.clone().config.clone()))
       .app_data(web::Data::new(server_state_arc.stripe.clone().client.clone()))
       .app_data(web::Data::new(server_state_arc.third_party_url_redirector.clone()))
+      .app_data(web::Data::new(server_state_arc.server_environment.clone()))
       .app_data(web::Data::from(product_lookup)) // NB: Data::from(Arc<T>) for dynamic dispatch
       .app_data(web::Data::from(stripe_lookup)) // NB: Data::from(Arc<T>) for dynamic dispatch
       .app_data(web::Data::from(user_lookup)) // NB: Data::from(Arc<T>) for dynamic dispatch

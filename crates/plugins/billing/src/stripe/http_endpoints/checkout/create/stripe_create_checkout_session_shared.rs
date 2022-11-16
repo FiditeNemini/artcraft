@@ -11,6 +11,7 @@ use sqlx::MySqlPool;
 use std::collections::HashMap;
 use std::str::FromStr;
 use stripe::{CheckoutSession, CheckoutSessionMode, CreateCheckoutSession, CreateCheckoutSessionAutomaticTax, CreateCheckoutSessionLineItems, CreateCheckoutSessionPaymentIntentData, CreateCheckoutSessionSubscriptionData, CustomerId, ParseIdError};
+use url_config::server_environment::ServerEnvironment;
 use url_config::third_party_url_redirector::ThirdPartyUrlRedirector;
 
 /// Create a checkout session and return the URL
@@ -19,6 +20,7 @@ pub async fn stripe_create_checkout_session_shared(
   maybe_internal_product_key: Option<&str>,
   http_request: &HttpRequest,
   stripe_config: &StripeConfig,
+  server_environment: ServerEnvironment,
   stripe_client: &stripe::Client,
   url_redirector: &ThirdPartyUrlRedirector,
   internal_product_to_stripe_lookup: &dyn InternalProductToStripeLookup,
@@ -31,7 +33,7 @@ pub async fn stripe_create_checkout_session_shared(
   };
 
   let stripe_product = internal_product_to_stripe_lookup
-      .lookup_stripe_product_from_internal_product_key(internal_product_key)
+      .lookup_stripe_product_from_internal_product_key(server_environment, internal_product_key)
       .map_err(|err| {
         error!("Error looking up product: {:?}", err);
         CreateCheckoutSessionError::ServerError // NB: This was probably *our* fault.
@@ -224,8 +226,8 @@ mod tests {
     let mut internal_product_to_stripe_lookup_mock = MockInternalProductToStripeLookup::new();
 
     internal_product_to_stripe_lookup_mock.expect_lookup_stripe_product_from_internal_product_key()
-        .with(eq("TEST_FAKEYOU_PRODUCT"))
-        .returning(|_| Ok(Some(StripeProduct {
+        .with(eq(ServerEnvironment::Development), eq("TEST_FAKEYOU_PRODUCT"))
+        .returning(|_, _| Ok(Some(StripeProduct {
           stripe_product_id: "TEST_PRODUCT_ID".to_string(),
           stripe_price_id: "TEST_PRICE_ID".to_string(),
           is_subscription_product: true,
@@ -247,6 +249,7 @@ mod tests {
       maybe_internal_product_key,
       &http_request,
       &stripe_config,
+      ServerEnvironment::Development,
       &stripe_client,
       &url_redirector,
       &internal_product_to_stripe_lookup_mock,
