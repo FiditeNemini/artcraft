@@ -16,9 +16,9 @@ interface Props {
 function DashboardPage(props: Props) {
   return (
     <div>
-      <div className="features-bg" id="dashboard">
-        <div className="container section d-flex flex-column align-items-center">
-          <h1 className="display-5 fw-bold">
+      <div className="py-lg-5" id="dashboard">
+        <div className="container d-flex flex-column align-items-center pt-5">
+          <h1 className="fw-bold pt-5">
             <span className="word">Dashboard</span>
           </h1>
           <div className="features-section">
@@ -50,7 +50,9 @@ function DashboardPage(props: Props) {
                     Morbi dapibus commodo porta. Sed faucibus tristique orci in
                     tristique. Praesent quam nunc, fermentum eu feugiat sit.
                   </p>
-                  <button className="btn btn-primary w-100">Setup TTS</button>
+                  <Link to="/tts_configs" className="btn btn-primary w-100">
+                    Setup TTS
+                  </Link>
                 </div>
               </div>
               <div className="col-md-4 d-flex align-items-stretch">
@@ -74,7 +76,7 @@ function DashboardPage(props: Props) {
         </div>
       </div>
 
-      <div className="community-bg mb-5 pb-5">
+      <div className="mb-5 py-5">
         <div className="container mb-3 d-flex flex-column align-items-center">
           <div className="d-flex justify-content-center align-items-center gap-4">
             <img className="rotateimg180" src="assets/title-shape.png" alt="" />

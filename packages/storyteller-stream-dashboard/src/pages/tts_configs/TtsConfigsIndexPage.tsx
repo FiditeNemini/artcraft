@@ -65,7 +65,7 @@ function TtsConfigsIndexPage(props: Props) {
   return (
     <>
       <div className="pt-5 container">
-        <h1 className="mt-5 pt-5">
+        <h1 className="fw-bold mt-5 pt-lg-5">
           <span className="word">Stream Setup</span>
         </h1>
         <h3>Configure TTS (and soon much more!)</h3>
@@ -172,7 +172,7 @@ function TtsConfigsIndexPage(props: Props) {
         <br />
         <br />
 
-        <div className="content">
+        {/* <div className="content">
           <h1 className="title is-1">
             {" "}
             <FontAwesomeIcon icon={faMeteor} /> Coming Soon&hellip;
@@ -259,9 +259,7 @@ function TtsConfigsIndexPage(props: Props) {
             />{" "}
             so that we can build it!
           </p>
-        </div>
-        <br />
-        <br />
+        </div> */}
       </div>
     </>
   );
