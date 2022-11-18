@@ -5,8 +5,8 @@ enum Environment {
   Production,
 }
 
-export class FrontendEnvironment {
-  static instance?: FrontendEnvironment;
+export class FakeYouFrontendEnvironment {
+  static instance?: FakeYouFrontendEnvironment;
 
   environment: Environment;
   
@@ -26,11 +26,11 @@ export class FrontendEnvironment {
     }
   }
 
-  public static getInstance() : FrontendEnvironment {
-    if (FrontendEnvironment.instance === undefined) {
-        FrontendEnvironment.instance = new FrontendEnvironment();
+  public static getInstance() : FakeYouFrontendEnvironment {
+    if (FakeYouFrontendEnvironment.instance === undefined) {
+        FakeYouFrontendEnvironment.instance = new FakeYouFrontendEnvironment();
     }
-    return FrontendEnvironment.instance;
+    return FakeYouFrontendEnvironment.instance;
   }
 
   public useProductionStripePlans() : boolean {
