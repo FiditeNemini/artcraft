@@ -179,9 +179,6 @@ function TtsModelListPage(props: Props) {
     listTtsCategories();
   }, [listModels, listTtsCategories]);
 
-  // TODO: I never did anything with this.
-  let remainingCharactersButtonDisabled = false;
-
   const handleChangeText = (ev: React.FormEvent<HTMLTextAreaElement>) => {
     const textValue = (ev.target as HTMLTextAreaElement).value;
     props.setTextBuffer(textValue);
@@ -352,6 +349,9 @@ function TtsModelListPage(props: Props) {
       );
     }
   }
+
+  // NB: If the text is too long, don't allow submission
+  let remainingCharactersButtonDisabled = props.textBuffer.trim().length > 1024;
 
   return (
     <motion.div initial="hidden" animate="visible" variants={container}>
