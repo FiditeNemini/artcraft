@@ -7,6 +7,7 @@ import { ProfileTtsModelListFc } from "./Profile_TtsModelListFc";
 import { ProfileW2lInferenceResultsListFc } from "./Profile_W2lInferenceResultListFc";
 import { ProfileW2lTemplateListFc } from "./Profile_W2lTemplateListFc";
 import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
+import { SessionSubscriptionsWrapper } from "@storyteller/components/src/session/SessionSubscriptionsWrapper";
 import { useParams } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -24,6 +25,7 @@ import {
   faVideo,
   faGlobe,
   faDollarSign,
+  faStar,
 } from "@fortawesome/free-solid-svg-icons";
 
 import {
@@ -43,6 +45,7 @@ import { motion } from "framer-motion";
 
 interface Props {
   sessionWrapper: SessionWrapper;
+  sessionSubscriptionsWrapper: SessionSubscriptionsWrapper;
 }
 
 // function copyToClipboard(username: string): any {
@@ -97,10 +100,29 @@ function ProfileFc(props: Props) {
 
   let banUserButton = undefined;
 
+  let upgradeButton = undefined;
+
+  if (props.sessionWrapper.isLoggedIn()) {
+    if (props.sessionWrapper.userTokenMatches(userData.user_token)) {
+      if (!props.sessionSubscriptionsWrapper.hasPaidFeatures()) {
+        const upgradeLinkUrl = FrontendUrlConfig.pricingPage();
+
+        upgradeButton = (
+          <>
+            <Link className="btn btn-primary" to={upgradeLinkUrl}>
+              <FontAwesomeIcon icon={faStar} className="me-2" />
+              <span>Upgrade</span>
+            </Link>
+          </>
+        );
+      }
+    }
+  }
+
   if (props.sessionWrapper.canBanUsers()) {
     const currentlyBanned = userData.maybe_moderator_fields?.is_banned;
     const banLinkUrl = FrontendUrlConfig.userProfileBanPage(userData.username);
-    const buttonLabel = currentlyBanned ? "Unban User" : "Ban User";
+    const buttonLabel = currentlyBanned ? "Unban" : "Ban";
     const banButtonCss = currentlyBanned
       ? "btn btn-secondary"
       : "btn btn-destructive";
@@ -141,6 +163,7 @@ function ProfileFc(props: Props) {
     profileButtonsMobile = (
       <div className="container d-flex d-lg-none mb-4">
         <div className="d-flex w-100 gap-3 justify-content-center flex-column flex-md-row">
+          {upgradeButton}
           {editProfileButton}
           {banUserButton}
         </div>
@@ -298,18 +321,22 @@ function ProfileFc(props: Props) {
               email_hash={userEmailHash}
             />
           </div>
-          <h1 className="display-5 fw-bold text-center text-lg-start w-100 mb-0">
-            {userData.display_name}
-          </h1>
-          <div className="w-100 justify-content-end d-none d-lg-flex">
+          <div className="d-flex flex-column flex-lg-row align-items-center gap-3">
+            <h1 className="display-6 fw-bold text-center text-lg-start mb-0">
+              {userData.display_name}
+            </h1>
+          </div>
+
+          <div className="justify-content-end d-none d-lg-flex w-100">
             <div className="d-flex gap-3">
               {banUserButton}
+              {upgradeButton}
               {editProfileButton}
             </div>
           </div>
         </motion.div>
         <motion.div
-          className="d-flex flex-column flex-lg-row gap-4 gap-lg-3 mt-3"
+          className="d-flex flex-column flex-lg-row gap-4 gap-lg-3 mt-4"
           variants={item}
         >
           {profileJoinDate}
