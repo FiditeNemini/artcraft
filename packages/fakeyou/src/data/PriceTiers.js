@@ -156,7 +156,7 @@ const FAKEYOU_PRICES = {
       title: "TTS",
       features: [
         "Unlimited generation",
-        "Up to 5 minutes audio",
+        "Up to 2 minutes audio",
         //"Generate MP3 file",
         "Upload private models",
         "Share private models",
