@@ -43,6 +43,7 @@ interface Props {
   sessionWrapper: SessionWrapper;
   logoutHandler: () => void;
   querySessionCallback: () => void;
+  querySessionSubscriptionsCallback: () => void;
 }
 
 function NewTopNavFc(props: Props) {
@@ -139,6 +140,7 @@ function NewTopNavFc(props: Props) {
   const logoutHandler = async () => {
     await Logout();
     props.querySessionCallback();
+    props.querySessionSubscriptionsCallback();
     history.push("/");
   };
 

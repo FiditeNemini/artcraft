@@ -324,6 +324,7 @@ class App extends React.Component<Props, State> {
     })
       .then((_raw_response) => {
         this.querySession();
+        this.querySessionSubscriptions();
       })
       .catch((e) => {
         /* Ignore. */
@@ -659,6 +660,7 @@ class App extends React.Component<Props, State> {
                     sessionWrapper={this.state.sessionWrapper}
                     querySessionAction={this.querySession}
                     sessionSubscriptionsWrapper={this.state.sessionSubscriptionsWrapper}
+                    querySessionSubscriptionsAction={this.querySessionSubscriptions}
                     isShowingVocodesNotice={this.state.isShowingVocodesNotice}
                     clearVocodesNotice={this.clearVocodesNotice}
                     isShowingLangaugeNotice={this.state.isShowingLanguageNotice}

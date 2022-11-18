@@ -15,6 +15,7 @@ import { container, panel } from "../../../data/animation";
 interface Props {
   sessionWrapper: SessionWrapper;
   querySessionAction: () => void;
+  querySessionSubscriptionsAction: () => void;
 }
 
 function LoginPage(props: Props) {
@@ -63,6 +64,7 @@ function LoginPage(props: Props) {
     } else if (CreateSessionIsSuccess(response)) {
       console.log("querying new session");
       props.querySessionAction();
+      props.querySessionSubscriptionsAction();
       history.push("/");
     }
 

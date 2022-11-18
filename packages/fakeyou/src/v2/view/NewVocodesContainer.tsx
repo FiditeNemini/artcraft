@@ -68,6 +68,7 @@ interface Props {
   querySessionAction: () => void;
 
   sessionSubscriptionsWrapper: SessionSubscriptionsWrapper;
+  querySessionSubscriptionsAction: () => void;
 
   isShowingVocodesNotice: boolean;
   clearVocodesNotice: () => void;
@@ -143,6 +144,7 @@ class NewVocodesContainer extends React.Component<Props, State> {
             logoutHandler={this.logout}
             sessionWrapper={this.props.sessionWrapper}
             querySessionCallback={this.props.querySessionAction}
+            querySessionSubscriptionsCallback={this.props.querySessionSubscriptionsAction}
           />
 
           <ScrollToTop />
@@ -160,6 +162,7 @@ class NewVocodesContainer extends React.Component<Props, State> {
               <LoginPage
                 sessionWrapper={this.props.sessionWrapper}
                 querySessionAction={this.props.querySessionAction}
+                querySessionSubscriptionsAction={this.props.querySessionSubscriptionsAction}
               />
             </Route>
 
