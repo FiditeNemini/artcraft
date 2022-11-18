@@ -12,9 +12,9 @@ interface SpectrogramResponse {
   mel_scaled: Array<Array<number>>;
 }
 
-const COLOR_MAP_PRESETS = [VIRIDIS, MAGMA];
+const COLOR_MAP_PRESETS = [MAGMA]; // [VIRIDIS, MAGMA]
 
-function SpectrogramFc(props: Props) {
+function SpectrogramImage(props: Props) {
   const canvasRef = useRef(null);
 
   let linearizeImage = (image: Array<Array<number>>): Uint8ClampedArray => {
@@ -91,4 +91,4 @@ function SpectrogramFc(props: Props) {
   return <div className="py-6">{canvas}</div>;
 }
 
-export { SpectrogramFc };
+export { SpectrogramImage };

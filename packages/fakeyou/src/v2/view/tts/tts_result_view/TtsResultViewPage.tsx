@@ -3,7 +3,7 @@ import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapp
 import { Gravatar } from "@storyteller/components/src/elements/Gravatar";
 import { BucketConfig } from "@storyteller/components/src/api/BucketConfig";
 import { useParams, Link } from "react-router-dom";
-import { SpectrogramFc } from "./SpectrogramFc";
+import { SpectrogramImage } from "./SpectrogramImage";
 import { ReportDiscordLinkFc } from "../../_common/DiscordReportLinkFc";
 import { FrontendUrlConfig } from "../../../../common/FrontendUrlConfig";
 
@@ -328,7 +328,7 @@ function TtsResultViewPage(props: Props) {
       <motion.div className="container-panel pt-3 pb-5" variants={panel}>
         <div className="panel p-3 p-lg-4">
           <h2 className="panel-title fw-bold">Spectrogram</h2>
-          <SpectrogramFc spectrogramJsonLink={spectrogramLink} />
+          <SpectrogramImage spectrogramJsonLink={spectrogramLink} />
         </div>
       </motion.div>
 
