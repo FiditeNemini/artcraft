@@ -24,6 +24,9 @@ struct InferenceRequest {
   // Text
   pub inference_text : String,
 
+  // Tacotron hyperparameter determining roughly the maximum number of seconds of output
+  pub max_decoder_steps: u32,
+
   // Named text pipeline/algorithm, eg. "legacy_fakeyou", "english_v1", "spanish_v2", etc.
   pub text_pipeline_type: String,
 
@@ -48,10 +51,12 @@ impl TtsInferenceSidecarClient {
     }
   }
 
+  // TODO: Make the args a struct.
   /// NB: 'hifigan_vocoder_checkpoint_path' may be either a pretrained or custom vocoder
   pub async fn request_inference<P: AsRef<Path>>(
     &self,
     raw_text: &str,
+    max_decoder_steps: u32,
     synthesizer_checkpoint_path: P,
     vocoder_type: VocoderType,
     text_pipeline_type: &str,
@@ -108,6 +113,7 @@ impl TtsInferenceSidecarClient {
 
     let request = InferenceRequest {
       inference_text: raw_text.to_string(),
+      max_decoder_steps,
       vocoder_type,
       text_pipeline_type: text_pipeline_type.to_string(),
       waveglow_vocoder_checkpoint_path,

@@ -29,6 +29,7 @@ use tempdir::TempDir;
 use tts_common::clean_symbols::clean_symbols;
 use tts_common::text_pipelines::guess_pipeline::guess_text_pipeline_heuristic;
 use tts_common::text_pipelines::text_pipeline_type::TextPipelineType;
+use crate::job_steps::seconds_to_decoder_steps::seconds_to_decoder_steps;
 
 #[derive(Deserialize, Default)]
 struct FileMetadata {
@@ -284,8 +285,13 @@ pub async fn process_single_job(
     },
   };
 
+  // NB: Tacotron operates on decoder steps. 1000 steps is the default and correlates to
+  //  roughly 12 seconds max. Here we map seconds to decoder steps.
+  let max_decoder_steps = seconds_to_decoder_steps(job.max_duration_seconds);
+
   job_args.http_clients.tts_inference_sidecar_client.request_inference(
     &cleaned_inference_text,
+    max_decoder_steps,
     &tts_synthesizer_fs_path,
     pretrained_vocoder,
     &text_pipeline_type_or_guess.to_str(),

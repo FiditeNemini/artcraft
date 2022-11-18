@@ -131,6 +131,7 @@ LABEL org.opencontainers.image.authors='bt@brand.io, echelon@gmail.com'
 LABEL org.opencontainers.image.url='https://github.com/storytold/storyteller-web'
 LABEL org.opencontainers.image.documentation='https://github.com/storytold/storyteller-web'
 LABEL org.opencontainers.image.source='https://github.com/storytold/storyteller-web'
+LABEL org.opencontainers.image.description='All of the binaries from the Rust monorepo'
 
 WORKDIR /
 

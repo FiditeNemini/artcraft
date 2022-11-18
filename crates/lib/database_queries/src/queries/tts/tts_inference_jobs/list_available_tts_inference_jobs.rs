@@ -21,6 +21,12 @@ pub struct AvailableTtsInferenceJob {
   pub model_token: String,
   pub raw_inference_text: String,
 
+  /// Zero is implied to be the default value (12 seconds)
+  /// Negative is interpreted as "unlimited"
+  /// NB: We can't technically control the seconds, but rather the model's "max_decoder_steps".
+  /// We attempt to turn this into an appropriate "max_decoder_steps" value downstream of here.
+  pub max_duration_seconds: i32,
+
   pub creator_ip_address: String,
   pub maybe_creator_user_token: Option<String>,
   pub creator_set_visibility: RecordVisibility,
@@ -64,6 +70,8 @@ SELECT
 
   model_token,
   raw_inference_text,
+
+  max_duration_seconds,
 
   creator_ip_address,
   maybe_creator_user_token,
@@ -112,6 +120,8 @@ SELECT
   model_token,
   raw_inference_text,
 
+  max_duration_seconds,
+
   creator_ip_address,
   maybe_creator_user_token,
   creator_set_visibility as `creator_set_visibility: crate::column_types::record_visibility::RecordVisibility`,
@@ -156,6 +166,7 @@ WHERE
           uuid_idempotency_token: record.uuid_idempotency_token,
           model_token: record.model_token,
           raw_inference_text: record.raw_inference_text,
+          max_duration_seconds: record.max_duration_seconds,
           creator_ip_address: record.creator_ip_address,
           maybe_creator_user_token: record.maybe_creator_user_token,
           creator_set_visibility: record.creator_set_visibility,
@@ -201,6 +212,8 @@ SELECT
   model_token,
   raw_inference_text,
 
+  max_duration_seconds,
+  
   creator_ip_address,
   maybe_creator_user_token,
   creator_set_visibility as `creator_set_visibility: crate::column_types::record_visibility::RecordVisibility`,
@@ -247,6 +260,7 @@ WHERE
           uuid_idempotency_token: record.uuid_idempotency_token,
           model_token: record.model_token,
           raw_inference_text: record.raw_inference_text,
+          max_duration_seconds: record.max_duration_seconds,
           creator_ip_address: record.creator_ip_address,
           maybe_creator_user_token: record.maybe_creator_user_token,
           creator_set_visibility: record.creator_set_visibility,
@@ -275,6 +289,8 @@ struct AvailableTtsInferenceJobRawInternal {
 
   pub model_token: String,
   pub raw_inference_text: String,
+
+  pub max_duration_seconds: i32,
 
   pub creator_ip_address: String,
   pub maybe_creator_user_token: Option<String>,
