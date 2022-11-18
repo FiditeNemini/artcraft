@@ -21,6 +21,10 @@ pub async fn list_active_user_subscriptions(
     mysql_connection: &mut PoolConnection<MySql>,
     user_token: &str
 ) -> AnyhowResult<Vec<ActiveUserSubscription>> {
+    // NB: "status=incomplete" subscriptions can happen when a user submits credit card info,
+    //  but the CRC is wrong. Eg. what happened with ftx on 2022.11.18.
+    //
+    //  https://stripe.com/docs/billing/subscriptions/overview#subscription-statuses
     let records = sqlx::query_as!(
       RawActiveUserSubscription,
         r#"
