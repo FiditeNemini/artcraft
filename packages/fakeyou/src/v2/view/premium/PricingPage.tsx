@@ -62,8 +62,6 @@ function PricingPage(props: Props) {
 
   const userHasPaidPremium = props.sessionSubscriptionsWrapper.hasPaidFeatures();
 
-  let freeButtonText = "Use for free";
-
   let plusButtonText = "Buy Plus";
   let plusButtonDisabled = false;
 
@@ -74,26 +72,50 @@ function PricingPage(props: Props) {
   let eliteButtonText = "Buy Elite";
   let eliteButtonDisabled = false;
 
+  let freeButton = (
+    <>
+      <Link to="/" className="btn btn-secondary w-100 fs-6">
+        Use for free
+      </Link>
+    </>
+  );
+
   if (userHasPaidPremium) {
-    freeButtonText = "Unsubscribe";
+    let unsubscribeKey = FYP.plus.internal_plan_key[planKey]; // NB: Default to something (I don't think this matters to Stripe.)
+
     if (props.sessionSubscriptionsWrapper.hasActivePlusSubscription()) {
       plusButtonText = "Subscribed";
       plusButtonDisabled = true;
     } else {
       plusButtonText = "Switch to Plus";
     }
+
     if (props.sessionSubscriptionsWrapper.hasActiveProSubscription()) {
+      unsubscribeKey = FYP.pro.internal_plan_key[planKey];
       proButtonText = "Subscribed";
       proButtonDisabled = true;
     } else {
       proButtonText = "Switch to Pro";
     }
+
     if (props.sessionSubscriptionsWrapper.hasActiveEliteSubscription()) {
+      unsubscribeKey = FYP.elite.internal_plan_key[planKey];
       eliteButtonText = "Subscribed";
       eliteButtonDisabled = true;
     } else {
       eliteButtonText = "Switch to Elite";
     }
+
+    freeButton = (
+      <>
+        <button
+          onClick={() => beginStripeFlow(unsubscribeKey)}
+          className="btn btn-secondary w-100 fs-6"
+        >
+          Unsubscribe
+        </button>
+      </>
+    );
   }
 
   // Highlight the mid-tier plan if nothing is subscribed
@@ -126,9 +148,9 @@ function PricingPage(props: Props) {
               <h2 className="text-center my-2 fw-bold mb-4">
                 {FYP.starter.tier}
               </h2>
-              <Link to="/" className="btn btn-secondary w-100 fs-6">
-                {freeButtonText}
-              </Link>
+
+              {freeButton}
+
               <h2 className="display-5 fw-bold text-center my-5">
                 ${FYP.starter.price}
                 <span className="fs-5 opacity-75 fw-normal"> /month</span>
