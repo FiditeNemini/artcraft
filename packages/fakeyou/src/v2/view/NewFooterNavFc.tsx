@@ -44,7 +44,7 @@ function NewFooterNavFc(props: Props) {
       <div className="d-flex flex-column container py-5 gap-4">
         <div className="text-center align-items-center justify-content-center gap-2 d-flex flex-wrap">
           <div>
-            <Link to="/">Pricing</Link>
+            <Link to="/pricing">Pricing</Link>
           </div>
           |
           <div>
