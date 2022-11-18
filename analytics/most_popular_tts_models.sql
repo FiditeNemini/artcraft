@@ -5,6 +5,30 @@
 --
 -- Top 100 models all time by use count
 --
+select
+    m.token,
+    m.title,
+    m.ietf_language_tag,
+    u.username,
+    r.use_count,
+    m.user_deleted_at,
+    m.mod_deleted_at,
+    m.created_at
+from (
+         select model_token, count(*) as use_count
+         from tts_results
+         group by model_token
+     ) as r
+         join tts_models as m
+              on m.token = r.model_token
+         join users as u
+              on u.token = m.creator_user_token
+order by r.use_count desc
+    limit 100;
+
+--
+-- Same, but simpler...
+--
 select m.token, m.title, r.use_count from (
   select model_token, count(*) as use_count from tts_results
   group by model_token
