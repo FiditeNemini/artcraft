@@ -1,6 +1,6 @@
 import React from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { Link } from "react-router-dom";
+import { Link, useHistory } from "react-router-dom";
 import { faCheck, faHeart } from "@fortawesome/free-solid-svg-icons";
 import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
 import { SessionSubscriptionsWrapper } from "@storyteller/components/src/session/SessionSubscriptionsWrapper";
@@ -25,6 +25,8 @@ interface Props {
 }
 
 function PricingPage(props: Props) {
+  let history = useHistory();
+
   const beginStripeCheckoutFlow = async (
     internal_plan_key: string
   ): Promise<boolean> => {
@@ -50,7 +52,11 @@ function PricingPage(props: Props) {
   const beginStripeFlow = async (
     internal_plan_key: string
   ): Promise<boolean> => {
-    if (props.sessionSubscriptionsWrapper.hasPaidFeatures()) {
+    if (!props.sessionWrapper.isLoggedIn()) {
+      // TODO: This needs to bring the user back to purchase flow.
+      history.push("/signup");
+      return false;
+    } else if (props.sessionSubscriptionsWrapper.hasPaidFeatures()) {
       return await beginStripePortalFlow();
     } else {
       return await beginStripeCheckoutFlow(internal_plan_key);
