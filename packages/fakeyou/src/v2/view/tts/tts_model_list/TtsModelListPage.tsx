@@ -38,6 +38,7 @@ import { TwitchTtsNotice } from "./notices/TwitchTtsNotice";
 import { PleaseFollowNotice } from "./notices/PleaseFollowNotice";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
+  faStar,
   faTrash,
   faVolumeHigh,
   faVolumeUp,
@@ -46,6 +47,7 @@ import { GenericNotice } from "./notices/GenericNotice";
 import { DiscordLink2 } from "@storyteller/components/src/elements/DiscordLink2";
 import { motion } from "framer-motion";
 import { container, item, image, panel } from "../../../../data/animation";
+import { SessionSubscriptionsWrapper } from "@storyteller/components/src/session/SessionSubscriptionsWrapper";
 
 export interface EnqueueJobResponsePayload {
   success: boolean;
@@ -54,6 +56,7 @@ export interface EnqueueJobResponsePayload {
 
 interface Props {
   sessionWrapper: SessionWrapper;
+  sessionSubscriptionsWrapper: SessionSubscriptionsWrapper;
 
   isShowingVocodesNotice: boolean;
   clearVocodesNotice: () => void;
@@ -114,7 +117,7 @@ function TtsModelListPage(props: Props) {
       // "mascot/halloween_1.webp",
       // "mascot/halloween_2.webp",
       // "mascot/halloween_3.webp",
-      
+
       "mascot/kitsune_pose2.webp",
       "mascot/kitsune_wizard.webp",
     ];
@@ -321,6 +324,7 @@ function TtsModelListPage(props: Props) {
   }
 
   let signUpButton = <></>;
+  let upgradeButton = <></>;
 
   if (!props.sessionWrapper.isLoggedIn()) {
     signUpButton = (
@@ -332,6 +336,21 @@ function TtsModelListPage(props: Props) {
         </Link>
       </>
     );
+  }
+
+  if (props.sessionWrapper.isLoggedIn()) {
+    if (!props.sessionSubscriptionsWrapper.hasPaidFeatures()) {
+      upgradeButton = (
+        <>
+          <Link to="/pricing">
+            <button type="button" className="btn btn-primary w-100">
+              <FontAwesomeIcon icon={faStar} className="me-2" />
+              Upgrade Plan
+            </button>
+          </Link>
+        </>
+      );
+    }
   }
 
   return (
@@ -383,6 +402,7 @@ function TtsModelListPage(props: Props) {
               className="d-flex flex-column flex-md-row gap-3 justify-content-center justify-content-lg-start mb-5 mb-lg-4"
               variants={item}
             >
+              {upgradeButton}
               {signUpButton}
               <Link to="/clone">
                 <button type="button" className="btn btn-secondary w-100">

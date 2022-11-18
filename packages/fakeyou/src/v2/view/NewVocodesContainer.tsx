@@ -61,6 +61,7 @@ import { PricingPage } from "./premium/PricingPage";
 import { CheckoutSuccessPage } from "./premium/CheckoutSuccessPage";
 import { CheckoutCancelPage } from "./premium/CheckoutCancelPage";
 import { PortalSuccessPage } from "./premium/PortalSuccessPage";
+import { PrivacyPage } from "./about/privacy_page/PrivacyPage";
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -184,7 +185,9 @@ class NewVocodesContainer extends React.Component<Props, State> {
             <Route path="/pricing" exact={true}>
               <PricingPage
                 sessionWrapper={this.props.sessionWrapper}
-                sessionSubscriptionsWrapper={this.props.sessionSubscriptionsWrapper}
+                sessionSubscriptionsWrapper={
+                  this.props.sessionSubscriptionsWrapper
+                }
               />
             </Route>
 
@@ -404,6 +407,10 @@ class NewVocodesContainer extends React.Component<Props, State> {
               <TermsPage />
             </Route>
 
+            <Route path="/privacy">
+              <PrivacyPage />
+            </Route>
+
             <Route path="/guide">
               <GuidePage />
             </Route>
@@ -415,6 +422,9 @@ class NewVocodesContainer extends React.Component<Props, State> {
             <Route path="/">
               <TtsModelListPage
                 sessionWrapper={this.props.sessionWrapper}
+                sessionSubscriptionsWrapper={
+                  this.props.sessionSubscriptionsWrapper
+                }
                 isShowingVocodesNotice={this.props.isShowingVocodesNotice}
                 clearVocodesNotice={this.props.clearVocodesNotice}
                 isShowingLanguageNotice={this.props.isShowingLangaugeNotice}
