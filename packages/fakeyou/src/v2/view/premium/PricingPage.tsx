@@ -17,7 +17,7 @@ import {
 } from "@storyteller/components/src/api/premium/CreateStripePortalRedirect";
 import { motion } from "framer-motion";
 import { container, item, panel } from "../../../data/animation";
-import { FrontendEnvironment } from "../_common/FrontendEnvironment";
+import { FakeYouFrontendEnvironment } from "@storyteller/components/src/env/FakeYouFrontendEnvironment";
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -57,21 +57,48 @@ function PricingPage(props: Props) {
     }
   };
 
-  const environment = FrontendEnvironment.getInstance();
+  const environment = FakeYouFrontendEnvironment.getInstance();
   const planKey = environment.useProductionStripePlans() ? "production" : "development";
 
   const userHasPaidPremium = props.sessionSubscriptionsWrapper.hasPaidFeatures();
 
   let freeButtonText = "Use for free";
+
   let plusButtonText = "Buy Plus";
+  let plusButtonDisabled = false;
+
   let proButtonText = "Buy Pro";
+  let proButtonDisabled = false;
+  let proBorderCss = "rounded panel p-4 h-100"
+
   let eliteButtonText = "Buy Elite";
+  let eliteButtonDisabled = false;
 
   if (userHasPaidPremium) {
     freeButtonText = "Unsubscribe";
-    plusButtonText = "Switch to Plus";
-    proButtonText = "Switch to Pro";
-    eliteButtonText = "Switch to Elite";
+    if (props.sessionSubscriptionsWrapper.hasActivePlusSubscription()) {
+      plusButtonText = "Subscribed";
+      plusButtonDisabled = true;
+    } else {
+      plusButtonText = "Switch to Plus";
+    }
+    if (props.sessionSubscriptionsWrapper.hasActiveProSubscription()) {
+      proButtonText = "Subscribed";
+      proButtonDisabled = true;
+    } else {
+      proButtonText = "Switch to Pro";
+    }
+    if (props.sessionSubscriptionsWrapper.hasActiveEliteSubscription()) {
+      eliteButtonText = "Subscribed";
+      eliteButtonDisabled = true;
+    } else {
+      eliteButtonText = "Switch to Elite";
+    }
+  }
+
+  // Highlight the mid-tier plan if nothing is subscribed
+  if (!userHasPaidPremium) {
+    proBorderCss = "rounded panel p-4 h-100  panel-border"
   }
 
   return (
@@ -259,11 +286,12 @@ function PricingPage(props: Props) {
 
           {/* Plus Tier */}
           <motion.div className="col-12 col-sm-6 col-lg-3" variants={panel}>
-            <div className="rounded panel p-4 h-100 panel-border">
+            <div className="rounded panel p-4 h-100">
               <h2 className="text-center my-2 fw-bold mb-4">{FYP.plus.tier}</h2>
               <button
                 onClick={() => beginStripeFlow(FYP.plus.internal_plan_key[planKey])}
                 className="btn btn-primary w-100 fs-6"
+                disabled={plusButtonDisabled}
               >
                 {plusButtonText}
               </button>
@@ -355,11 +383,12 @@ function PricingPage(props: Props) {
 
           {/* Pro Tier */}
           <motion.div className="col-12 col-sm-6 col-lg-3" variants={panel}>
-            <div className="rounded panel p-4 h-100">
+            <div className={proBorderCss}>
               <h2 className="text-center my-2 fw-bold mb-4">{FYP.pro.tier}</h2>
               <button
                 onClick={() => beginStripeFlow(FYP.pro.internal_plan_key[planKey])}
                 className="btn btn-primary w-100 fs-6"
+                disabled={proButtonDisabled}
               >
                 {proButtonText}
               </button>
@@ -470,6 +499,7 @@ function PricingPage(props: Props) {
               <button
                 onClick={() => beginStripeFlow(FYP.elite.internal_plan_key[planKey])}
                 className="btn btn-primary w-100 fs-6"
+                disabled={eliteButtonDisabled}
               >
                 {eliteButtonText}
               </button>
