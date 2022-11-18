@@ -172,7 +172,12 @@ class NewVocodesContainer extends React.Component<Props, State> {
             </Route>
 
             <Route path="/profile/:username">
-              <ProfileFc sessionWrapper={this.props.sessionWrapper} />
+              <ProfileFc
+                sessionWrapper={this.props.sessionWrapper}
+                sessionSubscriptionsWrapper={
+                  this.props.sessionSubscriptionsWrapper
+                }
+              />
             </Route>
 
             <Route path="/signup">
