@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from "react";
-import { VIRIDIS, MAGMA } from "@colormap/presets";
+import { MAGMA } from "@colormap/presets";
 import { createColorMap, linearScale } from "@colormap/core";
 import { GetRandomArrayValue } from "@storyteller/components/src/utils/GetRandomArrayValue";
 
