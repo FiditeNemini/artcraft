@@ -5,6 +5,7 @@ use log::{info, warn};
 use std::io::{BufReader, Read};
 use std::path::{PathBuf, Path};
 use std::process::Command;
+use subprocess_common::docker_options::DockerOptions;
 use tempdir::TempDir;
 
 /// This is a Python script that uses the `gdown` package to download from Google Drive.
@@ -22,18 +23,6 @@ pub struct GoogleDriveDownloadCommand {
   download_script: String,
   maybe_venv_activation_script: Option<String>,
   maybe_docker_options: Option<DockerOptions>,
-}
-
-#[derive(Clone)]
-pub struct DockerOptions {
-  pub image_name: String,
-  pub maybe_bind_mount: Option<DockerFilesystemMount>,
-}
-
-#[derive(Clone)]
-pub struct DockerFilesystemMount {
-  pub local_filesystem: String,
-  pub container_filesystem: String,
 }
 
 impl GoogleDriveDownloadCommand {

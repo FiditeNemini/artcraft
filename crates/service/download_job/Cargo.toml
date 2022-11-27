@@ -22,6 +22,7 @@ google_drive_common = { path = "../../lib/google_drive_common" }
 jobs_common = { path = "../../lib/jobs_common" }
 reusable_types = { path = "../../lib/reusable_types" }
 storage_buckets_common = { path = "../../lib/storage_buckets_common" }
+subprocess_common = { path = "../../lib/subprocess_common" }
 tts_common = { path = "../../lib/tts_common" }
 
 # Vendored code
