@@ -32,11 +32,27 @@ build_storyteller_web_app() {
   popd
 }
 
+build_download_job() {
+  # NB: This imports the inference/upload job queries
+  # It should also import the shared database lib queries, but something(???) broke.
+  pushd crates/service/download_job
+  SQLX_OFFLINE=true cargo sqlx prepare -- --bin download-job
+  popd
+}
+
 build_tts_download_job() {
   # NB: This imports the inference/upload job queries
   # It should also import the shared database lib queries, but something(???) broke.
   pushd crates/service/tts_download_job
   SQLX_OFFLINE=true cargo sqlx prepare -- --bin tts-download-job
+  popd
+}
+
+build_inference_job() {
+  # NB: This imports the inference/upload job queries
+  # It should also import the shared database lib queries, but something(???) broke.
+  pushd crates/service/inference_job
+  SQLX_OFFLINE=true cargo sqlx prepare -- --bin inference-job
   popd
 }
 
@@ -70,7 +86,9 @@ combine_sqlx_queries() {
   jq -s '.[0] * .[1]' \
     crates/lib/database_queries/sqlx-data.json \
     crates/service/storyteller_web/sqlx-data.json \
+    crates/service/download_job/sqlx-data.json \
     crates/service/tts_download_job/sqlx-data.json \
+    crates/service/inference_job/sqlx-data.json \
     crates/service/tts_inference_job/sqlx-data.json \
     crates/service/w2l_download_job/sqlx-data.json \
     crates/service/w2l_inference_job/sqlx-data.json \
@@ -80,7 +98,9 @@ combine_sqlx_queries() {
 cleanup_temp_files() {
   rm crates/lib/database_queries/sqlx-data.json \
     crates/service/storyteller_web/sqlx-data.json \
+    crates/service/download_job/sqlx-data.json \
     crates/service/tts_download_job/sqlx-data.json \
+    crates/service/inference_job/sqlx-data.json \
     crates/service/tts_inference_job/sqlx-data.json \
     crates/service/w2l_download_job/sqlx-data.json \
     crates/service/w2l_inference_job/sqlx-data.json
@@ -88,9 +108,12 @@ cleanup_temp_files() {
 
 build_shared_database_library
 build_storyteller_web_app
+build_download_job
 build_tts_download_job
+build_inference_job
 build_tts_inference_job
 build_w2l_download_job
 build_w2l_inference_job
 combine_sqlx_queries
 cleanup_temp_files
+
