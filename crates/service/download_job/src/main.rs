@@ -41,7 +41,7 @@ use std::path::PathBuf;
 use std::time::Duration;
 use storage_buckets_common::bucket_client::BucketClient;
 use storage_buckets_common::bucket_path_unifier::BucketPathUnifier;
-use subprocess_common::docker_options::{DockerFilesystemMount, DockerOptions};
+use subprocess_common::docker_options::{DockerFilesystemMount, DockerGpu, DockerOptions};
 
 // Buckets
 const ENV_ACCESS_KEY : &'static str = "ACCESS_KEY";
@@ -99,11 +99,12 @@ async fn main() -> AnyhowResult<()> {
     "./download_internet_file.py",
     "./python/bin/activate",
     DockerOptions {
-      image_name: "d73f28ce3ff6".to_string(),
+      image_name: "d73f28ce3ff6".to_string(), // web-downloader
       maybe_bind_mount: Some(DockerFilesystemMount {
         local_filesystem: "/tmp".to_string(),
         container_filesystem: "/tmp".to_string()
-      })
+      }),
+      maybe_gpu: None,
     }
   );
 
@@ -143,13 +144,21 @@ async fn main() -> AnyhowResult<()> {
   };
 
   let hifigan_model_check_command= HifiGanModelCheckCommand::new(
-    &easyenv::get_env_string_required("HIFIGAN_ROOT_CODE_DIRECTORY")?,
-    &easyenv::get_env_string_or_default(
-    "HIFIGAN_VIRTUAL_ENV_ACTIVATION_COMMAND",
-    "source python-tacotron/bin/activate"),
-  &easyenv::get_env_string_or_default(
-    "HIFIGAN_MODEL_CHECK_SCRIPT_NAME",
-    "vocodes_model_check_hifigan.py"),
+    //&easyenv::get_env_string_required("HIFIGAN_ROOT_CODE_DIRECTORY")?,
+    "/models/tts",
+    //&easyenv::get_env_string_or_default(
+    //"HIFIGAN_VIRTUAL_ENV_ACTIVATION_COMMAND",
+    //"source python-tacotron/bin/activate"),
+    "source python/bin/activate",
+    //&easyenv::get_env_string_or_default(
+    //"HIFIGAN_MODEL_CHECK_SCRIPT_NAME",
+    //"vocodes_model_check_hifigan.py"),
+    "./vocodes_model_check_hifigan.py",
+    Some(DockerOptions {
+      image_name: "5642d0fd7fc1".to_string(), // storyteller-ml
+      maybe_bind_mount: Some(DockerFilesystemMount::tmp_to_tmp()),
+      maybe_gpu: Some(DockerGpu::All),
+    }),
   );
 
   let job_state = JobState {

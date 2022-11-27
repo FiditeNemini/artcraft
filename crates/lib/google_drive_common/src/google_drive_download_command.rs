@@ -22,6 +22,8 @@ use tempdir::TempDir;
 pub struct GoogleDriveDownloadCommand {
   download_script: String,
   maybe_venv_activation_script: Option<String>,
+
+  /// If this is run under Docker (eg. in development), these are the options.
   maybe_docker_options: Option<DockerOptions>,
 }
 
@@ -75,18 +77,7 @@ impl GoogleDriveDownloadCommand {
     }
 
     if let Some(docker_options) = self.maybe_docker_options.as_ref() {
-      let fuse_command = match docker_options.maybe_bind_mount.as_ref()  {
-        None => "".to_string(),
-        Some(mount) => format!(" --mount type=bind,source={},target={}",
-          &mount.local_filesystem,
-          &mount.container_filesystem),
-      };
-
-      command = format!("docker run --rm {} {} /bin/bash -c \"{}\"",
-        &fuse_command,
-        &docker_options.image_name,
-        command
-      )
+      command = docker_options.to_command_string(&command);
     }
 
     info!("Running command: {}", command);

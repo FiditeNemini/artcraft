@@ -2,6 +2,7 @@ use crate::AnyhowResult;
 use log::info;
 use subprocess::{Popen, PopenConfig};
 use std::path::Path;
+use subprocess_common::docker_options::DockerOptions;
 
 /// This command is used to check hifigan for being a real model
 #[derive(Clone)]
@@ -13,6 +14,9 @@ pub struct HifiGanModelCheckCommand {
   virtual_env_activation_command: String,
   
   hifigan_model_check_script_name: String,
+
+  /// If this is run under Docker (eg. in development), these are the options.
+  maybe_docker_options: Option<DockerOptions>,
 }
 
 impl HifiGanModelCheckCommand {
@@ -20,11 +24,13 @@ impl HifiGanModelCheckCommand {
     hifigan_root_code_directory: &str,
     virtual_env_activation_command: &str,
     hifigan_model_check_script_name: &str,
+    maybe_docker_options: Option<DockerOptions>,
   ) -> Self {
     Self {
       hifigan_root_code_directory: hifigan_root_code_directory.to_string(),
       virtual_env_activation_command: virtual_env_activation_command.to_string(),
       hifigan_model_check_script_name: hifigan_model_check_script_name.to_string(),
+      maybe_docker_options,
     }
   }
 
@@ -45,6 +51,10 @@ impl HifiGanModelCheckCommand {
     command.push_str(&checkpoint_path.as_ref().display().to_string());
     command.push_str(" --output_metadata_filename ");
     command.push_str(&output_metadata_filename.as_ref().display().to_string());
+
+    if let Some(docker_options) = self.maybe_docker_options.as_ref() {
+      command = docker_options.to_command_string(&command);
+    }
 
     info!("Command: {:?}", command);
 
