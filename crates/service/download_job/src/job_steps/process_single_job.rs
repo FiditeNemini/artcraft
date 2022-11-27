@@ -50,6 +50,8 @@ pub async fn process_single_job(job_state: &JobState, job: &AvailableDownloadJob
     }
   };
 
+  info!("Downloaded filename: {}", &download_filename);
+
   // ==================== HANDLE DIFFERENT DOWNLOAD TYPES ==================== //
 
   let mut entity_token : Option<String> = None;
@@ -68,6 +70,9 @@ pub async fn process_single_job(job_state: &JobState, job: &AvailableDownloadJob
       entity_type = results.entity_type.clone();
     }
     GenericDownloadType::MelGanVocodes => {
+      return Err(anyhow!("MelGan not yet supported!"));
+    }
+    GenericDownloadType::Tacotron2 => {
       let results = process_tacotron_model(
         job_state,
         job,
@@ -77,9 +82,6 @@ pub async fn process_single_job(job_state: &JobState, job: &AvailableDownloadJob
       ).await?;
       entity_token = results.entity_token.clone();
       entity_type = results.entity_type.clone();
-    }
-    GenericDownloadType::Tacotron2 => {
-      // TODO
     }
   }
 
