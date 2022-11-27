@@ -4,6 +4,7 @@ use container_common::anyhow_result::AnyhowResult;
 use container_common::filesystem::safe_delete_temp_directory::safe_delete_temp_directory;
 use crate::JobState;
 use crate::job_types::hifigan::process_hifigan_vocoder::process_hifigan_vocoder;
+use crate::job_types::tacotron::process_tacotron_model::process_tacotron_model;
 use database_queries::queries::generic_download::job::list_available_generic_download_jobs::AvailableDownloadJob;
 use database_queries::queries::generic_download::job::mark_generic_download_job_done::mark_generic_download_job_done;
 use database_queries::queries::generic_download::job::mark_generic_download_job_pending_and_grab_lock::mark_generic_download_job_pending_and_grab_lock;
@@ -67,6 +68,17 @@ pub async fn process_single_job(job_state: &JobState, job: &AvailableDownloadJob
       entity_type = results.entity_type.clone();
     }
     GenericDownloadType::MelGanVocodes => {
+      let results = process_tacotron_model(
+        job_state,
+        job,
+        &temp_dir,
+        &download_filename,
+        &mut redis_logger,
+      ).await?;
+      entity_token = results.entity_token.clone();
+      entity_type = results.entity_type.clone();
+    }
+    GenericDownloadType::Tacotron2 => {
       // TODO
     }
   }

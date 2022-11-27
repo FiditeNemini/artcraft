@@ -12,6 +12,10 @@ pub enum GenericDownloadType {
   #[serde(rename = "melgan_vocodes")]
   #[sqlx(rename = "melgan_vocodes")]
   MelGanVocodes,
+
+  #[serde(rename = "tacotron2")]
+  #[sqlx(rename = "tacotron2")]
+  Tacotron2,
 }
 
 /// NB: Legacy API for older code.
@@ -20,6 +24,7 @@ impl GenericDownloadType {
     match self {
       Self::HifiGan => "hifigan",
       Self::MelGanVocodes => "melgan_vocodes",
+      Self::Tacotron2 => "tacotron2",
     }
   }
 
@@ -27,6 +32,7 @@ impl GenericDownloadType {
     match value {
       "hifigan" => Ok(Self::HifiGan),
       "melgan_vocodes" => Ok(Self::MelGanVocodes),
+      "tacotron2" => Ok(Self::Tacotron2),
       _ => Err(format!("invalid value: {:?}", value)),
     }
   }
@@ -41,17 +47,20 @@ mod tests {
   fn test_serialization() {
     assert_serialization(GenericDownloadType::HifiGan, "hifigan");
     assert_serialization(GenericDownloadType::MelGanVocodes, "melgan_vocodes");
+    assert_serialization(GenericDownloadType::Tacotron2, "tacotron2");
   }
 
   #[test]
   fn to_str() {
     assert_eq!(GenericDownloadType::HifiGan.to_str(), "hifigan");
     assert_eq!(GenericDownloadType::MelGanVocodes.to_str(), "melgan_vocodes");
+    assert_eq!(GenericDownloadType::Tacotron2.to_str(), "tacotron2");
   }
 
   #[test]
   fn from_str() {
     assert_eq!(GenericDownloadType::from_str("hifigan").unwrap(), GenericDownloadType::HifiGan);
     assert_eq!(GenericDownloadType::from_str("melgan_vocodes").unwrap(), GenericDownloadType::MelGanVocodes);
+    assert_eq!(GenericDownloadType::from_str("tacotron2").unwrap(), GenericDownloadType::Tacotron2);
   }
 }

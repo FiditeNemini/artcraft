@@ -42,6 +42,7 @@ use std::time::Duration;
 use storage_buckets_common::bucket_client::BucketClient;
 use storage_buckets_common::bucket_path_unifier::BucketPathUnifier;
 use subprocess_common::docker_options::{DockerFilesystemMount, DockerGpu, DockerOptions};
+use crate::job_types::tacotron::tacotron_model_check_command::TacotronModelCheckCommand;
 
 // Buckets
 const ENV_ACCESS_KEY : &'static str = "ACCESS_KEY";
@@ -94,6 +95,7 @@ async fn main() -> AnyhowResult<()> {
     "DOWNLOAD_SCRIPT",
     "./scripts/download_internet_file.py");
 
+  // TODO/FIXME: Cannot be deployed as currently written.
   //let google_drive_downloader = GoogleDriveDownloadCommand::new(&download_script);
   let google_drive_downloader = GoogleDriveDownloadCommand::new_local_dev_docker(
     "./download_internet_file.py",
@@ -143,6 +145,19 @@ async fn main() -> AnyhowResult<()> {
     firehose_publisher: firehose_publisher.clone(), // NB: Also safe
   };
 
+  // TODO/FIXME: Cannot be deployed as currently written.
+  let tacotron_model_check_command = TacotronModelCheckCommand::new(
+    "/models/tts",
+    "source python/bin/activate",
+    "./vocodes_model_check_tacotron.py",
+    Some(DockerOptions {
+      image_name: "5642d0fd7fc1".to_string(), // storyteller-ml
+      maybe_bind_mount: Some(DockerFilesystemMount::tmp_to_tmp()),
+      maybe_gpu: Some(DockerGpu::All),
+    })
+  );
+
+  // TODO/FIXME: Cannot be deployed as currently written.
   let hifigan_model_check_command= HifiGanModelCheckCommand::new(
     //&easyenv::get_env_string_required("HIFIGAN_ROOT_CODE_DIRECTORY")?,
     "/models/tts",
@@ -172,6 +187,7 @@ async fn main() -> AnyhowResult<()> {
     bucket_root_tts_model_uploads: bucket_root.to_string(),
     firehose_publisher,
     badge_granter,
+    tacotron_model_check_command,
     hifigan_model_check_command,
     job_batch_wait_millis: common_env.job_batch_wait_millis,
     job_max_attempts: common_env.job_max_attempts as i32,
