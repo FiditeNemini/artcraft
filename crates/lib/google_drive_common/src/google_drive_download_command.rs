@@ -11,18 +11,49 @@ use tempdir::TempDir;
 /// We're using this because it's a hack that gets around OAuth gateways. All the Rust
 /// crates require OAuth permissions. Ugh.
 ///
+/// This script lives here: https://github.com/storytold/web-downloader
+///
 /// Filename: `download_internet_file.py`
 /// Arguments:
 ///   --url (google drive, web, or youtube url)
-///   --output_file (local download filename)
+///   --output_filename (local download filename)
+#[derive(Clone)]
 pub struct GoogleDriveDownloadCommand {
-  command: String,
+  download_script: String,
+  maybe_venv_activation_script: Option<String>,
+  maybe_docker_options: Option<DockerOptions>,
+}
+
+#[derive(Clone)]
+pub struct DockerOptions {
+  pub image_name: String,
+  pub maybe_bind_mount: Option<DockerFilesystemMount>,
+}
+
+#[derive(Clone)]
+pub struct DockerFilesystemMount {
+  pub local_filesystem: String,
+  pub container_filesystem: String,
 }
 
 impl GoogleDriveDownloadCommand {
-  pub fn new(command: &str) -> Self {
+  pub fn new(download_script: &str) -> Self {
     Self {
-      command: command.to_string(),
+      download_script: download_script.to_string(),
+      maybe_venv_activation_script: None,
+      maybe_docker_options: None,
+    }
+  }
+
+  pub fn new_local_dev_docker(
+    download_script: &str,
+    venv_activation_script: &str,
+    docker_options: DockerOptions
+  ) -> Self {
+    Self {
+      download_script: download_script.to_string(),
+      maybe_venv_activation_script: Some(venv_activation_script.to_string()),
+      maybe_docker_options: Some(docker_options),
     }
   }
 
@@ -42,10 +73,32 @@ impl GoogleDriveDownloadCommand {
 
     info!("Downloading {} to: {}", download_url, temp_filename);
 
-    let command = format!("{} --url {} --output_file {}",
-                          &self.command,
-                          &download_url,
+    let mut command = format!("{} --url {} --output_filename {}",
+                          &self.download_script,
+                          download_url,
                           &temp_filename);
+
+    if let Some(venv_activation_script) = self.maybe_venv_activation_script.as_deref() {
+      // NB: "." is source for non-bash shells
+      command = format!(". {} && {}",
+                        venv_activation_script,
+                        &command);
+    }
+
+    if let Some(docker_options) = self.maybe_docker_options.as_ref() {
+      let fuse_command = match docker_options.maybe_bind_mount.as_ref()  {
+        None => "".to_string(),
+        Some(mount) => format!(" --mount type=bind,source={},target={}",
+          &mount.local_filesystem,
+          &mount.container_filesystem),
+      };
+
+      command = format!("docker run --rm {} {} /bin/bash -c \"{}\"",
+        &fuse_command,
+        &docker_options.image_name,
+        command
+      )
+    }
 
     info!("Running command: {}", command);
 

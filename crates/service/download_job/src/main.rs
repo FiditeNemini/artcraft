@@ -31,7 +31,7 @@ use crate::job_steps::main_loop::main_loop;
 use crate::job_types::hifigan::hifigan_model_check_command::HifiGanModelCheckCommand;
 use database_queries::mediators::badge_granter::BadgeGranter;
 use database_queries::mediators::firehose_publisher::FirehosePublisher;
-use google_drive_common::google_drive_download_command::GoogleDriveDownloadCommand;
+use google_drive_common::google_drive_download_command::{DockerFilesystemMount, DockerOptions, GoogleDriveDownloadCommand};
 use log::info;
 use r2d2_redis::RedisConnectionManager;
 use r2d2_redis::r2d2;
@@ -93,7 +93,18 @@ async fn main() -> AnyhowResult<()> {
     "DOWNLOAD_SCRIPT",
     "./scripts/download_internet_file.py");
 
-  let google_drive_downloader = GoogleDriveDownloadCommand::new(&download_script);
+  //let google_drive_downloader = GoogleDriveDownloadCommand::new(&download_script);
+  let google_drive_downloader = GoogleDriveDownloadCommand::new_local_dev_docker(
+    "./download_internet_file.py",
+    "./python/bin/activate",
+    DockerOptions {
+      image_name: "d73f28ce3ff6".to_string(),
+      maybe_bind_mount: Some(DockerFilesystemMount {
+        local_filesystem: "/tmp".to_string(),
+        container_filesystem: "/tmp".to_string()
+      })
+    }
+  );
 
   let temp_directory = PathBuf::from(temp_directory);
 
