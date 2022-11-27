@@ -133,11 +133,12 @@ RUN SQLX_OFFLINE=true \
 FROM ubuntu:jammy as final
 
 # See: https://github.com/opencontainers/image-spec/blob/master/annotations.md
+LABEL org.opencontainers.image.title='Storyteller Rust'
 LABEL org.opencontainers.image.authors='bt@brand.io, echelon@gmail.com'
-LABEL org.opencontainers.image.url='https://github.com/storytold/storyteller-web'
+LABEL org.opencontainers.image.description='All of the binaries from the Rust monorepo'
 LABEL org.opencontainers.image.documentation='https://github.com/storytold/storyteller-web'
 LABEL org.opencontainers.image.source='https://github.com/storytold/storyteller-web'
-LABEL org.opencontainers.image.description='All of the binaries from the Rust monorepo'
+LABEL org.opencontainers.image.url='https://github.com/storytold/storyteller-web'
 
 WORKDIR /
 
