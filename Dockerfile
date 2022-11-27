@@ -93,7 +93,7 @@ RUN SQLX_OFFLINE=true \
   LD_LIBRARY_PATH=/usr/lib:${LD_LIBRARY_PATH} \
   $HOME/.cargo/bin/cargo build \
   --release \
-  --bin generic-download-job
+  --bin download-job
 
 RUN SQLX_OFFLINE=true \
   LD_LIBRARY_PATH=/usr/lib:${LD_LIBRARY_PATH} \
@@ -147,7 +147,7 @@ COPY --from=builder /tmp/target/release/w2l-download-job /
 COPY --from=builder /tmp/target/release/w2l-inference-job /
 COPY --from=builder /tmp/target/release/websocket-gateway /
 COPY --from=builder /tmp/target/release/twitch-pubsub-subscriber /
-COPY --from=builder /tmp/target/release/generic-download-job /
+COPY --from=builder /tmp/target/release/download-job /
 
 # SSL certs are required for crypto
 COPY --from=builder /etc/ssl /etc/ssl

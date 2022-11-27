@@ -1,5 +1,5 @@
 [package]
-name = "generic-download-job"
+name = "download-job"
 publish = false
 edition = "2018"
 version = "0.0.1"
@@ -9,7 +9,7 @@ authors = [
 ]
 
 [[bin]]
-name = "generic-download-job"
+name = "download-job"
 path = "src/main.rs"
 
 [dependencies]

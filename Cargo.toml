@@ -27,7 +27,7 @@ members = [
   "crates/lib/user_input_common",
 
   # Services: API servers, jobs, workers, etc.
-  "crates/service/generic_download_job",
+  "crates/service/download_job",
   "crates/service/image_generation_service",
   "crates/service/storyteller_web",
   "crates/service/tts_download_job",

@@ -1611,6 +1611,38 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "1435fa1053d8b2fbbe9be7e97eca7f33d37b28409959813daefc1446a14247f1"
 
 [[package]]
+name = "download-job"
+version = "0.0.1"
+dependencies = [
+ "anyhow",
+ "chrono",
+ "clap 2.34.0",
+ "config",
+ "container_common",
+ "database_queries",
+ "dotenv",
+ "easyenv",
+ "google_drive_common",
+ "hostname",
+ "hyper 0.14.14",
+ "jobs_common",
+ "lfu",
+ "log",
+ "newrelic-telemetry",
+ "r2d2_redis",
+ "reusable_types",
+ "serde",
+ "serde_derive",
+ "serde_json",
+ "sqlx",
+ "storage_buckets_common",
+ "subprocess",
+ "tempdir",
+ "tokio 1.13.0",
+ "tts_common",
+]
+
+[[package]]
 name = "dtoa"
 version = "0.4.8"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1921,38 +1953,6 @@ checksum = "501466ecc8a30d1d3b7fc9229b122b2ce8ed6e9d9223f1138d4babb253e51817"
 dependencies = [
  "typenum",
  "version_check",
-]
-
-[[package]]
-name = "generic-download-job"
-version = "0.0.1"
-dependencies = [
- "anyhow",
- "chrono",
- "clap 2.34.0",
- "config",
- "container_common",
- "database_queries",
- "dotenv",
- "easyenv",
- "google_drive_common",
- "hostname",
- "hyper 0.14.14",
- "jobs_common",
- "lfu",
- "log",
- "newrelic-telemetry",
- "r2d2_redis",
- "reusable_types",
- "serde",
- "serde_derive",
- "serde_json",
- "sqlx",
- "storage_buckets_common",
- "subprocess",
- "tempdir",
- "tokio 1.13.0",
- "tts_common",
 ]
 
 [[package]]
