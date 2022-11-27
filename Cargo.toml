@@ -30,6 +30,7 @@ members = [
   # Services: API servers, jobs, workers, etc.
   "crates/service/download_job",
   "crates/service/image_generation_service",
+  "crates/service/inference_job",
   "crates/service/storyteller_web",
   "crates/service/tts_download_job",
   "crates/service/tts_inference_job",
