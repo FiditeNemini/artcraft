@@ -1,20 +1,15 @@
 use anyhow::anyhow;
-use config::bad_urls::is_bad_tts_model_download_url;
 use config::is_bad_download_url::is_bad_download_url;
 use container_common::anyhow_result::AnyhowResult;
-use container_common::filesystem::check_file_exists::check_file_exists;
 use container_common::filesystem::safe_delete_temp_directory::safe_delete_temp_directory;
-use container_common::filesystem::safe_delete_temp_file::safe_delete_temp_file;
-use container_common::hashing::hash_file_sha2::hash_file_sha2;
 use crate::JobState;
-use crate::job_steps::process_hifigan_vocoder::process_hifigan_vocoder;
+use crate::job_types::hifigan::process_hifigan_vocoder::process_hifigan_vocoder;
 use database_queries::queries::generic_download::job::list_available_generic_download_jobs::AvailableDownloadJob;
 use database_queries::queries::generic_download::job::mark_generic_download_job_done::mark_generic_download_job_done;
 use database_queries::queries::generic_download::job::mark_generic_download_job_pending_and_grab_lock::mark_generic_download_job_pending_and_grab_lock;
 use jobs_common::redis_job_status_logger::RedisJobStatusLogger;
 use log::{info, warn};
 use reusable_types::generic_download_type::GenericDownloadType;
-use std::path::PathBuf;
 use tempdir::TempDir;
 
 pub async fn process_single_job(job_state: &JobState, job: &AvailableDownloadJob) -> AnyhowResult<()> {
@@ -70,6 +65,9 @@ pub async fn process_single_job(job_state: &JobState, job: &AvailableDownloadJob
       ).await?;
       entity_token = results.entity_token.clone();
       entity_type = results.entity_type.clone();
+    }
+    GenericDownloadType::MelGanVocodes => {
+      // TODO
     }
   }
 

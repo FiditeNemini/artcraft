@@ -1,4 +1,4 @@
-use crate::HifiGanModelCheckCommand;
+use crate::job_types::hifigan::hifigan_model_check_command::HifiGanModelCheckCommand;
 use database_queries::mediators::badge_granter::BadgeGranter;
 use database_queries::mediators::firehose_publisher::FirehosePublisher;
 use google_drive_common::google_drive_download_command::GoogleDriveDownloadCommand;

@@ -7,7 +7,6 @@ use container_common::hashing::hash_file_sha2::hash_file_sha2;
 use crate::JobState;
 use crate::job_steps::job_results::JobResults;
 use database_queries::queries::generic_download::job::list_available_generic_download_jobs::AvailableDownloadJob;
-use database_queries::queries::tts::tts_download_jobs::tts_download_job_queries::insert_tts_model;
 use database_queries::queries::vocoder::insert_vocoder_model::{Args, insert_vocoder_model};
 use jobs_common::redis_job_status_logger::RedisJobStatusLogger;
 use log::{info, warn};
@@ -94,7 +93,7 @@ pub async fn process_hifigan_vocoder<'a, 'b>(
   // ==================== SAVE RECORDS ==================== //
 
   info!("Saving model record...");
-  let (id, model_token) = insert_vocoder_model(Args {
+  let (_id, model_token) = insert_vocoder_model(Args {
     vocoder_type: VocoderType::HifiGan,
     title: &job.title,
     original_download_url: &job.download_url,
