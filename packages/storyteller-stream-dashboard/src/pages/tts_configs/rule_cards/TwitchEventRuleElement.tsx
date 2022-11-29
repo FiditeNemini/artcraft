@@ -98,7 +98,7 @@ function TwitchEventRuleElement(props: Props) {
     description = (
       <>
         <p>
-          TTS with voice:
+          <span className="fw-semibold">TTS with voice:</span>
           <br />
           {modelName}{" "}
           <a href={link} target="_blank" rel="noreferrer">
@@ -132,8 +132,10 @@ function TwitchEventRuleElement(props: Props) {
     description = (
       <>
         <p>
-          TTS with a random voice from the following {modelNameAndLinks.length}{" "}
-          voice(s):
+          <span className="fw-semibold">
+            TTS with a random voice from the following{" "}
+            {modelNameAndLinks.length} voice(s):
+          </span>
           <ul>{modelNameAndLinks}</ul>
         </p>
       </>
@@ -143,7 +145,7 @@ function TwitchEventRuleElement(props: Props) {
   const editUrl = `/tts_configs/edit/${props.rule.token}`;
   const deleteUrl = `/tts_configs/delete/${props.rule.token}`;
 
-  let buttons = <></>;
+  let buttons = undefined;
   if (!hideButtons) {
     buttons = (
       <>
@@ -163,7 +165,7 @@ function TwitchEventRuleElement(props: Props) {
 
   return (
     <div key={props.rule.token}>
-      <div className="panel p-4">
+      <div className="panel p-3 p-lg-4">
         <div>
           <h4 className="fw-bold mb-4">{subtitle}</h4>
           <div className="mb-4">{description}</div>

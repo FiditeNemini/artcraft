@@ -1,48 +1,89 @@
-import React from 'react';
-import { TwitchEventRule } from '@storyteller/components/src/api/storyteller/twitch_event_rules/ListTwitchEventRules';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faArrowDown, faArrowUp, faExternalLinkAlt, } from '@fortawesome/free-solid-svg-icons';
-import { TtsModelListItem } from '@storyteller/components/src/api/tts/ListTtsModels';
+import React from "react";
+import { TwitchEventRule } from "@storyteller/components/src/api/storyteller/twitch_event_rules/ListTwitchEventRules";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+  faArrowDown,
+  faArrowUp,
+  faExternalLinkAlt,
+} from "@fortawesome/free-solid-svg-icons";
+import { TtsModelListItem } from "@storyteller/components/src/api/tts/ListTtsModels";
 
 interface Props {
-  rule: TwitchEventRule,
+  rule: TwitchEventRule;
 
   // Index of the rule in the parents' list
-  ruleIndex: number,
+  ruleIndex: number;
 
   // Update callbacks
-  handleMoveUp: (index: number) => void,
-  handleMoveDown: (index: number) => void,
+  handleMoveUp: (index: number) => void;
+  handleMoveDown: (index: number) => void;
 
   // FakeYou voices
-  allTtsModelsByToken: Map<string, TtsModelListItem>,
+  allTtsModelsByToken: Map<string, TtsModelListItem>;
 }
 
 function ReorderableTwitchEventRuleElement(props: Props) {
   let subtitle = <></>;
   let description = <></>;
 
-  if (props.rule.event_match_predicate.bits_cheermote_name_exact_match !== undefined) {
-    subtitle = (
-      <>Cheermote name matches "{props.rule.event_match_predicate.bits_cheermote_name_exact_match.cheermote_name}"</>
-    );
-  } else if (props.rule.event_match_predicate.bits_cheermote_prefix_spend_threshold !== undefined) {
+  if (
+    props.rule.event_match_predicate.bits_cheermote_name_exact_match !==
+    undefined
+  ) {
     subtitle = (
       <>
-        Cheermote prefix is "{props.rule.event_match_predicate.bits_cheermote_prefix_spend_threshold.cheermote_prefix}"
-        and spend at least {props.rule.event_match_predicate.bits_cheermote_prefix_spend_threshold.minimum_bits_spent} bits
+        Cheermote name matches "
+        {
+          props.rule.event_match_predicate.bits_cheermote_name_exact_match
+            .cheermote_name
+        }
+        "
       </>
     );
-  } else if (props.rule.event_match_predicate.bits_spend_threshold !== undefined) {
+  } else if (
+    props.rule.event_match_predicate.bits_cheermote_prefix_spend_threshold !==
+    undefined
+  ) {
     subtitle = (
       <>
-        Spend at least {props.rule.event_match_predicate.bits_spend_threshold.minimum_bits_spent} bits
+        Cheermote prefix is "
+        {
+          props.rule.event_match_predicate.bits_cheermote_prefix_spend_threshold
+            .cheermote_prefix
+        }
+        " and spend at least{" "}
+        {
+          props.rule.event_match_predicate.bits_cheermote_prefix_spend_threshold
+            .minimum_bits_spent
+        }{" "}
+        bits
       </>
     );
-  } else if (props.rule.event_match_predicate.channel_points_reward_name_exact_match !== undefined) {
+  } else if (
+    props.rule.event_match_predicate.bits_spend_threshold !== undefined
+  ) {
     subtitle = (
       <>
-        Reward name matches "{props.rule.event_match_predicate.channel_points_reward_name_exact_match.reward_name}"
+        Spend at least{" "}
+        {
+          props.rule.event_match_predicate.bits_spend_threshold
+            .minimum_bits_spent
+        }{" "}
+        bits
+      </>
+    );
+  } else if (
+    props.rule.event_match_predicate.channel_points_reward_name_exact_match !==
+    undefined
+  ) {
+    subtitle = (
+      <>
+        Reward name matches "
+        {
+          props.rule.event_match_predicate
+            .channel_points_reward_name_exact_match.reward_name
+        }
+        "
       </>
     );
   }
@@ -61,7 +102,14 @@ function ReorderableTwitchEventRuleElement(props: Props) {
 
     description = (
       <>
-        TTS with voice: {modelName} <a href={link} target="_blank" rel="noreferrer"><FontAwesomeIcon icon={faExternalLinkAlt} /></a>
+        <p>
+          <span className="fw-semibold">TTS with voice:</span>
+          <br />
+          {modelName}{" "}
+          <a href={link} target="_blank" rel="noreferrer">
+            <FontAwesomeIcon icon={faExternalLinkAlt} />
+          </a>
+        </p>
       </>
     );
   } else if (props.rule.event_response.tts_random_voice !== undefined) {
@@ -78,50 +126,55 @@ function ReorderableTwitchEventRuleElement(props: Props) {
 
       return (
         <li key={index}>
-          {modelName} <a href={link} target="_blank" rel="noreferrer"><FontAwesomeIcon icon={faExternalLinkAlt} /></a>
+          {modelName}{" "}
+          <a href={link} target="_blank" rel="noreferrer">
+            <FontAwesomeIcon icon={faExternalLinkAlt} />
+          </a>
         </li>
       );
     });
 
     description = (
       <>
-        TTS with a random voice from the following {modelNameAndLinks.length} voice(s): 
-        <ul>{modelNameAndLinks}</ul>
+        <p>
+          <span className="fw-semibold">
+            TTS with a random voice from the following{" "}
+            {modelNameAndLinks.length} voice(s):
+          </span>
+          <ul>{modelNameAndLinks}</ul>
+        </p>
       </>
     );
   }
 
   return (
     <div key={props.rule.token}>
-      <div className="card">
-        <div className="card-content">
-          <div className="title is-5">
-            {subtitle}
-          </div>
-          <div>
-            {description}
-          </div>
+      <div className="panel p-3 p-lg-4">
+        <div className="mb-4">
+          <h4 className="fw-bold mb-4">{subtitle}</h4>
+          <div>{description}</div>
         </div>
-        <footer className="card-footer">
-          <div className="card-footer-item">
-            <span className="icon">
-              <button onClick={() => props.handleMoveUp(props.ruleIndex)} className="button is-ghost">
-                <FontAwesomeIcon icon={faArrowUp} />&nbsp;Up
-              </button>
-            </span>
-          </div>
-          <div className="card-footer-item">
-            <span className="icon">
-              <button onClick={() => props.handleMoveDown(props.ruleIndex)} className="button is-ghost">
-                <FontAwesomeIcon icon={faArrowDown} />&nbsp;Down
-              </button>
-            </span>
-          </div>
-        </footer>
+        <div className="d-flex gap-3">
+          <button
+            onClick={() => props.handleMoveUp(props.ruleIndex)}
+            className="btn btn-secondary w-100"
+          >
+            <FontAwesomeIcon icon={faArrowUp} className="me-2" />
+            Up
+          </button>
+
+          <button
+            onClick={() => props.handleMoveDown(props.ruleIndex)}
+            className="btn btn-secondary w-100"
+          >
+            <FontAwesomeIcon icon={faArrowDown} className="me-2" />
+            Down
+          </button>
+        </div>
       </div>
       <br />
     </div>
-  )
+  );
 }
 
-export { ReorderableTwitchEventRuleElement }
+export { ReorderableTwitchEventRuleElement };

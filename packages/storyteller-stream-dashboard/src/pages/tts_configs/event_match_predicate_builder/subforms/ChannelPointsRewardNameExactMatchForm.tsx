@@ -1,12 +1,14 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from "react";
 
 interface ChannelPointsRewardNameExactMatchProps {
-  rewardName: string,
-  updateRewardName: (name: string) => void,
-};
+  rewardName: string;
+  updateRewardName: (name: string) => void;
+}
 
-function ChannelPointsRewardNameExactMatchForm(props: ChannelPointsRewardNameExactMatchProps) {
-  const [rewardName, setRewardName] = useState<string>('');
+function ChannelPointsRewardNameExactMatchForm(
+  props: ChannelPointsRewardNameExactMatchProps
+) {
+  const [rewardName, setRewardName] = useState<string>("");
 
   // NB: useState is not always setting from props correctly (after several re-renders)
   // The following answers suggests using useEffect:
@@ -16,28 +18,29 @@ function ChannelPointsRewardNameExactMatchForm(props: ChannelPointsRewardNameExa
     setRewardName(props.rewardName);
   }, [props.rewardName]);
 
-  const updateRewardName = (ev: React.FormEvent<HTMLInputElement>) : boolean => {
+  const updateRewardName = (ev: React.FormEvent<HTMLInputElement>): boolean => {
     const value = (ev.target as HTMLInputElement).value;
     setRewardName(value);
     props.updateRewardName(value);
     return true;
-  }
+  };
 
   return (
     <>
-      <div className="field">
-        <label className="label">Match the following reward name</label>
-        <div className="control is-medium">
-          <input 
+      <div className="form-group">
+        <label className="sub-title">Match the following reward name</label>
+        <div>
+          <input
             value={rewardName}
             onChange={updateRewardName}
-            className="input is-medium" 
-            type="text" 
-            placeholder="Reward Name" />
+            className="form-control"
+            type="text"
+            placeholder="Reward Name"
+          />
         </div>
       </div>
     </>
-  )
+  );
 }
 
-export { ChannelPointsRewardNameExactMatchForm }
+export { ChannelPointsRewardNameExactMatchForm };

@@ -1,68 +1,83 @@
-import React, { useEffect, useState } from 'react';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faGem } from '@fortawesome/free-solid-svg-icons';
-import { CHEER_BIT_LEVELS, CHEER_PREFIXES, CHEER_PREFIX_TO_STRING_MAP } from '../../../../twitch/Cheers';
-import { CheerState, CheerStateIsCustom, CheerStateIsOfficial } from '../CheerState';
+import React, { useEffect, useState } from "react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faGem } from "@fortawesome/free-solid-svg-icons";
+import {
+  CHEER_BIT_LEVELS,
+  CHEER_PREFIXES,
+  CHEER_PREFIX_TO_STRING_MAP,
+} from "../../../../twitch/Cheers";
+import {
+  CheerState,
+  CheerStateIsCustom,
+  CheerStateIsOfficial,
+} from "../CheerState";
 
 // TODO: Don't duplicate
 const CHEER_REGEX = /^([A-Za-z]+)(\d+)?$/;
 
 interface BitsCheermoteNameExactMatchProps {
-  cheerState: CheerState,
-  updateCheerName: (cheerNameOrPrefix: string) => void,
-};
+  cheerState: CheerState;
+  updateCheerName: (cheerNameOrPrefix: string) => void;
+}
 
-function BitsCheermoteNameExactMatchForm(props: BitsCheermoteNameExactMatchProps) {
+function BitsCheermoteNameExactMatchForm(
+  props: BitsCheermoteNameExactMatchProps
+) {
   // The two dropdowns
-  const [cheerPrefix, setCheerPrefix] = useState<string>('');
+  const [cheerPrefix, setCheerPrefix] = useState<string>("");
   const [bitsValue, setBitsValue] = useState<number>(1);
   // The freeform text input
-  const [manualCheerValue, setManualCheerValue] = useState<string>('');
+  const [manualCheerValue, setManualCheerValue] = useState<string>("");
 
   // NB: useState is not always setting from props correctly (after several re-renders)
   // The following answers suggests using useEffect:
   //  https://stackoverflow.com/a/54866051 (less clear by also using useState(), but good comments)
   //  https://stackoverflow.com/a/62982753
   useEffect(() => {
-    let newPrefix = '';
-    let newFullName = '';
+    let newPrefix = "";
+    let newFullName = "";
     let newBits = 1;
     let hasBits = false;
 
-    if (!!props.cheerState.bits && !isNaN(props.cheerState.bits) && props.cheerState.bits > 0) {
+    if (
+      !!props.cheerState.bits &&
+      !isNaN(props.cheerState.bits) &&
+      props.cheerState.bits > 0
+    ) {
       newBits = props.cheerState.bits;
       hasBits = true;
     }
 
     if (CheerStateIsOfficial(props.cheerState)) {
       if (!!props.cheerState.cheerPrefix) {
-        newPrefix = CHEER_PREFIX_TO_STRING_MAP.get((props.cheerState.cheerPrefix)) || '';
+        newPrefix =
+          CHEER_PREFIX_TO_STRING_MAP.get(props.cheerState.cheerPrefix) || "";
       }
-      
+
       if (hasBits) {
         newFullName = `${newPrefix}${newBits}`;
       } else {
         newFullName = newPrefix;
       }
-
     } else if (CheerStateIsCustom(props.cheerState)) {
-      newFullName = props.cheerState.cheerFull || '';
+      newFullName = props.cheerState.cheerFull || "";
     }
 
     setCheerPrefix(newPrefix);
     setBitsValue(newBits);
     setManualCheerValue(newFullName);
-
   }, [props.cheerState]);
 
-  const updateCheerPrefix = (ev: React.FormEvent<HTMLSelectElement>) : boolean => {
+  const updateCheerPrefix = (
+    ev: React.FormEvent<HTMLSelectElement>
+  ): boolean => {
     const value = (ev.target as HTMLSelectElement).value;
     setCheerPrefix(value);
     recalcuateFieldValue(value, bitsValue);
     return true;
-  }
+  };
 
-  const updateBitsValue = (ev: React.FormEvent<HTMLSelectElement>) : boolean => {
+  const updateBitsValue = (ev: React.FormEvent<HTMLSelectElement>): boolean => {
     const value = (ev.target as HTMLSelectElement).value;
     const numericValue = parseInt(value);
     if (!isNaN(numericValue)) {
@@ -71,13 +86,15 @@ function BitsCheermoteNameExactMatchForm(props: BitsCheermoteNameExactMatchProps
       recalcuateFieldValue(cheerPrefix, numericValue);
     }
     return true;
-  }
+  };
 
-  const updateTextCheerValue = (ev: React.FormEvent<HTMLInputElement>) : boolean => {
+  const updateTextCheerValue = (
+    ev: React.FormEvent<HTMLInputElement>
+  ): boolean => {
     const value = (ev.target as HTMLInputElement).value;
 
     // Cheer name is the full value, eg. 'Corgo100'
-    const matches = value.trim().match(CHEER_REGEX)
+    const matches = value.trim().match(CHEER_REGEX);
 
     if (!!matches && matches.length > 1) {
       setCheerPrefix(matches[1]); // First match group
@@ -93,77 +110,73 @@ function BitsCheermoteNameExactMatchForm(props: BitsCheermoteNameExactMatchProps
     setManualCheerValue(value);
     props.updateCheerName(value);
     return true;
-  }
+  };
 
   // When the dropdowns are used, replace any manual text entry.
   const recalcuateFieldValue = (prefix: string, bits: number) => {
     const cheerValue = `${prefix}${bits}`;
     setManualCheerValue(cheerValue);
     props.updateCheerName(cheerValue);
-  }
+  };
 
   return (
     <>
-      <div className="field is-grouped">
-        <div className="control">
-          <label className="label">Pick the cheer</label>
-          <div className="select is-medium">
-            <select 
-              onChange={updateCheerPrefix}
-              value={cheerPrefix}
-              >
-              <option
-                key={`option-*`}
-                value=""
-              >Select cheer...</option>
-              {CHEER_PREFIXES.map(cheerPrefix => {
-                return (
-                  <option
-                    key={`option-${cheerPrefix}`}
-                    value={cheerPrefix}
-                  >{cheerPrefix}</option>
-                );
-              })}
-            </select>
-          </div>
+      <div className="d-flex flex-column gap-4">
+        <div className="form-group">
+          <label className="sub-title">Pick the cheer</label>
+          <select
+            onChange={updateCheerPrefix}
+            value={cheerPrefix}
+            className="form-select"
+          >
+            <option key={`option-*`} value="">
+              Select cheer...
+            </option>
+            {CHEER_PREFIXES.map((cheerPrefix) => {
+              return (
+                <option key={`option-${cheerPrefix}`} value={cheerPrefix}>
+                  {cheerPrefix}
+                </option>
+              );
+            })}
+          </select>
         </div>
-        <div className="control">
-          <label className="label">Then the bit value</label>
-          <div className="control">
-            <div className="select is-medium">
-              <select 
-                onChange={updateBitsValue}
-                value={bitsValue}
-                >
-                {CHEER_BIT_LEVELS.map(level => {
-                  return (
-                    <option
-                      key={`option-${cheerPrefix}-${level}`}
-                      value={level}
-                    >{level}</option>
-                  );
-                })}
-              </select>
-            </div>
-          </div>
+        <div className="form-group">
+          <label className="sub-title">Then the bit value</label>
+          <select
+            onChange={updateBitsValue}
+            value={bitsValue}
+            className="form-select"
+          >
+            {CHEER_BIT_LEVELS.map((level) => {
+              return (
+                <option key={`option-${cheerPrefix}-${level}`} value={level}>
+                  {level}
+                </option>
+              );
+            })}
+          </select>
         </div>
         <div className="control is-expanded">
-          <label className="label">To match against this (or set something custom)</label>
-          <p className="control has-icons-left is-large">
-            <input 
-              value={manualCheerValue}
-              onChange={updateTextCheerValue}
-              className="input is-medium is-primary" 
-              type="text" 
-              placeholder="Cheermote full name (including bit value)" />
-            <span className="icon is-small is-left">
+          <label className="sub-title">
+            To match against this (or set something custom)
+          </label>
+          <div className="input-icon">
+            <span className="form-control-feedback">
               <FontAwesomeIcon icon={faGem} />
             </span>
-          </p>
+            <input
+              value={manualCheerValue}
+              onChange={updateTextCheerValue}
+              className="form-control"
+              type="text"
+              placeholder="Cheermote full name (including bit value)"
+            />
+          </div>
         </div>
       </div>
     </>
-  )
+  );
 }
 
-export { BitsCheermoteNameExactMatchForm }
+export { BitsCheermoteNameExactMatchForm };

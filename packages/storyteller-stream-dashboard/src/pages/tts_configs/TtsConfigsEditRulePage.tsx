@@ -1,43 +1,58 @@
-import React, { useCallback, useEffect, useState } from 'react';
-import { SessionWrapper } from '@storyteller/components/src/session/SessionWrapper';
-import { GetTwitchEventRule, GetTwitchEventRuleIsError, GetTwitchEventRuleIsOk, TwitchEventRule } from '@storyteller/components/src/api/storyteller/twitch_event_rules/GetTwitchEventRule';
-import { EditTwitchEventRule, EditTwitchEventRuleRequest } from '@storyteller/components/src/api/storyteller/twitch_event_rules/EditTwitchEventRule';
-import { TwitchEventRuleElement } from './rule_cards/TwitchEventRuleElement';
-import { Link, useHistory, useParams } from 'react-router-dom';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faAngleLeft, faSave } from '@fortawesome/free-solid-svg-icons';
-import { EventMatchPredicate } from '@storyteller/components/src/api/storyteller/twitch_event_rules/shared/EventMatchPredicate';
-import { EventResponse } from '@storyteller/components/src/api/storyteller/twitch_event_rules/shared/EventResponse';
-import { TtsModelListItem } from '@storyteller/components/src/api/tts/ListTtsModels';
-import { EventResponseComponent } from './event_response_builder/EventResponseComponent';
-import { EventMatchPredicateBuilderComponent } from './event_match_predicate_builder/EventMatchPredicateBuilderComponent';
+import React, { useCallback, useEffect, useState } from "react";
+import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
+import {
+  GetTwitchEventRule,
+  GetTwitchEventRuleIsError,
+  GetTwitchEventRuleIsOk,
+  TwitchEventRule,
+} from "@storyteller/components/src/api/storyteller/twitch_event_rules/GetTwitchEventRule";
+import {
+  EditTwitchEventRule,
+  EditTwitchEventRuleRequest,
+} from "@storyteller/components/src/api/storyteller/twitch_event_rules/EditTwitchEventRule";
+import { TwitchEventRuleElement } from "./rule_cards/TwitchEventRuleElement";
+import { Link, useHistory, useParams } from "react-router-dom";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faAngleLeft, faSave } from "@fortawesome/free-solid-svg-icons";
+import { EventMatchPredicate } from "@storyteller/components/src/api/storyteller/twitch_event_rules/shared/EventMatchPredicate";
+import { EventResponse } from "@storyteller/components/src/api/storyteller/twitch_event_rules/shared/EventResponse";
+import { TtsModelListItem } from "@storyteller/components/src/api/tts/ListTtsModels";
+import { EventResponseComponent } from "./event_response_builder/EventResponseComponent";
+import { EventMatchPredicateBuilderComponent } from "./event_match_predicate_builder/EventMatchPredicateBuilderComponent";
 
 interface Props {
-  sessionWrapper: SessionWrapper,
-  allTtsModels: TtsModelListItem[],
-  allTtsModelsByToken: Map<string, TtsModelListItem>,
+  sessionWrapper: SessionWrapper;
+  allTtsModels: TtsModelListItem[];
+  allTtsModelsByToken: Map<string, TtsModelListItem>;
 }
 
 function TtsConfigsEditRulePage(props: Props) {
-  const { token } : { token : string } = useParams();
+  const { token }: { token: string } = useParams();
 
   // TODO: Use centralized URL configs
-  const indexLink = '/tts_configs';
+  const indexLink = "/tts_configs";
 
   const history = useHistory();
 
   // ========== Initial Load of Server State ==========
 
-  const [twitchEventRule, setTwitchEventRule] = useState<TwitchEventRule|undefined>(undefined);
+  const [twitchEventRule, setTwitchEventRule] = useState<
+    TwitchEventRule | undefined
+  >(undefined);
 
   // Sent to sub-components to initialize UI
-  const [serverEventMatchPredicate, setServerEventMatchPredicate] = useState<EventMatchPredicate>({});
-  const [serverEventResponse, setServerEventResponse] = useState<EventResponse>({});
+  const [serverEventMatchPredicate, setServerEventMatchPredicate] =
+    useState<EventMatchPredicate>({});
+  const [serverEventResponse, setServerEventResponse] = useState<EventResponse>(
+    {}
+  );
 
   // ========== In-Progress Model Edits ==========
 
-  const [modifiedEventMatchPredicate, setModifiedEventMatchPredicate] = useState<EventMatchPredicate>({});
-  const [modifiedEventResponse, setModifiedEventResponse] = useState<EventResponse>({});
+  const [modifiedEventMatchPredicate, setModifiedEventMatchPredicate] =
+    useState<EventMatchPredicate>({});
+  const [modifiedEventResponse, setModifiedEventResponse] =
+    useState<EventResponse>({});
   const [ruleIsDisabled, setRuleIsDisabled] = useState(false);
 
   const getTwitchEventRule = useCallback(async (token: string) => {
@@ -46,15 +61,18 @@ function TtsConfigsEditRulePage(props: Props) {
     if (GetTwitchEventRuleIsOk(response)) {
       // Source of truth
       setTwitchEventRule(response.twitch_event_rule);
-      setServerEventMatchPredicate(response.twitch_event_rule.event_match_predicate);
+      setServerEventMatchPredicate(
+        response.twitch_event_rule.event_match_predicate
+      );
       setServerEventResponse(response.twitch_event_rule.event_response);
 
       // In-progress modifications
-      setModifiedEventMatchPredicate(response.twitch_event_rule.event_match_predicate);
+      setModifiedEventMatchPredicate(
+        response.twitch_event_rule.event_match_predicate
+      );
       setModifiedEventResponse(response.twitch_event_rule.event_response);
       setRuleIsDisabled(response.twitch_event_rule.rule_is_disabled);
-
-    } else if (GetTwitchEventRuleIsError(response))  {
+    } else if (GetTwitchEventRuleIsError(response)) {
       // TODO
     }
   }, []);
@@ -63,15 +81,19 @@ function TtsConfigsEditRulePage(props: Props) {
     getTwitchEventRule(token);
   }, [getTwitchEventRule, token]);
 
-  const updateModifiedEventMatchPredicate = (predicate: EventMatchPredicate) => {
+  const updateModifiedEventMatchPredicate = (
+    predicate: EventMatchPredicate
+  ) => {
     setModifiedEventMatchPredicate(predicate);
-  }
+  };
 
   const updateModifiedEventResponse = (response: EventResponse) => {
     setModifiedEventResponse(response);
-  }
+  };
 
-  const handleFormSubmit = async (ev: React.FormEvent<HTMLFormElement>) : Promise<boolean> => {
+  const handleFormSubmit = async (
+    ev: React.FormEvent<HTMLFormElement>
+  ): Promise<boolean> => {
     ev.preventDefault();
 
     // TODO: Check for errors.
@@ -79,7 +101,7 @@ function TtsConfigsEditRulePage(props: Props) {
     let newEventMatchPredicate = modifiedEventMatchPredicate;
     let newEventResponse = modifiedEventResponse;
 
-    const request : EditTwitchEventRuleRequest = {
+    const request: EditTwitchEventRuleRequest = {
       event_match_predicate: newEventMatchPredicate,
       event_response: newEventResponse,
       rule_is_disabled: ruleIsDisabled,
@@ -91,7 +113,7 @@ function TtsConfigsEditRulePage(props: Props) {
     }
 
     return false;
-  }
+  };
 
   if (!props.sessionWrapper.isLoggedIn()) {
     return <h1>Must Log In</h1>;
@@ -102,7 +124,7 @@ function TtsConfigsEditRulePage(props: Props) {
   }
 
   // NB: This is a hypothetical version of what we'll update to
-  let renderRule : TwitchEventRule = {
+  let renderRule: TwitchEventRule = {
     // Unchanged
     token: twitchEventRule.token,
     event_category: twitchEventRule.event_category,
@@ -118,54 +140,52 @@ function TtsConfigsEditRulePage(props: Props) {
 
   return (
     <>
-      <div className="section">
-        <h1 className="title"> Edit Rule </h1>
+      <div className="pt-5 container">
+        <h1 className="fw-bold mt-5 pt-lg-5">
+          <span className="word">Edit Rule</span>
+        </h1>
       </div>
 
-      <br />
-      <br />
-
-      <form onSubmit={handleFormSubmit}>
-
-        <EventMatchPredicateBuilderComponent
-          twitchEventCategory={twitchEventRule.event_category}
-          serverEventMatchPredicate={serverEventMatchPredicate}
-          updateModifiedEventMatchPredicate={updateModifiedEventMatchPredicate}
+      <div className="container mt-5">
+        <form onSubmit={handleFormSubmit} className="d-flex flex-column gap-4">
+          <EventMatchPredicateBuilderComponent
+            twitchEventCategory={twitchEventRule.event_category}
+            serverEventMatchPredicate={serverEventMatchPredicate}
+            updateModifiedEventMatchPredicate={
+              updateModifiedEventMatchPredicate
+            }
           />
 
-        <br />
-        <br />
-
-        <EventResponseComponent
-          serverEventResponse={serverEventResponse}
-          updateModifiedEventResponse={updateModifiedEventResponse}
-          allTtsModels={props.allTtsModels}
-          allTtsModelsByToken={props.allTtsModelsByToken}
-          />
-
-        <h2 className="title is-4">This is the rule:</h2>
-
-        <div className="content">
-          <TwitchEventRuleElement 
-            rule={renderRule} 
-            hideButtons={true} 
+          <EventResponseComponent
+            serverEventResponse={serverEventResponse}
+            updateModifiedEventResponse={updateModifiedEventResponse}
+            allTtsModels={props.allTtsModels}
             allTtsModelsByToken={props.allTtsModelsByToken}
+          />
+
+          <h2 className="fw-bold mt-4">This is the rule:</h2>
+
+          <div className="content">
+            <TwitchEventRuleElement
+              rule={renderRule}
+              hideButtons={true}
+              allTtsModelsByToken={props.allTtsModelsByToken}
             />
-        </div>
+          </div>
 
-        <button className="button is-large is-fullwidth is-primary">
-          Save Changes&nbsp;<FontAwesomeIcon icon={faSave} />
-        </button>
-      </form>
-      
-      <br />
+          <button className="btn btn-primary">
+            <FontAwesomeIcon icon={faSave} className="me-2" />
+            Save Changes
+          </button>
+        </form>
 
-      <Link to={indexLink} className="button is-large is-fullwidth is-info is-outlined">
-        <FontAwesomeIcon icon={faAngleLeft} />&nbsp;Cancel / Go Back
-      </Link>
-
+        <Link to={indexLink} className="btn btn-secondary mt-3 mb-5">
+          <FontAwesomeIcon icon={faAngleLeft} className="me-2" />
+          Cancel / Go Back
+        </Link>
+      </div>
     </>
-  )
+  );
 }
 
-export { TtsConfigsEditRulePage }
+export { TtsConfigsEditRulePage };
