@@ -20,21 +20,29 @@ use tempdir::TempDir;
 ///   --output_filename (local download filename)
 #[derive(Clone)]
 pub struct GoogleDriveDownloadCommand {
+  /// The python downloader script.
   download_script: String,
+
+  /// If present, change to this directory before doing anything.
+  maybe_change_to_directory: Option<String>,
+
+  /// If a virtual environment is necessary, this is the name of the activation script (which will be sourced.)
   maybe_venv_activation_script: Option<String>,
 
-  /// If this is run under Docker (eg. in development), these are the options.
+  /// If this is run under Docker (eg. in development), these are the options for Docker (GPU, mount, etc.)
   maybe_docker_options: Option<DockerOptions>,
 }
 
 impl GoogleDriveDownloadCommand {
   pub fn new(
     download_script: &str,
+    maybe_change_to_directory: Option<&str>,
     maybe_venv_activation_script: Option<&str>,
     maybe_docker_options: Option<DockerOptions>
   ) -> Self {
     Self {
       download_script: download_script.to_string(),
+      maybe_change_to_directory: maybe_change_to_directory.map(|s| s.to_string()),
       maybe_venv_activation_script: maybe_venv_activation_script.map(|s| s.to_string()),
       maybe_docker_options,
     }
@@ -43,20 +51,9 @@ impl GoogleDriveDownloadCommand {
   pub fn new_production(download_script: &str) -> Self {
     Self {
       download_script: download_script.to_string(),
+      maybe_change_to_directory: None,
       maybe_venv_activation_script: None,
       maybe_docker_options: None,
-    }
-  }
-
-  pub fn new_local_dev_docker(
-    download_script: &str,
-    venv_activation_script: &str,
-    docker_options: DockerOptions
-  ) -> Self {
-    Self {
-      download_script: download_script.to_string(),
-      maybe_venv_activation_script: Some(venv_activation_script.to_string()),
-      maybe_docker_options: Some(docker_options),
     }
   }
 
@@ -85,6 +82,12 @@ impl GoogleDriveDownloadCommand {
       // NB: "." is source for non-bash shells
       command = format!(". {} && {}",
                         venv_activation_script,
+                        &command);
+    }
+
+    if let Some(change_to_directory) = self.maybe_change_to_directory.as_deref() {
+      command = format!("cd {} && {}",
+                        change_to_directory,
                         &command);
     }
 

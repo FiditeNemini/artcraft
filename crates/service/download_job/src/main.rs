@@ -95,6 +95,9 @@ async fn main() -> AnyhowResult<()> {
   // =============== Configure Python "Sidecars" ===============
 
   let google_drive_downloader = {
+    let maybe_root_directory = easyenv::get_env_string_optional(
+      "WEB_DOWNLOADER_MAYBE_ROOT_DIRECTORY");
+
     let downloader_command= easyenv::get_env_string_or_default(
       "WEB_DOWNLOADER_COMMAND", // TODO: Was "DOWNLOAD_SCRIPT" in old apps
       "./download_internet_file.py");
@@ -114,6 +117,7 @@ async fn main() -> AnyhowResult<()> {
 
     GoogleDriveDownloadCommand::new(
       &downloader_command,
+      maybe_root_directory.as_deref(),
       maybe_downloader_venv_script.as_deref(),
       docker_options,
     )
