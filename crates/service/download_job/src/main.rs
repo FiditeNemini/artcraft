@@ -26,9 +26,10 @@ use config::shared_constants::DEFAULT_MYSQL_CONNECTION_STRING;
 use config::shared_constants::DEFAULT_RUST_LOG;
 use container_common::anyhow_result::AnyhowResult;
 use container_common::filesystem::check_directory_exists::check_directory_exists;
-use crate::job_state::JobState;
+use crate::job_state::{JobState, SidecarConfigs};
 use crate::job_steps::main_loop::main_loop;
 use crate::job_types::hifigan::hifigan_model_check_command::HifiGanModelCheckCommand;
+use crate::job_types::tacotron::tacotron_model_check_command::TacotronModelCheckCommand;
 use database_queries::mediators::badge_granter::BadgeGranter;
 use database_queries::mediators::firehose_publisher::FirehosePublisher;
 use google_drive_common::google_drive_download_command::GoogleDriveDownloadCommand;
@@ -42,7 +43,6 @@ use std::time::Duration;
 use storage_buckets_common::bucket_client::BucketClient;
 use storage_buckets_common::bucket_path_unifier::BucketPathUnifier;
 use subprocess_common::docker_options::{DockerFilesystemMount, DockerGpu, DockerOptions};
-use crate::job_types::tacotron::tacotron_model_check_command::TacotronModelCheckCommand;
 
 // Buckets
 const ENV_ACCESS_KEY : &'static str = "ACCESS_KEY";
@@ -57,7 +57,8 @@ const DEFAULT_TEMP_DIR: &'static str = "/tmp";
 async fn main() -> AnyhowResult<()> {
   easyenv::init_all_with_default_logging(Some(DEFAULT_RUST_LOG));
 
-  let _ = dotenv::from_filename(".env-secrets").ok();
+  let _ = dotenv::from_filename(".env-download-job").ok(); // NB: Specific to `download-job` app.
+  let _ = dotenv::from_filename(".env-secrets").ok(); // NB: Secrets not to live in source control.
 
   info!("Obtaining hostname...");
 
@@ -91,24 +92,92 @@ async fn main() -> AnyhowResult<()> {
     "DOWNLOAD_TEMP_DIR",
     DEFAULT_TEMP_DIR);
 
-  let download_script = easyenv::get_env_string_or_default(
-    "DOWNLOAD_SCRIPT",
-    "./scripts/download_internet_file.py");
+  // =============== Configure Python "Sidecars" ===============
 
-  // TODO/FIXME: Cannot be deployed as currently written.
-  //let google_drive_downloader = GoogleDriveDownloadCommand::new(&download_script);
-  let google_drive_downloader = GoogleDriveDownloadCommand::new_local_dev_docker(
-    "./download_internet_file.py",
-    "./python/bin/activate",
-    DockerOptions {
-      image_name: "d73f28ce3ff6".to_string(), // web-downloader
-      maybe_bind_mount: Some(DockerFilesystemMount {
-        local_filesystem: "/tmp".to_string(),
-        container_filesystem: "/tmp".to_string()
-      }),
-      maybe_gpu: None,
-    }
-  );
+  let google_drive_downloader = {
+    let downloader_command= easyenv::get_env_string_or_default(
+      "WEB_DOWNLOADER_COMMAND", // TODO: Was "DOWNLOAD_SCRIPT" in old apps
+      "./download_internet_file.py");
+
+    let maybe_downloader_venv_script = easyenv::get_env_string_optional(
+      "WEB_DOWNLOADER_MAYBE_VENV_SCRIPT");
+
+    let docker_options = easyenv::get_env_string_optional(
+      "WEB_DOWNLOADER_MAYBE_DOCKER_IMAGE")
+        .map(|image_name| {
+            DockerOptions {
+              image_name,
+              maybe_bind_mount: Some(DockerFilesystemMount::tmp_to_tmp()),
+              maybe_gpu: None,
+            }
+          });
+
+    GoogleDriveDownloadCommand::new(
+      &downloader_command,
+      maybe_downloader_venv_script.as_deref(),
+      docker_options,
+    )
+  };
+
+  let tacotron_model_check_command = {
+    let root_directory = easyenv::get_env_string_required(
+      "TACOTRON_MODEL_CHECK_ROOT_DIRECTORY")?;
+
+    let python_command = easyenv::get_env_string_or_default(
+      "TACOTRON_MODEL_CHECK_COMMAND",
+      "./vocodes_model_check_tacotron.py");
+
+    let maybe_venv_command = easyenv::get_env_string_optional(
+      "TACOTRON_MODEL_CHECK_MAYBE_VENV_COMMAND");
+
+    let maybe_docker_options = easyenv::get_env_string_optional(
+      "TACOTRON_MODEL_CHECK_MAYBE_DOCKER_IMAGE")
+        .map(|image_name| {
+          DockerOptions {
+            image_name,
+            maybe_bind_mount: Some(DockerFilesystemMount::tmp_to_tmp()),
+            maybe_gpu: Some(DockerGpu::All),
+          }
+        });
+
+    TacotronModelCheckCommand::new(
+      &root_directory,
+      maybe_venv_command.as_deref(),
+      &python_command,
+      maybe_docker_options,
+    )
+  };
+
+  let hifigan_model_check_command= {
+    let root_directory = easyenv::get_env_string_required(
+      "HIFIGAN_MODEL_CHECK_ROOT_DIRECTORY")?;
+
+    let python_command = easyenv::get_env_string_or_default(
+      "HIFIGAN_MODEL_CHECK_COMMAND",
+      "./vocodes_model_check_tacotron.py");
+
+    let maybe_venv_command = easyenv::get_env_string_optional(
+      "HIFIGAN_MODEL_CHECK_MAYBE_VENV_COMMAND");
+
+    let maybe_docker_options = easyenv::get_env_string_optional(
+      "HIFIGAN_MODEL_CHECK_MAYBE_DOCKER_IMAGE")
+        .map(|image_name| {
+          DockerOptions {
+            image_name,
+            maybe_bind_mount: Some(DockerFilesystemMount::tmp_to_tmp()),
+            maybe_gpu: Some(DockerGpu::All),
+          }
+        });
+
+    HifiGanModelCheckCommand::new(
+      &root_directory,
+      maybe_venv_command.as_deref(),
+      &python_command,
+      maybe_docker_options,
+    )
+  };
+
+  // =============== End Configure Python "Sidecars" ===============
 
   let temp_directory = PathBuf::from(temp_directory);
 
@@ -145,50 +214,21 @@ async fn main() -> AnyhowResult<()> {
     firehose_publisher: firehose_publisher.clone(), // NB: Also safe
   };
 
-  // TODO/FIXME: Cannot be deployed as currently written.
-  let tacotron_model_check_command = TacotronModelCheckCommand::new(
-    "/models/tts",
-    "source python/bin/activate",
-    "./vocodes_model_check_tacotron.py",
-    Some(DockerOptions {
-      image_name: "5642d0fd7fc1".to_string(), // storyteller-ml
-      maybe_bind_mount: Some(DockerFilesystemMount::tmp_to_tmp()),
-      maybe_gpu: Some(DockerGpu::All),
-    })
-  );
-
-  // TODO/FIXME: Cannot be deployed as currently written.
-  let hifigan_model_check_command= HifiGanModelCheckCommand::new(
-    //&easyenv::get_env_string_required("HIFIGAN_ROOT_CODE_DIRECTORY")?,
-    "/models/tts",
-    //&easyenv::get_env_string_or_default(
-    //"HIFIGAN_VIRTUAL_ENV_ACTIVATION_COMMAND",
-    //"source python-tacotron/bin/activate"),
-    "source python/bin/activate",
-    //&easyenv::get_env_string_or_default(
-    //"HIFIGAN_MODEL_CHECK_SCRIPT_NAME",
-    //"vocodes_model_check_hifigan.py"),
-    "./vocodes_model_check_hifigan.py",
-    Some(DockerOptions {
-      image_name: "5642d0fd7fc1".to_string(), // storyteller-ml
-      maybe_bind_mount: Some(DockerFilesystemMount::tmp_to_tmp()),
-      maybe_gpu: Some(DockerGpu::All),
-    }),
-  );
 
   let job_state = JobState {
     download_temp_directory: temp_directory,
     mysql_pool,
     redis_pool,
     bucket_client,
-    download_script,
-    google_drive_downloader,
     bucket_path_unifier: BucketPathUnifier::default_paths(),
     bucket_root_tts_model_uploads: bucket_root.to_string(),
     firehose_publisher,
     badge_granter,
-    tacotron_model_check_command,
-    hifigan_model_check_command,
+    sidecar_configs: SidecarConfigs {
+      google_drive_downloader,
+      tacotron_model_check_command,
+      hifigan_model_check_command,
+    },
     job_batch_wait_millis: common_env.job_batch_wait_millis,
     job_max_attempts: common_env.job_max_attempts as i32,
     no_op_logger_millis: common_env.no_op_logger_millis,

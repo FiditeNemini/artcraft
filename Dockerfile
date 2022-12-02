@@ -169,6 +169,7 @@ RUN ldd storyteller-web
 
 # Without a .env file, Rust crashes "mysteriously" (ugh)
 RUN touch .env
+RUN touch .env-download-job
 RUN touch .env-secrets
 
 EXPOSE 8080

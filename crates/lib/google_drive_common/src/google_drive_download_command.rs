@@ -28,7 +28,19 @@ pub struct GoogleDriveDownloadCommand {
 }
 
 impl GoogleDriveDownloadCommand {
-  pub fn new(download_script: &str) -> Self {
+  pub fn new(
+    download_script: &str,
+    maybe_venv_activation_script: Option<&str>,
+    maybe_docker_options: Option<DockerOptions>
+  ) -> Self {
+    Self {
+      download_script: download_script.to_string(),
+      maybe_venv_activation_script: maybe_venv_activation_script.map(|s| s.to_string()),
+      maybe_docker_options,
+    }
+  }
+
+  pub fn new_production(download_script: &str) -> Self {
     Self {
       download_script: download_script.to_string(),
       maybe_venv_activation_script: None,

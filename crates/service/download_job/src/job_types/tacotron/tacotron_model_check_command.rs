@@ -12,7 +12,7 @@ pub struct TacotronModelCheckCommand {
   tacotron_root_code_directory: String,
   
   /// eg. `source python/bin/activate`
-  virtual_env_activation_command: String,
+  maybe_virtual_env_activation_command: Option<String>,
   
   tacotron_model_check_script_name: String,
 
@@ -23,13 +23,13 @@ pub struct TacotronModelCheckCommand {
 impl TacotronModelCheckCommand {
   pub fn new(
     tacotron_root_code_directory: &str,
-    virtual_env_activation_command: &str,
+    maybe_virtual_env_activation_command: Option<&str>,
     tacotron_model_check_script_name: &str,
     maybe_docker_options: Option<DockerOptions>,
   ) -> Self {
     Self {
       tacotron_root_code_directory: tacotron_root_code_directory.to_string(),
-      virtual_env_activation_command: virtual_env_activation_command.to_string(),
+      maybe_virtual_env_activation_command: maybe_virtual_env_activation_command.map(|s| s.to_string()),
       tacotron_model_check_script_name: tacotron_model_check_script_name.to_string(),
       maybe_docker_options,
     }
@@ -46,8 +46,13 @@ impl TacotronModelCheckCommand {
     command.push_str("echo 'test'");
     command.push_str(" && ");
     command.push_str(&format!("cd {}", self.tacotron_root_code_directory));
-    command.push_str(" && ");
-    command.push_str(&self.virtual_env_activation_command);
+
+    if let Some(venv_command) = self.maybe_virtual_env_activation_command.as_deref() {
+      command.push_str(" && ");
+      command.push_str(venv_command);
+      command.push_str(" ");
+    }
+
     command.push_str(" && ");
     command.push_str("python ");
     command.push_str(&self.tacotron_model_check_script_name);

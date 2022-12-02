@@ -19,15 +19,11 @@ pub struct JobState {
   pub bucket_client: BucketClient,
   pub firehose_publisher: FirehosePublisher,
   pub badge_granter: BadgeGranter,
-  pub google_drive_downloader: GoogleDriveDownloadCommand,
 
   pub bucket_path_unifier: BucketPathUnifier,
 
-  pub tacotron_model_check_command: TacotronModelCheckCommand,
-  pub hifigan_model_check_command: HifiGanModelCheckCommand,
+  pub sidecar_configs: SidecarConfigs,
 
-  // Command to run
-  pub download_script: String,
   // Root to store TTS results
   pub bucket_root_tts_model_uploads: String,
 
@@ -40,4 +36,11 @@ pub struct JobState {
   // Max job attempts before failure.
   // NB: This is an i32 so we don't need to convert to db column type.
   pub job_max_attempts: i32,
+}
+
+/// Configurations and interfaces to code deployed as sidecars or container mounts.
+pub struct SidecarConfigs {
+  pub google_drive_downloader: GoogleDriveDownloadCommand,
+  pub tacotron_model_check_command: TacotronModelCheckCommand,
+  pub hifigan_model_check_command: HifiGanModelCheckCommand,
 }
