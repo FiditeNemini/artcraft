@@ -19,6 +19,7 @@ import { EventResponseComponent } from "./event_response_builder/EventResponseCo
 import { TwitchEventRuleElement } from "./rule_cards/TwitchEventRuleElement";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faAngleLeft, faSave } from "@fortawesome/free-solid-svg-icons";
+import { MustBeLoggedInView } from "../../layout/MustBeLoggedInView";
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -100,7 +101,11 @@ function TtsConfigsCreateRulePage(props: Props) {
   };
 
   if (!props.sessionWrapper.isLoggedIn()) {
-    return <h1>Must Log In</h1>;
+    return (
+      <>
+        <MustBeLoggedInView />
+      </>
+    );
   }
 
   // NB: This is a hypothetical version of what we'll update to

@@ -19,6 +19,7 @@ import { EventResponse } from "@storyteller/components/src/api/storyteller/twitc
 import { TtsModelListItem } from "@storyteller/components/src/api/tts/ListTtsModels";
 import { EventResponseComponent } from "./event_response_builder/EventResponseComponent";
 import { EventMatchPredicateBuilderComponent } from "./event_match_predicate_builder/EventMatchPredicateBuilderComponent";
+import { MustBeLoggedInView } from "../../layout/MustBeLoggedInView";
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -116,7 +117,11 @@ function TtsConfigsEditRulePage(props: Props) {
   };
 
   if (!props.sessionWrapper.isLoggedIn()) {
-    return <h1>Must Log In</h1>;
+    return (
+      <>
+        <MustBeLoggedInView />
+      </>
+    );
   }
 
   if (twitchEventRule === undefined) {

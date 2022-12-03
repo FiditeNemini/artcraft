@@ -12,6 +12,7 @@ import { Link, useHistory, useParams } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faAngleLeft, faTrash } from "@fortawesome/free-solid-svg-icons";
 import { TtsModelListItem } from "@storyteller/components/src/api/tts/ListTtsModels";
+import { MustBeLoggedInView } from "../../layout/MustBeLoggedInView";
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -57,7 +58,11 @@ function TtsConfigsDeleteRulePage(props: Props) {
   };
 
   if (!props.sessionWrapper.isLoggedIn()) {
-    return <h1>Must Log In</h1>;
+    return (
+      <>
+        <MustBeLoggedInView />
+      </>
+    );
   }
 
   if (twitchEventRule === undefined) {

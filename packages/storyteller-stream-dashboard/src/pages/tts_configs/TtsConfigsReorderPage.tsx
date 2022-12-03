@@ -19,6 +19,7 @@ import { faSave } from "@fortawesome/free-solid-svg-icons";
 import { TtsModelListItem } from "@storyteller/components/src/api/tts/ListTtsModels";
 import { useHistory, useParams } from "react-router-dom";
 import { ReorderableTwitchEventRuleElement } from "./rule_cards/ReorderableTwitchEventRuleElement";
+import { MustBeLoggedInView } from "../../layout/MustBeLoggedInView";
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -133,7 +134,11 @@ function TtsConfigsReorderPage(props: Props) {
   };
 
   if (!props.sessionWrapper.isLoggedIn()) {
-    return <h1>Must Log In</h1>;
+    return (
+      <>
+        <MustBeLoggedInView />
+      </>
+    );
   }
 
   return (

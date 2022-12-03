@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faVideo, faVolumeUp } from "@fortawesome/free-solid-svg-icons";
@@ -9,12 +9,41 @@ import {
 } from "@fortawesome/free-brands-svg-icons";
 import { Link } from "react-router-dom";
 import { MustBeLoggedInView } from "../../layout/MustBeLoggedInView";
+import { StorytellerUrlConfig } from "@storyteller/components/src/urls/StorytellerUrlConfig";
+import {
+  CheckTwitchOauth,
+  CheckTwitchOauthIsError,
+  CheckTwitchOauthIsOk,
+} from "@storyteller/components/src/api/storyteller/twitch_oauth/CheckTwitchOauth";
 
 interface Props {
   sessionWrapper: SessionWrapper;
 }
 
 function DashboardPage(props: Props) {
+  const oauthUrl = new StorytellerUrlConfig().twitchOauthEnrollRedirect();
+
+  const [oauthTokenFound, setOauthTokenFound] = useState(false);
+
+  const checkTwitchOauth = useCallback(async () => {
+    const result = await CheckTwitchOauth();
+
+    if (CheckTwitchOauthIsOk(result)) {
+      setOauthTokenFound(result.oauth_token_found);
+    } else if (CheckTwitchOauthIsError(result)) {
+    }
+  }, []);
+
+  useEffect(() => {
+    checkTwitchOauth();
+  }, [checkTwitchOauth]);
+
+  let twitchText = "Link Your Twitch";
+
+  if (oauthTokenFound) {
+    twitchText = "Re-link Your Twitch";
+  }
+
   if (!props.sessionWrapper.isLoggedIn()) {
     return (
       <>
@@ -38,14 +67,17 @@ function DashboardPage(props: Props) {
                     icon={faTwitch}
                     className="features-icon purple-glow twitch-color dashboard-icon"
                   />
-                  <h4 className="features-title mb-3">Link Your Twitch</h4>
+                  <h4 className="features-title mb-3">{twitchText}</h4>
                   <p className="mb-4">
                     Morbi dapibus commodo porta. Sed faucibus tristique orci in
                     tristique. Praesent quam nunc, fermentum eu feugiat sit.
                   </p>
-                  <button className="btn btn-primary w-100 twitch-btn">
-                    Link Twitch
-                  </button>
+                  <a
+                    href={oauthUrl}
+                    className="btn btn-primary w-100 twitch-btn"
+                  >
+                    {twitchText}
+                  </a>
                 </div>
               </div>
               <div className="col-md-4 d-flex align-items-stretch">
