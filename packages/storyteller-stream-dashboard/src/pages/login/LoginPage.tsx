@@ -4,10 +4,6 @@ import { faUser, faKey } from "@fortawesome/free-solid-svg-icons";
 import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
 import { Link, useHistory } from "react-router-dom";
 import {
-  iconPasswordField,
-  iconUser,
-} from "@storyteller/components/src/icons/SemanticIcons";
-import {
   CreateSession,
   CreateSessionIsError,
   CreateSessionIsSuccess,
@@ -85,6 +81,13 @@ function LoginPage(props: Props) {
         <div className="container-panel pb-5 pt-lg-5 my-lg-5 login-panel">
           <div className="panel p-3 p-lg-4 load-hidden mt-5 mt-lg-0 px-md-4">
             <h1 className="panel-title fw-bold">Login</h1>
+            <p className="mt-4 text-center text-lg-start">
+              You can login with your{" "}
+              <a rel="noopener" target="_blank" href="https://fakeyou.com">
+                Fakeyou.com
+              </a>{" "}
+              account.
+            </p>
             <div className="py-6">
               {errorWarning}
 

@@ -29,9 +29,9 @@ function TopNav(props: Props) {
         <div className="container">
           <Link className="navbar-brand me-5 pr-8" to="/">
             <img
-              src="/assets/storyteller-logo.png"
+              src="/assets/powerstream-logo.png"
               alt="Fake You Logo"
-              height="34"
+              height="32"
             />
           </Link>
           <button
@@ -50,7 +50,7 @@ function TopNav(props: Props) {
           >
             <div className="offcanvas-header">
               <Link className="navbar-brand me-5 pr-8" to="/">
-                <img src="/assets/storyteller-logo.png" alt="" height="34" />
+                <img src="/assets/storyteller-logo.png" alt="" height="32" />
               </Link>
               <button
                 type="button"
