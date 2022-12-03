@@ -1,8 +1,7 @@
 import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { Logout } from "@storyteller/components/src/api/session/Logout";
-import { Gravatar } from "@storyteller/components/src/elements/Gravatar";
+import { TopNavSessionButton } from "./TopNavSessionButton";
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -81,13 +80,20 @@ function TopNav(props: Props) {
                   </Link>
                 </li>
               </ul>
-              <div className="d-grid gap-2 d-flex justify-content-start align-items-center pt-4 ps-3 pt-lg-0 ps-lg-0">
+              {/* <div className="d-grid gap-2 d-flex justify-content-start align-items-center pt-4 ps-3 pt-lg-0 ps-lg-0">
                 <Link className="nav-login me-3" to="/login">
                   Login
                 </Link>
                 <button type="button" className="btn btn-primary">
                   Sign up
                 </button>
+              </div> */}
+              <div>
+                <TopNavSessionButton
+                  sessionWrapper={props.sessionWrapper}
+                  enableAlpha={true}
+                  querySessionAction={props.querySessionCallback}
+                />
               </div>
             </div>
           </div>

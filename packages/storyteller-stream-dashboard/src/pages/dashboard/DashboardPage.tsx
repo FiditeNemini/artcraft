@@ -8,12 +8,21 @@ import {
   faTwitter,
 } from "@fortawesome/free-brands-svg-icons";
 import { Link } from "react-router-dom";
+import { MustBeLoggedInView } from "../../layout/MustBeLoggedInView";
 
 interface Props {
   sessionWrapper: SessionWrapper;
 }
 
 function DashboardPage(props: Props) {
+  if (!props.sessionWrapper.isLoggedIn()) {
+    return (
+      <>
+        <MustBeLoggedInView />
+      </>
+    );
+  }
+
   return (
     <div>
       <div className="py-lg-5" id="dashboard">

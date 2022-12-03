@@ -17,6 +17,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { TtsModelListItem } from "@storyteller/components/src/api/tts/ListTtsModels";
 import { Link } from "react-router-dom";
+import { MustBeLoggedInView } from "../../layout/MustBeLoggedInView";
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -43,7 +44,11 @@ function TtsConfigsIndexPage(props: Props) {
   }, [listTwitchEventRules]);
 
   if (!props.sessionWrapper.isLoggedIn()) {
-    return <h1>Must Log In</h1>;
+    return (
+      <>
+        <MustBeLoggedInView />
+      </>
+    );
   }
 
   const cheerEventRules = twitchEventRules.filter(
@@ -102,7 +107,7 @@ function TtsConfigsIndexPage(props: Props) {
         })}
       </div>
 
-      <div className="container pt-5">
+      <div className="container pt-5 mb-5">
         <h2 className="fw-bold">
           <FontAwesomeIcon icon={faBox} className="text-red me-3" />
           Channel Points / Rewards

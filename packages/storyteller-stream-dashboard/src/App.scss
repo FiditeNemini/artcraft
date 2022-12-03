@@ -823,6 +823,10 @@ span.word:after {
   font-size: 50px;
 }
 
+.text-red {
+  color: $primary;
+}
+
 @media (min-width: 768px) {
   .container-panel {
     width: 100%;

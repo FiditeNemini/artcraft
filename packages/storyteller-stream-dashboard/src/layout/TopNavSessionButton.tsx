@@ -1,29 +1,28 @@
-import React from 'react';
-import { Link, useHistory } from 'react-router-dom';
-import { SessionWrapper } from '@storyteller/components/src/session/SessionWrapper';
-import { Logout } from '@storyteller/components/src/api/session/Logout';
-import { t } from 'i18next';
-import { Gravatar } from '@storyteller/components/src/elements/Gravatar';
+import React from "react";
+import { Link, useHistory } from "react-router-dom";
+import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
+import { Logout } from "@storyteller/components/src/api/session/Logout";
+import { t } from "i18next";
+import { Gravatar } from "@storyteller/components/src/elements/Gravatar";
 
 interface Props {
-  sessionWrapper: SessionWrapper,
-  enableAlpha: boolean,
-  querySessionAction: () => void,
-  closeHamburgerAction: () => void,
+  sessionWrapper: SessionWrapper;
+  enableAlpha: boolean;
+  querySessionAction: () => void;
 }
 
 function TopNavSessionButton(props: Props) {
   let history = useHistory();
 
   if (!props.enableAlpha) {
-    return <nav />
+    return <nav />;
   }
 
   const logoutHandler = async () => {
     await Logout();
     props.querySessionAction();
-    history.push('/');
-  }
+    history.push("/");
+  };
 
   let loggedIn = props.sessionWrapper.isLoggedIn();
   let displayName = props.sessionWrapper.getDisplayName();
@@ -31,11 +30,11 @@ function TopNavSessionButton(props: Props) {
   let gravatar = <span />;
 
   if (displayName === undefined) {
-    displayName = 'My Account';
+    displayName = "My Account";
   }
 
   if (gravatarHash !== undefined) {
-    gravatar = <Gravatar email_hash={gravatarHash} size={15} />
+    gravatar = <Gravatar email_hash={gravatarHash} size={15} />;
   }
 
   let sessionLink = <span />;
@@ -48,31 +47,39 @@ function TopNavSessionButton(props: Props) {
         href={url}
         target="_blank"
         rel="noreferrer"
-        onClick={() => props.closeHamburgerAction()}
-        className="button is-alert is-inverted is-pulled-right"
-        > {gravatar}&nbsp; {displayName} (FakeYou)</a>
+        className="btn btn-secondary"
+      >
+        {" "}
+        {gravatar}&nbsp; {displayName} (FakeYou)
+      </a>
     );
-    logoutLink = <button
-        className="button is-alert is-inverted is-pulled-right"
+    logoutLink = (
+      <button
+        className="btn btn-destructive"
         onClick={async () => {
           await logoutHandler();
-          props.closeHamburgerAction();
         }}
-      >{t('common.logout')}</button>;
+      >
+        {t("common.logout")}
+      </button>
+    );
   } else {
     sessionLink = (
-      <Link
-        to="/signup"
-        className="button is-danger is-pulled-right"
-        onClick={() => props.closeHamburgerAction()}
-        >{t('common.signUpLogin')}</Link>
+      <>
+        <Link to="/login" className="nav-login me-2">
+          Login
+        </Link>
+        <Link to="/signup" className="btn btn-primary">
+          Sign Up
+        </Link>
+      </>
     );
   }
 
   return (
-    <span>
-      {logoutLink}
+    <span className="d-flex gap-3 align-items-center">
       {sessionLink}
+      {logoutLink}
     </span>
   );
 }

@@ -2,6 +2,7 @@
 import "./App.scss";
 
 import React from "react";
+import { Link } from "react-router-dom";
 import { BrowserRouter, Route, Switch } from "react-router-dom";
 // import { GitSha } from "@storyteller/components/src/elements/GitSha";
 import {
@@ -190,39 +191,19 @@ class App extends React.Component<Props, State> {
               <hr />
             </div>
 
-            <footer className="d-flex flex-column container py-5 gap-4">
-              <div className="text-center align-items-center justify-content-center gap-3">
-                <a className="footer-link" href="#">
+            <footer className="d-flex flex-column container py-5 gap-5">
+              <div className="text-center align-items-center justify-content-center d-flex gap-2">
+                <Link className="footer-link" to="/tts_configs">
                   TTS Configs
-                </a>
-                &nbsp;|&nbsp;
-                <a className="footer-link" href="#">
+                </Link>
+                |
+                <Link className="footer-link" to="#">
                   OBS Configs
-                </a>
-                &nbsp;|&nbsp;
-                <a className="footer-link" href="#">
-                  Terms
-                </a>
+                </Link>
               </div>
-              <div className="d-flex justify-content-center gap-4">
-                <a className="social-icon" href="#">
-                  <i className="fa-brands fa-discord"></i>
-                </a>
-                <a className="social-icon" href="#">
-                  <i className="fa-brands fa-twitch"></i>
-                </a>
-                <a className="social-icon" href="#">
-                  <i className="fa-brands fa-twitter"></i>
-                </a>
-                <a className="social-icon" href="#">
-                  <i className="fa-brands fa-facebook"></i>
-                </a>
-                <a className="social-icon" href="#">
-                  <i className="fa-brands fa-patreon"></i>
-                </a>
-              </div>
+
               <div className="d-flex justify-content-center">
-                © 2022 Storyteller Stream.
+                © 2022 PowerStream.
               </div>
             </footer>
           </div>

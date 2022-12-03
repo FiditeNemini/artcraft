@@ -9,6 +9,7 @@ import {
 } from "@storyteller/components/src/api/storyteller/twitch_oauth/CheckTwitchOauth";
 import { StorytellerUrlConfig } from "@storyteller/components/src/urls/StorytellerUrlConfig";
 import { faExternalLinkAlt, faPlus } from "@fortawesome/free-solid-svg-icons";
+import { MustBeLoggedInView } from "../../layout/MustBeLoggedInView";
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -31,7 +32,11 @@ function ObsConfigsPage(props: Props) {
   }, [checkTwitchOauth]);
 
   if (!props.sessionWrapper.isLoggedIn()) {
-    return <h1>Must Log In</h1>;
+    return (
+      <>
+        <MustBeLoggedInView />
+      </>
+    );
   }
 
   const username = !!maybeTwitchUsername
@@ -46,10 +51,10 @@ function ObsConfigsPage(props: Props) {
         <h1 className="fw-bold mt-5 pt-lg-5">
           <span className="word">OBS Setup</span>
         </h1>
-        <h3>Ready to Broadcast!</h3>
+        <h3>Set up your OBS</h3>
       </div>
 
-      <div className="container pt-5 d-flex flex-column gap-3">
+      <div className="container pt-5 d-flex flex-column gap-3 pb-5">
         <h2 className="fw-bold">Your OBS Browser Source</h2>
         <div className="panel p-3 p-lg-4">
           <p className="pb-3">
