@@ -138,7 +138,8 @@ async fn main() -> AnyhowResult<()> {
     "DOWNLOAD_SCRIPT",
     "./scripts/download_internet_file.py");
 
-  let google_drive_downloader = GoogleDriveDownloadCommand::new(&download_script);
+  let google_drive_downloader =
+      GoogleDriveDownloadCommand::new_production(&download_script);
 
   let temp_directory = PathBuf::from(temp_directory);
 
