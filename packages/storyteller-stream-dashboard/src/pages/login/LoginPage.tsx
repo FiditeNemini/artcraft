@@ -83,7 +83,7 @@ function LoginPage(props: Props) {
             <h1 className="panel-title fw-bold">Login</h1>
             <p className="mt-4 text-center text-lg-start">
               You can login with your{" "}
-              <a rel="noopener" target="_blank" href="https://fakeyou.com">
+              <a rel="noreferrer" target="_blank" href="https://fakeyou.com">
                 Fakeyou.com
               </a>{" "}
               account.
