@@ -30,6 +30,11 @@ static SUPPORTED_LANGUAGES_FOR_MODELS : Lazy<HashSet<String>> = Lazy::new(|| {
     "fr-CA",
     "fr-FR",
 
+    // Italian
+    "it",
+    "it-CH", // https://en.wikipedia.org/wiki/Swiss_Italian
+    "it-IT",
+
     // Portuguese
     "pt",
     "pt-BR",
@@ -47,8 +52,6 @@ static SUPPORTED_LANGUAGES_FOR_MODELS : Lazy<HashSet<String>> = Lazy::new(|| {
     // Misc
     "id",
     "id-ID",
-    "it",
-    "it-IT",
     "ru",
     "ru-RU",
     "th-TH",
@@ -90,6 +93,7 @@ mod tests {
     assert_eq!("en", get_canonicalized_language_tag_for_model("EN").unwrap());
     assert_eq!("es-419", get_canonicalized_language_tag_for_model("ES-419").unwrap());
     assert_eq!("en-US", get_canonicalized_language_tag_for_model("En-Us").unwrap());
+    assert_eq!("it-IT", get_canonicalized_language_tag_for_model("iT-iT").unwrap());
   }
 
   #[test]
@@ -105,6 +109,8 @@ mod tests {
     assert!(is_valid_language_for_models("en"));
     assert!(is_valid_language_for_models("es-419"));
     assert!(is_valid_language_for_models("ja-JP"));
+    assert!(is_valid_language_for_models("it"));
+    assert!(is_valid_language_for_models("it-CH"));
     // Invalid due to case
     assert!(!is_valid_language_for_models("EN"));
     assert!(!is_valid_language_for_models("ES-419"));
