@@ -20,7 +20,7 @@ set -euxo pipefail
 
 build_shared_database_library() {
   pushd crates/lib/database_queries
-  SQLX_OFFLINE=true cargo sqlx prepare
+  SQLX_OFFLINE=true cargo sqlx prepare --merged
   popd
 }
 
@@ -28,7 +28,7 @@ build_storyteller_web_app() {
   # NB: This imports the inference/upload job queries
   # It should also import the shared database lib queries, but something(???) broke.
   pushd crates/service/storyteller_web
-  SQLX_OFFLINE=true cargo sqlx prepare -- --bin storyteller-web # NB: Because multiple binary targets
+  SQLX_OFFLINE=true cargo sqlx prepare --merged -- --bin storyteller-web # NB: Because multiple binary targets
   popd
 }
 
@@ -36,7 +36,7 @@ build_download_job() {
   # NB: This imports the inference/upload job queries
   # It should also import the shared database lib queries, but something(???) broke.
   pushd crates/service/download_job
-  SQLX_OFFLINE=true cargo sqlx prepare -- --bin download-job
+  SQLX_OFFLINE=true cargo sqlx prepare --merged -- --bin download-job
   popd
 }
 
@@ -44,7 +44,7 @@ build_tts_download_job() {
   # NB: This imports the inference/upload job queries
   # It should also import the shared database lib queries, but something(???) broke.
   pushd crates/service/tts_download_job
-  SQLX_OFFLINE=true cargo sqlx prepare -- --bin tts-download-job
+  SQLX_OFFLINE=true cargo sqlx prepare --merged -- --bin tts-download-job
   popd
 }
 
@@ -52,7 +52,7 @@ build_inference_job() {
   # NB: This imports the inference/upload job queries
   # It should also import the shared database lib queries, but something(???) broke.
   pushd crates/service/inference_job
-  SQLX_OFFLINE=true cargo sqlx prepare -- --bin inference-job
+  SQLX_OFFLINE=true cargo sqlx prepare --merged -- --bin inference-job
   popd
 }
 
@@ -60,7 +60,7 @@ build_tts_inference_job() {
   # NB: This imports the inference/upload job queries
   # It should also import the shared database lib queries, but something(???) broke.
   pushd crates/service/tts_inference_job
-  SQLX_OFFLINE=true cargo sqlx prepare -- --bin tts-inference-job
+  SQLX_OFFLINE=true cargo sqlx prepare --merged -- --bin tts-inference-job
   popd
 }
 
@@ -68,7 +68,7 @@ build_w2l_download_job() {
   # NB: This imports the inference/upload job queries
   # It should also import the shared database lib queries, but something(???) broke.
   pushd crates/service/w2l_download_job
-  SQLX_OFFLINE=true cargo sqlx prepare -- --bin w2l-download-job
+  SQLX_OFFLINE=true cargo sqlx prepare --merged -- --bin w2l-download-job
   popd
 }
 
@@ -76,7 +76,7 @@ build_w2l_inference_job() {
   # NB: This imports the inference/upload job queries
   # It should also import the shared database lib queries, but something(???) broke.
   pushd crates/service/w2l_inference_job
-  SQLX_OFFLINE=true cargo sqlx prepare -- --bin w2l-inference-job
+  SQLX_OFFLINE=true cargo sqlx prepare --merged -- --bin w2l-inference-job
   popd
 }
 

@@ -16,8 +16,10 @@ This stuff is a nightmare.
 Install the following libraries, and see the notes further below about MySQL on Ubuntu 20.04.
 
 ```
+jq # for combining mysql codegen outputs
+libmysqlclient-dev
 mysql-server
-imagemagick
+pkgconf # if using openssl instead of rustls
 ```
 
 To manage the database and perform migrations, install the Rust tools diesel and sqlx.
@@ -25,9 +27,11 @@ To manage the database and perform migrations, install the Rust tools diesel and
 We'll be using diesel to manage the migrations, but sqlx within the app to actually perform queries.
 Diesel is an ORM, which is dumb, so we use sqlx as at-compile-time typesafe SQL.
 
+The CLI is necessary to perform codegen:
+
 ```
 sudo apt-get install libmysqlclient-dev
-cargo install sqlx-cli --no-default-features --features rustls,mysql [2022-01-16: is this needed?]
+cargo install sqlx-cli --no-default-features --features rustls,mysql
 ```
 
 Diesel now supports configuring the migration directory via an environment variable,
