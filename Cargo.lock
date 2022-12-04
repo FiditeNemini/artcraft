@@ -8,7 +8,7 @@ version = "0.12.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "3720d0064a0ce5c0de7bd93bdb0a6caebab2a9b5668746145d7b3b0c5da02914"
 dependencies = [
- "actix-rt 2.4.0",
+ "actix-rt 2.7.0",
  "actix_derive",
  "bitflags",
  "bytes 1.0.1",
@@ -22,7 +22,7 @@ dependencies = [
  "parking_lot 0.11.1",
  "pin-project-lite 0.2.6",
  "smallvec 1.6.1",
- "tokio 1.13.0",
+ "tokio 1.16.1",
  "tokio-util 0.6.9",
 ]
 
@@ -55,7 +55,7 @@ dependencies = [
  "log",
  "memchr",
  "pin-project-lite 0.2.6",
- "tokio 1.13.0",
+ "tokio 1.16.1",
  "tokio-util 0.6.9",
 ]
 
@@ -181,7 +181,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c9b510d35f13987537289f38bf136e7e702a5c87cc28760310cc459544f40afd"
 dependencies = [
  "actix-codec 0.4.1",
- "actix-rt 2.4.0",
+ "actix-rt 2.7.0",
  "actix-service 2.0.1",
  "actix-tls 3.0.0-beta.7",
  "actix-utils 3.0.0",
@@ -212,7 +212,7 @@ dependencies = [
  "rand 0.8.4",
  "sha-1",
  "smallvec 1.6.1",
- "tokio 1.13.0",
+ "tokio 1.16.1",
  "zstd",
 ]
 
@@ -299,13 +299,13 @@ dependencies = [
 
 [[package]]
 name = "actix-rt"
-version = "2.4.0"
+version = "2.7.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "4a0c218d0a17c120f10ee0c69c9f0c45d87319e8f66b1f065e8412b612fc3e24"
+checksum = "7ea16c295198e958ef31930a6ef37d0fb64e9ca3b6116e6b93a8bdae96ee1000"
 dependencies = [
  "actix-macros 0.2.3",
  "futures-core",
- "tokio 1.13.0",
+ "tokio 1.16.1",
 ]
 
 [[package]]
@@ -334,14 +334,14 @@ version = "2.0.0-beta.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7367665785765b066ad16e1086d26a087f696bc7c42b6f93004ced6cfcf1eeca"
 dependencies = [
- "actix-rt 2.4.0",
+ "actix-rt 2.7.0",
  "actix-service 2.0.1",
  "actix-utils 3.0.0",
  "futures-core",
  "log",
  "mio 0.7.11",
  "num_cpus",
- "tokio 1.13.0",
+ "tokio 1.16.1",
 ]
 
 [[package]]
@@ -413,7 +413,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "e4af84e13e4600829858a3e68079be710d1ada461431e1e4c5ae663479ea0a3c"
 dependencies = [
  "actix-codec 0.4.1",
- "actix-rt 2.4.0",
+ "actix-rt 2.7.0",
  "actix-service 2.0.1",
  "actix-utils 3.0.0",
  "derive_more",
@@ -502,7 +502,7 @@ dependencies = [
  "actix-http 3.0.0-beta.11",
  "actix-macros 0.2.3",
  "actix-router 0.5.0-beta.2",
- "actix-rt 2.4.0",
+ "actix-rt 2.7.0",
  "actix-server 2.0.0-beta.6",
  "actix-service 2.0.1",
  "actix-utils 3.0.0",
@@ -547,7 +547,7 @@ dependencies = [
  "bytestring",
  "futures-core",
  "pin-project 1.0.7",
- "tokio 1.13.0",
+ "tokio 1.16.1",
 ]
 
 [[package]]
@@ -710,7 +710,7 @@ dependencies = [
  "smart-default",
  "smol_str",
  "thiserror",
- "tokio 1.13.0",
+ "tokio 1.16.1",
  "uuid",
 ]
 
@@ -877,7 +877,7 @@ dependencies = [
  "serde_derive",
  "serde_json",
  "sqlx",
- "tokio 1.13.0",
+ "tokio 1.16.1",
  "toml",
  "url_config",
 ]
@@ -1147,7 +1147,7 @@ dependencies = [
  "futures-core",
  "memchr",
  "pin-project-lite 0.2.6",
- "tokio 1.13.0",
+ "tokio 1.16.1",
  "tokio-util 0.6.9",
 ]
 
@@ -1639,7 +1639,7 @@ dependencies = [
  "subprocess",
  "subprocess_common",
  "tempdir",
- "tokio 1.13.0",
+ "tokio 1.16.1",
  "tts_common",
 ]
 
@@ -2032,7 +2032,7 @@ dependencies = [
  "http",
  "indexmap",
  "slab",
- "tokio 1.13.0",
+ "tokio 1.16.1",
  "tokio-util 0.6.9",
  "tracing",
 ]
@@ -2189,6 +2189,7 @@ version = "0.0.1"
 dependencies = [
  "actix-cors 0.6.0-beta.3",
  "actix-http 3.0.0-beta.11",
+ "actix-rt 2.7.0",
  "actix-web 4.0.0-beta.10",
  "anyhow",
  "base64 0.13.0",
@@ -2199,9 +2200,11 @@ dependencies = [
  "log",
  "once_cell",
  "regex",
+ "reusable_types",
  "serde",
  "serde_derive",
  "serde_json",
+ "speculoos",
  "toml",
 ]
 
@@ -2274,7 +2277,7 @@ dependencies = [
  "itoa 0.4.7",
  "pin-project-lite 0.2.6",
  "socket2 0.4.0",
- "tokio 1.13.0",
+ "tokio 1.16.1",
  "tower-service",
  "tracing",
  "want",
@@ -2289,7 +2292,7 @@ dependencies = [
  "bytes 1.0.1",
  "hyper 0.14.14",
  "native-tls",
- "tokio 1.13.0",
+ "tokio 1.16.1",
  "tokio-native-tls",
 ]
 
@@ -2334,7 +2337,7 @@ dependencies = [
  "actix-files",
  "actix-http 3.0.0-beta.11",
  "actix-multipart",
- "actix-rt 2.4.0",
+ "actix-rt 2.7.0",
  "actix-service 2.0.1",
  "actix-utils 3.0.0",
  "actix-web 4.0.0-beta.10",
@@ -2393,7 +2396,7 @@ dependencies = [
  "subprocess",
  "tempdir",
  "time 0.2.26",
- "tokio 1.13.0",
+ "tokio 1.16.1",
  "toml",
  "tts_common",
  "twitch_common",
@@ -2453,7 +2456,7 @@ dependencies = [
  "storage_buckets_common",
  "subprocess",
  "tempdir",
- "tokio 1.13.0",
+ "tokio 1.16.1",
  "tts_common",
 ]
 
@@ -2996,7 +2999,7 @@ dependencies = [
  "rand 0.7.3",
  "serde",
  "serde_json",
- "tokio 1.13.0",
+ "tokio 1.16.1",
  "uuid",
 ]
 
@@ -3664,7 +3667,7 @@ dependencies = [
  "percent-encoding 2.2.0",
  "pin-project-lite 0.2.6",
  "sha1",
- "tokio 1.13.0",
+ "tokio 1.16.1",
  "tokio-util 0.6.9",
  "url 2.3.1",
 ]
@@ -3758,7 +3761,7 @@ dependencies = [
  "serde",
  "serde_json",
  "serde_urlencoded",
- "tokio 1.13.0",
+ "tokio 1.16.1",
  "tokio-native-tls",
  "url 2.3.1",
  "wasm-bindgen",
@@ -3886,7 +3889,7 @@ dependencies = [
  "sha2 0.10.5",
  "thiserror",
  "time 0.3.14",
- "tokio 1.13.0",
+ "tokio 1.16.1",
  "tokio-stream",
  "url 2.3.1",
 ]
@@ -3941,7 +3944,7 @@ dependencies = [
  "pin-project-lite 0.2.6",
  "rxml_validation",
  "smartstring",
- "tokio 1.13.0",
+ "tokio 1.16.1",
 ]
 
 [[package]]
@@ -4378,10 +4381,10 @@ version = "0.5.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "0d1bd069de53442e7a320f525a6d4deb8bb0621ac7a55f7eccbc2b58b57f43d0"
 dependencies = [
- "actix-rt 2.4.0",
+ "actix-rt 2.7.0",
  "native-tls",
  "once_cell",
- "tokio 1.13.0",
+ "tokio 1.16.1",
  "tokio-native-tls",
 ]
 
@@ -4457,7 +4460,7 @@ dependencies = [
  "container_common",
  "log",
  "rust-s3",
- "tokio 1.13.0",
+ "tokio 1.16.1",
 ]
 
 [[package]]
@@ -4468,7 +4471,7 @@ dependencies = [
  "actix-files",
  "actix-http 3.0.0-beta.11",
  "actix-multipart",
- "actix-rt 2.4.0",
+ "actix-rt 2.7.0",
  "actix-service 2.0.1",
  "actix-utils 3.0.0",
  "actix-web 4.0.0-beta.10",
@@ -4532,7 +4535,7 @@ dependencies = [
  "subprocess",
  "tempdir",
  "time 0.2.26",
- "tokio 1.13.0",
+ "tokio 1.16.1",
  "toml",
  "tts_common",
  "twitch_api2",
@@ -4813,11 +4816,10 @@ dependencies = [
 
 [[package]]
 name = "tokio"
-version = "1.13.0"
+version = "1.16.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "588b2d10a336da58d877567cd8fb8a14b463e2104910f8132cd054b4b96e29ee"
+checksum = "0c27a64b625de6d309e8c57716ba93021dccf1b3b5c97edd6d3dd2d2135afc0a"
 dependencies = [
- "autocfg 1.0.1",
  "bytes 1.0.1",
  "libc",
  "memchr",
@@ -4865,9 +4867,9 @@ dependencies = [
 
 [[package]]
 name = "tokio-macros"
-version = "1.5.1"
+version = "1.8.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "114383b041aa6212c579467afa0075fbbdd0718de036100bc0ba7961d8cb9095"
+checksum = "d266c00fde287f55d3f1c3e96c500c362a2b8c695076ec180f27918820bc6df8"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -4881,7 +4883,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "f7d995660bd2b7f8c1568414c1126076c13fbb725c40112dc0120b78eb9b717b"
 dependencies = [
  "native-tls",
- "tokio 1.13.0",
+ "tokio 1.16.1",
 ]
 
 [[package]]
@@ -4910,7 +4912,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "bc6844de72e57df1980054b38be3a9f4702aba4858be64dd700181a8a6d0e1b6"
 dependencies = [
  "rustls",
- "tokio 1.13.0",
+ "tokio 1.16.1",
  "webpki",
 ]
 
@@ -4922,7 +4924,7 @@ checksum = "50145484efff8818b5ccd256697f36863f587da82cf8b409c53adf1e840798e3"
 dependencies = [
  "futures-core",
  "pin-project-lite 0.2.6",
- "tokio 1.13.0",
+ "tokio 1.16.1",
 ]
 
 [[package]]
@@ -4959,7 +4961,7 @@ dependencies = [
  "log",
  "pin-project 1.0.7",
  "rustls",
- "tokio 1.13.0",
+ "tokio 1.16.1",
  "tokio-rustls",
  "tungstenite",
  "webpki",
@@ -5009,7 +5011,7 @@ dependencies = [
  "futures-sink",
  "log",
  "pin-project-lite 0.2.6",
- "tokio 1.13.0",
+ "tokio 1.16.1",
 ]
 
 [[package]]
@@ -5130,7 +5132,7 @@ dependencies = [
  "storage_buckets_common",
  "subprocess",
  "tempdir",
- "tokio 1.13.0",
+ "tokio 1.16.1",
  "tts_common",
 ]
 
@@ -5161,7 +5163,7 @@ dependencies = [
  "storage_buckets_common",
  "subprocess",
  "tempdir",
- "tokio 1.13.0",
+ "tokio 1.16.1",
  "tts_common",
 ]
 
@@ -5211,7 +5213,7 @@ dependencies = [
  "actix-cors 0.5.4",
  "actix-files",
  "actix-http 3.0.0-beta.11",
- "actix-rt 2.4.0",
+ "actix-rt 2.7.0",
  "actix-service 2.0.1",
  "actix-utils 3.0.0",
  "actix-web 4.0.0-beta.10",
@@ -5259,7 +5261,7 @@ dependencies = [
  "sha2 0.9.5",
  "sqlx",
  "time 0.2.26",
- "tokio 1.13.0",
+ "tokio 1.16.1",
  "tokio-tungstenite",
  "toml",
  "tts_common",
@@ -5464,6 +5466,7 @@ dependencies = [
  "actix-web 4.0.0-beta.10",
  "anyhow",
  "http_server_common",
+ "reusable_types",
 ]
 
 [[package]]
@@ -5576,7 +5579,7 @@ dependencies = [
  "storage_buckets_common",
  "subprocess",
  "tempdir",
- "tokio 1.13.0",
+ "tokio 1.16.1",
  "tts_common",
 ]
 
@@ -5607,7 +5610,7 @@ dependencies = [
  "storage_buckets_common",
  "subprocess",
  "tempdir",
- "tokio 1.13.0",
+ "tokio 1.16.1",
  "tts_common",
 ]
 
@@ -5742,7 +5745,7 @@ dependencies = [
  "actix-cors 0.5.4",
  "actix-files",
  "actix-http 3.0.0-beta.11",
- "actix-rt 2.4.0",
+ "actix-rt 2.7.0",
  "actix-service 2.0.1",
  "actix-utils 3.0.0",
  "actix-web 4.0.0-beta.10",
@@ -5791,7 +5794,7 @@ dependencies = [
  "sha2 0.9.5",
  "sqlx",
  "time 0.2.26",
- "tokio 1.13.0",
+ "tokio 1.16.1",
  "tokio-tungstenite",
  "toml",
  "twitch_api2",

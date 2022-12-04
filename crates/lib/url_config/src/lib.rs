@@ -51,5 +51,4 @@ Here are the domain names we handle:
 #![allow(dead_code)]
 #![allow(non_snake_case)]
 
-pub mod server_environment;
 pub mod third_party_url_redirector;

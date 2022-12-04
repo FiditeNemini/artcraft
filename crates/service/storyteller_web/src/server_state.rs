@@ -12,9 +12,9 @@ use database_queries::queries::tts::tts_inference_jobs::get_pending_tts_inferenc
 use database_queries::queries::w2l::w2l_templates::list_w2l_templates::W2lTemplateRecordForList;
 use memory_caching::single_item_ttl_cache::SingleItemTtlCache;
 use r2d2_redis::{r2d2, RedisConnectionManager};
+use reusable_types::server_environment::ServerEnvironment;
 use sqlx::MySqlPool;
 use storage_buckets_common::bucket_client::BucketClient;
-use url_config::server_environment::ServerEnvironment;
 use url_config::third_party_url_redirector::ThirdPartyUrlRedirector;
 use users_component::utils::session_checker::SessionChecker;
 use users_component::utils::session_cookie_manager::SessionCookieManager;

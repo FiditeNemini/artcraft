@@ -68,13 +68,14 @@ use crate::util::encrypted_sort_id::SortKeyCrypto;
 use database_queries::mediators::badge_granter::BadgeGranter;
 use database_queries::mediators::firehose_publisher::FirehosePublisher;
 use futures::Future;
-use http_server_common::cors::build_common_cors_config;
+use http_server_common::cors::{build_cors_config, build_production_cors_config};
 use limitation::Limiter;
 use log::{error, info};
 use memory_caching::single_item_ttl_cache::SingleItemTtlCache;
 use r2d2_redis::RedisConnectionManager;
 use r2d2_redis::r2d2;
 use r2d2_redis::redis::Commands;
+use reusable_types::server_environment::ServerEnvironment;
 use sqlx::MySqlPool;
 use sqlx::mysql::MySqlPoolOptions;
 use std::sync::Arc;
@@ -82,7 +83,6 @@ use std::time::Duration;
 use storage_buckets_common::bucket_client::BucketClient;
 use tokio::runtime::Runtime;
 use twitch_common::twitch_secrets::TwitchSecrets;
-use url_config::server_environment::ServerEnvironment;
 use url_config::third_party_url_redirector::ThirdPartyUrlRedirector;
 use users_component::utils::session_checker::SessionChecker;
 use users_component::utils::session_cookie_manager::SessionCookieManager;
@@ -438,7 +438,7 @@ pub async fn serve(server_state: ServerState) -> AnyhowResult<()>
       .app_data(web::Data::from(stripe_lookup)) // NB: Data::from(Arc<T>) for dynamic dispatch
       .app_data(web::Data::from(user_lookup)) // NB: Data::from(Arc<T>) for dynamic dispatch
       .app_data(server_state_arc.clone())
-      .wrap(build_common_cors_config())
+      .wrap(build_cors_config(server_state_arc.server_environment.clone()))
       .wrap(DefaultHeaders::new()
         .header("X-Backend-Hostname", &hostname)
         .header("X-Build-Sha", build_sha.trim()))

@@ -3,7 +3,7 @@ use mockall::{automock, mock, predicate::*};
 
 use std::error::Error;
 use std::fmt::{Display, Formatter};
-use url_config::server_environment::ServerEnvironment;
+use reusable_types::server_environment::ServerEnvironment;
 
 /// Errors for this component are not strongly typed.
 #[derive(Debug)]

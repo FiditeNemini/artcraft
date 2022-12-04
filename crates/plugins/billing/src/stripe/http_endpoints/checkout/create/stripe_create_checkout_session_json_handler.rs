@@ -16,7 +16,7 @@ use sqlx::MySqlPool;
 use std::collections::HashMap;
 use std::fmt;
 use stripe::{CheckoutSession, CheckoutSessionMode, CreateCheckoutSession, CreateCheckoutSessionLineItems};
-use url_config::server_environment::ServerEnvironment;
+use reusable_types::server_environment::ServerEnvironment;
 use url_config::third_party_url_redirector::ThirdPartyUrlRedirector;
 
 // =============== Request ===============

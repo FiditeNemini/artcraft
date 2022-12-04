@@ -1,8 +1,8 @@
-use std::ops::Deref;
 use chrono::Utc;
 use crate::configs::plans::plan::Plan;
 use crate::configs::plans::plan_list::{DEVELOPMENT_PREMIUM_PLANS, DEVELOPMENT_PREMIUM_PLANS_BY_SLUG, FREE_LOGGED_IN_PLAN, FREE_LOGGED_OUT_PLAN, LOYALTY_PLANS_BY_SLUG, PRODUCTION_PREMIUM_PLANS, PRODUCTION_PREMIUM_PLANS_BY_SLUG};
-use url_config::server_environment::ServerEnvironment;
+use reusable_types::server_environment::ServerEnvironment;
+use std::ops::Deref;
 use users_component::utils::user_session_extended::{UserSessionExtended, UserSessionSubscriptionPlan};
 
 /// Look up the most appropriate plan for the session.
@@ -64,7 +64,7 @@ pub mod tests {
   use chrono::{Duration, Utc};
   use crate::configs::plans::get_correct_plan_for_session::get_correct_plan_for_session;
   use crate::configs::plans::plan_list::{ALL_PLANS_BY_SLUG, FREE_LOGGED_IN_PLAN, FREE_LOGGED_OUT_PLAN};
-  use url_config::server_environment::ServerEnvironment;
+  use reusable_types::server_environment::ServerEnvironment;
   use users_component::utils::user_session_extended::{UserSessionExtended, UserSessionSubscriptionPlan};
 
   #[test]

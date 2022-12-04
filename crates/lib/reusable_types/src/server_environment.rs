@@ -17,7 +17,18 @@ impl ServerEnvironment {
         match environment {
             "dev" | "DEV" | "development" | "DEVELOPMENT" => Some(ServerEnvironment::Development),
             "prod" | "PROD" | "production" | "PRODUCTION" => Some(ServerEnvironment::Production),
+            // "stage" | "STAGE" | "staging" | "STAGING" => Some(ServerEnvironment::Staging),
             _ => None,
+        }
+    }
+
+    /// Reports whether the software is running in production.
+    /// This is useful once proper "staging" backends gets introduced, as currently staging frontend
+    /// is served by the production backend.
+    pub fn is_deployed_in_production(&self) -> bool {
+        match self {
+            ServerEnvironment::Development => false,
+            ServerEnvironment::Production => true,
         }
     }
 }
@@ -48,5 +59,11 @@ mod tests {
         assert_eq!(ServerEnvironment::from_str("develops"), None);
         assert_eq!(ServerEnvironment::from_str("pRoDs"), None);
         assert_eq!(ServerEnvironment::from_str("staging"), None);
+    }
+
+    #[test]
+    fn test_is_deployed_in_production() {
+        assert_eq!(true, ServerEnvironment::Production.is_deployed_in_production());
+        assert_eq!(false, ServerEnvironment::Development.is_deployed_in_production());
     }
 }

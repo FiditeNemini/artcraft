@@ -28,7 +28,7 @@ use crate::endpoints_ws::obs_gateway_websocket_handler::obs_gateway_websocket_ha
 use crate::server_state::{ObsGatewayServerState, EnvConfig, TwitchOauthSecrets, BackendsConfig, MultithreadingConfig};
 use futures::Future;
 use futures::executor::ThreadPool;
-use http_server_common::cors::build_common_cors_config;
+use http_server_common::cors::build_production_cors_config;
 use http_server_common::endpoints::default_route_404::default_route_404;
 use http_server_common::endpoints::root_index::get_root_index;
 use limitation::Limiter;
@@ -165,7 +165,7 @@ pub async fn serve(server_state: ObsGatewayServerState) -> AnyhowResult<()>
   HttpServer::new(move || {
     App::new()
         .app_data(server_state_arc.clone())
-        .wrap(build_common_cors_config())
+        .wrap(build_production_cors_config())
         .wrap(Logger::new(&log_format)
             .exclude("/liveness")
             .exclude("/readiness"))

@@ -11,7 +11,7 @@ use sqlx::MySqlPool;
 use std::collections::HashMap;
 use std::str::FromStr;
 use stripe::{CheckoutSession, CheckoutSessionMode, CreateCheckoutSession, CreateCheckoutSessionAutomaticTax, CreateCheckoutSessionLineItems, CreateCheckoutSessionPaymentIntentData, CreateCheckoutSessionSubscriptionData, CustomerId, ParseIdError};
-use url_config::server_environment::ServerEnvironment;
+use reusable_types::server_environment::ServerEnvironment;
 use url_config::third_party_url_redirector::ThirdPartyUrlRedirector;
 
 /// Create a checkout session and return the URL
@@ -190,7 +190,7 @@ mod tests {
   use crate::stripe::traits::internal_user_lookup::{MockInternalUserLookup, UserMetadata};
   use mockall::predicate::*;
   use tokio;
-  use url_config::server_environment::ServerEnvironment;
+  use reusable_types::server_environment::ServerEnvironment;
   use url_config::third_party_url_redirector::ThirdPartyUrlRedirector;
 
   #[tokio::test]

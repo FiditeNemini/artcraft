@@ -1,8 +1,8 @@
 use actix_web::HttpRequest;
 use actix_web::http::Uri;
 use anyhow::anyhow;
-use crate::server_environment::ServerEnvironment;
 use http_server_common::request::get_request_host::get_request_host;
+use reusable_types::server_environment::ServerEnvironment;
 use std::ops::Deref;
 use std::str::FromStr;
 
@@ -79,7 +79,7 @@ mod tests {
     use actix_web::HttpRequest;
     use actix_web::http::header::HOST;
     use actix_web::test::TestRequest;
-    use crate::server_environment::ServerEnvironment;
+    use reusable_types::server_environment::ServerEnvironment;
     use crate::third_party_url_redirector::ThirdPartyUrlRedirector;
 
     fn request_with_host(hostname: &str) -> HttpRequest {

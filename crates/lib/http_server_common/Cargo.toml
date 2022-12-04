@@ -16,6 +16,7 @@ path = "src/lib.rs"
 
 # Internal
 container_common = { path = "../container_common" }
+reusable_types = { path = "../reusable_types" }
 
 # External
 anyhow = "1.0.40"
@@ -40,3 +41,7 @@ serde = "1.0.125"
 serde_derive = "1.0.125"
 serde_json = "1.0.64"
 toml = "0.5.8"
+
+[dev-dependencies]
+actix-rt = "2.7.0"
+speculoos = "0.9.0" # Fluent assertions

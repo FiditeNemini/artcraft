@@ -27,7 +27,7 @@ use config::shared_constants::{DEFAULT_MYSQL_CONNECTION_STRING, DEFAULT_RUST_LOG
 use container_common::anyhow_result::AnyhowResult;
 use crate::routes::add_routes;
 use crate::server_state::{EnvConfig, InMemoryCaches, ServerState};
-use http_server_common::cors::build_common_cors_config;
+use http_server_common::cors::build_production_cors_config;
 use limitation::Limiter;
 use log::info;
 use memory_caching::single_item_ttl_cache::SingleItemTtlCache;
@@ -227,7 +227,7 @@ pub async fn serve(server_state: ServerState) -> AnyhowResult<()>
 
     let app = App::new()
         .app_data(server_state_arc.clone())
-        .wrap(build_common_cors_config())
+        .wrap(build_production_cors_config())
         .wrap(DefaultHeaders::new()
             .header("X-Backend-Hostname", &hostname)
             .header("X-Build-Sha", build_sha.trim()))
