@@ -30,6 +30,14 @@ static SUPPORTED_LANGUAGES_FOR_MODELS : Lazy<HashSet<String>> = Lazy::new(|| {
     "fr-CA",
     "fr-FR",
 
+    // German
+    "de",
+    "de-AT", //	German (Austria)
+    "de-CH", //	German (Switzerland)
+    "de-DE", //	German (Germany)
+    "de-LI", //	German (Liechtenstein)
+    "de-LU", //	German (Luxembourg)
+
     // Italian
     "it",
     "it-CH", // https://en.wikipedia.org/wiki/Swiss_Italian
@@ -40,10 +48,6 @@ static SUPPORTED_LANGUAGES_FOR_MODELS : Lazy<HashSet<String>> = Lazy::new(|| {
     "pt-BR",
 
     // ========== But these are on the horizon ==========
-
-    // German
-    "de",
-    "de-DE",
 
     // Japanese
     "ja",
