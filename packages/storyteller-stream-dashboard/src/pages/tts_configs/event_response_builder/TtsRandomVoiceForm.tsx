@@ -1,0 +1,209 @@
+import React, { useEffect } from "react";
+import { TtsModelListItem } from "@storyteller/components/src/api/tts/ListTtsModels";
+import { FakeYouExternalLink } from "@storyteller/components/src/elements/FakeYouExternalLink";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faPlus, faTrash } from "@fortawesome/free-solid-svg-icons";
+
+interface TtsRandomVoiceFormProps {
+  selectedTtsModelTokens: string[];
+  updateSelectedTtsModelTokens: (tokens: string[]) => void;
+
+  // FakeYou voices
+  allTtsModels: TtsModelListItem[];
+  allTtsModelsByToken: Map<string, TtsModelListItem>;
+}
+
+function TtsRandomVoiceForm(props: TtsRandomVoiceFormProps) {
+  // NB: useState is not always setting from props correctly (after several re-renders)
+  // The following answers suggests using useEffect:
+  //  https://stackoverflow.com/a/54866051 (less clear by also using useState(), but good comments)
+  //  https://stackoverflow.com/a/62982753
+  useEffect(() => {}, [props.selectedTtsModelTokens]);
+
+  const handleAddVoice = (ev: React.FormEvent<HTMLButtonElement>): boolean => {
+    ev.preventDefault();
+
+    let newModelTokens = [...props.selectedTtsModelTokens];
+
+    newModelTokens.push("");
+
+    props.updateSelectedTtsModelTokens(newModelTokens);
+
+    return true;
+  };
+
+  const handleModelSelect = (ttsModelToken: string, voiceIndex: number) => {
+    let newModelTokens = [...props.selectedTtsModelTokens];
+
+    if (voiceIndex >= newModelTokens.length) {
+      return;
+    }
+
+    newModelTokens[voiceIndex] = ttsModelToken;
+    props.updateSelectedTtsModelTokens(newModelTokens);
+  };
+
+  const handleModelDelete = (voiceIndex: number) => {
+    let newModelTokens = [...props.selectedTtsModelTokens];
+
+    if (newModelTokens.length <= 1 || voiceIndex >= newModelTokens.length) {
+      // We must have at least one item in the list
+      return;
+    }
+
+    newModelTokens.splice(voiceIndex, 1);
+
+    props.updateSelectedTtsModelTokens(newModelTokens);
+  };
+
+  const deleteDisabled = props.selectedTtsModelTokens.length < 2;
+
+  let selectBoxes: JSX.Element[] = [];
+
+  // No tokens - show one box (unselected)
+  // One or more tokens - show boxes for each (with selections)
+
+  props.selectedTtsModelTokens.forEach((token, index) => {
+    selectBoxes.push(
+      <VoiceDropdown
+        key={index}
+        selectedTtsModelToken={token}
+        voiceIndex={index}
+        handleModelSelect={handleModelSelect}
+        handleModelDelete={handleModelDelete}
+        deleteDisabled={deleteDisabled}
+        allTtsModels={props.allTtsModels}
+        allTtsModelsByToken={props.allTtsModelsByToken}
+      />
+    );
+  });
+
+  if (selectBoxes.length === 0) {
+    selectBoxes.push(
+      <VoiceDropdown
+        key={0}
+        selectedTtsModelToken={""}
+        voiceIndex={0}
+        handleModelSelect={handleModelSelect}
+        handleModelDelete={handleModelDelete}
+        deleteDisabled={false}
+        allTtsModels={props.allTtsModels}
+        allTtsModelsByToken={props.allTtsModelsByToken}
+      />
+    );
+  }
+
+  return (
+    <>
+      {selectBoxes}
+
+      <button className="btn btn-primary mt-3" onClick={handleAddVoice}>
+        <FontAwesomeIcon icon={faPlus} className="me-2" />
+        Add Additional Voice
+      </button>
+
+      <p className="mt-4">
+        <FakeYouExternalLink>
+          Check out the voices at FakeYou
+        </FakeYouExternalLink>{" "}
+        to search for voices, experiment with them, and see how they sound.
+        Sorry that this list is a nightmare to navigate. It will improve over
+        time.
+      </p>
+    </>
+  );
+}
+
+interface VoiceDropdownProps {
+  // Actual token or empty string
+  selectedTtsModelToken: string;
+
+  // Position in the list, 0-indexed
+  voiceIndex: number;
+
+  // Callbacks
+  handleModelSelect: (token: string, index: number) => void;
+  handleModelDelete: (index: number) => void;
+
+  // Whether to disable the delete button
+  deleteDisabled: boolean;
+
+  // FakeYou voices
+  allTtsModels: TtsModelListItem[];
+  allTtsModelsByToken: Map<string, TtsModelListItem>;
+}
+
+function VoiceDropdown(props: VoiceDropdownProps) {
+  const handleSelectChange = (
+    ev: React.FormEvent<HTMLSelectElement>
+  ): boolean => {
+    const maybeModelToken = (ev.target as HTMLSelectElement).value;
+
+    if (!maybeModelToken) {
+      // Clear selection
+      props.handleModelSelect(maybeModelToken, props.voiceIndex);
+      return true;
+    }
+
+    if (!!maybeModelToken && !props.allTtsModelsByToken.has(maybeModelToken)) {
+      return false;
+    }
+
+    props.handleModelSelect(maybeModelToken, props.voiceIndex);
+    return true;
+  };
+
+  const handleRemoveClick = (
+    ev: React.FormEvent<HTMLButtonElement>
+  ): boolean => {
+    props.handleModelDelete(props.voiceIndex);
+    return true;
+  };
+
+  return (
+    <div key={`dropdown-${props.voiceIndex}`}>
+      <label className="sub-title">
+        {props.voiceIndex + 1}. TTS Voice Model (used as a Random Voice)
+      </label>
+
+      <div className="form-group">
+        <div className="d-flex gap-3">
+          <select
+            value={props.selectedTtsModelToken}
+            onChange={handleSelectChange}
+            className="form-select"
+          >
+            <option key={`option-${props.voiceIndex}-*`} value="">
+              Select a voice...
+            </option>
+            {props.allTtsModels.map((ttsModel) => {
+              return (
+                <option
+                  key={`option-${props.voiceIndex}-${ttsModel.model_token}`}
+                  value={ttsModel.model_token}
+                >
+                  {ttsModel.title}
+                </option>
+              );
+            })}
+          </select>
+        </div>
+
+        <div className="mt-3">
+          <button
+            onClick={handleRemoveClick}
+            className="btn btn-destructive"
+            disabled={props.deleteDisabled}
+          >
+            <FontAwesomeIcon icon={faTrash} className="me-2" />
+            Remove
+          </button>
+        </div>
+      </div>
+
+      <br />
+    </div>
+  );
+}
+
+export { TtsRandomVoiceForm };

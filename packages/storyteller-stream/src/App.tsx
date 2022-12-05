@@ -1,4 +1,4 @@
-import "bulma/css/bulma.css";
+// import "bulma/css/bulma.css";
 import "./App.scss";
 
 import React from "react";
@@ -120,7 +120,7 @@ class App extends React.Component<Props, State> {
   public render() {
     return (
       <BrowserRouter>
-        <div id="main" className="mainwrap">
+        <div id="main" className="bg-gradient">
           <div id="viewable">
             <TopNav
               sessionWrapper={this.state.sessionWrapper}
@@ -186,12 +186,43 @@ class App extends React.Component<Props, State> {
               </Route>
             </Switch>
 
-            <footer className="footer">
-              <div className="content has-text-centered">
-                <p>Copyright &copy; 2022 Storyteller</p>
-                <p>
-                  <GitSha />
-                </p>
+            <div className="container">
+              <hr />
+            </div>
+
+            <footer className="d-flex flex-column container py-5 gap-4">
+              <div className="text-center align-items-center justify-content-center gap-3">
+                <a className="footer-link" href="#">
+                  TTS Configs
+                </a>
+                &nbsp;|&nbsp;
+                <a className="footer-link" href="#">
+                  OBS Configs
+                </a>
+                &nbsp;|&nbsp;
+                <a className="footer-link" href="#">
+                  Terms
+                </a>
+              </div>
+              <div className="d-flex justify-content-center gap-4">
+                <a className="social-icon" href="#">
+                  <i className="fa-brands fa-discord"></i>
+                </a>
+                <a className="social-icon" href="#">
+                  <i className="fa-brands fa-twitch"></i>
+                </a>
+                <a className="social-icon" href="#">
+                  <i className="fa-brands fa-twitter"></i>
+                </a>
+                <a className="social-icon" href="#">
+                  <i className="fa-brands fa-facebook"></i>
+                </a>
+                <a className="social-icon" href="#">
+                  <i className="fa-brands fa-patreon"></i>
+                </a>
+              </div>
+              <div className="d-flex justify-content-center">
+                © 2022 Storyteller Stream.
               </div>
             </footer>
           </div>

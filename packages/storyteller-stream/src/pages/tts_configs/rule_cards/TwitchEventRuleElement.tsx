@@ -1,14 +1,18 @@
-import React from 'react';
-import { TwitchEventRule } from '@storyteller/components/src/api/storyteller/twitch_event_rules/ListTwitchEventRules';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faEdit, faExternalLinkAlt, faTrash } from '@fortawesome/free-solid-svg-icons';
-import { Link } from 'react-router-dom';
-import { TtsModelListItem } from '@storyteller/components/src/api/tts/ListTtsModels';
+import React from "react";
+import { TwitchEventRule } from "@storyteller/components/src/api/storyteller/twitch_event_rules/ListTwitchEventRules";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+  faEdit,
+  faExternalLinkAlt,
+  faTrash,
+} from "@fortawesome/free-solid-svg-icons";
+import { Link } from "react-router-dom";
+import { TtsModelListItem } from "@storyteller/components/src/api/tts/ListTtsModels";
 
 interface Props {
-  rule: TwitchEventRule,
-  allTtsModelsByToken: Map<string, TtsModelListItem>,
-  hideButtons?: boolean,
+  rule: TwitchEventRule;
+  allTtsModelsByToken: Map<string, TtsModelListItem>;
+  hideButtons?: boolean;
 }
 
 function TwitchEventRuleElement(props: Props) {
@@ -17,27 +21,64 @@ function TwitchEventRuleElement(props: Props) {
   let subtitle = <></>;
   let description = <></>;
 
-  if (props.rule.event_match_predicate.bits_cheermote_name_exact_match !== undefined) {
-    subtitle = (
-      <>Cheermote name matches "{props.rule.event_match_predicate.bits_cheermote_name_exact_match.cheermote_name}"</>
-    );
-  } else if (props.rule.event_match_predicate.bits_cheermote_prefix_spend_threshold !== undefined) {
+  if (
+    props.rule.event_match_predicate.bits_cheermote_name_exact_match !==
+    undefined
+  ) {
     subtitle = (
       <>
-        Cheermote prefix is "{props.rule.event_match_predicate.bits_cheermote_prefix_spend_threshold.cheermote_prefix}"
-        and spend at least {props.rule.event_match_predicate.bits_cheermote_prefix_spend_threshold.minimum_bits_spent} bits
+        Cheermote name matches "
+        {
+          props.rule.event_match_predicate.bits_cheermote_name_exact_match
+            .cheermote_name
+        }
+        "
       </>
     );
-  } else if (props.rule.event_match_predicate.bits_spend_threshold !== undefined) {
+  } else if (
+    props.rule.event_match_predicate.bits_cheermote_prefix_spend_threshold !==
+    undefined
+  ) {
     subtitle = (
       <>
-        Spend at least {props.rule.event_match_predicate.bits_spend_threshold.minimum_bits_spent} bits
+        Cheermote prefix is "
+        {
+          props.rule.event_match_predicate.bits_cheermote_prefix_spend_threshold
+            .cheermote_prefix
+        }
+        " and spend at least{" "}
+        {
+          props.rule.event_match_predicate.bits_cheermote_prefix_spend_threshold
+            .minimum_bits_spent
+        }{" "}
+        bits
       </>
     );
-  } else if (props.rule.event_match_predicate.channel_points_reward_name_exact_match !== undefined) {
+  } else if (
+    props.rule.event_match_predicate.bits_spend_threshold !== undefined
+  ) {
     subtitle = (
       <>
-        Reward name matches "{props.rule.event_match_predicate.channel_points_reward_name_exact_match.reward_name}"
+        Spend at least{" "}
+        {
+          props.rule.event_match_predicate.bits_spend_threshold
+            .minimum_bits_spent
+        }{" "}
+        bits
+      </>
+    );
+  } else if (
+    props.rule.event_match_predicate.channel_points_reward_name_exact_match !==
+    undefined
+  ) {
+    subtitle = (
+      <>
+        Reward name matches "
+        {
+          props.rule.event_match_predicate
+            .channel_points_reward_name_exact_match.reward_name
+        }
+        "
       </>
     );
   }
@@ -56,7 +97,14 @@ function TwitchEventRuleElement(props: Props) {
 
     description = (
       <>
-        TTS with voice: {modelName} <a href={link} target="_blank" rel="noreferrer"><FontAwesomeIcon icon={faExternalLinkAlt} /></a>
+        <p>
+          TTS with voice:
+          <br />
+          {modelName}{" "}
+          <a href={link} target="_blank" rel="noreferrer">
+            <FontAwesomeIcon icon={faExternalLinkAlt} className="ms-1" />
+          </a>
+        </p>
       </>
     );
   } else if (props.rule.event_response.tts_random_voice !== undefined) {
@@ -73,15 +121,21 @@ function TwitchEventRuleElement(props: Props) {
 
       return (
         <li key={index}>
-          {modelName} <a href={link} target="_blank" rel="noreferrer"><FontAwesomeIcon icon={faExternalLinkAlt} /></a>
+          {modelName}{" "}
+          <a href={link} target="_blank" rel="noreferrer">
+            <FontAwesomeIcon icon={faExternalLinkAlt} className="ms-1" />
+          </a>
         </li>
       );
     });
 
     description = (
       <>
-        TTS with a random voice from the following {modelNameAndLinks.length} voice(s): 
-        <ul>{modelNameAndLinks}</ul>
+        <p>
+          TTS with a random voice from the following {modelNameAndLinks.length}{" "}
+          voice(s):
+          <ul>{modelNameAndLinks}</ul>
+        </p>
       </>
     );
   }
@@ -93,42 +147,32 @@ function TwitchEventRuleElement(props: Props) {
   if (!hideButtons) {
     buttons = (
       <>
-        <footer className="card-footer">
-          <div className="card-footer-item">
-            <span>
-              <Link to={editUrl}>
-                <FontAwesomeIcon icon={faEdit} />&nbsp;Edit
-              </Link>
-            </span>
-          </div>
-          <div className="card-footer-item">
-            <span>
-              <Link to={deleteUrl}>
-                <FontAwesomeIcon icon={faTrash} /> Delete
-              </Link>
-            </span>
-          </div>
-        </footer>
+        <div className="d-flex gap-3">
+          <Link to={editUrl} className="btn btn-secondary w-100">
+            <FontAwesomeIcon icon={faEdit} className="me-2" />
+            Edit
+          </Link>
+          <Link to={deleteUrl} className="btn btn-destructive w-100">
+            <FontAwesomeIcon icon={faTrash} className="me-2" />
+            Delete
+          </Link>
+        </div>
       </>
-    )
+    );
   }
 
   return (
     <div key={props.rule.token}>
-      <div className="card">
-        <div className="card-content">
-          <div className="title is-5">
-            {subtitle}
-          </div>
-          <div>
-            {description}
-          </div>
+      <div className="panel p-4">
+        <div>
+          <h4 className="fw-bold mb-4">{subtitle}</h4>
+          <div className="mb-4">{description}</div>
         </div>
         {buttons}
       </div>
       <br />
     </div>
-  )
+  );
 }
 
-export { TwitchEventRuleElement }
+export { TwitchEventRuleElement };
