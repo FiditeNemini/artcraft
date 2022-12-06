@@ -8,10 +8,10 @@ API backend.
 Here are the websites contained: 
 
 - [FakeYou.com](https://fakeyou.com), our social deepfaking website
-- [Storyteller.io](https://storyteller.io), our investor relations website and eventual home of our production software
-- [Storyteller.stream](https://storyteller.stream), a Twitch TTS platform
-  - [Obs.Storyteller.stream](https://obs.storyteller.stream), a subdomain for streamers to integrate with OBS.
-
+- [storyteller.io](https://storyteller.io), our investor relations website and eventual home of our production software
+- [power.stream](https://power.stream), our Twitch TTS platform
+  - [dash.power.stream](https://dash.power.stream), a subdomain for the dashboard.
+  - [obs.power.stream](https://obs.power.stream), a subdomain for streamers to integrate with OBS.
 
 Here are some static websites contained:
 
