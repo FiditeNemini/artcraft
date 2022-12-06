@@ -142,6 +142,11 @@ styles with important tags:
     padding: 1.2rem !important;
   }
 
+  .alert-cta {
+    font-weight: 500 !important;
+    font-size: 18px !important;
+  }
+
   .btn {
     border-radius: 5px;
     outline: none;
@@ -630,6 +635,10 @@ input {
   background-color: $input !important;
   border-color: $input !important;
   color: $white !important;
+}
+
+.alert-cta {
+  font-size: 18px !important;
 }
 
 @media (min-width: 992px) {

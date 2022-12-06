@@ -5,6 +5,7 @@ import { BucketConfig } from "@storyteller/components/src/api/BucketConfig";
 import { JobState } from "@storyteller/components/src/jobs/JobStates";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
+  faClock,
   faLink,
   faList,
   faMicrophone,
@@ -127,17 +128,24 @@ function SessionTtsInferenceResultListFc(props: Props) {
   let upgradeNotice = <></>;
 
   // Ask non-premium users to upgrade
-  if (results.length !== 0 && !props.sessionSubscriptionsWrapper.hasPaidFeatures()) {
+  if (
+    results.length !== 0 &&
+    !props.sessionSubscriptionsWrapper.hasPaidFeatures()
+  ) {
     upgradeNotice = (
-      <div className="d-flex flex-column gap-4">
-        <motion.div className="alert alert-warning" variants={sessionItem}>
-          <h4>
-            Don't want to wait? 
-            Step to the front of the line with a <Link to="/pricing" className="alert-link">FakeYou membership</Link>.
-          </h4>
+      <div className="d-flex flex-column gap-4 mx-3 mx-md-0">
+        <motion.div
+          className="alert alert-warning alert-cta"
+          variants={sessionItem}
+        >
+          <FontAwesomeIcon icon={faClock} className="me-3" />
+          Don't want to wait? Step to the front of the line with a{" "}
+          <Link to="/pricing" className="alert-link">
+            <span className="fw-semibold">FakeYou membership</span>.
+          </Link>
         </motion.div>
       </div>
-    )
+    );
   }
 
   // Users have requested reverse chronological results
