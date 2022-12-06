@@ -405,6 +405,7 @@ function TtsModelListPage(props: Props) {
 
       <SessionTtsInferenceResultListFc
         ttsInferenceJobs={props.ttsInferenceJobs}
+        sessionSubscriptionsWrapper={props.sessionSubscriptionsWrapper}
       />
 
       <SessionW2lInferenceResultListFc

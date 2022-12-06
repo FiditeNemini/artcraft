@@ -48,9 +48,11 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { motion } from "framer-motion";
 import { container, item, panel } from "../../../../data/animation";
+import { SessionSubscriptionsWrapper } from "@storyteller/components/src/session/SessionSubscriptionsWrapper";
 
 interface Props {
   sessionWrapper: SessionWrapper;
+  sessionSubscriptionsWrapper: SessionSubscriptionsWrapper;
   enqueueTtsJob: (jobToken: string) => void;
   ttsInferenceJobs: Array<TtsInferenceJob>;
   textBuffer: string;
@@ -681,6 +683,7 @@ function TtsModelViewPage(props: Props) {
 
       <SessionTtsInferenceResultListFc
         ttsInferenceJobs={props.ttsInferenceJobs}
+        sessionSubscriptionsWrapper={props.sessionSubscriptionsWrapper}
       />
     </motion.div>
   );

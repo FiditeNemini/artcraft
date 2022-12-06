@@ -11,9 +11,11 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { motion } from "framer-motion";
 import { container, item, sessionItem } from "../../../data/animation";
+import { SessionSubscriptionsWrapper } from "@storyteller/components/src/session/SessionSubscriptionsWrapper";
 
 interface Props {
   ttsInferenceJobs: Array<TtsInferenceJob>;
+  sessionSubscriptionsWrapper: SessionSubscriptionsWrapper;
 }
 
 function SessionTtsInferenceResultListFc(props: Props) {
@@ -122,6 +124,22 @@ function SessionTtsInferenceResultListFc(props: Props) {
     );
   }
 
+  let upgradeNotice = <></>;
+
+  // Ask non-premium users to upgrade
+  if (results.length !== 0 && !props.sessionSubscriptionsWrapper.hasPaidFeatures()) {
+    upgradeNotice = (
+      <div className="d-flex flex-column gap-4">
+        <motion.div className="alert alert-warning" variants={sessionItem}>
+          <h4>
+            Don't want to wait? 
+            Step to the front of the line with a <Link to="/pricing" className="alert-link">FakeYou membership</Link>.
+          </h4>
+        </motion.div>
+      </div>
+    )
+  }
+
   // Users have requested reverse chronological results
   results.reverse();
 
@@ -130,13 +148,8 @@ function SessionTtsInferenceResultListFc(props: Props) {
       <div className="container-panel mb-5">
         <div className="d-flex flex-column gap-4">
           {title}
+          {upgradeNotice}
 
-          {/*<div className="notification is-info is-light">
-        <strong>Working on speeding this up</strong> 
-        <p>
-          Sorry this is slow. I'm scaling the cluster and fixing the caching strategy.
-        </p>
-      </div>*/}
           <div className="d-flex flex-column gap-4">{results}</div>
         </div>
       </div>

@@ -251,6 +251,7 @@ class PageContainer extends React.Component<Props, State> {
             <Route path="/tts/:token">
               <TtsModelViewPage
                 sessionWrapper={this.props.sessionWrapper}
+                sessionSubscriptionsWrapper={this.props.sessionSubscriptionsWrapper}
                 enqueueTtsJob={this.props.enqueueTtsJob}
                 ttsInferenceJobs={this.props.ttsInferenceJobs}
                 textBuffer={this.props.textBuffer}
