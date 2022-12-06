@@ -11832,6 +11832,11 @@ react-wavesurfer.js@^0.0.5:
   resolved "https://registry.yarnpkg.com/react-wavesurfer.js/-/react-wavesurfer.js-0.0.5.tgz#e2f4e1195f9b01c084ced1aa3e4ddda89de394ab"
   integrity sha512-KLjNTKS25xfsTWrJd+knXF5wFH8CRu7repXSeDSjh4zhj27QbNL5jtcK8pNl82/kcoTeB0fZvtCcxPreEE8dQw==
 
+react-wavesurfer.js@^2.2.2:
+  version "0.0.8"
+  resolved "https://registry.yarnpkg.com/react-wavesurfer.js/-/react-wavesurfer.js-0.0.8.tgz#89de500f0e8179f9e4e556b33bce02d868aeed13"
+  integrity sha512-73UDCIbHolcKsT8mVKiMxsgBwNvjOtq1eVisLV/d7W7+1W/y0cpBsEfSHfEIS63au9bXpepC+pGiN5kepWrUuw==
+
 react@^16.13.1:
   version "16.14.0"
   resolved "https://registry.yarnpkg.com/react/-/react-16.14.0.tgz#94d776ddd0aaa37da3eda8fc5b6b18a4c9a3114d"
