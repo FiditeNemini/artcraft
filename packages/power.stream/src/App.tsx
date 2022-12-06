@@ -192,37 +192,37 @@ class App extends React.Component<Props, State> {
 
             <footer className="d-flex flex-column container py-5 gap-4">
               <div className="text-center align-items-center justify-content-center gap-3">
-                <a className="footer-link" href="#">
+                <a className="footer-link" href="https://power.stream">
                   TTS Configs
                 </a>
                 &nbsp;|&nbsp;
-                <a className="footer-link" href="#">
+                <a className="footer-link" href="https://power.stream">
                   OBS Configs
                 </a>
                 &nbsp;|&nbsp;
-                <a className="footer-link" href="#">
+                <a className="footer-link" href="https://power.stream">
                   Terms
                 </a>
               </div>
               <div className="d-flex justify-content-center gap-4">
-                <a className="social-icon" href="#">
+                <a className="social-icon" href="https://fakeyou.com">
                   <i className="fa-brands fa-discord"></i>
                 </a>
-                <a className="social-icon" href="#">
+                <a className="social-icon" href="https://fakeyou.com">
                   <i className="fa-brands fa-twitch"></i>
                 </a>
-                <a className="social-icon" href="#">
+                <a className="social-icon" href="https://fakeyou.com">
                   <i className="fa-brands fa-twitter"></i>
                 </a>
-                <a className="social-icon" href="#">
+                <a className="social-icon" href="https://fakeyou.com">
                   <i className="fa-brands fa-facebook"></i>
                 </a>
-                <a className="social-icon" href="#">
+                <a className="social-icon" href="https://fakeyou.com">
                   <i className="fa-brands fa-patreon"></i>
                 </a>
               </div>
               <div className="d-flex justify-content-center">
-                © 2022 Storyteller Stream.
+                © 2022 Storyteller Stream. | <GitSha />
               </div>
             </footer>
           </div>

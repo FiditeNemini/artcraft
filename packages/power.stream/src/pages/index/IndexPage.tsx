@@ -4,8 +4,6 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faArrowRight,
   faHeadphones,
-  faLongArrowAltRight,
-  faMicrophone,
   faVolumeUp,
 } from "@fortawesome/free-solid-svg-icons";
 import { faDiscord } from "@fortawesome/free-brands-svg-icons";
@@ -112,7 +110,7 @@ function IndexPage(props: Props) {
                     Morbi dapibus commodo porta. Sed faucibus tristique orci in
                     tristique. Praesent quam nunc, fermentum eu feugiat sit.
                   </p>
-                  <a className="fw-bold" href="">
+                  <a className="fw-bold" href="https://fakeyou.com">
                     Sign up now
                     <FontAwesomeIcon icon={faArrowRight} className="ms-2" />
                   </a>
@@ -131,7 +129,7 @@ function IndexPage(props: Props) {
                     Morbi dapibus commodo porta. Sed faucibus tristique orci in
                     tristique. Praesent quam nunc, fermentum eu feugiat sit.
                   </p>
-                  <a className="fw-bold" href="">
+                  <a className="fw-bold" href="https://fakeyou.com">
                     See all the voices on FakeYou
                     <FontAwesomeIcon icon={faArrowRight} className="ms-2" />
                   </a>
@@ -150,7 +148,7 @@ function IndexPage(props: Props) {
                     Morbi dapibus commodo porta. Sed faucibus tristique orci in
                     tristique. Praesent quam nunc, fermentum eu feugiat sit.
                   </p>
-                  <a className="fw-bold" href="">
+                  <a className="fw-bold" href="https://fakeyou.com">
                     Sign up now
                     <FontAwesomeIcon icon={faArrowRight} className="ms-2" />
                   </a>

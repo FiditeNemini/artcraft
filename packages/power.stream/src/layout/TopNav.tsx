@@ -1,8 +1,6 @@
 import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { Logout } from "@storyteller/components/src/api/session/Logout";
-import { Gravatar } from "@storyteller/components/src/elements/Gravatar";
 
 interface Props {
   sessionWrapper: SessionWrapper;
