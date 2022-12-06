@@ -16,5 +16,5 @@ yarn-error.log
 # Project-specific
 templates/storyteller-stream-green
 
-packages/fakeyou/.env
-packages/storyteller-stream/.env
+packages/fakeyou.com/.env
+packages/power.stream/.env
