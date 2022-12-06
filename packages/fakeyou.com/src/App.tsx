@@ -8,7 +8,7 @@ import {
 } from "@storyteller/components/src/api/locale/DetectLocale";
 import { Language } from "@storyteller/components/src/i18n/Language";
 import { BrowserRouter, Route, Switch } from "react-router-dom";
-import { NewVocodesContainer } from "./v2/view/NewVocodesContainer";
+import { PageContainer } from "./v2/view/PageContainer";
 import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
 import { SessionSubscriptionsWrapper } from "@storyteller/components/src/session/SessionSubscriptionsWrapper";
 import {
@@ -656,7 +656,7 @@ class App extends React.Component<Props, State> {
             <div className="migrationComponentWrapper">
               <Switch>
                 <Route path="/">
-                  <NewVocodesContainer
+                  <PageContainer
                     sessionWrapper={this.state.sessionWrapper}
                     querySessionAction={this.querySession}
                     sessionSubscriptionsWrapper={this.state.sessionSubscriptionsWrapper}

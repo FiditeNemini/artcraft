@@ -3,7 +3,7 @@ import { GitSha } from "@storyteller/components/src/elements/GitSha";
 import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
 import { Link } from "react-router-dom";
 
-import { ModerationIcon } from "./_icons/ModerationIcon";
+import { ModerationIcon } from "../view/_icons/ModerationIcon";
 import { FrontendUrlConfig } from "../../common/FrontendUrlConfig";
 import { t } from "i18next";
 import { Trans } from "react-i18next";
@@ -22,7 +22,7 @@ interface Props {
   sessionWrapper: SessionWrapper;
 }
 
-function NewFooterNavFc(props: Props) {
+function FooterNav(props: Props) {
   let moderationLink = <span />;
 
   if (props.sessionWrapper.canBanUsers()) {
@@ -156,4 +156,4 @@ function NewFooterNavFc(props: Props) {
   );
 }
 
-export { NewFooterNavFc };
+export { FooterNav };

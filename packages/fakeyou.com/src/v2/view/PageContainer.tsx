@@ -6,8 +6,8 @@ import { LoginPage } from "./login/LoginPage";
 import { ModerationFc } from "./moderation/moderation_main/ModerationFc";
 import { ModerationIpBanListFc } from "./moderation/moderation_ip_ban_list/ModerationIpBanListFc";
 import { ModerationViewIpBanFc } from "./moderation/moderation_view_ip_ban/ModerationViewIpBanFc";
-import { NewFooterNavFc } from "./NewFooterNavFc";
-import { NewTopNavFc } from "./NewTopNavFc";
+import { FooterNav } from "../nav/FooterNav";
+import { TopNav } from "../nav/TopNav";
 import { ProfileEditFc } from "./profile/profile_edit/ProfileEditFc";
 import { ProfileFc } from "./profile/profile_view/ProfileFc";
 import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
@@ -127,7 +127,7 @@ interface Props {
 
 interface State {}
 
-class NewVocodesContainer extends React.Component<Props, State> {
+class PageContainer extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props);
 
@@ -140,7 +140,7 @@ class NewVocodesContainer extends React.Component<Props, State> {
     return (
       <div id="main" className="mainwrap">
         <div id="viewable">
-          <NewTopNavFc
+          <TopNav
             logoutHandler={this.logout}
             sessionWrapper={this.props.sessionWrapper}
             querySessionCallback={this.props.querySessionAction}
@@ -477,11 +477,11 @@ class NewVocodesContainer extends React.Component<Props, State> {
             </Route>
           </Switch>
 
-          <NewFooterNavFc sessionWrapper={this.props.sessionWrapper} />
+          <FooterNav sessionWrapper={this.props.sessionWrapper} />
         </div>
       </div>
     );
   }
 }
 
-export { NewVocodesContainer };
+export { PageContainer };

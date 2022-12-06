@@ -46,7 +46,7 @@ interface Props {
   querySessionSubscriptionsCallback: () => void;
 }
 
-function NewTopNavFc(props: Props) {
+function TopNav(props: Props) {
   // const defaultColourView = window.localStorage.getItem("darkMode");
   const defaultLowSpecView = window.localStorage.getItem("lowSpec");
 
@@ -579,4 +579,4 @@ function NewTopNavFc(props: Props) {
   );
 }
 
-export { NewTopNavFc };
+export { TopNav };
