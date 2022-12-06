@@ -1,5 +1,5 @@
 #!/bin/bash
-# NB: This file is executed by Netlify to build fakeyou.com
+# NB: This file is executed by Netlify to build stream.storyteller.io (soon storyteller.stream)
 
 set -euxo pipefail
 
@@ -15,11 +15,11 @@ find . -type f -exec sed -i "s/CURRENT_STORYTELLER_VERSION/${SHORT_SHA}/g" {} +
 # find . -type f -exec sed -i '' -e "s/CURRENT_STORYTELLER_VERSION/${SHORT_SHA}/g" {} + 
 
 # --ignore-engines: https://stackoverflow.com/a/59615348
-yarn build-fakeyou --verbose --ignore-optional --ignore-engines
+yarn build-powerstream-dashboard --verbose --ignore-optional --ignore-engines
 
-mkdir fakeyou
-mv packages/fakeyou/build/ fakeyou/build/
+mkdir power.stream-dashboard
+mv packages/power.stream-dashboard/build/ power.stream-dashboard/build/
 
 echo "Copying redirects configuration to Netlify build dir..."
-cp _redirects fakeyou/build/
+cp _redirects power.stream-dashboard/build/
 

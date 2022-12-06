@@ -4,7 +4,7 @@ import { Link, useHistory } from "react-router-dom";
 import { faCheck, faHeart } from "@fortawesome/free-solid-svg-icons";
 import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
 import { SessionSubscriptionsWrapper } from "@storyteller/components/src/session/SessionSubscriptionsWrapper";
-import { FAKEYOU_PRICES as FYP } from "@storyteller/fakeyou/src/data/PriceTiers";
+import { FAKEYOU_PRICES as FYP } from "../../../data/PriceTiers";
 import {
   CreateStripeCheckoutRedirect,
   CreateStripeCheckoutRedirectIsError,
