@@ -28,20 +28,22 @@ function IndexPage(props: Props) {
         <div className="hero-section d-flex flex-column align-items-center">
           <div className="hero-inner container-fluid d-flex flex-column align-items-center justify-content-center">
             <h1 className="display-3 fw-bold mb-3 parent">
-              Text to Speech For <span className="word">Your Stream</span>
+              Power for <span className="word">Your Stream</span>
             </h1>
             <p className="hero-text lead mb-4">
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-              eiusmod tempor incididunt ut labore et dolore magna aliqua.
+              Advanced Text to Speech Donations and Rewards for your stream,
+              from the creators of FakeYou.com
+              <br />
+              (And a lot more coming in the future!)
             </p>
             <div className="panel-ani mt-4 d-flex gap-3 flex-column flex-md-row">
-              <button
-                type="button"
+              <a
+                href="https://dash.power.stream/signup"
                 className="btn btn-primary btn-hero d-flex align-items-center"
               >
                 Sign Up Now
                 <FontAwesomeIcon icon={faArrowRight} className="ms-2" />
-              </button>
+              </a>
               <button
                 type="button"
                 className="btn btn-secondary btn-hero d-flex align-items-center"

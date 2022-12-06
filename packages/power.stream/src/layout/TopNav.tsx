@@ -28,9 +28,9 @@ function TopNav(props: Props) {
         <div className="container">
           <Link className="navbar-brand me-5 pr-8" to="/">
             <img
-              src="/assets/storyteller-logo.png"
-              alt="Fake You Logo"
-              height="34"
+              src="/assets/powerstream-logo.png"
+              alt="PowerStream Logo"
+              height="32"
             />
           </Link>
           <button
@@ -49,7 +49,11 @@ function TopNav(props: Props) {
           >
             <div className="offcanvas-header">
               <Link className="navbar-brand me-5 pr-8" to="/">
-                <img src="/assets/storyteller-logo.png" alt="" height="34" />
+                <img
+                  src="/assets/powerstream-logo.png"
+                  alt="PowerStream Logo"
+                  height="32"
+                />
               </Link>
               <button
                 type="button"
@@ -66,7 +70,7 @@ function TopNav(props: Props) {
                     aria-current="page"
                     to="/tts_configs"
                   >
-                    TTS Configs
+                    Features
                   </Link>
                 </li>
                 <li className="nav-item">
@@ -75,17 +79,50 @@ function TopNav(props: Props) {
                     aria-current="page"
                     to="/obs_configs"
                   >
-                    OBS Configs
+                    Voice Previews
+                  </Link>
+                </li>
+                <li className="nav-item">
+                  <Link
+                    className="nav-link"
+                    aria-current="page"
+                    to="/obs_configs"
+                  >
+                    Insights
+                  </Link>
+                </li>
+                <li className="nav-item">
+                  <Link
+                    className="nav-link"
+                    aria-current="page"
+                    to="/obs_configs"
+                  >
+                    FAQ
+                  </Link>
+                </li>
+                <li className="nav-item">
+                  <Link
+                    className="nav-link"
+                    aria-current="page"
+                    to="/obs_configs"
+                  >
+                    Community
                   </Link>
                 </li>
               </ul>
               <div className="d-grid gap-2 d-flex justify-content-start align-items-center pt-4 ps-3 pt-lg-0 ps-lg-0">
-                <Link className="nav-login me-3" to="/login">
+                <a
+                  className="nav-login me-3"
+                  href="https://dash.power.stream/login"
+                >
                   Login
-                </Link>
-                <button type="button" className="btn btn-primary">
+                </a>
+                <a
+                  href="https://dash.power.stream/signup"
+                  className="btn btn-primary"
+                >
                   Sign up
-                </button>
+                </a>
               </div>
             </div>
           </div>
