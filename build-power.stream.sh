@@ -15,11 +15,11 @@ find . -type f -exec sed -i "s/CURRENT_STORYTELLER_VERSION/${SHORT_SHA}/g" {} +
 # find . -type f -exec sed -i '' -e "s/CURRENT_STORYTELLER_VERSION/${SHORT_SHA}/g" {} + 
 
 # --ignore-engines: https://stackoverflow.com/a/59615348
-yarn build-storyteller-stream --verbose --ignore-optional --ignore-engines
+yarn build-powerstream --verbose --ignore-optional --ignore-engines
 
-mkdir storyteller-stream
-mv packages/storyteller-stream/build/ storyteller-stream/build/
+mkdir power.stream
+mv packages/power.stream/build/ power.stream/build/
 
 echo "Copying redirects configuration to Netlify build dir..."
-cp _redirects storyteller-stream/build/
+cp _redirects power.stream/build/
 
