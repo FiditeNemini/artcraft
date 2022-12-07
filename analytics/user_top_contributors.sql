@@ -8,6 +8,7 @@ select
     u.token,
     u.username,
     u.created_at,
+    u.maybe_stripe_customer_id,
     u.maybe_loyalty_program_key,
     m.upload_count
 from users as u
