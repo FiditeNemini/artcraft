@@ -9,7 +9,7 @@ import { ModerationViewIpBanFc } from "./moderation/moderation_view_ip_ban/Moder
 import { FooterNav } from "../nav/FooterNav";
 import { TopNav } from "../nav/TopNav";
 import { ProfileEditFc } from "./profile/profile_edit/ProfileEditFc";
-import { ProfileFc } from "./profile/profile_view/ProfileFc";
+import { ProfilePage } from "./profile/profile_view/ProfilePage";
 import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
 import { SessionSubscriptionsWrapper } from "@storyteller/components/src/session/SessionSubscriptionsWrapper";
 import { SignupPage } from "./signup/SignupPage";
@@ -175,7 +175,7 @@ class PageContainer extends React.Component<Props, State> {
             </Route>
 
             <Route path="/profile/:username">
-              <ProfileFc
+              <ProfilePage
                 sessionWrapper={this.props.sessionWrapper}
                 sessionSubscriptionsWrapper={
                   this.props.sessionSubscriptionsWrapper

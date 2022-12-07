@@ -52,7 +52,7 @@ interface Props {
 //   navigator.clipboard.writeText(username);
 // }
 
-function ProfileFc(props: Props) {
+function ProfilePage(props: Props) {
   const { username }: { username: string } = useParams();
 
   const [userData, setUserData] = useState<User | undefined>(undefined);
@@ -406,4 +406,4 @@ function ProfileFc(props: Props) {
   );
 }
 
-export { ProfileFc };
+export { ProfilePage };

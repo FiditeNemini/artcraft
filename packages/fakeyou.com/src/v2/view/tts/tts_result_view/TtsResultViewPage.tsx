@@ -6,7 +6,7 @@ import { useParams, Link } from "react-router-dom";
 import { SpectrogramImage } from "./SpectrogramImage";
 import { ReportDiscordLinkFc } from "../../_common/DiscordReportLinkFc";
 import { FrontendUrlConfig } from "../../../../common/FrontendUrlConfig";
-
+import { formatDistance } from "date-fns";
 import {
   GetTtsResult,
   GetTtsResultIsErr,
@@ -287,6 +287,9 @@ function TtsResultViewPage(props: Props) {
     );
   }
 
+  const createdAt = new Date(ttsInferenceResult.created_at);
+  const createdAtRelative = formatDistance(createdAt, new Date(), { addSuffix: true })
+
   return (
     <motion.div initial="hidden" animate="visible" variants={container}>
       <div className="container py-5">
@@ -355,6 +358,14 @@ function TtsResultViewPage(props: Props) {
                 <tr>
                   <th scope="row">Visibility</th>
                   <td>{resultVisibility}</td>
+                </tr>
+                <tr>
+                  <th scope="row">Created (relative)</th>
+                  <td>{createdAtRelative}</td>
+                </tr>
+                <tr>
+                  <th scope="row">Created (UTC)</th>
+                  <td>{ttsInferenceResult.created_at}</td>
                 </tr>
               </tbody>
             </table>
