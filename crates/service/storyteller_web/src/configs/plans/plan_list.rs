@@ -39,7 +39,7 @@ pub static FREE_LOGGED_IN_PLAN : Lazy<Plan> = Lazy::new(|| {
 pub static LOYALTY_PLANS : Lazy<HashSet<Plan>> = Lazy::new(|| {
     let mut plans = HashSet::new();
 
-    plans.insert(PlanBuilder::new("loyalty_plan")
+    plans.insert(PlanBuilder::new("fakeyou_contributor")
         .is_synthetic_plan(true)
         .plan_category(PlanCategory::LoyaltyReward)
         .tts_base_priority_level(2)
@@ -319,7 +319,7 @@ mod test {
         assert_eq!(1, ALL_PLANS_BY_SLUG.get("free_logged_in").unwrap().tts_base_priority_level());
 
         // Loyalty-based
-        assert_eq!(2, ALL_PLANS_BY_SLUG.get("loyalty_plan").unwrap().tts_base_priority_level());
+        assert_eq!(2, ALL_PLANS_BY_SLUG.get("fakeyou_contributor").unwrap().tts_base_priority_level());
 
         // Premium (Production)
         assert_eq!(10, ALL_PLANS_BY_SLUG.get("fakeyou_basic").unwrap().tts_base_priority_level());
@@ -341,7 +341,7 @@ mod test {
         assert_eq!(12, ALL_PLANS_BY_SLUG.get("free_logged_in").unwrap().tts_max_duration().num_seconds());
 
         // Loyalty-based
-        assert_eq!(30, ALL_PLANS_BY_SLUG.get("loyalty_plan").unwrap().tts_max_duration().num_seconds());
+        assert_eq!(30, ALL_PLANS_BY_SLUG.get("fakeyou_contributor").unwrap().tts_max_duration().num_seconds());
 
         // Premium (Production)
         assert_eq!(30, ALL_PLANS_BY_SLUG.get("fakeyou_basic").unwrap().tts_max_duration().num_seconds());
