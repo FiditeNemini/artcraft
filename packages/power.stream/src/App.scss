@@ -716,13 +716,13 @@ span.word:after {
 }
 
 .accordion-button::after {
-  // background-image: url(assets/plus.svg);
+  background-image: url(../public/assets/plus.svg);
   opacity: 0.5;
   background-position: center;
 }
 
 .accordion-button:not(.collapsed)::after {
-  // background-image: url(assets/munis.svg);
+  background-image: url(../public/assets/munis.svg);
   opacity: 0.5;
 }
 
