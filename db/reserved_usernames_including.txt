@@ -1,8 +1,12 @@
 # This is a more restrictive list of reserved usernames.
 # Any of the substrings may not be used.
 # You should check string.remove('_') as well.
+fake_you
 fakeyou
 hyperjail
+power_stream
+powerstream
+story_teller
 storytell
 storyteller
 test
