@@ -45,13 +45,15 @@ function IndexPage(props: Props) {
                 Sign Up Now
                 <FontAwesomeIcon icon={faArrowRight} className="ms-2" />
               </a>
-              <button
-                type="button"
+              <a
+                href="https://discord.gg/fakeyou"
+                target="_blank"
+                rel="noreferrer"
                 className="btn btn-secondary btn-hero d-flex align-items-center"
               >
                 <FontAwesomeIcon icon={faDiscord} className="me-2" />
                 Join Discord
-              </button>
+              </a>
             </div>
           </div>
 
