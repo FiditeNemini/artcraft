@@ -191,38 +191,49 @@ class App extends React.Component<Props, State> {
             </div>
 
             <footer className="d-flex flex-column container py-5 gap-4">
-              <div className="text-center align-items-center justify-content-center gap-3">
-                <a className="footer-link" href="https://power.stream">
-                  TTS Configs
+              <div className="d-flex text-center align-items-center justify-content-center gap-2 flex-wrap">
+                <a className="footer-link" href="#features">
+                  Features
                 </a>
-                &nbsp;|&nbsp;
-                <a className="footer-link" href="https://power.stream">
-                  OBS Configs
+                |
+                <a className="footer-link" href="#voices">
+                  Voice Previews
                 </a>
-                &nbsp;|&nbsp;
-                <a className="footer-link" href="https://power.stream">
-                  Terms
+                |
+                <a className="footer-link" href="#insights">
+                  Insights
+                </a>
+                |
+                <a className="footer-link" href="#faq">
+                  FAQ
+                </a>
+                |
+                <a className="footer-link" href="#community">
+                  Community
+                </a>
+                |
+                <a
+                  className="footer-link"
+                  rel="noreferrer"
+                  target="_blank"
+                  href="https://fakeyou.com"
+                >
+                  FakeYou
+                </a>
+                |
+                <a
+                  className="footer-link"
+                  rel="noreferrer"
+                  target="_blank"
+                  href="https://discord.gg/fakeyou"
+                >
+                  Discord
                 </a>
               </div>
-              <div className="d-flex justify-content-center gap-4">
-                <a className="social-icon" href="https://fakeyou.com">
-                  <i className="fa-brands fa-discord"></i>
-                </a>
-                <a className="social-icon" href="https://fakeyou.com">
-                  <i className="fa-brands fa-twitch"></i>
-                </a>
-                <a className="social-icon" href="https://fakeyou.com">
-                  <i className="fa-brands fa-twitter"></i>
-                </a>
-                <a className="social-icon" href="https://fakeyou.com">
-                  <i className="fa-brands fa-facebook"></i>
-                </a>
-                <a className="social-icon" href="https://fakeyou.com">
-                  <i className="fa-brands fa-patreon"></i>
-                </a>
-              </div>
-              <div className="d-flex justify-content-center">
-                © 2022 Storyteller Stream. | <GitSha />
+
+              <div className="d-flex flex-column text-center gap-4 mt-4">
+                © 2022 PowerStream.
+                <GitSha />
               </div>
             </footer>
           </div>

@@ -26,13 +26,13 @@ function TopNav(props: Props) {
         aria-label="Offcanvas navbar large"
       >
         <div className="container">
-          <Link className="navbar-brand me-5 pr-8" to="/">
+          <a className="navbar-brand me-5 pr-8" href="#">
             <img
               src="/assets/powerstream-logo.png"
               alt="PowerStream Logo"
               height="32"
             />
-          </Link>
+          </a>
           <button
             className="navbar-toggler p-0 border-0"
             type="button"
@@ -47,14 +47,14 @@ function TopNav(props: Props) {
             id="offcanvasNavbar2"
             aria-labelledby="offcanvasNavbar2Label"
           >
-            <div className="offcanvas-header">
-              <Link className="navbar-brand me-5 pr-8" to="/">
+            <div className="offcanvas-header" data-bs-toggle="offcanvas">
+              <a className="navbar-brand me-5 pr-8" href="#">
                 <img
                   src="/assets/powerstream-logo.png"
                   alt="PowerStream Logo"
                   height="32"
                 />
-              </Link>
+              </a>
               <button
                 type="button"
                 className="btn-close btn-close-white"
@@ -65,52 +65,33 @@ function TopNav(props: Props) {
             <div className="offcanvas-body">
               <ul className="navbar-nav justify-content-start flex-grow-1 align-items-lg-center">
                 <li className="nav-item">
-                  <Link
-                    className="nav-link"
-                    aria-current="page"
-                    to="/tts_configs"
-                  >
+                  <a className="nav-link" href="#features">
                     Features
-                  </Link>
+                  </a>
                 </li>
-                <li className="nav-item">
-                  <Link
-                    className="nav-link"
-                    aria-current="page"
-                    to="/obs_configs"
-                  >
+                <li className="nav-item" data-bs-toggle="offcanvas">
+                  <a className="nav-link" href="#voices">
                     Voice Previews
-                  </Link>
+                  </a>
                 </li>
-                <li className="nav-item">
-                  <Link
-                    className="nav-link"
-                    aria-current="page"
-                    to="/obs_configs"
-                  >
+                <li className="nav-item" data-bs-toggle="offcanvas">
+                  <a className="nav-link" href="#insights">
                     Insights
-                  </Link>
+                  </a>
                 </li>
-                <li className="nav-item">
-                  <Link
-                    className="nav-link"
-                    aria-current="page"
-                    to="/obs_configs"
-                  >
+                <li className="nav-item" data-bs-toggle="offcanvas">
+                  <a className="nav-link" href="#faq">
                     FAQ
-                  </Link>
+                  </a>
                 </li>
-                <li className="nav-item">
-                  <Link
-                    className="nav-link"
-                    aria-current="page"
-                    to="/obs_configs"
-                  >
+                <li className="nav-item" data-bs-toggle="offcanvas">
+                  <a className="nav-link" href="#community">
                     Community
-                  </Link>
+                  </a>
                 </li>
               </ul>
-              <div className="d-grid gap-2 d-flex justify-content-start align-items-center pt-4 ps-3 pt-lg-0 ps-lg-0">
+              <hr className="my-4" />
+              <div className="d-grid gap-2 d-flex justify-content-start align-items-center ps-3 pt-lg-0 ps-lg-0">
                 <a
                   className="nav-login me-3"
                   href="https://dash.power.stream/login"
@@ -121,7 +102,7 @@ function TopNav(props: Props) {
                   href="https://dash.power.stream/signup"
                   className="btn btn-primary"
                 >
-                  Sign up
+                  Sign Up
                 </a>
               </div>
             </div>

@@ -6,7 +6,7 @@ import {
   faHeadphones,
   faVolumeUp,
 } from "@fortawesome/free-solid-svg-icons";
-import { faDiscord } from "@fortawesome/free-brands-svg-icons";
+import { faDiscord, faTwitter } from "@fortawesome/free-brands-svg-icons";
 import { VoicePreviewPlayer } from "./VoicePreviewPlayer";
 import { wavesurferConfigs } from "./wsConfig";
 
@@ -28,12 +28,13 @@ function IndexPage(props: Props) {
         <div className="hero-section d-flex flex-column align-items-center">
           <div className="hero-inner container-fluid d-flex flex-column align-items-center justify-content-center">
             <h1 className="display-3 fw-bold mb-3 parent">
-              Power for <span className="word">Your Stream</span>
+              Power for <br className="d-sm-none" />
+              <span className="word">Your Stream</span>
             </h1>
-            <p className="hero-text lead mb-4">
+            <p className="hero-text lead mb-4 px-4 px-lg-0">
               Advanced Text to Speech Donations and Rewards for your stream,
-              from the creators of FakeYou.com
-              <br />
+              from the creators of FakeYou.com{" "}
+              <br className="d-none d-lg-block" />
               (And a lot more coming in the future!)
             </p>
             <div className="panel-ani mt-4 d-flex gap-3 flex-column flex-md-row">
@@ -195,7 +196,7 @@ function IndexPage(props: Props) {
         </div>
       </div>
 
-      <div className="insights-bg">
+      <div className="insights-bg" id="insights">
         <div className="container section d-flex flex-column align-items-center">
           <div className="row insights-section align-items-center">
             <div className="col-md-6 mb-4 mb-md-0 text-center text-md-start">
@@ -242,7 +243,7 @@ function IndexPage(props: Props) {
         </div>
       </div>
 
-      <div className="faq-bg">
+      <div className="faq-bg" id="faq">
         <div className="container section d-flex flex-column align-items-center">
           <div className="d-flex justify-content-center align-items-center gap-4">
             <img className="rotateimg180" src="assets/title-shape.png" alt="" />
@@ -355,7 +356,7 @@ function IndexPage(props: Props) {
         </div>
       </div>
 
-      <div className="community-bg">
+      <div className="community-bg" id="community">
         <div className="container section mb-3 d-flex flex-column align-items-center">
           <div className="d-flex justify-content-center align-items-center gap-4">
             <img className="rotateimg180" src="assets/title-shape.png" alt="" />
@@ -374,30 +375,49 @@ function IndexPage(props: Props) {
           </p>
           <div className="d-flex flex-column flex-lg-row gap-3 mb-5">
             <button className="btn btn-secondary">
-              <i className="fa-brands fa-twitter me-2"></i>Follow on Twitter
+              <FontAwesomeIcon icon={faTwitter} className="me-2" />
+              Follow on Twitter
             </button>
             <button className="btn btn-primary">
-              <i className="fa-brands fa-discord me-2"></i>Join our Discord
+              <i className="fa-brands fa-discord me-2"></i>
+              <FontAwesomeIcon icon={faDiscord} className="me-2" />
+              Join our Discord
             </button>
           </div>
         </div>
       </div>
 
-      <div className="container section d-flex flex-column align-items-center">
+      <div className="container section pt-5 d-flex flex-column align-items-center">
         <div className="cta-panel panel-ani">
           <div className="row">
             <div className="col-md-6 parent">
-              <img className="cta-img w-100" src="assets/cta-img.png" alt="" />
+              <img
+                className="cta-img w-100"
+                src="assets/cta-img.png"
+                alt="cta mascot"
+              />
             </div>
-            <div className="col-md-6 cta-right text-center text-sm-start px-5">
+            <div className="col-md-6 cta-right text-center text-sm-start px-4 px-lg-5">
               <h1 className="display-5 fw-bold mb-5">
                 Get started with Storyteller Stream!
               </h1>
-              <div className="d-flex gap-3">
-                <button className="btn btn-secondary w-100">Sign Up</button>
-                <button className="btn btn-secondary w-100">
+              <div className="d-flex flex-column flex-sm-row gap-3">
+                <a
+                  className="btn btn-cta w-100"
+                  href="https://dash.power.stream/signup"
+                >
+                  Sign Up
+                  <FontAwesomeIcon icon={faArrowRight} className="ms-2" />
+                </a>
+                <a
+                  className="btn btn-cta w-100"
+                  target="_blank"
+                  rel="noreferrer"
+                  href="https://discord.gg/fakeyou"
+                >
+                  <FontAwesomeIcon icon={faDiscord} className="me-2" />
                   Join Discord
-                </button>
+                </a>
               </div>
             </div>
           </div>
