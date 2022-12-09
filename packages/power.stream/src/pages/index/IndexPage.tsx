@@ -376,15 +376,24 @@ function IndexPage(props: Props) {
             Please join us in Discord so that we know what you're thinking.
           </p>
           <div className="d-flex flex-column flex-lg-row gap-3 mb-5">
-            <button className="btn btn-secondary">
+            <a
+              className="btn btn-secondary"
+              href="https://twitter.com/FakeYouApp"
+              target="_blank"
+              rel="noreferrer"
+            >
               <FontAwesomeIcon icon={faTwitter} className="me-2" />
               Follow on Twitter
-            </button>
-            <button className="btn btn-primary">
-              <i className="fa-brands fa-discord me-2"></i>
+            </a>
+            <a
+              className="btn btn-primary"
+              href="https://discord.gg/fakeyou"
+              target="_blank"
+              rel="noreferrer"
+            >
               <FontAwesomeIcon icon={faDiscord} className="me-2" />
               Join our Discord
-            </button>
+            </a>
           </div>
         </div>
       </div>
@@ -401,7 +410,7 @@ function IndexPage(props: Props) {
             </div>
             <div className="col-md-6 cta-right text-center text-sm-start px-4 px-lg-5">
               <h1 className="display-5 fw-bold mb-5">
-                Get started with Storyteller Stream!
+                Get started with Power Stream!
               </h1>
               <div className="d-flex flex-column flex-sm-row gap-3">
                 <a
