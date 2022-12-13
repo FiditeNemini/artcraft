@@ -23,6 +23,7 @@ use sqlx::error::Error::Database;
 use sqlx::mysql::MySqlDatabaseError;
 use std::fmt;
 use std::sync::Arc;
+use tokens::jobs::download::DownloadJobToken;
 
 #[derive(Deserialize)]
 pub struct EnqueueGenericDownloadRequest {
@@ -128,12 +129,7 @@ pub async fn enqueue_generic_download_handler(
   }
 
   // This token is returned to the client.
-  let job_token = Tokens::new_generic_upload_job()
-    .map_err(|e| {
-      warn!("Error creating token");
-      EnqueueGenericDownloadError::ServerError
-    })?;
-
+  let job_token = DownloadJobToken::generate();
 
   let record_id = insert_generic_download_job(Args {
     job_token: &job_token,
@@ -154,7 +150,7 @@ pub async fn enqueue_generic_download_handler(
 
   info!("new generic download job id: {}", record_id);
 
-  server_state.firehose_publisher.enqueue_generic_download(&user_session.user_token, &job_token)
+  server_state.firehose_publisher.enqueue_generic_download(&user_session.user_token, job_token.as_str())
       .await
       .map_err(|e| {
         warn!("error publishing event: {:?}", e);

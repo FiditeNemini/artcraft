@@ -6,7 +6,7 @@ use std::fmt::Debug;
 /// The primary key for "generic" inference jobs.
 #[derive(Clone, PartialEq, Eq, sqlx::Type, Debug, Serialize, Deserialize)]
 #[sqlx(transparent)]
-pub struct InferenceJobToken(String);
+pub struct DownloadJobToken(String);
 
-impl_string_token!(InferenceJobToken);
-impl_crockford_generator!(InferenceJobToken, 32usize, EntityType::InferenceJob, CrockfordLower);
+impl_string_token!(DownloadJobToken);
+impl_crockford_generator!(DownloadJobToken, 32usize, EntityType::DownloadJob, CrockfordLower);

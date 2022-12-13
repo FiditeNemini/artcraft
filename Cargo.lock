@@ -4548,6 +4548,7 @@ dependencies = [
  "subprocess",
  "tempdir",
  "time 0.2.26",
+ "tokens",
  "tokio 1.16.1",
  "toml",
  "tts_common",

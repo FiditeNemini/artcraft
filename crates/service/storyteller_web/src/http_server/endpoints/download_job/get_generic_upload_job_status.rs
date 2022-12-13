@@ -23,16 +23,17 @@ use sqlx::error::Error::Database;
 use sqlx::mysql::MySqlDatabaseError;
 use std::fmt;
 use std::sync::Arc;
+use tokens::jobs::download::DownloadJobToken;
 
 /// For the URL PathInfo
 #[derive(Deserialize)]
 pub struct GetGenericDownloadJobStatusPathInfo {
-  token: String,
+  token: DownloadJobToken,
 }
 
 #[derive(Serialize)]
 pub struct GetGenericDownloadJobStatusForResponse {
-  pub job_token: String,
+  pub job_token: DownloadJobToken,
   pub status: String,
 
   /// Extra, temporary status from Redis.
@@ -61,7 +62,7 @@ pub enum GetGenericDownloadJobStatusError {
 
 #[derive(Serialize)]
 pub struct GetGenericDownloadJobStatusRecord {
-  pub job_token: String,
+  pub job_token: DownloadJobToken,
 
   pub status: String,
   pub attempt_count: i32,
@@ -122,7 +123,7 @@ pub async fn get_generic_download_job_status_handler(
         GetGenericDownloadJobStatusError::ServerError
       })?;
 
-  let extra_status_key = RedisKeys::generic_download_extra_status_info(&path.token);
+  let extra_status_key = RedisKeys::generic_download_extra_status_info(path.token.as_str());
   let maybe_extra_status_description : Option<String> = match redis.get(&extra_status_key) {
     Ok(Some(status)) => {
       Some(status)

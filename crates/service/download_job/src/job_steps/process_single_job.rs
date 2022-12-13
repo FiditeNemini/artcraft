@@ -15,7 +15,7 @@ use tempdir::TempDir;
 
 pub async fn process_single_job(job_state: &JobState, job: &AvailableDownloadJob) -> AnyhowResult<()> {
   let mut redis = job_state.redis_pool.get()?;
-  let mut redis_logger = RedisJobStatusLogger::new_generic_download(&mut redis, &job.download_job_token);
+  let mut redis_logger = RedisJobStatusLogger::new_generic_download(&mut redis, job.download_job_token.as_str());
 
   // ==================== ATTEMPT TO GRAB JOB LOCK ==================== //
 

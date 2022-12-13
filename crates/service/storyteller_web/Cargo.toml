@@ -26,6 +26,7 @@ memory_caching = { path = "../../lib/memory_caching" }
 redis_common = { path = "../../lib/redis_common" }
 reusable_types = { path = "../../lib/reusable_types" }
 storage_buckets_common = { path = "../../lib/storage_buckets_common" }
+tokens = { path = "../../lib/tokens" }
 tts_common = { path = "../../lib/tts_common" }
 twitch_common = { path = "../../lib/twitch_common" }
 url_config = { path = "../../lib/url_config" }

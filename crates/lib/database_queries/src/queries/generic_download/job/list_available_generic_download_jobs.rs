@@ -8,12 +8,13 @@ use reusable_types::entity_visibility::EntityVisibility;
 use reusable_types::generic_download_type::GenericDownloadType;
 use sqlx::MySqlPool;
 use std::path::Path;
+use tokens::jobs::download::DownloadJobToken;
 
 /// table: generic_download_jobs
 #[derive(Debug)]
 pub struct AvailableDownloadJob {
   pub id: GenericDownloadJobId,
-  pub download_job_token: String,
+  pub download_job_token: DownloadJobToken,
 
   pub creator_user_token: String,
   pub creator_ip_address: String,
@@ -40,7 +41,7 @@ pub async fn list_available_generic_download_jobs(pool: &MySqlPool, num_records:
         r#"
 SELECT
   id,
-  token AS download_job_token,
+  token AS `download_job_token: tokens::jobs::download::DownloadJobToken`,
 
   creator_user_token,
   creator_ip_address,
@@ -103,7 +104,7 @@ WHERE
 #[derive(Debug)]
 struct AvailableDownloadJobRawInternal {
   pub id: i64,
-  pub download_job_token: String,
+  pub download_job_token: DownloadJobToken,
 
   pub creator_user_token: String,
   pub creator_ip_address: String,

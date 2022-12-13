@@ -1,11 +1,12 @@
 use anyhow::anyhow;
-use sqlx::MySqlPool;
 use container_common::anyhow_result::AnyhowResult;
 use reusable_types::entity_visibility::EntityVisibility;
 use reusable_types::generic_download_type::GenericDownloadType;
+use sqlx::MySqlPool;
+use tokens::jobs::download::DownloadJobToken;
 
 pub struct Args <'a> {
-  pub job_token: &'a str,
+  pub job_token: &'a DownloadJobToken,
   pub uuid_idempotency_token: &'a str,
   pub download_type: GenericDownloadType,
   pub download_url: &'a str,

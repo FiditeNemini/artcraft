@@ -1,13 +1,14 @@
 use anyhow::anyhow;
 use chrono::{DateTime, Utc};
-use log::warn;
-use sqlx::MySqlPool;
 use container_common::anyhow_result::AnyhowResult;
+use log::warn;
 use reusable_types::entity_visibility::EntityVisibility;
 use reusable_types::generic_download_type::GenericDownloadType;
+use sqlx::MySqlPool;
+use tokens::jobs::download::DownloadJobToken;
 
 pub struct GenericDownloadJobStatus {
-  pub job_token: String,
+  pub job_token: DownloadJobToken,
 
   pub status: String,
   pub attempt_count: i32,
@@ -20,14 +21,14 @@ pub struct GenericDownloadJobStatus {
 
 /// Look up job status.
 /// Returns Ok(None) when the record cannot be found.
-pub async fn get_generic_download_job_status(job_token: &str, mysql_pool: &MySqlPool)
+pub async fn get_generic_download_job_status(job_token: &DownloadJobToken, mysql_pool: &MySqlPool)
   -> AnyhowResult<Option<GenericDownloadJobStatus>>
 {
   let maybe_status = sqlx::query_as!(
       GenericDownloadJobStatus,
         r#"
 SELECT
-    jobs.token as job_token,
+    jobs.token as `job_token: tokens::jobs::download::DownloadJobToken`,
 
     jobs.status,
     jobs.attempt_count,
