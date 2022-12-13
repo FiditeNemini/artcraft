@@ -30,14 +30,18 @@ macro_rules! impl_string_token {
 }
 
 macro_rules! impl_crockford_generator {
-  ($t:ident, $total_string_length:literal, $token_prefix:literal, $uppercase:literal) => {
+  ($t:ident, $total_string_length:literal, $token_prefix:literal, $character_case:ident) => {
     impl $t {
       /// Constructor for a new token.
       #[inline]
       pub fn generate() -> Self {
         use rand::Rng;
 
-        let charset = if $uppercase { crate::CROCKFORD_UPPERCASE_CHARSET } else { crate::CROCKFORD_LOWERCASE_CHARSET };
+        let charset = match crate::TokenCharacterSet::$character_case {
+          crate::TokenCharacterSet::CrockfordUpper => crate::CROCKFORD_UPPERCASE_CHARSET,
+          crate::TokenCharacterSet::CrockfordLower => crate::CROCKFORD_LOWERCASE_CHARSET,
+          crate::TokenCharacterSet::CrockfordMixed => crate::CROCKFORD_MIXED_CASE_CHARSET,
+        };
 
         let mut rng = rand::thread_rng();
 
