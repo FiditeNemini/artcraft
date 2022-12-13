@@ -1,17 +1,11 @@
-use serde::Serialize;
 use serde::Deserialize;
-use std::fmt::{Debug, Display, Formatter};
+use serde::Serialize;
+use std::fmt::Debug;
 
 // https://docs.rs/sqlx/latest/sqlx/trait.Type.html
 #[derive(Clone, PartialEq, Eq, sqlx::Type, Debug, Serialize, Deserialize)]
 #[sqlx(transparent)]
 pub struct UserToken(pub String);
-
-impl Display for UserToken {
-  fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
-    write!(f, "{}", self.0)
-  }
-}
 
 // For reference, here's what the serde implementation might be if manually written.
 // This may be useful for designing composite types in the future:
@@ -31,16 +25,42 @@ impl Display for UserToken {
 //     }
 //   }
 
+impl_string_token!(UserToken);
+
 #[cfg(test)]
 mod tests {
   use crate::users::user::UserToken;
-  use serde::Serialize;
   use serde::Deserialize;
+  use serde::Serialize;
 
   #[derive(Serialize, Deserialize, PartialEq, Debug)]
   struct CompositeType {
     user_token: UserToken,
     string: String,
+  }
+
+  #[test]
+  fn test_new() {
+    let token = UserToken::new("U:foo".to_string());
+    assert_eq!(token, UserToken("U:foo".to_string()));
+  }
+
+  #[test]
+  fn test_new_from_str() {
+    let token = UserToken::new_from_str("U:foo");
+    assert_eq!(token, UserToken("U:foo".to_string()));
+  }
+
+  #[test]
+  fn as_str() {
+    let token = UserToken("U:foo".to_string());
+    assert_eq!(token.as_str(), "U:foo");
+  }
+
+  #[test]
+  fn to_string() {
+    let token = UserToken("U:foo".to_string());
+    assert_eq!(token.to_string(), "U:foo".to_string());
   }
 
   #[test]

@@ -17,5 +17,8 @@
 #![allow(dead_code)]
 #![allow(non_snake_case)]
 
+#[macro_use]
+mod macros;
+
 pub mod jobs;
 pub mod users;
