@@ -3,6 +3,7 @@ use container_common::token::random_prefix_crockford_token::random_prefix_crockf
 
 /// Central place to define all the token types.
 // TODO: Make tokens strongly typed.
+#[deprecated(note = "use the 'tokens' crate instead")]
 pub struct Tokens {}
 
 impl Tokens {

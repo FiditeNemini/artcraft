@@ -101,19 +101,19 @@ pub mod tests {
     let mut user_session = UserSessionExtended::default();
 
     user_session.premium.subscription_plans = vec![];
-    user_session.premium.maybe_loyalty_program_key = Some("loyalty_plan".to_string());
+    user_session.premium.maybe_loyalty_program_key = Some("fakeyou_contributor".to_string());
 
     let plan = get_correct_plan_for_session(
       ServerEnvironment::Development,
       Some(&user_session));
 
-    assert_eq!(&plan, ALL_PLANS_BY_SLUG.get("loyalty_plan").unwrap());
+    assert_eq!(&plan, ALL_PLANS_BY_SLUG.get("fakeyou_contributor").unwrap());
 
     let plan = get_correct_plan_for_session(
       ServerEnvironment::Production,
       Some(&user_session));
 
-    assert_eq!(&plan, ALL_PLANS_BY_SLUG.get("loyalty_plan").unwrap());
+    assert_eq!(&plan, ALL_PLANS_BY_SLUG.get("fakeyou_contributor").unwrap());
   }
 
   #[test]
@@ -226,7 +226,7 @@ pub mod tests {
 
     let future_expiry = Utc::now().add(Duration::days(30));
 
-    user_session.premium.maybe_loyalty_program_key = Some("loyalty_plan".to_string());
+    user_session.premium.maybe_loyalty_program_key = Some("fakeyou_contributor".to_string());
 
     user_session.premium.subscription_plans = vec![
       UserSessionSubscriptionPlan {
@@ -249,6 +249,6 @@ pub mod tests {
 
     // NB: The user has a "production" plan, and since this is invalid in development,
     // we see the loyalty plan instead.
-    assert_eq!(&plan, ALL_PLANS_BY_SLUG.get("loyalty_plan").unwrap());
+    assert_eq!(&plan, ALL_PLANS_BY_SLUG.get("fakeyou_contributor").unwrap());
   }
 }
