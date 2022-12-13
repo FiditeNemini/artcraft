@@ -1474,6 +1474,7 @@ dependencies = [
  "serde_derive",
  "serde_json",
  "sqlx",
+ "tokens",
  "toml",
 ]
 
@@ -4794,6 +4795,19 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "cda74da7e1a664f795bb1f8a87ec406fb89a02522cf6e50620d016add6dbbf5c"
 
 [[package]]
+name = "tokens"
+version = "0.0.1"
+dependencies = [
+ "anyhow",
+ "serde",
+ "serde_derive",
+ "serde_json",
+ "sqlx",
+ "sqlx-core",
+ "toml",
+]
+
+[[package]]
 name = "tokio"
 version = "0.2.25"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -5509,6 +5523,7 @@ dependencies = [
  "sha2 0.9.5",
  "sqlx",
  "time 0.2.26",
+ "tokens",
  "toml",
  "user_input_common",
 ]

@@ -22,6 +22,7 @@ members = [
   "crates/lib/reusable_types",
   "crates/lib/storage_buckets_common",
   "crates/lib/subprocess_common",
+  "crates/lib/tokens",
   "crates/lib/tts_common",
   "crates/lib/twitch_common",
   "crates/lib/url_config",
