@@ -79,20 +79,58 @@ macro_rules! impl_crockford_generator {
 
     #[cfg(test)]
     #[test]
-    fn test_entropy() {
-      assert!($t::entropic_character_len() > 100); // TODO
+    fn test_entropy_is_sufficient() {
+      assert!($t::entropic_character_len() > crate::MINIMUM_CHARACTER_ENTROPY);
     }
 
     #[cfg(test)]
     #[test]
     fn test_token_length() {
-      assert_eq!($t::generate().as_str(), "foo"); // TODO
+      assert_eq!($t::generate().as_str().len(), $total_string_length);
+    }
+
+    #[cfg(test)]
+    #[test]
+    fn test_tokens_are_random() {
+      let mut tokens = std::collections::HashSet::new();
+      for _ in 0..100 {
+        tokens.insert($t::generate().to_string());
+      }
+      assert_eq!(tokens.len(), 100);
     }
 
     #[cfg(test)]
     #[test]
     fn test_character_set() {
-      assert_eq!($t::generate().as_str(), "foo"); // TODO
+      let token_string = $t::generate().to_string();
+      let prefix = $t::token_prefix();
+      let random_part = token_string.replace(prefix, "");
+
+      assert!(random_part.len() > crate::MINIMUM_CHARACTER_ENTROPY);
+
+      match crate::TokenCharacterSet::$character_case {
+        crate::TokenCharacterSet::CrockfordUpper => assert!(random_part.chars().all(|c| c.is_numeric() || c.is_uppercase())),
+        crate::TokenCharacterSet::CrockfordLower => assert!(random_part.chars().all(|c| c.is_numeric() || c.is_lowercase())),
+        crate::TokenCharacterSet::CrockfordMixed => assert!(random_part.chars().all(|c| c.is_numeric() || c.is_uppercase() || c.is_lowercase())),
+      }
+    }
+
+    #[cfg(test)]
+    #[test]
+    fn test_prefix_ends_with_separator() {
+      let prefix = $t::token_prefix();
+      assert!(prefix.ends_with(":") || prefix.ends_with("_"));
+
+      let token_string = $t::generate().to_string();
+      assert!(token_string.contains(":") || token_string.contains("_"));
+    }
+
+    #[cfg(test)]
+    #[test]
+    fn test_token_begins_with_prefix() {
+      let prefix = $t::token_prefix();
+      let token_string = $t::generate().to_string();
+      assert!(token_string.starts_with(prefix));
     }
   }
 }

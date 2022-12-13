@@ -29,6 +29,9 @@ pub(crate) enum TokenCharacterSet {
   CrockfordMixed,
 }
 
+/// Every token must have at least this many "characters" of entropy.
+pub(crate) static MINIMUM_CHARACTER_ENTROPY : usize = 8;
+
 #[macro_use]
 mod macros;
 
