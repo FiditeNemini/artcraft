@@ -137,7 +137,7 @@ pub async fn login_handler(
   let ip_address = get_request_ip(&http_request);
 
   let create_session_result =
-    create_user_session(&user.token.value, &ip_address, &mysql_pool).await;
+    create_user_session(&user.token.0, &ip_address, &mysql_pool).await;
 
   let session_token = match create_session_result {
     Ok(token) => token,
@@ -147,9 +147,9 @@ pub async fn login_handler(
     }
   };
 
-  info!("login session created for user: {}", &user.token);
+  info!("login session created for user: {} / {:?}", &user.token, &user.token);
 
-  let session_cookie = match session_cookie_manager.create_cookie(&session_token, &user.token.value) {
+  let session_cookie = match session_cookie_manager.create_cookie(&session_token, &user.token.0) {
     Ok(cookie) => cookie,
     Err(_) => return Err(LoginErrorResponse::server_error()),
   };

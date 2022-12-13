@@ -251,7 +251,7 @@ pub async fn edit_profile_handler(
     edit_user_profile_as_account_holder(
       &mysql_pool,
       edit_user_profile_as_account_holder::Args {
-        user_token: &user_record.user_token,
+        user_token: &user_record.user_token.0,
         profile_markdown: profile_markdown.as_deref(),
         profile_html: profile_html.as_deref(),
         discord_username: discord_username.as_deref(),
@@ -271,7 +271,7 @@ pub async fn edit_profile_handler(
     edit_user_profile_as_mod(
       &mysql_pool,
       edit_user_profile_as_mod::Args {
-        user_token: &user_record.user_token,
+        user_token: &user_record.user_token.0,
         profile_markdown: profile_markdown.as_deref(),
         profile_html: profile_html.as_deref(),
         discord_username: discord_username.as_deref(),

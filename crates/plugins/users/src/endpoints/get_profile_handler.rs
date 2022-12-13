@@ -19,13 +19,14 @@ use log::warn;
 use reusable_types::entity_visibility::EntityVisibility;
 use sqlx::MySqlPool;
 use std::fmt;
+use tokens::users::user::UserToken;
 
 // TODO: This is duplicated in query_user_profile
 // TODO: This handler has embedded queries.
 
 #[derive(Serialize)]
 pub struct UserProfileRecordForResponse {
-  pub user_token: String,
+  pub user_token: UserToken,
   pub username: String,
   pub display_name: String,
   pub email_gravatar_hash: String,
@@ -159,7 +160,7 @@ pub async fn get_profile_handler(
 
   let (_pool_connection, maybe_badges) =
       benchmark.time_async_section_moving_args("badges query", pool_connection, |mut pc| async {
-        let ret = list_user_badges(&mut pc, &user_profile.user_token)
+        let ret = list_user_badges(&mut pc, &user_profile.user_token.0)
             .await;
         (pc, ret)
       }).await;

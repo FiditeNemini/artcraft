@@ -4,17 +4,18 @@ use container_common::anyhow_result::AnyhowResult;
 use crate::helpers::boolean_converters::i8_to_bool;
 use log::{info, warn, log};
 use reusable_types::entity_visibility::EntityVisibility;
-use sqlx::{MySqlPool, MySql};
 use sqlx::error::DatabaseError;
 use sqlx::error::Error::Database;
 use sqlx::mysql::MySqlDatabaseError;
-use std::sync::Arc;
 use sqlx::pool::PoolConnection;
+use sqlx::{MySqlPool, MySql};
+use std::sync::Arc;
+use tokens::users::user::UserToken;
 
 // TODO: Make non-`Serialize` and make the HTTP endpoints do the work
 #[derive(Serialize)]
 pub struct UserProfileResult {
-  pub user_token: String,
+  pub user_token: UserToken,
   pub username: String,
   pub display_name: String,
   pub email_gravatar_hash: String,
@@ -56,7 +57,7 @@ pub struct UserProfileModeratorFields {
 }
 
 struct RawUserProfileRecord {
-  user_token: String,
+  user_token: UserToken,
   username: String,
   email_gravatar_hash: String,
   display_name: String,
@@ -100,7 +101,7 @@ pub async fn get_user_profile_by_username_from_connection<'a>(
       RawUserProfileRecord,
         r#"
 SELECT
-    users.token as user_token,
+    users.token as `user_token: tokens::users::user::UserToken`,
     username,
     display_name,
     email_gravatar_hash,
