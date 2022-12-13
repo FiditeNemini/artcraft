@@ -30,6 +30,14 @@ impl<'de> serde::Deserialize<'de> for UserToken {
 #[cfg(test)]
 mod tests {
   use crate::users::user::UserToken;
+  use serde::Serialize;
+  use serde::Deserialize;
+
+  #[derive(Serialize, Deserialize, PartialEq, Debug)]
+  struct CompositeType {
+    user_token: UserToken,
+    string: String,
+  }
 
   #[test]
   fn test_display_trait() {
@@ -55,8 +63,15 @@ mod tests {
   }
 
   #[test]
+  fn test_nested_serialize_trait() {
+    let value = CompositeType { user_token: UserToken("U:foo".to_string()), string: "bar".to_string() };
+    let expected = r#"{"user_token":"U:foo","string":"bar"}"#.to_string();
+    assert_eq!(expected, serde_json::to_string(&value).unwrap());
+  }
+
+  #[test]
   fn test_deserialize_trait() {
-    let payload = "\"U:foo\"";
+    let payload = "\"U:foo\""; // NB: Quoted
     let expected  = "U:foo".to_string();
 
     let value : UserToken = serde_json::from_str(payload).unwrap();
@@ -65,5 +80,16 @@ mod tests {
     // Just to show this deserializes the same way as a string
     let value : String = serde_json::from_str(payload).unwrap();
     assert_eq!(value, expected.clone());
+  }
+
+  #[test]
+  fn test_nested_deserialize_trait() {
+    let payload = r#"{"user_token":"U:foo","string":"bar"}"#.to_string();
+    let expected = CompositeType {
+      user_token: UserToken("U:foo".to_string()),
+      string: "bar".to_string(),
+    };
+
+    assert_eq!(expected, serde_json::from_str::<CompositeType>(&payload).unwrap());
   }
 }
