@@ -1,12 +1,5 @@
 
-pub struct InferenceToken {
-  pub value: String,
-}
+pub struct InferenceToken(String);
 
-impl InferenceToken {
-  pub fn new() -> Self {
-    InferenceToken {
-      value: "".to_string(),
-    }
-  }
-}
+impl_string_token!(InferenceToken);
+impl_crockford_generator!(InferenceToken, 32usize, "infj_", false);

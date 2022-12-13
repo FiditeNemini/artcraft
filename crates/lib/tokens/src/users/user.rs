@@ -26,7 +26,7 @@ pub struct UserToken(pub String);
 //   }
 
 impl_string_token!(UserToken);
-impl_crockford_generator!(UserToken, 10, true, 18);
+impl_crockford_generator!(UserToken, 15usize, "U:", true);
 
 #[cfg(test)]
 mod tests {
