@@ -30,7 +30,7 @@ macro_rules! impl_string_token {
 }
 
 macro_rules! impl_crockford_generator {
-  ($t:ident, $total_string_length:literal, $token_prefix:literal, $character_case:ident) => {
+  ($t:ident, $total_string_length:literal, $variant:path, $character_case:ident) => {
     impl $t {
       /// Constructor for a new token.
       #[inline]
@@ -49,14 +49,22 @@ macro_rules! impl_crockford_generator {
           })
           .collect();
 
-        let token = format!("{}{}", $token_prefix, entropy_part);
+        let token_prefix = Self::token_prefix();
+
+        let token = format!("{}{}", token_prefix, entropy_part);
 
         $t(token)
       }
 
       #[inline]
       pub fn entropic_character_len() -> usize {
-        $total_string_length.saturating_sub($token_prefix.len())
+        let token_prefix = Self::token_prefix();
+        $total_string_length.saturating_sub(token_prefix.len())
+      }
+
+      #[inline]
+      pub fn token_prefix() -> &'static str {
+        $variant.prefix()
       }
 
       #[inline]

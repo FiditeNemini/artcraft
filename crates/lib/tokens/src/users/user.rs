@@ -1,3 +1,4 @@
+use crate::prefixes::EntityType;
 use serde::Deserialize;
 use serde::Serialize;
 use std::fmt::Debug;
@@ -26,7 +27,7 @@ pub struct UserToken(pub String);
 //   }
 
 impl_string_token!(UserToken);
-impl_crockford_generator!(UserToken, 15usize, "U:", CrockfordUpper);
+impl_crockford_generator!(UserToken, 15usize, EntityType::User, CrockfordUpper);
 
 #[cfg(test)]
 mod tests {

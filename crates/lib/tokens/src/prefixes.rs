@@ -10,7 +10,7 @@ use strum::EnumIter;
 /// Older entities have prefixes ending in ':', but newer entities use the Stripe-style "_"
 /// separator, which makes it easy to select and copy entire tokens with just mouse clicks across
 /// all major operating systems.
-#[derive(Debug)]
+#[derive(Debug, Copy, Clone, Eq, PartialEq)]
 #[cfg_attr(test, derive(EnumIter, EnumCount))]
 pub(crate) enum EntityType {
   InferenceJob,
