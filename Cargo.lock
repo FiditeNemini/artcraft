@@ -4799,6 +4799,7 @@ name = "tokens"
 version = "0.0.1"
 dependencies = [
  "anyhow",
+ "rand 0.8.4",
  "serde",
  "serde_derive",
  "serde_json",

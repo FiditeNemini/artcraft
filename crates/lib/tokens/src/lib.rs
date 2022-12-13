@@ -17,6 +17,11 @@
 #![allow(dead_code)]
 #![allow(non_snake_case)]
 
+// Crockford characters
+pub(crate) const CROCKFORD_UPPERCASE_CHARSET: &[u8] = b"0123456789ABCDEFGHJKMNPQRSTVWXYZ";
+
+pub(crate) const CROCKFORD_LOWERCASE_CHARSET: &[u8] = b"0123456789abcdefghjkmnpqrstvwxyz";
+
 #[macro_use]
 mod macros;
 

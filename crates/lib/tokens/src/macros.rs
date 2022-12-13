@@ -28,3 +28,31 @@ macro_rules! impl_string_token {
     }
   }
 }
+
+macro_rules! impl_crockford_generator {
+  ($t:ident, $entropy_length:literal, $uppercase:literal, $string_length:literal) => {
+    use rand::Rng;
+
+    // Constructors and accessors.
+    impl $t {
+      #[inline]
+      pub fn generate() -> Self {
+        let charset = if $uppercase { crate::CROCKFORD_UPPERCASE_CHARSET } else { crate::CROCKFORD_LOWERCASE_CHARSET };
+
+        let mut rng = rand::thread_rng();
+
+        let entropy_part: String = (0..$entropy_length)
+          .map(|_| {
+            let idx = rng.gen_range(0..charset.len());
+            charset[idx] as char
+          })
+          .collect();
+
+        let token = format!("TOKEN:{}", entropy_part);
+
+        $t(token)
+      }
+    }
+  }
+}
+

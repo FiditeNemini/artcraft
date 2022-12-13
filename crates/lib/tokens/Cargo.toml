@@ -22,6 +22,9 @@ serde_derive = "1.0.125"
 serde_json = "1.0.64"
 toml = "0.5.8"
 
+# Random
+rand = "0.8.3"
+
 # MySql Database
 # "offline" supports typesafe builds without a live database
 # "rustls" doesn't appear to work with IP addresses, per:

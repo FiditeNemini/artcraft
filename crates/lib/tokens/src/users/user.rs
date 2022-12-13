@@ -26,6 +26,7 @@ pub struct UserToken(pub String);
 //   }
 
 impl_string_token!(UserToken);
+impl_crockford_generator!(UserToken, 10, true, 18);
 
 #[cfg(test)]
 mod tests {
@@ -37,6 +38,12 @@ mod tests {
   struct CompositeType {
     user_token: UserToken,
     string: String,
+  }
+
+  #[test]
+  fn test_generate() {
+    let token = UserToken::generate();
+    assert_eq!(token, UserToken("U:foo".to_string()));
   }
 
   #[test]
