@@ -32,3 +32,8 @@ rand = "0.8.3"
 #sqlx = { version = "0.4", features = [ "mysql", "runtime-tokio-native-tls", "offline", "chrono" ] }
 sqlx = { version = "0.5", features = [ "mysql", "runtime-actix-native-tls", "offline", "chrono" ] }
 sqlx-core = { version = "0.5.7" }
+
+[dev-dependencies]
+
+# Enum utilities
+strum = { version = "0.24", features = ["derive"] }

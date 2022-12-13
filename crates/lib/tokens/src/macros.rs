@@ -37,14 +37,9 @@ macro_rules! impl_crockford_generator {
       pub fn generate() -> Self {
         use rand::Rng;
 
-        let charset = match crate::TokenCharacterSet::$character_case {
-          crate::TokenCharacterSet::CrockfordUpper => crate::CROCKFORD_UPPERCASE_CHARSET,
-          crate::TokenCharacterSet::CrockfordLower => crate::CROCKFORD_LOWERCASE_CHARSET,
-          crate::TokenCharacterSet::CrockfordMixed => crate::CROCKFORD_MIXED_CASE_CHARSET,
-        };
-
         let mut rng = rand::thread_rng();
 
+        let charset = Self::token_character_set();
         let entropy_length = Self::entropic_character_len();
 
         let entropy_part: String = (0..entropy_length)
@@ -63,18 +58,33 @@ macro_rules! impl_crockford_generator {
       pub fn entropic_character_len() -> usize {
         $total_string_length.saturating_sub($token_prefix.len())
       }
+
+      #[inline]
+      pub fn token_character_set() -> &'static [u8] {
+        match crate::TokenCharacterSet::$character_case {
+          crate::TokenCharacterSet::CrockfordUpper => crate::CROCKFORD_UPPERCASE_CHARSET,
+          crate::TokenCharacterSet::CrockfordLower => crate::CROCKFORD_LOWERCASE_CHARSET,
+          crate::TokenCharacterSet::CrockfordMixed => crate::CROCKFORD_MIXED_CASE_CHARSET,
+        }
+      }
     }
 
     #[cfg(test)]
     #[test]
     fn test_entropy() {
-      assert!($t::entropic_character_len() > 100);
+      assert!($t::entropic_character_len() > 100); // TODO
     }
 
     #[cfg(test)]
     #[test]
     fn test_token_length() {
-      assert_eq!($t::generate().as_str(), "foo");
+      assert_eq!($t::generate().as_str(), "foo"); // TODO
+    }
+
+    #[cfg(test)]
+    #[test]
+    fn test_character_set() {
+      assert_eq!($t::generate().as_str(), "foo"); // TODO
     }
   }
 }

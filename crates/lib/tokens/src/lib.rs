@@ -32,5 +32,7 @@ pub(crate) enum TokenCharacterSet {
 #[macro_use]
 mod macros;
 
+pub (crate) mod prefixes;
+
 pub mod jobs;
 pub mod users;
