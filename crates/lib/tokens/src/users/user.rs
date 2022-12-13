@@ -3,10 +3,25 @@ use serde::{Deserializer, Serializer};
 use sqlx_core::database::{Database, HasValueRef};
 use sqlx_core::decode::Decode;
 use std::error::Error;
+use std::fmt::{Debug, Display, Formatter};
 
-#[derive(Clone, PartialEq, Eq, Debug, sqlx::Type)]
+#[derive(Clone, PartialEq, Eq, sqlx::Type)]
 pub struct UserToken {
   pub value: String,
+}
+
+// TODO: Macros should implement all of the following:
+
+impl Display for UserToken {
+  fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+    write!(f, "{}", self.value)
+  }
+}
+
+impl Debug for UserToken {
+  fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+    write!(f, "{}", self.value)
+  }
 }
 
 impl serde::Serialize for UserToken {

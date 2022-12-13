@@ -7,7 +7,12 @@ pub async fn lookup_user_for_login_by_email(email: &str, pool: &MySqlPool) -> An
   let record = sqlx::query_as!(
     UserRecordForLogin,
         r#"
-SELECT token, username, email_address, password_hash, is_banned
+SELECT
+  token as `token: tokens::users::user::UserToken`,
+  username,
+  email_address,
+  password_hash,
+  is_banned
 FROM users
 WHERE email_address = ?
 LIMIT 1
