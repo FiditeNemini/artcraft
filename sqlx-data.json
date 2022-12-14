@@ -1641,109 +1641,6 @@
     },
     "query": "\nSELECT\n  id,\n  token AS inference_job_token,\n  uuid_idempotency_token,\n\n  model_token,\n  raw_inference_text,\n\n  max_duration_seconds,\n\n  creator_ip_address,\n  maybe_creator_user_token,\n  creator_set_visibility as `creator_set_visibility: crate::column_types::record_visibility::RecordVisibility`,\n\n  is_from_api,\n  is_for_twitch,\n  is_debug_request,\n\n  status as `status: crate::column_types::job_status::JobStatus`,\n  priority_level,\n  attempt_count,\n  failure_reason,\n\n  created_at,\n  updated_at,\n  retry_at\nFROM tts_inference_jobs\nWHERE\n  is_debug_request = ?\n  AND\n  (\n    status IN (\"pending\", \"attempt_failed\")\n  )\n  AND\n  (\n    retry_at IS NULL\n    OR\n    retry_at < CURRENT_TIMESTAMP\n  )\n  ORDER BY priority_level DESC, id ASC\n  LIMIT ?\n        "
   },
-  "08b412e9db9e9ecc9b0ccaa8e422330888d21d4abd620df7af1646358fd945e7": {
-    "describe": {
-      "columns": [
-        {
-          "name": "job_token",
-          "ordinal": 0,
-          "type_info": {
-            "char_set": 224,
-            "flags": {
-              "bits": 4229
-            },
-            "max_size": 128,
-            "type": "VarString"
-          }
-        },
-        {
-          "name": "status",
-          "ordinal": 1,
-          "type_info": {
-            "char_set": 224,
-            "flags": {
-              "bits": 393
-            },
-            "max_size": 64,
-            "type": "String"
-          }
-        },
-        {
-          "name": "attempt_count",
-          "ordinal": 2,
-          "type_info": {
-            "char_set": 63,
-            "flags": {
-              "bits": 1
-            },
-            "max_size": 3,
-            "type": "Long"
-          }
-        },
-        {
-          "name": "maybe_downloaded_entity_token",
-          "ordinal": 3,
-          "type_info": {
-            "char_set": 224,
-            "flags": {
-              "bits": 128
-            },
-            "max_size": 128,
-            "type": "VarString"
-          }
-        },
-        {
-          "name": "maybe_downloaded_entity_type",
-          "ordinal": 4,
-          "type_info": {
-            "char_set": 224,
-            "flags": {
-              "bits": 128
-            },
-            "max_size": 128,
-            "type": "VarString"
-          }
-        },
-        {
-          "name": "created_at",
-          "ordinal": 5,
-          "type_info": {
-            "char_set": 63,
-            "flags": {
-              "bits": 1153
-            },
-            "max_size": 19,
-            "type": "Timestamp"
-          }
-        },
-        {
-          "name": "updated_at",
-          "ordinal": 6,
-          "type_info": {
-            "char_set": 63,
-            "flags": {
-              "bits": 9345
-            },
-            "max_size": 19,
-            "type": "Timestamp"
-          }
-        }
-      ],
-      "nullable": [
-        false,
-        false,
-        false,
-        true,
-        true,
-        false,
-        false
-      ],
-      "parameters": {
-        "Right": 1
-      }
-    },
-    "query": "\nSELECT\n    jobs.token as job_token,\n\n    jobs.status,\n    jobs.attempt_count,\n    jobs.on_success_downloaded_entity_token as maybe_downloaded_entity_token,\n    jobs.on_success_downloaded_entity_type as maybe_downloaded_entity_type,\n\n    jobs.created_at,\n    jobs.updated_at\n\nFROM generic_download_jobs as jobs\n\nWHERE jobs.token = ?\n        "
-  },
   "09e655ea4b3504cbb3bc18b92c6c25861c941ba073e3aead414e560b05bd7638": {
     "describe": {
       "columns": [
@@ -2568,6 +2465,291 @@
     },
     "query": "\nUPDATE tts_results\nSET\n  mod_deleted_at = CURRENT_TIMESTAMP,\n  maybe_mod_user_token = ?\nWHERE\n  token = ?\nLIMIT 1\n        "
   },
+  "37cfb8e1c8e3f8ab1c5ae506316dc9c4108228da1e51e9fc88823db4defe7e3e": {
+    "describe": {
+      "columns": [
+        {
+          "name": "user_token: tokens::users::user::UserToken",
+          "ordinal": 0,
+          "type_info": {
+            "char_set": 224,
+            "flags": {
+              "bits": 4229
+            },
+            "max_size": 128,
+            "type": "VarString"
+          }
+        },
+        {
+          "name": "username",
+          "ordinal": 1,
+          "type_info": {
+            "char_set": 224,
+            "flags": {
+              "bits": 4229
+            },
+            "max_size": 80,
+            "type": "VarString"
+          }
+        },
+        {
+          "name": "display_name",
+          "ordinal": 2,
+          "type_info": {
+            "char_set": 224,
+            "flags": {
+              "bits": 4225
+            },
+            "max_size": 80,
+            "type": "VarString"
+          }
+        },
+        {
+          "name": "email_gravatar_hash",
+          "ordinal": 3,
+          "type_info": {
+            "char_set": 224,
+            "flags": {
+              "bits": 4225
+            },
+            "max_size": 128,
+            "type": "String"
+          }
+        },
+        {
+          "name": "profile_markdown",
+          "ordinal": 4,
+          "type_info": {
+            "char_set": 224,
+            "flags": {
+              "bits": 4241
+            },
+            "max_size": 262140,
+            "type": "Blob"
+          }
+        },
+        {
+          "name": "profile_rendered_html",
+          "ordinal": 5,
+          "type_info": {
+            "char_set": 224,
+            "flags": {
+              "bits": 4241
+            },
+            "max_size": 262140,
+            "type": "Blob"
+          }
+        },
+        {
+          "name": "user_role_slug",
+          "ordinal": 6,
+          "type_info": {
+            "char_set": 224,
+            "flags": {
+              "bits": 4233
+            },
+            "max_size": 64,
+            "type": "VarString"
+          }
+        },
+        {
+          "name": "disable_gravatar",
+          "ordinal": 7,
+          "type_info": {
+            "char_set": 63,
+            "flags": {
+              "bits": 1
+            },
+            "max_size": 1,
+            "type": "Tiny"
+          }
+        },
+        {
+          "name": "preferred_tts_result_visibility: reusable_types::entity_visibility::EntityVisibility",
+          "ordinal": 8,
+          "type_info": {
+            "char_set": 224,
+            "flags": {
+              "bits": 385
+            },
+            "max_size": 28,
+            "type": "String"
+          }
+        },
+        {
+          "name": "preferred_w2l_result_visibility: reusable_types::entity_visibility::EntityVisibility",
+          "ordinal": 9,
+          "type_info": {
+            "char_set": 224,
+            "flags": {
+              "bits": 385
+            },
+            "max_size": 28,
+            "type": "String"
+          }
+        },
+        {
+          "name": "discord_username",
+          "ordinal": 10,
+          "type_info": {
+            "char_set": 224,
+            "flags": {
+              "bits": 128
+            },
+            "max_size": 144,
+            "type": "VarString"
+          }
+        },
+        {
+          "name": "twitch_username",
+          "ordinal": 11,
+          "type_info": {
+            "char_set": 224,
+            "flags": {
+              "bits": 128
+            },
+            "max_size": 144,
+            "type": "VarString"
+          }
+        },
+        {
+          "name": "twitter_username",
+          "ordinal": 12,
+          "type_info": {
+            "char_set": 224,
+            "flags": {
+              "bits": 128
+            },
+            "max_size": 144,
+            "type": "VarString"
+          }
+        },
+        {
+          "name": "patreon_username",
+          "ordinal": 13,
+          "type_info": {
+            "char_set": 224,
+            "flags": {
+              "bits": 128
+            },
+            "max_size": 144,
+            "type": "VarString"
+          }
+        },
+        {
+          "name": "github_username",
+          "ordinal": 14,
+          "type_info": {
+            "char_set": 224,
+            "flags": {
+              "bits": 128
+            },
+            "max_size": 144,
+            "type": "VarString"
+          }
+        },
+        {
+          "name": "cashapp_username",
+          "ordinal": 15,
+          "type_info": {
+            "char_set": 224,
+            "flags": {
+              "bits": 128
+            },
+            "max_size": 144,
+            "type": "VarString"
+          }
+        },
+        {
+          "name": "website_url",
+          "ordinal": 16,
+          "type_info": {
+            "char_set": 224,
+            "flags": {
+              "bits": 128
+            },
+            "max_size": 1020,
+            "type": "VarString"
+          }
+        },
+        {
+          "name": "is_banned",
+          "ordinal": 17,
+          "type_info": {
+            "char_set": 63,
+            "flags": {
+              "bits": 1
+            },
+            "max_size": 1,
+            "type": "Tiny"
+          }
+        },
+        {
+          "name": "maybe_mod_comments",
+          "ordinal": 18,
+          "type_info": {
+            "char_set": 224,
+            "flags": {
+              "bits": 128
+            },
+            "max_size": 1020,
+            "type": "VarString"
+          }
+        },
+        {
+          "name": "maybe_mod_user_token",
+          "ordinal": 19,
+          "type_info": {
+            "char_set": 224,
+            "flags": {
+              "bits": 128
+            },
+            "max_size": 128,
+            "type": "VarString"
+          }
+        },
+        {
+          "name": "created_at",
+          "ordinal": 20,
+          "type_info": {
+            "char_set": 63,
+            "flags": {
+              "bits": 1153
+            },
+            "max_size": 19,
+            "type": "Timestamp"
+          }
+        }
+      ],
+      "nullable": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        false,
+        true,
+        true,
+        false
+      ],
+      "parameters": {
+        "Right": 1
+      }
+    },
+    "query": "\nSELECT\n    users.token as `user_token: tokens::users::user::UserToken`,\n    username,\n    display_name,\n    email_gravatar_hash,\n    profile_markdown,\n    profile_rendered_html,\n    user_role_slug,\n    disable_gravatar,\n    preferred_tts_result_visibility as `preferred_tts_result_visibility: reusable_types::entity_visibility::EntityVisibility`,\n    preferred_w2l_result_visibility as `preferred_w2l_result_visibility: reusable_types::entity_visibility::EntityVisibility`,\n    discord_username,\n    twitch_username,\n    twitter_username,\n    patreon_username,\n    github_username,\n    cashapp_username,\n    website_url,\n    is_banned,\n    maybe_mod_comments,\n    maybe_mod_user_token,\n    created_at\nFROM users\nWHERE\n    users.username = ?\n    AND users.user_deleted_at IS NULL\n    AND users.mod_deleted_at IS NULL\n        "
+  },
   "3a079cf76bcdfeb2c6f11e54c4afe1054fa39e6a7cf1c45254fd12d2b691f6c4": {
     "describe": {
       "columns": [
@@ -2893,6 +3075,83 @@
       }
     },
     "query": "\nUPDATE tts_inference_jobs\nSET\n  status = ?,\n  failure_reason = ?,\n  internal_debugging_failure_reason = ?,\n  last_assigned_worker = ?,\n  retry_at = NOW() + interval 1 minute\nWHERE id = ?\n        "
+  },
+  "48be5888d5deb63b8a91fcf9dc77965f8f2167e94bd83f3b48e29ef185f0ccd1": {
+    "describe": {
+      "columns": [
+        {
+          "name": "token: tokens::users::user::UserToken",
+          "ordinal": 0,
+          "type_info": {
+            "char_set": 224,
+            "flags": {
+              "bits": 4229
+            },
+            "max_size": 128,
+            "type": "VarString"
+          }
+        },
+        {
+          "name": "username",
+          "ordinal": 1,
+          "type_info": {
+            "char_set": 224,
+            "flags": {
+              "bits": 4229
+            },
+            "max_size": 80,
+            "type": "VarString"
+          }
+        },
+        {
+          "name": "email_address",
+          "ordinal": 2,
+          "type_info": {
+            "char_set": 224,
+            "flags": {
+              "bits": 4229
+            },
+            "max_size": 1020,
+            "type": "VarString"
+          }
+        },
+        {
+          "name": "password_hash",
+          "ordinal": 3,
+          "type_info": {
+            "char_set": 63,
+            "flags": {
+              "bits": 4225
+            },
+            "max_size": 60,
+            "type": "String"
+          }
+        },
+        {
+          "name": "is_banned",
+          "ordinal": 4,
+          "type_info": {
+            "char_set": 63,
+            "flags": {
+              "bits": 1
+            },
+            "max_size": 1,
+            "type": "Tiny"
+          }
+        }
+      ],
+      "nullable": [
+        false,
+        false,
+        false,
+        false,
+        false
+      ],
+      "parameters": {
+        "Right": 1
+      }
+    },
+    "query": "\nSELECT\n  token as `token: tokens::users::user::UserToken`,\n  username,\n  email_address,\n  password_hash,\n  is_banned\nFROM users\nWHERE email_address = ?\nLIMIT 1\n        "
   },
   "497aa22c0f3085dd2905ab6a66643a247ecbb25a5a125e8bf67a49c87a20b70f": {
     "describe": {
@@ -3683,256 +3942,172 @@
     },
     "query": "\nUPDATE tts_models\nSET\n    is_public_listing_approved = ?,\n    is_locked_from_user_modification = ?,\n    is_locked_from_use = ?,\n    maybe_mod_comments = ?,\n    maybe_mod_user_token = ?,\n    is_front_page_featured = ?,\n    is_twitch_featured = ?,\n    maybe_suggested_unique_bot_command = ?,\n    version = version + 1\nWHERE token = ?\nLIMIT 1\n        "
   },
-  "58c885e18f6b876efeb219f97b61f08eda0fc59816ae41ccb67dd85c2c6cff37": {
+  "5b9c3d879425da5becb93829e09d779ec86a5488cef9eb75232599607d13f964": {
     "describe": {
       "columns": [
         {
-          "name": "user_token",
+          "name": "id",
           "ordinal": 0,
           "type_info": {
-            "char_set": 224,
+            "char_set": 63,
             "flags": {
-              "bits": 4229
+              "bits": 515
             },
-            "max_size": 128,
-            "type": "VarString"
+            "max_size": 20,
+            "type": "LongLong"
           }
         },
         {
-          "name": "username",
+          "name": "download_job_token: tokens::jobs::download::DownloadJobToken",
           "ordinal": 1,
           "type_info": {
             "char_set": 224,
             "flags": {
               "bits": 4229
             },
-            "max_size": 80,
-            "type": "VarString"
-          }
-        },
-        {
-          "name": "display_name",
-          "ordinal": 2,
-          "type_info": {
-            "char_set": 224,
-            "flags": {
-              "bits": 4225
-            },
-            "max_size": 80,
-            "type": "VarString"
-          }
-        },
-        {
-          "name": "email_gravatar_hash",
-          "ordinal": 3,
-          "type_info": {
-            "char_set": 224,
-            "flags": {
-              "bits": 4225
-            },
             "max_size": 128,
-            "type": "String"
+            "type": "VarString"
           }
         },
         {
-          "name": "profile_markdown",
-          "ordinal": 4,
-          "type_info": {
-            "char_set": 224,
-            "flags": {
-              "bits": 4241
-            },
-            "max_size": 262140,
-            "type": "Blob"
-          }
-        },
-        {
-          "name": "profile_rendered_html",
-          "ordinal": 5,
-          "type_info": {
-            "char_set": 224,
-            "flags": {
-              "bits": 4241
-            },
-            "max_size": 262140,
-            "type": "Blob"
-          }
-        },
-        {
-          "name": "user_role_slug",
-          "ordinal": 6,
+          "name": "creator_user_token",
+          "ordinal": 2,
           "type_info": {
             "char_set": 224,
             "flags": {
               "bits": 4233
             },
-            "max_size": 64,
+            "max_size": 128,
             "type": "VarString"
           }
         },
         {
-          "name": "disable_gravatar",
+          "name": "creator_ip_address",
+          "ordinal": 3,
+          "type_info": {
+            "char_set": 224,
+            "flags": {
+              "bits": 4233
+            },
+            "max_size": 160,
+            "type": "VarString"
+          }
+        },
+        {
+          "name": "creator_set_visibility: reusable_types::entity_visibility::EntityVisibility",
+          "ordinal": 4,
+          "type_info": {
+            "char_set": 224,
+            "flags": {
+              "bits": 385
+            },
+            "max_size": 28,
+            "type": "String"
+          }
+        },
+        {
+          "name": "download_type: reusable_types::generic_download_type::GenericDownloadType",
+          "ordinal": 5,
+          "type_info": {
+            "char_set": 224,
+            "flags": {
+              "bits": 4233
+            },
+            "max_size": 128,
+            "type": "VarString"
+          }
+        },
+        {
+          "name": "download_url",
+          "ordinal": 6,
+          "type_info": {
+            "char_set": 224,
+            "flags": {
+              "bits": 4225
+            },
+            "max_size": 2048,
+            "type": "VarString"
+          }
+        },
+        {
+          "name": "title",
           "ordinal": 7,
+          "type_info": {
+            "char_set": 224,
+            "flags": {
+              "bits": 4225
+            },
+            "max_size": 1020,
+            "type": "VarString"
+          }
+        },
+        {
+          "name": "status: crate::column_types::job_status::JobStatus",
+          "ordinal": 8,
+          "type_info": {
+            "char_set": 224,
+            "flags": {
+              "bits": 393
+            },
+            "max_size": 64,
+            "type": "String"
+          }
+        },
+        {
+          "name": "attempt_count",
+          "ordinal": 9,
           "type_info": {
             "char_set": 63,
             "flags": {
               "bits": 1
             },
-            "max_size": 1,
-            "type": "Tiny"
+            "max_size": 3,
+            "type": "Long"
           }
         },
         {
-          "name": "preferred_tts_result_visibility: reusable_types::entity_visibility::EntityVisibility",
-          "ordinal": 8,
-          "type_info": {
-            "char_set": 224,
-            "flags": {
-              "bits": 385
-            },
-            "max_size": 28,
-            "type": "String"
-          }
-        },
-        {
-          "name": "preferred_w2l_result_visibility: reusable_types::entity_visibility::EntityVisibility",
-          "ordinal": 9,
-          "type_info": {
-            "char_set": 224,
-            "flags": {
-              "bits": 385
-            },
-            "max_size": 28,
-            "type": "String"
-          }
-        },
-        {
-          "name": "discord_username",
+          "name": "failure_reason",
           "ordinal": 10,
           "type_info": {
             "char_set": 224,
             "flags": {
               "bits": 128
             },
-            "max_size": 144,
-            "type": "VarString"
-          }
-        },
-        {
-          "name": "twitch_username",
-          "ordinal": 11,
-          "type_info": {
-            "char_set": 224,
-            "flags": {
-              "bits": 128
-            },
-            "max_size": 144,
-            "type": "VarString"
-          }
-        },
-        {
-          "name": "twitter_username",
-          "ordinal": 12,
-          "type_info": {
-            "char_set": 224,
-            "flags": {
-              "bits": 128
-            },
-            "max_size": 144,
-            "type": "VarString"
-          }
-        },
-        {
-          "name": "patreon_username",
-          "ordinal": 13,
-          "type_info": {
-            "char_set": 224,
-            "flags": {
-              "bits": 128
-            },
-            "max_size": 144,
-            "type": "VarString"
-          }
-        },
-        {
-          "name": "github_username",
-          "ordinal": 14,
-          "type_info": {
-            "char_set": 224,
-            "flags": {
-              "bits": 128
-            },
-            "max_size": 144,
-            "type": "VarString"
-          }
-        },
-        {
-          "name": "cashapp_username",
-          "ordinal": 15,
-          "type_info": {
-            "char_set": 224,
-            "flags": {
-              "bits": 128
-            },
-            "max_size": 144,
-            "type": "VarString"
-          }
-        },
-        {
-          "name": "website_url",
-          "ordinal": 16,
-          "type_info": {
-            "char_set": 224,
-            "flags": {
-              "bits": 128
-            },
-            "max_size": 1020,
-            "type": "VarString"
-          }
-        },
-        {
-          "name": "is_banned",
-          "ordinal": 17,
-          "type_info": {
-            "char_set": 63,
-            "flags": {
-              "bits": 1
-            },
-            "max_size": 1,
-            "type": "Tiny"
-          }
-        },
-        {
-          "name": "maybe_mod_comments",
-          "ordinal": 18,
-          "type_info": {
-            "char_set": 224,
-            "flags": {
-              "bits": 128
-            },
-            "max_size": 1020,
-            "type": "VarString"
-          }
-        },
-        {
-          "name": "maybe_mod_user_token",
-          "ordinal": 19,
-          "type_info": {
-            "char_set": 224,
-            "flags": {
-              "bits": 128
-            },
-            "max_size": 128,
+            "max_size": 2048,
             "type": "VarString"
           }
         },
         {
           "name": "created_at",
-          "ordinal": 20,
+          "ordinal": 11,
           "type_info": {
             "char_set": 63,
             "flags": {
               "bits": 1153
+            },
+            "max_size": 19,
+            "type": "Timestamp"
+          }
+        },
+        {
+          "name": "updated_at",
+          "ordinal": 12,
+          "type_info": {
+            "char_set": 63,
+            "flags": {
+              "bits": 9345
+            },
+            "max_size": 19,
+            "type": "Timestamp"
+          }
+        },
+        {
+          "name": "retry_at",
+          "ordinal": 13,
+          "type_info": {
+            "char_set": 63,
+            "flags": {
+              "bits": 128
             },
             "max_size": 19,
             "type": "Timestamp"
@@ -3951,22 +4126,15 @@
         false,
         false,
         true,
-        true,
-        true,
-        true,
-        true,
-        true,
-        true,
         false,
-        true,
-        true,
-        false
+        false,
+        true
       ],
       "parameters": {
         "Right": 1
       }
     },
-    "query": "\nSELECT\n    users.token as user_token,\n    username,\n    display_name,\n    email_gravatar_hash,\n    profile_markdown,\n    profile_rendered_html,\n    user_role_slug,\n    disable_gravatar,\n    preferred_tts_result_visibility as `preferred_tts_result_visibility: reusable_types::entity_visibility::EntityVisibility`,\n    preferred_w2l_result_visibility as `preferred_w2l_result_visibility: reusable_types::entity_visibility::EntityVisibility`,\n    discord_username,\n    twitch_username,\n    twitter_username,\n    patreon_username,\n    github_username,\n    cashapp_username,\n    website_url,\n    is_banned,\n    maybe_mod_comments,\n    maybe_mod_user_token,\n    created_at\nFROM users\nWHERE\n    users.username = ?\n    AND users.user_deleted_at IS NULL\n    AND users.mod_deleted_at IS NULL\n        "
+    "query": "\nSELECT\n  id,\n  token AS `download_job_token: tokens::jobs::download::DownloadJobToken`,\n\n  creator_user_token,\n  creator_ip_address,\n  creator_set_visibility as `creator_set_visibility: reusable_types::entity_visibility::EntityVisibility`,\n\n  download_type as `download_type: reusable_types::generic_download_type::GenericDownloadType`,\n  download_url,\n  title,\n\n  status as `status: crate::column_types::job_status::JobStatus`,\n  attempt_count,\n  failure_reason,\n\n  created_at,\n  updated_at,\n  retry_at\nFROM generic_download_jobs\nWHERE\n  (\n    status IN (\"pending\", \"attempt_failed\")\n  )\n  AND\n  (\n    retry_at IS NULL\n    OR\n    retry_at < CURRENT_TIMESTAMP\n  )\n  ORDER BY id ASC\n  LIMIT ?\n        "
   },
   "5e4a00c339ce4d7fac19aff728449156b1e02b9e1d9fd534ac37d4ac79f44820": {
     "describe": {
@@ -4694,21 +4862,11 @@
     },
     "query": "\nSELECT\n  stripe_event_id,\n  should_ignore_retry\nFROM stripe_webhook_event_logs\nWHERE\n  stripe_event_id = ?\n        "
   },
-  "73558104936aab6add2d9c789b368b5f155f1fe01d32e7314f2f120422866f54": {
-    "describe": {
-      "columns": [],
-      "nullable": [],
-      "parameters": {
-        "Right": 3
-      }
-    },
-    "query": "\nUPDATE w2l_template_upload_jobs\nSET\n  status = ?,\n  on_success_result_token = ?,\n  failure_reason = NULL,\n  retry_at = NULL\nWHERE id = ?\n        "
-  },
-  "7490dcb8de10b1eda2c857e53ebc5c0465cdb589d3df4c5549859f7919acac77": {
+  "718174fa75df95d510a330bcdfb898653ae3e405e4609c9a4011cc5389c2e9ba": {
     "describe": {
       "columns": [
         {
-          "name": "token",
+          "name": "job_token: tokens::jobs::download::DownloadJobToken",
           "ordinal": 0,
           "type_info": {
             "char_set": 224,
@@ -4720,51 +4878,75 @@
           }
         },
         {
-          "name": "username",
+          "name": "status",
           "ordinal": 1,
           "type_info": {
             "char_set": 224,
             "flags": {
-              "bits": 4229
+              "bits": 393
             },
-            "max_size": 80,
-            "type": "VarString"
-          }
-        },
-        {
-          "name": "email_address",
-          "ordinal": 2,
-          "type_info": {
-            "char_set": 224,
-            "flags": {
-              "bits": 4229
-            },
-            "max_size": 1020,
-            "type": "VarString"
-          }
-        },
-        {
-          "name": "password_hash",
-          "ordinal": 3,
-          "type_info": {
-            "char_set": 63,
-            "flags": {
-              "bits": 4225
-            },
-            "max_size": 60,
+            "max_size": 64,
             "type": "String"
           }
         },
         {
-          "name": "is_banned",
-          "ordinal": 4,
+          "name": "attempt_count",
+          "ordinal": 2,
           "type_info": {
             "char_set": 63,
             "flags": {
               "bits": 1
             },
-            "max_size": 1,
-            "type": "Tiny"
+            "max_size": 3,
+            "type": "Long"
+          }
+        },
+        {
+          "name": "maybe_downloaded_entity_token",
+          "ordinal": 3,
+          "type_info": {
+            "char_set": 224,
+            "flags": {
+              "bits": 128
+            },
+            "max_size": 128,
+            "type": "VarString"
+          }
+        },
+        {
+          "name": "maybe_downloaded_entity_type",
+          "ordinal": 4,
+          "type_info": {
+            "char_set": 224,
+            "flags": {
+              "bits": 128
+            },
+            "max_size": 128,
+            "type": "VarString"
+          }
+        },
+        {
+          "name": "created_at",
+          "ordinal": 5,
+          "type_info": {
+            "char_set": 63,
+            "flags": {
+              "bits": 1153
+            },
+            "max_size": 19,
+            "type": "Timestamp"
+          }
+        },
+        {
+          "name": "updated_at",
+          "ordinal": 6,
+          "type_info": {
+            "char_set": 63,
+            "flags": {
+              "bits": 9345
+            },
+            "max_size": 19,
+            "type": "Timestamp"
           }
         }
       ],
@@ -4772,6 +4954,8 @@
         false,
         false,
         false,
+        true,
+        true,
         false,
         false
       ],
@@ -4779,7 +4963,17 @@
         "Right": 1
       }
     },
-    "query": "\nSELECT token, username, email_address, password_hash, is_banned\nFROM users\nWHERE email_address = ?\nLIMIT 1\n        "
+    "query": "\nSELECT\n    jobs.token as `job_token: tokens::jobs::download::DownloadJobToken`,\n\n    jobs.status,\n    jobs.attempt_count,\n    jobs.on_success_downloaded_entity_token as maybe_downloaded_entity_token,\n    jobs.on_success_downloaded_entity_type as maybe_downloaded_entity_type,\n\n    jobs.created_at,\n    jobs.updated_at\n\nFROM generic_download_jobs as jobs\n\nWHERE jobs.token = ?\n        "
+  },
+  "73558104936aab6add2d9c789b368b5f155f1fe01d32e7314f2f120422866f54": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Right": 3
+      }
+    },
+    "query": "\nUPDATE w2l_template_upload_jobs\nSET\n  status = ?,\n  on_success_result_token = ?,\n  failure_reason = NULL,\n  retry_at = NULL\nWHERE id = ?\n        "
   },
   "78006a7a9388557d53c9a9cc8aeec84496e87355501c5b412f788a2291077473": {
     "describe": {
@@ -8868,200 +9062,6 @@
     },
     "query": "\nUPDATE api_tokens\nSET\n    maybe_short_description = ?,\n    ip_address_last_update = ?\nWHERE\n    user_token = ?\n    AND api_token = ?\nLIMIT 1\n        "
   },
-  "b6f51c88423f6232cfa33131bed755a03bdcb4b4e4a314b5679190f310da8b14": {
-    "describe": {
-      "columns": [
-        {
-          "name": "id",
-          "ordinal": 0,
-          "type_info": {
-            "char_set": 63,
-            "flags": {
-              "bits": 515
-            },
-            "max_size": 20,
-            "type": "LongLong"
-          }
-        },
-        {
-          "name": "download_job_token",
-          "ordinal": 1,
-          "type_info": {
-            "char_set": 224,
-            "flags": {
-              "bits": 4229
-            },
-            "max_size": 128,
-            "type": "VarString"
-          }
-        },
-        {
-          "name": "creator_user_token",
-          "ordinal": 2,
-          "type_info": {
-            "char_set": 224,
-            "flags": {
-              "bits": 4233
-            },
-            "max_size": 128,
-            "type": "VarString"
-          }
-        },
-        {
-          "name": "creator_ip_address",
-          "ordinal": 3,
-          "type_info": {
-            "char_set": 224,
-            "flags": {
-              "bits": 4233
-            },
-            "max_size": 160,
-            "type": "VarString"
-          }
-        },
-        {
-          "name": "creator_set_visibility: reusable_types::entity_visibility::EntityVisibility",
-          "ordinal": 4,
-          "type_info": {
-            "char_set": 224,
-            "flags": {
-              "bits": 385
-            },
-            "max_size": 28,
-            "type": "String"
-          }
-        },
-        {
-          "name": "download_type: reusable_types::generic_download_type::GenericDownloadType",
-          "ordinal": 5,
-          "type_info": {
-            "char_set": 224,
-            "flags": {
-              "bits": 4233
-            },
-            "max_size": 128,
-            "type": "VarString"
-          }
-        },
-        {
-          "name": "download_url",
-          "ordinal": 6,
-          "type_info": {
-            "char_set": 224,
-            "flags": {
-              "bits": 4225
-            },
-            "max_size": 2048,
-            "type": "VarString"
-          }
-        },
-        {
-          "name": "title",
-          "ordinal": 7,
-          "type_info": {
-            "char_set": 224,
-            "flags": {
-              "bits": 4225
-            },
-            "max_size": 1020,
-            "type": "VarString"
-          }
-        },
-        {
-          "name": "status: crate::column_types::job_status::JobStatus",
-          "ordinal": 8,
-          "type_info": {
-            "char_set": 224,
-            "flags": {
-              "bits": 393
-            },
-            "max_size": 64,
-            "type": "String"
-          }
-        },
-        {
-          "name": "attempt_count",
-          "ordinal": 9,
-          "type_info": {
-            "char_set": 63,
-            "flags": {
-              "bits": 1
-            },
-            "max_size": 3,
-            "type": "Long"
-          }
-        },
-        {
-          "name": "failure_reason",
-          "ordinal": 10,
-          "type_info": {
-            "char_set": 224,
-            "flags": {
-              "bits": 128
-            },
-            "max_size": 2048,
-            "type": "VarString"
-          }
-        },
-        {
-          "name": "created_at",
-          "ordinal": 11,
-          "type_info": {
-            "char_set": 63,
-            "flags": {
-              "bits": 1153
-            },
-            "max_size": 19,
-            "type": "Timestamp"
-          }
-        },
-        {
-          "name": "updated_at",
-          "ordinal": 12,
-          "type_info": {
-            "char_set": 63,
-            "flags": {
-              "bits": 9345
-            },
-            "max_size": 19,
-            "type": "Timestamp"
-          }
-        },
-        {
-          "name": "retry_at",
-          "ordinal": 13,
-          "type_info": {
-            "char_set": 63,
-            "flags": {
-              "bits": 128
-            },
-            "max_size": 19,
-            "type": "Timestamp"
-          }
-        }
-      ],
-      "nullable": [
-        false,
-        false,
-        false,
-        false,
-        false,
-        false,
-        false,
-        false,
-        false,
-        false,
-        true,
-        false,
-        false,
-        true
-      ],
-      "parameters": {
-        "Right": 1
-      }
-    },
-    "query": "\nSELECT\n  id,\n  token AS download_job_token,\n\n  creator_user_token,\n  creator_ip_address,\n  creator_set_visibility as `creator_set_visibility: reusable_types::entity_visibility::EntityVisibility`,\n\n  download_type as `download_type: reusable_types::generic_download_type::GenericDownloadType`,\n  download_url,\n  title,\n\n  status as `status: crate::column_types::job_status::JobStatus`,\n  attempt_count,\n  failure_reason,\n\n  created_at,\n  updated_at,\n  retry_at\nFROM generic_download_jobs\nWHERE\n  (\n    status IN (\"pending\", \"attempt_failed\")\n  )\n  AND\n  (\n    retry_at IS NULL\n    OR\n    retry_at < CURRENT_TIMESTAMP\n  )\n  ORDER BY id ASC\n  LIMIT ?\n        "
-  },
   "b7535ecf2e63b7f02b5b96f833fd8cd28285b24473df6f89795ff360c1723215": {
     "describe": {
       "columns": [
@@ -9631,6 +9631,83 @@
       }
     },
     "query": "\nSELECT\n    w2l_results.token as w2l_result_token,\n    w2l_results.maybe_tts_inference_result_token,\n\n    w2l_results.public_bucket_video_path,\n\n    w2l_templates.token as maybe_w2l_template_token,\n    w2l_templates.template_type,\n    w2l_templates.title as template_title,\n\n    users.token as maybe_creator_user_token,\n    users.username as maybe_creator_username,\n    users.display_name as maybe_creator_display_name,\n    users.email_gravatar_hash as maybe_creator_gravatar_hash,\n    users.is_banned as maybe_creator_is_banned,\n\n    template_users.token as maybe_template_creator_user_token,\n    template_users.username as maybe_template_creator_username,\n    template_users.display_name as maybe_template_creator_display_name,\n    template_users.email_gravatar_hash as maybe_template_creator_gravatar_hash,\n    template_users.is_banned as maybe_template_creator_is_banned,\n\n    w2l_results.creator_set_visibility,\n\n    w2l_results.file_size_bytes,\n    w2l_results.frame_width,\n    w2l_results.frame_height,\n    w2l_results.duration_millis,\n    w2l_results.created_at,\n    w2l_results.updated_at,\n\n    w2l_results.creator_ip_address,\n    w2l_results.user_deleted_at,\n    w2l_results.mod_deleted_at\n\nFROM w2l_results\nLEFT OUTER JOIN w2l_templates\n    ON w2l_results.maybe_w2l_template_token = w2l_templates.token\nLEFT OUTER JOIN users\n    ON w2l_results.maybe_creator_user_token = users.token\nLEFT OUTER JOIN users as template_users\n    ON w2l_templates.creator_user_token = template_users.token\nWHERE\n    w2l_results.token = ?\n        "
+  },
+  "bbd2579fbd17fcbd13488ee6a038cbefe30bf3669da0b74eb8852e070a948021": {
+    "describe": {
+      "columns": [
+        {
+          "name": "token: tokens::users::user::UserToken",
+          "ordinal": 0,
+          "type_info": {
+            "char_set": 224,
+            "flags": {
+              "bits": 4229
+            },
+            "max_size": 128,
+            "type": "VarString"
+          }
+        },
+        {
+          "name": "username",
+          "ordinal": 1,
+          "type_info": {
+            "char_set": 224,
+            "flags": {
+              "bits": 4229
+            },
+            "max_size": 80,
+            "type": "VarString"
+          }
+        },
+        {
+          "name": "email_address",
+          "ordinal": 2,
+          "type_info": {
+            "char_set": 224,
+            "flags": {
+              "bits": 4229
+            },
+            "max_size": 1020,
+            "type": "VarString"
+          }
+        },
+        {
+          "name": "password_hash",
+          "ordinal": 3,
+          "type_info": {
+            "char_set": 63,
+            "flags": {
+              "bits": 4225
+            },
+            "max_size": 60,
+            "type": "String"
+          }
+        },
+        {
+          "name": "is_banned",
+          "ordinal": 4,
+          "type_info": {
+            "char_set": 63,
+            "flags": {
+              "bits": 1
+            },
+            "max_size": 1,
+            "type": "Tiny"
+          }
+        }
+      ],
+      "nullable": [
+        false,
+        false,
+        false,
+        false,
+        false
+      ],
+      "parameters": {
+        "Right": 1
+      }
+    },
+    "query": "\nSELECT\n  token as `token: tokens::users::user::UserToken`,\n  username,\n  email_address,\n  password_hash,\n  is_banned\nFROM users\nWHERE username = ?\nLIMIT 1\n        "
   },
   "bc9c6b57b2578b8163956d11a5f6a9a77ddab6098d2c4207e1a70502db30c9d1": {
     "describe": {
@@ -12414,83 +12491,6 @@
       }
     },
     "query": "\nSELECT count(*) as count\nFROM vocoder_models\nWHERE\n  creator_user_token = ?\nLIMIT 1\n        "
-  },
-  "feb0dae816a5701707a76e15011ea6cb262b10c663abf2cf1fb46bd9b1cebe09": {
-    "describe": {
-      "columns": [
-        {
-          "name": "token",
-          "ordinal": 0,
-          "type_info": {
-            "char_set": 224,
-            "flags": {
-              "bits": 4229
-            },
-            "max_size": 128,
-            "type": "VarString"
-          }
-        },
-        {
-          "name": "username",
-          "ordinal": 1,
-          "type_info": {
-            "char_set": 224,
-            "flags": {
-              "bits": 4229
-            },
-            "max_size": 80,
-            "type": "VarString"
-          }
-        },
-        {
-          "name": "email_address",
-          "ordinal": 2,
-          "type_info": {
-            "char_set": 224,
-            "flags": {
-              "bits": 4229
-            },
-            "max_size": 1020,
-            "type": "VarString"
-          }
-        },
-        {
-          "name": "password_hash",
-          "ordinal": 3,
-          "type_info": {
-            "char_set": 63,
-            "flags": {
-              "bits": 4225
-            },
-            "max_size": 60,
-            "type": "String"
-          }
-        },
-        {
-          "name": "is_banned",
-          "ordinal": 4,
-          "type_info": {
-            "char_set": 63,
-            "flags": {
-              "bits": 1
-            },
-            "max_size": 1,
-            "type": "Tiny"
-          }
-        }
-      ],
-      "nullable": [
-        false,
-        false,
-        false,
-        false,
-        false
-      ],
-      "parameters": {
-        "Right": 1
-      }
-    },
-    "query": "\nSELECT token, username, email_address, password_hash, is_banned\nFROM users\nWHERE username = ?\nLIMIT 1\n        "
   },
   "ffa85f7c65101a43653c724479ee080e0a74577d2ae37863b039f3a452493d1e": {
     "describe": {
