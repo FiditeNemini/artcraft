@@ -1,5 +1,5 @@
 [package]
-name = "tts-inference-job"
+name = "inference-job"
 edition = "2018"
 version = "0.0.1"
 authors = [
@@ -9,22 +9,22 @@ authors = [
 publish = false
 
 [[bin]]
-name = "tts-inference-job"
+name = "inference-job"
 path = "src/main.rs"
 
 [dependencies]
 
 # Internal
-config = { path = "../../lib/config" }
-container_common = { path = "../../lib/container_common" }
-database_queries = { path = "../../lib/database_queries" }
-jobs_common = { path = "../../lib/jobs_common" }
-memory_caching = { path = "../../lib/memory_caching" }
-storage_buckets_common = { path = "../../lib/storage_buckets_common" }
-tts_common = { path = "../../lib/tts_common" }
+config = { path = "../../../lib/config" }
+container_common = { path = "../../../lib/container_common" }
+database_queries = { path = "../../../lib/database_queries" }
+jobs_common = { path = "../../../lib/jobs_common" }
+memory_caching = { path = "../../../lib/memory_caching" }
+storage_buckets_common = { path = "../../../lib/storage_buckets_common" }
+tts_common = { path = "../../../lib/tts_common" }
 
 # Vendored code
-newrelic-telemetry = { path = "../../vendor/newrelic-telemetry-sdk-rust" }
+newrelic-telemetry = { path = "../../../vendor/newrelic-telemetry-sdk-rust" }
 
 # External
 anyhow = "1.0.40"

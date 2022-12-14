@@ -16,28 +16,28 @@ path = "src/main.rs"
 [dependencies]
 
 # Internal
-config = { path = "../../lib/config" }
-container_common = { path = "../../lib/container_common" }
-database_queries = { path = "../../lib/database_queries" }
-google_drive_common = { path = "../../lib/google_drive_common" }
-http_server_common = { path = "../../lib/http_server_common" }
-jobs_common = { path = "../../lib/jobs_common" }
-memory_caching = { path = "../../lib/memory_caching" }
-redis_common = { path = "../../lib/redis_common" }
-reusable_types = { path = "../../lib/reusable_types" }
-storage_buckets_common = { path = "../../lib/storage_buckets_common" }
-tokens = { path = "../../lib/tokens" }
-tts_common = { path = "../../lib/tts_common" }
-twitch_common = { path = "../../lib/twitch_common" }
-url_config = { path = "../../lib/url_config" }
-user_input_common = { path = "../../lib/user_input_common" }
+config = { path = "../../../lib/config" }
+container_common = { path = "../../../lib/container_common" }
+database_queries = { path = "../../../lib/database_queries" }
+google_drive_common = { path = "../../../lib/google_drive_common" }
+http_server_common = { path = "../../../lib/http_server_common" }
+jobs_common = { path = "../../../lib/jobs_common" }
+memory_caching = { path = "../../../lib/memory_caching" }
+redis_common = { path = "../../../lib/redis_common" }
+reusable_types = { path = "../../../lib/reusable_types" }
+storage_buckets_common = { path = "../../../lib/storage_buckets_common" }
+tokens = { path = "../../../lib/tokens" }
+tts_common = { path = "../../../lib/tts_common" }
+twitch_common = { path = "../../../lib/twitch_common" }
+url_config = { path = "../../../lib/url_config" }
+user_input_common = { path = "../../../lib/user_input_common" }
 
 # Internal Components
-billing_component = { path = "../../plugins/billing" }
-users_component = { path = "../../plugins/users" }
+billing_component = { path = "../../../plugins/billing" }
+users_component = { path = "../../../plugins/users" }
 
 # Vendored code
-newrelic-telemetry = { path = "../../vendor/newrelic-telemetry-sdk-rust" }
+newrelic-telemetry = { path = "../../../vendor/newrelic-telemetry-sdk-rust" }
 
 # External
 anyhow = "1.0.40"
