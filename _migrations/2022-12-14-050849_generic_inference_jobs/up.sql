@@ -82,7 +82,7 @@ CREATE TABLE generic_inference_jobs (
   --   - All jobs from logged in FakeYou users have level 1.
   --   - All jobs from Twitch TTS (unpaid) have level 10 (ten).
   --   - (There will be future levels for paid Twitch and social FakeYou rewards.)
-  priority_level TINYINT UNSIGNED NOT NULL DEFAULT 0,
+  priority_level SMALLINT UNSIGNED NOT NULL DEFAULT 0,
 
   is_from_premium_user BOOLEAN NOT NULL DEFAULT FALSE,
   is_from_api_user BOOLEAN NOT NULL DEFAULT FALSE,
@@ -114,7 +114,7 @@ CREATE TABLE generic_inference_jobs (
     'dead') NOT NULL DEFAULT 'pending',
 
   -- We can track this against a "max_attempt_count"
-  attempt_count INT(3) NOT NULL DEFAULT 0,
+  attempt_count SMALLINT UNSIGNED NOT NULL DEFAULT 0,
 
   -- If there is a failure, tell the user why.
   failure_reason VARCHAR(512) DEFAULT NULL,

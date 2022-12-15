@@ -10,7 +10,7 @@ use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::server_state::ServerState;
 use crate::validations::model_uploads::validate_model_title;
 use crate::validations::validate_idempotency_token_format::validate_idempotency_token_format;
-use database_queries::queries::generic_download::insert_generic_download_job::{Args, insert_generic_download_job};
+use database_queries::queries::generic_download::web::insert_generic_download_job::{Args, insert_generic_download_job};
 use database_queries::tokens::Tokens;
 use http_server_common::request::get_request_ip::get_request_ip;
 use http_server_common::response::serialize_as_json_error::serialize_as_json_error;

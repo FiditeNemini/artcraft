@@ -11,7 +11,7 @@ use chrono::{DateTime, Utc};
 use crate::AnyhowResult;
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::server_state::ServerState;
-use database_queries::queries::generic_download::get_generic_download_job_status::{GenericDownloadJobStatus, get_generic_download_job_status};
+use database_queries::queries::generic_download::web::get_generic_download_job_status::{GenericDownloadJobStatus, get_generic_download_job_status};
 use http_server_common::response::serialize_as_json_error::serialize_as_json_error;
 use log::{info, warn, log};
 use r2d2_redis::redis::Commands;

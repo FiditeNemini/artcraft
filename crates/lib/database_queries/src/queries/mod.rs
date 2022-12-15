@@ -1,6 +1,7 @@
 pub mod api_tokens;
 pub mod billing;
 pub mod generic_download;
+pub mod generic_inference;
 pub mod health_check;
 pub mod ip_bans;
 pub mod model_categories;
