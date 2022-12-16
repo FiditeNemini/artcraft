@@ -66,6 +66,7 @@ impl BucketPathUnifier {
   }
 
   /// User-uploaded vocoders.
+  /// These can be HifiGan and HifiGanSoftVc
   pub fn vocoder_path(&self, vocoder_file_hash: &str) -> PathBuf {
     let hashed_path = Self::hashed_directory_path(vocoder_file_hash);
     let model_filename = format!("{}.pt", &vocoder_file_hash);

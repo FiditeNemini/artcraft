@@ -11,6 +11,9 @@ pub enum UserBadgeType {
   /// Granted for uploading vocoder models
   VocoderModelUploader,
 
+  /// Granted for uploading vocoder (softvc aka "rocket_vc") models
+  VocoderRocketVcModelUploader,
+
   /// Granted for uploading W2L templates
   W2lTemplateUploader,
 

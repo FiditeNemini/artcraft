@@ -1,4 +1,5 @@
 use crate::job_types::hifigan::hifigan_model_check_command::HifiGanModelCheckCommand;
+use crate::job_types::hifigan_softvc::hifigan_softvc_model_check_command::HifiGanSoftVcModelCheckCommand;
 use crate::job_types::tacotron::tacotron_model_check_command::TacotronModelCheckCommand;
 use database_queries::mediators::badge_granter::BadgeGranter;
 use database_queries::mediators::firehose_publisher::FirehosePublisher;
@@ -43,4 +44,5 @@ pub struct SidecarConfigs {
   pub google_drive_downloader: GoogleDriveDownloadCommand,
   pub tacotron_model_check_command: TacotronModelCheckCommand,
   pub hifigan_model_check_command: HifiGanModelCheckCommand,
+  pub hifigan_softvc_model_check_command: HifiGanSoftVcModelCheckCommand,
 }

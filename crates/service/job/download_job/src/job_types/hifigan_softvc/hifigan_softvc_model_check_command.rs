@@ -6,20 +6,20 @@ use subprocess_common::docker_options::DockerOptions;
 
 /// This command is used to check hifigan for being a real model
 #[derive(Clone)]
-pub struct HifiGanModelCheckCommand {
+pub struct HifiGanSoftVcModelCheckCommand {
   /// Where the HifiGan code lives
-  hifigan_root_code_directory: String,
+  hifigan_softvc_root_code_directory: String,
   
   /// eg. `source python/bin/activate`
   maybe_virtual_env_activation_command: Option<String>,
   
-  hifigan_model_check_script_name: String,
+  hifigan_softvc_model_check_script_name: String,
 
   /// If this is run under Docker (eg. in development), these are the options.
   maybe_docker_options: Option<DockerOptions>,
 }
 
-impl HifiGanModelCheckCommand {
+impl HifiGanSoftVcModelCheckCommand {
   pub fn new(
     hifigan_root_code_directory: &str,
     maybe_virtual_env_activation_command: Option<&str>,
@@ -27,9 +27,9 @@ impl HifiGanModelCheckCommand {
     maybe_docker_options: Option<DockerOptions>,
   ) -> Self {
     Self {
-      hifigan_root_code_directory: hifigan_root_code_directory.to_string(),
+      hifigan_softvc_root_code_directory: hifigan_root_code_directory.to_string(),
       maybe_virtual_env_activation_command: maybe_virtual_env_activation_command.map(|s| s.to_string()),
-      hifigan_model_check_script_name: hifigan_model_check_script_name.to_string(),
+      hifigan_softvc_model_check_script_name: hifigan_model_check_script_name.to_string(),
       maybe_docker_options,
     }
   }
@@ -41,7 +41,7 @@ impl HifiGanModelCheckCommand {
   ) -> AnyhowResult<()> {
 
     let mut command = String::new();
-    command.push_str(&format!("cd {}", self.hifigan_root_code_directory));
+    command.push_str(&format!("cd {}", self.hifigan_softvc_root_code_directory));
 
     if let Some(venv_command) = self.maybe_virtual_env_activation_command.as_deref() {
       command.push_str(" && ");
@@ -51,7 +51,7 @@ impl HifiGanModelCheckCommand {
 
     command.push_str(" && ");
     command.push_str("python ");
-    command.push_str(&self.hifigan_model_check_script_name);
+    command.push_str(&self.hifigan_softvc_model_check_script_name);
     command.push_str(" --checkpoint_path ");
     command.push_str(&checkpoint_path.as_ref().display().to_string());
     command.push_str(" --output_metadata_filename ");

@@ -38,7 +38,11 @@ impl BadgeGranter {
 
     let mut maybe_badge = None;
 
-    if count >= 250 {
+    if count >= 1000 {
+      maybe_badge = Some(UserBadge::TtsModelUploader1000);
+    } else if count >= 500 {
+      maybe_badge = Some(UserBadge::TtsModelUploader500);
+    } else if count >= 250 {
       maybe_badge = Some(UserBadge::TtsModelUploader250);
     } else if count >= 200 {
       maybe_badge = Some(UserBadge::TtsModelUploader200);
@@ -133,7 +137,11 @@ impl BadgeGranter {
 
     let mut maybe_badge = None;
 
-    if count >= 250 {
+    if count >= 1000 {
+      maybe_badge = Some(UserBadge::VocoderModelUploader1000);
+    } else if count >= 500 {
+      maybe_badge = Some(UserBadge::VocoderModelUploader500);
+    } else if count >= 250 {
       maybe_badge = Some(UserBadge::VocoderModelUploader250);
     } else if count >= 200 {
       maybe_badge = Some(UserBadge::VocoderModelUploader200);
@@ -151,6 +159,56 @@ impl BadgeGranter {
       maybe_badge = Some(UserBadge::VocoderModelUploader5);
     } else if count >= 1 {
       maybe_badge = Some(UserBadge::VocoderModelUploader1);
+    }
+
+    let badge = match maybe_badge {
+      Some(badge) => badge,
+      None => return Ok(()),
+    };
+
+    if self.has_badge(user_token, badge).await? {
+      return Ok(())
+    }
+
+    let _record_id = self.insert(
+      badge,
+      user_token,
+    ).await?;
+
+    self.firehose_publisher.publish_user_badge_granted(user_token, badge.to_db_value())
+        .await?;
+
+    Ok(())
+  }
+
+  /// This needs to be called *after* successful upload.
+  pub async fn maybe_grant_softvc_vocoder_model_uploads_badge(&self, user_token: &str) -> AnyhowResult<()> {
+    let count = self.count_softvc_vocoder_models_uploaded(user_token).await?;
+
+    let mut maybe_badge = None;
+
+    if count >= 1000 {
+      maybe_badge = Some(UserBadge::VocoderRocketVcModelUploader1000);
+    } else if count >= 500 {
+      maybe_badge = Some(UserBadge::VocoderRocketVcModelUploader500);
+    } else if count >= 250 {
+      maybe_badge = Some(UserBadge::VocoderRocketVcModelUploader250);
+    } else if count >= 200 {
+      maybe_badge = Some(UserBadge::VocoderRocketVcModelUploader200);
+    } else if count >= 150 {
+      maybe_badge = Some(UserBadge::VocoderRocketVcModelUploader150);
+    } else if count >= 100 {
+      maybe_badge = Some(UserBadge::VocoderRocketVcModelUploader100);
+    } else if count >= 50 {
+      maybe_badge = Some(UserBadge::VocoderRocketVcModelUploader50);
+    } else if count >= 20 {
+      maybe_badge = Some(UserBadge::VocoderRocketVcModelUploader20);
+    } else if count >= 10 {
+      maybe_badge = Some(UserBadge::VocoderRocketVcModelUploader10);
+    } else if count >= 5 {
+      maybe_badge = Some(UserBadge::VocoderRocketVcModelUploader5);
+    } else if count >= 1 {
+      maybe_badge = Some(UserBadge::VocoderRocketVcModelUploader1);
     }
 
     let badge = match maybe_badge {
@@ -245,6 +303,30 @@ SELECT count(*) as count
 FROM vocoder_models
 WHERE
   creator_user_token = ?
+  AND vocoder_type = 'hifigan'
+LIMIT 1
+        "#,
+      user_token
+    )
+        .fetch_one(&self.mysql_pool)
+        .await;
+
+    self.handle_count_query(maybe_result)
+  }
+
+  async fn count_softvc_vocoder_models_uploaded(
+    &self,
+    user_token: &str,
+  ) -> AnyhowResult<u64> {
+    // NB: This could get expensive!
+    let maybe_result = sqlx::query_as!(
+      CountRecord,
+        r#"
+SELECT count(*) as count
+FROM vocoder_models
+WHERE
+  creator_user_token = ?
+  AND vocoder_type = 'hifigan_rocket_vc'
 LIMIT 1
         "#,
       user_token

@@ -17,6 +17,8 @@ pub enum UserBadge {
   TtsModelUploader150,
   TtsModelUploader200,
   TtsModelUploader250,
+  TtsModelUploader500,
+  TtsModelUploader1000,
 
   // Granted for vocoder models
   VocoderModelUploader1,
@@ -28,6 +30,21 @@ pub enum UserBadge {
   VocoderModelUploader150,
   VocoderModelUploader200,
   VocoderModelUploader250,
+  VocoderModelUploader500,
+  VocoderModelUploader1000,
+
+  // Granted for vocoder (softvc aka "rocket_vc") models
+  VocoderRocketVcModelUploader1,
+  VocoderRocketVcModelUploader5,
+  VocoderRocketVcModelUploader10,
+  VocoderRocketVcModelUploader20,
+  VocoderRocketVcModelUploader50,
+  VocoderRocketVcModelUploader100,
+  VocoderRocketVcModelUploader150,
+  VocoderRocketVcModelUploader200,
+  VocoderRocketVcModelUploader250,
+  VocoderRocketVcModelUploader500,
+  VocoderRocketVcModelUploader1000,
 
   // Granted for uploading templates
   W2lTemplateUploader1,
@@ -57,6 +74,7 @@ pub enum UserBadge {
 }
 
 impl UserBadge {
+  /// This is the value that lives in the database as a VARCHAR(32)
   pub fn to_db_value(&self) -> &'static str {
     match self {
       UserBadge::EarlyUser => "early_user",
@@ -69,6 +87,9 @@ impl UserBadge {
       UserBadge::TtsModelUploader150 => "tts_model_uploader_150",
       UserBadge::TtsModelUploader200 => "tts_model_uploader_200",
       UserBadge::TtsModelUploader250 => "tts_model_uploader_250",
+      UserBadge::TtsModelUploader500 => "tts_model_uploader_500",
+      UserBadge::TtsModelUploader1000 => "tts_model_uploader_1000",
+
       UserBadge::VocoderModelUploader1 => "vocoder_model_uploader_1",
       UserBadge::VocoderModelUploader5 => "vocoder_model_uploader_5",
       UserBadge::VocoderModelUploader10 => "vocoder_model_uploader_10",
@@ -78,6 +99,21 @@ impl UserBadge {
       UserBadge::VocoderModelUploader150 => "vocoder_model_uploader_150",
       UserBadge::VocoderModelUploader200 => "vocoder_model_uploader_200",
       UserBadge::VocoderModelUploader250 => "vocoder_model_uploader_250",
+      UserBadge::VocoderModelUploader500 => "vocoder_model_uploader_500",
+      UserBadge::VocoderModelUploader1000 => "vocoder_model_uploader_1000",
+
+      UserBadge::VocoderRocketVcModelUploader1 => "vocoder_rocket_vc_uploader_1",
+      UserBadge::VocoderRocketVcModelUploader5 => "vocoder_rocket_vc_uploader_5",
+      UserBadge::VocoderRocketVcModelUploader10 => "vocoder_rocket_vc_uploader_10",
+      UserBadge::VocoderRocketVcModelUploader20 => "vocoder_rocket_vc_uploader_20",
+      UserBadge::VocoderRocketVcModelUploader50 => "vocoder_rocket_vc_uploader_50",
+      UserBadge::VocoderRocketVcModelUploader100 => "vocoder_rocket_vc_uploader_100",
+      UserBadge::VocoderRocketVcModelUploader150 => "vocoder_rocket_vc_uploader_150",
+      UserBadge::VocoderRocketVcModelUploader200 => "vocoder_rocket_vc_uploader_200",
+      UserBadge::VocoderRocketVcModelUploader250 => "vocoder_rocket_vc_uploader_250",
+      UserBadge::VocoderRocketVcModelUploader500 => "vocoder_rocket_vc_uploader_500",
+      UserBadge::VocoderRocketVcModelUploader1000 => "vocoder_rocket_vc_uploader_1000", // NB: 31 characters, table max is 32
+
       UserBadge::W2lTemplateUploader1 => "w2l_template_uploader_1",
       UserBadge::W2lTemplateUploader10 => "w2l_template_uploader_10",
       UserBadge::W2lTemplateUploader50 => "w2l_template_uploader_50",
@@ -88,6 +124,7 @@ impl UserBadge {
       UserBadge::W2lTemplateUploader2000 => "w2l_template_uploader_2000",
       UserBadge::W2lTemplateUploader5000 => "w2l_template_uploader_5000",
       UserBadge::W2lTemplateUploader10000 => "w2l_template_uploader_10000",
+
       //UserBadge::TtsInferenceUser100 => "tts_inference_100",
       //UserBadge::TtsInferenceUser500 => "tts_inference_500",
       //UserBadge::TtsInferenceUser1000 => "tts_inference_1000",
@@ -113,7 +150,10 @@ impl UserBadge {
         | UserBadge::TtsModelUploader100
         | UserBadge::TtsModelUploader150
         | UserBadge::TtsModelUploader200
-        | UserBadge::TtsModelUploader250 => UserBadgeType::TtsModelUploader,
+        | UserBadge::TtsModelUploader250
+        | UserBadge::TtsModelUploader500
+        | UserBadge::TtsModelUploader1000
+          => UserBadgeType::TtsModelUploader,
 
       UserBadge::VocoderModelUploader1
         | UserBadge::VocoderModelUploader5
@@ -123,7 +163,23 @@ impl UserBadge {
         | UserBadge::VocoderModelUploader100
         | UserBadge::VocoderModelUploader150
         | UserBadge::VocoderModelUploader200
-        | UserBadge::VocoderModelUploader250 => UserBadgeType::VocoderModelUploader,
+        | UserBadge::VocoderModelUploader250
+        | UserBadge::VocoderModelUploader500
+        | UserBadge::VocoderModelUploader1000
+          => UserBadgeType::VocoderModelUploader,
+
+      UserBadge::VocoderRocketVcModelUploader1
+        | UserBadge::VocoderRocketVcModelUploader5
+        | UserBadge::VocoderRocketVcModelUploader10
+        | UserBadge::VocoderRocketVcModelUploader20
+        | UserBadge::VocoderRocketVcModelUploader50
+        | UserBadge::VocoderRocketVcModelUploader100
+        | UserBadge::VocoderRocketVcModelUploader150
+        | UserBadge::VocoderRocketVcModelUploader200
+        | UserBadge::VocoderRocketVcModelUploader250
+        | UserBadge::VocoderRocketVcModelUploader500
+        | UserBadge::VocoderRocketVcModelUploader1000
+          => UserBadgeType::VocoderRocketVcModelUploader,
 
       UserBadge::W2lTemplateUploader1
         | UserBadge::W2lTemplateUploader10
