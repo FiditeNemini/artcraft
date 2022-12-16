@@ -4,8 +4,8 @@ use container_common::anyhow_result::AnyhowResult;
 use crate::column_types::job_status::JobStatus;
 use crate::helpers::boolean_converters::i8_to_bool;
 use crate::queries::generic_inference::job::_keys::GenericInferenceJobId;
-use reusable_types::entity_visibility::EntityVisibility;
-use reusable_types::generic_inference_type::GenericInferenceType;
+use reusable_types::db::enums::entity_visibility::EntityVisibility;
+use reusable_types::db::enums::generic_inference_type::GenericInferenceType;
 use sqlx::MySqlPool;
 use std::path::Path;
 use tokens::jobs::inference::InferenceJobToken;
@@ -51,14 +51,14 @@ SELECT
   id as `id: crate::queries::generic_inference::job::_keys::GenericInferenceJobId`,
   token AS `inference_job_token: tokens::jobs::inference::InferenceJobToken`,
 
-  inference_type as `inference_type: reusable_types::generic_inference_type::GenericInferenceType`,
+  inference_type as `inference_type: reusable_types::db::enums::generic_inference_type::GenericInferenceType`,
   maybe_inference_args,
   maybe_raw_inference_text,
   maybe_model_token,
 
   maybe_creator_user_token,
   creator_ip_address,
-  creator_set_visibility as `creator_set_visibility: reusable_types::entity_visibility::EntityVisibility`,
+  creator_set_visibility as `creator_set_visibility: reusable_types::db::enums::entity_visibility::EntityVisibility`,
 
   status as `status: crate::column_types::job_status::JobStatus`,
 

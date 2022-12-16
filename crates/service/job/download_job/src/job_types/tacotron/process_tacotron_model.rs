@@ -11,7 +11,7 @@ use database_queries::queries::tts::tts_models::insert_tts_model_from_download_j
 use database_queries::queries::tts::tts_models::insert_tts_model_from_download_job;
 use jobs_common::redis_job_status_logger::RedisJobStatusLogger;
 use log::{info, warn};
-use reusable_types::entity_visibility::EntityVisibility;
+use reusable_types::db::enums::entity_visibility::EntityVisibility;
 use std::fs::File;
 use std::io::Read;
 use std::path::PathBuf;

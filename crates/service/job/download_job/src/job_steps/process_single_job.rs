@@ -10,7 +10,7 @@ use database_queries::queries::generic_download::job::mark_generic_download_job_
 use database_queries::queries::generic_download::job::mark_generic_download_job_pending_and_grab_lock::mark_generic_download_job_pending_and_grab_lock;
 use jobs_common::redis_job_status_logger::RedisJobStatusLogger;
 use log::{info, warn};
-use reusable_types::generic_download_type::GenericDownloadType;
+use reusable_types::db::enums::generic_download_type::GenericDownloadType;
 use tempdir::TempDir;
 
 pub async fn process_single_job(job_state: &JobState, job: &AvailableDownloadJob) -> AnyhowResult<()> {

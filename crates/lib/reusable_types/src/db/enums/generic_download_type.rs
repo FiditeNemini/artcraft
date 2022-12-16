@@ -40,7 +40,7 @@ impl GenericDownloadType {
 
 #[cfg(test)]
 mod tests {
-  use crate::generic_download_type::GenericDownloadType;
+  use crate::db::enums::generic_download_type::GenericDownloadType;
   use crate::test_helpers::assert_serialization;
 
   #[test]

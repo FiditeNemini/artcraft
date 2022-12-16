@@ -4,8 +4,8 @@ use container_common::anyhow_result::AnyhowResult;
 use crate::column_types::job_status::JobStatus;
 use crate::queries::generic_download::job::_keys::GenericDownloadJobId;
 use crate::tokens::Tokens;
-use reusable_types::entity_visibility::EntityVisibility;
-use reusable_types::generic_download_type::GenericDownloadType;
+use reusable_types::db::enums::entity_visibility::EntityVisibility;
+use reusable_types::db::enums::generic_download_type::GenericDownloadType;
 use sqlx::MySqlPool;
 use std::path::Path;
 use tokens::jobs::download::DownloadJobToken;
@@ -45,9 +45,9 @@ SELECT
 
   creator_user_token,
   creator_ip_address,
-  creator_set_visibility as `creator_set_visibility: reusable_types::entity_visibility::EntityVisibility`,
+  creator_set_visibility as `creator_set_visibility: reusable_types::db::enums::entity_visibility::EntityVisibility`,
 
-  download_type as `download_type: reusable_types::generic_download_type::GenericDownloadType`,
+  download_type as `download_type: reusable_types::db::enums::generic_download_type::GenericDownloadType`,
   download_url,
   title,
 

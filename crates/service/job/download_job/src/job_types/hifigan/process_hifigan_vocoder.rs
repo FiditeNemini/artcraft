@@ -10,7 +10,7 @@ use database_queries::queries::generic_download::job::list_available_generic_dow
 use database_queries::queries::vocoder::insert_vocoder_model::{Args, insert_vocoder_model};
 use jobs_common::redis_job_status_logger::RedisJobStatusLogger;
 use log::{info, warn};
-use reusable_types::vocoder_type::VocoderType;
+use reusable_types::db::enums::vocoder_type::VocoderType;
 use std::fs::File;
 use std::io::Read;
 use std::path::PathBuf;

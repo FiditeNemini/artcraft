@@ -3,7 +3,7 @@ use chrono::{DateTime, Utc};
 use container_common::anyhow_result::AnyhowResult;
 use crate::helpers::boolean_converters::i8_to_bool;
 use log::{info, warn, log};
-use reusable_types::entity_visibility::EntityVisibility;
+use reusable_types::db::enums::entity_visibility::EntityVisibility;
 use sqlx::error::DatabaseError;
 use sqlx::error::Error::Database;
 use sqlx::mysql::MySqlDatabaseError;
@@ -109,8 +109,8 @@ SELECT
     profile_rendered_html,
     user_role_slug,
     disable_gravatar,
-    preferred_tts_result_visibility as `preferred_tts_result_visibility: reusable_types::entity_visibility::EntityVisibility`,
-    preferred_w2l_result_visibility as `preferred_w2l_result_visibility: reusable_types::entity_visibility::EntityVisibility`,
+    preferred_tts_result_visibility as `preferred_tts_result_visibility: reusable_types::db::enums::entity_visibility::EntityVisibility`,
+    preferred_w2l_result_visibility as `preferred_w2l_result_visibility: reusable_types::db::enums::entity_visibility::EntityVisibility`,
     discord_username,
     twitch_username,
     twitter_username,

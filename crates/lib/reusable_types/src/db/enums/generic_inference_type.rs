@@ -34,7 +34,7 @@ impl GenericInferenceType {
 
 #[cfg(test)]
 mod tests {
-  use crate::generic_inference_type::GenericInferenceType;
+  use crate::db::enums::generic_inference_type::GenericInferenceType;
   use crate::test_helpers::assert_serialization;
 
   #[test]

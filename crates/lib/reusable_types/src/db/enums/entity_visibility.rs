@@ -39,7 +39,7 @@ impl EntityVisibility {
 
 #[cfg(test)]
 mod tests {
-  use crate::entity_visibility::EntityVisibility;
+  use crate::db::enums::entity_visibility::EntityVisibility;
   use crate::test_helpers::assert_serialization;
 
   #[test]

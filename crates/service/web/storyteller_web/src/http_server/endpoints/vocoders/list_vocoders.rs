@@ -11,7 +11,7 @@ use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::server_state::ServerState;
 use database_queries::queries::vocoder::list_vocoder_models::{list_vocoder_models, VocoderModelListItem};
 use log::warn;
-use reusable_types::vocoder_type::VocoderType;
+use reusable_types::db::enums::vocoder_type::VocoderType;
 use std::fmt;
 use std::sync::Arc;
 

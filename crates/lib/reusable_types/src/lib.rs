@@ -17,9 +17,6 @@
 #[cfg(test)] pub mod test_helpers;
 
 pub mod achievements;
-pub mod entity_visibility;
-pub mod generic_download_type;
-pub mod generic_inference_type;
+pub mod db;
 pub mod server_environment;
 pub mod stripe;
-pub mod vocoder_type;

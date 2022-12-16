@@ -16,7 +16,7 @@ use http_server_common::request::get_request_header_optional::get_request_header
 use http_server_common::response::serialize_as_json_error::serialize_as_json_error;
 use http_server_common::util::timer::MultiBenchmarkingTimer;
 use log::warn;
-use reusable_types::entity_visibility::EntityVisibility;
+use reusable_types::db::enums::entity_visibility::EntityVisibility;
 use sqlx::MySqlPool;
 use std::fmt;
 use tokens::users::user::UserToken;

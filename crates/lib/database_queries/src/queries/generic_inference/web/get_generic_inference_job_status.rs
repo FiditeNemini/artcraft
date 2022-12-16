@@ -2,8 +2,6 @@ use anyhow::anyhow;
 use chrono::{DateTime, Utc};
 use container_common::anyhow_result::AnyhowResult;
 use log::warn;
-use reusable_types::entity_visibility::EntityVisibility;
-use reusable_types::generic_inference_type::GenericInferenceType;
 use sqlx::MySqlPool;
 use tokens::jobs::inference::InferenceJobToken;
 

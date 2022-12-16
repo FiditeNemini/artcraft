@@ -23,8 +23,8 @@ impl VocoderType {
 
 #[cfg(test)]
 mod tests {
+  use crate::db::enums::vocoder_type::VocoderType;
   use crate::test_helpers::assert_serialization;
-  use crate::vocoder_type::VocoderType;
 
   #[test]
   fn test_serialization() {

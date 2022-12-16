@@ -3,7 +3,7 @@ use chrono::Utc;
 use container_common::anyhow_result::AnyhowResult;
 use crate::queries::generic_download::job::list_available_generic_download_jobs::AvailableDownloadJob;
 use crate::tokens::Tokens;
-use reusable_types::entity_visibility::EntityVisibility;
+use reusable_types::db::enums::entity_visibility::EntityVisibility;
 use sqlx::MySqlPool;
 use std::path::Path;
 
