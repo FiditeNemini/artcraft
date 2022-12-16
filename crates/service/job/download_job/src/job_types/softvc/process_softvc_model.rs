@@ -9,6 +9,7 @@ use crate::job_steps::job_results::JobResults;
 use database_queries::queries::generic_download::job::list_available_generic_download_jobs::AvailableDownloadJob;
 use database_queries::queries::tts::tts_models::insert_tts_model_from_download_job::insert_tts_model_from_download_job;
 use database_queries::queries::tts::tts_models::insert_tts_model_from_download_job;
+use database_queries::queries::voice_conversion::voice_conversion_models::insert_voice_conversion_model_from_download_job::{Args, insert_voice_conversion_model_from_download_job};
 use jobs_common::redis_job_status_logger::RedisJobStatusLogger;
 use log::{info, warn};
 use reusable_types::db::enums::entity_visibility::EntityVisibility;
@@ -95,12 +96,7 @@ pub async fn process_softvc_model<'a, 'b>(
 
   info!("Saving Soft VC record...");
 
-  // TODO FIX BELOW QUERIES FOR SOFTVC --
-  // TODO FIX BELOW QUERIES FOR SOFTVC --
-  // TODO FIX BELOW QUERIES FOR SOFTVC --
-  // TODO FIX BELOW QUERIES FOR SOFTVC --
-
-  let (_id, model_token) = insert_tts_model_from_download_job(insert_tts_model_from_download_job::Args {
+  let (_id, model_token) = insert_voice_conversion_model_from_download_job(Args {
     title: &job.title,
     original_download_url: &job.download_url,
     original_filename: &download_filename,
@@ -113,7 +109,7 @@ pub async fn process_softvc_model<'a, 'b>(
     mysql_pool: &job_state.mysql_pool,
   }).await?;
 
-  job_state.badge_granter.maybe_grant_tts_model_uploads_badge(&job.creator_user_token)
+  job_state.badge_granter.maybe_grant_softvc_vocoder_model_uploads_badge(&job.creator_user_token)
       .await
       .map_err(|e| {
         warn!("error maybe awarding badge: {:?}", e);
@@ -121,8 +117,9 @@ pub async fn process_softvc_model<'a, 'b>(
       })?;
 
   Ok(JobResults {
-    entity_token: Some(model_token),
-    entity_type: Some("tacotron2".to_string()), // NB: This may be different from `GenericDownloadType` in the future!
+    entity_token: Some(model_token.to_string()),
+    // NB(1): "rocket_vc" is codename for softvc
+    entity_type: Some("rocket_vc".to_string()), // NB(2): This may be different from `GenericDownloadType` in the future!
   })
 }
 
@@ -137,4 +134,3 @@ fn read_metadata_file(filename: &PathBuf) -> AnyhowResult<FileMetadata> {
   file.read_to_string(&mut buffer)?;
   Ok(serde_json::from_str(&buffer)?)
 }
-

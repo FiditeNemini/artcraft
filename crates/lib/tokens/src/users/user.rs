@@ -4,7 +4,6 @@ use serde::Serialize;
 use std::fmt::Debug;
 
 /// The primary key for users.
-// https://docs.rs/sqlx/latest/sqlx/trait.Type.html
 #[derive(Clone, PartialEq, Eq, sqlx::Type, Debug, Serialize, Deserialize)]
 #[sqlx(transparent)]
 pub struct UserToken(pub String);

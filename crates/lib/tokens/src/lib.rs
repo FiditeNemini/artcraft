@@ -39,3 +39,4 @@ pub (crate) mod prefixes;
 
 pub mod jobs;
 pub mod users;
+pub mod voice_conversion;

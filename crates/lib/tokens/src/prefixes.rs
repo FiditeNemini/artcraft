@@ -16,15 +16,17 @@ pub(crate) enum EntityType {
   DownloadJob,
   InferenceJob,
   User,
+  VoiceConversionModel,
 }
 
 impl EntityType {
 
   pub fn prefix(self) -> &'static str {
     match self {
-      Self::DownloadJob => "jdown_:", // NB: Was "JGUP:"
+      Self::DownloadJob => "jdown_", // NB: Was "JGUP:"
       Self::InferenceJob => "jinf_",
       Self::User => "U:", // NB: Old-style prefix.
+      Self::VoiceConversionModel => "voco_",
     }
   }
 }
@@ -58,5 +60,19 @@ mod tests {
 
     assert!(entities.len() > 0);
     assert_eq!(entities.len(), EntityType::COUNT);
+  }
+
+  #[test]
+  fn test_all_prefixes_end_with_separator() {
+    assert!(EntityType::iter()
+        .map(|entity| entity.prefix())
+        .all(|prefix| prefix.ends_with(":") || prefix.ends_with("_")));
+  }
+
+  #[test]
+  fn test_all_prefixes_end_with_separator_length_one() {
+    for prefix in EntityType::iter().map(|entity| entity.prefix()) {
+      assert_eq!(prefix.len() - 1, prefix.replace(":", "").replace("_", "").len());
+    }
   }
 }

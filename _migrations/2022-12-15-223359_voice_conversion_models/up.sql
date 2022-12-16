@@ -12,7 +12,7 @@ CREATE TABLE voice_conversion_models (
   -- ========== MODEL FUNCTIONALITY ==========
 
   -- The type of voice conversion model
-  -- eg. 'softvc', 'diffsvc'
+  -- eg. 'rocket_vc' (codename for 'softvc'), 'diffsvc'
   model_type VARCHAR(32) NOT NULL,
 
   -- If set, we'll use the vocoder defined.

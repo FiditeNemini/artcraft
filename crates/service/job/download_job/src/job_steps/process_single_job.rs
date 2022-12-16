@@ -5,6 +5,7 @@ use container_common::filesystem::safe_delete_temp_directory::safe_delete_temp_d
 use crate::JobState;
 use crate::job_types::hifigan::process_hifigan_vocoder::process_hifigan_vocoder;
 use crate::job_types::hifigan_softvc::process_hifigan_softvc_vocoder::process_hifigan_softvc_vocoder;
+use crate::job_types::softvc::process_softvc_model::process_softvc_model;
 use crate::job_types::tacotron::process_tacotron_model::process_tacotron_model;
 use database_queries::queries::generic_download::job::list_available_generic_download_jobs::AvailableDownloadJob;
 use database_queries::queries::generic_download::job::mark_generic_download_job_done::mark_generic_download_job_done;
