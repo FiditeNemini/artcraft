@@ -131,7 +131,7 @@ async fn main() -> AnyhowResult<()> {
 
     let python_command = easyenv::get_env_string_or_default(
       "SOFTVC_MODEL_CHECK_COMMAND",
-      "./vocodes_model_check_tacotron.py");
+      "./model_check_softvc_acoustic.py");
 
     let maybe_venv_command = easyenv::get_env_string_optional(
       "SOFTVC_MODEL_CHECK_MAYBE_VENV_COMMAND");
@@ -218,7 +218,7 @@ async fn main() -> AnyhowResult<()> {
 
     let python_command = easyenv::get_env_string_or_default(
       "HIFIGAN_SOFTVC_MODEL_CHECK_COMMAND",
-      "./vocodes_model_check_tacotron.py");
+      "./model_check_hifigan.py");
 
     let maybe_venv_command = easyenv::get_env_string_optional(
       "HIFIGAN_SOFTVC_MODEL_CHECK_MAYBE_VENV_COMMAND");
