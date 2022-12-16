@@ -1,6 +1,6 @@
 /* Config */
 $color-bg: #000000;
-$color-particle: rgba(255, 255, 255, 0.04);
+$color-particle: rgba(255, 255, 255, 0.12);
 $spacing: 2560px;
 $time-1: 120s;
 $time-2: 240s;
@@ -99,10 +99,12 @@ $time-4: 420s;
 
 @keyframes animParticle {
   from {
-    transform: translateY(0px);
+    // transform: translateY(0px);
+    transform: translateY($spacing * -1);
   }
   to {
-    transform: translateY($spacing * -1);
+    // transform: translateY($spacing * -1);
+    transform: translateY(0px);
   }
 }
 

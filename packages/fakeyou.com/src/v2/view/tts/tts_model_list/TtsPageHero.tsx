@@ -15,15 +15,19 @@ interface Props {
 }
 
 export function TtsPageHero(props: Props) {
-
   const randomImage = useMemo(() => {
     const images = [
       // "mascot/halloween_1.webp",
       // "mascot/halloween_2.webp",
       // "mascot/halloween_3.webp",
 
-      "mascot/kitsune_pose2.webp",
-      "mascot/kitsune_wizard.webp",
+      // "mascot/kitsune_pose2.webp",
+      // "mascot/kitsune_wizard.webp",
+
+      "mascot/xmas_1.webp",
+      "mascot/xmas_2.webp",
+      "mascot/xmas_3.webp",
+      "mascot/xmas_4.webp",
     ];
 
     return images[Math.floor(Math.random() * images.length)];
@@ -61,52 +65,52 @@ export function TtsPageHero(props: Props) {
 
   return (
     <div className="container hero-section">
-    <div className="row gx-3 flex-lg-row-reverse align-items-center">
+      <div className="row gx-3 flex-lg-row-reverse align-items-center">
         <div className="col-lg-6">
-        <div className="d-flex justify-content-center">
+          <div className="d-flex justify-content-center">
             <motion.img
-            src={randomImage}
-            className="img-fluid"
-            width="516"
-            height="508"
-            alt="FakeYou Mascot"
-            variants={image}
+              src={randomImage}
+              className="img-fluid"
+              width="516"
+              height="508"
+              alt="FakeYou Mascot"
+              variants={image}
             />
-        </div>
+          </div>
         </div>
         <div className="col-lg-6 px-md-2 px-lg-5 px-xl-2">
-        <div>
+          <div>
             <motion.h1
-            className="display-3 fw-bold lh-1 mb-3 text-center text-lg-start"
-            variants={item}
+              className="display-3 fw-bold lh-1 mb-3 text-center text-lg-start"
+              variants={item}
             >
-            {t("tts.TtsModelListPage.heroSection.title")}
+              {t("tts.TtsModelListPage.heroSection.title")}
             </motion.h1>
             <motion.p
-            className="lead mb-5 text-center text-lg-start pe-xl-2"
-            variants={item}
+              className="lead mb-5 text-center text-lg-start pe-xl-2"
+              variants={item}
             >
-            <Trans i18nKey="tts.TtsModelListPage.heroSection.subtitle">
+              <Trans i18nKey="tts.TtsModelListPage.heroSection.subtitle">
                 Use FakeYou's deepfake tech to say stuff with your favorite
                 characters.
-            </Trans>
+              </Trans>
             </motion.p>
-        </div>
+          </div>
 
-        <motion.div
+          <motion.div
             className="d-flex flex-column flex-md-row gap-3 justify-content-center justify-content-lg-start mb-5 mb-lg-4"
             variants={item}
-        >
+          >
             {upgradeButton}
             {signUpButton}
             <Link to="/clone">
-            <button type="button" className="btn btn-secondary w-100">
+              <button type="button" className="btn btn-secondary w-100">
                 {t("tts.TtsModelListPage.heroSection.buttons.cloneVoice")}
-            </button>
+              </button>
             </Link>
-        </motion.div>
+          </motion.div>
         </div>
-    </div>
+      </div>
     </div>
   );
 }
