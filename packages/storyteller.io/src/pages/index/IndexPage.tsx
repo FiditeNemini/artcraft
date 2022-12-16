@@ -687,12 +687,12 @@ function IndexPage() {
               <div className="col-lg-5 text-center text-lg-start">
                 <img
                   src="/images/Stream-img.webp"
-                  alt="Storyteller Stream"
+                  alt="Power Stream"
                   className="img-fluid"
                 />
               </div>
               <div className="col-lg-7 d-flex flex-column justify-content-center">
-                <h1 className="fw-bold display-5">Storyteller Stream</h1>
+                <h1 className="fw-bold display-5">Power Stream</h1>
                 <h4 className="fw-semibold opacity-75 mb-4">
                   Twitch Streamers and Creators can engage and monetize
                 </h4>
@@ -701,14 +701,14 @@ function IndexPage() {
                   to earn an income. We've built the most comprehensive and
                   engaging donation system for Twitch to date, letting audience
                   members pay to use Deep Fake voices and emotes in their
-                  favorite streamers' live broadcasts.Get started with your
+                  favorite streamers' live broadcasts. Get started with your
                   channel! There's nothing to install. It's the easiest, most
                   engaging, most fun system for Twitch yet. And it earns you
                   money!
                 </p>
                 <div>
                   <a
-                    href="https://storyteller.stream"
+                    href="https://power.stream"
                     rel="noreferrer"
                     target="_blank"
                     className="btn btn-primary mt-4"
