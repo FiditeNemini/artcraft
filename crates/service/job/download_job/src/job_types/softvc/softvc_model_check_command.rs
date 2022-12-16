@@ -1,8 +1,7 @@
 use container_common::anyhow_result::AnyhowResult;
 use log::info;
-use std::fs::OpenOptions;
 use std::path::Path;
-use subprocess::{Popen, PopenConfig, Redirection};
+use subprocess::{Popen, PopenConfig};
 use subprocess_common::docker_options::DockerOptions;
 
 /// This command is used to check softvc for being a real model

@@ -7,8 +7,6 @@ use container_common::hashing::hash_file_sha2::hash_file_sha2;
 use crate::JobState;
 use crate::job_steps::job_results::JobResults;
 use database_queries::queries::generic_download::job::list_available_generic_download_jobs::AvailableDownloadJob;
-use database_queries::queries::tts::tts_models::insert_tts_model_from_download_job::insert_tts_model_from_download_job;
-use database_queries::queries::tts::tts_models::insert_tts_model_from_download_job;
 use database_queries::queries::voice_conversion::voice_conversion_models::insert_voice_conversion_model_from_download_job::{Args, insert_voice_conversion_model_from_download_job};
 use jobs_common::redis_job_status_logger::RedisJobStatusLogger;
 use log::{info, warn};

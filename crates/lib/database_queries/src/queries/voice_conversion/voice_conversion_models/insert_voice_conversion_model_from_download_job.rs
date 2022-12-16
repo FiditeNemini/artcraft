@@ -41,13 +41,13 @@ pub async fn insert_voice_conversion_model_from_download_job<P: AsRef<Path>>(
 INSERT INTO voice_conversion_models
 SET
   token = ?,
-  tts_model_type = "rocket_vc",
+  model_type = "rocket_vc",
   title = ?,
   description_markdown = '',
   description_rendered_html = '',
   creator_user_token = ?,
-  creator_ip_address_creation = ?,
-  creator_ip_address_last_update = ?,
+  ip_address_creation = ?,
+  ip_address_last_update = ?,
   original_download_url = ?,
   private_bucket_hash = ?,
   private_bucket_object_name = ?,

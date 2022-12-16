@@ -29,6 +29,8 @@ use container_common::filesystem::check_directory_exists::check_directory_exists
 use crate::job_state::{JobState, SidecarConfigs};
 use crate::job_steps::main_loop::main_loop;
 use crate::job_types::hifigan::hifigan_model_check_command::HifiGanModelCheckCommand;
+use crate::job_types::hifigan_softvc::hifigan_softvc_model_check_command::HifiGanSoftVcModelCheckCommand;
+use crate::job_types::softvc::softvc_model_check_command::SoftVcModelCheckCommand;
 use crate::job_types::tacotron::tacotron_model_check_command::TacotronModelCheckCommand;
 use database_queries::mediators::badge_granter::BadgeGranter;
 use database_queries::mediators::firehose_publisher::FirehosePublisher;
@@ -123,6 +125,35 @@ async fn main() -> AnyhowResult<()> {
     )
   };
 
+  let softvc_model_check_command = {
+    let root_directory = easyenv::get_env_string_required(
+      "SOFTVC_MODEL_CHECK_ROOT_DIRECTORY")?;
+
+    let python_command = easyenv::get_env_string_or_default(
+      "SOFTVC_MODEL_CHECK_COMMAND",
+      "./vocodes_model_check_tacotron.py");
+
+    let maybe_venv_command = easyenv::get_env_string_optional(
+      "SOFTVC_MODEL_CHECK_MAYBE_VENV_COMMAND");
+
+    let maybe_docker_options = easyenv::get_env_string_optional(
+      "SOFTVC_MODEL_CHECK_MAYBE_DOCKER_IMAGE")
+        .map(|image_name| {
+          DockerOptions {
+            image_name,
+            maybe_bind_mount: Some(DockerFilesystemMount::tmp_to_tmp()),
+            maybe_gpu: Some(DockerGpu::All),
+          }
+        });
+
+    SoftVcModelCheckCommand::new(
+      &root_directory,
+      maybe_venv_command.as_deref(),
+      &python_command,
+      maybe_docker_options,
+    )
+  };
+
   let tacotron_model_check_command = {
     let root_directory = easyenv::get_env_string_required(
       "TACOTRON_MODEL_CHECK_ROOT_DIRECTORY")?;
@@ -181,6 +212,35 @@ async fn main() -> AnyhowResult<()> {
     )
   };
 
+  let hifigan_softvc_model_check_command= {
+    let root_directory = easyenv::get_env_string_required(
+      "HIFIGAN_SOFTVC_MODEL_CHECK_ROOT_DIRECTORY")?;
+
+    let python_command = easyenv::get_env_string_or_default(
+      "HIFIGAN_SOFTVC_MODEL_CHECK_COMMAND",
+      "./vocodes_model_check_tacotron.py");
+
+    let maybe_venv_command = easyenv::get_env_string_optional(
+      "HIFIGAN_SOFTVC_MODEL_CHECK_MAYBE_VENV_COMMAND");
+
+    let maybe_docker_options = easyenv::get_env_string_optional(
+      "HIFIGAN_SOFTVC_MODEL_CHECK_MAYBE_DOCKER_IMAGE")
+        .map(|image_name| {
+          DockerOptions {
+            image_name,
+            maybe_bind_mount: Some(DockerFilesystemMount::tmp_to_tmp()),
+            maybe_gpu: Some(DockerGpu::All),
+          }
+        });
+
+    HifiGanSoftVcModelCheckCommand::new(
+      &root_directory,
+      maybe_venv_command.as_deref(),
+      &python_command,
+      maybe_docker_options,
+    )
+  };
+
   // =============== End Configure Python "Sidecars" ===============
 
   let temp_directory = PathBuf::from(temp_directory);
@@ -230,8 +290,10 @@ async fn main() -> AnyhowResult<()> {
     badge_granter,
     sidecar_configs: SidecarConfigs {
       google_drive_downloader,
+      softvc_model_check_command,
       tacotron_model_check_command,
       hifigan_model_check_command,
+      hifigan_softvc_model_check_command,
     },
     job_batch_wait_millis: common_env.job_batch_wait_millis,
     job_max_attempts: common_env.job_max_attempts as i32,
