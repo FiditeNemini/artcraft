@@ -16,6 +16,8 @@ pub struct BucketPathUnifier {
   pub w2l_inference_output_root: PathBuf,
   pub w2l_model_root: PathBuf,
   pub w2l_end_bump_root: PathBuf,
+  // VC
+  pub softvc_model_root: PathBuf,
 }
 
 impl BucketPathUnifier {
@@ -33,6 +35,8 @@ impl BucketPathUnifier {
       w2l_inference_output_root: PathBuf::from("/w2l_inference_output"),
       w2l_model_root: PathBuf::from("/w2l_pretrained_models"),
       w2l_end_bump_root: PathBuf::from("/w2l_end_bumps"),
+      // VC
+      softvc_model_root: PathBuf::from("/user_uploaded_softvc_models"),
     }
   }
 
@@ -169,6 +173,19 @@ impl BucketPathUnifier {
       .join(video_filename)
   }
 
+  // ==================== VOICE CONVERSION MODELS ==================== //
+
+  pub fn softvc_model_path(&self, softvc_model_file_hash: &str) -> PathBuf {
+    let hashed_path = Self::hashed_directory_path(softvc_model_file_hash);
+    let model_filename = format!("{}.pt", &softvc_model_file_hash);
+
+    self.softvc_model_root
+        .join(hashed_path)
+        .join(model_filename)
+  }
+
+  // ==================== UTILITY ==================== //
+
   pub fn hashed_directory_path(file_hash: &str) -> String {
     match file_hash.len() {
       0 | 1=> "".to_string(),
@@ -197,6 +214,8 @@ mod tests {
       w2l_inference_output_root: PathBuf::from("/test_path_w2l_output"),
       w2l_model_root: PathBuf::from("/test_path_w2l_pretrained_models"),
       w2l_end_bump_root: PathBuf::from("/test_path_w2l_end_bumps"),
+      // VOICE CONVERSION
+      softvc_model_root: PathBuf::from("/test_path_softvc_models"),
     }
   }
 
@@ -295,6 +314,13 @@ mod tests {
     // It also handles capitalization
     assert_eq!(paths.w2l_inference_video_output_path("TYPE:ABCDEF").to_str().unwrap(),
                "/test_path_w2l_output/a/b/c/vocodes_video_TYPEABCDEF.mp4");
+  }
+
+  #[test]
+  fn test_softvc_model_path() {
+    let paths = get_instance();
+    assert_eq!(paths.softvc_model_path("foobar").to_str().unwrap(),
+               "/test_path_softvc_models/f/o/o/foobar.pt");
   }
 
   #[test]

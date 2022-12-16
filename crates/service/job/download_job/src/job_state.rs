@@ -1,5 +1,6 @@
 use crate::job_types::hifigan::hifigan_model_check_command::HifiGanModelCheckCommand;
 use crate::job_types::hifigan_softvc::hifigan_softvc_model_check_command::HifiGanSoftVcModelCheckCommand;
+use crate::job_types::softvc::softvc_model_check_command::SoftVcModelCheckCommand;
 use crate::job_types::tacotron::tacotron_model_check_command::TacotronModelCheckCommand;
 use database_queries::mediators::badge_granter::BadgeGranter;
 use database_queries::mediators::firehose_publisher::FirehosePublisher;
@@ -42,6 +43,7 @@ pub struct JobState {
 /// Configurations and interfaces to code deployed as sidecars or container mounts.
 pub struct SidecarConfigs {
   pub google_drive_downloader: GoogleDriveDownloadCommand,
+  pub softvc_model_check_command: SoftVcModelCheckCommand,
   pub tacotron_model_check_command: TacotronModelCheckCommand,
   pub hifigan_model_check_command: HifiGanModelCheckCommand,
   pub hifigan_softvc_model_check_command: HifiGanSoftVcModelCheckCommand,
