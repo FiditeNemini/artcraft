@@ -17,7 +17,7 @@ find . -type f -exec sed -i "s/CURRENT_STORYTELLER_VERSION/${SHORT_SHA}/g" {} +
 # --ignore-engines: https://stackoverflow.com/a/59615348
 yarn build-storyteller --verbose --ignore-optional --ignore-engines
 
-mkdir storyteller
+mkdir storyteller.io
 mv packages/storyteller.io/build/ storyteller.io/build/
 
 echo "Copying redirects configuration to Netlify build dir..."
