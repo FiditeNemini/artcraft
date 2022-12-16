@@ -69,9 +69,6 @@ pub async fn process_single_job(job_state: &JobState, job: &AvailableDownloadJob
       entity_token = results.entity_token.clone();
       entity_type = results.entity_type.clone();
     }
-    GenericDownloadType::MelGanVocodes => {
-      return Err(anyhow!("MelGan not yet supported!"));
-    }
     GenericDownloadType::Tacotron2 => {
       let results = process_tacotron_model(
         job_state,
@@ -83,6 +80,8 @@ pub async fn process_single_job(job_state: &JobState, job: &AvailableDownloadJob
       entity_token = results.entity_token.clone();
       entity_type = results.entity_type.clone();
     }
+    GenericDownloadType::HifiGanRocketVc => {}
+    GenericDownloadType::RocketVc => {}
   }
 
   // =====================================================

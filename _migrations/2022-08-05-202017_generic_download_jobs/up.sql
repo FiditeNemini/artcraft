@@ -27,7 +27,7 @@ CREATE TABLE generic_download_jobs (
   -- ========== UPLOAD DETAILS ==========
 
   -- A "well defined" type of upload
-  -- The first upload type will be "hifigan_model"
+  -- Examples: "hifigan", "tacotron2", etc.
   download_type VARCHAR(32) NOT NULL,
 
   -- Assume the same URL can be uploaded more than once (in case of errors or
