@@ -28,6 +28,8 @@ pub async fn process_single_job(job_state: &JobState, job: &AvailableDownloadJob
     return Ok(())
   }
 
+  info!("Beginning work on {:?} = {} | {}", job.download_type, job.download_job_token, job.download_url);
+
   // ==================== SETUP TEMP DIRS ==================== //
 
   let temp_dir = format!("temp_{}", job.id.0);

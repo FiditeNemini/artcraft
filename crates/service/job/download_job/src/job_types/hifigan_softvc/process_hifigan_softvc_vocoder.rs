@@ -35,7 +35,7 @@ pub async fn process_hifigan_softvc_vocoder<'a, 'b>(
 
   let output_metadata_fs_path = temp_dir.path().join("metadata.json");
 
-  let model_check_result = job_state.sidecar_configs.hifigan_model_check_command.execute(
+  let model_check_result = job_state.sidecar_configs.hifigan_softvc_model_check_command.execute(
     &file_path,
     &output_metadata_fs_path
   );
