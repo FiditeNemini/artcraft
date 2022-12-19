@@ -5,6 +5,7 @@ use actix_web::cookie::Cookie;
 use actix_web::error::ResponseError;
 use actix_web::http::StatusCode;
 use actix_web::{Responder, web, HttpResponse, error, HttpRequest};
+use config::is_bad_video_download_url::is_bad_video_download_url;
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::server_state::ServerState;
 use crate::validations::model_uploads::validate_model_title;
@@ -125,6 +126,10 @@ pub async fn upload_w2l_template_handler(
 
   if let Err(reason) = validate_model_title(&request.title) {
     return Err(UploadW2lTemplateError::BadInput(reason));
+  }
+
+  if is_bad_video_download_url(&request.download_url) {
+    return Err(UploadW2lTemplateError::BadInput("url is invalid".to_string()));
   }
 
   if contains_slurs(&request.title) {

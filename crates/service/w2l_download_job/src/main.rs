@@ -16,6 +16,7 @@ pub mod script_execution;
 use anyhow::{anyhow, Error};
 use chrono::Utc;
 use config::common_env::CommonEnv;
+use config::is_bad_video_download_url::is_bad_video_download_url;
 use config::shared_constants::DEFAULT_MYSQL_CONNECTION_STRING;
 use config::shared_constants::DEFAULT_RUST_LOG;
 use container_common::anyhow_result::AnyhowResult;
@@ -378,6 +379,18 @@ async fn process_job(downloader: &Downloader, job: &W2lTemplateUploadJobRecord) 
   let download_url = job.download_url.as_ref()
       .map(|c| c.to_string())
       .unwrap_or("".to_string());
+
+  if is_bad_video_download_url(&download_url) {
+    warn!("Download URL is invalid: {}", download_url);
+
+    mark_w2l_template_upload_job_permanently_dead(
+      &downloader.mysql_pool,
+      job,
+      "bad download URL"
+    ).await?;
+
+    return Ok(())
+  }
 
   info!("Calling downloader...");
   let download_filename = match downloader.google_drive_downloader.download_file(&download_url, &temp_dir).await {
