@@ -86,4 +86,55 @@ mod tests {
     assert_eq!(Visibility::from_str("private").unwrap(), Visibility::Private);
     assert!(Visibility::from_str("foo").is_err());
   }
+
+  #[derive(Serialize, Deserialize, PartialEq, Debug)]
+  struct CompositeType {
+    visibility: Visibility,
+    string: String,
+  }
+
+  mod serde_serialization {
+    use crate::core::visibility::Visibility;
+    use super::CompositeType;
+
+    #[test]
+    fn serialize() {
+      let expected = "\"public\"".to_string(); // NB: Quoted
+
+      assert_eq!(expected, toml::to_string(&Visibility::Public).unwrap());
+
+      // Just to show this serializes the same as a string
+      assert_eq!(expected, toml::to_string("public").unwrap());
+    }
+
+    #[test]
+    fn nested_serialize() {
+      let value = CompositeType { visibility: Visibility::Hidden, string: "bar".to_string() };
+      let expected = r#"{"visibility":"hidden","string":"bar"}"#.to_string();
+      assert_eq!(expected, serde_json::to_string(&value).unwrap());
+    }
+  }
+
+  mod serde_deserialization {
+    use crate::core::visibility::Visibility;
+    use super::CompositeType;
+
+    #[test]
+    fn deserialize() {
+      let payload = "\"private\""; // NB: Quoted
+      let value: Visibility = serde_json::from_str(payload).unwrap();
+      assert_eq!(value, Visibility::Private);
+    }
+
+    #[test]
+    fn nested_deserialize() {
+      let payload = r#"{"visibility":"hidden","string":"bar"}"#.to_string();
+      let expected = CompositeType {
+        visibility: Visibility::Hidden,
+        string: "bar".to_string(),
+      };
+
+      assert_eq!(expected, serde_json::from_str::<CompositeType>(&payload).unwrap());
+    }
+  }
 }

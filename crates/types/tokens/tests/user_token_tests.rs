@@ -88,7 +88,7 @@ mod deserialization {
   use tokens::users::user::UserToken;
 
   #[test]
-  fn test_deserialize_trait() {
+  fn deserialize() {
     let payload = "\"U:foo\""; // NB: Quoted
     let expected = "U:foo".to_string();
 
@@ -101,7 +101,7 @@ mod deserialization {
   }
 
   #[test]
-  fn test_nested_deserialize_trait() {
+  fn nested_deserialize() {
     let payload = r#"{"user_token":"U:foo","string":"bar"}"#.to_string();
     let expected = CompositeType {
       user_token: UserToken("U:foo".to_string()),
