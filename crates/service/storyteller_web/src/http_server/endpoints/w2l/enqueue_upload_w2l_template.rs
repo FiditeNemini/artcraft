@@ -128,7 +128,7 @@ pub async fn upload_w2l_template_handler(
     return Err(UploadW2lTemplateError::BadInput(reason));
   }
 
-  if is_bad_video_download_url(&request.download_url) {
+  if is_bad_video_download_url(&request.download_url).unwrap_or(true) {
     return Err(UploadW2lTemplateError::BadInput("url is invalid".to_string()));
   }
 

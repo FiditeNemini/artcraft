@@ -380,7 +380,7 @@ async fn process_job(downloader: &Downloader, job: &W2lTemplateUploadJobRecord) 
       .map(|c| c.to_string())
       .unwrap_or("".to_string());
 
-  if is_bad_video_download_url(&download_url) {
+  if is_bad_video_download_url(&download_url).unwrap_or(true) {
     warn!("Download URL is invalid: {}", download_url);
 
     mark_w2l_template_upload_job_permanently_dead(
