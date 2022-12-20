@@ -17,8 +17,8 @@ path = "src/lib.rs"
 # Internal
 config = { path = "../config" }
 container_common = { path = "../container_common" }
-reusable_types = { path = "../reusable_types" }
-tokens = { path = "../tokens" }
+reusable_types = { path = "../../types/reusable_types" }
+tokens = { path = "../../types/tokens" }
 
 # External
 anyhow = "1.0.40"

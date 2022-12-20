@@ -19,14 +19,16 @@ members = [
   "crates/lib/jobs_common",
   "crates/lib/memory_caching",
   "crates/lib/redis_common",
-  "crates/lib/reusable_types",
   "crates/lib/storage_buckets_common",
   "crates/lib/subprocess_common",
-  "crates/lib/tokens",
   "crates/lib/tts_common",
   "crates/lib/twitch_common",
   "crates/lib/url_config",
   "crates/lib/user_input_common",
+
+  # Types: common strongly-typed tokens, ids, payloads, etc.
+  "crates/types/reusable_types",
+  "crates/types/tokens",
 
   # Services: API servers, jobs, workers, etc.
   "crates/service/job/download_job",
