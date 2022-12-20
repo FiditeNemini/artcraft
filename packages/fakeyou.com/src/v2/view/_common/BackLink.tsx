@@ -11,7 +11,8 @@ function BackLink(props: Props) {
   const linkText = props.text === undefined ? "Back" : props.text;
   return (
     <Link to={props.link}>
-      <BackButtonIcon title={linkText} /> {linkText}
+      <BackButtonIcon title={linkText} />
+      <span className="ms-2">{linkText}</span>
     </Link>
   );
 }
