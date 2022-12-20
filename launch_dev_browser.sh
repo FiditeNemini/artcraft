@@ -2,10 +2,13 @@
 
 declare -r CHROME_DIR="${HOME}/.chromeDevTemp"
 
-mkdir -p $CHROME_DIR
+# NB: Creating the directory first seems to block process start.
+# Perhaps this is the wrong chmod ownership flags.
+#mkdir -p $CHROME_DIR
 
-chromium \ 
+chromium \
   --disable-web-security \
   --ignore-certificate-errors \
-  --user-data-dir $CHROME_DIR
+  --user-data-dir="${CHROME_DIR}" \
+  https://dev.fakeyou.com
 
