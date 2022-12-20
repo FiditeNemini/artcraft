@@ -9,4 +9,4 @@ use std::fmt::Debug;
 pub struct MediaUploadToken(String);
 
 impl_string_token!(MediaUploadToken);
-impl_crockford_generator!(MediaUploadToken, 32usize, EntityType::DownloadJob, CrockfordLower);
+impl_crockford_generator!(MediaUploadToken, 32usize, EntityType::MediaUpload, CrockfordLower);

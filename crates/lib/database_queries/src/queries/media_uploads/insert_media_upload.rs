@@ -37,14 +37,7 @@ pub struct Args <'a> {
 
 pub async fn insert_media_upload(args: Args<'_>) -> AnyhowResult<u64> {
 
-  let query = sqlx::query!(
-        r#"
-INSERT INTO media_uploads
-SET
-  token = ?,
-  uuid_idempotency_token = ?,
-
-  media_type = ?,
+  /*
   maybe_original_filename = ?,
   original_file_size_bytes = ?,
   original_duration_millis = ?,
@@ -53,6 +46,31 @@ SET
   maybe_original_video_encoding = ?,
   maybe_original_frame_width = ?,
   maybe_original_frame_height = ?,
+
+
+
+      INSERT INTO
+      media_uploads
+    SET
+      token = 'foo',
+      uuid_idempotency_token = 'bar',
+      public_bucket_directory_full_path = 'asdf',
+      extra_file_modification_info = 'asdf',
+      maybe_creator_user_token = 'asdf',
+      maybe_creator_anonymous_visitor_token = 'asdf',
+      creator_ip_address = 'asdf',
+      creator_set_visibility = 'asdf',
+      maybe_creator_synthetic_id = 'asdf'
+
+   */
+  let query = sqlx::query!(
+        r#"
+INSERT INTO media_uploads
+SET
+  token = ?,
+  uuid_idempotency_token = ?,
+
+  media_type = ?,
   checksum_sha2 = ?,
 
   public_bucket_directory_full_path = ?,
@@ -68,15 +86,15 @@ SET
         args.token,
         args.uuid_idempotency_token,
 
-        args.media_type,
-        args.maybe_original_filename,
+        "audio", //  TODO: args.media_type,
+        /*args.maybe_original_filename,
         args.original_file_size_bytes,
         args.original_duration_millis,
         args.maybe_original_mime_type,
         args.maybe_original_audio_encoding,
         args.maybe_original_video_encoding,
         args.maybe_original_frame_width,
-        args.maybe_original_frame_height,
+        args.maybe_original_frame_height,*/
         args.checksum_sha2,
 
         args.public_bucket_directory_full_path,
@@ -85,7 +103,7 @@ SET
         args.maybe_creator_user_token,
         args.maybe_creator_anonymous_visitor_token,
         args.creator_ip_address,
-        args.creator_set_visibility,
+        args.creator_set_visibility.to_str(),
 
         args.maybe_creator_synthetic_id,
     );
