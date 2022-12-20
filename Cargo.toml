@@ -27,6 +27,7 @@ members = [
   "crates/lib/user_input_common",
 
   # Types: common strongly-typed tokens, ids, payloads, etc.
+  "crates/types/enums",
   "crates/types/reusable_types",
   "crates/types/tokens",
 

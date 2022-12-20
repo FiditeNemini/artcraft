@@ -1466,6 +1466,7 @@ dependencies = [
  "config",
  "container_common",
  "dotenv",
+ "enums",
  "log",
  "once_cell",
  "regex",
@@ -1689,6 +1690,19 @@ dependencies = [
  "proc-macro2",
  "quote",
  "syn",
+]
+
+[[package]]
+name = "enums"
+version = "0.0.1"
+dependencies = [
+ "serde",
+ "serde_derive",
+ "serde_json",
+ "sqlx",
+ "sqlx-core",
+ "strum",
+ "toml",
 ]
 
 [[package]]
@@ -4514,6 +4528,7 @@ dependencies = [
  "diesel",
  "dotenv",
  "easyenv",
+ "enums",
  "futures 0.1.31",
  "futures 0.3.17",
  "futures-util",
@@ -4843,7 +4858,6 @@ checksum = "cda74da7e1a664f795bb1f8a87ec406fb89a02522cf6e50620d016add6dbbf5c"
 name = "tokens"
 version = "0.0.1"
 dependencies = [
- "anyhow",
  "rand 0.8.4",
  "serde",
  "serde_derive",

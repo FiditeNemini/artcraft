@@ -14,12 +14,11 @@ use crate::validations::model_uploads::validate_model_title;
 use crate::validations::validate_idempotency_token_format::validate_idempotency_token_format;
 use database_queries::column_types::record_visibility::RecordVisibility;
 use database_queries::queries::media_uploads::insert_media_upload::{Args, insert_media_upload};
-use database_queries::tokens::Tokens;
+use enums::core::visibility::Visibility;
 use http_server_common::request::get_request_ip::get_request_ip;
 use http_server_common::response::serialize_as_json_error::serialize_as_json_error;
 use log::{info, warn, log};
 use regex::Regex;
-use reusable_types::db::enums::entity_visibility::EntityVisibility;
 use reusable_types::db::enums::generic_download_type::GenericDownloadType;
 use reusable_types::db::enums::media_upload_type::MediaUploadType;
 use reusable_types::db::payloads::MediaUploadDetails;
@@ -124,8 +123,8 @@ pub async fn upload_audio_handler(
 
   let creator_set_visibility = maybe_user_session
       .as_ref()
-      .map(|user_session| user_session.preferred_tts_result_visibility)
-      .unwrap_or(RecordVisibility::Public);
+      .map(|user_session| user_session.get_preferred_tts_result_visibility()) // TODO: We need a new type of visibility control.
+      .unwrap_or(Visibility::default());
 
   let ip_address = get_request_ip(&http_request);
 
@@ -152,7 +151,7 @@ pub async fn upload_audio_handler(
     maybe_creator_user_token: maybe_user_token.as_ref(),
     maybe_creator_anonymous_visitor_token: None,
     creator_ip_address: &ip_address,
-    creator_set_visibility: EntityVisibility::Public, // TODO: Combine these two types.
+    creator_set_visibility,
     maybe_creator_synthetic_id: None,
     mysql_pool: &server_state.mysql_pool,
   })

@@ -13,9 +13,6 @@ name = "tokens"
 path = "src/lib.rs"
 
 [dependencies]
-# Errors
-anyhow = "1.0.40"
-
 # Serialization
 serde = "1.0.125"
 serde_derive = "1.0.125"

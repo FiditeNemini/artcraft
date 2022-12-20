@@ -1,7 +1,9 @@
 //! tokens
+//!
 //! The purpose of this library is to have a strongly-typed primary/foreign key system.
 //! Every Database or Redis key will have a type here.
 //! Well known keys will have short identifiers (eg. "user" is prefixed with "U:")
+//!
 
 // Never allow these
 #![forbid(private_in_public)]

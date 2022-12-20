@@ -9,6 +9,7 @@ use crate::helpers::boolean_converters::{nullable_i8_to_optional_bool, i8_to_boo
 use log::warn;
 use sqlx::MySql;
 use sqlx::pool::PoolConnection;
+use enums::core::visibility::Visibility;
 use tokens::users::user::UserToken;
 
 pub struct SessionUserRecord {
@@ -70,6 +71,24 @@ impl SessionUserRecord {
   // TODO(bt, 2022-12-20): Convert all users of the bare record to using `UserToken`, then get rid of this method.
   pub fn get_strongly_typed_user_token(&self) -> UserToken {
     UserToken::new_from_str(&self.user_token)
+  }
+
+  // TODO(bt, 2022-12-20): Expunge RecordVisibility and EntityVisibility from the codebase.
+  pub fn get_preferred_tts_result_visibility(&self) -> Visibility {
+    match self.preferred_tts_result_visibility {
+      RecordVisibility::Public => Visibility::Public,
+      RecordVisibility::Hidden => Visibility::Hidden,
+      RecordVisibility::Private => Visibility::Private,
+    }
+  }
+
+  // TODO(bt, 2022-12-20): Expunge RecordVisibility and EntityVisibility from the codebase.
+  pub fn get_preferred_w2l_result_visibility(&self) -> Visibility {
+    match self.preferred_w2l_result_visibility {
+      RecordVisibility::Public => Visibility::Public,
+      RecordVisibility::Hidden => Visibility::Hidden,
+      RecordVisibility::Private => Visibility::Private,
+    }
   }
 }
 

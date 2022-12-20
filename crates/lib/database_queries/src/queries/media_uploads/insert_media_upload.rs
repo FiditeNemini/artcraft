@@ -1,6 +1,6 @@
 use anyhow::anyhow;
 use container_common::anyhow_result::AnyhowResult;
-use reusable_types::db::enums::entity_visibility::EntityVisibility;
+use enums::core::visibility::Visibility;
 use reusable_types::db::enums::media_upload_type::MediaUploadType;
 use reusable_types::db::payloads::MediaUploadDetails;
 use sqlx::MySqlPool;
@@ -28,7 +28,7 @@ pub struct Args <'a> {
   pub maybe_creator_user_token: Option<&'a UserToken>,
   pub maybe_creator_anonymous_visitor_token: Option<&'a str>,
   pub creator_ip_address: &'a str,
-  pub creator_set_visibility: EntityVisibility,
+  pub creator_set_visibility: Visibility,
 
   pub maybe_creator_synthetic_id: Option<u64>,
 
