@@ -355,7 +355,7 @@ function TopNav(props: Props) {
                     aria-labelledby="offcanvasNavbarLgDropdown-tts"
                   >
                     <li data-bs-toggle="offcanvas">
-                      <Link className="dropdown-item" to="/">
+                      <Link className="dropdown-item" to="/tts">
                         <FontAwesomeIcon icon={faVolumeUp} className="me-2" />
                         TTS
                       </Link>

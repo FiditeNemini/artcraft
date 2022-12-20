@@ -62,6 +62,7 @@ import { CheckoutSuccessPage } from "./premium/CheckoutSuccessPage";
 import { CheckoutCancelPage } from "./premium/CheckoutCancelPage";
 import { PortalSuccessPage } from "./premium/PortalSuccessPage";
 import { PrivacyPage } from "./about/privacy_page/PrivacyPage";
+import { LandingPage } from "./landing/LandingPage";
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -144,7 +145,9 @@ class PageContainer extends React.Component<Props, State> {
             logoutHandler={this.logout}
             sessionWrapper={this.props.sessionWrapper}
             querySessionCallback={this.props.querySessionAction}
-            querySessionSubscriptionsCallback={this.props.querySessionSubscriptionsAction}
+            querySessionSubscriptionsCallback={
+              this.props.querySessionSubscriptionsAction
+            }
           />
 
           <ScrollToTop />
@@ -162,7 +165,9 @@ class PageContainer extends React.Component<Props, State> {
               <LoginPage
                 sessionWrapper={this.props.sessionWrapper}
                 querySessionAction={this.props.querySessionAction}
-                querySessionSubscriptionsAction={this.props.querySessionSubscriptionsAction}
+                querySessionSubscriptionsAction={
+                  this.props.querySessionSubscriptionsAction
+                }
               />
             </Route>
 
@@ -251,7 +256,9 @@ class PageContainer extends React.Component<Props, State> {
             <Route path="/tts/:token">
               <TtsModelViewPage
                 sessionWrapper={this.props.sessionWrapper}
-                sessionSubscriptionsWrapper={this.props.sessionSubscriptionsWrapper}
+                sessionSubscriptionsWrapper={
+                  this.props.sessionSubscriptionsWrapper
+                }
                 enqueueTtsJob={this.props.enqueueTtsJob}
                 ttsInferenceJobs={this.props.ttsInferenceJobs}
                 textBuffer={this.props.textBuffer}
@@ -428,7 +435,7 @@ class PageContainer extends React.Component<Props, State> {
               <VocodesPage />
             </Route>
 
-            <Route path="/">
+            <Route path="/tts">
               <TtsModelListPage
                 sessionWrapper={this.props.sessionWrapper}
                 sessionSubscriptionsWrapper={
@@ -474,6 +481,15 @@ class PageContainer extends React.Component<Props, State> {
                 setSelectedCategories={this.props.setSelectedCategories}
                 maybeSelectedTtsModel={this.props.maybeSelectedTtsModel}
                 setMaybeSelectedTtsModel={this.props.setMaybeSelectedTtsModel}
+              />
+            </Route>
+
+            <Route path="/">
+              <LandingPage
+                sessionWrapper={this.props.sessionWrapper}
+                sessionSubscriptionsWrapper={
+                  this.props.sessionSubscriptionsWrapper
+                }
               />
             </Route>
           </Switch>
