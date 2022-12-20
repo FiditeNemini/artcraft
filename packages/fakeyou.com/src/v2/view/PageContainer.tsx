@@ -63,6 +63,7 @@ import { CheckoutCancelPage } from "./premium/CheckoutCancelPage";
 import { PortalSuccessPage } from "./premium/PortalSuccessPage";
 import { PrivacyPage } from "./about/privacy_page/PrivacyPage";
 import { LandingPage } from "./landing/LandingPage";
+import { VcModelListPage } from "./vc/vc_model_list/VcModelListPage";
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -481,6 +482,15 @@ class PageContainer extends React.Component<Props, State> {
                 setSelectedCategories={this.props.setSelectedCategories}
                 maybeSelectedTtsModel={this.props.maybeSelectedTtsModel}
                 setMaybeSelectedTtsModel={this.props.setMaybeSelectedTtsModel}
+              />
+            </Route>
+
+            <Route path="/voice-conversion">
+              <VcModelListPage
+                sessionWrapper={this.props.sessionWrapper}
+                sessionSubscriptionsWrapper={
+                  this.props.sessionSubscriptionsWrapper
+                }
               />
             </Route>
 
