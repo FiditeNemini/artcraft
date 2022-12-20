@@ -6,7 +6,15 @@ import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapp
 import { SessionSubscriptionsWrapper } from "@storyteller/components/src/session/SessionSubscriptionsWrapper";
 import { t } from "i18next";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faUsers, faStar } from "@fortawesome/free-solid-svg-icons";
+import {
+  faUsers,
+  faStar,
+  faShapes,
+  faMicrophoneAlt,
+  faPaintBrush,
+  faPersonRunning,
+  faMusic,
+} from "@fortawesome/free-solid-svg-icons";
 import { faDiscord, faTwitter } from "@fortawesome/free-brands-svg-icons";
 
 interface Props {
@@ -59,13 +67,13 @@ function LandingPage(props: Props) {
           </motion.h1>
         </div>
         <div>
-          <motion.p className="lead mw-lead mb-3" variants={item}>
+          <motion.p className="lead mw-lead mb-3 px-2" variants={item}>
             Use FakeYou deep fake technology to say stuff with your favorite
             characters.
           </motion.p>
         </div>
         <motion.div
-          className="d-flex flex-column flex-md-row gap-3 justify-content-center justify-content-lg-start my-4"
+          className="d-flex flex-column flex-md-row gap-3 justify-content-center my-4 w-100"
           variants={item}
         >
           {upgradeButton}
@@ -93,7 +101,7 @@ function LandingPage(props: Props) {
         <div className="row pt-5 gy-5">
           <div className="col-12 col-md-6 text-center">
             <Link
-              to="tts"
+              to="/tts"
               className="w-100 d-flex flex-column align-items-center"
             >
               <div className="panel p-3 p-lg-4 mt-5 mt-lg-0 panel-select">
@@ -111,7 +119,7 @@ function LandingPage(props: Props) {
           </div>
           <div className="col-12 col-md-6 text-center">
             <Link
-              to="vc"
+              to="/voice-conversion"
               className="w-100 d-flex flex-column align-items-center"
             >
               <div className="panel p-3 p-lg-4 mt-5 mt-lg-0 panel-select">
@@ -122,10 +130,71 @@ function LandingPage(props: Props) {
                 />
                 <h2 className="fw-bold text-white">Voice Conversion</h2>
                 <h6 className="fw-normal opacity-75 text-white">
-                  Speak as someone else
+                  Speak as your favorite characters
                 </h6>
               </div>
             </Link>
+          </div>
+        </div>
+        <div className="text-center mt-2 mt-lg-5">
+          <Link
+            to="/video"
+            className="w-100 d-flex flex-column align-items-center"
+          >
+            <div className="panel p-3 p-lg-4 mt-5 mt-lg-0 panel-select">
+              <h3 className="fw-bold text-white">Lip Sync Video</h3>
+              <h6 className="fw-normal opacity-75 text-white">
+                Generate lip sync videos with your audio
+              </h6>
+            </div>
+          </Link>
+        </div>
+      </motion.div>
+
+      <motion.div className="container-panel my-5 py-5" variants={panel}>
+        <div className="d-flex flex-column align-items-center text-center">
+          <motion.h1 className="fw-bold lh-2 mb-3 zi-2" variants={item}>
+            <FontAwesomeIcon icon={faShapes} className="me-3" />
+            Upcoming Features
+          </motion.h1>
+          <motion.p className="lead mb-5" variants={item}>
+            Some of our features coming soon...
+          </motion.p>
+        </div>
+        <div className="d-flex justify-content-center">
+          <div className="panel p-3 p-md-4 d-flex flex-column align-items-center justify-content-center">
+            <div className="row gy-4">
+              <div className="col-12 col-md-6">
+                <h6 className="fw-normal text-white mb-0 d-flex align-items-center justify-content-center">
+                  <FontAwesomeIcon
+                    icon={faMicrophoneAlt}
+                    className="fs-4 me-3"
+                  />
+                  Voice Conversion App
+                </h6>
+              </div>
+              <div className="col-12 col-md-6">
+                <h6 className="fw-normal text-white mb-0 d-flex align-items-center justify-content-center">
+                  <FontAwesomeIcon icon={faPaintBrush} className="fs-4 me-3" />
+                  Concept Art Generation
+                </h6>
+              </div>
+              <div className="col-12 col-md-6">
+                <h6 className="fw-normal text-white mb-0 d-flex align-items-center justify-content-center">
+                  <FontAwesomeIcon
+                    icon={faPersonRunning}
+                    className="fs-4 me-3"
+                  />
+                  3D Animation
+                </h6>
+              </div>
+              <div className="col-12 col-md-6">
+                <h6 className="fw-normal text-white mb-0 d-flex align-items-center justify-content-center">
+                  <FontAwesomeIcon icon={faMusic} className="fs-4 me-3" />
+                  Music Generation
+                </h6>
+              </div>
+            </div>
           </div>
         </div>
       </motion.div>

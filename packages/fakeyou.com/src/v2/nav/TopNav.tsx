@@ -18,6 +18,7 @@ import {
   faLaptop,
   faBook,
   faStar,
+  faMicrophoneLines,
 } from "@fortawesome/free-solid-svg-icons";
 import { faDiscord, faPatreon } from "@fortawesome/free-brands-svg-icons";
 import { Logout } from "@storyteller/components/src/api/session/Logout";
@@ -358,6 +359,16 @@ function TopNav(props: Props) {
                       <Link className="dropdown-item" to="/tts">
                         <FontAwesomeIcon icon={faVolumeUp} className="me-2" />
                         TTS
+                      </Link>
+                    </li>
+                    <li data-bs-toggle="offcanvas">
+                      <Link className="dropdown-item" to="/voice-conversion">
+                        <FontAwesomeIcon
+                          icon={faMicrophoneLines}
+                          className="me-2"
+                        />
+                        {"  "}
+                        Voice Conversion
                       </Link>
                     </li>
                     <li data-bs-toggle="offcanvas">

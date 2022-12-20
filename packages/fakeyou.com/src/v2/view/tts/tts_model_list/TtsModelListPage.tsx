@@ -48,6 +48,7 @@ import { motion } from "framer-motion";
 import { container, panel } from "../../../../data/animation";
 import { SessionSubscriptionsWrapper } from "@storyteller/components/src/session/SessionSubscriptionsWrapper";
 import { TtsPageHero } from "./TtsPageHero";
+import { BackLink } from "../../_common/BackLink";
 
 export interface EnqueueJobResponsePayload {
   success: boolean;
@@ -307,7 +308,6 @@ function TtsModelListPage(props: Props) {
     }
   }
 
-
   // NB: If the text is too long, don't allow submission
   let remainingCharactersButtonDisabled = props.textBuffer.trim().length > 1024;
 
@@ -323,7 +323,7 @@ function TtsModelListPage(props: Props) {
 
       {twitchTtsNotice}
 
-      <TtsPageHero 
+      <TtsPageHero
         sessionWrapper={props.sessionWrapper}
         sessionSubscriptionsWrapper={props.sessionSubscriptionsWrapper}
       />
@@ -401,6 +401,10 @@ function TtsModelListPage(props: Props) {
             </div>
           </div>
         </div>
+
+        <div className="pt-5">
+          <BackLink link="/" text="Back to main page" />
+        </div>
       </motion.div>
 
       <SessionTtsInferenceResultListFc
@@ -419,7 +423,6 @@ function TtsModelListPage(props: Props) {
       <SessionTtsModelUploadResultListFc
         modelUploadJobs={props.ttsModelUploadJobs}
       />
-      <br />
     </motion.div>
   );
 }
