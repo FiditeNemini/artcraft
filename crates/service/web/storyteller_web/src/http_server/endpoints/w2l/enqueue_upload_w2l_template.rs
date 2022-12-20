@@ -1,21 +1,20 @@
-use actix_http::Error;
-use actix_http::http::header;
-use actix_web::HttpResponseBuilder;
-use actix_web::cookie::Cookie;
+// NB: Incrementally getting rid of build warnings...
+#![forbid(unused_imports)]
+#![forbid(unused_mut)]
+#![forbid(unused_variables)]
+
 use actix_web::error::ResponseError;
 use actix_web::http::StatusCode;
-use actix_web::{Responder, web, HttpResponse, error, HttpRequest};
+use actix_web::{web, HttpResponse, HttpRequest};
 use config::is_bad_video_download_url::is_bad_video_download_url;
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::server_state::ServerState;
 use crate::validations::model_uploads::validate_model_title;
 use database_queries::tokens::Tokens;
+use enums::core::visibility::Visibility;
 use http_server_common::request::get_request_ip::get_request_ip;
-use log::{info, warn, log};
-use regex::Regex;
-use sqlx::error::DatabaseError;
+use log::{info, warn};
 use sqlx::error::Error::Database;
-use sqlx::mysql::MySqlDatabaseError;
 use std::fmt;
 use std::sync::Arc;
 use user_input_common::check_for_slurs::contains_slurs;
@@ -30,24 +29,13 @@ pub enum W2lTemplateType {
   Image,
 }
 
-#[deprecated(note = "Use `RecordVisibility` instead!")]
-#[derive(Deserialize)]
-pub enum CreatorSetVisibility {
-  /// public
-  Public,
-  /// hidden
-  Hidden,
-  /// private
-  Private,
-}
-
 #[derive(Deserialize)]
 pub struct UploadW2lTemplateRequest {
   idempotency_token: String,
   title: String,
   download_url: String,
   template_type: Option<W2lTemplateType>,
-  creator_set_visibility: Option<CreatorSetVisibility>,
+  creator_set_visibility: Option<Visibility>,
 }
 
 #[derive(Serialize)]
@@ -147,7 +135,7 @@ pub async fn upload_w2l_template_handler(
 
   // This token is returned to the client.
   let job_token = Tokens::new_w2l_template_upload_job()
-    .map_err(|e| {
+    .map_err(|_e| {
       warn!("Error creating token");
       UploadW2lTemplateError::ServerError
     })?;
@@ -190,7 +178,7 @@ SET
       // NB: MySQL Error Code 1062: Duplicate key insertion (this is harder to access)
       match err {
         Database(err) => {
-          let maybe_code = err.code().map(|c| c.into_owned());
+          let _maybe_code = err.code().map(|c| c.into_owned());
           /*match maybe_code.as_deref() {
             Some("23000") => {
               if err.message().contains("username") {
@@ -223,7 +211,7 @@ SET
   };
 
   let body = serde_json::to_string(&response)
-    .map_err(|e| UploadW2lTemplateError::ServerError)?;
+    .map_err(|_e| UploadW2lTemplateError::ServerError)?;
 
   Ok(HttpResponse::Ok()
     .content_type("application/json")
