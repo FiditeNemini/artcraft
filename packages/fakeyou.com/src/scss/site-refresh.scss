@@ -54,7 +54,6 @@ styles with important tags:
   .btn:active,
   .btn.focus {
     outline: 0px !important;
-    -webkit-appearance: none;
     box-shadow: none !important;
   }
 
@@ -637,6 +636,43 @@ input {
   color: $white !important;
 }
 
+.img-product {
+  &.img-tts {
+    margin-top: -100px;
+    max-height: 240px;
+  }
+
+  &.img-vc {
+    margin-top: -100px;
+    max-height: 240px;
+  }
+}
+
+.index-title {
+  line-height: 5;
+}
+
+.panel-select {
+  transition: 0.2s all;
+  cursor: pointer;
+  border-radius: 8px !important;
+  max-width: 512px;
+  border-width: 3px !important;
+
+  &:hover {
+    border-color: $primary !important;
+  }
+}
+
+.mw-lead {
+  max-width: 480px;
+}
+
+.zi-2 {
+  position: relative;
+  z-index: 2;
+}
+
 @media (min-width: 992px) {
   .fakeyou-refresh {
     .panel {
@@ -688,6 +724,16 @@ input {
 
     .video-card {
       min-height: 220px;
+    }
+
+    .img-product {
+      &.img-tts {
+        max-height: 300px;
+      }
+
+      &.img-vc {
+        max-height: 300px;
+      }
     }
   }
 }
