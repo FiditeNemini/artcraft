@@ -9,9 +9,9 @@ use actix_web::web::Path;
 use actix_web::{web, HttpResponse, HttpRequest};
 use chrono::{DateTime, Utc};
 use crate::server_state::ServerState;
-use database_queries::column_types::record_visibility::RecordVisibility;
 use database_queries::column_types::vocoder_type::VocoderType;
 use database_queries::queries::tts::tts_models::get_tts_model::get_tts_model_by_token_using_connection;
+use enums::core::visibility::Visibility;
 use http_server_common::response::serialize_as_json_error::serialize_as_json_error;
 use log::warn;
 use std::fmt;
@@ -80,7 +80,7 @@ pub struct TtsModelInfo {
 
   pub maybe_suggested_unique_bot_command: Option<String>,
 
-  pub creator_set_visibility: RecordVisibility,
+  pub creator_set_visibility: Visibility,
 
   pub is_locked_from_use: bool,
   pub is_locked_from_user_modification: bool,

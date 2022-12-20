@@ -11,11 +11,11 @@ use container_common::i18n::supported_languages_for_models::get_canonicalized_la
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::http_server::web_utils::response_success_helpers::simple_json_success;
 use crate::server_state::ServerState;
-use database_queries::column_types::record_visibility::RecordVisibility;
 use database_queries::column_types::vocoder_type::VocoderType;
 use database_queries::queries::tts::tts_models::edit_tts_model_details::{edit_tts_model_details_as_author, edit_tts_model_details_as_mod};
 use database_queries::queries::tts::tts_models::edit_tts_model_moderator_details::edit_tts_model_moderator_details;
 use database_queries::queries::tts::tts_models::get_tts_model::get_tts_model_by_token;
+use enums::core::visibility::Visibility;
 use http_server_common::request::get_request_ip::get_request_ip;
 use language_tags::LanguageTag;
 use log::{info, warn, error};
@@ -193,7 +193,7 @@ pub async fn edit_tts_model_handler(
   let mut ietf_language_tag = None;
   let mut ietf_primary_language_subtag = None;
 
-  let mut creator_set_visibility = RecordVisibility::Public;
+  let mut creator_set_visibility = Visibility::Public;
   let mut maybe_default_pretrained_vocoder =
       model_record.maybe_default_pretrained_vocoder
           .clone();
@@ -248,7 +248,7 @@ pub async fn edit_tts_model_handler(
       .unwrap_or(DEFAULT_IETF_PRIMARY_LANGUAGE_SUBTAG.to_string());
 
   if let Some(visibility) = request.creator_set_visibility.as_deref() {
-    creator_set_visibility = RecordVisibility::from_str(visibility)
+    creator_set_visibility = Visibility::from_str(visibility)
         .map_err(|_| EditTtsModelError::BadInput("bad record visibility".to_string()))?;
   }
 

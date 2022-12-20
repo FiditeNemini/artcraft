@@ -10,8 +10,8 @@ use actix_web::{web, HttpResponse, HttpRequest};
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::http_server::web_utils::response_success_helpers::simple_json_success;
 use crate::server_state::ServerState;
-use database_queries::column_types::record_visibility::RecordVisibility;
 use database_queries::queries::w2l::w2l_templates::get_w2l_template::select_w2l_template_by_token;
+use enums::core::visibility::Visibility;
 use http_server_common::request::get_request_ip::get_request_ip;
 use log::{info, warn};
 use sqlx::MySqlPool;
@@ -145,7 +145,7 @@ pub async fn edit_w2l_template_handler(
   let mut title = None;
   let mut description_markdown = None;
   let mut description_html = None;
-  let mut creator_set_visibility = RecordVisibility::Public;
+  let mut creator_set_visibility = Visibility::Public;
 
   if let Some(payload) = request.title.as_deref() {
     if contains_slurs(payload) {
@@ -168,7 +168,7 @@ pub async fn edit_w2l_template_handler(
   }
 
   if let Some(visibility) = request.creator_set_visibility.as_deref() {
-    creator_set_visibility = RecordVisibility::from_str(visibility)
+    creator_set_visibility = Visibility::from_str(visibility)
         .map_err(|_| EditW2lTemplateError::BadInput("bad record visibility".to_string()))?;
   }
 

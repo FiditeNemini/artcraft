@@ -4,12 +4,11 @@
 
 use anyhow::anyhow;
 use container_common::anyhow_result::AnyhowResult;
-use crate::column_types::record_visibility::RecordVisibility;
 use crate::helpers::boolean_converters::{nullable_i8_to_optional_bool, i8_to_bool, nullable_i8_to_bool_default_false};
+use enums::core::visibility::Visibility;
 use log::warn;
 use sqlx::MySql;
 use sqlx::pool::PoolConnection;
-use enums::core::visibility::Visibility;
 use tokens::users::user::UserToken;
 
 pub struct SessionUserRecord {
@@ -30,8 +29,8 @@ pub struct SessionUserRecord {
 
   pub disable_gravatar: bool,
   pub auto_play_audio_preference: Option<bool>,
-  pub preferred_tts_result_visibility: RecordVisibility,
-  pub preferred_w2l_result_visibility: RecordVisibility,
+  pub preferred_tts_result_visibility: Visibility,
+  pub preferred_w2l_result_visibility: Visibility,
   pub auto_play_video_preference: Option<bool>,
 
   // ===== ROLE ===== //
@@ -72,24 +71,6 @@ impl SessionUserRecord {
   pub fn get_strongly_typed_user_token(&self) -> UserToken {
     UserToken::new_from_str(&self.user_token)
   }
-
-  // TODO(bt, 2022-12-20): Expunge RecordVisibility and EntityVisibility from the codebase.
-  pub fn get_preferred_tts_result_visibility(&self) -> Visibility {
-    match self.preferred_tts_result_visibility {
-      RecordVisibility::Public => Visibility::Public,
-      RecordVisibility::Hidden => Visibility::Hidden,
-      RecordVisibility::Private => Visibility::Private,
-    }
-  }
-
-  // TODO(bt, 2022-12-20): Expunge RecordVisibility and EntityVisibility from the codebase.
-  pub fn get_preferred_w2l_result_visibility(&self) -> Visibility {
-    match self.preferred_w2l_result_visibility {
-      RecordVisibility::Public => Visibility::Public,
-      RecordVisibility::Hidden => Visibility::Hidden,
-      RecordVisibility::Private => Visibility::Private,
-    }
-  }
 }
 
 pub async fn get_user_session_by_token(
@@ -116,8 +97,8 @@ SELECT
     users.disable_gravatar,
     users.auto_play_audio_preference,
     users.auto_play_video_preference,
-    users.preferred_tts_result_visibility as `preferred_tts_result_visibility: crate::column_types::record_visibility::RecordVisibility`,
-    users.preferred_w2l_result_visibility as `preferred_w2l_result_visibility: crate::column_types::record_visibility::RecordVisibility`,
+    users.preferred_tts_result_visibility as `preferred_tts_result_visibility: enums::core::visibility::Visibility`,
+    users.preferred_w2l_result_visibility as `preferred_w2l_result_visibility: enums::core::visibility::Visibility`,
 
     users.user_role_slug,
     users.is_banned,
@@ -238,8 +219,8 @@ struct SessionUserRawDbRecord {
   disable_gravatar: i8,
   auto_play_audio_preference: Option<i8>,
   auto_play_video_preference: Option<i8>,
-  preferred_tts_result_visibility: RecordVisibility,
-  preferred_w2l_result_visibility: RecordVisibility,
+  preferred_tts_result_visibility: Visibility,
+  preferred_w2l_result_visibility: Visibility,
 
   user_role_slug: String,
   is_banned: i8,

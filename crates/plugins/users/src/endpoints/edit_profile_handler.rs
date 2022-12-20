@@ -14,11 +14,11 @@ use crate::validations::validate_profile_github_username::validate_profile_githu
 use crate::validations::validate_profile_twitch_username::validate_profile_twitch_username;
 use crate::validations::validate_profile_twitter_username::{normalize_twitter_username_for_storage, validate_profile_twitter_username};
 use crate::validations::validate_profile_website_url::validate_profile_website_url;
-use database_queries::column_types::record_visibility::RecordVisibility;
 use database_queries::queries::users::user_profiles::edit_user_profile_as_account_holder::edit_user_profile_as_account_holder;
 use database_queries::queries::users::user_profiles::edit_user_profile_as_mod::edit_user_profile_as_mod;
 use database_queries::queries::users::user_profiles::get_user_profile_by_username::get_user_profile_by_username;
 use database_queries::queries::users::user_profiles::{edit_user_profile_as_account_holder, edit_user_profile_as_mod};
+use enums::core::visibility::Visibility;
 use http_server_common::request::get_request_ip::get_request_ip;
 use http_server_common::response::serialize_as_json_error::serialize_as_json_error;
 use log::warn;
@@ -47,8 +47,8 @@ pub struct EditProfileRequest {
   pub cashapp_username: Option<String>,
   pub website_url: Option<String>,
 
-  pub preferred_tts_result_visibility: Option<RecordVisibility>,
-  pub preferred_w2l_result_visibility: Option<RecordVisibility>,
+  pub preferred_tts_result_visibility: Option<Visibility>,
+  pub preferred_w2l_result_visibility: Option<Visibility>,
 }
 
 #[derive(Serialize)]
@@ -242,10 +242,10 @@ pub async fn edit_profile_handler(
   let ip_address = get_request_ip(&http_request);
 
   let preferred_tts_result_visibility = request.preferred_tts_result_visibility
-      .unwrap_or(RecordVisibility::Hidden);
+      .unwrap_or(Visibility::Hidden);
 
   let preferred_w2l_result_visibility = request.preferred_w2l_result_visibility
-      .unwrap_or(RecordVisibility::Hidden);
+      .unwrap_or(Visibility::Hidden);
 
   let query_result = if editor_is_original_user {
     edit_user_profile_as_account_holder(

@@ -6,9 +6,9 @@
 use anyhow::anyhow;
 use chrono::{DateTime, Utc};
 use container_common::anyhow_result::AnyhowResult;
-use crate::column_types::record_visibility::RecordVisibility;
 use crate::column_types::vocoder_type::VocoderType;
 use crate::helpers::boolean_converters::i8_to_bool;
+use enums::core::visibility::Visibility;
 use log::warn;
 use sqlx::pool::PoolConnection;
 use sqlx::{MySql, MySqlPool};
@@ -44,7 +44,7 @@ pub struct TtsModelRecord {
 
   pub maybe_suggested_unique_bot_command: Option<String>,
 
-  pub creator_set_visibility: RecordVisibility,
+  pub creator_set_visibility: Visibility,
 
   pub is_locked_from_use: bool,
   pub is_locked_from_user_modification: bool,
@@ -152,8 +152,8 @@ pub async fn get_tts_model_by_token_using_connection(
     is_front_page_featured: i8_to_bool(model.is_front_page_featured),
     is_twitch_featured: i8_to_bool(model.is_twitch_featured),
     maybe_suggested_unique_bot_command: model.maybe_suggested_unique_bot_command,
-    creator_set_visibility: RecordVisibility::from_str(&model.creator_set_visibility)
-        .unwrap_or(RecordVisibility::Public),
+    creator_set_visibility: Visibility::from_str(&model.creator_set_visibility)
+        .unwrap_or(Visibility::Public),
     is_locked_from_use: i8_to_bool(model.is_locked_from_use),
     is_locked_from_user_modification: i8_to_bool(model.is_locked_from_user_modification),
     created_at: model.created_at,

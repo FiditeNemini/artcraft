@@ -1,23 +1,19 @@
-use actix_http::Error;
-use actix_http::http::header;
-use actix_web::HttpResponseBuilder;
-use actix_web::cookie::Cookie;
+// NB: Incrementally getting rid of build warnings...
+#![forbid(unused_imports)]
+#![forbid(unused_mut)]
+#![forbid(unused_variables)]
+
 use actix_web::error::ResponseError;
 use actix_web::http::StatusCode;
-use actix_web::web::{Path, Json};
-use actix_web::{Responder, web, HttpResponse, error, HttpRequest};
+use actix_web::web::Path;
+use actix_web::{web, HttpResponse, HttpRequest};
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::http_server::web_utils::response_success_helpers::simple_json_success;
 use crate::server_state::ServerState;
-use database_queries::column_types::record_visibility::RecordVisibility;
 use database_queries::queries::w2l::w2l_results::query_w2l_result::select_w2l_result_by_token;
+use enums::core::visibility::Visibility;
 use http_server_common::request::get_request_ip::get_request_ip;
-use log::{info, warn, log};
-use regex::Regex;
-use sqlx::MySqlPool;
-use sqlx::error::DatabaseError;
-use sqlx::error::Error::Database;
-use sqlx::mysql::MySqlDatabaseError;
+use log::warn;
 use std::fmt;
 use std::sync::Arc;
 
@@ -107,7 +103,7 @@ pub async fn edit_w2l_inference_result_handler(
     &server_state.mysql_pool
   ).await;
 
-  let mut inference_result = match inference_result_query_result {
+  let inference_result = match inference_result_query_result {
     Err(e) => {
       warn!("query error: {:?}", e);
       return Err(EditW2lResultError::ServerError);
@@ -129,10 +125,10 @@ pub async fn edit_w2l_inference_result_handler(
 
   // Author + Mod fields.
   // These fields must be present on all requests.
-  let mut creator_set_visibility = RecordVisibility::Public;
+  let mut creator_set_visibility = Visibility::Public;
 
   if let Some(visibility) = request.creator_set_visibility.as_deref() {
-    creator_set_visibility = RecordVisibility::from_str(visibility)
+    creator_set_visibility = Visibility::from_str(visibility)
         .map_err(|_| EditW2lResultError::BadInput("bad record visibility".to_string()))?;
   }
 

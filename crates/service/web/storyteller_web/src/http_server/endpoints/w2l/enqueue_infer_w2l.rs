@@ -1,22 +1,19 @@
-use actix_http::Error;
-use actix_http::http::header;
-use actix_web::HttpResponseBuilder;
-use actix_web::cookie::Cookie;
+// NB: Incrementally getting rid of build warnings...
+#![forbid(unused_imports)]
+#![forbid(unused_mut)]
+#![forbid(unused_variables)]
+
 use actix_web::error::ResponseError;
 use actix_web::http::StatusCode;
-use actix_web::{Responder, web, HttpResponse, error, HttpRequest};
+use actix_web::{web, HttpResponse, HttpRequest};
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::server_state::ServerState;
-use crate::validations::model_uploads::validate_model_title;
-use database_queries::column_types::record_visibility::RecordVisibility;
+use enums::core::visibility::Visibility;
 use http_server_common::request::get_request_ip::get_request_ip;
-use log::{info, warn, log};
+use log::{info, warn};
 use r2d2_redis::redis::Commands;
 use redis_common::redis_keys::RedisKeys;
-use regex::Regex;
-use sqlx::error::DatabaseError;
 use sqlx::error::Error::Database;
-use sqlx::mysql::MySqlDatabaseError;
 use std::fmt;
 use std::sync::Arc;
 
@@ -24,7 +21,7 @@ use std::sync::Arc;
 pub struct InferW2lRequest {
   w2l_template_token: Option<String>,
   tts_inference_result_token: Option<String>,
-  creator_set_visibility: Option<RecordVisibility>,
+  creator_set_visibility: Option<Visibility>,
 }
 
 #[derive(Serialize)]
@@ -93,7 +90,7 @@ pub async fn infer_w2l_handler(
   //  return Err(InferW2lError::RateLimited);
   //}
 
-  let mut maybe_user_token : Option<String> = maybe_session
+  let maybe_user_token : Option<String> = maybe_session
     .as_ref()
     .map(|user_session| user_session.user_token.to_string());
 
@@ -176,7 +173,7 @@ SET
       // NB: MySQL Error Code 1062: Duplicate key insertion (this is harder to access)
       match err {
         Database(err) => {
-          let maybe_code = err.code().map(|c| c.into_owned());
+          let _maybe_code = err.code().map(|c| c.into_owned());
           /*match maybe_code.as_deref() {
             Some("23000") => {
               if err.message().contains("username") {
@@ -201,7 +198,7 @@ SET
   };
 
   let body = serde_json::to_string(&response)
-    .map_err(|e| InferW2lError::ServerError)?;
+    .map_err(|_e| InferW2lError::ServerError)?;
 
   Ok(HttpResponse::Ok()
     .content_type("application/json")

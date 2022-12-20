@@ -1,5 +1,5 @@
 use chrono::{DateTime, Utc};
-use database_queries::column_types::record_visibility::RecordVisibility;
+use enums::core::visibility::Visibility;
 
 #[derive(Clone, Default)]
 pub struct UserSessionExtended {
@@ -54,8 +54,8 @@ impl Default for UserSessionSubscriptionPlan {
 pub struct UserSessionPreferences {
     pub disable_gravatar: bool,
     pub auto_play_audio_preference: Option<bool>,
-    pub preferred_tts_result_visibility: RecordVisibility,
-    pub preferred_w2l_result_visibility: RecordVisibility,
+    pub preferred_tts_result_visibility: Visibility,
+    pub preferred_w2l_result_visibility: Visibility,
     pub auto_play_video_preference: Option<bool>,
 }
 

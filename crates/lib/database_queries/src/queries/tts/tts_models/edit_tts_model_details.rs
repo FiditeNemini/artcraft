@@ -1,5 +1,5 @@
-use crate::column_types::record_visibility::RecordVisibility;
 use crate::column_types::vocoder_type::VocoderType;
+use enums::core::visibility::Visibility;
 use sqlx::MySqlPool;
 use sqlx::mysql::MySqlQueryResult;
 use sqlx;
@@ -12,7 +12,7 @@ pub async fn edit_tts_model_details_as_author(
   description_html: Option<&str>,
   ietf_language_tag: &str,
   ietf_primary_language_subtag: &str,
-  creator_set_visibility: RecordVisibility,
+  creator_set_visibility: Visibility,
   maybe_default_pretrained_vocoder: Option<VocoderType>,
   maybe_custom_vocoder_token: Option<&str>,
   text_pipeline_type: Option<&str>,
@@ -62,7 +62,7 @@ pub async fn edit_tts_model_details_as_mod(
   description_html: Option<&str>,
   ietf_language_tag: &str,
   ietf_primary_language_subtag: &str,
-  creator_set_visibility: RecordVisibility,
+  creator_set_visibility: Visibility,
   maybe_default_pretrained_vocoder: Option<VocoderType>,
   maybe_custom_vocoder_token: Option<&str>,
   text_pipeline_type: Option<&str>,

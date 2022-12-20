@@ -1,23 +1,22 @@
-use actix_http::http::header;
-use actix_multipart::{Multipart, Field};
-use actix_web::HttpResponseBuilder;
-use actix_web::body::ResponseBody::Body;
+// NB: Incrementally getting rid of build warnings...
+#![forbid(unused_imports)]
+#![forbid(unused_mut)]
+#![forbid(unused_variables)]
+
+use actix_multipart::Multipart;
 use actix_web::http::StatusCode;
-use actix_web::http::header::ContentDisposition;
-use actix_web::web::{Data, Json, BytesMut};
-use actix_web::{middleware, web, App, Error, HttpResponse, HttpServer, HttpRequest, Either, ResponseError};
+use actix_web::web::BytesMut;
+use actix_web::{web, HttpResponse, HttpRequest, ResponseError};
 use anyhow::anyhow;
 use container_common::anyhow_result::AnyhowResult;
 use container_common::token::random_uuid::generate_random_uuid;
 use crate::http_server::web_utils::read_multipart_field_bytes::checked_read_multipart_bytes;
-use crate::http_server::web_utils::read_multipart_field_bytes::read_multipart_field_as_boolean;
 use crate::http_server::web_utils::read_multipart_field_bytes::read_multipart_field_as_text;
-use crate::http_server::web_utils::read_multipart_field_bytes::read_multipart_field_bytes;
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::server_state::ServerState;
-use database_queries::column_types::record_visibility::RecordVisibility;
 use database_queries::tokens::Tokens;
-use futures::{StreamExt, TryStreamExt};
+use enums::core::visibility::Visibility;
+use futures::TryStreamExt;
 use http_server_common::request::get_request_ip::get_request_ip;
 use log::{warn, info};
 use r2d2_redis::redis::Commands;
@@ -25,7 +24,6 @@ use redis_common::redis_keys::RedisKeys;
 use sqlx::MySqlPool;
 use sqlx::error::Error::Database;
 use std::fmt;
-use std::io::Write;
 use std::sync::Arc;
 use storage_buckets_common::bucket_paths::hash_to_bucket_path;
 
@@ -127,16 +125,16 @@ pub async fn enqueue_infer_w2l_with_uploads(
 
   // ==================== SESSION DETAILS ==================== //
 
-  let mut maybe_user_token : Option<String> = maybe_session
+  let maybe_user_token : Option<String> = maybe_session
     .as_ref()
     .map(|user_session| user_session.user_token.to_string());
 
-  let maybe_user_preferred_visibility : Option<RecordVisibility> = maybe_session
+  let maybe_user_preferred_visibility : Option<Visibility> = maybe_session
       .as_ref()
       .map(|user_session| user_session.preferred_tts_result_visibility);
 
   let set_visibility = maybe_user_preferred_visibility
-      .unwrap_or(RecordVisibility::Public);
+      .unwrap_or(Visibility::Public);
 
   info!("Enqueue infer w2l by user token: {:?}", maybe_user_token);
 
@@ -279,7 +277,7 @@ pub async fn enqueue_infer_w2l_with_uploads(
 
   // This token is returned to the client.
   let job_token = Tokens::new_w2l_inference_job()
-    .map_err(|e| {
+    .map_err(|_e| {
       warn!("Error creating token");
       InferW2lWithUploadError::ServerError
     })?;
@@ -320,7 +318,7 @@ SET
     .execute(&server_state.mysql_pool)
     .await;
 
-  let record_id = match query_result {
+  let _record_id = match query_result {
     Ok(res) => {
       res.last_insert_id()
     },
@@ -331,7 +329,7 @@ SET
       // NB: MySQL Error Code 1062: Duplicate key insertion (this is harder to access)
       match err {
         Database(err) => {
-          let maybe_code = err.code().map(|c| c.into_owned());
+          let _maybe_code = err.code().map(|c| c.into_owned());
           /*match maybe_code.as_deref() {
             Some("23000") => {
               if err.message().contains("username") {
@@ -363,7 +361,7 @@ SET
   };
 
   let body = serde_json::to_string(&response)
-    .map_err(|e| InferW2lWithUploadError::ServerError)?;
+    .map_err(|_e| InferW2lWithUploadError::ServerError)?;
 
   Ok(HttpResponse::Ok()
     .content_type("application/json")
@@ -391,7 +389,7 @@ WHERE
     .await; // TODO: This will return error if it doesn't exist
 
   let record_exists = match maybe_template {
-    Ok(record) => {
+    Ok(_record) => {
       true
     },
     Err(err) => {

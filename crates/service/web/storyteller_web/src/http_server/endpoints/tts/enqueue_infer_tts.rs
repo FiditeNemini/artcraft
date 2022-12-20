@@ -1,29 +1,28 @@
-use actix_http::Error;
-use actix_http::http::header;
-use actix_web::HttpResponseBuilder;
-use actix_web::cookie::Cookie;
+// NB: Incrementally getting rid of build warnings...
+#![forbid(unused_imports)]
+#![forbid(unused_mut)]
+#![forbid(unused_variables)]
+
 use actix_web::error::ResponseError;
 use actix_web::http::StatusCode;
-use actix_web::{Responder, web, HttpResponse, error, HttpRequest};
+use actix_web::{web, HttpResponse, HttpRequest};
+use crate::configs::plans::get_correct_plan_for_session::get_correct_plan_for_session;
 use crate::http_server::endpoints::investor_demo::demo_cookie::request_has_demo_cookie;
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::server_state::ServerState;
-use crate::validations::model_uploads::validate_model_title;
-use database_queries::column_types::record_visibility::RecordVisibility;
 use database_queries::queries::tts::tts_inference_jobs::insert_tts_inference_job::TtsInferenceJobInsertBuilder;
 use database_queries::tokens::Tokens;
+use enums::core::visibility::Visibility;
 use http_server_common::request::get_request_api_token::get_request_api_token;
 use http_server_common::request::get_request_header_optional::get_request_header_optional;
 use http_server_common::request::get_request_ip::get_request_ip;
-use log::{info, warn, log};
+use log::{info, warn};
 use r2d2_redis::redis::Commands;
 use redis_common::redis_keys::RedisKeys;
-use regex::Regex;
 use std::fmt;
 use std::sync::Arc;
-use tts_common::priority::{FAKEYOU_LOGGED_IN_PRIORITY_LEVEL, FAKEYOU_ANONYMOUS_PRIORITY_LEVEL, FAKEYOU_INVESTOR_PRIORITY_LEVEL, FAKEYOU_DEFAULT_VALID_API_TOKEN_PRIORITY_LEVEL};
+use tts_common::priority::{FAKEYOU_INVESTOR_PRIORITY_LEVEL, FAKEYOU_DEFAULT_VALID_API_TOKEN_PRIORITY_LEVEL};
 use user_input_common::check_for_slurs::contains_slurs;
-use crate::configs::plans::get_correct_plan_for_session::get_correct_plan_for_session;
 
 // TODO: Temporary for investor demo
 const STORYTELLER_DEMO_COOKIE_NAME : &'static str = "storyteller_demo";
@@ -37,7 +36,7 @@ pub struct InferTtsRequest {
   uuid_idempotency_token: String,
   tts_model_token: String,
   inference_text: String,
-  creator_set_visibility: Option<RecordVisibility>,
+  creator_set_visibility: Option<Visibility>,
   is_storyteller_demo: Option<bool>,
 }
 
@@ -238,17 +237,17 @@ pub async fn infer_tts_handler(
 
   let ip_address = get_request_ip(&http_request);
 
-  let maybe_user_preferred_visibility : Option<RecordVisibility> = maybe_user_session
+  let maybe_user_preferred_visibility : Option<Visibility> = maybe_user_session
       .as_ref()
       .map(|user_session| user_session.preferences.preferred_tts_result_visibility);
 
   let set_visibility = request.creator_set_visibility
       .or(maybe_user_preferred_visibility)
-      .unwrap_or(RecordVisibility::Public);
+      .unwrap_or(Visibility::Public);
 
   // This token is returned to the client.
   let job_token = Tokens::new_tts_inference_job()
-      .map_err(|e| {
+      .map_err(|_e| {
         warn!("Error creating token");
         InferTtsError::ServerError
       })?;
@@ -291,7 +290,7 @@ pub async fn infer_tts_handler(
   };
 
   let body = serde_json::to_string(&response)
-    .map_err(|e| InferTtsError::ServerError)?;
+    .map_err(|_e| InferTtsError::ServerError)?;
 
   Ok(HttpResponse::Ok()
     .content_type("application/json")
