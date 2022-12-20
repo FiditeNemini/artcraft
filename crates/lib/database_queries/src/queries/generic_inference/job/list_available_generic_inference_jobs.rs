@@ -4,7 +4,7 @@ use container_common::anyhow_result::AnyhowResult;
 use crate::column_types::job_status::JobStatus;
 use crate::helpers::boolean_converters::i8_to_bool;
 use crate::queries::generic_inference::job::_keys::GenericInferenceJobId;
-use reusable_types::db::enums::entity_visibility::EntityVisibility;
+use enums::core::visibility::Visibility;
 use reusable_types::db::enums::generic_inference_type::GenericInferenceType;
 use sqlx::MySqlPool;
 use std::path::Path;
@@ -25,7 +25,7 @@ pub struct AvailableInferenceJob {
   // User information to propagate downstream
   pub maybe_creator_user_token: Option<String>,
   pub creator_ip_address: String,
-  pub creator_set_visibility: EntityVisibility,
+  pub creator_set_visibility: Visibility,
 
   // Job information
   pub status: JobStatus,
@@ -58,7 +58,7 @@ SELECT
 
   maybe_creator_user_token,
   creator_ip_address,
-  creator_set_visibility as `creator_set_visibility: reusable_types::db::enums::entity_visibility::EntityVisibility`,
+  creator_set_visibility as `creator_set_visibility: enums::core::visibility::Visibility`,
 
   status as `status: crate::column_types::job_status::JobStatus`,
 
@@ -135,7 +135,7 @@ struct AvailableInferenceJobRawInternal {
   // User information to propagate downstream
   pub maybe_creator_user_token: Option<String>,
   pub creator_ip_address: String,
-  pub creator_set_visibility: EntityVisibility,
+  pub creator_set_visibility: Visibility,
 
   // Job information
   pub status: JobStatus,

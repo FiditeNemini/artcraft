@@ -12,11 +12,11 @@ use crate::validations::model_uploads::validate_model_title;
 use crate::validations::validate_idempotency_token_format::validate_idempotency_token_format;
 use database_queries::queries::generic_download::web::insert_generic_download_job::{Args, insert_generic_download_job};
 use database_queries::tokens::Tokens;
+use enums::core::visibility::Visibility;
 use http_server_common::request::get_request_ip::get_request_ip;
 use http_server_common::response::serialize_as_json_error::serialize_as_json_error;
 use log::{info, warn, log};
 use regex::Regex;
-use reusable_types::db::enums::entity_visibility::EntityVisibility;
 use reusable_types::db::enums::generic_download_type::GenericDownloadType;
 use sqlx::error::DatabaseError;
 use sqlx::error::Error::Database;
@@ -35,7 +35,7 @@ pub struct EnqueueGenericDownloadRequest {
   /// Not all upload types will have an associated visibility, so supplying this is optional.
   /// If an upload type supports it and it is not supplied, assume a reasonable default or user
   /// setting.
-  creator_set_visibility: Option<EntityVisibility>,
+  creator_set_visibility: Option<Visibility>,
 }
 
 #[derive(Serialize)]
@@ -107,7 +107,7 @@ pub async fn enqueue_generic_download_handler(
   let download_url = request.download_url.trim().to_string();
 
   let creator_set_visibility = request.creator_set_visibility
-      .unwrap_or(EntityVisibility::Public);
+      .unwrap_or(Visibility::Public);
 
   if let Err(reason) = validate_idempotency_token_format(&uuid) {
     return Err(EnqueueGenericDownloadError::BadInput(reason));

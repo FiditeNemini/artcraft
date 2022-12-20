@@ -1,6 +1,6 @@
 use anyhow::anyhow;
 use container_common::anyhow_result::AnyhowResult;
-use reusable_types::db::enums::entity_visibility::EntityVisibility;
+use enums::core::visibility::Visibility;
 use reusable_types::db::enums::generic_inference_type::GenericInferenceType;
 use sqlx::MySqlPool;
 use tokens::jobs::inference::InferenceJobToken;
@@ -16,7 +16,7 @@ pub struct Args <'a> {
 
   pub maybe_creator_user_token: Option<&'a str>,
   pub creator_ip_address: &'a str,
-  pub creator_set_visibility: EntityVisibility,
+  pub creator_set_visibility: Visibility,
 
   pub mysql_pool: &'a MySqlPool,
 }

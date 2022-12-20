@@ -1,6 +1,6 @@
 use anyhow::anyhow;
 use container_common::anyhow_result::AnyhowResult;
-use reusable_types::db::enums::entity_visibility::EntityVisibility;
+use enums::core::visibility::Visibility;
 use reusable_types::db::enums::generic_download_type::GenericDownloadType;
 use sqlx::MySqlPool;
 use tokens::jobs::download::DownloadJobToken;
@@ -13,7 +13,7 @@ pub struct Args <'a> {
   pub title: &'a str,
   pub creator_user_token: &'a str,
   pub creator_ip_address: &'a str,
-  pub creator_set_visibility: EntityVisibility,
+  pub creator_set_visibility: Visibility,
   pub mysql_pool: &'a MySqlPool,
 }
 

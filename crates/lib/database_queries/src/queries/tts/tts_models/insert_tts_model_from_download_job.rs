@@ -3,7 +3,7 @@ use chrono::Utc;
 use container_common::anyhow_result::AnyhowResult;
 use crate::queries::generic_download::job::list_available_generic_download_jobs::AvailableDownloadJob;
 use crate::tokens::Tokens;
-use reusable_types::db::enums::entity_visibility::EntityVisibility;
+use enums::core::visibility::Visibility;
 use sqlx::MySqlPool;
 use std::path::Path;
 
@@ -16,7 +16,7 @@ pub struct Args<'a, P: AsRef<Path>> {
 
   pub creator_user_token: &'a str,
   pub creator_ip_address: &'a str,
-  pub creator_set_visibility: EntityVisibility,
+  pub creator_set_visibility: Visibility,
 
   pub private_bucket_hash: &'a str,
   pub private_bucket_object_name: P,

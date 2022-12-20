@@ -18,6 +18,7 @@ path = "src/main.rs"
 config = { path = "../../../lib/config" }
 container_common = { path = "../../../lib/container_common" }
 database_queries = { path = "../../../lib/database_queries" }
+enums = { path = "../../../types/enums" }
 google_drive_common = { path = "../../../lib/google_drive_common" }
 jobs_common = { path = "../../../lib/jobs_common" }
 reusable_types = { path = "../../../types/reusable_types" }

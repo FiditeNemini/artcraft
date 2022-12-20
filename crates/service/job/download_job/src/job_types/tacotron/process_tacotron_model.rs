@@ -9,9 +9,9 @@ use crate::job_steps::job_results::JobResults;
 use database_queries::queries::generic_download::job::list_available_generic_download_jobs::AvailableDownloadJob;
 use database_queries::queries::tts::tts_models::insert_tts_model_from_download_job::insert_tts_model_from_download_job;
 use database_queries::queries::tts::tts_models::insert_tts_model_from_download_job;
+use enums::core::visibility::Visibility;
 use jobs_common::redis_job_status_logger::RedisJobStatusLogger;
 use log::{info, warn};
-use reusable_types::db::enums::entity_visibility::EntityVisibility;
 use std::fs::File;
 use std::io::Read;
 use std::path::PathBuf;
@@ -103,7 +103,7 @@ pub async fn process_tacotron_model<'a, 'b>(
     file_size_bytes: file_metadata.file_size_bytes,
     creator_user_token: &job.creator_user_token,
     creator_ip_address: &job.creator_ip_address,
-    creator_set_visibility: EntityVisibility::Public, // TODO: All models default to public at start
+    creator_set_visibility: Visibility::Public, // TODO: All models default to public at start
     private_bucket_hash: &private_bucket_hash,
     private_bucket_object_name: &model_bucket_path,
     mysql_pool: &job_state.mysql_pool,

@@ -11,8 +11,8 @@ use chrono::{DateTime, Utc};
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::server_state::ServerState;
 use database_queries::queries::vocoder::get_vocoder_model::get_vocoder_model_by_token;
+use enums::core::visibility::Visibility;
 use log::warn;
-use reusable_types::db::enums::entity_visibility::EntityVisibility;
 use reusable_types::db::enums::vocoder_type::VocoderType;
 use std::fmt;
 use std::sync::Arc;
@@ -49,7 +49,7 @@ pub struct Vocoder {
   pub creator_display_name: String,
   pub creator_gravatar_hash: String,
 
-  pub creator_set_visibility: EntityVisibility,
+  pub creator_set_visibility: Visibility,
 
   pub created_at: DateTime<Utc>,
   pub updated_at: DateTime<Utc>,
