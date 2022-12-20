@@ -5,6 +5,7 @@ pub mod events;
 pub mod flags;
 pub mod investor_demo;
 pub mod leaderboard;
+pub mod media_uploads;
 pub mod misc;
 pub mod moderation;
 pub mod service;

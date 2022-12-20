@@ -21,6 +21,7 @@ use crate::http_server::endpoints::flags::design_refresh_flag::enable_design_ref
 use crate::http_server::endpoints::investor_demo::disable_demo_mode_handler::disable_demo_mode_handler;
 use crate::http_server::endpoints::investor_demo::enable_demo_mode_handler::enable_demo_mode_handler;
 use crate::http_server::endpoints::leaderboard::get_leaderboard::leaderboard_handler;
+use crate::http_server::endpoints::media_uploads::upload_audio::upload_audio_handler;
 use crate::http_server::endpoints::misc::default_route_404::default_route_404;
 use crate::http_server::endpoints::misc::detect_locale_handler::detect_locale_handler;
 use crate::http_server::endpoints::misc::enable_alpha_easy_handler::enable_alpha_easy_handler;
@@ -37,6 +38,7 @@ use crate::http_server::endpoints::moderation::ip_bans::list_ip_bans::list_ip_ba
 use crate::http_server::endpoints::moderation::jobs::get_tts_inference_queue_count::get_tts_inference_queue_count_handler;
 use crate::http_server::endpoints::moderation::jobs::get_w2l_inference_queue_count::get_w2l_inference_queue_count_handler;
 use crate::http_server::endpoints::moderation::jobs::kill_tts_inference_jobs::kill_tts_inference_jobs_handler;
+use crate::http_server::endpoints::moderation::stats::get_on_prem_worker_stats::get_on_prem_worker_stats_handler;
 use crate::http_server::endpoints::moderation::stats::get_voice_count_stats::get_voice_count_stats_handler;
 use crate::http_server::endpoints::moderation::user_bans::ban_user::ban_user_handler;
 use crate::http_server::endpoints::moderation::user_bans::list_banned_users::list_banned_users_handler;
@@ -97,7 +99,6 @@ use crate::http_server::endpoints::w2l::set_w2l_template_mod_approval::set_w2l_t
 use users_component::default_routes::add_suggested_api_v1_account_creation_and_session_routes;
 use users_component::endpoints::edit_profile_handler::edit_profile_handler;
 use users_component::endpoints::get_profile_handler::get_profile_handler;
-use crate::http_server::endpoints::moderation::stats::get_on_prem_worker_stats::get_on_prem_worker_stats_handler;
 
 pub fn add_routes<T, B> (app: App<T, B>) -> App<T, B>
   where
@@ -122,7 +123,8 @@ pub fn add_routes<T, B> (app: App<T, B>) -> App<T, B>
   app = add_twitch_routes(app); /* /twitch */ // TODO: MAYBE TEMPORARY
   app = add_investor_demo_routes(app); /* /demo_mode */ // TODO: DEFINITELY TEMPORARY
   app = add_flag_routes(app); /* /flag */
-  app = add_desktop_app_routes(app); /* /api/v1/vc/... */
+  app = add_desktop_app_routes(app); /* /v1/vc/... */
+  app = add_media_upload_routes(app); /* /v1/media_upload/... */
 
   // From components
   app = add_suggested_api_v1_account_creation_and_session_routes(app); // /create_account, /session, /login, /logout
@@ -774,6 +776,27 @@ fn add_desktop_app_routes<T, B> (app: App<T, B>) -> App<T, B>
             .route(web::head().to(|| HttpResponse::Ok()))
         )
     )
+}
+
+// ==================== MEDIA UPLOAD ROUTES ====================
+
+fn add_media_upload_routes<T, B> (app: App<T, B>) -> App<T, B>
+  where
+      B: MessageBody,
+      T: ServiceFactory<
+        ServiceRequest,
+        Config = (),
+        Response = ServiceResponse<B>,
+        Error = Error,
+        InitError = (),
+      >,
+{
+  app.service(web::scope("/v1/media_upload")
+      .service(web::resource("/upload_audio")
+          .route(web::post().to(upload_audio_handler))
+          .route(web::head().to(|| HttpResponse::Ok()))
+      )
+  )
 }
 
 // ==================== TWITCH ROUTES ====================

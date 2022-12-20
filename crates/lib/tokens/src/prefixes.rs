@@ -15,6 +15,7 @@ use strum::EnumIter;
 pub(crate) enum EntityType {
   DownloadJob,
   InferenceJob,
+  MediaUpload,
   User,
   VoiceConversionModel,
 }
@@ -25,6 +26,7 @@ impl EntityType {
     match self {
       Self::DownloadJob => "jdown_", // NB: Was "JGUP:"
       Self::InferenceJob => "jinf_",
+      Self::MediaUpload => "mu_",
       Self::User => "U:", // NB: Old-style prefix.
       Self::VoiceConversionModel => "voco_",
     }

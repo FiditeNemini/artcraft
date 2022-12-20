@@ -60,6 +60,8 @@ CREATE TABLE media_uploads (
 
   -- ========== UPLOAD, TRANSCODING, AND TRUNCATION DETAILS ==========
 
+  -- TODO(bt, 2022-12-20): Before landing, rename this field be better and indicate this
+  --  is a *directory*. Add a second field to contain the default file name.
   -- The directory this media is uploaded to will be exclusive for this file.
   -- Only this given record will live in this bucket, but the directory may include
   -- other transcodings or truncations.

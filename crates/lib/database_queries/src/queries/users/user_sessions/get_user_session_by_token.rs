@@ -9,9 +9,10 @@ use crate::helpers::boolean_converters::{nullable_i8_to_optional_bool, i8_to_boo
 use log::warn;
 use sqlx::MySql;
 use sqlx::pool::PoolConnection;
+use tokens::users::user::UserToken;
 
 pub struct SessionUserRecord {
-  pub user_token: String,
+  pub user_token: String, // TODO(bt, 2022-12-20): Convert to strongly-typed `UserToken`
   pub username: String,
   pub display_name: String,
 
@@ -63,6 +64,13 @@ pub struct SessionUserRecord {
   pub can_delete_other_users_w2l_results: bool,
   pub can_ban_users: bool,
   pub can_delete_users: bool,
+}
+
+impl SessionUserRecord {
+  // TODO(bt, 2022-12-20): Convert all users of the bare record to using `UserToken`, then get rid of this method.
+  pub fn get_strongly_typed_user_token(&self) -> UserToken {
+    UserToken::new_from_str(&self.user_token)
+  }
 }
 
 pub async fn get_user_session_by_token(
