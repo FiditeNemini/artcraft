@@ -5,6 +5,7 @@ use actix_web::HttpResponseBuilder;
 use actix_web::cookie::Cookie;
 use actix_web::error::ResponseError;
 use actix_web::http::StatusCode;
+use actix_web::web::BytesMut;
 use actix_web::{Responder, web, HttpResponse, error, HttpRequest};
 use config::bad_urls::is_bad_tts_model_download_url;
 use crate::http_server::endpoints::media_uploads::drain_multipart_request::drain_multipart_request;
@@ -14,20 +15,25 @@ use crate::validations::model_uploads::validate_model_title;
 use crate::validations::validate_idempotency_token_format::validate_idempotency_token_format;
 use database_queries::queries::media_uploads::insert_media_upload::{Args, insert_media_upload};
 use enums::core::visibility::Visibility;
+use enums::files::media_upload_type::MediaUploadType;
+use files_common::hash::hash_bytes_sha2;
+use files_common::mimetype::{get_mimetype_for_bytes, get_mimetype_for_bytes_or_default};
 use http_server_common::request::get_request_ip::get_request_ip;
 use http_server_common::response::serialize_as_json_error::serialize_as_json_error;
 use log::{info, warn, log};
 use regex::Regex;
 use reusable_types::db::enums::generic_download_type::GenericDownloadType;
-use enums::files::media_upload_type::MediaUploadType;
 use reusable_types::db::payloads::MediaUploadDetails;
 use sqlx::error::DatabaseError;
 use sqlx::error::Error::Database;
 use sqlx::mysql::MySqlDatabaseError;
 use std::fmt;
+use std::io::{BufReader, Cursor};
 use std::sync::Arc;
-use files_common::hash::hash_bytes_sha2;
-use files_common::mimetype::{get_mimetype_for_bytes, get_mimetype_for_bytes_or_default};
+use symphonia::core::formats::FormatOptions;
+use symphonia::core::io::{MediaSourceStream, ReadOnlySource};
+use symphonia::core::meta::MetadataOptions;
+use symphonia::core::probe::Hint;
 use tokens::files::media_upload::MediaUploadToken;
 
 #[derive(Serialize)]
@@ -153,13 +159,65 @@ pub async fn upload_audio_handler(
     Some(hash) => hash,
   };
 
+  let bytes = match upload_media_request.file_bytes {
+    None => return Err(UploadAudioError::BadInput("invalid file".to_string())),
+    Some(bytes) => bytes,
+  };
+
+  let mut maybe_duration_millis = None;
+
+  if let Some(mimetype) = maybe_mimetype.as_deref() {
+    match mimetype {
+      "audio/x-wav" => {
+        // FIXME(bt, 2022-12-21): Ugh.
+        let bytes = bytes.to_vec();
+        let reader = Cursor::new(bytes);
+        let source = ReadOnlySource::new(reader);
+        let mss = MediaSourceStream::new(Box::new(source), Default::default());
+
+        // Create a probe hint using the file's extension. [Optional]
+        let mut hint = Hint::new();
+        hint.mime_type(mimetype);
+
+        // Use the default options for metadata and format readers.
+        let meta_opts: MetadataOptions = Default::default();
+        let fmt_opts: FormatOptions = Default::default();
+
+        // Probe the media source.
+        let probed = symphonia::default::get_probe()
+            .format(&hint, mss, &fmt_opts, &meta_opts)
+            .map_err(|e| {
+              warn!("Invalid format: {:?}", e);
+              UploadAudioError::BadInput("bad file".to_string())
+            })?;
+
+        let format = probed.format;
+
+        let duration = format.default_track()
+            .map(|track| {
+              let timebase= track.codec_params.time_base.unwrap();
+              let n_frames = track.codec_params.n_frames.unwrap();
+              timebase.calc_time(n_frames)
+            })
+            .unwrap();
+
+        let duration_millis = duration.seconds * 1000;
+        let frac_millis = (duration.frac * 1000.0).trunc() as u64;
+        let duration_millis = duration_millis + frac_millis;
+
+        maybe_duration_millis = Some(duration_millis);
+      }
+      _ => {}
+    }
+  }
+
   let record_id = insert_media_upload(Args {
     token: &token,
     uuid_idempotency_token: &uuid_idempotency_token,
     media_type: MediaUploadType::Audio,
     maybe_original_filename: upload_media_request.file_name.as_deref(),
     original_file_size_bytes: 0,
-    original_duration_millis: 0,
+    maybe_original_duration_millis: maybe_duration_millis,
     maybe_original_mime_type: maybe_mimetype,
     maybe_original_audio_encoding: None,
     maybe_original_video_encoding: None,
