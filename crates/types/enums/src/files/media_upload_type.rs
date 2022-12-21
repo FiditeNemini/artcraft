@@ -8,10 +8,16 @@ use sqlx_core::encode::IsNull;
 use sqlx_core::error::BoxDynError;
 use sqlx_core::mysql::{MySql, MySqlTypeInfo, MySqlValueRef};
 
+#[cfg(test)]
+use strum::EnumCount;
+#[cfg(test)]
+use strum::EnumIter;
+
 /// Used in the `media_uploads` table in a `VARCHAR` field.
 ///
 /// DO NOT CHANGE VALUES WITHOUT A MIGRATION STRATEGY.
-#[derive(Clone, Copy, Eq, PartialEq, Debug, Deserialize, Serialize)]
+#[cfg_attr(test, derive(EnumIter, EnumCount))]
+#[derive(Clone, Copy, Eq, PartialEq, Deserialize, Serialize)]
 #[serde(rename_all = "lowercase")]
 pub enum MediaUploadType {
   /// Audio files: wav, mp3, etc.
@@ -50,7 +56,7 @@ impl<'r> Decode<'r, MySql> for MediaUploadType {
   }
 }
 
-impl_string_enum!(MediaUploadType);
+impl_enum_display_and_debug_for_to_str!(MediaUploadType);
 
 /// NB: Legacy API for older code.
 impl MediaUploadType {

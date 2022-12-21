@@ -1,3 +1,8 @@
+#[cfg(test)]
+use strum::EnumCount;
+#[cfg(test)]
+use strum::EnumIter;
+
 /// Visibility
 ///
 /// Used in various database tables (as enums! careful!) and the HTTP API to convey
@@ -11,7 +16,8 @@
 ///
 /// *DO NOT CHANGE VALUES WITHOUT A MIGRATION STRATEGY!*
 ///
-#[derive(Clone, Copy, Eq, PartialEq, Debug, Deserialize, Serialize, sqlx::Type)]
+#[cfg_attr(test, derive(EnumIter, EnumCount))]
+#[derive(Clone, Copy, Eq, PartialEq, Deserialize, Serialize, sqlx::Type)]
 #[serde(rename_all = "lowercase")]
 #[sqlx(rename_all = "lowercase")]
 pub enum Visibility {
@@ -31,7 +37,7 @@ pub enum Visibility {
 }
 
 
-impl_string_enum!(Visibility);
+impl_enum_display_and_debug_for_to_str!(Visibility);
 
 // For reference, here's what the serde implementation might be if manually written.
 // This may be useful for designing composite types in the future:
