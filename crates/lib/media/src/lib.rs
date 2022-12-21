@@ -1,8 +1,7 @@
-//! files
+//! media
 //!
-//! The purpose of this library is to have a strongly-typed MySQL enum-type wrapper.
-//! This should also work for CHAR/VARCHAR fields that work similarly to enums (typically
-//! as part of a composite key)
+//! The purpose of this library is to package audio/video related functions together until they need
+//! to be split apart.
 //!
 
 // Never allow these
@@ -19,5 +18,4 @@
 #![allow(dead_code)]
 #![allow(non_snake_case)]
 
-pub mod hash;
-pub mod mimetype;
+pub mod decode_basic_audio_info;

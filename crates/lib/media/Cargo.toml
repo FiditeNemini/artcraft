@@ -1,0 +1,19 @@
+[package]
+name = "media"
+edition = "2018"
+version = "0.0.1"
+authors = [
+    "Brandon Thomas <bt@brand.io>",
+    "Brandon Thomas <echelon@gmail.com>",
+]
+publish = false
+
+[lib]
+name = "media" # NB: Public "media" crate was squatted, so we're good to use this name internally.
+path = "src/lib.rs"
+
+[dependencies]
+symphonia = "0.5.1" # Powerful audio decoder and demuxer
+
+[dev-dependencies]
+# None yet

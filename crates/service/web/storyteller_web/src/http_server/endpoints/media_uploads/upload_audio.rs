@@ -16,8 +16,8 @@ use crate::validations::validate_idempotency_token_format::validate_idempotency_
 use database_queries::queries::media_uploads::insert_media_upload::{Args, insert_media_upload};
 use enums::core::visibility::Visibility;
 use enums::files::media_upload_type::MediaUploadType;
-use files_common::hash::hash_bytes_sha2;
-use files_common::mimetype::{get_mimetype_for_bytes, get_mimetype_for_bytes_or_default};
+use files::hash::hash_bytes_sha2;
+use files::mimetype::{get_mimetype_for_bytes, get_mimetype_for_bytes_or_default};
 use http_server_common::request::get_request_ip::get_request_ip;
 use http_server_common::response::serialize_as_json_error::serialize_as_json_error;
 use log::{info, warn, log};
@@ -34,6 +34,7 @@ use symphonia::core::formats::FormatOptions;
 use symphonia::core::io::{MediaSourceStream, ReadOnlySource};
 use symphonia::core::meta::MetadataOptions;
 use symphonia::core::probe::Hint;
+use media::decode_basic_audio_info::decode_basic_audio_info;
 use tokens::files::media_upload::MediaUploadToken;
 
 #[derive(Serialize)]
@@ -170,6 +171,7 @@ pub async fn upload_audio_handler(
     match mimetype {
       "audio/x-wav" => {
         // FIXME(bt, 2022-12-21): Ugh.
+        /*
         let bytes = bytes.to_vec();
         let reader = Cursor::new(bytes);
         let source = ReadOnlySource::new(reader);
@@ -204,8 +206,15 @@ pub async fn upload_audio_handler(
         let duration_millis = duration.seconds * 1000;
         let frac_millis = (duration.frac * 1000.0).trunc() as u64;
         let duration_millis = duration_millis + frac_millis;
+         */
 
-        maybe_duration_millis = Some(duration_millis);
+        let basic_info = decode_basic_audio_info(bytes.as_ref(), Some(mimetype), None)
+            .map_err(|e| {
+              warn!("file decoding error: {:?}", e);
+              UploadAudioError::BadInput("could not decode file".to_string())
+            })?;
+
+        maybe_duration_millis = basic_info.duration_millis;
       }
       _ => {}
     }

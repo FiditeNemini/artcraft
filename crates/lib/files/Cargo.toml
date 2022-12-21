@@ -1,5 +1,5 @@
 [package]
-name = "files_common"
+name = "files"
 edition = "2018"
 version = "0.0.1"
 authors = [
@@ -9,7 +9,9 @@ authors = [
 publish = false
 
 [lib]
-name = "files_common"
+# NB: Public "files" crate is some CDN nonsense we'll never use, so we're good to
+# use this crate name internally.
+name = "files"
 path = "src/lib.rs"
 
 [dependencies]

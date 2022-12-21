@@ -1758,7 +1758,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "files_common"
+name = "files"
 version = "0.0.1"
 dependencies = [
  "data-encoding",
@@ -2855,6 +2855,13 @@ name = "md5"
 version = "0.7.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "490cc448043f947bae3cbee9c203358d62dbee0db12107a74be5c30ccfd09771"
+
+[[package]]
+name = "media"
+version = "0.0.1"
+dependencies = [
+ "symphonia",
+]
 
 [[package]]
 name = "memchr"
@@ -4571,7 +4578,7 @@ dependencies = [
  "dotenv",
  "easyenv",
  "enums",
- "files_common",
+ "files",
  "futures 0.1.31",
  "futures 0.3.17",
  "futures-util",
@@ -4593,6 +4600,7 @@ dependencies = [
  "lru_time_cache",
  "magic-crypt",
  "md-5",
+ "media",
  "memory_caching",
  "native-tls",
  "newrelic-telemetry",
