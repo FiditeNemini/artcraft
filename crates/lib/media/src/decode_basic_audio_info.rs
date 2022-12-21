@@ -1,3 +1,4 @@
+use errors::AnyhowResult;
 use std::io::Cursor;
 use symphonia::core::formats::FormatOptions;
 use symphonia::core::io::{MediaSourceStream, ReadOnlySource};
@@ -12,7 +13,7 @@ pub fn decode_basic_audio_info(
   audio_bytes: &[u8],
   maybe_mimetype: Option<&str>,
   maybe_extension: Option<&str>,
-) -> symphonia::core::errors::Result<BasicAudioInfo> {
+) -> AnyhowResult<BasicAudioInfo> {
 
   // FIXME(bt, 2022-12-21): This is horribly inefficient.
   let bytes = audio_bytes.to_vec();
@@ -38,20 +39,23 @@ pub fn decode_basic_audio_info(
 
   let format = probed.format;
 
-  // TODO: FIX
-  let duration = format.default_track()
+  let maybe_track_duration = format.default_track()
       .map(|track| {
-        let timebase= track.codec_params.time_base.unwrap();
-        let n_frames = track.codec_params.n_frames.unwrap();
-        timebase.calc_time(n_frames)
+        track.codec_params.time_base
+            .zip(track.codec_params.n_frames)
+            .map(|(time_base, n_frames)| {
+              // NB: This yields the duration of the track
+              time_base.calc_time(n_frames)
+            })
       })
-      .unwrap();
-
-  let duration_millis = duration.seconds * 1000;
-  let frac_millis = (duration.frac * 1000.0).trunc() as u64;
-  let duration_millis = duration_millis + frac_millis;
+      .flatten()
+      .map(|time| {
+        let duration_millis = time.seconds * 1000;
+        let frac_millis = (time.frac * 1000.0).trunc() as u64;
+        duration_millis + frac_millis
+      });
 
   Ok(BasicAudioInfo {
-    duration_millis: Some(duration_millis),
+    duration_millis: maybe_track_duration,
   })
 }

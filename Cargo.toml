@@ -19,6 +19,7 @@ members = [
   "crates/lib/config",
   "crates/lib/container_common",
   "crates/lib/database_queries",
+  "crates/lib/errors",
   "crates/lib/files",
   "crates/lib/google_drive_common",
   "crates/lib/http_server_common",

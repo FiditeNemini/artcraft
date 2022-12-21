@@ -1,5 +1,5 @@
 [package]
-name = "media"
+name = "errors"
 edition = "2018"
 version = "0.0.1"
 authors = [
@@ -9,16 +9,12 @@ authors = [
 publish = false
 
 [lib]
-name = "media" # NB: Public "media" crate was squatted, so we're good to use this name internally.
+# NB: Public "errors" crate is name-squatted, so we're fine to use this internally.
+name = "errors"
 path = "src/lib.rs"
 
 [dependencies]
-
-# Internal
-errors = { path = "../errors" }
-
-# External
-symphonia = "0.5.1" # Powerful audio decoder and demuxer
+anyhow = "1.0.40"
 
 [dev-dependencies]
 # None yet

@@ -1743,6 +1743,13 @@ dependencies = [
 ]
 
 [[package]]
+name = "errors"
+version = "0.0.1"
+dependencies = [
+ "anyhow",
+]
+
+[[package]]
 name = "event-listener"
 version = "2.5.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2860,6 +2867,7 @@ checksum = "490cc448043f947bae3cbee9c203358d62dbee0db12107a74be5c30ccfd09771"
 name = "media"
 version = "0.0.1"
 dependencies = [
+ "errors",
  "symphonia",
 ]
 
