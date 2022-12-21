@@ -1216,7 +1216,7 @@ dependencies = [
  "log",
  "once_cell",
  "rand 0.8.4",
- "ring 0.17.0-alpha.10",
+ "ring 0.17.0-alpha.11",
  "serde",
  "serde_json",
  "tempfile",
@@ -1426,9 +1426,9 @@ dependencies = [
 
 [[package]]
 name = "data-encoding"
-version = "2.3.2"
+version = "2.3.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "3ee2393c4a91429dffb4bedf19f4d6abf27d8a732c8ce4980305d782e5426d57"
+checksum = "23d8666cb01533c39dde32bcbab8e227b4ed6679b2c925eba05feabea39508fb"
 
 [[package]]
 name = "database-backup"
@@ -1749,7 +1749,9 @@ dependencies = [
 name = "files_common"
 version = "0.0.1"
 dependencies = [
+ "data-encoding",
  "infer 0.11.0",
+ "ring 0.17.0-alpha.11",
 ]
 
 [[package]]
@@ -2425,7 +2427,7 @@ dependencies = [
  "regex",
  "reqwest",
  "reusable_types",
- "ring 0.17.0-alpha.10",
+ "ring 0.17.0-alpha.11",
  "rust-s3",
  "serde",
  "serde_derive",
@@ -3869,9 +3871,9 @@ dependencies = [
 
 [[package]]
 name = "ring"
-version = "0.17.0-alpha.10"
+version = "0.17.0-alpha.11"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "55ae9a4d2975bdd8254d7bcdd2261be62b42b8920f903ec682b08cdc11b87af2"
+checksum = "4575a179070909595bea5f999d67934737c2e0757a1eb9839af555917817b257"
 dependencies = [
  "cc",
  "libc",
@@ -4590,7 +4592,7 @@ dependencies = [
  "regex",
  "reqwest",
  "reusable_types",
- "ring 0.17.0-alpha.10",
+ "ring 0.17.0-alpha.11",
  "rust-s3",
  "serde",
  "serde_derive",

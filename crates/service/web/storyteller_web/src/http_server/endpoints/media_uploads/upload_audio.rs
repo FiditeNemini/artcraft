@@ -26,6 +26,7 @@ use sqlx::error::Error::Database;
 use sqlx::mysql::MySqlDatabaseError;
 use std::fmt;
 use std::sync::Arc;
+use files_common::hash::hash_bytes_sha2;
 use files_common::mimetype::{get_mimetype_for_bytes, get_mimetype_for_bytes_or_default};
 use tokens::files::media_upload::MediaUploadToken;
 
@@ -138,6 +139,20 @@ pub async fn upload_audio_handler(
       .map(|bytes| get_mimetype_for_bytes(bytes.as_ref()))
       .flatten();
 
+  let maybe_hash = upload_media_request.file_bytes
+      .as_ref()
+      .map(|bytes| hash_bytes_sha2(bytes.as_ref()))
+      .transpose()
+      .map_err(|io_error| {
+        warn!("Problem hashing bytes: {:?}", io_error);
+        return UploadAudioError::ServerError;
+      })?;
+
+  let hash = match maybe_hash {
+    None => return Err(UploadAudioError::BadInput("invalid file".to_string())),
+    Some(hash) => hash,
+  };
+
   let record_id = insert_media_upload(Args {
     token: &token,
     uuid_idempotency_token: &uuid_idempotency_token,
@@ -150,7 +165,7 @@ pub async fn upload_audio_handler(
     maybe_original_video_encoding: None,
     maybe_original_frame_width: None,
     maybe_original_frame_height: None,
-    checksum_sha2: "",
+    checksum_sha2: &hash,
     public_bucket_directory_full_path: "",
     extra_file_modification_info: MediaUploadDetails {}, // TODO
     maybe_creator_user_token: maybe_user_token.as_ref(),

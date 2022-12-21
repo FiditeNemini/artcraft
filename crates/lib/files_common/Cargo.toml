@@ -13,8 +13,9 @@ name = "files_common"
 path = "src/lib.rs"
 
 [dependencies]
-# Mimetype detection
-infer = "0.11"
+data-encoding = "2.3.3" # base64, hex, etc.
+infer = "0.11" # Mimetype detection
+ring = "0.17.0-alpha.11" # Crypto
 
 [dev-dependencies]
 # None yet
