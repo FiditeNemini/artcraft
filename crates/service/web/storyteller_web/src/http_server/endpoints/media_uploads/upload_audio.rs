@@ -166,6 +166,7 @@ pub async fn upload_audio_handler(
   };
 
   let mut maybe_duration_millis = None;
+  let mut maybe_codec_name = None;
 
   if let Some(mimetype) = maybe_mimetype.as_deref() {
     match mimetype {
@@ -215,6 +216,7 @@ pub async fn upload_audio_handler(
             })?;
 
         maybe_duration_millis = basic_info.duration_millis;
+        maybe_codec_name = basic_info.codec_name;
       }
       _ => {}
     }
@@ -228,7 +230,7 @@ pub async fn upload_audio_handler(
     original_file_size_bytes: 0,
     maybe_original_duration_millis: maybe_duration_millis,
     maybe_original_mime_type: maybe_mimetype,
-    maybe_original_audio_encoding: None,
+    maybe_original_audio_encoding: maybe_codec_name.as_deref(),
     maybe_original_video_encoding: None,
     maybe_original_frame_width: None,
     maybe_original_frame_height: None,

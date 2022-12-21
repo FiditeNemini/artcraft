@@ -7,6 +7,7 @@ use symphonia::core::probe::Hint;
 
 pub struct BasicAudioInfo {
   pub duration_millis: Option<u64>,
+  pub codec_name: Option<String>,
 }
 
 pub fn decode_basic_audio_info(
@@ -55,7 +56,16 @@ pub fn decode_basic_audio_info(
         duration_millis + frac_millis
       });
 
+  let codec_registry = symphonia::default::get_codecs();
+
+  let maybe_codec_name = format.default_track()
+      .map(|track| track.codec_params.codec)
+      .map(|codec_type| codec_registry.get_codec(codec_type))
+      .flatten()
+      .map(|codec_descriptor| codec_descriptor.short_name.to_string());
+
   Ok(BasicAudioInfo {
     duration_millis: maybe_track_duration,
+    codec_name: maybe_codec_name,
   })
 }
