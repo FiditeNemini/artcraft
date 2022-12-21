@@ -1,7 +1,7 @@
 use anyhow::anyhow;
 use container_common::anyhow_result::AnyhowResult;
 use enums::core::visibility::Visibility;
-use reusable_types::db::enums::media_upload_type::MediaUploadType;
+use enums::files::media_upload_type::MediaUploadType;
 use reusable_types::db::payloads::MediaUploadDetails;
 use sqlx::MySqlPool;
 use tokens::files::media_upload::MediaUploadToken;
@@ -86,7 +86,7 @@ SET
         args.token,
         args.uuid_idempotency_token,
 
-        "audio", //  TODO: args.media_type,
+        args.media_type,
         /*args.maybe_original_filename,
         args.original_file_size_bytes,
         args.original_duration_millis,

@@ -21,6 +21,10 @@
 
 #[macro_use] extern crate serde_derive;
 
+#[macro_use]
+mod macros;
+
 #[cfg(test)] pub mod test_helpers;
 
 pub mod core;
+pub mod files;

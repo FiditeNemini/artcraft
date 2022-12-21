@@ -30,6 +30,33 @@ pub enum Visibility {
   //  have not yet been migrated to this scheme.
 }
 
+
+impl_string_enum!(Visibility);
+
+// For reference, here's what the serde implementation might be if manually written.
+// This may be useful for designing composite types in the future:
+//
+//   use serde::{Deserializer, Serializer};
+//
+//   impl serde::Serialize for UserToken {
+//     fn serialize<S: Serializer>(&self, serializer: S) -> Result<S::Ok, S::Error> {
+//       serializer.serialize_str(&self.0)
+//     }
+//   }
+//
+//   impl<'de> serde::Deserialize<'de> for UserToken {
+//     fn deserialize<D: Deserializer<'de>>(d: D) -> Result<Self, D::Error> {
+//       let s = String::deserialize(d)?;
+//       Ok(UserToken(s))
+//     }
+//   }
+
+//impl sqlx::Type<MySql> for Visibility {
+//  fn type_info() -> sqlx_core::database::TypeInfo<MySql> {
+//    todo!()
+//  }
+//}
+
 impl Default for Visibility {
   fn default() -> Self { Self::Public }
 }
@@ -85,6 +112,22 @@ mod tests {
     assert_eq!(Visibility::from_str("hidden").unwrap(), Visibility::Hidden);
     assert_eq!(Visibility::from_str("private").unwrap(), Visibility::Private);
     assert!(Visibility::from_str("foo").is_err());
+  }
+
+  mod traits {
+    use crate::core::visibility::Visibility;
+
+    #[test]
+    fn display() {
+      let visibility = Visibility::Hidden;
+      assert_eq!(format!("{}", visibility), "hidden".to_string());
+    }
+
+    #[test]
+    fn debug() {
+      let visibility = Visibility::Private;
+      assert_eq!(format!("{:?}", visibility), "private".to_string());
+    }
   }
 
   #[derive(Serialize, Deserialize, PartialEq, Debug)]
