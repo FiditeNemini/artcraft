@@ -19,6 +19,7 @@ pub enum MediaUploadType {
   Video,
 }
 
+// TODO(bt, 2022-12-21): This desperately needs MySQL integration tests!
 impl_enum_display_and_debug_using_to_str!(MediaUploadType);
 impl_enum_sqlx_coders!(MediaUploadType);
 

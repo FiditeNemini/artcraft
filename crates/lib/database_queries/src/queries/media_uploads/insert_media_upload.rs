@@ -36,33 +36,6 @@ pub struct Args <'a> {
 }
 
 pub async fn insert_media_upload(args: Args<'_>) -> AnyhowResult<u64> {
-
-  /*
-  maybe_original_filename = ?,
-  original_file_size_bytes = ?,
-  original_duration_millis = ?,
-  maybe_original_mime_type = ?,
-  maybe_original_audio_encoding = ?,
-  maybe_original_video_encoding = ?,
-  maybe_original_frame_width = ?,
-  maybe_original_frame_height = ?,
-
-
-
-      INSERT INTO
-      media_uploads
-    SET
-      token = 'foo',
-      uuid_idempotency_token = 'bar',
-      public_bucket_directory_full_path = 'asdf',
-      extra_file_modification_info = 'asdf',
-      maybe_creator_user_token = 'asdf',
-      maybe_creator_anonymous_visitor_token = 'asdf',
-      creator_ip_address = 'asdf',
-      creator_set_visibility = 'asdf',
-      maybe_creator_synthetic_id = 'asdf'
-
-   */
   let query = sqlx::query!(
         r#"
 INSERT INTO media_uploads
@@ -71,6 +44,14 @@ SET
   uuid_idempotency_token = ?,
 
   media_type = ?,
+  maybe_original_filename = ?,
+  original_file_size_bytes = ?,
+  original_duration_millis = ?,
+  maybe_original_mime_type = ?,
+  maybe_original_audio_encoding = ?,
+  maybe_original_video_encoding = ?,
+  maybe_original_frame_width = ?,
+  maybe_original_frame_height = ?,
   checksum_sha2 = ?,
 
   public_bucket_directory_full_path = ?,
@@ -87,14 +68,14 @@ SET
         args.uuid_idempotency_token,
 
         args.media_type,
-        /*args.maybe_original_filename,
+        args.maybe_original_filename,
         args.original_file_size_bytes,
         args.original_duration_millis,
         args.maybe_original_mime_type,
         args.maybe_original_audio_encoding,
         args.maybe_original_video_encoding,
         args.maybe_original_frame_width,
-        args.maybe_original_frame_height,*/
+        args.maybe_original_frame_height,
         args.checksum_sha2,
 
         args.public_bucket_directory_full_path,

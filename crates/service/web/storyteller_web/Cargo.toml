@@ -20,6 +20,7 @@ config = { path = "../../../lib/config" }
 container_common = { path = "../../../lib/container_common" }
 database_queries = { path = "../../../lib/database_queries" }
 enums = { path = "../../../types/enums" }
+files_common = { path = "../../../lib/files_common" }
 google_drive_common = { path = "../../../lib/google_drive_common" }
 http_server_common = { path = "../../../lib/http_server_common" }
 jobs_common = { path = "../../../lib/jobs_common" }

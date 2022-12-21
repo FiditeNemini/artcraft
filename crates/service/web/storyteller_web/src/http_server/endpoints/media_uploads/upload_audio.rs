@@ -26,6 +26,7 @@ use sqlx::error::Error::Database;
 use sqlx::mysql::MySqlDatabaseError;
 use std::fmt;
 use std::sync::Arc;
+use files_common::mimetype::{get_mimetype_for_bytes, get_mimetype_for_bytes_or_default};
 use tokens::files::media_upload::MediaUploadToken;
 
 #[derive(Serialize)]
@@ -132,6 +133,11 @@ pub async fn upload_audio_handler(
 
   let token = MediaUploadToken::generate();
 
+  let maybe_mimetype = upload_media_request.file_bytes
+      .as_ref()
+      .map(|bytes| get_mimetype_for_bytes(bytes.as_ref()))
+      .flatten();
+
   let record_id = insert_media_upload(Args {
     token: &token,
     uuid_idempotency_token: &uuid_idempotency_token,
@@ -139,7 +145,7 @@ pub async fn upload_audio_handler(
     maybe_original_filename: upload_media_request.file_name.as_deref(),
     original_file_size_bytes: 0,
     original_duration_millis: 0,
-    maybe_original_mime_type: None,
+    maybe_original_mime_type: maybe_mimetype,
     maybe_original_audio_encoding: None,
     maybe_original_video_encoding: None,
     maybe_original_frame_width: None,

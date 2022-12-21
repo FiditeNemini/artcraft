@@ -14,6 +14,7 @@ members = [
   "crates/lib/config",
   "crates/lib/container_common",
   "crates/lib/database_queries",
+  "crates/lib/files_common",
   "crates/lib/google_drive_common",
   "crates/lib/http_server_common",
   "crates/lib/jobs_common",
@@ -28,7 +29,7 @@ members = [
 
   # Types: common strongly-typed tokens, ids, payloads, etc.
   "crates/types/enums",
-  "crates/types/reusable_types",
+  "crates/types/reusable_types", # TODO(bt, 2022-12-21): Deprecate
   "crates/types/tokens",
 
   # Services: API servers, jobs, workers, etc.
