@@ -37,7 +37,7 @@ pub enum Visibility {
 }
 
 
-impl_enum_display_and_debug_for_to_str!(Visibility);
+impl_enum_display_and_debug_using_to_str!(Visibility);
 
 // For reference, here's what the serde implementation might be if manually written.
 // This may be useful for designing composite types in the future:
