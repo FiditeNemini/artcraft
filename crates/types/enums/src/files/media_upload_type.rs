@@ -1,51 +1,54 @@
-use sqlx::Type;
 use serde::Deserialize;
 use serde::Serialize;
+use sqlx::Decode;
+use sqlx::Encode;
+use sqlx::Type;
 use sqlx_core::database::HasArguments;
 use sqlx_core::encode::IsNull;
-use sqlx_core::mysql::MySql;
+use sqlx_core::error::BoxDynError;
+use sqlx_core::mysql::{MySql, MySqlTypeInfo, MySqlValueRef};
 
 /// Used in the `media_uploads` table in a `VARCHAR` field.
 ///
 /// DO NOT CHANGE VALUES WITHOUT A MIGRATION STRATEGY.
-//#[derive(Clone, Copy, Eq, PartialEq, Debug, Deserialize, Serialize, sqlx::Type)]
 #[derive(Clone, Copy, Eq, PartialEq, Debug, Deserialize, Serialize)]
 #[serde(rename_all = "lowercase")]
-//#[sqlx(rename_all = "lowercase")]
 pub enum MediaUploadType {
-  #[serde(rename = "audio")]
-  //#[sqlx(rename = "audio")]
+  /// Audio files: wav, mp3, etc.
   Audio,
-  #[serde(rename = "video")]
-  //#[sqlx(rename = "video")]
+  /// Video files: mp4, etc.
   Video,
 }
 
+// This overt approach is being taken because of the following error:
+// `MySqlDatabaseError { code: Some("HY000"), number: 1210, message: "Incorrect arguments to mysqld_stmt_execute" }`
+// Basically, sqlx can't turn our enum into a VARCHAR when using #[derive(sqlx::Type)].
+// We further lose the ability to `#[sqlx(rename_all="lowercase")]`, etc., so our encoder/decoder
+// need to set the rules.
 // Solution adapted from https://github.com/launchbadge/sqlx/discussions/1502
-impl Type<sqlx::MySql> for MediaUploadType {
-  fn type_info() -> sqlx::mysql::MySqlTypeInfo {
+impl Type<MySql> for MediaUploadType {
+  fn type_info() -> MySqlTypeInfo {
     String::type_info()
   }
 }
 
-
-impl<'q> sqlx::Encode<'q, sqlx::MySql> for MediaUploadType {
+impl<'q> Encode<'q, MySql> for MediaUploadType {
   fn encode_by_ref(&self, buf: &mut <MySql as HasArguments<'q>>::ArgumentBuffer) -> IsNull {
-    self.to_string().encode_by_ref(buf)
+    // NB: In the absence of `#[derive(sqlx::Type)]` and `#sqlx(rename_all="lowercase")]`,
+    // this controls the casing of the variants when sent to MySQL.
+    self.to_str().encode_by_ref(buf)
   }
 }
 
-impl<'r> sqlx::Decode<'r, sqlx::MySql> for MediaUploadType {
+impl<'r> Decode<'r, MySql> for MediaUploadType {
   fn decode(
-    value: sqlx::mysql::MySqlValueRef<'r>,
-  ) -> Result<Self, sqlx::error::BoxDynError> {
+    value: MySqlValueRef<'r>,
+  ) -> Result<Self, BoxDynError> {
     let string = String::decode(value)?;
     let value = MediaUploadType::from_str(&string)?;
-    //let value = string.parse()?;
     Ok(value)
   }
 }
-
 
 impl_string_enum!(MediaUploadType);
 
