@@ -1,6 +1,11 @@
 [workspace]
 
 members = [
+  # Types: common strongly-typed tokens, ids, payloads, etc.
+  "crates/_types/enums",
+  "crates/_types/reusable_types", # TODO(bt, 2022-12-21): Deprecate
+  "crates/_types/tokens",
+
   # CLI tools for operations, etc.
   "crates/cli/database_backup",
   "crates/cli/database_cleanup",
@@ -26,11 +31,6 @@ members = [
   "crates/lib/twitch_common",
   "crates/lib/url_config",
   "crates/lib/user_input_common",
-
-  # Types: common strongly-typed tokens, ids, payloads, etc.
-  "crates/types/enums",
-  "crates/types/reusable_types", # TODO(bt, 2022-12-21): Deprecate
-  "crates/types/tokens",
 
   # Services: API servers, jobs, workers, etc.
   "crates/service/job/download_job",

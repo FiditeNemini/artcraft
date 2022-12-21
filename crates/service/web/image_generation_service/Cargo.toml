@@ -24,7 +24,7 @@ http_server_common = { path = "../../../lib/http_server_common" }
 jobs_common = { path = "../../../lib/jobs_common" }
 memory_caching = { path = "../../../lib/memory_caching" }
 redis_common = { path = "../../../lib/redis_common" }
-reusable_types = { path = "../../../types/reusable_types" }
+reusable_types = { path = "../../../_types/reusable_types" }
 storage_buckets_common = { path = "../../../lib/storage_buckets_common" }
 tts_common = { path = "../../../lib/tts_common" }
 twitch_common = { path = "../../../lib/twitch_common" }
