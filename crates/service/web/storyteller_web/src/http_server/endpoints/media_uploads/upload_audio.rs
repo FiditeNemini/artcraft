@@ -165,6 +165,8 @@ pub async fn upload_audio_handler(
     Some(bytes) => bytes,
   };
 
+  let file_size_bytes = bytes.len();
+
   let mut maybe_duration_millis = None;
   let mut maybe_codec_name = None;
 
@@ -227,7 +229,7 @@ pub async fn upload_audio_handler(
     uuid_idempotency_token: &uuid_idempotency_token,
     media_type: MediaUploadType::Audio,
     maybe_original_filename: upload_media_request.file_name.as_deref(),
-    original_file_size_bytes: 0,
+    original_file_size_bytes: file_size_bytes as u64,
     maybe_original_duration_millis: maybe_duration_millis,
     maybe_original_mime_type: maybe_mimetype,
     maybe_original_audio_encoding: maybe_codec_name.as_deref(),
