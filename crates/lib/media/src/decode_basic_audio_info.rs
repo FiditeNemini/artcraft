@@ -69,3 +69,69 @@ pub fn decode_basic_audio_info(
     codec_name: maybe_codec_name,
   })
 }
+
+#[cfg(test)]
+mod tests {
+  use std::path::PathBuf;
+  use errors::AnyhowResult;
+  use crate::decode_basic_audio_info::decode_basic_audio_info;
+
+  fn test_file(root_file_path: &str) -> PathBuf {
+    // https://doc.rust-lang.org/cargo/reference/environment-variables.html
+    let mut path = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
+    path.push(format!("../../../{}", root_file_path));
+    path
+  }
+
+  #[test]
+  fn decode_flac_info() -> AnyhowResult<()> {
+    let path = test_file("test_data/audio/flac/zelda_ocarina_small_item.flac");
+    let bytes = std::fs::read(path)?;
+    let info = decode_basic_audio_info(&bytes, None, None)?;
+    assert_eq!(info.codec_name, Some("flac".to_string()));
+    assert_eq!(info.duration_millis, Some(5120));
+    Ok(())
+  }
+
+  // NB: Requires symphonia 'aac' and 'isomp4' feature flags
+  #[test]
+  fn decode_m4a_alac_info() -> AnyhowResult<()> {
+    let path = test_file("test_data/audio/m4a/super_mario_bros_lost_life.m4a");
+    let bytes = std::fs::read(path)?;
+    let info = decode_basic_audio_info(&bytes, None, None)?;
+    assert_eq!(info.codec_name, Some("alac".to_string()));
+    assert_eq!(info.duration_millis, Some(5493));
+    Ok(())
+  }
+
+  // NB: Requires symphonia 'mp3' feature flag
+  #[test]
+  fn decode_mp3_info() -> AnyhowResult<()> {
+    let path = test_file("test_data/audio/mp3/super_mario_rpg_beware_the_forests_mushrooms.mp3");
+    let bytes = std::fs::read(path)?;
+    let info = decode_basic_audio_info(&bytes, None, None)?;
+    assert_eq!(info.codec_name, Some("mp3".to_string()));
+    assert_eq!(info.duration_millis, Some(15023));
+    Ok(())
+  }
+
+  #[test]
+  fn decode_ogg_info() -> AnyhowResult<()> {
+    let path = test_file("test_data/audio/ogg/banjo-kazooie_jiggy_appearance.ogg");
+    let bytes = std::fs::read(path)?;
+    let info = decode_basic_audio_info(&bytes, None, None)?;
+    assert_eq!(info.codec_name, Some("vorbis".to_string()));
+    // assert_eq!(info.duration_millis, Some(5120)); // TODO/FIXME: No duration reported.
+    Ok(())
+  }
+
+  #[test]
+  fn decode_wav_info_pcm_s16le() -> AnyhowResult<()> {
+    let path = test_file("test_data/audio/wav/sm64_mario_its_me.wav");
+    let bytes = std::fs::read(path)?;
+    let info = decode_basic_audio_info(&bytes, None, None)?;
+    assert_eq!(info.codec_name, Some("pcm_s16le".to_string()));
+    assert_eq!(info.duration_millis, Some(1891));
+    Ok(())
+  }
+}

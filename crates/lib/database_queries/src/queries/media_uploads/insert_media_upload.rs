@@ -70,7 +70,7 @@ SET
         args.media_type,
         args.maybe_original_filename,
         args.original_file_size_bytes,
-        args.maybe_original_duration_millis,
+        args.maybe_original_duration_millis.unwrap_or(0),
         args.maybe_original_mime_type,
         args.maybe_original_audio_encoding,
         args.maybe_original_video_encoding,

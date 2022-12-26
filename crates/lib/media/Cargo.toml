@@ -18,7 +18,8 @@ path = "src/lib.rs"
 errors = { path = "../errors" }
 
 # External
-symphonia = "0.5.1" # Powerful audio decoder and demuxer
+log = "0.4.14"
+symphonia = { version = "0.5.1", features = ["aac", "alac", "mp3", "isomp4"] } # Powerful audio decoder and demuxer
 
 [dev-dependencies]
 # None yet
