@@ -64,6 +64,7 @@ COPY Cargo.toml .
 COPY sqlx-data.json .
 COPY crates/ ./crates
 COPY db/ ./db
+COPY test_data/ ./test_data
 
 # Run all of the tests
 RUN SQLX_OFFLINE=true \

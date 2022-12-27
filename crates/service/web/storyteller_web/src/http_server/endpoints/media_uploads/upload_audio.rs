@@ -169,31 +169,58 @@ pub async fn upload_audio_handler(
 
   let mut maybe_duration_millis = None;
   let mut maybe_codec_name = None;
+  let mut media_upload_type = None;
 
   if let Some(mimetype) = maybe_mimetype.as_deref() {
-    match mimetype {
-      "video/x-msvideo" => {
-        // .avi
-      },
-      "audio/x-wav"  | "audio/ogg" => {
-        // .wav, .ogg
-        let basic_info = decode_basic_audio_info(bytes.as_ref(), Some(mimetype), None)
-            .map_err(|e| {
-              warn!("file decoding error: {:?}", e);
-              UploadAudioError::BadInput("could not decode file".to_string())
-            })?;
+    // NB: .aiff (audio/aiff) isn't supported by Symphonia:
+    //  It contains uncompressed PCM-encoded audio similar to wav.
+    //  See: https://github.com/pdeljanov/Symphonia/issues/75
+    // NB: The following formats are not supported by Symphonia and
+    //  do not have any open issues filed. They may simply be too old:
+    //  - .wma (audio/x-ms-wma)
+    //  - .avi (video/x-msvideo)
+    media_upload_type = match mimetype {
+      // Audio
+      "audio/aac" /* .aac */ => Some(MediaUploadType::Audio),
+      "audio/m4a" /* .m4a */ => Some(MediaUploadType::Audio),
+      "audio/mpeg" /* .mp3 */ => Some(MediaUploadType::Audio),
+      "audio/ogg" /* .ogg */ => Some(MediaUploadType::Audio),
+      "audio/x-flac" /* .flac */ => Some(MediaUploadType::Audio),
+      "audio/x-wav" /* .wav */ => Some(MediaUploadType::Audio),
+      // Video
+      "video/mp4" /* .mp4 */ => Some(MediaUploadType::Video),
+      "video/quicktime" /* .mov */ => Some(MediaUploadType::Video),
+      "video/webm" /* .webm */ => Some(MediaUploadType::Video),
+      _ => None,
+    };
 
-        maybe_duration_millis = basic_info.duration_millis;
-        maybe_codec_name = basic_info.codec_name;
-      }
-      _ => {}
+    if media_upload_type.is_some() {
+      let basic_info = decode_basic_audio_info(
+        bytes.as_ref(),
+        Some(mimetype),
+        None
+      ).map_err(|e| {
+        warn!("file decoding error: {:?}", e);
+        UploadAudioError::BadInput("could not decode file".to_string())
+      })?;
+
+      maybe_duration_millis = basic_info.duration_millis;
+      maybe_codec_name = basic_info.codec_name;
     }
   }
+
+  let media_upload_type = match media_upload_type {
+    Some(m) => m,
+    None => {
+      warn!("Invalid mimetype: {:?}", maybe_mimetype);
+      return Err(UploadAudioError::BadInput(format!("Bad mimetype: {:?}", maybe_mimetype)))
+    },
+  };
 
   let record_id = insert_media_upload(Args {
     token: &token,
     uuid_idempotency_token: &uuid_idempotency_token,
-    media_type: MediaUploadType::Audio,
+    media_type: media_upload_type,
     maybe_original_filename: upload_media_request.file_name.as_deref(),
     original_file_size_bytes: file_size_bytes as u64,
     maybe_original_duration_millis: maybe_duration_millis,
