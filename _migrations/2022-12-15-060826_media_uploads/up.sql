@@ -60,6 +60,10 @@ CREATE TABLE media_uploads (
 
   -- ========== UPLOAD, TRANSCODING, AND TRUNCATION DETAILS ==========
 
+  -- The hash for the bucket directory that contains the original upload
+  -- as well as any transcodings, downsamplings, etc.
+  public_bucket_directory_hash  VARCHAR(32) NOT NULL,
+
   -- TODO(bt, 2022-12-20): Before landing, rename this field be better and indicate this
   --  is a *directory*. Add a second field to contain the default file name.
   -- The directory this media is uploaded to will be exclusive for this file.

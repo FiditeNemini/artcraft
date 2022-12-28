@@ -34,17 +34,18 @@ use symphonia::core::formats::FormatOptions;
 use symphonia::core::io::{MediaSourceStream, ReadOnlySource};
 use symphonia::core::meta::MetadataOptions;
 use symphonia::core::probe::Hint;
+use buckets::public::media_uploads::original_file::MediaUploadOriginalFilePath;
 use media::decode_basic_audio_info::decode_basic_audio_info;
 use tokens::files::media_upload::MediaUploadToken;
 
 #[derive(Serialize)]
-pub struct UploadAudioSuccessResponse {
+pub struct UploadMediaSuccessResponse {
   pub success: bool,
   pub upload_token: MediaUploadToken,
 }
 
 #[derive(Debug, Serialize)]
-pub enum UploadAudioError {
+pub enum UploadMediaError {
   BadInput(String),
   NotAuthorized,
   MustBeLoggedIn,
@@ -52,14 +53,14 @@ pub enum UploadAudioError {
   RateLimited,
 }
 
-impl ResponseError for UploadAudioError {
+impl ResponseError for UploadMediaError {
   fn status_code(&self) -> StatusCode {
     match *self {
-      UploadAudioError::BadInput(_) => StatusCode::BAD_REQUEST,
-      UploadAudioError::NotAuthorized => StatusCode::UNAUTHORIZED,
-      UploadAudioError::MustBeLoggedIn => StatusCode::UNAUTHORIZED,
-      UploadAudioError::ServerError => StatusCode::INTERNAL_SERVER_ERROR,
-      UploadAudioError::RateLimited => StatusCode::TOO_MANY_REQUESTS,
+      UploadMediaError::BadInput(_) => StatusCode::BAD_REQUEST,
+      UploadMediaError::NotAuthorized => StatusCode::UNAUTHORIZED,
+      UploadMediaError::MustBeLoggedIn => StatusCode::UNAUTHORIZED,
+      UploadMediaError::ServerError => StatusCode::INTERNAL_SERVER_ERROR,
+      UploadMediaError::RateLimited => StatusCode::TOO_MANY_REQUESTS,
     }
   }
 
@@ -69,17 +70,17 @@ impl ResponseError for UploadAudioError {
 }
 
 // NB: Not using derive_more::Display since Clion doesn't understand it.
-impl fmt::Display for UploadAudioError {
+impl fmt::Display for UploadMediaError {
   fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
     write!(f, "{:?}", self)
   }
 }
 
-pub async fn upload_audio_handler(
+pub async fn upload_media_handler(
   http_request: HttpRequest,
   server_state: web::Data<Arc<ServerState>>,
   mut multipart_payload: Multipart,
-) -> Result<HttpResponse, UploadAudioError> {
+) -> Result<HttpResponse, UploadMediaError> {
 
   // ==================== READ SESSION ==================== //
 
@@ -89,7 +90,7 @@ pub async fn upload_audio_handler(
       .await
       .map_err(|e| {
         warn!("Session checker error: {:?}", e);
-        UploadAudioError::ServerError
+        UploadMediaError::ServerError
       })?;
 
   // ==================== RATE LIMIT ==================== //
@@ -98,18 +99,18 @@ pub async fn upload_audio_handler(
     None => &server_state.redis_rate_limiters.logged_out,
     Some(ref user) => {
       if user.is_banned {
-        return Err(UploadAudioError::NotAuthorized);
+        return Err(UploadMediaError::NotAuthorized);
       }
       &server_state.redis_rate_limiters.logged_in
     },
   };
 
   if let Err(_err) = rate_limiter.rate_limit_request(&http_request) {
-    return Err(UploadAudioError::RateLimited);
+    return Err(UploadMediaError::RateLimited);
   }
 
   if let Err(_err) = server_state.redis_rate_limiters.model_upload.rate_limit_request(&http_request) {
-    return Err(UploadAudioError::RateLimited);
+    return Err(UploadMediaError::RateLimited);
   }
 
   // ==================== READ MULTIPART REQUEST ==================== //
@@ -118,15 +119,15 @@ pub async fn upload_audio_handler(
       .await
       .map_err(|e| {
         // TODO: Error handling could be nicer.
-        UploadAudioError::BadInput("bad request".to_string())
+        UploadMediaError::BadInput("bad request".to_string())
       })?;
 
 
   let uuid_idempotency_token = upload_media_request.uuid_idempotency_token
-      .ok_or(UploadAudioError::BadInput("no uuid".to_string()))?;
+      .ok_or(UploadMediaError::BadInput("no uuid".to_string()))?;
 
   if let Err(reason) = validate_idempotency_token_format(&uuid_idempotency_token) {
-    return Err(UploadAudioError::BadInput(reason));
+    return Err(UploadMediaError::BadInput(reason));
   }
 
   let creator_set_visibility = maybe_user_session
@@ -152,16 +153,16 @@ pub async fn upload_audio_handler(
       .transpose()
       .map_err(|io_error| {
         warn!("Problem hashing bytes: {:?}", io_error);
-        return UploadAudioError::ServerError;
+        return UploadMediaError::ServerError;
       })?;
 
   let hash = match maybe_hash {
-    None => return Err(UploadAudioError::BadInput("invalid file".to_string())),
+    None => return Err(UploadMediaError::BadInput("invalid file".to_string())),
     Some(hash) => hash,
   };
 
   let bytes = match upload_media_request.file_bytes {
-    None => return Err(UploadAudioError::BadInput("invalid file".to_string())),
+    None => return Err(UploadMediaError::BadInput("invalid file".to_string())),
     Some(bytes) => bytes,
   };
 
@@ -201,7 +202,7 @@ pub async fn upload_audio_handler(
         None
       ).map_err(|e| {
         warn!("file decoding error: {:?}", e);
-        UploadAudioError::BadInput("could not decode file".to_string())
+        UploadMediaError::BadInput("could not decode file".to_string())
       })?;
 
       maybe_duration_millis = basic_info.duration_millis;
@@ -213,9 +214,12 @@ pub async fn upload_audio_handler(
     Some(m) => m,
     None => {
       warn!("Invalid mimetype: {:?}", maybe_mimetype);
-      return Err(UploadAudioError::BadInput(format!("Bad mimetype: {:?}", maybe_mimetype)))
+      return Err(UploadMediaError::BadInput(format!("Bad mimetype: {:?}", maybe_mimetype)))
     },
   };
+
+  let public_upload_path =
+      MediaUploadOriginalFilePath::from_object_hash("todo");
 
   let record_id = insert_media_upload(Args {
     token: &token,
@@ -230,7 +234,7 @@ pub async fn upload_audio_handler(
     maybe_original_frame_width: None,
     maybe_original_frame_height: None,
     checksum_sha2: &hash,
-    public_bucket_directory_full_path: "",
+    public_upload_path: &public_upload_path,
     extra_file_modification_info: MediaUploadDetails {}, // TODO
     maybe_creator_user_token: maybe_user_token.as_ref(),
     maybe_creator_anonymous_visitor_token: None,
@@ -242,7 +246,7 @@ pub async fn upload_audio_handler(
       .await
       .map_err(|err| {
         warn!("New generic download creation DB error: {:?}", err);
-        UploadAudioError::ServerError
+        UploadMediaError::ServerError
       })?;
 
   info!("new media upload id: {}", record_id);
@@ -253,16 +257,16 @@ pub async fn upload_audio_handler(
       .await
       .map_err(|e| {
         warn!("error publishing event: {:?}", e);
-        UploadAudioError::ServerError
+        UploadMediaError::ServerError
       })?;
 
-  let response = UploadAudioSuccessResponse {
+  let response = UploadMediaSuccessResponse {
     success: true,
     upload_token: token,
   };
 
   let body = serde_json::to_string(&response)
-      .map_err(|e| UploadAudioError::ServerError)?;
+      .map_err(|e| UploadMediaError::ServerError)?;
 
   Ok(HttpResponse::Ok()
       .content_type("application/json")

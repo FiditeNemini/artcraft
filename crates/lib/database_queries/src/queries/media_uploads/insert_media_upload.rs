@@ -1,4 +1,5 @@
 use anyhow::anyhow;
+use buckets::public::media_uploads::original_file::MediaUploadOriginalFilePath;
 use container_common::anyhow_result::AnyhowResult;
 use enums::core::visibility::Visibility;
 use enums::files::media_upload_type::MediaUploadType;
@@ -22,7 +23,7 @@ pub struct Args <'a> {
   pub maybe_original_frame_height: Option<u64>,
   pub checksum_sha2: &'a str,
 
-  pub public_bucket_directory_full_path: &'a str,
+  pub public_upload_path: &'a MediaUploadOriginalFilePath,
   pub extra_file_modification_info: MediaUploadDetails,
 
   pub maybe_creator_user_token: Option<&'a UserToken>,
@@ -54,6 +55,7 @@ SET
   maybe_original_frame_height = ?,
   checksum_sha2 = ?,
 
+  public_bucket_directory_hash = ?,
   public_bucket_directory_full_path = ?,
   extra_file_modification_info = ?,
 
@@ -78,7 +80,8 @@ SET
         args.maybe_original_frame_height,
         args.checksum_sha2,
 
-        args.public_bucket_directory_full_path,
+        args.public_upload_path.get_object_hash(),
+        args.public_upload_path.get_full_object_path_str(),
         "", // TODO: args.extra_file_modification_info,
 
         args.maybe_creator_user_token,

@@ -1,6 +1,8 @@
 use crate::public::public_path::PublicPath;
 use crate::util::hashed_directory_path_long_string::hashed_directory_path_long_string;
 
+// TODO: Generate these from a macro.
+
 // TODO: Use a central path registry for quick reference
 const MEDIA_UPLOAD_DIRECTORY : &'static str = "/media";
 
@@ -30,6 +32,10 @@ impl MediaUploadDirectory {
   pub fn get_directory_path_str(&self) -> &str {
     &self.directory
   }
+
+  pub fn get_object_hash(&self) -> &str {
+    &self.object_hash
+  }
 }
 
 #[cfg(test)]
@@ -46,5 +52,12 @@ mod tests {
   pub fn get_directory_path_str_short_name() {
     let directory = MediaUploadDirectory::from_object_hash("foo");
     assert_eq!(directory.get_directory_path_str(), "/media/f/o/foo");
+  }
+
+  #[test]
+  pub fn get_object_hash() {
+    let hash = "abcdefghijk";
+    let directory = MediaUploadDirectory::from_object_hash(hash);
+    assert_eq!(directory.get_object_hash(), hash);
   }
 }

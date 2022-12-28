@@ -21,7 +21,7 @@ use crate::http_server::endpoints::flags::design_refresh_flag::enable_design_ref
 use crate::http_server::endpoints::investor_demo::disable_demo_mode_handler::disable_demo_mode_handler;
 use crate::http_server::endpoints::investor_demo::enable_demo_mode_handler::enable_demo_mode_handler;
 use crate::http_server::endpoints::leaderboard::get_leaderboard::leaderboard_handler;
-use crate::http_server::endpoints::media_uploads::upload_audio::upload_audio_handler;
+use crate::http_server::endpoints::media_uploads::upload_media::upload_media_handler;
 use crate::http_server::endpoints::misc::default_route_404::default_route_404;
 use crate::http_server::endpoints::misc::detect_locale_handler::detect_locale_handler;
 use crate::http_server::endpoints::misc::enable_alpha_easy_handler::enable_alpha_easy_handler;
@@ -791,9 +791,9 @@ fn add_media_upload_routes<T, B> (app: App<T, B>) -> App<T, B>
         InitError = (),
       >,
 {
-  app.service(web::scope("/v1/media_upload")
-      .service(web::resource("/upload_audio")
-          .route(web::post().to(upload_audio_handler))
+  app.service(web::scope("/v1/media_uploads")
+      .service(web::resource("/upload")
+          .route(web::post().to(upload_media_handler))
           .route(web::head().to(|| HttpResponse::Ok()))
       )
   )
