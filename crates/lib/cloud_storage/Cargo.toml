@@ -1,5 +1,5 @@
 [package]
-name = "storage_buckets_common"
+name = "cloud_storage"
 edition = "2018"
 version = "0.0.1"
 authors = [
@@ -9,7 +9,7 @@ authors = [
 publish = false
 
 [lib]
-name = "storage_buckets_common"
+name = "cloud_storage"
 path = "src/lib.rs"
 
 [dependencies]

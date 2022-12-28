@@ -21,6 +21,8 @@ pub mod job_state;
 pub mod job_steps;
 pub mod job_types;
 
+use cloud_storage::bucket_client::BucketClient;
+use cloud_storage::bucket_path_unifier::BucketPathUnifier;
 use config::common_env::CommonEnv;
 use config::shared_constants::DEFAULT_MYSQL_CONNECTION_STRING;
 use config::shared_constants::DEFAULT_RUST_LOG;
@@ -42,8 +44,6 @@ use sqlx::mysql::MySqlPoolOptions;
 use std::ops::Deref;
 use std::path::PathBuf;
 use std::time::Duration;
-use storage_buckets_common::bucket_client::BucketClient;
-use storage_buckets_common::bucket_path_unifier::BucketPathUnifier;
 use subprocess_common::docker_options::{DockerFilesystemMount, DockerGpu, DockerOptions};
 
 // Buckets

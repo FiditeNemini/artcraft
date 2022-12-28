@@ -1139,6 +1139,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "cloud_storage"
+version = "0.0.1"
+dependencies = [
+ "anyhow",
+ "container_common",
+ "log",
+ "rust-s3",
+ "tokio 1.16.1",
+]
+
+[[package]]
 name = "cloudabi"
 version = "0.0.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1642,6 +1653,7 @@ dependencies = [
  "anyhow",
  "chrono",
  "clap 2.34.0",
+ "cloud_storage",
  "config",
  "container_common",
  "database_queries",
@@ -1661,7 +1673,6 @@ dependencies = [
  "serde_derive",
  "serde_json",
  "sqlx",
- "storage_buckets_common",
  "subprocess",
  "subprocess_common",
  "tempdir",
@@ -2407,6 +2418,7 @@ dependencies = [
  "base64 0.13.0",
  "bcrypt",
  "chrono",
+ "cloud_storage",
  "config",
  "container_common",
  "data-encoding",
@@ -2453,7 +2465,6 @@ dependencies = [
  "serde_json",
  "sha2 0.9.5",
  "sqlx",
- "storage_buckets_common",
  "subprocess",
  "tempdir",
  "time 0.2.26",
@@ -2506,6 +2517,7 @@ dependencies = [
  "anyhow",
  "chrono",
  "clap 2.34.0",
+ "cloud_storage",
  "config",
  "container_common",
  "database_queries",
@@ -2523,7 +2535,6 @@ dependencies = [
  "serde_derive",
  "serde_json",
  "sqlx",
- "storage_buckets_common",
  "subprocess",
  "tempdir",
  "tokio 1.16.1",
@@ -4548,17 +4559,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "213701ba3370744dcd1a12960caa4843b3d68b4d1c0a5d575e0d65b2ee9d16c0"
 
 [[package]]
-name = "storage_buckets_common"
-version = "0.0.1"
-dependencies = [
- "anyhow",
- "container_common",
- "log",
- "rust-s3",
- "tokio 1.16.1",
-]
-
-[[package]]
 name = "storyteller-web"
 version = "0.0.1"
 dependencies = [
@@ -4578,6 +4578,7 @@ dependencies = [
  "bcrypt",
  "billing_component",
  "chrono",
+ "cloud_storage",
  "config",
  "container_common",
  "data-encoding",
@@ -4629,7 +4630,6 @@ dependencies = [
  "sha2 0.9.5",
  "speculoos",
  "sqlx",
- "storage_buckets_common",
  "subprocess",
  "symphonia",
  "tempdir",
@@ -5420,6 +5420,7 @@ dependencies = [
  "anyhow",
  "chrono",
  "clap 2.34.0",
+ "cloud_storage",
  "config",
  "container_common",
  "database_queries",
@@ -5437,7 +5438,6 @@ dependencies = [
  "serde_derive",
  "serde_json",
  "sqlx",
- "storage_buckets_common",
  "subprocess",
  "tempdir",
  "tokio 1.16.1",
@@ -5451,6 +5451,7 @@ dependencies = [
  "anyhow",
  "chrono",
  "clap 2.34.0",
+ "cloud_storage",
  "config",
  "container_common",
  "database_queries",
@@ -5468,7 +5469,6 @@ dependencies = [
  "serde_derive",
  "serde_json",
  "sqlx",
- "storage_buckets_common",
  "subprocess",
  "tempdir",
  "tokio 1.16.1",
@@ -5875,6 +5875,7 @@ dependencies = [
  "anyhow",
  "chrono",
  "clap 2.34.0",
+ "cloud_storage",
  "config",
  "container_common",
  "database_queries",
@@ -5892,7 +5893,6 @@ dependencies = [
  "serde_derive",
  "serde_json",
  "sqlx",
- "storage_buckets_common",
  "subprocess",
  "tempdir",
  "tokio 1.16.1",
@@ -5906,6 +5906,7 @@ dependencies = [
  "anyhow",
  "chrono",
  "clap 2.34.0",
+ "cloud_storage",
  "config",
  "container_common",
  "database_queries",
@@ -5923,7 +5924,6 @@ dependencies = [
  "serde_derive",
  "serde_json",
  "sqlx",
- "storage_buckets_common",
  "subprocess",
  "tempdir",
  "tokio 1.16.1",

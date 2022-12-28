@@ -8,6 +8,7 @@ use actix_web::http::StatusCode;
 use actix_web::web::BytesMut;
 use actix_web::{web, HttpResponse, HttpRequest, ResponseError};
 use anyhow::anyhow;
+use cloud_storage::bucket_paths::hash_to_bucket_path;
 use container_common::anyhow_result::AnyhowResult;
 use container_common::token::random_uuid::generate_random_uuid;
 use crate::http_server::web_utils::read_multipart_field_bytes::checked_read_multipart_bytes;
@@ -25,7 +26,6 @@ use sqlx::MySqlPool;
 use sqlx::error::Error::Database;
 use std::fmt;
 use std::sync::Arc;
-use storage_buckets_common::bucket_paths::hash_to_bucket_path;
 
 const BUCKET_AUDIO_FILE_NAME : &'static str = "input_audio_file";
 const BUCKET_IMAGE_FILE_NAME: &'static str = "input_image_file";

@@ -1,3 +1,5 @@
+use cloud_storage::bucket_client::BucketClient;
+use cloud_storage::bucket_path_unifier::BucketPathUnifier;
 use crate::job_types::hifigan::hifigan_model_check_command::HifiGanModelCheckCommand;
 use crate::job_types::hifigan_softvc::hifigan_softvc_model_check_command::HifiGanSoftVcModelCheckCommand;
 use crate::job_types::softvc::softvc_model_check_command::SoftVcModelCheckCommand;
@@ -9,8 +11,6 @@ use r2d2_redis::RedisConnectionManager;
 use r2d2_redis::r2d2;
 use sqlx::MySqlPool;
 use std::path::PathBuf;
-use storage_buckets_common::bucket_client::BucketClient;
-use storage_buckets_common::bucket_path_unifier::BucketPathUnifier;
 
 pub struct JobState {
   pub download_temp_directory: PathBuf,

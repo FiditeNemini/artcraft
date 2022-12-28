@@ -15,6 +15,7 @@ path = "src/main.rs"
 [dependencies]
 
 # Internal
+cloud_storage = { path = "../../../lib/cloud_storage" }
 config = { path = "../../../lib/config" }
 container_common = { path = "../../../lib/container_common" }
 database_queries = { path = "../../../lib/database_queries" }
@@ -22,7 +23,6 @@ enums = { path = "../../../_types/enums" }
 google_drive_common = { path = "../../../lib/google_drive_common" }
 jobs_common = { path = "../../../lib/jobs_common" }
 reusable_types = { path = "../../../_types/reusable_types" }
-storage_buckets_common = { path = "../../../lib/storage_buckets_common" }
 subprocess_common = { path = "../../../lib/subprocess_common" }
 tts_common = { path = "../../../lib/tts_common" }
 

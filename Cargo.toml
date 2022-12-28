@@ -16,6 +16,7 @@ members = [
   "crates/plugins/users",
 
   # Shared libraries
+  "crates/lib/cloud_storage",
   "crates/lib/config",
   "crates/lib/container_common",
   "crates/lib/database_queries",
@@ -27,7 +28,6 @@ members = [
   "crates/lib/media",
   "crates/lib/memory_caching",
   "crates/lib/redis_common",
-  "crates/lib/storage_buckets_common",
   "crates/lib/subprocess_common",
   "crates/lib/tts_common",
   "crates/lib/twitch_common",

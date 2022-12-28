@@ -15,6 +15,8 @@ pub mod script_execution;
 
 use anyhow::anyhow;
 use chrono::Utc;
+use cloud_storage::bucket_client::BucketClient;
+use cloud_storage::bucket_path_unifier::BucketPathUnifier;
 use config::bad_urls::is_bad_tts_model_download_url;
 use config::common_env::CommonEnv;
 use config::shared_constants::DEFAULT_MYSQL_CONNECTION_STRING;
@@ -51,8 +53,6 @@ use std::ops::Deref;
 use std::path::{PathBuf, Path};
 use std::process::Command;
 use std::time::Duration;
-use storage_buckets_common::bucket_client::BucketClient;
-use storage_buckets_common::bucket_path_unifier::BucketPathUnifier;
 use tempdir::TempDir;
 
 // Buckets

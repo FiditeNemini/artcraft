@@ -1,3 +1,5 @@
+use cloud_storage::bucket_client::BucketClient;
+use cloud_storage::bucket_path_unifier::BucketPathUnifier;
 use crate::caching::cache_miss_strategizer_multi::SyncMultiCacheMissStrategizer;
 use crate::caching::virtual_lfu_cache::SyncVirtualLfuCache;
 use crate::http_clients::tts_inference_sidecar_client::TtsInferenceSidecarClient;
@@ -13,8 +15,6 @@ use memory_caching::multi_item_ttl_cache::MultiItemTtlCache;
 use newrelic_telemetry::Client as NewRelicClient;
 use sqlx::MySqlPool;
 use std::path::PathBuf;
-use storage_buckets_common::bucket_client::BucketClient;
-use storage_buckets_common::bucket_path_unifier::BucketPathUnifier;
 
 pub struct JobArgs {
   pub download_temp_directory: PathBuf,

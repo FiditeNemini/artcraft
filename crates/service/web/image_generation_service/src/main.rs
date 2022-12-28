@@ -22,6 +22,7 @@ mod server_state;
 
 use actix_web::middleware::{DefaultHeaders, Logger};
 use actix_web::{App, HttpServer, web};
+use cloud_storage::bucket_client::BucketClient;
 use config::common_env::CommonEnv;
 use config::shared_constants::{DEFAULT_MYSQL_CONNECTION_STRING, DEFAULT_RUST_LOG};
 use container_common::anyhow_result::AnyhowResult;
@@ -35,7 +36,6 @@ use r2d2_redis::{r2d2, RedisConnectionManager};
 use sqlx::mysql::MySqlPoolOptions;
 use std::sync::Arc;
 use std::time::Duration;
-use storage_buckets_common::bucket_client::BucketClient;
 use tokio::runtime::Runtime;
 
 const DEFAULT_BIND_ADDRESS : &'static str = "0.0.0.0:12345";

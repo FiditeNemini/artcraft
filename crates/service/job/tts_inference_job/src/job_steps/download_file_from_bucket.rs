@@ -1,8 +1,8 @@
-use std::path::Path;
-use log::{info, warn};
-use jobs_common::job_progress_reporter::job_progress_reporter::JobProgressReporter;
-use storage_buckets_common::bucket_client::BucketClient;
+use cloud_storage::bucket_client::BucketClient;
 use crate::{ProcessSingleJobError, ScopedTempDirCreator};
+use jobs_common::job_progress_reporter::job_progress_reporter::JobProgressReporter;
+use log::{info, warn};
+use std::path::Path;
 
 // TODO(bt, 2022-07-15): Make a concrete type for bucket paths
 

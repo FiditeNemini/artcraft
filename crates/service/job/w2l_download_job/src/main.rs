@@ -15,6 +15,8 @@ pub mod script_execution;
 
 use anyhow::{anyhow, Error};
 use chrono::Utc;
+use cloud_storage::bucket_client::BucketClient;
+use cloud_storage::bucket_paths::hash_to_bucket_path;
 use config::common_env::CommonEnv;
 use config::is_bad_video_download_url::is_bad_video_download_url;
 use config::shared_constants::DEFAULT_MYSQL_CONNECTION_STRING;
@@ -53,8 +55,6 @@ use std::path::{PathBuf, Path};
 use std::process::Command;
 use std::thread;
 use std::time::Duration;
-use storage_buckets_common::bucket_client::BucketClient;
-use storage_buckets_common::bucket_paths::hash_to_bucket_path;
 use tempdir::TempDir;
 
 // Buckets (shared config)
