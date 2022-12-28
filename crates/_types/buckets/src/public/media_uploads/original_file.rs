@@ -1,5 +1,6 @@
 use crate::public::media_uploads::directory::MediaUploadDirectory;
 use crate::public::public_path::PublicPath;
+use crockford::crockford_entropy_lower;
 
 const ORIGINAL_FILE_BASENAME : &'static str = "original_contents.bin";
 
@@ -16,6 +17,11 @@ pub struct MediaUploadOriginalFilePath {
 impl PublicPath for MediaUploadOriginalFilePath {}
 
 impl MediaUploadOriginalFilePath {
+
+  pub fn generate_new() -> Self {
+    let entropy = crockford_entropy_lower(32);
+    Self::from_object_hash(&entropy)
+  }
 
   pub fn from_object_hash(hash: &str) -> Self {
     // TODO: Path construction could be cleaner.
@@ -47,6 +53,13 @@ impl MediaUploadOriginalFilePath {
 #[cfg(test)]
 mod tests {
   use crate::public::media_uploads::original_file::MediaUploadOriginalFilePath;
+
+  #[test]
+  pub fn generate_new_entropy() {
+    let file = MediaUploadOriginalFilePath::generate_new();
+    assert_eq!(file.get_object_hash().len(), 32);
+    assert_eq!(file.get_directory().get_object_hash().len(), 32);
+  }
 
   #[test]
   pub fn get_full_object_path_str() {

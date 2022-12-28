@@ -218,8 +218,7 @@ pub async fn upload_media_handler(
     },
   };
 
-  let public_upload_path =
-      MediaUploadOriginalFilePath::from_object_hash("todo");
+  let public_upload_path = MediaUploadOriginalFilePath::generate_new();
 
   let record_id = insert_media_upload(Args {
     token: &token,

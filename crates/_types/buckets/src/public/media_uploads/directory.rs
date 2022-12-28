@@ -1,5 +1,6 @@
 use crate::public::public_path::PublicPath;
 use crate::util::hashed_directory_path_long_string::hashed_directory_path_long_string;
+use crockford::crockford_entropy_lower;
 
 // TODO: Generate these from a macro.
 
@@ -18,6 +19,11 @@ pub struct MediaUploadDirectory {
 impl PublicPath for MediaUploadDirectory {}
 
 impl MediaUploadDirectory {
+
+  pub fn generate_new() -> Self {
+    let entropy = crockford_entropy_lower(32);
+    Self::from_object_hash(&entropy)
+  }
 
   pub fn from_object_hash(object_hash: &str) -> Self {
     // TODO: Path construction could be cleaner.
@@ -41,6 +47,12 @@ impl MediaUploadDirectory {
 #[cfg(test)]
 mod tests {
   use crate::public::media_uploads::directory::MediaUploadDirectory;
+
+  #[test]
+  pub fn generate_new_entropy() {
+    let directory = MediaUploadDirectory::generate_new();
+    assert_eq!(directory.get_object_hash().len(), 32);
+  }
 
   #[test]
   pub fn get_directory_path_str() {

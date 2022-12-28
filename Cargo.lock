@@ -985,6 +985,7 @@ dependencies = [
 name = "buckets"
 version = "0.0.1"
 dependencies = [
+ "crockford",
  "errors",
 ]
 
@@ -1354,6 +1355,13 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "81156fece84ab6a9f2afdb109ce3ae577e42b1228441eded99bd77f627953b1a"
 dependencies = [
  "cfg-if 1.0.0",
+]
+
+[[package]]
+name = "crockford"
+version = "0.0.1"
+dependencies = [
+ "rand 0.8.4",
 ]
 
 [[package]]

@@ -3,6 +3,7 @@ use rand::Rng;
 // Crockford characters
 const CROCKFORD_CHARSET: &[u8] = b"0123456789ABCDEFGHJKMNPQRSTVWXYZ";
 
+#[deprecated(note = "see internal 'crockford' and 'token' crates")]
 pub fn random_crockford_token(length: usize) -> String {
   let mut rng = rand::thread_rng();
 

@@ -21,6 +21,7 @@ members = [
   "crates/lib/cloud_storage",
   "crates/lib/config",
   "crates/lib/container_common",
+  "crates/lib/crockford",
   "crates/lib/database_queries",
   "crates/lib/errors",
   "crates/lib/files",

@@ -43,6 +43,7 @@ impl BucketPathUnifier {
 
   // ==================== TTS MODELS (SYNTHESIZER + VOCODER) ==================== //
 
+  // NB: Callers use "hash_file_sha2" as the file hash.
   pub fn tts_synthesizer_path(&self, tts_synthesizer_file_hash: &str) -> PathBuf {
     let hashed_path = Self::hashed_directory_path(tts_synthesizer_file_hash);
     let model_filename = format!("{}.pt", &tts_synthesizer_file_hash);
@@ -70,6 +71,7 @@ impl BucketPathUnifier {
     self.tts_pretrained_vocoder_model_root.join(tts_vocoder_model_name)
   }
 
+  // NB: Callers use "hash_file_sha2" as the file hash.
   /// User-uploaded vocoders.
   /// These can be HifiGan and HifiGanSoftVc
   pub fn vocoder_path(&self, vocoder_file_hash: &str) -> PathBuf {
@@ -83,6 +85,7 @@ impl BucketPathUnifier {
 
   // ==================== TTS INFERENCE OUTPUT ==================== //
 
+  // NB: Callers use job uuid_idempotency_token, which seems *bad*
   /// This should include the string "vocodes" for downloaders.
   pub fn tts_inference_wav_audio_output_path(&self, tts_inference_output_uuid: &str) -> PathBuf {
     let hashed_path = Self::hashed_directory_path(tts_inference_output_uuid);
@@ -147,6 +150,7 @@ impl BucketPathUnifier {
 
   // ==================== W2L INFERENCE OUTPUT ==================== //
 
+  // NB: caller uses inference job token, which seems ideal
   // W2L inference output videos
   pub fn w2l_inference_video_output_path(&self, w2l_inference_job_token: &str) -> PathBuf {
     // NB: We don't want colons from the token in the filename.
@@ -176,6 +180,7 @@ impl BucketPathUnifier {
 
   // ==================== VOICE CONVERSION MODELS ==================== //
 
+  // NB: Callers use "hash_file_sha2" as the file hash.
   pub fn softvc_model_path(&self, softvc_model_file_hash: &str) -> PathBuf {
     let hashed_path = Self::hashed_directory_path(softvc_model_file_hash);
     let model_filename = format!("{}.pt", &softvc_model_file_hash);
