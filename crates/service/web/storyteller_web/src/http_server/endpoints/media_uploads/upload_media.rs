@@ -7,6 +7,7 @@ use actix_web::error::ResponseError;
 use actix_web::http::StatusCode;
 use actix_web::web::BytesMut;
 use actix_web::{Responder, web, HttpResponse, error, HttpRequest};
+use buckets::public::media_uploads::original_file::MediaUploadOriginalFilePath;
 use config::bad_urls::is_bad_tts_model_download_url;
 use crate::http_server::endpoints::media_uploads::drain_multipart_request::drain_multipart_request;
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
@@ -21,6 +22,7 @@ use files::mimetype::{get_mimetype_for_bytes, get_mimetype_for_bytes_or_default}
 use http_server_common::request::get_request_ip::get_request_ip;
 use http_server_common::response::serialize_as_json_error::serialize_as_json_error;
 use log::{info, warn, log};
+use media::decode_basic_audio_info::decode_basic_audio_info;
 use regex::Regex;
 use reusable_types::db::enums::generic_download_type::GenericDownloadType;
 use reusable_types::db::payloads::MediaUploadDetails;
@@ -34,8 +36,6 @@ use symphonia::core::formats::FormatOptions;
 use symphonia::core::io::{MediaSourceStream, ReadOnlySource};
 use symphonia::core::meta::MetadataOptions;
 use symphonia::core::probe::Hint;
-use buckets::public::media_uploads::original_file::MediaUploadOriginalFilePath;
-use media::decode_basic_audio_info::decode_basic_audio_info;
 use tokens::files::media_upload::MediaUploadToken;
 
 #[derive(Serialize)]
@@ -218,7 +218,28 @@ pub async fn upload_media_handler(
     },
   };
 
+  // TODO: Clean up code
+  let mime_type = match maybe_mimetype {
+    Some(m) => m,
+    None => {
+      warn!("Missing mimetype!");
+      return Err(UploadMediaError::BadInput("Missing mimetype".to_string()));
+    },
+  };
+
   let public_upload_path = MediaUploadOriginalFilePath::generate_new();
+
+  info!("Uploading media to bucket path: {}", public_upload_path.get_full_object_path_str());
+
+  server_state.public_bucket_client.upload_file_with_content_type(
+    public_upload_path.get_full_object_path_str(),
+    bytes.as_ref(),
+    &mime_type)
+      .await
+      .map_err(|e| {
+        warn!("Upload media bytes to bucket error: {:?}", e);
+        UploadMediaError::ServerError
+      })?;
 
   let record_id = insert_media_upload(Args {
     token: &token,

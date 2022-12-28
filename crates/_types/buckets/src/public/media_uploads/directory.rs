@@ -5,7 +5,7 @@ use crockford::crockford_entropy_lower;
 // TODO: Generate these from a macro.
 
 // TODO: Use a central path registry for quick reference
-const MEDIA_UPLOAD_DIRECTORY : &'static str = "/media";
+const MEDIA_UPLOAD_DIRECTORY : &'static str = "/media_upload";
 
 /// Directory for user media uploads.
 /// Each uploaded file gets its own directory so that we can store the original
@@ -57,13 +57,13 @@ mod tests {
   #[test]
   pub fn get_directory_path_str() {
     let directory = MediaUploadDirectory::from_object_hash("abcdefghijk");
-    assert_eq!(directory.get_directory_path_str(), "/media/a/b/c/d/e/abcdefghijk");
+    assert_eq!(directory.get_directory_path_str(), "/media_upload/a/b/c/d/e/abcdefghijk");
   }
 
   #[test]
   pub fn get_directory_path_str_short_name() {
     let directory = MediaUploadDirectory::from_object_hash("foo");
-    assert_eq!(directory.get_directory_path_str(), "/media/f/o/foo");
+    assert_eq!(directory.get_directory_path_str(), "/media_upload/f/o/foo");
   }
 
   #[test]

@@ -2,7 +2,7 @@ use crate::public::media_uploads::directory::MediaUploadDirectory;
 use crate::public::public_path::PublicPath;
 use crockford::crockford_entropy_lower;
 
-const ORIGINAL_FILE_BASENAME : &'static str = "original_contents.bin";
+const ORIGINAL_FILE_BASENAME : &'static str = "original_upload.bin";
 
 // TODO: Generate these from a macro.
 
@@ -64,13 +64,13 @@ mod tests {
   #[test]
   pub fn get_full_object_path_str() {
     let file = MediaUploadOriginalFilePath::from_object_hash("abcdefghijk");
-    assert_eq!(file.get_full_object_path_str(), "/media/a/b/c/d/e/abcdefghijk/original_contents.bin");
+    assert_eq!(file.get_full_object_path_str(), "/media_upload/a/b/c/d/e/abcdefghijk/original_upload.bin");
   }
 
   #[test]
   pub fn get_full_object_path_str_short_name() {
     let file = MediaUploadOriginalFilePath::from_object_hash("foo");
-    assert_eq!(file.get_full_object_path_str(), "/media/f/o/foo/original_contents.bin");
+    assert_eq!(file.get_full_object_path_str(), "/media_upload/f/o/foo/original_upload.bin");
   }
 
   #[test]
