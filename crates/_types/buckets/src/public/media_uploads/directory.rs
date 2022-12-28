@@ -1,0 +1,50 @@
+use crate::public::public_path::PublicPath;
+use crate::util::hashed_directory_path_long_string::hashed_directory_path_long_string;
+
+// TODO: Use a central path registry for quick reference
+const MEDIA_UPLOAD_DIRECTORY : &'static str = "/media";
+
+/// Directory for user media uploads.
+/// Each uploaded file gets its own directory so that we can store the original
+/// file alongside re-processed derivatives.
+#[derive(Clone)]
+pub struct MediaUploadDirectory {
+  object_hash: String,
+  directory: String,
+}
+
+impl PublicPath for MediaUploadDirectory {}
+
+impl MediaUploadDirectory {
+
+  pub fn from_object_hash(object_hash: &str) -> Self {
+    // TODO: Path construction could be cleaner.
+    let middle = hashed_directory_path_long_string(object_hash);
+    let directory = format!("{}/{}{}", MEDIA_UPLOAD_DIRECTORY, middle, object_hash);
+    Self {
+      object_hash: object_hash.to_string(),
+      directory,
+    }
+  }
+
+  pub fn get_directory_path_str(&self) -> &str {
+    &self.directory
+  }
+}
+
+#[cfg(test)]
+mod tests {
+  use crate::public::media_uploads::directory::MediaUploadDirectory;
+
+  #[test]
+  pub fn get_directory_path_str() {
+    let directory = MediaUploadDirectory::from_object_hash("abcdefghijk");
+    assert_eq!(directory.get_directory_path_str(), "/media/a/b/c/d/e/abcdefghijk");
+  }
+
+  #[test]
+  pub fn get_directory_path_str_short_name() {
+    let directory = MediaUploadDirectory::from_object_hash("foo");
+    assert_eq!(directory.get_directory_path_str(), "/media/f/o/foo");
+  }
+}

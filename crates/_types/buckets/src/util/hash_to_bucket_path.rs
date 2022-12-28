@@ -1,11 +1,11 @@
-use anyhow::anyhow;
-use anyhow::bail;
-use container_common::anyhow_result::AnyhowResult;
+use errors::AnyhowResult;
+use errors::bail;
 use std::path::PathBuf;
 
-pub fn hash_to_bucket_path(file_hash: &str,
+#[deprecated(note = "this is a messy function and should be avoided")]
+pub (crate) fn hash_to_bucket_path(file_hash: &str,
                            optional_root_directory: Option<&str>)
-  -> AnyhowResult<String>
+  -> AnyhowResult<PathBuf>
 {
   if file_hash.len() < 4 {
     bail!("File length is too short");
@@ -23,29 +23,25 @@ pub fn hash_to_bucket_path(file_hash: &str,
     &file_hash,
   );
 
-  let maybe_path = root_directory
-    .join(file_path)
-    .to_str()
-    .map(|s| s.to_string());
-
-  maybe_path.ok_or(anyhow!("Path could not be converted"))
+  Ok(root_directory.join(file_path))
 }
 
 #[cfg(test)]
 mod tests {
-  use crate::bucket_paths::hash_to_bucket_path;
+  use crate::util::hash_to_bucket_path::hash_to_bucket_path;
+  use std::path::PathBuf;
 
   #[test]
   fn test_bucket_without_root() {
     assert_eq!(
       hash_to_bucket_path("abcdefg", None).unwrap(),
-      "/a/b/c/abcdefg".to_string());
+      PathBuf::from("/a/b/c/abcdefg"));
   }
 
   #[test]
   fn test_bucket_with_root() {
     assert_eq!(
       hash_to_bucket_path("abcdefg", Some("/root")).unwrap(),
-      "/root/a/b/c/abcdefg".to_string());
+      PathBuf::from("/root/a/b/c/abcdefg"));
   }
 }

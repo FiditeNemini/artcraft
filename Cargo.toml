@@ -2,6 +2,8 @@
 
 members = [
   # Types: common strongly-typed tokens, ids, payloads, etc.
+  # Also common cloud buckets and other "strongly typed" configs.
+  "crates/_types/buckets",
   "crates/_types/enums",
   "crates/_types/reusable_types", # TODO(bt, 2022-12-21): Deprecate
   "crates/_types/tokens",

@@ -1,9 +1,10 @@
+use buckets::util::hashed_directory_path_short_string::hashed_directory_path_short_string;
 use container_common::anyhow_result::AnyhowResult;
-use crate::bucket_paths::hash_to_bucket_path;
 use std::path::PathBuf;
 
 /// This is designed to make it centrally configurable where
 /// different types of objects are stored.
+#[deprecated(note = "see the 'buckets' crate for a better approach")]
 pub struct BucketPathUnifier {
   // TTS
   pub tts_synthesizer_model_root: PathBuf,
@@ -187,12 +188,7 @@ impl BucketPathUnifier {
   // ==================== UTILITY ==================== //
 
   pub fn hashed_directory_path(file_hash: &str) -> String {
-    match file_hash.len() {
-      0 | 1=> "".to_string(),
-      2 => format!("{}/", &file_hash[0..1]),
-      3 => format!("{}/{}/", &file_hash[0..1], &file_hash[1..2]),
-      _ => format!("{}/{}/{}/", &file_hash[0..1], &file_hash[1..2], &file_hash[2..3]),
-    }
+    hashed_directory_path_short_string(file_hash)
   }
 }
 

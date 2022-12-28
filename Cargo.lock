@@ -982,6 +982,13 @@ dependencies = [
 ]
 
 [[package]]
+name = "buckets"
+version = "0.0.1"
+dependencies = [
+ "errors",
+]
+
+[[package]]
 name = "bumpalo"
 version = "3.6.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1143,6 +1150,7 @@ name = "cloud_storage"
 version = "0.0.1"
 dependencies = [
  "anyhow",
+ "buckets",
  "container_common",
  "log",
  "rust-s3",
@@ -4577,6 +4585,7 @@ dependencies = [
  "base64 0.13.0",
  "bcrypt",
  "billing_component",
+ "buckets",
  "chrono",
  "cloud_storage",
  "config",
@@ -5873,6 +5882,7 @@ name = "w2l-download-job"
 version = "0.0.1"
 dependencies = [
  "anyhow",
+ "buckets",
  "chrono",
  "clap 2.34.0",
  "cloud_storage",

@@ -15,6 +15,7 @@ path = "src/main.rs"
 [dependencies]
 
 # Internal
+buckets = { path = "../../../_types/buckets" }
 cloud_storage = { path = "../../../lib/cloud_storage" }
 config = { path = "../../../lib/config" }
 container_common = { path = "../../../lib/container_common" }

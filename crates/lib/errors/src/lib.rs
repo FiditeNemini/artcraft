@@ -19,7 +19,9 @@
 #![allow(non_snake_case)]
 
 /// Easier to import than anyhow::Result.
+/// (Naming things "Result" pollutes the import scope or requires nasty renames. Gross.)
 pub type AnyhowResult<T> = anyhow::Result<T>;
 
 /// Useful re-export.
 pub use anyhow::anyhow;
+pub use anyhow::bail;

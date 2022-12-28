@@ -14,9 +14,9 @@
 pub mod script_execution;
 
 use anyhow::{anyhow, Error};
+use buckets::util::hash_to_bucket_path_string::hash_to_bucket_path_string;
 use chrono::Utc;
 use cloud_storage::bucket_client::BucketClient;
-use cloud_storage::bucket_paths::hash_to_bucket_path;
 use config::common_env::CommonEnv;
 use config::is_bad_video_download_url::is_bad_video_download_url;
 use config::shared_constants::DEFAULT_MYSQL_CONNECTION_STRING;
@@ -471,7 +471,7 @@ async fn process_job(downloader: &Downloader, job: &W2lTemplateUploadJobRecord) 
   info!("File hash: {}", private_bucket_hash);
 
   // Full path to video/image
-  let full_object_path = hash_to_bucket_path(
+  let full_object_path = hash_to_bucket_path_string(
     &private_bucket_hash,
     Some(&downloader.bucket_root_w2l_template_uploads))?;
 

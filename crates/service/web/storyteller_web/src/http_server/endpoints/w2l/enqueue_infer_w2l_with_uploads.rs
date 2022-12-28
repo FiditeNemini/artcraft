@@ -8,7 +8,7 @@ use actix_web::http::StatusCode;
 use actix_web::web::BytesMut;
 use actix_web::{web, HttpResponse, HttpRequest, ResponseError};
 use anyhow::anyhow;
-use cloud_storage::bucket_paths::hash_to_bucket_path;
+use buckets::util::hash_to_bucket_path_string::hash_to_bucket_path_string;
 use container_common::anyhow_result::AnyhowResult;
 use container_common::token::random_uuid::generate_random_uuid;
 use crate::http_server::web_utils::read_multipart_field_bytes::checked_read_multipart_bytes;
@@ -254,7 +254,7 @@ pub async fn enqueue_infer_w2l_with_uploads(
 
   let audio_upload_bucket_hash = upload_uuid.clone();
 
-  let audio_upload_bucket_path = hash_to_bucket_path(
+  let audio_upload_bucket_path = hash_to_bucket_path_string(
     &upload_uuid,
     Some(&server_state.audio_uploads_bucket_root)
   ).map_err(|e| {
