@@ -99,6 +99,7 @@ use crate::http_server::endpoints::w2l::set_w2l_template_mod_approval::set_w2l_t
 use users_component::default_routes::add_suggested_api_v1_account_creation_and_session_routes;
 use users_component::endpoints::edit_profile_handler::edit_profile_handler;
 use users_component::endpoints::get_profile_handler::get_profile_handler;
+use crate::http_server::endpoints::voice_conversion::inference::enqueue_voice_conversion_inference::enqueue_voice_conversion_inference_handler;
 
 pub fn add_routes<T, B> (app: App<T, B>) -> App<T, B>
   where
@@ -114,6 +115,7 @@ pub fn add_routes<T, B> (app: App<T, B>) -> App<T, B>
   let mut app = add_moderator_routes(app); /* /moderation */
   app = add_tts_routes(app); /* /tts */
   app = add_w2l_routes(app); /* /w2l */
+  app = add_web_vc_routes(app); /* /v1/voice_conversion */
   app = add_vocoder_routes(app); /* /vocoder */
   app = add_retrieval_routes(app); /* /retrieval (aka. "generic_download_jobs") */
   app = add_category_routes(app); /* /category */
@@ -468,6 +470,90 @@ fn add_w2l_routes<T, B> (app: App<T, B>) -> App<T, B>
       )
   )
 }
+
+// ==================== WEB VOICE CONVERSION ROUTES ====================
+
+fn add_web_vc_routes<T, B> (app: App<T, B>) -> App<T, B>
+  where
+      B: MessageBody,
+      T: ServiceFactory<
+        ServiceRequest,
+        Config = (),
+        Response = ServiceResponse<B>,
+        Error = Error,
+        InitError = (),
+      >,
+{
+  app.service(
+    web::scope("/v1/voice_conversion")
+        .service(
+          web::resource("/inference")
+              .route(web::post().to(enqueue_voice_conversion_inference_handler))
+              .route(web::head().to(|| HttpResponse::Ok()))
+        )
+        //.service(
+        //  web::resource("/upload")
+        //      .route(web::post().to(upload_w2l_template_handler))
+        //      .route(web::head().to(|| HttpResponse::Ok()))
+        //)
+        //.service(
+        //  web::resource("/list")
+        //      .route(web::get().to(list_w2l_templates_handler))
+        //      .route(web::head().to(|| HttpResponse::Ok()))
+        //)
+        //.service(
+        //  web::resource("/template/{token}")
+        //      .route(web::get().to(get_w2l_template_handler))
+        //      .route(web::head().to(|| HttpResponse::Ok()))
+        //)
+        //.service(
+        //  web::resource("/template/{template_token}/count")
+        //      .route(web::get().to(get_w2l_template_use_count_handler))
+        //      .route(web::head().to(|| HttpResponse::Ok()))
+        //)
+        //.service(
+        //  web::resource("/template/{template_token}/edit")
+        //      .route(web::post().to(edit_w2l_template_handler))
+        //      .route(web::head().to(|| HttpResponse::Ok()))
+        //)
+        //.service(
+        //  web::resource("/template/{token}/moderate")
+        //      .route(web::post().to(set_w2l_template_mod_approval_handler))
+        //      .route(web::head().to(|| HttpResponse::Ok()))
+        //)
+        //.service(
+        //  web::resource("/template/{token}/delete")
+        //      .route(web::post().to(delete_w2l_template_handler))
+        //      .route(web::head().to(|| HttpResponse::Ok()))
+        //)
+        //.service(
+        //  web::resource("/result/{token}")
+        //      .route(web::get().to(get_w2l_inference_result_handler))
+        //      .route(web::head().to(|| HttpResponse::Ok()))
+        //)
+        //.service(
+        //  web::resource("/result/{token}/edit")
+        //      .route(web::post().to(edit_w2l_inference_result_handler))
+        //      .route(web::head().to(|| HttpResponse::Ok()))
+        //)
+        //.service(
+        //  web::resource("/result/{token}/delete")
+        //      .route(web::post().to(delete_w2l_inference_result_handler))
+        //      .route(web::head().to(|| HttpResponse::Ok()))
+        //)
+        //.service(
+        //  web::resource("/job/{token}")
+        //      .route(web::get().to(get_w2l_inference_job_status_handler))
+        //      .route(web::head().to(|| HttpResponse::Ok()))
+        //)
+        //.service(
+        //  web::resource("/upload_template_job/{token}")
+        //      .route(web::get().to(get_w2l_upload_template_job_status_handler))
+        //      .route(web::head().to(|| HttpResponse::Ok()))
+        //)
+  )
+}
+
 
 // ==================== VOCODER ROUTES ====================
 

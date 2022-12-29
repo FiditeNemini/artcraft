@@ -4,6 +4,8 @@ use crate::configs::plans::plan_category::PlanCategory;
 const TTS_DEFAULT_PRIORITY_LEVEL : u8 = 0;
 const TTS_DEFAULT_DURATION_SECONDS : i64 = 12;
 
+const VC_DEFAULT_PRIORITY_LEVEL : u8 = 0;
+
 const VC_DEFAULT_MAX_CONCURRENT_MODELS : u32 = 5;
 
 const VC_DEFAULT_PRE_RECORDED_TIME_LIMIT_SECONDS : i64 = 20;
@@ -48,7 +50,11 @@ pub struct Plan {
     tts_can_upload_private_models: bool,
     tts_can_share_private_models: bool,
 
-    // ========== Features for Voice Conversion ==========
+    // ========== Features for Web Voice Conversion ==========
+
+    web_vc_base_priority_level: u8,
+
+    // ========== Features for Real Time Voice Conversion ==========
 
     vc_max_concurrent_models: u32,
 
@@ -79,6 +85,7 @@ impl Plan {
             tts_can_generate_mp3: builder.tts_can_generate_mp3,
             tts_can_upload_private_models: builder.tts_can_upload_private_models,
             tts_can_share_private_models: builder.tts_can_share_private_models,
+            web_vc_base_priority_level: builder.web_vc_base_priority_level,
             vc_max_concurrent_models: builder.vc_max_concurrent_models,
             vc_pre_recorded_time_limit: builder.vc_pre_recorded_time_limit,
             vc_pre_recorded_time_is_unlimited: builder.vc_pre_recorded_time_is_unlimited,
@@ -132,6 +139,10 @@ impl Plan {
     pub fn tts_max_duration_seconds(&self) -> i32 {
         self.tts_max_duration.num_seconds() as i32
     }
+
+    pub fn web_vc_base_priority_level(&self) -> u8 {
+        self.web_vc_base_priority_level
+    }
 }
 
 /// Builder pattern for Plans.
@@ -153,7 +164,11 @@ pub struct PlanBuilder {
     tts_can_upload_private_models: bool,
     tts_can_share_private_models: bool,
 
-    // ========== Features for Voice Conversion ==========
+    // ========== Features for Web Voice Conversion ==========
+
+    web_vc_base_priority_level: u8,
+
+    // ========== Features for Real Time Voice Conversion ==========
 
     vc_max_concurrent_models: u32,
 
@@ -188,7 +203,10 @@ impl PlanBuilder {
             tts_can_upload_private_models: false,
             tts_can_share_private_models : false,
 
-            // VC
+            // VC (WEB)
+            web_vc_base_priority_level: VC_DEFAULT_PRIORITY_LEVEL,
+
+            // VC (REALTIME)
             vc_max_concurrent_models: VC_DEFAULT_MAX_CONCURRENT_MODELS,
             vc_pre_recorded_time_limit: Duration::seconds(VC_DEFAULT_PRE_RECORDED_TIME_LIMIT_SECONDS),
             vc_pre_recorded_time_is_unlimited: false,
@@ -257,6 +275,11 @@ impl PlanBuilder {
 
     pub fn tts_can_share_private_models(mut self, value: bool) -> Self {
         self.tts_can_share_private_models = value;
+        self
+    }
+
+    pub fn web_vc_base_priority_level(mut self, value: u8) -> Self {
+        self.web_vc_base_priority_level = value;
         self
     }
 

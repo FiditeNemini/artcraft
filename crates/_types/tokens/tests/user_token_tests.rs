@@ -17,6 +17,7 @@ mod interface {
   fn generate() {
     let token = UserToken::generate();
     assert!(!token.to_string().is_empty());
+    assert!(token.to_string().starts_with("U:"));
   }
 
   #[test]

@@ -6,7 +6,7 @@ use std::fmt::Debug;
 /// The primary key for "generic" inference jobs.
 #[derive(Clone, PartialEq, Eq, sqlx::Type, Debug, Serialize, Deserialize)]
 #[sqlx(transparent)]
-pub struct VoiceConversionModelToken(String);
+pub struct VoiceConversionModelToken(pub String);
 
 impl_string_token!(VoiceConversionModelToken);
 impl_crockford_generator!(VoiceConversionModelToken, 16usize, EntityType::VoiceConversionModel, CrockfordLower);

@@ -12,6 +12,13 @@ impl RedisKeys {
     format!("ttsUseCount:{}", model_token)
   }
 
+  /// This is a counter incremented with web VC inference.
+  /// We can use a job to read MySql and fix counts if they get out of sync.
+  /// These should be long-lived keys.
+  pub fn web_vc_model_usage_count(model_token: &str) -> String {
+    format!("vcUseCount:{}", model_token)
+  }
+
   /// This is a counter incremented with TTS inference.
   /// We can use a job to read MySql and fix counts if they get out of sync.
   /// These should be long-lived keys.

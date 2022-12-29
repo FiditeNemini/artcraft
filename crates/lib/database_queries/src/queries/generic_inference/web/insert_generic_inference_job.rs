@@ -4,6 +4,7 @@ use enums::core::visibility::Visibility;
 use reusable_types::db::enums::generic_inference_type::GenericInferenceType;
 use sqlx::MySqlPool;
 use tokens::jobs::inference::InferenceJobToken;
+use tokens::users::user::UserToken;
 
 pub struct Args <'a> {
   pub job_token: &'a InferenceJobToken,
@@ -14,9 +15,12 @@ pub struct Args <'a> {
   pub maybe_raw_inference_text: Option<String>,
   pub maybe_model_token: Option<String>,
 
-  pub maybe_creator_user_token: Option<&'a str>,
+  pub maybe_creator_user_token: Option<&'a UserToken>,
   pub creator_ip_address: &'a str,
   pub creator_set_visibility: Visibility,
+
+  pub priority_level: u8,
+  pub is_debug_request: bool,
 
   pub mysql_pool: &'a MySqlPool,
 }
@@ -39,6 +43,9 @@ SET
   creator_ip_address = ?,
   creator_set_visibility = ?,
 
+  priority_level = ?,
+  is_debug_request = ?,
+
   status = "pending"
         "#,
         args.job_token,
@@ -52,6 +59,8 @@ SET
         args.maybe_creator_user_token,
         args.creator_ip_address,
         args.creator_set_visibility.to_str(),
+        args.priority_level,
+        args.is_debug_request,
     );
 
   let query_result = query.execute(args.mysql_pool)

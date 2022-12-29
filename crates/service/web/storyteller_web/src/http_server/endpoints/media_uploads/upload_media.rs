@@ -260,7 +260,7 @@ pub async fn upload_media_handler(
     maybe_creator_anonymous_visitor_token: None,
     creator_ip_address: &ip_address,
     creator_set_visibility,
-    maybe_creator_synthetic_id: None,
+    maybe_creator_synthetic_id: None, // TODO: Don't forget about this.
     mysql_pool: &server_state.mysql_pool,
   })
       .await

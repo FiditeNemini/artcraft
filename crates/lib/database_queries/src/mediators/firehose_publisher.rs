@@ -7,6 +7,7 @@ use sqlx::mysql::MySqlQueryResult;
 use sqlx::{MySqlPool};
 use std::sync::Arc;
 use tokens::files::media_upload::MediaUploadToken;
+use tokens::jobs::inference::InferenceJobToken;
 use tokens::users::user::UserToken;
 
 // TODO(bt, 2022-12-19): Convert this to a database 'enum'. Also, create an 'enums' package similar to 'tokens'.
@@ -26,6 +27,9 @@ enum FirehoseEvent {
   W2lTemplateUploadCompleted,
   W2lInferenceStarted,
   W2lInferenceCompleted,
+
+  VcInferenceStarted,
+  VcInferenceCompleted,
 
   GenericDownloadStarted,
   GenericDownloadCompleted,
@@ -54,6 +58,8 @@ impl FirehoseEvent {
       FirehoseEvent::W2lTemplateUploadCompleted => "w2l_template_upload_completed",
       FirehoseEvent::W2lInferenceStarted => "w2l_inference_started",
       FirehoseEvent::W2lInferenceCompleted => "w2l_inference_completed",
+      FirehoseEvent::VcInferenceStarted => "vc_inference_started",
+      FirehoseEvent::VcInferenceCompleted => "vc_inference_completed",
       FirehoseEvent::GenericDownloadStarted => "generic_download_started",
       FirehoseEvent::GenericDownloadCompleted => "generic_download_completed",
       FirehoseEvent::MediaUploaded => "media_uploaded",
@@ -181,6 +187,27 @@ impl FirehosePublisher {
       FirehoseEvent::W2lInferenceCompleted,
       maybe_user_token,
       Some(job_token), // TODO: This could be template_token
+      Some(result_token)
+    ).await?;
+    Ok(())
+  }
+
+  pub async fn enqueue_vc_inference(&self, maybe_user_token: Option<&UserToken>, inference_job_token: &InferenceJobToken) -> AnyhowResult<()> {
+    let _record_id = self.insert(
+      FirehoseEvent::VcInferenceStarted,
+      maybe_user_token.map(|u| u.as_str()),
+      Some(inference_job_token.as_str()),
+      Some(inference_job_token.as_str()),
+    ).await?;
+    Ok(())
+  }
+
+  // TODO: Change result token type.
+  pub async fn vc_inference_finished(&self, maybe_user_token: Option<&UserToken>, inference_job_token: &InferenceJobToken, result_token: &str) -> AnyhowResult<()> {
+    let _record_id = self.insert(
+      FirehoseEvent::VcInferenceCompleted,
+      maybe_user_token.map(|u| u.as_str()),
+      Some(inference_job_token.as_str()), // TODO: This could be vc model token
       Some(result_token)
     ).await?;
     Ok(())
