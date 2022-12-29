@@ -48,15 +48,15 @@ SET
 
   status = "pending"
         "#,
-        args.job_token,
+        args.job_token.as_str(),
         args.uuid_idempotency_token,
 
-        args.inference_type,
+        args.inference_type.to_str(),
         args.maybe_inference_args,
         args.maybe_raw_inference_text,
-        args.maybe_model_token,
+        args.maybe_model_token.map(|t| t.to_string()),
 
-        args.maybe_creator_user_token,
+        args.maybe_creator_user_token.map(|t| t.to_string()),
         args.creator_ip_address,
         args.creator_set_visibility.to_str(),
         args.priority_level,

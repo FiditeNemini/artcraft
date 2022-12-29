@@ -32,7 +32,7 @@ const DEBUG_HEADER_NAME : &'static str = "enable_debug_mode";
 pub struct EnqueueVoiceConversionInferenceRequest {
   uuid_idempotency_token: String,
   voice_conversion_model_token: String,
-  media_token: String,
+  source_media_token: String,
   creator_set_visibility: Option<Visibility>,
   is_storyteller_demo: Option<bool>,
 }
@@ -177,7 +177,7 @@ pub async fn enqueue_voice_conversion_inference_handler(
 
   // TODO(bt): CHECK DATABASE!
   let model_token = request.voice_conversion_model_token.to_string();
-  let _media_token = request.media_token.to_string();
+  let _media_token = request.source_media_token.to_string();
 
   let mut redis = server_state.redis_pool
       .get()
@@ -206,7 +206,7 @@ pub async fn enqueue_voice_conversion_inference_handler(
 
   let job_token = InferenceJobToken::generate();
 
-  info!("Creating tts inference job record...");
+  info!("Creating voice conversion inference job record...");
 
   let query_result = insert_generic_inference_job(Args {
     job_token: &job_token,
