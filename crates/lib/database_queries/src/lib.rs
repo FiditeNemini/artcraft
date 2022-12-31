@@ -6,5 +6,6 @@ pub mod column_types;
 pub mod complex_models;
 pub mod helpers;
 pub mod mediators;
+pub mod payloads;
 pub mod queries;
 pub mod tokens;

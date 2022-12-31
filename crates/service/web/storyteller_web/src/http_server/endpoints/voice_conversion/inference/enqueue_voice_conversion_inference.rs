@@ -20,8 +20,11 @@ use r2d2_redis::redis::Commands;
 use redis_common::redis_keys::RedisKeys;
 use std::fmt;
 use std::sync::Arc;
+use database_queries::payloads::generic_inference_args::{GenericInferenceArgs, PolymorphicInferenceArgs};
+use tokens::files::media_upload::MediaUploadToken;
 use tokens::jobs::inference::InferenceJobToken;
 use tokens::users::user::UserToken;
+use tokens::voice_conversion::model::VoiceConversionModelToken;
 use tts_common::priority::FAKEYOU_INVESTOR_PRIORITY_LEVEL;
 
 /// Debug requests can get routed to special "debug-only" workers, which can
@@ -177,7 +180,7 @@ pub async fn enqueue_voice_conversion_inference_handler(
 
   // TODO(bt): CHECK DATABASE!
   let model_token = request.voice_conversion_model_token.to_string();
-  let _media_token = request.source_media_token.to_string();
+  let media_token = request.source_media_token.to_string();
 
   let mut redis = server_state.redis_pool
       .get()
@@ -220,7 +223,13 @@ pub async fn enqueue_voice_conversion_inference_handler(
     job_token: &job_token,
     uuid_idempotency_token: &request.uuid_idempotency_token,
     inference_type: GenericInferenceType::VoiceConversion,
-    maybe_inference_args: None, // TODO: Include both tokens as well as allowed duration.
+    maybe_inference_args: Some(GenericInferenceArgs {
+      inference_type: Some(GenericInferenceType::VoiceConversion),
+      args: Some(PolymorphicInferenceArgs::VoiceConversionInferenceArgs {
+        model_token: Some(VoiceConversionModelToken::new_from_str(&model_token)),
+        maybe_media_token: Some(MediaUploadToken::new_from_str(&media_token)),
+      }),
+    }),
     maybe_raw_inference_text: None,
     maybe_model_token: Some(model_token),
     maybe_creator_user_token: maybe_user_token.as_ref(),

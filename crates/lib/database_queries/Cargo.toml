@@ -19,6 +19,7 @@ buckets = { path = "../../_types/buckets" }
 config = { path = "../config" }
 container_common = { path = "../container_common" }
 enums = { path = "../../_types/enums" }
+errors = { path = "../errors" }
 reusable_types = { path = "../../_types/reusable_types" }
 tokens = { path = "../../_types/tokens" }
 
