@@ -13,11 +13,11 @@ use crate::validations::validate_idempotency_token_format::validate_idempotency_
 use database_queries::queries::generic_download::web::insert_generic_download_job::{Args, insert_generic_download_job};
 use database_queries::tokens::Tokens;
 use enums::core::visibility::Visibility;
+use enums::workers::generic_download_type::GenericDownloadType;
 use http_server_common::request::get_request_ip::get_request_ip;
 use http_server_common::response::serialize_as_json_error::serialize_as_json_error;
 use log::{info, warn, log};
 use regex::Regex;
-use reusable_types::db::enums::generic_download_type::GenericDownloadType;
 use sqlx::error::DatabaseError;
 use sqlx::error::Error::Database;
 use sqlx::mysql::MySqlDatabaseError;

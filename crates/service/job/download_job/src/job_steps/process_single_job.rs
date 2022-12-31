@@ -10,9 +10,9 @@ use crate::job_types::tacotron::process_tacotron_model::process_tacotron_model;
 use database_queries::queries::generic_download::job::list_available_generic_download_jobs::AvailableDownloadJob;
 use database_queries::queries::generic_download::job::mark_generic_download_job_done::mark_generic_download_job_done;
 use database_queries::queries::generic_download::job::mark_generic_download_job_pending_and_grab_lock::mark_generic_download_job_pending_and_grab_lock;
+use enums::workers::generic_download_type::GenericDownloadType;
 use jobs_common::redis_job_status_logger::RedisJobStatusLogger;
 use log::{info, warn};
-use reusable_types::db::enums::generic_download_type::GenericDownloadType;
 use tempdir::TempDir;
 
 pub async fn process_single_job(job_state: &JobState, job: &AvailableDownloadJob) -> AnyhowResult<()> {

@@ -1,7 +1,7 @@
 use anyhow::anyhow;
 use container_common::anyhow_result::AnyhowResult;
 use enums::core::visibility::Visibility;
-use reusable_types::db::enums::generic_download_type::GenericDownloadType;
+use enums::workers::generic_download_type::GenericDownloadType;
 use sqlx::MySqlPool;
 use tokens::jobs::download::DownloadJobToken;
 

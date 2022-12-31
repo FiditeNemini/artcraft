@@ -1,3 +1,6 @@
+
+// TODO: Use macro-derived impls
+
 /// Our "generic inference" pipeline supports a wide variety of ML models and other media.
 /// Each type of inference is identified by the following enum variants.
 /// These types are present in the HTTP API and database columns as serialized here.
@@ -34,7 +37,7 @@ impl GenericInferenceType {
 
 #[cfg(test)]
 mod tests {
-  use crate::db::enums::generic_inference_type::GenericInferenceType;
+  use crate::workers::generic_inference_type::GenericInferenceType;
   use crate::test_helpers::assert_serialization;
 
   #[test]

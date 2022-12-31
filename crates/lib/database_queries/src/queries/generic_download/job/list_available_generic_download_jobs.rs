@@ -5,7 +5,7 @@ use crate::column_types::job_status::JobStatus;
 use crate::queries::generic_download::job::_keys::GenericDownloadJobId;
 use crate::tokens::Tokens;
 use enums::core::visibility::Visibility;
-use reusable_types::db::enums::generic_download_type::GenericDownloadType;
+use enums::workers::generic_download_type::GenericDownloadType;
 use sqlx::MySqlPool;
 use std::path::Path;
 use tokens::jobs::download::DownloadJobToken;
@@ -47,7 +47,7 @@ SELECT
   creator_ip_address,
   creator_set_visibility as `creator_set_visibility: enums::core::visibility::Visibility`,
 
-  download_type as `download_type: reusable_types::db::enums::generic_download_type::GenericDownloadType`,
+  download_type as `download_type: enums::workers::generic_download_type::GenericDownloadType`,
   download_url,
   title,
 

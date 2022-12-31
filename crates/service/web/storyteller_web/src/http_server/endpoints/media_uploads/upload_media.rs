@@ -24,7 +24,6 @@ use http_server_common::response::serialize_as_json_error::serialize_as_json_err
 use log::{info, warn, log};
 use media::decode_basic_audio_info::decode_basic_audio_info;
 use regex::Regex;
-use reusable_types::db::enums::generic_download_type::GenericDownloadType;
 use reusable_types::db::payloads::MediaUploadDetails;
 use sqlx::error::DatabaseError;
 use sqlx::error::Error::Database;

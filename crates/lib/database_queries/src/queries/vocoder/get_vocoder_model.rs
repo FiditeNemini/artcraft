@@ -8,8 +8,8 @@ use chrono::{DateTime, Utc};
 use container_common::anyhow_result::AnyhowResult;
 use crate::helpers::boolean_converters::i8_to_bool;
 use enums::core::visibility::Visibility;
+use enums::ml::vocoder_type::VocoderType;
 use log::warn;
-use reusable_types::db::enums::vocoder_type::VocoderType;
 use sqlx::MySqlPool;
 
 // FIXME: This is the old style of query scoping and shouldn't be copied.
@@ -120,7 +120,7 @@ async fn select_including_deleted(
         r#"
 SELECT
     vocoder.token as vocoder_token,
-    vocoder.vocoder_type as `vocoder_type: reusable_types::db::enums::vocoder_type::VocoderType`,
+    vocoder.vocoder_type as `vocoder_type: enums::ml::vocoder_type::VocoderType`,
 
     vocoder.creator_user_token,
     users.username as creator_username,
@@ -168,7 +168,7 @@ async fn select_without_deleted(
         r#"
 SELECT
     vocoder.token as vocoder_token,
-    vocoder.vocoder_type as `vocoder_type: reusable_types::db::enums::vocoder_type::VocoderType`,
+    vocoder.vocoder_type as `vocoder_type: enums::ml::vocoder_type::VocoderType`,
 
     vocoder.creator_user_token,
     users.username as creator_username,

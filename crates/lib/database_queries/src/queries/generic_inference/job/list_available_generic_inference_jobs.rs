@@ -5,7 +5,7 @@ use crate::column_types::job_status::JobStatus;
 use crate::helpers::boolean_converters::i8_to_bool;
 use crate::queries::generic_inference::job::_keys::GenericInferenceJobId;
 use enums::core::visibility::Visibility;
-use reusable_types::db::enums::generic_inference_type::GenericInferenceType;
+use enums::workers::generic_inference_type::GenericInferenceType;
 use sqlx::MySqlPool;
 use std::path::Path;
 use tokens::jobs::inference::InferenceJobToken;
@@ -51,7 +51,7 @@ SELECT
   id as `id: crate::queries::generic_inference::job::_keys::GenericInferenceJobId`,
   token AS `inference_job_token: tokens::jobs::inference::InferenceJobToken`,
 
-  inference_type as `inference_type: reusable_types::db::enums::generic_inference_type::GenericInferenceType`,
+  inference_type as `inference_type: enums::workers::generic_inference_type::GenericInferenceType`,
   maybe_inference_args,
   maybe_raw_inference_text,
   maybe_model_token,

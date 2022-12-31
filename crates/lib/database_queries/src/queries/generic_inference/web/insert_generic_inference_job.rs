@@ -1,7 +1,7 @@
 use anyhow::anyhow;
 use container_common::anyhow_result::AnyhowResult;
 use enums::core::visibility::Visibility;
-use reusable_types::db::enums::generic_inference_type::GenericInferenceType;
+use enums::workers::generic_inference_type::GenericInferenceType;
 use sqlx::MySqlPool;
 use tokens::jobs::inference::InferenceJobToken;
 use tokens::users::user::UserToken;

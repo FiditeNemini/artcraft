@@ -2,7 +2,6 @@ use anyhow::anyhow;
 use chrono::{DateTime, Utc};
 use container_common::anyhow_result::AnyhowResult;
 use log::warn;
-use reusable_types::db::enums::generic_download_type::GenericDownloadType;
 use sqlx::MySqlPool;
 use tokens::jobs::download::DownloadJobToken;
 

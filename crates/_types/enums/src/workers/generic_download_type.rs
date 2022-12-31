@@ -1,3 +1,6 @@
+
+// TODO: Use macro-derived impls
+
 /// Our "generic downloads" pipeline supports a wide variety of ML models and other media.
 /// They are serialized in the database table `generic_download_jobs` as a VARCHAR(32).
 ///
@@ -59,7 +62,7 @@ impl GenericDownloadType {
 
 #[cfg(test)]
 mod tests {
-  use crate::db::enums::generic_download_type::GenericDownloadType;
+  use crate::workers::generic_download_type::GenericDownloadType;
   use crate::test_helpers::assert_serialization;
 
   #[test]

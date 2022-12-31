@@ -12,12 +12,12 @@ use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::server_state::ServerState;
 use database_queries::queries::generic_inference::web::insert_generic_inference_job::{Args, insert_generic_inference_job};
 use enums::core::visibility::Visibility;
+use enums::workers::generic_inference_type::GenericInferenceType;
 use http_server_common::request::get_request_header_optional::get_request_header_optional;
 use http_server_common::request::get_request_ip::get_request_ip;
 use log::{info, warn};
 use r2d2_redis::redis::Commands;
 use redis_common::redis_keys::RedisKeys;
-use reusable_types::db::enums::generic_inference_type::GenericInferenceType;
 use std::fmt;
 use std::sync::Arc;
 use tokens::jobs::inference::InferenceJobToken;
@@ -208,10 +208,18 @@ pub async fn enqueue_voice_conversion_inference_handler(
 
   info!("Creating voice conversion inference job record...");
 
+
+  // TODO TODO TODO TODO --- InferenceArgs. ! This is where the media token will live.
+  //  - Also maybe move reusable_types stuff to `_types` as a manner of cleanup
+  //  - Also figure out which serializable types are giving the DB trouble. Wasn't this solved?
+  //     I don't want to call to_str, as_str, etc. everywhere.
+  //  - INFERENCE JOB(1) -> Voice Conversion (w/ Docker sidecar)
+  //  - INFERENCE JOB(2) -> Get it working with TTS too, and update the frontend
+
   let query_result = insert_generic_inference_job(Args {
     job_token: &job_token,
     uuid_idempotency_token: &request.uuid_idempotency_token,
-    inference_type: GenericInferenceType::VoiceConversion, // TODO: Move from `reusable_types`
+    inference_type: GenericInferenceType::VoiceConversion,
     maybe_inference_args: None, // TODO: Include both tokens as well as allowed duration.
     maybe_raw_inference_text: None,
     maybe_model_token: Some(model_token),
