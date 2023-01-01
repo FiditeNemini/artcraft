@@ -10,9 +10,10 @@ use container_common::filesystem::safe_delete_temp_directory::safe_delete_temp_d
 use container_common::filesystem::safe_delete_temp_file::safe_delete_temp_file;
 use container_common::hashing::hash_string_sha2::hash_string_sha2;
 use container_common::token::random_uuid::generate_random_uuid;
-use crate::job_steps::download_file_from_bucket::maybe_download_file_from_bucket;
-use crate::job_steps::job_args::JobArgs;
+use crate::job_steps::job_dependencies::JobDependencies;
 use crate::job_steps::process_single_job_error::ProcessSingleJobError;
+use crate::job_types::tts::seconds_to_decoder_steps::seconds_to_decoder_steps;
+use crate::util::download_file_from_bucket::maybe_download_file_from_bucket;
 use database_queries::column_types::vocoder_type::VocoderType;
 use database_queries::queries::tts::tts_inference_jobs::list_available_tts_inference_jobs::AvailableTtsInferenceJob;
 use database_queries::queries::tts::tts_inference_jobs::mark_tts_inference_job_done::mark_tts_inference_job_done;
@@ -29,7 +30,6 @@ use tempdir::TempDir;
 use tts_common::clean_symbols::clean_symbols;
 use tts_common::text_pipelines::guess_pipeline::guess_text_pipeline_heuristic;
 use tts_common::text_pipelines::text_pipeline_type::TextPipelineType;
-use crate::job_steps::seconds_to_decoder_steps::seconds_to_decoder_steps;
 
 #[derive(Deserialize, Default)]
 struct FileMetadata {
@@ -46,7 +46,7 @@ fn read_metadata_file(filename: &PathBuf) -> AnyhowResult<FileMetadata> {
 }
 
 pub async fn process_single_job(
-  job_args: &JobArgs,
+  job_args: &JobDependencies,
   job: &AvailableTtsInferenceJob,
   model_record: &TtsModelForInferenceRecord,
 ) -> Result<(Span, Span), ProcessSingleJobError> {

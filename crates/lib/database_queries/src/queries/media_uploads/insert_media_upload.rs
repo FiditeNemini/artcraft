@@ -1,9 +1,9 @@
 use anyhow::anyhow;
 use buckets::public::media_uploads::original_file::MediaUploadOriginalFilePath;
 use container_common::anyhow_result::AnyhowResult;
+use crate::payloads::media_upload_details::MediaUploadDetails;
 use enums::core::visibility::Visibility;
 use enums::files::media_upload_type::MediaUploadType;
-use reusable_types::db::payloads::MediaUploadDetails;
 use sqlx::MySqlPool;
 use tokens::files::media_upload::MediaUploadToken;
 use tokens::users::user::UserToken;

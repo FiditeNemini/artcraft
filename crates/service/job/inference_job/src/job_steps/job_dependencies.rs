@@ -16,7 +16,7 @@ use newrelic_telemetry::Client as NewRelicClient;
 use sqlx::MySqlPool;
 use std::path::PathBuf;
 
-pub struct JobArgs {
+pub struct JobDependencies {
   pub download_temp_directory: PathBuf,
   pub scoped_temp_dir_creator: ScopedTempDirCreator,
 
@@ -111,7 +111,7 @@ pub struct JobHttpClients {
   pub tts_sidecar_health_check_client: TtsSidecarHealthCheckClient,
 }
 
-impl JobArgs {
+impl JobDependencies {
 
   /// Get the best name for the worker.
   pub fn get_worker_name(&self) -> String {

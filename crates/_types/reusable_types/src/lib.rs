@@ -17,6 +17,5 @@
 #[cfg(test)] pub mod test_helpers;
 
 pub mod achievements;
-pub mod db;
 pub mod server_environment;
 pub mod stripe;
