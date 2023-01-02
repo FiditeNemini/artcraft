@@ -1,108 +1,39 @@
-// NB: Incrementally getting rid of build warnings...
-#![forbid(unused_imports)]
-#![forbid(unused_mut)]
-#![forbid(unused_variables)]
-
 use anyhow::anyhow;
-use container_common::filesystem::check_file_exists::check_file_exists;
-use container_common::filesystem::safe_delete_temp_directory::safe_delete_temp_directory;
-use container_common::filesystem::safe_delete_temp_file::safe_delete_temp_file;
-use container_common::hashing::hash_string_sha2::hash_string_sha2;
-use container_common::token::random_uuid::generate_random_uuid;
+use log::{info, warn};
+use tempdir::TempDir;
 use crate::job_steps::job_dependencies::JobDependencies;
 use crate::job_steps::process_single_job_error::ProcessSingleJobError;
-use crate::job_types::tts::seconds_to_decoder_steps::seconds_to_decoder_steps;
-use crate::util::download_file_from_bucket::maybe_download_file_from_bucket;
-use database_queries::column_types::vocoder_type::VocoderType;
-use database_queries::queries::tts::tts_inference_jobs::list_available_tts_inference_jobs::AvailableTtsInferenceJob;
-use database_queries::queries::tts::tts_inference_jobs::mark_tts_inference_job_done::mark_tts_inference_job_done;
-use database_queries::queries::tts::tts_inference_jobs::mark_tts_inference_job_pending_and_grab_lock::mark_tts_inference_job_pending_and_grab_lock;
-use database_queries::queries::tts::tts_models::get_tts_model_for_inference::TtsModelForInferenceRecord;
-use database_queries::queries::tts::tts_results::insert_tts_result::insert_tts_result;
+use database_queries::queries::generic_inference::job::list_available_generic_inference_jobs::AvailableInferenceJob;
 use errors::AnyhowResult;
-use log::{warn, info, error};
-use newrelic_telemetry::Span;
-use std::fs::File;
-use std::io::Read;
-use std::path::PathBuf;
-use std::time::{SystemTime, UNIX_EPOCH, Instant};
-use tempdir::TempDir;
 use tts_common::clean_symbols::clean_symbols;
-use tts_common::text_pipelines::guess_pipeline::guess_text_pipeline_heuristic;
-use tts_common::text_pipelines::text_pipeline_type::TextPipelineType;
+use crate::util::download_file_from_bucket::maybe_download_file_from_bucket;
 
-pub async fn process_single_job_old(
-  job_args: &JobDependencies,
-  job: &AvailableTtsInferenceJob,
-  model_record: &TtsModelForInferenceRecord,
-) -> Result<(Span, Span), ProcessSingleJobError> {
+pub async fn handle_tts_inference(
+  job_dependencies: &JobDependencies,
+  job: &AvailableInferenceJob,
+) -> AnyhowResult<()> {
 
-  let start = Instant::now();
-
-  //let span_id = generate_random_uuid();
-  //let trace_id = generate_random_uuid();
-  //let maybe_user_token = job.maybe_creator_user_token.as_deref().unwrap_or("");
-
-  //let mut job_iteration_span = Span::new(&span_id, &trace_id, get_timestamp_millis())
-  //    .name("single job execution")
-  //    .attribute("user_token", maybe_user_token)
-  //    .service_name("tts-inference-job");
-
-  //let span_id = generate_random_uuid();
-  //let trace_id = generate_random_uuid();
-
-  //let created_at_timestamp = (job.created_at.timestamp() as u64) * 1000;
-
-  //let mut since_creation_span = Span::new(&span_id, &trace_id, created_at_timestamp)
-  //    .name("job since creation")
-  //    .attribute("user_token", maybe_user_token)
-  //    .service_name("tts-inference-job");
-
-  let mut job_progress_reporter = job_args
+  let mut job_progress_reporter = job_dependencies
       .job_progress_reporter
-      .new_tts_inference(&job.inference_job_token)
+      .new_tts_inference(job.inference_job_token.as_str())
       .map_err(|e| ProcessSingleJobError::Other(anyhow!(e)))?;
-
-  // ==================== ATTEMPT TO GRAB JOB LOCK ==================== //
-
-  info!("Attempting to grab lock for job: {}", job.inference_job_token);
-
-  let lock_acquired =
-      mark_tts_inference_job_pending_and_grab_lock(&job_args.mysql_pool, job.id)
-          .await
-          .map_err(|e| ProcessSingleJobError::Other(e))?;
-
-  if !lock_acquired {
-    warn!("Could not acquire job lock for: {:?}", &job.id);
-    let duration = start.elapsed();
-
-    since_creation_span.set_attribute("status", "failure");
-    since_creation_span.set_duration(duration);
-
-    job_iteration_span.set_attribute("status", "failure");
-    job_iteration_span.set_duration(duration);
-
-    return Ok((since_creation_span, job_iteration_span));
-  }
-
-  info!("Lock acquired for job: {}", job.inference_job_token);
 
   // ==================== CONFIRM OR DOWNLOAD WAVEGLOW VOCODER MODEL ==================== //
 
   let waveglow_vocoder_model_fs_path = {
-    let waveglow_vocoder_model_filename = job_args.waveglow_vocoder_model_filename.clone();
-    let waveglow_vocoder_model_fs_path = job_args.semi_persistent_cache.tts_pretrained_vocoder_model_path(&waveglow_vocoder_model_filename);
-    let waveglow_vocoder_model_object_path = job_args.bucket_path_unifier.tts_pretrained_vocoders_path(&waveglow_vocoder_model_filename);
+    let waveglow_vocoder_model_filename = job_dependencies.waveglow_vocoder_model_filename.clone();
+    let waveglow_vocoder_model_fs_path = job_dependencies.semi_persistent_cache.tts_pretrained_vocoder_model_path(&waveglow_vocoder_model_filename);
+    let waveglow_vocoder_model_object_path = job_dependencies.bucket_path_unifier.tts_pretrained_vocoders_path(&waveglow_vocoder_model_filename);
 
     maybe_download_file_from_bucket(
       "waveglow vocoder model",
       &waveglow_vocoder_model_fs_path,
       &waveglow_vocoder_model_object_path,
-      &job_args.private_bucket_client,
+      &job_dependencies.private_bucket_client,
       &mut job_progress_reporter,
       "downloading vocoder (1 of 3)",
       job.id.0,
-      &job_args.scoped_temp_dir_creator,
+      &job_dependencies.scoped_temp_dir_creator,
     ).await?;
 
     waveglow_vocoder_model_fs_path
@@ -111,19 +42,19 @@ pub async fn process_single_job_old(
   // ==================== CONFIRM OR DOWNLOAD HIFIGAN (NORMAL) VOCODER MODEL ==================== //
 
   let pretrained_hifigan_vocoder_model_fs_path = {
-    let hifigan_vocoder_model_filename = job_args.hifigan_vocoder_model_filename.clone();
-    let hifigan_vocoder_model_fs_path = job_args.semi_persistent_cache.tts_pretrained_vocoder_model_path(&hifigan_vocoder_model_filename);
-    let hifigan_vocoder_model_object_path = job_args.bucket_path_unifier.tts_pretrained_vocoders_path(&hifigan_vocoder_model_filename);
+    let hifigan_vocoder_model_filename = job_dependencies.hifigan_vocoder_model_filename.clone();
+    let hifigan_vocoder_model_fs_path = job_dependencies.semi_persistent_cache.tts_pretrained_vocoder_model_path(&hifigan_vocoder_model_filename);
+    let hifigan_vocoder_model_object_path = job_dependencies.bucket_path_unifier.tts_pretrained_vocoders_path(&hifigan_vocoder_model_filename);
 
     maybe_download_file_from_bucket(
       "hifigan vocoder model",
       &hifigan_vocoder_model_fs_path,
       &hifigan_vocoder_model_object_path,
-      &job_args.private_bucket_client,
+      &job_dependencies.private_bucket_client,
       &mut job_progress_reporter,
       "downloading vocoder (2 of 3)",
       job.id.0,
-      &job_args.scoped_temp_dir_creator,
+      &job_dependencies.scoped_temp_dir_creator,
     ).await?;
 
     hifigan_vocoder_model_fs_path
@@ -132,19 +63,19 @@ pub async fn process_single_job_old(
   // ==================== CONFIRM OR DOWNLOAD HIFIGAN (SUPERRES) VOCODER MODEL ==================== //
 
   let hifigan_superres_vocoder_model_fs_path = {
-    let hifigan_superres_vocoder_model_filename = job_args.hifigan_superres_vocoder_model_filename.clone();
-    let hifigan_superres_vocoder_model_fs_path = job_args.semi_persistent_cache.tts_pretrained_vocoder_model_path(&hifigan_superres_vocoder_model_filename);
-    let hifigan_superres_vocoder_model_object_path = job_args.bucket_path_unifier.tts_pretrained_vocoders_path(&hifigan_superres_vocoder_model_filename);
+    let hifigan_superres_vocoder_model_filename = job_dependencies.hifigan_superres_vocoder_model_filename.clone();
+    let hifigan_superres_vocoder_model_fs_path = job_dependencies.semi_persistent_cache.tts_pretrained_vocoder_model_path(&hifigan_superres_vocoder_model_filename);
+    let hifigan_superres_vocoder_model_object_path = job_dependencies.bucket_path_unifier.tts_pretrained_vocoders_path(&hifigan_superres_vocoder_model_filename);
 
     maybe_download_file_from_bucket(
       "hifigan superres vocoder model",
       &hifigan_superres_vocoder_model_fs_path,
       &hifigan_superres_vocoder_model_object_path,
-      &job_args.private_bucket_client,
+      &job_dependencies.private_bucket_client,
       &mut job_progress_reporter,
       "downloading vocoder (3 of 3)",
       job.id.0,
-      &job_args.scoped_temp_dir_creator,
+      &job_dependencies.scoped_temp_dir_creator,
     ).await?;
 
     hifigan_superres_vocoder_model_fs_path
@@ -155,18 +86,18 @@ pub async fn process_single_job_old(
   let custom_vocoder_fs_path = match &model_record.maybe_custom_vocoder {
     None => None,
     Some(vocoder) => {
-      let custom_vocoder_fs_path = job_args.semi_persistent_cache.custom_vocoder_model_path(&vocoder.vocoder_token);
-      let custom_vocoder_object_path  = job_args.bucket_path_unifier.vocoder_path(&vocoder.vocoder_private_bucket_hash);
+      let custom_vocoder_fs_path = job_dependencies.semi_persistent_cache.custom_vocoder_model_path(&vocoder.vocoder_token);
+      let custom_vocoder_object_path  = job_dependencies.bucket_path_unifier.vocoder_path(&vocoder.vocoder_private_bucket_hash);
 
       maybe_download_file_from_bucket(
         "custom vocoder",
         &custom_vocoder_fs_path,
         &custom_vocoder_object_path,
-        &job_args.private_bucket_client,
+        &job_dependencies.private_bucket_client,
         &mut job_progress_reporter,
         "downloading user vocoder",
         job.id.0,
-        &job_args.scoped_temp_dir_creator,
+        &job_dependencies.scoped_temp_dir_creator,
       ).await?;
 
       Some(custom_vocoder_fs_path)
@@ -176,18 +107,18 @@ pub async fn process_single_job_old(
   // ==================== CONFIRM OR DOWNLOAD TTS SYNTHESIZER MODEL ==================== //
 
   let tts_synthesizer_fs_path = {
-    let tts_synthesizer_fs_path = job_args.semi_persistent_cache.tts_synthesizer_model_path(&model_record.model_token);
-    let tts_synthesizer_object_path  = job_args.bucket_path_unifier.tts_synthesizer_path(&model_record.private_bucket_hash);
+    let tts_synthesizer_fs_path = job_dependencies.semi_persistent_cache.tts_synthesizer_model_path(&model_record.model_token);
+    let tts_synthesizer_object_path  = job_dependencies.bucket_path_unifier.tts_synthesizer_path(&model_record.private_bucket_hash);
 
     maybe_download_file_from_bucket(
       "synthesizer",
       &tts_synthesizer_fs_path,
       &tts_synthesizer_object_path,
-      &job_args.private_bucket_client,
+      &job_dependencies.private_bucket_client,
       &mut job_progress_reporter,
       "downloading synthesizer",
       job.id.0,
-      &job_args.scoped_temp_dir_creator,
+      &job_dependencies.scoped_temp_dir_creator,
     ).await?;
 
     tts_synthesizer_fs_path
@@ -218,7 +149,7 @@ pub async fn process_single_job_old(
       .map_err(|e| ProcessSingleJobError::Other(e))?;
 
   // TODO: Fix this.
-  let maybe_unload_model_path = job_args
+  let maybe_unload_model_path = job_dependencies
       .virtual_model_lfu
       .insert_returning_replaced(tts_synthesizer_fs_path.to_str().unwrap_or(""))
       .map_err(|e| ProcessSingleJobError::Other(e))?;
@@ -275,7 +206,7 @@ pub async fn process_single_job_old(
   //  roughly 12 seconds max. Here we map seconds to decoder steps.
   let max_decoder_steps = seconds_to_decoder_steps(job.max_duration_seconds);
 
-  job_args.http_clients.tts_inference_sidecar_client.request_inference(
+  job_dependencies.http_clients.tts_inference_sidecar_client.request_inference(
     &cleaned_inference_text,
     max_decoder_steps,
     &tts_synthesizer_fs_path,
@@ -309,14 +240,14 @@ pub async fn process_single_job_old(
   job_progress_reporter.log_status("uploading result")
       .map_err(|e| ProcessSingleJobError::Other(e))?;
 
-  let audio_result_object_path = job_args.bucket_path_unifier.tts_inference_wav_audio_output_path(
+  let audio_result_object_path = job_dependencies.bucket_path_unifier.tts_inference_wav_audio_output_path(
     &job.uuid_idempotency_token); // TODO: Don't use this!
 
   info!("Audio destination bucket path: {:?}", &audio_result_object_path);
 
   info!("Uploading audio...");
 
-  job_args.public_bucket_client.upload_filename_with_content_type(
+  job_dependencies.public_bucket_client.upload_filename_with_content_type(
     &audio_result_object_path,
     &output_audio_fs_path,
     "audio/wav")
@@ -327,14 +258,14 @@ pub async fn process_single_job_old(
 
   // ==================== UPLOAD SPECTROGRAM TO BUCKETS ==================== //
 
-  let spectrogram_result_object_path = job_args.bucket_path_unifier.tts_inference_spectrogram_output_path(
+  let spectrogram_result_object_path = job_dependencies.bucket_path_unifier.tts_inference_spectrogram_output_path(
     &job.uuid_idempotency_token); // TODO: Don't use this!
 
   info!("Spectrogram destination bucket path: {:?}", &spectrogram_result_object_path);
 
   info!("Uploading spectrogram...");
 
-  job_args.public_bucket_client.upload_filename_with_content_type(
+  job_dependencies.public_bucket_client.upload_filename_with_content_type(
     &spectrogram_result_object_path,
     &output_spectrogram_fs_path,
     "application/json")
@@ -353,12 +284,12 @@ pub async fn process_single_job_old(
   let text_hash = hash_string_sha2(&cleaned_inference_text)
       .map_err(|e| ProcessSingleJobError::Other(e))?;
 
-  let worker_name = job_args.get_worker_name();
+  let worker_name = job_dependencies.get_worker_name();
 
   info!("Saving tts inference record...");
 
   let (id, inference_result_token) = insert_tts_result(
-    &job_args.mysql_pool,
+    &job_dependencies.mysql_pool,
     job,
     &text_hash,
     pretrained_vocoder,
@@ -366,15 +297,15 @@ pub async fn process_single_job_old(
     &spectrogram_result_object_path,
     file_metadata.file_size_bytes,
     file_metadata.duration_millis.unwrap_or(0),
-    job_args.worker_details.is_on_prem,
+    job_dependencies.worker_details.is_on_prem,
     &worker_name,
-    job_args.worker_details.is_debug_worker)
+    job_dependencies.worker_details.is_debug_worker)
       .await
       .map_err(|e| ProcessSingleJobError::Other(e))?;
 
   info!("Marking job complete...");
   mark_tts_inference_job_done(
-    &job_args.mysql_pool,
+    &job_dependencies.mysql_pool,
     job.id,
     true,
     Some(&inference_result_token),
@@ -384,7 +315,7 @@ pub async fn process_single_job_old(
 
   info!("TTS Done. Original text was: {}", &job.raw_inference_text);
 
-  job_args.firehose_publisher.tts_inference_finished(
+  job_dependencies.firehose_publisher.tts_inference_finished(
     job.maybe_creator_user_token.as_deref(),
     &model_record.model_token,
     &inference_result_token)
@@ -409,11 +340,5 @@ pub async fn process_single_job_old(
   job_iteration_span.set_duration(duration);
 
   Ok((since_creation_span, job_iteration_span))
-}
-
-fn get_timestamp_millis() -> u64 {
-  SystemTime::now()
-      .duration_since(UNIX_EPOCH)
-      .map(|d| d.as_millis() as u64)
-      .unwrap_or(0)
+  Ok(())
 }

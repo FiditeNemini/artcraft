@@ -28,10 +28,8 @@ pub async fn process_single_job(job_dependencies: &JobDependencies, job: &Availa
 
   // ==================== SETUP TEMP DIRS ==================== //
 
-  // TODO: Scoped temp dir
-
   let temp_dir = format!("temp_{}", job.id.0);
-  let temp_dir = TempDir::new(&temp_dir)?;
+  let temp_dir = job_dependencies.scoped_temp_dir_creator.new_tempdir(&temp_dir)?;
 
   // ==================== HANDLE DIFFERENT INFERENCE TYPES ==================== //
 
