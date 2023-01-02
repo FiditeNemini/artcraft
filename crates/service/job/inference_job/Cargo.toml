@@ -19,8 +19,11 @@ cloud_storage = { path = "../../../lib/cloud_storage" }
 config = { path = "../../../lib/config" }
 container_common = { path = "../../../lib/container_common" }
 database_queries = { path = "../../../lib/database_queries" }
+enums = { path = "../../../_types/enums" }
+errors = { path = "../../../lib/errors" }
 jobs_common = { path = "../../../lib/jobs_common" }
 memory_caching = { path = "../../../lib/memory_caching" }
+tokens = { path = "../../../_types/tokens" }
 tts_common = { path = "../../../lib/tts_common" }
 
 # Vendored code

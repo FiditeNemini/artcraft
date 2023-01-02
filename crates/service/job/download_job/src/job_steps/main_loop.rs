@@ -7,6 +7,7 @@ use jobs_common::noop_logger::NoOpLogger;
 use log::warn;
 use std::time::Duration;
 
+// Job runner timeouts (guards MySQL)
 const START_TIMEOUT_MILLIS : u64 = 500;
 const INCREASE_TIMEOUT_MILLIS : u64 = 1000;
 
@@ -41,7 +42,7 @@ pub async fn main_loop(job_state: JobState) {
     match result {
       Ok(_) => {},
       Err(e) => {
-        warn!("Error querying jobs: {:?}", e);
+        warn!("Error processing jobs: {:?}", e);
         std::thread::sleep(Duration::from_millis(error_timeout_millis));
         error_timeout_millis += INCREASE_TIMEOUT_MILLIS;
         continue;

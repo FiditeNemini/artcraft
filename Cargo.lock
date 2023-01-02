@@ -2541,6 +2541,8 @@ dependencies = [
  "database_queries",
  "dotenv",
  "easyenv",
+ "enums",
+ "errors",
  "hostname",
  "hyper 0.14.14",
  "jobs_common",
@@ -2555,6 +2557,7 @@ dependencies = [
  "sqlx",
  "subprocess",
  "tempdir",
+ "tokens",
  "tokio 1.16.1",
  "tts_common",
 ]

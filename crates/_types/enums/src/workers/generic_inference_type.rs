@@ -1,12 +1,14 @@
 
 // TODO: Use macro-derived impls
 
+use std::collections::BTreeSet;
+
 /// Our "generic inference" pipeline supports a wide variety of ML models and other media.
 /// Each type of inference is identified by the following enum variants.
 /// These types are present in the HTTP API and database columns as serialized here.
 ///
 /// DO NOT CHANGE VALUES WITHOUT A MIGRATION STRATEGY.
-#[derive(Clone, Copy, Eq, PartialEq, Debug, Deserialize, Serialize, sqlx::Type)]
+#[derive(Clone, Copy, Eq, PartialEq, Debug, Hash, Ord, PartialOrd, Deserialize, Serialize, sqlx::Type)]
 pub enum GenericInferenceType {
   #[serde(rename = "text_to_speech")]
   #[sqlx(rename = "text_to_speech")]
@@ -33,6 +35,15 @@ impl GenericInferenceType {
       _ => Err(format!("invalid value: {:?}", value)),
     }
   }
+
+  pub fn all_variants() -> BTreeSet<GenericInferenceType> {
+    // NB: BTreeSet is sorted
+    // NB: BTreeSet::from() isn't const, but not worth using LazyStatic, etc.
+    BTreeSet::from([
+      GenericInferenceType::TextToSpeech,
+      GenericInferenceType::VoiceConversion,
+    ])
+  }
 }
 
 #[cfg(test)]
@@ -56,5 +67,14 @@ mod tests {
   fn from_str() {
     assert_eq!(GenericInferenceType::from_str("text_to_speech").unwrap(), GenericInferenceType::TextToSpeech);
     assert_eq!(GenericInferenceType::from_str("voice_conversion").unwrap(), GenericInferenceType::VoiceConversion);
+  }
+
+  #[test]
+  fn all_variants() {
+    let mut variants = GenericInferenceType::all_variants();
+    assert_eq!(variants.len(), 2);
+    assert_eq!(variants.pop_first(), Some(GenericInferenceType::TextToSpeech));
+    assert_eq!(variants.pop_first(), Some(GenericInferenceType::VoiceConversion));
+    assert_eq!(variants.pop_first(), None);
   }
 }

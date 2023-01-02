@@ -1,6 +1,9 @@
 pub mod job_dependencies;
 pub mod job_stats;
 pub mod main_loop;
+pub mod main_loop_old;
 pub mod process_single_job;
 pub mod process_single_job_error;
+pub mod process_single_job_old;
+pub mod select_job_batch;
 pub mod sidecar_health_check_trap;

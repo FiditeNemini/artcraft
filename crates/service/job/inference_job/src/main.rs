@@ -38,7 +38,7 @@ use crate::http_clients::tts_sidecar_health_check_client::TtsSidecarHealthCheckC
 use crate::job_steps::job_dependencies::JobWorkerDetails;
 use crate::job_steps::job_dependencies::{JobDependencies, JobCaches, JobHttpClients};
 use crate::job_steps::job_stats::JobStats;
-use crate::job_steps::main_loop::main_loop;
+use crate::job_steps::main_loop_old::main_loop_old;
 use crate::script_execution::tacotron_inference_command::TacotronInferenceCommand;
 use crate::util::scoped_temp_dir_creator::ScopedTempDirCreator;
 use database_queries::mediators::firehose_publisher::FirehosePublisher;
@@ -328,7 +328,7 @@ async fn main() -> AnyhowResult<()> {
     maybe_minimum_priority,
   };
 
-  main_loop(inferencer).await;
+  main_loop_old(inferencer).await;
 
   Ok(())
 }

@@ -6,7 +6,10 @@ use crate::helpers::boolean_converters::i8_to_bool;
 use crate::queries::generic_inference::job::_keys::GenericInferenceJobId;
 use enums::core::visibility::Visibility;
 use enums::workers::generic_inference_type::GenericInferenceType;
-use sqlx::MySqlPool;
+use sqlx::mysql::MySqlArguments;
+use sqlx::{MySql, MySqlPool};
+use std::collections::BTreeSet;
+use std::future::Future;
 use std::path::Path;
 use tokens::jobs::inference::InferenceJobToken;
 
@@ -41,56 +44,33 @@ pub struct AvailableInferenceJob {
   pub retry_at: Option<chrono::DateTime<Utc>>,
 }
 
-pub async fn list_available_generic_inference_jobs(pool: &MySqlPool, num_records: u32)
+pub struct ListAvailableGenericInferenceJobArgs<'a> {
+  pub num_records: u32,
+  pub is_debug_worker: bool,
+  pub sort_by_priority: bool,
+  pub maybe_scope_by_job_type: Option<BTreeSet<GenericInferenceType>>,
+  pub mysql_pool: &'a MySqlPool,
+}
+
+pub async fn list_available_generic_inference_jobs(
+  args: ListAvailableGenericInferenceJobArgs<'_>,
+)
   -> AnyhowResult<Vec<AvailableInferenceJob>>
 {
-  let job_records = sqlx::query_as!(
-      AvailableInferenceJobRawInternal,
-        r#"
-SELECT
-  id as `id: crate::queries::generic_inference::job::_keys::GenericInferenceJobId`,
-  token AS `inference_job_token: tokens::jobs::inference::InferenceJobToken`,
+  let ALL_TYPES = GenericInferenceType::all_variants();
 
-  inference_type as `inference_type: enums::workers::generic_inference_type::GenericInferenceType`,
-  maybe_inference_args,
-  maybe_raw_inference_text,
-  maybe_model_token,
+  let inference_types = args.maybe_scope_by_job_type
+      .as_ref()
+      .map(|types| types.clone())
+      .unwrap_or(ALL_TYPES);
 
-  maybe_creator_user_token,
-  creator_ip_address,
-  creator_set_visibility as `creator_set_visibility: enums::core::visibility::Visibility`,
+  let query = if args.sort_by_priority {
+    list_sorted_by_priority(args, inference_types).await
+  } else {
+    list_sorted_by_id(args, inference_types).await
+  };
 
-  status as `status: crate::column_types::job_status::JobStatus`,
-
-
-  attempt_count,
-  priority_level,
-  is_from_premium_user,
-  is_from_api_user,
-  is_for_twitch,
-  is_debug_request,
-
-  created_at,
-  updated_at,
-  retry_at
-FROM generic_inference_jobs
-WHERE
-  (
-    status IN ("pending", "attempt_failed")
-  )
-  AND
-  (
-    retry_at IS NULL
-    OR
-    retry_at < CURRENT_TIMESTAMP
-  )
-  ORDER BY id ASC
-  LIMIT ?
-        "#,
-      num_records,
-    )
-      .fetch_all(pool)
-      .await?;
+  let job_records = query?;
 
   let job_records = job_records.into_iter()
       .map(|record : AvailableInferenceJobRawInternal| {
@@ -121,6 +101,124 @@ WHERE
   Ok(job_records)
 }
 
+async fn list_sorted_by_id(args: ListAvailableGenericInferenceJobArgs<'_>, inference_types: BTreeSet<GenericInferenceType>) -> Result<Vec<AvailableInferenceJobRawInternal>, sqlx::Error> {
+  sqlx::query_as!(
+      AvailableInferenceJobRawInternal,
+        r#"
+SELECT
+  id as `id: crate::queries::generic_inference::job::_keys::GenericInferenceJobId`,
+  token AS `inference_job_token: tokens::jobs::inference::InferenceJobToken`,
+
+  inference_type as `inference_type: enums::workers::generic_inference_type::GenericInferenceType`,
+  maybe_inference_args,
+  maybe_raw_inference_text,
+  maybe_model_token,
+
+  maybe_creator_user_token,
+  creator_ip_address,
+  creator_set_visibility as `creator_set_visibility: enums::core::visibility::Visibility`,
+
+  status as `status: crate::column_types::job_status::JobStatus`,
+
+  attempt_count,
+  priority_level,
+  is_from_premium_user,
+  is_from_api_user,
+  is_for_twitch,
+  is_debug_request,
+
+  created_at,
+  updated_at,
+  retry_at
+FROM generic_inference_jobs
+WHERE
+  (
+    inference_type IN (?)
+  )
+  AND
+  (
+    status IN ("pending", "attempt_failed")
+  )
+  AND
+  (
+    retry_at IS NULL
+    OR
+    retry_at < CURRENT_TIMESTAMP
+  )
+  AND
+  (
+    is_debug_request = ?
+  )
+  ORDER BY id ASC
+  LIMIT ?
+        "#,
+      to_where_in_predicate(&inference_types),
+      args.is_debug_worker,
+      args.num_records,
+    )
+      .fetch_all(args.mysql_pool)
+      .await
+}
+
+async fn list_sorted_by_priority(args: ListAvailableGenericInferenceJobArgs<'_>, inference_types: BTreeSet<GenericInferenceType>) -> Result<Vec<AvailableInferenceJobRawInternal>, sqlx::Error> {
+  sqlx::query_as!(
+      AvailableInferenceJobRawInternal,
+        r#"
+SELECT
+  id as `id: crate::queries::generic_inference::job::_keys::GenericInferenceJobId`,
+  token AS `inference_job_token: tokens::jobs::inference::InferenceJobToken`,
+
+  inference_type as `inference_type: enums::workers::generic_inference_type::GenericInferenceType`,
+  maybe_inference_args,
+  maybe_raw_inference_text,
+  maybe_model_token,
+
+  maybe_creator_user_token,
+  creator_ip_address,
+  creator_set_visibility as `creator_set_visibility: enums::core::visibility::Visibility`,
+
+  status as `status: crate::column_types::job_status::JobStatus`,
+
+  attempt_count,
+  priority_level,
+  is_from_premium_user,
+  is_from_api_user,
+  is_for_twitch,
+  is_debug_request,
+
+  created_at,
+  updated_at,
+  retry_at
+FROM generic_inference_jobs
+WHERE
+  (
+    inference_type IN (?)
+  )
+  AND
+  (
+    status IN ("pending", "attempt_failed")
+  )
+  AND
+  (
+    retry_at IS NULL
+    OR
+    retry_at < CURRENT_TIMESTAMP
+  )
+  AND
+  (
+    is_debug_request = ?
+  )
+  ORDER BY priority_level DESC, id ASC
+  LIMIT ?
+        "#,
+      to_where_in_predicate(&inference_types),
+      args.is_debug_worker,
+      args.num_records,
+    )
+      .fetch_all(args.mysql_pool)
+      .await
+}
+
 #[derive(Debug)]
 struct AvailableInferenceJobRawInternal {
   pub id: GenericInferenceJobId,
@@ -149,4 +247,41 @@ struct AvailableInferenceJobRawInternal {
   pub created_at: chrono::DateTime<Utc>,
   pub updated_at: chrono::DateTime<Utc>,
   pub retry_at: Option<chrono::DateTime<Utc>>,
+}
+
+/// Return a comma-separated predicate, since SQLx does not yet support WHERE IN(?) for Vec<T>, etc.
+/// Issue: https://github.com/launchbadge/sqlx/issues/875
+fn to_where_in_predicate(types: &BTreeSet<GenericInferenceType>) -> String {
+  let mut vec = types.iter()
+      .map(|ty| ty.to_str()) // TODO: These strings might need to be quoted.
+      .collect::<Vec<&'static str>>();
+  vec.sort(); // NB: For the benefit of tests.
+  vec.join(", ")
+}
+
+#[cfg(test)]
+mod tests {
+  use crate::queries::generic_inference::job::list_available_generic_inference_jobs::to_where_in_predicate;
+  use enums::workers::generic_inference_type::GenericInferenceType;
+  use std::collections::BTreeSet;
+
+  #[test]
+  fn test_where_in_clause() {
+    // None
+    let types = BTreeSet::from([]);
+    assert_eq!(to_where_in_predicate(&types), "".to_string());
+
+    // Some
+    let types = BTreeSet::from([
+      GenericInferenceType::VoiceConversion,
+    ]);
+
+    assert_eq!(to_where_in_predicate(&types), "voice_conversion".to_string());
+    // All
+    let types = BTreeSet::from([
+      GenericInferenceType::TextToSpeech,
+      GenericInferenceType::VoiceConversion,
+    ]);
+    assert_eq!(to_where_in_predicate(&types), "text_to_speech, voice_conversion".to_string());
+  }
 }
