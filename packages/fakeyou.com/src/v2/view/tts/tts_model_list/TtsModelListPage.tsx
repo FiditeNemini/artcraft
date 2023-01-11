@@ -402,9 +402,9 @@ function TtsModelListPage(props: Props) {
           </div>
         </div>
 
-        <div className="pt-5">
+        {/* <div className="pt-5">
           <BackLink link="/" text="Back to main page" />
-        </div>
+        </div> */}
       </motion.div>
 
       <SessionTtsInferenceResultListFc

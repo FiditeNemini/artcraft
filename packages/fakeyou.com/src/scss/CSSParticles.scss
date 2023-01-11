@@ -1,6 +1,6 @@
 /* Config */
 $color-bg: #000000;
-$color-particle: rgba(255, 255, 255, 0.12);
+$color-particle: rgba(255, 255, 255, 0.04);
 $spacing: 2560px;
 $time-1: 120s;
 $time-2: 240s;
@@ -53,26 +53,26 @@ $time-4: 420s;
 
 .particle-1 {
   animation: animParticle $time-1 linear infinite;
-  @include particles(500);
+  @include particles(400);
   height: 7px;
   width: 7px;
 }
 
 .particle-1:after {
-  @include particles(400);
+  @include particles(300);
   height: 8px;
   width: 8px;
 }
 
 .particle-2 {
   animation: animParticle $time-2 linear infinite;
-  @include particles(300);
+  @include particles(200);
   height: 5px;
   width: 5px;
 }
 
 .particle-2:after {
-  @include particles(500);
+  @include particles(400);
   height: 5px;
   width: 5px;
 }
@@ -99,12 +99,12 @@ $time-4: 420s;
 
 @keyframes animParticle {
   from {
-    // transform: translateY(0px);
-    transform: translateY($spacing * -1);
+    transform: translateY(0px);
+    // transform: translateY($spacing * -1);
   }
   to {
-    // transform: translateY($spacing * -1);
-    transform: translateY(0px);
+    transform: translateY($spacing * -1);
+    // transform: translateY(0px);
   }
 }
 

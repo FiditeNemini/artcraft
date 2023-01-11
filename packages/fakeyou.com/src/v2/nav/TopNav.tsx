@@ -116,10 +116,10 @@ function TopNav(props: Props) {
       sessionItem.hidden.opacity = 1;
     } else {
       image.hidden.opacity = 0;
-      image.hidden.x = 100;
-      panel.hidden.y = 50;
-      item.hidden.y = 50;
-      sessionItem.hidden.x = 50;
+      image.hidden.x = 15;
+      panel.hidden.y = 15;
+      item.hidden.y = 15;
+      sessionItem.hidden.x = 15;
       panel.hidden.opacity = 0;
       item.hidden.opacity = 0;
       container.hidden.opacity = 0;
