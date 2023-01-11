@@ -13,6 +13,8 @@ use jobs_common::job_progress_reporter::job_progress_reporter::JobProgressReport
 use jobs_common::semi_persistent_cache_dir::SemiPersistentCacheDir;
 use memory_caching::multi_item_ttl_cache::MultiItemTtlCache;
 use newrelic_telemetry::Client as NewRelicClient;
+use r2d2_redis::RedisConnectionManager;
+use r2d2_redis::r2d2;
 use sqlx::MySqlPool;
 use std::path::PathBuf;
 
@@ -21,6 +23,13 @@ pub struct JobDependencies {
   pub scoped_temp_dir_creator: ScopedTempDirCreator,
 
   pub mysql_pool: MySqlPool,
+
+  // TODO(2023-01-11): We don't always connect to a Redis
+  //  Typically this is for job status reporting, but we might also report on when users leave the
+  //  site to proactively kill their inference jobs and save on worker quota.
+  //  On local dev we probably don't care about Redis at all, and on on-prem workers, we cannot
+  //  connect to production Redis easily (requires lots of setup - ghosttunnel or something + IP rules)
+  pub maybe_redis_pool: Option<r2d2::Pool<RedisConnectionManager>>,
 
   pub job_progress_reporter: Box<dyn JobProgressReporterBuilder>,
 
@@ -64,8 +73,7 @@ pub struct JobDependencies {
   pub job_batch_wait_millis: u64,
 
   // Max job attempts before failure.
-  // NB: This is an i32 so we don't need to convert to db column type.
-  pub job_max_attempts: i32,
+  pub job_max_attempts: u16,
 
   // Number of jobs to dequeue at once.
   pub job_batch_size: u32,

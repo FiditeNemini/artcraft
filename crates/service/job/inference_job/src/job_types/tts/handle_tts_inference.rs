@@ -1,17 +1,15 @@
-use anyhow::anyhow;
-use log::{info, warn};
-use tempdir::TempDir;
 use crate::job_steps::job_dependencies::JobDependencies;
-use crate::job_steps::process_single_job_error::ProcessSingleJobError;
 use database_queries::queries::generic_inference::job::list_available_generic_inference_jobs::AvailableInferenceJob;
 use errors::AnyhowResult;
-use tts_common::clean_symbols::clean_symbols;
-use crate::util::download_file_from_bucket::maybe_download_file_from_bucket;
 
 pub async fn handle_tts_inference(
-  job_dependencies: &JobDependencies,
-  job: &AvailableInferenceJob,
+  _job_dependencies: &JobDependencies,
+  _job: &AvailableInferenceJob,
 ) -> AnyhowResult<()> {
+
+  /*
+  TODO(bt, 2023-01-11): This was just copied verbatim from tts-inference-job.
+   It's not ready to run from inference-job yet as it needs adjustments to the new schema.
 
   let mut job_progress_reporter = job_dependencies
       .job_progress_reporter
@@ -339,6 +337,6 @@ pub async fn handle_tts_inference(
   job_iteration_span.set_attribute("status", "success");
   job_iteration_span.set_duration(duration);
 
-  Ok((since_creation_span, job_iteration_span))
+   */
   Ok(())
 }

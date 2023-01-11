@@ -38,7 +38,6 @@ use crate::http_clients::tts_sidecar_health_check_client::TtsSidecarHealthCheckC
 use crate::job_steps::job_dependencies::JobWorkerDetails;
 use crate::job_steps::job_dependencies::{JobDependencies, JobCaches, JobHttpClients};
 use crate::job_steps::job_stats::JobStats;
-use crate::job_steps::main_loop_old::main_loop_old;
 use crate::script_execution::tacotron_inference_command::TacotronInferenceCommand;
 use crate::util::scoped_temp_dir_creator::ScopedTempDirCreator;
 use database_queries::mediators::firehose_publisher::FirehosePublisher;
@@ -286,10 +285,11 @@ async fn main() -> AnyhowResult<()> {
     }
   };
 
-  let inferencer = JobDependencies {
+  let _job_dependencies = JobDependencies {
     scoped_temp_dir_creator: ScopedTempDirCreator::for_directory(&temp_directory),
     download_temp_directory: temp_directory,
     mysql_pool,
+    maybe_redis_pool: None, // TODO(bt, 2023-01-11): See note in JobDependencies
     job_progress_reporter,
     public_bucket_client,
     private_bucket_client,
@@ -320,7 +320,7 @@ async fn main() -> AnyhowResult<()> {
     hifigan_vocoder_model_filename,
     hifigan_superres_vocoder_model_filename,
     job_batch_wait_millis: common_env.job_batch_wait_millis,
-    job_max_attempts: common_env.job_max_attempts as i32,
+    job_max_attempts: common_env.job_max_attempts as u16,
     job_batch_size: common_env.job_batch_size,
     no_op_logger_millis: common_env.no_op_logger_millis,
     sidecar_max_synthesizer_models,
@@ -328,7 +328,8 @@ async fn main() -> AnyhowResult<()> {
     maybe_minimum_priority,
   };
 
-  main_loop_old(inferencer).await;
+  // TODO: Main loop start
+  //main_loop_old(inferencer).await;
 
   Ok(())
 }

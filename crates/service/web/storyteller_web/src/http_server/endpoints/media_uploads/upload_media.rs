@@ -14,6 +14,7 @@ use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::server_state::ServerState;
 use crate::validations::model_uploads::validate_model_title;
 use crate::validations::validate_idempotency_token_format::validate_idempotency_token_format;
+use database_queries::payloads::media_upload_details::MediaUploadDetails;
 use database_queries::queries::media_uploads::insert_media_upload::{Args, insert_media_upload};
 use enums::core::visibility::Visibility;
 use enums::files::media_upload_type::MediaUploadType;
@@ -24,7 +25,6 @@ use http_server_common::response::serialize_as_json_error::serialize_as_json_err
 use log::{info, warn, log};
 use media::decode_basic_audio_info::decode_basic_audio_info;
 use regex::Regex;
-use reusable_types::db::payloads::MediaUploadDetails;
 use sqlx::error::DatabaseError;
 use sqlx::error::Error::Database;
 use sqlx::mysql::MySqlDatabaseError;

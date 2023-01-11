@@ -1,5 +1,4 @@
 use crate::job_steps::job_dependencies::JobDependencies;
-use crate::job_steps::process_single_job_old::process_single_job_old;
 use database_queries::queries::generic_inference::job::list_available_generic_inference_jobs::{AvailableInferenceJob, list_available_generic_inference_jobs, ListAvailableGenericInferenceJobArgs};
 use database_queries::queries::generic_inference::job::mark_generic_inference_job_failure::mark_generic_inference_job_failure;
 use errors::AnyhowResult;
@@ -77,19 +76,20 @@ pub async fn main_loop(job_dependencies: JobDependencies) {
 // TODO: A common interface/trait for each submodule (tts, webvc) to declare how to determine if the job is "ready".
 //  This probably returns a struct or enum with some measure of how many GB need to be downloaded.
 
-async fn process_job_batch(job_state: &JobState, jobs: Vec<AvailableInferenceJob>) -> AnyhowResult<()> {
+async fn process_job_batch(job_dependencies: &JobDependencies, jobs: Vec<AvailableInferenceJob>) -> AnyhowResult<()> {
   for job in jobs.into_iter() {
-    let result = process_single_job(job_state, &job).await;
+    let result = process_single_job(job_dependencies, &job).await;
     match result {
       Ok(_) => {},
       Err(e) => {
         warn!("Failure to process job: {:?}", e);
         let failure_reason = "";
         let _r = mark_generic_inference_job_failure(
-          &job_state.mysql_pool,
+          &job_dependencies.mysql_pool,
           &job,
           failure_reason,
-          job_state.job_max_attempts
+          failure_reason,
+          job_dependencies.job_max_attempts
         ).await;
       }
     }
