@@ -44,5 +44,6 @@ jobs:
           diesel migration run
           set -e -o pipefail
       - name: Build 
-        run: |
-          cargo build --release
+        run: cargo build --release
+      - name: Test
+        run: cargo test --release
