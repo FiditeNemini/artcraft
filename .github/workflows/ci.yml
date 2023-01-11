@@ -39,9 +39,10 @@ jobs:
           cargo install diesel_cli
       - name: Run database migrations
         run: |
-          set +e +pipefail
+          # nothing to see here ;)
+          set +e +o pipefail
           diesel migration run
-          set -e -pipefail
+          set -e -o pipefail
       - name: Build 
         run: |
           cargo build --release
