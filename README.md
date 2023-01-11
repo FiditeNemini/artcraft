@@ -1,8 +1,7 @@
 storyteller-rust
 ================
 
-Our Rust monorepo, which services our 
-API surface area. 
+Our Rust monorepo, which services our API surface area. 
 
 Application overview
 --------------------
