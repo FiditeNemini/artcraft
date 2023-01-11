@@ -35,8 +35,8 @@ jobs:
         run: |
           rustup set profile minimal
           rustup override set stable
-          cargo install --root=/usr/local/ sqlx-cli --features openssl-vendored
-          cargo install --root=/usr/local/ diesel_cli
+          cargo install sqlx-cli --features openssl-vendored
+          cargo install diesel_cli
       - name: Run database migrations
         run: |
           diesel migration run
