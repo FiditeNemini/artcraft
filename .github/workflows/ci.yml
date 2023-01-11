@@ -35,6 +35,9 @@ jobs:
         run: |
           rustup set profile minimal
           rustup override set stable
+          rustup show
+          rustup install 1.66
+          rustup show
           cargo install sqlx-cli --features openssl-vendored
           cargo install diesel_cli
       - name: Run database migrations
