@@ -1,0 +1,46 @@
+name: CI
+on: [push, pull_request]
+env: 
+  MYSQL_URL: mysql://root:root@localhost/storyteller
+  DATABASE_URL: mysql://root:root@localhost/storyteller
+  REDIS_0_URL: redis://redisd@localhost/0
+  REDIS_1_URL: redis://redisd@localhost/1
+  DEBIAN_FRONTEND: noninteractive
+
+jobs:
+  setup_build_test:
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@v3
+      - name: Cache cargo registry
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.toml') }}
+      - name: Setup mysql
+        run: |
+          #docker run -p 3306:3306 -e MYSQL_ROOT_PASSWORD=root -d mysql:8.0.31
+          service mysql start
+          apt-get update
+          apt-get -y install mysql-client libmysqlclient-dev
+          mysql -h localhost -u root -p root -e "create user 'storyteller'@'localhost' IDENTIFIED BY 'password';"
+          mysql -h localhost -u root -p root -e "create database storyteller; grant all on storyteller.* to 'storyteller'@'localhost';" 
+      - name: Setup Redis
+        run: |
+          apt-get -y install redis-server
+          service redis-server start
+      - name: Setup Rust
+        run: |
+          rustup set profile minimal
+          rustup override set stable
+          cargo install --root=/usr/local/ sqlx-cli --features openssl-vendored
+          cargo install --root=/usr/local/ diesel_cli
+      - name: Run database migrations
+        run: |
+          diesel migration run
+      - name: Build 
+        run: |
+          cargo build --release
