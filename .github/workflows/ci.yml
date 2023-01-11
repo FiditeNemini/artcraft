@@ -22,8 +22,7 @@ jobs:
           key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.toml') }}
       - name: Setup mysql
         run: |
-          #docker run -p 3306:3306 -e MYSQL_ROOT_PASSWORD=root -d mysql:8.0.31
-          service mysql start
+          sudo systemctl start mysql
           apt-get update
           apt-get -y install mysql-client libmysqlclient-dev
           mysql -h localhost -u root -p root -e "create user 'storyteller'@'localhost' IDENTIFIED BY 'password';"
