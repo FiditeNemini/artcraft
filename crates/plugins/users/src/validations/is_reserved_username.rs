@@ -47,6 +47,7 @@ mod tests {
     assert_eq!(is_reserved_username("vocodes"), true);
     assert_eq!(is_reserved_username("user"), true);
     assert_eq!(is_reserved_username("username"), true);
+    assert_eq!(is_reserved_username("thread"), true);
   }
 
   #[test]
