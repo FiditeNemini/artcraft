@@ -85,25 +85,25 @@ combine_sqlx_queries() {
   # https://stackoverflow.com/a/24904276
   jq -s '.[0] * .[1]' \
     crates/lib/database_queries/sqlx-data.json \
-    crates/service/storyteller_web/sqlx-data.json \
-    crates/service/download_job/sqlx-data.json \
-    crates/service/tts_download_job/sqlx-data.json \
-    crates/service/inference_job/sqlx-data.json \
-    crates/service/tts_inference_job/sqlx-data.json \
-    crates/service/w2l_download_job/sqlx-data.json \
-    crates/service/w2l_inference_job/sqlx-data.json \
+    crates/service/web/storyteller_web/sqlx-data.json \
+    crates/service/job/download_job/sqlx-data.json \
+    crates/service/job/tts_download_job/sqlx-data.json \
+    crates/service/job/inference_job/sqlx-data.json \
+    crates/service/job/tts_inference_job/sqlx-data.json \
+    crates/service/job/w2l_download_job/sqlx-data.json \
+    crates/service/job/w2l_inference_job/sqlx-data.json \
     > sqlx-data.json
 }
 
 cleanup_temp_files() {
   rm crates/lib/database_queries/sqlx-data.json \
-    crates/service/storyteller_web/sqlx-data.json \
-    crates/service/download_job/sqlx-data.json \
-    crates/service/tts_download_job/sqlx-data.json \
-    crates/service/inference_job/sqlx-data.json \
-    crates/service/tts_inference_job/sqlx-data.json \
-    crates/service/w2l_download_job/sqlx-data.json \
-    crates/service/w2l_inference_job/sqlx-data.json
+    crates/service/web/storyteller_web/sqlx-data.json \
+    crates/service/job/download_job/sqlx-data.json \
+    crates/service/job/tts_download_job/sqlx-data.json \
+    crates/service/job/inference_job/sqlx-data.json \
+    crates/service/job/tts_inference_job/sqlx-data.json \
+    crates/service/job/w2l_download_job/sqlx-data.json \
+    crates/service/job/w2l_inference_job/sqlx-data.json
 }
 
 build_shared_database_library

@@ -3,7 +3,7 @@ dev setup
 
 [Back to main README](../README.md)
 
-### Debugging and Fixing CUDA/PyTorch
+## Debugging and Fixing CUDA/PyTorch
 
 See this spreadsheet for previous battles with version incompatibility:
 https://docs.google.com/spreadsheets/d/1BEdLmwOzo3r83-iJn9sj6co1VT92t3lIeJ-lNH25bdQ/edit#gid=0
@@ -11,7 +11,17 @@ https://docs.google.com/spreadsheets/d/1BEdLmwOzo3r83-iJn9sj6co1VT92t3lIeJ-lNH25
 Ubuntu might upgrade the driver by accident, and it might need reinstallation. Who knows.
 This stuff is a nightmare.
 
-### Database Setup
+## Database Setup
+
+### Mac Install
+
+```
+brew install mysql
+# If mysql -uroot fails, reboot the machine:
+sudo reboot now
+```
+
+### Linux Install
 
 Install the following libraries, and see the notes further below about MySQL on Ubuntu 20.04.
 
@@ -21,6 +31,8 @@ libmysqlclient-dev
 mysql-server
 pkgconf # if using openssl instead of rustls
 ```
+
+### Migrations
 
 To manage the database and perform migrations, install the Rust tools diesel and sqlx.
 
