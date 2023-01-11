@@ -158,7 +158,8 @@ class App extends React.Component<Props, State> {
       migrationMode: migrationMode,
 
       sessionWrapper: SessionWrapper.emptySession(),
-      sessionSubscriptionsWrapper: SessionSubscriptionsWrapper.emptySubscriptions(),
+      sessionSubscriptionsWrapper:
+        SessionSubscriptionsWrapper.emptySubscriptions(),
 
       isShowingVocodesNotice: props.flashVocodesNotice,
 
@@ -220,7 +221,8 @@ class App extends React.Component<Props, State> {
   };
 
   querySessionSubscriptions = async () => {
-    const sessionSubscriptionsWrapper = await SessionSubscriptionsWrapper.lookupActiveSubscriptions();
+    const sessionSubscriptionsWrapper =
+      await SessionSubscriptionsWrapper.lookupActiveSubscriptions();
     this.setState({
       sessionSubscriptionsWrapper: sessionSubscriptionsWrapper,
     });
@@ -640,8 +642,6 @@ class App extends React.Component<Props, State> {
           <div className="animation-wrapper">
             <div className="particle particle-1"></div>
             <div className="particle particle-2"></div>
-            <div className="particle particle-3"></div>
-            <div className="particle particle-4"></div>
           </div>
 
           <div id="viewable">
@@ -659,8 +659,12 @@ class App extends React.Component<Props, State> {
                   <PageContainer
                     sessionWrapper={this.state.sessionWrapper}
                     querySessionAction={this.querySession}
-                    sessionSubscriptionsWrapper={this.state.sessionSubscriptionsWrapper}
-                    querySessionSubscriptionsAction={this.querySessionSubscriptions}
+                    sessionSubscriptionsWrapper={
+                      this.state.sessionSubscriptionsWrapper
+                    }
+                    querySessionSubscriptionsAction={
+                      this.querySessionSubscriptions
+                    }
                     isShowingVocodesNotice={this.state.isShowingVocodesNotice}
                     clearVocodesNotice={this.clearVocodesNotice}
                     isShowingLangaugeNotice={this.state.isShowingLanguageNotice}
