@@ -21,13 +21,13 @@ export function TtsPageHero(props: Props) {
       // "mascot/halloween_2.webp",
       // "mascot/halloween_3.webp",
 
-      // "mascot/kitsune_pose2.webp",
-      // "mascot/kitsune_wizard.webp",
+      "mascot/kitsune_pose2.webp",
+      "mascot/kitsune_wizard.webp",
 
-      "mascot/xmas_1.webp",
-      "mascot/xmas_2.webp",
-      "mascot/xmas_3.webp",
-      "mascot/xmas_4.webp",
+      //"mascot/xmas_1.webp",
+      //"mascot/xmas_2.webp",
+      //"mascot/xmas_3.webp",
+      //"mascot/xmas_4.webp",
     ];
 
     return images[Math.floor(Math.random() * images.length)];

@@ -18,7 +18,6 @@ import {
   faLaptop,
   faBook,
   faStar,
-  faMicrophoneLines,
 } from "@fortawesome/free-solid-svg-icons";
 import { faDiscord, faPatreon } from "@fortawesome/free-brands-svg-icons";
 import { Logout } from "@storyteller/components/src/api/session/Logout";
@@ -356,11 +355,12 @@ function TopNav(props: Props) {
                     aria-labelledby="offcanvasNavbarLgDropdown-tts"
                   >
                     <li data-bs-toggle="offcanvas">
-                      <Link className="dropdown-item" to="/tts">
+                      <Link className="dropdown-item" to="/">
                         <FontAwesomeIcon icon={faVolumeUp} className="me-2" />
                         TTS
                       </Link>
                     </li>
+                    {/* TODO(bt, 2023-01-11): Not ready to launch voice conversion
                     <li data-bs-toggle="offcanvas">
                       <Link className="dropdown-item" to="/voice-conversion">
                         <FontAwesomeIcon
@@ -371,6 +371,7 @@ function TopNav(props: Props) {
                         Voice Conversion
                       </Link>
                     </li>
+                    */}
                     <li data-bs-toggle="offcanvas">
                       <Link className="dropdown-item" to="/video">
                         <FontAwesomeIcon icon={faVideo} className="me-2" />

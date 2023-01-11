@@ -62,8 +62,8 @@ import { CheckoutSuccessPage } from "./premium/CheckoutSuccessPage";
 import { CheckoutCancelPage } from "./premium/CheckoutCancelPage";
 import { PortalSuccessPage } from "./premium/PortalSuccessPage";
 import { PrivacyPage } from "./about/privacy_page/PrivacyPage";
-import { LandingPage } from "./landing/LandingPage";
-import { VcModelListPage } from "./vc/vc_model_list/VcModelListPage";
+//import { LandingPage } from "./landing/LandingPage";
+//import { VcModelListPage } from "./vc/vc_model_list/VcModelListPage";
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -436,7 +436,7 @@ class PageContainer extends React.Component<Props, State> {
               <VocodesPage />
             </Route>
 
-            <Route path="/tts">
+            <Route path="/">
               <TtsModelListPage
                 sessionWrapper={this.props.sessionWrapper}
                 sessionSubscriptionsWrapper={
@@ -485,6 +485,7 @@ class PageContainer extends React.Component<Props, State> {
               />
             </Route>
 
+            {/* TODO(bt, 2023-01-11): Not ready to launch voice conversion yet
             <Route path="/voice-conversion">
               <VcModelListPage
                 sessionWrapper={this.props.sessionWrapper}
@@ -493,7 +494,9 @@ class PageContainer extends React.Component<Props, State> {
                 }
               />
             </Route>
+              */}
 
+            {/* TODO(bt, 2023-01-11): Not ready to launch voice conversion yet
             <Route path="/">
               <LandingPage
                 sessionWrapper={this.props.sessionWrapper}
@@ -502,6 +505,7 @@ class PageContainer extends React.Component<Props, State> {
                 }
               />
             </Route>
+              */}
           </Switch>
 
           <FooterNav sessionWrapper={this.props.sessionWrapper} />
