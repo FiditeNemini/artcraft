@@ -1,9 +1,12 @@
-use anyhow::anyhow;
+// NB: Incrementally getting rid of build warnings...
+#![forbid(unused_imports)]
+#![forbid(unused_mut)]
+#![forbid(unused_variables)]
+
 use chrono::{DateTime, Utc};
 use config::shared_constants::DEFAULT_MYSQL_QUERY_RESULT_PAGE_SIZE;
 use container_common::anyhow_result::AnyhowResult;
-use crate::column_types::record_visibility::RecordVisibility;
-use log::{warn, info};
+use enums::core::visibility::Visibility;
 use sqlx::MySqlPool;
 
 #[derive(Serialize)]
@@ -38,7 +41,7 @@ pub struct W2lInferenceRecordForList {
   pub frame_height: u32,
   pub duration_millis: u32,
 
-  pub visibility: RecordVisibility,
+  pub visibility: Visibility,
 
   //pub template_is_mod_approved: bool, // converted
   //pub maybe_mod_user_token: Option<String>,
@@ -132,10 +135,10 @@ impl ListW2lResultsQueryBuilder {
 
     let internal_results = self.perform_internal_query(mysql_pool).await?;
 
-    let mut first_id = internal_results.first()
+    let first_id = internal_results.first()
         .map(|raw_result| raw_result.w2l_result_id);
 
-    let mut last_id = internal_results.last()
+    let last_id = internal_results.last()
         .map(|raw_result| raw_result.w2l_result_id);
 
     let inference_results = internal_results
@@ -155,7 +158,7 @@ impl ListW2lResultsQueryBuilder {
             frame_width: if r.frame_width > 0 { r.frame_width as u32 } else { 0 },
             frame_height: if r.frame_height > 0 { r.frame_height as u32 } else { 0 },
             duration_millis: if r.duration_millis > 0 { r.duration_millis as u32 } else { 0 },
-            visibility: RecordVisibility::from_str(&r.creator_set_visibility).unwrap_or(RecordVisibility::Public),
+            visibility: Visibility::from_str(&r.creator_set_visibility).unwrap_or(Visibility::Public),
             created_at: r.created_at,
             updated_at: r.updated_at,
           }
@@ -255,7 +258,7 @@ LEFT OUTER JOIN users
 
     let mut query = "".to_string();
 
-    if let Some(offset) = self.offset {
+    if let Some(_offset) = self.offset {
       if !first_predicate_added {
         query.push_str(" WHERE");
         first_predicate_added = true;
@@ -282,7 +285,7 @@ LEFT OUTER JOIN users
       }
     }
 
-    if let Some(username) = self.scope_creator_username.as_deref() {
+    if let Some(_username) = self.scope_creator_username.as_deref() {
       if !first_predicate_added {
         query.push_str(" WHERE users.username = ?");
         first_predicate_added = true;

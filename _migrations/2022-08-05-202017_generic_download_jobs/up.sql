@@ -22,12 +22,13 @@ CREATE TABLE generic_download_jobs (
 
   -- The type of the object will vary based on the type of the upload,
   -- and we may include heuristics that auto-detect types in the future
+  -- Example types: 'hifigan', 'hifigan_rocket_vc' (codename for softvc), 'tacotron2', ...
   on_success_downloaded_entity_type VARCHAR(32) DEFAULT NULL,
 
   -- ========== UPLOAD DETAILS ==========
 
   -- A "well defined" type of upload
-  -- The first upload type will be "hifigan_model"
+  -- Examples: "hifigan", "tacotron2", etc.
   download_type VARCHAR(32) NOT NULL,
 
   -- Assume the same URL can be uploaded more than once (in case of errors or

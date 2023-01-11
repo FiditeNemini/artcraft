@@ -6,8 +6,8 @@
 use anyhow::anyhow;
 use container_common::anyhow_result::AnyhowResult;
 use crate::tokens::Tokens;
-use reusable_types::entity_visibility::EntityVisibility;
-use reusable_types::vocoder_type::VocoderType;
+use enums::core::visibility::Visibility;
+use enums::ml::vocoder_type::VocoderType;
 use sqlx::MySqlPool;
 use std::path::Path;
 
@@ -22,7 +22,7 @@ pub struct Args<'a, P: AsRef<Path>> {
 
   pub creator_user_token: &'a str,
   pub creator_ip_address: &'a str,
-  pub creator_set_visibility: EntityVisibility,
+  pub creator_set_visibility: Visibility,
 
   pub private_bucket_hash: &'a str,
   pub private_bucket_object_name: P,

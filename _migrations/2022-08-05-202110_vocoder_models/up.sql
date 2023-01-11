@@ -10,7 +10,9 @@ CREATE TABLE vocoder_models (
   token VARCHAR(32) NOT NULL,
 
   -- The architecture of the vocoder.
-  -- Currently supported values: 'hifigan'
+  -- Currently supported values:
+  --   * 'hifigan' - hifigan for Tacotron2
+  --   * 'hifigan_rocket_vc' - hifigan for SoftVC ("rocket" is a codename)
   vocoder_type VARCHAR(32) NOT NULL,
 
   -- ========== MUTABLE METADATA ==========

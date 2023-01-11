@@ -1,8 +1,10 @@
 pub mod api_tokens;
 pub mod billing;
 pub mod generic_download;
+pub mod generic_inference;
 pub mod health_check;
 pub mod ip_bans;
+pub mod media_uploads;
 pub mod model_categories;
 pub mod stats;
 pub mod tts;
@@ -10,4 +12,5 @@ pub mod twitch;
 pub mod users;
 pub mod vocoder;
 pub mod voice_clone_requests;
+pub mod voice_conversion;
 pub mod w2l;

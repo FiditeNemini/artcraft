@@ -1,0 +1,23 @@
+[package]
+name = "files"
+edition = "2018"
+version = "0.0.1"
+authors = [
+    "Brandon Thomas <bt@brand.io>",
+    "Brandon Thomas <echelon@gmail.com>",
+]
+publish = false
+
+[lib]
+# NB: Public "files" crate is some CDN nonsense we'll never use, so we're good to
+# use this crate name internally.
+name = "files"
+path = "src/lib.rs"
+
+[dependencies]
+data-encoding = "2.3.3" # base64, hex, etc.
+infer = "0.11" # Mimetype detection
+ring = "0.17.0-alpha.11" # Crypto
+
+[dev-dependencies]
+# None yet

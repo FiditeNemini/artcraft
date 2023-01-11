@@ -1,0 +1,2 @@
+pub mod get_generic_inference_job_status;
+pub mod insert_generic_inference_job;

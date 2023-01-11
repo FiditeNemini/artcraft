@@ -1,0 +1,410 @@
+// NB: Incrementally getting rid of build warnings...
+#![forbid(unused_imports)]
+#![forbid(unused_mut)]
+#![forbid(unused_variables)]
+
+use actix_multipart::Multipart;
+use actix_web::http::StatusCode;
+use actix_web::web::BytesMut;
+use actix_web::{web, HttpResponse, HttpRequest, ResponseError};
+use anyhow::anyhow;
+use buckets::util::hash_to_bucket_path_string::hash_to_bucket_path_string;
+use container_common::anyhow_result::AnyhowResult;
+use container_common::token::random_uuid::generate_random_uuid;
+use crate::http_server::web_utils::read_multipart_field_bytes::checked_read_multipart_bytes;
+use crate::http_server::web_utils::read_multipart_field_bytes::read_multipart_field_as_text;
+use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
+use crate::server_state::ServerState;
+use database_queries::tokens::Tokens;
+use enums::core::visibility::Visibility;
+use futures::TryStreamExt;
+use http_server_common::request::get_request_ip::get_request_ip;
+use log::{warn, info};
+use r2d2_redis::redis::Commands;
+use redis_common::redis_keys::RedisKeys;
+use sqlx::MySqlPool;
+use sqlx::error::Error::Database;
+use std::fmt;
+use std::sync::Arc;
+
+const BUCKET_AUDIO_FILE_NAME : &'static str = "input_audio_file";
+const BUCKET_IMAGE_FILE_NAME: &'static str = "input_image_file";
+const BUCKET_VIDEO_FILE_NAME : &'static str = "input_video_file";
+
+const MIN_BYTES : usize = 10;
+const MAX_BYTES : usize = 1024 * 1024 * 20;
+
+/// Just to query for existence
+#[derive(Serialize)]
+pub struct W2lTemplateExistenceRecord {
+  pub template_token: String,
+}
+
+#[derive(Serialize)]
+pub struct InferW2lWithUploadSuccessResponse {
+  pub success: bool,
+  /// This is how frontend clients can request the job execution status.
+  pub inference_job_token: String,
+}
+
+#[derive(Debug)]
+pub enum InferW2lWithUploadError {
+  BadInput(String),
+  NotAuthorized,
+  EmptyFileUploaded,
+  ServerError,
+  RateLimited,
+}
+
+impl ResponseError for InferW2lWithUploadError {
+  fn status_code(&self) -> StatusCode {
+    match *self {
+      InferW2lWithUploadError::BadInput(_) => StatusCode::BAD_REQUEST,
+      InferW2lWithUploadError::NotAuthorized => StatusCode::UNAUTHORIZED,
+      InferW2lWithUploadError::EmptyFileUploaded => StatusCode::BAD_REQUEST,
+      InferW2lWithUploadError::ServerError => StatusCode::INTERNAL_SERVER_ERROR,
+      InferW2lWithUploadError::RateLimited => StatusCode::TOO_MANY_REQUESTS,
+    }
+  }
+
+  fn error_response(&self) -> HttpResponse {
+    let error_reason = match self {
+      InferW2lWithUploadError::BadInput(reason) => reason.to_string(),
+      InferW2lWithUploadError::NotAuthorized => "unauthorized".to_string(),
+      InferW2lWithUploadError::EmptyFileUploaded => "empty file uploaded".to_string(),
+      InferW2lWithUploadError::ServerError => "server error".to_string(),
+      InferW2lWithUploadError::RateLimited => "rate limited".to_string(),
+    };
+
+    to_simple_json_error(&error_reason, self.status_code())
+  }
+}
+
+// NB: Not using derive_more::Display since Clion doesn't understand it.
+impl fmt::Display for InferW2lWithUploadError {
+  fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+    write!(f, "{:?}", self)
+  }
+}
+
+/// This handles audio uploads w/ W2L templates.
+pub async fn enqueue_infer_w2l_with_uploads(
+  http_request: HttpRequest,
+  server_state: web::Data<Arc<ServerState>>,
+  mut payload: Multipart
+) -> Result<HttpResponse, InferW2lWithUploadError> {
+
+  let ip_address = get_request_ip(&http_request);
+
+  // ==================== READ SESSION ==================== //
+
+  let maybe_session = server_state
+    .session_checker
+    .maybe_get_user_session(&http_request, &server_state.mysql_pool)
+    .await
+    .map_err(|e| {
+      warn!("Session checker error: {:?}", e);
+      InferW2lWithUploadError::ServerError
+    })?;
+
+  // ==================== RATE LIMIT ==================== //
+
+  let rate_limiter = match maybe_session {
+    None => &server_state.redis_rate_limiters.logged_out,
+    Some(ref user) => {
+      if user.is_banned {
+        return Err(InferW2lWithUploadError::NotAuthorized);
+      }
+      &server_state.redis_rate_limiters.logged_in
+    },
+  };
+
+  if let Err(_err) = rate_limiter.rate_limit_request(&http_request) {
+    return Err(InferW2lWithUploadError::RateLimited);
+  }
+
+  // ==================== SESSION DETAILS ==================== //
+
+  let maybe_user_token : Option<String> = maybe_session
+    .as_ref()
+    .map(|user_session| user_session.user_token.to_string());
+
+  let maybe_user_preferred_visibility : Option<Visibility> = maybe_session
+      .as_ref()
+      .map(|user_session| user_session.preferred_tts_result_visibility);
+
+  let set_visibility = maybe_user_preferred_visibility
+      .unwrap_or(Visibility::Public);
+
+  info!("Enqueue infer w2l by user token: {:?}", maybe_user_token);
+
+  // ==================== READ MULTIPART REQUEST ==================== //
+
+  info!("Reading multipart request...");
+
+  let mut maybe_uuid_idempotency_token: Option<String> = None;
+  let mut maybe_template_token: Option<String> = None;
+  let mut maybe_audio_file_name : Option<String> = None;
+  let mut audio_bytes = BytesMut::with_capacity(0);
+
+  while let Ok(Some(mut field)) = payload.try_next().await {
+    let mut field_name = "".to_string();
+    let mut filename = "".to_string();
+
+    if let Some(content_disposition) = field.content_disposition() {
+      field_name = content_disposition.get_name()
+        .map(|s| s.to_string())
+        .unwrap_or("".to_string());
+      filename = content_disposition.get_filename()
+        .map(|s| s.to_string())
+        .unwrap_or("".to_string());
+    }
+
+    match field_name.as_ref() {
+      "uuid_idempotency_token" => {
+        // Form text field.
+        maybe_uuid_idempotency_token = read_multipart_field_as_text(&mut field).await
+          .map_err(|e| {
+            warn!("Error reading idempotency token: {:}", e);
+            InferW2lWithUploadError::ServerError
+          })?;
+      },
+      "template_token" => {
+        // Form text field.
+        maybe_template_token = read_multipart_field_as_text(&mut field).await
+          .map_err(|e| {
+            warn!("Error reading template token: {:}", e);
+            InferW2lWithUploadError::ServerError
+          })?;
+      },
+      "audio" => {
+        // Form binary data.
+        maybe_audio_file_name = Some(filename.to_string());
+
+        let maybe_bytes = checked_read_multipart_bytes(&mut field).await
+          .map_err(|e| {
+            warn!("Error reading audio upload: {:}", e);
+            InferW2lWithUploadError::ServerError
+          })?;
+
+        audio_bytes = match maybe_bytes {
+          Some(bytes) => bytes,
+          None => {
+            warn!("Empty file uploaded");
+            return Err(InferW2lWithUploadError::EmptyFileUploaded); // Nothing was uploaded!
+          },
+        };
+      },
+      _ => continue,
+    }
+
+    info!("Saved file: {}.", &filename);
+  }
+
+  // ==================== CHECK REQUEST ==================== //
+
+  let template_token = match &maybe_template_token {
+    Some(ref token) => token.to_string(),
+    None => {
+      return Err(InferW2lWithUploadError::BadInput("No template selected".to_string()));
+    }
+  };
+
+  let uuid_idempotency_token = match maybe_uuid_idempotency_token {
+    Some(token) => token,
+    None => {
+      return Err(InferW2lWithUploadError::BadInput("No uuid idempotency token".to_string()));
+    }
+  };
+
+  let exists = check_template_exists(&template_token, &server_state.mysql_pool).await
+    .map_err(|e| {
+      warn!("error checking tmpl existence : {:?}", e);
+      InferW2lWithUploadError::ServerError
+    })?;
+
+  if !exists {
+    return Err(InferW2lWithUploadError::BadInput("Template does not exist".to_string()));
+  }
+
+  let mut redis = server_state.redis_pool
+      .get()
+      .map_err(|e| {
+        warn!("redis error: {:?}", e);
+        InferW2lWithUploadError::ServerError
+      })?;
+
+  let redis_count_key = RedisKeys::w2l_template_usage_count(&template_token);
+
+  redis.incr(&redis_count_key, 1)
+      .map_err(|e| {
+        warn!("redis error: {:?}", e);
+        InferW2lWithUploadError::ServerError
+      })?;
+
+  // ==================== ANALYZE AND UPLOAD AUDIO FILE ==================== //
+
+  let mut audio_type = "application/octet-stream".to_string();
+
+  if let Some(maybe_type) = infer::get(audio_bytes.as_ref()) {
+    audio_type = maybe_type.mime_type().to_string();
+  }
+
+  let upload_uuid = generate_random_uuid();
+
+  let audio_upload_bucket_hash = upload_uuid.clone();
+
+  let audio_upload_bucket_path = hash_to_bucket_path_string(
+    &upload_uuid,
+    Some(&server_state.audio_uploads_bucket_root)
+  ).map_err(|e| {
+    warn!("Hash bucket path error: {:?}", e);
+    InferW2lWithUploadError::ServerError
+  })?;
+
+  info!("Uploading audio to bucket...");
+  server_state.private_bucket_client.upload_file_with_content_type(
+    &audio_upload_bucket_path,
+    audio_bytes.as_ref(),
+    &audio_type)
+    .await
+    .map_err(|e| {
+      warn!("Upload audio bytes to bucket error: {:?}", e);
+      InferW2lWithUploadError::ServerError
+    })?;
+
+  // ==================== SAVE JOB RECORD ==================== //
+
+  // This token is returned to the client.
+  let job_token = Tokens::new_w2l_inference_job()
+    .map_err(|_e| {
+      warn!("Error creating token");
+      InferW2lWithUploadError::ServerError
+    })?;
+
+  info!("Creating w2l inference job record...");
+
+  let query_result = sqlx::query!(
+        r#"
+INSERT INTO w2l_inference_jobs
+SET
+  token = ?,
+  uuid_idempotency_token = ?,
+
+  maybe_w2l_template_token = ?,
+  maybe_public_audio_bucket_hash = ?,
+  maybe_public_audio_bucket_location = ?,
+
+  maybe_original_audio_filename = ?,
+  maybe_audio_mime_type = ?,
+
+  maybe_creator_user_token = ?,
+  creator_ip_address = ?,
+  disable_end_bump = false,
+  creator_set_visibility = ?,
+  status = "pending"
+        "#,
+        job_token.to_string(),
+        uuid_idempotency_token.to_string(),
+        maybe_template_token.clone(),
+        Some(audio_upload_bucket_hash.clone()),
+        Some(audio_upload_bucket_path.clone()),
+        maybe_audio_file_name.clone(),
+        Some(audio_type.clone()),
+        maybe_user_token.clone(),
+        ip_address.to_string(),
+        set_visibility.to_str(),
+    )
+    .execute(&server_state.mysql_pool)
+    .await;
+
+  let _record_id = match query_result {
+    Ok(res) => {
+      res.last_insert_id()
+    },
+    Err(err) => {
+      warn!("New w2l template upload creation DB error: {:?}", err);
+
+      // NB: SQLSTATE[23000]: Integrity constraint violation
+      // NB: MySQL Error Code 1062: Duplicate key insertion (this is harder to access)
+      match err {
+        Database(err) => {
+          let _maybe_code = err.code().map(|c| c.into_owned());
+          /*match maybe_code.as_deref() {
+            Some("23000") => {
+              if err.message().contains("username") {
+                return Err(UsernameTaken);
+              } else if err.message().contains("email_address") {
+                return Err(EmailTaken);
+              }
+            }
+            _ => {},
+          }*/
+        },
+        _ => {},
+      }
+      return Err(InferW2lWithUploadError::ServerError);
+    }
+  };
+
+  server_state.firehose_publisher.enqueue_w2l_inference(maybe_user_token.as_deref(), &job_token, &template_token)
+    .await
+    .map_err(|e| {
+      warn!("error publishing event: {:?}", e);
+      InferW2lWithUploadError::ServerError
+    })?;
+
+
+  let response = InferW2lWithUploadSuccessResponse {
+    success: true,
+    inference_job_token: job_token.to_string(),
+  };
+
+  let body = serde_json::to_string(&response)
+    .map_err(|_e| InferW2lWithUploadError::ServerError)?;
+
+  Ok(HttpResponse::Ok()
+    .content_type("application/json")
+    .body(body))
+}
+
+async fn check_template_exists(template_token: &str, mysql_pool: &MySqlPool) -> AnyhowResult<bool>
+{
+  // NB: Lookup failure is Err(RowNotFound).
+  // NB: Since this is publicly exposed, we don't query sensitive data.
+  let maybe_template = sqlx::query_as!(
+      W2lTemplateExistenceRecord,
+        r#"
+SELECT
+    token as template_token
+FROM w2l_templates
+WHERE
+    token = ?
+    AND user_deleted_at IS NULL
+    AND mod_deleted_at IS NULL
+        "#,
+      &template_token
+    )
+    .fetch_one(mysql_pool)
+    .await; // TODO: This will return error if it doesn't exist
+
+  let record_exists = match maybe_template {
+    Ok(_record) => {
+      true
+    },
+    Err(err) => {
+      match err {
+        sqlx::Error::RowNotFound => {
+          false
+        },
+        _ => {
+          warn!("Infer w2l query error: {:?}", err);
+          return Err(anyhow!("infer w2l query error: {:?}", err));
+        }
+      }
+    }
+  };
+
+  Ok(record_exists)
+}
+

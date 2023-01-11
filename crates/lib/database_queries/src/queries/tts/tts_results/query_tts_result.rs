@@ -1,15 +1,16 @@
+// NB: Incrementally getting rid of build warnings...
+#![forbid(unused_imports)]
+#![forbid(unused_mut)]
+#![forbid(unused_variables)]
+
 use anyhow::anyhow;
 use chrono::{DateTime, Utc};
 use container_common::anyhow_result::AnyhowResult;
-use crate::column_types::record_visibility::RecordVisibility;
 use crate::column_types::vocoder_type::VocoderType;
 use crate::helpers::boolean_converters::{nullable_i8_to_bool, i8_to_bool};
-use log::{info, warn, log};
+use enums::core::visibility::Visibility;
+use log::warn;
 use sqlx::MySqlPool;
-use sqlx::error::DatabaseError;
-use sqlx::error::Error::Database;
-use sqlx::mysql::MySqlDatabaseError;
-use std::sync::Arc;
 
 #[derive(Serialize)]
 pub struct TtsResultRecordForResponse {
@@ -34,7 +35,7 @@ pub struct TtsResultRecordForResponse {
   pub public_bucket_wav_audio_path: String,
   pub public_bucket_spectrogram_path: String,
 
-  pub creator_set_visibility: RecordVisibility,
+  pub creator_set_visibility: Visibility,
 
   // Worker hostname that generated the audio. Has the value "unknown" if null.
   pub generated_by_worker: String,
@@ -170,8 +171,8 @@ pub async fn select_tts_result_by_token(
     public_bucket_spectrogram_path: ir.public_bucket_spectrogram_path,
 
     // NB: Fail open/public since we're already looking at it
-    creator_set_visibility: RecordVisibility::from_str(&ir.creator_set_visibility)
-        .unwrap_or(RecordVisibility::Public),
+    creator_set_visibility: Visibility::from_str(&ir.creator_set_visibility)
+        .unwrap_or(Visibility::Public),
 
     generated_by_worker: ir.generated_by_worker.unwrap_or("unknown".to_string()),
 

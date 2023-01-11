@@ -1,13 +1,15 @@
+// NB: Incrementally getting rid of build warnings...
+#![forbid(unused_imports)]
+#![forbid(unused_mut)]
+#![forbid(unused_variables)]
+
 use anyhow::anyhow;
 use chrono::{DateTime, Utc};
 use container_common::anyhow_result::AnyhowResult;
-use crate::column_types::record_visibility::RecordVisibility;
 use crate::helpers::boolean_converters::nullable_i8_to_bool;
-use log::{info, warn, log};
+use enums::core::visibility::Visibility;
+use log::warn;
 use sqlx::MySqlPool;
-use sqlx::error::DatabaseError;
-use sqlx::error::Error::Database;
-use sqlx::mysql::MySqlDatabaseError;
 
 #[derive(Serialize)]
 pub struct W2lResultRecordForResponse {
@@ -30,7 +32,7 @@ pub struct W2lResultRecordForResponse {
   pub maybe_template_creator_display_name: Option<String>,
   pub maybe_template_creator_gravatar_hash: Option<String>,
 
-  pub creator_set_visibility: RecordVisibility,
+  pub creator_set_visibility: Visibility,
 
   pub file_size_bytes: u32,
   pub frame_width: u32,
@@ -148,8 +150,8 @@ pub async fn select_w2l_result_by_token(
     maybe_template_creator_gravatar_hash: ir.maybe_template_creator_gravatar_hash,
 
     // NB: Fail open/public since we're already looking at it
-    creator_set_visibility: RecordVisibility::from_str(&ir.creator_set_visibility)
-        .unwrap_or(RecordVisibility::Public),
+    creator_set_visibility: Visibility::from_str(&ir.creator_set_visibility)
+        .unwrap_or(Visibility::Public),
 
     //template_is_mod_approved: if ir.template_is_mod_approved == 0 { false } else { true },
 

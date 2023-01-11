@@ -1,0 +1,27 @@
+[package]
+name = "media"
+edition = "2018"
+version = "0.0.1"
+authors = [
+    "Brandon Thomas <bt@brand.io>",
+    "Brandon Thomas <echelon@gmail.com>",
+]
+publish = false
+
+[lib]
+name = "media" # NB: Public "media" crate was squatted, so we're good to use this name internally.
+path = "src/lib.rs"
+
+[dependencies]
+
+# Internal
+errors = { path = "../errors" }
+
+# External
+log = "0.4.14"
+
+# Powerful audio decoder and demuxer
+symphonia = { version = "0.5.1", features = ["aac", "alac", "flac", "isomp4", "mkv", "mp3", "ogg", "vorbis", "wav"] }
+
+[dev-dependencies]
+# None yet

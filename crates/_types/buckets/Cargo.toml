@@ -1,0 +1,25 @@
+[package]
+name = "buckets"
+edition = "2018"
+version = "0.0.1"
+authors = [
+    "Brandon Thomas <bt@brand.io>",
+    "Brandon Thomas <echelon@gmail.com>",
+]
+publish = false
+
+[lib]
+name = "buckets"
+path = "src/lib.rs"
+
+[dependencies]
+
+# Internal
+crockford = { path = "../../lib/crockford" }
+errors = { path = "../../lib/errors" }
+
+# External
+# (none yet)
+
+[dev-dependencies]
+# (none yet)

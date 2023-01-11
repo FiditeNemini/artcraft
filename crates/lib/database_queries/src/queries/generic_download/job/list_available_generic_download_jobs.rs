@@ -4,8 +4,8 @@ use container_common::anyhow_result::AnyhowResult;
 use crate::column_types::job_status::JobStatus;
 use crate::queries::generic_download::job::_keys::GenericDownloadJobId;
 use crate::tokens::Tokens;
-use reusable_types::entity_visibility::EntityVisibility;
-use reusable_types::generic_download_type::GenericDownloadType;
+use enums::core::visibility::Visibility;
+use enums::workers::generic_download_type::GenericDownloadType;
 use sqlx::MySqlPool;
 use std::path::Path;
 use tokens::jobs::download::DownloadJobToken;
@@ -18,7 +18,7 @@ pub struct AvailableDownloadJob {
 
   pub creator_user_token: String,
   pub creator_ip_address: String,
-  pub creator_set_visibility: EntityVisibility,
+  pub creator_set_visibility: Visibility,
 
   pub download_type: GenericDownloadType,
   pub download_url: String,
@@ -45,9 +45,9 @@ SELECT
 
   creator_user_token,
   creator_ip_address,
-  creator_set_visibility as `creator_set_visibility: reusable_types::entity_visibility::EntityVisibility`,
+  creator_set_visibility as `creator_set_visibility: enums::core::visibility::Visibility`,
 
-  download_type as `download_type: reusable_types::generic_download_type::GenericDownloadType`,
+  download_type as `download_type: enums::workers::generic_download_type::GenericDownloadType`,
   download_url,
   title,
 
@@ -108,7 +108,7 @@ struct AvailableDownloadJobRawInternal {
 
   pub creator_user_token: String,
   pub creator_ip_address: String,
-  pub creator_set_visibility: EntityVisibility,
+  pub creator_set_visibility: Visibility,
 
   pub download_type: GenericDownloadType,
   pub download_url: String,

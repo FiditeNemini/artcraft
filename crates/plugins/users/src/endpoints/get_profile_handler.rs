@@ -12,11 +12,11 @@ use crate::utils::session_checker::SessionChecker;
 use database_queries::queries::users::user_badges::list_user_badges::UserBadgeForList;
 use database_queries::queries::users::user_badges::list_user_badges::list_user_badges;
 use database_queries::queries::users::user_profiles::get_user_profile_by_username::get_user_profile_by_username_from_connection;
+use enums::core::visibility::Visibility;
 use http_server_common::request::get_request_header_optional::get_request_header_optional;
 use http_server_common::response::serialize_as_json_error::serialize_as_json_error;
 use http_server_common::util::timer::MultiBenchmarkingTimer;
 use log::warn;
-use reusable_types::entity_visibility::EntityVisibility;
 use sqlx::MySqlPool;
 use std::fmt;
 use tokens::users::user::UserToken;
@@ -34,8 +34,8 @@ pub struct UserProfileRecordForResponse {
   pub profile_rendered_html: String,
   pub user_role_slug: String,
   pub disable_gravatar: bool,
-  pub preferred_tts_result_visibility: EntityVisibility,
-  pub preferred_w2l_result_visibility: EntityVisibility,
+  pub preferred_tts_result_visibility: Visibility,
+  pub preferred_w2l_result_visibility: Visibility,
   pub discord_username: Option<String>,
   pub twitch_username: Option<String>,
   pub twitter_username: Option<String>,

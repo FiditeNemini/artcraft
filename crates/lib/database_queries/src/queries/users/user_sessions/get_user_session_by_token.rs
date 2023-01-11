@@ -4,14 +4,15 @@
 
 use anyhow::anyhow;
 use container_common::anyhow_result::AnyhowResult;
-use crate::column_types::record_visibility::RecordVisibility;
 use crate::helpers::boolean_converters::{nullable_i8_to_optional_bool, i8_to_bool, nullable_i8_to_bool_default_false};
+use enums::core::visibility::Visibility;
 use log::warn;
 use sqlx::MySql;
 use sqlx::pool::PoolConnection;
+use tokens::users::user::UserToken;
 
 pub struct SessionUserRecord {
-  pub user_token: String,
+  pub user_token: String, // TODO(bt, 2022-12-20): Convert to strongly-typed `UserToken`
   pub username: String,
   pub display_name: String,
 
@@ -28,8 +29,8 @@ pub struct SessionUserRecord {
 
   pub disable_gravatar: bool,
   pub auto_play_audio_preference: Option<bool>,
-  pub preferred_tts_result_visibility: RecordVisibility,
-  pub preferred_w2l_result_visibility: RecordVisibility,
+  pub preferred_tts_result_visibility: Visibility,
+  pub preferred_w2l_result_visibility: Visibility,
   pub auto_play_video_preference: Option<bool>,
 
   // ===== ROLE ===== //
@@ -65,6 +66,13 @@ pub struct SessionUserRecord {
   pub can_delete_users: bool,
 }
 
+impl SessionUserRecord {
+  // TODO(bt, 2022-12-20): Convert all users of the bare record to using `UserToken`, then get rid of this method.
+  pub fn get_strongly_typed_user_token(&self) -> UserToken {
+    UserToken::new_from_str(&self.user_token)
+  }
+}
+
 pub async fn get_user_session_by_token(
   mysql_connection: &mut PoolConnection<MySql>,
   session_token: &str,
@@ -89,8 +97,8 @@ SELECT
     users.disable_gravatar,
     users.auto_play_audio_preference,
     users.auto_play_video_preference,
-    users.preferred_tts_result_visibility as `preferred_tts_result_visibility: crate::column_types::record_visibility::RecordVisibility`,
-    users.preferred_w2l_result_visibility as `preferred_w2l_result_visibility: crate::column_types::record_visibility::RecordVisibility`,
+    users.preferred_tts_result_visibility as `preferred_tts_result_visibility: enums::core::visibility::Visibility`,
+    users.preferred_w2l_result_visibility as `preferred_w2l_result_visibility: enums::core::visibility::Visibility`,
 
     users.user_role_slug,
     users.is_banned,
@@ -211,8 +219,8 @@ struct SessionUserRawDbRecord {
   disable_gravatar: i8,
   auto_play_audio_preference: Option<i8>,
   auto_play_video_preference: Option<i8>,
-  preferred_tts_result_visibility: RecordVisibility,
-  preferred_w2l_result_visibility: RecordVisibility,
+  preferred_tts_result_visibility: Visibility,
+  preferred_w2l_result_visibility: Visibility,
 
   user_role_slug: String,
   is_banned: i8,

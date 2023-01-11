@@ -10,6 +10,7 @@ const CROCKFORD_LOWERCASE_CHARSET: &[u8] = b"0123456789abcdefghjkmnpqrstvwxyz";
 // Random part can't be any less than this.
 const MIN_ENTROPY_LENGTH : usize = 8;
 
+#[deprecated(note = "see internal 'crockford' and 'token' crates")]
 pub fn random_prefix_crockford_token(prefix: &str, length: usize, uppercase: bool) -> AnyhowResult<String> {
   let mut prefix = prefix.trim().to_string();
 

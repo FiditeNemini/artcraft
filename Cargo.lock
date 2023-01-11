@@ -668,6 +668,12 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "23b62fc65de8e4e7f52534fb52b0f3ed04746ae267519eef2a83941e8085068b"
 
 [[package]]
+name = "arrayvec"
+version = "0.7.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "8da52d66c7071e2e3fa2a1e5c6d088fec47b593032b254f5e980de8ea54454d6"
+
+[[package]]
 name = "ascii"
 version = "0.9.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -711,7 +717,7 @@ dependencies = [
  "smol_str",
  "thiserror",
  "tokio 1.16.1",
- "uuid",
+ "uuid 0.8.2",
 ]
 
 [[package]]
@@ -976,10 +982,24 @@ dependencies = [
 ]
 
 [[package]]
+name = "buckets"
+version = "0.0.1"
+dependencies = [
+ "crockford",
+ "errors",
+]
+
+[[package]]
 name = "bumpalo"
 version = "3.6.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "63396b8a4b9de3f4fdfb320ab6080762242f66a8ef174c49d8e19b674db4cdbe"
+
+[[package]]
+name = "bytemuck"
+version = "1.12.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "aaa3a8d9a1ca92e282c96a32d6511b695d7d994d1d102ba85d279f9b2756947f"
 
 [[package]]
 name = "byteorder"
@@ -1040,7 +1060,18 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "ca453e8624711b2f0f4eb47076a318feda166252a827ee25d067b43de83dcba0"
 dependencies = [
  "byteorder",
- "uuid",
+ "uuid 0.8.2",
+]
+
+[[package]]
+name = "cfb"
+version = "0.7.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "d38f2da7a0a2c4ccf0065be06397cc26a81f4e528be095826eee9d4adbb8c60f"
+dependencies = [
+ "byteorder",
+ "fnv",
+ "uuid 1.2.2",
 ]
 
 [[package]]
@@ -1113,6 +1144,18 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "0d4198f73e42b4936b35b5bb248d81d2b595ecb170da0bac7655c54eedfa8da8"
 dependencies = [
  "os_str_bytes",
+]
+
+[[package]]
+name = "cloud_storage"
+version = "0.0.1"
+dependencies = [
+ "anyhow",
+ "buckets",
+ "container_common",
+ "log",
+ "rust-s3",
+ "tokio 1.16.1",
 ]
 
 [[package]]
@@ -1205,12 +1248,12 @@ dependencies = [
  "log",
  "once_cell",
  "rand 0.8.4",
- "ring 0.17.0-alpha.10",
+ "ring 0.17.0-alpha.11",
  "serde",
  "serde_json",
  "tempfile",
  "toml",
- "uuid",
+ "uuid 0.8.2",
 ]
 
 [[package]]
@@ -1315,6 +1358,13 @@ dependencies = [
 ]
 
 [[package]]
+name = "crockford"
+version = "0.0.1"
+dependencies = [
+ "rand 0.8.4",
+]
+
+[[package]]
 name = "crossbeam"
 version = "0.8.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1415,9 +1465,9 @@ dependencies = [
 
 [[package]]
 name = "data-encoding"
-version = "2.3.2"
+version = "2.3.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "3ee2393c4a91429dffb4bedf19f4d6abf27d8a732c8ce4980305d782e5426d57"
+checksum = "23d8666cb01533c39dde32bcbab8e227b4ed6679b2c925eba05feabea39508fb"
 
 [[package]]
 name = "database-backup"
@@ -1462,10 +1512,13 @@ version = "0.0.1"
 dependencies = [
  "anyhow",
  "base64 0.13.0",
+ "buckets",
  "chrono",
  "config",
  "container_common",
  "dotenv",
+ "enums",
+ "errors",
  "log",
  "once_cell",
  "regex",
@@ -1618,11 +1671,13 @@ dependencies = [
  "anyhow",
  "chrono",
  "clap 2.34.0",
+ "cloud_storage",
  "config",
  "container_common",
  "database_queries",
  "dotenv",
  "easyenv",
+ "enums",
  "google_drive_common",
  "hostname",
  "hyper 0.14.14",
@@ -1636,7 +1691,6 @@ dependencies = [
  "serde_derive",
  "serde_json",
  "sqlx",
- "storage_buckets_common",
  "subprocess",
  "subprocess_common",
  "tempdir",
@@ -1692,6 +1746,19 @@ dependencies = [
 ]
 
 [[package]]
+name = "enums"
+version = "0.0.1"
+dependencies = [
+ "serde",
+ "serde_derive",
+ "serde_json",
+ "sqlx",
+ "sqlx-core",
+ "strum",
+ "toml",
+]
+
+[[package]]
 name = "env_logger"
 version = "0.7.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1702,6 +1769,13 @@ dependencies = [
  "log",
  "regex",
  "termcolor",
+]
+
+[[package]]
+name = "errors"
+version = "0.0.1"
+dependencies = [
+ "anyhow",
 ]
 
 [[package]]
@@ -1717,6 +1791,15 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c3fcf0cee53519c866c09b5de1f6c56ff9d647101f81c1964fa632e148896cdf"
 dependencies = [
  "instant",
+]
+
+[[package]]
+name = "files"
+version = "0.0.1"
+dependencies = [
+ "data-encoding",
+ "infer 0.11.0",
+ "ring 0.17.0-alpha.11",
 ]
 
 [[package]]
@@ -2353,6 +2436,7 @@ dependencies = [
  "base64 0.13.0",
  "bcrypt",
  "chrono",
+ "cloud_storage",
  "config",
  "container_common",
  "data-encoding",
@@ -2392,14 +2476,13 @@ dependencies = [
  "regex",
  "reqwest",
  "reusable_types",
- "ring 0.17.0-alpha.10",
+ "ring 0.17.0-alpha.11",
  "rust-s3",
  "serde",
  "serde_derive",
  "serde_json",
  "sha2 0.9.5",
  "sqlx",
- "storage_buckets_common",
  "subprocess",
  "tempdir",
  "time 0.2.26",
@@ -2408,7 +2491,7 @@ dependencies = [
  "tts_common",
  "twitch_common",
  "user_input_common",
- "uuid",
+ "uuid 0.8.2",
 ]
 
 [[package]]
@@ -2433,7 +2516,16 @@ version = "0.5.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "ea70330449622910e0edebab230734569516269fb32342fb0a8956340fa48c6c"
 dependencies = [
- "cfb",
+ "cfb 0.4.0",
+]
+
+[[package]]
+name = "infer"
+version = "0.11.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "0a6c16b11a665b26aeeb9b1d7f954cdeb034be38dd00adab4f2ae921a8fee804"
+dependencies = [
+ "cfb 0.7.3",
 ]
 
 [[package]]
@@ -2443,11 +2535,14 @@ dependencies = [
  "anyhow",
  "chrono",
  "clap 2.34.0",
+ "cloud_storage",
  "config",
  "container_common",
  "database_queries",
  "dotenv",
  "easyenv",
+ "enums",
+ "errors",
  "hostname",
  "hyper 0.14.14",
  "jobs_common",
@@ -2460,9 +2555,9 @@ dependencies = [
  "serde_derive",
  "serde_json",
  "sqlx",
- "storage_buckets_common",
  "subprocess",
  "tempdir",
+ "tokens",
  "tokio 1.16.1",
  "tts_common",
 ]
@@ -2607,7 +2702,7 @@ version = "0.7.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "6607c62aa161d23d17a9072cc5da0be67cdfc89d3afb1e8d9c842bebc2525ffe"
 dependencies = [
- "arrayvec",
+ "arrayvec 0.5.2",
  "bitflags",
  "cfg-if 1.0.0",
  "ryu",
@@ -2799,6 +2894,15 @@ name = "md5"
 version = "0.7.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "490cc448043f947bae3cbee9c203358d62dbee0db12107a74be5c30ccfd09771"
+
+[[package]]
+name = "media"
+version = "0.0.1"
+dependencies = [
+ "errors",
+ "log",
+ "symphonia",
+]
 
 [[package]]
 name = "memchr"
@@ -3007,7 +3111,7 @@ dependencies = [
  "serde",
  "serde_json",
  "tokio 1.16.1",
- "uuid",
+ "uuid 0.8.2",
 ]
 
 [[package]]
@@ -3827,9 +3931,9 @@ dependencies = [
 
 [[package]]
 name = "ring"
-version = "0.17.0-alpha.10"
+version = "0.17.0-alpha.11"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "55ae9a4d2975bdd8254d7bcdd2261be62b42b8920f903ec682b08cdc11b87af2"
+checksum = "4575a179070909595bea5f999d67934737c2e0757a1eb9839af555917817b257"
 dependencies = [
  "cc",
  "libc",
@@ -4476,17 +4580,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "213701ba3370744dcd1a12960caa4843b3d68b4d1c0a5d575e0d65b2ee9d16c0"
 
 [[package]]
-name = "storage_buckets_common"
-version = "0.0.1"
-dependencies = [
- "anyhow",
- "container_common",
- "log",
- "rust-s3",
- "tokio 1.16.1",
-]
-
-[[package]]
 name = "storyteller-web"
 version = "0.0.1"
 dependencies = [
@@ -4505,7 +4598,9 @@ dependencies = [
  "base64 0.13.0",
  "bcrypt",
  "billing_component",
+ "buckets",
  "chrono",
+ "cloud_storage",
  "config",
  "container_common",
  "data-encoding",
@@ -4514,6 +4609,8 @@ dependencies = [
  "diesel",
  "dotenv",
  "easyenv",
+ "enums",
+ "files",
  "futures 0.1.31",
  "futures 0.3.17",
  "futures-util",
@@ -4535,6 +4632,7 @@ dependencies = [
  "lru_time_cache",
  "magic-crypt",
  "md-5",
+ "media",
  "memory_caching",
  "native-tls",
  "newrelic-telemetry",
@@ -4546,7 +4644,7 @@ dependencies = [
  "regex",
  "reqwest",
  "reusable_types",
- "ring 0.17.0-alpha.10",
+ "ring 0.17.0-alpha.11",
  "rust-s3",
  "serde",
  "serde_derive",
@@ -4554,8 +4652,8 @@ dependencies = [
  "sha2 0.9.5",
  "speculoos",
  "sqlx",
- "storage_buckets_common",
  "subprocess",
+ "symphonia",
  "tempdir",
  "time 0.2.26",
  "tokens",
@@ -4568,7 +4666,7 @@ dependencies = [
  "url_config",
  "user_input_common",
  "users_component",
- "uuid",
+ "uuid 0.8.2",
 ]
 
 [[package]]
@@ -4638,6 +4736,178 @@ name = "subtle"
 version = "2.4.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "1e81da0851ada1f3e9d4312c704aa4f8806f0f9d69faaf8df2f3464b4a9437c2"
+
+[[package]]
+name = "symphonia"
+version = "0.5.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "17033fe05e4f7f10a6ad602c272bafd2520b2e5cdd9feb61494d9cdce08e002f"
+dependencies = [
+ "lazy_static",
+ "symphonia-bundle-flac",
+ "symphonia-bundle-mp3",
+ "symphonia-codec-aac",
+ "symphonia-codec-alac",
+ "symphonia-codec-pcm",
+ "symphonia-codec-vorbis",
+ "symphonia-core",
+ "symphonia-format-isomp4",
+ "symphonia-format-mkv",
+ "symphonia-format-ogg",
+ "symphonia-format-wav",
+ "symphonia-metadata",
+]
+
+[[package]]
+name = "symphonia-bundle-flac"
+version = "0.5.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "044f655337892b217d6df1d8336ee119414c3886c89c72e0156989cd2ad7934a"
+dependencies = [
+ "log",
+ "symphonia-core",
+ "symphonia-metadata",
+ "symphonia-utils-xiph",
+]
+
+[[package]]
+name = "symphonia-bundle-mp3"
+version = "0.5.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "db5d3d53535ae2b7d0e39e82f683cac5398a6c8baca25ff1183e107d13959d3e"
+dependencies = [
+ "bitflags",
+ "lazy_static",
+ "log",
+ "symphonia-core",
+ "symphonia-metadata",
+]
+
+[[package]]
+name = "symphonia-codec-aac"
+version = "0.5.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "9e9431b89428c31b01428563df18e52b1aff7c49e71fb80b2fa8e85632094776"
+dependencies = [
+ "lazy_static",
+ "log",
+ "symphonia-core",
+]
+
+[[package]]
+name = "symphonia-codec-alac"
+version = "0.5.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "452438d6f32bf07f2f55f35371c3c8e9cce4a028a08b47fb301001f85a950f02"
+dependencies = [
+ "log",
+ "symphonia-core",
+]
+
+[[package]]
+name = "symphonia-codec-pcm"
+version = "0.5.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "17cca412c954abda6ab62b5e51223568eb604ed8266ec777d99e1d63c608443c"
+dependencies = [
+ "log",
+ "symphonia-core",
+]
+
+[[package]]
+name = "symphonia-codec-vorbis"
+version = "0.5.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "323b94435a1a807e1001e29490aeaef2660fb72b145d47497e8429a6cb1d67c3"
+dependencies = [
+ "log",
+ "symphonia-core",
+ "symphonia-utils-xiph",
+]
+
+[[package]]
+name = "symphonia-core"
+version = "0.5.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "199a6417cd4115bac79289b64b859358ea050b7add0ceb364dc991f628c5b347"
+dependencies = [
+ "arrayvec 0.7.2",
+ "bitflags",
+ "bytemuck",
+ "lazy_static",
+ "log",
+]
+
+[[package]]
+name = "symphonia-format-isomp4"
+version = "0.5.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "1dce84cea63247dfcc43e12edf2d19406fbb62ebc24bac1b8e6c49f1ba67b890"
+dependencies = [
+ "encoding_rs",
+ "log",
+ "symphonia-core",
+ "symphonia-metadata",
+ "symphonia-utils-xiph",
+]
+
+[[package]]
+name = "symphonia-format-mkv"
+version = "0.5.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "f405400330b2cc0c70e19515198628ae9a6a99a59c77800541127d4cff113b96"
+dependencies = [
+ "lazy_static",
+ "log",
+ "symphonia-core",
+ "symphonia-metadata",
+ "symphonia-utils-xiph",
+]
+
+[[package]]
+name = "symphonia-format-ogg"
+version = "0.5.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "8d2f741469a0f103607ed1f2605f7f00b13ba044ea9ddc616764558c6d3d9b7d"
+dependencies = [
+ "log",
+ "symphonia-core",
+ "symphonia-metadata",
+ "symphonia-utils-xiph",
+]
+
+[[package]]
+name = "symphonia-format-wav"
+version = "0.5.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "5f9d771aa6889f05b771e629110f6a60b5e1c0ad580fc41da574bc490fbe2822"
+dependencies = [
+ "log",
+ "symphonia-core",
+ "symphonia-metadata",
+]
+
+[[package]]
+name = "symphonia-metadata"
+version = "0.5.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "6ed71acf6b5e6e8bee1509597b86365a06b78c1d73218df47357620a6fe5997b"
+dependencies = [
+ "encoding_rs",
+ "lazy_static",
+ "log",
+ "symphonia-core",
+]
+
+[[package]]
+name = "symphonia-utils-xiph"
+version = "0.5.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "73cbb0766ce77a8aef535f9438db645e7b6f1b2c4cf3be9bf246b4e11a7d5531"
+dependencies = [
+ "symphonia-core",
+ "symphonia-metadata",
+]
 
 [[package]]
 name = "syn"
@@ -4843,7 +5113,6 @@ checksum = "cda74da7e1a664f795bb1f8a87ec406fb89a02522cf6e50620d016add6dbbf5c"
 name = "tokens"
 version = "0.0.1"
 dependencies = [
- "anyhow",
  "rand 0.8.4",
  "serde",
  "serde_derive",
@@ -5173,6 +5442,7 @@ dependencies = [
  "anyhow",
  "chrono",
  "clap 2.34.0",
+ "cloud_storage",
  "config",
  "container_common",
  "database_queries",
@@ -5190,7 +5460,6 @@ dependencies = [
  "serde_derive",
  "serde_json",
  "sqlx",
- "storage_buckets_common",
  "subprocess",
  "tempdir",
  "tokio 1.16.1",
@@ -5204,6 +5473,7 @@ dependencies = [
  "anyhow",
  "chrono",
  "clap 2.34.0",
+ "cloud_storage",
  "config",
  "container_common",
  "database_queries",
@@ -5221,7 +5491,6 @@ dependencies = [
  "serde_derive",
  "serde_json",
  "sqlx",
- "storage_buckets_common",
  "subprocess",
  "tempdir",
  "tokio 1.16.1",
@@ -5329,7 +5598,7 @@ dependencies = [
  "twitch_api2",
  "twitch_common",
  "twitch_oauth2",
- "uuid",
+ "uuid 0.8.2",
 ]
 
 [[package]]
@@ -5555,6 +5824,7 @@ dependencies = [
  "container_common",
  "database_queries",
  "dotenv",
+ "enums",
  "hmac 0.10.1",
  "http_server_common",
  "jwt",
@@ -5591,6 +5861,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "uuid"
+version = "1.2.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "422ee0de9031b5b948b97a8fc04e3aa35230001a722ddd27943e0be31564ce4c"
+
+[[package]]
 name = "vcpkg"
 version = "0.2.12"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -5619,8 +5895,10 @@ name = "w2l-download-job"
 version = "0.0.1"
 dependencies = [
  "anyhow",
+ "buckets",
  "chrono",
  "clap 2.34.0",
+ "cloud_storage",
  "config",
  "container_common",
  "database_queries",
@@ -5638,7 +5916,6 @@ dependencies = [
  "serde_derive",
  "serde_json",
  "sqlx",
- "storage_buckets_common",
  "subprocess",
  "tempdir",
  "tokio 1.16.1",
@@ -5652,6 +5929,7 @@ dependencies = [
  "anyhow",
  "chrono",
  "clap 2.34.0",
+ "cloud_storage",
  "config",
  "container_common",
  "database_queries",
@@ -5669,7 +5947,6 @@ dependencies = [
  "serde_derive",
  "serde_json",
  "sqlx",
- "storage_buckets_common",
  "subprocess",
  "tempdir",
  "tokio 1.16.1",
@@ -5862,7 +6139,7 @@ dependencies = [
  "twitch_api2",
  "twitch_common",
  "twitch_oauth2",
- "uuid",
+ "uuid 0.8.2",
 ]
 
 [[package]]

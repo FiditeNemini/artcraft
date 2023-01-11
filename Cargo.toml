@@ -1,6 +1,13 @@
 [workspace]
 
 members = [
+  # Types: common strongly-typed tokens, ids, payloads, etc.
+  # Also common cloud buckets and other "strongly typed" configs.
+  "crates/_types/buckets",
+  "crates/_types/enums",
+  "crates/_types/reusable_types", # TODO(bt, 2022-12-21): Deprecate
+  "crates/_types/tokens",
+
   # CLI tools for operations, etc.
   "crates/cli/database_backup",
   "crates/cli/database_cleanup",
@@ -11,32 +18,34 @@ members = [
   "crates/plugins/users",
 
   # Shared libraries
+  "crates/lib/cloud_storage",
   "crates/lib/config",
   "crates/lib/container_common",
+  "crates/lib/crockford",
   "crates/lib/database_queries",
+  "crates/lib/errors",
+  "crates/lib/files",
   "crates/lib/google_drive_common",
   "crates/lib/http_server_common",
   "crates/lib/jobs_common",
+  "crates/lib/media",
   "crates/lib/memory_caching",
   "crates/lib/redis_common",
-  "crates/lib/reusable_types",
-  "crates/lib/storage_buckets_common",
   "crates/lib/subprocess_common",
-  "crates/lib/tokens",
   "crates/lib/tts_common",
   "crates/lib/twitch_common",
   "crates/lib/url_config",
   "crates/lib/user_input_common",
 
   # Services: API servers, jobs, workers, etc.
-  "crates/service/download_job",
-  "crates/service/image_generation_service",
-  "crates/service/inference_job",
-  "crates/service/storyteller_web",
-  "crates/service/tts_download_job",
-  "crates/service/tts_inference_job",
-  "crates/service/twitch_pubsub_subscriber",
-  "crates/service/w2l_download_job",
-  "crates/service/w2l_inference_job",
-  "crates/service/websocket_gateway",
+  "crates/service/job/download_job",
+  "crates/service/job/inference_job",
+  "crates/service/job/tts_download_job",
+  "crates/service/job/tts_inference_job",
+  "crates/service/job/w2l_download_job",
+  "crates/service/job/w2l_inference_job",
+  "crates/service/other/twitch_pubsub_subscriber",
+  "crates/service/web/image_generation_service",
+  "crates/service/web/storyteller_web",
+  "crates/service/web/websocket_gateway",
 ]

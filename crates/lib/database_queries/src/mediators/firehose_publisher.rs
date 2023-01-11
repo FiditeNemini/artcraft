@@ -6,12 +6,16 @@ use sqlx::error::Error::Database;
 use sqlx::mysql::MySqlQueryResult;
 use sqlx::{MySqlPool};
 use std::sync::Arc;
+use tokens::files::media_upload::MediaUploadToken;
+use tokens::jobs::inference::InferenceJobToken;
+use tokens::users::user::UserToken;
 
+// TODO(bt, 2022-12-19): Convert this to a database 'enum'. Also, create an 'enums' package similar to 'tokens'.
 #[derive(Debug, Clone, Copy)]
 enum FirehoseEvent {
   UserSignUp,
 
-  // We don't publish for all badges (eg. early user signup)
+  // NB: We don't publish for all badges (eg. early user signup)
   UserBadgeGranted,
 
   TtsModelUploadStarted,
@@ -24,9 +28,15 @@ enum FirehoseEvent {
   W2lInferenceStarted,
   W2lInferenceCompleted,
 
+  VcInferenceStarted,
+  VcInferenceCompleted,
+
   GenericDownloadStarted,
   GenericDownloadCompleted,
 
+  MediaUploaded,
+
+  // TODO(bt, 2022-12-19): Are the following unused, merely planned (?)
   TwitterMention,
   TwitterRetweet,
   DiscordJoin,
@@ -48,14 +58,19 @@ impl FirehoseEvent {
       FirehoseEvent::W2lTemplateUploadCompleted => "w2l_template_upload_completed",
       FirehoseEvent::W2lInferenceStarted => "w2l_inference_started",
       FirehoseEvent::W2lInferenceCompleted => "w2l_inference_completed",
+      FirehoseEvent::VcInferenceStarted => "vc_inference_started",
+      FirehoseEvent::VcInferenceCompleted => "vc_inference_completed",
+      FirehoseEvent::GenericDownloadStarted => "generic_download_started",
+      FirehoseEvent::GenericDownloadCompleted => "generic_download_completed",
+      FirehoseEvent::MediaUploaded => "media_uploaded",
+
+      // Are the following unused (?)
       FirehoseEvent::TwitterMention => "twitter_mention",
       FirehoseEvent::TwitterRetweet => "twitter_retweet",
       FirehoseEvent::DiscordJoin => "discord_join",
       FirehoseEvent::DiscordMessage => "discord_message",
       FirehoseEvent::TwitchSubscribe => "twitch_subscribe",
       FirehoseEvent::TwitchFollow => "twitch_follow",
-      FirehoseEvent::GenericDownloadStarted => "generic_download_started",
-      FirehoseEvent::GenericDownloadCompleted => "generic_download_completed",
     }
   }
 }
@@ -177,6 +192,27 @@ impl FirehosePublisher {
     Ok(())
   }
 
+  pub async fn enqueue_vc_inference(&self, maybe_user_token: Option<&UserToken>, inference_job_token: &InferenceJobToken) -> AnyhowResult<()> {
+    let _record_id = self.insert(
+      FirehoseEvent::VcInferenceStarted,
+      maybe_user_token.map(|u| u.as_str()),
+      Some(inference_job_token.as_str()),
+      Some(inference_job_token.as_str()),
+    ).await?;
+    Ok(())
+  }
+
+  // TODO: Change result token type.
+  pub async fn vc_inference_finished(&self, maybe_user_token: Option<&UserToken>, inference_job_token: &InferenceJobToken, result_token: &str) -> AnyhowResult<()> {
+    let _record_id = self.insert(
+      FirehoseEvent::VcInferenceCompleted,
+      maybe_user_token.map(|u| u.as_str()),
+      Some(inference_job_token.as_str()), // TODO: This could be vc model token
+      Some(result_token)
+    ).await?;
+    Ok(())
+  }
+
   pub async fn enqueue_generic_download(&self, user_token: &str, job_token: &str) -> AnyhowResult<()> {
     let _record_id = self.insert(
       FirehoseEvent::GenericDownloadStarted,
@@ -194,6 +230,16 @@ impl FirehosePublisher {
       Some(user_token),
       entity_token,
       entity_token,
+    ).await?;
+    Ok(())
+  }
+
+  pub async fn publish_media_uploaded(&self, maybe_user_token: Option<&UserToken>, upload_token: &MediaUploadToken) -> AnyhowResult<()> {
+    let _record_id = self.insert(
+      FirehoseEvent::MediaUploaded,
+      maybe_user_token.map(|u| u.as_str()),
+      Some(upload_token.as_str()),
+      Some(upload_token.as_str()),
     ).await?;
     Ok(())
   }
@@ -237,6 +283,8 @@ SET
       Ok(res) => {
         res.last_insert_id()
       },
+      // TODO(bt, 2022-12-20): I've never richly handled database errors/error codes.
+      //  I should revisit these in the future and consider some kind of middleware.
       Err(err) => {
         warn!("Insert record DB error: {:?}", err);
 

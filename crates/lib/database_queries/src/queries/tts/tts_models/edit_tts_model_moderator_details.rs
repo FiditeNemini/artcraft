@@ -1,6 +1,8 @@
-use container_common::anyhow_result::AnyhowResult;
-use crate::column_types::record_visibility::RecordVisibility;
-use crate::column_types::vocoder_type::VocoderType;
+// NB: Incrementally getting rid of build warnings...
+#![forbid(unused_imports)]
+#![forbid(unused_mut)]
+#![forbid(unused_variables)]
+
 use sqlx::MySqlPool;
 use sqlx;
 use sqlx::mysql::MySqlQueryResult;

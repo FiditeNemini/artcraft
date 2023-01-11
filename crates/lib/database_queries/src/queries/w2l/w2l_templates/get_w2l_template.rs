@@ -1,14 +1,15 @@
+// NB: Incrementally getting rid of build warnings...
+#![forbid(unused_imports)]
+#![forbid(unused_mut)]
+#![forbid(unused_variables)]
+
 use anyhow::anyhow;
 use chrono::{DateTime, Utc};
 use container_common::anyhow_result::AnyhowResult;
-use crate::column_types::record_visibility::RecordVisibility;
 use crate::helpers::boolean_converters::{nullable_i8_to_optional_bool, i8_to_bool};
-use log::{info, warn, log};
+use enums::core::visibility::Visibility;
+use log::warn;
 use sqlx::MySqlPool;
-use sqlx::error::DatabaseError;
-use sqlx::error::Error::Database;
-use sqlx::mysql::MySqlDatabaseError;
-use std::sync::Arc;
 
 // FIXME: This is the old style of query scoping and shouldn't be copied.
 //  The moderator-only fields are good practice, though.
@@ -29,7 +30,7 @@ pub struct W2lTemplateRecordForResponse {
   pub duration_millis: u32,
   pub maybe_image_object_name: Option<String>,
   pub maybe_video_object_name: Option<String>,
-  pub creator_set_visibility: RecordVisibility,
+  pub creator_set_visibility: Visibility,
   pub is_public_listing_approved: Option<bool>,
   pub is_locked_from_use: bool,
   pub is_locked_from_user_modification: bool,
@@ -122,8 +123,8 @@ pub async fn select_w2l_template_by_token(
     maybe_image_object_name: template.maybe_public_bucket_preview_image_object_name,
     maybe_video_object_name: template.maybe_public_bucket_preview_video_object_name,
     // NB: Fail open/public with creator_set_visibility since we're already looking at it
-    creator_set_visibility: RecordVisibility::from_str(&template.creator_set_visibility)
-        .unwrap_or(RecordVisibility::Public),
+    creator_set_visibility: Visibility::from_str(&template.creator_set_visibility)
+        .unwrap_or(Visibility::Public),
     is_public_listing_approved: nullable_i8_to_optional_bool(template.is_public_listing_approved),
     is_locked_from_use: i8_to_bool(template.is_locked_from_use),
     is_locked_from_user_modification: i8_to_bool(template.is_locked_from_user_modification),

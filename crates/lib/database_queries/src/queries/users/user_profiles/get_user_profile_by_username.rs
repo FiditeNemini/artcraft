@@ -2,8 +2,8 @@ use anyhow::anyhow;
 use chrono::{DateTime, Utc};
 use container_common::anyhow_result::AnyhowResult;
 use crate::helpers::boolean_converters::i8_to_bool;
+use enums::core::visibility::Visibility;
 use log::{info, warn, log};
-use reusable_types::entity_visibility::EntityVisibility;
 use sqlx::error::DatabaseError;
 use sqlx::error::Error::Database;
 use sqlx::mysql::MySqlDatabaseError;
@@ -38,8 +38,8 @@ pub struct UserProfileResult {
   pub website_url: Option<String>,
 
   // Preferences; NB: included for get_profile_handler legacy reasons
-  pub preferred_tts_result_visibility: EntityVisibility,
-  pub preferred_w2l_result_visibility: EntityVisibility,
+  pub preferred_tts_result_visibility: Visibility,
+  pub preferred_w2l_result_visibility: Visibility,
 
   pub created_at: DateTime<Utc>,
 
@@ -75,8 +75,8 @@ struct RawUserProfileRecord {
   created_at: DateTime<Utc>,
 
   // Preferences; NB: included for get_profile_handler legacy reasons
-  preferred_tts_result_visibility: EntityVisibility,
-  preferred_w2l_result_visibility: EntityVisibility,
+  preferred_tts_result_visibility: Visibility,
+  preferred_w2l_result_visibility: Visibility,
 
   // Mod fields
   is_banned: i8,
@@ -109,8 +109,8 @@ SELECT
     profile_rendered_html,
     user_role_slug,
     disable_gravatar,
-    preferred_tts_result_visibility as `preferred_tts_result_visibility: reusable_types::entity_visibility::EntityVisibility`,
-    preferred_w2l_result_visibility as `preferred_w2l_result_visibility: reusable_types::entity_visibility::EntityVisibility`,
+    preferred_tts_result_visibility as `preferred_tts_result_visibility: enums::core::visibility::Visibility`,
+    preferred_w2l_result_visibility as `preferred_w2l_result_visibility: enums::core::visibility::Visibility`,
     discord_username,
     twitch_username,
     twitter_username,

@@ -1,0 +1,89 @@
+use crate::public::media_uploads::directory::MediaUploadDirectory;
+use crate::public::public_path::PublicPath;
+use crockford::crockford_entropy_lower;
+
+const ORIGINAL_FILE_BASENAME : &'static str = "original_upload.bin";
+
+// TODO: Generate these from a macro.
+
+/// The original user upload file.
+/// It may have derivative files (down samples, crops, etc.) that live alongside it.
+#[derive(Clone)]
+pub struct MediaUploadOriginalFilePath {
+  directory: MediaUploadDirectory,
+  full_object_path: String,
+}
+
+impl PublicPath for MediaUploadOriginalFilePath {}
+
+impl MediaUploadOriginalFilePath {
+
+  pub fn generate_new() -> Self {
+    let entropy = crockford_entropy_lower(32);
+    Self::from_object_hash(&entropy)
+  }
+
+  pub fn from_object_hash(hash: &str) -> Self {
+    // TODO: Path construction could be cleaner.
+    let directory = MediaUploadDirectory::from_object_hash(hash);
+    let full_object_path = format!("{}/{}", directory.get_directory_path_str(), ORIGINAL_FILE_BASENAME);
+    Self {
+      directory,
+      full_object_path,
+    }
+  }
+
+  pub fn get_full_object_path_str(&self) -> &str {
+    &self.full_object_path
+  }
+
+  pub fn get_directory(&self) -> &MediaUploadDirectory {
+    &self.directory
+  }
+
+  pub fn get_object_hash(&self) -> &str {
+    &self.directory.get_object_hash()
+  }
+
+  pub fn get_basename() -> &'static str {
+    ORIGINAL_FILE_BASENAME
+  }
+}
+
+#[cfg(test)]
+mod tests {
+  use crate::public::media_uploads::original_file::MediaUploadOriginalFilePath;
+
+  #[test]
+  pub fn generate_new_entropy() {
+    let file = MediaUploadOriginalFilePath::generate_new();
+    assert_eq!(file.get_object_hash().len(), 32);
+    assert_eq!(file.get_directory().get_object_hash().len(), 32);
+  }
+
+  #[test]
+  pub fn get_full_object_path_str() {
+    let file = MediaUploadOriginalFilePath::from_object_hash("abcdefghijk");
+    assert_eq!(file.get_full_object_path_str(), "/media_upload/a/b/c/d/e/abcdefghijk/original_upload.bin");
+  }
+
+  #[test]
+  pub fn get_full_object_path_str_short_name() {
+    let file = MediaUploadOriginalFilePath::from_object_hash("foo");
+    assert_eq!(file.get_full_object_path_str(), "/media_upload/f/o/foo/original_upload.bin");
+  }
+
+  #[test]
+  pub fn get_full_object_path_str_starts_with_directory() {
+    let file = MediaUploadOriginalFilePath::from_object_hash("abcdefghijk");
+    let full_path = file.get_full_object_path_str();
+    assert!(full_path.starts_with(file.get_directory().get_directory_path_str()))
+  }
+
+  #[test]
+  pub fn get_object_hash() {
+    let hash = "abcdefghijk";
+    let file = MediaUploadOriginalFilePath::from_object_hash(hash);
+    assert_eq!(file.get_object_hash(), hash);
+  }
+}

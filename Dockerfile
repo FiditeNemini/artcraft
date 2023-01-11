@@ -9,7 +9,7 @@
 FROM ubuntu:jammy as rust-base
 
 # NB: This can be "stable" or another version.
-ARG RUST_TOOLCHAIN="1.65.0"
+ARG RUST_TOOLCHAIN="1.66.0"
 
 WORKDIR /tmp
 
@@ -64,6 +64,7 @@ COPY Cargo.toml .
 COPY sqlx-data.json .
 COPY crates/ ./crates
 COPY db/ ./db
+COPY test_data/ ./test_data
 
 # Run all of the tests
 RUN SQLX_OFFLINE=true \

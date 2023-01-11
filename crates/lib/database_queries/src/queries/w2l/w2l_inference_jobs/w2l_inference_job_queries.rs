@@ -5,8 +5,8 @@
 use anyhow::anyhow;
 use chrono::{Utc, DateTime};
 use container_common::anyhow_result::AnyhowResult;
-use crate::column_types::record_visibility::RecordVisibility;
 use crate::tokens::Tokens;
+use enums::core::visibility::Visibility;
 use log::{warn, info};
 use sqlx::MySqlPool;
 use std::path::Path;
@@ -38,7 +38,7 @@ pub struct W2lInferenceJobRecord {
   pub creator_ip_address: String,
   pub maybe_creator_user_token: Option<String>,
 
-  pub creator_set_visibility: RecordVisibility,
+  pub creator_set_visibility: Visibility,
   pub disable_end_bump: i8, // bool
   pub disable_watermark: i8, // bool
 
@@ -76,7 +76,7 @@ SELECT
   creator_ip_address,
   maybe_creator_user_token,
 
-  creator_set_visibility as `creator_set_visibility: crate::column_types::record_visibility::RecordVisibility`,
+  creator_set_visibility as `creator_set_visibility: enums::core::visibility::Visibility`,
   disable_end_bump,
   disable_watermark,
 

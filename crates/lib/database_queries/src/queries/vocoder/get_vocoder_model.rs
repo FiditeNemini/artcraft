@@ -7,9 +7,9 @@ use anyhow::anyhow;
 use chrono::{DateTime, Utc};
 use container_common::anyhow_result::AnyhowResult;
 use crate::helpers::boolean_converters::i8_to_bool;
+use enums::core::visibility::Visibility;
+use enums::ml::vocoder_type::VocoderType;
 use log::warn;
-use reusable_types::entity_visibility::EntityVisibility;
-use reusable_types::vocoder_type::VocoderType;
 use sqlx::MySqlPool;
 
 // FIXME: This is the old style of query scoping and shouldn't be copied.
@@ -31,7 +31,7 @@ pub struct VocoderModelRecord {
   pub creator_display_name: String,
   pub creator_gravatar_hash: String,
 
-  pub creator_set_visibility: EntityVisibility,
+  pub creator_set_visibility: Visibility,
 
   pub created_at: DateTime<Utc>,
   pub updated_at: DateTime<Utc>,
@@ -120,7 +120,7 @@ async fn select_including_deleted(
         r#"
 SELECT
     vocoder.token as vocoder_token,
-    vocoder.vocoder_type as `vocoder_type: reusable_types::vocoder_type::VocoderType`,
+    vocoder.vocoder_type as `vocoder_type: enums::ml::vocoder_type::VocoderType`,
 
     vocoder.creator_user_token,
     users.username as creator_username,
@@ -137,7 +137,7 @@ SELECT
     vocoder.is_mod_disabled_from_author_use,
     vocoder.is_mod_author_editing_locked,
 
-    vocoder.creator_set_visibility as `creator_set_visibility: reusable_types::entity_visibility::EntityVisibility`,
+    vocoder.creator_set_visibility as `creator_set_visibility: enums::core::visibility::Visibility`,
 
     vocoder.created_at,
     vocoder.updated_at,
@@ -168,7 +168,7 @@ async fn select_without_deleted(
         r#"
 SELECT
     vocoder.token as vocoder_token,
-    vocoder.vocoder_type as `vocoder_type: reusable_types::vocoder_type::VocoderType`,
+    vocoder.vocoder_type as `vocoder_type: enums::ml::vocoder_type::VocoderType`,
 
     vocoder.creator_user_token,
     users.username as creator_username,
@@ -185,7 +185,7 @@ SELECT
     vocoder.is_mod_disabled_from_author_use,
     vocoder.is_mod_author_editing_locked,
 
-    vocoder.creator_set_visibility as `creator_set_visibility: reusable_types::entity_visibility::EntityVisibility`,
+    vocoder.creator_set_visibility as `creator_set_visibility: enums::core::visibility::Visibility`,
 
     vocoder.created_at,
     vocoder.updated_at,
@@ -224,7 +224,7 @@ struct InternalVocoderModelRecordRaw {
   pub creator_display_name: String,
   pub creator_gravatar_hash: String,
 
-  pub creator_set_visibility: EntityVisibility,
+  pub creator_set_visibility: Visibility,
 
   pub created_at: DateTime<Utc>,
   pub updated_at: DateTime<Utc>,
