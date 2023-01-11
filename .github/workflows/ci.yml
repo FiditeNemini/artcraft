@@ -23,14 +23,14 @@ jobs:
       - name: Setup mysql
         run: |
           sudo systemctl start mysql
-          apt-get update
-          apt-get -y install mysql-client libmysqlclient-dev
+          sudo apt-get update
+          sudo apt-get -y install mysql-client libmysqlclient-dev
           mysql -h localhost -u root -p root -e "create user 'storyteller'@'localhost' IDENTIFIED BY 'password';"
           mysql -h localhost -u root -p root -e "create database storyteller; grant all on storyteller.* to 'storyteller'@'localhost';" 
       - name: Setup Redis
         run: |
-          apt-get -y install redis-server
-          service redis-server start
+          sudo apt-get -y install redis-server
+          sudo service redis-server start
       - name: Setup Rust
         run: |
           rustup set profile minimal
