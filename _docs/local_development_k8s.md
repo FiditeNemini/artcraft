@@ -5,7 +5,7 @@
 - `cargo build --release --bin storyteller-web --target=x86_64-unknown-linux-musl`
 - `minikube start --extra-config=apiserver.service-node-port-range=1-65535`
 - `eval $(minikube docker-env)`
-- `minikube mount /path/to/storyteller-rust/:/storyteller-rust &> /dev/null`
+- `minikube mount /path/to/storyteller-rust/:/storyteller-rust &> /dev/null &`
 - `docker build -t storyteller-web -f localdev/Dockerfile .`
 - `kubectl apply -f localdev/kubernetes.yml`
 - Get the ip address of minikube with `minikube ip`, this is where all the services will be running on their 
