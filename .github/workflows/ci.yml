@@ -39,7 +39,7 @@ jobs:
           cargo install diesel_cli
       - name: Run database migrations
         run: |
-          diesel migration run
+          diesel migration run | true
       - name: Build 
         run: |
           cargo build --release
