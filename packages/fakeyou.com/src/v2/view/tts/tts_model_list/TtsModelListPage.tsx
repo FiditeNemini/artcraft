@@ -192,13 +192,11 @@ function TtsModelListPage(props: Props) {
 
     const response = await GenerateTtsAudio(request);
 
-    // NB/TODO: I'm not sure which of these invocations is correct, so I'm testing several.
-    gtag('event', 'send', {
-      'event_category': 'event_category_test',
-      'event_label': 'event_label_test',
-      'value': 'value_test',
+    gtag('event', 'generate_tts', {
+      'event_category': 'TTS',
+      'event_label': modelToken,
+      'value': props.textBuffer.length,
       });
-
 
     if (GenerateTtsAudioIsOk(response)) {
       setMaybeTtsError(undefined);
