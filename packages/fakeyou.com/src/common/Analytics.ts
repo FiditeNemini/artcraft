@@ -87,6 +87,18 @@ class Analytics {
     Analytics.sendCategorizedEvent(this.TTS, 'click_tts_result_link');
   }
 
+  static ttsClickHeroVoiceClone() {
+    Analytics.sendCategorizedEvent(this.TTS, 'click_hero_voice_clone');
+  }
+
+  static ttsClickHeroUpgradePlan() {
+    Analytics.sendCategorizedEvent(this.TTS, 'click_hero_upgrade_plan');
+  }
+
+  static ttsClickHeroSignup() {
+    Analytics.sendCategorizedEvent(this.TTS, 'click_hero_signup');
+  }
+
   static ttsTooSlowUpgradePremium() {
     Analytics.sendCategorizedEvent(this.TTS, 'tts_too_slow_upgrade_premium');
   }

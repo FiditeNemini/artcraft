@@ -8,6 +8,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faStar } from "@fortawesome/free-solid-svg-icons";
 import { item, image } from "../../../../data/animation";
 import { motion } from "framer-motion";
+import { Analytics } from "../../../../common/Analytics";
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -39,7 +40,10 @@ export function TtsPageHero(props: Props) {
   if (!props.sessionWrapper.isLoggedIn()) {
     signUpButton = (
       <>
-        <Link to="/signup">
+        <Link 
+            to="/signup"
+            onClick={() => { Analytics.ttsClickHeroSignup() } }
+            >
           <button type="button" className="btn btn-primary w-100">
             {t("tts.TtsModelListPage.heroSection.buttons.signUp")}
           </button>
@@ -52,7 +56,10 @@ export function TtsPageHero(props: Props) {
     if (!props.sessionSubscriptionsWrapper.hasPaidFeatures()) {
       upgradeButton = (
         <>
-          <Link to="/pricing">
+          <Link 
+              to="/pricing"
+              onClick={() => { Analytics.ttsClickHeroUpgradePlan() } }
+              >
             <button type="button" className="btn btn-primary w-100">
               <FontAwesomeIcon icon={faStar} className="me-2" />
               Upgrade Plan
@@ -103,7 +110,10 @@ export function TtsPageHero(props: Props) {
           >
             {upgradeButton}
             {signUpButton}
-            <Link to="/clone">
+            <Link 
+                to="/clone"
+                onClick={() => { Analytics.ttsClickHeroVoiceClone() } }
+                >
               <button type="button" className="btn btn-secondary w-100">
                 {t("tts.TtsModelListPage.heroSection.buttons.cloneVoice")}
               </button>
