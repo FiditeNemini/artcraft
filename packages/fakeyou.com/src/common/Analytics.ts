@@ -16,9 +16,9 @@ class Analytics {
   // These should be stable values for analytics.
   private static readonly ACCOUNT = "account";
   private static readonly PREMIUM = "premium";
-  private static readonly TTS = "TTS";
+  private static readonly TTS = "tts";
   private static readonly TTS_RESULT = "tts_result";
-  private static readonly UI = "UI";
+  private static readonly UI = "ui";
   private static readonly TOPBAR = "topbar";
 
   // ========== USER ==========
