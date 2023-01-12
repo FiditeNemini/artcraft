@@ -48,6 +48,7 @@ import { motion } from "framer-motion";
 import { container, panel } from "../../../../data/animation";
 import { SessionSubscriptionsWrapper } from "@storyteller/components/src/session/SessionSubscriptionsWrapper";
 import { TtsPageHero } from "./TtsPageHero";
+import { Analytics } from "../../../../common/Analytics";
 
 export interface EnqueueJobResponsePayload {
   success: boolean;
@@ -192,11 +193,7 @@ function TtsModelListPage(props: Props) {
 
     const response = await GenerateTtsAudio(request);
 
-    gtag('event', 'generate_tts', {
-      'event_category': 'TTS',
-      'event_label': modelToken,
-      'value': props.textBuffer.length,
-      });
+    Analytics.ttsGenerate(modelToken, props.textBuffer.length);
 
     if (GenerateTtsAudioIsOk(response)) {
       setMaybeTtsError(undefined);
@@ -211,6 +208,9 @@ function TtsModelListPage(props: Props) {
   const handleClearClick = (ev: React.FormEvent<HTMLButtonElement>) => {
     ev.preventDefault();
     props.clearTextBuffer();
+
+    Analytics.ttsClear(props.maybeSelectedTtsModel?.model_token);
+
     return false;
   };
 

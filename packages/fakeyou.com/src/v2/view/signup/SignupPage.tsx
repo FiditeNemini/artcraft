@@ -10,6 +10,7 @@ import { Link } from "react-router-dom";
 import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
 import { motion } from "framer-motion";
 import { container, panel } from "../../../data/animation";
+import { Analytics } from "../../../common/Analytics";
 
 enum FieldTriState {
   EMPTY_FALSE,
@@ -166,6 +167,8 @@ function SignupPage(props: Props) {
   ): Promise<boolean> => {
     ev.preventDefault();
 
+    Analytics.accountSignupAttempt();
+
     if (
       !usernameValid ||
       !emailValid ||
@@ -194,8 +197,9 @@ function SignupPage(props: Props) {
         setUsernameInvalidReason(response.error_fields["username"] || "");
       }
     } else if (CreateAccountIsSuccess(response)) {
-      console.log("querying new session");
       props.querySessionCallback();
+
+      Analytics.accountSignupComplete();
 
       // TODO: Switch to functional component.
       window.location.href = "/";

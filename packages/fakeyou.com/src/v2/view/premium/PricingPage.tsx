@@ -18,6 +18,7 @@ import {
 import { motion } from "framer-motion";
 import { container, item, panel } from "../../../data/animation";
 import { FakeYouFrontendEnvironment } from "@storyteller/components/src/env/FakeYouFrontendEnvironment";
+import { Analytics } from "../../../common/Analytics";
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -54,11 +55,14 @@ function PricingPage(props: Props) {
   ): Promise<boolean> => {
     if (!props.sessionWrapper.isLoggedIn()) {
       // TODO: This needs to bring the user back to purchase flow.
+      Analytics.premiumBounceToSignup();
       history.push("/signup");
       return false;
     } else if (props.sessionSubscriptionsWrapper.hasPaidFeatures()) {
+      Analytics.premiumForwardToStripePortal();
       return await beginStripePortalFlow();
     } else {
+      Analytics.premiumForwardToStripeCheckout();
       return await beginStripeCheckoutFlow(internal_plan_key);
     }
   };
