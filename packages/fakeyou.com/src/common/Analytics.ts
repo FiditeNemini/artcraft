@@ -32,6 +32,22 @@ class Analytics {
 
   // ========== PREMIUM ==========
 
+  static premiumSelectPlanPlus() {
+    Analytics.sendCategorizedEvent('premium', 'select_plan_plus');
+  }
+
+  static premiumSelectPlanPro() {
+    Analytics.sendCategorizedEvent('premium', 'select_plan_pro');
+  }
+
+  static premiumSelectPlanElite() {
+    Analytics.sendCategorizedEvent('premium', 'select_plan_elite');
+  }
+
+  static premiumSelectUnsubscribe() {
+    Analytics.sendCategorizedEvent('premium', 'select_unsubscribe');
+  }
+
   static premiumForwardToStripeCheckout() {
     Analytics.sendCategorizedEvent('premium', 'forward_to_stripe_checkout');
   }
