@@ -170,7 +170,7 @@ function PricingPage(props: Props) {
                         icon={faCheck}
                         className="text-red me-3"
                       />
-                      {e} <span className="small-text">(registered users)</span>
+                      {e}
                     </li>
                   );
                 })}
