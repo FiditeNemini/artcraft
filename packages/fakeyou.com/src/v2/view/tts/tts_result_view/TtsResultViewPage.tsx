@@ -22,6 +22,7 @@ import {
   faTrash,
   faEye,
   faEyeSlash,
+  faUser,
 } from "@fortawesome/free-solid-svg-icons";
 import { motion } from "framer-motion";
 import { container, item, panel } from "../../../../data/animation";
@@ -80,7 +81,7 @@ function TtsResultViewPage(props: Props) {
   let modelLink = `/tts/${ttsInferenceResult.tts_model_token}`;
 
   // NB: Not respected in firefox: https://stackoverflow.com/a/28468261
-  let audioDownloadFilename = `vocodes-${ttsInferenceResult.tts_model_token.replace(
+  let audioDownloadFilename = `fakeyou-${ttsInferenceResult.tts_model_token.replace(
     ":",
     ""
   )}.wav`;
@@ -290,6 +291,35 @@ function TtsResultViewPage(props: Props) {
   const createdAt = new Date(ttsInferenceResult.created_at);
   const createdAtRelative = formatDistance(createdAt, new Date(), { addSuffix: true })
 
+  let downloadButton = null;
+
+  if (props.sessionWrapper.isLoggedIn()) {
+    downloadButton = (
+      <>
+        <a
+          className=" btn btn-primary w-100 mt-4"
+          href={audioLink}
+          download={audioDownloadFilename}
+        >
+          <FontAwesomeIcon icon={faDownload} className="me-2" />
+          Download File{" "}
+        </a>
+      </>
+    );
+  } else {
+    downloadButton = (
+      <>
+        <Link
+          className=" btn btn-primary w-100 mt-4"
+          to={FrontendUrlConfig.signupPage()}
+        >
+          <FontAwesomeIcon icon={faUser} className="me-2" />
+          Register Account to Download
+        </Link>
+      </>
+    );
+  }
+
   return (
     <motion.div initial="hidden" animate="visible" variants={container}>
       <div className="container py-5">
@@ -308,14 +338,7 @@ function TtsResultViewPage(props: Props) {
           {subtitle}
           <div className="py-6">
             <TtsResultAudioPlayerFc ttsResult={ttsInferenceResult} />
-            <a
-              className=" btn btn-primary w-100 mt-4"
-              href={audioLink}
-              download={audioDownloadFilename}
-            >
-              <FontAwesomeIcon icon={faDownload} className="me-2" />
-              Download File{" "}
-            </a>
+            {downloadButton}
           </div>
         </div>
       </motion.div>
