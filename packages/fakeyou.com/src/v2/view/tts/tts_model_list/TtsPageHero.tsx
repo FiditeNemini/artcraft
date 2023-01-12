@@ -5,7 +5,11 @@ import { Link } from "react-router-dom";
 import { Trans } from "react-i18next";
 import { t } from "i18next";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faStar } from "@fortawesome/free-solid-svg-icons";
+import {
+  faStar,
+  faUser,
+  faArrowRight,
+} from "@fortawesome/free-solid-svg-icons";
 import { item, image } from "../../../../data/animation";
 import { motion } from "framer-motion";
 import { Analytics } from "../../../../common/Analytics";
@@ -35,17 +39,32 @@ export function TtsPageHero(props: Props) {
   }, []);
 
   let signUpButton = <></>;
+  let viewPricingButton = <></>;
   let upgradeButton = <></>;
+  let myProfileButton = <></>;
 
   if (!props.sessionWrapper.isLoggedIn()) {
     signUpButton = (
       <>
-        <Link 
-            to="/signup"
-            onClick={() => { Analytics.ttsClickHeroSignup() } }
-            >
+        <Link
+          to="/signup"
+          onClick={() => {
+            Analytics.ttsClickHeroSignup();
+          }}
+        >
           <button type="button" className="btn btn-primary w-100">
             {t("tts.TtsModelListPage.heroSection.buttons.signUp")}
+            <FontAwesomeIcon icon={faArrowRight} className="ms-2" />
+          </button>
+        </Link>
+      </>
+    );
+    viewPricingButton = (
+      <>
+        <Link to="/pricing">
+          <button type="button" className="btn btn-secondary w-100">
+            <FontAwesomeIcon icon={faStar} className="me-2" />
+            View Pricing
           </button>
         </Link>
       </>
@@ -53,13 +72,27 @@ export function TtsPageHero(props: Props) {
   }
 
   if (props.sessionWrapper.isLoggedIn()) {
+    let displayName = props.sessionWrapper.getDisplayName();
+    let url = `/profile/${displayName}`;
+    myProfileButton = (
+      <>
+        <Link to={url}>
+          <button type="button" className="btn btn-secondary w-100">
+            <FontAwesomeIcon icon={faUser} className="me-2" />
+            View my profile
+          </button>
+        </Link>
+      </>
+    );
     if (!props.sessionSubscriptionsWrapper.hasPaidFeatures()) {
       upgradeButton = (
         <>
-          <Link 
-              to="/pricing"
-              onClick={() => { Analytics.ttsClickHeroUpgradePlan() } }
-              >
+          <Link
+            to="/pricing"
+            onClick={() => {
+              Analytics.ttsClickHeroUpgradePlan();
+            }}
+          >
             <button type="button" className="btn btn-primary w-100">
               <FontAwesomeIcon icon={faStar} className="me-2" />
               Upgrade Plan
@@ -110,14 +143,8 @@ export function TtsPageHero(props: Props) {
           >
             {upgradeButton}
             {signUpButton}
-            <Link 
-                to="/clone"
-                onClick={() => { Analytics.ttsClickHeroVoiceClone() } }
-                >
-              <button type="button" className="btn btn-secondary w-100">
-                {t("tts.TtsModelListPage.heroSection.buttons.cloneVoice")}
-              </button>
-            </Link>
+            {viewPricingButton}
+            {myProfileButton}
           </motion.div>
         </div>
       </div>
