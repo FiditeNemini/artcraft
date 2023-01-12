@@ -41,7 +41,7 @@ mod shared_queries {
 use actix_cors::Cors;
 use actix_http::http;
 use actix_web::middleware::{Logger, DefaultHeaders};
-use actix_web::{HttpServer, web, HttpResponse, App};
+use actix_web::{HttpServer, web, HttpResponse, App, middleware};
 use anyhow::anyhow;
 use billing_component::stripe::stripe_config::{FullUrlOrPath, StripeCheckoutConfigs, StripeConfig, StripeCustomerPortalConfigs, StripeSecrets};
 use billing_component::stripe::traits::internal_product_to_stripe_lookup::InternalProductToStripeLookup;
@@ -445,7 +445,8 @@ pub async fn serve(server_state: ServerState) -> AnyhowResult<()>
       .wrap(IpFilter::new(ip_banlist))
       .wrap(Logger::new(&log_format)
         .exclude("/liveness")
-        .exclude("/readiness"));
+        .exclude("/readiness"))
+      .wrap(middleware::Compress::default());
 
     add_routes(app)
   })
