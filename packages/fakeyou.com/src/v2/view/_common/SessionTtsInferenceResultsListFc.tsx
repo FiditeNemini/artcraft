@@ -13,6 +13,7 @@ import {
 import { motion } from "framer-motion";
 import { container, item, sessionItem } from "../../../data/animation";
 import { SessionSubscriptionsWrapper } from "@storyteller/components/src/session/SessionSubscriptionsWrapper";
+import { Analytics } from "../../../common/Analytics";
 
 interface Props {
   ttsInferenceJobs: Array<TtsInferenceJob>;
@@ -99,7 +100,11 @@ function SessionTtsInferenceResultListFc(props: Props) {
               </audio>
 
               <div>
-                <Link to={ttsPermalink} className="btn btn-primary">
+                <Link 
+                    to={ttsPermalink} 
+                    onClick={() => { Analytics.ttsClickResultLink() }}
+                    className="btn btn-primary"
+                    >
                   <FontAwesomeIcon icon={faLink} className="me-2" />
                   Permalink &amp; download
                 </Link>
@@ -140,7 +145,11 @@ function SessionTtsInferenceResultListFc(props: Props) {
         >
           <FontAwesomeIcon icon={faClock} className="me-3" />
           Don't want to wait? Step to the front of the line with a{" "}
-          <Link to="/pricing" className="alert-link">
+          <Link 
+              to="/pricing" 
+              onClick={() => { Analytics.ttsTooSlowUpgradePremium() }}
+              className="alert-link"
+              >
             <span className="fw-semibold">FakeYou membership</span>.
           </Link>
         </motion.div>

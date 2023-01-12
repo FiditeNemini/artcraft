@@ -38,6 +38,7 @@ import Tippy from "@tippyjs/react";
 import "tippy.js/dist/tippy.css";
 import "tippy.js/animations/shift-away.css";
 import { ThirdPartyLinks } from "@storyteller/components/src/constants/ThirdPartyLinks";
+import { Analytics } from "../../common/Analytics";
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -73,14 +74,13 @@ function TopNav(props: Props) {
     useState<GetPendingTtsJobCountSuccessResponse>({
       success: true,
       pending_job_count: 0,
-      cache_time: new Date(0), // NB: Epoch
+      cache_time: new Date(0), // NB: Epoch is used for vector clock's initial state
     });
 
   useEffect(() => {
     const fetch = async () => {
       const response = await GetPendingTtsJobCount();
       if (GetPendingTtsJobCountIsOk(response)) {
-        console.log(response);
         if (
           response.cache_time.getTime() > pendingTtsJobs.cache_time.getTime()
         ) {
@@ -114,6 +114,7 @@ function TopNav(props: Props) {
       item.hidden.opacity = 1;
       container.hidden.opacity = 1;
       sessionItem.hidden.opacity = 1;
+      Analytics.uiTurnOnAnimations();
     } else {
       image.hidden.opacity = 0;
       image.hidden.x = 15;
@@ -124,6 +125,7 @@ function TopNav(props: Props) {
       item.hidden.opacity = 0;
       container.hidden.opacity = 0;
       sessionItem.hidden.opacity = 0;
+      Analytics.uiTurnOffAnimations();
     }
   };
 
@@ -141,6 +143,7 @@ function TopNav(props: Props) {
     await Logout();
     props.querySessionCallback();
     props.querySessionSubscriptionsCallback();
+    Analytics.accountLogout();
     history.push("/");
   };
 
@@ -210,10 +213,10 @@ function TopNav(props: Props) {
       <div className="top-bar d-none d-lg-flex">
         <div className="container d-flex align-items-center">
           <div className="d-flex gap-4 flex-grow-1">
-            <Link className="top-bar-text" to="/about">
+            <Link className="top-bar-text" to="/about" onClick={() => { Analytics.topbarClickAbout() } }>
               About
             </Link>
-            <Link className="top-bar-text" to="/terms">
+            <Link className="top-bar-text" to="/terms" onClick={() => { Analytics.topbarClickTerms() } }>
               Terms of Use
             </Link>
             <Link className="top-bar-text" to="/privacy">
@@ -320,6 +323,7 @@ function TopNav(props: Props) {
                 <li data-bs-toggle="offcanvas" className="nav-item">
                   <Link
                     to={FrontendUrlConfig.pricingPage()}
+                    onClick={() => { Analytics.topbarClickPricing() } }
                     className="nav-link"
                   >
                     <FontAwesomeIcon icon={faStar} className="me-2" />
@@ -330,6 +334,7 @@ function TopNav(props: Props) {
                 <li data-bs-toggle="offcanvas" className="nav-item">
                   <Link
                     to={FrontendUrlConfig.cloneRequestPage()}
+                    onClick={() => { Analytics.topbarClickVoiceClone() } }
                     className="nav-link"
                   >
                     <FontAwesomeIcon icon={faMicrophone} className="me-2" />

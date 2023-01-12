@@ -10,66 +10,112 @@
  *  - [GTag events for multiple Google products: UA, GA4, etc.](https://developers.google.com/tag-platform/devguides/events)
  *  - [Sending events to both UA and GA4](https://support.google.com/analytics/answer/11091026)
  */
+
 class Analytics {
+  // NB: DO NOT CHANGE! 
+  // These should be stable values for analytics.
+  private static readonly ACCOUNT = "account";
+  private static readonly PREMIUM = "premium";
+  private static readonly TTS = "TTS";
+  private static readonly UI = "UI";
+  private static readonly TOPBAR = "topbar";
 
   // ========== USER ==========
 
   static accountSignupAttempt() {
-    Analytics.sendCategorizedEvent('account', 'signup_attempt');
+    Analytics.sendCategorizedEvent(this.ACCOUNT, 'signup_attempt');
   }
 
   static accountSignupComplete() {
-    Analytics.sendCategorizedEvent('account', 'signup_complete');
+    Analytics.sendCategorizedEvent(this.ACCOUNT, 'signup_complete');
   }
 
   static accountLoginAttempt() {
-    Analytics.sendCategorizedEvent('account', 'login_attempt');
+    Analytics.sendCategorizedEvent(this.ACCOUNT, 'login_attempt');
   }
 
   static accountLoginSuccess() {
-    Analytics.sendCategorizedEvent('account', 'login_success');
+    Analytics.sendCategorizedEvent(this.ACCOUNT, 'login_success');
+  }
+
+  static accountLogout() {
+    Analytics.sendCategorizedEvent(this.ACCOUNT, 'logout');
   }
 
   // ========== PREMIUM ==========
 
   static premiumSelectPlanPlus() {
-    Analytics.sendCategorizedEvent('premium', 'select_plan_plus');
+    Analytics.sendCategorizedEvent(this.PREMIUM, 'select_plan_plus');
   }
 
   static premiumSelectPlanPro() {
-    Analytics.sendCategorizedEvent('premium', 'select_plan_pro');
+    Analytics.sendCategorizedEvent(this.PREMIUM, 'select_plan_pro');
   }
 
   static premiumSelectPlanElite() {
-    Analytics.sendCategorizedEvent('premium', 'select_plan_elite');
+    Analytics.sendCategorizedEvent(this.PREMIUM, 'select_plan_elite');
   }
 
   static premiumSelectUnsubscribe() {
-    Analytics.sendCategorizedEvent('premium', 'select_unsubscribe');
+    Analytics.sendCategorizedEvent(this.PREMIUM, 'select_unsubscribe');
   }
 
   static premiumForwardToStripeCheckout() {
-    Analytics.sendCategorizedEvent('premium', 'forward_to_stripe_checkout');
+    Analytics.sendCategorizedEvent(this.PREMIUM, 'forward_to_stripe_checkout');
   }
 
   static premiumForwardToStripePortal() {
-    Analytics.sendCategorizedEvent('premium', 'forward_to_stripe_portal');
+    Analytics.sendCategorizedEvent(this.PREMIUM, 'forward_to_stripe_portal');
   }
-
 
   static premiumBounceToSignup() {
-    Analytics.sendCategorizedEvent('premium', 'bounce_to_signup');
+    Analytics.sendCategorizedEvent(this.PREMIUM, 'bounce_to_signup');
   }
-
 
   // ========== TTS ==========
 
   static ttsGenerate(modelToken: string, ttsLength: number) {
-    Analytics.sendCategorizedEvent('TTS', 'generate_tts', modelToken, ttsLength);
+    Analytics.sendCategorizedEvent(this.TTS, 'generate_tts', modelToken, ttsLength);
   }
 
   static ttsClear(modelToken?: string) {
-    Analytics.sendCategorizedEvent('TTS', 'clear', modelToken);
+    Analytics.sendCategorizedEvent(this.TTS, 'clear', modelToken);
+  }
+  
+  static ttsClickResultLink() {
+    Analytics.sendCategorizedEvent(this.TTS, 'click_tts_result_link');
+  }
+
+  static ttsTooSlowUpgradePremium() {
+    Analytics.sendCategorizedEvent(this.TTS, 'tts_too_slow_upgrade_premium');
+  }
+
+  // ========== UI ==========
+
+  static uiTurnOnAnimations() {
+    Analytics.sendCategorizedEvent(this.UI, 'turn_on_animations');
+  }
+
+  static uiTurnOffAnimations() {
+    Analytics.sendCategorizedEvent(this.UI, 'turn_off_animations');
+  }
+
+  // ========== TOPBAR ==========
+
+  static topbarClickPricing() {
+    Analytics.sendCategorizedEvent(this.TOPBAR, 'click_pricing');
+  }
+
+  static topbarClickVoiceClone() {
+    Analytics.sendCategorizedEvent(this.TOPBAR, 'click_voice_clone');
+  }
+
+  static topbarClickAbout() {
+    Analytics.sendCategorizedEvent(this.TOPBAR, 'click_about');
+  }
+
+  static topbarClickTerms() {
+    Analytics.sendCategorizedEvent(this.TOPBAR, 'click_terms');
   }
 
   // ========== (impl) ==========
