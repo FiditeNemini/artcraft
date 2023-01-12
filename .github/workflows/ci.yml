@@ -34,7 +34,6 @@ jobs:
       - name: Setup Rust
         run: |
           rustup set profile minimal
-          rustup override set stable
           rustup show
           rustup install 1.66
           rustup default 1.66
