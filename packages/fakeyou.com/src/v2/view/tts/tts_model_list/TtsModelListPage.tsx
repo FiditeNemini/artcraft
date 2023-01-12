@@ -48,7 +48,6 @@ import { motion } from "framer-motion";
 import { container, panel } from "../../../../data/animation";
 import { SessionSubscriptionsWrapper } from "@storyteller/components/src/session/SessionSubscriptionsWrapper";
 import { TtsPageHero } from "./TtsPageHero";
-// import { BackLink } from "../../_common/BackLink";
 
 export interface EnqueueJobResponsePayload {
   success: boolean;
@@ -192,6 +191,17 @@ function TtsModelListPage(props: Props) {
     };
 
     const response = await GenerateTtsAudio(request);
+
+    // NB/TODO: I'm not sure which of these invocations is correct, so I'm testing several.
+    ga('send', 'event', 'testCategory', 'testAction', 'testLabel', 'testValue');
+    ga('send', 'event', ['testCategory2'], ['testAction2'], ['testLabel2'], ['testValue2']);
+    ga('send', {
+        hitType: 'event',
+        eventCategory: 'eventCategory',
+        eventAction: 'eventAction',
+        eventLabel: 'eventLabel',
+        value: 'eventValue',
+    }); 
 
     if (GenerateTtsAudioIsOk(response)) {
       setMaybeTtsError(undefined);
