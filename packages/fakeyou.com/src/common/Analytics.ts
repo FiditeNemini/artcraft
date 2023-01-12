@@ -93,7 +93,7 @@ class Analytics {
 
   // ========== TTS RESULT PAGE ==========
 
-  static ttsResultPageClickPlay() {
+  static ttsResultPageClickPlayPauseToggle() {
     Analytics.sendCategorizedEvent(this.TTS_RESULT, 'click_play_pause_toggle');
   }
 
