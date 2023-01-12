@@ -26,6 +26,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { motion } from "framer-motion";
 import { container, item, panel } from "../../../../data/animation";
+import { Analytics } from "../../../../common/Analytics";
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -299,6 +300,7 @@ function TtsResultViewPage(props: Props) {
         <a
           className=" btn btn-primary w-100 mt-4"
           href={audioLink}
+          onClick={() => { Analytics.ttsResultPageClickDownload() } }
           download={audioDownloadFilename}
         >
           <FontAwesomeIcon icon={faDownload} className="me-2" />
@@ -312,6 +314,7 @@ function TtsResultViewPage(props: Props) {
         <Link
           className=" btn btn-primary w-100 mt-4"
           to={FrontendUrlConfig.signupPage()}
+          onClick={() => { Analytics.ttsResultPageClickRegisterToDownload() } }
         >
           <FontAwesomeIcon icon={faUser} className="me-2" />
           Register Account to Download

@@ -17,6 +17,7 @@ class Analytics {
   private static readonly ACCOUNT = "account";
   private static readonly PREMIUM = "premium";
   private static readonly TTS = "TTS";
+  private static readonly TTS_RESULT = "tts_result";
   private static readonly UI = "UI";
   private static readonly TOPBAR = "topbar";
 
@@ -89,6 +90,21 @@ class Analytics {
   static ttsTooSlowUpgradePremium() {
     Analytics.sendCategorizedEvent(this.TTS, 'tts_too_slow_upgrade_premium');
   }
+
+  // ========== TTS RESULT PAGE ==========
+
+  static ttsResultPageClickPlay() {
+    Analytics.sendCategorizedEvent(this.TTS_RESULT, 'click_play_pause_toggle');
+  }
+
+  static ttsResultPageClickDownload() {
+    Analytics.sendCategorizedEvent(this.TTS_RESULT, 'click_download');
+  }
+
+  static ttsResultPageClickRegisterToDownload() {
+    Analytics.sendCategorizedEvent(this.TTS_RESULT, 'click_register_to_download');
+  }
+
 
   // ========== UI ==========
 
