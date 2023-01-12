@@ -87,6 +87,10 @@ class Analytics {
     Analytics.sendCategorizedEvent(this.TTS, 'click_tts_result_link');
   }
 
+  static ttsClickModelDetailsLink() {
+    Analytics.sendCategorizedEvent(this.TTS, 'click_model_details_link');
+  }
+
   static ttsClickHeroVoiceClone() {
     Analytics.sendCategorizedEvent(this.TTS, 'click_hero_voice_clone');
   }
@@ -97,6 +101,26 @@ class Analytics {
 
   static ttsClickHeroSignup() {
     Analytics.sendCategorizedEvent(this.TTS, 'click_hero_signup');
+  }
+
+  static ttsSelectVoiceFromCategory() {
+    Analytics.sendCategorizedEvent(this.TTS, 'select_voice_from_category');
+  }
+
+  static ttsSelectVoiceFromSearchResult() {
+    Analytics.sendCategorizedEvent(this.TTS, 'select_voice_from_search_result');
+  }
+
+  static ttsClickSelectCategory() {
+    Analytics.sendCategorizedEvent(this.TTS, 'click_select_category');
+  }
+
+  //static ttsClickVoiceSearchBox() {
+  //  Analytics.sendCategorizedEvent(this.TTS, 'click_voice_search_box');
+  //}
+
+  static ttsClickTextInputBox() {
+    Analytics.sendCategorizedEvent(this.TTS, 'click_text_input_box');
   }
 
   static ttsTooSlowUpgradePremium() {

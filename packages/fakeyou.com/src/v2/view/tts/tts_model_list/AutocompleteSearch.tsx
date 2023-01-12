@@ -5,6 +5,7 @@ import Autocomplete from "react-autocomplete";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSearch } from "@fortawesome/free-solid-svg-icons";
 import { t } from "i18next";
+import { Analytics } from "../../../../common/Analytics";
 
 // NB: This probably is not the best autocomplete library in the world
 // A lot of the libraries are really old and depend on jQuery (gross).
@@ -86,6 +87,8 @@ export function AutocompleteSearch(props: Props) {
 
               props.setDropdownCategories(newDropdownCategories);
               props.setMaybeSelectedTtsModel(item);
+
+              Analytics.ttsSelectVoiceFromSearchResult();
             }}
             shouldItemRender={(item: TtsModelListItem, value) => {
               // TODO: A trie would be so much better. Ugh, this is so bad.

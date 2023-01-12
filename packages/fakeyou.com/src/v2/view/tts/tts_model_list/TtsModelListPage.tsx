@@ -221,7 +221,11 @@ function TtsModelListPage(props: Props) {
     let modelName = props.maybeSelectedTtsModel.title;
     let userName = props.maybeSelectedTtsModel.creator_display_name;
     directViewLink = (
-      <Link to={modelLink} className="py-2">
+      <Link 
+          to={modelLink} 
+          onClick={() => { Analytics.ttsClickModelDetailsLink() } }
+          className="py-2"
+          >
         <Trans i18nKey="tts.TtsModelListPage.form.modelSeeMoreLink">
           See more details about the "
           <span className="fw-semibold">{{ modelName }}</span>" model by&nbsp;
@@ -376,6 +380,7 @@ function TtsModelListPage(props: Props) {
 
                 <div className="text-input">
                   <textarea
+                    onClick={() => { Analytics.ttsClickTextInputBox() } }
                     onChange={handleChangeText}
                     className="form-control fs-5"
                     style={{ minHeight: "200px" }}
