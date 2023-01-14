@@ -27,6 +27,16 @@ import {
 import { motion } from "framer-motion";
 import { container, item, panel } from "../../../../data/animation";
 import { Analytics } from "../../../../common/Analytics";
+import {
+  TwitterShareButton,
+  FacebookShareButton,
+  RedditShareButton,
+  WhatsappShareButton,
+  FacebookIcon,
+  TwitterIcon,
+  RedditIcon,
+  WhatsappIcon,
+} from "react-share";
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -52,6 +62,17 @@ function TtsResultViewPage(props: Props) {
       }
     }
   }, []);
+
+  //TTS Results Sharing Link
+  const [shareLink, setShareLink] = useState(
+    `https://fakeyou.com${FrontendUrlConfig.ttsResultPage(token)}`
+  );
+  const handleCopyLink = () => {
+    navigator.clipboard.writeText(shareLink);
+    const copyBtn = document.getElementById("copyBtn");
+    copyBtn!.innerHTML = "Copied!";
+    setTimeout(() => (copyBtn!.innerHTML = "Copy"), 2000);
+  };
 
   useEffect(() => {
     getTtsResult(token);
@@ -290,7 +311,9 @@ function TtsResultViewPage(props: Props) {
   }
 
   const createdAt = new Date(ttsInferenceResult.created_at);
-  const createdAtRelative = formatDistance(createdAt, new Date(), { addSuffix: true })
+  const createdAtRelative = formatDistance(createdAt, new Date(), {
+    addSuffix: true,
+  });
 
   let downloadButton = null;
 
@@ -300,7 +323,9 @@ function TtsResultViewPage(props: Props) {
         <a
           className=" btn btn-primary w-100 mt-4"
           href={audioLink}
-          onClick={() => { Analytics.ttsResultPageClickDownload() } }
+          onClick={() => {
+            Analytics.ttsResultPageClickDownload();
+          }}
           download={audioDownloadFilename}
         >
           <FontAwesomeIcon icon={faDownload} className="me-2" />
@@ -314,7 +339,9 @@ function TtsResultViewPage(props: Props) {
         <Link
           className=" btn btn-primary w-100 mt-4"
           to={FrontendUrlConfig.signupPage()}
-          onClick={() => { Analytics.ttsResultPageClickRegisterToDownload() } }
+          onClick={() => {
+            Analytics.ttsResultPageClickRegisterToDownload();
+          }}
         >
           <FontAwesomeIcon icon={faUser} className="me-2" />
           Register Account to Download
@@ -322,6 +349,48 @@ function TtsResultViewPage(props: Props) {
       </>
     );
   }
+
+  let socialSharing = (
+    <>
+      <div className="align-items-start panel p-3 p-lg-4">
+        <h2 className="panel-title">Share this audio</h2>
+
+        <div className="py-6 d-flex gap-3 flex-column flex-lg-row align-items-center">
+          <div className="d-flex gap-3">
+            <TwitterShareButton title="test" url={shareLink}>
+              <TwitterIcon size={42} round={true} className="share-icon" />
+            </TwitterShareButton>
+            <FacebookShareButton title="test" url={shareLink}>
+              <FacebookIcon size={42} round={true} className="share-icon" />
+            </FacebookShareButton>
+            <RedditShareButton title="test" url={shareLink}>
+              <RedditIcon size={42} round={true} className="share-icon" />
+            </RedditShareButton>
+            <WhatsappShareButton title="test" url={shareLink}>
+              <WhatsappIcon size={42} round={true} className="share-icon" />
+            </WhatsappShareButton>
+          </div>
+          <div className="d-flex copy-link w-100">
+            <input
+              id="resultLink"
+              type="text"
+              className="form-control"
+              value={shareLink}
+              readOnly
+            ></input>
+            <button
+              onClick={handleCopyLink}
+              id="copyBtn"
+              type="button"
+              className="btn btn-primary"
+            >
+              Copy
+            </button>
+          </div>
+        </div>
+      </div>
+    </>
+  );
 
   return (
     <motion.div initial="hidden" animate="visible" variants={container}>
@@ -441,6 +510,10 @@ function TtsResultViewPage(props: Props) {
         <motion.p className="text-center text-lg-start" variants={item}>
           <ReportDiscordLinkFc />
         </motion.p>
+      </motion.div>
+
+      <motion.div className="container-panel py-5" variants={item}>
+        {socialSharing}
       </motion.div>
     </motion.div>
   );

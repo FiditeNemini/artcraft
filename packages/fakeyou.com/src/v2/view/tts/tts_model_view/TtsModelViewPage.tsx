@@ -49,6 +49,16 @@ import {
 import { motion } from "framer-motion";
 import { container, item, panel } from "../../../../data/animation";
 import { SessionSubscriptionsWrapper } from "@storyteller/components/src/session/SessionSubscriptionsWrapper";
+import {
+  TwitterShareButton,
+  FacebookShareButton,
+  RedditShareButton,
+  WhatsappShareButton,
+  FacebookIcon,
+  TwitterIcon,
+  RedditIcon,
+  WhatsappIcon,
+} from "react-share";
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -143,6 +153,17 @@ function TtsModelViewPage(props: Props) {
     listTtsCategoriesForModel,
     listAllTtsCategories,
   ]);
+
+  //TTS Results Sharing Link
+  const [shareLink, setShareLink] = useState(
+    `https://fakeyou.com${FrontendUrlConfig.ttsModelPage(token)}`
+  );
+  const handleCopyLink = () => {
+    navigator.clipboard.writeText(shareLink);
+    const copyBtn = document.getElementById("copyBtn");
+    copyBtn!.innerHTML = "Copied!";
+    setTimeout(() => (copyBtn!.innerHTML = "Copy"), 2000);
+  };
 
   if (notFoundState) {
     return (
@@ -528,7 +549,9 @@ function TtsModelViewPage(props: Props) {
               email_hash={ttsModel.maybe_custom_vocoder.creator_gravatar_hash}
             />
             &nbsp;
-            <Link to={vocoderCreatorUrl}>{ttsModel.maybe_custom_vocoder.creator_display_name}</Link>
+            <Link to={vocoderCreatorUrl}>
+              {ttsModel.maybe_custom_vocoder.creator_display_name}
+            </Link>
           </td>
         </tr>
       </>
@@ -545,7 +568,6 @@ function TtsModelViewPage(props: Props) {
         break;
     }
 
-
     vocoderRows = (
       <>
         <tr>
@@ -555,6 +577,48 @@ function TtsModelViewPage(props: Props) {
       </>
     );
   }
+
+  let socialSharing = (
+    <>
+      <div className="align-items-start panel p-3 p-lg-4">
+        <h2 className="panel-title">Share this TTS model</h2>
+
+        <div className="py-6 d-flex gap-3 flex-column flex-lg-row align-items-center">
+          <div className="d-flex gap-3">
+            <TwitterShareButton title="test" url={shareLink}>
+              <TwitterIcon size={42} round={true} className="share-icon" />
+            </TwitterShareButton>
+            <FacebookShareButton title="test" url={shareLink}>
+              <FacebookIcon size={42} round={true} className="share-icon" />
+            </FacebookShareButton>
+            <RedditShareButton title="test" url={shareLink}>
+              <RedditIcon size={42} round={true} className="share-icon" />
+            </RedditShareButton>
+            <WhatsappShareButton title="test" url={shareLink}>
+              <WhatsappIcon size={42} round={true} className="share-icon" />
+            </WhatsappShareButton>
+          </div>
+          <div className="d-flex copy-link w-100">
+            <input
+              id="resultLink"
+              type="text"
+              className="form-control"
+              value={shareLink}
+              readOnly
+            ></input>
+            <button
+              onClick={handleCopyLink}
+              id="copyBtn"
+              type="button"
+              className="btn btn-primary"
+            >
+              Copy
+            </button>
+          </div>
+        </div>
+      </div>
+    </>
+  );
 
   // NB: Investors might not like the in-your-face "over 1 year ago" dates.
   //const createdAt = new Date(ttsModel?.created_at);
@@ -633,9 +697,7 @@ function TtsModelViewPage(props: Props) {
           <h2 className="panel-title fw-bold">Vocoder Details</h2>
           <div className="py-6">
             <table className="table">
-              <tbody>
-                {vocoderRows}
-              </tbody>
+              <tbody>{vocoderRows}</tbody>
             </table>
           </div>
         </div>
@@ -679,6 +741,10 @@ function TtsModelViewPage(props: Props) {
             </form>
           </div>
         </div>
+      </motion.div>
+
+      <motion.div className="container-panel pt-4 pb-5" variants={item}>
+        {socialSharing}
       </motion.div>
 
       <motion.div className="container pb-5" variants={item}>
