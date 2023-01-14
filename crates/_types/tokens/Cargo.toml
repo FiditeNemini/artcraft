@@ -26,9 +26,8 @@ rand = "0.8.3"
 # "offline" supports typesafe builds without a live database
 # "rustls" doesn't appear to work with IP addresses, per:
 # https://github.com/launchbadge/sqlx/issues/1095#issuecomment-798050828
-#sqlx = { version = "0.4", features = [ "mysql", "runtime-tokio-native-tls", "offline", "chrono" ] }
-sqlx = { version = "0.5", features = [ "mysql", "runtime-actix-native-tls", "offline", "chrono" ] }
-sqlx-core = { version = "0.5.7" }
+sqlx = { version = "0.6.2", features = [ "mysql", "runtime-actix-native-tls", "offline", "chrono" ] }
+sqlx-core = { version = "0.6.2" }
 
 [dev-dependencies]
 
