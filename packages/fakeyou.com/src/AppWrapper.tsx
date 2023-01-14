@@ -177,11 +177,14 @@ export function AppWrapper(props: Props) {
   )
 }
 
+///  NB: This was the really expensive cubic time++ aglorithm to recursively calculate nested category assignments.
+///   This has since been ported to the server and will no longer be computed here. We're preserving this for posterity.
+///
 /// function findAllAncestorTokens(categoryToken: string, allCategoriesByTokenMap: Map<string, TtsCategory>): Set<string> {
 ///   const ancestorTokens = recursiveFindAllAncestorTokens(categoryToken, allCategoriesByTokenMap);
 ///   return new Set(ancestorTokens);
 /// }
-
+///
 /// function recursiveFindAllAncestorTokens(categoryToken: string, allCategoriesByTokenMap: Map<string, TtsCategory>): string[] {
 ///   let category = allCategoriesByTokenMap.get(categoryToken)
 ///   if (category === undefined) {
