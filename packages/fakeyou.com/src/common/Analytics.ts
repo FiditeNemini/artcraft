@@ -130,6 +130,10 @@ class Analytics {
 
   // ========== TTS MODEL PAGE ==========
 
+  static ttsModelPageClickShareLink() {
+    Analytics.sendCategorizedEvent(this.TTS_MODEL, 'click_share_link');
+  }
+
   static ttsModelPageClickShareFacebook() {
     Analytics.sendCategorizedEvent(this.TTS_MODEL, 'click_share_facebook');
   }
@@ -158,6 +162,10 @@ class Analytics {
 
   static ttsResultPageClickRegisterToDownload() {
     Analytics.sendCategorizedEvent(this.TTS_RESULT, 'click_register_to_download');
+  }
+
+  static ttsResultPageClickShareLink() {
+    Analytics.sendCategorizedEvent(this.TTS_RESULT, 'click_share_link');
   }
 
   static ttsResultPageClickShareFacebook() {

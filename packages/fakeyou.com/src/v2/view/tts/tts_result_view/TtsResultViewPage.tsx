@@ -75,6 +75,7 @@ function TtsResultViewPage(props: Props) {
     const copyBtn = document.getElementById("copyBtn");
     copyBtn!.innerHTML = "Copied!";
     setTimeout(() => (copyBtn!.innerHTML = "Copy"), 2000);
+    Analytics.ttsResultPageClickShareLink();
   };
 
   useEffect(() => {
