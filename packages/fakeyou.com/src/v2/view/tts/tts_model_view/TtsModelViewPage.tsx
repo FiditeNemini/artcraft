@@ -591,7 +591,7 @@ function TtsModelViewPage(props: Props) {
             <TwitterShareButton title={shareTitle} url={shareLink}>
               <TwitterIcon size={42} round={true} className="share-icon" />
             </TwitterShareButton>
-            <FacebookShareButton title={shareTitle} url={shareLink}>
+            <FacebookShareButton quote={shareTitle} url={shareLink}>
               <FacebookIcon size={42} round={true} className="share-icon" />
             </FacebookShareButton>
             <RedditShareButton title={shareTitle} url={shareLink}>
