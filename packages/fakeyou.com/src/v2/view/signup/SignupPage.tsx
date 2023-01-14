@@ -202,7 +202,7 @@ function SignupPage(props: Props) {
       Analytics.accountSignupComplete();
 
       // TODO: Switch to functional component.
-      window.location.href = "/";
+      window.location.href = "/pricing";
     }
 
     return false;
