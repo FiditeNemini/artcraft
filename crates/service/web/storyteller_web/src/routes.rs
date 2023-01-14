@@ -100,6 +100,7 @@ use crate::http_server::endpoints::w2l::set_w2l_template_mod_approval::set_w2l_t
 use users_component::default_routes::add_suggested_api_v1_account_creation_and_session_routes;
 use users_component::endpoints::edit_profile_handler::edit_profile_handler;
 use users_component::endpoints::get_profile_handler::get_profile_handler;
+use crate::http_server::endpoints::categories::list_fully_computed_assigned_tts_categories::list_fully_computed_assigned_tts_categories_handler;
 
 pub fn add_routes<T, B> (app: App<T, B>) -> App<T, B>
   where
@@ -635,7 +636,26 @@ fn add_category_routes<T, B> (app: App<T, B>) -> App<T, B>
       >,
 {
   app.service(
-    web::scope("/category")
+    web::scope("/v1/category")
+        .service(
+          web::scope("/list")
+              .service(
+                web::resource("/tts")
+                    .route(web::get().to(list_tts_categories_handler))
+                    .route(web::head().to(|| HttpResponse::Ok()))
+              )
+        )
+        .service(
+          web::scope("/computed_assignments")
+              .service(
+                web::resource("/tts")
+                    .route(web::get().to(list_fully_computed_assigned_tts_categories_handler))
+                    .route(web::head().to(|| HttpResponse::Ok()))
+              )
+        )
+  )
+      .service(
+        web::scope("/category")
         .service(
           web::resource("/create")
               .route(web::post().to(create_category_handler))
@@ -650,7 +670,7 @@ fn add_category_routes<T, B> (app: App<T, B>) -> App<T, B>
           web::scope("/list")
               .service(
                 web::resource("/tts")
-                    .route(web::get().to(list_tts_categories_handler))
+                    .route(web::get().to(list_tts_categories_handler)) // TODO: Deprecate with use of /v1* copy
                     .route(web::head().to(|| HttpResponse::Ok()))
               )
         )
