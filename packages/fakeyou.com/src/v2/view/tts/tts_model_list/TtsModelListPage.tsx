@@ -49,7 +49,12 @@ import { container, panel } from "../../../../data/animation";
 import { SessionSubscriptionsWrapper } from "@storyteller/components/src/session/SessionSubscriptionsWrapper";
 import { TtsPageHero } from "./TtsPageHero";
 import { Analytics } from "../../../../common/Analytics";
-import { GetComputedTtsCategoryAssignments, GetComputedTtsCategoryAssignmentsIsError, GetComputedTtsCategoryAssignmentsIsOk, GetComputedTtsCategoryAssignmentsSuccessResponse } from "../../../api/category/GetComputedTtsCategoryAssignments";
+import {
+  GetComputedTtsCategoryAssignments,
+  GetComputedTtsCategoryAssignmentsIsError,
+  GetComputedTtsCategoryAssignmentsIsOk,
+  GetComputedTtsCategoryAssignmentsSuccessResponse,
+} from "@storyteller/components/src/api/category/GetComputedTtsCategoryAssignments";
 
 export interface EnqueueJobResponsePayload {
   success: boolean;
@@ -92,7 +97,9 @@ interface Props {
   setAllTtsCategories: (allTtsCategories: TtsCategoryType[]) => void;
 
   computedTtsCategoryAssignments?: GetComputedTtsCategoryAssignmentsSuccessResponse;
-  setComputedTtsCategoryAssignments: (categoryAssignments: GetComputedTtsCategoryAssignmentsSuccessResponse) => void;
+  setComputedTtsCategoryAssignments: (
+    categoryAssignments: GetComputedTtsCategoryAssignmentsSuccessResponse
+  ) => void;
 
   allTtsCategoriesByTokenMap: Map<string, TtsCategoryType>;
   allTtsModelsByTokenMap: Map<string, TtsModelListItem>;
@@ -125,9 +132,10 @@ function TtsModelListPage(props: Props) {
 
   const ttsModelsLoaded = ttsModels.length > 0;
   const ttsCategoriesLoaded = allTtsCategories.length > 0;
-  const computedTtsCategoryAssignmentsLoaded = 
-    computedTtsCategoryAssignments !== undefined && 
-    computedTtsCategoryAssignments.category_token_to_tts_model_tokens.recursive.size > 0;
+  const computedTtsCategoryAssignmentsLoaded =
+    computedTtsCategoryAssignments !== undefined &&
+    computedTtsCategoryAssignments.category_token_to_tts_model_tokens.recursive
+      .size > 0;
 
   const listModels = useCallback(async () => {
     if (ttsModelsLoaded) {
@@ -186,7 +194,7 @@ function TtsModelListPage(props: Props) {
   useEffect(() => {
     listModels();
     listTtsCategories();
-    getComputedAssignments()
+    getComputedAssignments();
   }, [listModels, listTtsCategories, getComputedAssignments]);
 
   const handleChangeText = (ev: React.FormEvent<HTMLTextAreaElement>) => {
@@ -243,11 +251,13 @@ function TtsModelListPage(props: Props) {
     let modelName = props.maybeSelectedTtsModel.title;
     let userName = props.maybeSelectedTtsModel.creator_display_name;
     directViewLink = (
-      <Link 
-          to={modelLink} 
-          onClick={() => { Analytics.ttsClickModelDetailsLink() } }
-          className="py-2"
-          >
+      <Link
+        to={modelLink}
+        onClick={() => {
+          Analytics.ttsClickModelDetailsLink();
+        }}
+        className="py-2"
+      >
         <Trans i18nKey="tts.TtsModelListPage.form.modelSeeMoreLink">
           See more details about the "
           <span className="fw-semibold">{{ modelName }}</span>" model by&nbsp;
@@ -402,7 +412,9 @@ function TtsModelListPage(props: Props) {
 
                 <div className="text-input">
                   <textarea
-                    onClick={() => { Analytics.ttsClickTextInputBox() } }
+                    onClick={() => {
+                      Analytics.ttsClickTextInputBox();
+                    }}
                     onChange={handleChangeText}
                     className="form-control fs-5"
                     style={{ minHeight: "200px" }}
