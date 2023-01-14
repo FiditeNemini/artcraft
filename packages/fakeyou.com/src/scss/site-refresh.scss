@@ -385,6 +385,23 @@ styles with important tags:
     }
   }
 
+  .share-icon {
+    transition: 0.2s;
+
+    &:hover {
+      opacity: 0.6;
+    }
+  }
+
+  #resultLink {
+    border-radius: 5px 0 0 5px;
+  }
+
+  #copyBtn {
+    min-width: 105px;
+    border-radius: 0 5px 5px 0;
+  }
+
   .firehose-ul {
     list-style-type: none;
     padding: 0;
