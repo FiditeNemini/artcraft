@@ -422,6 +422,10 @@ function TtsResultViewPage(props: Props) {
             <code>audio</code> element.
       </audio>*/}
 
+      <motion.div className="container-panel py-5" variants={item}>
+        {socialSharing}
+      </motion.div>
+
       <motion.div className="container-panel pt-3 pb-5" variants={panel}>
         <div className="panel p-3 p-lg-4">
           <h2 className="panel-title fw-bold">Spectrogram</h2>
@@ -510,10 +514,7 @@ function TtsResultViewPage(props: Props) {
           <ReportDiscordLinkFc />
         </motion.p>
       </motion.div>
-
-      <motion.div className="container-panel py-5" variants={item}>
-        {socialSharing}
-      </motion.div>
+    
     </motion.div>
   );
 }

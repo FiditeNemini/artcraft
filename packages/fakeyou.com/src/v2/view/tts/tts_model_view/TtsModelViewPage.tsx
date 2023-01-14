@@ -638,6 +638,10 @@ function TtsModelViewPage(props: Props) {
 
       <div>{modelDescription}</div>
 
+      <motion.div className="container-panel pt-4 pb-5" variants={item}>
+        {socialSharing}
+      </motion.div>
+
       <div>{modelCategoriesSection}</div>
 
       <motion.div className="container-panel pt-3 pb-5" variants={panel}>
