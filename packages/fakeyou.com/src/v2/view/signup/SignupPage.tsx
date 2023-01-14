@@ -110,7 +110,7 @@ function SignupPage(props: Props) {
     let passwordConfirmationInvalidReason = "";
 
     if (newPassword.length > 1) {
-      if (newPassword.length < 5) {
+      if (newPassword.length < 6) {
         passwordValid = FieldTriState.FALSE;
         passwordInvalidReason = "password is too short";
       } else {
@@ -362,12 +362,12 @@ function SignupPage(props: Props) {
                     {passwordConfirmationInvalidReason}
                   </p>
                 </div>
-                <div className="alert alert-warning mb-0">
+                {/*<div className="alert alert-warning mb-0">
                   <strong>Remember your password!</strong> We don't have
                   password reset currently, and it'll be a few more weeks before
                   it's added (there are more important features to work on). If
                   you lose your password, please let us know in Discord.
-                </div>
+                </div>*/}
                 <button className="btn btn-primary btn-lg w-100 mt-2">
                   Sign up
                 </button>
