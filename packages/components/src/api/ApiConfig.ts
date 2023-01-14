@@ -326,11 +326,16 @@ class ApiConfig {
   }
 
   listTtsCategories(): string {
+    // TODO: Move to /v1
     return `${this.getScheme()}://${this.getNewApiHost()}/category/list/tts`;
   }
 
   listTtsCategoriesForModel(ttsModelToken: string): string {
     return `${this.getScheme()}://${this.getNewApiHost()}/category/assignments/tts/${ttsModelToken}`;
+  }
+
+  getComputedTtsCategoryAssignments(): string {
+    return `${this.getScheme()}://${this.getNewApiHost()}/v1/category/computed_assignments/tts`;
   }
 
   firehoseEvents(): string {

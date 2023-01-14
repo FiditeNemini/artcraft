@@ -49,6 +49,7 @@ import { container, panel } from "../../../../data/animation";
 import { SessionSubscriptionsWrapper } from "@storyteller/components/src/session/SessionSubscriptionsWrapper";
 import { TtsPageHero } from "./TtsPageHero";
 import { Analytics } from "../../../../common/Analytics";
+import { GetComputedTtsCategoryAssignments, GetComputedTtsCategoryAssignmentsIsError, GetComputedTtsCategoryAssignmentsIsOk, GetComputedTtsCategoryAssignmentsSuccessResponse } from "../../../api/category/GetComputedTtsCategoryAssignments";
 
 export interface EnqueueJobResponsePayload {
   success: boolean;
@@ -90,6 +91,9 @@ interface Props {
   allTtsCategories: TtsCategoryType[];
   setAllTtsCategories: (allTtsCategories: TtsCategoryType[]) => void;
 
+  computedTtsCategoryAssignments?: GetComputedTtsCategoryAssignmentsSuccessResponse;
+  setComputedTtsCategoryAssignments: (categoryAssignments: GetComputedTtsCategoryAssignmentsSuccessResponse) => void;
+
   allTtsCategoriesByTokenMap: Map<string, TtsCategoryType>;
   allTtsModelsByTokenMap: Map<string, TtsModelListItem>;
   ttsModelsByCategoryToken: Map<string, Set<TtsModelListItem>>;
@@ -107,8 +111,10 @@ function TtsModelListPage(props: Props) {
   let {
     setTtsModels,
     setAllTtsCategories,
+    setComputedTtsCategoryAssignments,
     ttsModels,
     allTtsCategories,
+    computedTtsCategoryAssignments,
     maybeSelectedTtsModel,
     setMaybeSelectedTtsModel,
   } = props;
@@ -119,6 +125,9 @@ function TtsModelListPage(props: Props) {
 
   const ttsModelsLoaded = ttsModels.length > 0;
   const ttsCategoriesLoaded = allTtsCategories.length > 0;
+  const computedTtsCategoryAssignmentsLoaded = 
+    computedTtsCategoryAssignments !== undefined && 
+    computedTtsCategoryAssignments.category_token_to_tts_model_tokens.recursive.size > 0;
 
   const listModels = useCallback(async () => {
     if (ttsModelsLoaded) {
@@ -162,10 +171,23 @@ function TtsModelListPage(props: Props) {
     }
   }, [setAllTtsCategories, ttsCategoriesLoaded]);
 
+  const getComputedAssignments = useCallback(async () => {
+    if (computedTtsCategoryAssignmentsLoaded) {
+      return; // Already queried.
+    }
+    const computedAssignments = await GetComputedTtsCategoryAssignments();
+    if (GetComputedTtsCategoryAssignmentsIsOk(computedAssignments)) {
+      setComputedTtsCategoryAssignments(computedAssignments);
+    } else if (GetComputedTtsCategoryAssignmentsIsError(computedAssignments)) {
+      // TODO: Retry on decay function
+    }
+  }, [setComputedTtsCategoryAssignments, computedTtsCategoryAssignmentsLoaded]);
+
   useEffect(() => {
     listModels();
     listTtsCategories();
-  }, [listModels, listTtsCategories]);
+    getComputedAssignments()
+  }, [listModels, listTtsCategories, getComputedAssignments]);
 
   const handleChangeText = (ev: React.FormEvent<HTMLTextAreaElement>) => {
     const textValue = (ev.target as HTMLTextAreaElement).value;
