@@ -17,6 +17,7 @@ class Analytics {
   private static readonly ACCOUNT = "account";
   private static readonly PREMIUM = "premium";
   private static readonly TTS = "tts";
+  private static readonly TTS_MODEL = "tts_model";
   private static readonly TTS_RESULT = "tts_result";
   private static readonly UI = "ui";
   private static readonly TOPBAR = "topbar";
@@ -127,6 +128,24 @@ class Analytics {
     Analytics.sendCategorizedEvent(this.TTS, 'tts_too_slow_upgrade_premium');
   }
 
+  // ========== TTS MODEL PAGE ==========
+
+  static ttsModelPageClickShareFacebook() {
+    Analytics.sendCategorizedEvent(this.TTS_MODEL, 'click_share_facebook');
+  }
+
+  static ttsModelPageClickShareReddit() {
+    Analytics.sendCategorizedEvent(this.TTS_MODEL, 'click_share_reddit');
+  }
+
+  static ttsModelPageClickShareTwitter() {
+    Analytics.sendCategorizedEvent(this.TTS_MODEL, 'click_share_twitter');
+  }
+
+  static ttsModelPageClickShareWhatsapp() {
+    Analytics.sendCategorizedEvent(this.TTS_MODEL, 'click_share_whatsapp');
+  }
+
   // ========== TTS RESULT PAGE ==========
 
   static ttsResultPageClickPlayPauseToggle() {
@@ -141,6 +160,21 @@ class Analytics {
     Analytics.sendCategorizedEvent(this.TTS_RESULT, 'click_register_to_download');
   }
 
+  static ttsResultPageClickShareFacebook() {
+    Analytics.sendCategorizedEvent(this.TTS_RESULT, 'click_share_facebook');
+  }
+
+  static ttsResultPageClickShareReddit() {
+    Analytics.sendCategorizedEvent(this.TTS_RESULT, 'click_share_reddit');
+  }
+
+  static ttsResultPageClickShareTwitter() {
+    Analytics.sendCategorizedEvent(this.TTS_RESULT, 'click_share_twitter');
+  }
+
+  static ttsResultPageClickShareWhatsapp() {
+    Analytics.sendCategorizedEvent(this.TTS_RESULT, 'click_share_whatsapp');
+  }
 
   // ========== UI ==========
 

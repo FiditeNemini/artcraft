@@ -360,16 +360,40 @@ function TtsResultViewPage(props: Props) {
 
         <div className="py-6 d-flex gap-3 flex-column flex-lg-row align-items-center">
           <div className="d-flex gap-3">
-            <TwitterShareButton title={shareTitle} url={shareLink}>
+            <TwitterShareButton
+              title={shareTitle}
+              url={shareLink}
+              onClick={() => {
+                Analytics.ttsResultPageClickShareTwitter();
+              }}
+            >
               <TwitterIcon size={42} round={true} className="share-icon" />
             </TwitterShareButton>
-            <FacebookShareButton quote={shareTitle} url={shareLink}>
+            <FacebookShareButton
+              quote={shareTitle}
+              url={shareLink}
+              onClick={() => {
+                Analytics.ttsResultPageClickShareFacebook();
+              }}
+            >
               <FacebookIcon size={42} round={true} className="share-icon" />
             </FacebookShareButton>
-            <RedditShareButton title={shareTitle} url={shareLink}>
+            <RedditShareButton
+              title={shareTitle}
+              url={shareLink}
+              onClick={() => {
+                Analytics.ttsResultPageClickShareReddit();
+              }}
+            >
               <RedditIcon size={42} round={true} className="share-icon" />
             </RedditShareButton>
-            <WhatsappShareButton title={shareTitle} url={shareLink}>
+            <WhatsappShareButton
+              title={shareTitle}
+              url={shareLink}
+              onClick={() => {
+                Analytics.ttsResultPageClickShareWhatsapp();
+              }}
+            >
               <WhatsappIcon size={42} round={true} className="share-icon" />
             </WhatsappShareButton>
           </div>
