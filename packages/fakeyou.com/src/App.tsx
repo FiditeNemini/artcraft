@@ -38,6 +38,7 @@ import {
   GetRetrievalJobStatus,
   GetRetrievalJobStatusIsOk,
 } from "@storyteller/components/src/api/retrieval/GetRetrievalJobStatus";
+import { GetComputedTtsCategoryAssignmentsSuccessResponse } from "./v2/api/category/GetComputedTtsCategoryAssignments";
 
 i18n
   .use(initReactI18next) // passes i18n down to react-i18next
@@ -72,6 +73,9 @@ interface Props {
 
   allTtsModels: TtsModelListItem[];
   setAllTtsModels: (allTtsModels: TtsModelListItem[]) => void;
+
+  computedTtsCategoryAssignments?: GetComputedTtsCategoryAssignmentsSuccessResponse;
+  setComputedTtsCategoryAssignments: (categoryAssignments: GetComputedTtsCategoryAssignmentsSuccessResponse) => void;
 
   allTtsCategoriesByTokenMap: Map<string, TtsCategoryType>;
   allTtsModelsByTokenMap: Map<string, TtsModelListItem>;
@@ -704,6 +708,8 @@ class App extends React.Component<Props, State> {
                     setTtsModels={this.props.setAllTtsModels}
                     allTtsCategories={this.props.allTtsCategories}
                     setAllTtsCategories={this.props.setAllTtsCategories}
+                    computedTtsCategoryAssignments={this.props.computedTtsCategoryAssignments}
+                    setComputedTtsCategoryAssignments={this.props.setComputedTtsCategoryAssignments}
                     allTtsCategoriesByTokenMap={
                       this.props.allTtsCategoriesByTokenMap
                     }

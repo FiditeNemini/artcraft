@@ -3,6 +3,7 @@ import { TtsCategory } from './v2/api/category/ListTtsCategories';
 import { TtsModelListItem } from '@storyteller/components/src/api/tts/ListTtsModels';
 import { App } from './App';
 import { v4 as uuidv4 } from 'uuid';
+import { GetComputedTtsCategoryAssignmentsSuccessResponse } from './v2/api/category/GetComputedTtsCategoryAssignments';
 
 interface Props {
   // Certan browsers (iPhone) have pitiful support for drawing APIs. Worse yet,
@@ -41,6 +42,7 @@ export function AppWrapper(props: Props) {
   // These may be triggered by a different page than the user initially lands on.
   const [allTtsCategories, setAllTtsCategories] = useState<TtsCategoryType[]>([]);
   const [allTtsModels, setAllTtsModels] = useState<TtsModelListItem[]>([]);
+  const [computedTtsCategoryAssignments, setComputedTtsCategoryAssignments] = useState<GetComputedTtsCategoryAssignmentsSuccessResponse|undefined>(undefined);
 
   // Precalculated maps for lookup by primary key
   const [allCategoriesByTokenMap, setAllCategoriesByTokenMap] = useState<Map<string,TtsCategoryType>>(new Map());
@@ -90,37 +92,61 @@ export function AppWrapper(props: Props) {
     const rootLevel = [rootCategories];
     setDropdownCategories(rootLevel);
 
-    // Voice lookup table
-    let categoriesToTtsModelTokens = new Map();
-    // Category ancestry memoization
-    let categoryTokenToAllAncestorTokens : Map<string, Set<string>> = new Map();
+///  NB: This was the really expensive cubic time++ aglorithm to recursively calculate nested category assignments.
+///   This has since been ported to the server and will no longer be computed here. We're preserving this for posterity.
+///     
+///    // Voice lookup table
+///    let categoriesToTtsModelTokens = new Map();
+///    // Category ancestry memoization
+///    let categoryTokenToAllAncestorTokens : Map<string, Set<string>> = new Map();
+///
+///    // N * M with memoization should't be too bad here.
+///    // Also note that the models should be lexographically sorted by name.
+///    allTtsModels.forEach(ttsModel => {
+///      if (ttsModel.category_tokens.length === 0) {
+///        // TODO: Attach to "uncategorized" special category
+///        return;
+///      }
+///      ttsModel.category_tokens.forEach(categoryToken => {
+///        let ancestors = categoryTokenToAllAncestorTokens.get(categoryToken);
+///        if (ancestors === undefined) {
+///          ancestors = findAllAncestorTokens(categoryToken, categoriesByTokenMap);
+///          categoryTokenToAllAncestorTokens.set(categoryToken, ancestors);
+///        }
+///        ancestors.forEach(categoryToken => {
+///          let models : Set<TtsModelListItem> = categoriesToTtsModelTokens.get(categoryToken);
+///          if (models === undefined) {
+///            models = new Set();
+///            categoriesToTtsModelTokens.set(categoryToken, models);
+///          }
+///          models.add(ttsModel);
+///        })
+///      });
+///    });
+///    setTtsModelsByCategoryToken(categoriesToTtsModelTokens);
 
-    // N * M with memoization should't be too bad here.
-    // Also note that the models should be lexographically sorted by name.
-    allTtsModels.forEach(ttsModel => {
-      if (ttsModel.category_tokens.length === 0) {
-        // TODO: Attach to "uncategorized" special category
-        return;
-      }
-      ttsModel.category_tokens.forEach(categoryToken => {
-        let ancestors = categoryTokenToAllAncestorTokens.get(categoryToken);
-        if (ancestors === undefined) {
-          ancestors = findAllAncestorTokens(categoryToken, categoriesByTokenMap);
-          categoryTokenToAllAncestorTokens.set(categoryToken, ancestors);
+    const nestedCategoryTokenToModelTokensMap : Map<string, Set<string>> = computedTtsCategoryAssignments?.category_token_to_tts_model_tokens.recursive || new Map();
+
+    let categoriesToTtsModelTokens = new Map();
+
+    nestedCategoryTokenToModelTokensMap.forEach((ttsModelTokens, categoryToken) => {
+      ttsModelTokens.forEach(ttsModelToken => {
+        let ttsModel = ttsModelsByTokenMap.get(ttsModelToken);
+        if (ttsModel === undefined) {
+          return;
         }
-        ancestors.forEach(categoryToken => {
-          let models : Set<TtsModelListItem> = categoriesToTtsModelTokens.get(categoryToken);
-          if (models === undefined) {
-            models = new Set();
-            categoriesToTtsModelTokens.set(categoryToken, models);
-          }
-          models.add(ttsModel);
-        })
-      });
-    });
+        let models : Set<TtsModelListItem> = categoriesToTtsModelTokens.get(categoryToken);
+        if (models === undefined) {
+          models = new Set();
+          categoriesToTtsModelTokens.set(categoryToken, models);
+        }
+        models.add(ttsModel);
+      })
+    })
+
     setTtsModelsByCategoryToken(categoriesToTtsModelTokens);
 
-  }, [allTtsCategories, allTtsModels]);
+  }, [allTtsCategories, allTtsModels, computedTtsCategoryAssignments]);
 
   return (
     <App 
@@ -132,6 +158,9 @@ export function AppWrapper(props: Props) {
 
         allTtsModels={allTtsModels}
         setAllTtsModels={setAllTtsModels}
+
+        computedTtsCategoryAssignments={computedTtsCategoryAssignments}
+        setComputedTtsCategoryAssignments={setComputedTtsCategoryAssignments}
 
         allTtsCategoriesByTokenMap={allCategoriesByTokenMap}
         allTtsModelsByTokenMap={allTtsModelsByTokenMap}
@@ -148,21 +177,21 @@ export function AppWrapper(props: Props) {
   )
 }
 
-function findAllAncestorTokens(categoryToken: string, allCategoriesByTokenMap: Map<string, TtsCategory>): Set<string> {
-  const ancestorTokens = recursiveFindAllAncestorTokens(categoryToken, allCategoriesByTokenMap);
-  return new Set(ancestorTokens);
-}
+/// function findAllAncestorTokens(categoryToken: string, allCategoriesByTokenMap: Map<string, TtsCategory>): Set<string> {
+///   const ancestorTokens = recursiveFindAllAncestorTokens(categoryToken, allCategoriesByTokenMap);
+///   return new Set(ancestorTokens);
+/// }
 
-function recursiveFindAllAncestorTokens(categoryToken: string, allCategoriesByTokenMap: Map<string, TtsCategory>): string[] {
-  let category = allCategoriesByTokenMap.get(categoryToken)
-  if (category === undefined) {
-    return [];
-  }
-  if (!category.maybe_super_category_token) {
-    return [categoryToken];
-  }
-  return [
-    ...recursiveFindAllAncestorTokens(category.maybe_super_category_token, allCategoriesByTokenMap), 
-    categoryToken,
-  ];
-}
+/// function recursiveFindAllAncestorTokens(categoryToken: string, allCategoriesByTokenMap: Map<string, TtsCategory>): string[] {
+///   let category = allCategoriesByTokenMap.get(categoryToken)
+///   if (category === undefined) {
+///     return [];
+///   }
+///   if (!category.maybe_super_category_token) {
+///     return [categoryToken];
+///   }
+///   return [
+///     ...recursiveFindAllAncestorTokens(category.maybe_super_category_token, allCategoriesByTokenMap), 
+///     categoryToken,
+///   ];
+/// }
