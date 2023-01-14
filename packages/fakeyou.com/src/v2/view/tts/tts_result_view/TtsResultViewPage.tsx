@@ -64,6 +64,7 @@ function TtsResultViewPage(props: Props) {
   }, []);
 
   const shareLink = `https://fakeyou.com${FrontendUrlConfig.ttsResultPage(token)}`;
+  const shareTitle = `I just used FakeYou to generate speech as ${ttsInferenceResult?.tts_model_title || "one of my favorite characters"}!`
 
   const handleCopyLink = () => {
     navigator.clipboard.writeText(shareLink);
@@ -355,16 +356,16 @@ function TtsResultViewPage(props: Props) {
 
         <div className="py-6 d-flex gap-3 flex-column flex-lg-row align-items-center">
           <div className="d-flex gap-3">
-            <TwitterShareButton title="test" url={shareLink}>
+            <TwitterShareButton title={shareTitle} url={shareLink}>
               <TwitterIcon size={42} round={true} className="share-icon" />
             </TwitterShareButton>
-            <FacebookShareButton title="test" url={shareLink}>
+            <FacebookShareButton title={shareTitle} url={shareLink}>
               <FacebookIcon size={42} round={true} className="share-icon" />
             </FacebookShareButton>
-            <RedditShareButton title="test" url={shareLink}>
+            <RedditShareButton title={shareTitle} url={shareLink}>
               <RedditIcon size={42} round={true} className="share-icon" />
             </RedditShareButton>
-            <WhatsappShareButton title="test" url={shareLink}>
+            <WhatsappShareButton title={shareTitle} url={shareLink}>
               <WhatsappIcon size={42} round={true} className="share-icon" />
             </WhatsappShareButton>
           </div>
