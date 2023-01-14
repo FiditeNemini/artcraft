@@ -2,8 +2,8 @@ import React, { useEffect, useState } from "react";
 import { TtsCategory } from "./v2/api/category/ListTtsCategories";
 import { TtsModelListItem } from "@storyteller/components/src/api/tts/ListTtsModels";
 import { App } from "./App";
-import { v4 as uuidv4 } from "uuid";
 import { GetComputedTtsCategoryAssignmentsSuccessResponse } from "@storyteller/components/src/api/category/GetComputedTtsCategoryAssignments";
+import { SyntheticCategory } from "./model/categories/SyntheticCategory";
 
 interface Props {
   // Certan browsers (iPhone) have pitiful support for drawing APIs. Worse yet,
@@ -14,29 +14,6 @@ interface Props {
 
   // Whether or not to inform users that the name of the website has changed.
   flashVocodesNotice: boolean;
-}
-
-// Special synthetic categories created on the frontend.
-// Used in a union type, but they should play well with `TtsCategory`.
-export class SyntheticCategory {
-  name: string;
-  name_for_dropdown: string;
-  category_token: string;
-  maybe_super_category_token?: string;
-
-  ttsModels: Set<TtsModelListItem>;
-
-  constructor(
-    name: string,
-    token?: string,
-    maybe_super_category_token?: string
-  ) {
-    this.name = name;
-    this.name_for_dropdown = name;
-    this.category_token = !!token ? token : `syn:${uuidv4()}`;
-    this.maybe_super_category_token = maybe_super_category_token;
-    this.ttsModels = new Set();
-  }
 }
 
 export type TtsCategoryType = TtsCategory | SyntheticCategory;
