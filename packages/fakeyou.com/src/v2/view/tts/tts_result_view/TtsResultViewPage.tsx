@@ -63,10 +63,8 @@ function TtsResultViewPage(props: Props) {
     }
   }, []);
 
-  //TTS Results Sharing Link
-  const [shareLink, setShareLink] = useState(
-    `https://fakeyou.com${FrontendUrlConfig.ttsResultPage(token)}`
-  );
+  const shareLink = `https://fakeyou.com${FrontendUrlConfig.ttsResultPage(token)}`;
+
   const handleCopyLink = () => {
     navigator.clipboard.writeText(shareLink);
     const copyBtn = document.getElementById("copyBtn");

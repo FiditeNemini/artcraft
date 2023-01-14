@@ -154,10 +154,8 @@ function TtsModelViewPage(props: Props) {
     listAllTtsCategories,
   ]);
 
-  //TTS Results Sharing Link
-  const [shareLink, setShareLink] = useState(
-    `https://fakeyou.com${FrontendUrlConfig.ttsModelPage(token)}`
-  );
+  const shareLink = `https://fakeyou.com${FrontendUrlConfig.ttsModelPage(token)}`;
+
   const handleCopyLink = () => {
     navigator.clipboard.writeText(shareLink);
     const copyBtn = document.getElementById("copyBtn");
