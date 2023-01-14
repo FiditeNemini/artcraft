@@ -16,8 +16,11 @@ pub(crate) enum EntityType {
   DownloadJob,
   InferenceJob,
   MediaUpload,
+  ModelCategory,
+  TtsModel,
   User,
   VoiceConversionModel,
+  W2lTemplate,
 }
 
 impl EntityType {
@@ -27,8 +30,11 @@ impl EntityType {
       Self::DownloadJob => "jdown_", // NB: Was "JGUP:"
       Self::InferenceJob => "jinf_",
       Self::MediaUpload => "mu_",
-      Self::User => "U:", // NB: Old-style prefix.
+      Self::ModelCategory => "CAT:", // NB: Old-style prefix, do not use for future tokens.
+      Self::TtsModel => "TM:", // NB: Old-style prefix, do not use for future tokens.
+      Self::User => "U:", // NB: Old-style prefix, do not use for future tokens.
       Self::VoiceConversionModel => "voco_",
+      Self::W2lTemplate => "WT:", // NB: Old-style prefix, do not use for future tokens.
     }
   }
 }
