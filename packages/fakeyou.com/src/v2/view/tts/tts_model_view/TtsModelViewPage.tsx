@@ -154,8 +154,12 @@ function TtsModelViewPage(props: Props) {
     listAllTtsCategories,
   ]);
 
-  const shareLink = `https://fakeyou.com${FrontendUrlConfig.ttsModelPage(token)}`;
-  const shareTitle = `Use FakeYou to generate speech as ${ttsModel?.title || "your favorite characters"}!`
+  const shareLink = `https://fakeyou.com${FrontendUrlConfig.ttsModelPage(
+    token
+  )}`;
+  const shareTitle = `Use FakeYou to generate speech as ${
+    ttsModel?.title || "your favorite characters"
+  }!`;
 
   const handleCopyLink = () => {
     navigator.clipboard.writeText(shareLink);
@@ -580,7 +584,7 @@ function TtsModelViewPage(props: Props) {
   let socialSharing = (
     <>
       <div className="align-items-start panel p-3 p-lg-4">
-        <h2 className="panel-title">Share this TTS model</h2>
+        <h2 className="fw-bold panel-title">Share this TTS model</h2>
 
         <div className="py-6 d-flex gap-3 flex-column flex-lg-row align-items-center">
           <div className="d-flex gap-3">
@@ -637,10 +641,6 @@ function TtsModelViewPage(props: Props) {
       </div>
 
       <div>{modelDescription}</div>
-
-      <motion.div className="container-panel pt-4 pb-5" variants={item}>
-        {socialSharing}
-      </motion.div>
 
       <div>{modelCategoriesSection}</div>
 

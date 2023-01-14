@@ -63,8 +63,12 @@ function TtsResultViewPage(props: Props) {
     }
   }, []);
 
-  const shareLink = `https://fakeyou.com${FrontendUrlConfig.ttsResultPage(token)}`;
-  const shareTitle = `I just used FakeYou to generate speech as ${ttsInferenceResult?.tts_model_title || "one of my favorite characters"}!`
+  const shareLink = `https://fakeyou.com${FrontendUrlConfig.ttsResultPage(
+    token
+  )}`;
+  const shareTitle = `I just used FakeYou to generate speech as ${
+    ttsInferenceResult?.tts_model_title || "one of my favorite characters"
+  }!`;
 
   const handleCopyLink = () => {
     navigator.clipboard.writeText(shareLink);
@@ -352,7 +356,7 @@ function TtsResultViewPage(props: Props) {
   let socialSharing = (
     <>
       <div className="align-items-start panel p-3 p-lg-4">
-        <h2 className="panel-title">Share this audio</h2>
+        <h2 className="fw-bold panel-title">Share this audio</h2>
 
         <div className="py-6 d-flex gap-3 flex-column flex-lg-row align-items-center">
           <div className="d-flex gap-3">
@@ -422,7 +426,7 @@ function TtsResultViewPage(props: Props) {
             <code>audio</code> element.
       </audio>*/}
 
-      <motion.div className="container-panel py-5" variants={item}>
+      <motion.div className="container-panel pt-3 pb-5" variants={item}>
         {socialSharing}
       </motion.div>
 
@@ -514,7 +518,6 @@ function TtsResultViewPage(props: Props) {
           <ReportDiscordLinkFc />
         </motion.p>
       </motion.div>
-    
     </motion.div>
   );
 }
