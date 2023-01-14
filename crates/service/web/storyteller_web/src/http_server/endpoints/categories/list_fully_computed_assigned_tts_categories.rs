@@ -1,7 +1,7 @@
 // NB: Incrementally getting rid of build warnings...
-//#![forbid(unused_imports)]
-//#![forbid(unused_mut)]
-//#![forbid(unused_variables)]
+#![forbid(unused_imports)]
+#![forbid(unused_mut)]
+#![forbid(unused_variables)]
 
 //! This endpoint recursively calculates (and caches) the list of every category a TTS model
 //! belongs to. This saves an enormous amount of clientside CPU compute.
@@ -10,20 +10,18 @@
 use actix_web::error::ResponseError;
 use actix_web::http::StatusCode;
 use actix_web::{web, HttpResponse, HttpRequest};
-use chrono::{DateTime, Utc};
 use container_common::anyhow_result::AnyhowResult;
 use crate::server_state::ServerState;
-use database_queries::queries::model_categories::list_categories_query_builder::{Category, CategoryList, ListCategoriesQueryBuilder};
-use database_queries::queries::tts::tts_category_assignments::fetch_and_build_tts_model_category_map::{fetch_and_build_tts_model_category_map_with_connection, TtsModelCategoryMap};
-use database_queries::queries::tts::tts_models::list_tts_models::{list_tts_models_with_connection, TtsModelRecordForList};
+use database_queries::queries::model_categories::list_categories_query_builder::ListCategoriesQueryBuilder;
+use database_queries::queries::tts::tts_category_assignments::fetch_and_build_tts_model_category_map::fetch_and_build_tts_model_category_map_with_connection;
+use database_queries::queries::tts::tts_models::list_tts_models::list_tts_models_with_connection;
 use http_server_common::response::serialize_as_json_error::serialize_as_json_error;
 use lexical_sort::natural_lexical_cmp;
-use log::{info, warn, error};
-use sqlx::MySql;
+use log::{info, error};
+use sqlx::{MySql, MySqlPool};
 use sqlx::pool::PoolConnection;
 use std::collections::{BTreeMap, BTreeSet, HashMap, HashSet};
 use std::fmt;
-use std::iter::FromIterator;
 use std::sync::Arc;
 use tokens::tokens::model_categories::ModelCategoryToken;
 use tokens::tokens::tts_models::TtsModelToken;
@@ -34,9 +32,9 @@ use tokens::tokens::tts_models::TtsModelToken;
 pub struct ListFullyComputedAssignedTtsCategoriesResponse {
   pub success: bool,
 
-  /// All category tokens in use by at least one TTS model.
-  /// Unused categories will not be present.
-  pub utilized_tts_category_tokens: UtilizedCategoryTokens,
+//  /// All category tokens in use by at least one TTS model.
+//  /// Unused categories will not be present.
+//  pub utilized_tts_category_tokens: UtilizedCategoryTokens,
 
   /// Maps of category tokens to the TTS model tokens that are assigned to them.
   pub category_token_to_tts_model_tokens: ModelTokensByCategoryToken,
@@ -56,7 +54,7 @@ pub struct UtilizedCategoryTokens {
   pub leaf_only: BTreeSet<ModelCategoryToken>,
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, Clone)]
 pub struct ModelTokensByCategoryToken {
   /// For every category, the TTS model tokens assigned. This is built up recursively.
   /// Parent categories *will* include all of the TTS models assigned to children categories.
@@ -99,123 +97,38 @@ pub async fn list_fully_computed_assigned_tts_categories_handler(
   _http_request: HttpRequest,
   server_state: web::Data<Arc<ServerState>>) -> Result<HttpResponse, ListFullyComputedAssignedTtsCategoriesError>
 {
-//  let maybe_categories = server_state.caches.category_list.copy_without_bump_if_unexpired()
-//      .map_err(|e| {
-//        error!("Error consulting cache: {:?}", e);
-//        ListFullyComputedAssignedTtsCategoriesError::ServerError
-//      })?;
-//
-//  let categories = match maybe_categories {
-//    Some(categories) => {
-//      info!("Serving TTS categories from cache");
-//      categories
-//    },
-//    None => {
-//      let mut mysql_connection = server_state.mysql_pool.acquire()
-//          .await
-//          .map_err(|e| {
-//            warn!("Could not acquire DB pool: {:?}", e);
-//            ListFullyComputedAssignedTtsCategoriesError::ServerError
-//          })?;
-//
-//      let query_builder = ListCategoriesQueryBuilder::new()
-//          .show_deleted(false)
-//          .show_unapproved(false)
-//          .scope_model_type(Some("tts"));
-//
-//      let query_result =
-//          query_builder.perform_query_using_connection(&mut mysql_connection).await;
-//
-//      let results = match query_result {
-//        Ok(results) => results,
-//        Err(err) => {
-//          warn!("DB error: {:?}", err);
-//          return Err(ListFullyComputedAssignedTtsCategoriesError::ServerError);
-//        }
-//      };
-//
-//      warn!("Number of categories: {:?}", results.categories.len());
-//
-//      let mut categories = results.categories.iter()
-//          .map(|c| {
-//            DisplayCategory {
-//              category_token: c.category_token.clone(),
-//              model_type: c.model_type.clone(),
-//              maybe_super_category_token: c.maybe_super_category_token.clone(),
-//              can_directly_have_models: c.can_directly_have_models,
-//              can_have_subcategories: c.can_have_subcategories,
-//              can_only_mods_apply: c.can_only_mods_apply,
-//              is_mod_approved: c.is_mod_approved,
-//              name: c.name.clone(),
-//              name_for_dropdown: c.maybe_dropdown_name.clone().unwrap_or(c.name.clone()),
-//              created_at: c.created_at.clone(),
-//              updated_at: c.updated_at.clone(),
-//              deleted_at: c.deleted_at.clone(),
-//            }
-//          })
-//          .collect::<Vec<DisplayCategory>>();
-//
-//      // NB: This might produce weird sorting resorts relative to the "name" field,
-//      // but the typical way this should be consumed is via dropdowns.
-//      categories.sort_by(|c1, c2|
-//          natural_lexical_cmp(&c1.name_for_dropdown, &c2.name_for_dropdown));
-//
-//      server_state.caches.category_list.store_copy(&categories)
-//          .map_err(|e| {
-//            error!("Error storing cache: {:?}", e);
-//            ListFullyComputedAssignedTtsCategoriesError::ServerError
-//          })?;
-//
-//      categories
-//    },
-//  };
+  let maybe_category_assignments = server_state.caches.tts_model_category_assignments.copy_without_bump_if_unexpired()
+      .map_err(|e| {
+        error!("Error consulting cache: {:?}", e);
+        ListFullyComputedAssignedTtsCategoriesError::ServerError
+      })?;
 
-  let (models, categories, model_category_map) = {
-    let mut mysql_connection = server_state.mysql_pool.acquire()
-        .await
-        .map_err(|e| {
-          error!("Could not acquire DB pool: {:?}", e);
-          ListFullyComputedAssignedTtsCategoriesError::ServerError
-        })?;
+  let category_assignments = match maybe_category_assignments {
+    Some(category_assignments) => {
+      info!("Serving TTS category assignments from cache");
+      category_assignments
+    },
+    None => {
+      let category_assignments = query_and_construct_payload(&server_state.mysql_pool)
+          .await?;
 
-    let models = list_tts_models(&mut mysql_connection)
-        .await
-        .map_err(|e| {
-          error!("Error querying models: {:?}", e);
-          ListFullyComputedAssignedTtsCategoriesError::ServerError
-        })?;
+      server_state.caches.tts_model_category_assignments.store_copy(&category_assignments)
+          .map_err(|e| {
+            error!("Error storing cache: {:?}", e);
+            ListFullyComputedAssignedTtsCategoriesError::ServerError
+          })?;
 
-    let categories = list_tts_categories(&mut mysql_connection)
-        .await
-        .map_err(|e| {
-          error!("Error querying categories: {:?}", e);
-          ListFullyComputedAssignedTtsCategoriesError::ServerError
-        })?;
-
-    let model_category_map = build_model_categories_map(&mut mysql_connection)
-        .await
-        .map_err(|e| {
-          error!("Error querying and building model category map: {:?}", e);
-          ListFullyComputedAssignedTtsCategoriesError::ServerError
-        })?;
-
-    (models, categories, model_category_map)
+      category_assignments
+    },
   };
-
-
-  info!("Assignments: {:?}", model_category_map);
-
 
   let response = ListFullyComputedAssignedTtsCategoriesResponse {
     success: true,
-    utilized_tts_category_tokens: UtilizedCategoryTokens {
-      recursive: recursive_category_tokens(&model_category_map, &categories),
-      leaf_only: leaf_category_tokens(&model_category_map),
-    },
-    category_token_to_tts_model_tokens: ModelTokensByCategoryToken {
-      recursive: recursive_category_to_model_map(&model_category_map, &categories),
-      leaf_only: leaf_category_to_model_map(&model_category_map),
-    },
+    //utilized_tts_category_tokens: UtilizedCategoryTokens {
+    //  recursive: recursive_category_tokens(&model_category_map, &categories),
+    //  leaf_only: leaf_category_tokens(&model_category_map),
+    //},
+    category_token_to_tts_model_tokens: category_assignments,
   };
 
   let body = serde_json::to_string(&response)
@@ -251,6 +164,45 @@ type ModelTokenToCategoryTokensMap = HashMap<TtsModelToken, HashSet<ModelCategor
 // NB: We use BTree to maintain insertion order for our return type.
 type CategoryTokenToModelTokensMap = BTreeMap<ModelCategoryToken, BTreeSet<TtsModelToken>>;
 
+async fn query_and_construct_payload(mysql_pool: &MySqlPool) -> Result<ModelTokensByCategoryToken, ListFullyComputedAssignedTtsCategoriesError> {
+  let (categories, model_category_map) = {
+    let mut mysql_connection = mysql_pool.acquire()
+        .await
+        .map_err(|e| {
+          error!("Could not acquire DB pool: {:?}", e);
+          ListFullyComputedAssignedTtsCategoriesError::ServerError
+        })?;
+
+    //let models = list_tts_models(&mut mysql_connection)
+    //    .await
+    //    .map_err(|e| {
+    //      error!("Error querying models: {:?}", e);
+    //      ListFullyComputedAssignedTtsCategoriesError::ServerError
+    //    })?;
+
+    let categories = list_tts_categories(&mut mysql_connection)
+        .await
+        .map_err(|e| {
+          error!("Error querying categories: {:?}", e);
+          ListFullyComputedAssignedTtsCategoriesError::ServerError
+        })?;
+
+    let model_category_map = build_model_categories_map(&mut mysql_connection)
+        .await
+        .map_err(|e| {
+          error!("Error querying and building model category map: {:?}", e);
+          ListFullyComputedAssignedTtsCategoriesError::ServerError
+        })?;
+
+    (categories, model_category_map)
+  };
+
+  Ok(ModelTokensByCategoryToken {
+    recursive: recursive_category_to_model_map(&model_category_map, &categories),
+    leaf_only: leaf_category_to_model_map(&model_category_map),
+  })
+}
+
 // ========== Queries / model transformations ==========
 
 async fn list_tts_categories(mysql_connection: &mut PoolConnection<MySql>) -> AnyhowResult<Vec<CategoryInfoLite>> {
@@ -259,7 +211,7 @@ async fn list_tts_categories(mysql_connection: &mut PoolConnection<MySql>) -> An
       .show_unapproved(false)
       .scope_model_type(Some("tts"));
 
-  let mut categories = query_builder
+  let categories = query_builder
       .perform_query_using_connection(mysql_connection)
       .await?
       .categories;
@@ -283,7 +235,7 @@ async fn list_tts_categories(mysql_connection: &mut PoolConnection<MySql>) -> An
 }
 
 async fn list_tts_models(mysql_connection: &mut PoolConnection<MySql>) -> AnyhowResult<Vec<TtsModelInfoLite>> {
-  let mut models = list_tts_models_with_connection(
+  let models = list_tts_models_with_connection(
     mysql_connection,
     None,
     false
@@ -379,7 +331,7 @@ fn leaf_category_to_model_map(model_category_map: &ModelTokenToCategoryTokensMap
       if !category_token_to_model_tokens.contains_key(category_token) {
         category_token_to_model_tokens.insert(category_token.clone(), BTreeSet::new());
       }
-      if let Some(mut inner_map) = category_token_to_model_tokens.get_mut(category_token) {
+      if let Some(inner_map) = category_token_to_model_tokens.get_mut(category_token) {
         inner_map.insert(model_token.clone());
       }
     }
@@ -419,7 +371,7 @@ fn recursive_category_to_model_map(model_category_map: &ModelTokenToCategoryToke
         if !category_token_to_model_tokens.contains_key(category_token) {
           category_token_to_model_tokens.insert(category_token.clone(), BTreeSet::new());
         }
-        if let Some(mut inner_map) = category_token_to_model_tokens.get_mut(category_token) {
+        if let Some(inner_map) = category_token_to_model_tokens.get_mut(category_token) {
           inner_map.insert(model_token.clone());
         }
       }
@@ -454,5 +406,5 @@ fn recursively_find_category_ancestors(
 
 #[cfg(test)]
 mod tests {
-
+  // TODO: This really needs tests!
 }

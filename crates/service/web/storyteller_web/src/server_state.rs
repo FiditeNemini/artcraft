@@ -1,6 +1,7 @@
 use billing_component::stripe::stripe_config::StripeConfig;
 use cloud_storage::bucket_client::BucketClient;
 use crate::StaticApiTokenSet;
+use crate::http_server::endpoints::categories::list_fully_computed_assigned_tts_categories::ModelTokensByCategoryToken;
 use crate::http_server::endpoints::categories::list_tts_categories::DisplayCategory;
 use crate::http_server::endpoints::tts::list_tts_models::TtsModelRecordForResponse;
 use crate::http_server::web_utils::redis_rate_limiter::RedisRateLimiter;
@@ -126,6 +127,10 @@ pub struct InMemoryCaches {
   /// The frontend will consult a distributed cache and use the monotonic DB time as a
   /// vector clock.
   pub tts_queue_length: SingleItemTtlCache<TtsQueueLengthResult>,
+
+  /// Computed category assignments for TTS models
+  /// This is approximately O(n^3) and recursively generates all super-category membership.
+  pub tts_model_category_assignments: SingleItemTtlCache<ModelTokensByCategoryToken>,
 }
 
 #[derive(Clone)]
