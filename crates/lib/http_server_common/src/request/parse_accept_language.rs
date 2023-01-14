@@ -1,12 +1,21 @@
 use language_tags::LanguageTag;
 use log::warn;
+use once_cell::sync::Lazy;
+use regex::Regex;
+
+/// https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Accept-Language
+static ACCEPT_LANGUAGE_QUALITY_FACTOR_REGEX : Lazy<Regex> = Lazy::new(|| {
+  Regex::new(r#";q=\d+\.\d+"#).expect("should be valid regex")
+});
 
 /// Parse out accept languages
 /// Does not error so that the endpoint won't degrade
 pub fn parse_accept_language(accept_languages_header: &str) -> Vec<LanguageTag> {
   let unparsed_tags = accept_languages_header.split(",")
       .into_iter()
-      .map(|tag| tag.trim().to_string())
+      .map(|tag| tag.trim())
+      .map(|tag| ACCEPT_LANGUAGE_QUALITY_FACTOR_REGEX.replace(tag, ""))
+      .map(|tag| tag.to_string())
       .collect::<Vec<String>>();
 
   let mut parsed_tags = Vec::new();
@@ -17,7 +26,7 @@ pub fn parse_accept_language(accept_languages_header: &str) -> Vec<LanguageTag> 
         parsed_tags.push(t);
       }
       Err(e) => {
-        warn!("Error parsing language tag: {:?}", e);
+        warn!("Error parsing language tag '{}' : {:?}", tag, e);
       }
     }
   }
@@ -70,5 +79,24 @@ mod tests {
     assert_eq!(first.primary_language(), "en");
     assert_eq!(second.primary_language(), "es");
     assert_eq!(third.primary_language(), "en");
+  }
+
+  #[test]
+  fn test_language_with_q_factor() {
+    let list = parse_accept_language("en;q=0.9");
+    let lang = list.get(0).unwrap();
+    assert_eq!(lang.primary_language(), "en");
+
+    let list = parse_accept_language("fr-CH, fr;q=0.9, en;q=0.8, de;q=0.7, *;q=0.5");
+    let first = list.get(0).unwrap();
+    let second = list.get(1).unwrap();
+    let third = list.get(2).unwrap();
+    let fourth = list.get(3).unwrap();
+    assert_eq!(first.primary_language(), "fr");
+    assert_eq!(second.primary_language(), "fr");
+    assert_eq!(third.primary_language(), "en");
+    assert_eq!(fourth.primary_language(), "de");
+
+    // TODO: Handle wildcard?
   }
 }
