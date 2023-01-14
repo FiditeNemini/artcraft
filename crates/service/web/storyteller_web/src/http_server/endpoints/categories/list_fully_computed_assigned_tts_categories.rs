@@ -40,19 +40,19 @@ pub struct ListFullyComputedAssignedTtsCategoriesResponse {
   pub category_token_to_tts_model_tokens: ModelTokensByCategoryToken,
 }
 
-#[derive(Serialize)]
-pub struct UtilizedCategoryTokens {
-  /// Every category token used at least once by a TTS model (recursive).
-  /// This is a recursive membership, so parent categories with no models assigned will still be
-  /// present if at least one model is assigned to any of that category's children.
-  pub recursive: BTreeSet<ModelCategoryToken>,
-
-  /// Every category token used at least once by a TTS model (leaf only).
-  /// The TTS model must have a direct attachment to the category to be considered "assigned",
-  /// so parent categories will not be considered "utilized" in this sense unless they have models
-  /// directly assigned to them.
-  pub leaf_only: BTreeSet<ModelCategoryToken>,
-}
+//#[derive(Serialize)]
+//pub struct UtilizedCategoryTokens {
+//  /// Every category token used at least once by a TTS model (recursive).
+//  /// This is a recursive membership, so parent categories with no models assigned will still be
+//  /// present if at least one model is assigned to any of that category's children.
+//  pub recursive: BTreeSet<ModelCategoryToken>,
+//
+//  /// Every category token used at least once by a TTS model (leaf only).
+//  /// The TTS model must have a direct attachment to the category to be considered "assigned",
+//  /// so parent categories will not be considered "utilized" in this sense unless they have models
+//  /// directly assigned to them.
+//  pub leaf_only: BTreeSet<ModelCategoryToken>,
+//}
 
 #[derive(Serialize, Clone)]
 pub struct ModelTokensByCategoryToken {
@@ -60,9 +60,9 @@ pub struct ModelTokensByCategoryToken {
   /// Parent categories *will* include all of the TTS models assigned to children categories.
   pub recursive: BTreeMap<ModelCategoryToken, BTreeSet<TtsModelToken>>,
 
-  /// For every category, the TTS model tokens *directly* assigned.
-  /// Parent categories *will not* include the TTS models assigned to children categories.
-  pub leaf_only: BTreeMap<ModelCategoryToken, BTreeSet<TtsModelToken>>,
+//  /// For every category, the TTS model tokens *directly* assigned.
+//  /// Parent categories *will not* include the TTS models assigned to children categories.
+//  pub leaf_only: BTreeMap<ModelCategoryToken, BTreeSet<TtsModelToken>>,
 }
 
 // =============== Error Response ===============
@@ -199,7 +199,7 @@ async fn query_and_construct_payload(mysql_pool: &MySqlPool) -> Result<ModelToke
 
   Ok(ModelTokensByCategoryToken {
     recursive: recursive_category_to_model_map(&model_category_map, &categories),
-    leaf_only: leaf_category_to_model_map(&model_category_map),
+    //leaf_only: leaf_category_to_model_map(&model_category_map),
   })
 }
 
