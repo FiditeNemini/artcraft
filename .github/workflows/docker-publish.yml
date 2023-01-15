@@ -68,7 +68,7 @@ jobs:
           # https://github.com/whoan/docker-build-with-cache-action/issues/72
           image_tag: latest,${{ github.sha }},${{ steps.vars.outputs.sha_short }}
           # NB: Inject the Git SHA into the container so the servers can emit their own version:
-          build_extra_args: "--build-arg GET_SHA=${{ github.sha }}"
+          build_extra_args: "--build-arg=GET_SHA=${{ github.sha }}"
 
       # - name: Build image
       #   run: |
