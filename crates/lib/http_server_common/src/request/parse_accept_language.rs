@@ -99,4 +99,13 @@ mod tests {
 
     // TODO: Handle wildcard?
   }
+
+  #[test]
+  fn vegito_browser() {
+    // This is FakeYou user 'vegito's accept language
+    let list = parse_accept_language("en-US,en;q=0.9,es;q=0.8");
+    assert_eq!(list.get(0).unwrap().primary_language(), "en");
+    assert_eq!(list.get(1).unwrap().primary_language(), "en");
+    assert_eq!(list.get(2).unwrap().primary_language(), "es");
+  }
 }
