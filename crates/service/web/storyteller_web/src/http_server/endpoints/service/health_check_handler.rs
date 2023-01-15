@@ -30,6 +30,7 @@ pub struct HealthCheckResponse {
   pub last_db_time: Option<NaiveDateTime>,
   pub healthy_check_consecutive_count: Option<u64>,
   pub unhealthy_check_consecutive_count: Option<u64>,
+  pub server_build_sha: String,
 }
 
 
@@ -79,6 +80,7 @@ pub async fn get_health_check_handler(
     last_db_time: health_check_status.last_db_time,
     healthy_check_consecutive_count: health_check_status.healthy_check_consecutive_count,
     unhealthy_check_consecutive_count: health_check_status.unhealthy_check_consecutive_count,
+    server_build_sha: server_state.server_info.build_sha.clone(),
   };
 
   let body = serde_json::to_string(&response)

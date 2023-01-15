@@ -25,6 +25,8 @@ pub struct ServerState {
   /// Configuration from ENV vars.
   pub env_config: EnvConfig,
 
+  pub server_info: ServerInfo,
+
   pub stripe: StripeSettings,
 
   pub hostname: String,
@@ -75,6 +77,11 @@ pub struct EnvConfig {
   pub cookie_secure: bool,
   pub cookie_http_only: bool,
   pub website_homepage_redirect: String,
+}
+
+#[derive(Clone)]
+pub struct ServerInfo {
+  pub build_sha: String,
 }
 
 /// Necessary to run the OAuth flow.

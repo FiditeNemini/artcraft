@@ -60,7 +60,7 @@ use crate::configs::static_api_tokens::{StaticApiTokenConfig, StaticApiTokens, S
 use crate::http_server::middleware::ip_filter_middleware::IpFilter;
 use crate::http_server::web_utils::redis_rate_limiter::RedisRateLimiter;
 use crate::routes::add_routes;
-use crate::server_state::{ServerState, EnvConfig, TwitchOauthSecrets, TwitchOauth, RedisRateLimiters, InMemoryCaches, StripeSettings};
+use crate::server_state::{ServerState, EnvConfig, TwitchOauthSecrets, TwitchOauth, RedisRateLimiters, InMemoryCaches, StripeSettings, ServerInfo};
 use crate::threads::db_health_checker_thread::db_health_check_status::HealthCheckStatus;
 use crate::threads::db_health_checker_thread::db_health_checker_thread::db_health_checker_thread;
 use crate::threads::ip_banlist_set::IpBanlistSet;
@@ -339,6 +339,12 @@ async fn main() -> AnyhowResult<()> {
     stripe::Client::new(api_secret)
   };
 
+  // NB: Docker creates this file within container builds.
+  let build_sha = std::fs::read_to_string("/GIT_SHA")
+      .unwrap_or(String::from("unknown"))
+      .trim()
+      .to_string();
+
   let server_state = ServerState {
     env_config: EnvConfig {
       num_workers,
@@ -347,6 +353,9 @@ async fn main() -> AnyhowResult<()> {
       cookie_secure,
       cookie_http_only,
       website_homepage_redirect,
+    },
+    server_info: ServerInfo {
+      build_sha,
     },
     stripe: StripeSettings {
       config: stripe_configs,
@@ -419,7 +428,6 @@ pub async fn serve(server_state: ServerState) -> AnyhowResult<()>
   HttpServer::new(move || {
     // NB: Safe to clone due to internal arc
     let ip_banlist = server_state_arc.ip_banlist.clone();
-    let build_sha = std::fs::read_to_string("/GIT_SHA").unwrap_or(String::from("unknown"));
 
     // NB: Dynamic dispatch needs to be wrapped with Arc.
     let product_lookup : Arc<dyn InternalSubscriptionProductLookup> = Arc::new(StripeInternalSubscriptionProductLookupImpl {});
@@ -446,7 +454,7 @@ pub async fn serve(server_state: ServerState) -> AnyhowResult<()>
       .wrap(build_cors_config(server_state_arc.server_environment.clone()))
       .wrap(DefaultHeaders::new()
         .header("X-Backend-Hostname", &hostname)
-        .header("X-Build-Sha", build_sha.trim()))
+        .header("X-Build-Sha", server_state_arc.server_info.build_sha.clone()))
       .wrap(IpFilter::new(ip_banlist))
       .wrap(Logger::new(&log_format)
         .exclude("/liveness")
