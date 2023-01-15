@@ -22,17 +22,15 @@ interface Props {
 export function TtsPageHero(props: Props) {
   const randomImage = useMemo(() => {
     const images = [
+      "mascot/kitsune_pose2.webp",
+      "mascot/kitsune_wizard.webp",
       // "mascot/halloween_1.webp",
       // "mascot/halloween_2.webp",
       // "mascot/halloween_3.webp",
-
-      "mascot/kitsune_pose2.webp",
-      "mascot/kitsune_wizard.webp",
-
-      //"mascot/xmas_1.webp",
-      //"mascot/xmas_2.webp",
-      //"mascot/xmas_3.webp",
-      //"mascot/xmas_4.webp",
+      // "mascot/xmas_1.webp",
+      // "mascot/xmas_2.webp",
+      // "mascot/xmas_3.webp",
+      // "mascot/xmas_4.webp",
     ];
 
     return images[Math.floor(Math.random() * images.length)];
@@ -61,7 +59,12 @@ export function TtsPageHero(props: Props) {
     );
     viewPricingButton = (
       <>
-        <Link to="/pricing">
+        <Link 
+          to="/pricing"
+          onClick={() => {
+            Analytics.ttsClickHeroViewPricing();
+          }}
+        >
           <button type="button" className="btn btn-secondary w-100">
             <FontAwesomeIcon icon={faStar} className="me-2" />
             View Pricing
@@ -76,7 +79,12 @@ export function TtsPageHero(props: Props) {
     let url = `/profile/${displayName}`;
     myProfileButton = (
       <>
-        <Link to={url}>
+        <Link 
+          to={url}
+          onClick={() => {
+            Analytics.ttsClickHeroViewProfile();
+          }}
+        >
           <button type="button" className="btn btn-secondary w-100">
             <FontAwesomeIcon icon={faUser} className="me-2" />
             View my profile

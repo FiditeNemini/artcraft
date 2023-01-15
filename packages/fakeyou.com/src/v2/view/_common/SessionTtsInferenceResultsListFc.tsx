@@ -94,7 +94,12 @@ function SessionTtsInferenceResultListFc(props: Props) {
                 <p>{job.rawInferenceText}</p>
               </div>
 
-              <audio className="w-100" controls src={audioLink}>
+              <audio 
+                className="w-100" 
+                controls 
+                src={audioLink}
+                onClick={() => { Analytics.ttsClickResultInlinePlay() }}
+              >
                 Your browser does not support the
                 <code>audio</code> element.
               </audio>

@@ -84,12 +84,24 @@ class Analytics {
     Analytics.sendCategorizedEvent(this.TTS, 'clear', modelToken);
   }
   
+  static ttsClickResultInlinePlay() {
+    Analytics.sendCategorizedEvent(this.TTS, 'click_tts_result_inline_play');
+  }
+
   static ttsClickResultLink() {
     Analytics.sendCategorizedEvent(this.TTS, 'click_tts_result_link');
   }
 
   static ttsClickModelDetailsLink() {
     Analytics.sendCategorizedEvent(this.TTS, 'click_model_details_link');
+  }
+
+  static ttsClickHeroViewProfile() {
+    Analytics.sendCategorizedEvent(this.TTS, 'click_hero_view_profile');
+  }
+
+  static ttsClickHeroViewPricing() {
+    Analytics.sendCategorizedEvent(this.TTS, 'click_hero_view_pricing');
   }
 
   static ttsClickHeroVoiceClone() {
