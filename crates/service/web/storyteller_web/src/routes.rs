@@ -8,11 +8,12 @@ use crate::http_server::endpoints::api_tokens::create_api_token::create_api_toke
 use crate::http_server::endpoints::api_tokens::delete_api_token::delete_api_token_handler;
 use crate::http_server::endpoints::api_tokens::edit_api_token::edit_api_token_handler;
 use crate::http_server::endpoints::api_tokens::list_api_tokens::list_api_tokens_handler;
-use crate::http_server::endpoints::categories::assign_tts_category::assign_tts_category_handler;
 use crate::http_server::endpoints::categories::create_category::create_category_handler;
 use crate::http_server::endpoints::categories::get_category::get_category_handler;
-use crate::http_server::endpoints::categories::list_tts_categories::list_tts_categories_handler;
-use crate::http_server::endpoints::categories::list_tts_model_assigned_categories::list_tts_model_assigned_categories_handler;
+use crate::http_server::endpoints::categories::tts::assign_tts_category::assign_tts_category_handler;
+use crate::http_server::endpoints::categories::tts::list_fully_computed_assigned_tts_categories::list_fully_computed_assigned_tts_categories_handler;
+use crate::http_server::endpoints::categories::tts::list_tts_categories::list_tts_categories_handler;
+use crate::http_server::endpoints::categories::tts::list_tts_model_assigned_categories::list_tts_model_assigned_categories_handler;
 use crate::http_server::endpoints::download_job::enqueue_generic_download::enqueue_generic_download_handler;
 use crate::http_server::endpoints::download_job::get_generic_upload_job_status::get_generic_download_job_status_handler;
 use crate::http_server::endpoints::events::list_events::list_events_handler;
@@ -100,7 +101,6 @@ use crate::http_server::endpoints::w2l::set_w2l_template_mod_approval::set_w2l_t
 use users_component::default_routes::add_suggested_api_v1_account_creation_and_session_routes;
 use users_component::endpoints::edit_profile_handler::edit_profile_handler;
 use users_component::endpoints::get_profile_handler::get_profile_handler;
-use crate::http_server::endpoints::categories::list_fully_computed_assigned_tts_categories::list_fully_computed_assigned_tts_categories_handler;
 
 pub fn add_routes<T, B> (app: App<T, B>) -> App<T, B>
   where

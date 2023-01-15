@@ -1,8 +1,8 @@
 use billing_component::stripe::stripe_config::StripeConfig;
 use cloud_storage::bucket_client::BucketClient;
 use crate::StaticApiTokenSet;
-use crate::http_server::endpoints::categories::list_fully_computed_assigned_tts_categories::ModelTokensByCategoryToken;
-use crate::http_server::endpoints::categories::list_tts_categories::DisplayCategory;
+use crate::http_server::endpoints::categories::tts::list_fully_computed_assigned_tts_categories::ModelTokensByCategoryToken;
+use crate::http_server::endpoints::categories::tts::list_tts_categories::DisplayCategory;
 use crate::http_server::endpoints::tts::list_tts_models::TtsModelRecordForResponse;
 use crate::http_server::web_utils::redis_rate_limiter::RedisRateLimiter;
 use crate::threads::db_health_checker_thread::db_health_check_status::HealthCheckStatus;
