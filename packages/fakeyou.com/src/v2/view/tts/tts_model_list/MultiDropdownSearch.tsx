@@ -297,10 +297,10 @@ export function MultiDropdownSearch(props: Props) {
   return (
     <div>
       {/* Category Dropdowns */}
-      {/* <label className="sub-title">
+      <label className="sub-title">
         {t("tts.TtsModelListPage.form.categoryFiltersLabel")}
-      </label> */}
-      {/* {categoryFieldGroups} */}
+      </label>
+      {categoryFieldGroups}
 
       {/* Model Dropdown */}
       <label className="sub-title">

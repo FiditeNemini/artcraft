@@ -8,10 +8,9 @@ import {
   faClock,
   faLink,
   faHeadphonesSimple,
-  faMicrophone,
 } from "@fortawesome/free-solid-svg-icons";
 import { motion } from "framer-motion";
-import { container, item, sessionItem } from "../../../data/animation";
+import { container, sessionItem } from "../../../data/animation";
 import { SessionSubscriptionsWrapper } from "@storyteller/components/src/session/SessionSubscriptionsWrapper";
 import { Analytics } from "../../../common/Analytics";
 
@@ -25,7 +24,7 @@ function SessionTtsInferenceResultListFc(props: Props) {
 
   props.ttsInferenceJobs.forEach((job) => {
     if (!job.maybeResultToken) {
-      let cssStyle = "alert alert-secondary mx-3 mx-md-0 mb-0";
+      let cssStyle = "alert alert-secondary mb-0";
       let stateDescription = "Pending...";
 
       switch (job.jobState) {
@@ -37,24 +36,24 @@ function SessionTtsInferenceResultListFc(props: Props) {
               : job.maybeExtraStatusDescription;
           break;
         case JobState.STARTED:
-          cssStyle = "alert alert-success mx-3 mx-md-0 mb-0";
+          cssStyle = "alert alert-success mb-0";
           stateDescription =
             job.maybeExtraStatusDescription == null
               ? "Started..."
               : job.maybeExtraStatusDescription;
           break;
         case JobState.ATTEMPT_FAILED:
-          cssStyle = "alert alert-danger mx-3 mx-md-0 mb-0";
+          cssStyle = "alert alert-danger mb-0";
           stateDescription = `Failed ${job.attemptCount} attempt(s). Will retry...`;
           break;
         case JobState.COMPLETE_FAILURE:
         case JobState.DEAD:
-          cssStyle = "alert alert-danger mx-3 mx-md-0 mb-0";
+          cssStyle = "alert alert-danger mb-0";
           stateDescription =
             "Failed Permanently. Please tell us in Discord so we can fix. :(";
           break;
         case JobState.COMPLETE_SUCCESS:
-          cssStyle = "message is-success mx-3 mx-md-0 mb-0";
+          cssStyle = "message is-success mb-0";
           stateDescription = "Success!"; // Not sure why we're here instead of other branch!
           break;
       }
@@ -83,7 +82,7 @@ function SessionTtsInferenceResultListFc(props: Props) {
             </div>*/}
           <div>
             <motion.div
-              className="panel panel-inner p-4 gap-3 d-flex flex-column"
+              className="panel panel-tts-results p-4 gap-3 d-flex flex-column"
               variants={sessionItem}
             >
               <div>
@@ -144,7 +143,7 @@ function SessionTtsInferenceResultListFc(props: Props) {
     !props.sessionSubscriptionsWrapper.hasPaidFeatures()
   ) {
     upgradeNotice = (
-      <div className="d-flex flex-column gap-3 mx-3 mx-md-0 sticky-top">
+      <div className="d-flex flex-column gap-3 sticky-top zi-2">
         <motion.div
           className="alert alert-warning alert-cta mb-0"
           variants={sessionItem}

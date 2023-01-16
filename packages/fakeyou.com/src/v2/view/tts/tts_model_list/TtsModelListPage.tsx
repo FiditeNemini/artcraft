@@ -29,7 +29,7 @@ import {
 } from "../../../api/category/ListTtsCategories";
 import { MultiDropdownSearch } from "./MultiDropdownSearch";
 import { TtsCategoryType } from "../../../../AppWrapper";
-import { AutocompleteSearch } from "./AutocompleteSearch";
+import { SelectSearch } from "./SelectSearch";
 import { LanguageNotice } from "./notices/LanguageNotice";
 import { Language } from "@storyteller/components/src/i18n/Language";
 import { t } from "i18next";
@@ -39,10 +39,17 @@ import { PleaseFollowNotice } from "./notices/PleaseFollowNotice";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faArrowRight,
+  faArrowRightLong,
   faBarsStaggered,
+  faCaretRight,
   faChevronRight,
+  faCompass,
   faDeleteLeft,
   faGlobe,
+  faMicrophone,
+  faShuffle,
+  faTag,
+  faTags,
   faVolumeHigh,
   faVolumeUp,
 } from "@fortawesome/free-solid-svg-icons";
@@ -62,6 +69,9 @@ import {
 import {
   DynamicallyCategorizeModels,
 } from "../../../../model/categories/SyntheticCategory";
+import Select from "react-select";
+import AsyncSelect from "react-select/async";
+import { SearchFieldClass } from "./SearchFieldClass";
 
 export interface EnqueueJobResponsePayload {
   success: boolean;
@@ -270,7 +280,7 @@ function TtsModelListPage(props: Props) {
         <div className="flex-grow-1">
           <p>
             Model by{" "}
-            <Link to="profile/Vegito1089" className="fw-semibold">
+            <Link to="profile/Vegito1089" className="fw-medium">
               {userName}{" "}
               <Gravatar
                 size={20}
@@ -286,7 +296,7 @@ function TtsModelListPage(props: Props) {
         {/* <Trans i18nKey="tts.TtsModelListPage.form.modelSeeMoreLink">
           See more details
         </Trans> */}
-        <div className="fw-semibold">
+        <div className="fw-medium">
           <span>See more details</span>
           <FontAwesomeIcon icon={faChevronRight} className="ms-2" />
         </div>
@@ -371,6 +381,15 @@ function TtsModelListPage(props: Props) {
     }
   }
 
+  const options = [
+    { value: "chocolate", label: "Chocolate" },
+    { value: "strawberry", label: "Strawberry" },
+    { value: "vanilla", label: "Vanilla" },
+    { value: "chocolate", label: "Chocolate" },
+    { value: "strawberry", label: "Strawberry" },
+    { value: "vanilla", label: "Vanilla" },
+  ];
+
   // NB: If the text is too long, don't allow submission
   let remainingCharactersButtonDisabled = props.textBuffer.trim().length > 1024;
 
@@ -404,7 +423,7 @@ function TtsModelListPage(props: Props) {
                 className="w-100 d-flex flex-column gap-4"
                 onSubmit={handleFormSubmit}
               >
-                <MultiDropdownSearch
+                {/* <MultiDropdownSearch
                   allTtsCategories={props.allTtsCategories}
                   allTtsModels={props.ttsModels}
                   allTtsCategoriesByTokenMap={props.allTtsCategoriesByTokenMap}
@@ -416,8 +435,7 @@ function TtsModelListPage(props: Props) {
                   setSelectedCategories={props.setSelectedCategories}
                   maybeSelectedTtsModel={props.maybeSelectedTtsModel}
                   setMaybeSelectedTtsModel={props.setMaybeSelectedTtsModel}
-                />
-
+                /> */}
                 {/* <AutocompleteSearch
                   allTtsCategories={props.allTtsCategories}
                   allTtsModels={props.ttsModels}
@@ -429,13 +447,180 @@ function TtsModelListPage(props: Props) {
                   maybeSelectedTtsModel={props.maybeSelectedTtsModel}
                   setMaybeSelectedTtsModel={props.setMaybeSelectedTtsModel}
                 /> */}
+                <div>
+                  <div className="d-flex gap-2">
+                    <label className="sub-title">Select Voice</label>
+                    <a href="/" className="ms-1">
+                      <FontAwesomeIcon icon={faShuffle} />
+                    </a>
+                  </div>
+
+                  <div className="d-flex flex-column flex-lg-row gap-3 ">
+                    <div className="flex-grow-1">
+                      <SelectSearch
+                        allTtsCategories={props.allTtsCategories}
+                        allTtsModels={props.ttsModels}
+                        allTtsModelsByTokenMap={props.allTtsModelsByTokenMap}
+                        dropdownCategories={props.dropdownCategories}
+                        setDropdownCategories={props.setDropdownCategories}
+                        selectedCategories={props.selectedCategories}
+                        setSelectedCategories={props.setSelectedCategories}
+                        maybeSelectedTtsModel={props.maybeSelectedTtsModel}
+                        setMaybeSelectedTtsModel={
+                          props.setMaybeSelectedTtsModel
+                        }
+                      />
+                    </div>
+
+                    <button
+                      onClick={handleClearClick}
+                      className="btn btn-primary rounded-50"
+                      data-bs-toggle="modal"
+                      data-bs-target="#exploreModal"
+                    >
+                      <FontAwesomeIcon icon={faCompass} className="me-2" />
+                      Explore Voices
+                    </button>
+                  </div>
+                </div>
+
+                {/* Explore Modal */}
+                <div
+                  className="modal fade"
+                  id="exploreModal"
+                  aria-labelledby="ModalLabel"
+                  aria-hidden="true"
+                >
+                  <div className="modal-dialog modal-xl modal-fullscreen-lg-down modal-dialog-centered modal-dialog-scrollable">
+                    <div className="modal-content">
+                      <div className="modal-header p-3">
+                        <h5 className="modal-title fw-semibold" id="ModalLabel">
+                          <FontAwesomeIcon icon={faCompass} className="me-3" />
+                          Explore Voices
+                        </h5>
+                        <button
+                          type="button"
+                          className="btn-close"
+                          data-bs-dismiss="modal"
+                          aria-label="Close"
+                        ></button>
+                      </div>
+                      <div className="modal-body p-3 p-lg-4">
+                        <div className="row gx-3 gy-3">
+                          <div className="col-12 col-lg-3 input-icon-search">
+                            <label className="sub-title">Language</label>
+                            <div>
+                              <span className="form-control-feedback">
+                                <FontAwesomeIcon icon={faGlobe} />
+                              </span>
+                              <Select
+                                defaultValue={options[2]}
+                                options={options}
+                                classNames={SearchFieldClass}
+                              />
+                            </div>
+                          </div>
+                          <div className="col-12 col-md-12 col-lg-9 input-icon-search">
+                            <div className="d-flex">
+                              <label className="sub-title flex-grow-1">
+                                Category
+                              </label>
+                              <a href="/" className="ms-3 fw-medium">
+                                Clear category filters
+                              </a>
+                            </div>
+
+                            <div className="d-flex flex-column flex-md-row gap-2">
+                              <div className="w-100">
+                                <span className="form-control-feedback">
+                                  <FontAwesomeIcon icon={faTags} />
+                                </span>
+                                <Select
+                                  defaultValue={options[2]}
+                                  options={options}
+                                  classNames={SearchFieldClass}
+                                  className="w-100"
+                                />
+                              </div>
+                              <div className="d-none d-md-flex align-items-center">
+                                <FontAwesomeIcon
+                                  icon={faArrowRightLong}
+                                  className="fs-6 opacity-75"
+                                />
+                              </div>
+                              <div className="w-100">
+                                <span className="form-control-feedback">
+                                  <FontAwesomeIcon icon={faTags} />
+                                </span>
+                                <Select
+                                  defaultValue={options[2]}
+                                  options={options}
+                                  classNames={SearchFieldClass}
+                                  className="w-100"
+                                />
+                              </div>
+                              <div className="d-none d-md-flex align-items-center">
+                                <FontAwesomeIcon
+                                  icon={faArrowRightLong}
+                                  className="fs-6 opacity-75"
+                                />
+                              </div>
+                              <div className="w-100">
+                                <span className="form-control-feedback">
+                                  <FontAwesomeIcon icon={faTags} />
+                                </span>
+                                <Select
+                                  defaultValue={options[2]}
+                                  options={options}
+                                  classNames={SearchFieldClass}
+                                  className="w-100"
+                                />
+                              </div>
+                            </div>
+                          </div>
+                          {/* <div className="col-12 col-lg-3 input-icon-search">
+                            <label className="sub-title">Sub-category 1</label>
+                            <div>
+                              <span className="form-control-feedback">
+                                <FontAwesomeIcon icon={faTags} />
+                              </span>
+                              <Select
+                                defaultValue={options[2]}
+                                options={options}
+                                classNames={SearchFieldClass}
+                              />
+                            </div>
+                          </div>
+                          <div className="col-12 col-lg-3 input-icon-search">
+                            <label className="sub-title">Sub-category 2</label>
+                            <div>
+                              <span className="form-control-feedback">
+                                <FontAwesomeIcon icon={faTags} />
+                              </span>
+                              <Select
+                                defaultValue={options[2]}
+                                options={options}
+                                classNames={SearchFieldClass}
+                              />
+                            </div>
+                          </div> */}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
 
                 {directViewLink}
 
                 <div className="row gx-5 gy-5">
                   <div className="col-12 col-lg-6 d-flex flex-column gap-3">
                     <div className="d-flex flex-column gap-3 h-100">
-                      <label className="sub-title pb-0">Your Text</label>
+                      <div className="d-flex gap-2">
+                        <label className="sub-title pb-0">Your Text</label>
+                        <a href="/" className="ms-1">
+                          <FontAwesomeIcon icon={faShuffle} />
+                        </a>
+                      </div>
                       <textarea
                         onClick={() => {
                           Analytics.ttsClickTextInputBox();
@@ -501,7 +686,6 @@ function TtsModelListPage(props: Props) {
                     </div>
                   </div>
                 </div>
-
                 {maybeError}
               </form>
             </div>

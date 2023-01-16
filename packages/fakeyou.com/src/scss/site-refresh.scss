@@ -103,6 +103,10 @@ styles with important tags:
     font-weight: 600;
   }
 
+  .fw-medium {
+    font-weight: 500;
+  }
+
   .container {
     max-width: 1080px !important;
   }
@@ -237,7 +241,12 @@ styles with important tags:
     border-radius: 0px;
 
     .panel-inner {
-      background-color: lighten($panel, 2%);
+      background-color: lighten($panel, 4%);
+    }
+
+    .panel-tts-results {
+      border-radius: 5px;
+      background-color: lighten($panel, 4%);
     }
 
     .panel-title {
@@ -315,6 +324,9 @@ styles with important tags:
 
   .form-control {
     border-radius: 5px;
+    background-color: $input-dark !important;
+    border-color: $input-dark !important;
+    color: $white !important;
   }
 
   .form-control,
@@ -623,10 +635,11 @@ styles with important tags:
     height: 450px;
     overflow-x: hidden;
     overflow-y: auto;
+    overscroll-behavior: contain;
   }
 
   .direct-view-link {
-    background-color: lighten($panel, 2%);
+    background-color: lighten($panel, 4%);
     border: 1px solid #39394c;
     border-radius: 5px;
     padding: 11px 16px;
@@ -634,6 +647,100 @@ styles with important tags:
     &:hover {
       border-color: lighten(#39394c, 10%);
     }
+  }
+
+  .input-icon-search {
+    .form-control-feedback {
+      padding: 12px 18px;
+      position: absolute;
+      z-index: 2;
+      width: 2.375rem;
+      // height: 2.375rem;
+      // line-height: 2.69rem;
+      text-align: center;
+      pointer-events: none;
+      color: $white;
+      opacity: 0.9;
+    }
+  }
+
+  .select-search {
+    height: 48px;
+    border-width: 2px;
+    padding-left: 2.25rem;
+    padding-right: 0.5rem;
+    background-color: $input-dark;
+    border-radius: 50px;
+    border-color: $input-dark !important;
+    box-shadow: none;
+    cursor: pointer;
+
+    &:hover {
+      background-color: lighten($input-dark, 5%);
+      border-color: lighten($input-dark, 5%) !important;
+    }
+
+    &.focused {
+      border-color: $primary !important;
+    }
+  }
+
+  .select-option {
+    background-color: $input-dark;
+    cursor: pointer;
+    padding: 0.5rem 1rem;
+
+    &:hover {
+      background-color: lighten($input-dark, 8%);
+    }
+  }
+
+  .select-input,
+  .select-value {
+    color: $white;
+  }
+
+  .select-placeholder {
+    color: $white !important;
+  }
+
+  .select-container {
+    background: $input-dark;
+    margin-top: 6px;
+    padding: 0;
+    border-radius: 5px;
+    z-index: 3;
+  }
+
+  .select-separator {
+    display: none;
+  }
+
+  .rounded-50 {
+    border-radius: 50px;
+  }
+
+  .modal-content {
+    background-color: $panel;
+    border-color: lighten($panel, 8%) !important;
+    border: 1px solid;
+    border-radius: 8px;
+    box-shadow: 0px 9px 33px 1px rgba(19, 19, 27, 0.8);
+    -webkit-box-shadow: 0px 9px 33px 1px rgba(19, 19, 27, 0.8);
+    -moz-box-shadow: 0px 9px 33px 1px rgba(19, 19, 27, 0.8);
+    min-height: 600px;
+  }
+
+  .modal-header {
+    border-bottom: 1px solid lighten($panel, 8%);
+  }
+
+  .modal-backdrop {
+    background-color: #0d0d14;
+  }
+
+  .modal-header .btn-close {
+    filter: brightness(0) invert(1);
   }
 }
 
@@ -668,6 +775,7 @@ textarea {
 
   &.text-message {
     font-size: 18px;
+    font-weight: 300;
     min-height: 200px !important;
   }
 }
@@ -697,11 +805,11 @@ textarea {
   color: $white !important;
 }
 
-input {
-  background-color: $input !important;
-  border-color: $input !important;
-  color: $white !important;
-}
+// input {
+//   background-color: $input !important;
+//   border-color: $input !important;
+//   color: $white !important;
+// }
 
 .img-product {
   &.img-tts {
@@ -737,7 +845,12 @@ input {
 
 .zi-2 {
   position: relative;
-  z-index: 2;
+  z-index: 2 !important;
+}
+
+.zi-3 {
+  position: relative;
+  z-index: 3 !important;
 }
 
 @media (min-width: 992px) {
