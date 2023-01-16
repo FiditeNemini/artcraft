@@ -7,8 +7,9 @@
 --
 select
     m.token,
-    m.title,
+    m.text_pipeline_type,
     m.ietf_language_tag,
+    m.title,
     u.username,
     r.use_count,
     m.user_deleted_at,
@@ -38,24 +39,17 @@ select m.token, m.title, r.use_count from (
   on m.token = r.model_token;
 
 --
--- Top 100 models by use count, last 30 days
---
-select m.token, m.title, m.ietf_language_tag, r.use_count from (
-    select model_token, count(*) as use_count
-    from tts_results
-    where created_at > ( CURDATE() - INTERVAL 30 DAY )
-    group by model_token
-    order by use_count desc
-        limit 500
-) as r
-    join tts_models as m
-    on m.token = r.model_token;
-
---
 -- Top 500 models by use count, last 5 days
 -- Limited due to tmux scrollback.
 --
-select m.token, m.title, m.ietf_language_tag, u.username, r.use_count from (
+select
+    m.token,
+    m.text_pipeline_type,
+    m.ietf_language_tag,
+    m.title,
+    u.username,
+    r.use_count
+from (
     select model_token, count(*) as use_count
     from tts_results
     where created_at > ( CURDATE() - INTERVAL 5 DAY )
@@ -74,8 +68,9 @@ order by r.use_count desc
 --
 select
     m.token,
-    m.title,
+    m.text_pipeline_type,
     m.ietf_language_tag,
+    m.title,
     u.username,
     r.use_count,
     m.user_deleted_at,
