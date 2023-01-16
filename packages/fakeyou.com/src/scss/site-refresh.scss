@@ -41,6 +41,7 @@ styles with important tags:
 
   select {
     cursor: pointer;
+    border-radius: 5px;
   }
 
   .no-wrap {
@@ -79,6 +80,10 @@ styles with important tags:
 
   .rounded {
     border-radius: 8px !important;
+  }
+
+  .rounded-5 {
+    border-radius: 5px !important;
   }
 
   code {
@@ -143,7 +148,7 @@ styles with important tags:
 
   .alert-cta {
     font-weight: 500 !important;
-    font-size: 18px !important;
+    font-size: 16px !important;
   }
 
   .btn {
@@ -220,6 +225,7 @@ styles with important tags:
     padding: 0 0.75rem;
     padding-top: 1px;
     font-size: 22px;
+    border-radius: 50px;
   }
 
   .panel {
@@ -229,6 +235,10 @@ styles with important tags:
     border-color: #ffffff12 !important;
     border: 1px solid;
     border-radius: 0px;
+
+    .panel-inner {
+      background-color: lighten($panel, 2%);
+    }
 
     .panel-title {
       position: static;
@@ -296,14 +306,22 @@ styles with important tags:
 
   .form-select {
     background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23ffffff' stroke-linecap='round' stroke-linejoin='round' stroke-width='3' d='M2 5l6 6 6-6'/%3e%3c/svg%3e") !important;
+    border-radius: 50px;
+
+    &.main-select {
+      height: 48px;
+    }
+  }
+
+  .form-control {
+    border-radius: 5px;
   }
 
   .form-control,
   .form-select {
     border-width: 1px;
     border-color: $white;
-    border-radius: 5px;
-    padding: 0.5rem 0.75rem;
+    padding: 11px 0.75rem;
 
     &:focus {
       border-color: $primary;
@@ -600,12 +618,38 @@ styles with important tags:
   .btn-close {
     transition: 0.2s;
   }
+
+  .session-tts-section {
+    height: 450px;
+    overflow-x: hidden;
+    overflow-y: auto;
+  }
+
+  .direct-view-link {
+    background-color: lighten($panel, 2%);
+    border: 1px solid #39394c;
+    border-radius: 5px;
+    padding: 11px 16px;
+
+    &:hover {
+      border-color: lighten(#39394c, 10%);
+    }
+  }
 }
 
 select {
   border-color: $input-dark !important;
   background-color: $input-dark !important;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='white' class='bi bi-chevron-down' viewBox='0 0 16 16'%3E%3Cpath fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3E%3C/svg%3E");
+  transition: 0.1s !important;
+
+  &:hover {
+    background-color: lighten($input-dark, 5%) !important;
+  }
+
+  option {
+    background-color: $input-dark !important;
+  }
 }
 
 .btn-destructive {
@@ -621,10 +665,16 @@ textarea {
   background-color: $input-dark !important;
   border-color: $input-dark !important;
   color: $white !important;
+
+  &.text-message {
+    font-size: 18px;
+    min-height: 200px !important;
+  }
 }
 
 .form-select {
   color: $white !important;
+  border-radius: 50%;
 }
 
 .form-control::placeholder {

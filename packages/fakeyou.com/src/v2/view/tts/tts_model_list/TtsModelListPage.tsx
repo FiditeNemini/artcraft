@@ -38,7 +38,11 @@ import { TwitchTtsNotice } from "./notices/TwitchTtsNotice";
 import { PleaseFollowNotice } from "./notices/PleaseFollowNotice";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
-  faTrash,
+  faArrowRight,
+  faBarsStaggered,
+  faChevronRight,
+  faDeleteLeft,
+  faGlobe,
   faVolumeHigh,
   faVolumeUp,
 } from "@fortawesome/free-solid-svg-icons";
@@ -253,7 +257,7 @@ function TtsModelListPage(props: Props) {
 
   if (props.maybeSelectedTtsModel) {
     let modelLink = `/tts/${props.maybeSelectedTtsModel.model_token}`;
-    let modelName = props.maybeSelectedTtsModel.title;
+    // let modelName = props.maybeSelectedTtsModel.title;
     let userName = props.maybeSelectedTtsModel.creator_display_name;
     directViewLink = (
       <Link
@@ -261,18 +265,31 @@ function TtsModelListPage(props: Props) {
         onClick={() => {
           Analytics.ttsClickModelDetailsLink();
         }}
-        className="py-2"
+        className="d-flex flex-column flex-lg-row gap-3 direct-view-link zi-2 align-items-lg-center mb-4"
       >
-        <Trans i18nKey="tts.TtsModelListPage.form.modelSeeMoreLink">
-          See more details about the "
-          <span className="fw-semibold">{{ modelName }}</span>" model by&nbsp;
-          <span className="fw-semibold">{{ userName }}</span>&nbsp;
-        </Trans>{" "}
-        <Gravatar
-          size={15}
-          username={props.maybeSelectedTtsModel.creator_display_name}
-          email_hash={props.maybeSelectedTtsModel.creator_gravatar_hash}
-        />
+        <div className="flex-grow-1">
+          <p>
+            Model by{" "}
+            <Link to="profile/Vegito1089" className="fw-semibold">
+              {userName}{" "}
+              <Gravatar
+                size={20}
+                username={props.maybeSelectedTtsModel.creator_display_name}
+                email_hash={props.maybeSelectedTtsModel.creator_gravatar_hash}
+              />
+            </Link>{" "}
+            | <FontAwesomeIcon icon={faGlobe} className="me-2" />
+            Language: <span className="fw-semibold">English</span> | Use count:{" "}
+            <span className="fw-semibold">616400</span>
+          </p>
+        </div>
+        {/* <Trans i18nKey="tts.TtsModelListPage.form.modelSeeMoreLink">
+          See more details
+        </Trans> */}
+        <div className="fw-semibold">
+          <span>See more details</span>
+          <FontAwesomeIcon icon={faChevronRight} className="ms-2" />
+        </div>
       </Link>
     );
   }
@@ -401,7 +418,7 @@ function TtsModelListPage(props: Props) {
                   setMaybeSelectedTtsModel={props.setMaybeSelectedTtsModel}
                 />
 
-                <AutocompleteSearch
+                {/* <AutocompleteSearch
                   allTtsCategories={props.allTtsCategories}
                   allTtsModels={props.ttsModels}
                   allTtsModelsByTokenMap={props.allTtsModelsByTokenMap}
@@ -411,41 +428,81 @@ function TtsModelListPage(props: Props) {
                   setSelectedCategories={props.setSelectedCategories}
                   maybeSelectedTtsModel={props.maybeSelectedTtsModel}
                   setMaybeSelectedTtsModel={props.setMaybeSelectedTtsModel}
-                />
+                /> */}
 
                 {directViewLink}
 
-                <div className="text-input">
-                  <textarea
-                    onClick={() => {
-                      Analytics.ttsClickTextInputBox();
-                    }}
-                    onChange={handleChangeText}
-                    className="form-control fs-5"
-                    style={{ minHeight: "200px" }}
-                    value={props.textBuffer}
-                    placeholder={t("tts.TtsModelListPage.form.textInputHint")}
-                  ></textarea>
+                <div className="row gx-5 gy-5">
+                  <div className="col-12 col-lg-6 d-flex flex-column gap-3">
+                    <div className="d-flex flex-column gap-3 h-100">
+                      <label className="sub-title pb-0">Your Text</label>
+                      <textarea
+                        onClick={() => {
+                          Analytics.ttsClickTextInputBox();
+                        }}
+                        onChange={handleChangeText}
+                        className="form-control text-message h-100"
+                        value={props.textBuffer}
+                        placeholder={t(
+                          "tts.TtsModelListPage.form.textInputHint"
+                        )}
+                      ></textarea>
+                      <div className="d-flex gap-3">
+                        <button
+                          className="btn btn-primary w-100"
+                          disabled={remainingCharactersButtonDisabled}
+                        >
+                          <FontAwesomeIcon
+                            icon={faVolumeHigh}
+                            className="me-2"
+                          />
+                          {t("tts.TtsModelListPage.form.buttons.speak")}
+                        </button>
+                        <button
+                          className="btn btn-destructive w-25"
+                          onClick={handleClearClick}
+                        >
+                          <FontAwesomeIcon
+                            icon={faDeleteLeft}
+                            className="me-2"
+                          />
+                          {t("tts.TtsModelListPage.form.buttons.clear")}
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="col-12 col-lg-6">
+                    <div className="d-flex flex-column gap-3">
+                      <h4 className="text-center text-lg-start">
+                        <FontAwesomeIcon
+                          icon={faBarsStaggered}
+                          className="me-3"
+                        />
+                        Session TTS Results
+                      </h4>
+                      <div className="d-flex flex-column gap-3 session-tts-section">
+                        {/* <div className="panel panel-inner text-center p-5 rounded-5">
+                          <div className="d-flex flex-column opacity-75 h-100 justify-content-center">
+                            <FontAwesomeIcon
+                              icon={faHeadphonesSimple}
+                              className="fs-3 mb-3"
+                            />
+                            <h5 className="fw-semibold">No results yet</h5>
+                            <p>Generated audio will appear here.</p>
+                          </div>
+                        </div> */}
+                        <SessionTtsInferenceResultListFc
+                          ttsInferenceJobs={props.ttsInferenceJobs}
+                          sessionSubscriptionsWrapper={
+                            props.sessionSubscriptionsWrapper
+                          }
+                        />
+                      </div>
+                    </div>
+                  </div>
                 </div>
 
                 {maybeError}
-
-                <div className="d-flex flex-column flex-md-row w-100 gap-3 mt-3">
-                  <button
-                    className="btn btn-primary w-100"
-                    disabled={remainingCharactersButtonDisabled}
-                  >
-                    <FontAwesomeIcon icon={faVolumeHigh} className="me-2" />
-                    {t("tts.TtsModelListPage.form.buttons.speak")}
-                  </button>
-                  <button
-                    className="btn btn-destructive w-100"
-                    onClick={handleClearClick}
-                  >
-                    <FontAwesomeIcon icon={faTrash} className="me-2" />
-                    {t("tts.TtsModelListPage.form.buttons.clear")}
-                  </button>
-                </div>
               </form>
             </div>
           </div>
@@ -455,11 +512,6 @@ function TtsModelListPage(props: Props) {
           <BackLink link="/" text="Back to main page" />
         </div> */}
       </motion.div>
-
-      <SessionTtsInferenceResultListFc
-        ttsInferenceJobs={props.ttsInferenceJobs}
-        sessionSubscriptionsWrapper={props.sessionSubscriptionsWrapper}
-      />
 
       <SessionW2lInferenceResultListFc
         w2lInferenceJobs={props.w2lInferenceJobs}

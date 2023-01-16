@@ -28,6 +28,7 @@
     "lerna": "^4.0.0"
   },
   "dependencies": {
+    "react-select": "^5.7.0",
     "yarn": "^1.22.19"
   }
 }

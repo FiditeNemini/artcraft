@@ -203,7 +203,9 @@ export function MultiDropdownSearch(props: Props) {
         <div className="d-flex gap-3 align-items-center mb-4 w-100">
           <div className="form-group input-icon w-100">
             <select
-              onClick={() => { Analytics.ttsClickSelectCategory() } }
+              onClick={() => {
+                Analytics.ttsClickSelectCategory();
+              }}
               className={selectCssClasses}
               name={`categories-${i}`}
               onChange={(ev) => handleChangeCategory(ev, i)}
@@ -295,10 +297,10 @@ export function MultiDropdownSearch(props: Props) {
   return (
     <div>
       {/* Category Dropdowns */}
-      <label className="sub-title">
+      {/* <label className="sub-title">
         {t("tts.TtsModelListPage.form.categoryFiltersLabel")}
-      </label>
-      {categoryFieldGroups}
+      </label> */}
+      {/* {categoryFieldGroups} */}
 
       {/* Model Dropdown */}
       <label className="sub-title">
@@ -317,7 +319,9 @@ export function MultiDropdownSearch(props: Props) {
           className={selectClasses}
           name="tts-model-select"
           onChange={handleChangeVoice}
-          onClick={() => { Analytics.ttsSelectVoiceFromCategory() }}
+          onClick={() => {
+            Analytics.ttsSelectVoiceFromCategory();
+          }}
           disabled={isLoading}
         >
           {isLoading
