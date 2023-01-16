@@ -6,7 +6,7 @@ use anyhow::anyhow;
 use chrono::{Utc, DateTime};
 use container_common::anyhow_result::AnyhowResult;
 use crate::tokens::Tokens;
-use enums::core::visibility::Visibility;
+use enums::common::visibility::Visibility;
 use log::{warn, info};
 use sqlx::MySqlPool;
 use std::path::Path;
@@ -76,7 +76,7 @@ SELECT
   creator_ip_address,
   maybe_creator_user_token,
 
-  creator_set_visibility as `creator_set_visibility: enums::core::visibility::Visibility`,
+  creator_set_visibility as `creator_set_visibility: enums::common::visibility::Visibility`,
   disable_end_bump,
   disable_watermark,
 

@@ -18,7 +18,7 @@ use database_queries::queries::users::user_profiles::edit_user_profile_as_accoun
 use database_queries::queries::users::user_profiles::edit_user_profile_as_mod::edit_user_profile_as_mod;
 use database_queries::queries::users::user_profiles::get_user_profile_by_username::get_user_profile_by_username;
 use database_queries::queries::users::user_profiles::{edit_user_profile_as_account_holder, edit_user_profile_as_mod};
-use enums::core::visibility::Visibility;
+use enums::common::visibility::Visibility;
 use http_server_common::request::get_request_ip::get_request_ip;
 use http_server_common::response::serialize_as_json_error::serialize_as_json_error;
 use log::warn;

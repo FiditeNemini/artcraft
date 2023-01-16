@@ -10,7 +10,7 @@ use strum::EnumIter;
 ///
 /// To use this in a query, the query must have type annotations.
 /// See: https://www.gitmemory.com/issue/launchbadge/sqlx/1241/847154375
-/// eg. preferred_tts_result_visibility as `preferred_tts_result_visibility: enums::core::visibility::Visibility`
+/// eg. preferred_tts_result_visibility as `preferred_tts_result_visibility: enums::common::visibility::Visibility`
 ///
 /// See also: https://docs.rs/sqlx/0.4.0-beta.1/sqlx/trait.Type.html
 ///
@@ -89,7 +89,7 @@ impl Visibility {
 
 #[cfg(test)]
 mod tests {
-  use crate::core::visibility::Visibility;
+  use crate::common::visibility::Visibility;
   use crate::test_helpers::assert_serialization;
 
   #[test]
@@ -121,7 +121,7 @@ mod tests {
   }
 
   mod traits {
-    use crate::core::visibility::Visibility;
+    use crate::common::visibility::Visibility;
 
     #[test]
     fn display() {
@@ -143,7 +143,7 @@ mod tests {
   }
 
   mod serde_serialization {
-    use crate::core::visibility::Visibility;
+    use crate::common::visibility::Visibility;
     use super::CompositeType;
 
     #[test]
@@ -165,7 +165,7 @@ mod tests {
   }
 
   mod serde_deserialization {
-    use crate::core::visibility::Visibility;
+    use crate::common::visibility::Visibility;
     use super::CompositeType;
 
     #[test]

@@ -4,7 +4,7 @@ use container_common::anyhow_result::AnyhowResult;
 use crate::column_types::job_status::JobStatus;
 use crate::queries::generic_download::job::_keys::GenericDownloadJobId;
 use crate::tokens::Tokens;
-use enums::core::visibility::Visibility;
+use enums::common::visibility::Visibility;
 use enums::workers::generic_download_type::GenericDownloadType;
 use sqlx::MySqlPool;
 use std::path::Path;
@@ -45,7 +45,7 @@ SELECT
 
   creator_user_token,
   creator_ip_address,
-  creator_set_visibility as `creator_set_visibility: enums::core::visibility::Visibility`,
+  creator_set_visibility as `creator_set_visibility: enums::common::visibility::Visibility`,
 
   download_type as `download_type: enums::workers::generic_download_type::GenericDownloadType`,
   download_url,

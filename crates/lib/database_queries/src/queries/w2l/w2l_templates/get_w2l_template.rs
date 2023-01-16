@@ -7,7 +7,7 @@ use anyhow::anyhow;
 use chrono::{DateTime, Utc};
 use container_common::anyhow_result::AnyhowResult;
 use crate::helpers::boolean_converters::{nullable_i8_to_optional_bool, i8_to_bool};
-use enums::core::visibility::Visibility;
+use enums::common::visibility::Visibility;
 use log::warn;
 use sqlx::MySqlPool;
 

@@ -16,7 +16,7 @@ use crate::http_server::web_utils::read_multipart_field_bytes::read_multipart_fi
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::server_state::ServerState;
 use database_queries::tokens::Tokens;
-use enums::core::visibility::Visibility;
+use enums::common::visibility::Visibility;
 use futures::TryStreamExt;
 use http_server_common::request::get_request_ip::get_request_ip;
 use log::{warn, info};

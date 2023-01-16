@@ -11,7 +11,7 @@ use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::http_server::web_utils::response_success_helpers::simple_json_success;
 use crate::server_state::ServerState;
 use database_queries::queries::tts::tts_results::query_tts_result::select_tts_result_by_token;
-use enums::core::visibility::Visibility;
+use enums::common::visibility::Visibility;
 use http_server_common::request::get_request_ip::get_request_ip;
 use log::warn;
 use std::fmt;

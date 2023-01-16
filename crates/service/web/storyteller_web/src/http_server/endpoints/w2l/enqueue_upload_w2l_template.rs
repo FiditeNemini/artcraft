@@ -11,7 +11,7 @@ use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::server_state::ServerState;
 use crate::validations::model_uploads::validate_model_title;
 use database_queries::tokens::Tokens;
-use enums::core::visibility::Visibility;
+use enums::common::visibility::Visibility;
 use http_server_common::request::get_request_ip::get_request_ip;
 use log::{info, warn};
 use sqlx::error::Error::Database;

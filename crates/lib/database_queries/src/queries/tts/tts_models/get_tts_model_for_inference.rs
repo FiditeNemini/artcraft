@@ -4,7 +4,7 @@
 #![forbid(unused_variables)]
 
 use chrono::{Utc, DateTime};
-use enums::ml::vocoder_type::VocoderType;
+use enums::common::vocoder_type::VocoderType;
 use log::warn;
 use sqlx::MySqlPool;
 use sqlx;
@@ -91,7 +91,7 @@ SELECT
     tts.maybe_default_pretrained_vocoder,
 
     tts.maybe_custom_vocoder_token,
-    vocoder.vocoder_type as `maybe_custom_vocoder_type: enums::ml::vocoder_type::VocoderType`,
+    vocoder.vocoder_type as `maybe_custom_vocoder_type: enums::common::vocoder_type::VocoderType`,
     vocoder.title as maybe_custom_vocoder_title,
     vocoder.private_bucket_hash as maybe_custom_vocoder_private_bucket_hash,
 

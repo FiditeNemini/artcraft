@@ -5,7 +5,7 @@
 use anyhow::anyhow;
 use container_common::anyhow_result::AnyhowResult;
 use crate::helpers::boolean_converters::{nullable_i8_to_optional_bool, i8_to_bool, nullable_i8_to_bool_default_false};
-use enums::core::visibility::Visibility;
+use enums::common::visibility::Visibility;
 use log::warn;
 use sqlx::MySql;
 use sqlx::pool::PoolConnection;
@@ -97,8 +97,8 @@ SELECT
     users.disable_gravatar,
     users.auto_play_audio_preference,
     users.auto_play_video_preference,
-    users.preferred_tts_result_visibility as `preferred_tts_result_visibility: enums::core::visibility::Visibility`,
-    users.preferred_w2l_result_visibility as `preferred_w2l_result_visibility: enums::core::visibility::Visibility`,
+    users.preferred_tts_result_visibility as `preferred_tts_result_visibility: enums::common::visibility::Visibility`,
+    users.preferred_w2l_result_visibility as `preferred_w2l_result_visibility: enums::common::visibility::Visibility`,
 
     users.user_role_slug,
     users.is_banned,

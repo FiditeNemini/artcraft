@@ -1,7 +1,7 @@
 use anyhow::anyhow;
 use chrono::Utc;
 use container_common::anyhow_result::AnyhowResult;
-use enums::core::visibility::Visibility;
+use enums::common::visibility::Visibility;
 use sqlx::MySqlPool;
 use std::path::Path;
 use tokens::voice_conversion::model::VoiceConversionModelToken;

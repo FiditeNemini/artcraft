@@ -8,7 +8,7 @@ use chrono::{DateTime, Utc};
 use container_common::anyhow_result::AnyhowResult;
 use crate::column_types::vocoder_type::VocoderType;
 use crate::helpers::boolean_converters::i8_to_bool;
-use enums::core::visibility::Visibility;
+use enums::common::visibility::Visibility;
 use log::warn;
 use sqlx::pool::PoolConnection;
 use sqlx::{MySql, MySqlPool};

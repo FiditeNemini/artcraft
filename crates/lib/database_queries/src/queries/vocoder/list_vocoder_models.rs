@@ -7,7 +7,7 @@ use anyhow::anyhow;
 use chrono::{DateTime, Utc};
 use container_common::anyhow_result::AnyhowResult;
 use crate::helpers::boolean_converters::i8_to_bool;
-use enums::ml::vocoder_type::VocoderType;
+use enums::common::vocoder_type::VocoderType;
 use log::{warn, info};
 use sqlx::MySqlPool;
 
@@ -115,7 +115,7 @@ async fn list_vocoder_models_for_all_creators(
         r#"
 SELECT
     vocoder.token as vocoder_token,
-    vocoder.vocoder_type as `vocoder_type: enums::ml::vocoder_type::VocoderType`,
+    vocoder.vocoder_type as `vocoder_type: enums::common::vocoder_type::VocoderType`,
     vocoder.creator_user_token,
     users.username as creator_username,
     users.display_name as creator_display_name,
@@ -147,7 +147,7 @@ WHERE
         r#"
 SELECT
     vocoder.token as vocoder_token,
-    vocoder.vocoder_type as `vocoder_type: enums::ml::vocoder_type::VocoderType`,
+    vocoder.vocoder_type as `vocoder_type: enums::common::vocoder_type::VocoderType`,
     vocoder.creator_user_token,
     users.username as creator_username,
     users.display_name as creator_display_name,
@@ -187,7 +187,7 @@ async fn list_vocoder_models_creator_scoped(
         r#"
 SELECT
     vocoder.token as vocoder_token,
-    vocoder.vocoder_type as `vocoder_type: enums::ml::vocoder_type::VocoderType`,
+    vocoder.vocoder_type as `vocoder_type: enums::common::vocoder_type::VocoderType`,
     vocoder.creator_user_token,
     users.username as creator_username,
     users.display_name as creator_display_name,
@@ -221,7 +221,7 @@ WHERE
         r#"
 SELECT
     vocoder.token as vocoder_token,
-    vocoder.vocoder_type as `vocoder_type: enums::ml::vocoder_type::VocoderType`,
+    vocoder.vocoder_type as `vocoder_type: enums::common::vocoder_type::VocoderType`,
     vocoder.creator_user_token,
     users.username as creator_username,
     users.display_name as creator_display_name,
