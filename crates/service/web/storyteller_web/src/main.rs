@@ -23,6 +23,7 @@ pub const RESERVED_SUBSTRINGS : &'static str = include_str!("../../../../../db/r
 pub mod billing;
 pub mod configs;
 pub mod http_server;
+pub mod model;
 pub mod routes;
 pub mod server_state;
 pub mod subscriptions;

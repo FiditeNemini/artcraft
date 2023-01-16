@@ -26,6 +26,7 @@ mod macros;
 
 #[cfg(test)] pub mod test_helpers;
 
+pub mod by_table;
 pub mod core;
 pub mod files;
 pub mod ml;

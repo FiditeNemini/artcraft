@@ -38,6 +38,7 @@ pub struct DisplayCategory {
   pub can_only_mods_apply: bool,
 
   pub name: String,
+
   /// Instead of making the frontend deal with "maybe_dropdown_name", always use this:
   pub name_for_dropdown: String,
 
@@ -45,10 +46,6 @@ pub struct DisplayCategory {
   // It's okay to leak this since we do for assigned categories and for mods to see
   // which assigned categories might be invalid.
   pub is_mod_approved: Option<bool>,
-
-  //pub creator_user_token: Option<String>,
-  //pub creator_username: Option<String>,
-  //pub creator_display_name: Option<String>,
 
   pub created_at: DateTime<Utc>,
   pub updated_at: DateTime<Utc>,
