@@ -33,7 +33,7 @@ impl VocoderType {
 
 #[cfg(test)]
 mod tests {
-  use crate::ml::vocoder_type::VocoderType;
+  use crate::common::vocoder_type::VocoderType;
   use crate::test_helpers::assert_serialization;
 
   #[test]

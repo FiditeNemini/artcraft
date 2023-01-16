@@ -43,7 +43,7 @@ impl MediaUploadType {
 
 #[cfg(test)]
 mod tests {
-  use crate::files::media_upload_type::MediaUploadType;
+  use crate::by_table::media_uploads::media_upload_type::MediaUploadType;
   use crate::test_helpers::assert_serialization;
 
   #[test]

@@ -4,7 +4,7 @@ use container_common::anyhow_result::AnyhowResult;
 use crate::column_types::job_status::JobStatus;
 use crate::helpers::boolean_converters::i8_to_bool;
 use crate::queries::generic_inference::job::_keys::GenericInferenceJobId;
-use enums::core::visibility::Visibility;
+use enums::common::visibility::Visibility;
 use enums::workers::generic_inference_type::GenericInferenceType;
 use sqlx::mysql::MySqlArguments;
 use sqlx::{MySql, MySqlPool};
@@ -116,7 +116,7 @@ SELECT
 
   maybe_creator_user_token,
   creator_ip_address,
-  creator_set_visibility as `creator_set_visibility: enums::core::visibility::Visibility`,
+  creator_set_visibility as `creator_set_visibility: enums::common::visibility::Visibility`,
 
   status as `status: crate::column_types::job_status::JobStatus`,
 
@@ -175,7 +175,7 @@ SELECT
 
   maybe_creator_user_token,
   creator_ip_address,
-  creator_set_visibility as `creator_set_visibility: enums::core::visibility::Visibility`,
+  creator_set_visibility as `creator_set_visibility: enums::common::visibility::Visibility`,
 
   status as `status: crate::column_types::job_status::JobStatus`,
 

@@ -1,6 +1,6 @@
 use anyhow::anyhow;
 use crate::payloads::generic_inference_args::GenericInferenceArgs;
-use enums::core::visibility::Visibility;
+use enums::common::visibility::Visibility;
 use enums::workers::generic_inference_type::GenericInferenceType;
 use errors::AnyhowResult;
 use sqlx::MySqlPool;

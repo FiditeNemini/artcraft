@@ -1,5 +1,5 @@
 use chrono::{DateTime, Utc};
-use enums::core::visibility::Visibility;
+use enums::common::visibility::Visibility;
 
 #[derive(Clone, Default)]
 pub struct UserSessionExtended {

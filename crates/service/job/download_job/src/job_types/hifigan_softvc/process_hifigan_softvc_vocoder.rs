@@ -8,7 +8,7 @@ use crate::JobState;
 use crate::job_steps::job_results::JobResults;
 use database_queries::queries::generic_download::job::list_available_generic_download_jobs::AvailableDownloadJob;
 use database_queries::queries::vocoder::insert_vocoder_model::{Args, insert_vocoder_model};
-use enums::ml::vocoder_type::VocoderType;
+use enums::common::vocoder_type::VocoderType;
 use jobs_common::redis_job_status_logger::RedisJobStatusLogger;
 use log::{info, warn};
 use std::fs::File;

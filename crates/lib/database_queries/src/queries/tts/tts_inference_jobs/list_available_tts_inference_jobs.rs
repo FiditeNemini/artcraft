@@ -8,7 +8,7 @@ use container_common::anyhow_result::AnyhowResult;
 use crate::column_types::job_status::JobStatus;
 use crate::helpers::boolean_converters::i8_to_bool;
 use crate::queries::tts::tts_inference_jobs::_keys::TtsInferenceJobId;
-use enums::core::visibility::Visibility;
+use enums::common::visibility::Visibility;
 use sqlx::MySqlPool;
 
 /// table: tts_inference_jobs
@@ -75,7 +75,7 @@ SELECT
 
   creator_ip_address,
   maybe_creator_user_token,
-  creator_set_visibility as `creator_set_visibility: enums::core::visibility::Visibility`,
+  creator_set_visibility as `creator_set_visibility: enums::common::visibility::Visibility`,
 
   is_from_api,
   is_for_twitch,
@@ -124,7 +124,7 @@ SELECT
 
   creator_ip_address,
   maybe_creator_user_token,
-  creator_set_visibility as `creator_set_visibility: enums::core::visibility::Visibility`,
+  creator_set_visibility as `creator_set_visibility: enums::common::visibility::Visibility`,
 
   is_from_api,
   is_for_twitch,
@@ -216,7 +216,7 @@ SELECT
   
   creator_ip_address,
   maybe_creator_user_token,
-  creator_set_visibility as `creator_set_visibility: enums::core::visibility::Visibility`,
+  creator_set_visibility as `creator_set_visibility: enums::common::visibility::Visibility`,
 
   is_from_api,
   is_for_twitch,

@@ -6,7 +6,7 @@
 use chrono::{DateTime, Utc};
 use config::shared_constants::DEFAULT_MYSQL_QUERY_RESULT_PAGE_SIZE;
 use container_common::anyhow_result::AnyhowResult;
-use enums::core::visibility::Visibility;
+use enums::common::visibility::Visibility;
 use sqlx::MySqlPool;
 
 #[derive(Serialize)]

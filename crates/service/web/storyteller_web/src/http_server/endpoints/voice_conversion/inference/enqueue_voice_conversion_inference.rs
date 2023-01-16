@@ -11,7 +11,7 @@ use crate::http_server::endpoints::investor_demo::demo_cookie::request_has_demo_
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::server_state::ServerState;
 use database_queries::queries::generic_inference::web::insert_generic_inference_job::{Args, insert_generic_inference_job};
-use enums::core::visibility::Visibility;
+use enums::common::visibility::Visibility;
 use enums::workers::generic_inference_type::GenericInferenceType;
 use http_server_common::request::get_request_header_optional::get_request_header_optional;
 use http_server_common::request::get_request_ip::get_request_ip;

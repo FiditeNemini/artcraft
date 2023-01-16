@@ -12,7 +12,7 @@ use crate::utils::session_checker::SessionChecker;
 use database_queries::queries::users::user_badges::list_user_badges::UserBadgeForList;
 use database_queries::queries::users::user_badges::list_user_badges::list_user_badges;
 use database_queries::queries::users::user_profiles::get_user_profile_by_username::get_user_profile_by_username_from_connection;
-use enums::core::visibility::Visibility;
+use enums::common::visibility::Visibility;
 use http_server_common::request::get_request_header_optional::get_request_header_optional;
 use http_server_common::response::serialize_as_json_error::serialize_as_json_error;
 use http_server_common::util::timer::MultiBenchmarkingTimer;

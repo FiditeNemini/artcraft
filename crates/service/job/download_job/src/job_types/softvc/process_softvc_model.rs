@@ -8,7 +8,7 @@ use crate::JobState;
 use crate::job_steps::job_results::JobResults;
 use database_queries::queries::generic_download::job::list_available_generic_download_jobs::AvailableDownloadJob;
 use database_queries::queries::voice_conversion::models::insert_voice_conversion_model_from_download_job::{Args, insert_voice_conversion_model_from_download_job};
-use enums::core::visibility::Visibility;
+use enums::common::visibility::Visibility;
 use jobs_common::redis_job_status_logger::RedisJobStatusLogger;
 use log::{info, warn};
 use std::fs::File;

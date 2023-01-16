@@ -6,8 +6,8 @@
 use anyhow::anyhow;
 use container_common::anyhow_result::AnyhowResult;
 use crate::tokens::Tokens;
-use enums::core::visibility::Visibility;
-use enums::ml::vocoder_type::VocoderType;
+use enums::common::visibility::Visibility;
+use enums::common::vocoder_type::VocoderType;
 use sqlx::MySqlPool;
 use std::path::Path;
 

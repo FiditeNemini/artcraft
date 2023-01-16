@@ -1,5 +1,5 @@
 use crate::column_types::vocoder_type::VocoderType;
-use enums::core::visibility::Visibility;
+use enums::common::visibility::Visibility;
 use sqlx::MySqlPool;
 use sqlx::mysql::MySqlQueryResult;
 use sqlx;
