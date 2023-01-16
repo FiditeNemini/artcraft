@@ -16,6 +16,7 @@ use memory_caching::single_item_ttl_cache::SingleItemTtlCache;
 use r2d2_redis::{r2d2, RedisConnectionManager};
 use reusable_types::server_environment::ServerEnvironment;
 use sqlx::MySqlPool;
+use database_queries::queries::model_categories::list_categories_query_builder::CategoryList;
 use url_config::third_party_url_redirector::ThirdPartyUrlRedirector;
 use users_component::utils::session_checker::SessionChecker;
 use users_component::utils::session_cookie_manager::SessionCookieManager;
@@ -118,26 +119,28 @@ pub struct RedisRateLimiters {
   pub model_upload: RedisRateLimiter,
 }
 
-/// In-memory caches
+/// In-memory caches with TTL-based eviction.
 #[derive(Clone)]
 pub struct InMemoryCaches {
-  /// In-memory caches with TTL-based eviction. Contains a list of all voices.
+  /// Contains a list of all voices.
   pub voice_list: SingleItemTtlCache<Vec<TtsModelRecordForResponse>>,
 
   /// Contains a list of all W2L templates.
   pub w2l_template_list: SingleItemTtlCache<Vec<W2lTemplateRecordForList>>,
 
-  /// In-memory caches with TTL-based eviction. Contains a list of all TTS categories.
-  pub category_list: SingleItemTtlCache<Vec<DisplayCategory>>,
+  /// Contains a list of all TTS categories in the database
+  /// (before any enrichment with synthetic categories)
+  /// This is used in several places (list categories, computed category assignments)
+  pub database_tts_category_list: SingleItemTtlCache<CategoryList>,
+
+  /// Computed category assignments for TTS models
+  /// This is approximately O(n^3) and recursively generates all super-category membership.
+  pub tts_model_category_assignments: SingleItemTtlCache<ModelTokensByCategoryToken>,
 
   /// TTS queue length
   /// The frontend will consult a distributed cache and use the monotonic DB time as a
   /// vector clock.
   pub tts_queue_length: SingleItemTtlCache<TtsQueueLengthResult>,
-
-  /// Computed category assignments for TTS models
-  /// This is approximately O(n^3) and recursively generates all super-category membership.
-  pub tts_model_category_assignments: SingleItemTtlCache<ModelTokensByCategoryToken>,
 }
 
 #[derive(Clone)]

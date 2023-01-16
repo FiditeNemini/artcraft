@@ -259,7 +259,10 @@ async fn main() -> AnyhowResult<()> {
   let voice_list_cache_ttl = easyenv::get_env_duration_seconds_or_default("VOICE_LIST_CACHE_TTL_SECONDS", Duration::from_secs(60));
   let category_list_cache_ttl = easyenv::get_env_duration_seconds_or_default("CATEGORY_LIST_CACHE_TTL_SECONDS", Duration::from_secs(60));
   let voice_list_cache = SingleItemTtlCache::create_with_duration(voice_list_cache_ttl);
-  let category_list_cache = SingleItemTtlCache::create_with_duration(category_list_cache_ttl);
+
+  let database_tts_category_list_cache = SingleItemTtlCache::create_with_duration(
+    easyenv::get_env_duration_seconds_or_default("DATABASE_TTS_CATEGORY_LIST_CACHE_TTL_SECONDS", Duration::from_secs(60))
+  );
 
   let w2l_template_cache = SingleItemTtlCache::create_with_duration(
     easyenv::get_env_duration_seconds_or_default("W2L_TEMPLATE_LIST_CACHE_TTL_SECONDS", Duration::from_secs(300)) // 5 minutes
@@ -387,7 +390,7 @@ async fn main() -> AnyhowResult<()> {
     caches: InMemoryCaches {
       voice_list: voice_list_cache,
       w2l_template_list: w2l_template_cache,
-      category_list: category_list_cache,
+      database_tts_category_list: database_tts_category_list_cache,
       tts_queue_length: tts_queue_length_cache,
       tts_model_category_assignments: tts_model_category_assignments_cache,
     },

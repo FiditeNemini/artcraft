@@ -7,11 +7,11 @@ use strum::EnumCount;
 use strum::EnumIter;
 
 /// Used in the `model_categories` table in an `ENUM` field.
-/// (We want to stop using enum fields due to migration issues.)
+/// (*WE WANT TO STOP USING ENUM FIELDS DUE TO MIGRATION ISSUES*)
 ///
 /// DO NOT CHANGE VALUES WITHOUT A MIGRATION STRATEGY.
 #[cfg_attr(test, derive(EnumIter, EnumCount))]
-#[derive(Clone, Copy, Eq, PartialEq, Deserialize, Serialize)]
+#[derive(Clone, Copy, Eq, PartialEq, Hash, Deserialize, Serialize)]
 #[serde(rename_all = "lowercase")]
 pub enum ModelType {
   Tts,

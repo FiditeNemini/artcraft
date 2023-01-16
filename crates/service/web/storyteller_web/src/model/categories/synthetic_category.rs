@@ -1,3 +1,4 @@
+use enums::by_table::model_categories::model_type::ModelType;
 use tokens::tokens::model_categories::ModelCategoryToken;
 
 #[derive(Clone, Eq, PartialEq, Hash, Debug)]
@@ -9,7 +10,7 @@ pub struct SyntheticCategory {
   pub name: &'static str,
   pub name_for_dropdown: &'static str,
 
-  pub model_type: &'static str,
+  pub model_type: ModelType,
 
   pub can_directly_have_models: bool,
   pub can_directly_have_subcategories: bool,

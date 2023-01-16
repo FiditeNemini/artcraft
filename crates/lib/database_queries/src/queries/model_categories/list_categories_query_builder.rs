@@ -8,12 +8,12 @@ use sqlx::pool::PoolConnection;
 
 /// List of categories
 /// This is *NOT* paginated, as that defeats the purpose of having a category system.
-#[derive(Serialize)]
+#[derive(Serialize, Clone)]
 pub struct CategoryList {
   pub categories: Vec<Category>,
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, Clone)]
 pub struct Category {
   pub category_token: String,
 
