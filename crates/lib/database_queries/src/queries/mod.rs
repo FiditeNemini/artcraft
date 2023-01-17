@@ -7,6 +7,7 @@ pub mod ip_bans;
 pub mod media_uploads;
 pub mod model_categories;
 pub mod stats;
+pub mod trending_model_analytics;
 pub mod tts;
 pub mod twitch;
 pub mod users;

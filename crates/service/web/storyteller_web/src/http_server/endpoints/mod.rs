@@ -10,6 +10,7 @@ pub mod misc;
 pub mod moderation;
 pub mod service;
 pub mod stubs;
+pub mod trending;
 pub mod tts;
 pub mod twitch;
 pub mod vocoders;
