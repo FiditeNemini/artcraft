@@ -27,6 +27,7 @@ use std::fmt;
 use std::sync::Arc;
 use chrono::{DateTime, Utc};
 use database_queries::queries::trending_model_analytics::list_trending_tts_models::{list_trending_tts_models, TrendingModels};
+use enums::by_table::trending_model_analytics::window_name::WindowName;
 use tokens::tokens::model_categories::ModelCategoryToken;
 use tokens::tokens::tts_models::TtsModelToken;
 use crate::model::categories::synthetic_category_list::{SYNTHETIC_CATEGORY_LATEST_TTS_MODELS, SYNTHETIC_CATEGORY_TRENDING_TTS_MODELS};
@@ -452,6 +453,7 @@ fn add_recent_models(recursive_category_to_model_map: &mut CategoryTokenToModelT
 fn add_trending_models(recursive_category_to_model_map: &mut CategoryTokenToModelTokensMap, trending_models: TrendingModels) {
   // TODO: This is a grossly bad guess.
   let model_tokens = trending_models.models.iter()
+      .filter(|trending_model| trending_model.window_name == WindowName::Last3Hours)
       .take(30)
       .map(|trending_model| {
         trending_model.model_token.clone()
