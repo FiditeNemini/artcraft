@@ -2414,6 +2414,16 @@
     },
     "query": "\nSELECT\n    vocoder.token as vocoder_token,\n    vocoder.vocoder_type as `vocoder_type: enums::common::vocoder_type::VocoderType`,\n    vocoder.creator_user_token,\n    users.username as creator_username,\n    users.display_name as creator_display_name,\n    users.email_gravatar_hash as creator_gravatar_hash,\n    vocoder.title,\n    vocoder.is_staff_recommended,\n    vocoder.is_mod_disabled_from_public_use,\n    vocoder.is_mod_disabled_from_author_use,\n    vocoder.is_mod_author_editing_locked,\n    vocoder.created_at,\n    vocoder.updated_at,\n    vocoder.user_deleted_at,\n    vocoder.mod_deleted_at\nFROM vocoder_models as vocoder\nJOIN users\n    ON users.token = vocoder.creator_user_token\nWHERE\n    users.username = ?\n        "
   },
+  "225a2fb97e75f4facadbef0d4ca3a4746f796cafc5ab017648a4b506b5da7fcc": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Right": 5
+      }
+    },
+    "query": "\nINSERT INTO trending_model_analytics\nSET\n  model_type = ?,\n  model_token = ?,\n  window_name = ?,\n  numeric_value = ?,\n  version = 1\n\nON DUPLICATE KEY UPDATE\n  numeric_value = ?,\n  version = version + 1\n        "
+  },
   "28cf5843d68d6cb0e67eb316ef9e7e5fb05a6be2433f86c081576b279167508d": {
     "describe": {
       "columns": [],
@@ -2874,6 +2884,31 @@
       }
     },
     "query": "\nSELECT\n    tts.token as model_token,\n    tts.tts_model_type,\n    tts.text_pipeline_type,\n    tts.text_preprocessing_algorithm,\n    tts.maybe_default_pretrained_vocoder,\n\n    tts.creator_user_token,\n    users.username as creator_username,\n    users.display_name as creator_display_name,\n    users.email_gravatar_hash as creator_gravatar_hash,\n    users.is_banned as creator_is_banned,\n\n    tts.title,\n    tts.description_markdown,\n    tts.description_rendered_html,\n\n    tts.ietf_language_tag,\n    tts.ietf_primary_language_subtag,\n\n    tts.is_front_page_featured,\n    tts.is_twitch_featured,\n\n    tts.maybe_suggested_unique_bot_command,\n\n    tts.creator_set_visibility,\n\n    tts.is_locked_from_use,\n    tts.is_locked_from_user_modification,\n\n    tts.maybe_custom_vocoder_token,\n    vocoder.title as maybe_custom_vocoder_title,\n    vocoder_user.token as maybe_custom_vocoder_creator_user_token,\n    vocoder_user.username as maybe_custom_vocoder_creator_username,\n    vocoder_user.display_name as maybe_custom_vocoder_creator_display_name,\n    vocoder_user.email_gravatar_hash as maybe_custom_vocoder_creator_gravatar_hash,\n\n    tts.created_at,\n    tts.updated_at,\n\n    tts.creator_ip_address_creation,\n    tts.creator_ip_address_last_update,\n    tts.mod_deleted_at,\n    tts.user_deleted_at\n\nFROM tts_models as tts\nJOIN users\n    ON users.token = tts.creator_user_token\n\nLEFT OUTER JOIN vocoder_models AS vocoder\n    ON vocoder.token = tts.maybe_custom_vocoder_token\nLEFT OUTER JOIN users AS vocoder_user\n    ON vocoder_user.token = vocoder.creator_user_token\n\nWHERE\n    tts.token = ?\n    AND tts.user_deleted_at IS NULL\n    AND tts.mod_deleted_at IS NULL\n        "
+  },
+  "29764c89bec917b0d8e4eaae25372ede56d51114a8641e3423c0cf72212542eb": {
+    "describe": {
+      "columns": [
+        {
+          "name": "use_count",
+          "ordinal": 0,
+          "type_info": {
+            "char_set": 63,
+            "flags": {
+              "bits": 129
+            },
+            "max_size": 21,
+            "type": "LongLong"
+          }
+        }
+      ],
+      "nullable": [
+        false
+      ],
+      "parameters": {
+        "Right": 2
+      }
+    },
+    "query": "\n    SELECT\n      count(*) AS use_count\n    FROM\n      tts_results\n    WHERE\n      created_at > ( CURDATE() - INTERVAL ? MINUTE )\n      AND model_token = ?\n        "
   },
   "2b04dd7db52ef3a97a6f420a22a4dbee7416ae58697438df69e87ffd47bbf350": {
     "describe": {
@@ -10653,6 +10688,31 @@
     },
     "query": "\nUPDATE w2l_templates\nSET\n  maybe_mod_user_token = ?,\n  mod_deleted_at = NULL\nWHERE\n  token = ?\nLIMIT 1\n        "
   },
+  "c5767a301b7c14abaf836394dd7aeab5dc4718b47296bc12b3679a29643c3fb5": {
+    "describe": {
+      "columns": [
+        {
+          "name": "total_use_count",
+          "ordinal": 0,
+          "type_info": {
+            "char_set": 63,
+            "flags": {
+              "bits": 129
+            },
+            "max_size": 21,
+            "type": "LongLong"
+          }
+        }
+      ],
+      "nullable": [
+        false
+      ],
+      "parameters": {
+        "Right": 1
+      }
+    },
+    "query": "\n    SELECT\n      count(*) AS total_use_count\n    FROM\n      tts_results\n    WHERE\n      model_token = ?\n        "
+  },
   "c5959e2cc13e007392ce136ec41a2bc1ead7571e602f30e99528a93aeb699de2": {
     "describe": {
       "columns": [
@@ -12956,6 +13016,31 @@
       }
     },
     "query": "\nUPDATE w2l_inference_jobs\nSET\n  status = 'started',\n  attempt_count = attempt_count + 1,\n  retry_at = NOW() + interval 2 minute\nWHERE id = ?\n        "
+  },
+  "ef7bd99d998e080d274f9a08ae281ff522b33fd9e0ddedd17296604ad487a2cf": {
+    "describe": {
+      "columns": [
+        {
+          "name": "token: tokens::tokens::tts_models::TtsModelToken",
+          "ordinal": 0,
+          "type_info": {
+            "char_set": 224,
+            "flags": {
+              "bits": 4229
+            },
+            "max_size": 128,
+            "type": "VarString"
+          }
+        }
+      ],
+      "nullable": [
+        false
+      ],
+      "parameters": {
+        "Right": 0
+      }
+    },
+    "query": "\nSELECT\n    token as `token: tokens::tokens::tts_models::TtsModelToken`\nFROM tts_models\n        "
   },
   "efda8c2f3b856b1995d57cf5050636457c56589e9ae2676550a709c49e79a4c7": {
     "describe": {
