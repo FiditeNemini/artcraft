@@ -52,6 +52,7 @@ use crate::http_server::endpoints::stubs::app_model_downloads::get_app_model_dow
 use crate::http_server::endpoints::stubs::app_news::get_app_news_handler;
 use crate::http_server::endpoints::stubs::app_plans::get_app_plans_handler;
 use crate::http_server::endpoints::stubs::post_app_analytics::post_app_analytics_handler;
+use crate::http_server::endpoints::trending::list_trending_tts_models::list_trending_tts_models_handler;
 use crate::http_server::endpoints::tts::delete_tts_model::delete_tts_model_handler;
 use crate::http_server::endpoints::tts::delete_tts_result::delete_tts_inference_result_handler;
 use crate::http_server::endpoints::tts::edit_tts_model::edit_tts_model_handler;
@@ -128,6 +129,7 @@ pub fn add_routes<T, B> (app: App<T, B>) -> App<T, B>
   app = add_flag_routes(app); /* /flag */
   app = add_desktop_app_routes(app); /* /v1/vc/... */
   app = add_media_upload_routes(app); /* /v1/media_upload/... */
+  app = add_trending_routes(app); /* /v1/trending/... */
 
   // From components
   app = add_suggested_api_v1_account_creation_and_session_routes(app); // /create_account, /session, /login, /logout
@@ -904,6 +906,28 @@ fn add_media_upload_routes<T, B> (app: App<T, B>) -> App<T, B>
       )
   )
 }
+
+// ==================== TRENDING ROUTES ====================
+
+fn add_trending_routes<T, B> (app: App<T, B>) -> App<T, B>
+  where
+      B: MessageBody,
+      T: ServiceFactory<
+        ServiceRequest,
+        Config = (),
+        Response = ServiceResponse<B>,
+        Error = Error,
+        InitError = (),
+      >,
+{
+  app.service(web::scope("/v1/trending")
+      .service(web::resource("/tts_models")
+          .route(web::get().to(list_trending_tts_models_handler))
+          .route(web::head().to(|| HttpResponse::Ok()))
+      )
+  )
+}
+
 
 // ==================== TWITCH ROUTES ====================
 

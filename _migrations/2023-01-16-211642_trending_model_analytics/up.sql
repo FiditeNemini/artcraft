@@ -19,6 +19,13 @@ CREATE TABLE trending_model_analytics (
   -- The measured numerical value of the statistic, eg "500 uses" = 500.
   numeric_value INT(10) NOT NULL DEFAULT 0,
 
+  -- ========== VECTOR CLOCK ==========
+
+  -- Incremented with every update.
+  version INT NOT NULL DEFAULT 0,
+
+  -- ========== TIMESTAMPS ==========
+
   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 
@@ -26,6 +33,7 @@ CREATE TABLE trending_model_analytics (
   PRIMARY KEY (id),
   UNIQUE KEY (model_token, model_type, window_name),
   KEY index_model_type_model_token (model_type, model_token),
+  KEY index_model_type (model_type),
   KEY index_model_token (model_token),
   KEY index_numeric_value (numeric_value)
 

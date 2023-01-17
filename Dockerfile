@@ -82,6 +82,12 @@ RUN SQLX_OFFLINE=true \
   LD_LIBRARY_PATH=/usr/lib:${LD_LIBRARY_PATH} \
   $HOME/.cargo/bin/cargo build \
   --release \
+  --bin analytics-job \
+
+RUN SQLX_OFFLINE=true \
+  LD_LIBRARY_PATH=/usr/lib:${LD_LIBRARY_PATH} \
+  $HOME/.cargo/bin/cargo build \
+  --release \
   --bin download-job
 
 RUN SQLX_OFFLINE=true \
@@ -149,6 +155,7 @@ RUN echo -n ${GIT_SHA} > GIT_SHA
 
 # Copy all the binaries.
 COPY --from=builder /tmp/target/release/storyteller-web /
+COPY --from=builder /tmp/target/release/analytics-job /
 COPY --from=builder /tmp/target/release/download-job /
 COPY --from=builder /tmp/target/release/inference-job /
 COPY --from=builder /tmp/target/release/tts-download-job /

@@ -26,9 +26,10 @@ use std::collections::{BTreeMap, BTreeSet, HashMap, HashSet};
 use std::fmt;
 use std::sync::Arc;
 use chrono::{DateTime, Utc};
+use database_queries::queries::trending_model_analytics::list_trending_tts_models::{list_trending_tts_models, TrendingModels};
 use tokens::tokens::model_categories::ModelCategoryToken;
 use tokens::tokens::tts_models::TtsModelToken;
-use crate::model::categories::synthetic_category_list::SYNTHETIC_CATEGORY_LATEST_TTS_MODELS;
+use crate::model::categories::synthetic_category_list::{SYNTHETIC_CATEGORY_LATEST_TTS_MODELS, SYNTHETIC_CATEGORY_TRENDING_TTS_MODELS};
 
 // =============== Success Response ===============
 
@@ -177,7 +178,12 @@ async fn query_and_construct_payload(
   category_cache: &SingleItemTtlCache<CategoryList>,
   mysql_pool: &MySqlPool
 ) -> Result<ModelTokensByCategoryToken, ListFullyComputedAssignedTtsCategoriesError> {
-  let (categories, models, model_category_map) = {
+  let (
+    categories,
+    models,
+    model_category_map,
+    trending_models
+  ) = {
     let mut mysql_connection = mysql_pool.acquire()
         .await
         .map_err(|e| {
@@ -206,12 +212,20 @@ async fn query_and_construct_payload(
           ListFullyComputedAssignedTtsCategoriesError::ServerError
         })?;
 
-    (categories, models, model_category_map)
+    let trending_models = list_trending_tts_models(&mut mysql_connection)
+        .await
+        .map_err(|e| {
+          error!("Error querying trending TTS models: {:?}", e);
+          ListFullyComputedAssignedTtsCategoriesError::ServerError
+        })?;
+
+    (categories, models, model_category_map, trending_models)
   };
 
   let mut recursive_category_to_model_map = recursive_category_to_model_map(&model_category_map, &categories);
 
   add_recent_models(&mut recursive_category_to_model_map, models);
+  add_trending_models(&mut recursive_category_to_model_map, trending_models);
 
   Ok(ModelTokensByCategoryToken {
     recursive: recursive_category_to_model_map,
@@ -432,6 +446,19 @@ fn add_recent_models(recursive_category_to_model_map: &mut CategoryTokenToModelT
   });
 
   let synthetic_token = ModelCategoryToken::new_from_str(SYNTHETIC_CATEGORY_LATEST_TTS_MODELS.category_token);
+  recursive_category_to_model_map.insert(synthetic_token, model_tokens);
+}
+
+fn add_trending_models(recursive_category_to_model_map: &mut CategoryTokenToModelTokensMap, trending_models: TrendingModels) {
+  // TODO: This is a grossly bad guess.
+  let model_tokens = trending_models.models.iter()
+      .take(30)
+      .map(|trending_model| {
+        trending_model.model_token.clone()
+      })
+      .collect::<BTreeSet<TtsModelToken>>();
+
+  let synthetic_token = ModelCategoryToken::new_from_str(SYNTHETIC_CATEGORY_TRENDING_TTS_MODELS.category_token);
   recursive_category_to_model_map.insert(synthetic_token, model_tokens);
 }
 

@@ -641,6 +641,33 @@ dependencies = [
 ]
 
 [[package]]
+name = "analytics-job"
+version = "0.0.1"
+dependencies = [
+ "anyhow",
+ "chrono",
+ "clap 2.34.0",
+ "config",
+ "container_common",
+ "database_queries",
+ "dotenv",
+ "easyenv",
+ "enums",
+ "errors",
+ "hostname",
+ "jobs_common",
+ "log",
+ "rand 0.8.4",
+ "reusable_types",
+ "serde",
+ "serde_derive",
+ "serde_json",
+ "sqlx",
+ "tokens",
+ "tokio 1.16.1",
+]
+
+[[package]]
 name = "ansi_term"
 version = "0.12.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
