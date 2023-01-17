@@ -13,6 +13,7 @@ import { motion } from "framer-motion";
 import { container, sessionItem } from "../../../data/animation";
 import { SessionSubscriptionsWrapper } from "@storyteller/components/src/session/SessionSubscriptionsWrapper";
 import { Analytics } from "../../../common/Analytics";
+import { SessionTtsAudioPlayer } from "./SessionTtsAudioPlayer";
 
 interface Props {
   ttsInferenceJobs: Array<TtsInferenceJob>;
@@ -74,6 +75,9 @@ function SessionTtsInferenceResultListFc(props: Props) {
         job.maybePublicBucketWavAudioPath
       );
       let ttsPermalink = `/tts/result/${job.maybeResultToken}`;
+
+      let wavesurfers = <SessionTtsAudioPlayer filename={audioLink} />;
+
       results.push(
         <div key={job.jobToken}>
           {/*<div className="message-header">
@@ -86,11 +90,11 @@ function SessionTtsInferenceResultListFc(props: Props) {
               variants={sessionItem}
             >
               <div>
-                <h5 className="mb-1">{job.title}</h5>
+                <h5 className="mb-2">{job.title}</h5>
                 <p>{job.rawInferenceText}</p>
               </div>
 
-              <audio
+              {/* <audio
                 className="w-100"
                 controls
                 src={audioLink}
@@ -100,9 +104,11 @@ function SessionTtsInferenceResultListFc(props: Props) {
               >
                 Your browser does not support the
                 <code>audio</code> element.
-              </audio>
+              </audio> */}
 
-              <div>
+              {wavesurfers}
+
+              <div className="mt-2">
                 <Link
                   to={ttsPermalink}
                   onClick={() => {
@@ -111,7 +117,7 @@ function SessionTtsInferenceResultListFc(props: Props) {
                   className="fw-semibold"
                 >
                   <FontAwesomeIcon icon={faLink} className="me-2" />
-                  Permalink / Download
+                  Audio details / Download
                 </Link>
               </div>
             </motion.div>

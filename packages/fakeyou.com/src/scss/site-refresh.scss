@@ -232,6 +232,12 @@ styles with important tags:
     border-radius: 50px;
   }
 
+  .btn-session-tts-play {
+    height: 36px;
+    width: 36px;
+    padding: 0 12px;
+  }
+
   .panel {
     position: relative;
     width: 100%;
@@ -632,7 +638,7 @@ styles with important tags:
   }
 
   .session-tts-section {
-    height: 450px;
+    height: 100%;
     overflow-x: hidden;
     overflow-y: auto;
     overscroll-behavior: contain;
@@ -878,6 +884,10 @@ textarea {
 
     .alert {
       font-size: 13px;
+    }
+
+    .session-tts-section {
+      height: 450px;
     }
   }
 }
