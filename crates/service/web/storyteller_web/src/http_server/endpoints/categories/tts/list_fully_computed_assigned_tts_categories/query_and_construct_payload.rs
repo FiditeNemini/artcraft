@@ -3,28 +3,26 @@
 #![forbid(unused_mut)]
 #![forbid(unused_variables)]
 
-use std::collections::{BTreeMap, BTreeSet, HashMap, HashSet};
-
 use chrono::{DateTime, Utc};
-use lexical_sort::natural_lexical_cmp;
-use log::error;
-use sqlx::{MySql, MySqlPool};
-use sqlx::pool::PoolConnection;
-
-use database_queries::queries::model_categories::list_categories_query_builder::CategoryList;
-use database_queries::queries::trending_model_analytics::list_trending_tts_models::list_trending_tts_models;
-use database_queries::queries::tts::tts_category_assignments::fetch_and_build_tts_model_category_map::fetch_and_build_tts_model_category_map_with_connection;
-use database_queries::queries::tts::tts_models::list_tts_models::list_tts_models_with_connection;
-use errors::AnyhowResult;
-use memory_caching::single_item_ttl_cache::SingleItemTtlCache;
-use tokens::tokens::model_categories::ModelCategoryToken;
-use tokens::tokens::tts_models::TtsModelToken;
-
 use crate::http_server::endpoints::categories::tts::list_fully_computed_assigned_tts_categories::add_synthetic_categories::{add_recent_models, add_trending_models};
 use crate::http_server::endpoints::categories::tts::list_fully_computed_assigned_tts_categories::error::ListFullyComputedAssignedTtsCategoriesError;
 use crate::http_server::endpoints::categories::tts::list_fully_computed_assigned_tts_categories::list_fully_computed_assigned_tts_categories::ModelTokensByCategoryToken;
 use crate::http_server::endpoints::categories::tts::list_fully_computed_assigned_tts_categories::recursively_build_category_map::recursive_category_to_model_map;
 use crate::model::cached_queries::list_cached_tts_categories_for_public_dropdown::list_cached_tts_categories_for_public_dropdown;
+use database_queries::queries::model_categories::list_categories_query_builder::CategoryList;
+use database_queries::queries::trending_model_analytics::list_trending_tts_models::list_trending_tts_models;
+use database_queries::queries::tts::tts_category_assignments::fetch_and_build_tts_model_category_map::fetch_and_build_tts_model_category_map_with_connection;
+use database_queries::queries::tts::tts_models::list_tts_models::list_tts_models_with_connection;
+use errors::AnyhowResult;
+use lexical_sort::natural_lexical_cmp;
+use log::error;
+use memory_caching::single_item_ttl_cache::SingleItemTtlCache;
+use sqlx::pool::PoolConnection;
+use sqlx::{MySql, MySqlPool};
+use std::collections::{BTreeMap, BTreeSet, HashMap, HashSet};
+use tokens::tokens::model_categories::ModelCategoryToken;
+use tokens::tokens::tts_models::TtsModelToken;
+use crate::http_server::endpoints::categories::tts::list_fully_computed_assigned_tts_categories::sort_models::sort_models;
 
 #[derive(Clone)]
 pub struct CategoryInfoLite {
@@ -107,11 +105,17 @@ pub async fn query_and_construct_payload(
     &categories);
 
   // Add synthetic categories
-  add_recent_models(&mut recursive_category_to_model_map, models);
+  add_recent_models(&mut recursive_category_to_model_map, &models);
   add_trending_models(&mut recursive_category_to_model_map, trending_models);
 
+  // TODO: This is a mess, because late in the process I realized "BTreeMap"/"BTreeSet" sorts on
+  //  key and not insertion order. Classic reading the docs.
+
+  // Sort all of the models within the categories
+  let final_map = sort_models(&recursive_category_to_model_map, &models);
+
   Ok(ModelTokensByCategoryToken {
-    recursive: recursive_category_to_model_map,
+    recursive: final_map,
   })
 }
 

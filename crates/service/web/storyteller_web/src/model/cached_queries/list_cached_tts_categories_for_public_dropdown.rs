@@ -4,8 +4,8 @@ use errors::AnyhowResult;
 use lexical_sort::natural_lexical_cmp;
 use log::{error};
 use memory_caching::single_item_ttl_cache::SingleItemTtlCache;
-use sqlx::{MySql, MySqlPool};
 use sqlx::pool::PoolConnection;
+use sqlx::{MySql, MySqlPool};
 
 /// Fetch from cache if available, otherwise fetch from DB.
 pub async fn list_cached_tts_categories_for_public_dropdown_db_pool(

@@ -7,18 +7,15 @@
 //! belongs to. This saves an enormous amount of clientside CPU compute.
 //!
 
-use std::collections::{BTreeMap, BTreeSet};
-use std::sync::Arc;
-
 use actix_web::{HttpRequest, HttpResponse, web};
-use log::{error, info};
-
-use tokens::tokens::model_categories::ModelCategoryToken;
-use tokens::tokens::tts_models::TtsModelToken;
-
 use crate::http_server::endpoints::categories::tts::list_fully_computed_assigned_tts_categories::error::ListFullyComputedAssignedTtsCategoriesError;
 use crate::http_server::endpoints::categories::tts::list_fully_computed_assigned_tts_categories::query_and_construct_payload::query_and_construct_payload;
 use crate::server_state::ServerState;
+use log::{error, info};
+use std::collections::BTreeMap;
+use std::sync::Arc;
+use tokens::tokens::model_categories::ModelCategoryToken;
+use tokens::tokens::tts_models::TtsModelToken;
 
 // =============== Success Response ===============
 
@@ -26,37 +23,15 @@ use crate::server_state::ServerState;
 pub struct ListFullyComputedAssignedTtsCategoriesResponse {
   pub success: bool,
 
-//  /// All category tokens in use by at least one TTS model.
-//  /// Unused categories will not be present.
-//  pub utilized_tts_category_tokens: UtilizedCategoryTokens,
-
   /// Maps of category tokens to the TTS model tokens that are assigned to them.
   pub category_token_to_tts_model_tokens: ModelTokensByCategoryToken,
 }
-
-//#[derive(Serialize)]
-//pub struct UtilizedCategoryTokens {
-//  /// Every category token used at least once by a TTS model (recursive).
-//  /// This is a recursive membership, so parent categories with no models assigned will still be
-//  /// present if at least one model is assigned to any of that category's children.
-//  pub recursive: BTreeSet<ModelCategoryToken>,
-//
-//  /// Every category token used at least once by a TTS model (leaf only).
-//  /// The TTS model must have a direct attachment to the category to be considered "assigned",
-//  /// so parent categories will not be considered "utilized" in this sense unless they have models
-//  /// directly assigned to them.
-//  pub leaf_only: BTreeSet<ModelCategoryToken>,
-//}
 
 #[derive(Serialize, Clone)]
 pub struct ModelTokensByCategoryToken {
   /// For every category, the TTS model tokens assigned. This is built up recursively.
   /// Parent categories *will* include all of the TTS models assigned to children categories.
-  pub recursive: BTreeMap<ModelCategoryToken, BTreeSet<TtsModelToken>>,
-
-//  /// For every category, the TTS model tokens *directly* assigned.
-//  /// Parent categories *will not* include the TTS models assigned to children categories.
-//  pub leaf_only: BTreeMap<ModelCategoryToken, BTreeSet<TtsModelToken>>,
+  pub recursive: BTreeMap<ModelCategoryToken, Vec<TtsModelToken>>,
 }
 
 // =============== Handler ===============
@@ -94,10 +69,6 @@ pub async fn list_fully_computed_assigned_tts_categories_handler(
 
   let response = ListFullyComputedAssignedTtsCategoriesResponse {
     success: true,
-    //utilized_tts_category_tokens: UtilizedCategoryTokens {
-    //  recursive: recursive_category_tokens(&model_category_map, &categories),
-    //  leaf_only: leaf_category_tokens(&model_category_map),
-    //},
     category_token_to_tts_model_tokens: category_assignments,
   };
 
