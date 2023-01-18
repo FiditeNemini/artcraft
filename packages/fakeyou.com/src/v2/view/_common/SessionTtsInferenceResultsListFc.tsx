@@ -117,7 +117,7 @@ function SessionTtsInferenceResultListFc(props: Props) {
                   className="fw-semibold"
                 >
                   <FontAwesomeIcon icon={faLink} className="me-2" />
-                  Audio details / Download
+                  Share &amp; Download
                 </Link>
               </div>
             </motion.div>

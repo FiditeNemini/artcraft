@@ -1,9 +1,9 @@
 import React from "react";
-import { faArrowRightLong, faCompass, faGlobe, faTags } from "@fortawesome/free-solid-svg-icons";
+import { faArrowRightLong, faCompass, faTags } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Select from "react-select";
-import AsyncSelect from "react-select/async";
-import { SearchFieldClass } from "./SearchFieldClass";
+import { SearchFieldClass } from "../SearchFieldClass";
+import { LanguageOptions } from "./LanguageOptions";
 
 interface Props {
 
@@ -43,19 +43,12 @@ export function ExploreVoicesModal(props: Props) {
           </div>
           <div className="modal-body p-3 p-lg-4">
             <div className="row gx-3 gy-3">
+
               <div className="col-12 col-lg-3 input-icon-search">
                 <label className="sub-title">Language</label>
-                <div>
-                  <span className="form-control-feedback">
-                    <FontAwesomeIcon icon={faGlobe} />
-                  </span>
-                  <Select
-                    defaultValue={options[2]}
-                    options={options}
-                    classNames={SearchFieldClass}
-                    />
-                </div>
+                <LanguageOptions />
               </div>
+
               <div className="col-12 col-md-12 col-lg-9 input-icon-search">
                 <div className="d-flex">
                   <label className="sub-title flex-grow-1">

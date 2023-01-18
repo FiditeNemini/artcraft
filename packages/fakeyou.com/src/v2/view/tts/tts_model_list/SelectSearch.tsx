@@ -34,9 +34,6 @@ export function SelectSearch(props: Props) {
 
 
   const handleChange = (option: any, actionMeta: ActionMeta<Option>) => {
-    console.log("option", option);
-    console.log("actionMeta", actionMeta);
-
     const ttsModelToken = option?.value;
     const maybeNewTtsModel = props.allTtsModelsByTokenMap.get(ttsModelToken);
 
@@ -48,8 +45,9 @@ export function SelectSearch(props: Props) {
   }
 
   // TODO/FIXME: The default option is not working.
-
   let defaultOption = options.length > 0 ? options[0] : undefined;
+
+  //let defaultText = options.length > 0 ? options[0].label : "Search for a voice... (loading)";
 
   if (props.maybeSelectedTtsModel !== undefined) {
     defaultOption = { 
@@ -58,8 +56,6 @@ export function SelectSearch(props: Props) {
     };
   }
 
-  console.log('defaultOption', defaultOption);
-
   return (
     <>
       <div className="zi-3 input-icon-search">
@@ -67,7 +63,9 @@ export function SelectSearch(props: Props) {
           <FontAwesomeIcon icon={faMicrophone} />
         </span>
         <Select
+          //defaultInputValue={defaultText}
           defaultValue={defaultOption}
+          isSearchable={true}
           options={options}
           classNames={SearchFieldClass}
           onChange={handleChange}

@@ -4,6 +4,9 @@ export interface AvailableLanguage {
   language: Language;
   languageCode: string;
   languageName: string;
+  languageNameLocalized?: string;
+  flags: string[],
+  flagsMore?: string[],
   showPleaseFollowNotice: boolean;
   showBootstrapLanguageNotice: boolean;
 }
@@ -12,16 +15,25 @@ export const ENGLISH_LANGUAGE: AvailableLanguage = {
   language: Language.English,
   languageCode: "en",
   languageName: "English",
+  languageNameLocalized: undefined,
+  flags: ["🇺🇸", "🇬🇧"],
   showPleaseFollowNotice: false,
   showBootstrapLanguageNotice: false,
 };
 
-export const AVAILABLE_LANGUAGE_MAP: Record<string, AvailableLanguage> = {
+
+// These are the languages the website has been *translated* into.
+// This is *not* the list of TTS langauge categories.
+type AvailableLanguageKey = "en" | "es" | "de" | "fr" | "hi" | "id" | "it" | "ja" | "ko" | "pt" | "tr" | "vi" | "zh";
+export const AVAILABLE_LANGUAGE_MAP: Record<AvailableLanguageKey, AvailableLanguage> = {
   en: ENGLISH_LANGUAGE,
   es: {
     language: Language.Spanish,
     languageCode: "es",
     languageName: "Spanish",
+    languageNameLocalized: "Español",
+    flags: ["🇪🇸", "🇲🇽"],
+    flagsMore: ["🇨🇴", "🇦🇷"],
     showPleaseFollowNotice: true,
     showBootstrapLanguageNotice: false,
   },
@@ -29,6 +41,8 @@ export const AVAILABLE_LANGUAGE_MAP: Record<string, AvailableLanguage> = {
     language: Language.German,
     languageCode: "de",
     languageName: "German",
+    languageNameLocalized: "Deutsch",
+    flags: ["🇩🇪"],
     showPleaseFollowNotice: false,
     showBootstrapLanguageNotice: true,
   },
@@ -36,6 +50,8 @@ export const AVAILABLE_LANGUAGE_MAP: Record<string, AvailableLanguage> = {
     language: Language.French,
     languageCode: "fr",
     languageName: "French",
+    languageNameLocalized: "Français",
+    flags: ["🇫🇷"],
     showPleaseFollowNotice: false,
     showBootstrapLanguageNotice: true,
   },
@@ -43,6 +59,8 @@ export const AVAILABLE_LANGUAGE_MAP: Record<string, AvailableLanguage> = {
     language: Language.Hindi,
     languageCode: "hi",
     languageName: "Hindi",
+    languageNameLocalized: "Hindi",
+    flags: [],
     showPleaseFollowNotice: false,
     showBootstrapLanguageNotice: true,
   },
@@ -50,6 +68,8 @@ export const AVAILABLE_LANGUAGE_MAP: Record<string, AvailableLanguage> = {
     language: Language.Indonesian,
     languageCode: "id",
     languageName: "Indonesian",
+    languageNameLocalized: "Indonesian",
+    flags: [],
     showPleaseFollowNotice: false,
     showBootstrapLanguageNotice: true,
   },
@@ -57,6 +77,8 @@ export const AVAILABLE_LANGUAGE_MAP: Record<string, AvailableLanguage> = {
     language: Language.Italian,
     languageCode: "it",
     languageName: "Italian",
+    languageNameLocalized: "Italiano",
+    flags: ["🇮🇹"],
     showPleaseFollowNotice: false,
     showBootstrapLanguageNotice: false,
   },
@@ -64,6 +86,8 @@ export const AVAILABLE_LANGUAGE_MAP: Record<string, AvailableLanguage> = {
     language: Language.Japanese,
     languageCode: "ja",
     languageName: "Japanese",
+    languageNameLocalized: "Japanese",
+    flags: [],
     showPleaseFollowNotice: false,
     showBootstrapLanguageNotice: true,
   },
@@ -71,6 +95,8 @@ export const AVAILABLE_LANGUAGE_MAP: Record<string, AvailableLanguage> = {
     language: Language.Korean,
     languageCode: "ko",
     languageName: "Korean",
+    languageNameLocalized: "Korean",
+    flags: [],
     showPleaseFollowNotice: false,
     showBootstrapLanguageNotice: true,
   },
@@ -78,6 +104,8 @@ export const AVAILABLE_LANGUAGE_MAP: Record<string, AvailableLanguage> = {
     language: Language.Portuguese,
     languageCode: "pt",
     languageName: "Portuguese",
+    languageNameLocalized: "Português",
+    flags: ["🇵🇹", "🇧🇷"],
     showPleaseFollowNotice: true,
     showBootstrapLanguageNotice: false,
   },
@@ -85,6 +113,8 @@ export const AVAILABLE_LANGUAGE_MAP: Record<string, AvailableLanguage> = {
     language: Language.Turkish,
     languageCode: "tr",
     languageName: "Turkish",
+    languageNameLocalized: "Turkish",
+    flags: [],
     showPleaseFollowNotice: false,
     showBootstrapLanguageNotice: true,
   },
@@ -92,6 +122,8 @@ export const AVAILABLE_LANGUAGE_MAP: Record<string, AvailableLanguage> = {
     language: Language.Vietnamese,
     languageCode: "vi",
     languageName: "Vietnamese",
+    languageNameLocalized: "Vietnamese",
+    flags: [],
     showPleaseFollowNotice: false,
     showBootstrapLanguageNotice: true,
   },
@@ -99,7 +131,20 @@ export const AVAILABLE_LANGUAGE_MAP: Record<string, AvailableLanguage> = {
     language: Language.ChineseSimplified,
     languageCode: "zh",
     languageName: "Chinese Simplified",
+    languageNameLocalized: "Chinese Simplified",
+    flags: [],
     showPleaseFollowNotice: false,
     showBootstrapLanguageNotice: true,
   },
 };
+
+/// These are the languages TTS has been categorized into.
+type AvailableTtsLanguageKey = "en" | "es" | "it" | "de" | "fr" | "pt";
+export const AVAILABLE_TTS_LANGUAGE_CATEGORY_MAP : Record<AvailableTtsLanguageKey, AvailableLanguage> = {
+  en: AVAILABLE_LANGUAGE_MAP["en"],
+  es: AVAILABLE_LANGUAGE_MAP["es"],
+  it: AVAILABLE_LANGUAGE_MAP["it"],
+  de: AVAILABLE_LANGUAGE_MAP["de"],
+  fr: AVAILABLE_LANGUAGE_MAP["fr"],
+  pt: AVAILABLE_LANGUAGE_MAP["pt"],
+}

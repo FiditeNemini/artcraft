@@ -72,8 +72,9 @@ import {
 import Select from "react-select";
 import AsyncSelect from "react-select/async";
 import { SearchFieldClass } from "./SearchFieldClass";
-import { AVAILABLE_LANGUAGE_MAP, ENGLISH_LANGUAGE } from "../../../../_i18n/AvailableLanguageMap";
-import { ExploreVoicesModal } from "./ExploreVoicesModal";
+import { AvailableTtsLanguageKey, AVAILABLE_LANGUAGE_MAP, ENGLISH_LANGUAGE } from "../../../../_i18n/AvailableLanguageMap";
+import { ExploreVoicesModal } from "./explore/ExploreVoicesModal";
+import { FrontendUrlConfig } from "../../../../common/FrontendUrlConfig";
 
 export interface EnqueueJobResponsePayload {
   success: boolean;
@@ -285,9 +286,10 @@ function TtsModelListPage(props: Props) {
   let directViewLink = <span />;
 
   if (props.maybeSelectedTtsModel) {
-    const modelLink = `/tts/${props.maybeSelectedTtsModel.model_token}`;
     const userName = props.maybeSelectedTtsModel.creator_display_name;
-    const modelLanguage = AVAILABLE_LANGUAGE_MAP[props.maybeSelectedTtsModel.ietf_primary_language_subtag] || ENGLISH_LANGUAGE;
+    const modelLink = FrontendUrlConfig.ttsModelPage(props.maybeSelectedTtsModel.model_token);
+    const profileLink = FrontendUrlConfig.userProfilePage(props.maybeSelectedTtsModel.creator_display_name);
+    const modelLanguage = AVAILABLE_LANGUAGE_MAP[props.maybeSelectedTtsModel.ietf_primary_language_subtag as AvailableTtsLanguageKey] || ENGLISH_LANGUAGE;
 
     directViewLink = (
       <Link
@@ -300,7 +302,7 @@ function TtsModelListPage(props: Props) {
         <div className="flex-grow-1">
           <p>
             Model by{" "}
-            <Link to="profile/Vegito1089" className="fw-medium">
+            <Link to={profileLink} className="fw-medium">
               {userName}{" "}
               <Gravatar
                 size={20}
@@ -474,7 +476,7 @@ function TtsModelListPage(props: Props) {
                 /> */}
                 <div>
                   <div className="d-flex gap-2">
-                    <label className="sub-title">Select Voice</label>
+                    <label className="sub-title">Search for a Voice</label>
                     <a href="/" className="ms-1">
                       <FontAwesomeIcon icon={faShuffle} />
                     </a>
