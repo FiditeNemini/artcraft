@@ -9,7 +9,8 @@
   },
   "scripts": {
     "build-fakeyou": "lerna exec --scope @storyteller/fakeyou.com -- yarn build",
-    "start-fakeyou": "PORT=80 BROWSER=none lerna exec --scope @storyteller/fakeyou.com -- yarn start",
+    "start-fakeyou": "PORT=7000 BROWSER=none lerna exec --scope @storyteller/fakeyou.com -- yarn start",
+    "start-fakeyou-80": "PORT=80 BROWSER=none lerna exec --scope @storyteller/fakeyou.com -- yarn start",
     "start-fakeyou-w": "set PORT=7000 && lerna exec --scope @storyteller/fakeyou.com -- yarn start-w",
     "build-storyteller": "lerna exec --scope @storyteller/storyteller.io -- yarn build",
     "start-storyteller": "PORT=7008 BROWSER=none lerna exec --scope @storyteller/storyteller.io -- yarn start",

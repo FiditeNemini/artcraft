@@ -91,7 +91,7 @@ class ApiConfig {
     }
 
     this.domain = domain;
-    this.useSsl = false;
+    this.useSsl = useSsl;
     this.v2ApiHost = v2ApiHost;
   }
 
