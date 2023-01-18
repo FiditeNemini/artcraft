@@ -57,7 +57,6 @@ import {
 } from "@storyteller/components/src/api/category/GetComputedTtsCategoryAssignments";
 import {
   DynamicallyCategorizeModels,
-  GenerateSyntheticCategories,
 } from "../../../../model/categories/SyntheticCategory";
 
 export interface EnqueueJobResponsePayload {
@@ -173,11 +172,13 @@ function TtsModelListPage(props: Props) {
     }
     const categoryList = await ListTtsCategories();
     if (ListTtsCategoriesIsOk(categoryList)) {
-      const serverCategories: TtsCategoryType[] = categoryList.categories;
-      const dynamicCategories: TtsCategoryType[] =
-        GenerateSyntheticCategories();
-      const allCategories = serverCategories.concat(dynamicCategories);
-      setAllTtsCategories(allCategories);
+      // NB(bt, 2023-01-18): We no longer generate categories on the frontend.
+      //const serverCategories: TtsCategoryType[] = categoryList.categories;
+      //const dynamicCategories: TtsCategoryType[] =
+      //  GenerateSyntheticCategories();
+      //const allCategories = serverCategories.concat(dynamicCategories);
+      //setAllTtsCategories(allCategories);
+      setAllTtsCategories(categoryList.categories);
     } else if (ListTtsCategoriesIsError(categoryList)) {
       // TODO: Retry on decay function
     }
