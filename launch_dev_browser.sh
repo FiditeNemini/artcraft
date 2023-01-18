@@ -15,6 +15,7 @@ launch_linux() {
 }
 
 launch_mac() {
+  # See https://stackoverflow.com/a/58658101
   open -na "Google Chrome" --args \
     --disable-site-isolation-trials \
     --disable-web-security \

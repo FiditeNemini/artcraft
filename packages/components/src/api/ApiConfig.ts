@@ -82,8 +82,7 @@ class ApiConfig {
           !useSsl &&
           (domain === Domain.Localhost || domain === Domain.JungleHorse)
         ) {
-          // NB: Lack of SSL means use local development.
-          v2ApiHost = "api.jungle.horse";
+          v2ApiHost = "api.dev.fakeyou.com";
         } else if (domain === Domain.JungleHorse) {
           // TODO: Clean up these branches
           v2ApiHost = "api.jungle.horse";
