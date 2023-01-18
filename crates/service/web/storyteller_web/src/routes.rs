@@ -11,7 +11,7 @@ use crate::http_server::endpoints::api_tokens::list_api_tokens::list_api_tokens_
 use crate::http_server::endpoints::categories::create_category::create_category_handler;
 use crate::http_server::endpoints::categories::get_category::get_category_handler;
 use crate::http_server::endpoints::categories::tts::assign_tts_category::assign_tts_category_handler;
-use crate::http_server::endpoints::categories::tts::list_fully_computed_assigned_tts_categories::list_fully_computed_assigned_tts_categories_handler;
+use crate::http_server::endpoints::categories::tts::list_fully_computed_assigned_tts_categories::list_fully_computed_assigned_tts_categories::list_fully_computed_assigned_tts_categories_handler;
 use crate::http_server::endpoints::categories::tts::list_tts_categories::list_tts_categories_handler;
 use crate::http_server::endpoints::categories::tts::list_tts_model_assigned_categories::list_tts_model_assigned_categories_handler;
 use crate::http_server::endpoints::download_job::enqueue_generic_download::enqueue_generic_download_handler;
