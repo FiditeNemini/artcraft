@@ -15,7 +15,8 @@ launch_linux() {
 }
 
 launch_mac() {
-  open -a "Google Chrome" --args \
+  open -na "Google Chrome" --args \
+    --disable-site-isolation-trials \
     --disable-web-security \
     --ignore-certificate-errors \
     --user-data-dir="${CHROME_DIR}" \
