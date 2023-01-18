@@ -11,24 +11,23 @@
     "build-fakeyou": "lerna exec --scope @storyteller/fakeyou.com -- yarn build",
     "start-fakeyou": "PORT=7000 BROWSER=none lerna exec --scope @storyteller/fakeyou.com -- yarn start",
     "start-fakeyou-w": "set PORT=7000 && lerna exec --scope @storyteller/fakeyou.com -- yarn start-w",
-
     "build-storyteller": "lerna exec --scope @storyteller/storyteller.io -- yarn build",
     "start-storyteller": "PORT=7008 BROWSER=none lerna exec --scope @storyteller/storyteller.io -- yarn start",
     "start-storyteller-w": "set PORT=7008 && lerna exec --scope @storyteller/storyteller.io -- yarn start-w",
-
     "build-powerstream": "lerna exec --scope @storyteller/power.stream -- yarn build",
     "start-powerstream": "PORT=7001 BROWSER=none lerna exec --scope @storyteller/power.stream -- yarn start",
     "start-powerstream-w": "set PORT=7001 && lerna exec --scope @storyteller/power.stream -- yarn start-w",
-
     "build-powerstream-dashboard": "lerna exec --scope @storyteller/power.stream-dashboard -- yarn build",
     "start-powerstream-dashboard": "PORT=7002 BROWSER=none lerna exec --scope @storyteller/power.stream-dashboard -- yarn start",
     "start-powerstream-dashboard-w": "set PORT=7002 && lerna exec --scope @storyteller/power.stream-dashboard -- yarn start-w",
-
     "build-powerstream-obs": "lerna exec --scope @storyteller/power.stream-obs -- yarn build",
     "start-powerstream-obs": "PORT=7007 BROWSER=none lerna exec --scope @storyteller/power.stream-obs -- yarn start"
   },
   "devDependencies": {
     "craco": "^0.0.3",
     "lerna": "^4.0.0"
+  },
+  "dependencies": {
+    "yarn": "^1.22.19"
   }
 }

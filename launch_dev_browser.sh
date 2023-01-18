@@ -1,4 +1,4 @@
-#!/usr/bin/bash
+#!/bin/bash
 
 declare -r CHROME_DIR="${HOME}/.chromeDevTemp"
 
@@ -6,9 +6,31 @@ declare -r CHROME_DIR="${HOME}/.chromeDevTemp"
 # Perhaps this is the wrong chmod ownership flags.
 #mkdir -p $CHROME_DIR
 
-chromium \
-  --disable-web-security \
-  --ignore-certificate-errors \
-  --user-data-dir="${CHROME_DIR}" \
-  https://dev.fakeyou.com
+launch_linux() {
+  chromium \
+    --disable-web-security \
+    --ignore-certificate-errors \
+    --user-data-dir="${CHROME_DIR}" \
+    https://dev.fakeyou.com
+}
+
+launch_mac() {
+  open -a "Google Chrome" --args \
+    --disable-web-security \
+    --ignore-certificate-errors \
+    --user-data-dir="${CHROME_DIR}" \
+    https://dev.fakeyou.com
+}
+
+case $OSTYPE in 
+  linux*)
+    launch_linux
+  ;; 
+  darwin*)
+    launch_mac
+  ;; 
+  *)
+    echo "Unknown OS"
+  ;; 
+esac
 
