@@ -1,13 +1,10 @@
-import React, { useState } from "react";
+import React from "react";
 import { TtsModelListItem } from "@storyteller/components/src/api/tts/ListTtsModels";
 import { TtsCategoryType } from "../../../../AppWrapper";
-import Autocomplete from "react-autocomplete";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faMicrophone, faSearch } from "@fortawesome/free-solid-svg-icons";
-import { t } from "i18next";
-import { Analytics } from "../../../../common/Analytics";
-import Select from "react-select";
-import AsyncSelect from "react-select/async";
+import { faMicrophone } from "@fortawesome/free-solid-svg-icons";
+import Select, { ActionMeta } from "react-select";
+import Option from "react-select";
 import { SearchFieldClass } from "./SearchFieldClass";
 
 // NB: This probably is not the best autocomplete library in the world
@@ -31,16 +28,37 @@ interface Props {
 }
 
 export function SelectSearch(props: Props) {
-  // const [searchValue, setSearchValue] = useState<string>("");
+  const options : any = props.allTtsModels.map((ttsModel) => {
+    return { value: ttsModel.model_token, label: ttsModel.title }
+  });
 
-  const options = [
-    { value: "chocolate", label: "Chocolate" },
-    { value: "strawberry", label: "Strawberry" },
-    { value: "vanilla", label: "Vanilla" },
-    { value: "chocolate", label: "Chocolate" },
-    { value: "strawberry", label: "Strawberry" },
-    { value: "vanilla", label: "Vanilla" },
-  ];
+
+  const handleChange = (option: any, actionMeta: ActionMeta<Option>) => {
+    console.log("option", option);
+    console.log("actionMeta", actionMeta);
+
+    const ttsModelToken = option?.value;
+    const maybeNewTtsModel = props.allTtsModelsByTokenMap.get(ttsModelToken);
+
+    if (maybeNewTtsModel === undefined) {
+      return;
+    }
+
+    props.setMaybeSelectedTtsModel(maybeNewTtsModel);
+  }
+
+  // TODO/FIXME: The default option is not working.
+
+  let defaultOption = options.length > 0 ? options[0] : undefined;
+
+  if (props.maybeSelectedTtsModel !== undefined) {
+    defaultOption = { 
+      value: props.maybeSelectedTtsModel.model_token, 
+      label: props.maybeSelectedTtsModel.title,
+    };
+  }
+
+  console.log('defaultOption', defaultOption);
 
   return (
     <>
@@ -49,9 +67,10 @@ export function SelectSearch(props: Props) {
           <FontAwesomeIcon icon={faMicrophone} />
         </span>
         <Select
-          defaultValue={options[2]}
+          defaultValue={defaultOption}
           options={options}
           classNames={SearchFieldClass}
+          onChange={handleChange}
         />
       </div>
     </>
