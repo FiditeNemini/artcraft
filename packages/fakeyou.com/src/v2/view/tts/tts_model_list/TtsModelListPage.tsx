@@ -72,6 +72,7 @@ import {
 import Select from "react-select";
 import AsyncSelect from "react-select/async";
 import { SearchFieldClass } from "./SearchFieldClass";
+import { AVAILABLE_LANGUAGE_MAP, ENGLISH_LANGUAGE } from "../../../../_i18n/AvailableLanguageMap";
 
 export interface EnqueueJobResponsePayload {
   success: boolean;
@@ -283,9 +284,10 @@ function TtsModelListPage(props: Props) {
   let directViewLink = <span />;
 
   if (props.maybeSelectedTtsModel) {
-    let modelLink = `/tts/${props.maybeSelectedTtsModel.model_token}`;
-    // let modelName = props.maybeSelectedTtsModel.title;
-    let userName = props.maybeSelectedTtsModel.creator_display_name;
+    const modelLink = `/tts/${props.maybeSelectedTtsModel.model_token}`;
+    const userName = props.maybeSelectedTtsModel.creator_display_name;
+    const modelLanguage = AVAILABLE_LANGUAGE_MAP[props.maybeSelectedTtsModel.ietf_primary_language_subtag] || ENGLISH_LANGUAGE;
+
     directViewLink = (
       <Link
         to={modelLink}
@@ -306,8 +308,8 @@ function TtsModelListPage(props: Props) {
               />
             </Link>{" "}
             | <FontAwesomeIcon icon={faGlobe} className="me-2" />
-            Language: <span className="fw-semibold">English</span> | Use count:{" "}
-            <span className="fw-semibold">616400</span>
+            Language: <span className="fw-semibold">{modelLanguage.languageName}</span> {/*| Use count:{" "}
+            <span className="fw-semibold">616400</span>*/}
           </p>
         </div>
         {/* <Trans i18nKey="tts.TtsModelListPage.form.modelSeeMoreLink">

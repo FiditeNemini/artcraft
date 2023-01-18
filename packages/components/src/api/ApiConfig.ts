@@ -83,6 +83,7 @@ class ApiConfig {
           (domain === Domain.Localhost || domain === Domain.JungleHorse)
         ) {
           v2ApiHost = "api.dev.fakeyou.com";
+          useSsl = false;
         } else if (domain === Domain.JungleHorse) {
           // TODO: Clean up these branches
           v2ApiHost = "api.jungle.horse";
@@ -90,7 +91,7 @@ class ApiConfig {
     }
 
     this.domain = domain;
-    this.useSsl = useSsl;
+    this.useSsl = false;
     this.v2ApiHost = v2ApiHost;
   }
 
