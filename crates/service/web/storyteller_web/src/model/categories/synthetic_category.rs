@@ -14,4 +14,7 @@ pub struct SyntheticCategory {
 
   pub can_directly_have_models: bool,
   pub can_directly_have_subcategories: bool,
+
+  /// Whether the frontend should alphabetically sort the models.
+  pub should_be_sorted: bool,
 }

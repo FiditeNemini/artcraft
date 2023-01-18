@@ -12,6 +12,7 @@ pub const SYNTHETIC_CATEGORY_LATEST_TTS_MODELS : SyntheticCategory = SyntheticCa
   model_type: ModelType::Tts,
   can_directly_have_models: false,
   can_directly_have_subcategories: false,
+  should_be_sorted: false,
 };
 
 pub const SYNTHETIC_CATEGORY_TRENDING_TTS_MODELS : SyntheticCategory = SyntheticCategory {
@@ -22,6 +23,7 @@ pub const SYNTHETIC_CATEGORY_TRENDING_TTS_MODELS : SyntheticCategory = Synthetic
   model_type: ModelType::Tts,
   can_directly_have_models: false,
   can_directly_have_subcategories: false,
+  should_be_sorted: true,
 };
 
 /// List of the system's statically configured synthetic TTS categories
