@@ -38,6 +38,11 @@ import {
   GetRetrievalJobStatus,
   GetRetrievalJobStatusIsOk,
 } from "@storyteller/components/src/api/retrieval/GetRetrievalJobStatus";
+import { GetComputedTtsCategoryAssignmentsSuccessResponse } from "@storyteller/components/src/api/category/GetComputedTtsCategoryAssignments";
+import {
+  AVAILABLE_LANGUAGE_MAP,
+  ENGLISH_LANGUAGE,
+} from "./_i18n/AvailableLanguageMap";
 
 i18n
   .use(initReactI18next) // passes i18n down to react-i18next
@@ -72,6 +77,11 @@ interface Props {
 
   allTtsModels: TtsModelListItem[];
   setAllTtsModels: (allTtsModels: TtsModelListItem[]) => void;
+
+  computedTtsCategoryAssignments?: GetComputedTtsCategoryAssignmentsSuccessResponse;
+  setComputedTtsCategoryAssignments: (
+    categoryAssignments: GetComputedTtsCategoryAssignmentsSuccessResponse
+  ) => void;
 
   allTtsCategoriesByTokenMap: Map<string, TtsCategoryType>;
   allTtsModelsByTokenMap: Map<string, TtsModelListItem>;
@@ -231,85 +241,31 @@ class App extends React.Component<Props, State> {
   queryLanguage = async () => {
     let locale = await DetectLocale();
     if (DetectLocaleIsOk(locale)) {
-      // TODO: Does not respect preference
-      const hasChineseSimplified = locale.language_codes.indexOf("zh") > -1;
-      const hasFrench = locale.language_codes.indexOf("fr") > -1;
-      const hasGerman = locale.language_codes.indexOf("de") > -1;
-      const hasHindi = locale.language_codes.indexOf("hi") > -1;
-      const hasIndonesian = locale.language_codes.indexOf("id") > -1;
-      const hasItalian = locale.language_codes.indexOf("it") > -1;
-      const hasJapanese = locale.language_codes.indexOf("ja") > -1;
-      const hasKorean = locale.language_codes.indexOf("ko") > -1;
-      const hasPortuguese = locale.language_codes.indexOf("pt") > -1;
-      const hasSpanish = locale.language_codes.indexOf("es") > -1;
-      const hasTurkish = locale.language_codes.indexOf("tr") > -1;
-      const hasVietnamese = locale.language_codes.indexOf("vi") > -1;
+      // NB: We treat the language preference as being the order in the array.
+      //  As of 2023-01-14, the backend does not handle quality values / q-weights,
+      //  so these may be slightly wrong. An adjustment to the server will fix this.
 
-      let displayLanguage = Language.English;
-      let languageCode = "en";
+      let preferredLanguage = ENGLISH_LANGUAGE;
 
-      if (hasSpanish) {
-        displayLanguage = Language.Spanish;
-        languageCode = "es";
-      } else if (hasPortuguese) {
-        displayLanguage = Language.Portuguese;
-        languageCode = "pt";
-      } else if (hasTurkish) {
-        displayLanguage = Language.Turkish;
-        languageCode = "tr";
-      } else if (hasIndonesian) {
-        displayLanguage = Language.Indonesian;
-        languageCode = "id";
-      } else if (hasGerman) {
-        displayLanguage = Language.German;
-        languageCode = "de";
-      } else if (hasJapanese) {
-        displayLanguage = Language.Japanese;
-        languageCode = "ja";
-      } else if (hasKorean) {
-        displayLanguage = Language.Korean;
-        languageCode = "ko";
-      } else if (hasFrench) {
-        displayLanguage = Language.French;
-        languageCode = "fr";
-      } else if (hasVietnamese) {
-        displayLanguage = Language.Vietnamese;
-        languageCode = "vi";
-      } else if (hasHindi) {
-        displayLanguage = Language.Hindi;
-        languageCode = "hi";
-      } else if (hasItalian) {
-        displayLanguage = Language.Italian;
-        languageCode = "it";
-      } else if (hasChineseSimplified) {
-        displayLanguage = Language.ChineseSimplified;
-        languageCode = "zh";
+      for (let languageCode of locale.language_codes) {
+        let maybeLanguage = AVAILABLE_LANGUAGE_MAP[languageCode];
+
+        if (maybeLanguage !== undefined) {
+          preferredLanguage = maybeLanguage;
+          break;
+        }
       }
 
-      const showNotice = hasSpanish || hasPortuguese || hasTurkish;
-      const showPleaseFollowNotice = hasSpanish || hasPortuguese;
-
-      const showBootstrapLanguageNotice =
-        hasJapanese ||
-        hasChineseSimplified ||
-        hasFrench ||
-        hasGerman ||
-        hasHindi ||
-        hasIndonesian ||
-        hasItalian ||
-        hasKorean ||
-        hasTurkish ||
-        hasVietnamese;
-
       this.setState({
-        isShowingLanguageNotice: showNotice,
-        displayLanguage: displayLanguage,
-        primaryLanguageCode: languageCode,
-        isShowingPleaseFollowNotice: showPleaseFollowNotice,
-        isShowingBootstrapLanguageNotice: showBootstrapLanguageNotice,
+        isShowingLanguageNotice: false, // TODO: Remove/consolidate
+        displayLanguage: preferredLanguage.language,
+        primaryLanguageCode: preferredLanguage.languageCode,
+        isShowingPleaseFollowNotice: preferredLanguage.showPleaseFollowNotice,
+        isShowingBootstrapLanguageNotice:
+          preferredLanguage.showBootstrapLanguageNotice,
       });
 
-      i18n.changeLanguage(languageCode);
+      i18n.changeLanguage(preferredLanguage.languageCode);
     }
   };
 
@@ -704,6 +660,12 @@ class App extends React.Component<Props, State> {
                     setTtsModels={this.props.setAllTtsModels}
                     allTtsCategories={this.props.allTtsCategories}
                     setAllTtsCategories={this.props.setAllTtsCategories}
+                    computedTtsCategoryAssignments={
+                      this.props.computedTtsCategoryAssignments
+                    }
+                    setComputedTtsCategoryAssignments={
+                      this.props.setComputedTtsCategoryAssignments
+                    }
                     allTtsCategoriesByTokenMap={
                       this.props.allTtsCategoriesByTokenMap
                     }

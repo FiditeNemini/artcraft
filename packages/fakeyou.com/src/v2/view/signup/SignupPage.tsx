@@ -10,6 +10,7 @@ import { Link } from "react-router-dom";
 import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
 import { motion } from "framer-motion";
 import { container, panel } from "../../../data/animation";
+import { Analytics } from "../../../common/Analytics";
 
 enum FieldTriState {
   EMPTY_FALSE,
@@ -109,7 +110,7 @@ function SignupPage(props: Props) {
     let passwordConfirmationInvalidReason = "";
 
     if (newPassword.length > 1) {
-      if (newPassword.length < 5) {
+      if (newPassword.length < 6) {
         passwordValid = FieldTriState.FALSE;
         passwordInvalidReason = "password is too short";
       } else {
@@ -166,6 +167,8 @@ function SignupPage(props: Props) {
   ): Promise<boolean> => {
     ev.preventDefault();
 
+    Analytics.accountSignupAttempt();
+
     if (
       !usernameValid ||
       !emailValid ||
@@ -194,11 +197,12 @@ function SignupPage(props: Props) {
         setUsernameInvalidReason(response.error_fields["username"] || "");
       }
     } else if (CreateAccountIsSuccess(response)) {
-      console.log("querying new session");
       props.querySessionCallback();
 
+      Analytics.accountSignupComplete();
+
       // TODO: Switch to functional component.
-      window.location.href = "/";
+      window.location.href = "/pricing";
     }
 
     return false;
@@ -358,12 +362,12 @@ function SignupPage(props: Props) {
                     {passwordConfirmationInvalidReason}
                   </p>
                 </div>
-                <div className="alert alert-warning mb-0">
+                {/*<div className="alert alert-warning mb-0">
                   <strong>Remember your password!</strong> We don't have
                   password reset currently, and it'll be a few more weeks before
                   it's added (there are more important features to work on). If
                   you lose your password, please let us know in Discord.
-                </div>
+                </div>*/}
                 <button className="btn btn-primary btn-lg w-100 mt-2">
                   Sign up
                 </button>

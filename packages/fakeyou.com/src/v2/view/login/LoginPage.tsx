@@ -11,6 +11,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faUser, faKey } from "@fortawesome/free-solid-svg-icons";
 import { motion } from "framer-motion";
 import { container, panel } from "../../../data/animation";
+import { Analytics } from "../../../common/Analytics";
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -57,14 +58,16 @@ function LoginPage(props: Props) {
       password: password,
     };
 
+    Analytics.accountLoginAttempt();
+
     const response = await CreateSession(request);
 
     if (CreateSessionIsError(response)) {
       setErrorMessage(response.error_message);
     } else if (CreateSessionIsSuccess(response)) {
-      console.log("querying new session");
       props.querySessionAction();
       props.querySessionSubscriptionsAction();
+      Analytics.accountLoginSuccess();
       history.push("/");
     }
 

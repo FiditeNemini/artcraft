@@ -7,6 +7,7 @@ import { PlayIcon } from "../../_icons/PlayIcon";
 import { PauseIcon } from "../../_icons/PauseIcon";
 import { RepeatIcon } from "../../_icons/RepeatIcon";
 import { NoRepeatIcon } from "../../_icons/NoRepeatIcon";
+import { Analytics } from "../../../../common/Analytics";
 
 enum PlaybackSpeed {
   HALF,
@@ -69,6 +70,7 @@ function TtsResultAudioPlayerFc(props: Props) {
   const togglePlayPause = () => {
     if (waveSurfer) {
       waveSurfer.playPause();
+      Analytics.ttsResultPageClickPlayPauseToggle();
     }
   };
 

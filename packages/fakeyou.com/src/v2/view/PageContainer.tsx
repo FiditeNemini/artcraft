@@ -62,6 +62,7 @@ import { CheckoutSuccessPage } from "./premium/CheckoutSuccessPage";
 import { CheckoutCancelPage } from "./premium/CheckoutCancelPage";
 import { PortalSuccessPage } from "./premium/PortalSuccessPage";
 import { PrivacyPage } from "./about/privacy_page/PrivacyPage";
+import { GetComputedTtsCategoryAssignmentsSuccessResponse } from "@storyteller/components/src/api/category/GetComputedTtsCategoryAssignments";
 //import { LandingPage } from "./landing/LandingPage";
 //import { VcModelListPage } from "./vc/vc_model_list/VcModelListPage";
 
@@ -113,6 +114,11 @@ interface Props {
 
   allTtsCategories: TtsCategoryType[];
   setAllTtsCategories: (allTtsCategories: TtsCategoryType[]) => void;
+
+  computedTtsCategoryAssignments?: GetComputedTtsCategoryAssignmentsSuccessResponse;
+  setComputedTtsCategoryAssignments: (
+    categoryAssignments: GetComputedTtsCategoryAssignmentsSuccessResponse
+  ) => void;
 
   allTtsCategoriesByTokenMap: Map<string, TtsCategoryType>;
   allTtsModelsByTokenMap: Map<string, TtsModelListItem>;
@@ -473,6 +479,12 @@ class PageContainer extends React.Component<Props, State> {
                 setAllTtsCategories={this.props.setAllTtsCategories}
                 allTtsCategoriesByTokenMap={
                   this.props.allTtsCategoriesByTokenMap
+                }
+                computedTtsCategoryAssignments={
+                  this.props.computedTtsCategoryAssignments
+                }
+                setComputedTtsCategoryAssignments={
+                  this.props.setComputedTtsCategoryAssignments
                 }
                 allTtsModelsByTokenMap={this.props.allTtsModelsByTokenMap}
                 ttsModelsByCategoryToken={this.props.ttsModelsByCategoryToken}

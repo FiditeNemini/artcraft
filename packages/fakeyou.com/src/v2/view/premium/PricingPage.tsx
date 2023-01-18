@@ -18,6 +18,7 @@ import {
 import { motion } from "framer-motion";
 import { container, item, panel } from "../../../data/animation";
 import { FakeYouFrontendEnvironment } from "@storyteller/components/src/env/FakeYouFrontendEnvironment";
+import { Analytics } from "../../../common/Analytics";
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -50,15 +51,35 @@ function PricingPage(props: Props) {
   };
 
   const beginStripeFlow = async (
-    internal_plan_key: string
+    internal_plan_key: string,
+    analyticsName: string,
   ): Promise<boolean> => {
+
+    switch (analyticsName) {
+      case "plus":
+        Analytics.premiumSelectPlanPlus();
+        break;
+      case "pro":
+        Analytics.premiumSelectPlanPro();
+        break;
+      case "elite":
+        Analytics.premiumSelectPlanElite();
+        break;
+      case "unsubscribe":
+        Analytics.premiumSelectUnsubscribe();
+        break;
+    }
+
     if (!props.sessionWrapper.isLoggedIn()) {
       // TODO: This needs to bring the user back to purchase flow.
+      Analytics.premiumBounceToSignup();
       history.push("/signup");
       return false;
     } else if (props.sessionSubscriptionsWrapper.hasPaidFeatures()) {
+      Analytics.premiumForwardToStripePortal();
       return await beginStripePortalFlow();
     } else {
+      Analytics.premiumForwardToStripeCheckout();
       return await beginStripeCheckoutFlow(internal_plan_key);
     }
   };
@@ -115,7 +136,7 @@ function PricingPage(props: Props) {
     freeButton = (
       <>
         <button
-          onClick={() => beginStripeFlow(unsubscribeKey)}
+          onClick={() => beginStripeFlow(unsubscribeKey, "unsubscribe")}
           className="btn btn-secondary w-100 fs-6"
         >
           Unsubscribe
@@ -170,7 +191,7 @@ function PricingPage(props: Props) {
                         icon={faCheck}
                         className="text-red me-3"
                       />
-                      {e} <span className="small-text">(registered users)</span>
+                      {e}
                     </li>
                   );
                 })}
@@ -317,7 +338,7 @@ function PricingPage(props: Props) {
             <div className="rounded panel p-4 h-100">
               <h2 className="text-center my-2 fw-bold mb-4">{FYP.plus.tier}</h2>
               <button
-                onClick={() => beginStripeFlow(FYP.plus.internal_plan_key[planKey])}
+                onClick={() => beginStripeFlow(FYP.plus.internal_plan_key[planKey], "plus")}
                 className="btn btn-primary w-100 fs-6"
                 disabled={plusButtonDisabled}
               >
@@ -414,7 +435,7 @@ function PricingPage(props: Props) {
             <div className={proBorderCss}>
               <h2 className="text-center my-2 fw-bold mb-4">{FYP.pro.tier}</h2>
               <button
-                onClick={() => beginStripeFlow(FYP.pro.internal_plan_key[planKey])}
+                onClick={() => beginStripeFlow(FYP.pro.internal_plan_key[planKey], "pro")}
                 className="btn btn-primary w-100 fs-6"
                 disabled={proButtonDisabled}
               >
@@ -525,7 +546,7 @@ function PricingPage(props: Props) {
                 {FYP.elite.tier}
               </h2>
               <button
-                onClick={() => beginStripeFlow(FYP.elite.internal_plan_key[planKey])}
+                onClick={() => beginStripeFlow(FYP.elite.internal_plan_key[planKey], "elite")}
                 className="btn btn-primary w-100 fs-6"
                 disabled={eliteButtonDisabled}
               >

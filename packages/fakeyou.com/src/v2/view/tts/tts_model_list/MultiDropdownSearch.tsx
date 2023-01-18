@@ -9,6 +9,7 @@ import {
 import { TtsModelListItem } from "@storyteller/components/src/api/tts/ListTtsModels";
 import { TtsCategoryType } from "../../../../AppWrapper";
 import { Trans, useTranslation } from "react-i18next";
+import { Analytics } from "../../../../common/Analytics";
 
 interface Props {
   allTtsCategories: TtsCategoryType[];
@@ -202,6 +203,7 @@ export function MultiDropdownSearch(props: Props) {
         <div className="d-flex gap-3 align-items-center mb-4 w-100">
           <div className="form-group input-icon w-100">
             <select
+              onClick={() => { Analytics.ttsClickSelectCategory() } }
               className={selectCssClasses}
               name={`categories-${i}`}
               onChange={(ev) => handleChangeCategory(ev, i)}
@@ -315,6 +317,7 @@ export function MultiDropdownSearch(props: Props) {
           className={selectClasses}
           name="tts-model-select"
           onChange={handleChangeVoice}
+          onClick={() => { Analytics.ttsSelectVoiceFromCategory() }}
           disabled={isLoading}
         >
           {isLoading

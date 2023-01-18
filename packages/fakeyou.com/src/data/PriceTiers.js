@@ -7,6 +7,10 @@ const FAKEYOU_PRICES = {
     },
     tier: "Starter",
     price: 0,
+    priority: {
+      title: "Processing Priority",
+      features: ["Slowest"],
+    },
     tts: {
       title: "TTS",
       features: ["Unlimited generation", "Up to 12 seconds audio"],
@@ -27,44 +31,6 @@ const FAKEYOU_PRICES = {
       title: "Wav2Lip",
       features: ["Up to 12 seconds video"],
     },
-    priority: {
-      title: "Processing Priority",
-      features: ["Level 1"],
-    },
-  },
-
-  //Basic Tier
-  basic: {
-    internal_plan_key: {
-      development: null, // TODO
-      production: null, // TODO
-    },
-    tier: "Basic",
-    price: 3,
-    tts: {
-      title: "TTS",
-      features: ["Unlimited generation", "Up to 20 seconds audio"],
-    },
-    // vcweb: {
-    //   title: "VC Web",
-    //   features: ["Up to 20 seconds audio", "Push to play"],
-    // },
-    // vcapp: {
-    //   title: "VC App",
-    //   features: [
-    //     "7 model downloads",
-    //     "Up to 20 secs prerecorded",
-    //     "Up to 5 mins realtime",
-    //   ],
-    // },
-    w2l: {
-      title: "Wav2Lip",
-      features: ["Up to 30 seconds video"],
-    },
-    priority: {
-      title: "Processing Priority",
-      features: ["Level 10"],
-    },
   },
 
   //Plus Tier
@@ -75,6 +41,10 @@ const FAKEYOU_PRICES = {
     },
     tier: "Plus",
     price: 7,
+    priority: {
+      title: "Processing Priority",
+      features: ["Normal"],
+    },
     tts: {
       title: "TTS",
       features: ["Unlimited generation", "Up to 30 seconds audio"],
@@ -95,10 +65,6 @@ const FAKEYOU_PRICES = {
       title: "Wav2Lip",
       features: ["Up to 1 minute video"],
     },
-    priority: {
-      title: "Processing Priority",
-      features: ["Level 20"],
-    },
   },
 
   //Pro Tier
@@ -109,6 +75,10 @@ const FAKEYOU_PRICES = {
     },
     tier: "Pro",
     price: 15,
+    priority: {
+      title: "Processing Priority",
+      features: ["Faster"],
+    },
     tts: {
       title: "TTS",
       features: [
@@ -134,10 +104,6 @@ const FAKEYOU_PRICES = {
       title: "Wav2Lip",
       features: ["Up to 2 minutes video"],
     },
-    priority: {
-      title: "Processing Priority",
-      features: ["Level 30"],
-    },
     api: {
       title: "API Access",
       features: ["Full API access"],
@@ -152,6 +118,10 @@ const FAKEYOU_PRICES = {
     },
     tier: "Elite",
     price: 25,
+    priority: {
+      title: "Processing Priority",
+      features: ["Fastest"],
+    },
     tts: {
       title: "TTS",
       features: [
@@ -177,10 +147,6 @@ const FAKEYOU_PRICES = {
     w2l: {
       title: "Wav2Lip",
       features: ["Up to 2 minutes video"],
-    },
-    priority: {
-      title: "Processing Priority",
-      features: ["Level 40"],
     },
     api: {
       title: "API Access",

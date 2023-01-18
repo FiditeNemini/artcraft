@@ -8,7 +8,7 @@
         "by": "by",
         "categoryFiltersLabel": "Category / Langauge",
         "modelSeeMoreLink": "See more details about the \"<1>{{modelName}}</1>\" model by <3>{{userName}}</3>",
-        "searchHint": "Search Term",
+        "searchHint": "Search for Voice",
         "searchLabel": "Search",
         "textInputHint": "Textual shenanigans go here...",
         "voicesLabel": "Voice ({{count}} to choose from)"

@@ -28,7 +28,7 @@ import {
   ListTtsCategoriesIsOk,
 } from "../../../api/category/ListTtsCategories";
 import { MultiDropdownSearch } from "./MultiDropdownSearch";
-import { SyntheticCategory, TtsCategoryType } from "../../../../AppWrapper";
+import { TtsCategoryType } from "../../../../AppWrapper";
 import { AutocompleteSearch } from "./AutocompleteSearch";
 import { LanguageNotice } from "./notices/LanguageNotice";
 import { Language } from "@storyteller/components/src/i18n/Language";
@@ -48,7 +48,16 @@ import { motion } from "framer-motion";
 import { container, panel } from "../../../../data/animation";
 import { SessionSubscriptionsWrapper } from "@storyteller/components/src/session/SessionSubscriptionsWrapper";
 import { TtsPageHero } from "./TtsPageHero";
-// import { BackLink } from "../../_common/BackLink";
+import { Analytics } from "../../../../common/Analytics";
+import {
+  GetComputedTtsCategoryAssignments,
+  GetComputedTtsCategoryAssignmentsIsError,
+  GetComputedTtsCategoryAssignmentsIsOk,
+  GetComputedTtsCategoryAssignmentsSuccessResponse,
+} from "@storyteller/components/src/api/category/GetComputedTtsCategoryAssignments";
+import {
+  DynamicallyCategorizeModels,
+} from "../../../../model/categories/SyntheticCategory";
 
 export interface EnqueueJobResponsePayload {
   success: boolean;
@@ -90,6 +99,11 @@ interface Props {
   allTtsCategories: TtsCategoryType[];
   setAllTtsCategories: (allTtsCategories: TtsCategoryType[]) => void;
 
+  computedTtsCategoryAssignments?: GetComputedTtsCategoryAssignmentsSuccessResponse;
+  setComputedTtsCategoryAssignments: (
+    categoryAssignments: GetComputedTtsCategoryAssignmentsSuccessResponse
+  ) => void;
+
   allTtsCategoriesByTokenMap: Map<string, TtsCategoryType>;
   allTtsModelsByTokenMap: Map<string, TtsModelListItem>;
   ttsModelsByCategoryToken: Map<string, Set<TtsModelListItem>>;
@@ -107,8 +121,10 @@ function TtsModelListPage(props: Props) {
   let {
     setTtsModels,
     setAllTtsCategories,
+    setComputedTtsCategoryAssignments,
     ttsModels,
     allTtsCategories,
+    computedTtsCategoryAssignments,
     maybeSelectedTtsModel,
     setMaybeSelectedTtsModel,
   } = props;
@@ -119,6 +135,10 @@ function TtsModelListPage(props: Props) {
 
   const ttsModelsLoaded = ttsModels.length > 0;
   const ttsCategoriesLoaded = allTtsCategories.length > 0;
+  const computedTtsCategoryAssignmentsLoaded =
+    computedTtsCategoryAssignments !== undefined &&
+    computedTtsCategoryAssignments.category_token_to_tts_model_tokens.recursive
+      .size > 0;
 
   const listModels = useCallback(async () => {
     if (ttsModelsLoaded) {
@@ -126,7 +146,7 @@ function TtsModelListPage(props: Props) {
     }
     const models = await ListTtsModels();
     if (models) {
-      dynamicallyCategorizeModels(models);
+      DynamicallyCategorizeModels(models);
       setTtsModels(models);
       if (!maybeSelectedTtsModel && models.length > 0) {
         let model = models[0];
@@ -152,20 +172,35 @@ function TtsModelListPage(props: Props) {
     }
     const categoryList = await ListTtsCategories();
     if (ListTtsCategoriesIsOk(categoryList)) {
-      const serverCategories: TtsCategoryType[] = categoryList.categories;
-      const dynamicCategories: TtsCategoryType[] =
-        generateSyntheticCategories();
-      const allCategories = serverCategories.concat(dynamicCategories);
-      setAllTtsCategories(allCategories);
+      // NB(bt, 2023-01-18): We no longer generate categories on the frontend.
+      //const serverCategories: TtsCategoryType[] = categoryList.categories;
+      //const dynamicCategories: TtsCategoryType[] =
+      //  GenerateSyntheticCategories();
+      //const allCategories = serverCategories.concat(dynamicCategories);
+      //setAllTtsCategories(allCategories);
+      setAllTtsCategories(categoryList.categories);
     } else if (ListTtsCategoriesIsError(categoryList)) {
       // TODO: Retry on decay function
     }
   }, [setAllTtsCategories, ttsCategoriesLoaded]);
 
+  const getComputedAssignments = useCallback(async () => {
+    if (computedTtsCategoryAssignmentsLoaded) {
+      return; // Already queried.
+    }
+    const computedAssignments = await GetComputedTtsCategoryAssignments();
+    if (GetComputedTtsCategoryAssignmentsIsOk(computedAssignments)) {
+      setComputedTtsCategoryAssignments(computedAssignments);
+    } else if (GetComputedTtsCategoryAssignmentsIsError(computedAssignments)) {
+      // TODO: Retry on decay function
+    }
+  }, [setComputedTtsCategoryAssignments, computedTtsCategoryAssignmentsLoaded]);
+
   useEffect(() => {
     listModels();
     listTtsCategories();
-  }, [listModels, listTtsCategories]);
+    getComputedAssignments();
+  }, [listModels, listTtsCategories, getComputedAssignments]);
 
   const handleChangeText = (ev: React.FormEvent<HTMLTextAreaElement>) => {
     const textValue = (ev.target as HTMLTextAreaElement).value;
@@ -193,6 +228,8 @@ function TtsModelListPage(props: Props) {
 
     const response = await GenerateTtsAudio(request);
 
+    Analytics.ttsGenerate(modelToken, props.textBuffer.length);
+
     if (GenerateTtsAudioIsOk(response)) {
       setMaybeTtsError(undefined);
       props.enqueueTtsJob(response.inference_job_token);
@@ -206,6 +243,9 @@ function TtsModelListPage(props: Props) {
   const handleClearClick = (ev: React.FormEvent<HTMLButtonElement>) => {
     ev.preventDefault();
     props.clearTextBuffer();
+
+    Analytics.ttsClear(props.maybeSelectedTtsModel?.model_token);
+
     return false;
   };
 
@@ -216,7 +256,13 @@ function TtsModelListPage(props: Props) {
     let modelName = props.maybeSelectedTtsModel.title;
     let userName = props.maybeSelectedTtsModel.creator_display_name;
     directViewLink = (
-      <Link to={modelLink} className="py-2">
+      <Link
+        to={modelLink}
+        onClick={() => {
+          Analytics.ttsClickModelDetailsLink();
+        }}
+        className="py-2"
+      >
         <Trans i18nKey="tts.TtsModelListPage.form.modelSeeMoreLink">
           See more details about the "
           <span className="fw-semibold">{{ modelName }}</span>" model by&nbsp;
@@ -371,6 +417,9 @@ function TtsModelListPage(props: Props) {
 
                 <div className="text-input">
                   <textarea
+                    onClick={() => {
+                      Analytics.ttsClickTextInputBox();
+                    }}
                     onChange={handleChangeText}
                     className="form-control fs-5"
                     style={{ minHeight: "200px" }}
@@ -425,57 +474,6 @@ function TtsModelListPage(props: Props) {
       />
     </motion.div>
   );
-}
-
-function generateSyntheticCategories(): SyntheticCategory[] {
-  return [
-    // Under-categorized
-    new SyntheticCategory("Under-categorized Models", "syn:under"),
-    new SyntheticCategory(
-      "With 0 categories",
-      "syn:uncategorized",
-      "syn:under"
-    ),
-    new SyntheticCategory("With 1 category", "syn:one-category", "syn:under"),
-    // Most recent
-    new SyntheticCategory("Most Recent Voices", "syn:most-recent"),
-  ];
-}
-
-// Directly mutate the model records
-function dynamicallyCategorizeModels(models: TtsModelListItem[]) {
-  // NB: Sorting by creation date will involve more refactoring, so this is fine for now.
-  const mostRecentModelTokens = new Set(
-    [...models]
-      .sort((modelA, modelB) => {
-        const dateA = new Date(modelA.created_at);
-        const dateB = new Date(modelB.created_at);
-        if (dateA > dateB) {
-          return -1;
-        } else if (dateA < dateB) {
-          return 1;
-        } else {
-          return 0;
-        }
-      })
-      .map((model) => model.model_token)
-      .slice(0, 25)
-  );
-
-  models.forEach((model) => {
-    if (!model.category_tokens) {
-      model.category_tokens = [];
-    }
-    if (model.category_tokens.length === 1) {
-      model.category_tokens.push("syn:one-category");
-    } else if (model.category_tokens.length === 0) {
-      model.category_tokens.push("syn:uncategorized");
-    }
-
-    if (mostRecentModelTokens.has(model.model_token)) {
-      model.category_tokens.push("syn:most-recent");
-    }
-  });
 }
 
 export { TtsModelListPage };
