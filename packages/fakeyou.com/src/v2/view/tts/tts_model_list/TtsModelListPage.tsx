@@ -132,6 +132,23 @@ interface Props {
 }
 
 function TtsModelListPage(props: Props) {
+  //Loading spinning icon
+  const [loading, setLoading] = useState(false);
+
+  const handleLoading = () => {
+    setLoading(true);
+    setTimeout(() => {
+      setLoading(false);
+    }, 1000);
+  };
+
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      setLoading(false);
+    }, 1000);
+    return () => clearTimeout(timeout);
+  }, []);
+
   let {
     setTtsModels,
     setAllTtsCategories,
@@ -392,6 +409,11 @@ function TtsModelListPage(props: Props) {
 
   // NB: If the text is too long, don't allow submission
   let remainingCharactersButtonDisabled = props.textBuffer.trim().length > 1024;
+  let noTextInputButtonDisabled = props.textBuffer.trim() === "";
+
+  const speakButtonClass = loading
+    ? "btn btn-primary w-100 disabled"
+    : "btn btn-primary w-100";
 
   return (
     <motion.div initial="hidden" animate="visible" variants={container}>
@@ -634,18 +656,26 @@ function TtsModelListPage(props: Props) {
                       ></textarea>
                       <div className="d-flex gap-3">
                         <button
-                          className="btn btn-primary w-100"
-                          disabled={remainingCharactersButtonDisabled}
+                          className={speakButtonClass}
+                          disabled={
+                            remainingCharactersButtonDisabled ||
+                            noTextInputButtonDisabled
+                          }
+                          onClick={handleLoading}
+                          type="submit"
                         >
                           <FontAwesomeIcon
                             icon={faVolumeHigh}
                             className="me-2"
                           />
                           {t("tts.TtsModelListPage.form.buttons.speak")}
+
+                          {loading && <LoadingIcon />}
                         </button>
                         <button
                           className="btn btn-destructive w-25"
                           onClick={handleClearClick}
+                          disabled={noTextInputButtonDisabled}
                         >
                           <FontAwesomeIcon
                             icon={faDeleteLeft}
@@ -711,5 +741,18 @@ function TtsModelListPage(props: Props) {
     </motion.div>
   );
 }
+
+const LoadingIcon: React.FC = () => {
+  return (
+    <>
+      <span
+        className="spinner-border spinner-border-sm ms-3"
+        role="status"
+        aria-hidden="true"
+      ></span>
+      <span className="visually-hidden">Loading...</span>
+    </>
+  );
+};
 
 export { TtsModelListPage };
