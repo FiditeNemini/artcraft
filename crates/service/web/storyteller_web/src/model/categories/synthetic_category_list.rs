@@ -7,8 +7,8 @@ use tokens::tokens::model_categories::ModelCategoryToken;
 pub const SYNTHETIC_CATEGORY_LATEST_TTS_MODELS : SyntheticCategory = SyntheticCategory {
   category_token: "SYNTHETIC_CATEGORY:LATEST_MODELS",
   maybe_super_category_token: None,
-  name: "Latest Models",
-  name_for_dropdown: "Latest Models",
+  name: "Latest Voices 🎁",
+  name_for_dropdown: "Latest Voices 🎁",
   model_type: ModelType::Tts,
   can_directly_have_models: false,
   can_directly_have_subcategories: false,
@@ -17,8 +17,8 @@ pub const SYNTHETIC_CATEGORY_LATEST_TTS_MODELS : SyntheticCategory = SyntheticCa
 pub const SYNTHETIC_CATEGORY_TRENDING_TTS_MODELS : SyntheticCategory = SyntheticCategory {
   category_token: "SYNTHETIC_CATEGORY:TRENDING_MODELS",
   maybe_super_category_token: None,
-  name: "Trending Models",
-  name_for_dropdown: "Trending Models",
+  name: "Trending Voices 🔥",
+  name_for_dropdown: "Trending Voices 🔥",
   model_type: ModelType::Tts,
   can_directly_have_models: false,
   can_directly_have_subcategories: false,
