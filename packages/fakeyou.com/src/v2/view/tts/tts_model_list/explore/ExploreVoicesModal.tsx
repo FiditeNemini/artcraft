@@ -101,9 +101,7 @@ export function ExploreVoicesModal(props: Props) {
                   ttsModelsByCategoryToken={props.ttsModelsByCategoryToken}
 
                   dropdownCategories={props.dropdownCategories}
-                  setDropdownCategories={props.setDropdownCategories}
                   selectedCategories={props.selectedCategories}
-                  setSelectedCategories={props.setSelectedCategories}
                   maybeSelectedTtsModel={props.maybeSelectedTtsModel}
                   setMaybeSelectedTtsModel={
                     props.setMaybeSelectedTtsModel

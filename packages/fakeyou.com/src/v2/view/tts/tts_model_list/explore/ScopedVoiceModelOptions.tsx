@@ -11,7 +11,8 @@ import { TtsModelListItem } from "@storyteller/components/src/api/tts/ListTtsMod
 import { TtsCategoryType } from "../../../../../AppWrapper";
 import { Trans, useTranslation } from "react-i18next";
 import { Analytics } from "../../../../../common/Analytics";
-import Select from "react-select";
+import Select, { ActionMeta } from "react-select";
+//import Option from "react-select";
 import { SearchFieldClass } from "../search/SearchFieldClass";
 
 interface Props {
@@ -23,10 +24,7 @@ interface Props {
   ttsModelsByCategoryToken: Map<string, Set<TtsModelListItem>>;
 
   dropdownCategories: TtsCategoryType[][];
-  setDropdownCategories: (dropdownCategories: TtsCategoryType[][]) => void;
-
   selectedCategories: TtsCategoryType[];
-  setSelectedCategories: (selectedCategories: TtsCategoryType[]) => void;
 
   maybeSelectedTtsModel?: TtsModelListItem;
   setMaybeSelectedTtsModel: (maybeSelectedTtsModel: TtsModelListItem) => void;
@@ -34,27 +32,35 @@ interface Props {
 
 export function ScopedVoiceModelOptions(props: Props) {
   const {
-    allTtsCategories,
     allTtsModels,
-    allTtsCategoriesByTokenMap,
-    allTtsModelsByTokenMap,
     ttsModelsByCategoryToken,
-    dropdownCategories,
-    setDropdownCategories,
     selectedCategories,
-    setSelectedCategories,
     maybeSelectedTtsModel,
   } = props;
 
   const { t } = useTranslation();
 
+  const handleChange = (option: any, actionMeta: any) => {
+    const ttsModelToken = option?.value;
+    const maybeNewTtsModel = props.allTtsModelsByTokenMap.get(ttsModelToken);
+
+    if (maybeNewTtsModel === undefined) {
+      return;
+    }
+
+    props.setMaybeSelectedTtsModel(maybeNewTtsModel);
+  }
+
+
   const leafiestCategory = selectedCategories[selectedCategories.length - 1];
 
   let leafiestCategoryModels: Array<TtsModelListItem> = new Array();
+
   if (leafiestCategory !== undefined) {
     leafiestCategoryModels =
-      Array.from(ttsModelsByCategoryToken.get(leafiestCategory.category_token) ||
-      new Set());
+      Array.from(
+        ttsModelsByCategoryToken.get(leafiestCategory.category_token) || 
+          new Set());
   } else {
     leafiestCategoryModels = Array.from(new Set(allTtsModels));
   }
@@ -65,12 +71,18 @@ export function ScopedVoiceModelOptions(props: Props) {
       value: ttsModel.model_token,
     }
   });
+
+  let selectedOption = options.find((option) => option.value === maybeSelectedTtsModel?.model_token);
+
+  if (selectedOption === undefined && options.length > 0) {
+    selectedOption = options[0];
+  }
  
   const voiceCount = leafiestCategoryModels.length;
 
   return (
     <>
-      <div className="">
+      <div className="col">
         <label className="sub-title">
           <Trans
             i18nKey="tts.TtsModelListPage.form.voicesLabel"
@@ -86,9 +98,10 @@ export function ScopedVoiceModelOptions(props: Props) {
           </span>
 
           <Select
-            defaultValue={options[2]}
+            defaultValue={selectedOption}
             options={options}
             classNames={SearchFieldClass}
+            onChange={handleChange}
             />
         </div>
       </div>
