@@ -143,8 +143,8 @@ export type AvailableTtsLanguageKey = "en" | "es" | "it" | "de" | "fr" | "pt";
 export const AVAILABLE_TTS_LANGUAGE_CATEGORY_MAP : Record<AvailableTtsLanguageKey, AvailableLanguage> = {
   en: AVAILABLE_LANGUAGE_MAP["en"],
   es: AVAILABLE_LANGUAGE_MAP["es"],
-  it: AVAILABLE_LANGUAGE_MAP["it"],
   de: AVAILABLE_LANGUAGE_MAP["de"],
   fr: AVAILABLE_LANGUAGE_MAP["fr"],
+  it: AVAILABLE_LANGUAGE_MAP["it"],
   pt: AVAILABLE_LANGUAGE_MAP["pt"],
 }
