@@ -48,6 +48,30 @@ export function ScopedVoiceModelOptions(props: Props) {
     props.setMaybeSelectedTtsModel(maybeNewTtsModel);
   }
 
+//  if (props.allTtsModels.length === 0) {
+//    // While the XHR requests are still completing, we may have nothing to build.
+//    // It's easier to return a fully disabled "loading" <Select /> component.
+//    return (
+//
+//      <div className="col">
+//        <label className="sub-title">
+//          Voice
+//        </label>
+//        <div className="zi-3 input-icon-search">
+//          <span className="form-control-feedback">
+//            <FontAwesomeIcon icon={faMicrophone} />
+//          </span>
+//          <Select 
+//            isLoading={true}
+//            options={[]}
+//            inputValue={"Loading..."}
+//            classNames={SearchFieldClass}
+//            className={"w-100"}
+//          />
+//        </div>
+//      </div>
+//    );
+//  }
 
   const leafiestCategory = selectedCategories[selectedCategories.length - 1];
 

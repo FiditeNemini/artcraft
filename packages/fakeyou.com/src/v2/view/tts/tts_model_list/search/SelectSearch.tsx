@@ -45,6 +45,25 @@ export function SelectSearch(props: Props) {
     props.setMaybeSelectedTtsModel(maybeNewTtsModel);
   }
 
+//  if (props.allTtsModels.length === 0) {
+//    // While the XHR requests are still completing, we may have nothing to build.
+//    // It's easier to return a fully disabled "loading" <Select /> component.
+//    return (
+//      <div className="zi-3 input-icon-search">
+//        <span className="form-control-feedback">
+//          <FontAwesomeIcon icon={faMicrophone} />
+//        </span>
+//        <Select 
+//          isLoading={true}
+//          options={[]}
+//          inputValue={"Loading..."}
+//          classNames={SearchFieldClass}
+//          className={"w-100"}
+//        />
+//      </div>
+//    );
+//  }
+
   let defaultOption = options.length > 0 ? options[0] : undefined;
 
   if (props.maybeSelectedTtsModel !== undefined) {
