@@ -61,8 +61,9 @@ export function AppWrapper(props: Props) {
 
   // User selections.
   // This allows the user to filter out voices that don't match their 
-  // preferred language. The value "*" serves as a sentinel for all 
-  // voices / no filter.
+  // preferred language. 
+  // Values are IETF 2-letter language codes. Other locale information is stripped.
+  // The value "*" serves as a sentinel for all voices / no filter.
   const [selectedTtsLanguageScope, setSelectedTtsLanguageScope] = 
     useState<string>("*");
 

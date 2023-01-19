@@ -21,13 +21,11 @@ interface Props {
 
   maybeSelectedTtsModel?: TtsModelListItem;
   setMaybeSelectedTtsModel: (maybeSelectedTtsModel: TtsModelListItem) => void;
+
+  selectedTtsLanguageScope: string,
 }
 
 export function SelectSearch(props: Props) {
-  const options : any = props.allTtsModels.map((ttsModel) => {
-    return { value: ttsModel.model_token, label: ttsModel.title }
-  });
-
 
   const handleChange = (option: any, actionMeta: ActionMeta<Option>) => {
     const ttsModelToken = option?.value;
@@ -39,6 +37,18 @@ export function SelectSearch(props: Props) {
 
     props.setMaybeSelectedTtsModel(maybeNewTtsModel);
   }
+
+  const options : any = props.allTtsModels
+    .filter((ttsModel) => {
+      if (props.selectedTtsLanguageScope === "*") {
+        // NB: Sentinel value of "*" means all languages.
+        return true;
+      }
+      return ttsModel.ietf_primary_language_subtag === props.selectedTtsLanguageScope;
+    })
+    .map((ttsModel) => {
+      return { value: ttsModel.model_token, label: ttsModel.title }
+    });
 
   let defaultOption = options.length > 0 ? options[0] : undefined;
 

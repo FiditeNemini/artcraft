@@ -456,6 +456,7 @@ function TtsModelListPage(props: Props) {
                         setMaybeSelectedTtsModel={
                           props.setMaybeSelectedTtsModel
                         }
+                        selectedTtsLanguageScope={props.selectedTtsLanguageScope}
                       />
                     </div>
 
