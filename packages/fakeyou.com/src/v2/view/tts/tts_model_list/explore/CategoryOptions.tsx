@@ -148,6 +148,24 @@ function buildDropdowns(
   ttsModelsByCategoryToken: Map<string, Set<TtsModelListItem>>,
   handleChangeCategory : (i: number, categoryToken?: string) => void,
 ) {
+  if (dropdownCategories.length === 0 || ttsModelsByCategoryToken.size === 0) {
+    // While the XHR requests are still completing, we may have nothing to build.
+    // It's easier to return a fully disabled "loading" <Select /> component.
+    return [
+      <div className="w-100">
+        <span className="form-control-feedback">
+          <FontAwesomeIcon icon={faTags} />
+        </span>
+        <Select 
+          isLoading={true}
+          options={[]}
+          inputValue={"Loading..."}
+          classNames={SearchFieldClass}
+          className={"w-100"}
+        />
+      </div>
+    ];
+  }
 
   let categoryDropdowns = [];
 
@@ -229,7 +247,6 @@ function buildDropdowns(
 
     categoryDropdowns.push(
       <React.Fragment key={`categoryDropdown-${i}`}>
-
         <div className="w-100">
           <span className="form-control-feedback">
             <FontAwesomeIcon icon={faTags} />
