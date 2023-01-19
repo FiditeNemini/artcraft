@@ -131,6 +131,9 @@ interface Props {
 
   maybeSelectedTtsModel?: TtsModelListItem;
   setMaybeSelectedTtsModel: (maybeSelectedTtsModel: TtsModelListItem) => void;
+
+  selectedTtsLanguageScope: string,
+  setSelectedTtsLanguageScope: (selectedTtsLanguageScope: string) => void,
 }
 
 interface State {}
@@ -494,6 +497,8 @@ class PageContainer extends React.Component<Props, State> {
                 setSelectedCategories={this.props.setSelectedCategories}
                 maybeSelectedTtsModel={this.props.maybeSelectedTtsModel}
                 setMaybeSelectedTtsModel={this.props.setMaybeSelectedTtsModel}
+                selectedTtsLanguageScope={this.props.selectedTtsLanguageScope}
+                setSelectedTtsLanguageScope={this.props.setSelectedTtsLanguageScope}
               />
             </Route>
 

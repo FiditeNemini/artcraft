@@ -122,6 +122,9 @@ interface Props {
 
   maybeSelectedTtsModel?: TtsModelListItem;
   setMaybeSelectedTtsModel: (maybeSelectedTtsModel: TtsModelListItem) => void;
+
+  selectedTtsLanguageScope: string,
+  setSelectedTtsLanguageScope: (selectedTtsLanguageScope: string) => void,
 }
 
 function TtsModelListPage(props: Props) {
@@ -485,6 +488,8 @@ function TtsModelListPage(props: Props) {
                   setMaybeSelectedTtsModel={
                     props.setMaybeSelectedTtsModel
                   }
+                  selectedTtsLanguageScope={props.selectedTtsLanguageScope}
+                  setSelectedTtsLanguageScope={props.setSelectedTtsLanguageScope}
                   />
 
                 {directViewLink}

@@ -95,6 +95,9 @@ interface Props {
 
   maybeSelectedTtsModel?: TtsModelListItem;
   setMaybeSelectedTtsModel: (maybeSelectedTtsModel: TtsModelListItem) => void;
+
+  selectedTtsLanguageScope: string,
+  setSelectedTtsLanguageScope: (selectedTtsLanguageScope: string) => void,
 }
 
 interface State {
@@ -682,6 +685,8 @@ class App extends React.Component<Props, State> {
                     setMaybeSelectedTtsModel={
                       this.props.setMaybeSelectedTtsModel
                     }
+                    selectedTtsLanguageScope={this.props.selectedTtsLanguageScope}
+                    setSelectedTtsLanguageScope={this.props.setSelectedTtsLanguageScope}
                   />
                 </Route>
               </Switch>

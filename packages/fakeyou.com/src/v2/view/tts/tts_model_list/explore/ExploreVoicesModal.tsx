@@ -27,6 +27,9 @@ interface Props {
 
   maybeSelectedTtsModel?: TtsModelListItem;
   setMaybeSelectedTtsModel: (maybeSelectedTtsModel: TtsModelListItem) => void;
+
+  selectedTtsLanguageScope: string,
+  setSelectedTtsLanguageScope: (selectedTtsLanguageScope: string) => void,
 }
 
 export function ExploreVoicesModal(props: Props) {
@@ -111,7 +114,10 @@ export function ExploreVoicesModal(props: Props) {
             <div className="row gx-3 gy-3">
               <div className="col-12 col-lg-3 input-icon-search">
                 <label className="sub-title">Language</label>
-                <LanguageOptions />
+                <LanguageOptions 
+                  selectedTtsLanguageScope={props.selectedTtsLanguageScope}
+                  setSelectedTtsLanguageScope={props.setSelectedTtsLanguageScope}
+                  />
               </div>
 
               <div className="col-12 col-md-12 col-lg-9 input-icon-search">
