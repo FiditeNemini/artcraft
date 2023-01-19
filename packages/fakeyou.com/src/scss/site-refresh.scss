@@ -29,6 +29,20 @@ styles with important tags:
     }
   }
 
+  .btn-link {
+    font-weight: 400;
+    color: $primary;
+    text-decoration: none;
+    cursor: pointer;
+    transition: 0.1s;
+    background: none;
+    border: none;
+
+    &:hover {
+      color: lighten($primary, 5%);
+    }
+  }
+
   hr {
     border: 0;
     border-top: 1px solid $white;
