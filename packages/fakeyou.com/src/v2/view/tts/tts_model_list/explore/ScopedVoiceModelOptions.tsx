@@ -96,6 +96,12 @@ export function ScopedVoiceModelOptions(props: Props) {
       label: "Loading...",
       value: "*",
     }
+  } else if (options.length === 0) {
+    // NB: Perhaps the user has refined their search to be too narrow (langauge + category)
+    selectedOption = {
+      label: "No results (remove some filters)",
+      value: "*",
+    }
   }
 
   return (
