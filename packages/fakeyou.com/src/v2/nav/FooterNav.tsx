@@ -27,9 +27,10 @@ function FooterNav(props: Props) {
 
   if (props.sessionWrapper.canBanUsers()) {
     moderationLink = (
-      <div className="v2_mod_link">
+      <div className="v2_mod_link mb-4 mb-lg-0 me-0 me-lg-4">
         <Link to={FrontendUrlConfig.moderationMain()}>
-          <ModerationIcon /> Mod Controls
+          <ModerationIcon />
+          <span className="ms-2">Mod Controls</span>
         </Link>
       </div>
     );
@@ -37,121 +38,139 @@ function FooterNav(props: Props) {
 
   return (
     <div>
-      <div className="container">
-        <hr />
-      </div>
+      <footer id="footer">
+        <div className="container py-5">
+          {/* <div className="pb-4">
+            <hr />
+          </div> */}
 
-      <div className="d-flex flex-column container py-5 gap-4">
-        <div className="text-center align-items-center justify-content-center gap-2 d-flex flex-wrap">
-          <div>
-            <Link to="/pricing">Pricing</Link>
+          <div className="row gx-5 gy-5">
+            <div className="col-12 col-lg-3 d-flex flex-column gap-4 align-items-center align-items-lg-start">
+              <Link to="/">
+                <img
+                  src="/fakeyou/FakeYou-Logo.png"
+                  alt="FakeYou: Cartoon and Celebrity Text to Speech"
+                  height="38"
+                />
+              </Link>
+              <div className="d-flex gap-3">
+                <a
+                  className="social-icon"
+                  href={ThirdPartyLinks.FAKEYOU_DISCORD}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  title="Join our Discord Server"
+                >
+                  <FontAwesomeIcon icon={faDiscord} className="me-2" />
+                </a>
+                <a
+                  className="social-icon"
+                  href="https://twitch.tv/FakeYouLabs"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  title="Subscribe to our Twitch Channel"
+                >
+                  <FontAwesomeIcon icon={faTwitch} className="me-2" />
+                </a>
+                <a
+                  className="social-icon"
+                  href={ThirdPartyLinks.FAKEYOU_TWITTER_WITH_FOLLOW_INTENT}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  title="Follow us on Twitter"
+                >
+                  <FontAwesomeIcon icon={faTwitter} className="me-2" />
+                </a>
+                <a
+                  className="social-icon"
+                  href="https://facebook.com/vocodes"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  title="Like us on Facebook"
+                >
+                  <FontAwesomeIcon icon={faFacebook} className="me-2" />
+                </a>
+                <a
+                  className="social-icon"
+                  href={ThirdPartyLinks.FAKEYOU_PATREON}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  title="Support us by becoming a patreon"
+                >
+                  <FontAwesomeIcon icon={faPatreon} />
+                </a>
+              </div>
+            </div>
+            <div className="py-2 col-12 col-lg-3 d-flex flex-column gap-2 gap-lg-3 align-items-center align-items-lg-start">
+              <p className="fw-bold">AI Tools</p>
+              <li>
+                <Link to="/">Text to Speech</Link>
+              </li>
+
+              <li>
+                <Link to="/video">Video Lipsync</Link>
+              </li>
+            </div>
+            <div className="py-2 col-12 col-lg-3 d-flex flex-column gap-2 gap-lg-3 align-items-center align-items-lg-start">
+              <p className="fw-bold">Community</p>
+
+              <li>
+                <Link to="/contribute">Upload</Link>
+              </li>
+
+              <li>
+                <Link to="/leaderboard">Leaderboard</Link>
+              </li>
+
+              <li>
+                <Link to={FrontendUrlConfig.patronsPage()}>Patrons</Link>
+              </li>
+
+              <li>
+                <Link to="/firehose">Feed</Link>
+              </li>
+            </div>
+            <div className="py-2 col-12 col-lg-3 d-flex flex-column gap-2 gap-lg-3 align-items-center align-items-lg-start">
+              <p className="fw-bold">Info</p>
+              <li>
+                <Link to="/pricing">Pricing</Link>
+              </li>
+
+              <li>
+                <Link to="/about">About</Link>
+              </li>
+
+              <li>
+                <Link to="/terms">Terms of Use</Link>
+              </li>
+
+              <li>
+                <Link to="/privacy">Privacy Policy</Link>
+              </li>
+              <li>
+                <a href={FrontendUrlConfig.developerDocs()}>API Docs</a>
+              </li>
+            </div>
           </div>
-          |
-          <div>
-            <Link to="/">Text to Speech</Link>
+
+          <div className="pt-4">
+            <hr />
           </div>
-          {/*
-          &nbsp;|
-          <Link to="/pricing">{t('coreUi.footerNav.pricing')}</Link>
-          */}
-          |<Link to="/video">{t("coreUi.footerNav.video")}</Link>|
-          <div>
-            <Link to="/contribute">Upload</Link>
-          </div>
-          |
-          <div>
-            <Link to="/leaderboard">Leaderboard</Link>
-          </div>
-          |
-          <div>
-            <Link to={FrontendUrlConfig.patronsPage()}>Patrons</Link>
-          </div>
-          |
-          <div>
-            <Link to="/firehose">Feed</Link>
-          </div>
-          |
-          <div>
-            <a href={FrontendUrlConfig.developerDocs()}>API Docs</a>
-          </div>
-          |
-          <div>
-            <Link to="/about">About</Link>
-          </div>
-          |
-          <div>
-            <Link to="/terms">Terms of Use</Link>
-          </div>
-          |
-          <div>
-            <Link to="/privacy">Privacy Policy</Link>
+
+          <div className="d-flex flex-column flex-lg-row pt-2 align-items-center gap-4">
+            <span className="flex-grow-1">
+              © 2023 FakeYou,{" "}
+              <Trans i18nKey="coreUi.footerNav.builtBy">
+                Built by <EchelonTwitterLink hideIcon={true} /> in Atlanta.
+              </Trans>
+            </span>
+            <div className="d-flex flex-column flex-lg-row align-items-center ">
+              {moderationLink}
+              <GitSha />
+            </div>
           </div>
         </div>
-
-        <div className="d-flex justify-content-center gap-4">
-          <a
-            className="social-icon"
-            href={ThirdPartyLinks.FAKEYOU_DISCORD}
-            target="_blank"
-            rel="noopener noreferrer"
-            title="Join our Discord Server"
-          >
-            <FontAwesomeIcon icon={faDiscord} className="me-2" />
-          </a>
-          <a
-            className="social-icon"
-            href="https://twitch.tv/FakeYouLabs"
-            target="_blank"
-            rel="noopener noreferrer"
-            title="Subscribe to our Twitch Channel"
-          >
-            <FontAwesomeIcon icon={faTwitch} className="me-2" />
-          </a>
-          <a
-            className="social-icon"
-            href={ThirdPartyLinks.FAKEYOU_TWITTER_WITH_FOLLOW_INTENT}
-            target="_blank"
-            rel="noopener noreferrer"
-            title="Follow us on Twitter"
-          >
-            <FontAwesomeIcon icon={faTwitter} className="me-2" />
-          </a>
-          <a
-            className="social-icon"
-            href="https://facebook.com/vocodes"
-            target="_blank"
-            rel="noopener noreferrer"
-            title="Like us on Facebook"
-          >
-            <FontAwesomeIcon icon={faFacebook} className="me-2" />
-          </a>
-          <a
-            className="social-icon"
-            href={ThirdPartyLinks.FAKEYOU_PATREON}
-            target="_blank"
-            rel="noopener noreferrer"
-            title="Support us by becoming a patreon"
-          >
-            <FontAwesomeIcon icon={faPatreon} className="me-2" />
-          </a>
-        </div>
-
-        <div className="d-flex flex-column align-items-center gap-4">
-          <div>
-            <Trans i18nKey="coreUi.footerNav.builtBy">
-              Built by <EchelonTwitterLink hideIcon={true} /> in Atlanta.
-            </Trans>
-          </div>
-
-          <GitSha />
-
-          {moderationLink}
-        </div>
-
-        {/*<p>
-          <a href="https://create.storyteller.io" target="_blank" rel="noreferrer">storyteller<sup>(alpha)</sup></a>
-        </p>*/}
-      </div>
+      </footer>
     </div>
   );
 }
