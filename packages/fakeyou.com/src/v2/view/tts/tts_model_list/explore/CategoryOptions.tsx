@@ -26,18 +26,16 @@ interface Props {
 
   maybeSelectedTtsModel?: TtsModelListItem;
   setMaybeSelectedTtsModel: (maybeSelectedTtsModel: TtsModelListItem) => void;
+
+  handleChangeCategory: (level: number, maybeToken?: string) => void;
 }
 
 export function CategoryOptions(props: Props) {
   const {
-    allTtsCategories,
-    allTtsCategoriesByTokenMap,
     ttsModelsByCategoryToken,
     dropdownCategories,
-    setDropdownCategories,
     selectedCategories,
-    setSelectedCategories,
-    maybeSelectedTtsModel,
+    handleChangeCategory,
   } = props;
 
   //const { t } = useTranslation();
@@ -87,54 +85,6 @@ export function CategoryOptions(props: Props) {
       (categoryDropdownElement as any).value = selectedCategory.category_token;
     }
   });
-
-
-  const doChangeCategory = (level: number, maybeToken: string) => {
-    // Slice off all the irrelevant child category choices, then append new choice.
-    let newCategorySelections = selectedCategories.slice(0, level);
-
-    // And the dropdowns themselves
-    let newDropdownCategories = dropdownCategories.slice(0, level + 1);
-
-    let category = allTtsCategoriesByTokenMap.get(maybeToken);
-    if (!!category) {
-      newCategorySelections.push(category);
-    }
-
-    setSelectedCategories(newCategorySelections);
-
-    const newSubcategories = allTtsCategories.filter((category) => {
-      return category.maybe_super_category_token === maybeToken;
-    });
-
-    newDropdownCategories.push(newSubcategories);
-    setDropdownCategories(newDropdownCategories);
-
-    // We might have switched into a category without our selected TTS model.
-    // If so, pick a new TTS model.
-    let maybeNewModel = undefined;
-    const availableModelsForCategory = ttsModelsByCategoryToken.get(maybeToken);
-    if (!!availableModelsForCategory && !!maybeSelectedTtsModel) {
-      const modelValid = availableModelsForCategory.has(maybeSelectedTtsModel);
-      if (!modelValid) {
-        maybeNewModel = Array.from(availableModelsForCategory)[0];
-      }
-    }
-    if (!!maybeNewModel) {
-      props.setMaybeSelectedTtsModel(maybeNewModel);
-    }
-  };
-
-  const handleChangeCategory = (
-    level: number,
-    maybeCategoryToken?: string,
-  ) => {
-    if (!maybeCategoryToken) {
-      return true;
-    }
-    doChangeCategory(level, maybeCategoryToken);
-    return true;
-  };
 
 //  const handleRemoveCategory = (level: number) => {
 //    let parentLevel = Math.max(level - 1, 0);
@@ -258,6 +208,24 @@ function buildDropdowns(
       // No sense trying to build more.
       break;
     }
+    
+    let selectProps : any = {
+      options: options,
+      classNames: SearchFieldClass,
+      onChange: (option: any) => handleChangeCategory(i, option?.value),
+      className:"w-100",
+    };
+
+    if (selectedCategoryOption === undefined) {
+      // NB(bt, 2023-01-19): I'm not sure why we're having to do this to clear categories.
+      // If I had more time to spend with this library, I might have a better solution than this hack.
+      selectProps['value'] = {
+        value: "*",
+        label: "Select category...",
+      };
+    } else {
+      selectProps['value'] = selectedCategoryOption;
+    }
 
     categoryDropdowns.push(
       <React.Fragment key={`categoryDropdown-${i}`}>
@@ -266,12 +234,7 @@ function buildDropdowns(
           <span className="form-control-feedback">
             <FontAwesomeIcon icon={faTags} />
           </span>
-          <Select
-            value={selectedCategoryOption}
-            options={options}
-            classNames={SearchFieldClass}
-            onChange={(option) => handleChangeCategory(i, option?.value)}
-            className="w-100"
+          <Select {... selectProps}
           />
         </div>
       </React.Fragment>
