@@ -1,5 +1,5 @@
 import React from "react";
-import { faCompass } from "@fortawesome/free-solid-svg-icons";
+import { faCompass, faEraser } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { LanguageOptions } from "./LanguageOptions";
 import { TtsCategoryType } from "../../../../../AppWrapper";
@@ -73,10 +73,7 @@ export function ExploreVoicesModal(props: Props) {
     }
   };
 
-  const handleChangeCategory = (
-    level: number,
-    maybeCategoryToken?: string,
-  ) => {
+  const handleChangeCategory = (level: number, maybeCategoryToken?: string) => {
     if (!maybeCategoryToken) {
       return true;
     }
@@ -93,7 +90,6 @@ export function ExploreVoicesModal(props: Props) {
     >
       <div className="modal-dialog modal-xl modal-fullscreen-lg-down modal-dialog-centered modal-dialog-scrollable">
         <div className="modal-content">
-
           <div className="modal-header p-3">
             <h5 className="modal-title fw-semibold" id="ModalLabel">
               <FontAwesomeIcon icon={faCompass} className="me-3" />
@@ -109,7 +105,6 @@ export function ExploreVoicesModal(props: Props) {
 
           <div className="modal-body p-3 p-lg-4">
             <div className="row gx-3 gy-3">
-
               <div className="col-12 col-lg-3 input-icon-search">
                 <label className="sub-title">Language</label>
                 <LanguageOptions />
@@ -117,58 +112,52 @@ export function ExploreVoicesModal(props: Props) {
 
               <div className="col-12 col-md-12 col-lg-9 input-icon-search">
                 <div className="d-flex">
-                  <label className="sub-title flex-grow-1">
-                  Category
-                  </label>
+                  <label className="sub-title flex-grow-1">Category</label>
                   <button
-                    className="ms-3 fw-medium"
-                    onClick={() => { handleChangeCategory(0, "*"); }}
-                    >
-                  Clear category filters
+                    className="ms-3 fw-medium btn-link"
+                    onClick={() => {
+                      handleChangeCategory(0, "*");
+                    }}
+                  >
+                    <FontAwesomeIcon icon={faEraser} className="me-2" />
+                    Clear category filters
                   </button>
                 </div>
 
-                <CategoryOptions 
+                <CategoryOptions
                   allTtsCategories={props.allTtsCategories}
                   allTtsModels={props.allTtsModels}
-
                   allTtsCategoriesByTokenMap={props.allTtsCategoriesByTokenMap}
                   allTtsModelsByTokenMap={props.allTtsModelsByTokenMap}
                   ttsModelsByCategoryToken={props.ttsModelsByCategoryToken}
-
                   dropdownCategories={props.dropdownCategories}
                   setDropdownCategories={props.setDropdownCategories}
                   selectedCategories={props.selectedCategories}
                   setSelectedCategories={props.setSelectedCategories}
                   maybeSelectedTtsModel={props.maybeSelectedTtsModel}
-                  setMaybeSelectedTtsModel={
-                    props.setMaybeSelectedTtsModel
-                  }
+                  setMaybeSelectedTtsModel={props.setMaybeSelectedTtsModel}
                   handleChangeCategory={handleChangeCategory}
-                  />
+                />
+              </div>
+            </div>
+
+            <br />
+
+            <div className="row gx-3 gy-3">
+              <ScopedVoiceModelOptions
+                allTtsCategories={props.allTtsCategories}
+                allTtsModels={props.allTtsModels}
+                allTtsCategoriesByTokenMap={props.allTtsCategoriesByTokenMap}
+                allTtsModelsByTokenMap={props.allTtsModelsByTokenMap}
+                ttsModelsByCategoryToken={props.ttsModelsByCategoryToken}
+                dropdownCategories={props.dropdownCategories}
+                selectedCategories={props.selectedCategories}
+                maybeSelectedTtsModel={props.maybeSelectedTtsModel}
+                setMaybeSelectedTtsModel={props.setMaybeSelectedTtsModel}
+              />
             </div>
           </div>
 
-          <br />
-
-          <div className="row gx-3 gy-3">
-            <ScopedVoiceModelOptions
-              allTtsCategories={props.allTtsCategories}
-              allTtsModels={props.allTtsModels}
-
-              allTtsCategoriesByTokenMap={props.allTtsCategoriesByTokenMap}
-              allTtsModelsByTokenMap={props.allTtsModelsByTokenMap}
-              ttsModelsByCategoryToken={props.ttsModelsByCategoryToken}
-
-              dropdownCategories={props.dropdownCategories}
-              selectedCategories={props.selectedCategories}
-              maybeSelectedTtsModel={props.maybeSelectedTtsModel}
-              setMaybeSelectedTtsModel={
-                props.setMaybeSelectedTtsModel
-              }
-              />
-
-          </div>
 
           <br />
 
@@ -184,6 +173,5 @@ export function ExploreVoicesModal(props: Props) {
         </div>
       </div>
     </div>
-  </div>
-  )
+  );
 }
