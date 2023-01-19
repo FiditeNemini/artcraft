@@ -437,9 +437,9 @@ function TtsModelListPage(props: Props) {
                 <div>
                   <div className="d-flex gap-2">
                     <label className="sub-title">Search for a Voice</label>
-                    <a href="/" className="ms-1">
+                    {/*<a href="/" className="ms-1">
                       <FontAwesomeIcon icon={faShuffle} />
-                    </a>
+                    </a>*/}
                   </div>
 
                   <div className="d-flex flex-column flex-lg-row gap-3 ">
@@ -500,9 +500,9 @@ function TtsModelListPage(props: Props) {
                     <div className="d-flex flex-column gap-3 h-100">
                       <div className="d-flex gap-2">
                         <label className="sub-title pb-0">Your Text</label>
-                        <a href="/" className="ms-1">
+                        {/*<a href="/" className="ms-1">
                           <FontAwesomeIcon icon={faShuffle} />
-                        </a>
+                        </a>*/}
                       </div>
                       <textarea
                         onClick={() => {
