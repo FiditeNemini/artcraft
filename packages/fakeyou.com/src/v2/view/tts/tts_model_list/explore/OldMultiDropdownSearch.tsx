@@ -7,9 +7,9 @@ import {
   faTimes,
 } from "@fortawesome/free-solid-svg-icons";
 import { TtsModelListItem } from "@storyteller/components/src/api/tts/ListTtsModels";
-import { TtsCategoryType } from "../../../../AppWrapper";
+import { TtsCategoryType } from "../../../../../AppWrapper";
 import { Trans, useTranslation } from "react-i18next";
-import { Analytics } from "../../../../common/Analytics";
+import { Analytics } from "../../../../../common/Analytics";
 
 interface Props {
   allTtsCategories: TtsCategoryType[];
@@ -29,7 +29,7 @@ interface Props {
   setMaybeSelectedTtsModel: (maybeSelectedTtsModel: TtsModelListItem) => void;
 }
 
-export function MultiDropdownSearch(props: Props) {
+export function OldMultiDropdownSearch(props: Props) {
   const {
     allTtsCategories,
     allTtsModels,
@@ -203,7 +203,9 @@ export function MultiDropdownSearch(props: Props) {
         <div className="d-flex gap-3 align-items-center mb-4 w-100">
           <div className="form-group input-icon w-100">
             <select
-              onClick={() => { Analytics.ttsClickSelectCategory() } }
+              onClick={() => {
+                Analytics.ttsClickSelectCategory();
+              }}
               className={selectCssClasses}
               name={`categories-${i}`}
               onChange={(ev) => handleChangeCategory(ev, i)}
@@ -294,12 +296,6 @@ export function MultiDropdownSearch(props: Props) {
 
   return (
     <div>
-      {/* Category Dropdowns */}
-      <label className="sub-title">
-        {t("tts.TtsModelListPage.form.categoryFiltersLabel")}
-      </label>
-      {categoryFieldGroups}
-
       {/* Model Dropdown */}
       <label className="sub-title">
         <Trans
@@ -317,7 +313,9 @@ export function MultiDropdownSearch(props: Props) {
           className={selectClasses}
           name="tts-model-select"
           onChange={handleChangeVoice}
-          onClick={() => { Analytics.ttsSelectVoiceFromCategory() }}
+          onClick={() => {
+            Analytics.ttsSelectVoiceFromCategory();
+          }}
           disabled={isLoading}
         >
           {isLoading

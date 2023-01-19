@@ -41,6 +41,7 @@ styles with important tags:
 
   select {
     cursor: pointer;
+    border-radius: 5px;
   }
 
   .no-wrap {
@@ -81,6 +82,10 @@ styles with important tags:
     border-radius: 8px !important;
   }
 
+  .rounded-5 {
+    border-radius: 5px !important;
+  }
+
   code {
     color: $primary;
     background-color: rgba($white, 0.06);
@@ -96,6 +101,10 @@ styles with important tags:
 
   .fw-semibold {
     font-weight: 600;
+  }
+
+  .fw-medium {
+    font-weight: 500;
   }
 
   .container {
@@ -143,7 +152,7 @@ styles with important tags:
 
   .alert-cta {
     font-weight: 500 !important;
-    font-size: 18px !important;
+    font-size: 16px !important;
   }
 
   .btn {
@@ -220,6 +229,13 @@ styles with important tags:
     padding: 0 0.75rem;
     padding-top: 1px;
     font-size: 22px;
+    border-radius: 50px;
+  }
+
+  .btn-session-tts-play {
+    height: 36px;
+    width: 36px;
+    padding: 0 12px;
   }
 
   .panel {
@@ -229,6 +245,15 @@ styles with important tags:
     border-color: #ffffff12 !important;
     border: 1px solid;
     border-radius: 0px;
+
+    .panel-inner {
+      background-color: lighten($panel, 4%);
+    }
+
+    .panel-tts-results {
+      border-radius: 5px;
+      background-color: lighten($panel, 4%);
+    }
 
     .panel-title {
       position: static;
@@ -296,14 +321,25 @@ styles with important tags:
 
   .form-select {
     background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23ffffff' stroke-linecap='round' stroke-linejoin='round' stroke-width='3' d='M2 5l6 6 6-6'/%3e%3c/svg%3e") !important;
+    border-radius: 50px;
+
+    &.main-select {
+      height: 48px;
+    }
+  }
+
+  .form-control {
+    border-radius: 5px;
+    background-color: $input-dark !important;
+    border-color: $input-dark !important;
+    color: $white !important;
   }
 
   .form-control,
   .form-select {
     border-width: 1px;
     border-color: $white;
-    border-radius: 5px;
-    padding: 0.5rem 0.75rem;
+    padding: 11px 0.75rem;
 
     &:focus {
       border-color: $primary;
@@ -600,12 +636,133 @@ styles with important tags:
   .btn-close {
     transition: 0.2s;
   }
+
+  .session-tts-section {
+    height: 100%;
+    overflow-x: hidden;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+
+  .direct-view-link {
+    background-color: lighten($panel, 4%);
+    border: 1px solid #39394c;
+    border-radius: 5px;
+    padding: 11px 16px;
+
+    &:hover {
+      border-color: lighten(#39394c, 10%);
+    }
+  }
+
+  .input-icon-search {
+    .form-control-feedback {
+      padding: 12px 18px;
+      position: absolute;
+      z-index: 2;
+      width: 2.375rem;
+      // height: 2.375rem;
+      // line-height: 2.69rem;
+      text-align: center;
+      pointer-events: none;
+      color: $white;
+      opacity: 0.9;
+    }
+  }
+
+  .select-search {
+    height: 48px;
+    border-width: 2px;
+    padding-left: 2.25rem;
+    padding-right: 0.5rem;
+    background-color: $input-dark;
+    border-radius: 50px;
+    border-color: $input-dark !important;
+    box-shadow: none;
+    cursor: pointer;
+
+    &:hover {
+      background-color: lighten($input-dark, 5%);
+      border-color: lighten($input-dark, 5%) !important;
+    }
+
+    &.focused {
+      border-color: $primary !important;
+    }
+  }
+
+  .select-option {
+    background-color: $input-dark;
+    cursor: pointer;
+    padding: 0.5rem 1rem;
+
+    &:hover {
+      background-color: lighten($input-dark, 8%);
+    }
+  }
+
+  .select-input,
+  .select-value {
+    color: $white;
+  }
+
+  .select-placeholder {
+    color: $white !important;
+  }
+
+  .select-container {
+    background: $input-dark;
+    margin-top: 6px;
+    padding: 0;
+    border-radius: 5px;
+    z-index: 3;
+  }
+
+  .select-separator {
+    display: none;
+  }
+
+  .rounded-50 {
+    border-radius: 50px;
+  }
+
+  .modal-content {
+    background-color: $panel;
+    border-color: lighten($panel, 8%) !important;
+    border: 1px solid;
+    border-radius: 8px;
+    box-shadow: 0px 9px 33px 1px rgba(19, 19, 27, 0.8);
+    -webkit-box-shadow: 0px 9px 33px 1px rgba(19, 19, 27, 0.8);
+    -moz-box-shadow: 0px 9px 33px 1px rgba(19, 19, 27, 0.8);
+    min-height: 600px;
+  }
+
+  .modal-header {
+    border-bottom: 1px solid lighten($panel, 8%);
+  }
+
+  .modal-backdrop {
+    background-color: #0d0d14;
+  }
+
+  .modal-header .btn-close {
+    filter: brightness(0) invert(1);
+  }
 }
 
 select {
   border-color: $input-dark !important;
   background-color: $input-dark !important;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='white' class='bi bi-chevron-down' viewBox='0 0 16 16'%3E%3Cpath fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3E%3C/svg%3E");
+  transition: 0.1s !important;
+
+  &:hover {
+    background-color: lighten($input-dark, 5%) !important;
+  }
+
+  option {
+    background-color: $input-dark !important;
+  }
 }
 
 .btn-destructive {
@@ -621,10 +778,17 @@ textarea {
   background-color: $input-dark !important;
   border-color: $input-dark !important;
   color: $white !important;
+
+  &.text-message {
+    font-size: 18px;
+    font-weight: 300;
+    min-height: 200px !important;
+  }
 }
 
 .form-select {
   color: $white !important;
+  border-radius: 50%;
 }
 
 .form-control::placeholder {
@@ -647,11 +811,11 @@ textarea {
   color: $white !important;
 }
 
-input {
-  background-color: $input !important;
-  border-color: $input !important;
-  color: $white !important;
-}
+// input {
+//   background-color: $input !important;
+//   border-color: $input !important;
+//   color: $white !important;
+// }
 
 .img-product {
   &.img-tts {
@@ -687,7 +851,12 @@ input {
 
 .zi-2 {
   position: relative;
-  z-index: 2;
+  z-index: 2 !important;
+}
+
+.zi-3 {
+  position: relative;
+  z-index: 3 !important;
 }
 
 @media (min-width: 992px) {
@@ -715,6 +884,28 @@ input {
 
     .alert {
       font-size: 13px;
+    }
+
+    .session-tts-section {
+      height: 450px;
+    }
+
+    .session-tts-section::-webkit-scrollbar {
+      width: 10px;
+    }
+
+    .session-tts-section::-webkit-scrollbar-track {
+      background-color: darken($panel, 2%);
+      border-radius: 20px;
+    }
+
+    .session-tts-section::-webkit-scrollbar-thumb {
+      border-radius: 20px;
+      background-color: $secondary;
+
+      &:hover {
+        background-color: lighten($secondary, 5%);
+      }
     }
   }
 }

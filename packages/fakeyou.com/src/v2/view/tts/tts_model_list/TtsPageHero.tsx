@@ -59,7 +59,7 @@ export function TtsPageHero(props: Props) {
     );
     viewPricingButton = (
       <>
-        <Link 
+        <Link
           to="/pricing"
           onClick={() => {
             Analytics.ttsClickHeroViewPricing();
@@ -79,7 +79,7 @@ export function TtsPageHero(props: Props) {
     let url = `/profile/${displayName}`;
     myProfileButton = (
       <>
-        <Link 
+        <Link
           to={url}
           onClick={() => {
             Analytics.ttsClickHeroViewProfile();

@@ -40,6 +40,7 @@ import {
 } from "@storyteller/components/src/api/retrieval/GetRetrievalJobStatus";
 import { GetComputedTtsCategoryAssignmentsSuccessResponse } from "@storyteller/components/src/api/category/GetComputedTtsCategoryAssignments";
 import {
+  AvailableLanguageKey,
   AVAILABLE_LANGUAGE_MAP,
   ENGLISH_LANGUAGE,
 } from "./_i18n/AvailableLanguageMap";
@@ -248,7 +249,7 @@ class App extends React.Component<Props, State> {
       let preferredLanguage = ENGLISH_LANGUAGE;
 
       for (let languageCode of locale.language_codes) {
-        let maybeLanguage = AVAILABLE_LANGUAGE_MAP[languageCode];
+        let maybeLanguage = AVAILABLE_LANGUAGE_MAP[languageCode as AvailableLanguageKey];
 
         if (maybeLanguage !== undefined) {
           preferredLanguage = maybeLanguage;

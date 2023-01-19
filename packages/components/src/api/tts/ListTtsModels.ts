@@ -12,6 +12,8 @@ export interface TtsModelListItem {
   creator_username: string,
   creator_display_name: string,
   creator_gravatar_hash: string,
+  ietf_language_tag: string,
+  ietf_primary_language_subtag: string,
   updatable_slug: string,
   title: string,
   is_front_page_featured: boolean,
