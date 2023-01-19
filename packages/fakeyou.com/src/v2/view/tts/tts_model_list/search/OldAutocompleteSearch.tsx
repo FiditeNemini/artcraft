@@ -1,11 +1,11 @@
 import React, { useState } from "react";
 import { TtsModelListItem } from "@storyteller/components/src/api/tts/ListTtsModels";
-import { TtsCategoryType } from "../../../../AppWrapper";
+import { TtsCategoryType } from "../../../../../AppWrapper";
 import Autocomplete from "react-autocomplete";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSearch } from "@fortawesome/free-solid-svg-icons";
 import { t } from "i18next";
-import { Analytics } from "../../../../common/Analytics";
+import { Analytics } from "../../../../../common/Analytics";
 
 // NB: This probably is not the best autocomplete library in the world
 // A lot of the libraries are really old and depend on jQuery (gross).
@@ -27,7 +27,7 @@ interface Props {
   setMaybeSelectedTtsModel: (maybeSelectedTtsModel: TtsModelListItem) => void;
 }
 
-export function AutocompleteSearch(props: Props) {
+export function OldAutocompleteSearch(props: Props) {
   const [searchValue, setSearchValue] = useState<string>("");
 
   // NB: Hack to constrain number of matches.

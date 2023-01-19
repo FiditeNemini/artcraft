@@ -12,7 +12,7 @@ import { TtsCategoryType } from "../../../../../AppWrapper";
 import { Trans, useTranslation } from "react-i18next";
 import { Analytics } from "../../../../../common/Analytics";
 import Select from "react-select";
-import { SearchFieldClass } from "../SearchFieldClass";
+import { SearchFieldClass } from "../search/SearchFieldClass";
 
 interface Props {
   allTtsCategories: TtsCategoryType[];

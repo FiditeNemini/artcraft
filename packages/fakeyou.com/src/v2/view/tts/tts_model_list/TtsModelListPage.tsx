@@ -27,9 +27,9 @@ import {
   ListTtsCategoriesIsError,
   ListTtsCategoriesIsOk,
 } from "../../../api/category/ListTtsCategories";
-import { MultiDropdownSearch } from "./MultiDropdownSearch";
+import { OldMultiDropdownSearch } from "./explore/OldMultiDropdownSearch";
 import { TtsCategoryType } from "../../../../AppWrapper";
-import { SelectSearch } from "./SelectSearch";
+import { SelectSearch } from "./search/SelectSearch";
 import { LanguageNotice } from "./notices/LanguageNotice";
 import { Language } from "@storyteller/components/src/i18n/Language";
 import { t } from "i18next";
@@ -71,7 +71,7 @@ import {
 } from "../../../../model/categories/SyntheticCategory";
 import Select from "react-select";
 import AsyncSelect from "react-select/async";
-import { SearchFieldClass } from "./SearchFieldClass";
+import { SearchFieldClass } from "./search/SearchFieldClass";
 import { AvailableTtsLanguageKey, AVAILABLE_LANGUAGE_MAP, ENGLISH_LANGUAGE } from "../../../../_i18n/AvailableLanguageMap";
 import { ExploreVoicesModal } from "./explore/ExploreVoicesModal";
 import { FrontendUrlConfig } from "../../../../common/FrontendUrlConfig";

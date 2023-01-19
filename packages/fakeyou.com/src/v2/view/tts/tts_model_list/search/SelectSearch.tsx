@@ -1,6 +1,6 @@
 import React from "react";
 import { TtsModelListItem } from "@storyteller/components/src/api/tts/ListTtsModels";
-import { TtsCategoryType } from "../../../../AppWrapper";
+import { TtsCategoryType } from "../../../../../AppWrapper";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faMicrophone } from "@fortawesome/free-solid-svg-icons";
 import Select, { ActionMeta } from "react-select";

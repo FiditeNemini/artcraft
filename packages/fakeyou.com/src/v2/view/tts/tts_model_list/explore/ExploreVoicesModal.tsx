@@ -4,7 +4,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { LanguageOptions } from "./LanguageOptions";
 import { TtsCategoryType } from "../../../../../AppWrapper";
 import { TtsModelListItem } from "@storyteller/components/src/api/tts/ListTtsModels";
-import { MultiDropdownSearch } from "../MultiDropdownSearch";
+import { OldMultiDropdownSearch } from "./OldMultiDropdownSearch";
 import { CategoryOptions } from "./CategoryOptions";
 import { ScopedVoiceModelOptions } from "./ScopedVoiceModelOptions";
 
@@ -112,7 +112,7 @@ export function ExploreVoicesModal(props: Props) {
                   }
               />
 
-            <MultiDropdownSearch
+            <OldMultiDropdownSearch
                   allTtsCategories={props.allTtsCategories}
                   allTtsModels={props.allTtsModels}
 

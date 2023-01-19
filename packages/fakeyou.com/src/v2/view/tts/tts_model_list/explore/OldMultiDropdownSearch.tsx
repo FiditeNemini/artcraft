@@ -7,9 +7,9 @@ import {
   faTimes,
 } from "@fortawesome/free-solid-svg-icons";
 import { TtsModelListItem } from "@storyteller/components/src/api/tts/ListTtsModels";
-import { TtsCategoryType } from "../../../../AppWrapper";
+import { TtsCategoryType } from "../../../../../AppWrapper";
 import { Trans, useTranslation } from "react-i18next";
-import { Analytics } from "../../../../common/Analytics";
+import { Analytics } from "../../../../../common/Analytics";
 
 interface Props {
   allTtsCategories: TtsCategoryType[];
@@ -29,7 +29,7 @@ interface Props {
   setMaybeSelectedTtsModel: (maybeSelectedTtsModel: TtsModelListItem) => void;
 }
 
-export function MultiDropdownSearch(props: Props) {
+export function OldMultiDropdownSearch(props: Props) {
   const {
     allTtsCategories,
     allTtsModels,
