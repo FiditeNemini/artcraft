@@ -732,7 +732,8 @@ styles with important tags:
   }
 
   .select-separator {
-    display: none;
+    width: 1px;
+    opacity: 0.3;
   }
 
   .rounded-50 {
