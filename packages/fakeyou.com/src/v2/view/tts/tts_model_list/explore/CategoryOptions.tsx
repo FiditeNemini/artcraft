@@ -2,15 +2,11 @@ import React, { useEffect } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faArrowRightLong,
-  faCaretRight,
-  faMicrophone,
   faTags,
-  faTimes,
 } from "@fortawesome/free-solid-svg-icons";
 import { TtsModelListItem } from "@storyteller/components/src/api/tts/ListTtsModels";
 import { TtsCategoryType } from "../../../../../AppWrapper";
-import { Trans, useTranslation } from "react-i18next";
-import { Analytics } from "../../../../../common/Analytics";
+//import { useTranslation } from "react-i18next";
 import Select from "react-select";
 import { SearchFieldClass } from "../search/SearchFieldClass";
 
@@ -35,9 +31,7 @@ interface Props {
 export function CategoryOptions(props: Props) {
   const {
     allTtsCategories,
-    allTtsModels,
     allTtsCategoriesByTokenMap,
-    allTtsModelsByTokenMap,
     ttsModelsByCategoryToken,
     dropdownCategories,
     setDropdownCategories,
@@ -46,9 +40,10 @@ export function CategoryOptions(props: Props) {
     maybeSelectedTtsModel,
   } = props;
 
-  const { t } = useTranslation();
+  //const { t } = useTranslation();
 
-  const isLoading = allTtsModels.length === 0;
+// NB: Not used anymore?
+//  const isLoading = allTtsModels.length === 0;
 
   useEffect(() => {
     // NB: Dropdowns do not seem to respect React very well.
@@ -56,14 +51,15 @@ export function CategoryOptions(props: Props) {
     // the dropdowns are left in a default state. I'll use the post-render side effect
     // to select the correct options.
 
-    let selectedModelToken = undefined;
-
-    if (maybeSelectedTtsModel) {
-      selectedModelToken = maybeSelectedTtsModel.model_token;
-    } else if (allTtsModels.length > 0) {
-      // TODO: Move the initial model selection logic here, perhaps.
-      //selectedModelToken = allTtsModels[0].model_token;
-    }
+// NB: Not used anymore?
+//    let selectedModelToken = undefined;
+//
+//    if (maybeSelectedTtsModel) {
+//      selectedModelToken = maybeSelectedTtsModel.model_token;
+//    } else if (allTtsModels.length > 0) {
+//      // TODO: Move the initial model selection logic here, perhaps.
+//      //selectedModelToken = allTtsModels[0].model_token;
+//    }
 
 // NB: This was reaching across the DOM and breaking. Find a new way to handle loading 
 //    let maybeElement = document.getElementsByName("tts-model-select")[0];
@@ -140,29 +136,29 @@ export function CategoryOptions(props: Props) {
     return true;
   };
 
-  const handleRemoveCategory = (level: number) => {
-    let parentLevel = Math.max(level - 1, 0);
-    let maybeToken = "*"; // NB: Sentinel for the "All Voices" / "Select..." <option>
+//  const handleRemoveCategory = (level: number) => {
+//    let parentLevel = Math.max(level - 1, 0);
+//    let maybeToken = "*"; // NB: Sentinel for the "All Voices" / "Select..." <option>
+//
+//    doChangeCategory(parentLevel, maybeToken);
+//
+//    // NB: There's a bug selecting the "default" of the parent category.
+//    // React won't respect the state, so we'll brute force it here.
+//    let maybeElement = document.getElementsByName(
+//      `categories-${parentLevel}`
+//    )[0];
+//    if (maybeElement) {
+//      (maybeElement as any).value = "*";
+//    }
+//  };
 
-    doChangeCategory(parentLevel, maybeToken);
-
-    // NB: There's a bug selecting the "default" of the parent category.
-    // React won't respect the state, so we'll brute force it here.
-    let maybeElement = document.getElementsByName(
-      `categories-${parentLevel}`
-    )[0];
-    if (maybeElement) {
-      (maybeElement as any).value = "*";
-    }
-  };
-
-  const handleChangeVoice = (ev: React.FormEvent<HTMLSelectElement>) => {
-    const ttsModelToken = (ev.target as HTMLSelectElement).value;
-    const maybeTtsModel = allTtsModelsByTokenMap.get(ttsModelToken);
-    if (maybeTtsModel) {
-      props.setMaybeSelectedTtsModel(maybeTtsModel);
-    }
-  };
+//  const handleChangeVoice = (ev: React.FormEvent<HTMLSelectElement>) => {
+//    const ttsModelToken = (ev.target as HTMLSelectElement).value;
+//    const maybeTtsModel = allTtsModelsByTokenMap.get(ttsModelToken);
+//    if (maybeTtsModel) {
+//      props.setMaybeSelectedTtsModel(maybeTtsModel);
+//    }
+//  };
 
   let categoryDropdowns = buildDropdowns(
     dropdownCategories, 

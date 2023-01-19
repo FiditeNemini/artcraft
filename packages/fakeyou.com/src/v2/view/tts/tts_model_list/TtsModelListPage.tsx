@@ -27,7 +27,6 @@ import {
   ListTtsCategoriesIsError,
   ListTtsCategoriesIsOk,
 } from "../../../api/category/ListTtsCategories";
-import { OldMultiDropdownSearch } from "./explore/OldMultiDropdownSearch";
 import { TtsCategoryType } from "../../../../AppWrapper";
 import { SelectSearch } from "./search/SelectSearch";
 import { LanguageNotice } from "./notices/LanguageNotice";
@@ -38,18 +37,12 @@ import { TwitchTtsNotice } from "./notices/TwitchTtsNotice";
 import { PleaseFollowNotice } from "./notices/PleaseFollowNotice";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
-  faArrowRight,
-  faArrowRightLong,
   faBarsStaggered,
-  faCaretRight,
   faChevronRight,
   faCompass,
   faDeleteLeft,
   faGlobe,
-  faMicrophone,
   faShuffle,
-  faTag,
-  faTags,
   faVolumeHigh,
   faVolumeUp,
 } from "@fortawesome/free-solid-svg-icons";
@@ -69,9 +62,6 @@ import {
 import {
   DynamicallyCategorizeModels,
 } from "../../../../model/categories/SyntheticCategory";
-import Select from "react-select";
-import AsyncSelect from "react-select/async";
-import { SearchFieldClass } from "./search/SearchFieldClass";
 import { AvailableTtsLanguageKey, AVAILABLE_LANGUAGE_MAP, ENGLISH_LANGUAGE } from "../../../../_i18n/AvailableLanguageMap";
 import { ExploreVoicesModal } from "./explore/ExploreVoicesModal";
 import { FrontendUrlConfig } from "../../../../common/FrontendUrlConfig";

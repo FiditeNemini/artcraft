@@ -74,9 +74,9 @@ export function SelectSearch(props: Props) {
 }
 
 class CustomOption extends React.Component {
-  constructor(props: any) {
-      super(props);
-  }
+  //constructor(props: any) {
+  //    super(props);
+  //}
 
   render() {
       const {innerProps, isFocused, ...otherProps} = this.props as any;

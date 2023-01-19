@@ -1,17 +1,13 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
-  faArrowRightLong,
-  faCaretRight,
   faMicrophone,
-  faTags,
-  faTimes,
 } from "@fortawesome/free-solid-svg-icons";
 import { TtsModelListItem } from "@storyteller/components/src/api/tts/ListTtsModels";
 import { TtsCategoryType } from "../../../../../AppWrapper";
-import { Trans, useTranslation } from "react-i18next";
-import { Analytics } from "../../../../../common/Analytics";
-import Select, { ActionMeta } from "react-select";
+import { Trans } from "react-i18next";
+//import { Analytics } from "../../../../../common/Analytics";
+import Select from "react-select";
 //import Option from "react-select";
 import { SearchFieldClass } from "../search/SearchFieldClass";
 
@@ -38,7 +34,7 @@ export function ScopedVoiceModelOptions(props: Props) {
     maybeSelectedTtsModel,
   } = props;
 
-  const { t } = useTranslation();
+  //const { t } = useTranslation();
 
   const handleChange = (option: any, actionMeta: any) => {
     const ttsModelToken = option?.value;
@@ -54,7 +50,7 @@ export function ScopedVoiceModelOptions(props: Props) {
 
   const leafiestCategory = selectedCategories[selectedCategories.length - 1];
 
-  let leafiestCategoryModels: Array<TtsModelListItem> = new Array();
+  let leafiestCategoryModels: Array<TtsModelListItem> = [];
 
   if (leafiestCategory !== undefined) {
     leafiestCategoryModels =
