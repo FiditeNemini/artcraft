@@ -1,5 +1,9 @@
 import React from "react";
-import { faCompass, faEraser } from "@fortawesome/free-solid-svg-icons";
+import {
+  faArrowRight,
+  faCompass,
+  faEraser,
+} from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { LanguageOptions } from "./LanguageOptions";
 import { TtsCategoryType } from "../../../../../AppWrapper";
@@ -88,7 +92,7 @@ export function ExploreVoicesModal(props: Props) {
       aria-labelledby="ModalLabel"
       aria-hidden="true"
     >
-      <div className="modal-dialog modal-xl modal-fullscreen-lg-down modal-dialog-centered modal-dialog-scrollable">
+      <div className="modal-dialog modal-xl modal-fullscreen-lg-down modal-dialog-centered">
         <div className="modal-content">
           <div className="modal-header p-3">
             <h5 className="modal-title fw-semibold" id="ModalLabel">
@@ -111,7 +115,7 @@ export function ExploreVoicesModal(props: Props) {
               </div>
 
               <div className="col-12 col-md-12 col-lg-9 input-icon-search">
-                <div className="d-flex">
+                <div className="d-flex align-items-start">
                   <label className="sub-title flex-grow-1">Category</label>
                   <button
                     className="ms-3 fw-medium btn-link"
@@ -158,18 +162,17 @@ export function ExploreVoicesModal(props: Props) {
             </div>
           </div>
 
-
           <br />
 
-            <button
-              type="button"
-              className="btn btn-primary"
-              data-bs-dismiss="modal"
-              aria-label="Close"
-              >
-                Use this voice
-            </button>
-
+          <button
+            type="button"
+            className="btn btn-primary rounded-top-0"
+            data-bs-dismiss="modal"
+            aria-label="Close"
+          >
+            Use this voice
+            <FontAwesomeIcon icon={faArrowRight} className="ms-2" />
+          </button>
         </div>
       </div>
     </div>
