@@ -125,6 +125,7 @@ export function ScopedVoiceModelOptions(props: Props) {
             onChange={handleChange}
             // On mobile, we don't want the onscreen keyboard to take up half the UI.
             autoFocus={false}
+            isSearchable={false}
             // NB: The following settings improve upon performance. 
             // See: https://github.com/JedWatson/react-select/issues/3128
             filterOption={createFilter({ignoreAccents: false})}

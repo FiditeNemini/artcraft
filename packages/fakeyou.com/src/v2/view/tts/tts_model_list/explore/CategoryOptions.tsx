@@ -232,6 +232,7 @@ function buildDropdowns(
       classNames: SearchFieldClass,
       className:"w-100",
       autoFocus: false, // On mobile, we don't want the onscreen keyboard to take up half the UI.
+      isSearchable: false, // On mobile, we don't want the onscreen keyboard to take up half the UI.
       onChange: (option: any) => handleChangeCategory(i, option?.value),
     };
 
