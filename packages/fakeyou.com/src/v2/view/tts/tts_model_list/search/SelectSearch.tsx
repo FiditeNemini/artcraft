@@ -2,16 +2,11 @@ import React from "react";
 import { TtsModelListItem } from "@storyteller/components/src/api/tts/ListTtsModels";
 import { TtsCategoryType } from "../../../../../AppWrapper";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faMicrophone } from "@fortawesome/free-solid-svg-icons";
+import { faSearch } from "@fortawesome/free-solid-svg-icons";
 import Select, { ActionMeta, createFilter } from "react-select";
 import Option from "react-select";
 import { SearchFieldClass } from "./SearchFieldClass";
 import { FastReactSelectOption } from "../../../_common/FastReactSelectOption";
-
-// NB: This probably is not the best autocomplete library in the world
-// A lot of the libraries are really old and depend on jQuery (gross).
-// This one seemed to be simple and minimal, but unfortunately it doesn't
-// use any sort of Trie or caching, and it's almost too minimal.
 
 interface Props {
   allTtsCategories: TtsCategoryType[];
@@ -60,8 +55,8 @@ export function SelectSearch(props: Props) {
     // NB: react-select will cache values, even across different instances (!!!)
     // This can cause confusion when initializing a select instance before the data
     // is loaded, and the select will never update to show the new data.
-    // The proper way to change voices after load from a placeholder "Loading..." 
-    // label is to use controlled props / defaultOptions as is done here:
+    // The proper way to change voices after load from a placeholder "Loading..."
+    // label is to use controlled props / value as is done here:
     isLoading = true;
     defaultOption = {
       label: "Loading...",
@@ -73,7 +68,7 @@ export function SelectSearch(props: Props) {
     <>
       <div className="zi-3 input-icon-search">
         <span className="form-control-feedback">
-          <FontAwesomeIcon icon={faMicrophone} />
+          <FontAwesomeIcon icon={faSearch} />
         </span>
         <Select
           value={defaultOption} // Controlled components use "value" instead of "defaultValue".
