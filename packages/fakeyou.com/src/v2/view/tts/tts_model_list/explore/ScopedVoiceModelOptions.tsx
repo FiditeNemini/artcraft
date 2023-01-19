@@ -48,31 +48,6 @@ export function ScopedVoiceModelOptions(props: Props) {
     props.setMaybeSelectedTtsModel(maybeNewTtsModel);
   }
 
-//  if (props.allTtsModels.length === 0) {
-//    // While the XHR requests are still completing, we may have nothing to build.
-//    // It's easier to return a fully disabled "loading" <Select /> component.
-//    return (
-//
-//      <div className="col">
-//        <label className="sub-title">
-//          Voice
-//        </label>
-//        <div className="zi-3 input-icon-search">
-//          <span className="form-control-feedback">
-//            <FontAwesomeIcon icon={faMicrophone} />
-//          </span>
-//          <Select 
-//            isLoading={true}
-//            options={[]}
-//            inputValue={"Loading..."}
-//            classNames={SearchFieldClass}
-//            className={"w-100"}
-//          />
-//        </div>
-//      </div>
-//    );
-//  }
-
   const leafiestCategory = selectedCategories[selectedCategories.length - 1];
 
   let leafiestCategoryModels: Array<TtsModelListItem> = [];
@@ -107,7 +82,7 @@ export function ScopedVoiceModelOptions(props: Props) {
     // NB: react-select will cache values, even across different instances (!!!)
     // This can cause confusion when initializing a select instance before the data
     // is loaded, and the select will never update to show the new data.
-    // The proper way to change voices after load from a placeholder "Loading..." 
+    // The proper way to change voices after load from a placeholder "Loading..."
     // label is to use controlled props / value as is done here:
     isLoading = true;
     selectedOption = {
