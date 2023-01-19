@@ -23,9 +23,68 @@ interface Props {
 
   maybeSelectedTtsModel?: TtsModelListItem;
   setMaybeSelectedTtsModel: (maybeSelectedTtsModel: TtsModelListItem) => void;
+
+  handleChangeCategory: (level: number, maybeToken?: string) => void;
 }
 
 export function ExploreVoicesModal(props: Props) {
+  const {
+    allTtsCategories,
+    allTtsCategoriesByTokenMap,
+    ttsModelsByCategoryToken,
+    dropdownCategories,
+    setDropdownCategories,
+    selectedCategories,
+    setSelectedCategories,
+    maybeSelectedTtsModel,
+  } = props;
+
+  const doChangeCategory = (level: number, maybeToken: string) => {
+    // Slice off all the irrelevant child category choices, then append new choice.
+    let newCategorySelections = selectedCategories.slice(0, level);
+
+    // And the dropdowns themselves
+    let newDropdownCategories = dropdownCategories.slice(0, level + 1);
+
+    let category = allTtsCategoriesByTokenMap.get(maybeToken);
+    if (!!category) {
+      newCategorySelections.push(category);
+    }
+
+    setSelectedCategories(newCategorySelections);
+
+    const newSubcategories = allTtsCategories.filter((category) => {
+      return category.maybe_super_category_token === maybeToken;
+    });
+
+    newDropdownCategories.push(newSubcategories);
+    setDropdownCategories(newDropdownCategories);
+
+    // We might have switched into a category without our selected TTS model.
+    // If so, pick a new TTS model.
+    let maybeNewModel = undefined;
+    const availableModelsForCategory = ttsModelsByCategoryToken.get(maybeToken);
+    if (!!availableModelsForCategory && !!maybeSelectedTtsModel) {
+      const modelValid = availableModelsForCategory.has(maybeSelectedTtsModel);
+      if (!modelValid) {
+        maybeNewModel = Array.from(availableModelsForCategory)[0];
+      }
+    }
+    if (!!maybeNewModel) {
+      props.setMaybeSelectedTtsModel(maybeNewModel);
+    }
+  };
+
+  const handleChangeCategory = (
+    level: number,
+    maybeCategoryToken?: string,
+  ) => {
+    if (!maybeCategoryToken) {
+      return true;
+    }
+    doChangeCategory(level, maybeCategoryToken);
+    return true;
+  };
 
   return (
     <div
@@ -63,7 +122,10 @@ export function ExploreVoicesModal(props: Props) {
                   <label className="sub-title flex-grow-1">
                   Category
                   </label>
-                  <a href="/" className="ms-3 fw-medium">
+                  <a
+                    className="ms-3 fw-medium"
+                    onClick={() => { props.handleChangeCategory(0, "*"); }}
+                    >
                   Clear category filters
                   </a>
                 </div>
@@ -84,6 +146,7 @@ export function ExploreVoicesModal(props: Props) {
                   setMaybeSelectedTtsModel={
                     props.setMaybeSelectedTtsModel
                   }
+                  handleChangeCategory={handleChangeCategory}
                   />
             </div>
           </div>
