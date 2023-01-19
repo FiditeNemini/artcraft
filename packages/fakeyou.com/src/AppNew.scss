@@ -92,24 +92,6 @@ $headings-font-family: "Merriweather", serif;
     }
   }
 
-  $footer-height: 2rem;
-
-  #viewable {
-    padding-bottom: $footer-height;
-  }
-
-  footer {
-    font-family: $footer-font-family;
-    text-align: center;
-    width: 100%;
-    position: absolute; // Footer attachment.
-    bottom: 0;
-    // NB: Setting explicit height doesn't appear to be necessary, and
-    // it was creating an annoying scrollbar.
-    //height: $footer-height;
-    color: $light-text-color;
-  }
-
   .social {
     img {
       max-width: 70px;
@@ -211,7 +193,6 @@ $headings-font-family: "Merriweather", serif;
     background-color: $panel;
     margin-bottom: 5px;
     padding: 10px 0;
-    backdrop-filter: blur(5px);
     border-bottom: 1px solid;
     border-color: rgba(255, 255, 255, 0.06);
   }
@@ -315,9 +296,8 @@ $headings-font-family: "Merriweather", serif;
   // }
 
   .git-sha {
-    color: #999;
-    font-size: 0.8rem;
-    margin-top: 10px;
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 14px;
   }
 
   // /* TAILWIND STYLE CLASSES */
