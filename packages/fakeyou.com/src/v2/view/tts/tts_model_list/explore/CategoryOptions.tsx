@@ -28,6 +28,8 @@ interface Props {
   setMaybeSelectedTtsModel: (maybeSelectedTtsModel: TtsModelListItem) => void;
 
   handleChangeCategory: (level: number, maybeToken?: string) => void;
+
+  selectedTtsLanguageScope: string,
 }
 
 export function CategoryOptions(props: Props) {
@@ -71,6 +73,8 @@ export function CategoryOptions(props: Props) {
     </>
   );
 }
+
+// ========= Build dropdowns ========
 
 function buildDropdowns(
   dropdownCategories: TtsCategoryType[][], 

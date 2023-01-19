@@ -25,6 +25,8 @@ interface Props {
 
   maybeSelectedTtsModel?: TtsModelListItem;
   setMaybeSelectedTtsModel: (maybeSelectedTtsModel: TtsModelListItem) => void;
+
+  selectedTtsLanguageScope: string,
 }
 
 export function ScopedVoiceModelOptions(props: Props) {
@@ -40,12 +42,9 @@ export function ScopedVoiceModelOptions(props: Props) {
   const handleChange = (option: any, actionMeta: any) => {
     const ttsModelToken = option?.value;
     const maybeNewTtsModel = props.allTtsModelsByTokenMap.get(ttsModelToken);
-
-    if (maybeNewTtsModel === undefined) {
-      return;
+    if (maybeNewTtsModel !== undefined) {
+      props.setMaybeSelectedTtsModel(maybeNewTtsModel);
     }
-
-    props.setMaybeSelectedTtsModel(maybeNewTtsModel);
   }
 
   const leafiestCategory = selectedCategories[selectedCategories.length - 1];
@@ -61,12 +60,20 @@ export function ScopedVoiceModelOptions(props: Props) {
     leafiestCategoryModels = Array.from(new Set(allTtsModels));
   }
 
-  let options = leafiestCategoryModels.map((ttsModel) => {
-    return {
-      label: ttsModel.title,
-      value: ttsModel.model_token,
-    }
-  });
+  let options = leafiestCategoryModels
+    .filter((ttsModel) => {
+      // Scope to currently selected language
+      if (props.selectedTtsLanguageScope === "*") {
+        return true; // NB: Sentinel value of "*" means all languages.
+      }
+      return ttsModel.ietf_primary_language_subtag === props.selectedTtsLanguageScope;
+    })
+    .map((ttsModel) => {
+      return {
+        label: ttsModel.title,
+        value: ttsModel.model_token,
+      }
+    });
 
   let selectedOption = options.find((option) => option.value === maybeSelectedTtsModel?.model_token);
 
@@ -74,7 +81,7 @@ export function ScopedVoiceModelOptions(props: Props) {
     selectedOption = options[0];
   }
  
-  const voiceCount = leafiestCategoryModels.length;
+  const voiceCount = options.length;
 
   let isLoading = false;
 

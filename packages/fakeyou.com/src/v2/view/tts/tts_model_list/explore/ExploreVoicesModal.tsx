@@ -147,6 +147,7 @@ export function ExploreVoicesModal(props: Props) {
                   maybeSelectedTtsModel={props.maybeSelectedTtsModel}
                   setMaybeSelectedTtsModel={props.setMaybeSelectedTtsModel}
                   handleChangeCategory={handleChangeCategory}
+                  selectedTtsLanguageScope={props.selectedTtsLanguageScope}
                 />
               </div>
             </div>
@@ -164,6 +165,7 @@ export function ExploreVoicesModal(props: Props) {
                 selectedCategories={props.selectedCategories}
                 maybeSelectedTtsModel={props.maybeSelectedTtsModel}
                 setMaybeSelectedTtsModel={props.setMaybeSelectedTtsModel}
+                selectedTtsLanguageScope={props.selectedTtsLanguageScope}
               />
             </div>
           </div>

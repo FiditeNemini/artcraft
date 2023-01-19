@@ -40,9 +40,9 @@ export function SelectSearch(props: Props) {
 
   const options : any = props.allTtsModels
     .filter((ttsModel) => {
+      // Scope to currently selected language
       if (props.selectedTtsLanguageScope === "*") {
-        // NB: Sentinel value of "*" means all languages.
-        return true;
+        return true; // NB: Sentinel value of "*" means all languages.
       }
       return ttsModel.ietf_primary_language_subtag === props.selectedTtsLanguageScope;
     })
