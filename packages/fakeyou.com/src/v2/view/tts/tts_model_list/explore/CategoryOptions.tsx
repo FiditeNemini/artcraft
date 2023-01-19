@@ -32,14 +32,9 @@ interface Props {
 
 export function CategoryOptions(props: Props) {
   const {
-    allTtsCategories,
-    allTtsCategoriesByTokenMap,
     ttsModelsByCategoryToken,
     dropdownCategories,
-    setDropdownCategories,
     selectedCategories,
-    setSelectedCategories,
-    maybeSelectedTtsModel,
     handleChangeCategory,
   } = props;
 
@@ -213,6 +208,24 @@ function buildDropdowns(
       // No sense trying to build more.
       break;
     }
+    
+    let selectProps : any = {
+      options: options,
+      classNames: SearchFieldClass,
+      onChange: (option: any) => handleChangeCategory(i, option?.value),
+      className:"w-100",
+    };
+
+    if (selectedCategoryOption === undefined) {
+      // NB(bt, 2023-01-19): I'm not sure why we're having to do this to clear categories.
+      // If I had more time to spend with this library, I might have a better solution than this hack.
+      selectProps['value'] = {
+        value: "*",
+        label: "Select category...",
+      };
+    } else {
+      selectProps['value'] = selectedCategoryOption;
+    }
 
     categoryDropdowns.push(
       <React.Fragment key={`categoryDropdown-${i}`}>
@@ -221,12 +234,7 @@ function buildDropdowns(
           <span className="form-control-feedback">
             <FontAwesomeIcon icon={faTags} />
           </span>
-          <Select
-            value={selectedCategoryOption}
-            options={options}
-            classNames={SearchFieldClass}
-            onChange={(option) => handleChangeCategory(i, option?.value)}
-            className="w-100"
+          <Select {... selectProps}
           />
         </div>
       </React.Fragment>

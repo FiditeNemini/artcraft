@@ -23,8 +23,6 @@ interface Props {
 
   maybeSelectedTtsModel?: TtsModelListItem;
   setMaybeSelectedTtsModel: (maybeSelectedTtsModel: TtsModelListItem) => void;
-
-  handleChangeCategory: (level: number, maybeToken?: string) => void;
 }
 
 export function ExploreVoicesModal(props: Props) {
@@ -122,12 +120,12 @@ export function ExploreVoicesModal(props: Props) {
                   <label className="sub-title flex-grow-1">
                   Category
                   </label>
-                  <a
+                  <button
                     className="ms-3 fw-medium"
-                    onClick={() => { props.handleChangeCategory(0, "*"); }}
+                    onClick={() => { handleChangeCategory(0, "*"); }}
                     >
                   Clear category filters
-                  </a>
+                  </button>
                 </div>
 
                 <CategoryOptions 
