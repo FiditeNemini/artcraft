@@ -98,7 +98,7 @@ export function ScopedVoiceModelOptions(props: Props) {
           </span>
 
           <Select
-            defaultValue={selectedOption}
+            value={selectedOption}
             options={options}
             classNames={SearchFieldClass}
             onChange={handleChange}

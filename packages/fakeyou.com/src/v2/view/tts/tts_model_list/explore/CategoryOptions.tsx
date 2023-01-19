@@ -166,17 +166,9 @@ export function CategoryOptions(props: Props) {
 
   let categoryDropdowns = buildDropdowns(
     dropdownCategories, 
+    selectedCategories,
     ttsModelsByCategoryToken, 
     handleChangeCategory);
-
-  const options = [
-    { value: "chocolate", label: "Chocolate" },
-    { value: "strawberry", label: "Strawberry" },
-    { value: "vanilla", label: "Vanilla" },
-    { value: "chocolate", label: "Chocolate" },
-    { value: "strawberry", label: "Strawberry" },
-    { value: "vanilla", label: "Vanilla" },
-  ];
 
   const CATEGORY_SEPARATOR = (
     <div className="d-none d-md-flex align-items-center">
@@ -206,6 +198,7 @@ export function CategoryOptions(props: Props) {
 
 function buildDropdowns(
   dropdownCategories: TtsCategoryType[][], 
+  selectedCategories: TtsCategoryType[], 
   ttsModelsByCategoryToken: Map<string, Set<TtsModelListItem>>,
   handleChangeCategory : (i: number, categoryToken?: string) => void,
 ) {
@@ -214,6 +207,7 @@ function buildDropdowns(
 
   for (let i = 0; i < dropdownCategories.length; i++) {
     const currentDropdownCategories = dropdownCategories[i];
+    const selectedCategory = selectedCategories[i];
 
     let defaultName = i === 0 ? "All Voices" : "Select...";
 
@@ -255,6 +249,14 @@ function buildDropdowns(
       );
     });
 
+    let selectedCategoryOption = undefined;
+    if (selectedCategory !== undefined) {
+      selectedCategoryOption = {
+        value: selectedCategory.category_token,
+        label: selectedCategory.name_for_dropdown,
+      };
+    }
+
     if (dropdownOptions.length <= 1) {
       // We've run out of subcategories. (1 == "Select...")
       // No sense trying to build more.
@@ -269,7 +271,7 @@ function buildDropdowns(
             <FontAwesomeIcon icon={faTags} />
           </span>
           <Select
-            defaultValue={options[2]}
+            value={selectedCategoryOption}
             options={options}
             classNames={SearchFieldClass}
             onChange={(option) => handleChangeCategory(i, option?.value)}

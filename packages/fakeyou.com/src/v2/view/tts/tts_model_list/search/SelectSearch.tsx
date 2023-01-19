@@ -44,10 +44,7 @@ export function SelectSearch(props: Props) {
     props.setMaybeSelectedTtsModel(maybeNewTtsModel);
   }
 
-  // TODO/FIXME: The default option is not working.
   let defaultOption = options.length > 0 ? options[0] : undefined;
-
-  //let defaultText = options.length > 0 ? options[0].label : "Search for a voice... (loading)";
 
   if (props.maybeSelectedTtsModel !== undefined) {
     defaultOption = { 
@@ -55,7 +52,7 @@ export function SelectSearch(props: Props) {
       label: props.maybeSelectedTtsModel.title,
     };
   }
-
+  
   return (
     <>
       <div className="zi-3 input-icon-search">
@@ -63,8 +60,7 @@ export function SelectSearch(props: Props) {
           <FontAwesomeIcon icon={faMicrophone} />
         </span>
         <Select
-          //defaultInputValue={defaultText}
-          defaultValue={defaultOption}
+          value={defaultOption} // Controlled components use "value" instead of "defaultValue".
           isSearchable={true}
           options={options}
           classNames={SearchFieldClass}

@@ -1,10 +1,9 @@
 import React from "react";
-import { faArrowRightLong, faCompass, faTags } from "@fortawesome/free-solid-svg-icons";
+import { faCompass } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { LanguageOptions } from "./LanguageOptions";
 import { TtsCategoryType } from "../../../../../AppWrapper";
 import { TtsModelListItem } from "@storyteller/components/src/api/tts/ListTtsModels";
-import { OldMultiDropdownSearch } from "./OldMultiDropdownSearch";
 import { CategoryOptions } from "./CategoryOptions";
 import { ScopedVoiceModelOptions } from "./ScopedVoiceModelOptions";
 
@@ -93,19 +92,19 @@ export function ExploreVoicesModal(props: Props) {
 
           <div className="row gx-3 gy-3">
             <ScopedVoiceModelOptions
-                  allTtsCategories={props.allTtsCategories}
-                  allTtsModels={props.allTtsModels}
+              allTtsCategories={props.allTtsCategories}
+              allTtsModels={props.allTtsModels}
 
-                  allTtsCategoriesByTokenMap={props.allTtsCategoriesByTokenMap}
-                  allTtsModelsByTokenMap={props.allTtsModelsByTokenMap}
-                  ttsModelsByCategoryToken={props.ttsModelsByCategoryToken}
+              allTtsCategoriesByTokenMap={props.allTtsCategoriesByTokenMap}
+              allTtsModelsByTokenMap={props.allTtsModelsByTokenMap}
+              ttsModelsByCategoryToken={props.ttsModelsByCategoryToken}
 
-                  dropdownCategories={props.dropdownCategories}
-                  selectedCategories={props.selectedCategories}
-                  maybeSelectedTtsModel={props.maybeSelectedTtsModel}
-                  setMaybeSelectedTtsModel={
-                    props.setMaybeSelectedTtsModel
-                  }
+              dropdownCategories={props.dropdownCategories}
+              selectedCategories={props.selectedCategories}
+              maybeSelectedTtsModel={props.maybeSelectedTtsModel}
+              setMaybeSelectedTtsModel={
+                props.setMaybeSelectedTtsModel
+              }
               />
 
           </div>

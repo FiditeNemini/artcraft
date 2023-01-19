@@ -32,7 +32,7 @@ export function LanguageOptions(props: Props) {
         <FontAwesomeIcon icon={faGlobe} />
       </span>
       <Select
-        defaultValue={languageOptions[0]}
+        value={languageOptions[0]}
         options={languageOptions}
         classNames={SearchFieldClass}
       />
