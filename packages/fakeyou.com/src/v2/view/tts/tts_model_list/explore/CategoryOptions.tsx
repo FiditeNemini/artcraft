@@ -1,4 +1,3 @@
-
 import React, { useEffect } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -66,13 +65,14 @@ export function CategoryOptions(props: Props) {
       //selectedModelToken = allTtsModels[0].model_token;
     }
 
-    let maybeElement = document.getElementsByName("tts-model-select")[0];
-
-    if (!!maybeElement && !!selectedModelToken) {
-      (maybeElement as any).value = selectedModelToken;
-    } else if (isLoading) {
-      (maybeElement as any).value = ""; // Empty string will match "loading" <option>
-    }
+// NB: This was reaching across the DOM and breaking. Find a new way to handle loading 
+//    let maybeElement = document.getElementsByName("tts-model-select")[0];
+//
+//    if (!!maybeElement && !!selectedModelToken) {
+//      (maybeElement as any).value = selectedModelToken;
+//    } else if (isLoading) {
+//      (maybeElement as any).value = ""; // Empty string will match "loading" <option>
+//    }
 
     let categoryDropdownElements =
       document.getElementsByClassName("category-dropdown");
@@ -167,9 +167,7 @@ export function CategoryOptions(props: Props) {
   let categoryDropdowns = buildDropdowns(
     dropdownCategories, 
     ttsModelsByCategoryToken, 
-    handleChangeCategory, 
-    handleRemoveCategory);
-
+    handleChangeCategory);
 
   const options = [
     { value: "chocolate", label: "Chocolate" },
@@ -180,67 +178,27 @@ export function CategoryOptions(props: Props) {
     { value: "vanilla", label: "Vanilla" },
   ];
 
+  const CATEGORY_SEPARATOR = (
+    <div className="d-none d-md-flex align-items-center">
+      <FontAwesomeIcon
+          icon={faArrowRightLong}
+          className="fs-6 opacity-75"
+      />
+    </div>
+  );
+
+  let categoryDropdownsWithSeparators = [];
+  for (let i = 0; i < categoryDropdowns.length; i++) {
+    categoryDropdownsWithSeparators.push(categoryDropdowns[i]);
+    if (i < categoryDropdowns.length - 1) {
+      categoryDropdownsWithSeparators.push(CATEGORY_SEPARATOR);
+    }
+  }
+
   return (
     <>
       <div className="d-flex flex-column flex-md-row gap-2">
-        {categoryDropdowns}
-      </div>
-
-      <br />
-      <hr />
-      <br />
-
-      <div className="d-flex flex-column flex-md-row gap-2">
-        
-        <div className="w-100">
-          <span className="form-control-feedback">
-            <FontAwesomeIcon icon={faTags} />
-          </span>
-          <Select
-              defaultValue={options[2]}
-              options={options}
-              classNames={SearchFieldClass}
-              className="w-100"
-          />
-        </div>
-
-        <div className="d-none d-md-flex align-items-center">
-          <FontAwesomeIcon
-              icon={faArrowRightLong}
-              className="fs-6 opacity-75"
-          />
-        </div>
-
-        <div className="w-100">
-          <span className="form-control-feedback">
-              <FontAwesomeIcon icon={faTags} />
-          </span>
-          <Select
-              defaultValue={options[2]}
-              options={options}
-              classNames={SearchFieldClass}
-              className="w-100"
-          />
-        </div>
-
-        <div className="d-none d-md-flex align-items-center">
-          <FontAwesomeIcon
-              icon={faArrowRightLong}
-              className="fs-6 opacity-75"
-          />
-        </div>
-
-        <div className="w-100">
-          <span className="form-control-feedback">
-              <FontAwesomeIcon icon={faTags} />
-          </span>
-          <Select
-              defaultValue={options[2]}
-              options={options}
-              classNames={SearchFieldClass}
-              className="w-100"
-          />
-        </div>
+        {categoryDropdownsWithSeparators}
       </div>
     </>
   );
@@ -250,7 +208,6 @@ function buildDropdowns(
   dropdownCategories: TtsCategoryType[][], 
   ttsModelsByCategoryToken: Map<string, Set<TtsModelListItem>>,
   handleChangeCategory : (i: number, categoryToken?: string) => void,
-  handleRemoveCategory : (i: number) => void,
 ) {
 
   let categoryDropdowns = [];
@@ -267,12 +224,21 @@ function buildDropdowns(
       </option>
     );
 
-    const options = currentDropdownCategories.map((category) => {
-      return {
-        value: category.category_token,
-        label: category.name_for_dropdown,
-      }
-    });
+    // TODO(bt, 2023-01-18): Clean this up
+
+    // Transform into "react-select" library compatible options
+    const options = currentDropdownCategories
+      .filter((category) => {
+        // If there are no models at the leaves, skip the category
+        const models = ttsModelsByCategoryToken.get(category.category_token);
+        return !(models === undefined || models.size === 0);
+      })
+      .map((category) => {
+        return {
+          value: category.category_token,
+          label: category.name_for_dropdown,
+        }
+      });
 
     currentDropdownCategories.forEach((category) => {
       const models = ttsModelsByCategoryToken.get(category.category_token);
@@ -294,36 +260,6 @@ function buildDropdowns(
       // No sense trying to build more.
       break;
     }
-
-    const selectCssClasses = "category-dropdown form-select"; // NB: 'category-dropdown' is important for function.
-    const xButtonCssClasses = "btn btn-destructive btn-inform";
-
-//    categoryDropdowns.push(
-//      <React.Fragment key={`categoryDropdown-${i}`}>
-//        <div className="d-flex gap-3 align-items-center mb-4 w-100">
-//          <div className="form-group input-icon w-100">
-//            <select
-//              onClick={() => {
-//                Analytics.ttsClickSelectCategory();
-//              }}
-//              className={selectCssClasses}
-//              name={`categories-${i}`}
-//              onChange={(ev) => handleChangeCategory(ev, i)}
-//              defaultValue="*"
-//            >
-//              {dropdownOptions}
-//            </select>
-//            <span className="form-control-feedback">
-//              <FontAwesomeIcon icon={faTags} />
-//            </span>
-//          </div>
-//
-//          <div className="control">
-//            <FontAwesomeIcon icon={faCaretRight} size="2x" color="#999" />
-//          </div>
-//        </div>
-//      </React.Fragment>
-//    );
 
     categoryDropdowns.push(
       <React.Fragment key={`categoryDropdown-${i}`}>
