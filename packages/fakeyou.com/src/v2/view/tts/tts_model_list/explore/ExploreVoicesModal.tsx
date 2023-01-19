@@ -170,6 +170,17 @@ export function ExploreVoicesModal(props: Props) {
 
           </div>
 
+          <br />
+
+            <button
+              type="button"
+              className="btn btn-primary"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+              >
+                Use this voice
+            </button>
+
         </div>
       </div>
     </div>
