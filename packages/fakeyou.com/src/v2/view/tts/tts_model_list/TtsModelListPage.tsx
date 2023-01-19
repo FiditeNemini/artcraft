@@ -42,7 +42,6 @@ import {
   faCompass,
   faDeleteLeft,
   faGlobe,
-  faShuffle,
   faVolumeHigh,
   faVolumeUp,
 } from "@fortawesome/free-solid-svg-icons";
