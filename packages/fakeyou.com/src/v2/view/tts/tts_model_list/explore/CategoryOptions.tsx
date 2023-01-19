@@ -230,8 +230,9 @@ function buildDropdowns(
     let selectProps : any = {
       options: options,
       classNames: SearchFieldClass,
-      onChange: (option: any) => handleChangeCategory(i, option?.value),
       className:"w-100",
+      autoFocus: false, // On mobile, we don't want the onscreen keyboard to take up half the UI.
+      onChange: (option: any) => handleChangeCategory(i, option?.value),
     };
 
     if (selectedCategoryOption === undefined) {
