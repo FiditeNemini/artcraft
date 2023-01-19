@@ -24,7 +24,7 @@ export const ENGLISH_LANGUAGE: AvailableLanguage = {
 
 // These are the languages the website has been *translated* into.
 // This is *not* the list of TTS langauge categories.
-type AvailableLanguageKey = "en" | "es" | "de" | "fr" | "hi" | "id" | "it" | "ja" | "ko" | "pt" | "tr" | "vi" | "zh";
+export type AvailableLanguageKey = "en" | "es" | "de" | "fr" | "hi" | "id" | "it" | "ja" | "ko" | "pt" | "tr" | "vi" | "zh";
 export const AVAILABLE_LANGUAGE_MAP: Record<AvailableLanguageKey, AvailableLanguage> = {
   en: ENGLISH_LANGUAGE,
   es: {
@@ -139,7 +139,7 @@ export const AVAILABLE_LANGUAGE_MAP: Record<AvailableLanguageKey, AvailableLangu
 };
 
 /// These are the languages TTS has been categorized into.
-type AvailableTtsLanguageKey = "en" | "es" | "it" | "de" | "fr" | "pt";
+export type AvailableTtsLanguageKey = "en" | "es" | "it" | "de" | "fr" | "pt";
 export const AVAILABLE_TTS_LANGUAGE_CATEGORY_MAP : Record<AvailableTtsLanguageKey, AvailableLanguage> = {
   en: AVAILABLE_LANGUAGE_MAP["en"],
   es: AVAILABLE_LANGUAGE_MAP["es"],

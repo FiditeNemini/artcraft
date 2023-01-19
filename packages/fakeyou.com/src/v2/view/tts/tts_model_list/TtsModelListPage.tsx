@@ -403,15 +403,6 @@ function TtsModelListPage(props: Props) {
     }
   }
 
-  const options = [
-    { value: "chocolate", label: "Chocolate" },
-    { value: "strawberry", label: "Strawberry" },
-    { value: "vanilla", label: "Vanilla" },
-    { value: "chocolate", label: "Chocolate" },
-    { value: "strawberry", label: "Strawberry" },
-    { value: "vanilla", label: "Vanilla" },
-  ];
-
   // NB: If the text is too long, don't allow submission
   let remainingCharactersButtonDisabled = props.textBuffer.trim().length > 1024;
   let noTextInputButtonDisabled = props.textBuffer.trim() === "";
@@ -512,7 +503,23 @@ function TtsModelListPage(props: Props) {
                 </div>
 
                 {/* Explore Modal */}
-                <ExploreVoicesModal />
+                <ExploreVoicesModal 
+                  allTtsCategories={props.allTtsCategories}
+                  allTtsModels={props.ttsModels}
+
+                  allTtsCategoriesByTokenMap={props.allTtsCategoriesByTokenMap}
+                  allTtsModelsByTokenMap={props.allTtsModelsByTokenMap}
+                  ttsModelsByCategoryToken={props.ttsModelsByCategoryToken}
+
+                  dropdownCategories={props.dropdownCategories}
+                  setDropdownCategories={props.setDropdownCategories}
+                  selectedCategories={props.selectedCategories}
+                  setSelectedCategories={props.setSelectedCategories}
+                  maybeSelectedTtsModel={props.maybeSelectedTtsModel}
+                  setMaybeSelectedTtsModel={
+                    props.setMaybeSelectedTtsModel
+                  }
+                  />
 
                 {directViewLink}
 
