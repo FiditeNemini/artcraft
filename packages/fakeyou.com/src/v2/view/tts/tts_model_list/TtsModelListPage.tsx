@@ -431,30 +431,6 @@ function TtsModelListPage(props: Props) {
                 className="w-100 d-flex flex-column gap-4"
                 onSubmit={handleFormSubmit}
               >
-                {/* <MultiDropdownSearch
-                  allTtsCategories={props.allTtsCategories}
-                  allTtsModels={props.ttsModels}
-                  allTtsCategoriesByTokenMap={props.allTtsCategoriesByTokenMap}
-                  allTtsModelsByTokenMap={props.allTtsModelsByTokenMap}
-                  ttsModelsByCategoryToken={props.ttsModelsByCategoryToken}
-                  dropdownCategories={props.dropdownCategories}
-                  setDropdownCategories={props.setDropdownCategories}
-                  selectedCategories={props.selectedCategories}
-                  setSelectedCategories={props.setSelectedCategories}
-                  maybeSelectedTtsModel={props.maybeSelectedTtsModel}
-                  setMaybeSelectedTtsModel={props.setMaybeSelectedTtsModel}
-                /> */}
-                {/* <AutocompleteSearch
-                  allTtsCategories={props.allTtsCategories}
-                  allTtsModels={props.ttsModels}
-                  allTtsModelsByTokenMap={props.allTtsModelsByTokenMap}
-                  dropdownCategories={props.dropdownCategories}
-                  setDropdownCategories={props.setDropdownCategories}
-                  selectedCategories={props.selectedCategories}
-                  setSelectedCategories={props.setSelectedCategories}
-                  maybeSelectedTtsModel={props.maybeSelectedTtsModel}
-                  setMaybeSelectedTtsModel={props.setMaybeSelectedTtsModel}
-                /> */}
                 <div>
                   <div className="d-flex gap-2">
                     <label className="sub-title">Search for a Voice</label>
@@ -575,16 +551,6 @@ function TtsModelListPage(props: Props) {
                         Session TTS Results
                       </h4>
                       <div className="d-flex flex-column gap-3 session-tts-section">
-                        {/* <div className="panel panel-inner text-center p-5 rounded-5">
-                          <div className="d-flex flex-column opacity-75 h-100 justify-content-center">
-                            <FontAwesomeIcon
-                              icon={faHeadphonesSimple}
-                              className="fs-3 mb-3"
-                            />
-                            <h5 className="fw-semibold">No results yet</h5>
-                            <p>Generated audio will appear here.</p>
-                          </div>
-                        </div> */}
                         <SessionTtsInferenceResultListFc
                           ttsInferenceJobs={props.ttsInferenceJobs}
                           sessionSubscriptionsWrapper={

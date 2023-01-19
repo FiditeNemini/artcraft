@@ -101,6 +101,21 @@ export function ScopedVoiceModelOptions(props: Props) {
  
   const voiceCount = leafiestCategoryModels.length;
 
+  let isLoading = false;
+
+  if (props.allTtsModels.length === 0) {
+    // NB: react-select will cache values, even across different instances (!!!)
+    // This can cause confusion when initializing a select instance before the data
+    // is loaded, and the select will never update to show the new data.
+    // The proper way to change voices after load from a placeholder "Loading..." 
+    // label is to use controlled props / value as is done here:
+    isLoading = true;
+    selectedOption = {
+      label: "Loading...",
+      value: "*",
+    }
+  }
+
   return (
     <>
       <div className="col">
@@ -123,6 +138,7 @@ export function ScopedVoiceModelOptions(props: Props) {
             options={options}
             classNames={SearchFieldClass}
             onChange={handleChange}
+            isLoading={isLoading}
             // On mobile, we don't want the onscreen keyboard to take up half the UI.
             autoFocus={false}
             isSearchable={false}

@@ -45,25 +45,6 @@ export function SelectSearch(props: Props) {
     props.setMaybeSelectedTtsModel(maybeNewTtsModel);
   }
 
-//  if (props.allTtsModels.length === 0) {
-//    // While the XHR requests are still completing, we may have nothing to build.
-//    // It's easier to return a fully disabled "loading" <Select /> component.
-//    return (
-//      <div className="zi-3 input-icon-search">
-//        <span className="form-control-feedback">
-//          <FontAwesomeIcon icon={faMicrophone} />
-//        </span>
-//        <Select 
-//          isLoading={true}
-//          options={[]}
-//          inputValue={"Loading..."}
-//          classNames={SearchFieldClass}
-//          className={"w-100"}
-//        />
-//      </div>
-//    );
-//  }
-
   let defaultOption = options.length > 0 ? options[0] : undefined;
 
   if (props.maybeSelectedTtsModel !== undefined) {
@@ -71,6 +52,21 @@ export function SelectSearch(props: Props) {
       value: props.maybeSelectedTtsModel.model_token, 
       label: props.maybeSelectedTtsModel.title,
     };
+  }
+
+  let isLoading = false;
+
+  if (props.allTtsModels.length === 0) {
+    // NB: react-select will cache values, even across different instances (!!!)
+    // This can cause confusion when initializing a select instance before the data
+    // is loaded, and the select will never update to show the new data.
+    // The proper way to change voices after load from a placeholder "Loading..." 
+    // label is to use controlled props / defaultOptions as is done here:
+    isLoading = true;
+    defaultOption = {
+      label: "Loading...",
+      value: "*",
+    }
   }
   
   return (
@@ -82,6 +78,7 @@ export function SelectSearch(props: Props) {
         <Select
           value={defaultOption} // Controlled components use "value" instead of "defaultValue".
           isSearchable={true}
+          isLoading={isLoading}
           options={options}
           classNames={SearchFieldClass}
           onChange={handleChange}
