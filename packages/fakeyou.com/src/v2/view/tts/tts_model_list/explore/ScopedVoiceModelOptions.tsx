@@ -92,7 +92,7 @@ export function ScopedVoiceModelOptions(props: Props) {
           </Trans>
         </label>
 
-        <div className="zi-3 input-icon-search">
+        <div className="input-icon-search">
           <span className="form-control-feedback">
             <FontAwesomeIcon icon={faMicrophone} />
           </span>
