@@ -7,9 +7,10 @@ import { TtsModelListItem } from "@storyteller/components/src/api/tts/ListTtsMod
 import { TtsCategoryType } from "../../../../../AppWrapper";
 import { Trans } from "react-i18next";
 //import { Analytics } from "../../../../../common/Analytics";
-import Select from "react-select";
+import Select, { createFilter } from "react-select";
 //import Option from "react-select";
 import { SearchFieldClass } from "../search/SearchFieldClass";
+import { FastReactSelectOption } from "../../../_common/FastReactSelectOption";
 
 interface Props {
   allTtsCategories: TtsCategoryType[];
@@ -98,6 +99,10 @@ export function ScopedVoiceModelOptions(props: Props) {
             options={options}
             classNames={SearchFieldClass}
             onChange={handleChange}
+            // NB: The following settings improve upon performance. 
+            // See: https://github.com/JedWatson/react-select/issues/3128
+            filterOption={createFilter({ignoreAccents: false})}
+            components={{Option: FastReactSelectOption} as any}
             />
         </div>
       </div>

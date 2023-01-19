@@ -3,9 +3,10 @@ import { TtsModelListItem } from "@storyteller/components/src/api/tts/ListTtsMod
 import { TtsCategoryType } from "../../../../../AppWrapper";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faMicrophone } from "@fortawesome/free-solid-svg-icons";
-import Select, { ActionMeta, createFilter, components } from "react-select";
+import Select, { ActionMeta, createFilter } from "react-select";
 import Option from "react-select";
 import { SearchFieldClass } from "./SearchFieldClass";
+import { FastReactSelectOption } from "../../../_common/FastReactSelectOption";
 
 // NB: This probably is not the best autocomplete library in the world
 // A lot of the libraries are really old and depend on jQuery (gross).
@@ -64,41 +65,13 @@ export function SelectSearch(props: Props) {
           isSearchable={true}
           options={options}
           classNames={SearchFieldClass}
-          filterOption={createFilter({ignoreAccents: false})}
           onChange={handleChange}
-          components={{Option: CustomOption} as any}
+          // NB: The following settings improve upon performance. 
+          // See: https://github.com/JedWatson/react-select/issues/3128
+          filterOption={createFilter({ignoreAccents: false})}
+          components={{Option: FastReactSelectOption} as any}
         />
       </div>
     </>
   );
 }
-
-class CustomOption extends React.Component {
-  //constructor(props: any) {
-  //    super(props);
-  //}
-
-  render() {
-      const {innerProps, isFocused, ...otherProps} = this.props as any;
-      const {onMouseMove, onMouseOver, ...otherInnerProps} = innerProps;
-      const newProps = {innerProps: {...otherInnerProps}, ...otherProps};
-      return (
-          <components.Option {...newProps} className="">{this.props.children}
-          </components.Option>
-      );
-  }
-}
-
-//const CustomOption2 = ({ children, ...props } : any ) => {
-//  const {innerProps, isFocused, ...otherProps} = props;
-//  const { onMouseMove, onMouseOver, ...rest } = props.innerProps;
-//  //const newProps = Object.assign(props, { innerProps: rest });
-//  const newProps = {innerProps: {...rest}, otherProps} as any;
-//  return (
-//    <components.Option
-//      {...newProps}
-//    >
-//      {children}
-//    </components.Option>
-//  );
-//};
