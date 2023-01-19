@@ -28,8 +28,8 @@ interface Props {
   maybeSelectedTtsModel?: TtsModelListItem;
   setMaybeSelectedTtsModel: (maybeSelectedTtsModel: TtsModelListItem) => void;
 
-  selectedTtsLanguageScope: string,
-  setSelectedTtsLanguageScope: (selectedTtsLanguageScope: string) => void,
+  selectedTtsLanguageScope: string;
+  setSelectedTtsLanguageScope: (selectedTtsLanguageScope: string) => void;
 }
 
 export function ExploreVoicesModal(props: Props) {
@@ -114,10 +114,12 @@ export function ExploreVoicesModal(props: Props) {
             <div className="row gx-3 gy-3">
               <div className="col-12 col-lg-3 input-icon-search">
                 <label className="sub-title">Language</label>
-                <LanguageOptions 
+                <LanguageOptions
                   selectedTtsLanguageScope={props.selectedTtsLanguageScope}
-                  setSelectedTtsLanguageScope={props.setSelectedTtsLanguageScope}
-                  />
+                  setSelectedTtsLanguageScope={
+                    props.setSelectedTtsLanguageScope
+                  }
+                />
               </div>
 
               <div className="col-12 col-md-12 col-lg-9 input-icon-search">
@@ -172,15 +174,17 @@ export function ExploreVoicesModal(props: Props) {
 
           <br />
 
-          <button
-            type="button"
-            className="btn btn-primary rounded-top-0"
-            data-bs-dismiss="modal"
-            aria-label="Close"
-          >
-            Use this voice
-            <FontAwesomeIcon icon={faArrowRight} className="ms-2" />
-          </button>
+          <div className="p-4 w-100">
+            <button
+              type="button"
+              className="btn btn-primary w-100"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            >
+              Use this voice
+              <FontAwesomeIcon icon={faArrowRight} className="ms-2" />
+            </button>
+          </div>
         </div>
       </div>
     </div>
