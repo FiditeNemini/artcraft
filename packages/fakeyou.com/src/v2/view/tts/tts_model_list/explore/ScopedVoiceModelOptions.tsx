@@ -70,7 +70,7 @@ export function ScopedVoiceModelOptions(props: Props) {
 
   return (
     <>
-      <div className="col-12 col-lg-3 input-icon-search">
+      <div className="">
         <label className="sub-title">
           <Trans
             i18nKey="tts.TtsModelListPage.form.voicesLabel"

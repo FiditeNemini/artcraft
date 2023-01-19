@@ -90,29 +90,9 @@ export function ExploreVoicesModal(props: Props) {
           </div>
 
           <br />
-          <hr />
-          <br />
 
           <div className="row gx-3 gy-3">
             <ScopedVoiceModelOptions
-                  allTtsCategories={props.allTtsCategories}
-                  allTtsModels={props.allTtsModels}
-
-                  allTtsCategoriesByTokenMap={props.allTtsCategoriesByTokenMap}
-                  allTtsModelsByTokenMap={props.allTtsModelsByTokenMap}
-                  ttsModelsByCategoryToken={props.ttsModelsByCategoryToken}
-
-                  dropdownCategories={props.dropdownCategories}
-                  setDropdownCategories={props.setDropdownCategories}
-                  selectedCategories={props.selectedCategories}
-                  setSelectedCategories={props.setSelectedCategories}
-                  maybeSelectedTtsModel={props.maybeSelectedTtsModel}
-                  setMaybeSelectedTtsModel={
-                    props.setMaybeSelectedTtsModel
-                  }
-              />
-
-            <OldMultiDropdownSearch
                   allTtsCategories={props.allTtsCategories}
                   allTtsModels={props.allTtsModels}
 
