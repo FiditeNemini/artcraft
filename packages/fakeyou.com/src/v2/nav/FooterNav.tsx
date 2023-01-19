@@ -5,7 +5,6 @@ import { Link } from "react-router-dom";
 
 import { ModerationIcon } from "../view/_icons/ModerationIcon";
 import { FrontendUrlConfig } from "../../common/FrontendUrlConfig";
-import { t } from "i18next";
 import { Trans } from "react-i18next";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
