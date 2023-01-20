@@ -778,6 +778,10 @@ styles with important tags:
       list-style: none;
     }
   }
+
+  .no-hyphen {
+    word-wrap: normal;
+  }
 }
 
 select {

@@ -311,7 +311,7 @@ function ProfilePage(props: Props) {
     <motion.div initial="hidden" animate="visible" variants={container}>
       <div className="container pt-5 pb-4 px-lg-5 px-xl-3">
         <motion.div
-          className="d-flex flex-column flex-lg-row align-items-center"
+          className="d-flex flex-column flex-lg-row align-items-center w-100"
           variants={item}
         >
           <div className="mb-3 me-lg-4 mb-lg-0">
@@ -321,7 +321,7 @@ function ProfilePage(props: Props) {
               email_hash={userEmailHash}
             />
           </div>
-          <div className="d-flex flex-column flex-lg-row align-items-center gap-3">
+          <div className="d-flex flex-column flex-lg-row align-items-center gap-3 w-100">
             <h1 className="display-6 fw-bold text-center text-lg-start mb-0">
               {userData.display_name}
             </h1>
