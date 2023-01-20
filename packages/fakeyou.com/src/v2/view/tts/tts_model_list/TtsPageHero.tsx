@@ -22,8 +22,8 @@ interface Props {
 export function TtsPageHero(props: Props) {
   const randomImage = useMemo(() => {
     const images = [
-      "mascot/kitsune_pose2.webp",
-      "mascot/kitsune_wizard.webp",
+      // "mascot/kitsune_pose2.webp",
+      // "mascot/kitsune_wizard.webp",
       // "mascot/halloween_1.webp",
       // "mascot/halloween_2.webp",
       // "mascot/halloween_3.webp",
@@ -31,6 +31,7 @@ export function TtsPageHero(props: Props) {
       // "mascot/xmas_2.webp",
       // "mascot/xmas_3.webp",
       // "mascot/xmas_4.webp",
+      "mascot/chinese_new_year.webp",
     ];
 
     return images[Math.floor(Math.random() * images.length)];
