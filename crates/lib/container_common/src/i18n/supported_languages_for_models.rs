@@ -47,6 +47,29 @@ static SUPPORTED_LANGUAGES_FOR_MODELS : Lazy<HashSet<String>> = Lazy::new(|| {
     "pt",
     "pt-BR",
 
+    // Turkish
+    "tr",
+    "tr-TR", // Turkish (Turkey), which is more common amongst visitors than strictly "tr"
+
+    // Arabic
+    "ar",     // Arabic
+    "ar-AE",	// Arabic (U.A.E.)
+    "ar-BH",	// Arabic (Bahrain)
+    "ar-DZ",	// Arabic (Algeria)
+    "ar-EG",	// Arabic (Egypt)
+    "ar-IQ",	// Arabic (Iraq)
+    "ar-JO",	// Arabic (Jordan)
+    "ar-KW",	// Arabic (Kuwait)
+    "ar-LB",	// Arabic (Lebanon)
+    "ar-LY",	// Arabic (Libya)
+    "ar-MA",	// Arabic (Morocco)
+    "ar-OM",	// Arabic (Oman)
+    "ar-QA",	// Arabic (Qatar)
+    "ar-SA",	// Arabic (Saudi Arabia)
+    "ar-SY",	// Arabic (Syria)
+    "ar-TN",	// Arabic (Tunisia)
+    "ar-YE",	// Arabic (Yemen)
+
     // ========== But these are on the horizon ==========
 
     // Japanese
