@@ -1,9 +1,9 @@
-import React from "react";
+import React, { Fragment } from "react";
 import { TtsModelListItem } from "@storyteller/components/src/api/tts/ListTtsModels";
 import { TtsCategoryType } from "../../../../../AppWrapper";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSearch } from "@fortawesome/free-solid-svg-icons";
-import Select, { ActionMeta, createFilter } from "react-select";
+import Select, { ActionMeta, createFilter, components } from "react-select";
 import Option from "react-select";
 import { SearchFieldClass } from "./SearchFieldClass";
 import { FastReactSelectOption } from "../../../_common/FastReactSelectOption";
@@ -90,9 +90,21 @@ export function SelectSearch(props: Props) {
           // NB: The following settings improve upon performance. 
           // See: https://github.com/JedWatson/react-select/issues/3128
           filterOption={createFilter({ignoreAccents: false})}
-          components={{Option: FastReactSelectOption} as any}
+          components={{SingleValue: FixedSingleValue, Option: FastReactSelectOption} as any}
         />
       </div>
     </>
   );
+}
+
+// Problem - search label isn't present when searching, confusing users that don't realize it's 
+// a text search box.
+// Ticket: https://github.com/JedWatson/react-select/issues/1351
+// Solution from: https://codesandbox.io/s/hide-selected-on-focus-react-select-n05yi2?file=/src/App.js:531-774
+
+function FixedSingleValue(props: any) {
+  const { children, ...rest } = props;
+  const { selectProps } = props;
+  if (selectProps.menuIsOpen) return <Fragment></Fragment>;
+  return <components.SingleValue {...rest}>{children}</components.SingleValue>;
 }
