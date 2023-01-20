@@ -37,6 +37,7 @@ import {
   RedditIcon,
   WhatsappIcon,
 } from "react-share";
+import { BackLink } from "../../_common/BackLink";
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -424,12 +425,12 @@ function TtsResultViewPage(props: Props) {
     <motion.div initial="hidden" animate="visible" variants={container}>
       <div className="container py-5">
         <div className="d-flex flex-column">
-          <motion.h1
-            className="display-5 fw-bold mb-4 text-center text-lg-start"
-            variants={item}
-          >
+          <motion.h1 className="display-5 fw-bold mb-3" variants={item}>
             {headingTitle}
           </motion.h1>
+          <motion.div className="mb-4" variants={item}>
+            <BackLink link="/" text="Back to all models" />
+          </motion.div>
         </div>
       </div>
 
@@ -542,6 +543,9 @@ function TtsResultViewPage(props: Props) {
         <motion.p className="text-center text-lg-start" variants={item}>
           <ReportDiscordLinkFc />
         </motion.p>
+        <motion.div className="pt-5" variants={item}>
+          <BackLink link="/" text="Back to all models" />
+        </motion.div>
       </motion.div>
     </motion.div>
   );
