@@ -78,7 +78,14 @@ export function ScopedVoiceModelOptions(props: Props) {
   let selectedOption = options.find((option) => option.value === maybeSelectedTtsModel?.model_token);
 
   if (selectedOption === undefined && options.length > 0) {
-    selectedOption = options[0];
+    // NB: We shouldn't select the first item in the list since that won't update the currently
+    // selected model. If the user were to close the dialogue, they'd think they had picked a voice,
+    // when in reality no state would have changed. By forcing the user to choose, the user will set
+    // the state appropriately.
+    selectedOption = {
+      label: "Select voice...",
+      value: "*",
+    }
   }
  
   const voiceCount = options.length;
