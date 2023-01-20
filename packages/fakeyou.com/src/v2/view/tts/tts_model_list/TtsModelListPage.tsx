@@ -61,7 +61,7 @@ import {
 import {
   DynamicallyCategorizeModels,
 } from "../../../../model/categories/SyntheticCategory";
-import { AvailableTtsLanguageKey, AVAILABLE_LANGUAGE_MAP, ENGLISH_LANGUAGE } from "../../../../_i18n/AvailableLanguageMap";
+import { AvailableTtsLanguageKey, AVAILABLE_TTS_LANGUAGE_CATEGORY_MAP, ENGLISH_LANGUAGE } from "../../../../_i18n/AvailableLanguageMap";
 import { ExploreVoicesModal } from "./explore/ExploreVoicesModal";
 import { FrontendUrlConfig } from "../../../../common/FrontendUrlConfig";
 
@@ -281,7 +281,7 @@ function TtsModelListPage(props: Props) {
     const userName = props.maybeSelectedTtsModel.creator_display_name;
     const modelLink = FrontendUrlConfig.ttsModelPage(props.maybeSelectedTtsModel.model_token);
     const profileLink = FrontendUrlConfig.userProfilePage(props.maybeSelectedTtsModel.creator_display_name);
-    const modelLanguage = AVAILABLE_LANGUAGE_MAP[props.maybeSelectedTtsModel.ietf_primary_language_subtag as AvailableTtsLanguageKey] || ENGLISH_LANGUAGE;
+    const modelLanguage = AVAILABLE_TTS_LANGUAGE_CATEGORY_MAP[props.maybeSelectedTtsModel.ietf_primary_language_subtag as AvailableTtsLanguageKey] || ENGLISH_LANGUAGE;
 
     directViewLink = (
       <Link

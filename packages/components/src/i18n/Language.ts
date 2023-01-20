@@ -1,6 +1,7 @@
 enum Language {
   English,
   Spanish,
+  Arabic,
   Portuguese,
   Turkish,
   Indonesian,

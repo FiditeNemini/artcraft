@@ -21,7 +21,6 @@ export const ENGLISH_LANGUAGE: AvailableLanguage = {
   showBootstrapLanguageNotice: false,
 };
 
-
 // These are the languages the website has been *translated* into.
 // This is *not* the list of TTS langauge categories.
 export type AvailableLanguageKey = "en" | "es" | "de" | "fr" | "hi" | "id" | "it" | "ja" | "ko" | "pt" | "tr" | "vi" | "zh";
@@ -138,13 +137,37 @@ export const AVAILABLE_LANGUAGE_MAP: Record<AvailableLanguageKey, AvailableLangu
   },
 };
 
+// Langauges the website has not yet been translated into
+export const ARABIC_LANGUAGE: AvailableLanguage = {
+  language: Language.Arabic,
+  languageCode: "ar",
+  languageName: "Arabic",
+  languageNameLocalized: "عربي",
+  flags: ["🇦🇪", "🇸🇦"],
+  showPleaseFollowNotice: false,
+  showBootstrapLanguageNotice: false, // TODO
+};
+
+// Langauges the website has not yet been translated into
+export const TURKISH_LANGUAGE: AvailableLanguage = {
+  language: Language.Turkish,
+  languageCode: "tr",
+  languageName: "Turkish",
+  languageNameLocalized: "Türk",
+  flags: ["🇹🇷"],
+  showPleaseFollowNotice: false,
+  showBootstrapLanguageNotice: false, // TODO
+};
+
 /// These are the languages TTS has been categorized into.
-export type AvailableTtsLanguageKey = "en" | "es" | "it" | "de" | "fr" | "pt";
+export type AvailableTtsLanguageKey = "en" | "es" | "it" | "de" | "fr" | "pt" | "ar" | "tr";
 export const AVAILABLE_TTS_LANGUAGE_CATEGORY_MAP : Record<AvailableTtsLanguageKey, AvailableLanguage> = {
   en: AVAILABLE_LANGUAGE_MAP["en"],
   es: AVAILABLE_LANGUAGE_MAP["es"],
+  ar: ARABIC_LANGUAGE,
   de: AVAILABLE_LANGUAGE_MAP["de"],
   fr: AVAILABLE_LANGUAGE_MAP["fr"],
   it: AVAILABLE_LANGUAGE_MAP["it"],
   pt: AVAILABLE_LANGUAGE_MAP["pt"],
+  tr: TURKISH_LANGUAGE,
 }
