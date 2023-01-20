@@ -203,7 +203,7 @@ pub async fn edit_tts_model_handler(
       return Err(EditTtsModelError::BadInput("title contains slurs".to_string()));
     }
 
-    title = Some(payload.to_string());
+    title = Some(payload.trim().to_string());
   }
 
   if let Some(markdown) = request.description_markdown.as_deref() {

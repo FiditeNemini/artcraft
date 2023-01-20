@@ -120,7 +120,7 @@ pub async fn upload_tts_model_handler(
   let ip_address = get_request_ip(&http_request);
 
   let uuid = request.idempotency_token.to_string();
-  let title = request.title.to_string();
+  let title = request.title.trim().to_string();
   let download_url = request.download_url.to_string();
 
   match is_bad_tts_model_download_url(&download_url) {
