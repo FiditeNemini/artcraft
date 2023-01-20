@@ -45,6 +45,7 @@ import {
   faTrash,
   faVolumeHigh,
   faDeleteLeft,
+  faBarsStaggered,
 } from "@fortawesome/free-solid-svg-icons";
 import { motion } from "framer-motion";
 import { container, item, panel } from "../../../../data/animation";
@@ -657,13 +658,13 @@ function TtsModelViewPage(props: Props) {
     <motion.div initial="hidden" animate="visible" variants={container}>
       <div className="container py-5">
         <div className="d-flex flex-column">
-          <motion.h1
-            className="display-5 fw-bold mb-4  text-center text-lg-start"
-            variants={item}
-          >
+          <motion.h1 className="display-5 fw-bold mb-3" variants={item}>
             {title}
           </motion.h1>
         </div>
+        <motion.div className="mb-4" variants={item}>
+          <BackLink link="/" text="Back to all models" />
+        </motion.div>
       </div>
 
       <div>{modelDescription}</div>
@@ -749,18 +750,18 @@ function TtsModelViewPage(props: Props) {
               <textarea
                 onChange={handleChangeText}
                 value={props.textBuffer}
-                className="form-control fs-5"
+                className="form-control text-message"
                 placeholder="Textual shenanigans go here..."
                 rows={6}
               ></textarea>
               <div className="d-flex gap-3 mt-4 pt-3 flex-column flex-md-row">
-                <button className="btn btn-primary w-100">
+                <button className="btn btn-primary w-75">
                   <FontAwesomeIcon icon={faVolumeHigh} className="me-2" />
                   Speak
                 </button>
 
                 <button
-                  className="btn btn-destructive w-100"
+                  className="btn btn-destructive w-25"
                   onClick={handleClearClick}
                 >
                   <FontAwesomeIcon icon={faDeleteLeft} className="me-2" />
@@ -780,10 +781,16 @@ function TtsModelViewPage(props: Props) {
         <BackLink link="/" text="Back to all models" />
       </motion.div>
 
-      <SessionTtsInferenceResultListFc
-        ttsInferenceJobs={props.ttsInferenceJobs}
-        sessionSubscriptionsWrapper={props.sessionSubscriptionsWrapper}
-      />
+      <motion.div className="container" variants={item}>
+        <h4 className="text-center text-lg-start mb-4">
+          <FontAwesomeIcon icon={faBarsStaggered} className="me-3" />
+          Session TTS Results
+        </h4>
+        <SessionTtsInferenceResultListFc
+          ttsInferenceJobs={props.ttsInferenceJobs}
+          sessionSubscriptionsWrapper={props.sessionSubscriptionsWrapper}
+        />
+      </motion.div>
     </motion.div>
   );
 }
