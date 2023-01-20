@@ -198,13 +198,36 @@ function TtsModelListPage(props: Props) {
     }
     const categoryList = await ListTtsCategories();
     if (ListTtsCategoriesIsOk(categoryList)) {
-      // NB(bt, 2023-01-18): We no longer generate categories on the frontend.
-      //const serverCategories: TtsCategoryType[] = categoryList.categories;
-      //const dynamicCategories: TtsCategoryType[] =
-      //  GenerateSyntheticCategories();
-      //const allCategories = serverCategories.concat(dynamicCategories);
-      //setAllTtsCategories(allCategories);
-      setAllTtsCategories(categoryList.categories);
+      let categories = categoryList.categories;
+
+      // NB: We'll use the frontend to order the synthetic categories first.
+
+      const LATEST_MODELS_CATEGORY_TOKEN = 'SYNTHETIC_CATEGORY:LATEST_MODELS';
+      const TRENDING_MODELS_CATEGORY_TOKEN = 'SYNTHETIC_CATEGORY:TRENDING_MODELS';
+
+      let maybeLatestCategory = categories
+        .find((category) => category.category_token === LATEST_MODELS_CATEGORY_TOKEN);
+
+      let maybeTrendingCategory = categories
+        .find((category) => category.category_token === TRENDING_MODELS_CATEGORY_TOKEN);
+
+      let otherCategories = categories
+        .filter((category) => category.category_token !== LATEST_MODELS_CATEGORY_TOKEN)
+        .filter((category) => category.category_token !== TRENDING_MODELS_CATEGORY_TOKEN);
+
+      categories = [];
+
+      if (maybeLatestCategory !== undefined) {
+        categories.push(maybeLatestCategory);
+      }
+
+      if (maybeTrendingCategory !== undefined) {
+        categories.push(maybeTrendingCategory);
+      }
+
+      categories.push(...otherCategories);
+
+      setAllTtsCategories(categories);
     } else if (ListTtsCategoriesIsError(categoryList)) {
       // TODO: Retry on decay function
     }
