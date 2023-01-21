@@ -9,6 +9,7 @@ import { TtsCategoryType } from "../../../../../AppWrapper";
 //import { useTranslation } from "react-i18next";
 import Select from "react-select";
 import { SearchFieldClass } from "../search/SearchFieldClass";
+import { Analytics } from "../../../../../common/Analytics";
 
 interface Props {
   allTtsCategories: TtsCategoryType[];
@@ -167,6 +168,7 @@ function buildDropdowns(
       className:"w-100",
       autoFocus: false, // On mobile, we don't want the onscreen keyboard to take up half the UI.
       isSearchable: false, // On mobile, we don't want the onscreen keyboard to take up half the UI.
+      onMenuOpen: () => { Analytics.ttsOpenCategorySelectMenu() },
       onChange: (option: any) => handleChangeCategory(i, option?.value),
     };
 

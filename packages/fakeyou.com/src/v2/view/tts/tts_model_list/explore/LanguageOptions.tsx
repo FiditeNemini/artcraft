@@ -4,6 +4,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Select from "react-select";
 import { SearchFieldClass } from "../search/SearchFieldClass";
 import { AVAILABLE_TTS_LANGUAGE_CATEGORY_MAP } from "../../../../../_i18n/AvailableLanguageMap";
+import { Analytics } from "../../../../../common/Analytics";
 
 interface Props {
   selectedTtsLanguageScope: string,
@@ -55,6 +56,7 @@ export function LanguageOptions(props: Props) {
         options={languageOptions}
         classNames={SearchFieldClass}
         onChange={handleChange}
+        onMenuOpen={() => { Analytics.ttsOpenCategorySelectMenu() } }
       />
     </div>
   )

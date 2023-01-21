@@ -128,6 +128,23 @@ class Analytics {
     Analytics.sendCategorizedEvent(this.TTS, 'click_select_category');
   }
 
+  static ttsOpenCategorySelectMenu() {
+    Analytics.sendCategorizedEvent(this.TTS, 'open_category_select_menu');
+  }
+
+  static ttsOpenLanguageSelectMenu() {
+    Analytics.sendCategorizedEvent(this.TTS, 'open_language_select_menu');
+  }
+
+  static ttsOpenPrimaryVoiceSelectMenu() {
+    Analytics.sendCategorizedEvent(this.TTS, 'open_primary_voice_select_menu');
+  }
+
+  static ttsOpenExploreVoicesModal() {
+    Analytics.sendCategorizedEvent(this.TTS, 'open_explore_voices_modal');
+  }
+
+
   //static ttsClickVoiceSearchBox() {
   //  Analytics.sendCategorizedEvent(this.TTS, 'click_voice_search_box');
   //}

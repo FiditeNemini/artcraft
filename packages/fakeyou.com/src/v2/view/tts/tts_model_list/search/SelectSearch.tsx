@@ -7,6 +7,7 @@ import Select, { ActionMeta, createFilter, components } from "react-select";
 import Option from "react-select";
 import { SearchFieldClass } from "./SearchFieldClass";
 import { FastReactSelectOption } from "../../../_common/FastReactSelectOption";
+import { Analytics } from "../../../../../common/Analytics";
 
 interface Props {
   allTtsCategories: TtsCategoryType[];
@@ -87,6 +88,7 @@ export function SelectSearch(props: Props) {
           options={options}
           classNames={SearchFieldClass}
           onChange={handleChange}
+          onMenuOpen={() => { Analytics.ttsOpenPrimaryVoiceSelectMenu() } }
           // NB: The following settings improve upon performance. 
           // See: https://github.com/JedWatson/react-select/issues/3128
           filterOption={createFilter({ignoreAccents: false})}

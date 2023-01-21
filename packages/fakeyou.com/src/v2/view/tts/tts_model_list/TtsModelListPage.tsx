@@ -483,7 +483,7 @@ function TtsModelListPage(props: Props) {
                     </div>
 
                     <button
-                      onClick={handleClearClick}
+                      onClick={() => { Analytics.ttsOpenExploreVoicesModal() } }
                       className="btn btn-primary rounded-50"
                       data-bs-toggle="modal"
                       data-bs-target="#exploreModal"
