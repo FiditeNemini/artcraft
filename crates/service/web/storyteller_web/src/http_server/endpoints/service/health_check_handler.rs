@@ -31,6 +31,7 @@ pub struct HealthCheckResponse {
   pub healthy_check_consecutive_count: Option<u64>,
   pub unhealthy_check_consecutive_count: Option<u64>,
   pub server_build_sha: String,
+  pub server_hostname: String,
 }
 
 
@@ -64,8 +65,8 @@ impl fmt::Display for HealthCheckError {
 
 pub async fn get_health_check_handler(
   http_request: HttpRequest,
-  server_state: web::Data<Arc<ServerState>>) -> Result<HttpResponse, HealthCheckError>
-{
+  server_state: web::Data<Arc<ServerState>>
+) -> Result<HttpResponse, HealthCheckError> {
   let health_check_status = server_state.health_check_status.get_health_check_status()
       .map_err(|e| {
         error!("Error serving health check status: {:?}", e);
@@ -81,6 +82,7 @@ pub async fn get_health_check_handler(
     healthy_check_consecutive_count: health_check_status.healthy_check_consecutive_count,
     unhealthy_check_consecutive_count: health_check_status.unhealthy_check_consecutive_count,
     server_build_sha: server_state.server_info.build_sha.clone(),
+    server_hostname: server_state.hostname.clone(),
   };
 
   let body = serde_json::to_string(&response)

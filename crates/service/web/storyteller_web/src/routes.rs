@@ -102,6 +102,7 @@ use crate::http_server::endpoints::w2l::set_w2l_template_mod_approval::set_w2l_t
 use users_component::default_routes::add_suggested_api_v1_account_creation_and_session_routes;
 use users_component::endpoints::edit_profile_handler::edit_profile_handler;
 use users_component::endpoints::get_profile_handler::get_profile_handler;
+use crate::http_server::endpoints::service::public_info_handler::get_public_info_handler;
 
 pub fn add_routes<T, B> (app: App<T, B>) -> App<T, B>
   where
@@ -139,6 +140,11 @@ pub fn add_routes<T, B> (app: App<T, B>) -> App<T, B>
   app.service(
     web::resource("/_status")
         .route(web::get().to(get_health_check_handler))
+        .route(web::head().to(|| HttpResponse::Ok()))
+  )
+  .service(
+    web::resource("/server_info") // NB/TODO(bt,2023-01-21): Couldn't scope to /v1/, actix routing table might not like collision
+        .route(web::get().to(get_public_info_handler))
         .route(web::head().to(|| HttpResponse::Ok()))
   )
   // ==================== MISC ====================
