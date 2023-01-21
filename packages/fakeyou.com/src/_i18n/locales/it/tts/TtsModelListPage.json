@@ -1,25 +1,26 @@
 {
     "form": {
-        "asyncLoadingDropdownValue": "Loading...",
+        "asyncLoadingDropdownValue": "Caricamento...",
         "buttons": {
-            "clear": "Clear",
-            "speak": "Speak"
+            "clear": "Ripristina",
+            "speak": "Parlare"
         },
-        "by": "by",
+        "by": "per",
         "categoryFiltersLabel": "Category / Langauge",
         "modelSeeMoreLink": "See more details about the \"<1>{{modelName}}</1>\" model by <3>{{userName}}</3>",
+        "searchBarLabel": "Cerca una voce",  
         "searchHint": "Search for Voice",
-        "searchLabel": "Search",
-        "textInputHint": "Textual shenanigans go here...",
+        "searchLabel": "Ricerca",
+        "textInputHint": "Inserisci qui il testo da generare",
         "voicesLabel": "Voice ({{count}} to choose from)"
     },
-    "formTitle": "Create TTS",
+    "formTitle": "Crea TTS",
     "heroSection": {
         "buttons": {
-            "cloneVoice": "Clone My Voice!",
-            "signUp": "Sign Up"
+            "cloneVoice": "Clona la mia Voce!",
+            "signUp": "Registrarsi"
         },
-        "subtitle": "Use <strong>FakeYou</strong> deep fake tech to say stuff with your favorite characters",
-        "title": "Text to Speech"
+        "subtitle": "Usa la tecnologia deep fake di <strong>FakeYou</strong> per dire cose con i tuoi personaggi preferiti",
+        "title": "Testo alla Voce"
     }
 }

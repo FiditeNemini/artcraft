@@ -316,7 +316,7 @@ function TtsModelListPage(props: Props) {
       >
         <div className="flex-grow-1">
           <p>
-            Model by{" "}
+            Voice by{" "}
             <Link 
               to={profileLink} 
               onClick={ () => { Analytics.ttsClickModelCreatorLink() } }
@@ -330,13 +330,10 @@ function TtsModelListPage(props: Props) {
               />
             </Link>{" "}
             | <FontAwesomeIcon icon={faGlobe} className="me-2" />
-            Language: <span className="fw-semibold">{modelLanguage.languageName}</span> {/*| Use count:{" "}
+            {t("tts.TtsModelListPage.languageLabel")}: <span className="fw-semibold">{modelLanguage.languageName}</span> {/*| Use count:{" "}
             <span className="fw-semibold">616400</span>*/}
           </p>
         </div>
-        {/* <Trans i18nKey="tts.TtsModelListPage.form.modelSeeMoreLink">
-          See more details
-        </Trans> */}
         <div className="fw-medium">
           <span>See more details</span>
           <FontAwesomeIcon icon={faChevronRight} className="ms-2" />
@@ -462,7 +459,9 @@ function TtsModelListPage(props: Props) {
               >
                 <div>
                   <div className="d-flex gap-2">
-                    <label className="sub-title">Search for a Voice</label>
+                    <label className="sub-title">
+                      {t("tts.TtsModelListPage.form.searchBarLabel")}
+                    </label>
                     {/*<a href="/" className="ms-1">
                       <FontAwesomeIcon icon={faShuffle} />
                     </a>*/}

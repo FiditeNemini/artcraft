@@ -1,0 +1,28 @@
+{
+    "form": {
+        "asyncLoadingDropdownValue": "Lütfen bekle...",
+        "buttons": {
+            "clear": "Sil",
+            "speak": "Konuşmak"
+        },
+        "by": "'ye göre",
+        "categoryFiltersLabel": "Kategori / Dil",
+        "modelSeeMoreLink": "<3>{{userName}}</3> tarafından \"<1>{{modelName}}</1>\" modeli hakkında daha fazla ayrıntıya bakın",
+        "searchBarLabel": "Ses Ara",  
+        "searchHint": "Ses Ara",
+        "searchLabel": "Arama",
+        "textInputHint": "Burada oluşturulacak metni girin",
+        "voicesLabel": "Ses (seçim için {{count}})"
+    },
+    "formTitle": "TTS oluştur",
+    "languageLabel": "Dil",
+    "heroSection": {
+        "buttons": {
+            "cloneVoice": "Sesimi klonla!",
+            "signUp": "üye olmak",
+            "viewPricing": "Fiyatlandırmayı Görüntüle"
+        },
+        "subtitle": "En sevdiğiniz karakterlerle bir şeyler söylemek için <strong>FakeYou</strong> derin sahte teknolojisini kullanın",
+        "title": "Konuşma metni"
+    }
+}

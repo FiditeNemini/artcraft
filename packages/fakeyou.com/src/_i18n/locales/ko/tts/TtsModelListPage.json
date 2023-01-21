@@ -8,16 +8,19 @@
         "by": "의",
         "categoryFiltersLabel": "카테고리 / 언어",
         "modelSeeMoreLink": "<3>{{userName}}</3>의 \"<1>{{modelName}}</1>\" 모델에 대한 자세한 내용 보기",
+        "searchBarLabel": "음성 검색",  
         "searchHint": "검색어",
         "searchLabel": "검색",
         "textInputHint": "여기에 텍스트를 입력하세요",
         "voicesLabel": "음성({{count}}개 중에서 선택)"
     },
     "formTitle": "TTS 생성",
+    "languageLabel": "언어",
     "heroSection": {
         "buttons": {
             "cloneVoice": "내 목소리를 복제하십시오!",
-            "signUp": "가입하기"
+            "signUp": "가입하기",
+            "viewPricing": "가격 보기"
         },
         "subtitle": "<strong>FakeYou</strong> 딥 페이크 기술을 사용하여 좋아하는 캐릭터와 함께 말하세요.",
         "title": "텍스트 음성 변환"
