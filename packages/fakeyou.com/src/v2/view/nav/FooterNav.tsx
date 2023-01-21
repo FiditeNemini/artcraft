@@ -3,8 +3,8 @@ import { GitSha } from "@storyteller/components/src/elements/GitSha";
 import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
 import { Link } from "react-router-dom";
 
-import { ModerationIcon } from "../view/_icons/ModerationIcon";
-import { FrontendUrlConfig } from "../../common/FrontendUrlConfig";
+import { ModerationIcon } from "../_icons/ModerationIcon";
+import { FrontendUrlConfig } from "../../../common/FrontendUrlConfig";
 import { Trans } from "react-i18next";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {

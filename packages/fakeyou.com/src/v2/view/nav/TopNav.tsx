@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
 import { Link, useHistory } from "react-router-dom";
-import { FrontendUrlConfig } from "../../common/FrontendUrlConfig";
+import { FrontendUrlConfig } from "../../../common/FrontendUrlConfig";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faMicrophone,
@@ -33,12 +33,12 @@ import {
   panel,
   image,
   sessionItem,
-} from "../../data/animation";
+} from "../../../data/animation";
 import Tippy from "@tippyjs/react";
 import "tippy.js/dist/tippy.css";
 import "tippy.js/animations/shift-away.css";
 import { ThirdPartyLinks } from "@storyteller/components/src/constants/ThirdPartyLinks";
-import { Analytics } from "../../common/Analytics";
+import { Analytics } from "../../../common/Analytics";
 
 interface Props {
   sessionWrapper: SessionWrapper;
