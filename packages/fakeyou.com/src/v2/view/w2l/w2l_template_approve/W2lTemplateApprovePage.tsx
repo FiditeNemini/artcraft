@@ -19,7 +19,7 @@ interface Props {
   sessionWrapper: SessionWrapper;
 }
 
-function W2lTemplateApproveFc(props: Props) {
+function W2lTemplateApprovePage(props: Props) {
   const history = useHistory();
 
   let { templateToken }: { templateToken: string } = useParams();
@@ -195,4 +195,4 @@ function W2lTemplateApproveFc(props: Props) {
   );
 }
 
-export { W2lTemplateApproveFc };
+export { W2lTemplateApprovePage };

@@ -1,19 +1,19 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { JobState } from "@storyteller/components/src/jobs/JobStates";
+import { TtsModelUploadJob } from "@storyteller/components/src/jobs/TtsModelUploadJobs";
 import { motion } from "framer-motion";
 import { container, sessionItem, item } from "../../../data/animation";
-import { VocoderUploadJob } from "@storyteller/components/src/jobs/VocoderUploadJobs";
 
 interface Props {
-  vocoderUploadJobs: Array<VocoderUploadJob>;
+  modelUploadJobs: Array<TtsModelUploadJob>;
 }
 
-function SessionVocoderUploadResultListFc(props: Props) {
+function SessionTtsModelUploadResultList(props: Props) {
   let results: Array<JSX.Element> = [];
 
-  props.vocoderUploadJobs.forEach((job) => {
-    if (!job.maybeDownloadedEntityToken) {
+  props.modelUploadJobs.forEach((job) => {
+    if (!job.maybeModelToken) {
       let stateDescription = "Pending...";
 
       switch (job.jobState) {
@@ -49,7 +49,7 @@ function SessionVocoderUploadResultListFc(props: Props) {
         </div>
       );
     } else {
-      let permalink = `/vocoder/${job.maybeDownloadedEntityToken}`;
+      let ttsPermalink = `/tts/${job.maybeModelToken}`;
 
       results.push(
         <div key={job.jobToken}>
@@ -58,8 +58,8 @@ function SessionVocoderUploadResultListFc(props: Props) {
             variants={sessionItem}
           >
             Complete!
-            <Link to={permalink} className="btn btn-primary ms-4">
-              See &amp; use vocoder model
+            <Link to={ttsPermalink} className="btn btn-primary ms-4">
+              See &amp; use TTS model
             </Link>
           </motion.div>
         </div>
@@ -71,7 +71,7 @@ function SessionVocoderUploadResultListFc(props: Props) {
   if (results.length !== 0) {
     title = (
       <motion.h2 className="text-center text-lg-start fw-bold" variants={item}>
-        Vocoder Upload Status
+        TTS Model Upload Status
       </motion.h2>
     );
   }
@@ -86,4 +86,4 @@ function SessionVocoderUploadResultListFc(props: Props) {
   );
 }
 
-export { SessionVocoderUploadResultListFc };
+export { SessionTtsModelUploadResultList };

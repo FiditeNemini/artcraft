@@ -1,21 +1,19 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { W2lInferenceJob } from "../../../App";
 import { JobState } from "@storyteller/components/src/jobs/JobStates";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faList } from "@fortawesome/free-solid-svg-icons";
 import { motion } from "framer-motion";
-import { container, item, sessionItem } from "../../../data/animation";
+import { container, sessionItem, item } from "../../../data/animation";
+import { VocoderUploadJob } from "@storyteller/components/src/jobs/VocoderUploadJobs";
 
 interface Props {
-  w2lInferenceJobs: Array<W2lInferenceJob>;
+  vocoderUploadJobs: Array<VocoderUploadJob>;
 }
 
-function SessionW2lInferenceResultListFc(props: Props) {
+function SessionVocoderUploadResultList(props: Props) {
   let results: Array<JSX.Element> = [];
 
-  props.w2lInferenceJobs.forEach((job) => {
-    if (!job.maybeResultToken) {
+  props.vocoderUploadJobs.forEach((job) => {
+    if (!job.maybeDownloadedEntityToken) {
       let stateDescription = "Pending...";
 
       switch (job.jobState) {
@@ -47,13 +45,11 @@ function SessionW2lInferenceResultListFc(props: Props) {
 
       results.push(
         <div key={job.jobToken}>
-          <motion.div className="alert alert-primary" variants={sessionItem}>
-            {stateDescription}
-          </motion.div>
+          <div className="alert alert-primary">{stateDescription}</div>
         </div>
       );
     } else {
-      let w2lPermalink = `/w2l/result/${job.maybeResultToken}`;
+      let permalink = `/vocoder/${job.maybeDownloadedEntityToken}`;
 
       results.push(
         <div key={job.jobToken}>
@@ -61,9 +57,9 @@ function SessionW2lInferenceResultListFc(props: Props) {
             className="panel py-4 p-3 p-lg-4 gap-4"
             variants={sessionItem}
           >
-            Complete!{" "}
-            <Link to={w2lPermalink} className="btn btn-primary ms-4">
-              Permalink &amp; download
+            Complete!
+            <Link to={permalink} className="btn btn-primary ms-4">
+              See &amp; use vocoder model
             </Link>
           </motion.div>
         </div>
@@ -75,8 +71,7 @@ function SessionW2lInferenceResultListFc(props: Props) {
   if (results.length !== 0) {
     title = (
       <motion.h2 className="text-center text-lg-start fw-bold" variants={item}>
-        <FontAwesomeIcon icon={faList} className="me-3" />
-        Session W2L Results
+        Vocoder Upload Status
       </motion.h2>
     );
   }
@@ -91,4 +86,4 @@ function SessionW2lInferenceResultListFc(props: Props) {
   );
 }
 
-export { SessionW2lInferenceResultListFc };
+export { SessionVocoderUploadResultList };

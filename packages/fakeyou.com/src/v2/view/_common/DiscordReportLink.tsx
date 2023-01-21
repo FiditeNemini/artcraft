@@ -4,7 +4,7 @@ import { DiscordLink } from '@storyteller/components/src/elements/DiscordLink';
 interface Props {
 }
 
-function ReportDiscordLinkFc(props: Props) {
+function ReportDiscordLink(props: Props) {
   return (
     <div className="content">
       <p>Report inappropriate content on <DiscordLink />.</p>
@@ -12,4 +12,4 @@ function ReportDiscordLinkFc(props: Props) {
   )
 }
 
-export { ReportDiscordLinkFc };
+export { ReportDiscordLink };

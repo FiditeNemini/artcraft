@@ -56,7 +56,7 @@ interface Props {
   sessionWrapper: SessionWrapper;
 }
 
-function W2lResultEditFc(props: Props) {
+function W2lResultEditPage(props: Props) {
   let { token }: { token: string } = useParams();
 
   const history = useHistory();
@@ -189,4 +189,4 @@ function W2lResultEditFc(props: Props) {
   );
 }
 
-export { W2lResultEditFc };
+export { W2lResultEditPage };

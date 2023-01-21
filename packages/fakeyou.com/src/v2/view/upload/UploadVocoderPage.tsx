@@ -10,7 +10,7 @@ import { FrontendUrlConfig } from "../../../common/FrontendUrlConfig";
 import { motion } from "framer-motion";
 import { container, item, panel } from "../../../data/animation";
 import { VocoderUploadJob } from "@storyteller/components/src/jobs/VocoderUploadJobs";
-import { SessionVocoderUploadResultListFc } from "../_common/SessionVocoderUploadResultsListFc";
+import { SessionVocoderUploadResultList } from "../_common/SessionVocoderUploadResultsList";
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -172,7 +172,7 @@ function UploadVocoderPage(props: Props) {
         </motion.div>
       </motion.form>
 
-      <SessionVocoderUploadResultListFc
+      <SessionVocoderUploadResultList
         vocoderUploadJobs={props.vocoderUploadJobs}
       />
     </motion.div>

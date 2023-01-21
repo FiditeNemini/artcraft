@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { ApiConfig } from "@storyteller/components";
-import { SessionW2lTemplateUploadResultListFc } from "../_common/SessionW2lTemplateUploadResultsListFc";
+import { SessionW2lTemplateUploadResultList } from "../_common/SessionW2lTemplateUploadResultsList";
 import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
 import { W2lTemplateUploadJob } from "@storyteller/components/src/jobs/W2lTemplateUploadJobs";
 import { useHistory } from "react-router-dom";
@@ -166,7 +166,7 @@ function UploadW2lVideoPage(props: Props) {
         </div>*/}
       </motion.form>
 
-      <SessionW2lTemplateUploadResultListFc
+      <SessionW2lTemplateUploadResultList
         w2lTemplateUploadJobs={props.w2lTemplateUploadJobs}
       />
     </motion.div>

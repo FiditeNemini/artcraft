@@ -9,7 +9,7 @@ interface Props {
   w2lTemplateUploadJobs: Array<W2lTemplateUploadJob>;
 }
 
-function SessionW2lTemplateUploadResultListFc(props: Props) {
+function SessionW2lTemplateUploadResultList(props: Props) {
   let results: Array<JSX.Element> = [];
 
   props.w2lTemplateUploadJobs.forEach((job) => {
@@ -88,4 +88,4 @@ function SessionW2lTemplateUploadResultListFc(props: Props) {
   );
 }
 
-export { SessionW2lTemplateUploadResultListFc };
+export { SessionW2lTemplateUploadResultList };

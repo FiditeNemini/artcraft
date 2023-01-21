@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { ApiConfig } from "@storyteller/components";
 import { EnqueueJobResponsePayload } from "../tts_model_list/TtsModelListPage";
-import { SessionTtsInferenceResultListFc } from "../../_common/SessionTtsInferenceResultsListFc";
+import { SessionTtsInferenceResultList } from "../../_common/SessionTtsInferenceResultsList";
 import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
 import { Gravatar } from "@storyteller/components/src/elements/Gravatar";
 import { LanguageCodeToDescriptionWithDefault } from "@storyteller/components/src/i18n/SupportedModelLanguages";
@@ -786,7 +786,7 @@ function TtsModelViewPage(props: Props) {
           <FontAwesomeIcon icon={faBarsStaggered} className="me-3" />
           Session TTS Results
         </h4>
-        <SessionTtsInferenceResultListFc
+        <SessionTtsInferenceResultList
           ttsInferenceJobs={props.ttsInferenceJobs}
           sessionSubscriptionsWrapper={props.sessionSubscriptionsWrapper}
         />

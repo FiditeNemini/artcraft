@@ -20,7 +20,7 @@ interface Props {
   sessionSubscriptionsWrapper: SessionSubscriptionsWrapper;
 }
 
-function SessionTtsInferenceResultListFc(props: Props) {
+function SessionTtsInferenceResultList(props: Props) {
   let results: Array<JSX.Element> = [];
 
   props.ttsInferenceJobs.forEach((job) => {
@@ -185,4 +185,4 @@ function SessionTtsInferenceResultListFc(props: Props) {
   );
 }
 
-export { SessionTtsInferenceResultListFc };
+export { SessionTtsInferenceResultList };

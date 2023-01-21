@@ -4,7 +4,7 @@ import { Gravatar } from "@storyteller/components/src/elements/Gravatar";
 import { BucketConfig } from "@storyteller/components/src/api/BucketConfig";
 import { useParams, Link } from "react-router-dom";
 import { SpectrogramImage } from "./SpectrogramImage";
-import { ReportDiscordLinkFc } from "../../_common/DiscordReportLinkFc";
+import { ReportDiscordLink } from "../../_common/DiscordReportLink";
 import { FrontendUrlConfig } from "../../../../common/FrontendUrlConfig";
 import { formatDistance } from "date-fns";
 import {
@@ -541,7 +541,7 @@ function TtsResultViewPage(props: Props) {
           {deleteButton}
         </div>
         <motion.p className="text-center text-lg-start" variants={item}>
-          <ReportDiscordLinkFc />
+          <ReportDiscordLink />
         </motion.p>
         <motion.div className="pt-5" variants={item}>
           <BackLink link="/" text="Back to all models" />

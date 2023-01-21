@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from "react";
 import { Gravatar } from "@storyteller/components/src/elements/Gravatar";
 import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
 import { useParams, Link } from "react-router-dom";
-import { ReportDiscordLinkFc } from "../../_common/DiscordReportLinkFc";
+import { ReportDiscordLink } from "../../_common/DiscordReportLink";
 import { BucketConfig } from "@storyteller/components/src/api/BucketConfig";
 import { HiddenIconFc } from "../../_icons/HiddenIcon";
 import { VisibleIconFc } from "../../_icons/VisibleIcon";
@@ -24,7 +24,7 @@ interface Props {
   sessionWrapper: SessionWrapper;
 }
 
-function W2lResultViewFc(props: Props) {
+function W2lResultViewPage(props: Props) {
   let { token } = useParams() as { token: string };
 
   const [w2lInferenceResult, setW2lInferenceResult] = useState<
@@ -343,11 +343,11 @@ function W2lResultViewFc(props: Props) {
           {deleteButton}
         </div>
         <motion.div className="mt-4" variants={item}>
-          <ReportDiscordLinkFc />
+          <ReportDiscordLink />
         </motion.div>
       </motion.div>
     </motion.div>
   );
 }
 
-export { W2lResultViewFc };
+export { W2lResultViewPage };

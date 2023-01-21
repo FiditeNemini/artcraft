@@ -4,7 +4,7 @@ import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapp
 import { W2lTemplateUploadJob } from "@storyteller/components/src/jobs/W2lTemplateUploadJobs";
 import { useHistory } from "react-router-dom";
 import { v4 as uuidv4 } from "uuid";
-import { SessionW2lTemplateUploadResultListFc } from "../_common/SessionW2lTemplateUploadResultsListFc";
+import { SessionW2lTemplateUploadResultList } from "../_common/SessionW2lTemplateUploadResultsList";
 import { BackLink } from "../_common/BackLink";
 import { FrontendUrlConfig } from "../../../common/FrontendUrlConfig";
 import { motion } from "framer-motion";
@@ -167,7 +167,7 @@ function UploadW2lPhotoPage(props: Props) {
         </div>*/}
       </motion.form>
 
-      <SessionW2lTemplateUploadResultListFc
+      <SessionW2lTemplateUploadResultList
         w2lTemplateUploadJobs={props.w2lTemplateUploadJobs}
       />
     </motion.div>

@@ -41,7 +41,7 @@ interface Props {
   sessionWrapper: SessionWrapper;
 }
 
-function FirehoseEventListFc(props: Props) {
+function FirehoseEventListPage(props: Props) {
   const [firehoseEvents, setFirehoseEvents] = useState<Array<FirehoseEvent>>(
     []
   );
@@ -327,4 +327,4 @@ function FirehoseEventListFc(props: Props) {
   );
 }
 
-export { FirehoseEventListFc };
+export { FirehoseEventListPage };

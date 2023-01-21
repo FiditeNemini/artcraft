@@ -1,19 +1,21 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import { W2lInferenceJob } from "../../../App";
 import { JobState } from "@storyteller/components/src/jobs/JobStates";
-import { TtsModelUploadJob } from "@storyteller/components/src/jobs/TtsModelUploadJobs";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faList } from "@fortawesome/free-solid-svg-icons";
 import { motion } from "framer-motion";
-import { container, sessionItem, item } from "../../../data/animation";
+import { container, item, sessionItem } from "../../../data/animation";
 
 interface Props {
-  modelUploadJobs: Array<TtsModelUploadJob>;
+  w2lInferenceJobs: Array<W2lInferenceJob>;
 }
 
-function SessionTtsModelUploadResultListFc(props: Props) {
+function SessionW2lInferenceResultList(props: Props) {
   let results: Array<JSX.Element> = [];
 
-  props.modelUploadJobs.forEach((job) => {
-    if (!job.maybeModelToken) {
+  props.w2lInferenceJobs.forEach((job) => {
+    if (!job.maybeResultToken) {
       let stateDescription = "Pending...";
 
       switch (job.jobState) {
@@ -45,11 +47,13 @@ function SessionTtsModelUploadResultListFc(props: Props) {
 
       results.push(
         <div key={job.jobToken}>
-          <div className="alert alert-primary">{stateDescription}</div>
+          <motion.div className="alert alert-primary" variants={sessionItem}>
+            {stateDescription}
+          </motion.div>
         </div>
       );
     } else {
-      let ttsPermalink = `/tts/${job.maybeModelToken}`;
+      let w2lPermalink = `/w2l/result/${job.maybeResultToken}`;
 
       results.push(
         <div key={job.jobToken}>
@@ -57,9 +61,9 @@ function SessionTtsModelUploadResultListFc(props: Props) {
             className="panel py-4 p-3 p-lg-4 gap-4"
             variants={sessionItem}
           >
-            Complete!
-            <Link to={ttsPermalink} className="btn btn-primary ms-4">
-              See &amp; use TTS model
+            Complete!{" "}
+            <Link to={w2lPermalink} className="btn btn-primary ms-4">
+              Permalink &amp; download
             </Link>
           </motion.div>
         </div>
@@ -71,7 +75,8 @@ function SessionTtsModelUploadResultListFc(props: Props) {
   if (results.length !== 0) {
     title = (
       <motion.h2 className="text-center text-lg-start fw-bold" variants={item}>
-        TTS Model Upload Status
+        <FontAwesomeIcon icon={faList} className="me-3" />
+        Session W2L Results
       </motion.h2>
     );
   }
@@ -86,4 +91,4 @@ function SessionTtsModelUploadResultListFc(props: Props) {
   );
 }
 
-export { SessionTtsModelUploadResultListFc };
+export { SessionW2lInferenceResultList };

@@ -6,8 +6,8 @@ import { Gravatar } from "@storyteller/components/src/elements/Gravatar";
 import { W2lInferenceJob } from "../../../../App";
 import { useParams, Link } from "react-router-dom";
 import { v4 as uuidv4 } from "uuid";
-import { SessionW2lInferenceResultListFc } from "../../_common/SessionW2lInferenceResultsListFc";
-import { ReportDiscordLinkFc } from "../../_common/DiscordReportLinkFc";
+import { SessionW2lInferenceResultList } from "../../_common/SessionW2lInferenceResultsList";
+import { ReportDiscordLink } from "../../_common/DiscordReportLink";
 import { BucketConfig } from "@storyteller/components/src/api/BucketConfig";
 import { VisibleIconFc } from "../../_icons/VisibleIcon";
 import { HiddenIconFc } from "../../_icons/HiddenIcon";
@@ -38,7 +38,7 @@ interface Props {
   w2lInferenceJobs: Array<W2lInferenceJob>;
 }
 
-function W2lTemplateViewFc(props: Props) {
+function W2lTemplateViewPage(props: Props) {
   let { templateSlug }: { templateSlug: string } = useParams();
 
   // Ajax
@@ -536,15 +536,15 @@ function W2lTemplateViewFc(props: Props) {
 
       <motion.div variants={item}>
         <div className="container pt-4 pb-5">
-          <ReportDiscordLinkFc />
+          <ReportDiscordLink />
         </div>
       </motion.div>
 
-      <SessionW2lInferenceResultListFc
+      <SessionW2lInferenceResultList
         w2lInferenceJobs={props.w2lInferenceJobs}
       />
     </motion.div>
   );
 }
 
-export { W2lTemplateViewFc };
+export { W2lTemplateViewPage };

@@ -19,7 +19,7 @@ interface Props {
   sessionWrapper: SessionWrapper;
 }
 
-function LeaderboardFc(props: Props) {
+function LeaderboardPage(props: Props) {
   const [leaderboard, setLeaderboard] = useState<Leaderboard | undefined>(
     undefined
   );
@@ -148,4 +148,4 @@ function LeaderboardFc(props: Props) {
   );
 }
 
-export { LeaderboardFc };
+export { LeaderboardPage };

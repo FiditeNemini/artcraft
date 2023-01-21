@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { ApiConfig } from "@storyteller/components";
-import { SessionTtsModelUploadResultListFc } from "../_common/SessionTtsModelUploadResultsListFc";
+import { SessionTtsModelUploadResultList } from "../_common/SessionTtsModelUploadResultsList";
 import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
 import { TtsModelUploadJob } from "@storyteller/components/src/jobs/TtsModelUploadJobs";
 import { DiscordLink } from "@storyteller/components/src/elements/DiscordLink";
@@ -225,7 +225,7 @@ function UploadTtsModelPage(props: Props) {
         </motion.div>
       </motion.form>
 
-      <SessionTtsModelUploadResultListFc
+      <SessionTtsModelUploadResultList
         modelUploadJobs={props.ttsModelUploadJobs}
       />
     </motion.div>

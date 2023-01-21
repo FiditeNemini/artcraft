@@ -1,7 +1,7 @@
 import React from "react";
 import { AboutPage } from "./about/about_page/AboutPage";
 import { GuidePage } from "./about/guide_page/GuidePage";
-import { FirehoseEventListFc } from "./firehose/FirehoseEventListFc";
+import { FirehoseEventListPage } from "./firehose/FirehoseEventListPage";
 import { LoginPage } from "./login/LoginPage";
 import { ModerationFc } from "./moderation/moderation_main/ModerationFc";
 import { ModerationIpBanListFc } from "./moderation/moderation_ip_ban_list/ModerationIpBanListFc";
@@ -27,21 +27,21 @@ import { ContributeIndexPage } from "./contribute/ContributeIndexPage";
 import { UploadTtsModelPage } from "./upload/UploadTtsModelPage";
 import { UploadW2lPhotoPage } from "./upload/UploadW2lPhotoPage";
 import { UploadW2lVideoPage } from "./upload/UploadW2lVideoPage";
-import { W2lResultViewFc } from "./w2l/w2l_result_view/W2lResultViewFc";
-import { W2lTemplateListFc } from "./w2l/w2l_template_list/W2lTemplateListFc";
+import { W2lResultViewPage } from "./w2l/w2l_result_view/W2lResultViewPage";
+import { W2lTemplateListPage } from "./w2l/w2l_template_list/W2lTemplateListPage";
 import { W2lTemplateUploadJob } from "@storyteller/components/src/jobs/W2lTemplateUploadJobs";
-import { W2lTemplateViewFc } from "./w2l/w2l_template_view/W2lTemplateViewFc";
+import { W2lTemplateViewPage } from "./w2l/w2l_template_view/W2lTemplateViewPage";
 import { TtsResultEditPage } from "./tts/tts_result_edit/TtsResultEditPage";
-import { W2lResultEditFc } from "./w2l/w2l_result_edit/W2lResultEditFc";
-import { W2lTemplateDeleteFc } from "./w2l/w2l_template_delete/W2lTemplateDeleteFc";
-import { W2lTemplateEditFc } from "./w2l/w2l_template_edit/W2lTemplateEditFc";
-import { W2lResultDeleteFc } from "./w2l/w2l_result_delete/W2lResultDeleteFc";
-import { W2lTemplateApproveFc } from "./w2l/w2l_template_approve/W2lTemplateApproveFc";
+import { W2lResultEditPage } from "./w2l/w2l_result_edit/W2lResultEditPage";
+import { W2lTemplateDeletePage } from "./w2l/w2l_template_delete/W2lTemplateDeletePage";
+import { W2lTemplateEditPage } from "./w2l/w2l_template_edit/W2lTemplateEditPage";
+import { W2lResultDeletePage } from "./w2l/w2l_result_delete/W2lResultDeletePage";
+import { W2lTemplateApprovePage } from "./w2l/w2l_template_approve/W2lTemplateApprovePage";
 import { TtsModelListPage } from "./tts/tts_model_list/TtsModelListPage";
 import { TtsModelListItem } from "@storyteller/components/src/api/tts/ListTtsModels";
 import { ProfileBanFc } from "./profile/profile_ban/ProfileBanFc";
 import { ModerationUserListFc } from "./moderation/moderation_user_list/ModerationUserList";
-import { LeaderboardFc } from "./leaderboard/LeaderboardFc";
+import { LeaderboardPage } from "./leaderboard/LeaderboardPage";
 import { ModerationJobStatsFc } from "./moderation/moderation_job_stats/ModerationJobStatsFc";
 import { ModerationPendingW2lTemplatesFc } from "./moderation/moderation_pending_w2l_templates/ModerationPendingW2lTemplatesFc";
 import { ModerationVoiceStatsFc } from "./moderation/moderation_voice_stats/ModerationVoiceStatsFc";
@@ -164,11 +164,11 @@ class PageContainer extends React.Component<Props, State> {
 
           <Switch>
             <Route path="/firehose">
-              <FirehoseEventListFc sessionWrapper={this.props.sessionWrapper} />
+              <FirehoseEventListPage sessionWrapper={this.props.sessionWrapper} />
             </Route>
 
             <Route path="/leaderboard">
-              <LeaderboardFc sessionWrapper={this.props.sessionWrapper} />
+              <LeaderboardPage sessionWrapper={this.props.sessionWrapper} />
             </Route>
 
             <Route path="/login">
@@ -278,33 +278,33 @@ class PageContainer extends React.Component<Props, State> {
             </Route>
 
             <Route path="/w2l/result/:token/edit">
-              <W2lResultEditFc sessionWrapper={this.props.sessionWrapper} />
+              <W2lResultEditPage sessionWrapper={this.props.sessionWrapper} />
             </Route>
 
             <Route path="/w2l/result/:token/delete">
-              <W2lResultDeleteFc sessionWrapper={this.props.sessionWrapper} />
+              <W2lResultDeletePage sessionWrapper={this.props.sessionWrapper} />
             </Route>
 
             <Route path="/w2l/result/:token">
-              <W2lResultViewFc sessionWrapper={this.props.sessionWrapper} />
+              <W2lResultViewPage sessionWrapper={this.props.sessionWrapper} />
             </Route>
 
             <Route path="/w2l/:templateToken/edit">
-              <W2lTemplateEditFc sessionWrapper={this.props.sessionWrapper} />
+              <W2lTemplateEditPage sessionWrapper={this.props.sessionWrapper} />
             </Route>
 
             <Route path="/w2l/:templateToken/approval">
-              <W2lTemplateApproveFc
+              <W2lTemplateApprovePage
                 sessionWrapper={this.props.sessionWrapper}
               />
             </Route>
 
             <Route path="/w2l/:templateToken/delete">
-              <W2lTemplateDeleteFc sessionWrapper={this.props.sessionWrapper} />
+              <W2lTemplateDeletePage sessionWrapper={this.props.sessionWrapper} />
             </Route>
 
             <Route path="/w2l/:templateSlug">
-              <W2lTemplateViewFc
+              <W2lTemplateViewPage
                 sessionWrapper={this.props.sessionWrapper}
                 enqueueW2lJob={this.props.enqueueW2lJob}
                 w2lInferenceJobs={this.props.w2lInferenceJobs}
@@ -312,7 +312,7 @@ class PageContainer extends React.Component<Props, State> {
             </Route>
 
             <Route path="/video">
-              <W2lTemplateListFc sessionWrapper={this.props.sessionWrapper} />
+              <W2lTemplateListPage sessionWrapper={this.props.sessionWrapper} />
             </Route>
 
             <Route path="/upload/w2l_photo">

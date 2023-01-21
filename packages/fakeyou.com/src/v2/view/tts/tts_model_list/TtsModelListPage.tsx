@@ -1,9 +1,9 @@
 import React, { useEffect, useCallback, useState } from "react";
 import { Link } from "react-router-dom";
-import { SessionTtsInferenceResultListFc } from "../../_common/SessionTtsInferenceResultsListFc";
-import { SessionTtsModelUploadResultListFc } from "../../_common/SessionTtsModelUploadResultsListFc";
-import { SessionW2lInferenceResultListFc } from "../../_common/SessionW2lInferenceResultsListFc";
-import { SessionW2lTemplateUploadResultListFc } from "../../_common/SessionW2lTemplateUploadResultsListFc";
+import { SessionTtsInferenceResultList } from "../../_common/SessionTtsInferenceResultsList";
+import { SessionTtsModelUploadResultList } from "../../_common/SessionTtsModelUploadResultsList";
+import { SessionW2lInferenceResultList } from "../../_common/SessionW2lInferenceResultsList";
+import { SessionW2lTemplateUploadResultList } from "../../_common/SessionW2lTemplateUploadResultsList";
 import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
 import { Gravatar } from "@storyteller/components/src/elements/Gravatar";
 import { TtsInferenceJob } from "@storyteller/components/src/jobs/TtsInferenceJobs";
@@ -583,7 +583,7 @@ function TtsModelListPage(props: Props) {
                         Session TTS Results
                       </h4>
                       <div className="d-flex flex-column gap-3 session-tts-section">
-                        <SessionTtsInferenceResultListFc
+                        <SessionTtsInferenceResultList
                           ttsInferenceJobs={props.ttsInferenceJobs}
                           sessionSubscriptionsWrapper={
                             props.sessionSubscriptionsWrapper
@@ -604,15 +604,15 @@ function TtsModelListPage(props: Props) {
         </div> */}
       </motion.div>
 
-      <SessionW2lInferenceResultListFc
+      <SessionW2lInferenceResultList
         w2lInferenceJobs={props.w2lInferenceJobs}
       />
 
-      <SessionW2lTemplateUploadResultListFc
+      <SessionW2lTemplateUploadResultList
         w2lTemplateUploadJobs={props.w2lTemplateUploadJobs}
       />
 
-      <SessionTtsModelUploadResultListFc
+      <SessionTtsModelUploadResultList
         modelUploadJobs={props.ttsModelUploadJobs}
       />
     </motion.div>

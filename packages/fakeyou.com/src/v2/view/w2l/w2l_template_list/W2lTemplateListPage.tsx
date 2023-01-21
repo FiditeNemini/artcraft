@@ -46,7 +46,7 @@ interface Props {
   sessionWrapper: SessionWrapper;
 }
 
-function W2lTemplateListFc(props: Props) {
+function W2lTemplateListPage(props: Props) {
   const [w2lTemplates, setW2lTemplates] = useState<Array<W2lTemplate>>([]);
   const [currentPageIndex, setCurrentPageIndex] = useState(0);
 
@@ -268,4 +268,4 @@ function W2lTemplateListFc(props: Props) {
   );
 }
 
-export { W2lTemplateListFc };
+export { W2lTemplateListPage };

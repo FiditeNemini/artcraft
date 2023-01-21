@@ -20,7 +20,7 @@ interface Props {
   sessionWrapper: SessionWrapper;
 }
 
-function W2lTemplateEditFc(props: Props) {
+function W2lTemplateEditPage(props: Props) {
   let { templateToken }: { templateToken: string } = useParams();
 
   const history = useHistory();
@@ -193,4 +193,4 @@ function W2lTemplateEditFc(props: Props) {
   );
 }
 
-export { W2lTemplateEditFc };
+export { W2lTemplateEditPage };

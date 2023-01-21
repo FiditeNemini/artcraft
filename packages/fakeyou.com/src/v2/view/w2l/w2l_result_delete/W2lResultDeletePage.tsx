@@ -15,7 +15,7 @@ interface Props {
   sessionWrapper: SessionWrapper;
 }
 
-function W2lResultDeleteFc(props: Props) {
+function W2lResultDeletePage(props: Props) {
   const history = useHistory();
 
   let { token } = useParams() as { token: string };
@@ -157,4 +157,4 @@ function W2lResultDeleteFc(props: Props) {
   );
 }
 
-export { W2lResultDeleteFc };
+export { W2lResultDeletePage };
