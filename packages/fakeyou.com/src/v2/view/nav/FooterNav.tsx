@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { GitSha } from "@storyteller/components/src/elements/GitSha";
 import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
 import { Link } from "react-router-dom";
@@ -16,12 +16,26 @@ import {
 } from "@fortawesome/free-brands-svg-icons";
 import { ThirdPartyLinks } from "@storyteller/components/src/constants/ThirdPartyLinks";
 import { EchelonTwitterLink } from "@storyteller/components/src/elements/EchelonTwitterLink";
+import { GetServerInfo, GetServerInfoIsOk, GetServerInfoSuccessResponse } from "@storyteller/components/src/api/server/GetServerInfo";
 
 interface Props {
   sessionWrapper: SessionWrapper;
 }
 
 function FooterNav(props: Props) {
+  const [serverInfo, setServerInfo] = useState<GetServerInfoSuccessResponse|undefined>(undefined);
+
+  const getServerInfo = useCallback(async () => {
+    const response = await GetServerInfo();
+    if (GetServerInfoIsOk(response)) {
+      setServerInfo(response);
+    }
+  }, []);
+
+  useEffect(() => {
+    getServerInfo();
+  }, [getServerInfo]);
+
   let moderationLink = <span />;
 
   if (props.sessionWrapper.canBanUsers()) {
@@ -31,6 +45,19 @@ function FooterNav(props: Props) {
           <ModerationIcon />
           <span className="ms-2">Mod Controls</span>
         </Link>
+      </div>
+    );
+  }
+
+  let serverGitSha = <></>;
+  
+  if (serverInfo !== undefined 
+    && !!serverInfo.server_build_sha 
+    && serverInfo.server_build_sha !== 'undefined') 
+  {
+    serverGitSha = (
+      <div className="d-flex flex-column flex-lg-row align-items-center ">
+        <div className="git-sha">API: {serverInfo.server_build_sha.substring(0, 8)}</div>
       </div>
     );
   }
@@ -165,8 +192,13 @@ function FooterNav(props: Props) {
             </span>
             <div className="d-flex flex-column flex-lg-row align-items-center ">
               {moderationLink}
-              <GitSha />
             </div>
+            <div className="d-flex flex-column flex-lg-row align-items-center ">
+              <GitSha prefix="FE: " />
+            </div>
+
+            {serverGitSha}
+
           </div>
         </div>
       </footer>

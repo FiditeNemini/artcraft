@@ -480,6 +480,12 @@ class ApiConfig {
     return `${this.getScheme()}://${this.getNewApiHost()}/v1/stripe/portal/create_redirect`;
   }
 
+  // =============== Server ===============
+
+  getServerInfo(): string {
+    return `${this.getScheme()}://${this.getNewApiHost()}/server_info`;
+  }
+
   // =============== Helper ===============
 
   private getScheme(): string {
