@@ -10,6 +10,7 @@ import { TtsCategoryType } from "../../../../../../AppWrapper";
 import Select from "react-select";
 import { SearchFieldClass } from "../search/SearchFieldClass";
 import { Analytics } from "../../../../../../common/Analytics";
+import { t } from "i18next";
 
 interface Props {
   allTtsCategories: TtsCategoryType[];
@@ -177,7 +178,7 @@ function buildDropdowns(
       // If I had more time to spend with this library, I might have a better solution than this hack.
       selectProps['value'] = {
         value: "*",
-        label: "Select category...",
+        label: t("tts.TtsModelListPage.exploreModal.selectCategoryText"),
       };
     } else {
       selectProps['value'] = selectedCategoryOption;

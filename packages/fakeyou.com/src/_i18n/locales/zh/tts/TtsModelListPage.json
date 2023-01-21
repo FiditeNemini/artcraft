@@ -16,6 +16,16 @@
     },
     "formTitle": "创建 TTS",
     "languageLabel": "语言",
+    "exploreModal": {
+        "exploreModalOpenButton": "Explore Voices",
+        "exploreModalTitle": "Explore Voices",
+        "languageLabel": "Language",
+        "allLanguagesOptionText": "All Languages",
+        "categoryLabel": "Category",
+        "selectCategoryText": "Select category...",
+        "clearCategoryFilterButton": "Clear category filters",
+        "useThisVoiceButton": "Use this voice"
+    },
     "heroSection": {
         "buttons": {
             "cloneVoice": "克隆我的声音！",

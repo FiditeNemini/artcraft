@@ -492,7 +492,7 @@ function TtsModelListPage(props: Props) {
                       data-bs-target="#exploreModal"
                     >
                       <FontAwesomeIcon icon={faCompass} className="me-2" />
-                      Explore Voices
+                      {t("tts.TtsModelListPage.exploreModal.exploreModalOpenButton")}
                     </button>
                   </div>
                 </div>

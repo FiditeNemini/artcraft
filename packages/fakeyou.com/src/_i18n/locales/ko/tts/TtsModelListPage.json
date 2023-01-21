@@ -16,6 +16,16 @@
     },
     "formTitle": "TTS 생성",
     "languageLabel": "언어",
+    "exploreModal": {
+        "exploreModalOpenButton": "Explore Voices",
+        "exploreModalTitle": "Explore Voices",
+        "languageLabel": "Language",
+        "allLanguagesOptionText": "All Languages",
+        "categoryLabel": "Category",
+        "selectCategoryText": "Select category...",
+        "clearCategoryFilterButton": "Clear category filters",
+        "useThisVoiceButton": "Use this voice"
+    },
     "heroSection": {
         "buttons": {
             "cloneVoice": "내 목소리를 복제하십시오!",

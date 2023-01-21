@@ -10,6 +10,7 @@ import { TtsCategoryType } from "../../../../../../AppWrapper";
 import { TtsModelListItem } from "@storyteller/components/src/api/tts/ListTtsModels";
 import { CategoryOptions } from "./CategoryOptions";
 import { ScopedVoiceModelOptions } from "./ScopedVoiceModelOptions";
+import { t } from "i18next";
 
 interface Props {
   allTtsCategories: TtsCategoryType[];
@@ -100,7 +101,7 @@ export function ExploreVoicesModal(props: Props) {
           <div className="modal-header p-3">
             <h5 className="modal-title fw-semibold" id="ModalLabel">
               <FontAwesomeIcon icon={faCompass} className="me-3" />
-              Explore Voices
+              {t("tts.TtsModelListPage.exploreModal.exploreModalTitle")}
             </h5>
             <button
               type="button"
@@ -113,7 +114,9 @@ export function ExploreVoicesModal(props: Props) {
           <div className="modal-body p-3 p-lg-4">
             <div className="row gx-3 gy-3">
               <div className="col-12 col-lg-3 input-icon-search">
-                <label className="sub-title">Language</label>
+                <label className="sub-title">
+                  {t("tts.TtsModelListPage.exploreModal.languageLabel")}
+                </label>
                 <LanguageOptions
                   selectedTtsLanguageScope={props.selectedTtsLanguageScope}
                   setSelectedTtsLanguageScope={
@@ -124,7 +127,9 @@ export function ExploreVoicesModal(props: Props) {
 
               <div className="col-12 col-md-12 col-lg-9 input-icon-search">
                 <div className="d-flex align-items-start">
-                  <label className="sub-title flex-grow-1">Category</label>
+                  <label className="sub-title flex-grow-1">
+                    {t("tts.TtsModelListPage.exploreModal.categoryLabel")}
+                  </label>
                   <button
                     className="ms-3 fw-medium btn-link"
                     onClick={() => {
@@ -132,7 +137,7 @@ export function ExploreVoicesModal(props: Props) {
                     }}
                   >
                     <FontAwesomeIcon icon={faEraser} className="me-2" />
-                    Clear category filters
+                    {t("tts.TtsModelListPage.exploreModal.clearCategoryFilterButton")}
                   </button>
                 </div>
 
@@ -181,7 +186,7 @@ export function ExploreVoicesModal(props: Props) {
               data-bs-dismiss="modal"
               aria-label="Close"
             >
-              Use this voice
+              {t("tts.TtsModelListPage.exploreModal.useThisVoiceButton")}
               <FontAwesomeIcon icon={faArrowRight} className="ms-2" />
             </button>
           </div>
