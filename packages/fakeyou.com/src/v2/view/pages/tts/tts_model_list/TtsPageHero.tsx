@@ -68,7 +68,7 @@ export function TtsPageHero(props: Props) {
         >
           <button type="button" className="btn btn-secondary w-100">
             <FontAwesomeIcon icon={faStar} className="me-2" />
-            View Pricing
+            {t("tts.TtsModelListPage.heroSection.buttons.viewPricing")}
           </button>
         </Link>
       </>

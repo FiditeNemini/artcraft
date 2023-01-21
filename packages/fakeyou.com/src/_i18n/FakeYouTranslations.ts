@@ -7,6 +7,7 @@ import {
 
 // NB: This is the new translation system design. Multiple, per-page or per-module files are easier
 // to navigate and maintain than singular monolithic files. We'll gradually phase out the old system.
+import * as ar from "./locales/ar";
 import * as de from "./locales/de";
 import * as en from "./locales/en";
 import * as es from "./locales/es";
@@ -17,10 +18,12 @@ import * as it from "./locales/it";
 import * as ja from "./locales/ja";
 import * as ko from "./locales/ko";
 import * as pt from "./locales/pt";
+import * as tr from "./locales/tr";
 import * as vi from "./locales/vi";
 import * as zh from "./locales/zh";
 
 const NEW_TRANSLATIONS: any = {
+  ar: { translation: ar },
   de: { translation: de },
   en: { translation: en },
   es: { translation: es },
@@ -31,6 +34,7 @@ const NEW_TRANSLATIONS: any = {
   ja: { translation: ja },
   ko: { translation: ko },
   pt: { translation: pt },
+  tr: { translation: tr },
   vi: { translation: vi },
   zh: { translation: zh },
 };
@@ -168,7 +172,7 @@ const FAKEYOU_TRANSLATIONS: any = {
       pages: {
         // Index page
         ttsList: {
-          buttonClear: "Claro",
+          buttonClear: "Borrar",
           buttonSpeak: "Hablar",
           errorTooManyRequests:
             "<strong>¡Estás enviando demasiadas solicitudes!</strong> Reduzca la velocidad un poco. Tenemos que ralentizar un poco las cosas cuando el servidor está ocupado. ",
@@ -296,7 +300,7 @@ const FAKEYOU_TRANSLATIONS: any = {
         search: "Procurar",
         searchTerm: "Termo de pesquisa",
         speakButton: "Falar",
-        clearButton: "Claro",
+        clearButton: "Borrar",
       },
     },
   },

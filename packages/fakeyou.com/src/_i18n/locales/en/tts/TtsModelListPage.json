@@ -8,16 +8,19 @@
         "by": "by",
         "categoryFiltersLabel": "Category / Language",
         "modelSeeMoreLink": "See more details about the \"<1>{{modelName}}</1>\" model by <3>{{userName}}</3>",
+        "searchBarLabel": "Search for a Voice",  
         "searchHint": "Search for Voice",
         "searchLabel": "Search",
         "textInputHint": "Textual shenanigans go here...",
         "voicesLabel": "Voice ({{count}} to choose from)"
     },
     "formTitle": "Create TTS",
+    "languageLabel": "Language",
     "heroSection": {
         "buttons": {
             "cloneVoice": "Clone My Voice!",
-            "signUp": "Sign Up"
+            "signUp": "Sign Up",
+            "viewPricing": "View Pricing"
         },
         "subtitle": "Use <strong>FakeYou</strong> deep fake tech to say stuff with your favorite characters",
         "title": "Text to Speech"

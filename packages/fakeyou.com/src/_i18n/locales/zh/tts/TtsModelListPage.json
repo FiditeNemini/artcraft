@@ -8,16 +8,19 @@
         "by": "的",
         "categoryFiltersLabel": "类别/语言",
         "modelSeeMoreLink": "查看 <3>{{userName}}</3> 的\"<1>{{modelName}}</1>\"模型的更多详细信息",
+        "searchBarLabel": "搜索语音",  
         "searchHint": "搜索词",
         "searchLabel": "搜索",
         "textInputHint": "此处输入文字",
         "voicesLabel": "语音（{{count}} 个可供选择）"
     },
     "formTitle": "创建 TTS",
+    "languageLabel": "语言",
     "heroSection": {
         "buttons": {
             "cloneVoice": "克隆我的声音！",
-            "signUp": "注册"
+            "signUp": "注册",
+            "viewPricing": "查看定价"
         },
         "subtitle": "使用 <strong>FakeYou</strong> 深度伪造技术与您最喜欢的角色说话",
         "title": "文字转语音"
