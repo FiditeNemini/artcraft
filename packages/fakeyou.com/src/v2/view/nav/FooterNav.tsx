@@ -50,7 +50,7 @@ function FooterNav(props: Props) {
   }
 
   let serverGitSha = <></>;
-  
+
   if (serverInfo !== undefined 
     && !!serverInfo.server_build_sha 
     && serverInfo.server_build_sha !== 'undefined') 
@@ -193,12 +193,12 @@ function FooterNav(props: Props) {
             <div className="d-flex flex-column flex-lg-row align-items-center ">
               {moderationLink}
             </div>
-            <div className="d-flex flex-column flex-lg-row align-items-center ">
-              <GitSha prefix="FE: " />
-            </div>
 
             {serverGitSha}
 
+            <div className="d-flex flex-column flex-lg-row align-items-center ">
+              <GitSha prefix="FE: " />
+            </div>
           </div>
         </div>
       </footer>
