@@ -96,6 +96,10 @@ class Analytics {
     Analytics.sendCategorizedEvent(this.TTS, 'click_model_details_link');
   }
 
+  static ttsClickModelCreatorLink() {
+    Analytics.sendCategorizedEvent(this.TTS, 'click_model_creator_link');
+  }
+
   static ttsClickHeroViewProfile() {
     Analytics.sendCategorizedEvent(this.TTS, 'click_hero_view_profile');
   }
@@ -138,6 +142,10 @@ class Analytics {
 
   static ttsOpenPrimaryVoiceSelectMenu() {
     Analytics.sendCategorizedEvent(this.TTS, 'open_primary_voice_select_menu');
+  }
+
+  static ttsOpenScopedVoiceSelectMenu() {
+    Analytics.sendCategorizedEvent(this.TTS, 'open_scoped_voice_select_menu');
   }
 
   static ttsOpenExploreVoicesModal() {

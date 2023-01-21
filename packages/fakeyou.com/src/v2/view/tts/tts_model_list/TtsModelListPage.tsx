@@ -317,7 +317,11 @@ function TtsModelListPage(props: Props) {
         <div className="flex-grow-1">
           <p>
             Model by{" "}
-            <Link to={profileLink} className="fw-medium">
+            <Link 
+              to={profileLink} 
+              onClick={ () => { Analytics.ttsClickModelCreatorLink() } }
+              className="fw-medium"
+            >
               {userName}{" "}
               <Gravatar
                 size={20}

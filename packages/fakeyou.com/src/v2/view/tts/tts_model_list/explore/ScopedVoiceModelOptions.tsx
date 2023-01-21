@@ -11,6 +11,7 @@ import Select, { createFilter } from "react-select";
 //import Option from "react-select";
 import { SearchFieldClass } from "../search/SearchFieldClass";
 import { FastReactSelectOption } from "../../../_common/FastReactSelectOption";
+import { Analytics } from "../../../../../common/Analytics";
 
 interface Props {
   allTtsCategories: TtsCategoryType[];
@@ -133,6 +134,7 @@ export function ScopedVoiceModelOptions(props: Props) {
             options={options}
             classNames={SearchFieldClass}
             onChange={handleChange}
+            onMenuOpen={() => { Analytics.ttsOpenScopedVoiceSelectMenu() } }
             isLoading={isLoading}
             // On mobile, we don't want the onscreen keyboard to take up half the UI.
             autoFocus={false}
