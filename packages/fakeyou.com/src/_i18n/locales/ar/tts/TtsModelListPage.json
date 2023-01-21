@@ -16,6 +16,16 @@
     },
     "formTitle": "قم بإنشاء TTS",
     "languageLabel": "لغة",
+    "exploreModal": {
+        "exploreModalOpenButton": "استكشف أصوات",
+        "exploreModalTitle": "استكشف أصوات",
+        "languageLabel": "لغة",
+        "allLanguagesOptionText": "كل اللغات",
+        "categoryLabel": "فئة",
+        "selectCategoryText": "اختر الفئة",
+        "clearCategoryFilterButton": "مسح عوامل التصفية",
+        "useThisVoiceButton": "استخدم هذا الصوت"
+    },
     "heroSection": {
         "buttons": {
             "cloneVoice": "استنساخ صوتي!",

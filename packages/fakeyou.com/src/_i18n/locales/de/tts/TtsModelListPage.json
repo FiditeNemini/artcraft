@@ -16,6 +16,16 @@
     },
     "formTitle": "TTS erstellen",
     "languageLabel": "Sprache",
+    "exploreModal": {
+        "exploreModalOpenButton": "Erforschen Sie Stimmen",
+        "exploreModalTitle": "Erforschen Sie Stimmen",
+        "languageLabel": "Sprache",
+        "allLanguagesOptionText": "Alle Sprachen",
+        "categoryLabel": "Kategorie",
+        "selectCategoryText": "Kategorie wählen...",
+        "clearCategoryFilterButton": "Kategoriefilter löschen",
+        "useThisVoiceButton": "Verwenden Sie diese Stimme"
+    },
     "heroSection": {
         "buttons": {
             "cloneVoice": "Klonen Sie meine Stimme!",

@@ -16,6 +16,16 @@
     },
     "formTitle": "Créer une synthèse vocale",
     "languageLabel": "Langue",
+    "exploreModal": {
+        "exploreModalOpenButton": "Explorer les voix",
+        "exploreModalTitle": "Explorer les voix",
+        "languageLabel": "Langue",
+        "allLanguagesOptionText": "Toutes les langues",
+        "categoryLabel": "Catégorie",
+        "selectCategoryText": "Choisir une catégorie",
+        "clearCategoryFilterButton": "Effacer les filtres de catégorie",
+        "useThisVoiceButton": "Utilisez cette voix"
+    },
     "heroSection": {
         "buttons": {
             "cloneVoice": "Clonez ma voix!",

@@ -16,6 +16,16 @@
     },
     "formTitle": "TTSを作成する",
     "languageLabel": "言語",
+    "exploreModal": {
+        "exploreModalOpenButton": "声を探る",
+        "exploreModalTitle": "声を探る",
+        "languageLabel": "言語",
+        "allLanguagesOptionText": "すべての言語",
+        "categoryLabel": "カテゴリー",
+        "selectCategoryText": "カテゴリを選択",
+        "clearCategoryFilterButton": "フィルタをリセット",
+        "useThisVoiceButton": "この声を使う"
+    },
     "heroSection": {
         "buttons": {
             "cloneVoice": "私の声を複製する",

@@ -16,6 +16,16 @@
     },
     "formTitle": "Crear mensaje de texto",
     "languageLabel": "Idioma",
+    "exploreModal": {
+        "exploreModalOpenButton": "Explorar Voces",
+        "exploreModalTitle": "Explorar Voces",
+        "languageLabel": "Idioma",
+        "allLanguagesOptionText": "Todos los idiomas",
+        "categoryLabel": "Categoría",
+        "selectCategoryText": "Selecciona una categoría",
+        "clearCategoryFilterButton": "Restablecer filtros",
+        "useThisVoiceButton": "Usa esta voz"
+    },
     "heroSection": {
         "buttons": {
             "cloneVoice": "Clonar mi Voz!",

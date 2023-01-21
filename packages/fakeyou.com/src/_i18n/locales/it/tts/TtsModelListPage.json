@@ -15,10 +15,22 @@
         "voicesLabel": "Voice ({{count}} to choose from)"
     },
     "formTitle": "Crea TTS",
+    "languageLabel": "Lingua",
+    "exploreModal": {
+        "exploreModalOpenButton": "Esplora Voci",
+        "exploreModalTitle": "Esplora Voci",
+        "languageLabel": "Lingua",
+        "allLanguagesOptionText": "Tutte le lingue",
+        "categoryLabel": "Categoria",
+        "selectCategoryText": "Seleziona categoria...",
+        "clearCategoryFilterButton": "Cancella i filtri di categoria",
+        "useThisVoiceButton": "Usa questa voce"
+    },
     "heroSection": {
         "buttons": {
             "cloneVoice": "Clona la mia Voce!",
-            "signUp": "Registrarsi"
+            "signUp": "Registrarsi",
+            "viewPricing": "Visualizza i prezzi"
         },
         "subtitle": "Usa la tecnologia deep fake di <strong>FakeYou</strong> per dire cose con i tuoi personaggi preferiti",
         "title": "Testo alla Voce"

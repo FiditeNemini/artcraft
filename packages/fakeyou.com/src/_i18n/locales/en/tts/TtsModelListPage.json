@@ -16,6 +16,16 @@
     },
     "formTitle": "Create TTS",
     "languageLabel": "Language",
+    "exploreModal": {
+        "exploreModalOpenButton": "Explore Voices",
+        "exploreModalTitle": "Explore Voices",
+        "languageLabel": "Language",
+        "allLanguagesOptionText": "All Languages",
+        "categoryLabel": "Category",
+        "selectCategoryText": "Select category...",
+        "clearCategoryFilterButton": "Clear category filters",
+        "useThisVoiceButton": "Use this voice"
+    },
     "heroSection": {
         "buttons": {
             "cloneVoice": "Clone My Voice!",

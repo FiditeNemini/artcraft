@@ -5,6 +5,7 @@ import Select from "react-select";
 import { SearchFieldClass } from "../search/SearchFieldClass";
 import { AVAILABLE_TTS_LANGUAGE_CATEGORY_MAP } from "../../../../../../_i18n/AvailableLanguageMap";
 import { Analytics } from "../../../../../../common/Analytics";
+import { t } from "i18next";
 
 interface Props {
   selectedTtsLanguageScope: string,
@@ -36,7 +37,7 @@ export function LanguageOptions(props: Props) {
 
   languageOptions = [
     {
-      label: 'All Languages 🌐',
+      label: `${t("tts.TtsModelListPage.exploreModal.allLanguagesOptionText")} 🌐`,
       value: '*',
     },
     ...languageOptions,
