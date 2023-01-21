@@ -152,11 +152,6 @@ class Analytics {
     Analytics.sendCategorizedEvent(this.TTS, 'open_explore_voices_modal');
   }
 
-
-  //static ttsClickVoiceSearchBox() {
-  //  Analytics.sendCategorizedEvent(this.TTS, 'click_voice_search_box');
-  //}
-
   static ttsClickTextInputBox() {
     Analytics.sendCategorizedEvent(this.TTS, 'click_text_input_box');
   }
