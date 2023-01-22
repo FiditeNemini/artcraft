@@ -490,6 +490,7 @@ function TtsModelListPage(props: Props) {
                       className="btn btn-primary rounded-50"
                       data-bs-toggle="modal"
                       data-bs-target="#exploreModal"
+                      type="button"
                     >
                       <FontAwesomeIcon icon={faCompass} className="me-2" />
                       {t("tts.TtsModelListPage.exploreModal.exploreModalOpenButton")}
