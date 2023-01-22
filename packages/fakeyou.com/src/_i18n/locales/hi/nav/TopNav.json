@@ -4,6 +4,7 @@
     "termsLink": "Terms of Use",
     "privacyLink": "Privacy Policy",
     "developersLink": "Developers",
+    "options": "Options",
     "ttsQueued": "TTS Queued"
   },
   "main": {
@@ -17,6 +18,7 @@
     "leaderboardOption": "Leaderboard",
     "discordOption": "Discord Chat",
     "patronsOption": "Patrons",
+    "guideOption": "Guide",
     "feedOption": "Feed",
     "myDataOption": "My Data"
   },
