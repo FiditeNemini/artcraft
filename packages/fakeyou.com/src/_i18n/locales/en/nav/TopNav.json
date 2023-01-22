@@ -1,3 +1,28 @@
 {
-
+  "topbar": {
+    "aboutLink": "About",
+    "termsLink": "Terms of Use",
+    "privacyLink": "Privacy Policy",
+    "developersLink": "Developers",
+    "ttsQueued": "TTS Queued"
+  },
+  "main": {
+    "pricingLink": "Pricing",
+    "voiceCloneLink": "Voice Clone",
+    "createDropdown": "Create",
+    "ttsOption": "TTS",
+    "videoOption": "Video",
+    "communityDropdown": "Community",
+    "contributeOption": "Contribute/Upload",
+    "leaderboardOption": "Leaderboard",
+    "discordOption": "Discord Chat",
+    "patronsOption": "Patrons",
+    "feedOption": "Feed",
+    "myDataOption": "My Data"
+  },
+  "buttons": {
+    "login": "Login",
+    "logout": "Log Out",
+    "signUp": "Sign Up"
+  }
 }
