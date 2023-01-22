@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { t } from "i18next";
 import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
 import { Link, useHistory } from "react-router-dom";
 import { FrontendUrlConfig } from "../../../common/FrontendUrlConfig";
@@ -153,7 +154,7 @@ function TopNav(props: Props) {
     <>
       <Link to="/login">
         <span className="nav-login me-4" data-bs-toggle="offcanvas">
-          Login
+          {t("nav.TopNav.buttons.login")}
         </span>
       </Link>
     </>
@@ -163,7 +164,7 @@ function TopNav(props: Props) {
     <>
       <Link to="/signup">
         <button className="btn btn-primary" data-bs-toggle="offcanvas">
-          Sign Up
+          {t("nav.TopNav.buttons.signUp")}
         </button>
       </Link>
     </>
@@ -202,7 +203,9 @@ function TopNav(props: Props) {
             await logoutHandler();
           }}
         >
-          <FontAwesomeIcon icon={faSignOutAlt} /> Log Out
+          <FontAwesomeIcon icon={faSignOutAlt} />
+          {" "}
+          {t("nav.TopNav.buttons.logout")}
         </button>
       </>
     );
@@ -214,19 +217,19 @@ function TopNav(props: Props) {
         <div className="container d-flex align-items-center">
           <div className="d-flex gap-4 flex-grow-1">
             <Link className="top-bar-text" to="/about" onClick={() => { Analytics.topbarClickAbout() } }>
-              About
+              {t("nav.TopNav.topbar.aboutLink")}
             </Link>
             <Link className="top-bar-text" to="/terms" onClick={() => { Analytics.topbarClickTerms() } }>
-              Terms of Use
+              {t("nav.TopNav.topbar.termsLink")}
             </Link>
             <Link className="top-bar-text" to="/privacy">
-              Privacy Policy
+              {t("nav.TopNav.topbar.privacyLink")}
             </Link>
             <a
               className="top-bar-text"
               href={FrontendUrlConfig.developerDocs()}
             >
-              Developers
+              {t("nav.TopNav.topbar.developersLink")}
             </a>
           </div>
           <div className="d-flex gap-3 align-items-center">
@@ -262,7 +265,8 @@ function TopNav(props: Props) {
               </button>
             </Tippy>
             <p className="top-bar-text ms-2">
-              TTS Queued:{" "}
+              {t("nav.TopNav.topbar.ttsQueued")}:
+              {" "}
               <span className="fw-bold text-red">
                 {pendingTtsJobs.pending_job_count}
               </span>
@@ -327,7 +331,7 @@ function TopNav(props: Props) {
                     className="nav-link"
                   >
                     <FontAwesomeIcon icon={faStar} className="me-2" />
-                    Pricing
+                    {t("nav.TopNav.main.pricingLink")}
                   </Link>
                 </li>
 
@@ -338,7 +342,7 @@ function TopNav(props: Props) {
                     className="nav-link"
                   >
                     <FontAwesomeIcon icon={faMicrophone} className="me-2" />
-                    Voice Clone
+                    {t("nav.TopNav.main.voiceCloneLink")}
                   </Link>
                 </li>
 
@@ -353,7 +357,7 @@ function TopNav(props: Props) {
                     aria-expanded="false"
                   >
                     <FontAwesomeIcon icon={faPlus} className="me-2" />
-                    Create
+                    {t("nav.TopNav.main.createDropdown")}
                   </a>
                   <ul
                     className="dropdown-menu"
@@ -362,7 +366,7 @@ function TopNav(props: Props) {
                     <li data-bs-toggle="offcanvas">
                       <Link className="dropdown-item" to="/">
                         <FontAwesomeIcon icon={faVolumeUp} className="me-2" />
-                        TTS
+                        {t("nav.TopNav.main.ttsOption")}
                       </Link>
                     </li>
                     {/* TODO(bt, 2023-01-11): Not ready to launch voice conversion
@@ -380,7 +384,7 @@ function TopNav(props: Props) {
                     <li data-bs-toggle="offcanvas">
                       <Link className="dropdown-item" to="/video">
                         <FontAwesomeIcon icon={faVideo} className="me-2" />
-                        Video
+                        {t("nav.TopNav.main.videoOption")}
                       </Link>
                     </li>
                   </ul>
@@ -397,7 +401,7 @@ function TopNav(props: Props) {
                     aria-label="Community dropdown"
                   >
                     <FontAwesomeIcon icon={faUsers} className="me-2" />
-                    Community
+                    {t("nav.TopNav.main.communityDropdown")}
                   </a>
                   <ul
                     className="dropdown-menu"
@@ -410,7 +414,7 @@ function TopNav(props: Props) {
                         title="to Upload page"
                       >
                         <FontAwesomeIcon icon={faUpload} className="me-2" />
-                        Contribute/Upload
+                        {t("nav.TopNav.main.contributeOption")}
                       </Link>
                     </li>
                     <li data-bs-toggle="offcanvas">
@@ -420,7 +424,7 @@ function TopNav(props: Props) {
                         title="to leaderboard"
                       >
                         <FontAwesomeIcon icon={faTrophy} className="me-2" />
-                        Leaderboard
+                        {t("nav.TopNav.main.leaderboardOption")}
                       </Link>
                     </li>
                     <li data-bs-toggle="offcanvas">
@@ -432,7 +436,7 @@ function TopNav(props: Props) {
                         rel="noopener noreferrer"
                       >
                         <FontAwesomeIcon icon={faDiscord} className="me-2" />
-                        Discord Chat
+                        {t("nav.TopNav.main.discordOption")}
                       </a>
                     </li>
                     <li data-bs-toggle="offcanvas">
@@ -442,7 +446,7 @@ function TopNav(props: Props) {
                         title="to patron list"
                       >
                         <FontAwesomeIcon icon={faPatreon} className="me-2" />
-                        Patrons
+                        {t("nav.TopNav.main.patronsOption")}
                       </Link>
                     </li>
                     <li data-bs-toggle="offcanvas">
@@ -452,7 +456,7 @@ function TopNav(props: Props) {
                         title="to guide"
                       >
                         <FontAwesomeIcon icon={faBook} className="me-2" />
-                        Guide
+                        {t("nav.TopNav.main.guideOption")}
                       </Link>
                     </li>
                     <li data-bs-toggle="offcanvas">
@@ -462,7 +466,7 @@ function TopNav(props: Props) {
                         title="to feed"
                       >
                         <FontAwesomeIcon icon={faList} className="me-2" />
-                        Feed
+                        {t("nav.TopNav.main.feedOption")}
                       </Link>
                     </li>
                     <hr className="dropdown-divider" />
@@ -473,7 +477,7 @@ function TopNav(props: Props) {
                         title="my profile"
                       >
                         <FontAwesomeIcon icon={faUser} className="me-2" />
-                        My Data
+                        {t("nav.TopNav.main.myDataOption")}
                       </Link>
                     </li>
                   </ul>
@@ -486,7 +490,7 @@ function TopNav(props: Props) {
                     to="/about"
                     title="About Us"
                   >
-                    About
+                    {t("nav.TopNav.topbar.aboutLink")}
                   </Link>
                 </li>
 
@@ -497,7 +501,7 @@ function TopNav(props: Props) {
                     title="Terms of Use"
                     to="/terms"
                   >
-                    Terms of Use
+                    {t("nav.TopNav.topbar.termsLink")}
                   </Link>
                 </li>
 
@@ -508,7 +512,7 @@ function TopNav(props: Props) {
                     title="Privacy Policy"
                     to="/privacy"
                   >
-                    Privacy Policy
+                    {t("nav.TopNav.topbar.privacyLink")}
                   </Link>
                 </li>
 
@@ -520,7 +524,7 @@ function TopNav(props: Props) {
                     title="to API"
                     href={FrontendUrlConfig.developerDocs()}
                   >
-                    Developers
+                    {t("nav.TopNav.topbar.developersLink")}
                   </a>
                 </li>
                 <li className="d-lg-none">
@@ -533,7 +537,8 @@ function TopNav(props: Props) {
                       Online: <span className="fw-bold text-red">1,204</span>
                     </p> */}
                     <div className="top-bar-text mobile">
-                      TTS Queued:{" "}
+                      {t("nav.TopNav.topbar.ttsQueued")}:
+                      {" "}
                       <span className="fw-bold text-red ">
                         {pendingTtsJobs.pending_job_count}
                       </span>
@@ -547,7 +552,9 @@ function TopNav(props: Props) {
 
                 <li className="ps-3 d-lg-none">
                   <div className="d-flex gap-4 py-2">
-                    <div className="top-bar-text mobile">Options:</div>
+                    <div className="top-bar-text mobile">
+                      {t("nav.TopNav.topbar.options")}:
+                    </div>
                     {/* <Tippy
                       content={`${
                         darkModes ? "Toggle Light Mode" : "Toggle Dark Mode"

@@ -1,28 +1,30 @@
 {
   "topbar": {
-    "aboutLink": "About",
-    "termsLink": "Terms of Use",
-    "privacyLink": "Privacy Policy",
-    "developersLink": "Developers",
-    "ttsQueued": "TTS Queued"
+    "aboutLink": "Sobre",
+    "termsLink": "Condiciones de Uso",
+    "privacyLink": "Política de Privacidad",
+    "developersLink": "Programadores",
+    "options": "Opciones",
+    "ttsQueued": "Puesto en cola"
   },
   "main": {
-    "pricingLink": "Pricing",
-    "voiceCloneLink": "Voice Clone",
-    "createDropdown": "Create",
+    "pricingLink": "Precios",
+    "voiceCloneLink": "Clon de voz",
+    "createDropdown": "Crear",
     "ttsOption": "TTS",
     "videoOption": "Video",
-    "communityDropdown": "Community",
-    "contributeOption": "Contribute/Upload",
-    "leaderboardOption": "Leaderboard",
-    "discordOption": "Discord Chat",
-    "patronsOption": "Patrons",
-    "feedOption": "Feed",
-    "myDataOption": "My Data"
+    "communityDropdown": "Comunidad",
+    "contributeOption": "Contribuir/Subir",
+    "leaderboardOption": "Tabla de clasificación",
+    "discordOption": "Charla de Discord",
+    "patronsOption": "Mecenas",
+    "guideOption": "Guía",
+    "feedOption": "Noticias",
+    "myDataOption": "Mis datos"
   },
   "buttons": {
-    "login": "Login",
-    "logout": "Log Out",
-    "signUp": "Sign Up"
+    "login": "Acceso",
+    "logout": "Cerrar",
+    "signUp": "Inscribirse"
   }
 }
