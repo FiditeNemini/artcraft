@@ -12,10 +12,16 @@
         "searchHint": "Terme de recherche",
         "searchLabel": "Chercher",
         "textInputHint": "Texte de saisie...",
-        "voicesLabel": "Voix ({{count}} au choix)"
+        "voicesLabel": "Voix ({{count}} au choix)",
+        "yourTextLabel": "Ton texte"
+    },
+    "voiceDetails": {
+        "voiceBy": "Voix de",
+        "seeMoreDetails": "Voir plus de détails"
     },
     "formTitle": "Créer une synthèse vocale",
     "languageLabel": "Langue",
+    "sessionTtsResultsLabel": "Résultats TTS",
     "exploreModal": {
         "exploreModalOpenButton": "Explorer les voix",
         "exploreModalTitle": "Explorer les voix",

@@ -12,10 +12,16 @@
         "searchHint": "Término de búsqueda",
         "searchLabel": "Búsqueda",
         "textInputHint": "Las travesuras de texto van aquí...",
-        "voicesLabel": "Voz ({{count}} para elegir)"
+        "voicesLabel": "Voz ({{count}} para elegir)",
+        "yourTextLabel": "Tu texto"
+    },
+    "voiceDetails": {
+        "voiceBy": "Voz de",
+        "seeMoreDetails": "Ver más detalles"
     },
     "formTitle": "Crear mensaje de texto",
     "languageLabel": "Idioma",
+    "sessionTtsResultsLabel": "Resultados de TTS",
     "exploreModal": {
         "exploreModalOpenButton": "Explorar Voces",
         "exploreModalTitle": "Explorar Voces",

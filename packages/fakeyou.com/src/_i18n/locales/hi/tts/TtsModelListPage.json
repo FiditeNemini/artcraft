@@ -12,10 +12,16 @@
         "searchHint": "शब्द को खोजें",
         "searchLabel": "तलाशी",
         "textInputHint": "यहां टेक्स्ट इनपुट करें",
-        "voicesLabel": "आवाज ({{count}} चुनने के लिए)"
+        "voicesLabel": "आवाज ({{count}} चुनने के लिए)",
+        "yourTextLabel": "Your Text"
+    },
+    "voiceDetails": {
+        "voiceBy": "Voice by",
+        "seeMoreDetails": "See more details"
     },
     "formTitle": "टीटीएस बनाएं",
     "languageLabel": "भाषा",
+    "sessionTtsResultsLabel": "Session TTS Results",
     "exploreModal": {
         "exploreModalOpenButton": "Explore Voices",
         "exploreModalTitle": "Explore Voices",

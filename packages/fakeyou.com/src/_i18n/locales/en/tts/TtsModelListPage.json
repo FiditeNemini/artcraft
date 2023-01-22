@@ -12,10 +12,16 @@
         "searchHint": "Search for Voice",
         "searchLabel": "Search",
         "textInputHint": "Textual shenanigans go here...",
-        "voicesLabel": "Voice ({{count}} to choose from)"
+        "voicesLabel": "Voice ({{count}} to choose from)",
+        "yourTextLabel": "Your Text"
+    },
+    "voiceDetails": {
+        "voiceBy": "Voice by",
+        "seeMoreDetails": "See more details"
     },
     "formTitle": "Create TTS",
     "languageLabel": "Language",
+    "sessionTtsResultsLabel": "Session TTS Results",
     "exploreModal": {
         "exploreModalOpenButton": "Explore Voices",
         "exploreModalTitle": "Explore Voices",

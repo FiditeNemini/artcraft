@@ -316,7 +316,8 @@ function TtsModelListPage(props: Props) {
       >
         <div className="flex-grow-1">
           <p>
-            Voice by{" "}
+            {t("tts.TtsModelListPage.voiceDetails.voiceBy")}
+            {" "}
             <Link 
               to={profileLink} 
               onClick={ () => { Analytics.ttsClickModelCreatorLink() } }
@@ -335,7 +336,9 @@ function TtsModelListPage(props: Props) {
           </p>
         </div>
         <div className="fw-medium">
-          <span>See more details</span>
+          <span>
+            {t("tts.TtsModelListPage.voiceDetails.seeMoreDetails")}
+          </span>
           <FontAwesomeIcon icon={faChevronRight} className="ms-2" />
         </div>
       </Link>
@@ -525,7 +528,9 @@ function TtsModelListPage(props: Props) {
                   <div className="col-12 col-lg-6 d-flex flex-column gap-3">
                     <div className="d-flex flex-column gap-3 h-100">
                       <div className="d-flex gap-2">
-                        <label className="sub-title pb-0">Your Text</label>
+                        <label className="sub-title pb-0">
+                          {t("tts.TtsModelListPage.form.yourTextLabel")}
+                        </label>
                         {/*<a href="/" className="ms-1">
                           <FontAwesomeIcon icon={faShuffle} />
                         </a>*/}
@@ -580,7 +585,7 @@ function TtsModelListPage(props: Props) {
                           icon={faBarsStaggered}
                           className="me-3"
                         />
-                        Session TTS Results
+                        {t("tts.TtsModelListPage.sessionTtsResultsLabel")}
                       </h4>
                       <div className="d-flex flex-column gap-3 session-tts-section">
                         <SessionTtsInferenceResultList

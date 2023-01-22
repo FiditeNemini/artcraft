@@ -12,19 +12,25 @@
         "searchHint": "Termo de pesquisa",
         "searchLabel": "Procurar",
         "textInputHint": "Insira o texto aqui",
-        "voicesLabel": "Voz ({{count}} para escolher)"
+        "voicesLabel": "Voz ({{count}} para escolher)",
+        "yourTextLabel": "Seu texto"
+    },
+    "voiceDetails": {
+        "voiceBy": "Voz de",
+        "seeMoreDetails": "Ver mais detalhes"
     },
     "formTitle": "Criar TTS",
     "languageLabel": "Linguagem",
+    "sessionTtsResultsLabel": "Resultados TTS",
     "exploreModal": {
-        "exploreModalOpenButton": "Explore Voices",
-        "exploreModalTitle": "Explore Voices",
-        "languageLabel": "Language",
-        "allLanguagesOptionText": "All Languages",
-        "categoryLabel": "Category",
-        "selectCategoryText": "Select category...",
-        "clearCategoryFilterButton": "Clear category filters",
-        "useThisVoiceButton": "Use this voice"
+        "exploreModalOpenButton": "Explorar vozes",
+        "exploreModalTitle": "Explorar vozes",
+        "languageLabel": "Linguagem",
+        "allLanguagesOptionText": "Todas as línguas",
+        "categoryLabel": "Categoria",
+        "selectCategoryText": "Selecione a Categoria",
+        "clearCategoryFilterButton": "Limpar filtros de categoria",
+        "useThisVoiceButton": "Use esta voz"
     },
     "heroSection": {
         "buttons": {

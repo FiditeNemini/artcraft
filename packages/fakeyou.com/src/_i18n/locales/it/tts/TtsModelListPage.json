@@ -12,10 +12,16 @@
         "searchHint": "Search for Voice",
         "searchLabel": "Ricerca",
         "textInputHint": "Inserisci qui il testo da generare",
-        "voicesLabel": "Voice ({{count}} to choose from)"
+        "voicesLabel": "Voice ({{count}} to choose from)",
+        "yourTextLabel": "Il tuo testo"
+    },
+    "voiceDetails": {
+        "voiceBy": "Voce di",
+        "seeMoreDetails": "Vedi maggiori dettagli"
     },
     "formTitle": "Crea TTS",
     "languageLabel": "Lingua",
+    "sessionTtsResultsLabel": "Risultati sintesi vocale",
     "exploreModal": {
         "exploreModalOpenButton": "Esplora Voci",
         "exploreModalTitle": "Esplora Voci",

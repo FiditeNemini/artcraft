@@ -12,10 +12,16 @@
         "searchHint": "Istilah Pencarian",
         "searchLabel": "Mencari",
         "textInputHint": "Masukan teks",
-        "voicesLabel": "Suara ({{count}} untuk dipilih)"
+        "voicesLabel": "Suara ({{count}} untuk dipilih)",
+        "yourTextLabel": "Your Text"
+    },
+    "voiceDetails": {
+        "voiceBy": "Voice by",
+        "seeMoreDetails": "See more details"
     },
     "formTitle": "Buat TTS",
     "languageLabel": "Bahasa",
+    "sessionTtsResultsLabel": "Session TTS Results",
     "exploreModal": {
         "exploreModalOpenButton": "Explore Voices",
         "exploreModalTitle": "Explore Voices",

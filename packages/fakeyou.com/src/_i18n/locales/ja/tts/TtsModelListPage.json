@@ -12,10 +12,16 @@
         "searchHint": "検索語",
         "searchLabel": "探す",
         "textInputHint": "ここに言うテキストを入力してください",
-        "voicesLabel": "音声（{{count}}から選択）"
+        "voicesLabel": "音声（{{count}}から選択）",
+        "yourTextLabel": "あなたのテキスト"
+    },
+    "voiceDetails": {
+        "voiceBy": "作成者の声",
+        "seeMoreDetails": "詳細を見る"
     },
     "formTitle": "TTSを作成する",
     "languageLabel": "言語",
+    "sessionTtsResultsLabel": "TTS の結果",
     "exploreModal": {
         "exploreModalOpenButton": "声を探る",
         "exploreModalTitle": "声を探る",

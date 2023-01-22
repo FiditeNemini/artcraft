@@ -12,19 +12,25 @@
         "searchHint": "Cụm từ tìm kiếm",
         "searchLabel": "Tìm kiếm",
         "textInputHint": "Nhập văn bản tại đây",
-        "voicesLabel": "Giọng nói ({{count}} để chọn)"
+        "voicesLabel": "Giọng nói ({{count}} để chọn)",
+        "yourTextLabel": "Văn bản của bạn"
+    },
+    "voiceDetails": {
+        "voiceBy": "Giọng nói của",
+        "seeMoreDetails": "Xem thêm chi tiết"
     },
     "formTitle": "Tạo TTS",
     "languageLabel": "Ngôn ngữ",
+    "sessionTtsResultsLabel": "Kết quả TTS",
     "exploreModal": {
-        "exploreModalOpenButton": "Explore Voices",
-        "exploreModalTitle": "Explore Voices",
-        "languageLabel": "Language",
-        "allLanguagesOptionText": "All Languages",
-        "categoryLabel": "Category",
-        "selectCategoryText": "Select category...",
-        "clearCategoryFilterButton": "Clear category filters",
-        "useThisVoiceButton": "Use this voice"
+        "exploreModalOpenButton": "Khám phá giọng nói",
+        "exploreModalTitle": "Khám phá giọng nói",
+        "languageLabel": "Ngôn ngữ",
+        "allLanguagesOptionText": "Tất cả các ngôn ngữ",
+        "categoryLabel": "Loại",
+        "selectCategoryText": "Chọn danh mục",
+        "clearCategoryFilterButton": "Xóa bộ lọc danh mục",
+        "useThisVoiceButton": "Sử dụng giọng nói này"
     },
     "heroSection": {
         "buttons": {

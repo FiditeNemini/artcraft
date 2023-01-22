@@ -12,10 +12,16 @@
         "searchHint": "Ses Ara",
         "searchLabel": "Arama",
         "textInputHint": "Burada oluşturulacak metni girin",
-        "voicesLabel": "Ses (seçim için {{count}})"
+        "voicesLabel": "Ses (seçim için {{count}})",
+        "yourTextLabel": "Your Text"
+    },
+    "voiceDetails": {
+        "voiceBy": "Voice by",
+        "seeMoreDetails": "See more details"
     },
     "formTitle": "TTS oluştur",
     "languageLabel": "Dil",
+    "sessionTtsResultsLabel": "Session TTS Results",
     "exploreModal": {
         "exploreModalOpenButton": "Explore Voices",
         "exploreModalTitle": "Explore Voices",

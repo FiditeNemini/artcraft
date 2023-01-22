@@ -12,10 +12,16 @@
         "searchHint": "Suchbegriff",
         "searchLabel": "Suche",
         "textInputHint": "Eingang...",
-        "voicesLabel": "Stimme ({{count}} zur Auswahl)"
+        "voicesLabel": "Stimme ({{count}} zur Auswahl)",
+        "yourTextLabel": "Dein Text"
+    },
+    "voiceDetails": {
+        "voiceBy": "Stimme von",
+        "seeMoreDetails": "Siehe weitere Einzelheiten"
     },
     "formTitle": "TTS erstellen",
     "languageLabel": "Sprache",
+    "sessionTtsResultsLabel": "TTS-Ergebnisse",
     "exploreModal": {
         "exploreModalOpenButton": "Erforschen Sie Stimmen",
         "exploreModalTitle": "Erforschen Sie Stimmen",

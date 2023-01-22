@@ -12,19 +12,25 @@
         "searchHint": "搜索词",
         "searchLabel": "搜索",
         "textInputHint": "此处输入文字",
-        "voicesLabel": "语音（{{count}} 个可供选择）"
+        "voicesLabel": "语音（{{count}} 个可供选择）",
+        "yourTextLabel": "你的文字"
+    },
+    "voiceDetails": {
+        "voiceBy": "声音创作者",
+        "seeMoreDetails": "查看更多详情"
     },
     "formTitle": "创建 TTS",
     "languageLabel": "语言",
+    "sessionTtsResultsLabel": "TTS 结果",
     "exploreModal": {
-        "exploreModalOpenButton": "Explore Voices",
-        "exploreModalTitle": "Explore Voices",
-        "languageLabel": "Language",
-        "allLanguagesOptionText": "All Languages",
-        "categoryLabel": "Category",
-        "selectCategoryText": "Select category...",
-        "clearCategoryFilterButton": "Clear category filters",
-        "useThisVoiceButton": "Use this voice"
+        "exploreModalOpenButton": "探索声音",
+        "exploreModalTitle": "探索声音",
+        "languageLabel": "语言",
+        "allLanguagesOptionText": "所有语言",
+        "categoryLabel": "类别",
+        "selectCategoryText": "选择类别",
+        "clearCategoryFilterButton": "清除类别",
+        "useThisVoiceButton": "用这个声音"
     },
     "heroSection": {
         "buttons": {
