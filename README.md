@@ -118,3 +118,5 @@ Reverse clips are generated with ffmpeg:
 ffmpeg -i input.mp4 -vf reverse reversed.mp4
 ```
 
+If node becomes a zombie process and you want to find/kill it, `ps aux | grep node`.
+
