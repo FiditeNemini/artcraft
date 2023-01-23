@@ -1,4 +1,6 @@
 import React, { useState } from "react";
+import { t } from "i18next";
+import { Trans } from "react-i18next";
 import {
   CreateAccount,
   CreateAccountIsError,
@@ -56,10 +58,11 @@ function SignupPage(props: Props) {
     if (newUsername.length > 1) {
       if (newUsername.length < 3) {
         usernameValid = FieldTriState.FALSE;
-        usernameInvalidReason = "username is too short";
+        usernameInvalidReason = t("account.SignUpPage.errors.usernameTooShort");
       } else if (newUsername.length > 15) {
         usernameValid = FieldTriState.FALSE;
-        usernameInvalidReason = "username is too long";
+        usernameInvalidReason = t("account.SignUpPage.errors.usernameTooLong")
+
       } else {
         usernameValid = FieldTriState.TRUE;
       }
@@ -83,10 +86,11 @@ function SignupPage(props: Props) {
     if (newEmail.length > 1) {
       if (newEmail.length < 3) {
         emailValid = FieldTriState.FALSE;
-        emailInvalidReason = "email is too short";
+        emailInvalidReason = t("account.SignUpPage.errors.emailTooShort");
       } else if (!newEmail.includes("@")) {
         emailValid = FieldTriState.FALSE;
-        emailInvalidReason = "email is invalid";
+        emailInvalidReason = t("account.SignUpPage.errors.emailInvalid");
+
       } else {
         emailValid = FieldTriState.TRUE;
       }
@@ -112,14 +116,15 @@ function SignupPage(props: Props) {
     if (newPassword.length > 1) {
       if (newPassword.length < 6) {
         passwordValid = FieldTriState.FALSE;
-        passwordInvalidReason = "password is too short";
+        passwordInvalidReason = t("account.SignUpPage.errors.passwordTooShort");
       } else {
         passwordValid = FieldTriState.TRUE;
       }
 
       if (newPassword !== passwordConfirmation) {
         passwordConfirmationValid = FieldTriState.FALSE;
-        passwordConfirmationInvalidReason = "passwords do not match";
+        passwordConfirmationInvalidReason = t("account.SignUpPage.errors.passwordsDoNotMatch");
+
       } else {
         passwordConfirmationValid = FieldTriState.TRUE;
         passwordConfirmationInvalidReason = "";
@@ -148,7 +153,7 @@ function SignupPage(props: Props) {
     if (newPasswordConfirmation.length > 1) {
       if (newPasswordConfirmation !== password) {
         passwordConfirmationValid = FieldTriState.FALSE;
-        passwordConfirmationInvalidReason = "passwords do not match";
+        passwordConfirmationInvalidReason = t("account.SignUpPage.errors.passwordsDoNotMatch");
       } else {
         passwordConfirmationValid = FieldTriState.TRUE;
         passwordConfirmationInvalidReason = "";
@@ -217,7 +222,7 @@ function SignupPage(props: Props) {
           </h1>
           <div className="text-center">
             <Link className="btn btn-primary" to="/">
-              Back to main
+              {t("account.SignUpPage.backToMainLink")}
             </Link>
           </div>
         </div>
@@ -292,12 +297,16 @@ function SignupPage(props: Props) {
         variants={panel}
       >
         <div className="panel p-3 p-lg-4 load-hidden mt-5 mt-lg-0 px-md-4">
-          <h1 className="panel-title fw-bold ">Sign Up</h1>
+          <h1 className="panel-title fw-bold ">
+            {t("account.SignUpPage.signUpTitle")}
+          </h1>
           <div className="py-6">
             <form onSubmit={handleFormSubmit}>
               <div className="d-flex flex-column gap-4">
                 <div>
-                  <label className="sub-title">Username</label>
+                  <label className="sub-title">
+                    {t("account.SignUpPage.inputs.username")}
+                  </label>
                   <div className="form-group input-icon">
                     <span className="form-control-feedback">
                       <FontAwesomeIcon icon={faUser} />
@@ -305,7 +314,7 @@ function SignupPage(props: Props) {
                     <input
                       className={usernameInputClass}
                       type="text"
-                      placeholder="Username"
+                      placeholder={t("account.SignUpPage.inputs.usernamePlaceholder")}
                       value={username}
                       onChange={handleUsernameChange}
                     />
@@ -313,7 +322,9 @@ function SignupPage(props: Props) {
                   <p className={usernameHelpClass}>{usernameInvalidReason}</p>
                 </div>
                 <div>
-                  <label className="sub-title">Email</label>
+                  <label className="sub-title">
+                    {t("account.SignUpPage.inputs.email")}
+                  </label>
                   <div className="form-group input-icon">
                     <span className="form-control-feedback">
                       <FontAwesomeIcon icon={faEnvelope} />
@@ -321,7 +332,7 @@ function SignupPage(props: Props) {
                     <input
                       className={emailInputClass}
                       type="email"
-                      placeholder="Email"
+                      placeholder={t("account.SignUpPage.inputs.emailPlaceholder")}
                       value={email}
                       onChange={handleEmailChange}
                     />
@@ -329,7 +340,9 @@ function SignupPage(props: Props) {
                   <p className={emailHelpClass}>{emailInvalidReason}</p>
                 </div>
                 <div>
-                  <label className="sub-title">Password</label>
+                  <label className="sub-title">
+                    {t("account.SignUpPage.inputs.password")}
+                  </label>
                   <div className="form-group input-icon">
                     <span className="form-control-feedback">
                       <FontAwesomeIcon icon={faKey} />
@@ -337,7 +350,7 @@ function SignupPage(props: Props) {
                     <input
                       className={passwordInputClass}
                       type="password"
-                      placeholder="Password"
+                      placeholder={t("account.SignUpPage.inputs.passwordPlaceholder")}
                       value={password}
                       onChange={handlePasswordChange}
                     />
@@ -345,7 +358,9 @@ function SignupPage(props: Props) {
                   <p className={passwordHelpClass}>{passwordInvalidReason}</p>
                 </div>
                 <div>
-                  <label className="sub-title">Password Confirmation</label>
+                  <label className="sub-title">
+                    {t("account.SignUpPage.inputs.passwordConfirm")}
+                  </label>
                   <div className="form-group input-icon">
                     <span className="form-control-feedback">
                       <FontAwesomeIcon icon={faKey} />
@@ -353,7 +368,7 @@ function SignupPage(props: Props) {
                     <input
                       className={passwordConfirmationInputClass}
                       type="password"
-                      placeholder="Password confirmation"
+                      placeholder={t("account.SignUpPage.inputs.passwordConfirmPlaceholder")}
                       value={passwordConfirmation}
                       onChange={handlePasswordConfirmationChange}
                     />
@@ -369,11 +384,13 @@ function SignupPage(props: Props) {
                   you lose your password, please let us know in Discord.
                 </div>*/}
                 <button className="btn btn-primary btn-lg w-100 mt-2">
-                  Sign up
+                  {t("account.SignUpPage.signUpButton")}
                 </button>
                 <p>
-                  Already have an account?{" "}
-                  <Link to="/login">Log in instead.</Link>
+                  <Trans i18nKey="account.SignUpPage.signInInstead">
+                    Already have an account?{" "}
+                    <Link to="/login">Log in instead.</Link>
+                  </Trans>
                 </p>
               </div>
             </form>
