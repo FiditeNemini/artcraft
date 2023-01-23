@@ -1,4 +1,5 @@
 {
+  "__comments__": "We don't have a JSON comments preprocessor, so look for interleved comments.",
   "topbar": {
     "aboutLink": "Chi Siamo",
     "termsLink": "Condizioni d'uso",
@@ -25,6 +26,7 @@
   "buttons": {
     "login": "Accesso",
     "logout": "Disconnettersi",
-    "signUp": "Iscrizione"
+    "signUp__human__": true,
+    "signUp": "Registrati"
   }
 }

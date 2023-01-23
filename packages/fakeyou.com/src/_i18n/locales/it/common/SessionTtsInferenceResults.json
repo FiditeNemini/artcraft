@@ -1,10 +1,13 @@
 {
+  "__comments__": "We don't have a JSON comments preprocessor, so look for interleved comments.",
   "premium": {
     "ad": "Non vuoi aspettare? Mettiti in prima linea con un <2>abbonamento FakeYou.</2>"
   },
   "noResults": {
-    "title": "Ancora nessun risultato",
-    "subtitle": "L'audio generato apparirà qui."
+    "title__human__": true,
+    "title": "Nessun risultato",
+    "subtitle__human__": true,
+    "subtitle": "Gli audio generati appariranno qui."
   },
   "progress": {
     "pending": "In attesa di...",

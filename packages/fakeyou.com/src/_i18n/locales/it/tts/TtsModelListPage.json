@@ -1,9 +1,12 @@
 {
+    "__comments__": "We don't have a JSON comments preprocessor, so look for interleved comments.",
     "form": {
         "asyncLoadingDropdownValue": "Caricamento...",
         "buttons": {
-            "clear": "Ripristina",
-            "speak": "Parlare"
+            "clear__human__": true,
+            "clear": "Cancella",
+            "speak__human__": true,
+            "speak": "Genera"
         },
         "by": "per",
         "categoryFiltersLabel": "Category / Langauge",
@@ -13,7 +16,8 @@
         "searchLabel": "Ricerca",
         "textInputHint": "Inserisci qui il testo da generare",
         "voicesLabel": "Voce ({{count}} tra cui scegliere)",
-        "yourTextLabel": "Il tuo testo"
+        "yourTextLabel__human__": true,
+        "yourTextLabel": "Testo"
     },
     "voiceDetails": {
         "voiceBy": "Voce di",
@@ -21,7 +25,8 @@
     },
     "formTitle": "Crea TTS",
     "languageLabel": "Lingua",
-    "sessionTtsResultsLabel": "Risultati sintesi vocale",
+    "sessionTtsResultsLabel__human__": true,
+    "sessionTtsResultsLabel": "Audio Generati",
     "exploreModal": {
         "exploreModalOpenButton": "Esplora Voci",
         "exploreModalTitle": "Esplora Voci",
@@ -35,7 +40,8 @@
     "heroSection": {
         "buttons": {
             "cloneVoice": "Clona la mia Voce!",
-            "signUp": "Registrarsi",
+            "signUp__human__": true,
+            "signUp": "Registrati",
             "viewPricing": "Visualizza i prezzi"
         },
         "subtitle": "Usa la tecnologia deep fake di <strong>FakeYou</strong> per dire cose con i tuoi personaggi preferiti",
