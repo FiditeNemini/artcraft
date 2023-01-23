@@ -1,4 +1,6 @@
 import React from "react";
+import { t } from "i18next";
+import { Trans } from "react-i18next";
 import { Link } from "react-router-dom";
 import { TtsInferenceJob } from "../../../App";
 import { BucketConfig } from "@storyteller/components/src/api/BucketConfig";
@@ -33,14 +35,14 @@ function SessionTtsInferenceResultList(props: Props) {
         case JobState.UNKNOWN:
           stateDescription =
             job.maybeExtraStatusDescription == null
-              ? "Pending..."
+              ? t("common.SessionTtsInferenceResults.progress.pending")
               : job.maybeExtraStatusDescription;
           break;
         case JobState.STARTED:
           cssStyle = "alert alert-success mb-0";
           stateDescription =
             job.maybeExtraStatusDescription == null
-              ? "Started..."
+              ? t("common.SessionTtsInferenceResults.progress.started")
               : job.maybeExtraStatusDescription;
           break;
         case JobState.ATTEMPT_FAILED:
@@ -50,12 +52,13 @@ function SessionTtsInferenceResultList(props: Props) {
         case JobState.COMPLETE_FAILURE:
         case JobState.DEAD:
           cssStyle = "alert alert-danger mb-0";
-          stateDescription =
-            "Failed Permanently. Please tell us in Discord so we can fix. :(";
+          // TODO(bt,2023-01-23): Translate when I can test it
+          stateDescription = t("common.SessionTtsInferenceResults.progress.dead");
           break;
         case JobState.COMPLETE_SUCCESS:
           cssStyle = "message is-success mb-0";
-          stateDescription = "Success!"; // Not sure why we're here instead of other branch!
+          // Not sure why we're here instead of other branch!
+          stateDescription = t("common.SessionTtsInferenceResults.progress.success");
           break;
       }
 
@@ -117,7 +120,7 @@ function SessionTtsInferenceResultList(props: Props) {
                   className="fw-semibold"
                 >
                   <FontAwesomeIcon icon={faLink} className="me-2" />
-                  Share &amp; Download
+                  {t("common.SessionTtsInferenceResults.result.shareDownload")}
                 </Link>
               </div>
             </motion.div>
@@ -131,8 +134,12 @@ function SessionTtsInferenceResultList(props: Props) {
     <div className="panel panel-inner text-center p-5 rounded-5 h-100">
       <div className="d-flex flex-column opacity-75 h-100 justify-content-center">
         <FontAwesomeIcon icon={faHeadphonesSimple} className="fs-3 mb-3" />
-        <h5 className="fw-semibold">No results yet</h5>
-        <p>Generated audio will appear here.</p>
+        <h5 className="fw-semibold">
+          {t("common.SessionTtsInferenceResults.noResults.title")}
+        </h5>
+        <p>
+          {t("common.SessionTtsInferenceResults.noResults.subtitle")}
+        </p>
       </div>
     </div>
   );
@@ -155,16 +162,20 @@ function SessionTtsInferenceResultList(props: Props) {
           variants={sessionItem}
         >
           <FontAwesomeIcon icon={faClock} className="me-2" />
-          Don't want to wait? Step to the front of the line with a{" "}
-          <Link
-            to="/pricing"
-            onClick={() => {
-              Analytics.ttsTooSlowUpgradePremium();
-            }}
-            className="alert-link"
-          >
-            <span className="fw-semibold">FakeYou membership</span>.
-          </Link>
+          
+          <Trans i18nKey="common.SessionTtsInferenceResults.premium.ad">
+            Don't want to wait? Step to the front of the line with a{" "}
+            <Link
+              to="/pricing"
+              onClick={() => {
+                Analytics.ttsTooSlowUpgradePremium();
+              }}
+              className="alert-link fw-semibold"
+            >
+              FakeYou membership.
+            </Link>
+          </Trans>
+
         </motion.div>
       </div>
     );
