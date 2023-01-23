@@ -12,7 +12,7 @@
         "searchHint": "Search for Voice",
         "searchLabel": "Ricerca",
         "textInputHint": "Inserisci qui il testo da generare",
-        "voicesLabel": "Voice ({{count}} to choose from)",
+        "voicesLabel": "Voce ({{count}} tra cui scegliere)",
         "yourTextLabel": "Il tuo testo"
     },
     "voiceDetails": {
