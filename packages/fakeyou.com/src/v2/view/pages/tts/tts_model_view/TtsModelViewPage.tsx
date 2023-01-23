@@ -754,14 +754,14 @@ function TtsModelViewPage(props: Props) {
                 placeholder="Textual shenanigans go here..."
                 rows={6}
               ></textarea>
-              <div className="d-flex gap-3 mt-4 pt-3 flex-column flex-md-row">
-                <button className="btn btn-primary w-75">
+              <div className="d-flex gap-3 mt-3">
+                <button className="btn btn-primary w-100">
                   <FontAwesomeIcon icon={faVolumeHigh} className="me-2" />
                   Speak
                 </button>
 
                 <button
-                  className="btn btn-destructive w-25"
+                  className="btn btn-destructive w-100"
                   onClick={handleClearClick}
                 >
                   <FontAwesomeIcon icon={faDeleteLeft} className="me-2" />

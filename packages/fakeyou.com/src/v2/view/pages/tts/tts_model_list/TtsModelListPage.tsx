@@ -58,10 +58,12 @@ import {
   GetComputedTtsCategoryAssignmentsIsOk,
   GetComputedTtsCategoryAssignmentsSuccessResponse,
 } from "@storyteller/components/src/api/category/GetComputedTtsCategoryAssignments";
+import { DynamicallyCategorizeModels } from "../../../../../model/categories/SyntheticCategory";
 import {
-  DynamicallyCategorizeModels,
-} from "../../../../../model/categories/SyntheticCategory";
-import { AvailableTtsLanguageKey, AVAILABLE_TTS_LANGUAGE_CATEGORY_MAP, ENGLISH_LANGUAGE } from "../../../../../_i18n/AvailableLanguageMap";
+  AvailableTtsLanguageKey,
+  AVAILABLE_TTS_LANGUAGE_CATEGORY_MAP,
+  ENGLISH_LANGUAGE,
+} from "../../../../../_i18n/AvailableLanguageMap";
 import { ExploreVoicesModal } from "./explore/ExploreVoicesModal";
 import { FrontendUrlConfig } from "../../../../../common/FrontendUrlConfig";
 
@@ -122,8 +124,8 @@ interface Props {
   maybeSelectedTtsModel?: TtsModelListItem;
   setMaybeSelectedTtsModel: (maybeSelectedTtsModel: TtsModelListItem) => void;
 
-  selectedTtsLanguageScope: string,
-  setSelectedTtsLanguageScope: (selectedTtsLanguageScope: string) => void,
+  selectedTtsLanguageScope: string;
+  setSelectedTtsLanguageScope: (selectedTtsLanguageScope: string) => void;
 }
 
 function TtsModelListPage(props: Props) {
@@ -202,18 +204,26 @@ function TtsModelListPage(props: Props) {
 
       // NB: We'll use the frontend to order the synthetic categories first.
 
-      const LATEST_MODELS_CATEGORY_TOKEN = 'SYNTHETIC_CATEGORY:LATEST_MODELS';
-      const TRENDING_MODELS_CATEGORY_TOKEN = 'SYNTHETIC_CATEGORY:TRENDING_MODELS';
+      const LATEST_MODELS_CATEGORY_TOKEN = "SYNTHETIC_CATEGORY:LATEST_MODELS";
+      const TRENDING_MODELS_CATEGORY_TOKEN =
+        "SYNTHETIC_CATEGORY:TRENDING_MODELS";
 
-      let maybeLatestCategory = categories
-        .find((category) => category.category_token === LATEST_MODELS_CATEGORY_TOKEN);
+      let maybeLatestCategory = categories.find(
+        (category) => category.category_token === LATEST_MODELS_CATEGORY_TOKEN
+      );
 
-      let maybeTrendingCategory = categories
-        .find((category) => category.category_token === TRENDING_MODELS_CATEGORY_TOKEN);
+      let maybeTrendingCategory = categories.find(
+        (category) => category.category_token === TRENDING_MODELS_CATEGORY_TOKEN
+      );
 
       let otherCategories = categories
-        .filter((category) => category.category_token !== LATEST_MODELS_CATEGORY_TOKEN)
-        .filter((category) => category.category_token !== TRENDING_MODELS_CATEGORY_TOKEN);
+        .filter(
+          (category) => category.category_token !== LATEST_MODELS_CATEGORY_TOKEN
+        )
+        .filter(
+          (category) =>
+            category.category_token !== TRENDING_MODELS_CATEGORY_TOKEN
+        );
 
       categories = [];
 
@@ -302,9 +312,17 @@ function TtsModelListPage(props: Props) {
 
   if (props.maybeSelectedTtsModel) {
     const userName = props.maybeSelectedTtsModel.creator_display_name;
-    const modelLink = FrontendUrlConfig.ttsModelPage(props.maybeSelectedTtsModel.model_token);
-    const profileLink = FrontendUrlConfig.userProfilePage(props.maybeSelectedTtsModel.creator_display_name);
-    const modelLanguage = AVAILABLE_TTS_LANGUAGE_CATEGORY_MAP[props.maybeSelectedTtsModel.ietf_primary_language_subtag as AvailableTtsLanguageKey] || ENGLISH_LANGUAGE;
+    const modelLink = FrontendUrlConfig.ttsModelPage(
+      props.maybeSelectedTtsModel.model_token
+    );
+    const profileLink = FrontendUrlConfig.userProfilePage(
+      props.maybeSelectedTtsModel.creator_display_name
+    );
+    const modelLanguage =
+      AVAILABLE_TTS_LANGUAGE_CATEGORY_MAP[
+        props.maybeSelectedTtsModel
+          .ietf_primary_language_subtag as AvailableTtsLanguageKey
+      ] || ENGLISH_LANGUAGE;
 
     directViewLink = (
       <Link
@@ -316,11 +334,12 @@ function TtsModelListPage(props: Props) {
       >
         <div className="flex-grow-1">
           <p>
-            {t("tts.TtsModelListPage.voiceDetails.voiceBy")}
-            {" "}
-            <Link 
-              to={profileLink} 
-              onClick={ () => { Analytics.ttsClickModelCreatorLink() } }
+            {t("tts.TtsModelListPage.voiceDetails.voiceBy")}{" "}
+            <Link
+              to={profileLink}
+              onClick={() => {
+                Analytics.ttsClickModelCreatorLink();
+              }}
               className="fw-medium"
             >
               {userName}{" "}
@@ -331,14 +350,14 @@ function TtsModelListPage(props: Props) {
               />
             </Link>{" "}
             | <FontAwesomeIcon icon={faGlobe} className="me-2" />
-            {t("tts.TtsModelListPage.languageLabel")}: <span className="fw-semibold">{modelLanguage.languageName}</span> {/*| Use count:{" "}
+            {t("tts.TtsModelListPage.languageLabel")}:{" "}
+            <span className="fw-semibold">{modelLanguage.languageName}</span>{" "}
+            {/*| Use count:{" "}
             <span className="fw-semibold">616400</span>*/}
           </p>
         </div>
         <div className="fw-medium">
-          <span>
-            {t("tts.TtsModelListPage.voiceDetails.seeMoreDetails")}
-          </span>
+          <span>{t("tts.TtsModelListPage.voiceDetails.seeMoreDetails")}</span>
           <FontAwesomeIcon icon={faChevronRight} className="ms-2" />
         </div>
       </Link>
@@ -484,43 +503,47 @@ function TtsModelListPage(props: Props) {
                         setMaybeSelectedTtsModel={
                           props.setMaybeSelectedTtsModel
                         }
-                        selectedTtsLanguageScope={props.selectedTtsLanguageScope}
+                        selectedTtsLanguageScope={
+                          props.selectedTtsLanguageScope
+                        }
                       />
                     </div>
 
                     <button
-                      onClick={() => { Analytics.ttsOpenExploreVoicesModal() } }
+                      onClick={() => {
+                        Analytics.ttsOpenExploreVoicesModal();
+                      }}
                       className="btn btn-primary rounded-50"
                       data-bs-toggle="modal"
                       data-bs-target="#exploreModal"
                       type="button"
                     >
                       <FontAwesomeIcon icon={faCompass} className="me-2" />
-                      {t("tts.TtsModelListPage.exploreModal.exploreModalOpenButton")}
+                      {t(
+                        "tts.TtsModelListPage.exploreModal.exploreModalOpenButton"
+                      )}
                     </button>
                   </div>
                 </div>
 
                 {/* Explore Modal */}
-                <ExploreVoicesModal 
+                <ExploreVoicesModal
                   allTtsCategories={props.allTtsCategories}
                   allTtsModels={props.ttsModels}
-
                   allTtsCategoriesByTokenMap={props.allTtsCategoriesByTokenMap}
                   allTtsModelsByTokenMap={props.allTtsModelsByTokenMap}
                   ttsModelsByCategoryToken={props.ttsModelsByCategoryToken}
-
                   dropdownCategories={props.dropdownCategories}
                   setDropdownCategories={props.setDropdownCategories}
                   selectedCategories={props.selectedCategories}
                   setSelectedCategories={props.setSelectedCategories}
                   maybeSelectedTtsModel={props.maybeSelectedTtsModel}
-                  setMaybeSelectedTtsModel={
-                    props.setMaybeSelectedTtsModel
-                  }
+                  setMaybeSelectedTtsModel={props.setMaybeSelectedTtsModel}
                   selectedTtsLanguageScope={props.selectedTtsLanguageScope}
-                  setSelectedTtsLanguageScope={props.setSelectedTtsLanguageScope}
-                  />
+                  setSelectedTtsLanguageScope={
+                    props.setSelectedTtsLanguageScope
+                  }
+                />
 
                 {directViewLink}
 
@@ -565,7 +588,7 @@ function TtsModelListPage(props: Props) {
                           {loading && <LoadingIcon />}
                         </button>
                         <button
-                          className="btn btn-destructive w-25"
+                          className="btn btn-destructive w-100"
                           onClick={handleClearClick}
                           disabled={noTextInputButtonDisabled}
                         >
