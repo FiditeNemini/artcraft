@@ -194,12 +194,33 @@ function SignupPage(props: Props) {
 
     if (CreateAccountIsError(response)) {
       if ("email_address" in response.error_fields) {
+        let reason = response.error_fields["email_address"] || "";
+        // NB: Hacky translation of serverside error strings.
+        switch (reason) {
+          case "email is invalid":
+            reason = t("account.SignUpPage.errors.emailInvalid");
+            break;
+        }
         setEmailValid(FieldTriState.FALSE);
-        setEmailInvalidReason(response.error_fields["email_address"] || "");
+        setEmailInvalidReason(reason);
       }
       if ("username" in response.error_fields) {
+        let reason = response.error_fields["username"] || "";
         setUsernameValid(FieldTriState.FALSE);
-        setUsernameInvalidReason(response.error_fields["username"] || "");
+        // NB: Hacky translation of serverside error strings.
+        switch (reason) {
+          case "username is taken":
+            reason = t("account.SignUpPage.errors.usernameIsTaken");
+            break;
+          case "username is reserved":
+            reason = t("account.SignUpPage.errors.usernameIsReserved");
+            break;
+          case "username contains slurs":
+            reason = t("account.SignUpPage.errors.usernameIsSlur");
+            break;
+        }
+
+        setUsernameInvalidReason(reason);
       }
     } else if (CreateAccountIsSuccess(response)) {
       props.querySessionCallback();
