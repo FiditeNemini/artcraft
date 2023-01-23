@@ -209,6 +209,13 @@ function SignupPage(props: Props) {
         setUsernameValid(FieldTriState.FALSE);
         // NB: Hacky translation of serverside error strings.
         switch (reason) {
+          case "invalid username characters":
+            reason = t("account.SignUpPage.errors.usernameInvalidCharacters");
+            break;
+          case "username is too long":
+            // NB: If the frontend doesn't catch it, the server will
+            reason = t("account.SignUpPage.errors.usernameTooLong");
+            break;
           case "username is taken":
             reason = t("account.SignUpPage.errors.usernameIsTaken");
             break;

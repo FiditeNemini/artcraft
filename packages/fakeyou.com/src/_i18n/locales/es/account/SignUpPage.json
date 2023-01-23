@@ -13,6 +13,7 @@
   "errors": {
     "usernameTooShort": "el nombre de usuario es demasiado corto",
     "usernameTooLong": "el nombre de usuario es demasiado largo",
+    "usernameInvalidCharacters": "el nombre de usuario tiene caracteres inválidos",
     "usernameIsTaken": "se toma el nombre de usuario",
     "usernameIsReserved": "el nombre de usuario está reservado",
     "usernameIsSlur": "el nombre de usuario contiene insultos",
