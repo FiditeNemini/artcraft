@@ -16,7 +16,8 @@
   "errors": {
     "usernameTooShort": "il nome utente è troppo corto",
     "usernameTooLong": "il nome utente è troppo lungo",
-    "usernameIsTaken": "il nome utente è preso",
+    "usernameIsTaken__human__": true,
+    "usernameIsTaken": "il nome utente è già in uso",
     "usernameIsReserved": "il nome utente è riservato",
     "usernameIsSlur": "il nome utente contiene insulti",
     "emailTooShort": "l'e-mail è troppo breve",
