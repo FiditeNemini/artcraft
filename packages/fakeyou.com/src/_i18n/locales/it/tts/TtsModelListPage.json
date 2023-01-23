@@ -44,7 +44,8 @@
             "signUp": "Registrati",
             "viewPricing": "Visualizza i prezzi"
         },
-        "subtitle": "Usa la tecnologia deep fake di <strong>FakeYou</strong> per dire cose con i tuoi personaggi preferiti",
+        "subtitle__human__": true,
+        "subtitle": "Usa la tecnologia deep fake di <strong>FakeYou</strong> per far dire cose ai tuoi personaggi preferiti",
         "title": "Testo alla Voce"
     }
 }
