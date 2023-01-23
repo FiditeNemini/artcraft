@@ -1,12 +1,15 @@
 {
-  "signUpTitle": "Iscrizione",
+  "__comments__": "We don't have a JSON comments preprocessor, so look for interleved comments.",
+  "signUpTitle__human__": true,
+  "signUpTitle": "Iscriviti",
   "inputs": {
     "username": "Nome utente",
     "usernamePlaceholder": "Nome utente",
     "email": "E-mail",
     "emailPlaceholder": "E-mail",
-    "password": "Parola d'ordine",
-    "passwordPlaceholder": "Parola d'ordine",
+    "password__human__": true,
+    "password": "Password",
+    "passwordPlaceholder": "Password",
     "passwordConfirm": "Conferma Password",
     "passwordConfirmPlaceholder": "Conferma Password"
   },
@@ -17,11 +20,15 @@
     "usernameIsReserved": "il nome utente è riservato",
     "usernameIsSlur": "il nome utente contiene insulti",
     "emailTooShort": "l'e-mail è troppo breve",
-    "emailInvalid": "L'email non è valida",
+    "emailInvalid__human__": true,
+    "emailInvalid": "Email non valida",
     "passwordTooShort": "la password è troppo corta",
-    "passwordsDoNotMatch": "le passwords non corrispondono"
+    "passwordsDoNotMatch__human__": true,
+    "passwordsDoNotMatch": "le password non corrispondono"
   },
-  "signUpButton": "Iscrizione",
+  "signUpButton__human__": true,
+  "signUpButton": "Iscriviti",
   "backToMainLink": "Torna al principale",
-  "signInInstead": "Hai già un account? <2>Accedi invece.</2>"
+  "signInInstead__human__": true,
+  "signInInstead": "Hai già un account? <2>Accedi.</2>"
 }
