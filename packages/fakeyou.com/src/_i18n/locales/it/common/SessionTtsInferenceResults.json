@@ -1,0 +1,19 @@
+{
+  "premium": {
+    "ad": "Non vuoi aspettare? Mettiti in prima linea con un <2>abbonamento FakeYou.</2>"
+  },
+  "noResults": {
+    "title": "Ancora nessun risultato",
+    "subtitle": "L'audio generato apparirà qui."
+  },
+  "progress": {
+    "pending": "In attesa di...",
+    "started": "Cominciato...",
+    "success": "Successo!",
+    "failed": "{{count}} tentativi falliti. Riproverò...",
+    "dead": "Fallito in modo permanente. Per favore, comunicacelo in Discord in modo che possiamo risolvere il problema. :("
+  },
+  "result": {
+    "shareDownload": "Condividi e Scarica"
+  }
+}

@@ -2,11 +2,13 @@
 // 67 million speakers (worldwide #?)
 // Twitch #10 (41k concurrent viewers, 1.2k concurrent viewers)
 
+import * as common from './common';
 import * as nav from './nav';
 import * as notices from './notices';
 import * as tts from './tts';
 
 export {
+    common,
     nav,
     notices,
     tts,
