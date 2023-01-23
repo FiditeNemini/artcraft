@@ -13,24 +13,24 @@
         "searchLabel": "तलाशी",
         "textInputHint": "यहां टेक्स्ट इनपुट करें",
         "voicesLabel": "आवाज ({{count}} चुनने के लिए)",
-        "yourTextLabel": "Your Text"
+        "yourTextLabel": "अपका संदेश"
     },
     "voiceDetails": {
-        "voiceBy": "Voice by",
-        "seeMoreDetails": "See more details"
+        "voiceBy": "द्वारा आवाज",
+        "seeMoreDetails": "अधिक विवरण देखें"
     },
     "formTitle": "टीटीएस बनाएं",
     "languageLabel": "भाषा",
-    "sessionTtsResultsLabel": "Session TTS Results",
+    "sessionTtsResultsLabel": "सत्र परिणाम",
     "exploreModal": {
-        "exploreModalOpenButton": "Explore Voices",
-        "exploreModalTitle": "Explore Voices",
-        "languageLabel": "Language",
-        "allLanguagesOptionText": "All Languages",
-        "categoryLabel": "Category",
-        "selectCategoryText": "Select category...",
-        "clearCategoryFilterButton": "Clear category filters",
-        "useThisVoiceButton": "Use this voice"
+        "exploreModalOpenButton": "आवाज़ें एक्सप्लोर करें",
+        "exploreModalTitle": "आवाज़ें एक्सप्लोर करें",
+        "languageLabel": "भाषा",
+        "allLanguagesOptionText": "सारी भाषाएँ",
+        "categoryLabel": "श्रेणी",
+        "selectCategoryText": "श्रेणी चुनना",
+        "clearCategoryFilterButton": "श्रेणी फ़िल्टर साफ़ करें",
+        "useThisVoiceButton": "इस आवाज का प्रयोग करें"
     },
     "heroSection": {
         "buttons": {
