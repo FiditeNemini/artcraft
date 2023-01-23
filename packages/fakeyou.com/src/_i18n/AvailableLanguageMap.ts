@@ -115,7 +115,7 @@ export const AVAILABLE_LANGUAGE_MAP: Record<AvailableLanguageKey, AvailableLangu
     languageNameLocalized: "Português",
     flags: ["🇵🇹", "🇧🇷"],
     showPleaseFollowNotice: true,
-    showBootstrapLanguageNotice: false,
+    showBootstrapLanguageNotice: true,
   },
   tr:  {
     language: Language.Turkish,
