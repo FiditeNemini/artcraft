@@ -1,19 +1,19 @@
 {
   "premium": {
-    "ad": "Don't want to wait? Step to the front of the line with a <2>FakeYou membership.</2>"
+    "ad": "Vous ne voulez pas attendre ? Passez en tête de file avec un <2>abonnement FakeYou.</2>"
   },
   "noResults": {
-    "title": "No results yet",
-    "subtitle": "Generated audio will appear here."
+    "title": "Pas encore de résultats",
+    "subtitle": "L'audio généré apparaîtra ici."
   },
   "progress": {
-    "pending": "Pending...",
-    "started": "Started...",
-    "success": "Success!",
-    "failed": "Failed {{count}} attempt(s). Will retry...",
-    "dead": "Failed Permanently. Please tell us in Discord so we can fix. :("
+    "pending": "En attente...",
+    "started": "A débuté...",
+    "success": "Succès!",
+    "failed": "Échec de {{count}} tentative(s). Je vais réessayer...",
+    "dead": "Échoué de façon permanente. S'il vous plaît dites-nous dans Discord afin que nous puissions réparer. :("
   },
   "result": {
-    "shareDownload": "Share & Download"
+    "shareDownload": "Partager et Télécharger"
   }
 }

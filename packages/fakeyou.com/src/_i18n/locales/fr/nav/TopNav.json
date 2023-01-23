@@ -1,30 +1,30 @@
 {
   "topbar": {
-    "aboutLink": "About",
-    "termsLink": "Terms of Use",
-    "privacyLink": "Privacy Policy",
-    "developersLink": "Developers",
-    "options": "Options",
-    "ttsQueued": "TTS Queued"
+    "aboutLink": "À propos de",
+    "termsLink": "Conditions d'utilisation",
+    "privacyLink": "Politique de confidentialité",
+    "developersLink": "Développeurs",
+    "options": "Choix",
+    "ttsQueued": "TTS en file d'attente"
   },
   "main": {
-    "pricingLink": "Pricing",
-    "voiceCloneLink": "Voice Clone",
-    "createDropdown": "Create",
+    "pricingLink": "Tarification",
+    "voiceCloneLink": "Clone de Voix",
+    "createDropdown": "Créer",
     "ttsOption": "TTS",
-    "videoOption": "Video",
-    "communityDropdown": "Community",
-    "contributeOption": "Contribute/Upload",
-    "leaderboardOption": "Leaderboard",
-    "discordOption": "Discord Chat",
-    "patronsOption": "Patrons",
-    "guideOption": "Guide",
-    "feedOption": "Feed",
-    "myDataOption": "My Data"
+    "videoOption": "Vidéo",
+    "communityDropdown": "Communauté",
+    "contributeOption": "Contribuer/Télécharger",
+    "leaderboardOption": "Classement",
+    "discordOption": "Discussion Discord",
+    "patronsOption": "Mécènes",
+    "guideOption": "Guider",
+    "feedOption": "Mettre à Jour le Flux",
+    "myDataOption": "Mes Données"
   },
   "buttons": {
-    "login": "Login",
-    "logout": "Log Out",
-    "signUp": "Sign Up"
+    "login": "Connexion",
+    "logout": "Se déconnecter",
+    "signUp": "S'inscrire"
   }
 }
