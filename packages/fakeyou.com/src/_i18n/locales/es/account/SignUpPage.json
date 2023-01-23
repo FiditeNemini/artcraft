@@ -1,27 +1,27 @@
 {
-  "signUpTitle": "Sign Up",
+  "signUpTitle": "Regístrate",
   "inputs": {
-    "username": "Username",
-    "usernamePlaceholder": "Username",
-    "email": "Email",
-    "emailPlaceholder": "Email",
-    "password": "Password",
-    "passwordPlaceholder": "Password",
-    "passwordConfirm": "Password Confirmation",
-    "passwordConfirmPlaceholder": "Password Confirmation"
+    "username": "Nombre de usuario",
+    "usernamePlaceholder": "Nombre de usuario",
+    "email": "Correo electrónico",
+    "emailPlaceholder": "Correo electrónico",
+    "password": "Contraseña",
+    "passwordPlaceholder": "Contraseña",
+    "passwordConfirm": "Confirmación de contraseña",
+    "passwordConfirmPlaceholder": "Confirmación de contraseña"
   },
   "errors": {
-    "usernameTooShort": "username is too short",
-    "usernameTooLong": "username is too long",
-    "usernameIsTaken": "username is taken",
-    "usernameIsReserved": "username is reserved",
-    "usernameIsSlur": "username contains slurs",
-    "emailTooShort": "email is too short",
-    "emailInvalid": "email is invalid",
-    "passwordTooShort": "password is too short",
-    "passwordsDoNotMatch": "passwords do not match"
+    "usernameTooShort": "el nombre de usuario es demasiado corto",
+    "usernameTooLong": "el nombre de usuario es demasiado largo",
+    "usernameIsTaken": "se toma el nombre de usuario",
+    "usernameIsReserved": "el nombre de usuario está reservado",
+    "usernameIsSlur": "el nombre de usuario contiene insultos",
+    "emailTooShort": "el correo electrónico es demasiado corto",
+    "emailInvalid": "el correo electrónico es invalido",
+    "passwordTooShort": "la contraseña es demasiado corta",
+    "passwordsDoNotMatch": "las contraseñas no coinciden"
   },
-  "signUpButton": "Sign up",
-  "backToMainLink": "Back to main",
-  "signInInstead": "Already have an account? <2>Log in instead.</2>"
+  "signUpButton": "Regístrate",
+  "backToMainLink": "volver a la página principal",
+  "signInInstead": "¿Ya tienes una cuenta? <2>Inicie sesión en su lugar.</2>"
 }
