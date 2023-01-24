@@ -1,6 +1,6 @@
 import React from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { Link, useHistory } from "react-router-dom";
+import { useHistory } from "react-router-dom";
 import { faCheck, faHeart } from "@fortawesome/free-solid-svg-icons";
 import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
 import { SessionSubscriptionsWrapper } from "@storyteller/components/src/session/SessionSubscriptionsWrapper";
@@ -99,13 +99,7 @@ function PricingPage(props: Props) {
   let eliteButtonText = "Buy Elite";
   let eliteButtonDisabled = false;
 
-  let freeButton = (
-    <>
-      <Link to="/" className="btn btn-secondary w-100 fs-6">
-        Use for free
-      </Link>
-    </>
-  );
+  let unsubscribeButton = <></>;
 
   if (userHasPaidPremium) {
     let unsubscribeKey = FYP.plus.internal_plan_key[planKey]; // NB: Default to something (I don't think this matters to Stripe.)
@@ -133,14 +127,21 @@ function PricingPage(props: Props) {
       eliteButtonText = "Switch to Elite";
     }
 
-    freeButton = (
+    unsubscribeButton = (
       <>
-        <button
-          onClick={() => beginStripeFlow(unsubscribeKey, "unsubscribe")}
-          className="btn btn-secondary w-100 fs-6"
-        >
-          Unsubscribe
-        </button>
+        <div className="container pt-5 pb-3 text-center">
+          <motion.div
+            className="mt-4"
+            variants={item}
+          >
+            <button
+              onClick={() => beginStripeFlow(unsubscribeKey, "unsubscribe")}
+              className="btn btn-link w-100 fs-6"
+            >
+              Unsubscribe
+            </button>
+          </motion.div>
+        </div>
       </>
     );
   }
@@ -169,14 +170,15 @@ function PricingPage(props: Props) {
       </div>
       <div className="container mt-3 mb-5">
         <div className="row gx-3 gy-4">
+
+
           {/* Starter Tier */}
-          <motion.div className="col-12 col-sm-6 col-lg-3" variants={panel}>
+          {/*<motion.div className="col-12 col-sm-6 col-lg-3" variants={panel}>
             <div className="rounded panel p-4 h-100">
               <h2 className="text-center my-2 fw-bold mb-4">
                 {FYP.starter.tier}
               </h2>
 
-              {freeButton}
 
               <h2 className="display-5 fw-bold text-center my-5">
                 ${FYP.starter.price}
@@ -208,33 +210,6 @@ function PricingPage(props: Props) {
                     </li>
                   );
                 })}
-                {/*<li className="fw-semibold">{FYP.starter.vcweb.title}</li>
-                {FYP.starter.vcweb.features.map((e: any) => {
-                  return (
-                    <li key={e}>
-                      <FontAwesomeIcon
-                        icon={faCheck}
-                        className="text-red me-3"
-                      />
-                      {e}
-                    </li>
-                  );
-                })}
-                <li className="fw-semibold">
-                  {FYP.starter.vcapp.title}{" "}
-                  <span className="small-text">(registered users)</span>
-                </li>
-                {FYP.starter.vcapp.features.map((e: any) => {
-                  return (
-                    <li key={e}>
-                      <FontAwesomeIcon
-                        icon={faCheck}
-                        className="text-red me-3"
-                      />
-                      {e}
-                    </li>
-                  );
-                })}*/}
                 <li className="fw-semibold">{FYP.starter.w2l.title}</li>
                 {FYP.starter.w2l.features.map((e: any) => {
                   return (
@@ -250,91 +225,10 @@ function PricingPage(props: Props) {
               </ul>
             </div>
           </motion.div>
-
-          {/* Basic Tier (For Latin American countries) */}
-          {/* <div className="col-12 col-sm-6 col-lg-3">
-            <div className="rounded panel p-4 h-100">
-              <h2 className="text-center my-2 fw-bold mb-4">
-                {FYP.basic.tier}
-              </h2>
-              <Link to="/" className="btn btn-primary w-100 fs-6">
-                Buy {FYP.basic.tier}
-              </Link>
-              <h2 className="display-5 fw-bold text-center my-5">
-                ${FYP.basic.price}
-                <span className="fs-5 opacity-75 fw-normal"> /month</span>
-              </h2>
-              <ul className="pricing-list d-flex flex-column gap-2">
-                <li className="fw-semibold">{FYP.basic.tts.title}</li>
-                {FYP.basic.tts.features.map((e: any) => {
-                  return (
-                    <li key={e}>
-                      <FontAwesomeIcon
-                        icon={faCheck}
-                        className="text-red me-3"
-                      />
-                      {e}
-                    </li>
-                  );
-                })}
-                <li className="fw-semibold">{FYP.basic.vcweb.title}</li>
-                {FYP.basic.vcweb.features.map((e: any) => {
-                  return (
-                    <li key={e}>
-                      <FontAwesomeIcon
-                        icon={faCheck}
-                        className="text-red me-3"
-                      />
-                      {e}
-                    </li>
-                  );
-                })}
-                <li className="fw-semibold">{FYP.basic.vcapp.title}</li>
-                {FYP.basic.vcapp.features.map((e: any) => {
-                  return (
-                    <li key={e}>
-                      <FontAwesomeIcon
-                        icon={faCheck}
-                        className="text-red me-3"
-                      />
-                      {e}
-                    </li>
-                  );
-                })}
-                <li className="fw-semibold">{FYP.basic.w2l.title}</li>
-                {FYP.basic.w2l.features.map((e: any) => {
-                  return (
-                    <li key={e}>
-                      <FontAwesomeIcon
-                        icon={faCheck}
-                        className="text-red me-3"
-                      />
-                      {e}
-                    </li>
-                  );
-                })}
-                <li className="fw-semibold">{FYP.basic.priority.title}</li>
-                {FYP.basic.priority.features.map((e: any) => {
-                  return (
-                    <li key={e}>
-                      <FontAwesomeIcon
-                        icon={faCheck}
-                        className="text-red me-3"
-                      />
-                      {e}
-                    </li>
-                  );
-                })}
-              </ul>
-              <hr className="my-4" />
-              <h6 className="text-center fw-normal">
-                + Many more features coming soon!
-              </h6>
-            </div>
-          </div> */}
+              */}
 
           {/* Plus Tier */}
-          <motion.div className="col-12 col-sm-6 col-lg-3" variants={panel}>
+          <motion.div className="col-12 col-sm-6 col-lg-4" variants={panel}>
             <div className="rounded panel p-4 h-100">
               <h2 className="text-center my-2 fw-bold mb-4">{FYP.plus.tier}</h2>
               <button
@@ -431,7 +325,7 @@ function PricingPage(props: Props) {
           </motion.div>
 
           {/* Pro Tier */}
-          <motion.div className="col-12 col-sm-6 col-lg-3" variants={panel}>
+          <motion.div className="col-12 col-sm-6 col-lg-4" variants={panel}>
             <div className={proBorderCss}>
               <h2 className="text-center my-2 fw-bold mb-4">{FYP.pro.tier}</h2>
               <button
@@ -540,7 +434,7 @@ function PricingPage(props: Props) {
           </motion.div>
 
           {/* Elite Tier */}
-          <motion.div className="col-12 col-sm-6 col-lg-3" variants={panel}>
+          <motion.div className="col-12 col-sm-6 col-lg-4" variants={panel}>
             <div className="rounded panel p-4 h-100">
               <h2 className="text-center my-2 fw-bold mb-4">
                 {FYP.elite.tier}
@@ -662,6 +556,12 @@ function PricingPage(props: Props) {
             </div>
           </motion.div>
         </div>
+
+      <div className="container mt-3 mb-5">
+        <div className="row gx-3 gy-4">
+          {unsubscribeButton}
+        </div>
+      </div>
 
         {/* Starter Tier (to show for Latin American countries) */}
         {/* <div className="w-100 mt-4">
