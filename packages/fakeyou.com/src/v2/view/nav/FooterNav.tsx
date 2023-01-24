@@ -159,19 +159,19 @@ function FooterNav(props: Props) {
             <div className="py-2 col-12 col-lg-3 d-flex flex-column gap-2 gap-lg-3 align-items-center align-items-lg-start">
               <p className="fw-bold">Info</p>
               <li>
-                <Link to="/pricing">Pricing</Link>
+                <Link to={FrontendUrlConfig.pricingPageWithReferer("footer")}>Pricing</Link>
               </li>
 
               <li>
-                <Link to="/about">About</Link>
+                <Link to={FrontendUrlConfig.aboutUsPage()}>About</Link>
               </li>
 
               <li>
-                <Link to="/terms">Terms of Use</Link>
+                <Link to={FrontendUrlConfig.termsPage()}>Terms of Use</Link>
               </li>
 
               <li>
-                <Link to="/privacy">Privacy Policy</Link>
+                <Link to={FrontendUrlConfig.privacyPage()}>Privacy Policy</Link>
               </li>
               <li>
                 <a href={FrontendUrlConfig.developerDocs()}>API Docs</a>

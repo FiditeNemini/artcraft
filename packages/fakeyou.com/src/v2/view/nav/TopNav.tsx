@@ -62,11 +62,11 @@ function TopNav(props: Props) {
 
   let history = useHistory();
 
-  let myDataLink = "/signup";
+  let myDataLink = FrontendUrlConfig.signupPage();
 
   if (props.sessionWrapper.isLoggedIn()) {
-    let username = props.sessionWrapper.getUsername();
-    myDataLink = `/profile/${username}`;
+    let username = props.sessionWrapper.getUsername() as string; // NB: Should be present if logged in
+    myDataLink = FrontendUrlConfig.userProfilePage(username);
   }
 
   // NB: The responses from the "job count" endpoint are cached in a distributed manner.
@@ -152,7 +152,7 @@ function TopNav(props: Props) {
 
   let userOrLoginButton = (
     <>
-      <Link to="/login">
+      <Link to={FrontendUrlConfig.loginPage()}>
         <span className="nav-login me-4" data-bs-toggle="offcanvas">
           {t("nav.TopNav.buttons.login")}
         </span>
@@ -162,7 +162,7 @@ function TopNav(props: Props) {
 
   let signupOrLogOutButton = (
     <>
-      <Link to="/signup">
+      <Link to={FrontendUrlConfig.signupPage()}>
         <button className="btn btn-primary" data-bs-toggle="offcanvas">
           {t("nav.TopNav.buttons.signUp")}
         </button>
@@ -183,7 +183,7 @@ function TopNav(props: Props) {
       gravatar = <Gravatar email_hash={gravatarHash} size={15} />;
     }
 
-    let url = `/profile/${displayName}`;
+    let url = FrontendUrlConfig.userProfilePage(displayName);
     userOrLoginButton = (
       <>
         <Link className="btn btn-secondary me-3" to={url}>
@@ -326,7 +326,7 @@ function TopNav(props: Props) {
               <ul className="navbar-nav justify-content-start align-items-lg-center flex-grow-1 gap-2 gap-lg-0">
                 <li data-bs-toggle="offcanvas" className="nav-item">
                   <Link
-                    to={FrontendUrlConfig.pricingPage()}
+                    to={FrontendUrlConfig.pricingPageWithReferer("topnav")}
                     onClick={() => { Analytics.topbarClickPricing() } }
                     className="nav-link"
                   >

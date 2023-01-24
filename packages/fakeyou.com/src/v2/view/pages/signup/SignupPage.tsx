@@ -243,7 +243,7 @@ function SignupPage(props: Props) {
 
       let redirectWasSuccessful = await afterSignupRedirect();
       if (!redirectWasSuccessful) {
-        window.location.href = FrontendUrlConfig.pricingPage();
+        window.location.href = FrontendUrlConfig.pricingPageWithReferer("signup");
       }
     }
 
@@ -257,7 +257,7 @@ function SignupPage(props: Props) {
       return await BeginStripeCheckoutFlow(maybeInternalPlanKey);
     }
 
-    let redirectUrl = FrontendUrlConfig.pricingPage();
+    let redirectUrl = FrontendUrlConfig.pricingPageWithReferer("signup");
     history.push(redirectUrl);
 
     return true;

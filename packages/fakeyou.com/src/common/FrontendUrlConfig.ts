@@ -18,18 +18,33 @@ class FrontendUrlConfig {
     return `/signup?sub=${pricingPlanKey}`;
   }
 
+  static loginPage() : string {
+    return '/login';
+  }
+
+  // Pricing page
+
+  static pricingPage(): string {
+    return '/pricing';
+  }
+
+  static pricingPageWithReferer(fromPage: string): string {
+    // NB: This is to more easily track the referer page in Google Analytics
+    return `/pricing?from=${fromPage}`;
+  }
+
   // Standalone pages
 
   static aboutUsPage(): string {
     return '/about';
   }
 
-  static pricingPage(): string {
-    return '/pricing';
-  }
-
   static termsPage(): string {
     return '/terms';
+  }
+
+  static privacyPage(): string {
+    return '/privacy';
   }
 
   static patronsPage(): string {
