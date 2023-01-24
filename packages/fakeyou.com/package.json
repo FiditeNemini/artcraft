@@ -32,6 +32,7 @@
     "howler": "^2.2.0",
     "i18next": "^21.6.11",
     "js-cookie": "^3.0.1",
+    "query-string": "^8.1.0",
     "react": "^16.13.1",
     "react-autocomplete": "^1.8.1",
     "react-dom": "^16.13.1",
@@ -41,10 +42,10 @@
     "react-scripts": "5.0.0",
     "react-select": "^5.7.0",
     "react-share": "^4.4.1",
+    "react-wavesurfer.js": "^0.0.8",
     "sass": "^1.57.1",
     "typescript": "^3.7.5",
     "uuid": "^8.3.2",
-    "react-wavesurfer.js": "^0.0.8",
     "wavesurfer.js": "^6.4.0"
   },
   "scripts": {

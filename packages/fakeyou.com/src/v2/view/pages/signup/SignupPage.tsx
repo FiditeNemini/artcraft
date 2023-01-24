@@ -8,11 +8,14 @@ import {
 } from "@storyteller/components/src/api/user/CreateAccount";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faUser, faEnvelope, faKey } from "@fortawesome/free-solid-svg-icons";
-import { Link } from "react-router-dom";
+import { Link, useHistory } from "react-router-dom";
 import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
 import { motion } from "framer-motion";
 import { container, panel } from "../../../../data/animation";
 import { Analytics } from "../../../../common/Analytics";
+import queryString from "query-string";
+import { FrontendUrlConfig } from "../../../../common/FrontendUrlConfig";
+import { BeginStripeCheckoutFlow } from "../../../../common/BeginStripeCheckoutFlow";
 
 enum FieldTriState {
   EMPTY_FALSE,
@@ -26,6 +29,10 @@ interface Props {
 }
 
 function SignupPage(props: Props) {
+  let history = useHistory();
+
+  const parsedQueryString = queryString.parse(window.location.search);
+
   const [username, setUsername] = useState("");
   const [usernameValid, setUsernameValid] = useState(FieldTriState.EMPTY_FALSE);
   const [usernameInvalidReason, setUsernameInvalidReason] = useState("");
@@ -234,12 +241,27 @@ function SignupPage(props: Props) {
 
       Analytics.accountSignupComplete();
 
-      // TODO: Switch to functional component.
-      window.location.href = "/pricing";
+      let redirectWasSuccessful = await afterSignupRedirect();
+      if (!redirectWasSuccessful) {
+        window.location.href = FrontendUrlConfig.pricingPage();
+      }
     }
 
     return false;
   };
+
+  const afterSignupRedirect = async () => {
+    const maybeInternalPlanKey = parsedQueryString['sub'] as string | undefined;
+
+    if (maybeInternalPlanKey !== undefined) {
+      return await BeginStripeCheckoutFlow(maybeInternalPlanKey);
+    }
+
+    let redirectUrl = FrontendUrlConfig.pricingPage();
+    history.push(redirectUrl);
+
+    return true;
+  }
 
   if (props.sessionWrapper.isLoggedIn()) {
     return (

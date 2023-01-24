@@ -14,6 +14,10 @@ class FrontendUrlConfig {
     return '/signup';
   }
 
+  static signupPageWithPurchaseIntent(pricingPlanKey: string) : string {
+    return `/signup?sub=${pricingPlanKey}`;
+  }
+
   // Standalone pages
 
   static aboutUsPage(): string {

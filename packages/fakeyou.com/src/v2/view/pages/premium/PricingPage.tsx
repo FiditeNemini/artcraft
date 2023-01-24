@@ -6,11 +6,6 @@ import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapp
 import { SessionSubscriptionsWrapper } from "@storyteller/components/src/session/SessionSubscriptionsWrapper";
 import { FAKEYOU_PRICES as FYP } from "../../../../data/PriceTiers";
 import {
-  CreateStripeCheckoutRedirect,
-  CreateStripeCheckoutRedirectIsError,
-  CreateStripeCheckoutRedirectIsSuccess,
-} from "@storyteller/components/src/api/premium/CreateStripeCheckoutRedirect";
-import {
   CreateStripePortalRedirect,
   CreateStripePortalRedirectIsError,
   CreateStripePortalRedirectIsSuccess,
@@ -19,6 +14,8 @@ import { motion } from "framer-motion";
 import { container, item, panel } from "../../../../data/animation";
 import { FakeYouFrontendEnvironment } from "@storyteller/components/src/env/FakeYouFrontendEnvironment";
 import { Analytics } from "../../../../common/Analytics";
+import { FrontendUrlConfig } from "../../../../common/FrontendUrlConfig";
+import { BeginStripeCheckoutFlow } from "../../../../common/BeginStripeCheckoutFlow";
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -27,18 +24,6 @@ interface Props {
 
 function PricingPage(props: Props) {
   let history = useHistory();
-
-  const beginStripeCheckoutFlow = async (
-    internal_plan_key: string
-  ): Promise<boolean> => {
-    const response = await CreateStripeCheckoutRedirect(internal_plan_key);
-    if (CreateStripeCheckoutRedirectIsSuccess(response)) {
-      window.location.href = response.stripe_checkout_redirect_url;
-    } else if (CreateStripeCheckoutRedirectIsError(response)) {
-      // TODO
-    }
-    return false;
-  };
 
   const beginStripePortalFlow = async (): Promise<boolean> => {
     const response = await CreateStripePortalRedirect();
@@ -73,14 +58,18 @@ function PricingPage(props: Props) {
     if (!props.sessionWrapper.isLoggedIn()) {
       // TODO: This needs to bring the user back to purchase flow.
       Analytics.premiumBounceToSignup();
-      history.push("/signup");
+
+      const signupUrl = FrontendUrlConfig.signupPageWithPurchaseIntent(internal_plan_key);
+      history.push(signupUrl);
+
       return false;
+
     } else if (props.sessionSubscriptionsWrapper.hasPaidFeatures()) {
       Analytics.premiumForwardToStripePortal();
-      return await beginStripePortalFlow();
+      return await beginStripePortalFlow(); // NB: This redirects the user to Stripe
     } else {
       Analytics.premiumForwardToStripeCheckout();
-      return await beginStripeCheckoutFlow(internal_plan_key);
+      return await BeginStripeCheckoutFlow(internal_plan_key); // NB: This redirects the user to Stripe
     }
   };
 
