@@ -12,7 +12,7 @@ const FAKEYOU_PRICES = {
       features: ["Slowest"],
     },
     tts: {
-      title: "TTS",
+      title: "Text to Speech",
       features: ["Unlimited generation", "Up to 12 seconds audio"],
     },
     // vcweb: {
@@ -46,7 +46,7 @@ const FAKEYOU_PRICES = {
       features: ["Normal"],
     },
     tts: {
-      title: "TTS",
+      title: "Text to Speech",
       features: ["Unlimited generation", "Up to 30 seconds audio"],
     },
     // vcweb: {
@@ -80,7 +80,7 @@ const FAKEYOU_PRICES = {
       features: ["Faster"],
     },
     tts: {
-      title: "TTS",
+      title: "Text to Speech",
       features: [
         "Unlimited generation",
         "Up to 1 minute audio",
@@ -123,7 +123,7 @@ const FAKEYOU_PRICES = {
       features: ["Fastest"],
     },
     tts: {
-      title: "TTS",
+      title: "Text to Speech",
       features: [
         "Unlimited generation",
         "Up to 2 minutes audio",
