@@ -13,6 +13,7 @@ use tokens::users::user::UserToken;
 
 pub struct SessionUserRecord {
   pub user_token: String, // TODO(bt, 2022-12-20): Convert to strongly-typed `UserToken`
+  pub user_token_typed: UserToken,
   pub username: String,
   pub display_name: String,
 
@@ -143,7 +144,8 @@ WHERE user_sessions.token = ?
   match maybe_user_record {
     Ok(raw_user_record) => {
       let result_user_record = SessionUserRecord {
-        user_token: raw_user_record.user_token,
+        user_token: raw_user_record.user_token.to_string(),
+        user_token_typed: UserToken::new(raw_user_record.user_token),
         username: raw_user_record.username,
         display_name: raw_user_record.display_name,
         email_address: raw_user_record.email_address,

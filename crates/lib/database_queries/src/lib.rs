@@ -4,6 +4,7 @@ mod builders;
 
 pub mod column_types;
 pub mod complex_models;
+pub mod composite_keys;
 pub mod helpers;
 pub mod mediators;
 pub mod payloads;

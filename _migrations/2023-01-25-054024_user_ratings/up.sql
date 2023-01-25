@@ -18,11 +18,11 @@ CREATE TABLE user_ratings (
   entity_token VARCHAR(32) NOT NULL,
 
   -- Whether the vote is up/positive (TRUE) or down/negative (FALSE)
-  is_positive_rating BOOLEAN NOT NULL DEFAULT FALSE,
+  -- is_positive_rating BOOLEAN NOT NULL DEFAULT FALSE,
 
   -- Whether the vote is "soft deleted" (="neutral"), up/positive, or down/negative.
   -- Rather than a nullable bool for ratings, we'll provide an enum.
-  rating_type ENUM(
+  rating_value ENUM(
     'neutral',
     'positive',
     'negative'

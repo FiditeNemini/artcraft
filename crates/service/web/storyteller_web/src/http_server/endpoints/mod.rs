@@ -13,6 +13,7 @@ pub mod stubs;
 pub mod trending;
 pub mod tts;
 pub mod twitch;
+pub mod user_ratings;
 pub mod vocoders;
 pub mod voice_clone_requests;
 pub mod voice_conversion;

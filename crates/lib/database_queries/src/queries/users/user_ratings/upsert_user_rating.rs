@@ -1,30 +1,24 @@
 use container_common::anyhow_result::AnyhowResult;
+use crate::composite_keys::by_table::user_ratings::user_rating_entity::UserRatingEntity;
 use enums::by_table::user_ratings::entity_type::UserRatingEntityType;
 use sqlx::MySql;
 use sqlx::pool::PoolConnection;
-use enums::by_table::user_ratings::rating_type::UserRatingType;
 use tokens::tokens::tts_models::TtsModelToken;
 use tokens::tokens::w2l_templates::W2lTemplateToken;
 use tokens::users::user::UserToken;
 
-pub enum UserRatingEntityToken<'a> {
-  TtsModel(&'a TtsModelToken),
-  W2lTemplate(&'a W2lTemplateToken),
-}
-
 pub struct Args<'a> {
   pub user_token: &'a UserToken,
-  pub entity_token: UserRatingEntityToken<'a>,
-  pub rating_type: UserRatingType,
+  pub user_rating_entity: &'a UserRatingEntity,
   pub ip_address: &'a str,
   pub mysql_connection: &'a mut PoolConnection<MySql>,
 }
 
 pub async fn upsert_user_rating(args: Args<'_>) -> AnyhowResult<()> {
 
-  let (entity_type, entity_token) = match args.entity_token {
-    EntityToken::TtsModel(token) => (UserRatingEntityType::TtsModel, token.as_str()),
-    EntityToken::W2lTemplate(token) => (UserRatingEntityType::W2lTemplate, token.as_str()),
+  let (entity_type, entity_token) = match args.user_rating_entity {
+    UserRatingEntity::TtsModel(token) => (UserRatingEntityType::TtsModel, token.as_str()),
+    UserRatingEntity::W2lTemplate(token) => (UserRatingEntityType::W2lTemplate, token.as_str()),
   };
 
   let query = sqlx::query!(

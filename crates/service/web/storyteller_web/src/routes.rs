@@ -48,6 +48,7 @@ use crate::http_server::endpoints::moderation::user_roles::list_staff::list_staf
 use crate::http_server::endpoints::moderation::user_roles::set_user_role::set_user_role_handler;
 use crate::http_server::endpoints::moderation::users::list_users::list_users_handler;
 use crate::http_server::endpoints::service::health_check_handler::get_health_check_handler;
+use crate::http_server::endpoints::service::public_info_handler::get_public_info_handler;
 use crate::http_server::endpoints::stubs::app_model_downloads::get_app_model_downloads_handler;
 use crate::http_server::endpoints::stubs::app_news::get_app_news_handler;
 use crate::http_server::endpoints::stubs::app_plans::get_app_plans_handler;
@@ -78,6 +79,8 @@ use crate::http_server::endpoints::twitch::oauth::check_oauth_status::check_oaut
 use crate::http_server::endpoints::twitch::oauth::oauth_begin_json::oauth_begin_enroll_json;
 use crate::http_server::endpoints::twitch::oauth::oauth_begin_redirect::oauth_begin_enroll_redirect;
 use crate::http_server::endpoints::twitch::oauth::oauth_end::oauth_end_enroll_from_redirect;
+use crate::http_server::endpoints::user_ratings::get_user_rating_handler::get_user_rating_handler;
+use crate::http_server::endpoints::user_ratings::set_user_rating_handler::set_user_rating_handler;
 use crate::http_server::endpoints::vocoders::get_vocoder::get_vocoder_handler;
 use crate::http_server::endpoints::vocoders::list_vocoders::list_vocoders_handler;
 use crate::http_server::endpoints::voice_clone_requests::check_if_voice_clone_request_submitted::check_if_voice_clone_request_submitted_handler;
@@ -102,7 +105,6 @@ use crate::http_server::endpoints::w2l::set_w2l_template_mod_approval::set_w2l_t
 use users_component::default_routes::add_suggested_api_v1_account_creation_and_session_routes;
 use users_component::endpoints::edit_profile_handler::edit_profile_handler;
 use users_component::endpoints::get_profile_handler::get_profile_handler;
-use crate::http_server::endpoints::service::public_info_handler::get_public_info_handler;
 
 pub fn add_routes<T, B> (app: App<T, B>) -> App<T, B>
   where
@@ -131,6 +133,7 @@ pub fn add_routes<T, B> (app: App<T, B>) -> App<T, B>
   app = add_desktop_app_routes(app); /* /v1/vc/... */
   app = add_media_upload_routes(app); /* /v1/media_upload/... */
   app = add_trending_routes(app); /* /v1/trending/... */
+  app = add_user_rating_routes(app); /* /v1/user_rating/... */
 
   // From components
   app = add_suggested_api_v1_account_creation_and_session_routes(app); // /create_account, /session, /login, /logout
@@ -934,6 +937,30 @@ fn add_trending_routes<T, B> (app: App<T, B>) -> App<T, B>
   )
 }
 
+// ==================== USER RATING ROUTES ====================
+
+fn add_user_rating_routes<T, B> (app: App<T, B>) -> App<T, B>
+  where
+      B: MessageBody,
+      T: ServiceFactory<
+        ServiceRequest,
+        Config = (),
+        Response = ServiceResponse<B>,
+        Error = Error,
+        InitError = (),
+      >,
+{
+  app.service(web::scope("/v1/user_rating")
+      .service(web::resource("/rate")
+          .route(web::post().to(set_user_rating_handler))
+          .route(web::head().to(|| HttpResponse::Ok()))
+      )
+      .service(web::resource("/view/{entity_type}/{entity_token}")
+          .route(web::get().to(get_user_rating_handler))
+          .route(web::head().to(|| HttpResponse::Ok()))
+      )
+  )
+}
 
 // ==================== TWITCH ROUTES ====================
 
