@@ -20,6 +20,14 @@ CREATE TABLE user_ratings (
   -- Whether the vote is up/positive (TRUE) or down/negative (FALSE)
   is_positive_rating BOOLEAN NOT NULL DEFAULT FALSE,
 
+  -- Whether the vote is "soft deleted" (="neutral"), up/positive, or down/negative.
+  -- Rather than a nullable bool for ratings, we'll provide an enum.
+  rating_type ENUM(
+    'neutral',
+    'positive',
+    'negative'
+  ) NOT NULL DEFAULT 'neutral',
+
   -- For abuse tracking.
   -- Wide enough for IPv4/6
   vote_ip_address VARCHAR(40) NOT NULL,
@@ -38,6 +46,7 @@ CREATE TABLE user_ratings (
   PRIMARY KEY (id),
   UNIQUE KEY (user_token, entity_type, entity_token),
   KEY index_entity_type_entity_token (entity_type, entity_token),
-  KEY index_user_token (user_token)
+  KEY index_user_token (user_token),
+  KEY index_rating_type (rating_type)
 
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;

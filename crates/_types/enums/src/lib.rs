@@ -4,6 +4,10 @@
 //! This should also work for CHAR/VARCHAR fields that work similarly to enums (typically
 //! as part of a composite key)
 //!
+//! These types should also be friendly for API usage in JSON payloads.
+//!
+//! In the future this should be *CODEGEN DRIVEN* and should get checked into source control.
+//!
 
 // Never allow these
 #![forbid(private_in_public)]
