@@ -37,11 +37,14 @@ import { TwitchTtsNotice } from "./notices/TwitchTtsNotice";
 import { PleaseFollowNotice } from "./notices/PleaseFollowNotice";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
+  faArrowRight,
   faBarsStaggered,
-  faChevronRight,
   faCompass,
   faDeleteLeft,
   faGlobe,
+  faStar,
+  faThumbsDown,
+  faThumbsUp,
   faVolumeHigh,
   faVolumeUp,
 } from "@fortawesome/free-solid-svg-icons";
@@ -67,6 +70,9 @@ import {
 import { ExploreVoicesModal } from "./explore/ExploreVoicesModal";
 import { WebUrl } from "../../../../../common/WebUrl";
 import { usePrefixedDocumentTitle } from "../../../../../common/UsePrefixedDocumentTitle";
+import Tippy from "@tippyjs/react";
+import "tippy.js/dist/tippy.css";
+import { roundArrow } from "tippy.js";
 
 export interface EnqueueJobResponsePayload {
   success: boolean;
@@ -326,15 +332,9 @@ function TtsModelListPage(props: Props) {
       ] || ENGLISH_LANGUAGE;
 
     directViewLink = (
-      <Link
-        to={modelLink}
-        onClick={() => {
-          Analytics.ttsClickModelDetailsLink();
-        }}
-        className="d-flex flex-column flex-lg-row gap-3 direct-view-link zi-2 align-items-lg-center mb-4"
-      >
-        <div className="flex-grow-1">
-          <p>
+      <div className="d-flex flex-column direct-view-link zi-2 mb-4">
+        <div className="d-flex flex-column gap-3 flex-lg-row">
+          <p className="flex-grow-1">
             {t("tts.TtsModelListPage.voiceDetails.voiceBy")}{" "}
             <Link
               to={profileLink}
@@ -352,16 +352,61 @@ function TtsModelListPage(props: Props) {
             </Link>{" "}
             | <FontAwesomeIcon icon={faGlobe} className="me-2" />
             {t("tts.TtsModelListPage.languageLabel")}:{" "}
-            <span className="fw-semibold">{modelLanguage.languageName}</span>{" "}
+            <span className="fw-medium">{modelLanguage.languageName}</span>{" "}
             {/*| Use count:{" "}
             <span className="fw-semibold">616400</span>*/}
+            | Uses: <span className="fw-medium">308,270 times</span>
           </p>
+          <Link
+            to={modelLink}
+            onClick={() => {
+              Analytics.ttsClickModelDetailsLink();
+            }}
+            className="d-flex align-items-center"
+          >
+            <span className="fw-medium">
+              {t("tts.TtsModelListPage.voiceDetails.seeMoreDetails")}
+            </span>
+            <FontAwesomeIcon icon={faArrowRight} className="ms-2" />
+          </Link>
         </div>
-        <div className="fw-medium">
-          <span>{t("tts.TtsModelListPage.voiceDetails.seeMoreDetails")}</span>
-          <FontAwesomeIcon icon={faChevronRight} className="ms-2" />
+        <hr />
+        <div className="d-flex gap-3">
+          <div className="d-flex">
+            <Tippy
+              content="I like this voice"
+              hideOnClick
+              placement="bottom"
+              theme="fakeyou"
+              arrow={false}
+            >
+              <button className="btn-rate left rated">
+                <FontAwesomeIcon icon={faThumbsUp} />
+              </button>
+            </Tippy>
+
+            <div className="vr"></div>
+
+            <Tippy
+              content="I dislike this voice"
+              hideOnClick
+              placement="bottom"
+              theme="fakeyou"
+              arrow={false}
+            >
+              <button className="btn-rate right">
+                <FontAwesomeIcon icon={faThumbsDown} />
+              </button>
+            </Tippy>
+          </div>
+          <div className="d-flex align-items-center">
+            <FontAwesomeIcon icon={faStar} className="me-2 rating-icon" />
+            <p>
+              Rating: <span className="fw-medium">4.5 Great</span>
+            </p>
+          </div>
         </div>
-      </Link>
+      </div>
     );
   }
 
