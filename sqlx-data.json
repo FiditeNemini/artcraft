@@ -9281,6 +9281,16 @@
     },
     "query": "\nSELECT count(*) as count\nFROM vocoder_models\nWHERE\n  creator_user_token = ?\n  AND vocoder_type = 'hifigan'\nLIMIT 1\n        "
   },
+  "a993e289a631846abd26185d6a78ba37e10ce98782d00fd4aecb4a4a5502ad38": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Right": 7
+      }
+    },
+    "query": "\nINSERT INTO user_ratings\nSET\n  user_token = ?,\n  entity_type = ?,\n  entity_token = ?,\n  rating_value = ?,\n  vote_ip_address = ?,\n  version = 1\n\nON DUPLICATE KEY UPDATE\n  rating_value = ?,\n  vote_ip_address = ?,\n  version = version + 1\n        "
+  },
   "ab6f25eb0f6340d49aa705835ed428434d8b6ab14b0740f6a5ebe7841b9ece20": {
     "describe": {
       "columns": [],
@@ -9300,6 +9310,57 @@
       }
     },
     "query": "\nUPDATE w2l_template_upload_jobs\nSET\n  status = \"dead\",\n  failure_reason = ?,\n  retry_at = NULL\nWHERE id = ?\n        "
+  },
+  "ad0dfcca42406d0fe109056f2238ff2a48e2b0f287f86dbaf36363e3a9624ba2": {
+    "describe": {
+      "columns": [
+        {
+          "name": "rating_value: enums::by_table::user_ratings::rating_value::UserRatingValue",
+          "ordinal": 0,
+          "type_info": {
+            "char_set": 224,
+            "flags": {
+              "bits": 393
+            },
+            "max_size": 32,
+            "type": "String"
+          }
+        },
+        {
+          "name": "created_at",
+          "ordinal": 1,
+          "type_info": {
+            "char_set": 63,
+            "flags": {
+              "bits": 1153
+            },
+            "max_size": 19,
+            "type": "Timestamp"
+          }
+        },
+        {
+          "name": "updated_at",
+          "ordinal": 2,
+          "type_info": {
+            "char_set": 63,
+            "flags": {
+              "bits": 9345
+            },
+            "max_size": 19,
+            "type": "Timestamp"
+          }
+        }
+      ],
+      "nullable": [
+        false,
+        false,
+        false
+      ],
+      "parameters": {
+        "Right": 3
+      }
+    },
+    "query": "\nSELECT\n    rating_value as `rating_value: enums::by_table::user_ratings::rating_value::UserRatingValue`,\n    created_at,\n    updated_at\n\nFROM user_ratings\n\nWHERE user_token = ?\nAND entity_type = ?\nAND entity_token = ?\nLIMIT 1\n        "
   },
   "adf2d5eb967fa2bc00fad1c8fcc2e1bf4384d39dc54e8240d78bb4ca6fcc3409": {
     "describe": {
