@@ -23,6 +23,10 @@ import {
   faEye,
   faEyeSlash,
   faUser,
+  faThumbsUp,
+  faThumbsDown,
+  faStar,
+  faHeart,
 } from "@fortawesome/free-solid-svg-icons";
 import { motion } from "framer-motion";
 import { container, item, panel } from "../../../../../data/animation";
@@ -40,6 +44,8 @@ import {
 import { BackLink } from "../../../_common/BackLink";
 import { TextExpander } from "../../../_common/TextExpander";
 import { usePrefixedDocumentTitle } from "../../../../../common/UsePrefixedDocumentTitle";
+import Tippy from "@tippyjs/react";
+import "tippy.js/dist/tippy.css";
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -436,11 +442,47 @@ function TtsResultViewPage(props: Props) {
           <motion.h1 className="display-5 fw-bold mb-3" variants={item}>
             {headingTitle}
           </motion.h1>
+          {/* Rate Result Buttons */}
+          <div className="d-flex gap-3">
+            <div className="d-flex">
+              <Tippy
+                content="I like this audio"
+                hideOnClick
+                placement="bottom"
+                theme="fakeyou"
+                arrow={false}
+              >
+                <button className="btn-rate left rated">
+                  <FontAwesomeIcon icon={faThumbsUp} />
+                </button>
+              </Tippy>
 
-          <motion.div className="mb-4 pb-2" variants={item}>
-            <BackLink link="/" text="Back to all models" />
-          </motion.div>
-          <motion.p className="mb-3 result-text">
+              <div className="vr"></div>
+
+              <Tippy
+                content="I dislike this audio"
+                hideOnClick
+                placement="bottom"
+                theme="fakeyou"
+                arrow={false}
+              >
+                <button className="btn-rate right">
+                  <FontAwesomeIcon icon={faThumbsDown} />
+                </button>
+              </Tippy>
+            </div>
+            <div className="d-flex align-items-center">
+              <FontAwesomeIcon
+                icon={faHeart}
+                className="me-2 rating-icon heart"
+              />
+              <p>
+                <span className="fw-medium">1,518 likes</span>
+              </p>
+            </div>
+          </div>
+
+          <motion.p className="mb-3 result-text mt-4 pt-2">
             <TextExpander text={ttsInferenceResult.raw_inference_text} />
           </motion.p>
         </div>

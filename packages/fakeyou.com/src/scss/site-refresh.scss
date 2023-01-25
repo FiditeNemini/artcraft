@@ -814,6 +814,10 @@ styles with important tags:
 
   .rating-icon {
     color: #ffbc39;
+
+    &.heart {
+      color: $primary;
+    }
   }
 
   .tippy-box[data-theme~="fakeyou"] {

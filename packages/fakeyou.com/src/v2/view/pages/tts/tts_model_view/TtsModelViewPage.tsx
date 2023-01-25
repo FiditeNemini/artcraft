@@ -46,6 +46,9 @@ import {
   faVolumeHigh,
   faDeleteLeft,
   faBarsStaggered,
+  faThumbsUp,
+  faThumbsDown,
+  faStar,
 } from "@fortawesome/free-solid-svg-icons";
 import { motion } from "framer-motion";
 import { container, item, panel } from "../../../../../data/animation";
@@ -62,6 +65,8 @@ import {
 } from "react-share";
 import { Analytics } from "../../../../../common/Analytics";
 import { usePrefixedDocumentTitle } from "../../../../../common/UsePrefixedDocumentTitle";
+import Tippy from "@tippyjs/react";
+import "tippy.js/dist/tippy.css";
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -92,7 +97,10 @@ function TtsModelViewPage(props: Props) {
 
   const [notFoundState, setNotFoundState] = useState<boolean>(false);
 
-  const documentTitle = ttsModel?.title === undefined ? undefined : `${ttsModel.title} Deep Fake TTS generator`;
+  const documentTitle =
+    ttsModel?.title === undefined
+      ? undefined
+      : `${ttsModel.title} Deep Fake TTS generator`;
   usePrefixedDocumentTitle(documentTitle);
 
   const getModel = useCallback(async (token) => {
@@ -160,9 +168,7 @@ function TtsModelViewPage(props: Props) {
     listAllTtsCategories,
   ]);
 
-  const shareLink = `https://fakeyou.com${WebUrl.ttsModelPage(
-    token
-  )}`;
+  const shareLink = `https://fakeyou.com${WebUrl.ttsModelPage(token)}`;
   const shareTitle = `Use FakeYou to generate speech as ${
     ttsModel?.title || "your favorite characters"
   }!`;
@@ -255,9 +261,7 @@ function TtsModelViewPage(props: Props) {
   let creatorLink = <span />;
 
   if (!!ttsModel?.creator_display_name) {
-    const creatorUrl = WebUrl.userProfilePage(
-      ttsModel?.creator_username
-    );
+    const creatorUrl = WebUrl.userProfilePage(ttsModel?.creator_username);
     creatorLink = (
       <span>
         <Gravatar
@@ -325,10 +329,7 @@ function TtsModelViewPage(props: Props) {
 
     deleteModelButton = (
       <>
-        <Link
-          className={deleteButtonCss}
-          to={WebUrl.ttsModelDeletePage(token)}
-        >
+        <Link className={deleteButtonCss} to={WebUrl.ttsModelDeletePage(token)}>
           <FontAwesomeIcon icon={faTrash} className="me-2" />
           {deleteButtonTitle}
         </Link>
@@ -667,8 +668,44 @@ function TtsModelViewPage(props: Props) {
           <motion.h1 className="display-5 fw-bold mb-3" variants={item}>
             {title}
           </motion.h1>
+          {/* Rate Voice Model Buttons */}
+          <div className="d-flex gap-3">
+            <div className="d-flex">
+              <Tippy
+                content="I like this voice"
+                hideOnClick
+                placement="bottom"
+                theme="fakeyou"
+                arrow={false}
+              >
+                <button className="btn-rate left rated">
+                  <FontAwesomeIcon icon={faThumbsUp} />
+                </button>
+              </Tippy>
+
+              <div className="vr"></div>
+
+              <Tippy
+                content="I dislike this voice"
+                hideOnClick
+                placement="bottom"
+                theme="fakeyou"
+                arrow={false}
+              >
+                <button className="btn-rate right">
+                  <FontAwesomeIcon icon={faThumbsDown} />
+                </button>
+              </Tippy>
+            </div>
+            <div className="d-flex align-items-center">
+              <FontAwesomeIcon icon={faStar} className="me-2 rating-icon" />
+              <p>
+                Rating: <span className="fw-medium">4.5 Great</span>
+              </p>
+            </div>
+          </div>
         </div>
-        <motion.div className="mb-4" variants={item}>
+        <motion.div className="mb-3 mt-4 pt-2" variants={item}>
           <BackLink link="/" text="Back to all models" />
         </motion.div>
       </div>

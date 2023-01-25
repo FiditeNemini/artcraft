@@ -72,7 +72,6 @@ import { WebUrl } from "../../../../../common/WebUrl";
 import { usePrefixedDocumentTitle } from "../../../../../common/UsePrefixedDocumentTitle";
 import Tippy from "@tippyjs/react";
 import "tippy.js/dist/tippy.css";
-import { roundArrow } from "tippy.js";
 
 export interface EnqueueJobResponsePayload {
   success: boolean;
