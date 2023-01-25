@@ -38,6 +38,7 @@ import {
   WhatsappIcon,
 } from "react-share";
 import { BackLink } from "../../../_common/BackLink";
+import { TextExpander } from "../../../_common/TextExpander";
 import { usePrefixedDocumentTitle } from "../../../../../common/UsePrefixedDocumentTitle";
 
 interface Props {
@@ -65,14 +66,15 @@ function TtsResultViewPage(props: Props) {
     }
   }, []);
 
-  const documentTitle = ttsInferenceResult?.tts_model_title === undefined 
-    ? undefined 
-    : `Deep Fake ${ttsInferenceResult.tts_model_title} TTS says ${ttsInferenceResult.raw_inference_text.substring(0, 50)}`;
+  const documentTitle =
+    ttsInferenceResult?.tts_model_title === undefined
+      ? undefined
+      : `Deep Fake ${
+          ttsInferenceResult.tts_model_title
+        } TTS says ${ttsInferenceResult.raw_inference_text.substring(0, 50)}`;
   usePrefixedDocumentTitle(documentTitle);
 
-  const shareLink = `https://fakeyou.com${WebUrl.ttsResultPage(
-    token
-  )}`;
+  const shareLink = `https://fakeyou.com${WebUrl.ttsResultPage(token)}`;
   const shareTitle = `I just used FakeYou to generate speech as ${
     ttsInferenceResult?.tts_model_title || "one of my favorite characters"
   }!`;
@@ -434,9 +436,13 @@ function TtsResultViewPage(props: Props) {
           <motion.h1 className="display-5 fw-bold mb-3" variants={item}>
             {headingTitle}
           </motion.h1>
-          <motion.div className="mb-4" variants={item}>
+
+          <motion.div className="mb-4 pb-2" variants={item}>
             <BackLink link="/" text="Back to all models" />
           </motion.div>
+          <motion.p className="mb-3 result-text">
+            <TextExpander text={ttsInferenceResult.raw_inference_text} />
+          </motion.p>
         </div>
       </div>
 
@@ -475,12 +481,12 @@ function TtsResultViewPage(props: Props) {
           <div className="py-6">
             <table className="table tts-result-table">
               <tbody>
-                <tr>
+                {/* <tr>
                   <th scope="row">Original text</th>
                   <td className="overflow-fix">
                     {ttsInferenceResult.raw_inference_text}
                   </td>
-                </tr>
+                </tr> */}
                 <tr>
                   <th scope="row">Audio creator</th>
                   <td>{creatorDetails}</td>
