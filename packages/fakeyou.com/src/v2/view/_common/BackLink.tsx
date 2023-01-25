@@ -11,7 +11,7 @@ interface Props {
 function BackLink(props: Props) {
   const linkText = props.text === undefined ? "Back" : props.text;
   return (
-    <Link to={props.link}>
+    <Link to={props.link} className="fw-medium">
       <FontAwesomeIcon icon={faArrowLeft} />
       <span className="ms-2">{linkText}</span>
     </Link>
