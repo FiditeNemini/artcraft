@@ -205,7 +205,7 @@ function SessionTtsInferenceResultList(props: Props) {
               FakeYou membership.
             </Link>
           </Trans>{" "}
-          (Current Queued:{" "}
+          (TTS Queued:{" "}
           <span className="text-red">~{pendingTtsJobs.pending_job_count}</span>)
         </motion.div>
       </div>
