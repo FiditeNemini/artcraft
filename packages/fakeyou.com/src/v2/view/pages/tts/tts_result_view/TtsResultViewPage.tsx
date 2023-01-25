@@ -25,7 +25,6 @@ import {
   faUser,
   faThumbsUp,
   faThumbsDown,
-  faStar,
   faHeart,
 } from "@fortawesome/free-solid-svg-icons";
 import { motion } from "framer-motion";
