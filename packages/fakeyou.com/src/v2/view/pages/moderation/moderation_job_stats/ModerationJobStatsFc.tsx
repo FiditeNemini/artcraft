@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
-import { FrontendUrlConfig } from "../../../../../common/FrontendUrlConfig";
+import { WebUrl } from "../../../../../common/WebUrl";
 import { BackLink } from "../../../_common/BackLink";
 import {
   GetTtsInferenceStats,
@@ -107,7 +107,7 @@ function ModerationJobStatsFc(props: Props) {
         <h1 className="display-5 fw-bold">Job Stats</h1>
         <div className="pt-3">
           <BackLink
-            link={FrontendUrlConfig.moderationMain()}
+            link={WebUrl.moderationMain()}
             text="Back to moderation"
           />
         </div>
@@ -247,7 +247,7 @@ function ModerationJobStatsFc(props: Props) {
 
       <div className="container pb-5">
         <BackLink
-          link={FrontendUrlConfig.moderationMain()}
+          link={WebUrl.moderationMain()}
           text="Back to moderation"
         />
       </div>

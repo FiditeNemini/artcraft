@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { SessionWrapper } from '@storyteller/components/src/session/SessionWrapper';
 import { Gravatar } from '@storyteller/components/src/elements/Gravatar';
 import { formatDistance } from 'date-fns';
-import { FrontendUrlConfig } from '../../../../../common/FrontendUrlConfig';
+import { WebUrl } from '../../../../../common/WebUrl';
 import { BackLink } from '../../../_common/BackLink';
 import { GetPendingW2lTemplates, GetPendingW2lTemplatesIsOk, PendingW2lTemplatesEntryForList } from '../../../../api/moderation/GetPendingW2lTemplates';
 import { PhotoVideoIcon } from '../../../_icons/PhotoVideoIcon';
@@ -47,14 +47,14 @@ function ModerationPendingW2lTemplatesFc(props: Props) {
     rows.push(
       <tr key={template.template_token}>
         <td>
-          <Link to={FrontendUrlConfig.w2lTemplatePage(template.template_token)}>
+          <Link to={WebUrl.w2lTemplatePage(template.template_token)}>
             <PhotoVideoIcon title="W2l Template" />
             &nbsp;
             {template.title}
           </Link>
         </td>
         <td>
-          <Link to={FrontendUrlConfig.userProfilePage(template.creator_display_name)}>
+          <Link to={WebUrl.userProfilePage(template.creator_display_name)}>
             <Gravatar username={template.creator_display_name} email_hash={template.creator_gravatar_hash} size={12} />
             &nbsp;
             {template.creator_display_name}
@@ -70,7 +70,7 @@ function ModerationPendingW2lTemplatesFc(props: Props) {
     <div>
       <h1 className="title is-1"> Unapproved W2L Templates </h1>
 
-      <BackLink link={FrontendUrlConfig.moderationMain()} text="Back to moderation" />
+      <BackLink link={WebUrl.moderationMain()} text="Back to moderation" />
 
       <br />
       <br />

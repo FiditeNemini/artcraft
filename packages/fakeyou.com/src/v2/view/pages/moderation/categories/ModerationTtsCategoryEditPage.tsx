@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { BackLink } from '../../../_common/BackLink';
 import { Category, GetCategory, GetCategoryIsError, GetCategoryIsOk } from '../../../../api/category/GetCategory';
-import { FrontendUrlConfig } from '../../../../../common/FrontendUrlConfig';
+import { WebUrl } from '../../../../../common/WebUrl';
 import { Link, useHistory } from 'react-router-dom';
 import { SessionWrapper } from '@storyteller/components/src/session/SessionWrapper';
 import { useParams } from 'react-router-dom';
@@ -202,7 +202,7 @@ function ModerationTtsCategoryEditPage(props: Props) {
     <div>
       <h1 className="title is-1"> Moderate TTS Category </h1>
 
-      <BackLink link={FrontendUrlConfig.moderationTtsCategoryList()} text="Back to category list" />
+      <BackLink link={WebUrl.moderationTtsCategoryList()} text="Back to category list" />
 
       <br />
       <br />
@@ -313,12 +313,12 @@ function ModerationTtsCategoryEditPage(props: Props) {
 
       <Link 
         className={deleteButtonCss}
-        to={FrontendUrlConfig.moderationCategoryDeletePage(token)}
+        to={WebUrl.moderationCategoryDeletePage(token)}
         >{deleteButtonTitle}</Link>
 
       <br />
 
-      <BackLink link={FrontendUrlConfig.moderationTtsCategoryList()} text="Back to category list" />
+      <BackLink link={WebUrl.moderationTtsCategoryList()} text="Back to category list" />
     </div>
   )
 }

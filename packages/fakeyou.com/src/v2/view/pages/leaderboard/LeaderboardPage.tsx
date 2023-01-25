@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { FrontendUrlConfig } from "../../../../common/FrontendUrlConfig";
+import { WebUrl } from "../../../../common/WebUrl";
 import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
 import { Gravatar } from "@storyteller/components/src/elements/Gravatar";
 import {
@@ -67,7 +67,7 @@ function LeaderboardPage(props: Props) {
       ttsRows.push(
         <tr>
           <td className="lb-name">
-            <Link to={FrontendUrlConfig.userProfilePage(ttsEntry.display_name)}>
+            <Link to={WebUrl.userProfilePage(ttsEntry.display_name)}>
               <Gravatar
                 size={12}
                 username={ttsEntry.display_name}
@@ -90,7 +90,7 @@ function LeaderboardPage(props: Props) {
       w2lRows.push(
         <tr>
           <td className="lb-name">
-            <Link to={FrontendUrlConfig.userProfilePage(w2lEntry.display_name)}>
+            <Link to={WebUrl.userProfilePage(w2lEntry.display_name)}>
               <Gravatar
                 size={12}
                 username={w2lEntry.display_name}

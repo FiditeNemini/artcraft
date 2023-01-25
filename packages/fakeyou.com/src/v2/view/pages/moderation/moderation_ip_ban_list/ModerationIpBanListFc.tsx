@@ -4,7 +4,7 @@ import { ApiConfig } from "@storyteller/components";
 import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
 import { formatDistance } from "date-fns";
 import { BackLink } from "../../../_common/BackLink";
-import { FrontendUrlConfig } from "../../../../../common/FrontendUrlConfig";
+import { WebUrl } from "../../../../../common/WebUrl";
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -145,7 +145,7 @@ function ModerationIpBanListFc(props: Props) {
         </p>
         <div className="pt-4">
           <BackLink
-            link={FrontendUrlConfig.moderationMain()}
+            link={WebUrl.moderationMain()}
             text="Back to moderation"
           />
         </div>

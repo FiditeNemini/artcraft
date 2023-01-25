@@ -2,7 +2,7 @@ import React from "react";
 import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
 import { Link } from "react-router-dom";
 import { DiscordLink } from "@storyteller/components/src/elements/DiscordLink";
-import { FrontendUrlConfig } from "../../../../common/FrontendUrlConfig";
+import { WebUrl } from "../../../../common/WebUrl";
 import { t } from "i18next";
 import { Trans } from "react-i18next";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -108,7 +108,7 @@ function ContributeIndexPage(props: Props) {
             </p>
             <div className="d-flex gap-3">
               <Link
-                to={FrontendUrlConfig.createCategoryPage()}
+                to={WebUrl.createCategoryPage()}
                 className="btn btn-secondary w-100"
               >
                 {categoryButton}

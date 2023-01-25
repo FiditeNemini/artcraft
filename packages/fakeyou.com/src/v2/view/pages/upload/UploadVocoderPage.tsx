@@ -6,7 +6,7 @@ import { useHistory } from "react-router-dom";
 import { v4 as uuidv4 } from "uuid";
 import { BackLink } from "../../_common/BackLink";
 import { Link } from "react-router-dom";
-import { FrontendUrlConfig } from "../../../../common/FrontendUrlConfig";
+import { WebUrl } from "../../../../common/WebUrl";
 import { motion } from "framer-motion";
 import { container, item, panel } from "../../../../data/animation";
 import { VocoderUploadJob } from "@storyteller/components/src/jobs/VocoderUploadJobs";
@@ -92,7 +92,7 @@ function UploadVocoderPage(props: Props) {
           <motion.h4 variants={item}>Make your voice sound better!</motion.h4>
           <motion.div className="my-3" variants={item}>
             <BackLink
-              link={FrontendUrlConfig.contributePage()}
+              link={WebUrl.contributePage()}
               text="Back to contribute page"
             />
           </motion.div>

@@ -14,7 +14,7 @@ import { motion } from "framer-motion";
 import { container, item, panel } from "../../../../data/animation";
 import { FakeYouFrontendEnvironment } from "@storyteller/components/src/env/FakeYouFrontendEnvironment";
 import { Analytics } from "../../../../common/Analytics";
-import { FrontendUrlConfig } from "../../../../common/FrontendUrlConfig";
+import { WebUrl } from "../../../../common/WebUrl";
 import { BeginStripeCheckoutFlow } from "../../../../common/BeginStripeCheckoutFlow";
 
 interface Props {
@@ -59,7 +59,7 @@ function PricingPage(props: Props) {
       // TODO: This needs to bring the user back to purchase flow.
       Analytics.premiumBounceToSignup();
 
-      const signupUrl = FrontendUrlConfig.signupPageWithPurchaseIntent(internal_plan_key);
+      const signupUrl = WebUrl.signupPageWithPurchaseIntent(internal_plan_key);
       history.push(signupUrl);
 
       return false;

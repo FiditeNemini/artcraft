@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { BackLink } from '../../../_common/BackLink';
 import { Category, GetCategory, GetCategoryIsError, GetCategoryIsOk } from '../../../../api/category/GetCategory';
-import { FrontendUrlConfig } from '../../../../../common/FrontendUrlConfig';
+import { WebUrl } from '../../../../../common/WebUrl';
 import { Link, useHistory } from 'react-router-dom';
 import { SessionWrapper } from '@storyteller/components/src/session/SessionWrapper';
 import { useParams } from 'react-router-dom';
@@ -60,7 +60,7 @@ function ModerationCategoryDeletePage(props: Props) {
     if (SetCategoryDeletionStateIsError(response)) {
       setErrorMessage('there was an error with the request'); // TODO: Fix error serialization
     } else if (SetCategoryDeletionStateIsSuccess(response)) {
-      history.push(FrontendUrlConfig.moderationTtsCategoryEdit(token));
+      history.push(WebUrl.moderationTtsCategoryEdit(token));
     }
 
     return false;
@@ -85,7 +85,7 @@ function ModerationCategoryDeletePage(props: Props) {
     <div>
       <h1 className="title is-1"> {deletePageTitle} </h1>
 
-      <BackLink link={FrontendUrlConfig.moderationTtsCategoryEdit(token)} text="Back to category edit page" />
+      <BackLink link={WebUrl.moderationTtsCategoryEdit(token)} text="Back to category edit page" />
 
       <br />
 
@@ -111,7 +111,7 @@ function ModerationCategoryDeletePage(props: Props) {
             <th>Creator</th>
             <td>
               <Link 
-                to={FrontendUrlConfig.userProfilePage(category?.creator_username || "")}
+                to={WebUrl.userProfilePage(category?.creator_username || "")}
                 >{category?.creator_username}</Link>
             </td>
           </tr>
@@ -144,7 +144,7 @@ function ModerationCategoryDeletePage(props: Props) {
 
       <br />
 
-      <BackLink link={FrontendUrlConfig.moderationTtsCategoryEdit(token)} text="Back to category edit page" />
+      <BackLink link={WebUrl.moderationTtsCategoryEdit(token)} text="Back to category edit page" />
     </div>
   )
 }

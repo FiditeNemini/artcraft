@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from "react";
 import { ApiConfig } from "@storyteller/components";
 import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
 import { useParams, Link, useHistory } from "react-router-dom";
-import { FrontendUrlConfig } from "../../../../../common/FrontendUrlConfig";
+import { WebUrl } from "../../../../../common/WebUrl";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
 import { motion } from "framer-motion";
@@ -100,7 +100,7 @@ function TtsResultEditPage(props: Props) {
     setVisibility((ev.target as HTMLSelectElement).value);
   };
 
-  const resultLink = FrontendUrlConfig.ttsResultPage(token);
+  const resultLink = WebUrl.ttsResultPage(token);
 
   const handleFormSubmit = (ev: React.FormEvent<HTMLFormElement>) => {
     ev.preventDefault();

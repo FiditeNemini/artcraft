@@ -1,6 +1,6 @@
 
 /** Centralize URL configurations (apart from bindings) */
-class FrontendUrlConfig {
+class WebUrl {
 
   // Main
 
@@ -168,4 +168,4 @@ class FrontendUrlConfig {
   }
 }
 
-export { FrontendUrlConfig }
+export { WebUrl }

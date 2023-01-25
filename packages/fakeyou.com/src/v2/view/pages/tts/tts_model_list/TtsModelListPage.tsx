@@ -65,7 +65,7 @@ import {
   ENGLISH_LANGUAGE,
 } from "../../../../../_i18n/AvailableLanguageMap";
 import { ExploreVoicesModal } from "./explore/ExploreVoicesModal";
-import { FrontendUrlConfig } from "../../../../../common/FrontendUrlConfig";
+import { WebUrl } from "../../../../../common/WebUrl";
 
 export interface EnqueueJobResponsePayload {
   success: boolean;
@@ -312,10 +312,10 @@ function TtsModelListPage(props: Props) {
 
   if (props.maybeSelectedTtsModel) {
     const userName = props.maybeSelectedTtsModel.creator_display_name;
-    const modelLink = FrontendUrlConfig.ttsModelPage(
+    const modelLink = WebUrl.ttsModelPage(
       props.maybeSelectedTtsModel.model_token
     );
-    const profileLink = FrontendUrlConfig.userProfilePage(
+    const profileLink = WebUrl.userProfilePage(
       props.maybeSelectedTtsModel.creator_display_name
     );
     const modelLanguage =

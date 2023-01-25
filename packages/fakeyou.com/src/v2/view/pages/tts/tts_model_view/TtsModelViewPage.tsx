@@ -12,7 +12,7 @@ import {
 } from "@storyteller/components/src/constants/TextPipeline";
 import { useParams, Link } from "react-router-dom";
 import { v4 as uuidv4 } from "uuid";
-import { FrontendUrlConfig } from "../../../../../common/FrontendUrlConfig";
+import { WebUrl } from "../../../../../common/WebUrl";
 import {
   GetTtsModel,
   GetTtsModelIsErr,
@@ -156,7 +156,7 @@ function TtsModelViewPage(props: Props) {
     listAllTtsCategories,
   ]);
 
-  const shareLink = `https://fakeyou.com${FrontendUrlConfig.ttsModelPage(
+  const shareLink = `https://fakeyou.com${WebUrl.ttsModelPage(
     token
   )}`;
   const shareTitle = `Use FakeYou to generate speech as ${
@@ -249,7 +249,7 @@ function TtsModelViewPage(props: Props) {
   let creatorLink = <span />;
 
   if (!!ttsModel?.creator_display_name) {
-    const creatorUrl = FrontendUrlConfig.userProfilePage(
+    const creatorUrl = WebUrl.userProfilePage(
       ttsModel?.creator_username
     );
     creatorLink = (
@@ -289,7 +289,7 @@ function TtsModelViewPage(props: Props) {
       <>
         <Link
           className={"btn btn-secondary w-100"}
-          to={FrontendUrlConfig.ttsModelEditPage(token)}
+          to={WebUrl.ttsModelEditPage(token)}
         >
           <FontAwesomeIcon icon={faEdit} className="me-2" />
           Edit Model Details
@@ -321,7 +321,7 @@ function TtsModelViewPage(props: Props) {
       <>
         <Link
           className={deleteButtonCss}
-          to={FrontendUrlConfig.ttsModelDeletePage(token)}
+          to={WebUrl.ttsModelDeletePage(token)}
         >
           <FontAwesomeIcon icon={faTrash} className="me-2" />
           {deleteButtonTitle}
@@ -396,7 +396,7 @@ function TtsModelViewPage(props: Props) {
         <>
           <Link
             className={"btn btn-secondary w-100 mt-4"}
-            to={FrontendUrlConfig.ttsModelEditCategoriesPage(token)}
+            to={WebUrl.ttsModelEditCategoriesPage(token)}
           >
             <FontAwesomeIcon icon={faEdit} className="me-2" />
             Edit Model Categories
@@ -536,7 +536,7 @@ function TtsModelViewPage(props: Props) {
   let vocoderRows = undefined;
 
   if (!!ttsModel.maybe_custom_vocoder) {
-    const vocoderCreatorUrl = FrontendUrlConfig.userProfilePage(
+    const vocoderCreatorUrl = WebUrl.userProfilePage(
       ttsModel.maybe_custom_vocoder.creator_username
     );
 

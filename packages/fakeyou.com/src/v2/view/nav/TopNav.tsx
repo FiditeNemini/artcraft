@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { t } from "i18next";
 import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
 import { Link, useHistory } from "react-router-dom";
-import { FrontendUrlConfig } from "../../../common/FrontendUrlConfig";
+import { WebUrl } from "../../../common/WebUrl";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faMicrophone,
@@ -62,11 +62,11 @@ function TopNav(props: Props) {
 
   let history = useHistory();
 
-  let myDataLink = FrontendUrlConfig.signupPage();
+  let myDataLink = WebUrl.signupPage();
 
   if (props.sessionWrapper.isLoggedIn()) {
     let username = props.sessionWrapper.getUsername() as string; // NB: Should be present if logged in
-    myDataLink = FrontendUrlConfig.userProfilePage(username);
+    myDataLink = WebUrl.userProfilePage(username);
   }
 
   // NB: The responses from the "job count" endpoint are cached in a distributed manner.
@@ -152,7 +152,7 @@ function TopNav(props: Props) {
 
   let userOrLoginButton = (
     <>
-      <Link to={FrontendUrlConfig.loginPage()}>
+      <Link to={WebUrl.loginPage()}>
         <span className="nav-login me-4" data-bs-toggle="offcanvas">
           {t("nav.TopNav.buttons.login")}
         </span>
@@ -162,7 +162,7 @@ function TopNav(props: Props) {
 
   let signupOrLogOutButton = (
     <>
-      <Link to={FrontendUrlConfig.signupPage()}>
+      <Link to={WebUrl.signupPage()}>
         <button className="btn btn-primary" data-bs-toggle="offcanvas">
           {t("nav.TopNav.buttons.signUp")}
         </button>
@@ -183,7 +183,7 @@ function TopNav(props: Props) {
       gravatar = <Gravatar email_hash={gravatarHash} size={15} />;
     }
 
-    let url = FrontendUrlConfig.userProfilePage(displayName);
+    let url = WebUrl.userProfilePage(displayName);
     userOrLoginButton = (
       <>
         <Link className="btn btn-secondary me-3" to={url}>
@@ -227,7 +227,7 @@ function TopNav(props: Props) {
             </Link>
             <a
               className="top-bar-text"
-              href={FrontendUrlConfig.developerDocs()}
+              href={WebUrl.developerDocs()}
             >
               {t("nav.TopNav.topbar.developersLink")}
             </a>
@@ -326,7 +326,7 @@ function TopNav(props: Props) {
               <ul className="navbar-nav justify-content-start align-items-lg-center flex-grow-1 gap-2 gap-lg-0">
                 <li data-bs-toggle="offcanvas" className="nav-item">
                   <Link
-                    to={FrontendUrlConfig.pricingPageWithReferer("topnav")}
+                    to={WebUrl.pricingPageWithReferer("topnav")}
                     onClick={() => { Analytics.topbarClickPricing() } }
                     className="nav-link"
                   >
@@ -337,7 +337,7 @@ function TopNav(props: Props) {
 
                 <li data-bs-toggle="offcanvas" className="nav-item">
                   <Link
-                    to={FrontendUrlConfig.cloneRequestPage()}
+                    to={WebUrl.cloneRequestPage()}
                     onClick={() => { Analytics.topbarClickVoiceClone() } }
                     className="nav-link"
                   >
@@ -522,7 +522,7 @@ function TopNav(props: Props) {
                     className="nav-link"
                     aria-current="page"
                     title="to API"
-                    href={FrontendUrlConfig.developerDocs()}
+                    href={WebUrl.developerDocs()}
                   >
                     {t("nav.TopNav.topbar.developersLink")}
                   </a>

@@ -4,7 +4,7 @@ import { SessionWrapper } from '@storyteller/components/src/session/SessionWrapp
 import { Gravatar } from '@storyteller/components/src/elements/Gravatar';
 import { GetUserList, GetUserListIsOk, UserForList } from '../../../../api/moderation/GetUserList';
 import { formatDistance } from 'date-fns';
-import { FrontendUrlConfig } from '../../../../../common/FrontendUrlConfig';
+import { WebUrl } from '../../../../../common/WebUrl';
 import { BackLink } from '../../../_common/BackLink';
 
 interface Props {
@@ -50,7 +50,7 @@ function ModerationUserListFc(props: Props) {
       <tr key={user.user_token}>
         <td>{user.user_id}</td>
         <td>
-          <Link to={FrontendUrlConfig.userProfilePage(user.display_name)}>
+          <Link to={WebUrl.userProfilePage(user.display_name)}>
             <Gravatar username={user.display_name} email_hash={user.gravatar_hash} size={12} />
             &nbsp;
             {user.display_name}
@@ -68,7 +68,7 @@ function ModerationUserListFc(props: Props) {
     <div>
       <h1 className="title is-1"> User list </h1>
 
-      <BackLink link={FrontendUrlConfig.moderationMain()} text="Back to moderation" />
+      <BackLink link={WebUrl.moderationMain()} text="Back to moderation" />
 
       <br />
       <br />

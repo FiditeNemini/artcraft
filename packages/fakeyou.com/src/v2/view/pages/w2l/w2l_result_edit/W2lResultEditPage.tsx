@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from "react";
 import { ApiConfig } from "@storyteller/components";
 import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
 import { useParams, Link, useHistory } from "react-router-dom";
-import { FrontendUrlConfig } from "../../../../../common/FrontendUrlConfig";
+import { WebUrl } from "../../../../../common/WebUrl";
 import { VisibleIconFc } from "../../../_icons/VisibleIcon";
 import { HiddenIconFc } from "../../../_icons/HiddenIcon";
 import { motion } from "framer-motion";
@@ -100,7 +100,7 @@ function W2lResultEditPage(props: Props) {
     setVisibility((ev.target as HTMLSelectElement).value);
   };
 
-  const resultLink = FrontendUrlConfig.w2lResultPage(token);
+  const resultLink = WebUrl.w2lResultPage(token);
 
   const handleFormSubmit = (ev: React.FormEvent<HTMLFormElement>) => {
     ev.preventDefault();

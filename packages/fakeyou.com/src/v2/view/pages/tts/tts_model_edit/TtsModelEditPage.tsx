@@ -3,7 +3,7 @@ import { ApiConfig } from "@storyteller/components";
 import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
 import { TtsInferenceJob } from "@storyteller/components/src/jobs/TtsInferenceJobs";
 import { useParams, useHistory, Link } from "react-router-dom";
-import { FrontendUrlConfig } from "../../../../../common/FrontendUrlConfig";
+import { WebUrl } from "../../../../../common/WebUrl";
 import { VisibleIconFc } from "../../../_icons/VisibleIcon";
 import { HiddenIconFc } from "../../../_icons/HiddenIcon";
 import {
@@ -194,7 +194,7 @@ function TtsModelEditPage(props: Props) {
     setSuggestedUniqueBotCommand(command);
   };
 
-  const modelLink = FrontendUrlConfig.ttsModelPage(token);
+  const modelLink = WebUrl.ttsModelPage(token);
 
   const isModerator = props.sessionWrapper.canEditOtherUsersTtsModels();
 

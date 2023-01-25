@@ -6,7 +6,7 @@ import { ReportDiscordLink } from "../../../_common/DiscordReportLink";
 import { BucketConfig } from "@storyteller/components/src/api/BucketConfig";
 import { HiddenIconFc } from "../../../_icons/HiddenIcon";
 import { VisibleIconFc } from "../../../_icons/VisibleIcon";
-import { FrontendUrlConfig } from "../../../../../common/FrontendUrlConfig";
+import { WebUrl } from "../../../../../common/WebUrl";
 import {
   GetW2lResult,
   GetW2lResultIsErr,
@@ -225,7 +225,7 @@ function W2lResultViewPage(props: Props) {
       <>
         <Link
           className="btn btn-secondary w-100"
-          to={FrontendUrlConfig.w2lResultEditPage(token)}
+          to={WebUrl.w2lResultEditPage(token)}
         >
           <FontAwesomeIcon icon={faEdit} className="me-2" />
           Edit Result Visibility
@@ -244,7 +244,7 @@ function W2lResultViewPage(props: Props) {
       <>
         <Link
           className={deleteButtonCss}
-          to={FrontendUrlConfig.w2lResultDeletePage(token)}
+          to={WebUrl.w2lResultDeletePage(token)}
         >
           <FontAwesomeIcon icon={faTrash} className="me-2" />
           {deleteButtonTitle}

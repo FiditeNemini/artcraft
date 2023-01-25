@@ -6,7 +6,7 @@ import { W2lTemplateUploadJob } from "@storyteller/components/src/jobs/W2lTempla
 import { useHistory } from "react-router-dom";
 import { v4 as uuidv4 } from "uuid";
 import { BackLink } from "../../_common/BackLink";
-import { FrontendUrlConfig } from "../../../../common/FrontendUrlConfig";
+import { WebUrl } from "../../../../common/WebUrl";
 import { motion } from "framer-motion";
 import { container, item, panel } from "../../../../data/animation";
 
@@ -99,7 +99,7 @@ function UploadW2lVideoPage(props: Props) {
           </motion.h1>
           <motion.div className="my-3" variants={item}>
             <BackLink
-              link={FrontendUrlConfig.contributePage()}
+              link={WebUrl.contributePage()}
               text="Back to contribute page"
             />
           </motion.div>

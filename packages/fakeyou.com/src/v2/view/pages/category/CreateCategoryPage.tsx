@@ -9,7 +9,7 @@ import {
   CreateCategoryRequest,
 } from "../../../api/category/CreateCategory";
 import { BackLink } from "../../_common/BackLink";
-import { FrontendUrlConfig } from "../../../../common/FrontendUrlConfig";
+import { WebUrl } from "../../../../common/WebUrl";
 import { motion } from "framer-motion";
 import { container, item, panel } from "../../../../data/animation";
 
@@ -195,7 +195,7 @@ function CreateCategoryPage(props: Props) {
       <>
         <motion.div className="container pt-4 pb-5" variants={item}>
           <Link
-            to={FrontendUrlConfig.moderationTtsCategoryList()}
+            to={WebUrl.moderationTtsCategoryList()}
             className="btn btn-secondary w-100"
           >
             Moderate categories
@@ -213,7 +213,7 @@ function CreateCategoryPage(props: Props) {
         </motion.h1>
         <motion.div className="pt-3" variants={item}>
           <BackLink
-            link={FrontendUrlConfig.contributePage()}
+            link={WebUrl.contributePage()}
             text="Back to contribute page"
           />
         </motion.div>

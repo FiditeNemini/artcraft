@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { SessionWrapper } from '@storyteller/components/src/session/SessionWrapper';
-import { FrontendUrlConfig } from '../../../../../common/FrontendUrlConfig';
+import { WebUrl } from '../../../../../common/WebUrl';
 import { BackLink } from '../../../_common/BackLink';
 import { GetVoiceInventoryStats, GetVoiceInventoryStatsIsOk } from '../../../../api/moderation/GetVoiceInventoryStats';
 
@@ -41,7 +41,7 @@ function ModerationVoiceStatsFc(props: Props) {
     <div>
       <h1 className="title is-1"> Voice Stats </h1>
 
-      <BackLink link={FrontendUrlConfig.moderationMain()} text="Back to moderation" />
+      <BackLink link={WebUrl.moderationMain()} text="Back to moderation" />
 
       <br />
       <br />

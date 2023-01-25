@@ -6,7 +6,7 @@ import {
 } from "../../../../api/category/AssignTtsCategory";
 import { BackLink } from "../../../_common/BackLink";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { FrontendUrlConfig } from "../../../../../common/FrontendUrlConfig";
+import { WebUrl } from "../../../../../common/WebUrl";
 import {
   GetTtsModel,
   GetTtsModelIsErr,
@@ -146,7 +146,7 @@ function TtsEditCategoriesPage(props: Props) {
     await assignCategory(categoryToken, false);
   };
 
-  const modelLink = FrontendUrlConfig.ttsModelPage(token);
+  const modelLink = WebUrl.ttsModelPage(token);
 
   const assignedCategoryTokens = new Set<string>(
     assignedCategories.map((category) => category.category_token)

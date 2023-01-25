@@ -1,6 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { FrontendUrlConfig } from "../../../../../common/FrontendUrlConfig";
+import { WebUrl } from "../../../../../common/WebUrl";
 import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -64,7 +64,7 @@ function ModerationFc(props: Props) {
               </Link>
 
               <Link
-                to={FrontendUrlConfig.moderationTtsCategoryList()}
+                to={WebUrl.moderationTtsCategoryList()}
                 className="btn btn-secondary w-100"
               >
                 <FontAwesomeIcon icon={faTags} className="me-2" />

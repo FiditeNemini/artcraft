@@ -36,7 +36,7 @@ import {
   UserLookupError,
 } from "../../../../api/user/GetUserByUsername";
 import { format } from "date-fns";
-import { FrontendUrlConfig } from "../../../../../common/FrontendUrlConfig";
+import { WebUrl } from "../../../../../common/WebUrl";
 import { container, item, panel } from "../../../../../data/animation";
 import Tippy from "@tippyjs/react";
 import "tippy.js/dist/tippy.css";
@@ -105,7 +105,7 @@ function ProfilePage(props: Props) {
   if (props.sessionWrapper.isLoggedIn()) {
     if (props.sessionWrapper.userTokenMatches(userData.user_token)) {
       if (!props.sessionSubscriptionsWrapper.hasPaidFeatures()) {
-        const upgradeLinkUrl = FrontendUrlConfig.pricingPage();
+        const upgradeLinkUrl = WebUrl.pricingPage();
 
         upgradeButton = (
           <>
@@ -121,7 +121,7 @@ function ProfilePage(props: Props) {
 
   if (props.sessionWrapper.canBanUsers()) {
     const currentlyBanned = userData.maybe_moderator_fields?.is_banned;
-    const banLinkUrl = FrontendUrlConfig.userProfileBanPage(userData.username);
+    const banLinkUrl = WebUrl.userProfileBanPage(userData.username);
     const buttonLabel = currentlyBanned ? "Unban" : "Ban";
     const banButtonCss = currentlyBanned
       ? "btn btn-secondary"
@@ -140,7 +140,7 @@ function ProfilePage(props: Props) {
   let profileButtonsMobile = <span />;
 
   if (props.sessionWrapper.canEditUserProfile(userData.username)) {
-    const editLinkUrl = FrontendUrlConfig.userProfileEditPage(
+    const editLinkUrl = WebUrl.userProfileEditPage(
       userData.username
     );
 

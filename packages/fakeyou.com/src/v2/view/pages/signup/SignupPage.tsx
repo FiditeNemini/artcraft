@@ -14,7 +14,7 @@ import { motion } from "framer-motion";
 import { container, panel } from "../../../../data/animation";
 import { Analytics } from "../../../../common/Analytics";
 import queryString from "query-string";
-import { FrontendUrlConfig } from "../../../../common/FrontendUrlConfig";
+import { WebUrl } from "../../../../common/WebUrl";
 import { BeginStripeCheckoutFlow } from "../../../../common/BeginStripeCheckoutFlow";
 
 enum FieldTriState {
@@ -243,7 +243,7 @@ function SignupPage(props: Props) {
 
       let redirectWasSuccessful = await afterSignupRedirect();
       if (!redirectWasSuccessful) {
-        window.location.href = FrontendUrlConfig.pricingPageWithReferer("signup");
+        window.location.href = WebUrl.pricingPageWithReferer("signup");
       }
     }
 
@@ -257,7 +257,7 @@ function SignupPage(props: Props) {
       return await BeginStripeCheckoutFlow(maybeInternalPlanKey);
     }
 
-    let redirectUrl = FrontendUrlConfig.pricingPageWithReferer("signup");
+    let redirectUrl = WebUrl.pricingPageWithReferer("signup");
     history.push(redirectUrl);
 
     return true;

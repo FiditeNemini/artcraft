@@ -11,7 +11,7 @@ import { ReportDiscordLink } from "../../../_common/DiscordReportLink";
 import { BucketConfig } from "@storyteller/components/src/api/BucketConfig";
 import { VisibleIconFc } from "../../../_icons/VisibleIcon";
 import { HiddenIconFc } from "../../../_icons/HiddenIcon";
-import { FrontendUrlConfig } from "../../../../../common/FrontendUrlConfig";
+import { WebUrl } from "../../../../../common/WebUrl";
 import {
   GetW2lTemplate,
   GetW2lTemplateIsErr,
@@ -271,7 +271,7 @@ function W2lTemplateViewPage(props: Props) {
   let creatorLink = <span />;
 
   if (!!w2lTemplate?.creator_display_name) {
-    const creatorUrl = FrontendUrlConfig.userProfilePage(
+    const creatorUrl = WebUrl.userProfilePage(
       w2lTemplate?.creator_username
     );
     creatorLink = (
@@ -304,7 +304,7 @@ function W2lTemplateViewPage(props: Props) {
       <>
         <Link
           className={"btn btn-secondary w-100"}
-          to={FrontendUrlConfig.w2lTemplateEditPage(templateSlug)}
+          to={WebUrl.w2lTemplateEditPage(templateSlug)}
         >
           <FontAwesomeIcon icon={faEdit} className="me-2" />
           Edit Template Details
@@ -330,7 +330,7 @@ function W2lTemplateViewPage(props: Props) {
       <>
         <Link
           className={approveButtonCss}
-          to={FrontendUrlConfig.w2lTemplateApprovalPage(templateSlug)}
+          to={WebUrl.w2lTemplateApprovalPage(templateSlug)}
         >
           {approveButtonTitle}
         </Link>
@@ -361,7 +361,7 @@ function W2lTemplateViewPage(props: Props) {
       <>
         <Link
           className={deleteButtonCss}
-          to={FrontendUrlConfig.w2lTemplateDeletePage(templateSlug)}
+          to={WebUrl.w2lTemplateDeletePage(templateSlug)}
         >
           <FontAwesomeIcon icon={faTrash} className="me-2" />
           {deleteButtonTitle}
@@ -412,7 +412,7 @@ function W2lTemplateViewPage(props: Props) {
         <motion.h4 variants={item}>Template: {w2lTemplate?.title}</motion.h4>
         <motion.div className="pt-3" variants={item}>
           <BackLink
-            link={FrontendUrlConfig.w2lListPage()}
+            link={WebUrl.w2lListPage()}
             text="Back to all templates"
           />
         </motion.div>

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { ApiConfig } from "@storyteller/components";
-import { FrontendUrlConfig } from "../../../../../common/FrontendUrlConfig";
+import { WebUrl } from "../../../../../common/WebUrl";
 import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
 import { useParams, Link, useHistory } from "react-router-dom";
 import {
@@ -35,7 +35,7 @@ function W2lResultDeletePage(props: Props) {
     getInferenceResult(token);
   }, [token, getInferenceResult]);
 
-  const templateResultLink = FrontendUrlConfig.w2lResultPage(token);
+  const templateResultLink = WebUrl.w2lResultPage(token);
 
   const handleDeleteFormSubmit = (
     ev: React.FormEvent<HTMLFormElement>
@@ -75,7 +75,7 @@ function W2lResultDeletePage(props: Props) {
   let creatorLink = <span />;
 
   if (!!w2lInferenceResult?.maybe_creator_display_name) {
-    const creatorUrl = FrontendUrlConfig.userProfilePage(
+    const creatorUrl = WebUrl.userProfilePage(
       w2lInferenceResult?.maybe_creator_display_name
     );
     creatorLink = (

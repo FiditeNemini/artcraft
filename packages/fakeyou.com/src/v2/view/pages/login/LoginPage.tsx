@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { FrontendUrlConfig } from "../../../../common/FrontendUrlConfig";
+import { WebUrl } from "../../../../common/WebUrl";
 import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
 import { Link, useHistory } from "react-router-dom";
 import {
@@ -134,7 +134,7 @@ function LoginPage(props: Props) {
                 <p>
                   Don’t have an account? &nbsp;
                   <Link
-                    to={FrontendUrlConfig.signupPage()}
+                    to={WebUrl.signupPage()}
                     className="text-link"
                   >
                     Create an account now.

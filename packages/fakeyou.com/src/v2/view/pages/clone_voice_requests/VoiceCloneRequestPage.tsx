@@ -22,7 +22,7 @@ import {
   CheckVoiceCloneApplicationRequest,
 } from "@storyteller/components/src/api/clone_requests/CheckVoiceCloneApplication";
 import { Link } from "react-router-dom";
-import { FrontendUrlConfig } from "../../../../common/FrontendUrlConfig";
+import { WebUrl } from "../../../../common/WebUrl";
 import { motion } from "framer-motion";
 import { container, item, image, panel } from "../../../../data/animation";
 
@@ -295,7 +295,7 @@ function VoiceCloneRequestPage(props: Props) {
           <br />
 
           <Link
-            to={FrontendUrlConfig.indexPage()}
+            to={WebUrl.indexPage()}
             className="button is-info is-large is-fullwidth is-outlined"
           >
             Back to home&nbsp;

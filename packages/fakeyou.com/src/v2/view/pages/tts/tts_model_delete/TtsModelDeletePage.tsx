@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { ApiConfig } from "@storyteller/components";
-import { FrontendUrlConfig } from "../../../../../common/FrontendUrlConfig";
+import { WebUrl } from "../../../../../common/WebUrl";
 import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
 import { useParams, Link, useHistory } from "react-router-dom";
 import { BackLink } from "../../../_common/BackLink";
@@ -105,7 +105,7 @@ function TtsModelDeletePage(props: Props) {
     getModelUseCount(token);
   }, [token, getModel, getModelUseCount]);
 
-  const modelLink = FrontendUrlConfig.ttsModelPage(token);
+  const modelLink = WebUrl.ttsModelPage(token);
 
   const handleDeleteFormSubmit = (
     ev: React.FormEvent<HTMLFormElement>
@@ -148,7 +148,7 @@ function TtsModelDeletePage(props: Props) {
   let creatorLink = <span />;
 
   if (!!ttsModel?.creator_display_name) {
-    const creatorUrl = FrontendUrlConfig.userProfilePage(
+    const creatorUrl = WebUrl.userProfilePage(
       ttsModel?.creator_display_name
     );
     creatorLink = <Link to={creatorUrl}>{ttsModel?.creator_display_name}</Link>;

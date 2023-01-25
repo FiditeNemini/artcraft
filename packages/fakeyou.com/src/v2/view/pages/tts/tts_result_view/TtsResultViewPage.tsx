@@ -5,7 +5,7 @@ import { BucketConfig } from "@storyteller/components/src/api/BucketConfig";
 import { useParams, Link } from "react-router-dom";
 import { SpectrogramImage } from "./SpectrogramImage";
 import { ReportDiscordLink } from "../../../_common/DiscordReportLink";
-import { FrontendUrlConfig } from "../../../../../common/FrontendUrlConfig";
+import { WebUrl } from "../../../../../common/WebUrl";
 import { formatDistance } from "date-fns";
 import {
   GetTtsResult,
@@ -64,7 +64,7 @@ function TtsResultViewPage(props: Props) {
     }
   }, []);
 
-  const shareLink = `https://fakeyou.com${FrontendUrlConfig.ttsResultPage(
+  const shareLink = `https://fakeyou.com${WebUrl.ttsResultPage(
     token
   )}`;
   const shareTitle = `I just used FakeYou to generate speech as ${
@@ -287,7 +287,7 @@ function TtsResultViewPage(props: Props) {
       <>
         <Link
           className="btn btn-secondary w-100"
-          to={FrontendUrlConfig.ttsResultEditPage(token)}
+          to={WebUrl.ttsResultEditPage(token)}
         >
           <FontAwesomeIcon icon={faEdit} className="me-2" />
           Edit Result Visibility
@@ -306,7 +306,7 @@ function TtsResultViewPage(props: Props) {
       <>
         <Link
           className={deleteButtonCss}
-          to={FrontendUrlConfig.ttsResultDeletePage(token)}
+          to={WebUrl.ttsResultDeletePage(token)}
         >
           <FontAwesomeIcon icon={faTrash} className="me-2" />
           {deleteButtonTitle}
@@ -343,7 +343,7 @@ function TtsResultViewPage(props: Props) {
       <>
         <Link
           className=" btn btn-primary w-100 mt-4"
-          to={FrontendUrlConfig.signupPage()}
+          to={WebUrl.signupPage()}
           onClick={() => {
             Analytics.ttsResultPageClickRegisterToDownload();
           }}

@@ -13,7 +13,7 @@ import {
 import { item, image } from "../../../../../data/animation";
 import { motion } from "framer-motion";
 import { Analytics } from "../../../../../common/Analytics";
-import { FrontendUrlConfig } from "../../../../../common/FrontendUrlConfig";
+import { WebUrl } from "../../../../../common/WebUrl";
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -62,7 +62,7 @@ export function TtsPageHero(props: Props) {
     viewPricingButton = (
       <>
         <Link
-          to={FrontendUrlConfig.pricingPageWithReferer("tts_hero_new")}
+          to={WebUrl.pricingPageWithReferer("tts_hero_new")}
           onClick={() => {
             Analytics.ttsClickHeroViewPricing();
           }}
@@ -78,7 +78,7 @@ export function TtsPageHero(props: Props) {
 
   if (props.sessionWrapper.isLoggedIn()) {
     let displayName = props.sessionWrapper.getDisplayName() as string; // NB: If logged in, should be string
-    let url = FrontendUrlConfig.userProfilePage(displayName);
+    let url = WebUrl.userProfilePage(displayName);
     myProfileButton = (
       <>
         <Link
@@ -98,7 +98,7 @@ export function TtsPageHero(props: Props) {
       upgradeButton = (
         <>
           <Link
-            to={FrontendUrlConfig.pricingPageWithReferer("tts_hero_user")}
+            to={WebUrl.pricingPageWithReferer("tts_hero_user")}
             onClick={() => {
               Analytics.ttsClickHeroUpgradePlan();
             }}

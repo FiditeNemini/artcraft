@@ -5,7 +5,7 @@ import {
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React from "react";
 import { Link } from "react-router-dom";
-import { FrontendUrlConfig } from "../../../common/FrontendUrlConfig";
+import { WebUrl } from "../../../common/WebUrl";
 import { TtsCategory } from "../../api/category/ListTtsCategories";
 import { TtsModelCategory } from "../../api/category/ListTtsCategoriesForModel";
 import { ModerationTtsCategory } from "../../api/moderation/category/ListTtsCategoriesForModeration";
@@ -93,7 +93,7 @@ export function CategoryBreadcrumb(props: Props) {
         categoryName = (
           <>
             <Link
-              to={FrontendUrlConfig.moderationTtsCategoryEdit(
+              to={WebUrl.moderationTtsCategoryEdit(
                 category.category_token
               )}
             >

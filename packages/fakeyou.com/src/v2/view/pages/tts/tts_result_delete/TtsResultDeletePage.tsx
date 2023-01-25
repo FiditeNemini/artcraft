@@ -3,7 +3,7 @@ import { ApiConfig } from "@storyteller/components";
 import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
 import { useParams, Link, useHistory } from "react-router-dom";
 import { Gravatar } from "@storyteller/components/src/elements/Gravatar";
-import { FrontendUrlConfig } from "../../../../../common/FrontendUrlConfig";
+import { WebUrl } from "../../../../../common/WebUrl";
 import { motion } from "framer-motion";
 import { container, item, panel } from "../../../../../data/animation";
 
@@ -89,7 +89,7 @@ function TtsResultDeletePage(props: Props) {
     !!ttsInferenceResult?.maybe_moderator_fields?.mod_deleted_at ||
     !!ttsInferenceResult?.maybe_moderator_fields?.user_deleted_at;
 
-  const resultLink = FrontendUrlConfig.ttsResultPage(token);
+  const resultLink = WebUrl.ttsResultPage(token);
 
   const handleDeleteFormSubmit = (
     ev: React.FormEvent<HTMLFormElement>
@@ -133,7 +133,7 @@ function TtsResultDeletePage(props: Props) {
     return <div />; // Exit rendering until data loads.
   }
 
-  const modelLink = FrontendUrlConfig.ttsModelPage(
+  const modelLink = WebUrl.ttsModelPage(
     ttsInferenceResult.tts_model_token
   );
 

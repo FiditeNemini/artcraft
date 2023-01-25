@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from "react";
 import { ApiConfig } from "@storyteller/components";
 import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
 import { useParams, useHistory } from "react-router-dom";
-import { FrontendUrlConfig } from "../../../../../common/FrontendUrlConfig";
+import { WebUrl } from "../../../../../common/WebUrl";
 import { VisibleIconFc } from "../../../_icons/VisibleIcon";
 import { HiddenIconFc } from "../../../_icons/HiddenIcon";
 import {
@@ -67,7 +67,7 @@ function W2lTemplateEditPage(props: Props) {
     setVisibility((ev.target as HTMLSelectElement).value);
   };
 
-  const templateLink = FrontendUrlConfig.w2lTemplatePage(templateToken);
+  const templateLink = WebUrl.w2lTemplatePage(templateToken);
 
   const handleFormSubmit = (ev: React.FormEvent<HTMLFormElement>) => {
     ev.preventDefault();

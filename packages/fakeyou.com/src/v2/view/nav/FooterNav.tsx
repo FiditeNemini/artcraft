@@ -4,7 +4,7 @@ import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapp
 import { Link } from "react-router-dom";
 
 import { ModerationIcon } from "../_icons/ModerationIcon";
-import { FrontendUrlConfig } from "../../../common/FrontendUrlConfig";
+import { WebUrl } from "../../../common/WebUrl";
 import { Trans } from "react-i18next";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -41,7 +41,7 @@ function FooterNav(props: Props) {
   if (props.sessionWrapper.canBanUsers()) {
     moderationLink = (
       <div className="v2_mod_link mb-4 mb-lg-0 me-0 me-lg-4">
-        <Link to={FrontendUrlConfig.moderationMain()}>
+        <Link to={WebUrl.moderationMain()}>
           <ModerationIcon />
           <span className="ms-2">Mod Controls</span>
         </Link>
@@ -149,7 +149,7 @@ function FooterNav(props: Props) {
               </li>
 
               <li>
-                <Link to={FrontendUrlConfig.patronsPage()}>Patrons</Link>
+                <Link to={WebUrl.patronsPage()}>Patrons</Link>
               </li>
 
               <li>
@@ -159,22 +159,22 @@ function FooterNav(props: Props) {
             <div className="py-2 col-12 col-lg-3 d-flex flex-column gap-2 gap-lg-3 align-items-center align-items-lg-start">
               <p className="fw-bold">Info</p>
               <li>
-                <Link to={FrontendUrlConfig.pricingPageWithReferer("footer")}>Pricing</Link>
+                <Link to={WebUrl.pricingPageWithReferer("footer")}>Pricing</Link>
               </li>
 
               <li>
-                <Link to={FrontendUrlConfig.aboutUsPage()}>About</Link>
+                <Link to={WebUrl.aboutUsPage()}>About</Link>
               </li>
 
               <li>
-                <Link to={FrontendUrlConfig.termsPage()}>Terms of Use</Link>
+                <Link to={WebUrl.termsPage()}>Terms of Use</Link>
               </li>
 
               <li>
-                <Link to={FrontendUrlConfig.privacyPage()}>Privacy Policy</Link>
+                <Link to={WebUrl.privacyPage()}>Privacy Policy</Link>
               </li>
               <li>
-                <a href={FrontendUrlConfig.developerDocs()}>API Docs</a>
+                <a href={WebUrl.developerDocs()}>API Docs</a>
               </li>
             </div>
           </div>

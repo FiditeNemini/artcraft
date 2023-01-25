@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { SessionWrapper } from '@storyteller/components/src/session/SessionWrapper';
 import { Gravatar } from '@storyteller/components/src/elements/Gravatar';
-import { FrontendUrlConfig } from '../../../../../common/FrontendUrlConfig';
+import { WebUrl } from '../../../../../common/WebUrl';
 import { BackLink } from '../../../_common/BackLink';
 import { ListTtsCategoriesForModeration, ListTtsCategoriesForModerationIsError, ListTtsCategoriesForModerationIsOk, ListTtsCategoriesTriState, ModerationTtsCategory } from '../../../../api/moderation/category/ListTtsCategoriesForModeration';
 import { Link } from 'react-router-dom';
@@ -104,7 +104,7 @@ function ModerationTtsCategoryListPage(props: Props) {
     <div>
       <h1 className="title is-1"> Moderate TTS Categories </h1>
 
-      <BackLink link={FrontendUrlConfig.moderationMain()} text="Back to moderation" />
+      <BackLink link={WebUrl.moderationMain()} text="Back to moderation" />
 
       <br />
 
@@ -210,7 +210,7 @@ function ModerationTtsCategoryListPage(props: Props) {
             let creatorLink = <span />;
 
             if (!!category?.creator_display_name) {
-              const creatorUrl = FrontendUrlConfig.userProfilePage(category?.creator_username || "username error");
+              const creatorUrl = WebUrl.userProfilePage(category?.creator_username || "username error");
               creatorLink = (
                 <span className="white-space-nowrap">
                   <Gravatar
@@ -252,7 +252,7 @@ function ModerationTtsCategoryListPage(props: Props) {
                   {deleted}
                 </td>
                 <td>
-                  <Link to={FrontendUrlConfig.moderationTtsCategoryEdit(category.category_token)}>edit</Link>
+                  <Link to={WebUrl.moderationTtsCategoryEdit(category.category_token)}>edit</Link>
                 </td>
               </tr>
             );
@@ -269,13 +269,13 @@ function ModerationTtsCategoryListPage(props: Props) {
       <br />
       
       <Link
-        to={FrontendUrlConfig.createCategoryPage()}
+        to={WebUrl.createCategoryPage()}
         className="button is-info is-large is-fullwidth"
         >Create new category</Link>
 
       <br />
 
-      <BackLink link={FrontendUrlConfig.moderationMain()} text="Back to moderation" />
+      <BackLink link={WebUrl.moderationMain()} text="Back to moderation" />
     </div>
   )
 }

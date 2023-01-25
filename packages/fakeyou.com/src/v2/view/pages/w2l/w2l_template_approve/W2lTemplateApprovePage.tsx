@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { ApiConfig } from "@storyteller/components";
-import { FrontendUrlConfig } from "../../../../../common/FrontendUrlConfig";
+import { WebUrl } from "../../../../../common/WebUrl";
 import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
 import { useParams, Link, useHistory } from "react-router-dom";
 import {
@@ -49,7 +49,7 @@ function W2lTemplateApprovePage(props: Props) {
     setW2lTemplateUseCount(count || 0);
   }, []);
 
-  const templateLink = FrontendUrlConfig.w2lTemplatePage(templateToken);
+  const templateLink = WebUrl.w2lTemplatePage(templateToken);
 
   useEffect(() => {
     getTemplate(templateToken);
@@ -95,7 +95,7 @@ function W2lTemplateApprovePage(props: Props) {
   let creatorLink = <span />;
 
   if (!!w2lTemplate?.creator_display_name) {
-    const creatorUrl = FrontendUrlConfig.userProfilePage(
+    const creatorUrl = WebUrl.userProfilePage(
       w2lTemplate?.creator_display_name
     );
     creatorLink = (

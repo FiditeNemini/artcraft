@@ -16,7 +16,7 @@ import { container, sessionItem } from "../../../data/animation";
 import { SessionSubscriptionsWrapper } from "@storyteller/components/src/session/SessionSubscriptionsWrapper";
 import { Analytics } from "../../../common/Analytics";
 import { SessionTtsAudioPlayer } from "./SessionTtsAudioPlayer";
-import { FrontendUrlConfig } from "../../../common/FrontendUrlConfig";
+import { WebUrl } from "../../../common/WebUrl";
 
 interface Props {
   ttsInferenceJobs: Array<TtsInferenceJob>;
@@ -167,7 +167,7 @@ function SessionTtsInferenceResultList(props: Props) {
           <Trans i18nKey="common.SessionTtsInferenceResults.premium.ad">
             Don't want to wait? Step to the front of the line with a{" "}
             <Link
-              to={FrontendUrlConfig.pricingPageWithReferer("no_wait")}
+              to={WebUrl.pricingPageWithReferer("nowait")}
               onClick={() => {
                 Analytics.ttsTooSlowUpgradePremium();
               }}
