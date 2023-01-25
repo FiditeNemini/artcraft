@@ -275,7 +275,7 @@ function TtsResultViewPage(props: Props) {
     ttsInferenceResult.tts_model_title !== null
   ) {
     headingTitle = `${ttsInferenceResult.tts_model_title}`;
-    subtitle = <h1 className="panel-title fw-bold">TTS Result</h1>;
+    subtitle = <h2 className="panel-title fw-bold">TTS Result</h2>;
   }
 
   const currentlyDeleted =

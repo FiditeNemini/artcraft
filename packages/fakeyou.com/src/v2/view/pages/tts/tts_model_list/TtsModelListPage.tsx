@@ -354,7 +354,7 @@ function TtsModelListPage(props: Props) {
             <span className="fw-medium">{modelLanguage.languageName}</span>{" "}
             {/*| Use count:{" "}
             <span className="fw-semibold">616400</span>*/}
-            | Uses: <span className="fw-medium">308,270 times</span>
+            | Used <span className="fw-medium">308,270 times</span>
           </p>
           <Link
             to={modelLink}
@@ -373,7 +373,7 @@ function TtsModelListPage(props: Props) {
         <div className="d-flex gap-3">
           <div className="d-flex">
             <Tippy
-              content="I like this voice"
+              content="This voice sounds good"
               hideOnClick
               placement="bottom"
               theme="fakeyou"
@@ -387,7 +387,7 @@ function TtsModelListPage(props: Props) {
             <div className="vr"></div>
 
             <Tippy
-              content="I dislike this voice"
+              content="This voice sounds bad"
               hideOnClick
               placement="bottom"
               theme="fakeyou"
@@ -401,7 +401,7 @@ function TtsModelListPage(props: Props) {
           <div className="d-flex align-items-center">
             <FontAwesomeIcon icon={faStar} className="me-2 rating-icon" />
             <p>
-              Rating: <span className="fw-medium">4.5 Great</span>
+              Rating: <span className="fw-medium">4.5 — Great</span>
             </p>
           </div>
         </div>
