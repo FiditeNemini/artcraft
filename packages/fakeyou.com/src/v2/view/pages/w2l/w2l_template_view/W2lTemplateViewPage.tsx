@@ -26,6 +26,7 @@ import { faEdit, faTrash } from "@fortawesome/free-solid-svg-icons";
 import { motion } from "framer-motion";
 import { container, item, panel } from "../../../../../data/animation";
 import { ThirdPartyLinks } from "@storyteller/components/src/constants/ThirdPartyLinks";
+import { usePrefixedDocumentTitle } from "../../../../../common/UsePrefixedDocumentTitle";
 
 interface EnqueueJobResponsePayload {
   success: boolean;
@@ -56,6 +57,9 @@ function W2lTemplateViewPage(props: Props) {
   // Moderation
   const [modApprovedFormValue, setModApprovedFormValue] =
     useState<boolean>(true);
+
+  const documentTitle = w2lTemplate?.title === undefined ? undefined : `Create Deep Fake ${w2lTemplate.title} Lip Sync Video`;
+  usePrefixedDocumentTitle(documentTitle);
 
   const getTemplate = useCallback(
     async (templateSlug: string) => {

@@ -17,6 +17,7 @@ import {
 } from "@fortawesome/free-brands-svg-icons";
 import { motion } from "framer-motion";
 import { duration, delay, container, item } from "../../../../data/animation";
+import { usePrefixedDocumentTitle } from "../../../../common/UsePrefixedDocumentTitle";
 
 const Fade = require("react-reveal/Fade");
 
@@ -300,6 +301,8 @@ function FirehoseEventListPage(props: Props) {
       </li>
     );
   });
+
+  usePrefixedDocumentTitle("Firehose Event Feed");
 
   return (
     <motion.div initial="hidden" animate="visible" variants={container}>

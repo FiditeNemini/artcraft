@@ -12,6 +12,7 @@ import { faUser, faKey } from "@fortawesome/free-solid-svg-icons";
 import { motion } from "framer-motion";
 import { container, panel } from "../../../../data/animation";
 import { Analytics } from "../../../../common/Analytics";
+import { usePrefixedDocumentTitle } from "../../../../common/UsePrefixedDocumentTitle";
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -73,6 +74,8 @@ function LoginPage(props: Props) {
 
     return false;
   };
+
+  usePrefixedDocumentTitle("Log in to your account");
 
   let errorWarning = <span />;
   if (errorMessage) {

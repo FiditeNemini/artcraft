@@ -38,6 +38,7 @@ import {
   WhatsappIcon,
 } from "react-share";
 import { BackLink } from "../../../_common/BackLink";
+import { usePrefixedDocumentTitle } from "../../../../../common/UsePrefixedDocumentTitle";
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -63,6 +64,11 @@ function TtsResultViewPage(props: Props) {
       }
     }
   }, []);
+
+  const documentTitle = ttsInferenceResult?.tts_model_title === undefined 
+    ? undefined 
+    : `Deep Fake ${ttsInferenceResult.tts_model_title} TTS says ${ttsInferenceResult.raw_inference_text.substring(0, 50)}`;
+  usePrefixedDocumentTitle(documentTitle);
 
   const shareLink = `https://fakeyou.com${WebUrl.ttsResultPage(
     token

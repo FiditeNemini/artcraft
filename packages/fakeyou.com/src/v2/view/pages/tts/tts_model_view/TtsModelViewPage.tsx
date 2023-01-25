@@ -61,6 +61,7 @@ import {
   WhatsappIcon,
 } from "react-share";
 import { Analytics } from "../../../../../common/Analytics";
+import { usePrefixedDocumentTitle } from "../../../../../common/UsePrefixedDocumentTitle";
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -90,6 +91,9 @@ function TtsModelViewPage(props: Props) {
   >(new Map());
 
   const [notFoundState, setNotFoundState] = useState<boolean>(false);
+
+  const documentTitle = ttsModel?.title === undefined ? undefined : `${ttsModel.title} Deep Fake TTS generator`;
+  usePrefixedDocumentTitle(documentTitle);
 
   const getModel = useCallback(async (token) => {
     const model = await GetTtsModel(token);
@@ -172,6 +176,8 @@ function TtsModelViewPage(props: Props) {
   };
 
   if (notFoundState) {
+    //useDocumentTitle("FakeYou - Not Found");
+
     return (
       <div className="container py-5">
         <div className="py-5">

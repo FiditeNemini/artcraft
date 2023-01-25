@@ -16,6 +16,7 @@ import {
   faChevronRight,
 } from "@fortawesome/free-solid-svg-icons";
 import { motion } from "framer-motion";
+import { usePrefixedDocumentTitle } from "../../../../../common/UsePrefixedDocumentTitle";
 
 const Fade = require("react-reveal/Fade");
 
@@ -192,6 +193,8 @@ function W2lTemplateListPage(props: Props) {
       </p>
     );
   }
+
+  usePrefixedDocumentTitle("Create Deep Fake lip sync videos");
 
   return (
     <motion.div initial="hidden" animate="visible" variants={container}>

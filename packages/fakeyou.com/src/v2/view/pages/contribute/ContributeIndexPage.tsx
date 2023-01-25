@@ -17,6 +17,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { motion } from "framer-motion";
 import { container, item, panel } from "../../../../data/animation";
+import { usePrefixedDocumentTitle } from "../../../../common/UsePrefixedDocumentTitle";
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -30,6 +31,8 @@ function ContributeIndexPage(props: Props) {
   const categoryButton = props.sessionWrapper.canEditCategories()
     ? t("pages.contributeIndex.buttonCreateCategory")
     : t("pages.contributeIndex.buttonSuggestCategory");
+
+  usePrefixedDocumentTitle("Contribute to FakeYou");
 
   return (
     <motion.div initial="hidden" animate="visible" variants={container}>

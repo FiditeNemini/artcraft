@@ -42,6 +42,7 @@ import Tippy from "@tippyjs/react";
 import "tippy.js/dist/tippy.css";
 import "tippy.js/animations/shift-away.css";
 import { motion } from "framer-motion";
+import { usePrefixedDocumentTitle } from "../../../../../common/UsePrefixedDocumentTitle";
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -74,6 +75,11 @@ function ProfilePage(props: Props) {
   useEffect(() => {
     getUser(username);
   }, [username, getUser]);
+
+  const documentTitle = userData?.display_name === undefined 
+    ? undefined 
+    : `${userData.display_name}`;
+  usePrefixedDocumentTitle(documentTitle);
 
   if (notFoundState) {
     return (

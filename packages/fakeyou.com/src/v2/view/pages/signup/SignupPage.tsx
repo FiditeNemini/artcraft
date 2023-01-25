@@ -16,6 +16,7 @@ import { Analytics } from "../../../../common/Analytics";
 import queryString from "query-string";
 import { WebUrl } from "../../../../common/WebUrl";
 import { BeginStripeCheckoutFlow } from "../../../../common/BeginStripeCheckoutFlow";
+import { usePrefixedDocumentTitle } from "../../../../common/UsePrefixedDocumentTitle";
 
 enum FieldTriState {
   EMPTY_FALSE,
@@ -262,6 +263,8 @@ function SignupPage(props: Props) {
 
     return true;
   }
+
+  usePrefixedDocumentTitle("Create an account");
 
   if (props.sessionWrapper.isLoggedIn()) {
     return (

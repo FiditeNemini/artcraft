@@ -66,6 +66,7 @@ import {
 } from "../../../../../_i18n/AvailableLanguageMap";
 import { ExploreVoicesModal } from "./explore/ExploreVoicesModal";
 import { WebUrl } from "../../../../../common/WebUrl";
+import { usePrefixedDocumentTitle } from "../../../../../common/UsePrefixedDocumentTitle";
 
 export interface EnqueueJobResponsePayload {
   success: boolean;
@@ -363,6 +364,8 @@ function TtsModelListPage(props: Props) {
       </Link>
     );
   }
+
+  usePrefixedDocumentTitle(undefined); // NB: Sets to default title
 
   const vocodesNotice = props.isShowingVocodesNotice ? (
     <VocodesNotice clearVocodesNotice={props.clearVocodesNotice} />

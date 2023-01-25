@@ -2,10 +2,14 @@ import React from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { container, item, image, panel } from "../../../../../data/animation";
+import { usePrefixedDocumentTitle } from "../../../../../common/UsePrefixedDocumentTitle";
 
 interface Props {}
 
 function AboutPage(props: Props) {
+
+  usePrefixedDocumentTitle("About Us");
+
   return (
     <motion.div initial="hidden" animate="visible" variants={container}>
       <div className="container mb-4">

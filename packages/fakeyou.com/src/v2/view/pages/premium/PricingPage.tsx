@@ -16,6 +16,7 @@ import { FakeYouFrontendEnvironment } from "@storyteller/components/src/env/Fake
 import { Analytics } from "../../../../common/Analytics";
 import { WebUrl } from "../../../../common/WebUrl";
 import { BeginStripeCheckoutFlow } from "../../../../common/BeginStripeCheckoutFlow";
+import { usePrefixedDocumentTitle } from "../../../../common/UsePrefixedDocumentTitle";
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -72,6 +73,8 @@ function PricingPage(props: Props) {
       return await BeginStripeCheckoutFlow(internal_plan_key); // NB: This redirects the user to Stripe
     }
   };
+
+  usePrefixedDocumentTitle("Premium Deep Fake TTS");
 
   const environment = FakeYouFrontendEnvironment.getInstance();
   const planKey = environment.useProductionStripePlans() ? "production" : "development";

@@ -25,10 +25,14 @@ import { Link } from "react-router-dom";
 import { WebUrl } from "../../../../common/WebUrl";
 import { motion } from "framer-motion";
 import { container, item, image, panel } from "../../../../data/animation";
+import { usePrefixedDocumentTitle } from "../../../../common/UsePrefixedDocumentTitle";
 
 interface Props {}
 
 function VoiceCloneRequestPage(props: Props) {
+
+  usePrefixedDocumentTitle("Create a Custom Voice Clone with Deep Fake TTS");
+
   // Contact
   const [emailAddress, setEmailAddress] = useState("");
   const [discord, setDiscord] = useState("");

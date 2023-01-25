@@ -7,11 +7,15 @@ import { faPatreon } from "@fortawesome/free-brands-svg-icons";
 import { motion } from "framer-motion";
 import { container, item, image, panel } from "../../../../data/animation";
 import { ThirdPartyLinks } from "@storyteller/components/src/constants/ThirdPartyLinks";
+import { usePrefixedDocumentTitle } from "../../../../common/UsePrefixedDocumentTitle";
 interface Props {
   sessionWrapper: SessionWrapper;
 }
 
 function PatronPage(props: Props) {
+
+  usePrefixedDocumentTitle("Thank you to our Patrons!");
+
   return (
     <motion.div initial="hidden" animate="visible" variants={container}>
       <div className="container py-5 pt-lg-0">

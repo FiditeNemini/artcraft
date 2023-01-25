@@ -1,10 +1,14 @@
 import React from "react";
 import { motion } from "framer-motion";
 import { container, item, panel } from "../../../../../data/animation";
+import { usePrefixedDocumentTitle } from "../../../../../common/UsePrefixedDocumentTitle";
 
 interface Props {}
 
 function PrivacyPage(props: Props) {
+
+  usePrefixedDocumentTitle("Privacy Statement");
+
   return (
     <motion.div initial="hidden" animate="visible" variants={container}>
       <div className="container pb-0 pt-5 pb-lg-5 px-md-4 px-lg-5 px-xl-3">

@@ -14,6 +14,7 @@ import {
 import { DiscordLink2 } from "@storyteller/components/src/elements/DiscordLink2";
 import { motion } from "framer-motion";
 import { container, item, panel } from "../../../../data/animation";
+import { usePrefixedDocumentTitle } from "../../../../common/UsePrefixedDocumentTitle";
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -55,6 +56,8 @@ function LeaderboardPage(props: Props) {
   useEffect(() => {
     getLeaderboard();
   }, [getLeaderboard]);
+
+  usePrefixedDocumentTitle("Leaderboard of Top Contributors");
 
   if (!leaderboard) {
     return <div />;

@@ -19,6 +19,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faDownload, faEdit, faTrash } from "@fortawesome/free-solid-svg-icons";
 import { motion } from "framer-motion";
 import { container, item, panel } from "../../../../../data/animation";
+import { usePrefixedDocumentTitle } from "../../../../../common/UsePrefixedDocumentTitle";
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -48,6 +49,11 @@ function W2lResultViewPage(props: Props) {
   useEffect(() => {
     getInferenceResult(token);
   }, [token, getInferenceResult]); // NB: Empty array dependency sets to run ONLY on mount
+
+  const documentTitle = w2lInferenceResult?.template_title === undefined 
+    ? undefined 
+    : `Deep Fake ${w2lInferenceResult.template_title} Lip Sync Video Result`;
+  usePrefixedDocumentTitle(documentTitle);
 
   if (notFoundState) {
     return (

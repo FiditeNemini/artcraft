@@ -3,10 +3,14 @@ import { motion } from "framer-motion";
 import { container, item, panel, image } from "../../../../../data/animation";
 import { Link } from "react-router-dom";
 import { DiscordLink2 } from "@storyteller/components/src/elements/DiscordLink2";
+import { usePrefixedDocumentTitle } from "../../../../../common/UsePrefixedDocumentTitle";
 
 interface Props {}
 
 function GuidePage(props: Props) {
+
+  usePrefixedDocumentTitle("Guide to all things Deep Fake");
+
   return (
     <motion.div initial="hidden" animate="visible" variants={container}>
       <div className="container">
