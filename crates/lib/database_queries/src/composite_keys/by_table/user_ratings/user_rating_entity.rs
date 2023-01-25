@@ -24,4 +24,11 @@ impl UserRatingEntity {
       UserRatingEntity::W2lTemplate(_) => UserRatingEntityType::W2lTemplate,
     }
   }
+
+  pub fn get_entity_token_str(&self) -> &str {
+    match self {
+      UserRatingEntity::TtsModel(token) => token.as_str(),
+      UserRatingEntity::W2lTemplate(token) => token.as_str(),
+    }
+  }
 }

@@ -21,14 +21,10 @@ pub struct Args<'a> {
 }
 
 /// Look up the user rating
-pub async fn get_user_rating(args: Args) -> AnyhowResult<Option<UserRating>>
+pub async fn get_user_rating(args: Args<'_>) -> AnyhowResult<Option<UserRating>>
 {
   let entity_type = args.user_rating_entity.get_entity_type();
-
-  let entity_token = match args.user_rating_entity {
-    UserRatingEntity::TtsModel(token) => token.as_str(),
-    UserRatingEntity::W2lTemplate(token) => token.as_str(),
-  };
+  let entity_token = args.user_rating_entity.get_entity_token_str();
 
   let maybe_result = sqlx::query_as!(
       InternalUserRatingRecord,
@@ -40,8 +36,8 @@ SELECT
 
 FROM user_ratings
 
-WHERE user_token = ?,
-AND entity_type = ?,
+WHERE user_token = ?
+AND entity_type = ?
 AND entity_token = ?
 LIMIT 1
         "#,

@@ -47,6 +47,6 @@ CREATE TABLE user_ratings (
   UNIQUE KEY (user_token, entity_type, entity_token),
   KEY index_entity_type_entity_token (entity_type, entity_token),
   KEY index_user_token (user_token),
-  KEY index_rating_type (rating_type)
+  KEY index_rating_value (rating_value)
 
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;

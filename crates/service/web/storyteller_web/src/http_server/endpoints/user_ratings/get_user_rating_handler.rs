@@ -2,13 +2,13 @@ use actix_web::http::StatusCode;
 use actix_web::{HttpRequest, HttpResponse, ResponseError, web};
 use crate::server_state::ServerState;
 use database_queries::composite_keys::by_table::user_ratings::user_rating_entity::UserRatingEntity;
+use database_queries::queries::users::user_ratings::get_user_rating::{Args, get_user_rating};
 use enums::by_table::user_ratings::entity_type::UserRatingEntityType;
 use enums::by_table::user_ratings::rating_value::UserRatingValue;
 use http_server_common::request::get_request_ip::get_request_ip;
 use http_server_common::response::serialize_as_json_error::serialize_as_json_error;
 use log::{error, info};
 use std::sync::Arc;
-use database_queries::queries::users::user_ratings::get_user_rating::{Args, get_user_rating};
 use tokens::tokens::tts_models::TtsModelToken;
 use tokens::tokens::w2l_templates::W2lTemplateToken;
 
@@ -72,7 +72,7 @@ pub async fn get_user_rating_handler(
   path: web::Path<GetUserRatingPath>,
   server_state: web::Data<Arc<ServerState>>) -> Result<HttpResponse, GetUserRatingError>
 {
-  let mut mysql_connection = mysql_pool.acquire()
+  let mut mysql_connection = server_state.mysql_pool.acquire()
       .await
       .map_err(|e| {
         error!("Could not acquire DB pool: {:?}", e);
@@ -81,7 +81,7 @@ pub async fn get_user_rating_handler(
 
   let maybe_user_session = server_state
       .session_checker
-      .maybe_get_user_session(&http_request, &server_state.mysql_pool)
+      .maybe_get_user_session_from_connection(&http_request, &mut mysql_connection)
       .await
       .map_err(|e| {
         error!("Session checker error: {:?}", e);

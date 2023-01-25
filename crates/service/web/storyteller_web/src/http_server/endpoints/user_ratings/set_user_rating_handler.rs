@@ -2,7 +2,7 @@ use actix_web::http::StatusCode;
 use actix_web::{HttpRequest, HttpResponse, ResponseError, web};
 use crate::server_state::ServerState;
 use database_queries::composite_keys::by_table::user_ratings::user_rating_entity::UserRatingEntity;
-use database_queries::queries::users::user_ratings::upsert_user_rating::{Args, upsert_user_rating, UserRatingEntityToken};
+use database_queries::queries::users::user_ratings::upsert_user_rating::{Args, upsert_user_rating};
 use enums::by_table::user_ratings::entity_type::UserRatingEntityType;
 use enums::by_table::user_ratings::rating_value::UserRatingValue;
 use http_server_common::request::get_request_ip::get_request_ip;
@@ -69,7 +69,7 @@ pub async fn set_user_rating_handler(
   request: web::Json<SetUserRatingRequest>,
   server_state: web::Data<Arc<ServerState>>) -> Result<HttpResponse, SetUserRatingError>
 {
-  let mut mysql_connection = mysql_pool.acquire()
+  let mut mysql_connection = server_state.mysql_pool.acquire()
       .await
       .map_err(|e| {
         error!("Could not acquire DB pool: {:?}", e);
@@ -78,7 +78,7 @@ pub async fn set_user_rating_handler(
 
   let maybe_user_session = server_state
       .session_checker
-      .maybe_get_user_session(&http_request, &server_state.mysql_pool)
+      .maybe_get_user_session_from_connection(&http_request, &mut mysql_connection)
       .await
       .map_err(|e| {
         error!("Session checker error: {:?}", e);
@@ -110,6 +110,7 @@ pub async fn set_user_rating_handler(
   let _r = upsert_user_rating(Args {
     user_token: &user_session.user_token_typed,
     user_rating_entity: &entity,
+    user_rating_value: request.rating_value,
     ip_address: &ip_address,
     mysql_connection: &mut mysql_connection
   })
