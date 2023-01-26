@@ -72,6 +72,7 @@ import { WebUrl } from "../../../../../common/WebUrl";
 import { usePrefixedDocumentTitle } from "../../../../../common/UsePrefixedDocumentTitle";
 import Tippy from "@tippyjs/react";
 import "tippy.js/dist/tippy.css";
+import { RatingBlock } from "../../../_common/RatingBlock";
 
 export interface EnqueueJobResponsePayload {
   success: boolean;
@@ -352,9 +353,10 @@ function TtsModelListPage(props: Props) {
             | <FontAwesomeIcon icon={faGlobe} className="me-2" />
             {t("tts.TtsModelListPage.languageLabel")}:{" "}
             <span className="fw-medium">{modelLanguage.languageName}</span>{" "}
+            {/* We're not ready for use count yet. */}
             {/*| Use count:{" "}
-            <span className="fw-semibold">616400</span>*/}
-            | Used <span className="fw-medium">308,270 times</span>
+            <span className="fw-semibold">616400</span> -- the old one*/}
+            {/*| Used <span className="fw-medium">308,270 times</span> -- the new one */}
           </p>
           <Link
             to={modelLink}
@@ -369,6 +371,10 @@ function TtsModelListPage(props: Props) {
             <FontAwesomeIcon icon={faArrowRight} className="ms-2" />
           </Link>
         </div>
+        <hr />
+
+        <RatingBlock entity_type="tts_model" entity_token={maybeSelectedTtsModel?.model_token || ""} />
+
         <hr />
         <div className="d-flex gap-3">
           <div className="d-flex">
