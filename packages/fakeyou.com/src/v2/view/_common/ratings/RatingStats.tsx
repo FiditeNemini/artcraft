@@ -5,6 +5,9 @@ import {
   faStar, 
   faStarHalfAlt, 
 } from "@fortawesome/free-solid-svg-icons";
+import {
+  faStarExclamation,
+} from "@fortawesome/pro-duotone-svg-icons";
 import { prettyNum, ROUNDING_MODE } from "pretty-num";
 
 interface Props {
@@ -21,7 +24,7 @@ function RatingStats(props: Props) {
   ) {
     return (
       <div className="d-flex align-items-center">
-        <FontAwesomeIcon icon={faStar} className="me-2 rating-icon" />
+        <FontAwesomeIcon icon={faStarExclamation} className="me-2 rating-icon" />
         <p>
           Voice Not Yet Rated
         </p>
