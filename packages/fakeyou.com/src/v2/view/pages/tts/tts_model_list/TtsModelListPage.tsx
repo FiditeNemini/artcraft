@@ -326,6 +326,16 @@ function TtsModelListPage(props: Props) {
         props.maybeSelectedTtsModel
           .ietf_primary_language_subtag as AvailableTtsLanguageKey
       ] || ENGLISH_LANGUAGE;
+    
+    let ratingButtons = <></>;
+    if (props.sessionWrapper.isLoggedIn()) {
+      ratingButtons = (
+        <RatingButtons 
+          entity_type="tts_model" 
+          entity_token={maybeSelectedTtsModel?.model_token || ""} 
+        />
+      );
+    }
 
     directViewLink = (
       <div className="d-flex flex-column direct-view-link zi-2 mb-4">
@@ -371,10 +381,7 @@ function TtsModelListPage(props: Props) {
         <hr />
 
         <div className="d-flex gap-3">
-          <RatingButtons 
-            entity_type="tts_model" 
-            entity_token={maybeSelectedTtsModel?.model_token || ""} 
-          />
+          {ratingButtons}
 
           <RatingStats
             positive_votes={maybeSelectedTtsModel?.user_ratings?.positive_count || 0}

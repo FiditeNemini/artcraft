@@ -654,6 +654,16 @@ function TtsModelViewPage(props: Props) {
     </>
   );
 
+  let ratingButtons = <></>;
+  if (props.sessionWrapper.isLoggedIn()) {
+    ratingButtons = (
+      <RatingButtons 
+        entity_type="tts_model" 
+        entity_token={ttsModel?.model_token || ""} 
+      />
+    )
+  }
+
   // NB: Investors might not like the in-your-face "over 1 year ago" dates.
   //const createdAt = new Date(ttsModel?.created_at);
   //const createdAtRelative = createdAt !== undefined ? formatDistance(createdAt, new Date(), { addSuffix: true }) : undefined;
@@ -667,10 +677,7 @@ function TtsModelViewPage(props: Props) {
           </motion.h1>
           {/* Rate Voice Model Buttons */}
           <div className="d-flex gap-3">
-            <RatingButtons 
-              entity_type="tts_model" 
-              entity_token={ttsModel?.model_token || ""} 
-            />
+            {ratingButtons}
 
             <RatingStats
               positive_votes={ttsModel?.user_ratings?.positive_count || 0}
