@@ -9,6 +9,7 @@ use http_server_common::request::get_request_ip::get_request_ip;
 use http_server_common::response::serialize_as_json_error::serialize_as_json_error;
 use log::{error, info};
 use std::sync::Arc;
+use database_queries::queries::users::user_ratings::update_tts_model_ratings::update_tts_model_ratings;
 use tokens::tokens::tts_models::TtsModelToken;
 use tokens::tokens::w2l_templates::W2lTemplateToken;
 
@@ -119,6 +120,21 @@ pub async fn set_user_rating_handler(
         error!("Error upserting rating: {:?}", err);
         SetUserRatingError::ServerError
       })?;
+
+  match request.entity_type {
+    UserRatingEntityType::TtsModel => {
+      let token = TtsModelToken::new_from_str(&request.entity_token);
+      update_tts_model_ratings(&token, &mut mysql_connection)
+          .await
+          .map_err(|err| {
+            error!("Error updating TTS rating summary stats: {:?}", err);
+            SetUserRatingError::ServerError
+          })?;
+    }
+    _ => {
+      // TODO
+    }
+  }
 
   let response = SetUserRatingResponse {
     success: true,
