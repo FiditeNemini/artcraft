@@ -1,4 +1,5 @@
 import React, { useState, useCallback, useEffect } from "react";
+import { t } from "i18next";
 import { GetUserRating, GetUserRatingIsOk } from "@storyteller/components/src/api/user_ratings/GetUserRating";
 import { SetUserRating, SetUserRatingIsOk } from "@storyteller/components/src/api/user_ratings/SetUserRating";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -77,10 +78,13 @@ function RatingButtons(props: Props) {
     downClasses += " rated";
   }
 
+  const upvoteTooltip = t("common.RatingButtons.voice.upvote");
+  const downvoteTooltip = t("common.RatingButtons.voice.downvote");
+
   return (
     <div className="d-flex">
       <Tippy
-        content="This voice sounds good"
+        content={upvoteTooltip}
         hideOnClick
         placement="bottom"
         theme="fakeyou"
@@ -97,7 +101,7 @@ function RatingButtons(props: Props) {
       <div className="vr"></div>
 
       <Tippy
-        content="This voice sounds bad"
+        content={downvoteTooltip}
         hideOnClick
         placement="bottom"
         theme="fakeyou"
