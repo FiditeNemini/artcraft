@@ -37,8 +37,8 @@ import { TwitchTtsNotice } from "./notices/TwitchTtsNotice";
 import { PleaseFollowNotice } from "./notices/PleaseFollowNotice";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
+  faArrowRight,
   faBarsStaggered,
-  faChevronRight,
   faCompass,
   faDeleteLeft,
   faGlobe,
@@ -67,6 +67,8 @@ import {
 import { ExploreVoicesModal } from "./explore/ExploreVoicesModal";
 import { WebUrl } from "../../../../../common/WebUrl";
 import { usePrefixedDocumentTitle } from "../../../../../common/UsePrefixedDocumentTitle";
+import { RatingButtons } from "../../../_common/ratings/RatingButtons";
+import { RatingStats } from "../../../_common/ratings/RatingStats";
 
 export interface EnqueueJobResponsePayload {
   success: boolean;
@@ -326,15 +328,9 @@ function TtsModelListPage(props: Props) {
       ] || ENGLISH_LANGUAGE;
 
     directViewLink = (
-      <Link
-        to={modelLink}
-        onClick={() => {
-          Analytics.ttsClickModelDetailsLink();
-        }}
-        className="d-flex flex-column flex-lg-row gap-3 direct-view-link zi-2 align-items-lg-center mb-4"
-      >
-        <div className="flex-grow-1">
-          <p>
+      <div className="d-flex flex-column direct-view-link zi-2 mb-4">
+        <div className="d-flex flex-column gap-3 flex-lg-row">
+          <p className="flex-grow-1">
             {t("tts.TtsModelListPage.voiceDetails.voiceBy")}{" "}
             <Link
               to={profileLink}
@@ -352,16 +348,42 @@ function TtsModelListPage(props: Props) {
             </Link>{" "}
             | <FontAwesomeIcon icon={faGlobe} className="me-2" />
             {t("tts.TtsModelListPage.languageLabel")}:{" "}
-            <span className="fw-semibold">{modelLanguage.languageName}</span>{" "}
+            <span className="fw-medium">{modelLanguage.languageName}</span>{" "}
+            {/* We're not ready for use count yet. */}
             {/*| Use count:{" "}
-            <span className="fw-semibold">616400</span>*/}
+            <span className="fw-semibold">616400</span> -- the old one*/}
+            {/*| Used <span className="fw-medium">308,270 times</span> -- the new one */}
           </p>
+          <Link
+            to={modelLink}
+            onClick={() => {
+              Analytics.ttsClickModelDetailsLink();
+            }}
+            className="d-flex align-items-center"
+          >
+            <span className="fw-medium">
+              {t("tts.TtsModelListPage.voiceDetails.seeMoreDetails")}
+            </span>
+            <FontAwesomeIcon icon={faArrowRight} className="ms-2" />
+          </Link>
         </div>
-        <div className="fw-medium">
-          <span>{t("tts.TtsModelListPage.voiceDetails.seeMoreDetails")}</span>
-          <FontAwesomeIcon icon={faChevronRight} className="ms-2" />
+
+        <hr />
+
+        <div className="d-flex gap-3">
+          <RatingButtons 
+            entity_type="tts_model" 
+            entity_token={maybeSelectedTtsModel?.model_token || ""} 
+          />
+
+          <RatingStats
+            positive_votes={maybeSelectedTtsModel?.user_ratings?.positive_count || 0}
+            negative_votes={maybeSelectedTtsModel?.user_ratings?.negative_count || 0 }
+            total_votes={maybeSelectedTtsModel?.user_ratings?.total_count || 0}
+          />
+
         </div>
-      </Link>
+      </div>
     );
   }
 

@@ -62,6 +62,8 @@ import {
 } from "react-share";
 import { Analytics } from "../../../../../common/Analytics";
 import { usePrefixedDocumentTitle } from "../../../../../common/UsePrefixedDocumentTitle";
+import { RatingButtons } from "../../../_common/ratings/RatingButtons";
+import { RatingStats } from "../../../_common/ratings/RatingStats";
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -92,7 +94,10 @@ function TtsModelViewPage(props: Props) {
 
   const [notFoundState, setNotFoundState] = useState<boolean>(false);
 
-  const documentTitle = ttsModel?.title === undefined ? undefined : `${ttsModel.title} Deep Fake TTS generator`;
+  const documentTitle =
+    ttsModel?.title === undefined
+      ? undefined
+      : `${ttsModel.title} Deep Fake TTS generator`;
   usePrefixedDocumentTitle(documentTitle);
 
   const getModel = useCallback(async (token) => {
@@ -160,9 +165,7 @@ function TtsModelViewPage(props: Props) {
     listAllTtsCategories,
   ]);
 
-  const shareLink = `https://fakeyou.com${WebUrl.ttsModelPage(
-    token
-  )}`;
+  const shareLink = `https://fakeyou.com${WebUrl.ttsModelPage(token)}`;
   const shareTitle = `Use FakeYou to generate speech as ${
     ttsModel?.title || "your favorite characters"
   }!`;
@@ -255,9 +258,7 @@ function TtsModelViewPage(props: Props) {
   let creatorLink = <span />;
 
   if (!!ttsModel?.creator_display_name) {
-    const creatorUrl = WebUrl.userProfilePage(
-      ttsModel?.creator_username
-    );
+    const creatorUrl = WebUrl.userProfilePage(ttsModel?.creator_username);
     creatorLink = (
       <span>
         <Gravatar
@@ -325,10 +326,7 @@ function TtsModelViewPage(props: Props) {
 
     deleteModelButton = (
       <>
-        <Link
-          className={deleteButtonCss}
-          to={WebUrl.ttsModelDeletePage(token)}
-        >
+        <Link className={deleteButtonCss} to={WebUrl.ttsModelDeletePage(token)}>
           <FontAwesomeIcon icon={faTrash} className="me-2" />
           {deleteButtonTitle}
         </Link>
@@ -667,8 +665,22 @@ function TtsModelViewPage(props: Props) {
           <motion.h1 className="display-5 fw-bold mb-3" variants={item}>
             {title}
           </motion.h1>
+          {/* Rate Voice Model Buttons */}
+          <div className="d-flex gap-3">
+            <RatingButtons 
+              entity_type="tts_model" 
+              entity_token={ttsModel?.model_token || ""} 
+            />
+
+            <RatingStats
+              positive_votes={ttsModel?.user_ratings?.positive_count || 0}
+              negative_votes={ttsModel?.user_ratings?.negative_count || 0 }
+              total_votes={ttsModel?.user_ratings?.total_count || 0}
+            />
+
+          </div>
         </div>
-        <motion.div className="mb-4" variants={item}>
+        <motion.div className="mb-3 mt-4 pt-2" variants={item}>
           <BackLink link="/" text="Back to all models" />
         </motion.div>
       </div>

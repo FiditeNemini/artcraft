@@ -10,6 +10,7 @@ styles with important tags:
 // makes it impossible to dynamically change styles.
 //
 // Once the rollout is complete, this outer wrapper class can be removed.
+
 .fakeyou-refresh {
   p {
     font-weight: 300;
@@ -172,7 +173,7 @@ styles with important tags:
     border-radius: 5px;
     outline: none;
     font-size: 15px;
-    font-weight: 600;
+    font-weight: 500;
     padding: 10px 24px;
     z-index: 2;
     display: flex;
@@ -661,11 +662,11 @@ styles with important tags:
     background-color: lighten($panel, 4%);
     border: 1px solid #39394c;
     border-radius: 5px;
-    padding: 11px 16px;
+    padding: 16px 20px;
 
-    &:hover {
-      border-color: lighten(#39394c, 10%);
-    }
+    // &:hover {
+    //   border-color: lighten(#39394c, 10%);
+    // }
   }
 
   .input-icon-search {
@@ -781,6 +782,51 @@ styles with important tags:
 
   .result-text {
     font-size: 18px;
+  }
+
+  .btn-rate {
+    font-weight: 500;
+    font-size: 17px;
+    background-color: lighten($secondary, 4%);
+    border-radius: 50px;
+    border: none;
+    padding: 6px 20px;
+    color: rgba($white, 0.5);
+    transition: 0.1s all;
+
+    &.left {
+      border-radius: 50px 0px 0px 50px;
+    }
+
+    &.right {
+      border-radius: 0px 50px 50px 5px;
+    }
+
+    &.rated {
+      color: $white;
+      background-color: lighten($secondary, 15%);
+    }
+
+    &:hover {
+      background-color: lighten($secondary, 10%);
+    }
+  }
+
+  .rating-icon {
+    color: #ffbc39;
+
+    &.heart {
+      color: $primary;
+    }
+  }
+
+  .tippy-box[data-theme~="fakeyou"] {
+    background-color: lighten($secondary, 5%);
+    color: $white;
+  }
+
+  .tippy-box[data-theme~="fakeyou"] > .tippy-svg-arrow {
+    fill: lighten($secondary, 5%);
   }
 }
 

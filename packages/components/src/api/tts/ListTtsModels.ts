@@ -18,9 +18,17 @@ export interface TtsModelListItem {
   title: string,
   is_front_page_featured: boolean,
   is_twitch_featured: boolean,
+  user_ratings: UserRatings,
   category_tokens: string[],
   created_at: string,
   updated_at: string,
+}
+
+export interface UserRatings {
+  positive_count: number,
+  negative_count: number,
+  // Total count does not take into account "neutral" ratings.
+  total_count: number,
 }
 
 export async function ListTtsModels() : Promise<Array<TtsModelListItem>| undefined> {

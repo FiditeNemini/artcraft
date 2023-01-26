@@ -31,5 +31,6 @@
   "dependencies": {
     "react-select": "^5.7.0",
     "yarn": "^1.22.19"
-  }
+  },
+  "packageManager": "yarn@3.3.1"
 }
