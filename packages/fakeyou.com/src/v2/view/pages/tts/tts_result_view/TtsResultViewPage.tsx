@@ -23,9 +23,6 @@ import {
   faEye,
   faEyeSlash,
   faUser,
-  faThumbsUp,
-  faThumbsDown,
-  faHeart,
 } from "@fortawesome/free-solid-svg-icons";
 import { motion } from "framer-motion";
 import { container, item, panel } from "../../../../../data/animation";
@@ -442,7 +439,8 @@ function TtsResultViewPage(props: Props) {
             {headingTitle}
           </motion.h1>
           {/* Rate Result Buttons */}
-          <div className="d-flex gap-3">
+          {/* Commented out because not ready yet. */}
+          {/*<div className="d-flex gap-3">
             <div className="d-flex">
               <Tippy
                 content="I like this audio"
@@ -479,7 +477,7 @@ function TtsResultViewPage(props: Props) {
                 <span className="fw-medium">1,518 likes</span>
               </p>
             </div>
-          </div>
+          </div>*/}
 
           <motion.p className="mb-3 result-text mt-4 pt-2">
             <TextExpander text={ttsInferenceResult.raw_inference_text} />
