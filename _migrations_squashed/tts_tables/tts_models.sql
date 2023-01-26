@@ -162,6 +162,11 @@ CREATE TABLE tts_models (
   -- calculated_total_ratings_submitted_count INT(10) NOT NULL DEFAULT 0,
   -- calculated_total_uses_count BIGINT(10) NOT NULL DEFAULT 0,
 
+  -- Total count only includes "positive" and "negative" votes, not neutral ones.
+  user_ratings_total_count INT(10) UNSIGNED NOT NULL DEFAULT 0,
+  user_ratings_positive_count INT(10) UNSIGNED NOT NULL DEFAULT 0,
+  user_ratings_negative_count INT(10) UNSIGNED NOT NULL DEFAULT 0,
+
   -- ========== MODERATION DETAILS ==========
 
   -- Mods have to approve of tts models for them to show up in a public index.
