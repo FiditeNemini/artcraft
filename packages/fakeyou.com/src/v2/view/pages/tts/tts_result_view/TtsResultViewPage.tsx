@@ -40,8 +40,6 @@ import {
 import { BackLink } from "../../../_common/BackLink";
 import { TextExpander } from "../../../_common/TextExpander";
 import { usePrefixedDocumentTitle } from "../../../../../common/UsePrefixedDocumentTitle";
-import Tippy from "@tippyjs/react";
-import "tippy.js/dist/tippy.css";
 
 interface Props {
   sessionWrapper: SessionWrapper;
