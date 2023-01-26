@@ -1,4 +1,5 @@
 import React from "react";
+import { t } from "i18next";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faFrown,
@@ -26,7 +27,7 @@ function RatingStats(props: Props) {
       <div className="d-flex align-items-center">
         <FontAwesomeIcon icon={faStarExclamation} className="me-2 rating-icon" />
         <p>
-          Voice Not Yet Rated
+          {t("common.RatingStats.voice.notRated")}
         </p>
       </div>
     );
@@ -40,16 +41,16 @@ function RatingStats(props: Props) {
   let icon;
 
   if (scoreRounded >= 4.0) {
-    scoreTitle = "Voice Sounds Great";
+    scoreTitle = t("common.RatingStats.voice.score5");
     icon = faStar;
   } else if (scoreRounded >= 3.0) {
-    scoreTitle = "Voice Sounds Good";
+    scoreTitle = t("common.RatingStats.voice.score4");
     icon = faStar;
   } else if (scoreRounded >= 2.0) {
-    scoreTitle = "Voice Sounds Okay";
+    scoreTitle = t("common.RatingStats.voice.score3");
     icon = faStarHalfAlt;
   } else {
-    scoreTitle = "Voice Sounds Meh";
+    scoreTitle = t("common.RatingStats.voice.score2");
     icon = faFrown;
   }
 
@@ -57,7 +58,7 @@ function RatingStats(props: Props) {
     <div className="d-flex align-items-center">
       <FontAwesomeIcon icon={icon} className="me-2 rating-icon" />
       <p>
-        Rating: <span className="fw-medium">{scoreRounded} — {scoreTitle}</span>
+        {t("common.RatingStats.voice.rating")}: <span className="fw-medium">{scoreRounded} — {scoreTitle}</span>
       </p>
     </div>
   )
