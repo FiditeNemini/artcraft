@@ -80,6 +80,8 @@ pub struct TtsModelInfo {
 
   pub maybe_suggested_unique_bot_command: Option<String>,
 
+  pub user_ratings: UserRatingsStats,
+
   pub creator_set_visibility: Visibility,
 
   pub is_locked_from_use: bool,
@@ -101,6 +103,14 @@ pub struct CustomVocoderInfo {
   pub creator_username: String,
   pub creator_display_name: String,
   pub creator_gravatar_hash: String,
+}
+
+#[derive(Serialize)]
+pub struct UserRatingsStats {
+  pub positive_count: u32,
+  pub negative_count: u32,
+  /// Total count does not take into account "neutral" ratings.
+  pub total_count: u32,
 }
 
 /// "Moderator-only fields" that we wouldn't want to expose to ordinary users.
@@ -264,6 +274,11 @@ pub async fn get_tts_model_handler(
       is_front_page_featured: model.is_front_page_featured,
       is_twitch_featured: model.is_twitch_featured,
       maybe_suggested_unique_bot_command: model.maybe_suggested_unique_bot_command,
+      user_ratings: UserRatingsStats {
+        positive_count: model.user_ratings_positive_count,
+        negative_count: model.user_ratings_negative_count,
+        total_count: model.user_ratings_total_count,
+      },
       creator_set_visibility: model.creator_set_visibility,
       is_locked_from_use: model.is_locked_from_use,
       is_locked_from_user_modification: model.is_locked_from_user_modification,

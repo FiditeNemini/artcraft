@@ -44,6 +44,10 @@ pub struct TtsModelRecord {
 
   pub maybe_suggested_unique_bot_command: Option<String>,
 
+  pub user_ratings_positive_count: u32,
+  pub user_ratings_negative_count: u32,
+  pub user_ratings_total_count: u32, // NB: Does not include "neutral" ratings.
+
   pub creator_set_visibility: Visibility,
 
   pub is_locked_from_use: bool,
@@ -152,6 +156,9 @@ pub async fn get_tts_model_by_token_using_connection(
     is_front_page_featured: i8_to_bool(model.is_front_page_featured),
     is_twitch_featured: i8_to_bool(model.is_twitch_featured),
     maybe_suggested_unique_bot_command: model.maybe_suggested_unique_bot_command,
+    user_ratings_positive_count: model.user_ratings_positive_count,
+    user_ratings_negative_count: model.user_ratings_negative_count,
+    user_ratings_total_count: model.user_ratings_total_count,
     creator_set_visibility: Visibility::from_str(&model.creator_set_visibility)
         .unwrap_or(Visibility::Public),
     is_locked_from_use: i8_to_bool(model.is_locked_from_use),
@@ -201,6 +208,10 @@ SELECT
     tts.is_twitch_featured,
 
     tts.maybe_suggested_unique_bot_command,
+
+    tts.user_ratings_positive_count,
+    tts.user_ratings_negative_count,
+    tts.user_ratings_total_count,
 
     tts.creator_set_visibility,
 
@@ -271,6 +282,10 @@ SELECT
 
     tts.maybe_suggested_unique_bot_command,
 
+    tts.user_ratings_positive_count,
+    tts.user_ratings_negative_count,
+    tts.user_ratings_total_count,
+
     tts.creator_set_visibility,
 
     tts.is_locked_from_use,
@@ -336,6 +351,10 @@ struct InternalTtsModelRecordRaw {
   pub is_twitch_featured: i8,
 
   pub maybe_suggested_unique_bot_command: Option<String>,
+
+  pub user_ratings_positive_count: u32,
+  pub user_ratings_negative_count: u32,
+  pub user_ratings_total_count: u32, // NB: Does not include "neutral" ratings.
 
   pub creator_set_visibility: String,
 

@@ -31,6 +31,10 @@ pub struct TtsModelRecordForList {
 
   pub maybe_suggested_unique_bot_command: Option<String>,
 
+  pub user_ratings_positive_count: u32,
+  pub user_ratings_negative_count: u32,
+  pub user_ratings_total_count: u32, // NB: Does not include "neutral" ratings.
+
   pub created_at: DateTime<Utc>,
   pub updated_at: DateTime<Utc>,
 }
@@ -94,6 +98,9 @@ pub async fn list_tts_models_with_connection(
         is_front_page_featured: i8_to_bool(model.is_front_page_featured),
         is_twitch_featured: i8_to_bool(model.is_twitch_featured),
         maybe_suggested_unique_bot_command: model.maybe_suggested_unique_bot_command,
+        user_ratings_positive_count: model.user_ratings_positive_count,
+        user_ratings_negative_count: model.user_ratings_negative_count,
+        user_ratings_total_count: model.user_ratings_total_count,
         created_at: model.created_at,
         updated_at: model.updated_at,
       }
@@ -126,6 +133,9 @@ SELECT
     tts.is_front_page_featured,
     tts.is_twitch_featured,
     tts.maybe_suggested_unique_bot_command,
+    tts.user_ratings_positive_count,
+    tts.user_ratings_negative_count,
+    tts.user_ratings_total_count,
     tts.created_at,
     tts.updated_at
 FROM tts_models as tts
@@ -157,6 +167,9 @@ SELECT
     tts.is_front_page_featured,
     tts.is_twitch_featured,
     tts.maybe_suggested_unique_bot_command,
+    tts.user_ratings_positive_count,
+    tts.user_ratings_negative_count,
+    tts.user_ratings_total_count,
     tts.created_at,
     tts.updated_at
 FROM tts_models as tts
@@ -199,6 +212,9 @@ SELECT
     tts.is_front_page_featured,
     tts.is_twitch_featured,
     tts.maybe_suggested_unique_bot_command,
+    tts.user_ratings_positive_count,
+    tts.user_ratings_negative_count,
+    tts.user_ratings_total_count,
     tts.created_at,
     tts.updated_at
 FROM tts_models as tts
@@ -233,6 +249,9 @@ SELECT
     tts.is_front_page_featured,
     tts.is_twitch_featured,
     tts.maybe_suggested_unique_bot_command,
+    tts.user_ratings_positive_count,
+    tts.user_ratings_negative_count,
+    tts.user_ratings_total_count,
     tts.created_at,
     tts.updated_at
 FROM tts_models as tts
@@ -272,6 +291,10 @@ struct InternalRawTtsModelRecordForList {
   pub is_twitch_featured: i8, // bool
 
   pub maybe_suggested_unique_bot_command: Option<String>,
+
+  pub user_ratings_positive_count: u32,
+  pub user_ratings_negative_count: u32,
+  pub user_ratings_total_count: u32, // NB: Does not include "neutral" ratings.
 
   pub created_at: DateTime<Utc>,
   pub updated_at: DateTime<Utc>,

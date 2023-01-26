@@ -35,12 +35,22 @@ pub struct TtsModelRecordForResponse {
   pub is_twitch_featured: bool,
   pub maybe_suggested_unique_bot_command: Option<String>,
 
+  pub user_ratings: UserRatingsStats,
+
   /// Category assignments
   /// From non-deleted, mod-approved categories only
   pub category_tokens: HashSet<String>,
 
   pub created_at: DateTime<Utc>,
   pub updated_at: DateTime<Utc>,
+}
+
+#[derive(Serialize, Clone)]
+pub struct UserRatingsStats {
+  pub positive_count: u32,
+  pub negative_count: u32,
+  /// Total count does not take into account "neutral" ratings.
+  pub total_count: u32,
 }
 
 #[derive(Serialize)]
@@ -161,6 +171,11 @@ async fn get_all_models(mysql_connection: &mut PoolConnection<MySql>) -> AnyhowR
           is_front_page_featured: model.is_front_page_featured,
           is_twitch_featured: model.is_twitch_featured,
           maybe_suggested_unique_bot_command: model.maybe_suggested_unique_bot_command,
+          user_ratings: UserRatingsStats {
+            positive_count: model.user_ratings_positive_count,
+            negative_count: model.user_ratings_negative_count,
+            total_count: model.user_ratings_total_count,
+          },
           category_tokens: model_categories_map.model_to_category_tokens.get(&model_token)
               .map(|hash| hash.clone())
               .unwrap_or(HashSet::new()),
