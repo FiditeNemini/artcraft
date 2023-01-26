@@ -2,3 +2,8 @@
 [context.production]
 environment = { GENERATE_SOURCEMAP = "false" }
 
+[build.environment]
+# NB: We updated yarn locally with `yarn set version berry`, and this was done to pick up
+# the ability to pull fontawesome pro from their private registry. Prior to this we were 
+# using yarn 1.x.
+YARN_VERSION = "3.3.1"
