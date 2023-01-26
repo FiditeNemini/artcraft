@@ -24,12 +24,8 @@ interface Props {
  */
 function RatingButtons(props: Props) {
   const [userRatingValue, setUserRatingValue] = useState<string|undefined>(undefined);
-  const [userRatingIsLoaded, setUserRatingIsLoaded] = useState<boolean>(false);
 
   const loadRating = useCallback(async () => {
-    if (userRatingIsLoaded) {
-      return; // Already queried.
-    }
     const request = {
       entity_type: props.entity_type,
       entity_token: props.entity_token,
@@ -38,12 +34,9 @@ function RatingButtons(props: Props) {
     if (GetUserRatingIsOk(rating)) {
       let ratingValue = rating.maybe_rating_value || undefined;
       setUserRatingValue(ratingValue);
-      setUserRatingIsLoaded(true);
     }
   }, [
-    userRatingIsLoaded, 
     setUserRatingValue, 
-    setUserRatingIsLoaded, 
     props.entity_type, 
     props.entity_token,
   ]);
@@ -67,14 +60,13 @@ function RatingButtons(props: Props) {
     const result = await SetUserRating(request);
     if (SetUserRatingIsOk(result)) {
       setUserRatingValue(ratingValue);
-      setUserRatingIsLoaded(false);
       loadRating();
     }
   };
 
   useEffect(() => {
     loadRating();
-  }, [loadRating]);
+  }, [loadRating, props.entity_token]);
 
   let upClasses = "btn-rate left";
   let downClasses = "btn-rate right";
