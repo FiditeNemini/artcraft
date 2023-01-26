@@ -18,8 +18,8 @@ import {
   GetW2lTemplateIsOk,
   W2lTemplate,
   W2lTemplateLookupError,
-} from "../../../../api/w2l/GetW2lTemplate";
-import { GetW2lTemplateUseCount } from "../../../../api/w2l/GetW2lTemplateUseCount";
+} from "@storyteller/components/src/api/w2l/GetW2lTemplate";
+import { GetW2lTemplateUseCount } from "@storyteller/components/src/api/w2l/GetW2lTemplateUseCount";
 import { BackLink } from "../../../_common/BackLink";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEdit, faTrash } from "@fortawesome/free-solid-svg-icons";

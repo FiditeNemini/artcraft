@@ -5,7 +5,7 @@ import { Gravatar } from '@storyteller/components/src/elements/Gravatar';
 import { formatDistance } from 'date-fns';
 import { WebUrl } from '../../../../../common/WebUrl';
 import { BackLink } from '../../../_common/BackLink';
-import { GetPendingW2lTemplates, GetPendingW2lTemplatesIsOk, PendingW2lTemplatesEntryForList } from '../../../../api/moderation/GetPendingW2lTemplates';
+import { GetPendingW2lTemplates, GetPendingW2lTemplatesIsOk, PendingW2lTemplatesEntryForList } from '@storyteller/components/src/api/moderation/w2l/GetPendingW2lTemplates';
 import { PhotoVideoIcon } from '../../../_icons/PhotoVideoIcon';
 
 interface Props {

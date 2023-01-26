@@ -34,7 +34,7 @@ import {
   GetUserByUsernameIsOk,
   User,
   UserLookupError,
-} from "../../../../api/user/GetUserByUsername";
+} from "@storyteller/components/src/api/user/GetUserByUsername";
 import { format } from "date-fns";
 import { WebUrl } from "../../../../../common/WebUrl";
 import { container, item, panel } from "../../../../../data/animation";

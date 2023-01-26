@@ -9,7 +9,7 @@ import {
   GetW2lTemplate,
   GetW2lTemplateIsOk,
   W2lTemplate,
-} from "../../../../api/w2l/GetW2lTemplate";
+} from "@storyteller/components/src/api/w2l/GetW2lTemplate";
 import { BackLink } from "../../../_common/BackLink";
 import { motion } from "framer-motion";
 import { container, item, panel } from "../../../../../data/animation";

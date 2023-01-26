@@ -28,7 +28,7 @@ import {
   ListTtsCategories,
   ListTtsCategoriesIsError,
   ListTtsCategoriesIsOk,
-} from "../../../../api/category/ListTtsCategories";
+} from "@storyteller/components/src/api/category/ListTtsCategories";
 import { TtsCategoryType } from "../../../../../AppWrapper";
 import { SelectSearch } from "./search/SelectSearch";
 import { LanguageNotice } from "./notices/LanguageNotice";

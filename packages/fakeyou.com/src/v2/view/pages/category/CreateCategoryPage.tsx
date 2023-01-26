@@ -7,7 +7,7 @@ import {
   CreateCategoryIsError,
   CreateCategoryIsSuccess,
   CreateCategoryRequest,
-} from "../../../api/category/CreateCategory";
+} from "@storyteller/components/src/api/category/CreateCategory";
 import { BackLink } from "../../_common/BackLink";
 import { WebUrl } from "../../../../common/WebUrl";
 import { motion } from "framer-motion";

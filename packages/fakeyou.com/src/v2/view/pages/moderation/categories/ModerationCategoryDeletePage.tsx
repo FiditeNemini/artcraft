@@ -1,11 +1,11 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { BackLink } from '../../../_common/BackLink';
-import { Category, GetCategory, GetCategoryIsError, GetCategoryIsOk } from '../../../../api/category/GetCategory';
+import { Category, GetCategory, GetCategoryIsError, GetCategoryIsOk } from '@storyteller/components/src/api/category/GetCategory';
 import { WebUrl } from '../../../../../common/WebUrl';
 import { Link, useHistory } from 'react-router-dom';
 import { SessionWrapper } from '@storyteller/components/src/session/SessionWrapper';
 import { useParams } from 'react-router-dom';
-import { SetCategoryDeletionState, SetCategoryDeletionStateIsError, SetCategoryDeletionStateIsSuccess } from '../../../../api/moderation/category/SetCategoryDeletionState';
+import { SetCategoryDeletionState, SetCategoryDeletionStateIsError, SetCategoryDeletionStateIsSuccess } from '@storyteller/components/src/api/moderation/category/SetCategoryDeletionState';
 
 interface Props {
   sessionWrapper: SessionWrapper,

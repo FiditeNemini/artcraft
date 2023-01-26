@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { SessionWrapper } from '@storyteller/components/src/session/SessionWrapper';
 import { WebUrl } from '../../../../../common/WebUrl';
 import { BackLink } from '../../../_common/BackLink';
-import { GetVoiceInventoryStats, GetVoiceInventoryStatsIsOk } from '../../../../api/moderation/GetVoiceInventoryStats';
+import { GetVoiceInventoryStats, GetVoiceInventoryStatsIsOk } from '@storyteller/components/src/api/moderation/stats/GetVoiceInventoryStats';
 
 interface Props {
   sessionWrapper: SessionWrapper,

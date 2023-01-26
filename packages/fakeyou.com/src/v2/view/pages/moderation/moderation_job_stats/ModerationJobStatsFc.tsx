@@ -5,11 +5,11 @@ import { BackLink } from "../../../_common/BackLink";
 import {
   GetTtsInferenceStats,
   GetTtsInferenceStatsIsOk,
-} from "../../../../api/moderation/GetTtsInferenceStats";
+} from "@storyteller/components/src/api/moderation/stats/GetTtsInferenceStats";
 import {
   GetW2lInferenceStats,
   GetW2lInferenceStatsIsOk,
-} from "../../../../api/moderation/GetW2lInferenceStats";
+} from "@storyteller/components/src/api/moderation/stats/GetW2lInferenceStats";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBomb, faRedo } from "@fortawesome/free-solid-svg-icons";
 import {

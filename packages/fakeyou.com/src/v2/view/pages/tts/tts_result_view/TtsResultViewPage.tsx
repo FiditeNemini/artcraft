@@ -13,7 +13,7 @@ import {
   GetTtsResultIsOk,
   TtsResult,
   TtsResultLookupError,
-} from "../../../../api/tts/GetTtsResult";
+} from "@storyteller/components/src/api/tts/GetTtsResult";
 import { TtsResultAudioPlayerFc } from "./TtsResultAudioPlayerFc";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {

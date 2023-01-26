@@ -7,8 +7,8 @@ import {
   GetW2lTemplate,
   GetW2lTemplateIsOk,
   W2lTemplate,
-} from "../../../../api/w2l/GetW2lTemplate";
-import { GetW2lTemplateUseCount } from "../../../../api/w2l/GetW2lTemplateUseCount";
+} from "@storyteller/components/src/api/w2l/GetW2lTemplate";
+import { GetW2lTemplateUseCount } from "@storyteller/components/src/api/w2l/GetW2lTemplateUseCount";
 import { BackLink } from "../../../_common/BackLink";
 import { motion } from "framer-motion";
 import { container, item, panel } from "../../../../../data/animation";

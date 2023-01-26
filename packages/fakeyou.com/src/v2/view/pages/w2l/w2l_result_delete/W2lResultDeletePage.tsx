@@ -7,7 +7,7 @@ import {
   GetW2lResult,
   GetW2lResultIsOk,
   W2lResult,
-} from "../../../../api/w2l/GetW2lResult";
+} from "@storyteller/components/src/api/w2l/GetW2lResult";
 import { motion } from "framer-motion";
 import { container, item, panel } from "../../../../../data/animation";
 

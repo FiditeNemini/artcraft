@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { TtsCategory } from "./v2/api/category/ListTtsCategories";
+import { TtsCategory } from "@storyteller/components/src/api/category/ListTtsCategories";
 import { TtsModelListItem } from "@storyteller/components/src/api/tts/ListTtsModels";
 import { App } from "./App";
 import { GetComputedTtsCategoryAssignmentsSuccessResponse } from "@storyteller/components/src/api/category/GetComputedTtsCategoryAssignments";

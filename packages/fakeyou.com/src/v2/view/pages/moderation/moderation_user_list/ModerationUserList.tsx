@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { SessionWrapper } from '@storyteller/components/src/session/SessionWrapper';
 import { Gravatar } from '@storyteller/components/src/elements/Gravatar';
-import { GetUserList, GetUserListIsOk, UserForList } from '../../../../api/moderation/GetUserList';
+import { GetUserList, GetUserListIsOk, UserForList } from '@storyteller/components/src/api/moderation/user/GetUserList';
 import { formatDistance } from 'date-fns';
 import { WebUrl } from '../../../../../common/WebUrl';
 import { BackLink } from '../../../_common/BackLink';

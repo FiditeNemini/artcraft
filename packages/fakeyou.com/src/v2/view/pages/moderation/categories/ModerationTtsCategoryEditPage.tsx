@@ -1,12 +1,12 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { BackLink } from '../../../_common/BackLink';
-import { Category, GetCategory, GetCategoryIsError, GetCategoryIsOk } from '../../../../api/category/GetCategory';
+import { Category, GetCategory, GetCategoryIsError, GetCategoryIsOk } from '@storyteller/components/src/api/category/GetCategory';
 import { WebUrl } from '../../../../../common/WebUrl';
 import { Link, useHistory } from 'react-router-dom';
 import { SessionWrapper } from '@storyteller/components/src/session/SessionWrapper';
 import { useParams } from 'react-router-dom';
-import { EditCategory, EditCategoryIsError, EditCategoryIsSuccess, EditCategoryRequest } from '../../../../api/moderation/category/EditCategory';
-import { ListTtsCategories, ListTtsCategoriesIsError, ListTtsCategoriesIsOk, TtsCategory } from '../../../../api/category/ListTtsCategories';
+import { EditCategory, EditCategoryIsError, EditCategoryIsSuccess, EditCategoryRequest } from '@storyteller/components/src/api/moderation/category/EditCategory';
+import { ListTtsCategories, ListTtsCategoriesIsError, ListTtsCategoriesIsOk, TtsCategory } from '@storyteller/components/src/api/category/ListTtsCategories';
 import { CategoryBreadcrumb } from '../../../_common/CategoryBreadcrumb';
 
 interface Props {

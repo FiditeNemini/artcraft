@@ -13,7 +13,7 @@ import {
   GetW2lResultIsOk,
   W2lResult,
   W2lResultLookupError,
-} from "../../../../api/w2l/GetW2lResult";
+} from "@storyteller/components/src/api/w2l/GetW2lResult";
 import { MetaTags } from "../../../../../common/MetaTags";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faDownload, faEdit, faTrash } from "@fortawesome/free-solid-svg-icons";

@@ -3,7 +3,7 @@ import {
   AssignTtsCategory,
   AssignTtsCategoryIsError,
   AssignTtsCategoryIsOk,
-} from "../../../../api/category/AssignTtsCategory";
+} from "@storyteller/components/src/api/category/AssignTtsCategory";
 import { BackLink } from "../../../_common/BackLink";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { WebUrl } from "../../../../../common/WebUrl";
@@ -19,13 +19,13 @@ import {
   ListTtsCategoriesIsError,
   ListTtsCategoriesIsOk,
   TtsCategory,
-} from "../../../../api/category/ListTtsCategories";
+} from "@storyteller/components/src/api/category/ListTtsCategories";
 import {
   ListTtsCategoriesForModel,
   ListTtsCategoriesForModelIsError,
   ListTtsCategoriesForModelIsOk,
   TtsModelCategory,
-} from "../../../../api/category/ListTtsCategoriesForModel";
+} from "@storyteller/components/src/api/category/ListTtsCategoriesForModel";
 import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
 import {
   faExclamationCircle,

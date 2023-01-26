@@ -3,7 +3,7 @@ import { SessionWrapper } from '@storyteller/components/src/session/SessionWrapp
 import { Gravatar } from '@storyteller/components/src/elements/Gravatar';
 import { WebUrl } from '../../../../../common/WebUrl';
 import { BackLink } from '../../../_common/BackLink';
-import { ListTtsCategoriesForModeration, ListTtsCategoriesForModerationIsError, ListTtsCategoriesForModerationIsOk, ListTtsCategoriesTriState, ModerationTtsCategory } from '../../../../api/moderation/category/ListTtsCategoriesForModeration';
+import { ListTtsCategoriesForModeration, ListTtsCategoriesForModerationIsError, ListTtsCategoriesForModerationIsOk, ListTtsCategoriesTriState, ModerationTtsCategory } from '@storyteller/components/src/api/moderation/category/ListTtsCategoriesForModeration';
 import { Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBox, faBoxOpen, faLock } from '@fortawesome/free-solid-svg-icons';

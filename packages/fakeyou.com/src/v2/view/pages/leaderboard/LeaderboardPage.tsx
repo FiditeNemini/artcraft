@@ -10,7 +10,7 @@ import {
   Leaderboard,
   LeaderboardEntryForList,
   LeaderboardLookupError,
-} from "../../../api/misc/GetLeaderboard";
+} from "@storyteller/components/src/api/leaderboard/GetLeaderboard";
 import { DiscordLink2 } from "@storyteller/components/src/elements/DiscordLink2";
 import { motion } from "framer-motion";
 import { container, item, panel } from "../../../../data/animation";

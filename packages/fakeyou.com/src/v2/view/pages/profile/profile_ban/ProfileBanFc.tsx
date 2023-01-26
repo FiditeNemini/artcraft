@@ -7,7 +7,7 @@ import {
   GetUserByUsername,
   GetUserByUsernameIsOk,
   User,
-} from "../../../../api/user/GetUserByUsername";
+} from "@storyteller/components/src/api/user/GetUserByUsername";
 import { BackLink } from "../../../_common/BackLink";
 import { motion } from "framer-motion";
 import { container, item, panel } from "../../../../../data/animation";

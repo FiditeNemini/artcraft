@@ -20,20 +20,20 @@ import {
   TtsModel,
   TtsModelLookupError,
 } from "@storyteller/components/src/api/tts/GetTtsModel";
-import { GetTtsModelUseCount } from "../../../../api/tts/GetTtsModelUseCount";
+import { GetTtsModelUseCount } from "@storyteller/components/src/api/tts/GetTtsModelUseCount";
 import { BackLink } from "../../../_common/BackLink";
 import {
   ListTtsCategoriesForModel,
   ListTtsCategoriesForModelIsError,
   ListTtsCategoriesForModelIsOk,
   TtsModelCategory,
-} from "../../../../api/category/ListTtsCategoriesForModel";
+} from "@storyteller/components/src/api/category/ListTtsCategoriesForModel";
 import {
   ListTtsCategories,
   ListTtsCategoriesIsError,
   ListTtsCategoriesIsOk,
   TtsCategory,
-} from "../../../../api/category/ListTtsCategories";
+} from "@storyteller/components/src/api/category/ListTtsCategories";
 import { CategoryBreadcrumb } from "../../../_common/CategoryBreadcrumb";
 import { DiscordLink } from "@storyteller/components/src/elements/DiscordLink";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";

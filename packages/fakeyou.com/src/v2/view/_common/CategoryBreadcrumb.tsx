@@ -6,9 +6,9 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React from "react";
 import { Link } from "react-router-dom";
 import { WebUrl } from "../../../common/WebUrl";
-import { TtsCategory } from "../../api/category/ListTtsCategories";
-import { TtsModelCategory } from "../../api/category/ListTtsCategoriesForModel";
-import { ModerationTtsCategory } from "../../api/moderation/category/ListTtsCategoriesForModeration";
+import { TtsCategory } from "@storyteller/components/src/api/category/ListTtsCategories";
+import { TtsModelCategory } from "@storyteller/components/src/api/category/ListTtsCategoriesForModel";
+import { ModerationTtsCategory } from "@storyteller/components/src/api/moderation/category/ListTtsCategoriesForModeration";
 
 export interface Props {
   // This is a list of categories in order: [grandparent/root, parent, child/leaf]
