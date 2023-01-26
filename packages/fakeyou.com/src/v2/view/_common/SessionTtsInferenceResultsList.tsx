@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { t } from "i18next";
 import { Trans } from "react-i18next";
 import { Link } from "react-router-dom";
@@ -17,6 +17,11 @@ import { SessionSubscriptionsWrapper } from "@storyteller/components/src/session
 import { Analytics } from "../../../common/Analytics";
 import { SessionTtsAudioPlayer } from "./SessionTtsAudioPlayer";
 import { WebUrl } from "../../../common/WebUrl";
+import {
+  GetPendingTtsJobCount,
+  GetPendingTtsJobCountIsOk,
+  GetPendingTtsJobCountSuccessResponse,
+} from "@storyteller/components/src/api/tts/GetPendingTtsJobCount";
 
 interface Props {
   ttsInferenceJobs: Array<TtsInferenceJob>;
@@ -24,6 +29,29 @@ interface Props {
 }
 
 function SessionTtsInferenceResultList(props: Props) {
+  const [pendingTtsJobs, setPendingTtsJobs] =
+    useState<GetPendingTtsJobCountSuccessResponse>({
+      success: true,
+      pending_job_count: 0,
+      cache_time: new Date(0), // NB: Epoch is used for vector clock's initial state
+    });
+
+  useEffect(() => {
+    const fetch = async () => {
+      const response = await GetPendingTtsJobCount();
+      if (GetPendingTtsJobCountIsOk(response)) {
+        if (
+          response.cache_time.getTime() > pendingTtsJobs.cache_time.getTime()
+        ) {
+          setPendingTtsJobs(response);
+        }
+      }
+    };
+    const interval = setInterval(async () => fetch(), 15000);
+    fetch();
+    return () => clearInterval(interval);
+  }, [pendingTtsJobs]);
+
   let results: Array<JSX.Element> = [];
 
   props.ttsInferenceJobs.forEach((job) => {
@@ -54,12 +82,16 @@ function SessionTtsInferenceResultList(props: Props) {
         case JobState.DEAD:
           cssStyle = "alert alert-danger mb-0";
           // TODO(bt,2023-01-23): Translate when I can test it
-          stateDescription = t("common.SessionTtsInferenceResults.progress.dead");
+          stateDescription = t(
+            "common.SessionTtsInferenceResults.progress.dead"
+          );
           break;
         case JobState.COMPLETE_SUCCESS:
           cssStyle = "message is-success mb-0";
           // Not sure why we're here instead of other branch!
-          stateDescription = t("common.SessionTtsInferenceResults.progress.success");
+          stateDescription = t(
+            "common.SessionTtsInferenceResults.progress.success"
+          );
           break;
       }
 
@@ -138,9 +170,7 @@ function SessionTtsInferenceResultList(props: Props) {
         <h5 className="fw-semibold">
           {t("common.SessionTtsInferenceResults.noResults.title")}
         </h5>
-        <p>
-          {t("common.SessionTtsInferenceResults.noResults.subtitle")}
-        </p>
+        <p>{t("common.SessionTtsInferenceResults.noResults.subtitle")}</p>
       </div>
     </div>
   );
@@ -163,9 +193,8 @@ function SessionTtsInferenceResultList(props: Props) {
           variants={sessionItem}
         >
           <FontAwesomeIcon icon={faClock} className="me-2" />
-          
           <Trans i18nKey="common.SessionTtsInferenceResults.premium.ad">
-            Don't want to wait? Step to the front of the line with a{" "}
+            Don't want to wait? Step to the back of the line with a{" "}
             <Link
               to={WebUrl.pricingPageWithReferer("nowait")}
               onClick={() => {
@@ -175,8 +204,9 @@ function SessionTtsInferenceResultList(props: Props) {
             >
               FakeYou membership.
             </Link>
-          </Trans>
-
+          </Trans>{" "}
+          (TTS Queued:{" "}
+          <span className="text-red">~{pendingTtsJobs.pending_job_count}</span>)
         </motion.div>
       </div>
     );
