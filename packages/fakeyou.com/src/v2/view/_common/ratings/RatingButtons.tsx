@@ -14,7 +14,15 @@ interface Props {
   entity_token: string;
 }
 
-function RatingBlock(props: Props) {
+/**
+ * This is a reusable component that can be put on several different pages.
+ * 
+ * It requires the entity type ("tts_model", "tts_result", "w2l_template", "w2l_result", etc.)
+ * and the entity token, and it will be able to fetch a user's previous vote and change it.
+ * 
+ * This button component manages all of its own state and API calls.
+ */
+function RatingButtons(props: Props) {
   const [userRatingValue, setUserRatingValue] = useState<string|undefined>(undefined);
   const [userRatingIsLoaded, setUserRatingIsLoaded] = useState<boolean>(false);
 
@@ -114,4 +122,4 @@ function RatingBlock(props: Props) {
   )
 }
 
-export { RatingBlock };
+export { RatingButtons };

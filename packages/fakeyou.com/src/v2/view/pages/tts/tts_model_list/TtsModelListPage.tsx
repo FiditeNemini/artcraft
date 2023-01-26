@@ -42,9 +42,6 @@ import {
   faCompass,
   faDeleteLeft,
   faGlobe,
-  faStar,
-  faThumbsDown,
-  faThumbsUp,
   faVolumeHigh,
   faVolumeUp,
 } from "@fortawesome/free-solid-svg-icons";
@@ -70,9 +67,8 @@ import {
 import { ExploreVoicesModal } from "./explore/ExploreVoicesModal";
 import { WebUrl } from "../../../../../common/WebUrl";
 import { usePrefixedDocumentTitle } from "../../../../../common/UsePrefixedDocumentTitle";
-import Tippy from "@tippyjs/react";
-import "tippy.js/dist/tippy.css";
-import { RatingBlock } from "../../../_common/RatingBlock";
+import { RatingButtons } from "../../../_common/ratings/RatingButtons";
+import { RatingStats } from "../../../_common/ratings/RatingStats";
 
 export interface EnqueueJobResponsePayload {
   success: boolean;
@@ -371,45 +367,21 @@ function TtsModelListPage(props: Props) {
             <FontAwesomeIcon icon={faArrowRight} className="ms-2" />
           </Link>
         </div>
-        <hr />
-
-        <RatingBlock entity_type="tts_model" entity_token={maybeSelectedTtsModel?.model_token || ""} />
 
         <hr />
+
         <div className="d-flex gap-3">
-          <div className="d-flex">
-            <Tippy
-              content="This voice sounds good"
-              hideOnClick
-              placement="bottom"
-              theme="fakeyou"
-              arrow={false}
-            >
-              <button className="btn-rate left rated">
-                <FontAwesomeIcon icon={faThumbsUp} />
-              </button>
-            </Tippy>
+          <RatingButtons 
+            entity_type="tts_model" 
+            entity_token={maybeSelectedTtsModel?.model_token || ""} 
+          />
 
-            <div className="vr"></div>
+          <RatingStats
+            positive_votes={maybeSelectedTtsModel?.user_ratings?.positive_count || 0}
+            negative_votes={maybeSelectedTtsModel?.user_ratings?.negative_count || 0 }
+            total_votes={maybeSelectedTtsModel?.user_ratings?.total_count || 0}
+          />
 
-            <Tippy
-              content="This voice sounds bad"
-              hideOnClick
-              placement="bottom"
-              theme="fakeyou"
-              arrow={false}
-            >
-              <button className="btn-rate right">
-                <FontAwesomeIcon icon={faThumbsDown} />
-              </button>
-            </Tippy>
-          </div>
-          <div className="d-flex align-items-center">
-            <FontAwesomeIcon icon={faStar} className="me-2 rating-icon" />
-            <p>
-              Rating: <span className="fw-medium">4.5 — Great</span>
-            </p>
-          </div>
         </div>
       </div>
     );

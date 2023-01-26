@@ -46,9 +46,6 @@ import {
   faVolumeHigh,
   faDeleteLeft,
   faBarsStaggered,
-  faThumbsUp,
-  faThumbsDown,
-  faStar,
 } from "@fortawesome/free-solid-svg-icons";
 import { motion } from "framer-motion";
 import { container, item, panel } from "../../../../../data/animation";
@@ -65,8 +62,8 @@ import {
 } from "react-share";
 import { Analytics } from "../../../../../common/Analytics";
 import { usePrefixedDocumentTitle } from "../../../../../common/UsePrefixedDocumentTitle";
-import Tippy from "@tippyjs/react";
-import "tippy.js/dist/tippy.css";
+import { RatingButtons } from "../../../_common/ratings/RatingButtons";
+import { RatingStats } from "../../../_common/ratings/RatingStats";
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -670,39 +667,17 @@ function TtsModelViewPage(props: Props) {
           </motion.h1>
           {/* Rate Voice Model Buttons */}
           <div className="d-flex gap-3">
-            <div className="d-flex">
-              <Tippy
-                content="This voice sounds good"
-                hideOnClick
-                placement="bottom"
-                theme="fakeyou"
-                arrow={false}
-              >
-                <button className="btn-rate left rated">
-                  <FontAwesomeIcon icon={faThumbsUp} />
-                </button>
-              </Tippy>
+            <RatingButtons 
+              entity_type="tts_model" 
+              entity_token={ttsModel?.model_token || ""} 
+            />
 
-              <div className="vr"></div>
+            <RatingStats
+              positive_votes={ttsModel?.user_ratings?.positive_count || 0}
+              negative_votes={ttsModel?.user_ratings?.negative_count || 0 }
+              total_votes={ttsModel?.user_ratings?.total_count || 0}
+            />
 
-              <Tippy
-                content="This voice sounds bad"
-                hideOnClick
-                placement="bottom"
-                theme="fakeyou"
-                arrow={false}
-              >
-                <button className="btn-rate right">
-                  <FontAwesomeIcon icon={faThumbsDown} />
-                </button>
-              </Tippy>
-            </div>
-            <div className="d-flex align-items-center">
-              <FontAwesomeIcon icon={faStar} className="me-2 rating-icon" />
-              <p>
-                Rating: <span className="fw-medium">4.5 — Great</span>
-              </p>
-            </div>
           </div>
         </div>
         <motion.div className="mb-3 mt-4 pt-2" variants={item}>

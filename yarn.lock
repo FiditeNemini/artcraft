@@ -7061,6 +7061,11 @@ fresh@0.5.2:
   resolved "https://registry.yarnpkg.com/fresh/-/fresh-0.5.2.tgz#3d8cadd90d976569fa835ab1f8e4b23a105605a7"
   integrity sha1-PYyt2Q2XZWn6g1qx+OSyOhBWBac=
 
+from-exponential@^1.1.1:
+  version "1.1.1"
+  resolved "https://registry.yarnpkg.com/from-exponential/-/from-exponential-1.1.1.tgz#41caff748d22e9c195713802cdac31acbe4b1b83"
+  integrity sha512-VBE7f5OVnYwdgB3LHa+Qo29h8qVpxhVO9Trlc+AWm+/XNAgks1tAwMFHb33mjeiof77GglsJzeYF7OqXrROP/A==
+
 from2@^2.1.0:
   version "2.3.0"
   resolved "https://registry.yarnpkg.com/from2/-/from2-2.3.0.tgz#8bfb5502bde4a4d36cfdeea007fcca21d7e382af"
@@ -11247,6 +11252,14 @@ pretty-format@^27.0.0, pretty-format@^27.0.2, pretty-format@^27.4.6:
     ansi-styles "^5.0.0"
     react-is "^17.0.1"
 
+pretty-num@^0.5.2:
+  version "0.5.2"
+  resolved "https://registry.yarnpkg.com/pretty-num/-/pretty-num-0.5.2.tgz#0b6ad1e648c440ba4c8d6a3a26445f2d52c57296"
+  integrity sha512-79Rzmw+BmoOGLpfnhjZ+B+y1dMR6+4GxNsPEl4NrDsvYAO1sdzocaus5QB6fuhy1rkyrHoN7/y4bD0axNgdN0A==
+  dependencies:
+    from-exponential "^1.1.1"
+    thousands "^1.0.1"
+
 process-nextick-args@~2.0.0:
   version "2.0.1"
   resolved "https://registry.yarnpkg.com/process-nextick-args/-/process-nextick-args-2.0.1.tgz#7820d9b16120cc55ca9ae7792680ae7dba6d7fe2"
@@ -13283,6 +13296,11 @@ text-table@^0.2.0:
   version "0.2.0"
   resolved "https://registry.yarnpkg.com/text-table/-/text-table-0.2.0.tgz#7f5ee823ae805207c00af2df4a84ec3fcfa570b4"
   integrity sha1-f17oI66AUgfACvLfSoTsP8+lcLQ=
+
+thousands@^1.0.1:
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/thousands/-/thousands-1.0.1.tgz#59eb5b6d179ab20a42d9d1bdd05c2ca07fbc2d94"
+  integrity sha512-Di+gdTXx6Xm6ST/XJqqp1Y7N+SnA1WAfrjABCnVvFi3ao6cqkV/wMfxQXJaxJ0qw/L05GVjPP6DKigdkCwnGNg==
 
 three@0.138.3:
   version "0.138.3"

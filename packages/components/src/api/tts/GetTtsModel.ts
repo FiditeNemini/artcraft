@@ -20,6 +20,7 @@ export interface TtsModel {
   is_front_page_featured: boolean,
   is_twitch_featured: boolean,
   maybe_suggested_unique_bot_command: string | null,
+  user_ratings: UserRatings,
   creator_set_visibility: string,
   updatable_slug: string,
   created_at: string,
@@ -34,6 +35,13 @@ export interface CustomVocoderFields {
   creator_username: string,
   creator_display_name: string,
   creator_gravatar_hash: string,
+}
+
+export interface UserRatings {
+  positive_count: number,
+  negative_count: number,
+  // Total count does not take into account "neutral" ratings.
+  total_count: number,
 }
 
 export interface TtsModelModeratorFields {
