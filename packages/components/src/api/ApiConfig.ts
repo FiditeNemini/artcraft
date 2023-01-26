@@ -14,6 +14,11 @@ export interface ListW2lInferenceResultsForUserArgs {
   limit?: number;
 }
 
+export interface GetUserRatingArgs {
+  entity_type: string,
+  entity_token: string,
+}
+
 enum Domain {
   Localhost,
   JungleHorse,
@@ -420,6 +425,16 @@ class ApiConfig {
 
   getRetrievalJobStatus(jobToken: string): string {
     return `${this.getScheme()}://${this.getNewApiHost()}/retrieval/job_status/${jobToken}`;
+  }
+
+  // =============== User Ratings ===============
+
+  getUserRating(args: GetUserRatingArgs): string {
+    return `${this.getScheme()}://${this.getNewApiHost()}/v1/user_rating/view/${args.entity_type}/${args.entity_token}`;
+  }
+
+  setUserRating(): string {
+    return `${this.getScheme()}://${this.getNewApiHost()}/v1/user_rating/rate`;
   }
 
   // =============== Storyteller-specific ===============
