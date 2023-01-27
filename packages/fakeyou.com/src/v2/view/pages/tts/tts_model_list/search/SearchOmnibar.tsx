@@ -37,8 +37,6 @@ export function SearchOmnibar(props: Props) {
     setIsOpen(!isOpen);
   };
 
-  const canSearchVoices = !isOpen; // TODO: Perhaps only set false on mobile.
-
   return (
     <>
       <div
@@ -88,7 +86,7 @@ export function SearchOmnibar(props: Props) {
               maybeSelectedTtsModel={props.maybeSelectedTtsModel}
               setMaybeSelectedTtsModel={props.setMaybeSelectedTtsModel}
               selectedTtsLanguageScope={props.selectedTtsLanguageScope}
-              canSearchVoices={canSearchVoices}
+              isExploreTrayOpen={isOpen}
             />
           </div>
 

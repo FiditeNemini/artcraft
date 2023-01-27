@@ -25,7 +25,7 @@ interface Props {
 
   selectedTtsLanguageScope: string;
 
-  canSearchVoices: boolean;
+  isExploreTrayOpen: boolean;
 }
 
 export function ScopedVoiceModelOptions(props: Props) {
@@ -111,9 +111,17 @@ export function ScopedVoiceModelOptions(props: Props) {
     };
   }
 
+  const numberVoices = options.length;
+
+  const canSearchVoices = !props.isExploreTrayOpen // Always allow search when try is closed
+      || numberVoices > 30 // Always allow search when there are over 30 voices
+      || window.innerWidth >= 1000; // Always allow search when on desktop
+
   let select;
 
-  if (props.canSearchVoices) {
+  // TODO: Cleanup
+
+  if (canSearchVoices) {
     select = (
       <Select
         value={selectedOption} // Controlled components use "value" instead of "defaultValue".
