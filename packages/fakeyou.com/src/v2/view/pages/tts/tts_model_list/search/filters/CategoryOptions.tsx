@@ -5,11 +5,11 @@ import {
   faTags,
 } from "@fortawesome/free-solid-svg-icons";
 import { TtsModelListItem } from "@storyteller/components/src/api/tts/ListTtsModels";
-import { TtsCategoryType } from "../../../../../../AppWrapper";
+import { TtsCategoryType } from "../../../../../../../AppWrapper";
 //import { useTranslation } from "react-i18next";
 import Select from "react-select";
-import { SearchFieldClass } from "../search/SearchFieldClass";
-import { Analytics } from "../../../../../../common/Analytics";
+import { SearchFieldClass } from "../SearchFieldClass";
+import { Analytics } from "../../../../../../../common/Analytics";
 import { t } from "i18next";
 
 interface Props {

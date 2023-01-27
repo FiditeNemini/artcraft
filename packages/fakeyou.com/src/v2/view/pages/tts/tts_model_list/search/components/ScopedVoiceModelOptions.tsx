@@ -2,12 +2,12 @@ import React from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faMicrophone } from "@fortawesome/free-solid-svg-icons";
 import { TtsModelListItem } from "@storyteller/components/src/api/tts/ListTtsModels";
-import { TtsCategoryType } from "../../../../../../AppWrapper";
-import { Trans } from "react-i18next";
+import { TtsCategoryType } from "../../../../../../../AppWrapper";
 import Select, { createFilter } from "react-select";
-import { SearchFieldClass } from "../search/SearchFieldClass";
-import { FastReactSelectOption } from "../../../../_common/FastReactSelectOption";
-import { Analytics } from "../../../../../../common/Analytics";
+import { SearchFieldClass } from "../SearchFieldClass";
+import { FastReactSelectOption } from "../../../../../_common/react_select/FastReactSelectOption";
+import { Analytics } from "../../../../../../../common/Analytics";
+import { FixedSingleValueSelectOption } from "../../../../../_common/react_select/FixedSingleValueSelectOption";
 
 interface Props {
   allTtsCategories: TtsCategoryType[];
@@ -24,6 +24,8 @@ interface Props {
   setMaybeSelectedTtsModel: (maybeSelectedTtsModel: TtsModelListItem) => void;
 
   selectedTtsLanguageScope: string;
+
+  canSearchVoices: boolean;
 }
 
 export function ScopedVoiceModelOptions(props: Props) {
@@ -88,8 +90,6 @@ export function ScopedVoiceModelOptions(props: Props) {
     };
   }
 
-  const voiceCount = options.length;
-
   let isLoading = false;
 
   if (props.allTtsModels.length === 0) {
@@ -111,40 +111,56 @@ export function ScopedVoiceModelOptions(props: Props) {
     };
   }
 
+  let select;
+
+  if (props.canSearchVoices) {
+    select = (
+      <Select
+        value={selectedOption} // Controlled components use "value" instead of "defaultValue".
+        options={options}
+        classNames={SearchFieldClass}
+        onChange={handleChange}
+        onMenuOpen={() => { Analytics.ttsOpenPrimaryVoiceSelectMenu() } }
+        isLoading={isLoading}
+        isSearchable={true}
+        // NB: The following settings improve upon performance. 
+        // See: https://github.com/JedWatson/react-select/issues/3128
+        filterOption={createFilter({ignoreAccents: false})}
+        components={{SingleValue: FixedSingleValueSelectOption, Option: FastReactSelectOption} as any}
+      />
+    );
+  } else {
+    select = (
+      <Select
+        value={selectedOption}
+        options={options}
+        classNames={SearchFieldClass}
+        onChange={handleChange}
+        onMenuOpen={() => {
+          Analytics.ttsOpenScopedVoiceSelectMenu();
+        }}
+        isLoading={isLoading}
+        // On mobile, we don't want the onscreen keyboard to take up half the UI.
+        autoFocus={false}
+        isSearchable={false}
+        // NB: The following settings improve upon performance.
+        // See: https://github.com/JedWatson/react-select/issues/3128
+        filterOption={createFilter({ ignoreAccents: false })}
+        components={{ Option: FastReactSelectOption } as any}
+      />
+    );
+  }
+
   return (
     <>
       <div className="col">
-        <label className="sub-title">
-          <Trans
-            i18nKey="tts.TtsModelListPage.form.voicesLabel"
-            count={voiceCount}
-          >
-            Voice ({voiceCount} to choose from)
-          </Trans>
-        </label>
-
         <div className="input-icon-search">
           <span className="form-control-feedback">
             <FontAwesomeIcon icon={faMicrophone} />
           </span>
 
-          <Select
-            value={selectedOption}
-            options={options}
-            classNames={SearchFieldClass}
-            onChange={handleChange}
-            onMenuOpen={() => {
-              Analytics.ttsOpenScopedVoiceSelectMenu();
-            }}
-            isLoading={isLoading}
-            // On mobile, we don't want the onscreen keyboard to take up half the UI.
-            autoFocus={false}
-            isSearchable={false}
-            // NB: The following settings improve upon performance.
-            // See: https://github.com/JedWatson/react-select/issues/3128
-            filterOption={createFilter({ ignoreAccents: false })}
-            components={{ Option: FastReactSelectOption } as any}
-          />
+          {select}
+
         </div>
       </div>
     </>

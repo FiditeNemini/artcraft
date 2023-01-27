@@ -1,11 +1,10 @@
 import React from "react";
 import { faEraser } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { LanguageOptions } from "./LanguageOptions";
-import { TtsCategoryType } from "../../../../../../AppWrapper";
+import { LanguageOptions } from "../filters/LanguageOptions";
+import { TtsCategoryType } from "../../../../../../../AppWrapper";
 import { TtsModelListItem } from "@storyteller/components/src/api/tts/ListTtsModels";
-import { CategoryOptions } from "./CategoryOptions";
-import { ScopedVoiceModelOptions } from "./ScopedVoiceModelOptions";
+import { CategoryOptions } from "../filters/CategoryOptions";
 import { t } from "i18next";
 
 interface Props {
@@ -29,7 +28,7 @@ interface Props {
   setSelectedTtsLanguageScope: (selectedTtsLanguageScope: string) => void;
 }
 
-export function ExploreVoicesModal(props: Props) {
+export function ExploreVoicesTray(props: Props) {
   const {
     allTtsCategories,
     allTtsCategoriesByTokenMap,
@@ -131,20 +130,6 @@ export function ExploreVoicesModal(props: Props) {
             selectedTtsLanguageScope={props.selectedTtsLanguageScope}
           />
         </div>
-      </div>
-      <div className="mt-4">
-        <ScopedVoiceModelOptions
-          allTtsCategories={props.allTtsCategories}
-          allTtsModels={props.allTtsModels}
-          allTtsCategoriesByTokenMap={props.allTtsCategoriesByTokenMap}
-          allTtsModelsByTokenMap={props.allTtsModelsByTokenMap}
-          ttsModelsByCategoryToken={props.ttsModelsByCategoryToken}
-          dropdownCategories={props.dropdownCategories}
-          selectedCategories={props.selectedCategories}
-          maybeSelectedTtsModel={props.maybeSelectedTtsModel}
-          setMaybeSelectedTtsModel={props.setMaybeSelectedTtsModel}
-          selectedTtsLanguageScope={props.selectedTtsLanguageScope}
-        />
       </div>
     </div>
   );

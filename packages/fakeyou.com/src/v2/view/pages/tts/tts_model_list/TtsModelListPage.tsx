@@ -30,7 +30,6 @@ import {
   ListTtsCategoriesIsOk,
 } from "@storyteller/components/src/api/category/ListTtsCategories";
 import { TtsCategoryType } from "../../../../../AppWrapper";
-import { SelectSearch } from "./search/SelectSearch";
 import { LanguageNotice } from "./notices/LanguageNotice";
 import { Language } from "@storyteller/components/src/i18n/Language";
 import { TwitchTtsNotice } from "./notices/TwitchTtsNotice";
@@ -39,8 +38,6 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faArrowRight,
   faBarsStaggered,
-  faChevronDown,
-  faChevronUp,
   faDeleteLeft,
   faGlobe,
   faVolumeHigh,
@@ -69,7 +66,7 @@ import { WebUrl } from "../../../../../common/WebUrl";
 import { usePrefixedDocumentTitle } from "../../../../../common/UsePrefixedDocumentTitle";
 import { RatingButtons } from "../../../_common/ratings/RatingButtons";
 import { RatingStats } from "../../../_common/ratings/RatingStats";
-import { ExploreVoicesModal } from "./explore/ExploreVoicesModal";
+import { SearchOmnibar } from "./search/SearchOmnibar";
 
 export interface EnqueueJobResponsePayload {
   success: boolean;
@@ -149,12 +146,6 @@ function TtsModelListPage(props: Props) {
     }, 2000);
     return () => clearTimeout(timeout);
   }, []);
-
-  const [isOpen, setIsOpen] = useState(false);
-
-  const handleClickExplore = () => {
-    setIsOpen(!isOpen);
-  };
 
   let {
     setTtsModels,
@@ -522,82 +513,29 @@ function TtsModelListPage(props: Props) {
                 onSubmit={handleFormSubmit}
               >
                 {/* Explore Rollout */}
-                <div
-                  className={`sliding-content ${
-                    isOpen ? "open pb-4" : "closed"
-                  }`}
-                >
-                  <ExploreVoicesModal
-                    allTtsCategories={props.allTtsCategories}
-                    allTtsModels={props.ttsModels}
-                    allTtsCategoriesByTokenMap={
-                      props.allTtsCategoriesByTokenMap
-                    }
-                    allTtsModelsByTokenMap={props.allTtsModelsByTokenMap}
-                    ttsModelsByCategoryToken={props.ttsModelsByCategoryToken}
-                    dropdownCategories={props.dropdownCategories}
-                    setDropdownCategories={props.setDropdownCategories}
-                    selectedCategories={props.selectedCategories}
-                    setSelectedCategories={props.setSelectedCategories}
-                    maybeSelectedTtsModel={props.maybeSelectedTtsModel}
-                    setMaybeSelectedTtsModel={props.setMaybeSelectedTtsModel}
-                    selectedTtsLanguageScope={props.selectedTtsLanguageScope}
-                    setSelectedTtsLanguageScope={
-                      props.setSelectedTtsLanguageScope
-                    }
-                  />
-                </div>
 
-                <div className="pb-4">
-                  <div className="d-flex gap-2">
-                    <label className="sub-title">
-                      {t("tts.TtsModelListPage.form.searchBarLabel")}
-                    </label>
-                    {/*<a href="/" className="ms-1">
-                      <FontAwesomeIcon icon={faShuffle} />
-                    </a>*/}
-                  </div>
+                <SearchOmnibar
+                  allTtsCategories={props.allTtsCategories}
+                  allTtsModels={props.ttsModels}
+                  allTtsCategoriesByTokenMap={props.allTtsCategoriesByTokenMap}
+                  allTtsModelsByTokenMap={props.allTtsModelsByTokenMap}
+                  ttsModelsByCategoryToken={props.ttsModelsByCategoryToken}
+                  dropdownCategories={props.dropdownCategories}
+                  setDropdownCategories={props.setDropdownCategories}
+                  selectedCategories={props.selectedCategories}
+                  setSelectedCategories={props.setSelectedCategories}
+                  maybeSelectedTtsModel={props.maybeSelectedTtsModel}
+                  setMaybeSelectedTtsModel={props.setMaybeSelectedTtsModel}
+                  selectedTtsLanguageScope={props.selectedTtsLanguageScope}
+                  setSelectedTtsLanguageScope={props.setSelectedTtsLanguageScope}
+                />
 
-                  <div className="d-flex flex-column flex-lg-row gap-3 zi-2">
-                    <div className="flex-grow-1">
-                      <SelectSearch
-                        allTtsCategories={props.allTtsCategories}
-                        allTtsModels={props.ttsModels}
-                        allTtsModelsByTokenMap={props.allTtsModelsByTokenMap}
-                        dropdownCategories={props.dropdownCategories}
-                        setDropdownCategories={props.setDropdownCategories}
-                        selectedCategories={props.selectedCategories}
-                        setSelectedCategories={props.setSelectedCategories}
-                        maybeSelectedTtsModel={props.maybeSelectedTtsModel}
-                        setMaybeSelectedTtsModel={
-                          props.setMaybeSelectedTtsModel
-                        }
-                        selectedTtsLanguageScope={
-                          props.selectedTtsLanguageScope
-                        }
-                      />
-                    </div>
-
-                    {}
-
-                    <button
-                      onClick={handleClickExplore}
-                      // onClick={() => {
-                      //   Analytics.ttsOpenExploreVoicesModal();
-                      // }}
-                      className="btn btn-primary rounded-50"
-                      type="button"
-                    >
-                      <FontAwesomeIcon
-                        icon={isOpen ? faChevronUp : faChevronDown}
-                        className="me-2"
-                      />
-                      {t(
-                        "tts.TtsModelListPage.exploreModal.exploreModalOpenButton"
-                      )}
-                    </button>
-                  </div>
-                </div>
+                {/*
+                
+                
+                EXPLORE OMNIBAR GOES HERE TODO
+                
+                */}
 
                 {directViewLink}
 
