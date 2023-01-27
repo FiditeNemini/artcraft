@@ -39,7 +39,8 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faArrowRight,
   faBarsStaggered,
-  faCompass,
+  faChevronDown,
+  faChevronUp,
   faDeleteLeft,
   faGlobe,
   faVolumeHigh,
@@ -64,11 +65,11 @@ import {
   AVAILABLE_TTS_LANGUAGE_CATEGORY_MAP,
   ENGLISH_LANGUAGE,
 } from "../../../../../_i18n/AvailableLanguageMap";
-import { ExploreVoicesModal } from "./explore/ExploreVoicesModal";
 import { WebUrl } from "../../../../../common/WebUrl";
 import { usePrefixedDocumentTitle } from "../../../../../common/UsePrefixedDocumentTitle";
 import { RatingButtons } from "../../../_common/ratings/RatingButtons";
 import { RatingStats } from "../../../_common/ratings/RatingStats";
+import { ExploreVoicesModal } from "./explore/ExploreVoicesModal";
 
 export interface EnqueueJobResponsePayload {
   success: boolean;
@@ -148,6 +149,14 @@ function TtsModelListPage(props: Props) {
     }, 2000);
     return () => clearTimeout(timeout);
   }, []);
+
+  const [isSliding, setIsSliding] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
+
+  const handleClick = () => {
+    setIsSliding(!isSliding);
+    setIsOpen(!isOpen);
+  };
 
   let {
     setTtsModels,
@@ -326,19 +335,19 @@ function TtsModelListPage(props: Props) {
         props.maybeSelectedTtsModel
           .ietf_primary_language_subtag as AvailableTtsLanguageKey
       ] || ENGLISH_LANGUAGE;
-    
+
     let ratingButtons = <></>;
     if (props.sessionWrapper.isLoggedIn()) {
       ratingButtons = (
-        <RatingButtons 
-          entity_type="tts_model" 
-          entity_token={maybeSelectedTtsModel?.model_token || ""} 
+        <RatingButtons
+          entity_type="tts_model"
+          entity_token={maybeSelectedTtsModel?.model_token || ""}
         />
       );
     }
 
     directViewLink = (
-      <div className="d-flex flex-column direct-view-link zi-2 mb-4">
+      <div className="d-flex flex-column direct-view-link mb-4">
         <div className="d-flex flex-column gap-3 flex-lg-row">
           <p className="flex-grow-1">
             {t("tts.TtsModelListPage.voiceDetails.voiceBy")}{" "}
@@ -384,11 +393,14 @@ function TtsModelListPage(props: Props) {
           {ratingButtons}
 
           <RatingStats
-            positive_votes={maybeSelectedTtsModel?.user_ratings?.positive_count || 0}
-            negative_votes={maybeSelectedTtsModel?.user_ratings?.negative_count || 0 }
+            positive_votes={
+              maybeSelectedTtsModel?.user_ratings?.positive_count || 0
+            }
+            negative_votes={
+              maybeSelectedTtsModel?.user_ratings?.negative_count || 0
+            }
             total_votes={maybeSelectedTtsModel?.user_ratings?.total_count || 0}
           />
-
         </div>
       </div>
     );
@@ -508,10 +520,10 @@ function TtsModelListPage(props: Props) {
           <div className="py-6">
             <div className="d-flex gap-4">
               <form
-                className="w-100 d-flex flex-column gap-4"
+                className="w-100 d-flex flex-column"
                 onSubmit={handleFormSubmit}
               >
-                <div>
+                <div className="pb-4">
                   <div className="d-flex gap-2">
                     <label className="sub-title">
                       {t("tts.TtsModelListPage.form.searchBarLabel")}
@@ -542,15 +554,17 @@ function TtsModelListPage(props: Props) {
                     </div>
 
                     <button
-                      onClick={() => {
-                        Analytics.ttsOpenExploreVoicesModal();
-                      }}
+                      onClick={handleClick}
+                      // onClick={() => {
+                      //   Analytics.ttsOpenExploreVoicesModal();
+                      // }}
                       className="btn btn-primary rounded-50"
-                      data-bs-toggle="modal"
-                      data-bs-target="#exploreModal"
                       type="button"
                     >
-                      <FontAwesomeIcon icon={faCompass} className="me-2" />
+                      <FontAwesomeIcon
+                        icon={isOpen ? faChevronUp : faChevronDown}
+                        className="me-2"
+                      />
                       {t(
                         "tts.TtsModelListPage.exploreModal.exploreModalOpenButton"
                       )}
@@ -559,23 +573,32 @@ function TtsModelListPage(props: Props) {
                 </div>
 
                 {/* Explore Modal */}
-                <ExploreVoicesModal
-                  allTtsCategories={props.allTtsCategories}
-                  allTtsModels={props.ttsModels}
-                  allTtsCategoriesByTokenMap={props.allTtsCategoriesByTokenMap}
-                  allTtsModelsByTokenMap={props.allTtsModelsByTokenMap}
-                  ttsModelsByCategoryToken={props.ttsModelsByCategoryToken}
-                  dropdownCategories={props.dropdownCategories}
-                  setDropdownCategories={props.setDropdownCategories}
-                  selectedCategories={props.selectedCategories}
-                  setSelectedCategories={props.setSelectedCategories}
-                  maybeSelectedTtsModel={props.maybeSelectedTtsModel}
-                  setMaybeSelectedTtsModel={props.setMaybeSelectedTtsModel}
-                  selectedTtsLanguageScope={props.selectedTtsLanguageScope}
-                  setSelectedTtsLanguageScope={
-                    props.setSelectedTtsLanguageScope
-                  }
-                />
+
+                <div
+                  className={`sliding-content ${
+                    isSliding ? "open pb-4 mt-2 mb-3" : "closed"
+                  }`}
+                >
+                  <ExploreVoicesModal
+                    allTtsCategories={props.allTtsCategories}
+                    allTtsModels={props.ttsModels}
+                    allTtsCategoriesByTokenMap={
+                      props.allTtsCategoriesByTokenMap
+                    }
+                    allTtsModelsByTokenMap={props.allTtsModelsByTokenMap}
+                    ttsModelsByCategoryToken={props.ttsModelsByCategoryToken}
+                    dropdownCategories={props.dropdownCategories}
+                    setDropdownCategories={props.setDropdownCategories}
+                    selectedCategories={props.selectedCategories}
+                    setSelectedCategories={props.setSelectedCategories}
+                    maybeSelectedTtsModel={props.maybeSelectedTtsModel}
+                    setMaybeSelectedTtsModel={props.setMaybeSelectedTtsModel}
+                    selectedTtsLanguageScope={props.selectedTtsLanguageScope}
+                    setSelectedTtsLanguageScope={
+                      props.setSelectedTtsLanguageScope
+                    }
+                  />
+                </div>
 
                 {directViewLink}
 

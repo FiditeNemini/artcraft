@@ -828,6 +828,23 @@ styles with important tags:
   .tippy-box[data-theme~="fakeyou"] > .tippy-svg-arrow {
     fill: lighten($secondary, 5%);
   }
+
+  .sliding-content {
+    overflow: hidden;
+    opacity: 0;
+    height: 0;
+    transition-property: none !important;
+    transition: all 0.05s !important;
+    transition-timing-function: ease !important;
+  }
+  .sliding-content.open {
+    overflow: visible;
+    opacity: 1;
+    height: 100%;
+    transition-property: none !important;
+    transition: all 0.2s !important;
+    transition-timing-function: ease !important;
+  }
 }
 
 select {
