@@ -1,9 +1,5 @@
 import React from "react";
-import {
-  faArrowRight,
-  faCompass,
-  faEraser,
-} from "@fortawesome/free-solid-svg-icons";
+import { faEraser } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { LanguageOptions } from "./LanguageOptions";
 import { TtsCategoryType } from "../../../../../../AppWrapper";
@@ -90,107 +86,65 @@ export function ExploreVoicesModal(props: Props) {
   };
 
   return (
-    <div
-      className="modal fade"
-      id="exploreModal"
-      aria-labelledby="ModalLabel"
-      aria-hidden="true"
-    >
-      <div className="modal-dialog modal-xl modal-fullscreen-lg-down modal-dialog-centered">
-        <div className="modal-content">
-          <div className="modal-header p-3">
-            <h5 className="modal-title fw-semibold" id="ModalLabel">
-              <FontAwesomeIcon icon={faCompass} className="me-3" />
-              {t("tts.TtsModelListPage.exploreModal.exploreModalTitle")}
-            </h5>
+    <div>
+      <div className="row gx-3 gy-3">
+        <div className="col-12 col-lg-3 input-icon-search">
+          <label className="sub-title">
+            {t("tts.TtsModelListPage.exploreModal.languageLabel")}
+          </label>
+          <LanguageOptions
+            selectedTtsLanguageScope={props.selectedTtsLanguageScope}
+            setSelectedTtsLanguageScope={props.setSelectedTtsLanguageScope}
+          />
+        </div>
+
+        <div className="col-12 col-md-12 col-lg-9 input-icon-search">
+          <div className="d-flex align-items-start">
+            <label className="sub-title flex-grow-1">
+              {t("tts.TtsModelListPage.exploreModal.categoryLabel")}
+            </label>
             <button
+              className="ms-3 fw-medium btn-link"
+              onClick={() => {
+                handleChangeCategory(0, "*");
+              }}
               type="button"
-              className="btn-close"
-              data-bs-dismiss="modal"
-              aria-label="Close"
-            ></button>
-          </div>
-
-          <div className="modal-body p-3 p-lg-4">
-            <div className="row gx-3 gy-3">
-              <div className="col-12 col-lg-3 input-icon-search">
-                <label className="sub-title">
-                  {t("tts.TtsModelListPage.exploreModal.languageLabel")}
-                </label>
-                <LanguageOptions
-                  selectedTtsLanguageScope={props.selectedTtsLanguageScope}
-                  setSelectedTtsLanguageScope={
-                    props.setSelectedTtsLanguageScope
-                  }
-                />
-              </div>
-
-              <div className="col-12 col-md-12 col-lg-9 input-icon-search">
-                <div className="d-flex align-items-start">
-                  <label className="sub-title flex-grow-1">
-                    {t("tts.TtsModelListPage.exploreModal.categoryLabel")}
-                  </label>
-                  <button
-                    className="ms-3 fw-medium btn-link"
-                    onClick={() => {
-                      handleChangeCategory(0, "*");
-                    }}
-                  >
-                    <FontAwesomeIcon icon={faEraser} className="me-2" />
-                    {t("tts.TtsModelListPage.exploreModal.clearCategoryFilterButton")}
-                  </button>
-                </div>
-
-                <CategoryOptions
-                  allTtsCategories={props.allTtsCategories}
-                  allTtsModels={props.allTtsModels}
-                  allTtsCategoriesByTokenMap={props.allTtsCategoriesByTokenMap}
-                  allTtsModelsByTokenMap={props.allTtsModelsByTokenMap}
-                  ttsModelsByCategoryToken={props.ttsModelsByCategoryToken}
-                  dropdownCategories={props.dropdownCategories}
-                  setDropdownCategories={props.setDropdownCategories}
-                  selectedCategories={props.selectedCategories}
-                  setSelectedCategories={props.setSelectedCategories}
-                  maybeSelectedTtsModel={props.maybeSelectedTtsModel}
-                  setMaybeSelectedTtsModel={props.setMaybeSelectedTtsModel}
-                  handleChangeCategory={handleChangeCategory}
-                  selectedTtsLanguageScope={props.selectedTtsLanguageScope}
-                />
-              </div>
-            </div>
-
-            <br />
-
-            <div className="row gx-3 gy-3">
-              <ScopedVoiceModelOptions
-                allTtsCategories={props.allTtsCategories}
-                allTtsModels={props.allTtsModels}
-                allTtsCategoriesByTokenMap={props.allTtsCategoriesByTokenMap}
-                allTtsModelsByTokenMap={props.allTtsModelsByTokenMap}
-                ttsModelsByCategoryToken={props.ttsModelsByCategoryToken}
-                dropdownCategories={props.dropdownCategories}
-                selectedCategories={props.selectedCategories}
-                maybeSelectedTtsModel={props.maybeSelectedTtsModel}
-                setMaybeSelectedTtsModel={props.setMaybeSelectedTtsModel}
-                selectedTtsLanguageScope={props.selectedTtsLanguageScope}
-              />
-            </div>
-          </div>
-
-          <br />
-
-          <div className="p-4 w-100">
-            <button
-              type="button"
-              className="btn btn-primary w-100"
-              data-bs-dismiss="modal"
-              aria-label="Close"
             >
-              {t("tts.TtsModelListPage.exploreModal.useThisVoiceButton")}
-              <FontAwesomeIcon icon={faArrowRight} className="ms-2" />
+              <FontAwesomeIcon icon={faEraser} className="me-2" />
+              {t("tts.TtsModelListPage.exploreModal.clearCategoryFilterButton")}
             </button>
           </div>
+
+          <CategoryOptions
+            allTtsCategories={props.allTtsCategories}
+            allTtsModels={props.allTtsModels}
+            allTtsCategoriesByTokenMap={props.allTtsCategoriesByTokenMap}
+            allTtsModelsByTokenMap={props.allTtsModelsByTokenMap}
+            ttsModelsByCategoryToken={props.ttsModelsByCategoryToken}
+            dropdownCategories={props.dropdownCategories}
+            setDropdownCategories={props.setDropdownCategories}
+            selectedCategories={props.selectedCategories}
+            setSelectedCategories={props.setSelectedCategories}
+            maybeSelectedTtsModel={props.maybeSelectedTtsModel}
+            setMaybeSelectedTtsModel={props.setMaybeSelectedTtsModel}
+            handleChangeCategory={handleChangeCategory}
+            selectedTtsLanguageScope={props.selectedTtsLanguageScope}
+          />
         </div>
+      </div>
+      <div className="mt-4">
+        <ScopedVoiceModelOptions
+          allTtsCategories={props.allTtsCategories}
+          allTtsModels={props.allTtsModels}
+          allTtsCategoriesByTokenMap={props.allTtsCategoriesByTokenMap}
+          allTtsModelsByTokenMap={props.allTtsModelsByTokenMap}
+          ttsModelsByCategoryToken={props.ttsModelsByCategoryToken}
+          dropdownCategories={props.dropdownCategories}
+          selectedCategories={props.selectedCategories}
+          maybeSelectedTtsModel={props.maybeSelectedTtsModel}
+          setMaybeSelectedTtsModel={props.setMaybeSelectedTtsModel}
+          selectedTtsLanguageScope={props.selectedTtsLanguageScope}
+        />
       </div>
     </div>
   );

@@ -1,8 +1,6 @@
 import React from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faMicrophone,
-} from "@fortawesome/free-solid-svg-icons";
+import { faMicrophone } from "@fortawesome/free-solid-svg-icons";
 import { TtsModelListItem } from "@storyteller/components/src/api/tts/ListTtsModels";
 import { TtsCategoryType } from "../../../../../../AppWrapper";
 import { Trans } from "react-i18next";
@@ -25,7 +23,7 @@ interface Props {
   maybeSelectedTtsModel?: TtsModelListItem;
   setMaybeSelectedTtsModel: (maybeSelectedTtsModel: TtsModelListItem) => void;
 
-  selectedTtsLanguageScope: string,
+  selectedTtsLanguageScope: string;
 }
 
 export function ScopedVoiceModelOptions(props: Props) {
@@ -44,17 +42,16 @@ export function ScopedVoiceModelOptions(props: Props) {
     if (maybeNewTtsModel !== undefined) {
       props.setMaybeSelectedTtsModel(maybeNewTtsModel);
     }
-  }
+  };
 
   const leafiestCategory = selectedCategories[selectedCategories.length - 1];
 
   let leafiestCategoryModels: Array<TtsModelListItem> = [];
 
   if (leafiestCategory !== undefined) {
-    leafiestCategoryModels =
-      Array.from(
-        ttsModelsByCategoryToken.get(leafiestCategory.category_token) || 
-          new Set());
+    leafiestCategoryModels = Array.from(
+      ttsModelsByCategoryToken.get(leafiestCategory.category_token) || new Set()
+    );
   } else {
     leafiestCategoryModels = Array.from(new Set(allTtsModels));
   }
@@ -65,16 +62,20 @@ export function ScopedVoiceModelOptions(props: Props) {
       if (props.selectedTtsLanguageScope === "*") {
         return true; // NB: Sentinel value of "*" means all languages.
       }
-      return ttsModel.ietf_primary_language_subtag === props.selectedTtsLanguageScope;
+      return (
+        ttsModel.ietf_primary_language_subtag === props.selectedTtsLanguageScope
+      );
     })
     .map((ttsModel) => {
       return {
         label: ttsModel.title,
         value: ttsModel.model_token,
-      }
+      };
     });
 
-  let selectedOption = options.find((option) => option.value === maybeSelectedTtsModel?.model_token);
+  let selectedOption = options.find(
+    (option) => option.value === maybeSelectedTtsModel?.model_token
+  );
 
   if (selectedOption === undefined && options.length > 0) {
     // NB: We shouldn't select the first item in the list since that won't update the currently
@@ -84,9 +85,9 @@ export function ScopedVoiceModelOptions(props: Props) {
     selectedOption = {
       label: "Select voice...",
       value: "*",
-    }
+    };
   }
- 
+
   const voiceCount = options.length;
 
   let isLoading = false;
@@ -101,13 +102,13 @@ export function ScopedVoiceModelOptions(props: Props) {
     selectedOption = {
       label: "Loading...",
       value: "*",
-    }
+    };
   } else if (options.length === 0) {
     // NB: Perhaps the user has refined their search to be too narrow (langauge + category)
     selectedOption = {
       label: "No results (remove some filters)",
       value: "*",
-    }
+    };
   }
 
   return (
@@ -132,18 +133,20 @@ export function ScopedVoiceModelOptions(props: Props) {
             options={options}
             classNames={SearchFieldClass}
             onChange={handleChange}
-            onMenuOpen={() => { Analytics.ttsOpenScopedVoiceSelectMenu() } }
+            onMenuOpen={() => {
+              Analytics.ttsOpenScopedVoiceSelectMenu();
+            }}
             isLoading={isLoading}
             // On mobile, we don't want the onscreen keyboard to take up half the UI.
             autoFocus={false}
             isSearchable={false}
-            // NB: The following settings improve upon performance. 
+            // NB: The following settings improve upon performance.
             // See: https://github.com/JedWatson/react-select/issues/3128
-            filterOption={createFilter({ignoreAccents: false})}
-            components={{Option: FastReactSelectOption} as any}
-            />
+            filterOption={createFilter({ ignoreAccents: false })}
+            components={{ Option: FastReactSelectOption } as any}
+          />
         </div>
       </div>
     </>
-  )
+  );
 }
