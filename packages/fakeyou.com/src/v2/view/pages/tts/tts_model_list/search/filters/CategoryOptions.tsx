@@ -8,7 +8,7 @@ import { TtsModelListItem } from "@storyteller/components/src/api/tts/ListTtsMod
 import { TtsCategoryType } from "../../../../../../../AppWrapper";
 //import { useTranslation } from "react-i18next";
 import Select from "react-select";
-import { SearchFieldClass } from "../SearchFieldClass";
+import { SearchFieldClass } from "../components/SearchFieldClass";
 import { Analytics } from "../../../../../../../common/Analytics";
 import { t } from "i18next";
 

@@ -2,7 +2,7 @@ import React from "react";
 import { faGlobe } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Select from "react-select";
-import { SearchFieldClass } from "../SearchFieldClass";
+import { SearchFieldClass } from "../components/SearchFieldClass";
 import { AVAILABLE_TTS_LANGUAGE_CATEGORY_MAP } from "../../../../../../../_i18n/AvailableLanguageMap";
 import { Analytics } from "../../../../../../../common/Analytics";
 import { t } from "i18next";
