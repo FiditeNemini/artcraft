@@ -114,7 +114,7 @@ export function ScopedVoiceModelOptions(props: Props) {
   const numberVoices = options.length;
 
   const canSearchVoices = !props.isExploreTrayOpen // Always allow search when try is closed
-      || numberVoices > 30 // Always allow search when there are over 30 voices
+      || numberVoices > 100 // Always allow search when there are over 100 voices
       || window.innerWidth >= 1000; // Always allow search when on desktop
 
   let select;

@@ -37,7 +37,7 @@ export function LanguageOptions(props: Props) {
 
   languageOptions = [
     {
-      label: `${t("tts.TtsModelListPage.exploreModal.allLanguagesOptionText")} 🌐`,
+      label: `${t("tts.TtsModelListPage.exploreModal.allLanguagesOptionText")}`,
       value: '*',
     },
     ...languageOptions,
@@ -56,6 +56,7 @@ export function LanguageOptions(props: Props) {
         value={currentValue}
         options={languageOptions}
         classNames={SearchFieldClass}
+        isSearchable={false}
         onChange={handleChange}
         onMenuOpen={() => { Analytics.ttsOpenCategorySelectMenu() } }
       />
