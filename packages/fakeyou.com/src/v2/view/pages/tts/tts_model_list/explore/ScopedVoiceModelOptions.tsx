@@ -114,6 +114,15 @@ export function ScopedVoiceModelOptions(props: Props) {
   return (
     <>
       <div className="col">
+        <label className="sub-title">
+          <Trans
+            i18nKey="tts.TtsModelListPage.form.voicesLabel"
+            count={voiceCount}
+          >
+            Voice ({voiceCount} to choose from)
+          </Trans>
+        </label>
+
         <div className="input-icon-search">
           <span className="form-control-feedback">
             <FontAwesomeIcon icon={faMicrophone} />
