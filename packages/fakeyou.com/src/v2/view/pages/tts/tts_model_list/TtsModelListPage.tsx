@@ -150,11 +150,9 @@ function TtsModelListPage(props: Props) {
     return () => clearTimeout(timeout);
   }, []);
 
-  const [isSliding, setIsSliding] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
 
-  const handleClick = () => {
-    setIsSliding(!isSliding);
+  const handleClickExplore = () => {
     setIsOpen(!isOpen);
   };
 
@@ -523,60 +521,10 @@ function TtsModelListPage(props: Props) {
                 className="w-100 d-flex flex-column"
                 onSubmit={handleFormSubmit}
               >
-                <div className="pb-4">
-                  <div className="d-flex gap-2">
-                    <label className="sub-title">
-                      {t("tts.TtsModelListPage.form.searchBarLabel")}
-                    </label>
-                    {/*<a href="/" className="ms-1">
-                      <FontAwesomeIcon icon={faShuffle} />
-                    </a>*/}
-                  </div>
-
-                  <div className="d-flex flex-column flex-lg-row gap-3 ">
-                    <div className="flex-grow-1">
-                      <SelectSearch
-                        allTtsCategories={props.allTtsCategories}
-                        allTtsModels={props.ttsModels}
-                        allTtsModelsByTokenMap={props.allTtsModelsByTokenMap}
-                        dropdownCategories={props.dropdownCategories}
-                        setDropdownCategories={props.setDropdownCategories}
-                        selectedCategories={props.selectedCategories}
-                        setSelectedCategories={props.setSelectedCategories}
-                        maybeSelectedTtsModel={props.maybeSelectedTtsModel}
-                        setMaybeSelectedTtsModel={
-                          props.setMaybeSelectedTtsModel
-                        }
-                        selectedTtsLanguageScope={
-                          props.selectedTtsLanguageScope
-                        }
-                      />
-                    </div>
-
-                    <button
-                      onClick={handleClick}
-                      // onClick={() => {
-                      //   Analytics.ttsOpenExploreVoicesModal();
-                      // }}
-                      className="btn btn-primary rounded-50"
-                      type="button"
-                    >
-                      <FontAwesomeIcon
-                        icon={isOpen ? faChevronUp : faChevronDown}
-                        className="me-2"
-                      />
-                      {t(
-                        "tts.TtsModelListPage.exploreModal.exploreModalOpenButton"
-                      )}
-                    </button>
-                  </div>
-                </div>
-
-                {/* Explore Modal */}
-
+                {/* Explore Rollout */}
                 <div
                   className={`sliding-content ${
-                    isSliding ? "open pb-4 mt-2 mb-3" : "closed"
+                    isOpen ? "open pb-4" : "closed"
                   }`}
                 >
                   <ExploreVoicesModal
@@ -598,6 +546,57 @@ function TtsModelListPage(props: Props) {
                       props.setSelectedTtsLanguageScope
                     }
                   />
+                </div>
+
+                <div className="pb-4">
+                  <div className="d-flex gap-2">
+                    <label className="sub-title">
+                      {t("tts.TtsModelListPage.form.searchBarLabel")}
+                    </label>
+                    {/*<a href="/" className="ms-1">
+                      <FontAwesomeIcon icon={faShuffle} />
+                    </a>*/}
+                  </div>
+
+                  <div className="d-flex flex-column flex-lg-row gap-3 zi-2">
+                    <div className="flex-grow-1">
+                      <SelectSearch
+                        allTtsCategories={props.allTtsCategories}
+                        allTtsModels={props.ttsModels}
+                        allTtsModelsByTokenMap={props.allTtsModelsByTokenMap}
+                        dropdownCategories={props.dropdownCategories}
+                        setDropdownCategories={props.setDropdownCategories}
+                        selectedCategories={props.selectedCategories}
+                        setSelectedCategories={props.setSelectedCategories}
+                        maybeSelectedTtsModel={props.maybeSelectedTtsModel}
+                        setMaybeSelectedTtsModel={
+                          props.setMaybeSelectedTtsModel
+                        }
+                        selectedTtsLanguageScope={
+                          props.selectedTtsLanguageScope
+                        }
+                      />
+                    </div>
+
+                    {}
+
+                    <button
+                      onClick={handleClickExplore}
+                      // onClick={() => {
+                      //   Analytics.ttsOpenExploreVoicesModal();
+                      // }}
+                      className="btn btn-primary rounded-50"
+                      type="button"
+                    >
+                      <FontAwesomeIcon
+                        icon={isOpen ? faChevronUp : faChevronDown}
+                        className="me-2"
+                      />
+                      {t(
+                        "tts.TtsModelListPage.exploreModal.exploreModalOpenButton"
+                      )}
+                    </button>
+                  </div>
                 </div>
 
                 {directViewLink}

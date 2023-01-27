@@ -834,7 +834,7 @@ styles with important tags:
     opacity: 0;
     height: 0;
     transition-property: none !important;
-    transition: all 0.05s !important;
+    transition: all 0.1s !important;
     transition-timing-function: ease !important;
   }
   .sliding-content.open {
@@ -842,7 +842,7 @@ styles with important tags:
     opacity: 1;
     height: 100%;
     transition-property: none !important;
-    transition: all 0.2s !important;
+    transition: all 0.4s !important;
     transition-timing-function: ease !important;
   }
 }

@@ -5,7 +5,7 @@ import { LanguageOptions } from "./LanguageOptions";
 import { TtsCategoryType } from "../../../../../../AppWrapper";
 import { TtsModelListItem } from "@storyteller/components/src/api/tts/ListTtsModels";
 import { CategoryOptions } from "./CategoryOptions";
-// import { ScopedVoiceModelOptions } from "./ScopedVoiceModelOptions";
+import { ScopedVoiceModelOptions } from "./ScopedVoiceModelOptions";
 import { t } from "i18next";
 
 interface Props {
@@ -108,6 +108,7 @@ export function ExploreVoicesModal(props: Props) {
               onClick={() => {
                 handleChangeCategory(0, "*");
               }}
+              type="button"
             >
               <FontAwesomeIcon icon={faEraser} className="me-2" />
               {t("tts.TtsModelListPage.exploreModal.clearCategoryFilterButton")}
@@ -130,6 +131,20 @@ export function ExploreVoicesModal(props: Props) {
             selectedTtsLanguageScope={props.selectedTtsLanguageScope}
           />
         </div>
+      </div>
+      <div className="mt-4">
+        <ScopedVoiceModelOptions
+          allTtsCategories={props.allTtsCategories}
+          allTtsModels={props.allTtsModels}
+          allTtsCategoriesByTokenMap={props.allTtsCategoriesByTokenMap}
+          allTtsModelsByTokenMap={props.allTtsModelsByTokenMap}
+          ttsModelsByCategoryToken={props.ttsModelsByCategoryToken}
+          dropdownCategories={props.dropdownCategories}
+          selectedCategories={props.selectedCategories}
+          maybeSelectedTtsModel={props.maybeSelectedTtsModel}
+          setMaybeSelectedTtsModel={props.setMaybeSelectedTtsModel}
+          selectedTtsLanguageScope={props.selectedTtsLanguageScope}
+        />
       </div>
     </div>
   );
