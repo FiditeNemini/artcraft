@@ -1,6 +1,5 @@
 import React from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faMicrophone } from "@fortawesome/free-solid-svg-icons";
 import { TtsModelListItem } from "@storyteller/components/src/api/tts/ListTtsModels";
 import { TtsCategoryType } from "../../../../../../../AppWrapper";
 import Select, { createFilter } from "react-select";
@@ -8,6 +7,7 @@ import { SearchFieldClass } from "./SearchFieldClass";
 import { FastReactSelectOption } from "../../../../../_common/react_select/FastReactSelectOption";
 import { Analytics } from "../../../../../../../common/Analytics";
 import { FixedSingleValueSelectOption } from "../../../../../_common/react_select/FixedSingleValueSelectOption";
+import { faMicrophone } from "@fortawesome/pro-duotone-svg-icons";
 
 interface Props {
   allTtsCategories: TtsCategoryType[];
