@@ -3,7 +3,7 @@
 -- noinspection SqlResolveForFile
 
 --
--- Top 500 models all time by use count
+-- Top 100 models all time by use count
 --
 select
     m.token,
@@ -25,7 +25,7 @@ from (
          join users as u
               on u.token = m.creator_user_token
 order by r.use_count desc
-    limit 500;
+    limit 100;
 
 --
 -- Same, but simpler...
@@ -33,13 +33,13 @@ order by r.use_count desc
 select m.token, m.title, r.use_count from (
   select model_token, count(*) as use_count from tts_results
   group by model_token
-  order by use_count desc limit 500
+  order by use_count desc limit 100
 ) as r
   join tts_models as m
   on m.token = r.model_token;
 
 --
--- Top 500 models by use count, last 5 days
+-- Top 100 models by use count, last 5 days
 -- Limited due to tmux scrollback.
 --
 select
@@ -60,7 +60,7 @@ from (
     join users as u
     on u.token = m.creator_user_token
 order by r.use_count desc
-    limit 500;
+    limit 100;
 
 --
 -- Top 20 ***NEW*** models to share in #announcements
@@ -89,10 +89,10 @@ from (
 where m.created_at > ( CURDATE() - INTERVAL 31 DAY )
   AND u.username IN ( 'vegito1089', 'justinjohn0306')
 order by r.use_count desc
-    limit 500;
+    limit 100;
 
 --
--- Top 500 models by use count, last 5 days, not spanish, etc.
+-- Top 100 models by use count, last 5 days, not spanish, etc.
 -- Limited due to tmux scrollback.
 --
 select
@@ -117,10 +117,10 @@ from (
     on u.token = m.creator_user_token
     where m.ietf_language_tag NOT IN ('es', 'es-419', 'es-ES', 'es-MX', 'pt-BR')
 order by r.use_count desc
-    limit 500;
+    limit 100;
 
 --
--- Top 500 models by use count, last 5 days, in specific language.
+-- Top 100 models by use count, last 5 days, in specific language.
 -- Limited due to tmux scrollback.
 --
 select
@@ -144,7 +144,7 @@ from (
               on u.token = m.creator_user_token
 where m.ietf_language_tag IN ('en', 'en-US', 'en-AU', 'en-CA', 'en-GB')
 order by r.use_count desc
-    limit 500;
+    limit 100;
 
 --
 -- Most popular voices by use count over 5-day window, single language, single user.
@@ -172,7 +172,7 @@ from (
         m.ietf_language_tag NOT IN ('es', 'es-419', 'es-ES', 'es-MX', 'pt-BR')
         AND u.username = 'vegito1089'
 order by r.use_count desc
-    limit 500;
+    limit 100;
 
 --
 -- Most popular deleted models
@@ -203,7 +203,7 @@ from (
     join users as u
     on u.token = m.creator_user_token
 order by r.use_count desc
-    limit 500;
+    limit 100;
 
 --
 -- Most popular deleted models (only by users, not mods)
@@ -233,7 +233,7 @@ from (
          join users as u
               on u.token = m.creator_user_token
 order by r.use_count desc
-    limit 500;
+    limit 100;
 
 
 --
@@ -261,5 +261,5 @@ from (
          join users as u
               on u.token = m.creator_user_token
 order by m.created_at desc
-    limit 500;
+    limit 100;
 
