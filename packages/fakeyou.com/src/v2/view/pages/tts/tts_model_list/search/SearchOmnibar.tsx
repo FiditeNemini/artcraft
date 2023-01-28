@@ -39,32 +39,6 @@ export function SearchOmnibar(props: Props) {
 
   return (
     <>
-      <div
-        className={`sliding-content ${
-          isOpen ? "open pb-4" : "closed"
-        }`}
-      >
-        <ExploreVoicesTray
-          allTtsCategories={props.allTtsCategories}
-          allTtsModels={props.allTtsModels}
-          allTtsCategoriesByTokenMap={
-            props.allTtsCategoriesByTokenMap
-          }
-          allTtsModelsByTokenMap={props.allTtsModelsByTokenMap}
-          ttsModelsByCategoryToken={props.ttsModelsByCategoryToken}
-          dropdownCategories={props.dropdownCategories}
-          setDropdownCategories={props.setDropdownCategories}
-          selectedCategories={props.selectedCategories}
-          setSelectedCategories={props.setSelectedCategories}
-          maybeSelectedTtsModel={props.maybeSelectedTtsModel}
-          setMaybeSelectedTtsModel={props.setMaybeSelectedTtsModel}
-          selectedTtsLanguageScope={props.selectedTtsLanguageScope}
-          setSelectedTtsLanguageScope={
-            props.setSelectedTtsLanguageScope
-          }
-        />
-      </div>
-
       <div className="pb-4">
         <VoiceCountLabel
           allTtsModels={props.allTtsModels}
@@ -104,12 +78,28 @@ export function SearchOmnibar(props: Props) {
               icon={isOpen ? faChevronUp : faChevronDown}
               className="me-2"
             />
-            {t(
-              "tts.TtsModelListPage.exploreModal.exploreModalOpenButton"
-            )}
+            {t("tts.TtsModelListPage.exploreModal.exploreModalOpenButton")}
           </button>
         </div>
       </div>
+
+      <div className={`sliding-content ${isOpen ? "open pb-4" : "closed"}`}>
+        <ExploreVoicesTray
+          allTtsCategories={props.allTtsCategories}
+          allTtsModels={props.allTtsModels}
+          allTtsCategoriesByTokenMap={props.allTtsCategoriesByTokenMap}
+          allTtsModelsByTokenMap={props.allTtsModelsByTokenMap}
+          ttsModelsByCategoryToken={props.ttsModelsByCategoryToken}
+          dropdownCategories={props.dropdownCategories}
+          setDropdownCategories={props.setDropdownCategories}
+          selectedCategories={props.selectedCategories}
+          setSelectedCategories={props.setSelectedCategories}
+          maybeSelectedTtsModel={props.maybeSelectedTtsModel}
+          setMaybeSelectedTtsModel={props.setMaybeSelectedTtsModel}
+          selectedTtsLanguageScope={props.selectedTtsLanguageScope}
+          setSelectedTtsLanguageScope={props.setSelectedTtsLanguageScope}
+        />
+      </div>
     </>
-  )
+  );
 }
