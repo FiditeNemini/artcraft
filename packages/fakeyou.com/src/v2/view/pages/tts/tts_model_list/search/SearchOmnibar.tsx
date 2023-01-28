@@ -47,7 +47,7 @@ export function SearchOmnibar(props: Props) {
           selectedTtsLanguageScope={props.selectedTtsLanguageScope}
         />
 
-        <div className="d-flex flex-column flex-lg-row gap-3 zi-2">
+        <div className="d-flex flex-column flex-lg-row gap-3">
           <div className="flex-grow-1">
             <ScopedVoiceModelOptions
               allTtsCategories={props.allTtsCategories}
