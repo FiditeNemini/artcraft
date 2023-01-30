@@ -13,6 +13,8 @@ select count(*) from user_subscriptions;
 -- NB: "active" status users are current, treating "past_due" as active too (for now)
 select count(*) from user_subscriptions where maybe_stripe_subscription_status NOT IN ("canceled", "incomplete", "incomplete_expired");
 
+-- ==================== TEXT TO SPEECH====================
+
 -- All paid subscribers generating results in the last week
 select u.username, count(*) as use_count
 from users as u
@@ -45,7 +47,7 @@ FROM (
 ) as t
 WHERE use_count > 10
 
--- Paid users gennerating results in the last month
+-- Paid users generating results in the last month
 select u.username, count(*) as use_count
 from users as u
       join tts_inference_jobs as j
@@ -59,10 +61,64 @@ AND j.created_at > NOW() - interval 1 day
 GROUP BY u.username
 ORDER BY use_count desc
 
+-- ==================== WAV2LIP ====================
 
+select u.username, count(*) as use_count
+from users as u
+         join w2l_inference_jobs as j
+              on u.token = j.maybe_creator_user_token
+WHERE u.token IN (
+    select distinct user_token
+    from user_subscriptions
+    where maybe_stripe_subscription_status NOT IN ("canceled", "incomplete", "incomplete_expired")
+)
+  AND j.created_at > NOW() - interval 31 day
+GROUP BY u.username
+ORDER BY use_count desc
 
--- Number of paid users who created a result in the last 7 days
-select u.created_at from users as u
-where u.token IN
-      (select distinct u.token from tts_inference_jobs as j join users u on u.token = j.maybe_creator_user_token where j.created_at > now() - interval 7 day)
-order by u.created_at ASC;
+select username, use_count
+FROM (
+         select u.username, count(*) as use_count
+         from users as u
+                  join w2l_inference_jobs as j
+                       on u.token = j.maybe_creator_user_token
+         WHERE u.token IN (
+             select distinct user_token
+             from user_subscriptions
+             where maybe_stripe_subscription_status NOT IN ("canceled", "incomplete", "incomplete_expired")
+         )
+           AND j.created_at > NOW() - interval 31 day
+         GROUP BY u.username
+         ORDER BY use_count desc
+     ) as t
+WHERE use_count >=5;
+
+-- ==================== TTS MODELS ====================
+
+select u.username, count(*) as use_count
+from users as u
+         join tts_model_upload_jobs as j
+              on u.token = j.creator_user_token
+WHERE u.token IN (
+    select distinct user_token
+    from user_subscriptions
+    where maybe_stripe_subscription_status NOT IN ("canceled", "incomplete", "incomplete_expired")
+)
+  AND j.created_at > NOW() - interval 1 day
+GROUP BY u.username
+ORDER BY use_count desc
+
+-- ==================== W2L TEMPLATES ====================
+
+select u.username, count(*) as use_count
+from users as u
+         join w2l_template_upload_jobs as j
+              on u.token = j.creator_user_token
+WHERE u.token IN (
+    select distinct user_token
+    from user_subscriptions
+    where maybe_stripe_subscription_status NOT IN ("canceled", "incomplete", "incomplete_expired")
+)
+  AND j.created_at > NOW() - interval 1 day
+GROUP BY u.username
+ORDER BY use_count desc
