@@ -27,7 +27,7 @@ AND j.created_at > NOW() - interval 7 day
 GROUP BY u.username
 ORDER BY use_count desc
 
--- Paid subscribers generating # results
+-- Paid subscribers generating results in the last month (with # threshold)
 select username, use_count
 FROM (
     select u.username, count(*) as use_count
@@ -43,7 +43,21 @@ FROM (
     GROUP BY u.username
     ORDER BY use_count desc
 ) as t
-WHERE use_count > 50
+WHERE use_count > 10
+
+-- Paid users gennerating results in the last month
+select u.username, count(*) as use_count
+from users as u
+      join tts_inference_jobs as j
+           on u.token = j.maybe_creator_user_token
+WHERE u.token IN (
+     select distinct user_token
+     from user_subscriptions
+     where maybe_stripe_subscription_status NOT IN ("canceled", "incomplete", "incomplete_expired")
+)
+AND j.created_at > NOW() - interval 1 day
+GROUP BY u.username
+ORDER BY use_count desc
 
 
 
