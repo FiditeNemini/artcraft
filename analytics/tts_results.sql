@@ -41,6 +41,14 @@ select count(*) from tts_results
 where model_token = 'TM:ztt5s1be5tq6'
 and mod_deleted_at is NULL;
 
+-- Sample results for a single model
+select
+    TRIM(REPLACE(SUBSTRING(raw_inference_text, 1, 50), '\n', ''))
+from tts_results
+where model_token='TM:yt4gfbkngsjj'
+order by id desc
+limit 150;
+
 -- Delete TTS results for a single model
 -- Do this in short batches so a lock isn't held for prohibitively long.
 update tts_results
