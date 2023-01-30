@@ -7,7 +7,6 @@ import { SessionTtsModelUploadResultList } from "../../../_common/SessionTtsMode
 import { SessionW2lInferenceResultList } from "../../../_common/SessionW2lInferenceResultsList";
 import { SessionW2lTemplateUploadResultList } from "../../../_common/SessionW2lTemplateUploadResultsList";
 import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
-import { Gravatar } from "@storyteller/components/src/elements/Gravatar";
 import { TtsInferenceJob } from "@storyteller/components/src/jobs/TtsInferenceJobs";
 import { TtsModelUploadJob } from "@storyteller/components/src/jobs/TtsModelUploadJobs";
 import { W2lInferenceJob } from "@storyteller/components/src/jobs/W2lInferenceJobs";
@@ -312,12 +311,8 @@ function TtsModelListPage(props: Props) {
   let directViewLink = <span />;
 
   if (props.maybeSelectedTtsModel) {
-    const userName = props.maybeSelectedTtsModel.creator_display_name;
     const modelLink = WebUrl.ttsModelPage(
       props.maybeSelectedTtsModel.model_token
-    );
-    const profileLink = WebUrl.userProfilePage(
-      props.maybeSelectedTtsModel.creator_display_name
     );
     const modelLanguage =
       AVAILABLE_TTS_LANGUAGE_CATEGORY_MAP[
@@ -336,25 +331,23 @@ function TtsModelListPage(props: Props) {
     }
 
     directViewLink = (
-      <div className="d-flex flex-column direct-view-link mb-4">
+      <div className="d-flex flex-column align-items-start align-items-lg-center flex-lg-row direct-view-link mb-4 gap-3">
+        <div className="d-flex gap-3 flex-column flex-lg-row flex-grow-1">
+          {ratingButtons}
+          <RatingStats
+            positive_votes={
+              maybeSelectedTtsModel?.user_ratings?.positive_count || 0
+            }
+            negative_votes={
+              maybeSelectedTtsModel?.user_ratings?.negative_count || 0
+            }
+            total_votes={maybeSelectedTtsModel?.user_ratings?.total_count || 0}
+          />
+        </div>
+
         <div className="d-flex flex-column gap-3 flex-lg-row">
-          <p className="flex-grow-1">
-            {t("tts.TtsModelListPage.voiceDetails.voiceBy")}{" "}
-            <Link
-              to={profileLink}
-              onClick={() => {
-                Analytics.ttsClickModelCreatorLink();
-              }}
-              className="fw-medium"
-            >
-              {userName}{" "}
-              <Gravatar
-                size={20}
-                username={props.maybeSelectedTtsModel.creator_display_name}
-                email_hash={props.maybeSelectedTtsModel.creator_gravatar_hash}
-              />
-            </Link>{" "}
-            | <FontAwesomeIcon icon={faGlobe} className="me-2" />
+          <p>
+            <FontAwesomeIcon icon={faGlobe} className="me-2" />
             {t("tts.TtsModelListPage.languageLabel")}:{" "}
             <span className="fw-medium">{modelLanguage.languageName}</span>{" "}
             {/* We're not ready for use count yet. */}
@@ -362,6 +355,7 @@ function TtsModelListPage(props: Props) {
             <span className="fw-semibold">616400</span> -- the old one*/}
             {/*| Used <span className="fw-medium">308,270 times</span> -- the new one */}
           </p>
+          <span className="opacity-25 d-none d-lg-block">|</span>
           <Link
             to={modelLink}
             onClick={() => {
@@ -374,22 +368,6 @@ function TtsModelListPage(props: Props) {
             </span>
             <FontAwesomeIcon icon={faArrowRight} className="ms-2" />
           </Link>
-        </div>
-
-        <hr />
-
-        <div className="d-flex gap-3">
-          {ratingButtons}
-
-          <RatingStats
-            positive_votes={
-              maybeSelectedTtsModel?.user_ratings?.positive_count || 0
-            }
-            negative_votes={
-              maybeSelectedTtsModel?.user_ratings?.negative_count || 0
-            }
-            total_votes={maybeSelectedTtsModel?.user_ratings?.total_count || 0}
-          />
         </div>
       </div>
     );
@@ -527,7 +505,9 @@ function TtsModelListPage(props: Props) {
                   maybeSelectedTtsModel={props.maybeSelectedTtsModel}
                   setMaybeSelectedTtsModel={props.setMaybeSelectedTtsModel}
                   selectedTtsLanguageScope={props.selectedTtsLanguageScope}
-                  setSelectedTtsLanguageScope={props.setSelectedTtsLanguageScope}
+                  setSelectedTtsLanguageScope={
+                    props.setSelectedTtsLanguageScope
+                  }
                 />
 
                 {/*
