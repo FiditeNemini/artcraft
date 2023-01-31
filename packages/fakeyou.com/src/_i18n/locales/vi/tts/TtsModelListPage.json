@@ -11,7 +11,7 @@
         "searchBarLabel": "Tìm kiếm một giọng nói",  
         "searchHint": "Cụm từ tìm kiếm",
         "searchLabel": "Tìm kiếm",
-        "textInputHint": "Nhập văn bản tại đây",
+        "textInputHint": "Nhập nội dung bạn muốn {{voice}} nói vào đây.",
         "voicesLabel": "Giọng nói ({{count}} để chọn)",
         "yourTextLabel": "Văn bản của bạn"
     },

@@ -11,7 +11,7 @@
         "searchBarLabel": "声を探す",  
         "searchHint": "検索語",
         "searchLabel": "探す",
-        "textInputHint": "ここに言うテキストを入力してください",
+        "textInputHint": "{{voice}} に伝えたいテキストをここに入力してください。",
         "voicesLabel": "音声（{{count}}から選択）",
         "yourTextLabel": "あなたのテキスト"
     },

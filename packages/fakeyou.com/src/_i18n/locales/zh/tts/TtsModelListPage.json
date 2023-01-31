@@ -11,7 +11,7 @@
         "searchBarLabel": "搜索语音",  
         "searchHint": "搜索词",
         "searchLabel": "搜索",
-        "textInputHint": "此处输入文字",
+        "textInputHint": "在此处输入您希望 {{voice}} 说的文字。",
         "voicesLabel": "语音（{{count}} 个可供选择）",
         "yourTextLabel": "你的文字"
     },

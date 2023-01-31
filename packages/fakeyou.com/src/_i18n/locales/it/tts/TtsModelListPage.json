@@ -14,7 +14,7 @@
         "searchBarLabel": "Cerca una voce",  
         "searchHint": "Search for Voice",
         "searchLabel": "Ricerca",
-        "textInputHint": "Inserisci qui il testo da generare",
+        "textInputHint": "Inserisci qui il testo che vuoi che {{voice}} dica.",
         "voicesLabel": "Voce ({{count}} tra cui scegliere)",
         "yourTextLabel__human__": true,
         "yourTextLabel": "Testo"

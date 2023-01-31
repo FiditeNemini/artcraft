@@ -538,7 +538,8 @@ function TtsModelListPage(props: Props) {
                         className="form-control text-message h-100"
                         value={props.textBuffer}
                         placeholder={t(
-                          "tts.TtsModelListPage.form.textInputHint"
+                          "tts.TtsModelListPage.form.textInputHint",
+                          { voice: props.maybeSelectedTtsModel?.title || "the voice" }
                         )}
                       ></textarea>
                       <div className="d-flex gap-3">

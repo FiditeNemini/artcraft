@@ -11,7 +11,7 @@
         "searchBarLabel": "Cari Suara",
         "searchHint": "Istilah Pencarian",
         "searchLabel": "Mencari",
-        "textInputHint": "Masukan teks",
+        "textInputHint": "Masukkan teks yang ingin Anda ucapkan {{voice}} di sini.",
         "voicesLabel": "Suara ({{count}} untuk dipilih)",
         "yourTextLabel": "Your Text"
     },

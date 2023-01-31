@@ -11,7 +11,7 @@
         "searchBarLabel": "Suche nach einer Stimme",
         "searchHint": "Suchbegriff",
         "searchLabel": "Suche",
-        "textInputHint": "Eingang...",
+        "textInputHint": "Geben Sie hier den Text ein, den {{voice}} sagen soll.",
         "voicesLabel": "Stimme ({{count}} zur Auswahl)",
         "yourTextLabel": "Dein Text"
     },

@@ -11,7 +11,7 @@
         "searchBarLabel": "음성 검색",  
         "searchHint": "검색어",
         "searchLabel": "검색",
-        "textInputHint": "여기에 텍스트를 입력하세요",
+        "textInputHint": "{{voice}}가 말하길 원하는 텍스트를 여기에 입력하세요.",
         "voicesLabel": "음성 ({{count}} 개 중에서 선택)",
         "yourTextLabel": "당신의 텍스트"
     },

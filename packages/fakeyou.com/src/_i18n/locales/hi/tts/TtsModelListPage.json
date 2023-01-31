@@ -11,7 +11,7 @@
         "searchBarLabel": "एक आवाज खोजें",
         "searchHint": "शब्द को खोजें",
         "searchLabel": "तलाशी",
-        "textInputHint": "यहां टेक्स्ट इनपुट करें",
+        "textInputHint": "वह पाठ दर्ज करें जिसे आप {{voice}} कहना चाहते हैं।",
         "voicesLabel": "आवाज ({{count}} चुनने के लिए)",
         "yourTextLabel": "अपका संदेश"
     },

@@ -11,7 +11,7 @@
         "searchBarLabel": "Ses Ara",  
         "searchHint": "Ses Ara",
         "searchLabel": "Arama",
-        "textInputHint": "Burada oluşturulacak metni girin",
+        "textInputHint": "{{voice}}'nin buraya söylemesini istediğiniz metni girin.",
         "voicesLabel": "Ses (seçim için {{count}})",
         "yourTextLabel": "Your Text"
     },

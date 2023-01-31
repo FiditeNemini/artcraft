@@ -11,7 +11,7 @@
         "searchBarLabel": "ابحث عن صوت",  
         "searchHint": "ابحث عن الصوت",
         "searchLabel": "يبحث",
-        "textInputHint": "أدخل النص الخاص بك هنا",
+        "textInputHint": "أدخل النص الذي تريد أن يقوله {{voice}} هنا.",
         "voicesLabel": "صوت ({{count}} للاختيار من بينها)",
         "yourTextLabel": "Your Text"
     },
