@@ -252,6 +252,11 @@ styles with important tags:
     padding: 0 12px;
   }
 
+  .btn-explore {
+    min-width: 172px;
+    border-radius: 50px;
+  }
+
   .panel {
     position: relative;
     width: 100%;
@@ -664,6 +669,7 @@ styles with important tags:
     border-radius: 5px;
     padding: 12px 16px;
     min-height: 63px;
+    height: 100%;
 
     // &:hover {
     //   border-color: lighten(#39394c, 10%);

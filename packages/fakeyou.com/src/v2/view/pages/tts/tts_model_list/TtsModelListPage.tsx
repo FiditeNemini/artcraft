@@ -480,7 +480,7 @@ function TtsModelListPage(props: Props) {
       <motion.div className="container-panel pt-4 pb-5 mb-4" variants={panel}>
         <div className="panel p-3 p-lg-4 mt-5 mt-lg-0">
           <i className="fas fa-volume-high"></i>
-          <h1 className="panel-title fw-bold">
+          <h1 className="panel-title fw-bold px-3 px-lg-0">
             <FontAwesomeIcon icon={faVolumeUp} className="me-3" />
             {t("tts.TtsModelListPage.formTitle")}
           </h1>
@@ -539,7 +539,10 @@ function TtsModelListPage(props: Props) {
                         value={props.textBuffer}
                         placeholder={t(
                           "tts.TtsModelListPage.form.textInputHint",
-                          { voice: props.maybeSelectedTtsModel?.title || "the voice" }
+                          {
+                            voice:
+                              props.maybeSelectedTtsModel?.title || "the voice",
+                          }
                         )}
                       ></textarea>
                       <div className="d-flex gap-3">
