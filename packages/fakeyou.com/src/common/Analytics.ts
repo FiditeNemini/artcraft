@@ -152,6 +152,10 @@ class Analytics {
     Analytics.sendCategorizedEvent(this.TTS, 'open_explore_voices_modal');
   }
 
+  static ttsClickRandomVoice() {
+    Analytics.sendCategorizedEvent(this.TTS, 'click_random_voice');
+  }
+
   static ttsClickTextInputBox() {
     Analytics.sendCategorizedEvent(this.TTS, 'click_text_input_box');
   }

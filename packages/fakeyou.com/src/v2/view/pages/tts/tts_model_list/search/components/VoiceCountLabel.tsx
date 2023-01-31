@@ -1,13 +1,18 @@
 import React from "react";
+import { Trans } from "react-i18next";
 import { TtsModelListItem } from "@storyteller/components/src/api/tts/ListTtsModels";
 import { TtsCategoryType } from "../../../../../../../AppWrapper";
-import { Trans } from "react-i18next";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faShuffle } from "@fortawesome/pro-light-svg-icons";
+import { Analytics } from "../../../../../../../common/Analytics";
+import { GetRandomArrayValue } from "@storyteller/components/src/utils/GetRandomArrayValue";
 
 interface Props {
   allTtsModels: TtsModelListItem[];
   ttsModelsByCategoryToken: Map<string, Set<TtsModelListItem>>;
   selectedCategories: TtsCategoryType[];
   selectedTtsLanguageScope: string;
+  setMaybeSelectedTtsModel: (maybeSelectedTtsModel: TtsModelListItem) => void;
 }
 
 // NB/TODO: This duplicates the work of a sister component, but it was the fastest way
@@ -33,7 +38,7 @@ export function VoiceCountLabel(props: Props) {
     leafiestCategoryModels = Array.from(new Set(allTtsModels));
   }
 
-  let options = leafiestCategoryModels
+  let possibleVoices = leafiestCategoryModels
     .filter((ttsModel) => {
       // Scope to currently selected language
       if (props.selectedTtsLanguageScope === "*") {
@@ -42,13 +47,17 @@ export function VoiceCountLabel(props: Props) {
       return (
         ttsModel.ietf_primary_language_subtag === props.selectedTtsLanguageScope
       );
-    })
-    .map((ttsModel) => {
-      return true; // NB: We're only counting voices.
     });
 
+  const selectRandomVoice = () => {
+    // TODO: Prefer to select a random *good* voice or *popular* voice.
+    const randomVoice = GetRandomArrayValue(possibleVoices);
+    if (randomVoice !== undefined) {
+      props.setMaybeSelectedTtsModel(randomVoice);
+    }
+  }
 
-  const voiceCount = options.length;
+  const voiceCount = possibleVoices.length;
 
   return (
     <>
@@ -61,10 +70,16 @@ export function VoiceCountLabel(props: Props) {
             Voice ({voiceCount} to choose from)
           </Trans>
         </label>
-
-        {/*<a href="/" className="ms-1">
+        <button
+          onClick={() => {
+            Analytics.ttsClickRandomVoice();
+            selectRandomVoice();
+          }}
+          className="btn btn-link btn-small pt-0 ps-0"
+          type="button"
+        >
           <FontAwesomeIcon icon={faShuffle} />
-        </a>*/}
+        </button>
       </div>
     </>
   );

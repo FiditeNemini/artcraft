@@ -45,6 +45,7 @@ export function SearchOmnibar(props: Props) {
           ttsModelsByCategoryToken={props.ttsModelsByCategoryToken}
           selectedCategories={props.selectedCategories}
           selectedTtsLanguageScope={props.selectedTtsLanguageScope}
+          setMaybeSelectedTtsModel={props.setMaybeSelectedTtsModel}
         />
 
         <div className="d-flex flex-column flex-lg-row gap-3">
