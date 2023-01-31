@@ -36,7 +36,7 @@ function SessionTtsAudioPlayer(props: Props) {
   }
 
   return (
-    <div className="d-flex w-100 align-items-center gap-3">
+    <div className="d-flex w-100 align-items-center gap-3 zi-1">
       <button
         className="btn btn-primary btn-session-tts-play align-items-center justify-content-center"
         onClick={() => handleTogglePlay()}
