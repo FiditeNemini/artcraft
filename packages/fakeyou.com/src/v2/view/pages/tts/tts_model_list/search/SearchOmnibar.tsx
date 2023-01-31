@@ -72,7 +72,7 @@ export function SearchOmnibar(props: Props) {
               Analytics.ttsOpenExploreVoicesModal();
               handleClickExplore();
             }}
-            className="btn btn-primary rounded-50"
+            className="btn btn-primary btn-explore"
             type="button"
           >
             <FontAwesomeIcon
