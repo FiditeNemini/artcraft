@@ -50,8 +50,17 @@ export function VoiceCountLabel(props: Props) {
     });
 
   const selectRandomVoice = () => {
-    // TODO: Prefer to select a random *good* voice or *popular* voice.
-    const randomVoice = GetRandomArrayValue(possibleVoices);
+    let randomVoice = undefined;
+    for (let i = 0; i < 10; i++) {
+      // We're going to try to find a *good* voice.
+      randomVoice = GetRandomArrayValue(possibleVoices);
+      if (randomVoice.user_ratings.positive_count > randomVoice.user_ratings.negative_count) {
+        break; // First "mostly good" voice is good.
+      }
+      if (i % 3 === 2 && randomVoice.user_ratings.total_count === 0) {
+        break; // Sometimes we'll return a voice that hasn't been rated.
+      }
+    }
     if (randomVoice !== undefined) {
       props.setMaybeSelectedTtsModel(randomVoice);
     }
