@@ -3,4 +3,7 @@
   <sitemap>
     <loc>https://fakeyou.com/sitemap_static_pages.xml</loc>
   </sitemap>
+  <sitemap>
+    <loc>https://fakeyou.com/sitemap_tts_models.xml</loc>
+  </sitemap>
 </sitemapindex>

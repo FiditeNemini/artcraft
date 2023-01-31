@@ -7,6 +7,15 @@
     <loc>https://fakeyou.com/pricing</loc>
   </url>
   <url>
-    <loc>https://fakeyou.com/video</loc>
+    <loc>https://fakeyou.com/videos</loc>
+  </url>
+  <url>
+    <loc>https://fakeyou.com/about</loc>
+  </url>
+  <url>
+    <loc>https://fakeyou.com/terms</loc>
+  </url>
+  <url>
+    <loc>https://fakeyou.com/guide</loc>
   </url>
 </urlset>
