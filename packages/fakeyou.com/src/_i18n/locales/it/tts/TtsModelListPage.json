@@ -23,7 +23,7 @@
         "voiceBy": "Voce di",
         "seeMoreDetails": "Vedi maggiori dettagli"
     },
-    "formTitle": "Crea TTS",
+    "formTitle": "Genera discorso dal testo",
     "languageLabel": "Lingua",
     "sessionTtsResultsLabel__human__": true,
     "sessionTtsResultsLabel": "Audio Generati",

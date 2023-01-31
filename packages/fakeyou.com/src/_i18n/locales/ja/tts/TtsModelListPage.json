@@ -19,7 +19,7 @@
         "voiceBy": "作成者の声",
         "seeMoreDetails": "詳細を見る"
     },
-    "formTitle": "TTSを作成する",
+    "formTitle": "テキストから音声を生成",
     "languageLabel": "言語",
     "sessionTtsResultsLabel": "TTS の結果",
     "exploreModal": {

@@ -11,7 +11,7 @@
         "searchBarLabel": "Tìm kiếm một giọng nói",  
         "searchHint": "Cụm từ tìm kiếm",
         "searchLabel": "Tìm kiếm",
-        "textInputHint": "Nhập nội dung bạn muốn {{voice}} nói vào đây.",
+        "textInputHint": "",
         "voicesLabel": "Giọng nói ({{count}} để chọn)",
         "yourTextLabel": "Văn bản của bạn"
     },
@@ -19,7 +19,7 @@
         "voiceBy": "Giọng nói của",
         "seeMoreDetails": "Xem thêm chi tiết"
     },
-    "formTitle": "Tạo TTS",
+    "formTitle": "Tạo bài phát biểu từ văn bản",
     "languageLabel": "Ngôn ngữ",
     "sessionTtsResultsLabel": "Kết quả TTS",
     "exploreModal": {

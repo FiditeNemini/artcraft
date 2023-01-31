@@ -19,7 +19,7 @@
         "voiceBy": "Voice by",
         "seeMoreDetails": "See more details"
     },
-    "formTitle": "قم بإنشاء TTS",
+    "formTitle": "توليد الكلام من النص",
     "languageLabel": "لغة",
     "sessionTtsResultsLabel": "Session TTS Results",
     "exploreModal": {

@@ -19,7 +19,7 @@
         "voiceBy": "Voz de",
         "seeMoreDetails": "Ver más detalles"
     },
-    "formTitle": "Crear mensaje de texto",
+    "formTitle": "Generar voz a partir de texto",
     "languageLabel": "Idioma",
     "sessionTtsResultsLabel": "Resultados de TTS",
     "exploreModal": {

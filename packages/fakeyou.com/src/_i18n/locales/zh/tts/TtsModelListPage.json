@@ -19,7 +19,7 @@
         "voiceBy": "声音创作者",
         "seeMoreDetails": "查看更多详情"
     },
-    "formTitle": "创建 TTS",
+    "formTitle": "从文本生成语音",
     "languageLabel": "语言",
     "sessionTtsResultsLabel": "TTS 结果",
     "exploreModal": {

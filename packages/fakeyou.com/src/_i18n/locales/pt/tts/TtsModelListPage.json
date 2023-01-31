@@ -19,7 +19,7 @@
         "voiceBy": "Voz de",
         "seeMoreDetails": "Ver mais detalhes"
     },
-    "formTitle": "Criar TTS",
+    "formTitle": "Gerar fala a partir do texto",
     "languageLabel": "Linguagem",
     "sessionTtsResultsLabel": "Resultados TTS",
     "exploreModal": {

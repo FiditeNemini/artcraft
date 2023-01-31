@@ -19,7 +19,7 @@
         "voiceBy": "Voix de",
         "seeMoreDetails": "Voir plus de détails"
     },
-    "formTitle": "Créer une synthèse vocale",
+    "formTitle": "Générer de la parole à partir de texte",
     "languageLabel": "Langue",
     "sessionTtsResultsLabel": "Résultats TTS",
     "exploreModal": {

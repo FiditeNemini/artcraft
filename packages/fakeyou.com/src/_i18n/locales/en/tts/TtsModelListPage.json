@@ -19,7 +19,7 @@
         "voiceBy": "Voice by",
         "seeMoreDetails": "See more details"
     },
-    "formTitle": "Create TTS",
+    "formTitle": "Generate Speech from Text",
     "languageLabel": "Language",
     "sessionTtsResultsLabel": "Session TTS Results",
     "exploreModal": {

@@ -19,7 +19,7 @@
         "voiceBy": "Stimme von",
         "seeMoreDetails": "Siehe weitere Einzelheiten"
     },
-    "formTitle": "TTS erstellen",
+    "formTitle": "Sprache aus Text generieren",
     "languageLabel": "Sprache",
     "sessionTtsResultsLabel": "TTS-Ergebnisse",
     "exploreModal": {
