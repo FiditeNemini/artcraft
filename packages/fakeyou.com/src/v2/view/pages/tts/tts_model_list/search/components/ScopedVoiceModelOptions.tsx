@@ -70,7 +70,14 @@ export function ScopedVoiceModelOptions(props: Props) {
     })
     .map((ttsModel) => {
       return {
-        label: ttsModel.title,
+        label: (
+          <>
+            {ttsModel.title}{" "}
+            <span className="opacity-50">
+              — {ttsModel.creator_display_name}
+            </span>
+          </>
+        ),
         value: ttsModel.model_token,
       };
     });
@@ -85,7 +92,7 @@ export function ScopedVoiceModelOptions(props: Props) {
     // when in reality no state would have changed. By forcing the user to choose, the user will set
     // the state appropriately.
     selectedOption = {
-      label: "Select voice...",
+      label: <>"Select voice...",</>,
       value: "*",
     };
   }
@@ -100,22 +107,23 @@ export function ScopedVoiceModelOptions(props: Props) {
     // label is to use controlled props / value as is done here:
     isLoading = true;
     selectedOption = {
-      label: "Loading...",
+      label: <>"Loading..."</>,
       value: "*",
     };
   } else if (options.length === 0) {
     // NB: Perhaps the user has refined their search to be too narrow (langauge + category)
     selectedOption = {
-      label: "No results (remove some filters)",
+      label: <>"No results (remove some filters)"</>,
       value: "*",
     };
   }
 
   const numberVoices = options.length;
 
-  const canSearchVoices = !props.isExploreTrayOpen // Always allow search when try is closed
-      || numberVoices > 100 // Always allow search when there are over 100 voices
-      || window.innerWidth >= 1000; // Always allow search when on desktop
+  const canSearchVoices =
+    !props.isExploreTrayOpen || // Always allow search when try is closed
+    numberVoices > 100 || // Always allow search when there are over 100 voices
+    window.innerWidth >= 1000; // Always allow search when on desktop
 
   let select;
 
@@ -128,13 +136,20 @@ export function ScopedVoiceModelOptions(props: Props) {
         options={options}
         classNames={SearchFieldClass}
         onChange={handleChange}
-        onMenuOpen={() => { Analytics.ttsOpenPrimaryVoiceSelectMenu() } }
+        onMenuOpen={() => {
+          Analytics.ttsOpenPrimaryVoiceSelectMenu();
+        }}
         isLoading={isLoading}
         isSearchable={true}
-        // NB: The following settings improve upon performance. 
+        // NB: The following settings improve upon performance.
         // See: https://github.com/JedWatson/react-select/issues/3128
-        filterOption={createFilter({ignoreAccents: false})}
-        components={{SingleValue: FixedSingleValueSelectOption, Option: FastReactSelectOption} as any}
+        filterOption={createFilter({ ignoreAccents: false })}
+        components={
+          {
+            SingleValue: FixedSingleValueSelectOption,
+            Option: FastReactSelectOption,
+          } as any
+        }
       />
     );
   } else {
@@ -168,7 +183,6 @@ export function ScopedVoiceModelOptions(props: Props) {
           </span>
 
           {select}
-
         </div>
       </div>
     </>
