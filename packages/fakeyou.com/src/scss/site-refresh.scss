@@ -852,6 +852,10 @@ styles with important tags:
     transition: all 0.3s !important;
     transition-timing-function: ease !important;
   }
+
+  wave {
+    overflow: hidden !important;
+  }
 }
 
 select {
