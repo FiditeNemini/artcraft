@@ -2,7 +2,7 @@ import React from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { TtsModelListItem } from "@storyteller/components/src/api/tts/ListTtsModels";
 import { TtsCategoryType } from "../../../../../../../AppWrapper";
-import Select, { createFilter, StylesConfig } from "react-select";
+import Select, { createFilter } from "react-select";
 import { SearchFieldClass } from "./SearchFieldClass";
 import { FastReactSelectOption } from "../../../../../_common/react_select/FastReactSelectOption";
 import { Analytics } from "../../../../../../../common/Analytics";
