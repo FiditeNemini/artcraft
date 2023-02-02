@@ -25,6 +25,8 @@ vocodes
 # Past brands/products
 hyper_jail
 hyperjail
+jungle_horse
+junglehorse
 voxelcam
 
 # Hypothetical brands/products
