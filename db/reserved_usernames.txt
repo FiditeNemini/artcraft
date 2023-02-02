@@ -31,6 +31,29 @@ voxelcam
 generative
 generatv
 
+# Permission levels, users, etc.
+account
+accounts
+admin
+administrator
+administrators
+admins
+employee
+employees
+employer
+employers
+member
+members
+mod
+moderator
+moderators
+mods
+official
+staff
+user
+users
+verified
+
 # Types of models
 diffusion
 first_order_model

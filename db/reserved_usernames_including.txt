@@ -1,7 +1,14 @@
 # This is a more restrictive list of reserved usernames.
 # Any of the substrings may not be used.
 # You should check string.remove('_') as well.
+
+# Permission levels
+# "admin" catches "administrator", etc.
 admin
+employee
+moderator
+
+# Branding
 fake_you
 fakeu
 fakeyou
