@@ -1,4 +1,5 @@
 use eframe::egui;
+use log::info;
 
 pub struct AppGui {
   filename: String,

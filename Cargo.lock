@@ -726,7 +726,11 @@ dependencies = [
  "eframe",
  "egui",
  "errors",
+ "http_server_common",
  "log",
+ "serde",
+ "serde_derive",
+ "serde_json",
  "tokio 1.16.1",
 ]
 

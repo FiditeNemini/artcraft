@@ -8,14 +8,24 @@ pub mod main_loop;
 pub mod state;
 pub mod web_server;
 
+#[macro_use] extern crate serde_derive;
+
+use std::thread;
+use std::time::Duration;
+use tokio::runtime::Runtime;
+//use actix_rt::Runtime;
+use actix_web::{HttpResponse, HttpServer, web};
 use clap::{App, Arg};
 use crate::main_loop::main_loop;
 use errors::AnyhowResult;
 use log::info;
 use crate::gui::launch_gui::launch_gui;
+use crate::web_server::get_next_audio_file_handler::get_next_audio_file_handler;
+use crate::web_server::launch_web_server::launch_web_server;
 
 
-#[tokio::main]
+//#[tokio::main]
+#[actix_web::main]
 pub async fn main() -> AnyhowResult<()> {
   easyenv::init_all_with_default_logging(Some("info"));
 
@@ -34,11 +44,69 @@ pub async fn main() -> AnyhowResult<()> {
   //        .takes_value(true))
   //    .get_matches();
 
-  info!("starting main loop...");
 
-  let _r = launch_gui()?;
+  info!("Get runtime...");
 
-  let _r = main_loop().await?;
+  let tokio_runtime = Runtime::new()?;
+
+
+  //info!("Starting main loop...");
+
+  tokio_runtime.spawn(async {
+    info!("STARTING MAIN LOOP...");
+    let _r = main_loop().await;
+  });
+
+  info!("Launching GUI...");
+  thread::spawn(|| {
+    info!("LAUNCHING GUI...");
+    let _r = launch_gui();
+  });
+
+
+  //tokio_runtime.spawn(async {
+  //  info!("LAUNCHING GUI...");
+  //  let _r = launch_gui();
+  //});
+
+  info!("Starting web server...");
+
+  //tokio_runtime.spawn(async move {
+  //  info!("LAUNCHING WEBSERVER...");
+  //  //let _r = launch_gui();
+  //  let _r = launch_web_server().await;
+  //});
+
+  //thread::spawn(move || {
+  //  info!("LAUNCHING WEBSERVER...");
+  //  //tokio::runtime::Runtime::new().unwrap().block_on(async {
+  //  tokio_runtime.block_on(async {
+  //    let _r = launch_web_server().await;
+  //  });
+  //});
+
+
+//  HttpServer::new(move || {
+//    let app = actix_web::App::new();
+//    //.app_data(web::Data::new(server_state_arc.firehose_publisher.clone()))
+//
+//    app.service(
+//      web::resource("/next")
+//          .route(web::get().to(get_next_audio_file_handler))
+//          .route(web::head().to(|| HttpResponse::Ok()))
+//    )
+//  })
+//      .bind("localhost:23333")?
+//      .workers(8)
+//      .run()
+//      .await?;
+
+  let _r = launch_web_server().await;
+
+  loop {
+    info!("Sleep");
+    thread::sleep(Duration::from_secs(5));
+  }
 
   Ok(())
 }

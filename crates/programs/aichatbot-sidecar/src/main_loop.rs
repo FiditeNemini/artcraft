@@ -8,6 +8,4 @@ pub async fn main_loop() -> AnyhowResult<()> {
     info!("iter");
     thread::sleep(Duration::from_millis(5000));
   }
-
-  Ok(())
 }
