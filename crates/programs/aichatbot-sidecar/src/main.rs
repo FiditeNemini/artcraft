@@ -2,6 +2,7 @@
 // https://github.com/emilk/egui/blob/master/examples/hello_world/src/main.rs
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")] // hide console window on Windows in release
 
+pub mod gui;
 pub mod jobs;
 pub mod main_loop;
 pub mod state;
@@ -18,6 +19,7 @@ use clap::{App, Arg};
 use crate::main_loop::main_loop;
 use errors::AnyhowResult;
 use log::info;
+use crate::gui::launch_gui::launch_gui;
 use crate::web_server::launch_web_server::launch_web_server;
 
 //#[tokio::main]
@@ -55,10 +57,16 @@ pub async fn main() -> AnyhowResult<()> {
 
   //tokio_runtime.spawn(async {
   //  info!("LAUNCHING GUI...");
-  //  let _r = launch_gui();
   //});
 
   info!("Starting web server...");
 
-  launch_web_server().await
+  thread::spawn(move || {
+    let server_future = launch_web_server();
+    actix_web::rt::System::new().block_on(server_future)
+  });
+
+  let _r = launch_gui();
+
+  Ok(())
 }
