@@ -20,6 +20,7 @@ use crate::main_loop::main_loop;
 use errors::AnyhowResult;
 use log::info;
 use crate::gui::launch_gui::launch_gui;
+use crate::gui::launch_imgui::launch_imgui;
 use crate::web_server::get_next_audio_file_handler::get_next_audio_file_handler;
 use crate::web_server::launch_web_server::launch_web_server;
 
@@ -60,7 +61,7 @@ pub async fn main() -> AnyhowResult<()> {
   info!("Launching GUI...");
   thread::spawn(|| {
     info!("LAUNCHING GUI...");
-    let _r = launch_gui();
+    let _r = launch_imgui();
   });
 
 
