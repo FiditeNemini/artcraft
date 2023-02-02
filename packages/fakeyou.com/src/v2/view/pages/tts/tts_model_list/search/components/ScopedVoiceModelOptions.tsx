@@ -58,7 +58,13 @@ export function ScopedVoiceModelOptions(props: Props) {
     leafiestCategoryModels = Array.from(new Set(allTtsModels));
   }
 
-  let options = leafiestCategoryModels
+  interface DropdownOption {
+    label: string;
+    value: string;
+    creatorName?: string;
+  }
+
+  let options : DropdownOption[] = leafiestCategoryModels
     .filter((ttsModel) => {
       // Scope to currently selected language
       if (props.selectedTtsLanguageScope === "*") {
@@ -72,6 +78,7 @@ export function ScopedVoiceModelOptions(props: Props) {
       return {
         label: ttsModel.title,
         value: ttsModel.model_token,
+        creatorName: ttsModel.creator_display_name,
       };
     });
 
@@ -87,6 +94,7 @@ export function ScopedVoiceModelOptions(props: Props) {
     selectedOption = {
       label: "Select voice...",
       value: "*",
+      creatorName: undefined,
     };
   }
 
@@ -102,22 +110,42 @@ export function ScopedVoiceModelOptions(props: Props) {
     selectedOption = {
       label: "Loading...",
       value: "*",
+      creatorName: undefined,
     };
   } else if (options.length === 0) {
     // NB: Perhaps the user has refined their search to be too narrow (langauge + category)
     selectedOption = {
       label: "No results (remove some filters)",
       value: "*",
+      creatorName: undefined,
     };
   }
 
   const numberVoices = options.length;
 
-  const canSearchVoices = !props.isExploreTrayOpen // Always allow search when try is closed
-      || numberVoices > 100 // Always allow search when there are over 100 voices
-      || window.innerWidth >= 1000; // Always allow search when on desktop
+  const canSearchVoices =
+    !props.isExploreTrayOpen || // Always allow search when try is closed
+    numberVoices > 100 || // Always allow search when there are over 100 voices
+    window.innerWidth >= 1000; // Always allow search when on desktop
 
   let select;
+
+  // Function to build the options themselves, so we can introduce extra elements.
+  const formatOptionLabel = (data: DropdownOption, formatOptionLabelMeta: any) => {
+    let creatorName = <></>
+    if (data.creatorName !== undefined) {
+      creatorName = (
+        <span className="opacity-50">
+        {" "} — {data.creatorName}
+        </span>
+      );
+    }
+    return (
+      <div>
+        {data.label}{creatorName}
+      </div>
+    )
+  };
 
   // TODO: Cleanup
 
@@ -128,13 +156,21 @@ export function ScopedVoiceModelOptions(props: Props) {
         options={options}
         classNames={SearchFieldClass}
         onChange={handleChange}
-        onMenuOpen={() => { Analytics.ttsOpenPrimaryVoiceSelectMenu() } }
+        onMenuOpen={() => {
+          Analytics.ttsOpenPrimaryVoiceSelectMenu();
+        }}
         isLoading={isLoading}
         isSearchable={true}
-        // NB: The following settings improve upon performance. 
+        // NB: The following settings improve upon performance.
         // See: https://github.com/JedWatson/react-select/issues/3128
-        filterOption={createFilter({ignoreAccents: false})}
-        components={{SingleValue: FixedSingleValueSelectOption, Option: FastReactSelectOption} as any}
+        filterOption={createFilter({ ignoreAccents: false })}
+        components={
+          {
+            SingleValue: FixedSingleValueSelectOption,
+            Option: FastReactSelectOption,
+          } as any
+        }
+        formatOptionLabel={formatOptionLabel}
       />
     );
   } else {
@@ -155,6 +191,7 @@ export function ScopedVoiceModelOptions(props: Props) {
         // See: https://github.com/JedWatson/react-select/issues/3128
         filterOption={createFilter({ ignoreAccents: false })}
         components={{ Option: FastReactSelectOption } as any}
+        formatOptionLabel={formatOptionLabel}
       />
     );
   }
@@ -168,7 +205,6 @@ export function ScopedVoiceModelOptions(props: Props) {
           </span>
 
           {select}
-
         </div>
       </div>
     </>
