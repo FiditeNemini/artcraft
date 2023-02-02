@@ -123,9 +123,15 @@ order by r.use_count desc
 -- Top 100 models by use count, last 5 days, in specific language.
 -- Limited due to tmux scrollback.
 --
+-- English: ('en', 'en-US', 'en-AU', 'en-CA', 'en-GB')
+-- Spanish: ('es', 'es-419', 'es-AR', 'es-CL', 'es-CO', 'es-ES', 'es-MX', 'es-PE', 'es-US')
+-- Italian: ('it', 'it-CH', 'it-IT')
+-- Portuguese: ('pt', 'pt-BR')
+--
 select
     m.token,
     m.title,
+    m.text_pipeline_type,
     m.ietf_language_tag,
     u.username,
     r.use_count,
@@ -135,7 +141,7 @@ select
 from (
          select model_token, count(*) as use_count
          from tts_results
-         where created_at > ( CURDATE() - INTERVAL 5 DAY )
+         where created_at > ( CURDATE() - INTERVAL 30 DAY )
          group by model_token
      ) as r
          join tts_models as m
