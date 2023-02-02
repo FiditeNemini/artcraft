@@ -15,6 +15,7 @@ path = "src/main.rs"
 [dependencies]
 
 # Internal
+actix_helpers = { path = "../../lib/actix_helpers" }
 errors = { path = "../../lib/errors" }
 http_server_common = { path = "../../lib/http_server_common" }
 
@@ -25,17 +26,6 @@ log = "0.4.14"
 
 # Async Runtime
 tokio = { version = "1.6.0", features = ["macros"] }
-
-# Gui (Egui)
-eframe = "0.20.1"
-egui = "0.20.1"
-
-# Gui (Imgui)
-imgui = "0.10.0"
-glium = { version = "0.32.1", default-features = true }
-imgui-glium-renderer = "0.10.0"
-imgui-winit-support = "0.10.0"
-
 
 # Web
 actix-cors = "0.6.0-beta.3"

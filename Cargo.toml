@@ -13,6 +13,7 @@ members = [
   "crates/cli/database_cleanup",
 
   # Shared libraries
+  "crates/lib/actix_helpers",
   "crates/lib/cloud_storage",
   "crates/lib/config",
   "crates/lib/container_common",

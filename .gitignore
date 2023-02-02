@@ -4,6 +4,7 @@
 *~
 .env
 .env-secrets
+.env-aichatbot-secrets
 .idea/
 __pycache__/
 _ignored_schema.rs

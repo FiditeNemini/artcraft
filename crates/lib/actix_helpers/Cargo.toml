@@ -1,0 +1,32 @@
+[package]
+name = "actix_helpers"
+edition = "2018"
+version = "0.0.1"
+authors = [
+    "Brandon Thomas <bt@brand.io>",
+    "Brandon Thomas <echelon@gmail.com>",
+]
+publish = false
+
+[lib]
+# NB: Public "errors" crate is name-squatted, so we're fine to use this internally.
+name = "actix_helpers"
+path = "src/lib.rs"
+
+[dependencies]
+# Internal
+errors = { path = "../../lib/errors" }
+
+# Actix
+actix-cors = "0.6.0-beta.3"
+actix-files= "0.6.0-beta.8"
+actix-http = "3.0.0-beta.11"
+actix-multipart = "0.4.0-beta.7"
+actix-rt = "2.4.0"
+actix-service = "2.0.1"
+actix-utils = "3.0.0"
+actix-web = "4.0.0-beta.10"
+actix-web-actors = "4.0.0-beta.7"
+
+[dev-dependencies]
+# None yet

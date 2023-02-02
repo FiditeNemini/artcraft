@@ -2,7 +2,6 @@
 // https://github.com/emilk/egui/blob/master/examples/hello_world/src/main.rs
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")] // hide console window on Windows in release
 
-pub mod gui;
 pub mod jobs;
 pub mod main_loop;
 pub mod state;
@@ -19,11 +18,7 @@ use clap::{App, Arg};
 use crate::main_loop::main_loop;
 use errors::AnyhowResult;
 use log::info;
-use crate::gui::launch_gui::launch_gui;
-use crate::gui::launch_imgui::launch_imgui;
-use crate::web_server::get_next_audio_file_handler::get_next_audio_file_handler;
 use crate::web_server::launch_web_server::launch_web_server;
-
 
 //#[tokio::main]
 #[actix_web::main]
@@ -58,13 +53,6 @@ pub async fn main() -> AnyhowResult<()> {
     let _r = main_loop().await;
   });
 
-  info!("Launching GUI...");
-  thread::spawn(|| {
-    info!("LAUNCHING GUI...");
-    let _r = launch_imgui();
-  });
-
-
   //tokio_runtime.spawn(async {
   //  info!("LAUNCHING GUI...");
   //  let _r = launch_gui();
@@ -72,42 +60,5 @@ pub async fn main() -> AnyhowResult<()> {
 
   info!("Starting web server...");
 
-  //tokio_runtime.spawn(async move {
-  //  info!("LAUNCHING WEBSERVER...");
-  //  //let _r = launch_gui();
-  //  let _r = launch_web_server().await;
-  //});
-
-  //thread::spawn(move || {
-  //  info!("LAUNCHING WEBSERVER...");
-  //  //tokio::runtime::Runtime::new().unwrap().block_on(async {
-  //  tokio_runtime.block_on(async {
-  //    let _r = launch_web_server().await;
-  //  });
-  //});
-
-
-//  HttpServer::new(move || {
-//    let app = actix_web::App::new();
-//    //.app_data(web::Data::new(server_state_arc.firehose_publisher.clone()))
-//
-//    app.service(
-//      web::resource("/next")
-//          .route(web::get().to(get_next_audio_file_handler))
-//          .route(web::head().to(|| HttpResponse::Ok()))
-//    )
-//  })
-//      .bind("localhost:23333")?
-//      .workers(8)
-//      .run()
-//      .await?;
-
-  let _r = launch_web_server().await;
-
-  loop {
-    info!("Sleep");
-    thread::sleep(Duration::from_secs(5));
-  }
-
-  Ok(())
+  launch_web_server().await
 }
