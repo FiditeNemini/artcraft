@@ -1,0 +1,41 @@
+[package]
+name = "aichatbot-sidecar"
+publish = false
+edition = "2021"
+version = "0.0.1"
+authors = [
+    "Brandon Thomas <bt@brand.io>",
+    "Brandon Thomas <echelon@gmail.com>",
+]
+
+[[bin]]
+name = "aichatbot-sidecar"
+path = "src/main.rs"
+
+[dependencies]
+
+# Internal
+errors = { path = "../../lib/errors" }
+
+# External
+clap = "2.34.0" # TODO: This is really out of date, but has conflicts when updated
+easyenv = "0.0.6"
+log = "0.4.14"
+
+# Async Runtime
+tokio = { version = "1.6.0", features = ["macros"] }
+
+# Gui
+eframe = "0.20.1"
+egui = "0.20.1"
+
+# Web
+actix-cors = "0.6.0-beta.3"
+actix-files= "0.6.0-beta.8"
+actix-http = "3.0.0-beta.11"
+actix-multipart = "0.4.0-beta.7"
+actix-rt = "2.4.0"
+actix-service = "2.0.1"
+actix-utils = "3.0.0"
+actix-web = "4.0.0-beta.10"
+actix-web-actors = "4.0.0-beta.7"

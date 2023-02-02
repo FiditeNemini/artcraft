@@ -33,6 +33,9 @@ members = [
   "crates/lib/url_config",
   "crates/lib/user_input_common",
 
+  # Programs: Desktop apps
+  "crates/programs/aichatbot-sidecar",
+
   # Services: API servers, jobs, workers, etc.
   "crates/service/job/analytics_job",
   "crates/service/job/download_job",
