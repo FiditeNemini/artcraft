@@ -2,7 +2,7 @@ import React from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { TtsModelListItem } from "@storyteller/components/src/api/tts/ListTtsModels";
 import { TtsCategoryType } from "../../../../../../../AppWrapper";
-import Select, { createFilter } from "react-select";
+import Select, { createFilter, StylesConfig } from "react-select";
 import { SearchFieldClass } from "./SearchFieldClass";
 import { FastReactSelectOption } from "../../../../../_common/react_select/FastReactSelectOption";
 import { Analytics } from "../../../../../../../common/Analytics";
@@ -58,7 +58,13 @@ export function ScopedVoiceModelOptions(props: Props) {
     leafiestCategoryModels = Array.from(new Set(allTtsModels));
   }
 
-  let options = leafiestCategoryModels
+  interface DropdownOption {
+    label: string;
+    value: string;
+    creatorName?: string;
+  }
+
+  let options : DropdownOption[] = leafiestCategoryModels
     .filter((ttsModel) => {
       // Scope to currently selected language
       if (props.selectedTtsLanguageScope === "*") {
@@ -70,15 +76,9 @@ export function ScopedVoiceModelOptions(props: Props) {
     })
     .map((ttsModel) => {
       return {
-        label: (
-          <>
-            {ttsModel.title}{" "}
-            <span className="opacity-50">
-              — {ttsModel.creator_display_name}
-            </span>
-          </>
-        ),
+        label: ttsModel.title,
         value: ttsModel.model_token,
+        creatorName: ttsModel.creator_display_name,
       };
     });
 
@@ -92,8 +92,9 @@ export function ScopedVoiceModelOptions(props: Props) {
     // when in reality no state would have changed. By forcing the user to choose, the user will set
     // the state appropriately.
     selectedOption = {
-      label: <>"Select voice...",</>,
+      label: "Select voice...",
       value: "*",
+      creatorName: undefined,
     };
   }
 
@@ -107,14 +108,16 @@ export function ScopedVoiceModelOptions(props: Props) {
     // label is to use controlled props / value as is done here:
     isLoading = true;
     selectedOption = {
-      label: <>"Loading..."</>,
+      label: "Loading...",
       value: "*",
+      creatorName: undefined,
     };
   } else if (options.length === 0) {
     // NB: Perhaps the user has refined their search to be too narrow (langauge + category)
     selectedOption = {
-      label: <>"No results (remove some filters)"</>,
+      label: "No results (remove some filters)",
       value: "*",
+      creatorName: undefined,
     };
   }
 
@@ -126,6 +129,23 @@ export function ScopedVoiceModelOptions(props: Props) {
     window.innerWidth >= 1000; // Always allow search when on desktop
 
   let select;
+
+  // Function to build the options themselves, so we can introduce extra elements.
+  const formatOptionLabel = (data: DropdownOption, formatOptionLabelMeta: any) => {
+    let creatorName = <></>
+    if (data.creatorName !== undefined) {
+      creatorName = (
+        <span className="opacity-50">
+        {" "} — {data.creatorName}
+        </span>
+      );
+    }
+    return (
+      <div>
+        {data.label}{creatorName}
+      </div>
+    )
+  };
 
   // TODO: Cleanup
 
@@ -150,6 +170,7 @@ export function ScopedVoiceModelOptions(props: Props) {
             Option: FastReactSelectOption,
           } as any
         }
+        formatOptionLabel={formatOptionLabel}
       />
     );
   } else {
@@ -170,6 +191,7 @@ export function ScopedVoiceModelOptions(props: Props) {
         // See: https://github.com/JedWatson/react-select/issues/3128
         filterOption={createFilter({ ignoreAccents: false })}
         components={{ Option: FastReactSelectOption } as any}
+        formatOptionLabel={formatOptionLabel}
       />
     );
   }
