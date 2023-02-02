@@ -10,8 +10,6 @@ fake_you
 fakeu
 fakeyou
 hanashi
-hyper_jail
-hyperjail
 monogatari
 storied
 stories
@@ -23,7 +21,15 @@ vocode
 vocoder
 vocoders
 vocodes
+
+# Past brands/products
+hyper_jail
+hyperjail
 voxelcam
+
+# Hypothetical brands/products
+generative
+generatv
 
 # Types of models
 diffusion
@@ -31,6 +37,7 @@ first_order_model
 fom
 hifigan
 melgan
+spleeter
 stable_diffusion
 stablediffusion
 tacotron
@@ -39,8 +46,13 @@ tts
 w2l
 
 # Competitors
+11_labs
+11labs
 15_ai
 15ai
+eleven
+eleven_labs
+elevenlabs
 fifteen_ai
 fifteenai
 playground
@@ -223,6 +235,7 @@ result
 results
 robot
 robots
+rust
 search
 setting
 settings
@@ -338,9 +351,11 @@ promote
 rank
 ranking
 rankings
+redeem
 redirect
 regenerate
 remove
+renew
 reset
 search
 send

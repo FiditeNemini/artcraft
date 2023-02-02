@@ -1,6 +1,12 @@
 # This file serves to remove racial slurs and epithets from usage with vocodes.
 # There's probably more than this that we'll want to remove.
 # I need to investigate.
+
+# A few fake slurs for testing
+fakeslur
+junglehorse
+slurfake
+
 # Additional slurs from BibbyBoi 2022-03-04
 arabush
 aravush
