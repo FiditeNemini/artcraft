@@ -15,13 +15,13 @@ path = "src/lib.rs"
 [dependencies]
 
 # Internal
-container_common = { path = "../../lib/container_common" }
-database_queries = { path = "../../lib/database_queries" }
-enums = { path = "../../_types/enums" }
-http_server_common = { path = "../../lib/http_server_common" }
-reusable_types = { path = "../../_types/reusable_types" }
-tokens = { path = "../../_types/tokens" }
-user_input_common = { path = "../../lib/user_input_common" }
+container_common = { path = "../../../lib/container_common" }
+database_queries = { path = "../../../lib/database_queries" }
+enums = { path = "../../../_types/enums" }
+http_server_common = { path = "../../../lib/http_server_common" }
+reusable_types = { path = "../../../_types/reusable_types" }
+tokens = { path = "../../../_types/tokens" }
+user_input_common = { path = "../../../lib/user_input_common" }
 
 # External
 anyhow = "1.0.40"

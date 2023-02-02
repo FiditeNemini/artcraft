@@ -15,7 +15,7 @@ path = "src/lib.rs"
 [dependencies]
 
 # Internal
-container_common = { path = "../../lib/container_common" }
+container_common = { path = "../../../lib/container_common" }
 
 # External
 anyhow = "1.0.40"

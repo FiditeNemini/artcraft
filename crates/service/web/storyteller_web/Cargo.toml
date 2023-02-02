@@ -39,8 +39,8 @@ url_config = { path = "../../../lib/url_config" }
 user_input_common = { path = "../../../lib/user_input_common" }
 
 # Internal Components
-billing_component = { path = "../../../plugins/billing" }
-users_component = { path = "../../../plugins/users" }
+billing_component = { path = "../../plugins/billing" }
+users_component = { path = "../../plugins/users" }
 
 # Vendored code
 newrelic-telemetry = { path = "../../../vendor/newrelic-telemetry-sdk-rust" }

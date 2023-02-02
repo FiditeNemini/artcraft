@@ -15,11 +15,11 @@ path = "src/lib.rs"
 [dependencies]
 
 # Internal
-container_common = { path = "../../lib/container_common" }
-database_queries = { path = "../../lib/database_queries" }
-http_server_common = { path = "../../lib/http_server_common" }
-reusable_types = { path = "../../_types/reusable_types" }
-url_config = { path = "../../lib/url_config" }
+container_common = { path = "../../../lib/container_common" }
+database_queries = { path = "../../../lib/database_queries" }
+http_server_common = { path = "../../../lib/http_server_common" }
+reusable_types = { path = "../../../_types/reusable_types" }
+url_config = { path = "../../../lib/url_config" }
 
 # External
 anyhow = "1.0.40"

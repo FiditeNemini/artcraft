@@ -12,11 +12,6 @@ members = [
   "crates/cli/database_backup",
   "crates/cli/database_cleanup",
 
-  # Plugins are complete subsystems that can be plugged into services (users, billing, etc.)
-  "crates/plugins/billing",
-  "crates/plugins/inference_workloads",
-  "crates/plugins/users",
-
   # Shared libraries
   "crates/lib/cloud_storage",
   "crates/lib/config",
@@ -50,4 +45,9 @@ members = [
   "crates/service/web/image_generation_service",
   "crates/service/web/storyteller_web",
   "crates/service/web/websocket_gateway",
+
+  # Service Plugins: complete subsystems that can be plugged into services (users, billing, etc.)
+  "crates/service/plugins/billing",
+  "crates/service/plugins/inference_workloads",
+  "crates/service/plugins/users",
 ]
