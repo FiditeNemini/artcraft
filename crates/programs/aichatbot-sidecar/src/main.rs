@@ -5,24 +5,24 @@
 pub mod gui;
 pub mod jobs;
 pub mod main_loop;
-pub mod state;
+pub mod shared_state;
 pub mod web_server;
 
 #[macro_use] extern crate serde_derive;
 
+use actix_web::{HttpResponse, HttpServer, web};
+use clap::{App, Arg};
+use crate::gui::launch_gui::launch_gui;
+use crate::main_loop::main_loop;
+use crate::shared_state::control_state::ControlState;
+use crate::web_server::launch_web_server::launch_web_server;
+use errors::AnyhowResult;
+use log::info;
+use std::sync::Arc;
 use std::thread;
 use std::time::Duration;
 use tokio::runtime::Runtime;
-//use actix_rt::Runtime;
-use actix_web::{HttpResponse, HttpServer, web};
-use clap::{App, Arg};
-use crate::main_loop::main_loop;
-use errors::AnyhowResult;
-use log::info;
-use crate::gui::launch_gui::launch_gui;
-use crate::web_server::launch_web_server::launch_web_server;
 
-//#[tokio::main]
 #[actix_web::main]
 pub async fn main() -> AnyhowResult<()> {
   easyenv::init_all_with_default_logging(Some("info"));
@@ -42,31 +42,28 @@ pub async fn main() -> AnyhowResult<()> {
   //        .takes_value(true))
   //    .get_matches();
 
-
-  info!("Get runtime...");
+  let control_state = Arc::new(ControlState::new());
 
   let tokio_runtime = Runtime::new()?;
 
-
-  //info!("Starting main loop...");
+  info!("Starting async processes...");
 
   tokio_runtime.spawn(async {
-    info!("STARTING MAIN LOOP...");
     let _r = main_loop().await;
   });
 
-  //tokio_runtime.spawn(async {
-  //  info!("LAUNCHING GUI...");
-  //});
-
   info!("Starting web server...");
 
+  let control_state2 = control_state.clone();
+
   thread::spawn(move || {
-    let server_future = launch_web_server();
+    let server_future = launch_web_server(control_state2);
     actix_web::rt::System::new().block_on(server_future)
   });
 
-  let _r = launch_gui();
+  info!("Starting GUI ...");
+
+  let _r = launch_gui(control_state.clone());
 
   Ok(())
 }

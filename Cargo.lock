@@ -747,7 +747,7 @@ dependencies = [
  "actix-web 4.0.0-beta.10",
  "actix-web-actors",
  "actix_helpers",
- "clap 2.34.0",
+ "clap",
  "easyenv",
  "eframe",
  "egui",
@@ -790,7 +790,7 @@ version = "0.0.1"
 dependencies = [
  "anyhow",
  "chrono",
- "clap 2.34.0",
+ "clap",
  "config",
  "container_common",
  "database_queries",
@@ -1408,28 +1408,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "clap"
-version = "4.0.18"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "335867764ed2de42325fafe6d18b8af74ba97ee0c590fa016f157535b42ab04b"
-dependencies = [
- "atty",
- "bitflags",
- "clap_lex",
- "strsim 0.10.0",
- "termcolor",
-]
-
-[[package]]
-name = "clap_lex"
-version = "0.3.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0d4198f73e42b4936b35b5bb248d81d2b595ecb170da0bac7655c54eedfa8da8"
-dependencies = [
- "os_str_bytes",
-]
-
-[[package]]
 name = "clipboard-win"
 version = "4.5.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1960,8 +1938,7 @@ version = "0.0.1"
 dependencies = [
  "anyhow",
  "chrono",
- "clap 2.34.0",
- "clap 4.0.18",
+ "clap",
  "config",
  "container_common",
  "dotenv",
@@ -1979,7 +1956,6 @@ version = "0.0.1"
 dependencies = [
  "anyhow",
  "chrono",
- "clap 4.0.18",
  "config",
  "container_common",
  "dotenv",
@@ -2201,7 +2177,7 @@ version = "0.0.1"
 dependencies = [
  "anyhow",
  "chrono",
- "clap 2.34.0",
+ "clap",
  "cloud_storage",
  "config",
  "container_common",
@@ -3474,7 +3450,7 @@ version = "0.0.1"
 dependencies = [
  "anyhow",
  "chrono",
- "clap 2.34.0",
+ "clap",
  "cloud_storage",
  "config",
  "container_common",
@@ -4531,12 +4507,6 @@ dependencies = [
  "dlv-list",
  "hashbrown",
 ]
-
-[[package]]
-name = "os_str_bytes"
-version = "6.3.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "3baf96e39c5359d2eb0dd6ccb42c62b91d9678aa68160d261b9e0ccbf9e9dea9"
 
 [[package]]
 name = "osmesa-sys"
@@ -6869,7 +6839,7 @@ version = "0.0.1"
 dependencies = [
  "anyhow",
  "chrono",
- "clap 2.34.0",
+ "clap",
  "cloud_storage",
  "config",
  "container_common",
@@ -6900,7 +6870,7 @@ version = "0.0.1"
 dependencies = [
  "anyhow",
  "chrono",
- "clap 2.34.0",
+ "clap",
  "cloud_storage",
  "config",
  "container_common",
@@ -7319,7 +7289,7 @@ dependencies = [
  "anyhow",
  "buckets",
  "chrono",
- "clap 2.34.0",
+ "clap",
  "cloud_storage",
  "config",
  "container_common",
@@ -7350,7 +7320,7 @@ version = "0.0.1"
 dependencies = [
  "anyhow",
  "chrono",
- "clap 2.34.0",
+ "clap",
  "cloud_storage",
  "config",
  "container_common",

@@ -1,6 +1,9 @@
+use std::sync::Arc;
 use actix_http::StatusCode;
 use actix_web::{HttpRequest, HttpResponse, ResponseError, web};
+use log::error;
 use http_server_common::response::serialize_as_json_error::serialize_as_json_error;
+use crate::shared_state::control_state::ControlState;
 
 #[derive(Serialize)]
 pub struct GetNextAudioFileResponse {
@@ -34,12 +37,18 @@ impl std::fmt::Display for GetNextAudioFileError {
 
 pub async fn get_next_audio_file_handler(
   _http_request: HttpRequest,
-  //_server_state: web::Data<Arc<ServerState>>
+  control_state: web::Data<Arc<ControlState>>
 ) -> Result<HttpResponse, GetNextAudioFileError> {
+
+  let is_paused = control_state.is_paused()
+      .map_err(|err| {
+        error!("Error: {:?}", err);
+        GetNextAudioFileError::ServerError
+      })?;
 
   let response = GetNextAudioFileResponse {
     success: true,
-    is_paused: false,
+    is_paused,
   };
 
   let body = serde_json::to_string(&response)
