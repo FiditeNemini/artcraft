@@ -21,7 +21,8 @@ container_common = { path = "../../lib/container_common" }
 # External
 anyhow = "1.0.40"
 chrono = { version = "0.4.19", features = ["serde"] }
-clap4 = { package = "clap", version = "4.0" } # TODO/NB: We're using an older version of clap elsewhere, hence the naming.
+# TODO/NB: Commenting out clap4 as it prevents windows builds
+# clap4 = { package = "clap", version = "4.0" } # TODO/NB: We're using an older version of clap elsewhere, hence the naming.
 dotenv = "0.15.0"
 easyenv = "0.0.6"
 hostname = "0.3.1"
