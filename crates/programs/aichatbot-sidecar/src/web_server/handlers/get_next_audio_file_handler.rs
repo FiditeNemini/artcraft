@@ -17,7 +17,10 @@ pub struct GetNextAudioQuery {
 pub struct GetNextAudioFileResponse {
   pub success: bool,
   pub is_paused: bool,
-  pub audio_filename: Option<String>,
+  pub audio_filename_platform: Option<String>,
+  /// The audio filename, in a Unix style (forward slashes).
+  /// Note, this might have a windows drive letter.
+  pub audio_filename_unixy: Option<String>,
   pub next_cursor: u64,
 }
 
@@ -70,11 +73,13 @@ pub async fn get_next_audio_file_handler(
 
   let next_cursor;
   let mut audio_filename : Option<String> = None;
+  let mut audio_filename_unixy : Option<String> = None;
 
   if file_exists(&maybe_audio_filename) {
     next_cursor = request.cursor + 1;
     audio_filename = maybe_audio_filename.to_str()
         .map(|s| s.to_string());
+    audio_filename_unixy = audio_filename.map(|s| s.replace("\\", "/"));
   } else {
     next_cursor = 0;
     audio_filename = None;
@@ -84,7 +89,8 @@ pub async fn get_next_audio_file_handler(
     success: true,
     is_paused,
     next_cursor,
-    audio_filename,
+    audio_filename_platform: audio_filename,
+    audio_filename_unixy,
   };
 
   let body = serde_json::to_string(&response)
