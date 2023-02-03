@@ -48,9 +48,9 @@ fn get_save_directory(matches: &ArgMatches) -> AnyhowResult<String> {
     // Use the current directory
     maybe_save_directory = std::env::current_dir()
         .ok()
-        .map(|pathbuf| pathbuf.join(DEFAULT_SAVE_DIRECTORY))
-        .map(|pathbuf| std::fs::canonicalize(pathbuf).ok())
-        .flatten();
+        .map(|pathbuf| pathbuf.join(DEFAULT_SAVE_DIRECTORY));
+        //.map(|pathbuf| std::fs::canonicalize(pathbuf).ok())
+        //.flatten();
 
     info!("SA dir(2): {:?}", maybe_save_directory);
   }
