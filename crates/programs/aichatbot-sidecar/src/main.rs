@@ -17,15 +17,16 @@ use async_openai::Client;
 use clap::{App, Arg};
 use crate::gui::launch_gui::launch_gui;
 use crate::main_loop::main_loop;
-use crate::shared_state::control_state::ControlState;
+use crate::shared_state::app_control_state::AppControlState;
 use crate::startup_args::get_startup_args;
-use crate::web_server::launch_web_server::launch_web_server;
+use crate::web_server::launch_web_server::{launch_web_server, LaunchWebServerArgs};
 use errors::AnyhowResult;
 use log::info;
 use std::sync::Arc;
 use std::thread;
 use std::time::Duration;
 use tokio::runtime::Runtime;
+use crate::persistence::save_directory::SaveDirectory;
 
 #[actix_web::main]
 pub async fn main() -> AnyhowResult<()> {
@@ -37,13 +38,14 @@ pub async fn main() -> AnyhowResult<()> {
 
   let startup_args = get_startup_args()?;
 
-  let control_state = Arc::new(ControlState::new());
+  let app_control_state = Arc::new(AppControlState::new());
 
   let openai_client = Arc::new(Client::new()
       .with_api_key(startup_args.openai_secret_key.clone()));
 
-
   let tokio_runtime = Runtime::new()?;
+
+  let save_directory = SaveDirectory::new(&startup_args.save_directory);
 
   info!("Starting async processes...");
 
@@ -53,20 +55,21 @@ pub async fn main() -> AnyhowResult<()> {
 
   info!("Starting web server...");
 
-  let control_state2 = control_state.clone();
+  let app_control_state2 = app_control_state.clone();
   let openai_client2 = openai_client.clone();
 
   thread::spawn(move || {
-    let server_future = launch_web_server(
-      control_state2,
-      openai_client2,
-    );
+    let server_future = launch_web_server(LaunchWebServerArgs {
+      app_control_state: app_control_state2,
+      openai_client: openai_client2,
+      save_directory,
+    });
     actix_web::rt::System::new().block_on(server_future)
   });
 
   info!("Starting GUI ...");
 
-  let _r = launch_gui(startup_args.clone(), control_state.clone());
+  let _r = launch_gui(startup_args.clone(), app_control_state.clone());
 
   Ok(())
 }

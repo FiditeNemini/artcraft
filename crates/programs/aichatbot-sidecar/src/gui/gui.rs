@@ -1,7 +1,7 @@
 use std::sync::Arc;
 use eframe::egui;
 use log::{error, info};
-use crate::shared_state::control_state::ControlState;
+use crate::shared_state::app_control_state::AppControlState;
 
 /// Initial state for the GUI
 pub struct AppGuiArgs {
@@ -9,7 +9,7 @@ pub struct AppGuiArgs {
   pub save_directory: String,
 
   /// Shared state with the HTTP server and workers.
-  pub control_state: Arc<ControlState>,
+  pub control_state: Arc<AppControlState>,
 }
 
 pub struct AppGui {
@@ -20,7 +20,7 @@ pub struct AppGui {
   is_paused: bool,
 
   /// Shared state with the HTTP server and workers.
-  control_state: Arc<ControlState>,
+  control_state: Arc<AppControlState>,
 }
 
 impl AppGui {

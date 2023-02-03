@@ -5,7 +5,7 @@ use async_openai::Client;
 use async_openai::types::CreateCompletionRequestArgs;
 use log::{error, info};
 use http_server_common::response::serialize_as_json_error::serialize_as_json_error;
-use crate::shared_state::control_state::ControlState;
+use crate::shared_state::app_control_state::AppControlState;
 
 #[derive(Serialize)]
 pub struct OpenAiInferenceResponse {
@@ -39,7 +39,7 @@ impl std::fmt::Display for OpenAiInferenceError {
 
 pub async fn openai_inference_handler(
   _http_request: HttpRequest,
-  control_state: web::Data<Arc<ControlState>>,
+  control_state: web::Data<Arc<AppControlState>>,
   openai_client: web::Data<Arc<Client>>,
 ) -> Result<HttpResponse, OpenAiInferenceError> {
 

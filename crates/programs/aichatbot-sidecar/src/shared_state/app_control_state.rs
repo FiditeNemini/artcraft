@@ -1,16 +1,17 @@
 use std::sync::{Arc, LockResult, RwLock};
 use errors::{anyhow, AnyhowResult};
 
-pub struct ControlState {
+/// User-controlled parameters that determine how the app behaves at runtime.
+pub struct AppControlState {
   /// Whether the playback should be paused
   /// Unreal Engine will get this over HTTP and know whether to no-op.
   is_paused: Arc<RwLock<bool>>,
 }
 
-impl ControlState {
+impl AppControlState {
 
   pub fn new() -> Self {
-    ControlState {
+    AppControlState {
       is_paused: Arc::new(RwLock::new(false)),
     }
   }

@@ -24,6 +24,7 @@ clap = "2.34.0" # TODO: This is really out of date, but has conflicts when updat
 easyenv = "0.0.6"
 log = "0.4.14"
 dotenv = "0.15.0"
+path-absolutize = "3.0.14" # Absolute paths have not stabilized in Rust yet
 
 # Async Runtime
 tokio = { version = "1.6.0", features = ["macros"] }

@@ -1,9 +1,11 @@
 use async_openai::Client;
-use crate::shared_state::control_state::ControlState;
+use crate::persistence::save_directory::SaveDirectory;
+use crate::shared_state::app_control_state::AppControlState;
 use std::sync::Arc;
 
 #[derive(Clone)]
 pub struct ServerState {
-  pub control_state: Arc<ControlState>,
+  pub app_control_state: Arc<AppControlState>,
   pub openai_client: Arc<Client>,
+  pub save_directory: SaveDirectory,
 }

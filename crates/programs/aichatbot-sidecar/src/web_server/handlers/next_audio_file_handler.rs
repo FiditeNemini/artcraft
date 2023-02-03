@@ -3,7 +3,7 @@ use actix_http::StatusCode;
 use actix_web::{HttpRequest, HttpResponse, ResponseError, web};
 use log::error;
 use http_server_common::response::serialize_as_json_error::serialize_as_json_error;
-use crate::shared_state::control_state::ControlState;
+use crate::shared_state::app_control_state::AppControlState;
 
 #[derive(Serialize)]
 pub struct NextAudioFileResponse {
@@ -37,7 +37,7 @@ impl std::fmt::Display for NextAudioFileError {
 
 pub async fn next_audio_file_handler(
   _http_request: HttpRequest,
-  control_state: web::Data<Arc<ControlState>>
+  control_state: web::Data<Arc<AppControlState>>
 ) -> Result<HttpResponse, NextAudioFileError> {
 
   let is_paused = control_state.is_paused()

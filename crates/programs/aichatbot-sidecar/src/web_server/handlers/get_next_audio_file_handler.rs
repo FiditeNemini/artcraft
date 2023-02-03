@@ -4,7 +4,7 @@ use actix_web::{HttpRequest, HttpResponse, ResponseError, web};
 use actix_web::web::Query;
 use log::{error, info};
 use http_server_common::response::serialize_as_json_error::serialize_as_json_error;
-use crate::shared_state::control_state::ControlState;
+use crate::shared_state::app_control_state::AppControlState;
 
 #[derive(Deserialize)]
 pub struct GetNextAudioQuery {
@@ -44,7 +44,7 @@ impl std::fmt::Display for GetNextAudioFileError {
 
 pub async fn get_next_audio_file_handler(
   _http_request: HttpRequest,
-  control_state: web::Data<Arc<ControlState>>,
+  control_state: web::Data<Arc<AppControlState>>,
   request: Query<GetNextAudioQuery>,
 ) -> Result<HttpResponse, GetNextAudioFileError> {
 
