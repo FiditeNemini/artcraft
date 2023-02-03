@@ -42,6 +42,8 @@ fn get_save_directory(matches: &ArgMatches) -> AnyhowResult<String> {
       .map(|val| val.trim().to_string())
       .map(|val| PathBuf::from(val));
 
+  info!("SA dir(1): {:?}", maybe_save_directory);
+
   if maybe_save_directory.is_none() {
     // Use the current directory
     maybe_save_directory = std::env::current_dir()
@@ -49,12 +51,14 @@ fn get_save_directory(matches: &ArgMatches) -> AnyhowResult<String> {
         .map(|pathbuf| pathbuf.join(DEFAULT_SAVE_DIRECTORY))
         .map(|pathbuf| std::fs::canonicalize(pathbuf).ok())
         .flatten();
+
+    info!("SA dir(2): {:?}", maybe_save_directory);
   }
 
   let save_directory = maybe_save_directory
       .unwrap_or_else(|| PathBuf::from(DEFAULT_SAVE_DIRECTORY));
 
-  info!("Possible save directory: {:?}", save_directory);
+  info!("SA dir(3): {:?}", save_directory);
 
   let save_directory= std::fs::canonicalize(save_directory)
       .ok()
@@ -63,6 +67,8 @@ fn get_save_directory(matches: &ArgMatches) -> AnyhowResult<String> {
       .map(|pathbuf| pathbuf.to_str().map(|s| s.to_string()))
       .flatten()
       .ok_or(anyhow!("could not construct path"))?;
+
+  info!("SA dir(4): {:?}", save_directory);
 
   Ok(save_directory)
 }
