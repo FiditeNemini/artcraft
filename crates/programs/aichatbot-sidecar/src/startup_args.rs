@@ -4,7 +4,7 @@ use log::info;
 use path_absolutize::Absolutize;
 use errors::{anyhow, AnyhowResult};
 
-const DEFAULT_SAVE_DIRECTORY : &'static str = "./data";
+const DEFAULT_SAVE_DIRECTORY : &'static str = "data";
 
 #[derive(Clone, Default)]
 pub struct StartupArgs {
@@ -60,10 +60,10 @@ fn get_save_directory(matches: &ArgMatches) -> AnyhowResult<String> {
 
   info!("SA dir(3): {:?}", save_directory);
 
-  let save_directory= std::fs::canonicalize(save_directory)
+  let save_directory = save_directory
+      .absolutize()
       .ok()
-      .map(|pathbuf| pathbuf.absolutize().ok().map(|inner| inner.to_path_buf()))
-      .flatten()
+      .map(|inner| inner.to_path_buf())
       .map(|pathbuf| pathbuf.to_str().map(|s| s.to_string()))
       .flatten()
       .ok_or(anyhow!("could not construct path"))?;
