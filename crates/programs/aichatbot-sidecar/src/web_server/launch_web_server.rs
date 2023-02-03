@@ -3,11 +3,12 @@ use actix_web::{App, HttpResponse, HttpServer, web};
 use async_openai::Client;
 use crate::shared_state::control_state::ControlState;
 use crate::web_server::handlers::get_next_audio_file_handler::get_next_audio_file_handler;
+use crate::web_server::handlers::next_audio_file_handler::next_audio_file_handler;
+use crate::web_server::handlers::openai_inference_handler::openai_inference_handler;
 use crate::web_server::server_state::ServerState;
 use errors::AnyhowResult;
 use http_server_common::endpoints::root_index::get_root_index;
 use std::sync::Arc;
-use crate::web_server::handlers::openai_inference_handler::openai_inference_handler;
 
 pub async fn launch_web_server(
   control_state: Arc<ControlState>,
@@ -29,7 +30,8 @@ pub async fn launch_web_server(
 
     let app = route_builder
         .add_get("/", get_root_index)
-        .add_get("/next", get_next_audio_file_handler)
+        .add_get("/get_next_audio", get_next_audio_file_handler)
+        .add_post("/next_audio", next_audio_file_handler)
         .add_get("/openai", openai_inference_handler)
         .into_app();
 

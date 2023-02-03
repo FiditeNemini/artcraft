@@ -1,32 +1,25 @@
 use std::sync::Arc;
 use actix_http::StatusCode;
 use actix_web::{HttpRequest, HttpResponse, ResponseError, web};
-use actix_web::web::Query;
-use log::{error, info};
+use log::error;
 use http_server_common::response::serialize_as_json_error::serialize_as_json_error;
 use crate::shared_state::control_state::ControlState;
 
-#[derive(Deserialize)]
-pub struct GetNextAudioQuery {
-  pub cursor: u64,
-}
-
 #[derive(Serialize)]
-pub struct GetNextAudioFileResponse {
+pub struct NextAudioFileResponse {
   pub success: bool,
   pub is_paused: bool,
-  pub next_cursor: u64,
 }
 
 #[derive(Debug, Serialize)]
-pub enum GetNextAudioFileError {
+pub enum NextAudioFileError {
   ServerError,
 }
 
-impl ResponseError for GetNextAudioFileError {
+impl ResponseError for NextAudioFileError {
   fn status_code(&self) -> StatusCode {
     match *self {
-      GetNextAudioFileError::ServerError => StatusCode::INTERNAL_SERVER_ERROR,
+      NextAudioFileError::ServerError => StatusCode::INTERNAL_SERVER_ERROR,
     }
   }
 
@@ -36,36 +29,30 @@ impl ResponseError for GetNextAudioFileError {
 }
 
 // NB: Not using derive_more::Display since Clion doesn't understand it.
-impl std::fmt::Display for GetNextAudioFileError {
+impl std::fmt::Display for NextAudioFileError {
   fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
     write!(f, "{:?}", self)
   }
 }
 
-pub async fn get_next_audio_file_handler(
+pub async fn next_audio_file_handler(
   _http_request: HttpRequest,
-  control_state: web::Data<Arc<ControlState>>,
-  request: Query<GetNextAudioQuery>,
-) -> Result<HttpResponse, GetNextAudioFileError> {
-
-  info!("Requested cursor: {}", request.cursor);
+  control_state: web::Data<Arc<ControlState>>
+) -> Result<HttpResponse, NextAudioFileError> {
 
   let is_paused = control_state.is_paused()
       .map_err(|err| {
         error!("Error: {:?}", err);
-        GetNextAudioFileError::ServerError
+        NextAudioFileError::ServerError
       })?;
 
-  let next_cursor = request.cursor + 1;
-
-  let response = GetNextAudioFileResponse {
+  let response = NextAudioFileResponse {
     success: true,
     is_paused,
-    next_cursor,
   };
 
   let body = serde_json::to_string(&response)
-      .map_err(|e| GetNextAudioFileError::ServerError)?;
+      .map_err(|e| NextAudioFileError::ServerError)?;
 
   Ok(HttpResponse::Ok()
       .content_type("application/json")

@@ -13,6 +13,7 @@ pub mod web_server;
 #[macro_use] extern crate serde_derive;
 
 use actix_web::{HttpResponse, HttpServer, web};
+use async_openai::Client;
 use clap::{App, Arg};
 use crate::gui::launch_gui::launch_gui;
 use crate::main_loop::main_loop;
@@ -24,7 +25,6 @@ use log::info;
 use std::sync::Arc;
 use std::thread;
 use std::time::Duration;
-use async_openai::Client;
 use tokio::runtime::Runtime;
 
 #[actix_web::main]
