@@ -17,5 +17,7 @@
 #![allow(dead_code)]
 #![allow(non_snake_case)]
 
+pub mod directory_exists;
+pub mod file_exists;
 pub mod hash;
 pub mod mimetype;

@@ -3,8 +3,10 @@ use actix_http::StatusCode;
 use actix_web::{HttpRequest, HttpResponse, ResponseError, web};
 use actix_web::web::Query;
 use log::{error, info};
+use files::file_exists::file_exists;
 use http_server_common::response::serialize_as_json_error::serialize_as_json_error;
 use crate::shared_state::app_control_state::AppControlState;
+use crate::web_server::server_state::ServerState;
 
 #[derive(Deserialize)]
 pub struct GetNextAudioQuery {
@@ -15,6 +17,7 @@ pub struct GetNextAudioQuery {
 pub struct GetNextAudioFileResponse {
   pub success: bool,
   pub is_paused: bool,
+  pub audio_filename: Option<String>,
   pub next_cursor: u64,
 }
 
@@ -45,6 +48,7 @@ impl std::fmt::Display for GetNextAudioFileError {
 pub async fn get_next_audio_file_handler(
   _http_request: HttpRequest,
   control_state: web::Data<Arc<AppControlState>>,
+  server_state: web::Data<Arc<ServerState>>,
   request: Query<GetNextAudioQuery>,
 ) -> Result<HttpResponse, GetNextAudioFileError> {
 
@@ -56,12 +60,29 @@ pub async fn get_next_audio_file_handler(
         GetNextAudioFileError::ServerError
       })?;
 
-  let next_cursor = request.cursor + 1;
+
+  let audio_file_dir = server_state.save_directory.get_audio_files_dir_v1();
+
+  let maybe_audio_filename = format!("{}.wav", request.cursor);
+  let maybe_audio_filename = audio_file_dir.join(maybe_audio_filename);
+
+  let next_cursor;
+  let mut audio_filename : Option<String> = None;
+
+  if file_exists(&maybe_audio_filename) {
+    next_cursor = request.cursor + 1;
+    audio_filename = maybe_audio_filename.to_str()
+        .map(|s| s.to_string());
+  } else {
+    next_cursor = 0;
+    audio_filename = None;
+  };
 
   let response = GetNextAudioFileResponse {
     success: true,
     is_paused,
     next_cursor,
+    audio_filename,
   };
 
   let body = serde_json::to_string(&response)

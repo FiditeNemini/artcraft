@@ -1,4 +1,6 @@
 use std::path::{Path, PathBuf};
+use log::info;
+use path_absolutize::Absolutize;
 
 #[derive(Clone)]
 pub struct SaveDirectory {
@@ -16,6 +18,12 @@ impl SaveDirectory {
   /// This is just the first directory structure, which is sequential audio files.
   /// We'll be using a database and well-formed filesystem layout later.
   pub fn get_audio_files_dir_v1(&self) -> PathBuf {
-    self.directory.join("./audio_files")
+    let result = self.directory.join("./audio_files");
+    info!("{:?}", result.canonicalize());
+    let result = result.canonicalize().unwrap_or(result);
+    let result = result.absolutize()
+        .map(|file| file.to_path_buf())
+        .unwrap_or(result);
+    result
   }
 }

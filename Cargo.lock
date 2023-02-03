@@ -754,6 +754,7 @@ dependencies = [
  "eframe",
  "egui",
  "errors",
+ "files",
  "glium",
  "http_server_common",
  "imgui",
