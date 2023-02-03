@@ -3,6 +3,15 @@ use eframe::egui;
 use log::{error, info};
 use crate::shared_state::control_state::ControlState;
 
+/// Initial state for the GUI
+pub struct AppGuiArgs {
+  /// Where the program saves its database
+  pub save_directory: String,
+
+  /// Shared state with the HTTP server and workers.
+  pub control_state: Arc<ControlState>,
+}
+
 pub struct AppGui {
   // NB: This is not the authoritative set of state.
   // These will be copied into the shared server state.
@@ -10,16 +19,17 @@ pub struct AppGui {
   default_directory: String,
   is_paused: bool,
 
+  /// Shared state with the HTTP server and workers.
   control_state: Arc<ControlState>,
 }
 
 impl AppGui {
-  pub fn new(control_state: Arc<ControlState>) -> Self {
+  pub fn new(args: AppGuiArgs) -> Self {
     Self {
       filename: "".to_string(),
-      default_directory: "".to_string(),
+      default_directory: args.save_directory,
       is_paused: false,
-      control_state,
+      control_state: args.control_state,
     }
   }
 }

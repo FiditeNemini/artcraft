@@ -23,11 +23,12 @@ http_server_common = { path = "../../lib/http_server_common" }
 clap = "2.34.0" # TODO: This is really out of date, but has conflicts when updated
 easyenv = "0.0.6"
 log = "0.4.14"
+dotenv = "0.15.0"
 
 # Async Runtime
 tokio = { version = "1.6.0", features = ["macros"] }
 
-# Web
+# Webserver
 actix-cors = "0.6.0-beta.3"
 actix-files= "0.6.0-beta.8"
 actix-http = "3.0.0-beta.11"
@@ -52,3 +53,6 @@ imgui = "0.10.0"
 glium = { version = "0.32.1", default-features = true }
 imgui-glium-renderer = "0.10.0"
 imgui-winit-support = "0.10.0"
+
+# API integrations
+async-openai = "0.6.0"

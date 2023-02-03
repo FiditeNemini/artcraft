@@ -1,21 +1,28 @@
-use std::sync::Arc;
 use actix_helpers::route_builder::RouteBuilder;
 use actix_web::{App, HttpResponse, HttpServer, web};
+use async_openai::Client;
+use crate::shared_state::control_state::ControlState;
 use crate::web_server::handlers::get_next_audio_file_handler::get_next_audio_file_handler;
+use crate::web_server::server_state::ServerState;
 use errors::AnyhowResult;
 use http_server_common::endpoints::root_index::get_root_index;
-use crate::shared_state::control_state::ControlState;
-use crate::web_server::server_state::ServerState;
+use std::sync::Arc;
+use crate::web_server::handlers::openai_inference_handler::openai_inference_handler;
 
-pub async fn launch_web_server(control_state: Arc<ControlState>) -> AnyhowResult<()> {
+pub async fn launch_web_server(
+  control_state: Arc<ControlState>,
+  openai_client: Arc<Client>
+) -> AnyhowResult<()> {
 
   let server_state = Arc::new(ServerState {
     control_state: control_state.clone(),
+    openai_client: openai_client.clone(),
   });
 
   HttpServer::new(move || {
     let app = App::new()
         .app_data(web::Data::new(control_state.clone()))
+        .app_data(web::Data::new(openai_client.clone()))
         .app_data(web::Data::new(server_state.clone()));
 
     let mut route_builder = RouteBuilder::from_app(app);
@@ -23,6 +30,7 @@ pub async fn launch_web_server(control_state: Arc<ControlState>) -> AnyhowResult
     let app = route_builder
         .add_get("/", get_root_index)
         .add_get("/next", get_next_audio_file_handler)
+        .add_get("/openai", openai_inference_handler)
         .into_app();
 
     /*app.service(
