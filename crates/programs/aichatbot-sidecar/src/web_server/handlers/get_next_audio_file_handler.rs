@@ -79,7 +79,9 @@ pub async fn get_next_audio_file_handler(
     next_cursor = request.cursor + 1;
     audio_filename = maybe_audio_filename.to_str()
         .map(|s| s.to_string());
-    audio_filename_unixy = audio_filename.map(|s| s.replace("\\", "/"));
+    audio_filename_unixy = audio_filename.as_deref()
+        .map(|s| s.to_string())
+        .map(|s| s.replace("\\", "/"));
   } else {
     next_cursor = 0;
     audio_filename = None;
