@@ -66,6 +66,8 @@ pub async fn get_next_audio_file_handler(
   let maybe_audio_filename = format!("{}.wav", request.cursor);
   let maybe_audio_filename = audio_file_dir.join(maybe_audio_filename);
 
+  info!("Hypothetical audio file: {:?}", maybe_audio_filename);
+
   let next_cursor;
   let mut audio_filename : Option<String> = None;
 
