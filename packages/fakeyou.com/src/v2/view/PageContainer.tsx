@@ -63,6 +63,7 @@ import { CheckoutCancelPage } from "./pages/premium/CheckoutCancelPage";
 import { PortalSuccessPage } from "./pages/premium/PortalSuccessPage";
 import { PrivacyPage } from "./pages/about/privacy_page/PrivacyPage";
 import { GetComputedTtsCategoryAssignmentsSuccessResponse } from "@storyteller/components/src/api/category/GetComputedTtsCategoryAssignments";
+import { ChannelsPage } from "./pages/channels/ChannelsPage";
 //import { LandingPage } from "./pages/landing/LandingPage";
 //import { VcModelListPage } from "./pages/vc/vc_model_list/VcModelListPage";
 
@@ -132,8 +133,8 @@ interface Props {
   maybeSelectedTtsModel?: TtsModelListItem;
   setMaybeSelectedTtsModel: (maybeSelectedTtsModel: TtsModelListItem) => void;
 
-  selectedTtsLanguageScope: string,
-  setSelectedTtsLanguageScope: (selectedTtsLanguageScope: string) => void,
+  selectedTtsLanguageScope: string;
+  setSelectedTtsLanguageScope: (selectedTtsLanguageScope: string) => void;
 }
 
 interface State {}
@@ -164,7 +165,13 @@ class PageContainer extends React.Component<Props, State> {
 
           <Switch>
             <Route path="/firehose">
-              <FirehoseEventListPage sessionWrapper={this.props.sessionWrapper} />
+              <FirehoseEventListPage
+                sessionWrapper={this.props.sessionWrapper}
+              />
+            </Route>
+
+            <Route path="/channels">
+              <ChannelsPage sessionWrapper={this.props.sessionWrapper} />
             </Route>
 
             <Route path="/leaderboard">
@@ -300,7 +307,9 @@ class PageContainer extends React.Component<Props, State> {
             </Route>
 
             <Route path="/w2l/:templateToken/delete">
-              <W2lTemplateDeletePage sessionWrapper={this.props.sessionWrapper} />
+              <W2lTemplateDeletePage
+                sessionWrapper={this.props.sessionWrapper}
+              />
             </Route>
 
             <Route path="/w2l/:templateSlug">
@@ -498,7 +507,9 @@ class PageContainer extends React.Component<Props, State> {
                 maybeSelectedTtsModel={this.props.maybeSelectedTtsModel}
                 setMaybeSelectedTtsModel={this.props.setMaybeSelectedTtsModel}
                 selectedTtsLanguageScope={this.props.selectedTtsLanguageScope}
-                setSelectedTtsLanguageScope={this.props.setSelectedTtsLanguageScope}
+                setSelectedTtsLanguageScope={
+                  this.props.setSelectedTtsLanguageScope
+                }
               />
             </Route>
 
