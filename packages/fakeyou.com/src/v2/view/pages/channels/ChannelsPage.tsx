@@ -40,7 +40,6 @@ function ChannelsPage(props: Props) {
   const [stream, setStream] = useState<StreamInfo>({
     broadcaster_name: "",
     title: "",
-    // viewer_count: "",
   });
 
   const [channel, setChannel] = useState<ChannelInfo>({
