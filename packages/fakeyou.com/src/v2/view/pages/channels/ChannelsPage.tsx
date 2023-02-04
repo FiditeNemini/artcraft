@@ -1,23 +1,93 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
-import {} from "@fortawesome/free-solid-svg-icons";
-import {} from "@fortawesome/free-brands-svg-icons";
 import { motion } from "framer-motion";
 import { container, item } from "../../../../data/animation";
 import { usePrefixedDocumentTitle } from "../../../../common/UsePrefixedDocumentTitle";
-import { TwitchPlayerNonInteractive, TwitchChat } from "react-twitch-embed";
+import { TwitchPlayer, TwitchChat } from "react-twitch-embed";
+import axios from "axios";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faEye } from "@fortawesome/pro-solid-svg-icons";
 
 interface Props {
   sessionWrapper: SessionWrapper;
 }
 
+interface StreamInfo {
+  broadcaster_name: string;
+  title: string;
+  // viewer_count: string;
+}
+
+interface ChannelInfo {
+  profile_image_url: string;
+  description: string;
+  login: string;
+}
+
+interface ViewerCount {
+  viewer_count: number;
+}
+
+let twitchApi = axios.create({
+  headers: {
+    "Client-ID": "8s2gjp7ora3zswgjabz1svoi24ting",
+    Authorization: "Bearer 10uyyp7l6n21zlezht8vvv25uvenu3",
+  },
+});
+
 function ChannelsPage(props: Props) {
   usePrefixedDocumentTitle("Channels");
 
+  const [stream, setStream] = useState<StreamInfo>({
+    broadcaster_name: "",
+    title: "",
+    // viewer_count: "",
+  });
+
+  const [channel, setChannel] = useState<ChannelInfo>({
+    profile_image_url: "",
+    description: "",
+    login: "",
+  });
+
+  const [viewerCount, setViewerCount] = useState<ViewerCount>({
+    viewer_count: 0,
+  });
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const streamInfo = await twitchApi.get(
+        "https://api.twitch.tv/helix/channels?broadcaster_id=650154491"
+      );
+      setStream(streamInfo.data.data[0]);
+      const channelInfo = await twitchApi.get(
+        "https://api.twitch.tv/helix/users?login=testytest512"
+      );
+      setChannel(channelInfo.data.data[0]);
+      const viewerCountInfo = await twitchApi.get(
+        "https://api.twitch.tv/helix/streams?user_login=testytest512"
+      );
+      setViewerCount(viewerCountInfo.data.data[0]);
+    };
+    fetchData();
+  });
+
+  let twitchChannelLink = "https://twitch.tv/" + channel.login;
+
+  // if (viewerCount !== undefined) {
+  //   console.log("helllooo");
+  // } else {
+  //   let viewerCountNumber = viewerCount.viewer_count.toString();
+  // }
+  let viewCountNumber = "Offline";
+  if (viewerCount !== undefined) {
+    viewCountNumber = viewerCount.viewer_count.toString();
+  }
+
   return (
     <motion.div initial="hidden" animate="visible" variants={container}>
-      <div className="container-panel py-5 px-md-4 px-lg-5 px-xl-3">
-        <div className="row gx-3">
+      <div className="container-panel py-1 py-lg-4 px-md-4 px-lg-5 px-xl-3">
+        <div className="row gx-3 gy-3">
           <div className="col-12 col-lg-8 d-flex flex-column gap-3">
             {/* <div className="d-flex flex-column ms-3 ms-lg-0">
               <motion.h1 className="fw-bold" variants={item}>
@@ -27,18 +97,56 @@ function ChannelsPage(props: Props) {
 
             {/* Feed Content */}
             <motion.div variants={item} className="d-flex flex-column gap-3">
-              <TwitchPlayerNonInteractive
+              <TwitchPlayer
                 channel="testytest512"
                 width="100%"
+                height="100%"
                 autoplay
                 muted
+                className="twitch-video-container"
               />
+              <div className="row align-items-center px-3 px-md-0">
+                <div className="col-12 col-lg-9 d-flex gap-3">
+                  <a href={twitchChannelLink}>
+                    <img
+                      src={channel.profile_image_url}
+                      alt="profile"
+                      width="60"
+                      height="60"
+                      className="channel-image rounded-circle"
+                    />
+                  </a>
+
+                  <div className="d-flex flex-column">
+                    <p className="fw-medium channel-title">
+                      {stream.broadcaster_name}
+                    </p>
+                    <p className="fw-medium opacity-75 stream-title">
+                      {stream.title}
+                    </p>
+                  </div>
+                </div>
+                <div className="col-12 col-lg-3 d-flex justify-content-lg-end h-100">
+                  <p className="fw-medium view-count pe-3 d-none d-lg-block">
+                    <FontAwesomeIcon icon={faEye} className="me-2" />
+                    {viewCountNumber}
+                  </p>
+                </div>
+              </div>
+              <div className="panel d-flex align-items-center gap-3 p-3 channel-description">
+                <p>{channel.description}</p>
+              </div>
             </motion.div>
           </div>
 
           {/* Side column */}
-          <div className="col-4 d-none d-lg-flex flex-column gap-3">
-            <TwitchChat channel="moonstar_x" darkMode width="100%" />
+          <div className="col-12 col-lg-4 flex-column gap-3">
+            <TwitchChat
+              channel="testytest512"
+              darkMode
+              width="100%"
+              className="twitch-chat-container"
+            />
           </div>
         </div>
       </div>

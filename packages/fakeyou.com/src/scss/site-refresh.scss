@@ -856,6 +856,56 @@ styles with important tags:
   wave {
     overflow: hidden !important;
   }
+
+  .twitch-video-container {
+    border: 1px solid #ffffff12 !important;
+    border-radius: 0px;
+    overflow: hidden;
+    background-color: $panel !important;
+    min-height: 220px;
+    height: 100%;
+    box-shadow: 0 0 0 1px rgba(0 0 0 / 30%), 0 70px 65px rgb(0 0 0 / 10%),
+      0 30px 30px rgb(0 0 0 / 8%), 0 15px 15px rgb(0 0 0 / 6%),
+      0 10px 8px rgb(0 0 0 / 4%), 0 4px 4px rgb(0 0 0 / 2%),
+      0 2px 2px rgb(0 0 0 / 1%) !important;
+  }
+
+  .twitch-chat-container {
+    border: 1px solid #ffffff12 !important;
+    border-radius: 8px;
+    background-color: $panel !important;
+    min-height: 650px;
+    box-shadow: 0 0 0 1px rgba(0 0 0 / 30%), 0 70px 65px rgb(0 0 0 / 10%),
+      0 30px 30px rgb(0 0 0 / 8%), 0 15px 15px rgb(0 0 0 / 6%),
+      0 10px 8px rgb(0 0 0 / 4%), 0 4px 4px rgb(0 0 0 / 2%),
+      0 2px 2px rgb(0 0 0 / 1%) !important;
+  }
+
+  .channel-title {
+    font-size: 16px;
+  }
+
+  .stream-title {
+    font-size: 14px;
+  }
+
+  .channel-description {
+    font-size: 14px;
+  }
+
+  .channel-image {
+    border: 2px solid $white;
+    min-width: 60px;
+    min-height: 60px;
+    height: 60px;
+    width: 60px;
+    object-fit: cover;
+  }
+
+  .view-count {
+    font-size: 14px;
+    color: #fc6b68;
+  }
 }
 
 select {
@@ -1055,6 +1105,12 @@ textarea {
       &.img-vc {
         max-height: 300px;
       }
+    }
+
+    .twitch-video-container {
+      min-height: 391px;
+      height: 100%;
+      border-radius: 8px;
     }
   }
 }
