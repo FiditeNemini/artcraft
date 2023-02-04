@@ -3,6 +3,7 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")] // hide console window on Windows in release
 
 pub mod gui;
+pub mod ingestion;
 pub mod jobs;
 pub mod main_loop;
 pub mod persistence;
