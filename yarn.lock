@@ -3795,6 +3795,7 @@ __metadata:
     react-scripts: 5.0.0
     react-select: ^5.7.0
     react-share: ^4.4.1
+    react-twitch-embed: ^3.0.1
     react-wavesurfer.js: ^0.0.8
     sass: ^1.57.1
     typescript: ^3.7.5
@@ -3900,8 +3901,6 @@ __metadata:
   dependencies:
     craco: ^0.0.3
     lerna: ^4.0.0
-    react-select: ^5.7.0
-    react-twitch-embed: ^3.0.1
     yarn: ^1.22.19
   languageName: unknown
   linkType: soft
