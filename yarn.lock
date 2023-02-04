@@ -3901,6 +3901,7 @@ __metadata:
     craco: ^0.0.3
     lerna: ^4.0.0
     react-select: ^5.7.0
+    react-twitch-embed: ^3.0.1
     yarn: ^1.22.19
   languageName: unknown
   linkType: soft
@@ -16357,6 +16358,16 @@ __metadata:
     react: ">=16.6.0"
     react-dom: ">=16.6.0"
   checksum: 75602840106aa9c6545149d6d7ae1502fb7b7abadcce70a6954c4b64a438ff1cd16fc77a0a1e5197cdd72da398f39eb929ea06f9005c45b132ed34e056ebdeb1
+  languageName: node
+  linkType: hard
+
+"react-twitch-embed@npm:^3.0.1":
+  version: 3.0.1
+  resolution: "react-twitch-embed@npm:3.0.1"
+  peerDependencies:
+    react: ^18.2.0
+    react-dom: ^18.2.0
+  checksum: 07e885abc479afcf2918584fd449f516c37d3a766762004fdbb92f84a3d3177287e92009755f16bbc9e68b022820e26af1bf86b1edddef2499abe750345b662b
   languageName: node
   linkType: hard
 
