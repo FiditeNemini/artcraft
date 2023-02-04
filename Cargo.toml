@@ -33,6 +33,7 @@ members = [
   "crates/lib/twitch_common",
   "crates/lib/url_config",
   "crates/lib/user_input_common",
+  "crates/lib/web_scrapers",
 
   # Programs: Desktop apps
   "crates/programs/aichatbot-sidecar",

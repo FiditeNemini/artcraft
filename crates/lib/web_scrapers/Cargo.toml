@@ -1,0 +1,24 @@
+[package]
+name = "web_scrapers"
+edition = "2018"
+version = "0.0.1"
+authors = [
+    "Brandon Thomas <bt@brand.io>",
+    "Brandon Thomas <echelon@gmail.com>",
+]
+publish = false
+
+[lib]
+# NB: Public "errors" crate is name-squatted, so we're fine to use this internally.
+name = "web_scrapers"
+path = "src/lib.rs"
+
+[dependencies]
+# Internal
+errors = { path = "../../lib/errors" }
+
+# External
+scraper = "0.14.0"
+
+[dev-dependencies]
+# None yet
