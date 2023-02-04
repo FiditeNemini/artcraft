@@ -15,7 +15,6 @@ interface Props {
 interface StreamInfo {
   broadcaster_name: string;
   title: string;
-  // viewer_count: string;
 }
 
 interface ChannelInfo {
