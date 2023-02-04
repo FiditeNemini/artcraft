@@ -1,15 +1,10 @@
-import React, { useState, useEffect, useRef } from "react";
-import { ApiConfig } from "@storyteller/components";
+import React from "react";
 import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
-import { Gravatar } from "@storyteller/components/src/elements/Gravatar";
-import { Link } from "react-router-dom";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {} from "@fortawesome/free-solid-svg-icons";
 import {} from "@fortawesome/free-brands-svg-icons";
 import { motion } from "framer-motion";
 import { container, item } from "../../../../data/animation";
 import { usePrefixedDocumentTitle } from "../../../../common/UsePrefixedDocumentTitle";
-import { RatingButtons } from "../../_common/ratings/RatingButtons";
 import { TwitchPlayerNonInteractive, TwitchChat } from "react-twitch-embed";
 
 interface Props {
@@ -22,7 +17,7 @@ function ChannelsPage(props: Props) {
   return (
     <motion.div initial="hidden" animate="visible" variants={container}>
       <div className="container-panel py-5 px-md-4 px-lg-5 px-xl-3">
-        <div className="row">
+        <div className="row gx-3">
           <div className="col-12 col-lg-9 d-flex flex-column gap-3">
             {/* <div className="d-flex flex-column ms-3 ms-lg-0">
               <motion.h1 className="fw-bold" variants={item}>
