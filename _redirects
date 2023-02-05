@@ -11,6 +11,8 @@
 /firehose*   /index.html   200
 /guide*   /index.html   200
 /jobs*   /index.html   200
+/landing*   /index.html   200
+/landing_temp*   /index.html   200
 /leaderboard*   /index.html   200
 /login*   /index.html   200
 /moderation*   /index.html   200
