@@ -93,6 +93,8 @@ voicemod
 # Existing frontend pages (frontend repo)
 about
 category
+channel
+channels
 checkout_cancel
 checkout_success
 clone
