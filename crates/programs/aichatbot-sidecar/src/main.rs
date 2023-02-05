@@ -30,7 +30,9 @@ use std::time::Duration;
 use sqlx::sqlite::SqlitePoolOptions;
 use tokio::runtime::Runtime;
 use sqlite_queries::queries::by_table::web_scraping_targets::insert_web_scraping_target::{Args, insert_web_scraping_target};
-use web_scrapers::sites::cnn::cnn_scraper::cnn_scraper_test;
+use web_scrapers::sites::cnn::cnn_article_scraper::cnn_article_scraper;
+use web_scrapers::sites::cnn::cnn_indexer::cnn_scraper_test;
+use web_scrapers::sites::techcrunch::techcrunch_article_scraper::techcrunch_article_scraper;
 use web_scrapers::sites::techcrunch::techcrunch_scraper::techcrunch_scraper_test;
 use web_scrapers::sites::theguardian::theguardian_scraper::theguardian_scraper_test;
 
@@ -41,9 +43,15 @@ pub async fn main() -> AnyhowResult<()> {
       .max_connections(5)
       .connect(&database_url).await?;
 
-  //let targets = cnn_scraper_test().await?;
+  /*
+  let mut targets = Vec::new();
+
   //let targets = techcrunch_scraper_test().await?;
-  let targets = theguardian_scraper_test().await?;
+  //let targets = theguardian_scraper_test().await?;
+
+  targets.extend(cnn_scraper_test().await?);
+  targets.extend(techcrunch_scraper_test().await?);
+  targets.extend(theguardian_scraper_test().await?);
 
   for target in targets.iter() {
     //println!("\n\nTarget: {:?}", target);
@@ -57,6 +65,11 @@ pub async fn main() -> AnyhowResult<()> {
       sqlite_pool: &pool,
     }).await;
   }
+  */
+
+  //let _r = cnn_article_scraper("https://www.cnn.com/2023/02/02/tech/first-generation-iphone-auction/index.html").await?;
+  let _r = techcrunch_article_scraper("https://techcrunch.com/2023/02/04/elon-musk-says-twitter-will-provide-a-free-write-only-api-to-bots-providing-good-content/").await?;
+
 
   Ok(())
 }
