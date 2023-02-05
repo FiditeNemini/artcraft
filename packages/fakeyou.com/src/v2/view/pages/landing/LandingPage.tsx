@@ -131,10 +131,7 @@ function LandingPage(props: Props) {
         </motion.div>
       </div>
 
-      <motion.div
-        className="container container-panel-blur mt-5 mb-5"
-        variants={panel}
-      >
+      <motion.div className="container mt-5 mb-5" variants={panel}>
         <div className="row pt-1 pt-lg-5 gy-5">
           <div className="col-12 col-md-6 text-center">
             <Link
