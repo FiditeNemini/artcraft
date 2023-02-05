@@ -1,23 +1,39 @@
-*.swo
-*.swp
+# Secrets are BAD!
 *secret*sh
-*~
 .env
-.env-secrets
 .env-aichatbot-secrets
-.idea/
-__pycache__/
-_ignored_schema.rs
+.env-secrets
 db.secrets
 db_secrets.toml
-models/Wav2Lip/python/
-models/tacotron2/python/
 production_database_secret_connect.sh
 production_database_secret_query.sh
 production_database_voice_clone_report_download.sh
 secrets.toml
 secrets.yaml
-target/
 tools/.secrets
 tools/db_secrets.toml
 twitch_secrets.toml
+
+# Rust build directory
+target/
+
+# Vim noise
+*.swo
+*.swp
+*~
+
+# IntelliJ/CLion noise
+.idea/
+
+# Python noise
+__pycache__/
+
+# We use diesel for DB migrations only. We don't care about its codgen.
+_ignored_schema.rs
+
+# AI Chat Sidecar has its own schema managed by diesel, but we don't care for diesel codegen.
+crates/programs/aichatbot-sidecar/_ignored_schema.rs
+
+# Old Python virtual environments
+models/Wav2Lip/python/
+models/tacotron2/python/
