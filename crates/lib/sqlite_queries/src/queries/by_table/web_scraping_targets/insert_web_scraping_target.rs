@@ -1,0 +1,56 @@
+use errors::{anyhow, AnyhowResult};
+use sqlx::SqlitePool;
+use enums::by_table::web_scraping_targets::web_content_type::WebContentType;
+
+pub struct Args <'a> {
+  pub canonical_url: &'a str,
+
+  pub web_content_type: WebContentType,
+
+  pub maybe_title: Option<&'a str>,
+  pub maybe_article_full_image_url: Option<&'a str>,
+  pub maybe_article_thumbnail_image_url: Option<&'a str>,
+
+  pub sqlite_pool: &'a SqlitePool,
+}
+
+pub async fn insert_web_scraping_target(args: Args<'_>) -> AnyhowResult<()> {
+
+  let web_content_type = args.web_content_type.to_str().to_string();
+
+  let query = sqlx::query!(
+        r#"
+INSERT INTO web_scraping_targets(
+  canonical_url,
+  web_content_type,
+  maybe_title,
+  maybe_article_full_image_url,
+  maybe_article_thumbnail_image_url
+)
+VALUES (
+  ?,
+  ?,
+  ?,
+  ?,
+  ?
+)
+        "#,
+        args.canonical_url,
+        web_content_type,
+        args.maybe_title,
+        args.maybe_article_full_image_url,
+        args.maybe_article_thumbnail_image_url,
+    );
+
+  let query_result = query.execute(args.sqlite_pool)
+      .await;
+
+  let _record_id = match query_result {
+    Ok(res) => res.last_insert_rowid(),
+    Err(err) => {
+      return Err(anyhow!("error inserting: {:?}", err));
+    }
+  };
+
+  Ok(())
+}

@@ -1,7 +1,8 @@
-//! web_scrapers
+//! sqlite_queries
 //!
-//! The purpose of this library is to scrape content from websites.
-//! This should power our AI Chatbot and other functionalities.
+//! The purpose of this library is to contain all of our SQlite-related queries.
+//! Keeping them in a single place abstracts away the data layer and makes it easy
+//! to statically generate bindings and write tests.
 //!
 
 // Never allow these
@@ -18,5 +19,4 @@
 #![allow(dead_code)]
 #![allow(non_snake_case)]
 
-pub mod payloads;
-pub mod sites;
+pub mod queries;

@@ -19,6 +19,7 @@ actix_helpers = { path = "../../lib/actix_helpers" }
 errors = { path = "../../lib/errors" }
 files = { path = "../../lib/files" }
 http_server_common = { path = "../../lib/http_server_common" }
+sqlite_queries = { path = "../../lib/sqlite_queries" }
 web_scrapers = { path = "../../lib/web_scrapers" }
 
 # External
@@ -27,6 +28,13 @@ easyenv = "0.0.6"
 log = "0.4.14"
 dotenv = "0.15.0"
 path-absolutize = "3.0.14" # Absolute paths have not stabilized in Rust yet
+
+# SQlite Database
+# "offline" supports typesafe builds without a live database
+# "rustls" doesn't appear to work with IP addresses, per:
+# https://github.com/launchbadge/sqlx/issues/1095#issuecomment-798050828
+#  ^^^ Granted, this applies to *MySQL* and probably not SQLite for our use case here ^^^
+sqlx = { version = "0.6.2", features = [ "sqlite", "runtime-actix-native-tls", "offline", "chrono" ] }
 
 # Async Runtime
 tokio = { version = "1.6.0", features = ["macros"] }

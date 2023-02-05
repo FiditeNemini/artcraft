@@ -9,15 +9,16 @@ authors = [
 publish = false
 
 [lib]
-# NB: Public "errors" crate is name-squatted, so we're fine to use this internally.
 name = "web_scrapers"
 path = "src/lib.rs"
 
 [dependencies]
 # Internal
+enums = { path = "../../_types/enums" }
 errors = { path = "../../lib/errors" }
 
 # External
+log = "0.4.14"
 reqwest = { version = "0.11", features = ["json"] } # HTTP Client
 rss = "2.0.2"
 scraper = "0.14.0"

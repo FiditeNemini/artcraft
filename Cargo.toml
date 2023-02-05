@@ -28,6 +28,7 @@ members = [
   "crates/lib/media",
   "crates/lib/memory_caching",
   "crates/lib/redis_common",
+  "crates/lib/sqlite_queries",
   "crates/lib/subprocess_common",
   "crates/lib/tts_common",
   "crates/lib/twitch_common",

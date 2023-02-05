@@ -27,14 +27,34 @@ use log::info;
 use std::sync::Arc;
 use std::thread;
 use std::time::Duration;
+use sqlx::sqlite::SqlitePoolOptions;
 use tokio::runtime::Runtime;
+use sqlite_queries::queries::by_table::web_scraping_targets::insert_web_scraping_target::{Args, insert_web_scraping_target};
 use web_scrapers::sites::cnn::cnn_scraper::cnn_scraper_test;
 
 #[tokio::main]
 pub async fn main() -> AnyhowResult<()> {
+  let database_url = easyenv::get_env_string_required("DATABASE_URL")?;
+  let pool = SqlitePoolOptions::new()
+      .max_connections(5)
+      .connect(&database_url).await?;
 
-  cnn_scraper_test().await;
+  let targets = cnn_scraper_test().await?;
 
+  for target in targets.iter() {
+    //println!("Target: {:?}", target)
+  }
+
+  for target in targets.iter() {
+    let _r = insert_web_scraping_target(Args {
+      canonical_url: &target.canonical_url,
+      web_content_type: target.web_content_type,
+      maybe_title: target.maybe_title.as_deref(),
+      maybe_article_full_image_url: target.maybe_full_image_url.as_deref(),
+      maybe_article_thumbnail_image_url: target.maybe_thumbnail_image_url.as_deref(),
+      sqlite_pool: &pool,
+    }).await;
+  }
 
   Ok(())
 }
