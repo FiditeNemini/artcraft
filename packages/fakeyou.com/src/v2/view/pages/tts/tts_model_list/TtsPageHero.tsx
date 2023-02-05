@@ -138,15 +138,12 @@ export function TtsPageHero(props: Props) {
                   characters.
                 </Trans>
               </p>
-              <motion.div
-                className="d-flex flex-column flex-md-row gap-3 justify-content-center justify-content-md-start mt-4"
-                variants={item}
-              >
+              <div className="d-flex flex-column flex-md-row gap-3 justify-content-center justify-content-md-start mt-4">
                 {upgradeButton}
                 {signUpButton}
                 {viewPricingButton}
                 {myProfileButton}
-              </motion.div>
+              </div>
             </div>
           </div>
         </div>

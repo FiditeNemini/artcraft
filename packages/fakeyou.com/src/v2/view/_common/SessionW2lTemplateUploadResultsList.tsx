@@ -78,6 +78,12 @@ function SessionW2lTemplateUploadResultList(props: Props) {
     );
   }
 
+  let noResultsSection = <></>;
+
+  if (results.length === 0) {
+    return <>{noResultsSection}</>;
+  }
+
   return (
     <motion.div initial="hidden" animate="visible" variants={container}>
       <div className="container-panel pt-4 pb-5">
