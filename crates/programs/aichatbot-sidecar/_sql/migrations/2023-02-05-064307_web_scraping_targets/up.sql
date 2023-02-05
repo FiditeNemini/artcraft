@@ -14,6 +14,14 @@ CREATE TABLE web_scraping_targets (
   -- We'll need to figure this out for each site.
   canonical_url TEXT NOT NULL UNIQUE,
 
+  -- A full image will only be set at this stage if the RSS feed or HTML specifies one.
+  -- This can be useful downstream during the actual scraping.
+  maybe_article_full_image_url TEXT,
+
+  -- A thumbnail will only be set at this stage if the RSS feed or HTML specifies one.
+  -- This can be useful downstream during the actual scraping.
+  maybe_article_thumbnail_image_url TEXT,
+
   -- Scraping status: "new", "failed", "permanently_failed", "success"
   scraping_status TEXT DEFAULT "new" NOT NULL,
   scrape_attempts INT NOT NULL,

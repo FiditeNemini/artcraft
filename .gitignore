@@ -37,6 +37,9 @@ crates/programs/aichatbot-sidecar/_ignored_schema.rs
 # AI Chat sidecar's SQlite database shouldn't be checked in
 crates/programs/aichatbot-sidecar/database.db
 
+# Runtime data for the AI chatbot
+runtime_data/
+
 # Old Python virtual environments
 models/Wav2Lip/python/
 models/tacotron2/python/
