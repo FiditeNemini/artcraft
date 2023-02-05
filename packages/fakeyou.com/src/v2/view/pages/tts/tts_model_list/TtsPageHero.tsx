@@ -9,6 +9,7 @@ import {
   faStar,
   faUser,
   faArrowRight,
+  faVolumeHigh,
 } from "@fortawesome/free-solid-svg-icons";
 import { item, image } from "../../../../../data/animation";
 import { motion } from "framer-motion";
@@ -23,8 +24,8 @@ interface Props {
 export function TtsPageHero(props: Props) {
   const randomImage = useMemo(() => {
     const images = [
-      // "mascot/kitsune_pose2.webp",
-      // "mascot/kitsune_wizard.webp",
+      "mascot/kitsune_pose2.webp",
+      "mascot/kitsune_wizard.webp",
       // "mascot/halloween_1.webp",
       // "mascot/halloween_2.webp",
       // "mascot/halloween_3.webp",
@@ -32,7 +33,7 @@ export function TtsPageHero(props: Props) {
       // "mascot/xmas_2.webp",
       // "mascot/xmas_3.webp",
       // "mascot/xmas_4.webp",
-      "mascot/chinese_new_year.webp",
+      // "mascot/chinese_new_year.webp",
     ];
 
     return images[Math.floor(Math.random() * images.length)];
@@ -114,8 +115,41 @@ export function TtsPageHero(props: Props) {
   }
 
   return (
-    <div className="container hero-section">
-      <div className="row gx-3 flex-lg-row-reverse align-items-center">
+    <div className="container-panel hero-section pt-4 pt-lg-5 pb-5">
+      <div className="panel">
+        <div className="row gx-3 flex-md-row-reverse">
+          <div className="col-12 col-md-6 hero-img-container d-none d-md-block">
+            <motion.img
+              src={randomImage}
+              className="hero-img"
+              alt="FakeYou Mascot"
+              variants={image}
+            />
+          </div>
+          <div className="col-12 col-md-6">
+            <div className="p-3 py-4 p-lg-4">
+              <h1 className="fw-bold text-center text-md-start">
+                <FontAwesomeIcon icon={faVolumeHigh} className="me-3" />
+                Text to Speech
+              </h1>
+              <p className="text-center text-md-start">
+                {t("tts.TtsModelListPage.formTitle")}
+              </p>
+              <motion.div
+                className="d-flex flex-column flex-md-row gap-3 justify-content-center justify-content-md-start mt-4"
+                variants={item}
+              >
+                {upgradeButton}
+                {signUpButton}
+                {viewPricingButton}
+                {myProfileButton}
+              </motion.div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* <div className="row gx-3 flex-lg-row-reverse align-items-center">
         <div className="col-lg-6">
           <div className="d-flex justify-content-center">
             <motion.img
@@ -157,7 +191,7 @@ export function TtsPageHero(props: Props) {
             {myProfileButton}
           </motion.div>
         </div>
-      </div>
+      </div> */}
     </div>
   );
 }
