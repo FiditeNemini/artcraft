@@ -29,6 +29,7 @@ Install the following libraries, and see the notes further below about MySQL on 
 jq # for combining mysql codegen outputs
 libmysqlclient-dev
 mysql-server
+libsqlite3-dev
 pkgconf # if using openssl instead of rustls
 ```
 
@@ -52,7 +53,7 @@ so we can install the currently published version:
 ```
 cargo install diesel_cli \
   --no-default-features \
-  --features mysql
+  --features mysql,sqlite
 ```
 
 If the modern version fails, try installing a cherry-picked version with a 

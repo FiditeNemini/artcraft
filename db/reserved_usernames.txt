@@ -105,6 +105,7 @@ demo
 firehose
 guide
 jobs
+landing
 leaderboard
 login
 moderation

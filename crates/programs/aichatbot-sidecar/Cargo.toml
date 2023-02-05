@@ -19,6 +19,7 @@ actix_helpers = { path = "../../lib/actix_helpers" }
 errors = { path = "../../lib/errors" }
 files = { path = "../../lib/files" }
 http_server_common = { path = "../../lib/http_server_common" }
+web_scrapers = { path = "../../lib/web_scrapers" }
 
 # External
 clap = "2.34.0" # TODO: This is really out of date, but has conflicts when updated
@@ -30,8 +31,9 @@ path-absolutize = "3.0.14" # Absolute paths have not stabilized in Rust yet
 # Async Runtime
 tokio = { version = "1.6.0", features = ["macros"] }
 
-# HTTP Client
-reqwest = { version = "0.11", features = ["json"] }
+# Content downloads
+reqwest = { version = "0.11", features = ["json"] } # HTTP Client
+rss = "2.0.2"
 
 # Webserver
 actix-cors = "0.6.0-beta.3"

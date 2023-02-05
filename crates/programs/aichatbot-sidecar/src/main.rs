@@ -18,6 +18,7 @@ use async_openai::Client;
 use clap::{App, Arg};
 use crate::gui::launch_gui::launch_gui;
 use crate::main_loop::main_loop;
+use crate::persistence::save_directory::SaveDirectory;
 use crate::shared_state::app_control_state::AppControlState;
 use crate::startup_args::get_startup_args;
 use crate::web_server::launch_web_server::{launch_web_server, LaunchWebServerArgs};
@@ -27,10 +28,19 @@ use std::sync::Arc;
 use std::thread;
 use std::time::Duration;
 use tokio::runtime::Runtime;
-use crate::persistence::save_directory::SaveDirectory;
+use web_scrapers::sites::cnn::cnn_scraper::cnn_scraper_test;
+
+#[tokio::main]
+pub async fn main() -> AnyhowResult<()> {
+
+  cnn_scraper_test().await;
+
+
+  Ok(())
+}
 
 #[actix_web::main]
-pub async fn main() -> AnyhowResult<()> {
+pub async fn main2() -> AnyhowResult<()> {
   easyenv::init_all_with_default_logging(Some("info"));
 
   // NB: Do not check this secrets-containing dotenv file into VCS.

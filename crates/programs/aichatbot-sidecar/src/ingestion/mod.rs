@@ -1,3 +1,4 @@
+pub mod cnn;
 pub mod hackernews;
 pub mod reddit;
 pub mod reuters;
