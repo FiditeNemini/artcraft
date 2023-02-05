@@ -4,6 +4,7 @@ use errors::AnyhowResult;
 use log::warn;
 use rss::Channel;
 
+// NB: Contains nearly 70 items
 const RSS_TOP_STORIES : &'static str = "http://rss.cnn.com/rss/cnn_topstories.rss";
 
 const RSS_WORLD : &'static str = "http://rss.cnn.com/rss/cnn_world.rss";

@@ -1,16 +1,26 @@
+use std::ops::Deref;
+use bytes::Bytes;
 use crate::payloads::web_scraping_target::WebScrapingTarget;
 use enums::by_table::web_scraping_targets::web_content_type::WebContentType;
 use errors::AnyhowResult;
 use log::warn;
 use rss::Channel;
 
+// NB: Contains 20 items
 const RSS_FEED : &'static str = "https://techcrunch.com/feed/";
 
+const VENTURE_FEED : &'static str = "https://techcrunch.com/category/venture/feed/";
+
 pub async fn techcrunch_scraper_test() -> AnyhowResult<Vec<WebScrapingTarget>> {
-  let content = reqwest::get(RSS_FEED)
+  let content = reqwest::get(VENTURE_FEED)
       .await?
       .bytes()
       .await?;
+
+  // NB: TechCrunch's venture feed contains an "&bull;" HTML entity that makes the RSS client choke
+  let content = String::from_utf8_lossy(content.deref());
+  let content = content.replace("&bull;", "");
+  let content = Bytes::from(content);
 
   let channel = Channel::read_from(&content[..])?;
 
