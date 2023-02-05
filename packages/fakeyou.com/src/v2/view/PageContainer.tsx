@@ -64,6 +64,7 @@ import { PortalSuccessPage } from "./pages/premium/PortalSuccessPage";
 import { PrivacyPage } from "./pages/about/privacy_page/PrivacyPage";
 import { GetComputedTtsCategoryAssignmentsSuccessResponse } from "@storyteller/components/src/api/category/GetComputedTtsCategoryAssignments";
 import { ChannelsPage } from "./pages/channels/ChannelsPage";
+import { LandingPage } from "./pages/landing/LandingPage";
 //import { LandingPage } from "./pages/landing/LandingPage";
 //import { VcModelListPage } from "./pages/vc/vc_model_list/VcModelListPage";
 
@@ -432,6 +433,15 @@ class PageContainer extends React.Component<Props, State> {
 
             <Route path="/patrons">
               <PatronPage sessionWrapper={this.props.sessionWrapper} />
+            </Route>
+
+            <Route path="/landing_temp">
+              <LandingPage 
+                sessionWrapper={this.props.sessionWrapper} 
+                sessionSubscriptionsWrapper={
+                  this.props.sessionSubscriptionsWrapper
+                }
+              />
             </Route>
 
             <Route path="/about">
