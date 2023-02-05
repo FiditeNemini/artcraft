@@ -915,36 +915,17 @@ styles with important tags:
     position: relative;
     min-height: 100%;
     overflow: hidden;
-
-    // &:after {
-    //   content: "";
-    //   position: absolute;
-    //   z-index: 1;
-    //   bottom: 0;
-    //   left: 0;
-    //   pointer-events: none;
-    //   background-image: linear-gradient(
-    //     to bottom,
-    //     rgba($panel, 0),
-    //     rgba($panel, 1) 90%
-    //   );
-    //   width: 100%;
-    //   height: 2em;
-    // }
   }
 
   .hero-img {
     pointer-events: none;
     position: absolute;
-    width: 80%;
+    width: 90%;
     margin: auto;
-    top: -26%;
-    right: 4%;
+    top: 30%;
+    right: 6%;
+    bottom: 0;
   }
-
-  // .hero-img-container-mobile {
-  //   // margin-top: 100px;
-  // }
 
   .hero-img-mobile {
     pointer-events: none;
