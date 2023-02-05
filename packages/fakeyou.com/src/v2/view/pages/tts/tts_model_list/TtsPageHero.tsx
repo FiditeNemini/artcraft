@@ -13,7 +13,7 @@ import {
 } from "@fortawesome/pro-solid-svg-icons";
 import { Analytics } from "../../../../../common/Analytics";
 import { WebUrl } from "../../../../../common/WebUrl";
-import { PageHeader } from "../../../_common/PageHeader";
+import { PageHeaderWithImage } from "../../../_common/PageHeaderWithImage";
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -115,7 +115,7 @@ export function TtsPageHero(props: Props) {
 
   const titleIcon = <FontAwesomeIcon icon={faWaveformLines} className="me-3" />;
   const title = <>{t("tts.TtsModelListPage.heroSection.title")}</>;
-  const subtext = (
+  const subText = (
     <>
       <Trans i18nKey="tts.TtsModelListPage.heroSection.subtitle">
         Use FakeYou's deepfake tech to say stuff with your favorite characters.
@@ -133,11 +133,11 @@ export function TtsPageHero(props: Props) {
 
   return (
     <>
-      <PageHeader
+      <PageHeaderWithImage
         headerImage={randomImage}
         titleIcon={titleIcon}
         title={title}
-        subtext={subtext}
+        subText={subText}
         showButtons={true}
         actionButtons={actionButtons}
       />
