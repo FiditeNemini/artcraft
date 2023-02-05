@@ -118,7 +118,7 @@ export function TtsPageHero(props: Props) {
     <div className="container-panel hero-section pt-4 pt-lg-5 pb-5">
       <div className="panel">
         <div className="row gx-3 flex-md-row-reverse">
-          <div className="col-12 col-md-6 hero-img-container d-none d-md-block">
+          <div className="col-12 col-md-5 hero-img-container d-none d-md-block">
             <motion.img
               src={randomImage}
               className="hero-img"
@@ -126,14 +126,17 @@ export function TtsPageHero(props: Props) {
               variants={image}
             />
           </div>
-          <div className="col-12 col-md-6">
-            <div className="p-3 py-4 p-lg-4">
+          <div className="col-12 col-md-7">
+            <div className="p-3 py-4 p-md-4">
               <h1 className="fw-bold text-center text-md-start">
                 <FontAwesomeIcon icon={faVolumeHigh} className="me-3" />
-                Text to Speech
+                {t("tts.TtsModelListPage.heroSection.title")}
               </h1>
               <p className="text-center text-md-start">
-                {t("tts.TtsModelListPage.formTitle")}
+                <Trans i18nKey="tts.TtsModelListPage.heroSection.subtitle">
+                  Use FakeYou's deepfake tech to say stuff with your favorite
+                  characters.
+                </Trans>
               </p>
               <motion.div
                 className="d-flex flex-column flex-md-row gap-3 justify-content-center justify-content-md-start mt-4"
@@ -148,50 +151,6 @@ export function TtsPageHero(props: Props) {
           </div>
         </div>
       </div>
-
-      {/* <div className="row gx-3 flex-lg-row-reverse align-items-center">
-        <div className="col-lg-6">
-          <div className="d-flex justify-content-center">
-            <motion.img
-              src={randomImage}
-              className="img-fluid"
-              width="516"
-              height="508"
-              alt="FakeYou Mascot"
-              variants={image}
-            />
-          </div>
-        </div>
-        <div className="col-lg-6 px-md-2 px-lg-5 px-xl-2">
-          <div>
-            <motion.h1
-              className="display-3 fw-bold lh-1 mb-3 text-center text-lg-start"
-              variants={item}
-            >
-              {t("tts.TtsModelListPage.heroSection.title")}
-            </motion.h1>
-            <motion.p
-              className="lead mb-5 text-center text-lg-start pe-xl-2"
-              variants={item}
-            >
-              <Trans i18nKey="tts.TtsModelListPage.heroSection.subtitle">
-                Use FakeYou's deepfake tech to say stuff with your favorite
-                characters.
-              </Trans>
-            </motion.p>
-          </div>
-
-          <motion.div
-            className="d-flex flex-column flex-md-row gap-3 justify-content-center justify-content-lg-start mb-5 mb-lg-4"
-            variants={item}
-          >
-            {upgradeButton}
-            {signUpButton}
-            {viewPricingButton}
-            {myProfileButton}
-          </motion.div>
-        </div>
-      </div> */}
     </div>
   );
 }
