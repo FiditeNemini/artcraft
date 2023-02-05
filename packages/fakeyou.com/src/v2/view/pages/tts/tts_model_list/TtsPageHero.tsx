@@ -11,7 +11,7 @@ import {
   faArrowRight,
   faWaveformLines,
 } from "@fortawesome/pro-solid-svg-icons";
-import { item, image } from "../../../../../data/animation";
+import { image } from "../../../../../data/animation";
 import { motion } from "framer-motion";
 import { Analytics } from "../../../../../common/Analytics";
 import { WebUrl } from "../../../../../common/WebUrl";

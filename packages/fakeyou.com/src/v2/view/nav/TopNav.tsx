@@ -6,7 +6,6 @@ import { WebUrl } from "../../../common/WebUrl";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faMicrophone,
-  faVolumeUp,
   faPlus,
   faUsers,
   faVideo,
@@ -40,6 +39,7 @@ import "tippy.js/dist/tippy.css";
 import "tippy.js/animations/shift-away.css";
 import { ThirdPartyLinks } from "@storyteller/components/src/constants/ThirdPartyLinks";
 import { Analytics } from "../../../common/Analytics";
+import { faWaveformLines } from "@fortawesome/pro-solid-svg-icons";
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -203,8 +203,7 @@ function TopNav(props: Props) {
             await logoutHandler();
           }}
         >
-          <FontAwesomeIcon icon={faSignOutAlt} />
-          {" "}
+          <FontAwesomeIcon icon={faSignOutAlt} />{" "}
           {t("nav.TopNav.buttons.logout")}
         </button>
       </>
@@ -216,19 +215,28 @@ function TopNav(props: Props) {
       <div className="top-bar d-none d-lg-flex">
         <div className="container d-flex align-items-center">
           <div className="d-flex gap-4 flex-grow-1">
-            <Link className="top-bar-text" to="/about" onClick={() => { Analytics.topbarClickAbout() } }>
+            <Link
+              className="top-bar-text"
+              to="/about"
+              onClick={() => {
+                Analytics.topbarClickAbout();
+              }}
+            >
               {t("nav.TopNav.topbar.aboutLink")}
             </Link>
-            <Link className="top-bar-text" to="/terms" onClick={() => { Analytics.topbarClickTerms() } }>
+            <Link
+              className="top-bar-text"
+              to="/terms"
+              onClick={() => {
+                Analytics.topbarClickTerms();
+              }}
+            >
               {t("nav.TopNav.topbar.termsLink")}
             </Link>
             <Link className="top-bar-text" to="/privacy">
               {t("nav.TopNav.topbar.privacyLink")}
             </Link>
-            <a
-              className="top-bar-text"
-              href={WebUrl.developerDocs()}
-            >
+            <a className="top-bar-text" href={WebUrl.developerDocs()}>
               {t("nav.TopNav.topbar.developersLink")}
             </a>
           </div>
@@ -265,8 +273,7 @@ function TopNav(props: Props) {
               </button>
             </Tippy>
             <p className="top-bar-text ms-2">
-              {t("nav.TopNav.topbar.ttsQueued")}:
-              {" "}
+              {t("nav.TopNav.topbar.ttsQueued")}:{" "}
               <span className="fw-bold text-red">
                 {pendingTtsJobs.pending_job_count}
               </span>
@@ -327,7 +334,9 @@ function TopNav(props: Props) {
                 <li data-bs-toggle="offcanvas" className="nav-item">
                   <Link
                     to={WebUrl.pricingPageWithReferer("topnav")}
-                    onClick={() => { Analytics.topbarClickPricing() } }
+                    onClick={() => {
+                      Analytics.topbarClickPricing();
+                    }}
                     className="nav-link"
                   >
                     <FontAwesomeIcon icon={faStar} className="me-2" />
@@ -338,7 +347,9 @@ function TopNav(props: Props) {
                 <li data-bs-toggle="offcanvas" className="nav-item">
                   <Link
                     to={WebUrl.cloneRequestPage()}
-                    onClick={() => { Analytics.topbarClickVoiceClone() } }
+                    onClick={() => {
+                      Analytics.topbarClickVoiceClone();
+                    }}
                     className="nav-link"
                   >
                     <FontAwesomeIcon icon={faMicrophone} className="me-2" />
@@ -365,7 +376,10 @@ function TopNav(props: Props) {
                   >
                     <li data-bs-toggle="offcanvas">
                       <Link className="dropdown-item" to="/">
-                        <FontAwesomeIcon icon={faVolumeUp} className="me-2" />
+                        <FontAwesomeIcon
+                          icon={faWaveformLines}
+                          className="me-2"
+                        />
                         {t("nav.TopNav.main.ttsOption")}
                       </Link>
                     </li>
@@ -537,8 +551,7 @@ function TopNav(props: Props) {
                       Online: <span className="fw-bold text-red">1,204</span>
                     </p> */}
                     <div className="top-bar-text mobile">
-                      {t("nav.TopNav.topbar.ttsQueued")}:
-                      {" "}
+                      {t("nav.TopNav.topbar.ttsQueued")}:{" "}
                       <span className="fw-bold text-red ">
                         {pendingTtsJobs.pending_job_count}
                       </span>
