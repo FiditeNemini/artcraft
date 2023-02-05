@@ -14,7 +14,7 @@ const VENTURE_FEED : &'static str = "https://techcrunch.com/category/venture/fee
 const STARTUPS_FEED : &'static str = "https://techcrunch.com/category/startups/feed/";
 
 pub async fn techcrunch_scraper_test() -> AnyhowResult<Vec<WebScrapingTarget>> {
-  let content = reqwest::get(STARTUPS_FEED)
+  let content = reqwest::get(MAIN_RSS_FEED)
       .await?
       .bytes()
       .await?;

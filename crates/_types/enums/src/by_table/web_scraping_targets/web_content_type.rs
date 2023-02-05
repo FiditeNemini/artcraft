@@ -27,6 +27,9 @@ pub enum WebContentType {
 
   #[serde(rename = "techcrunch_article")]
   TechCrunchArticle,
+
+  #[serde(rename = "the_guardian_article")]
+  TheGuardianArticle,
 }
 
 // TODO(bt, 2023-01-17): This desperately needs MySQL integration tests!
@@ -43,6 +46,7 @@ impl WebContentType {
       Self::SlashdotArticle => "slashdot_article",
       Self::SubstackPost => "substack_post",
       Self::TechCrunchArticle => "techcrunch_article",
+      Self::TheGuardianArticle => "the_guardian_article",
     }
   }
 
@@ -54,6 +58,7 @@ impl WebContentType {
       "slashdot_article" => Ok(Self::SlashdotArticle),
       "substack_post" => Ok(Self::SubstackPost),
       "techcrunch_article" => Ok(Self::TechCrunchArticle),
+      "the_guardian_article" => Ok(Self::TheGuardianArticle),
       _ => Err(format!("invalid value: {:?}", value)),
     }
   }
@@ -75,6 +80,7 @@ mod tests {
       assert_serialization(WebContentType::SlashdotArticle, "slashdot_article");
       assert_serialization(WebContentType::SubstackPost, "substack_post");
       assert_serialization(WebContentType::TechCrunchArticle, "techcrunch_article");
+      assert_serialization(WebContentType::TheGuardianArticle, "the_guardian_article");
     }
   }
 
@@ -89,6 +95,7 @@ mod tests {
       assert_eq!(WebContentType::SlashdotArticle.to_str(), "slashdot_article");
       assert_eq!(WebContentType::SubstackPost.to_str(), "substack_post");
       assert_eq!(WebContentType::TechCrunchArticle.to_str(), "techcrunch_article");
+      assert_eq!(WebContentType::TheGuardianArticle.to_str(), "the_guardian_article");
     }
 
     #[test]
@@ -99,6 +106,7 @@ mod tests {
       assert_eq!(WebContentType::from_str("slashdot_article").unwrap(), WebContentType::SlashdotArticle);
       assert_eq!(WebContentType::from_str("substack_post").unwrap(), WebContentType::SubstackPost);
       assert_eq!(WebContentType::from_str("techcrunch_article").unwrap(), WebContentType::TechCrunchArticle);
+      assert_eq!(WebContentType::from_str("the_guardian_article").unwrap(), WebContentType::TheGuardianArticle);
       assert!(WebContentType::from_str("foo").is_err());
     }
   }

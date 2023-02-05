@@ -32,6 +32,7 @@ use tokio::runtime::Runtime;
 use sqlite_queries::queries::by_table::web_scraping_targets::insert_web_scraping_target::{Args, insert_web_scraping_target};
 use web_scrapers::sites::cnn::cnn_scraper::cnn_scraper_test;
 use web_scrapers::sites::techcrunch::techcrunch_scraper::techcrunch_scraper_test;
+use web_scrapers::sites::theguardian::theguardian_scraper::theguardian_scraper_test;
 
 #[tokio::main]
 pub async fn main() -> AnyhowResult<()> {
@@ -41,10 +42,11 @@ pub async fn main() -> AnyhowResult<()> {
       .connect(&database_url).await?;
 
   //let targets = cnn_scraper_test().await?;
-  let targets = techcrunch_scraper_test().await?;
+  //let targets = techcrunch_scraper_test().await?;
+  let targets = theguardian_scraper_test().await?;
 
   for target in targets.iter() {
-    println!("\n\nTarget: {:?}", target);
+    //println!("\n\nTarget: {:?}", target);
 
     let _r = insert_web_scraping_target(Args {
       canonical_url: &target.canonical_url,

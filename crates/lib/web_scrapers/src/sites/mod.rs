@@ -3,3 +3,4 @@ pub mod hackernews;
 pub mod reddit;
 pub mod slashdot;
 pub mod techcrunch;
+pub mod theguardian;
