@@ -264,6 +264,10 @@ styles with important tags:
     border-color: #ffffff12 !important;
     border: 1px solid;
     border-radius: 0px;
+    box-shadow: 0 0 0 1px rgba(0 0 0 / 16%), 0 70px 65px rgb(0 0 0 / 8%),
+      0 30px 30px rgb(0 0 0 / 7%), 0 15px 15px rgb(0 0 0 / 5%),
+      0 10px 8px rgb(0 0 0 / 3%), 0 4px 4px rgb(0 0 0 / 2%),
+      0 2px 2px rgb(0 0 0 / 1%) !important;
 
     .panel-inner {
       background-color: lighten($panel, 4%);
@@ -977,12 +981,12 @@ textarea {
 
 .img-product {
   &.img-tts {
-    margin-top: -100px;
+    margin-top: -82px;
     max-height: 240px;
   }
 
-  &.img-vc {
-    margin-top: -100px;
+  &.img-channels {
+    margin-top: -82px;
     max-height: 240px;
   }
 }
@@ -996,7 +1000,7 @@ textarea {
   cursor: pointer;
   border-radius: 8px !important;
   max-width: 500px;
-  border-width: 3px !important;
+  border-width: 1px !important;
 
   &:hover {
     border-color: $primary !important;
@@ -1095,16 +1099,6 @@ textarea {
 
     .video-card {
       min-height: 220px;
-    }
-
-    .img-product {
-      &.img-tts {
-        max-height: 300px;
-      }
-
-      &.img-vc {
-        max-height: 300px;
-      }
     }
 
     .twitch-video-container {
