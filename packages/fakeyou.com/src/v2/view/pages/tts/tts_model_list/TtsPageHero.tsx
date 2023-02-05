@@ -142,40 +142,5 @@ export function TtsPageHero(props: Props) {
         actionButtons={actionButtons}
       />
     </>
-
-    // <div className="container-panel hero-section pt-4 pt-lg-5 pb-5">
-    //   <div className="panel">
-    //     <div className="row gx-3 flex-md-row-reverse">
-    //       <div className="col-12 col-md-5 hero-img-container d-none d-md-block">
-    //         <motion.img
-    //           src={randomImage}
-    //           className="hero-img"
-    //           alt="FakeYou Mascot"
-    //           variants={image}
-    //         />
-    //       </div>
-    //       <div className="col-12 col-md-7">
-    //         <div className="p-3 py-4 p-md-4">
-    //           <h1 className="fw-bold text-center text-md-start">
-    //             <FontAwesomeIcon icon={faWaveformLines} className="me-3" />
-    //             {t("tts.TtsModelListPage.heroSection.title")}
-    //           </h1>
-    //           <p className="text-center text-md-start">
-    //             <Trans i18nKey="tts.TtsModelListPage.heroSection.subtitle">
-    //               Use FakeYou's deepfake tech to say stuff with your favorite
-    //               characters.
-    //             </Trans>
-    //           </p>
-    //           <div className="d-flex flex-column flex-md-row gap-3 justify-content-center justify-content-md-start mt-4">
-    //             {upgradeButton}
-    //             {signUpButton}
-    //             {viewPricingButton}
-    //             {myProfileButton}
-    //           </div>
-    //         </div>
-    //       </div>
-    //     </div>
-    //   </div>
-    // </div>
   );
 }
