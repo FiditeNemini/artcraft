@@ -21,7 +21,7 @@ pub async fn cnn_article_scraper(url: &str) -> AnyhowResult<WebScrapingResult> {
 
   //let selector = Selector::parse(".article__content")
   //let selector = Selector::parse("p.paragraph")
-  let selector = Selector::parse(".article__content")
+  let article_content_selector = Selector::parse(".article__content")
       .map_err(|e| {
         error!("Could not parse selector: {:?}", e);
         anyhow!("Could not parse selector: {:?}", e)
@@ -34,7 +34,7 @@ pub async fn cnn_article_scraper(url: &str) -> AnyhowResult<WebScrapingResult> {
       })?;
 
 
-  let matches = document.select(&selector);
+  let matches = document.select(&article_content_selector);
 
   for mat in matches.into_iter() {
 
@@ -48,9 +48,11 @@ pub async fn cnn_article_scraper(url: &str) -> AnyhowResult<WebScrapingResult> {
 
 
   Ok(WebScrapingResult {
+    url: url.to_string(),
     web_content_type: WebContentType::CnnArticle,
     maybe_title: None,
     maybe_author: None,
+    paragraphs: vec![],
     body_text: "".to_string(),
     maybe_heading_image_url: None,
     maybe_featured_image_url: None,

@@ -4,6 +4,8 @@ use enums::by_table::web_scraping_targets::web_content_type::WebContentType;
 
 #[derive(Clone, Debug)]
 pub struct WebScrapingResult {
+  /// Location the article came from
+  pub url: String,
 
   /// What this is and where it came from.
   pub web_content_type: WebContentType,
@@ -15,6 +17,9 @@ pub struct WebScrapingResult {
   pub maybe_author: Option<String>,
 
   /// The paragraphs
+  pub paragraphs: Vec<String>,
+
+  /// The paragraphs joined by newlines.
   pub body_text: String,
 
   /// A heading image (at top), if present

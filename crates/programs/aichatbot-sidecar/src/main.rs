@@ -68,7 +68,9 @@ pub async fn main() -> AnyhowResult<()> {
   */
 
   //let _r = cnn_article_scraper("https://www.cnn.com/2023/02/02/tech/first-generation-iphone-auction/index.html").await?;
-  let _r = techcrunch_article_scraper("https://techcrunch.com/2023/02/04/elon-musk-says-twitter-will-provide-a-free-write-only-api-to-bots-providing-good-content/").await?;
+  let result = techcrunch_article_scraper("https://techcrunch.com/2023/02/04/elon-musk-says-twitter-will-provide-a-free-write-only-api-to-bots-providing-good-content/").await?;
+
+  println!("Result: {:?}", result);
 
 
   Ok(())
