@@ -36,6 +36,7 @@ let twitchApi = axios.create({
 
 function ChannelsPage(props: Props) {
   usePrefixedDocumentTitle("Channels");
+    console.log('Channels page regenerated');
 
   const [stream, setStream] = useState<StreamInfo>({
     broadcaster_name: "",
@@ -53,6 +54,7 @@ function ChannelsPage(props: Props) {
   });
 
   useEffect(() => {
+    console.log('useEffect() triggered');
     const fetchData = async () => {
       const streamInfo = await twitchApi.get(
         "https://api.twitch.tv/helix/channels?broadcaster_id=650154491"
