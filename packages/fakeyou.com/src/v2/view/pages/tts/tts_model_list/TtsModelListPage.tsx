@@ -478,7 +478,7 @@ function TtsModelListPage(props: Props) {
       />
 
       <motion.div className="container-panel pb-5 mb-4" variants={panel}>
-        <div className="panel p-3 p-lg-4">
+        <div className="panel p-3 py-4 p-lg-4">
           <i className="fas fa-volume-high"></i>
 
           <div className="d-flex gap-4">
