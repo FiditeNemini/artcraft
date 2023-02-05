@@ -9,8 +9,8 @@ import {
   faStar,
   faUser,
   faArrowRight,
-  faVolumeHigh,
-} from "@fortawesome/free-solid-svg-icons";
+  faWaveformLines,
+} from "@fortawesome/pro-solid-svg-icons";
 import { item, image } from "../../../../../data/animation";
 import { motion } from "framer-motion";
 import { Analytics } from "../../../../../common/Analytics";
@@ -129,7 +129,7 @@ export function TtsPageHero(props: Props) {
           <div className="col-12 col-md-7">
             <div className="p-3 py-4 p-md-4">
               <h1 className="fw-bold text-center text-md-start">
-                <FontAwesomeIcon icon={faVolumeHigh} className="me-3" />
+                <FontAwesomeIcon icon={faWaveformLines} className="me-3" />
                 {t("tts.TtsModelListPage.heroSection.title")}
               </h1>
               <p className="text-center text-md-start">
