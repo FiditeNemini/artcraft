@@ -2,7 +2,7 @@ use enums::by_table::web_scraping_targets::web_content_type::WebContentType;
 
 // TODO: Add publish date
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct WebScrapingResult {
   /// Location the article came from
   pub url: String,

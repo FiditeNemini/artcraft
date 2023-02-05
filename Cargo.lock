@@ -8150,6 +8150,10 @@ dependencies = [
  "reqwest",
  "rss",
  "scraper",
+ "serde",
+ "serde_derive",
+ "serde_json",
+ "toml",
 ]
 
 [[package]]
