@@ -44,33 +44,6 @@ pub async fn main2() -> AnyhowResult<()> {
       .max_connections(5)
       .connect(&database_url).await?;
 
-  /*
-  let mut targets = Vec::new();
-
-  //let targets = techcrunch_scraper_test().await?;
-  //let targets = theguardian_scraper_test().await?;
-
-  targets.extend(cnn_scraper_test().await?);
-  targets.extend(techcrunch_scraper_test().await?);
-  targets.extend(theguardian_scraper_test().await?);
-
-  for target in targets.iter() {
-    //println!("\n\nTarget: {:?}", target);
-
-    let _r = insert_web_scraping_target(Args {
-      canonical_url: &target.canonical_url,
-      web_content_type: target.web_content_type,
-      maybe_title: target.maybe_title.as_deref(),
-      maybe_article_full_image_url: target.maybe_full_image_url.as_deref(),
-      maybe_article_thumbnail_image_url: target.maybe_thumbnail_image_url.as_deref(),
-      sqlite_pool: &pool,
-    }).await;
-  }
-  */
-
-  //let _r = cnn_article_scraper("https://www.cnn.com/2023/02/02/tech/first-generation-iphone-auction/index.html").await?;
-  //let result = techcrunch_article_scraper("https://techcrunch.com/2023/02/04/elon-musk-says-twitter-will-provide-a-free-write-only-api-to-bots-providing-good-content/").await?;
-
   let _ = dotenv::from_filename(".env-aichatbot-secrets").ok();
   let startup_args = get_startup_args()?;
   let save_directory = SaveDirectory::new(&startup_args.save_directory);
@@ -110,7 +83,7 @@ pub async fn main() -> AnyhowResult<()> {
     save_directory: save_directory.clone(),
   });
 
-  info!("Starting web server...");
+  info!("Starting worker threads and web server...");
 
   let app_control_state2 = app_control_state.clone();
   let openai_client2 = openai_client.clone();
@@ -118,7 +91,7 @@ pub async fn main() -> AnyhowResult<()> {
 
   // NB: both egui and imgui (which we aren't using) complain about launching on a non-main thread.
   // They even complain that this is impossible on Windows (and our program aims to be multiplatform)
-  // Thus, we launch everything else into its own thread. (TODO: Jobs + Server in one thread)
+  // Thus, we launch everything else into its own thread.
   thread::spawn(move || {
     let server_future = launch_web_server(LaunchWebServerArgs {
       app_control_state: app_control_state2,
@@ -129,25 +102,34 @@ pub async fn main() -> AnyhowResult<()> {
     let tokio_runtime = Runtime::new()?;
 
     tokio_runtime.spawn(async {
-      let _r = web_index_ingestion_main_loop(job_state2).await;
+      let _r = web_index_ingestion_main_loop(job_state2.clone()).await;
     });
+
+    // TODO: Scraping thread (needs Sqlite queries)
+    //tokio_runtime.spawn(async {
+    //  // TODO...
+    //  let _r = web_index_ingestion_main_loop(job_state2.clone()).await;
+    //});
+
+    // TODO: GPT Transformation thread
+    //tokio_runtime.spawn(async {
+    //  // TODO...
+    //});
+
+    // TODO: FakeYou enrichment thread
+    //tokio_runtime.spawn(async {
+    //  // TODO...
+    //});
+
+    // TODO: Final scheduling thread
+    //tokio_runtime.spawn(async {
+    //  // TODO...
+    //});
 
     let runtime = actix_web::rt::System::new();
 
     runtime.block_on(server_future)
   });
-
-//  info!("Starting async processes...");
-//
-//  thread::spawn(move|| {
-//
-//    tokio_runtime.block_on(async || {
-//      loop {
-//        thread::sleep(Duration::from_secs(60))
-//        std::future::
-//      }
-//    }.await)
-//  });
 
   info!("Starting GUI ...");
 
