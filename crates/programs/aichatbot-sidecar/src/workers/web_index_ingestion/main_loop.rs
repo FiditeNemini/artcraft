@@ -13,14 +13,16 @@ use web_scrapers::payloads::web_scraping_target::WebScrapingTarget;
 use web_scrapers::sites::techcrunch::techcrunch_indexer::{techcrunch_indexer, TechcrunchFeed};
 
 pub async fn web_index_ingestion_main_loop(job_state: Arc<JobState>) {
-
   loop {
     info!("web_index_ingestion main loop");
 
     match single_iteration(&job_state).await {
-      Ok(_) => thread::sleep(Duration::from_secs(300)),
+      Ok(_) => {
+        info!("web_index_ingestion loop finished; waiting...");
+        thread::sleep(Duration::from_secs(10))
+      },
       Err(err) => {
-        error!("Error with indexing: {:?}", err);
+        error!("web_index_ingestion - error with indexing: {:?}", err);
         thread::sleep(Duration::from_secs(60));
       }
     }
@@ -32,8 +34,8 @@ async fn single_iteration(job_state: &Arc<JobState>) -> AnyhowResult<()> {
   for variant in TechcrunchFeed::iter() {
     let index_targets = techcrunch_indexer(variant).await?;
     insert_targets(job_state, &index_targets).await?;
+    thread::sleep(Duration::from_secs(2));
   }
-
 
   //let index_targets = techcrunch_indexer(TechcrunchFeed::Main).await?;
   //insert_targets(&index_targets).await?;
