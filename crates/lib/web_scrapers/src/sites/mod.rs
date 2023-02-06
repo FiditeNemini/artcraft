@@ -5,3 +5,4 @@ pub mod reuters;
 pub mod slashdot;
 pub mod techcrunch;
 pub mod theguardian;
+pub mod twitter;

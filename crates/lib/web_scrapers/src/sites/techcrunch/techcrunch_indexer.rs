@@ -1,20 +1,37 @@
-use std::ops::Deref;
 use bytes::Bytes;
 use crate::payloads::web_scraping_target::WebScrapingTarget;
 use enums::by_table::web_scraping_targets::web_content_type::WebContentType;
 use errors::AnyhowResult;
 use log::warn;
 use rss::Channel;
+use std::ops::Deref;
 
-// NB: Contains 20 items
+// NB: Feed contains ~20 items.
 const MAIN_RSS_FEED : &'static str = "https://techcrunch.com/feed/";
 
 const VENTURE_FEED : &'static str = "https://techcrunch.com/category/venture/feed/";
 
 const STARTUPS_FEED : &'static str = "https://techcrunch.com/category/startups/feed/";
 
-pub async fn techcrunch_scraper_test() -> AnyhowResult<Vec<WebScrapingTarget>> {
-  let content = reqwest::get(MAIN_RSS_FEED)
+#[derive(Copy, Clone, Debug, EnumIter, EnumCount)]
+pub enum TechcrunchFeed {
+  Main,
+  Venture,
+  Startups,
+}
+
+impl TechcrunchFeed {
+  fn url(&self) -> &'static str {
+    match self {
+      TechcrunchFeed::Main => MAIN_RSS_FEED,
+      TechcrunchFeed::Venture => VENTURE_FEED,
+      TechcrunchFeed::Startups => STARTUPS_FEED,
+    }
+  }
+}
+
+pub async fn techcrunch_indexer(feed: TechcrunchFeed) -> AnyhowResult<Vec<WebScrapingTarget>> {
+  let content = reqwest::get(feed.url())
       .await?
       .bytes()
       .await?;

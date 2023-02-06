@@ -772,6 +772,7 @@ dependencies = [
  "serde_yaml",
  "sqlite_queries",
  "sqlx",
+ "strum",
  "tokens",
  "tokio 1.25.0",
  "web_scrapers",
@@ -8189,6 +8190,7 @@ dependencies = [
  "serde",
  "serde_derive",
  "serde_json",
+ "strum",
  "toml",
 ]
 

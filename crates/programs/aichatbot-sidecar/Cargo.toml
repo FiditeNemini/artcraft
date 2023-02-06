@@ -27,10 +27,11 @@ web_scrapers = { path = "../../lib/web_scrapers" }
 
 # External
 clap = "2.34.0" # TODO: This is really out of date, but has conflicts when updated
+dotenv = "0.15.0"
 easyenv = "0.0.6"
 log = "0.4.14"
-dotenv = "0.15.0"
 path-absolutize = "3.0.14" # Absolute paths have not stabilized in Rust yet
+strum = { version = "0.24", features = ["derive"] } # Fancy enum iteration, etc.
 
 # SQlite Database
 # "offline" supports typesafe builds without a live database

@@ -19,6 +19,7 @@
 #![allow(non_snake_case)]
 
 #[macro_use] extern crate serde_derive;
+#[macro_use] extern crate strum;
 
 pub mod payloads;
 pub mod sites;
