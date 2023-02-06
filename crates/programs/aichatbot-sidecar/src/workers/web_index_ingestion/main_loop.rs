@@ -10,8 +10,10 @@ use std::time::Duration;
 use strum::IntoEnumIterator;
 use web_scrapers::payloads::web_scraping_result::WebScrapingResult;
 use web_scrapers::payloads::web_scraping_target::WebScrapingTarget;
+use web_scrapers::sites::cnn::cnn_indexer::{cnn_indexer, CnnFeed};
 use web_scrapers::sites::techcrunch::techcrunch_indexer::{techcrunch_indexer, TechcrunchFeed};
 
+/// Download RSS feeds and index pages to determine which articles and content will be scraped (async/downstream of this)
 pub async fn web_index_ingestion_main_loop(job_state: Arc<JobState>) {
   loop {
     info!("web_index_ingestion main loop");
@@ -19,7 +21,7 @@ pub async fn web_index_ingestion_main_loop(job_state: Arc<JobState>) {
     match single_iteration(&job_state).await {
       Ok(_) => {
         info!("web_index_ingestion loop finished; waiting...");
-        thread::sleep(Duration::from_secs(10))
+        thread::sleep(Duration::from_secs(300))
       },
       Err(err) => {
         error!("web_index_ingestion - error with indexing: {:?}", err);
@@ -31,14 +33,19 @@ pub async fn web_index_ingestion_main_loop(job_state: Arc<JobState>) {
 
 async fn single_iteration(job_state: &Arc<JobState>) -> AnyhowResult<()> {
 
+  // CNN
+  for variant in CnnFeed::iter() {
+    let index_targets = cnn_indexer(variant).await?;
+    insert_targets(job_state, &index_targets).await?;
+    thread::sleep(Duration::from_secs(2));
+  }
+
+  // TechCrunch
   for variant in TechcrunchFeed::iter() {
     let index_targets = techcrunch_indexer(variant).await?;
     insert_targets(job_state, &index_targets).await?;
     thread::sleep(Duration::from_secs(2));
   }
-
-  //let index_targets = techcrunch_indexer(TechcrunchFeed::Main).await?;
-  //insert_targets(&index_targets).await?;
 
   Ok(())
 }

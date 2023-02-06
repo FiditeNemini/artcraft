@@ -13,8 +13,27 @@ const RSS_US : &'static str = "http://rss.cnn.com/rss/cnn_us.rss";
 
 const RSS_TECH : &'static str = "http://rss.cnn.com/rss/cnn_tech.rss";
 
-pub async fn cnn_scraper_test() -> AnyhowResult<Vec<WebScrapingTarget>> {
-  let content = reqwest::get(RSS_WORLD)
+#[derive(Copy, Clone, Debug, EnumIter, EnumCount)]
+pub enum CnnFeed {
+  TopStories,
+  World,
+  UnitedStates,
+  Tech,
+}
+
+impl CnnFeed {
+  fn url(&self) -> &'static str {
+    match self {
+      Self::TopStories => RSS_TOP_STORIES,
+      Self::World => RSS_WORLD,
+      Self::UnitedStates => RSS_US,
+      Self::Tech => RSS_TECH,
+    }
+  }
+}
+
+pub async fn cnn_indexer(feed: CnnFeed) -> AnyhowResult<Vec<WebScrapingTarget>> {
+  let content = reqwest::get(feed.url())
       .await?
       .bytes()
       .await?;

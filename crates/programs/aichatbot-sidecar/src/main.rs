@@ -31,7 +31,6 @@ use tokio::runtime::Runtime;
 use enums::by_table::web_scraping_targets::web_content_type::WebContentType;
 use sqlite_queries::queries::by_table::web_scraping_targets::insert_web_scraping_target::{Args, insert_web_scraping_target};
 use web_scrapers::sites::cnn::cnn_article_scraper::cnn_article_scraper;
-use web_scrapers::sites::cnn::cnn_indexer::cnn_scraper_test;
 use web_scrapers::sites::techcrunch::techcrunch_article_scraper::techcrunch_article_scraper;
 use web_scrapers::sites::theguardian::theguardian_scraper::theguardian_scraper_test;
 use workers::web_content_scraping::ingest_url_scrape_and_save::ingest_url_scrape_and_save;
