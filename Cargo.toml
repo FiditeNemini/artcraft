@@ -23,6 +23,7 @@ members = [
   "crates/lib/errors",
   "crates/lib/files",
   "crates/lib/google_drive_common",
+  "crates/lib/hashing",
   "crates/lib/http_server_common",
   "crates/lib/jobs_common",
   "crates/lib/media",

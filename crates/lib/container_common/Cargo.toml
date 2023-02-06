@@ -13,6 +13,9 @@ name = "container_common"
 path = "src/lib.rs"
 
 [dependencies]
+# Internal
+errors = { path = "../../lib/errors" }
+hashing = { path = "../../lib/hashing" }
 
 # External
 anyhow = "1.0.40"

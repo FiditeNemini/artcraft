@@ -1636,6 +1636,8 @@ version = "0.0.1"
 dependencies = [
  "anyhow",
  "data-encoding",
+ "errors",
+ "hashing",
  "log",
  "once_cell",
  "rand 0.8.5",
@@ -3200,7 +3202,9 @@ dependencies = [
 name = "hashing"
 version = "0.0.1"
 dependencies = [
+ "data-encoding",
  "errors",
+ "ring 0.17.0-alpha.11",
 ]
 
 [[package]]
@@ -7450,6 +7454,7 @@ dependencies = [
  "database_queries",
  "dotenv",
  "easyenv",
+ "hashing",
  "hostname",
  "hyper 0.14.24",
  "jobs_common",

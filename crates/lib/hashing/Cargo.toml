@@ -18,6 +18,8 @@ path = "src/lib.rs"
 errors = { path = "../../lib/errors" }
 
 # External
+data-encoding = "2.3.2"
+ring = "0.17.0-alpha.10"
 
 [dev-dependencies]
 # None yet
