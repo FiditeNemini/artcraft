@@ -29,12 +29,14 @@ use std::thread;
 use std::time::Duration;
 use sqlx::sqlite::SqlitePoolOptions;
 use tokio::runtime::Runtime;
+use enums::by_table::web_scraping_targets::web_content_type::WebContentType;
 use sqlite_queries::queries::by_table::web_scraping_targets::insert_web_scraping_target::{Args, insert_web_scraping_target};
 use web_scrapers::sites::cnn::cnn_article_scraper::cnn_article_scraper;
 use web_scrapers::sites::cnn::cnn_indexer::cnn_scraper_test;
 use web_scrapers::sites::techcrunch::techcrunch_article_scraper::techcrunch_article_scraper;
 use web_scrapers::sites::techcrunch::techcrunch_scraper::techcrunch_scraper_test;
 use web_scrapers::sites::theguardian::theguardian_scraper::theguardian_scraper_test;
+use crate::ingestion::ingest_url_scrape_and_save::ingest_url_scrape_and_save;
 
 #[tokio::main]
 pub async fn main() -> AnyhowResult<()> {
@@ -68,16 +70,14 @@ pub async fn main() -> AnyhowResult<()> {
   */
 
   //let _r = cnn_article_scraper("https://www.cnn.com/2023/02/02/tech/first-generation-iphone-auction/index.html").await?;
-  let result = techcrunch_article_scraper("https://techcrunch.com/2023/02/04/elon-musk-says-twitter-will-provide-a-free-write-only-api-to-bots-providing-good-content/").await?;
-
+  //let result = techcrunch_article_scraper("https://techcrunch.com/2023/02/04/elon-musk-says-twitter-will-provide-a-free-write-only-api-to-bots-providing-good-content/").await?;
 
   let _ = dotenv::from_filename(".env-aichatbot-secrets").ok();
   let startup_args = get_startup_args()?;
   let save_directory = SaveDirectory::new(&startup_args.save_directory);
 
-  let directory = save_directory.for_webpage_url("https://techcrunch.com/2023/02/04/elon-musk-says-twitter-will-provide-a-free-write-only-api-to-bots-providing-good-content/")?;
-
-  println!("Directory: {}", directory);
+  let url = "https://techcrunch.com/2023/02/04/elon-musk-says-twitter-will-provide-a-free-write-only-api-to-bots-providing-good-content/";
+  ingest_url_scrape_and_save(url, WebContentType::TechCrunchArticle, &save_directory).await?;
 
 
 

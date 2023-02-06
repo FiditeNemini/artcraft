@@ -18,20 +18,30 @@ impl SaveDirectory {
     }
   }
 
-  pub fn directory_for_webpage_url(&self, url: &str) -> AnyhowResult<String> {
+  pub fn directory_for_webpage_url(&self, url: &str) -> AnyhowResult<PathBuf> {
     let url_hash = sha256_hash_string(url)?;
     let directory_path= hashed_directory_path(&url_hash);
 
     let directory = self.directory.clone()
+        .join("webpages/")
         .join(directory_path)
         .join(url_hash);
 
-    let full_path = directory.to_str()
-        .ok_or(anyhow!("could not construct path"))?
-        .to_string();
+    //let full_path = directory.to_str()
+    //    .ok_or(anyhow!("could not construct path"))?
+    //    .to_string();
 
-    Ok(full_path)
+    Ok(directory)
   }
+
+  pub fn html_file_for_webpage_url(&self, url: &str) -> AnyhowResult<PathBuf> {
+    Ok(self.directory_for_webpage_url(url)?.join("webpage.html"))
+  }
+
+  pub fn scrape_summary_file_for_webpage_url(&self, url: &str) -> AnyhowResult<PathBuf> {
+    Ok(self.directory_for_webpage_url(url)?.join("scrape_summary.yaml"))
+  }
+
 
   /// This is just the first directory structure, which is sequential audio files.
   /// We'll be using a database and well-formed filesystem layout later.
