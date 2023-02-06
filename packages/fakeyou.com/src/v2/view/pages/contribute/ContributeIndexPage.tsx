@@ -18,6 +18,8 @@ import {
 import { motion } from "framer-motion";
 import { container, item, panel } from "../../../../data/animation";
 import { usePrefixedDocumentTitle } from "../../../../common/UsePrefixedDocumentTitle";
+import { PageHeader } from "../../_common/PageHeader";
+import { faHandHoldingHeart } from "@fortawesome/pro-solid-svg-icons";
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -34,9 +36,24 @@ function ContributeIndexPage(props: Props) {
 
   usePrefixedDocumentTitle("Contribute to FakeYou");
 
+  const title = <>{t("pages.contributeIndex.heroTitle")}</>;
+  const subText = (
+    <>
+      <h5 className="pb-1">
+        <Trans i18nKey="pages.contributeIndex.heroSubtitle">
+          You make FakeYou better by contributing
+        </Trans>
+      </h5>
+      {t("pages.contributeIndex.introText")}
+    </>
+  );
+  const titleIcon = (
+    <FontAwesomeIcon icon={faHandHoldingHeart} className="me-3" />
+  );
+
   return (
     <motion.div initial="hidden" animate="visible" variants={container}>
-      <div className="container py-5 px-md-4 px-lg-5 px-xl-3">
+      {/* <div className="container py-5 px-md-4 px-lg-5 px-xl-3">
         <div className="d-flex flex-column">
           <motion.h1 className="display-5 fw-bold" variants={item}>
             {t("pages.contributeIndex.heroTitle")}
@@ -50,7 +67,13 @@ function ContributeIndexPage(props: Props) {
             {t("pages.contributeIndex.introText")}
           </motion.p>
         </div>
-      </div>
+      </div> */}
+      <PageHeader
+        title={title}
+        subText={subText}
+        showButtons={false}
+        titleIcon={titleIcon}
+      />
 
       <motion.div className="container-panel pt-2 pb-5" variants={panel}>
         <div className="panel p-3 p-lg-4 mt-3">

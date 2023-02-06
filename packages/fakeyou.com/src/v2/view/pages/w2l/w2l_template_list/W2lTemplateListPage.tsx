@@ -14,9 +14,11 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faChevronLeft,
   faChevronRight,
+  faFilm,
 } from "@fortawesome/free-solid-svg-icons";
 import { motion } from "framer-motion";
 import { usePrefixedDocumentTitle } from "../../../../../common/UsePrefixedDocumentTitle";
+import { PageHeader } from "../../../_common/PageHeader";
 
 const Fade = require("react-reveal/Fade");
 
@@ -176,7 +178,7 @@ function W2lTemplateListPage(props: Props) {
 
   if (props.sessionWrapper.isLoggedIn()) {
     extraDetails = (
-      <p className="lead mb-4">
+      <p>
         Pick a template, then you can make it lip sync. If you want to use your
         own video or image, you can
         <Link to="/contribute"> upload it as a template</Link>. You'll then be
@@ -185,7 +187,7 @@ function W2lTemplateListPage(props: Props) {
     );
   } else {
     extraDetails = (
-      <p className="lead mb-4">
+      <p>
         Pick a template, then you can make it lip sync. If you want to use your
         own video or image, you'll need to{" "}
         <Link to="/signup">create an account</Link>. You'll then be able to
@@ -196,16 +198,18 @@ function W2lTemplateListPage(props: Props) {
 
   usePrefixedDocumentTitle("Create Deep Fake lip sync videos");
 
+  const title = <>Video Lip Sync Templates</>;
+  const subText = <>{extraDetails}</>;
+  const titleIcon = <FontAwesomeIcon icon={faFilm} className="me-3" />;
+
   return (
     <motion.div initial="hidden" animate="visible" variants={container}>
-      <div className="container pt-5 pb-4 px-md-4 px-lg-5 px-xl-3">
-        <div>
-          <motion.h1 className="display-5 fw-bold mb-3" variants={item}>
-            Video Lip Sync Templates
-          </motion.h1>
-          <motion.div variants={item}>{extraDetails}</motion.div>
-        </div>
-      </div>
+      <PageHeader
+        title={title}
+        subText={subText}
+        showButtons={false}
+        titleIcon={titleIcon}
+      />
 
       <motion.div className="container" variants={item}>
         <div className="d-flex  w-100 gap-3 mb-4">
