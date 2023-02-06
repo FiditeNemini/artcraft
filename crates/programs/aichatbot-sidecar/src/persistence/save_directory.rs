@@ -1,7 +1,9 @@
 use std::path::{Path, PathBuf};
 use log::info;
 use path_absolutize::Absolutize;
-use errors::AnyhowResult;
+use errors::{anyhow, AnyhowResult};
+use hashing::sha256::sha256_hash_string::sha256_hash_string;
+use crate::persistence::hashed_directory_path::hashed_directory_path;
 
 #[derive(Clone)]
 pub struct SaveDirectory {
@@ -16,9 +18,19 @@ impl SaveDirectory {
     }
   }
 
-  pub fn for_url(url: &str) -> AnyhowResult<String> {
+  pub fn directory_for_webpage_url(&self, url: &str) -> AnyhowResult<String> {
+    let url_hash = sha256_hash_string(url)?;
+    let directory_path= hashed_directory_path(&url_hash);
 
-    Ok("todo".to_string())
+    let directory = self.directory.clone()
+        .join(directory_path)
+        .join(url_hash);
+
+    let full_path = directory.to_str()
+        .ok_or(anyhow!("could not construct path"))?
+        .to_string();
+
+    Ok(full_path)
   }
 
   /// This is just the first directory structure, which is sequential audio files.

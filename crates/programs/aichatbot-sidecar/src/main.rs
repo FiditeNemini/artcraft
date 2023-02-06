@@ -70,7 +70,15 @@ pub async fn main() -> AnyhowResult<()> {
   //let _r = cnn_article_scraper("https://www.cnn.com/2023/02/02/tech/first-generation-iphone-auction/index.html").await?;
   let result = techcrunch_article_scraper("https://techcrunch.com/2023/02/04/elon-musk-says-twitter-will-provide-a-free-write-only-api-to-bots-providing-good-content/").await?;
 
-  println!("Result: {:?}", result);
+
+  let _ = dotenv::from_filename(".env-aichatbot-secrets").ok();
+  let startup_args = get_startup_args()?;
+  let save_directory = SaveDirectory::new(&startup_args.save_directory);
+
+  let directory = save_directory.for_webpage_url("https://techcrunch.com/2023/02/04/elon-musk-says-twitter-will-provide-a-free-write-only-api-to-bots-providing-good-content/")?;
+
+  println!("Directory: {}", directory);
+
 
 
   Ok(())

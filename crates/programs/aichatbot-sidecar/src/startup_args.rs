@@ -4,7 +4,7 @@ use log::info;
 use path_absolutize::Absolutize;
 use errors::{anyhow, AnyhowResult};
 
-const DEFAULT_SAVE_DIRECTORY : &'static str = "data";
+const DEFAULT_SAVE_DIRECTORY : &'static str = "runtime_data";
 
 #[derive(Clone, Default)]
 pub struct StartupArgs {
