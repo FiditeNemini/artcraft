@@ -8,17 +8,18 @@ use container_common::anyhow_result::AnyhowResult;
 use container_common::filesystem::check_file_exists::check_file_exists;
 use container_common::filesystem::safe_delete_temp_directory::safe_delete_temp_directory;
 use container_common::filesystem::safe_delete_temp_file::safe_delete_temp_file;
-use container_common::hashing::hash_string_sha2::hash_string_sha2;
 use container_common::token::random_uuid::generate_random_uuid;
 use crate::job_steps::download_file_from_bucket::maybe_download_file_from_bucket;
 use crate::job_steps::job_args::JobArgs;
 use crate::job_steps::process_single_job_error::ProcessSingleJobError;
+use crate::job_steps::seconds_to_decoder_steps::seconds_to_decoder_steps;
 use database_queries::column_types::vocoder_type::VocoderType;
 use database_queries::queries::tts::tts_inference_jobs::list_available_tts_inference_jobs::AvailableTtsInferenceJob;
 use database_queries::queries::tts::tts_inference_jobs::mark_tts_inference_job_done::mark_tts_inference_job_done;
 use database_queries::queries::tts::tts_inference_jobs::mark_tts_inference_job_pending_and_grab_lock::mark_tts_inference_job_pending_and_grab_lock;
 use database_queries::queries::tts::tts_models::get_tts_model_for_inference::TtsModelForInferenceRecord;
 use database_queries::queries::tts::tts_results::insert_tts_result::insert_tts_result;
+use hashing::sha256::sha256_hash_string::sha256_hash_string;
 use log::{warn, info, error};
 use newrelic_telemetry::Span;
 use std::fs::File;
@@ -29,7 +30,6 @@ use tempdir::TempDir;
 use tts_common::clean_symbols::clean_symbols;
 use tts_common::text_pipelines::guess_pipeline::guess_text_pipeline_heuristic;
 use tts_common::text_pipelines::text_pipeline_type::TextPipelineType;
-use crate::job_steps::seconds_to_decoder_steps::seconds_to_decoder_steps;
 
 #[derive(Deserialize, Default)]
 struct FileMetadata {
@@ -364,7 +364,7 @@ pub async fn process_single_job(
 
   // ==================== SAVE RECORDS ==================== //
 
-  let text_hash = hash_string_sha2(&cleaned_inference_text)
+  let text_hash = sha256_hash_string(&cleaned_inference_text)
       .map_err(|e| ProcessSingleJobError::Other(e))?;
 
   let worker_name = job_args.get_worker_name();
