@@ -1,6 +1,7 @@
 use std::path::{Path, PathBuf};
 use log::info;
 use path_absolutize::Absolutize;
+use errors::AnyhowResult;
 
 #[derive(Clone)]
 pub struct SaveDirectory {
@@ -13,6 +14,11 @@ impl SaveDirectory {
     Self {
       directory: directory.as_ref().to_path_buf()
     }
+  }
+
+  pub fn for_url(url: &str) -> AnyhowResult<String> {
+
+    Ok("todo".to_string())
   }
 
   /// This is just the first directory structure, which is sequential audio files.

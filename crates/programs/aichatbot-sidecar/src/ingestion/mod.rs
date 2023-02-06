@@ -1,6 +1,1 @@
-pub mod cnn;
-pub mod hackernews;
-pub mod reddit;
-pub mod reuters;
-pub mod slashdot;
-pub mod techcrunch;
+pub mod ingest_url_scrape_and_save;

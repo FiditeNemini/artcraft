@@ -16,10 +16,13 @@ path = "src/main.rs"
 
 # Internal
 actix_helpers = { path = "../../lib/actix_helpers" }
+enums = { path = "../../_types/enums" }
 errors = { path = "../../lib/errors" }
 files = { path = "../../lib/files" }
+hashing = { path = "../../lib/hashing" }
 http_server_common = { path = "../../lib/http_server_common" }
 sqlite_queries = { path = "../../lib/sqlite_queries" }
+tokens = { path = "../../_types/tokens" }
 web_scrapers = { path = "../../lib/web_scrapers" }
 
 # External

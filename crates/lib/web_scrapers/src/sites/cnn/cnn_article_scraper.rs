@@ -5,17 +5,16 @@ use errors::{anyhow, AnyhowResult};
 use log::{error, warn};
 use rss::Channel;
 use scraper::{Html, Selector};
-use crate::payloads::web_scraping_result::WebScrapingResult;
+use crate::payloads::web_scraping_result::{OriginalHtmlWithWebScrapingResult, WebScrapingResult};
 
-pub async fn cnn_article_scraper(url: &str) -> AnyhowResult<WebScrapingResult> {
+pub async fn cnn_article_scraper(url: &str) -> AnyhowResult<OriginalHtmlWithWebScrapingResult> {
   let downloaded_document= reqwest::get(url)
       .await?
       .bytes()
       .await?;
 
-  // TODO: Save raw html download
-  let content = String::from_utf8_lossy(downloaded_document.deref()).to_string();
-  let document = Html::parse_document(&content);
+  let downloaded_document = String::from_utf8_lossy(downloaded_document.deref()).to_string();
+  let document = Html::parse_document(&downloaded_document);
 
   //println!("Document: {:?}", document);
 
@@ -37,24 +36,23 @@ pub async fn cnn_article_scraper(url: &str) -> AnyhowResult<WebScrapingResult> {
   let matches = document.select(&article_content_selector);
 
   for mat in matches.into_iter() {
-
     let matches2 = mat.select(&selector2);
-
     for mat2 in matches2.into_iter() {
       println!("\n\n{:?}\n\n", mat2);
     }
   }
 
-
-
-  Ok(WebScrapingResult {
-    url: url.to_string(),
-    web_content_type: WebContentType::CnnArticle,
-    maybe_title: None,
-    maybe_author: None,
-    paragraphs: vec![],
-    body_text: "".to_string(),
-    maybe_heading_image_url: None,
-    maybe_featured_image_url: None,
+  Ok(OriginalHtmlWithWebScrapingResult {
+    original_html: downloaded_document,
+    result: WebScrapingResult {
+      url: url.to_string(),
+      web_content_type: WebContentType::CnnArticle,
+      maybe_title: None,
+      maybe_author: None,
+      paragraphs: vec![],
+      body_text: "".to_string(),
+      maybe_heading_image_url: None,
+      maybe_featured_image_url: None,
+    }
   })
 }

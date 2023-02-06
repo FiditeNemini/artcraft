@@ -31,3 +31,12 @@ pub struct WebScrapingResult {
   // TODO
   // pub maybe_publish_date_utc: Option<DateTime<Utc>>
 }
+
+#[derive(Clone, Debug, Serialize, Deserialize)]
+pub struct OriginalHtmlWithWebScrapingResult {
+  /// Surface the original HTML to callers that care about it.
+  pub original_html: String,
+
+  /// Output of *successful* scraping.
+  pub result: WebScrapingResult,
+}

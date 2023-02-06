@@ -6,7 +6,7 @@ use log::{error, warn};
 use once_cell::sync::Lazy;
 use rss::Channel;
 use scraper::{Html, Selector};
-use crate::payloads::web_scraping_result::WebScrapingResult;
+use crate::payloads::web_scraping_result::{OriginalHtmlWithWebScrapingResult, WebScrapingResult};
 
 /// The main article content container
 static ARTICLE_CONTENT_SELECTOR : Lazy<Selector> = Lazy::new(|| {
@@ -25,15 +25,14 @@ static TITLE_SELECTOR : Lazy<Selector> = Lazy::new(|| {
   Selector::parse(".article__title").expect("this selector should parse")
 });
 
-pub async fn techcrunch_article_scraper(url: &str) -> AnyhowResult<WebScrapingResult> {
+pub async fn techcrunch_article_scraper(url: &str) -> AnyhowResult<OriginalHtmlWithWebScrapingResult> {
   let downloaded_document= reqwest::get(url)
       .await?
       .bytes()
       .await?;
 
-  // TODO: Save raw html download
-  let content = String::from_utf8_lossy(downloaded_document.deref()).to_string();
-  let document = Html::parse_document(&content);
+  let downloaded_document = String::from_utf8_lossy(downloaded_document.deref()).to_string();
+  let document = Html::parse_document(&downloaded_document);
 
   let mut article_title = None;
 
@@ -76,14 +75,17 @@ pub async fn techcrunch_article_scraper(url: &str) -> AnyhowResult<WebScrapingRe
     }
   }
 
-  Ok(WebScrapingResult {
-    url: url.to_string(),
-    web_content_type: WebContentType::TechCrunchArticle,
-    maybe_title: article_title,
-    maybe_author: None,
-    paragraphs: paragraphs.clone(),
-    body_text: paragraphs.join("\n\n"),
-    maybe_heading_image_url: None,
-    maybe_featured_image_url: None,
+  Ok(OriginalHtmlWithWebScrapingResult {
+    original_html: downloaded_document,
+    result: WebScrapingResult {
+      url: url.to_string(),
+      web_content_type: WebContentType::TechCrunchArticle,
+      maybe_title: article_title,
+      maybe_author: None,
+      paragraphs: paragraphs.clone(),
+      body_text: paragraphs.join("\n\n"),
+      maybe_heading_image_url: None,
+      maybe_featured_image_url: None,
+    }
   })
 }
