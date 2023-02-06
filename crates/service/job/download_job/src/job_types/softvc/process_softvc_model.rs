@@ -3,12 +3,12 @@ use container_common::anyhow_result::AnyhowResult;
 use container_common::filesystem::check_file_exists::check_file_exists;
 use container_common::filesystem::safe_delete_temp_directory::safe_delete_temp_directory;
 use container_common::filesystem::safe_delete_temp_file::safe_delete_temp_file;
-use container_common::hashing::hash_file_sha2::hash_file_sha2;
 use crate::JobState;
 use crate::job_steps::job_results::JobResults;
 use database_queries::queries::generic_download::job::list_available_generic_download_jobs::AvailableDownloadJob;
 use database_queries::queries::voice_conversion::models::insert_voice_conversion_model_from_download_job::{Args, insert_voice_conversion_model_from_download_job};
 use enums::common::visibility::Visibility;
+use hashing::sha256::sha256_hash_file::sha256_hash_file;
 use jobs_common::redis_job_status_logger::RedisJobStatusLogger;
 use log::{info, warn};
 use std::fs::File;
@@ -66,7 +66,7 @@ pub async fn process_softvc_model<'a, 'b>(
 
   info!("Uploading SoftVC model to GCS...");
 
-  let private_bucket_hash = hash_file_sha2(&download_filename)?;
+  let private_bucket_hash = sha256_hash_file(&download_filename)?;
 
   info!("File hash: {}", private_bucket_hash);
 

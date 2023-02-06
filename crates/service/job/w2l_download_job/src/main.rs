@@ -26,7 +26,6 @@ use container_common::filesystem::check_directory_exists::check_directory_exists
 use container_common::filesystem::check_file_exists::check_file_exists;
 use container_common::filesystem::safe_delete_temp_directory::safe_delete_temp_directory;
 use container_common::filesystem::safe_delete_temp_file::safe_delete_temp_file;
-use container_common::hashing::hash_file_sha2::hash_file_sha2;
 use crate::script_execution::ffmpeg_generate_preview_image_command::FfmpegGeneratePreviewImageCommand;
 use crate::script_execution::ffmpeg_generate_preview_video_command::FfmpegGeneratePreviewVideoCommand;
 use crate::script_execution::imagemagick_generate_preview_image_command::ImagemagickGeneratePreviewImageCommand;
@@ -41,6 +40,7 @@ use database_queries::queries::w2l::w2l_download_jobs::w2l_download_job_queries:
 use database_queries::queries::w2l::w2l_download_jobs::w2l_download_job_queries::mark_w2l_template_upload_job_permanently_dead;
 use database_queries::queries::w2l::w2l_download_jobs::w2l_download_job_queries::query_w2l_template_upload_job_records;
 use google_drive_common::google_drive_download_command::GoogleDriveDownloadCommand;
+use hashing::sha256::sha256_hash_file::sha256_hash_file;
 use jobs_common::noop_logger::NoOpLogger;
 use jobs_common::redis_job_status_logger::RedisJobStatusLogger;
 use log::{warn, info};
@@ -466,7 +466,7 @@ async fn process_job(downloader: &Downloader, job: &W2lTemplateUploadJobRecord) 
 
   // ==================== BASE OBJECT NAMES BASED ON HASH ==================== //
 
-  let private_bucket_hash = hash_file_sha2(&download_filename)?;
+  let private_bucket_hash = sha256_hash_file(&download_filename)?;
 
   info!("File hash: {}", private_bucket_hash);
 

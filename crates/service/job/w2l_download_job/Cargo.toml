@@ -21,6 +21,7 @@ config = { path = "../../../lib/config" }
 container_common = { path = "../../../lib/container_common" }
 database_queries = { path = "../../../lib/database_queries" }
 google_drive_common = { path = "../../../lib/google_drive_common" }
+hashing = { path = "../../../lib/hashing" }
 jobs_common = { path = "../../../lib/jobs_common" }
 tts_common = { path = "../../../lib/tts_common" }
 

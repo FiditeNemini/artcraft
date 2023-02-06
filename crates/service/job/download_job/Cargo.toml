@@ -21,6 +21,7 @@ container_common = { path = "../../../lib/container_common" }
 database_queries = { path = "../../../lib/database_queries" }
 enums = { path = "../../../_types/enums" }
 google_drive_common = { path = "../../../lib/google_drive_common" }
+hashing = { path = "../../../lib/hashing" }
 jobs_common = { path = "../../../lib/jobs_common" }
 reusable_types = { path = "../../../_types/reusable_types" }
 subprocess_common = { path = "../../../lib/subprocess_common" }
