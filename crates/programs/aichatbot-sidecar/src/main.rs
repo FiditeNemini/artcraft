@@ -56,9 +56,18 @@ pub async fn main2() -> AnyhowResult<()> {
   Ok(())
 }
 
+pub const LOG_LEVEL: &'static str = concat!(
+  "info,",
+  "actix_web=info,",
+  "sqlx::query=warn,", // SQLX logs all queries as "info", which is super spammy
+  "hyper::proto::h1::io=warn,",
+  "storyteller_web::threads::db_health_checker_thread::db_health_checker_thread=warn,",
+  "http_server_common::request::get_request_ip=info," // Debug spams Rust logs
+);
+
 #[actix_web::main]
 pub async fn main() -> AnyhowResult<()> {
-  easyenv::init_all_with_default_logging(Some("info"));
+  easyenv::init_all_with_default_logging(Some(LOG_LEVEL));
 
   // NB: Do not check this secrets-containing dotenv file into VCS.
   // This file should only contain *development* secrets, never production.
@@ -102,7 +111,7 @@ pub async fn main() -> AnyhowResult<()> {
     let tokio_runtime = Runtime::new()?;
 
     tokio_runtime.spawn(async {
-      let _r = web_index_ingestion_main_loop(job_state2.clone()).await;
+      let _r = web_index_ingestion_main_loop(job_state2).await;
     });
 
     // TODO: Scraping thread (needs Sqlite queries)

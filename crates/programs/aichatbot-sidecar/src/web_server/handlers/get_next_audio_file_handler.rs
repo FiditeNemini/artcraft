@@ -71,7 +71,7 @@ pub async fn get_next_audio_file_handler(
 
   info!("Hypothetical audio file: {:?}", maybe_audio_filename);
 
-  let next_cursor;
+  let mut next_cursor;
   let mut audio_filename : Option<String> = None;
   let mut audio_filename_unixy : Option<String> = None;
 
@@ -86,6 +86,13 @@ pub async fn get_next_audio_file_handler(
     next_cursor = 0;
     audio_filename = None;
   };
+
+  let maybe_next_audio_filename = format!("{}.wav", next_cursor);
+  let maybe_next_audio_filename = audio_file_dir.join(maybe_next_audio_filename);
+
+  if !file_exists(&maybe_next_audio_filename) {
+    next_cursor = 0;
+  }
 
   let response = GetNextAudioFileResponse {
     success: true,
