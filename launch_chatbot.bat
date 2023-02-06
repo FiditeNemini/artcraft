@@ -2,7 +2,7 @@ REM Comments on windows use "REM". Weird-ass platform.
 
 REM Make sure migrations are up to date
 pushd crates\programs\aichatbot-sidecar
-
+set DATABASE_URL=sqlite://../../../runtime_data/database.db 
 diesel migration run
 popd
 
