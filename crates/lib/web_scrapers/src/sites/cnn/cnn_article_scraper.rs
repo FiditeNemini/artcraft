@@ -1,11 +1,28 @@
-use std::ops::Deref;
+use crate::common_extractors::title_extractor::extract_title;
+use crate::payloads::web_scraping_result::{OriginalHtmlWithWebScrapingResult, WebScrapingResult};
 use crate::payloads::web_scraping_target::WebScrapingTarget;
 use enums::by_table::web_scraping_targets::web_content_type::WebContentType;
 use errors::{anyhow, AnyhowResult};
 use log::{error, warn};
+use once_cell::sync::Lazy;
 use rss::Channel;
 use scraper::{Html, Selector};
-use crate::payloads::web_scraping_result::{OriginalHtmlWithWebScrapingResult, WebScrapingResult};
+use std::ops::Deref;
+
+/// The main article content container
+static ARTICLE_CONTENT_SELECTOR : Lazy<Selector> = Lazy::new(|| {
+  Selector::parse(".article__content").expect("this selector should parse")
+});
+
+/// Paragraphs within the article
+static PARAGRAPH_SELECTOR : Lazy<Selector> = Lazy::new(|| {
+  Selector::parse("p.paragraph").expect("this selector should parse")
+});
+
+/// The title of the article
+static TITLE_SELECTOR : Lazy<Selector> = Lazy::new(|| {
+  Selector::parse(".headline__text").expect("this selector should parse")
+});
 
 pub async fn cnn_article_scraper(url: &str) -> AnyhowResult<OriginalHtmlWithWebScrapingResult> {
   let downloaded_document= reqwest::get(url)
@@ -20,39 +37,46 @@ pub async fn cnn_article_scraper(url: &str) -> AnyhowResult<OriginalHtmlWithWebS
 
   //let selector = Selector::parse(".article__content")
   //let selector = Selector::parse("p.paragraph")
-  let article_content_selector = Selector::parse(".article__content")
-      .map_err(|e| {
-        error!("Could not parse selector: {:?}", e);
-        anyhow!("Could not parse selector: {:?}", e)
-      })?;
 
-  let selector2 = Selector::parse("p.paragraph")
-      .map_err(|e| {
-        error!("Could not parse selector: {:?}", e);
-        anyhow!("Could not parse selector: {:?}", e)
-      })?;
+  let mut paragraphs = Vec::new();
 
+  if let Some(article_content_div) = document.select(&ARTICLE_CONTENT_SELECTOR).next() {
+    for paragraph in article_content_div.select(&PARAGRAPH_SELECTOR).into_iter() {
 
-  let matches = document.select(&article_content_selector);
+      let mut paragraph_assembly = Vec::new();
 
-  //for mat in matches.into_iter() {
-  //  let matches2 = mat.select(&selector2);
-  //  for mat2 in matches2.into_iter() {
-  //    println!("\n\n{:?}\n\n", mat2);
-  //  }
-  //}
+      for text in paragraph.text() {
+        let stripped = text.trim();
+        if !stripped.is_empty() {
+          paragraph_assembly.push(stripped.to_string());
+        }
+      }
+
+      let paragraph_full_text = paragraph_assembly.join(" ")
+          .trim()
+          .to_string();
+
+      if !paragraph_full_text.is_empty() {
+        paragraphs.push(paragraph_full_text);
+      }
+    }
+  }
+
+  let maybe_title = extract_title(&document, &TITLE_SELECTOR);
+
+  let body_text = paragraphs.join("\n\n");
 
   Ok(OriginalHtmlWithWebScrapingResult {
     original_html: downloaded_document,
     result: WebScrapingResult {
       url: url.to_string(),
       web_content_type: WebContentType::CnnArticle,
-      maybe_title: None,
-      maybe_author: None,
-      paragraphs: vec![],
-      body_text: "".to_string(),
-      maybe_heading_image_url: None,
-      maybe_featured_image_url: None,
+      maybe_title,
+      maybe_author: None, // TODO
+      paragraphs,
+      body_text,
+      maybe_heading_image_url: None, // TODO
+      maybe_featured_image_url: None, // TODO
     }
   })
 }

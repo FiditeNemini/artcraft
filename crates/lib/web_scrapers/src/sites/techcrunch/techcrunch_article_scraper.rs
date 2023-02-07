@@ -1,4 +1,5 @@
-use std::ops::Deref;
+use crate::common_extractors::title_extractor::extract_title;
+use crate::payloads::web_scraping_result::{OriginalHtmlWithWebScrapingResult, WebScrapingResult};
 use crate::payloads::web_scraping_target::WebScrapingTarget;
 use enums::by_table::web_scraping_targets::web_content_type::WebContentType;
 use errors::{anyhow, AnyhowResult};
@@ -6,7 +7,7 @@ use log::{error, warn};
 use once_cell::sync::Lazy;
 use rss::Channel;
 use scraper::{Html, Selector};
-use crate::payloads::web_scraping_result::{OriginalHtmlWithWebScrapingResult, WebScrapingResult};
+use std::ops::Deref;
 
 /// The main article content container
 static ARTICLE_CONTENT_SELECTOR : Lazy<Selector> = Lazy::new(|| {
@@ -15,7 +16,8 @@ static ARTICLE_CONTENT_SELECTOR : Lazy<Selector> = Lazy::new(|| {
 
 /// Paragraphs within the article
 static PARAGRAPH_SELECTOR : Lazy<Selector> = Lazy::new(|| {
-  // NB: The "div >" removes mysterious inclusion of Twitter <iframe>s
+  // NB: Techcrunch content issue:
+  // The "div >" removes mysterious inclusion of Twitter <iframe>s
   // (not sure why those are included, as the dom doesn't include <p>'s)
   Selector::parse("div > p").expect("this selector should parse")
 });
@@ -35,21 +37,6 @@ pub async fn techcrunch_article_scraper(url: &str) -> AnyhowResult<OriginalHtmlW
   let document = Html::parse_document(&downloaded_document);
 
   let mut article_title = None;
-
-  if let Some(title) = document.select(&TITLE_SELECTOR).next() {
-    let mut pieces = Vec::new();
-
-    for mut text in title.text() {
-      text = text.trim();
-      if !text.is_empty() {
-        pieces.push(text.to_string());
-      }
-    }
-
-    let title = pieces.join(" ").trim().to_string();
-
-    article_title = Some(title);
-  }
 
   let mut paragraphs = Vec::new();
 
@@ -75,17 +62,21 @@ pub async fn techcrunch_article_scraper(url: &str) -> AnyhowResult<OriginalHtmlW
     }
   }
 
+  let maybe_title = extract_title(&document, &TITLE_SELECTOR);
+
+  let body_text = paragraphs.join("\n\n");
+
   Ok(OriginalHtmlWithWebScrapingResult {
     original_html: downloaded_document,
     result: WebScrapingResult {
       url: url.to_string(),
       web_content_type: WebContentType::TechCrunchArticle,
-      maybe_title: article_title,
-      maybe_author: None,
-      paragraphs: paragraphs.clone(),
-      body_text: paragraphs.join("\n\n"),
-      maybe_heading_image_url: None,
-      maybe_featured_image_url: None,
+      maybe_title,
+      maybe_author: None, // TODO
+      paragraphs,
+      body_text,
+      maybe_heading_image_url: None, // TODO
+      maybe_featured_image_url: None, // TODO
     }
   })
 }

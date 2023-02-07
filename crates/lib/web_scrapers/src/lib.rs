@@ -21,5 +21,6 @@
 #[macro_use] extern crate serde_derive;
 #[macro_use] extern crate strum;
 
+pub mod common_extractors;
 pub mod payloads;
 pub mod sites;

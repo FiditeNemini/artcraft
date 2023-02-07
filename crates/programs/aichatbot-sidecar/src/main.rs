@@ -38,24 +38,23 @@ use web_scrapers::sites::techcrunch::techcrunch_article_scraper::techcrunch_arti
 use web_scrapers::sites::theguardian::theguardian_scraper::theguardian_scraper_test;
 use workers::web_content_scraping::single_target::ingest_url_scrape_and_save::ingest_url_scrape_and_save;
 
-//#[tokio::main]
-//pub async fn main2() -> AnyhowResult<()> {
-//  let database_url = easyenv::get_env_string_required("DATABASE_URL")?;
-//  let pool = SqlitePoolOptions::new()
-//      .max_connections(5)
-//      .connect(&database_url).await?;
-//
-//  let _ = dotenv::from_filename(".env-aichatbot-secrets").ok();
-//  let startup_args = get_startup_args()?;
-//  let save_directory = SaveDirectory::new(&startup_args.save_directory);
-//
-//  let url = "https://techcrunch.com/2023/02/04/elon-musk-says-twitter-will-provide-a-free-write-only-api-to-bots-providing-good-content/";
-//  ingest_url_scrape_and_save(url, WebContentType::TechCrunchArticle, &save_directory).await?;
-//
-//
-//
-//  Ok(())
-//}
+#[tokio::main]
+pub async fn main() -> AnyhowResult<()> {
+  let database_url = easyenv::get_env_string_required("DATABASE_URL")?;
+  let pool = SqlitePoolOptions::new()
+      .max_connections(5)
+      .connect(&database_url).await?;
+
+  let _ = dotenv::from_filename(".env-aichatbot-secrets").ok();
+  let startup_args = get_startup_args()?;
+  let save_directory = SaveDirectory::new(&startup_args.save_directory);
+
+  //let url = "https://techcrunch.com/2023/02/04/elon-musk-says-twitter-will-provide-a-free-write-only-api-to-bots-providing-good-content/";
+  let url = "https://www.cnn.com/2023/02/04/business/automakers-problems-catching-up-with-tesla/index.html";
+  ingest_url_scrape_and_save(url, WebContentType::CnnArticle, &save_directory).await?;
+
+  Ok(())
+}
 
 pub const LOG_LEVEL: &'static str = concat!(
   "info,",
@@ -67,7 +66,7 @@ pub const LOG_LEVEL: &'static str = concat!(
 );
 
 #[actix_web::main]
-pub async fn main() -> AnyhowResult<()> {
+pub async fn main2() -> AnyhowResult<()> {
   easyenv::init_all_with_default_logging(Some(LOG_LEVEL));
 
   // NB: Do not check this secrets-containing dotenv file into VCS.
