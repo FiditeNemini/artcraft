@@ -19,7 +19,7 @@ pub async fn theguardian_scraper_test() -> AnyhowResult<Vec<WebScrapingTarget>> 
   let mut targets = Vec::with_capacity(channel.items.len());
 
   for item in channel.items {
-    println!("\n\nitem: {:?}", item);
+    //println!("\n\nitem: {:?}", item);
 
     let canonical_url = match item.link {
       Some(url) => url.clone(),

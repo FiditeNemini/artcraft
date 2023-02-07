@@ -35,12 +35,12 @@ pub async fn cnn_article_scraper(url: &str) -> AnyhowResult<OriginalHtmlWithWebS
 
   let matches = document.select(&article_content_selector);
 
-  for mat in matches.into_iter() {
-    let matches2 = mat.select(&selector2);
-    for mat2 in matches2.into_iter() {
-      println!("\n\n{:?}\n\n", mat2);
-    }
-  }
+  //for mat in matches.into_iter() {
+  //  let matches2 = mat.select(&selector2);
+  //  for mat2 in matches2.into_iter() {
+  //    println!("\n\n{:?}\n\n", mat2);
+  //  }
+  //}
 
   Ok(OriginalHtmlWithWebScrapingResult {
     original_html: downloaded_document,
