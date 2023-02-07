@@ -10,7 +10,8 @@ programs.
 The application uses sqlite, which is tricky to install on Windows.
 
 1. Put together an sqlite build directory containing the sources and dll file. One is checked in under this monorepo 
-   in ./windows/sqlite at the time of this writing, though that may change in the future.
+   in `./windows/sqlite` at the time of this writing, though that may change in the future.
+
 
 2. Add environment variables for the sqlite build directory (see https://github.com/diesel-rs/diesel/issues/487)
 
@@ -25,6 +26,7 @@ The application uses sqlite, which is tricky to install on Windows.
    ```
    
    This must be done in "Developer Command Prompt for VS 2022" (or similar), not `cmd` or `PowerShell`.
+
 
 4. Run the diesel_cli tool build  
    ```
