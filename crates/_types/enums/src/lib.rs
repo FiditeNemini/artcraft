@@ -28,9 +28,6 @@
 #[macro_use]
 mod macros;
 
-#[macro_use]
-mod macros2;
-
 #[cfg(test)] pub mod test_helpers;
 
 pub mod by_table;
