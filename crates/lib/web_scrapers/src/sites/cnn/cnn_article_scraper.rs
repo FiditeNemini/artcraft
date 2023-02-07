@@ -1,5 +1,6 @@
+use crate::common_extractors::extract_featured_image::extract_featured_image;
 use crate::common_extractors::extract_title::extract_title;
-use crate::payloads::web_scraping_result::{OriginalHtmlWithWebScrapingResult, WebScrapingResult};
+use crate::payloads::web_scraping_result::{WebScrapingResult, ScrapedWebArticle};
 use crate::payloads::web_scraping_target::WebScrapingTarget;
 use enums::by_table::web_scraping_targets::web_content_type::WebContentType;
 use errors::{anyhow, AnyhowResult};
@@ -29,7 +30,7 @@ pub static CNN_FEATURED_IMAGE_SELECTOR: Lazy<Selector> = Lazy::new(|| {
   Selector::parse(".image__lede .image__picture > img").expect("this selector should parse")
 });
 
-pub async fn cnn_article_scraper(url: &str) -> AnyhowResult<OriginalHtmlWithWebScrapingResult> {
+pub async fn cnn_article_scraper(url: &str) -> AnyhowResult<WebScrapingResult> {
   let downloaded_document= reqwest::get(url)
       .await?
       .bytes()
@@ -68,19 +69,20 @@ pub async fn cnn_article_scraper(url: &str) -> AnyhowResult<OriginalHtmlWithWebS
   }
 
   let maybe_title = extract_title(&document, &CNN_TITLE_SELECTOR);
+  let maybe_heading_image_url = extract_featured_image(&document, &CNN_FEATURED_IMAGE_SELECTOR);
 
   let body_text = paragraphs.join("\n\n");
 
-  Ok(OriginalHtmlWithWebScrapingResult {
+  Ok(WebScrapingResult {
     original_html: downloaded_document,
-    result: WebScrapingResult {
+    result: ScrapedWebArticle {
       url: url.to_string(),
       web_content_type: WebContentType::CnnArticle,
       maybe_title,
       maybe_author: None, // TODO
       paragraphs,
       body_text,
-      maybe_heading_image_url: None, // TODO
+      maybe_heading_image_url,
       maybe_featured_image_url: None, // TODO
     }
   })

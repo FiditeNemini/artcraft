@@ -1,9 +1,17 @@
 use enums::by_table::web_scraping_targets::web_content_type::WebContentType;
 
-// TODO: Add publish date
-
+// TODO: Rename this to not confuse with `Result<T, E>`.
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct WebScrapingResult {
+  /// Surface the original HTML to callers that care about it.
+  pub original_html: String,
+
+  /// Output of *successful* scraping.
+  pub result: ScrapedWebArticle,
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize)]
+pub struct ScrapedWebArticle {
   /// Location the article came from
   pub url: String,
 
@@ -28,15 +36,14 @@ pub struct WebScrapingResult {
   /// A featured image (somewhere in the body), if present
   pub maybe_featured_image_url: Option<String>,
 
-  // TODO
+  // TODO: Add publish date
   // pub maybe_publish_date_utc: Option<DateTime<Utc>>
 }
 
-#[derive(Clone, Debug, Serialize, Deserialize)]
-pub struct OriginalHtmlWithWebScrapingResult {
-  /// Surface the original HTML to callers that care about it.
-  pub original_html: String,
+// TODO: Other types - threaded discussions (HN, Reddit), video essays (CNN, YouTube), etc.
+//  then return these in an enum container.
+pub struct ScrapedThreadedDiscussion {
+}
 
-  /// Output of *successful* scraping.
-  pub result: WebScrapingResult,
+pub struct ScrapedVideo {
 }

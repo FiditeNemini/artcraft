@@ -11,7 +11,7 @@ use std::sync::Arc;
 use std::thread;
 use std::time::Duration;
 use strum::IntoEnumIterator;
-use web_scrapers::payloads::web_scraping_result::WebScrapingResult;
+use web_scrapers::payloads::web_scraping_result::ScrapedWebArticle;
 use web_scrapers::payloads::web_scraping_target::WebScrapingTarget;
 use web_scrapers::sites::cnn::cnn_indexer::{cnn_indexer, CnnFeed};
 use web_scrapers::sites::techcrunch::techcrunch_indexer::{techcrunch_indexer, TechcrunchFeed};
