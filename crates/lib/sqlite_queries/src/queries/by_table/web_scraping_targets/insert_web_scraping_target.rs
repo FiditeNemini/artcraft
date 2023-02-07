@@ -1,6 +1,6 @@
+use enums::by_table::web_scraping_targets::web_content_type::WebContentType;
 use errors::{anyhow, AnyhowResult};
 use sqlx::SqlitePool;
-use enums::by_table::web_scraping_targets::web_content_type::WebContentType;
 
 pub struct Args <'a> {
   pub canonical_url: &'a str,
@@ -15,9 +15,7 @@ pub struct Args <'a> {
 }
 
 pub async fn insert_web_scraping_target(args: Args<'_>) -> AnyhowResult<()> {
-
   let web_content_type = args.web_content_type.to_str().to_string();
-
   let query = sqlx::query!(
         r#"
 INSERT INTO web_scraping_targets(
