@@ -29,7 +29,7 @@ pub enum WindowName {
 
 // TODO(bt, 2023-01-17): This desperately needs MySQL integration tests!
 impl_enum_display_and_debug_using_to_str!(WindowName);
-impl_enum_sqlx_coders!(WindowName);
+impl_mysql_enum_coders!(WindowName);
 
 /// NB: Legacy API for older code.
 impl WindowName {
