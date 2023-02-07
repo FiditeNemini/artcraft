@@ -1,4 +1,4 @@
-use crate::common_extractors::title_extractor::extract_title;
+use crate::common_extractors::extract_title::extract_title;
 use crate::payloads::web_scraping_result::{OriginalHtmlWithWebScrapingResult, WebScrapingResult};
 use crate::payloads::web_scraping_target::WebScrapingTarget;
 use enums::by_table::web_scraping_targets::web_content_type::WebContentType;
@@ -23,8 +23,13 @@ static PARAGRAPH_SELECTOR : Lazy<Selector> = Lazy::new(|| {
 });
 
 /// The title of the article
-static TITLE_SELECTOR : Lazy<Selector> = Lazy::new(|| {
+pub static TECHCRUNCH_TITLE_SELECTOR: Lazy<Selector> = Lazy::new(|| {
   Selector::parse(".article__title").expect("this selector should parse")
+});
+
+/// The article featured image
+pub static TECHCRUNCH_FEATURED_IMAGE_SELECTOR: Lazy<Selector> = Lazy::new(|| {
+  Selector::parse(".article__featured-image").expect("this selector should parse")
 });
 
 pub async fn techcrunch_article_scraper(url: &str) -> AnyhowResult<OriginalHtmlWithWebScrapingResult> {
@@ -35,8 +40,6 @@ pub async fn techcrunch_article_scraper(url: &str) -> AnyhowResult<OriginalHtmlW
 
   let downloaded_document = String::from_utf8_lossy(downloaded_document.deref()).to_string();
   let document = Html::parse_document(&downloaded_document);
-
-  let mut article_title = None;
 
   let mut paragraphs = Vec::new();
 
@@ -62,7 +65,7 @@ pub async fn techcrunch_article_scraper(url: &str) -> AnyhowResult<OriginalHtmlW
     }
   }
 
-  let maybe_title = extract_title(&document, &TITLE_SELECTOR);
+  let maybe_title = extract_title(&document, &TECHCRUNCH_TITLE_SELECTOR);
 
   let body_text = paragraphs.join("\n\n");
 

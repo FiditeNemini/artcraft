@@ -1,4 +1,4 @@
-use crate::common_extractors::title_extractor::extract_title;
+use crate::common_extractors::extract_title::extract_title;
 use crate::payloads::web_scraping_result::{OriginalHtmlWithWebScrapingResult, WebScrapingResult};
 use crate::payloads::web_scraping_target::WebScrapingTarget;
 use enums::by_table::web_scraping_targets::web_content_type::WebContentType;
@@ -20,8 +20,13 @@ static PARAGRAPH_SELECTOR : Lazy<Selector> = Lazy::new(|| {
 });
 
 /// The title of the article
-static TITLE_SELECTOR : Lazy<Selector> = Lazy::new(|| {
+pub static CNN_TITLE_SELECTOR: Lazy<Selector> = Lazy::new(|| {
   Selector::parse(".headline__text").expect("this selector should parse")
+});
+
+/// The article featured image
+pub static CNN_FEATURED_IMAGE_SELECTOR: Lazy<Selector> = Lazy::new(|| {
+  Selector::parse(".image__lede .image__picture > img").expect("this selector should parse")
 });
 
 pub async fn cnn_article_scraper(url: &str) -> AnyhowResult<OriginalHtmlWithWebScrapingResult> {
@@ -62,7 +67,7 @@ pub async fn cnn_article_scraper(url: &str) -> AnyhowResult<OriginalHtmlWithWebS
     }
   }
 
-  let maybe_title = extract_title(&document, &TITLE_SELECTOR);
+  let maybe_title = extract_title(&document, &CNN_TITLE_SELECTOR);
 
   let body_text = paragraphs.join("\n\n");
 

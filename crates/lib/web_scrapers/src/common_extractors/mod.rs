@@ -1,1 +1,3 @@
-pub mod title_extractor;
+pub mod extract_featured_image;
+pub mod extract_title;
+
