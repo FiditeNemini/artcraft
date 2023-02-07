@@ -41,7 +41,7 @@ FROM web_scraping_targets
 WHERE
   scraping_status = ?
   AND id > ?
-ORDER BY id DESC
+ORDER BY id ASC
 LIMIT ?
         "#,
         scraping_status,

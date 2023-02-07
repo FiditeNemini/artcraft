@@ -24,7 +24,7 @@ pub async fn web_content_scraping_main_loop(job_state: Arc<JobState>) {
 
     single_job_loop_iteration(&job_state).await;
 
-    info!("web_index_ingestion loop finished; waiting...");
+    info!("web_content_scraping loop finished; waiting...");
     thread::sleep(Duration::from_secs(60));
   }
 }
@@ -44,6 +44,11 @@ async fn scrape_jobs_of_status(status: ScrapingStatus, job_state: &Arc<JobState>
   let mut failure_count = 0;
 
   loop {
+    // NB: Protect sqlite from contention.
+    thread::sleep(Duration::from_millis(500));
+
+    info!("web_content_scraping querying {:?} targets from id > {} ...", &status, last_id);
+
     let query_result = list_web_scraping_targets(
       status, last_id, BATCH_SIZE, &job_state.sqlite_pool).await;
 
@@ -73,11 +78,16 @@ async fn scrape_jobs_of_status(status: ScrapingStatus, job_state: &Arc<JobState>
     }
 
     for target in targets {
+      info!("Download and scrape target: {:?}", target.canonical_url);
+
       let result = process_target_record(&target, job_state).await;
       if let Err(err) = result {
         error!("Error processing target: {:?}", err);
       }
+
       last_id = target.id;
+
+      thread::sleep(Duration::from_secs(1));
     }
   }
 }

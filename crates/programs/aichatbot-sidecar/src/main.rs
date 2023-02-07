@@ -32,7 +32,7 @@ use sqlx::sqlite::SqlitePoolOptions;
 use std::sync::Arc;
 use std::thread;
 use std::time::Duration;
-use tokio::runtime::Runtime;
+use tokio::runtime::{Builder, Runtime};
 use web_scrapers::sites::cnn::cnn_article_scraper::cnn_article_scraper;
 use web_scrapers::sites::techcrunch::techcrunch_article_scraper::techcrunch_article_scraper;
 use web_scrapers::sites::theguardian::theguardian_scraper::theguardian_scraper_test;
@@ -110,7 +110,14 @@ pub async fn main() -> AnyhowResult<()> {
       save_directory,
     });
 
-    let tokio_runtime = Runtime::new()?;
+    let tokio_runtime = Builder::new_multi_thread()
+        .worker_threads(4)
+        .thread_name("tokio-worker")
+        .thread_stack_size(3 * 1024 * 1024)
+        .enable_time()
+        .enable_io()
+        .build()
+        .unwrap();
 
     tokio_runtime.spawn(async {
       let _r = web_index_ingestion_main_loop(job_state2).await;
