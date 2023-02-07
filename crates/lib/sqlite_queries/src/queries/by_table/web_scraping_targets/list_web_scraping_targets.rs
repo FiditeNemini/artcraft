@@ -4,6 +4,7 @@ use sqlx::SqlitePool;
 use enums::by_table::web_scraping_targets::web_content_type::WebContentType;
 
 pub struct WebScrapingTarget {
+  pub id: i64,
   pub canonical_url: String,
   pub web_content_type: WebContentType,
   pub maybe_title: Option<String>,
@@ -13,18 +14,22 @@ pub struct WebScrapingTarget {
   pub scrape_attempts: i64,
 }
 
-pub async fn insert_web_scraping_target(
+pub async fn list_web_scraping_targets(
   scraping_status: ScrapingStatus,
+  last_id: i64,
   limit: i64,
   sqlite_pool: &SqlitePool,
 ) -> AnyhowResult<Vec<WebScrapingTarget>> {
 
+  // NB: Sqlx doesn't support `WHERE ... IN (...)` "yet". :(
+  // https://github.com/launchbadge/sqlx/blob/6d0d7402c8a9cbea2676a1795e9fb50b0cf60c03/FAQ.md?plain=1#L73
   let scraping_status = scraping_status.to_str().to_string();
 
   let query = sqlx::query_as!(
     RawInternalWebScrapingTarget,
         r#"
 SELECT
+  id,
   canonical_url,
   web_content_type as `web_content_type: enums::by_table::web_scraping_targets::web_content_type::WebContentType`,
   maybe_title,
@@ -35,20 +40,22 @@ SELECT
 FROM web_scraping_targets
 WHERE
   scraping_status = ?
+  AND id > ?
 ORDER BY id DESC
 LIMIT ?
         "#,
         scraping_status,
+        last_id,
         limit,
     );
 
   let records = query.fetch_all(sqlite_pool)
       .await?;
 
-
   let records = records.into_iter()
       .map(|record : RawInternalWebScrapingTarget| {
         WebScrapingTarget {
+          id: record.id,
           canonical_url: record.canonical_url,
           web_content_type: record.web_content_type,
           maybe_title: record.maybe_title,
@@ -64,6 +71,7 @@ LIMIT ?
 }
 
 struct RawInternalWebScrapingTarget {
+  id: i64,
   canonical_url: String,
   web_content_type: WebContentType,
   maybe_title: Option<String>,

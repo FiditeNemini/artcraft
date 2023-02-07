@@ -19,42 +19,43 @@ use crate::gui::launch_gui::launch_gui;
 use crate::main_loop::main_loop;
 use crate::persistence::save_directory::SaveDirectory;
 use crate::shared_state::app_control_state::AppControlState;
+use crate::shared_state::job_state::JobState;
 use crate::startup_args::get_startup_args;
 use crate::web_server::launch_web_server::{launch_web_server, LaunchWebServerArgs};
+use crate::workers::web_content_scraping::main_loop::web_content_scraping_main_loop;
+use crate::workers::web_index_ingestion::main_loop::web_index_ingestion_main_loop;
+use enums::by_table::web_scraping_targets::web_content_type::WebContentType;
 use errors::AnyhowResult;
 use log::info;
+use sqlite_queries::queries::by_table::web_scraping_targets::insert_web_scraping_target::{Args, insert_web_scraping_target};
+use sqlx::sqlite::SqlitePoolOptions;
 use std::sync::Arc;
 use std::thread;
 use std::time::Duration;
-use sqlx::sqlite::SqlitePoolOptions;
 use tokio::runtime::Runtime;
-use enums::by_table::web_scraping_targets::web_content_type::WebContentType;
-use sqlite_queries::queries::by_table::web_scraping_targets::insert_web_scraping_target::{Args, insert_web_scraping_target};
 use web_scrapers::sites::cnn::cnn_article_scraper::cnn_article_scraper;
 use web_scrapers::sites::techcrunch::techcrunch_article_scraper::techcrunch_article_scraper;
 use web_scrapers::sites::theguardian::theguardian_scraper::theguardian_scraper_test;
-use workers::web_content_scraping::ingest_url_scrape_and_save::ingest_url_scrape_and_save;
-use crate::shared_state::job_state::JobState;
-use crate::workers::web_index_ingestion::main_loop::web_index_ingestion_main_loop;
+use workers::web_content_scraping::single_target::ingest_url_scrape_and_save::ingest_url_scrape_and_save;
 
-#[tokio::main]
-pub async fn main2() -> AnyhowResult<()> {
-  let database_url = easyenv::get_env_string_required("DATABASE_URL")?;
-  let pool = SqlitePoolOptions::new()
-      .max_connections(5)
-      .connect(&database_url).await?;
-
-  let _ = dotenv::from_filename(".env-aichatbot-secrets").ok();
-  let startup_args = get_startup_args()?;
-  let save_directory = SaveDirectory::new(&startup_args.save_directory);
-
-  let url = "https://techcrunch.com/2023/02/04/elon-musk-says-twitter-will-provide-a-free-write-only-api-to-bots-providing-good-content/";
-  ingest_url_scrape_and_save(url, WebContentType::TechCrunchArticle, &save_directory).await?;
-
-
-
-  Ok(())
-}
+//#[tokio::main]
+//pub async fn main2() -> AnyhowResult<()> {
+//  let database_url = easyenv::get_env_string_required("DATABASE_URL")?;
+//  let pool = SqlitePoolOptions::new()
+//      .max_connections(5)
+//      .connect(&database_url).await?;
+//
+//  let _ = dotenv::from_filename(".env-aichatbot-secrets").ok();
+//  let startup_args = get_startup_args()?;
+//  let save_directory = SaveDirectory::new(&startup_args.save_directory);
+//
+//  let url = "https://techcrunch.com/2023/02/04/elon-musk-says-twitter-will-provide-a-free-write-only-api-to-bots-providing-good-content/";
+//  ingest_url_scrape_and_save(url, WebContentType::TechCrunchArticle, &save_directory).await?;
+//
+//
+//
+//  Ok(())
+//}
 
 pub const LOG_LEVEL: &'static str = concat!(
   "info,",
@@ -97,6 +98,7 @@ pub async fn main() -> AnyhowResult<()> {
   let app_control_state2 = app_control_state.clone();
   let openai_client2 = openai_client.clone();
   let job_state2 = job_state.clone();
+  let job_state3 = job_state.clone();
 
   // NB: both egui and imgui (which we aren't using) complain about launching on a non-main thread.
   // They even complain that this is impossible on Windows (and our program aims to be multiplatform)
@@ -114,11 +116,9 @@ pub async fn main() -> AnyhowResult<()> {
       let _r = web_index_ingestion_main_loop(job_state2).await;
     });
 
-    // TODO: Scraping thread (needs Sqlite queries)
-    //tokio_runtime.spawn(async {
-    //  // TODO...
-    //  let _r = web_index_ingestion_main_loop(job_state2.clone()).await;
-    //});
+    tokio_runtime.spawn(async {
+      let _r = web_content_scraping_main_loop(job_state3).await;
+    });
 
     // TODO: GPT Transformation thread
     //tokio_runtime.spawn(async {
