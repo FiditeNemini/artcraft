@@ -13,10 +13,6 @@ pub async fn ingest_url_scrape_and_save(url: &str, web_content_type: WebContentT
     _ => return Ok(()), // TODO: Implement the rest
   };
 
-  println!("\n\nScraping result: {:?}", scraping_result.result);
-
-  println!("\n\nScraping result: {}", scraping_result.result.body_text);
-
   {
     let directory = save_directory.directory_for_webpage_url(url)?;
     std::fs::create_dir_all(&directory)?;

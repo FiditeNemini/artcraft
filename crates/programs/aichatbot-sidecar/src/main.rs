@@ -40,6 +40,10 @@ use workers::web_content_scraping::single_target::ingest_url_scrape_and_save::in
 
 #[tokio::main]
 pub async fn main() -> AnyhowResult<()> {
+  test().await
+}
+
+async fn test() -> AnyhowResult<()> {
   let database_url = easyenv::get_env_string_required("DATABASE_URL")?;
   let pool = SqlitePoolOptions::new()
       .max_connections(5)

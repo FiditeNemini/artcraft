@@ -39,11 +39,6 @@ pub async fn cnn_article_scraper(url: &str) -> AnyhowResult<WebScrapingResult> {
   let downloaded_document = String::from_utf8_lossy(downloaded_document.deref()).to_string();
   let document = Html::parse_document(&downloaded_document);
 
-  //println!("Document: {:?}", document);
-
-  //let selector = Selector::parse(".article__content")
-  //let selector = Selector::parse("p.paragraph")
-
   let mut paragraphs = Vec::new();
 
   if let Some(article_content_div) = document.select(&ARTICLE_CONTENT_SELECTOR).next() {
