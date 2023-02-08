@@ -1,4 +1,5 @@
 use crate::shared_state::job_state::JobState;
+use crate::workers::web_content_scraping::single_target::process_target_record::process_target_record;
 use enums::by_table::web_scraping_targets::scraping_status::ScrapingStatus;
 use errors::AnyhowResult;
 use log::{error, info};
@@ -15,7 +16,6 @@ use web_scrapers::payloads::web_scraping_result::ScrapedWebArticle;
 use web_scrapers::payloads::web_scraping_target::WebScrapingTarget;
 use web_scrapers::sites::cnn::cnn_indexer::{cnn_indexer, CnnFeed};
 use web_scrapers::sites::techcrunch::techcrunch_indexer::{techcrunch_indexer, TechcrunchFeed};
-use crate::workers::web_content_scraping::single_target::process_target_record::process_target_record;
 
 /// Follow up on articles tagged to be indexed by downloading and scraping their contents.
 pub async fn web_content_scraping_main_loop(job_state: Arc<JobState>) {

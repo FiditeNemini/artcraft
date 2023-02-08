@@ -37,11 +37,12 @@ use web_scrapers::sites::cnn::cnn_article_scraper::cnn_article_scraper;
 use web_scrapers::sites::techcrunch::techcrunch_article_scraper::techcrunch_article_scraper;
 use web_scrapers::sites::theguardian::theguardian_scraper::theguardian_scraper_test;
 use workers::web_content_scraping::single_target::ingest_url_scrape_and_save::ingest_url_scrape_and_save;
+use crate::workers::gpt_rendition::main_loop::gpt_rendition_main_loop;
 
-#[tokio::main]
-pub async fn main() -> AnyhowResult<()> {
-  test().await
-}
+//#[tokio::main]
+//pub async fn main() -> AnyhowResult<()> {
+//  test().await
+//}
 
 async fn test() -> AnyhowResult<()> {
   let database_url = easyenv::get_env_string_required("DATABASE_URL")?;
@@ -70,7 +71,7 @@ pub const LOG_LEVEL: &'static str = concat!(
 );
 
 #[actix_web::main]
-pub async fn main2() -> AnyhowResult<()> {
+pub async fn main() -> AnyhowResult<()> {
   easyenv::init_all_with_default_logging(Some(LOG_LEVEL));
 
   // NB: Do not check this secrets-containing dotenv file into VCS.
@@ -92,16 +93,15 @@ pub async fn main2() -> AnyhowResult<()> {
       .connect(&database_url).await?;
 
   let job_state = Arc::new(JobState {
-    sqlite_pool: pool,
+    openai_client: openai_client.clone(),
     save_directory: save_directory.clone(),
+    sqlite_pool: pool,
   });
 
   info!("Starting worker threads and web server...");
 
   let app_control_state2 = app_control_state.clone();
   let openai_client2 = openai_client.clone();
-  let job_state2 = job_state.clone();
-  let job_state3 = job_state.clone();
 
   // NB: both egui and imgui (which we aren't using) complain about launching on a non-main thread.
   // They even complain that this is impossible on Windows (and our program aims to be multiplatform)
@@ -122,6 +122,10 @@ pub async fn main2() -> AnyhowResult<()> {
         .build()
         .unwrap();
 
+    let job_state2 = job_state.clone();
+    let job_state3 = job_state.clone();
+    let job_state4 = job_state.clone();
+
     tokio_runtime.spawn(async {
       let _r = web_index_ingestion_main_loop(job_state2).await;
     });
@@ -130,10 +134,9 @@ pub async fn main2() -> AnyhowResult<()> {
       let _r = web_content_scraping_main_loop(job_state3).await;
     });
 
-    // TODO: GPT Transformation thread
-    //tokio_runtime.spawn(async {
-    //  // TODO...
-    //});
+    tokio_runtime.spawn(async {
+      let _r = gpt_rendition_main_loop(job_state4).await;
+    });
 
     // TODO: FakeYou enrichment thread
     //tokio_runtime.spawn(async {

@@ -42,6 +42,9 @@ impl SaveDirectory {
     Ok(self.directory_for_webpage_url(url)?.join("scrape_summary.yaml"))
   }
 
+  pub fn rendition_file_for_webpage_url(&self, url: &str) -> AnyhowResult<PathBuf> {
+    Ok(self.directory_for_webpage_url(url)?.join("rendition.yaml"))
+  }
 
   /// This is just the first directory structure, which is sequential audio files.
   /// We'll be using a database and well-formed filesystem layout later.

@@ -3,8 +3,11 @@ use crate::workers::web_content_scraping::single_target::ingest_url_scrape_and_s
 use enums::by_table::web_scraping_targets::scraping_status::ScrapingStatus;
 use errors::AnyhowResult;
 use log::error;
+use sqlite_queries::queries::by_table::web_rendition_targets::insert_web_rendition_target::Args as RenditionArgs;
+use sqlite_queries::queries::by_table::web_rendition_targets::insert_web_rendition_target::insert_web_rendition_target;
 use sqlite_queries::queries::by_table::web_scraping_targets::list_web_scraping_targets::WebScrapingTarget as WebScrapingTargetRecord;
-use sqlite_queries::queries::by_table::web_scraping_targets::update_web_scraping_target::{Args, update_web_scraping_target};
+use sqlite_queries::queries::by_table::web_scraping_targets::update_web_scraping_target::Args as ScrapingArgs;
+use sqlite_queries::queries::by_table::web_scraping_targets::update_web_scraping_target::update_web_scraping_target;
 use std::sync::Arc;
 
 pub async fn process_target_record(target: &WebScrapingTargetRecord, job_state: &Arc<JobState>) -> AnyhowResult<()> {
@@ -21,7 +24,7 @@ pub async fn process_target_record(target: &WebScrapingTargetRecord, job_state: 
     } else {
       ScrapingStatus::Failed
     };
-    update_web_scraping_target(Args {
+    update_web_scraping_target(ScrapingArgs {
       canonical_url: &target.canonical_url,
       scraping_status: next_scraping_status,
       scrape_attempts: target.scrape_attempts + 1,
@@ -31,12 +34,16 @@ pub async fn process_target_record(target: &WebScrapingTargetRecord, job_state: 
     return Err(err);
   }
 
-  // TODO: Insert result record in new table.
-
-  update_web_scraping_target(Args {
+  update_web_scraping_target(ScrapingArgs {
     canonical_url: &target.canonical_url,
     scraping_status: ScrapingStatus::Success,
     scrape_attempts: target.scrape_attempts + 1,
+    sqlite_pool: &job_state.sqlite_pool,
+  }).await?; // NB: If these queries fail, we could get stuck.
+
+  insert_web_rendition_target( RenditionArgs {
+    canonical_url: &target.canonical_url,
+    web_content_type: target.web_content_type,
     sqlite_pool: &job_state.sqlite_pool,
   }).await?; // NB: If these queries fail, we could get stuck.
 
