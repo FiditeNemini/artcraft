@@ -3,6 +3,7 @@ use enums::by_table::web_scraping_targets::web_content_type::WebContentType;
 use errors::AnyhowResult;
 use log::warn;
 use rss::Channel;
+use enums::common::sqlite::skip_reason::SkipReason;
 
 // NB: Contains nearly 70 items
 const RSS_TOP_STORIES : &'static str = "http://rss.cnn.com/rss/cnn_topstories.rss";
@@ -51,6 +52,14 @@ pub async fn cnn_indexer(feed: CnnFeed) -> AnyhowResult<Vec<WebScrapingTarget>> 
       }
     };
 
+    let mut maybe_skip_reason = None;
+
+    // Lazy heuristic to skip CNN video articles, which contain little text.
+    // eg. https://www.cnn.com/videos/politics/2023/02/08/pelosi-gop-hecklers-reaction-joe-biden-state-of-the-union-tapper-intv-vpx.cnn
+    if canonical_url.contains("/videos/") {
+      maybe_skip_reason = Some(SkipReason::VideoContent);
+    }
+
     let maybe_image_url = item.extensions.get("media")
         .map(|media| media.get("group"))
         .flatten()
@@ -70,6 +79,7 @@ pub async fn cnn_indexer(feed: CnnFeed) -> AnyhowResult<Vec<WebScrapingTarget>> 
       maybe_title: item.title.clone(),
       maybe_full_image_url: maybe_image_url,
       maybe_thumbnail_image_url: None,
+      maybe_skip_reason,
     });
   }
 

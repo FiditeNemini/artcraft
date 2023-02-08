@@ -74,6 +74,7 @@ pub async fn techcrunch_indexer(feed: TechcrunchFeed) -> AnyhowResult<Vec<WebScr
       maybe_title: item.title.clone(),
       maybe_full_image_url: None,
       maybe_thumbnail_image_url: None,
+      maybe_skip_reason: None, // NB: None known for TechCrunch at this stage (yet)
     });
   }
 

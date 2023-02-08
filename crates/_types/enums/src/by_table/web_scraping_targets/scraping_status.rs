@@ -13,6 +13,9 @@ pub enum ScrapingStatus {
   #[serde(rename = "new")]
   New,
 
+  #[serde(rename = "skipped")]
+  Skipped,
+
   #[serde(rename = "failed")]
   Failed,
 
@@ -32,6 +35,7 @@ impl ScrapingStatus {
   pub fn to_str(&self) -> &'static str {
     match self {
       Self::New => "new",
+      Self::Skipped => "skipped",
       Self::Failed => "failed",
       Self::PermanentlyFailed => "permanently_failed",
       Self::Success => "success",
@@ -41,6 +45,7 @@ impl ScrapingStatus {
   pub fn from_str(value: &str) -> Result<Self, String> {
     match value {
       "new" => Ok(Self::New),
+      "skipped" => Ok(Self::Skipped),
       "failed" => Ok(Self::Failed),
       "permanently_failed" => Ok(Self::PermanentlyFailed),
       "success" => Ok(Self::Success),
@@ -60,6 +65,7 @@ mod tests {
     #[test]
     fn test_serialization() {
       assert_serialization(ScrapingStatus::New, "new");
+      assert_serialization(ScrapingStatus::Skipped, "skipped");
       assert_serialization(ScrapingStatus::Failed, "failed");
       assert_serialization(ScrapingStatus::PermanentlyFailed, "permanently_failed");
       assert_serialization(ScrapingStatus::Success, "success");
@@ -72,6 +78,7 @@ mod tests {
     #[test]
     fn test_to_str() {
       assert_eq!(ScrapingStatus::New.to_str(), "new");
+      assert_eq!(ScrapingStatus::Skipped.to_str(), "skipped");
       assert_eq!(ScrapingStatus::Failed.to_str(), "failed");
       assert_eq!(ScrapingStatus::PermanentlyFailed.to_str(), "permanently_failed");
       assert_eq!(ScrapingStatus::Success.to_str(), "success");
@@ -80,6 +87,7 @@ mod tests {
     #[test]
     fn test_from_str() {
       assert_eq!(ScrapingStatus::from_str("new").unwrap(), ScrapingStatus::New);
+      assert_eq!(ScrapingStatus::from_str("skipped").unwrap(), ScrapingStatus::Skipped);
       assert_eq!(ScrapingStatus::from_str("failed").unwrap(), ScrapingStatus::Failed);
       assert_eq!(ScrapingStatus::from_str("permanently_failed").unwrap(), ScrapingStatus::PermanentlyFailed);
       assert_eq!(ScrapingStatus::from_str("success").unwrap(), ScrapingStatus::Success);

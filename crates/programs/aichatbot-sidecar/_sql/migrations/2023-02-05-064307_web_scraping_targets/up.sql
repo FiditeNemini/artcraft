@@ -25,7 +25,11 @@ CREATE TABLE web_scraping_targets (
   -- This can be useful downstream during the actual scraping.
   maybe_article_thumbnail_image_url TEXT,
 
-  -- Scraping status: "new", "failed", "permanently_failed", "success"
+  -- If we skip the target (a priori or after scraping), this is why.
+  -- Enum-like value, eg. "predominantly_video", "empty", "filtered_topic", "nobody_cares", etc.
+  maybe_skip_reason TEXT,
+
+  -- Scraping status: "new", "failed", "permanently_failed", "success", "skipped"
   scraping_status TEXT DEFAULT "new" NOT NULL,
   scrape_attempts INT DEFAULT 0 NOT NULL,
 

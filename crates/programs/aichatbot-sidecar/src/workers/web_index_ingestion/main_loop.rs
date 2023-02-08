@@ -58,6 +58,7 @@ async fn insert_targets(job_state: &Arc<JobState>, targets: &Vec<WebScrapingTarg
       maybe_title: target.maybe_title.as_deref(),
       maybe_article_full_image_url: target.maybe_full_image_url.as_deref(),
       maybe_article_thumbnail_image_url: target.maybe_thumbnail_image_url.as_deref(),
+      maybe_skip_reason: target.maybe_skip_reason,
       sqlite_pool: &job_state.sqlite_pool,
     }).await;
   }

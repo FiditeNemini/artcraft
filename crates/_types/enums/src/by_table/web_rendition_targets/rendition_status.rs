@@ -13,6 +13,9 @@ pub enum RenditionStatus {
   #[serde(rename = "new")]
   New,
 
+  #[serde(rename = "skipped")]
+  Skipped,
+
   #[serde(rename = "failed")]
   Failed,
 
@@ -32,6 +35,7 @@ impl RenditionStatus {
   pub fn to_str(&self) -> &'static str {
     match self {
       Self::New => "new",
+      Self::Skipped => "skipped",
       Self::Failed => "failed",
       Self::PermanentlyFailed => "permanently_failed",
       Self::Success => "success",
@@ -41,6 +45,7 @@ impl RenditionStatus {
   pub fn from_str(value: &str) -> Result<Self, String> {
     match value {
       "new" => Ok(Self::New),
+      "skipped" => Ok(Self::Skipped),
       "failed" => Ok(Self::Failed),
       "permanently_failed" => Ok(Self::PermanentlyFailed),
       "success" => Ok(Self::Success),
@@ -60,6 +65,7 @@ mod tests {
     #[test]
     fn test_serialization() {
       assert_serialization(RenditionStatus::New, "new");
+      assert_serialization(RenditionStatus::Skipped, "skipped");
       assert_serialization(RenditionStatus::Failed, "failed");
       assert_serialization(RenditionStatus::PermanentlyFailed, "permanently_failed");
       assert_serialization(RenditionStatus::Success, "success");
@@ -72,6 +78,7 @@ mod tests {
     #[test]
     fn test_to_str() {
       assert_eq!(RenditionStatus::New.to_str(), "new");
+      assert_eq!(RenditionStatus::Skipped.to_str(), "skipped");
       assert_eq!(RenditionStatus::Failed.to_str(), "failed");
       assert_eq!(RenditionStatus::PermanentlyFailed.to_str(), "permanently_failed");
       assert_eq!(RenditionStatus::Success.to_str(), "success");
@@ -80,6 +87,7 @@ mod tests {
     #[test]
     fn test_from_str() {
       assert_eq!(RenditionStatus::from_str("new").unwrap(), RenditionStatus::New);
+      assert_eq!(RenditionStatus::from_str("skipped").unwrap(), RenditionStatus::Skipped);
       assert_eq!(RenditionStatus::from_str("failed").unwrap(), RenditionStatus::Failed);
       assert_eq!(RenditionStatus::from_str("permanently_failed").unwrap(), RenditionStatus::PermanentlyFailed);
       assert_eq!(RenditionStatus::from_str("success").unwrap(), RenditionStatus::Success);

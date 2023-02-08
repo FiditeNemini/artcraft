@@ -53,6 +53,7 @@ pub async fn theguardian_scraper_test() -> AnyhowResult<Vec<WebScrapingTarget>> 
       maybe_title: item.title.clone(),
       maybe_full_image_url: maybe_image_url,
       maybe_thumbnail_image_url: maybe_thumbnail_url,
+      maybe_skip_reason: None, // NB: None known for TheGuardian at this stage (yet)
     });
   }
 

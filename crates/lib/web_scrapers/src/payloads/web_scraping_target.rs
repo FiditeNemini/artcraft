@@ -1,4 +1,5 @@
 use enums::by_table::web_scraping_targets::web_content_type::WebContentType;
+use enums::common::sqlite::skip_reason::SkipReason;
 
 // TODO: Include the article publish date(!)
 
@@ -11,4 +12,8 @@ pub struct WebScrapingTarget {
   pub maybe_title: Option<String>,
   pub maybe_full_image_url: Option<String>,
   pub maybe_thumbnail_image_url: Option<String>,
+
+  /// If a possible skip reason was detected, we can choose to bail out.
+  /// At this stage, only the URL, RSS metadata, etc. can inform this.
+  pub maybe_skip_reason: Option<SkipReason>,
 }

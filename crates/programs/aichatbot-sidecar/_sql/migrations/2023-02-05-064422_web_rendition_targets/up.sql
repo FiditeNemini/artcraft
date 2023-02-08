@@ -19,7 +19,11 @@ CREATE TABLE web_rendition_targets (
   -- Effectively an enum-like: CnnArticle, SlashdotArticle, HackerNewsThread, etc.
   web_content_type TEXT NOT NULL,
 
-  -- Scraping status: "new", "failed", "permanently_failed", "success"
+  -- If we skip the target (after scraping or after rendition), this is why.
+  -- Enum-like value, eg. "predominantly_video", "empty", "world_leader", "nobody_cares", etc.
+  maybe_skip_reason TEXT,
+
+  -- Scraping status: "new", "failed", "permanently_failed", "success", "skipped"
   rendition_status TEXT DEFAULT "new" NOT NULL,
   rendition_attempts INT DEFAULT 0 NOT NULL,
 
