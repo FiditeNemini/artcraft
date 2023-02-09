@@ -8,13 +8,10 @@ import { WebUrl } from "../../../common/WebUrl";
 import { Trans } from "react-i18next";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
-  faPatreon,
   faTwitch,
   faDiscord,
   faTwitter,
-  faFacebook,
   faTiktok,
-  faInstagram,
 } from "@fortawesome/free-brands-svg-icons";
 import { ThirdPartyLinks } from "@storyteller/components/src/constants/ThirdPartyLinks";
 import { EchelonTwitterLink } from "@storyteller/components/src/elements/EchelonTwitterLink";
