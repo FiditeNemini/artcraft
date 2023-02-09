@@ -13,6 +13,8 @@ import {
   faDiscord,
   faTwitter,
   faFacebook,
+  faTiktok,
+  faInstagram,
 } from "@fortawesome/free-brands-svg-icons";
 import { ThirdPartyLinks } from "@storyteller/components/src/constants/ThirdPartyLinks";
 import { EchelonTwitterLink } from "@storyteller/components/src/elements/EchelonTwitterLink";
@@ -91,15 +93,6 @@ function FooterNav(props: Props) {
                 </a>
                 <a
                   className="social-icon"
-                  href="https://twitch.tv/FakeYouLabs"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  title="Subscribe to our Twitch Channel"
-                >
-                  <FontAwesomeIcon icon={faTwitch} className="me-2" />
-                </a>
-                <a
-                  className="social-icon"
                   href={ThirdPartyLinks.FAKEYOU_TWITTER_WITH_FOLLOW_INTENT}
                   target="_blank"
                   rel="noopener noreferrer"
@@ -109,21 +102,21 @@ function FooterNav(props: Props) {
                 </a>
                 <a
                   className="social-icon"
-                  href="https://facebook.com/vocodes"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  title="Like us on Facebook"
-                >
-                  <FontAwesomeIcon icon={faFacebook} className="me-2" />
-                </a>
-                <a
-                  className="social-icon"
-                  href={ThirdPartyLinks.FAKEYOU_PATREON}
+                  href={ThirdPartyLinks.FAKEYOU_TIKTOK}
                   target="_blank"
                   rel="noopener noreferrer"
                   title="Support us by becoming a patreon"
                 >
-                  <FontAwesomeIcon icon={faPatreon} />
+                  <FontAwesomeIcon icon={faTiktok} className="me-2" />
+                </a>
+                <a
+                  className="social-icon"
+                  href={ThirdPartyLinks.FAKEYOU_TWITCH}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  title="Subscribe to our Twitch Channel"
+                >
+                  <FontAwesomeIcon icon={faTwitch} className="me-2" />
                 </a>
               </div>
             </div>
