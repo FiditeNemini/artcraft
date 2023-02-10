@@ -34,6 +34,7 @@ SELECT
 FROM web_rendition_targets
 WHERE
   rendition_status = ?
+  AND maybe_skip_reason IS NULL
   AND id > ?
 ORDER BY id ASC
 LIMIT ?

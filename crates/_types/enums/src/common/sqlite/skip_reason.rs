@@ -20,6 +20,9 @@ pub enum SkipReason {
   #[serde(rename = "filtered_topic")]
   FilteredTopic,
 
+  #[serde(rename = "filtered_topic_politics")]
+  FilteredTopicPolitics,
+
   #[serde(rename = "nobody_cares")]
   NobodyCares,
 }
@@ -35,6 +38,7 @@ impl SkipReason {
       Self::EmptyContent => "empty_content",
       Self::VideoContent => "video_content",
       Self::FilteredTopic => "filtered_topic",
+      Self::FilteredTopicPolitics => "filtered_topic_politics",
       Self::NobodyCares => "nobody_cares",
     }
   }
@@ -44,6 +48,7 @@ impl SkipReason {
       "empty_content" => Ok(Self::EmptyContent),
       "video_content" => Ok(Self::VideoContent),
       "filtered_topic" => Ok(Self::FilteredTopic),
+      "filtered_topic_politics" => Ok(Self::FilteredTopicPolitics),
       "nobody_cares" => Ok(Self::NobodyCares),
       _ => Err(format!("invalid value: {:?}", value)),
     }
@@ -63,6 +68,7 @@ mod tests {
       assert_serialization(SkipReason::EmptyContent, "empty_content");
       assert_serialization(SkipReason::VideoContent, "video_content");
       assert_serialization(SkipReason::FilteredTopic, "filtered_topic");
+      assert_serialization(SkipReason::FilteredTopicPolitics, "filtered_topic_politics");
       assert_serialization(SkipReason::NobodyCares, "nobody_cares");
     }
   }
@@ -75,6 +81,7 @@ mod tests {
       assert_eq!(SkipReason::EmptyContent.to_str(), "empty_content");
       assert_eq!(SkipReason::VideoContent.to_str(), "video_content");
       assert_eq!(SkipReason::FilteredTopic.to_str(), "filtered_topic");
+      assert_eq!(SkipReason::FilteredTopicPolitics.to_str(), "filtered_topic_politics");
       assert_eq!(SkipReason::NobodyCares.to_str(), "nobody_cares");
     }
 
@@ -83,6 +90,7 @@ mod tests {
       assert_eq!(SkipReason::from_str("empty_content").unwrap(), SkipReason::EmptyContent);
       assert_eq!(SkipReason::from_str("video_content").unwrap(), SkipReason::VideoContent);
       assert_eq!(SkipReason::from_str("filtered_topic").unwrap(), SkipReason::FilteredTopic);
+      assert_eq!(SkipReason::from_str("filtered_topic_politics").unwrap(), SkipReason::FilteredTopicPolitics);
       assert_eq!(SkipReason::from_str("nobody_cares").unwrap(), SkipReason::NobodyCares);
       assert!(SkipReason::from_str("foo").is_err());
     }

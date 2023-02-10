@@ -40,6 +40,7 @@ SELECT
 FROM web_scraping_targets
 WHERE
   scraping_status = ?
+  AND maybe_skip_reason IS NULL
   AND id > ?
 ORDER BY id ASC
 LIMIT ?

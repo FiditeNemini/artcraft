@@ -9,6 +9,7 @@ use sqlite_queries::queries::by_table::web_scraping_targets::list_web_scraping_t
 use sqlite_queries::queries::by_table::web_scraping_targets::update_web_scraping_target::Args as ScrapingArgs;
 use sqlite_queries::queries::by_table::web_scraping_targets::update_web_scraping_target::update_web_scraping_target;
 use std::sync::Arc;
+use crate::workers::web_content_scraping::single_target::filter_scraped_result_heuristics::filter_scraped_result_heuristics;
 
 pub async fn process_target_record(target: &WebScrapingTargetRecord, job_state: &Arc<JobState>) -> AnyhowResult<()> {
   let result = ingest_url_scrape_and_save(
@@ -16,36 +17,61 @@ pub async fn process_target_record(target: &WebScrapingTargetRecord, job_state: 
     target.web_content_type,
     &job_state.save_directory).await;
 
-  if let Err(err) = result {
-    error!("error ingesting url: {:?}", err);
+  match result {
+    Err(err) => {
+      error!("error ingesting url: {:?}", err);
 
-    let next_scraping_status = if target.scrape_attempts >= 2 {
-      ScrapingStatus::PermanentlyFailed
-    } else {
-      ScrapingStatus::Failed
-    };
-    update_web_scraping_target(ScrapingArgs {
-      canonical_url: &target.canonical_url,
-      scraping_status: next_scraping_status,
-      scrape_attempts: target.scrape_attempts + 1,
-      sqlite_pool: &job_state.sqlite_pool,
-    }).await?; // NB: If these queries fail, we could get stuck.
+      let next_scraping_status = next_status(target.scrape_attempts);
 
-    return Err(err);
+      update_web_scraping_target(ScrapingArgs {
+        canonical_url: &target.canonical_url,
+        scraping_status: next_scraping_status,
+        scrape_attempts: target.scrape_attempts + 1,
+        sqlite_pool: &job_state.sqlite_pool,
+      }).await?; // NB: If these queries fail, we could get stuck.
+
+      Err(err)
+    },
+    Ok(None) => {
+      // Nothing was scraped.
+      let next_scraping_status = next_status(target.scrape_attempts);
+
+      update_web_scraping_target(ScrapingArgs {
+        canonical_url: &target.canonical_url,
+        scraping_status: next_scraping_status,
+        scrape_attempts: target.scrape_attempts + 1,
+        sqlite_pool: &job_state.sqlite_pool,
+      }).await?; // NB: If these queries fail, we could get stuck.
+
+      Ok(())
+    },
+    Ok(Some(result)) => {
+      update_web_scraping_target(ScrapingArgs {
+        canonical_url: &target.canonical_url,
+        scraping_status: ScrapingStatus::Success,
+        scrape_attempts: target.scrape_attempts + 1,
+        sqlite_pool: &job_state.sqlite_pool,
+      }).await?; // NB: If these queries fail, we could get stuck.
+
+      let maybe_skip_reason = filter_scraped_result_heuristics(&result)
+          .await?;
+
+      insert_web_rendition_target( RenditionArgs {
+        canonical_url: &target.canonical_url,
+        web_content_type: target.web_content_type,
+        sqlite_pool: &job_state.sqlite_pool,
+        maybe_skip_reason,
+      }).await?; // NB: If these queries fail, we could get stuck.
+
+      Ok(())
+    },
   }
+}
 
-  update_web_scraping_target(ScrapingArgs {
-    canonical_url: &target.canonical_url,
-    scraping_status: ScrapingStatus::Success,
-    scrape_attempts: target.scrape_attempts + 1,
-    sqlite_pool: &job_state.sqlite_pool,
-  }).await?; // NB: If these queries fail, we could get stuck.
-
-  insert_web_rendition_target( RenditionArgs {
-    canonical_url: &target.canonical_url,
-    web_content_type: target.web_content_type,
-    sqlite_pool: &job_state.sqlite_pool,
-  }).await?; // NB: If these queries fail, we could get stuck.
-
-  Ok(())
+fn next_status(scrape_attempts: i64) -> ScrapingStatus {
+  if scrape_attempts >= 2 {
+    ScrapingStatus::PermanentlyFailed
+  } else {
+    ScrapingStatus::Failed
+  }
 }
