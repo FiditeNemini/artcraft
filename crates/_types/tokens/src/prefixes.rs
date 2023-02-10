@@ -17,6 +17,7 @@ pub(crate) enum EntityType {
   InferenceJob,
   MediaUpload,
   ModelCategory,
+  NewsStory, // NB: aichatbot / sqlite
   TtsModel,
   User,
   VoiceConversionModel,
@@ -31,6 +32,7 @@ impl EntityType {
       Self::InferenceJob => "jinf_",
       Self::MediaUpload => "mu_",
       Self::ModelCategory => "CAT:", // NB: Old-style prefix, do not use for future tokens.
+      Self::NewsStory => "news_story_",
       Self::TtsModel => "TM:", // NB: Old-style prefix, do not use for future tokens.
       Self::User => "U:", // NB: Old-style prefix, do not use for future tokens.
       Self::VoiceConversionModel => "voco_",

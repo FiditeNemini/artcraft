@@ -49,6 +49,21 @@ where model_token='TM:yt4gfbkngsjj'
 order by id desc
 limit 150;
 
+-- Search for results by eminem
+select
+    token,
+    created_at,
+    raw_inference_text
+from  tts_results
+where
+    model_token IN ('TM:27fj0gsh11pd', 'TM:8h9bfjgabeer', 'TM:pdf9c1anbdjq')
+    AND raw_inference_text LIKE "%rave%"
+  AND raw_inference_text LIKE "%sound%"
+  AND created_at > ( CURDATE() - INTERVAL 5 MONTH )
+ORDER BY created_at DESC
+
+
+
 -- Delete TTS results for a single model
 -- Do this in short batches so a lock isn't held for prohibitively long.
 update tts_results
@@ -56,3 +71,4 @@ set mod_deleted_at = NOW()
 where model_token = 'TM:ztt5s1be5tq6'
 and mod_deleted_at IS NULL
 limit 5000;
+
