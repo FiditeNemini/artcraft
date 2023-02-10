@@ -3,7 +3,6 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")] // hide console window on Windows in release
 
 pub mod gui;
-pub mod main_loop;
 pub mod persistence;
 pub mod shared_state;
 pub mod startup_args;
@@ -16,7 +15,6 @@ use actix_web::{HttpResponse, HttpServer, web};
 use async_openai::Client;
 use clap::{App, Arg};
 use crate::gui::launch_gui::launch_gui;
-use crate::main_loop::main_loop;
 use crate::persistence::save_directory::SaveDirectory;
 use crate::shared_state::app_control_state::AppControlState;
 use crate::shared_state::job_state::JobState;
