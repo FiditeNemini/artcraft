@@ -5,9 +5,11 @@ use crate::persistence::save_directory::SaveDirectory;
 use crate::shared_state::job_state::JobState;
 use crate::workers::gpt_rendition::gpt_prompts::news_article_prompt::NewsArticlePrompt;
 use errors::AnyhowResult;
-use log::info;
+use log::{error, info};
 use sqlite_queries::queries::by_table::web_rendition_targets::list_web_rendition_targets::WebRenditionTarget;
 use std::sync::Arc;
+use enums::by_table::web_rendition_targets::rendition_status::RenditionStatus;
+use sqlite_queries::queries::by_table::web_rendition_targets::update_web_rendition_target::{Args, update_web_rendition_target};
 use web_scrapers::payloads::web_scraping_result::ScrapedWebArticle;
 
 pub async fn process_single_item(target: &WebRenditionTarget, job_state: &Arc<JobState>) -> AnyhowResult<()> {
@@ -19,11 +21,36 @@ pub async fn process_single_item(target: &WebRenditionTarget, job_state: &Arc<Jo
   let prompt = NewsArticlePrompt::new(&scraping_result.paragraphs);
   let prompt = prompt.make_prompt();
 
-  let rendition_data = call_openai_gpt(
+  let rendition_result = call_openai_gpt(
     &target.canonical_url,
     &prompt,
     &job_state.openai_client
-  ).await?;
+  ).await;
+
+  let rendition_data = match rendition_result {
+    Err(err) => {
+      error!("Error using GPT: {:?}", err);
+
+      let next_rendition_status = next_status(target.rendition_attempts);
+
+      update_web_rendition_target(Args {
+        canonical_url: &target.canonical_url,
+        rendition_status: next_rendition_status,
+        rendition_attempts: target.rendition_attempts + 1,
+        sqlite_pool: &job_state.sqlite_pool,
+      }).await?; // NB: If these queries fail, we could get stuck.
+
+      return Err(err);
+    }
+    Ok(rendition_data) => rendition_data,
+  };
+
+  update_web_rendition_target(Args {
+    canonical_url: &target.canonical_url,
+    rendition_status: RenditionStatus::Success,
+    rendition_attempts: target.rendition_attempts + 1,
+    sqlite_pool: &job_state.sqlite_pool,
+  }).await?; // NB: If these queries fail, we could get stuck.
 
   {
     let yaml_filename = job_state.save_directory
@@ -67,4 +94,12 @@ async fn call_openai_gpt(url: &str, prompt: &str, openai_client: &Arc<Client>) -
     original_prompt: prompt.to_string(),
     response: rendition_text,
   })
+}
+
+fn next_status(rendition_attempts: i64) -> RenditionStatus {
+  if rendition_attempts >= 2 {
+    RenditionStatus::PermanentlyFailed
+  } else {
+    RenditionStatus::Failed
+  }
 }
