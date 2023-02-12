@@ -7,5 +7,6 @@ pub struct NewsStoryProductionItem {
   pub original_news_canonical_url: String,
   pub overall_production_status: AwaitableJobStatus,
   pub llm_rendition_status: AwaitableJobStatus,
+  pub llm_rendition_attempts: i64,
   pub audio_generation_status: AwaitableJobStatus,
 }

@@ -9,7 +9,7 @@ use std::time::Duration;
 /// Decide which potential news stories to greenlight
 pub async fn news_story_greenlighting_main_loop(job_state: Arc<JobState>) {
   loop {
-    info!("news_story_greenlighting main loop iteration start");
+    debug!("news_story_greenlighting main loop iteration start");
 
     query_and_process_all_batches(&job_state).await;
 

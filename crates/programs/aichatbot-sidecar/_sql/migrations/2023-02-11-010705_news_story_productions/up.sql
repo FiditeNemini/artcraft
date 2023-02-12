@@ -20,6 +20,9 @@ CREATE TABLE news_story_productions (
   -- "not_ready", "ready_waiting", "processing", "retryably_failed", "permanently_failed", "skipped", "done"
   llm_rendition_status TEXT DEFAULT "not_ready" NOT NULL,
 
+  -- Number of LLM/GPT rendition attempts that have been made
+  llm_rendition_attempts INT DEFAULT 0 NOT NULL,
+
   -- TTS for the audio with FakeYou
   -- "not_ready", "ready_waiting", "processing", "retryably_failed", "permanently_failed", "skipped", "done"
   audio_generation_status TEXT DEFAULT "not_ready" NOT NULL,
