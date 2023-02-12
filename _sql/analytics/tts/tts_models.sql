@@ -48,11 +48,14 @@ select
     m.ietf_language_tag,
     m.title,
     u.username,
-    r.use_count
+    r.use_count,
+    m.created_at,
+    m.user_deleted_at,
+    m.mod_deleted_at
 from (
     select model_token, count(*) as use_count
     from tts_results
-    where created_at > ( CURDATE() - INTERVAL 5 DAY )
+    where created_at > ( CURDATE() - INTERVAL 12 HOUR )
     group by model_token
 ) as r
     join tts_models as m
