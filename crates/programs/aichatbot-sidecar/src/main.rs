@@ -36,6 +36,7 @@ use web_scrapers::sites::techcrunch::techcrunch_article_scraper::techcrunch_arti
 use web_scrapers::sites::theguardian::theguardian_scraper::theguardian_scraper_test;
 use workers::web_content_scraping::single_target::ingest_url_scrape_and_save::ingest_url_scrape_and_save;
 use crate::workers::gpt_rendition::main_loop::gpt_rendition_main_loop;
+use crate::workers::news_stories::news_story_greenlighting::main_loop::news_story_greenlighting_main_loop;
 
 //#[tokio::main]
 //pub async fn main() -> AnyhowResult<()> {
@@ -105,14 +106,8 @@ pub async fn main() -> AnyhowResult<()> {
   // They even complain that this is impossible on Windows (and our program aims to be multiplatform)
   // Thus, we launch everything else into its own thread.
   thread::spawn(move || {
-    let server_future = launch_web_server(LaunchWebServerArgs {
-      app_control_state: app_control_state2,
-      openai_client: openai_client2,
-      save_directory,
-    });
-
     let tokio_runtime = Builder::new_multi_thread()
-        .worker_threads(4)
+        .worker_threads(8)
         .thread_name("tokio-worker")
         .thread_stack_size(3 * 1024 * 1024)
         .enable_time()
@@ -123,6 +118,7 @@ pub async fn main() -> AnyhowResult<()> {
     let job_state2 = job_state.clone();
     let job_state3 = job_state.clone();
     let job_state4 = job_state.clone();
+    let job_state5 = job_state.clone();
 
     tokio_runtime.spawn(async {
       let _r = web_index_ingestion_main_loop(job_state2).await;
@@ -132,19 +128,25 @@ pub async fn main() -> AnyhowResult<()> {
       let _r = web_content_scraping_main_loop(job_state3).await;
     });
 
+
     tokio_runtime.spawn(async {
-      let _r = gpt_rendition_main_loop(job_state4).await;
+      let _r = news_story_greenlighting_main_loop(job_state4).await;
     });
 
-    // TODO: FakeYou enrichment thread
-    //tokio_runtime.spawn(async {
-    //  // TODO...
-    //});
+    tokio_runtime.spawn(async {
+      let _r = gpt_rendition_main_loop(job_state5).await;
+    });
 
     // TODO: Final scheduling thread
     //tokio_runtime.spawn(async {
     //  // TODO...
     //});
+
+    let server_future = launch_web_server(LaunchWebServerArgs {
+      app_control_state: app_control_state2,
+      openai_client: openai_client2,
+      save_directory,
+    });
 
     let runtime = actix_web::rt::System::new();
 

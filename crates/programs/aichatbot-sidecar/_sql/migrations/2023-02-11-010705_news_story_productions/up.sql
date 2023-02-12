@@ -14,19 +14,19 @@ CREATE TABLE news_story_productions (
 
   -- The overall status of the news story.
   -- "not_ready", "ready_waiting", "processing", "retryably_failed", "permanently_failed", "skipped", "done"
-  overall_production_status TEXT DEFAULT "new" NOT NULL,
+  overall_production_status TEXT DEFAULT "not_ready" NOT NULL,
 
   -- Renditioning the audio with LLM/GPT
   -- "not_ready", "ready_waiting", "processing", "retryably_failed", "permanently_failed", "skipped", "done"
-  llm_rendition_status TEXT DEFAULT "new" NOT NULL,
+  llm_rendition_status TEXT DEFAULT "not_ready" NOT NULL,
 
   -- TTS for the audio with FakeYou
   -- "not_ready", "ready_waiting", "processing", "retryably_failed", "permanently_failed", "skipped", "done"
-  audio_generation_status TEXT DEFAULT "new" NOT NULL,
+  audio_generation_status TEXT DEFAULT "not_ready" NOT NULL,
 
   -- Generating extra media (images, etc.)
   -- "not_ready", "ready_waiting", "processing", "retryably_failed", "permanently_failed", "skipped", "done"
-  -- media_generation_status TEXT DEFAULT "new" NOT NULL,
+  -- media_generation_status TEXT DEFAULT "not_ready" NOT NULL,
 
   created_at DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL,
   updated_at DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL,
