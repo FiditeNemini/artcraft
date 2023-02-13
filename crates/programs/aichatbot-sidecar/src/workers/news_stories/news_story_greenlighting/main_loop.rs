@@ -14,7 +14,7 @@ pub async fn news_story_greenlighting_main_loop(job_state: Arc<JobState>) {
     query_and_process_all_batches(&job_state).await;
 
     debug!("news_story_greenlighting loop finished; waiting...");
-    thread::sleep(Duration::from_secs(15));
+    thread::sleep(Duration::from_secs(5));
   }
 }
 

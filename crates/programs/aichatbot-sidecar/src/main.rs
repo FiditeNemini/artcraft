@@ -37,6 +37,7 @@ use web_scrapers::sites::cnn::cnn_article_scraper::cnn_article_scraper;
 use web_scrapers::sites::techcrunch::techcrunch_article_scraper::techcrunch_article_scraper;
 use web_scrapers::sites::theguardian::theguardian_scraper::theguardian_scraper_test;
 use workers::web_content_scraping::single_target::ingest_url_scrape_and_save::ingest_url_scrape_and_save;
+use crate::workers::news_stories::news_story_audio_preprocessing::main_loop::news_story_audio_preprocessing_main_loop;
 
 //#[tokio::main]
 //pub async fn main() -> AnyhowResult<()> {
@@ -119,6 +120,7 @@ pub async fn main() -> AnyhowResult<()> {
     let job_state3 = job_state.clone();
     let job_state4 = job_state.clone();
     let job_state5 = job_state.clone();
+    let job_state6 = job_state.clone();
 
     tokio_runtime.spawn(async {
       let _r = web_index_ingestion_main_loop(job_state2).await;
@@ -134,6 +136,10 @@ pub async fn main() -> AnyhowResult<()> {
 
     tokio_runtime.spawn(async {
       let _r = news_story_llm_rendition_main_loop(job_state5).await;
+    });
+
+    tokio_runtime.spawn(async {
+      let _r = news_story_audio_preprocessing_main_loop(job_state6).await;
     });
 
     // TODO: Final scheduling thread

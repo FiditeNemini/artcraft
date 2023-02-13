@@ -87,7 +87,7 @@ async fn scrape_jobs_of_status(status: ScrapingStatus, job_state: &Arc<JobState>
 
       last_id = target.id;
 
-      thread::sleep(Duration::from_secs(1));
+      thread::sleep(Duration::from_secs(3));
     }
   }
 }
