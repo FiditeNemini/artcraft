@@ -17,7 +17,11 @@ pub struct AppGui {
   // These will be copied into the shared server state.
   filename: String,
   default_directory: String,
-  is_paused: bool,
+
+  is_unreal_paused : bool,
+  is_scraping_paused: bool,
+  is_openai_paused: bool,
+  is_fakeyou_paused: bool,
 
   /// Shared state with the HTTP server and workers.
   control_state: Arc<AppControlState>,
@@ -28,7 +32,10 @@ impl AppGui {
     Self {
       filename: "".to_string(),
       default_directory: args.save_directory,
-      is_paused: false,
+      is_unreal_paused: false,
+      is_scraping_paused: false,
+      is_openai_paused: false,
+      is_fakeyou_paused: false,
       control_state: args.control_state,
     }
   }
@@ -36,27 +43,55 @@ impl AppGui {
 
 impl eframe::App for AppGui {
   fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
-    if let Err(e) = self.control_state.set_is_paused(self.is_paused) {
-      error!("Couldn't set paused state: {:?}", e);
-    }
+    //if let Err(e) = self.control_state.set_is_paused(self.is_paused) {
+    //  error!("Couldn't set paused state: {:?}", e);
+    //}
+
+    self.control_state.set_is_unreal_paused(self.is_unreal_paused);
+    self.control_state.set_is_scraping_paused(self.is_scraping_paused);
+    self.control_state.set_is_openai_paused(self.is_openai_paused);
+    self.control_state.set_is_fakeyou_paused(self.is_fakeyou_paused);
 
     egui::CentralPanel::default().show(ctx, |ui| {
-      ui.heading("AiChatBot Sidecar");
+      //ui.heading("AiChatBot Sidecar");
+      //ui.horizontal(|ui| {
+      //  let name_label = ui.label("Filename: ");
+      //  ui.text_edit_singleline(&mut self.filename)
+      //      .labelled_by(name_label.id);
+      //});
+      //ui.horizontal(|ui| {
+      //  let name_label = ui.label("Default directory: ");
+      //  ui.text_edit_singleline(&mut self.default_directory)
+      //      .labelled_by(name_label.id);
+      //});
+
+      //ui.horizontal(|ui| {
+      //  let name_label = ui.label("Is Paused?: ");
+      //  ui.checkbox(&mut self.is_paused, "Is Paused?")
+      //      .labelled_by(name_label.id);
+      //});
+
+      ui.add_space(10.0);
+      ui.heading("Sidecar Pause Controls");
+      ui.add_space(10.0);
+
       ui.horizontal(|ui| {
-        let name_label = ui.label("Filename: ");
-        ui.text_edit_singleline(&mut self.filename)
-            .labelled_by(name_label.id);
+        ui.checkbox(&mut self.is_scraping_paused, "Web Scraping");
       });
       ui.horizontal(|ui| {
-        let name_label = ui.label("Default directory: ");
-        ui.text_edit_singleline(&mut self.default_directory)
-            .labelled_by(name_label.id);
+        ui.checkbox(&mut self.is_openai_paused, "OpenAI API");
       });
       ui.horizontal(|ui| {
-        let name_label = ui.label("Is Paused?: ");
-        ui.checkbox(&mut self.is_paused, "Is Paused?")
-            .labelled_by(name_label.id);
+        ui.checkbox(&mut self.is_fakeyou_paused, "FakeYou API");
       });
+
+      ui.add_space(10.0);
+      ui.heading("Unreal Pause Controls");
+      ui.add_space(10.0);
+      ui.horizontal(|ui| {
+        ui.checkbox(&mut self.is_unreal_paused, "FakeYou API");
+      });
+
     });
   }
 }

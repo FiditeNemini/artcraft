@@ -85,7 +85,16 @@ fn split_into_manageable_portions(text: &str) -> Vec<String> {
     }
   }
 
-  speakable_portions
+  let filtered = speakable_portions.into_iter()
+      .filter(|portion| {
+        match portion.as_ref()  {
+          "." | ":" | "," => false,
+          _ => true,
+        }
+      })
+      .collect::<Vec<String>>();
+
+  filtered
 }
 
 fn split_paragraph(text: &str) -> Vec<String> {

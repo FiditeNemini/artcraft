@@ -749,6 +749,7 @@ dependencies = [
  "actix_helpers",
  "async-openai",
  "clap",
+ "concurrency",
  "dotenv",
  "easyenv",
  "eframe",
@@ -1602,6 +1603,13 @@ dependencies = [
  "serde_derive",
  "serde_json",
  "toml",
+]
+
+[[package]]
+name = "concurrency"
+version = "0.0.1"
+dependencies = [
+ "errors",
 ]
 
 [[package]]

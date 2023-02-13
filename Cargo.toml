@@ -15,10 +15,11 @@ members = [
   # Shared libraries
   "crates/lib/actix_helpers",
   "crates/lib/cloud_storage",
-  "crates/lib/config",
-  "crates/lib/container_common",
+  "crates/lib/concurrency",
+  "crates/lib/config", # TODO(bt, 2023-02-13): Deprecate or repurpose
+  "crates/lib/container_common", # TODO(bt, 2023-02-13): Pull apart and rehome pieces
   "crates/lib/crockford",
-  "crates/lib/database_queries",
+  "crates/lib/database_queries", # TODO(bt2, 2023-02-13): Rename "mysql_queries", though this will not live beyond a single DB
   "crates/lib/datetimes",
   "crates/lib/errors",
   "crates/lib/fakeyou_client",

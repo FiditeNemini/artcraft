@@ -16,6 +16,7 @@ path = "src/main.rs"
 
 # Internal
 actix_helpers = { path = "../../lib/actix_helpers" }
+concurrency = { path = "../../lib/concurrency" }
 enums = { path = "../../_types/enums" }
 errors = { path = "../../lib/errors" }
 files = { path = "../../lib/files" }
