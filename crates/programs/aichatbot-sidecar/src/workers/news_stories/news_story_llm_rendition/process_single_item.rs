@@ -71,8 +71,7 @@ pub async fn process_single_item(target: &NewsStoryProductionItem, job_state: &A
   {
     let yaml_filename = job_state.save_directory
         .rendition_file_for_webpage_url(&target.original_news_canonical_url)?;
-    let mut file = std::fs::File::create(&yaml_filename)?;
-    serde_yaml::to_writer(file, &rendition_data)?;
+    rendition_data.write_to_yaml_file(yaml_filename)?;
   }
 
   Ok(())

@@ -1,3 +1,4 @@
+pub mod list_news_story_productions_awaiting_audio_generation;
 pub mod list_news_story_productions_awaiting_greenlight;
 pub mod list_news_story_productions_awaiting_llm_rendition;
 pub mod news_story_production_item;
