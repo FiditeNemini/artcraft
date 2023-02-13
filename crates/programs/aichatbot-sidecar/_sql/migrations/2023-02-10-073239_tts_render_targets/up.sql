@@ -7,6 +7,10 @@
 CREATE TABLE tts_render_targets (
   id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
 
+  -- Composite primary key for what this TTS render job belongs to (eg. news story)
+  story_type TEXT NOT NULL,
+  story_token TEXT NOT NULL,
+
   -- If the source came from somewhere, this is it
   -- maybe_canonical_url TEXT NOT NULL UNIQUE,
 
@@ -40,3 +44,4 @@ CREATE TABLE tts_render_targets (
 );
 
 CREATE INDEX index_tts_render_status ON tts_render_targets(tts_render_status);
+CREATE INDEX index_tts_render_foreign_key ON tts_render_targets(story_type, story_token);

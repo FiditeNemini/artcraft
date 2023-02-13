@@ -3,7 +3,13 @@ use once_cell::sync::Lazy;
 use regex::Regex;
 use errors::AnyhowResult;
 use sqlite_queries::queries::by_table::news_story_productions::list::news_story_production_item::NewsStoryProductionItem;
+use sqlite_queries::queries::by_table::news_story_productions::update::update_news_story_audio_preprocessing_status::update_news_story_audio_preprocessing_status;
+use sqlite_queries::queries::by_table::news_story_productions::update::update_news_story_audio_preprocessing_status::Args as UpdateArgs;
+use sqlite_queries::queries::by_table::tts_render_targets::insert_tts_render_target::Args as InsertArgs;
+use sqlite_queries::queries::by_table::tts_render_targets::insert_tts_render_target::insert_tts_render_target;
+use tokens::tokens::tts_models::TtsModelToken;
 use crate::persistence::rendition_data::RenditionData;
+use crate::persistence::speakable_monologue::SpeakableMonologue;
 use crate::shared_state::job_state::JobState;
 
 static NEWLINE_REGEX : Lazy<Regex> = Lazy::new(|| {
@@ -28,16 +34,35 @@ pub async fn process_single_item(target: &NewsStoryProductionItem, job_state: &A
 
   let text = rendition_data.response.trim();
 
-  let mut speakable_portions = Vec::new();
+  let paragraphs = split_into_manageable_portions(&text);
 
-  for paragraph in NEWLINE_REGEX.split(text) {
-    speakable_portions.push(paragraph.to_string());
+  let speakable_monologue = SpeakableMonologue {
+    paragraphs: paragraphs.clone(),
+  };
 
-    if paragraph.len() > 512 {
-
-    }
+  {
+    let yaml_filename = job_state.save_directory
+        .speakable_monologue_file_for_webpage_url(&target.original_news_canonical_url)?;
+    speakable_monologue.write_to_yaml_file(yaml_filename)?;
   }
 
+  // NB: John Madden voice model
+  let tts_model_token = TtsModelToken::new_from_str("TM:30ha2t6bxfn4");
+
+  for paragraph in paragraphs {
+    insert_tts_render_target(InsertArgs {
+      news_story_token: &target.news_story_token,
+      tts_voice_identifier: &tts_model_token,
+      full_text: &paragraph,
+      sqlite_pool: &job_state.sqlite_pool,
+    }).await?;
+  }
+
+  update_news_story_audio_preprocessing_status(UpdateArgs {
+    news_story_token: &target.news_story_token,
+    is_success: true,
+    sqlite_pool: &job_state.sqlite_pool,
+  }).await?;
 
   Ok(())
 }

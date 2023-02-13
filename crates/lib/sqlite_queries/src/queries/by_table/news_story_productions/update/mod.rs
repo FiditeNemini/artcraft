@@ -1,2 +1,3 @@
+pub mod update_news_story_audio_preprocessing_status;
 pub mod update_news_story_llm_rendition_status;
 pub mod update_news_story_production_greenlit_status;
