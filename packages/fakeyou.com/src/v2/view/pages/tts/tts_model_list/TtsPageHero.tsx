@@ -36,8 +36,9 @@ export function TtsPageHero(props: Props) {
       // "mascot/xmas_3.webp",
       // "mascot/xmas_4.webp",
       // "mascot/chinese_new_year.webp",
-      "mascot/superbowl-KCC.webp",
-      "mascot/superbowl-PE.webp",
+      //"mascot/superbowl-KCC.webp",
+      //"mascot/superbowl-PE.webp",
+      "mascot/valentines.webp",
     ];
 
     return images[Math.floor(Math.random() * images.length)];
