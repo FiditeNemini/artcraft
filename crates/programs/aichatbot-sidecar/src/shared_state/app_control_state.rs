@@ -3,6 +3,7 @@ use concurrency::relaxed_atomic_bool::RelaxedAtomicBool;
 use errors::{anyhow, AnyhowResult};
 
 /// User-controlled parameters that determine how the app behaves at runtime.
+#[derive(Clone)]
 pub struct AppControlState {
   /// Whether the playback should be paused
   /// Unreal Engine will get this over HTTP and know whether to no-op.

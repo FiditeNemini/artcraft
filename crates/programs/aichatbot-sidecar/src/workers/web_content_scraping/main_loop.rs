@@ -22,6 +22,10 @@ pub async fn web_content_scraping_main_loop(job_state: Arc<JobState>) {
   loop {
     info!("web_content_scraping main loop");
 
+    while job_state.app_control_state.is_scraping_paused() {
+      thread::sleep(Duration::from_secs(5));
+    }
+
     single_job_loop_iteration(&job_state).await;
 
     info!("web_content_scraping loop finished; waiting...");
@@ -79,6 +83,10 @@ async fn scrape_jobs_of_status(status: ScrapingStatus, job_state: &Arc<JobState>
 
     for target in targets {
       info!("Download and scrape target: {:?}", target.canonical_url);
+
+      while job_state.app_control_state.is_scraping_paused() {
+        thread::sleep(Duration::from_secs(5));
+      }
 
       let result = process_target_record(&target, job_state).await;
       if let Err(err) = result {

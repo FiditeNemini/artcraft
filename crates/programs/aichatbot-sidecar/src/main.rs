@@ -80,7 +80,9 @@ pub async fn main() -> AnyhowResult<()> {
 
   let startup_args = get_startup_args()?;
 
-  let app_control_state = Arc::new(AppControlState::new());
+  // TODO: Fix this mess of Arc<T> wrapping other Arc<T> !
+  let app_control_state_inner = AppControlState::new();
+  let app_control_state = Arc::new(app_control_state_inner.clone());
 
   let openai_client = Arc::new(Client::new()
       .with_api_key(startup_args.openai_secret_key.clone()));
@@ -96,6 +98,7 @@ pub async fn main() -> AnyhowResult<()> {
     openai_client: openai_client.clone(),
     save_directory: save_directory.clone(),
     sqlite_pool: pool,
+    app_control_state: app_control_state_inner.clone(),
   });
 
   info!("Starting worker threads and web server...");

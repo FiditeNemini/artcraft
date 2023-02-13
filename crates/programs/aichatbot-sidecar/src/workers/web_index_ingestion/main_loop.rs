@@ -18,6 +18,10 @@ pub async fn web_index_ingestion_main_loop(job_state: Arc<JobState>) {
   loop {
     info!("web_index_ingestion main loop");
 
+    while job_state.app_control_state.is_scraping_paused() {
+      thread::sleep(Duration::from_secs(5));
+    }
+
     match single_iteration(&job_state).await {
       Ok(_) => {
         info!("web_index_ingestion loop finished; waiting...");
