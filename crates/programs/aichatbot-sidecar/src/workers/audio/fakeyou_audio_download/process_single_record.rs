@@ -1,3 +1,4 @@
+use std::io::Cursor;
 use crate::shared_state::job_state::JobState;
 use errors::{anyhow, AnyhowResult};
 use fakeyou_client::api::tts_inference::{CreateTtsInferenceRequest, TtsInferenceJobStatusStatePayload};
@@ -7,6 +8,7 @@ use sqlite_queries::queries::by_table::tts_render_targets::list::tts_render_targ
 use sqlite_queries::queries::by_table::tts_render_targets::update::update_tts_render_target_successfully_downloaded::Args;
 use sqlite_queries::queries::by_table::tts_render_targets::update::update_tts_render_target_successfully_downloaded::update_tts_render_target_successfully_downloaded;
 use std::sync::Arc;
+use tokens::tokens::news_stories::NewsStoryToken;
 use tokens::tokens::tts_models::TtsModelToken;
 use tokens::tokens::tts_render_tasks::TtsRenderTaskToken;
 
@@ -46,7 +48,7 @@ pub async fn process_single_record(target: &TtsRenderTarget, job_state: &Arc<Job
           //}).await?;
         }
         Some(payload) => {
-          process_download(&target.token, &payload, job_state).await?;
+          process_download(&target, &payload, job_state).await?;
         }
       }
     },
@@ -55,7 +57,7 @@ pub async fn process_single_record(target: &TtsRenderTarget, job_state: &Arc<Job
   Ok(())
 }
 
-async fn process_download(task_token: &TtsRenderTaskToken, payload: &TtsInferenceJobStatusStatePayload, job_state: &Arc<JobState>) -> AnyhowResult<()> {
+async fn process_download(target: &TtsRenderTarget, payload: &TtsInferenceJobStatusStatePayload, job_state: &Arc<JobState>) -> AnyhowResult<()> {
   let tts_result_token = match &payload.maybe_result_token {
     None => return Ok(()), // TODO: Wait
     Some(result_token) => result_token.to_string(),
@@ -67,9 +69,25 @@ async fn process_download(task_token: &TtsRenderTaskToken, payload: &TtsInferenc
   };
 
   let audio_url = get_audio_url(&bucket_path, true);
+  let news_story_token = NewsStoryToken::new_from_str(&target.story_token);
+
+  {
+    let directory = job_state.save_directory.directory_for_audio(&news_story_token)?;
+    std::fs::create_dir_all(&directory)?;
+  }
+
+  {
+    let download_filename = job_state.save_directory
+        .audio_wav_file_for_news_story(&news_story_token, target.sequence_order)?;
+
+    let response = reqwest::get(&audio_url).await?;
+    let mut file = std::fs::File::create(download_filename)?;
+    let mut content =  Cursor::new(response.bytes().await?);
+    std::io::copy(&mut content, &mut file)?;
+  }
 
   update_tts_render_target_successfully_downloaded(Args {
-    tts_render_task_token: task_token,
+    tts_render_task_token: &target.token,
     tts_result_token: &tts_result_token,
     result_url: &audio_url,
     sqlite_pool: &job_state.sqlite_pool,

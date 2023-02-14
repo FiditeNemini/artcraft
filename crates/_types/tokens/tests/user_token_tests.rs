@@ -163,4 +163,16 @@ mod crockford_traits {
     let token_string = UserToken::generate().to_string();
     assert!(token_string.starts_with(prefix));
   }
+
+  #[test]
+  fn entropy_suffix() {
+    let token = UserToken::new_from_str("U:foo");
+    assert_eq!(token.entropy_suffix(), "foo");
+
+    let token = UserToken::new_from_str("bar");
+    assert_eq!(token.entropy_suffix(), "bar");
+
+    let token = UserToken::generate();
+    assert_eq!(token.entropy_suffix().len(), 13);
+  }
 }

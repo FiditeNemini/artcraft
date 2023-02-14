@@ -163,4 +163,16 @@ mod crockford_traits {
     let token_string = MediaUploadToken::generate().to_string();
     assert!(token_string.starts_with(prefix));
   }
+
+  #[test]
+  fn entropy_suffix() {
+    let token = MediaUploadToken::new_from_str("mu_foo");
+    assert_eq!(token.entropy_suffix(), "foo");
+
+    let token = MediaUploadToken::new_from_str("bar");
+    assert_eq!(token.entropy_suffix(), "bar");
+
+    let token = MediaUploadToken::generate();
+    assert_eq!(token.entropy_suffix().len(), 29);
+  }
 }

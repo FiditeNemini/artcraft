@@ -57,6 +57,13 @@ macro_rules! impl_crockford_generator {
       }
 
       #[inline]
+      pub fn entropy_suffix(&self) -> &str {
+        &self.0
+          .strip_prefix($variant.prefix())
+          .unwrap_or(&self.0)
+      }
+
+      #[inline]
       pub fn entropic_character_len() -> usize {
         let token_prefix = Self::token_prefix();
         $total_string_length.saturating_sub(token_prefix.len())
