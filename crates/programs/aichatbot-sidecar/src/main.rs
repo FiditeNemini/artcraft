@@ -86,8 +86,12 @@ pub async fn main() -> AnyhowResult<()> {
   let app_control_state_inner = AppControlState::new();
   let app_control_state = Arc::new(app_control_state_inner.clone());
 
-  let openai_client = Arc::new(Client::new()
-      .with_api_key(startup_args.openai_secret_key.clone()));
+  let openai_client = Client::new()
+      .with_api_key(startup_args.openai_secret_key.clone())
+      //.with_backoff(backoff::ExponentialBackoff)
+      ;
+
+  let openai_client = Arc::new(openai_client);
 
   let fakeyou_client = Arc::new(FakeYouApiClient::make_production_client(
     &startup_args.fakeyou_api_token));

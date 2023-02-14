@@ -5,11 +5,12 @@ use crate::persistence::save_directory::SaveDirectory;
 use crate::shared_state::job_state::JobState;
 use crate::workers::news_stories::news_story_llm_rendition::gpt_prompts::news_article_prompt::NewsArticlePrompt;
 use enums::by_table::web_rendition_targets::rendition_status::RenditionStatus;
-use errors::AnyhowResult;
-use log::{error, info};
+use errors::{anyhow, AnyhowResult};
+use log::{error, info, warn};
 use sqlite_queries::queries::by_table::news_story_productions::list::news_story_production_item::NewsStoryProductionItem;
 use sqlite_queries::queries::by_table::news_story_productions::update::update_news_story_llm_rendition_status::{Args, update_news_story_llm_rendition_status};
 use std::sync::Arc;
+use async_openai::error::OpenAIError;
 use web_scrapers::payloads::web_scraping_result::ScrapedWebArticle;
 
 pub async fn process_single_item(target: &NewsStoryProductionItem, job_state: &Arc<JobState>) -> AnyhowResult<()> {
@@ -33,14 +34,20 @@ pub async fn process_single_item(target: &NewsStoryProductionItem, job_state: &A
     Err(err) => {
       error!("Error using GPT: {:?}", err);
 
-//      let next_rendition_status = next_status(target.llm_rendition_attempts);
-//
-//      update_web_rendition_target(Args {
-//        canonical_url: &target.original_news_canonical_url,
-//        rendition_status: next_rendition_status,
-//        rendition_attempts: target.llm_rendition_attempts + 1,
-//        sqlite_pool: &job_state.sqlite_pool,
-//      }).await?; // NB: If these queries fail, we could get stuck.
+      match &err {
+        WrappedOpenAiError::Other(_) => {}
+        WrappedOpenAiError::OpenAiError(inner) => {
+          match inner {
+            OpenAIError::Reqwest(e) => { error!("Request error: {:?}", e) }
+            OpenAIError::ApiError(e) => { error!("API error: {:?}", e) }
+            OpenAIError::JSONDeserialize(e) => { error!("JSON error: {:?}", e) }
+            OpenAIError::FileSaveError(e) => { error!("File save error: {:?}", e) }
+            OpenAIError::FileReadError(e) => { error!("File read error: {:?}", e) }
+            OpenAIError::StreamError(e) => { error!("Stream error: {:?}", e) }
+            OpenAIError::InvalidArgument(e) => { error!("Invalid args error: {:?}", e) }
+          }
+        }
+      }
 
       update_news_story_llm_rendition_status(Args {
         news_story_token: &target.news_story_token,
@@ -49,7 +56,7 @@ pub async fn process_single_item(target: &NewsStoryProductionItem, job_state: &A
         sqlite_pool: &job_state.sqlite_pool,
       }).await?; // NB: If these queries fail, we could get stuck in retry hell.
 
-      return Err(err);
+      return Err(anyhow!("OpenAI Rendition Error: {:?}", err));
     }
     Ok(rendition_data) => rendition_data,
   };
@@ -84,17 +91,33 @@ async fn load_scraped_result(url: &str, save_directory: &SaveDirectory) -> Anyho
   Ok(scraping_result)
 }
 
-async fn call_openai_gpt(url: &str, prompt: &str, openai_client: &Arc<Client>) -> AnyhowResult<RenditionData> {
+#[derive(Debug)]
+pub enum WrappedOpenAiError {
+  OpenAiError(OpenAIError),
+  Other(String),
+}
+
+async fn call_openai_gpt(url: &str, prompt: &str, openai_client: &Arc<Client>) -> Result<RenditionData, WrappedOpenAiError> {
+  warn!("Building OpenAI Request...");
   let request = CreateCompletionRequestArgs::default()
       .model("text-davinci-003")
       .prompt(prompt)
-      .max_tokens(1200_u16)
-      .build()?;
+      .max_tokens(2500_u16)
+      .build()
+      .map_err(|err| {
+        error!("Error building request: {:?}", err);
+        WrappedOpenAiError::Other(format!("error: {:?}",  err))
+      })?;
 
+  warn!("Making OpenAI Request...");
   let response = openai_client
       .completions()
       .create(request)
-      .await?;
+      .await
+      .map_err(|err| {
+        error!("OpenAI Error: {:?}", err);
+        WrappedOpenAiError::OpenAiError(err)
+      })?;
 
   info!("Open AI response: {:?}", response);
 

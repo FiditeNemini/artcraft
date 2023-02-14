@@ -64,7 +64,7 @@ WHERE
 }
 
 fn next_status(attempts: i64) -> AwaitableJobStatus {
-  if attempts >= 2 {
+  if attempts >= 3 {
     AwaitableJobStatus::PermanentlyFailed
   } else {
     AwaitableJobStatus::RetryablyFailed
