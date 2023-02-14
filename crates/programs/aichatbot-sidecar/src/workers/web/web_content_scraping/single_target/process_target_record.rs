@@ -6,8 +6,6 @@ use errors::AnyhowResult;
 use log::error;
 use sqlite_queries::queries::by_table::news_story_productions::insert_news_story_production::Args as ProductionArgs;
 use sqlite_queries::queries::by_table::news_story_productions::insert_news_story_production::insert_news_story_production;
-use sqlite_queries::queries::by_table::web_rendition_targets::insert_web_rendition_target::Args as RenditionArgs;
-use sqlite_queries::queries::by_table::web_rendition_targets::insert_web_rendition_target::insert_web_rendition_target;
 use sqlite_queries::queries::by_table::web_scraping_targets::list_web_scraping_targets::WebScrapingTarget as WebScrapingTargetRecord;
 use sqlite_queries::queries::by_table::web_scraping_targets::update_web_scraping_target::Args as ScrapingArgs;
 use sqlite_queries::queries::by_table::web_scraping_targets::update_web_scraping_target::update_web_scraping_target;
@@ -59,18 +57,19 @@ pub async fn process_target_record(target: &WebScrapingTargetRecord, job_state: 
       let maybe_skip_reason = filter_scraped_result_heuristics(&result)
           .await?;
 
-      insert_web_rendition_target( RenditionArgs {
-        canonical_url: &target.canonical_url,
-        web_content_type: target.web_content_type,
-        sqlite_pool: &job_state.sqlite_pool,
-        maybe_skip_reason,
-      }).await?; // NB: If these queries fail, we could get stuck.
+      //insert_web_rendition_target( RenditionArgs {
+      //  canonical_url: &target.canonical_url,
+      //  web_content_type: target.web_content_type,
+      //  sqlite_pool: &job_state.sqlite_pool,
+      //  maybe_skip_reason,
+      //}).await?; // NB: If these queries fail, we could get stuck.
 
       let news_story_token = NewsStoryToken::generate();
 
       insert_news_story_production(ProductionArgs {
         news_story_token: &news_story_token,
         original_news_canonical_url: &target.canonical_url,
+        // maybe_skip_reason, // TODO: Should I do this?
         sqlite_pool: &job_state.sqlite_pool,
       }).await?;
 

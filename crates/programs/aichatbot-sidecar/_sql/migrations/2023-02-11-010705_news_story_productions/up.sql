@@ -12,6 +12,11 @@ CREATE TABLE news_story_productions (
   -- The original URL for the news item
   original_news_canonical_url TEXT NOT NULL UNIQUE,
 
+  -- If we skip the production at any stage (after scraping, after rendition, etc.), for a non-failure
+  -- reason, this is why.
+  -- Enum-like value, eg. "predominantly_video", "empty", "world_leader", "nobody_cares", etc.
+  maybe_skip_reason TEXT,
+
   -- The overall status of the news story.
   -- "not_ready", "ready_waiting", "processing", "retryably_failed", "permanently_failed", "skipped", "done"
   overall_production_status TEXT DEFAULT "not_ready" NOT NULL,
