@@ -16,7 +16,11 @@ CREATE TABLE tts_render_targets (
   story_token TEXT NOT NULL,
 
   -- For each "sequence" of audio, this is the order.
+  -- This is 1-indexed
   sequence_order INTEGER NOT NULL,
+
+  -- The total number of audio files in the entire speech.
+  sequence_length INTEGER NOT NULL,
 
   -- If the source came from somewhere, this is it
   -- maybe_canonical_url TEXT NOT NULL UNIQUE,
