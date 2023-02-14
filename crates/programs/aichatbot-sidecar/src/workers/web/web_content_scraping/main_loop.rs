@@ -1,5 +1,5 @@
 use crate::shared_state::job_state::JobState;
-use crate::workers::web_content_scraping::single_target::process_target_record::process_target_record;
+use crate::workers::web::web_content_scraping::single_target::process_target_record::process_target_record;
 use enums::by_table::web_scraping_targets::scraping_status::ScrapingStatus;
 use errors::AnyhowResult;
 use log::{error, info};

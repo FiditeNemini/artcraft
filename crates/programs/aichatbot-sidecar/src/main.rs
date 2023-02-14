@@ -20,10 +20,12 @@ use crate::shared_state::app_control_state::AppControlState;
 use crate::shared_state::job_state::JobState;
 use crate::startup_args::get_startup_args;
 use crate::web_server::launch_web_server::{launch_web_server, LaunchWebServerArgs};
+use crate::workers::news_stories::news_story_audio_preprocessing::main_loop::news_story_audio_preprocessing_main_loop;
 use crate::workers::news_stories::news_story_greenlighting::main_loop::news_story_greenlighting_main_loop;
 use crate::workers::news_stories::news_story_llm_rendition::main_loop::news_story_llm_rendition_main_loop;
-use crate::workers::web_content_scraping::main_loop::web_content_scraping_main_loop;
-use crate::workers::web_index_ingestion::main_loop::web_index_ingestion_main_loop;
+use crate::workers::web::web_content_scraping::main_loop::web_content_scraping_main_loop;
+use crate::workers::web::web_content_scraping::single_target::ingest_url_scrape_and_save::ingest_url_scrape_and_save;
+use crate::workers::web::web_index_ingestion::main_loop::web_index_ingestion_main_loop;
 use enums::by_table::web_scraping_targets::web_content_type::WebContentType;
 use errors::AnyhowResult;
 use log::info;
@@ -36,8 +38,6 @@ use tokio::runtime::{Builder, Runtime};
 use web_scrapers::sites::cnn::cnn_article_scraper::cnn_article_scraper;
 use web_scrapers::sites::techcrunch::techcrunch_article_scraper::techcrunch_article_scraper;
 use web_scrapers::sites::theguardian::theguardian_scraper::theguardian_scraper_test;
-use workers::web_content_scraping::single_target::ingest_url_scrape_and_save::ingest_url_scrape_and_save;
-use crate::workers::news_stories::news_story_audio_preprocessing::main_loop::news_story_audio_preprocessing_main_loop;
 
 //#[tokio::main]
 //pub async fn main() -> AnyhowResult<()> {

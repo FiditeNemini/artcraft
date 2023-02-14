@@ -1,6 +1,6 @@
 use crate::shared_state::job_state::JobState;
-use crate::workers::web_content_scraping::single_target::filter_scraped_result_heuristics::filter_scraped_result_heuristics;
-use crate::workers::web_content_scraping::single_target::ingest_url_scrape_and_save::ingest_url_scrape_and_save;
+use crate::workers::web::web_content_scraping::single_target::filter_scraped_result_heuristics::filter_scraped_result_heuristics;
+use crate::workers::web::web_content_scraping::single_target::ingest_url_scrape_and_save::ingest_url_scrape_and_save;
 use enums::by_table::web_scraping_targets::scraping_status::ScrapingStatus;
 use errors::AnyhowResult;
 use log::error;
