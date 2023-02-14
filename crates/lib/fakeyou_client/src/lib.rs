@@ -21,4 +21,5 @@
 
 pub mod api;
 pub mod fakeyou_api_client;
+pub mod get_audio_url;
 

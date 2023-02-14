@@ -1,4 +1,3 @@
 pub mod insert_tts_render_target;
-pub mod list_tts_render_targets;
-pub mod update_tts_render_target_unsuccessfully_submitted;
-pub mod update_tts_render_target_successfully_submitted;
+pub mod list;
+pub mod update;

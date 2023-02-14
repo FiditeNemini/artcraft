@@ -13,6 +13,10 @@ pub enum TtsRenderStatus {
   #[serde(rename = "new")]
   New,
 
+  // TODO: Added to fix a big. This whole enum should die.
+  #[serde(rename = "processing")]
+  Processing,
+
   #[serde(rename = "skipped")]
   Skipped,
 
@@ -35,6 +39,7 @@ impl TtsRenderStatus {
   pub fn to_str(&self) -> &'static str {
     match self {
       Self::New => "new",
+      Self::Processing => "processing",
       Self::Skipped => "skipped",
       Self::Failed => "failed",
       Self::PermanentlyFailed => "permanently_failed",
@@ -45,6 +50,7 @@ impl TtsRenderStatus {
   pub fn from_str(value: &str) -> Result<Self, String> {
     match value {
       "new" => Ok(Self::New),
+      "processing" => Ok(Self::Processing),
       "skipped" => Ok(Self::Skipped),
       "failed" => Ok(Self::Failed),
       "permanently_failed" => Ok(Self::PermanentlyFailed),
@@ -65,6 +71,7 @@ mod tests {
     #[test]
     fn test_serialization() {
       assert_serialization(TtsRenderStatus::New, "new");
+      assert_serialization(TtsRenderStatus::Processing, "processing");
       assert_serialization(TtsRenderStatus::Skipped, "skipped");
       assert_serialization(TtsRenderStatus::Failed, "failed");
       assert_serialization(TtsRenderStatus::PermanentlyFailed, "permanently_failed");
@@ -78,6 +85,7 @@ mod tests {
     #[test]
     fn test_to_str() {
       assert_eq!(TtsRenderStatus::New.to_str(), "new");
+      assert_eq!(TtsRenderStatus::Processing.to_str(), "processing");
       assert_eq!(TtsRenderStatus::Skipped.to_str(), "skipped");
       assert_eq!(TtsRenderStatus::Failed.to_str(), "failed");
       assert_eq!(TtsRenderStatus::PermanentlyFailed.to_str(), "permanently_failed");
@@ -87,6 +95,7 @@ mod tests {
     #[test]
     fn test_from_str() {
       assert_eq!(TtsRenderStatus::from_str("new").unwrap(), TtsRenderStatus::New);
+      assert_eq!(TtsRenderStatus::from_str("processing").unwrap(), TtsRenderStatus::Processing);
       assert_eq!(TtsRenderStatus::from_str("skipped").unwrap(), TtsRenderStatus::Skipped);
       assert_eq!(TtsRenderStatus::from_str("failed").unwrap(), TtsRenderStatus::Failed);
       assert_eq!(TtsRenderStatus::from_str("permanently_failed").unwrap(), TtsRenderStatus::PermanentlyFailed);

@@ -3,11 +3,11 @@ use errors::{anyhow, AnyhowResult};
 use fakeyou_client::api::tts_inference::CreateTtsInferenceRequest;
 use idempotency::uuid::generate_random_uuid;
 use log::{error, info};
-use sqlite_queries::queries::by_table::tts_render_targets::list_tts_render_targets::TtsRenderTarget;
-use sqlite_queries::queries::by_table::tts_render_targets::update_tts_render_target_successfully_submitted::Args as SuccessArgs;
-use sqlite_queries::queries::by_table::tts_render_targets::update_tts_render_target_successfully_submitted::update_tts_render_target_successfully_submitted;
-use sqlite_queries::queries::by_table::tts_render_targets::update_tts_render_target_unsuccessfully_submitted::Args as UnsuccessfulArgs;
-use sqlite_queries::queries::by_table::tts_render_targets::update_tts_render_target_unsuccessfully_submitted::update_tts_render_target_unsuccessfully_submitted;
+use sqlite_queries::queries::by_table::tts_render_targets::list::tts_render_target::TtsRenderTarget;
+use sqlite_queries::queries::by_table::tts_render_targets::update::update_tts_render_target_successfully_submitted::Args as SuccessArgs;
+use sqlite_queries::queries::by_table::tts_render_targets::update::update_tts_render_target_successfully_submitted::update_tts_render_target_successfully_submitted;
+use sqlite_queries::queries::by_table::tts_render_targets::update::update_tts_render_target_unsuccessfully_submitted::Args as UnsuccessfulArgs;
+use sqlite_queries::queries::by_table::tts_render_targets::update::update_tts_render_target_unsuccessfully_submitted::update_tts_render_target_unsuccessfully_submitted;
 use std::sync::Arc;
 use tokens::tokens::tts_models::TtsModelToken;
 

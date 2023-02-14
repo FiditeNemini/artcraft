@@ -40,6 +40,7 @@ use web_scrapers::sites::cnn::cnn_article_scraper::cnn_article_scraper;
 use web_scrapers::sites::techcrunch::techcrunch_article_scraper::techcrunch_article_scraper;
 use web_scrapers::sites::theguardian::theguardian_scraper::theguardian_scraper_test;
 use crate::workers::audio::fakeyou_audio_create::main_loop::fakeyou_audio_create_main_loop;
+use crate::workers::audio::fakeyou_audio_download::main_loop::fakeyou_audio_download_main_loop;
 
 //#[tokio::main]
 //pub async fn main() -> AnyhowResult<()> {
@@ -136,6 +137,7 @@ pub async fn main() -> AnyhowResult<()> {
     let job_state5 = job_state.clone();
     let job_state6 = job_state.clone();
     let job_state7 = job_state.clone();
+    let job_state8 = job_state.clone();
 
     tokio_runtime.spawn(async {
       let _r = web_index_ingestion_main_loop(job_state2).await;
@@ -160,6 +162,11 @@ pub async fn main() -> AnyhowResult<()> {
     tokio_runtime.spawn(async {
       let _r = fakeyou_audio_create_main_loop(job_state7).await;
     });
+
+    tokio_runtime.spawn(async {
+      let _r = fakeyou_audio_download_main_loop(job_state8).await;
+    });
+
 
     // TODO: Final scheduling thread
     //tokio_runtime.spawn(async {
