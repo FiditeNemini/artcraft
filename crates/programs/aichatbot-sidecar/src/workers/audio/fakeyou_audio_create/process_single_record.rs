@@ -1,6 +1,7 @@
 use crate::shared_state::job_state::JobState;
 use errors::AnyhowResult;
 use fakeyou_client::api::tts_inference::CreateTtsInferenceRequest;
+use idempotency::uuid::generate_random_uuid;
 use log::{error, info};
 use sqlite_queries::queries::by_table::tts_render_targets::list_tts_render_targets::TtsRenderTarget;
 use sqlite_queries::queries::by_table::tts_render_targets::update_tts_render_target_successfully_submitted::Args as SuccessArgs;
@@ -15,13 +16,13 @@ pub async fn process_single_record(target: &TtsRenderTarget, job_state: &Arc<Job
   info!("Posting FakeYou create TTS request...");
 
   let tts_model_token = TtsModelToken::new_from_str(&target.tts_voice_identifier);
-
+  let uuid_idempotency_token = generate_random_uuid();
   let tts_render_attempts = target.tts_render_attempts + 1;
 
   let result = job_state
       .fakeyou_client
       .create_tts_inference(CreateTtsInferenceRequest {
-        uuid_idempotency_token: "",
+        uuid_idempotency_token: &uuid_idempotency_token,
         tts_model_token: &tts_model_token,
         inference_text: &target.full_text,
       }).await;

@@ -27,6 +27,7 @@ members = [
   "crates/lib/google_drive_common",
   "crates/lib/hashing",
   "crates/lib/http_server_common",
+  "crates/lib/idempotency",
   "crates/lib/jobs_common",
   "crates/lib/media",
   "crates/lib/memory_caching",

@@ -761,6 +761,7 @@ dependencies = [
  "glium",
  "hashing",
  "http_server_common",
+ "idempotency",
  "imgui",
  "imgui-glium-renderer",
  "imgui-winit-support",
@@ -3493,6 +3494,13 @@ dependencies = [
  "native-tls",
  "tokio 1.25.0",
  "tokio-native-tls",
+]
+
+[[package]]
+name = "idempotency"
+version = "0.0.1"
+dependencies = [
+ "uuid 0.8.2",
 ]
 
 [[package]]

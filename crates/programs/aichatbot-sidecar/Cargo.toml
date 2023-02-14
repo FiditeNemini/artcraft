@@ -23,6 +23,7 @@ fakeyou_client = { path = "../../lib/fakeyou_client" }
 files = { path = "../../lib/files" }
 hashing = { path = "../../lib/hashing" }
 http_server_common = { path = "../../lib/http_server_common" }
+idempotency = { path = "../../lib/idempotency" }
 sqlite_queries = { path = "../../lib/sqlite_queries" }
 tokens = { path = "../../_types/tokens" }
 web_scrapers = { path = "../../lib/web_scrapers" }

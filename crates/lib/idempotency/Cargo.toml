@@ -1,0 +1,25 @@
+[package]
+name = "idempotency"
+edition = "2018"
+version = "0.0.1"
+authors = [
+    "Brandon Thomas <bt@brand.io>",
+    "Brandon Thomas <echelon@gmail.com>",
+]
+publish = false
+
+[lib]
+name = "idempotency"
+path = "src/lib.rs"
+
+[dependencies]
+# Internal
+# errors = { path = "../../lib/errors" }
+# (None yet)
+
+# External
+uuid = { version = "0.8.2", features = ["v4"] }
+
+[dev-dependencies]
+# None yet
+# (None yet)

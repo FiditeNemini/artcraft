@@ -40,7 +40,7 @@ WHERE
 }
 
 fn next_status(attempts: i64) -> TtsRenderStatus {
-  if attempts >= 2 {
+  if attempts >= 3 {
     TtsRenderStatus::PermanentlyFailed
   } else {
     TtsRenderStatus::Failed
