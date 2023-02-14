@@ -49,9 +49,12 @@ pub async fn process_single_item(target: &NewsStoryProductionItem, job_state: &A
   // NB: John Madden voice model
   let tts_model_token = TtsModelToken::new_from_str("TM:30ha2t6bxfn4");
 
-  for paragraph in paragraphs {
+  for (i, paragraph) in paragraphs.iter().enumerate() {
+    let sequence_order = (i + 1) as i64;
+
     insert_tts_render_target(InsertArgs {
       news_story_token: &target.news_story_token,
+      sequence_order,
       tts_voice_identifier: &tts_model_token,
       full_text: &paragraph,
       sqlite_pool: &job_state.sqlite_pool,

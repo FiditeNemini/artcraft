@@ -12,6 +12,8 @@ pub struct TtsRenderTarget {
   pub story_type: String,
   pub story_token: String,
 
+  pub sequence_order: i64,
+
   pub tts_service: String,
   pub tts_voice_identifier: String,
 
@@ -48,6 +50,7 @@ SELECT
   token as `token: tokens::tokens::tts_render_tasks::TtsRenderTaskToken`,
   story_type,
   story_token,
+  sequence_order,
   tts_service,
   tts_voice_identifier,
   full_text,
@@ -79,6 +82,7 @@ LIMIT ?
           token: record.token,
           story_type: record.story_type,
           story_token: record.story_token,
+          sequence_order: record.sequence_order,
           tts_service: record.tts_service,
           tts_voice_identifier: record.tts_voice_identifier,
           full_text: record.full_text,
@@ -102,6 +106,8 @@ struct RawInternalTtsRenderTarget {
   // Composite foreign key
   pub story_type: String,
   pub story_token: String,
+
+  pub sequence_order: i64,
 
   pub tts_service: String,
   pub tts_voice_identifier: String,

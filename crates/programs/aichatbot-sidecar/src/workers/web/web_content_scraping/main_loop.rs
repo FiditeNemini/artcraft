@@ -2,7 +2,7 @@ use crate::shared_state::job_state::JobState;
 use crate::workers::web::web_content_scraping::single_target::process_target_record::process_target_record;
 use enums::by_table::web_scraping_targets::scraping_status::ScrapingStatus;
 use errors::AnyhowResult;
-use log::{error, info};
+use log::{debug, error, info};
 use sqlite_queries::queries::by_table::web_scraping_targets::insert_web_scraping_target::{Args, insert_web_scraping_target};
 use sqlite_queries::queries::by_table::web_scraping_targets::list_web_scraping_targets::WebScrapingTarget as WebScrapingTargetRecord;
 use sqlite_queries::queries::by_table::web_scraping_targets::list_web_scraping_targets::list_web_scraping_targets;
@@ -20,7 +20,7 @@ use web_scrapers::sites::techcrunch::techcrunch_indexer::{techcrunch_indexer, Te
 /// Follow up on articles tagged to be indexed by downloading and scraping their contents.
 pub async fn web_content_scraping_main_loop(job_state: Arc<JobState>) {
   loop {
-    info!("web_content_scraping main loop");
+    debug!("web_content_scraping main loop");
 
     while job_state.app_control_state.is_scraping_paused() {
       thread::sleep(Duration::from_secs(5));
@@ -28,7 +28,7 @@ pub async fn web_content_scraping_main_loop(job_state: Arc<JobState>) {
 
     single_job_loop_iteration(&job_state).await;
 
-    info!("web_content_scraping loop finished; waiting...");
+    debug!("web_content_scraping loop finished; waiting...");
     thread::sleep(Duration::from_secs(60));
   }
 }
@@ -51,7 +51,7 @@ async fn scrape_jobs_of_status(status: ScrapingStatus, job_state: &Arc<JobState>
     // NB: Protect sqlite from contention.
     thread::sleep(Duration::from_millis(500));
 
-    info!("web_content_scraping querying {:?} targets from id > {} ...", &status, last_id);
+    debug!("web_content_scraping querying {:?} targets from id > {} ...", &status, last_id);
 
     let query_result = list_web_scraping_targets(
       status, last_id, BATCH_SIZE, &job_state.sqlite_pool).await;
@@ -95,7 +95,7 @@ async fn scrape_jobs_of_status(status: ScrapingStatus, job_state: &Arc<JobState>
 
       last_id = target.id;
 
-      thread::sleep(Duration::from_secs(3));
+      thread::sleep(Duration::from_secs(5));
     }
   }
 }

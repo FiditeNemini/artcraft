@@ -15,6 +15,9 @@ CREATE TABLE tts_render_targets (
   story_type TEXT NOT NULL,
   story_token TEXT NOT NULL,
 
+  -- For each "sequence" of audio, this is the order.
+  sequence_order INTEGER NOT NULL,
+
   -- If the source came from somewhere, this is it
   -- maybe_canonical_url TEXT NOT NULL UNIQUE,
 

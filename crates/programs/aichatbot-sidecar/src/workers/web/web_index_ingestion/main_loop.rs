@@ -1,6 +1,6 @@
 use crate::shared_state::job_state::JobState;
 use errors::AnyhowResult;
-use log::{error, info};
+use log::{debug, error, info};
 use sqlite_queries::queries::by_table::web_scraping_targets::insert_web_scraping_target::{Args, insert_web_scraping_target};
 use sqlx::sqlite::SqlitePoolOptions;
 use std::future::Future;
@@ -16,7 +16,7 @@ use web_scrapers::sites::techcrunch::techcrunch_indexer::{techcrunch_indexer, Te
 /// Download RSS feeds and index pages to determine which articles and content will be scraped (async/downstream of this)
 pub async fn web_index_ingestion_main_loop(job_state: Arc<JobState>) {
   loop {
-    info!("web_index_ingestion main loop");
+    debug!("web_index_ingestion main loop");
 
     while job_state.app_control_state.is_scraping_paused() {
       thread::sleep(Duration::from_secs(5));
@@ -24,7 +24,7 @@ pub async fn web_index_ingestion_main_loop(job_state: Arc<JobState>) {
 
     match single_iteration(&job_state).await {
       Ok(_) => {
-        info!("web_index_ingestion loop finished; waiting...");
+        debug!("web_index_ingestion loop finished; waiting...");
         thread::sleep(Duration::from_secs(300))
       },
       Err(err) => {
@@ -41,14 +41,14 @@ async fn single_iteration(job_state: &Arc<JobState>) -> AnyhowResult<()> {
   for variant in CnnFeed::iter() {
     let index_targets = cnn_indexer(variant).await?;
     insert_targets(job_state, &index_targets).await?;
-    thread::sleep(Duration::from_secs(2));
+    thread::sleep(Duration::from_secs(5));
   }
 
   // TechCrunch
   for variant in TechcrunchFeed::iter() {
     let index_targets = techcrunch_indexer(variant).await?;
     insert_targets(job_state, &index_targets).await?;
-    thread::sleep(Duration::from_secs(2));
+    thread::sleep(Duration::from_secs(5));
   }
 
   Ok(())

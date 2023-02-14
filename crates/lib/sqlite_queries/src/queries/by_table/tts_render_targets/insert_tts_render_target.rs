@@ -11,6 +11,8 @@ pub struct Args <'a> {
   // TODO: This will be multiple types in the future
   pub news_story_token: &'a NewsStoryToken,
 
+  pub sequence_order: i64,
+
   pub tts_voice_identifier: &'a TtsModelToken,
 
   pub full_text: &'a str,
@@ -30,6 +32,7 @@ INSERT INTO tts_render_targets(
   token,
   story_type,
   story_token,
+  sequence_order,
   tts_service,
   tts_voice_identifier,
   full_text
@@ -38,6 +41,7 @@ VALUES (
   ?,
   "news_story",
   ?,
+  ?,
   "fakeyou",
   ?,
   ?
@@ -45,6 +49,7 @@ VALUES (
         "#,
         tts_render_task_token,
         news_story_token,
+        args.sequence_order,
         tts_voice_identifier,
         args.full_text
     );
