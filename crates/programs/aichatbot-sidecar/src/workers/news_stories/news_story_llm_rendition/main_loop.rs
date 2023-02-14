@@ -12,12 +12,12 @@ use std::time::Duration;
 /// Project scraped, etc. content into the desired shape  with GPT.
 pub async fn news_story_llm_rendition_main_loop(job_state: Arc<JobState>) {
   loop {
-    info!("news_story_llm_rendition_main_loop main loop");
+    debug!("news_story_llm_rendition_main_loop main loop");
 
     single_job_loop_iteration(&job_state).await;
 
-    info!("gpt_rendition loop finished; waiting...");
-    thread::sleep(Duration::from_secs(10));
+    debug!("gpt_rendition loop finished; waiting...");
+    thread::sleep(Duration::from_secs(1));
   }
 }
 

@@ -44,3 +44,6 @@ runtime_data/
 models/Wav2Lip/python/
 models/tacotron2/python/
 
+# Stuff I want to keep around, but not commit
+scraps/
+
