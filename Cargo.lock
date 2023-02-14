@@ -756,6 +756,7 @@ dependencies = [
  "egui",
  "enums",
  "errors",
+ "fakeyou_client",
  "files",
  "glium",
  "hashing",

@@ -19,6 +19,7 @@ pub(crate) enum EntityType {
   ModelCategory,
   NewsStory, // NB: aichatbot / sqlite
   TtsModel,
+  TtsRenderTask, // NB: aichatbot / sqlite
   User,
   VoiceConversionModel,
   W2lTemplate,
@@ -34,6 +35,7 @@ impl EntityType {
       Self::ModelCategory => "CAT:", // NB: Old-style prefix, do not use for future tokens.
       Self::NewsStory => "news_story_",
       Self::TtsModel => "TM:", // NB: Old-style prefix, do not use for future tokens.
+      Self::TtsRenderTask => "tts_task_",
       Self::User => "U:", // NB: Old-style prefix, do not use for future tokens.
       Self::VoiceConversionModel => "voco_",
       Self::W2lTemplate => "WT:", // NB: Old-style prefix, do not use for future tokens.

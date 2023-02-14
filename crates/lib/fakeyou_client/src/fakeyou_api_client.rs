@@ -22,18 +22,19 @@ impl FakeYouApiClient {
   }
 
   // TODO: need to yield better, more "library"-appropriate errors.
-  pub async fn post_inference(&self, request: CreateTtsInferenceRequest<'_>) -> AnyhowResult<CreateTtsInferenceResponse> {
+  pub async fn create_tts_inference(&self, request: CreateTtsInferenceRequest<'_>) -> AnyhowResult<CreateTtsInferenceResponse> {
     let url = format!("https://{}/tts/inference", self.api_domain);
 
     let response = self.client
         .post(url)
         .header(AUTHORIZATION_HEADER, &self.api_token)
         .json(&request)
+        .send()
         .await?
-        .bytes()
+        .text()
         .await?;
 
-    let response = serde_json::from_str(response)?;
+    let response = serde_json::from_str(&response)?;
 
     Ok(response)
   }
@@ -45,11 +46,12 @@ impl FakeYouApiClient {
     let response = self.client
         .get(url)
         .header(AUTHORIZATION_HEADER, &self.api_token)
+        .send()
         .await?
-        .bytes()
+        .text()
         .await?;
 
-    let response = serde_json::from_str(response)?;
+    let response = serde_json::from_str(&response)?;
 
     Ok(response)
   }

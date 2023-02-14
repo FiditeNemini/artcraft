@@ -35,9 +35,11 @@ use std::sync::Arc;
 use std::thread;
 use std::time::Duration;
 use tokio::runtime::{Builder, Runtime};
+use fakeyou_client::fakeyou_api_client::FakeYouApiClient;
 use web_scrapers::sites::cnn::cnn_article_scraper::cnn_article_scraper;
 use web_scrapers::sites::techcrunch::techcrunch_article_scraper::techcrunch_article_scraper;
 use web_scrapers::sites::theguardian::theguardian_scraper::theguardian_scraper_test;
+use crate::workers::audio::fakeyou_audio_create::main_loop::fakeyou_audio_create_main_loop;
 
 //#[tokio::main]
 //pub async fn main() -> AnyhowResult<()> {
@@ -87,15 +89,20 @@ pub async fn main() -> AnyhowResult<()> {
   let openai_client = Arc::new(Client::new()
       .with_api_key(startup_args.openai_secret_key.clone()));
 
+  let fakeyou_client = Arc::new(FakeYouApiClient::make_production_client(
+    &startup_args.fakeyou_api_token));
+
   let save_directory = SaveDirectory::new(&startup_args.save_directory);
 
   let database_url = easyenv::get_env_string_required("DATABASE_URL")?;
+
   let pool = SqlitePoolOptions::new()
       .max_connections(5)
       .connect(&database_url).await?;
 
   let job_state = Arc::new(JobState {
     openai_client: openai_client.clone(),
+    fakeyou_client: fakeyou_client.clone(),
     save_directory: save_directory.clone(),
     sqlite_pool: pool,
     app_control_state: app_control_state_inner.clone(),
@@ -124,6 +131,7 @@ pub async fn main() -> AnyhowResult<()> {
     let job_state4 = job_state.clone();
     let job_state5 = job_state.clone();
     let job_state6 = job_state.clone();
+    let job_state7 = job_state.clone();
 
     tokio_runtime.spawn(async {
       let _r = web_index_ingestion_main_loop(job_state2).await;
@@ -143,6 +151,10 @@ pub async fn main() -> AnyhowResult<()> {
 
     tokio_runtime.spawn(async {
       let _r = news_story_audio_preprocessing_main_loop(job_state6).await;
+    });
+
+    tokio_runtime.spawn(async {
+      let _r = fakeyou_audio_create_main_loop(job_state7).await;
     });
 
     // TODO: Final scheduling thread

@@ -3,7 +3,7 @@ use serde::Deserialize;
 use serde::Serialize;
 use std::fmt::Debug;
 
-/// The primary key for "generic" inference jobs.
+/// The primary key for news stories (Sqlite)
 #[derive(Clone, PartialEq, Eq, sqlx::Type, Debug, Serialize, Deserialize)]
 #[sqlx(transparent)]
 pub struct NewsStoryToken(pub String);

@@ -7,6 +7,10 @@
 CREATE TABLE tts_render_targets (
   id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
 
+  -- Effective primary key.
+  -- Follows a single TTS audio through the phases of rendering
+  token TEXT NOT NULL UNIQUE,
+
   -- Composite primary key for what this TTS render job belongs to (eg. news story)
   story_type TEXT NOT NULL,
   story_token TEXT NOT NULL,
@@ -30,7 +34,7 @@ CREATE TABLE tts_render_targets (
 
   -- For audio results that get downloaded, they live on the filesystem here
   -- This is relative to the runtime data directory.
-  maybe_filesystem_relative_location TEXT,
+  maybe_result_relative_filesystem_location TEXT,
 
   -- TTS render status: "new", "processing", "failed", "permanently_failed", "success", "skipped"
   tts_render_status TEXT DEFAULT "new" NOT NULL,

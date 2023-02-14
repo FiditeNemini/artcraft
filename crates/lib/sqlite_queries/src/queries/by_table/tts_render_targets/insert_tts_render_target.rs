@@ -5,6 +5,7 @@ use sqlx::SqlitePool;
 use enums::by_table::web_scraping_targets::scraping_status::ScrapingStatus;
 use tokens::tokens::news_stories::NewsStoryToken;
 use tokens::tokens::tts_models::TtsModelToken;
+use tokens::tokens::tts_render_tasks::TtsRenderTaskToken;
 
 pub struct Args <'a> {
   // TODO: This will be multiple types in the future
@@ -21,9 +22,12 @@ pub async fn insert_tts_render_target(args: Args<'_>) -> AnyhowResult<()> {
   let news_story_token = args.news_story_token.to_string();
   let tts_voice_identifier= args.tts_voice_identifier.to_string();
 
+  let tts_render_task_token = TtsRenderTaskToken::generate().to_string();
+
   let query = sqlx::query!(
         r#"
 INSERT INTO tts_render_targets(
+  token,
   story_type,
   story_token,
   tts_service,
@@ -31,6 +35,7 @@ INSERT INTO tts_render_targets(
   full_text
 )
 VALUES (
+  ?,
   "news_story",
   ?,
   "fakeyou",
@@ -38,6 +43,7 @@ VALUES (
   ?
 )
         "#,
+        tts_render_task_token,
         news_story_token,
         tts_voice_identifier,
         args.full_text

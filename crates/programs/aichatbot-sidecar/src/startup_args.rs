@@ -12,6 +12,7 @@ pub struct StartupArgs {
   pub save_directory: String,
 
   pub openai_secret_key: String,
+  pub fakeyou_api_token: String,
 }
 
 /// Read in environment and CLI args and output the consolidated startup state
@@ -28,11 +29,14 @@ pub fn get_startup_args() -> AnyhowResult<StartupArgs> {
 
   let openai_secret_key = easyenv::get_env_string_required("OPENAI_SECRET_KEY")?;
 
+  let fakeyou_api_token = easyenv::get_env_string_required("FAKEYOU_API_TOKEN")?;
+
   let save_directory = get_save_directory(&matches)?;
 
   Ok(StartupArgs {
     save_directory,
     openai_secret_key,
+    fakeyou_api_token,
   })
 }
 
