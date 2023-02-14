@@ -1,5 +1,5 @@
 use crate::shared_state::job_state::JobState;
-use errors::AnyhowResult;
+use errors::{anyhow, AnyhowResult};
 use fakeyou_client::api::tts_inference::CreateTtsInferenceRequest;
 use idempotency::uuid::generate_random_uuid;
 use log::{error, info};
@@ -49,6 +49,7 @@ pub async fn process_single_record(target: &TtsRenderTarget, job_state: &Arc<Job
       } else {
         update_tts_render_target_successfully_submitted(SuccessArgs {
           tts_render_task_token: &target.token,
+          tts_inference_job_token: &res.inference_job_token.ok_or(anyhow!("no token"))?,
           sqlite_pool: &job_state.sqlite_pool,
         }).await?;
       }

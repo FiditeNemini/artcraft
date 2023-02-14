@@ -29,7 +29,13 @@ CREATE TABLE tts_render_targets (
   -- Original text of the TTS result
   full_text TEXT NOT NULL,
 
-  -- For audio results, the URL to the result.
+  -- For pending audio results, this is the job token to check back later.
+  maybe_inference_job_token TEXT,
+
+  -- For finished audio results, the token of the result.
+  maybe_result_token TEXT,
+
+  -- For finished audio results, the URL to the result.
   maybe_result_url TEXT,
 
   -- For audio results that get downloaded, they live on the filesystem here

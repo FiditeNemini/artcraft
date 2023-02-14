@@ -6,6 +6,9 @@ use tokens::tokens::tts_render_tasks::TtsRenderTaskToken;
 
 pub struct Args <'a> {
   pub tts_render_task_token: &'a TtsRenderTaskToken,
+
+  pub tts_inference_job_token: &'a str,
+
   pub sqlite_pool: &'a SqlitePool,
 }
 
@@ -14,12 +17,14 @@ pub async fn update_tts_render_target_successfully_submitted(args: Args<'_>) -> 
         r#"
 UPDATE tts_render_targets
 SET
+  maybe_inference_job_token = ?,
   tts_render_status = "processing",
   tts_render_attempts = tts_render_attempts + 1,
   version = version + 1
 WHERE
   token = ?
         "#,
+        args.tts_inference_job_token,
         args.tts_render_task_token,
     );
 

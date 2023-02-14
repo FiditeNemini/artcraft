@@ -16,6 +16,12 @@ pub struct TtsRenderTarget {
   pub tts_voice_identifier: String,
 
   pub full_text: String,
+
+  // Token for in-progress render jobs.
+  pub maybe_inference_job_token: Option<String>,
+
+  // Results for finished jobs
+  pub maybe_result_token: Option<String>,
   pub maybe_result_url: Option<String>,
   pub maybe_result_relative_filesystem_location: Option<String>,
 
@@ -45,6 +51,8 @@ SELECT
   tts_service,
   tts_voice_identifier,
   full_text,
+  maybe_inference_job_token,
+  maybe_result_token,
   maybe_result_url,
   maybe_result_relative_filesystem_location,
   tts_render_status as `tts_render_status: enums::by_table::tts_render_targets::tts_render_status::TtsRenderStatus`,
@@ -74,6 +82,8 @@ LIMIT ?
           tts_service: record.tts_service,
           tts_voice_identifier: record.tts_voice_identifier,
           full_text: record.full_text,
+          maybe_inference_job_token: record.maybe_inference_job_token,
+          maybe_result_token: record.maybe_result_token,
           maybe_result_url: record.maybe_result_url,
           maybe_result_relative_filesystem_location: record.maybe_result_relative_filesystem_location,
           tts_render_status: record.tts_render_status,
@@ -97,6 +107,12 @@ struct RawInternalTtsRenderTarget {
   pub tts_voice_identifier: String,
 
   pub full_text: String,
+
+  // Token for in-progress render jobs.
+  pub maybe_inference_job_token: Option<String>,
+
+  // Results for finished jobs
+  pub maybe_result_token: Option<String>,
   pub maybe_result_url: Option<String>,
   pub maybe_result_relative_filesystem_location: Option<String>,
 
