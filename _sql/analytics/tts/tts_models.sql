@@ -272,3 +272,31 @@ from (
 order by m.created_at desc
     limit 100;
 
+--
+-- Models deleted recently (voice actor take down)
+--
+select
+    m.token,
+    m.title,
+    m.text_pipeline_type,
+    m.ietf_language_tag,
+    u.username,
+    r.use_count,
+    m.created_at,
+    m.user_deleted_at,
+    m.mod_deleted_at
+from (
+         select model_token, count(*) as use_count
+         from tts_results
+         where created_at > ( CURDATE() - INTERVAL 30 DAY )
+         group by model_token
+     ) as r
+         join tts_models as m
+              on m.token = r.model_token
+         join users as u
+              on u.token = m.creator_user_token
+where m.mod_deleted_at > ( CURDATE() - INTERVAL 14 DAY )
+   or m.user_deleted_at > ( CURDATE() - INTERVAL 14 DAY )
+order by r.use_count desc
+    limit 500;
+

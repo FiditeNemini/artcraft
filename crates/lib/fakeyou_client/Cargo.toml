@@ -16,6 +16,7 @@ path = "src/lib.rs"
 # Internal
 enums = { path = "../../_types/enums" }
 errors = { path = "../../lib/errors" }
+tokens = { path = "../../_types/tokens" }
 
 # External
 bytes = "1.3"
