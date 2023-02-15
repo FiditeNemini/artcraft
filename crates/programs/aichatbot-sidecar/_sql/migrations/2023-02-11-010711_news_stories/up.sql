@@ -12,6 +12,15 @@ CREATE TABLE news_stories (
   -- The original URL for the news item
   original_news_canonical_url TEXT NOT NULL UNIQUE,
 
+  -- Original article title (not LLM renditioned)
+  original_news_title TEXT NOT NULL,
+
+  -- Total number of discrete audio files for this story
+  audio_file_count INTEGER NOT NULL,
+
+  -- Total amount of time in the audio files.
+  audio_total_duration_seconds INTEGER NOT NULL,
+
   -- When the story should stop being scheduled.
   replayable_until DATETIME NOT NULL,
 

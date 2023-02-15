@@ -7,6 +7,10 @@ pub struct Args <'a> {
   pub news_story_token: &'a NewsStoryToken,
 
   pub original_news_canonical_url: &'a str,
+  pub original_news_title: &'a str,
+
+  pub audio_file_count: i64,
+  pub audio_total_duration_seconds: i64,
 
   pub replayable_until: DateTime<Utc>,
 
@@ -21,10 +25,16 @@ pub async fn insert_news_story(args: Args<'_>) -> AnyhowResult<()> {
 INSERT INTO news_stories (
   news_story_token,
   original_news_canonical_url,
+  original_news_title,
+  audio_file_count,
+  audio_total_duration_seconds,
   replayable_until,
   is_playable
 )
 VALUES (
+  ?,
+  ?,
+  ?,
   ?,
   ?,
   ?,
@@ -33,6 +43,9 @@ VALUES (
         "#,
         news_story_token,
         args.original_news_canonical_url,
+        args.original_news_title,
+        args.audio_file_count,
+        args.audio_total_duration_seconds,
         args.replayable_until
     );
 

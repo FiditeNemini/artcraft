@@ -6,6 +6,7 @@ pub struct Args <'a> {
   pub news_story_token: &'a NewsStoryToken,
 
   pub original_news_canonical_url: &'a str,
+  pub original_news_title: &'a str,
 
   pub sqlite_pool: &'a SqlitePool,
 }
@@ -18,15 +19,18 @@ pub async fn insert_news_story_production(args: Args<'_>) -> AnyhowResult<()> {
 INSERT INTO news_story_productions (
   news_story_token,
   original_news_canonical_url,
+  original_news_title,
   overall_production_status
 )
 VALUES (
+  ?,
   ?,
   ?,
   "ready_waiting"
 )
         "#,
         news_story_token,
+        args.original_news_title,
         args.original_news_canonical_url
     );
 

@@ -70,6 +70,7 @@ pub async fn process_target_record(target: &WebScrapingTargetRecord, job_state: 
         news_story_token: &news_story_token,
         original_news_canonical_url: &target.canonical_url,
         // maybe_skip_reason, // TODO: Should I do this?
+        original_news_title: target.maybe_title.as_deref().unwrap_or(""),
         sqlite_pool: &job_state.sqlite_pool,
       }).await?;
 

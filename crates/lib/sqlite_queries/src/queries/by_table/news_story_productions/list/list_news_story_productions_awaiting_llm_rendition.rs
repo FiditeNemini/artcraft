@@ -22,6 +22,7 @@ SELECT
   id,
   news_story_token as `news_story_token: tokens::tokens::news_stories::NewsStoryToken`,
   original_news_canonical_url,
+  original_news_title,
   overall_production_status as `overall_production_status: enums::common::sqlite::awaitable_job_status::AwaitableJobStatus`,
   llm_rendition_status as `llm_rendition_status: enums::common::sqlite::awaitable_job_status::AwaitableJobStatus`,
   llm_rendition_attempts,

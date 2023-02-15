@@ -5,6 +5,7 @@ pub struct NewsStoryProductionItem {
   pub id: i64,
   pub news_story_token: NewsStoryToken,
   pub original_news_canonical_url: String,
+  pub original_news_title: String,
   pub overall_production_status: AwaitableJobStatus,
   pub llm_rendition_status: AwaitableJobStatus,
   pub llm_rendition_attempts: i64,
