@@ -1,7 +1,7 @@
-use enums::by_table::tts_render_targets::tts_render_status::TtsRenderStatus;
+use enums::by_table::tts_render_tasks::tts_render_status::TtsRenderStatus;
 use tokens::tokens::tts_render_tasks::TtsRenderTaskToken;
 
-pub struct TtsRenderTarget {
+pub struct TtsRenderTask {
   pub id: i64,
   pub token: TtsRenderTaskToken,
 

@@ -5,6 +5,6 @@ pub mod trending_model_analytics;
 pub mod user_ratings;
 
 // ===== Sqlite =====
-pub mod tts_render_targets;
+pub mod tts_render_tasks;
 pub mod web_rendition_targets;
 pub mod web_scraping_targets;

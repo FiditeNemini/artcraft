@@ -1,8 +1,5 @@
-use enums::by_table::web_scraping_targets::web_content_type::WebContentType;
-use enums::common::sqlite::skip_reason::SkipReason;
 use errors::{anyhow, AnyhowResult};
 use sqlx::SqlitePool;
-use enums::by_table::web_scraping_targets::scraping_status::ScrapingStatus;
 use tokens::tokens::news_stories::NewsStoryToken;
 use tokens::tokens::tts_models::TtsModelToken;
 use tokens::tokens::tts_render_tasks::TtsRenderTaskToken;
@@ -20,7 +17,7 @@ pub struct Args <'a> {
   pub sqlite_pool: &'a SqlitePool,
 }
 
-pub async fn insert_tts_render_target(args: Args<'_>) -> AnyhowResult<()> {
+pub async fn insert_tts_render_task(args: Args<'_>) -> AnyhowResult<()> {
   let news_story_token = args.news_story_token.to_string();
   let tts_voice_identifier= args.tts_voice_identifier.to_string();
 
@@ -28,7 +25,7 @@ pub async fn insert_tts_render_target(args: Args<'_>) -> AnyhowResult<()> {
 
   let query = sqlx::query!(
         r#"
-INSERT INTO tts_render_targets(
+INSERT INTO tts_render_tasks(
   token,
   story_type,
   story_token,

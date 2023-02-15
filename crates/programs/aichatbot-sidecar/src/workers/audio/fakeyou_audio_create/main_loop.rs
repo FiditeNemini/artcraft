@@ -1,9 +1,9 @@
 use crate::shared_state::job_state::JobState;
-use enums::by_table::tts_render_targets::tts_render_status::TtsRenderStatus;
+use enums::by_table::tts_render_tasks::tts_render_status::TtsRenderStatus;
 use enums::by_table::web_scraping_targets::scraping_status::ScrapingStatus;
 use errors::AnyhowResult;
 use log::{debug, error, info};
-use sqlite_queries::queries::by_table::tts_render_targets::list::list_tts_render_targets_awaiting_render::list_tts_render_targets_awaiting_render;
+use sqlite_queries::queries::by_table::tts_render_tasks::list::list_tts_render_tasks_awaiting_render::list_tts_render_tasks_awaiting_render;
 use sqlite_queries::queries::by_table::web_scraping_targets::insert_web_scraping_target::{Args, insert_web_scraping_target};
 use sqlite_queries::queries::by_table::web_scraping_targets::list_web_scraping_targets::WebScrapingTarget as WebScrapingTargetRecord;
 use sqlite_queries::queries::by_table::web_scraping_targets::list_web_scraping_targets::list_web_scraping_targets;
@@ -55,7 +55,7 @@ async fn scrape_jobs_of_status(status: TtsRenderStatus, job_state: &Arc<JobState
 
     debug!("fakeyou_audio_create querying {:?} targets from id > {} ...", &status, last_id);
 
-    let query_result = list_tts_render_targets_awaiting_render(
+    let query_result = list_tts_render_tasks_awaiting_render(
       status, last_id, BATCH_SIZE, &job_state.sqlite_pool).await;
 
     let targets = match query_result {

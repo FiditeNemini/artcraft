@@ -3,15 +3,15 @@ use errors::{anyhow, AnyhowResult};
 use fakeyou_client::api::tts_inference::CreateTtsInferenceRequest;
 use idempotency::uuid::generate_random_uuid;
 use log::{error, info};
-use sqlite_queries::queries::by_table::tts_render_targets::list::tts_render_target::TtsRenderTarget;
-use sqlite_queries::queries::by_table::tts_render_targets::update::update_tts_render_target_successfully_submitted::Args as SuccessArgs;
-use sqlite_queries::queries::by_table::tts_render_targets::update::update_tts_render_target_successfully_submitted::update_tts_render_target_successfully_submitted;
-use sqlite_queries::queries::by_table::tts_render_targets::update::update_tts_render_target_unsuccessfully_submitted::Args as UnsuccessfulArgs;
-use sqlite_queries::queries::by_table::tts_render_targets::update::update_tts_render_target_unsuccessfully_submitted::update_tts_render_target_unsuccessfully_submitted;
+use sqlite_queries::queries::by_table::tts_render_tasks::list::tts_render_task::TtsRenderTask;
+use sqlite_queries::queries::by_table::tts_render_tasks::update::update_tts_render_task_successfully_submitted::Args as SuccessArgs;
+use sqlite_queries::queries::by_table::tts_render_tasks::update::update_tts_render_task_successfully_submitted::update_tts_render_task_successfully_submitted;
+use sqlite_queries::queries::by_table::tts_render_tasks::update::update_tts_render_task_unsuccessfully_submitted::Args as UnsuccessfulArgs;
+use sqlite_queries::queries::by_table::tts_render_tasks::update::update_tts_render_task_unsuccessfully_submitted::update_tts_render_task_unsuccessfully_submitted;
 use std::sync::Arc;
 use tokens::tokens::tts_models::TtsModelToken;
 
-pub async fn process_single_record(target: &TtsRenderTarget, job_state: &Arc<JobState>) -> AnyhowResult<()> {
+pub async fn process_single_record(target: &TtsRenderTask, job_state: &Arc<JobState>) -> AnyhowResult<()> {
 
   info!("Posting FakeYou create TTS request...");
 
@@ -31,7 +31,7 @@ pub async fn process_single_record(target: &TtsRenderTarget, job_state: &Arc<Job
     Err(err) => {
       error!("problem submitting to FakeYou: {:}", err);
 
-      update_tts_render_target_unsuccessfully_submitted(UnsuccessfulArgs {
+      update_tts_render_task_unsuccessfully_submitted(UnsuccessfulArgs {
         tts_render_task_token: &target.token,
         tts_render_attempts,
         sqlite_pool: &job_state.sqlite_pool,
@@ -41,13 +41,13 @@ pub async fn process_single_record(target: &TtsRenderTarget, job_state: &Arc<Job
       if !res.success {
         error!("unknown problem in submitting to FakeYou");
 
-        update_tts_render_target_unsuccessfully_submitted(UnsuccessfulArgs {
+        update_tts_render_task_unsuccessfully_submitted(UnsuccessfulArgs {
           tts_render_task_token: &target.token,
           tts_render_attempts,
           sqlite_pool: &job_state.sqlite_pool,
         }).await?;
       } else {
-        update_tts_render_target_successfully_submitted(SuccessArgs {
+        update_tts_render_task_successfully_submitted(SuccessArgs {
           tts_render_task_token: &target.token,
           tts_inference_job_token: &res.inference_job_token.ok_or(anyhow!("no token"))?,
           sqlite_pool: &job_state.sqlite_pool,

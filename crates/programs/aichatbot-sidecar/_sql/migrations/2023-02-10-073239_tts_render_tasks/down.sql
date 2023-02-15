@@ -2,4 +2,4 @@
 -- noinspection SqlNoDataSourceInspectionForFile
 -- noinspection SqlResolveForFile
 
-DROP TABLE tts_render_targets;
+DROP TABLE tts_render_tasks;

@@ -7,31 +7,24 @@ use tokens::tokens::tts_render_tasks::TtsRenderTaskToken;
 pub struct Args <'a> {
   pub tts_render_task_token: &'a TtsRenderTaskToken,
 
-  pub tts_result_token: &'a str,
-
-  pub result_url: &'a str,
+  pub tts_inference_job_token: &'a str,
 
   pub sqlite_pool: &'a SqlitePool,
 }
 
-// TODO: Split inference + downloads
-
-pub async fn update_tts_render_target_successfully_downloaded(args: Args<'_>) -> AnyhowResult<()> {
+pub async fn update_tts_render_task_successfully_submitted(args: Args<'_>) -> AnyhowResult<()> {
   let query = sqlx::query!(
         r#"
-UPDATE tts_render_targets
+UPDATE tts_render_tasks
 SET
-  maybe_result_token = ?,
-  maybe_result_url = ?,
-
-  tts_render_status = "success",
+  maybe_inference_job_token = ?,
+  tts_render_status = "processing",
   tts_render_attempts = tts_render_attempts + 1,
   version = version + 1
 WHERE
   token = ?
         "#,
-        args.tts_result_token,
-        args.result_url,
+        args.tts_inference_job_token,
         args.tts_render_task_token,
     );
 

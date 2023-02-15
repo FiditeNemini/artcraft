@@ -1,7 +1,7 @@
 use enums::common::sqlite::awaitable_job_status::AwaitableJobStatus;
 use errors::{anyhow, AnyhowResult};
 use sqlx::SqlitePool;
-use enums::by_table::tts_render_targets::tts_render_status::TtsRenderStatus;
+use enums::by_table::tts_render_tasks::tts_render_status::TtsRenderStatus;
 use tokens::tokens::news_stories::NewsStoryToken;
 use tokens::tokens::tts_render_tasks::TtsRenderTaskToken;
 
@@ -12,12 +12,12 @@ pub struct Args <'a> {
   pub sqlite_pool: &'a SqlitePool,
 }
 
-pub async fn update_tts_render_target_unsuccessfully_submitted(args: Args<'_>) -> AnyhowResult<()> {
+pub async fn update_tts_render_task_unsuccessfully_submitted(args: Args<'_>) -> AnyhowResult<()> {
   let mut tts_render_status = next_status(args.tts_render_attempts);
 
   let query = sqlx::query!(
         r#"
-UPDATE tts_render_targets
+UPDATE tts_render_tasks
 SET
   tts_render_status = ?,
   tts_render_attempts = ?,

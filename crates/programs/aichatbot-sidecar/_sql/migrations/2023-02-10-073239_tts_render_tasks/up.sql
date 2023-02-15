@@ -4,7 +4,7 @@
 
 -- NB: These tables are designed for sqlite, not MySQL!
 
-CREATE TABLE tts_render_targets (
+CREATE TABLE tts_render_tasks (
   id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
 
   -- Effective primary key.
@@ -60,5 +60,5 @@ CREATE TABLE tts_render_targets (
   version INT DEFAULT 0 NOT NULL
 );
 
-CREATE INDEX index_tts_render_status ON tts_render_targets(tts_render_status);
-CREATE INDEX index_tts_render_foreign_key ON tts_render_targets(story_type, story_token);
+CREATE INDEX index_tts_render_status ON tts_render_tasks(tts_render_status);
+CREATE INDEX index_tts_render_foreign_key ON tts_render_tasks(story_type, story_token);

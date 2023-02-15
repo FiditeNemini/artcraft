@@ -6,7 +6,7 @@ use strum::EnumCount;
 #[cfg(test)]
 use strum::EnumIter;
 
-/// Used in the SqLite `web_scraping_targets` table in a `TEXT` field named `scraping_status`.
+/// Used in the SqLite `tts_render_tasks` table in a `TEXT` field named `tts_render_status`.
 #[cfg_attr(test, derive(EnumIter, EnumCount))]
 #[derive(Clone, Copy, Eq, PartialEq, Hash, Deserialize, Serialize)]
 pub enum TtsRenderStatus {
@@ -30,7 +30,7 @@ pub enum TtsRenderStatus {
   Success,
 }
 
-// TODO(bt, 2023-01-17): This desperately needs MySQL integration tests!
+// TODO(bt, 2023-01-17): This desperately needs Sqlite integration tests!
 impl_enum_display_and_debug_using_to_str!(TtsRenderStatus);
 impl_sqlite_enum_coders!(TtsRenderStatus);
 

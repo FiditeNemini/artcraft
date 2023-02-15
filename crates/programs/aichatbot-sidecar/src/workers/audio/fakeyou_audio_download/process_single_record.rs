@@ -4,15 +4,15 @@ use errors::{anyhow, AnyhowResult};
 use fakeyou_client::api::tts_inference::{CreateTtsInferenceRequest, TtsInferenceJobStatusStatePayload};
 use fakeyou_client::get_audio_url::get_audio_url;
 use log::{error, info};
-use sqlite_queries::queries::by_table::tts_render_targets::list::tts_render_target::TtsRenderTarget;
-use sqlite_queries::queries::by_table::tts_render_targets::update::update_tts_render_target_successfully_downloaded::Args;
-use sqlite_queries::queries::by_table::tts_render_targets::update::update_tts_render_target_successfully_downloaded::update_tts_render_target_successfully_downloaded;
+use sqlite_queries::queries::by_table::tts_render_tasks::list::tts_render_task::TtsRenderTask;
+use sqlite_queries::queries::by_table::tts_render_tasks::update::update_tts_render_task_successfully_downloaded::Args;
+use sqlite_queries::queries::by_table::tts_render_tasks::update::update_tts_render_task_successfully_downloaded::update_tts_render_task_successfully_downloaded;
 use std::sync::Arc;
 use tokens::tokens::news_stories::NewsStoryToken;
 use tokens::tokens::tts_models::TtsModelToken;
 use tokens::tokens::tts_render_tasks::TtsRenderTaskToken;
 
-pub async fn process_single_record(target: &TtsRenderTarget, job_state: &Arc<JobState>) -> AnyhowResult<()> {
+pub async fn process_single_record(target: &TtsRenderTask, job_state: &Arc<JobState>) -> AnyhowResult<()> {
 
   info!("Attempting to download audio...");
 
@@ -30,7 +30,7 @@ pub async fn process_single_record(target: &TtsRenderTarget, job_state: &Arc<Job
       error!("problem submitting to FakeYou: {:}", err);
 
       // TODO: Errors
-      //update_tts_render_target_unsuccessfully_submitted(UnsuccessfulArgs {
+      //update_tts_render_task_unsuccessfully_submitted(UnsuccessfulArgs {
       //  tts_render_task_token: &target.token,
       //  tts_render_attempts,
       //  sqlite_pool: &job_state.sqlite_pool,
@@ -41,7 +41,7 @@ pub async fn process_single_record(target: &TtsRenderTarget, job_state: &Arc<Job
         None => {
           error!("unknown problem in submitting to FakeYou");
           // TODO: Errors
-          //update_tts_render_target_unsuccessfully_submitted(UnsuccessfulArgs {
+          //update_tts_render_task_unsuccessfully_submitted(UnsuccessfulArgs {
           //  tts_render_task_token: &target.token,
           //  tts_render_attempts,
           //  sqlite_pool: &job_state.sqlite_pool,
@@ -57,7 +57,7 @@ pub async fn process_single_record(target: &TtsRenderTarget, job_state: &Arc<Job
   Ok(())
 }
 
-async fn process_download(target: &TtsRenderTarget, payload: &TtsInferenceJobStatusStatePayload, job_state: &Arc<JobState>) -> AnyhowResult<()> {
+async fn process_download(target: &TtsRenderTask, payload: &TtsInferenceJobStatusStatePayload, job_state: &Arc<JobState>) -> AnyhowResult<()> {
   let tts_result_token = match &payload.maybe_result_token {
     None => return Ok(()), // TODO: Wait
     Some(result_token) => result_token.to_string(),
@@ -86,7 +86,7 @@ async fn process_download(target: &TtsRenderTarget, payload: &TtsInferenceJobSta
     std::io::copy(&mut content, &mut file)?;
   }
 
-  update_tts_render_target_successfully_downloaded(Args {
+  update_tts_render_task_successfully_downloaded(Args {
     tts_render_task_token: &target.token,
     tts_result_token: &tts_result_token,
     result_url: &audio_url,
