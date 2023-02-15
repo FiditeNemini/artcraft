@@ -754,6 +754,7 @@ dependencies = [
  "http_server_common",
  "idempotency",
  "log",
+ "media",
  "once_cell",
  "path-absolutize",
  "regex",

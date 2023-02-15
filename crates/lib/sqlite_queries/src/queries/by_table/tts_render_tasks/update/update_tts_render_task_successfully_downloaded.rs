@@ -11,6 +11,8 @@ pub struct Args <'a> {
 
   pub result_url: &'a str,
 
+  pub audio_duration_millis: i64,
+
   pub sqlite_pool: &'a SqlitePool,
 }
 
@@ -23,6 +25,7 @@ UPDATE tts_render_tasks
 SET
   maybe_result_token = ?,
   maybe_result_url = ?,
+  maybe_audio_duration_millis = ?,
 
   tts_render_status = "success",
   tts_render_attempts = tts_render_attempts + 1,
@@ -32,6 +35,7 @@ WHERE
         "#,
         args.tts_result_token,
         args.result_url,
+        args.audio_duration_millis,
         args.tts_render_task_token,
     );
 

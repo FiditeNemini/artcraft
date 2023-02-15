@@ -8,6 +8,7 @@ use sqlite_queries::queries::by_table::tts_render_tasks::list::tts_render_task::
 use sqlite_queries::queries::by_table::tts_render_tasks::update::update_tts_render_task_successfully_downloaded::Args;
 use sqlite_queries::queries::by_table::tts_render_tasks::update::update_tts_render_task_successfully_downloaded::update_tts_render_task_successfully_downloaded;
 use std::sync::Arc;
+use media::decode_basic_audio_info::decode_basic_audio_info;
 use tokens::tokens::news_stories::NewsStoryToken;
 use tokens::tokens::tts_models::TtsModelToken;
 use tokens::tokens::tts_render_tasks::TtsRenderTaskToken;
@@ -76,20 +77,31 @@ async fn process_download(target: &TtsRenderTask, payload: &TtsInferenceJobStatu
     std::fs::create_dir_all(&directory)?;
   }
 
-  {
-    let download_filename = job_state.save_directory
-        .audio_wav_file_for_news_story(&news_story_token, target.sequence_order)?;
+  let download_filename = job_state.save_directory
+      .audio_wav_file_for_news_story(&news_story_token, target.sequence_order)?;
 
+  {
     let response = reqwest::get(&audio_url).await?;
-    let mut file = std::fs::File::create(download_filename)?;
+    let mut file = std::fs::File::create(&download_filename)?;
     let mut content =  Cursor::new(response.bytes().await?);
     std::io::copy(&mut content, &mut file)?;
   }
+
+  let audio_info = {
+    let bytes = std::fs::read(&download_filename)?;
+    decode_basic_audio_info(
+      &bytes,
+      Some("audio/wav"),
+      Some(".wav"))?
+  };
+
+  let audio_duration_millis = audio_info.duration_millis.unwrap_or(0) as i64;
 
   update_tts_render_task_successfully_downloaded(Args {
     tts_render_task_token: &target.token,
     tts_result_token: &tts_result_token,
     result_url: &audio_url,
+    audio_duration_millis,
     sqlite_pool: &job_state.sqlite_pool,
   }).await?;
 

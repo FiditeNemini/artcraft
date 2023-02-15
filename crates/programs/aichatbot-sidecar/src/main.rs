@@ -69,9 +69,9 @@ async fn test() -> AnyhowResult<()> {
 pub const LOG_LEVEL: &'static str = concat!(
   "info,",
   "actix_web=info,",
+  "symphonia_core=warn,", // Symphonia is spammy af.
   "sqlx::query=warn,", // SQLX logs all queries as "info", which is super spammy
   "hyper::proto::h1::io=warn,",
-  "storyteller_web::threads::db_health_checker_thread::db_health_checker_thread=warn,",
   "http_server_common::request::get_request_ip=info," // Debug spams Rust logs
 );
 

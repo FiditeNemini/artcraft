@@ -49,6 +49,9 @@ CREATE TABLE tts_render_tasks (
   -- This is relative to the runtime data directory.
   maybe_result_relative_filesystem_location TEXT,
 
+  -- When the file is downloaded, the duration in milliseconds.
+  maybe_audio_duration_millis INTEGER,
+
   -- TTS render status: "new", "processing", "failed", "permanently_failed", "success", "skipped"
   tts_render_status TEXT DEFAULT "new" NOT NULL,
   tts_render_attempts INT DEFAULT 0 NOT NULL,

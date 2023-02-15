@@ -23,6 +23,7 @@ pub struct TtsRenderTask {
   pub maybe_result_token: Option<String>,
   pub maybe_result_url: Option<String>,
   pub maybe_result_relative_filesystem_location: Option<String>,
+  pub maybe_audio_duration_millis: Option<i64>,
 
   // TODO: This status appears to be an ill-fit for this job system.
   //  It can't function over *two* queues (render/download) and has weird enum states.

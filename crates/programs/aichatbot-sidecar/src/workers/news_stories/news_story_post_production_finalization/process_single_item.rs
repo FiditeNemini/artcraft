@@ -30,9 +30,14 @@ pub async fn process_single_item(target: &NewsStoryProductionItem, job_state: &A
     &story_token,
     &job_state.sqlite_pool).await?;
 
+  let audio_total_duration_millis : i64 = tts_render_tasks.iter()
+      .map(|task| task.maybe_audio_duration_millis.unwrap_or(0))
+      .sum();
+
+  let audio_total_duration_seconds = audio_total_duration_millis / 1000;
+
   // TODO: Include new column "tts_render_tasks.sequence_length" to verify. Math.max() it.
   let audio_file_count = tts_render_tasks.len() as i64;
-  let audio_total_duration_seconds = 0; // TODO
 
   let replayable_until = Utc::now().add(*STORY_FRESHNESS_THRESHOLD);
 
