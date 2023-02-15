@@ -19,6 +19,7 @@ CREATE TABLE news_stories (
   audio_file_count INTEGER NOT NULL,
 
   -- Total amount of time in the audio files.
+  -- NB: This is seconds, not millis!
   audio_total_duration_seconds INTEGER NOT NULL,
 
   -- When the story should stop being scheduled.

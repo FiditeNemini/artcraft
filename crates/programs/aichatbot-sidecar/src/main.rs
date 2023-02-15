@@ -107,6 +107,8 @@ pub async fn main() -> AnyhowResult<()> {
       .max_connections(5)
       .connect(&database_url).await?;
 
+  let pool2 = pool.clone(); // NB: Clone-safe.
+
   let job_state = Arc::new(JobState {
     openai_client: openai_client.clone(),
     fakeyou_client: fakeyou_client.clone(),
@@ -188,6 +190,7 @@ pub async fn main() -> AnyhowResult<()> {
       app_control_state: app_control_state2,
       openai_client: openai_client2,
       save_directory,
+      sqlite_pool: pool2.clone(),
     });
 
     let runtime = actix_web::rt::System::new();
