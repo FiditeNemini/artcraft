@@ -30,8 +30,8 @@ VALUES (
 )
         "#,
         news_story_token,
+        args.original_news_canonical_url,
         args.original_news_title,
-        args.original_news_canonical_url
     );
 
   let query_result = query.execute(args.sqlite_pool)
