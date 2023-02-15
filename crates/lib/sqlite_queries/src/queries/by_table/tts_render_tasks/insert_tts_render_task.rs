@@ -8,7 +8,11 @@ pub struct Args <'a> {
   // TODO: This will be multiple types in the future
   pub news_story_token: &'a NewsStoryToken,
 
+  // 1-indexed offset of the audio file within the total speech
   pub sequence_order: i64,
+
+  // Total number of wav file items in the speech
+  pub sequence_length: i64,
 
   pub tts_voice_identifier: &'a TtsModelToken,
 
@@ -30,6 +34,7 @@ INSERT INTO tts_render_tasks(
   story_type,
   story_token,
   sequence_order,
+  sequence_length,
   tts_service,
   tts_voice_identifier,
   full_text
@@ -37,6 +42,7 @@ INSERT INTO tts_render_tasks(
 VALUES (
   ?,
   "news_story",
+  ?,
   ?,
   ?,
   "fakeyou",
@@ -47,6 +53,7 @@ VALUES (
         tts_render_task_token,
         news_story_token,
         args.sequence_order,
+        args.sequence_length,
         tts_voice_identifier,
         args.full_text
     );
