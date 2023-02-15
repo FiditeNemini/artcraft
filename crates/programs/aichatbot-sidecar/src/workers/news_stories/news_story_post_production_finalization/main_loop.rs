@@ -1,22 +1,23 @@
 use crate::shared_state::job_state::JobState;
-use crate::workers::news_stories::news_story_audio_final_verification::process_single_item::process_single_item;
+use crate::workers::news_stories::news_story_post_production_finalization::process_single_item::process_single_item;
 use enums::by_table::web_rendition_targets::rendition_status::RenditionStatus;
 use enums::common::sqlite::awaitable_job_status::AwaitableJobStatus;
 use log::{debug, error, info};
 use sqlite_queries::queries::by_table::news_story_productions::list::list_news_story_productions_awaiting_audio_final_verification::list_news_story_productions_awaiting_audio_final_verification;
 use sqlite_queries::queries::by_table::news_story_productions::list::list_news_story_productions_awaiting_llm_rendition::list_news_story_productions_awaiting_llm_rendition;
+use sqlite_queries::queries::by_table::news_story_productions::list::list_news_story_productions_ready_for_debut::list_news_story_productions_ready_for_debut;
 use std::sync::Arc;
 use std::thread;
 use std::time::Duration;
 
-/// Verify all audio files have been requested, generated, and downloaded.
-pub async fn news_story_audio_final_verification_main_loop(job_state: Arc<JobState>) {
+/// Find in-production stories with all tasks done, then promote them to stories
+pub async fn news_story_post_production_finalization_main_loop(job_state: Arc<JobState>) {
   loop {
-    debug!("news_story_audio_final_verification main loop");
+    debug!("news_story_post_production main loop");
 
     query_all_batches(&job_state).await;
 
-    debug!("news_story_audio_final_verification loop finished; waiting...");
+    debug!("news_story_post_production loop finished; waiting...");
     thread::sleep(Duration::from_secs(1));
   }
 }
@@ -31,9 +32,9 @@ async fn query_all_batches(job_state: &Arc<JobState>) {
     // NB: Protect sqlite from contention.
     thread::sleep(Duration::from_millis(500));
 
-    debug!("audio_final_verification querying targets from id > {} ...", last_id);
+    debug!("news_story_post_production querying targets from id > {} ...", last_id);
 
-    let query_result = list_news_story_productions_awaiting_audio_final_verification(
+    let query_result = list_news_story_productions_ready_for_debut(
       last_id, BATCH_SIZE, &job_state.sqlite_pool).await;
 
     let targets = match query_result {
@@ -62,7 +63,7 @@ async fn query_all_batches(job_state: &Arc<JobState>) {
     }
 
     for target in targets {
-      debug!("Audio verification for target: {:?}", target.original_news_canonical_url);
+      debug!("Final post production for target: {:?}", target.original_news_canonical_url);
 
       let result = process_single_item(&target, job_state).await;
       if let Err(err) = result {
@@ -71,7 +72,7 @@ async fn query_all_batches(job_state: &Arc<JobState>) {
 
       last_id = target.id;
 
-      thread::sleep(Duration::from_millis(100));
+      thread::sleep(Duration::from_millis(200));
     }
   }
 }

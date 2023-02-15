@@ -42,6 +42,7 @@ use web_scrapers::sites::theguardian::theguardian_scraper::theguardian_scraper_t
 use crate::workers::audio::fakeyou_audio_create::main_loop::fakeyou_audio_create_main_loop;
 use crate::workers::audio::fakeyou_audio_download::main_loop::fakeyou_audio_download_main_loop;
 use crate::workers::news_stories::news_story_audio_final_verification::main_loop::news_story_audio_final_verification_main_loop;
+use crate::workers::news_stories::news_story_post_production_finalization::main_loop::news_story_post_production_finalization_main_loop;
 
 //#[tokio::main]
 //pub async fn main() -> AnyhowResult<()> {
@@ -124,7 +125,7 @@ pub async fn main() -> AnyhowResult<()> {
   // Thus, we launch everything else into its own thread.
   thread::spawn(move || {
     let tokio_runtime = Builder::new_multi_thread()
-        .worker_threads(8)
+        .worker_threads(16)
         .thread_name("tokio-worker")
         .thread_stack_size(3 * 1024 * 1024)
         .enable_time()
@@ -140,6 +141,7 @@ pub async fn main() -> AnyhowResult<()> {
     let job_state7 = job_state.clone();
     let job_state8 = job_state.clone();
     let job_state9 = job_state.clone();
+    let job_state10 = job_state.clone();
 
     tokio_runtime.spawn(async {
       let _r = web_index_ingestion_main_loop(job_state2).await;
@@ -173,6 +175,9 @@ pub async fn main() -> AnyhowResult<()> {
       let _r = news_story_audio_final_verification_main_loop(job_state9).await;
     });
 
+    tokio_runtime.spawn(async {
+      let _r = news_story_post_production_finalization_main_loop(job_state10).await;
+    });
 
     // TODO: Final scheduling thread
     //tokio_runtime.spawn(async {

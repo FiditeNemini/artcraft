@@ -97,7 +97,7 @@ async fn scrape_jobs_of_status(status: TtsRenderStatus, job_state: &Arc<JobState
 
       last_id = target.id;
 
-      thread::sleep(Duration::from_secs(3));
+      thread::sleep(Duration::from_secs(1));
     }
   }
 }

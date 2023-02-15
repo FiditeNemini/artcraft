@@ -91,7 +91,7 @@ async fn query_and_process_jobs(job_state: &Arc<JobState>) {
 
       last_id = target.id;
 
-      thread::sleep(Duration::from_secs(3));
+      thread::sleep(Duration::from_secs(1));
     }
   }
 }
