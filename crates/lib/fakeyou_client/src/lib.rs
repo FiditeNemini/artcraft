@@ -20,6 +20,7 @@
 #[macro_use] extern crate serde_derive;
 
 pub mod api;
+pub mod credentials;
 pub mod fakeyou_api_client;
 pub mod get_audio_url;
 

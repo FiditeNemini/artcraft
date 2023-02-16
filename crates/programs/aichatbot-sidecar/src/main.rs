@@ -35,6 +35,7 @@ use std::sync::Arc;
 use std::thread;
 use std::time::Duration;
 use tokio::runtime::{Builder, Runtime};
+use fakeyou_client::credentials::FakeYouCredentials;
 use fakeyou_client::fakeyou_api_client::FakeYouApiClient;
 use web_scrapers::sites::cnn::cnn_article_scraper::cnn_article_scraper;
 use web_scrapers::sites::techcrunch::techcrunch_article_scraper::techcrunch_article_scraper;
@@ -96,8 +97,11 @@ pub async fn main() -> AnyhowResult<()> {
 
   let openai_client = Arc::new(openai_client);
 
-  let fakeyou_client = Arc::new(FakeYouApiClient::make_production_client(
-    &startup_args.fakeyou_api_token));
+  let fakeyou_credentials = FakeYouCredentials::from_session_cookie_payload(
+    &startup_args.fakeyou_session_cookie_payload);
+
+  let fakeyou_client =
+      Arc::new(FakeYouApiClient::make_production_client_from_credentials(fakeyou_credentials)?);
 
   let save_directory = SaveDirectory::new(&startup_args.save_directory);
 
