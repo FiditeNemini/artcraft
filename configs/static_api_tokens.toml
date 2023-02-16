@@ -15,6 +15,15 @@
 
 # ==================== IMPORTANT ====================
 
+# /profile/news_story (FakeYou Channels: News)
+# This is our own account.
+[[api_tokens]]
+api_token = "SAPI:FAKEYOU_NEWS_CHANNEL_74A3AF"
+maybe_user_token = 'U:XAWRARC1N89X6'
+maybe_priority_level = 30
+#maybe_disable_rate_limiter = true
+maybe_use_high_priority_rate_limiter = true
+
 # /profile/api_vidvoiceai (VidVoice.ai)
 # Requested 2022-05-27 in Discord
 # Startup raising "institutional capital"
