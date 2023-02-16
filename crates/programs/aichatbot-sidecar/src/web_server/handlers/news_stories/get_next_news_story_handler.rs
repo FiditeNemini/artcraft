@@ -5,13 +5,13 @@ use crate::shared_state::app_control_state::AppControlState;
 use crate::web_server::server_state::ServerState;
 use files::file_exists::file_exists;
 use http_server_common::response::serialize_as_json_error::serialize_as_json_error;
-use log::{error, info};
+use log::{error, info, warn};
 use rand::seq::SliceRandom;
 use sqlite_queries::queries::by_table::news_stories::list_news_stories_replayable::list_news_stories_replayable;
 use std::sync::Arc;
 use tokens::tokens::news_stories::NewsStoryToken;
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Debug)]
 pub struct GetNextNewsStoryQuery {
   pub news_story_token: Option<NewsStoryToken>,
 }
@@ -56,6 +56,8 @@ pub async fn get_next_news_story_handler(
   server_state: web::Data<Arc<ServerState>>,
   query: Query<GetNextNewsStoryQuery>,
 ) -> Result<HttpResponse, GetNextNewsStoryFileError> {
+
+  warn!("get_next_news_story_handler() : {:?}", &query);
 
   let stories = list_news_stories_replayable(&server_state.sqlite_pool)
       .await

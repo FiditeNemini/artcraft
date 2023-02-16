@@ -16,7 +16,7 @@ use sqlite_queries::queries::by_table::tts_render_tasks::list::tts_render_task::
 use tokens::tokens::news_stories::NewsStoryToken;
 use crate::web_server::handlers::misc::get_next_audio_file_handler::GetNextAudioFileError;
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Debug)]
 pub struct GetNextNewsStoryAudioFileQuery {
   /// News Story Token. REQUIRED.
   pub news_story_token: Option<NewsStoryToken>,
@@ -85,6 +85,8 @@ pub async fn get_next_news_story_audio_file_handler(
   server_state: web::Data<Arc<ServerState>>,
   query: Query<GetNextNewsStoryAudioFileQuery>,
 ) -> Result<HttpResponse, GetNextNewsStoryAudioFileError> {
+
+  warn!("get_next_news_story_audio_file_handler() : {:?}", &query);
 
   let news_story_token = query.news_story_token
       .clone()
