@@ -1,1 +1,2 @@
+pub mod get_next_news_story_audio_file_handler;
 pub mod get_next_news_story_handler;

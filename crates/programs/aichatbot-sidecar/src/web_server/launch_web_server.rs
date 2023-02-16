@@ -12,6 +12,7 @@ use errors::AnyhowResult;
 use http_server_common::endpoints::root_index::get_root_index;
 use std::sync::Arc;
 use sqlx::{Pool, Sqlite};
+use crate::web_server::handlers::news_stories::get_next_news_story_audio_file_handler::get_next_news_story_audio_file_handler;
 
 pub struct LaunchWebServerArgs {
   pub app_control_state: Arc<AppControlState>,
@@ -43,6 +44,7 @@ pub async fn launch_web_server(args: LaunchWebServerArgs) -> AnyhowResult<()> {
         .add_post("/next_audio", next_audio_file_handler)
         .add_get("/openai", openai_inference_handler)
         .add_get("/news_story/next_story", get_next_news_story_handler)
+        .add_get("/news_story/audio", get_next_news_story_audio_file_handler)
         .into_app();
 
     /*app.service(

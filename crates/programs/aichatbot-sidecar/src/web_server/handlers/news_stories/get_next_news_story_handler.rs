@@ -13,7 +13,7 @@ use tokens::tokens::news_stories::NewsStoryToken;
 
 #[derive(Deserialize)]
 pub struct GetNextNewsStoryQuery {
-  pub news_story_token: Option<String>,
+  pub news_story_token: Option<NewsStoryToken>,
 }
 
 #[derive(Serialize)]
@@ -68,47 +68,6 @@ pub async fn get_next_news_story_handler(
 
   let story = stories.choose(&mut rand::thread_rng())
       .ok_or(GetNextNewsStoryFileError::ServerError)?;
-
-
-
-//  info!("Requested cursor: {}", request.cursor);
-//
-//  let is_paused = control_state.is_paused()
-//      .map_err(|err| {
-//        error!("Error: {:?}", err);
-//        GetNextNewsStoryFileError::ServerError
-//      })?;
-//
-//
-//  let audio_file_dir = server_state.save_directory.get_audio_files_dir_v1();
-//
-//  let maybe_audio_filename = format!("{}.wav", request.cursor);
-//  let maybe_audio_filename = audio_file_dir.join(maybe_audio_filename);
-//
-//  info!("Hypothetical audio file: {:?}", maybe_audio_filename);
-//
-//  let mut next_cursor;
-//  let mut audio_filename : Option<String> = None;
-//  let mut audio_filename_unixy : Option<String> = None;
-//
-//  if file_exists(&maybe_audio_filename) {
-//    next_cursor = request.cursor + 1;
-//    audio_filename = maybe_audio_filename.to_str()
-//        .map(|s| s.to_string());
-//    audio_filename_unixy = audio_filename.as_deref()
-//        .map(|s| s.to_string())
-//        .map(|s| s.replace("\\", "/"));
-//  } else {
-//    next_cursor = 0;
-//    audio_filename = None;
-//  };
-//
-//  let maybe_next_audio_filename = format!("{}.wav", next_cursor);
-//  let maybe_next_audio_filename = audio_file_dir.join(maybe_next_audio_filename);
-//
-//  if !file_exists(&maybe_next_audio_filename) {
-//    next_cursor = 0;
-//  }
 
   let response = GetNextNewsStoryFileResponse {
     success: true,
