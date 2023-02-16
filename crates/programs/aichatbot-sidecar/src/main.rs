@@ -104,7 +104,7 @@ pub async fn main() -> AnyhowResult<()> {
   let database_url = easyenv::get_env_string_required("DATABASE_URL")?;
 
   let pool = SqlitePoolOptions::new()
-      .max_connections(5)
+      .max_connections(16)
       .connect(&database_url).await?;
 
   let pool2 = pool.clone(); // NB: Clone-safe.
