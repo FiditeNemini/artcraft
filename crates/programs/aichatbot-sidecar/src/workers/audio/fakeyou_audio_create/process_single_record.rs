@@ -21,7 +21,7 @@ pub async fn process_single_record(target: &TtsRenderTask, job_state: &Arc<JobSt
 
   let result = job_state
       .fakeyou_client
-      .create_tts_inference(CreateTtsInferenceRequest {
+      .create_tts_inference_with_backoff(CreateTtsInferenceRequest {
         uuid_idempotency_token: &uuid_idempotency_token,
         tts_model_token: &tts_model_token,
         inference_text: &target.full_text,
@@ -39,7 +39,7 @@ pub async fn process_single_record(target: &TtsRenderTask, job_state: &Arc<JobSt
     },
     Ok(res) => {
       if !res.success {
-        error!("unknown problem in submitting to FakeYou");
+        error!("unknown problem in submitting TTS request to FakeYou");
 
         update_tts_render_task_unsuccessfully_submitted(UnsuccessfulArgs {
           tts_render_task_token: &target.token,

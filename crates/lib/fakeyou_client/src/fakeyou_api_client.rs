@@ -1,9 +1,12 @@
-use std::sync::Arc;
+use backoff::future::retry;
+use backoff::{ExponentialBackoff, ExponentialBackoffBuilder};
 use crate::api::tts_inference::{CreateTtsInferenceRequest, CreateTtsInferenceResponse, TtsInferenceJobStatus};
-use errors::AnyhowResult;
-use reqwest::{Client, ClientBuilder, RequestBuilder, Url};
-use reqwest::cookie::Jar;
 use crate::credentials::FakeYouCredentials;
+use errors::{anyhow, AnyhowResult};
+use reqwest::cookie::Jar;
+use reqwest::{Client, ClientBuilder, RequestBuilder, Url};
+use std::sync::Arc;
+use std::time::Duration;
 
 const AUTHORIZATION_HEADER: &'static str = "Authorization";
 const SESSION_COOKIE_NAME : &'static str = "session";
@@ -55,18 +58,37 @@ impl FakeYouApiClient {
 
   // TODO: need to yield better, more "library"-appropriate errors.
   pub async fn create_tts_inference(&self, request: CreateTtsInferenceRequest<'_>) -> AnyhowResult<CreateTtsInferenceResponse> {
-    let url = format!("https://{}/tts/inference", self.api_domain);
+    let response = self.do_create_tts_inference(&request).await?;
+    let response = serde_json::from_str(&response)?;
+    Ok(response)
+  }
 
+  pub async fn create_tts_inference_with_backoff(&self, request: CreateTtsInferenceRequest<'_>) -> AnyhowResult<CreateTtsInferenceResponse> {
+    //let backoff = ExponentialBackoff::default();
+    let mut backoff = ExponentialBackoffBuilder::new()
+        .with_initial_interval(Duration::from_secs(3)) // Initial retry interval: 3 seconds
+        .with_randomization_factor(0.5) // 50% below, 50% above interval
+        .with_multiplier(2.0) // Double the wait
+        .with_max_elapsed_time(Some(Duration::from_secs(60)))
+        //.with_max_interval(Duration::from_secs(30))
+        .build();
+    let response = retry(backoff, || async {
+      Ok(self.do_create_tts_inference(&request).await?)
+    }).await?;
+
+    let response = serde_json::from_str(&response)?;
+    Ok(response)
+  }
+
+  pub async fn do_create_tts_inference(&self, request: &CreateTtsInferenceRequest<'_>) -> Result<String, reqwest::Error> {
+    let url = format!("https://{}/tts/inference", self.api_domain);
     let response = self.add_credentials(self.client
         .post(url))
-        .json(&request)
+        .json(request)
         .send()
         .await?
         .text()
         .await?;
-
-    let response = serde_json::from_str(&response)?;
-
     Ok(response)
   }
 

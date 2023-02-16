@@ -40,7 +40,7 @@ pub async fn process_single_record(target: &TtsRenderTask, job_state: &Arc<JobSt
     Ok(res) => {
       match res.state {
         None => {
-          error!("unknown problem in submitting to FakeYou");
+          error!("unknown problem in checking FakeYou TTS inference job status");
           // TODO: Errors
           //update_tts_render_task_unsuccessfully_submitted(UnsuccessfulArgs {
           //  tts_render_task_token: &target.token,
