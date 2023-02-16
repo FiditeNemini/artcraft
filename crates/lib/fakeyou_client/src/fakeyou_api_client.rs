@@ -2,11 +2,12 @@ use backoff::future::retry;
 use backoff::{ExponentialBackoff, ExponentialBackoffBuilder};
 use crate::api::tts_inference::{CreateTtsInferenceRequest, CreateTtsInferenceResponse, TtsInferenceJobStatus};
 use crate::credentials::FakeYouCredentials;
-use errors::{anyhow, AnyhowResult};
+use errors::{anyhow, AnyhowError, AnyhowResult};
 use reqwest::cookie::Jar;
-use reqwest::{Client, ClientBuilder, RequestBuilder, Url};
+use reqwest::{Client, ClientBuilder, RequestBuilder, StatusCode, Url};
 use std::sync::Arc;
 use std::time::Duration;
+use log::{error, warn};
 
 const AUTHORIZATION_HEADER: &'static str = "Authorization";
 const SESSION_COOKIE_NAME : &'static str = "session";
@@ -72,23 +73,34 @@ impl FakeYouApiClient {
         .with_max_elapsed_time(Some(Duration::from_secs(60)))
         //.with_max_interval(Duration::from_secs(30))
         .build();
+
     let response = retry(backoff, || async {
-      Ok(self.do_create_tts_inference(&request).await?)
+      Ok(self.do_create_tts_inference(&request).await
+          .map_err(|err| {
+            //warn!("reqwest err: {:?}", err);
+            err
+          })?
+      )
     }).await?;
 
     let response = serde_json::from_str(&response)?;
     Ok(response)
   }
 
-  pub async fn do_create_tts_inference(&self, request: &CreateTtsInferenceRequest<'_>) -> Result<String, reqwest::Error> {
+  pub async fn do_create_tts_inference(&self, request: &CreateTtsInferenceRequest<'_>) -> Result<String, AnyhowError> {
     let url = format!("https://{}/tts/inference", self.api_domain);
     let response = self.add_credentials(self.client
         .post(url))
         .json(request)
         .send()
-        .await?
-        .text()
         .await?;
+
+    match response.status().as_u16() {
+      200 => { /* Okay */ }
+      _ => return Err(anyhow!("bad status: {}", response.status())),
+    };
+
+    let response = response.text().await?;
     Ok(response)
   }
 

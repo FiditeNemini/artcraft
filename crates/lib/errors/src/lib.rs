@@ -22,6 +22,8 @@
 /// (Naming things "Result" pollutes the import scope or requires nasty renames. Gross.)
 pub type AnyhowResult<T> = anyhow::Result<T>;
 
+pub type AnyhowError = anyhow::Error;
+
 /// Useful re-export.
 pub use anyhow::anyhow;
 pub use anyhow::bail;
