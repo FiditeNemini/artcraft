@@ -16,7 +16,7 @@ pub struct GetNextNewsStoryQuery {
   pub news_story_token: Option<NewsStoryToken>,
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, Debug)]
 pub struct GetNextNewsStoryFileResponse {
   pub success: bool,
   pub news_story_token: NewsStoryToken,
@@ -79,6 +79,8 @@ pub async fn get_next_news_story_handler(
     audio_file_count: story.audio_file_count as u64,
     audio_total_duration_seconds: story.audio_total_duration_seconds as u64,
   };
+
+  warn!("Response: {:?}", &response);
 
   let body = serde_json::to_string(&response)
       .map_err(|e| GetNextNewsStoryFileError::ServerError)?;
