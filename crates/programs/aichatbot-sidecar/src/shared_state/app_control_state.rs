@@ -1,6 +1,7 @@
 use std::sync::{Arc, LockResult, RwLock};
 use concurrency::relaxed_atomic_bool::RelaxedAtomicBool;
 use errors::{anyhow, AnyhowResult};
+use crate::configs::fakeyou_voice_option::FakeYouVoiceOption;
 
 /// User-controlled parameters that determine how the app behaves at runtime.
 #[derive(Clone)]
@@ -20,6 +21,9 @@ pub struct AppControlState {
 
   /// Whether calls to FakeYou should be paused.
   is_fakeyou_paused: RelaxedAtomicBool,
+
+  /// Option of which voice to use for TTS.
+  fakeyou_voice: Arc<RwLock<FakeYouVoiceOption>>,
 }
 
 impl AppControlState {
@@ -31,6 +35,7 @@ impl AppControlState {
       is_scraping_paused: RelaxedAtomicBool::new(false),
       is_openai_paused: RelaxedAtomicBool::new(false),
       is_fakeyou_paused: RelaxedAtomicBool::new(false),
+      fakeyou_voice: Arc::new(RwLock::new(FakeYouVoiceOption::Hanashi)),
     }
   }
 
@@ -81,5 +86,22 @@ impl AppControlState {
 
   pub fn set_is_fakeyou_paused(&self, new_value: bool) {
     self.is_fakeyou_paused.set(new_value)
+  }
+
+  pub fn fakeyou_voice(&self) -> AnyhowResult<FakeYouVoiceOption> {
+    match self.fakeyou_voice.read() {
+      Ok(value) => Ok(*value),
+      Err(err) => Err(anyhow!("lock error: {:?}", err)),
+    }
+  }
+
+  pub fn set_fakeyou_voice(&self, new_value: FakeYouVoiceOption) -> AnyhowResult<()> {
+    match self.fakeyou_voice.write() {
+      Ok(mut value) => {
+        *value = new_value;
+        Ok(())
+      },
+      Err(err) => Err(anyhow!("lock error: {:?}", err)),
+    }
   }
 }

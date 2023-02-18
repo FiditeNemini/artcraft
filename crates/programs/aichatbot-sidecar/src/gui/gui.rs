@@ -56,6 +56,8 @@ impl eframe::App for AppGui {
     self.control_state.set_is_openai_paused(self.is_openai_paused);
     self.control_state.set_is_fakeyou_paused(self.is_fakeyou_paused);
 
+    let _r = self.control_state.set_fakeyou_voice(self.fakeyou_voice); // NB: Ignore lock errors.
+
     egui::CentralPanel::default().show(ctx, |ui| {
       //ui.heading("AiChatBot Sidecar");
       //ui.horizontal(|ui| {
@@ -77,7 +79,7 @@ impl eframe::App for AppGui {
 
       ui.add_space(10.0);
       ui.heading("Sidecar Pause Controls");
-      ui.add_space(10.0);
+      ui.add_space(7.0);
 
       ui.horizontal(|ui| {
         ui.checkbox(&mut self.is_scraping_paused, "Web Scraping");
@@ -89,16 +91,16 @@ impl eframe::App for AppGui {
         ui.checkbox(&mut self.is_fakeyou_paused, "FakeYou API");
       });
 
-      ui.add_space(10.0);
+      ui.add_space(20.0);
       ui.heading("Unreal Pause Controls");
-      ui.add_space(10.0);
+      ui.add_space(7.0);
       ui.horizontal(|ui| {
         ui.checkbox(&mut self.is_unreal_paused, "TODO: This does not work yet.");
       });
 
-      ui.add_space(10.0);
+      ui.add_space(20.0);
       ui.heading("FakeYou Voice");
-      ui.add_space(10.0);
+      ui.add_space(7.0);
 
       egui::ComboBox::from_label("Note: once a story is generated, it will not be re-voiced!")
           .selected_text(format!("{:?}", self.fakeyou_voice))
@@ -108,15 +110,6 @@ impl eframe::App for AppGui {
           });
 
       ui.add_space(30.0);
-      ui.heading(".");
     });
   }
-}
-
-
-#[derive(Copy, Clone, Debug, PartialEq, Eq)]
-pub enum TestOption {
-  First,
-  Second,
-  Third
 }

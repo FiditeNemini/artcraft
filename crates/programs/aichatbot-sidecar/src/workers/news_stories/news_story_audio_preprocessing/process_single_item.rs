@@ -8,6 +8,7 @@ use sqlite_queries::queries::by_table::news_story_productions::update::update_ne
 use sqlite_queries::queries::by_table::tts_render_tasks::insert_tts_render_task::Args as InsertArgs;
 use sqlite_queries::queries::by_table::tts_render_tasks::insert_tts_render_task::insert_tts_render_task;
 use tokens::tokens::tts_models::TtsModelToken;
+use crate::configs::fakeyou_voice_option::FakeYouVoiceOption;
 use crate::persistence::rendition_data::RenditionData;
 use crate::persistence::speakable_monologue::SpeakableMonologue;
 use crate::shared_state::job_state::JobState;
@@ -46,8 +47,10 @@ pub async fn process_single_item(target: &NewsStoryProductionItem, job_state: &A
     speakable_monologue.write_to_yaml_file(yaml_filename)?;
   }
 
-  // NB: John Madden voice model
-  let tts_model_token = TtsModelToken::new_from_str("TM:30ha2t6bxfn4");
+  let tts_model_token = job_state.app_control_state
+      .fakeyou_voice()
+      .unwrap_or(FakeYouVoiceOption::Hanashi)
+      .tts_model_token();
 
   let sequence_length = paragraphs.len() as i64;
 
