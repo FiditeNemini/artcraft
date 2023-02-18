@@ -45,7 +45,13 @@ pub struct GetNextNewsStoryAudioFileResponse {
   pub has_next_in_sequence: bool,
 
   /// If there's a next cursor in the current sequence, this is it.
+  /// If no such cursor, the field will be set to JSON NULL.
   pub maybe_next_cursor: Option<u64>,
+
+  /// If there's a next cursor in the current sequence, this is it.
+  /// If no such cursor, the field will be set to the sigil "-1".
+  /// This is for Unreal Engine's sake, which is sloppy with handling JSON.
+  pub maybe_next_cursor_else_sigil_value: i64,
 
   //pub audio_total_duration_seconds: u64,
 }
@@ -152,7 +158,10 @@ pub async fn get_next_news_story_audio_file_handler(
     current_audio_index: audio_cursor as u64,
     audio_file_path: audio_filename,
     has_next_in_sequence,
-    maybe_next_cursor,
+    maybe_next_cursor: maybe_next_cursor.clone(),
+    maybe_next_cursor_else_sigil_value: maybe_next_cursor
+        .map(|val| val as i64)
+        .unwrap_or(-1),
   };
 
   warn!("Response: {:?}", &response);
