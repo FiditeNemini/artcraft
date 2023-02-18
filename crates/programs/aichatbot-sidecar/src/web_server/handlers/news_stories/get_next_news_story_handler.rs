@@ -7,7 +7,8 @@ use files::file_exists::file_exists;
 use http_server_common::response::serialize_as_json_error::serialize_as_json_error;
 use log::{error, info, warn};
 use rand::seq::SliceRandom;
-use sqlite_queries::queries::by_table::news_stories::list_news_stories_replayable::list_news_stories_replayable;
+use sqlite_queries::queries::by_table::news_stories::list::list_news_stories_all::list_news_stories_all;
+use sqlite_queries::queries::by_table::news_stories::list::list_news_stories_replayable::list_news_stories_replayable;
 use std::sync::Arc;
 use tokens::tokens::news_stories::NewsStoryToken;
 
@@ -59,12 +60,22 @@ pub async fn get_next_news_story_handler(
 
   warn!("get_next_news_story_handler() : {:?}", &query);
 
-  let stories = list_news_stories_replayable(&server_state.sqlite_pool)
+  let mut stories = list_news_stories_replayable(&server_state.sqlite_pool)
       .await
       .map_err(|err| {
         error!("Error querying: {:?}", err);
         GetNextNewsStoryFileError::ServerError
       })?;
+
+  // TODO: Probably shouldn't fall back on old stories! Maybe flag this.
+  if stories.is_empty() {
+    stories = list_news_stories_all(&server_state.sqlite_pool)
+        .await
+        .map_err(|err| {
+          error!("Error querying: {:?}", err);
+          GetNextNewsStoryFileError::ServerError
+        })?;
+  }
 
   // TODO: Use history information to skip recently played.
 
