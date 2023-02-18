@@ -2,6 +2,7 @@
 // https://github.com/emilk/egui/blob/master/examples/hello_world/src/main.rs
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")] // hide console window on Windows in release
 
+pub mod configs;
 pub mod gui;
 pub mod persistence;
 pub mod shared_state;

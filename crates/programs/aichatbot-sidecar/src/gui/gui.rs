@@ -1,6 +1,7 @@
 use std::sync::Arc;
 use eframe::egui;
 use log::{error, info};
+use crate::configs::fakeyou_voice_option::FakeYouVoiceOption;
 use crate::shared_state::app_control_state::AppControlState;
 
 /// Initial state for the GUI
@@ -23,6 +24,8 @@ pub struct AppGui {
   is_openai_paused: bool,
   is_fakeyou_paused: bool,
 
+  fakeyou_voice: FakeYouVoiceOption,
+
   /// Shared state with the HTTP server and workers.
   control_state: Arc<AppControlState>,
 }
@@ -36,6 +39,7 @@ impl AppGui {
       is_scraping_paused: false,
       is_openai_paused: false,
       is_fakeyou_paused: false,
+      fakeyou_voice: FakeYouVoiceOption::Hanashi,
       control_state: args.control_state,
     }
   }
@@ -89,10 +93,30 @@ impl eframe::App for AppGui {
       ui.heading("Unreal Pause Controls");
       ui.add_space(10.0);
       ui.horizontal(|ui| {
-        ui.checkbox(&mut self.is_unreal_paused, "FakeYou API");
+        ui.checkbox(&mut self.is_unreal_paused, "TODO: This does not work yet.");
       });
 
+      ui.add_space(10.0);
+      ui.heading("FakeYou Voice");
+      ui.add_space(10.0);
+
+      egui::ComboBox::from_label("Note: once a story is generated, it will not be re-voiced!")
+          .selected_text(format!("{:?}", self.fakeyou_voice))
+          .show_ui(ui, |ui| {
+            ui.selectable_value(&mut self.fakeyou_voice, FakeYouVoiceOption::Hanashi, FakeYouVoiceOption::Hanashi.variant_name());
+            ui.selectable_value(&mut self.fakeyou_voice, FakeYouVoiceOption::JohnMadden, FakeYouVoiceOption::JohnMadden.variant_name());
+          });
+
+      ui.add_space(30.0);
+      ui.heading(".");
     });
   }
 }
 
+
+#[derive(Copy, Clone, Debug, PartialEq, Eq)]
+pub enum TestOption {
+  First,
+  Second,
+  Third
+}

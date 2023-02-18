@@ -9,8 +9,12 @@ pub fn launch_gui(startup_args: StartupArgs, control_state: Arc<AppControlState>
   // Log to stdout (if you run with `RUST_LOG=debug`).
   //tracing_subscriber::fmt::init();
 
+  // TODO: Is there a way for the program to determine size by itself? Default::default() yields a bad size too.
+  let width = 440.0;
+  let height = 300.0;
+
   let options = eframe::NativeOptions {
-    initial_window_size: Some(egui::vec2(320.0, 240.0)),
+    initial_window_size: Some(egui::vec2(width, height)),
     ..Default::default()
   };
 
