@@ -9,6 +9,8 @@ import { TwitchPlayer, TwitchChat } from "react-twitch-embed";
 import { Link } from "react-router-dom";
 import { WebUrl } from "../../../../common/WebUrl";
 import { DiscordLink2 } from "@storyteller/components/src/elements/DiscordLink2";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faStar } from "@fortawesome/pro-solid-svg-icons";
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -41,7 +43,7 @@ const TWITCH_CHANNEL = "FakeYouLabs";
 
 function NewsPage(props: Props) {
   usePrefixedDocumentTitle("AI News");
-    console.log('Channels page regenerated');
+  console.log("Channels page regenerated");
 
   //const [stream, setStream] = useState<StreamInfo>({
   //  broadcaster_name: "",
@@ -59,7 +61,7 @@ function NewsPage(props: Props) {
   //});
 
   useEffect(() => {
-    console.log('useEffect() triggered');
+    console.log("useEffect() triggered");
     const fetchData = async () => {
       //const streamInfo = await twitchApi.get(
       //  "https://api.twitch.tv/helix/channels?broadcaster_id=650154491"
@@ -90,13 +92,20 @@ function NewsPage(props: Props) {
   //}
 
   let subscriberPart = <></>;
+  let subscribeButton = <></>;
   if (!props.sessionSubscriptionsWrapper.hasPaidFeatures()) {
     subscriberPart = (
-      <>
-        If you'd like an ad-free experience, <Link to={WebUrl.pricingPage()}>please subscribe</Link>!
-        <br />
-        <br />
-      </>
+      <p>
+        If you'd like an ad-free experience,{" "}
+        <Link to={WebUrl.pricingPage()}>please subscribe</Link>!
+      </p>
+    );
+
+    subscribeButton = (
+      <Link to="/pricing" className="btn btn-primary w-100">
+        <FontAwesomeIcon icon={faStar} className="me-2" />
+        Subscribe to FakeYou
+      </Link>
     );
   }
 
@@ -121,7 +130,7 @@ function NewsPage(props: Props) {
                 muted={false}
                 className="twitch-video-container"
               />
-                {/*
+              {/*
               <div className="row align-items-center px-3 px-md-0">
                 <div className="col-12 col-lg-9 d-flex gap-3">
                   <a href={twitchChannelLink}>
@@ -151,17 +160,18 @@ function NewsPage(props: Props) {
                 </div>
               </div>
              */}
-              <div className="panel d-flex align-items-center gap-3 p-3 channel-description">
-                <p>
-                  {subscriberPart}
 
-                  We've built a powerful new AI animation system that we're nearly ready to unveil. 
-                  For now, enjoy this teaser tech demo of a 24/7 streaming news channel.
-                  <br />
-                  <br />
-                  Want to give us feedback? Please join our <DiscordLink2 />.
+              {subscribeButton}
+
+              <div className="panel d-flex flex-column gap-3 p-3 channel-description">
+                {subscriberPart}
+                <p>
+                  We've built a powerful new AI animation system that we're
+                  nearly ready to unveil. For now, enjoy this teaser tech demo
+                  of a 24/7 streaming news channel.
                 </p>
                 <p>
+                  Want to give us feedback? Please join our <DiscordLink2 />.
                 </p>
               </div>
             </motion.div>
