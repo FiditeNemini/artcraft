@@ -39,7 +39,7 @@ impl AppGui {
       is_scraping_paused: false,
       is_openai_paused: false,
       is_fakeyou_paused: false,
-      fakeyou_voice: FakeYouVoiceOption::Hanashi,
+      fakeyou_voice: FakeYouVoiceOption::HanashiV2,
       control_state: args.control_state,
     }
   }
@@ -105,7 +105,7 @@ impl eframe::App for AppGui {
       egui::ComboBox::from_label("Note: once a story is generated, it will not be re-voiced!")
           .selected_text(format!("{:?}", self.fakeyou_voice))
           .show_ui(ui, |ui| {
-            ui.selectable_value(&mut self.fakeyou_voice, FakeYouVoiceOption::Hanashi, FakeYouVoiceOption::Hanashi.variant_name());
+            ui.selectable_value(&mut self.fakeyou_voice, FakeYouVoiceOption::HanashiV2, FakeYouVoiceOption::HanashiV2.variant_name());
             ui.selectable_value(&mut self.fakeyou_voice, FakeYouVoiceOption::JohnMadden, FakeYouVoiceOption::JohnMadden.variant_name());
           });
 

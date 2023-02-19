@@ -14,12 +14,15 @@ const RSS_US : &'static str = "http://rss.cnn.com/rss/cnn_us.rss";
 
 const RSS_TECH : &'static str = "http://rss.cnn.com/rss/cnn_tech.rss";
 
+const RSS_ENTERTAINMENT : &'static str = "http://rss.cnn.com/rss/cnn_showbiz.rss";
+
 #[derive(Copy, Clone, Debug, EnumIter, EnumCount)]
 pub enum CnnFeed {
   TopStories,
   World,
   UnitedStates,
   Tech,
+  Entertainment,
 }
 
 impl CnnFeed {
@@ -29,6 +32,7 @@ impl CnnFeed {
       Self::World => RSS_WORLD,
       Self::UnitedStates => RSS_US,
       Self::Tech => RSS_TECH,
+      Self::Entertainment => RSS_ENTERTAINMENT,
     }
   }
 }

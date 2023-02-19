@@ -49,7 +49,7 @@ pub async fn process_single_item(target: &NewsStoryProductionItem, job_state: &A
 
   let tts_model_token = job_state.app_control_state
       .fakeyou_voice()
-      .unwrap_or(FakeYouVoiceOption::Hanashi)
+      .unwrap_or(FakeYouVoiceOption::HanashiV2)
       .tts_model_token();
 
   let sequence_length = paragraphs.len() as i64;

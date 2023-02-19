@@ -35,7 +35,7 @@ impl AppControlState {
       is_scraping_paused: RelaxedAtomicBool::new(false),
       is_openai_paused: RelaxedAtomicBool::new(false),
       is_fakeyou_paused: RelaxedAtomicBool::new(false),
-      fakeyou_voice: Arc::new(RwLock::new(FakeYouVoiceOption::Hanashi)),
+      fakeyou_voice: Arc::new(RwLock::new(FakeYouVoiceOption::HanashiV2)),
     }
   }
 
