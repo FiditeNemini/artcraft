@@ -44,6 +44,7 @@ pub async fn process_single_item(target: &NewsStoryProductionItem, job_state: &A
   insert_news_story(InsertArgs {
     news_story_token: &target.news_story_token,
     original_news_canonical_url: &target.original_news_canonical_url,
+    web_content_type: target.web_content_type,
     original_news_title: &target.original_news_title,
     audio_file_count,
     audio_total_duration_seconds,

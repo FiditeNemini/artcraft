@@ -7,6 +7,8 @@ use strum::EnumCount;
 use strum::EnumIter;
 
 /// Used in the SqLite `web_scraping_targets` table in a `TEXT` field named `web_content_type`.
+/// Used in the SqLite `news_story_productions` table in a `TEXT` field named `web_content_type`.
+/// Used in the SqLite `news_stories` table in a `TEXT` field named `web_content_type`.
 #[cfg_attr(test, derive(EnumIter, EnumCount))]
 #[derive(Clone, Copy, Eq, PartialEq, Hash, Deserialize, Serialize)]
 pub enum WebContentType {
@@ -66,8 +68,8 @@ impl WebContentType {
 
 #[cfg(test)]
 mod tests {
-  use crate::by_table::web_scraping_targets::web_content_type::WebContentType;
   use crate::test_helpers::assert_serialization;
+  use crate::common::sqlite::web_content_type::WebContentType;
 
   mod serde {
     use super::*;

@@ -1,5 +1,5 @@
-use enums::by_table::web_scraping_targets::web_content_type::WebContentType;
 use enums::common::sqlite::skip_reason::SkipReason;
+use enums::common::sqlite::web_content_type::WebContentType;
 
 // TODO: Include the article publish date(!)
 

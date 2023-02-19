@@ -12,12 +12,15 @@ CREATE TABLE news_story_productions (
   -- The original URL for the news item
   original_news_canonical_url TEXT NOT NULL UNIQUE,
 
+  -- Effectively an enum-like: CnnArticle, SlashdotArticle, HackerNewsThread, etc.
+  web_content_type TEXT NOT NULL,
+
   -- Original article title (not LLM renditioned)
   original_news_title TEXT NOT NULL,
 
   -- If we skip the production at any stage (after scraping, after rendition, etc.), for a non-failure
   -- reason, this is why.
-  -- Enum-like value, eg. "predominantly_video", "empty", "world_leader", "nobody_cares", etc.
+  -- Enum-like value, eg. "predominantly_video", "empty", "world_leader", "nobody_cares", "advertisement", etc.
   maybe_skip_reason TEXT,
 
   -- The overall status of the news story.

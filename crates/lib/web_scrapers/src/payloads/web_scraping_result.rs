@@ -1,4 +1,4 @@
-use enums::by_table::web_scraping_targets::web_content_type::WebContentType;
+use enums::common::sqlite::web_content_type::WebContentType;
 
 // TODO: Rename this to not confuse with `Result<T, E>`.
 #[derive(Clone, Debug, Serialize, Deserialize)]

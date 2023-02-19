@@ -1,4 +1,5 @@
 use chrono::{DateTime, Utc};
+use enums::common::sqlite::web_content_type::WebContentType;
 use errors::{anyhow, AnyhowResult};
 use sqlx::SqlitePool;
 use tokens::tokens::news_stories::NewsStoryToken;
@@ -7,6 +8,7 @@ pub struct Args <'a> {
   pub news_story_token: &'a NewsStoryToken,
 
   pub original_news_canonical_url: &'a str,
+  pub web_content_type: WebContentType,
   pub original_news_title: &'a str,
 
   pub audio_file_count: i64,
@@ -19,12 +21,14 @@ pub struct Args <'a> {
 
 pub async fn insert_news_story(args: Args<'_>) -> AnyhowResult<()> {
   let news_story_token = args.news_story_token.as_str();
+  let web_content_type = args.web_content_type.to_str();
 
   let query = sqlx::query!(
         r#"
 INSERT INTO news_stories (
   news_story_token,
   original_news_canonical_url,
+  web_content_type,
   original_news_title,
   audio_file_count,
   audio_total_duration_seconds,
@@ -38,11 +42,13 @@ VALUES (
   ?,
   ?,
   ?,
+  ?,
   true
 )
         "#,
         news_story_token,
         args.original_news_canonical_url,
+        web_content_type,
         args.original_news_title,
         args.audio_file_count,
         args.audio_total_duration_seconds,

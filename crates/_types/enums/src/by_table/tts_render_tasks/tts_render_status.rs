@@ -62,8 +62,8 @@ impl TtsRenderStatus {
 
 #[cfg(test)]
 mod tests {
-  use crate::by_table::tts_render_targets::tts_render_status::TtsRenderStatus;
   use crate::test_helpers::assert_serialization;
+  use crate::by_table::tts_render_tasks::tts_render_status::TtsRenderStatus;
 
   mod serde {
     use super::*;

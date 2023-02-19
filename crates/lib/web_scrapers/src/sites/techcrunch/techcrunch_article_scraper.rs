@@ -2,7 +2,7 @@ use crate::common_extractors::extract_featured_image::extract_featured_image;
 use crate::common_extractors::extract_title::extract_title;
 use crate::payloads::web_scraping_result::{WebScrapingResult, ScrapedWebArticle};
 use crate::payloads::web_scraping_target::WebScrapingTarget;
-use enums::by_table::web_scraping_targets::web_content_type::WebContentType;
+use enums::common::sqlite::web_content_type::WebContentType;
 use errors::{anyhow, AnyhowResult};
 use log::{error, warn};
 use once_cell::sync::Lazy;

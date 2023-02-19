@@ -1,5 +1,5 @@
 use crate::persistence::save_directory::SaveDirectory;
-use enums::by_table::web_scraping_targets::web_content_type::WebContentType;
+use enums::common::sqlite::web_content_type::WebContentType;
 use errors::AnyhowResult;
 use std::io::Write;
 use web_scrapers::payloads::web_scraping_result::WebScrapingResult;

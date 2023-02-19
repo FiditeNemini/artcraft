@@ -1,6 +1,6 @@
 use bytes::Bytes;
 use crate::payloads::web_scraping_target::WebScrapingTarget;
-use enums::by_table::web_scraping_targets::web_content_type::WebContentType;
+use enums::common::sqlite::web_content_type::WebContentType;
 use errors::AnyhowResult;
 use log::warn;
 use rss::Channel;

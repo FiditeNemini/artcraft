@@ -1,9 +1,11 @@
 use enums::common::sqlite::awaitable_job_status::AwaitableJobStatus;
+use enums::common::sqlite::web_content_type::WebContentType;
 use tokens::tokens::news_stories::NewsStoryToken;
 
 pub struct NewsStoryProductionItem {
   pub id: i64,
   pub news_story_token: NewsStoryToken,
+  pub web_content_type: WebContentType,
   pub original_news_canonical_url: String,
   pub original_news_title: String,
   pub overall_production_status: AwaitableJobStatus,

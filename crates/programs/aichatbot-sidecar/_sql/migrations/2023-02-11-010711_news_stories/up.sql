@@ -12,6 +12,9 @@ CREATE TABLE news_stories (
   -- The original URL for the news item
   original_news_canonical_url TEXT NOT NULL UNIQUE,
 
+  -- Effectively an enum-like: CnnArticle, SlashdotArticle, HackerNewsThread, etc.
+  web_content_type TEXT NOT NULL,
+
   -- Original article title (not LLM renditioned)
   original_news_title TEXT NOT NULL,
 

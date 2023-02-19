@@ -1,8 +1,8 @@
-use enums::by_table::web_scraping_targets::web_content_type::WebContentType;
+use enums::by_table::web_scraping_targets::scraping_status::ScrapingStatus;
 use enums::common::sqlite::skip_reason::SkipReason;
+use enums::common::sqlite::web_content_type::WebContentType;
 use errors::{anyhow, AnyhowResult};
 use sqlx::SqlitePool;
-use enums::by_table::web_scraping_targets::scraping_status::ScrapingStatus;
 
 pub struct Args <'a> {
   pub canonical_url: &'a str,
