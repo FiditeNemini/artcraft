@@ -1,11 +1,13 @@
 use enums::common::sqlite::awaitable_job_status::AwaitableJobStatus;
 use errors::{anyhow, AnyhowResult};
 use sqlx::SqlitePool;
+use enums::common::sqlite::skip_reason::SkipReason;
 use tokens::tokens::news_stories::NewsStoryToken;
 
 pub struct Args <'a> {
   pub news_story_token: &'a NewsStoryToken,
 
+  pub maybe_skip_reason: Option<SkipReason>,
   pub is_greenlit: bool,
 
   pub sqlite_pool: &'a SqlitePool,
@@ -28,12 +30,14 @@ pub async fn update_news_story_production_greenlit_status(args: Args<'_>) -> Any
         r#"
 UPDATE news_story_productions
 SET
+  maybe_skip_reason = ?,
   overall_production_status = ?,
   llm_rendition_status = ?,
   version = version + 1
 WHERE
   news_story_token = ?
         "#,
+        args.maybe_skip_reason,
         overall_production_status,
         llm_rendition_status,
         args.news_story_token,
