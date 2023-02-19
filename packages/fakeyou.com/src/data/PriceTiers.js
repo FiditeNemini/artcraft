@@ -88,6 +88,13 @@ const FAKEYOU_PRICES = {
         "Upload private models",
       ],
     },
+    channels: {
+      title: "Video Channels",
+      features: [
+        "Ad-free (coming soon)",
+        "Interactive features (coming soon)",
+      ],
+    },
     // vcweb: {
     //   title: "VC Web",
     //   features: ["Up to 30 seconds audio", "Push to play", "Generate MP3 file"],
@@ -130,6 +137,15 @@ const FAKEYOU_PRICES = {
         //"Generate MP3 file",
         "Upload private models",
         "Share private models",
+      ],
+    },
+    channels: {
+      title: "Video Channels",
+      features: [
+        "Influence creative direction",
+        "Ad-free (coming soon)",
+        "Interactive features (coming soon)",
+        "Build your own channel (coming soon)",
       ],
     },
     // vcweb: {

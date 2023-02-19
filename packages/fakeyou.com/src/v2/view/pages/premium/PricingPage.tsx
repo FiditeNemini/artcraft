@@ -393,6 +393,20 @@ function PricingPage(props: Props) {
                     </li>
                   );
                 })}
+
+                <li className="fw-semibold">{FYP.pro.channels.title}</li>
+                {FYP.pro.channels.features.map((e: any) => {
+                  return (
+                    <li key={e}>
+                      <FontAwesomeIcon
+                        icon={faCheck}
+                        className="text-red me-3"
+                      />
+                      {e}
+                    </li>
+                  );
+                })}
+
                 {/*<li className="fw-semibold">{FYP.pro.api.title}</li>
                 {FYP.pro.api.features.map((e: any) => {
                   return (
@@ -504,6 +518,20 @@ function PricingPage(props: Props) {
                     </li>
                   );
                 })}
+
+                <li className="fw-semibold">{FYP.elite.channels.title}</li>
+                {FYP.elite.channels.features.map((e: any) => {
+                  return (
+                    <li key={e}>
+                      <FontAwesomeIcon
+                        icon={faCheck}
+                        className="text-red me-3"
+                      />
+                      {e}
+                    </li>
+                  );
+                })}
+
                 {/*<li className="fw-semibold">{FYP.elite.api.title}</li>
                 {FYP.elite.api.features.map((e: any) => {
                   return (
