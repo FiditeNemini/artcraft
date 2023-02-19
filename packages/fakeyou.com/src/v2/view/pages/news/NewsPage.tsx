@@ -92,12 +92,20 @@ function NewsPage(props: Props) {
   //}
 
   let subscriberPart = <></>;
+  let subscribeButton = <></>;
   if (!props.sessionSubscriptionsWrapper.hasPaidFeatures()) {
     subscriberPart = (
       <p>
         If you'd like an ad-free experience,{" "}
         <Link to={WebUrl.pricingPage()}>please subscribe</Link>!
       </p>
+    );
+
+    subscribeButton = (
+      <Link to="/pricing" className="btn btn-primary w-100">
+        <FontAwesomeIcon icon={faStar} className="me-2" />
+        Subscribe to FakeYou
+      </Link>
     );
   }
 
@@ -153,12 +161,7 @@ function NewsPage(props: Props) {
               </div>
              */}
 
-              <div>
-                <Link to="/pricing" className="btn btn-primary w-100">
-                  <FontAwesomeIcon icon={faStar} className="me-2" />
-                  Subscribe to FakeYou
-                </Link>
-              </div>
+              {subscribeButton}
 
               <div className="panel d-flex flex-column gap-3 p-3 channel-description">
                 {subscriberPart}
