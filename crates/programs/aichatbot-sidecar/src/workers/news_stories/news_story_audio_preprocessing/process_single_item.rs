@@ -90,7 +90,7 @@ fn split_into_manageable_portions(text: &str) -> Vec<String> {
     if trimmed_paragraph.len() > 250 {
       speakable_portions.extend(split_paragraph(&trimmed_paragraph));
     } else {
-      speakable_portions.push(paragraph.to_string());
+      speakable_portions.push(trimmed_paragraph.to_string());
     }
   }
 
