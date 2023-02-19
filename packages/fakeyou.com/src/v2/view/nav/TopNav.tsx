@@ -5,7 +5,6 @@ import { Link, useHistory } from "react-router-dom";
 import { WebUrl } from "../../../common/WebUrl";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
-  faMicrophone,
   faPlus,
   faUsers,
   faVideo,
@@ -40,6 +39,7 @@ import "tippy.js/animations/shift-away.css";
 import { ThirdPartyLinks } from "@storyteller/components/src/constants/ThirdPartyLinks";
 import { Analytics } from "../../../common/Analytics";
 import { faWaveformLines } from "@fortawesome/pro-solid-svg-icons";
+import { faTvRetro } from "@fortawesome/pro-regular-svg-icons";
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -346,14 +346,14 @@ function TopNav(props: Props) {
 
                 <li data-bs-toggle="offcanvas" className="nav-item">
                   <Link
-                    to={WebUrl.cloneRequestPage()}
+                    to={WebUrl.newsPage()}
                     onClick={() => {
-                      Analytics.topbarClickVoiceClone();
+                      Analytics.topbarClickNews();
                     }}
                     className="nav-link"
                   >
-                    <FontAwesomeIcon icon={faMicrophone} className="me-2" />
-                    {t("nav.TopNav.main.voiceCloneLink")}
+                    <FontAwesomeIcon icon={faTvRetro} className="me-2" />
+                    {t("nav.TopNav.main.newsLink")}
                   </Link>
                 </li>
 

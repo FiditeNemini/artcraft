@@ -16,6 +16,7 @@
 /leaderboard*   /index.html   200
 /login*   /index.html   200
 /moderation*   /index.html   200
+/news*   /index.html   200
 /obs_configs*   /index.html   200
 /old*   /index.html   200
 /patrons*   /index.html   200
@@ -38,12 +39,12 @@
 # This is the *OLD* video for Summer 2022. We'll re-edit.
 # PLEASE DO NOT ACECSS THIS URL OR WATCH. IT WILL CHANGE THE 
 # VIEW STATISTICS AND WE WON'T BE ABLE TO TELL IF THEY SAW IT
-/demo   https://www.youtube.com/watch?v=wfFpi-Mv3fY   302
+#/demo   https://www.youtube.com/watch?v=wfFpi-Mv3fY   302
 
 # This is for AI Grant.
 # This is the *OLD* video for Summer 2022. We'll re-edit.
 # PLEASE DO NOT ACECSS THIS URL OR WATCH. IT WILL CHANGE THE 
 # VIEW STATISTICS AND WE WON'T BE ABLE TO TELL IF THEY SAW IT
-/ai-grant-founder-video  https://www.youtube.com/watch?v=Cj7rchSSuLg  302
-/ai-grant-demo           https://www.youtube.com/watch?v=0EOZsrH7jxI  302
+#/ai-grant-founder-video  https://www.youtube.com/watch?v=Cj7rchSSuLg  302
+#/ai-grant-demo           https://www.youtube.com/watch?v=0EOZsrH7jxI  302
 

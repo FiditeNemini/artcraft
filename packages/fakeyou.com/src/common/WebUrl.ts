@@ -55,6 +55,10 @@ class WebUrl {
     return '/clone';
   }
 
+  static newsPage(): string {
+    return '/news';
+  }
+
   // Other domains
 
   static developerDocs(): string {

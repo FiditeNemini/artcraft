@@ -248,6 +248,14 @@ class Analytics {
     Analytics.sendCategorizedEvent(this.TOPBAR, 'click_terms');
   }
 
+  static topbarClickChannels() {
+    Analytics.sendCategorizedEvent(this.TOPBAR, 'click_channels');
+  }
+
+  static topbarClickNews() {
+    Analytics.sendCategorizedEvent(this.TOPBAR, 'click_news');
+  }
+
   // ========== (impl) ==========
 
   private static sendEvent(actionName: string, eventLabel?: string, value?: number) {

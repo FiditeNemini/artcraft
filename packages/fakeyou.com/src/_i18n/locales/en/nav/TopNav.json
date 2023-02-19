@@ -8,6 +8,7 @@
     "ttsQueued": "TTS Queued"
   },
   "main": {
+    "newsLink": "AI News",
     "pricingLink": "Pricing",
     "voiceCloneLink": "Voice Clone",
     "createDropdown": "Create",
