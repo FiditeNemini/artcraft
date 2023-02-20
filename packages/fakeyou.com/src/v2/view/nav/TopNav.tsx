@@ -350,7 +350,7 @@ function TopNav(props: Props) {
                     onClick={() => {
                       Analytics.topbarClickNews();
                     }}
-                    className="nav-link"
+                    className="nav-link nav-link-red"
                   >
                     <FontAwesomeIcon icon={faTvRetro} className="me-2" />
                     {t("nav.TopNav.main.newsLink")}

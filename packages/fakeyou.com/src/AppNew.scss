@@ -127,6 +127,14 @@ $headings-font-family: "Merriweather", serif;
       align-items: center;
     }
 
+    a:link.nav-link-red , a:visited.nav-link-red {
+      color: #e66462 !important;
+    }
+
+    a:hover.nav-link-red , a:active.nav-link-red {
+      color: #ea7a78 !important;
+    }
+
     .navbar-brand {
       padding-top: 0;
       margin-bottom: 4px;
