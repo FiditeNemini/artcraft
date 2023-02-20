@@ -62,6 +62,10 @@ impl SaveDirectory {
     Ok(self.directory_for_webpage_url(url)?.join("speakable_monologue.yaml"))
   }
 
+  pub fn generated_headline_image_for_webpage_url(&self, url: &str) -> AnyhowResult<PathBuf> {
+    Ok(self.directory_for_webpage_url(url)?.join("generated_headline_image.png"))
+  }
+
   pub fn audio_wav_file_for_news_story(&self, news_story_token: &NewsStoryToken, sequence_order: i64) -> AnyhowResult<PathBuf> {
     let filename = format!("{}.wav", sequence_order);
     Ok(self.directory_for_audio(news_story_token)?.join(filename))

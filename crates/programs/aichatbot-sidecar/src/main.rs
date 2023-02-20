@@ -12,6 +12,7 @@ pub mod workers;
 
 #[macro_use] extern crate serde_derive;
 
+use std::path::PathBuf;
 use actix_web::{HttpResponse, HttpServer, web};
 use async_openai::Client;
 use clap::{App, Arg};
@@ -41,10 +42,12 @@ use sqlx::sqlite::SqlitePoolOptions;
 use std::sync::Arc;
 use std::thread;
 use std::time::Duration;
+use async_openai::types::{CreateImageEditRequest, CreateImageRequest, ImageInput, ImageSize, ResponseFormat};
 use tokio::runtime::{Builder, Runtime};
 use web_scrapers::sites::cnn::cnn_article_scraper::cnn_article_scraper;
 use web_scrapers::sites::techcrunch::techcrunch_article_scraper::techcrunch_article_scraper;
 use web_scrapers::sites::theguardian::theguardian_scraper::theguardian_scraper_test;
+use crate::workers::news_stories::news_story_image_generation::main_loop::news_story_image_generation_main_loop;
 
 //#[tokio::main]
 //pub async fn main() -> AnyhowResult<()> {
@@ -64,6 +67,58 @@ async fn test() -> AnyhowResult<()> {
   //let url = "https://techcrunch.com/2023/02/04/elon-musk-says-twitter-will-provide-a-free-write-only-api-to-bots-providing-good-content/";
   let url = "https://www.cnn.com/2023/02/04/business/automakers-problems-catching-up-with-tesla/index.html";
   ingest_url_scrape_and_save(url, WebContentType::CnnArticle, &save_directory).await?;
+
+  let openai_client = Client::new()
+      .with_api_key(startup_args.openai_secret_key.clone());
+
+  let create_request = CreateImageRequest {
+    n: Some(1),
+    //prompt: "A news headline image; headline: After nearly one year of war, how Ukraine defied the odds — and may still defeat Russia".to_string(),
+    //prompt: "A news headline image; headline: 'Heartbreaking': Visitor accidentally shatters Jeff Koons 'balloon dog' sculpture at Art Wynwood".to_string(),
+    //prompt: "A news headline image; headline: Mayorkas goes on the offensive as GOP scrutiny builds, says it’s up to Congress to fix immigration system ".to_string(),
+    //prompt: "Brave or lucky? See the moment a dog took on a hammerhead shark".to_string(),
+    //prompt: "Headline: Jimmy Carter to begin receiving home hospice care".to_string(),
+    //prompt: "Nine children hurt, shooting; Tragic, frightful, chaotic, violent, frightening.".to_string(),
+    //prompt: "9 kids hurt in Georgia; Disturbing, tragic, frightening, violent, chaotic; Art Style/Director: Wes Anderson/Surrealist.; remove text; no text; no English text".to_string(),
+    //prompt: "Summary: 9 kids hurt in Georgia; Adjectives: Disturbing, tragic, frightening, violent, chaotic; Art Style/Director: Wes Anderson/Surrealist.".to_string(),
+    //prompt: "Reviving cheetahs in India. Adventurous, ambitious, necessary, daring, wild. Wes Anderson, Runnings fields with cheetahs racing around in the distance, trees swaying in the wind, and the sun setting in the background.".to_string(),
+    prompt: "Closure found after WWII; moving, emotional, joyous, triumphant, proud.
+Art style: Impressionism.
+Setting: A coastal beach with a few people looking out to sea, with a large American flag waving in the background. Objects: a few boats in the distant, a lighthouse, and some driftwood on the shore. A photo or painting of this might be a peaceful beachscape with vibrant colors of the sky, sea, and flag.".to_string(),
+    //prompt: "LGBTQ love, vibrant, colorful, playful, revolutionary. Art style: Bollywood musicals. Setting: A city street in the evening, lit up with vibrant neon signs and bustling crowds. There are couples in traditional Indian clothing, dancing and singing around colorful street vendors selling snacks and trinkets.".to_string(),
+    //prompt: "Kinkade painting of Releasing twelve manatees: miraculous, astounding, incredible, remarkable, amazing. Setting: A peaceful beach, with gentle sand and a clear blue sky. Objects: A crowd of people lined up along the shore, a boat full of manatees, and the vibrant colors of the ocean.".to_string(),
+    //prompt: "Photo of Releasing twelve manatees: miraculous, astounding, incredible, remarkable, amazing. Art style: Tim Burton.".to_string(),
+    size: Some(ImageSize::S1024x1024),
+    response_format: Some(ResponseFormat::Url),
+    user: Some("test".to_string()),
+  };
+
+  let response = openai_client
+      .images()
+      .create(create_request)
+      .await
+      .unwrap();
+
+//  let create_edit_request = CreateImageEditRequest {
+//    image: ImageInput { path: PathBuf::from("runtime_data/scaled_test.png") },
+//    mask: ImageInput { path: PathBuf::from("runtime_data/scaled_mask.png") },
+//    prompt: "Closure found after WWII; moving, emotional, joyous, triumphant, proud.
+//Art style: Impressionism.
+//Setting: A coastal beach with a few people looking out to sea, with a large American flag waving in the background. Objects: a few boats in the distant, a lighthouse, and some driftwood on the shore. A photo or painting of this might be a peaceful beachscape with vibrant colors of the sky, sea, and flag.".to_string(),
+//    n: Some(1),
+//    size: Some(ImageSize::S1024x1024),
+//    response_format: Some(ResponseFormat::Url),
+//    user: Some("test".to_string()),
+//  };
+//
+//  let response = openai_client
+//      .images()
+//      .create_edit(create_edit_request)
+//      .await
+//      .unwrap();
+
+
+  println!("Response: {:?}", response);
 
   Ok(())
 }
@@ -149,6 +204,7 @@ pub async fn main() -> AnyhowResult<()> {
     let job_state8 = job_state.clone();
     let job_state9 = job_state.clone();
     let job_state10 = job_state.clone();
+    let job_state11 = job_state.clone();
 
     tokio_runtime.spawn(async {
       let _r = web_index_ingestion_main_loop(job_state2).await;
@@ -184,6 +240,10 @@ pub async fn main() -> AnyhowResult<()> {
 
     tokio_runtime.spawn(async {
       let _r = news_story_post_production_finalization_main_loop(job_state10).await;
+    });
+
+    tokio_runtime.spawn(async {
+      let _r = news_story_image_generation_main_loop(job_state11).await;
     });
 
     // TODO: Final scheduling thread

@@ -1,5 +1,6 @@
 pub mod news_story_audio_final_verification;
 pub mod news_story_audio_preprocessing;
 pub mod news_story_greenlighting;
+pub mod news_story_image_generation;
 pub mod news_story_llm_rendition;
 pub mod news_story_post_production_finalization;

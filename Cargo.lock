@@ -739,6 +739,7 @@ dependencies = [
  "actix-web-actors",
  "actix_helpers",
  "async-openai",
+ "base64 0.21.0",
  "chrono",
  "clap",
  "concurrency",

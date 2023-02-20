@@ -22,7 +22,9 @@ SELECT
   overall_production_status as `overall_production_status: enums::common::sqlite::awaitable_job_status::AwaitableJobStatus`,
   llm_rendition_status as `llm_rendition_status: enums::common::sqlite::awaitable_job_status::AwaitableJobStatus`,
   llm_rendition_attempts,
-  audio_generation_status as `audio_generation_status: enums::common::sqlite::awaitable_job_status::AwaitableJobStatus`
+  audio_generation_status as `audio_generation_status: enums::common::sqlite::awaitable_job_status::AwaitableJobStatus`,
+  image_generation_status as `image_generation_status: enums::common::sqlite::awaitable_job_status::AwaitableJobStatus`,
+  image_generation_attempts
 FROM news_story_productions
 WHERE
   overall_production_status = "processing"

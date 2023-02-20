@@ -38,6 +38,13 @@ CREATE TABLE news_story_productions (
   -- "not_ready", "ready_waiting", "processing", "retryably_failed", "permanently_failed", "skipped", "done"
   audio_generation_status TEXT DEFAULT "not_ready" NOT NULL,
 
+  -- Generating headline images
+  -- "not_ready", "ready_waiting", "processing", "retryably_failed", "permanently_failed", "skipped", "done"
+  image_generation_status TEXT DEFAULT "not_ready" NOT NULL,
+
+  -- Number of image generation attempts that have been made
+  image_generation_attempts INT DEFAULT 0 NOT NULL,
+
   -- Generating extra media (images, etc.)
   -- "not_ready", "ready_waiting", "processing", "retryably_failed", "permanently_failed", "skipped", "done"
   -- media_generation_status TEXT DEFAULT "not_ready" NOT NULL,
