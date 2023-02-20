@@ -41,6 +41,9 @@ pub struct GetNextNewsStoryAudioFileResponse {
   /// The local filesystem path of the audio file.
   pub audio_file_path: PathBuf,
 
+  /// The local headline image file path.
+  pub headline_image_file_path: PathBuf,
+
   /// Whether there's a next cursor in the current sequence.
   pub has_next_in_sequence: bool,
 
@@ -141,6 +144,13 @@ pub async fn get_next_news_story_audio_file_handler(
         GetNextNewsStoryAudioFileError::ServerError
       })?;
 
+  let headline_image_filename = server_state.save_directory
+      .generated_headline_image_for_webpage_url(&news_story.original_news_canonical_url)
+      .map_err(|err| {
+        error!("Path error: {:?}", err);
+        GetNextNewsStoryAudioFileError::ServerError
+      })?;
+
   let next_audio_cursor = audio_cursor + 1;
 
   let mut has_next_in_sequence = false;
@@ -157,6 +167,7 @@ pub async fn get_next_news_story_audio_file_handler(
     sequence_audio_file_count: news_story.audio_file_count as u64,
     current_audio_index: audio_cursor as u64,
     audio_file_path: audio_filename,
+    headline_image_file_path: headline_image_filename,
     has_next_in_sequence,
     maybe_next_cursor: maybe_next_cursor.clone(),
     maybe_next_cursor_else_sigil_value: maybe_next_cursor
