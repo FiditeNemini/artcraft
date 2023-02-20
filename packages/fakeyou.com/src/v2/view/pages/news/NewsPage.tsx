@@ -168,7 +168,8 @@ function NewsPage(props: Props) {
                 <p>
                   We've built a powerful new AI animation system that we're
                   nearly ready to unveil. For now, enjoy this teaser tech demo
-                  of a 24/7 streaming news channel.
+                  of a 24/7 streaming news channel. This is a tech demo and may
+                  occasionally report factually incorrect information.
                 </p>
                 <p>
                   Want to give us feedback? Please join our <DiscordLink2 />.
