@@ -16,6 +16,7 @@ use sqlite_queries::queries::by_table::news_story_productions::update::update_ne
 use std::ops::Add;
 use std::sync::Arc;
 use web_scrapers::payloads::web_scraping_result::ScrapedWebArticle;
+use crate::persistence::image_generation_debug_data::ImageGenerationDebugData;
 
 pub async fn process_single_item(target: &NewsStoryProductionItem, job_state: &Arc<JobState>) -> AnyhowResult<()> {
 
@@ -30,7 +31,7 @@ pub async fn process_single_item(target: &NewsStoryProductionItem, job_state: &A
 
   let create_request = CreateImageRequest {
     n: Some(1),
-    prompt: dalle_prompt,
+    prompt: dalle_prompt.clone(),
     size: Some(ImageSize::S1024x1024),
     response_format: Some(ResponseFormat::B64Json),
     user: Some("article".to_string()),
@@ -58,6 +59,16 @@ pub async fn process_single_item(target: &NewsStoryProductionItem, job_state: &A
     }
     _ => {},
   }
+
+  let debug_data = ImageGenerationDebugData {
+    image_generation_prompt: dalle_prompt.to_string(),
+    maybe_preconditioning_prompt: None, // TODO: Plumb this through.
+  };
+
+  let yaml_filename = job_state.save_directory
+      .image_generation_prompt_debug_file_webpage_url(&target.original_news_canonical_url)?;
+
+  let _r = debug_data.write_to_yaml_file(yaml_filename)?;
 
   let image_generation_attempts = target.image_generation_attempts + 1;
 

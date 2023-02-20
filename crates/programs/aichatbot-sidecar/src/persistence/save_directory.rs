@@ -66,6 +66,10 @@ impl SaveDirectory {
     Ok(self.directory_for_webpage_url(url)?.join("generated_headline_image.png"))
   }
 
+  pub fn image_generation_prompt_debug_file_webpage_url(&self, url: &str) -> AnyhowResult<PathBuf> {
+    Ok(self.directory_for_webpage_url(url)?.join("image_generation_prompts.yaml"))
+  }
+
   pub fn audio_wav_file_for_news_story(&self, news_story_token: &NewsStoryToken, sequence_order: i64) -> AnyhowResult<PathBuf> {
     let filename = format!("{}.wav", sequence_order);
     Ok(self.directory_for_audio(news_story_token)?.join(filename))

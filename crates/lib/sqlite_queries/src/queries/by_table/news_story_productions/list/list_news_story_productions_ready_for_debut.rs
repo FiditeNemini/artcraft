@@ -30,6 +30,7 @@ WHERE
   overall_production_status = "processing"
   AND llm_rendition_status = "done"
   AND audio_generation_status = "done"
+  AND image_generation_status = "done"
   AND id > ?
 ORDER BY id ASC
 LIMIT ?
