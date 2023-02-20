@@ -1,8 +1,9 @@
-use std::io::Write;
 use async_openai::Client;
 use async_openai::error::OpenAIError;
 use async_openai::types::{CreateCompletionRequestArgs, CreateImageRequest, ImageData, ImageSize, ResponseFormat};
 use base64::{Engine as _, engine::general_purpose};
+use crate::persistence::image_generation_debug_data::ImageGenerationDebugData;
+use crate::persistence::load_scraped_result::load_scraped_result;
 use crate::persistence::rendition_data::RenditionData;
 use crate::persistence::save_directory::SaveDirectory;
 use crate::shared_state::job_state::JobState;
@@ -13,10 +14,10 @@ use log::{debug, error, info, warn};
 use sqlite_queries::queries::by_table::news_story_productions::list::news_story_production_item::NewsStoryProductionItem;
 use sqlite_queries::queries::by_table::news_story_productions::update::update_news_story_image_generation_status::Args;
 use sqlite_queries::queries::by_table::news_story_productions::update::update_news_story_image_generation_status::update_news_story_image_generation_status;
+use std::io::Write;
 use std::ops::Add;
 use std::sync::Arc;
 use web_scrapers::payloads::web_scraping_result::ScrapedWebArticle;
-use crate::persistence::image_generation_debug_data::ImageGenerationDebugData;
 
 pub async fn process_single_item(target: &NewsStoryProductionItem, job_state: &Arc<JobState>) -> AnyhowResult<()> {
 
@@ -86,13 +87,6 @@ pub async fn process_single_item(target: &NewsStoryProductionItem, job_state: &A
 //  }
 
   Ok(())
-}
-
-async fn load_scraped_result(url: &str, save_directory: &SaveDirectory) -> AnyhowResult<ScrapedWebArticle> {
-  let scrape_yaml_filename = save_directory.scrape_summary_file_for_webpage_url(url)?;
-  let mut file = std::fs::File::open(&scrape_yaml_filename)?;
-  let scraping_result : ScrapedWebArticle = serde_yaml::from_reader(file)?;
-  Ok(scraping_result)
 }
 
 async fn generate_dalle_prompt_with_gpt(headline: &str, openai_client: &Arc<Client>) -> AnyhowResult<String> {
