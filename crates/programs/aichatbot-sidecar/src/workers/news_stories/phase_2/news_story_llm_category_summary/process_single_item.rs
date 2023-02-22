@@ -59,7 +59,7 @@ pub async fn process_single_item(target: &NewsStoryProductionItem, job_state: &A
         sqlite_pool: &job_state.sqlite_pool,
       }).await?; // NB: If these queries fail, we could get stuck in retry hell.
 
-      return Err(anyhow!("OpenAI Rendition Error: {:?}", err));
+      return Err(anyhow!("OpenAI Rendition Error for {}: {:?}", target.news_story_token, err));
     }
     Ok(rendition_data) => rendition_data,
   };

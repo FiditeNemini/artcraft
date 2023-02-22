@@ -1,4 +1,5 @@
-pub mod update_news_story_audio_finalized;
+pub mod update_news_story_audio_finalized_failure;
+pub mod update_news_story_audio_finalized_success;
 pub mod update_news_story_audio_preprocessing_status;
 pub mod update_news_story_image_generation_status;
 pub mod update_news_story_llm_categorization_status;
