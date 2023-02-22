@@ -12,9 +12,17 @@ pub struct NewsStoryProductionItem {
   // Overall production status, which depends on all other statuses
   pub overall_production_status: AwaitableJobStatus,
 
-  // LLM rendition task
+  // LLM main text rendition task
   pub llm_rendition_status: AwaitableJobStatus,
   pub llm_rendition_attempts: i64,
+
+  // LLM title summary task
+  pub llm_title_summary_status: AwaitableJobStatus,
+  pub llm_title_summary_attempts: i64,
+
+  // LLM categorization task
+  pub llm_categorization_status: AwaitableJobStatus,
+  pub llm_categorization_attempts: i64,
 
   // Audio generation tasks (farmed out to 1:n work items)
   pub audio_generation_status: AwaitableJobStatus,

@@ -20,8 +20,16 @@ SELECT
   web_content_type as `web_content_type: enums::common::sqlite::web_content_type::WebContentType`,
   original_news_title,
   overall_production_status as `overall_production_status: enums::common::sqlite::awaitable_job_status::AwaitableJobStatus`,
+
   llm_rendition_status as `llm_rendition_status: enums::common::sqlite::awaitable_job_status::AwaitableJobStatus`,
   llm_rendition_attempts,
+
+  llm_title_summary_status as `llm_title_summary_status: enums::common::sqlite::awaitable_job_status::AwaitableJobStatus`,
+  llm_title_summary_attempts,
+
+  llm_categorization_status as `llm_categorization_status: enums::common::sqlite::awaitable_job_status::AwaitableJobStatus`,
+  llm_categorization_attempts,
+
   audio_generation_status as `audio_generation_status: enums::common::sqlite::awaitable_job_status::AwaitableJobStatus`,
   image_generation_status as `image_generation_status: enums::common::sqlite::awaitable_job_status::AwaitableJobStatus`,
   image_generation_attempts
