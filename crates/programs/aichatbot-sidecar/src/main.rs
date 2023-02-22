@@ -12,9 +12,9 @@ pub mod workers;
 
 #[macro_use] extern crate serde_derive;
 
-use std::path::PathBuf;
 use actix_web::{HttpResponse, HttpServer, web};
 use async_openai::Client;
+use async_openai::types::{CreateImageEditRequest, CreateImageRequest, ImageInput, ImageSize, ResponseFormat};
 use clap::{App, Arg};
 use crate::gui::launch_gui::launch_gui;
 use crate::persistence::save_directory::SaveDirectory;
@@ -24,11 +24,10 @@ use crate::startup_args::get_startup_args;
 use crate::web_server::launch_web_server::{launch_web_server, LaunchWebServerArgs};
 use crate::workers::audio::fakeyou_audio_create::main_loop::fakeyou_audio_create_main_loop;
 use crate::workers::audio::fakeyou_audio_download::main_loop::fakeyou_audio_download_main_loop;
-use crate::workers::news_stories::news_story_audio_final_verification::main_loop::news_story_audio_final_verification_main_loop;
-use crate::workers::news_stories::news_story_audio_preprocessing::main_loop::news_story_audio_preprocessing_main_loop;
-use crate::workers::news_stories::news_story_greenlighting::main_loop::news_story_greenlighting_main_loop;
-use crate::workers::news_stories::news_story_llm_rendition::main_loop::news_story_llm_rendition_main_loop;
-use crate::workers::news_stories::news_story_post_production_finalization::main_loop::news_story_post_production_finalization_main_loop;
+use crate::workers::news_stories::phase_1::news_story_greenlighting::main_loop::news_story_greenlighting_main_loop;
+use crate::workers::news_stories::phase_2::news_story_image_generation::main_loop::news_story_image_generation_main_loop;
+use crate::workers::news_stories::phase_2::news_story_llm_rendition::main_loop::news_story_llm_rendition_main_loop;
+use crate::workers::news_stories::phase_3::news_story_audio_preprocessing::main_loop::news_story_audio_preprocessing_main_loop;
 use crate::workers::web::web_content_scraping::main_loop::web_content_scraping_main_loop;
 use crate::workers::web::web_content_scraping::single_target::ingest_url_scrape_and_save::ingest_url_scrape_and_save;
 use crate::workers::web::web_index_ingestion::main_loop::web_index_ingestion_main_loop;
@@ -39,15 +38,16 @@ use fakeyou_client::fakeyou_api_client::FakeYouApiClient;
 use log::info;
 use sqlite_queries::queries::by_table::web_scraping_targets::insert_web_scraping_target::{Args, insert_web_scraping_target};
 use sqlx::sqlite::SqlitePoolOptions;
+use std::path::PathBuf;
 use std::sync::Arc;
 use std::thread;
 use std::time::Duration;
-use async_openai::types::{CreateImageEditRequest, CreateImageRequest, ImageInput, ImageSize, ResponseFormat};
 use tokio::runtime::{Builder, Runtime};
 use web_scrapers::sites::cnn::cnn_article_scraper::cnn_article_scraper;
 use web_scrapers::sites::techcrunch::techcrunch_article_scraper::techcrunch_article_scraper;
 use web_scrapers::sites::theguardian::theguardian_scraper::theguardian_scraper_test;
-use crate::workers::news_stories::news_story_image_generation::main_loop::news_story_image_generation_main_loop;
+use workers::news_stories::phase_4::news_story_audio_final_verification::main_loop::news_story_audio_final_verification_main_loop;
+use workers::news_stories::phase_5::news_story_post_production_finalization::main_loop::news_story_post_production_finalization_main_loop;
 
 //#[tokio::main]
 //pub async fn main() -> AnyhowResult<()> {

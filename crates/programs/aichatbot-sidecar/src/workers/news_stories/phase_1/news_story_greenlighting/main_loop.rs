@@ -1,5 +1,5 @@
 use crate::shared_state::job_state::JobState;
-use crate::workers::news_stories::news_story_greenlighting::process_target_record::process_target_record;
+use crate::workers::news_stories::phase_1::news_story_greenlighting::process_target_record::process_target_record;
 use log::{debug, error, info};
 use sqlite_queries::queries::by_table::news_story_productions::list::list_news_story_productions_awaiting_greenlight::list_news_story_productions_awaiting_greenlight;
 use std::sync::Arc;

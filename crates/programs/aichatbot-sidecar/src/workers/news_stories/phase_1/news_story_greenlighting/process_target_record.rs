@@ -1,6 +1,6 @@
 use crate::persistence::load_scraped_result::load_scraped_result;
 use crate::shared_state::job_state::JobState;
-use crate::workers::news_stories::news_story_greenlighting::site_handlers::cnn_greenlighting::cnn_greenlighting;
+use crate::workers::news_stories::phase_1::news_story_greenlighting::site_handlers::cnn_greenlighting::cnn_greenlighting;
 use enums::common::sqlite::skip_reason::SkipReason;
 use enums::common::sqlite::web_content_type::WebContentType;
 use errors::AnyhowResult;

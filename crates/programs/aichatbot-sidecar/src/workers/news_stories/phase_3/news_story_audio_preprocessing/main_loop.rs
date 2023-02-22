@@ -1,5 +1,5 @@
 use crate::shared_state::job_state::JobState;
-use crate::workers::news_stories::news_story_audio_preprocessing::process_single_item::process_single_item;
+use crate::workers::news_stories::phase_3::news_story_audio_preprocessing::process_single_item::process_single_item;
 use log::{debug, error};
 use sqlite_queries::queries::by_table::news_story_productions::list::list_news_story_productions_awaiting_audio_generation::list_news_story_productions_awaiting_audio_generation;
 use std::sync::Arc;
