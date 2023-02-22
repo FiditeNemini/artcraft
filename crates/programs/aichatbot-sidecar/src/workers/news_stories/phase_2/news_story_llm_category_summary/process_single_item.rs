@@ -64,10 +64,31 @@ pub async fn process_single_item(target: &NewsStoryProductionItem, job_state: &A
     Ok(rendition_data) => rendition_data,
   };
 
+  let categorization = rendition_data.response.trim();
+
+  // NB: GPT often completes the prompt we used itself, so we grab the last line (presumably output)
+  let categorization = categorization.split("\n")
+      .map(|line| line.trim().to_string())
+      .filter(|line| line.len() > 5)
+      .last()
+      .unwrap_or("".to_string());
+
+  if categorization.len() < 5 {
+    update_news_story_llm_categorization_status(Args {
+      news_story_token: &target.news_story_token,
+      is_successful: false,
+      maybe_categorization: None,
+      llm_categorization_attempts,
+      sqlite_pool: &job_state.sqlite_pool,
+    }).await?; // NB: If these queries fail, we could get stuck in retry hell.
+
+    return Err(anyhow!("too short"));
+  }
+
   update_news_story_llm_categorization_status(Args {
     news_story_token: &target.news_story_token,
     is_successful: true,
-    maybe_categorization: None,
+    maybe_categorization: Some(categorization.to_string()),
     llm_categorization_attempts,
     sqlite_pool: &job_state.sqlite_pool,
   }).await?; // NB: If these queries fail, we could get stuck in retry hell.

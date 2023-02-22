@@ -68,10 +68,32 @@ pub async fn process_single_item(target: &NewsStoryProductionItem, job_state: &A
     Ok(rendition_data) => rendition_data,
   };
 
+  let title_summary = rendition_data.response.trim();
+
+  // NB: GPT often completes the prompt we used itself, so we grab the last line (presumably output)
+  let title_summary = title_summary.split("\n")
+      .map(|line| line.trim().to_string())
+      .filter(|line| line.len() > 5)
+      .last()
+      .unwrap_or("".to_string());
+
+  // NB: GPT often includes quotes in the output.
+  let title_summary = title_summary.replace("\"", "");
+
+  if title_summary.len() < 5 {
+    update_news_story_llm_title_summary_status(Args {
+      news_story_token: &target.news_story_token,
+      is_successful: false,
+      maybe_title_summary: None,
+      llm_title_summary_attempts,
+      sqlite_pool: &job_state.sqlite_pool,
+    }).await?; // NB: If these queries fail, we could get stuck in retry hell.
+  }
+
   update_news_story_llm_title_summary_status(Args {
     news_story_token: &target.news_story_token,
     is_successful: true,
-    maybe_title_summary: None,
+    maybe_title_summary: Some(title_summary.to_string()),
     llm_title_summary_attempts,
     sqlite_pool: &job_state.sqlite_pool,
   }).await?; // NB: If these queries fail, we could get stuck in retry hell.
