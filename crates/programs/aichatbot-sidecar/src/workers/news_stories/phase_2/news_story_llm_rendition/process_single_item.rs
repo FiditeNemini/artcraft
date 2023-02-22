@@ -1,11 +1,11 @@
 use async_openai::Client;
 use async_openai::error::OpenAIError;
 use async_openai::types::CreateCompletionRequestArgs;
+use crate::gpt_prompts::news_article_prompt::NewsArticlePrompt;
 use crate::persistence::load_scraped_result::load_scraped_result;
 use crate::persistence::rendition_data::RenditionData;
 use crate::persistence::save_directory::SaveDirectory;
 use crate::shared_state::job_state::JobState;
-use crate::workers::news_stories::phase_2::news_story_llm_rendition::gpt_prompts::news_article_prompt::NewsArticlePrompt;
 use enums::by_table::web_rendition_targets::rendition_status::RenditionStatus;
 use errors::{anyhow, AnyhowResult};
 use log::{error, info, warn};

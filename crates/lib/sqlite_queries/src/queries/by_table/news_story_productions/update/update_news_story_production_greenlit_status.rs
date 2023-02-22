@@ -17,15 +17,21 @@ pub async fn update_news_story_production_greenlit_status(args: Args<'_>) -> Any
   // NB: "audio_generation_status" etc. should still be "not_ready".
   let mut overall_production_status;
   let mut llm_rendition_status;
+  let mut llm_title_summary_status;
+  let mut llm_categorization_status;
   let mut image_generation_status;
 
   if args.is_greenlit {
     overall_production_status = AwaitableJobStatus::Processing.to_str();
     llm_rendition_status = AwaitableJobStatus::ReadyWaiting.to_str();
+    llm_title_summary_status = AwaitableJobStatus::ReadyWaiting.to_str();
+    llm_categorization_status = AwaitableJobStatus::ReadyWaiting.to_str();
     image_generation_status = AwaitableJobStatus::ReadyWaiting.to_str();
   } else {
     overall_production_status = AwaitableJobStatus::Skipped.to_str();
     llm_rendition_status = AwaitableJobStatus::Skipped.to_str();
+    llm_title_summary_status = AwaitableJobStatus::Skipped.to_str();
+    llm_categorization_status = AwaitableJobStatus::Skipped.to_str();
     image_generation_status = AwaitableJobStatus::Skipped.to_str();
   }
 
@@ -36,6 +42,8 @@ SET
   maybe_skip_reason = ?,
   overall_production_status = ?,
   llm_rendition_status = ?,
+  llm_title_summary_status = ?,
+  llm_categorization_status = ?,
   image_generation_status = ?,
   version = version + 1
 WHERE
@@ -44,6 +52,8 @@ WHERE
         args.maybe_skip_reason,
         overall_production_status,
         llm_rendition_status,
+        llm_title_summary_status,
+        llm_categorization_status,
         image_generation_status,
         args.news_story_token,
     );
