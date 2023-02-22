@@ -3,6 +3,7 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")] // hide console window on Windows in release
 
 pub mod configs;
+pub mod gpt_prompts;
 pub mod gui;
 pub mod persistence;
 pub mod shared_state;
@@ -48,6 +49,8 @@ use web_scrapers::sites::techcrunch::techcrunch_article_scraper::techcrunch_arti
 use web_scrapers::sites::theguardian::theguardian_scraper::theguardian_scraper_test;
 use workers::news_stories::phase_4::news_story_audio_final_verification::main_loop::news_story_audio_final_verification_main_loop;
 use workers::news_stories::phase_5::news_story_post_production_finalization::main_loop::news_story_post_production_finalization_main_loop;
+use crate::workers::news_stories::phase_2::news_story_llm_category_summary::main_loop::news_story_llm_category_summary_main_loop;
+use crate::workers::news_stories::phase_2::news_story_llm_title_summary::main_loop::news_story_llm_title_summary_main_loop;
 
 //#[tokio::main]
 //pub async fn main() -> AnyhowResult<()> {
@@ -205,6 +208,8 @@ pub async fn main() -> AnyhowResult<()> {
     let job_state9 = job_state.clone();
     let job_state10 = job_state.clone();
     let job_state11 = job_state.clone();
+    let job_state12 = job_state.clone();
+    let job_state13 = job_state.clone();
 
     tokio_runtime.spawn(async {
       let _r = web_index_ingestion_main_loop(job_state2).await;
@@ -220,6 +225,14 @@ pub async fn main() -> AnyhowResult<()> {
 
     tokio_runtime.spawn(async {
       let _r = news_story_llm_rendition_main_loop(job_state5).await;
+    });
+
+    tokio_runtime.spawn(async {
+      let _r = news_story_llm_title_summary_main_loop(job_state12).await;
+    });
+
+    tokio_runtime.spawn(async {
+      let _r = news_story_llm_category_summary_main_loop(job_state13).await;
     });
 
     tokio_runtime.spawn(async {

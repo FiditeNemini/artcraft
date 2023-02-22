@@ -19,6 +19,10 @@ SELECT
   original_news_canonical_url,
   web_content_type as `web_content_type: enums::common::sqlite::web_content_type::WebContentType`,
   original_news_title,
+
+  maybe_summary_news_title,
+  maybe_categorization,
+
   overall_production_status as `overall_production_status: enums::common::sqlite::awaitable_job_status::AwaitableJobStatus`,
 
   llm_rendition_status as `llm_rendition_status: enums::common::sqlite::awaitable_job_status::AwaitableJobStatus`,
@@ -37,6 +41,8 @@ FROM news_story_productions
 WHERE
   overall_production_status = "processing"
   AND llm_rendition_status = "done"
+  AND llm_title_summary_status = "done"
+  AND llm_categorization_status = "done"
   AND audio_generation_status = "done"
   AND image_generation_status = "done"
   AND id > ?

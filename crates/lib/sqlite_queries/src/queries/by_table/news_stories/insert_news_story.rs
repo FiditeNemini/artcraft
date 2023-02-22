@@ -11,6 +11,9 @@ pub struct Args <'a> {
   pub web_content_type: WebContentType,
   pub original_news_title: &'a str,
 
+  pub summary_news_title: &'a str,
+  pub llm_categorization: &'a str,
+
   pub audio_file_count: i64,
   pub audio_total_duration_seconds: i64,
 
@@ -30,12 +33,16 @@ INSERT INTO news_stories (
   original_news_canonical_url,
   web_content_type,
   original_news_title,
+  summary_news_title,
+  llm_categorization,
   audio_file_count,
   audio_total_duration_seconds,
   replayable_until,
   is_playable
 )
 VALUES (
+  ?,
+  ?,
   ?,
   ?,
   ?,
@@ -50,6 +57,8 @@ VALUES (
         args.original_news_canonical_url,
         web_content_type,
         args.original_news_title,
+        args.summary_news_title,
+        args.llm_categorization,
         args.audio_file_count,
         args.audio_total_duration_seconds,
         args.replayable_until

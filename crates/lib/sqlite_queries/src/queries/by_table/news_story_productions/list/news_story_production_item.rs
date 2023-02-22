@@ -9,6 +9,9 @@ pub struct NewsStoryProductionItem {
   pub original_news_canonical_url: String,
   pub original_news_title: String,
 
+  pub maybe_summary_news_title: Option<String>,
+  pub maybe_categorization: Option<String>,
+
   // Overall production status, which depends on all other statuses
   pub overall_production_status: AwaitableJobStatus,
 

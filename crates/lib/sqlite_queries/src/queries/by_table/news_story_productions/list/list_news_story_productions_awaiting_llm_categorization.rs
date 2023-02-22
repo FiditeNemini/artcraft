@@ -4,11 +4,16 @@ use errors::{anyhow, AnyhowResult};
 use sqlx::SqlitePool;
 use tokens::tokens::news_stories::NewsStoryToken;
 
-pub async fn list_news_story_productions_awaiting_greenlight(
+pub async fn list_news_story_productions_awaiting_llm_categorization(
+  llm_rendition_status: AwaitableJobStatus,
   last_id: i64,
   limit: i64,
   sqlite_pool: &SqlitePool,
 ) -> AnyhowResult<Vec<NewsStoryProductionItem>> {
+
+  // NB: Sqlx doesn't support `WHERE ... IN (...)` "yet". :(
+  // https://github.com/launchbadge/sqlx/blob/6d0d7402c8a9cbea2676a1795e9fb50b0cf60c03/FAQ.md?plain=1#L73
+  let llm_rendition_status = llm_rendition_status.to_string();
 
   let query = sqlx::query_as!(
     NewsStoryProductionItem,
@@ -39,11 +44,13 @@ SELECT
   image_generation_attempts
 FROM news_story_productions
 WHERE
-  overall_production_status = "ready_waiting"
+  overall_production_status = "processing"
+  AND llm_categorization_status = ?
   AND id > ?
 ORDER BY id ASC
 LIMIT ?
         "#,
+        llm_rendition_status,
         last_id,
         limit,
     );

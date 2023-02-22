@@ -1,9 +1,9 @@
 use crate::shared_state::job_state::JobState;
-use crate::workers::news_stories::phase_2::news_story_llm_rendition::process_single_item::process_single_item;
+use crate::workers::news_stories::phase_2::news_story_llm_title_summary::process_single_item::process_single_item;
 use enums::by_table::web_rendition_targets::rendition_status::RenditionStatus;
 use enums::common::sqlite::awaitable_job_status::AwaitableJobStatus;
 use log::{debug, error, info};
-use sqlite_queries::queries::by_table::news_story_productions::list::list_news_story_productions_awaiting_llm_rendition::list_news_story_productions_awaiting_llm_rendition;
+use sqlite_queries::queries::by_table::news_story_productions::list::list_news_story_productions_awaiting_llm_title_summary::list_news_story_productions_awaiting_llm_title_summary;
 use std::sync::Arc;
 use std::thread;
 use std::time::Duration;
@@ -38,9 +38,9 @@ async fn rendition_jobs_of_status(status: AwaitableJobStatus, job_state: &Arc<Jo
     // NB: Protect sqlite from contention.
     thread::sleep(Duration::from_millis(500));
 
-    debug!("web_rendition querying {:?} targets from id > {} ...", &status, last_id);
+    debug!("llm_title_summary querying {:?} targets from id > {} ...", &status, last_id);
 
-    let query_result = list_news_story_productions_awaiting_llm_rendition(
+    let query_result = list_news_story_productions_awaiting_llm_title_summary(
       status, last_id, BATCH_SIZE, &job_state.sqlite_pool).await;
 
     let targets = match query_result {
@@ -69,7 +69,7 @@ async fn rendition_jobs_of_status(status: AwaitableJobStatus, job_state: &Arc<Jo
     }
 
     for target in targets {
-      debug!("Rendition for target: {:?}", target.original_news_canonical_url);
+      debug!("LLM title summary for target: {:?}", target.original_news_canonical_url);
 
       let result = process_single_item(&target, job_state).await;
       if let Err(err) = result {
