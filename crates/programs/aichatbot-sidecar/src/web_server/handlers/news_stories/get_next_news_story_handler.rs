@@ -23,6 +23,7 @@ pub struct GetNextNewsStoryFileResponse {
   pub news_story_token: NewsStoryToken,
   pub original_news_canonical_url: String,
   pub original_news_title: String,
+  pub summary_news_title: String,
   pub audio_file_count: u64,
   pub audio_total_duration_seconds: u64,
 }
@@ -87,6 +88,7 @@ pub async fn get_next_news_story_handler(
     news_story_token: story.news_story_token.clone(),
     original_news_canonical_url: story.original_news_canonical_url.clone(),
     original_news_title: story.original_news_title.clone(),
+    summary_news_title: story.summary_news_title.clone(),
     audio_file_count: story.audio_file_count as u64,
     audio_total_duration_seconds: story.audio_total_duration_seconds as u64,
   };

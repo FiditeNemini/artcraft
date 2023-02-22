@@ -16,6 +16,7 @@ SELECT
   news_story_token as `news_story_token: tokens::tokens::news_stories::NewsStoryToken`,
   original_news_canonical_url,
   original_news_title,
+  summary_news_title,
   audio_file_count,
   audio_total_duration_seconds
 FROM news_stories
