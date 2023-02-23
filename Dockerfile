@@ -13,15 +13,17 @@ ARG RUST_TOOLCHAIN="1.66.0"
 
 WORKDIR /tmp
 
-# NB: pkg-config and libssl are for container TLS; we may switch to rustls in the future.
 # NB: cmake is required for freetype-sys-0.13.1, which in turn has only been added for egui.
 # NB: fontconfig is required by servo-fontconfig-sys, which is in the dependency chain for egui.
+# NB: libfontconfig-dev is required by servo-fontconfig-sys, which is in the dependency chain for egui.
+# NB: pkg-config and libssl are for container TLS; we may switch to rustls in the future.
 RUN apt-get update \
     && DEBIAN_FRONTEND=noninteractive TZ=Etc/UTC apt-get install -y \
         build-essential \
         cmake \
         curl \
         fontconfig \
+        libfontconfig1-dev \
         libssl-dev \
         pkg-config
 
