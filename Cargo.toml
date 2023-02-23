@@ -11,6 +11,7 @@ members = [
   # CLI tools for operations, etc.
   "crates/cli/database_backup",
   "crates/cli/database_cleanup",
+  "crates/cli/scrape_test",
 
   # Shared libraries
   "crates/lib/actix_helpers",

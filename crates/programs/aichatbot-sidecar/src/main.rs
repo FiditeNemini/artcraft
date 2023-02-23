@@ -27,7 +27,9 @@ use crate::workers::audio::fakeyou_audio_create::main_loop::fakeyou_audio_create
 use crate::workers::audio::fakeyou_audio_download::main_loop::fakeyou_audio_download_main_loop;
 use crate::workers::news_stories::phase_1::news_story_greenlighting::main_loop::news_story_greenlighting_main_loop;
 use crate::workers::news_stories::phase_2::news_story_image_generation::main_loop::news_story_image_generation_main_loop;
+use crate::workers::news_stories::phase_2::news_story_llm_category_summary::main_loop::news_story_llm_category_summary_main_loop;
 use crate::workers::news_stories::phase_2::news_story_llm_rendition::main_loop::news_story_llm_rendition_main_loop;
+use crate::workers::news_stories::phase_2::news_story_llm_title_summary::main_loop::news_story_llm_title_summary_main_loop;
 use crate::workers::news_stories::phase_3::news_story_audio_preprocessing::main_loop::news_story_audio_preprocessing_main_loop;
 use crate::workers::web::web_content_scraping::main_loop::web_content_scraping_main_loop;
 use crate::workers::web::web_content_scraping::single_target::ingest_url_scrape_and_save::ingest_url_scrape_and_save;
@@ -49,8 +51,6 @@ use web_scrapers::sites::techcrunch::techcrunch_article_scraper::techcrunch_arti
 use web_scrapers::sites::theguardian::theguardian_scraper::theguardian_scraper_test;
 use workers::news_stories::phase_4::news_story_audio_final_verification::main_loop::news_story_audio_final_verification_main_loop;
 use workers::news_stories::phase_5::news_story_post_production_finalization::main_loop::news_story_post_production_finalization_main_loop;
-use crate::workers::news_stories::phase_2::news_story_llm_category_summary::main_loop::news_story_llm_category_summary_main_loop;
-use crate::workers::news_stories::phase_2::news_story_llm_title_summary::main_loop::news_story_llm_title_summary_main_loop;
 
 //#[tokio::main]
 //pub async fn main() -> AnyhowResult<()> {

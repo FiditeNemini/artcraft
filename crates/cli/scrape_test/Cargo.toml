@@ -1,0 +1,23 @@
+[package]
+name = "scrape_test"
+publish = false
+edition = "2021"
+version = "0.0.1"
+authors = [
+    "Brandon Thomas <bt@brand.io>",
+    "Brandon Thomas <echelon@gmail.com>",
+]
+
+[[bin]]
+name = "scrape_test"
+path = "src/main.rs"
+
+[dependencies]
+
+# Internal
+errors = { path = "../../lib/errors" }
+web_scrapers = { path = "../../lib/web_scrapers" }
+
+# External
+clap = "2.34.0" # TODO: This is really out of date, but has conflicts when updated
+tokio = { version = "1.6.0", features = ["macros"] }
