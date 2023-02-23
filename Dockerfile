@@ -25,6 +25,10 @@ RUN apt-get update \
         libssl-dev \
         pkg-config
 
+# NB: Fix for fontconfig (servo-fontconfig-sys): https://github.com/alacritty/alacritty/issues/4423#issuecomment-727277235
+# TODO(bt, 2023-02-23): This has not been verified to work yet.
+RUN export PKG_CONFIG_PATH=/usr/lib/x86_64-linux-gnu/pkgconfig
+
 # Install Rust
 RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs \
     | sh  -s -- --default-toolchain $RUST_TOOLCHAIN -y
