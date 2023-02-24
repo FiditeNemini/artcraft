@@ -18,6 +18,8 @@ pub async fn process_target_record(target: &WebScrapingTargetRecord, job_state: 
     target.web_content_type,
     &job_state.save_directory).await;
 
+  let scrape_attempts = target.scrape_attempts + 1;
+
   match result {
     Err(err) => {
       error!("error ingesting url: {:?}", err);
@@ -27,20 +29,22 @@ pub async fn process_target_record(target: &WebScrapingTargetRecord, job_state: 
       update_web_scraping_target(ScrapingArgs {
         canonical_url: &target.canonical_url,
         scraping_status: next_scraping_status,
-        scrape_attempts: target.scrape_attempts + 1,
+        scrape_attempts,
         sqlite_pool: &job_state.sqlite_pool,
       }).await?; // NB: If these queries fail, we could get stuck.
 
       Err(err)
     },
     Ok(None) => {
+      error!("nothing was scraped from url: {:?}", &target.canonical_url);
+
       // Nothing was scraped.
       let next_scraping_status = next_status(target.scrape_attempts);
 
       update_web_scraping_target(ScrapingArgs {
         canonical_url: &target.canonical_url,
         scraping_status: next_scraping_status,
-        scrape_attempts: target.scrape_attempts + 1,
+        scrape_attempts,
         sqlite_pool: &job_state.sqlite_pool,
       }).await?; // NB: If these queries fail, we could get stuck.
 
@@ -50,19 +54,12 @@ pub async fn process_target_record(target: &WebScrapingTargetRecord, job_state: 
       update_web_scraping_target(ScrapingArgs {
         canonical_url: &target.canonical_url,
         scraping_status: ScrapingStatus::Success,
-        scrape_attempts: target.scrape_attempts + 1,
+        scrape_attempts,
         sqlite_pool: &job_state.sqlite_pool,
       }).await?; // NB: If these queries fail, we could get stuck.
 
       let maybe_skip_reason = filter_scraped_result_heuristics(&result)
           .await?;
-
-      //insert_web_rendition_target( RenditionArgs {
-      //  canonical_url: &target.canonical_url,
-      //  web_content_type: target.web_content_type,
-      //  sqlite_pool: &job_state.sqlite_pool,
-      //  maybe_skip_reason,
-      //}).await?; // NB: If these queries fail, we could get stuck.
 
       let news_story_token = NewsStoryToken::generate();
 
@@ -81,7 +78,7 @@ pub async fn process_target_record(target: &WebScrapingTargetRecord, job_state: 
 }
 
 fn next_status(scrape_attempts: i64) -> ScrapingStatus {
-  if scrape_attempts >= 2 {
+  if scrape_attempts > 2 {
     ScrapingStatus::PermanentlyFailed
   } else {
     ScrapingStatus::Failed

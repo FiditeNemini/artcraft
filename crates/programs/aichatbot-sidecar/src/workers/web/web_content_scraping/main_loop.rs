@@ -3,6 +3,8 @@ use crate::workers::web::web_content_scraping::single_target::process_target_rec
 use enums::by_table::web_scraping_targets::scraping_status::ScrapingStatus;
 use errors::AnyhowResult;
 use log::{debug, error, info};
+use rand::seq::SliceRandom;
+use rand::thread_rng;
 use sqlite_queries::queries::by_table::web_scraping_targets::insert_web_scraping_target::{Args, insert_web_scraping_target};
 use sqlite_queries::queries::by_table::web_scraping_targets::list_web_scraping_targets::WebScrapingTarget as WebScrapingTargetRecord;
 use sqlite_queries::queries::by_table::web_scraping_targets::list_web_scraping_targets::list_web_scraping_targets;
@@ -43,6 +45,7 @@ async fn single_job_loop_iteration(job_state: &Arc<JobState>) {
 
 async fn scrape_jobs_of_status(status: ScrapingStatus, job_state: &Arc<JobState>) {
   const BATCH_SIZE : i64 = 10;
+  const SHUFFLE : bool = true;
 
   let mut last_id = 0;
   let mut failure_count = 0;
@@ -56,7 +59,7 @@ async fn scrape_jobs_of_status(status: ScrapingStatus, job_state: &Arc<JobState>
     let query_result = list_web_scraping_targets(
       status, last_id, BATCH_SIZE, &job_state.sqlite_pool).await;
 
-    let targets = match query_result {
+    let mut targets = match query_result {
       Ok(targets) => targets,
       Err(err) => {
         error!("failure querying batch: {:?}", err);
@@ -79,6 +82,10 @@ async fn scrape_jobs_of_status(status: ScrapingStatus, job_state: &Arc<JobState>
 
     if targets.is_empty() {
       return; // Done with batches.
+    }
+
+    if SHUFFLE {
+      targets.shuffle(&mut thread_rng());
     }
 
     for target in targets {
