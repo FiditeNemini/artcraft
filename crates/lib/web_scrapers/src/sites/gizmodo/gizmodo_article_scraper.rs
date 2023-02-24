@@ -76,18 +76,9 @@ pub async fn gizmodo_article_scraper(url: &str) -> AnyhowResult<WebScrapingResul
 
   let maybe_timestamp_raw = extract_attribute(&document, &DATETIME_SELECTOR, "datetime");
 
-  // Format on webpage: "Thu 23 Feb 2023 12.39 EST",
-  // Timestamp is present as *almost* RFC3339: 2023-02-23T19:30:30-0500
-  // Frustratingly, there should be a colon in the timezone offset.
+  // Timestamp is present as RFC3339: 2023-02-23T19:30:30-05:00
   let maybe_timestamp = maybe_timestamp_raw
       .as_deref()
-      // This is a lazy af fix for the RFC3339 non-compliance.
-      .map(|invalid| invalid.replace("-0400", "-04:00"))
-      .map(|invalid| invalid.replace("-0500", "-05:00"))
-      .map(|invalid| invalid.replace("-0600", "-06:00"))
-      .map(|invalid| invalid.replace("-0700", "-07:00"))
-      .map(|invalid| invalid.replace("-0800", "-08:00"))
-      .map(|invalid| invalid.replace("-0900", "-09:00"))
       .map(|ts| DateTime::parse_from_rfc3339(ts.trim()))
       .transpose()?
       // We need to juggle from DateTime<NaiveOffset> to DateTime<Utc>.

@@ -2,9 +2,15 @@ use scraper::{Html, Selector};
 
 pub fn extract_attribute(document: &Html, element_selector: &Selector, attribute_name: &str) -> Option<String> {
   let element = match document.select(element_selector).next() {
-    None => return None,
+    None => {
+      println!("NOT FOUND");
+      return None
+    },
     Some(element) => element,
   };
+
+  println!("FOUND");
+
   element.value()
       .attr(attribute_name)
       .map(|value| value.to_string())
