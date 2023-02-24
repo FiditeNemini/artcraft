@@ -478,7 +478,10 @@ function TtsResultViewPage(props: Props) {
           </div>*/}
 
           <motion.p className="mb-3 result-text mt-4 pt-2">
-            <TextExpander text={ttsInferenceResult.raw_inference_text} />
+            <TextExpander
+              text={ttsInferenceResult.raw_inference_text}
+              cutLength={250}
+            />
           </motion.p>
         </div>
       </div>
