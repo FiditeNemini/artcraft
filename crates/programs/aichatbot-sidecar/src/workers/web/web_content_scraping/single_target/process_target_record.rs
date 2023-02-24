@@ -6,7 +6,7 @@ use errors::AnyhowResult;
 use log::error;
 use sqlite_queries::queries::by_table::news_story_productions::insert_news_story_production::Args as ProductionArgs;
 use sqlite_queries::queries::by_table::news_story_productions::insert_news_story_production::insert_news_story_production;
-use sqlite_queries::queries::by_table::web_scraping_targets::list_web_scraping_targets::WebScrapingTarget as WebScrapingTargetRecord;
+use sqlite_queries::queries::by_table::web_scraping_targets::list::web_scraping_target::WebScrapingTarget as WebScrapingTargetRecord;
 use sqlite_queries::queries::by_table::web_scraping_targets::update_web_scraping_target::Args as ScrapingArgs;
 use sqlite_queries::queries::by_table::web_scraping_targets::update_web_scraping_target::update_web_scraping_target;
 use std::sync::Arc;

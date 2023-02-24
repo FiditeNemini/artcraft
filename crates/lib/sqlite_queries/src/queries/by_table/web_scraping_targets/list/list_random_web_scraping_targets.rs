@@ -1,20 +1,10 @@
+use crate::queries::by_table::web_scraping_targets::list::web_scraping_target::{RawInternalWebScrapingTarget, WebScrapingTarget};
 use enums::by_table::web_scraping_targets::scraping_status::ScrapingStatus;
 use enums::common::sqlite::web_content_type::WebContentType;
 use errors::{anyhow, AnyhowResult};
 use sqlx::SqlitePool;
 
-pub struct WebScrapingTarget {
-  pub id: i64,
-  pub canonical_url: String,
-  pub web_content_type: WebContentType,
-  pub maybe_title: Option<String>,
-  pub maybe_article_full_image_url: Option<String>,
-  pub maybe_article_thumbnail_image_url: Option<String>,
-  pub scraping_status: ScrapingStatus,
-  pub scrape_attempts: i64,
-}
-
-pub async fn list_web_scraping_targets(
+pub async fn list_random_web_scraping_targets(
   scraping_status: ScrapingStatus,
   last_id: i64,
   limit: i64,
@@ -69,15 +59,4 @@ LIMIT ?
       .collect::<Vec<WebScrapingTarget>>();
 
   Ok(records)
-}
-
-struct RawInternalWebScrapingTarget {
-  id: i64,
-  canonical_url: String,
-  web_content_type: WebContentType,
-  maybe_title: Option<String>,
-  maybe_article_full_image_url: Option<String>,
-  maybe_article_thumbnail_image_url: Option<String>,
-  scraping_status: ScrapingStatus,
-  scrape_attempts: i64,
 }

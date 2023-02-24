@@ -6,8 +6,8 @@ use log::{debug, error, info};
 use rand::seq::SliceRandom;
 use rand::thread_rng;
 use sqlite_queries::queries::by_table::web_scraping_targets::insert_web_scraping_target::{Args, insert_web_scraping_target};
-use sqlite_queries::queries::by_table::web_scraping_targets::list_web_scraping_targets::WebScrapingTarget as WebScrapingTargetRecord;
-use sqlite_queries::queries::by_table::web_scraping_targets::list_web_scraping_targets::list_web_scraping_targets;
+use sqlite_queries::queries::by_table::web_scraping_targets::list::list_random_web_scraping_targets::list_random_web_scraping_targets;
+use sqlite_queries::queries::by_table::web_scraping_targets::list::web_scraping_target::WebScrapingTarget as WebScrapingTargetRecord;
 use sqlx::sqlite::SqlitePoolOptions;
 use std::future::Future;
 use std::sync::Arc;
@@ -44,7 +44,8 @@ async fn single_job_loop_iteration(job_state: &Arc<JobState>) {
 }
 
 async fn scrape_jobs_of_status(status: ScrapingStatus, job_state: &Arc<JobState>) {
-  const BATCH_SIZE : i64 = 10;
+  // NB: Low batch size so we can shuffle in memory and process stories in a more random order
+  const BATCH_SIZE : i64 = 5;
   const SHUFFLE : bool = true;
 
   let mut last_id = 0;
@@ -56,7 +57,7 @@ async fn scrape_jobs_of_status(status: ScrapingStatus, job_state: &Arc<JobState>
 
     debug!("web_content_scraping querying {:?} targets from id > {} ...", &status, last_id);
 
-    let query_result = list_web_scraping_targets(
+    let query_result = list_random_web_scraping_targets(
       status, last_id, BATCH_SIZE, &job_state.sqlite_pool).await;
 
     let mut targets = match query_result {
