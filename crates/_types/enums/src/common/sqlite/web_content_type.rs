@@ -12,6 +12,9 @@ use strum::EnumIter;
 #[cfg_attr(test, derive(EnumIter, EnumCount))]
 #[derive(Clone, Copy, Eq, PartialEq, Hash, Deserialize, Serialize)]
 pub enum WebContentType {
+  #[serde(rename = "cbs_news_article")]
+  CbsNewsArticle,
+
   #[serde(rename = "cnn_article")]
   CnnArticle,
 
@@ -42,6 +45,7 @@ impl_sqlite_enum_coders!(WebContentType);
 impl WebContentType {
   pub fn to_str(&self) -> &'static str {
     match self {
+      Self::CbsNewsArticle => "cbs_news_article",
       Self::CnnArticle => "cnn_article",
       Self::HackerNewsThread => "hacker_news_thread",
       Self::RedditThread => "reddit_thread",
@@ -54,6 +58,7 @@ impl WebContentType {
 
   pub fn from_str(value: &str) -> Result<Self, String> {
     match value {
+      "cbs_news_article" => Ok(Self::CbsNewsArticle),
       "cnn_article" => Ok(Self::CnnArticle),
       "hacker_news_thread" => Ok(Self::HackerNewsThread),
       "reddit_thread" => Ok(Self::RedditThread),
@@ -76,6 +81,7 @@ mod tests {
 
     #[test]
     fn test_serialization() {
+      assert_serialization(WebContentType::CbsNewsArticle, "cbs_news_article");
       assert_serialization(WebContentType::CnnArticle, "cnn_article");
       assert_serialization(WebContentType::HackerNewsThread, "hacker_news_thread");
       assert_serialization(WebContentType::RedditThread, "reddit_thread");
@@ -91,6 +97,7 @@ mod tests {
 
     #[test]
     fn test_to_str() {
+      assert_eq!(WebContentType::CbsNewsArticle.to_str(), "cbs_news_article");
       assert_eq!(WebContentType::CnnArticle.to_str(), "cnn_article");
       assert_eq!(WebContentType::HackerNewsThread.to_str(), "hacker_news_thread");
       assert_eq!(WebContentType::RedditThread.to_str(), "reddit_thread");
@@ -102,6 +109,7 @@ mod tests {
 
     #[test]
     fn test_from_str() {
+      assert_eq!(WebContentType::from_str("cbs_news_article").unwrap(), WebContentType::CbsNewsArticle);
       assert_eq!(WebContentType::from_str("cnn_article").unwrap(), WebContentType::CnnArticle);
       assert_eq!(WebContentType::from_str("hacker_news_thread").unwrap(), WebContentType::HackerNewsThread);
       assert_eq!(WebContentType::from_str("reddit_thread").unwrap(), WebContentType::RedditThread);

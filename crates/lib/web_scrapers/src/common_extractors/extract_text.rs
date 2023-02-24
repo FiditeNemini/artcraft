@@ -20,6 +20,7 @@ pub fn extract_text(document: &Html, text_selector: &Selector) -> Option<String>
 
 #[cfg(test)]
 mod tests {
+  use crate::common_extractors::extract_text::extract_text;
   use crate::sites::cnn::cnn_article_scraper::CNN_TITLE_SELECTOR;
   use crate::sites::techcrunch::techcrunch_article_scraper::TECHCRUNCH_TITLE_SELECTOR;
   use scraper::{Html, Selector};

@@ -6,3 +6,4 @@ pub mod slashdot;
 pub mod techcrunch;
 pub mod theguardian;
 pub mod twitter;
+pub mod cbsnews;
