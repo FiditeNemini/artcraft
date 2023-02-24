@@ -9,7 +9,7 @@ use once_cell::sync::Lazy;
 use rss::Channel;
 use scraper::{Html, Selector};
 use std::ops::{Add, Deref};
-use chrono::{Duration, LocalResult, NaiveDateTime, TimeZone, Utc};
+use chrono::{DateTime, Duration, LocalResult, NaiveDateTime, TimeZone, Utc};
 use crate::common_extractors::extract_text::extract_text;
 use crate::utils::remove_timestamp_abbreviated_timezone::remove_timestamp_abbreviated_timezone;
 use crate::utils::remove_timestamp_abbreviated_weekday_name::remove_timestamp_abbreviated_weekday_name;
@@ -77,25 +77,13 @@ pub async fn cnn_article_scraper(url: &str) -> AnyhowResult<WebScrapingResult> {
   // Timestamp is present as "Published\n11:25 PM EST, Thu February 23, 2023"
   let maybe_timestamp_raw = extract_text(&document, &DATETIME_SELECTOR)
       .map(|raw| raw.replace("Published", ""))
+      .map(|raw| raw.replace("Updated", ""))
       .map(|raw| raw.trim().to_string());
 
   let maybe_timestamp = maybe_timestamp_raw
       .as_deref()
-      // TODO: This is such a flaky, unstable hack
-      .map(|ts| remove_timestamp_abbreviated_weekday_name(&ts))
-      .map(|ts| remove_timestamp_abbreviated_timezone(&ts))
-      .map(|ts| ts.replace("  ", " "))
-      .map(|ts| ts.replace(" , ", ", "))
-      .map(|ts| NaiveDateTime::parse_from_str(&ts, "%l:%M %P, %B %e, %Y"))
-      .transpose()?
-      .map(|naive| match Utc.from_local_datetime(&naive) {
-        LocalResult::None => Err(anyhow!("invalid datetime conversion")),
-        LocalResult::Ambiguous(_, _) => Err(anyhow!("ambiguous datetime conversion")),
-        LocalResult::Single(time) => Ok(time),
-      })
-      .transpose()?
-      // NB: The "Utc" time above is actually EST/EDT.
-      .map(|utc| utc.add(Duration::hours(5)));
+      .map(|ts| parse_timestamp(ts))
+      .flatten();
 
   let body_text = paragraphs.join("\n\n");
 
@@ -115,4 +103,56 @@ pub async fn cnn_article_scraper(url: &str) -> AnyhowResult<WebScrapingResult> {
       maybe_publish_datetime_utc: maybe_timestamp,
     }
   })
+}
+
+fn parse_timestamp(timestamp: &str) -> Option<DateTime<Utc>> {
+  // NB: CNN article timestamps are horrible.
+  let timestamp = timestamp
+      .replace("Published\n", "")
+      .replace("Updated\n", "")
+      .trim()
+      .to_string();
+
+  // NB: Remove attributes that parse_from_str() struggles with.
+  // TODO: This is such a flaky, unstable hack
+  let maybe_timestamp = Some(timestamp)
+      .map(|ts| remove_timestamp_abbreviated_weekday_name(&ts))
+      .map(|ts| remove_timestamp_abbreviated_timezone(&ts))
+      .map(|ts| ts.replace("  ", " "))
+      .map(|ts| ts.replace(" , ", ", "));
+
+  // Parse
+  let maybe_timestamp = maybe_timestamp
+      .map(|ts| NaiveDateTime::parse_from_str(&ts, "%l:%M %P, %B %e, %Y"))
+      .transpose()
+      .ok()
+      .flatten()
+      .map(|naive| match Utc.from_local_datetime(&naive) {
+        LocalResult::None => Err(anyhow!("invalid datetime conversion")),
+        LocalResult::Ambiguous(_, _) => Err(anyhow!("ambiguous datetime conversion")),
+        LocalResult::Single(time) => Ok(time),
+      })
+      .transpose()
+      .ok()
+      .flatten()
+      // NB: The "Utc" time above is actually EST/EDT.
+      .map(|utc| utc.add(Duration::hours(5)));
+
+  maybe_timestamp
+}
+
+#[cfg(test)]
+mod tests {
+  use crate::sites::cnn::cnn_article_scraper::parse_timestamp;
+
+  #[test]
+  fn test_published() {
+    // NB: Actual website timestamp
+    assert!(parse_timestamp("Updated\n        5:55 PM EST, Thu February 23, 2023").is_some());
+  }
+
+  fn test_updated() {
+    // NB: Actual website timestamp
+    assert!(parse_timestamp("Published\n        11:25 PM EST, Thu February 23, 2023").is_some());
+  }
 }
