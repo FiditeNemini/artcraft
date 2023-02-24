@@ -19,9 +19,6 @@ import {
 import {
   faBan,
   faGear,
-  faAward,
-  faVolumeHigh,
-  faVideo,
   faGlobe,
   faDollarSign,
   faStar,
@@ -42,7 +39,6 @@ import "tippy.js/dist/tippy.css";
 import { motion } from "framer-motion";
 import { usePrefixedDocumentTitle } from "../../../../../common/UsePrefixedDocumentTitle";
 import { faCalendarAlt } from "@fortawesome/pro-solid-svg-icons";
-import "rc-tabs/assets/index.css";
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -399,7 +395,7 @@ function ProfilePage(props: Props) {
 
       {profileButtonsMobile}
 
-      <div className="container-panel mt-5">
+      <motion.div className="container-panel mt-5" variants={panel}>
         <div className="panel">
           <ul
             className="nav nav-tabs nav-profile justify-content-lg-center"
@@ -520,60 +516,7 @@ function ProfilePage(props: Props) {
             </div>
           </div>
         </div>
-      </div>
-
-      {/* <motion.div className="container-panel py-5" variants={panel}>
-        <div className="panel p-3 p-lg-4">
-          <h2 className="panel-title fw-bold">
-            <FontAwesomeIcon icon={faAward} className="me-3" />
-            Badges{" "}
-            <span className="fs-5 fw-normal ms-2">(images coming soon)</span>
-          </h2>
-          <div className="py-6">{badges}</div>
-        </div>
-      </motion.div> */}
-
-      {/* <motion.div className="container-panel pt-3 pb-5" variants={panel}>
-        <div className="panel p-3 p-lg-4">
-          <h2 className="panel-title fw-bold">
-            <FontAwesomeIcon icon={faVolumeHigh} className="me-3" />
-            TTS Results
-          </h2>
-          <div className="py-6">
-            <ProfileTtsInferenceResultsListFc username={userData.username} />
-          </div>
-        </div>
-      </motion.div> */}
-
-      {/* <motion.div className="container-panel pt-3 pb-5" variants={panel}>
-        <div className="panel p-3 p-lg-4">
-          <h2 className="panel-title fw-bold">
-            <FontAwesomeIcon icon={faVideo} className="me-3" />
-            Lipsync Results
-          </h2>
-          <div className="py-6">
-            <ProfileW2lInferenceResultsListFc username={userData.username} />
-          </div>
-        </div>
-      </motion.div> */}
-
-      {/* <motion.div className="container-panel pt-3 pb-5" variants={panel}>
-        <div className="panel p-3 p-lg-4">
-          <h2 className="panel-title fw-bold">Uploaded TTS Models </h2>
-          <div className="py-6">
-            <ProfileTtsModelListFc username={userData.username} />
-          </div>
-        </div>
-      </motion.div> */}
-
-      {/* <motion.div className="container-panel pt-3 pb-5" variants={panel}>
-        <div className="panel p-3 p-lg-4">
-          <h2 className="panel-title fw-bold">Uploaded Templates </h2>
-          <div className="py-6">
-            <ProfileW2lTemplateListFc username={userData.username} />
-          </div>
-        </div>
-      </motion.div> */}
+      </motion.div>
     </motion.div>
   );
 }
