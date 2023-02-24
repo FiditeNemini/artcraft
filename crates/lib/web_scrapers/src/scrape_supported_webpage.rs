@@ -5,6 +5,7 @@ use errors::AnyhowResult;
 use crate::payloads::web_scraping_result::WebScrapingResult;
 use crate::scrape_supported_webpage::ScrapeUtilityError::UrlParseError;
 use crate::sites::cnn::cnn_article_scraper::cnn_article_scraper;
+use crate::sites::theguardian::theguardian_article_scraper::theguardian_article_scraper;
 
 #[derive(Debug, Clone)]
 pub enum ScrapeUtilityError {
@@ -33,6 +34,7 @@ pub async fn scrape_supported_webpage(url: &str) -> Result<WebScrapingResult, Sc
 
   let maybe_result = match hostname.as_ref() {
     "cnn.com" | "www.cnn.com" => cnn_article_scraper(url).await,
+    "theguardian.com" | "www.theguardian.com" => theguardian_article_scraper(url).await,
     _ => return Err(ScrapeUtilityError::UnknownUrl),
   };
 

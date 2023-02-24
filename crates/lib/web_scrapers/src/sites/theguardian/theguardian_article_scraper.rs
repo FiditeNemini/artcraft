@@ -12,28 +12,30 @@ use std::ops::Deref;
 
 /// The main article content container
 static ARTICLE_CONTENT_SELECTOR : Lazy<Selector> = Lazy::new(|| {
-  Selector::parse(".article-content").expect("this selector should parse")
+  Selector::parse("#maincontent").expect("this selector should parse")
 });
 
 /// Paragraphs within the article
 static PARAGRAPH_SELECTOR : Lazy<Selector> = Lazy::new(|| {
-  // NB: Techcrunch content issue:
-  // The "div >" removes mysterious inclusion of Twitter <iframe>s
-  // (not sure why those are included, as the dom doesn't include <p>'s)
-  Selector::parse("div > p").expect("this selector should parse")
+  Selector::parse("p").expect("this selector should parse")
 });
 
 /// The title of the article
-pub static TECHCRUNCH_TITLE_SELECTOR: Lazy<Selector> = Lazy::new(|| {
-  Selector::parse(".article__title").expect("this selector should parse")
+pub static TITLE_SELECTOR: Lazy<Selector> = Lazy::new(|| {
+  Selector::parse("h1").expect("this selector should parse")
+});
+
+/// The title of the article
+pub static SUBTITLE_SELECTOR: Lazy<Selector> = Lazy::new(|| {
+  Selector::parse("div[data-gu-name=\"standfirst\"] p").expect("this selector should parse")
 });
 
 /// The article featured image
-pub static TECHCRUNCH_FEATURED_IMAGE_SELECTOR: Lazy<Selector> = Lazy::new(|| {
-  Selector::parse(".article__featured-image").expect("this selector should parse")
+pub static FEATURED_IMAGE_SELECTOR: Lazy<Selector> = Lazy::new(|| {
+  Selector::parse("figure > picture > img").expect("this selector should parse")
 });
 
-pub async fn techcrunch_article_scraper(url: &str) -> AnyhowResult<WebScrapingResult> {
+pub async fn theguardian_article_scraper(url: &str) -> AnyhowResult<WebScrapingResult> {
   let downloaded_document= reqwest::get(url)
       .await?
       .bytes()
@@ -66,8 +68,9 @@ pub async fn techcrunch_article_scraper(url: &str) -> AnyhowResult<WebScrapingRe
     }
   }
 
-  let maybe_title = extract_title(&document, &TECHCRUNCH_TITLE_SELECTOR);
-  let maybe_heading_image_url = extract_featured_image(&document, &TECHCRUNCH_FEATURED_IMAGE_SELECTOR);
+  let maybe_title = extract_title(&document, &TITLE_SELECTOR);
+  let maybe_subtitle = extract_title(&document, &SUBTITLE_SELECTOR);
+  let maybe_heading_image_url = extract_featured_image(&document, &FEATURED_IMAGE_SELECTOR);
 
   let body_text = paragraphs.join("\n\n");
 
@@ -75,9 +78,9 @@ pub async fn techcrunch_article_scraper(url: &str) -> AnyhowResult<WebScrapingRe
     original_html: downloaded_document,
     result: ScrapedWebArticle {
       url: url.to_string(),
-      web_content_type: WebContentType::TechCrunchArticle,
+      web_content_type: WebContentType::TheGuardianArticle,
       maybe_title,
-      maybe_subtitle: None,
+      maybe_subtitle,
       maybe_author: None, // TODO
       paragraphs,
       body_text,

@@ -74,6 +74,7 @@ pub async fn cnn_article_scraper(url: &str) -> AnyhowResult<WebScrapingResult> {
       url: url.to_string(),
       web_content_type: WebContentType::CnnArticle,
       maybe_title,
+      maybe_subtitle: None,
       maybe_author: None, // TODO
       paragraphs,
       body_text,

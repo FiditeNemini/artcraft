@@ -48,7 +48,7 @@ use std::time::Duration;
 use tokio::runtime::{Builder, Runtime};
 use web_scrapers::sites::cnn::cnn_article_scraper::cnn_article_scraper;
 use web_scrapers::sites::techcrunch::techcrunch_article_scraper::techcrunch_article_scraper;
-use web_scrapers::sites::theguardian::theguardian_scraper::theguardian_scraper_test;
+use web_scrapers::sites::theguardian::theguardian_indexer::theguardian_scraper_test;
 use workers::news_stories::phase_4::news_story_audio_final_verification::main_loop::news_story_audio_final_verification_main_loop;
 use workers::news_stories::phase_5::news_story_post_production_finalization::main_loop::news_story_post_production_finalization_main_loop;
 

@@ -8,7 +8,7 @@ const RSS_WORLD_NEWS : &'static str = "https://www.theguardian.com/world/rss";
 
 const RSS_TECHNOLOGY : &'static str = "https://www.theguardian.com/technology/rss";
 
-pub async fn theguardian_scraper_test() -> AnyhowResult<Vec<WebScrapingTarget>> {
+pub async fn theguardian_indexer() -> AnyhowResult<Vec<WebScrapingTarget>> {
   let content = reqwest::get(RSS_WORLD_NEWS)
       .await?
       .bytes()

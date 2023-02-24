@@ -21,6 +21,9 @@ pub struct ScrapedWebArticle {
   /// From page title or heading
   pub maybe_title: Option<String>,
 
+  /// Some pages have subtitles under the main title.
+  pub maybe_subtitle: Option<String>,
+
   /// The author of the  article
   pub maybe_author: Option<String>,
 
