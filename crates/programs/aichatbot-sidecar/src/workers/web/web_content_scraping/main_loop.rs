@@ -6,7 +6,6 @@ use log::{debug, error, info};
 use rand::seq::SliceRandom;
 use rand::thread_rng;
 use sqlite_queries::queries::by_table::web_scraping_targets::insert_web_scraping_target::{Args, insert_web_scraping_target};
-use sqlite_queries::queries::by_table::web_scraping_targets::list::list_random_web_scraping_targets::list_random_web_scraping_targets;
 use sqlite_queries::queries::by_table::web_scraping_targets::list::web_scraping_target::WebScrapingTarget as WebScrapingTargetRecord;
 use sqlx::sqlite::SqlitePoolOptions;
 use std::future::Future;
@@ -14,6 +13,7 @@ use std::sync::Arc;
 use std::thread;
 use std::time::Duration;
 use strum::IntoEnumIterator;
+use sqlite_queries::queries::by_table::web_scraping_targets::list::list_all_web_scraping_targets::list_all_web_scraping_targets;
 use web_scrapers::payloads::web_scraping_result::ScrapedWebArticle;
 use web_scrapers::payloads::web_scraping_target::WebScrapingTarget;
 use web_scrapers::sites::cnn::cnn_indexer::{cnn_indexer, CnnFeed};
@@ -45,7 +45,7 @@ async fn single_job_loop_iteration(job_state: &Arc<JobState>) {
 
 async fn scrape_jobs_of_status(status: ScrapingStatus, job_state: &Arc<JobState>) {
   // NB: Low batch size so we can shuffle in memory and process stories in a more random order
-  const BATCH_SIZE : i64 = 5;
+  const BATCH_SIZE : usize = 5;
   const SHUFFLE : bool = true;
 
   let mut last_id = 0;
@@ -57,8 +57,10 @@ async fn scrape_jobs_of_status(status: ScrapingStatus, job_state: &Arc<JobState>
 
     debug!("web_content_scraping querying {:?} targets from id > {} ...", &status, last_id);
 
-    let query_result = list_random_web_scraping_targets(
-      status, last_id, BATCH_SIZE, &job_state.sqlite_pool).await;
+    // NB: We query the whole list so we can randomly select in-memory.
+    // There were some problems with SQLX' RANDOM() making non-null fields nullable.
+    let query_result = list_all_web_scraping_targets(
+      status, &job_state.sqlite_pool).await;
 
     let mut targets = match query_result {
       Ok(targets) => targets,
@@ -88,6 +90,8 @@ async fn scrape_jobs_of_status(status: ScrapingStatus, job_state: &Arc<JobState>
     if SHUFFLE {
       targets.shuffle(&mut thread_rng());
     }
+
+    targets.truncate(BATCH_SIZE);
 
     for target in targets {
       info!("Download and scrape target: {:?}", target.canonical_url);

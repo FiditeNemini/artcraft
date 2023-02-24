@@ -4,10 +4,10 @@ use enums::common::sqlite::web_content_type::WebContentType;
 use errors::{anyhow, AnyhowResult};
 use sqlx::SqlitePool;
 
-pub async fn list_random_web_scraping_targets(
+// NB: I wanted to do "RANDOM()", but Sqlx turns non-NULL fields to null. (WTF?!)
+
+pub async fn list_all_web_scraping_targets(
   scraping_status: ScrapingStatus,
-  last_id: i64,
-  limit: i64,
   sqlite_pool: &SqlitePool,
 ) -> AnyhowResult<Vec<WebScrapingTarget>> {
 
@@ -31,13 +31,9 @@ FROM web_scraping_targets
 WHERE
   scraping_status = ?
   AND maybe_skip_reason IS NULL
-  AND id > ?
 ORDER BY id ASC
-LIMIT ?
         "#,
         scraping_status,
-        last_id,
-        limit,
     );
 
   let records = query.fetch_all(sqlite_pool)
