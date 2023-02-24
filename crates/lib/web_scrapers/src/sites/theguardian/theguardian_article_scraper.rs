@@ -8,7 +8,10 @@ use log::{error, warn};
 use once_cell::sync::Lazy;
 use rss::Channel;
 use scraper::{Html, Selector};
-use std::ops::Deref;
+use std::ops::{Add, Deref};
+use chrono::{DateTime, Duration, Local, LocalResult, NaiveDate, NaiveDateTime, TimeZone, Utc};
+use crate::common_extractors::extract_text::extract_text;
+use crate::utils::remove_timestamp_abbreviated_weekday_name::remove_timestamp_abbreviated_weekday_name;
 
 /// The main article content container
 static ARTICLE_CONTENT_SELECTOR : Lazy<Selector> = Lazy::new(|| {
@@ -32,7 +35,11 @@ pub static SUBTITLE_SELECTOR: Lazy<Selector> = Lazy::new(|| {
 
 /// The article featured image
 pub static FEATURED_IMAGE_SELECTOR: Lazy<Selector> = Lazy::new(|| {
-  Selector::parse("figure > picture > img").expect("this selector should parse")
+  Selector::parse("figure picture img").expect("this selector should parse")
+});
+
+pub static DATETIME_SELECTOR : Lazy<Selector> = Lazy::new(|| {
+  Selector::parse("aside[data-gu-name=\"meta\"] summary span").expect("this selector should parse")
 });
 
 pub async fn theguardian_article_scraper(url: &str) -> AnyhowResult<WebScrapingResult> {
@@ -72,6 +79,27 @@ pub async fn theguardian_article_scraper(url: &str) -> AnyhowResult<WebScrapingR
   let maybe_subtitle = extract_title(&document, &SUBTITLE_SELECTOR);
   let maybe_heading_image_url = extract_featured_image(&document, &FEATURED_IMAGE_SELECTOR);
 
+  let maybe_timestamp_raw = extract_text(&document, &DATETIME_SELECTOR);
+
+  // Format on webpage: "Thu 23 Feb 2023 12.39 EST",
+  // Parsed with: "Thu (%a) 23 (%e) Feb (%b) 2023 (%Y) 12 (%H).39 (%M) EST (%Z)",
+  // However, the "%a" (abbreviated weekday) fails to parse, so we remove it.
+  // Furthermore, it's unable to use the timezone data and the library hates it, so we
+  // have to type juggle.
+  let maybe_timestamp = maybe_timestamp_raw
+      .as_deref()
+      .map(|ts| remove_timestamp_abbreviated_weekday_name(&ts))
+      .map(|ts| NaiveDateTime::parse_from_str(&ts, "%e %b %Y %H.%M %Z"))
+      .transpose()?
+      .map(|naive| match Utc.from_local_datetime(&naive) {
+        LocalResult::None => Err(anyhow!("invalid datetime conversion")),
+        LocalResult::Ambiguous(_, _) => Err(anyhow!("ambiguous datetime conversion")),
+        LocalResult::Single(time) => Ok(time),
+      })
+      .transpose()?
+      // NB: The "Utc" time above is actually EST/EDT.
+      .map(|utc| utc.add(Duration::hours(5)));
+
   let body_text = paragraphs.join("\n\n");
 
   Ok(WebScrapingResult {
@@ -86,6 +114,8 @@ pub async fn theguardian_article_scraper(url: &str) -> AnyhowResult<WebScrapingR
       body_text,
       maybe_heading_image_url,
       maybe_featured_image_url: None, // TODO
+      maybe_publish_timestamp_raw: maybe_timestamp_raw,
+      maybe_publish_datetime_utc: maybe_timestamp,
     }
   })
 }

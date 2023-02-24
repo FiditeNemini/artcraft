@@ -83,6 +83,8 @@ pub async fn techcrunch_article_scraper(url: &str) -> AnyhowResult<WebScrapingRe
       body_text,
       maybe_heading_image_url,
       maybe_featured_image_url: None, // TODO
+      maybe_publish_timestamp_raw: None,
+      maybe_publish_datetime_utc: None,
     }
   })
 }

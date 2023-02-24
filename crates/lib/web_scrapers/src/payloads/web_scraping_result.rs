@@ -1,3 +1,4 @@
+use chrono::{DateTime, Utc};
 use enums::common::sqlite::web_content_type::WebContentType;
 
 // TODO: Rename this to not confuse with `Result<T, E>`.
@@ -39,8 +40,11 @@ pub struct ScrapedWebArticle {
   /// A featured image (somewhere in the body), if present
   pub maybe_featured_image_url: Option<String>,
 
-  // TODO: Add publish date
-  // pub maybe_publish_date_utc: Option<DateTime<Utc>>
+  /// A timestamp that has not been parsed to a proper time
+  pub maybe_publish_timestamp_raw: Option<String>,
+
+  /// A timestamp that has not been parsed to a proper time
+  pub maybe_publish_datetime_utc: Option<DateTime<Utc>>,
 }
 
 // TODO: Other types - threaded discussions (HN, Reddit), video essays (CNN, YouTube), etc.
