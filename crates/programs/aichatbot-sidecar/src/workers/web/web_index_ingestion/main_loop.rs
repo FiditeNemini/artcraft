@@ -11,6 +11,8 @@ use strum::IntoEnumIterator;
 use web_scrapers::payloads::web_scraping_result::ScrapedWebArticle;
 use web_scrapers::payloads::web_scraping_target::WebScrapingTarget;
 use web_scrapers::sites::cnn::cnn_indexer::{cnn_indexer, CnnFeed};
+use web_scrapers::sites::gizmodo::gizmodo_indexer::gizmodo_indexer;
+use web_scrapers::sites::kotaku::kotaku_indexer::kotaku_indexer;
 use web_scrapers::sites::techcrunch::techcrunch_indexer::{techcrunch_indexer, TechcrunchFeed};
 
 /// Download RSS feeds and index pages to determine which articles and content will be scraped (async/downstream of this)
@@ -37,24 +39,42 @@ pub async fn web_index_ingestion_main_loop(job_state: Arc<JobState>) {
 
 async fn single_iteration(job_state: &Arc<JobState>) -> AnyhowResult<()> {
 
+  // Kotaku
+  {
+    let index_targets = kotaku_indexer().await?;
+    insert_targets(job_state, &index_targets).await?;
+    thread::sleep(Duration::from_secs(2));
+  }
+
+  // Gizmodo
+  {
+    let index_targets = gizmodo_indexer().await?;
+    insert_targets(job_state, &index_targets).await?;
+    thread::sleep(Duration::from_secs(2));
+  }
+
   // CNN
   for variant in CnnFeed::iter() {
     let index_targets = cnn_indexer(variant).await?;
     insert_targets(job_state, &index_targets).await?;
-    thread::sleep(Duration::from_secs(5));
+    thread::sleep(Duration::from_secs(2));
   }
 
   // TechCrunch
   for variant in TechcrunchFeed::iter() {
     let index_targets = techcrunch_indexer(variant).await?;
     insert_targets(job_state, &index_targets).await?;
-    thread::sleep(Duration::from_secs(5));
+    thread::sleep(Duration::from_secs(2));
   }
 
   Ok(())
 }
 
 async fn insert_targets(job_state: &Arc<JobState>, targets: &Vec<WebScrapingTarget>) -> AnyhowResult<()> {
+  while job_state.app_control_state.is_scraping_paused() {
+    thread::sleep(Duration::from_secs(5));
+  }
+
   for target in targets.iter() {
     let _r = insert_web_scraping_target(Args {
       canonical_url: &target.canonical_url,
