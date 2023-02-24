@@ -24,6 +24,9 @@ pub enum WebContentType {
   #[serde(rename = "hacker_news_thread")]
   HackerNewsThread,
 
+  #[serde(rename = "kotaku_article")]
+  KotakuArticle,
+
   #[serde(rename = "reddit_thread")]
   RedditThread,
 
@@ -52,6 +55,7 @@ impl WebContentType {
       Self::CnnArticle => "cnn_article",
       Self::GizmodoArticle => "gizmodo_article",
       Self::HackerNewsThread => "hacker_news_thread",
+      Self::KotakuArticle => "kotaku_article",
       Self::RedditThread => "reddit_thread",
       Self::SlashdotArticle => "slashdot_article",
       Self::SubstackPost => "substack_post",
@@ -66,6 +70,7 @@ impl WebContentType {
       "cnn_article" => Ok(Self::CnnArticle),
       "gizmodo_article" => Ok(Self::GizmodoArticle),
       "hacker_news_thread" => Ok(Self::HackerNewsThread),
+      "kotaku_article" => Ok(Self::KotakuArticle),
       "reddit_thread" => Ok(Self::RedditThread),
       "slashdot_article" => Ok(Self::SlashdotArticle),
       "substack_post" => Ok(Self::SubstackPost),
@@ -90,6 +95,7 @@ mod tests {
       assert_serialization(WebContentType::CnnArticle, "cnn_article");
       assert_serialization(WebContentType::GizmodoArticle, "gizmodo_article");
       assert_serialization(WebContentType::HackerNewsThread, "hacker_news_thread");
+      assert_serialization(WebContentType::KotakuArticle, "kotaku_article");
       assert_serialization(WebContentType::RedditThread, "reddit_thread");
       assert_serialization(WebContentType::SlashdotArticle, "slashdot_article");
       assert_serialization(WebContentType::SubstackPost, "substack_post");
@@ -107,6 +113,7 @@ mod tests {
       assert_eq!(WebContentType::CnnArticle.to_str(), "cnn_article");
       assert_eq!(WebContentType::GizmodoArticle.to_str(), "gizmodo_article");
       assert_eq!(WebContentType::HackerNewsThread.to_str(), "hacker_news_thread");
+      assert_eq!(WebContentType::KotakuArticle.to_str(), "kotaku_article");
       assert_eq!(WebContentType::RedditThread.to_str(), "reddit_thread");
       assert_eq!(WebContentType::SlashdotArticle.to_str(), "slashdot_article");
       assert_eq!(WebContentType::SubstackPost.to_str(), "substack_post");
@@ -120,6 +127,7 @@ mod tests {
       assert_eq!(WebContentType::from_str("cnn_article").unwrap(), WebContentType::CnnArticle);
       assert_eq!(WebContentType::from_str("gizmodo_article").unwrap(), WebContentType::GizmodoArticle);
       assert_eq!(WebContentType::from_str("hacker_news_thread").unwrap(), WebContentType::HackerNewsThread);
+      assert_eq!(WebContentType::from_str("kotaku_article").unwrap(), WebContentType::KotakuArticle);
       assert_eq!(WebContentType::from_str("reddit_thread").unwrap(), WebContentType::RedditThread);
       assert_eq!(WebContentType::from_str("slashdot_article").unwrap(), WebContentType::SlashdotArticle);
       assert_eq!(WebContentType::from_str("substack_post").unwrap(), WebContentType::SubstackPost);
