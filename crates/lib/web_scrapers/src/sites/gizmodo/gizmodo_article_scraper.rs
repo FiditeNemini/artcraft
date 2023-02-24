@@ -16,7 +16,7 @@ use crate::utils::remove_timestamp_abbreviated_weekday_name::remove_timestamp_ab
 
 /// The main article content container
 static ARTICLE_CONTENT_SELECTOR : Lazy<Selector> = Lazy::new(|| {
-  Selector::parse("section.content__body").expect("this selector should parse")
+  Selector::parse(".js_post-content").expect("this selector should parse")
 });
 
 /// Paragraphs within the article
@@ -26,24 +26,19 @@ static PARAGRAPH_SELECTOR : Lazy<Selector> = Lazy::new(|| {
 
 /// The title of the article
 pub static TITLE_SELECTOR: Lazy<Selector> = Lazy::new(|| {
-  Selector::parse("h1.content__title").expect("this selector should parse")
+  Selector::parse("h1").expect("this selector should parse")
 });
 
-///// The title of the article
-//pub static SUBTITLE_SELECTOR: Lazy<Selector> = Lazy::new(|| {
-//  Selector::parse("div[data-gu-name=\"standfirst\"] p").expect("this selector should parse")
-//});
-
-/// The article featured image
-pub static FEATURED_IMAGE_SELECTOR: Lazy<Selector> = Lazy::new(|| {
-  Selector::parse("figure .embed__content img").expect("this selector should parse")
+/// The title of the article
+pub static SUBTITLE_SELECTOR: Lazy<Selector> = Lazy::new(|| {
+  Selector::parse("h2.js_regular-subhead").expect("this selector should parse")
 });
 
 pub static DATETIME_SELECTOR : Lazy<Selector> = Lazy::new(|| {
-  Selector::parse(".content__meta--timestamp time").expect("this selector should parse")
+  Selector::parse(".js_starterpost time").expect("this selector should parse")
 });
 
-pub async fn cbsnews_article_scraper(url: &str) -> AnyhowResult<WebScrapingResult> {
+pub async fn gizmodo_article_scraper(url: &str) -> AnyhowResult<WebScrapingResult> {
   let downloaded_document= reqwest::get(url)
       .await?
       .bytes()
@@ -77,10 +72,11 @@ pub async fn cbsnews_article_scraper(url: &str) -> AnyhowResult<WebScrapingResul
   }
 
   let maybe_title = extract_title(&document, &TITLE_SELECTOR);
-  let maybe_featured_image_url = extract_featured_image(&document, &FEATURED_IMAGE_SELECTOR);
+  let maybe_subtitle = extract_title(&document, &SUBTITLE_SELECTOR);
 
   let maybe_timestamp_raw = extract_attribute(&document, &DATETIME_SELECTOR, "datetime");
 
+  // Format on webpage: "Thu 23 Feb 2023 12.39 EST",
   // Timestamp is present as *almost* RFC3339: 2023-02-23T19:30:30-0500
   // Frustratingly, there should be a colon in the timezone offset.
   let maybe_timestamp = maybe_timestamp_raw
@@ -109,14 +105,14 @@ pub async fn cbsnews_article_scraper(url: &str) -> AnyhowResult<WebScrapingResul
     original_html: downloaded_document,
     result: ScrapedWebArticle {
       url: url.to_string(),
-      web_content_type: WebContentType::CbsNewsArticle,
+      web_content_type: WebContentType::GizmodoArticle,
       maybe_title,
-      maybe_subtitle: None,
+      maybe_subtitle,
       maybe_author: None, // TODO
       paragraphs,
       body_text,
       maybe_heading_image_url: None, // TODO
-      maybe_featured_image_url,
+      maybe_featured_image_url: None, // TODO
       maybe_publish_timestamp_raw: maybe_timestamp_raw,
       maybe_publish_datetime_utc: maybe_timestamp,
     }

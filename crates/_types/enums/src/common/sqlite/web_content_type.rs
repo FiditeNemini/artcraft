@@ -18,6 +18,9 @@ pub enum WebContentType {
   #[serde(rename = "cnn_article")]
   CnnArticle,
 
+  #[serde(rename = "gizmodo_article")]
+  GizmodoArticle,
+
   #[serde(rename = "hacker_news_thread")]
   HackerNewsThread,
 
@@ -47,6 +50,7 @@ impl WebContentType {
     match self {
       Self::CbsNewsArticle => "cbs_news_article",
       Self::CnnArticle => "cnn_article",
+      Self::GizmodoArticle => "gizmodo_article",
       Self::HackerNewsThread => "hacker_news_thread",
       Self::RedditThread => "reddit_thread",
       Self::SlashdotArticle => "slashdot_article",
@@ -60,6 +64,7 @@ impl WebContentType {
     match value {
       "cbs_news_article" => Ok(Self::CbsNewsArticle),
       "cnn_article" => Ok(Self::CnnArticle),
+      "gizmodo_article" => Ok(Self::GizmodoArticle),
       "hacker_news_thread" => Ok(Self::HackerNewsThread),
       "reddit_thread" => Ok(Self::RedditThread),
       "slashdot_article" => Ok(Self::SlashdotArticle),
@@ -83,6 +88,7 @@ mod tests {
     fn test_serialization() {
       assert_serialization(WebContentType::CbsNewsArticle, "cbs_news_article");
       assert_serialization(WebContentType::CnnArticle, "cnn_article");
+      assert_serialization(WebContentType::GizmodoArticle, "gizmodo_article");
       assert_serialization(WebContentType::HackerNewsThread, "hacker_news_thread");
       assert_serialization(WebContentType::RedditThread, "reddit_thread");
       assert_serialization(WebContentType::SlashdotArticle, "slashdot_article");
@@ -99,6 +105,7 @@ mod tests {
     fn test_to_str() {
       assert_eq!(WebContentType::CbsNewsArticle.to_str(), "cbs_news_article");
       assert_eq!(WebContentType::CnnArticle.to_str(), "cnn_article");
+      assert_eq!(WebContentType::GizmodoArticle.to_str(), "gizmodo_article");
       assert_eq!(WebContentType::HackerNewsThread.to_str(), "hacker_news_thread");
       assert_eq!(WebContentType::RedditThread.to_str(), "reddit_thread");
       assert_eq!(WebContentType::SlashdotArticle.to_str(), "slashdot_article");
@@ -111,6 +118,7 @@ mod tests {
     fn test_from_str() {
       assert_eq!(WebContentType::from_str("cbs_news_article").unwrap(), WebContentType::CbsNewsArticle);
       assert_eq!(WebContentType::from_str("cnn_article").unwrap(), WebContentType::CnnArticle);
+      assert_eq!(WebContentType::from_str("gizmodo_article").unwrap(), WebContentType::GizmodoArticle);
       assert_eq!(WebContentType::from_str("hacker_news_thread").unwrap(), WebContentType::HackerNewsThread);
       assert_eq!(WebContentType::from_str("reddit_thread").unwrap(), WebContentType::RedditThread);
       assert_eq!(WebContentType::from_str("slashdot_article").unwrap(), WebContentType::SlashdotArticle);
