@@ -579,6 +579,16 @@
     },
     "query": "\nSELECT\n    w2l.token as template_token,\n    w2l.template_type,\n    w2l.creator_user_token,\n    users.username as creator_username,\n    users.display_name as creator_display_name,\n    w2l.title,\n    w2l.frame_width,\n    w2l.frame_height,\n    w2l.duration_millis,\n    w2l.maybe_public_bucket_preview_image_object_name,\n    w2l.maybe_public_bucket_preview_video_object_name,\n    w2l.is_public_listing_approved,\n    w2l.created_at,\n    w2l.updated_at\nFROM w2l_templates as w2l\nJOIN users\nON\n    users.token = w2l.creator_user_token\nWHERE\n    users.username = ?\n    AND w2l.user_deleted_at IS NULL\n    AND w2l.mod_deleted_at IS NULL\n        "
   },
+  "079ea2dd582d061db2e824833bf47e60523aed758aefb6a317f29611b8344ab8": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Right": 3
+      }
+    },
+    "query": "\nINSERT INTO unsubscribe_reason \nSET \n    user_token = ?,\n    feedback_reason = ?,\n    ip_address = ?\n        "
+  },
   "07d330b4c2e6b0dc76e2e61a3b44b47b8d287adf5eb0646f6cf2876655581a13": {
     "describe": {
       "columns": [
