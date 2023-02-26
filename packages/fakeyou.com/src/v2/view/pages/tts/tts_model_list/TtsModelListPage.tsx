@@ -130,6 +130,7 @@ interface Props {
 function TtsModelListPage(props: Props) {
   //Loading spinning icon
   const [loading, setLoading] = useState(false);
+  const [isAudioLimitAlertVisible, setAudioLimitAlertVisible] = useState(false);
 
   const handleLoading = () => {
     setLoading(true);
@@ -263,6 +264,7 @@ function TtsModelListPage(props: Props) {
   const handleChangeText = (ev: React.FormEvent<HTMLTextAreaElement>) => {
     const textValue = (ev.target as HTMLTextAreaElement).value;
     props.setTextBuffer(textValue);
+    setAudioLimitAlertVisible(textValue.length > 100);
   };
 
   const handleFormSubmit = async (ev: React.FormEvent<HTMLFormElement>) => {
@@ -459,6 +461,26 @@ function TtsModelListPage(props: Props) {
     ? "btn btn-primary w-100 disabled"
     : "btn btn-primary w-100";
 
+  let audioLimitAlert = <></>;
+  if (
+    isAudioLimitAlertVisible &&
+    !props.sessionSubscriptionsWrapper.hasPaidFeatures()
+  ) {
+    audioLimitAlert = (
+      <>
+        <div className="alert alert-warning fs-7 mb-0">
+          <span className="fw-semibold">
+            <u>Note:</u> Non-premium is limited to 12 seconds of audio.{" "}
+            <Link className="fw-semibold" to="/pricing">
+              Upgrade now
+            </Link>
+            .
+          </span>
+        </div>
+      </>
+    );
+  }
+
   return (
     <motion.div initial="hidden" animate="visible" variants={container}>
       {bootstrapLanguageNotice}
@@ -538,6 +560,7 @@ function TtsModelListPage(props: Props) {
                         }
                       )}
                     ></textarea>
+                    {audioLimitAlert}
                     <div className="d-flex gap-3">
                       <button
                         className={speakButtonClass}
