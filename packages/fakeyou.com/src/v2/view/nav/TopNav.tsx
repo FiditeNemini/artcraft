@@ -20,7 +20,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { faDiscord, faPatreon } from "@fortawesome/free-brands-svg-icons";
 import { Logout } from "@storyteller/components/src/api/session/Logout";
-import { Gravatar } from "@storyteller/components/src/elements/Gravatar";
+// import { Gravatar } from "@storyteller/components/src/elements/Gravatar";
 import {
   GetPendingTtsJobCount,
   GetPendingTtsJobCountIsOk,
@@ -172,23 +172,24 @@ function TopNav(props: Props) {
 
   if (loggedIn) {
     let displayName = props.sessionWrapper.getDisplayName();
-    let gravatarHash = props.sessionWrapper.getEmailGravatarHash();
-    let gravatar = <span />;
+    // let gravatarHash = props.sessionWrapper.getEmailGravatarHash();
+    // let gravatar = <span />;
 
     if (displayName === undefined) {
       displayName = "My Account";
     }
 
-    if (gravatarHash !== undefined) {
-      gravatar = <Gravatar email_hash={gravatarHash} size={15} />;
-    }
+    // if (gravatarHash !== undefined) {
+    //   gravatar = <Gravatar email_hash={gravatarHash} size={15} />;
+    // }
 
     let url = WebUrl.userProfilePage(displayName);
     userOrLoginButton = (
       <>
         <Link className="btn btn-secondary me-3" to={url}>
           <span data-bs-toggle="offcanvas">
-            {gravatar}&nbsp; {displayName}
+            <FontAwesomeIcon icon={faUser} className="me-2" />
+            {displayName}
           </span>
         </Link>
       </>

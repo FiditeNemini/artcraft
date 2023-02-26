@@ -17,12 +17,8 @@ import {
   faTwitter,
 } from "@fortawesome/free-brands-svg-icons";
 import {
-  faClock,
   faBan,
   faGear,
-  faAward,
-  faVolumeHigh,
-  faVideo,
   faGlobe,
   faDollarSign,
   faStar,
@@ -40,9 +36,9 @@ import { WebUrl } from "../../../../../common/WebUrl";
 import { container, item, panel } from "../../../../../data/animation";
 import Tippy from "@tippyjs/react";
 import "tippy.js/dist/tippy.css";
-import "tippy.js/animations/shift-away.css";
 import { motion } from "framer-motion";
 import { usePrefixedDocumentTitle } from "../../../../../common/UsePrefixedDocumentTitle";
+import { faCalendarAlt } from "@fortawesome/pro-solid-svg-icons";
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -76,9 +72,10 @@ function ProfilePage(props: Props) {
     getUser(username);
   }, [username, getUser]);
 
-  const documentTitle = userData?.display_name === undefined 
-    ? undefined 
-    : `${userData.display_name}`;
+  const documentTitle =
+    userData?.display_name === undefined
+      ? undefined
+      : `${userData.display_name}`;
   usePrefixedDocumentTitle(documentTitle);
 
   if (notFoundState) {
@@ -146,9 +143,7 @@ function ProfilePage(props: Props) {
   let profileButtonsMobile = <span />;
 
   if (props.sessionWrapper.canEditUserProfile(userData.username)) {
-    const editLinkUrl = WebUrl.userProfileEditPage(
-      userData.username
-    );
+    const editLinkUrl = WebUrl.userProfileEditPage(userData.username);
 
     // Mods shouldn't edit preferences.
     const buttonLabel = props.sessionWrapper.userTokenMatches(
@@ -177,12 +172,16 @@ function ProfilePage(props: Props) {
     );
   }
 
-  let profileDesc = undefined;
+  let profileDesc = (
+    <motion.div className="mt-3 text-center text-lg-start opacity-50">
+      No profile description.
+    </motion.div>
+  );
 
   if (!!userData.profile_rendered_html) {
     profileDesc = (
       <motion.div
-        className="container content mb-5 mb-lg-5 text-center text-lg-start px-4 px-md-5 px-lg-5 px-xl-3"
+        className="mt-3 text-center text-lg-start"
         variants={item}
         dangerouslySetInnerHTML={{
           __html: userData.profile_rendered_html || "",
@@ -199,10 +198,10 @@ function ProfilePage(props: Props) {
   profileJoinDate.push(
     <div
       key="created"
-      className="d-flex align-items-center justify-content-center fs-6 me-3"
+      className="d-flex align-items-center justify-content-center justify-content-lg-start"
     >
-      <FontAwesomeIcon icon={faClock} className="me-2" />
-      <p className="fw-bold">Joined {joinDate}</p>
+      <FontAwesomeIcon icon={faCalendarAlt} className="me-2" />
+      <p className="fw-normal">Joined {joinDate}</p>
     </div>
   );
 
@@ -213,7 +212,13 @@ function ProfilePage(props: Props) {
       userData.website_url?.startsWith("https://")
     ) {
       websiteUrl = (
-        <Tippy content="Website" animation="shift-away">
+        <Tippy
+          content="Website"
+          hideOnClick
+          placement="bottom"
+          theme="fakeyou"
+          arrow={false}
+        >
           <a
             href={userData.website_url}
             target="_blank"
@@ -231,7 +236,13 @@ function ProfilePage(props: Props) {
   if (userData.twitch_username) {
     let twitchUrl = `https://twitch.com/${userData.twitch_username}`;
     let twitchLink = (
-      <Tippy content="Twitch" animation="shift-away">
+      <Tippy
+        content="Twitch"
+        hideOnClick
+        placement="bottom"
+        theme="fakeyou"
+        arrow={false}
+      >
         <a href={twitchUrl} target="_blank" rel="noopener noreferrer nofollow">
           <FontAwesomeIcon icon={faTwitch} />
         </a>
@@ -244,7 +255,13 @@ function ProfilePage(props: Props) {
   if (userData.twitter_username) {
     let twitterUrl = `https://twitter.com/${userData.twitter_username}`;
     let twitterLink = (
-      <Tippy content="Twitter" animation="shift-away">
+      <Tippy
+        content="Twitter"
+        hideOnClick
+        placement="bottom"
+        theme="fakeyou"
+        arrow={false}
+      >
         <a href={twitterUrl} target="_blank" rel="noopener noreferrer nofollow">
           <FontAwesomeIcon icon={faTwitter} />
         </a>
@@ -265,7 +282,10 @@ function ProfilePage(props: Props) {
           </div>
         }
         interactive
-        animation="shift-away"
+        hideOnClick
+        placement="bottom"
+        theme="fakeyou"
+        arrow={false}
       >
         <a
           // eslint-disable-next-line no-script-url
@@ -281,8 +301,19 @@ function ProfilePage(props: Props) {
   if (userData.github_username) {
     let githubUrl = `https://github.com/${userData.github_username}`;
     let githubLink = (
-      <Tippy content="GitHub" animation="shift-away">
-        <a href={githubUrl} target="_blank" rel="noopener noreferrer nofollow">
+      <Tippy
+        content="GitHub"
+        hideOnClick
+        placement="bottom"
+        theme="fakeyou"
+        arrow={false}
+      >
+        <a
+          href={githubUrl}
+          target="_blank"
+          rel="noopener noreferrer nofollow"
+          className="fw-normal"
+        >
           <FontAwesomeIcon icon={faGithub} />
         </a>
       </Tippy>
@@ -294,7 +325,13 @@ function ProfilePage(props: Props) {
     // NB: URL includes a dollar sign
     let cashAppUrl = `https://cash.me/$${userData.cashapp_username}`;
     let cashAppLink = (
-      <Tippy content="CashApp" animation="shift-away">
+      <Tippy
+        content="CashApp"
+        hideOnClick
+        placement="bottom"
+        theme="fakeyou"
+        arrow={false}
+      >
         <a href={cashAppUrl} target="_blank" rel="noopener noreferrer nofollow">
           <FontAwesomeIcon icon={faDollarSign} />
         </a>
@@ -317,94 +354,166 @@ function ProfilePage(props: Props) {
     <motion.div initial="hidden" animate="visible" variants={container}>
       <div className="container pt-5 pb-4 px-lg-5 px-xl-3">
         <motion.div
-          className="d-flex flex-column flex-lg-row align-items-center w-100"
+          className="d-flex flex-column flex-lg-row w-100"
           variants={item}
         >
           <div className="mb-3 me-lg-4 mb-lg-0">
-            <Gravatar
-              size={45}
-              username={userData.display_name}
-              email_hash={userEmailHash}
-            />
-          </div>
-          <div className="d-flex flex-column flex-lg-row align-items-center gap-3 w-100">
-            <h1 className="display-6 fw-bold text-center text-lg-start mb-0">
-              {userData.display_name}
-            </h1>
-          </div>
-
-          <div className="justify-content-end d-none d-lg-flex w-100">
-            <div className="d-flex gap-3">
-              {banUserButton}
-              {upgradeButton}
-              {editProfileButton}
+            <div className="border-3 d-none d-lg-block">
+              <Gravatar
+                size={150}
+                username={userData.display_name}
+                email_hash={userEmailHash}
+              />
+            </div>
+            <div className="border-3 text-center d-lg-none">
+              <Gravatar
+                size={100}
+                username={userData.display_name}
+                email_hash={userEmailHash}
+              />
             </div>
           </div>
-        </motion.div>
-        <motion.div
-          className="d-flex flex-column flex-lg-row gap-4 gap-lg-3 mt-4"
-          variants={item}
-        >
-          {profileJoinDate}
-          <div className="d-flex justify-content-center gap-4 gap-lg-3 profile-social-icons">
-            {profileRows}
+          <div className="d-flex flex-column w-100">
+            <div className="d-flex">
+              <h1 className="fw-bold mb-0 flex-grow-1 text-center text-lg-start">
+                {userData.display_name}
+              </h1>
+              <div className="gap-3 d-none d-lg-flex">
+                {banUserButton}
+                {upgradeButton}
+                {editProfileButton}
+              </div>
+            </div>
+            <div className="opacity-75 mt-1">{profileJoinDate}</div>
+            <div>{profileDesc}</div>
+            <div className="d-flex mt-3 gap-4 gap-lg-3 profile-social-icons justify-content-center justify-content-lg-start">
+              {profileRows}
+            </div>
           </div>
         </motion.div>
       </div>
 
-      {profileDesc}
-
       {profileButtonsMobile}
 
-      <motion.div className="container-panel py-5" variants={panel}>
-        <div className="panel p-3 p-lg-4">
-          <h2 className="panel-title fw-bold">
-            <FontAwesomeIcon icon={faAward} className="me-3" />
-            Badges{" "}
-            <span className="fs-5 fw-normal ms-2">(images coming soon)</span>
-          </h2>
-          <div className="py-6">{badges}</div>
-        </div>
-      </motion.div>
-
-      <motion.div className="container-panel pt-3 pb-5" variants={panel}>
-        <div className="panel p-3 p-lg-4">
-          <h2 className="panel-title fw-bold">
-            <FontAwesomeIcon icon={faVolumeHigh} className="me-3" />
-            TTS Results
-          </h2>
-          <div className="py-6">
-            <ProfileTtsInferenceResultsListFc username={userData.username} />
-          </div>
-        </div>
-      </motion.div>
-
-      <motion.div className="container-panel pt-3 pb-5" variants={panel}>
-        <div className="panel p-3 p-lg-4">
-          <h2 className="panel-title fw-bold">
-            <FontAwesomeIcon icon={faVideo} className="me-3" />
-            Lipsync Results
-          </h2>
-          <div className="py-6">
-            <ProfileW2lInferenceResultsListFc username={userData.username} />
-          </div>
-        </div>
-      </motion.div>
-
-      <motion.div className="container-panel pt-3 pb-5" variants={panel}>
-        <div className="panel p-3 p-lg-4">
-          <h2 className="panel-title fw-bold">Uploaded TTS Models </h2>
-          <div className="py-6">
-            <ProfileTtsModelListFc username={userData.username} />
-          </div>
-        </div>
-      </motion.div>
-
-      <motion.div className="container-panel pt-3 pb-5" variants={panel}>
-        <div className="panel p-3 p-lg-4">
-          <h2 className="panel-title fw-bold">Uploaded Templates </h2>
-          <div className="py-6">
-            <ProfileW2lTemplateListFc username={userData.username} />
+      <motion.div className="container-panel mt-5" variants={panel}>
+        <div className="panel">
+          <ul
+            className="nav nav-tabs nav-profile justify-content-lg-center"
+            id="myTab"
+            role="tablist"
+          >
+            <li className="nav-item" role="presentation">
+              <button
+                className="nav-link active"
+                id="ttsresults-tab"
+                data-bs-toggle="tab"
+                data-bs-target="#ttsresults"
+                type="button"
+                role="tab"
+                aria-controls="ttsresults"
+                aria-selected="true"
+              >
+                TTS Results
+              </button>
+            </li>
+            <li className="nav-item" role="presentation">
+              <button
+                className="nav-link"
+                id="w2lresults-tab"
+                data-bs-toggle="tab"
+                data-bs-target="#w2lresults"
+                type="button"
+                role="tab"
+                aria-controls="w2lresults"
+                aria-selected="false"
+              >
+                Lipsync Results
+              </button>
+            </li>
+            <li className="nav-item" role="presentation">
+              <button
+                className="nav-link"
+                id="uploadedtts-tab"
+                data-bs-toggle="tab"
+                data-bs-target="#uploadedtts"
+                type="button"
+                role="tab"
+                aria-controls="uploadedtts"
+                aria-selected="false"
+              >
+                Uploaded TTS Models
+              </button>
+            </li>
+            <li className="nav-item" role="presentation">
+              <button
+                className="nav-link"
+                id="uploadedw2l-tab"
+                data-bs-toggle="tab"
+                data-bs-target="#uploadedw2l"
+                type="button"
+                role="tab"
+                aria-controls="uploadedw2l"
+                aria-selected="false"
+              >
+                Uploaded Templates
+              </button>
+            </li>
+            <li className="nav-item" role="presentation">
+              <button
+                className="nav-link"
+                id="badges-tab"
+                data-bs-toggle="tab"
+                data-bs-target="#badges"
+                type="button"
+                role="tab"
+                aria-controls="badges"
+                aria-selected="false"
+              >
+                Badges
+              </button>
+            </li>
+          </ul>
+          <div className="tab-content p-3 p-lg-4" id="myTabContent">
+            <div
+              className="tab-pane fade show active"
+              id="ttsresults"
+              role="tabpanel"
+              aria-labelledby="ttsresults-tab"
+            >
+              <ProfileTtsInferenceResultsListFc username={userData.username} />
+            </div>
+            <div
+              className="tab-pane fade"
+              id="w2lresults"
+              role="tabpanel"
+              aria-labelledby="w2lresults-tab"
+            >
+              <ProfileW2lInferenceResultsListFc username={userData.username} />
+            </div>
+            <div
+              className="tab-pane fade"
+              id="uploadedtts"
+              role="tabpanel"
+              aria-labelledby="uploadedtts-tab"
+            >
+              <ProfileTtsModelListFc username={userData.username} />
+            </div>
+            <div
+              className="tab-pane fade"
+              id="uploadedw2l"
+              role="tabpanel"
+              aria-labelledby="uploadedw2l-tab"
+            >
+              <ProfileW2lTemplateListFc username={userData.username} />
+            </div>
+            <div
+              className="tab-pane fade"
+              id="badges"
+              role="tabpanel"
+              aria-labelledby="badges-tab"
+            >
+              {badges}
+            </div>
           </div>
         </div>
       </motion.div>

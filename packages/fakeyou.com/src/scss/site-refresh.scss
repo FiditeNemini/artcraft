@@ -597,7 +597,7 @@ styles with important tags:
   }
 
   .profile-social-icons {
-    font-size: 22px;
+    font-size: 20px;
   }
 
   .w2l-ani .w2l-ani-item {
@@ -938,6 +938,38 @@ styles with important tags:
     border-width: 2px;
   }
 
+  //Nav Tabs (Profile)
+
+  .nav-profile {
+    flex-wrap: nowrap;
+    height: 100%;
+    overflow-y: hidden;
+    overflow-x: auto;
+  }
+
+  .nav-tabs {
+    border-bottom: 2px solid #ffffff15;
+
+    .nav-link {
+      border: none;
+      padding: 1rem 1.4rem;
+      border-bottom: 4px solid transparent;
+      color: rgba($white, 0.5);
+      font-weight: 500;
+      white-space: nowrap;
+
+      &:hover {
+        color: rgba($white, 0.75);
+      }
+
+      &.active {
+        color: $white;
+        background-color: transparent;
+        border-bottom: 4px solid $primary;
+      }
+    }
+  }
+  
   .fs-7 {
     font-size: 14px !important;
   }
