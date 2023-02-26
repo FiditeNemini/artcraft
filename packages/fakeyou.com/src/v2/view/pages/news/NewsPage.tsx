@@ -102,10 +102,12 @@ function NewsPage(props: Props) {
     );
 
     subscribeButton = (
-      <Link to="/pricing" className="btn btn-primary w-100">
-        <FontAwesomeIcon icon={faStar} className="me-2" />
-        Subscribe to FakeYou
-      </Link>
+      <div className="mx-3 mx-md-0">
+        <Link to="/pricing" className="btn btn-primary w-100">
+          <FontAwesomeIcon icon={faStar} className="me-2" />
+          Subscribe to FakeYou
+        </Link>
+      </div>
     );
   }
 
