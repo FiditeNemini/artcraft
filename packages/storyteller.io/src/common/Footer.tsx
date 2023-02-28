@@ -55,8 +55,8 @@ function Footer(props: Props) {
         <div className="footer-bottom">
           <div className="container d-flex flex-column flex-md-row text-center text-md-start gap-3">
             <div className="flex-grow-1">
-              Copyright &copy; 2020 &mdash; 2022 Learning Machines, Inc. (makers
-              of FakeYou and Storyteller)
+              Copyright &copy; 2020 &mdash; 2023 Learning Machines, Inc. (makers
+              of FakeYou)
             </div>
 
             <GitSha />
