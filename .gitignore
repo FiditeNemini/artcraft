@@ -17,4 +17,5 @@ yarn-error.log
 templates/storyteller-stream-green
 
 packages/fakeyou.com/.env
+packages/storyteller.io/.env
 packages/power.stream/.env
