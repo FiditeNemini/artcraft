@@ -153,88 +153,96 @@ function IndexPage() {
     <>
       <div id="home" data-scroll-section>
         <div className="bg-hero">
-          <div className="container">
-            <div className="hero-title-container">
-              <h1
-                id="hero-title"
-                className="hero-title d-flex flex-column text-center"
-              >
-                <span
-                  className="hero-title-one align-items-center zi-2"
-                  data-scroll
-                  data-scroll-speed="3"
-                  data-scroll-direction="horizontal"
-                  data-scroll-position="top"
+          <video
+            className="bg-video"
+            src="/hero/brandon-hyperjail.webm"
+            autoPlay
+            loop
+            playsInline
+            muted
+          ></video>
+          <div className="bg-overlay">
+            <div className="container">
+              <div className="hero-title-container">
+                {/* Desktop Title */}
+                <h1
+                  id="hero-title"
+                  className="hero-title mb-0 d-none d-lg-block"
                 >
-                  The <span>Future</span>
-                </span>
-                <span
-                  className="hero-title-two zi-2"
-                  data-scroll
-                  data-scroll-speed="-3"
-                  data-scroll-direction="horizontal"
-                  data-scroll-position="top"
-                >
-                  of Production
-                </span>
-              </h1>
-
-              <div
-                className="d-flex flex-column align-items-center align-items-xl-end"
-                id="sub-title"
-              >
-                <p
-                  className="lead hero-sub-title fw-normal opacity-75"
-                  data-scroll
-                  data-scroll-speed="-4"
-                  data-scroll-direction="horizontal"
-                  data-scroll-position="top"
-                >
+                  <span className="hero-title-one align-items-center zi-2">
+                    The Future of Storytelling
+                  </span>
+                </h1>
+                {/* Mobile Title */}
+                <h1 className="hero-title d-lg-none">
+                  <span className="hero-title-one align-items-center zi-2">
+                    The Future of Storytelling
+                  </span>
+                </h1>
+                <p className="hero-sub-title">
                   We’re scientists, engineers, and creatives building the future
                   AI cloud production studio.
                 </p>
-                <div
-                  id="hero-btn"
-                  data-scroll
-                  data-scroll-speed="-5"
-                  data-scroll-direction="horizontal"
-                  data-scroll-position="top"
-                  className="zi-10 mt-2"
-                >
-                  <a className="btn btn-primary" href="#about" data-scroll-to>
-                    <span>Explore</span>
+                <div id="hero-btn" className="pt-4 mt-3">
+                  <a
+                    className="btn btn-primary d-inline-flex"
+                    href="#about"
+                    data-scroll-to
+                  >
+                    <span>Explore Storyteller</span>
                   </a>
                 </div>
-              </div>
-
-              <div className="hero-title-outline noselect">
-                <h1
-                  id="hero-title-outline"
-                  className="hero-title d-flex flex-column text-center"
-                >
-                  <span
-                    className="hero-title-one align-items-center text-outline"
-                    data-scroll
-                    data-scroll-speed="-4"
-                    data-scroll-direction="horizontal"
-                    data-scroll-position="top"
-                  >
-                    The Future
-                  </span>
-                  <span
-                    className="hero-title-two text-outline"
-                    data-scroll
-                    data-scroll-speed="4"
-                    data-scroll-direction="horizontal"
-                    data-scroll-position="top"
-                  >
-                    of Production
-                  </span>
-                </h1>
               </div>
             </div>
           </div>
 
+          <div
+            className="d-none d-xl-flex social-icons flex-column gap-4 align-items-center"
+            data-scroll
+            data-scroll-speed="8"
+            data-scroll-direction="horizontal"
+            data-scroll-position="top"
+          >
+            <Tippy content="Discord" placement="right">
+              <a
+                href={ThirdPartyLinks.FAKEYOU_DISCORD}
+                rel="noreferrer"
+                target="_blank"
+              >
+                <FontAwesomeIcon icon={faDiscord} />
+              </a>
+            </Tippy>
+            <Tippy content="Twitch" placement="right">
+              <a
+                href="https://twitch.tv/FakeYouLabs"
+                rel="noreferrer"
+                target="_blank"
+              >
+                <FontAwesomeIcon icon={faTwitch} />
+              </a>
+            </Tippy>
+            <Tippy content="Facebook" placement="right">
+              <a
+                href="https://facebook.com/vocodes"
+                rel="noreferrer"
+                target="_blank"
+              >
+                <FontAwesomeIcon icon={faFacebook} />
+              </a>
+            </Tippy>
+            <Tippy content="Twitter" placement="right">
+              <a
+                href="https://twitter.com/intent/follow?screen_name=FakeYouApp"
+                rel="noreferrer"
+                target="_blank"
+              >
+                <FontAwesomeIcon icon={faTwitter} />
+              </a>
+            </Tippy>
+          </div>
+        </div>
+
+        <div className="bg-hero-2 d-none d-lg-block">
           <div className="d-flex justify-content-center">
             {/* <img
               id="hero-img"
@@ -337,7 +345,7 @@ function IndexPage() {
           <div
             className="shape-3-container"
             data-scroll
-            data-scroll-speed="3"
+            data-scroll-speed="2"
             data-scroll-position="top"
           >
             <div className="shape-3"></div>
@@ -360,20 +368,21 @@ function IndexPage() {
             <div className="shape-4"></div>
           </div>
         </div>
+
         <div
           id="about"
           className="bg-light section section-pb-extra about-section"
         >
           <Marquee gradient={false} speed={100}>
-            <h1 className="marquee-title d-flex gap-3 gap-md-4 gap-lg-5">
+            <h1 className="marquee-title d-flex gap-3 gap-md-4 gap-lg-5 mt-4 mb-5">
               <span className="text-outline">Storyteller</span>
-              <span className="text-red">\\</span>
+              <span className="text-red">\</span>
               <span>Storyteller</span>
-              <span className="text-red">\\</span>
+              <span className="text-red">\</span>
               <span className="text-outline">Storyteller</span>
-              <span className="text-red">\\</span>
+              <span className="text-red">\</span>
               <span>Storyteller</span>
-              <span className="text-red me-3 me-md-4 me-lg-5">\\</span>
+              <span className="text-red me-3 me-md-4 me-lg-5">\</span>
             </h1>
           </Marquee>
 
@@ -381,7 +390,7 @@ function IndexPage() {
             <h1 className="fw-bold display-4 about-title mt-5">
               You can run the new Hollywood and top the Billboard Hot 100
             </h1>
-            <h4 className="fw-semibold opacity-75 mt-4">
+            <h4 className="fw-normal opacity-75 mt-4">
               Our technology can turn anyone into a director, musician, or movie
               star.
             </h4>
@@ -390,30 +399,6 @@ function IndexPage() {
           <div className="about-cards-container mt-4 mb-5">
             <div className="container text-center d-flex flex-column align-items-center">
               <div className="row gx-4 gy-5 pt-4 position-relative">
-                <div
-                  className="shape-5-container"
-                  data-scroll
-                  data-scroll-speed="4"
-                  data-scroll-position="top"
-                >
-                  <div className="shape-5"></div>
-                </div>
-                <div
-                  className="shape-6-container"
-                  data-scroll
-                  data-scroll-speed="4"
-                  data-scroll-position="top"
-                >
-                  <div className="shape-6"></div>
-                </div>
-                <div
-                  className="shape-7-container"
-                  data-scroll
-                  data-scroll-speed="3"
-                  data-scroll-position="top"
-                >
-                  <div className="shape-7"></div>
-                </div>
                 <div className="col-12 col-md-6 col-lg-3">
                   <p className="fw-normal card bg-dark-solid pt-5 about-card">
                     <FontAwesomeIcon icon={faMusic} className="about-icon" />
@@ -491,14 +476,14 @@ function IndexPage() {
           <div id="products">
             <Marquee gradient={false} speed={100}>
               <h1 className="marquee-title d-flex gap-3 gap-md-4 gap-lg-5">
-                <span>What we do</span>
-                <span className="text-red">\\</span>
-                <span className="text-outline">What we do</span>
-                <span className="text-red">\\</span>
-                <span>What we do</span>
-                <span className="text-red">\\</span>
-                <span className="text-outline">What we do</span>
-                <span className="text-red me-3 me-md-4 me-lg-5">\\</span>
+                <span>What We Do</span>
+                <span className="text-red">\</span>
+                <span className="text-outline">What We Do</span>
+                <span className="text-red">\</span>
+                <span>What We Do</span>
+                <span className="text-red">\</span>
+                <span className="text-outline">What We Do</span>
+                <span className="text-red me-3 me-md-4 me-lg-5">\</span>
               </h1>
             </Marquee>
           </div>
@@ -513,7 +498,7 @@ function IndexPage() {
               </div>
               <div className="col-lg-7 d-flex flex-column justify-content-center">
                 <h1 className="fw-bold display-5">Voice Changing</h1>
-                <h4 className="fw-semibold opacity-75 mb-4">
+                <h4 className="fw-normal opacity-75 mb-4">
                   Now you can sound like someone else
                 </h4>
                 <p className="mt-3">
@@ -541,11 +526,13 @@ function IndexPage() {
                 This is still an early beta. Voice quality will change and
                 improve substantially over time.
               </p>
-              <p className="text-center my-4 pt-5">
+              <p className="pt-5 opacity-100 mb-0">
                 <strong className="fw-semibold fs-5">Brandon</strong>
                 <FontAwesomeIcon icon={faArrowRight} className="mx-2" />
                 <strong className="fw-semibold fs-5">Donald Trump</strong>
                 <br />
+              </p>
+              <p className="text-center pb-3">
                 Real time voice to voice conversion.
               </p>
               <div className="row gx-4 gy-4 text-center pb-5">
@@ -613,7 +600,7 @@ function IndexPage() {
               </div>
               <div className="col-lg-7 d-flex flex-column justify-content-center">
                 <h1 className="fw-bold display-5">FakeYou</h1>
-                <h4 className="fw-semibold opacity-75 mb-4">
+                <h4 className="fw-normal opacity-75 mb-4">
                   Used by millions of people every month
                 </h4>
                 <p className="mt-3">
@@ -693,7 +680,7 @@ function IndexPage() {
               </div>
               <div className="col-lg-7 d-flex flex-column justify-content-center">
                 <h1 className="fw-bold display-5">Power Stream</h1>
-                <h4 className="fw-semibold opacity-75 mb-4">
+                <h4 className="fw-normal opacity-75 mb-4">
                   Twitch Streamers and Creators can engage and monetize
                 </h4>
                 <p className="mt-3">
@@ -733,7 +720,7 @@ function IndexPage() {
               </div>
               <div className="col-lg-7 d-flex flex-column justify-content-center">
                 <h1 className="fw-bold display-5">Storyteller Engine</h1>
-                <h4 className="fw-semibold opacity-75 mb-4">
+                <h4 className="fw-normal opacity-75 mb-4">
                   A fully 3D virtual set for your stream or film
                 </h4>
                 <p className="mt-3">
@@ -866,7 +853,7 @@ function IndexPage() {
               </div>
               <div className="col-lg-7 d-flex flex-column justify-content-center">
                 <h1 className="fw-bold display-5">Storyteller VoxelCam</h1>
-                <h4 className="fw-semibold opacity-75 mb-4">
+                <h4 className="fw-normal opacity-75 mb-4">
                   Volumetric capture for your stream, and for your film set.
                 </h4>
                 <p className="mt-3">
@@ -933,14 +920,14 @@ function IndexPage() {
           <div>
             <Marquee gradient={false} speed={120}>
               <h1 className="marquee-title d-flex gap-3 gap-md-4 gap-lg-5 mt-0">
-                <span className="text-outline">Press and mentions</span>
-                <span className="text-red">\\</span>
-                <span>Press and mentions</span>
-                <span className="text-red">\\</span>
-                <span className="text-outline">Press and mentions</span>
-                <span className="text-red">\\</span>
-                <span>Press and mentions</span>
-                <span className="text-red me-3 me-md-4 me-lg-5">\\</span>
+                <span className="text-outline">Press & Mentions</span>
+                <span className="text-red">\</span>
+                <span>Press & Mentions</span>
+                <span className="text-red">\</span>
+                <span className="text-outline">Press & Mentions</span>
+                <span className="text-red">\</span>
+                <span>Press & Mentions</span>
+                <span className="text-red me-3 me-md-4 me-lg-5">\</span>
               </h1>
             </Marquee>
           </div>

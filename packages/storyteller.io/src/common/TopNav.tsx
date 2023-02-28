@@ -75,9 +75,9 @@ function TopNav(props: Props) {
           >
             <img
               id="logo"
-              src="/logo/Storyteller-Logo.png"
+              src="/logo/storytellerai-logo.png"
               alt="Storyteller Logo"
-              height="36"
+              height="34"
               className="mb-2"
             />
           </a>
@@ -119,10 +119,10 @@ function TopNav(props: Props) {
           >
             <img
               id="logo"
-              src="/logo/Storyteller-Logo.png"
+              src="/logo/storytellerai-logo.png"
               alt="Storyteller Logo"
-              height="36"
-              className="mb-2"
+              height="30"
+              className="mt-2"
             />
           </a>
           <button
