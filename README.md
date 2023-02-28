@@ -22,6 +22,7 @@ Here are some static websites contained:
 TODO: In the future, it will be worth updating this structure to match Netlify's recommended monorepo practices: 
 https://docs.netlify.com/configure-builds/monorepos/
 
+
 Development
 -----------
 
