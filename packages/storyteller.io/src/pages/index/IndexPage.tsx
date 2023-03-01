@@ -167,7 +167,7 @@ function IndexPage() {
                 {/* Desktop Title */}
                 <h1
                   id="hero-title"
-                  className="hero-title mb-0 d-none d-lg-block"
+                  className="hero-title mb-0 d-none d-lg-block nowrap"
                 >
                   <span className="hero-title-one align-items-center zi-2">
                     The Future of Storytelling
