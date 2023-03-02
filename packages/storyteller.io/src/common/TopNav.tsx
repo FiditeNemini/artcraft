@@ -1,5 +1,5 @@
 import { useLocomotiveScroll } from "react-locomotive-scroll";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 
 interface Props {}
 
@@ -7,11 +7,11 @@ function TopNav(props: Props) {
   const { scroll } = useLocomotiveScroll();
   const [isScrolling, setIsScrolling] = useState(false);
   const [showTopBtn, setTopBtn] = useState(false);
+  const [activeLink, setActiveLink] = useState("");
 
-  if (!!scroll) {
-    scroll.on(
-      "scroll",
-      (position: { scroll: { y: number } }, direction: string) => {
+  useEffect(() => {
+    if (!!scroll) {
+      scroll.on("scroll", (position: { scroll: { y: number } }) => {
         if (position.scroll.y > 50) {
           // console.log(">> scroll > 50");
           if (!isScrolling) {
@@ -35,9 +35,11 @@ function TopNav(props: Props) {
             setTopBtn(false);
           }
         }
-      }
-    );
-  }
+      });
+    }
+  }, [isScrolling, scroll, showTopBtn]);
+
+  // Add .active class to the current button on click (highlight it)
 
   const navClassNames = isScrolling
     ? "container-fluid nav-scroll"
@@ -65,10 +67,56 @@ function TopNav(props: Props) {
     }
   }, [mobileMenuOpen]);
 
+  // Add .active class on nav links when scrolling (highlight it)
+
+  useEffect(() => {
+    if (mobileMenuOpen) {
+      document.body.classList.add("lock-scroll");
+    } else {
+      document.body.classList.remove("lock-scroll");
+    }
+  }, [mobileMenuOpen]);
+
+  // window.addEventListener("load", () => {
+  //   const navBtn1 = document.getElementById("nav-btn-1");
+  //   const navBtn2 = document.getElementById("nav-btn-2");
+  //   const navBtn3 = document.getElementById("nav-btn-3");
+  //   // const navBtn4 = document.getElementById("nav-btn-4");
+
+  //   // Add .active class on buttons when scrolling (highlight it)
+  //   scroll.on("call", (callValue: string) => {
+  //     if (callValue === "home") {
+  //       navBtn1?.classList.add("active");
+  //       console.log(callValue);
+  //     } else {
+  //       navBtn1?.classList.remove("active");
+  //     }
+
+  //     if (callValue === "film") {
+  //       navBtn2?.classList.add("active");
+  //       console.log(callValue);
+  //     } else {
+  //       navBtn2?.classList.remove("active");
+  //     }
+
+  //     if (callValue === "music") {
+  //       navBtn3?.classList.add("active");
+  //       console.log(callValue);
+  //     } else {
+  //       navBtn3?.classList.remove("active");
+  //     }
+  //   });
+  // });
+
   return (
     <>
-      <nav id="navbar" className={navClassNames} data-scroll-section>
-        <div className="d-none d-lg-flex flex-wrap align-items-center justify-content-center justify-content-md-between mt-3 topnav">
+      <nav
+        id="navbar"
+        className={navClassNames}
+        data-scroll-container
+        data-scroll-sticky
+      >
+        <div className="d-none d-lg-flex flex-wrap align-items-center justify-content-center justify-content-md-between">
           <a
             href="/"
             className="d-flex align-items-center col-md-3 mb-2 mb-md-0 text-dark text-decoration-none"
@@ -78,41 +126,75 @@ function TopNav(props: Props) {
               src="/logo/storytellerai-logo.png"
               alt="Storyteller Logo"
               height="34"
-              className="mb-2"
             />
           </a>
 
           <ul className="nav col-12 col-md-auto mb-2 justify-content-center mb-md-0">
             <li>
-              <a href="#root" className="nav-link active" data-scroll-to>
+              <a
+                href="#home"
+                id="nav-btn-1"
+                className="nav-link"
+                data-scroll-to
+              >
                 Home
               </a>
             </li>
             <li>
-              <a href="#about" className="nav-link" data-scroll-to>
-                About
+              <a
+                id="nav-btn-2"
+                href="#film"
+                className="nav-link"
+                data-scroll-to
+              >
+                Film
               </a>
             </li>
             <li>
-              <a href="#products" className="nav-link" data-scroll-to>
-                What We Do
+              <a
+                id="nav-btn-3"
+                href="#music"
+                className="nav-link"
+                data-scroll-to
+              >
+                Music
               </a>
             </li>
             <li>
-              <a href="#mentions" className="nav-link" data-scroll-to>
-                Mentions
+              <a
+                id="nav-btn-4"
+                href="#social"
+                className="nav-link"
+                data-scroll-to
+              >
+                Social
+              </a>
+            </li>
+            <li>
+              <a
+                id="nav-btn-5"
+                href="#mentions"
+                className="nav-link"
+                data-scroll-to
+              >
+                Our Team
               </a>
             </li>
           </ul>
 
           <div className="col-md-3 text-end">
-            <a href="#contact" className="btn btn-primary fs-6" data-scroll-to>
+            <a
+              id="nav-btn-6"
+              href="#contact"
+              className="btn btn-primary fs-6"
+              data-scroll-to
+            >
               Contact
             </a>
           </div>
         </div>
 
-        <div className="d-flex d-lg-none justify-content-between pt-2">
+        <div className="d-flex d-lg-none justify-content-between">
           <a
             href="/"
             className="d-flex align-items-center text-dark text-decoration-none"
@@ -121,8 +203,7 @@ function TopNav(props: Props) {
               id="logo"
               src="/logo/storytellerai-logo.png"
               alt="Storyteller Logo"
-              height="30"
-              className="mt-2"
+              height="34"
             />
           </a>
           <button
@@ -138,11 +219,12 @@ function TopNav(props: Props) {
           </button>
         </div>
       </nav>
+
       <div className={menuClassNames}>
         <div className="overlay-menu">
           <ul>
             <li className="nav-link active">
-              <a onClick={menuToggle} href="#root" data-scroll-to>
+              <a onClick={menuToggle} href="#home" data-scroll-to>
                 Home
               </a>
             </li>

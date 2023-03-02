@@ -20,6 +20,7 @@ function App() {
           smooth: true,
           multiplier: 0.9,
           getDirection: true,
+          scrollFromAnywhere: true,
           mobile: {
             smooth: false,
           },

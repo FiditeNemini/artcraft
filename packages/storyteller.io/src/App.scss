@@ -133,29 +133,30 @@ p {
 #navbar {
   position: fixed;
   z-index: 15;
-  transition: 0.3s all ease;
+  width: 100%;
+  min-height: auto !important;
+  transition: all 0.2s;
+  padding-top: 12px;
+  padding-bottom: 12px;
 }
 
 .nav-scroll {
-  margin-top: -100px;
-  opacity: 0;
-}
-
-.topnav {
-  z-index: 10;
+  background-color: rgba(11, 12, 20, 0.8);
+  backdrop-filter: blur(10px);
 }
 
 .nav-link {
   font-size: 16px;
   font-weight: 500;
-  color: rgba($white, 0.6);
+  color: rgba($white, 0.7);
   padding: 4px 0;
-  margin: auto 24px;
+  margin: auto 20px;
   position: relative;
   text-decoration: none;
+  letter-spacing: 0.3px;
 
   &:focus {
-    color: rgba($white, 0.6);
+    color: rgba($white, 0.7);
   }
 
   &:hover {
@@ -599,9 +600,9 @@ p {
 .card {
   height: 100%;
   padding: 28px;
-  border-radius: 12px;
-  border: 2px solid;
-  border-color: rgba(#4d4d66, 0.6);
+  border-radius: 8px;
+  border: 1px solid;
+  border-color: rgba(#4d4d66, 0.8);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -928,7 +929,7 @@ $font: montserrat, sans-serif;
     position: relative;
     height: 70%;
     top: 50%;
-    transform: translateY(-50%);
+    transform: fY(-50%);
     font-size: 50px;
     font-family: $font;
     font-weight: 400;
@@ -1007,6 +1008,7 @@ $font: montserrat, sans-serif;
 
 .about-card {
   min-height: 185px;
+  line-height: 1.5;
 
   &:hover > .about-icon {
     transform: translate(0, -4px);
@@ -1023,8 +1025,8 @@ $font: montserrat, sans-serif;
 
 .img-border {
   border-radius: 8px;
-  border: 2px solid;
-  border-color: rgba(#4d4d66, 0.6);
+  border: 1px solid;
+  border-color: rgba(#4d4d66, 0.8);
 }
 
 .img-hover {
