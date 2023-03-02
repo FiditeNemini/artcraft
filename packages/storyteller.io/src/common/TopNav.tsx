@@ -223,24 +223,29 @@ function TopNav(props: Props) {
       <div className={menuClassNames}>
         <div className="overlay-menu">
           <ul>
-            <li className="nav-link active">
+            <li className="nav-link">
               <a onClick={menuToggle} href="#home" data-scroll-to>
                 Home
               </a>
             </li>
-            <li>
-              <a onClick={menuToggle} href="#about" data-scroll-to>
-                About
+            <li className="nav-link">
+              <a onClick={menuToggle} href="#film" data-scroll-to>
+                Film
               </a>
             </li>
-            <li>
-              <a onClick={menuToggle} href="#products" data-scroll-to>
-                What We Do
+            <li className="nav-link">
+              <a onClick={menuToggle} href="#music" data-scroll-to>
+                Music
               </a>
             </li>
-            <li>
-              <a onClick={menuToggle} href="#mentions" data-scroll-to>
-                Mentions
+            <li className="nav-link">
+              <a onClick={menuToggle} href="#social" data-scroll-to>
+                Social
+              </a>
+            </li>
+            <li className="nav-link">
+              <a onClick={menuToggle} href="#team" data-scroll-to>
+                Our Team
               </a>
             </li>
             <li className="mt-4">
