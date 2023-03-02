@@ -1,4 +1,3 @@
-import React, { useRef } from "react";
 import {
   faDiscord,
   faFacebook,
@@ -40,8 +39,6 @@ import { Autoplay, Pagination } from "swiper";
 import { useForm, ValidationError } from "@formspree/react";
 
 function IndexPage() {
-  const indexPageRef = useRef<HTMLDivElement>(null);
-
   // Title Animation
   useEffect(() => {
     const splitTitle = new SplitType("#hero-title", {
@@ -347,8 +344,18 @@ function IndexPage() {
           </div>
         </div>
 
-        <div className="container pt-5 mt-5">
-          <div className="row gx-4 gy-4 gx-lg-5 gy-lg-5 mb-5 mt-5">
+        {/* <div className="w-100 d-flex justify-content-center">
+            <img
+              src="/logo/Storyteller-Icon-Logo.png"
+              alt="Storyteller Logo Icon"
+              className="divider-logo"
+            />
+          </div> */}
+      </div>
+
+      <div className="bg-dark section-2">
+        <div className="container">
+          <div className="row gx-4 gy-4 gx-lg-5 gy-lg-5 mb-5">
             <div className="col-12 col-md-6 d-flex flex-column justify-content-center">
               <video
                 src="/video/webpage-demo-1-640.mp4"
@@ -360,7 +367,7 @@ function IndexPage() {
               ></video>
             </div>
             <div className="col-12 col-md-6 d-flex flex-column justify-content-center">
-              <div className="card bg-dark-solid align-items-start justify-content-center fs-6 h-auto">
+              <div className="p-lg-4 align-items-start justify-content-center fs-6 h-auto">
                 <h3 className="pb-3">Volumetric Capture</h3>
                 <p className="mb-0">
                   Use one or more cameras to build a 3D volumetric capture of
@@ -383,7 +390,7 @@ function IndexPage() {
               ></video>
             </div>
             <div className="col-12 col-md-6 d-flex flex-column justify-content-center">
-              <div className="card bg-dark-solid align-items-start justify-content-center fs-6 h-auto">
+              <div className="p-lg-4 align-items-start justify-content-center fs-6 h-auto">
                 <h3 className="pb-3">Motion Capture</h3>
                 <p className="mb-0">
                   Community-contributed models, sets, and scenarios can be
@@ -394,7 +401,7 @@ function IndexPage() {
             </div>
           </div>
 
-          <div className="row gx-4 gy-4 gx-lg-5 gy-lg-5 pb-5">
+          <div className="row gx-4 gy-4 gx-lg-5 gy-lg-5">
             <div className="col-12 col-md-6 d-flex flex-column justify-content-center">
               <video
                 src="/video/webpage-demo-3-640.mp4"
@@ -406,7 +413,7 @@ function IndexPage() {
               ></video>
             </div>
             <div className="col-12 col-md-6 d-flex flex-column justify-content-center">
-              <div className="card bg-dark-solid align-items-start justify-content-center fs-6 h-auto">
+              <div className="p-lg-4 align-items-start justify-content-center fs-6 h-auto">
                 <h3 className="pb-3">
                   Fake Faces, Voices, and Corrected Motion
                 </h3>
@@ -420,14 +427,6 @@ function IndexPage() {
             </div>
           </div>
         </div>
-
-        {/* <div className="w-100 d-flex justify-content-center">
-            <img
-              src="/logo/Storyteller-Icon-Logo.png"
-              alt="Storyteller Logo Icon"
-              className="divider-logo"
-            />
-          </div> */}
       </div>
 
       <div className="bg-hero-2">
