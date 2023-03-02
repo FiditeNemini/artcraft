@@ -44,7 +44,7 @@ The CLI is necessary to perform codegen:
 
 ```
 sudo apt-get install libmysqlclient-dev
-cargo install sqlx-cli --no-default-features --features rustls,mysql
+cargo install sqlx-cli --no-default-features --features rustls,mysql,sqlite
 ```
 
 Diesel now supports configuring the migration directory via an environment variable,

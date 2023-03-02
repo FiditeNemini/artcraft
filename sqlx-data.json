@@ -1,5 +1,5 @@
 {
-  "db": "MySQL",
+  "db": "SQLite",
   "0033c76be0ea1c99069f1a8df1ce400c7064526feaf5dc88930da0718a885b19": {
     "describe": {
       "columns": [
@@ -13656,17 +13656,7 @@
     },
     "query": "\nUPDATE w2l_results\nSET\n  user_deleted_at = CURRENT_TIMESTAMP\nWHERE\n  token = ?\nLIMIT 1\n        "
   },
-  "0ff13b84956c2625050211a5bb2352a489ef8435571c364c8b2d1d21d936cbd4": {
-    "describe": {
-      "columns": [],
-      "nullable": [],
-      "parameters": {
-        "Right": 3
-      }
-    },
-    "query": "\nUPDATE tts_results\nSET\n    creator_set_visibility = ?,\n    maybe_mod_user_token = ?\nWHERE token = ?\nLIMIT 1\n        "
-  },
-  "17c8d210d93ee9c0d8e8422eed605c9150f19f9bf72affcf111b15a67a5b9e70": {
+  "05342b205c2d303deadbc4729b8b888ba908fe024be7832945f02e96eccd3dc5": {
     "describe": {
       "columns": [],
       "nullable": [],
@@ -13674,39 +13664,133 @@
         "Right": 6
       }
     },
-    "query": "\nUPDATE w2l_templates\nSET\n    is_public_listing_approved = ?,\n    is_locked_from_user_modification = ?,\n    is_locked_from_use = ?,\n    maybe_mod_comments = ?,\n    maybe_mod_user_token = ?,\n    version = version + 1\nWHERE token = ?\nLIMIT 1\n        "
+    "query": "\nINSERT INTO tts_render_tasks(\n  token,\n  story_type,\n  story_token,\n  sequence_order,\n  sequence_length,\n  tts_service,\n  tts_voice_identifier,\n  full_text\n)\nVALUES (\n  ?,\n  \"news_story\",\n  ?,\n  ?,\n  ?,\n  \"fakeyou\",\n  ?,\n  ?\n)\n        "
   },
-  "218b3fe667b34bfa158bb7d4f600a3b91a22460adf566dcdf6ce540006e6c684": {
+  "18edd8ed5a0a310ef049ea020d22d88fd6cea1cc7c7462356e554c3450bef4cc": {
     "describe": {
       "columns": [],
       "nullable": [],
       "parameters": {
-        "Right": 10
+        "Right": 7
       }
     },
-    "query": "\nUPDATE model_categories\nSET\n    name = ?,\n    maybe_dropdown_name = ?,\n\n    can_directly_have_models = ?,\n    can_have_subcategories = ?,\n    can_only_mods_apply = ?,\n\n    maybe_super_category_token = ?,\n\n    is_mod_approved = ?,\n    maybe_mod_user_token = ?,\n    maybe_mod_comments = ?,\n\n    version = version + 1\n\nWHERE token = ?\nLIMIT 1\n        "
+    "query": "\nUPDATE news_story_productions\nSET\n  maybe_skip_reason = ?,\n  overall_production_status = ?,\n  llm_rendition_status = ?,\n  llm_title_summary_status = ?,\n  llm_categorization_status = ?,\n  image_generation_status = ?,\n  version = version + 1\nWHERE\n  news_story_token = ?\n        "
   },
-  "25e7858d370ac1359deb42ef5292e85ccd1fe7debf3a1ba73303e5882523a4d0": {
+  "2249dfe956745708a58dbbabadb8634fff7204ed4c1e39aa2a23ad743ed0588c": {
     "describe": {
-      "columns": [],
-      "nullable": [],
+      "columns": [
+        {
+          "name": "id",
+          "ordinal": 0,
+          "type_info": "Int64"
+        },
+        {
+          "name": "news_story_token: tokens::tokens::news_stories::NewsStoryToken",
+          "ordinal": 1,
+          "type_info": "Text"
+        },
+        {
+          "name": "original_news_canonical_url",
+          "ordinal": 2,
+          "type_info": "Text"
+        },
+        {
+          "name": "web_content_type: enums::common::sqlite::web_content_type::WebContentType",
+          "ordinal": 3,
+          "type_info": "Text"
+        },
+        {
+          "name": "original_news_title",
+          "ordinal": 4,
+          "type_info": "Text"
+        },
+        {
+          "name": "maybe_summary_news_title",
+          "ordinal": 5,
+          "type_info": "Text"
+        },
+        {
+          "name": "maybe_categorization",
+          "ordinal": 6,
+          "type_info": "Text"
+        },
+        {
+          "name": "overall_production_status: enums::common::sqlite::awaitable_job_status::AwaitableJobStatus",
+          "ordinal": 7,
+          "type_info": "Text"
+        },
+        {
+          "name": "llm_rendition_status: enums::common::sqlite::awaitable_job_status::AwaitableJobStatus",
+          "ordinal": 8,
+          "type_info": "Text"
+        },
+        {
+          "name": "llm_rendition_attempts",
+          "ordinal": 9,
+          "type_info": "Int64"
+        },
+        {
+          "name": "llm_title_summary_status: enums::common::sqlite::awaitable_job_status::AwaitableJobStatus",
+          "ordinal": 10,
+          "type_info": "Text"
+        },
+        {
+          "name": "llm_title_summary_attempts",
+          "ordinal": 11,
+          "type_info": "Int64"
+        },
+        {
+          "name": "llm_categorization_status: enums::common::sqlite::awaitable_job_status::AwaitableJobStatus",
+          "ordinal": 12,
+          "type_info": "Text"
+        },
+        {
+          "name": "llm_categorization_attempts",
+          "ordinal": 13,
+          "type_info": "Int64"
+        },
+        {
+          "name": "audio_generation_status: enums::common::sqlite::awaitable_job_status::AwaitableJobStatus",
+          "ordinal": 14,
+          "type_info": "Text"
+        },
+        {
+          "name": "image_generation_status: enums::common::sqlite::awaitable_job_status::AwaitableJobStatus",
+          "ordinal": 15,
+          "type_info": "Text"
+        },
+        {
+          "name": "image_generation_attempts",
+          "ordinal": 16,
+          "type_info": "Int64"
+        }
+      ],
+      "nullable": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        true,
+        true,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false
+      ],
       "parameters": {
-        "Right": 8
+        "Right": 2
       }
     },
-    "query": "\nINSERT INTO w2l_template_upload_jobs\nSET\n  token = ?,\n  uuid_idempotency_token = ?,\n  creator_user_token = ?,\n  creator_ip_address = ?,\n  creator_set_visibility = ?,\n  title = ?,\n  template_type = ?,\n  download_url = ?,\n  status = \"pending\"\n        "
+    "query": "\nSELECT\n  id,\n  news_story_token as `news_story_token: tokens::tokens::news_stories::NewsStoryToken`,\n  original_news_canonical_url,\n  web_content_type as `web_content_type: enums::common::sqlite::web_content_type::WebContentType`,\n  original_news_title,\n\n  maybe_summary_news_title,\n  maybe_categorization,\n\n  overall_production_status as `overall_production_status: enums::common::sqlite::awaitable_job_status::AwaitableJobStatus`,\n\n  llm_rendition_status as `llm_rendition_status: enums::common::sqlite::awaitable_job_status::AwaitableJobStatus`,\n  llm_rendition_attempts,\n\n  llm_title_summary_status as `llm_title_summary_status: enums::common::sqlite::awaitable_job_status::AwaitableJobStatus`,\n  llm_title_summary_attempts,\n\n  llm_categorization_status as `llm_categorization_status: enums::common::sqlite::awaitable_job_status::AwaitableJobStatus`,\n  llm_categorization_attempts,\n\n  audio_generation_status as `audio_generation_status: enums::common::sqlite::awaitable_job_status::AwaitableJobStatus`,\n  image_generation_status as `image_generation_status: enums::common::sqlite::awaitable_job_status::AwaitableJobStatus`,\n  image_generation_attempts\nFROM news_story_productions\nWHERE\n  audio_generation_status = \"ready_waiting\"\n  AND id > ?\nORDER BY id ASC\nLIMIT ?\n        "
   },
-  "33cd0c0b8eaaf494ef97232ac89775b8eb6a22d310824b7aa7db310dd4fd41b1": {
-    "describe": {
-      "columns": [],
-      "nullable": [],
-      "parameters": {
-        "Right": 3
-      }
-    },
-    "query": "\nUPDATE w2l_results\nSET\n    creator_set_visibility = ?,\n    maybe_mod_user_token = ?\nWHERE token = ?\nLIMIT 1\n        "
-  },
-  "346c02b215cb35efaa35fe96d866a8c9056ac46e987b4e01f64222259dccdcbf": {
+  "32a88b3752abf487754345f4a7b12f6c9386b4b834160f5a3a7ac8fcfe784480": {
     "describe": {
       "columns": [],
       "nullable": [],
@@ -13714,394 +13798,95 @@
         "Right": 2
       }
     },
-    "query": "\nUPDATE\n    ip_address_bans\nSET\n    mod_user_token = ?,\n    deleted_at = NULL\nWHERE\n    ip_address = ?\nLIMIT 1\n        "
+    "query": "\nUPDATE news_story_productions\nSET\n  overall_production_status = ?,\n  version = version + 1\nWHERE\n  news_story_token = ?\n        "
   },
-  "5473d3857478d001688998056377fefe4bcc792477f303b41fa3cf64f79170f3": {
+  "3353bfc5b60ec523a85e83af9dd07a627a56f3855604280139f06488e0698e49": {
     "describe": {
       "columns": [],
       "nullable": [],
       "parameters": {
-        "Right": 9
+        "Right": 7
       }
     },
-    "query": "\n      INSERT INTO tts_category_assignments\n      SET\n        model_token = ?,\n        category_token = ?,\n        category_removal_user_token = ?,\n        ip_address_creation = ?,\n        ip_address_last_update = ?,\n        deleted_at = CURRENT_TIMESTAMP\n      ON DUPLICATE KEY UPDATE\n        model_token = ?,\n        category_token = ?,\n        category_removal_user_token = ?,\n        ip_address_last_update = ?,\n        deleted_at = CURRENT_TIMESTAMP\n    "
+    "query": "\nINSERT INTO web_scraping_targets(\n  canonical_url,\n  web_content_type,\n  maybe_title,\n  maybe_article_full_image_url,\n  maybe_article_thumbnail_image_url,\n  maybe_skip_reason,\n  scraping_status\n)\nVALUES (\n  ?,\n  ?,\n  ?,\n  ?,\n  ?,\n  ?,\n  ?\n)\n        "
   },
-  "56a0a2bfc3c73d6845ca9cf1d285b175a40b50a250b7effb9ce6474e58113d6e": {
+  "3bc02116e3446f59e3c3d86f768bf1c73402dc1ed299da1958697904a7803e3d": {
     "describe": {
       "columns": [
         {
-          "name": "job_token",
+          "name": "id",
           "ordinal": 0,
-          "type_info": {
-            "char_set": 224,
-            "flags": {
-              "bits": 4229
-            },
-            "max_size": 128,
-            "type": "VarString"
-          }
+          "type_info": "Int64"
         },
         {
-          "name": "status",
+          "name": "token: tokens::tokens::tts_render_tasks::TtsRenderTaskToken",
           "ordinal": 1,
-          "type_info": {
-            "char_set": 224,
-            "flags": {
-              "bits": 393
-            },
-            "max_size": 64,
-            "type": "String"
-          }
+          "type_info": "Text"
         },
         {
-          "name": "attempt_count",
+          "name": "story_type",
           "ordinal": 2,
-          "type_info": {
-            "char_set": 63,
-            "flags": {
-              "bits": 1
-            },
-            "max_size": 3,
-            "type": "Long"
-          }
+          "type_info": "Text"
         },
         {
-          "name": "maybe_model_token",
+          "name": "story_token",
           "ordinal": 3,
-          "type_info": {
-            "char_set": 224,
-            "flags": {
-              "bits": 136
-            },
-            "max_size": 128,
-            "type": "VarString"
-          }
+          "type_info": "Text"
         },
         {
-          "name": "created_at",
+          "name": "sequence_order",
           "ordinal": 4,
-          "type_info": {
-            "char_set": 63,
-            "flags": {
-              "bits": 1153
-            },
-            "max_size": 19,
-            "type": "Timestamp"
-          }
+          "type_info": "Int64"
         },
         {
-          "name": "updated_at",
+          "name": "tts_service",
           "ordinal": 5,
-          "type_info": {
-            "char_set": 63,
-            "flags": {
-              "bits": 9345
-            },
-            "max_size": 19,
-            "type": "Timestamp"
-          }
-        }
-      ],
-      "nullable": [
-        false,
-        false,
-        false,
-        true,
-        false,
-        false
-      ],
-      "parameters": {
-        "Right": 1
-      }
-    },
-    "query": "\nSELECT\n    jobs.token as job_token,\n\n    jobs.status,\n    jobs.attempt_count,\n    jobs.on_success_result_token as maybe_model_token,\n\n    jobs.created_at,\n    jobs.updated_at\n\nFROM tts_model_upload_jobs as jobs\n\nWHERE jobs.token = ?\n        "
-  },
-  "57928b1001a10a88ac5a07f43b1dd30f6dee6edbc0808be99fe1233f9e276c56": {
-    "describe": {
-      "columns": [
-        {
-          "name": "job_token",
-          "ordinal": 0,
-          "type_info": {
-            "char_set": 224,
-            "flags": {
-              "bits": 4229
-            },
-            "max_size": 128,
-            "type": "VarString"
-          }
+          "type_info": "Text"
         },
         {
-          "name": "status",
-          "ordinal": 1,
-          "type_info": {
-            "char_set": 224,
-            "flags": {
-              "bits": 393
-            },
-            "max_size": 64,
-            "type": "String"
-          }
+          "name": "tts_voice_identifier",
+          "ordinal": 6,
+          "type_info": "Text"
         },
         {
-          "name": "attempt_count",
-          "ordinal": 2,
-          "type_info": {
-            "char_set": 63,
-            "flags": {
-              "bits": 1
-            },
-            "max_size": 3,
-            "type": "Long"
-          }
+          "name": "full_text",
+          "ordinal": 7,
+          "type_info": "Text"
+        },
+        {
+          "name": "maybe_inference_job_token",
+          "ordinal": 8,
+          "type_info": "Text"
         },
         {
           "name": "maybe_result_token",
-          "ordinal": 3,
-          "type_info": {
-            "char_set": 224,
-            "flags": {
-              "bits": 136
-            },
-            "max_size": 128,
-            "type": "VarString"
-          }
-        },
-        {
-          "name": "maybe_public_bucket_video_path",
-          "ordinal": 4,
-          "type_info": {
-            "char_set": 224,
-            "flags": {
-              "bits": 4224
-            },
-            "max_size": 1020,
-            "type": "VarString"
-          }
-        },
-        {
-          "name": "maybe_w2l_template_token",
-          "ordinal": 5,
-          "type_info": {
-            "char_set": 224,
-            "flags": {
-              "bits": 136
-            },
-            "max_size": 128,
-            "type": "VarString"
-          }
-        },
-        {
-          "name": "w2l_template_type",
-          "ordinal": 6,
-          "type_info": {
-            "char_set": 224,
-            "flags": {
-              "bits": 393
-            },
-            "max_size": 28,
-            "type": "String"
-          }
-        },
-        {
-          "name": "title",
-          "ordinal": 7,
-          "type_info": {
-            "char_set": 224,
-            "flags": {
-              "bits": 4225
-            },
-            "max_size": 1020,
-            "type": "String"
-          }
-        },
-        {
-          "name": "created_at",
-          "ordinal": 8,
-          "type_info": {
-            "char_set": 63,
-            "flags": {
-              "bits": 1153
-            },
-            "max_size": 19,
-            "type": "Timestamp"
-          }
-        },
-        {
-          "name": "updated_at",
           "ordinal": 9,
-          "type_info": {
-            "char_set": 63,
-            "flags": {
-              "bits": 9345
-            },
-            "max_size": 19,
-            "type": "Timestamp"
-          }
-        }
-      ],
-      "nullable": [
-        false,
-        false,
-        false,
-        true,
-        true,
-        true,
-        false,
-        false,
-        false,
-        false
-      ],
-      "parameters": {
-        "Right": 1
-      }
-    },
-    "query": "\nSELECT\n    jobs.token as job_token,\n\n    jobs.status,\n    jobs.attempt_count,\n    jobs.on_success_result_token as maybe_result_token,\n    results.public_bucket_video_path as maybe_public_bucket_video_path,\n\n    jobs.maybe_w2l_template_token,\n    w2l.template_type as w2l_template_type,\n    w2l.title,\n\n    jobs.created_at,\n    jobs.updated_at\n\nFROM w2l_inference_jobs as jobs\nJOIN w2l_templates as w2l\n    ON w2l.token = jobs.maybe_w2l_template_token\nLEFT OUTER JOIN w2l_results as results\n    ON jobs.on_success_result_token = results.token\n\nWHERE jobs.token = ?\n        "
-  },
-  "60c06a507349919addb5d26b1c4a283a04f66fce86e84ed0a51db6001c9fc2b5": {
-    "describe": {
-      "columns": [],
-      "nullable": [],
-      "parameters": {
-        "Right": 6
-      }
-    },
-    "query": "\nUPDATE w2l_templates\nSET\n    title = ?,\n    description_markdown = ?,\n    description_rendered_html = ?,\n    creator_set_visibility = ?,\n    maybe_mod_user_token = ?,\n    version = version + 1\nWHERE token = ?\nLIMIT 1\n        "
-  },
-  "619d18c87075a86c01f1e0ac26744774293ff8ca6b0011ce611b3f47d8a97a0e": {
-    "describe": {
-      "columns": [
-        {
-          "name": "template_token",
-          "ordinal": 0,
-          "type_info": {
-            "char_set": 224,
-            "flags": {
-              "bits": 4229
-            },
-            "max_size": 128,
-            "type": "VarString"
-          }
+          "type_info": "Text"
         },
         {
-          "name": "title",
-          "ordinal": 1,
-          "type_info": {
-            "char_set": 224,
-            "flags": {
-              "bits": 4225
-            },
-            "max_size": 1020,
-            "type": "String"
-          }
-        },
-        {
-          "name": "template_type",
-          "ordinal": 2,
-          "type_info": {
-            "char_set": 224,
-            "flags": {
-              "bits": 393
-            },
-            "max_size": 28,
-            "type": "String"
-          }
-        },
-        {
-          "name": "duration_millis",
-          "ordinal": 3,
-          "type_info": {
-            "char_set": 63,
-            "flags": {
-              "bits": 1
-            },
-            "max_size": 10,
-            "type": "Long"
-          }
-        },
-        {
-          "name": "frame_width",
-          "ordinal": 4,
-          "type_info": {
-            "char_set": 63,
-            "flags": {
-              "bits": 1
-            },
-            "max_size": 10,
-            "type": "Long"
-          }
-        },
-        {
-          "name": "frame_height",
-          "ordinal": 5,
-          "type_info": {
-            "char_set": 63,
-            "flags": {
-              "bits": 1
-            },
-            "max_size": 10,
-            "type": "Long"
-          }
-        },
-        {
-          "name": "creator_user_token",
-          "ordinal": 6,
-          "type_info": {
-            "char_set": 224,
-            "flags": {
-              "bits": 4233
-            },
-            "max_size": 128,
-            "type": "VarString"
-          }
-        },
-        {
-          "name": "creator_username",
-          "ordinal": 7,
-          "type_info": {
-            "char_set": 224,
-            "flags": {
-              "bits": 4229
-            },
-            "max_size": 80,
-            "type": "VarString"
-          }
-        },
-        {
-          "name": "creator_display_name",
-          "ordinal": 8,
-          "type_info": {
-            "char_set": 224,
-            "flags": {
-              "bits": 4225
-            },
-            "max_size": 80,
-            "type": "VarString"
-          }
-        },
-        {
-          "name": "creator_gravatar_hash",
-          "ordinal": 9,
-          "type_info": {
-            "char_set": 224,
-            "flags": {
-              "bits": 4225
-            },
-            "max_size": 128,
-            "type": "String"
-          }
-        },
-        {
-          "name": "created_at",
+          "name": "maybe_result_url",
           "ordinal": 10,
-          "type_info": {
-            "char_set": 63,
-            "flags": {
-              "bits": 1153
-            },
-            "max_size": 19,
-            "type": "Timestamp"
-          }
+          "type_info": "Text"
+        },
+        {
+          "name": "maybe_result_relative_filesystem_location",
+          "ordinal": 11,
+          "type_info": "Text"
+        },
+        {
+          "name": "maybe_audio_duration_millis",
+          "ordinal": 12,
+          "type_info": "Int64"
+        },
+        {
+          "name": "tts_render_status: enums::by_table::tts_render_tasks::tts_render_status::TtsRenderStatus",
+          "ordinal": 13,
+          "type_info": "Text"
+        },
+        {
+          "name": "tts_render_attempts",
+          "ordinal": 14,
+          "type_info": "Int64"
         }
       ],
       "nullable": [
@@ -14113,174 +13898,106 @@
         false,
         false,
         false,
-        false,
+        true,
+        true,
+        true,
+        true,
+        true,
         false,
         false
       ],
-      "parameters": {
-        "Right": 0
-      }
-    },
-    "query": "\nSELECT\n  w2l_templates.token as template_token,\n  w2l_templates.title,\n  w2l_templates.template_type,\n  w2l_templates.duration_millis,\n  w2l_templates.frame_width,\n  w2l_templates.frame_height,\n  w2l_templates.creator_user_token,\n  users.username AS creator_username,\n  users.display_name AS creator_display_name,\n  users.email_gravatar_hash AS creator_gravatar_hash,\n  w2l_templates.created_at\nFROM\n  w2l_templates\nJOIN\n  users\nON\n  users.token = w2l_templates.creator_user_token\nWHERE\n  w2l_templates.is_public_listing_approved IS NULL\n  AND w2l_templates.user_deleted_at IS NULL\n  AND w2l_templates.mod_deleted_at IS NULL\n  AND w2l_templates.is_locked_from_use IS FALSE\n        "
-  },
-  "68376f750b8421c10d319fa1045a2f3ce8fb1d35a5fe6ec92b2022babafbde80": {
-    "describe": {
-      "columns": [],
-      "nullable": [],
       "parameters": {
         "Right": 2
       }
     },
-    "query": "\nUPDATE users\nSET\n  user_role_slug = ?\nWHERE\n  token = ?\nLIMIT 1\n        "
+    "query": "\nSELECT\n  id,\n  token as `token: tokens::tokens::tts_render_tasks::TtsRenderTaskToken`,\n  story_type,\n  story_token,\n  sequence_order,\n  tts_service,\n  tts_voice_identifier,\n  full_text,\n  maybe_inference_job_token,\n  maybe_result_token,\n  maybe_result_url,\n  maybe_result_relative_filesystem_location,\n  maybe_audio_duration_millis,\n  tts_render_status as `tts_render_status: enums::by_table::tts_render_tasks::tts_render_status::TtsRenderStatus`,\n  tts_render_attempts\nFROM tts_render_tasks\nWHERE\n  story_type = ?\n  AND story_token = ?\nORDER BY sequence_order ASC\n        "
   },
-  "720d7a26fb8ce75a8a1b3a62ef509d8ca99d419172e9cc5d8e2c803e0eebcb7f": {
-    "describe": {
-      "columns": [],
-      "nullable": [],
-      "parameters": {
-        "Right": 1
-      }
-    },
-    "query": "\n      UPDATE model_categories\n      SET\n        deleted_at = NULL\n      WHERE\n        token = ?\n      LIMIT 1\n    "
-  },
-  "7622292c05fe1b5832136762042780a12a02048166bb1b4492dfd627c48c8968": {
+  "3d77d2e2b23cc0372155a50b3034206b2385ea4d415ee874120b254b4a001773": {
     "describe": {
       "columns": [
         {
-          "name": "template_token",
+          "name": "id",
           "ordinal": 0,
-          "type_info": {
-            "char_set": 224,
-            "flags": {
-              "bits": 4229
-            },
-            "max_size": 128,
-            "type": "VarString"
-          }
-        }
-      ],
-      "nullable": [
-        false
-      ],
-      "parameters": {
-        "Right": 1
-      }
-    },
-    "query": "\nSELECT\n    token as template_token\nFROM w2l_templates\nWHERE\n    token = ?\n    AND user_deleted_at IS NULL\n    AND mod_deleted_at IS NULL\n        "
-  },
-  "88328e04ce947d3f541951aada9cee25135aa950ab478cf0dc6de453bb079e17": {
-    "describe": {
-      "columns": [
-        {
-          "name": "event_token",
-          "ordinal": 0,
-          "type_info": {
-            "char_set": 224,
-            "flags": {
-              "bits": 4229
-            },
-            "max_size": 128,
-            "type": "VarString"
-          }
+          "type_info": "Int64"
         },
         {
-          "name": "event_type",
+          "name": "token: tokens::tokens::tts_render_tasks::TtsRenderTaskToken",
           "ordinal": 1,
-          "type_info": {
-            "char_set": 224,
-            "flags": {
-              "bits": 4233
-            },
-            "max_size": 128,
-            "type": "VarString"
-          }
+          "type_info": "Text"
         },
         {
-          "name": "maybe_target_user_token",
+          "name": "story_type",
           "ordinal": 2,
-          "type_info": {
-            "char_set": 224,
-            "flags": {
-              "bits": 136
-            },
-            "max_size": 128,
-            "type": "VarString"
-          }
+          "type_info": "Text"
         },
         {
-          "name": "maybe_target_username",
+          "name": "story_token",
           "ordinal": 3,
-          "type_info": {
-            "char_set": 224,
-            "flags": {
-              "bits": 4228
-            },
-            "max_size": 80,
-            "type": "VarString"
-          }
+          "type_info": "Text"
         },
         {
-          "name": "maybe_target_display_name",
+          "name": "sequence_order",
           "ordinal": 4,
-          "type_info": {
-            "char_set": 224,
-            "flags": {
-              "bits": 4224
-            },
-            "max_size": 80,
-            "type": "VarString"
-          }
+          "type_info": "Int64"
         },
         {
-          "name": "maybe_target_user_gravatar_hash",
+          "name": "tts_service",
           "ordinal": 5,
-          "type_info": {
-            "char_set": 224,
-            "flags": {
-              "bits": 4224
-            },
-            "max_size": 128,
-            "type": "String"
-          }
+          "type_info": "Text"
         },
         {
-          "name": "maybe_target_entity_token",
+          "name": "tts_voice_identifier",
           "ordinal": 6,
-          "type_info": {
-            "char_set": 224,
-            "flags": {
-              "bits": 136
-            },
-            "max_size": 128,
-            "type": "VarString"
-          }
+          "type_info": "Text"
         },
         {
-          "name": "created_at",
+          "name": "full_text",
           "ordinal": 7,
-          "type_info": {
-            "char_set": 63,
-            "flags": {
-              "bits": 1153
-            },
-            "max_size": 19,
-            "type": "Timestamp"
-          }
+          "type_info": "Text"
         },
         {
-          "name": "updated_at",
+          "name": "maybe_inference_job_token",
           "ordinal": 8,
-          "type_info": {
-            "char_set": 63,
-            "flags": {
-              "bits": 9345
-            },
-            "max_size": 19,
-            "type": "Timestamp"
-          }
+          "type_info": "Text"
+        },
+        {
+          "name": "maybe_result_token",
+          "ordinal": 9,
+          "type_info": "Text"
+        },
+        {
+          "name": "maybe_result_url",
+          "ordinal": 10,
+          "type_info": "Text"
+        },
+        {
+          "name": "maybe_result_relative_filesystem_location",
+          "ordinal": 11,
+          "type_info": "Text"
+        },
+        {
+          "name": "maybe_audio_duration_millis",
+          "ordinal": 12,
+          "type_info": "Int64"
+        },
+        {
+          "name": "tts_render_status: enums::by_table::tts_render_tasks::tts_render_status::TtsRenderStatus",
+          "ordinal": 13,
+          "type_info": "Text"
+        },
+        {
+          "name": "tts_render_attempts",
+          "ordinal": 14,
+          "type_info": "Int64"
         }
       ],
       "nullable": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
         false,
         false,
         true,
@@ -14292,52 +14009,126 @@
         false
       ],
       "parameters": {
-        "Right": 0
-      }
-    },
-    "query": "\nSELECT\n    events.token as event_token,\n    events.event_type,\n    events.maybe_target_user_token,\n    users.username as maybe_target_username,\n    users.display_name as maybe_target_display_name,\n    users.email_gravatar_hash as maybe_target_user_gravatar_hash,\n    events.maybe_target_entity_token,\n    events.created_at,\n    events.updated_at\nFROM firehose_entries as events\nLEFT OUTER JOIN users\nON events.maybe_target_user_token = users.token\nORDER BY events.id DESC\nLIMIT 25\n        "
-  },
-  "886861e91c7e8af53eb856c949389a172b8d9e079f1c2070d115423907c47c50": {
-    "describe": {
-      "columns": [],
-      "nullable": [],
-      "parameters": {
-        "Right": 8
-      }
-    },
-    "query": "\nINSERT INTO tts_model_upload_jobs\nSET\n  token = ?,\n  uuid_idempotency_token = ?,\n  creator_user_token = ?,\n  creator_ip_address = ?,\n  creator_set_visibility = ?,\n  title = ?,\n  tts_model_type = ?,\n  download_url = ?,\n  status = \"pending\"\n        "
-  },
-  "8b1b9cf11b80da18d79237f2579a96b4a85fa7201118e01fffc01c1eba64cbaf": {
-    "describe": {
-      "columns": [],
-      "nullable": [],
-      "parameters": {
-        "Right": 1
-      }
-    },
-    "query": "\n      UPDATE model_categories\n      SET\n        deleted_at = CURRENT_TIMESTAMP\n      WHERE\n        token = ?\n      LIMIT 1\n    "
-  },
-  "9b607b814cd7c445c2c46ec5c13dc23f3a6a771a3469a786ed46ec099577d95e": {
-    "describe": {
-      "columns": [],
-      "nullable": [],
-      "parameters": {
         "Right": 2
       }
     },
-    "query": "\nUPDATE\n    ip_address_bans\nSET\n    mod_user_token = ?,\n    deleted_at = CURRENT_TIMESTAMP\nWHERE\n    ip_address = ?\nLIMIT 1\n        "
+    "query": "\nSELECT\n  id,\n  token as `token: tokens::tokens::tts_render_tasks::TtsRenderTaskToken`,\n  story_type,\n  story_token,\n  sequence_order,\n  tts_service,\n  tts_voice_identifier,\n  full_text,\n  maybe_inference_job_token,\n  maybe_result_token,\n  maybe_result_url,\n  maybe_result_relative_filesystem_location,\n  maybe_audio_duration_millis,\n  tts_render_status as `tts_render_status: enums::by_table::tts_render_tasks::tts_render_status::TtsRenderStatus`,\n  tts_render_attempts\nFROM tts_render_tasks\nWHERE\n  tts_render_status = \"processing\"\n  AND id > ?\nORDER BY id ASC\nLIMIT ?\n        "
   },
-  "9cc5f697350814199344d3d9a0ff026e0d1e09e9097648400d4b63cfcbd31178": {
+  "3debbf81213592847f997ea612990f9be2a474710a6d74c0f276934d314d51e0": {
     "describe": {
-      "columns": [],
-      "nullable": [],
+      "columns": [
+        {
+          "name": "id",
+          "ordinal": 0,
+          "type_info": "Int64"
+        },
+        {
+          "name": "news_story_token: tokens::tokens::news_stories::NewsStoryToken",
+          "ordinal": 1,
+          "type_info": "Text"
+        },
+        {
+          "name": "original_news_canonical_url",
+          "ordinal": 2,
+          "type_info": "Text"
+        },
+        {
+          "name": "web_content_type: enums::common::sqlite::web_content_type::WebContentType",
+          "ordinal": 3,
+          "type_info": "Text"
+        },
+        {
+          "name": "original_news_title",
+          "ordinal": 4,
+          "type_info": "Text"
+        },
+        {
+          "name": "maybe_summary_news_title",
+          "ordinal": 5,
+          "type_info": "Text"
+        },
+        {
+          "name": "maybe_categorization",
+          "ordinal": 6,
+          "type_info": "Text"
+        },
+        {
+          "name": "overall_production_status: enums::common::sqlite::awaitable_job_status::AwaitableJobStatus",
+          "ordinal": 7,
+          "type_info": "Text"
+        },
+        {
+          "name": "llm_rendition_status: enums::common::sqlite::awaitable_job_status::AwaitableJobStatus",
+          "ordinal": 8,
+          "type_info": "Text"
+        },
+        {
+          "name": "llm_rendition_attempts",
+          "ordinal": 9,
+          "type_info": "Int64"
+        },
+        {
+          "name": "llm_title_summary_status: enums::common::sqlite::awaitable_job_status::AwaitableJobStatus",
+          "ordinal": 10,
+          "type_info": "Text"
+        },
+        {
+          "name": "llm_title_summary_attempts",
+          "ordinal": 11,
+          "type_info": "Int64"
+        },
+        {
+          "name": "llm_categorization_status: enums::common::sqlite::awaitable_job_status::AwaitableJobStatus",
+          "ordinal": 12,
+          "type_info": "Text"
+        },
+        {
+          "name": "llm_categorization_attempts",
+          "ordinal": 13,
+          "type_info": "Int64"
+        },
+        {
+          "name": "audio_generation_status: enums::common::sqlite::awaitable_job_status::AwaitableJobStatus",
+          "ordinal": 14,
+          "type_info": "Text"
+        },
+        {
+          "name": "image_generation_status: enums::common::sqlite::awaitable_job_status::AwaitableJobStatus",
+          "ordinal": 15,
+          "type_info": "Text"
+        },
+        {
+          "name": "image_generation_attempts",
+          "ordinal": 16,
+          "type_info": "Int64"
+        }
+      ],
+      "nullable": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        true,
+        true,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false
+      ],
       "parameters": {
         "Right": 3
       }
     },
-    "query": "\nUPDATE w2l_results\nSET\n    creator_set_visibility = ?,\n    creator_ip_address = ?\nWHERE token = ?\nLIMIT 1\n        "
+    "query": "\nSELECT\n  id,\n  news_story_token as `news_story_token: tokens::tokens::news_stories::NewsStoryToken`,\n  original_news_canonical_url,\n  web_content_type as `web_content_type: enums::common::sqlite::web_content_type::WebContentType`,\n  original_news_title,\n\n  maybe_summary_news_title,\n  maybe_categorization,\n\n  overall_production_status as `overall_production_status: enums::common::sqlite::awaitable_job_status::AwaitableJobStatus`,\n\n  llm_rendition_status as `llm_rendition_status: enums::common::sqlite::awaitable_job_status::AwaitableJobStatus`,\n  llm_rendition_attempts,\n\n  llm_title_summary_status as `llm_title_summary_status: enums::common::sqlite::awaitable_job_status::AwaitableJobStatus`,\n  llm_title_summary_attempts,\n\n  llm_categorization_status as `llm_categorization_status: enums::common::sqlite::awaitable_job_status::AwaitableJobStatus`,\n  llm_categorization_attempts,\n\n  audio_generation_status as `audio_generation_status: enums::common::sqlite::awaitable_job_status::AwaitableJobStatus`,\n  image_generation_status as `image_generation_status: enums::common::sqlite::awaitable_job_status::AwaitableJobStatus`,\n  image_generation_attempts\nFROM news_story_productions\nWHERE\n  overall_production_status = \"processing\"\n  AND image_generation_status = ?\n  AND id > ?\nORDER BY id ASC\nLIMIT ?\n        "
   },
-  "9d4932baa4023accc2d28af98b58a47149d37c4937cd0171e6b955c09855c5f8": {
+  "4a497d25bf18bfd6aff81d392caea07a4f1ef44c1fb3d563a9b025e255cd2b03": {
     "describe": {
       "columns": [],
       "nullable": [],
@@ -14345,150 +14136,109 @@
         "Right": 5
       }
     },
-    "query": "\nINSERT INTO w2l_inference_jobs\nSET\n  maybe_w2l_template_token = ?,\n  maybe_tts_inference_result_token = ?,\n  maybe_public_audio_bucket_location = NULL,\n  maybe_public_image_bucket_location = NULL,\n  maybe_creator_user_token = ?,\n  creator_ip_address = ?,\n  creator_set_visibility = ?,\n  status = \"pending\"\n        "
+    "query": "\nUPDATE news_story_productions\nSET\n  maybe_categorization = ?,\n  overall_production_status = ?,\n  llm_categorization_status = ?,\n  llm_categorization_attempts = ?,\n  version = version + 1\nWHERE\n  news_story_token = ?\n        "
   },
-  "a2b586dd2120f29dd26281626f7381e292c821f8e826b9bc584b92ffa45035b2": {
+  "5ca1b3eed4a4841ca768ba9af35995847019bd70f662a2f98b6f97a13376fcd0": {
     "describe": {
       "columns": [
         {
-          "name": "job_token",
+          "name": "id",
           "ordinal": 0,
-          "type_info": {
-            "char_set": 224,
-            "flags": {
-              "bits": 4229
-            },
-            "max_size": 128,
-            "type": "VarString"
-          }
+          "type_info": "Int64"
         },
         {
-          "name": "status",
+          "name": "news_story_token: tokens::tokens::news_stories::NewsStoryToken",
           "ordinal": 1,
-          "type_info": {
-            "char_set": 224,
-            "flags": {
-              "bits": 393
-            },
-            "max_size": 64,
-            "type": "String"
-          }
+          "type_info": "Text"
         },
         {
-          "name": "attempt_count",
+          "name": "original_news_canonical_url",
           "ordinal": 2,
-          "type_info": {
-            "char_set": 63,
-            "flags": {
-              "bits": 1
-            },
-            "max_size": 3,
-            "type": "Long"
-          }
+          "type_info": "Text"
         },
         {
-          "name": "maybe_result_token",
+          "name": "web_content_type: enums::common::sqlite::web_content_type::WebContentType",
           "ordinal": 3,
-          "type_info": {
-            "char_set": 224,
-            "flags": {
-              "bits": 136
-            },
-            "max_size": 128,
-            "type": "VarString"
-          }
+          "type_info": "Text"
         },
         {
-          "name": "maybe_public_bucket_wav_audio_path",
+          "name": "original_news_title",
           "ordinal": 4,
-          "type_info": {
-            "char_set": 224,
-            "flags": {
-              "bits": 4224
-            },
-            "max_size": 1020,
-            "type": "VarString"
-          }
+          "type_info": "Text"
         },
         {
-          "name": "model_token",
+          "name": "maybe_summary_news_title",
           "ordinal": 5,
-          "type_info": {
-            "char_set": 224,
-            "flags": {
-              "bits": 4233
-            },
-            "max_size": 128,
-            "type": "VarString"
-          }
+          "type_info": "Text"
         },
         {
-          "name": "tts_model_type",
+          "name": "maybe_categorization",
           "ordinal": 6,
-          "type_info": {
-            "char_set": 224,
-            "flags": {
-              "bits": 385
-            },
-            "max_size": 60,
-            "type": "String"
-          }
+          "type_info": "Text"
         },
         {
-          "name": "title",
+          "name": "overall_production_status: enums::common::sqlite::awaitable_job_status::AwaitableJobStatus",
           "ordinal": 7,
-          "type_info": {
-            "char_set": 224,
-            "flags": {
-              "bits": 4225
-            },
-            "max_size": 1020,
-            "type": "VarString"
-          }
+          "type_info": "Text"
         },
         {
-          "name": "raw_inference_text",
+          "name": "llm_rendition_status: enums::common::sqlite::awaitable_job_status::AwaitableJobStatus",
           "ordinal": 8,
-          "type_info": {
-            "char_set": 224,
-            "flags": {
-              "bits": 4241
-            },
-            "max_size": 262140,
-            "type": "Blob"
-          }
+          "type_info": "Text"
         },
         {
-          "name": "created_at",
+          "name": "llm_rendition_attempts",
           "ordinal": 9,
-          "type_info": {
-            "char_set": 63,
-            "flags": {
-              "bits": 1153
-            },
-            "max_size": 19,
-            "type": "Timestamp"
-          }
+          "type_info": "Int64"
         },
         {
-          "name": "updated_at",
+          "name": "llm_title_summary_status: enums::common::sqlite::awaitable_job_status::AwaitableJobStatus",
           "ordinal": 10,
-          "type_info": {
-            "char_set": 63,
-            "flags": {
-              "bits": 9345
-            },
-            "max_size": 19,
-            "type": "Timestamp"
-          }
+          "type_info": "Text"
+        },
+        {
+          "name": "llm_title_summary_attempts",
+          "ordinal": 11,
+          "type_info": "Int64"
+        },
+        {
+          "name": "llm_categorization_status: enums::common::sqlite::awaitable_job_status::AwaitableJobStatus",
+          "ordinal": 12,
+          "type_info": "Text"
+        },
+        {
+          "name": "llm_categorization_attempts",
+          "ordinal": 13,
+          "type_info": "Int64"
+        },
+        {
+          "name": "audio_generation_status: enums::common::sqlite::awaitable_job_status::AwaitableJobStatus",
+          "ordinal": 14,
+          "type_info": "Text"
+        },
+        {
+          "name": "image_generation_status: enums::common::sqlite::awaitable_job_status::AwaitableJobStatus",
+          "ordinal": 15,
+          "type_info": "Text"
+        },
+        {
+          "name": "image_generation_attempts",
+          "ordinal": 16,
+          "type_info": "Int64"
         }
       ],
       "nullable": [
         false,
         false,
         false,
+        false,
+        false,
         true,
         true,
+        false,
+        false,
+        false,
+        false,
         false,
         false,
         false,
@@ -14497,239 +14247,47 @@
         false
       ],
       "parameters": {
-        "Right": 1
+        "Right": 2
       }
     },
-    "query": "\nSELECT\n    jobs.token as job_token,\n\n    jobs.status,\n    jobs.attempt_count,\n    jobs.on_success_result_token as maybe_result_token,\n    results.public_bucket_wav_audio_path as maybe_public_bucket_wav_audio_path,\n\n    jobs.model_token,\n    tts.tts_model_type,\n    tts.title,\n\n    jobs.raw_inference_text,\n\n    jobs.created_at,\n    jobs.updated_at\n\nFROM tts_inference_jobs as jobs\nJOIN tts_models as tts\n    ON tts.token = jobs.model_token\nLEFT OUTER JOIN tts_results as results\n    ON jobs.on_success_result_token = results.token\n\nWHERE jobs.token = ?\n        "
+    "query": "\nSELECT\n  id,\n  news_story_token as `news_story_token: tokens::tokens::news_stories::NewsStoryToken`,\n  original_news_canonical_url,\n  web_content_type as `web_content_type: enums::common::sqlite::web_content_type::WebContentType`,\n  original_news_title,\n\n  maybe_summary_news_title,\n  maybe_categorization,\n\n  overall_production_status as `overall_production_status: enums::common::sqlite::awaitable_job_status::AwaitableJobStatus`,\n\n  llm_rendition_status as `llm_rendition_status: enums::common::sqlite::awaitable_job_status::AwaitableJobStatus`,\n  llm_rendition_attempts,\n\n  llm_title_summary_status as `llm_title_summary_status: enums::common::sqlite::awaitable_job_status::AwaitableJobStatus`,\n  llm_title_summary_attempts,\n\n  llm_categorization_status as `llm_categorization_status: enums::common::sqlite::awaitable_job_status::AwaitableJobStatus`,\n  llm_categorization_attempts,\n\n  audio_generation_status as `audio_generation_status: enums::common::sqlite::awaitable_job_status::AwaitableJobStatus`,\n  image_generation_status as `image_generation_status: enums::common::sqlite::awaitable_job_status::AwaitableJobStatus`,\n  image_generation_attempts\nFROM news_story_productions\nWHERE\n  overall_production_status = \"processing\"\n  AND llm_rendition_status = \"done\"\n  AND llm_title_summary_status = \"done\"\n  AND llm_categorization_status = \"done\"\n  AND audio_generation_status = \"done\"\n  AND image_generation_status = \"done\"\n  AND id > ?\nORDER BY id ASC\nLIMIT ?\n        "
   },
-  "ae04054c4d32e581dd183fd7ebb8e48fc7df856d2ffd8036d9ce6006bb7a296a": {
+  "698853f7118d81e475ed6d2b0690bf801bac4893a5b9fea3f8cbd1deb0809a2b": {
     "describe": {
       "columns": [
         {
-          "name": "job_token",
+          "name": "news_story_token: tokens::tokens::news_stories::NewsStoryToken",
           "ordinal": 0,
-          "type_info": {
-            "char_set": 224,
-            "flags": {
-              "bits": 4229
-            },
-            "max_size": 128,
-            "type": "VarString"
-          }
+          "type_info": "Text"
         },
         {
-          "name": "status",
+          "name": "original_news_canonical_url",
           "ordinal": 1,
-          "type_info": {
-            "char_set": 224,
-            "flags": {
-              "bits": 393
-            },
-            "max_size": 64,
-            "type": "String"
-          }
+          "type_info": "Text"
         },
         {
-          "name": "attempt_count",
+          "name": "original_news_title",
           "ordinal": 2,
-          "type_info": {
-            "char_set": 63,
-            "flags": {
-              "bits": 1
-            },
-            "max_size": 3,
-            "type": "Long"
-          }
+          "type_info": "Text"
         },
         {
-          "name": "maybe_template_token",
+          "name": "summary_news_title",
           "ordinal": 3,
-          "type_info": {
-            "char_set": 224,
-            "flags": {
-              "bits": 136
-            },
-            "max_size": 128,
-            "type": "VarString"
-          }
+          "type_info": "Text"
         },
         {
-          "name": "maybe_failure_reason",
+          "name": "audio_file_count",
           "ordinal": 4,
-          "type_info": {
-            "char_set": 224,
-            "flags": {
-              "bits": 128
-            },
-            "max_size": 2048,
-            "type": "VarString"
-          }
+          "type_info": "Int64"
         },
         {
-          "name": "created_at",
+          "name": "audio_total_duration_seconds",
           "ordinal": 5,
-          "type_info": {
-            "char_set": 63,
-            "flags": {
-              "bits": 1153
-            },
-            "max_size": 19,
-            "type": "Timestamp"
-          }
-        },
-        {
-          "name": "updated_at",
-          "ordinal": 6,
-          "type_info": {
-            "char_set": 63,
-            "flags": {
-              "bits": 9345
-            },
-            "max_size": 19,
-            "type": "Timestamp"
-          }
+          "type_info": "Int64"
         }
       ],
       "nullable": [
         false,
-        false,
-        false,
-        true,
-        true,
-        false,
-        false
-      ],
-      "parameters": {
-        "Right": 1
-      }
-    },
-    "query": "\nSELECT\n    jobs.token as job_token,\n\n    jobs.status,\n    jobs.attempt_count,\n    jobs.on_success_result_token as maybe_template_token,\n\n    jobs.failure_reason as maybe_failure_reason,\n\n    jobs.created_at,\n    jobs.updated_at\n\nFROM w2l_template_upload_jobs as jobs\n\nWHERE jobs.token = ?\n        "
-  },
-  "b257c267dfe063995374786d3004f215e77e8a32843c024645da6fa435507dce": {
-    "describe": {
-      "columns": [],
-      "nullable": [],
-      "parameters": {
-        "Right": 8
-      }
-    },
-    "query": "\nINSERT INTO\n    ip_address_bans\nSET\n    ip_address = ?,\n    maybe_target_user_token = ?,\n    mod_user_token = ?,\n    mod_notes = ?\nON DUPLICATE KEY UPDATE\n    expires_at = NULL,\n    deleted_at = NULL,\n    ip_address = ?,\n    maybe_target_user_token = ?,\n    mod_user_token = ?,\n    mod_notes = ?\n        "
-  },
-  "bee13160674414391587f56e8fb0aa3629e3dfcead0afa5759bff1e161f1bb6e": {
-    "describe": {
-      "columns": [],
-      "nullable": [],
-      "parameters": {
-        "Right": 3
-      }
-    },
-    "query": "\nUPDATE w2l_templates\nSET\n  is_public_listing_approved = ?,\n  maybe_mod_user_token = ?\nWHERE\n  token = ?\nLIMIT 1\n        "
-  },
-  "cc4372cdd1a65999cbaf008f200683eedc93ab83e17256e47e011667ba8384d8": {
-    "describe": {
-      "columns": [],
-      "nullable": [],
-      "parameters": {
-        "Right": 3
-      }
-    },
-    "query": "\nUPDATE tts_results\nSET\n    creator_set_visibility = ?,\n    creator_ip_address = ?\nWHERE token = ?\nLIMIT 1\n        "
-  },
-  "ce629cea6c387590759cc89a060c471ecdcb5d5f46a53576897a963154ed4d74": {
-    "describe": {
-      "columns": [],
-      "nullable": [],
-      "parameters": {
-        "Right": 9
-      }
-    },
-    "query": "\n      INSERT INTO tts_category_assignments\n      SET\n        model_token = ?,\n        category_token = ?,\n        category_addition_user_token = ?,\n        ip_address_creation = ?,\n        ip_address_last_update = ?,\n        deleted_at = NULL\n      ON DUPLICATE KEY UPDATE\n        model_token = ?,\n        category_token = ?,\n        category_addition_user_token = ?,\n        ip_address_last_update = ?,\n        deleted_at = NULL\n    "
-  },
-  "d2ef33027abc15b6ec00260f7d30a8c66a3190229ea103ecb571d4957af63525": {
-    "describe": {
-      "columns": [],
-      "nullable": [],
-      "parameters": {
-        "Right": 6
-      }
-    },
-    "query": "\nUPDATE w2l_templates\nSET\n    title = ?,\n    description_markdown = ?,\n    description_rendered_html = ?,\n    creator_set_visibility = ?,\n    creator_ip_address_last_update = ?,\n    version = version + 1\nWHERE token = ?\nLIMIT 1\n        "
-  },
-  "d850784ca167e686b91fdd4d3cce20c7a00e4e38e4da629733114a1c55ba4ab3": {
-    "describe": {
-      "columns": [],
-      "nullable": [],
-      "parameters": {
-        "Right": 10
-      }
-    },
-    "query": "\nINSERT INTO w2l_inference_jobs\nSET\n  token = ?,\n  uuid_idempotency_token = ?,\n\n  maybe_w2l_template_token = ?,\n  maybe_public_audio_bucket_hash = ?,\n  maybe_public_audio_bucket_location = ?,\n\n  maybe_original_audio_filename = ?,\n  maybe_audio_mime_type = ?,\n\n  maybe_creator_user_token = ?,\n  creator_ip_address = ?,\n  disable_end_bump = false,\n  creator_set_visibility = ?,\n  status = \"pending\"\n        "
-  },
-  "de2d38b505ecff7b8b73996888ff6a904c5a0fab38e1c0b6156929c812b94302": {
-    "describe": {
-      "columns": [
-        {
-          "name": "user_token",
-          "ordinal": 0,
-          "type_info": {
-            "char_set": 224,
-            "flags": {
-              "bits": 4229
-            },
-            "max_size": 128,
-            "type": "VarString"
-          }
-        },
-        {
-          "name": "username",
-          "ordinal": 1,
-          "type_info": {
-            "char_set": 224,
-            "flags": {
-              "bits": 4229
-            },
-            "max_size": 80,
-            "type": "VarString"
-          }
-        },
-        {
-          "name": "display_name",
-          "ordinal": 2,
-          "type_info": {
-            "char_set": 224,
-            "flags": {
-              "bits": 4225
-            },
-            "max_size": 80,
-            "type": "VarString"
-          }
-        },
-        {
-          "name": "user_role_slug",
-          "ordinal": 3,
-          "type_info": {
-            "char_set": 224,
-            "flags": {
-              "bits": 4229
-            },
-            "max_size": 64,
-            "type": "String"
-          }
-        },
-        {
-          "name": "user_role_name",
-          "ordinal": 4,
-          "type_info": {
-            "char_set": 224,
-            "flags": {
-              "bits": 4225
-            },
-            "max_size": 1020,
-            "type": "VarString"
-          }
-        }
-      ],
-      "nullable": [
         false,
         false,
         false,
@@ -14740,47 +14298,9 @@
         "Right": 0
       }
     },
-    "query": "\nSELECT\n    users.token as user_token,\n    users.username,\n    users.display_name,\n    user_roles.slug as user_role_slug,\n    user_roles.name as user_role_name\nFROM\n    users\nJOIN user_roles\n    ON users.user_role_slug = user_roles.slug\nWHERE\n    user_roles.slug != 'user'\n        "
+    "query": "\nSELECT\n  news_story_token as `news_story_token: tokens::tokens::news_stories::NewsStoryToken`,\n  original_news_canonical_url,\n  original_news_title,\n  summary_news_title,\n  audio_file_count,\n  audio_total_duration_seconds\nFROM news_stories\nWHERE\n  is_playable IS TRUE\nORDER BY id ASC\n        "
   },
-  "dfe818ab849c5f6e2a5931142aab640d249aa96cb85dc06bfffae4d7feef541e": {
-    "describe": {
-      "columns": [
-        {
-          "name": "seconds_since_first",
-          "ordinal": 0,
-          "type_info": {
-            "char_set": 63,
-            "flags": {
-              "bits": 129
-            },
-            "max_size": 16,
-            "type": "LongLong"
-          }
-        },
-        {
-          "name": "pending_count",
-          "ordinal": 1,
-          "type_info": {
-            "char_set": 63,
-            "flags": {
-              "bits": 128
-            },
-            "max_size": 21,
-            "type": "LongLong"
-          }
-        }
-      ],
-      "nullable": [
-        false,
-        true
-      ],
-      "parameters": {
-        "Right": 0
-      }
-    },
-    "query": "\nSELECT\n  NOW() - t2.created_at AS seconds_since_first,\n  (\n    SELECT\n      count(t1.id) as pending_count\n    FROM w2l_inference_jobs AS t1\n    WHERE t1.status = \"pending\"\n  ) as pending_count\nFROM w2l_inference_jobs AS t2\nWHERE t2.status = \"pending\"\nORDER BY t2.id ASC\nLIMIT 1\n        "
-  },
-  "eab69a8d679b2dcfb06a9ccc79851f6c693d0c372142ff0e7ded89c95e4bcf44": {
+  "6ac1017e62e264e332084432510582c99b16f72a076e6816afb69299c039ca5e": {
     "describe": {
       "columns": [],
       "nullable": [],
@@ -14788,73 +14308,84 @@
         "Right": 4
       }
     },
-    "query": "\nUPDATE users\nSET\n    is_banned = ?,\n    maybe_mod_comments = ?,\n    maybe_mod_user_token  = ?,\n    version = version + 1\n\nWHERE users.token = ?\nLIMIT 1\n        "
+    "query": "\nINSERT INTO news_story_productions (\n  news_story_token,\n  original_news_canonical_url,\n  web_content_type,\n  original_news_title,\n  overall_production_status\n)\nVALUES (\n  ?,\n  ?,\n  ?,\n  ?,\n  \"ready_waiting\"\n)\n        "
   },
-  "ed8d32dd94719ad6479dd638cdc7a8cfbf725785f51678533988ddba94aac112": {
+  "71662f475787a04babc6c7f100c3d2354d7299ff63e705604e4df258af291144": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Right": 3
+      }
+    },
+    "query": "\nUPDATE news_story_productions\nSET\n  overall_production_status = ?,\n  audio_generation_status = ?,\n  version = version + 1\nWHERE\n  news_story_token = ?\n        "
+  },
+  "72b1a2b68d24fbf4cf30107f660f2073f1be19a3011dd6322b0f0598dc535108": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Right": 2
+      }
+    },
+    "query": "\nUPDATE news_story_productions\nSET\n  audio_generation_status = ?,\n  version = version + 1\nWHERE\n  news_story_token = ?\n        "
+  },
+  "7da63cb507dd3b20eb3c91ede8a12a042ab5b061b2ee8a0ddb100c286b4b610d": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Right": 2
+      }
+    },
+    "query": "\nUPDATE tts_render_tasks\nSET\n  maybe_inference_job_token = ?,\n  tts_render_status = \"processing\",\n  tts_render_attempts = tts_render_attempts + 1,\n  version = version + 1\nWHERE\n  token = ?\n        "
+  },
+  "7f10b713ac9b66aeb71cdab1689f76227f5a9957c6578e0d7d2e4c1022562511": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Right": 3
+      }
+    },
+    "query": "\nUPDATE news_story_productions\nSET\n  image_generation_status = ?,\n  image_generation_attempts = ?,\n  version = version + 1\nWHERE\n  news_story_token = ?\n        "
+  },
+  "8353a0725691606b7e70d0477ee6360ece111a16a40e2ea1a66924a1ba2b7a28": {
     "describe": {
       "columns": [
         {
-          "name": "seconds_since_first",
+          "name": "news_story_token: tokens::tokens::news_stories::NewsStoryToken",
           "ordinal": 0,
-          "type_info": {
-            "char_set": 63,
-            "flags": {
-              "bits": 129
-            },
-            "max_size": 16,
-            "type": "LongLong"
-          }
+          "type_info": "Text"
         },
         {
-          "name": "pending_count",
+          "name": "original_news_canonical_url",
           "ordinal": 1,
-          "type_info": {
-            "char_set": 63,
-            "flags": {
-              "bits": 1
-            },
-            "max_size": 21,
-            "type": "LongLong"
-          }
+          "type_info": "Text"
         },
         {
-          "name": "pending_priority_nonzero_count",
+          "name": "original_news_title",
           "ordinal": 2,
-          "type_info": {
-            "char_set": 63,
-            "flags": {
-              "bits": 1
-            },
-            "max_size": 21,
-            "type": "LongLong"
-          }
+          "type_info": "Text"
         },
         {
-          "name": "pending_priority_gt_one_count",
+          "name": "summary_news_title",
           "ordinal": 3,
-          "type_info": {
-            "char_set": 63,
-            "flags": {
-              "bits": 1
-            },
-            "max_size": 21,
-            "type": "LongLong"
-          }
+          "type_info": "Text"
         },
         {
-          "name": "attempt_failed_count",
+          "name": "audio_file_count",
           "ordinal": 4,
-          "type_info": {
-            "char_set": 63,
-            "flags": {
-              "bits": 1
-            },
-            "max_size": 21,
-            "type": "LongLong"
-          }
+          "type_info": "Int64"
+        },
+        {
+          "name": "audio_total_duration_seconds",
+          "ordinal": 5,
+          "type_info": "Int64"
         }
       ],
       "nullable": [
+        false,
         false,
         false,
         false,
@@ -14865,125 +14396,716 @@
         "Right": 0
       }
     },
-    "query": "\nSELECT\n  IFNULL((\n    SELECT\n      NOW() - t1.created_at AS seconds_since_first\n    FROM tts_inference_jobs AS t1\n    WHERE t1.status = \"pending\"\n    ORDER BY t1.id ASC\n    LIMIT 1\n  ), 0) as seconds_since_first,\n  sub2.pending_count,\n  sub3.pending_priority_nonzero_count,\n  sub4.pending_priority_gt_one_count,\n  sub5.attempt_failed_count\nFROM\n  (\n    SELECT\n      count(t2.id) as pending_count\n    FROM tts_inference_jobs AS t2\n    WHERE t2.status = \"pending\"\n  ) as sub2,\n  (\n    SELECT\n      count(t3.id) as pending_priority_nonzero_count\n    FROM tts_inference_jobs AS t3\n    WHERE t3.status = \"pending\"\n    AND t3.priority_level > 0\n  ) as sub3,\n  (\n    SELECT\n      count(t4.id) as pending_priority_gt_one_count\n    FROM tts_inference_jobs AS t4\n    WHERE t4.status = \"pending\"\n    AND t4.priority_level > 1\n  ) as sub4,\n  (\n    SELECT\n      count(t5.id) as attempt_failed_count\n    FROM tts_inference_jobs AS t5\n    WHERE t5.status = \"attempt_failed\"\n  ) as sub5\n        "
+    "query": "\nSELECT\n  news_story_token as `news_story_token: tokens::tokens::news_stories::NewsStoryToken`,\n  original_news_canonical_url,\n  original_news_title,\n  summary_news_title,\n  audio_file_count,\n  audio_total_duration_seconds\nFROM news_stories\nWHERE\n  is_playable IS TRUE\n  AND replayable_until > DATE('now')\nORDER BY id ASC\n        "
   },
-  "ef828549a221fe6fad3105fede0b38a439a685d6ea7f83a0657df9cdbb80c589": {
+  "87fcd66d605c1b1e9e43f60303ea46615d31777082ad7097408dd371c72f61fd": {
     "describe": {
       "columns": [
         {
-          "name": "ip_address",
+          "name": "id",
           "ordinal": 0,
-          "type_info": {
-            "char_set": 224,
-            "flags": {
-              "bits": 4229
-            },
-            "max_size": 160,
-            "type": "VarString"
-          }
+          "type_info": "Int64"
         },
         {
-          "name": "maybe_target_user_token",
+          "name": "canonical_url",
           "ordinal": 1,
-          "type_info": {
-            "char_set": 224,
-            "flags": {
-              "bits": 136
-            },
-            "max_size": 128,
-            "type": "VarString"
-          }
+          "type_info": "Text"
         },
         {
-          "name": "maybe_target_username",
+          "name": "web_content_type: enums::common::sqlite::web_content_type::WebContentType",
           "ordinal": 2,
-          "type_info": {
-            "char_set": 224,
-            "flags": {
-              "bits": 4228
-            },
-            "max_size": 80,
-            "type": "VarString"
-          }
+          "type_info": "Text"
         },
         {
-          "name": "mod_user_token",
+          "name": "maybe_title",
           "ordinal": 3,
-          "type_info": {
-            "char_set": 224,
-            "flags": {
-              "bits": 4233
-            },
-            "max_size": 128,
-            "type": "VarString"
-          }
+          "type_info": "Text"
         },
         {
-          "name": "mod_username",
+          "name": "maybe_article_full_image_url",
           "ordinal": 4,
-          "type_info": {
-            "char_set": 224,
-            "flags": {
-              "bits": 4229
-            },
-            "max_size": 80,
-            "type": "VarString"
-          }
+          "type_info": "Text"
         },
         {
-          "name": "mod_display_name",
+          "name": "maybe_article_thumbnail_image_url",
           "ordinal": 5,
-          "type_info": {
-            "char_set": 224,
-            "flags": {
-              "bits": 4225
-            },
-            "max_size": 80,
-            "type": "VarString"
-          }
+          "type_info": "Text"
         },
         {
-          "name": "mod_notes",
+          "name": "scraping_status: enums::by_table::web_scraping_targets::scraping_status::ScrapingStatus",
           "ordinal": 6,
-          "type_info": {
-            "char_set": 224,
-            "flags": {
-              "bits": 4241
-            },
-            "max_size": 262140,
-            "type": "Blob"
-          }
+          "type_info": "Text"
         },
         {
-          "name": "created_at",
+          "name": "scrape_attempts",
           "ordinal": 7,
-          "type_info": {
-            "char_set": 63,
-            "flags": {
-              "bits": 1153
-            },
-            "max_size": 19,
-            "type": "Timestamp"
-          }
-        },
-        {
-          "name": "updated_at",
-          "ordinal": 8,
-          "type_info": {
-            "char_set": 63,
-            "flags": {
-              "bits": 9345
-            },
-            "max_size": 19,
-            "type": "Timestamp"
-          }
+          "type_info": "Int64"
         }
       ],
       "nullable": [
         false,
+        false,
+        false,
+        true,
         true,
         true,
         false,
+        false
+      ],
+      "parameters": {
+        "Right": 1
+      }
+    },
+    "query": "\nSELECT\n  id,\n  canonical_url,\n  web_content_type as `web_content_type: enums::common::sqlite::web_content_type::WebContentType`,\n  maybe_title,\n  maybe_article_full_image_url,\n  maybe_article_thumbnail_image_url,\n  scraping_status as `scraping_status: enums::by_table::web_scraping_targets::scraping_status::ScrapingStatus`,\n  scrape_attempts\nFROM web_scraping_targets\nWHERE\n  scraping_status = ?\n  AND maybe_skip_reason IS NULL\nORDER BY id ASC\n        "
+  },
+  "8f6422156213894f2a206072cee2506afef22cd4b931bcff1874af7bdda1cd03": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Right": 3
+      }
+    },
+    "query": "\nUPDATE tts_render_tasks\nSET\n  tts_render_status = ?,\n  tts_render_attempts = ?,\n  version = version + 1\nWHERE\n  token = ?\n        "
+  },
+  "90791c0933bbb542aa4710066281e5f3cffdacdbec5a4805364db96bc19abed6": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Right": 3
+      }
+    },
+    "query": "\nUPDATE web_scraping_targets\nSET\n  scraping_status = ?,\n  scrape_attempts = ?,\n  version = version + 1\nWHERE\n  canonical_url = ?\n        "
+  },
+  "a0f4778e7f5b17eca0bd7b2dafbc933ac456af95ebc1af69be892ff08457619d": {
+    "describe": {
+      "columns": [
+        {
+          "name": "id",
+          "ordinal": 0,
+          "type_info": "Int64"
+        },
+        {
+          "name": "news_story_token: tokens::tokens::news_stories::NewsStoryToken",
+          "ordinal": 1,
+          "type_info": "Text"
+        },
+        {
+          "name": "original_news_canonical_url",
+          "ordinal": 2,
+          "type_info": "Text"
+        },
+        {
+          "name": "web_content_type: enums::common::sqlite::web_content_type::WebContentType",
+          "ordinal": 3,
+          "type_info": "Text"
+        },
+        {
+          "name": "original_news_title",
+          "ordinal": 4,
+          "type_info": "Text"
+        },
+        {
+          "name": "maybe_summary_news_title",
+          "ordinal": 5,
+          "type_info": "Text"
+        },
+        {
+          "name": "maybe_categorization",
+          "ordinal": 6,
+          "type_info": "Text"
+        },
+        {
+          "name": "overall_production_status: enums::common::sqlite::awaitable_job_status::AwaitableJobStatus",
+          "ordinal": 7,
+          "type_info": "Text"
+        },
+        {
+          "name": "llm_rendition_status: enums::common::sqlite::awaitable_job_status::AwaitableJobStatus",
+          "ordinal": 8,
+          "type_info": "Text"
+        },
+        {
+          "name": "llm_rendition_attempts",
+          "ordinal": 9,
+          "type_info": "Int64"
+        },
+        {
+          "name": "llm_title_summary_status: enums::common::sqlite::awaitable_job_status::AwaitableJobStatus",
+          "ordinal": 10,
+          "type_info": "Text"
+        },
+        {
+          "name": "llm_title_summary_attempts",
+          "ordinal": 11,
+          "type_info": "Int64"
+        },
+        {
+          "name": "llm_categorization_status: enums::common::sqlite::awaitable_job_status::AwaitableJobStatus",
+          "ordinal": 12,
+          "type_info": "Text"
+        },
+        {
+          "name": "llm_categorization_attempts",
+          "ordinal": 13,
+          "type_info": "Int64"
+        },
+        {
+          "name": "audio_generation_status: enums::common::sqlite::awaitable_job_status::AwaitableJobStatus",
+          "ordinal": 14,
+          "type_info": "Text"
+        },
+        {
+          "name": "image_generation_status: enums::common::sqlite::awaitable_job_status::AwaitableJobStatus",
+          "ordinal": 15,
+          "type_info": "Text"
+        },
+        {
+          "name": "image_generation_attempts",
+          "ordinal": 16,
+          "type_info": "Int64"
+        }
+      ],
+      "nullable": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        true,
+        true,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false
+      ],
+      "parameters": {
+        "Right": 2
+      }
+    },
+    "query": "\nSELECT\n  id,\n  news_story_token as `news_story_token: tokens::tokens::news_stories::NewsStoryToken`,\n  original_news_canonical_url,\n  web_content_type as `web_content_type: enums::common::sqlite::web_content_type::WebContentType`,\n  original_news_title,\n\n  maybe_summary_news_title,\n  maybe_categorization,\n\n  overall_production_status as `overall_production_status: enums::common::sqlite::awaitable_job_status::AwaitableJobStatus`,\n\n  llm_rendition_status as `llm_rendition_status: enums::common::sqlite::awaitable_job_status::AwaitableJobStatus`,\n  llm_rendition_attempts,\n\n  llm_title_summary_status as `llm_title_summary_status: enums::common::sqlite::awaitable_job_status::AwaitableJobStatus`,\n  llm_title_summary_attempts,\n\n  llm_categorization_status as `llm_categorization_status: enums::common::sqlite::awaitable_job_status::AwaitableJobStatus`,\n  llm_categorization_attempts,\n\n  audio_generation_status as `audio_generation_status: enums::common::sqlite::awaitable_job_status::AwaitableJobStatus`,\n  image_generation_status as `image_generation_status: enums::common::sqlite::awaitable_job_status::AwaitableJobStatus`,\n  image_generation_attempts\nFROM news_story_productions\nWHERE\n  overall_production_status = \"ready_waiting\"\n  AND id > ?\nORDER BY id ASC\nLIMIT ?\n        "
+  },
+  "a5bddb92c41b19036acf4c9ad1b72889f34356f96e3e42e39e575af8fe09f9e9": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Right": 5
+      }
+    },
+    "query": "\nUPDATE news_story_productions\nSET\n  overall_production_status = ?,\n  llm_rendition_status = ?,\n  llm_rendition_attempts = ?,\n  audio_generation_status = ?,\n  version = version + 1\nWHERE\n  news_story_token = ?\n        "
+  },
+  "aa89bace8114f6aef8534a74112c108d8da545d7b48af1c2215ad2a49792cb36": {
+    "describe": {
+      "columns": [
+        {
+          "name": "id",
+          "ordinal": 0,
+          "type_info": "Int64"
+        },
+        {
+          "name": "news_story_token: tokens::tokens::news_stories::NewsStoryToken",
+          "ordinal": 1,
+          "type_info": "Text"
+        },
+        {
+          "name": "original_news_canonical_url",
+          "ordinal": 2,
+          "type_info": "Text"
+        },
+        {
+          "name": "web_content_type: enums::common::sqlite::web_content_type::WebContentType",
+          "ordinal": 3,
+          "type_info": "Text"
+        },
+        {
+          "name": "original_news_title",
+          "ordinal": 4,
+          "type_info": "Text"
+        },
+        {
+          "name": "maybe_summary_news_title",
+          "ordinal": 5,
+          "type_info": "Text"
+        },
+        {
+          "name": "maybe_categorization",
+          "ordinal": 6,
+          "type_info": "Text"
+        },
+        {
+          "name": "overall_production_status: enums::common::sqlite::awaitable_job_status::AwaitableJobStatus",
+          "ordinal": 7,
+          "type_info": "Text"
+        },
+        {
+          "name": "llm_rendition_status: enums::common::sqlite::awaitable_job_status::AwaitableJobStatus",
+          "ordinal": 8,
+          "type_info": "Text"
+        },
+        {
+          "name": "llm_rendition_attempts",
+          "ordinal": 9,
+          "type_info": "Int64"
+        },
+        {
+          "name": "llm_title_summary_status: enums::common::sqlite::awaitable_job_status::AwaitableJobStatus",
+          "ordinal": 10,
+          "type_info": "Text"
+        },
+        {
+          "name": "llm_title_summary_attempts",
+          "ordinal": 11,
+          "type_info": "Int64"
+        },
+        {
+          "name": "llm_categorization_status: enums::common::sqlite::awaitable_job_status::AwaitableJobStatus",
+          "ordinal": 12,
+          "type_info": "Text"
+        },
+        {
+          "name": "llm_categorization_attempts",
+          "ordinal": 13,
+          "type_info": "Int64"
+        },
+        {
+          "name": "audio_generation_status: enums::common::sqlite::awaitable_job_status::AwaitableJobStatus",
+          "ordinal": 14,
+          "type_info": "Text"
+        },
+        {
+          "name": "image_generation_status: enums::common::sqlite::awaitable_job_status::AwaitableJobStatus",
+          "ordinal": 15,
+          "type_info": "Text"
+        },
+        {
+          "name": "image_generation_attempts",
+          "ordinal": 16,
+          "type_info": "Int64"
+        }
+      ],
+      "nullable": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        true,
+        true,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false
+      ],
+      "parameters": {
+        "Right": 3
+      }
+    },
+    "query": "\nSELECT\n  id,\n  news_story_token as `news_story_token: tokens::tokens::news_stories::NewsStoryToken`,\n  original_news_canonical_url,\n  web_content_type as `web_content_type: enums::common::sqlite::web_content_type::WebContentType`,\n  original_news_title,\n\n  maybe_summary_news_title,\n  maybe_categorization,\n\n  overall_production_status as `overall_production_status: enums::common::sqlite::awaitable_job_status::AwaitableJobStatus`,\n\n  llm_rendition_status as `llm_rendition_status: enums::common::sqlite::awaitable_job_status::AwaitableJobStatus`,\n  llm_rendition_attempts,\n\n  llm_title_summary_status as `llm_title_summary_status: enums::common::sqlite::awaitable_job_status::AwaitableJobStatus`,\n  llm_title_summary_attempts,\n\n  llm_categorization_status as `llm_categorization_status: enums::common::sqlite::awaitable_job_status::AwaitableJobStatus`,\n  llm_categorization_attempts,\n\n  audio_generation_status as `audio_generation_status: enums::common::sqlite::awaitable_job_status::AwaitableJobStatus`,\n  image_generation_status as `image_generation_status: enums::common::sqlite::awaitable_job_status::AwaitableJobStatus`,\n  image_generation_attempts\nFROM news_story_productions\nWHERE\n  overall_production_status = \"processing\"\n  AND llm_rendition_status = ?\n  AND id > ?\nORDER BY id ASC\nLIMIT ?\n        "
+  },
+  "bd363d9397830e4a44e7927757fc23086bd960ec001297b2522c82d9f129edcc": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Right": 9
+      }
+    },
+    "query": "\nINSERT INTO news_stories (\n  news_story_token,\n  original_news_canonical_url,\n  web_content_type,\n  original_news_title,\n  summary_news_title,\n  llm_categorization,\n  audio_file_count,\n  audio_total_duration_seconds,\n  replayable_until,\n  is_playable\n)\nVALUES (\n  ?,\n  ?,\n  ?,\n  ?,\n  ?,\n  ?,\n  ?,\n  ?,\n  ?,\n  true\n)\n        "
+  },
+  "c4559ea5e1debbcdf1700c566211ad1d20167453867cc49825cf13a36bb98973": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Right": 4
+      }
+    },
+    "query": "\nUPDATE tts_render_tasks\nSET\n  maybe_result_token = ?,\n  maybe_result_url = ?,\n  maybe_audio_duration_millis = ?,\n\n  tts_render_status = \"success\",\n  tts_render_attempts = tts_render_attempts + 1,\n  version = version + 1\nWHERE\n  token = ?\n        "
+  },
+  "cf40dba6f4ef85c815e7220dc2ccdf06987f5a5a1628d280d9c92581fea64833": {
+    "describe": {
+      "columns": [
+        {
+          "name": "id",
+          "ordinal": 0,
+          "type_info": "Int64"
+        },
+        {
+          "name": "token: tokens::tokens::tts_render_tasks::TtsRenderTaskToken",
+          "ordinal": 1,
+          "type_info": "Text"
+        },
+        {
+          "name": "story_type",
+          "ordinal": 2,
+          "type_info": "Text"
+        },
+        {
+          "name": "story_token",
+          "ordinal": 3,
+          "type_info": "Text"
+        },
+        {
+          "name": "sequence_order",
+          "ordinal": 4,
+          "type_info": "Int64"
+        },
+        {
+          "name": "tts_service",
+          "ordinal": 5,
+          "type_info": "Text"
+        },
+        {
+          "name": "tts_voice_identifier",
+          "ordinal": 6,
+          "type_info": "Text"
+        },
+        {
+          "name": "full_text",
+          "ordinal": 7,
+          "type_info": "Text"
+        },
+        {
+          "name": "maybe_inference_job_token",
+          "ordinal": 8,
+          "type_info": "Text"
+        },
+        {
+          "name": "maybe_result_token",
+          "ordinal": 9,
+          "type_info": "Text"
+        },
+        {
+          "name": "maybe_result_url",
+          "ordinal": 10,
+          "type_info": "Text"
+        },
+        {
+          "name": "maybe_result_relative_filesystem_location",
+          "ordinal": 11,
+          "type_info": "Text"
+        },
+        {
+          "name": "maybe_audio_duration_millis",
+          "ordinal": 12,
+          "type_info": "Int64"
+        },
+        {
+          "name": "tts_render_status: enums::by_table::tts_render_tasks::tts_render_status::TtsRenderStatus",
+          "ordinal": 13,
+          "type_info": "Text"
+        },
+        {
+          "name": "tts_render_attempts",
+          "ordinal": 14,
+          "type_info": "Int64"
+        }
+      ],
+      "nullable": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        true,
+        true,
+        true,
+        true,
+        true,
+        false,
+        false
+      ],
+      "parameters": {
+        "Right": 3
+      }
+    },
+    "query": "\nSELECT\n  id,\n  token as `token: tokens::tokens::tts_render_tasks::TtsRenderTaskToken`,\n  story_type,\n  story_token,\n  sequence_order,\n  tts_service,\n  tts_voice_identifier,\n  full_text,\n  maybe_inference_job_token,\n  maybe_result_token,\n  maybe_result_url,\n  maybe_result_relative_filesystem_location,\n  maybe_audio_duration_millis,\n  tts_render_status as `tts_render_status: enums::by_table::tts_render_tasks::tts_render_status::TtsRenderStatus`,\n  tts_render_attempts\nFROM tts_render_tasks\nWHERE\n  tts_render_status = ?\n  AND id > ?\nORDER BY id ASC\nLIMIT ?\n        "
+  },
+  "d0a8c6652ebbca269e72f7267d68bd7fe3ca1187619c1bfa76fbad0707cbb17e": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Right": 5
+      }
+    },
+    "query": "\nUPDATE news_story_productions\nSET\n  maybe_summary_news_title = ?,\n  overall_production_status = ?,\n  llm_title_summary_status = ?,\n  llm_title_summary_attempts = ?,\n  version = version + 1\nWHERE\n  news_story_token = ?\n        "
+  },
+  "db83ce37033c10c9bf89042e79fb1fcf2ca099fdfc739843c0f0f214890cf436": {
+    "describe": {
+      "columns": [
+        {
+          "name": "id",
+          "ordinal": 0,
+          "type_info": "Int64"
+        },
+        {
+          "name": "news_story_token: tokens::tokens::news_stories::NewsStoryToken",
+          "ordinal": 1,
+          "type_info": "Text"
+        },
+        {
+          "name": "original_news_canonical_url",
+          "ordinal": 2,
+          "type_info": "Text"
+        },
+        {
+          "name": "web_content_type: enums::common::sqlite::web_content_type::WebContentType",
+          "ordinal": 3,
+          "type_info": "Text"
+        },
+        {
+          "name": "original_news_title",
+          "ordinal": 4,
+          "type_info": "Text"
+        },
+        {
+          "name": "maybe_summary_news_title",
+          "ordinal": 5,
+          "type_info": "Text"
+        },
+        {
+          "name": "maybe_categorization",
+          "ordinal": 6,
+          "type_info": "Text"
+        },
+        {
+          "name": "overall_production_status: enums::common::sqlite::awaitable_job_status::AwaitableJobStatus",
+          "ordinal": 7,
+          "type_info": "Text"
+        },
+        {
+          "name": "llm_rendition_status: enums::common::sqlite::awaitable_job_status::AwaitableJobStatus",
+          "ordinal": 8,
+          "type_info": "Text"
+        },
+        {
+          "name": "llm_rendition_attempts",
+          "ordinal": 9,
+          "type_info": "Int64"
+        },
+        {
+          "name": "llm_title_summary_status: enums::common::sqlite::awaitable_job_status::AwaitableJobStatus",
+          "ordinal": 10,
+          "type_info": "Text"
+        },
+        {
+          "name": "llm_title_summary_attempts",
+          "ordinal": 11,
+          "type_info": "Int64"
+        },
+        {
+          "name": "llm_categorization_status: enums::common::sqlite::awaitable_job_status::AwaitableJobStatus",
+          "ordinal": 12,
+          "type_info": "Text"
+        },
+        {
+          "name": "llm_categorization_attempts",
+          "ordinal": 13,
+          "type_info": "Int64"
+        },
+        {
+          "name": "audio_generation_status: enums::common::sqlite::awaitable_job_status::AwaitableJobStatus",
+          "ordinal": 14,
+          "type_info": "Text"
+        },
+        {
+          "name": "image_generation_status: enums::common::sqlite::awaitable_job_status::AwaitableJobStatus",
+          "ordinal": 15,
+          "type_info": "Text"
+        },
+        {
+          "name": "image_generation_attempts",
+          "ordinal": 16,
+          "type_info": "Int64"
+        }
+      ],
+      "nullable": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        true,
+        true,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false
+      ],
+      "parameters": {
+        "Right": 3
+      }
+    },
+    "query": "\nSELECT\n  id,\n  news_story_token as `news_story_token: tokens::tokens::news_stories::NewsStoryToken`,\n  original_news_canonical_url,\n  web_content_type as `web_content_type: enums::common::sqlite::web_content_type::WebContentType`,\n  original_news_title,\n\n  maybe_summary_news_title,\n  maybe_categorization,\n\n  overall_production_status as `overall_production_status: enums::common::sqlite::awaitable_job_status::AwaitableJobStatus`,\n\n  llm_rendition_status as `llm_rendition_status: enums::common::sqlite::awaitable_job_status::AwaitableJobStatus`,\n  llm_rendition_attempts,\n\n  llm_title_summary_status as `llm_title_summary_status: enums::common::sqlite::awaitable_job_status::AwaitableJobStatus`,\n  llm_title_summary_attempts,\n\n  llm_categorization_status as `llm_categorization_status: enums::common::sqlite::awaitable_job_status::AwaitableJobStatus`,\n  llm_categorization_attempts,\n\n  audio_generation_status as `audio_generation_status: enums::common::sqlite::awaitable_job_status::AwaitableJobStatus`,\n  image_generation_status as `image_generation_status: enums::common::sqlite::awaitable_job_status::AwaitableJobStatus`,\n  image_generation_attempts\nFROM news_story_productions\nWHERE\n  overall_production_status = \"processing\"\n  AND llm_categorization_status = ?\n  AND id > ?\nORDER BY id ASC\nLIMIT ?\n        "
+  },
+  "e804be59d034053057769296c402c2d334b01afa7a5a78aa25fc1c21a795b0df": {
+    "describe": {
+      "columns": [
+        {
+          "name": "id",
+          "ordinal": 0,
+          "type_info": "Int64"
+        },
+        {
+          "name": "news_story_token: tokens::tokens::news_stories::NewsStoryToken",
+          "ordinal": 1,
+          "type_info": "Text"
+        },
+        {
+          "name": "original_news_canonical_url",
+          "ordinal": 2,
+          "type_info": "Text"
+        },
+        {
+          "name": "web_content_type: enums::common::sqlite::web_content_type::WebContentType",
+          "ordinal": 3,
+          "type_info": "Text"
+        },
+        {
+          "name": "original_news_title",
+          "ordinal": 4,
+          "type_info": "Text"
+        },
+        {
+          "name": "maybe_summary_news_title",
+          "ordinal": 5,
+          "type_info": "Text"
+        },
+        {
+          "name": "maybe_categorization",
+          "ordinal": 6,
+          "type_info": "Text"
+        },
+        {
+          "name": "overall_production_status: enums::common::sqlite::awaitable_job_status::AwaitableJobStatus",
+          "ordinal": 7,
+          "type_info": "Text"
+        },
+        {
+          "name": "llm_rendition_status: enums::common::sqlite::awaitable_job_status::AwaitableJobStatus",
+          "ordinal": 8,
+          "type_info": "Text"
+        },
+        {
+          "name": "llm_rendition_attempts",
+          "ordinal": 9,
+          "type_info": "Int64"
+        },
+        {
+          "name": "llm_title_summary_status: enums::common::sqlite::awaitable_job_status::AwaitableJobStatus",
+          "ordinal": 10,
+          "type_info": "Text"
+        },
+        {
+          "name": "llm_title_summary_attempts",
+          "ordinal": 11,
+          "type_info": "Int64"
+        },
+        {
+          "name": "llm_categorization_status: enums::common::sqlite::awaitable_job_status::AwaitableJobStatus",
+          "ordinal": 12,
+          "type_info": "Text"
+        },
+        {
+          "name": "llm_categorization_attempts",
+          "ordinal": 13,
+          "type_info": "Int64"
+        },
+        {
+          "name": "audio_generation_status: enums::common::sqlite::awaitable_job_status::AwaitableJobStatus",
+          "ordinal": 14,
+          "type_info": "Text"
+        },
+        {
+          "name": "image_generation_status: enums::common::sqlite::awaitable_job_status::AwaitableJobStatus",
+          "ordinal": 15,
+          "type_info": "Text"
+        },
+        {
+          "name": "image_generation_attempts",
+          "ordinal": 16,
+          "type_info": "Int64"
+        }
+      ],
+      "nullable": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        true,
+        true,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false
+      ],
+      "parameters": {
+        "Right": 3
+      }
+    },
+    "query": "\nSELECT\n  id,\n  news_story_token as `news_story_token: tokens::tokens::news_stories::NewsStoryToken`,\n  original_news_canonical_url,\n  web_content_type as `web_content_type: enums::common::sqlite::web_content_type::WebContentType`,\n  original_news_title,\n\n  maybe_summary_news_title,\n  maybe_categorization,\n\n  overall_production_status as `overall_production_status: enums::common::sqlite::awaitable_job_status::AwaitableJobStatus`,\n\n  llm_rendition_status as `llm_rendition_status: enums::common::sqlite::awaitable_job_status::AwaitableJobStatus`,\n  llm_rendition_attempts,\n\n  llm_title_summary_status as `llm_title_summary_status: enums::common::sqlite::awaitable_job_status::AwaitableJobStatus`,\n  llm_title_summary_attempts,\n\n  llm_categorization_status as `llm_categorization_status: enums::common::sqlite::awaitable_job_status::AwaitableJobStatus`,\n  llm_categorization_attempts,\n\n  audio_generation_status as `audio_generation_status: enums::common::sqlite::awaitable_job_status::AwaitableJobStatus`,\n  image_generation_status as `image_generation_status: enums::common::sqlite::awaitable_job_status::AwaitableJobStatus`,\n  image_generation_attempts\nFROM news_story_productions\nWHERE\n  overall_production_status = \"processing\"\n  AND llm_title_summary_status = ?\n  AND id > ?\nORDER BY id ASC\nLIMIT ?\n        "
+  },
+  "e9fe22c556cf7531b9b4424ed15dab69c43cb3188fe09e82ef6d6a91ba3b0c68": {
+    "describe": {
+      "columns": [
+        {
+          "name": "news_story_token: tokens::tokens::news_stories::NewsStoryToken",
+          "ordinal": 0,
+          "type_info": "Text"
+        },
+        {
+          "name": "original_news_canonical_url",
+          "ordinal": 1,
+          "type_info": "Text"
+        },
+        {
+          "name": "original_news_title",
+          "ordinal": 2,
+          "type_info": "Text"
+        },
+        {
+          "name": "audio_file_count",
+          "ordinal": 3,
+          "type_info": "Int64"
+        },
+        {
+          "name": "audio_total_duration_seconds",
+          "ordinal": 4,
+          "type_info": "Int64"
+        }
+      ],
+      "nullable": [
         false,
         false,
         false,
@@ -14994,16 +15116,180 @@
         "Right": 1
       }
     },
-    "query": "\nSELECT\n    ip_bans.ip_address,\n\n    ip_bans.maybe_target_user_token,\n    banned_users.username as maybe_target_username,\n\n    ip_bans.mod_user_token,\n    mod_users.username as mod_username,\n    mod_users.display_name as mod_display_name,\n\n    ip_bans.mod_notes,\n    ip_bans.created_at,\n    ip_bans.updated_at\nFROM\n    ip_address_bans AS ip_bans\nLEFT OUTER JOIN users as banned_users\n    ON ip_bans.maybe_target_user_token = banned_users.token\nJOIN users as mod_users\n    ON ip_bans.mod_user_token = mod_users.token\nWHERE\n    ip_bans.ip_address = ?\nLIMIT 1\n        "
+    "query": "\nSELECT\n  news_story_token as `news_story_token: tokens::tokens::news_stories::NewsStoryToken`,\n  original_news_canonical_url,\n  original_news_title,\n  audio_file_count,\n  audio_total_duration_seconds\nFROM news_stories\nWHERE\n  news_story_token = ?\n        "
   },
-  "fd31f7abe386147c07f862d668c9e56eb3d809c4f0a61b7debf9b2e3785a4c83": {
+  "ed7c657520f75ce0fdc42222c81a24a791b6302c2cf23b38615fb4e588f039a9": {
     "describe": {
-      "columns": [],
-      "nullable": [],
+      "columns": [
+        {
+          "name": "id",
+          "ordinal": 0,
+          "type_info": "Int64"
+        },
+        {
+          "name": "canonical_url",
+          "ordinal": 1,
+          "type_info": "Text"
+        },
+        {
+          "name": "web_content_type: enums::common::sqlite::web_content_type::WebContentType",
+          "ordinal": 2,
+          "type_info": "Text"
+        },
+        {
+          "name": "maybe_title",
+          "ordinal": 3,
+          "type_info": "Text"
+        },
+        {
+          "name": "maybe_article_full_image_url",
+          "ordinal": 4,
+          "type_info": "Text"
+        },
+        {
+          "name": "maybe_article_thumbnail_image_url",
+          "ordinal": 5,
+          "type_info": "Text"
+        },
+        {
+          "name": "scraping_status: enums::by_table::web_scraping_targets::scraping_status::ScrapingStatus",
+          "ordinal": 6,
+          "type_info": "Text"
+        },
+        {
+          "name": "scrape_attempts",
+          "ordinal": 7,
+          "type_info": "Int64"
+        }
+      ],
+      "nullable": [
+        false,
+        false,
+        false,
+        true,
+        true,
+        true,
+        false,
+        false
+      ],
       "parameters": {
-        "Right": 12
+        "Right": 3
       }
     },
-    "query": "\nINSERT INTO model_categories\nSET\n    token = ?,\n    uuid_idempotency_token = ?,\n    model_type = ?,\n    name = ?,\n\n    creator_user_token = ?,\n    creator_ip_address_creation = ?,\n    creator_ip_address_last_update = ?,\n\n    is_mod_approved = ?,\n    maybe_mod_user_token = ?,\n    can_directly_have_models = ?,\n    can_have_subcategories = ?,\n    can_only_mods_apply = ?\n        "
+    "query": "\nSELECT\n  id,\n  canonical_url,\n  web_content_type as `web_content_type: enums::common::sqlite::web_content_type::WebContentType`,\n  maybe_title,\n  maybe_article_full_image_url,\n  maybe_article_thumbnail_image_url,\n  scraping_status as `scraping_status: enums::by_table::web_scraping_targets::scraping_status::ScrapingStatus`,\n  scrape_attempts\nFROM web_scraping_targets\nWHERE\n  scraping_status = ?\n  AND maybe_skip_reason IS NULL\n  AND id > ?\nORDER BY id ASC\nLIMIT ?\n        "
+  },
+  "eede5f52003a54309cd919962acf1230cdfbdb1b0a334dbcfc80e11f94b63484": {
+    "describe": {
+      "columns": [
+        {
+          "name": "id",
+          "ordinal": 0,
+          "type_info": "Int64"
+        },
+        {
+          "name": "news_story_token: tokens::tokens::news_stories::NewsStoryToken",
+          "ordinal": 1,
+          "type_info": "Text"
+        },
+        {
+          "name": "original_news_canonical_url",
+          "ordinal": 2,
+          "type_info": "Text"
+        },
+        {
+          "name": "web_content_type: enums::common::sqlite::web_content_type::WebContentType",
+          "ordinal": 3,
+          "type_info": "Text"
+        },
+        {
+          "name": "original_news_title",
+          "ordinal": 4,
+          "type_info": "Text"
+        },
+        {
+          "name": "maybe_summary_news_title",
+          "ordinal": 5,
+          "type_info": "Text"
+        },
+        {
+          "name": "maybe_categorization",
+          "ordinal": 6,
+          "type_info": "Text"
+        },
+        {
+          "name": "overall_production_status: enums::common::sqlite::awaitable_job_status::AwaitableJobStatus",
+          "ordinal": 7,
+          "type_info": "Text"
+        },
+        {
+          "name": "llm_rendition_status: enums::common::sqlite::awaitable_job_status::AwaitableJobStatus",
+          "ordinal": 8,
+          "type_info": "Text"
+        },
+        {
+          "name": "llm_rendition_attempts",
+          "ordinal": 9,
+          "type_info": "Int64"
+        },
+        {
+          "name": "llm_title_summary_status: enums::common::sqlite::awaitable_job_status::AwaitableJobStatus",
+          "ordinal": 10,
+          "type_info": "Text"
+        },
+        {
+          "name": "llm_title_summary_attempts",
+          "ordinal": 11,
+          "type_info": "Int64"
+        },
+        {
+          "name": "llm_categorization_status: enums::common::sqlite::awaitable_job_status::AwaitableJobStatus",
+          "ordinal": 12,
+          "type_info": "Text"
+        },
+        {
+          "name": "llm_categorization_attempts",
+          "ordinal": 13,
+          "type_info": "Int64"
+        },
+        {
+          "name": "audio_generation_status: enums::common::sqlite::awaitable_job_status::AwaitableJobStatus",
+          "ordinal": 14,
+          "type_info": "Text"
+        },
+        {
+          "name": "image_generation_status: enums::common::sqlite::awaitable_job_status::AwaitableJobStatus",
+          "ordinal": 15,
+          "type_info": "Text"
+        },
+        {
+          "name": "image_generation_attempts",
+          "ordinal": 16,
+          "type_info": "Int64"
+        }
+      ],
+      "nullable": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        true,
+        true,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false
+      ],
+      "parameters": {
+        "Right": 2
+      }
+    },
+    "query": "\nSELECT\n  id,\n  news_story_token as `news_story_token: tokens::tokens::news_stories::NewsStoryToken`,\n  original_news_canonical_url,\n  web_content_type as `web_content_type: enums::common::sqlite::web_content_type::WebContentType`,\n  original_news_title,\n\n  maybe_summary_news_title,\n  maybe_categorization,\n\n  overall_production_status as `overall_production_status: enums::common::sqlite::awaitable_job_status::AwaitableJobStatus`,\n\n  llm_rendition_status as `llm_rendition_status: enums::common::sqlite::awaitable_job_status::AwaitableJobStatus`,\n  llm_rendition_attempts,\n\n  llm_title_summary_status as `llm_title_summary_status: enums::common::sqlite::awaitable_job_status::AwaitableJobStatus`,\n  llm_title_summary_attempts,\n\n  llm_categorization_status as `llm_categorization_status: enums::common::sqlite::awaitable_job_status::AwaitableJobStatus`,\n  llm_categorization_attempts,\n\n  audio_generation_status as `audio_generation_status: enums::common::sqlite::awaitable_job_status::AwaitableJobStatus`,\n  image_generation_status as `image_generation_status: enums::common::sqlite::awaitable_job_status::AwaitableJobStatus`,\n  image_generation_attempts\nFROM news_story_productions\nWHERE\n  audio_generation_status = \"processing\"\n  AND id > ?\nORDER BY id ASC\nLIMIT ?\n        "
   }
 }

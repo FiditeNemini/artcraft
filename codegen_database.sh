@@ -13,14 +13,30 @@
 
 set -euxo pipefail
 
+# NB: Database used by desktop app for AiChatBot sidecar.
+# Make sure it has been migrated (use aichatbot-sidecar app directory as root).
+SQLITE_DATABASE_PATH=./runtime_data/database.db
+
 # NB: OpenSSL is broken on Ubuntu 22.04 (this is documented elsewhere)
 # See https://askubuntu.com/a/1403961
 # For some reason, the choice of "rustls" or the vendored openssl is not persistent between calls.
 #cargo install sqlx-cli --features openssl-vendored,mysql
 
-build_shared_database_library() {
+build_shared_mysql_database_library() {
+  # NB: For now, this is our monolithic DB that serves all of our microservices (gross)
+  # It's a single package so that queries can be shared (again, gross)
   pushd crates/lib/database_queries
   SQLX_OFFLINE=true cargo sqlx prepare --merged
+  popd
+}
+
+build_shared_sqlite_database_library() {
+  # NB(1): These are *SQLite* queries for the desktop AiChatBot app.
+  # NB(2): Make sure to run migrations first.
+  # NB(3): SqLite has trouble with relative paths, so we copy the file to /
+  cp $SQLITE_DATABASE_PATH /tmp
+  pushd crates/lib/sqlite_queries
+  DATABASE_URL=sqlite:///tmp/database.db cargo sqlx prepare --merged
   popd
 }
 
@@ -81,10 +97,17 @@ build_w2l_inference_job() {
 }
 
 combine_sqlx_queries() {
+
+
+#jq: error: Could not open file crates/programs/aichatbot-sidecar/sqlx-data.json: No such file or directory
+#jq: error: Could not open file crates/service/web/storyteller_web/sqlx-data.json: No such file or directory
+
+
   # Merge multiple JSON files into a single dictionary.
   # https://stackoverflow.com/a/24904276
   jq -s '.[0] * .[1]' \
     crates/lib/database_queries/sqlx-data.json \
+    crates/lib/sqlite_queries/sqlx-data.json \
     crates/service/web/storyteller_web/sqlx-data.json \
     crates/service/job/download_job/sqlx-data.json \
     crates/service/job/tts_download_job/sqlx-data.json \
@@ -97,6 +120,7 @@ combine_sqlx_queries() {
 
 cleanup_temp_files() {
   rm crates/lib/database_queries/sqlx-data.json \
+    crates/lib/sqlite_queries/sqlx-data.json \
     crates/service/web/storyteller_web/sqlx-data.json \
     crates/service/job/download_job/sqlx-data.json \
     crates/service/job/tts_download_job/sqlx-data.json \
@@ -106,7 +130,8 @@ cleanup_temp_files() {
     crates/service/job/w2l_inference_job/sqlx-data.json
 }
 
-build_shared_database_library
+build_shared_mysql_database_library
+build_shared_sqlite_database_library
 build_storyteller_web_app
 build_download_job
 build_tts_download_job
