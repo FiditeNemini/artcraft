@@ -60,10 +60,13 @@ function TopNav(props: Props) {
   const menuClassNames = mobileMenuOpen ? "overlay open" : "overlay";
 
   useEffect(() => {
+    const overlay = document.getElementById("navbar");
     if (mobileMenuOpen) {
       document.body.classList.add("lock-scroll");
+      overlay?.classList.add("h-100");
     } else {
       document.body.classList.remove("lock-scroll");
+      overlay?.classList.remove("h-100");
     }
   }, [mobileMenuOpen]);
 
@@ -218,49 +221,49 @@ function TopNav(props: Props) {
             <span className="bottom"></span>
           </button>
         </div>
-      </nav>
 
-      <div className={menuClassNames}>
-        <div className="overlay-menu">
-          <ul>
-            <li className="nav-link">
-              <a onClick={menuToggle} href="#home" data-scroll-to>
-                Home
-              </a>
-            </li>
-            <li className="nav-link">
-              <a onClick={menuToggle} href="#film" data-scroll-to>
-                Film
-              </a>
-            </li>
-            <li className="nav-link">
-              <a onClick={menuToggle} href="#music" data-scroll-to>
-                Music
-              </a>
-            </li>
-            <li className="nav-link">
-              <a onClick={menuToggle} href="#social" data-scroll-to>
-                Social
-              </a>
-            </li>
-            <li className="nav-link">
-              <a onClick={menuToggle} href="#team" data-scroll-to>
-                Our Team
-              </a>
-            </li>
-            <li className="mt-4">
-              <a
-                onClick={menuToggle}
-                href="#contact"
-                data-scroll-to
-                className="btn btn-primary"
-              >
-                Contact
-              </a>
-            </li>
-          </ul>
+        <div className={menuClassNames}>
+          <div className="overlay-menu">
+            <ul>
+              <li className="nav-link">
+                <a onClick={menuToggle} href="#home" data-scroll-to>
+                  Home
+                </a>
+              </li>
+              <li className="nav-link">
+                <a onClick={menuToggle} href="#film" data-scroll-to>
+                  Film
+                </a>
+              </li>
+              <li className="nav-link">
+                <a onClick={menuToggle} href="#music" data-scroll-to>
+                  Music
+                </a>
+              </li>
+              <li className="nav-link">
+                <a onClick={menuToggle} href="#social" data-scroll-to>
+                  Social
+                </a>
+              </li>
+              <li className="nav-link">
+                <a onClick={menuToggle} href="#team" data-scroll-to>
+                  Our Team
+                </a>
+              </li>
+              <li className="mt-4">
+                <a
+                  onClick={menuToggle}
+                  href="#contact"
+                  data-scroll-to
+                  className="btn btn-primary"
+                >
+                  Contact
+                </a>
+              </li>
+            </ul>
+          </div>
         </div>
-      </div>
+      </nav>
 
       <a href="#home" className={backToTop} data-scroll-to>
         <div className="btt-shape"></div>
