@@ -1024,7 +1024,7 @@ function IndexPage() {
             <div className="col-6 col-md-3">
               <img
                 src="/images/team/placeholder-pfp.jpg"
-                className="img-fluid img-team mb-3"
+                className="img-fluid img-team mb-3 opacity-50"
                 alt=""
               />
               <p className="fw-semibold opacity-100 mb-0">Brandon</p>
@@ -1033,7 +1033,7 @@ function IndexPage() {
             <div className="col-6 col-md-3">
               <img
                 src="/images/team/placeholder-pfp.jpg"
-                className="img-fluid img-team mb-3"
+                className="img-fluid img-team mb-3 opacity-50"
                 alt=""
               />
               <p className="fw-semibold opacity-100 mb-0">Scott</p>
@@ -1042,7 +1042,7 @@ function IndexPage() {
             <div className="col-6 col-md-3">
               <img
                 src="/images/team/placeholder-pfp.jpg"
-                className="img-fluid img-team mb-3"
+                className="img-fluid img-team mb-3 opacity-50"
                 alt=""
               />
               <p className="fw-semibold opacity-100 mb-0">Paul</p>
@@ -1051,7 +1051,7 @@ function IndexPage() {
             <div className="col-6 col-md-3">
               <img
                 src="/images/team/placeholder-pfp.jpg"
-                className="img-fluid img-team mb-3"
+                className="img-fluid img-team mb-3 opacity-50"
                 alt=""
               />
               <p className="fw-semibold opacity-100 mb-0">Bombay</p>
@@ -1060,7 +1060,7 @@ function IndexPage() {
             <div className="col-6 col-md-3">
               <img
                 src="/images/team/placeholder-pfp.jpg"
-                className="img-fluid img-team mb-3"
+                className="img-fluid img-team mb-3 opacity-50"
                 alt=""
               />
               <p className="fw-semibold opacity-100 mb-0">Michael</p>
@@ -1069,29 +1069,29 @@ function IndexPage() {
             <div className="col-6 col-md-3">
               <img
                 src="/images/team/placeholder-pfp.jpg"
-                className="img-fluid img-team mb-3"
+                className="img-fluid img-team mb-3 opacity-50"
                 alt=""
               />
-              <p className="fw-semibold opacity-100 mb-0">Echelon</p>
-              <p>Founder / Backend Engineer</p>
+              <p className="fw-semibold opacity-100 mb-0">Someone</p>
+              <p>Role Title</p>
             </div>
             <div className="col-6 col-md-3">
               <img
                 src="/images/team/placeholder-pfp.jpg"
-                className="img-fluid img-team mb-3"
+                className="img-fluid img-team mb-3 opacity-50"
                 alt=""
               />
-              <p className="fw-semibold opacity-100 mb-0">Echelon</p>
-              <p>Founder / Backend Engineer</p>
+              <p className="fw-semibold opacity-100 mb-0">Someone</p>
+              <p>Role Title</p>
             </div>
             <div className="col-6 col-md-3">
               <img
                 src="/images/team/placeholder-pfp.jpg"
-                className="img-fluid img-team mb-3"
+                className="img-fluid img-team mb-3 opacity-50"
                 alt=""
               />
-              <p className="fw-semibold opacity-100 mb-0">Echelon</p>
-              <p>Founder / Backend Engineer</p>
+              <p className="fw-semibold opacity-100 mb-0">Someone</p>
+              <p>Role Title</p>
             </div>
           </div>
         </div>
