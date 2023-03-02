@@ -380,8 +380,9 @@ p {
 
 .shape-1-container {
   position: absolute;
-  bottom: 48%;
+  bottom: 80%;
   left: 18%;
+  z-index: 5;
 }
 .shape-1 {
   width: 140px;
@@ -390,7 +391,6 @@ p {
   border-radius: 12px;
   transform: translate3d(0px, 0px, 0px) rotate(45deg);
   z-index: 5;
-  opacity: 0;
 }
 
 .shape-2 {
@@ -403,12 +403,11 @@ p {
   top: -20%;
   right: 18%;
   z-index: 1;
-  opacity: 0;
 }
 
 .shape-3-container {
   position: absolute;
-  bottom: 25%;
+  bottom: 60%;
   right: 25%;
 }
 
@@ -419,12 +418,11 @@ p {
   border-radius: 12px;
   transform: translate3d(0px, 0px, 0px) rotate(45deg);
   z-index: 5;
-  opacity: 0;
 }
 
 .shape-4-container {
   position: absolute;
-  bottom: 16%;
+  bottom: 36%;
   left: 25%;
 }
 
@@ -435,7 +433,6 @@ p {
   border-radius: 10px;
   transform: translate3d(0px, 0px, 0px) rotate(45deg);
   z-index: 5;
-  opacity: 0;
 }
 
 .zi-1 {
@@ -532,14 +529,14 @@ p {
   margin-left: 1.2rem;
   font-size: 26px;
   position: absolute;
-  top: 50%;
+  top: 36%;
 
   a {
-    color: rgba($white, 0.6);
+    color: rgba($white, 0.5);
     transition: 0.3s;
 
     &:hover {
-      color: lighten($white, 10%);
+      color: $primary;
       transform: translateX(2px);
     }
   }
@@ -663,15 +660,19 @@ p {
   opacity: 0.4;
 }
 
+.divider-logo-container {
+  margin-top: 220px;
+}
+
 .divider-logo {
-  height: 220px;
-  margin-top: 80px;
-  position: absolute;
+  height: 160px;
+  margin-top: -100px;
+  margin-bottom: 40px;
   transition: 0.4s;
 
-  &:hover {
-    transform: scale(1.2);
-  }
+  // &:hover {
+  //   transform: scale(1.2);
+  // }
 }
 
 .marquee-title {
@@ -693,9 +694,9 @@ p {
 }
 
 .footer-bottom {
-  padding-top: 1.2rem;
-  padding-bottom: 1.2rem;
-  font-size: 13px;
+  padding-top: 1.6rem;
+  padding-bottom: 1.6rem;
+  font-size: 14px;
   background: rgb(47, 47, 75);
 }
 
@@ -719,7 +720,7 @@ p {
 
 .footer-social-icon {
   background: rgb(47, 47, 75);
-  border-radius: 10px;
+  border-radius: 8px;
   height: 50px;
   width: 50px;
   display: flex;
@@ -727,14 +728,13 @@ p {
   justify-content: center;
   color: $white;
   transition: 0.3s;
-  border: 2px solid;
-  border-color: rgba($white, 0);
+  border: 1px solid;
+  border-color: rgba($white, 0.05);
   font-size: 20px;
 
   &:hover {
     color: $white;
-    background: lighten(rgb(47, 47, 75), 10%);
-    transform: rotate(45deg);
+    background: $primary;
   }
 }
 
@@ -760,6 +760,11 @@ p {
   &.dark {
     background: lighten(#2c2c40, 8%);
     opacity: 0.4;
+  }
+
+  &.small {
+    width: 160px;
+    height: 160px;
   }
 }
 
@@ -1088,8 +1093,46 @@ span.swiper-pagination-bullet.swiper-pagination-bullet-active {
   --swiper-theme-color: #fa6b68 !important;
 }
 
-.contact-container {
-  max-width: 700px;
+.contact-email {
+  cursor: pointer;
+  transition: all 0.4s;
+  display: inline-block;
+  position: relative;
+  font-weight: 700;
+  z-index: 2;
+  color: $white;
+  font-family: "Poppins", sans-serif;
+  text-decoration: none;
+
+  &:hover {
+    transform: scale(1.05);
+    color: $primary;
+  }
+
+  &::after {
+    content: "";
+    position: absolute;
+    width: 100%;
+    transform: scaleX(0);
+    height: 6px;
+    bottom: 0;
+    left: 0;
+    z-index: 1;
+    background-color: $primary;
+    transform-origin: bottom right;
+    transition: transform 0.25s ease-out;
+  }
+
+  &:hover::after {
+    transform: scaleX(1);
+    transform-origin: bottom left;
+  }
+}
+
+.img-team {
+  border-radius: 8px;
+  border: 1px solid;
+  border-color: rgba(#4d4d66, 0.8);
 }
 
 @media (max-width: 1199.98px) {
@@ -1262,6 +1305,10 @@ span.swiper-pagination-bullet.swiper-pagination-bullet-active {
       padding: 2rem;
     }
   }
+
+  .contact-email {
+    font-size: 2rem;
+  }
 }
 
 #sub-title {
@@ -1269,17 +1316,22 @@ span.swiper-pagination-bullet.swiper-pagination-bullet-active {
   transform: translate(8rem, 0);
 }
 
-#pascal {
+#hero-btn {
   opacity: 0;
-  transform: translate(0, 300px);
+  transform: translate(4rem, 0);
 }
 
-#basilisk {
-  opacity: 0;
-  transform: translate(300px, 0);
-}
+// #pascal {
+//   opacity: 0;
+//   transform: translate(0, 300px);
+// }
 
-#roko {
-  opacity: 0;
-  transform: translate(-300px, 0);
-}
+// #basilisk {
+//   opacity: 0;
+//   transform: translate(300px, 0);
+// }
+
+// #roko {
+//   opacity: 0;
+//   transform: translate(-300px, 0);
+// }

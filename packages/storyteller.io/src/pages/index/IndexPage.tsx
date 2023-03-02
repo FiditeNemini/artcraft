@@ -36,7 +36,6 @@ import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/css";
 import "swiper/css/pagination";
 import { Autoplay, Pagination } from "swiper";
-import { useForm, ValidationError } from "@formspree/react";
 
 function IndexPage() {
   // Title Animation
@@ -55,40 +54,9 @@ function IndexPage() {
 
     var tl = gsap.timeline({ delay: 0.2 });
     tl.to(
-      "#pascal",
-      {
-        delay: 0.2,
-        duration: 1.2,
-        y: 0,
-        opacity: 1,
-        ease: "expo",
-      },
-      "<"
-    );
-    tl.to(
-      "#roko",
-      {
-        duration: 1.2,
-        x: 0,
-        opacity: 1,
-        ease: "expo",
-      },
-      "<"
-    );
-    tl.to(
-      "#basilisk",
-      {
-        duration: 1.2,
-        x: 0,
-        opacity: 1,
-        ease: "expo",
-      },
-      "<"
-    );
-    tl.to(
       splitTitle.chars,
       {
-        delay: 0.3,
+        delay: 0,
         duration: 0.4,
         y: 0,
         opacity: 1,
@@ -101,7 +69,7 @@ function IndexPage() {
       splitTitleOutline.words,
       {
         delay: 0,
-        duration: 0.8,
+        duration: 0.5,
         y: 0,
         scale: 1,
         opacity: 1,
@@ -121,37 +89,19 @@ function IndexPage() {
       },
       "<"
     );
-
     tl.to(
-      ".shape-2, .shape-1, .shape-3, .shape-4",
+      "#hero-btn",
       {
-        duration: 1,
-        y: 0,
+        delay: 0.2,
+        duration: 0.8,
+        x: 0,
         scale: 1,
-        opacity: 0.6,
+        opacity: 1,
         ease: "expo",
       },
-      0.4
+      "<"
     );
   }, []);
-
-  const [state, handleSubmit] = useForm("xnqrvjbo");
-  if (state.succeeded) {
-    const reset = document.getElementById("reset");
-    const success = document.getElementById("success_message");
-
-    if (reset) reset.click();
-
-    setTimeout(function () {
-      if (success)
-        success.innerHTML =
-          '<div class="alert alert-success fw-semibold w-100 mb-4">Thank you for your message!</div>';
-    }, 500);
-
-    setTimeout(function () {
-      if (success) success.innerHTML = "";
-    }, 5000);
-  }
 
   return (
     <div data-scroll-section data-scroll-repeat="true">
@@ -188,7 +138,7 @@ function IndexPage() {
                   The Future of Storytelling
                 </span>
               </h1>
-              <p className="hero-sub-title">
+              <p id="sub-title" className="hero-sub-title">
                 We’re scientists, engineers, and creatives building the future
                 AI cloud production studio.
               </p>
@@ -343,14 +293,6 @@ function IndexPage() {
             </div>
           </div>
         </div>
-
-        {/* <div className="w-100 d-flex justify-content-center">
-            <img
-              src="/logo/Storyteller-Icon-Logo.png"
-              alt="Storyteller Logo Icon"
-              className="divider-logo"
-            />
-          </div> */}
       </div>
 
       <div className="bg-dark section-2">
@@ -526,11 +468,11 @@ function IndexPage() {
         </div>
 
         <div className="shape-2"></div>
-        <div className="shape-3-container" data-scroll data-scroll-speed="2">
+        <div className="shape-3-container" data-scroll data-scroll-speed="3">
           <div className="shape-3"></div>
         </div>
 
-        <div className="shape-1-container" data-scroll data-scroll-speed="4">
+        <div className="shape-1-container" data-scroll data-scroll-speed="3">
           <div className="shape-1"></div>
         </div>
 
@@ -1062,6 +1004,99 @@ function IndexPage() {
           </div>
         </div> */}
 
+      <div id="team" className="bg-light section-2">
+        <div>
+          <Marquee gradient={false} speed={120}>
+            <h1 className="marquee-title d-flex gap-3 gap-md-4 gap-lg-5 mt-0">
+              <span className="text-outline">Our Team</span>
+              <span className="text-red">\</span>
+              <span>Our Team</span>
+              <span className="text-red">\</span>
+              <span className="text-outline">Our Team</span>
+              <span className="text-red">\</span>
+              <span>Our Team</span>
+              <span className="text-red me-3 me-md-4 me-lg-5">\</span>
+            </h1>
+          </Marquee>
+        </div>
+        <div className="container mt-5 pt-5">
+          <div className="row g-4 g-md-5">
+            <div className="col-6 col-md-3">
+              <img
+                src="/images/team/placeholder-pfp.jpg"
+                className="img-fluid img-team mb-3"
+                alt=""
+              />
+              <p className="fw-semibold opacity-100 mb-0">Brandon</p>
+              <p>Founder / Backend</p>
+            </div>
+            <div className="col-6 col-md-3">
+              <img
+                src="/images/team/placeholder-pfp.jpg"
+                className="img-fluid img-team mb-3"
+                alt=""
+              />
+              <p className="fw-semibold opacity-100 mb-0">Scott</p>
+              <p>3D Artist</p>
+            </div>
+            <div className="col-6 col-md-3">
+              <img
+                src="/images/team/placeholder-pfp.jpg"
+                className="img-fluid img-team mb-3"
+                alt=""
+              />
+              <p className="fw-semibold opacity-100 mb-0">Paul</p>
+              <p>ML / Backend</p>
+            </div>
+            <div className="col-6 col-md-3">
+              <img
+                src="/images/team/placeholder-pfp.jpg"
+                className="img-fluid img-team mb-3"
+                alt=""
+              />
+              <p className="fw-semibold opacity-100 mb-0">Bombay</p>
+              <p>Web Designer / Frontend </p>
+            </div>
+            <div className="col-6 col-md-3">
+              <img
+                src="/images/team/placeholder-pfp.jpg"
+                className="img-fluid img-team mb-3"
+                alt=""
+              />
+              <p className="fw-semibold opacity-100 mb-0">Michael</p>
+              <p>ML / Backend</p>
+            </div>
+            <div className="col-6 col-md-3">
+              <img
+                src="/images/team/placeholder-pfp.jpg"
+                className="img-fluid img-team mb-3"
+                alt=""
+              />
+              <p className="fw-semibold opacity-100 mb-0">Echelon</p>
+              <p>Founder / Backend Engineer</p>
+            </div>
+            <div className="col-6 col-md-3">
+              <img
+                src="/images/team/placeholder-pfp.jpg"
+                className="img-fluid img-team mb-3"
+                alt=""
+              />
+              <p className="fw-semibold opacity-100 mb-0">Echelon</p>
+              <p>Founder / Backend Engineer</p>
+            </div>
+            <div className="col-6 col-md-3">
+              <img
+                src="/images/team/placeholder-pfp.jpg"
+                className="img-fluid img-team mb-3"
+                alt=""
+              />
+              <p className="fw-semibold opacity-100 mb-0">Echelon</p>
+              <p>Founder / Backend Engineer</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <div id="mentions" className="bg-light section-2">
         <div>
           <Marquee gradient={false} speed={120}>
@@ -1243,71 +1278,28 @@ function IndexPage() {
         </div>
       </div>
 
-      <div id="contact" className="bg-light section-2">
-        <div className="container contact-container">
-          <h1 className="text-center fw-bold display-5">Contact Us</h1>
-          <h4 className="text-center opacity-75 mb-5">
-            Send us a message and we'll get back to you!
-          </h4>
-
-          <div id="success_message"></div>
-          <form
-            id="contact_form"
-            onSubmit={handleSubmit}
-            className="col-12 col-md-6 card bg-dark-solid w-100"
-          >
-            <fieldset className="d-flex flex-column gap-3 w-100">
-              <input
-                id="name"
-                type="text"
-                name="name"
-                placeholder="Name*"
-                required
-                className="col-12 form-control"
-              />
-              <ValidationError
-                prefix="Name"
-                field="name"
-                errors={state.errors}
-              />
-              <input
-                id="email"
-                type="email"
-                name="email"
-                placeholder="Email*"
-                required
-                className="col-12 mt-2 form-control"
-              />
-              <ValidationError
-                prefix="Email"
-                field="email"
-                errors={state.errors}
-              />
-              <textarea
-                id="message"
-                name="message"
-                placeholder='Say "hi" here!'
-                required
-                className="col-12 mt-2 form-control"
-                cols={40}
-                rows={4}
-                style={{ resize: "none" }}
-              />
-              <ValidationError
-                prefix="Message"
-                field="message"
-                errors={state.errors}
-              />
-            </fieldset>
-            <button
-              type="submit"
-              className="btn btn-primary mt-4 col-12"
-              disabled={state.submitting}
+      <div id="contact" className="bg-light section-2 pb-0">
+        <div className="container text-center">
+          <h4 className="opacity-75 position-relative zi-2 mb-1">Contact Us</h4>
+          <div className="position-relative">
+            <a
+              href="mailto:hello@storyteller.ai"
+              className="display-1 contact-email"
             >
-              Submit
-            </button>
-            <input type="reset" id="reset" className="d-none" />
-          </form>
+              hello@storyteller.ai
+            </a>
+            <div className="shape-bg dark small"></div>
+          </div>
+        </div>
+
+        <div className="bg-dark-solid divider-logo-container">
+          <div className="w-100 d-flex justify-content-center">
+            <img
+              src="/logo/Storyteller-Icon-Logo.png"
+              alt="Storyteller Logo Icon"
+              className="divider-logo"
+            />
+          </div>
         </div>
       </div>
     </div>

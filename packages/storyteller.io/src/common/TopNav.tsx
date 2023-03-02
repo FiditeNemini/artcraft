@@ -173,7 +173,7 @@ function TopNav(props: Props) {
             <li>
               <a
                 id="nav-btn-5"
-                href="#mentions"
+                href="#team"
                 className="nav-link"
                 data-scroll-to
               >
