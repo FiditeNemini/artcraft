@@ -1018,6 +1018,7 @@ $font: montserrat, sans-serif;
 .about-card {
   min-height: 185px;
   line-height: 1.5;
+  padding: 28px;
 
   &:hover > .about-icon {
     transform: translate(0, -4px);
@@ -1317,6 +1318,10 @@ span.swiper-pagination-bullet.swiper-pagination-bullet-active {
 
   .contact-email {
     font-size: 2rem;
+  }
+
+  .about-card {
+    min-height: 120px;
   }
 }
 
