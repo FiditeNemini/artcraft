@@ -1017,7 +1017,7 @@ function IndexPage() {
 
         <div className="container py-5 text-center d-flex flex-column align-items-center mt-3">
           <h1 className="fw-bold display-5 about-title mt-5">
-            We’re making machine learning as easy to use as software.
+            We’re building the future production cloud studio
           </h1>
           <p className="fw-normal opacity-75 mt-4">
             Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec quis
