@@ -484,7 +484,7 @@ function IndexPage() {
         data-scroll-call="music"
       >
         <Marquee gradient={false} speed={100}>
-          <h1 className="marquee-title d-flex gap-3 gap-md-4 gap-lg-5 my-lg-5">
+          <h1 className="marquee-title d-flex gap-3 gap-md-4 gap-lg-5 mt-0 my-lg-5">
             <span className="text-outline">Music</span>
             <span className="text-red">\</span>
             <span>Music</span>
@@ -1002,7 +1002,7 @@ function IndexPage() {
       <div id="team" className="bg-light section-2">
         <div>
           <Marquee gradient={false} speed={120}>
-            <h1 className="marquee-title d-flex gap-3 gap-md-4 gap-lg-5 mt-0 mb-lg-4">
+            <h1 className="marquee-title d-flex gap-3 gap-md-4 gap-lg-5 mt-0 mb-lg-5">
               <span className="text-outline">Our Team</span>
               <span className="text-red">\</span>
               <span>Our Team</span>
@@ -1029,7 +1029,7 @@ function IndexPage() {
           </p>
         </div>
 
-        <div className="container mt-5">
+        <div className="container mt-4">
           <div className="row g-4 g-md-5">
             <div className="col-6 col-md-3">
               <img
