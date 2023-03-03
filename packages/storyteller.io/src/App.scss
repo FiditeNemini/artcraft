@@ -35,7 +35,7 @@ h3 {
 
 p {
   font-size: 16px;
-  line-height: 1.7;
+  line-height: 28px;
   opacity: 0.8;
   font-weight: 400;
 }
@@ -1136,7 +1136,12 @@ span.swiper-pagination-bullet.swiper-pagination-bullet-active {
 .img-team {
   border-radius: 8px;
   border: 1px solid;
-  border-color: rgba(#4d4d66, 0.8);
+  border-color: rgba(#4d4d66, 1);
+}
+
+.team-role-text {
+  padding-top: 3px;
+  line-height: 1.4;
 }
 
 @media (max-width: 1199.98px) {

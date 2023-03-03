@@ -687,7 +687,7 @@ function IndexPage() {
               <h4 className="fw-normal opacity-75 mb-4">
                 Used by millions of people every month
               </h4>
-              <p className="mt-3">
+              <p>
                 We've built a social platform for deep learning and generative
                 models. FakeYou is a place where creators can upload and manage
                 a variety of deep fake models: speech, music, lipsyncing, and
@@ -767,7 +767,7 @@ function IndexPage() {
               <h4 className="fw-normal opacity-75 mb-4">
                 Twitch Streamers and Creators can engage and monetize
               </h4>
-              <p className="mt-3">
+              <p>
                 It’s tough to build an audience on Twitch. It's even tougher to
                 earn an income. We've built the most comprehensive and engaging
                 donation system for Twitch to date, letting audience members pay
@@ -1002,7 +1002,7 @@ function IndexPage() {
       <div id="team" className="bg-light section-2">
         <div>
           <Marquee gradient={false} speed={120}>
-            <h1 className="marquee-title d-flex gap-3 gap-md-4 gap-lg-5 mt-0">
+            <h1 className="marquee-title d-flex gap-3 gap-md-4 gap-lg-5 mt-0 mb-lg-4">
               <span className="text-outline">Our Team</span>
               <span className="text-red">\</span>
               <span>Our Team</span>
@@ -1014,7 +1014,22 @@ function IndexPage() {
             </h1>
           </Marquee>
         </div>
-        <div className="container mt-5 pt-5">
+
+        <div className="container py-5 text-center d-flex flex-column align-items-center mt-3">
+          <h1 className="fw-bold display-5 about-title mt-5">
+            We’re making machine learning as easy to use as software.
+          </h1>
+          <p className="fw-normal opacity-75 mt-4">
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec quis
+            vehicula odio. Nulla non sem scelerisque, hendrerit libero sagittis,
+            rhoncus orci. Etiam in molestie augue. Donec lobortis tincidunt
+            massa, a posuere libero sagittis eget. Vivamus sagittis mauris non
+            tristique ornare. Pellentesque rhoncus ipsum magna, nec lacinia odio
+            sagittis et. Nunc aliquet cursus dui fermentum molestie.
+          </p>
+        </div>
+
+        <div className="container mt-5">
           <div className="row g-4 g-md-5">
             <div className="col-6 col-md-3">
               <img
@@ -1023,7 +1038,7 @@ function IndexPage() {
                 alt=""
               />
               <p className="fw-semibold opacity-100 mb-0">Brandon</p>
-              <p>Founder / Backend</p>
+              <p className="team-role-text">Founder / Backend</p>
             </div>
             <div className="col-6 col-md-3">
               <img
@@ -1032,16 +1047,16 @@ function IndexPage() {
                 alt=""
               />
               <p className="fw-semibold opacity-100 mb-0">Scott</p>
-              <p>3D Artist</p>
+              <p className="team-role-text">3D Artist</p>
             </div>
             <div className="col-6 col-md-3">
               <img
-                src="/images/team/placeholder-pfp.jpg"
-                className="img-fluid img-team mb-3 opacity-50"
+                src="/images/team/paul.png"
+                className="img-fluid img-team mb-3"
                 alt=""
               />
               <p className="fw-semibold opacity-100 mb-0">Paul</p>
-              <p>ML / Backend</p>
+              <p className="team-role-text">Systems / Devops Engineer</p>
             </div>
             <div className="col-6 col-md-3">
               <img
@@ -1050,7 +1065,7 @@ function IndexPage() {
                 alt=""
               />
               <p className="fw-semibold opacity-100 mb-0">Bombay</p>
-              <p>Web Designer / Frontend </p>
+              <p className="team-role-text">Web Design / Frontend </p>
             </div>
             <div className="col-6 col-md-3">
               <img
@@ -1059,7 +1074,7 @@ function IndexPage() {
                 alt=""
               />
               <p className="fw-semibold opacity-100 mb-0">Michael</p>
-              <p>ML / Backend</p>
+              <p className="team-role-text">ML / Backend</p>
             </div>
             <div className="col-6 col-md-3">
               <img
@@ -1068,7 +1083,7 @@ function IndexPage() {
                 alt=""
               />
               <p className="fw-semibold opacity-100 mb-0">Someone</p>
-              <p>Role Title</p>
+              <p className="team-role-text">Role Title</p>
             </div>
             <div className="col-6 col-md-3">
               <img
@@ -1077,7 +1092,7 @@ function IndexPage() {
                 alt=""
               />
               <p className="fw-semibold opacity-100 mb-0">Someone</p>
-              <p>Role Title</p>
+              <p className="team-role-text">Role Title</p>
             </div>
             <div className="col-6 col-md-3">
               <img
@@ -1086,7 +1101,7 @@ function IndexPage() {
                 alt=""
               />
               <p className="fw-semibold opacity-100 mb-0">Someone</p>
-              <p>Role Title</p>
+              <p className="team-role-text">Role Title</p>
             </div>
           </div>
         </div>
