@@ -31,11 +31,9 @@ function IndexPage(props: Props) {
               Power for <br className="d-sm-none" />
               <span className="word">Your Stream</span>
             </h1>
-            <p className="hero-text lead mb-4 px-4 px-lg-0">
-              Advanced Text to Speech Donations and Rewards for your stream,
-              from the creators of FakeYou.com{" "}
-              <br className="d-none d-lg-block" />
-              (And a lot more coming in the future!)
+            <p className="hero-text lead mb-4 px-3 px-lg-5">
+              We use advanced AI to enhance your stream, making it easier for
+              you to engage your audience and get paid for the work you love.
             </p>
             <div className="panel-ani mt-4 d-flex gap-3 flex-column flex-md-row">
               <a
