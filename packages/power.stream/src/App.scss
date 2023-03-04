@@ -656,6 +656,15 @@ span.word:after {
   box-shadow: 0 0 0 0.1rem #fc6b68;
 }
 
+footer {
+  background-color: transparent;
+
+  li {
+    text-decoration: none;
+    list-style: none;
+  }
+}
+
 .footer-link {
   color: #fc6b68;
   font-weight: 400;

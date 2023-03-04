@@ -3,7 +3,6 @@ import "./App.scss";
 
 import React from "react";
 import { BrowserRouter, Route, Switch } from "react-router-dom";
-import { GitSha } from "@storyteller/components/src/elements/GitSha";
 import {
   ListTtsModels,
   TtsModelListItem,
@@ -28,6 +27,7 @@ import { TtsConfigsDeleteRulePage } from "./pages/tts_configs/TtsConfigsDeleteRu
 import { TtsConfigsEditRulePage } from "./pages/tts_configs/TtsConfigsEditRulePage";
 import { TtsConfigsReorderPage } from "./pages/tts_configs/TtsConfigsReorderPage";
 import { ObsConfigsPage } from "./pages/obs_configs/ObsConfigsPage";
+import { FooterNav } from "./layout/FooterNav";
 
 i18n
   .use(initReactI18next) // passes i18n down to react-i18next
@@ -186,11 +186,7 @@ class App extends React.Component<Props, State> {
               </Route>
             </Switch>
 
-            <div className="container">
-              <hr />
-            </div>
-
-            <footer className="d-flex flex-column container py-5 gap-4">
+            {/* <footer className="d-flex flex-column container py-5 gap-4">
               <div className="d-flex text-center align-items-center justify-content-center gap-2 flex-wrap">
                 <a className="footer-link" href="#features">
                   Features
@@ -233,9 +229,10 @@ class App extends React.Component<Props, State> {
 
               <div className="d-flex flex-column text-center gap-4 mt-4">
                 © 2022 PowerStream.
-                <GitSha />
               </div>
-            </footer>
+            </footer> */}
+
+            <FooterNav />
           </div>
         </div>
       </BrowserRouter>
