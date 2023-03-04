@@ -1060,8 +1060,8 @@ function IndexPage() {
             </div>
             <div className="col-6 col-md-3">
               <img
-                src="/images/team/placeholder-pfp.jpg"
-                className="img-fluid img-team mb-3 opacity-50"
+                src="/images/team/bombay.png"
+                className="img-fluid img-team mb-3"
                 alt=""
               />
               <p className="fw-semibold opacity-100 mb-0">Bombay</p>
@@ -1074,7 +1074,7 @@ function IndexPage() {
                 alt=""
               />
               <p className="fw-semibold opacity-100 mb-0">Michael</p>
-              <p className="team-role-text">ML / Backend</p>
+              <p className="team-role-text">ML</p>
             </div>
             <div className="col-6 col-md-3">
               <img
@@ -1082,8 +1082,8 @@ function IndexPage() {
                 className="img-fluid img-team mb-3 opacity-50"
                 alt=""
               />
-              <p className="fw-semibold opacity-100 mb-0">Someone</p>
-              <p className="team-role-text">Role Title</p>
+              <p className="fw-semibold opacity-100 mb-0">Jose</p>
+              <p className="team-role-text">ML</p>
             </div>
             <div className="col-6 col-md-3">
               <img
@@ -1091,8 +1091,8 @@ function IndexPage() {
                 className="img-fluid img-team mb-3 opacity-50"
                 alt=""
               />
-              <p className="fw-semibold opacity-100 mb-0">Someone</p>
-              <p className="team-role-text">Role Title</p>
+              <p className="fw-semibold opacity-100 mb-0">Rodrigo</p>
+              <p className="team-role-text">ML</p>
             </div>
             <div className="col-6 col-md-3">
               <img
