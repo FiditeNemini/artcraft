@@ -676,7 +676,7 @@ function IndexPage() {
           </Marquee>
         </div>
         <div className="container mt-5 pt-5">
-          <div className="row gx-5 flex-row-reverse">
+          <div className="row gx-5 flex-row-reverse gy-4">
             <div className="col-lg-6 img-layers">
               <Tilt trackOnWindow={true}>
                 <img
@@ -766,7 +766,7 @@ function IndexPage() {
       </div>
       <div className="bg-dark section-2">
         <div className="container">
-          <div className="row gx-5">
+          <div className="row gx-5 gy-5">
             <div className="col-lg-6 img-layers">
               <Tilt trackOnWindow={true}>
                 <img
