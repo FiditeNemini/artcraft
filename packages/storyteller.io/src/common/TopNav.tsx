@@ -170,9 +170,10 @@ function TopNav(props: Props) {
                 className="nav-link"
                 data-scroll-to
               >
-                Social
+                Social AI
               </a>
             </li>
+            {/* NB: Hiding this for now.
             <li>
               <a
                 id="nav-btn-5"
@@ -182,7 +183,7 @@ function TopNav(props: Props) {
               >
                 Our Team
               </a>
-            </li>
+            </li>*/}
           </ul>
 
           <div className="col-md-3 text-end">
