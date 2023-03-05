@@ -109,6 +109,10 @@ function IndexPage() {
 
   useEffect(() => {
     if (!!videoRef.current) {
+      videoRef.current.setAttribute("autoPlay", "true");
+      videoRef.current.setAttribute("loop", "true");
+      videoRef.current.setAttribute("muted", "true");
+      videoRef.current.setAttribute("playsInline", "true");
       videoRef.current.muted = true;
       videoRef.current.play()
     }
@@ -123,7 +127,7 @@ function IndexPage() {
         data-scroll-repeat="true"
         data-scroll-call="home"
       >
-        <video className="bg-video watwatwat" autoPlay={true} loop={true} muted={true} playsInline={true} ref={videoRef}>
+        <video className="bg-video" ref={videoRef}>
           <source src="/hero/brandon-hyperjail.webm" type="video/webm"></source>
         </video>
         <div className="bg-overlay">
