@@ -15,14 +15,20 @@ import {
 } from "@fortawesome/free-brands-svg-icons";
 import { ThirdPartyLinks } from "@storyteller/components/src/constants/ThirdPartyLinks";
 import { EchelonTwitterLink } from "@storyteller/components/src/elements/EchelonTwitterLink";
-import { GetServerInfo, GetServerInfoIsOk, GetServerInfoSuccessResponse } from "@storyteller/components/src/api/server/GetServerInfo";
+import {
+  GetServerInfo,
+  GetServerInfoIsOk,
+  GetServerInfoSuccessResponse,
+} from "@storyteller/components/src/api/server/GetServerInfo";
 
 interface Props {
   sessionWrapper: SessionWrapper;
 }
 
 function FooterNav(props: Props) {
-  const [serverInfo, setServerInfo] = useState<GetServerInfoSuccessResponse|undefined>(undefined);
+  const [serverInfo, setServerInfo] = useState<
+    GetServerInfoSuccessResponse | undefined
+  >(undefined);
 
   const getServerInfo = useCallback(async () => {
     const response = await GetServerInfo();
@@ -50,13 +56,16 @@ function FooterNav(props: Props) {
 
   let serverGitSha = <></>;
 
-  if (serverInfo !== undefined 
-    && !!serverInfo.server_build_sha 
-    && serverInfo.server_build_sha !== 'undefined') 
-  {
+  if (
+    serverInfo !== undefined &&
+    !!serverInfo.server_build_sha &&
+    serverInfo.server_build_sha !== "undefined"
+  ) {
     serverGitSha = (
       <div className="d-flex flex-column flex-lg-row align-items-center ">
-        <div className="git-sha">API: {serverInfo.server_build_sha.substring(0, 8)}</div>
+        <div className="git-sha">
+          API: {serverInfo.server_build_sha.substring(0, 8)}
+        </div>
       </div>
     );
   }
@@ -149,7 +158,9 @@ function FooterNav(props: Props) {
             <div className="py-2 col-12 col-lg-3 d-flex flex-column gap-2 gap-lg-3 align-items-center align-items-lg-start">
               <p className="fw-bold">Info</p>
               <li>
-                <Link to={WebUrl.pricingPageWithReferer("footer")}>Pricing</Link>
+                <Link to={WebUrl.pricingPageWithReferer("footer")}>
+                  Pricing
+                </Link>
               </li>
 
               <li>
@@ -175,10 +186,8 @@ function FooterNav(props: Props) {
 
           <div className="d-flex flex-column flex-lg-row pt-2 align-items-center gap-4">
             <span className="flex-grow-1">
-              © 2023 FakeYou,{" "}
-              <Trans i18nKey="coreUi.footerNav.builtBy">
-                Built by <EchelonTwitterLink hideIcon={true} /> in Atlanta.
-              </Trans>
+              © 2023 FakeYou, Built by{" "}
+              <a href="https://storyteller.ai">Storyteller.ai</a>
             </span>
             <div className="d-flex flex-column flex-lg-row align-items-center ">
               {moderationLink}
