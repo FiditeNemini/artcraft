@@ -682,13 +682,13 @@ function IndexPage() {
                 <img
                   src="/images/screenshots/fakeyou-screen.webp"
                   alt="FakeYou"
-                  className="img-fluid rounded"
+                  className="img-fluid img-back"
                 />
               </Tilt>
               <img
                 src="/images/fakeyou-mascot.webp"
                 alt="FakeYou"
-                className="img-front-right img-screen"
+                className="img-front-right img-mascot"
               />
             </div>
             <div className="col-lg-6 d-flex flex-column justify-content-center">
@@ -770,15 +770,15 @@ function IndexPage() {
             <div className="col-lg-6 img-layers">
               <Tilt trackOnWindow={true}>
                 <img
-                  src="/images/screenshots/fakeyou-screen.webp"
+                  src="/images/screenshots/powerstream-screen.webp"
                   alt="FakeYou"
-                  className="img-fluid rounded"
+                  className="img-fluid img-back"
                 />
               </Tilt>
               <img
-                src="/images/fakeyou-mascot.webp"
+                src="/images/powerstream-mascot.webp"
                 alt="FakeYou"
-                className="img-front-left img-screen"
+                className="img-front-left img-mascot"
               />
             </div>
             <div className="col-lg-6 d-flex flex-column justify-content-center">
