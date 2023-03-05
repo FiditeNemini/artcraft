@@ -221,7 +221,7 @@ function IndexPage() {
             Be Your Own Hollywood
           </h1>
           <h4 className="fw-normal opacity-75 mt-3">
-            Anyone can be a director, or movie star.
+            Storyteller&apos;s generative AI engine empowers anyone to be a film director or movie star.
           </h4>
         </div>
 
@@ -231,7 +231,7 @@ function IndexPage() {
               <div className="col-12 col-md-6 col-lg-3">
                 <p className="fw-normal card bg-dark-solid pt-5 about-card">
                   <FontAwesomeIcon icon={faUserCowboy} className="about-icon" />
-                  Cooperative AI actors
+                  Cooperative AI actors that can interact with humans
                 </p>
               </div>
               <div className="col-12 col-md-6 col-lg-3">
@@ -255,25 +255,25 @@ function IndexPage() {
                     icon={faPaintbrushPencil}
                     className="about-icon"
                   />
-                  Screenplay, concept art generation
+                  Graphical worldbuilding
                 </p>
               </div>
               <div className="col-12 col-md-6 col-lg-3">
                 <p className="fw-normal card bg-dark-solid pt-5 about-card">
                   <FontAwesomeIcon icon={faBookOpen} className="about-icon" />
-                  [Replace text here]
+                  Script writing assistance
                 </p>
               </div>
               <div className="col-12 col-md-6 col-lg-3">
                 <p className="fw-normal card bg-dark-solid pt-5 about-card">
                   <FontAwesomeIcon icon={faPaintbrush} className="about-icon" />
-                  [Replace text here]
+                  Concept art and storyboard generation
                 </p>
               </div>
               <div className="col-12 col-md-6 col-lg-3">
                 <p className="fw-normal card bg-dark-solid pt-5 about-card">
                   <FontAwesomeIcon icon={faDrum} className="about-icon" />
-                  [Replace text here]
+                  Automatic foley and soundtracks
                 </p>
               </div>
               <div className="col-12 col-md-6 col-lg-3">
@@ -282,7 +282,7 @@ function IndexPage() {
                     icon={faClapperboard}
                     className="about-icon"
                   />
-                  [Replace text here]
+                  High level, fast, and intuitive production
                 </p>
               </div>
             </div>
@@ -708,6 +708,7 @@ function IndexPage() {
               </div>
             </div>
           </div>
+          {/* NB: We probably don't need this anymore. Commenting out for now.
           <div className="mt-5 pt-4 text-center">
             <h2 className="text-center mt-5 fw-bold">
               <FontAwesomeIcon icon={faVolumeHigh} className="me-3" />
@@ -717,9 +718,10 @@ function IndexPage() {
               We have over 2,000 voices (with more added every day), but we've
               selected a few to show off.
             </p>
-          </div>
+          </div>*/}
         </div>
 
+        {/* NB: We probably don't need this anymore. Commenting out for now.
         <div className="d-flex flex-column align-items-center container tts-demo pb-5">
           <TtsComponent />
         </div>
@@ -751,6 +753,8 @@ function IndexPage() {
           </div>
           <div className="shape-bg dark"></div>
         </div>
+        */}
+
       </div>
       <div className="bg-dark section-2">
         <div className="container">
@@ -999,6 +1003,7 @@ function IndexPage() {
           </div>
         </div> */}
 
+      {/* NB: We're not quite ready to show our deck yet. But we're going to be filling this out silently.
       <div id="team" className="bg-light section-2">
         <div>
           <Marquee gradient={false} speed={120}>
@@ -1106,6 +1111,7 @@ function IndexPage() {
           </div>
         </div>
       </div>
+      */}
 
       <div id="mentions" className="bg-light section-2">
         <div>
