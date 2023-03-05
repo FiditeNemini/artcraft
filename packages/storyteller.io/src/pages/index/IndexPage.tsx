@@ -131,6 +131,7 @@ function IndexPage() {
       >
         <video className="bg-video" ref={videoRef}>
           <source src="/hero/brandon-hyperjail.webm" type="video/webm"></source>
+          <source src="/hero/brandon-hyperjail.mp4" type="video/mp4"></source>
         </video>
         <div className="bg-overlay">
           <div className="container">
