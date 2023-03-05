@@ -15,36 +15,36 @@ export let wavesurferConfigs = [
     filename: "/assets/preview/monokuma.wav",
     title: "Monokuma",
   },
-  {
-    filename: "/assets/preview/monokuma.wav",
-    title: "Monokuma",
-  },
-  {
-    filename: "/assets/preview/monokuma.wav",
-    title: "Monokuma",
-  },
-  {
-    filename: "/assets/preview/monokuma.wav",
-    title: "Monokuma",
-  },
-  {
-    filename: "/assets/preview/monokuma.wav",
-    title: "Monokuma",
-  },
-  {
-    filename: "/assets/preview/monokuma.wav",
-    title: "Monokuma",
-  },
-  {
-    filename: "/assets/preview/monokuma.wav",
-    title: "Monokuma",
-  },
-  {
-    filename: "/assets/preview/monokuma.wav",
-    title: "Monokuma",
-  },
-  {
-    filename: "/assets/preview/monokuma.wav",
-    title: "Monokuma",
-  },
+  // {
+  //   filename: "/assets/preview/monokuma.wav",
+  //   title: "Monokuma",
+  // },
+  // {
+  //   filename: "/assets/preview/monokuma.wav",
+  //   title: "Monokuma",
+  // },
+  // {
+  //   filename: "/assets/preview/monokuma.wav",
+  //   title: "Monokuma",
+  // },
+  // {
+  //   filename: "/assets/preview/monokuma.wav",
+  //   title: "Monokuma",
+  // },
+  // {
+  //   filename: "/assets/preview/monokuma.wav",
+  //   title: "Monokuma",
+  // },
+  // {
+  //   filename: "/assets/preview/monokuma.wav",
+  //   title: "Monokuma",
+  // },
+  // {
+  //   filename: "/assets/preview/monokuma.wav",
+  //   title: "Monokuma",
+  // },
+  // {
+  //   filename: "/assets/preview/monokuma.wav",
+  //   title: "Monokuma",
+  // },
 ];

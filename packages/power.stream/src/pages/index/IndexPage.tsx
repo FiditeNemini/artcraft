@@ -6,7 +6,7 @@ import {
   faHeadphones,
   faVolumeUp,
 } from "@fortawesome/free-solid-svg-icons";
-import { faDiscord } from "@fortawesome/free-brands-svg-icons";
+import { faDiscord, faTwitter } from "@fortawesome/free-brands-svg-icons";
 import { VoicePreviewPlayer } from "./VoicePreviewPlayer";
 import { wavesurferConfigs } from "./wsConfig";
 
@@ -28,27 +28,30 @@ function IndexPage(props: Props) {
         <div className="hero-section d-flex flex-column align-items-center">
           <div className="hero-inner container-fluid d-flex flex-column align-items-center justify-content-center">
             <h1 className="display-3 fw-bold mb-3 parent">
-              Text to Speech For <span className="word">Your Stream</span>
+              AI Power for <br className="d-sm-none" />
+              <span className="word">Your Stream</span>
             </h1>
-            <p className="hero-text lead mb-4">
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-              eiusmod tempor incididunt ut labore et dolore magna aliqua.
+            <p className="hero-text lead mb-4 px-3 px-lg-5">
+              We use advanced AI to enhance your stream, making it easier for
+              you to engage your audience and get paid for the work you love.
             </p>
             <div className="panel-ani mt-4 d-flex gap-3 flex-column flex-md-row">
-              <button
-                type="button"
+              <a
+                href="https://dash.power.stream/signup"
                 className="btn btn-primary btn-hero d-flex align-items-center"
               >
                 Sign Up Now
                 <FontAwesomeIcon icon={faArrowRight} className="ms-2" />
-              </button>
-              <button
-                type="button"
+              </a>
+              <a
+                href="https://discord.gg/fakeyou"
+                target="_blank"
+                rel="noreferrer"
                 className="btn btn-secondary btn-hero d-flex align-items-center"
               >
                 <FontAwesomeIcon icon={faDiscord} className="me-2" />
                 Join Discord
-              </button>
+              </a>
             </div>
           </div>
 
@@ -107,8 +110,10 @@ function IndexPage(props: Props) {
                   />
                   <h4 className="features-title mb-3">Channel Points</h4>
                   <p className="mb-4">
-                    Morbi dapibus commodo porta. Sed faucibus tristique orci in
-                    tristique. Praesent quam nunc, fermentum eu feugiat sit.
+                    Your viewers can use their hard-earned channel points to
+                    donate and have their messages read aloud. This adds a fun
+                    new way for your community to engage with your streams and
+                    show their support.
                   </p>
                   <a className="fw-bold" href="https://fakeyou.com">
                     Sign up now
@@ -126,8 +131,9 @@ function IndexPage(props: Props) {
                   />
                   <h4 className="features-title mb-3">Over 2000 voices!</h4>
                   <p className="mb-4">
-                    Morbi dapibus commodo porta. Sed faucibus tristique orci in
-                    tristique. Praesent quam nunc, fermentum eu feugiat sit.
+                    We're proud to offer over 2000 text-to-speech voices for you
+                    to choose from. Whether you're looking for something funny,
+                    serious, or somewhere in between, we've got you covered.
                   </p>
                   <a className="fw-bold" href="https://fakeyou.com">
                     See all the voices on FakeYou
@@ -145,8 +151,11 @@ function IndexPage(props: Props) {
                   />
                   <h4 className="features-title mb-3">Bits</h4>
                   <p className="mb-4">
-                    Morbi dapibus commodo porta. Sed faucibus tristique orci in
-                    tristique. Praesent quam nunc, fermentum eu feugiat sit.
+                    Your viewers can use Twitch Bits to donate and have their
+                    messages read aloud. This makes it easy for anyone to get
+                    involved and support your stream.
+                    <br />
+                    <br />
                   </p>
                   <a className="fw-bold" href="https://fakeyou.com">
                     Sign up now
@@ -193,7 +202,7 @@ function IndexPage(props: Props) {
         </div>
       </div>
 
-      <div className="insights-bg">
+      <div className="insights-bg" id="insights">
         <div className="container section d-flex flex-column align-items-center">
           <div className="row insights-section align-items-center">
             <div className="col-md-6 mb-4 mb-md-0 text-center text-md-start">
@@ -203,27 +212,27 @@ function IndexPage(props: Props) {
                   src="assets/title-shape.png"
                   alt=""
                 />
-                <h6 className="pre-heading fw-bold pt-2">Statistics</h6>
+                <h6 className="pre-heading fw-bold pt-2">It's Obvious</h6>
                 <img src="assets/title-shape.png" alt="" />
               </div>
               <h1 className="display-5 fw-bold mb-4 mt-3">
-                <span className="word">Our Insights</span>
+                <span className="word">Better Streams Grow</span>
               </h1>
               <p>
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-                eiusmod tempor incididunt ut labore et dolore magna aliqua.
+                We empower streamers to make incredible content. Use the power
+                of AI to do the hard work so you can focus on what matters.
               </p>
             </div>
             <div className="col-md-6">
               <div className="panel insights-panel h-100 panel-ani">
-                <h2 className="fw-bold mb-1">+2000</h2>
-                <p>TTS Voices in the library (and growing)</p>
+                <h2 className="fw-bold mb-1">2000+</h2>
+                <p>AI models and features to enrich your stream.</p>
                 <hr />
-                <h2 className="fw-bold mb-1">+10K</h2>
-                <p>Daily generated TTS or something</p>
+                <h2 className="fw-bold mb-1">40%</h2>
+                <p>Revenue boost by engaging your audience.</p>
                 <hr />
-                <h2 className="fw-bold mb-1">+1.1M</h2>
-                <p>Some kind of statistic here</p>
+                <h2 className="fw-bold mb-1">1+</h2>
+                <p>human centuries of content we’ve helped enrich.</p>
                 <img
                   className="red-glow insights-circle-1"
                   src="assets/circle-1.png"
@@ -240,7 +249,7 @@ function IndexPage(props: Props) {
         </div>
       </div>
 
-      <div className="faq-bg">
+      <div className="faq-bg" id="faq">
         <div className="container section d-flex flex-column align-items-center">
           <div className="d-flex justify-content-center align-items-center gap-4">
             <img className="rotateimg180" src="assets/title-shape.png" alt="" />
@@ -271,7 +280,7 @@ function IndexPage(props: Props) {
                     aria-expanded="false"
                     aria-controls="collapseOne"
                   >
-                    What is Storyteller TTS?
+                    PowerStream TTS?
                   </button>
                 </h2>
                 <div
@@ -281,12 +290,9 @@ function IndexPage(props: Props) {
                   data-bs-parent="#accordionExample"
                 >
                   <div className="accordion-body">
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed
-                    do eiusmod tempor incididunt ut labore et dolore magna
-                    aliqua. Ut enim ad minim veniam, quis nostrud exercitation
-                    ullamco laboris nisi ut aliquip ex ea commodo consequat.
-                    Duis aute irure dolor in reprehenderit in voluptate velit
-                    esse cillum dolore eu fugiat nulla pariatur.
+                    PowerStream TTS lets your audience inject AI TTS sound into
+                    your stream. You can engage with them directly and earn
+                    money from every use.
                   </div>
                 </div>
               </div>
@@ -300,7 +306,7 @@ function IndexPage(props: Props) {
                     aria-expanded="false"
                     aria-controls="collapseTwo"
                   >
-                    How do I use Storyteller TTS?
+                    PowerStream Autopilot?
                   </button>
                 </h2>
                 <div
@@ -310,12 +316,10 @@ function IndexPage(props: Props) {
                   data-bs-parent="#accordionExample"
                 >
                   <div className="accordion-body">
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed
-                    do eiusmod tempor incididunt ut labore et dolore magna
-                    aliqua. Ut enim ad minim veniam, quis nostrud exercitation
-                    ullamco laboris nisi ut aliquip ex ea commodo consequat.
-                    Duis aute irure dolor in reprehenderit in voluptate velit
-                    esse cillum dolore eu fugiat nulla pariatur.
+                    Coming soon. Use our advanced AI body double to run your
+                    stream while you’re away. It can fill in for bathroom
+                    breaks, or run 24/7, directly engaging your audience with
+                    custom-tailored content and your own unique personality.
                   </div>
                 </div>
               </div>
@@ -329,7 +333,7 @@ function IndexPage(props: Props) {
                     aria-expanded="false"
                     aria-controls="collapseThree"
                   >
-                    What is this question?
+                    PowerStream Transformer?
                   </button>
                 </h2>
                 <div
@@ -339,12 +343,8 @@ function IndexPage(props: Props) {
                   data-bs-parent="#accordionExample"
                 >
                   <div className="accordion-body">
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed
-                    do eiusmod tempor incididunt ut labore et dolore magna
-                    aliqua. Ut enim ad minim veniam, quis nostrud exercitation
-                    ullamco laboris nisi ut aliquip ex ea commodo consequat.
-                    Duis aute irure dolor in reprehenderit in voluptate velit
-                    esse cillum dolore eu fugiat nulla pariatur.
+                    Coming soon. Your community can donate to change your face
+                    and voice to that of popular characters and celebrities.
                   </div>
                 </div>
               </div>
@@ -353,7 +353,7 @@ function IndexPage(props: Props) {
         </div>
       </div>
 
-      <div className="community-bg">
+      <div className="community-bg" id="community">
         <div className="container section mb-3 d-flex flex-column align-items-center">
           <div className="d-flex justify-content-center align-items-center gap-4">
             <img className="rotateimg180" src="assets/title-shape.png" alt="" />
@@ -371,31 +371,59 @@ function IndexPage(props: Props) {
             Please join us in Discord so that we know what you're thinking.
           </p>
           <div className="d-flex flex-column flex-lg-row gap-3 mb-5">
-            <button className="btn btn-secondary">
-              <i className="fa-brands fa-twitter me-2"></i>Follow on Twitter
-            </button>
-            <button className="btn btn-primary">
-              <i className="fa-brands fa-discord me-2"></i>Join our Discord
-            </button>
+            <a
+              className="btn btn-secondary"
+              href="https://twitter.com/FakeYouApp"
+              target="_blank"
+              rel="noreferrer"
+            >
+              <FontAwesomeIcon icon={faTwitter} className="me-2" />
+              Follow on Twitter
+            </a>
+            <a
+              className="btn btn-primary"
+              href="https://discord.gg/fakeyou"
+              target="_blank"
+              rel="noreferrer"
+            >
+              <FontAwesomeIcon icon={faDiscord} className="me-2" />
+              Join our Discord
+            </a>
           </div>
         </div>
       </div>
 
-      <div className="container section d-flex flex-column align-items-center">
+      <div className="container section pt-5 d-flex flex-column align-items-center">
         <div className="cta-panel panel-ani">
           <div className="row">
             <div className="col-md-6 parent">
-              <img className="cta-img w-100" src="assets/cta-img.png" alt="" />
+              <img
+                className="cta-img w-100"
+                src="assets/cta-img.png"
+                alt="cta mascot"
+              />
             </div>
-            <div className="col-md-6 cta-right text-center text-sm-start px-5">
+            <div className="col-md-6 cta-right text-center text-sm-start px-4 px-lg-5">
               <h1 className="display-5 fw-bold mb-5">
-                Get started with Storyteller Stream!
+                Get started with Power Stream!
               </h1>
-              <div className="d-flex gap-3">
-                <button className="btn btn-secondary w-100">Sign Up</button>
-                <button className="btn btn-secondary w-100">
+              <div className="d-flex flex-column flex-sm-row gap-3">
+                <a
+                  className="btn btn-cta w-100"
+                  href="https://dash.power.stream/signup"
+                >
+                  Sign Up
+                  <FontAwesomeIcon icon={faArrowRight} className="ms-2" />
+                </a>
+                <a
+                  className="btn btn-cta w-100"
+                  target="_blank"
+                  rel="noreferrer"
+                  href="https://discord.gg/fakeyou"
+                >
+                  <FontAwesomeIcon icon={faDiscord} className="me-2" />
                   Join Discord
-                </button>
+                </a>
               </div>
             </div>
           </div>

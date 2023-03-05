@@ -3,7 +3,6 @@ import "./App.scss";
 
 import React from "react";
 import { BrowserRouter, Route, Switch } from "react-router-dom";
-import { GitSha } from "@storyteller/components/src/elements/GitSha";
 import {
   ListTtsModels,
   TtsModelListItem,
@@ -28,6 +27,7 @@ import { TtsConfigsDeleteRulePage } from "./pages/tts_configs/TtsConfigsDeleteRu
 import { TtsConfigsEditRulePage } from "./pages/tts_configs/TtsConfigsEditRulePage";
 import { TtsConfigsReorderPage } from "./pages/tts_configs/TtsConfigsReorderPage";
 import { ObsConfigsPage } from "./pages/obs_configs/ObsConfigsPage";
+import { FooterNav } from "./layout/FooterNav";
 
 i18n
   .use(initReactI18next) // passes i18n down to react-i18next
@@ -186,45 +186,53 @@ class App extends React.Component<Props, State> {
               </Route>
             </Switch>
 
-            <div className="container">
-              <hr />
-            </div>
+            {/* <footer className="d-flex flex-column container py-5 gap-4">
+              <div className="d-flex text-center align-items-center justify-content-center gap-2 flex-wrap">
+                <a className="footer-link" href="#features">
+                  Features
+                </a>
+                |
+                <a className="footer-link" href="#voices">
+                  Voice Previews
+                </a>
+                |
+                <a className="footer-link" href="#insights">
+                  Insights
+                </a>
+                |
+                <a className="footer-link" href="#faq">
+                  FAQ
+                </a>
+                |
+                <a className="footer-link" href="#community">
+                  Community
+                </a>
+                |
+                <a
+                  className="footer-link"
+                  rel="noreferrer"
+                  target="_blank"
+                  href="https://fakeyou.com"
+                >
+                  FakeYou
+                </a>
+                |
+                <a
+                  className="footer-link"
+                  rel="noreferrer"
+                  target="_blank"
+                  href="https://discord.gg/fakeyou"
+                >
+                  Discord
+                </a>
+              </div>
 
-            <footer className="d-flex flex-column container py-5 gap-4">
-              <div className="text-center align-items-center justify-content-center gap-3">
-                <a className="footer-link" href="https://power.stream">
-                  TTS Configs
-                </a>
-                &nbsp;|&nbsp;
-                <a className="footer-link" href="https://power.stream">
-                  OBS Configs
-                </a>
-                &nbsp;|&nbsp;
-                <a className="footer-link" href="https://power.stream">
-                  Terms
-                </a>
+              <div className="d-flex flex-column text-center gap-4 mt-4">
+                © 2022 PowerStream.
               </div>
-              <div className="d-flex justify-content-center gap-4">
-                <a className="social-icon" href="https://fakeyou.com">
-                  <i className="fa-brands fa-discord"></i>
-                </a>
-                <a className="social-icon" href="https://fakeyou.com">
-                  <i className="fa-brands fa-twitch"></i>
-                </a>
-                <a className="social-icon" href="https://fakeyou.com">
-                  <i className="fa-brands fa-twitter"></i>
-                </a>
-                <a className="social-icon" href="https://fakeyou.com">
-                  <i className="fa-brands fa-facebook"></i>
-                </a>
-                <a className="social-icon" href="https://fakeyou.com">
-                  <i className="fa-brands fa-patreon"></i>
-                </a>
-              </div>
-              <div className="d-flex justify-content-center">
-                © 2022 Storyteller Stream. | <GitSha />
-              </div>
-            </footer>
+            </footer> */}
+
+            <FooterNav />
           </div>
         </div>
       </BrowserRouter>

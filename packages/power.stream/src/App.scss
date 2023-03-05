@@ -35,12 +35,15 @@ $headings-font-family: "Merriweather", serif;
 
 html {
   height: 100%;
+  scroll-behavior: smooth;
+  overflow-anchor: none;
 }
 
 body {
   height: 100%;
   font-family: "Fira Sans", sans-serif;
   color: #fff;
+  overflow-anchor: none;
 }
 
 hr {
@@ -333,6 +336,23 @@ span.word:after {
   color: $white;
   border: 2.5px solid;
   border-color: lighten($destructive, 8%);
+}
+
+.btn-cta,
+.btn-cta:focus,
+.btn-cta:active {
+  background-color: $white;
+  color: darken($secondary, 10%);
+  border: 2.5px solid;
+  border-color: $white;
+  transition: 0.2s;
+}
+
+.btn-cta:hover {
+  background-color: darken($white, 20%);
+  color: darken($secondary, 10%);
+  border: 2.5px solid;
+  border-color: darken($white, 20%);
 }
 
 .btn-hero {
@@ -636,6 +656,15 @@ span.word:after {
   box-shadow: 0 0 0 0.1rem #fc6b68;
 }
 
+footer {
+  background-color: transparent;
+
+  li {
+    text-decoration: none;
+    list-style: none;
+  }
+}
+
 .footer-link {
   color: #fc6b68;
   font-weight: 400;
@@ -696,13 +725,13 @@ span.word:after {
 }
 
 .accordion-button::after {
-  // background-image: url(assets/plus.svg);
+  background-image: url(../public/assets/plus.svg);
   opacity: 0.5;
   background-position: center;
 }
 
 .accordion-button:not(.collapsed)::after {
-  // background-image: url(assets/munis.svg);
+  background-image: url(../public/assets/munis.svg);
   opacity: 0.5;
 }
 
