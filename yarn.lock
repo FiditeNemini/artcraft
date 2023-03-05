@@ -3901,6 +3901,7 @@ __metadata:
   dependencies:
     craco: ^0.0.3
     lerna: ^4.0.0
+    react-parallax-tilt: ^1.7.110
     yarn: ^1.22.19
   languageName: unknown
   linkType: soft
@@ -16176,6 +16177,16 @@ __metadata:
     locomotive-scroll: ^4.1.4
     react: ^18.0.2
   checksum: 06a1bf798f58244c0110512394ab80ae10a7b7227efbf3dfab81d56eeec1dc914a03410b5083b62a81dd4843fa4142dc6410ab7bfa239cd10a7b318a36820d08
+  languageName: node
+  linkType: hard
+
+"react-parallax-tilt@npm:^1.7.110":
+  version: 1.7.110
+  resolution: "react-parallax-tilt@npm:1.7.110"
+  peerDependencies:
+    react: ^15.0.0 || ^16.0.0 || ^17.0.0 || ^18.0.0
+    react-dom: ^15.0.0 || ^16.0.0 || ^17.0.0 || ^18.0.0
+  checksum: 74c28dfa77abb9bedde0f83b919e4f3f8694e66f5c90228bd5f72c05b128dedf06cbc3bd30461aa29c5a2139539977cc7628fa7b31ebdbfb536d8a666e8fd494
   languageName: node
   linkType: hard
 

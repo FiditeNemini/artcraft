@@ -35,7 +35,7 @@ h3 {
 
 p {
   font-size: 16px;
-  line-height: 28px;
+  line-height: 155%;
   opacity: 0.8;
   font-weight: 400;
 }
@@ -1145,6 +1145,35 @@ span.swiper-pagination-bullet.swiper-pagination-bullet-active {
   line-height: 1.4;
 }
 
+.img-layers {
+  display: flex;
+  position: relative;
+
+  .img-front-right {
+    position: absolute;
+    max-width: 380px;
+    right: -14%;
+    bottom: 12%;
+  }
+
+  .img-front-left {
+    position: absolute;
+    max-width: 380px;
+    left: -14%;
+    bottom: 12%;
+  }
+
+  .img-back {
+    border-radius: 8px;
+    border: 2px solid;
+    border-color: rgba(#4d4d66, 0.25);
+  }
+
+  .img-mascot {
+    filter: drop-shadow(0px 0px 50px rgba(0, 0, 0, 0.95));
+  }
+}
+
 @media (max-width: 1199.98px) {
   .hero-img {
     transform: scale(0.85) !important;
@@ -1228,6 +1257,22 @@ span.swiper-pagination-bullet.swiper-pagination-bullet-active {
   .section-2 {
     padding-top: 5rem;
     padding-bottom: 5rem;
+  }
+
+  .img-layers {
+    transform: scale(0.8);
+
+    .img-front-right {
+      transform: scale(1.4);
+      bottom: 15%;
+      right: 0;
+    }
+
+    .img-front-left {
+      transform: scale(1.4);
+      bottom: 15%;
+      left: 0;
+    }
   }
 }
 
@@ -1322,6 +1367,22 @@ span.swiper-pagination-bullet.swiper-pagination-bullet-active {
 
   .about-card {
     min-height: 120px;
+  }
+
+  .img-layers {
+    transform: scale(1);
+
+    .img-front-right {
+      transform: scale(0.8);
+      bottom: 0;
+      right: -15%;
+    }
+
+    .img-front-left {
+      transform: scale(0.8);
+      bottom: 0;
+      left: -15%;
+    }
   }
 }
 
