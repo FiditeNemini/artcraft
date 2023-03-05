@@ -1,5 +1,5 @@
 import { useLocomotiveScroll } from "react-locomotive-scroll";
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 
 interface Props {}
 
@@ -7,7 +7,6 @@ function TopNav(props: Props) {
   const { scroll } = useLocomotiveScroll();
   const [isScrolling, setIsScrolling] = useState(false);
   const [showTopBtn, setTopBtn] = useState(false);
-  const [activeLink, setActiveLink] = useState("");
 
   useEffect(() => {
     if (!!scroll) {

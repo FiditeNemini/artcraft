@@ -11,7 +11,6 @@ import {
   faDrum,
   faPaintbrush,
   faPersonWalkingArrowRight,
-  faVolumeHigh,
 } from "@fortawesome/free-solid-svg-icons";
 import {
   faUserCowboy,
@@ -23,7 +22,6 @@ import {
 } from "@fortawesome/pro-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Marquee from "react-fast-marquee";
-import { TtsComponent } from "./TtsComponent";
 import Tippy from "@tippyjs/react";
 import "tippy.js/dist/tippy.css";
 // import AudioSample from "./AudioSample";
@@ -177,7 +175,7 @@ function IndexPage() {
           </Tippy>
           <Tippy content="Facebook" placement="right">
             <a
-              href="https://facebook.com/vocodes"
+              href="https://facebook.com/FakeYouAi"
               rel="noreferrer"
               target="_blank"
             >
@@ -230,14 +228,14 @@ function IndexPage() {
             <div className="row gx-4 gy-5 pt-4 position-relative">
               <div className="col-12 col-md-6 col-lg-3">
                 <p className="fw-normal card bg-dark-solid pt-5 about-card">
-                  <FontAwesomeIcon icon={faUserCowboy} className="about-icon" />
-                  Cooperative AI actors that can interact with humans
+                  <FontAwesomeIcon icon={faCube} className="about-icon" />
+                  Blended 3D upscaling and style transfer to achieve any look &mdash; real or animated
                 </p>
               </div>
               <div className="col-12 col-md-6 col-lg-3">
                 <p className="fw-normal card bg-dark-solid pt-5 about-card">
-                  <FontAwesomeIcon icon={faCube} className="about-icon" />
-                  Blended 3D upscaling and style transfer
+                  <FontAwesomeIcon icon={faUserCowboy} className="about-icon" />
+                  Cooperative AI actors that can interact with humans and each other
                 </p>
               </div>
               <div className="col-12 col-md-6 col-lg-3">
@@ -255,13 +253,13 @@ function IndexPage() {
                     icon={faPaintbrushPencil}
                     className="about-icon"
                   />
-                  Graphical worldbuilding
+                  Graphical, procedural, and AI-assisted worldbuilding
                 </p>
               </div>
               <div className="col-12 col-md-6 col-lg-3">
                 <p className="fw-normal card bg-dark-solid pt-5 about-card">
                   <FontAwesomeIcon icon={faBookOpen} className="about-icon" />
-                  Script writing assistance
+                  Script writing, narrative construction, and tonal editor
                 </p>
               </div>
               <div className="col-12 col-md-6 col-lg-3">
@@ -518,7 +516,7 @@ function IndexPage() {
                     icon={faMicrophoneStand}
                     className="about-icon"
                   />
-                  Generate AI Vocals
+                  Generate AI Vocals from new or existing artists
                 </p>
               </div>
               <div className="col-12 col-md-6 col-lg-3">
@@ -527,19 +525,19 @@ function IndexPage() {
                     icon={faWaveformLines}
                     className="about-icon"
                   />
-                  Swap and transform existing vocals
+                  Swap and transform existing vocals into entirely new ones
                 </p>
               </div>
               <div className="col-12 col-md-6 col-lg-3">
                 <p className="fw-normal card bg-dark-solid pt-5 about-card">
                   <FontAwesomeIcon icon={faMusic} className="about-icon" />
-                  Generate lyrics and melody
+                  Generate lyrics, beat, and melody
                 </p>
               </div>
               <div className="col-12 col-md-6 col-lg-3">
                 <p className="fw-normal card bg-dark-solid pt-5 about-card">
                   <FontAwesomeIcon icon={faUserMusic} className="about-icon" />
-                  Take the stage with virtual artists
+                  Take the stage with virtual artists powered by AI animation
                 </p>
               </div>
             </div>
