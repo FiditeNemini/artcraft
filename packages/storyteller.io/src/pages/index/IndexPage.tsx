@@ -25,7 +25,7 @@ import Marquee from "react-fast-marquee";
 import Tippy from "@tippyjs/react";
 import "tippy.js/dist/tippy.css";
 // import AudioSample from "./AudioSample";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import gsap from "gsap";
 import SplitType from "split-type";
 // import Scene from "./Scene";
@@ -37,6 +37,11 @@ import { Autoplay, Pagination } from "swiper";
 import Tilt from "react-parallax-tilt";
 
 function IndexPage() {
+  // NB: React video bug:
+  // https://stackoverflow.com/questions/61510160/why-muted-attribute-on-video-tag-is-ignored-in-react
+  // https://stackoverflow.com/questions/61510160/why-muted-attribute-on-video-tag-is-ignored-in-react
+  const videoRef : any = useRef(null);
+
   // Title Animation
   useEffect(() => {
     const splitTitle = new SplitType("#hero-title", {
@@ -102,6 +107,13 @@ function IndexPage() {
     );
   }, []);
 
+  useEffect(() => {
+    if (!!videoRef.current) {
+      videoRef.current.muted = true;
+      videoRef.current.play()
+    }
+  }, [videoRef])
+
   return (
     <div data-scroll-section data-scroll-repeat="true">
       <div
@@ -111,10 +123,7 @@ function IndexPage() {
         data-scroll-repeat="true"
         data-scroll-call="home"
       >
-        <video className="bg-video" autoPlay loop muted playsInline ref={ref => {
-          ref!.muted = true;
-          ref!.play();
-        }}>
+        <video className="bg-video watwatwat" autoPlay={true} loop={true} muted={true} playsInline={true} ref={videoRef}>
           <source src="/hero/brandon-hyperjail.webm" type="video/webm"></source>
         </video>
         <div className="bg-overlay">
