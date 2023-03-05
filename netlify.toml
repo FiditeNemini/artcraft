@@ -7,3 +7,17 @@ environment = { GENERATE_SOURCEMAP = "false" }
 # the ability to pull fontawesome pro from their private registry. Prior to this we were 
 # using yarn 1.x.
 YARN_VERSION = "3.3.1"
+
+[[redirects]]
+# NB: storyteller.ai replaces storyteller.io
+from = "https://storyteller.io/*"
+to = "https://storyteller.ai/:splat?from=storyteller.io"
+status = 301
+force = true
+
+[[redirects]]
+# NB: storyteller.ai replaces storyteller.io
+from = "https://staging.storyteller.io/*"
+to = "https://staging.storyteller.ai/:splat?from=staging.storyteller.io"
+status = 301
+force = true
