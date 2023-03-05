@@ -34,6 +34,7 @@ import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/css";
 import "swiper/css/pagination";
 import { Autoplay, Pagination } from "swiper";
+import Tilt from "react-parallax-tilt";
 
 function IndexPage() {
   // Title Animation
@@ -219,7 +220,8 @@ function IndexPage() {
             Be Your Own Hollywood
           </h1>
           <h4 className="fw-normal opacity-75 mt-3">
-            Storyteller&apos;s generative AI engine empowers anyone to be a film director or movie star.
+            Storyteller&apos;s generative AI engine empowers anyone to be a film
+            director or movie star.
           </h4>
         </div>
 
@@ -229,13 +231,15 @@ function IndexPage() {
               <div className="col-12 col-md-6 col-lg-3">
                 <p className="fw-normal card bg-dark-solid pt-5 about-card">
                   <FontAwesomeIcon icon={faCube} className="about-icon" />
-                  Blended 3D upscaling and style transfer to achieve any look &mdash; real or animated
+                  Blended 3D upscaling and style transfer to achieve any look
+                  &mdash; real or animated
                 </p>
               </div>
               <div className="col-12 col-md-6 col-lg-3">
                 <p className="fw-normal card bg-dark-solid pt-5 about-card">
                   <FontAwesomeIcon icon={faUserCowboy} className="about-icon" />
-                  Cooperative AI actors that can interact with humans and each other
+                  Cooperative AI actors that can interact with humans and each
+                  other
                 </p>
               </div>
               <div className="col-12 col-md-6 col-lg-3">
@@ -673,14 +677,21 @@ function IndexPage() {
         </div>
         <div className="container mt-5 pt-5">
           <div className="row gx-5 flex-row-reverse">
-            <div className="col-lg-5 text-center text-lg-start">
+            <div className="col-lg-6 img-layers">
+              <Tilt trackOnWindow={true}>
+                <img
+                  src="/images/screenshots/fakeyou-screen.webp"
+                  alt="FakeYou"
+                  className="img-fluid rounded"
+                />
+              </Tilt>
               <img
-                src="/images/FakeYou-img.webp"
+                src="/images/fakeyou-mascot.webp"
                 alt="FakeYou"
-                className="img-fluid"
+                className="img-front-right img-screen"
               />
             </div>
-            <div className="col-lg-7 d-flex flex-column justify-content-center">
+            <div className="col-lg-6 d-flex flex-column justify-content-center">
               <h1 className="fw-bold display-5">FakeYou</h1>
               <h4 className="fw-normal opacity-75 mb-4">
                 Used by millions of people every month
@@ -752,20 +763,26 @@ function IndexPage() {
           <div className="shape-bg dark"></div>
         </div>
         */}
-
       </div>
       <div className="bg-dark section-2">
         <div className="container">
           <div className="row gx-5">
-            <div className="col-lg-5 text-center text-lg-start">
+            <div className="col-lg-6 img-layers">
+              <Tilt trackOnWindow={true}>
+                <img
+                  src="/images/screenshots/fakeyou-screen.webp"
+                  alt="FakeYou"
+                  className="img-fluid rounded"
+                />
+              </Tilt>
               <img
-                src="/images/Stream-img.webp"
-                alt="Power Stream"
-                className="img-fluid"
+                src="/images/fakeyou-mascot.webp"
+                alt="FakeYou"
+                className="img-front-left img-screen"
               />
             </div>
-            <div className="col-lg-7 d-flex flex-column justify-content-center">
-              <h1 className="fw-bold display-5">Power Stream</h1>
+            <div className="col-lg-6 d-flex flex-column justify-content-center">
+              <h1 className="fw-bold display-5">PowerStream</h1>
               <h4 className="fw-normal opacity-75 mb-4">
                 Twitch Streamers and Creators can engage and monetize
               </h4>
@@ -1054,7 +1071,7 @@ function IndexPage() {
             </div>
             <div className="col-6 col-md-3">
               <img
-                src="/images/team/paul.png"
+                src="/images/team/paul.webp"
                 className="img-fluid img-team mb-3"
                 alt=""
               />
@@ -1063,7 +1080,7 @@ function IndexPage() {
             </div>
             <div className="col-6 col-md-3">
               <img
-                src="/images/team/bombay.png"
+                src="/images/team/bombay.webp"
                 className="img-fluid img-team mb-3"
                 alt=""
               />
