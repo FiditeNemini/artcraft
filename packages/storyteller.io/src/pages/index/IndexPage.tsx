@@ -109,10 +109,12 @@ function IndexPage() {
 
   useEffect(() => {
     if (!!videoRef.current) {
-      videoRef.current.setAttribute("autoPlay", "true");
-      videoRef.current.setAttribute("loop", "true");
       videoRef.current.setAttribute("muted", "true");
-      videoRef.current.setAttribute("playsInline", "true");
+      videoRef.current.setAttribute("autoplay", "true");
+      videoRef.current.setAttribute("loop", "true");
+      videoRef.current.setAttribute("playsinline", "true");
+      videoRef.current.setAttribute("disablepictureinpicture", "true");
+      videoRef.current.setAttribute("preload", "auto");
       videoRef.current.muted = true;
       videoRef.current.play()
     }
