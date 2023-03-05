@@ -16,7 +16,7 @@ function Footer(props: Props) {
       <footer data-scroll-section>
         <div className="bg-dark-solid">
           <div className="container footer-top text-center">
-            <div className="d-flex gap-4 justify-content-center p-4">
+            <div className="d-flex gap-4 justify-content-center p-4 pb-5">
               <a
                 href="https://discord.gg/fakeyou"
                 className="footer-social-icon"
@@ -53,13 +53,14 @@ function Footer(props: Props) {
           </div>
         </div>
         <div className="footer-bottom">
-          <div className="container d-flex flex-column flex-md-row text-center text-md-start gap-3">
-            <div className="flex-grow-1">
-              Copyright &copy; 2020 &mdash; 2022 Learning Machines, Inc. (makers
-              of FakeYou and Storyteller)
+          <div className="container d-flex flex-column text-center gap-2">
+            <div>
+              Copyright &copy; 2023 Storyteller AI. All Rights Reserved.
             </div>
 
-            <GitSha />
+            <div className="opacity-50">
+              <GitSha />
+            </div>
           </div>
         </div>
       </footer>
