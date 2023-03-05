@@ -111,7 +111,10 @@ function IndexPage() {
         data-scroll-repeat="true"
         data-scroll-call="home"
       >
-        <video className="bg-video" autoPlay loop muted playsInline>
+        <video className="bg-video" autoPlay loop muted playsInline ref={ref => {
+          ref!.muted = true;
+          ref!.play();
+        }}>
           <source src="/hero/brandon-hyperjail.webm" type="video/webm"></source>
         </video>
         <div className="bg-overlay">
