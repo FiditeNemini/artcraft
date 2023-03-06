@@ -1,7 +1,7 @@
 use actix_http::Error;
 use actix_http::http::header;
-use actix_web::cookie::Cookie;
 use actix_web::HttpResponseBuilder;
+use actix_web::cookie::Cookie;
 use actix_web::error::ResponseError;
 use actix_web::http::StatusCode;
 use actix_web::web::{Path, Json};
@@ -9,15 +9,16 @@ use actix_web::{Responder, web, HttpResponse, error, HttpRequest};
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::http_server::web_utils::response_success_helpers::simple_json_success;
 use crate::server_state::ServerState;
+use database_queries::queries::model_categories::toggle_model_category_soft_delete::{toggle_model_category_soft_delete, ToggleSoftDeleteState};
+use http_server_common::response::serialize_as_json_error::serialize_as_json_error;
 use log::{info, warn, log};
 use regex::Regex;
 use sqlx::MySqlPool;
 use sqlx::error::DatabaseError;
 use sqlx::error::Error::Database;
 use sqlx::mysql::MySqlDatabaseError;
-use std::sync::Arc;
 use std::fmt;
-use http_server_common::response::serialize_as_json_error::serialize_as_json_error;
+use std::sync::Arc;
 
 // =============== Request ===============
 
@@ -100,31 +101,17 @@ pub async fn delete_category_handler(
     return Err(DeleteCategoryError::NotAuthorized);
   }
 
-  let query_builder = if request.set_delete {
-    sqlx::query!(r#"
-      UPDATE model_categories
-      SET
-        deleted_at = CURRENT_TIMESTAMP
-      WHERE
-        token = ?
-      LIMIT 1
-    "#,
-      path.token)
-
+  let soft_delete_state = if request.set_delete {
+    ToggleSoftDeleteState::Delete
   } else {
-    sqlx::query!(r#"
-      UPDATE model_categories
-      SET
-        deleted_at = NULL
-      WHERE
-        token = ?
-      LIMIT 1
-    "#,
-      path.token)
+    ToggleSoftDeleteState::Undelete
   };
 
-  // NB: We're soft deleting so we don't delete the associations.
-  let query_result = query_builder.execute(&server_state.mysql_pool).await;
+  let query_result = toggle_model_category_soft_delete(
+    &path.token,
+    soft_delete_state,
+    &server_state.mysql_pool
+  ).await;
 
   match query_result {
     Ok(_) => {},
