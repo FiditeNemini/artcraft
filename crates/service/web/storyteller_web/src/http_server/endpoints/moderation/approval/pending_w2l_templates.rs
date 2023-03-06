@@ -1,7 +1,7 @@
 use actix_http::Error;
 use actix_http::http::header;
-use actix_web::cookie::Cookie;
 use actix_web::HttpResponseBuilder;
+use actix_web::cookie::Cookie;
 use actix_web::error::ResponseError;
 use actix_web::http::StatusCode;
 use actix_web::web::Path;
@@ -9,6 +9,7 @@ use actix_web::{Responder, web, HttpResponse, error, HttpRequest};
 use chrono::{DateTime, Utc};
 use crate::http_server::web_utils::serialize_as_json_error::serialize_as_json_error;
 use crate::server_state::ServerState;
+use database_queries::queries::w2l::w2l_templates::list_pending_w2l_templates::list_pending_w2l_templates;
 use log::{info, warn, log};
 use sqlx::error::DatabaseError;
 use sqlx::error::Error::Database;
@@ -90,66 +91,26 @@ pub async fn get_pending_w2l_templates_handler(
     return Err(GetPendingW2lTemplatesError::Unauthorized);
   }
 
-  // NB: Lookup failure is Err(RowNotFound).
-  let maybe_results = sqlx::query_as!(
-      PendingW2lTemplatesRaw,
-        r#"
-SELECT
-  w2l_templates.token as template_token,
-  w2l_templates.title,
-  w2l_templates.template_type,
-  w2l_templates.duration_millis,
-  w2l_templates.frame_width,
-  w2l_templates.frame_height,
-  w2l_templates.creator_user_token,
-  users.username AS creator_username,
-  users.display_name AS creator_display_name,
-  users.email_gravatar_hash AS creator_gravatar_hash,
-  w2l_templates.created_at
-FROM
-  w2l_templates
-JOIN
-  users
-ON
-  users.token = w2l_templates.creator_user_token
-WHERE
-  w2l_templates.is_public_listing_approved IS NULL
-  AND w2l_templates.user_deleted_at IS NULL
-  AND w2l_templates.mod_deleted_at IS NULL
-  AND w2l_templates.is_locked_from_use IS FALSE
-        "#,
-    )
-      .fetch_all(&server_state.mysql_pool)
-      .await;
+  let results = list_pending_w2l_templates(&server_state.mysql_pool)
+      .await
+      .map_err(|err| {
+        warn!("list pending w2l db error: {:?}", err);
+        GetPendingW2lTemplatesError::ServerError
+      })?;
 
-  let results : Vec<PendingW2lTemplatesRaw> = match maybe_results {
-    Ok(results) => results,
-    Err(err) => {
-      match err {
-        sqlx::Error::RowNotFound => {
-          Vec::new()
-        },
-        _ => {
-          warn!("list pending w2l db error: {:?}", err);
-          return Err(GetPendingW2lTemplatesError::ServerError)
-        }
-      }
-    }
-  };
-
-  let results = results.iter().map(|r| {
+  let results = results.into_iter().map(|r| {
     PendingW2lTemplate {
-      template_token: r.template_token.clone(),
-      title: r.title.clone(),
-      template_type: r.template_type.clone(),
+      template_token: r.template_token,
+      title: r.title,
+      template_type: r.template_type,
       duration_millis: r.duration_millis,
       frame_width: r.frame_width,
       frame_height: r.frame_height,
-      creator_user_token: r.creator_user_token.clone(),
-      creator_username: r.creator_username.clone(),
-      creator_display_name: r.creator_display_name.clone(),
-      creator_gravatar_hash: r.creator_gravatar_hash.clone(),
-      created_at: r.created_at.clone(),
+      creator_user_token: r.creator_user_token,
+      creator_username: r.creator_username,
+      creator_display_name: r.creator_display_name,
+      creator_gravatar_hash: r.creator_gravatar_hash,
+      created_at: r.created_at,
     }
   }).collect::<Vec<PendingW2lTemplate>>();
 
@@ -166,17 +127,3 @@ WHERE
       .body(body))
 }
 
-#[derive(Serialize)]
-pub struct PendingW2lTemplatesRaw {
-  pub template_token: String,
-  pub title: String,
-  pub template_type: String,
-  pub duration_millis: i32,
-  pub frame_width: i32,
-  pub frame_height: i32,
-  pub creator_user_token: String,
-  pub creator_username: String,
-  pub creator_display_name: String,
-  pub creator_gravatar_hash: String,
-  pub created_at: DateTime<Utc>,
-}
