@@ -10,11 +10,10 @@ use config::bad_urls::is_bad_tts_model_download_url;
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::server_state::ServerState;
 use crate::validations::model_uploads::validate_model_title;
-use database_queries::tokens::Tokens;
+use database_queries::queries::tts::tts_model_upload_jobs::insert_tts_model_upload_job::{insert_tts_model_upload_job, InsertTtsModelUploadJobArgs};
 use enums::common::visibility::Visibility;
 use http_server_common::request::get_request_ip::get_request_ip;
-use log::{info, warn};
-use sqlx::error::Error::Database;
+use log::warn;
 use std::fmt;
 use std::sync::Arc;
 
@@ -138,68 +137,24 @@ pub async fn upload_tts_model_handler(
   let creator_set_visibility = "public".to_string();
 
   // This token is returned to the client.
-  let job_token = Tokens::new_tts_model_upload_job()
-    .map_err(|_e| {
-      warn!("Error creating token");
-      UploadTtsModelError::ServerError
-    })?;
+  let maybe_new_job_token = insert_tts_model_upload_job(InsertTtsModelUploadJobArgs {
+    uuid: &uuid,
+    creator_user_token: &user_session.user_token,
+    creator_ip_address: &ip_address,
+    creator_set_visibility: &creator_set_visibility,
+    title: &title,
+    tts_model_type: &tts_model_type,
+    download_url: &download_url,
+    mysql_pool: &server_state.mysql_pool,
+  }).await;
 
-  let query_result = sqlx::query!(
-        r#"
-INSERT INTO tts_model_upload_jobs
-SET
-  token = ?,
-  uuid_idempotency_token = ?,
-  creator_user_token = ?,
-  creator_ip_address = ?,
-  creator_set_visibility = ?,
-  title = ?,
-  tts_model_type = ?,
-  download_url = ?,
-  status = "pending"
-        "#,
-        job_token.to_string(),
-        uuid.to_string(),
-        user_session.user_token.to_string(),
-        ip_address.to_string(),
-        creator_set_visibility.to_string(),
-        title.to_string(),
-        tts_model_type,
-        download_url,
-    )
-    .execute(&server_state.mysql_pool)
-    .await;
-
-  let record_id = match query_result {
-    Ok(res) => {
-      res.last_insert_id()
-    },
+  let job_token = match maybe_new_job_token {
+    Ok(token) => token,
     Err(err) => {
-      warn!("New tts model upload creation DB error: {:?}", err);
-
-      // NB: SQLSTATE[23000]: Integrity constraint violation
-      // NB: MySQL Error Code 1062: Duplicate key insertion (this is harder to access)
-      match err {
-        Database(err) => {
-          let _maybe_code = err.code().map(|c| c.into_owned());
-          /*match maybe_code.as_deref() {
-            Some("23000") => {
-              if err.message().contains("username") {
-                return Err(UsernameTaken);
-              } else if err.message().contains("email_address") {
-                return Err(EmailTaken);
-              }
-            }
-            _ => {},
-          }*/
-        },
-        _ => {},
-      }
+      warn!("Error inserting new job record: {:?}", err);
       return Err(UploadTtsModelError::ServerError);
     }
   };
-
-  info!("new model upload job id: {}", record_id);
 
   server_state.firehose_publisher.enqueue_tts_model_upload(&user_session.user_token, &job_token)
       .await
