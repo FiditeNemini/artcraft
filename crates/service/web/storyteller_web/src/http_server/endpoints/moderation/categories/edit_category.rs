@@ -19,6 +19,7 @@ use sqlx::error::Error::Database;
 use sqlx::mysql::MySqlDatabaseError;
 use std::fmt;
 use std::sync::Arc;
+use database_queries::queries::model_categories::update_model_category::{update_model_category, UpdateModelCategoryArgs};
 
 // =============== Request ===============
 
@@ -144,43 +145,19 @@ pub async fn edit_category_handler(
     }
   }
 
-  let query_result =
-    // We need to store the IP address details.
-    sqlx::query!(
-        r#"
-UPDATE model_categories
-SET
-    name = ?,
-    maybe_dropdown_name = ?,
-
-    can_directly_have_models = ?,
-    can_have_subcategories = ?,
-    can_only_mods_apply = ?,
-
-    maybe_super_category_token = ?,
-
-    is_mod_approved = ?,
-    maybe_mod_user_token = ?,
-    maybe_mod_comments = ?,
-
-    version = version + 1
-
-WHERE token = ?
-LIMIT 1
-        "#,
-      &request.name,
-      &request.maybe_dropdown_name,
-      &request.can_directly_have_models,
-      &request.can_have_subcategories,
-      &request.can_only_mods_apply,
-      &request.maybe_super_category_token,
-      &request.is_mod_approved,
-      &user_session.user_token,
-      &request.maybe_mod_comments,
-      &path.token,
-    )
-        .execute(&server_state.mysql_pool)
-        .await;
+  let query_result = update_model_category(UpdateModelCategoryArgs {
+    name: &request.name,
+    maybe_dropdown_name: request.maybe_dropdown_name.as_deref(),
+    can_directly_have_models: request.can_directly_have_models,
+    can_have_subcategories: request.can_have_subcategories,
+    can_only_mods_apply: request.can_only_mods_apply,
+    maybe_super_category_token: request.maybe_super_category_token.as_deref(),
+    is_mod_approved: request.is_mod_approved,
+    mod_user_token: &user_session.user_token,
+    maybe_mod_comments: request.maybe_mod_comments.as_deref(),
+    model_category_token: &path.token,
+    mysql_pool: &server_state.mysql_pool,
+  }).await;
 
   match query_result {
     Ok(_) => {},
