@@ -12,12 +12,13 @@ use crate::http_server::web_utils::response_success_helpers::simple_json_success
 use crate::server_state::ServerState;
 use crate::validations::model_uploads::validate_model_title;
 use derive_more::{Display, Error};
-use log::{info, warn, log};
+use log::{info, warn, log, error};
 use regex::Regex;
 use sqlx::error::DatabaseError;
 use sqlx::error::Error::Database;
 use sqlx::mysql::MySqlDatabaseError;
 use std::sync::Arc;
+use database_queries::queries::ip_bans::get_ip_ban::get_ip_ban;
 
 /// For the URL PathInfo
 #[derive(Deserialize)]
@@ -104,53 +105,28 @@ pub async fn get_ip_ban_handler(
 
   let ip_address = path.ip_address.trim();
 
-  // NB: Lookup failure is Err(RowNotFound).
-  let maybe_result = sqlx::query_as!(
-      IpBanRecord,
-        r#"
-SELECT
-    ip_bans.ip_address,
-
-    ip_bans.maybe_target_user_token,
-    banned_users.username as maybe_target_username,
-
-    ip_bans.mod_user_token,
-    mod_users.username as mod_username,
-    mod_users.display_name as mod_display_name,
-
-    ip_bans.mod_notes,
-    ip_bans.created_at,
-    ip_bans.updated_at
-FROM
-    ip_address_bans AS ip_bans
-LEFT OUTER JOIN users as banned_users
-    ON ip_bans.maybe_target_user_token = banned_users.token
-JOIN users as mod_users
-    ON ip_bans.mod_user_token = mod_users.token
-WHERE
-    ip_bans.ip_address = ?
-LIMIT 1
-        "#,
-      ip_address
-    )
-      .fetch_one(&server_state.mysql_pool)
-      .await;
+  let maybe_result = get_ip_ban(ip_address, &server_state.mysql_pool)
+      .await
+      .map_err(|err| {
+        error!("get ip ban db error: {:?}", err);
+        GetIpBanError::ServerError
+      })?;
 
   let result : IpBanRecord = match maybe_result {
-    Ok(result) => {
-      result
+    None => {
+      return Err(GetIpBanError::NotFound);
     },
-    Err(err) => {
-      match err {
-        sqlx::Error::RowNotFound => {
-          return Err(GetIpBanError::NotFound);
-        },
-        _ => {
-          warn!("get ip ban db error: {:?}", err);
-          return Err(GetIpBanError::ServerError);
-        }
-      }
-    }
+    Some(ban) => IpBanRecord {
+      ip_address: ban.ip_address,
+      maybe_target_user_token: ban.maybe_target_user_token,
+      maybe_target_username: ban.maybe_target_username,
+      mod_user_token: ban.mod_user_token,
+      mod_username: ban.mod_username,
+      mod_display_name: ban.mod_display_name,
+      mod_notes: ban.mod_notes,
+      created_at: ban.created_at,
+      updated_at: ban.updated_at,
+    },
   };
 
   let response = GetIpBanResponse {
