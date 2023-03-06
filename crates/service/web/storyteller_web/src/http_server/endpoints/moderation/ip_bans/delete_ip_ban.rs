@@ -17,6 +17,7 @@ use sqlx::error::DatabaseError;
 use sqlx::error::Error::Database;
 use sqlx::mysql::MySqlDatabaseError;
 use std::sync::Arc;
+use database_queries::queries::ip_bans::toggle_ip_ban::{IpBanToggleState, toggle_ip_ban};
 
 /// For the URL PathInfo
 #[derive(Deserialize)]
@@ -85,45 +86,21 @@ pub async fn delete_ip_ban_handler(
     return Err(DeleteIpBanError::Unauthorized);
   }
 
-  let query_result = if request.delete {
+  let toggle_action = if request.delete {
     info!("Deleting IP ban: {}", &path.ip_address);
+    IpBanToggleState::DeleteIpBan
 
-    sqlx::query!(
-        r#"
-UPDATE
-    ip_address_bans
-SET
-    mod_user_token = ?,
-    deleted_at = CURRENT_TIMESTAMP
-WHERE
-    ip_address = ?
-LIMIT 1
-        "#,
-      &user_session.user_token,
-      &path.ip_address,
-    )
-        .execute(&server_state.mysql_pool)
-        .await
   } else {
     info!("Restoring IP ban: {}", &path.ip_address);
-
-    sqlx::query!(
-        r#"
-UPDATE
-    ip_address_bans
-SET
-    mod_user_token = ?,
-    deleted_at = NULL
-WHERE
-    ip_address = ?
-LIMIT 1
-        "#,
-      &user_session.user_token,
-      &path.ip_address,
-    )
-        .execute(&server_state.mysql_pool)
-        .await
+    IpBanToggleState::CreateIpBan
   };
+
+  let query_result = toggle_ip_ban(
+    &path.ip_address,
+    &user_session.user_token,
+    toggle_action,
+    &server_state.mysql_pool
+  ).await;
 
   match query_result {
     Ok(_) => {},
