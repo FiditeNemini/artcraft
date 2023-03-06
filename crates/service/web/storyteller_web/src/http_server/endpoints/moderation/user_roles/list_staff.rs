@@ -1,7 +1,7 @@
 use actix_http::Error;
 use actix_http::http::header;
-use actix_web::cookie::Cookie;
 use actix_web::HttpResponseBuilder;
+use actix_web::cookie::Cookie;
 use actix_web::error::ResponseError;
 use actix_web::http::StatusCode;
 use actix_web::web::Path;
@@ -11,14 +11,14 @@ use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::http_server::web_utils::response_success_helpers::simple_json_success;
 use crate::server_state::ServerState;
 use crate::validations::model_uploads::validate_model_title;
+use database_queries::queries::users::user_roles::list_staff::list_staff;
 use derive_more::{Display, Error};
-use log::{info, warn, log};
+use log::{info, warn, log, error};
 use regex::Regex;
 use sqlx::error::DatabaseError;
 use sqlx::error::Error::Database;
 use sqlx::mysql::MySqlDatabaseError;
 use std::sync::Arc;
-
 
 #[derive(Serialize)]
 pub struct ListStaffResponse {
@@ -90,44 +90,21 @@ pub async fn list_staff_handler(
     return Err(ListStaffError::Unauthorized);
   }
 
-  // NB: Lookup failure is Err(RowNotFound).
-  let maybe_results = sqlx::query_as!(
-      StaffRecordForList,
-        r#"
-SELECT
-    users.token as user_token,
-    users.username,
-    users.display_name,
-    user_roles.slug as user_role_slug,
-    user_roles.name as user_role_name
-FROM
-    users
-JOIN user_roles
-    ON users.user_role_slug = user_roles.slug
-WHERE
-    user_roles.slug != 'user'
-        "#,
-    )
-      .fetch_all(&server_state.mysql_pool)
-      .await;
-
-  let results : Vec<StaffRecordForList> = match maybe_results {
-    Ok(results) => {
-      info!("Results length: {}", results.len());
-      results
-    },
-    Err(err) => {
-      match err {
-        sqlx::Error::RowNotFound => {
-          Vec::new()
-        },
-        _ => {
-          warn!("list staff db error: {:?}", err);
-          return Err(ListStaffError::ServerError);
-        }
-      }
-    }
-  };
+  let results = list_staff(&server_state.mysql_pool)
+      .await
+      .map_err(|err| {
+        error!("list staff db error: {:?}", err);
+        ListStaffError::ServerError
+      })?
+      .into_iter()
+      .map(|user| StaffRecordForList {
+        user_token: user.user_token,
+        username: user.username,
+        display_name: user.display_name,
+        user_role_slug: user.user_role_slug,
+        user_role_name: user.user_role_name,
+      })
+      .collect();
 
   let response = ListStaffResponse {
     success: true,

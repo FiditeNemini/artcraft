@@ -1,7 +1,7 @@
 use actix_http::Error;
 use actix_http::http::header;
-use actix_web::cookie::Cookie;
 use actix_web::HttpResponseBuilder;
+use actix_web::cookie::Cookie;
 use actix_web::error::ResponseError;
 use actix_web::http::StatusCode;
 use actix_web::{Responder, web, HttpResponse, error, HttpRequest, HttpMessage};
@@ -9,8 +9,9 @@ use chrono::{DateTime, Utc};
 use crate::AnyhowResult;
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::server_state::ServerState;
+use database_queries::queries::public_event_feed::list_public_event_feed_items::list_public_event_feed_items;
 use derive_more::{Display, Error};
-use log::{info, warn, log};
+use log::{info, warn, log, error};
 use regex::Regex;
 use sqlx::MySqlPool;
 use sqlx::error::DatabaseError;
@@ -62,45 +63,27 @@ pub async fn list_events_handler(
   http_request: HttpRequest,
   server_state: web::Data<Arc<ServerState>>
 ) -> Result<HttpResponse, ListEventsError> {
-  // NB: Lookup failure is Err(RowNotFound).
-  // NB: Since this is publicly exposed, we don't query sensitive data.
-  let maybe_events = sqlx::query_as!(
-      EventRecord,
-        r#"
-SELECT
-    events.token as event_token,
-    events.event_type,
-    events.maybe_target_user_token,
-    users.username as maybe_target_username,
-    users.display_name as maybe_target_display_name,
-    users.email_gravatar_hash as maybe_target_user_gravatar_hash,
-    events.maybe_target_entity_token,
-    events.created_at,
-    events.updated_at
-FROM firehose_entries as events
-LEFT OUTER JOIN users
-ON events.maybe_target_user_token = users.token
-ORDER BY events.id DESC
-LIMIT 25
-        "#,
-    )
-    .fetch_all(&server_state.mysql_pool)
-    .await;
 
-  let events : Vec<EventRecord> = match maybe_events {
-    Ok(events) => events,
-    Err(err) => {
-      match err {
-        sqlx::Error::RowNotFound => {
-          return Err(ListEventsError::ServerError);
-        },
-        _ => {
-          warn!("tts models list query error: {:?}", err);
-          return Err(ListEventsError::ServerError);
-        }
-      }
-    }
-  };
+  // NB: Since this is publicly exposed, we don't query sensitive data.
+  let events = list_public_event_feed_items(&server_state.mysql_pool)
+      .await
+      .map_err(|err| {
+        error!("error querying for event feed events: {:?}", err);
+        ListEventsError::ServerError
+      })?
+      .into_iter()
+      .map(|event| EventRecord {
+        event_token: event.event_token,
+        event_type: event.event_type,
+        maybe_target_user_token: event.maybe_target_user_token,
+        maybe_target_username: event.maybe_target_username,
+        maybe_target_display_name: event.maybe_target_display_name,
+        maybe_target_user_gravatar_hash: event.maybe_target_user_gravatar_hash,
+        maybe_target_entity_token: event.maybe_target_entity_token,
+        created_at: event.created_at,
+        updated_at: event.updated_at,
+      })
+      .collect();
 
   let response = ListEventsSuccessResponse {
     success: true,

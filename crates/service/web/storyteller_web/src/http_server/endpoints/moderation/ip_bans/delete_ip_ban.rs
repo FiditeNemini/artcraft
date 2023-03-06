@@ -1,7 +1,7 @@
 use actix_http::Error;
 use actix_http::http::header;
-use actix_web::cookie::Cookie;
 use actix_web::HttpResponseBuilder;
+use actix_web::cookie::Cookie;
 use actix_web::error::ResponseError;
 use actix_web::http::StatusCode;
 use actix_web::web::Path;
@@ -10,6 +10,7 @@ use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::http_server::web_utils::response_success_helpers::simple_json_success;
 use crate::server_state::ServerState;
 use crate::validations::model_uploads::validate_model_title;
+use database_queries::queries::ip_bans::toggle_ip_ban::{IpBanToggleState, toggle_ip_ban};
 use derive_more::{Display, Error};
 use log::{info, warn, log};
 use regex::Regex;
@@ -85,45 +86,21 @@ pub async fn delete_ip_ban_handler(
     return Err(DeleteIpBanError::Unauthorized);
   }
 
-  let query_result = if request.delete {
+  let toggle_action = if request.delete {
     info!("Deleting IP ban: {}", &path.ip_address);
+    IpBanToggleState::DeleteIpBan
 
-    sqlx::query!(
-        r#"
-UPDATE
-    ip_address_bans
-SET
-    mod_user_token = ?,
-    deleted_at = CURRENT_TIMESTAMP
-WHERE
-    ip_address = ?
-LIMIT 1
-        "#,
-      &user_session.user_token,
-      &path.ip_address,
-    )
-        .execute(&server_state.mysql_pool)
-        .await
   } else {
     info!("Restoring IP ban: {}", &path.ip_address);
-
-    sqlx::query!(
-        r#"
-UPDATE
-    ip_address_bans
-SET
-    mod_user_token = ?,
-    deleted_at = NULL
-WHERE
-    ip_address = ?
-LIMIT 1
-        "#,
-      &user_session.user_token,
-      &path.ip_address,
-    )
-        .execute(&server_state.mysql_pool)
-        .await
+    IpBanToggleState::CreateIpBan
   };
+
+  let query_result = toggle_ip_ban(
+    &path.ip_address,
+    &user_session.user_token,
+    toggle_action,
+    &server_state.mysql_pool
+  ).await;
 
   match query_result {
     Ok(_) => {},

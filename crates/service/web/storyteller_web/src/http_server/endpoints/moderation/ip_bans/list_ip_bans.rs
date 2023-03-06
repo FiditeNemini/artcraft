@@ -1,7 +1,7 @@
 use actix_http::Error;
 use actix_http::http::header;
-use actix_web::cookie::Cookie;
 use actix_web::HttpResponseBuilder;
+use actix_web::cookie::Cookie;
 use actix_web::error::ResponseError;
 use actix_web::http::StatusCode;
 use actix_web::web::Path;
@@ -11,8 +11,8 @@ use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::http_server::web_utils::response_success_helpers::simple_json_success;
 use crate::server_state::ServerState;
 use crate::validations::model_uploads::validate_model_title;
-use derive_more::{Display, Error};
-use log::{info, warn, log};
+use database_queries::queries::ip_bans::list_ip_bans::list_ip_bans;
+use log::{info, warn, log, error};
 use regex::Regex;
 use sqlx::error::DatabaseError;
 use sqlx::error::Error::Database;
@@ -38,7 +38,7 @@ pub struct IpBanRecordForList {
   pub updated_at: DateTime<Utc>,
 }
 
-#[derive(Debug, Display)]
+#[derive(Debug)]
 pub enum ListIpBansError {
   BadInput(String),
   ServerError,
@@ -62,6 +62,13 @@ impl ResponseError for ListIpBansError {
     };
 
     to_simple_json_error(&error_reason, self.status_code())
+  }
+}
+
+// NB: Not using derive_more::Display since Clion doesn't understand it.
+impl std::fmt::Display for ListIpBansError {
+  fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+    write!(f, "{:?}", self)
   }
 }
 
@@ -92,53 +99,27 @@ pub async fn list_ip_bans_handler(
     return Err(ListIpBansError::Unauthorized);
   }
 
-  // NB: Lookup failure is Err(RowNotFound).
-  let maybe_results = sqlx::query_as!(
-      IpBanRecordForList,
-        r#"
-SELECT
-    ip_bans.ip_address,
-
-    ip_bans.maybe_target_user_token,
-    banned_users.username as maybe_target_username,
-
-    ip_bans.mod_user_token,
-    mod_users.username as mod_username,
-    mod_users.display_name as mod_display_name,
-
-    ip_bans.mod_notes,
-    ip_bans.created_at,
-    ip_bans.updated_at
-FROM
-    ip_address_bans AS ip_bans
-LEFT OUTER JOIN users as banned_users
-    ON ip_bans.maybe_target_user_token = banned_users.token
-JOIN users as mod_users
-    ON ip_bans.mod_user_token = mod_users.token
-WHERE
-    ip_bans.deleted_at IS NULL
-        "#,
-    )
-      .fetch_all(&server_state.mysql_pool)
-      .await;
-
-  let results : Vec<IpBanRecordForList> = match maybe_results {
-    Ok(results) => {
-      info!("Results length: {}", results.len());
-      results
-    },
-    Err(err) => {
-      match err {
-        sqlx::Error::RowNotFound => {
-          Vec::new()
-        },
-        _ => {
-          warn!("list ip bans db error: {:?}", err);
-          return Err(ListIpBansError::ServerError);
+  let results = list_ip_bans(&server_state.mysql_pool)
+      .await
+      .map_err(|err| {
+        error!("list ip bans db error: {:?}", err);
+        ListIpBansError::ServerError
+      })?
+      .into_iter()
+      .map(|ban| {
+        IpBanRecordForList {
+          ip_address: ban.ip_address,
+          maybe_target_user_token: ban.maybe_target_user_token,
+          maybe_target_username: ban.maybe_target_username,
+          mod_user_token: ban.mod_user_token,
+          mod_username: ban.mod_username,
+          mod_display_name: ban.mod_display_name,
+          mod_notes: ban.mod_notes,
+          created_at: ban.created_at,
+          updated_at: ban.updated_at,
         }
-      }
-    }
-  };
+      })
+      .collect();
 
   let response = ListIpBansResponse {
     success: true,
