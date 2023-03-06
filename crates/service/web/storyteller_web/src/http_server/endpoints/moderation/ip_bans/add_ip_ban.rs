@@ -16,6 +16,7 @@ use sqlx::error::Error::Database;
 use sqlx::mysql::MySqlDatabaseError;
 use std::fmt;
 use std::sync::Arc;
+use database_queries::queries::ip_bans::upsert_ip_ban::{upsert_ip_ban, UpsertIpBanArgs};
 use user_input_common::validate_user_provided_ip_address::validate_user_provided_ip_address;
 
 #[derive(Deserialize)]
@@ -96,44 +97,17 @@ pub async fn add_ip_ban_handler(
 
   info!("Creating ban...");
 
-  let query_result = sqlx::query!(
-        r#"
-INSERT INTO
-    ip_address_bans
-SET
-    ip_address = ?,
-    maybe_target_user_token = ?,
-    mod_user_token = ?,
-    mod_notes = ?
-ON DUPLICATE KEY UPDATE
-    expires_at = NULL,
-    deleted_at = NULL,
-    ip_address = ?,
-    maybe_target_user_token = ?,
-    mod_user_token = ?,
-    mod_notes = ?
-        "#,
-      // Insert
-      &request.ip_address,
-      &request.maybe_target_user_token,
-      &user_session.user_token,
-      &request.mod_notes,
-      // Update
-      &ip_address,
-      &request.maybe_target_user_token,
-      &user_session.user_token,
-      &request.mod_notes,
-    )
-      .execute(&server_state.mysql_pool)
-      .await;
-
-  match query_result {
-    Ok(_) => {},
-    Err(err) => {
-      warn!("Add IP ban DB error: {:?}", err);
-      return Err(AddIpBanError::ServerError);
-    }
-  };
+  upsert_ip_ban(UpsertIpBanArgs {
+    ip_address,
+    maybe_target_user_token: request.maybe_target_user_token.as_deref(),
+    mod_user_token: &user_session.user_token,
+    mod_notes: &request.mod_notes,
+    mysql_pool: &server_state.mysql_pool,
+  }).await
+      .map_err(|err| {
+        warn!("Add IP ban DB error: {:?}", err);
+        AddIpBanError::ServerError
+      })?;
 
   Ok(simple_json_success())
 }
