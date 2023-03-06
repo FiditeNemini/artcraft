@@ -8,12 +8,12 @@ use actix_web::http::StatusCode;
 use actix_web::{web, HttpResponse, HttpRequest};
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::server_state::ServerState;
+use database_queries::queries::w2l::w2l_inference_jobs::insert_w2l_inference_job::{insert_w2l_inference_job, InsertW2lInferenceJobArgs};
 use enums::common::visibility::Visibility;
 use http_server_common::request::get_request_ip::get_request_ip;
 use log::{info, warn};
 use r2d2_redis::redis::Commands;
 use redis_common::redis_keys::RedisKeys;
-use sqlx::error::Error::Database;
 use std::fmt;
 use std::sync::Arc;
 
@@ -140,58 +140,22 @@ pub async fn infer_w2l_handler(
     unimplemented!("this isn't finished");
   }
 
-  let query_result = sqlx::query!(
-        r#"
-INSERT INTO w2l_inference_jobs
-SET
-  maybe_w2l_template_token = ?,
-  maybe_tts_inference_result_token = ?,
-  maybe_public_audio_bucket_location = NULL,
-  maybe_public_image_bucket_location = NULL,
-  maybe_creator_user_token = ?,
-  creator_ip_address = ?,
-  creator_set_visibility = ?,
-  status = "pending"
-        "#,
-      w2l_template_token,
-      tts_inference_result_token,
-      maybe_user_token,
-      ip_address,
-      creator_set_visibility
-    )
-    .execute(&server_state.mysql_pool)
-    .await;
+  // FIXME: NB: This is an old query that was somewhat modernized when moved.
+  //  All the same, do not copy this example!
 
-  let record_id = match query_result {
-    Ok(res) => {
-      res.last_insert_id()
-    },
-    Err(err) => {
-      warn!("New w2l inference job creation DB error: {:?}", err);
+  insert_w2l_inference_job(InsertW2lInferenceJobArgs {
+    w2l_template_token: &w2l_template_token,
+    tts_inference_result_token: &tts_inference_result_token,
+    maybe_user_token: maybe_user_token.as_deref(),
+    ip_address: &ip_address,
+    creator_set_visibility: &creator_set_visibility,
+    mysql_pool: &server_state.mysql_pool,
+  }).await
+      .map_err(|_err| {
+        InferW2lError::ServerError
+      })?;
 
-      // NB: SQLSTATE[23000]: Integrity constraint violation
-      // NB: MySQL Error Code 1062: Duplicate key insertion (this is harder to access)
-      match err {
-        Database(err) => {
-          let _maybe_code = err.code().map(|c| c.into_owned());
-          /*match maybe_code.as_deref() {
-            Some("23000") => {
-              if err.message().contains("username") {
-                return Err(UsernameTaken);
-              } else if err.message().contains("email_address") {
-                return Err(EmailTaken);
-              }
-            }
-            _ => {},
-          }*/
-        },
-        _ => {},
-      }
-      return Err(InferW2lError::ServerError);
-    }
-  };
-
-  info!("new w2l inference job id: {}", record_id);
+  //info!("new w2l inference job id: {}", record_id);
 
   let response = InferW2lSuccessResponse {
     success: true,
