@@ -24,6 +24,7 @@ use std::borrow::BorrowMut;
 use std::fmt;
 use std::ops::Deref;
 use std::sync::Arc;
+use database_queries::queries::tts::tts_inference_jobs::get_tts_inference_job_status::get_tts_inference_job_status;
 
 /// For the URL PathInfo
 #[derive(Deserialize)]
@@ -68,26 +69,6 @@ pub enum GetTtsInferenceStatusError {
   ServerError,
 }
 
-#[derive(Serialize)]
-pub struct TtsInferenceJobStatusRecord {
-  pub job_token: String,
-
-  pub status: String,
-  pub attempt_count: i32,
-
-  pub maybe_result_token: Option<String>,
-  pub maybe_public_bucket_wav_audio_path: Option<String>,
-
-  pub model_token: String,
-  pub tts_model_type: String,
-  pub title: String, // Name of the TTS model
-
-  pub raw_inference_text: String, // User text
-
-  pub created_at: DateTime<Utc>,
-  pub updated_at: DateTime<Utc>,
-}
-
 impl ResponseError for GetTtsInferenceStatusError {
   fn status_code(&self) -> StatusCode {
     match *self {
@@ -119,52 +100,14 @@ pub async fn get_tts_inference_job_status_handler(
 {
   // NB: Lookup failure is Err(RowNotFound).
   // NB: Since this is publicly exposed, we don't query sensitive data.
-  let maybe_status = sqlx::query_as!(
-      TtsInferenceJobStatusRecord,
-        r#"
-SELECT
-    jobs.token as job_token,
+  let maybe_status = get_tts_inference_job_status(&path.token, &server_state.mysql_pool).await;
 
-    jobs.status,
-    jobs.attempt_count,
-    jobs.on_success_result_token as maybe_result_token,
-    results.public_bucket_wav_audio_path as maybe_public_bucket_wav_audio_path,
-
-    jobs.model_token,
-    tts.tts_model_type,
-    tts.title,
-
-    jobs.raw_inference_text,
-
-    jobs.created_at,
-    jobs.updated_at
-
-FROM tts_inference_jobs as jobs
-JOIN tts_models as tts
-    ON tts.token = jobs.model_token
-LEFT OUTER JOIN tts_results as results
-    ON jobs.on_success_result_token = results.token
-
-WHERE jobs.token = ?
-        "#,
-      &path.token
-    )
-      .fetch_one(&server_state.mysql_pool)
-      .await; // TODO: This will return error if it doesn't exist
-
-  let record : TtsInferenceJobStatusRecord = match maybe_status {
-    Ok(record) => record,
+  let record = match maybe_status {
+    Ok(Some(record)) => record,
+    Ok(None) => return Err(GetTtsInferenceStatusError::ServerError),
     Err(err) => {
-      match err {
-        sqlx::Error::RowNotFound => {
-          warn!("tts job record not found");
-          return Err(GetTtsInferenceStatusError::ServerError);
-        },
-        _ => {
-          error!("tts job query error: {:?}", err);
-          return Err(GetTtsInferenceStatusError::ServerError);
-        }
-      }
+      error!("tts job query error: {:?}", err);
+      return Err(GetTtsInferenceStatusError::ServerError);
     }
   };
 
