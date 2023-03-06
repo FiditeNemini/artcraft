@@ -19,6 +19,7 @@ use sqlx::error::Error::Database;
 use sqlx::mysql::MySqlDatabaseError;
 use std::fmt;
 use std::sync::Arc;
+use database_queries::queries::users::user_roles::set_user_role::set_user_role;
 
 /// For the URL PathInfo
 #[derive(Deserialize)]
@@ -125,20 +126,11 @@ pub async fn set_user_role_handler(
     }
   };
 
-  let query_result = sqlx::query!(
-        r#"
-UPDATE users
-SET
-  user_role_slug = ?
-WHERE
-  token = ?
-LIMIT 1
-        "#,
-      &request.user_role_slug,
-      &target_user.user_token,
-    )
-      .execute(&server_state.mysql_pool)
-      .await;
+  let query_result = set_user_role(
+    &target_user.user_token,
+    &request.user_role_slug,
+    &server_state.mysql_pool,
+  ).await;
 
   match query_result {
     Ok(_) => {},
