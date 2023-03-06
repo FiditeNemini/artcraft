@@ -10,6 +10,7 @@ use chrono::{DateTime, Utc};
 use crate::AnyhowResult;
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::server_state::ServerState;
+use database_queries::queries::w2l::w2l_inference_jobs::get_w2l_inference_job_status::get_w2l_inference_job_status;
 use log::{info, warn, log};
 use r2d2_redis::redis::Commands;
 use redis_common::redis_keys::RedisKeys;
@@ -107,53 +108,20 @@ pub async fn get_w2l_inference_job_status_handler(
   path: Path<GetW2lInferenceStatusPathInfo>,
   server_state: web::Data<Arc<ServerState>>) -> Result<HttpResponse, GetW2lInferenceStatusError>
 {
-  // NB: Lookup failure is Err(RowNotFound).
   // NB: Since this is publicly exposed, we don't query sensitive data.
-  let maybe_status = sqlx::query_as!(
-      W2lInferenceJobStatusRecord,
-        r#"
-SELECT
-    jobs.token as job_token,
+  let maybe_status = get_w2l_inference_job_status(
+    &path.token,
+    &server_state.mysql_pool
+  ).await;
 
-    jobs.status,
-    jobs.attempt_count,
-    jobs.on_success_result_token as maybe_result_token,
-    results.public_bucket_video_path as maybe_public_bucket_video_path,
-
-    jobs.maybe_w2l_template_token,
-    w2l.template_type as w2l_template_type,
-    w2l.title,
-
-    jobs.created_at,
-    jobs.updated_at
-
-FROM w2l_inference_jobs as jobs
-JOIN w2l_templates as w2l
-    ON w2l.token = jobs.maybe_w2l_template_token
-LEFT OUTER JOIN w2l_results as results
-    ON jobs.on_success_result_token = results.token
-
-WHERE jobs.token = ?
-        "#,
-      &path.token
-    )
-      .fetch_one(&server_state.mysql_pool)
-      .await; // TODO: This will return error if it doesn't exist
-
-  let record : W2lInferenceJobStatusRecord = match maybe_status {
-    Ok(record) => record,
-    Err(err) => {
-      match err {
-        sqlx::Error::RowNotFound => {
-          return Err(GetW2lInferenceStatusError::ServerError);
-        },
-        _ => {
-          warn!("w2l template query error: {:?}", err);
-          return Err(GetW2lInferenceStatusError::ServerError);
-        }
-      }
-    }
-  };
+  let record = maybe_status
+      .map_err(|err| {
+        warn!("w2l template query error: {:?}", err);
+        GetW2lInferenceStatusError::ServerError
+      })?
+      .ok_or_else(|| {
+        GetW2lInferenceStatusError::ServerError // TODO: Not found
+      })?;
 
   let mut redis = server_state.redis_pool
       .get()
