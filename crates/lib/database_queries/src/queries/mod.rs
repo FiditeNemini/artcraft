@@ -6,6 +6,7 @@ pub mod health_check;
 pub mod ip_bans;
 pub mod media_uploads;
 pub mod model_categories;
+pub mod public_event_feed;
 pub mod stats;
 pub mod trending_model_analytics;
 pub mod tts;

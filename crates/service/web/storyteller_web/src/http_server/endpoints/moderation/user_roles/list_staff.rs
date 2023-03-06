@@ -1,7 +1,7 @@
 use actix_http::Error;
 use actix_http::http::header;
-use actix_web::cookie::Cookie;
 use actix_web::HttpResponseBuilder;
+use actix_web::cookie::Cookie;
 use actix_web::error::ResponseError;
 use actix_web::http::StatusCode;
 use actix_web::web::Path;
@@ -11,6 +11,7 @@ use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::http_server::web_utils::response_success_helpers::simple_json_success;
 use crate::server_state::ServerState;
 use crate::validations::model_uploads::validate_model_title;
+use database_queries::queries::users::user_roles::list_staff::list_staff;
 use derive_more::{Display, Error};
 use log::{info, warn, log, error};
 use regex::Regex;
@@ -18,8 +19,6 @@ use sqlx::error::DatabaseError;
 use sqlx::error::Error::Database;
 use sqlx::mysql::MySqlDatabaseError;
 use std::sync::Arc;
-use database_queries::queries::users::user_roles::list_staff::list_staff;
-
 
 #[derive(Serialize)]
 pub struct ListStaffResponse {
