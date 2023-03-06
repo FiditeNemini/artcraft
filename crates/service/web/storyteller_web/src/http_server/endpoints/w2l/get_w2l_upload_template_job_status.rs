@@ -20,6 +20,7 @@ use sqlx::error::DatabaseError;
 use sqlx::error::Error::Database;
 use sqlx::mysql::MySqlDatabaseError;
 use std::sync::Arc;
+use database_queries::queries::w2l::w2l_template_upload_jobs::get_w2l_template_upload_job_status::get_w2l_template_upload_job_status;
 
 /// For the URL PathInfo
 #[derive(Deserialize)]
@@ -94,46 +95,17 @@ pub async fn get_w2l_upload_template_job_status_handler(
   path: Path<GetW2lUploadTemplateStatusPathInfo>,
   server_state: web::Data<Arc<ServerState>>) -> Result<HttpResponse, GetW2lUploadTemplateStatusError>
 {
-  // NB: Lookup failure is Err(RowNotFound).
   // NB: Since this is publicly exposed, we don't query sensitive data.
-  let maybe_status = sqlx::query_as!(
-      W2lUploadTemplateJobStatusRecord,
-        r#"
-SELECT
-    jobs.token as job_token,
-
-    jobs.status,
-    jobs.attempt_count,
-    jobs.on_success_result_token as maybe_template_token,
-
-    jobs.failure_reason as maybe_failure_reason,
-
-    jobs.created_at,
-    jobs.updated_at
-
-FROM w2l_template_upload_jobs as jobs
-
-WHERE jobs.token = ?
-        "#,
-      &path.token
-    )
-      .fetch_one(&server_state.mysql_pool)
-      .await; // TODO: This will return error if it doesn't exist
-
-  let record : W2lUploadTemplateJobStatusRecord = match maybe_status {
-    Ok(record) => record,
-    Err(err) => {
-      match err {
-        sqlx::Error::RowNotFound => {
-          return Err(GetW2lUploadTemplateStatusError::ServerError);
-        },
-        _ => {
-          warn!("w2l template query error: {:?}", err);
-          return Err(GetW2lUploadTemplateStatusError::ServerError);
-        }
-      }
-    }
-  };
+  let record = get_w2l_template_upload_job_status(&path.token, &server_state.mysql_pool)
+      .await
+      .map_err(|e| {
+        warn!("database error: {:?}", e);
+        GetW2lUploadTemplateStatusError::ServerError
+      })?
+      .ok_or_else(|| {
+        warn!("no w2l template upload job found with token: {}", &path.token);
+        GetW2lUploadTemplateStatusError::ServerError
+      })?;
 
   let mut redis = server_state.redis_pool
       .get()
