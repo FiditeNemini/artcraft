@@ -18,6 +18,7 @@ use sqlx::error::Error::Database;
 use sqlx::mysql::MySqlDatabaseError;
 use std::fmt;
 use std::sync::Arc;
+use database_queries::queries::w2l::w2l_templates::set_w2l_template_mod_approval::set_w2l_template_mod_approval;
 
 /// For the URL PathInfo
 #[derive(Deserialize)]
@@ -117,23 +118,12 @@ pub async fn set_w2l_template_mod_approval_handler(
 
   let ip_address = get_request_ip(&http_request);
 
-  let query_result = sqlx::query!(
-        r#"
-UPDATE w2l_templates
-SET
-  is_public_listing_approved = ?,
-  maybe_mod_user_token = ?
-WHERE
-  token = ?
-LIMIT 1
-        "#,
-
-      &request.is_approved,
-      &user_session.user_token,
-      &path.token,
-    )
-      .execute(&server_state.mysql_pool)
-      .await;
+  let query_result = set_w2l_template_mod_approval(
+    &path.token,
+    &user_session.user_token,
+    request.is_approved,
+    &server_state.mysql_pool,
+  ).await;
 
   match query_result {
     Ok(_) => {},
@@ -142,6 +132,7 @@ LIMIT 1
       return Err(SetW2lTemplateModApprovalError::ServerError);
     }
   };
+
   let response = SetW2lTemplateModApprovalSuccessResponse {
     success: true,
   };
