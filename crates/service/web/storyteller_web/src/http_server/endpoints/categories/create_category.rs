@@ -9,6 +9,7 @@ use actix_web::{Responder, web, HttpResponse, error, HttpRequest};
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::http_server::web_utils::response_success_helpers::simple_json_success;
 use crate::server_state::ServerState;
+use database_queries::queries::model_categories::create_category::{create_category, CreateCategoryArgs};
 use database_queries::tokens::Tokens;
 use http_server_common::request::get_request_ip::get_request_ip;
 use http_server_common::response::serialize_as_json_error::serialize_as_json_error;
@@ -157,41 +158,20 @@ pub async fn create_category_handler(
         .unwrap_or(DEFAULT_CAN_ONLY_MODS_APPLY);
   }
 
-  let query_result = sqlx::query!(
-        r#"
-INSERT INTO model_categories
-SET
-    token = ?,
-    uuid_idempotency_token = ?,
-    model_type = ?,
-    name = ?,
-
-    creator_user_token = ?,
-    creator_ip_address_creation = ?,
-    creator_ip_address_last_update = ?,
-
-    is_mod_approved = ?,
-    maybe_mod_user_token = ?,
-    can_directly_have_models = ?,
-    can_have_subcategories = ?,
-    can_only_mods_apply = ?
-        "#,
-
-    category_token,
-    idempotency_token,
+  let query_result = create_category(CreateCategoryArgs {
+    category_token: &category_token,
+    idempotency_token: &idempotency_token,
     model_type,
-    name,
-    &user_session.user_token,
-    &creator_ip_address,
-    &creator_ip_address,
+    name: &name,
+    creator_user_token: &user_session.user_token,
+    creator_ip_address: &creator_ip_address,
     is_mod_approved,
-    maybe_mod_user_token,
+    maybe_mod_user_token: maybe_mod_user_token.as_deref(),
     can_directly_have_models,
     can_have_subcategories,
-    can_only_mods_apply
-  )
-  .execute(&server_state.mysql_pool)
-    .await;
+    can_only_mods_apply,
+    mysql_pool: &server_state.mysql_pool,
+  }).await;
 
   match query_result {
     Ok(_) => {},
