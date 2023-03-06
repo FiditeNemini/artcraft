@@ -9,6 +9,7 @@ use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::http_server::web_utils::response_success_helpers::simple_json_success;
 use crate::http_server::web_utils::serialize_as_json_error::serialize_as_json_error;
 use crate::server_state::ServerState;
+use database_queries::queries::users::user::set_user_ban_status::{set_user_ban_status, SetUserBanStatsArgs};
 use database_queries::queries::users::user_profiles::get_user_profile_by_username::get_user_profile_by_username;
 use log::{info, warn, log};
 use regex::Regex;
@@ -131,33 +132,17 @@ pub async fn ban_user_handler(
     }
   };
 
-  let query_result = sqlx::query!(
-        r#"
-UPDATE users
-SET
-    is_banned = ?,
-    maybe_mod_comments = ?,
-    maybe_mod_user_token  = ?,
-    version = version + 1
-
-WHERE users.token = ?
-LIMIT 1
-        "#,
-      &request.is_banned,
-      &request.mod_notes,
-      &user_session.user_token,
-      &user_profile.user_token
-    )
-    .execute(&server_state.mysql_pool)
-    .await;
-
-  match query_result {
-    Ok(_) => {},
-    Err(err) => {
-      warn!("Add IP ban DB error: {:?}", err);
-      return Err(BanUserErrorResponse::server_error());
-    }
-  };
+  set_user_ban_status(SetUserBanStatsArgs {
+    subject_user_token: &user_profile.user_token,
+    is_banned: request.is_banned,
+    mod_user_token: &user_session.user_token_typed,
+    maybe_mod_comments: Some(&request.mod_notes),
+    mysql_pool: &server_state.mysql_pool,
+  }).await
+      .map_err(|err| {
+        warn!("Add IP ban DB error: {:?}", err);
+        BanUserErrorResponse::server_error()
+      })?;
 
   Ok(simple_json_success())
 }
