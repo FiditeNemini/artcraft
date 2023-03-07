@@ -2,7 +2,7 @@ use anyhow::anyhow;
 use sqlx::MySqlPool;
 use errors::AnyhowResult;
 
-#[derive(Serialize, Debug)]
+#[derive(Debug)]
 pub struct PendingCountResult {
   pub seconds_since_first: i64,
   pub pending_count: i64,

@@ -10,13 +10,14 @@ use chrono::{DateTime, Utc};
 use crate::http_server::web_utils::response_success_helpers::simple_json_success;
 use crate::http_server::web_utils::serialize_as_json_error::serialize_as_json_error;
 use crate::server_state::ServerState;
-use log::{info, warn, log};
+use log::{info, warn, log, error};
 use regex::Regex;
 use sqlx::error::DatabaseError;
 use sqlx::error::Error::Database;
 use sqlx::mysql::MySqlDatabaseError;
 use std::fmt;
 use std::sync::Arc;
+use database_queries::queries::w2l::w2l_inference_jobs::get_pending_w2l_inference_job_detailed_stats::{get_pending_w2l_inference_job_detailed_stats, PendingCountResult};
 
 #[derive(Serialize)]
 pub struct GetW2lInferenceQueueCountResponse {
@@ -79,45 +80,19 @@ pub async fn get_w2l_inference_queue_count_handler(
     return Err(GetW2lInferenceQueueCountError::Unauthorized);
   }
 
-  // NB: Lookup failure is Err(RowNotFound).
-  let maybe_result = sqlx::query_as!(
-      PendingCountResult,
-        r#"
-SELECT
-  NOW() - t2.created_at AS seconds_since_first,
-  (
-    SELECT
-      count(t1.id) as pending_count
-    FROM w2l_inference_jobs AS t1
-    WHERE t1.status = "pending"
-  ) as pending_count
-FROM w2l_inference_jobs AS t2
-WHERE t2.status = "pending"
-ORDER BY t2.id ASC
-LIMIT 1
-        "#,
-    )
-      .fetch_one(&server_state.mysql_pool)
-      .await;
-
-  let result : PendingCountResult = match maybe_result {
-    Ok(result) => result,
-    Err(err) => {
-      match err {
-        sqlx::Error::RowNotFound => {
-          // NB: Not Found for null results means nothing is pending in the queue
-          PendingCountResult {
-            pending_count: None,
-            seconds_since_first: 0,
-          }
-        },
-        _ => {
-          warn!("get w2l pending count error: {:?}", err);
-          return Err(GetW2lInferenceQueueCountError::ServerError)
+  let result = get_pending_w2l_inference_job_detailed_stats(&server_state.mysql_pool)
+      .await
+      .map_err(|err| {
+        error!("get w2l pending count error: {:?}", err);
+        GetW2lInferenceQueueCountError::ServerError
+      })?
+      .unwrap_or(
+        // NB: Not Found for null results means nothing is pending in the queue
+        PendingCountResult {
+          pending_count: None,
+          seconds_since_first: 0,
         }
-      }
-    },
-  };
+      );
 
   let response = GetW2lInferenceQueueCountResponse {
     success: true,
@@ -131,10 +106,4 @@ LIMIT 1
   Ok(HttpResponse::Ok()
       .content_type("application/json")
       .body(body))
-}
-
-#[derive(Serialize)]
-pub struct PendingCountResult {
-  pub pending_count: Option<i64>,
-  pub seconds_since_first: i64,
 }
