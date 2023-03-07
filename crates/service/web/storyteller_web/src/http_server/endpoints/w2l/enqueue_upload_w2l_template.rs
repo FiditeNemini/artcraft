@@ -10,11 +10,10 @@ use config::is_bad_video_download_url::is_bad_video_download_url;
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::server_state::ServerState;
 use crate::validations::model_uploads::validate_model_title;
-use database_queries::tokens::Tokens;
+use database_queries::queries::w2l::w2l_template_upload_jobs::insert_w2l_template_upload_job::{insert_w2l_template_upload_job, InsertW2lTemplateUploadJobArgs};
 use enums::common::visibility::Visibility;
 use http_server_common::request::get_request_ip::get_request_ip;
-use log::{info, warn};
-use sqlx::error::Error::Database;
+use log::warn;
 use std::fmt;
 use std::sync::Arc;
 use user_input_common::check_for_slurs::contains_slurs;
@@ -133,70 +132,20 @@ pub async fn upload_w2l_template_handler(
   let template_type = "unknown".to_string();
   let creator_set_visibility = "public".to_string();
 
-  // This token is returned to the client.
-  let job_token = Tokens::new_w2l_template_upload_job()
-    .map_err(|_e| {
-      warn!("Error creating token");
-      UploadW2lTemplateError::ServerError
-    })?;
-
-
-  let query_result = sqlx::query!(
-        r#"
-INSERT INTO w2l_template_upload_jobs
-SET
-  token = ?,
-  uuid_idempotency_token = ?,
-  creator_user_token = ?,
-  creator_ip_address = ?,
-  creator_set_visibility = ?,
-  title = ?,
-  template_type = ?,
-  download_url = ?,
-  status = "pending"
-        "#,
-        job_token.to_string(),
-        uuid.to_string(),
-        user_session.user_token.to_string(),
-        ip_address.to_string(),
-        creator_set_visibility.to_string(),
-        title.to_string(),
-        template_type,
-        download_url,
-    )
-    .execute(&server_state.mysql_pool)
-    .await;
-
-  let record_id = match query_result {
-    Ok(res) => {
-      res.last_insert_id()
-    },
-    Err(err) => {
-      warn!("New w2l template upload creation DB error: {:?}", err);
-
-      // NB: SQLSTATE[23000]: Integrity constraint violation
-      // NB: MySQL Error Code 1062: Duplicate key insertion (this is harder to access)
-      match err {
-        Database(err) => {
-          let _maybe_code = err.code().map(|c| c.into_owned());
-          /*match maybe_code.as_deref() {
-            Some("23000") => {
-              if err.message().contains("username") {
-                return Err(UsernameTaken);
-              } else if err.message().contains("email_address") {
-                return Err(EmailTaken);
-              }
-            }
-            _ => {},
-          }*/
-        },
-        _ => {},
-      }
-      return Err(UploadW2lTemplateError::ServerError);
-    }
-  };
-
-  info!("new w2l template upload job id: {}", record_id);
+  let job_token = insert_w2l_template_upload_job(InsertW2lTemplateUploadJobArgs {
+    uuid: &uuid,
+    creator_user_token: user_session.user_token.as_str(),
+    creator_ip_address: &ip_address,
+    creator_set_visibility: &creator_set_visibility,
+    title: &title,
+    template_type: &template_type,
+    download_url: &download_url,
+    mysql_pool: &server_state.mysql_pool,
+  }).await
+      .map_err(|err| {
+        warn!("New w2l template upload creation DB error: {:?}", err);
+        UploadW2lTemplateError::ServerError
+      })?;
 
   server_state.firehose_publisher.enqueue_w2l_template_upload(&user_session.user_token, &job_token)
     .await
