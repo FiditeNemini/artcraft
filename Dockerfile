@@ -55,7 +55,8 @@ RUN $HOME/.cargo/bin/cargo --version
 FROM rust-base AS planner
 
 # NB: Copying in everything does not appear to impact cached builds if irrelevant files are changed (at least at this step)
-COPY . .
+# TODO(bt,2023-03-08): builds are failing with "no space left on device"; disabling build caching
+#COPY . .
 # TODO(bt,2023-03-08): builds are failing with "no space left on device"; disabling build caching
 #RUN $HOME/.cargo/bin/cargo chef prepare --recipe-path recipe.json
 
