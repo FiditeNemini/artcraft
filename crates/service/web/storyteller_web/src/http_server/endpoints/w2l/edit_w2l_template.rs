@@ -13,10 +13,10 @@ use crate::server_state::ServerState;
 use database_queries::queries::w2l::w2l_templates::get_w2l_template::select_w2l_template_by_token;
 use enums::common::visibility::Visibility;
 use http_server_common::request::get_request_ip::get_request_ip;
-use log::{info, warn};
-use sqlx::MySqlPool;
+use log::{error, info, warn};
 use std::fmt;
 use std::sync::Arc;
+use database_queries::queries::w2l::w2l_templates::edit_w2l_template::{CreatorOrModFields, edit_w2l_template, EditW2lTemplateArgs, ModFields};
 use user_input_common::check_for_slurs::contains_slurs;
 use user_input_common::markdown_to_html::markdown_to_html;
 
@@ -82,7 +82,7 @@ impl fmt::Display for EditW2lTemplateError {
 pub async fn edit_w2l_template_handler(
   http_request: HttpRequest,
   path: Path<EditW2lTemplatePathInfo>,
-  request: web::Json<EditW2lTemplateRequest>,
+  request: Json<EditW2lTemplateRequest>,
   server_state: web::Data<Arc<ServerState>>) -> Result<HttpResponse, EditW2lTemplateError>
 {
   let maybe_user_session = server_state
@@ -174,119 +174,35 @@ pub async fn edit_w2l_template_handler(
 
   let ip_address = get_request_ip(&http_request);
 
-  let query_result = if is_author {
-    // We need to store the IP address details.
-    sqlx::query!(
-        r#"
-UPDATE w2l_templates
-SET
-    title = ?,
-    description_markdown = ?,
-    description_rendered_html = ?,
-    creator_set_visibility = ?,
-    creator_ip_address_last_update = ?,
-    version = version + 1
-WHERE token = ?
-LIMIT 1
-        "#,
-      &title,
-      &description_markdown,
-      &description_html,
-      &creator_set_visibility.to_str(),
-      &ip_address,
-      &template_record.template_token,
-    )
-        .execute(&server_state.mysql_pool)
-        .await
-  } else {
-    // We need to store the moderator details.
-    sqlx::query!(
-        r#"
-UPDATE w2l_templates
-SET
-    title = ?,
-    description_markdown = ?,
-    description_rendered_html = ?,
-    creator_set_visibility = ?,
-    maybe_mod_user_token = ?,
-    version = version + 1
-WHERE token = ?
-LIMIT 1
-        "#,
-      &title,
-      &description_markdown,
-      &description_html,
-      &creator_set_visibility.to_str(),
-      &user_session.user_token,
-      &template_record.template_token,
-    )
-        .execute(&server_state.mysql_pool)
-        .await
+  let args = EditW2lTemplateArgs {
+    w2l_template_token: &template_record.template_token,
+    title: title.as_deref(),
+    description_markdown: description_markdown.as_deref(),
+    description_rendered_html: description_html.as_deref(),
+    creator_set_visibility,
+    role_dependent_fields: if is_author {
+      CreatorOrModFields::CreatorFields {
+        creator_ip_address: &ip_address,
+      }
+    } else {
+      CreatorOrModFields::ModFields(ModFields {
+        mod_user_token: &user_session.user_token,
+        is_public_listing_approved: request.is_public_listing_approved.unwrap_or(false),
+        is_locked_from_user_modification: request.is_locked_from_user_modification.unwrap_or(false),
+        is_locked_from_use: request.is_locked_from_use.unwrap_or(false),
+        maybe_mod_comments: request.maybe_mod_comments.as_deref(),
+      })
+    },
+    mysql_pool: &server_state.mysql_pool,
   };
 
-  match query_result {
-    Ok(_) => {},
-    Err(err) => {
-      warn!("Update W2L template edit DB error: {:?}", err);
-      return Err(EditW2lTemplateError::ServerError);
-    }
-  };
-
-  // TODO: This is lazy and suboptimal af to UPDATE again.
-  //  The reason we're doing this is because `sqlx` only does static type checking of queries
-  //  with string literals. It does not support dynamic query building, thus the PREDICATES
-  //  MUST BE HELD CONSTANT (at least in type signature). :(
-  if is_mod {
-    update_mod_details(
-      &request,
-      &user_session.user_token,
-      &template_record.template_token,
-      &server_state.mysql_pool
-    ).await?;
-  }
+  edit_w2l_template(args)
+      .await
+      .map_err(|err| {
+        error!("Update W2L template DB error: {:?}", err);
+        EditW2lTemplateError::ServerError
+      })?;
 
   Ok(simple_json_success())
 }
 
-async fn update_mod_details(
-  request: &Json<EditW2lTemplateRequest>,
-  mod_user_token: &str,
-  template_token: &str,
-  mysql_pool: &MySqlPool
-) -> Result<(), EditW2lTemplateError> {
-
-  let is_public_listing_approved= request.is_public_listing_approved.unwrap_or(false);
-  let is_locked_from_user_modification = request.is_locked_from_user_modification.unwrap_or(false);
-  let is_locked_from_use = request.is_locked_from_use.unwrap_or(false);
-
-  let query_result = sqlx::query!(
-        r#"
-UPDATE w2l_templates
-SET
-    is_public_listing_approved = ?,
-    is_locked_from_user_modification = ?,
-    is_locked_from_use = ?,
-    maybe_mod_comments = ?,
-    maybe_mod_user_token = ?,
-    version = version + 1
-WHERE token = ?
-LIMIT 1
-        "#,
-      is_public_listing_approved,
-      is_locked_from_user_modification,
-      is_locked_from_use,
-      request.maybe_mod_comments,
-      mod_user_token,
-      template_token
-    )
-      .execute(mysql_pool)
-      .await;
-
-  match query_result {
-    Ok(_) => Ok(()),
-    Err(err) => {
-      warn!("Update W2L template (mod details) DB error: {:?}", err);
-      Err(EditW2lTemplateError::ServerError)
-    }
-  }
-}
