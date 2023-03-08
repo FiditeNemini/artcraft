@@ -13,9 +13,10 @@ use crate::server_state::ServerState;
 use database_queries::queries::w2l::w2l_results::query_w2l_result::select_w2l_result_by_token;
 use enums::common::visibility::Visibility;
 use http_server_common::request::get_request_ip::get_request_ip;
-use log::warn;
+use log::{error, warn};
 use std::fmt;
 use std::sync::Arc;
+use database_queries::queries::w2l::w2l_results::edit_w2l_result::{CreatorOrModFields, edit_w2l_result, EditW2lResultArgs};
 
 /// For the URL PathInfo
 #[derive(Deserialize)]
@@ -134,50 +135,27 @@ pub async fn edit_w2l_inference_result_handler(
 
   let ip_address = get_request_ip(&http_request);
 
-  let query_result = if is_author {
-    // TODO: Don't update the original IP address. Create a new field.
-    // We need to store the IP address details.
-    sqlx::query!(
-        r#"
-UPDATE w2l_results
-SET
-    creator_set_visibility = ?,
-    creator_ip_address = ?
-WHERE token = ?
-LIMIT 1
-        "#,
-      &creator_set_visibility.to_str(),
-      &ip_address,
-      &inference_result.w2l_result_token,
-    )
-        .execute(&server_state.mysql_pool)
-        .await
-  } else {
-    // We need to store the moderator details.
-    sqlx::query!(
-        r#"
-UPDATE w2l_results
-SET
-    creator_set_visibility = ?,
-    maybe_mod_user_token = ?
-WHERE token = ?
-LIMIT 1
-        "#,
-      &creator_set_visibility.to_str(),
-      &user_session.user_token,
-      &inference_result.w2l_result_token,
-    )
-        .execute(&server_state.mysql_pool)
-        .await
+  let args = EditW2lResultArgs {
+    w2l_result_token: &inference_result.w2l_result_token,
+    creator_set_visibility,
+    role_dependent_fields: if is_author {
+      CreatorOrModFields::CreatorFields {
+        creator_ip_address: &ip_address,
+      }
+    } else {
+      CreatorOrModFields::ModFields {
+        mod_user_token: &user_session.user_token,
+      }
+    },
+    mysql_pool: &server_state.mysql_pool,
   };
 
-  match query_result {
-    Ok(_) => {},
-    Err(err) => {
-      warn!("Update W2L result DB error: {:?}", err);
-      return Err(EditW2lResultError::ServerError);
-    }
-  };
+  edit_w2l_result(args)
+      .await
+      .map_err(|err| {
+        error!("Update W2L result DB error: {:?}", err);
+        EditW2lResultError::ServerError
+      })?;
 
   Ok(simple_json_success())
 }
