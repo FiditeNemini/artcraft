@@ -100,7 +100,13 @@ impl<S> Service<ServiceRequest> for PushbackFilterMiddleware<S>
 
     if !can_bypass_filter {
       // Don't kill the load balancer!
-      can_bypass_filter = req.path().starts_with("/_status");
+      //
+      // - `/` is used by the K8s load balancer:
+      //       gcloud compute health-checks describe k8s1-30d9a0ff-storyteller-storyteller-service-8080-0a8fb2fe
+      //
+      // - `/_status` is used by the K8s pod scheduler.
+      //
+      can_bypass_filter = req.path().starts_with("/_status") || req.path().eq("/");
     }
 
     if !can_bypass_filter {
