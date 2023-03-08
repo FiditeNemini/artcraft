@@ -106,59 +106,60 @@ RUN SQLX_OFFLINE=true \
   --release \
   --bin storyteller-web
 
-RUN SQLX_OFFLINE=true \
-  LD_LIBRARY_PATH=/usr/lib:${LD_LIBRARY_PATH} \
-  $HOME/.cargo/bin/cargo build \
-  --release \
-  --bin analytics-job
-
-RUN SQLX_OFFLINE=true \
-  LD_LIBRARY_PATH=/usr/lib:${LD_LIBRARY_PATH} \
-  $HOME/.cargo/bin/cargo build \
-  --release \
-  --bin download-job
-
-RUN SQLX_OFFLINE=true \
-  LD_LIBRARY_PATH=/usr/lib:${LD_LIBRARY_PATH} \
-  $HOME/.cargo/bin/cargo build \
-  --release \
-  --bin inference-job
-
-RUN SQLX_OFFLINE=true \
-  LD_LIBRARY_PATH=/usr/lib:${LD_LIBRARY_PATH} \
-  $HOME/.cargo/bin/cargo build \
-  --release \
-  --bin tts-download-job
-
-RUN SQLX_OFFLINE=true \
-  LD_LIBRARY_PATH=/usr/lib:${LD_LIBRARY_PATH} \
-  $HOME/.cargo/bin/cargo build \
-  --release \
-  --bin w2l-download-job
-
-RUN SQLX_OFFLINE=true \
-  LD_LIBRARY_PATH=/usr/lib:${LD_LIBRARY_PATH} \
-  $HOME/.cargo/bin/cargo build \
-  --release \
-  --bin tts-inference-job
-
-RUN SQLX_OFFLINE=true \
-  LD_LIBRARY_PATH=/usr/lib:${LD_LIBRARY_PATH} \
-  $HOME/.cargo/bin/cargo build \
-  --release \
-  --bin w2l-inference-job
-
-RUN SQLX_OFFLINE=true \
-  LD_LIBRARY_PATH=/usr/lib:${LD_LIBRARY_PATH} \
-  $HOME/.cargo/bin/cargo build \
-  --release \
-  --bin websocket-gateway
-
-RUN SQLX_OFFLINE=true \
-  LD_LIBRARY_PATH=/usr/lib:${LD_LIBRARY_PATH} \
-  $HOME/.cargo/bin/cargo build \
-  --release \
-  --bin twitch-pubsub-subscriber
+# TODO(bt,2023-03-08): disabling these to build web artifact faster during outage
+# RUN SQLX_OFFLINE=true \
+#   LD_LIBRARY_PATH=/usr/lib:${LD_LIBRARY_PATH} \
+#   $HOME/.cargo/bin/cargo build \
+#   --release \
+#   --bin analytics-job
+#
+# RUN SQLX_OFFLINE=true \
+#   LD_LIBRARY_PATH=/usr/lib:${LD_LIBRARY_PATH} \
+#   $HOME/.cargo/bin/cargo build \
+#   --release \
+#   --bin download-job
+#
+# RUN SQLX_OFFLINE=true \
+#   LD_LIBRARY_PATH=/usr/lib:${LD_LIBRARY_PATH} \
+#   $HOME/.cargo/bin/cargo build \
+#   --release \
+#   --bin inference-job
+#
+# RUN SQLX_OFFLINE=true \
+#   LD_LIBRARY_PATH=/usr/lib:${LD_LIBRARY_PATH} \
+#   $HOME/.cargo/bin/cargo build \
+#   --release \
+#   --bin tts-download-job
+#
+# RUN SQLX_OFFLINE=true \
+#   LD_LIBRARY_PATH=/usr/lib:${LD_LIBRARY_PATH} \
+#   $HOME/.cargo/bin/cargo build \
+#   --release \
+#   --bin w2l-download-job
+#
+# RUN SQLX_OFFLINE=true \
+#   LD_LIBRARY_PATH=/usr/lib:${LD_LIBRARY_PATH} \
+#   $HOME/.cargo/bin/cargo build \
+#   --release \
+#   --bin tts-inference-job
+#
+# RUN SQLX_OFFLINE=true \
+#   LD_LIBRARY_PATH=/usr/lib:${LD_LIBRARY_PATH} \
+#   $HOME/.cargo/bin/cargo build \
+#   --release \
+#   --bin w2l-inference-job
+#
+# RUN SQLX_OFFLINE=true \
+#   LD_LIBRARY_PATH=/usr/lib:${LD_LIBRARY_PATH} \
+#   $HOME/.cargo/bin/cargo build \
+#   --release \
+#   --bin websocket-gateway
+#
+# RUN SQLX_OFFLINE=true \
+#   LD_LIBRARY_PATH=/usr/lib:${LD_LIBRARY_PATH} \
+#   $HOME/.cargo/bin/cargo build \
+#   --release \
+#   --bin twitch-pubsub-subscriber
 
 # Print a report on disk space
 #RUN echo "Disk usage at root (after all builds):"
@@ -190,15 +191,16 @@ RUN echo -n ${GIT_SHA} > GIT_SHA
 
 # Copy all the binaries.
 COPY --from=builder /tmp/target/release/storyteller-web /
-COPY --from=builder /tmp/target/release/analytics-job /
-COPY --from=builder /tmp/target/release/download-job /
-COPY --from=builder /tmp/target/release/inference-job /
-COPY --from=builder /tmp/target/release/tts-download-job /
-COPY --from=builder /tmp/target/release/tts-inference-job /
-COPY --from=builder /tmp/target/release/w2l-download-job /
-COPY --from=builder /tmp/target/release/w2l-inference-job /
-COPY --from=builder /tmp/target/release/websocket-gateway /
-COPY --from=builder /tmp/target/release/twitch-pubsub-subscriber /
+# TODO(bt,2023-03-08): disabling these to build web artifact faster during outage
+#COPY --from=builder /tmp/target/release/analytics-job /
+#COPY --from=builder /tmp/target/release/download-job /
+#COPY --from=builder /tmp/target/release/inference-job /
+#COPY --from=builder /tmp/target/release/tts-download-job /
+#COPY --from=builder /tmp/target/release/tts-inference-job /
+#COPY --from=builder /tmp/target/release/w2l-download-job /
+#COPY --from=builder /tmp/target/release/w2l-inference-job /
+#COPY --from=builder /tmp/target/release/websocket-gateway /
+#COPY --from=builder /tmp/target/release/twitch-pubsub-subscriber /
 
 # SSL certs are required for crypto
 COPY --from=builder /etc/ssl /etc/ssl
