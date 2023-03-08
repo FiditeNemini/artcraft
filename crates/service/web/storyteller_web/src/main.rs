@@ -61,7 +61,7 @@ use crate::configs::static_api_tokens::{StaticApiTokenConfig, StaticApiTokens, S
 use crate::http_server::middleware::ip_filter_middleware::IpFilter;
 use crate::http_server::web_utils::redis_rate_limiter::RedisRateLimiter;
 use crate::routes::add_routes;
-use crate::server_state::{ServerState, EnvConfig, TwitchOauthSecrets, TwitchOauth, RedisRateLimiters, InMemoryCaches, StripeSettings, ServerInfo};
+use crate::server_state::{ServerState, EnvConfig, TwitchOauthSecrets, TwitchOauth, RedisRateLimiters, InMemoryCaches, StripeSettings, ServerInfo, ServiceFlags};
 use crate::threads::db_health_checker_thread::db_health_check_status::HealthCheckStatus;
 use crate::threads::db_health_checker_thread::db_health_checker_thread::db_health_checker_thread;
 use crate::threads::ip_banlist_set::IpBanlistSet;
@@ -336,6 +336,10 @@ async fn main() -> AnyhowResult<()> {
   let server_environment = ServerEnvironment::from_str(&easyenv::get_env_string_required("SERVER_ENVIRONMENT")?)
       .ok_or(anyhow!("invalid server environment"))?;
 
+  let service_feature_flags = ServiceFlags {
+    disable_tts_queue_length: easyenv::get_env_bool_or_default("FF_DISABLE_TTS_QUEUE_LENGTH", false),
+  };
+
   let third_party_url_redirector = ThirdPartyUrlRedirector::new(server_environment);
 
   let stripe_client = {
@@ -367,6 +371,7 @@ async fn main() -> AnyhowResult<()> {
     },
     hostname: server_hostname,
     server_environment,
+    flags: service_feature_flags,
     third_party_url_redirector,
     health_check_status,
     mysql_pool: pool,

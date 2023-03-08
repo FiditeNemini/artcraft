@@ -35,6 +35,9 @@ pub struct ServerState {
   /// Knowing if we're in production will allow us to turn off development-only functionalities.
   pub server_environment: ServerEnvironment,
 
+  /// Feature flags will allow us to restart the service with different conditions embedded in the code.
+  pub flags: ServiceFlags,
+
   pub third_party_url_redirector: ThirdPartyUrlRedirector,
 
   pub health_check_status: HealthCheckStatus,
@@ -147,4 +150,11 @@ pub struct InMemoryCaches {
 pub struct StripeSettings {
   pub config: StripeConfig,
   pub client: stripe::Client,
+}
+
+
+/// Flags set at service startup
+#[derive(Clone)]
+pub struct ServiceFlags {
+  pub disable_tts_queue_length: bool,
 }
