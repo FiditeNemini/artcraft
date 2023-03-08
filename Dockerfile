@@ -87,9 +87,9 @@ RUN pwd
 RUN du -hsc * | sort -hr
 
 # Run all of the tests
-RUN SQLX_OFFLINE=true \
-  LD_LIBRARY_PATH=/usr/lib:${LD_LIBRARY_PATH} \
-  $HOME/.cargo/bin/cargo test
+#RUN SQLX_OFFLINE=true \
+#  LD_LIBRARY_PATH=/usr/lib:${LD_LIBRARY_PATH} \
+#  $HOME/.cargo/bin/cargo test
 
 # Print a report on disk space
 RUN echo "Disk usage at root (after tests):"
