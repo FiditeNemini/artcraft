@@ -7,25 +7,22 @@ use actix_multipart::Multipart;
 use actix_web::http::StatusCode;
 use actix_web::web::BytesMut;
 use actix_web::{web, HttpResponse, HttpRequest, ResponseError};
-use anyhow::anyhow;
 use buckets::util::hash_to_bucket_path_string::hash_to_bucket_path_string;
-use container_common::anyhow_result::AnyhowResult;
 use container_common::token::random_uuid::generate_random_uuid;
 use crate::http_server::web_utils::read_multipart_field_bytes::checked_read_multipart_bytes;
 use crate::http_server::web_utils::read_multipart_field_bytes::read_multipart_field_as_text;
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::server_state::ServerState;
-use database_queries::tokens::Tokens;
 use enums::common::visibility::Visibility;
 use futures::TryStreamExt;
 use http_server_common::request::get_request_ip::get_request_ip;
-use log::{warn, info};
+use log::{warn, info, error};
 use r2d2_redis::redis::Commands;
 use redis_common::redis_keys::RedisKeys;
-use sqlx::MySqlPool;
-use sqlx::error::Error::Database;
 use std::fmt;
 use std::sync::Arc;
+use database_queries::queries::w2l::w2l_inference_jobs::insert_w2l_inference_job_extended::{insert_w2l_inference_job_extended, InsertW2lInferenceJobExtendedArgs};
+use database_queries::queries::w2l::w2l_templates::check_w2l_template_exists::check_w2l_template_exists;
 
 const BUCKET_AUDIO_FILE_NAME : &'static str = "input_audio_file";
 const BUCKET_IMAGE_FILE_NAME: &'static str = "input_image_file";
@@ -34,11 +31,6 @@ const BUCKET_VIDEO_FILE_NAME : &'static str = "input_video_file";
 const MIN_BYTES : usize = 10;
 const MAX_BYTES : usize = 1024 * 1024 * 20;
 
-/// Just to query for existence
-#[derive(Serialize)]
-pub struct W2lTemplateExistenceRecord {
-  pub template_token: String,
-}
 
 #[derive(Serialize)]
 pub struct InferW2lWithUploadSuccessResponse {
@@ -217,7 +209,7 @@ pub async fn enqueue_infer_w2l_with_uploads(
     }
   };
 
-  let exists = check_template_exists(&template_token, &server_state.mysql_pool).await
+  let exists = check_w2l_template_exists(&template_token, &server_state.mysql_pool).await
     .map_err(|e| {
       warn!("error checking tmpl existence : {:?}", e);
       InferW2lWithUploadError::ServerError
@@ -275,77 +267,24 @@ pub async fn enqueue_infer_w2l_with_uploads(
 
   // ==================== SAVE JOB RECORD ==================== //
 
-  // This token is returned to the client.
-  let job_token = Tokens::new_w2l_inference_job()
-    .map_err(|_e| {
-      warn!("Error creating token");
-      InferW2lWithUploadError::ServerError
-    })?;
-
   info!("Creating w2l inference job record...");
 
-  let query_result = sqlx::query!(
-        r#"
-INSERT INTO w2l_inference_jobs
-SET
-  token = ?,
-  uuid_idempotency_token = ?,
-
-  maybe_w2l_template_token = ?,
-  maybe_public_audio_bucket_hash = ?,
-  maybe_public_audio_bucket_location = ?,
-
-  maybe_original_audio_filename = ?,
-  maybe_audio_mime_type = ?,
-
-  maybe_creator_user_token = ?,
-  creator_ip_address = ?,
-  disable_end_bump = false,
-  creator_set_visibility = ?,
-  status = "pending"
-        "#,
-        job_token.to_string(),
-        uuid_idempotency_token.to_string(),
-        maybe_template_token.clone(),
-        Some(audio_upload_bucket_hash.clone()),
-        Some(audio_upload_bucket_path.clone()),
-        maybe_audio_file_name.clone(),
-        Some(audio_type.clone()),
-        maybe_user_token.clone(),
-        ip_address.to_string(),
-        set_visibility.to_str(),
-    )
-    .execute(&server_state.mysql_pool)
-    .await;
-
-  let _record_id = match query_result {
-    Ok(res) => {
-      res.last_insert_id()
-    },
-    Err(err) => {
-      warn!("New w2l template upload creation DB error: {:?}", err);
-
-      // NB: SQLSTATE[23000]: Integrity constraint violation
-      // NB: MySQL Error Code 1062: Duplicate key insertion (this is harder to access)
-      match err {
-        Database(err) => {
-          let _maybe_code = err.code().map(|c| c.into_owned());
-          /*match maybe_code.as_deref() {
-            Some("23000") => {
-              if err.message().contains("username") {
-                return Err(UsernameTaken);
-              } else if err.message().contains("email_address") {
-                return Err(EmailTaken);
-              }
-            }
-            _ => {},
-          }*/
-        },
-        _ => {},
-      }
-      return Err(InferW2lWithUploadError::ServerError);
-    }
-  };
+  let job_token = insert_w2l_inference_job_extended(InsertW2lInferenceJobExtendedArgs {
+    uuid_idempotency_token: &uuid_idempotency_token,
+    maybe_template_token: maybe_template_token.as_deref(),
+    audio_upload_bucket_hash: Some(&audio_upload_bucket_hash),
+    audio_upload_bucket_path: Some(&audio_upload_bucket_path),
+    maybe_audio_file_name: maybe_audio_file_name.as_deref(),
+    audio_type: Some(&audio_type),
+    maybe_user_token: maybe_user_token.as_deref(),
+    ip_address: &ip_address,
+    set_visibility,
+    mysql_pool: &server_state.mysql_pool,
+  }).await
+      .map_err(|err| {
+        error!("error inserting w2l inference job: {:?}", err);
+        InferW2lWithUploadError::ServerError
+      })?;
 
   server_state.firehose_publisher.enqueue_w2l_inference(maybe_user_token.as_deref(), &job_token, &template_token)
     .await
@@ -353,7 +292,6 @@ SET
       warn!("error publishing event: {:?}", e);
       InferW2lWithUploadError::ServerError
     })?;
-
 
   let response = InferW2lWithUploadSuccessResponse {
     success: true,
@@ -366,45 +304,5 @@ SET
   Ok(HttpResponse::Ok()
     .content_type("application/json")
     .body(body))
-}
-
-async fn check_template_exists(template_token: &str, mysql_pool: &MySqlPool) -> AnyhowResult<bool>
-{
-  // NB: Lookup failure is Err(RowNotFound).
-  // NB: Since this is publicly exposed, we don't query sensitive data.
-  let maybe_template = sqlx::query_as!(
-      W2lTemplateExistenceRecord,
-        r#"
-SELECT
-    token as template_token
-FROM w2l_templates
-WHERE
-    token = ?
-    AND user_deleted_at IS NULL
-    AND mod_deleted_at IS NULL
-        "#,
-      &template_token
-    )
-    .fetch_one(mysql_pool)
-    .await; // TODO: This will return error if it doesn't exist
-
-  let record_exists = match maybe_template {
-    Ok(_record) => {
-      true
-    },
-    Err(err) => {
-      match err {
-        sqlx::Error::RowNotFound => {
-          false
-        },
-        _ => {
-          warn!("Infer w2l query error: {:?}", err);
-          return Err(anyhow!("infer w2l query error: {:?}", err));
-        }
-      }
-    }
-  };
-
-  Ok(record_exists)
 }
 
