@@ -14,7 +14,7 @@ use database_queries::queries::model_categories::get_category_by_token::get_cate
 use database_queries::queries::tts::tts_models::get_tts_model::get_tts_model_by_token;
 use http_server_common::request::get_request_ip::get_request_ip;
 use http_server_common::response::serialize_as_json_error::serialize_as_json_error;
-use log::{info, warn, log};
+use log::{info, warn, log, error};
 use regex::Regex;
 use sqlx::MySqlPool;
 use sqlx::error::DatabaseError;
@@ -22,6 +22,7 @@ use sqlx::error::Error::Database;
 use sqlx::mysql::MySqlDatabaseError;
 use std::fmt;
 use std::sync::Arc;
+use database_queries::queries::model_categories::assign_tts_category::{assign_tts_category, AssignOrDeleteAction, AssignTtsCategoryArgs};
 
 // =============== Request ===============
 
@@ -179,79 +180,18 @@ pub async fn assign_tts_category_handler(
 
   let ip_address = get_request_ip(&http_request);
 
-  let query_builder = if request.assign {
-    // NB: deleted_at = NULL
-    sqlx::query!(r#"
-      INSERT INTO tts_category_assignments
-      SET
-        model_token = ?,
-        category_token = ?,
-        category_addition_user_token = ?,
-        ip_address_creation = ?,
-        ip_address_last_update = ?,
-        deleted_at = NULL
-      ON DUPLICATE KEY UPDATE
-        model_token = ?,
-        category_token = ?,
-        category_addition_user_token = ?,
-        ip_address_last_update = ?,
-        deleted_at = NULL
-    "#,
-      // Insert
-      &request.tts_model_token,
-      &request.category_token,
-      &user_session.user_token,
-      &ip_address,
-      &ip_address,
-      // Update
-      &request.tts_model_token,
-      &request.category_token,
-      &user_session.user_token,
-      &ip_address,
-    )
-
-  } else {
-    // NB: deleted_at = CURRENT_TIMESTAMP
-    sqlx::query!(r#"
-      INSERT INTO tts_category_assignments
-      SET
-        model_token = ?,
-        category_token = ?,
-        category_removal_user_token = ?,
-        ip_address_creation = ?,
-        ip_address_last_update = ?,
-        deleted_at = CURRENT_TIMESTAMP
-      ON DUPLICATE KEY UPDATE
-        model_token = ?,
-        category_token = ?,
-        category_removal_user_token = ?,
-        ip_address_last_update = ?,
-        deleted_at = CURRENT_TIMESTAMP
-    "#,
-      // Insert
-      &request.tts_model_token,
-      &request.category_token,
-      &user_session.user_token,
-      &ip_address,
-      &ip_address,
-      // Update
-      &request.tts_model_token,
-      &request.category_token,
-      &user_session.user_token,
-      &ip_address,
-    )
-  };
-
-  // NB: We're soft deleting so we don't delete the associations.
-  let query_result = query_builder.execute(&server_state.mysql_pool).await;
-
-  match query_result {
-    Ok(_) => {},
-    Err(err) => {
-      warn!("Assign category edit DB error: {:?}", err);
-      return Err(AssignTtsCategoryError::ServerError);
-    }
-  };
+  assign_tts_category(AssignTtsCategoryArgs {
+    tts_model_token: &request.tts_model_token,
+    tts_category_token: &request.category_token,
+    editor_user_token: &user_session.user_token,
+    editor_ip_address: &ip_address,
+    action: if request.assign { AssignOrDeleteAction::CreateAssignment } else { AssignOrDeleteAction::DeleteAssignment },
+    mysql_pool: &server_state.mysql_pool,
+  }).await
+      .map_err(|err| {
+        error!("Assign category edit DB error: {:?}", err);
+        AssignTtsCategoryError::ServerError
+      })?;
 
   let response = AssignTtsCategoryResponse {
     success: true,
