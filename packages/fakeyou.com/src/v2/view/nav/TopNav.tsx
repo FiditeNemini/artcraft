@@ -89,7 +89,9 @@ function TopNav(props: Props) {
         }
       }
     };
-    const interval = setInterval(async () => fetch(), 15000);
+    // TODO: We're having an outage and need to lower this.
+    //const interval = setInterval(async () => fetch(), 15000);
+    const interval = setInterval(async () => fetch(), 5 * 60 * 1000);
     fetch();
     return () => clearInterval(interval);
   }, [pendingTtsJobs]);
