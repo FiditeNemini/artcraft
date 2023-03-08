@@ -65,6 +65,7 @@ import { PrivacyPage } from "./pages/about/privacy_page/PrivacyPage";
 import { GetComputedTtsCategoryAssignmentsSuccessResponse } from "@storyteller/components/src/api/category/GetComputedTtsCategoryAssignments";
 import { NewsPage } from "./pages/news/NewsPage";
 import { LandingPage } from "./pages/landing/LandingPage";
+import { ChannelsPage } from "./pages/channels/Channels";
 //import { LandingPage } from "./pages/landing/LandingPage";
 //import { VcModelListPage } from "./pages/vc/vc_model_list/VcModelListPage";
 
@@ -172,12 +173,21 @@ class PageContainer extends React.Component<Props, State> {
             </Route>
 
             <Route path="/news">
-              <NewsPage 
-                sessionWrapper={this.props.sessionWrapper} 
+              <NewsPage
+                sessionWrapper={this.props.sessionWrapper}
                 sessionSubscriptionsWrapper={
                   this.props.sessionSubscriptionsWrapper
                 }
-                />
+              />
+            </Route>
+
+            <Route path="/channels">
+              <ChannelsPage
+                sessionWrapper={this.props.sessionWrapper}
+                sessionSubscriptionsWrapper={
+                  this.props.sessionSubscriptionsWrapper
+                }
+              />
             </Route>
 
             <Route path="/leaderboard">
@@ -441,8 +451,8 @@ class PageContainer extends React.Component<Props, State> {
             </Route>
 
             <Route path="/landing_temp">
-              <LandingPage 
-                sessionWrapper={this.props.sessionWrapper} 
+              <LandingPage
+                sessionWrapper={this.props.sessionWrapper}
                 sessionSubscriptionsWrapper={
                   this.props.sessionSubscriptionsWrapper
                 }
