@@ -12,6 +12,7 @@ use std::time::Duration;
 pub async fn db_health_checker_thread(
   health_check_status: HealthCheckStatus,
   mysql_pool: MySqlPool,
+  check_duration: Duration,
 ) {
   loop {
     debug!("Checking DB health...");
@@ -32,7 +33,7 @@ pub async fn db_health_checker_thread(
       }
     }
 
-    thread::sleep(Duration::from_millis(3_000));
+    thread::sleep(check_duration);
   }
 
   warn!("Should never happen: Health Checker Exits");

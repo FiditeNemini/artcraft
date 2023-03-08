@@ -293,6 +293,9 @@ async fn main() -> AnyhowResult<()> {
 
   let twitch_secrets = TwitchSecrets::from_env()?;
 
+  let health_check_interval = easyenv::get_env_duration_seconds_or_default(
+    "HEALTH_CHECK_INTERVAL_SECS", Duration::from_secs(3));
+
   let static_api_token_set = read_static_api_tokens();
 
   // Background jobs.
@@ -308,8 +311,12 @@ async fn main() -> AnyhowResult<()> {
 
   info!("Spawning DB health checker thread.");
 
-  tokio_runtime.spawn(async {
-    db_health_checker_thread(health_check_status2, mysql_pool3).await;
+  tokio_runtime.spawn(async move {
+    db_health_checker_thread(
+      health_check_status2,
+      mysql_pool3,
+      health_check_interval,
+    ).await;
   });
 
   info!("Spawning IP ban polling thread.");
