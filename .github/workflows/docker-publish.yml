@@ -58,7 +58,7 @@ jobs:
       #      ${{ runner.os }}-buildx-
 
       # Docs for this action are at https://github.com/marketplace/actions/build-docker-images-using-cache
-      - uses: whoan/docker-build-with-cache-action@v5
+      - uses: whoan/docker-build-with-cache-action@v6
         with:
           registry: ghcr.io
           username: ${{ github.actor }} # username: ${{ github.repository_owner }}
