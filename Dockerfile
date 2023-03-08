@@ -160,6 +160,13 @@ RUN SQLX_OFFLINE=true \
   --release \
   --bin twitch-pubsub-subscriber
 
+# Print a report on disk space
+#RUN echo "Disk usage at root (after all builds):"
+#RUN du -hsc / | sort -hr
+RUN echo "Disk usage at current directory (after all builds):"
+RUN pwd
+RUN du -hsc * | sort -hr
+
 # =============================================================
 # =============== (4) construct the final image ===============
 # =============================================================
