@@ -10,10 +10,11 @@ use actix_web::{web, HttpResponse, HttpRequest};
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::http_server::web_utils::response_success_helpers::simple_json_success;
 use crate::server_state::ServerState;
+use database_queries::queries::tts::tts_results::edit_tts_result::{CreatorOrModFields, edit_tts_result, EditTtsResultArgs};
 use database_queries::queries::tts::tts_results::query_tts_result::select_tts_result_by_token;
 use enums::common::visibility::Visibility;
 use http_server_common::request::get_request_ip::get_request_ip;
-use log::warn;
+use log::{error, warn};
 use std::fmt;
 use std::sync::Arc;
 
@@ -134,50 +135,27 @@ pub async fn edit_tts_inference_result_handler(
 
   let ip_address = get_request_ip(&http_request);
 
-  let query_result = if is_author {
-    // TODO: Don't update the original IP address. Create a new field.
-    // We need to store the IP address details.
-    sqlx::query!(
-        r#"
-UPDATE tts_results
-SET
-    creator_set_visibility = ?,
-    creator_ip_address = ?
-WHERE token = ?
-LIMIT 1
-        "#,
-      &creator_set_visibility.to_str(),
-      &ip_address,
-      &inference_result.tts_result_token,
-    )
-        .execute(&server_state.mysql_pool)
-        .await
-  } else {
-    // We need to store the moderator details.
-    sqlx::query!(
-        r#"
-UPDATE tts_results
-SET
-    creator_set_visibility = ?,
-    maybe_mod_user_token = ?
-WHERE token = ?
-LIMIT 1
-        "#,
-      &creator_set_visibility.to_str(),
-      &user_session.user_token,
-      &inference_result.tts_result_token,
-    )
-        .execute(&server_state.mysql_pool)
-        .await
+  let args = EditTtsResultArgs {
+    tts_result_token: &inference_result.tts_result_token,
+    creator_set_visibility,
+    role_dependent_fields: if is_author {
+      CreatorOrModFields::CreatorFields {
+        creator_ip_address: &ip_address,
+      }
+    } else {
+      CreatorOrModFields::ModFields {
+        mod_user_token: &user_session.user_token,
+      }
+    },
+    mysql_pool: &server_state.mysql_pool,
   };
 
-  match query_result {
-    Ok(_) => {},
-    Err(err) => {
-      warn!("Update TTS result DB error: {:?}", err);
-      return Err(EditTtsResultError::ServerError);
-    }
-  };
+  edit_tts_result(args)
+      .await
+      .map_err(|err| {
+        error!("Update TTS result DB error: {:?}", err);
+        EditTtsResultError::ServerError
+      })?;
 
   Ok(simple_json_success())
 }
