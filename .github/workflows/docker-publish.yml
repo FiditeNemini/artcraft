@@ -102,3 +102,11 @@ jobs:
       #     docker tag $IMAGE_NAME $IMAGE_ID:$SHORT_SHA
       #     docker push $IMAGE_ID:$SHORT_SHA
 
+      - name: Cleanup / Debug
+        # This job will run even on failures to help with debugging.
+        if: always()
+        run: |
+          echo "Report at final github action step:"
+          echo "Disk usage:"
+          pwd
+          du -hsc * | sort -hr
