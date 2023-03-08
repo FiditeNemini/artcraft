@@ -72,3 +72,30 @@ where model_token = 'TM:ztt5s1be5tq6'
 and mod_deleted_at IS NULL
 limit 5000;
 
+--- Search for particular text by a particular model
+SELECT
+    raw_inference_text,
+    maybe_creator_user_token,
+    created_at
+FROM
+    tts_results
+WHERE
+    model_token = 'TM:ztt5s1be5tq6'
+    AND raw_inference_text LIKE '%fakeyou%'
+
+---
+-- WTF WHY IS THIS SLOW???
+SELECT
+    res.id,
+    model.title,
+    res.raw_inference_text,
+    res.maybe_creator_user_token
+FROM
+    tts_results AS res
+JOIN
+    tts_models as model
+ON
+    res.model_token = model.token
+ORDER BY res.id
+LIMIT 10;
+

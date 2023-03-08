@@ -27,7 +27,7 @@ FROM (
                    from user_subscriptions
                )
            AND
-                 j.created_at > ( CURDATE() - INTERVAL 1 MONTH )
+                 j.created_at > ( CURDATE() - INTERVAL 1 DAY )
          GROUP BY t.token
          ORDER BY use_count DESC
      ) as x
@@ -65,6 +65,7 @@ FROM (
                                  (
                                      select distinct user_token
                                      from user_subscriptions
+                                     where created_at > (CURDATE() - INTERVAL 2 DAY)
                                  )
                        ) AS x
                   WHERE rownum = 1
