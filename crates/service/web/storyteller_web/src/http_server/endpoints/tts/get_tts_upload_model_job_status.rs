@@ -1,7 +1,7 @@
 use actix_http::Error;
 use actix_http::http::header;
-use actix_web::cookie::Cookie;
 use actix_web::HttpResponseBuilder;
+use actix_web::cookie::Cookie;
 use actix_web::error::ResponseError;
 use actix_web::http::StatusCode;
 use actix_web::web::Path;
@@ -10,8 +10,9 @@ use chrono::{DateTime, Utc};
 use crate::AnyhowResult;
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::server_state::ServerState;
+use database_queries::queries::tts::tts_model_upload_jobs::get_tts_model_upload_job_status::get_tts_model_upload_job_status;
 use derive_more::{Display, Error};
-use log::{info, warn, log};
+use log::{info, warn, log, error};
 use r2d2_redis::redis::Commands;
 use redis_common::redis_keys::RedisKeys;
 use regex::Regex;
@@ -57,18 +58,6 @@ pub enum GetTtsUploadModelStatusError {
   ServerError,
 }
 
-#[derive(Serialize)]
-pub struct TtsUploadModelJobStatusRecord {
-  pub job_token: String,
-
-  pub status: String,
-  pub attempt_count: i32,
-  pub maybe_model_token: Option<String>,
-
-  pub created_at: DateTime<Utc>,
-  pub updated_at: DateTime<Utc>,
-}
-
 impl ResponseError for GetTtsUploadModelStatusError {
   fn status_code(&self) -> StatusCode {
     match *self {
@@ -90,44 +79,17 @@ pub async fn get_tts_upload_model_job_status_handler(
   path: Path<GetTtsUploadModelStatusPathInfo>,
   server_state: web::Data<Arc<ServerState>>) -> Result<HttpResponse, GetTtsUploadModelStatusError>
 {
-  // NB: Lookup failure is Err(RowNotFound).
   // NB: Since this is publicly exposed, we don't query sensitive data.
-  let maybe_status = sqlx::query_as!(
-      TtsUploadModelJobStatusRecord,
-        r#"
-SELECT
-    jobs.token as job_token,
-
-    jobs.status,
-    jobs.attempt_count,
-    jobs.on_success_result_token as maybe_model_token,
-
-    jobs.created_at,
-    jobs.updated_at
-
-FROM tts_model_upload_jobs as jobs
-
-WHERE jobs.token = ?
-        "#,
-      &path.token
-    )
-      .fetch_one(&server_state.mysql_pool)
-      .await; // TODO: This will return error if it doesn't exist
-
-  let record : TtsUploadModelJobStatusRecord = match maybe_status {
-    Ok(record) => record,
-    Err(err) => {
-      match err {
-        sqlx::Error::RowNotFound => {
-          return Err(GetTtsUploadModelStatusError::ServerError);
-        },
-        _ => {
-          warn!("tts template query error: {:?}", err);
-          return Err(GetTtsUploadModelStatusError::ServerError);
-        }
-      }
-    }
-  };
+  let record = get_tts_model_upload_job_status(&path.token, &server_state.mysql_pool)
+      .await
+      .map_err(|err| {
+        error!("tts template query error: {:?}", err);
+        GetTtsUploadModelStatusError::ServerError
+      })?
+      .ok_or(
+        // TODO: 404
+        GetTtsUploadModelStatusError::ServerError
+      )?;
 
   let mut redis = server_state.redis_pool
       .get()
