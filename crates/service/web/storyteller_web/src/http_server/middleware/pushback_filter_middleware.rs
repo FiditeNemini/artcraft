@@ -3,16 +3,19 @@ use actix_http::http::{header, HeaderMap, HeaderValue};
 use actix_http::{error, body::Body, Response};
 use actix_web::dev::{Service, Transform};
 use actix_web::dev::{ServiceRequest, ServiceResponse};
+use actix_web::http::HeaderName;
+use actix_web::http::header::USER_AGENT;
 use actix_web::web::{BytesMut, Buf, BufMut};
 use actix_web::{Error, HttpResponse};
 use actix_web::{ResponseError, HttpMessage, HttpRequest, HttpResponseBuilder};
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
+use crate::server_state::StaticFeatureFlags;
 use crate::threads::ip_banlist_set::IpBanlistSet;
+use errors::AnyhowResult;
 use futures_util::future::{err, ok, Either, Ready};
 use http_server_common::request::get_request_ip::get_service_request_ip;
 use std::io::Write;
 use std::task::{Context, Poll};
-use crate::server_state::StaticFeatureFlags;
 
 // There are two steps in middleware processing.
 // 1. Middleware initialization, middleware factory gets called with
@@ -110,6 +113,10 @@ impl<S> Service<ServiceRequest> for PushbackFilterMiddleware<S>
     }
 
     if !can_bypass_filter {
+      can_bypass_filter = is_google_http_load_balancer_health_check(&req) || is_kube_probe_health_check(&req);
+    }
+
+    if !can_bypass_filter {
       // TODO: Clean up with transpose() once stable
       let result = req.headers()
           .get("bypass-pushback-filter")
@@ -128,4 +135,34 @@ impl<S> Service<ServiceRequest> for PushbackFilterMiddleware<S>
       Either::Right(err(Error::from(PushbackError {})))
     }
   }
+}
+
+fn is_google_http_load_balancer_health_check(request: &ServiceRequest) -> bool {
+  let is_load_balancer_user_agent = get_header_value(request, &USER_AGENT)
+      .map(|user_agent| user_agent.starts_with("GoogleHC")) // eg "GoogleHC/1.0"
+      .unwrap_or(false);
+
+  // TODO/FIXME: This may be incorrect, but the load balancer IPs seem to start with 35.* or 130.*
+  //  https://cloud.google.com/load-balancing/docs/https
+  // We should only allow these tests to pass for those IP ranges.
+
+  is_load_balancer_user_agent
+}
+
+fn is_kube_probe_health_check(request: &ServiceRequest) -> bool {
+  let is_k8s_probe_user_agent = get_header_value(request, &USER_AGENT)
+      .map(|user_agent| user_agent.starts_with("kube-probe")) // eg "kube-probe/1.23"
+      .unwrap_or(false);
+
+  // TODO/FIXME: Constrain to k8s IP ranges
+
+  is_k8s_probe_user_agent
+}
+
+fn get_header_value<'a>(request: &'a ServiceRequest, header_name: &HeaderName) -> Option<&'a str> {
+  request.headers()
+      .get(header_name)
+      .map(|h| h.to_str())
+      .transpose()
+      .unwrap_or(None)
 }
