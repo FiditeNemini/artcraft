@@ -67,18 +67,21 @@ pub struct GetTtsInferenceStatusSuccessResponse {
 #[derive(Debug)]
 pub enum GetTtsInferenceStatusError {
   ServerError,
+  NotFound,
 }
 
 impl ResponseError for GetTtsInferenceStatusError {
   fn status_code(&self) -> StatusCode {
     match *self {
-      GetTtsInferenceStatusError::ServerError=> StatusCode::INTERNAL_SERVER_ERROR,
+      GetTtsInferenceStatusError::ServerError => StatusCode::INTERNAL_SERVER_ERROR,
+      GetTtsInferenceStatusError::NotFound => StatusCode::NOT_FOUND,
     }
   }
 
   fn error_response(&self) -> HttpResponse {
     let error_reason = match self {
-      GetTtsInferenceStatusError::ServerError => "server error".to_string(),
+      Self::ServerError => "server error".to_string(),
+      Self::NotFound => "not found".to_string(),
     };
 
     to_simple_json_error(&error_reason, self.status_code())
@@ -98,13 +101,19 @@ pub async fn get_tts_inference_job_status_handler(
   path: Path<GetTtsInferenceStatusPathInfo>,
   server_state: web::Data<Arc<ServerState>>) -> Result<HttpResponse, GetTtsInferenceStatusError>
 {
+  if path.token.trim() == "None" {
+    // NB: A bunch of Python clients use our API and can fail in this manner.
+    // This was a large traffic driver during the 2023-03-08 outage.
+    return Err(GetTtsInferenceStatusError::NotFound);
+  }
+
   // NB: Lookup failure is Err(RowNotFound).
   // NB: Since this is publicly exposed, we don't query sensitive data.
   let maybe_status = get_tts_inference_job_status(&path.token, &server_state.mysql_pool).await;
 
   let record = match maybe_status {
     Ok(Some(record)) => record,
-    Ok(None) => return Err(GetTtsInferenceStatusError::ServerError),
+    Ok(None) => return Err(GetTtsInferenceStatusError::NotFound),
     Err(err) => {
       error!("tts job query error: {:?}", err);
       return Err(GetTtsInferenceStatusError::ServerError);
