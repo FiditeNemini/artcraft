@@ -16,6 +16,7 @@ use futures_util::future::{err, ok, Either, Ready};
 use http_server_common::request::get_request_ip::get_service_request_ip;
 use std::io::Write;
 use std::task::{Context, Poll};
+use log::warn;
 
 // There are two steps in middleware processing.
 // 1. Middleware initialization, middleware factory gets called with
@@ -132,9 +133,21 @@ impl<S> Service<ServiceRequest> for PushbackFilterMiddleware<S>
     if can_bypass_filter {
       Either::Left(self.service.call(req))
     } else {
+      // NB: Actix won't log the request when we return an error, so we manually log it.
+      log_dropped_request(&req);
       Either::Right(err(Error::from(PushbackError {})))
     }
   }
+}
+
+fn log_dropped_request(request: &ServiceRequest) {
+  // TODO: Is there a way to use the actix logger?
+  let remote_ip_address = get_service_request_ip(request);
+  let request_method = request.method().as_str();
+  let request_path = request.path();
+  let user_agent = get_header_value(request, &USER_AGENT).unwrap_or("");
+
+  warn!("dropped request: {} {} {} {}", remote_ip_address, request_method, request_path, user_agent)
 }
 
 fn is_google_http_load_balancer_health_check(request: &ServiceRequest) -> bool {
