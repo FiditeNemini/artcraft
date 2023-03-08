@@ -7,6 +7,7 @@ use hyper::StatusCode;
 use log::{error, info};
 use std::fmt;
 use std::sync::Arc;
+use errors::AnyhowResult;
 
 #[derive(Serialize)]
 pub struct Response {
@@ -49,6 +50,14 @@ pub async fn get_pending_tts_inference_job_count_handler(
   server_state: web::Data<Arc<ServerState>>
 ) -> Result<HttpResponse, GetPendingTtsInferenceJobCountError> {
 
+  if server_state.flags.disable_tts_queue_length {
+    return render_response_busy(Response {
+      success: true,
+      pending_job_count: 10_000,
+      cache_time: NaiveDateTime::from_timestamp(0, 0),
+    });
+  }
+
   let maybe_cached = server_state.caches.tts_queue_length.copy_without_bump_if_unexpired()
       .map_err(|e| {
         error!("error consulting cache: {:?}", e);
@@ -78,19 +87,32 @@ pub async fn get_pending_tts_inference_job_count_handler(
     },
   };
 
-  let response = Response {
+  render_response_ok(Response {
     success: true,
     pending_job_count: count_result.record_count,
     cache_time: count_result.present_time,
-  };
+  })
+}
 
+pub fn render_response_busy(response: Response) -> Result<HttpResponse, GetPendingTtsInferenceJobCountError> {
+  let body = render_response_payload(response)?;
+  Ok(HttpResponse::TooManyRequests()
+      .content_type("application/json")
+      .body(body))
+}
+
+pub fn render_response_ok(response: Response) -> Result<HttpResponse, GetPendingTtsInferenceJobCountError> {
+  let body = render_response_payload(response)?;
+  Ok(HttpResponse::Ok()
+      .content_type("application/json")
+      .body(body))
+}
+
+pub fn render_response_payload(response: Response) -> Result<String, GetPendingTtsInferenceJobCountError> {
   let body = serde_json::to_string(&response)
       .map_err(|e| {
         error!("error returning response: {:?}",  e);
         GetPendingTtsInferenceJobCountError::ServerError
       })?;
-
-  Ok(HttpResponse::Ok()
-      .content_type("application/json")
-      .body(body))
+  Ok(body)
 }
