@@ -153,7 +153,7 @@ fn split_paragraph(text: &str) -> Vec<String> {
 
 #[cfg(test)]
 mod tests {
-  use crate::workers::news_stories::news_story_audio_preprocessing::process_single_item::split_into_manageable_portions;
+  use crate::workers::news_stories::phase_3::news_story_audio_preprocessing::process_single_item::split_into_manageable_portions;
 
   #[test]
   fn test_split_long_text() {

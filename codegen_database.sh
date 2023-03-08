@@ -1,13 +1,5 @@
 #!/bin/bash
 
-# This is complicated since we're now in a more complex Rust workspace with 
-# multiple projects and targets.
-
-# NB(2022-01-31): For some reason, 'storyteller-web', despite importing the obs queries 
-# via the `database_queries` shared library, started to exclude these queries. It was 
-# working, but mysteriously stopped. I'm using this more complicated setup with jq-based 
-# json merge as a stop gap.
-
 # NB: This format can be used without changing directory:
 # SQLX_OFFLINE=true cargo sqlx prepare -- --bin storyteller-web --manifest-path crates/service/storyteller_web/Cargo.toml
 
@@ -40,105 +32,5 @@ build_shared_sqlite_database_library() {
   popd
 }
 
-build_storyteller_web_app() {
-  # NB: This imports the inference/upload job queries
-  # It should also import the shared database lib queries, but something(???) broke.
-  pushd crates/service/web/storyteller_web
-  SQLX_OFFLINE=true cargo sqlx prepare --merged -- --bin storyteller-web # NB: Because multiple binary targets
-  popd
-}
-
-build_download_job() {
-  # NB: This imports the inference/upload job queries
-  # It should also import the shared database lib queries, but something(???) broke.
-  pushd crates/service/job/download_job
-  SQLX_OFFLINE=true cargo sqlx prepare --merged -- --bin download-job
-  popd
-}
-
-build_tts_download_job() {
-  # NB: This imports the inference/upload job queries
-  # It should also import the shared database lib queries, but something(???) broke.
-  pushd crates/service/job/tts_download_job
-  SQLX_OFFLINE=true cargo sqlx prepare --merged -- --bin tts-download-job
-  popd
-}
-
-build_inference_job() {
-  # NB: This imports the inference/upload job queries
-  # It should also import the shared database lib queries, but something(???) broke.
-  pushd crates/service/job/inference_job
-  SQLX_OFFLINE=true cargo sqlx prepare --merged -- --bin inference-job
-  popd
-}
-
-build_tts_inference_job() {
-  # NB: This imports the inference/upload job queries
-  # It should also import the shared database lib queries, but something(???) broke.
-  pushd crates/service/job/tts_inference_job
-  SQLX_OFFLINE=true cargo sqlx prepare --merged -- --bin tts-inference-job
-  popd
-}
-
-build_w2l_download_job() {
-  # NB: This imports the inference/upload job queries
-  # It should also import the shared database lib queries, but something(???) broke.
-  pushd crates/service/job/w2l_download_job
-  SQLX_OFFLINE=true cargo sqlx prepare --merged -- --bin w2l-download-job
-  popd
-}
-
-build_w2l_inference_job() {
-  # NB: This imports the inference/upload job queries
-  # It should also import the shared database lib queries, but something(???) broke.
-  pushd crates/service/job/w2l_inference_job
-  SQLX_OFFLINE=true cargo sqlx prepare --merged -- --bin w2l-inference-job
-  popd
-}
-
-combine_sqlx_queries() {
-
-
-#jq: error: Could not open file crates/programs/aichatbot-sidecar/sqlx-data.json: No such file or directory
-#jq: error: Could not open file crates/service/web/storyteller_web/sqlx-data.json: No such file or directory
-
-
-  # Merge multiple JSON files into a single dictionary.
-  # https://stackoverflow.com/a/24904276
-  jq -s '.[0] * .[1]' \
-    crates/lib/database_queries/sqlx-data.json \
-    crates/lib/sqlite_queries/sqlx-data.json \
-    crates/service/web/storyteller_web/sqlx-data.json \
-    crates/service/job/download_job/sqlx-data.json \
-    crates/service/job/tts_download_job/sqlx-data.json \
-    crates/service/job/inference_job/sqlx-data.json \
-    crates/service/job/tts_inference_job/sqlx-data.json \
-    crates/service/job/w2l_download_job/sqlx-data.json \
-    crates/service/job/w2l_inference_job/sqlx-data.json \
-    > sqlx-data.json
-}
-
-cleanup_temp_files() {
-  rm crates/lib/database_queries/sqlx-data.json \
-    crates/lib/sqlite_queries/sqlx-data.json \
-    crates/service/web/storyteller_web/sqlx-data.json \
-    crates/service/job/download_job/sqlx-data.json \
-    crates/service/job/tts_download_job/sqlx-data.json \
-    crates/service/job/inference_job/sqlx-data.json \
-    crates/service/job/tts_inference_job/sqlx-data.json \
-    crates/service/job/w2l_download_job/sqlx-data.json \
-    crates/service/job/w2l_inference_job/sqlx-data.json
-}
-
 build_shared_mysql_database_library
 build_shared_sqlite_database_library
-build_storyteller_web_app
-build_download_job
-build_tts_download_job
-build_inference_job
-build_tts_inference_job
-build_w2l_download_job
-build_w2l_inference_job
-combine_sqlx_queries
-cleanup_temp_files
-

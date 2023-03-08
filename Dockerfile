@@ -71,7 +71,6 @@ RUN $HOME/.cargo/bin/cargo chef cook --release --recipe-path recipe.json
 # NB: Now we build and test our code.
 COPY Cargo.lock .
 COPY Cargo.toml .
-COPY sqlx-data.json .
 COPY crates/ ./crates
 COPY db/ ./db
 COPY test_data/ ./test_data
