@@ -36,7 +36,7 @@ pub struct ServerState {
   pub server_environment: ServerEnvironment,
 
   /// Feature flags will allow us to restart the service with different conditions embedded in the code.
-  pub flags: ServiceFlags,
+  pub flags: StaticFeatureFlags,
 
   pub third_party_url_redirector: ThirdPartyUrlRedirector,
 
@@ -155,6 +155,11 @@ pub struct StripeSettings {
 
 /// Flags set at service startup
 #[derive(Clone)]
-pub struct ServiceFlags {
+pub struct StaticFeatureFlags {
+  /// Disable the live /tts/queue_length endpoint for all users and serve a static value instead.
   pub disable_tts_queue_length: bool,
+
+  /// Filter incoming requests indiscriminately with HTTP 429.
+  /// Used to bring the service back online slowly.
+  pub global_429_pushback_filter_enabled: bool,
 }

@@ -61,7 +61,7 @@ use crate::configs::static_api_tokens::{StaticApiTokenConfig, StaticApiTokens, S
 use crate::http_server::middleware::ip_filter_middleware::IpFilter;
 use crate::http_server::web_utils::redis_rate_limiter::RedisRateLimiter;
 use crate::routes::add_routes;
-use crate::server_state::{ServerState, EnvConfig, TwitchOauthSecrets, TwitchOauth, RedisRateLimiters, InMemoryCaches, StripeSettings, ServerInfo, ServiceFlags};
+use crate::server_state::{ServerState, EnvConfig, TwitchOauthSecrets, TwitchOauth, RedisRateLimiters, InMemoryCaches, StripeSettings, ServerInfo, StaticFeatureFlags};
 use crate::threads::db_health_checker_thread::db_health_check_status::HealthCheckStatus;
 use crate::threads::db_health_checker_thread::db_health_checker_thread::db_health_checker_thread;
 use crate::threads::ip_banlist_set::IpBanlistSet;
@@ -87,6 +87,7 @@ use twitch_common::twitch_secrets::TwitchSecrets;
 use url_config::third_party_url_redirector::ThirdPartyUrlRedirector;
 use users_component::utils::session_checker::SessionChecker;
 use users_component::utils::session_cookie_manager::SessionCookieManager;
+use crate::http_server::middleware::pushback_filter_middleware::PushbackFilter;
 
 const DEFAULT_BIND_ADDRESS : &'static str = "0.0.0.0:12345";
 
@@ -336,8 +337,9 @@ async fn main() -> AnyhowResult<()> {
   let server_environment = ServerEnvironment::from_str(&easyenv::get_env_string_required("SERVER_ENVIRONMENT")?)
       .ok_or(anyhow!("invalid server environment"))?;
 
-  let service_feature_flags = ServiceFlags {
+  let service_feature_flags = StaticFeatureFlags {
     disable_tts_queue_length: easyenv::get_env_bool_or_default("FF_DISABLE_TTS_QUEUE_LENGTH", false),
+    global_429_pushback_filter_enabled: easyenv::get_env_bool_or_default("FF_GLOBAL_429_PUSHBACK_FILTER_ENABLED", false),
   };
 
   let third_party_url_redirector = ThirdPartyUrlRedirector::new(server_environment);
@@ -464,6 +466,7 @@ pub async fn serve(server_state: ServerState) -> AnyhowResult<()>
       .wrap(DefaultHeaders::new()
         .header("X-Backend-Hostname", &hostname)
         .header("X-Build-Sha", server_state_arc.server_info.build_sha.clone()))
+      .wrap(PushbackFilter::new(&server_state_arc.flags.clone()))
       .wrap(IpFilter::new(ip_banlist))
       .wrap(Logger::new(&log_format)
         .exclude("/liveness")
