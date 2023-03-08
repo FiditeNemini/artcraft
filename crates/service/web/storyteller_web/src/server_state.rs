@@ -156,10 +156,13 @@ pub struct StripeSettings {
 /// Flags set at service startup
 #[derive(Clone)]
 pub struct StaticFeatureFlags {
-  /// Disable the live /tts/queue_length endpoint for all users and serve a static value instead.
-  pub disable_tts_queue_length: bool,
-
   /// Filter incoming requests indiscriminately with HTTP 429.
   /// Used to bring the service back online slowly.
   pub global_429_pushback_filter_enabled: bool,
+
+  /// Disable the live `/tts/queue_length` endpoint for all users and serve a static value instead.
+  pub disable_tts_queue_length_endpoint: bool,
+
+  /// Disable the live `/tts/list` endpoint for all users and serve a static value instead.
+  pub disable_tts_model_list_endpoint: bool,
 }

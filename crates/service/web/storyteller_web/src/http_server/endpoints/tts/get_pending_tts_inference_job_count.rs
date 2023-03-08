@@ -50,7 +50,10 @@ pub async fn get_pending_tts_inference_job_count_handler(
   server_state: web::Data<Arc<ServerState>>
 ) -> Result<HttpResponse, GetPendingTtsInferenceJobCountError> {
 
-  if server_state.flags.disable_tts_queue_length {
+  if server_state.flags.disable_tts_queue_length_endpoint {
+    // NB: Despite the cache being a powerful protector of the database (this is an expensive query),
+    // if the cache goes stale during an outage, there is no protection. This feature flag lets us
+    // shut off all traffic to the endpoint.
     return render_response_busy(Response {
       success: true,
       pending_job_count: 10_000,

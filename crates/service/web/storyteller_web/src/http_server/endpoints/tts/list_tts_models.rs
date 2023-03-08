@@ -91,6 +91,16 @@ pub async fn list_tts_models_handler(
   _http_request: HttpRequest,
   server_state: web::Data<Arc<ServerState>>) -> Result<HttpResponse, ListTtsModelsError>
 {
+  if server_state.flags.disable_tts_model_list_endpoint {
+    // NB: Despite the cache being a powerful protector of the database (this is an expensive query),
+    // if the cache goes stale during an outage, there is no protection. This feature flag lets us
+    // shut off all traffic to the endpoint.
+    return render_response_busy(ListTtsModelsSuccessResponse {
+      success: true,
+      models: Vec::new(),
+    });
+  }
+
   let maybe_models = server_state.caches.voice_list.copy_without_bump_if_unexpired()
       .map_err(|e| {
         error!("Error consulting cache: {:?}", e);
@@ -128,17 +138,33 @@ pub async fn list_tts_models_handler(
     },
   };
 
-  let response = ListTtsModelsSuccessResponse {
+  render_response_ok(ListTtsModelsSuccessResponse {
     success: true,
     models,
-  };
+  })
+}
 
-  let body = serde_json::to_string(&response)
-    .map_err(|_e| ListTtsModelsError::ServerError)?;
+pub fn render_response_busy(response: ListTtsModelsSuccessResponse) -> Result<HttpResponse, ListTtsModelsError> {
+  let body = render_response_payload(response)?;
+  Ok(HttpResponse::TooManyRequests()
+      .content_type("application/json")
+      .body(body))
+}
 
+pub fn render_response_ok(response: ListTtsModelsSuccessResponse) -> Result<HttpResponse, ListTtsModelsError> {
+  let body = render_response_payload(response)?;
   Ok(HttpResponse::Ok()
-    .content_type("application/json")
-    .body(body))
+      .content_type("application/json")
+      .body(body))
+}
+
+pub fn render_response_payload(response: ListTtsModelsSuccessResponse) -> Result<String, ListTtsModelsError> {
+  let body = serde_json::to_string(&response)
+      .map_err(|e| {
+        error!("error returning response: {:?}",  e);
+        ListTtsModelsError::ServerError
+      })?;
+  Ok(body)
 }
 
 async fn get_all_models(mysql_connection: &mut PoolConnection<MySql>) -> AnyhowResult<Vec<TtsModelRecordForResponse>> {
