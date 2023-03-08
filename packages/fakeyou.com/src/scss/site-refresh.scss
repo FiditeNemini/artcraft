@@ -969,9 +969,53 @@ styles with important tags:
       }
     }
   }
-  
+
   .fs-7 {
     font-size: 14px !important;
+  }
+
+  .channel-thumbnail {
+    border-radius: 8px;
+    border: 1px solid #ffffff15;
+    overflow: hidden;
+    transition: all 0.2s;
+
+    img {
+      width: 100%;
+      object-fit: cover;
+    }
+
+    &:hover {
+      transform: scale(1.04);
+    }
+  }
+
+  .channel-profile {
+    border-radius: 60px;
+    overflow: hidden;
+    border: 2px solid #ffffff15;
+    width: 40px;
+    height: 40px;
+    object-fit: cover;
+
+    img {
+      width: 100%;
+      object-fit: cover;
+    }
+  }
+
+  .channel-title {
+    color: $white;
+    font-size: 16px;
+    margin: 0;
+    padding: 0;
+    margin-bottom: 2px;
+  }
+
+  .channel-name {
+    color: rgba($white, 0.75);
+    font-size: 13px;
+    padding: 0;
   }
 }
 
