@@ -101,7 +101,7 @@ pub async fn list_tts_models_handler(
     });
   }
 
-  let maybe_models = server_state.caches.voice_list.copy_without_bump_if_unexpired()
+  let maybe_models = server_state.caches.voice_list.grab_copy_without_bump_if_unexpired()
       .map_err(|e| {
         error!("Error consulting cache: {:?}", e);
         ListTtsModelsError::ServerError

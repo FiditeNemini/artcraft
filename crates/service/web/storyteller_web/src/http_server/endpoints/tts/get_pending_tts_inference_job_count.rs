@@ -66,7 +66,7 @@ pub async fn get_pending_tts_inference_job_count_handler(
     });
   }
 
-  let maybe_cached = server_state.caches.tts_queue_length.copy_without_bump_if_unexpired()
+  let maybe_cached = server_state.caches.tts_queue_length.grab_copy_without_bump_if_unexpired()
       .map_err(|e| {
         error!("error consulting cache: {:?}", e);
         GetPendingTtsInferenceJobCountError::ServerError

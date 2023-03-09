@@ -21,7 +21,7 @@ pub async fn list_cached_tts_categories_for_public_dropdown(
   cache: &SingleItemTtlCache<CategoryList>,
   mysql_connection: &mut PoolConnection<MySql>,
 ) -> AnyhowResult<CategoryList> {
-  let maybe_database_categories = cache.copy_without_bump_if_unexpired()?;
+  let maybe_database_categories = cache.grab_copy_without_bump_if_unexpired()?;
 
   match maybe_database_categories {
     Some(categories) => Ok(categories),

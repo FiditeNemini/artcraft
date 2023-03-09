@@ -63,7 +63,7 @@ pub async fn list_w2l_templates_handler(
   let maybe_templates = server_state
       .caches
       .w2l_template_list
-      .copy_without_bump_if_unexpired()
+      .grab_copy_without_bump_if_unexpired()
       .map_err(|e| {
         error!("Error consulting cache: {:?}", e);
         ListW2lTemplatesError::ServerError
