@@ -3,6 +3,7 @@ use cloud_storage::bucket_client::BucketClient;
 use crate::StaticApiTokenSet;
 use crate::http_server::endpoints::categories::tts::list_fully_computed_assigned_tts_categories::list_fully_computed_assigned_tts_categories::ModelTokensByCategoryToken;
 use crate::http_server::endpoints::categories::tts::list_tts_categories::DisplayCategory;
+use crate::http_server::endpoints::leaderboard::get_leaderboard::LeaderboardInfo;
 use crate::http_server::endpoints::tts::list_tts_models::TtsModelRecordForResponse;
 use crate::http_server::web_utils::redis_rate_limiter::RedisRateLimiter;
 use crate::threads::db_health_checker_thread::db_health_check_status::HealthCheckStatus;
@@ -144,6 +145,8 @@ pub struct InMemoryCaches {
   /// The frontend will consult a distributed cache and use the monotonic DB time as a
   /// vector clock.
   pub tts_queue_length: SingleItemTtlCache<TtsQueueLengthResult>,
+
+  pub leaderboard: SingleItemTtlCache<LeaderboardInfo>,
 }
 
 #[derive(Clone)]

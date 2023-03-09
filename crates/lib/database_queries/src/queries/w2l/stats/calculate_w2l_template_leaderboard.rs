@@ -4,7 +4,7 @@ use log::warn;
 use sqlx::{MySql, MySqlPool};
 use sqlx::pool::PoolConnection;
 
-#[derive(Serialize)]
+#[derive(Serialize, Clone)]
 pub struct W2lLeaderboardRecordForList {
   pub username: String,
   pub display_name: String,

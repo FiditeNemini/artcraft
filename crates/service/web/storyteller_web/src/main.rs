@@ -277,6 +277,10 @@ async fn main() -> AnyhowResult<()> {
     easyenv::get_env_duration_seconds_or_default("TTS_MODEL_CATEGORY_ASSIGNMENTS_CACHE_TTL_SECONDS", Duration::from_secs(60))
   );
 
+  let leaderboard_cache = SingleItemTtlCache::create_with_duration(
+    easyenv::get_env_duration_seconds_or_default("LEADERBOARD_CACHE_TTL_SECONDS", Duration::from_secs(60))
+  );
+
   // NB: This secret really isn't too important.
   // We can even rotate it without too much impact to users.
   let sort_key_crypto_secret =
@@ -409,6 +413,7 @@ async fn main() -> AnyhowResult<()> {
       database_tts_category_list: database_tts_category_list_cache,
       tts_queue_length: tts_queue_length_cache,
       tts_model_category_assignments: tts_model_category_assignments_cache,
+      leaderboard: leaderboard_cache,
     },
     twitch_oauth: TwitchOauth {
       secrets: TwitchOauthSecrets {
