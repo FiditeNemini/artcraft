@@ -104,7 +104,13 @@ RUN SQLX_OFFLINE=true \
   LD_LIBRARY_PATH=/usr/lib:${LD_LIBRARY_PATH} \
   $HOME/.cargo/bin/cargo build \
   --release \
-  --bin storyteller-web
+  --bin storyteller-web \
+
+RUN SQLX_OFFLINE=true \
+  LD_LIBRARY_PATH=/usr/lib:${LD_LIBRARY_PATH} \
+  $HOME/.cargo/bin/cargo build \
+  --release \
+  --bin dummy-service
 
 # TODO(bt,2023-03-08): disabling these to build web artifact faster during outage
 # RUN SQLX_OFFLINE=true \
@@ -191,6 +197,7 @@ RUN echo -n ${GIT_SHA} > GIT_SHA
 
 # Copy all the binaries.
 COPY --from=builder /tmp/target/release/storyteller-web /
+COPY --from=builder /tmp/target/release/dummy-service /
 # TODO(bt,2023-03-08): disabling these to build web artifact faster during outage
 #COPY --from=builder /tmp/target/release/analytics-job /
 #COPY --from=builder /tmp/target/release/download-job /
