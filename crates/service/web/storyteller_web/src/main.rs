@@ -443,7 +443,7 @@ pub async fn serve(server_state: ServerState) -> AnyhowResult<()>
   info!("Starting HTTP service.");
 
   //let log_format = "[%{HOSTNAME}e] %a \"%r\" %s %b \"%{Referer}i\" \"%{User-Agent}i\" %T";
-  let log_format = "[%{HOSTNAME}e] %{X-Forwarded-For}i \"%r\" %s %b \"%{Referer}i\" \"%{User-Agent}i\" %T";
+  let log_format = "[%{HOSTNAME}e] IP=[%{X-Forwarded-For}i] \"%r\" %s %b \"%{Referer}i\" \"%{User-Agent}i\" %T";
 
   HttpServer::new(move || {
     // NB: Safe to clone due to internal arc
