@@ -165,4 +165,8 @@ pub struct StaticFeatureFlags {
 
   /// Disable the live `/tts/list` endpoint for all users and serve a static value instead.
   pub disable_tts_model_list_endpoint: bool,
+
+  /// Tell the frontend client how fast to refresh their view of the pending TTS count.
+  /// During an attack, we may want this to go extremely slow.
+  pub frontend_pending_tts_refresh_interval_millis: u64,
 }

@@ -14,6 +14,10 @@ pub struct Response {
   pub success: bool,
   pub pending_job_count: u64,
   pub cache_time: NaiveDateTime,
+  
+  /// Tell the frontend client how fast to refresh their view of this list.
+  /// During an attack, we may want this to go extremely slow.
+  pub refresh_interval_millis: u64,
 }
 
 
@@ -58,6 +62,7 @@ pub async fn get_pending_tts_inference_job_count_handler(
       success: true,
       pending_job_count: 10_000,
       cache_time: NaiveDateTime::from_timestamp(0, 0),
+      refresh_interval_millis: server_state.flags.frontend_pending_tts_refresh_interval_millis,
     });
   }
 
@@ -94,6 +99,7 @@ pub async fn get_pending_tts_inference_job_count_handler(
     success: true,
     pending_job_count: count_result.record_count,
     cache_time: count_result.present_time,
+    refresh_interval_millis: server_state.flags.frontend_pending_tts_refresh_interval_millis,
   })
 }
 
