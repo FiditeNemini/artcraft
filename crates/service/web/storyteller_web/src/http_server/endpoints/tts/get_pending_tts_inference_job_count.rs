@@ -4,7 +4,7 @@ use crate::ServerState;
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use database_queries::queries::tts::tts_inference_jobs::get_pending_tts_inference_job_count::get_pending_tts_inference_job_count;
 use hyper::StatusCode;
-use log::{error, info};
+use log::{debug, error, info, warn};
 use std::fmt;
 use std::sync::Arc;
 use errors::AnyhowResult;
@@ -77,21 +77,41 @@ pub async fn get_pending_tts_inference_job_count_handler(
       cached
     },
     None => {
-      info!("populating tts queue length from database");
-      let count_result = get_pending_tts_inference_job_count(&server_state.mysql_pool)
-          .await
-          .map_err(|e| {
-            error!("error querying: {:?}",  e);
-            GetPendingTtsInferenceJobCountError::ServerError
-          })?;
+      debug!("populating tts queue length from database");
 
-      server_state.caches.tts_queue_length.store_copy(&count_result)
-          .map_err(|e| {
-            error!("error storing cache: {:?}", e);
-            GetPendingTtsInferenceJobCountError::ServerError
-          })?;
+      let count_query_result = get_pending_tts_inference_job_count(
+        &server_state.mysql_pool
+      ).await;
 
-      count_result
+      match count_query_result  {
+        // If the database misbehaves (eg. DDoS), let's stop spamming it.
+        // We'll attempt to read the old value from the cache and keep going.
+        Err(err) => {
+          warn!("error querying database / inserting into cache: {:?}", err);
+
+          let maybe_cached = server_state.caches.tts_queue_length.grab_even_expired_and_bump()
+              .map_err(|err| {
+                error!("error consulting cache (even expired): {:?}", err);
+                GetPendingTtsInferenceJobCountError::ServerError
+              })?;
+
+          maybe_cached.ok_or_else(|| {
+            error!("error querying database and subsequently reading cache: {:?}", err);
+            GetPendingTtsInferenceJobCountError::ServerError
+          })?
+        }
+
+        // Happy path...
+        Ok(count_result) => {
+          server_state.caches.tts_queue_length.store_copy(&count_result)
+              .map_err(|e| {
+                error!("error storing cache: {:?}", e);
+                GetPendingTtsInferenceJobCountError::ServerError
+              })?;
+
+          count_result
+        }
+      }
     },
   };
 
