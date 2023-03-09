@@ -2374,6 +2374,38 @@ dependencies = [
 ]
 
 [[package]]
+name = "dummy-service"
+version = "0.0.1"
+dependencies = [
+ "actix-cors 0.6.0-beta.3",
+ "actix-files",
+ "actix-http 3.0.0-beta.11",
+ "actix-multipart",
+ "actix-rt 2.7.0",
+ "actix-service 2.0.1",
+ "actix-utils 3.0.0",
+ "actix-web 4.0.0-beta.10",
+ "actix-web-actors",
+ "actix_helpers",
+ "chrono",
+ "dotenv",
+ "easyenv",
+ "errors",
+ "futures 0.1.31",
+ "futures 0.3.26",
+ "futures-util",
+ "hostname",
+ "http_server_common",
+ "jwt",
+ "reusable_types",
+ "serde",
+ "serde_derive",
+ "serde_json",
+ "tokio 1.25.0",
+ "toml",
+]
+
+[[package]]
 name = "dwrote"
 version = "0.11.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
