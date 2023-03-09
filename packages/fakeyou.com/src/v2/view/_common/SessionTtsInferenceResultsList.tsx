@@ -28,12 +28,17 @@ interface Props {
   sessionSubscriptionsWrapper: SessionSubscriptionsWrapper;
 }
 
+// TODO: This is duplicated in SessionTtsInferenceResultsList !
+// Default to querying every 15 seconds, but make it configurable serverside
+const DEFAULT_QUEUE_REFRESH_INTERVAL_MILLIS = 15000;
+
 function SessionTtsInferenceResultList(props: Props) {
   const [pendingTtsJobs, setPendingTtsJobs] =
     useState<GetPendingTtsJobCountSuccessResponse>({
       success: true,
       pending_job_count: 0,
       cache_time: new Date(0), // NB: Epoch is used for vector clock's initial state
+      refresh_interval_millis: DEFAULT_QUEUE_REFRESH_INTERVAL_MILLIS,
     });
 
   useEffect(() => {
@@ -47,7 +52,10 @@ function SessionTtsInferenceResultList(props: Props) {
         }
       }
     };
-    const interval = setInterval(async () => fetch(), 15000);
+    // TODO: We're having an outage and need to lower this.
+    //const interval = setInterval(async () => fetch(), 15000);
+    const refreshInterval = Math.max(DEFAULT_QUEUE_REFRESH_INTERVAL_MILLIS, pendingTtsJobs.refresh_interval_millis);
+    const interval = setInterval(async () => fetch(), refreshInterval);
     fetch();
     return () => clearInterval(interval);
   }, [pendingTtsJobs]);

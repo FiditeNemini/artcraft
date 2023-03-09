@@ -4,6 +4,7 @@ export interface GetPendingTtsJobCountSuccessResponse {
   success: boolean,
   pending_job_count: number,
   cache_time: Date,
+  refresh_interval_millis: number,
 }
 
 export interface GetPendingTtsJobCountErrorResponse {

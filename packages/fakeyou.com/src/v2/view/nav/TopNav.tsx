@@ -41,6 +41,10 @@ import { Analytics } from "../../../common/Analytics";
 import { faWaveformLines } from "@fortawesome/pro-solid-svg-icons";
 import { faTvRetro } from "@fortawesome/pro-regular-svg-icons";
 
+// TODO: This is duplicated in SessionTtsInferenceResultsList !
+// Default to querying every 15 seconds, but make it configurable serverside
+const DEFAULT_QUEUE_REFRESH_INTERVAL_MILLIS = 15000;
+
 interface Props {
   sessionWrapper: SessionWrapper;
   logoutHandler: () => void;
@@ -76,6 +80,7 @@ function TopNav(props: Props) {
       success: true,
       pending_job_count: 0,
       cache_time: new Date(0), // NB: Epoch is used for vector clock's initial state
+      refresh_interval_millis: DEFAULT_QUEUE_REFRESH_INTERVAL_MILLIS,
     });
 
   useEffect(() => {
@@ -91,7 +96,9 @@ function TopNav(props: Props) {
     };
     // TODO: We're having an outage and need to lower this.
     //const interval = setInterval(async () => fetch(), 15000);
-    const interval = setInterval(async () => fetch(), 5 * 60 * 1000);
+    const refreshInterval = Math.max(DEFAULT_QUEUE_REFRESH_INTERVAL_MILLIS, pendingTtsJobs.refresh_interval_millis);
+    console.log('new interval', refreshInterval);
+    const interval = setInterval(async () => fetch(), refreshInterval);
     fetch();
     return () => clearInterval(interval);
   }, [pendingTtsJobs]);
