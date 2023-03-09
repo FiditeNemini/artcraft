@@ -12,15 +12,8 @@ styles with important tags:
 // Once the rollout is complete, this outer wrapper class can be removed.
 
 .fakeyou-refresh {
-  // h1,
-  // h2,
-  // h3 {
-  //   font-family: Poppins, sans-serif;
-  //   letter-spacing: -0.2px;
-  // }
-
   p {
-    font-weight: 300;
+    font-weight: 400;
     margin-bottom: 0;
     color: rgba($white, 0.9);
   }
@@ -1013,7 +1006,7 @@ textarea {
 
   &.text-message {
     font-size: 18px;
-    font-weight: 300;
+    font-weight: 400;
     min-height: 200px !important;
   }
 }
