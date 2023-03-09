@@ -3,10 +3,13 @@
 pub mod env_args;
 pub mod handlers;
 
+use actix_http::body::MessageBody;
 use actix_helpers::route_builder::RouteBuilder;
 use actix_http::StatusCode;
+use actix_service::ServiceFactory;
 use actix_web::middleware::{Compress, DefaultHeaders, Logger};
 use actix_web::{App, HttpResponse, HttpServer};
+use actix_web::dev::{ServiceRequest, ServiceResponse};
 use crate::env_args::env_args;
 use errors::AnyhowResult;
 use http_server_common::cors::build_cors_config;
@@ -31,30 +34,44 @@ async fn main() -> AnyhowResult<()> {
       .and_then(|h| h.into_string().ok())
       .unwrap_or("hostname-unknown".to_string());
 
-  HttpServer::new(move || {
-    let mut app = App::new();
+  // TODO: Fix duplication for gzip compression. This is stupid.
+  //  I'm too tired to figure out the generic types though.
+  if env_args.enable_gzip {
+    HttpServer::new(move || {
+      let mut app = App::new()
+          .wrap(Logger::new(&log_format))
+          .wrap(DefaultHeaders::new()
+              .header("X-Backend-Hostname", &server_hostname))
+          .wrap(Compress::default());
 
-    //app.wrap(Compress::default())
-    let mut app = app
-        .wrap(Logger::new(&log_format))
-        .wrap(DefaultHeaders::new()
-            .header("X-Backend-Hostname", &server_hostname));
+      RouteBuilder::from_app(app)
+          .add_get("/", simple_handler)
+          .add_get("/_status", simple_handler)
+          .add_post("/{tail:.*}", simple_handler)
+          .into_app()
+    })
+        .bind(&env_args.bind_address)?
+        .workers(env_args.num_workers)
+        .run()
+        .await?;
+  } else {
+    HttpServer::new(move || {
+      let mut app = App::new()
+          .wrap(Logger::new(&log_format))
+          .wrap(DefaultHeaders::new()
+              .header("X-Backend-Hostname", &server_hostname));
 
-        let mut route_builder = RouteBuilder::from_app(app);
-
-        let mut app = route_builder
-            .add_get("/", simple_handler)
-            .add_get("/_status", simple_handler)
-            .add_post("/{tail:.*}", simple_handler)
-            .into_app();
-
-        app
-      })
-
-      .bind(&env_args.bind_address)?
-      .workers(env_args.num_workers)
-      .run()
-      .await?;
+      RouteBuilder::from_app(app)
+          .add_get("/", simple_handler)
+          .add_get("/_status", simple_handler)
+          .add_post("/{tail:.*}", simple_handler)
+          .into_app()
+    })
+        .bind(&env_args.bind_address)?
+        .workers(env_args.num_workers)
+        .run()
+        .await?;
+  }
 
   Ok(())
 }
