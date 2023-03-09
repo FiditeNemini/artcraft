@@ -26,7 +26,7 @@ async fn main() -> AnyhowResult<()> {
   easyenv::init_all_with_default_logging(Some(DEFAULT_RUST_LOG));
 
   //let log_format = "[%{HOSTNAME}e] %a \"%r\" %s %b \"%{Referer}i\" \"%{User-Agent}i\" %T";
-  let log_format = "[%{HOSTNAME}e] %{X-Forwarded-For}i \"%r\" %s %b \"%{Referer}i\" \"%{User-Agent}i\" %T";
+  let log_format = "[dummy-service] [%{HOSTNAME}e] %{X-Forwarded-For}i \"%r\" %s %b \"%{Referer}i\" \"%{User-Agent}i\" %T";
 
   let env_args = env_args()?;
 
