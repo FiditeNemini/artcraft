@@ -8,7 +8,7 @@ use actix_helpers::route_builder::RouteBuilder;
 use actix_http::StatusCode;
 use actix_service::ServiceFactory;
 use actix_web::middleware::{Compress, DefaultHeaders, Logger};
-use actix_web::{App, HttpResponse, HttpServer};
+use actix_web::{App, HttpResponse, HttpServer, web};
 use actix_web::dev::{ServiceRequest, ServiceResponse};
 use crate::env_args::env_args;
 use errors::AnyhowResult;
@@ -47,8 +47,8 @@ async fn main() -> AnyhowResult<()> {
       RouteBuilder::from_app(app)
           .add_get("/", simple_handler)
           .add_get("/_status", simple_handler)
-          .add_post("/{tail:.*}", simple_handler)
           .into_app()
+          .default_service(web::route().to(simple_handler))
     })
         .bind(&env_args.bind_address)?
         .workers(env_args.num_workers)
@@ -64,8 +64,8 @@ async fn main() -> AnyhowResult<()> {
       RouteBuilder::from_app(app)
           .add_get("/", simple_handler)
           .add_get("/_status", simple_handler)
-          .add_post("/{tail:.*}", simple_handler)
           .into_app()
+          .default_service(web::route().to(simple_handler))
     })
         .bind(&env_args.bind_address)?
         .workers(env_args.num_workers)
