@@ -18,6 +18,7 @@ use memory_caching::single_item_ttl_cache::SingleItemTtlCache;
 use r2d2_redis::{r2d2, RedisConnectionManager};
 use reusable_types::server_environment::ServerEnvironment;
 use sqlx::MySqlPool;
+use actix_helpers::middleware::ip_filter::ip_ban_list::ip_ban_list::IpBanList;
 use url_config::third_party_url_redirector::ThirdPartyUrlRedirector;
 use users_component::utils::session_checker::SessionChecker;
 use users_component::utils::session_cookie_manager::SessionCookieManager;
@@ -65,6 +66,7 @@ pub struct ServerState {
   pub sort_key_crypto: SortKeyCrypto,
 
   pub ip_banlist: IpBanlistSet,
+  pub ip_ban_list: IpBanList,
 
   pub static_api_token_set: StaticApiTokenSet,
 

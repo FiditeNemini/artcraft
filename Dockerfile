@@ -79,6 +79,7 @@ COPY Cargo.toml .
 COPY crates/ ./crates
 COPY db/ ./db
 COPY test_data/ ./test_data
+COPY container_includes/ ./container_includes
 
 # Print a report on disk space
 #RUN echo "Disk usage at root (before tests):"
@@ -215,6 +216,9 @@ COPY --from=builder /etc/ssl /etc/ssl
 # Required dynamically linked libraries
 COPY --from=builder /usr/lib/x86_64-linux-gnu/libssl.*             /lib/x86_64-linux-gnu/
 COPY --from=builder /usr/lib/x86_64-linux-gnu/libcrypto.*          /lib/x86_64-linux-gnu/
+
+# Container includes
+COPY container_includes/ /container_includes
 
 # Make sure all the links resolve
 RUN ldd storyteller-web

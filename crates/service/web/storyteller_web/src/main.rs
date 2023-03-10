@@ -83,6 +83,8 @@ use sqlx::mysql::MySqlPoolOptions;
 use std::sync::Arc;
 use std::time::Duration;
 use tokio::runtime::Runtime;
+use actix_helpers::middleware::ip_filter::ip_ban_list::ip_ban_list::IpBanList;
+use actix_helpers::middleware::ip_filter::ip_ban_list::load_ip_ban_list_from_directory::load_ip_ban_list_from_directory;
 use twitch_common::twitch_secrets::TwitchSecrets;
 use url_config::third_party_url_redirector::ThirdPartyUrlRedirector;
 use users_component::utils::session_checker::SessionChecker;
@@ -362,6 +364,8 @@ async fn main() -> AnyhowResult<()> {
     stripe::Client::new(api_secret)
   };
 
+  let ip_ban_list = load_static_container_ip_bans();
+
   // NB: Docker creates this file within container builds.
   let build_sha = std::fs::read_to_string("/GIT_SHA")
       .unwrap_or(String::from("unknown"))
@@ -422,7 +426,8 @@ async fn main() -> AnyhowResult<()> {
       },
       redirect_landing_url: twitch_oauth_redirect_landing_url,
       redirect_landing_finished_url: twitch_oauth_redirect_landing_finished_url,
-    }
+    },
+    ip_ban_list,
   };
 
   serve(server_state)
@@ -436,6 +441,19 @@ fn read_static_api_tokens() -> StaticApiTokenSet {
     "./configs/static_api_tokens.toml");
 
   StaticApiTokenSet::from_file(&filename)
+}
+
+fn load_static_container_ip_bans() -> IpBanList {
+  let ip_ban_directory = easyenv::get_env_string_or_default(
+    "IP_BAN_DIRECTORY",
+    "./container_includes/ip_bans"
+  );
+
+  let ip_ban_list = load_ip_ban_list_from_directory(ip_ban_directory)
+      .unwrap_or(IpBanList::new());
+
+  info!("Static IP bans loaded: {}", ip_ban_list.total_len().unwrap_or(0));
+  ip_ban_list
 }
 
 pub async fn serve(server_state: ServerState) -> AnyhowResult<()>
@@ -454,6 +472,7 @@ pub async fn serve(server_state: ServerState) -> AnyhowResult<()>
   HttpServer::new(move || {
     // NB: Safe to clone due to internal arc
     let ip_banlist = server_state_arc.ip_banlist.clone();
+    let ip_ban_list = server_state_arc.ip_ban_list.clone();
 
     // NB: Dynamic dispatch needs to be wrapped with Arc.
     let product_lookup : Arc<dyn InternalSubscriptionProductLookup> = Arc::new(StripeInternalSubscriptionProductLookupImpl {});
@@ -482,7 +501,8 @@ pub async fn serve(server_state: ServerState) -> AnyhowResult<()>
         .header("X-Backend-Hostname", &hostname)
         .header("X-Build-Sha", server_state_arc.server_info.build_sha.clone()))
       .wrap(PushbackFilter::new(&server_state_arc.flags.clone()))
-      .wrap(IpFilter::new(ip_banlist))
+      .wrap(IpFilter::new(ip_banlist)) // TODO: Remove the old IP filter middleware
+      .wrap(actix_helpers::middleware::ip_filter::ip_filter_middleware::IpFilter::new(ip_ban_list))
       .wrap(Logger::new(&log_format)
         .exclude("/liveness")
         .exclude("/readiness"))

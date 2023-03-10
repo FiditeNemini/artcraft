@@ -6391,6 +6391,7 @@ dependencies = [
  "actix-utils 3.0.0",
  "actix-web 4.0.0-beta.10",
  "actix-web-actors",
+ "actix_helpers",
  "anyhow",
  "async-stripe",
  "async-trait",

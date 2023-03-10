@@ -46,6 +46,17 @@ impl IpBanList {
       },
     }
   }
+
+  pub fn total_len(&self) -> AnyhowResult<usize> {
+    match self.ip_sets.read() {
+      Err(_) => Err(anyhow!("Can't read lock")),
+      Ok(sets) => {
+        Ok(sets.values()
+            .map(|set| set.len())
+            .sum())
+      },
+    }
+  }
 }
 
 #[cfg(test)]
