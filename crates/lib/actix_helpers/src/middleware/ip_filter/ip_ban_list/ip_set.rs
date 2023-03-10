@@ -13,6 +13,12 @@ impl IpSet {
     }
   }
 
+  pub fn from_set(ip_set: HashSet<String>) -> Self {
+    Self {
+      ip_set,
+    }
+  }
+
   pub fn replace_set(&mut self, ip_set: HashSet<String>) {
     self.ip_set = ip_set;
   }

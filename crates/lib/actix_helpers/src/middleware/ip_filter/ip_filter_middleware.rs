@@ -1,11 +1,11 @@
+use actix_web::Error;
 use actix_web::dev::{Service, Transform};
 use actix_web::dev::{ServiceRequest, ServiceResponse};
-use actix_web::Error;
+use crate::extractors::get_service_request_ip_address::get_service_request_ip_address;
 use crate::middleware::ip_filter::banned_error::BannedError;
-use crate::middleware::ip_filter::ip_ban_list::IpBanList;
+use crate::middleware::ip_filter::ip_ban_list::ip_ban_list::IpBanList;
 use futures_util::future::{err, ok, Either, Ready};
 use std::task::{Context, Poll};
-use crate::extractors::get_service_request_ip_address::get_service_request_ip_address;
 
 // There are two steps in middleware processing.
 // 1. Middleware initialization, middleware factory gets called with
