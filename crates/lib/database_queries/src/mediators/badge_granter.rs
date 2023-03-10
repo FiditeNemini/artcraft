@@ -1,5 +1,5 @@
 use anyhow::anyhow;
-use container_common::anyhow_result::AnyhowResult;
+use errors::AnyhowResult;
 use crate::mediators::firehose_publisher::FirehosePublisher;
 use log::{warn,info};
 use reusable_types::achievements::user_badge::UserBadge;

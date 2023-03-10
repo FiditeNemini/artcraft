@@ -1,6 +1,6 @@
 use anyhow::anyhow;
 use chrono::{DateTime, Utc};
-use container_common::anyhow_result::AnyhowResult;
+use errors::AnyhowResult;
 use crate::helpers::boolean_converters::i8_to_bool;
 use log::{warn, info};
 use sqlx::pool::PoolConnection;

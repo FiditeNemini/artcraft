@@ -1,4 +1,4 @@
-use container_common::anyhow_result::AnyhowResult;
+use errors::AnyhowResult;
 use crate::queries::users::user::lookup_user_for_login_result::UserRecordForLogin;
 use sqlx::MySqlPool;
 

@@ -1,6 +1,6 @@
 use anyhow::anyhow;
 use chrono::Utc;
-use container_common::anyhow_result::AnyhowResult;
+use errors::AnyhowResult;
 use crate::column_types::job_status::JobStatus;
 use crate::queries::generic_download::job::_keys::GenericDownloadJobId;
 use crate::tokens::Tokens;

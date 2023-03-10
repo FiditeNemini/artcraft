@@ -1,4 +1,4 @@
-use container_common::anyhow_result::AnyhowResult;
+use errors::AnyhowResult;
 use std::collections::HashMap;
 
 /// How TTS commands should be prefixed: !voiceName, /voiceName, etc.

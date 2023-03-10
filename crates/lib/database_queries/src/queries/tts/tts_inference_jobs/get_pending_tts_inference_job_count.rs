@@ -1,5 +1,5 @@
 use chrono::NaiveDateTime;
-use container_common::anyhow_result::AnyhowResult;
+use errors::AnyhowResult;
 use crate::helpers::numeric_converters::try_i64_to_u64_or_min;
 use sqlx::MySqlPool;
 

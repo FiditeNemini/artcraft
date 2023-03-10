@@ -1,6 +1,6 @@
 use anyhow::anyhow;
 use chrono::Utc;
-use container_common::anyhow_result::AnyhowResult;
+use errors::AnyhowResult;
 use enums::common::visibility::Visibility;
 use sqlx::MySqlPool;
 use std::path::Path;

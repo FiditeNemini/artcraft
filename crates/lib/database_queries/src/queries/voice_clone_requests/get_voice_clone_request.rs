@@ -1,6 +1,6 @@
 use anyhow::anyhow;
 use chrono::{Utc, DateTime};
-use container_common::anyhow_result::AnyhowResult;
+use errors::AnyhowResult;
 use crate::column_types::twitch_event_category::TwitchEventCategory;
 use crate::helpers::boolean_converters::i8_to_bool;
 use sqlx::MySqlPool;

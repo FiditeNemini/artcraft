@@ -2,7 +2,7 @@ use anyhow::anyhow;
 use sqlx::error::Error::Database;
 use log::error;
 use sqlx::MySqlPool;
-use container_common::anyhow_result::AnyhowResult;
+use errors::AnyhowResult;
 use enums::common::visibility::Visibility;
 
 // FIXME: NB: This is an old query that was somewhat modernized when moved.

@@ -1,5 +1,5 @@
 use anyhow::anyhow;
-use container_common::anyhow_result::AnyhowResult;
+use errors::AnyhowResult;
 use sqlx::MySqlPool;
 
 pub async fn delete_api_token(

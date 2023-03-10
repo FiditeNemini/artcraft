@@ -1,5 +1,5 @@
 use anyhow::anyhow;
-use container_common::anyhow_result::AnyhowResult;
+use errors::AnyhowResult;
 use container_common::token::random_uuid::generate_random_uuid;
 use crate::builders::RequiredOption;
 use sqlx::MySqlPool;

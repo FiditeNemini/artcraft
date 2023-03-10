@@ -1,6 +1,6 @@
 use anyhow::anyhow;
 use sqlx::MySqlPool;
-use container_common::anyhow_result::AnyhowResult;
+use errors::AnyhowResult;
 
 pub struct CreateCategoryArgs<'a> {
   pub category_token: &'a str,

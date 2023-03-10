@@ -1,6 +1,6 @@
 use anyhow::anyhow;
 use chrono::{Utc, DateTime, NaiveDateTime};
-use container_common::anyhow_result::AnyhowResult;
+use errors::AnyhowResult;
 use sqlx::MySqlPool;
 
 /// This just queries for current time. If it fails, we know the connection pool is dead.

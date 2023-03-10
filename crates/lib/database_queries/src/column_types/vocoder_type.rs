@@ -1,7 +1,7 @@
 //! These denote the pretrained vocoders
 
 use anyhow::anyhow;
-use container_common::anyhow_result::AnyhowResult;
+use errors::AnyhowResult;
 
 #[derive(Clone, Copy, PartialEq, Eq, Debug, Serialize, Deserialize, sqlx::Type)]
 #[serde(rename_all = "lowercase")]

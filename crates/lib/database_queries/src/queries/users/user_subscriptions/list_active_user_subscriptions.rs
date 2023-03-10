@@ -1,7 +1,7 @@
 use chrono::{DateTime, Utc};
 use sqlx::{MySql, MySqlPool};
 use sqlx::pool::PoolConnection;
-use container_common::anyhow_result::AnyhowResult;
+use errors::AnyhowResult;
 
 pub struct ActiveUserSubscription {
     pub user_token: String,

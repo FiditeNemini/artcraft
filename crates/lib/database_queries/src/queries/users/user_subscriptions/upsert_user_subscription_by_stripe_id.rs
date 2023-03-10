@@ -1,6 +1,6 @@
 use anyhow::anyhow;
 use chrono::NaiveDateTime;
-use container_common::anyhow_result::AnyhowResult;
+use errors::AnyhowResult;
 use crate::tokens::Tokens;
 use reusable_types::stripe::stripe_recurring_interval::StripeRecurringInterval;
 use reusable_types::stripe::stripe_subscription_status::StripeSubscriptionStatus;

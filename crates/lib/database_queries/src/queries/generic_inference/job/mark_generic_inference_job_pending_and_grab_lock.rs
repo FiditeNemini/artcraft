@@ -1,5 +1,5 @@
 use anyhow::anyhow;
-use container_common::anyhow_result::AnyhowResult;
+use errors::AnyhowResult;
 use crate::queries::generic_inference::job::_keys::GenericInferenceJobId;
 use sqlx::MySqlPool;
 use sqlx;

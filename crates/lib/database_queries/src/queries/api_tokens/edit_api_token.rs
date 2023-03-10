@@ -1,5 +1,5 @@
 use anyhow::anyhow;
-use container_common::anyhow_result::AnyhowResult;
+use errors::AnyhowResult;
 use log::warn;
 use sqlx::MySqlPool;
 use std::collections::{HashSet, HashMap};

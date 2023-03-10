@@ -1,4 +1,4 @@
-use container_common::anyhow_result::AnyhowResult;
+use errors::AnyhowResult;
 use enums::by_table::trending_model_analytics::model_type::ModelType;
 use enums::by_table::trending_model_analytics::window_name::WindowName;
 use sqlx::MySql;

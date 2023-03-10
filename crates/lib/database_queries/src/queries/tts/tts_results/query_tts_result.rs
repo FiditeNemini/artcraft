@@ -5,7 +5,7 @@
 
 use anyhow::anyhow;
 use chrono::{DateTime, Utc};
-use container_common::anyhow_result::AnyhowResult;
+use errors::AnyhowResult;
 use crate::column_types::vocoder_type::VocoderType;
 use crate::helpers::boolean_converters::{nullable_i8_to_bool, i8_to_bool};
 use enums::common::visibility::Visibility;

@@ -1,5 +1,5 @@
 use anyhow::anyhow;
-use container_common::anyhow_result::AnyhowResult;
+use errors::AnyhowResult;
 use crate::column_types::twitch_event_category::TwitchEventCategory;
 use crate::tokens::Tokens;
 use sqlx::MySqlPool;

@@ -3,7 +3,7 @@
 #![forbid(unused_mut)]
 
 use anyhow::anyhow;
-use container_common::anyhow_result::AnyhowResult;
+use errors::AnyhowResult;
 use crate::helpers::boolean_converters::{nullable_i8_to_optional_bool, i8_to_bool, nullable_i8_to_bool_default_false};
 use enums::common::visibility::Visibility;
 use log::warn;

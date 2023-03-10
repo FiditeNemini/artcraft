@@ -1,6 +1,6 @@
 use anyhow::anyhow;
 use chrono::{DateTime, NaiveDateTime, Utc};
-use container_common::anyhow_result::AnyhowResult;
+use errors::AnyhowResult;
 use crate::helpers::boolean_converters::nullable_i8_to_optional_bool;
 use log::warn;
 use reusable_types::stripe::stripe_subscription_status::StripeSubscriptionStatus;

@@ -1,6 +1,6 @@
 use anyhow::anyhow;
 use buckets::public::media_uploads::original_file::MediaUploadOriginalFilePath;
-use container_common::anyhow_result::AnyhowResult;
+use errors::AnyhowResult;
 use crate::payloads::media_upload_details::MediaUploadDetails;
 use enums::by_table::media_uploads::media_upload_type::MediaUploadType;
 use enums::common::visibility::Visibility;

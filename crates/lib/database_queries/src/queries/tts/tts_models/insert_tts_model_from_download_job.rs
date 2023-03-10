@@ -1,6 +1,6 @@
 use anyhow::anyhow;
 use chrono::Utc;
-use container_common::anyhow_result::AnyhowResult;
+use errors::AnyhowResult;
 use crate::queries::generic_download::job::list_available_generic_download_jobs::AvailableDownloadJob;
 use crate::tokens::Tokens;
 use enums::common::visibility::Visibility;

@@ -1,4 +1,4 @@
-use container_common::anyhow_result::AnyhowResult;
+use errors::AnyhowResult;
 use sqlx::MySqlPool;
 
 pub async fn delete_user_session(session_token: &str, mysql_pool: &MySqlPool) -> AnyhowResult<()> {

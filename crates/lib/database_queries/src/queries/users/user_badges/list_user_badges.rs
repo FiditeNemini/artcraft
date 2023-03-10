@@ -1,6 +1,6 @@
 use anyhow::anyhow;
 use chrono::{DateTime, Utc};
-use container_common::anyhow_result::AnyhowResult;
+use errors::AnyhowResult;
 use log::{warn, info};
 use sqlx::{MySql, MySqlPool};
 use sqlx::pool::PoolConnection;

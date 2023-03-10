@@ -4,7 +4,7 @@
 #![forbid(unused_variables)]
 
 use anyhow::anyhow;
-use container_common::anyhow_result::AnyhowResult;
+use errors::AnyhowResult;
 use crate::tokens::Tokens;
 use enums::common::visibility::Visibility;
 use enums::common::vocoder_type::VocoderType;

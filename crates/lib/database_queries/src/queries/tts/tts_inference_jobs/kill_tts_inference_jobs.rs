@@ -1,5 +1,5 @@
 use anyhow::anyhow;
-use container_common::anyhow_result::AnyhowResult;
+use errors::AnyhowResult;
 use sqlx::mysql::MySqlArguments;
 use sqlx::query::Query;
 use sqlx::{MySqlPool, MySql};

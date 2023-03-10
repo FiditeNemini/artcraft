@@ -1,7 +1,7 @@
 use anyhow::anyhow;
 use chrono::{DateTime, Utc};
 use sqlx::MySqlPool;
-use container_common::anyhow_result::AnyhowResult;
+use errors::AnyhowResult;
 
 pub struct W2lUploadTemplateJobStatusRecord {
   pub job_token: String,

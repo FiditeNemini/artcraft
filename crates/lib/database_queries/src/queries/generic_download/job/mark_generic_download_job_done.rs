@@ -1,5 +1,5 @@
 use anyhow::anyhow;
-use container_common::anyhow_result::AnyhowResult;
+use errors::AnyhowResult;
 use crate::queries::generic_download::job::list_available_generic_download_jobs::AvailableDownloadJob;
 use sqlx::MySqlPool;
 

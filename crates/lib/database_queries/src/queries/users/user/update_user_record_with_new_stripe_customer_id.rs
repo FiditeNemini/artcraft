@@ -1,5 +1,5 @@
 use anyhow::anyhow;
-use container_common::anyhow_result::AnyhowResult;
+use errors::AnyhowResult;
 use sqlx::MySqlPool;
 
 pub async fn update_user_record_with_new_stripe_customer_id(

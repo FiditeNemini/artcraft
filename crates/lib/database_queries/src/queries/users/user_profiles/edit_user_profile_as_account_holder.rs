@@ -4,7 +4,7 @@
 #![forbid(unused_variables)]
 
 use sqlx::MySqlPool;
-use container_common::anyhow_result::AnyhowResult;
+use errors::AnyhowResult;
 
 pub struct Args<'a> {
   pub user_token: &'a str,

@@ -1,6 +1,6 @@
 use anyhow::anyhow;
 use chrono::NaiveDateTime;
-use container_common::anyhow_result::AnyhowResult;
+use errors::AnyhowResult;
 use sqlx::MySqlPool;
 
 // TODO: Make a trait with default impls to handle common query concerns.
