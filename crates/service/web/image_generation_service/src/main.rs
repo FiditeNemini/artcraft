@@ -25,7 +25,7 @@ use actix_web::{App, HttpServer, web};
 use cloud_storage::bucket_client::BucketClient;
 use config::common_env::CommonEnv;
 use config::shared_constants::{DEFAULT_MYSQL_CONNECTION_STRING, DEFAULT_RUST_LOG};
-use container_common::anyhow_result::AnyhowResult;
+use errors::AnyhowResult;
 use crate::routes::add_routes;
 use crate::server_state::{EnvConfig, InMemoryCaches, ServerState};
 use http_server_common::cors::build_production_cors_config;

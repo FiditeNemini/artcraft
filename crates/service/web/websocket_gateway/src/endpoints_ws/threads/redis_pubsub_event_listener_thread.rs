@@ -1,4 +1,4 @@
-use container_common::anyhow_result::AnyhowResult;
+use errors::AnyhowResult;
 use crate::endpoints_ws::threads::tts_inference_job_token_queue::TtsInferenceJobTokenQueue;
 use futures::Future;
 use futures::future::Ready;

@@ -1,5 +1,5 @@
 use anyhow::anyhow;
-use container_common::anyhow_result::AnyhowResult;
+use errors::AnyhowResult;
 use log::error;
 use log::warn;
 use r2d2_redis::RedisConnectionManager;

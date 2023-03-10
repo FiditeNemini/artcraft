@@ -1,6 +1,6 @@
 use base64::{Config, CharacterSet};
 use base64;
-use container_common::anyhow_result::AnyhowResult;
+use errors::AnyhowResult;
 use magic_crypt::generic_array::typenum::U256;
 use magic_crypt::new_magic_crypt;
 use magic_crypt::{MagicCryptTrait, MagicCrypt256};

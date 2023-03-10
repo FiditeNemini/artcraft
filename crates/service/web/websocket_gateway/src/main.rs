@@ -23,7 +23,7 @@ use actix_web::{HttpServer, web, HttpResponse, App};
 use config::shared_constants::DEFAULT_MYSQL_CONNECTION_STRING;
 use config::shared_constants::DEFAULT_REDIS_DATABASE_1_CONNECTION_STRING;
 use config::shared_constants::DEFAULT_RUST_LOG;
-use container_common::anyhow_result::AnyhowResult;
+use errors::AnyhowResult;
 use crate::endpoints_ws::obs_gateway_websocket_handler::obs_gateway_websocket_handler;
 use crate::server_state::{ObsGatewayServerState, EnvConfig, TwitchOauthSecrets, BackendsConfig, MultithreadingConfig};
 use futures::Future;
