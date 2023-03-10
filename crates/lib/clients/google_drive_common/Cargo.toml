@@ -15,8 +15,8 @@ path = "src/lib.rs"
 [dependencies]
 
 # Internal
-container_common = { path = "../container_common" }
-subprocess_common = { path = "../subprocess_common" }
+container_common = { path = "../../container_common" }
+subprocess_common = { path = "../../subprocess_common" }
 
 # External
 anyhow = "1.0.40"

@@ -16,11 +16,11 @@ path = "src/main.rs"
 
 # Internal
 buckets = { path = "../../../_types/buckets" }
-cloud_storage = { path = "../../../lib/cloud_storage" }
+cloud_storage = { path = "../../../lib/clients/cloud_storage" }
 config = { path = "../../../lib/config" }
 container_common = { path = "../../../lib/container_common" }
 database_queries = { path = "../../../lib/database_queries" }
-google_drive_common = { path = "../../../lib/google_drive_common" }
+google_drive_common = { path = "../../../lib/clients/google_drive_common" }
 hashing = { path = "../../../lib/hashing" }
 jobs_common = { path = "../../../lib/jobs_common" }
 tts_common = { path = "../../../lib/tts_common" }

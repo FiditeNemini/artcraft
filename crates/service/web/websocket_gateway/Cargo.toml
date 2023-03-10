@@ -18,9 +18,10 @@ path = "src/main.rs"
 config = { path = "../../../lib/config" }
 container_common = { path = "../../../lib/container_common" }
 database_queries = { path = "../../../lib/database_queries" }
+errors = { path = "../../../lib/errors" }
 http_server_common = { path = "../../../lib/http_server_common" }
 redis_common = { path = "../../../lib/redis_common" }
-twitch_common = { path = "../../../lib/twitch_common" }
+twitch_common = { path = "../../../lib/clients/twitch_common" }
 
 # External
 anyhow = "1.0.40"

@@ -15,8 +15,8 @@ path = "src/lib.rs"
 [dependencies]
 
 # Internal
-buckets = { path = "../../_types/buckets" }
-container_common = { path = "../container_common" }
+buckets = { path = "../../../_types/buckets" }
+container_common = { path = "../../container_common" }
 
 # External
 anyhow = "1.0.40"
