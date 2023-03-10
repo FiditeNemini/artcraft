@@ -3340,6 +3340,7 @@ dependencies = [
  "chrono",
  "container_common",
  "dotenv",
+ "errors",
  "language-tags 0.3.2",
  "log",
  "once_cell",
@@ -4072,6 +4073,7 @@ dependencies = [
  "chrono",
  "config",
  "container_common",
+ "errors",
  "log",
  "lru_time_cache",
 ]

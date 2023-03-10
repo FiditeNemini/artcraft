@@ -1,5 +1,5 @@
 use anyhow::bail;
-use container_common::anyhow_result::AnyhowResult;
+use errors::AnyhowResult;
 use lru_time_cache::LruCache;
 use std::sync::{Arc, Mutex};
 use std::time::Duration;
