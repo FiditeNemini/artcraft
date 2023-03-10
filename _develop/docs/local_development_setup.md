@@ -1,7 +1,7 @@
 dev setup
 =========
 
-[Back to main README](../README.md)
+[Back to main README](../../README.md)
 
 ## Debugging and Fixing CUDA/PyTorch
 

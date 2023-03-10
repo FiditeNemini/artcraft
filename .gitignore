@@ -10,8 +10,8 @@ production_database_secret_query.sh
 production_database_voice_clone_report_download.sh
 secrets.toml
 secrets.yaml
-tools/.secrets
-tools/db_secrets.toml
+_develop/tools/.secrets
+_develop/tools/db_secrets.toml
 twitch_secrets.toml
 
 # Rust build directory
