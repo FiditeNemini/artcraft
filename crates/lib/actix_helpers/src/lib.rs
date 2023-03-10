@@ -1,7 +1,7 @@
-//! errors
+//! actix_helpers
 //!
-//! The purpose of this library is to pin to a single 'anyhow' and also develop
-//! common error utilities.
+//! The purpose of this library is to collect utility functionality that may be useful
+//! to reuse across Actix installs.
 //!
 
 // Never allow these
@@ -18,4 +18,6 @@
 #![allow(dead_code)]
 #![allow(non_snake_case)]
 
+pub mod extractors;
+pub mod middleware;
 pub mod route_builder;
