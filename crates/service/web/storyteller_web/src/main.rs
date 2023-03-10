@@ -447,14 +447,14 @@ fn read_static_api_tokens() -> StaticApiTokenSet {
 fn read_endpoint_disablements() -> DisabledEndpoints {
   let exact_filename = easyenv::get_env_string_or_default(
     "DISABLED_ENDPOINTS_FILE_EXACT_MATCH",
-    "./container_includes/endpoint_disablement/endpoint_exact_match.txt");
+    "./container_includes/endpoint_disablement/endpoint_exact_matches.txt");
 
   let exact = ExactMatchEndpointDisablements::load_from_file(exact_filename)
       .unwrap_or(ExactMatchEndpointDisablements::new()); // NB: Fail open
 
   let prefix_filename = easyenv::get_env_string_or_default(
     "DISABLED_ENDPOINTS_FILE_PREFIX_MATCH",
-    "./container_includes/endpoint_disablement/endpoint_starts_with.txt");
+    "./container_includes/endpoint_disablement/endpoint_prefixes.txt");
 
   let prefix = PrefixEndpointDisablements::load_from_file(prefix_filename)
       .unwrap_or(PrefixEndpointDisablements::new()); // NB: Fail open
