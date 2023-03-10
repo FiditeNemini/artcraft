@@ -1,24 +1,27 @@
-use anyhow::Error;
-use crate::threads::ip_banlist_set::IpBanlistSet;
+use actix_helpers::middleware::ip_filter::ip_ban_list::ip_ban_list::IpBanList;
+use actix_helpers::middleware::ip_filter::ip_ban_list::ip_set::IpSet;
 use database_queries::queries::ip_bans::list_ip_bans::list_ip_bans;
-use log::info;
+use errors::AnyhowResult;
+use log::{debug, error, info};
 use log::warn;
 use sqlx::MySqlPool;
 use std::collections::HashSet;
 use std::thread;
 use std::time::Duration;
 
+const DYNAMIC_BAN_LIST_NAME : &'static str = "DYNAMIC_POLLING_IP_BAN_LIST";
+
 pub async fn poll_ip_bans(
-  ip_banlist_set: IpBanlistSet,
+  ip_ban_list: IpBanList,
   mysql_pool: MySqlPool,
 ) {
   loop {
-    info!("Job fetching IP Address Bans...");
+    debug!("Job fetching IP Address Bans...");
 
     let bans = match list_ip_bans(&mysql_pool).await {
       Ok(bans) => bans,
       Err(e) => {
-        warn!("Error polling IP bans: {:?}", e);
+        error!("Error polling IP bans: {:?}", e);
         thread::sleep(Duration::from_millis(30_000));
         continue;
       }
@@ -28,12 +31,20 @@ pub async fn poll_ip_bans(
         .map(|record| record.ip_address.clone())
         .collect::<HashSet<String>>();
 
-    info!("Job found {} IP Address Bans.", ip_addresses.len());
+    let database_count = ip_addresses.len();
 
-    match ip_banlist_set.replace_list(ip_addresses) {
-      Ok(_) => info!("internal banlist updated!"),
+    info!("Job found {} database IP address bans.", database_count);
+
+    let ip_set = IpSet::from_set(ip_addresses);
+
+    match ip_ban_list.add_set(DYNAMIC_BAN_LIST_NAME.to_string(), ip_set)  {
+      Ok(_) => {
+        let total_count = ip_ban_list.total_len().unwrap_or(0);
+        info!("Internal IP ban list updated! Total bans: {} ({} from database)",
+          total_count, database_count);
+      },
       Err(e) => {
-        warn!("error replacing banlist: {:?}", e);
+        warn!("Error replacing IP ban list: {:?}", e);
       },
     }
 

@@ -1,3 +1,4 @@
+use actix_helpers::middleware::ip_filter::ip_ban_list::ip_ban_list::IpBanList;
 use billing_component::stripe::stripe_config::StripeConfig;
 use cloud_storage::bucket_client::BucketClient;
 use crate::StaticApiTokenSet;
@@ -7,7 +8,6 @@ use crate::http_server::endpoints::leaderboard::get_leaderboard::LeaderboardInfo
 use crate::http_server::endpoints::tts::list_tts_models::TtsModelRecordForResponse;
 use crate::http_server::web_utils::redis_rate_limiter::RedisRateLimiter;
 use crate::threads::db_health_checker_thread::db_health_check_status::HealthCheckStatus;
-use crate::threads::ip_banlist_set::IpBanlistSet;
 use crate::util::encrypted_sort_id::SortKeyCrypto;
 use database_queries::mediators::badge_granter::BadgeGranter;
 use database_queries::mediators::firehose_publisher::FirehosePublisher;
@@ -18,7 +18,6 @@ use memory_caching::single_item_ttl_cache::SingleItemTtlCache;
 use r2d2_redis::{r2d2, RedisConnectionManager};
 use reusable_types::server_environment::ServerEnvironment;
 use sqlx::MySqlPool;
-use actix_helpers::middleware::ip_filter::ip_ban_list::ip_ban_list::IpBanList;
 use url_config::third_party_url_redirector::ThirdPartyUrlRedirector;
 use users_component::utils::session_checker::SessionChecker;
 use users_component::utils::session_cookie_manager::SessionCookieManager;
@@ -65,7 +64,6 @@ pub struct ServerState {
 
   pub sort_key_crypto: SortKeyCrypto,
 
-  pub ip_banlist: IpBanlistSet,
   pub ip_ban_list: IpBanList,
 
   pub static_api_token_set: StaticApiTokenSet,

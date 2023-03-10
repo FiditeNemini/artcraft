@@ -26,6 +26,6 @@ impl ResponseError for BannedError {
     // However, I need to balance this requirement with not cluing in those that are banned.
     HttpResponseBuilder::new(self.status_code())
         .append_header((CONTENT_TYPE, ContentType::json()))
-        .body(r#"{\"success\": false, \"error_message\": \"ERR64: database error\"}"#)
+        .body(r#"{"success": false, "error_message": "ERR64: database error"}"#)
   }
 }

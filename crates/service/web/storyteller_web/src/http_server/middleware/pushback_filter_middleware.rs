@@ -10,7 +10,6 @@ use actix_web::{Error, HttpResponse};
 use actix_web::{ResponseError, HttpMessage, HttpRequest, HttpResponseBuilder};
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::server_state::StaticFeatureFlags;
-use crate::threads::ip_banlist_set::IpBanlistSet;
 use errors::AnyhowResult;
 use futures_util::future::{err, ok, Either, Ready};
 use http_server_common::request::get_request_ip::get_service_request_ip;

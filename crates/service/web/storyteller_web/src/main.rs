@@ -40,6 +40,9 @@ mod shared_queries {
 }
 
 use actix_cors::Cors;
+use actix_helpers::middleware::ip_filter::ip_ban_list::ip_ban_list::IpBanList;
+use actix_helpers::middleware::ip_filter::ip_ban_list::load_ip_ban_list_from_directory::load_ip_ban_list_from_directory;
+use actix_helpers::middleware::ip_filter::ip_filter_middleware::IpFilter;
 use actix_http::http;
 use actix_web::middleware::{Logger, DefaultHeaders};
 use actix_web::{HttpServer, web, HttpResponse, App, middleware};
@@ -52,23 +55,22 @@ use cloud_storage::bucket_client::BucketClient;
 use config::common_env::CommonEnv;
 use config::shared_constants::DEFAULT_MYSQL_CONNECTION_STRING;
 use config::shared_constants::DEFAULT_RUST_LOG;
-use errors::AnyhowResult;
 use container_common::files::read_toml_file_to_struct::read_toml_file_to_struct;
 use crate::billing::internal_product_to_stripe_lookup_impl::InternalProductToStripeLookupImpl;
 use crate::billing::stripe_internal_subscription_product_lookup_impl::StripeInternalSubscriptionProductLookupImpl;
 use crate::billing::stripe_internal_user_lookup_impl::StripeInternalUserLookupImpl;
 use crate::configs::static_api_tokens::{StaticApiTokenConfig, StaticApiTokens, StaticApiTokenSet};
-use crate::http_server::middleware::ip_filter_middleware::IpFilter;
+use crate::http_server::middleware::pushback_filter_middleware::PushbackFilter;
 use crate::http_server::web_utils::redis_rate_limiter::RedisRateLimiter;
 use crate::routes::add_routes;
 use crate::server_state::{ServerState, EnvConfig, TwitchOauthSecrets, TwitchOauth, RedisRateLimiters, InMemoryCaches, StripeSettings, ServerInfo, StaticFeatureFlags};
 use crate::threads::db_health_checker_thread::db_health_check_status::HealthCheckStatus;
 use crate::threads::db_health_checker_thread::db_health_checker_thread::db_health_checker_thread;
-use crate::threads::ip_banlist_set::IpBanlistSet;
 use crate::threads::poll_ip_banlist_thread::poll_ip_bans;
 use crate::util::encrypted_sort_id::SortKeyCrypto;
 use database_queries::mediators::badge_granter::BadgeGranter;
 use database_queries::mediators::firehose_publisher::FirehosePublisher;
+use errors::AnyhowResult;
 use futures::Future;
 use http_server_common::cors::{build_cors_config, build_production_cors_config};
 use limitation::Limiter;
@@ -83,13 +85,10 @@ use sqlx::mysql::MySqlPoolOptions;
 use std::sync::Arc;
 use std::time::Duration;
 use tokio::runtime::Runtime;
-use actix_helpers::middleware::ip_filter::ip_ban_list::ip_ban_list::IpBanList;
-use actix_helpers::middleware::ip_filter::ip_ban_list::load_ip_ban_list_from_directory::load_ip_ban_list_from_directory;
 use twitch_common::twitch_secrets::TwitchSecrets;
 use url_config::third_party_url_redirector::ThirdPartyUrlRedirector;
 use users_component::utils::session_checker::SessionChecker;
 use users_component::utils::session_cookie_manager::SessionCookieManager;
-use crate::http_server::middleware::pushback_filter_middleware::PushbackFilter;
 
 const DEFAULT_BIND_ADDRESS : &'static str = "0.0.0.0:12345";
 
@@ -304,12 +303,13 @@ async fn main() -> AnyhowResult<()> {
 
   let static_api_token_set = read_static_api_tokens();
 
+  let ip_ban_list = load_static_container_ip_bans();
+  let ip_ban_list2 = ip_ban_list.clone();
+
   // Background jobs.
 
   let health_check_status = HealthCheckStatus::new();
   let health_check_status2 = health_check_status.clone();
-  let ip_banlist = IpBanlistSet::new();
-  let ip_banlist2 = ip_banlist.clone();
   let mysql_pool3 = pool.clone();
   let mysql_pool4 = pool.clone();
 
@@ -328,7 +328,7 @@ async fn main() -> AnyhowResult<()> {
   info!("Spawning IP ban polling thread.");
 
   tokio_runtime.spawn(async {
-    poll_ip_bans(ip_banlist2, mysql_pool4).await;
+    poll_ip_bans(ip_ban_list2, mysql_pool4).await;
   });
 
   let stripe_configs = StripeConfig {
@@ -363,8 +363,6 @@ async fn main() -> AnyhowResult<()> {
     let api_secret = stripe_configs.secrets.secret_key.clone();
     stripe::Client::new(api_secret)
   };
-
-  let ip_ban_list = load_static_container_ip_bans();
 
   // NB: Docker creates this file within container builds.
   let build_sha = std::fs::read_to_string("/GIT_SHA")
@@ -409,7 +407,6 @@ async fn main() -> AnyhowResult<()> {
     public_bucket_client,
     audio_uploads_bucket_root,
     sort_key_crypto,
-    ip_banlist,
     static_api_token_set,
     caches: InMemoryCaches {
       voice_list: voice_list_cache,
@@ -471,7 +468,6 @@ pub async fn serve(server_state: ServerState) -> AnyhowResult<()>
 
   HttpServer::new(move || {
     // NB: Safe to clone due to internal arc
-    let ip_banlist = server_state_arc.ip_banlist.clone();
     let ip_ban_list = server_state_arc.ip_ban_list.clone();
 
     // NB: Dynamic dispatch needs to be wrapped with Arc.
@@ -501,8 +497,7 @@ pub async fn serve(server_state: ServerState) -> AnyhowResult<()>
         .header("X-Backend-Hostname", &hostname)
         .header("X-Build-Sha", server_state_arc.server_info.build_sha.clone()))
       .wrap(PushbackFilter::new(&server_state_arc.flags.clone()))
-      .wrap(IpFilter::new(ip_banlist)) // TODO: Remove the old IP filter middleware
-      .wrap(actix_helpers::middleware::ip_filter::ip_filter_middleware::IpFilter::new(ip_ban_list))
+      .wrap(IpFilter::new(ip_ban_list))
       .wrap(Logger::new(&log_format)
         .exclude("/liveness")
         .exclude("/readiness"))
