@@ -85,6 +85,10 @@ use sqlx::mysql::MySqlPoolOptions;
 use std::sync::Arc;
 use std::time::Duration;
 use tokio::runtime::Runtime;
+use actix_helpers::middleware::endpoint_disablement::disabled_endpoints::disabled_endpoints::DisabledEndpoints;
+use actix_helpers::middleware::endpoint_disablement::disabled_endpoints::exact_match_endpoint_disablements::ExactMatchEndpointDisablements;
+use actix_helpers::middleware::endpoint_disablement::disabled_endpoints::prefix_endpoint_disablements::PrefixEndpointDisablements;
+use actix_helpers::middleware::endpoint_disablement::endpoint_disablement_middleware::EndpointDisablementFilter;
 use twitch_common::twitch_secrets::TwitchSecrets;
 use url_config::third_party_url_redirector::ThirdPartyUrlRedirector;
 use users_component::utils::session_checker::SessionChecker;
@@ -440,6 +444,24 @@ fn read_static_api_tokens() -> StaticApiTokenSet {
   StaticApiTokenSet::from_file(&filename)
 }
 
+fn read_endpoint_disablements() -> DisabledEndpoints {
+  let exact_filename = easyenv::get_env_string_or_default(
+    "DISABLED_ENDPOINTS_FILE_EXACT_MATCH",
+    "./container_includes/endpoint_disablement/endpoint_exact_match.txt");
+
+  let exact = ExactMatchEndpointDisablements::load_from_file(exact_filename)
+      .unwrap_or(ExactMatchEndpointDisablements::new()); // NB: Fail open
+
+  let prefix_filename = easyenv::get_env_string_or_default(
+    "DISABLED_ENDPOINTS_FILE_PREFIX_MATCH",
+    "./container_includes/endpoint_disablement/endpoint_starts_with.txt");
+
+  let prefix = PrefixEndpointDisablements::load_from_file(prefix_filename)
+      .unwrap_or(PrefixEndpointDisablements::new()); // NB: Fail open
+
+  DisabledEndpoints::new(exact, prefix)
+}
+
 fn load_static_container_ip_bans() -> IpBanList {
   let ip_ban_directory = easyenv::get_env_string_or_default(
     "IP_BAN_DIRECTORY",
@@ -460,6 +482,8 @@ pub async fn serve(server_state: ServerState) -> AnyhowResult<()>
   let hostname = server_state.hostname.clone();
 
   let server_state_arc = web::Data::new(Arc::new(server_state));
+
+  let disablements = read_endpoint_disablements();
 
   info!("Starting HTTP service.");
 
@@ -497,6 +521,7 @@ pub async fn serve(server_state: ServerState) -> AnyhowResult<()>
         .header("X-Backend-Hostname", &hostname)
         .header("X-Build-Sha", server_state_arc.server_info.build_sha.clone()))
       .wrap(PushbackFilter::new(&server_state_arc.flags.clone()))
+      .wrap(EndpointDisablementFilter::new(disablements.clone()))
       .wrap(IpFilter::new(ip_ban_list))
       .wrap(Logger::new(&log_format)
         .exclude("/liveness")
