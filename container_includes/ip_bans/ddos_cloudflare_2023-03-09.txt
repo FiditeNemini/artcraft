@@ -1,0 +1,21 @@
+# These IP addresses were involved in a DDoS attempt against FakeYou.
+# The IPs in this file were pulled from the CloudFlare logs as being
+# the hosts that sent the most traffic to us.
+
+49.212.143.246
+52.251.92.41
+89.252.152.188
+89.252.152.228
+104.223.135.178
+114.255.132.60
+115.144.102.39
+115.75.195.208
+154.16.180.182
+171.244.10.75
+188.120.240.229
+190.136.50.67
+200.123.29.35
+204.137.250.6
+
+# TODO: Support IPv6 addresses and CIDRs
+# 2a01:4f8:c17:750::/64
