@@ -32,7 +32,7 @@ mod tests {
 
   #[test]
   fn test_load_ip_set_from_file() {
-    let filename = test_file("test_data/text_files/ip_addresses_and_comments.txt");
+    let filename = test_file("test_data/text_files/ip_ban_example/local_ip_addresses_and_comments.txt");
     let ip_set = load_ip_set_from_file(filename).unwrap();
 
     // Comments are not included
@@ -40,8 +40,9 @@ mod tests {
 
     // IP addresses in the file are.
     assert_eq!(ip_set.contains_ip_address("127.0.0.1"), true);
+    assert_eq!(ip_set.contains_ip_address("192.168.1.1"), false);
 
     // Length is expected
-    assert_eq!(ip_set.len(), 4);
+    assert_eq!(ip_set.len(), 2);
   }
 }
