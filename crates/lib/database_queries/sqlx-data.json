@@ -2007,6 +2007,265 @@
     },
     "query": "\nUPDATE tts_inference_jobs\nSET\n  status = \"dead\",\n  failure_reason = ?,\n  internal_debugging_failure_reason = ?,\n  last_assigned_worker = ?,\n  retry_at = NULL\nWHERE id = ?\n        "
   },
+  "1bcb79b19d2e894bdbda7d9f717a8f22d580cfbb8294f0702b9ffaf7f3602145": {
+    "describe": {
+      "columns": [
+        {
+          "name": "model_token",
+          "ordinal": 0,
+          "type_info": {
+            "char_set": 224,
+            "flags": {
+              "bits": 4229
+            },
+            "max_size": 128,
+            "type": "VarString"
+          }
+        },
+        {
+          "name": "tts_model_type",
+          "ordinal": 1,
+          "type_info": {
+            "char_set": 224,
+            "flags": {
+              "bits": 385
+            },
+            "max_size": 60,
+            "type": "String"
+          }
+        },
+        {
+          "name": "text_pipeline_type",
+          "ordinal": 2,
+          "type_info": {
+            "char_set": 224,
+            "flags": {
+              "bits": 128
+            },
+            "max_size": 256,
+            "type": "VarString"
+          }
+        },
+        {
+          "name": "use_default_mel_multiply_factor",
+          "ordinal": 3,
+          "type_info": {
+            "char_set": 63,
+            "flags": {
+              "bits": 1
+            },
+            "max_size": 1,
+            "type": "Tiny"
+          }
+        },
+        {
+          "name": "maybe_custom_mel_multiply_factor",
+          "ordinal": 4,
+          "type_info": {
+            "char_set": 63,
+            "flags": {
+              "bits": 0
+            },
+            "max_size": 22,
+            "type": "Double"
+          }
+        },
+        {
+          "name": "maybe_default_pretrained_vocoder",
+          "ordinal": 5,
+          "type_info": {
+            "char_set": 224,
+            "flags": {
+              "bits": 128
+            },
+            "max_size": 256,
+            "type": "VarString"
+          }
+        },
+        {
+          "name": "maybe_custom_vocoder_token",
+          "ordinal": 6,
+          "type_info": {
+            "char_set": 224,
+            "flags": {
+              "bits": 136
+            },
+            "max_size": 128,
+            "type": "VarString"
+          }
+        },
+        {
+          "name": "maybe_custom_vocoder_type: enums::common::vocoder_type::VocoderType",
+          "ordinal": 7,
+          "type_info": {
+            "char_set": 224,
+            "flags": {
+              "bits": 4224
+            },
+            "max_size": 128,
+            "type": "VarString"
+          }
+        },
+        {
+          "name": "maybe_custom_vocoder_title",
+          "ordinal": 8,
+          "type_info": {
+            "char_set": 224,
+            "flags": {
+              "bits": 4224
+            },
+            "max_size": 1020,
+            "type": "VarString"
+          }
+        },
+        {
+          "name": "maybe_custom_vocoder_private_bucket_hash",
+          "ordinal": 9,
+          "type_info": {
+            "char_set": 224,
+            "flags": {
+              "bits": 4232
+            },
+            "max_size": 256,
+            "type": "String"
+          }
+        },
+        {
+          "name": "creator_user_token",
+          "ordinal": 10,
+          "type_info": {
+            "char_set": 224,
+            "flags": {
+              "bits": 4233
+            },
+            "max_size": 128,
+            "type": "VarString"
+          }
+        },
+        {
+          "name": "creator_username",
+          "ordinal": 11,
+          "type_info": {
+            "char_set": 224,
+            "flags": {
+              "bits": 4229
+            },
+            "max_size": 80,
+            "type": "VarString"
+          }
+        },
+        {
+          "name": "creator_display_name",
+          "ordinal": 12,
+          "type_info": {
+            "char_set": 224,
+            "flags": {
+              "bits": 4225
+            },
+            "max_size": 80,
+            "type": "VarString"
+          }
+        },
+        {
+          "name": "title",
+          "ordinal": 13,
+          "type_info": {
+            "char_set": 224,
+            "flags": {
+              "bits": 4225
+            },
+            "max_size": 1020,
+            "type": "VarString"
+          }
+        },
+        {
+          "name": "private_bucket_hash",
+          "ordinal": 14,
+          "type_info": {
+            "char_set": 224,
+            "flags": {
+              "bits": 4233
+            },
+            "max_size": 256,
+            "type": "String"
+          }
+        },
+        {
+          "name": "created_at",
+          "ordinal": 15,
+          "type_info": {
+            "char_set": 63,
+            "flags": {
+              "bits": 1153
+            },
+            "max_size": 19,
+            "type": "Timestamp"
+          }
+        },
+        {
+          "name": "updated_at",
+          "ordinal": 16,
+          "type_info": {
+            "char_set": 63,
+            "flags": {
+              "bits": 9345
+            },
+            "max_size": 19,
+            "type": "Timestamp"
+          }
+        },
+        {
+          "name": "user_deleted_at",
+          "ordinal": 17,
+          "type_info": {
+            "char_set": 63,
+            "flags": {
+              "bits": 128
+            },
+            "max_size": 19,
+            "type": "Timestamp"
+          }
+        },
+        {
+          "name": "mod_deleted_at",
+          "ordinal": 18,
+          "type_info": {
+            "char_set": 63,
+            "flags": {
+              "bits": 128
+            },
+            "max_size": 19,
+            "type": "Timestamp"
+          }
+        }
+      ],
+      "nullable": [
+        false,
+        false,
+        true,
+        false,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        true,
+        true
+      ],
+      "parameters": {
+        "Right": 1
+      }
+    },
+    "query": "\nSELECT\n    tts.token as model_token,\n    tts.tts_model_type,\n    tts.text_pipeline_type,\n\n    tts.use_default_mel_multiply_factor,\n    tts.maybe_custom_mel_multiply_factor,\n\n    tts.maybe_default_pretrained_vocoder,\n\n    tts.maybe_custom_vocoder_token,\n    vocoder.vocoder_type as `maybe_custom_vocoder_type: enums::common::vocoder_type::VocoderType`,\n    vocoder.title as maybe_custom_vocoder_title,\n    vocoder.private_bucket_hash as maybe_custom_vocoder_private_bucket_hash,\n\n    tts.creator_user_token,\n    users.username as creator_username,\n    users.display_name as creator_display_name,\n    tts.title,\n    tts.private_bucket_hash,\n    tts.created_at,\n    tts.updated_at,\n    tts.user_deleted_at,\n    tts.mod_deleted_at\n\nFROM tts_models as tts\n\nJOIN users\n    ON users.token = tts.creator_user_token\n\nLEFT OUTER JOIN vocoder_models AS vocoder\n    ON vocoder.token = tts.maybe_custom_vocoder_token\n\nWHERE tts.token = ?\n        "
+  },
   "1c701cb34689e73e17beb89efd2d7a1898c798ece9ae702d570c97ebf5709768": {
     "describe": {
       "columns": [
@@ -9692,239 +9951,6 @@
       }
     },
     "query": "\nINSERT INTO generic_download_jobs\nSET\n  token = ?,\n  uuid_idempotency_token = ?,\n  download_type = ?,\n  download_url = ?,\n  title = ?,\n  creator_user_token = ?,\n  creator_ip_address = ?,\n  creator_set_visibility = ?,\n  status = \"pending\"\n        "
-  },
-  "a0f316dcf665b78efda63d72356c4a3c0a7870233ef148d698e1d746f3691b13": {
-    "describe": {
-      "columns": [
-        {
-          "name": "model_token",
-          "ordinal": 0,
-          "type_info": {
-            "char_set": 224,
-            "flags": {
-              "bits": 4229
-            },
-            "max_size": 128,
-            "type": "VarString"
-          }
-        },
-        {
-          "name": "tts_model_type",
-          "ordinal": 1,
-          "type_info": {
-            "char_set": 224,
-            "flags": {
-              "bits": 385
-            },
-            "max_size": 60,
-            "type": "String"
-          }
-        },
-        {
-          "name": "text_pipeline_type",
-          "ordinal": 2,
-          "type_info": {
-            "char_set": 224,
-            "flags": {
-              "bits": 128
-            },
-            "max_size": 256,
-            "type": "VarString"
-          }
-        },
-        {
-          "name": "maybe_default_pretrained_vocoder",
-          "ordinal": 3,
-          "type_info": {
-            "char_set": 224,
-            "flags": {
-              "bits": 128
-            },
-            "max_size": 256,
-            "type": "VarString"
-          }
-        },
-        {
-          "name": "maybe_custom_vocoder_token",
-          "ordinal": 4,
-          "type_info": {
-            "char_set": 224,
-            "flags": {
-              "bits": 136
-            },
-            "max_size": 128,
-            "type": "VarString"
-          }
-        },
-        {
-          "name": "maybe_custom_vocoder_type: enums::common::vocoder_type::VocoderType",
-          "ordinal": 5,
-          "type_info": {
-            "char_set": 224,
-            "flags": {
-              "bits": 4224
-            },
-            "max_size": 128,
-            "type": "VarString"
-          }
-        },
-        {
-          "name": "maybe_custom_vocoder_title",
-          "ordinal": 6,
-          "type_info": {
-            "char_set": 224,
-            "flags": {
-              "bits": 4224
-            },
-            "max_size": 1020,
-            "type": "VarString"
-          }
-        },
-        {
-          "name": "maybe_custom_vocoder_private_bucket_hash",
-          "ordinal": 7,
-          "type_info": {
-            "char_set": 224,
-            "flags": {
-              "bits": 4232
-            },
-            "max_size": 256,
-            "type": "String"
-          }
-        },
-        {
-          "name": "creator_user_token",
-          "ordinal": 8,
-          "type_info": {
-            "char_set": 224,
-            "flags": {
-              "bits": 4233
-            },
-            "max_size": 128,
-            "type": "VarString"
-          }
-        },
-        {
-          "name": "creator_username",
-          "ordinal": 9,
-          "type_info": {
-            "char_set": 224,
-            "flags": {
-              "bits": 4229
-            },
-            "max_size": 80,
-            "type": "VarString"
-          }
-        },
-        {
-          "name": "creator_display_name",
-          "ordinal": 10,
-          "type_info": {
-            "char_set": 224,
-            "flags": {
-              "bits": 4225
-            },
-            "max_size": 80,
-            "type": "VarString"
-          }
-        },
-        {
-          "name": "title",
-          "ordinal": 11,
-          "type_info": {
-            "char_set": 224,
-            "flags": {
-              "bits": 4225
-            },
-            "max_size": 1020,
-            "type": "VarString"
-          }
-        },
-        {
-          "name": "private_bucket_hash",
-          "ordinal": 12,
-          "type_info": {
-            "char_set": 224,
-            "flags": {
-              "bits": 4233
-            },
-            "max_size": 256,
-            "type": "String"
-          }
-        },
-        {
-          "name": "created_at",
-          "ordinal": 13,
-          "type_info": {
-            "char_set": 63,
-            "flags": {
-              "bits": 1153
-            },
-            "max_size": 19,
-            "type": "Timestamp"
-          }
-        },
-        {
-          "name": "updated_at",
-          "ordinal": 14,
-          "type_info": {
-            "char_set": 63,
-            "flags": {
-              "bits": 9345
-            },
-            "max_size": 19,
-            "type": "Timestamp"
-          }
-        },
-        {
-          "name": "user_deleted_at",
-          "ordinal": 15,
-          "type_info": {
-            "char_set": 63,
-            "flags": {
-              "bits": 128
-            },
-            "max_size": 19,
-            "type": "Timestamp"
-          }
-        },
-        {
-          "name": "mod_deleted_at",
-          "ordinal": 16,
-          "type_info": {
-            "char_set": 63,
-            "flags": {
-              "bits": 128
-            },
-            "max_size": 19,
-            "type": "Timestamp"
-          }
-        }
-      ],
-      "nullable": [
-        false,
-        false,
-        true,
-        true,
-        true,
-        true,
-        true,
-        true,
-        false,
-        false,
-        false,
-        false,
-        false,
-        false,
-        false,
-        true,
-        true
-      ],
-      "parameters": {
-        "Right": 1
-      }
-    },
-    "query": "\nSELECT\n    tts.token as model_token,\n    tts.tts_model_type,\n    tts.text_pipeline_type,\n\n    tts.maybe_default_pretrained_vocoder,\n\n    tts.maybe_custom_vocoder_token,\n    vocoder.vocoder_type as `maybe_custom_vocoder_type: enums::common::vocoder_type::VocoderType`,\n    vocoder.title as maybe_custom_vocoder_title,\n    vocoder.private_bucket_hash as maybe_custom_vocoder_private_bucket_hash,\n\n    tts.creator_user_token,\n    users.username as creator_username,\n    users.display_name as creator_display_name,\n    tts.title,\n    tts.private_bucket_hash,\n    tts.created_at,\n    tts.updated_at,\n    tts.user_deleted_at,\n    tts.mod_deleted_at\n\nFROM tts_models as tts\n\nJOIN users\n    ON users.token = tts.creator_user_token\n\nLEFT OUTER JOIN vocoder_models AS vocoder\n    ON vocoder.token = tts.maybe_custom_vocoder_token\n\nWHERE tts.token = ?\n        "
   },
   "a125f183f7ae5627fc2118e7302cea73d967200ba1cbb12550f5880187b7db5e": {
     "describe": {
