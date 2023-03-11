@@ -1,3 +1,7 @@
+-- noinspection SqlDialectInspectionForFile
+-- noinspection SqlNoDataSourceInspectionForFile
+-- noinspection SqlResolveForFile
+
 CREATE TABLE unsubscribe_reason (
     -- Generic primary key
     id BIGINT(20) NOT NULL AUTO_INCREMENT,

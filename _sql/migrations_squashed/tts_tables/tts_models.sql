@@ -49,6 +49,14 @@ CREATE TABLE tts_models (
       'arpabet'
   ) NOT NULL DEFAULT 'basic',
 
+  -- If true, multiply the mel outputs before being vocoded by a globally default constant.
+  use_default_mel_multiply_factor BOOLEAN NOT NULL DEFAULT FALSE,
+
+  -- If not null, multiply the mel outputs before being vocoded by this value.
+  -- This is used instead of the default if `use_default_mel_multiply_factor` is
+  -- set (ie. `use_default_mel_multiply_factor` is ignored and this custom value is used instead)
+  maybe_custom_mel_multiply_factor DOUBLE DEFAULT NULL,
+
   -- If set, use a different pretrained vocoder.
   -- If not set, use the website default. (Currently HifiGan-SS)
   maybe_default_pretrained_vocoder VARCHAR(64) DEFAULT NULL,
