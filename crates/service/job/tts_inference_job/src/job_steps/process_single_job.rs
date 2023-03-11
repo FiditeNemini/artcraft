@@ -17,7 +17,7 @@ use database_queries::column_types::vocoder_type::VocoderType;
 use database_queries::queries::tts::tts_inference_jobs::list_available_tts_inference_jobs::AvailableTtsInferenceJob;
 use database_queries::queries::tts::tts_inference_jobs::mark_tts_inference_job_done::mark_tts_inference_job_done;
 use database_queries::queries::tts::tts_inference_jobs::mark_tts_inference_job_pending_and_grab_lock::mark_tts_inference_job_pending_and_grab_lock;
-use database_queries::queries::tts::tts_models::get_tts_model_for_inference::TtsModelForInferenceRecord;
+use database_queries::queries::tts::tts_models::get_tts_model_for_inference::{get_tts_model_for_inference, TtsModelForInferenceRecord};
 use database_queries::queries::tts::tts_results::insert_tts_result::insert_tts_result;
 use hashing::sha256::sha256_hash_string::sha256_hash_string;
 use log::{warn, info, error};
@@ -30,6 +30,10 @@ use tempdir::TempDir;
 use tts_common::clean_symbols::clean_symbols;
 use tts_common::text_pipelines::guess_pipeline::guess_text_pipeline_heuristic;
 use tts_common::text_pipelines::text_pipeline_type::TextPipelineType;
+
+/// Text starting with this will be treated as a test request.
+/// This allows the request to bypass the model cache and query the latest TTS model.
+const TEST_REQUEST_TEXT: &'static str = "This is a test request.";
 
 #[derive(Deserialize, Default)]
 struct FileMetadata {
@@ -48,8 +52,13 @@ fn read_metadata_file(filename: &PathBuf) -> AnyhowResult<FileMetadata> {
 pub async fn process_single_job(
   job_args: &JobArgs,
   job: &AvailableTtsInferenceJob,
-  model_record: &TtsModelForInferenceRecord,
+  cached_model_record: &TtsModelForInferenceRecord,
 ) -> Result<(Span, Span), ProcessSingleJobError> {
+
+  // NB: Hack to allow cache bypass for debug requests
+  // This will let us iterate faster with model changes.
+  let mut maybe_queried_model = None;
+  let mut model_record = cached_model_record;
 
   let start = Instant::now();
 
@@ -100,6 +109,25 @@ pub async fn process_single_job(
   }
 
   info!("Lock acquired for job: {}", job.inference_job_token);
+
+  // ==================== DEBUG REQUEST ==================== //
+
+  if job.raw_inference_text.starts_with(TEST_REQUEST_TEXT) {
+    warn!("Test request - bypassing TTS model cache and re-querying...");
+
+    // Under ordinary circumstances, model records are held in a long duration cache.
+    // If we're operating quickly with edits, we may want to bypass that cache.
+    let tts_model = get_tts_model_for_inference(
+      &job_args.mysql_pool,
+      &job.model_token)
+        .await
+        .map_err(|e| {
+          ProcessSingleJobError::from_anyhow_error(anyhow!("error querying to bypass cache: {:?}", e))
+        })?;
+
+    maybe_queried_model = Some(tts_model); // Hold reference
+    model_record = maybe_queried_model.as_ref().unwrap_or(cached_model_record);
+  }
 
   // ==================== CONFIRM OR DOWNLOAD WAVEGLOW VOCODER MODEL ==================== //
 
