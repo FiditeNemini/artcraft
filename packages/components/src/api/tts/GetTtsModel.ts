@@ -45,6 +45,8 @@ export interface UserRatings {
 }
 
 export interface TtsModelModeratorFields {
+  use_default_m_factor: boolean,
+  maybe_custom_m_factor: number | undefined | null,
   creator_is_banned: boolean,
   creator_ip_address_creation: string,
   creator_ip_address_last_update: string,

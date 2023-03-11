@@ -36,6 +36,7 @@ import {
 } from "@storyteller/components/src/constants/TextPipeline";
 import { motion } from "framer-motion";
 import { container, item, panel } from "../../../../../data/animation";
+import { faFunction } from "@fortawesome/pro-solid-svg-icons";
 
 const DEFAULT_VISIBILITY = "public";
 
@@ -67,10 +68,17 @@ function TtsModelEditPage(props: Props) {
   const [descriptionMarkdown, setDescriptionMarkdown] = useState("");
   const [fullLanguageTag, setFullLanguageTag] = useState(""); // NB: Should be full IETF, eg. ["en", "en-US", "es-419", etc.]
   const [visibility, setVisibility] = useState(DEFAULT_VISIBILITY);
+
+  // Moderator-only fields (editable)
   const [isFrontPageFeatured, setIsFrontPageFeatured] = useState(false);
   const [isTwitchFeatured, setIsTwitchFeatured] = useState(false);
   const [suggestedUniqueBotCommand, setSuggestedUniqueBotCommand] =
     useState("");
+
+  // Moderator-only fields (both observable and editable)
+  const [useDefaultMFactor, setUseDefaultMFactor] = useState(false);
+  // NB: The field is an f64, but string is easy to edit
+  const [maybeCustomMFactor, setMaybeCustomMFactor] = useState<string| null>(null); 
 
   // Vocoder config (modern)
   const [maybeCustomVocoderToken, setMaybeCustomVocoderToken] = useState<string | null>(null);
@@ -107,6 +115,16 @@ function TtsModelEditPage(props: Props) {
       setDefaultPretrainedVocoder(
         model.maybe_default_pretrained_vocoder || DEFAULT_PRETRAINED_VOCODER
       );
+      setUseDefaultMFactor(
+        model.maybe_moderator_fields?.use_default_m_factor || false
+      );
+
+      let maybeCustomMFactor = (!!model.maybe_moderator_fields?.maybe_custom_m_factor) ? 
+        model.maybe_moderator_fields?.maybe_custom_m_factor.toString() : 
+        null;
+
+      setMaybeCustomMFactor(maybeCustomMFactor);
+
     } else if (GetTtsModelIsErr(model)) {
       switch (model) {
         case TtsModelLookupError.NotFound:
@@ -194,6 +212,18 @@ function TtsModelEditPage(props: Props) {
     setSuggestedUniqueBotCommand(command);
   };
 
+  const handleUseDefaultMFactorChange = (ev: React.FormEvent<HTMLInputElement>) => {
+    const value = (ev.target as HTMLInputElement).checked;
+    setUseDefaultMFactor(value);
+  };
+  
+  const handleMaybeCustomMFactorChange = (ev: React.FormEvent<HTMLInputElement>) => {
+    ev.preventDefault();
+    const textValue = (ev.target as HTMLInputElement).value.trim();
+    setMaybeCustomMFactor(textValue);
+    return false;
+  };
+
   const modelLink = WebUrl.ttsModelPage(token);
 
   const isModerator = props.sessionWrapper.canEditOtherUsersTtsModels();
@@ -234,6 +264,8 @@ function TtsModelEditPage(props: Props) {
       if (!!suggestedUniqueBotCommand) {
         request.maybe_suggested_unique_bot_command = suggestedUniqueBotCommand;
       }
+      request.use_default_m_factor = useDefaultMFactor;
+      request.maybe_custom_m_factor = maybeCustomMFactor === null ? null : Number(maybeCustomMFactor.trim());
     }
 
     fetch(endpointUrl, {
@@ -285,6 +317,8 @@ function TtsModelEditPage(props: Props) {
 
     optionalModeratorFields = (
       <>
+        <hr />
+        <h3> Moderator Fields </h3>
         <div>
           <label className="sub-title">
             Is Front Page Featured? (Don't set too many!)
@@ -348,6 +382,51 @@ function TtsModelEditPage(props: Props) {
           </div>
           {/*<p className="help">{invalidReason}</p>*/}
         </div>
+
+        <div>
+          <label className="sub-title">
+            Use m-factoring?
+          </label>
+          <div>
+            <div className="form-group input-icon">
+
+              <div className="form-check form-switch">
+                <input 
+                  className="form-check-input" 
+                  type="checkbox" 
+                  onChange={handleUseDefaultMFactorChange}
+                  checked={useDefaultMFactor}
+                  />
+                <label className="form-check-label">
+                  Enable this for voices that sound "tinny" or "metalic".
+                  {" "}
+                  This will use a globally defined suggested value (that may change).
+                </label>
+              </div>
+
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <label className="sub-title">
+            Use custom m-factor? If set, this will be used instead of the default m-factor.
+          </label>
+          <div className="form-group input-icon">
+            <FontAwesomeIcon
+              icon={faFunction}
+              className="form-control-feedback"
+            />
+            <input
+              onChange={handleMaybeCustomMFactorChange}
+              className="form-control"
+              type="text"
+              placeholder=""
+              value={maybeCustomMFactor ? maybeCustomMFactor : ""}
+            />
+          </div>
+        </div>
+
       </>
     );
   }

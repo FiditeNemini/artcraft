@@ -527,6 +527,15 @@ function TtsModelViewPage(props: Props) {
                     <th>Is Twitch Featured?</th>
                     <td>{ttsModel?.is_twitch_featured ? "yes" : "no"}</td>
                   </tr>
+
+                  <tr>
+                    <th>Use global m-factor? (default no)</th>
+                    <td>{ttsModel?.maybe_moderator_fields?.use_default_m_factor ? "yes" : "no"}</td>
+                  </tr>
+                  <tr>
+                    <th>Custom m-factor (optional)</th>
+                    <td>{ttsModel?.maybe_moderator_fields?.maybe_custom_m_factor}</td>
+                  </tr>
                 </tbody>
               </table>
             </div>
