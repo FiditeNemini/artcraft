@@ -301,7 +301,10 @@ pub async fn process_single_job(
     &output_audio_fs_path,
     &output_spectrogram_fs_path,
     &output_metadata_fs_path,
-    maybe_unload_model_path)
+    maybe_unload_model_path,
+    model_record.use_default_mel_multiply_factor,
+    model_record.maybe_custom_mel_multiply_factor,
+  )
       .await
       .map_err(|e| ProcessSingleJobError::Other(e))?;
 

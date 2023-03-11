@@ -8,6 +8,7 @@ use enums::common::vocoder_type::VocoderType;
 use log::warn;
 use sqlx::MySqlPool;
 use sqlx;
+use crate::helpers::boolean_converters::i8_to_bool;
 
 // TODO: Can probably just reuse another query.
 
@@ -18,6 +19,10 @@ pub struct TtsModelForInferenceRecord {
 
   /// NB: text_pipeline_type may not always be present in the database.
   pub text_pipeline_type: Option<String>,
+
+  /// Whether to multiply the mel outputs before being vocoded.
+  pub use_default_mel_multiply_factor: bool,
+  pub maybe_custom_mel_multiply_factor: Option<f64>,
 
   /// [vocoders 1]
   /// This is the new type of vocoder configuration. Users can choose a custom trained
@@ -88,6 +93,9 @@ SELECT
     tts.tts_model_type,
     tts.text_pipeline_type,
 
+    tts.use_default_mel_multiply_factor,
+    tts.maybe_custom_mel_multiply_factor,
+
     tts.maybe_default_pretrained_vocoder,
 
     tts.maybe_custom_vocoder_token,
@@ -145,6 +153,8 @@ WHERE tts.token = ?
     model_token: model.model_token,
     tts_model_type: model.tts_model_type,
     text_pipeline_type: model.text_pipeline_type,
+    use_default_mel_multiply_factor: i8_to_bool(model.use_default_mel_multiply_factor),
+    maybe_custom_mel_multiply_factor: model.maybe_custom_mel_multiply_factor,
     maybe_custom_vocoder: match model.maybe_custom_vocoder_token {
       // NB: We're relying on a single field's presence to infer that the others vocoder fields
       // are also there. If for some reason they aren't, fail open.
@@ -177,6 +187,9 @@ struct InternalTtsModelForInferenceRecordRaw {
   tts_model_type: String,
 
   text_pipeline_type: Option<String>,
+
+  use_default_mel_multiply_factor: i8, // NB: bool
+  maybe_custom_mel_multiply_factor: Option<f64>,
 
   // Joined custom vocoder fields
   maybe_custom_vocoder_token: Option<String>,

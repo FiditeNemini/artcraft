@@ -30,6 +30,10 @@ struct InferenceRequest {
   // Named text pipeline/algorithm, eg. "legacy_fakeyou", "english_v1", "spanish_v2", etc.
   pub text_pipeline_type: String,
 
+  // Whether to multiply the mel outputs before being vocoded.
+  use_default_mel_multiply_factor: bool,
+  maybe_custom_mel_multiply_factor: Option<f64>,
+
   // Output information
   pub output_audio_filename : String,
   pub output_spectrogram_filename : String,
@@ -67,6 +71,8 @@ impl TtsInferenceSidecarClient {
     output_spectrogram_filename: P,
     output_metadata_filename: P,
     maybe_unload_model_path: Option<String>,
+    use_default_mel_multiply_factor: bool,
+    maybe_custom_mel_multiply_factor: Option<f64>,
   ) -> AnyhowResult<()> {
 
     let waveglow_vocoder_checkpoint_path = waveglow_vocoder_checkpoint_path
@@ -116,6 +122,7 @@ impl TtsInferenceSidecarClient {
       max_decoder_steps,
       vocoder_type,
       text_pipeline_type: text_pipeline_type.to_string(),
+      use_default_mel_multiply_factor,
       waveglow_vocoder_checkpoint_path,
       hifigan_vocoder_checkpoint_path,
       hifigan_superres_vocoder_checkpoint_path,
@@ -124,6 +131,7 @@ impl TtsInferenceSidecarClient {
       output_spectrogram_filename,
       output_metadata_filename,
       maybe_clear_synthesizer_checkpoint_path: maybe_unload_model_path,
+      maybe_custom_mel_multiply_factor,
     };
 
     let url = format!("http://{}/infer", self.hostname);
