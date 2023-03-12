@@ -203,16 +203,30 @@ pub async fn get_tts_model_handler(
       })?;
 
   let key = path.token.clone();
+  let token = path.token.clone();
+  let mysql_pool_2 = server_state.mysql_pool.clone(); // TODO: Try to copy the connection!
 
   //let _result :AnyhowResult<Option<TtsModelRecord>> = redis_ttl_cache.lazy_load_if_not_cached(&key, move || {
   let _r = redis_ttl_cache.lazy_load_if_not_cached(&key, move || {
+
+
+
     let _r = async {
-      //let _model_query_result = get_tts_model_by_token_using_connection(
-      //  &path.token,
-      //  show_deleted_models,
-      //  &mut mysql_connection,
-      //).await;
+      let mut mysql_connection = mysql_pool_2.acquire()
+          .await?;
+
+      let model_query_result = get_tts_model_by_token_using_connection(
+        &token,
+        show_deleted_models,
+        &mut mysql_connection,
+      ).await?;
+
+      //Ok::<Option<TtsModelRecord>, String>(model_query_result)
+      AnyhowResult::Ok(model_query_result)
     };
+
+
+
     let foo = "foo".to_string();
 
     std::future::ready(Ok(Some(foo)))
