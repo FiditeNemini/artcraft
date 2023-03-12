@@ -89,11 +89,13 @@ use actix_helpers::middleware::endpoint_disablement::disabled_endpoints::disable
 use actix_helpers::middleware::endpoint_disablement::disabled_endpoints::exact_match_endpoint_disablements::ExactMatchEndpointDisablements;
 use actix_helpers::middleware::endpoint_disablement::disabled_endpoints::prefix_endpoint_disablements::PrefixEndpointDisablements;
 use actix_helpers::middleware::endpoint_disablement::endpoint_disablement_middleware::EndpointDisablementFilter;
+use billing_component::stripe::traits::internal_session_cache_purge::InternalSessionCachePurge;
 use redis_caching::redis_ttl_cache::RedisTtlCache;
 use twitch_common::twitch_secrets::TwitchSecrets;
 use url_config::third_party_url_redirector::ThirdPartyUrlRedirector;
 use users_component::utils::session_checker::SessionChecker;
 use users_component::utils::session_cookie_manager::SessionCookieManager;
+use crate::billing::internal_session_cache_purge_impl::InternalSessionCachePurgeImpl;
 
 const DEFAULT_BIND_ADDRESS : &'static str = "0.0.0.0:12345";
 
@@ -233,7 +235,10 @@ async fn main() -> AnyhowResult<()> {
       easyenv::get_env_string_or_default("WEBSITE_HOMEPAGE_REDIRECT", "https://vo.codes/");
 
   let cookie_manager = SessionCookieManager::new(&cookie_domain, &hmac_secret);
-  let session_checker = SessionChecker::new(&cookie_manager);
+  let session_checker = SessionChecker::new_with_cache(
+    &cookie_manager,
+    redis_ttl_cache.clone(),
+  );
 
   let access_key = easyenv::get_env_string_required(ENV_ACCESS_KEY)?;
   let secret_key = easyenv::get_env_string_required(ENV_SECRET_KEY)?;
@@ -508,12 +513,17 @@ pub async fn serve(server_state: ServerState) -> AnyhowResult<()>
       server_state_arc.session_checker.clone(),
       server_state_arc.mysql_pool.clone(),
     ));
+    let session_cache_purge : Arc<dyn InternalSessionCachePurge> = Arc::new(InternalSessionCachePurgeImpl::new(
+      server_state_arc.session_checker.clone(),
+      server_state_arc.redis_ttl_cache.clone(),
+    ));
 
     // NB: app_data being clone()'d below should all be safe (dependencies included)
     let app = App::new()
       .app_data(web::Data::new(server_state_arc.firehose_publisher.clone()))
       .app_data(web::Data::new(server_state_arc.mysql_pool.clone()))
       .app_data(web::Data::new(server_state_arc.redis_pool.clone()))
+      .app_data(web::Data::new(server_state_arc.redis_ttl_cache.clone()))
       .app_data(web::Data::new(server_state_arc.session_checker.clone()))
       .app_data(web::Data::new(server_state_arc.cookie_manager.clone()))
       .app_data(web::Data::new(server_state_arc.stripe.clone().config.clone()))
@@ -523,6 +533,7 @@ pub async fn serve(server_state: ServerState) -> AnyhowResult<()>
       .app_data(web::Data::from(product_lookup)) // NB: Data::from(Arc<T>) for dynamic dispatch
       .app_data(web::Data::from(stripe_lookup)) // NB: Data::from(Arc<T>) for dynamic dispatch
       .app_data(web::Data::from(user_lookup)) // NB: Data::from(Arc<T>) for dynamic dispatch
+      .app_data(web::Data::from(session_cache_purge)) // NB: Data::from(Arc<T>) for dynamic dispatch
       .app_data(server_state_arc.clone())
       .wrap(build_cors_config(server_state_arc.server_environment.clone()))
       .wrap(DefaultHeaders::new()

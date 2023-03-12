@@ -8,14 +8,15 @@ use crate::stripe::http_endpoints::checkout::create::stripe_create_checkout_sess
 use crate::stripe::http_endpoints::checkout::create::stripe_create_checkout_session_shared::stripe_create_checkout_session_shared;
 use crate::stripe::stripe_config::StripeConfig;
 use crate::stripe::traits::internal_product_to_stripe_lookup::InternalProductToStripeLookup;
+use crate::stripe::traits::internal_session_cache_purge::InternalSessionCachePurge;
 use crate::stripe::traits::internal_user_lookup::InternalUserLookup;
 use http_server_common::response::serialize_as_json_error::serialize_as_json_error;
 use log::{error, warn};
+use reusable_types::server_environment::ServerEnvironment;
 use sqlx::MySqlPool;
 use std::collections::HashMap;
 use std::fmt;
 use stripe::{CheckoutSession, CheckoutSessionMode, CreateCheckoutSession, CreateCheckoutSessionLineItems};
-use reusable_types::server_environment::ServerEnvironment;
 use url_config::third_party_url_redirector::ThirdPartyUrlRedirector;
 
 // =============== Request ===============
@@ -34,6 +35,7 @@ pub async fn stripe_create_checkout_session_redirect_handler(
   url_redirector: web::Data<ThirdPartyUrlRedirector>,
   internal_product_to_stripe_lookup: web::Data<dyn InternalProductToStripeLookup>,
   internal_user_lookup: web::Data<dyn InternalUserLookup>,
+  internal_session_cache_purge: web::Data<dyn InternalSessionCachePurge>,
 ) -> Result<HttpResponse, CreateCheckoutSessionError>
 {
   let maybe_internal_product_key = request.product.as_deref();
@@ -48,6 +50,9 @@ pub async fn stripe_create_checkout_session_redirect_handler(
     internal_product_to_stripe_lookup.get_ref(),
     internal_user_lookup.get_ref(),
   ).await?;
+
+  // Best effort to delete Redis session cache
+  internal_session_cache_purge.best_effort_purge_session_cache(&http_request);
 
   Ok(HttpResponse::Found()
       .append_header((header::LOCATION, url))

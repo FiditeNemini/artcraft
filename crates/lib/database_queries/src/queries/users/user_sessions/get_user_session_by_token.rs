@@ -7,10 +7,11 @@ use errors::AnyhowResult;
 use crate::helpers::boolean_converters::{nullable_i8_to_optional_bool, i8_to_bool, nullable_i8_to_bool_default_false};
 use enums::common::visibility::Visibility;
 use log::warn;
-use sqlx::MySql;
+use sqlx::{Executor, MySql};
 use sqlx::pool::PoolConnection;
 use tokens::users::user::UserToken;
 
+#[derive(Clone, Serialize, Deserialize)]
 pub struct SessionUserRecord {
   pub user_token: String, // TODO(bt, 2022-12-20): Convert to strongly-typed `UserToken`
   pub user_token_typed: UserToken,
@@ -74,11 +75,20 @@ impl SessionUserRecord {
   }
 }
 
-pub async fn get_user_session_by_token(
+pub async fn get_user_session_by_token_pooled_connection(
   mysql_connection: &mut PoolConnection<MySql>,
   session_token: &str,
 ) -> AnyhowResult<Option<SessionUserRecord>> {
+  get_user_session_by_token(mysql_connection, session_token).await
+}
 
+
+pub async fn get_user_session_by_token<'e, 'c : 'e, E>(
+  mysql_executor: E,
+  session_token: &str,
+) -> AnyhowResult<Option<SessionUserRecord>>
+  where E: 'e + Executor<'c, Database = MySql>
+{
   // NB: Lookup failure is Err(RowNotFound).
   let maybe_user_record = sqlx::query_as!(
       SessionUserRawDbRecord,
@@ -138,7 +148,7 @@ WHERE user_sessions.token = ?
         "#,
         session_token,
     )
-      .fetch_one(mysql_connection)
+      .fetch_one(mysql_executor)
       .await; // TODO: This will return error if it doesn't exist
 
   match maybe_user_record {

@@ -1,7 +1,7 @@
 // NB: Incrementally getting rid of build warnings...
-//#![forbid(unused_imports)]
-//#![forbid(unused_mut)]
-//#![forbid(unused_variables)]
+#![forbid(unused_imports)]
+#![forbid(unused_mut)]
+#![forbid(unused_variables)]
 
 use actix_web::error::ResponseError;
 use actix_web::http::StatusCode;
@@ -10,14 +10,13 @@ use actix_web::{web, HttpResponse, HttpRequest};
 use chrono::{DateTime, Utc};
 use crate::server_state::ServerState;
 use database_queries::column_types::vocoder_type::VocoderType;
-use database_queries::queries::tts::tts_models::get_tts_model::{get_tts_model_by_token_using_connection, TtsModelRecord};
+use database_queries::queries::tts::tts_models::get_tts_model::get_tts_model_by_token_using_connection;
 use enums::common::visibility::Visibility;
 use http_server_common::response::serialize_as_json_error::serialize_as_json_error;
 use log::warn;
+use redis_common::redis_cache_keys::RedisCacheKeys;
 use std::fmt;
 use std::sync::Arc;
-use errors::AnyhowResult;
-use redis_common::redis_cache_keys::RedisCacheKeys;
 use tts_common::text_pipelines::guess_pipeline::guess_text_pipeline_heuristic;
 use tts_common::text_pipelines::text_pipeline_type::TextPipelineType;
 

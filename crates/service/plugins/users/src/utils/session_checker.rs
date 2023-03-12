@@ -4,18 +4,22 @@
 #![forbid(unused_variables)]
 
 use actix_web::HttpRequest;
-use container_common::anyhow_result::AnyhowResult;
 use crate::utils::session_cookie_manager::SessionCookieManager;
 use crate::utils::user_session_extended::{UserSessionExtended, UserSessionPreferences, UserSessionPremiumPlanInfo, UserSessionRoleAndPermissions, UserSessionSubscriptionPlan, UserSessionUserDetails};
-use database_queries::queries::users::user_sessions::get_user_session_by_token::{get_user_session_by_token, SessionUserRecord};
+use database_queries::queries::users::user_sessions::get_user_session_by_token::{get_user_session_by_token, get_user_session_by_token_pooled_connection, SessionUserRecord};
 use database_queries::queries::users::user_sessions::get_user_session_by_token_light::{get_user_session_by_token_light, SessionRecord};
 use database_queries::queries::users::user_subscriptions::list_active_user_subscriptions::list_active_user_subscriptions;
+use errors::AnyhowResult;
+use log::warn;
+use redis_caching::redis_ttl_cache::{RedisTtlCache, RedisTtlCacheConnection};
+use redis_common::redis_cache_keys::RedisCacheKeys;
 use sqlx::pool::PoolConnection;
-use sqlx::{MySqlPool, MySql};
+use sqlx::{MySqlPool, MySql, Executor};
 
 #[derive(Clone)]
 pub struct SessionChecker {
   cookie_manager: SessionCookieManager,
+  maybe_redis_ttl_cache: Option<RedisTtlCache>,
 }
 
 impl SessionChecker {
@@ -23,19 +27,37 @@ impl SessionChecker {
   pub fn new(cookie_manager: &SessionCookieManager) -> Self {
     Self {
       cookie_manager: cookie_manager.clone(),
+      maybe_redis_ttl_cache: None,
     }
   }
 
-  #[deprecated = "Use the PoolConnection<MySql> method instead of the MySqlPool one."]
+  pub fn new_with_cache(cookie_manager: &SessionCookieManager, redis_ttl_cache: RedisTtlCache) -> Self {
+    Self {
+      cookie_manager: cookie_manager.clone(),
+      maybe_redis_ttl_cache: Some(redis_ttl_cache),
+    }
+  }
+
+  pub fn get_session_token(&self, request: &HttpRequest) -> AnyhowResult<Option<String>> {
+    self.cookie_manager.decode_session_token_from_request(request)
+  }
+
+  pub fn forgiving_get_session_token(&self, request: &HttpRequest) -> Option<String> {
+    self.get_session_token(request).ok().flatten()
+  }
+
+  // ==================== SessionRecord ====================
+
+  //#[deprecated = "Use the PoolConnection<MySql> method instead of the MySqlPool one."]
   pub async fn maybe_get_session_light(
     &self,
     request: &HttpRequest,
     pool: &MySqlPool
   ) -> AnyhowResult<Option<SessionRecord>>
   {
-    let mut connection = pool.acquire().await?;
-    self.maybe_get_session_light_from_connection(request, &mut connection).await
+    self.do_session_light_lookup_and_cookie_decode(request, pool).await
   }
+
 
   pub async fn maybe_get_session_light_from_connection(
     &self,
@@ -43,13 +65,48 @@ impl SessionChecker {
     mysql_connection: &mut PoolConnection<MySql>,
   ) -> AnyhowResult<Option<SessionRecord>>
   {
+    self.do_session_light_lookup_and_cookie_decode(request, mysql_connection).await
+  }
+
+
+  async fn do_session_light_lookup_and_cookie_decode<'e, 'c : 'e, E>(
+    &self,
+    request: &HttpRequest,
+    mysql_executor: E,
+  ) -> AnyhowResult<Option<SessionRecord>>
+    where E: 'e + Executor<'c, Database = MySql>
+  {
     let session_token = match self.cookie_manager.decode_session_token_from_request(request)? {
       None => return Ok(None),
       Some(session_token) => session_token,
     };
 
-    get_user_session_by_token_light(mysql_connection, &session_token).await
+    self.do_session_light_lookup(mysql_executor, &session_token).await
   }
+
+
+  async fn do_session_light_lookup<'e, 'c : 'e, E>(
+    &self,
+    mysql_executor: E,
+    session_token: &str,
+  ) -> AnyhowResult<Option<SessionRecord>>
+    where E: 'e + Executor<'c, Database = MySql>
+  {
+    match self.maybe_get_redis_cache_connection() {
+      None => {
+        get_user_session_by_token_light(mysql_executor, session_token).await
+      }
+      Some(mut redis_ttl_cache) => {
+        let cache_key = RedisCacheKeys::session_record_light(session_token);
+        redis_ttl_cache.lazy_load_if_not_cached(&cache_key, move || {
+          get_user_session_by_token_light(mysql_executor, session_token)
+        }).await
+      }
+    }
+  }
+
+
+  // ==================== SessionUserRecord ====================
 
   //#[deprecated = "Use the PoolConnection<MySql> method instead of the MySqlPool one."]
   pub async fn maybe_get_user_session(
@@ -58,9 +115,9 @@ impl SessionChecker {
     pool: &MySqlPool,
   ) -> AnyhowResult<Option<SessionUserRecord>>
   {
-    let mut connection = pool.acquire().await?;
-    self.maybe_get_user_session_from_connection(request, &mut connection).await
+    self.do_user_session_lookup_and_cookie_decode(request, pool).await
   }
+
 
   pub async fn maybe_get_user_session_from_connection(
     &self,
@@ -68,13 +125,49 @@ impl SessionChecker {
     mysql_connection: &mut PoolConnection<MySql>,
   ) -> AnyhowResult<Option<SessionUserRecord>>
   {
+    self.do_user_session_lookup_and_cookie_decode(request, mysql_connection).await
+  }
+
+
+  async fn do_user_session_lookup_and_cookie_decode<'e, 'c : 'e, E>(
+    &self,
+    request: &HttpRequest,
+    mysql_executor: E,
+  ) -> AnyhowResult<Option<SessionUserRecord>>
+    where E: 'e + Executor<'c, Database = MySql>
+  {
     let session_token = match self.cookie_manager.decode_session_token_from_request(request)? {
       None => return Ok(None),
       Some(session_token) => session_token,
     };
 
-    get_user_session_by_token(mysql_connection, &session_token).await
+    self.do_user_session_lookup(mysql_executor, &session_token).await
   }
+
+
+  async fn do_user_session_lookup<'e, 'c : 'e, E>(
+    &self,
+    mysql_executor: E,
+    session_token: &str,
+  ) -> AnyhowResult<Option<SessionUserRecord>>
+    where E: 'e + Executor<'c, Database = MySql>
+  {
+    match self.maybe_get_redis_cache_connection() {
+      None => {
+        get_user_session_by_token(mysql_executor, session_token).await
+      }
+      Some(mut redis_ttl_cache) => {
+        let cache_key = RedisCacheKeys::session_record_user(session_token);
+        redis_ttl_cache.lazy_load_if_not_cached(&cache_key, move || {
+          get_user_session_by_token(mysql_executor, session_token)
+        }).await
+      }
+    }
+  }
+
+
+
+  // ==================== UserSessionExtended ====================
 
   //#[deprecated = "Use the PoolConnection<MySql> method instead of the MySqlPool one."]
   pub async fn maybe_get_user_session_extended(
@@ -100,7 +193,7 @@ impl SessionChecker {
 
     // TODO: Fire both requests off simultaneously.
     let user_session = {
-      match get_user_session_by_token(mysql_connection, &session_payload.session_token).await? {
+      match get_user_session_by_token_pooled_connection(mysql_connection, &session_payload.session_token).await? {
         None => return Ok(None),
         Some(u) => u,
       }
@@ -163,6 +256,18 @@ impl SessionChecker {
         can_delete_users: user_session.can_delete_users,
       },
     }))
+  }
+
+  fn maybe_get_redis_cache_connection(&self) -> Option<RedisTtlCacheConnection> {
+    self.maybe_redis_ttl_cache
+        .as_ref()
+        .map(|redis_ttl_cache| redis_ttl_cache.get_connection()
+            .map_err(|err| {
+              warn!("redis cache failure: {:?}", err); // NB: We'll fail open if Redis cache fails
+              err
+            })
+            .ok())
+        .flatten()
   }
 }
 
