@@ -194,23 +194,9 @@ pub async fn get_tts_model_handler(
         || user_session.can_edit_other_users_tts_models;
   }
 
-
-
-
-
-
-
-  // TODO: Cache should fail open.
-  let mut redis_ttl_cache = server_state.redis_ttl_cache.get_connection()
-      .map_err(|err| {
-        warn!("Error loading Redis connection from TTL cache: {:?}", err);
-        GetTtsModelError::ServerError
-      })?;
-
-  let cache_key = format!("get_tts_model:{}:{}", path.token.clone(), show_deleted_models);
   let model_token = path.token.clone();
 
-  let model_query_result = redis_ttl_cache.lazy_load_if_not_cached(&cache_key, move || {
+  let get_tts_model = move || {
     // NB: async closures are not yet stable in Rust, so we include an async block.
     async move {
       get_tts_model_by_token_using_connection(
@@ -219,13 +205,20 @@ pub async fn get_tts_model_handler(
         &mut mysql_connection,
       ).await
     }
-  }).await;
+  };
 
-  //let model_query_result = get_tts_model_by_token_using_connection(
-  //  &path.token,
-  //  show_deleted_models,
-  //  &mut mysql_connection,
-  //).await;
+  let model_query_result  = match server_state.redis_ttl_cache.get_connection() {
+    Err(err) => {
+      warn!("Error loading Redis connection from TTL cache (calling DB instead): {:?}", err);
+      get_tts_model().await
+    }
+    Ok(mut redis_ttl_cache) => {
+      let cache_key = format!("get_tts_model:{}:{}", path.token.clone(), show_deleted_models);
+      redis_ttl_cache.lazy_load_if_not_cached(&cache_key, move || {
+        get_tts_model()
+      }).await
+    }
+  };
 
   let mut model = match model_query_result {
     Err(e) => {
