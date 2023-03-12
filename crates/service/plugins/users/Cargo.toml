@@ -20,6 +20,7 @@ database_queries = { path = "../../../lib/database_queries" }
 enums = { path = "../../../_types/enums" }
 http_server_common = { path = "../../../lib/http_server_common" }
 redis_caching = { path = "../../../lib/caching/redis_caching" }
+redis_common = { path = "../../../lib/redis_common" }
 reusable_types = { path = "../../../_types/reusable_types" }
 tokens = { path = "../../../_types/tokens" }
 user_input_common = { path = "../../../lib/user_input_common" }

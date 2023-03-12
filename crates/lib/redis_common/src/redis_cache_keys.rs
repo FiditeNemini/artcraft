@@ -8,4 +8,8 @@ impl RedisCacheKeys {
   pub fn get_tts_model_endpoint(model_token: &str) -> String {
     format!("get_tts_model:{}", model_token)
   }
+
+  pub fn session_record_light(session_token: &str) -> String {
+    format!("ses_light:{}", session_token)
+  }
 }

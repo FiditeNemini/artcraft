@@ -7759,6 +7759,7 @@ dependencies = [
  "once_cell",
  "r2d2_redis",
  "redis_caching",
+ "redis_common",
  "regex",
  "reusable_types",
  "serde",

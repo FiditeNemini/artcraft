@@ -14,6 +14,7 @@ use database_queries::queries::users::user_subscriptions::list_active_user_subsc
 use redis_caching::redis_ttl_cache::{RedisTtlCache, RedisTtlCacheConnection};
 use sqlx::pool::PoolConnection;
 use sqlx::{MySqlPool, MySql};
+use redis_common::redis_cache_keys::RedisCacheKeys;
 
 #[derive(Clone)]
 pub struct SessionChecker {
@@ -76,17 +77,23 @@ impl SessionChecker {
       Some(session_token) => session_token,
     };
 
-    let maybe_redis_cache = self.maybe_get_redis_cache_connection();
+    self.do_session_light_lookup(mysql_connection, &session_token).await
+  }
 
-    match maybe_redis_cache {
+  async fn do_session_light_lookup(
+    &self,
+    mysql_connection: &mut PoolConnection<MySql>,
+    session_token: &str,
+  ) -> AnyhowResult<Option<SessionRecord>>
+  {
+    match self.maybe_get_redis_cache_connection() {
       None => {
-        get_user_session_by_token_light(mysql_connection, &session_token).await
+        get_user_session_by_token_light(mysql_connection, session_token).await
       }
       Some(mut redis_ttl_cache) => {
-        let cache_key = "todo";
-        redis_ttl_cache.lazy_load_if_not_cached(cache_key, move || {
-          //let session_token2 = session_token.to_string(); // TODO FIXME
-          get_user_session_by_token_light(mysql_connection, "")
+        let cache_key = RedisCacheKeys::session_record_light(session_token);
+        redis_ttl_cache.lazy_load_if_not_cached(&cache_key, move || {
+          get_user_session_by_token_light(mysql_connection, session_token)
         }).await
       }
     }
