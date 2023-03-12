@@ -233,7 +233,10 @@ async fn main() -> AnyhowResult<()> {
       easyenv::get_env_string_or_default("WEBSITE_HOMEPAGE_REDIRECT", "https://vo.codes/");
 
   let cookie_manager = SessionCookieManager::new(&cookie_domain, &hmac_secret);
-  let session_checker = SessionChecker::new(&cookie_manager);
+  let session_checker = SessionChecker::new_with_cache(
+    &cookie_manager,
+    redis_ttl_cache.clone(),
+  );
 
   let access_key = easyenv::get_env_string_required(ENV_ACCESS_KEY)?;
   let secret_key = easyenv::get_env_string_required(ENV_SECRET_KEY)?;

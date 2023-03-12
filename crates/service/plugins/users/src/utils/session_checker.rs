@@ -1,7 +1,7 @@
 // NB: Incrementally getting rid of build warnings...
-//#![forbid(unused_imports)]
-//#![forbid(unused_mut)]
-//#![forbid(unused_variables)]
+#![forbid(unused_imports)]
+#![forbid(unused_mut)]
+#![forbid(unused_variables)]
 
 use actix_web::HttpRequest;
 use container_common::anyhow_result::AnyhowResult;
@@ -14,8 +14,7 @@ use log::warn;
 use redis_caching::redis_ttl_cache::{RedisTtlCache, RedisTtlCacheConnection};
 use redis_common::redis_cache_keys::RedisCacheKeys;
 use sqlx::pool::PoolConnection;
-use sqlx::{MySqlPool, MySql, Acquire, Executor};
-use sqlx_mysql_helpers::any_connection::MySqlHandleMixedRef;
+use sqlx::{MySqlPool, MySql, Executor};
 
 #[derive(Clone)]
 pub struct SessionChecker {
@@ -42,7 +41,7 @@ impl SessionChecker {
 
   // ==================== SessionRecord ====================
 
-  #[deprecated = "Use the PoolConnection<MySql> method instead of the MySqlPool one."]
+  //#[deprecated = "Use the PoolConnection<MySql> method instead of the MySqlPool one."]
   pub async fn maybe_get_session_light(
     &self,
     request: &HttpRequest,
@@ -52,6 +51,7 @@ impl SessionChecker {
     self.do_session_light_lookup_and_cookie_decode(request, pool).await
   }
 
+
   pub async fn maybe_get_session_light_from_connection(
     &self,
     request: &HttpRequest,
@@ -60,6 +60,7 @@ impl SessionChecker {
   {
     self.do_session_light_lookup_and_cookie_decode(request, mysql_connection).await
   }
+
 
   async fn do_session_light_lookup_and_cookie_decode<'e, 'c : 'e, E>(
     &self,
@@ -75,6 +76,7 @@ impl SessionChecker {
 
     self.do_session_light_lookup(mysql_executor, &session_token).await
   }
+
 
   async fn do_session_light_lookup<'e, 'c : 'e, E>(
     &self,
@@ -109,6 +111,7 @@ impl SessionChecker {
     self.do_user_session_lookup_and_cookie_decode(request, pool).await
   }
 
+
   pub async fn maybe_get_user_session_from_connection(
     &self,
     request: &HttpRequest,
@@ -117,6 +120,7 @@ impl SessionChecker {
   {
     self.do_user_session_lookup_and_cookie_decode(request, mysql_connection).await
   }
+
 
   async fn do_user_session_lookup_and_cookie_decode<'e, 'c : 'e, E>(
     &self,
@@ -133,6 +137,7 @@ impl SessionChecker {
     self.do_user_session_lookup(mysql_executor, &session_token).await
   }
 
+
   async fn do_user_session_lookup<'e, 'c : 'e, E>(
     &self,
     mysql_executor: E,
@@ -145,7 +150,7 @@ impl SessionChecker {
         get_user_session_by_token(mysql_executor, session_token).await
       }
       Some(mut redis_ttl_cache) => {
-        let cache_key = RedisCacheKeys::session_record_light(session_token);
+        let cache_key = RedisCacheKeys::session_record_user(session_token);
         redis_ttl_cache.lazy_load_if_not_cached(&cache_key, move || {
           get_user_session_by_token(mysql_executor, session_token)
         }).await
