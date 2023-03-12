@@ -194,6 +194,12 @@ pub async fn get_tts_model_handler(
         || user_session.can_edit_other_users_tts_models;
   }
 
+
+
+
+
+
+
   // TODO: Cache should fail open.
   let mut redis_ttl_cache = server_state.redis_ttl_cache.get_connection()
       .map_err(|err| {
@@ -201,62 +207,25 @@ pub async fn get_tts_model_handler(
         GetTtsModelError::ServerError
       })?;
 
-  let key = path.token.clone();
-  let token = path.token.clone();
-  let mysql_pool_2 = server_state.mysql_pool.clone(); // TODO: Try to copy the connection!
+  let cache_key = format!("get_tts_model:{}:{}", path.token.clone(), show_deleted_models);
+  let model_token = path.token.clone();
 
-  //let _result :AnyhowResult<Option<TtsModelRecord>> = redis_ttl_cache.lazy_load_if_not_cached(&key, move || {
-  let tts_model_record = redis_ttl_cache.lazy_load_if_not_cached(&key, move || {
-
-
-
+  let model_query_result = redis_ttl_cache.lazy_load_if_not_cached(&cache_key, move || {
     // NB: async closures are not yet stable in Rust, so we include an async block.
-    let model_query_result = async move {
-      let mut mysql_connection = mysql_pool_2.acquire()
-          .await?;
-
-      let model_query_result = get_tts_model_by_token_using_connection(
-        &token,
+    async move {
+      get_tts_model_by_token_using_connection(
+        &model_token,
         show_deleted_models,
         &mut mysql_connection,
-      ).await?;
-
-      AnyhowResult::Ok(model_query_result)
-    };
-
-
-
-    //let foo = "foo".to_string();
-
-    //std::future::ready(Ok(model_query_result))
-
-    model_query_result
-
+      ).await
+    }
   }).await;
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-  let model_query_result = get_tts_model_by_token_using_connection(
-    &path.token,
-    show_deleted_models,
-    &mut mysql_connection,
-  ).await;
+  //let model_query_result = get_tts_model_by_token_using_connection(
+  //  &path.token,
+  //  show_deleted_models,
+  //  &mut mysql_connection,
+  //).await;
 
   let mut model = match model_query_result {
     Err(e) => {

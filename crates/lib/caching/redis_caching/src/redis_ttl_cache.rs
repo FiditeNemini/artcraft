@@ -90,7 +90,6 @@ impl RedisTtlCacheConnection {
     Ok(None)
   }
 
-
   fn cache_key(key: &str) -> String {
     format!("{}:{}", REDIS_KEY_PREFIX, key)
   }
