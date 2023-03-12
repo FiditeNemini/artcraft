@@ -16,6 +16,7 @@ use sqlx::{MySql, MySqlPool};
 // FIXME: This is the old style of query scoping and shouldn't be copied.
 //  The moderator-only fields are good practice, though.
 
+#[derive(Serialize, Deserialize, Clone)]
 pub struct TtsModelRecord {
   pub model_token: String,
   pub tts_model_type: String,
@@ -59,6 +60,7 @@ pub struct TtsModelRecord {
   pub maybe_moderator_fields: Option<TtsModelModeratorFields>,
 }
 
+#[derive(Serialize, Deserialize, Clone)]
 pub struct CustomVocoderFields {
   pub vocoder_token: String,
   pub vocoder_title: String,
@@ -70,6 +72,7 @@ pub struct CustomVocoderFields {
 
 /// "Moderator-only fields" that we wouldn't want to expose to ordinary users.
 /// It's the web endpoint controller's responsibility to clear these for non-mods.
+#[derive(Serialize, Deserialize, Clone)]
 pub struct TtsModelModeratorFields {
   // Moderator-set mel multiply factors
   pub use_default_mel_multiply_factor: bool,

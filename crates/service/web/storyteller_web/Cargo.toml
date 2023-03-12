@@ -31,6 +31,7 @@ http_server_common = { path = "../../../lib/http_server_common" }
 jobs_common = { path = "../../../lib/jobs_common" }
 media = { path = "../../../lib/media" }
 memory_caching = { path = "../../../lib/caching/memory_caching" }
+redis_caching = { path = "../../../lib/caching/redis_caching" }
 redis_common = { path = "../../../lib/redis_common" }
 reusable_types = { path = "../../../_types/reusable_types" }
 tokens = { path = "../../../_types/tokens" }

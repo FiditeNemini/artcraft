@@ -6456,6 +6456,7 @@ dependencies = [
  "pulldown-cmark",
  "r2d2_redis",
  "rand 0.8.5",
+ "redis_caching",
  "redis_common",
  "regex",
  "reqwest",
