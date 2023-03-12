@@ -4,12 +4,12 @@
 #![forbid(unused_variables)]
 
 use actix_web::HttpRequest;
-use container_common::anyhow_result::AnyhowResult;
 use crate::utils::session_cookie_manager::SessionCookieManager;
 use crate::utils::user_session_extended::{UserSessionExtended, UserSessionPreferences, UserSessionPremiumPlanInfo, UserSessionRoleAndPermissions, UserSessionSubscriptionPlan, UserSessionUserDetails};
 use database_queries::queries::users::user_sessions::get_user_session_by_token::{get_user_session_by_token, get_user_session_by_token_pooled_connection, SessionUserRecord};
 use database_queries::queries::users::user_sessions::get_user_session_by_token_light::{get_user_session_by_token_light, SessionRecord};
 use database_queries::queries::users::user_subscriptions::list_active_user_subscriptions::list_active_user_subscriptions;
+use errors::AnyhowResult;
 use log::warn;
 use redis_caching::redis_ttl_cache::{RedisTtlCache, RedisTtlCacheConnection};
 use redis_common::redis_cache_keys::RedisCacheKeys;
@@ -38,6 +38,13 @@ impl SessionChecker {
     }
   }
 
+  pub fn get_session_token(&self, request: &HttpRequest) -> AnyhowResult<Option<String>> {
+    self.cookie_manager.decode_session_token_from_request(request)
+  }
+
+  pub fn forgiving_get_session_token(&self, request: &HttpRequest) -> Option<String> {
+    self.get_session_token(request).ok().flatten()
+  }
 
   // ==================== SessionRecord ====================
 

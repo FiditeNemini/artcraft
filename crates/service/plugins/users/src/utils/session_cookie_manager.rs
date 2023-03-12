@@ -6,7 +6,7 @@
 use actix_web::HttpRequest;
 use actix_web::cookie::Cookie;
 use anyhow::anyhow;
-use container_common::anyhow_result::AnyhowResult;
+use errors::AnyhowResult;
 use hmac::Hmac;
 use hmac::NewMac;
 use jwt::SignWithKey;

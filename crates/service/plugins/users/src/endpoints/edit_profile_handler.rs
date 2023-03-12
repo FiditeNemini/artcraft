@@ -24,6 +24,8 @@ use http_server_common::response::serialize_as_json_error::serialize_as_json_err
 use log::warn;
 use sqlx::MySqlPool;
 use std::fmt;
+use redis_caching::redis_ttl_cache::RedisTtlCache;
+use redis_common::redis_cache_keys::RedisCacheKeys;
 use user_input_common::check_for_slurs::contains_slurs;
 use user_input_common::markdown_to_html::markdown_to_html;
 
@@ -91,6 +93,7 @@ pub async fn edit_profile_handler(
   path: Path<EditProfilePathInfo>,
   request: web::Json<EditProfileRequest>,
   mysql_pool: web::Data<MySqlPool>,
+  redis_ttl_cache: web::Data<RedisTtlCache>,
   session_checker: web::Data<SessionChecker>,
 ) -> Result<HttpResponse, EditProfileError>
 {
@@ -291,6 +294,22 @@ pub async fn edit_profile_handler(
       return Err(EditProfileError::ServerError);
     }
   };
+
+  // TODO: Clear Redis cache of sessions
+  //  Unfortunately we don't yet have an index of user_token => session_tokens[] outside the DB.
+  //  For now, a hacky solution is just to delete the cache under the current user.
+  //  This makes sense for non-mods and should solve 95% of cases.
+  if let Some(session_token) = session_checker.forgiving_get_session_token(&http_request) {
+    if let Ok(mut redis_ttl_cache) = redis_ttl_cache.get_connection() {
+      let keys = vec![
+        RedisCacheKeys::session_record_user(&session_token),
+        RedisCacheKeys::session_record_light(&session_token),
+      ];
+      for key in keys.iter() {
+        let _r = redis_ttl_cache.delete_from_cache(key).ok();
+      }
+    }
+  }
 
   let response = EditProfileSuccessResponse {
     success: true,
