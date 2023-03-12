@@ -7,7 +7,7 @@ use actix_web::HttpRequest;
 use container_common::anyhow_result::AnyhowResult;
 use crate::utils::session_cookie_manager::SessionCookieManager;
 use crate::utils::user_session_extended::{UserSessionExtended, UserSessionPreferences, UserSessionPremiumPlanInfo, UserSessionRoleAndPermissions, UserSessionSubscriptionPlan, UserSessionUserDetails};
-use database_queries::queries::users::user_sessions::get_user_session_by_token::{get_user_session_by_token, SessionUserRecord};
+use database_queries::queries::users::user_sessions::get_user_session_by_token::{get_user_session_by_token, get_user_session_by_token_pooled_connection, SessionUserRecord};
 use database_queries::queries::users::user_sessions::get_user_session_by_token_light::{get_user_session_by_token_light, SessionRecord};
 use database_queries::queries::users::user_subscriptions::list_active_user_subscriptions::list_active_user_subscriptions;
 use log::warn;
@@ -49,7 +49,6 @@ impl SessionChecker {
     pool: &MySqlPool
   ) -> AnyhowResult<Option<SessionRecord>>
   {
-    //let mysql_handle = MySqlHandleMixedRef::ConnectionPool(pool);
     self.do_session_light_lookup_and_cookie_decode(request, pool).await
   }
 
@@ -59,14 +58,12 @@ impl SessionChecker {
     mysql_connection: &mut PoolConnection<MySql>,
   ) -> AnyhowResult<Option<SessionRecord>>
   {
-    //let mysql_handle = MySqlHandleMixedRef::Connection(mysql_connection);
     self.do_session_light_lookup_and_cookie_decode(request, mysql_connection).await
   }
 
   async fn do_session_light_lookup_and_cookie_decode<'e, 'c : 'e, E>(
     &self,
     request: &HttpRequest,
-    //mysql_handle: MySqlHandleMixedRef<'_>,
     mysql_executor: E,
   ) -> AnyhowResult<Option<SessionRecord>>
     where E: 'e + Executor<'c, Database = MySql>
@@ -81,7 +78,6 @@ impl SessionChecker {
 
   async fn do_session_light_lookup<'e, 'c : 'e, E>(
     &self,
-    //mysql_handle: MySqlHandleMixedRef<'_>,
     mysql_executor: E,
     session_token: &str,
   ) -> AnyhowResult<Option<SessionRecord>>
@@ -110,8 +106,7 @@ impl SessionChecker {
     pool: &MySqlPool,
   ) -> AnyhowResult<Option<SessionUserRecord>>
   {
-    let mut connection = pool.acquire().await?;
-    self.maybe_get_user_session_from_connection(request, &mut connection).await
+    self.do_user_session_lookup_and_cookie_decode(request, pool).await
   }
 
   pub async fn maybe_get_user_session_from_connection(
@@ -120,13 +115,44 @@ impl SessionChecker {
     mysql_connection: &mut PoolConnection<MySql>,
   ) -> AnyhowResult<Option<SessionUserRecord>>
   {
+    self.do_user_session_lookup_and_cookie_decode(request, mysql_connection).await
+  }
+
+  async fn do_user_session_lookup_and_cookie_decode<'e, 'c : 'e, E>(
+    &self,
+    request: &HttpRequest,
+    mysql_executor: E,
+  ) -> AnyhowResult<Option<SessionUserRecord>>
+    where E: 'e + Executor<'c, Database = MySql>
+  {
     let session_token = match self.cookie_manager.decode_session_token_from_request(request)? {
       None => return Ok(None),
       Some(session_token) => session_token,
     };
 
-    get_user_session_by_token(mysql_connection, &session_token).await
+    self.do_user_session_lookup(mysql_executor, &session_token).await
   }
+
+  async fn do_user_session_lookup<'e, 'c : 'e, E>(
+    &self,
+    mysql_executor: E,
+    session_token: &str,
+  ) -> AnyhowResult<Option<SessionUserRecord>>
+    where E: 'e + Executor<'c, Database = MySql>
+  {
+    match self.maybe_get_redis_cache_connection() {
+      None => {
+        get_user_session_by_token(mysql_executor, session_token).await
+      }
+      Some(mut redis_ttl_cache) => {
+        let cache_key = RedisCacheKeys::session_record_light(session_token);
+        redis_ttl_cache.lazy_load_if_not_cached(&cache_key, move || {
+          get_user_session_by_token(mysql_executor, session_token)
+        }).await
+      }
+    }
+  }
+
 
 
   // ==================== UserSessionExtended ====================
@@ -155,7 +181,7 @@ impl SessionChecker {
 
     // TODO: Fire both requests off simultaneously.
     let user_session = {
-      match get_user_session_by_token(mysql_connection, &session_payload.session_token).await? {
+      match get_user_session_by_token_pooled_connection(mysql_connection, &session_payload.session_token).await? {
         None => return Ok(None),
         Some(u) => u,
       }
