@@ -156,7 +156,10 @@ async fn main() -> AnyhowResult<()> {
   let redis_pool = r2d2::Pool::builder()
       .build(redis_manager)?;
 
-  let redis_ttl_cache = RedisTtlCache::new(redis_pool.clone());
+  let redis_ttl_cache = RedisTtlCache::new_with_ttl(
+    redis_pool.clone(),
+    easyenv::get_env_num("REDIS_CACHE_TTL_SECONDS", 60)?,
+  );
 
   info!("Setting up Redis rate limiters...");
 

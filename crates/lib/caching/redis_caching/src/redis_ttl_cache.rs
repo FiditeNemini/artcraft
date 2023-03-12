@@ -11,6 +11,8 @@ const REDIS_KEY_PREFIX : &'static str = "_c";
 
 // TODO: Async Redis
 
+// TODO: This *really* needs tests.
+
 #[derive(Clone)]
 pub struct RedisTtlCache {
   redis_pool: Pool<RedisConnectionManager>,
@@ -19,9 +21,13 @@ pub struct RedisTtlCache {
 
 impl RedisTtlCache {
   pub fn new(redis_pool: Pool<RedisConnectionManager>) -> Self {
+    Self::new_with_ttl(redis_pool, DEFAULT_TTL_SECONDS)
+  }
+
+  pub fn new_with_ttl(redis_pool: Pool<RedisConnectionManager>, key_ttl: usize) -> Self {
     Self {
       redis_pool,
-      default_key_ttl: DEFAULT_TTL_SECONDS,
+      default_key_ttl: key_ttl,
     }
   }
 

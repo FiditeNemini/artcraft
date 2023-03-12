@@ -17,6 +17,7 @@ use log::warn;
 use std::fmt;
 use std::sync::Arc;
 use errors::AnyhowResult;
+use redis_common::redis_cache_keys::RedisCacheKeys;
 use tts_common::text_pipelines::guess_pipeline::guess_text_pipeline_heuristic;
 use tts_common::text_pipelines::text_pipeline_type::TextPipelineType;
 
@@ -213,7 +214,7 @@ pub async fn get_tts_model_handler(
       get_tts_model().await
     }
     Ok(mut redis_ttl_cache) => {
-      let cache_key = format!("get_tts_model:{}:{}", path.token.clone(), show_deleted_models);
+      let cache_key = RedisCacheKeys::get_tts_model_endpoint(&path.token);
       redis_ttl_cache.lazy_load_if_not_cached(&cache_key, move || {
         get_tts_model()
       }).await
