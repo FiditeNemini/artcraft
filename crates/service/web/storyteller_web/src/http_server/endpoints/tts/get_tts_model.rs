@@ -194,8 +194,7 @@ pub async fn get_tts_model_handler(
         || user_session.can_edit_other_users_tts_models;
   }
 
-
-
+  // TODO: Cache should fail open.
   let mut redis_ttl_cache = server_state.redis_ttl_cache.get_connection()
       .map_err(|err| {
         warn!("Error loading Redis connection from TTL cache: {:?}", err);
@@ -207,11 +206,12 @@ pub async fn get_tts_model_handler(
   let mysql_pool_2 = server_state.mysql_pool.clone(); // TODO: Try to copy the connection!
 
   //let _result :AnyhowResult<Option<TtsModelRecord>> = redis_ttl_cache.lazy_load_if_not_cached(&key, move || {
-  let _r = redis_ttl_cache.lazy_load_if_not_cached(&key, move || {
+  let tts_model_record = redis_ttl_cache.lazy_load_if_not_cached(&key, move || {
 
 
 
-    let _r = async {
+    // NB: async closures are not yet stable in Rust, so we include an async block.
+    let model_query_result = async move {
       let mut mysql_connection = mysql_pool_2.acquire()
           .await?;
 
@@ -221,15 +221,16 @@ pub async fn get_tts_model_handler(
         &mut mysql_connection,
       ).await?;
 
-      //Ok::<Option<TtsModelRecord>, String>(model_query_result)
       AnyhowResult::Ok(model_query_result)
     };
 
 
 
-    let foo = "foo".to_string();
+    //let foo = "foo".to_string();
 
-    std::future::ready(Ok(Some(foo)))
+    //std::future::ready(Ok(model_query_result))
+
+    model_query_result
 
   }).await;
 
