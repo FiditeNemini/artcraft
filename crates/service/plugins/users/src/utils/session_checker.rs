@@ -1,20 +1,21 @@
 // NB: Incrementally getting rid of build warnings...
-#![forbid(unused_imports)]
-#![forbid(unused_mut)]
-#![forbid(unused_variables)]
+//#![forbid(unused_imports)]
+//#![forbid(unused_mut)]
+//#![forbid(unused_variables)]
 
 use actix_web::HttpRequest;
-use log::warn;
 use container_common::anyhow_result::AnyhowResult;
 use crate::utils::session_cookie_manager::SessionCookieManager;
 use crate::utils::user_session_extended::{UserSessionExtended, UserSessionPreferences, UserSessionPremiumPlanInfo, UserSessionRoleAndPermissions, UserSessionSubscriptionPlan, UserSessionUserDetails};
 use database_queries::queries::users::user_sessions::get_user_session_by_token::{get_user_session_by_token, SessionUserRecord};
 use database_queries::queries::users::user_sessions::get_user_session_by_token_light::{get_user_session_by_token_light, SessionRecord};
 use database_queries::queries::users::user_subscriptions::list_active_user_subscriptions::list_active_user_subscriptions;
+use log::warn;
 use redis_caching::redis_ttl_cache::{RedisTtlCache, RedisTtlCacheConnection};
-use sqlx::pool::PoolConnection;
-use sqlx::{MySqlPool, MySql};
 use redis_common::redis_cache_keys::RedisCacheKeys;
+use sqlx::pool::PoolConnection;
+use sqlx::{MySqlPool, MySql, Acquire, Executor};
+use sqlx_mysql_helpers::any_connection::MySqlHandleMixedRef;
 
 #[derive(Clone)]
 pub struct SessionChecker {
@@ -48,8 +49,8 @@ impl SessionChecker {
     pool: &MySqlPool
   ) -> AnyhowResult<Option<SessionRecord>>
   {
-    let mut connection = pool.acquire().await?;
-    self.maybe_get_session_light_from_connection(request, &mut connection).await
+    //let mysql_handle = MySqlHandleMixedRef::ConnectionPool(pool);
+    self.do_session_light_lookup_and_cookie_decode(request, pool).await
   }
 
   pub async fn maybe_get_session_light_from_connection(
@@ -58,42 +59,42 @@ impl SessionChecker {
     mysql_connection: &mut PoolConnection<MySql>,
   ) -> AnyhowResult<Option<SessionRecord>>
   {
-    let session_token = match self.cookie_manager.decode_session_token_from_request(request)? {
-      None => return Ok(None),
-      Some(session_token) => session_token,
-    };
-
-    get_user_session_by_token_light(mysql_connection, &session_token).await
+    //let mysql_handle = MySqlHandleMixedRef::Connection(mysql_connection);
+    self.do_session_light_lookup_and_cookie_decode(request, mysql_connection).await
   }
 
-  async fn maybe_get_session_light_from_connection_cached(
+  async fn do_session_light_lookup_and_cookie_decode<'e, 'c : 'e, E>(
     &self,
     request: &HttpRequest,
-    mysql_connection: &mut PoolConnection<MySql>,
+    //mysql_handle: MySqlHandleMixedRef<'_>,
+    mysql_executor: E,
   ) -> AnyhowResult<Option<SessionRecord>>
+    where E: 'e + Executor<'c, Database = MySql>
   {
     let session_token = match self.cookie_manager.decode_session_token_from_request(request)? {
       None => return Ok(None),
       Some(session_token) => session_token,
     };
 
-    self.do_session_light_lookup(mysql_connection, &session_token).await
+    self.do_session_light_lookup(mysql_executor, &session_token).await
   }
 
-  async fn do_session_light_lookup(
+  async fn do_session_light_lookup<'e, 'c : 'e, E>(
     &self,
-    mysql_connection: &mut PoolConnection<MySql>,
+    //mysql_handle: MySqlHandleMixedRef<'_>,
+    mysql_executor: E,
     session_token: &str,
   ) -> AnyhowResult<Option<SessionRecord>>
+    where E: 'e + Executor<'c, Database = MySql>
   {
     match self.maybe_get_redis_cache_connection() {
       None => {
-        get_user_session_by_token_light(mysql_connection, session_token).await
+        get_user_session_by_token_light(mysql_executor, session_token).await
       }
       Some(mut redis_ttl_cache) => {
         let cache_key = RedisCacheKeys::session_record_light(session_token);
         redis_ttl_cache.lazy_load_if_not_cached(&cache_key, move || {
-          get_user_session_by_token_light(mysql_connection, session_token)
+          get_user_session_by_token_light(mysql_executor, session_token)
         }).await
       }
     }

@@ -2101,6 +2101,7 @@ dependencies = [
  "serde_derive",
  "serde_json",
  "sqlx",
+ "sqlx_mysql_helpers",
  "tokens",
  "toml",
 ]
@@ -6323,6 +6324,14 @@ dependencies = [
 ]
 
 [[package]]
+name = "sqlx_mysql_helpers"
+version = "0.0.1"
+dependencies = [
+ "errors",
+ "sqlx",
+]
+
+[[package]]
 name = "stable_deref_trait"
 version = "1.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -7750,6 +7759,7 @@ dependencies = [
  "database_queries",
  "dotenv",
  "enums",
+ "errors",
  "hmac 0.10.1",
  "http_server_common",
  "jwt",
@@ -7767,6 +7777,7 @@ dependencies = [
  "serde_json",
  "sha2 0.9.5",
  "sqlx",
+ "sqlx_mysql_helpers",
  "time 0.2.26",
  "tokens",
  "toml",

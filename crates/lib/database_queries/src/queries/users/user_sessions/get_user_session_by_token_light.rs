@@ -5,8 +5,7 @@
 use anyhow::anyhow;
 use errors::AnyhowResult;
 use log::warn;
-use sqlx::MySql;
-use sqlx::pool::PoolConnection;
+use sqlx::{Executor, MySql};
 
 #[derive(Clone, Serialize, Deserialize)]
 pub struct SessionRecord {
@@ -14,12 +13,12 @@ pub struct SessionRecord {
   pub user_token: String,
 }
 
-pub async fn get_user_session_by_token_light(
-  mysql_connection: &mut PoolConnection<MySql>,
+pub async fn get_user_session_by_token_light<'e, 'c : 'e, E>(
+  mysql_executor: E,
   session_token: &str,
-) -> AnyhowResult<Option<SessionRecord>> {
-
-  // NB: Lookup failure is Err(RowNotFound).
+) -> AnyhowResult<Option<SessionRecord>>
+  where E: 'e + Executor<'c, Database = MySql>
+{
   let maybe_session_record = sqlx::query_as!(
       SessionRecord,
         r#"
@@ -32,7 +31,7 @@ AND deleted_at IS NULL
         "#,
         session_token,
     )
-      .fetch_one(mysql_connection)
+      .fetch_one(mysql_executor)
       .await;
 
   match maybe_session_record {
