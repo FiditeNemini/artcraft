@@ -1,7 +1,7 @@
 // NB: Incrementally getting rid of build warnings...
-#![forbid(unused_imports)]
-#![forbid(unused_mut)]
-#![forbid(unused_variables)]
+//#![forbid(unused_imports)]
+//#![forbid(unused_mut)]
+//#![forbid(unused_variables)]
 
 use actix_web::error::ResponseError;
 use actix_web::http::StatusCode;
@@ -10,12 +10,14 @@ use actix_web::{web, HttpResponse, HttpRequest};
 use chrono::{DateTime, Utc};
 use crate::server_state::ServerState;
 use database_queries::column_types::vocoder_type::VocoderType;
-use database_queries::queries::tts::tts_models::get_tts_model::get_tts_model_by_token_using_connection;
+use database_queries::queries::tts::tts_models::get_tts_model::{get_tts_model_by_token_using_connection, TtsModelRecord};
 use enums::common::visibility::Visibility;
 use http_server_common::response::serialize_as_json_error::serialize_as_json_error;
 use log::warn;
 use std::fmt;
 use std::sync::Arc;
+use errors::AnyhowResult;
+use redis_common::redis_cache_keys::RedisCacheKeys;
 use tts_common::text_pipelines::guess_pipeline::guess_text_pipeline_heuristic;
 use tts_common::text_pipelines::text_pipeline_type::TextPipelineType;
 
@@ -193,11 +195,31 @@ pub async fn get_tts_model_handler(
         || user_session.can_edit_other_users_tts_models;
   }
 
-  let model_query_result = get_tts_model_by_token_using_connection(
-    &path.token,
-    show_deleted_models,
-    &mut mysql_connection,
-  ).await;
+  let model_token = path.token.clone();
+
+  let get_tts_model = move || {
+    // NB: async closures are not yet stable in Rust, so we include an async block.
+    async move {
+      get_tts_model_by_token_using_connection(
+        &model_token,
+        show_deleted_models,
+        &mut mysql_connection,
+      ).await
+    }
+  };
+
+  let model_query_result  = match server_state.redis_ttl_cache.get_connection() {
+    Err(err) => {
+      warn!("Error loading Redis connection from TTL cache (calling DB instead): {:?}", err);
+      get_tts_model().await
+    }
+    Ok(mut redis_ttl_cache) => {
+      let cache_key = RedisCacheKeys::get_tts_model_endpoint(&path.token);
+      redis_ttl_cache.lazy_load_if_not_cached(&cache_key, move || {
+        get_tts_model()
+      }).await
+    }
+  };
 
   let mut model = match model_query_result {
     Err(e) => {

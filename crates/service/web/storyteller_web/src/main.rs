@@ -89,6 +89,7 @@ use actix_helpers::middleware::endpoint_disablement::disabled_endpoints::disable
 use actix_helpers::middleware::endpoint_disablement::disabled_endpoints::exact_match_endpoint_disablements::ExactMatchEndpointDisablements;
 use actix_helpers::middleware::endpoint_disablement::disabled_endpoints::prefix_endpoint_disablements::PrefixEndpointDisablements;
 use actix_helpers::middleware::endpoint_disablement::endpoint_disablement_middleware::EndpointDisablementFilter;
+use redis_caching::redis_ttl_cache::RedisTtlCache;
 use twitch_common::twitch_secrets::TwitchSecrets;
 use url_config::third_party_url_redirector::ThirdPartyUrlRedirector;
 use users_component::utils::session_checker::SessionChecker;
@@ -154,6 +155,11 @@ async fn main() -> AnyhowResult<()> {
 
   let redis_pool = r2d2::Pool::builder()
       .build(redis_manager)?;
+
+  let redis_ttl_cache = RedisTtlCache::new_with_ttl(
+    redis_pool.clone(),
+    easyenv::get_env_num("REDIS_CACHE_TTL_SECONDS", 60)?,
+  );
 
   info!("Setting up Redis rate limiters...");
 
@@ -397,6 +403,7 @@ async fn main() -> AnyhowResult<()> {
     health_check_status,
     mysql_pool: pool,
     redis_pool,
+    redis_ttl_cache,
     redis_rate_limiters: RedisRateLimiters {
       logged_out: logged_out_redis_rate_limiter,
       logged_in: logged_in_redis_rate_limiter,

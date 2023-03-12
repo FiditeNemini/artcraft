@@ -1,3 +1,4 @@
+use std::future::Future;
 use r2d2_redis::RedisConnectionManager;
 use r2d2_redis::r2d2::{Pool, PooledConnection};
 use r2d2_redis::redis::Commands;
@@ -10,6 +11,8 @@ const REDIS_KEY_PREFIX : &'static str = "_c";
 
 // TODO: Async Redis
 
+// TODO: This *really* needs tests.
+
 #[derive(Clone)]
 pub struct RedisTtlCache {
   redis_pool: Pool<RedisConnectionManager>,
@@ -18,9 +21,13 @@ pub struct RedisTtlCache {
 
 impl RedisTtlCache {
   pub fn new(redis_pool: Pool<RedisConnectionManager>) -> Self {
+    Self::new_with_ttl(redis_pool, DEFAULT_TTL_SECONDS)
+  }
+
+  pub fn new_with_ttl(redis_pool: Pool<RedisConnectionManager>, key_ttl: usize) -> Self {
     Self {
       redis_pool,
-      default_key_ttl: DEFAULT_TTL_SECONDS,
+      default_key_ttl: key_ttl,
     }
   }
 
@@ -65,10 +72,13 @@ impl RedisTtlCacheConnection {
     Ok(())
   }
 
-  pub fn lazy_load_if_not_cached<T, F>(&mut self, item_key: &str, loader_func: &mut F)
+  // NB(bt,2023-03-11): As of this writing, async closures are not yet stable.
+  // Return closures with internal async blocks instead. See: https://stackoverflow.com/a/74004017
+  pub async fn lazy_load_if_not_cached<T, F, Fut>(&mut self, item_key: &str, loader_func: F)
     -> AnyhowResult<Option<T>>
     where for<'a> T: Serialize + Deserialize<'a> + Clone,
-          F: FnMut() -> AnyhowResult<Option<T>>,
+          F: FnOnce() -> Fut,
+          Fut: Future<Output=AnyhowResult<Option<T>>>,
   {
     let maybe_value = self.get_from_cache(item_key)?;
 
@@ -76,7 +86,7 @@ impl RedisTtlCacheConnection {
       return Ok(value);
     }
 
-    let maybe_value = loader_func()?;
+    let maybe_value = loader_func().await?;
 
     if let Some(value) = maybe_value {
       self.persist_to_cache(item_key, value.clone())?;
@@ -85,7 +95,6 @@ impl RedisTtlCacheConnection {
 
     Ok(None)
   }
-
 
   fn cache_key(key: &str) -> String {
     format!("{}:{}", REDIS_KEY_PREFIX, key)

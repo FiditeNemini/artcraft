@@ -22,6 +22,7 @@ use log::{info, warn, error};
 use sqlx::MySqlPool;
 use std::fmt;
 use std::sync::Arc;
+use redis_common::redis_cache_keys::RedisCacheKeys;
 use tts_common::text_pipelines::text_pipeline_type::TextPipelineType;
 use user_input_common::check_for_slurs::contains_slurs;
 use user_input_common::markdown_to_html::markdown_to_html;
@@ -325,6 +326,12 @@ pub async fn edit_tts_model_handler(
       return Err(EditTtsModelError::ServerError);
     }
   };
+
+  // Best effort to clear any redis cache
+  if let Ok(mut redis_ttl_cache) = server_state.redis_ttl_cache.get_connection() {
+    let cache_key = RedisCacheKeys::get_tts_model_endpoint(&path.model_token);
+    let _r = redis_ttl_cache.delete_from_cache(&cache_key).ok();
+  }
 
   Ok(simple_json_success())
 }
