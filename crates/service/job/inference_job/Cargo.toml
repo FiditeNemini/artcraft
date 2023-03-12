@@ -22,7 +22,7 @@ database_queries = { path = "../../../lib/database_queries" }
 enums = { path = "../../../_types/enums" }
 errors = { path = "../../../lib/errors" }
 jobs_common = { path = "../../../lib/jobs_common" }
-memory_caching = { path = "../../../lib/memory_caching" }
+memory_caching = { path = "../../../lib/caching/memory_caching" }
 tokens = { path = "../../../_types/tokens" }
 tts_common = { path = "../../../lib/tts_common" }
 

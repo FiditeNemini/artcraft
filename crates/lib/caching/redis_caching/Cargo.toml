@@ -1,0 +1,28 @@
+[package]
+name = "redis_caching"
+edition = "2018"
+version = "0.0.1"
+authors = [
+    "Brandon Thomas <bt@brand.io>",
+    "Brandon Thomas <echelon@gmail.com>",
+]
+publish = false
+
+[lib]
+name = "redis_caching"
+path = "src/lib.rs"
+
+[dependencies]
+# Internal
+errors = { path = "../../errors" }
+
+# Redis Database
+r2d2_redis = "0.14.0"
+
+# Serialization
+serde = "1.0.125"
+serde_derive = "1.0.125"
+serde_json = "1.0.64"
+
+[dev-dependencies]
+# None yet

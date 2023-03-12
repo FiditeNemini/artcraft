@@ -5355,6 +5355,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "redis_caching"
+version = "0.0.1"
+dependencies = [
+ "errors",
+ "r2d2_redis",
+ "serde",
+ "serde_derive",
+ "serde_json",
+]
+
+[[package]]
 name = "redis_common"
 version = "0.0.1"
 dependencies = [
