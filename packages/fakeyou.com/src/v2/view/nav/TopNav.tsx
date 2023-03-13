@@ -284,7 +284,7 @@ function TopNav(props: Props) {
       </div>
 
       <nav
-        className="navbar navbar-expand-lg navbar-dark py-3"
+        className="navbar navbar-expand-lg navbar-dark pt-3"
         aria-label="Offcanvas navbar large"
       >
         <div className="container">
