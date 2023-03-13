@@ -82,7 +82,7 @@ function FooterNav(props: Props) {
                 <img
                   src="/fakeyou/FakeYou-Logo.png"
                   alt="FakeYou: Cartoon and Celebrity Text to Speech"
-                  height="38"
+                  height="36"
                 />
               </Link>
               <div className="d-flex gap-3">
