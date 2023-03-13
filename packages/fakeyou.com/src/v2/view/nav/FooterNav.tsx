@@ -184,8 +184,8 @@ function FooterNav(props: Props) {
 
           <div className="d-flex flex-column flex-lg-row pt-2 align-items-center gap-4">
             <span className="flex-grow-1">
-              © 2023 FakeYou by{" "}
-              <a href="https://storyteller.ai">Storyteller.ai</a>
+              © 2023 FakeYou, built by{" "}
+              <a href="https://twitter.com/echelon">Echelon</a> in Atlanta.
             </span>
             <div className="d-flex flex-column flex-lg-row align-items-center ">
               {moderationLink}
