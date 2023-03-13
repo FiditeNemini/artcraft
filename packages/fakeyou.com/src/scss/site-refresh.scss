@@ -1105,7 +1105,7 @@ textarea {
     }
 
     .p-lg-4 {
-      padding: 2rem !important;
+      padding: 1.8rem !important;
     }
 
     .lead {
@@ -1168,6 +1168,10 @@ textarea {
       min-height: 391px;
       height: 100%;
       border-radius: 8px;
+    }
+
+    .p-md-4 {
+      padding: 1.8rem !important;
     }
   }
 }
