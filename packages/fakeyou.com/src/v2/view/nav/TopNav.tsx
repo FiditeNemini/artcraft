@@ -291,7 +291,7 @@ function TopNav(props: Props) {
           <Link className="navbar-brand me-4" to="/">
             <img
               src="/fakeyou/FakeYou-Logo.png"
-              alt="FakeYou Logo"
+              alt="FakeYou: Cartoon and Celebrity Text to Speech"
               height="36"
             />
           </Link>
@@ -318,7 +318,7 @@ function TopNav(props: Props) {
               >
                 <img
                   src="/fakeyou/FakeYou-Logo.png"
-                  alt="FakeYou Logo"
+                  alt="FakeYou: Cartoon and Celebrity Text to Speech"
                   height="36"
                 />
               </Link>
