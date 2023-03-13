@@ -288,11 +288,11 @@ function TopNav(props: Props) {
         aria-label="Offcanvas navbar large"
       >
         <div className="container">
-          <Link className="navbar-brand me-3 pr-8" to="/">
+          <Link className="navbar-brand me-4" to="/">
             <img
               src="/fakeyou/FakeYou-Logo.png"
-              alt="FakeYou: Cartoon and Celebrity Text to Speech"
-              height="38"
+              alt="FakeYou Logo"
+              height="36"
             />
           </Link>
           <button
@@ -313,13 +313,13 @@ function TopNav(props: Props) {
             <div className="offcanvas-header">
               <Link
                 data-bs-toggle="offcanvas"
-                className="navbar-brand me-5 pr-8"
+                className="navbar-brand me-5"
                 to="/"
               >
                 <img
                   src="/fakeyou/FakeYou-Logo.png"
-                  alt="FakeYou: Cartoon and Celebrity Text to Speech"
-                  height="38"
+                  alt="FakeYou Logo"
+                  height="36"
                 />
               </Link>
 
