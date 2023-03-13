@@ -5,7 +5,6 @@ import { Link } from "react-router-dom";
 
 import { ModerationIcon } from "../_icons/ModerationIcon";
 import { WebUrl } from "../../../common/WebUrl";
-import { Trans } from "react-i18next";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faTwitch,
@@ -14,7 +13,6 @@ import {
   faTiktok,
 } from "@fortawesome/free-brands-svg-icons";
 import { ThirdPartyLinks } from "@storyteller/components/src/constants/ThirdPartyLinks";
-import { EchelonTwitterLink } from "@storyteller/components/src/elements/EchelonTwitterLink";
 import {
   GetServerInfo,
   GetServerInfoIsOk,
