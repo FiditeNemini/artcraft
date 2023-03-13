@@ -85,17 +85,13 @@ impl eframe::App for AppGui {
       ui.heading("Unreal Level");
       ui.add_space(7.0);
 
-      egui::ComboBox::from_label("This is the main control for what programming is generated and played.")
+      egui::ComboBox::from_label("Control for what programming is generated and played.")
           .selected_text(format!("{:?}", self.current_level))
           .show_ui(ui, |ui| {
-            ui.selectable_value(&mut self.current_level, LevelOption::BlankBlue, LevelOption::BlankBlue.variant_name());
-            ui.selectable_value(&mut self.current_level, LevelOption::BlankRed, LevelOption::BlankRed.variant_name());
-            ui.selectable_value(&mut self.current_level, LevelOption::NewsStation, LevelOption::NewsStation.variant_name());
-            ui.selectable_value(&mut self.current_level, LevelOption::FantasyStorytelling, LevelOption::FantasyStorytelling.variant_name());
-            ui.selectable_value(&mut self.current_level, LevelOption::VirtualMusician, LevelOption::VirtualMusician.variant_name());
-            ui.selectable_value(&mut self.current_level, LevelOption::AiUpscaledDeepFake, LevelOption::AiUpscaledDeepFake.variant_name());
+            for option in LevelOption::iterate() {
+              ui.selectable_value(&mut self.current_level, option, option.variant_name());
+            }
           });
-
 
       ui.add_space(10.0);
       ui.heading("Sidecar Pause Controls");
@@ -125,9 +121,9 @@ impl eframe::App for AppGui {
       egui::ComboBox::from_label("Note: once a story is generated, it will not be re-voiced!")
           .selected_text(format!("{:?}", self.fakeyou_voice))
           .show_ui(ui, |ui| {
-            ui.selectable_value(&mut self.fakeyou_voice, FakeYouVoiceOption::HanashiV3, FakeYouVoiceOption::HanashiV3.variant_name());
-            ui.selectable_value(&mut self.fakeyou_voice, FakeYouVoiceOption::HanashiV2, FakeYouVoiceOption::HanashiV2.variant_name());
-            ui.selectable_value(&mut self.fakeyou_voice, FakeYouVoiceOption::JohnMadden, FakeYouVoiceOption::JohnMadden.variant_name());
+            for option in FakeYouVoiceOption::iterate() {
+              ui.selectable_value(&mut self.fakeyou_voice, option, option.variant_name());
+            }
           });
 
       ui.add_space(30.0);

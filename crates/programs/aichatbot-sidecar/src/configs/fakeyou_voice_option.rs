@@ -1,8 +1,11 @@
+use strum::EnumIter;
+use strum::IntoEnumIterator;
 use tokens::tokens::tts_models::TtsModelToken;
 
 /// Static configurations for usable voices.
 /// These will be well-known character voices, test voices, etc.
 #[derive(Copy, Clone, Eq, PartialEq, Debug)]
+#[derive(EnumIter)]
 pub enum FakeYouVoiceOption {
   HanashiV3,
   HanashiV2,
@@ -40,5 +43,9 @@ impl FakeYouVoiceOption {
 
   pub fn tts_model_token(&self) -> TtsModelToken {
     TtsModelToken::new_from_str(self.tts_model_token_str())
+  }
+
+  pub fn iterate() -> FakeYouVoiceOptionIter {
+    Self::iter()
   }
 }

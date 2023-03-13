@@ -1,6 +1,9 @@
+use strum::EnumIter;
+use strum::IntoEnumIterator;
 
 /// Static configurations for which levels the Unreal Engine program can present.
 #[derive(Copy, Clone, Eq, PartialEq, Debug)]
+#[derive(EnumIter)]
 pub enum LevelOption {
   BlankBlue,
   BlankRed,
@@ -37,5 +40,9 @@ impl LevelOption {
       Self::VirtualMusician => "virtual_musician",
       Self::AiUpscaledDeepFake => "ai_upscaled_deep_fake",
     }
+  }
+
+  pub fn iterate() -> LevelOptionIter {
+    Self::iter()
   }
 }
