@@ -2,6 +2,7 @@ use std::sync::Arc;
 use eframe::egui;
 use log::{error, info};
 use crate::configs::fakeyou_voice_option::FakeYouVoiceOption;
+use crate::configs::level_option::LevelOption;
 use crate::shared_state::app_control_state::AppControlState;
 
 /// Initial state for the GUI
@@ -24,7 +25,8 @@ pub struct AppGui {
   is_openai_paused: bool,
   is_fakeyou_paused: bool,
 
-  fakeyou_voice: FakeYouVoiceOption,
+  current_level: LevelOption, // NB: Just a copy for the UI, not the authoritative copy
+  fakeyou_voice: FakeYouVoiceOption, // NB: Just a copy for the UI, not the authoritative copy
 
   /// Shared state with the HTTP server and workers.
   control_state: Arc<AppControlState>,
@@ -39,7 +41,8 @@ impl AppGui {
       is_scraping_paused: false,
       is_openai_paused: false,
       is_fakeyou_paused: false,
-      fakeyou_voice: FakeYouVoiceOption::HanashiV3,
+      current_level: LevelOption::default(),
+      fakeyou_voice: FakeYouVoiceOption::default(),
       control_state: args.control_state,
     }
   }
@@ -56,6 +59,7 @@ impl eframe::App for AppGui {
     self.control_state.set_is_openai_paused(self.is_openai_paused);
     self.control_state.set_is_fakeyou_paused(self.is_fakeyou_paused);
 
+    let _r = self.control_state.set_level(self.current_level); // NB: Ignore lock errors.
     let _r = self.control_state.set_fakeyou_voice(self.fakeyou_voice); // NB: Ignore lock errors.
 
     egui::CentralPanel::default().show(ctx, |ui| {
@@ -76,6 +80,22 @@ impl eframe::App for AppGui {
       //  ui.checkbox(&mut self.is_paused, "Is Paused?")
       //      .labelled_by(name_label.id);
       //});
+
+      ui.add_space(10.0);
+      ui.heading("Unreal Level");
+      ui.add_space(7.0);
+
+      egui::ComboBox::from_label("This is the main control for what programming is generated and played.")
+          .selected_text(format!("{:?}", self.current_level))
+          .show_ui(ui, |ui| {
+            ui.selectable_value(&mut self.current_level, LevelOption::BlankBlue, LevelOption::BlankBlue.variant_name());
+            ui.selectable_value(&mut self.current_level, LevelOption::BlankRed, LevelOption::BlankRed.variant_name());
+            ui.selectable_value(&mut self.current_level, LevelOption::NewsStation, LevelOption::NewsStation.variant_name());
+            ui.selectable_value(&mut self.current_level, LevelOption::FantasyStorytelling, LevelOption::FantasyStorytelling.variant_name());
+            ui.selectable_value(&mut self.current_level, LevelOption::VirtualMusician, LevelOption::VirtualMusician.variant_name());
+            ui.selectable_value(&mut self.current_level, LevelOption::AiUpscaledDeepFake, LevelOption::AiUpscaledDeepFake.variant_name());
+          });
+
 
       ui.add_space(10.0);
       ui.heading("Sidecar Pause Controls");

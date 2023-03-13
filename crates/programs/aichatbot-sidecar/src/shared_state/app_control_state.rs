@@ -2,6 +2,7 @@ use std::sync::{Arc, LockResult, RwLock};
 use concurrency::relaxed_atomic_bool::RelaxedAtomicBool;
 use errors::{anyhow, AnyhowResult};
 use crate::configs::fakeyou_voice_option::FakeYouVoiceOption;
+use crate::configs::level_option::LevelOption;
 
 /// User-controlled parameters that determine how the app behaves at runtime.
 #[derive(Clone)]
@@ -22,6 +23,9 @@ pub struct AppControlState {
   /// Whether calls to FakeYou should be paused.
   is_fakeyou_paused: RelaxedAtomicBool,
 
+  /// Which level to present.
+  current_level: Arc<RwLock<LevelOption>>,
+
   /// Option of which voice to use for TTS.
   fakeyou_voice: Arc<RwLock<FakeYouVoiceOption>>,
 }
@@ -35,7 +39,8 @@ impl AppControlState {
       is_scraping_paused: RelaxedAtomicBool::new(false),
       is_openai_paused: RelaxedAtomicBool::new(false),
       is_fakeyou_paused: RelaxedAtomicBool::new(false),
-      fakeyou_voice: Arc::new(RwLock::new(FakeYouVoiceOption::HanashiV2)),
+      current_level: Arc::new(RwLock::new(LevelOption::default())),
+      fakeyou_voice: Arc::new(RwLock::new(FakeYouVoiceOption::default())),
     }
   }
 
@@ -86,6 +91,23 @@ impl AppControlState {
 
   pub fn set_is_fakeyou_paused(&self, new_value: bool) {
     self.is_fakeyou_paused.set(new_value)
+  }
+
+  pub fn get_level(&self) -> AnyhowResult<LevelOption> {
+    match self.current_level.read() {
+      Ok(value) => Ok(*value),
+      Err(err) => Err(anyhow!("lock error: {:?}", err)),
+    }
+  }
+
+  pub fn set_level(&self, new_value: LevelOption) -> AnyhowResult<()> {
+    match self.current_level.write() {
+      Ok(mut value) => {
+        *value = new_value;
+        Ok(())
+      },
+      Err(err) => Err(anyhow!("lock error: {:?}", err)),
+    }
   }
 
   pub fn fakeyou_voice(&self) -> AnyhowResult<FakeYouVoiceOption> {

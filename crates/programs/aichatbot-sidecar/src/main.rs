@@ -16,7 +16,6 @@ pub mod workers;
 
 use actix_web::{HttpResponse, HttpServer, web};
 use async_openai::Client;
-use async_openai::types::{CreateImageEditRequest, CreateImageRequest, ImageInput, ImageSize, ResponseFormat};
 use clap::{App, Arg};
 use crate::gui::launch_gui::launch_gui;
 use crate::persistence::save_directory::SaveDirectory;

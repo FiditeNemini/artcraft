@@ -12,6 +12,12 @@ pub enum FakeYouVoiceOption {
   JohnMadden,
 }
 
+impl Default for FakeYouVoiceOption {
+  fn default() -> Self {
+    Self::HanashiV3
+  }
+}
+
 impl FakeYouVoiceOption {
 
   pub fn variant_name(&self) -> &'static str {
