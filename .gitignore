@@ -49,3 +49,7 @@ models/tacotron2/python/
 # Stuff I want to keep around, but not commit
 scraps/
 
+# Windows build files
+# These should be built by the platform
+windows/sqlite/sqlite3.exp
+windows/sqlite/sqlite3.lib
