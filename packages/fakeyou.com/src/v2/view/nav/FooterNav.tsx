@@ -43,7 +43,7 @@ function FooterNav(props: Props) {
 
   if (props.sessionWrapper.canBanUsers()) {
     moderationLink = (
-      <div className="v2_mod_link mb-4 mb-lg-0 me-0 me-lg-4">
+      <div className="mb-4 mb-lg-0 me-0 me-lg-4">
         <Link to={WebUrl.moderationMain()}>
           <ModerationIcon />
           <span className="ms-2">Mod Controls</span>
@@ -60,7 +60,7 @@ function FooterNav(props: Props) {
     serverInfo.server_build_sha !== "undefined"
   ) {
     serverGitSha = (
-      <div className="d-flex flex-column flex-lg-row align-items-center ">
+      <div className="d-flex flex-column flex-lg-row align-items-center">
         <div className="git-sha">
           API: {serverInfo.server_build_sha.substring(0, 8)}
         </div>
@@ -182,18 +182,18 @@ function FooterNav(props: Props) {
             <hr />
           </div>
 
-          <div className="d-flex flex-column flex-lg-row pt-2 align-items-center gap-4">
+          <div className="d-flex flex-column flex-lg-row pt-2 align-items-center gap-0 gap-lg-4">
             <span className="flex-grow-1">
               © 2023 FakeYou, built by{" "}
               <a href="https://twitter.com/echelon">echelon</a> in Atlanta.
             </span>
-            <div className="d-flex flex-column flex-lg-row align-items-center ">
+            <div className="d-flex flex-column flex-lg-row align-items-center mt-4 mt-lg-0">
               {moderationLink}
             </div>
 
             {serverGitSha}
 
-            <div className="d-flex flex-column flex-lg-row align-items-center ">
+            <div className="d-flex flex-column flex-lg-row align-items-center">
               <GitSha prefix="FE: " />
             </div>
           </div>
