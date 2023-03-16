@@ -44,6 +44,8 @@ CREATE TABLE comments (
 
   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+
+  -- Technically, this conveys *user* edits, not things that update the record itself.
   edited_at TIMESTAMP NULL,
 
   -- If this is removed by a mod.

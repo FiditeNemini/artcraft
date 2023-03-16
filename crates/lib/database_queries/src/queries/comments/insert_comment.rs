@@ -1,23 +1,16 @@
 use anyhow::anyhow;
 use chrono::Utc;
+use crate::queries::comments::comment_entity_token::CommentEntityToken;
+use enums::by_table::comments::comment_entity_type::CommentEntityType;
 use enums::common::visibility::Visibility;
 use errors::AnyhowResult;
 use sqlx::MySqlPool;
 use std::path::Path;
-use enums::by_table::comments::comment_entity_type::CommentEntityType;
 use tokens::tokens::comments::CommentToken;
 use tokens::tokens::tts_models::TtsModelToken;
 use tokens::tokens::w2l_templates::W2lTemplateToken;
 use tokens::users::user::UserToken;
 use tokens::voice_conversion::model::VoiceConversionModelToken;
-
-pub enum CommentEntityToken {
-  User(UserToken),
-  TtsModel(TtsModelToken),
-  TtsResult(String), // TODO: Strong type
-  W2lTemplate(W2lTemplateToken),
-  W2lResult(String), // TODO: Strong type
-}
 
 pub struct Args<'a> {
   pub entity_token: &'a CommentEntityToken,
@@ -40,14 +33,7 @@ pub async fn insert_comment(
 ) -> AnyhowResult<CommentToken> {
 
   let comment_token = CommentToken::generate();
-
-  let (entity_type, entity_token) = match args.entity_token {
-    CommentEntityToken::User(user_token) => (CommentEntityType::User, user_token.as_str()),
-    CommentEntityToken::TtsModel(tts_model_token) => (CommentEntityType::TtsModel, tts_model_token.as_str()),
-    CommentEntityToken::TtsResult(tts_result_token) => (CommentEntityType::TtsResult, tts_result_token.as_str()),
-    CommentEntityToken::W2lTemplate(w2l_template_token) => (CommentEntityType::W2lTemplate, w2l_template_token.as_str()),
-    CommentEntityToken::W2lResult(w2l_result_token) => (CommentEntityType::W2lResult, w2l_result_token.as_str()),
-  };
+  let (entity_type, entity_token) = args.entity_token.get_composite_keys();
 
   let query_result = sqlx::query!(
         r#"

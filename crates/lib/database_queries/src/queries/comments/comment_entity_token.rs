@@ -1,0 +1,25 @@
+use enums::by_table::comments::comment_entity_type::CommentEntityType;
+use tokens::tokens::tts_models::TtsModelToken;
+use tokens::tokens::w2l_templates::W2lTemplateToken;
+use tokens::users::user::UserToken;
+
+pub enum CommentEntityToken {
+  User(UserToken),
+  TtsModel(TtsModelToken),
+  TtsResult(String), // TODO: Strong type
+  W2lTemplate(W2lTemplateToken),
+  W2lResult(String), // TODO: Strong type
+}
+
+impl CommentEntityToken {
+  pub fn get_composite_keys(&self) -> (CommentEntityType, &str) {
+    let (entity_type, entity_token) = match self {
+      CommentEntityToken::User(user_token) => (CommentEntityType::User, user_token.as_str()),
+      CommentEntityToken::TtsModel(tts_model_token) => (CommentEntityType::TtsModel, tts_model_token.as_str()),
+      CommentEntityToken::TtsResult(tts_result_token) => (CommentEntityType::TtsResult, tts_result_token.as_str()),
+      CommentEntityToken::W2lTemplate(w2l_template_token) => (CommentEntityType::W2lTemplate, w2l_template_token.as_str()),
+      CommentEntityToken::W2lResult(w2l_result_token) => (CommentEntityType::W2lResult, w2l_result_token.as_str()),
+    };
+    (entity_type, entity_token)
+  }
+}
