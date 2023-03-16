@@ -29,6 +29,8 @@ pub struct TtsInferenceRecordForList {
   pub tts_model_title: String,
   pub raw_inference_text: String,
 
+  pub public_bucket_wav_audio_path: String,
+
   pub maybe_creator_user_token: Option<String>,
   pub maybe_creator_username: Option<String>,
   pub maybe_creator_display_name: Option<String>,
@@ -125,17 +127,18 @@ impl ListTtsResultsQueryBuilder {
         .map(|raw_result| raw_result.tts_result_id);
 
     let inference_results = internal_results
-        .iter()
+        .into_iter()
         .map(|r| {
           TtsInferenceRecordForList {
-            tts_result_token: r.tts_result_token.clone(),
-            tts_model_token: r.tts_model_token.clone(),
-            tts_model_title: r.tts_model_title.clone(),
-            raw_inference_text: r.raw_inference_text.clone(),
-            maybe_creator_user_token: r.maybe_creator_user_token.clone(),
-            maybe_creator_username: r.maybe_creator_username.clone(),
-            maybe_creator_display_name: r.maybe_creator_display_name.clone(),
-            maybe_creator_result_id: r.maybe_creator_result_id.map(|v| v as u64).clone(),
+            tts_result_token: r.tts_result_token,
+            tts_model_token: r.tts_model_token,
+            tts_model_title: r.tts_model_title,
+            raw_inference_text: r.raw_inference_text,
+            public_bucket_wav_audio_path: r.public_bucket_wav_audio_path,
+            maybe_creator_user_token: r.maybe_creator_user_token,
+            maybe_creator_username: r.maybe_creator_username,
+            maybe_creator_display_name: r.maybe_creator_display_name,
+            maybe_creator_result_id: r.maybe_creator_result_id.map(|v| v as u64),
             file_size_bytes: if r.file_size_bytes > 0 { r.file_size_bytes as u32 } else { 0 },
             duration_millis: if r.duration_millis > 0 { r.duration_millis as u32 } else { 0 },
             visibility: Visibility::from_str(&r.creator_set_visibility).unwrap_or(Visibility::Public),
@@ -201,6 +204,8 @@ SELECT
     tts_results.model_token as tts_model_token,
     tts_models.title as tts_model_title,
     tts_results.raw_inference_text as raw_inference_text,
+
+    tts_results.public_bucket_wav_audio_path,
 
     users.token as maybe_creator_user_token,
     users.username as maybe_creator_username,
@@ -311,6 +316,8 @@ pub struct RawInternalTtsRecord {
   pub tts_model_token: String,
   pub tts_model_title: String,
   pub raw_inference_text: String,
+
+  pub public_bucket_wav_audio_path: String,
 
   pub maybe_creator_user_token : Option<String>,
   pub maybe_creator_username: Option<String>,
