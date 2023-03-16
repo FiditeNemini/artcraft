@@ -1,5 +1,7 @@
 pub mod api_tokens;
+pub mod audit_logs;
 pub mod billing;
+pub mod comments;
 pub mod generic_download;
 pub mod generic_inference;
 pub mod health_check;

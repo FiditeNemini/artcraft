@@ -1,0 +1,84 @@
+use serde::Deserialize;
+use serde::Serialize;
+
+#[cfg(test)]
+use strum::EnumCount;
+#[cfg(test)]
+use strum::EnumIter;
+
+/// Used in the `audit_logs` table in a `VARCHAR(32)` field named `entity_action`.
+#[cfg_attr(test, derive(EnumIter, EnumCount))]
+#[derive(Clone, Copy, Eq, PartialEq, Hash, Deserialize, Serialize)]
+pub enum AuditLogEntityAction {
+  /// Create action
+  #[serde(rename = "create")]
+  Create,
+
+  /// Edit action
+  #[serde(rename = "edit")]
+  Edit,
+
+  /// Delete action
+  #[serde(rename = "delete")]
+  Delete,
+}
+
+// TODO(bt, 2023-01-17): This desperately needs MySQL integration tests!
+impl_enum_display_and_debug_using_to_str!(AuditLogEntityAction);
+impl_mysql_enum_coders!(AuditLogEntityAction);
+
+/// NB: Legacy API for older code.
+impl AuditLogEntityAction {
+  pub fn to_str(&self) -> &'static str {
+    match self {
+      Self::Create => "create",
+      Self::Edit => "edit",
+      Self::Delete => "delete",
+    }
+  }
+
+  pub fn from_str(value: &str) -> Result<Self, String> {
+    match value {
+      "create" => Ok(Self::Create),
+      "edit" => Ok(Self::Edit),
+      "delete" => Ok(Self::Delete),
+      _ => Err(format!("invalid value: {:?}", value)),
+    }
+  }
+}
+
+#[cfg(test)]
+mod tests {
+  use crate::by_table::audit_logs::audit_log_entity_action::AuditLogEntityAction;
+  use crate::test_helpers::assert_serialization;
+
+  mod serde {
+    use super::*;
+
+    #[test]
+    fn test_serialization() {
+      assert_serialization(AuditLogEntityAction::Create, "create");
+      assert_serialization(AuditLogEntityAction::Edit, "edit");
+      assert_serialization(AuditLogEntityAction::Delete, "delete");
+    }
+  }
+
+  mod impl_methods {
+    use super::*;
+
+    #[test]
+    fn test_to_str() {
+      assert_eq!(AuditLogEntityAction::Create.to_str(), "create");
+      assert_eq!(AuditLogEntityAction::Edit.to_str(), "edit");
+      assert_eq!(AuditLogEntityAction::Delete.to_str(), "delete");
+    }
+
+    #[test]
+    fn test_from_str() {
+      assert_eq!(AuditLogEntityAction::from_str("create").unwrap(), AuditLogEntityAction::Create);
+      assert_eq!(AuditLogEntityAction::from_str("edit").unwrap(), AuditLogEntityAction::Edit);
+      assert_eq!(AuditLogEntityAction::from_str("delete").unwrap(), AuditLogEntityAction::Delete);
+      assert!(AuditLogEntityAction::from_str("foo").is_err());
+    }
+  }
+}
