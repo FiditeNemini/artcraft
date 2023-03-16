@@ -36,9 +36,9 @@ pub async fn list_trending_tts_models(
 ) -> AnyhowResult<TrendingModels> {
   let query_parts = vec![
     // English
-    make_subquery(ModelType::Tts, WindowName::AllTime, "en", 25),
-    make_subquery(ModelType::Tts, WindowName::Last3Hours, "en", 25),
-    make_subquery(ModelType::Tts, WindowName::Last3Days, "en", 25),
+    make_subquery(ModelType::Tts, WindowName::AllTime, "en", 20),
+    make_subquery(ModelType::Tts, WindowName::Last3Hours, "en", 20),
+    make_subquery(ModelType::Tts, WindowName::Last3Days, "en", 20),
 
     // Spanish
     make_subquery(ModelType::Tts, WindowName::AllTime, "es", 10),
