@@ -13,6 +13,8 @@ use strum::EnumIter;
 #[derive(Debug, Copy, Clone, Eq, PartialEq)]
 #[cfg_attr(test, derive(EnumIter, EnumCount))]
 pub(crate) enum EntityType {
+  AuditLog,
+  Comment,
   DownloadJob,
   InferenceJob,
   MediaUpload,
@@ -29,6 +31,8 @@ impl EntityType {
 
   pub fn prefix(self) -> &'static str {
     match self {
+      Self::AuditLog => "audit_",
+      Self::Comment => "comment_",
       Self::DownloadJob => "jdown_", // NB: Was "JGUP:"
       Self::InferenceJob => "jinf_",
       Self::MediaUpload => "mu_",

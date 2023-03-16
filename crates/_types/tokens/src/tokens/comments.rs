@@ -1,0 +1,12 @@
+use crate::prefixes::EntityType;
+use serde::Deserialize;
+use serde::Serialize;
+use std::fmt::Debug;
+
+/// The primary key for Audit Logs.
+#[derive(Clone, PartialEq, Eq, PartialOrd, Ord, Hash, sqlx::Type, Debug, Serialize, Deserialize)]
+#[sqlx(transparent)]
+pub struct CommentToken(pub String);
+
+impl_string_token!(CommentToken);
+impl_crockford_generator!(CommentToken, 32usize, EntityType::Comment, CrockfordLower);
