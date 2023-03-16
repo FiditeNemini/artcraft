@@ -36,29 +36,29 @@ pub async fn list_trending_tts_models(
 ) -> AnyhowResult<TrendingModels> {
   let query_parts = vec![
     // English
-    make_subquery(ModelType::Tts, WindowName::AllTime, "en"),
-    make_subquery(ModelType::Tts, WindowName::Last3Hours, "en"),
-    make_subquery(ModelType::Tts, WindowName::Last3Days, "en"),
+    make_subquery(ModelType::Tts, WindowName::AllTime, "en", 25),
+    make_subquery(ModelType::Tts, WindowName::Last3Hours, "en", 25),
+    make_subquery(ModelType::Tts, WindowName::Last3Days, "en", 25),
 
     // Spanish
-    make_subquery(ModelType::Tts, WindowName::AllTime, "es"),
-    make_subquery(ModelType::Tts, WindowName::Last3Hours, "es"),
-    make_subquery(ModelType::Tts, WindowName::Last3Days, "es"),
+    make_subquery(ModelType::Tts, WindowName::AllTime, "es", 10),
+    make_subquery(ModelType::Tts, WindowName::Last3Hours, "es", 10),
+    make_subquery(ModelType::Tts, WindowName::Last3Days, "es", 10),
 
     // Italian
-    make_subquery(ModelType::Tts, WindowName::AllTime, "it"),
-    make_subquery(ModelType::Tts, WindowName::Last3Hours, "it"),
-    make_subquery(ModelType::Tts, WindowName::Last3Days, "it"),
+    make_subquery(ModelType::Tts, WindowName::AllTime, "it", 10),
+    make_subquery(ModelType::Tts, WindowName::Last3Hours, "it", 10),
+    make_subquery(ModelType::Tts, WindowName::Last3Days, "it", 10),
 
     // French
-    make_subquery(ModelType::Tts, WindowName::AllTime, "fr"),
-    make_subquery(ModelType::Tts, WindowName::Last3Hours, "fr"),
-    make_subquery(ModelType::Tts, WindowName::Last3Days, "fr"),
+    make_subquery(ModelType::Tts, WindowName::AllTime, "fr", 10),
+    make_subquery(ModelType::Tts, WindowName::Last3Hours, "fr", 10),
+    make_subquery(ModelType::Tts, WindowName::Last3Days, "fr", 10),
 
     // German
-    make_subquery(ModelType::Tts, WindowName::AllTime, "de"),
-    make_subquery(ModelType::Tts, WindowName::Last3Hours, "de"),
-    make_subquery(ModelType::Tts, WindowName::Last3Days, "de"),
+    make_subquery(ModelType::Tts, WindowName::AllTime, "de", 10),
+    make_subquery(ModelType::Tts, WindowName::Last3Hours, "de", 10),
+    make_subquery(ModelType::Tts, WindowName::Last3Days, "de", 10),
   ];
 
   let query = query_parts.join(" UNION ");
@@ -81,7 +81,7 @@ pub async fn list_trending_tts_models(
 }
 
 // Build queries meant to be UNION-d together.
-pub fn make_subquery(model_type: ModelType, window_name: WindowName, ietf_primary_language_subtag: &str) -> String {
+pub fn make_subquery(model_type: ModelType, window_name: WindowName, ietf_primary_language_subtag: &str, limit: u16) -> String {
   format!(r#"
 (
   SELECT
@@ -100,12 +100,14 @@ pub fn make_subquery(model_type: ModelType, window_name: WindowName, ietf_primar
     AND m.ietf_primary_language_subtag = "{}"
 
   ORDER BY numeric_value DESC
-  LIMIT 10
+  LIMIT {}
 )
   "#,
-          model_type,
-          window_name,
-          ietf_primary_language_subtag)
+    model_type,
+    window_name,
+    ietf_primary_language_subtag,
+    limit
+  )
 }
 
 #[derive(sqlx::FromRow)]
