@@ -183,30 +183,6 @@ function ProfileTtsInferenceResultsListFc(props: Props) {
     <div>
       <div className="table-responsive">
         <table className="table">
-          {/* <thead>
-            <tr>
-              <th>
-                <abbr title="Number">#</abbr>
-              </th>
-              <th>
-                <abbr title="Visibility">
-                  <FontAwesomeIcon icon={faEye} />
-                </abbr>
-              </th>
-              <th className="table-mw">
-                <abbr title="Download">Download &amp; Play Link</abbr>
-              </th>
-              <th>
-                <abbr title="Model">Model</abbr>
-              </th>
-              <th>
-                <abbr title="Duration">Duration</abbr>
-              </th>
-              <th>
-                <abbr title="Created">Creation Time</abbr>
-              </th>
-            </tr>
-          </thead> */}
           <Fade cascade bottom duration="200" distance="10px">
             <tbody className="">{rows}</tbody>
           </Fade>
