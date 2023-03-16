@@ -1017,6 +1017,14 @@ styles with important tags:
     font-size: 13px;
     padding: 0;
   }
+
+  .profile-model-title {
+    color: $white !important;
+
+    &:hover {
+      color: $primary !important;
+    }
+  }
 }
 
 select {

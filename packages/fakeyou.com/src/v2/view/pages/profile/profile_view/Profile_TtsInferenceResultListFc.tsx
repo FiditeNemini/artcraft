@@ -7,12 +7,14 @@ import { Link } from "react-router-dom";
 import { formatDistance } from "date-fns";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
-  faCirclePlay,
   faArrowLeft,
   faArrowRight,
   faEye,
   faEyeSlash,
 } from "@fortawesome/free-solid-svg-icons";
+import { BucketConfig } from "@storyteller/components/src/api/BucketConfig";
+import { ProfileTtsAudioPlayer } from "../../../_common/ProfileTtsAudioPlayer";
+import { TextExpander } from "../../../_common/TextExpander";
 
 const Fade = require("react-reveal/Fade");
 
@@ -30,6 +32,8 @@ interface TtsInferenceResult {
   tts_model_title: string;
 
   raw_inference_text: string;
+
+  public_bucket_wav_audio_path: string;
 
   maybe_creator_user_token?: string;
   maybe_creator_username?: string;
@@ -106,14 +110,16 @@ function ProfileTtsInferenceResultsListFc(props: Props) {
 
   ttsResults.slice(0, 10).forEach((result) => {
     const duration_seconds = result.duration_millis / 1000;
-
+    const audioLink = new BucketConfig().getGcsUrl(
+      result.public_bucket_wav_audio_path
+    );
+    const wavesurfer = <ProfileTtsAudioPlayer filename={audioLink} />;
     const inferenceLink = `/tts/result/${result.tts_result_token}`;
     const modelLink = `/tts/${result.tts_model_token}`;
 
-    const text =
-      result.raw_inference_text.length < 5
-        ? `Result: ${result.raw_inference_text}`
-        : result.raw_inference_text;
+    const text = (
+      <TextExpander text={result.raw_inference_text} cutLength={250} />
+    );
 
     const createTime = new Date(result.created_at);
     const relativeCreateTime = formatDistance(createTime, now, {
@@ -129,20 +135,40 @@ function ProfileTtsInferenceResultsListFc(props: Props) {
 
     rows.push(
       <tr key={result.tts_result_token}>
-        <td>{result.maybe_creator_result_id}</td>
-        <td>{visibilityIcon}</td>
-        <th className="overflow-fix">
-          <Link to={inferenceLink}>
-            <FontAwesomeIcon icon={faCirclePlay} className="me-2" />
-            {text}
-          </Link>
-          &nbsp;
-        </th>
-        <th>
-          <Link to={modelLink}>Model: {result.tts_model_title}</Link>
-        </th>
-        <td>{duration_seconds} s</td>
-        <td>{relativeCreateTime}</td>
+        <td className="p-4 p-lg-4 overflow-fix">
+          <div className="d-flex flex-column gap-4">
+            <div>
+              <div className="d-flex flex-column flex-lg-row mb-2 pb-1 gap-2 align-items-lg-center">
+                <h5 className="mb-0 fw-medium">
+                  <Link
+                    to={modelLink}
+                    className="fw-medium profile-model-title"
+                  >
+                    {result.tts_model_title}
+                  </Link>
+                </h5>
+                <span className="opacity-50 d-none d-lg-block">—</span>
+                <Link className="fw-medium fs-6" to={inferenceLink}>
+                  View Details / Download
+                </Link>
+              </div>
+
+              <p>{text}</p>
+            </div>
+
+            {wavesurfer}
+            <div className="d-flex flex-column flex-lg-row gap-2 gap-lg-0">
+              <p className="opacity-75">
+                #{result.maybe_creator_result_id}
+                <span className="px-2">·</span>
+                {visibilityIcon}
+                <span className="px-2">·</span>
+                {duration_seconds} s<span className="px-2">·</span>
+                {relativeCreateTime}
+              </p>
+            </div>
+          </div>
+        </td>
       </tr>
     );
   });
@@ -157,43 +183,13 @@ function ProfileTtsInferenceResultsListFc(props: Props) {
     <div>
       <div className="table-responsive">
         <table className="table">
-          <thead>
-            <tr>
-              <th>
-                <abbr title="Number">#</abbr>
-              </th>
-              <th>
-                <abbr title="Visibility">
-                  <FontAwesomeIcon icon={faEye} />
-                </abbr>
-              </th>
-              <th className="table-mw">
-                <abbr title="Download">Download &amp; Play Link</abbr>
-              </th>
-              <th>
-                <abbr title="Model">Model</abbr>
-              </th>
-              <th>
-                <abbr title="Duration">Duration</abbr>
-              </th>
-              <th>
-                <abbr title="Created">Creation Time</abbr>
-              </th>
-            </tr>
-          </thead>
           <Fade cascade bottom duration="200" distance="10px">
-            <tbody>{rows}</tbody>
+            <tbody className="">{rows}</tbody>
           </Fade>
         </table>
       </div>
 
-      <p className="text-center py-3">
-        Note: Results marked public (<FontAwesomeIcon icon={faEye} />) are
-        visible by anyone visiting your profile.
-        {/*You can change this by editing results. You can also set a default preference for new results.*/}
-      </p>
-
-      <div className="justify-content-center d-flex gap-3">
+      <div className="justify-content-center d-flex gap-3 p-3 p-lg-4">
         <button
           className="btn btn-secondary w-100"
           onClick={() => getPage(previousCursor, true)}

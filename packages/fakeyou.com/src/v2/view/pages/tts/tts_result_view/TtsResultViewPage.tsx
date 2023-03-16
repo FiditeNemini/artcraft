@@ -433,7 +433,7 @@ function TtsResultViewPage(props: Props) {
     <motion.div initial="hidden" animate="visible" variants={container}>
       <div className="container py-5">
         <div className="d-flex flex-column">
-          <motion.h1 className="display-5 fw-bold mb-3" variants={item}>
+          <motion.h1 className="display-5 fw-bold mb-2" variants={item}>
             {headingTitle}
           </motion.h1>
           {/* Rate Result Buttons */}
@@ -477,10 +477,10 @@ function TtsResultViewPage(props: Props) {
             </div>
           </div>*/}
 
-          <motion.p className="mb-3 result-text mt-4 pt-2">
+          <motion.p className="mb-3 result-text pt-2">
             <TextExpander
               text={ttsInferenceResult.raw_inference_text}
-              cutLength={250}
+              cutLength={240}
             />
           </motion.p>
         </div>

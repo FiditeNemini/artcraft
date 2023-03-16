@@ -473,7 +473,7 @@ function ProfilePage(props: Props) {
               </button>
             </li>
           </ul>
-          <div className="tab-content p-3 p-lg-4" id="myTabContent">
+          <div className="tab-content" id="myTabContent">
             <div
               className="tab-pane fade show active"
               id="ttsresults"
@@ -483,7 +483,7 @@ function ProfilePage(props: Props) {
               <ProfileTtsInferenceResultsListFc username={userData.username} />
             </div>
             <div
-              className="tab-pane fade"
+              className="tab-pane fade p-3 p-lg-4"
               id="w2lresults"
               role="tabpanel"
               aria-labelledby="w2lresults-tab"
@@ -491,7 +491,7 @@ function ProfilePage(props: Props) {
               <ProfileW2lInferenceResultsListFc username={userData.username} />
             </div>
             <div
-              className="tab-pane fade"
+              className="tab-pane fade p-3 p-lg-4"
               id="uploadedtts"
               role="tabpanel"
               aria-labelledby="uploadedtts-tab"
@@ -499,7 +499,7 @@ function ProfilePage(props: Props) {
               <ProfileTtsModelListFc username={userData.username} />
             </div>
             <div
-              className="tab-pane fade"
+              className="tab-pane fade p-3 p-lg-4"
               id="uploadedw2l"
               role="tabpanel"
               aria-labelledby="uploadedw2l-tab"
@@ -507,7 +507,7 @@ function ProfilePage(props: Props) {
               <ProfileW2lTemplateListFc username={userData.username} />
             </div>
             <div
-              className="tab-pane fade"
+              className="tab-pane fade p-3 p-lg-4"
               id="badges"
               role="tabpanel"
               aria-labelledby="badges-tab"
