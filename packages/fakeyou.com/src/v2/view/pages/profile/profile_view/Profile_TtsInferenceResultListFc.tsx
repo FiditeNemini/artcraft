@@ -15,7 +15,6 @@ import {
 import { BucketConfig } from "@storyteller/components/src/api/BucketConfig";
 import { ProfileTtsAudioPlayer } from "../../../_common/ProfileTtsAudioPlayer";
 import { TextExpander } from "../../../_common/TextExpander";
-import { faMicrophone } from "@fortawesome/pro-solid-svg-icons";
 
 const Fade = require("react-reveal/Fade");
 
