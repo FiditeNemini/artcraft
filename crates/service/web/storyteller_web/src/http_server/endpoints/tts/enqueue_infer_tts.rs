@@ -11,18 +11,21 @@ use crate::http_server::endpoints::investor_demo::demo_cookie::request_has_demo_
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::server_state::ServerState;
 use database_queries::queries::tts::tts_inference_jobs::insert_tts_inference_job::TtsInferenceJobInsertBuilder;
+use database_queries::queries::tts::tts_models::get_tts_model::{get_tts_model_by_token_using_connection, TtsModelRecord};
 use database_queries::tokens::Tokens;
 use enums::common::visibility::Visibility;
 use http_server_common::request::get_request_api_token::get_request_api_token;
 use http_server_common::request::get_request_header_optional::get_request_header_optional;
 use http_server_common::request::get_request_ip::get_request_ip;
-use log::{info, warn};
+use log::{error, info, warn};
 use r2d2_redis::redis::Commands;
+use redis_common::redis_cache_keys::RedisCacheKeys;
 use redis_common::redis_keys::RedisKeys;
 use std::fmt;
 use std::sync::Arc;
 use tts_common::priority::{FAKEYOU_INVESTOR_PRIORITY_LEVEL, FAKEYOU_DEFAULT_VALID_API_TOKEN_PRIORITY_LEVEL};
 use user_input_common::check_for_slurs::contains_slurs;
+use users_component::utils::user_session_extended::UserSessionExtended;
 
 // TODO: Temporary for investor demo
 const STORYTELLER_DEMO_COOKIE_NAME : &'static str = "storyteller_demo";
@@ -30,6 +33,9 @@ const STORYTELLER_DEMO_COOKIE_NAME : &'static str = "storyteller_demo";
 /// Debug requests can get routed to special "debug-only" workers, which can
 /// be used to trial new code, run debugging, etc.
 const DEBUG_HEADER_NAME : &'static str = "enable_debug_mode";
+
+const USER_FAKEYOU_USER_TOKEN : &'static str = "U:N5J8JXPW9BTYX";
+const USER_NEWS_STORY_USER_TOKEN : &'static str = "U:XAWRARC1N89X6";
 
 #[derive(Deserialize)]
 pub struct InferTtsRequest {
@@ -52,6 +58,7 @@ pub enum InferTtsError {
   NotAuthorized,
   ServerError,
   RateLimited,
+  NotFound,
 }
 
 impl ResponseError for InferTtsError {
@@ -61,6 +68,7 @@ impl ResponseError for InferTtsError {
       InferTtsError::NotAuthorized => StatusCode::UNAUTHORIZED,
       InferTtsError::ServerError => StatusCode::INTERNAL_SERVER_ERROR,
       InferTtsError::RateLimited => StatusCode::TOO_MANY_REQUESTS,
+      InferTtsError::NotFound => StatusCode::NOT_FOUND,
     }
   }
 
@@ -70,6 +78,7 @@ impl ResponseError for InferTtsError {
       InferTtsError::NotAuthorized => "unauthorized".to_string(),
       InferTtsError::ServerError => "server error".to_string(),
       InferTtsError::RateLimited => "rate limited".to_string(),
+      InferTtsError::NotFound => "not found".to_string(),
     };
 
     to_simple_json_error(&error_reason, self.status_code())
@@ -104,7 +113,7 @@ pub async fn infer_tts_handler(
 
   // ==================== USER SESSION ==================== //
 
-  let maybe_user_session = server_state
+  let maybe_user_session : Option<UserSessionExtended> = server_state
     .session_checker
     .maybe_get_user_session_extended_from_connection(&http_request, &mut mysql_connection)
     .await
@@ -205,6 +214,66 @@ pub async fn infer_tts_handler(
     }
   }
 
+  // ==================== CHECK TTS MODEL EXISTENCE / SETTINGS==================== //
+
+  let model_token = request.tts_model_token.to_string();
+  let model_token2 = model_token.clone();
+
+  let get_tts_model = move || {
+    // NB: async closures are not yet stable in Rust, so we include an async block.
+    async move {
+      get_tts_model_by_token_using_connection(
+        &model_token2,
+        true,
+        &mut mysql_connection).await
+    }
+  };
+
+  let cache_key = RedisCacheKeys::get_tts_model_endpoint(&model_token);
+
+  let mut redis_ttl_cache = server_state.redis_ttl_cache.get_connection()
+      .map_err(|err| {
+        error!("Can't get redis cache: {:?}", err);
+        InferTtsError::ServerError
+      })?;
+
+  let model_query_result = redis_ttl_cache.lazy_load_if_not_cached(&cache_key, move || {
+    get_tts_model()
+  }).await;
+
+  let tts_model : TtsModelRecord = match model_query_result {
+    Ok(Some(tts_model)) => tts_model,
+    Ok(None) => {
+      error!("Couldn't find TTS model");
+      return Err(InferTtsError::NotFound);
+    }
+    Err(err) => {
+      error!("Error querying for model: {:?}", err);
+      return Err(InferTtsError::ServerError);
+    }
+  };
+
+  match tts_model.creator_set_visibility {
+    Visibility::Public | Visibility::Hidden => {
+      // Allowed.
+    },
+    Visibility::Private => {
+      let is_authorized = maybe_user_session
+          .as_ref()
+          .map(|session| {
+            (session.user_token.as_str() == tts_model.creator_user_token.as_str()) // is_author
+              || (session.role.can_ban_users) // is_mod
+              || (session.user_token.as_str() == USER_FAKEYOU_USER_TOKEN) // is allowed user #1
+              || (session.user_token.as_str() == USER_NEWS_STORY_USER_TOKEN) // is allowed user #2
+          })
+          .unwrap_or(false);
+
+      if !is_authorized {
+        return Err(InferTtsError::NotAuthorized);
+      }
+    },
+  }
+
   // ==================== CHECK AND PERFORM TTS ==================== //
 
   let inference_text = &request.inference_text.trim().to_string();
@@ -217,8 +286,6 @@ pub async fn infer_tts_handler(
     return Err(InferTtsError::BadInput("text contains slurs".to_string()));
   }
 
-  // TODO(bt): CHECK DATABASE!
-  let model_token = request.tts_model_token.to_string();
 
   let mut redis = server_state.redis_pool
       .get()
