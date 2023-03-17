@@ -19,6 +19,8 @@ use sqlx::pool::PoolConnection;
 use std::collections::HashSet;
 use std::fmt;
 use std::sync::Arc;
+use database_queries::queries::users::user_sessions::get_user_session_by_token::SessionUserRecord;
+use enums::common::visibility::Visibility;
 
 #[derive(Serialize, Clone)]
 pub struct TtsModelRecordForResponse {
@@ -34,6 +36,8 @@ pub struct TtsModelRecordForResponse {
   pub is_front_page_featured: bool,
   pub is_twitch_featured: bool,
   pub maybe_suggested_unique_bot_command: Option<String>,
+
+  pub creator_set_visibility: Visibility,
 
   pub user_ratings: UserRatingsStats,
 
@@ -88,7 +92,7 @@ impl fmt::Display for ListTtsModelsError {
 }
 
 pub async fn list_tts_models_handler(
-  _http_request: HttpRequest,
+  http_request: HttpRequest,
   server_state: web::Data<Arc<ServerState>>) -> Result<HttpResponse, ListTtsModelsError>
 {
   if server_state.flags.disable_tts_model_list_endpoint {
@@ -107,6 +111,9 @@ pub async fn list_tts_models_handler(
         ListTtsModelsError::ServerError
       })?;
 
+  // NB: We don't know if we need a MySQL connection, so don't grab one unless we do.
+  let mut maybe_mysql_connection = None;
+
   let models = match maybe_models {
     Some(models) => {
       info!("Serving TTS models from cache");
@@ -122,6 +129,7 @@ pub async fn list_tts_models_handler(
             ListTtsModelsError::ServerError
           })?;
 
+      // TODO: Fail open in case the DB is down. Pull from expired cache if query fails.
       let models = get_all_models(&mut mysql_connection)
           .await
           .map_err(|e| {
@@ -129,14 +137,48 @@ pub async fn list_tts_models_handler(
             ListTtsModelsError::ServerError
           })?;
 
+      maybe_mysql_connection = Some(mysql_connection);
+
       server_state.caches.voice_list.store_copy(&models)
           .map_err(|e| {
             error!("Error storing cache: {:?}", e);
             ListTtsModelsError::ServerError
           })?;
+
       models
     },
   };
+
+  let maybe_user_session : Option<SessionUserRecord> = match maybe_mysql_connection {
+    None => {
+      server_state.session_checker
+          .maybe_get_user_session(&http_request, &server_state.mysql_pool)
+          .await
+    }
+    Some(mut mysql_connection) => {
+      server_state.session_checker
+          .maybe_get_user_session_from_connection(&http_request, &mut mysql_connection)
+          .await
+    }
+  }.map_err(|e| {
+    warn!("Session checker error: {:?}", e);
+    ListTtsModelsError::ServerError
+  })?;
+
+  let maybe_session_user_token = maybe_user_session
+      .as_ref()
+      .map(|s| s.user_token.as_str());
+
+  let models = models.into_iter()
+      .filter(|model| {
+        match model.creator_set_visibility {
+          Visibility::Public => true,
+          Visibility::Hidden | Visibility::Private => maybe_session_user_token
+              .map(|token| token == model.creator_user_token.as_str())
+              .unwrap_or(false),
+        }
+      })
+      .collect();
 
   render_response_ok(ListTtsModelsSuccessResponse {
     success: true,
@@ -197,6 +239,7 @@ async fn get_all_models(mysql_connection: &mut PoolConnection<MySql>) -> AnyhowR
           is_front_page_featured: model.is_front_page_featured,
           is_twitch_featured: model.is_twitch_featured,
           maybe_suggested_unique_bot_command: model.maybe_suggested_unique_bot_command,
+          creator_set_visibility: model.creator_set_visibility,
           user_ratings: UserRatingsStats {
             positive_count: model.user_ratings_positive_count,
             negative_count: model.user_ratings_negative_count,

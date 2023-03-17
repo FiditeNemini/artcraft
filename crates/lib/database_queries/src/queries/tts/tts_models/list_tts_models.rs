@@ -1,7 +1,8 @@
 use anyhow::anyhow;
 use chrono::{DateTime, Utc};
-use errors::AnyhowResult;
 use crate::helpers::boolean_converters::i8_to_bool;
+use enums::common::visibility::Visibility;
+use errors::AnyhowResult;
 use log::{warn, info};
 use sqlx::pool::PoolConnection;
 use sqlx::{MySql, MySqlPool};
@@ -34,6 +35,8 @@ pub struct TtsModelRecordForList {
   pub user_ratings_positive_count: u32,
   pub user_ratings_negative_count: u32,
   pub user_ratings_total_count: u32, // NB: Does not include "neutral" ratings.
+
+  pub creator_set_visibility: Visibility,
 
   pub created_at: DateTime<Utc>,
   pub updated_at: DateTime<Utc>,
@@ -101,6 +104,7 @@ pub async fn list_tts_models_with_connection(
         user_ratings_positive_count: model.user_ratings_positive_count,
         user_ratings_negative_count: model.user_ratings_negative_count,
         user_ratings_total_count: model.user_ratings_total_count,
+        creator_set_visibility: model.creator_set_visibility,
         created_at: model.created_at,
         updated_at: model.updated_at,
       }
@@ -136,6 +140,7 @@ SELECT
     tts.user_ratings_positive_count,
     tts.user_ratings_negative_count,
     tts.user_ratings_total_count,
+    tts.creator_set_visibility as `creator_set_visibility: enums::common::visibility::Visibility`,
     tts.created_at,
     tts.updated_at
 FROM tts_models as tts
@@ -170,6 +175,7 @@ SELECT
     tts.user_ratings_positive_count,
     tts.user_ratings_negative_count,
     tts.user_ratings_total_count,
+    tts.creator_set_visibility as `creator_set_visibility: enums::common::visibility::Visibility`,
     tts.created_at,
     tts.updated_at
 FROM tts_models as tts
@@ -215,6 +221,7 @@ SELECT
     tts.user_ratings_positive_count,
     tts.user_ratings_negative_count,
     tts.user_ratings_total_count,
+    tts.creator_set_visibility as `creator_set_visibility: enums::common::visibility::Visibility`,
     tts.created_at,
     tts.updated_at
 FROM tts_models as tts
@@ -252,6 +259,7 @@ SELECT
     tts.user_ratings_positive_count,
     tts.user_ratings_negative_count,
     tts.user_ratings_total_count,
+    tts.creator_set_visibility as `creator_set_visibility: enums::common::visibility::Visibility`,
     tts.created_at,
     tts.updated_at
 FROM tts_models as tts
@@ -295,6 +303,8 @@ struct InternalRawTtsModelRecordForList {
   pub user_ratings_positive_count: u32,
   pub user_ratings_negative_count: u32,
   pub user_ratings_total_count: u32, // NB: Does not include "neutral" ratings.
+
+  pub creator_set_visibility: Visibility,
 
   pub created_at: DateTime<Utc>,
   pub updated_at: DateTime<Utc>,
