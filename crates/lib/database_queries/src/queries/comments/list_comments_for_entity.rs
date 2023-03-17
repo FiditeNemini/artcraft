@@ -14,6 +14,7 @@ pub struct CommentForList {
   pub user_token: UserToken,
   pub username: String,
   pub user_display_name: String,
+  pub user_gravatar_hash: String,
 
   pub comment_markdown: String,
   pub comment_rendered_html: String,
@@ -48,6 +49,7 @@ SELECT
     c.user_token as `user_token: tokens::users::user::UserToken`,
     u.username,
     u.display_name as user_display_name,
+    u.email_gravatar_hash as user_gravatar_hash,
 
     c.comment_markdown,
     c.comment_rendered_html,
@@ -95,6 +97,7 @@ LIMIT 50
           user_token: comment.user_token,
           username: comment.username,
           user_display_name: comment.user_display_name,
+          user_gravatar_hash: comment.user_gravatar_hash,
           comment_markdown: comment.comment_markdown,
           comment_rendered_html: comment.comment_rendered_html,
           mod_fields: CommentForListModFields {
@@ -118,6 +121,7 @@ pub struct RawCommentForList {
   pub user_token: UserToken,
   pub username: String,
   pub user_display_name: String,
+  pub user_gravatar_hash: String,
 
   pub comment_markdown: String,
   pub comment_rendered_html: String,
