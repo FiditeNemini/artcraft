@@ -331,6 +331,7 @@ pub fn validate_inference_text(text: &str) -> Result<(), String> {
   Ok(())
 }
 
+// TODO: Read from in-memory TTS List cache first (!!!) for further performance savings
 
 /// If the model is private, determine if the user can use the model.
 /// This is designed to fail closed (read: actually open!) rather than hit resources.
