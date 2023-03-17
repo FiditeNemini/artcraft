@@ -23,6 +23,9 @@ use redis_common::redis_cache_keys::RedisCacheKeys;
 use redis_common::redis_keys::RedisKeys;
 use std::fmt;
 use std::sync::Arc;
+use sqlx::MySql;
+use sqlx::pool::PoolConnection;
+use redis_caching::redis_ttl_cache::RedisTtlCache;
 use tts_common::priority::{FAKEYOU_INVESTOR_PRIORITY_LEVEL, FAKEYOU_DEFAULT_VALID_API_TOKEN_PRIORITY_LEVEL};
 use user_input_common::check_for_slurs::contains_slurs;
 use users_component::utils::user_session_extended::UserSessionExtended;
@@ -216,62 +219,15 @@ pub async fn infer_tts_handler(
 
   // ==================== CHECK TTS MODEL EXISTENCE / SETTINGS==================== //
 
-  let model_token = request.tts_model_token.to_string();
-  let model_token2 = model_token.clone();
+  let is_authorized = check_if_authorized_to_use_model(
+    &request.tts_model_token,
+    maybe_user_session.as_ref(),
+    &server_state.redis_ttl_cache,
+    &mut mysql_connection,
+  ).await;
 
-  let get_tts_model = move || {
-    // NB: async closures are not yet stable in Rust, so we include an async block.
-    async move {
-      get_tts_model_by_token_using_connection(
-        &model_token2,
-        true,
-        &mut mysql_connection).await
-    }
-  };
-
-  let cache_key = RedisCacheKeys::get_tts_model_endpoint(&model_token);
-
-  let mut redis_ttl_cache = server_state.redis_ttl_cache.get_connection()
-      .map_err(|err| {
-        error!("Can't get redis cache: {:?}", err);
-        InferTtsError::ServerError
-      })?;
-
-  let model_query_result = redis_ttl_cache.lazy_load_if_not_cached(&cache_key, move || {
-    get_tts_model()
-  }).await;
-
-  let tts_model : TtsModelRecord = match model_query_result {
-    Ok(Some(tts_model)) => tts_model,
-    Ok(None) => {
-      error!("Couldn't find TTS model");
-      return Err(InferTtsError::NotFound);
-    }
-    Err(err) => {
-      error!("Error querying for model: {:?}", err);
-      return Err(InferTtsError::ServerError);
-    }
-  };
-
-  match tts_model.creator_set_visibility {
-    Visibility::Public | Visibility::Hidden => {
-      // Allowed.
-    },
-    Visibility::Private => {
-      let is_authorized = maybe_user_session
-          .as_ref()
-          .map(|session| {
-            (session.user_token.as_str() == tts_model.creator_user_token.as_str()) // is_author
-              || (session.role.can_ban_users) // is_mod
-              || (session.user_token.as_str() == USER_FAKEYOU_USER_TOKEN) // is allowed user #1
-              || (session.user_token.as_str() == USER_NEWS_STORY_USER_TOKEN) // is allowed user #2
-          })
-          .unwrap_or(false);
-
-      if !is_authorized {
-        return Err(InferTtsError::NotAuthorized);
-      }
-    },
+  if !is_authorized {
+    return Err(InferTtsError::NotAuthorized);
   }
 
   // ==================== CHECK AND PERFORM TTS ==================== //
@@ -286,7 +242,6 @@ pub async fn infer_tts_handler(
     return Err(InferTtsError::BadInput("text contains slurs".to_string()));
   }
 
-
   let mut redis = server_state.redis_pool
       .get()
       .map_err(|e| {
@@ -294,7 +249,7 @@ pub async fn infer_tts_handler(
         InferTtsError::ServerError
       })?;
 
-  let redis_count_key = RedisKeys::tts_model_usage_count(&model_token);
+  let redis_count_key = RedisKeys::tts_model_usage_count(&request.tts_model_token);
 
   redis.incr(&redis_count_key, 1)
       .map_err(|e| {
@@ -324,7 +279,7 @@ pub async fn infer_tts_handler(
   let query_result = TtsInferenceJobInsertBuilder::new_for_fakeyou_request()
       .set_job_token(&job_token)
       .set_uuid_idempotency_token(&request.uuid_idempotency_token)
-      .set_model_token(&model_token)
+      .set_model_token(&request.tts_model_token)
       .set_raw_inference_text(&inference_text)
       .set_maybe_creator_user_token(maybe_user_token.as_deref())
       .set_creator_ip_address(&ip_address)
@@ -344,7 +299,7 @@ pub async fn infer_tts_handler(
     }
   }
 
-  server_state.firehose_publisher.enqueue_tts_inference(maybe_user_token.as_deref(), &job_token, &model_token)
+  server_state.firehose_publisher.enqueue_tts_inference(maybe_user_token.as_deref(), &job_token, &request.tts_model_token)
       .await
       .map_err(|e| {
         warn!("error publishing event: {:?}", e);
@@ -374,4 +329,66 @@ pub fn validate_inference_text(text: &str) -> Result<(), String> {
   }
 
   Ok(())
+}
+
+
+/// If the model is private, determine if the user can use the model.
+/// This is designed to fail closed (read: actually open!) rather than hit resources.
+async fn check_if_authorized_to_use_model(
+  model_token: &str,
+  maybe_user_session: Option<&UserSessionExtended>,
+  redis_ttl_cache: &RedisTtlCache,
+  mysql_connection: &mut PoolConnection<MySql>,
+) -> bool {
+
+  let model_token2 = model_token.clone();
+
+  let get_tts_model = move || {
+    // NB: async closures are not yet stable in Rust, so we include an async block.
+    async move {
+      get_tts_model_by_token_using_connection(
+        &model_token2,
+        true,
+        mysql_connection).await
+    }
+  };
+
+  let cache_key = RedisCacheKeys::get_tts_model_endpoint(model_token);
+
+  let mut redis_ttl_cache_connection = match redis_ttl_cache.get_connection() {
+    Ok(connection) => connection,
+    Err(err) => {
+      error!("Can't get redis cache: {:?}", err);
+      return true; // TODO/FIXME: Failing open is probably a bad choice.
+    }
+  };
+
+  let model_query_result = redis_ttl_cache_connection.lazy_load_if_not_cached(&cache_key, move || {
+    get_tts_model()
+  }).await;
+
+  let tts_model : TtsModelRecord = match model_query_result {
+    Ok(Some(tts_model)) => tts_model,
+    Ok(None) => {
+      error!("Couldn't find TTS model");
+      //return Err(InferTtsError::NotFound);
+      return true; // TODO/FIXME: Failing open is probably a bad choice.
+    }
+    Err(err) => {
+      error!("Error querying for model: {:?}", err);
+      //return Err(InferTtsError::ServerError);
+      return true; // TODO/FIXME: Failing open is probably a bad choice.
+    }
+  };
+
+  let is_authorized = maybe_user_session
+      .map(|session| {
+        (session.user_token.as_str() == tts_model.creator_user_token.as_str()) // is_author
+            || (session.role.can_ban_users) // is_mod
+            || (session.user_token.as_str() == USER_FAKEYOU_USER_TOKEN) // is allowed user #1
+            || (session.user_token.as_str() == USER_NEWS_STORY_USER_TOKEN) // is allowed user #2
+      })
+      .unwrap_or(false);
+
+  is_authorized
 }
