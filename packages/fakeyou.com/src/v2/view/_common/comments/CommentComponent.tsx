@@ -51,7 +51,9 @@ function CommentComponent(props: Props) {
       <CommentList
         entityType={props.entityType}
         entityToken={props.entityToken}
+        loadComments={loadComments}
         comments={comments}
+        sessionWrapper={props.sessionWrapper}
       />
     </div>
   );

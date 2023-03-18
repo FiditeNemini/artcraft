@@ -444,11 +444,11 @@ class ApiConfig {
   }
 
   commentList(entityType: string, entityToken: string): string {
-    return `${this.getScheme()}://${this.getNewApiHost()}/v1/comments/${entityType}/${entityToken}`;
+    return `${this.getScheme()}://${this.getNewApiHost()}/v1/comments/list/${entityType}/${entityToken}`;
   }
 
   commentDelete(commentToken: string): string {
-    return `${this.getScheme()}://${this.getNewApiHost()}/v1/comments/${commentToken}/delete`;
+    return `${this.getScheme()}://${this.getNewApiHost()}/v1/comments/delete/${commentToken}`;
   }
 
   // =============== Storyteller-specific ===============
