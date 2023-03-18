@@ -2,6 +2,7 @@ import { ApiConfig } from "@storyteller/components";
 
 export interface CreateCommentRequest {
   uuid_idempotency_token: string,
+  // Valid values for entity_type: 'user', 'tts_model', 'tts_result', 'w2l_template', 'w2l_result'
   entity_type: string,
   entity_token: string,
   comment_markdown: string,
