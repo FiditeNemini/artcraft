@@ -3,7 +3,7 @@ import {
   CreateComment,
   CreateCommentIsOk,
 } from "@storyteller/components/src/api/comments/CreateComment";
-import { v4 as uuidv4 } from 'uuid';
+import { v4 as uuidv4 } from "uuid";
 
 interface Props {
   entity_type: string;
@@ -20,7 +20,9 @@ interface Props {
  */
 function CreateCommentComponent(props: Props) {
   const [commentMarkdown, setCommentMarkdown] = useState<string>("");
-  const [uuidIdempotencyToken, setUuidIdempotencyToken] = useState<string>(uuidv4());
+  const [uuidIdempotencyToken, setUuidIdempotencyToken] = useState<string>(
+    uuidv4()
+  );
 
   const postComment = useCallback(async () => {
     const request = {
@@ -34,11 +36,14 @@ function CreateCommentComponent(props: Props) {
       //let ratingValue = rating.maybe_rating_value || undefined;
       //setUserRatingValue(ratingValue);
     }
-  }, [props.entity_type, props.entity_token, uuidIdempotencyToken, commentMarkdown]);
+  }, [
+    props.entity_type,
+    props.entity_token,
+    uuidIdempotencyToken,
+    commentMarkdown,
+  ]);
 
-  const handleCommentChange = (
-    ev: React.FormEvent<HTMLTextAreaElement>
-  ) => {
+  const handleCommentChange = (ev: React.FormEvent<HTMLTextAreaElement>) => {
     ev.preventDefault();
     const textValue = (ev.target as HTMLTextAreaElement).value.trim();
     if (textValue !== commentMarkdown) {
@@ -57,20 +62,26 @@ function CreateCommentComponent(props: Props) {
 
     postComment();
     return false;
-  }
+  };
 
   return (
-    <div className="d-flex">
+    <div>
       <form onSubmit={handleFormSubmit}>
-      <div className="form-group">
-        <label htmlFor="exampleFormControlTextarea1">Example textarea</label>
-        <textarea 
-          className="form-control" 
-          id="exampleFormControlTextarea1" 
-          rows={5} 
-          onChange={handleCommentChange}>{commentMarkdown}</textarea>
-      </div>
-        <button type="submit" className="btn btn-primary">Submit Comment</button>
+        <div className="d-flex gap-3">
+          <div className="form-group flex-grow-1">
+            <textarea
+              placeholder="Add a comment..."
+              className="form-control textarea-comment"
+              rows={1}
+              onChange={handleCommentChange}
+            >
+              {commentMarkdown}
+            </textarea>
+          </div>
+          <button type="submit" className="btn btn-primary">
+            Submit Comment
+          </button>
+        </div>
       </form>
     </div>
   );

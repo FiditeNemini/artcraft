@@ -14,7 +14,6 @@ interface Props {
   entity_token: string;
 }
 
-
 function CommentList(props: Props) {
   const [comments, setComments] = useState<Array<Comment>>([]);
 
@@ -32,7 +31,6 @@ function CommentList(props: Props) {
     getComments();
   }, [getComments]);
 
-
   // NB: It's more convenient to show recent data first
   var reversedComments = comments.slice().reverse();
 
@@ -41,7 +39,6 @@ function CommentList(props: Props) {
   let rows: Array<JSX.Element> = [];
 
   reversedComments.forEach((comment) => {
-
     const createTime = new Date(comment.created_at);
     const relativeCreateTime = formatDistance(createTime, now, {
       addSuffix: true,
