@@ -83,6 +83,39 @@ WHERE
     model_token = 'TM:ztt5s1be5tq6'
     AND raw_inference_text LIKE '%fakeyou%'
 
+--- Search for 101soundboards.com using us
+SELECT
+    r.raw_inference_text,
+    r.maybe_creator_user_token,
+    u.username,
+    u.ip_address_creation,
+    r.creator_ip_address,
+    r.created_at
+FROM
+    tts_results as r
+LEFT OUTER JOIN
+    users as u
+ON
+    r.maybe_creator_user_token = u.token
+WHERE
+    r.raw_inference_text LIKE '%bananas%'
+    AND r.created_at > ( CURDATE() - INTERVAL 1 HOUR )
+
+
+--- Search for 101soundboards.com using us
+SELECT
+    r.maybe_creator_user_token
+FROM
+    tts_results as r
+        LEFT OUTER JOIN
+    users as u
+    ON
+            r.maybe_creator_user_token = u.token
+WHERE
+        r.raw_inference_text LIKE '%bananas%'
+  AND r.created_at > ( CURDATE() - INTERVAL 1 HOUR )
+
+
 ---
 -- WTF WHY IS THIS SLOW???
 SELECT
