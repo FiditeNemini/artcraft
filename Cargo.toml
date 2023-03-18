@@ -15,12 +15,12 @@ members = [
 
   # Shared libraries
   "crates/lib/actix_helpers",
+  "crates/lib/api_clients/cloud_storage",
+  "crates/lib/api_clients/fakeyou_client",
+  "crates/lib/api_clients/google_drive_common",
+  "crates/lib/api_clients/twitch_common",
   "crates/lib/caching/memory_caching",
   "crates/lib/caching/redis_caching",
-  "crates/lib/clients/cloud_storage",
-  "crates/lib/clients/fakeyou_client",
-  "crates/lib/clients/google_drive_common",
-  "crates/lib/clients/twitch_common",
   "crates/lib/concurrency",
   "crates/lib/crockford",
   "crates/lib/database_queries", # TODO(bt, 2023-02-13): Rename "mysql_queries", though this will not live beyond a single DB

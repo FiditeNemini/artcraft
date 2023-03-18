@@ -21,7 +21,7 @@ database_queries = { path = "../../../lib/database_queries" }
 http_server_common = { path = "../../../lib/deprecated/http_server_common" }
 redis_common = { path = "../../../lib/redis_common" }
 tts_common = { path = "../../../lib/tts_common" }
-twitch_common = { path = "../../../lib/clients/twitch_common" }
+twitch_common = { path = "../../../lib/api_clients/twitch_common" }
 
 # External
 anyhow = "1.0.40"
