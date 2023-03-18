@@ -51,7 +51,7 @@ interface Props {
 //   navigator.clipboard.writeText(username);
 // }
 
-function ProfilePage(props: Props) {
+function ProfilePage(this: any, props: Props) {
   const { username }: { username: string } = useParams();
 
   const [userData, setUserData] = useState<User | undefined>(undefined);
@@ -536,14 +536,17 @@ function ProfilePage(props: Props) {
               role="tabpanel"
               aria-labelledby="comments-tab"
             >
-              <CreateCommentComponent
-                entity_type="user"
-                entity_token={userData?.user_token}
-              />
-              <CommentList
-                entity_type="user"
-                entity_token={userData?.user_token}
-              />
+              <div className="d-flex flex-column gap-3">
+                <CreateCommentComponent
+                  entity_type="user"
+                  entity_token={userData?.user_token}
+                  sessionWrapper={props.sessionWrapper}
+                />
+                <CommentList
+                  entity_type="user"
+                  entity_token={userData?.user_token}
+                />
+              </div>
             </div>
           </div>
         </div>

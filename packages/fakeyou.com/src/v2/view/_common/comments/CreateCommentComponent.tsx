@@ -1,13 +1,15 @@
-import React, { useState, useCallback } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import {
   CreateComment,
   CreateCommentIsOk,
 } from "@storyteller/components/src/api/comments/CreateComment";
 import { v4 as uuidv4 } from "uuid";
+import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
 
 interface Props {
   entity_type: string;
   entity_token: string;
+  sessionWrapper: SessionWrapper;
 }
 
 /**
@@ -23,6 +25,7 @@ function CreateCommentComponent(props: Props) {
   const [uuidIdempotencyToken, setUuidIdempotencyToken] = useState<string>(
     uuidv4()
   );
+  const [buttonVisible, setButtonVisible] = useState(false);
 
   const postComment = useCallback(async () => {
     const request = {
@@ -43,17 +46,18 @@ function CreateCommentComponent(props: Props) {
     commentMarkdown,
   ]);
 
-  const handleCommentChange = (ev: React.FormEvent<HTMLTextAreaElement>) => {
+  const handleCommentChange = (ev: React.ChangeEvent<HTMLTextAreaElement>) => {
     ev.preventDefault();
     const textValue = (ev.target as HTMLTextAreaElement).value.trim();
     if (textValue !== commentMarkdown) {
       setUuidIdempotencyToken(uuidv4()); // Regenerate on any change.
     }
     setCommentMarkdown(textValue);
+    setButtonVisible(textValue.length > 0);
     return false;
   };
 
-  const handleFormSubmit = (ev: React.FormEvent<HTMLFormElement>) => {
+  const handleFormSubmit = (ev: React.ChangeEvent<HTMLFormElement>) => {
     ev.preventDefault();
 
     if (commentMarkdown.trim() === "") {
@@ -64,8 +68,33 @@ function CreateCommentComponent(props: Props) {
     return false;
   };
 
-  return (
-    <div>
+  const handleKeyDown = (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (event.key === "Enter") {
+      event.preventDefault();
+    }
+  };
+
+  let commentButton = <></>;
+  if (buttonVisible) {
+    commentButton = (
+      <button type="submit" className="btn btn-primary">
+        Post Comment
+      </button>
+    );
+  }
+
+  let createCommentComponent = (
+    <textarea
+      placeholder="You need to be logged in to comment."
+      className="form-control textarea-comment"
+      rows={1}
+      disabled
+    >
+      {commentMarkdown}
+    </textarea>
+  );
+  if (props.sessionWrapper.isLoggedIn()) {
+    createCommentComponent = (
       <form onSubmit={handleFormSubmit}>
         <div className="d-flex gap-3">
           <div className="form-group flex-grow-1">
@@ -74,17 +103,18 @@ function CreateCommentComponent(props: Props) {
               className="form-control textarea-comment"
               rows={1}
               onChange={handleCommentChange}
+              onKeyDown={handleKeyDown}
             >
               {commentMarkdown}
             </textarea>
           </div>
-          <button type="submit" className="btn btn-primary">
-            Submit Comment
-          </button>
+          {commentButton}
         </div>
       </form>
-    </div>
-  );
+    );
+  }
+
+  return <div>{createCommentComponent}</div>;
 }
 
 export { CreateCommentComponent };

@@ -31,8 +31,8 @@ function CommentList(props: Props) {
     getComments();
   }, [getComments]);
 
-  // NB: It's more convenient to show recent data first
-  var reversedComments = comments.slice().reverse();
+  // NB: It's more convenient to show recent data first {.reverse()}
+  var reversedComments = comments.slice();
 
   const now = new Date();
 
@@ -47,16 +47,23 @@ function CommentList(props: Props) {
     rows.push(
       <tr key={comment.token}>
         <td>
-          {/* It's okay to set "dangerous" html here as the server safely created it. */}
-          <div
-            className="mt-3 text-center text-lg-start"
-            dangerouslySetInnerHTML={{
-              __html: comment.comment_rendered_html || "",
-            }}
-          />
+          <div className="py-2">
+            <div>
+              <span className="fw-medium text-white">
+                {comment.user_display_name}
+              </span>
+              <span className="px-2">·</span>
+              <span className="opacity-75">{relativeCreateTime}</span>
+            </div>
+            {/* It's okay to set "dangerous" html here as the server safely created it. */}
+            <div
+              className="mt-1 text-center text-lg-start"
+              dangerouslySetInnerHTML={{
+                __html: comment.comment_rendered_html || "",
+              }}
+            />
+          </div>
         </td>
-        <td>{relativeCreateTime}</td>
-        <td>{comment.user_display_name} link</td>
       </tr>
     );
   });
