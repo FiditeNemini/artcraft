@@ -3,3 +3,6 @@
 
 # Just an example
 /exact/match/path
+
+# Broken Python script
+/tts/job/None
