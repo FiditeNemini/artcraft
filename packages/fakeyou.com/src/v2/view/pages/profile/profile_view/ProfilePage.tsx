@@ -39,6 +39,8 @@ import "tippy.js/dist/tippy.css";
 import { motion } from "framer-motion";
 import { usePrefixedDocumentTitle } from "../../../../../common/UsePrefixedDocumentTitle";
 import { faCalendarAlt } from "@fortawesome/pro-solid-svg-icons";
+//import { CreateCommentComponent } from "../../../_common/comments/CreateCommentComponent";
+//import { CommentList } from "../../../_common/comments/CommentList";
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -392,6 +394,14 @@ function ProfilePage(props: Props) {
           </div>
         </motion.div>
       </div>
+
+      {/*
+
+      TODO - this isn't where it should go
+      <CommentList entity_type="user" entity_token={userData?.user_token} />
+      <CreateCommentComponent entity_type="user" entity_token={userData?.user_token} />
+      */}
+
 
       {profileButtonsMobile}
 

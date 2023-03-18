@@ -34,7 +34,7 @@ function CreateCommentComponent(props: Props) {
       //let ratingValue = rating.maybe_rating_value || undefined;
       //setUserRatingValue(ratingValue);
     }
-  }, [props.entity_type, props.entity_token]);
+  }, [props.entity_type, props.entity_token, uuidIdempotencyToken, commentMarkdown]);
 
   const handleCommentChange = (
     ev: React.FormEvent<HTMLTextAreaElement>
