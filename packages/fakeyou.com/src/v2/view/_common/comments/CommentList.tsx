@@ -1,15 +1,10 @@
 import React from "react";
 import { formatDistance } from "date-fns";
 import {
-  DeleteComment,
-  DeleteCommentIsOk,
-} from "@storyteller/components/src/api/comments/DeleteComment";
-import {
   Comment,
 } from "@storyteller/components/src/api/comments/ListComments";
 import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faTrash } from "@fortawesome/pro-light-svg-icons";
+import { SafeDeleteCommentButton } from "./SafeDeleteCommentButton";
 
 const Fade = require("react-reveal/Fade");
 
@@ -28,13 +23,6 @@ interface Props {
  * See the documentation on the parent <CommentComponent />
  */
 function CommentList(props: Props) {
-
-  const handleDeleteComment = async (commentToken: string) => {
-    let response = await DeleteComment(commentToken);
-    if (DeleteCommentIsOk(response)) {
-      props.loadComments(); // Refresh comments
-    }
-  };
 
   // NB: It's more convenient to show recent data first {.reverse()}
   var reversedComments = props.comments.slice();
@@ -61,11 +49,10 @@ function CommentList(props: Props) {
     if (canDelete) {
       maybeDeleteButton = (
         <>
-          <button onClick={async () => await handleDeleteComment(comment.token)}>
-            <FontAwesomeIcon icon={faTrash} />
-            {" "}
-            Delete Comment
-          </button>
+          <SafeDeleteCommentButton
+            commentToken={comment.token}
+            loadComments={props.loadComments}
+          />
         </>
       )
     }

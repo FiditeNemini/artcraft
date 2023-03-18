@@ -1,0 +1,67 @@
+import React, { useState } from "react";
+import { DeleteComment, DeleteCommentIsOk } from "@storyteller/components/src/api/comments/DeleteComment";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faTrash, faTrashRestore } from "@fortawesome/free-solid-svg-icons";
+import { faTrashCheck } from "@fortawesome/pro-solid-svg-icons";
+
+interface Props {
+  commentToken: string;
+  loadComments: () => void;
+}
+
+/**
+ * This is part of a reusable component for putting comments on several 
+ * different page types.
+ *
+ * See the documentation on the parent <CommentComponent />
+ */
+function SafeDeleteCommentButton(props: Props) {
+  const [readyToDelete, setReadyToDelete] = useState<boolean>(false);
+
+  const handleDeleteComment = async (commentToken: string) => {
+    let response = await DeleteComment(commentToken);
+    if (DeleteCommentIsOk(response)) {
+      props.loadComments(); // Refresh comments
+    }
+  };
+
+  let deleteButton = <></>;
+
+  // We ask the user to confirm the deletion. 
+  // This makes it slightly safer and prevents accidental mis-clicks.
+  if (!readyToDelete) {
+    deleteButton = (
+      <>
+        <button onClick={() => setReadyToDelete(true)}>
+          <FontAwesomeIcon icon={faTrash} />
+          {" "}
+          Delete Comment
+        </button>
+      </>
+    )
+  } else {
+    deleteButton = (
+      <>
+        <button onClick={() => setReadyToDelete(false)}>
+          <FontAwesomeIcon icon={faTrashRestore} />
+          {" "}
+          Cancel
+        </button>
+
+        <button onClick={async () => await handleDeleteComment(props.commentToken)}>
+          <FontAwesomeIcon icon={faTrashCheck} />
+          {" "}
+          Confirm Comment
+        </button>
+      </>
+    )
+  }
+
+  return (
+    <>
+      {deleteButton}
+    </>
+  )
+}
+
+export { SafeDeleteCommentButton };
