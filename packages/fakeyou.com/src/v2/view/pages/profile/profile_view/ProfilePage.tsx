@@ -51,7 +51,7 @@ interface Props {
 //   navigator.clipboard.writeText(username);
 // }
 
-function ProfilePage(props: Props) {
+function ProfilePage(this: any, props: Props) {
   const { username }: { username: string } = useParams();
 
   const [userData, setUserData] = useState<User | undefined>(undefined);
@@ -395,12 +395,6 @@ function ProfilePage(props: Props) {
         </motion.div>
       </div>
 
-
-      {/*TODO - this isn't where it should go*/}
-      <CommentList entity_type="user" entity_token={userData?.user_token} />
-      <CreateCommentComponent entity_type="user" entity_token={userData?.user_token} />
-
-
       {profileButtonsMobile}
 
       <motion.div className="container-panel mt-5" variants={panel}>
@@ -480,6 +474,20 @@ function ProfilePage(props: Props) {
                 Badges
               </button>
             </li>
+            <li className="nav-item" role="presentation">
+              <button
+                className="nav-link"
+                id="comments-tab"
+                data-bs-toggle="tab"
+                data-bs-target="#comments"
+                type="button"
+                role="tab"
+                aria-controls="comments"
+                aria-selected="false"
+              >
+                Comments
+              </button>
+            </li>
           </ul>
           <div className="tab-content" id="myTabContent">
             <div
@@ -521,6 +529,24 @@ function ProfilePage(props: Props) {
               aria-labelledby="badges-tab"
             >
               {badges}
+            </div>
+            <div
+              className="tab-pane fade p-3 p-lg-4"
+              id="comments"
+              role="tabpanel"
+              aria-labelledby="comments-tab"
+            >
+              <div className="d-flex flex-column gap-3">
+                <CreateCommentComponent
+                  entity_type="user"
+                  entity_token={userData?.user_token}
+                  sessionWrapper={props.sessionWrapper}
+                />
+                <CommentList
+                  entity_type="user"
+                  entity_token={userData?.user_token}
+                />
+              </div>
             </div>
           </div>
         </div>

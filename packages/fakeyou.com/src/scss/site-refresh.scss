@@ -86,6 +86,7 @@ styles with important tags:
   td {
     color: rgba($white, 0.8);
     font-weight: 400;
+    border-color: rgba($white, 0.12);
   }
 
   .table-mw {
@@ -1024,6 +1025,10 @@ styles with important tags:
     &:hover {
       color: $primary !important;
     }
+  }
+
+  .textarea-comment {
+    resize: none;
   }
 }
 
