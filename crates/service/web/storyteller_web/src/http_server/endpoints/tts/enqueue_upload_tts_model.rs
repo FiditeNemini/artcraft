@@ -10,7 +10,7 @@ use config::bad_urls::is_bad_tts_model_download_url;
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::server_state::ServerState;
 use crate::validations::model_uploads::validate_model_title;
-use database_queries::queries::tts::tts_model_upload_jobs::insert_tts_model_upload_job::{insert_tts_model_upload_job, InsertTtsModelUploadJobArgs};
+use mysql_queries::queries::tts::tts_model_upload_jobs::insert_tts_model_upload_job::{insert_tts_model_upload_job, InsertTtsModelUploadJobArgs};
 use enums::common::visibility::Visibility;
 use http_server_common::request::get_request_ip::get_request_ip;
 use log::warn;

@@ -1,8 +1,8 @@
 use crate::job_state::JobState;
-use database_queries::queries::trending_model_analytics::upsert_trending_model_analytics::{Args, ModelToken, upsert_trending_model_analytics};
-use database_queries::queries::tts::tts_models::count_tts_model_uses::count_tts_model_uses;
-use database_queries::queries::tts::tts_models::count_tts_model_uses_total::count_tts_model_uses_total;
-use database_queries::queries::tts::tts_models::list_all_tts_model_tokens::{list_all_tts_model_tokens, TtsModelTokens};
+use mysql_queries::queries::trending_model_analytics::upsert_trending_model_analytics::{Args, ModelToken, upsert_trending_model_analytics};
+use mysql_queries::queries::tts::tts_models::count_tts_model_uses::count_tts_model_uses;
+use mysql_queries::queries::tts::tts_models::count_tts_model_uses_total::count_tts_model_uses_total;
+use mysql_queries::queries::tts::tts_models::list_all_tts_model_tokens::{list_all_tts_model_tokens, TtsModelTokens};
 use errors::AnyhowResult;
 use log::info;
 use rand::seq::SliceRandom;

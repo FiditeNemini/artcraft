@@ -17,7 +17,7 @@ use sqlx::error::Error::Database;
 use sqlx::mysql::MySqlDatabaseError;
 use std::fmt;
 use std::sync::Arc;
-use database_queries::queries::w2l::w2l_inference_jobs::get_pending_w2l_inference_job_detailed_stats::{get_pending_w2l_inference_job_detailed_stats, PendingCountResult};
+use mysql_queries::queries::w2l::w2l_inference_jobs::get_pending_w2l_inference_job_detailed_stats::{get_pending_w2l_inference_job_detailed_stats, PendingCountResult};
 
 #[derive(Serialize)]
 pub struct GetW2lInferenceQueueCountResponse {

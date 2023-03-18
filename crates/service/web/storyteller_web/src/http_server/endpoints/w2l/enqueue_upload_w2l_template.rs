@@ -10,7 +10,7 @@ use config::is_bad_video_download_url::is_bad_video_download_url;
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::server_state::ServerState;
 use crate::validations::model_uploads::validate_model_title;
-use database_queries::queries::w2l::w2l_template_upload_jobs::insert_w2l_template_upload_job::{insert_w2l_template_upload_job, InsertW2lTemplateUploadJobArgs};
+use mysql_queries::queries::w2l::w2l_template_upload_jobs::insert_w2l_template_upload_job::{insert_w2l_template_upload_job, InsertW2lTemplateUploadJobArgs};
 use enums::common::visibility::Visibility;
 use http_server_common::request::get_request_ip::get_request_ip;
 use log::warn;

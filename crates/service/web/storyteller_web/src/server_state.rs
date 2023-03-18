@@ -9,11 +9,11 @@ use crate::http_server::endpoints::tts::list_tts_models::TtsModelRecordForRespon
 use crate::http_server::web_utils::redis_rate_limiter::RedisRateLimiter;
 use crate::threads::db_health_checker_thread::db_health_check_status::HealthCheckStatus;
 use crate::util::encrypted_sort_id::SortKeyCrypto;
-use database_queries::mediators::badge_granter::BadgeGranter;
-use database_queries::mediators::firehose_publisher::FirehosePublisher;
-use database_queries::queries::model_categories::list_categories_query_builder::CategoryList;
-use database_queries::queries::tts::tts_inference_jobs::get_pending_tts_inference_job_count::TtsQueueLengthResult;
-use database_queries::queries::w2l::w2l_templates::list_w2l_templates::W2lTemplateRecordForList;
+use mysql_queries::mediators::badge_granter::BadgeGranter;
+use mysql_queries::mediators::firehose_publisher::FirehosePublisher;
+use mysql_queries::queries::model_categories::list_categories_query_builder::CategoryList;
+use mysql_queries::queries::tts::tts_inference_jobs::get_pending_tts_inference_job_count::TtsQueueLengthResult;
+use mysql_queries::queries::w2l::w2l_templates::list_w2l_templates::W2lTemplateRecordForList;
 use memory_caching::single_item_ttl_cache::SingleItemTtlCache;
 use r2d2_redis::{r2d2, RedisConnectionManager};
 use redis_caching::redis_ttl_cache::RedisTtlCache;

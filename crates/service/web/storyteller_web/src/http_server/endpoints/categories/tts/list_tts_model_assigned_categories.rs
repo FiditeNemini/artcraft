@@ -9,7 +9,7 @@ use actix_web::web::Path;
 use actix_web::{web, HttpResponse, HttpRequest};
 use chrono::{DateTime, Utc};
 use crate::server_state::ServerState;
-use database_queries::queries::tts::tts_category_assignments::list_assigned_tts_categories_query_builder::ListAssignedTtsCategoriesQueryBuilder;
+use mysql_queries::queries::tts::tts_category_assignments::list_assigned_tts_categories_query_builder::ListAssignedTtsCategoriesQueryBuilder;
 use http_server_common::response::serialize_as_json_error::serialize_as_json_error;
 use log::warn;
 use std::fmt;

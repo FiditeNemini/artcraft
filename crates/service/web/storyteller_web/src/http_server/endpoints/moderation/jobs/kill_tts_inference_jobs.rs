@@ -7,7 +7,7 @@ use actix_web::http::StatusCode;
 use actix_web::web::{Path, Json};
 use actix_web::{Responder, web, HttpResponse, error, HttpRequest};
 use crate::server_state::ServerState;
-use database_queries::queries::tts::tts_inference_jobs::kill_tts_inference_jobs::{kill_tts_inference_jobs, JobStatus};
+use mysql_queries::queries::tts::tts_inference_jobs::kill_tts_inference_jobs::{kill_tts_inference_jobs, JobStatus};
 use http_server_common::response::serialize_as_json_error::serialize_as_json_error;
 use log::{info, warn, log, error};
 use regex::Regex;

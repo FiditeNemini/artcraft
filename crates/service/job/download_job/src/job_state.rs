@@ -4,8 +4,8 @@ use crate::job_types::hifigan::hifigan_model_check_command::HifiGanModelCheckCom
 use crate::job_types::hifigan_softvc::hifigan_softvc_model_check_command::HifiGanSoftVcModelCheckCommand;
 use crate::job_types::softvc::softvc_model_check_command::SoftVcModelCheckCommand;
 use crate::job_types::tacotron::tacotron_model_check_command::TacotronModelCheckCommand;
-use database_queries::mediators::badge_granter::BadgeGranter;
-use database_queries::mediators::firehose_publisher::FirehosePublisher;
+use mysql_queries::mediators::badge_granter::BadgeGranter;
+use mysql_queries::mediators::firehose_publisher::FirehosePublisher;
 use google_drive_common::google_drive_download_command::GoogleDriveDownloadCommand;
 use r2d2_redis::RedisConnectionManager;
 use r2d2_redis::r2d2;

@@ -1,4 +1,4 @@
-use database_queries::complex_models::event_match_predicate::EventMatchPredicate;
+use mysql_queries::complex_models::event_match_predicate::EventMatchPredicate;
 
 // TODO: Check that the tokens are valid models.
 

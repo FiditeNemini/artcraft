@@ -1,8 +1,8 @@
 use container_common::anyhow_result::AnyhowResult;
 use crate::JobState;
 use crate::job_steps::process_single_job::process_single_job;
-use database_queries::queries::generic_download::job::list_available_generic_download_jobs::{AvailableDownloadJob, list_available_generic_download_jobs};
-use database_queries::queries::generic_download::job::mark_generic_download_job_failure::mark_generic_download_job_failure;
+use mysql_queries::queries::generic_download::job::list_available_generic_download_jobs::{AvailableDownloadJob, list_available_generic_download_jobs};
+use mysql_queries::queries::generic_download::job::mark_generic_download_job_failure::mark_generic_download_job_failure;
 use jobs_common::noop_logger::NoOpLogger;
 use log::warn;
 use std::time::Duration;

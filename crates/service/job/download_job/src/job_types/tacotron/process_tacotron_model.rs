@@ -5,9 +5,9 @@ use container_common::filesystem::safe_delete_temp_directory::safe_delete_temp_d
 use container_common::filesystem::safe_delete_temp_file::safe_delete_temp_file;
 use crate::JobState;
 use crate::job_steps::job_results::JobResults;
-use database_queries::queries::generic_download::job::list_available_generic_download_jobs::AvailableDownloadJob;
-use database_queries::queries::tts::tts_models::insert_tts_model_from_download_job::insert_tts_model_from_download_job;
-use database_queries::queries::tts::tts_models::insert_tts_model_from_download_job;
+use mysql_queries::queries::generic_download::job::list_available_generic_download_jobs::AvailableDownloadJob;
+use mysql_queries::queries::tts::tts_models::insert_tts_model_from_download_job::insert_tts_model_from_download_job;
+use mysql_queries::queries::tts::tts_models::insert_tts_model_from_download_job;
 use enums::common::visibility::Visibility;
 use hashing::sha256::sha256_hash_file::sha256_hash_file;
 use jobs_common::redis_job_status_logger::RedisJobStatusLogger;

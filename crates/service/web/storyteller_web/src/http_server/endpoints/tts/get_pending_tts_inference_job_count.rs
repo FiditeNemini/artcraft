@@ -2,7 +2,7 @@ use actix_web::{HttpRequest, HttpResponse, ResponseError, web};
 use chrono::NaiveDateTime;
 use crate::ServerState;
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
-use database_queries::queries::tts::tts_inference_jobs::get_pending_tts_inference_job_count::get_pending_tts_inference_job_count;
+use mysql_queries::queries::tts::tts_inference_jobs::get_pending_tts_inference_job_count::get_pending_tts_inference_job_count;
 use errors::AnyhowResult;
 use hyper::StatusCode;
 use log::{debug, error, info, warn};

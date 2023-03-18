@@ -10,8 +10,8 @@ use anyhow::anyhow;
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::http_server::web_utils::response_success_helpers::simple_json_success;
 use crate::server_state::ServerState;
-use database_queries::queries::model_categories::get_category_by_token::get_category_by_token;
-use database_queries::queries::tts::tts_models::get_tts_model::get_tts_model_by_token;
+use mysql_queries::queries::model_categories::get_category_by_token::get_category_by_token;
+use mysql_queries::queries::tts::tts_models::get_tts_model::get_tts_model_by_token;
 use http_server_common::request::get_request_ip::get_request_ip;
 use http_server_common::response::serialize_as_json_error::serialize_as_json_error;
 use log::{info, warn, log, error};
@@ -22,7 +22,7 @@ use sqlx::error::Error::Database;
 use sqlx::mysql::MySqlDatabaseError;
 use std::fmt;
 use std::sync::Arc;
-use database_queries::queries::model_categories::assign_tts_category::{assign_tts_category, AssignOrDeleteAction, AssignTtsCategoryArgs};
+use mysql_queries::queries::model_categories::assign_tts_category::{assign_tts_category, AssignOrDeleteAction, AssignTtsCategoryArgs};
 
 // =============== Request ===============
 

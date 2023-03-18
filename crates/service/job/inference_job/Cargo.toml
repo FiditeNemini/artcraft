@@ -18,11 +18,11 @@ path = "src/main.rs"
 cloud_storage = { path = "../../../lib/api_clients/cloud_storage" }
 config = { path = "../../../lib/deprecated/config" }
 container_common = { path = "../../../lib/deprecated/container_common" }
-database_queries = { path = "../../../lib/database_queries" }
 enums = { path = "../../../_types/enums" }
 errors = { path = "../../../lib/errors" }
 jobs_common = { path = "../../../lib/jobs_common" }
 memory_caching = { path = "../../../lib/caching/memory_caching" }
+mysql_queries = { path = "../../../lib/mysql_queries" }
 tokens = { path = "../../../_types/tokens" }
 tts_common = { path = "../../../lib/tts_common" }
 

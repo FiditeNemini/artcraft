@@ -1,8 +1,8 @@
 use actix_web::http::StatusCode;
 use actix_web::{HttpRequest, HttpResponse, ResponseError, web};
 use crate::server_state::ServerState;
-use database_queries::composite_keys::by_table::user_ratings::user_rating_entity::UserRatingEntity;
-use database_queries::queries::users::user_ratings::get_user_rating::{Args, get_user_rating};
+use mysql_queries::composite_keys::by_table::user_ratings::user_rating_entity::UserRatingEntity;
+use mysql_queries::queries::users::user_ratings::get_user_rating::{Args, get_user_rating};
 use enums::by_table::user_ratings::entity_type::UserRatingEntityType;
 use enums::by_table::user_ratings::rating_value::UserRatingValue;
 use http_server_common::request::get_request_ip::get_request_ip;

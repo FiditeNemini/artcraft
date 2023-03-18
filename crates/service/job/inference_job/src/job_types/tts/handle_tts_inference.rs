@@ -1,5 +1,5 @@
 use crate::job_steps::job_dependencies::JobDependencies;
-use database_queries::queries::generic_inference::job::list_available_generic_inference_jobs::AvailableInferenceJob;
+use mysql_queries::queries::generic_inference::job::list_available_generic_inference_jobs::AvailableInferenceJob;
 use errors::AnyhowResult;
 
 pub async fn handle_tts_inference(

@@ -1,7 +1,7 @@
 use actix_http::{StatusCode, header};
 use actix_web::{HttpResponse, HttpRequest, web, ResponseError};
 use crate::server_state::ServerState;
-use database_queries::queries::twitch::twitch_oauth::insert::TwitchOauthTokenInsertBuilder;
+use mysql_queries::queries::twitch::twitch_oauth::insert::TwitchOauthTokenInsertBuilder;
 use http_server_common::request::get_request_ip::get_request_ip;
 use http_server_common::response::response_error_helpers::to_simple_json_error;
 use log::error;
@@ -12,8 +12,8 @@ use std::sync::Arc;
 use twitch_common::oauth_token_builder::get_oauth_token_builder;
 use twitch_oauth2::tokens::BearerTokenType::UserToken;
 use twitch_oauth2::{CsrfToken, TwitchToken};
-use database_queries::tokens::Tokens;
-use database_queries::queries::twitch::twitch_oauth::find::{TwitchOauthTokenFinder, TwitchOauthTokenRecord};
+use mysql_queries::tokens::Tokens;
+use mysql_queries::queries::twitch::twitch_oauth::find::{TwitchOauthTokenFinder, TwitchOauthTokenRecord};
 
 #[derive(Serialize)]
 pub struct CheckOauthResponse {

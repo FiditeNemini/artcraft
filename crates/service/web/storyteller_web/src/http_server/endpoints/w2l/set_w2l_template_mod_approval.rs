@@ -9,7 +9,7 @@ use actix_web::{Responder, web, HttpResponse, error, HttpRequest};
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::server_state::ServerState;
 use crate::validations::model_uploads::validate_model_title;
-use database_queries::queries::w2l::w2l_templates::get_w2l_template::select_w2l_template_by_token;
+use mysql_queries::queries::w2l::w2l_templates::get_w2l_template::select_w2l_template_by_token;
 use http_server_common::request::get_request_ip::get_request_ip;
 use log::{info, warn, log};
 use regex::Regex;
@@ -18,7 +18,7 @@ use sqlx::error::Error::Database;
 use sqlx::mysql::MySqlDatabaseError;
 use std::fmt;
 use std::sync::Arc;
-use database_queries::queries::w2l::w2l_templates::set_w2l_template_mod_approval::set_w2l_template_mod_approval;
+use mysql_queries::queries::w2l::w2l_templates::set_w2l_template_mod_approval::set_w2l_template_mod_approval;
 
 /// For the URL PathInfo
 #[derive(Deserialize)]

@@ -17,8 +17,8 @@ path = "src/main.rs"
 # Internal
 config = { path = "../../../lib/deprecated/config" }
 container_common = { path = "../../../lib/deprecated/container_common" }
-database_queries = { path = "../../../lib/database_queries" }
 http_server_common = { path = "../../../lib/deprecated/http_server_common" }
+mysql_queries = { path = "../../../lib/mysql_queries" }
 redis_common = { path = "../../../lib/redis_common" }
 tts_common = { path = "../../../lib/tts_common" }
 twitch_common = { path = "../../../lib/api_clients/twitch_common" }

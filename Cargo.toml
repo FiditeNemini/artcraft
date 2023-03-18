@@ -23,7 +23,6 @@ members = [
   "crates/lib/caching/redis_caching",
   "crates/lib/concurrency",
   "crates/lib/crockford",
-  "crates/lib/database_queries", # TODO(bt, 2023-02-13): Rename "mysql_queries", though this will not live beyond a single DB
   "crates/lib/datetimes",
   "crates/lib/deprecated/config", # TODO(bt, 2023-02-13): Deprecate or repurpose
   "crates/lib/deprecated/container_common", # TODO(bt, 2023-02-13): Pull apart and rehome pieces
@@ -34,6 +33,7 @@ members = [
   "crates/lib/idempotency",
   "crates/lib/jobs_common",
   "crates/lib/media",
+  "crates/lib/mysql_queries",
   "crates/lib/redis_common",
   "crates/lib/sqlite_queries",
   "crates/lib/sqlx_mysql_helpers",

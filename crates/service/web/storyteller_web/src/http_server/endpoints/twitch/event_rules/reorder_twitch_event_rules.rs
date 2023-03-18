@@ -11,12 +11,12 @@ use crate::http_server::endpoints::twitch::event_rules::validations::validate_ev
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::http_server::web_utils::response_success_helpers::simple_json_success;
 use crate::server_state::ServerState;
-use database_queries::complex_models::event_match_predicate::EventMatchPredicate;
-use database_queries::complex_models::event_responses::EventResponse;
-use database_queries::queries::twitch::twitch_event_rules::get_twitch_event_rule_for_user::get_twitch_event_rule_for_user;
-use database_queries::queries::twitch::twitch_event_rules::list_twitch_event_rules_for_user::list_twitch_event_rules_for_user;
-use database_queries::queries::twitch::twitch_event_rules::reorder_twitch_event_rules::reorder_twitch_event_rules;
-use database_queries::queries::twitch::twitch_event_rules::update_twitch_event_rule_builder::UpdateTwitchEventRuleBuilder;
+use mysql_queries::complex_models::event_match_predicate::EventMatchPredicate;
+use mysql_queries::complex_models::event_responses::EventResponse;
+use mysql_queries::queries::twitch::twitch_event_rules::get_twitch_event_rule_for_user::get_twitch_event_rule_for_user;
+use mysql_queries::queries::twitch::twitch_event_rules::list_twitch_event_rules_for_user::list_twitch_event_rules_for_user;
+use mysql_queries::queries::twitch::twitch_event_rules::reorder_twitch_event_rules::reorder_twitch_event_rules;
+use mysql_queries::queries::twitch::twitch_event_rules::update_twitch_event_rule_builder::UpdateTwitchEventRuleBuilder;
 use http_server_common::request::get_request_ip::get_request_ip;
 use http_server_common::response::serialize_as_json_error::serialize_as_json_error;
 use log::{info, warn, log, error};

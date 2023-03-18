@@ -1,6 +1,6 @@
 use container_common::anyhow_result::AnyhowResult;
-use database_queries::queries::tts::tts_inference_jobs::insert_tts_inference_job::TtsInferenceJobInsertBuilder;
-use database_queries::tokens::Tokens;
+use mysql_queries::queries::tts::tts_inference_jobs::insert_tts_inference_job::TtsInferenceJobInsertBuilder;
+use mysql_queries::tokens::Tokens;
 use log::info;
 use r2d2_redis::RedisConnectionManager;
 use r2d2_redis::r2d2;

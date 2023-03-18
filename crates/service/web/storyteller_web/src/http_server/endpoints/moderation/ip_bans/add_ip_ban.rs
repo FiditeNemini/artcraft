@@ -9,7 +9,7 @@ use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::http_server::web_utils::response_success_helpers::simple_json_success;
 use crate::server_state::ServerState;
 use crate::validations::model_uploads::validate_model_title;
-use database_queries::queries::ip_bans::upsert_ip_ban::{upsert_ip_ban, UpsertIpBanArgs};
+use mysql_queries::queries::ip_bans::upsert_ip_ban::{upsert_ip_ban, UpsertIpBanArgs};
 use log::{info, warn, log};
 use regex::Regex;
 use sqlx::error::DatabaseError;

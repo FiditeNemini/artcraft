@@ -1,7 +1,7 @@
-use database_queries::queries::twitch::twitch_event_rules::list_twitch_event_rules_for_user::TwitchEventRule;
-use database_queries::column_types::twitch_event_category::TwitchEventCategory;
-use database_queries::complex_models::event_match_predicate::EventMatchPredicate;
-use database_queries::complex_models::event_responses::EventResponse;
+use mysql_queries::queries::twitch::twitch_event_rules::list_twitch_event_rules_for_user::TwitchEventRule;
+use mysql_queries::column_types::twitch_event_category::TwitchEventCategory;
+use mysql_queries::complex_models::event_match_predicate::EventMatchPredicate;
+use mysql_queries::complex_models::event_responses::EventResponse;
 
 #[derive(Clone)]
 pub struct TwitchEventRuleLight {

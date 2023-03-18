@@ -31,15 +31,11 @@ pub mod threads;
 pub mod util;
 pub mod validations;
 
-// TODO: Eventually move all of these to the `database_queries` crate and no longer write inline MySQL.
-// NB: Also so sqlx codegens everything.
-// Not sure if this is strictly necessary.
-mod shared_queries {
-  use database_queries::queries::twitch::twitch_oauth::find;
-  use database_queries::queries::twitch::twitch_oauth::insert;
-}
-
 use actix_cors::Cors;
+use actix_helpers::middleware::endpoint_disablement::disabled_endpoints::disabled_endpoints::DisabledEndpoints;
+use actix_helpers::middleware::endpoint_disablement::disabled_endpoints::exact_match_endpoint_disablements::ExactMatchEndpointDisablements;
+use actix_helpers::middleware::endpoint_disablement::disabled_endpoints::prefix_endpoint_disablements::PrefixEndpointDisablements;
+use actix_helpers::middleware::endpoint_disablement::endpoint_disablement_middleware::EndpointDisablementFilter;
 use actix_helpers::middleware::ip_filter::ip_ban_list::ip_ban_list::IpBanList;
 use actix_helpers::middleware::ip_filter::ip_ban_list::load_ip_ban_list_from_directory::load_ip_ban_list_from_directory;
 use actix_helpers::middleware::ip_filter::ip_filter_middleware::IpFilter;
@@ -49,6 +45,7 @@ use actix_web::{HttpServer, web, HttpResponse, App, middleware};
 use anyhow::anyhow;
 use billing_component::stripe::stripe_config::{FullUrlOrPath, StripeCheckoutConfigs, StripeConfig, StripeCustomerPortalConfigs, StripeSecrets};
 use billing_component::stripe::traits::internal_product_to_stripe_lookup::InternalProductToStripeLookup;
+use billing_component::stripe::traits::internal_session_cache_purge::InternalSessionCachePurge;
 use billing_component::stripe::traits::internal_subscription_product_lookup::InternalSubscriptionProductLookup;
 use billing_component::stripe::traits::internal_user_lookup::InternalUserLookup;
 use cloud_storage::bucket_client::BucketClient;
@@ -57,6 +54,7 @@ use config::shared_constants::DEFAULT_MYSQL_CONNECTION_STRING;
 use config::shared_constants::DEFAULT_RUST_LOG;
 use container_common::files::read_toml_file_to_struct::read_toml_file_to_struct;
 use crate::billing::internal_product_to_stripe_lookup_impl::InternalProductToStripeLookupImpl;
+use crate::billing::internal_session_cache_purge_impl::InternalSessionCachePurgeImpl;
 use crate::billing::stripe_internal_subscription_product_lookup_impl::StripeInternalSubscriptionProductLookupImpl;
 use crate::billing::stripe_internal_user_lookup_impl::StripeInternalUserLookupImpl;
 use crate::configs::static_api_tokens::{StaticApiTokenConfig, StaticApiTokens, StaticApiTokenSet};
@@ -68,34 +66,28 @@ use crate::threads::db_health_checker_thread::db_health_check_status::HealthChec
 use crate::threads::db_health_checker_thread::db_health_checker_thread::db_health_checker_thread;
 use crate::threads::poll_ip_banlist_thread::poll_ip_bans;
 use crate::util::encrypted_sort_id::SortKeyCrypto;
-use database_queries::mediators::badge_granter::BadgeGranter;
-use database_queries::mediators::firehose_publisher::FirehosePublisher;
 use errors::AnyhowResult;
 use futures::Future;
 use http_server_common::cors::{build_cors_config, build_production_cors_config};
 use limitation::Limiter;
 use log::{error, info};
 use memory_caching::single_item_ttl_cache::SingleItemTtlCache;
+use mysql_queries::mediators::badge_granter::BadgeGranter;
+use mysql_queries::mediators::firehose_publisher::FirehosePublisher;
 use r2d2_redis::RedisConnectionManager;
 use r2d2_redis::r2d2;
 use r2d2_redis::redis::Commands;
+use redis_caching::redis_ttl_cache::RedisTtlCache;
 use reusable_types::server_environment::ServerEnvironment;
 use sqlx::MySqlPool;
 use sqlx::mysql::MySqlPoolOptions;
 use std::sync::Arc;
 use std::time::Duration;
 use tokio::runtime::Runtime;
-use actix_helpers::middleware::endpoint_disablement::disabled_endpoints::disabled_endpoints::DisabledEndpoints;
-use actix_helpers::middleware::endpoint_disablement::disabled_endpoints::exact_match_endpoint_disablements::ExactMatchEndpointDisablements;
-use actix_helpers::middleware::endpoint_disablement::disabled_endpoints::prefix_endpoint_disablements::PrefixEndpointDisablements;
-use actix_helpers::middleware::endpoint_disablement::endpoint_disablement_middleware::EndpointDisablementFilter;
-use billing_component::stripe::traits::internal_session_cache_purge::InternalSessionCachePurge;
-use redis_caching::redis_ttl_cache::RedisTtlCache;
 use twitch_common::twitch_secrets::TwitchSecrets;
 use url_config::third_party_url_redirector::ThirdPartyUrlRedirector;
 use users_component::utils::session_checker::SessionChecker;
 use users_component::utils::session_cookie_manager::SessionCookieManager;
-use crate::billing::internal_session_cache_purge_impl::InternalSessionCachePurgeImpl;
 
 const DEFAULT_BIND_ADDRESS : &'static str = "0.0.0.0:12345";
 

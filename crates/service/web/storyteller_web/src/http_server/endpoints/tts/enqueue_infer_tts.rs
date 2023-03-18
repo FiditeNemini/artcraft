@@ -10,9 +10,9 @@ use crate::configs::plans::get_correct_plan_for_session::get_correct_plan_for_se
 use crate::http_server::endpoints::investor_demo::demo_cookie::request_has_demo_cookie;
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::server_state::ServerState;
-use database_queries::queries::tts::tts_inference_jobs::insert_tts_inference_job::TtsInferenceJobInsertBuilder;
-use database_queries::queries::tts::tts_models::get_tts_model::{get_tts_model_by_token_using_connection, TtsModelRecord};
-use database_queries::tokens::Tokens;
+use mysql_queries::queries::tts::tts_inference_jobs::insert_tts_inference_job::TtsInferenceJobInsertBuilder;
+use mysql_queries::queries::tts::tts_models::get_tts_model::{get_tts_model_by_token_using_connection, TtsModelRecord};
+use mysql_queries::tokens::Tokens;
 use enums::common::visibility::Visibility;
 use http_server_common::request::get_request_api_token::get_request_api_token;
 use http_server_common::request::get_request_header_optional::get_request_header_optional;

@@ -9,7 +9,7 @@ use actix_web::{Responder, web, HttpResponse, error, HttpRequest};
 use chrono::{DateTime, Utc};
 use crate::http_server::web_utils::serialize_as_json_error::serialize_as_json_error;
 use crate::server_state::ServerState;
-use database_queries::queries::w2l::w2l_templates::list_pending_w2l_templates::list_pending_w2l_templates;
+use mysql_queries::queries::w2l::w2l_templates::list_pending_w2l_templates::list_pending_w2l_templates;
 use log::{info, warn, log};
 use sqlx::error::DatabaseError;
 use sqlx::error::Error::Database;

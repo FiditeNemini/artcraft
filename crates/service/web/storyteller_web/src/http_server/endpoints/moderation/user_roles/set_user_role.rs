@@ -10,8 +10,8 @@ use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::http_server::web_utils::response_success_helpers::simple_json_success;
 use crate::server_state::ServerState;
 use crate::validations::model_uploads::validate_model_title;
-use database_queries::queries::users::user_profiles::get_user_profile_by_username::get_user_profile_by_username;
-use database_queries::queries::users::user_roles::list_user_roles::list_user_roles;
+use mysql_queries::queries::users::user_profiles::get_user_profile_by_username::get_user_profile_by_username;
+use mysql_queries::queries::users::user_roles::list_user_roles::list_user_roles;
 use log::{info, warn, log};
 use regex::Regex;
 use sqlx::error::DatabaseError;
@@ -19,7 +19,7 @@ use sqlx::error::Error::Database;
 use sqlx::mysql::MySqlDatabaseError;
 use std::fmt;
 use std::sync::Arc;
-use database_queries::queries::users::user_roles::set_user_role::set_user_role;
+use mysql_queries::queries::users::user_roles::set_user_role::set_user_role;
 
 /// For the URL PathInfo
 #[derive(Deserialize)]

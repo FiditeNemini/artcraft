@@ -8,7 +8,7 @@ use actix_web::http::StatusCode;
 use actix_web::{web, HttpResponse, HttpRequest};
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::server_state::ServerState;
-use database_queries::queries::w2l::w2l_inference_jobs::insert_w2l_inference_job::{insert_w2l_inference_job, InsertW2lInferenceJobArgs};
+use mysql_queries::queries::w2l::w2l_inference_jobs::insert_w2l_inference_job::{insert_w2l_inference_job, InsertW2lInferenceJobArgs};
 use enums::common::visibility::Visibility;
 use http_server_common::request::get_request_ip::get_request_ip;
 use log::{info, warn};

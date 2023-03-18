@@ -11,10 +11,10 @@ use container_common::i18n::supported_languages_for_models::get_canonicalized_la
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::http_server::web_utils::response_success_helpers::simple_json_success;
 use crate::server_state::ServerState;
-use database_queries::column_types::vocoder_type::VocoderType;
-use database_queries::queries::tts::tts_models::edit_tts_model_details::{edit_tts_model_details_as_author, edit_tts_model_details_as_mod};
-use database_queries::queries::tts::tts_models::edit_tts_model_moderator_details::edit_tts_model_moderator_details;
-use database_queries::queries::tts::tts_models::get_tts_model::get_tts_model_by_token;
+use mysql_queries::column_types::vocoder_type::VocoderType;
+use mysql_queries::queries::tts::tts_models::edit_tts_model_details::{edit_tts_model_details_as_author, edit_tts_model_details_as_mod};
+use mysql_queries::queries::tts::tts_models::edit_tts_model_moderator_details::edit_tts_model_moderator_details;
+use mysql_queries::queries::tts::tts_models::get_tts_model::get_tts_model_by_token;
 use enums::common::visibility::Visibility;
 use http_server_common::request::get_request_ip::get_request_ip;
 use language_tags::LanguageTag;

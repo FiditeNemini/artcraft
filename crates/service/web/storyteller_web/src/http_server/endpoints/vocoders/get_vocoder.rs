@@ -10,7 +10,7 @@ use actix_web::{web, HttpResponse, HttpRequest};
 use chrono::{DateTime, Utc};
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::server_state::ServerState;
-use database_queries::queries::vocoder::get_vocoder_model::get_vocoder_model_by_token;
+use mysql_queries::queries::vocoder::get_vocoder_model::get_vocoder_model_by_token;
 use enums::common::visibility::Visibility;
 use enums::common::vocoder_type::VocoderType;
 use log::warn;

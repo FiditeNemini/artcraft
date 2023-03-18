@@ -7,7 +7,7 @@ use actix_web::error::ResponseError;
 use actix_web::http::StatusCode;
 use actix_web::{web, HttpResponse, HttpRequest};
 use crate::utils::session_cookie_manager::SessionCookieManager;
-use database_queries::queries::users::user_sessions::delete_user_session::delete_user_session;
+use mysql_queries::queries::users::user_sessions::delete_user_session::delete_user_session;
 use http_server_common::response::response_error_helpers::to_simple_json_error;
 use log::warn;
 use sqlx::MySqlPool;

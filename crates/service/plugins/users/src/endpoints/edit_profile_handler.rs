@@ -14,10 +14,10 @@ use crate::validations::validate_profile_github_username::validate_profile_githu
 use crate::validations::validate_profile_twitch_username::validate_profile_twitch_username;
 use crate::validations::validate_profile_twitter_username::{normalize_twitter_username_for_storage, validate_profile_twitter_username};
 use crate::validations::validate_profile_website_url::validate_profile_website_url;
-use database_queries::queries::users::user_profiles::edit_user_profile_as_account_holder::edit_user_profile_as_account_holder;
-use database_queries::queries::users::user_profiles::edit_user_profile_as_mod::edit_user_profile_as_mod;
-use database_queries::queries::users::user_profiles::get_user_profile_by_username::get_user_profile_by_username;
-use database_queries::queries::users::user_profiles::{edit_user_profile_as_account_holder, edit_user_profile_as_mod};
+use mysql_queries::queries::users::user_profiles::edit_user_profile_as_account_holder::edit_user_profile_as_account_holder;
+use mysql_queries::queries::users::user_profiles::edit_user_profile_as_mod::edit_user_profile_as_mod;
+use mysql_queries::queries::users::user_profiles::get_user_profile_by_username::get_user_profile_by_username;
+use mysql_queries::queries::users::user_profiles::{edit_user_profile_as_account_holder, edit_user_profile_as_mod};
 use enums::common::visibility::Visibility;
 use http_server_common::request::get_request_ip::get_request_ip;
 use http_server_common::response::serialize_as_json_error::serialize_as_json_error;

@@ -21,8 +21,8 @@ use r2d2_redis::redis::Commands;
 use redis_common::redis_keys::RedisKeys;
 use std::fmt;
 use std::sync::Arc;
-use database_queries::queries::w2l::w2l_inference_jobs::insert_w2l_inference_job_extended::{insert_w2l_inference_job_extended, InsertW2lInferenceJobExtendedArgs};
-use database_queries::queries::w2l::w2l_templates::check_w2l_template_exists::check_w2l_template_exists;
+use mysql_queries::queries::w2l::w2l_inference_jobs::insert_w2l_inference_job_extended::{insert_w2l_inference_job_extended, InsertW2lInferenceJobExtendedArgs};
+use mysql_queries::queries::w2l::w2l_templates::check_w2l_template_exists::check_w2l_template_exists;
 
 const BUCKET_AUDIO_FILE_NAME : &'static str = "input_audio_file";
 const BUCKET_IMAGE_FILE_NAME: &'static str = "input_image_file";

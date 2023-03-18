@@ -1,4 +1,4 @@
-use database_queries::queries::generic_inference::job::list_available_generic_inference_jobs::{list_available_generic_inference_jobs, ListAvailableGenericInferenceJobArgs};
+use mysql_queries::queries::generic_inference::job::list_available_generic_inference_jobs::{list_available_generic_inference_jobs, ListAvailableGenericInferenceJobArgs};
 use enums::workers::generic_inference_type::GenericInferenceType;
 use sqlx::MySqlPool;
 use std::collections::BTreeSet;

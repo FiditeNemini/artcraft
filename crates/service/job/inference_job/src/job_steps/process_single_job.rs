@@ -1,7 +1,7 @@
 use crate::job_steps::job_dependencies::JobDependencies;
-use database_queries::queries::generic_inference::job::list_available_generic_inference_jobs::AvailableInferenceJob;
-use database_queries::queries::generic_inference::job::mark_generic_inference_job_pending_and_grab_lock::mark_generic_inference_job_pending_and_grab_lock;
-use database_queries::queries::generic_inference::job::mark_generic_inference_job_successfully_done::mark_generic_inference_job_successfully_done;
+use mysql_queries::queries::generic_inference::job::list_available_generic_inference_jobs::AvailableInferenceJob;
+use mysql_queries::queries::generic_inference::job::mark_generic_inference_job_pending_and_grab_lock::mark_generic_inference_job_pending_and_grab_lock;
+use mysql_queries::queries::generic_inference::job::mark_generic_inference_job_successfully_done::mark_generic_inference_job_successfully_done;
 use enums::workers::generic_inference_type::GenericInferenceType;
 use errors::AnyhowResult;
 use log::{info, warn};

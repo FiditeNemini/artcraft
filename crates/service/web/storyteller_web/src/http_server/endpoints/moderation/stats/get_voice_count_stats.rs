@@ -10,7 +10,7 @@ use chrono::{DateTime, Utc};
 use crate::http_server::web_utils::response_success_helpers::simple_json_success;
 use crate::http_server::web_utils::serialize_as_json_error::serialize_as_json_error;
 use crate::server_state::ServerState;
-use database_queries::queries::stats::get_voice_count_stats::get_voice_count_stats;
+use mysql_queries::queries::stats::get_voice_count_stats::get_voice_count_stats;
 use log::{info, warn, log};
 use regex::Regex;
 use sqlx::error::DatabaseError;

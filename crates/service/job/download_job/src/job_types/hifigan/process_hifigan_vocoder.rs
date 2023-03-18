@@ -5,8 +5,8 @@ use container_common::filesystem::safe_delete_temp_directory::safe_delete_temp_d
 use container_common::filesystem::safe_delete_temp_file::safe_delete_temp_file;
 use crate::JobState;
 use crate::job_steps::job_results::JobResults;
-use database_queries::queries::generic_download::job::list_available_generic_download_jobs::AvailableDownloadJob;
-use database_queries::queries::vocoder::insert_vocoder_model::{Args, insert_vocoder_model};
+use mysql_queries::queries::generic_download::job::list_available_generic_download_jobs::AvailableDownloadJob;
+use mysql_queries::queries::vocoder::insert_vocoder_model::{Args, insert_vocoder_model};
 use enums::common::vocoder_type::VocoderType;
 use hashing::sha256::sha256_hash_file::sha256_hash_file;
 use jobs_common::redis_job_status_logger::RedisJobStatusLogger;

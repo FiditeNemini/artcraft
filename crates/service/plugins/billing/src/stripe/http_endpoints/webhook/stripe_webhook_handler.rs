@@ -22,8 +22,8 @@ use crate::stripe::http_endpoints::webhook::webhook_event_handlers::stripe_webho
 use crate::stripe::http_endpoints::webhook::webhook_event_handlers::stripe_webhook_summary::StripeWebhookSummary;
 use crate::stripe::stripe_config::StripeConfig;
 use crate::stripe::traits::internal_subscription_product_lookup::InternalSubscriptionProductLookup;
-use database_queries::queries::billing::stripe::get_stripe_webhook_event_log_by_id::get_stripe_webhook_event_log_by_id;
-use database_queries::queries::billing::stripe::insert_stripe_webhook_event_log::InsertStripeWebhookEventLog;
+use mysql_queries::queries::billing::stripe::get_stripe_webhook_event_log_by_id::get_stripe_webhook_event_log_by_id;
+use mysql_queries::queries::billing::stripe::insert_stripe_webhook_event_log::InsertStripeWebhookEventLog;
 use http_server_common::request::get_request_header_optional::get_request_header_optional;
 use http_server_common::response::serialize_as_json_error::serialize_as_json_error;
 use http_server_common::util::timer::MultiBenchmarkingTimer;

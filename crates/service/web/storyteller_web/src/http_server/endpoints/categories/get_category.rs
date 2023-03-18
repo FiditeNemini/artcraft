@@ -10,7 +10,7 @@ use chrono::{DateTime, Utc};
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::http_server::web_utils::response_success_helpers::simple_json_success;
 use crate::server_state::ServerState;
-use database_queries::queries::model_categories::get_category_by_token::get_category_by_token;
+use mysql_queries::queries::model_categories::get_category_by_token::get_category_by_token;
 use http_server_common::response::serialize_as_json_error::serialize_as_json_error;
 use log::{info, warn, log};
 use regex::Regex;

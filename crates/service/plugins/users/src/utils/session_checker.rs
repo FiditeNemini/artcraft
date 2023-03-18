@@ -6,9 +6,9 @@
 use actix_web::HttpRequest;
 use crate::utils::session_cookie_manager::SessionCookieManager;
 use crate::utils::user_session_extended::{UserSessionExtended, UserSessionPreferences, UserSessionPremiumPlanInfo, UserSessionRoleAndPermissions, UserSessionSubscriptionPlan, UserSessionUserDetails};
-use database_queries::queries::users::user_sessions::get_user_session_by_token::{get_user_session_by_token, get_user_session_by_token_pooled_connection, SessionUserRecord};
-use database_queries::queries::users::user_sessions::get_user_session_by_token_light::{get_user_session_by_token_light, SessionRecord};
-use database_queries::queries::users::user_subscriptions::list_active_user_subscriptions::list_active_user_subscriptions;
+use mysql_queries::queries::users::user_sessions::get_user_session_by_token::{get_user_session_by_token, get_user_session_by_token_pooled_connection, SessionUserRecord};
+use mysql_queries::queries::users::user_sessions::get_user_session_by_token_light::{get_user_session_by_token_light, SessionRecord};
+use mysql_queries::queries::users::user_subscriptions::list_active_user_subscriptions::list_active_user_subscriptions;
 use errors::AnyhowResult;
 use log::warn;
 use redis_caching::redis_ttl_cache::{RedisTtlCache, RedisTtlCacheConnection};

@@ -11,7 +11,7 @@ use crate::endpoints_ws::obs_gateway_websocket_handler::ResponseType::TtsEvent;
 use crate::endpoints_ws::threads::redis_pubsub_event_listener_thread::RedisPubsubEventListenerThread;
 use crate::endpoints_ws::threads::tts_inference_job_token_queue::TtsInferenceJobTokenQueue;
 use crate::server_state::ObsGatewayServerState;
-use database_queries::queries::twitch::twitch_oauth::find::{TwitchOauthTokenFinder, TwitchOauthTokenRecord};
+use mysql_queries::queries::twitch::twitch_oauth::find::{TwitchOauthTokenFinder, TwitchOauthTokenRecord};
 use futures_timer::Delay;
 use futures_util::FutureExt;
 use http_server_common::error::common_server_error::CommonServerError;

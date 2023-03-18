@@ -10,7 +10,7 @@ use chrono::{DateTime, Utc};
 use crate::AnyhowResult;
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::server_state::ServerState;
-use database_queries::queries::tts::tts_model_upload_jobs::get_tts_model_upload_job_status::get_tts_model_upload_job_status;
+use mysql_queries::queries::tts::tts_model_upload_jobs::get_tts_model_upload_job_status::get_tts_model_upload_job_status;
 use derive_more::{Display, Error};
 use log::{info, warn, log, error};
 use r2d2_redis::redis::Commands;

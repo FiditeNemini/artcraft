@@ -20,7 +20,7 @@ use sqlx::error::DatabaseError;
 use sqlx::error::Error::Database;
 use sqlx::mysql::MySqlDatabaseError;
 use std::sync::Arc;
-use database_queries::queries::w2l::w2l_template_upload_jobs::get_w2l_template_upload_job_status::get_w2l_template_upload_job_status;
+use mysql_queries::queries::w2l::w2l_template_upload_jobs::get_w2l_template_upload_job_status::get_w2l_template_upload_job_status;
 
 /// For the URL PathInfo
 #[derive(Deserialize)]

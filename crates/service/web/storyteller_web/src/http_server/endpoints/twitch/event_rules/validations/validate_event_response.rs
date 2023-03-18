@@ -1,4 +1,4 @@
-use database_queries::complex_models::event_responses::EventResponse;
+use mysql_queries::complex_models::event_responses::EventResponse;
 
 // TODO: Check that the tokens are valid models.
 

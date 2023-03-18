@@ -9,10 +9,10 @@ use crate::http_server::endpoints::categories::tts::list_fully_computed_assigned
 use crate::http_server::endpoints::categories::tts::list_fully_computed_assigned_tts_categories::list_fully_computed_assigned_tts_categories::ModelTokensByCategoryToken;
 use crate::http_server::endpoints::categories::tts::list_fully_computed_assigned_tts_categories::recursively_build_category_map::recursive_category_to_model_map;
 use crate::model::cached_queries::list_cached_tts_categories_for_public_dropdown::list_cached_tts_categories_for_public_dropdown;
-use database_queries::queries::model_categories::list_categories_query_builder::CategoryList;
-use database_queries::queries::trending_model_analytics::list_trending_tts_models::list_trending_tts_models;
-use database_queries::queries::tts::tts_category_assignments::fetch_and_build_tts_model_category_map::fetch_and_build_tts_model_category_map_with_connection;
-use database_queries::queries::tts::tts_models::list_tts_models::list_tts_models_with_connection;
+use mysql_queries::queries::model_categories::list_categories_query_builder::CategoryList;
+use mysql_queries::queries::trending_model_analytics::list_trending_tts_models::list_trending_tts_models;
+use mysql_queries::queries::tts::tts_category_assignments::fetch_and_build_tts_model_category_map::fetch_and_build_tts_model_category_map_with_connection;
+use mysql_queries::queries::tts::tts_models::list_tts_models::list_tts_models_with_connection;
 use errors::AnyhowResult;
 use lexical_sort::natural_lexical_cmp;
 use log::error;

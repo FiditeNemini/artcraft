@@ -10,8 +10,8 @@ use chrono::{DateTime, Utc};
 use errors::AnyhowResult;
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::server_state::ServerState;
-use database_queries::queries::tts::tts_category_assignments::fetch_and_build_tts_model_category_map::fetch_and_build_tts_model_category_map_with_connection;
-use database_queries::queries::tts::tts_models::list_tts_models::list_tts_models_with_connection;
+use mysql_queries::queries::tts::tts_category_assignments::fetch_and_build_tts_model_category_map::fetch_and_build_tts_model_category_map_with_connection;
+use mysql_queries::queries::tts::tts_models::list_tts_models::list_tts_models_with_connection;
 use lexical_sort::natural_lexical_cmp;
 use log::{info, warn, error};
 use sqlx::MySql;
@@ -19,7 +19,7 @@ use sqlx::pool::PoolConnection;
 use std::collections::HashSet;
 use std::fmt;
 use std::sync::Arc;
-use database_queries::queries::users::user_sessions::get_user_session_by_token::SessionUserRecord;
+use mysql_queries::queries::users::user_sessions::get_user_session_by_token::SessionUserRecord;
 use enums::common::visibility::Visibility;
 
 #[derive(Serialize, Clone)]

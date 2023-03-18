@@ -10,7 +10,7 @@ use chrono::{DateTime, Utc, NaiveDateTime};
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::http_server::web_utils::response_success_helpers::simple_json_success;
 use crate::server_state::ServerState;
-use database_queries::complex_models::event_responses::EventResponse;
+use mysql_queries::complex_models::event_responses::EventResponse;
 use http_server_common::response::serialize_as_json_error::serialize_as_json_error;
 use lexical_sort::natural_lexical_cmp;
 use log::{info, warn, log, error};

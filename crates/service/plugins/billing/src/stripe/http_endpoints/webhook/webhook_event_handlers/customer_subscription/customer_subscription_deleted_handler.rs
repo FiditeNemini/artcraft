@@ -4,8 +4,8 @@ use crate::stripe::http_endpoints::webhook::webhook_event_handlers::customer_sub
 use crate::stripe::http_endpoints::webhook::webhook_event_handlers::stripe_webhook_error::StripeWebhookError;
 use crate::stripe::http_endpoints::webhook::webhook_event_handlers::stripe_webhook_summary::StripeWebhookSummary;
 use crate::stripe::traits::internal_subscription_product_lookup::InternalSubscriptionProductLookup;
-use database_queries::queries::users::user_subscriptions::get_user_subscription_by_stripe_subscription_id::get_user_subscription_by_stripe_subscription_id;
-use database_queries::queries::users::user_subscriptions::upsert_user_subscription_by_stripe_id::UpsertUserSubscription;
+use mysql_queries::queries::users::user_subscriptions::get_user_subscription_by_stripe_subscription_id::get_user_subscription_by_stripe_subscription_id;
+use mysql_queries::queries::users::user_subscriptions::upsert_user_subscription_by_stripe_id::UpsertUserSubscription;
 use log::{error, warn};
 use reusable_types::stripe::stripe_subscription_status::StripeSubscriptionStatus;
 use sqlx::MySqlPool;

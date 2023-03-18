@@ -10,7 +10,7 @@ use crate::configs::plans::get_correct_plan_for_session::get_correct_plan_for_se
 use crate::http_server::endpoints::investor_demo::demo_cookie::request_has_demo_cookie;
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::server_state::ServerState;
-use database_queries::queries::generic_inference::web::insert_generic_inference_job::{Args, insert_generic_inference_job};
+use mysql_queries::queries::generic_inference::web::insert_generic_inference_job::{Args, insert_generic_inference_job};
 use enums::common::visibility::Visibility;
 use enums::workers::generic_inference_type::GenericInferenceType;
 use http_server_common::request::get_request_header_optional::get_request_header_optional;
@@ -20,7 +20,7 @@ use r2d2_redis::redis::Commands;
 use redis_common::redis_keys::RedisKeys;
 use std::fmt;
 use std::sync::Arc;
-use database_queries::payloads::generic_inference_args::{GenericInferenceArgs, PolymorphicInferenceArgs};
+use mysql_queries::payloads::generic_inference_args::{GenericInferenceArgs, PolymorphicInferenceArgs};
 use tokens::files::media_upload::MediaUploadToken;
 use tokens::jobs::inference::InferenceJobToken;
 use tokens::users::user::UserToken;

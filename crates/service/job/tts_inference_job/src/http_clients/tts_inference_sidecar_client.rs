@@ -1,6 +1,6 @@
 use anyhow::anyhow;
 use container_common::anyhow_result::AnyhowResult;
-use database_queries::column_types::vocoder_type::VocoderType;
+use mysql_queries::column_types::vocoder_type::VocoderType;
 use hyper::client::Client;
 use hyper::{Body, Request};
 use log::info;

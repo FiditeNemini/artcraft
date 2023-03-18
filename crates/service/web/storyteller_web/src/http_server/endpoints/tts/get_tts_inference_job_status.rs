@@ -24,7 +24,7 @@ use std::borrow::BorrowMut;
 use std::fmt;
 use std::ops::Deref;
 use std::sync::Arc;
-use database_queries::queries::tts::tts_inference_jobs::get_tts_inference_job_status::get_tts_inference_job_status;
+use mysql_queries::queries::tts::tts_inference_jobs::get_tts_inference_job_status::get_tts_inference_job_status;
 
 /// For the URL PathInfo
 #[derive(Deserialize)]

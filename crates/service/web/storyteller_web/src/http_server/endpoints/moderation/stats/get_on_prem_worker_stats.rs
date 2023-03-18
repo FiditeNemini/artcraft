@@ -2,7 +2,7 @@ use actix_web::web::Query;
 use actix_web::{HttpRequest, HttpResponse, ResponseError, web};
 use crate::ServerState;
 use crate::http_server::web_utils::serialize_as_json_error::serialize_as_json_error;
-use database_queries::queries::stats::get_on_prem_worker_stats::get_on_prem_worker_stats;
+use mysql_queries::queries::stats::get_on_prem_worker_stats::get_on_prem_worker_stats;
 use hyper::StatusCode;
 use log::warn;
 use std::sync::Arc;

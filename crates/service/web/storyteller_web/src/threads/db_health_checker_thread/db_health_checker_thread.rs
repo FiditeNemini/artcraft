@@ -1,6 +1,6 @@
 use anyhow::Error;
 use crate::threads::db_health_checker_thread::db_health_check_status::HealthCheckStatus;
-use database_queries::queries::health_check::health_check_query::{health_check_db, HealthCheckResult};
+use mysql_queries::queries::health_check::health_check_query::{health_check_db, HealthCheckResult};
 use log::debug;
 use log::error;
 use log::info;

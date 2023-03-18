@@ -11,7 +11,7 @@ use log::{warn, info};
 use sqlx::MySqlPool;
 use std::path::Path;
 
-// TODO(2022-08-04): These were moved into the 'database_queries' crate, but they need
+// TODO(2022-08-04): These were moved into the 'mysql_queries' crate, but they need
 //  to be split up into several modules for better maintainability. cf the already moved
 //  `tts_inference_job` queries.
 

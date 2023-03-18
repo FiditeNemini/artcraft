@@ -1,5 +1,5 @@
 use anyhow::anyhow;
-use database_queries::queries::model_categories::list_categories_query_builder::{CategoryList, ListCategoriesQueryBuilder};
+use mysql_queries::queries::model_categories::list_categories_query_builder::{CategoryList, ListCategoriesQueryBuilder};
 use errors::AnyhowResult;
 use lexical_sort::natural_lexical_cmp;
 use log::{error};

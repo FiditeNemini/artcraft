@@ -1,5 +1,5 @@
 [package]
-name = "database_queries"
+name = "mysql_queries"
 edition = "2018"
 version = "0.0.1"
 authors = [
@@ -9,7 +9,7 @@ authors = [
 publish = false
 
 [lib]
-name = "database_queries"
+name = "mysql_queries"
 path = "src/lib.rs"
 
 [dependencies]

@@ -7,8 +7,8 @@ use crate::http_clients::tts_sidecar_health_check_client::TtsSidecarHealthCheckC
 use crate::job_steps::job_stats::JobStats;
 use crate::script_execution::tacotron_inference_command::TacotronInferenceCommand;
 use crate::util::scoped_temp_dir_creator::ScopedTempDirCreator;
-use database_queries::mediators::firehose_publisher::FirehosePublisher;
-use database_queries::queries::tts::tts_models::get_tts_model_for_inference::TtsModelForInferenceRecord;
+use mysql_queries::mediators::firehose_publisher::FirehosePublisher;
+use mysql_queries::queries::tts::tts_models::get_tts_model_for_inference::TtsModelForInferenceRecord;
 use jobs_common::job_progress_reporter::job_progress_reporter::JobProgressReporterBuilder;
 use jobs_common::semi_persistent_cache_dir::SemiPersistentCacheDir;
 use memory_caching::multi_item_ttl_cache::MultiItemTtlCache;

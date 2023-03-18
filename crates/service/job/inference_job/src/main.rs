@@ -40,7 +40,7 @@ use crate::job_steps::job_dependencies::{JobDependencies, JobCaches, JobHttpClie
 use crate::job_steps::job_stats::JobStats;
 use crate::script_execution::tacotron_inference_command::TacotronInferenceCommand;
 use crate::util::scoped_temp_dir_creator::ScopedTempDirCreator;
-use database_queries::mediators::firehose_publisher::FirehosePublisher;
+use mysql_queries::mediators::firehose_publisher::FirehosePublisher;
 use jobs_common::job_progress_reporter::job_progress_reporter::JobProgressReporterBuilder;
 use jobs_common::job_progress_reporter::noop_job_progress_reporter::NoOpJobProgressReporterBuilder;
 use jobs_common::job_progress_reporter::redis_job_progress_reporter::RedisJobProgressReporterBuilder;

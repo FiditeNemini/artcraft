@@ -1,6 +1,6 @@
 use crate::job_steps::job_dependencies::JobDependencies;
-use database_queries::queries::generic_inference::job::list_available_generic_inference_jobs::{AvailableInferenceJob, list_available_generic_inference_jobs, ListAvailableGenericInferenceJobArgs};
-use database_queries::queries::generic_inference::job::mark_generic_inference_job_failure::mark_generic_inference_job_failure;
+use mysql_queries::queries::generic_inference::job::list_available_generic_inference_jobs::{AvailableInferenceJob, list_available_generic_inference_jobs, ListAvailableGenericInferenceJobArgs};
+use mysql_queries::queries::generic_inference::job::mark_generic_inference_job_failure::mark_generic_inference_job_failure;
 use errors::AnyhowResult;
 use jobs_common::noop_logger::NoOpLogger;
 use log::{error, info, warn};

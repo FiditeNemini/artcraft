@@ -9,7 +9,7 @@ use actix_web::{web, HttpResponse, HttpRequest};
 use chrono::{DateTime, Utc};
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::server_state::ServerState;
-use database_queries::queries::vocoder::list_vocoder_models::{list_vocoder_models, VocoderModelListItem};
+use mysql_queries::queries::vocoder::list_vocoder_models::{list_vocoder_models, VocoderModelListItem};
 use enums::common::vocoder_type::VocoderType;
 use log::warn;
 use std::fmt;

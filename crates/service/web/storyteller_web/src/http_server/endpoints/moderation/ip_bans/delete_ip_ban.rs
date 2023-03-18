@@ -10,7 +10,7 @@ use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::http_server::web_utils::response_success_helpers::simple_json_success;
 use crate::server_state::ServerState;
 use crate::validations::model_uploads::validate_model_title;
-use database_queries::queries::ip_bans::toggle_ip_ban::{IpBanToggleState, toggle_ip_ban};
+use mysql_queries::queries::ip_bans::toggle_ip_ban::{IpBanToggleState, toggle_ip_ban};
 use derive_more::{Display, Error};
 use log::{info, warn, log};
 use regex::Regex;
