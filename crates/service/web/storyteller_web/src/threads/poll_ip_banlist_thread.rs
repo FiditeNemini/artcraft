@@ -39,7 +39,7 @@ pub async fn poll_ip_bans(
 
     match ip_ban_list.add_set(DYNAMIC_BAN_LIST_NAME.to_string(), ip_set)  {
       Ok(_) => {
-        let total_count = ip_ban_list.total_len().unwrap_or(0);
+        let total_count = ip_ban_list.total_ip_address_count().unwrap_or(0);
         info!("Internal IP ban list updated! Total bans: {} ({} from database)",
           total_count, database_count);
       },

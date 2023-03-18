@@ -475,7 +475,7 @@ fn load_static_container_ip_bans() -> IpBanList {
   let ip_ban_list = load_ip_ban_list_from_directory(ip_ban_directory)
       .unwrap_or(IpBanList::new());
 
-  info!("Static IP bans loaded: {}", ip_ban_list.total_len().unwrap_or(0));
+  info!("Static IP bans loaded: {}", ip_ban_list.total_ip_address_count().unwrap_or(0));
   ip_ban_list
 }
 

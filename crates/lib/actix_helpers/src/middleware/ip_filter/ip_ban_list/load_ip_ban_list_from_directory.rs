@@ -11,6 +11,9 @@ pub fn load_ip_ban_list_from_directory<P: AsRef<Path>>(path: P) -> AnyhowResult<
     let path = entry?.path();
     let path_name = path.to_string_lossy().to_string();
     let ip_set = load_ip_set_from_file(path)?;
+    if ip_set.is_empty() {
+      continue;
+    }
     ip_ban_list.add_set(path_name, ip_set)?;
   }
 
@@ -40,5 +43,17 @@ mod tests {
     // IP addresses in both files are
     assert_eq!(ip_set.contains_ip_address("127.0.0.1").unwrap(), true);
     assert_eq!(ip_set.contains_ip_address("192.168.0.1").unwrap(), true);
+
+    // All five IPs were loaded
+    assert_eq!(ip_set.total_ip_address_count().unwrap(), 5);
+  }
+
+  #[test]
+  fn empty_files_are_not_loaded() {
+    let directory = test_file("test_data/text_files/ip_ban_example/");
+    let ip_set = load_ip_ban_list_from_directory(directory).unwrap();
+
+    // NB: There are two files with IP addresses and a single empty file, which should not be loaded
+    assert_eq!(ip_set.set_count().unwrap(), 2);
   }
 }

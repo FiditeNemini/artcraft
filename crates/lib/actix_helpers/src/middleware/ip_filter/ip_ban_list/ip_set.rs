@@ -38,4 +38,8 @@ impl IpSet {
   pub fn len(&self) -> usize {
     self.ip_set.len()
   }
+
+  pub fn is_empty(&self) -> bool {
+    self.ip_set.is_empty()
+  }
 }
