@@ -7,20 +7,21 @@ import { v4 as uuidv4 } from "uuid";
 import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
 
 interface Props {
-  entity_type: string;
-  entity_token: string;
+  entityType: string;
+  entityToken: string;
+  loadComments: () => void;
   sessionWrapper: SessionWrapper;
 }
 
 /**
- * This is a reusable component that can be put on several different pages.
+ * This is part of a reusable component for putting comments on several 
+ * different page types.
  *
- * It requires the entity type ("tts_model", "tts_result", "w2l_template", "w2l_result", etc.)
- * and the entity token, and it will be able to fetch a user's previous vote and change it.
- *
- * This button component manages all of its own state and API calls.
+ * See the documentation on the parent <CommentComponent />
  */
-function CreateCommentComponent(props: Props) {
+function CreateCommentForm(props: Props) {
+  const {entityType, entityToken, loadComments} = props;
+
   const [commentMarkdown, setCommentMarkdown] = useState<string>("");
   const [uuidIdempotencyToken, setUuidIdempotencyToken] = useState<string>(
     uuidv4()
@@ -29,19 +30,20 @@ function CreateCommentComponent(props: Props) {
 
   const postComment = useCallback(async () => {
     const request = {
+      // Idempotency token prevents the user from clicking submit twice.
       uuid_idempotency_token: uuidIdempotencyToken,
-      entity_type: props.entity_type,
-      entity_token: props.entity_token,
+      entity_type: entityType,
+      entity_token: entityToken,
       comment_markdown: commentMarkdown,
     };
     const rating = await CreateComment(request);
     if (CreateCommentIsOk(rating)) {
-      //let ratingValue = rating.maybe_rating_value || undefined;
-      //setUserRatingValue(ratingValue);
+      loadComments(); // Trigger reload.
     }
   }, [
-    props.entity_type,
-    props.entity_token,
+    entityType,
+    entityToken,
+    loadComments,
     uuidIdempotencyToken,
     commentMarkdown,
   ]);
@@ -117,4 +119,4 @@ function CreateCommentComponent(props: Props) {
   return <div>{createCommentComponent}</div>;
 }
 
-export { CreateCommentComponent };
+export { CreateCommentForm };

@@ -39,8 +39,7 @@ import "tippy.js/dist/tippy.css";
 import { motion } from "framer-motion";
 import { usePrefixedDocumentTitle } from "../../../../../common/UsePrefixedDocumentTitle";
 import { faCalendarAlt } from "@fortawesome/pro-solid-svg-icons";
-import { CreateCommentComponent } from "../../../_common/comments/CreateCommentComponent";
-import { CommentList } from "../../../_common/comments/CommentList";
+import { CommentComponent } from "../../../_common/comments/CommentComponent";
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -537,14 +536,10 @@ function ProfilePage(this: any, props: Props) {
               aria-labelledby="comments-tab"
             >
               <div className="d-flex flex-column gap-3">
-                <CreateCommentComponent
-                  entity_type="user"
-                  entity_token={userData?.user_token}
+                <CommentComponent
+                  entityType="user"
+                  entityToken={userData?.user_token}
                   sessionWrapper={props.sessionWrapper}
-                />
-                <CommentList
-                  entity_type="user"
-                  entity_token={userData?.user_token}
                 />
               </div>
             </div>

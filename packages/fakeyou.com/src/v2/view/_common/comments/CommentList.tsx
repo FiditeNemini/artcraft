@@ -1,38 +1,27 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React from "react";
 import { formatDistance } from "date-fns";
 import {
   Comment,
-  ListComments,
-  ListCommentsIsError,
-  ListCommentsIsOk,
 } from "@storyteller/components/src/api/comments/ListComments";
 
 const Fade = require("react-reveal/Fade");
 
 interface Props {
-  entity_type: string;
-  entity_token: string;
+  entityType: string;
+  entityToken: string;
+  comments: Comment[];
 }
 
+/**
+ * This is part of a reusable component for putting comments on several 
+ * different page types.
+ *
+ * See the documentation on the parent <CommentComponent />
+ */
 function CommentList(props: Props) {
-  const [comments, setComments] = useState<Array<Comment>>([]);
-
-  const getComments = useCallback(async () => {
-    const response = await ListComments(props.entity_type, props.entity_token);
-
-    if (ListCommentsIsOk(response)) {
-      setComments(response.comments);
-    } else if (ListCommentsIsError(response)) {
-      // TODO
-    }
-  }, [props.entity_token, props.entity_type]);
-
-  useEffect(() => {
-    getComments();
-  }, [getComments]);
 
   // NB: It's more convenient to show recent data first {.reverse()}
-  var reversedComments = comments.slice();
+  var reversedComments = props.comments.slice();
 
   const now = new Date();
 
@@ -55,7 +44,12 @@ function CommentList(props: Props) {
               <span className="px-2">·</span>
               <span className="opacity-75">{relativeCreateTime}</span>
             </div>
-            {/* It's okay to set "dangerous" html here as the server safely created it. */}
+            {/* 
+              It's okay to set "dangerous" html here as the server safely created 
+              it from markdown and shields against user injection attempts. Don't
+              do this with other server data, though, unless you know that field 
+              is safe from the backend engineers. 
+            */}
             <div
               className="mt-1 text-center text-lg-start"
               dangerouslySetInnerHTML={{
