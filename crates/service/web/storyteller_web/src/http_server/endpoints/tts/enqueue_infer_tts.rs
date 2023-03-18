@@ -196,6 +196,7 @@ pub async fn infer_tts_handler(
       None => &server_state.redis_rate_limiters.logged_out,
       Some(ref user) => {
         if user.role.is_banned {
+          warn!("User is not authorized to use TTS model because they are banned.");
           return Err(InferTtsError::NotAuthorized);
         }
         &server_state.redis_rate_limiters.logged_in
@@ -227,6 +228,7 @@ pub async fn infer_tts_handler(
   ).await;
 
   if !is_authorized {
+    warn!("User is not authorized to use TTS model due to checks.");
     return Err(InferTtsError::NotAuthorized);
   }
 
@@ -381,6 +383,12 @@ async fn check_if_authorized_to_use_model(
       return true; // TODO/FIXME: Failing open is probably a bad choice.
     }
   };
+
+  match tts_model.creator_set_visibility {
+    Visibility::Public => return true,
+    Visibility::Hidden => return true,
+    Visibility::Private => {} // Fall through
+  }
 
   let is_authorized = maybe_user_session
       .map(|session| {
