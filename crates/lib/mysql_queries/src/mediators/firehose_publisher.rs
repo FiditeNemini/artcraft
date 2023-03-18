@@ -8,6 +8,7 @@ use sqlx::{MySqlPool};
 use std::sync::Arc;
 use tokens::files::media_upload::MediaUploadToken;
 use tokens::jobs::inference::InferenceJobToken;
+use tokens::tokens::comments::CommentToken;
 use tokens::users::user::UserToken;
 
 // TODO(bt, 2022-12-19): Convert this to a database 'enum'. Also, create an 'enums' package similar to 'tokens'.
@@ -36,6 +37,8 @@ enum FirehoseEvent {
 
   MediaUploaded,
 
+  CommentCreated,
+
   // TODO(bt, 2022-12-19): Are the following unused, merely planned (?)
   TwitterMention,
   TwitterRetweet,
@@ -63,6 +66,8 @@ impl FirehoseEvent {
       FirehoseEvent::GenericDownloadStarted => "generic_download_started",
       FirehoseEvent::GenericDownloadCompleted => "generic_download_completed",
       FirehoseEvent::MediaUploaded => "media_uploaded",
+
+      FirehoseEvent::CommentCreated => "comment_created",
 
       // Are the following unused (?)
       FirehoseEvent::TwitterMention => "twitter_mention",
@@ -240,6 +245,16 @@ impl FirehosePublisher {
       maybe_user_token.map(|u| u.as_str()),
       Some(upload_token.as_str()),
       Some(upload_token.as_str()),
+    ).await?;
+    Ok(())
+  }
+
+  pub async fn publish_comment_created(&self, user_token: &UserToken, comment_token: &CommentToken) -> AnyhowResult<()> {
+    let _record_id = self.insert(
+      FirehoseEvent::CommentCreated,
+      Some(user_token.as_str()),
+      None, // TODO: We need a composite key of (entity_type, entity_token).
+      Some(comment_token.as_str())
     ).await?;
     Ok(())
   }

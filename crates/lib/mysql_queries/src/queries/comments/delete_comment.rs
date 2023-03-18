@@ -1,4 +1,4 @@
-use sqlx::MySqlPool;
+use sqlx::{Executor, MySql, MySqlPool};
 use errors::AnyhowResult;
 use tokens::tokens::comments::CommentToken;
 
@@ -9,11 +9,14 @@ pub enum DeleteCommentAs {
   ObjectOwner,
 }
 
-pub async fn delete_comment(
-  comment_token: &CommentToken,
+pub async fn delete_comment<'e, 'c, E>(
+  comment_token: &'e CommentToken,
   delete_as: DeleteCommentAs,
-  mysql_pool: &MySqlPool
-) -> AnyhowResult<()> {
+  mysql_executor: E
+)
+  -> AnyhowResult<()>
+  where E: 'e + Executor<'c, Database = MySql>
+{
 
   match delete_as {
     DeleteCommentAs::Author => {
@@ -60,7 +63,7 @@ LIMIT 1
       )
     }
   }
-      .execute(mysql_pool)
+      .execute(mysql_executor)
       .await?;
 
   Ok(())

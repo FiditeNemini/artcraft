@@ -4,7 +4,8 @@ use crate::queries::comments::comment_entity_token::CommentEntityToken;
 use enums::by_table::comments::comment_entity_type::CommentEntityType;
 use enums::common::visibility::Visibility;
 use errors::AnyhowResult;
-use sqlx::MySqlPool;
+use sqlx::{Executor, MySql, MySqlPool};
+use std::marker::PhantomData;
 use std::path::Path;
 use tokens::tokens::comments::CommentToken;
 use tokens::tokens::tts_models::TtsModelToken;
@@ -12,25 +13,33 @@ use tokens::tokens::w2l_templates::W2lTemplateToken;
 use tokens::users::user::UserToken;
 use tokens::voice_conversion::model::VoiceConversionModelToken;
 
-pub struct Args<'a> {
-  pub entity_token: &'a CommentEntityToken,
+pub struct InsertCommentArgs<'e, 'c, E>
+  where E: 'e + Executor<'c, Database = MySql>
+{
+  pub entity_token: &'e CommentEntityToken,
 
-  pub uuid_idempotency_token: &'a str,
+  pub uuid_idempotency_token: &'e str,
 
-  pub user_token: Option<&'a UserToken>,
+  pub user_token: &'e UserToken,
 
-  pub comment_markdown: &'a str,
-  pub comment_rendered_html: &'a str,
+  pub comment_markdown: &'e str,
+  pub comment_rendered_html: &'e str,
 
-  pub creator_ip_address: &'a str,
+  pub creator_ip_address: &'e str,
 
-  pub mysql_pool: &'a MySqlPool,
+  pub mysql_executor: E,
+
+  // TODO: Not sure if this works to tell the compiler we need the lifetime annotation.
+  //  See: https://doc.rust-lang.org/std/marker/struct.PhantomData.html#unused-lifetime-parameters
+  pub phantom: PhantomData<&'c E>,
 }
 
-
-pub async fn insert_comment(
-  args: Args<'_>,
-) -> AnyhowResult<CommentToken> {
+pub async fn insert_comment<'e, 'c : 'e, E>(
+  args: InsertCommentArgs<'e, 'c, E>,
+)
+  -> AnyhowResult<CommentToken>
+  where E: 'e + Executor<'c, Database = MySql>
+{
 
   let comment_token = CommentToken::generate();
   let (entity_type, entity_token) = args.entity_token.get_composite_keys();
@@ -59,7 +68,7 @@ SET
       args.creator_ip_address,
       args.creator_ip_address,
     )
-      .execute(args.mysql_pool)
+      .execute(args.mysql_executor)
       .await;
 
   let _record_id = match query_result {

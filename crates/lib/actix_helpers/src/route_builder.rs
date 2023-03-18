@@ -7,6 +7,7 @@ use std::future::Future;
 
 // TODO: Check that routes don't overlap.
 // TODO: Properly handle scoped routes in a nice DSL.
+// TODO: Add tests.
 
 /// Build routes more concisely.
 pub struct RouteBuilder<T, B>

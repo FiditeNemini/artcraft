@@ -12,6 +12,17 @@ pub enum CommentEntityToken {
 }
 
 impl CommentEntityToken {
+
+  pub fn from_entity_type_and_token(entity_type: CommentEntityType, token: &str) -> Self {
+    match entity_type {
+      CommentEntityType::User => Self::User(UserToken::new_from_str(token)),
+      CommentEntityType::TtsModel => Self::TtsModel(TtsModelToken::new_from_str(token)),
+      CommentEntityType::TtsResult => Self::TtsResult(token.to_string()),
+      CommentEntityType::W2lTemplate => Self::W2lTemplate(W2lTemplateToken::new_from_str(token)),
+      CommentEntityType::W2lResult => Self::W2lResult(token.to_string()),
+    }
+  }
+
   pub fn get_composite_keys(&self) -> (CommentEntityType, &str) {
     let (entity_type, entity_token) = match self {
       CommentEntityToken::User(user_token) => (CommentEntityType::User, user_token.as_str()),

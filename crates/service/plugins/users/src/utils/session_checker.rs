@@ -259,15 +259,16 @@ impl SessionChecker {
   }
 
   fn maybe_get_redis_cache_connection(&self) -> Option<RedisTtlCacheConnection> {
-    self.maybe_redis_ttl_cache
+    // NB: This is split into assignment and return because CLion IDE couldn't figure out the types.
+    let result : Option<Option<RedisTtlCacheConnection>> = self.maybe_redis_ttl_cache
         .as_ref()
         .map(|redis_ttl_cache| redis_ttl_cache.get_connection()
             .map_err(|err| {
               warn!("redis cache failure: {:?}", err); // NB: We'll fail open if Redis cache fails
               err
             })
-            .ok())
-        .flatten()
+            .ok());
+    result.flatten()
   }
 }
 
