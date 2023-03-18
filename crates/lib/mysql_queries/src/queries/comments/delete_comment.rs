@@ -21,7 +21,8 @@ pub async fn delete_comment(
         r#"
 UPDATE comments
 SET
-  user_deleted_at = CURRENT_TIMESTAMP
+  user_deleted_at = CURRENT_TIMESTAMP,
+  version = version + 1
 WHERE
   token = ?
 LIMIT 1
@@ -34,7 +35,8 @@ LIMIT 1
         r#"
 UPDATE comments
 SET
-  mod_deleted_at = CURRENT_TIMESTAMP
+  mod_deleted_at = CURRENT_TIMESTAMP,
+  version = version + 1
 WHERE
   token = ?
 LIMIT 1
@@ -48,7 +50,8 @@ LIMIT 1
         r#"
 UPDATE comments
 SET
-  object_owner_deleted_at = CURRENT_TIMESTAMP
+  object_owner_deleted_at = CURRENT_TIMESTAMP,
+  version = version + 1
 WHERE
   token = ?
 LIMIT 1

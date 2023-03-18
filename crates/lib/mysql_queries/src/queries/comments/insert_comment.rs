@@ -46,7 +46,8 @@ SET
   entity_token = ?,
   comment_markdown = ?,
   comment_rendered_html = ?,
-  creator_ip_address = ?
+  creator_ip_address = ?,
+  editor_ip_address = ?
         "#,
       &comment_token,
       args.uuid_idempotency_token,
@@ -55,6 +56,7 @@ SET
       entity_token,
       args.comment_markdown,
       args.comment_rendered_html,
+      args.creator_ip_address,
       args.creator_ip_address,
     )
       .execute(args.mysql_pool)
