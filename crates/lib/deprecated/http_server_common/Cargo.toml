@@ -16,8 +16,8 @@ path = "src/lib.rs"
 
 # Internal
 container_common = { path = "../container_common" }
-errors = { path = "../errors" }
-reusable_types = { path = "../../_types/reusable_types" }
+errors = { path = "../../errors" }
+reusable_types = { path = "../../../_types/reusable_types" }
 
 # External
 anyhow = "1.0.40"

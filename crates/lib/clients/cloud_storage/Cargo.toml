@@ -16,7 +16,7 @@ path = "src/lib.rs"
 
 # Internal
 buckets = { path = "../../../_types/buckets" }
-container_common = { path = "../../container_common" }
+container_common = { path = "../../deprecated/container_common" }
 
 # External
 anyhow = "1.0.40"

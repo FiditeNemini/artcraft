@@ -15,7 +15,7 @@ path = "src/lib.rs"
 [dependencies]
 
 # Internal
-http_server_common = { path = "../../lib/http_server_common" }
+http_server_common = { path = "../deprecated/http_server_common" }
 reusable_types = { path = "../../_types/reusable_types" }
 
 # External

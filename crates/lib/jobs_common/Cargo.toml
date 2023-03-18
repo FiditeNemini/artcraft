@@ -18,7 +18,7 @@ path = "src/lib.rs"
 [dependencies]
 
 # Internal
-container_common = { path = "../container_common" }
+container_common = { path = "../deprecated/container_common" }
 redis_common = { path = "../redis_common" }
 
 # External

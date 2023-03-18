@@ -14,8 +14,8 @@ path = "src/lib.rs"
 
 [dependencies]
 # Internal
-errors = { path = "../../lib/errors" }
-hashing = { path = "../../lib/hashing" }
+errors = { path = "../../errors" }
+hashing = { path = "../../hashing" }
 
 # External
 anyhow = "1.0.40"

@@ -22,7 +22,7 @@ errors = { path = "../../lib/errors" }
 fakeyou_client = { path = "../../lib/clients/fakeyou_client" }
 files = { path = "../../lib/files" }
 hashing = { path = "../../lib/hashing" }
-http_server_common = { path = "../../lib/http_server_common" }
+http_server_common = { path = "../../lib/deprecated/http_server_common" }
 idempotency = { path = "../../lib/idempotency" }
 media = { path = "../../lib/media" }
 sqlite_queries = { path = "../../lib/sqlite_queries" }

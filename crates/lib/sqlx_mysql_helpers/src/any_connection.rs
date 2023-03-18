@@ -2,6 +2,8 @@ use sqlx::{MySql, MySqlPool};
 use sqlx::pool::PoolConnection;
 use errors::AnyhowResult;
 
+// TODO: I don't think I finished this work.
+
 /// Pass a handle to MySql without caring about the type.
 pub enum MySqlHandle {
   ConnectionPool(MySqlPool),

@@ -15,8 +15,8 @@ path = "src/lib.rs"
 [dependencies]
 
 # Internal
-config = { path = "../../config" }
-container_common = { path = "../../container_common" }
+config = { path = "../../deprecated/config" }
+container_common = { path = "../../deprecated/container_common" }
 errors = { path = "../../errors" }
 
 # External

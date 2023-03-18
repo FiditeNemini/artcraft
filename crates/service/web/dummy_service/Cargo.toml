@@ -17,7 +17,7 @@ path = "src/main.rs"
 # Internal
 actix_helpers = { path = "../../../lib/actix_helpers" }
 errors = { path = "../../../lib/errors" }
-http_server_common = { path = "../../../lib/http_server_common" }
+http_server_common = { path = "../../../lib/deprecated/http_server_common" }
 reusable_types = { path = "../../../_types/reusable_types" }
 
 # External
