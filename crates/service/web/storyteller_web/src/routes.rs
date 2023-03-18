@@ -144,7 +144,7 @@ pub fn add_routes<T, B> (app: App<T, B>) -> App<T, B>
   // ==================== Comments ====================
 
   let mut app = RouteBuilder::from_app(app)
-      .add_get("/v1/comments/{entity_type}/entity_token", list_comments_handler)
+      .add_get("/v1/comments/{entity_type}/{entity_token}", list_comments_handler)
       .add_post("/v1/comments/new", create_comment_handler)
       .add_post("/v1/comments/{comment_token}/delete", delete_comment_handler)
       .into_app();
