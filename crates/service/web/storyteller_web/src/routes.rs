@@ -3,6 +3,7 @@ use actix_service::ServiceFactory;
 use actix_web::dev::{ServiceRequest, ServiceResponse};
 use actix_web::error::Error;
 use actix_web::{App, web, HttpResponse};
+use actix_helpers::route_builder::RouteBuilder;
 use billing_component::default_routes::add_suggested_stripe_billing_routes;
 use crate::http_server::endpoints::api_tokens::create_api_token::create_api_token_handler;
 use crate::http_server::endpoints::api_tokens::delete_api_token::delete_api_token_handler;
@@ -106,6 +107,9 @@ use crate::http_server::endpoints::subscriptions::unsubscribe_reason::set_unsubs
 use users_component::default_routes::add_suggested_api_v1_account_creation_and_session_routes;
 use users_component::endpoints::edit_profile_handler::edit_profile_handler;
 use users_component::endpoints::get_profile_handler::get_profile_handler;
+use crate::http_server::endpoints::comments::create_comment_handler::create_comment_handler;
+use crate::http_server::endpoints::comments::delete_comment_handler::delete_comment_handler;
+use crate::http_server::endpoints::comments::list_comments_handler::list_comments_handler;
 
 pub fn add_routes<T, B> (app: App<T, B>) -> App<T, B>
   where
@@ -137,7 +141,16 @@ pub fn add_routes<T, B> (app: App<T, B>) -> App<T, B>
   app = add_user_rating_routes(app); /* /v1/user_rating/... */
   app = add_subscription_routes(app); /* /v1/subscriptions/... */
 
-  // From components
+  // ==================== Comments ====================
+
+  let mut app = RouteBuilder::from_app(app)
+      .add_get("/v1/comments/{entity_type}/entity_token", list_comments_handler)
+      .add_post("/v1/comments/new", create_comment_handler)
+      .add_post("/v1/comments/{comment_token}/delete", delete_comment_handler)
+      .into_app();
+
+  // ==================== COMPONENTS ====================
+
   app = add_suggested_api_v1_account_creation_and_session_routes(app); // /create_account, /session, /login, /logout
   app = add_suggested_stripe_billing_routes(app); // /stripe, billing, webhooks, etc.
 

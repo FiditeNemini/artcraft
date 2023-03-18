@@ -1,0 +1,137 @@
+// NB: Incrementally getting rid of build warnings...
+#![forbid(unused_imports)]
+#![forbid(unused_mut)]
+#![forbid(unused_variables)]
+
+use actix_web::error::ResponseError;
+use actix_web::http::StatusCode;
+use actix_web::web::Path;
+use actix_web::{web, HttpResponse, HttpRequest};
+use chrono::{DateTime, Utc};
+use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
+use crate::server_state::ServerState;
+use enums::by_table::comments::comment_entity_type::CommentEntityType;
+use log::warn;
+use mysql_queries::queries::comments::list_comments_for_entity::list_comments_for_entity;
+use std::fmt;
+use std::sync::Arc;
+use mysql_queries::queries::comments::comment_entity_token::CommentEntityToken;
+use tokens::tokens::comments::CommentToken;
+use tokens::users::user::UserToken;
+
+/// For the URL PathInfo
+#[derive(Deserialize)]
+pub struct ListCommentsPathInfo {
+  entity_type: CommentEntityType,
+  entity_token: String,
+}
+
+#[derive(Serialize)]
+pub struct ListCommentsSuccessResponse {
+  pub success: bool,
+  pub comments: Vec<Comment>,
+}
+
+#[derive(Serialize)]
+pub struct Comment {
+  pub token: CommentToken,
+
+  pub user_token: UserToken,
+  pub username: String,
+  pub user_display_name: String,
+  pub user_gravatar_hash: String,
+
+  pub comment_markdown: String,
+  pub comment_rendered_html: String,
+
+  //pub mod_fields: CommentForListModFields,
+
+  pub created_at: DateTime<Utc>,
+  pub updated_at: DateTime<Utc>,
+  pub maybe_edited_at: Option<DateTime<Utc>>,
+}
+
+// TODO
+//pub struct CommentForListModFields {
+//  pub creator_ip_address: String,
+//  pub editor_ip_address: String,
+//  pub maybe_user_deleted_at: Option<DateTime<Utc>>,
+//  pub maybe_mod_deleted_at: Option<DateTime<Utc>>,
+//  pub maybe_object_owner_deleted_at: Option<DateTime<Utc>>,
+//}
+
+#[derive(Debug)]
+pub enum ListCommentsError {
+  ServerError,
+}
+
+impl ResponseError for ListCommentsError {
+  fn status_code(&self) -> StatusCode {
+    match *self {
+      ListCommentsError::ServerError=> StatusCode::INTERNAL_SERVER_ERROR,
+    }
+  }
+
+  fn error_response(&self) -> HttpResponse {
+    let error_reason = match self {
+      ListCommentsError::ServerError => "server error".to_string(),
+    };
+
+    to_simple_json_error(&error_reason, self.status_code())
+  }
+}
+
+// NB: Not using derive_more::Display since Clion doesn't understand it.
+impl fmt::Display for ListCommentsError {
+  fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+    write!(f, "{:?}", self)
+  }
+}
+
+pub async fn list_comments_handler(
+  _http_request: HttpRequest,
+  path: Path<ListCommentsPathInfo>,
+  server_state: web::Data<Arc<ServerState>>
+) -> Result<HttpResponse, ListCommentsError>
+{
+  let entity_token = CommentEntityToken::from_entity_type_and_token(
+    path.entity_type, &path.entity_token);
+  
+  let query_results = list_comments_for_entity(
+    entity_token,
+    &server_state.mysql_pool,
+  ).await;
+
+  let comments = match query_results {
+    Ok(results) => results,
+    Err(e) => {
+      warn!("Query error: {:?}", e);
+      return Err(ListCommentsError::ServerError);
+    }
+  };
+
+  let response = ListCommentsSuccessResponse {
+    success: true,
+    comments: comments.into_iter()
+        .map(|comment| Comment {
+          token: comment.token,
+          user_token: comment.user_token,
+          username: comment.username,
+          user_display_name: comment.user_display_name,
+          user_gravatar_hash: comment.user_gravatar_hash,
+          comment_markdown: comment.comment_markdown,
+          comment_rendered_html: comment.comment_rendered_html,
+          created_at: comment.created_at,
+          updated_at: comment.updated_at,
+          maybe_edited_at: comment.maybe_edited_at,
+        })
+        .collect(),
+  };
+
+  let body = serde_json::to_string(&response)
+      .map_err(|_e| ListCommentsError::ServerError)?;
+
+  Ok(HttpResponse::Ok()
+      .content_type("application/json")
+      .body(body))
+}
