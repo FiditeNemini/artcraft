@@ -385,6 +385,16 @@
     },
     "query": "\nSELECT\n  id,\n  status\nFROM w2l_inference_jobs\nWHERE id = ?\nFOR UPDATE\n        "
   },
+  "044b4a53b537fdc154f049488e222ac001b04cf0f47df6ac79f2b0d8f79b5aff": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Right": 1
+      }
+    },
+    "query": "\nUPDATE comments\nSET\n  mod_deleted_at = CURRENT_TIMESTAMP,\n  version = version + 1\nWHERE\n  token = ?\nLIMIT 1\n        "
+  },
   "05c3ebf54cd8a5374d6f4bbe21b3c6027ce6314917af8acd0ed136d375d53342": {
     "describe": {
       "columns": [
@@ -1761,16 +1771,6 @@
     },
     "query": "\nSELECT\n    jobs.token as `job_token: tokens::jobs::inference::InferenceJobToken`,\n\n    jobs.status,\n    jobs.attempt_count,\n    jobs.on_success_result_entity_type as maybe_result_entity_type,\n    jobs.on_success_result_entity_token as maybe_result_entity_token,\n\n    jobs.created_at,\n    jobs.updated_at\n\nFROM generic_inference_jobs as jobs\n\nWHERE jobs.token = ?\n        "
   },
-  "1aa7500ccb4cc63afb6438ed080e417fe112287de5f32d07a74b82f6cb8ed9f0": {
-    "describe": {
-      "columns": [],
-      "nullable": [],
-      "parameters": {
-        "Right": 8
-      }
-    },
-    "query": "\nINSERT INTO comments\nSET\n  token = ?,\n  uuid_idempotency_token = ?,\n  user_token = ?,\n  entity_type = ?,\n  entity_token = ?,\n  comment_markdown = ?,\n  comment_rendered_html = ?,\n  creator_ip_address = ?\n        "
-  },
   "1bc8e8382345979e6cc618ce0360410258da1d376528b96ebf3b8d3d0f650147": {
     "describe": {
       "columns": [],
@@ -2590,6 +2590,16 @@
       }
     },
     "query": "\n    SELECT\n      count(*) AS use_count\n    FROM\n      tts_results\n    WHERE\n      created_at > ( CURDATE() - INTERVAL ? MINUTE )\n      AND model_token = ?\n        "
+  },
+  "29a775fceaaf8aa5a6d5173eef8acc69e089f2ebf5b62ca82b1d112ac98d66ec": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Right": 4
+      }
+    },
+    "query": "\nUPDATE comments\nSET\n  comment_markdown = ?,\n  comment_rendered_html = ?,\n  editor_ip_address = ?,\n  edited_at = NOW(),\n  version = version + 1\nWHERE\n  token = ?\n        "
   },
   "2b04dd7db52ef3a97a6f420a22a4dbee7416ae58697438df69e87ffd47bbf350": {
     "describe": {
@@ -4547,6 +4557,16 @@
     },
     "query": "\nSELECT\n    vocoder.token as vocoder_token,\n    vocoder.vocoder_type as `vocoder_type: enums::common::vocoder_type::VocoderType`,\n\n    vocoder.creator_user_token,\n    users.username as creator_username,\n    users.display_name as creator_display_name,\n    users.email_gravatar_hash as creator_gravatar_hash,\n    users.is_banned as creator_is_banned,\n\n    vocoder.title,\n    vocoder.description_markdown,\n    vocoder.description_rendered_html,\n    vocoder.is_staff_recommended,\n\n    vocoder.is_mod_disabled_from_public_use,\n    vocoder.is_mod_disabled_from_author_use,\n    vocoder.is_mod_author_editing_locked,\n\n    vocoder.creator_set_visibility as `creator_set_visibility: enums::common::visibility::Visibility`,\n\n    vocoder.created_at,\n    vocoder.updated_at,\n\n    vocoder.creator_ip_address_creation,\n    vocoder.creator_ip_address_last_update,\n    vocoder.mod_deleted_at,\n    vocoder.user_deleted_at\n\nFROM vocoder_models as vocoder\nJOIN users\n    ON users.token = vocoder.creator_user_token\nWHERE\n    vocoder.token = ?\n        "
   },
+  "46bc07744426037c6845f89a842599f82055db8e9f7dad1ec885f4433eb1a9af": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Right": 9
+      }
+    },
+    "query": "\nINSERT INTO comments\nSET\n  token = ?,\n  uuid_idempotency_token = ?,\n  user_token = ?,\n  entity_type = ?,\n  entity_token = ?,\n  comment_markdown = ?,\n  comment_rendered_html = ?,\n  creator_ip_address = ?,\n  editor_ip_address = ?\n        "
+  },
   "46e1cb058bffbea5a5d3ffa5dd904416d6f34ccefdb394030f19cc762b507d68": {
     "describe": {
       "columns": [
@@ -5518,16 +5538,6 @@
       }
     },
     "query": "\nSELECT\n    w2l_results.token as w2l_result_token,\n    w2l_results.maybe_tts_inference_result_token,\n\n    w2l_results.public_bucket_video_path,\n\n    w2l_templates.token as maybe_w2l_template_token,\n    w2l_templates.template_type,\n    w2l_templates.title as template_title,\n\n    users.token as maybe_creator_user_token,\n    users.username as maybe_creator_username,\n    users.display_name as maybe_creator_display_name,\n    users.email_gravatar_hash as maybe_creator_gravatar_hash,\n    users.is_banned as maybe_creator_is_banned,\n\n    template_users.token as maybe_template_creator_user_token,\n    template_users.username as maybe_template_creator_username,\n    template_users.display_name as maybe_template_creator_display_name,\n    template_users.email_gravatar_hash as maybe_template_creator_gravatar_hash,\n    template_users.is_banned as maybe_template_creator_is_banned,\n\n    w2l_results.creator_set_visibility,\n\n    w2l_results.file_size_bytes,\n    w2l_results.frame_width,\n    w2l_results.frame_height,\n    w2l_results.duration_millis,\n    w2l_results.created_at,\n    w2l_results.updated_at,\n\n    w2l_results.creator_ip_address,\n    w2l_results.user_deleted_at,\n    w2l_results.mod_deleted_at\n\nFROM w2l_results\nLEFT OUTER JOIN w2l_templates\n    ON w2l_results.maybe_w2l_template_token = w2l_templates.token\nLEFT OUTER JOIN users\n    ON w2l_results.maybe_creator_user_token = users.token\nLEFT OUTER JOIN users as template_users\n    ON w2l_templates.creator_user_token = template_users.token\nWHERE\n    w2l_results.token = ?\n    AND w2l_results.user_deleted_at IS NULL\n    AND w2l_results.mod_deleted_at IS NULL\n        "
-  },
-  "505c9597104422f3a376da8b978351496dc52ea552efd974d7153637403f9adc": {
-    "describe": {
-      "columns": [],
-      "nullable": [],
-      "parameters": {
-        "Right": 1
-      }
-    },
-    "query": "\nUPDATE comments\nSET\n  object_owner_deleted_at = CURRENT_TIMESTAMP\nWHERE\n  token = ?\nLIMIT 1\n        "
   },
   "521945dd4271b04e4607b30d5bee3b82b8e030405f48a320d0ee2827ddd59e4b": {
     "describe": {
@@ -6614,6 +6624,16 @@
     },
     "query": "\nUPDATE w2l_results\nSET\n  mod_deleted_at = CURRENT_TIMESTAMP,\n  maybe_mod_user_token = ?\nWHERE\n  token = ?\nLIMIT 1\n        "
   },
+  "66812c53b3c91b30a904c0e1c017f314570a0f02b1ac609bce319f424ef99b94": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Right": 1
+      }
+    },
+    "query": "\nUPDATE comments\nSET\n  object_owner_deleted_at = CURRENT_TIMESTAMP,\n  version = version + 1\nWHERE\n  token = ?\nLIMIT 1\n        "
+  },
   "68376f750b8421c10d319fa1045a2f3ce8fb1d35a5fe6ec92b2022babafbde80": {
     "describe": {
       "columns": [],
@@ -7270,6 +7290,239 @@
       }
     },
     "query": "\nUPDATE w2l_template_upload_jobs\nSET\n  status = ?,\n  on_success_result_token = ?,\n  failure_reason = NULL,\n  retry_at = NULL\nWHERE id = ?\n        "
+  },
+  "742407218df5d5a413e0a6403bfeafee25093a8bd32b7126fc0f17470048d4db": {
+    "describe": {
+      "columns": [
+        {
+          "name": "token: tokens::tokens::comments::CommentToken",
+          "ordinal": 0,
+          "type_info": {
+            "char_set": 224,
+            "flags": {
+              "bits": 4229
+            },
+            "max_size": 128,
+            "type": "VarString"
+          }
+        },
+        {
+          "name": "entity_type: enums::by_table::comments::comment_entity_type::CommentEntityType",
+          "ordinal": 1,
+          "type_info": {
+            "char_set": 224,
+            "flags": {
+              "bits": 4233
+            },
+            "max_size": 128,
+            "type": "VarString"
+          }
+        },
+        {
+          "name": "entity_token",
+          "ordinal": 2,
+          "type_info": {
+            "char_set": 224,
+            "flags": {
+              "bits": 4225
+            },
+            "max_size": 128,
+            "type": "VarString"
+          }
+        },
+        {
+          "name": "user_token: tokens::users::user::UserToken",
+          "ordinal": 3,
+          "type_info": {
+            "char_set": 224,
+            "flags": {
+              "bits": 4233
+            },
+            "max_size": 128,
+            "type": "VarString"
+          }
+        },
+        {
+          "name": "username",
+          "ordinal": 4,
+          "type_info": {
+            "char_set": 224,
+            "flags": {
+              "bits": 4229
+            },
+            "max_size": 80,
+            "type": "VarString"
+          }
+        },
+        {
+          "name": "user_display_name",
+          "ordinal": 5,
+          "type_info": {
+            "char_set": 224,
+            "flags": {
+              "bits": 4225
+            },
+            "max_size": 80,
+            "type": "VarString"
+          }
+        },
+        {
+          "name": "user_gravatar_hash",
+          "ordinal": 6,
+          "type_info": {
+            "char_set": 224,
+            "flags": {
+              "bits": 4225
+            },
+            "max_size": 128,
+            "type": "String"
+          }
+        },
+        {
+          "name": "comment_markdown",
+          "ordinal": 7,
+          "type_info": {
+            "char_set": 224,
+            "flags": {
+              "bits": 4241
+            },
+            "max_size": 262140,
+            "type": "Blob"
+          }
+        },
+        {
+          "name": "comment_rendered_html",
+          "ordinal": 8,
+          "type_info": {
+            "char_set": 224,
+            "flags": {
+              "bits": 4241
+            },
+            "max_size": 262140,
+            "type": "Blob"
+          }
+        },
+        {
+          "name": "creator_ip_address",
+          "ordinal": 9,
+          "type_info": {
+            "char_set": 224,
+            "flags": {
+              "bits": 4225
+            },
+            "max_size": 160,
+            "type": "VarString"
+          }
+        },
+        {
+          "name": "editor_ip_address",
+          "ordinal": 10,
+          "type_info": {
+            "char_set": 224,
+            "flags": {
+              "bits": 4225
+            },
+            "max_size": 160,
+            "type": "VarString"
+          }
+        },
+        {
+          "name": "created_at",
+          "ordinal": 11,
+          "type_info": {
+            "char_set": 63,
+            "flags": {
+              "bits": 1161
+            },
+            "max_size": 19,
+            "type": "Timestamp"
+          }
+        },
+        {
+          "name": "updated_at",
+          "ordinal": 12,
+          "type_info": {
+            "char_set": 63,
+            "flags": {
+              "bits": 9345
+            },
+            "max_size": 19,
+            "type": "Timestamp"
+          }
+        },
+        {
+          "name": "edited_at",
+          "ordinal": 13,
+          "type_info": {
+            "char_set": 63,
+            "flags": {
+              "bits": 128
+            },
+            "max_size": 19,
+            "type": "Timestamp"
+          }
+        },
+        {
+          "name": "user_deleted_at",
+          "ordinal": 14,
+          "type_info": {
+            "char_set": 63,
+            "flags": {
+              "bits": 136
+            },
+            "max_size": 19,
+            "type": "Timestamp"
+          }
+        },
+        {
+          "name": "mod_deleted_at",
+          "ordinal": 15,
+          "type_info": {
+            "char_set": 63,
+            "flags": {
+              "bits": 136
+            },
+            "max_size": 19,
+            "type": "Timestamp"
+          }
+        },
+        {
+          "name": "object_owner_deleted_at",
+          "ordinal": 16,
+          "type_info": {
+            "char_set": 63,
+            "flags": {
+              "bits": 136
+            },
+            "max_size": 19,
+            "type": "Timestamp"
+          }
+        }
+      ],
+      "nullable": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        true,
+        true,
+        true,
+        true
+      ],
+      "parameters": {
+        "Right": 1
+      }
+    },
+    "query": "\nSELECT\n    c.token as `token: tokens::tokens::comments::CommentToken`,\n\n    c.entity_type as `entity_type: enums::by_table::comments::comment_entity_type::CommentEntityType`,\n    c.entity_token,\n\n    c.user_token as `user_token: tokens::users::user::UserToken`,\n    u.username,\n    u.display_name as user_display_name,\n    u.email_gravatar_hash as user_gravatar_hash,\n\n    c.comment_markdown,\n    c.comment_rendered_html,\n\n    c.creator_ip_address,\n    c.editor_ip_address,\n\n    c.created_at,\n    c.updated_at,\n    c.edited_at,\n    c.user_deleted_at,\n    c.mod_deleted_at,\n    c.object_owner_deleted_at\n\nFROM\n    comments AS c\nJOIN users AS u\n    ON c.user_token = u.token\nWHERE\n    c.token = ?\n        "
   },
   "7622292c05fe1b5832136762042780a12a02048166bb1b4492dfd627c48c8968": {
     "describe": {
@@ -12070,16 +12323,6 @@
     },
     "query": "\nSELECT count(*) as count\nFROM w2l_templates\nWHERE\n  creator_user_token = ?\nLIMIT 1\n        "
   },
-  "c3cda4cb65ef8724fca57c740e60b2a481737317db371d3bec6190e3de2059de": {
-    "describe": {
-      "columns": [],
-      "nullable": [],
-      "parameters": {
-        "Right": 1
-      }
-    },
-    "query": "\nUPDATE comments\nSET\n  mod_deleted_at = CURRENT_TIMESTAMP\nWHERE\n  token = ?\nLIMIT 1\n        "
-  },
   "c4640a618e1d179fa95adce67a329818f8b1626ac88fa76dbb871b8788136191": {
     "describe": {
       "columns": [],
@@ -12318,6 +12561,16 @@
       }
     },
     "query": "\nSELECT\n  id,\n  token AS `download_job_token: tokens::jobs::download::DownloadJobToken`,\n\n  creator_user_token,\n  creator_ip_address,\n  creator_set_visibility as `creator_set_visibility: enums::common::visibility::Visibility`,\n\n  download_type as `download_type: enums::workers::generic_download_type::GenericDownloadType`,\n  download_url,\n  title,\n\n  status as `status: crate::column_types::job_status::JobStatus`,\n  attempt_count,\n  failure_reason,\n\n  created_at,\n  updated_at,\n  retry_at\nFROM generic_download_jobs\nWHERE\n  (\n    status IN (\"pending\", \"attempt_failed\")\n  )\n  AND\n  (\n    retry_at IS NULL\n    OR\n    retry_at < CURRENT_TIMESTAMP\n  )\n  ORDER BY id ASC\n  LIMIT ?\n        "
+  },
+  "c74b064d49726171ae626ba7d44591a8983f3fdf12d6131448c0cf3a16e5e97f": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Right": 1
+      }
+    },
+    "query": "\nUPDATE comments\nSET\n  user_deleted_at = CURRENT_TIMESTAMP,\n  version = version + 1\nWHERE\n  token = ?\nLIMIT 1\n        "
   },
   "c7b4fecd829bddaeff77a6ce2240e2b939c5faac4a94da56aefd2a27eb9ed64a": {
     "describe": {
@@ -15332,16 +15585,6 @@
       }
     },
     "query": "\nSELECT\n    tts.token as model_token,\n    tts.tts_model_type,\n    tts.creator_user_token,\n    users.username as creator_username,\n    users.display_name as creator_display_name,\n    users.email_gravatar_hash as creator_gravatar_hash,\n    tts.title,\n    tts.ietf_language_tag,\n    tts.ietf_primary_language_subtag,\n    tts.is_locked_from_use,\n    tts.is_front_page_featured,\n    tts.is_twitch_featured,\n    tts.maybe_suggested_unique_bot_command,\n    tts.user_ratings_positive_count,\n    tts.user_ratings_negative_count,\n    tts.user_ratings_total_count,\n    tts.creator_set_visibility as `creator_set_visibility: enums::common::visibility::Visibility`,\n    tts.created_at,\n    tts.updated_at\nFROM tts_models as tts\nJOIN users\nON\n    users.token = tts.creator_user_token\nWHERE\n    users.username = ?\n    AND tts.is_locked_from_use IS FALSE\n    AND tts.user_deleted_at IS NULL\n    AND tts.mod_deleted_at IS NULL\n        "
-  },
-  "f12ecaba283a5353f45412577b220ec086fa845e3f46885dc150c9b657e510af": {
-    "describe": {
-      "columns": [],
-      "nullable": [],
-      "parameters": {
-        "Right": 1
-      }
-    },
-    "query": "\nUPDATE comments\nSET\n  user_deleted_at = CURRENT_TIMESTAMP\nWHERE\n  token = ?\nLIMIT 1\n        "
   },
   "f75b713d166398ebea2bdbde4e416dc8eb2c48dba4aa9bd164bcf5bc77237ce1": {
     "describe": {
