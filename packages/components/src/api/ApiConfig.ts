@@ -437,6 +437,20 @@ class ApiConfig {
     return `${this.getScheme()}://${this.getNewApiHost()}/v1/user_rating/rate`;
   }
 
+  // =============== Comments ===============
+
+  commentCreate(): string {
+    return `${this.getScheme()}://${this.getNewApiHost()}/v1/comments/new`;
+  }
+
+  commentList(entityType: string, entityToken: string): string {
+    return `${this.getScheme()}://${this.getNewApiHost()}/v1/comments/${entityType}/${entityToken}`;
+  }
+
+  commentDelete(commentToken: string): string {
+    return `${this.getScheme()}://${this.getNewApiHost()}/v1/comments/${commentToken}/delete`;
+  }
+
   // =============== Storyteller-specific ===============
 
   listTwitchEventRules(): string {
