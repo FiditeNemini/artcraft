@@ -17,7 +17,7 @@ SQLITE_DATABASE_PATH=./runtime_data/database.db
 build_shared_mysql_database_library() {
   # NB: For now, this is our monolithic DB that serves all of our microservices (gross)
   # It's a single package so that queries can be shared (again, gross)
-  pushd crates/lib/database_queries
+  pushd crates/lib/mysql_queries
   SQLX_OFFLINE=true cargo sqlx prepare --merged
   popd
 }
