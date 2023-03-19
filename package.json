@@ -22,7 +22,11 @@
     "start-powerstream-dashboard": "PORT=7002 BROWSER=none lerna exec --scope @storyteller/power.stream-dashboard -- yarn start",
     "start-powerstream-dashboard-w": "set PORT=7002 && lerna exec --scope @storyteller/power.stream-dashboard -- yarn start-w",
     "build-powerstream-obs": "lerna exec --scope @storyteller/power.stream-obs -- yarn build",
-    "start-powerstream-obs": "PORT=7007 BROWSER=none lerna exec --scope @storyteller/power.stream-obs -- yarn start"
+    "start-powerstream-obs": "PORT=7007 BROWSER=none lerna exec --scope @storyteller/power.stream-obs -- yarn start",
+    "build-trumped": "lerna exec --scope @storyteller/trumped.com -- yarn build",
+    "start-trumped": "PORT=7000 BROWSER=none lerna exec --scope @storyteller/trumped.com -- yarn start",
+    "start-trumped-80": "PORT=80 BROWSER=none lerna exec --scope @storyteller/trumped.com -- yarn start",
+    "start-trumped-w": "set PORT=7000 && lerna exec --scope @storyteller/trumped.com -- yarn start-w"
   },
   "devDependencies": {
     "craco": "^0.0.3",
