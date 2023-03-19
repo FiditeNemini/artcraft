@@ -1,7 +1,10 @@
 import React, { useState } from "react";
-import { DeleteComment, DeleteCommentIsOk } from "@storyteller/components/src/api/comments/DeleteComment";
+import {
+  DeleteComment,
+  DeleteCommentIsOk,
+} from "@storyteller/components/src/api/comments/DeleteComment";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faTrash, faTrashRestore } from "@fortawesome/free-solid-svg-icons";
+import { faTrash } from "@fortawesome/free-solid-svg-icons";
 import { faTrashCheck } from "@fortawesome/pro-solid-svg-icons";
 
 interface Props {
@@ -10,7 +13,7 @@ interface Props {
 }
 
 /**
- * This is part of a reusable component for putting comments on several 
+ * This is part of a reusable component for putting comments on several
  * different page types.
  *
  * See the documentation on the parent <CommentComponent />
@@ -27,41 +30,42 @@ function SafeDeleteCommentButton(props: Props) {
 
   let deleteButton = <></>;
 
-  // We ask the user to confirm the deletion. 
+  // We ask the user to confirm the deletion.
   // This makes it slightly safer and prevents accidental mis-clicks.
   if (!readyToDelete) {
     deleteButton = (
       <>
-        <button onClick={() => setReadyToDelete(true)}>
-          <FontAwesomeIcon icon={faTrash} />
-          {" "}
-          Delete Comment
+        <button
+          onClick={() => setReadyToDelete(true)}
+          className="btn-link btn-link-small p-0 fw-medium"
+        >
+          <FontAwesomeIcon icon={faTrash} className="me-2" />
+          Delete
         </button>
       </>
-    )
+    );
   } else {
     deleteButton = (
       <>
-        <button onClick={() => setReadyToDelete(false)}>
-          <FontAwesomeIcon icon={faTrashRestore} />
-          {" "}
+        <button
+          onClick={() => setReadyToDelete(false)}
+          className="btn-link btn-link-small btn-link-white p-0 me-2 fw-medium"
+        >
           Cancel
         </button>
 
-        <button onClick={async () => await handleDeleteComment(props.commentToken)}>
-          <FontAwesomeIcon icon={faTrashCheck} />
-          {" "}
-          Confirm Comment
+        <button
+          onClick={async () => await handleDeleteComment(props.commentToken)}
+          className="btn-link btn-link-small p-0 fw-medium"
+        >
+          <FontAwesomeIcon icon={faTrashCheck} className="me-2" />
+          Confirm Delete
         </button>
       </>
-    )
+    );
   }
 
-  return (
-    <>
-      {deleteButton}
-    </>
-  )
+  return <>{deleteButton}</>;
 }
 
 export { SafeDeleteCommentButton };

@@ -5,6 +5,7 @@ import {
 } from "@storyteller/components/src/api/comments/CreateComment";
 import { v4 as uuidv4 } from "uuid";
 import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
+import { Gravatar } from "@storyteller/components/src/elements/Gravatar";
 
 interface Props {
   entityType: string;
@@ -14,13 +15,13 @@ interface Props {
 }
 
 /**
- * This is part of a reusable component for putting comments on several 
+ * This is part of a reusable component for putting comments on several
  * different page types.
  *
  * See the documentation on the parent <CommentComponent />
  */
 function CreateCommentForm(props: Props) {
-  const {entityType, entityToken, loadComments} = props;
+  const { entityType, entityToken, loadComments } = props;
 
   const [commentMarkdown, setCommentMarkdown] = useState<string>("");
   const [uuidIdempotencyToken, setUuidIdempotencyToken] = useState<string>(
@@ -67,21 +68,35 @@ function CreateCommentForm(props: Props) {
     }
 
     postComment();
+    const form = ev.target;
+    form.reset();
+    setButtonVisible(false);
     return false;
   };
 
-  const handleKeyDown = (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
-    if (event.key === "Enter") {
-      event.preventDefault();
+  const handleKeyDown = (ev: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (ev.key === "Enter") {
+      ev.preventDefault();
     }
   };
+
+  let gravatarHash = props.sessionWrapper.getEmailGravatarHash();
+  let gravatar = <span />;
+  if (gravatarHash !== undefined) {
+    gravatar = <Gravatar email_hash={gravatarHash} size={40} />;
+  }
 
   let commentButton = <></>;
   if (buttonVisible) {
     commentButton = (
-      <button type="submit" className="btn btn-primary">
-        Post Comment
-      </button>
+      <div className="d-flex w-100 justify-content-end">
+        <button type="button" className="btn btn-link text-white opacity-75">
+          Cancel
+        </button>
+        <button type="submit" className="btn btn-primary btn-comment">
+          Post Comment
+        </button>
+      </div>
     );
   }
 
@@ -97,19 +112,23 @@ function CreateCommentForm(props: Props) {
   );
   if (props.sessionWrapper.isLoggedIn()) {
     createCommentComponent = (
-      <form onSubmit={handleFormSubmit}>
-        <div className="d-flex gap-3">
-          <div className="form-group flex-grow-1">
-            <textarea
-              placeholder="Add a comment..."
-              className="form-control textarea-comment"
-              rows={1}
-              onChange={handleCommentChange}
-              onKeyDown={handleKeyDown}
-            >
-              {commentMarkdown}
-            </textarea>
+      <form onSubmit={handleFormSubmit} className="mb-3">
+        <div className="d-flex flex-column gap-2">
+          <div className="d-flex gap-2">
+            {gravatar}
+            <div className="form-group flex-grow-1">
+              <textarea
+                placeholder="Add a comment..."
+                className="form-control textarea-comment"
+                rows={1}
+                onChange={handleCommentChange}
+                onKeyDown={handleKeyDown}
+              >
+                {commentMarkdown}
+              </textarea>
+            </div>
           </div>
+
           {commentButton}
         </div>
       </form>

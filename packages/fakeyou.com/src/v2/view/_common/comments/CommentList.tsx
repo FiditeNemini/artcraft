@@ -1,12 +1,10 @@
 import React from "react";
 import { formatDistance } from "date-fns";
-import {
-  Comment,
-} from "@storyteller/components/src/api/comments/ListComments";
+import { Comment } from "@storyteller/components/src/api/comments/ListComments";
 import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
 import { SafeDeleteCommentButton } from "./SafeDeleteCommentButton";
-
-const Fade = require("react-reveal/Fade");
+import { motion } from "framer-motion";
+import { container, item } from "../../../../data/animation";
 
 interface Props {
   entityType: string;
@@ -17,13 +15,12 @@ interface Props {
 }
 
 /**
- * This is part of a reusable component for putting comments on several 
+ * This is part of a reusable component for putting comments on several
  * different page types.
  *
  * See the documentation on the parent <CommentComponent />
  */
 function CommentList(props: Props) {
-
   // NB: It's more convenient to show recent data first {.reverse()}
   var reversedComments = props.comments.slice();
 
@@ -37,9 +34,9 @@ function CommentList(props: Props) {
       addSuffix: true,
     });
 
-    // TODO: We'll soon add backend support for a third party that can delete 
-    // comments - the person that owns the thing the comment is attached to. 
-    // We want profile / model / result owner to be able to clear harassing 
+    // TODO: We'll soon add backend support for a third party that can delete
+    // comments - the person that owns the thing the comment is attached to.
+    // We want profile / model / result owner to be able to clear harassing
     // comments themselves. This isn't ready yet, though.
     const isAuthor = props.sessionWrapper.userTokenMatches(comment.user_token);
     const isModerator = props.sessionWrapper.canBanUsers();
@@ -54,19 +51,23 @@ function CommentList(props: Props) {
             loadComments={props.loadComments}
           />
         </>
-      )
+      );
     }
 
     rows.push(
-      <tr key={comment.token}>
+      <motion.tr key={comment.token} variants={item}>
         <td>
-          <div className="py-2">
-            <div>
+          <div className="py-3">
+            <div className="d-flex gap-2 align-items-center">
               <span className="fw-medium text-white">
                 {comment.user_display_name}
               </span>
-              <span className="px-2">·</span>
-              <span className="opacity-75">{relativeCreateTime}</span>
+              <span>·</span>
+              <span className="opacity-75 comment-time">
+                {relativeCreateTime}
+              </span>
+              <span>·</span>
+              {maybeDeleteButton}
             </div>
             {/* 
               It's okay to set "dangerous" html here as the server safely created 
@@ -75,26 +76,23 @@ function CommentList(props: Props) {
               is safe from the backend engineers. 
             */}
             <div
-              className="mt-1 text-center text-lg-start"
+              className="mt-1"
               dangerouslySetInnerHTML={{
                 __html: comment.comment_rendered_html || "",
               }}
             />
-            {maybeDeleteButton}
           </div>
         </td>
-      </tr>
+      </motion.tr>
     );
   });
 
   return (
-    <div>
+    <motion.div initial="hidden" animate="visible" variants={container}>
       <table className="table">
-        <Fade cascade bottom duration="200" distance="10px">
-          <tbody>{rows}</tbody>
-        </Fade>
+        <tbody>{rows}</tbody>
       </table>
-    </div>
+    </motion.div>
   );
 }
 
