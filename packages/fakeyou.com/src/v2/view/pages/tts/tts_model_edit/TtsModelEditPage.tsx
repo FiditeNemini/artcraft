@@ -24,6 +24,7 @@ import {
   faMicrophone,
   faHome,
   faRobot,
+  faLock,
 } from "@fortawesome/free-solid-svg-icons";
 import { faTwitch } from "@fortawesome/free-brands-svg-icons";
 import {
@@ -448,8 +449,20 @@ function TtsModelEditPage(props: Props) {
 
   let isDisabled = ttsModel === undefined;
 
-  const visibilityIcon =
-    visibility === "public" ? <VisibleIconFc /> : <HiddenIconFc />;
+  let visibilityIcon;
+
+  switch (visibility) {
+    case "private":
+      visibilityIcon = <FontAwesomeIcon icon={faLock} />;
+      break;
+    case "hidden":
+      visibilityIcon = <HiddenIconFc />;
+      break;
+    case "public":
+    default:
+      visibilityIcon = <VisibleIconFc />;
+      break;
+  }
 
   return (
     <motion.div initial="hidden" animate="visible" variants={container}>

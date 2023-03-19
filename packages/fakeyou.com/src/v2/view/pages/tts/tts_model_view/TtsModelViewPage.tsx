@@ -46,6 +46,7 @@ import {
   faVolumeHigh,
   faDeleteLeft,
   faBarsStaggered,
+  faLock,
 } from "@fortawesome/free-solid-svg-icons";
 import { motion } from "framer-motion";
 import { container, item, panel } from "../../../../../data/animation";
@@ -425,16 +426,32 @@ function TtsModelViewPage(props: Props) {
     );
   }
 
-  const resultVisibility =
-    ttsModel?.creator_set_visibility === "hidden" ? (
-      <span>
-        Hidden <FontAwesomeIcon icon={faEyeSlash} />
-      </span>
-    ) : (
-      <span>
-        Public <FontAwesomeIcon icon={faEye} />
-      </span>
-    );
+  let resultVisibility;
+
+  switch (ttsModel?.creator_set_visibility) {
+    case "private":
+      resultVisibility = (
+        <span>
+          Private <FontAwesomeIcon icon={faLock} />
+        </span>
+      );
+      break;
+    case "hidden":
+      resultVisibility = (
+        <span>
+          Hidden <FontAwesomeIcon icon={faEyeSlash} />
+        </span>
+      );
+      break;
+    case "public":
+    default:
+      resultVisibility = (
+        <span>
+          Public <FontAwesomeIcon icon={faEye} />
+        </span>
+      );
+      break;
+  }
 
   const language = LanguageCodeToDescriptionWithDefault(
     ttsModel?.ietf_language_tag
