@@ -10,6 +10,14 @@ function NewsComponent(props: Props) {
       <h1> Updates </h1>
 
       <h2>
+        Mar 19, 2023: That whole AI thing.
+      </h2>
+
+      <p>
+        Turns out AI was pretty big. Wow.
+      </p>
+
+      <h2>
         June 7, 2020: Website rewrite.
       </h2>
 

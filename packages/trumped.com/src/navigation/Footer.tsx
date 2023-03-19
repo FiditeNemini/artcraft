@@ -13,9 +13,12 @@ function Footer(props: Props) {
         Made in Atlanta by&nbsp;
         <a href="https://twitter.com/echelon">@echelon</a>.
       </p>*/}
-      <p>
-        Want more? <a href="https://vo.codes">Try over 50 cartoon and celebrity voices on vo.codes</a>.
-      </p>
+      <h2>
+        Want more Donald Trump TTS? 
+      </h2>
+      <p>The best <a href="https://fakeyou.com">Donald Trump TTS</a> can be found at FakeYou.</p>
+      <p>FakeYou is the world's best Text to Speech website and has thousands of voices. Angry 
+        Donald J Trump, Sad DJ Trump, Hillary Clinton, Nixon, and so many others!</p>
       <p>
         By using this, you agree to&nbsp;
         <a href="#terms" 
