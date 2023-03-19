@@ -39,7 +39,6 @@ function SafeDeleteCommentButton(props: Props) {
           onClick={() => setReadyToDelete(true)}
           className="btn-link btn-link-small p-0 fw-medium"
         >
-          <FontAwesomeIcon icon={faTrash} className="me-2" />
           Delete
         </button>
       </>
