@@ -5,6 +5,7 @@ import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapp
 import { SafeDeleteCommentButton } from "./SafeDeleteCommentButton";
 import { motion } from "framer-motion";
 import { container, item } from "../../../../data/animation";
+import { Gravatar } from "@storyteller/components/src/elements/Gravatar";
 
 interface Props {
   entityType: string;
@@ -56,31 +57,34 @@ function CommentList(props: Props) {
 
     rows.push(
       <motion.tr key={comment.token} variants={item}>
-        <td>
-          <div className="py-3">
-            <div className="d-flex gap-2 align-items-center">
-              <span className="fw-medium text-white">
-                {comment.user_display_name}
-              </span>
-              <span>·</span>
-              <span className="opacity-75 comment-time">
-                {relativeCreateTime}
-              </span>
-              <span>·</span>
-              {maybeDeleteButton}
-            </div>
-            {/* 
+        <td className="px-0">
+          <div className="d-flex gap-3 py-3">
+            <Gravatar size={40} email_hash={comment.user_gravatar_hash} />
+            <div>
+              <div className="d-flex gap-2 align-items-center">
+                <span className="fw-medium text-white">
+                  {comment.user_display_name}
+                </span>
+                <span>·</span>
+                <span className="opacity-75 comment-time">
+                  {relativeCreateTime}
+                </span>
+                <span>·</span>
+                {maybeDeleteButton}
+              </div>
+              {/* 
               It's okay to set "dangerous" html here as the server safely created 
               it from markdown and shields against user injection attempts. Don't
               do this with other server data, though, unless you know that field 
               is safe from the backend engineers. 
             */}
-            <div
-              className="mt-1"
-              dangerouslySetInnerHTML={{
-                __html: comment.comment_rendered_html || "",
-              }}
-            />
+              <div
+                className="mt-1"
+                dangerouslySetInnerHTML={{
+                  __html: comment.comment_rendered_html || "",
+                }}
+              />
+            </div>
           </div>
         </td>
       </motion.tr>

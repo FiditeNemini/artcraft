@@ -101,7 +101,7 @@ function CreateCommentForm(props: Props) {
       <div className="d-flex w-100 justify-content-end">
         <button
           type="reset"
-          className="btn btn-link text-white opacity-75"
+          className="btn btn-link btn-link-white"
           onClick={handleCancelButton}
         >
           Cancel
@@ -125,9 +125,9 @@ function CreateCommentForm(props: Props) {
   );
   if (props.sessionWrapper.isLoggedIn()) {
     createCommentComponent = (
-      <form onSubmit={handleFormSubmit} className="mb-3">
-        <div className="d-flex flex-column gap-2">
-          <div className="d-flex gap-2">
+      <form onSubmit={handleFormSubmit}>
+        <div className="d-flex flex-column gap-3">
+          <div className="d-flex gap-3 align-items-center">
             {gravatar}
             <div className="form-group flex-grow-1">
               <textarea
