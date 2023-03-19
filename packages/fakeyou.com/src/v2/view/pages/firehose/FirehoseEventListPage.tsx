@@ -106,18 +106,20 @@ function FirehoseEventListPage(props: Props) {
       let link = `/profile/${event.maybe_target_username}`;
       userLink = <Link to={link}>{event.maybe_target_display_name}</Link>;
       gravatar = (
-        <Gravatar
-          size={15}
-          username={event.maybe_target_username}
-          email_hash={event.maybe_target_user_gravatar_hash}
-        />
+        <div className="me-1">
+          <Gravatar
+            size={22}
+            username={event.maybe_target_username}
+            email_hash={event.maybe_target_user_gravatar_hash}
+          />
+        </div>
       );
     }
 
     switch (event.event_type) {
       case "user_sign_up":
         inner = (
-          <span>
+          <span className="d-flex align-items-center">
             <FontAwesomeIcon icon={faPenToSquare} className="me-3" />
             {gravatar}
             &nbsp;
@@ -128,7 +130,7 @@ function FirehoseEventListPage(props: Props) {
         break;
       case "user_badge_granted":
         inner = (
-          <span>
+          <span className="d-flex align-items-center">
             <FontAwesomeIcon icon={faAward} className="me-3" />
             {gravatar}
             &nbsp;
@@ -139,7 +141,7 @@ function FirehoseEventListPage(props: Props) {
         break;
       case "tts_model_upload_started":
         inner = (
-          <span>
+          <span className="d-flex align-items-center">
             <FontAwesomeIcon icon={faPlay} className="me-3" />
             {gravatar}
             &nbsp;
@@ -150,7 +152,7 @@ function FirehoseEventListPage(props: Props) {
         break;
       case "tts_model_upload_completed":
         inner = (
-          <span>
+          <span className="d-flex align-items-center">
             <FontAwesomeIcon icon={faFlagCheckered} className="me-3" />
             {gravatar}
             &nbsp;
@@ -161,7 +163,7 @@ function FirehoseEventListPage(props: Props) {
         break;
       case "tts_inference_started":
         inner = (
-          <span>
+          <span className="d-flex align-items-center">
             <FontAwesomeIcon icon={faPlay} className="me-3" />
             {gravatar}
             &nbsp;
@@ -172,7 +174,7 @@ function FirehoseEventListPage(props: Props) {
         break;
       case "tts_inference_completed":
         inner = (
-          <span>
+          <span className="d-flex align-items-center">
             <FontAwesomeIcon icon={faFlagCheckered} className="me-3" />
             {gravatar}
             &nbsp;
@@ -183,7 +185,7 @@ function FirehoseEventListPage(props: Props) {
         break;
       case "w2l_template_upload_started":
         inner = (
-          <span>
+          <span className="d-flex align-items-center">
             <FontAwesomeIcon icon={faPlay} className="me-3" />
             {gravatar}
             &nbsp;
@@ -194,7 +196,7 @@ function FirehoseEventListPage(props: Props) {
         break;
       case "w2l_template_upload_completed":
         inner = (
-          <span>
+          <span className="d-flex align-items-center">
             <FontAwesomeIcon icon={faFlagCheckered} className="me-3" />
             {gravatar}
             &nbsp;
@@ -205,7 +207,7 @@ function FirehoseEventListPage(props: Props) {
         break;
       case "w2l_inference_started":
         inner = (
-          <span>
+          <span className="d-flex align-items-center">
             <FontAwesomeIcon icon={faPlay} className="me-3" />
             {gravatar}
             &nbsp;
@@ -216,7 +218,7 @@ function FirehoseEventListPage(props: Props) {
         break;
       case "w2l_inference_completed":
         inner = (
-          <span>
+          <span className="d-flex align-items-center">
             <FontAwesomeIcon icon={faFlagCheckered} className="me-3" />
             {gravatar}
             &nbsp;
@@ -227,7 +229,7 @@ function FirehoseEventListPage(props: Props) {
         break;
       case "twitter_mention":
         inner = (
-          <span>
+          <span className="d-flex align-items-center">
             <FontAwesomeIcon icon={faTwitter} className="me-3" />
             {gravatar}
             &nbsp;
@@ -238,7 +240,7 @@ function FirehoseEventListPage(props: Props) {
         break;
       case "twitter_retweet":
         inner = (
-          <span>
+          <span className="d-flex align-items-center">
             <FontAwesomeIcon icon={faTwitter} className="me-3" />
             {gravatar}
             &nbsp;
@@ -249,7 +251,7 @@ function FirehoseEventListPage(props: Props) {
         break;
       case "discord_join":
         inner = (
-          <span>
+          <span className="d-flex align-items-center">
             <FontAwesomeIcon icon={faDiscord} className="me-3" />
             {gravatar}
             &nbsp;
@@ -260,7 +262,7 @@ function FirehoseEventListPage(props: Props) {
         break;
       case "discord_message":
         inner = (
-          <span>
+          <span className="d-flex align-items-center">
             <FontAwesomeIcon icon={faDiscord} className="me-3" />
             {gravatar}
             &nbsp;
@@ -271,7 +273,7 @@ function FirehoseEventListPage(props: Props) {
         break;
       case "twitch_subscribe":
         inner = (
-          <span>
+          <span className="d-flex align-items-center">
             <FontAwesomeIcon icon={faTwitch} className="me-3" />
             {gravatar}
             &nbsp;
@@ -282,7 +284,7 @@ function FirehoseEventListPage(props: Props) {
         break;
       case "twitch_follow":
         inner = (
-          <span>
+          <span className="d-flex align-items-center">
             <FontAwesomeIcon icon={faTwitch} className="me-3" />
             {gravatar}
             &nbsp;
