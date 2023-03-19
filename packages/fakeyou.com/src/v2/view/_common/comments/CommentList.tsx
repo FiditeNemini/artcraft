@@ -48,6 +48,7 @@ function CommentList(props: Props) {
     if (canDelete) {
       maybeDeleteButton = (
         <>
+          <span>·</span>
           <SafeDeleteCommentButton
             commentToken={comment.token}
             loadComments={props.loadComments}
@@ -72,7 +73,7 @@ function CommentList(props: Props) {
                 <span className="opacity-75 comment-time">
                   {relativeCreateTime}
                 </span>
-                <span>·</span>
+
                 {maybeDeleteButton}
               </div>
               {/* 
