@@ -7,7 +7,7 @@ interface Props {
 }
 
 function Gravatar(props: Props) {
-  const gravatarUrl = `https://www.gravatar.com/avatar/${props.email_hash}?s=${props.size}&d=https://placehold.co/600x600.png`;
+  const gravatarUrl = `https://www.gravatar.com/avatar/${props.email_hash}?s=${props.size}&d=https://fakeyou.com/images/avatars/default-pfp.png`;
 
   let altText = "gravatar";
   if (props.username !== undefined) {
