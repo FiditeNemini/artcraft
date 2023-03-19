@@ -8,7 +8,7 @@ import {
 import { Trump } from './TrumpSprite';
 import { getRandomInt } from '../../Utils';
 
-const logoImage = '/assets/trumped.png';
+const logoImage = '/images/trumped.png';
 
 enum AnimationState {
   IDLE,

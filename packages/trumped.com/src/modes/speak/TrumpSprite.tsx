@@ -3,36 +3,36 @@ import { PixiComponent } from '@inlet/react-pixi';
 import { AnimationState } from './Animation';
 
 const idleImages = [
-  '/assets/trumpette/idle_0.png', // 0
-  '/assets/trumpette/idle_1.png', // 1
-  '/assets/trumpette/idle_2.png', // 2
-  '/assets/trumpette/idle_3.png', // 3
-  '/assets/trumpette/idle_4.png', // 4
+  '/images/trumpette/idle_0.png', // 0
+  '/images/trumpette/idle_1.png', // 1
+  '/images/trumpette/idle_2.png', // 2
+  '/images/trumpette/idle_3.png', // 3
+  '/images/trumpette/idle_4.png', // 4
 ];
 
 const talkImages = [
-  '/assets/trumpette/talk_0.png', // 5
-  '/assets/trumpette/talk_1.png', // 6
-  '/assets/trumpette/talk_2.png', // 7
-  '/assets/trumpette/talk_3.png', // 8
-  '/assets/trumpette/talk_4.png', // 9
-  '/assets/trumpette/talk_5.png', // 10
-  '/assets/trumpette/talk_6.png', // 11
-  '/assets/trumpette/talk_7.png', // 12
-  '/assets/trumpette/talk_8.png', // 13
+  '/images/trumpette/talk_0.png', // 5
+  '/images/trumpette/talk_1.png', // 6
+  '/images/trumpette/talk_2.png', // 7
+  '/images/trumpette/talk_3.png', // 8
+  '/images/trumpette/talk_4.png', // 9
+  '/images/trumpette/talk_5.png', // 10
+  '/images/trumpette/talk_6.png', // 11
+  '/images/trumpette/talk_7.png', // 12
+  '/images/trumpette/talk_8.png', // 13
 ];
 
 const angryImages = [
-  '/assets/trumpette/angry_0.png', // 14
-  '/assets/trumpette/angry_1.png', // 15
-  '/assets/trumpette/angry_2.png', // 16
-  '/assets/trumpette/angry_3.png', // 17
-  '/assets/trumpette/angry_4.png', // 18
-  '/assets/trumpette/angry_5.png', // 19
-  '/assets/trumpette/angry_6.png', // 20
-  '/assets/trumpette/angry_7.png', // 21
-  '/assets/trumpette/angry_8.png', // 22
-  '/assets/trumpette/angry_between.png', // 23
+  '/images/trumpette/angry_0.png', // 14
+  '/images/trumpette/angry_1.png', // 15
+  '/images/trumpette/angry_2.png', // 16
+  '/images/trumpette/angry_3.png', // 17
+  '/images/trumpette/angry_4.png', // 18
+  '/images/trumpette/angry_5.png', // 19
+  '/images/trumpette/angry_6.png', // 20
+  '/images/trumpette/angry_7.png', // 21
+  '/images/trumpette/angry_8.png', // 22
+  '/images/trumpette/angry_between.png', // 23
 ];
 
 type AnimationProps = { 
