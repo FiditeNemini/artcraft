@@ -1,7 +1,12 @@
 import Howl from 'howler';
 import React from 'react';
+import { getRandomInt } from '../../Utils';
 import { SpeakRequest } from './SpeakRequest';
 
+const AUDIO_FILES = [
+  '/wav/fakeyou_1.wav',
+  '/wav/fakeyou_2.wav',
+];
 
 interface Props {
   clearStatusCallback: () => void,
@@ -15,7 +20,7 @@ interface Props {
 
 interface State {
   text: string,
-  howl?: Howl,
+  howl?: Howl.Howl,
 }
 
 class Form extends React.Component<Props, State> {
@@ -33,58 +38,33 @@ class Form extends React.Component<Props, State> {
     this.textarea?.focus();
   }
 
-  public speak(sentence: string, speaker: string) {
-    let request = new SpeakRequest(sentence, speaker);
-
-    console.log("Making SpeakRequest:", request);
-
-    //const url = this.props.apiConfig.getEndpoint('/speak');
-    const url = 'https://mumble.stream/speak';
-
-    this.props.onSpeakRequestCallback();
+  public speak(_sentence: string, _speaker: string) {
     let that = this;
 
-    fetch(url, {
-      method: 'POST',
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json',
+    this.props.onSpeakSuccessCallback();
+
+    const i = getRandomInt(0, AUDIO_FILES.length);;
+    const url = AUDIO_FILES[i];
+
+    const sound = new Howl.Howl({
+      src: [url],
+      // NB: Attempting to get this working on iPhone Safari
+      // https://github.com/goldfire/howler.js/issues/1093
+      // Other issues cite needing to cache a single player 
+      // across all user interaction events.
+      html5: true,
+      onplay: () => {
+        that.props.onPlayCallback();
       },
-      body: JSON.stringify(request),
-    })
-    .then(res => res.blob())
-    .then(blob => {
-      this.props.onSpeakSuccessCallback();
-
-      console.log(blob);
-
-      const url = window.URL.createObjectURL(blob);
-      console.log(url);
-
-      const sound = new Howl.Howl({
-        src: [url],
-        format: 'wav',
-        // NB: Attempting to get this working on iPhone Safari
-        // https://github.com/goldfire/howler.js/issues/1093
-        // Other issues cite needing to cache a single player 
-        // across all user interaction events.
-        html5: true,
-        onplay: () => {
-          that.props.onPlayCallback();
-        },
-        onend: () => {
-          that.props.onStopCallback();
-        },
-      });
-      
-      this.setState({howl: sound});
-      sound.play();
-
-      (window as any).sound = sound;
-    })
-    .catch(e => {
-      this.props.onSpeakErrorCallback();
+      onend: () => {
+        that.props.onStopCallback();
+      },
     });
+    
+    this.setState({howl: sound});
+    sound.play();
+
+    (window as any).sound = sound;
   }
 
   clear() {
