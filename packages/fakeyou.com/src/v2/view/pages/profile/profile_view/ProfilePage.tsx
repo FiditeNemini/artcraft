@@ -535,7 +535,7 @@ function ProfilePage(this: any, props: Props) {
               role="tabpanel"
               aria-labelledby="comments-tab"
             >
-              <div className="d-flex flex-column gap-3">
+              <div className="mt-3 mt-lg-0">
                 <CommentComponent
                   entityType="user"
                   entityToken={userData?.user_token}

@@ -20,6 +20,7 @@ import { faDownload, faEdit, faTrash } from "@fortawesome/free-solid-svg-icons";
 import { motion } from "framer-motion";
 import { container, item, panel } from "../../../../../data/animation";
 import { usePrefixedDocumentTitle } from "../../../../../common/UsePrefixedDocumentTitle";
+import { CommentComponent } from "../../../_common/comments/CommentComponent";
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -50,9 +51,10 @@ function W2lResultViewPage(props: Props) {
     getInferenceResult(token);
   }, [token, getInferenceResult]); // NB: Empty array dependency sets to run ONLY on mount
 
-  const documentTitle = w2lInferenceResult?.template_title === undefined 
-    ? undefined 
-    : `Deep Fake ${w2lInferenceResult.template_title} Lip Sync Video Result`;
+  const documentTitle =
+    w2lInferenceResult?.template_title === undefined
+      ? undefined
+      : `Deep Fake ${w2lInferenceResult.template_title} Lip Sync Video Result`;
   usePrefixedDocumentTitle(documentTitle);
 
   if (notFoundState) {
@@ -351,6 +353,19 @@ function W2lResultViewPage(props: Props) {
         <motion.div className="mt-4" variants={item}>
           <ReportDiscordLink />
         </motion.div>
+      </motion.div>
+
+      <motion.div className="container-panel pt-4 pb-5" variants={item}>
+        <div className="panel p-3 p-lg-4">
+          <h2 className="fw-bold panel-title">Comments</h2>
+          <div className="py-6">
+            <CommentComponent
+              entityType="user"
+              entityToken={w2lInferenceResult.w2l_result_token}
+              sessionWrapper={props.sessionWrapper}
+            />
+          </div>
+        </div>
       </motion.div>
     </motion.div>
   );

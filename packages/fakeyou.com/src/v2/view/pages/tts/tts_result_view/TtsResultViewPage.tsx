@@ -40,6 +40,7 @@ import {
 import { BackLink } from "../../../_common/BackLink";
 import { TextExpander } from "../../../_common/TextExpander";
 import { usePrefixedDocumentTitle } from "../../../../../common/UsePrefixedDocumentTitle";
+import { CommentComponent } from "../../../_common/comments/CommentComponent";
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -595,9 +596,23 @@ function TtsResultViewPage(props: Props) {
         <motion.p className="text-center text-lg-start" variants={item}>
           <ReportDiscordLink />
         </motion.p>
+
         <motion.div className="pt-5" variants={item}>
           <BackLink link="/" text="Back to all models" />
         </motion.div>
+      </motion.div>
+
+      <motion.div className="container-panel pt-4 pb-5" variants={item}>
+        <div className="panel p-3 p-lg-4">
+          <h2 className="fw-bold panel-title">Comments</h2>
+          <div className="py-6">
+            <CommentComponent
+              entityType="user"
+              entityToken={ttsInferenceResult.tts_result_token}
+              sessionWrapper={props.sessionWrapper}
+            />
+          </div>
+        </div>
       </motion.div>
     </motion.div>
   );

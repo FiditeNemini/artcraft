@@ -1029,6 +1029,34 @@ styles with important tags:
 
   .textarea-comment {
     resize: none;
+    overflow-x: none;
+  }
+
+  .btn-comment {
+    padding: 8px 20px;
+    font-size: 14px;
+  }
+
+  .btn-link-white {
+    color: $white;
+    opacity: 0.75;
+
+    &:hover {
+      color: $white;
+      opacity: 0.5;
+    }
+  }
+
+  .btn-link-small {
+    font-size: 14px;
+  }
+
+  .comment-time {
+    font-size: 14px;
+  }
+
+  .gravatar-img {
+    pointer-events: none;
   }
 }
 

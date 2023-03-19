@@ -64,6 +64,7 @@ import { Analytics } from "../../../../../common/Analytics";
 import { usePrefixedDocumentTitle } from "../../../../../common/UsePrefixedDocumentTitle";
 import { RatingButtons } from "../../../_common/ratings/RatingButtons";
 import { RatingStats } from "../../../_common/ratings/RatingStats";
+import { CommentComponent } from "../../../_common/comments/CommentComponent";
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -530,11 +531,17 @@ function TtsModelViewPage(props: Props) {
 
                   <tr>
                     <th>Use global m-factor? (default no)</th>
-                    <td>{ttsModel?.maybe_moderator_fields?.use_default_m_factor ? "yes" : "no"}</td>
+                    <td>
+                      {ttsModel?.maybe_moderator_fields?.use_default_m_factor
+                        ? "yes"
+                        : "no"}
+                    </td>
                   </tr>
                   <tr>
                     <th>Custom m-factor (optional)</th>
-                    <td>{ttsModel?.maybe_moderator_fields?.maybe_custom_m_factor}</td>
+                    <td>
+                      {ttsModel?.maybe_moderator_fields?.maybe_custom_m_factor}
+                    </td>
                   </tr>
                 </tbody>
               </table>
@@ -666,11 +673,11 @@ function TtsModelViewPage(props: Props) {
   let ratingButtons = <></>;
   if (props.sessionWrapper.isLoggedIn()) {
     ratingButtons = (
-      <RatingButtons 
-        entity_type="tts_model" 
-        entity_token={ttsModel?.model_token || ""} 
+      <RatingButtons
+        entity_type="tts_model"
+        entity_token={ttsModel?.model_token || ""}
       />
-    )
+    );
   }
 
   // NB: Investors might not like the in-your-face "over 1 year ago" dates.
@@ -690,10 +697,9 @@ function TtsModelViewPage(props: Props) {
 
             <RatingStats
               positive_votes={ttsModel?.user_ratings?.positive_count || 0}
-              negative_votes={ttsModel?.user_ratings?.negative_count || 0 }
+              negative_votes={ttsModel?.user_ratings?.negative_count || 0}
               total_votes={ttsModel?.user_ratings?.total_count || 0}
             />
-
           </div>
         </div>
         <motion.div className="mb-3 mt-4 pt-2" variants={item}>
@@ -813,6 +819,19 @@ function TtsModelViewPage(props: Props) {
 
       <motion.div className="container pb-5" variants={item}>
         <BackLink link="/" text="Back to all models" />
+      </motion.div>
+
+      <motion.div className="container-panel pt-4 pb-5" variants={item}>
+        <div className="panel p-3 p-lg-4">
+          <h2 className="fw-bold panel-title">Comments</h2>
+          <div className="py-6">
+            <CommentComponent
+              entityType="user"
+              entityToken={ttsModel.model_token}
+              sessionWrapper={props.sessionWrapper}
+            />
+          </div>
+        </div>
       </motion.div>
 
       <motion.div className="container" variants={item}>
