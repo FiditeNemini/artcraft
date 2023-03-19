@@ -599,6 +599,7 @@ function TtsModelEditPage(props: Props) {
                         Public (visible from your profile)
                       </option>
                       <option value="hidden">Unlisted (shareable URLs)</option>
+                      <option value="private">Private (work in progress)</option>
                     </select>
                   </div>
                 </div>
