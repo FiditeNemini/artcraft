@@ -80,6 +80,15 @@ function CreateCommentForm(props: Props) {
     }
   };
 
+  const handleCancelButton = (ev: any) => {
+    ev.preventDefault();
+    const commentTextArea = document.getElementById(
+      "comment-textarea"
+    ) as HTMLTextAreaElement;
+    commentTextArea.value = "";
+    setButtonVisible(false);
+  };
+
   let gravatarHash = props.sessionWrapper.getEmailGravatarHash();
   let gravatar = <span />;
   if (gravatarHash !== undefined) {
@@ -90,7 +99,11 @@ function CreateCommentForm(props: Props) {
   if (buttonVisible) {
     commentButton = (
       <div className="d-flex w-100 justify-content-end">
-        <button type="button" className="btn btn-link text-white opacity-75">
+        <button
+          type="reset"
+          className="btn btn-link text-white opacity-75"
+          onClick={handleCancelButton}
+        >
           Cancel
         </button>
         <button type="submit" className="btn btn-primary btn-comment">
@@ -123,6 +136,7 @@ function CreateCommentForm(props: Props) {
                 rows={1}
                 onChange={handleCommentChange}
                 onKeyDown={handleKeyDown}
+                id="comment-textarea"
               >
                 {commentMarkdown}
               </textarea>
