@@ -7,7 +7,7 @@ interface Props {
 }
 
 function Gravatar(props: Props) {
-  const gravatarUrl = `https://www.gravatar.com/avatar/${props.email_hash}?s=${props.size}`;
+  const gravatarUrl = `https://www.gravatar.com/avatar/${props.email_hash}?s=${props.size}&d=https://placehold.co/60x60.png`;
 
   let altText = "gravatar";
   if (props.username !== undefined) {
@@ -19,6 +19,8 @@ function Gravatar(props: Props) {
       className="rounded-circle border border-2 h-100"
       alt={altText}
       src={gravatarUrl}
+      height={props.size}
+      width={props.size}
     />
   );
 }
