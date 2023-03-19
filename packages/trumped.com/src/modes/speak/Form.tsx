@@ -1,7 +1,6 @@
 import Howl from 'howler';
 import React from 'react';
 import { getRandomInt } from '../../Utils';
-import { SpeakRequest } from './SpeakRequest';
 
 const AUDIO_FILES = [
   '/wav/fakeyou_1.wav',
