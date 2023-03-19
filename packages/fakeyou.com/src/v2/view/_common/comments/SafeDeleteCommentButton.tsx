@@ -4,7 +4,6 @@ import {
   DeleteCommentIsOk,
 } from "@storyteller/components/src/api/comments/DeleteComment";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faTrash } from "@fortawesome/free-solid-svg-icons";
 import { faTrashCheck } from "@fortawesome/pro-solid-svg-icons";
 
 interface Props {
