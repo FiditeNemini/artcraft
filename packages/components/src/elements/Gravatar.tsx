@@ -16,7 +16,7 @@ function Gravatar(props: Props) {
 
   return (
     <img
-      className="rounded-circle border border-3"
+      className="rounded-circle border border-2 h-100"
       alt={altText}
       src={gravatarUrl}
     />
