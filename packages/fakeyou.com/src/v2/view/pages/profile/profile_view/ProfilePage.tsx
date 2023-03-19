@@ -535,11 +535,13 @@ function ProfilePage(this: any, props: Props) {
               role="tabpanel"
               aria-labelledby="comments-tab"
             >
-              <CommentComponent
-                entityType="user"
-                entityToken={userData?.user_token}
-                sessionWrapper={props.sessionWrapper}
-              />
+              <div className="mt-3 mt-lg-0">
+                <CommentComponent
+                  entityType="user"
+                  entityToken={userData?.user_token}
+                  sessionWrapper={props.sessionWrapper}
+                />
+              </div>
             </div>
           </div>
         </div>

@@ -6,6 +6,7 @@ import { SafeDeleteCommentButton } from "./SafeDeleteCommentButton";
 import { motion } from "framer-motion";
 import { container, item } from "../../../../data/animation";
 import { Gravatar } from "@storyteller/components/src/elements/Gravatar";
+import { Link } from "react-router-dom";
 
 interface Props {
   entityType: string;
@@ -55,6 +56,8 @@ function CommentList(props: Props) {
       );
     }
 
+    let profileLink = `/profile/${comment.username}`;
+
     rows.push(
       <motion.tr key={comment.token} variants={item}>
         <td className="px-0">
@@ -62,9 +65,9 @@ function CommentList(props: Props) {
             <Gravatar size={40} email_hash={comment.user_gravatar_hash} />
             <div>
               <div className="d-flex gap-2 align-items-center">
-                <span className="fw-medium text-white">
+                <Link to={profileLink} className="fw-medium text-white">
                   {comment.user_display_name}
-                </span>
+                </Link>
                 <span>·</span>
                 <span className="opacity-75 comment-time">
                   {relativeCreateTime}
