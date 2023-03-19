@@ -95,11 +95,14 @@ function CommentList(props: Props) {
   });
 
   return (
-    <motion.div initial="hidden" animate="visible" variants={container}>
-      <table className="table">
-        <tbody>{rows}</tbody>
-      </table>
-    </motion.div>
+    <motion.table
+      className="table mb-0"
+      initial="hidden"
+      animate="visible"
+      variants={container}
+    >
+      <tbody>{rows}</tbody>
+    </motion.table>
   );
 }
 

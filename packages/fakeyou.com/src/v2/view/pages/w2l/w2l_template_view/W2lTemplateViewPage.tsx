@@ -27,6 +27,7 @@ import { motion } from "framer-motion";
 import { container, item, panel } from "../../../../../data/animation";
 import { ThirdPartyLinks } from "@storyteller/components/src/constants/ThirdPartyLinks";
 import { usePrefixedDocumentTitle } from "../../../../../common/UsePrefixedDocumentTitle";
+import { CommentComponent } from "../../../_common/comments/CommentComponent";
 
 interface EnqueueJobResponsePayload {
   success: boolean;
@@ -58,7 +59,10 @@ function W2lTemplateViewPage(props: Props) {
   const [modApprovedFormValue, setModApprovedFormValue] =
     useState<boolean>(true);
 
-  const documentTitle = w2lTemplate?.title === undefined ? undefined : `Create Deep Fake ${w2lTemplate.title} Lip Sync Video`;
+  const documentTitle =
+    w2lTemplate?.title === undefined
+      ? undefined
+      : `Create Deep Fake ${w2lTemplate.title} Lip Sync Video`;
   usePrefixedDocumentTitle(documentTitle);
 
   const getTemplate = useCallback(
@@ -275,9 +279,7 @@ function W2lTemplateViewPage(props: Props) {
   let creatorLink = <span />;
 
   if (!!w2lTemplate?.creator_display_name) {
-    const creatorUrl = WebUrl.userProfilePage(
-      w2lTemplate?.creator_username
-    );
+    const creatorUrl = WebUrl.userProfilePage(w2lTemplate?.creator_username);
     creatorLink = (
       <span>
         <Gravatar
@@ -415,10 +417,7 @@ function W2lTemplateViewPage(props: Props) {
         </motion.h1>
         <motion.h4 variants={item}>Template: {w2lTemplate?.title}</motion.h4>
         <motion.div className="pt-3" variants={item}>
-          <BackLink
-            link={WebUrl.w2lListPage()}
-            text="Back to all templates"
-          />
+          <BackLink link={WebUrl.w2lListPage()} text="Back to all templates" />
         </motion.div>
       </div>
 
@@ -541,6 +540,19 @@ function W2lTemplateViewPage(props: Props) {
       <motion.div variants={item}>
         <div className="container pt-4 pb-5">
           <ReportDiscordLink />
+        </div>
+      </motion.div>
+
+      <motion.div className="container-panel pt-4 pb-5" variants={item}>
+        <div className="panel p-3 p-lg-4">
+          <h2 className="fw-bold panel-title">Comments</h2>
+          <div className="py-6">
+            <CommentComponent
+              entityType="user"
+              entityToken={w2lTemplate.template_token}
+              sessionWrapper={props.sessionWrapper}
+            />
+          </div>
         </div>
       </motion.div>
 
