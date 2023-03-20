@@ -144,6 +144,16 @@ function TopNav(props: Props) {
             </li>
             <li>
               <a
+                id="nav-btn-4"
+                href="#social"
+                className="nav-link"
+                data-scroll-to
+              >
+                Social AI
+              </a>
+            </li>
+            <li>
+              <a
                 id="nav-btn-2"
                 href="#film"
                 className="nav-link"
@@ -162,16 +172,7 @@ function TopNav(props: Props) {
                 Music
               </a>
             </li>
-            <li>
-              <a
-                id="nav-btn-4"
-                href="#social"
-                className="nav-link"
-                data-scroll-to
-              >
-                Social AI
-              </a>
-            </li>
+
             {/* NB: Hiding this for now.
             <li>
               <a
@@ -231,6 +232,11 @@ function TopNav(props: Props) {
                 </a>
               </li>
               <li className="nav-link">
+                <a onClick={menuToggle} href="#social" data-scroll-to>
+                  Social AI
+                </a>
+              </li>
+              <li className="nav-link">
                 <a onClick={menuToggle} href="#film" data-scroll-to>
                   Film
                 </a>
@@ -240,16 +246,12 @@ function TopNav(props: Props) {
                   Music
                 </a>
               </li>
-              <li className="nav-link">
-                <a onClick={menuToggle} href="#social" data-scroll-to>
-                  Social
-                </a>
-              </li>
-              <li className="nav-link">
+
+              {/* <li className="nav-link">
                 <a onClick={menuToggle} href="#team" data-scroll-to>
                   Our Team
                 </a>
-              </li>
+              </li> */}
               <li className="mt-4">
                 <a
                   onClick={menuToggle}
