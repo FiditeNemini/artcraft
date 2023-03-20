@@ -1,4 +1,4 @@
-//! env
+//! envvar
 //!
 //! The purpose of this library is to handle reading environment variables.
 //!
@@ -30,9 +30,10 @@ pub fn read_from_filename<P: AsRef<Path>>(filename: P) -> AnyhowResult<PathBuf> 
 pub fn read_from_filename_and_paths<P: AsRef<Path>>(filename: P, paths: &[P]) -> AnyhowResult<()> {
   for path in paths.iter() {
     let path = path.as_ref().join(filename.as_ref());
-    let path = std::fs::canonicalize(path)?;
 
     if path.exists() && path.is_file() {
+      log::info!("Attempting to read env vars from file: {:?}", path);
+      let path = std::fs::canonicalize(path)?;
       return Ok(dotenv::from_path(path)?);
     }
   }

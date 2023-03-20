@@ -1,5 +1,5 @@
 [package]
-name = "env"
+name = "envvar"
 edition = "2018"
 version = "0.0.1"
 authors = [
@@ -9,8 +9,9 @@ authors = [
 publish = false
 
 [lib]
-# NB: Public "env" crate is name-squatted, so we're fine to use this internally.
-name = "env"
+# NB: Public "envvar" crate is real, but doesn't seem useful.
+# NB: We shouldn't use "env" because that overlaps std::env.
+name = "envvar"
 path = "src/lib.rs"
 
 [dependencies]
@@ -20,6 +21,7 @@ errors = { path = "../errors" }
 # External
 dotenv = "0.15.0"
 easyenv = "0.0.6"
+log = "0.4.14"
 
 [dev-dependencies]
 # None yet
