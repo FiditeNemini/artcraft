@@ -3595,6 +3595,7 @@ dependencies = [
  "dotenv",
  "easyenv",
  "enums",
+ "envvar",
  "errors",
  "hostname",
  "hyper 0.14.24",

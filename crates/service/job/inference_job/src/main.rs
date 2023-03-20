@@ -53,6 +53,7 @@ use r2d2_redis::r2d2;
 use sqlx::mysql::MySqlPoolOptions;
 use std::path::PathBuf;
 use std::time::Duration;
+use crate::job_steps::main_loop::main_loop;
 
 // Buckets (shared config)
 const ENV_ACCESS_KEY : &'static str = "ACCESS_KEY";
@@ -82,6 +83,10 @@ async fn main() -> AnyhowResult<()> {
   // NB: Do not check this secrets-containing dotenv file into VCS.
   // This file should only contain *development* secrets, never production.
   let _ = dotenv::from_filename(".env-secrets").ok();
+
+  let _ = envvar::read_from_filename_and_paths(
+    "inference-job.env",
+    &[".", "crates/service/job/inference_job"])?;
 
   let matches = App::new("tts-inference-job")
       .arg(Arg::with_name("sidecar_hostname")
@@ -285,7 +290,7 @@ async fn main() -> AnyhowResult<()> {
     }
   };
 
-  let _job_dependencies = JobDependencies {
+  let job_dependencies = JobDependencies {
     scoped_temp_dir_creator: ScopedTempDirCreator::for_directory(&temp_directory),
     download_temp_directory: temp_directory,
     mysql_pool,
@@ -329,7 +334,7 @@ async fn main() -> AnyhowResult<()> {
   };
 
   // TODO: Main loop start
-  //main_loop_old(inferencer).await;
+  main_loop(job_dependencies).await;
 
   Ok(())
 }

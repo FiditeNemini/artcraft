@@ -19,6 +19,7 @@ cloud_storage = { path = "../../../lib/api_clients/cloud_storage" }
 config = { path = "../../../lib/deprecated/config" }
 container_common = { path = "../../../lib/deprecated/container_common" }
 enums = { path = "../../../_types/enums" }
+envvar = { path = "../../../lib/envvar" }
 errors = { path = "../../../lib/errors" }
 jobs_common = { path = "../../../lib/jobs_common" }
 memory_caching = { path = "../../../lib/caching/memory_caching" }

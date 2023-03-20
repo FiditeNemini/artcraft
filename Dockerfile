@@ -226,6 +226,7 @@ RUN touch .env-secrets
 
 # Some services have default env files that live under their code directories
 # These should also be readable from the relative current path
+COPY crates/service/job/inference_job/inference-job.env .
 COPY crates/service/web/storyteller_web/storyteller-web.env .
 
 EXPOSE 8080
