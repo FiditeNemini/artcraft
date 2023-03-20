@@ -1,0 +1,25 @@
+[package]
+name = "env"
+edition = "2018"
+version = "0.0.1"
+authors = [
+    "Brandon Thomas <bt@brand.io>",
+    "Brandon Thomas <echelon@gmail.com>",
+]
+publish = false
+
+[lib]
+# NB: Public "env" crate is name-squatted, so we're fine to use this internally.
+name = "env"
+path = "src/lib.rs"
+
+[dependencies]
+# Internal
+errors = { path = "../errors" }
+
+# External
+dotenv = "0.15.0"
+easyenv = "0.0.6"
+
+[dev-dependencies]
+# None yet

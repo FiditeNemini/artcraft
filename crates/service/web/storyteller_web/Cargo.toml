@@ -23,6 +23,7 @@ config = { path = "../../../lib/deprecated/config" }
 container_common = { path = "../../../lib/deprecated/container_common" }
 datetimes = { path = "../../../lib/datetimes" }
 enums = { path = "../../../_types/enums" }
+env = { path = "../../../lib/env" }
 errors = { path = "../../../lib/errors" }
 files = { path = "../../../lib/files" }
 google_drive_common = { path = "../../../lib/api_clients/google_drive_common" }

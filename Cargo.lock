@@ -2561,6 +2561,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "env"
+version = "0.0.1"
+dependencies = [
+ "dotenv",
+ "easyenv",
+ "errors",
+]
+
+[[package]]
 name = "env_logger"
 version = "0.7.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -6433,6 +6442,7 @@ dependencies = [
  "dotenv",
  "easyenv",
  "enums",
+ "env",
  "errors",
  "files",
  "futures 0.1.31",
