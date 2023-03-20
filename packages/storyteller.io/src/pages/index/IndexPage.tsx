@@ -232,7 +232,7 @@ function IndexPage() {
         <div className="container mt-5 pt-5">
           <div className="row gx-5 flex-row-reverse gy-4">
             <div className="col-lg-6 img-layers">
-              <Tilt trackOnWindow={true}>
+              <Tilt trackOnWindow={true} tiltReverse={true}>
                 <img
                   src="/images/screenshots/fakeyou-screen.webp"
                   alt="FakeYou"
@@ -278,7 +278,7 @@ function IndexPage() {
         <div className="container">
           <div className="row gx-5 gy-5">
             <div className="col-lg-6 img-layers">
-              <Tilt trackOnWindow={true}>
+              <Tilt trackOnWindow={true} tiltReverse={true}>
                 <img
                   src="/images/screenshots/powerstream-screen.webp"
                   alt="FakeYou"
