@@ -40,7 +40,7 @@ function IndexPage() {
   // NB: React video bug:
   // https://stackoverflow.com/questions/61510160/why-muted-attribute-on-video-tag-is-ignored-in-react
   // https://stackoverflow.com/questions/61510160/why-muted-attribute-on-video-tag-is-ignored-in-react
-  const videoRef : any = useRef(null);
+  const videoRef: any = useRef(null);
 
   // Title Animation
   useEffect(() => {
@@ -116,9 +116,9 @@ function IndexPage() {
       videoRef.current.setAttribute("disablepictureinpicture", "true");
       videoRef.current.setAttribute("preload", "auto");
       videoRef.current.muted = true;
-      videoRef.current.play()
+      videoRef.current.play();
     }
-  }, [videoRef])
+  }, [videoRef]);
 
   return (
     <div data-scroll-section data-scroll-repeat="true">
@@ -211,6 +211,112 @@ function IndexPage() {
               <FontAwesomeIcon icon={faTwitter} />
             </a>
           </Tippy>
+        </div>
+      </div>
+
+      <div id="social" className="bg-light section-2">
+        <div>
+          <Marquee gradient={false} speed={100}>
+            <h1 className="marquee-title d-flex gap-3 gap-md-4 gap-lg-5 mt-0 mb-lg-5">
+              <span>Social AI</span>
+              <span className="text-red">\</span>
+              <span className="text-outline">Social AI</span>
+              <span className="text-red">\</span>
+              <span>Social AI</span>
+              <span className="text-red">\</span>
+              <span className="text-outline">Social AI</span>
+              <span className="text-red me-3 me-md-4 me-lg-5">\</span>
+            </h1>
+          </Marquee>
+        </div>
+        <div className="container mt-5 pt-5">
+          <div className="row gx-5 flex-row-reverse gy-4">
+            <div className="col-lg-6 img-layers">
+              <Tilt trackOnWindow={true}>
+                <img
+                  src="/images/screenshots/fakeyou-screen.webp"
+                  alt="FakeYou"
+                  className="img-fluid img-back"
+                />
+              </Tilt>
+              <img
+                src="/images/fakeyou-mascot.webp"
+                alt="FakeYou"
+                className="img-front-right img-mascot"
+              />
+            </div>
+            <div className="col-lg-6 d-flex flex-column justify-content-center">
+              <h1 className="fw-bold display-5">FakeYou</h1>
+              <h4 className="fw-normal opacity-75 mb-4">
+                Used by millions of people every month
+              </h4>
+              <p>
+                We've built a social platform for deep learning and generative
+                models. FakeYou is a place where creators can upload and manage
+                a variety of deep fake models: speech, music, lipsyncing, and
+                more. Every day, artists and musicians use our tools to their to
+                dub their creative work. We offer paid voice cloning services,
+                an API with free and paid tiers, and in the future, our users
+                will be able to monetize their own voices.
+              </p>
+              <div>
+                <a
+                  href="https://fakeyou.com"
+                  rel="noreferrer"
+                  target="_blank"
+                  className="btn btn-primary mt-4"
+                >
+                  <span>Go to FakeYou.com</span>
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="bg-dark section-2">
+        <div className="container">
+          <div className="row gx-5 gy-5">
+            <div className="col-lg-6 img-layers">
+              <Tilt trackOnWindow={true}>
+                <img
+                  src="/images/screenshots/powerstream-screen.webp"
+                  alt="FakeYou"
+                  className="img-fluid img-back"
+                />
+              </Tilt>
+              <img
+                src="/images/powerstream-mascot.webp"
+                alt="FakeYou"
+                className="img-front-left img-mascot"
+              />
+            </div>
+            <div className="col-lg-6 d-flex flex-column justify-content-center">
+              <h1 className="fw-bold display-5">PowerStream</h1>
+              <h4 className="fw-normal opacity-75 mb-4">
+                Twitch Streamers and Creators can engage and monetize
+              </h4>
+              <p>
+                It’s tough to build an audience on Twitch. It's even tougher to
+                earn an income. We've built the most comprehensive and engaging
+                donation system for Twitch to date, letting audience members pay
+                to use Deep Fake voices and emotes in their favorite streamers'
+                live broadcasts. Get started with your channel! There's nothing
+                to install. It's the easiest, most engaging, most fun system for
+                Twitch yet. And it earns you money!
+              </p>
+              <div>
+                <a
+                  href="https://power.stream"
+                  rel="noreferrer"
+                  target="_blank"
+                  className="btn btn-primary mt-4"
+                >
+                  <span>Add to your stream now!</span>
+                </a>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -566,476 +672,7 @@ function IndexPage() {
             </div>
           </div>
         </div>
-
-        {/* <div className="w-100 d-flex justify-content-center">
-            <img
-              src="/logo/Storyteller-Icon-Logo.png"
-              alt="Storyteller Logo Icon"
-              className="divider-logo"
-            />
-          </div> */}
       </div>
-
-      {/* <div className="bg-dark section-2">
-          
-          <div className="container pt-10">
-            <div className="row gx-5">
-              <div className="col-lg-5 text-center text-lg-start">
-                <img
-                  src="/images/VC-img.webp"
-                  alt="FakeYou"
-                  className="img-fluid"
-                />
-              </div>
-              <div className="col-lg-7 d-flex flex-column justify-content-center">
-                <h1 className="fw-bold display-5">Voice Changing</h1>
-                <h4 className="fw-normal opacity-75 mb-4">
-                  Now you can sound like someone else
-                </h4>
-                <p className="mt-3">
-                  Use offline (studio quality) or real time voice changing to
-                  re-dub your film or give your live performers a new character.
-                </p>
-                <div>
-                  <a
-                    href="https://fakeyou.com/clone"
-                    rel="noreferrer"
-                    target="_blank"
-                    className="btn btn-primary mt-4"
-                  >
-                    <span>Transform my voice</span>
-                  </a>
-                </div>
-              </div>
-            </div>
-            <div className="mt-5 pt-4 pb-5 text-center">
-              <h2 className="text-center mt-5 fw-bold">
-                <FontAwesomeIcon icon={faMicrophone} className="me-3" />
-                Voice Changing Demo
-              </h2>
-              <p className="mb-4">
-                This is still an early beta. Voice quality will change and
-                improve substantially over time.
-              </p>
-              <p className="pt-5 opacity-100 mb-0">
-                <strong className="fw-semibold fs-5">Brandon</strong>
-                <FontAwesomeIcon icon={faArrowRight} className="mx-2" />
-                <strong className="fw-semibold fs-5">Donald Trump</strong>
-                <br />
-              </p>
-              <p className="text-center pb-3">
-                Real time voice to voice conversion.
-              </p>
-              <div className="row gx-4 gy-4 text-center pb-5">
-                <div className="col-12 col-lg-6">
-                  <div className="card bg-light-solid justify-content-start">
-                    <AudioSample sampleUrl="/audio-samples/voice-conversion-1.mp3" />
-                    <p className="mb-0">
-                      <em className="fs-6">
-                        &ldquo;I've got a huge announcement. This just sounds
-                        really, really great. And other than some phase
-                        distortion, artifacts, this is just sounding really
-                        great. And it's good for America. And voice synthesis is
-                        amazing.&rdquo;
-                      </em>
-                    </p>
-                  </div>
-                </div>
-                <div className="col-12 col-lg-6">
-                  <div className="card bg-light-solid justify-content-start">
-                    <AudioSample sampleUrl="/audio-samples/voice-conversion-2.mp3" />
-                    <p className="mb-0">
-                      <em className="fs-6">
-                        &ldquo;My favorite game is Super Smash Bros Ultimate.
-                        It's a really, really great game. It's huge. There's so
-                        many characters.&rdquo;
-                      </em>
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div className="text-center position-relative">
-              <div className="position-relative zi-2">
-                <h2 className="text-center mt-5 fw-bold">
-                  Sign up for your very own voice changer
-                </h2>
-                <p className="mb-4">
-                  We'll be rolling this out shortly. Get on the list! Tell us
-                  who you want to be.
-                </p>
-                <div>
-                  <a
-                    href="https://fakeyou.com/clone"
-                    rel="noreferrer"
-                    target="_blank"
-                    className="btn btn-primary mt-3"
-                  >
-                    <span>Transform my voice</span>
-                  </a>
-                </div>
-              </div>
-              <div className="shape-bg"></div>
-            </div>
-          </div>
-        </div> */}
-      <div id="social" className="bg-light section-2">
-        <div>
-          <Marquee gradient={false} speed={100}>
-            <h1 className="marquee-title d-flex gap-3 gap-md-4 gap-lg-5 mt-0 mb-lg-5">
-              <span>Social AI</span>
-              <span className="text-red">\</span>
-              <span className="text-outline">Social AI</span>
-              <span className="text-red">\</span>
-              <span>Social AI</span>
-              <span className="text-red">\</span>
-              <span className="text-outline">Social AI</span>
-              <span className="text-red me-3 me-md-4 me-lg-5">\</span>
-            </h1>
-          </Marquee>
-        </div>
-        <div className="container mt-5 pt-5">
-          <div className="row gx-5 flex-row-reverse gy-4">
-            <div className="col-lg-6 img-layers">
-              <Tilt trackOnWindow={true}>
-                <img
-                  src="/images/screenshots/fakeyou-screen.webp"
-                  alt="FakeYou"
-                  className="img-fluid img-back"
-                />
-              </Tilt>
-              <img
-                src="/images/fakeyou-mascot.webp"
-                alt="FakeYou"
-                className="img-front-right img-mascot"
-              />
-            </div>
-            <div className="col-lg-6 d-flex flex-column justify-content-center">
-              <h1 className="fw-bold display-5">FakeYou</h1>
-              <h4 className="fw-normal opacity-75 mb-4">
-                Used by millions of people every month
-              </h4>
-              <p>
-                We've built a social platform for deep learning and generative
-                models. FakeYou is a place where creators can upload and manage
-                a variety of deep fake models: speech, music, lipsyncing, and
-                more. Every day, artists and musicians use our tools to their to
-                dub their creative work. We offer paid voice cloning services,
-                an API with free and paid tiers, and in the future, our users
-                will be able to monetize their own voices.
-              </p>
-              <div>
-                <a
-                  href="https://fakeyou.com"
-                  rel="noreferrer"
-                  target="_blank"
-                  className="btn btn-primary mt-4"
-                >
-                  <span>Go to FakeYou.com</span>
-                </a>
-              </div>
-            </div>
-          </div>
-          {/* NB: We probably don't need this anymore. Commenting out for now.
-          <div className="mt-5 pt-4 text-center">
-            <h2 className="text-center mt-5 fw-bold">
-              <FontAwesomeIcon icon={faVolumeHigh} className="me-3" />
-              Try our text to speech!
-            </h2>
-            <p className="mb-5">
-              We have over 2,000 voices (with more added every day), but we've
-              selected a few to show off.
-            </p>
-          </div>*/}
-        </div>
-
-        {/* NB: We probably don't need this anymore. Commenting out for now.
-        <div className="d-flex flex-column align-items-center container tts-demo pb-5">
-          <TtsComponent />
-        </div>
-
-        <div className="container text-center position-relative">
-          <div className="position-relative zi-2">
-            <h2 className="text-center mt-5 fw-bold">Want to hear more?</h2>
-            <p className="mb-4">
-              Listen to all of the 2,000+ available voices on FakeYou.
-            </p>
-            <div className="d-flex flex-column flex-md-row gap-3 justify-content-center pt-3">
-              <a
-                href="https://fakeyou.com/"
-                rel="noreferrer"
-                target="_blank"
-                className="btn btn-primary"
-              >
-                <span>Go to FakeYou.com</span>
-              </a>
-              <a
-                href="https://fakeyou.com/clone"
-                rel="noreferrer"
-                target="_blank"
-                className="btn btn-secondary"
-              >
-                <span>Clone my voice</span>
-              </a>
-            </div>
-          </div>
-          <div className="shape-bg dark"></div>
-        </div>
-        */}
-      </div>
-      <div className="bg-dark section-2">
-        <div className="container">
-          <div className="row gx-5 gy-5">
-            <div className="col-lg-6 img-layers">
-              <Tilt trackOnWindow={true}>
-                <img
-                  src="/images/screenshots/powerstream-screen.webp"
-                  alt="FakeYou"
-                  className="img-fluid img-back"
-                />
-              </Tilt>
-              <img
-                src="/images/powerstream-mascot.webp"
-                alt="FakeYou"
-                className="img-front-left img-mascot"
-              />
-            </div>
-            <div className="col-lg-6 d-flex flex-column justify-content-center">
-              <h1 className="fw-bold display-5">PowerStream</h1>
-              <h4 className="fw-normal opacity-75 mb-4">
-                Twitch Streamers and Creators can engage and monetize
-              </h4>
-              <p>
-                It’s tough to build an audience on Twitch. It's even tougher to
-                earn an income. We've built the most comprehensive and engaging
-                donation system for Twitch to date, letting audience members pay
-                to use Deep Fake voices and emotes in their favorite streamers'
-                live broadcasts. Get started with your channel! There's nothing
-                to install. It's the easiest, most engaging, most fun system for
-                Twitch yet. And it earns you money!
-              </p>
-              <div>
-                <a
-                  href="https://power.stream"
-                  rel="noreferrer"
-                  target="_blank"
-                  className="btn btn-primary mt-4"
-                >
-                  <span>Add to your stream now!</span>
-                </a>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* <div className="bg-light section-2">
-        <div className="container">
-          <div className="row gx-5 flex-row-reverse">
-            <div className="col-lg-5 text-center text-lg-start">
-              <img
-                src="/images/Engine-img.webp"
-                alt="FakeYou"
-                className="img-fluid"
-              />
-            </div>
-            <div className="col-lg-7 d-flex flex-column justify-content-center">
-              <h1 className="fw-bold display-5">Storyteller Engine</h1>
-              <h4 className="fw-normal opacity-75 mb-4">
-                A fully 3D virtual set for your stream or film
-              </h4>
-              <p className="mt-3">
-                Our community contributes sets, character models, props, events,
-                and more. Use motion or volumetric capture. Your audience can
-                control everything. Ideal for improv, news casts, interviews,
-                gaming, fast virtual filmmaking, and much more!
-              </p>
-              <div>
-                <a
-                  href={ThirdPartyLinks.FAKEYOU_DISCORD}
-                  rel="noreferrer"
-                  target="_blank"
-                  className="btn btn-primary mt-4"
-                >
-                  <span>Ask us in Discord</span>
-                </a>
-              </div>
-            </div>
-          </div>
-
-          <div className="row gx-4 gy-4 gx-lg-5 gy-lg-5 mb-5 mt-5">
-            <div className="col-12 col-md-6 d-flex flex-column justify-content-center">
-              <video
-                src="/video/webpage-demo-1-640.mp4"
-                autoPlay={true}
-                playsInline={true}
-                loop={true}
-                muted={true}
-                className="img-fluid img-border"
-              ></video>
-            </div>
-            <div className="col-12 col-md-6 d-flex flex-column justify-content-center">
-              <div className="card bg-dark-solid align-items-start justify-content-center fs-6 h-auto">
-                <h3 className="pb-3">Volumetric Capture</h3>
-                <p className="mb-0">
-                  Use one or more cameras to build a 3D volumetric capture of
-                  your actors. In the future, we'll be upscaling from
-                  VGA-resolution depth maps to full 4K.
-                </p>
-              </div>
-            </div>
-          </div>
-
-          <div className="row gx-4 gy-4 gx-lg-5 gy-lg-5 flex-row-reverse mb-5">
-            <div className="col-12 col-md-6 d-flex flex-column justify-content-center">
-              <video
-                src="/video/webpage-demo-2-640.mp4"
-                autoPlay={true}
-                playsInline={true}
-                loop={true}
-                muted={true}
-                className="img-fluid img-border"
-              ></video>
-            </div>
-            <div className="col-12 col-md-6 d-flex flex-column justify-content-center">
-              <div className="card bg-dark-solid align-items-start justify-content-center fs-6 h-auto">
-                <h3 className="pb-3">Motion Capture</h3>
-                <p className="mb-0">
-                  Community-contributed models, sets, and scenarios can be
-                  controlled with webcam, Kinect, or motion capture systems and
-                  directed remotely from the web.
-                </p>
-              </div>
-            </div>
-          </div>
-
-          <div className="row gx-4 gy-4 gx-lg-5 gy-lg-5 pb-5">
-            <div className="col-12 col-md-6 d-flex flex-column justify-content-center">
-              <video
-                src="/video/webpage-demo-3-640.mp4"
-                autoPlay={true}
-                playsInline={true}
-                loop={true}
-                muted={true}
-                className="img-fluid img-border"
-              ></video>
-            </div>
-            <div className="col-12 col-md-6 d-flex flex-column justify-content-center">
-              <div className="card bg-dark-solid align-items-start justify-content-center fs-6 h-auto">
-                <h3 className="pb-3">
-                  Fake Faces, Voices, and Corrected Motion
-                </h3>
-                <p className="mb-0">
-                  We couldn't hire Elon Musk, but that didn't stop us and it
-                  won't stop you. Change your actors faces and voices to fit
-                  your needs. Tweak their movements and posture &mdash; even the
-                  location and lighting &mdash; all post capture.
-                </p>
-              </div>
-            </div>
-          </div>
-
-          <div className="pt-5 mt-5">
-            <div className="text-center position-relative">
-              <div className="position-relative zi-2 d-flex flex-column align-items-center">
-                <h2 className="text-center fw-bold">
-                  Apply for our beta program
-                </h2>
-                <p className="mb-4 mw-text">
-                  Are you a streamer or filmmaker? Want to help us test and
-                  develop Storyteller Engine into the best tool ever created for
-                  making narrative content?
-                </p>
-                <div>
-                  <a
-                    href={ThirdPartyLinks.FAKEYOU_DISCORD}
-                    rel="noreferrer"
-                    target="_blank"
-                    className="btn btn-primary mt-3"
-                  >
-                    <span>Ask us in Discord</span>
-                  </a>
-                </div>
-              </div>
-              <div className="shape-bg"></div>
-            </div>
-          </div>
-        </div>
-      </div> */}
-      {/* <div className="bg-dark section-2">
-          <div className="container">
-            <div className="row gx-5">
-              <div className="col-lg-5 text-center text-lg-start">
-                <img
-                  src="/images/VoxelCam-img.webp"
-                  alt="FakeYou"
-                  className="img-fluid"
-                />
-              </div>
-              <div className="col-lg-7 d-flex flex-column justify-content-center">
-                <h1 className="fw-bold display-5">Storyteller VoxelCam</h1>
-                <h4 className="fw-normal opacity-75 mb-4">
-                  Volumetric capture for your stream, and for your film set.
-                </h4>
-                <p className="mt-3">
-                  Webcams are boring and flat. You can use our volumetric camera
-                  in-stream to make your personality come to life. This system
-                  can also be integrated into our no-cinema camera virtual set.
-                </p>
-                <div>
-                  <a
-                    href="https://discord.gg/fakeyou"
-                    rel="noreferrer"
-                    target="_blank"
-                    className="btn btn-primary mt-4"
-                  >
-                    <span>Ask us in Discord</span>
-                  </a>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div className="container pt-5">
-            <h2 className="text-center my-5 fw-bold">
-              Volumetric cameras aren't limited to two dimensions
-            </h2>
-
-            <div className="rounded overflow-hidden">
-              <Scene />
-            </div>
-
-            <h2 className="text-center mt-5 pt-5 fw-bold">Screenshots</h2>
-
-            <div className="row gx-4 gy-4 my-4 text-center">
-              <div className="col-12 col-sm-4">
-                <div>
-                  <img
-                    className="img-fluid img-border img-hover"
-                    src="/screenshots/engine-fuji.png"
-                    alt="screenshot"
-                  />
-                </div>
-              </div>
-
-              <div className="col-12 col-sm-4">
-                <img
-                  className="img-fluid img-border"
-                  src="/screenshots/engine-zelda-monsters.png"
-                  alt="screenshot"
-                />
-              </div>
-
-              <div className="col-12 col-sm-4">
-                <img
-                  className="img-fluid img-border"
-                  src="/screenshots/engine-point-cloud.png"
-                  alt="screenshot"
-                />
-              </div>
-            </div>
-          </div>
-        </div> */}
 
       {/* NB: We're not quite ready to show our deck yet. But we're going to be filling this out silently.
       <div id="team" className="bg-light section-2">
