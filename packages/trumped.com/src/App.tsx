@@ -1,22 +1,21 @@
-import './App.scss';
-import React from 'react';
-import { Footer } from './navigation/Footer';
-import { HelpWantedComponent } from './modes/help_wanted/HelpWantedComponent';
-import { Mode } from './AppMode';
-import { NewsComponent } from './modes/news/NewsComponent';
-import { SpeakComponent } from './modes/speak/SpeakComponent';
-import { TermsComponent } from './modes/terms/TermsComponent';
-import { TopNav } from './navigation/TopNav';
-import { UsageComponent } from './modes/usage/UsageComponent';
+import "./App.scss";
+import React from "react";
+import { Footer } from "./navigation/Footer";
+import { HelpWantedComponent } from "./modes/help_wanted/HelpWantedComponent";
+import { Mode } from "./AppMode";
+import { NewsComponent } from "./modes/news/NewsComponent";
+import { SpeakComponent } from "./modes/speak/SpeakComponent";
+import { TermsComponent } from "./modes/terms/TermsComponent";
+import { TopNav } from "./navigation/TopNav";
+import { UsageComponent } from "./modes/usage/UsageComponent";
 
 interface Props {}
 
 interface State {
-  mode: Mode,
+  mode: Mode;
 }
 
 class App extends React.Component<Props, State> {
-
   constructor(props: Props) {
     super(props);
     this.state = {
@@ -26,11 +25,11 @@ class App extends React.Component<Props, State> {
 
   switchMode = (mode: Mode) => {
     this.setState({ mode: mode });
-  }
+  };
 
   resetMode = () => {
     this.setState({ mode: Mode.SPEAK_MODE });
-  }
+  };
 
   public render() {
     let component;
@@ -52,12 +51,12 @@ class App extends React.Component<Props, State> {
         break;
     }
     return (
-      <div id="main">
+      <div id="main" className="container">
         <div id="viewable">
           <TopNav mode={this.state.mode} switchModeCallback={this.switchMode} />
           {component}
+          <Footer mode={this.state.mode} switchModeCallback={this.switchMode} />
         </div>
-        <Footer mode={this.state.mode} switchModeCallback={this.switchMode} />
       </div>
     );
   }
