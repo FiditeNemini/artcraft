@@ -25,6 +25,10 @@ p {
   }
 }
 
+h1 {
+  font-weight: 700;
+}
+
 button {
   background-color: #e5e5e5;
   border: 0;
@@ -75,6 +79,7 @@ nav {
     color: $light-text-color;
     display: inline-block;
     cursor: pointer;
+    padding: 4px 10px;
   }
   a:hover,
   a:active {

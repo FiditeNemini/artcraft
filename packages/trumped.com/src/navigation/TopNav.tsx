@@ -9,7 +9,7 @@ interface Props {
 function TopNav(props: Props) {
   return (
     <>
-      <nav className="d-flex justify-content-center gap-4 align-items-center py-3">
+      <nav className="d-flex justify-content-center gap-2 align-items-center py-2">
         <a
           href="#speak"
           onClick={() => props.switchModeCallback(Mode.SPEAK_MODE)}
