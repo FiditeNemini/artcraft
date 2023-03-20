@@ -9,11 +9,11 @@ function NewsComponent(props: Props) {
     <div id="updates" className="mt-5">
       <h1> Updates </h1>
 
-      <h2>Mar 19, 2023: That whole AI thing.</h2>
+      <h3>Mar 19, 2023: That whole AI thing.</h3>
 
       <p>Turns out AI was pretty big. Wow.</p>
 
-      <h2>June 7, 2020: Website rewrite.</h2>
+      <h3>June 7, 2020: Website rewrite.</h3>
 
       <p>
         I rewrote the incredibly dated frontend in React and added help, news,
@@ -23,7 +23,7 @@ function NewsComponent(props: Props) {
         replay them.
       </p>
 
-      <h2>June 4, 2020: There's a new model.</h2>
+      <h3>June 4, 2020: There's a new model.</h3>
 
       <p>
         I replaced the old model with a completely new one that doesn't crash
@@ -33,7 +33,7 @@ function NewsComponent(props: Props) {
         So many things in the pipeline...
       </p>
 
-      <h2>May 30, 2020: Intermittent failure.</h2>
+      <h3>May 30, 2020: Intermittent failure.</h3>
 
       <p>
         There's now another issue with how models are distributed to the
@@ -41,7 +41,7 @@ function NewsComponent(props: Props) {
         before morning tomorrow.
       </p>
 
-      <h2>May 25, 2020: I'm actively working on development.</h2>
+      <h3>May 25, 2020: I'm actively working on development.</h3>
 
       <p>
         This site has been sitting in limbo for four years. It used to use

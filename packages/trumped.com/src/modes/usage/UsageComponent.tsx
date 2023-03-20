@@ -9,7 +9,7 @@ function UsageComponent(props: Props) {
     <div id="usage" className="mt-5">
       <h1>Usage Recommendations</h1>
 
-      <h2>Short sentences are bad</h2>
+      <h3>Short sentences are bad</h3>
 
       <p>
         Don't say things like "hello" or "hi". They're too short for the current
@@ -17,7 +17,7 @@ function UsageComponent(props: Props) {
         it is low on the list of priorities.
       </p>
 
-      <h2>Try and try again</h2>
+      <h3>Try and try again</h3>
 
       <p>
         If you're unhappy with how the results sound, try changing the words a
@@ -25,11 +25,11 @@ function UsageComponent(props: Props) {
         marks.
       </p>
 
-      <h2>Use real words</h2>
+      <h3>Use real words</h3>
 
       <p>"Asdfagdadf" is not a word, and Trump won't know how to say it.</p>
 
-      <h2>Sound out difficult words</h2>
+      <h3>Sound out difficult words</h3>
 
       <p>
         If the words you want to use aren't working, that's likely because I
@@ -50,7 +50,7 @@ function UsageComponent(props: Props) {
         is to you.
       </p>
 
-      <h2>Example sentences</h2>
+      <h3>Example sentences</h3>
 
       <p>Try getting Trump to say the following:</p>
 

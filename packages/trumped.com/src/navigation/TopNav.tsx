@@ -37,7 +37,7 @@ function TopNav(props: Props) {
         </a>
       </nav>
       <hr className="mt-0 mb-4" />
-      <h1 className="fw-bold text-center fs-2">
+      <h1 className="fw-bold text-center fs-2 pb-2">
         Trumped Donald Trump TTS by FakeYou
       </h1>
     </>
