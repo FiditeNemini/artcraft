@@ -1,8 +1,8 @@
-import React from 'react';
-import { Animation } from './Animation';
-import { Form } from './Form';
-import { StatusText } from './StatusText';
-import { getRandomInt } from '../../Utils';
+import React from "react";
+import { Animation } from "./Animation";
+import { Form } from "./Form";
+import { StatusText } from "./StatusText";
+import { getRandomInt } from "../../Utils";
 
 enum StatusState {
   NONE,
@@ -15,17 +15,16 @@ interface Props {}
 
 interface State {
   statusState: StatusState;
-  statusMessage: string,
-  isTalking: boolean,
+  statusMessage: string;
+  isTalking: boolean;
 }
 
 class SpeakComponent extends React.Component<Props, State> {
-
   constructor(props: Props) {
     super(props);
     this.state = {
       statusState: StatusState.NONE,
-      statusMessage: '',
+      statusMessage: "",
       isTalking: false,
     };
   }
@@ -34,19 +33,19 @@ class SpeakComponent extends React.Component<Props, State> {
     this.setState({
       statusState: statusState,
       statusMessage: message,
-    })
-  }
+    });
+  };
 
   setHintMessage = (message: string) => {
     this.setMessage(StatusState.INFO, message);
-  }
+  };
 
   clearMessage = () => {
     this.setState({
       statusState: StatusState.NONE,
-      statusMessage: '',
-    })
-  }
+      statusMessage: "",
+    });
+  };
 
   onSpeakRequest = () => {
     let message;
@@ -66,7 +65,7 @@ class SpeakComponent extends React.Component<Props, State> {
         break;
     }
     this.setMessage(StatusState.INFO, message);
-  }
+  };
 
   onSpeakSuccess = () => {
     let message;
@@ -86,28 +85,32 @@ class SpeakComponent extends React.Component<Props, State> {
         break;
     }
     this.setMessage(StatusState.INFO, message);
-  }
+  };
 
   onSpeakError = () => {
-    this.setMessage(StatusState.ERROR, "There was an error. Perhaps you sent too much text or the server is busy. Try again.");
-  }
+    this.setMessage(
+      StatusState.ERROR,
+      "There was an error. Perhaps you sent too much text or the server is busy. Try again."
+    );
+  };
 
   onPlay = () => {
     this.setState({ isTalking: true });
-  }
+  };
 
   onStop = () => {
     this.setState({ isTalking: false });
-  }
+  };
 
   public render() {
     return (
-      <div>
+      <div className="d-flex flex-column align-items-center">
         <Animation isTalking={this.state.isTalking} />
-        <StatusText 
-          statusState={this.state.statusState} 
-          statusMessage={this.state.statusMessage}/>
-        <Form 
+        <StatusText
+          statusState={this.state.statusState}
+          statusMessage={this.state.statusMessage}
+        />
+        <Form
           clearStatusCallback={this.clearMessage}
           setHintMessage={this.setHintMessage}
           onSpeakRequestCallback={this.onSpeakRequest}
