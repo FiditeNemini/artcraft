@@ -224,5 +224,9 @@ RUN touch .env
 RUN touch .env-download-job
 RUN touch .env-secrets
 
+# Some services have default env files that live under their code directories
+# These should also be readable from the relative current path
+COPY crates/service/web/storyteller_web/storyteller-web.env .
+
 EXPOSE 8080
 CMD LD_LIBRARY_PATH=/usr/lib /storyteller-web
