@@ -736,7 +736,7 @@ function IndexPage() {
               </p>
               <p className="team-role-text">Founder and CEO</p>
               {/* <hr className="mt-0 my-4" /> */}
-              <p className="fw-normal opacity-75 mt-1">
+              <p className="fw-normal opacity-75 mt-1 mb-0">
                 Brandon worked 8 years as a distributed systems engineer at
                 Square. He’s spent the last decade making indie films and being
                 plugged into the Atlanta art scene. In college he built a laser
@@ -748,7 +748,7 @@ function IndexPage() {
             </div>
           </div>
 
-          <div className="row g-4 g-md-5 pb-4 pt-0 pt-md-5">
+          <div className="row g-4 g-md-5 pb-4 pt-3 pt-md-5">
             <div className="col-6 col-md-3">
               <img
                 src="/images/team/placeholder-pfp.jpg"
@@ -879,7 +879,7 @@ function IndexPage() {
               </p>
               <p className="team-role-text">Advisor</p>
               {/* <hr className="mt-0 my-4" /> */}
-              <p className="fw-normal opacity-75 mt-1">
+              <p className="fw-normal opacity-75 mt-1 mb-0">
                 Alex was the last person to graduate from MIT with a triple
                 major, and he’s led a combined 1B of startup exits.{" "}
                 <br className="d-none d-md-block" />
