@@ -1,26 +1,27 @@
 use anyhow::anyhow;
-use crate::job::job_steps::process_single_job_error::ProcessSingleJobError;
-use crate::job_dependencies::JobDependencies;
-use crate::util::maybe_download_file_from_bucket::maybe_download_file_from_bucket;
-use errors::AnyhowResult;
-use mysql_queries::queries::generic_inference::job::list_available_generic_inference_jobs::AvailableInferenceJob;
-use mysql_queries::queries::tts::tts_models::get_tts_model_for_inference_improved::TtsModelForInferenceRecord;
-use std::fs::File;
-use std::io::Read;
-use std::path::PathBuf;
-use log::{error, info};
-use tempdir::TempDir;
 use container_common::filesystem::check_file_exists::check_file_exists;
 use container_common::filesystem::safe_delete_temp_directory::safe_delete_temp_directory;
 use container_common::filesystem::safe_delete_temp_file::safe_delete_temp_file;
+use crate::job::job_steps::process_single_job_error::ProcessSingleJobError;
+use crate::job::job_types::tts::tacotron2_v2_early_fakeyou::seconds_to_decoder_steps::seconds_to_decoder_steps;
+use crate::job_dependencies::JobDependencies;
+use crate::util::maybe_download_file_from_bucket::maybe_download_file_from_bucket;
+use errors::AnyhowResult;
 use hashing::sha256::sha256_hash_string::sha256_hash_string;
+use log::{error, info};
 use mysql_queries::column_types::vocoder_type::VocoderType;
+use mysql_queries::queries::generic_inference::job::list_available_generic_inference_jobs::AvailableInferenceJob;
 use mysql_queries::queries::tts::tts_inference_jobs::mark_tts_inference_job_done::{JobIdType, mark_tts_inference_job_done};
+use mysql_queries::queries::tts::tts_models::get_tts_model_for_inference_improved::TtsModelForInferenceRecord;
 use mysql_queries::queries::tts::tts_results::insert_tts_result::{insert_tts_result, JobType};
+use std::fs::File;
+use std::io::Read;
+use std::path::PathBuf;
+use tempdir::TempDir;
 use tts_common::clean_symbols::clean_symbols;
 use tts_common::text_pipelines::guess_pipeline::guess_text_pipeline_heuristic;
 use tts_common::text_pipelines::text_pipeline_type::TextPipelineType;
-use crate::job::job_types::tts::tacotron2_v2_early_fakeyou::seconds_to_decoder_steps::seconds_to_decoder_steps;
+use crate::job::job_types::tts::tacotron2_v2_early_fakeyou::tacotron2_inference_command::{InferenceArgs, MelMultiplyFactor, Tacotron2InferenceCommand, VocoderForInferenceOption};
 
 /// Text starting with this will be treated as a test request.
 /// This allows the request to bypass the model cache and query the latest TTS model.
@@ -169,7 +170,7 @@ pub async fn process_job(args: ProcessJobArgs<'_>) -> Result<(), ProcessSingleJo
   std::fs::write(&text_input_fs_path, &cleaned_inference_text)
       .map_err(|e| ProcessSingleJobError::from_io_error(e))?;
 
-  // ==================== RUN INFERENCE ==================== //
+  // ==================== SETUP FOR INFERENCE ==================== //
 
   job_progress_reporter.log_status("running inference")
       .map_err(|e| ProcessSingleJobError::Other(e))?;
@@ -192,6 +193,30 @@ pub async fn process_job(args: ProcessJobArgs<'_>) -> Result<(), ProcessSingleJo
 
   info!("With pretrained vocoder: {:?}", pretrained_vocoder);
 
+  // TODO: Clean up the vocoder selection logic to make this crystal clear.
+  let mut vocoder_option = match pretrained_vocoder {
+    // We most likely will *not* use WaveGlow.
+    VocoderType::WaveGlow => {
+      VocoderForInferenceOption::Waveglow {
+        waveglow_vocoder_checkpoint_path: &waveglow_vocoder_model_fs_path
+      }
+    }
+    VocoderType::HifiGanSuperResolution => {
+      VocoderForInferenceOption::HifiganSuperres {
+        hifigan_vocoder_checkpoint_path: &pretrained_hifigan_vocoder_model_fs_path,
+        hifigan_superres_vocoder_checkpoint_path: &hifigan_superres_vocoder_model_fs_path,
+      }
+    }
+  };
+
+  if let Some(ref custom_vocoder_path) = custom_vocoder_fs_path {
+      info!("using custom user-trained HiFi-GAN vocoder: {:?}", custom_vocoder_fs_path);
+      vocoder_option = VocoderForInferenceOption::HifiganSuperres {
+        hifigan_vocoder_checkpoint_path: custom_vocoder_path,
+        hifigan_superres_vocoder_checkpoint_path: &hifigan_superres_vocoder_model_fs_path,
+      };
+  };
+
   let text_pipeline_type_or_guess = tts_model.text_pipeline_type
       .as_deref()
       // NB: If there's an error deserializing, turn it to None.
@@ -202,25 +227,39 @@ pub async fn process_job(args: ProcessJobArgs<'_>) -> Result<(), ProcessSingleJo
     &tts_model.text_pipeline_type,
     &text_pipeline_type_or_guess);
 
-  let hifigan_vocoder_model_fs_path_to_use = match custom_vocoder_fs_path {
-    None => {
-      info!("using pretrained HiFi-GAN vocoder");
-      pretrained_hifigan_vocoder_model_fs_path
-    },
-    Some(custom_vocoder_fs_path) => {
-      info!("using custom user-trained HiFi-GAN vocoder: {:?}", custom_vocoder_fs_path);
-      custom_vocoder_fs_path
-    },
-  };
-
   // NB: Tacotron operates on decoder steps. 1000 steps is the default and correlates to
   //  roughly 12 seconds max. Here we map seconds to decoder steps.
   let max_decoder_steps = seconds_to_decoder_steps(job.max_duration_seconds);
 
 
-  // TODO
-  // TODO RUN INFERENCE HERE
-  // TODO
+  // ==================== RUN INFERENCE SCRIPT ==================== //
+
+  let inference_command = Tacotron2InferenceCommand::new(
+    "/home/bt/dev/storyteller/storyteller-ml/tts/tacotron2_v1_early_fakeyou",
+    Some("source python/bin/activate"),
+    "vocodes_inference_updated.py",
+    None
+  );
+
+  let mut maybe_mel_multiply_factor = None;
+
+  if let Some(factor) = tts_model.maybe_custom_mel_multiply_factor {
+    maybe_mel_multiply_factor = Some(MelMultiplyFactor::CustomMultiplyFactor(factor));
+  } else if tts_model.use_default_mel_multiply_factor {
+    maybe_mel_multiply_factor = Some(MelMultiplyFactor::DefaultMultiplyFactor);
+  }
+
+  let _r = inference_command.execute_inference(InferenceArgs {
+    synthesizer_checkpoint_path: &tts_synthesizer_fs_path,
+    text_pipeline_type: text_pipeline_type_or_guess.to_str(),
+    vocoder: vocoder_option,
+    maybe_mel_multiply_factor,
+    max_decoder_steps,
+    input_text_filename: &text_input_fs_path,
+    output_audio_filename: &output_audio_fs_path,
+    output_spectrogram_filename: &output_spectrogram_fs_path,
+    output_metadata_filename: &output_metadata_fs_path,
+  });
 
 
   // ==================== CHECK ALL FILES EXIST AND GET METADATA ==================== //
