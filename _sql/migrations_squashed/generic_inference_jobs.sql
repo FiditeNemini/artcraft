@@ -69,7 +69,7 @@ CREATE TABLE generic_inference_jobs (
 
   -- ========== PREMIUM FEATURES METADATA ==========
 
-  -- The maximum duration for generated audio in seconds.
+  -- The maximum duration for generated audio or video in seconds.
   -- Zero is implied to be the default value, which is typically 12 seconds.
   -- A negative value implies "unlimited".
   max_duration_seconds INTEGER NOT NULL DEFAULT 0,
@@ -88,8 +88,15 @@ CREATE TABLE generic_inference_jobs (
   is_from_api_user BOOLEAN NOT NULL DEFAULT FALSE,
   is_for_twitch BOOLEAN NOT NULL DEFAULT FALSE,
 
-  -- NB: The meaning of this column has changed. See the "squashed" schema for docs/details.
+  -- ========== DEVELOPMENT AND DEBUGGING METADATA ==========
+
+  -- If true, the request gets a "debug" flag, which may do different
+  -- things depending on the type of work.
   is_debug_request BOOLEAN NOT NULL DEFAULT FALSE,
+
+  -- If set, the request gets processed by a special "tagged" worker
+  -- that matches this tag. The ordinary workers will ignore this work.
+  maybe_routing_tag VARCHAR(32) DEFAULT NULL,
 
   -- ========== JOB SYSTEM DETAILS ==========
 
@@ -145,6 +152,7 @@ CREATE TABLE generic_inference_jobs (
   KEY index_creator_ip_address (creator_ip_address),
   KEY index_priority_level (priority_level),
   KEY index_is_debug_request (is_debug_request),
+  KEY index_maybe_routing_tag (maybe_routing_tag),
   KEY index_status (status)
 
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;

@@ -5,6 +5,7 @@ use log::{info, warn};
 use mysql_queries::queries::generic_inference::job::list_available_generic_inference_jobs::AvailableInferenceJob;
 use mysql_queries::queries::generic_inference::job::mark_generic_inference_job_pending_and_grab_lock::mark_generic_inference_job_pending_and_grab_lock;
 use mysql_queries::queries::generic_inference::job::mark_generic_inference_job_successfully_done::mark_generic_inference_job_successfully_done;
+use crate::job::job_types::tts::process_single_tts_job::process_single_tts_job;
 
 pub async fn process_single_job(job_dependencies: &JobDependencies, job: &AvailableInferenceJob) -> AnyhowResult<()> {
   // TODO(bt, 2023-01-11): Restore an optional status logger
@@ -39,9 +40,12 @@ pub async fn process_single_job(job_dependencies: &JobDependencies, job: &Availa
       // TODO
       entity_type = Some("todo".to_string()); // TODO
       entity_token = Some("todo".to_string()); // TODO
+
+      let _r = process_single_tts_job(job_dependencies, job).await?;
     }
     GenericInferenceType::VoiceConversion => {
       // TODO
+      let _r process_single_vc_job(job_dependencies, job).await?;
     }
 //    GenericDownloadType::HifiGan => {
 //      let results = process_hifigan_vocoder(
