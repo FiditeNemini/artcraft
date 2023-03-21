@@ -15,10 +15,10 @@ use crate::job_steps::process_single_job_error::ProcessSingleJobError;
 use crate::job_steps::seconds_to_decoder_steps::seconds_to_decoder_steps;
 use mysql_queries::column_types::vocoder_type::VocoderType;
 use mysql_queries::queries::tts::tts_inference_jobs::list_available_tts_inference_jobs::AvailableTtsInferenceJob;
-use mysql_queries::queries::tts::tts_inference_jobs::mark_tts_inference_job_done::mark_tts_inference_job_done;
+use mysql_queries::queries::tts::tts_inference_jobs::mark_tts_inference_job_done::{JobIdType, mark_tts_inference_job_done};
 use mysql_queries::queries::tts::tts_inference_jobs::mark_tts_inference_job_pending_and_grab_lock::mark_tts_inference_job_pending_and_grab_lock;
 use mysql_queries::queries::tts::tts_models::get_tts_model_for_inference::{get_tts_model_for_inference, TtsModelForInferenceRecord};
-use mysql_queries::queries::tts::tts_results::insert_tts_result::insert_tts_result;
+use mysql_queries::queries::tts::tts_results::insert_tts_result::{insert_tts_result, JobType};
 use hashing::sha256::sha256_hash_string::sha256_hash_string;
 use log::{warn, info, error};
 use newrelic_telemetry::Span;
@@ -404,7 +404,7 @@ pub async fn process_single_job(
 
   let (id, inference_result_token) = insert_tts_result(
     &job_args.mysql_pool,
-    job,
+    JobType::TtsJob(&job),
     &text_hash,
     pretrained_vocoder,
     &audio_result_object_path,
@@ -420,7 +420,7 @@ pub async fn process_single_job(
   info!("Marking job complete...");
   mark_tts_inference_job_done(
     &job_args.mysql_pool,
-    job.id,
+    JobIdType::TtsJob(job.id),
     true,
     Some(&inference_result_token),
     &worker_name)

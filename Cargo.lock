@@ -3597,6 +3597,7 @@ dependencies = [
  "enums",
  "envvar",
  "errors",
+ "hashing",
  "hostname",
  "hyper 0.14.24",
  "jobs_common",

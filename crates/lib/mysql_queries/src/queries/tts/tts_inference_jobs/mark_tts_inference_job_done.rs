@@ -1,17 +1,29 @@
 use anyhow::anyhow;
-use errors::AnyhowResult;
+use crate::queries::generic_inference::job::_keys::GenericInferenceJobId;
 use crate::queries::tts::tts_inference_jobs::_keys::TtsInferenceJobId;
+use errors::AnyhowResult;
 use sqlx::MySqlPool;
 use sqlx;
 
+// TODO: Remove once all inference sits atop generic jobs
+pub enum JobIdType {
+  TtsJob(TtsInferenceJobId),
+  GenericJob(GenericInferenceJobId),
+}
+
 pub async fn mark_tts_inference_job_done(
   pool: &MySqlPool,
-  job_id: TtsInferenceJobId,
+  job_id: JobIdType,
   success: bool,
   maybe_result_token: Option<&str>,
   last_assigned_worker: &str,
 ) -> AnyhowResult<()> {
   let status = if success { "complete_success" } else { "complete_failure" };
+
+  let job_id = match job_id {
+    JobIdType::TtsJob(job) => job.0,
+    JobIdType::GenericJob(job) => job.0,
+  };
 
   let query_result = sqlx::query!(
         r#"
@@ -27,7 +39,7 @@ WHERE id = ?
         status,
         maybe_result_token,
         last_assigned_worker,
-        job_id.0
+        job_id,
     )
       .execute(pool)
       .await;

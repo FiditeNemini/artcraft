@@ -8,9 +8,19 @@ use mysql_queries::queries::tts::tts_models::get_tts_model_for_inference_improve
 use std::fs::File;
 use std::io::Read;
 use std::path::PathBuf;
-use log::info;
+use log::{error, info};
 use tempdir::TempDir;
+use container_common::filesystem::check_file_exists::check_file_exists;
+use container_common::filesystem::safe_delete_temp_directory::safe_delete_temp_directory;
+use container_common::filesystem::safe_delete_temp_file::safe_delete_temp_file;
+use hashing::sha256::sha256_hash_string::sha256_hash_string;
+use mysql_queries::column_types::vocoder_type::VocoderType;
+use mysql_queries::queries::tts::tts_inference_jobs::mark_tts_inference_job_done::{JobIdType, mark_tts_inference_job_done};
+use mysql_queries::queries::tts::tts_results::insert_tts_result::{insert_tts_result, JobType};
 use tts_common::clean_symbols::clean_symbols;
+use tts_common::text_pipelines::guess_pipeline::guess_text_pipeline_heuristic;
+use tts_common::text_pipelines::text_pipeline_type::TextPipelineType;
+use crate::job::job_types::tts::tacotron2_v2_early_fakeyou::seconds_to_decoder_steps::seconds_to_decoder_steps;
 
 /// Text starting with this will be treated as a test request.
 /// This allows the request to bypass the model cache and query the latest TTS model.
@@ -158,6 +168,169 @@ pub async fn process_job(args: ProcessJobArgs<'_>) -> Result<(), ProcessSingleJo
 
   std::fs::write(&text_input_fs_path, &cleaned_inference_text)
       .map_err(|e| ProcessSingleJobError::from_io_error(e))?;
+
+  // ==================== RUN INFERENCE ==================== //
+
+  job_progress_reporter.log_status("running inference")
+      .map_err(|e| ProcessSingleJobError::Other(e))?;
+
+  let output_audio_fs_path = temp_dir.path().join("output.wav");
+  let output_metadata_fs_path = temp_dir.path().join("metadata.json");
+  let output_spectrogram_fs_path = temp_dir.path().join("spectrogram.json");
+
+  info!("Running TTS inference...");
+
+  info!("Expected output audio filename: {:?}", &output_audio_fs_path);
+  info!("Expected output spectrogram filename: {:?}", &output_spectrogram_fs_path);
+  info!("Expected output metadata filename: {:?}", &output_metadata_fs_path);
+
+  let mut pretrained_vocoder = VocoderType::HifiGanSuperResolution;
+  if let Some(default_vocoder) = tts_model.maybe_default_pretrained_vocoder.as_deref() {
+    pretrained_vocoder = VocoderType::from_str(default_vocoder)
+        .map_err(|e| ProcessSingleJobError::Other(e))?;
+  }
+
+  info!("With pretrained vocoder: {:?}", pretrained_vocoder);
+
+  let text_pipeline_type_or_guess = tts_model.text_pipeline_type
+      .as_deref()
+      // NB: If there's an error deserializing, turn it to None.
+      .and_then(|pipeline_type| TextPipelineType::from_str(pipeline_type).ok())
+      .unwrap_or_else(|| guess_text_pipeline_heuristic(Some(tts_model.created_at)));
+
+  info!("With text pipeline type `{:?} ` (or guess: {:?})",
+    &tts_model.text_pipeline_type,
+    &text_pipeline_type_or_guess);
+
+  let hifigan_vocoder_model_fs_path_to_use = match custom_vocoder_fs_path {
+    None => {
+      info!("using pretrained HiFi-GAN vocoder");
+      pretrained_hifigan_vocoder_model_fs_path
+    },
+    Some(custom_vocoder_fs_path) => {
+      info!("using custom user-trained HiFi-GAN vocoder: {:?}", custom_vocoder_fs_path);
+      custom_vocoder_fs_path
+    },
+  };
+
+  // NB: Tacotron operates on decoder steps. 1000 steps is the default and correlates to
+  //  roughly 12 seconds max. Here we map seconds to decoder steps.
+  let max_decoder_steps = seconds_to_decoder_steps(job.max_duration_seconds);
+
+
+  // TODO
+  // TODO RUN INFERENCE HERE
+  // TODO
+
+
+  // ==================== CHECK ALL FILES EXIST AND GET METADATA ==================== //
+
+  info!("Checking that output files exist...");
+
+  check_file_exists(&output_audio_fs_path).map_err(|e| ProcessSingleJobError::Other(e))?;
+  check_file_exists(&output_spectrogram_fs_path).map_err(|e| ProcessSingleJobError::Other(e))?;
+  check_file_exists(&output_metadata_fs_path).map_err(|e| ProcessSingleJobError::Other(e))?;
+
+  let file_metadata = read_metadata_file(&output_metadata_fs_path)
+      .map_err(|e| ProcessSingleJobError::Other(e))?;
+
+  safe_delete_temp_file(&output_metadata_fs_path);
+
+  // ==================== UPLOAD AUDIO TO BUCKET ==================== //
+
+  job_progress_reporter.log_status("uploading result")
+      .map_err(|e| ProcessSingleJobError::Other(e))?;
+
+  let audio_result_object_path = args.job_dependencies.bucket_path_unifier.tts_inference_wav_audio_output_path(
+    &job.uuid_idempotency_token); // TODO: Don't use this!
+
+  info!("Audio destination bucket path: {:?}", &audio_result_object_path);
+
+  info!("Uploading audio...");
+
+  args.job_dependencies.public_bucket_client.upload_filename_with_content_type(
+    &audio_result_object_path,
+    &output_audio_fs_path,
+    "audio/wav")
+      .await
+      .map_err(|e| ProcessSingleJobError::Other(e))?;
+
+  safe_delete_temp_file(&output_audio_fs_path);
+
+  // ==================== UPLOAD SPECTROGRAM TO BUCKETS ==================== //
+
+  let spectrogram_result_object_path = args.job_dependencies.bucket_path_unifier.tts_inference_spectrogram_output_path(
+    &job.uuid_idempotency_token); // TODO: Don't use this!
+
+  info!("Spectrogram destination bucket path: {:?}", &spectrogram_result_object_path);
+
+  info!("Uploading spectrogram...");
+
+  args.job_dependencies.public_bucket_client.upload_filename_with_content_type(
+    &spectrogram_result_object_path,
+    &output_spectrogram_fs_path,
+    "application/json")
+      .await
+      .map_err(|e| ProcessSingleJobError::Other(e))?;
+
+  safe_delete_temp_file(&output_spectrogram_fs_path);
+
+  // ==================== DELETE DOWNLOADED FILE ==================== //
+
+  // NB: We should be using a tempdir, but to make absolutely certain we don't overflow the disk...
+  safe_delete_temp_directory(&temp_dir);
+
+  // ==================== SAVE RECORDS ==================== //
+
+  let text_hash = sha256_hash_string(&cleaned_inference_text)
+      .map_err(|e| ProcessSingleJobError::Other(e))?;
+
+  let worker_name = args.job_dependencies.get_worker_name();
+
+  info!("Saving tts inference record...");
+
+  let (id, inference_result_token) = insert_tts_result(
+    &args.job_dependencies.mysql_pool,
+    JobType::GenericInferenceJob(&job),
+    &text_hash,
+    pretrained_vocoder,
+    &audio_result_object_path,
+    &spectrogram_result_object_path,
+    file_metadata.file_size_bytes,
+    file_metadata.duration_millis.unwrap_or(0),
+    args.job_dependencies.worker_details.is_on_prem,
+    &worker_name,
+    args.job_dependencies.worker_details.is_debug_worker)
+      .await
+      .map_err(|e| ProcessSingleJobError::Other(e))?;
+
+  info!("Marking job complete...");
+  mark_tts_inference_job_done(
+    &args.job_dependencies.mysql_pool,
+    JobIdType::GenericJob(job.id),
+    true,
+    Some(&inference_result_token),
+    &worker_name)
+      .await
+      .map_err(|e| ProcessSingleJobError::Other(e))?;
+
+  info!("TTS Done. Original text was: {:?}", &job.maybe_raw_inference_text);
+
+  args.job_dependencies.firehose_publisher.tts_inference_finished(
+    job.maybe_creator_user_token.as_deref(),
+    tts_model.model_token.as_str(),
+    &inference_result_token)
+      .await
+      .map_err(|e| {
+        error!("error publishing event: {:?}", e);
+        ProcessSingleJobError::Other(anyhow!("error publishing event"))
+      })?;
+
+  job_progress_reporter.log_status("done")
+      .map_err(|e| ProcessSingleJobError::Other(e))?;
+
+  info!("Job {:?} complete success! Downloaded, ran inference, and uploaded. Saved model record: {}, Result Token: {}",
+        job.id, id, &inference_result_token);
 
   Ok(())
 }

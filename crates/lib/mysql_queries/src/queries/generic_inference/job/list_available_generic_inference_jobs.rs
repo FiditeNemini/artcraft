@@ -19,6 +19,8 @@ pub struct AvailableInferenceJob {
   pub id: GenericInferenceJobId,
   pub inference_job_token: InferenceJobToken,
 
+  pub uuid_idempotency_token: String, // TODO: This is temporarily being used for upload paths.
+
   // Inference information
   pub inference_type: GenericInferenceType,
   pub maybe_inference_args: Option<String>,
@@ -37,6 +39,13 @@ pub struct AvailableInferenceJob {
   pub is_from_premium_user: bool,
   pub is_from_api_user: bool,
   pub is_for_twitch: bool,
+
+  /// (This doesn't always have a meaning for all inference workloads)
+  /// Zero is implied to be the default value (12 seconds)
+  /// Negative is interpreted as "unlimited"
+  /// NB: We can't technically control the seconds, but rather the model's "max_decoder_steps".
+  /// We attempt to turn this into an appropriate "max_decoder_steps" value downstream of here.
+  pub max_duration_seconds: i32,
 
   // Development / debug info
   pub is_debug_request: bool,
@@ -80,6 +89,7 @@ pub async fn list_available_generic_inference_jobs(
         let record = AvailableInferenceJob {
           id: GenericInferenceJobId(record.id),
           inference_job_token: InferenceJobToken::new(record.inference_job_token),
+          uuid_idempotency_token: record.uuid_idempotency_token,
           creator_ip_address: record.creator_ip_address,
           maybe_creator_user_token: record.maybe_creator_user_token,
           creator_set_visibility: Visibility::from_str(&record.creator_set_visibility)
@@ -95,6 +105,7 @@ pub async fn list_available_generic_inference_jobs(
           is_from_premium_user: i8_to_bool(record.is_from_premium_user),
           is_from_api_user: i8_to_bool(record.is_from_api_user),
           is_for_twitch: i8_to_bool(record.is_for_twitch),
+          max_duration_seconds: record.max_duration_seconds,
           is_debug_request: i8_to_bool(record.is_debug_request),
           maybe_routing_tag: record.maybe_routing_tag,
           created_at: record.created_at,
@@ -125,6 +136,7 @@ async fn list_sorted_by_id(args: ListAvailableGenericInferenceJobArgs<'_>, infer
 SELECT
   id,
   token as inference_job_token,
+  uuid_idempotency_token,
 
   inference_type,
   maybe_inference_args,
@@ -142,6 +154,8 @@ SELECT
   is_from_premium_user,
   is_from_api_user,
   is_for_twitch,
+
+  max_duration_seconds,
 
   is_debug_request,
   maybe_routing_tag,
@@ -199,6 +213,7 @@ async fn list_sorted_by_priority(args: ListAvailableGenericInferenceJobArgs<'_>,
 SELECT
   id,
   token as inference_job_token,
+  uuid_idempotency_token,
 
   inference_type,
   maybe_inference_args,
@@ -216,6 +231,8 @@ SELECT
   is_from_premium_user,
   is_from_api_user,
   is_for_twitch,
+
+  max_duration_seconds,
 
   is_debug_request,
   maybe_routing_tag,
@@ -267,6 +284,7 @@ struct AvailableInferenceJobRawInternal {
   pub id: i64,
   //pub inference_job_token: InferenceJobToken,
   pub inference_job_token: String,
+  pub uuid_idempotency_token: String,
 
   // Inference information
   //pub inference_type: GenericInferenceType,
@@ -289,6 +307,8 @@ struct AvailableInferenceJobRawInternal {
   pub is_from_premium_user: i8,
   pub is_from_api_user: i8,
   pub is_for_twitch: i8,
+
+  pub max_duration_seconds: i32,
 
   // Development / debug info
   pub is_debug_request: i8,

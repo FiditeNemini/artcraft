@@ -7,15 +7,22 @@ use log::warn;
 use sqlx::MySqlPool;
 use sqlx;
 use std::path::Path;
+use crate::queries::generic_inference::job::list_available_generic_inference_jobs::AvailableInferenceJob;
 
 /// Used to give user-facing order to logged in user inference requests
 pub struct SyntheticIdRecord {
   pub next_id: i64,
 }
 
+// TODO: Remove once all inference sits atop generic jobs
+pub enum JobType<'a> {
+  TtsJob(&'a AvailableTtsInferenceJob),
+  GenericInferenceJob(&'a AvailableInferenceJob),
+}
+
 pub async fn insert_tts_result<P: AsRef<Path>>(
   pool: &MySqlPool,
-  job: &AvailableTtsInferenceJob,
+  job: JobType<'_>,
   text_hash: &str,
   pretrained_vocoder_used: VocoderType,
   bucket_audio_results_path: P,
@@ -39,9 +46,35 @@ pub async fn insert_tts_result<P: AsRef<Path>>(
       .display()
       .to_string();
 
-  let normalized_inference_text = job.raw_inference_text.clone(); // TODO
+  let raw_inference_text;
+  let maybe_creator_user_token;
+  let tts_model_token;
+  let creator_ip_address;
+  let creator_set_visibility;
 
-  let maybe_creator_user_token = job.maybe_creator_user_token.clone();
+  match job {
+    JobType::TtsJob(tts_job) => {
+      raw_inference_text = tts_job.raw_inference_text.clone();
+      maybe_creator_user_token = tts_job.maybe_creator_user_token.clone();
+      tts_model_token = tts_job.model_token.clone();
+      creator_ip_address = tts_job.creator_ip_address.clone();
+      creator_set_visibility = tts_job.creator_set_visibility.clone();
+    }
+    JobType::GenericInferenceJob(generic_job) => {
+      raw_inference_text = generic_job.maybe_raw_inference_text.as_deref()
+          .unwrap_or("")
+          .to_string();
+      maybe_creator_user_token = generic_job.maybe_creator_user_token.clone();
+      tts_model_token = generic_job.maybe_model_token.as_deref()
+          .unwrap_or("")
+          .to_string();
+      creator_ip_address = generic_job.creator_ip_address.clone();
+      creator_set_visibility = generic_job.creator_set_visibility.clone();
+    }
+  }
+
+  let normalized_inference_text = raw_inference_text.clone(); // TODO
+
   let mut maybe_creator_synthetic_id : Option<u64> = None;
 
   let mut transaction = pool.begin().await?;
@@ -131,17 +164,17 @@ SET
   is_debug_request = ?
         "#,
       inference_result_token,
-      job.model_token.clone(),
+      tts_model_token,
       pretrained_vocoder_used.to_str(),
-      job.raw_inference_text.clone(),
+      raw_inference_text,
       text_hash,
       normalized_inference_text,
 
       maybe_creator_user_token,
       maybe_creator_synthetic_id,
 
-      job.creator_ip_address.clone(),
-      job.creator_set_visibility.to_str(),
+      creator_ip_address,
+      creator_set_visibility.to_str(),
 
       bucket_audio_result_path,
       bucket_spectrogram_result_path,
