@@ -1,17 +1,13 @@
 use cloud_storage::bucket_client::BucketClient;
 use cloud_storage::bucket_path_unifier::BucketPathUnifier;
-use crate::caching::cache_miss_strategizer_multi::SyncMultiCacheMissStrategizer;
-use crate::caching::virtual_lfu_cache::SyncVirtualLfuCache;
-use crate::http_clients::tts_inference_sidecar_client::TtsInferenceSidecarClient;
-use crate::http_clients::tts_sidecar_health_check_client::TtsSidecarHealthCheckClient;
-use crate::job_steps::job_stats::JobStats;
-use crate::script_execution::tacotron_inference_command::TacotronInferenceCommand;
+use crate::job::job_steps::job_stats::JobStats;
+use crate::job::job_types::tts::tacotron2_v2_early_fakeyou::tacotron_inference_command::TacotronInferenceCommand;
 use crate::util::scoped_temp_dir_creator::ScopedTempDirCreator;
-use mysql_queries::mediators::firehose_publisher::FirehosePublisher;
-use mysql_queries::queries::tts::tts_models::get_tts_model_for_inference::TtsModelForInferenceRecord;
 use jobs_common::job_progress_reporter::job_progress_reporter::JobProgressReporterBuilder;
 use jobs_common::semi_persistent_cache_dir::SemiPersistentCacheDir;
 use memory_caching::multi_item_ttl_cache::MultiItemTtlCache;
+use mysql_queries::mediators::firehose_publisher::FirehosePublisher;
+use mysql_queries::queries::tts::tts_models::get_tts_model_for_inference::TtsModelForInferenceRecord;
 use newrelic_telemetry::Client as NewRelicClient;
 use r2d2_redis::RedisConnectionManager;
 use r2d2_redis::r2d2;
@@ -41,8 +37,6 @@ pub struct JobDependencies {
   pub bucket_path_unifier: BucketPathUnifier,
   pub semi_persistent_cache: SemiPersistentCacheDir,
 
-  pub http_clients: JobHttpClients,
-
   pub job_stats: JobStats,
 
   pub tts_inference_command: TacotronInferenceCommand,
@@ -52,10 +46,6 @@ pub struct JobDependencies {
   pub newrelic_disabled: bool,
 
   pub worker_details: JobWorkerDetails,
-
-  // Keep tabs of which models to hold in the sidecar memory with this virtual LRU cache
-  pub virtual_model_lfu: SyncVirtualLfuCache,
-  pub cache_miss_strategizers: SyncMultiCacheMissStrategizer,
 
   // In-process cache of database lookup records, etc.
   pub caches: JobCaches,
@@ -112,11 +102,6 @@ pub struct JobWorkerDetails {
 
 pub struct JobCaches {
   pub tts_model_record_cache: MultiItemTtlCache<String, TtsModelForInferenceRecord>,
-}
-
-pub struct JobHttpClients {
-  pub tts_inference_sidecar_client: TtsInferenceSidecarClient,
-  pub tts_sidecar_health_check_client: TtsSidecarHealthCheckClient,
 }
 
 impl JobDependencies {

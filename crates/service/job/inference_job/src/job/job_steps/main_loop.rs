@@ -1,11 +1,11 @@
-use crate::job_steps::job_dependencies::JobDependencies;
 use mysql_queries::queries::generic_inference::job::list_available_generic_inference_jobs::{AvailableInferenceJob, list_available_generic_inference_jobs, ListAvailableGenericInferenceJobArgs};
 use mysql_queries::queries::generic_inference::job::mark_generic_inference_job_failure::mark_generic_inference_job_failure;
 use errors::AnyhowResult;
 use jobs_common::noop_logger::NoOpLogger;
 use log::{error, info, warn};
 use std::time::Duration;
-use crate::job_steps::process_single_job::process_single_job;
+use crate::job::job_steps::job_dependencies::JobDependencies;
+use crate::job::job_steps::process_single_job::process_single_job;
 
 // Job runner timeouts (guards MySQL)
 const START_TIMEOUT_MILLIS : u64 = 500;

@@ -1,25 +1,21 @@
-// Never allow these
-#![forbid(private_in_public)]
-#![forbid(unused_must_use)] // NB: It's unsafe to not close/check some things
-
-// Okay to toggle
-//#![forbid(warnings)]
-//#![forbid(unreachable_patterns)]
-#![forbid(unused_imports)]
-#![forbid(unused_mut)]
-#![forbid(unused_variables)]
-
-// Always allow
-#![allow(dead_code)]
-#![allow(non_snake_case)]
+//   // Never allow these
+//   #![forbid(private_in_public)]
+//   #![forbid(unused_must_use)] // NB: It's unsafe to not close/check some things
+//
+//   // Okay to toggle
+//   //#![forbid(warnings)]
+//   //#![forbid(unreachable_patterns)]
+//   #![forbid(unused_imports)]
+//   #![forbid(unused_mut)]
+//   #![forbid(unused_variables)]
+//
+//   // Always allow
+//   #![allow(dead_code)]
+//   #![allow(non_snake_case)]
 
 #[macro_use] extern crate serde_derive;
 
-pub mod caching;
-pub mod http_clients;
-pub mod job_steps;
-pub mod job_types;
-pub mod script_execution;
+pub mod job;
 pub mod util;
 
 use clap::{App, Arg};
@@ -30,30 +26,24 @@ use config::shared_constants::DEFAULT_MYSQL_CONNECTION_STRING;
 use config::shared_constants::DEFAULT_RUST_LOG;
 use container_common::anyhow_result::AnyhowResult;
 use container_common::filesystem::check_directory_exists::check_directory_exists;
-use crate::caching::cache_miss_strategizer::CacheMissStrategizer;
-use crate::caching::cache_miss_strategizer_multi::SyncMultiCacheMissStrategizer;
-use crate::caching::virtual_lfu_cache::SyncVirtualLfuCache;
-use crate::http_clients::tts_inference_sidecar_client::TtsInferenceSidecarClient;
-use crate::http_clients::tts_sidecar_health_check_client::TtsSidecarHealthCheckClient;
-use crate::job_steps::job_dependencies::JobWorkerDetails;
-use crate::job_steps::job_dependencies::{JobDependencies, JobCaches, JobHttpClients};
-use crate::job_steps::job_stats::JobStats;
-use crate::script_execution::tacotron_inference_command::TacotronInferenceCommand;
+use crate::job::job_steps::job_dependencies::{JobCaches, JobDependencies, JobWorkerDetails};
+use crate::job::job_steps::job_stats::JobStats;
+use crate::job::job_steps::main_loop::main_loop;
+use crate::job::job_types::tts::tacotron2_v2_early_fakeyou::tacotron_inference_command::TacotronInferenceCommand;
 use crate::util::scoped_temp_dir_creator::ScopedTempDirCreator;
-use mysql_queries::mediators::firehose_publisher::FirehosePublisher;
 use jobs_common::job_progress_reporter::job_progress_reporter::JobProgressReporterBuilder;
 use jobs_common::job_progress_reporter::noop_job_progress_reporter::NoOpJobProgressReporterBuilder;
 use jobs_common::job_progress_reporter::redis_job_progress_reporter::RedisJobProgressReporterBuilder;
 use jobs_common::semi_persistent_cache_dir::SemiPersistentCacheDir;
-use log::{warn, info};
+use log::{info, warn};
 use memory_caching::multi_item_ttl_cache::MultiItemTtlCache;
+use mysql_queries::mediators::firehose_publisher::FirehosePublisher;
 use newrelic_telemetry::ClientBuilder;
 use r2d2_redis::RedisConnectionManager;
 use r2d2_redis::r2d2;
 use sqlx::mysql::MySqlPoolOptions;
 use std::path::PathBuf;
 use std::time::Duration;
-use crate::job_steps::main_loop::main_loop;
 
 // Buckets (shared config)
 const ENV_ACCESS_KEY : &'static str = "ACCESS_KEY";
@@ -88,21 +78,12 @@ async fn main() -> AnyhowResult<()> {
     "inference-job.env",
     &[".", "crates/service/job/inference_job"])?;
 
-  let matches = App::new("tts-inference-job")
-      .arg(Arg::with_name("sidecar_hostname")
-          .long("sidecar_hostname")
-          .value_name("HOSTNAME")
-          .help("Hostname for the TTS inference sidecar")
-          .takes_value(true)
-          .required(false))
-      .get_matches();
-
   info!("Obtaining worker hostname...");
 
   let server_hostname = hostname::get()
       .ok()
       .and_then(|h| h.into_string().ok())
-      .unwrap_or("tts-inference-job".to_string());
+      .unwrap_or("inference-job".to_string());
 
   // NB: These are non-standard env vars we're injecting ourselves.
   let k8s_node_name = easyenv::get_env_string_optional("K8S_NODE_NAME");
@@ -153,21 +134,6 @@ async fn main() -> AnyhowResult<()> {
     &py_script_name,
   );
 
-  let mut sidecar_hostname =
-      easyenv::get_env_string_required(ENV_TTS_INFERENCE_SIDECAR_HOSTNAME)?;
-
-  if let Some(hostname) = matches.value_of("sidecar_hostname") {
-    sidecar_hostname = hostname.to_string();
-  }
-
-  info!("Sidecar hostname: {:?}", sidecar_hostname);
-
-  let tts_inference_sidecar_client =
-      TtsInferenceSidecarClient::new(&sidecar_hostname);
-
-  let tts_sidecar_health_check_client=
-      TtsSidecarHealthCheckClient::new(&sidecar_hostname)?;
-
   let temp_directory = easyenv::get_env_string_or_default(
     "DOWNLOAD_TEMP_DIR",
     DEFAULT_TEMP_DIR);
@@ -189,7 +155,6 @@ async fn main() -> AnyhowResult<()> {
       .await?;
 
   let common_env = CommonEnv::read_from_env()?;
-
 
   let persistent_cache_path = easyenv::get_env_string_or_default(
     ENV_SEMIPERSISTENT_CACHE_DIR,
@@ -221,33 +186,6 @@ async fn main() -> AnyhowResult<()> {
 
   let firehose_publisher = FirehosePublisher {
     mysql_pool: mysql_pool.clone(), // NB: MySqlPool is clone/send/sync safe
-  };
-
-  let virtual_lfu_cache = SyncVirtualLfuCache::new(sidecar_max_synthesizer_models)?;
-
-  let cache_miss_strategizers = {
-    let in_memory_strategizer = CacheMissStrategizer::new(
-      chrono::Duration::milliseconds(
-        easyenv::get_env_num("MEMORY_MAX_COLD_DURATION_MILLIS", 5_000)?,
-      ),
-      chrono::Duration::milliseconds(
-        easyenv::get_env_num("MEMORY_CACHE_FORGET_DURATION_MILLIS", 60_000)?,
-      ),
-    );
-
-    let on_disk_strategizer = CacheMissStrategizer::new(
-      chrono::Duration::milliseconds(
-        easyenv::get_env_num("DISK_MAX_COLD_DURATION_MILLIS", 20_000)?,
-      ),
-      chrono::Duration::milliseconds(
-        easyenv::get_env_num("DISK_CACHE_FORGET_DURATION_MILLIS", 120_000)?,
-      ),
-    );
-
-    SyncMultiCacheMissStrategizer::new(
-      in_memory_strategizer,
-      on_disk_strategizer,
-    )
   };
 
   let model_cache_duration = std::time::Duration::from_millis(
@@ -299,10 +237,6 @@ async fn main() -> AnyhowResult<()> {
     public_bucket_client,
     private_bucket_client,
     tts_inference_command,
-    http_clients: JobHttpClients {
-      tts_inference_sidecar_client,
-      tts_sidecar_health_check_client,
-    },
     job_stats: JobStats::new(),
     newrelic_client,
     newrelic_disabled,
@@ -316,8 +250,6 @@ async fn main() -> AnyhowResult<()> {
     caches: JobCaches {
       tts_model_record_cache: MultiItemTtlCache::create_with_duration(model_cache_duration),
     },
-    virtual_model_lfu: virtual_lfu_cache,
-    cache_miss_strategizers,
     bucket_path_unifier: BucketPathUnifier::default_paths(),
     semi_persistent_cache,
     firehose_publisher,
@@ -333,7 +265,6 @@ async fn main() -> AnyhowResult<()> {
     maybe_minimum_priority,
   };
 
-  // TODO: Main loop start
   main_loop(job_dependencies).await;
 
   Ok(())
