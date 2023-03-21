@@ -25,7 +25,13 @@ use std::fmt;
 use std::sync::Arc;
 use sqlx::MySql;
 use sqlx::pool::PoolConnection;
+use enums::workers::generic_inference_type::GenericInferenceType;
+use mysql_queries::payloads::generic_inference_args::{GenericInferenceArgs, PolymorphicInferenceArgs};
+use mysql_queries::queries::generic_inference::web::insert_generic_inference_job::{insert_generic_inference_job, InsertGenericInferenceArgs};
 use redis_caching::redis_ttl_cache::RedisTtlCache;
+use tokens::jobs::inference::InferenceJobToken;
+use tokens::tokens::tts_models::TtsModelToken;
+use tokens::users::user::UserToken;
 use tts_common::priority::{FAKEYOU_INVESTOR_PRIORITY_LEVEL, FAKEYOU_DEFAULT_VALID_API_TOKEN_PRIORITY_LEVEL};
 use user_input_common::check_for_slurs::contains_slurs;
 use users_component::utils::user_session_extended::UserSessionExtended;
@@ -53,6 +59,8 @@ pub struct InferTtsRequest {
 pub struct InferTtsSuccessResponse {
   pub success: bool,
   pub inference_job_token: String,
+  // TODO: This is the new generic inference job system
+  pub generic_inference_job_token: Option<InferenceJobToken>,
 }
 
 #[derive(Debug)]
@@ -234,7 +242,7 @@ pub async fn infer_tts_handler(
 
   // ==================== CHECK AND PERFORM TTS ==================== //
 
-  let inference_text = &request.inference_text.trim().to_string();
+  let inference_text = request.inference_text.trim().to_string();
 
   if let Err(reason) = validate_inference_text(&inference_text) {
     return Err(InferTtsError::BadInput(reason));
@@ -301,6 +309,45 @@ pub async fn infer_tts_handler(
     }
   }
 
+  let mut maybe_generic_inference_job_token = None;
+
+  if server_state.flags.enable_enqueue_generic_tts_job {
+    let generic_inference_job_token = InferenceJobToken::generate();
+    let maybe_creator_user_token_typed = maybe_user_token
+        .as_deref()
+        .map(|token| UserToken::new_from_str(token));
+
+    let query_result = insert_generic_inference_job(InsertGenericInferenceArgs {
+      job_token: &generic_inference_job_token,
+      uuid_idempotency_token: &request.uuid_idempotency_token,
+      inference_type: GenericInferenceType::TextToSpeech,
+      maybe_inference_args: Some(GenericInferenceArgs {
+        inference_type: Some(GenericInferenceType::TextToSpeech),
+        args: Some(PolymorphicInferenceArgs::TextToSpeechInferenceArgs {
+          model_token: Some(TtsModelToken::new_from_str(&request.tts_model_token)),
+        }),
+      }),
+      maybe_raw_inference_text: Some(inference_text.as_str()),
+      maybe_model_token: Some(request.tts_model_token.as_str()),
+      maybe_creator_user_token: maybe_creator_user_token_typed.as_ref(),
+      creator_ip_address: &ip_address,
+      creator_set_visibility: set_visibility,
+      priority_level,
+      is_debug_request,
+      mysql_pool: &server_state.mysql_pool,
+    }).await;
+
+    match query_result {
+      Ok(_) => {},
+      Err(err) => {
+        warn!("New (generic) tts inference job creation DB error: {:?}", err);
+        return Err(InferTtsError::ServerError);
+      }
+    }
+
+    maybe_generic_inference_job_token = Some(generic_inference_job_token);
+  }
+
   server_state.firehose_publisher.enqueue_tts_inference(maybe_user_token.as_deref(), &job_token, &request.tts_model_token)
       .await
       .map_err(|e| {
@@ -311,6 +358,7 @@ pub async fn infer_tts_handler(
   let response = InferTtsSuccessResponse {
     success: true,
     inference_job_token: job_token.to_string(),
+    generic_inference_job_token: maybe_generic_inference_job_token,
   };
 
   let body = serde_json::to_string(&response)

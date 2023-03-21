@@ -10,7 +10,7 @@ use crate::configs::plans::get_correct_plan_for_session::get_correct_plan_for_se
 use crate::http_server::endpoints::investor_demo::demo_cookie::request_has_demo_cookie;
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::server_state::ServerState;
-use mysql_queries::queries::generic_inference::web::insert_generic_inference_job::{Args, insert_generic_inference_job};
+use mysql_queries::queries::generic_inference::web::insert_generic_inference_job::{InsertGenericInferenceArgs, insert_generic_inference_job};
 use enums::common::visibility::Visibility;
 use enums::workers::generic_inference_type::GenericInferenceType;
 use http_server_common::request::get_request_header_optional::get_request_header_optional;
@@ -219,7 +219,7 @@ pub async fn enqueue_voice_conversion_inference_handler(
   //  - INFERENCE JOB(1) -> Voice Conversion (w/ Docker sidecar)
   //  - INFERENCE JOB(2) -> Get it working with TTS too, and update the frontend
 
-  let query_result = insert_generic_inference_job(Args {
+  let query_result = insert_generic_inference_job(InsertGenericInferenceArgs {
     job_token: &job_token,
     uuid_idempotency_token: &request.uuid_idempotency_token,
     inference_type: GenericInferenceType::VoiceConversion,
@@ -231,7 +231,7 @@ pub async fn enqueue_voice_conversion_inference_handler(
       }),
     }),
     maybe_raw_inference_text: None,
-    maybe_model_token: Some(model_token),
+    maybe_model_token: Some(&model_token),
     maybe_creator_user_token: maybe_user_token.as_ref(),
     creator_ip_address: &ip_address,
     creator_set_visibility: set_visibility,

@@ -37,7 +37,10 @@ pub struct AvailableInferenceJob {
   pub is_from_premium_user: bool,
   pub is_from_api_user: bool,
   pub is_for_twitch: bool,
+
+  // Development / debug info
   pub is_debug_request: bool,
+  pub maybe_routing_tag: Option<String>,
 
   pub created_at: chrono::DateTime<Utc>,
   pub updated_at: chrono::DateTime<Utc>,
@@ -91,6 +94,7 @@ pub async fn list_available_generic_inference_jobs(
           is_from_api_user: i8_to_bool(record.is_from_api_user),
           is_for_twitch: i8_to_bool(record.is_for_twitch),
           is_debug_request: i8_to_bool(record.is_debug_request),
+          maybe_routing_tag: record.maybe_routing_tag,
           created_at: record.created_at,
           updated_at: record.updated_at,
           retry_at: record.retry_at,
@@ -125,7 +129,9 @@ SELECT
   is_from_premium_user,
   is_from_api_user,
   is_for_twitch,
+
   is_debug_request,
+  maybe_routing_tag,
 
   created_at,
   updated_at,
@@ -184,7 +190,9 @@ SELECT
   is_from_premium_user,
   is_from_api_user,
   is_for_twitch,
+
   is_debug_request,
+  maybe_routing_tag,
 
   created_at,
   updated_at,
@@ -242,7 +250,10 @@ struct AvailableInferenceJobRawInternal {
   pub is_from_premium_user: i8,
   pub is_from_api_user: i8,
   pub is_for_twitch: i8,
+
+  // Development / debug info
   pub is_debug_request: i8,
+  pub maybe_routing_tag: Option<String>,
 
   pub created_at: chrono::DateTime<Utc>,
   pub updated_at: chrono::DateTime<Utc>,

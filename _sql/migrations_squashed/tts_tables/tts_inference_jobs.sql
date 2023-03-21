@@ -63,6 +63,7 @@ CREATE TABLE tts_inference_jobs (
   is_for_twitch BOOLEAN NOT NULL DEFAULT FALSE,
 
   -- If true, the request gets routed to a special "debug" worker.
+  -- NB: This has a *DIFFERENT* meaning on the generic_inference_jobs table.
   is_debug_request BOOLEAN NOT NULL DEFAULT FALSE,
 
   -- ========== PREMIUM FEATURES METADATA ==========

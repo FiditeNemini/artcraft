@@ -174,4 +174,7 @@ pub struct StaticFeatureFlags {
   /// Tell the frontend client how fast to refresh their view of the pending TTS count.
   /// During an attack, we may want this to go extremely slow.
   pub frontend_pending_tts_refresh_interval_millis: u64,
+
+  /// TEMPORARY: Control enqueuing TTS jobs to the generic job worker.
+  pub enable_enqueue_generic_tts_job: bool,
 }

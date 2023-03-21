@@ -1,5 +1,6 @@
 use enums::workers::generic_inference_type::GenericInferenceType;
 use tokens::files::media_upload::MediaUploadToken;
+use tokens::tokens::tts_models::TtsModelToken;
 use tokens::voice_conversion::model::VoiceConversionModelToken;
 
 /// Used to encode extra state for the `generic_inference_jobs` table.
@@ -17,7 +18,9 @@ pub struct GenericInferenceArgs {
 #[derive(Clone, Serialize, Deserialize)]
 pub enum PolymorphicInferenceArgs {
   TextToSpeechInferenceArgs {
-    // TODO
+    /// REQUIRED.
+    /// The text to speech model to use.
+    model_token: Option<TtsModelToken>,
   },
   VoiceConversionInferenceArgs {
     /// REQUIRED.
@@ -34,8 +37,28 @@ pub enum PolymorphicInferenceArgs {
 #[cfg(test)]
 mod tests {
   use crate::payloads::generic_inference_args::{GenericInferenceArgs, PolymorphicInferenceArgs};
+
+  #[test]
+  fn typical_tts_args_serialize() {
+    let args = GenericInferenceArgs {
+      inference_type: Some(GenericInferenceType::VoiceConversion),
+      args: Some(PolymorphicInferenceArgs::TextToSpeechInferenceArgs {
+        model_token: Some(TtsModelToken::new_from_str("tts_model_token")),
+      }),
+    };
+
+    let json = serde_json::ser::to_string(&args).unwrap();
+
+    // NB: Assert the serialized form. If this changes and the test breaks, be careful about migrating.
+    assert_eq!(json,
+               r#"{"inference_type":"voice_conversion","args":{"TextToSpeechInferenceArgs":{"model_token":"tts_model_token"}}}"#.to_string());
+
+    // NB: Make sure we don't overflow the DB field capacity (TEXT column).
+    assert!(json.len() < 1000);
+  }
   use enums::workers::generic_inference_type::GenericInferenceType;
   use tokens::files::media_upload::MediaUploadToken;
+  use tokens::tokens::tts_models::TtsModelToken;
   use tokens::voice_conversion::model::VoiceConversionModelToken;
 
   #[test]

@@ -362,10 +362,14 @@ async fn main() -> AnyhowResult<()> {
       .ok_or(anyhow!("invalid server environment"))?;
 
   let service_feature_flags = StaticFeatureFlags {
+    // Permanent (control plane / safety) flags
     global_429_pushback_filter_enabled: easyenv::get_env_bool_or_default("FF_GLOBAL_429_PUSHBACK_FILTER_ENABLED", false),
     disable_tts_queue_length_endpoint: easyenv::get_env_bool_or_default("FF_DISABLE_TTS_QUEUE_LENGTH_ENDPOINT", false),
     disable_tts_model_list_endpoint: easyenv::get_env_bool_or_default("FF_DISABLE_TTS_MODEL_LIST_ENDPOINT", false),
     frontend_pending_tts_refresh_interval_millis: easyenv::get_env_num("FF_FRONTEND_PENDING_TTS_REFRESH_INTERVAL_MILLIS", 15_000)?,
+
+    // Temporary flags
+    enable_enqueue_generic_tts_job: easyenv::get_env_bool_or_default("FF_ENABLE_ENQUEUE_GENERIC_TTS_JOB", false),
   };
 
   let third_party_url_redirector = ThirdPartyUrlRedirector::new(server_environment);

@@ -7,14 +7,14 @@ use sqlx::MySqlPool;
 use tokens::jobs::inference::InferenceJobToken;
 use tokens::users::user::UserToken;
 
-pub struct Args <'a> {
+pub struct InsertGenericInferenceArgs<'a> {
   pub job_token: &'a InferenceJobToken,
   pub uuid_idempotency_token: &'a str,
 
   pub inference_type: GenericInferenceType,
   pub maybe_inference_args: Option<GenericInferenceArgs>,
-  pub maybe_raw_inference_text: Option<String>,
-  pub maybe_model_token: Option<String>,
+  pub maybe_raw_inference_text: Option<&'a str>,
+  pub maybe_model_token: Option<&'a str>,
 
   pub maybe_creator_user_token: Option<&'a UserToken>,
   pub creator_ip_address: &'a str,
@@ -26,7 +26,7 @@ pub struct Args <'a> {
   pub mysql_pool: &'a MySqlPool,
 }
 
-pub async fn insert_generic_inference_job(args: Args<'_>) -> AnyhowResult<u64> {
+pub async fn insert_generic_inference_job(args: InsertGenericInferenceArgs<'_>) -> AnyhowResult<u64> {
   let serialized_args_payload = serde_json::ser::to_string(&args.maybe_inference_args)
       .map_err(|_e| anyhow!("could not encode inference args"))?;
 
