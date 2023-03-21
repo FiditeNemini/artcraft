@@ -18,6 +18,7 @@ use std::fs::File;
 use std::io::Read;
 use std::path::PathBuf;
 use tempdir::TempDir;
+use subprocess_common::docker_options::{DockerFilesystemMount, DockerGpu, DockerOptions};
 use tts_common::clean_symbols::clean_symbols;
 use tts_common::text_pipelines::guess_pipeline::guess_text_pipeline_heuristic;
 use tts_common::text_pipelines::text_pipeline_type::TextPipelineType;
@@ -231,14 +232,28 @@ pub async fn process_job(args: ProcessJobArgs<'_>) -> Result<(), ProcessSingleJo
   //  roughly 12 seconds max. Here we map seconds to decoder steps.
   let max_decoder_steps = seconds_to_decoder_steps(job.max_duration_seconds);
 
+  let docker_options = DockerOptions {
+    image_name: "2b924678b729".to_string(),
+    maybe_bind_mount: Some(DockerFilesystemMount {
+      local_filesystem: "/tmp".to_string(),
+      container_filesystem: "/tmp".to_string(),
+    }),
+    maybe_gpu: Some(DockerGpu::All),
+  };
 
   // ==================== RUN INFERENCE SCRIPT ==================== //
 
+  //let tacotron_code_root_directory = "/home/bt/dev/storyteller/storyteller-ml/tts/tacotron2_v1_early_fakeyou";
+  let tacotron_code_root_directory = "/models/tts";
+  //let python = Some("python3");
+  let python = None;
+
   let inference_command = Tacotron2InferenceCommand::new(
-    "/home/bt/dev/storyteller/storyteller-ml/tts/tacotron2_v1_early_fakeyou",
+    tacotron_code_root_directory,
+    python,
     Some("source python/bin/activate"),
     "vocodes_inference_updated.py",
-    None
+    Some(docker_options),
   );
 
   let mut maybe_mel_multiply_factor = None;

@@ -16,6 +16,9 @@ pub struct Tacotron2InferenceCommand {
   /// eg. `source python/bin/activate`
   maybe_virtual_env_activation_command: Option<String>,
 
+  /// eg. `python3`
+  maybe_override_python_interpreter: Option<String>,
+
   /// If this is run under Docker (eg. in development), these are the options.
   maybe_docker_options: Option<DockerOptions>,
 }
@@ -85,14 +88,16 @@ pub struct InferenceArgs <'a, P: AsRef<Path>> {
 impl Tacotron2InferenceCommand {
   pub fn new<P: AsRef<Path>>(
     tacotron_code_root_directory: P,
+    maybe_override_python_interpreter: Option<&str>,
     maybe_virtual_env_activation_command: Option<&str>,
     inference_script_name: P,
     maybe_docker_options: Option<DockerOptions>,
   ) -> Self {
     Self {
       tacotron_code_root_directory: tacotron_code_root_directory.as_ref().to_path_buf(),
-      inference_script_name: inference_script_name.as_ref().to_path_buf(),
+      maybe_override_python_interpreter: maybe_override_python_interpreter.map(|s| s.to_string()),
       maybe_virtual_env_activation_command: maybe_virtual_env_activation_command.map(|s| s.to_string()),
+      inference_script_name: inference_script_name.as_ref().to_path_buf(),
       maybe_docker_options,
     }
   }
@@ -111,8 +116,13 @@ impl Tacotron2InferenceCommand {
       command.push_str(" ");
     }
 
+    let python_binary = self.maybe_override_python_interpreter
+        .as_deref()
+        .unwrap_or("python");
+
     command.push_str(" && ");
-    command.push_str("python ");
+    command.push_str(python_binary);
+    command.push_str(" ");
     command.push_str(&path_to_str(&self.inference_script_name));
 
     // ===== Begin Python Inference Args =====
@@ -150,7 +160,7 @@ impl Tacotron2InferenceCommand {
       None => {}
       Some(MelMultiplyFactor::DefaultMultiplyFactor) => {
         command.push_str(" --maybe_custom_mel_multiply_factor ");
-        command.push_str("True");
+        //command.push_str("True");
       }
       Some(MelMultiplyFactor::CustomMultiplyFactor(factor)) => {
         command.push_str(" --custom_mel_multiply_factor ");
