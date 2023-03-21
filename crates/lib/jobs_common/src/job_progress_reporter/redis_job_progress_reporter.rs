@@ -44,6 +44,11 @@ impl JobProgressReporterBuilder for RedisJobProgressReporterBuilder {
     RedisJobProgressReporterBuilder::create_instance(self.redis_pool.clone(), redis_key)
   }
 
+  fn new_generic_inference(&self, job_token: &str) -> AnyhowResult<Box<dyn JobProgressReporter>> {
+    let redis_key = RedisKeys::generic_inference_extra_status_info(job_token);
+    RedisJobProgressReporterBuilder::create_instance(self.redis_pool.clone(), redis_key)
+  }
+
   fn new_tts_download(&self, tts_job_token: &str) -> AnyhowResult<Box<dyn JobProgressReporter>> {
     let redis_key = RedisKeys::tts_download_extra_status_info(tts_job_token);
     RedisJobProgressReporterBuilder::create_instance(self.redis_pool.clone(), redis_key)

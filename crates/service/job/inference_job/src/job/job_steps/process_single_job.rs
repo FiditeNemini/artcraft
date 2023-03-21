@@ -1,3 +1,4 @@
+use anyhow::anyhow;
 use crate::job_dependencies::JobDependencies;
 use crate::job::job_types::tts::process_single_tts_job::process_single_tts_job;
 use crate::job::job_types::vc::process_single_vc_job::process_single_vc_job;
@@ -7,15 +8,18 @@ use log::{info, warn};
 use mysql_queries::queries::generic_inference::job::list_available_generic_inference_jobs::AvailableInferenceJob;
 use mysql_queries::queries::generic_inference::job::mark_generic_inference_job_pending_and_grab_lock::mark_generic_inference_job_pending_and_grab_lock;
 use mysql_queries::queries::generic_inference::job::mark_generic_inference_job_successfully_done::mark_generic_inference_job_successfully_done;
+use crate::job::job_steps::process_single_job_error::ProcessSingleJobError;
 
-pub async fn process_single_job(job_dependencies: &JobDependencies, job: &AvailableInferenceJob) -> AnyhowResult<()> {
+pub async fn process_single_job(job_dependencies: &JobDependencies, job: &AvailableInferenceJob) -> Result<(), ProcessSingleJobError> {
   // TODO(bt, 2023-01-11): Restore an optional status logger
   //let mut redis = job_dependencies.redis_pool.get()?;
   //let mut redis_logger = RedisJobStatusLogger::new_generic_download(&mut redis, job.download_job_token.as_str());
 
   // ==================== ATTEMPT TO GRAB JOB LOCK ==================== //
 
-  let lock_acquired = mark_generic_inference_job_pending_and_grab_lock(&job_dependencies.mysql_pool, job.id).await?;
+  let lock_acquired = mark_generic_inference_job_pending_and_grab_lock(&job_dependencies.mysql_pool, job.id)
+      .await
+      .map_err(|err| ProcessSingleJobError::Other(anyhow!("database error: {:?}", err)))?;
 
   if !lock_acquired {
     warn!("Could not acquire job lock for: {}", &job.id.0);
@@ -27,7 +31,8 @@ pub async fn process_single_job(job_dependencies: &JobDependencies, job: &Availa
   // ==================== SETUP TEMP DIRS ==================== //
 
   let temp_dir = format!("temp_{}", job.id.0);
-  let temp_dir = job_dependencies.scoped_temp_dir_creator.new_tempdir(&temp_dir)?;
+  let temp_dir = job_dependencies.scoped_temp_dir_creator.new_tempdir(&temp_dir)
+      .map_err(|err| ProcessSingleJobError::Other(anyhow!("filesystem error: {:?}", err)))?;
 
   let _p = temp_dir.path(); // TODO: Just so the build doesn't complain about unused. Remove.
 
@@ -102,7 +107,8 @@ pub async fn process_single_job(job_dependencies: &JobDependencies, job: &Availa
     job,
     entity_type.as_deref(),
     entity_token.as_deref(),
-  ).await?;
+  ).await
+      .map_err(|err| ProcessSingleJobError::Other(anyhow!("database error: {:?}", err)))?;
 
   info!("Saved model record: {} - {}", job.id.0, &job.inference_job_token);
 

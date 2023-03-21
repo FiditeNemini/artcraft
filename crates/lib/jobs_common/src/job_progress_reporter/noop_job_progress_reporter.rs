@@ -18,6 +18,10 @@ impl JobProgressReporterBuilder for NoOpJobProgressReporterBuilder {
     NoOpJobProgressReporterBuilder::create_instance()
   }
 
+  fn new_generic_inference(&self, job_token: &str) -> AnyhowResult<Box<dyn JobProgressReporter>> {
+    NoOpJobProgressReporterBuilder::create_instance()
+  }
+
   fn new_tts_download(&self, tts_job_token: &str) -> AnyhowResult<Box<dyn JobProgressReporter>> {
     NoOpJobProgressReporterBuilder::create_instance()
   }

@@ -8,6 +8,8 @@ pub trait JobProgressReporterBuilder {
 
   fn new_generic_download(&self, job_token: &str) -> AnyhowResult<Box<dyn JobProgressReporter>>;
 
+  fn new_generic_inference(&self, job_token: &str) -> AnyhowResult<Box<dyn JobProgressReporter>>;
+
   fn new_tts_download(&self, tts_job_token: &str) -> AnyhowResult<Box<dyn JobProgressReporter>>;
 
   fn new_tts_inference(&self, tts_job_token: &str) -> AnyhowResult<Box<dyn JobProgressReporter>>;
