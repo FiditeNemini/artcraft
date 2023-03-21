@@ -11,6 +11,7 @@ use sqlx::{MySql, MySqlPool};
 use std::collections::BTreeSet;
 use std::future::Future;
 use std::path::Path;
+use log::error;
 use tokens::jobs::inference::InferenceJobToken;
 
 /// table: generic_inference_jobs
@@ -106,9 +107,8 @@ pub async fn list_available_generic_inference_jobs(
 }
 
 async fn list_sorted_by_id(args: ListAvailableGenericInferenceJobArgs<'_>, inference_types: BTreeSet<GenericInferenceType>) -> Result<Vec<AvailableInferenceJobRawInternal>, sqlx::Error> {
-  sqlx::query_as!(
-      AvailableInferenceJobRawInternal,
-        r#"
+  // NB: Can't be type checked because of WHERE IN clause with dynamic contents
+  let mut query = r#"
 SELECT
   id as `id: crate::queries::generic_inference::job::_keys::GenericInferenceJobId`,
   token AS `inference_job_token: tokens::jobs::inference::InferenceJobToken`,
@@ -136,11 +136,17 @@ SELECT
   created_at,
   updated_at,
   retry_at
-FROM generic_inference_jobs
+FROM generic_inference_jobs"#.to_string();
+
+  query.push_str(&format!(r#"
 WHERE
-  (
-    inference_type IN (?)
-  )
+    (
+      inference_type IN ({})
+    )
+  "#, to_where_in_predicate(&inference_types)));
+
+
+  query.push_str(r#"
   AND
   (
     status IN ("pending", "attempt_failed")
@@ -157,19 +163,19 @@ WHERE
   )
   ORDER BY id ASC
   LIMIT ?
-        "#,
-      to_where_in_predicate(&inference_types),
-      args.is_debug_worker,
-      args.num_records,
-    )
-      .fetch_all(args.mysql_pool)
+        "#);
+
+  let mut query = sqlx::query_as::<_, AvailableInferenceJobRawInternal>(&query)
+      .bind(args.is_debug_worker)
+      .bind(args.num_records);
+
+  query.fetch_all(args.mysql_pool)
       .await
 }
 
 async fn list_sorted_by_priority(args: ListAvailableGenericInferenceJobArgs<'_>, inference_types: BTreeSet<GenericInferenceType>) -> Result<Vec<AvailableInferenceJobRawInternal>, sqlx::Error> {
-  sqlx::query_as!(
-      AvailableInferenceJobRawInternal,
-        r#"
+  // NB: Can't be type checked because of WHERE IN clause with dynamic contents
+  let mut query = r#"
 SELECT
   id as `id: crate::queries::generic_inference::job::_keys::GenericInferenceJobId`,
   token AS `inference_job_token: tokens::jobs::inference::InferenceJobToken`,
@@ -197,11 +203,17 @@ SELECT
   created_at,
   updated_at,
   retry_at
-FROM generic_inference_jobs
+FROM generic_inference_jobs"#.to_string();
+
+
+  query.push_str(&format!(r#"
 WHERE
-  (
-    inference_type IN (?)
-  )
+    (
+      inference_type IN ({})
+    )
+  "#, to_where_in_predicate(&inference_types)));
+
+  query.push_str(r#"
   AND
   (
     status IN ("pending", "attempt_failed")
@@ -218,16 +230,18 @@ WHERE
   )
   ORDER BY priority_level DESC, id ASC
   LIMIT ?
-        "#,
-      to_where_in_predicate(&inference_types),
-      args.is_debug_worker,
-      args.num_records,
-    )
-      .fetch_all(args.mysql_pool)
+        "#);
+
+  let mut query = sqlx::query_as::<_, AvailableInferenceJobRawInternal>(&query)
+      .bind(args.is_debug_worker)
+      .bind(args.num_records);
+
+  query.fetch_all(args.mysql_pool)
       .await
 }
 
 #[derive(Debug)]
+#[derive(sqlx::FromRow)]
 struct AvailableInferenceJobRawInternal {
   pub id: GenericInferenceJobId,
   pub inference_job_token: InferenceJobToken,
@@ -264,8 +278,9 @@ struct AvailableInferenceJobRawInternal {
 /// Issue: https://github.com/launchbadge/sqlx/issues/875
 fn to_where_in_predicate(types: &BTreeSet<GenericInferenceType>) -> String {
   let mut vec = types.iter()
-      .map(|ty| ty.to_str()) // TODO: These strings might need to be quoted.
-      .collect::<Vec<&'static str>>();
+      .map(|ty| ty.to_str())
+      .map(|ty| format!("\"{}\"", ty))
+      .collect::<Vec<String>>();
   vec.sort(); // NB: For the benefit of tests.
   vec.join(", ")
 }
