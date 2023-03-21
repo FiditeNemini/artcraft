@@ -158,7 +158,7 @@ function IndexPage() {
               <div id="hero-btn" className="pt-4 mt-3">
                 <a
                   className="btn btn-primary d-inline-flex"
-                  href="#film"
+                  href="#social"
                   data-scroll-to
                 >
                   <span>Explore Storyteller</span>
@@ -584,16 +584,28 @@ function IndexPage() {
           </Tippy>
         </div>
 
-        <div className="shape-2"></div>
-        <div className="shape-3-container" data-scroll data-scroll-speed="3">
+        <div className="shape-2 d-none d-lg-block"></div>
+        <div
+          className="shape-3-container d-none d-lg-block"
+          data-scroll
+          data-scroll-speed="3"
+        >
           <div className="shape-3"></div>
         </div>
 
-        <div className="shape-1-container" data-scroll data-scroll-speed="3">
+        <div
+          className="shape-1-container d-none d-lg-block"
+          data-scroll
+          data-scroll-speed="3"
+        >
           <div className="shape-1"></div>
         </div>
 
-        <div className="shape-4-container" data-scroll data-scroll-speed="2">
+        <div
+          className="shape-4-container d-none d-lg-block"
+          data-scroll
+          data-scroll-speed="2"
+        >
           <div className="shape-4"></div>
         </div>
       </div>
