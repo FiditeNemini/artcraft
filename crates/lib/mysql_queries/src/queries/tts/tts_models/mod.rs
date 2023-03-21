@@ -5,6 +5,7 @@ pub mod edit_tts_model_details;
 pub mod edit_tts_model_moderator_details;
 pub mod get_tts_model;
 pub mod get_tts_model_for_inference;
+pub mod get_tts_model_for_inference_improved;
 pub mod insert_tts_model_from_download_job;
 pub mod list_all_tts_model_tokens;
 pub mod list_tts_models;

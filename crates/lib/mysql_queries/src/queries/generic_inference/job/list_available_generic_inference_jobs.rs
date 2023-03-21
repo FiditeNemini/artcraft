@@ -83,9 +83,9 @@ pub async fn list_available_generic_inference_jobs(
           creator_ip_address: record.creator_ip_address,
           maybe_creator_user_token: record.maybe_creator_user_token,
           creator_set_visibility: Visibility::from_str(&record.creator_set_visibility)
-              .map_err(|e| anyhow!("error: {:?}", e))?,
+              .map_err(|e| anyhow!("error: {:?}", e))?, // TODO/FIXME: This is a gross fix.
           inference_type: GenericInferenceType::from_str(&record.inference_type)
-              .map_err(|e| anyhow!("error: {:?}", e))?,
+              .map_err(|e| anyhow!("error: {:?}", e))?, // TODO/FIXME: This is a gross fix.
           maybe_inference_args: record.maybe_inference_args,
           maybe_raw_inference_text: record.maybe_raw_inference_text,
           maybe_model_token: record.maybe_model_token,
