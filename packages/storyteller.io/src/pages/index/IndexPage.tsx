@@ -341,7 +341,7 @@ function IndexPage() {
           <h1 className="fw-bold display-4 about-title mt-5">
             Be Your Own Hollywood
           </h1>
-          <h4 className="fw-normal opacity-75 mt-3">
+          <h4 className="fw-normal opacity-75 mt-3 lh-base">
             Storyteller&apos;s generative AI engine empowers anyone to be a film
             director or movie star.
           </h4>
@@ -637,7 +637,7 @@ function IndexPage() {
           <h1 className="fw-bold display-4 about-title mt-5">
             Top the Billboard Charts
           </h1>
-          <h4 className="fw-normal opacity-75 mt-3">
+          <h4 className="fw-normal opacity-75 mt-3 lh-base">
             Our technology can turn anyone into a musician.
           </h4>
         </div>
