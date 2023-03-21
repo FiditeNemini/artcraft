@@ -685,7 +685,7 @@ function IndexPage() {
         </div>
 
         <div className="container py-5 mt-5">
-          <div className="row g-4 g-md-5 mb-5 align-items-center">
+          <div className="row g-4 g-md-5 align-items-center">
             <div className="col-12 col-md-6">
               <div>
                 <h1 className="fw-bold display-5 about-title">
@@ -707,7 +707,7 @@ function IndexPage() {
           </div>
         </div>
 
-        <div className="container">
+        <div className="container mt-md-5">
           <h2 className="mb-4">The Team</h2>
 
           <div className="row g-4 g-md-5 mb-4">
