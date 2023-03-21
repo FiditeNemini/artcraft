@@ -4,7 +4,7 @@ use errors::AnyhowResult;
 use jobs_common::noop_logger::NoOpLogger;
 use log::{error, info, warn};
 use std::time::Duration;
-use crate::job::job_steps::job_dependencies::JobDependencies;
+use crate::job_dependencies::JobDependencies;
 use crate::job::job_steps::process_single_job::process_single_job;
 
 // Job runner timeouts (guards MySQL)

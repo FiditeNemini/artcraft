@@ -17,6 +17,7 @@
 
 pub mod job;
 pub mod util;
+pub mod job_dependencies;
 
 use clap::{App, Arg};
 use cloud_storage::bucket_client::BucketClient;
@@ -26,10 +27,10 @@ use config::shared_constants::DEFAULT_MYSQL_CONNECTION_STRING;
 use config::shared_constants::DEFAULT_RUST_LOG;
 use container_common::anyhow_result::AnyhowResult;
 use container_common::filesystem::check_directory_exists::check_directory_exists;
-use crate::job::job_steps::job_dependencies::{JobCaches, JobDependencies, JobWorkerDetails};
 use crate::job::job_steps::job_stats::JobStats;
 use crate::job::job_steps::main_loop::main_loop;
 use crate::job::job_types::tts::tacotron2_v2_early_fakeyou::tacotron_inference_command::TacotronInferenceCommand;
+use crate::job_dependencies::{JobCaches, JobDependencies, JobWorkerDetails};
 use crate::util::scoped_temp_dir_creator::ScopedTempDirCreator;
 use jobs_common::job_progress_reporter::job_progress_reporter::JobProgressReporterBuilder;
 use jobs_common::job_progress_reporter::noop_job_progress_reporter::NoOpJobProgressReporterBuilder;

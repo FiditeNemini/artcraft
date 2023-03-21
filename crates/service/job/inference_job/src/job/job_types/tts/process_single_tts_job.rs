@@ -1,5 +1,5 @@
 use anyhow::anyhow;
-use crate::job::job_steps::job_dependencies::JobDependencies;
+use crate::job_dependencies::JobDependencies;
 use errors::AnyhowResult;
 use mysql_queries::column_types::tts_model_type::TtsModelType;
 use mysql_queries::queries::generic_inference::job::list_available_generic_inference_jobs::AvailableInferenceJob;

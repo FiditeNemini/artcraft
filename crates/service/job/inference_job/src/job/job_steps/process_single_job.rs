@@ -1,4 +1,4 @@
-use crate::job::job_steps::job_dependencies::JobDependencies;
+use crate::job_dependencies::JobDependencies;
 use crate::job::job_types::tts::process_single_tts_job::process_single_tts_job;
 use crate::job::job_types::vc::process_single_vc_job::process_single_vc_job;
 use enums::workers::generic_inference_type::GenericInferenceType;
