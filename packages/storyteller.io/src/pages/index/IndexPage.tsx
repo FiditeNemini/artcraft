@@ -710,11 +710,11 @@ function IndexPage() {
         <div className="container">
           <h2 className="mb-4">The Team</h2>
 
-          <div className="row g-4 g-md-5 mb-5">
+          <div className="row g-4 g-md-5 mb-4">
             <div className="col-6 col-md-3 mb-0">
               <img
                 src="/images/team/placeholder-pfp.jpg"
-                className="img-fluid img-team mb-3 opacity-50"
+                className="img-fluid img-team opacity-50"
                 alt=""
               />
             </div>
@@ -736,7 +736,7 @@ function IndexPage() {
             </div>
           </div>
 
-          <div className="row g-4 g-md-5 pb-4">
+          <div className="row g-4 g-md-5 pb-4 pt-0 pt-md-5">
             <div className="col-6 col-md-3">
               <img
                 src="/images/team/placeholder-pfp.jpg"
@@ -853,11 +853,11 @@ function IndexPage() {
 
           <h2 className="mb-4 mt-5">Our Advisor</h2>
 
-          <div className="row g-4 g-md-5 mb-5">
+          <div className="row g-4 g-md-5">
             <div className="col-6 col-md-3">
               <img
                 src="/images/team/placeholder-pfp.jpg"
-                className="img-fluid img-team mb-3 opacity-50"
+                className="img-fluid img-team opacity-50"
                 alt=""
               />
             </div>
