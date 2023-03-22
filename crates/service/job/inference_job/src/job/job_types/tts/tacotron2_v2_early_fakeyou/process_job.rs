@@ -233,7 +233,7 @@ pub async fn process_job(args: ProcessJobArgs<'_>) -> Result<(), ProcessSingleJo
   let max_decoder_steps = seconds_to_decoder_steps(job.max_duration_seconds);
 
   let docker_options = DockerOptions {
-    image_name: "2b924678b729".to_string(),
+    image_name: "c1336c8f9970".to_string(),
     maybe_bind_mount: Some(DockerFilesystemMount {
       local_filesystem: "/tmp".to_string(),
       container_filesystem: "/tmp".to_string(),
@@ -358,15 +358,15 @@ pub async fn process_job(args: ProcessJobArgs<'_>) -> Result<(), ProcessSingleJo
       .await
       .map_err(|e| ProcessSingleJobError::Other(e))?;
 
-  info!("Marking job complete...");
-  mark_tts_inference_job_done(
-    &args.job_dependencies.mysql_pool,
-    JobIdType::GenericJob(job.id),
-    true,
-    Some(&inference_result_token),
-    &worker_name)
-      .await
-      .map_err(|e| ProcessSingleJobError::Other(e))?;
+  //info!("Marking job complete...");
+  //mark_tts_inference_job_done(
+  //  &args.job_dependencies.mysql_pool,
+  //  JobIdType::GenericJob(job.id),
+  //  true,
+  //  Some(&inference_result_token),
+  //  &worker_name)
+  //    .await
+  //    .map_err(|e| ProcessSingleJobError::Other(e))?;
 
   info!("TTS Done. Original text was: {:?}", &job.maybe_raw_inference_text);
 

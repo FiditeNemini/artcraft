@@ -5,15 +5,9 @@ use errors::AnyhowResult;
 use sqlx::MySqlPool;
 use sqlx;
 
-// TODO: Remove once all inference sits atop generic jobs
-pub enum JobIdType {
-  TtsJob(TtsInferenceJobId),
-  GenericJob(GenericInferenceJobId),
-}
-
 pub async fn mark_tts_inference_job_done(
   pool: &MySqlPool,
-  job_id: JobIdType,
+  job_id: TtsInferenceJobId,
   success: bool,
   maybe_result_token: Option<&str>,
   last_assigned_worker: &str,

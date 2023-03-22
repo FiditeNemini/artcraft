@@ -420,7 +420,7 @@ pub async fn process_single_job(
   info!("Marking job complete...");
   mark_tts_inference_job_done(
     &job_args.mysql_pool,
-    JobIdType::TtsJob(job.id),
+    job.id,
     true,
     Some(&inference_result_token),
     &worker_name)
