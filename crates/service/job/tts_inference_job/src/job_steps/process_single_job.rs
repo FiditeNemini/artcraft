@@ -15,7 +15,7 @@ use crate::job_steps::process_single_job_error::ProcessSingleJobError;
 use crate::job_steps::seconds_to_decoder_steps::seconds_to_decoder_steps;
 use mysql_queries::column_types::vocoder_type::VocoderType;
 use mysql_queries::queries::tts::tts_inference_jobs::list_available_tts_inference_jobs::AvailableTtsInferenceJob;
-use mysql_queries::queries::tts::tts_inference_jobs::mark_tts_inference_job_done::{JobIdType, mark_tts_inference_job_done};
+use mysql_queries::queries::tts::tts_inference_jobs::mark_tts_inference_job_done::mark_tts_inference_job_done;
 use mysql_queries::queries::tts::tts_inference_jobs::mark_tts_inference_job_pending_and_grab_lock::mark_tts_inference_job_pending_and_grab_lock;
 use mysql_queries::queries::tts::tts_models::get_tts_model_for_inference::{get_tts_model_for_inference, TtsModelForInferenceRecord};
 use mysql_queries::queries::tts::tts_results::insert_tts_result::{insert_tts_result, JobType};
