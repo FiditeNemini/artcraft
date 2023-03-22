@@ -22,6 +22,7 @@ use sqlx::MySqlPool;
 use url_config::third_party_url_redirector::ThirdPartyUrlRedirector;
 use users_component::utils::session_checker::SessionChecker;
 use users_component::utils::session_cookie_manager::SessionCookieManager;
+use crate::util::troll_user_bans::troll_user_ban_list::TrollUserBanList;
 
 /// State that is injected into every endpoint.
 pub struct ServerState {
@@ -67,6 +68,7 @@ pub struct ServerState {
   pub sort_key_crypto: SortKeyCrypto,
 
   pub ip_ban_list: IpBanList,
+  pub troll_user_ban_list: TrollUserBanList,
 
   pub static_api_token_set: StaticApiTokenSet,
 
@@ -174,6 +176,10 @@ pub struct StaticFeatureFlags {
   /// Tell the frontend client how fast to refresh their view of the pending TTS count.
   /// During an attack, we may want this to go extremely slow.
   pub frontend_pending_tts_refresh_interval_millis: u64,
+
+  /// For "troll banned" users, what percentage of the time will the service misbehave?
+  /// This should be a number over 100.
+  pub troll_ban_user_percent: u8,
 
   /// TEMPORARY: Control enqueuing TTS jobs to the generic job worker.
   pub enable_enqueue_generic_tts_job: bool,

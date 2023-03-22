@@ -88,6 +88,8 @@ use twitch_common::twitch_secrets::TwitchSecrets;
 use url_config::third_party_url_redirector::ThirdPartyUrlRedirector;
 use users_component::utils::session_checker::SessionChecker;
 use users_component::utils::session_cookie_manager::SessionCookieManager;
+use crate::util::troll_user_bans::load_troll_user_ban_list_from_directory::load_user_token_ban_list_from_directory;
+use crate::util::troll_user_bans::troll_user_ban_list::TrollUserBanList;
 
 const DEFAULT_BIND_ADDRESS : &'static str = "0.0.0.0:12345";
 
@@ -317,6 +319,8 @@ async fn main() -> AnyhowResult<()> {
   let ip_ban_list = load_static_container_ip_bans();
   let ip_ban_list2 = ip_ban_list.clone();
 
+  let troll_user_ban_list = load_troll_user_token_bans();
+
   // Background jobs.
 
   let health_check_status = HealthCheckStatus::new();
@@ -367,6 +371,7 @@ async fn main() -> AnyhowResult<()> {
     disable_tts_queue_length_endpoint: easyenv::get_env_bool_or_default("FF_DISABLE_TTS_QUEUE_LENGTH_ENDPOINT", false),
     disable_tts_model_list_endpoint: easyenv::get_env_bool_or_default("FF_DISABLE_TTS_MODEL_LIST_ENDPOINT", false),
     frontend_pending_tts_refresh_interval_millis: easyenv::get_env_num("FF_FRONTEND_PENDING_TTS_REFRESH_INTERVAL_MILLIS", 15_000)?,
+    troll_ban_user_percent: easyenv::get_env_num("FF_TROLL_BANNED_USER_PERCENT", 0)?,
 
     // Temporary flags
     enable_enqueue_generic_tts_job: easyenv::get_env_bool_or_default("FF_ENABLE_ENQUEUE_GENERIC_TTS_JOB", false),
@@ -441,6 +446,7 @@ async fn main() -> AnyhowResult<()> {
       redirect_landing_finished_url: twitch_oauth_redirect_landing_finished_url,
     },
     ip_ban_list,
+    troll_user_ban_list,
   };
 
   serve(server_state)
@@ -485,6 +491,21 @@ fn load_static_container_ip_bans() -> IpBanList {
 
   info!("Static IP bans loaded: {}", ip_ban_list.total_ip_address_count().unwrap_or(0));
   ip_ban_list
+}
+
+// NB: Some users abuse our service.
+// Instead of outright banning them, we can change the function of the service.
+fn load_troll_user_token_bans() -> TrollUserBanList {
+  let user_token_troll_ban_directory = easyenv::get_env_string_or_default(
+    "USER_TOKEN_TROLL_BAN_DIRECTORY",
+    "./container_includes/user_token_troll_bans"
+  );
+
+  let troll_ban_list = load_user_token_ban_list_from_directory(user_token_troll_ban_directory)
+      .unwrap_or(TrollUserBanList::new());
+
+  info!("Static user token troll bans loaded: {}", troll_ban_list.total_user_token_count().unwrap_or(0));
+  troll_ban_list
 }
 
 pub async fn serve(server_state: ServerState) -> AnyhowResult<()>

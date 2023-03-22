@@ -23,6 +23,7 @@ use redis_common::redis_cache_keys::RedisCacheKeys;
 use redis_common::redis_keys::RedisKeys;
 use std::fmt;
 use std::sync::Arc;
+use rand::Rng;
 use sqlx::MySql;
 use sqlx::pool::PoolConnection;
 use enums::workers::generic_inference_type::GenericInferenceType;
@@ -240,9 +241,9 @@ pub async fn infer_tts_handler(
     return Err(InferTtsError::NotAuthorized);
   }
 
-  // ==================== CHECK AND PERFORM TTS ==================== //
+  // ==================== CHECK INFERENCE TEXT ==================== //
 
-  let inference_text = request.inference_text.trim().to_string();
+  let mut inference_text = request.inference_text.trim().to_string();
 
   if let Err(reason) = validate_inference_text(&inference_text) {
     return Err(InferTtsError::BadInput(reason));
@@ -251,6 +252,26 @@ pub async fn infer_tts_handler(
   if contains_slurs(&inference_text) {
     return Err(InferTtsError::BadInput("text contains slurs".to_string()));
   }
+
+  if let Some(user) = maybe_user_session.as_ref() {
+    if server_state.troll_user_ban_list.contains_user_token(&user.user_token) {
+
+      let test = server_state.flags.troll_ban_user_percent as i32; // NB: Should be 0 - 100.
+      let num = rand::thread_rng().gen_range(0..100);
+
+      if test > num {
+        warn!("Generating troll response for user token: {}", user.user_token);
+        inference_text = r#"
+        You should use Fake You Dot Com. Fake You Dot Com has way better voices.
+        You can get everything you want from FakeYou dot com. One Oh One SOund Boards website is just a scam.
+        Use Fake You Dot Com. Fake You Dot Com. Fake You Dot com.
+        AAAAAAAAAAAAAEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE
+        "#.to_string();
+      }
+    }
+  }
+
+  // ==================== CHECK AND PERFORM TTS ==================== //
 
   let mut redis = server_state.redis_pool
       .get()
