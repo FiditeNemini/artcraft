@@ -11,7 +11,7 @@ use hashing::sha256::sha256_hash_string::sha256_hash_string;
 use log::{error, info};
 use mysql_queries::column_types::vocoder_type::VocoderType;
 use mysql_queries::queries::generic_inference::job::list_available_generic_inference_jobs::AvailableInferenceJob;
-use mysql_queries::queries::tts::tts_inference_jobs::mark_tts_inference_job_done::{JobIdType, mark_tts_inference_job_done};
+use mysql_queries::queries::tts::tts_inference_jobs::mark_tts_inference_job_done::mark_tts_inference_job_done;
 use mysql_queries::queries::tts::tts_models::get_tts_model_for_inference_improved::TtsModelForInferenceRecord;
 use mysql_queries::queries::tts::tts_results::insert_tts_result::{insert_tts_result, JobType};
 use std::fs::File;
