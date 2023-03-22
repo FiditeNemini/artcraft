@@ -10,26 +10,27 @@ use crate::configs::plans::get_correct_plan_for_session::get_correct_plan_for_se
 use crate::http_server::endpoints::investor_demo::demo_cookie::request_has_demo_cookie;
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::server_state::ServerState;
-use mysql_queries::queries::tts::tts_inference_jobs::insert_tts_inference_job::TtsInferenceJobInsertBuilder;
-use mysql_queries::queries::tts::tts_models::get_tts_model::{get_tts_model_by_token_using_connection, TtsModelRecord};
-use mysql_queries::tokens::Tokens;
 use enums::common::visibility::Visibility;
+use enums::workers::generic_inference_type::GenericInferenceType;
 use http_server_common::request::get_request_api_token::get_request_api_token;
 use http_server_common::request::get_request_header_optional::get_request_header_optional;
 use http_server_common::request::get_request_ip::get_request_ip;
 use log::{error, info, warn};
-use r2d2_redis::redis::Commands;
-use redis_common::redis_cache_keys::RedisCacheKeys;
-use redis_common::redis_keys::RedisKeys;
-use std::fmt;
-use std::sync::Arc;
-use rand::Rng;
-use sqlx::MySql;
-use sqlx::pool::PoolConnection;
-use enums::workers::generic_inference_type::GenericInferenceType;
 use mysql_queries::payloads::generic_inference_args::{GenericInferenceArgs, PolymorphicInferenceArgs};
 use mysql_queries::queries::generic_inference::web::insert_generic_inference_job::{insert_generic_inference_job, InsertGenericInferenceArgs};
+use mysql_queries::queries::tts::tts_inference_jobs::insert_tts_inference_job::TtsInferenceJobInsertBuilder;
+use mysql_queries::queries::tts::tts_models::get_tts_model::{get_tts_model_by_token_using_connection, TtsModelRecord};
+use mysql_queries::tokens::Tokens;
+use r2d2_redis::redis::Commands;
+use rand::Rng;
+use rand::seq::SliceRandom;
 use redis_caching::redis_ttl_cache::RedisTtlCache;
+use redis_common::redis_cache_keys::RedisCacheKeys;
+use redis_common::redis_keys::RedisKeys;
+use sqlx::MySql;
+use sqlx::pool::PoolConnection;
+use std::fmt;
+use std::sync::Arc;
 use tokens::jobs::inference::InferenceJobToken;
 use tokens::tokens::tts_models::TtsModelToken;
 use tokens::users::user::UserToken;
@@ -254,19 +255,17 @@ pub async fn infer_tts_handler(
   }
 
   if let Some(user) = maybe_user_session.as_ref() {
-    if server_state.troll_user_ban_list.contains_user_token(&user.user_token) {
+    let is_troll_banned = server_state.troll_user_ban_list
+        .contains_user_token(&user.user_token)
+        .unwrap_or(false); // NB: Fail open
 
+    if is_troll_banned {
       let test = server_state.flags.troll_ban_user_percent as i32; // NB: Should be 0 - 100.
       let num = rand::thread_rng().gen_range(0..100);
 
       if test > num {
         warn!("Generating troll response for user token: {}", user.user_token);
-        inference_text = r#"
-        You should use Fake You Dot Com. Fake You Dot Com has way better voices.
-        You can get everything you want from FakeYou dot com. One Oh One SOund Boards website is just a scam.
-        Use Fake You Dot Com. Fake You Dot Com. Fake You Dot com.
-        AAAAAAAAAAAAAEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE
-        "#.to_string();
+        inference_text = random_troll_text().to_string();
       }
     }
   }
@@ -469,4 +468,29 @@ async fn check_if_authorized_to_use_model(
       .unwrap_or(false);
 
   is_authorized
+}
+
+fn random_troll_text() -> &'static str {
+  let texts = [
+    "Fake You Dot Com. Use Fake You Dot Com.",
+    "Use Fake You Dot Com. Fake You Dot Com. Fake You Dot Com is way better.",
+    "EEEEEEEEEEEEEEEEE",
+    "One Oh One Soundboards is a shitty website. Use Fake You Dot Com instead.",
+    r#"
+    You should use Fake You Dot Com. Fake You Dot Com has way better voices.
+    You can get everything you want from FakeYou dot com. One Oh One SOund Boards website is just a scam.
+    Use Fake You Dot Com. Fake You Dot Com. Fake You Dot com.
+    AAAAAAAAAAAAAEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE
+    "#,
+    r#"
+    beep. beep. beep. beep. beep.
+    May have installed a virus
+    OOOOOOOOEEEEUUUUUOOAAAA
+    Your device may be compromised
+    EEEEEEEEEEEEEEEEIIIUUUUOOOAAAA
+    Your location may be tracked by the advanced artificial intelligence.
+    "#
+  ];
+  let random = texts.choose(&mut rand::thread_rng());
+  random.map(|r| *r).unwrap_or(texts[0])
 }
