@@ -14,11 +14,6 @@ pub async fn mark_tts_inference_job_done(
 ) -> AnyhowResult<()> {
   let status = if success { "complete_success" } else { "complete_failure" };
 
-  let job_id = match job_id {
-    JobIdType::TtsJob(job) => job.0,
-    JobIdType::GenericJob(job) => job.0,
-  };
-
   let query_result = sqlx::query!(
         r#"
 UPDATE tts_inference_jobs
@@ -33,7 +28,7 @@ WHERE id = ?
         status,
         maybe_result_token,
         last_assigned_worker,
-        job_id,
+        job_id.0,
     )
       .execute(pool)
       .await;
