@@ -244,6 +244,8 @@ pub async fn infer_tts_handler(
 
   // ==================== CHECK INFERENCE TEXT ==================== //
 
+  let ip_address = get_request_ip(&http_request);
+
   let mut inference_text = request.inference_text.trim().to_string();
 
   if let Err(reason) = validate_inference_text(&inference_text) {
@@ -255,9 +257,15 @@ pub async fn infer_tts_handler(
   }
 
   if let Some(user) = maybe_user_session.as_ref() {
-    let is_troll_banned = server_state.troll_user_ban_list
+    let is_user_token_troll_banned = server_state.troll_bans.user_tokens
         .contains_user_token(&user.user_token)
         .unwrap_or(false); // NB: Fail open
+
+    let is_ip_address_troll_banned = server_state.troll_bans.ip_addresses
+        .contains_ip_address(&ip_address)
+        .unwrap_or(false); // NB: Fail open
+
+    let is_troll_banned = is_user_token_troll_banned || is_ip_address_troll_banned;
 
     if is_troll_banned {
       let test = server_state.flags.troll_ban_user_percent as i32; // NB: Should be 0 - 100.
@@ -286,8 +294,6 @@ pub async fn infer_tts_handler(
         warn!("redis error: {:?}", e);
         InferTtsError::ServerError
       })?;
-
-  let ip_address = get_request_ip(&http_request);
 
   let maybe_user_preferred_visibility : Option<Visibility> = maybe_user_session
       .as_ref()

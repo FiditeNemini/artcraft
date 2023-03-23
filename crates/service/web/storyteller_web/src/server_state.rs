@@ -68,7 +68,8 @@ pub struct ServerState {
   pub sort_key_crypto: SortKeyCrypto,
 
   pub ip_ban_list: IpBanList,
-  pub troll_user_ban_list: TrollUserBanList,
+
+  pub troll_bans: TrollBans,
 
   pub static_api_token_set: StaticApiTokenSet,
 
@@ -183,4 +184,12 @@ pub struct StaticFeatureFlags {
 
   /// TEMPORARY: Control enqueuing TTS jobs to the generic job worker.
   pub enable_enqueue_generic_tts_job: bool,
+}
+
+/// Instead of top level service denial, these are bans against entities that instead return
+/// garbage responses.
+#[derive(Clone)]
+pub struct TrollBans {
+  pub user_tokens: TrollUserBanList,
+  pub ip_addresses: IpBanList,
 }

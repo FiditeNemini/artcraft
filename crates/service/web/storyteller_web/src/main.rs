@@ -61,7 +61,7 @@ use crate::configs::static_api_tokens::{StaticApiTokenConfig, StaticApiTokens, S
 use crate::http_server::middleware::pushback_filter_middleware::PushbackFilter;
 use crate::http_server::web_utils::redis_rate_limiter::RedisRateLimiter;
 use crate::routes::add_routes;
-use crate::server_state::{ServerState, EnvConfig, TwitchOauthSecrets, TwitchOauth, RedisRateLimiters, InMemoryCaches, StripeSettings, ServerInfo, StaticFeatureFlags};
+use crate::server_state::{ServerState, EnvConfig, TwitchOauthSecrets, TwitchOauth, RedisRateLimiters, InMemoryCaches, StripeSettings, ServerInfo, StaticFeatureFlags, TrollBans};
 use crate::threads::db_health_checker_thread::db_health_check_status::HealthCheckStatus;
 use crate::threads::db_health_checker_thread::db_health_checker_thread::db_health_checker_thread;
 use crate::threads::poll_ip_banlist_thread::poll_ip_bans;
@@ -319,7 +319,8 @@ async fn main() -> AnyhowResult<()> {
   let ip_ban_list = load_static_container_ip_bans();
   let ip_ban_list2 = ip_ban_list.clone();
 
-  let troll_user_ban_list = load_troll_user_token_bans();
+  let user_token_troll_bans = load_troll_user_token_bans();
+  let ip_address_troll_bans = load_ip_address_troll_bans();
 
   // Background jobs.
 
@@ -446,7 +447,10 @@ async fn main() -> AnyhowResult<()> {
       redirect_landing_finished_url: twitch_oauth_redirect_landing_finished_url,
     },
     ip_ban_list,
-    troll_user_ban_list,
+    troll_bans: TrollBans {
+      user_tokens: user_token_troll_bans,
+      ip_addresses: ip_address_troll_bans,
+    },
   };
 
   serve(server_state)
@@ -498,7 +502,7 @@ fn load_static_container_ip_bans() -> IpBanList {
 fn load_troll_user_token_bans() -> TrollUserBanList {
   let user_token_troll_ban_directory = easyenv::get_env_string_or_default(
     "USER_TOKEN_TROLL_BAN_DIRECTORY",
-    "./container_includes/user_token_troll_bans"
+    "./container_includes/troll_bans/user_token_troll_bans"
   );
 
   let troll_ban_list = load_user_token_ban_list_from_directory(user_token_troll_ban_directory)
@@ -506,6 +510,21 @@ fn load_troll_user_token_bans() -> TrollUserBanList {
 
   info!("Static user token troll bans loaded: {}", troll_ban_list.total_user_token_count().unwrap_or(0));
   troll_ban_list
+}
+
+// NB: Some users abuse our service.
+// Instead of outright banning them, we can change the function of the service.
+fn load_ip_address_troll_bans() -> IpBanList {
+  let ip_ban_directory = easyenv::get_env_string_or_default(
+    "IP_TROLL_BAN_DIRECTORY",
+    "./container_includes/troll_bans/ip_address_troll_bans"
+  );
+
+  let ip_ban_list = load_ip_ban_list_from_directory(ip_ban_directory)
+      .unwrap_or(IpBanList::new());
+
+  info!("Static IP troll bans loaded: {}", ip_ban_list.total_ip_address_count().unwrap_or(0));
+  ip_ban_list
 }
 
 pub async fn serve(server_state: ServerState) -> AnyhowResult<()>
