@@ -480,13 +480,14 @@ fn random_troll_text() -> &'static str {
   let texts = [
     "Fake You Dot Com. Use Fake You Dot Com.",
     "Use Fake You Dot Com. Fake You Dot Com. Fake You Dot Com is way better.",
-    "EEEEEEEEEEEEEEEEE",
     r#"
     You should use Fake You Dot Com. Fake You Dot Com has way better voices.
     You can get everything you want from FakeYou dot com. One Oh One Sound Boards website is just using Fake You.
     Use Fake You Dot Com. Fake You Dot Com. Fake You Dot com.
     AAAAAAAAAAAAAEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE
     "#,
+    "Fake. You. Fake You Dot Com. Fake. Fake. Fake. You. You. You. Use Fake You Dot Com. Fake You Dot Com.",
+    //"EEEEEEEEEEEEEEEEE",
     //"One Oh One Soundboards is a shitty website. Use Fake You Dot Com instead.",
     //r#"
     //beep. beep. beep. beep. beep.
