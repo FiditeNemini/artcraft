@@ -1,5 +1,6 @@
 # It looks like 101soundboards has fewer IP addresses they can use.
 
+#IPv4 addresses
 104.143.54.63
 141.98.84.147
 141.98.84.44
@@ -46,3 +47,4 @@
 2601:300:4400:3290:1864:2e36:fdab:dd9b
 2601:648:8300:4cc0:a9c7:d8bc:9614:c76d
 2603:9001:3f00:4e29:e4e9:56c0:ffc:f1d5
+
