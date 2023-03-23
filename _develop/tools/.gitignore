@@ -1,0 +1,6 @@
+# Secrets
+db_secrets.toml
+
+# Python Virtual Env
+python/
+
