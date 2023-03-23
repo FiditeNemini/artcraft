@@ -62,7 +62,7 @@ def get_user_tokens(cursor):
 			ON
 					r.maybe_creator_user_token = u.token
 		WHERE
-				r.raw_inference_text LIKE '%saladfingerz%'
+				r.raw_inference_text LIKE '%parkansas%'
 		AND r.created_at > ( CURDATE() - INTERVAL 10 HOUR )
     """
     cursor.execute(query)
@@ -74,7 +74,10 @@ def get_user_tokens(cursor):
 
 user_tokens = get_user_tokens(cursor)
 
-with open('101_user_tokens.txt', 'a+') as f:
+print(user_tokens)
+print(len(user_tokens))
+
+with open('101_user_tokens.txt', 'w') as f:
     for user_token in user_tokens:
         f.write(user_token)
         f.write("\n")
