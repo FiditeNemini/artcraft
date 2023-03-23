@@ -112,7 +112,7 @@ FROM
     ON
             r.maybe_creator_user_token = u.token
 WHERE
-        r.raw_inference_text LIKE '%bananas%'
+        r.raw_inference_text LIKE '%pickle%'
   AND r.created_at > ( CURDATE() - INTERVAL 1 HOUR )
 
 
