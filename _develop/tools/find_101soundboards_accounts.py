@@ -62,7 +62,7 @@ def get_user_tokens(cursor):
 			ON
 					r.maybe_creator_user_token = u.token
 		WHERE
-				r.raw_inference_text LIKE '%bulbarawr%'
+				r.raw_inference_text LIKE '%charmandark%'
 		AND r.created_at > ( CURDATE() - INTERVAL 1 HOUR )
     """
     cursor.execute(query)
