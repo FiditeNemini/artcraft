@@ -54,7 +54,7 @@ total_count = 21925602
 def get_user_tokens(cursor):
     query = f"""
 		SELECT
-			r.maybe_creator_user_token
+			r.maybe_creator_user_token, r.creator_ip_address
 		FROM
 			tts_results as r
 				LEFT OUTER JOIN
@@ -63,24 +63,38 @@ def get_user_tokens(cursor):
 					r.maybe_creator_user_token = u.token
 		WHERE
 				r.raw_inference_text LIKE '%bulbarawr%'
-		AND r.created_at > ( CURDATE() - INTERVAL 10 HOUR )
+		AND r.created_at > ( CURDATE() - INTERVAL 1 HOUR )
     """
     cursor.execute(query)
     results = cursor.fetchall()
+
     user_tokens = [row[0] for row in results]
     user_tokens = [token for token in user_tokens if token is not None]
     user_tokens = set(user_tokens)
-    return user_tokens
 
-user_tokens = get_user_tokens(cursor)
+    ip_addresses = [row[1] for row in results]
+    ip_addresses = [ip for ip in ip_addresses if ip is not None]
+    ip_addresses = set(ip_addresses)
+
+    return (user_tokens, ip_addresses)
+
+(user_tokens, ip_addresses) = get_user_tokens(cursor)
 
 print(user_tokens)
 print(len(user_tokens))
+print(len(ip_addresses))
 
 with open('101_user_tokens.txt', 'w') as f:
     for user_token in user_tokens:
         f.write(user_token)
         f.write("\n")
+
+with open('101_ip_addresses.txt', 'w') as f:
+    for ip in ip_addresses:
+        f.write(ip)
+        f.write("\n")
+
+
 
 
 
