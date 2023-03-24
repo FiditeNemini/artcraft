@@ -231,7 +231,7 @@ function IndexPage() {
         </div>
         <div className="container mt-5 pt-5">
           <div className="row gx-5 flex-row-reverse gy-4">
-            <div className="col-lg-6 img-layers">
+            <div className="col-lg-6 img-layers d-none d-xl-block">
               <Tilt trackOnWindow={true} tiltReverse={true}>
                 <img
                   src="/images/screenshots/fakeyou-screen.webp"
@@ -245,6 +245,14 @@ function IndexPage() {
                 className="img-front-right img-mascot"
               />
             </div>
+            <div className="col-lg-6 d-xl-none">
+              <img
+                src="/images/screenshots/fakeyou-screen-mobile.webp"
+                alt="FakeYou"
+                className="img-fluid"
+              />
+            </div>
+
             <div className="col-lg-6 d-flex flex-column justify-content-center">
               <h1 className="fw-bold display-5">FakeYou</h1>
               <h4 className="fw-normal opacity-75 mb-4">
@@ -277,7 +285,7 @@ function IndexPage() {
       <div className="bg-dark section-2">
         <div className="container">
           <div className="row gx-5 gy-5">
-            <div className="col-lg-6 img-layers">
+            <div className="col-lg-6 img-layers d-none d-xl-block">
               <Tilt trackOnWindow={true} tiltReverse={true}>
                 <img
                   src="/images/screenshots/powerstream-screen.webp"
@@ -291,6 +299,14 @@ function IndexPage() {
                 className="img-front-left img-mascot"
               />
             </div>
+            <div className="col-lg-6 d-xl-none">
+              <img
+                src="/images/screenshots/powerstream-screen-mobile.webp"
+                alt="FakeYou"
+                className="img-fluid"
+              />
+            </div>
+
             <div className="col-lg-6 d-flex flex-column justify-content-center">
               <h1 className="fw-bold display-5">PowerStream</h1>
               <h4 className="fw-normal opacity-75 mb-4">
