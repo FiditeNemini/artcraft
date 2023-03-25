@@ -9,9 +9,11 @@ use chrono::{DateTime, Utc};
 use crate::AnyhowResult;
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::server_state::ServerState;
-use mysql_queries::queries::public_event_feed::list_public_event_feed_items::list_public_event_feed_items;
+use crate::user_avatars::default_avatar_color_from_username::default_avatar_color_from_username;
+use crate::user_avatars::default_avatar_from_username::default_avatar_from_username;
 use derive_more::{Display, Error};
 use log::{info, warn, log, error};
+use mysql_queries::queries::public_event_feed::list_public_event_feed_items::list_public_event_feed_items;
 use regex::Regex;
 use sqlx::MySqlPool;
 use sqlx::error::DatabaseError;
@@ -23,13 +25,35 @@ use std::sync::Arc;
 pub struct EventRecord {
   pub event_token: String,
   pub event_type: String,
+
+  // User information (new)
+  pub maybe_target_user_info: Option<TargetUserInfo>,
+
+  // User information (deprecated)
+  #[deprecated(note="don't remove until frontend removes")]
   pub maybe_target_user_token: Option<String>,
+  #[deprecated(note="don't remove until frontend removes")]
   pub maybe_target_username: Option<String>,
+  #[deprecated(note="don't remove until frontend removes")]
   pub maybe_target_display_name: Option<String>,
+  #[deprecated(note="don't remove until frontend removes")]
   pub maybe_target_user_gravatar_hash: Option<String>,
+
+  // Link to created entity
   pub maybe_target_entity_token: Option<String>,
+
   pub created_at: DateTime<Utc>,
   pub updated_at: DateTime<Utc>,
+}
+
+#[derive(Serialize)]
+pub struct TargetUserInfo {
+  pub user_token: String,
+  pub username: String,
+  pub display_name: String,
+  pub gravatar_hash: String,
+  pub default_avatar_index: u8,
+  pub default_avatar_color_index: u8,
 }
 
 #[derive(Serialize)]
@@ -72,16 +96,39 @@ pub async fn list_events_handler(
         ListEventsError::ServerError
       })?
       .into_iter()
-      .map(|event| EventRecord {
-        event_token: event.event_token,
-        event_type: event.event_type,
-        maybe_target_user_token: event.maybe_target_user_token,
-        maybe_target_username: event.maybe_target_username,
-        maybe_target_display_name: event.maybe_target_display_name,
-        maybe_target_user_gravatar_hash: event.maybe_target_user_gravatar_hash,
-        maybe_target_entity_token: event.maybe_target_entity_token,
-        created_at: event.created_at,
-        updated_at: event.updated_at,
+      .map(|event| {
+        let mut maybe_target_user_info = None;
+
+        // TODO/FIXME: Flock of seagulls + danger of a thing being null
+        if let Some(user_token) = event.maybe_target_user_token.as_deref() {
+          if let Some(username) = event.maybe_target_username.as_deref() {
+            if let Some(display_name) = event.maybe_target_display_name.as_deref() {
+              if let Some(gravatar_hash) = event.maybe_target_user_gravatar_hash.as_deref() {
+                maybe_target_user_info = Some(TargetUserInfo {
+                  user_token: user_token.to_string(),
+                  username: username.to_string(),
+                  display_name: display_name.to_string(),
+                  gravatar_hash: gravatar_hash.to_string(),
+                  default_avatar_index: default_avatar_from_username(&username),
+                  default_avatar_color_index: default_avatar_color_from_username(&username),
+                })
+              }
+            }
+          }
+        }
+
+        EventRecord {
+          event_token: event.event_token,
+          event_type: event.event_type,
+          maybe_target_user_info,
+          maybe_target_user_token: event.maybe_target_user_token,
+          maybe_target_username: event.maybe_target_username,
+          maybe_target_display_name: event.maybe_target_display_name,
+          maybe_target_user_gravatar_hash: event.maybe_target_user_gravatar_hash,
+          maybe_target_entity_token: event.maybe_target_entity_token,
+          created_at: event.created_at,
+          updated_at: event.updated_at,
+        }
       })
       .collect();
 
