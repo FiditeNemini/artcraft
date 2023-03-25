@@ -8,20 +8,22 @@ use actix_web::http::StatusCode;
 use actix_web::web::Path;
 use actix_web::{web, HttpResponse, HttpRequest};
 use chrono::{DateTime, Utc};
+use crate::utils::default_avatar_color_from_username::default_avatar_color_from_username;
+use crate::utils::default_avatar_from_username::default_avatar_from_username;
 use crate::utils::session_checker::SessionChecker;
-use mysql_queries::queries::users::user_badges::list_user_badges::UserBadgeForList;
-use mysql_queries::queries::users::user_badges::list_user_badges::list_user_badges;
-use mysql_queries::queries::users::user_profiles::get_user_profile_by_username::{get_user_profile_by_username_from_connection, UserProfileResult};
 use enums::common::visibility::Visibility;
 use http_server_common::request::get_request_header_optional::get_request_header_optional;
 use http_server_common::response::serialize_as_json_error::serialize_as_json_error;
 use http_server_common::util::timer::MultiBenchmarkingTimer;
 use log::{error, warn};
-use sqlx::MySqlPool;
-use std::fmt;
-use r2d2_redis::{r2d2, RedisConnectionManager};
+use mysql_queries::queries::users::user_badges::list_user_badges::UserBadgeForList;
+use mysql_queries::queries::users::user_badges::list_user_badges::list_user_badges;
+use mysql_queries::queries::users::user_profiles::get_user_profile_by_username::{get_user_profile_by_username_from_connection, UserProfileResult};
 use r2d2_redis::r2d2::PooledConnection;
 use r2d2_redis::redis::Commands;
+use r2d2_redis::{r2d2, RedisConnectionManager};
+use sqlx::MySqlPool;
+use std::fmt;
 use tokens::users::user::UserToken;
 
 // TODO: This is duplicated in query_user_profile
@@ -32,6 +34,8 @@ pub struct UserProfileRecordForResponse {
   pub username: String,
   pub display_name: String,
   pub email_gravatar_hash: String,
+  pub default_avatar_index: u8,
+  pub default_avatar_color_index: u8,
   pub profile_markdown: String,
   pub profile_rendered_html: String,
   pub user_role_slug: String,
@@ -213,9 +217,11 @@ pub async fn get_profile_handler(
 
   let mut profile_for_response = UserProfileRecordForResponse {
     user_token: user_data.user_profile.user_token,
-    username: user_data.user_profile.username,
+    username: user_data.user_profile.username.to_string(), // NB: Cloned because of ref use for avatar below
     display_name: user_data.user_profile.display_name,
     email_gravatar_hash: user_data.user_profile.email_gravatar_hash,
+    default_avatar_index: default_avatar_from_username(&user_data.user_profile.username),
+    default_avatar_color_index: default_avatar_color_from_username(&user_data.user_profile.username),
     profile_markdown: user_data.user_profile.profile_markdown,
     profile_rendered_html: user_data.user_profile.profile_rendered_html,
     user_role_slug: user_data.user_profile.user_role_slug,

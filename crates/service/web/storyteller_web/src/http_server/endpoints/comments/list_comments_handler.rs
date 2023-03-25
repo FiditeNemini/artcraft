@@ -10,12 +10,14 @@ use actix_web::{web, HttpResponse, HttpRequest};
 use chrono::{DateTime, Utc};
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::server_state::ServerState;
+use crate::user_avatars::default_avatar_color_from_username::default_avatar_color_from_username;
+use crate::user_avatars::default_avatar_from_username::default_avatar_from_username;
 use enums::by_table::comments::comment_entity_type::CommentEntityType;
 use log::warn;
+use mysql_queries::queries::comments::comment_entity_token::CommentEntityToken;
 use mysql_queries::queries::comments::list_comments_for_entity::list_comments_for_entity;
 use std::fmt;
 use std::sync::Arc;
-use mysql_queries::queries::comments::comment_entity_token::CommentEntityToken;
 use tokens::tokens::comments::CommentToken;
 use tokens::users::user::UserToken;
 
@@ -40,6 +42,8 @@ pub struct Comment {
   pub username: String,
   pub user_display_name: String,
   pub user_gravatar_hash: String,
+  pub default_avatar_index: u8,
+  pub default_avatar_color_index: u8,
 
   pub comment_markdown: String,
   pub comment_rendered_html: String,
@@ -116,9 +120,11 @@ pub async fn list_comments_handler(
         .map(|comment| Comment {
           token: comment.token,
           user_token: comment.user_token,
-          username: comment.username,
+          username: comment.username.to_string(), // NB: Cloned because of ref use for avatar below
           user_display_name: comment.user_display_name,
           user_gravatar_hash: comment.user_gravatar_hash,
+          default_avatar_index: default_avatar_from_username(&comment.username),
+          default_avatar_color_index: default_avatar_color_from_username(&comment.username),
           comment_markdown: comment.comment_markdown,
           comment_rendered_html: comment.comment_rendered_html,
           created_at: comment.created_at,

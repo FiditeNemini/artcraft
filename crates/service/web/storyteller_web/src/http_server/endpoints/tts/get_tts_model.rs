@@ -9,11 +9,13 @@ use actix_web::web::Path;
 use actix_web::{web, HttpResponse, HttpRequest};
 use chrono::{DateTime, Utc};
 use crate::server_state::ServerState;
-use mysql_queries::column_types::vocoder_type::VocoderType;
-use mysql_queries::queries::tts::tts_models::get_tts_model::get_tts_model_by_token_using_connection;
+use crate::user_avatars::default_avatar_color_from_username::default_avatar_color_from_username;
+use crate::user_avatars::default_avatar_from_username::default_avatar_from_username;
 use enums::common::visibility::Visibility;
 use http_server_common::response::serialize_as_json_error::serialize_as_json_error;
 use log::warn;
+use mysql_queries::column_types::vocoder_type::VocoderType;
+use mysql_queries::queries::tts::tts_models::get_tts_model::get_tts_model_by_token_using_connection;
 use redis_common::redis_cache_keys::RedisCacheKeys;
 use std::fmt;
 use std::sync::Arc;
@@ -68,6 +70,8 @@ pub struct TtsModelInfo {
   pub creator_username: String,
   pub creator_display_name: String,
   pub creator_gravatar_hash: String,
+  pub creator_default_avatar_index: u8,
+  pub creator_default_avatar_color_index: u8,
 
   pub title: String,
   pub description_markdown: String,
@@ -289,9 +293,11 @@ pub async fn get_tts_model_handler(
       maybe_default_pretrained_vocoder: model.maybe_default_pretrained_vocoder,
       text_preprocessing_algorithm: model.text_preprocessing_algorithm,
       creator_user_token: model.creator_user_token,
-      creator_username: model.creator_username,
+      creator_username: model.creator_username.to_string(), // NB: Cloned because of ref use for avatar below
       creator_display_name: model.creator_display_name,
       creator_gravatar_hash: model.creator_gravatar_hash,
+      creator_default_avatar_index: default_avatar_from_username(&model.creator_username),
+      creator_default_avatar_color_index: default_avatar_color_from_username(&model.creator_username),
       title: model.title,
       description_markdown: model.description_markdown,
       description_rendered_html: model.description_rendered_html,

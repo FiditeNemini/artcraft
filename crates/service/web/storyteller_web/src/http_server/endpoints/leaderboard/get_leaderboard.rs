@@ -6,14 +6,14 @@
 use actix_web::error::ResponseError;
 use actix_web::http::StatusCode;
 use actix_web::{web, HttpResponse, HttpRequest};
-use errors::AnyhowResult;
 use crate::http_server::web_utils::serialize_as_json_error::serialize_as_json_error;
 use crate::server_state::ServerState;
-use mysql_queries::queries::tts::stats::calculate_tts_model_leaderboard::TtsLeaderboardRecordForList;
-use mysql_queries::queries::tts::stats::calculate_tts_model_leaderboard::calculate_tts_model_leaderboard;
-use mysql_queries::queries::w2l::stats::calculate_w2l_template_leaderboard::W2lLeaderboardRecordForList;
-use mysql_queries::queries::w2l::stats::calculate_w2l_template_leaderboard::calculate_w2l_template_leaderboard;
+use crate::user_avatars::default_avatar_color_from_username::default_avatar_color_from_username;
+use crate::user_avatars::default_avatar_from_username::default_avatar_from_username;
+use errors::AnyhowResult;
 use log::{debug, error, warn};
+use mysql_queries::queries::tts::stats::calculate_tts_model_leaderboard::calculate_tts_model_leaderboard;
+use mysql_queries::queries::w2l::stats::calculate_w2l_template_leaderboard::calculate_w2l_template_leaderboard;
 use sqlx::MySqlPool;
 use std::fmt;
 use std::sync::Arc;
@@ -21,8 +21,21 @@ use std::sync::Arc;
 #[derive(Serialize)]
 pub struct LeaderboardResponse {
   success: bool,
-  tts_leaderboard: Vec<TtsLeaderboardRecordForList>,
-  w2l_leaderboard: Vec<W2lLeaderboardRecordForList>,
+  tts_leaderboard: Vec<LeaderboardRow>,
+  w2l_leaderboard: Vec<LeaderboardRow>,
+}
+
+#[derive(Clone, Serialize)]
+pub struct LeaderboardRow {
+  pub creator_user_token: String,
+
+  pub username: String,
+  pub display_name: String,
+  pub gravatar_hash: String,
+  pub default_avatar_index: u8,
+  pub default_avatar_color_index: u8,
+
+  pub uploaded_count: i64,
 }
 
 #[derive(Serialize, Debug)]
@@ -137,8 +150,8 @@ pub async fn leaderboard_handler(
 
 #[derive(Clone)]
 pub struct LeaderboardInfo {
-  tts_leaderboard: Vec<TtsLeaderboardRecordForList>,
-  w2l_leaderboard: Vec<W2lLeaderboardRecordForList>,
+  tts_leaderboard: Vec<LeaderboardRow>,
+  w2l_leaderboard: Vec<LeaderboardRow>,
 }
 
 async fn query_leaderboard(mysql_pool: &MySqlPool) -> AnyhowResult<LeaderboardInfo> {
@@ -156,8 +169,33 @@ async fn query_leaderboard(mysql_pool: &MySqlPool) -> AnyhowResult<LeaderboardIn
   let maybe_w2l_results =
       calculate_w2l_template_leaderboard(&mut mysql_connection_2);
 
-  let tts_results = maybe_tts_results.await?;
-  let w2l_results = maybe_w2l_results.await?;
+  let tts_results = maybe_tts_results
+      .await?
+      .into_iter()
+      .map(|record| LeaderboardRow {
+        creator_user_token: record.creator_user_token,
+        username: record.username.to_string(), // NB: Cloned because of ref use for avatar below
+        display_name: record.display_name,
+        gravatar_hash: record.gravatar_hash,
+        default_avatar_index: default_avatar_from_username(&record.username),
+        default_avatar_color_index: default_avatar_color_from_username(&record.username),
+        uploaded_count: record.uploaded_count,
+      })
+      .collect();
+
+  let w2l_results = maybe_w2l_results
+      .await?
+      .into_iter()
+      .map(|record| LeaderboardRow {
+        creator_user_token: record.creator_user_token,
+        username: record.username.to_string(), // NB: Cloned because of ref use for avatar below
+        display_name: record.display_name,
+        gravatar_hash: record.gravatar_hash,
+        default_avatar_index: default_avatar_from_username(&record.username),
+        default_avatar_color_index: default_avatar_color_from_username(&record.username),
+        uploaded_count: record.uploaded_count,
+      })
+      .collect();
 
   Ok(LeaderboardInfo {
     tts_leaderboard: tts_results,
