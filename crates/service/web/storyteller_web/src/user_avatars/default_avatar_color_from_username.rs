@@ -2,7 +2,8 @@ use std::collections::hash_map::DefaultHasher;
 use std::hash::{Hash, Hasher};
 
 /// The frontend folks will tell us how many colors to use.
-const NUMBER_OF_COLORS : u64 = 8;
+/// We'll return an index from [0, NUMBER_OF_COLORS) - [inclusive, exclusive)
+const NUMBER_OF_COLORS : u64 = 9;
 
 /// Not that it matters, but this perturbs the hash.
 const SALT_LIKE_OFFSET : u8 = 51;
@@ -14,6 +15,7 @@ pub fn default_avatar_color_from_username(username: &str) -> u8 {
   // There's a potential of mixing up `username` and `display_name`.
   let username_lower = username.to_lowercase();
 
+  // TODO: Maybe use consistent hashing so I don't have to keep updating the tests dramatically.
   let mut hasher = DefaultHasher::new();
 
   username_lower.hash(&mut hasher);
@@ -34,10 +36,10 @@ mod tests {
   #[test]
   fn test_stability() {
     assert_eq!(default_avatar_color_from_username("echelon"), 3);
-    assert_eq!(default_avatar_color_from_username("vegito"), 4);
-    assert_eq!(default_avatar_color_from_username("bflat"), 1);
-    assert_eq!(default_avatar_color_from_username("mechacosm"), 1);
-    assert_eq!(default_avatar_color_from_username("sajattack"), 3);
+    assert_eq!(default_avatar_color_from_username("vegito"), 3);
+    assert_eq!(default_avatar_color_from_username("bflat"), 6);
+    assert_eq!(default_avatar_color_from_username("mechacosm"), 3);
+    assert_eq!(default_avatar_color_from_username("sajattack"), 7);
     assert_eq!(default_avatar_color_from_username("zdisket"), 7);
   }
 
@@ -58,9 +60,9 @@ mod tests {
       let avatar_id = default_avatar_color_from_username(&random_username);
       distribution.insert(avatar_id);
       assert!(avatar_id >= 0);
-      assert!(avatar_id <= 8);
+      assert!(avatar_id <= 9);
     }
     // NB: We could test frequency of the distribution too
-    assert_eq!(distribution.len(), 8);
+    assert_eq!(distribution.len(), 9);
   }
 }
