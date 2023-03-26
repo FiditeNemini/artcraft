@@ -9,9 +9,10 @@ interface Props {
 
 function Gravatar(props: Props) {
   // TODO: staging domain + local dev support
-  let defaultImageUrl = props.avatarIndex === undefined ? 
-    "https://fakeyou.com/images/avatars/default-pfp.png" : 
-    `https://fakeyou.com/images/avatars/2000x2000/${props.avatarIndex}.png`
+  let defaultImageUrl =
+    props.avatarIndex === undefined
+      ? "https://fakeyou.com/images/avatars/default-pfp.png"
+      : `https://fakeyou.com/images/avatars/2000x2000/${props.avatarIndex}.webp`;
 
   // NB: Gravatar suggests URI encoding these:
   // https://en.gravatar.com/site/implement/images/
