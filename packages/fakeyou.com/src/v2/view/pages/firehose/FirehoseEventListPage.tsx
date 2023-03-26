@@ -29,6 +29,9 @@ interface FirehoseEventListResponsePayload {
 interface FirehoseEvent {
   event_token: string;
   event_type: string;
+
+  maybe_target_user_info?: TargetUserInfo;
+
   maybe_target_user_token?: string;
   maybe_target_username?: string;
   maybe_target_display_name?: string;
@@ -36,6 +39,15 @@ interface FirehoseEvent {
   maybe_target_entity_token?: string;
   created_at: string;
   updated_at: string;
+}
+
+interface TargetUserInfo {
+  user_token: string;
+  username: string;
+  display_name: string;
+  gravatar_hash: string;
+  default_avatar_index: number;
+  default_avatar_color_index: number; 
 }
 
 interface Props {
@@ -111,6 +123,7 @@ function FirehoseEventListPage(props: Props) {
             size={22}
             username={event.maybe_target_username}
             email_hash={event.maybe_target_user_gravatar_hash}
+            avatarIndex={event.maybe_target_user_info?.default_avatar_index || 0}
           />
         </div>
       );

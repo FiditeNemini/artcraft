@@ -8,7 +8,7 @@ import {
   GetLeaderboardIsErr,
   GetLeaderboardIsOk,
   Leaderboard,
-  LeaderboardEntryForList,
+  LeaderboardRow,
   LeaderboardLookupError,
 } from "@storyteller/components/src/api/leaderboard/GetLeaderboard";
 import { DiscordLink2 } from "@storyteller/components/src/elements/DiscordLink2";
@@ -25,10 +25,10 @@ function LeaderboardPage(props: Props) {
     undefined
   );
   const [ttsLeaderboard, setTtsLeaderboard] = useState<
-    Array<LeaderboardEntryForList> | undefined
+    Array<LeaderboardRow> | undefined
   >(undefined);
   const [w2lLeaderboard, setW2lLeaderboard] = useState<
-    Array<LeaderboardEntryForList> | undefined
+    Array<LeaderboardRow> | undefined
   >(undefined);
   const [retryCount, setRetryCount] = useState(0);
 
