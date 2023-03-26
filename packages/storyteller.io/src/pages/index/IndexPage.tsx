@@ -423,7 +423,7 @@ function IndexPage() {
                 playsInline={true}
                 loop={true}
                 muted={true}
-                className="img-fluid img-border"
+                className="ratio ratio-16x9 img-border"
               ></video>
             </div>
             <div className="col-12 col-md-6 d-flex flex-column justify-content-center">
@@ -446,7 +446,7 @@ function IndexPage() {
                 playsInline={true}
                 loop={true}
                 muted={true}
-                className="img-fluid img-border"
+                className="ratio ratio-16x9 img-border"
               ></video>
             </div>
             <div className="col-12 col-md-6 d-flex flex-column justify-content-center">
@@ -469,7 +469,7 @@ function IndexPage() {
                 playsInline={true}
                 loop={true}
                 muted={true}
-                className="img-fluid img-border"
+                className="ratio ratio-16x9 img-border"
               ></video>
             </div>
             <div className="col-12 col-md-6 d-flex flex-column justify-content-center">
