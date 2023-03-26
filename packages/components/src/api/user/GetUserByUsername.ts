@@ -5,6 +5,8 @@ export interface User {
   username: string,
   display_name: string,
   email_gravatar_hash: string,
+  default_avatar_index: number,
+  default_avatar_color_index: number,
   profile_markdown: string,
   profile_rendered_html: string,
   user_role_slug: string,
