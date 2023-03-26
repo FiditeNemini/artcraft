@@ -1,17 +1,20 @@
 import React from "react";
+import { getBackgroundColor } from "./GetBGColor";
 
 interface Props {
   size: number;
   email_hash?: string;
   username?: string;
   avatarIndex?: number;
+  backgroundIndex?: number;
 }
 
 function Gravatar(props: Props) {
   // TODO: staging domain + local dev support
-  let defaultImageUrl = props.avatarIndex === undefined ? 
-    "https://fakeyou.com/images/avatars/default-pfp.png" : 
-    `https://fakeyou.com/images/avatars/2000x2000/${props.avatarIndex}.png`
+  let defaultImageUrl =
+    props.avatarIndex === undefined
+      ? "https://fakeyou.com/images/avatars/default-pfp.png"
+      : `https://fakeyou.com/images/avatars/2000x2000/${props.avatarIndex}.png`;
 
   // NB: Gravatar suggests URI encoding these:
   // https://en.gravatar.com/site/implement/images/
@@ -31,6 +34,7 @@ function Gravatar(props: Props) {
       src={gravatarUrl}
       height={props.size}
       width={props.size}
+      style={{ backgroundColor: getBackgroundColor(props.backgroundIndex) }}
     />
   );
 }

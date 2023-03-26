@@ -70,13 +70,17 @@ function LeaderboardPage(props: Props) {
       ttsRows.push(
         <tr>
           <td className="lb-name">
-            <Link to={WebUrl.userProfilePage(ttsEntry.display_name)}>
+            <Link
+              to={WebUrl.userProfilePage(ttsEntry.display_name)}
+              className="d-flex align-items-center gap-2"
+            >
               <Gravatar
-                size={12}
+                size={32}
                 username={ttsEntry.display_name}
                 email_hash={ttsEntry.gravatar_hash}
+                avatarIndex={ttsEntry.default_avatar_index}
+                backgroundIndex={ttsEntry.default_avatar_color_index}
               />
-              &nbsp;
               {ttsEntry.display_name}
             </Link>
           </td>
@@ -93,13 +97,17 @@ function LeaderboardPage(props: Props) {
       w2lRows.push(
         <tr>
           <td className="lb-name">
-            <Link to={WebUrl.userProfilePage(w2lEntry.display_name)}>
+            <Link
+              to={WebUrl.userProfilePage(w2lEntry.display_name)}
+              className="d-flex align-items-center gap-2"
+            >
               <Gravatar
-                size={12}
+                size={32}
                 username={w2lEntry.display_name}
                 email_hash={w2lEntry.gravatar_hash}
+                avatarIndex={w2lEntry.default_avatar_index}
+                backgroundIndex={w2lEntry.default_avatar_color_index}
               />
-              &nbsp;
               {w2lEntry.display_name}
             </Link>
           </td>
