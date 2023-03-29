@@ -58,11 +58,10 @@ export function TtsPageHero(props: Props) {
           onClick={() => {
             Analytics.ttsClickHeroSignup();
           }}
+          className="btn btn-primary"
         >
-          <button type="button" className="btn btn-primary">
-            {t("tts.TtsModelListPage.heroSection.buttons.signUp")}
-            <FontAwesomeIcon icon={faArrowRight} className="ms-2" />
-          </button>
+          {t("tts.TtsModelListPage.heroSection.buttons.signUp")}
+          <FontAwesomeIcon icon={faArrowRight} className="ms-2" />
         </Link>
       </>
     );
@@ -73,11 +72,10 @@ export function TtsPageHero(props: Props) {
           onClick={() => {
             Analytics.ttsClickHeroViewPricing();
           }}
+          className="btn btn-secondary"
         >
-          <button type="button" className="btn btn-secondary w-100">
-            <FontAwesomeIcon icon={faStar} className="me-2" />
-            {t("tts.TtsModelListPage.heroSection.buttons.viewPricing")}
-          </button>
+          <FontAwesomeIcon icon={faStar} className="me-2" />
+          {t("tts.TtsModelListPage.heroSection.buttons.viewPricing")}
         </Link>
       </>
     );
@@ -93,8 +91,9 @@ export function TtsPageHero(props: Props) {
           onClick={() => {
             Analytics.ttsClickHeroViewProfile();
           }}
+          className="w-100"
         >
-          <button type="button" className="btn btn-secondary w-100">
+          <button type="button" className="btn btn-secondary">
             <FontAwesomeIcon icon={faUser} className="me-2" />
             View my profile
           </button>
@@ -109,8 +108,9 @@ export function TtsPageHero(props: Props) {
             onClick={() => {
               Analytics.ttsClickHeroUpgradePlan();
             }}
+            className="w-100"
           >
-            <button type="button" className="btn btn-primary w-100">
+            <button type="button" className="btn btn-primary">
               <FontAwesomeIcon icon={faStar} className="me-2" />
               Upgrade Plan
             </button>
