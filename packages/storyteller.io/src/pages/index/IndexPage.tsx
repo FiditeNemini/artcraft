@@ -773,13 +773,13 @@ function IndexPage() {
                 className="img-fluid img-team mb-3 opacity-50"
                 alt=""
               />
-              <p className="fw-semibold opacity-100 mb-0 fs-5">Z.</p>
+              <p className="fw-semibold opacity-100 mb-0 fs-5">Ramiro</p>
               <p className="team-role-text">Machine Learning Engineer</p>
             </div>
             <div className="col-6 col-md-3">
               <img
-                src="/images/team/placeholder-pfp.jpg"
-                className="img-fluid img-team mb-3 opacity-50"
+                src="/images/team/ramiro.jpg"
+                className="img-fluid img-team mb-3"
                 alt=""
               />
               <p className="fw-semibold opacity-100 mb-0 fs-5">Scott</p>
