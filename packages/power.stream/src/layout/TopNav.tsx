@@ -1,6 +1,5 @@
 import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
 import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -26,7 +25,7 @@ function TopNav(props: Props) {
         aria-label="Offcanvas navbar large"
       >
         <div className="container">
-          <a className="navbar-brand me-5 pr-8" href="#">
+          <a className="navbar-brand me-5 pr-8" href="#/">
             <img
               src="/assets/powerstream-logo.png"
               alt="PowerStream Logo"
@@ -48,7 +47,7 @@ function TopNav(props: Props) {
             aria-labelledby="offcanvasNavbar2Label"
           >
             <div className="offcanvas-header" data-bs-toggle="offcanvas">
-              <a className="navbar-brand me-5 pr-8" href="#">
+              <a className="navbar-brand me-5 pr-8" href="#/">
                 <img
                   src="/assets/powerstream-logo.png"
                   alt="PowerStream Logo"

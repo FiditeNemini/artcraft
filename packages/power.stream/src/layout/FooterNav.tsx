@@ -1,5 +1,4 @@
 import { GitSha } from "@storyteller/components/src/elements/GitSha";
-import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
 import { Link } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
