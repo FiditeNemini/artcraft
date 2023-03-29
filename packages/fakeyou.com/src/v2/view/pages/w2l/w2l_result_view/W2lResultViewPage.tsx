@@ -264,7 +264,7 @@ function W2lResultViewPage(props: Props) {
     <motion.div initial="hidden" animate="visible" variants={container}>
       <div className="container py-5 px-md-4 px-lg-5 px-xl-3">
         <motion.h1
-          className="display-5 fw-bold text-center text-lg-start"
+          className=" fw-bold text-center text-lg-start"
           variants={item}
         >
           Lipsync Result

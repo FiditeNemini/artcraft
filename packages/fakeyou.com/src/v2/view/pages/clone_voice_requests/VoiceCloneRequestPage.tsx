@@ -30,7 +30,6 @@ import { usePrefixedDocumentTitle } from "../../../../common/UsePrefixedDocument
 interface Props {}
 
 function VoiceCloneRequestPage(props: Props) {
-
   usePrefixedDocumentTitle("Create a Custom Voice Clone with Deep Fake TTS");
 
   // Contact
@@ -262,7 +261,7 @@ function VoiceCloneRequestPage(props: Props) {
           </div>
           <div className="col-lg-6 px-3 px-md-2 px-lg-5 px-xl-2">
             <div className="text-center text-lg-start">
-              <motion.h1 className="display-5 fw-bold lh-1" variants={item}>
+              <motion.h1 className=" fw-bold lh-1" variants={item}>
                 Professionally Clone Your Voice
               </motion.h1>
               <motion.h3 className="mb-4" variants={item}>

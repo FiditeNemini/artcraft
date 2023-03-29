@@ -133,9 +133,7 @@ function TtsResultDeletePage(props: Props) {
     return <div />; // Exit rendering until data loads.
   }
 
-  const modelLink = WebUrl.ttsModelPage(
-    ttsInferenceResult.tts_model_token
-  );
+  const modelLink = WebUrl.ttsModelPage(ttsInferenceResult.tts_model_token);
 
   let durationSeconds = ttsInferenceResult?.duration_millis / 1000;
   let modelName = ttsInferenceResult.tts_model_title;
@@ -189,7 +187,7 @@ function TtsResultDeletePage(props: Props) {
   return (
     <motion.div initial="hidden" animate="visible" variants={container}>
       <div className="container pt-5 pb-4 px-lg-5 px-xl-3">
-        <motion.h1 className="display-5 fw-bold mb-3" variants={item}>
+        <motion.h1 className=" fw-bold mb-3" variants={item}>
           {h1Title}
         </motion.h1>
         <motion.div variants={item}>

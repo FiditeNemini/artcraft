@@ -138,16 +138,13 @@ function ModerationIpBanListFc(props: Props) {
   return (
     <div>
       <div className="container py-5">
-        <h1 className="display-5 fw-bold">Moderation IP Ban List</h1>
+        <h1 className=" fw-bold">Moderation IP Ban List</h1>
         <p>
           IP Address bans will prevent bad actors from using and abusing the
           website.
         </p>
         <div className="pt-4">
-          <BackLink
-            link={WebUrl.moderationMain()}
-            text="Back to moderation"
-          />
+          <BackLink link={WebUrl.moderationMain()} text="Back to moderation" />
         </div>
       </div>
 

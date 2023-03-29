@@ -79,10 +79,14 @@ function TtsModelEditPage(props: Props) {
   // Moderator-only fields (both observable and editable)
   const [useDefaultMFactor, setUseDefaultMFactor] = useState(false);
   // NB: The field is an f64, but string is easy to edit
-  const [maybeCustomMFactor, setMaybeCustomMFactor] = useState<string| null>(null); 
+  const [maybeCustomMFactor, setMaybeCustomMFactor] = useState<string | null>(
+    null
+  );
 
   // Vocoder config (modern)
-  const [maybeCustomVocoderToken, setMaybeCustomVocoderToken] = useState<string | null>(null);
+  const [maybeCustomVocoderToken, setMaybeCustomVocoderToken] = useState<
+    string | null
+  >(null);
 
   // Vocoder config (legacy)
   const [defaultPretrainedVocoder, setDefaultPretrainedVocoder] = useState(
@@ -120,12 +124,12 @@ function TtsModelEditPage(props: Props) {
         model.maybe_moderator_fields?.use_default_m_factor || false
       );
 
-      let maybeCustomMFactor = (!!model.maybe_moderator_fields?.maybe_custom_m_factor) ? 
-        model.maybe_moderator_fields?.maybe_custom_m_factor.toString() : 
-        null;
+      let maybeCustomMFactor = !!model.maybe_moderator_fields
+        ?.maybe_custom_m_factor
+        ? model.maybe_moderator_fields?.maybe_custom_m_factor.toString()
+        : null;
 
       setMaybeCustomMFactor(maybeCustomMFactor);
-
     } else if (GetTtsModelIsErr(model)) {
       switch (model) {
         case TtsModelLookupError.NotFound:
@@ -135,7 +139,6 @@ function TtsModelEditPage(props: Props) {
     }
   }, []);
 
-
   const listVocoderModels = useCallback(async () => {
     const models = await ListVocoderModels();
 
@@ -143,7 +146,6 @@ function TtsModelEditPage(props: Props) {
       setVocoderModels(models.vocoders);
     }
   }, []);
-
 
   useEffect(() => {
     getModel(token);
@@ -192,7 +194,6 @@ function TtsModelEditPage(props: Props) {
     setMaybeCustomVocoderToken((ev.target as HTMLSelectElement).value);
   };
 
-
   const handleIsFrontPageFeaturedChange = (
     ev: React.FormEvent<HTMLSelectElement>
   ) => {
@@ -213,12 +214,16 @@ function TtsModelEditPage(props: Props) {
     setSuggestedUniqueBotCommand(command);
   };
 
-  const handleUseDefaultMFactorChange = (ev: React.FormEvent<HTMLInputElement>) => {
+  const handleUseDefaultMFactorChange = (
+    ev: React.FormEvent<HTMLInputElement>
+  ) => {
     const value = (ev.target as HTMLInputElement).checked;
     setUseDefaultMFactor(value);
   };
-  
-  const handleMaybeCustomMFactorChange = (ev: React.FormEvent<HTMLInputElement>) => {
+
+  const handleMaybeCustomMFactorChange = (
+    ev: React.FormEvent<HTMLInputElement>
+  ) => {
     ev.preventDefault();
     const textValue = (ev.target as HTMLInputElement).value.trim();
     setMaybeCustomMFactor(textValue);
@@ -255,7 +260,10 @@ function TtsModelEditPage(props: Props) {
       text_pipeline_type: textPipelineType,
     };
 
-    if (!!maybeCustomVocoderToken && maybeCustomVocoderToken !== UNSET_CUSTOM_VOCODER_SENTINEL) {
+    if (
+      !!maybeCustomVocoderToken &&
+      maybeCustomVocoderToken !== UNSET_CUSTOM_VOCODER_SENTINEL
+    ) {
       request.maybe_custom_vocoder_token = maybeCustomVocoderToken;
     }
 
@@ -266,7 +274,8 @@ function TtsModelEditPage(props: Props) {
         request.maybe_suggested_unique_bot_command = suggestedUniqueBotCommand;
       }
       request.use_default_m_factor = useDefaultMFactor;
-      request.maybe_custom_m_factor = maybeCustomMFactor === null ? null : Number(maybeCustomMFactor.trim());
+      request.maybe_custom_m_factor =
+        maybeCustomMFactor === null ? null : Number(maybeCustomMFactor.trim());
     }
 
     fetch(endpointUrl, {
@@ -385,33 +394,29 @@ function TtsModelEditPage(props: Props) {
         </div>
 
         <div>
-          <label className="sub-title">
-            Use m-factoring?
-          </label>
+          <label className="sub-title">Use m-factoring?</label>
           <div>
             <div className="form-group input-icon">
-
               <div className="form-check form-switch">
-                <input 
-                  className="form-check-input" 
-                  type="checkbox" 
+                <input
+                  className="form-check-input"
+                  type="checkbox"
                   onChange={handleUseDefaultMFactorChange}
                   checked={useDefaultMFactor}
-                  />
+                />
                 <label className="form-check-label">
-                  Enable this for voices that sound "tinny" or "metalic".
-                  {" "}
-                  This will use a globally defined suggested value (that may change).
+                  Enable this for voices that sound "tinny" or "metalic". This
+                  will use a globally defined suggested value (that may change).
                 </label>
               </div>
-
             </div>
           </div>
         </div>
 
         <div>
           <label className="sub-title">
-            Use custom m-factor? If set, this will be used instead of the default m-factor.
+            Use custom m-factor? If set, this will be used instead of the
+            default m-factor.
           </label>
           <div className="form-group input-icon">
             <FontAwesomeIcon
@@ -427,20 +432,16 @@ function TtsModelEditPage(props: Props) {
             />
           </div>
         </div>
-
       </>
     );
   }
 
-  let customVocoderOptions = vocoderModels.map((vocoder) =>  {
+  let customVocoderOptions = vocoderModels.map((vocoder) => {
     return (
-      <option
-        key={vocoder.vocoder_token}
-        value={vocoder.vocoder_token}
-        >
+      <option key={vocoder.vocoder_token} value={vocoder.vocoder_token}>
         {vocoder.title} (by {vocoder.creator_display_name})
       </option>
-    )
+    );
   });
 
   let usableTextPipelines = isModerator
@@ -468,7 +469,7 @@ function TtsModelEditPage(props: Props) {
     <motion.div initial="hidden" animate="visible" variants={container}>
       <div className="container py-5 pb-4 px-lg-5 px-xl-3">
         <div className="d-flex flex-column">
-          <motion.h1 className="display-5 fw-bold mb-3" variants={item}>
+          <motion.h1 className=" fw-bold mb-3" variants={item}>
             Edit Model
           </motion.h1>
           <motion.p variants={item}>
@@ -612,7 +613,9 @@ function TtsModelEditPage(props: Props) {
                         Public (visible from your profile)
                       </option>
                       <option value="hidden">Unlisted (shareable URLs)</option>
-                      <option value="private">Private (work in progress)</option>
+                      <option value="private">
+                        Private (work in progress)
+                      </option>
                     </select>
                   </div>
                 </div>

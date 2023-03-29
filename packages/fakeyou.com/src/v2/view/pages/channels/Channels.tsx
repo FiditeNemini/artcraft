@@ -48,7 +48,7 @@ function ChannelsPage(props: Props) {
       animate="visible"
       variants={container}
     >
-      <motion.h1 className="display-5 fw-bold mb-4" variants={item}>
+      <motion.h1 className=" fw-bold mb-4" variants={item}>
         Channels
       </motion.h1>
 

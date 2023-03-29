@@ -106,7 +106,7 @@ function W2lResultDeletePage(props: Props) {
   return (
     <motion.div initial="hidden" animate="visible" variants={container}>
       <div className="container pt-5 pb-4 px-md-4 px-lg-5 px-xl-3">
-        <motion.h1 className="display-5 fw-bold" variants={item}>
+        <motion.h1 className=" fw-bold" variants={item}>
           {h1Title}
         </motion.h1>
         <motion.div className="pt-3" variants={item}>

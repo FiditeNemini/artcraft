@@ -92,7 +92,7 @@ function IndexPage(props: Props) {
             <h6 className="pre-heading text-center fw-bold pt-2">Features</h6>
             <img src="assets/title-shape.png" alt="" />
           </div>
-          <h1 className="display-5 fw-bold mt-3">
+          <h1 className=" fw-bold mt-3">
             <span className="word">TTS Features</span>
           </h1>
           <div className="features-section">
@@ -166,7 +166,7 @@ function IndexPage(props: Props) {
             <h6 className="pre-heading text-center fw-bold pt-2">TTS Voices</h6>
             <img src="assets/title-shape.png" alt="" />
           </div>
-          <h1 className="display-5 fw-bold mt-3">
+          <h1 className=" fw-bold mt-3">
             <span className="word">Voice Previews</span>
           </h1>
           <div className="voices-section">
@@ -206,7 +206,7 @@ function IndexPage(props: Props) {
                 <h6 className="pre-heading fw-bold pt-2">Statistics</h6>
                 <img src="assets/title-shape.png" alt="" />
               </div>
-              <h1 className="display-5 fw-bold mb-4 mt-3">
+              <h1 className=" fw-bold mb-4 mt-3">
                 <span className="word">Our Insights</span>
               </h1>
               <p>
@@ -249,10 +249,10 @@ function IndexPage(props: Props) {
             </h6>
             <img src="assets/title-shape.png" alt="" />
           </div>
-          <h1 className="display-5 fw-bold mt-3 text-center d-none d-lg-block">
+          <h1 className=" fw-bold mt-3 text-center d-none d-lg-block">
             <span className="word">Frequently Asked Questions</span>
           </h1>
-          <h1 className="display-5 fw-bold mt-3 text-center d-lg-none">
+          <h1 className=" fw-bold mt-3 text-center d-lg-none">
             <span className="word">FAQ</span>
           </h1>
 
@@ -362,7 +362,7 @@ function IndexPage(props: Props) {
             </h6>
             <img src="assets/title-shape.png" alt="" />
           </div>
-          <h1 className="display-5 fw-bold mb-4 mt-3">
+          <h1 className=" fw-bold mb-4 mt-3">
             <span className="word">Join Our Community</span>
           </h1>
           <p className="lead text-center mb-5">
@@ -388,7 +388,7 @@ function IndexPage(props: Props) {
               <img className="cta-img w-100" src="assets/cta-img.png" alt="" />
             </div>
             <div className="col-md-6 cta-right text-center text-sm-start px-5">
-              <h1 className="display-5 fw-bold mb-5">
+              <h1 className=" fw-bold mb-5">
                 Get started with Storyteller Stream!
               </h1>
               <div className="d-flex gap-3">

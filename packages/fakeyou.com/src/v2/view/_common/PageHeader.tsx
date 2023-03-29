@@ -10,16 +10,14 @@ interface Props {
 
 function PageHeader(props: Props) {
   return (
-    <div className="container-panel hero-section pt-4 pt-lg-5 pb-5">
+    <div className="container-panel hero-section py-4">
       <div className="panel">
         <div className="p-3 py-4 p-md-4">
           <h1 className="fw-bold text-center text-md-start">
             {props.titleIcon}
             {props.title}
           </h1>
-          <p className="text-center text-md-start opacity-75 pt-1">
-            {props.subText}
-          </p>
+          <p className="text-center text-md-start pt-1">{props.subText}</p>
           {props.showButtons && (
             <div className="d-flex flex-column flex-md-row gap-3 justify-content-center justify-content-md-start mt-4">
               {props.actionButtons}

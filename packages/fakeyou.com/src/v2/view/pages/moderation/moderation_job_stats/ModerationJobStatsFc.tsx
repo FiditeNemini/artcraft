@@ -104,12 +104,9 @@ function ModerationJobStatsFc(props: Props) {
   return (
     <div>
       <div className="container py-5">
-        <h1 className="display-5 fw-bold">Job Stats</h1>
+        <h1 className=" fw-bold">Job Stats</h1>
         <div className="pt-3">
-          <BackLink
-            link={WebUrl.moderationMain()}
-            text="Back to moderation"
-          />
+          <BackLink link={WebUrl.moderationMain()} text="Back to moderation" />
         </div>
       </div>
 
@@ -246,10 +243,7 @@ function ModerationJobStatsFc(props: Props) {
       </div>
 
       <div className="container pb-5">
-        <BackLink
-          link={WebUrl.moderationMain()}
-          text="Back to moderation"
-        />
+        <BackLink link={WebUrl.moderationMain()} text="Back to moderation" />
       </div>
     </div>
   );

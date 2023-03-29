@@ -705,7 +705,7 @@ function TtsModelViewPage(props: Props) {
     <motion.div initial="hidden" animate="visible" variants={container}>
       <div className="container py-5">
         <div className="d-flex flex-column">
-          <motion.h1 className="display-5 fw-bold mb-3" variants={item}>
+          <motion.h1 className="fw-bold mb-3" variants={item}>
             {title}
           </motion.h1>
           {/* Rate Voice Model Buttons */}

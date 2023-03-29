@@ -24,7 +24,7 @@ function ModerationFc(props: Props) {
   return (
     <div>
       <div className="container py-5">
-        <h1 className="display-5 fw-bold text-center text-lg-start">
+        <h1 className=" fw-bold text-center text-lg-start">
           Moderation Controls
         </h1>
       </div>
