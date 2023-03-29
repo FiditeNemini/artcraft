@@ -254,7 +254,7 @@ function IndexPage() {
             </div>
 
             <div className="col-lg-6 d-flex flex-column justify-content-center">
-              <h1 className="fw-bold display-5">FakeYou</h1>
+              <h1 className="fw-bold ">FakeYou</h1>
               <h4 className="fw-normal opacity-75 mb-4">
                 Used by millions of people every month
               </h4>
@@ -308,7 +308,7 @@ function IndexPage() {
             </div>
 
             <div className="col-lg-6 d-flex flex-column justify-content-center">
-              <h1 className="fw-bold display-5">PowerStream</h1>
+              <h1 className="fw-bold ">PowerStream</h1>
               <h4 className="fw-normal opacity-75 mb-4">
                 Twitch Streamers and Creators can engage and monetize
               </h4>
@@ -708,7 +708,7 @@ function IndexPage() {
         </div>
 
         <div className="container py-5 text-center d-flex flex-column align-items-center mt-3">
-          <h1 className="fw-bold display-5 about-title mt-5">
+          <h1 className="fw-bold  about-title mt-5">
             We’re building the future production cloud studio
           </h1>
           <p className="fw-normal opacity-75 mt-4">

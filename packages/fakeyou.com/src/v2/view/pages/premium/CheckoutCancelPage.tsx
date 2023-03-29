@@ -29,28 +29,25 @@ function CheckoutCancelPage(props: Props) {
           <div className="col-lg-6 px-md-2 ps-lg-5 ps-xl-2">
             <div className="text-center text-lg-start">
               <div>
-                <motion.h1
-                  className="display-5 fw-bold lh-1 mb-4"
-                  variants={item}
-                >
+                <motion.h1 className=" fw-bold lh-1 mb-4" variants={item}>
                   Oh no!
                 </motion.h1>
               </div>
               <div>
                 <motion.p className="lead" variants={item}>
-                  It's okay if you don't want to support FakeYou right now, but we'd 
-                  appreciate it if you reconsider us in the future.
+                  It's okay if you don't want to support FakeYou right now, but
+                  we'd appreciate it if you reconsider us in the future.
                 </motion.p>
                 <br />
                 <motion.p className="lead" variants={item}>
-                  Paid plans go directly to helping us afford more GPUs, engineering, 
-                  and research talent.
+                  Paid plans go directly to helping us afford more GPUs,
+                  engineering, and research talent.
                 </motion.p>
                 <br />
                 <motion.p className="lead" variants={item}>
-                  We're trying to build a film and music production system that you 
-                  can use to make any content you dream up. Please consider supporting 
-                  us monetarily.
+                  We're trying to build a film and music production system that
+                  you can use to make any content you dream up. Please consider
+                  supporting us monetarily.
                 </motion.p>
               </div>
             </div>
@@ -65,14 +62,12 @@ function CheckoutCancelPage(props: Props) {
           <div className="col-lg-6">
             <div className="d-flex justify-content-center">
               <Link to="/pricing" className="btn btn-primary  fs-6">
-
                 Select a Premium Plan
               </Link>
             </div>
           </div>
         </div>
       </div>
-
     </motion.div>
   );
 }

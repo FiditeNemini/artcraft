@@ -29,10 +29,7 @@ function PortalSuccessPage(props: Props) {
           <div className="col-lg-6 px-md-2 ps-lg-5 ps-xl-2">
             <div className="text-center text-lg-start">
               <div>
-                <motion.h1
-                  className="display-5 fw-bold lh-1 mb-4"
-                  variants={item}
-                >
+                <motion.h1 className=" fw-bold lh-1 mb-4" variants={item}>
                   Thank You!
                 </motion.h1>
               </div>
@@ -55,7 +52,6 @@ function PortalSuccessPage(props: Props) {
           </div>
         </div>
       </div>
-
     </motion.div>
   );
 }

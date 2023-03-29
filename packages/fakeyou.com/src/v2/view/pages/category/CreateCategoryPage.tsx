@@ -208,7 +208,7 @@ function CreateCategoryPage(props: Props) {
   return (
     <motion.div initial="hidden" animate="visible" variants={container}>
       <div className="container pb-4 pt-5 px-md-4 px-lg-5 px-xl-3">
-        <motion.h1 className="display-5 fw-bold" variants={item}>
+        <motion.h1 className=" fw-bold" variants={item}>
           {categoryActionName} Category
         </motion.h1>
         <motion.div className="pt-3" variants={item}>

@@ -432,7 +432,7 @@ function TtsResultViewPage(props: Props) {
     <motion.div initial="hidden" animate="visible" variants={container}>
       <div className="container py-5">
         <div className="d-flex flex-column">
-          <motion.h1 className="display-5 fw-bold mb-2" variants={item}>
+          <motion.h1 className=" fw-bold mb-2" variants={item}>
             {headingTitle}
           </motion.h1>
           {/* Rate Result Buttons */}

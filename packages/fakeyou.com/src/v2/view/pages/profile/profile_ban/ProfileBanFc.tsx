@@ -111,7 +111,7 @@ function ProfileBanFc(props: Props) {
   return (
     <motion.div initial="hidden" animate="visible" variants={container}>
       <div className="container pt-5 pb-4 px-lg-5 px-xl-3">
-        <motion.h1 className="display-5 fw-bold mb-3" variants={item}>
+        <motion.h1 className=" fw-bold mb-3" variants={item}>
           Profile &amp; Preferences
         </motion.h1>
         <motion.div variants={item}>

@@ -94,7 +94,7 @@ function UploadW2lPhotoPage(props: Props) {
     <motion.div initial="hidden" animate="visible" variants={container}>
       <div className="container pt-5 pb-3 px-md-4 px-lg-5 px-xl-3">
         <div className="d-flex flex-column">
-          <motion.h1 className="display-5 fw-bold" variants={item}>
+          <motion.h1 className=" fw-bold" variants={item}>
             Upload Photo (w2l template)
           </motion.h1>
           <motion.div className="my-3" variants={item}>

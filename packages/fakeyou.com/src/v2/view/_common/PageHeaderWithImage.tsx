@@ -13,7 +13,7 @@ interface Props {
 
 function PageHeaderWithImage(props: Props) {
   return (
-    <div className="container-panel hero-section py-4 py-lg-5">
+    <div className="container-panel hero-section py-4">
       <div className="panel">
         <div className="row gx-3 flex-md-row-reverse">
           <div className="col-12 col-md-5 hero-img-container d-none d-md-block">
@@ -30,10 +30,12 @@ function PageHeaderWithImage(props: Props) {
                 {props.titleIcon}
                 {props.title}
               </h1>
-              <hr />
-              <p className="text-center text-md-start">{props.subText}</p>
+
+              <p className="text-center text-md-start opacity-75 pt-1">
+                {props.subText}
+              </p>
               {props.showButtons && (
-                <div className="d-flex flex-column flex-md-row gap-3 justify-content-center justify-content-md-start mt-4">
+                <div className="d-flex gap-3 justify-content-center justify-content-md-start mt-4 pt-2">
                   {props.actionButtons}
                 </div>
               )}

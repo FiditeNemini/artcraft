@@ -7,7 +7,6 @@ import { usePrefixedDocumentTitle } from "../../../../../common/UsePrefixedDocum
 interface Props {}
 
 function AboutPage(props: Props) {
-
   usePrefixedDocumentTitle("About Us");
 
   return (
@@ -29,10 +28,7 @@ function AboutPage(props: Props) {
           <div className="col-lg-6 px-md-2 ps-lg-5 ps-xl-2">
             <div className="text-center text-lg-start">
               <div>
-                <motion.h1
-                  className="display-5 fw-bold lh-1 mb-4"
-                  variants={item}
-                >
+                <motion.h1 className=" fw-bold lh-1 mb-4" variants={item}>
                   A Glimpse of the Future
                 </motion.h1>
               </div>
