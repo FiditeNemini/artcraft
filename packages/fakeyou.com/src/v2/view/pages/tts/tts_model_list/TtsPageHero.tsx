@@ -59,7 +59,7 @@ export function TtsPageHero(props: Props) {
             Analytics.ttsClickHeroSignup();
           }}
         >
-          <button type="button" className="btn btn-primary w-100">
+          <button type="button" className="btn btn-primary">
             {t("tts.TtsModelListPage.heroSection.buttons.signUp")}
             <FontAwesomeIcon icon={faArrowRight} className="ms-2" />
           </button>

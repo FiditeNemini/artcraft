@@ -30,10 +30,12 @@ function PageHeaderWithImage(props: Props) {
                 {props.titleIcon}
                 {props.title}
               </h1>
-              <hr />
-              <p className="text-center text-md-start">{props.subText}</p>
+
+              <p className="text-center text-md-start opacity-75 pb-2 pt-1">
+                {props.subText}
+              </p>
               {props.showButtons && (
-                <div className="d-flex flex-column flex-md-row gap-3 justify-content-center justify-content-md-start mt-4">
+                <div className="d-flex gap-3 justify-content-center justify-content-md-start mt-4">
                   {props.actionButtons}
                 </div>
               )}
