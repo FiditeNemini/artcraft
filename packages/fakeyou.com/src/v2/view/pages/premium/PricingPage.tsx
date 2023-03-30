@@ -228,7 +228,7 @@ function PricingPage(props: Props) {
               >
                 {plusButtonText}
               </button>
-              <h2 className=" fw-bold text-center my-5">
+              <h2 className="display-5 fw-bold text-center my-5">
                 ${FYP.plus.price}
                 <span className="fs-5 opacity-75 fw-normal"> /month</span>
               </h2>
@@ -327,7 +327,7 @@ function PricingPage(props: Props) {
               >
                 {proButtonText}
               </button>
-              <h2 className=" fw-bold text-center my-5">
+              <h2 className="display-5 fw-bold text-center my-5">
                 ${FYP.pro.price}
                 <span className="fs-5 opacity-75 fw-normal"> /month</span>
               </h2>
@@ -454,7 +454,7 @@ function PricingPage(props: Props) {
               >
                 {eliteButtonText}
               </button>
-              <h2 className=" fw-bold text-center my-5">
+              <h2 className="display-5 fw-bold text-center my-5">
                 ${FYP.elite.price}
                 <span className="fs-5 opacity-75 fw-normal"> /month</span>
               </h2>
