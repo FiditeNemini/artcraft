@@ -748,7 +748,7 @@ function IndexPage() {
             </div>
           </div>
 
-          <div className="row g-4 g-md-5 pb-4 pt-3 pt-md-5">
+          <div className="row g-4 gx-md-5 gy-md-4 pb-4 pt-3 pt-md-5">
             <div className="col-6 col-md-3">
               <img
                 src="/images/team/placeholder-pfp.jpg"
@@ -760,8 +760,8 @@ function IndexPage() {
             </div>
             <div className="col-6 col-md-3">
               <img
-                src="/images/team/placeholder-pfp.jpg"
-                className="img-fluid img-team mb-3 opacity-50"
+                src="/images/team/michael.webp"
+                className="img-fluid img-team mb-3"
                 alt=""
               />
               <p className="fw-semibold opacity-100 mb-0 fs-5">Michael</p>
@@ -769,8 +769,8 @@ function IndexPage() {
             </div>
             <div className="col-6 col-md-3">
               <img
-                src="/images/team/placeholder-pfp.jpg"
-                className="img-fluid img-team mb-3 opacity-50"
+                src="/images/team/ramiro.webp"
+                className="img-fluid img-team mb-3"
                 alt=""
               />
               <p className="fw-semibold opacity-100 mb-0 fs-5">Ramiro</p>
@@ -778,23 +778,14 @@ function IndexPage() {
             </div>
             <div className="col-6 col-md-3">
               <img
-                src="/images/team/ramiro.jpg"
-                className="img-fluid img-team mb-3"
+                src="/images/team/placeholder-pfp.jpg"
+                className="img-fluid img-team mb-3 opacity-50"
                 alt=""
               />
               <p className="fw-semibold opacity-100 mb-0 fs-5">Scott</p>
               <p className="team-role-text">
                 Chief Creative Officer / Technical 3D Artist
               </p>
-            </div>
-            <div className="col-6 col-md-3">
-              <img
-                src="/images/team/placeholder-pfp.jpg"
-                className="img-fluid img-team mb-3 opacity-50"
-                alt=""
-              />
-              <p className="fw-semibold opacity-100 mb-0 fs-5">???</p>
-              <p className="team-role-text">Technical 3D Artist</p>
             </div>
             <div className="col-6 col-md-3">
               <img
@@ -818,8 +809,8 @@ function IndexPage() {
             </div>
             <div className="col-6 col-md-3">
               <img
-                src="/images/team/placeholder-pfp.jpg"
-                className="img-fluid img-team mb-3 opacity-50"
+                src="/images/team/jose.webp"
+                className="img-fluid img-team mb-3"
                 alt=""
               />
               <p className="fw-semibold opacity-100 mb-0 fs-5">Jose</p>
@@ -827,39 +818,12 @@ function IndexPage() {
             </div>
             <div className="col-6 col-md-3">
               <img
-                src="/images/team/placeholder-pfp.jpg"
-                className="img-fluid img-team mb-3 opacity-50"
+                src="/images/team/rod.webp"
+                className="img-fluid img-team mb-3"
                 alt=""
               />
               <p className="fw-semibold opacity-100 mb-0 fs-5">Rodrigo</p>
               <p className="team-role-text">Data Team</p>
-            </div>
-            <div className="col-6 col-md-3">
-              <img
-                src="/images/team/placeholder-pfp.jpg"
-                className="img-fluid img-team mb-3 opacity-50"
-                alt=""
-              />
-              <p className="fw-semibold opacity-100 mb-0 fs-5">???</p>
-              <p className="team-role-text">???</p>
-            </div>
-            <div className="col-6 col-md-3">
-              <img
-                src="/images/team/placeholder-pfp.jpg"
-                className="img-fluid img-team mb-3 opacity-50"
-                alt=""
-              />
-              <p className="fw-semibold opacity-100 mb-0 fs-5">???</p>
-              <p className="team-role-text">???</p>
-            </div>
-            <div className="col-6 col-md-3">
-              <img
-                src="/images/team/placeholder-pfp.jpg"
-                className="img-fluid img-team mb-3 opacity-50"
-                alt=""
-              />
-              <p className="fw-semibold opacity-100 mb-0 fs-5">???</p>
-              <p className="team-role-text">???</p>
             </div>
           </div>
 
