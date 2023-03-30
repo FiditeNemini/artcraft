@@ -109,7 +109,7 @@ function FooterNav(props: Props) {
                   href={ThirdPartyLinks.FAKEYOU_TIKTOK}
                   target="_blank"
                   rel="noopener noreferrer"
-                  title="Support us by becoming a patreon"
+                  title="Follow us on Tiktok"
                 >
                   <FontAwesomeIcon icon={faTiktok} className="me-2" />
                 </a>
@@ -143,10 +143,6 @@ function FooterNav(props: Props) {
 
               <li>
                 <Link to="/leaderboard">Leaderboard</Link>
-              </li>
-
-              <li>
-                <Link to={WebUrl.patronsPage()}>Patrons</Link>
               </li>
 
               <li>

@@ -51,7 +51,6 @@ import { ModerationTtsCategoryListPage } from "./pages/moderation/categories/Mod
 import { ModerationTtsCategoryEditPage } from "./pages/moderation/categories/ModerationTtsCategoryEditPage";
 import { ModerationCategoryDeletePage } from "./pages/moderation/categories/ModerationCategoryDeletePage";
 import { TtsCategoryType } from "../../AppWrapper";
-import { PatronPage } from "./pages/patrons/PatronPage";
 import ScrollToTop from "./_common/ScrollToTop";
 import { Language } from "@storyteller/components/src/i18n/Language";
 import { VoiceCloneRequestPage } from "./pages/clone_voice_requests/VoiceCloneRequestPage";
@@ -444,10 +443,6 @@ class PageContainer extends React.Component<Props, State> {
 
             <Route exact={true} path="/clone">
               <VoiceCloneRequestPage />
-            </Route>
-
-            <Route path="/patrons">
-              <PatronPage sessionWrapper={this.props.sessionWrapper} />
             </Route>
 
             <Route path="/landing_temp">
