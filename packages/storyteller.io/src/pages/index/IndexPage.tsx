@@ -418,13 +418,21 @@ function IndexPage() {
           <div className="row gx-4 gy-4 gx-lg-5 gy-lg-5 mb-5">
             <div className="col-12 col-md-6 d-flex flex-column justify-content-center">
               <video
-                src="/video/webpage-demo-1-640.mp4"
                 autoPlay={true}
                 playsInline={true}
                 loop={true}
                 muted={true}
                 className="ratio ratio-16x9 img-border"
-              ></video>
+              >
+                <source
+                  src="/video/webpage-demo-1-640.webm"
+                  type="video/webm"
+                ></source>
+                <source
+                  src="/video/webpage-demo-1-640.mp4"
+                  type="video/mp4"
+                ></source>
+              </video>
             </div>
             <div className="col-12 col-md-6 d-flex flex-column justify-content-center">
               <div className="p-lg-4 align-items-start justify-content-center fs-6 h-auto">
@@ -441,13 +449,21 @@ function IndexPage() {
           <div className="row gx-4 gy-4 gx-lg-5 gy-lg-5 flex-row-reverse mb-5">
             <div className="col-12 col-md-6 d-flex flex-column justify-content-center">
               <video
-                src="/video/webpage-demo-2-640.mp4"
                 autoPlay={true}
                 playsInline={true}
                 loop={true}
                 muted={true}
                 className="ratio ratio-16x9 img-border"
-              ></video>
+              >
+                <source
+                  src="/video/webpage-demo-2-640.webm"
+                  type="video/webm"
+                ></source>
+                <source
+                  src="/video/webpage-demo-2-640.mp4"
+                  type="video/mp4"
+                ></source>
+              </video>
             </div>
             <div className="col-12 col-md-6 d-flex flex-column justify-content-center">
               <div className="p-lg-4 align-items-start justify-content-center fs-6 h-auto">
@@ -464,13 +480,21 @@ function IndexPage() {
           <div className="row gx-4 gy-4 gx-lg-5 gy-lg-5">
             <div className="col-12 col-md-6 d-flex flex-column justify-content-center">
               <video
-                src="/video/webpage-demo-3-640.mp4"
                 autoPlay={true}
                 playsInline={true}
                 loop={true}
                 muted={true}
                 className="ratio ratio-16x9 img-border"
-              ></video>
+              >
+                <source
+                  src="/video/webpage-demo-3-640.webm"
+                  type="video/webm"
+                ></source>
+                <source
+                  src="/video/webpage-demo-3-640.mp4"
+                  type="video/mp4"
+                ></source>
+              </video>
             </div>
             <div className="col-12 col-md-6 d-flex flex-column justify-content-center">
               <div className="p-lg-4 align-items-start justify-content-center fs-6 h-auto">
@@ -751,8 +775,8 @@ function IndexPage() {
           <div className="row g-4 gx-md-5 gy-md-4 pb-4 pt-3 pt-md-5">
             <div className="col-6 col-md-3">
               <img
-                src="/images/team/placeholder-pfp.jpg"
-                className="img-fluid img-team mb-3 opacity-50"
+                src="/images/team/ozzy.webp"
+                className="img-fluid img-team mb-3"
                 alt=""
               />
               <p className="fw-semibold opacity-100 mb-0 fs-5">Ozzy</p>
