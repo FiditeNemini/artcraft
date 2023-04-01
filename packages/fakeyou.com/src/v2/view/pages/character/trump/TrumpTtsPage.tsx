@@ -2,7 +2,7 @@ import React, { useEffect, useCallback, useState } from "react";
 import { t } from "i18next";
 import { Trans } from "react-i18next";
 import { Link } from "react-router-dom";
-import { SessionTtsInferenceResultList } from "../../_common/SessionTtsInferenceResultsList";
+import { SessionTtsInferenceResultList } from "../../../_common/SessionTtsInferenceResultsList";
 import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
 import { TtsInferenceJob } from "@storyteller/components/src/jobs/TtsInferenceJobs";
 import { TtsModelUploadJob } from "@storyteller/components/src/jobs/TtsModelUploadJobs";
@@ -24,7 +24,7 @@ import {
   ListTtsCategoriesIsError,
   ListTtsCategoriesIsOk,
 } from "@storyteller/components/src/api/category/ListTtsCategories";
-import { TtsCategoryType } from "../../../../AppWrapper";
+import { TtsCategoryType } from "../../../../../AppWrapper";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faBarsStaggered,
@@ -32,19 +32,19 @@ import {
   faVolumeHigh,
 } from "@fortawesome/free-solid-svg-icons";
 import { motion } from "framer-motion";
-import { container, panel } from "../../../../data/animation";
+import { container, panel } from "../../../../../data/animation";
 import { SessionSubscriptionsWrapper } from "@storyteller/components/src/session/SessionSubscriptionsWrapper";
 import { TtsPageHero } from "./TrumpTtsPageHero";
-import { Analytics } from "../../../../common/Analytics";
+import { Analytics } from "../../../../../common/Analytics";
 import {
   GetComputedTtsCategoryAssignments,
   GetComputedTtsCategoryAssignmentsIsError,
   GetComputedTtsCategoryAssignmentsIsOk,
   GetComputedTtsCategoryAssignmentsSuccessResponse,
 } from "@storyteller/components/src/api/category/GetComputedTtsCategoryAssignments";
-import { DynamicallyCategorizeModels } from "../../../../model/categories/SyntheticCategory";
+import { DynamicallyCategorizeModels } from "../../../../../model/categories/SyntheticCategory";
 
-import { usePrefixedDocumentTitle } from "../../../../common/UsePrefixedDocumentTitle";
+import { usePrefixedDocumentTitle } from "../../../../../common/UsePrefixedDocumentTitle";
 import { SearchOmnibar } from "./search/SearchOmnibar";
 export interface EnqueueJobResponsePayload {
   success: boolean;
@@ -343,6 +343,27 @@ function TrumpTtsPage(props: Props) {
     );
   }
 
+  const TOKENS = new Set<string>([
+    "TM:pmd1wm3kf6az", // Development: "Fake Donald Trump #1"
+    "TM:7rrwdhdq8ezq", // Development: "Fake Donald Trump #2"
+    //"TM:aejrk66wq3ss", // Production: "Donald Trump (bibby's model)"
+    "TM:pyzss4phqk6r", // Production: "Donald Trump (Sarcastic)"
+    "TM:4v0ft4j72y2g", // Production: "Donald Trump (Angry)"
+    "TM:03690khwpsbz", // Production: "Donald Trump (Casual Speech)"
+  ]);
+
+  let trumpModels = props.ttsModels.filter((model) => {
+    return TOKENS.has(model.model_token);
+  })
+
+  let maybeSelectedModel = props.maybeSelectedTtsModel;
+
+  if (maybeSelectedModel !== undefined && !TOKENS.has(maybeSelectedModel.model_token)) {
+    // If we don't select a trump model by default (which is rare), the list will be empty. 
+    // We'll set it here.
+    maybeSelectedModel = trumpModels[0];
+  }
+
   return (
     <motion.div initial="hidden" animate="visible" variants={container}>
       <TtsPageHero
@@ -362,7 +383,7 @@ function TrumpTtsPage(props: Props) {
               {/* Explore Rollout */}
               <SearchOmnibar
                 allTtsCategories={props.allTtsCategories}
-                allTtsModels={props.ttsModels}
+                allTtsModels={trumpModels}
                 allTtsCategoriesByTokenMap={props.allTtsCategoriesByTokenMap}
                 allTtsModelsByTokenMap={props.allTtsModelsByTokenMap}
                 ttsModelsByCategoryToken={props.ttsModelsByCategoryToken}
@@ -370,7 +391,7 @@ function TrumpTtsPage(props: Props) {
                 setDropdownCategories={props.setDropdownCategories}
                 selectedCategories={props.selectedCategories}
                 setSelectedCategories={props.setSelectedCategories}
-                maybeSelectedTtsModel={props.maybeSelectedTtsModel}
+                maybeSelectedTtsModel={maybeSelectedModel}
                 setMaybeSelectedTtsModel={props.setMaybeSelectedTtsModel}
                 selectedTtsLanguageScope={props.selectedTtsLanguageScope}
                 setSelectedTtsLanguageScope={props.setSelectedTtsLanguageScope}

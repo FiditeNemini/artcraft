@@ -1,9 +1,9 @@
 import React from "react";
 import { TtsModelListItem } from "@storyteller/components/src/api/tts/ListTtsModels";
-import { TtsCategoryType } from "../../../../../../AppWrapper";
+import { TtsCategoryType } from "../../../../../../../AppWrapper";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faShuffle } from "@fortawesome/pro-solid-svg-icons";
-import { Analytics } from "../../../../../../common/Analytics";
+import { Analytics } from "../../../../../../../common/Analytics";
 import { GetRandomArrayValue } from "@storyteller/components/src/utils/GetRandomArrayValue";
 import Tippy from "@tippyjs/react";
 import "tippy.js/dist/tippy.css";

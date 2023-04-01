@@ -1,5 +1,5 @@
 import React from "react";
-import { TtsCategoryType } from "../../../../../AppWrapper";
+import { TtsCategoryType } from "../../../../../../AppWrapper";
 import { TtsModelListItem } from "@storyteller/components/src/api/tts/ListTtsModels";
 import { ScopedVoiceModelOptions } from "./components/ScopedVoiceModelOptions";
 import { VoiceCountLabel } from "./components/VoiceCountLabel";

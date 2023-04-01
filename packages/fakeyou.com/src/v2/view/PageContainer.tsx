@@ -66,7 +66,7 @@ import { GetComputedTtsCategoryAssignmentsSuccessResponse } from "@storyteller/c
 import { NewsPage } from "./pages/news/NewsPage";
 import { LandingPage } from "./pages/landing/LandingPage";
 import { ChannelsPage } from "./pages/channels/Channels";
-import { TrumpTtsPage } from "./pages/trump/TrumpTtsPage";
+import { TrumpTtsPage } from "./pages/character/trump/TrumpTtsPage";
 //import { LandingPage } from "./pages/landing/LandingPage";
 //import { VcModelListPage } from "./pages/vc/vc_model_list/VcModelListPage";
 
@@ -480,7 +480,7 @@ class PageContainer extends React.Component<Props, State> {
               <VocodesPage />
             </Route>
 
-            <Route path="/donald-trump">
+            <Route path="/character/donald-trump">
               <TrumpTtsPage
                 sessionWrapper={this.props.sessionWrapper}
                 sessionSubscriptionsWrapper={

@@ -2,11 +2,11 @@ import React from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowRightLong, faTags } from "@fortawesome/free-solid-svg-icons";
 import { TtsModelListItem } from "@storyteller/components/src/api/tts/ListTtsModels";
-import { TtsCategoryType } from "../../../../../../AppWrapper";
+import { TtsCategoryType } from "../../../../../../../AppWrapper";
 //import { useTranslation } from "react-i18next";
 import Select from "react-select";
 import { SearchFieldClass } from "../components/SearchFieldClass";
-import { Analytics } from "../../../../../../common/Analytics";
+import { Analytics } from "../../../../../../../common/Analytics";
 import { t } from "i18next";
 
 interface Props {

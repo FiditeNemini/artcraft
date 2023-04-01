@@ -9,9 +9,9 @@ import {
   faArrowRight,
   faVolume,
 } from "@fortawesome/pro-solid-svg-icons";
-import { Analytics } from "../../../../common/Analytics";
-import { WebUrl } from "../../../../common/WebUrl";
-import { PageHeaderWithImage } from "../../_common/PageHeaderWithImage";
+import { Analytics } from "../../../../../common/Analytics";
+import { WebUrl } from "../../../../../common/WebUrl";
+import { PageHeaderWithImage } from "../../../_common/PageHeaderWithImage";
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -20,7 +20,7 @@ interface Props {
 
 export function TtsPageHero(props: Props) {
   const randomImage = useMemo(() => {
-    const images = ["mascot/trump.webp"];
+    const images = ["/mascot/trump.webp"];
 
     return images[Math.floor(Math.random() * images.length)];
   }, []);
@@ -57,7 +57,7 @@ export function TtsPageHero(props: Props) {
   const titleIcon = <FontAwesomeIcon icon={faVolume} className="me-3" />;
   const title = <>Donald Trump TTS</>;
   const subText = (
-    <>Type your text below and hear it in the voice of Donald Trump.</>
+    <>FakeYou has the very best Donald Trump AI voice on the internet. Use deep fake Donald Trump to say your favorite memes.</>
   );
   const actionButtons = (
     <>
