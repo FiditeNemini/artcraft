@@ -1,5 +1,4 @@
 import React from "react";
-import { Trans } from "react-i18next";
 import { TtsModelListItem } from "@storyteller/components/src/api/tts/ListTtsModels";
 import { TtsCategoryType } from "../../../../../../AppWrapper";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";

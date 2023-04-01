@@ -7,7 +7,6 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faStar,
   faArrowRight,
-  faWaveformLines,
   faVolume,
 } from "@fortawesome/pro-solid-svg-icons";
 import { Analytics } from "../../../../common/Analytics";
