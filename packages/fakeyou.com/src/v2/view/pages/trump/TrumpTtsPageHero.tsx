@@ -8,6 +8,7 @@ import {
   faStar,
   faArrowRight,
   faWaveformLines,
+  faVolume,
 } from "@fortawesome/pro-solid-svg-icons";
 import { Analytics } from "../../../../common/Analytics";
 import { WebUrl } from "../../../../common/WebUrl";
@@ -20,7 +21,7 @@ interface Props {
 
 export function TtsPageHero(props: Props) {
   const randomImage = useMemo(() => {
-    const images = ["mascot/trump.png"];
+    const images = ["mascot/trump.webp"];
 
     return images[Math.floor(Math.random() * images.length)];
   }, []);
@@ -54,7 +55,7 @@ export function TtsPageHero(props: Props) {
     </>
   );
 
-  const titleIcon = <FontAwesomeIcon icon={faWaveformLines} className="me-3" />;
+  const titleIcon = <FontAwesomeIcon icon={faVolume} className="me-3" />;
   const title = <>Donald Trump TTS</>;
   const subText = (
     <>Type your text below and hear it in the voice of Donald Trump.</>

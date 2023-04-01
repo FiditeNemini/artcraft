@@ -45,6 +45,7 @@ import {
 import { DynamicallyCategorizeModels } from "../../../../model/categories/SyntheticCategory";
 
 import { usePrefixedDocumentTitle } from "../../../../common/UsePrefixedDocumentTitle";
+import { SearchOmnibar } from "./search/SearchOmnibar";
 export interface EnqueueJobResponsePayload {
   success: boolean;
   inference_job_token?: string;
@@ -359,7 +360,21 @@ function TrumpTtsPage(props: Props) {
               onSubmit={handleFormSubmit}
             >
               {/* Explore Rollout */}
-
+              <SearchOmnibar
+                allTtsCategories={props.allTtsCategories}
+                allTtsModels={props.ttsModels}
+                allTtsCategoriesByTokenMap={props.allTtsCategoriesByTokenMap}
+                allTtsModelsByTokenMap={props.allTtsModelsByTokenMap}
+                ttsModelsByCategoryToken={props.ttsModelsByCategoryToken}
+                dropdownCategories={props.dropdownCategories}
+                setDropdownCategories={props.setDropdownCategories}
+                selectedCategories={props.selectedCategories}
+                setSelectedCategories={props.setSelectedCategories}
+                maybeSelectedTtsModel={props.maybeSelectedTtsModel}
+                setMaybeSelectedTtsModel={props.setMaybeSelectedTtsModel}
+                selectedTtsLanguageScope={props.selectedTtsLanguageScope}
+                setSelectedTtsLanguageScope={props.setSelectedTtsLanguageScope}
+              />
               {/*
                 
                 
