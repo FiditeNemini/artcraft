@@ -749,8 +749,8 @@ function IndexPage() {
           <div className="row g-4 g-md-5 mb-4">
             <div className="col-6 col-md-3 mb-0">
               <img
-                src="/images/team/placeholder-pfp.jpg"
-                className="img-fluid img-team opacity-50"
+                src="/images/team/brandon.webp"
+                className="img-fluid img-team"
                 alt=""
               />
             </div>
@@ -802,8 +802,8 @@ function IndexPage() {
             </div>
             <div className="col-6 col-md-3">
               <img
-                src="/images/team/placeholder-pfp.jpg"
-                className="img-fluid img-team mb-3 opacity-50"
+                src="/images/team/scott.webp"
+                className="img-fluid img-team mb-3"
                 alt=""
               />
               <p className="fw-semibold opacity-100 mb-0 fs-5">Scott</p>
@@ -833,7 +833,7 @@ function IndexPage() {
             </div>
             <div className="col-6 col-md-3">
               <img
-                src="/images/team/jose.webp"
+                src="/images/team/placeholder-pfp.jpg"
                 className="img-fluid img-team mb-3"
                 alt=""
               />
@@ -842,7 +842,7 @@ function IndexPage() {
             </div>
             <div className="col-6 col-md-3">
               <img
-                src="/images/team/rod.webp"
+                src="/images/team/placeholder-pfp.jpg"
                 className="img-fluid img-team mb-3"
                 alt=""
               />
