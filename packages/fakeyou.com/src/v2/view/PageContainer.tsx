@@ -66,6 +66,7 @@ import { GetComputedTtsCategoryAssignmentsSuccessResponse } from "@storyteller/c
 import { NewsPage } from "./pages/news/NewsPage";
 import { LandingPage } from "./pages/landing/LandingPage";
 import { ChannelsPage } from "./pages/channels/Channels";
+import { TrumpTtsPage } from "./pages/trump/TrumpTtsPage";
 //import { LandingPage } from "./pages/landing/LandingPage";
 //import { VcModelListPage } from "./pages/vc/vc_model_list/VcModelListPage";
 
@@ -477,6 +478,48 @@ class PageContainer extends React.Component<Props, State> {
 
             <Route path="/old">
               <VocodesPage />
+            </Route>
+
+            <Route path="/donald-trump">
+              <TrumpTtsPage
+                sessionWrapper={this.props.sessionWrapper}
+                sessionSubscriptionsWrapper={
+                  this.props.sessionSubscriptionsWrapper
+                }
+                enqueueTtsJob={this.props.enqueueTtsJob}
+                ttsInferenceJobs={this.props.ttsInferenceJobs}
+                ttsModelUploadJobs={this.props.ttsModelUploadJobs}
+                w2lInferenceJobs={this.props.w2lInferenceJobs}
+                w2lTemplateUploadJobs={this.props.w2lTemplateUploadJobs}
+                textBuffer={this.props.textBuffer}
+                setTextBuffer={this.props.setTextBuffer}
+                clearTextBuffer={this.props.clearTextBuffer}
+                ttsModels={this.props.ttsModels}
+                setTtsModels={this.props.setTtsModels}
+                allTtsCategories={this.props.allTtsCategories}
+                setAllTtsCategories={this.props.setAllTtsCategories}
+                allTtsCategoriesByTokenMap={
+                  this.props.allTtsCategoriesByTokenMap
+                }
+                computedTtsCategoryAssignments={
+                  this.props.computedTtsCategoryAssignments
+                }
+                setComputedTtsCategoryAssignments={
+                  this.props.setComputedTtsCategoryAssignments
+                }
+                allTtsModelsByTokenMap={this.props.allTtsModelsByTokenMap}
+                ttsModelsByCategoryToken={this.props.ttsModelsByCategoryToken}
+                dropdownCategories={this.props.dropdownCategories}
+                setDropdownCategories={this.props.setDropdownCategories}
+                selectedCategories={this.props.selectedCategories}
+                setSelectedCategories={this.props.setSelectedCategories}
+                maybeSelectedTtsModel={this.props.maybeSelectedTtsModel}
+                setMaybeSelectedTtsModel={this.props.setMaybeSelectedTtsModel}
+                selectedTtsLanguageScope={this.props.selectedTtsLanguageScope}
+                setSelectedTtsLanguageScope={
+                  this.props.setSelectedTtsLanguageScope
+                }
+              />
             </Route>
 
             <Route path="/">
