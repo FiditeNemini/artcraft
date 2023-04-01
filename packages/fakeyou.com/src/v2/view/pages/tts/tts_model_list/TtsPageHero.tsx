@@ -24,8 +24,8 @@ export function TtsPageHero(props: Props) {
   const randomImage = useMemo(() => {
     const images = [
       // Main Images:
-      "mascot/kitsune_pose2.webp",
-      "mascot/kitsune_wizard.webp",
+      // "mascot/kitsune_pose2.webp",
+      // "mascot/kitsune_wizard.webp",
 
       // Seasonal Images:
       // "mascot/halloween_1.webp",
@@ -40,6 +40,7 @@ export function TtsPageHero(props: Props) {
       //"mascot/superbowl-PE.webp",
       //"mascot/valentines.webp",
       // "mascot/st_patricks.webp",
+      "mascot/april_fools.png",
     ];
 
     return images[Math.floor(Math.random() * images.length)];
