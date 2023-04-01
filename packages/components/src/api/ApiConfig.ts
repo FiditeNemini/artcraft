@@ -95,6 +95,9 @@ class ApiConfig {
         }
     }
 
+    //v2ApiHost = "api.dev.fakeyou.com:12345";
+    //useSsl = false;
+
     this.domain = domain;
     this.useSsl = useSsl;
     this.v2ApiHost = v2ApiHost;
