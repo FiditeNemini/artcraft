@@ -96,6 +96,8 @@ function TrumpTtsPage(props: Props) {
   const [loading, setLoading] = useState(false);
   const [isAudioLimitAlertVisible, setAudioLimitAlertVisible] = useState(false);
 
+  usePrefixedDocumentTitle("Donald Trump TTS and Donald Trump AI Voice");
+
   const handleLoading = () => {
     setLoading(true);
     setTimeout(() => {
@@ -272,8 +274,6 @@ function TrumpTtsPage(props: Props) {
 
     return false;
   };
-
-  usePrefixedDocumentTitle(undefined); // NB: Sets to default title
 
   // Show errors on TTS failure
   let maybeError = <></>;
