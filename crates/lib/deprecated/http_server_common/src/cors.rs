@@ -63,8 +63,10 @@ pub fn add_fakeyou(cors: Cors, is_production: bool) -> Cors {
     cors
         // FakeYou (Development)
         .allowed_origin("http://dev.fakeyou.com")
+        .allowed_origin("http://dev.fakeyou.com:7001") // NB: Mac frontend
         .allowed_origin("http://development.fakeyou.com")
         .allowed_origin("https://dev.fakeyou.com")
+        .allowed_origin("https://dev.fakeyou.com:7001") // NB: Mac frontend
         .allowed_origin("https://development.fakeyou.com")
   }
 }
