@@ -1,18 +1,23 @@
-import React, { useMemo } from "react";
-import { Link } from "react-router-dom";
+import React, { useState, useEffect } from "react";
 import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
 import { t } from "i18next";
-import { Trans } from "react-i18next";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faMicrophone,
-  faStar,
-  faVolumeUp,
-} from "@fortawesome/free-solid-svg-icons";
 import { motion } from "framer-motion";
-import { container, item, image, panel } from "../../../../../data/animation";
+import { container, panel, sessionItem } from "../../../../../data/animation";
 import { SessionSubscriptionsWrapper } from "@storyteller/components/src/session/SessionSubscriptionsWrapper";
-import { BackLink } from "../../../_common/BackLink";
+import { VcPageHero } from "./VcPageHero";
+import Select, { createFilter } from "react-select";
+import { SearchFieldClass } from "../../tts/tts_model_list/search/components/SearchFieldClass";
+import {
+  faBarsStaggered,
+  faHeadphones,
+  faLink,
+  faMicrophone,
+  faTrash,
+  faVolumeHigh,
+} from "@fortawesome/pro-solid-svg-icons";
+import UploadComponent from "./UploadComponent";
+import { Link } from "react-router-dom";
 
 export interface EnqueueJobResponsePayload {
   success: boolean;
@@ -25,130 +30,167 @@ interface Props {
 }
 
 function VcModelListPage(props: Props) {
-  const randomImage = useMemo(() => {
-    const images = ["mascot/vc.webp"];
+  const [loading, setLoading] = useState(false);
 
-    return images[Math.floor(Math.random() * images.length)];
+  const handleLoading = () => {
+    setLoading(true);
+    setTimeout(() => {
+      setLoading(false);
+    }, 2000);
+  };
+
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      setLoading(false);
+    }, 2000);
+    return () => clearTimeout(timeout);
   }, []);
 
-  let signUpButton = <></>;
-  let upgradeButton = <></>;
+  const speakButtonClass = loading
+    ? "btn btn-primary w-100 disabled"
+    : "btn btn-primary w-100";
 
-  if (!props.sessionWrapper.isLoggedIn()) {
-    signUpButton = (
-      <>
-        <Link to="/signup">
-          <button type="button" className="btn btn-primary w-100">
-            {t("tts.TtsModelListPage.heroSection.buttons.signUp")}
-          </button>
-        </Link>
-      </>
-    );
-  }
+  const handleClearClick = (ev: React.FormEvent<HTMLButtonElement>) => {
+    ev.preventDefault();
 
-  if (props.sessionWrapper.isLoggedIn()) {
-    if (!props.sessionSubscriptionsWrapper.hasPaidFeatures()) {
-      upgradeButton = (
-        <>
-          <Link to="/pricing">
-            <button type="button" className="btn btn-primary w-100">
-              <FontAwesomeIcon icon={faStar} className="me-2" />
-              Upgrade Plan
-            </button>
-          </Link>
-        </>
-      );
-    }
-  }
+    return false;
+  };
+
+  const handleFormSubmit = async (ev: React.FormEvent<HTMLFormElement>) => {
+    ev.preventDefault();
+  };
+
+  let noResultsSection = (
+    <div className="panel panel-inner text-center p-5 rounded-5 h-100">
+      <div className="d-flex flex-column opacity-75 h-100 justify-content-center">
+        <FontAwesomeIcon icon={faHeadphones} className="fs-3 mb-3" />
+        <h5 className="fw-semibold">
+          {t("common.SessionTtsInferenceResults.noResults.title")}
+        </h5>
+        <p>{t("common.SessionTtsInferenceResults.noResults.subtitle")}</p>
+      </div>
+    </div>
+  );
 
   return (
     <motion.div initial="hidden" animate="visible" variants={container}>
-      <div className="container hero-section">
-        <div className="row gx-3 flex-lg-row-reverse align-items-center">
-          <div className="col-lg-6">
-            <div className="d-flex justify-content-center">
-              <motion.img
-                src={randomImage}
-                className="img-fluid"
-                width="516"
-                height="508"
-                alt="FakeYou Mascot"
-                variants={image}
-              />
-            </div>
-          </div>
-          <div className="col-lg-6 px-md-2 px-lg-5 px-xl-2">
-            <div>
-              <motion.h1
-                className="display-3 fw-bold lh-1 mb-3 text-center text-lg-start"
-                variants={item}
-              >
-                Voice Conversion
-              </motion.h1>
-              <motion.p
-                className="lead mb-5 text-center text-lg-start pe-xl-2"
-                variants={item}
-              >
-                <Trans i18nKey="tts.TtsModelListPage.heroSection.subtitle">
-                  Use FakeYou's deepfake tech to say stuff with your favorite
-                  characters.
-                </Trans>
-              </motion.p>
-            </div>
+      <VcPageHero
+        sessionWrapper={props.sessionWrapper}
+        sessionSubscriptionsWrapper={props.sessionSubscriptionsWrapper}
+      />
 
-            <motion.div
-              className="d-flex flex-column flex-md-row gap-3 justify-content-center justify-content-lg-start mb-5 mb-lg-4"
-              variants={item}
+      <motion.div className="container-panel pb-5 mb-4" variants={panel}>
+        <div className="panel p-3 py-4 p-md-4">
+          <div className="d-flex gap-4">
+            <form
+              className="w-100 d-flex flex-column"
+              onSubmit={handleFormSubmit}
             >
-              {upgradeButton}
-              {signUpButton}
-              <Link to="/clone">
-                <button type="button" className="btn btn-secondary w-100">
-                  {t("tts.TtsModelListPage.heroSection.buttons.cloneVoice")}
-                </button>
-              </Link>
-            </motion.div>
-          </div>
-        </div>
-      </div>
+              {/* Explore Rollout */}
+              <label className="sub-title">
+                Choose a Voice (XX to choose from)
+              </label>
+              <div className="input-icon-search pb-4">
+                <span className="form-control-feedback">
+                  <FontAwesomeIcon icon={faMicrophone} />
+                </span>
 
-      <motion.div className="container-panel pt-4 pb-5 mb-4" variants={panel}>
-        <div className="panel p-3 p-lg-4 mt-5 mt-lg-0">
-          <i className="fas fa-volume-high"></i>
-          <h1 className="panel-title fw-bold">
-            <FontAwesomeIcon icon={faVolumeUp} className="me-3" />
-            Convert Voice
-          </h1>
-          <div className="py-6">
-            <div className="d-flex flex-column gap-4">
-              <div>
-                <label className="sub-title">Output Voice</label>
-                <div className="form-group input-icon w-100">
-                  {/* NB: See note above about this library. */}
-                  <span className="form-control-feedback">
-                    <FontAwesomeIcon icon={faMicrophone} />
-                  </span>
-                  <select className="form-select">
-                    <option value="">Dummy Model</option>
-                  </select>
+                <Select
+                  value="test"
+                  classNames={SearchFieldClass}
+                  // On mobile, we don't want the onscreen keyboard to take up half the UI.
+                  autoFocus={false}
+                  isSearchable={false}
+                  // NB: The following settings improve upon performance.
+                  // See: https://github.com/JedWatson/react-select/issues/3128
+                  filterOption={createFilter({ ignoreAccents: false })}
+                />
+              </div>
+
+              <div className="row gx-5 gy-5">
+                <div className="col-12 col-lg-6 d-flex flex-column gap-3">
+                  <div className="d-flex flex-column gap-3 h-100">
+                    <label className="sub-title pb-0">Upload Audio Input</label>
+                    <div className="d-flex flex-column gap-3 upload-component">
+                      <UploadComponent />
+                    </div>
+
+                    <div className="d-flex gap-3">
+                      <button
+                        className={speakButtonClass}
+                        onClick={handleLoading}
+                        type="submit"
+                      >
+                        <FontAwesomeIcon icon={faVolumeHigh} className="me-2" />
+                        Convert Voice
+                        {loading && <LoadingIcon />}
+                      </button>
+                      <button
+                        className="btn btn-destructive w-100"
+                        onClick={handleClearClick}
+                      >
+                        <FontAwesomeIcon icon={faTrash} className="me-2" />
+                        Clear Input
+                      </button>
+                    </div>
+                  </div>
+                </div>
+                <div className="col-12 col-lg-6">
+                  <div className="d-flex flex-column gap-3">
+                    <h4 className="text-center text-lg-start">
+                      <FontAwesomeIcon
+                        icon={faBarsStaggered}
+                        className="me-3"
+                      />
+                      Session VC Results
+                    </h4>
+                    <div className="d-flex flex-column gap-3 session-tts-section">
+                      {noResultsSection}
+                      {/* <motion.div
+                        className="panel panel-tts-results p-4 gap-3 d-flex flex-column"
+                        variants={sessionItem}
+                      >
+                        <div>
+                          <h5 className="mb-2">Title</h5>
+                          <p>text</p>
+                        </div>
+
+                        {wavesurfers}
+
+                        <div className="mt-2">
+                          <Link to="/voice-conversion" className="fw-semibold">
+                            <FontAwesomeIcon icon={faLink} className="me-2" />
+                            Details
+                          </Link>
+                        </div>
+                      </motion.div> */}
+                    </div>
+                  </div>
                 </div>
               </div>
-              <div>
-                <label className="sub-title">Audio Input</label>
-                <audio className="w-100" src="test.wav">
-                  Your browser does not support the<code>audio</code> element.
-                </audio>
-              </div>
-            </div>
+            </form>
           </div>
         </div>
 
-        <div className="pt-5">
+        {/* <div className="pt-5">
           <BackLink link="/" text="Back to main page" />
-        </div>
+        </div> */}
       </motion.div>
     </motion.div>
   );
 }
+
+const LoadingIcon: React.FC = () => {
+  return (
+    <>
+      <span
+        className="spinner-border spinner-border-sm ms-3"
+        role="status"
+        aria-hidden="true"
+      ></span>
+      <span className="visually-hidden">Loading...</span>
+    </>
+  );
+};
 
 export { VcModelListPage };

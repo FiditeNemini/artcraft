@@ -69,7 +69,7 @@ import { ChannelsPage } from "./pages/channels/Channels";
 import { TrumpTtsPage } from "./pages/character/trump/TrumpTtsPage";
 import { InferenceJob } from "@storyteller/components/src/jobs/InferenceJob";
 //import { LandingPage } from "./pages/landing/LandingPage";
-//import { VcModelListPage } from "./pages/vc/vc_model_list/VcModelListPage";
+import { VcModelListPage } from "./pages/vc/vc_model_list/VcModelListPage";
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -465,6 +465,15 @@ class PageContainer extends React.Component<Props, State> {
               />
             </Route>
 
+            <Route path="/voice-conversion">
+              <VcModelListPage
+                sessionWrapper={this.props.sessionWrapper}
+                sessionSubscriptionsWrapper={
+                  this.props.sessionSubscriptionsWrapper
+                }
+              />
+            </Route>
+
             <Route path="/about">
               <AboutPage />
             </Route>
@@ -588,28 +597,6 @@ class PageContainer extends React.Component<Props, State> {
                 }
               />
             </Route>
-
-            {/* TODO(bt, 2023-01-11): Not ready to launch voice conversion yet
-            <Route path="/voice-conversion">
-              <VcModelListPage
-                sessionWrapper={this.props.sessionWrapper}
-                sessionSubscriptionsWrapper={
-                  this.props.sessionSubscriptionsWrapper
-                }
-              />
-            </Route>
-              */}
-
-            {/* TODO(bt, 2023-01-11): Not ready to launch voice conversion yet
-            <Route path="/">
-              <LandingPage
-                sessionWrapper={this.props.sessionWrapper}
-                sessionSubscriptionsWrapper={
-                  this.props.sessionSubscriptionsWrapper
-                }
-              />
-            </Route>
-              */}
           </Switch>
 
           <FooterNav sessionWrapper={this.props.sessionWrapper} />

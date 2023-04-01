@@ -1063,6 +1063,28 @@ styles with important tags:
   .gravatar-img {
     pointer-events: none;
   }
+
+  .upload-component {
+    overflow-x: hidden;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+
+    .panel {
+      box-shadow: none !important;
+    }
+
+    .upload-zone {
+      height: 100%;
+      border: dashed 2px rgba($white, 0.12) !important;
+      border-radius: 0.5rem;
+      transition: 0.1s all;
+
+      &:hover {
+        background-color: lighten($panel, 6%);
+        cursor: pointer;
+      }
+    }
+  }
 }
 
 select {
