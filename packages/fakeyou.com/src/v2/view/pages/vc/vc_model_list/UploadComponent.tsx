@@ -1,15 +1,23 @@
-import { faFileArrowUp } from "@fortawesome/pro-solid-svg-icons";
+import { faFileArrowUp, faFileAudio } from "@fortawesome/pro-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React, { useState } from "react";
 import { FileUploader } from "react-drag-drop-files";
 
-const fileTypes = ["WAV", "MP3", "FLAC"];
+const fileTypes = ["MP3", "WAV", "FLAC"];
 
 function UploadComponent() {
   const [file, setFile] = useState<any>();
   const handleChange = (file: any) => {
     setFile(file);
   };
+
+  const fileSize =
+    file && file.size >= 1024 * 1024
+      ? (file.size / 1024 / 1024).toFixed(2) + " MB"
+      : file
+      ? `${Math.floor(file.size / 1024)} KB`
+      : null;
+
   return (
     //Usage refer to https://github.com/KarimMokhtar/react-drag-drop-files
     <FileUploader
@@ -20,24 +28,35 @@ function UploadComponent() {
       children={
         <div className="panel panel-inner upload-zone p-4 d-flex align-items-center">
           <div className="me-4">
-            <FontAwesomeIcon icon={faFileArrowUp} className="fs-1" />
+            {file ? (
+              <FontAwesomeIcon icon={faFileAudio} className="upload-icon" />
+            ) : (
+              <FontAwesomeIcon icon={faFileArrowUp} className="upload-icon" />
+            )}
           </div>
           <div>
-            <p>
+            <div className="pb-0">
               {file ? (
-                <>Audio_Filename.wav</>
+                <span className="filename" title={file.name}>
+                  {file.name.slice(0, file.name.lastIndexOf("."))}
+                </span>
               ) : (
                 <>
-                  <u>Upload</u> or drop a file right here
+                  <u>Upload</u> or drop an audio file here
                 </>
               )}
-            </p>
+            </div>
             <div className="d-flex gap-1">
               <div>
                 {file ? (
-                  <p className="opacity-50">File size: 123KB</p>
+                  <p className="opacity-50">
+                    {file && `${file.name.split(".").pop().toUpperCase()}`} file
+                    size: {fileSize}
+                  </p>
                 ) : (
-                  <p className="opacity-50">No files uploaded yet</p>
+                  <p className="opacity-50">
+                    {fileTypes.join(", ").toString()} supported
+                  </p>
                 )}
               </div>
             </div>

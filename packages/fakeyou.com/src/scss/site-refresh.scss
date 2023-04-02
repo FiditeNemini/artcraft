@@ -1084,6 +1084,22 @@ styles with important tags:
         cursor: pointer;
       }
     }
+
+    .filename {
+      display: block;
+      max-width: 300px;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+    }
+
+    .supported-files {
+      font-size: 12px;
+    }
+
+    .upload-icon {
+      font-size: 42px;
+    }
   }
 }
 
