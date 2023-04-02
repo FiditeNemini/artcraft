@@ -10,19 +10,16 @@ import Select, { createFilter } from "react-select";
 import { SearchFieldClass } from "../../tts/tts_model_list/search/components/SearchFieldClass";
 import {
   faBarsStaggered,
+  faFiles,
   faHeadphones,
   faLink,
   faMicrophone,
+  faRightLeft,
   faTrash,
-  faVolumeHigh,
 } from "@fortawesome/pro-solid-svg-icons";
 import UploadComponent from "./UploadComponent";
 import { Link } from "react-router-dom";
-
-export interface EnqueueJobResponsePayload {
-  success: boolean;
-  inference_job_token?: string;
-}
+import { usePrefixedDocumentTitle } from "../../../../../common/UsePrefixedDocumentTitle";
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -72,6 +69,8 @@ function VcModelListPage(props: Props) {
     </div>
   );
 
+  usePrefixedDocumentTitle("Voice Conversion");
+
   return (
     <motion.div initial="hidden" animate="visible" variants={container}>
       <VcPageHero
@@ -88,7 +87,7 @@ function VcModelListPage(props: Props) {
             >
               {/* Explore Rollout */}
               <label className="sub-title">
-                Choose a Voice (XX to choose from)
+                Choose Target Voice (XX to choose from)
               </label>
               <div className="input-icon-search pb-4">
                 <span className="form-control-feedback">
@@ -109,10 +108,38 @@ function VcModelListPage(props: Props) {
 
               <div className="row gx-5 gy-5">
                 <div className="col-12 col-lg-6 d-flex flex-column gap-3">
-                  <div className="d-flex flex-column gap-3 h-100">
-                    <label className="sub-title pb-0">Upload Audio Input</label>
-                    <div className="d-flex flex-column gap-3 upload-component">
-                      <UploadComponent />
+                  <div className="d-flex flex-column gap-4 h-100">
+                    <div>
+                      <label className="sub-title">Select Input Audio</label>
+                      <div className="d-flex flex-column gap-3 upload-component">
+                        <UploadComponent />
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="sub-title">
+                        Your Uploaded Audio (5 files)
+                      </label>
+                      <div className="d-flex flex-column gap-3">
+                        <div className="input-icon-search">
+                          <span className="form-control-feedback">
+                            <FontAwesomeIcon icon={faFiles} />
+                          </span>
+
+                          <Select
+                            value="test"
+                            classNames={SearchFieldClass}
+                            // On mobile, we don't want the onscreen keyboard to take up half the UI.
+                            autoFocus={false}
+                            isSearchable={false}
+                            // NB: The following settings improve upon performance.
+                            // See: https://github.com/JedWatson/react-select/issues/3128
+                            filterOption={createFilter({
+                              ignoreAccents: false,
+                            })}
+                          />
+                        </div>
+                      </div>
                     </div>
 
                     <div className="d-flex gap-3">
@@ -120,17 +147,19 @@ function VcModelListPage(props: Props) {
                         className={speakButtonClass}
                         onClick={handleLoading}
                         type="submit"
+                        disabled={true}
                       >
-                        <FontAwesomeIcon icon={faVolumeHigh} className="me-2" />
-                        Convert Voice
+                        <FontAwesomeIcon icon={faRightLeft} className="me-2" />
+                        Convert
                         {loading && <LoadingIcon />}
                       </button>
                       <button
                         className="btn btn-destructive w-100"
                         onClick={handleClearClick}
+                        disabled={true}
                       >
                         <FontAwesomeIcon icon={faTrash} className="me-2" />
-                        Clear Input
+                        Clear
                       </button>
                     </div>
                   </div>
@@ -145,8 +174,8 @@ function VcModelListPage(props: Props) {
                       Session VC Results
                     </h4>
                     <div className="d-flex flex-column gap-3 session-tts-section">
-                      {noResultsSection}
-                      {/* <motion.div
+                      {/* {noResultsSection} */}
+                      <motion.div
                         className="panel panel-tts-results p-4 gap-3 d-flex flex-column"
                         variants={sessionItem}
                       >
@@ -154,16 +183,14 @@ function VcModelListPage(props: Props) {
                           <h5 className="mb-2">Title</h5>
                           <p>text</p>
                         </div>
-
-                        {wavesurfers}
-
+                        (wavesurfer)
                         <div className="mt-2">
                           <Link to="/voice-conversion" className="fw-semibold">
                             <FontAwesomeIcon icon={faLink} className="me-2" />
                             Details
                           </Link>
                         </div>
-                      </motion.div> */}
+                      </motion.div>
                     </div>
                   </div>
                 </div>

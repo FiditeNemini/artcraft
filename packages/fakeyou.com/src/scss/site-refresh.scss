@@ -1078,6 +1078,7 @@ styles with important tags:
       border: dashed 2px rgba($white, 0.12) !important;
       border-radius: 0.5rem;
       transition: 0.1s all;
+      padding: 1.5rem;
 
       &:hover {
         background-color: lighten($panel, 6%);
@@ -1085,9 +1086,13 @@ styles with important tags:
       }
     }
 
+    .upload-zone-drag {
+      background-color: $white !important;
+    }
+
     .filename {
       display: block;
-      max-width: 300px;
+      max-width: 230px;
       overflow: hidden;
       white-space: nowrap;
       text-overflow: ellipsis;
@@ -1263,6 +1268,12 @@ textarea {
 
       &:hover {
         background-color: lighten($secondary, 5%);
+      }
+    }
+
+    .upload-component {
+      .filename {
+        max-width: 320px;
       }
     }
   }

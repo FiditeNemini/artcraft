@@ -11,6 +11,18 @@ function UploadComponent() {
     setFile(file);
   };
 
+  const handleDragOver = (e: React.DragEvent<HTMLDivElement>): void => {
+    e.preventDefault();
+    e.stopPropagation();
+    e.currentTarget.classList.add("upload-zone-drag");
+  };
+
+  const handleDragLeave = (e: React.DragEvent<HTMLDivElement>): void => {
+    e.preventDefault();
+    e.stopPropagation();
+    e.currentTarget.classList.remove("upload-zone-drag");
+  };
+
   const fileSize =
     file && file.size >= 1024 * 1024
       ? (file.size / 1024 / 1024).toFixed(2) + " MB"
@@ -26,7 +38,11 @@ function UploadComponent() {
       types={fileTypes}
       maxSize={50}
       children={
-        <div className="panel panel-inner upload-zone p-4 d-flex align-items-center">
+        <div
+          className="panel panel-inner upload-zone d-flex align-items-center"
+          onDragOver={handleDragOver}
+          onDragLeave={handleDragLeave}
+        >
           <div className="me-4">
             {file ? (
               <FontAwesomeIcon icon={faFileAudio} className="upload-icon" />
@@ -42,7 +58,7 @@ function UploadComponent() {
                 </span>
               ) : (
                 <>
-                  <u>Upload</u> or drop an audio file here
+                  <u className="fw-medium">Upload a file</u> or drop it here...
                 </>
               )}
             </div>
