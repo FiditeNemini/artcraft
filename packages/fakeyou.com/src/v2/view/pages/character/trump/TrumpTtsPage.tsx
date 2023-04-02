@@ -46,6 +46,16 @@ import { DynamicallyCategorizeModels } from "../../../../../model/categories/Syn
 
 import { usePrefixedDocumentTitle } from "../../../../../common/UsePrefixedDocumentTitle";
 import { SearchOmnibar } from "./search/SearchOmnibar";
+
+const PAGE_MODEL_TOKENS = new Set<string>([
+  "TM:pmd1wm3kf6az", // Development: "Fake Donald Trump #1"
+  "TM:7rrwdhdq8ezq", // Development: "Fake Donald Trump #2"
+  //"TM:aejrk66wq3ss", // Production: "Donald Trump (bibby's model)"
+  "TM:pyzss4phqk6r", // Production: "Donald Trump (Sarcastic)"
+  "TM:4v0ft4j72y2g", // Production: "Donald Trump (Angry)"
+  "TM:03690khwpsbz", // Production: "Donald Trump (Casual Speech)"
+]);
+
 export interface EnqueueJobResponsePayload {
   success: boolean;
   inference_job_token?: string;
@@ -143,13 +153,20 @@ function TrumpTtsPage(props: Props) {
       DynamicallyCategorizeModels(models);
       setTtsModels(models);
       if (!maybeSelectedTtsModel && models.length > 0) {
-        let model = models[0];
-        const featuredModels = models.filter((m) => m.is_front_page_featured);
-        if (featuredModels.length > 0) {
-          // Random featured model
-          model =
-            featuredModels[Math.floor(Math.random() * featuredModels.length)];
-        }
+        //let model = models[0];
+        //const featuredModels = models.filter((m) => m.is_front_page_featured);
+        //if (featuredModels.length > 0) {
+        //  // Random featured model
+        //  model =
+        //    featuredModels[Math.floor(Math.random() * featuredModels.length)];
+        //}
+
+        let trumpModels = models.filter((model) => {
+          return PAGE_MODEL_TOKENS.has(model.model_token);
+        })
+
+        let model = trumpModels[Math.floor(Math.random() * trumpModels.length)];
+
         setMaybeSelectedTtsModel(model);
       }
     }
@@ -343,22 +360,13 @@ function TrumpTtsPage(props: Props) {
     );
   }
 
-  const TOKENS = new Set<string>([
-    "TM:pmd1wm3kf6az", // Development: "Fake Donald Trump #1"
-    "TM:7rrwdhdq8ezq", // Development: "Fake Donald Trump #2"
-    //"TM:aejrk66wq3ss", // Production: "Donald Trump (bibby's model)"
-    "TM:pyzss4phqk6r", // Production: "Donald Trump (Sarcastic)"
-    "TM:4v0ft4j72y2g", // Production: "Donald Trump (Angry)"
-    "TM:03690khwpsbz", // Production: "Donald Trump (Casual Speech)"
-  ]);
-
   let trumpModels = props.ttsModels.filter((model) => {
-    return TOKENS.has(model.model_token);
+    return PAGE_MODEL_TOKENS.has(model.model_token);
   })
 
   let maybeSelectedModel = props.maybeSelectedTtsModel;
 
-  if (maybeSelectedModel !== undefined && !TOKENS.has(maybeSelectedModel.model_token)) {
+  if (maybeSelectedModel !== undefined && !PAGE_MODEL_TOKENS.has(maybeSelectedModel.model_token)) {
     // If we don't select a trump model by default (which is rare), the list will be empty. 
     // We'll set it here.
     maybeSelectedModel = trumpModels[0];
