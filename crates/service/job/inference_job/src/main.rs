@@ -30,13 +30,13 @@ use container_common::filesystem::check_directory_exists::check_directory_exists
 use crate::job::job_steps::job_stats::JobStats;
 use crate::job::job_steps::main_loop::main_loop;
 use crate::job::job_types::tts::tacotron2_v2_early_fakeyou::tacotron_inference_command::TacotronInferenceCommand;
-use crate::job_dependencies::{JobCaches, JobDependencies, JobWorkerDetails};
+use crate::job_dependencies::{JobCaches, JobDependencies, JobTypeDetails, JobWorkerDetails, Tacotron2VocodesDetails};
 use crate::util::scoped_temp_dir_creator::ScopedTempDirCreator;
 use jobs_common::job_progress_reporter::job_progress_reporter::JobProgressReporterBuilder;
 use jobs_common::job_progress_reporter::noop_job_progress_reporter::NoOpJobProgressReporterBuilder;
 use jobs_common::job_progress_reporter::redis_job_progress_reporter::RedisJobProgressReporterBuilder;
 use jobs_common::semi_persistent_cache_dir::SemiPersistentCacheDir;
-use log::{info, warn};
+use log::{error, info, warn};
 use memory_caching::multi_item_ttl_cache::MultiItemTtlCache;
 use mysql_queries::mediators::firehose_publisher::FirehosePublisher;
 use newrelic_telemetry::ClientBuilder;
@@ -71,6 +71,7 @@ const DEFAULT_TEMP_DIR: &'static str = "/tmp";
 async fn main() -> AnyhowResult<()> {
   easyenv::init_all_with_default_logging(Some(DEFAULT_RUST_LOG));
 
+  // TODO: Deprecate
   // NB: Do not check this secrets-containing dotenv file into VCS.
   // This file should only contain *development* secrets, never production.
   let _ = dotenv::from_filename(".env-secrets").ok();
@@ -78,6 +79,14 @@ async fn main() -> AnyhowResult<()> {
   let _ = envvar::read_from_filename_and_paths(
     "inference-job.env",
     &[".", "crates/service/job/inference_job"])?;
+
+  let _ = envvar::read_from_filename_and_paths(
+    "inference-job-secrets.env",
+    &[".", "crates/service/job/inference_job"]
+  ).map_err(|err| {
+    // NB: Fail open.
+    warn!("Could not load app-specific secrets from env file (this might be fine, eg. provided by k8s): {:?}", err);
+  });
 
   info!("Obtaining worker hostname...");
 
@@ -264,6 +273,11 @@ async fn main() -> AnyhowResult<()> {
     sidecar_max_synthesizer_models,
     low_priority_starvation_prevention_every_nth,
     maybe_minimum_priority,
+    job_type_details: JobTypeDetails {
+      tacotron2_old_vocodes: Tacotron2VocodesDetails {
+        maybe_docker_image_sha: easyenv::get_env_string_optional("TACOTRON2_VOCODES_DOCKER_IMAGE_SHA"),
+      },
+    },
   };
 
   main_loop(job_dependencies).await;

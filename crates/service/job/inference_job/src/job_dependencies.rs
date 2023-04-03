@@ -82,6 +82,9 @@ pub struct JobDependencies {
   // A worker can be configured to only run jobs of a certain priority.
   // This finds jobs of equal or greater priority.
   pub maybe_minimum_priority: Option<u8>,
+
+  // Details for each job type (grouped by the job type)
+  pub job_type_details: JobTypeDetails,
 }
 
 pub struct JobWorkerDetails {
@@ -115,4 +118,18 @@ impl JobDependencies {
         .map(|name| name.to_string())
         .unwrap_or_else(|| self.worker_details.worker_hostname.clone())
   }
+}
+
+/// Per-job type details
+pub struct JobTypeDetails {
+  pub tacotron2_old_vocodes: Tacotron2VocodesDetails,
+  //pub tacotron2_modern: ...,
+  //pub vits: ...,
+  //pub softvc: ...,
+  //pub so_vits_svc: ...,
+}
+
+/// "Old" TT2 (vocodes-era)
+pub struct Tacotron2VocodesDetails {
+  pub maybe_docker_image_sha: Option<String>,
 }

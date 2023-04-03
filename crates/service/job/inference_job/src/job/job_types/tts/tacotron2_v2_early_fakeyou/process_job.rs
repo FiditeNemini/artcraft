@@ -232,14 +232,19 @@ pub async fn process_job(args: ProcessJobArgs<'_>) -> Result<(), ProcessSingleJo
   //  roughly 12 seconds max. Here we map seconds to decoder steps.
   let max_decoder_steps = seconds_to_decoder_steps(job.max_duration_seconds);
 
-  let docker_options = DockerOptions {
-    image_name: "c1336c8f9970".to_string(),
-    maybe_bind_mount: Some(DockerFilesystemMount {
-      local_filesystem: "/tmp".to_string(),
-      container_filesystem: "/tmp".to_string(),
-    }),
-    maybe_gpu: Some(DockerGpu::All),
-  };
+  // NB: Docker options are for development, not production.
+  let mut maybe_docker_options = None;
+
+  if let Some(docker_sha) = args.job_dependencies.job_type_details.tacotron2_old_vocodes.maybe_docker_image_sha.as_deref() {
+    maybe_docker_options = Some(DockerOptions {
+      image_name: docker_sha.to_string(),
+      maybe_bind_mount: Some(DockerFilesystemMount {
+        local_filesystem: "/tmp".to_string(),
+        container_filesystem: "/tmp".to_string(),
+      }),
+      maybe_gpu: Some(DockerGpu::All),
+    })
+  }
 
   // ==================== RUN INFERENCE SCRIPT ==================== //
 
@@ -253,7 +258,7 @@ pub async fn process_job(args: ProcessJobArgs<'_>) -> Result<(), ProcessSingleJo
     python,
     Some("source python/bin/activate"),
     "vocodes_inference_updated.py",
-    Some(docker_options),
+    maybe_docker_options,
   );
 
   let mut maybe_mel_multiply_factor = None;
