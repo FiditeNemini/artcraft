@@ -5,8 +5,7 @@ use enums::workers::generic_download_type::GenericDownloadType;
 use sqlx::MySqlPool;
 use tokens::jobs::download::DownloadJobToken;
 
-pub struct Args <'a> {
-  pub job_token: &'a DownloadJobToken,
+pub struct InsertGenericDownloadJobArgs<'a> {
   pub uuid_idempotency_token: &'a str,
   pub download_type: GenericDownloadType,
   pub download_url: &'a str,
@@ -17,7 +16,9 @@ pub struct Args <'a> {
   pub mysql_pool: &'a MySqlPool,
 }
 
-pub async fn insert_generic_download_job(args: Args<'_>) -> AnyhowResult<u64> {
+pub async fn insert_generic_download_job(args: InsertGenericDownloadJobArgs<'_>) -> AnyhowResult<(DownloadJobToken, u64)> {
+  // This token is returned to the client.
+  let job_token = DownloadJobToken::generate();
 
   let query = sqlx::query!(
         r#"
@@ -33,7 +34,7 @@ SET
   creator_set_visibility = ?,
   status = "pending"
         "#,
-        args.job_token,
+        &job_token,
         args.uuid_idempotency_token,
         args.download_type.to_str(),
         args.download_url,
@@ -55,5 +56,5 @@ SET
     }
   };
 
-  Ok(record_id)
+  Ok((job_token, record_id))
 }

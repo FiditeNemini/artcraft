@@ -17,8 +17,9 @@ use log::warn;
 use std::fmt;
 use std::sync::Arc;
 use enums::workers::generic_download_type::GenericDownloadType;
+use mysql_queries::queries::generic_download::web::insert_generic_download_job::{insert_generic_download_job, InsertGenericDownloadJobArgs};
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Copy, Clone)]
 pub enum SupportedTtsModelType {
   /// tacotron2
   Tacotron2,
@@ -139,49 +140,66 @@ pub async fn upload_tts_model_handler(
     }
   }
 
-  let mut supported_tts_model_type = request.tts_model_type
+  let supported_tts_model_type = request.tts_model_type
       .clone()
       .unwrap_or(SupportedTtsModelType::Tacotron2);
 
-  let mut job_token = "";
+  let mut job_token = "".to_string(); // TODO/FIXME: This is messy.
 
   match supported_tts_model_type {
     SupportedTtsModelType::Tacotron2 => {
-
-      let tts_model_type = "tacotron2".to_string();
-      let creator_set_visibility = "public".to_string();
+      // NB: This is the legacy upload path. In the future, all TT2 models should be generic uploads.
 
       // This token is returned to the client.
       let maybe_new_job_token = insert_tts_model_upload_job(InsertTtsModelUploadJobArgs {
         uuid: &uuid,
         creator_user_token: &user_session.user_token,
         creator_ip_address: &ip_address,
-        creator_set_visibility: &creator_set_visibility,
+        creator_set_visibility: "public", // TODO: Creator set preference.
         title: &title,
-        tts_model_type: &tts_model_type,
+        tts_model_type: "tacotron2",
         download_url: &download_url,
         mysql_pool: &server_state.mysql_pool,
       }).await;
 
-      let job_token = match maybe_new_job_token {
+      job_token = match maybe_new_job_token {
         Ok(token) => token,
         Err(err) => {
           warn!("Error inserting new job record: {:?}", err);
           return Err(UploadTtsModelError::ServerError);
         }
       };
-
-      server_state.firehose_publisher.enqueue_tts_model_upload(&user_session.user_token, &job_token)
-          .await
-          .map_err(|e| {
-            warn!("error publishing event: {:?}", e);
-            UploadTtsModelError::ServerError
-          })?;
     }
     SupportedTtsModelType::Vits => {
+      // NB: This is the new upload path. In the future, all models should use this path.
+      // When that's done, the code can be simplified.
+      // **ACTUALLY**, all future downloads should use the generic download job endpoint instead of this one!
+      let (download_job_token, _record_id)= insert_generic_download_job(InsertGenericDownloadJobArgs {
+        uuid_idempotency_token: &uuid,
+        download_type: GenericDownloadType::Vits,
+        download_url: &download_url,
+        title: &title,
+        creator_user_token: &user_session.user_token,
+        creator_ip_address: &ip_address,
+        creator_set_visibility: Visibility::Public, // TODO: Creator set preference
+        mysql_pool: &server_state.mysql_pool,
+      })
+          .await
+          .map_err(|err| {
+            warn!("New generic download creation DB error (for TTS model): {:?}", err);
+            UploadTtsModelError::ServerError
+          })?;
 
+      job_token = download_job_token.to_string();
     }
   }
+
+  server_state.firehose_publisher.enqueue_tts_model_upload(&user_session.user_token, &job_token)
+      .await
+      .map_err(|e| {
+        warn!("error publishing event: {:?}", e);
+        UploadTtsModelError::ServerError
+      })?;
 
   let response = UploadTtsModelSuccessResponse {
     success: true,

@@ -10,13 +10,13 @@ use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::server_state::ServerState;
 use crate::validations::model_uploads::validate_model_title;
 use crate::validations::validate_idempotency_token_format::validate_idempotency_token_format;
-use mysql_queries::queries::generic_download::web::insert_generic_download_job::{Args, insert_generic_download_job};
-use mysql_queries::tokens::Tokens;
 use enums::common::visibility::Visibility;
 use enums::workers::generic_download_type::GenericDownloadType;
 use http_server_common::request::get_request_ip::get_request_ip;
 use http_server_common::response::serialize_as_json_error::serialize_as_json_error;
 use log::{info, warn, log};
+use mysql_queries::queries::generic_download::web::insert_generic_download_job::{InsertGenericDownloadJobArgs, insert_generic_download_job};
+use mysql_queries::tokens::Tokens;
 use regex::Regex;
 use sqlx::error::DatabaseError;
 use sqlx::error::Error::Database;
@@ -128,11 +128,7 @@ pub async fn enqueue_generic_download_handler(
     }
   }
 
-  // This token is returned to the client.
-  let job_token = DownloadJobToken::generate();
-
-  let record_id = insert_generic_download_job(Args {
-    job_token: &job_token,
+  let (job_token, record_id) = insert_generic_download_job(InsertGenericDownloadJobArgs {
     uuid_idempotency_token: &uuid,
     download_type: request.generic_download_type,
     download_url: &download_url,
@@ -148,7 +144,7 @@ pub async fn enqueue_generic_download_handler(
         EnqueueGenericDownloadError::ServerError
       })?;
 
-  info!("new generic download job id: {}", record_id);
+  info!("new generic download job id: {}, token: {}", record_id, job_token);
 
   server_state.firehose_publisher.enqueue_generic_download(&user_session.user_token, job_token.as_str())
       .await
