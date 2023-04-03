@@ -21,10 +21,10 @@ use mysql_queries::queries::generic_download::web::insert_generic_download_job::
 
 #[derive(Deserialize, Copy, Clone)]
 pub enum SupportedTtsModelType {
-  /// tacotron2
+  #[serde(rename = "tacotron2")]
   Tacotron2,
 
-  /// VITS
+  #[serde(rename = "vits")]
   Vits,
 
   // Not yet supported:
@@ -45,11 +45,27 @@ pub struct UploadTtsModelRequest {
   creator_set_visibility: Option<Visibility>,
 }
 
+/// Tell the frontend how to deal with the download queue.
+#[derive(Serialize)]
+pub enum DownloadJobType {
+  /// Legacy TTS download job
+  #[serde(rename = "legacy_tts")]
+  LegacyTts,
+
+  /// Modern shared download type (everything will use this in the
+  /// future, and this endpoint will die.)
+  #[serde(rename = "generic")]
+  Generic,
+}
+
 #[derive(Serialize)]
 pub struct UploadTtsModelSuccessResponse {
   pub success: bool,
   /// This is how frontend clients can request the job execution status.
   pub job_token: String,
+
+  /// This is a transitional field to tell the frontend how to process the job checking.
+  pub job_type: DownloadJobType,
 }
 
 #[derive(Debug)]
@@ -144,7 +160,8 @@ pub async fn upload_tts_model_handler(
       .clone()
       .unwrap_or(SupportedTtsModelType::Tacotron2);
 
-  let mut job_token = "".to_string(); // TODO/FIXME: This is messy.
+  let job_token ;
+  let download_job_type;
 
   match supported_tts_model_type {
     SupportedTtsModelType::Tacotron2 => {
@@ -169,6 +186,7 @@ pub async fn upload_tts_model_handler(
           return Err(UploadTtsModelError::ServerError);
         }
       };
+      download_job_type = DownloadJobType::LegacyTts;
     }
     SupportedTtsModelType::Vits => {
       // NB: This is the new upload path. In the future, all models should use this path.
@@ -191,6 +209,7 @@ pub async fn upload_tts_model_handler(
           })?;
 
       job_token = download_job_token.to_string();
+      download_job_type = DownloadJobType::Generic;
     }
   }
 
@@ -204,6 +223,7 @@ pub async fn upload_tts_model_handler(
   let response = UploadTtsModelSuccessResponse {
     success: true,
     job_token: job_token.to_string(),
+    job_type: download_job_type,
   };
 
   let body = serde_json::to_string(&response)
