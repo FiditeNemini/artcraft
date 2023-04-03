@@ -16,17 +16,23 @@ use http_server_common::request::get_request_ip::get_request_ip;
 use log::warn;
 use std::fmt;
 use std::sync::Arc;
+use enums::workers::generic_download_type::GenericDownloadType;
 
 #[derive(Deserialize)]
-pub enum TtsModelType {
+pub enum SupportedTtsModelType {
   /// tacotron2
   Tacotron2,
-  /// glowtts
-  GlowTts,
-  /// glowtts-vocodes
-  GlowTts_Vocodes,
-  /// talknet
-  Talknet,
+
+  /// VITS
+  Vits,
+
+  // Not yet supported:
+  // /// glowtts
+  // GlowTts,
+  // /// glowtts-vocodes
+  // GlowTts_Vocodes,
+  // /// talknet
+  // Talknet,
 }
 
 #[derive(Deserialize)]
@@ -34,7 +40,7 @@ pub struct UploadTtsModelRequest {
   idempotency_token: String,
   title: String,
   download_url: String,
-  tts_model_type: Option<TtsModelType>,
+  tts_model_type: Option<SupportedTtsModelType>,
   creator_set_visibility: Option<Visibility>,
 }
 
@@ -133,35 +139,49 @@ pub async fn upload_tts_model_handler(
     }
   }
 
-  let tts_model_type = "tacotron2".to_string();
-  let creator_set_visibility = "public".to_string();
+  let mut supported_tts_model_type = request.tts_model_type
+      .clone()
+      .unwrap_or(SupportedTtsModelType::Tacotron2);
 
-  // This token is returned to the client.
-  let maybe_new_job_token = insert_tts_model_upload_job(InsertTtsModelUploadJobArgs {
-    uuid: &uuid,
-    creator_user_token: &user_session.user_token,
-    creator_ip_address: &ip_address,
-    creator_set_visibility: &creator_set_visibility,
-    title: &title,
-    tts_model_type: &tts_model_type,
-    download_url: &download_url,
-    mysql_pool: &server_state.mysql_pool,
-  }).await;
+  let mut job_token = "";
 
-  let job_token = match maybe_new_job_token {
-    Ok(token) => token,
-    Err(err) => {
-      warn!("Error inserting new job record: {:?}", err);
-      return Err(UploadTtsModelError::ServerError);
+  match supported_tts_model_type {
+    SupportedTtsModelType::Tacotron2 => {
+
+      let tts_model_type = "tacotron2".to_string();
+      let creator_set_visibility = "public".to_string();
+
+      // This token is returned to the client.
+      let maybe_new_job_token = insert_tts_model_upload_job(InsertTtsModelUploadJobArgs {
+        uuid: &uuid,
+        creator_user_token: &user_session.user_token,
+        creator_ip_address: &ip_address,
+        creator_set_visibility: &creator_set_visibility,
+        title: &title,
+        tts_model_type: &tts_model_type,
+        download_url: &download_url,
+        mysql_pool: &server_state.mysql_pool,
+      }).await;
+
+      let job_token = match maybe_new_job_token {
+        Ok(token) => token,
+        Err(err) => {
+          warn!("Error inserting new job record: {:?}", err);
+          return Err(UploadTtsModelError::ServerError);
+        }
+      };
+
+      server_state.firehose_publisher.enqueue_tts_model_upload(&user_session.user_token, &job_token)
+          .await
+          .map_err(|e| {
+            warn!("error publishing event: {:?}", e);
+            UploadTtsModelError::ServerError
+          })?;
     }
-  };
+    SupportedTtsModelType::Vits => {
 
-  server_state.firehose_publisher.enqueue_tts_model_upload(&user_session.user_token, &job_token)
-      .await
-      .map_err(|e| {
-        warn!("error publishing event: {:?}", e);
-        UploadTtsModelError::ServerError
-      })?;
+    }
+  }
 
   let response = UploadTtsModelSuccessResponse {
     success: true,

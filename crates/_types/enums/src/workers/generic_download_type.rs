@@ -36,6 +36,11 @@ pub enum GenericDownloadType {
   #[serde(rename = "tacotron2")]
   #[sqlx(rename = "tacotron2")]
   Tacotron2,
+
+  /// VITS TTS models.
+  #[serde(rename = "vits")]
+  #[sqlx(rename = "vits")]
+  Vits,
 }
 
 /// NB: Legacy API for older code.
@@ -46,6 +51,7 @@ impl GenericDownloadType {
       Self::HifiGanRocketVc => "hifigan_rocket_vc",
       Self::RocketVc => "rocket_vc",
       Self::Tacotron2 => "tacotron2",
+      Self::Vits => "vits",
     }
   }
 
@@ -55,6 +61,7 @@ impl GenericDownloadType {
       "hifigan_rocket_vc" => Ok(Self::HifiGanRocketVc),
       "rocket_vc" => Ok(Self::RocketVc),
       "tacotron2" => Ok(Self::Tacotron2),
+      "vits" => Ok(Self::Vits),
       _ => Err(format!("invalid value: {:?}", value)),
     }
   }
@@ -71,6 +78,7 @@ mod tests {
     assert_serialization(GenericDownloadType::HifiGanRocketVc, "hifigan_rocket_vc");
     assert_serialization(GenericDownloadType::RocketVc, "rocket_vc");
     assert_serialization(GenericDownloadType::Tacotron2, "tacotron2");
+    assert_serialization(GenericDownloadType::Vits, "vits");
   }
 
   #[test]
@@ -79,6 +87,7 @@ mod tests {
     assert_eq!(GenericDownloadType::HifiGanRocketVc.to_str(), "hifigan_rocket_vc");
     assert_eq!(GenericDownloadType::RocketVc.to_str(), "rocket_vc");
     assert_eq!(GenericDownloadType::Tacotron2.to_str(), "tacotron2");
+    assert_eq!(GenericDownloadType::Vits.to_str(), "vits");
   }
 
   #[test]
@@ -87,5 +96,6 @@ mod tests {
     assert_eq!(GenericDownloadType::from_str("hifigan_rocket_vc").unwrap(), GenericDownloadType::HifiGanRocketVc);
     assert_eq!(GenericDownloadType::from_str("rocket_vc").unwrap(), GenericDownloadType::RocketVc);
     assert_eq!(GenericDownloadType::from_str("tacotron2").unwrap(), GenericDownloadType::Tacotron2);
+    assert_eq!(GenericDownloadType::from_str("vits").unwrap(), GenericDownloadType::Vits);
   }
 }
