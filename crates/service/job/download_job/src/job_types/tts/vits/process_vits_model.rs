@@ -37,7 +37,7 @@ pub async fn process_vits_model<'a, 'b>(
   let original_model_file_path = PathBuf::from(download_filename.clone());
 
   // NB: We'll be creating the traced model in the "check" step and uploading it to GDrive along with the original.
-  let traced_model_file_path = PathBuf::from(format!("{:?}_traced", original_model_file_path));
+  let traced_model_file_path = PathBuf::from(format!("{:?}_traced", original_model_file_path.as_os_str()));
 
   let config_path = PathBuf::from("configs/ljs_li44_tmbert_nmp_s1_arpa.json"); // TODO: This could be variable.
 

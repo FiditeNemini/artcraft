@@ -266,6 +266,9 @@ async fn main() -> AnyhowResult<()> {
     let maybe_venv_command = easyenv::get_env_string_optional(
       "VITS_MODEL_CHECK_MAYBE_VENV_COMMAND");
 
+    let maybe_python_interpreter = easyenv::get_env_string_optional(
+      "VITS_MODEL_CHECK_MAYBE_PYTHON_INTERPRETER");
+
     let maybe_docker_options = easyenv::get_env_string_optional(
       "VITS_MODEL_CHECK_MAYBE_DOCKER_IMAGE")
         .map(|image_name| {
@@ -279,7 +282,7 @@ async fn main() -> AnyhowResult<()> {
     VitsModelCheckCommand::new(
        root_directory,
       check_script,
-      None,
+      maybe_python_interpreter.as_deref(),
       maybe_venv_command.as_deref(),
       maybe_docker_options,
     )
