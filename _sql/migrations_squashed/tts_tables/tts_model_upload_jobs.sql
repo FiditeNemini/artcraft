@@ -37,7 +37,8 @@ CREATE TABLE tts_model_upload_jobs (
       'tacotron2',
       'glowtts',
       'glowtts-vocodes',
-      'talknet'
+      'talknet',
+      'vits'
   ) NOT NULL DEFAULT 'not-set',
 
   -- Can be linked to a well-known voice

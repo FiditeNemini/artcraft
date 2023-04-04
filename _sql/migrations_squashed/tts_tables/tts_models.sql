@@ -19,7 +19,8 @@ CREATE TABLE tts_models (
       'tacotron2',
       'glowtts',
       'glowtts-vocodes',
-      'talknet'
+      'talknet',
+      'vits'
   ) NOT NULL DEFAULT 'not-set',
 
   -- The name of the type of pipeline to use, eg "legacy_fakeyou", "legacy_vocodes", "english_v1", etc.
