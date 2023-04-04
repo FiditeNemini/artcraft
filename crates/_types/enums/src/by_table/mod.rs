@@ -4,6 +4,7 @@ pub mod comments;
 pub mod media_uploads;
 pub mod model_categories;
 pub mod trending_model_analytics;
+pub mod tts_models;
 pub mod user_ratings;
 
 // ===== Sqlite =====

@@ -4,6 +4,8 @@ use container_common::filesystem::safe_delete_temp_directory::safe_delete_temp_d
 use container_common::filesystem::safe_delete_temp_file::safe_delete_temp_file;
 use crate::JobState;
 use crate::job_loop::job_results::JobResults;
+use crate::job_types::tts::vits::vits_model_check_command::{CheckArgs, Device};
+use enums::by_table::tts_models::tts_model_type::TtsModelType;
 use enums::common::visibility::Visibility;
 use errors::AnyhowResult;
 use hashing::sha256::sha256_hash_file::sha256_hash_file;
@@ -14,7 +16,7 @@ use mysql_queries::queries::tts::tts_models::insert_tts_model_from_download_job:
 use mysql_queries::queries::tts::tts_models::insert_tts_model_from_download_job;
 use std::fs::File;
 use std::io::Read;
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 use tempdir::TempDir;
 
 /// Returns the token of the entity.
@@ -32,39 +34,44 @@ pub async fn process_vits_model<'a, 'b>(
 
   redis_logger.log_status("checking VITS model")?;
 
-  let file_path = PathBuf::from(download_filename.clone());
+  let original_model_file_path = PathBuf::from(download_filename.clone());
+  let traced_model_file_path = original_model_file_path.join("_traced"); // NB: We'll be creating this.
+  let config_path = PathBuf::from("configs/ljs_li44_tmbert_nmp_s1_arpa.json"); // TODO: This could be variable.
 
-  let output_metadata_fs_path = temp_dir.path().join("metadata.json");
-
-  let model_check_result = job_state.sidecar_configs.vits_model_check_command.execute(
-    &file_path,
-    &output_metadata_fs_path,
-    false
-  );
+  let model_check_result = job_state.sidecar_configs.vits_model_check_command.execute_check(CheckArgs {
+    traced_model_output_path: &traced_model_file_path,
+    model_checkpoint_path: &original_model_file_path,
+    config_path: &config_path,
+    device: Device::Cuda,
+    test_string: "this is a test of model inference",
+  });
 
   if let Err(e) = model_check_result {
-    safe_delete_temp_file(&file_path);
+    safe_delete_temp_file(&original_model_file_path);
+    safe_delete_temp_file(&traced_model_file_path);
     safe_delete_temp_directory(&temp_dir);
     return Err(anyhow!("model check error: {:?}", e));
   }
 
   // ==================== CHECK ALL FILES EXIST AND GET METADATA ==================== //
 
-  info!("Checking that metadata output file exists...");
+  info!("Checking that output traced model file exists...");
 
-  check_file_exists(&output_metadata_fs_path)?;
+  check_file_exists(&traced_model_file_path)?;
 
-  let file_metadata = match read_metadata_file(&output_metadata_fs_path) {
-    Ok(metadata) => metadata,
-    Err(e) => {
-      safe_delete_temp_file(&file_path);
-      safe_delete_temp_file(&output_metadata_fs_path);
-      safe_delete_temp_directory(&temp_dir);
-      return Err(e);
-    }
-  };
+  // TODO: get model sizes
 
-  // ==================== UPLOAD MODEL FILE ==================== //
+  // let file_metadata = match read_metadata_file(&output_metadata_fs_path) {
+  //   Ok(metadata) => metadata,
+  //   Err(e) => {
+  //     safe_delete_temp_file(&file_path);
+  //     safe_delete_temp_file(&output_metadata_fs_path);
+  //     safe_delete_temp_directory(&temp_dir);
+  //     return Err(e);
+  //   }
+  // };
+
+  // ==================== UPLOAD ORIGINAL MODEL FILE ==================== //
 
   info!("Uploading VITS TTS model to GCS...");
 
@@ -78,9 +85,26 @@ pub async fn process_vits_model<'a, 'b>(
 
   redis_logger.log_status("uploading VITS TTS model")?;
 
-  if let Err(e) = job_state.bucket_client.upload_filename(&model_bucket_path, &file_path).await {
-    safe_delete_temp_file(&output_metadata_fs_path);
-    safe_delete_temp_file(&file_path);
+  if let Err(e) = job_state.bucket_client.upload_filename(&model_bucket_path, &original_model_file_path).await {
+    safe_delete_temp_file(&original_model_file_path);
+    safe_delete_temp_file(&traced_model_file_path);
+    safe_delete_temp_directory(&temp_dir);
+    return Err(e);
+  }
+
+  // ==================== UPLOAD TRACED MODEL FILE ==================== //
+
+  info!("Uploading VITS TTS (traced) model to GCS...");
+
+  let traced_model_bucket_path = job_state.bucket_path_unifier.tts_traced_synthesizer_path(&private_bucket_hash);
+
+  info!("Destination bucket path: {:?}", &traced_model_bucket_path);
+
+  redis_logger.log_status("uploading VITS TTS (traced) model")?;
+
+  if let Err(e) = job_state.bucket_client.upload_filename(&traced_model_bucket_path, &traced_model_bucket_path).await {
+    safe_delete_temp_file(&original_model_file_path);
+    safe_delete_temp_file(&traced_model_file_path);
     safe_delete_temp_directory(&temp_dir);
     return Err(e);
   }
@@ -88,24 +112,25 @@ pub async fn process_vits_model<'a, 'b>(
   // ==================== DELETE DOWNLOADED FILE ==================== //
 
   // NB: We should be using a tempdir, but to make absolutely certain we don't overflow the disk...
-  safe_delete_temp_file(&output_metadata_fs_path);
-  safe_delete_temp_file(&file_path);
+  safe_delete_temp_file(&original_model_file_path);
+  safe_delete_temp_file(&traced_model_file_path);
   safe_delete_temp_directory(&temp_dir);
 
   // ==================== SAVE RECORDS ==================== //
 
   info!("Saving TTS model record...");
 
-  let (_id, model_token) = insert_tts_model_from_download_job(insert_tts_model_from_download_job::Args {
+  let (_id, model_token) = insert_tts_model_from_download_job(insert_tts_model_from_download_job::InsertTtsModelFromDownloadJobArgs {
+    tts_model_type: TtsModelType::VITS,
     title: &job.title,
     original_download_url: &job.download_url,
     original_filename: &download_filename,
-    file_size_bytes: file_metadata.file_size_bytes,
+    file_size_bytes: 0, // TODO: Get file sizes!
     creator_user_token: &job.creator_user_token,
     creator_ip_address: &job.creator_ip_address,
     creator_set_visibility: Visibility::Public, // TODO: All models default to public at start
     private_bucket_hash: &private_bucket_hash,
-    private_bucket_object_name: &model_bucket_path,
+    private_bucket_object_name: "", // TODO: This should go away.
     mysql_pool: &job_state.mysql_pool,
   }).await?;
 
@@ -118,19 +143,6 @@ pub async fn process_vits_model<'a, 'b>(
 
   Ok(JobResults {
     entity_token: Some(model_token),
-    entity_type: Some("vits".to_string()), // NB: This may be different from `GenericDownloadType` in the future!
+    entity_type: Some(TtsModelType::VITS.to_string()), // NB: This may be different from `GenericDownloadType` in the future!
   })
 }
-
-#[derive(Deserialize)]
-struct FileMetadata {
-  pub file_size_bytes: u64,
-}
-
-fn read_metadata_file(filename: &PathBuf) -> AnyhowResult<FileMetadata> {
-  let mut file = File::open(filename)?;
-  let mut buffer = String::new();
-  file.read_to_string(&mut buffer)?;
-  Ok(serde_json::from_str(&buffer)?)
-}
-

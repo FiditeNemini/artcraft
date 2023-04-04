@@ -4,6 +4,7 @@ use container_common::filesystem::safe_delete_temp_directory::safe_delete_temp_d
 use container_common::filesystem::safe_delete_temp_file::safe_delete_temp_file;
 use crate::JobState;
 use crate::job_loop::job_results::JobResults;
+use enums::by_table::tts_models::tts_model_type::TtsModelType;
 use enums::common::visibility::Visibility;
 use errors::AnyhowResult;
 use hashing::sha256::sha256_hash_file::sha256_hash_file;
@@ -96,7 +97,8 @@ pub async fn process_tacotron_model<'a, 'b>(
 
   info!("Saving TTS model record...");
 
-  let (_id, model_token) = insert_tts_model_from_download_job(insert_tts_model_from_download_job::Args {
+  let (_id, model_token) = insert_tts_model_from_download_job(insert_tts_model_from_download_job::InsertTtsModelFromDownloadJobArgs {
+    tts_model_type: TtsModelType::Tacotron2,
     title: &job.title,
     original_download_url: &job.download_url,
     original_filename: &download_filename,
@@ -118,7 +120,7 @@ pub async fn process_tacotron_model<'a, 'b>(
 
   Ok(JobResults {
     entity_token: Some(model_token),
-    entity_type: Some("tacotron2".to_string()), // NB: This may be different from `GenericDownloadType` in the future!
+    entity_type: Some(TtsModelType::Tacotron2.to_string()), // NB: This may be different from `GenericDownloadType` in the future!
   })
 }
 

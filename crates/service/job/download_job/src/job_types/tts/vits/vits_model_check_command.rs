@@ -1,51 +1,75 @@
+use container_common::anyhow_result::AnyhowResult;
 use log::info;
 use std::fs::OpenOptions;
-use std::path::Path;
+use std::path::{Path, PathBuf};
 use subprocess::{Popen, PopenConfig, Redirection};
-use container_common::anyhow_result::AnyhowResult;
 use subprocess_common::docker_options::DockerOptions;
 
 /// This command is used to check tacotron for being a real model
 #[derive(Clone)]
 pub struct VitsModelCheckCommand {
-  /// Where the Tacotron code lives
-  tacotron_root_code_directory: String,
-  
+  /// Where the VITS code lives
+  vits_root_code_directory: PathBuf,
+
+  /// The name of the check/process script, eg. `export_ts.py`
+  check_script_name: PathBuf,
+
   /// eg. `source python/bin/activate`
   maybe_virtual_env_activation_command: Option<String>,
-  
-  tacotron_model_check_script_name: String,
+
+  /// eg. `python3`
+  maybe_override_python_interpreter: Option<String>,
 
   /// If this is run under Docker (eg. in development), these are the options.
   maybe_docker_options: Option<DockerOptions>,
 }
 
+pub enum Device {
+  Cuda,
+  Cpu,
+}
+
+pub struct CheckArgs<'a, P: AsRef<Path>> {
+  /// --out-path: output path of the traced model
+  pub traced_model_output_path: P,
+
+  /// --checkpoint: input path of the model checkpoint
+  pub model_checkpoint_path: P,
+
+  /// --config: path of the hparams json file
+  pub config_path: P,
+
+  /// --device: cpu or cuda
+  pub device: Device,
+
+  /// --test-string: string to infer when tracing (I think)
+  pub test_string: &'a str,
+}
+
 impl VitsModelCheckCommand {
-  pub fn new(
-    tacotron_root_code_directory: &str,
+  pub fn new<P: AsRef<Path>>(
+    vits_root_code_directory: P,
+    check_script_name: P,
+    maybe_override_python_interpreter: Option<&str>,
     maybe_virtual_env_activation_command: Option<&str>,
-    tacotron_model_check_script_name: &str,
     maybe_docker_options: Option<DockerOptions>,
   ) -> Self {
     Self {
-      tacotron_root_code_directory: tacotron_root_code_directory.to_string(),
+      vits_root_code_directory: vits_root_code_directory.as_ref().to_path_buf(),
+      check_script_name: check_script_name.as_ref().to_path_buf(),
       maybe_virtual_env_activation_command: maybe_virtual_env_activation_command.map(|s| s.to_string()),
-      tacotron_model_check_script_name: tacotron_model_check_script_name.to_string(),
+      maybe_override_python_interpreter: maybe_override_python_interpreter.map(|s| s.to_string()),
       maybe_docker_options,
     }
   }
 
-  pub fn execute<P: AsRef<Path>>(
+  pub fn execute_check<P: AsRef<Path>>(
     &self,
-    synthesizer_checkpoint_path: P,
-    output_metadata_filename: P,
-    spawn_process: bool
+    args: CheckArgs<'_, P>,
   ) -> AnyhowResult<()> {
-    let mut command = String::new();
 
-    command.push_str("echo 'test'");
-    command.push_str(" && ");
-    command.push_str(&format!("cd {}", self.tacotron_root_code_directory));
+    let mut command = String::new();
+    command.push_str(&format!("cd {}", path_to_str(&self.vits_root_code_directory)));
 
     if let Some(venv_command) = self.maybe_virtual_env_activation_command.as_deref() {
       command.push_str(" && ");
@@ -53,13 +77,38 @@ impl VitsModelCheckCommand {
       command.push_str(" ");
     }
 
+    let python_binary = self.maybe_override_python_interpreter
+        .as_deref()
+        .unwrap_or("python");
+
     command.push_str(" && ");
-    command.push_str("python ");
-    command.push_str(&self.tacotron_model_check_script_name);
-    command.push_str(" --synthesizer_checkpoint_path ");
-    command.push_str(&synthesizer_checkpoint_path.as_ref().display().to_string());
-    command.push_str(" --output_metadata_filename ");
-    command.push_str(&output_metadata_filename.as_ref().display().to_string());
+    command.push_str(python_binary);
+    command.push_str(" ");
+    command.push_str(&path_to_str(&self.check_script_name));
+
+    // ===== Begin Python Args =====
+
+    command.push_str(" --out-path ");
+    command.push_str(&path_to_str(args.traced_model_output_path));
+
+    command.push_str(" --checkpoint ");
+    command.push_str(&path_to_str(args.model_checkpoint_path));
+
+    command.push_str(" --config ");
+    command.push_str(&path_to_str(args.config_path));
+
+    let device = match args.device {
+      Device::Cuda => "cuda",
+      Device::Cpu => "cpu",
+    };
+
+    command.push_str(" --device ");
+    command.push_str(&path_to_str(device));
+
+    command.push_str(" --test-string ");
+    command.push_str(&path_to_str(args.test_string));
+
+    // ===== End Python Args =====
 
     if let Some(docker_options) = self.maybe_docker_options.as_ref() {
       command = docker_options.to_command_string(&command);
@@ -73,61 +122,20 @@ impl VitsModelCheckCommand {
       &command
     ];
 
-    if spawn_process {
-      // NB: This forks and returns immediately.
-      //let _child_pid = command_builder.spawn()?;
+    let mut p = Popen::create(&command_parts, PopenConfig {
+      ..Default::default()
+    })?;
 
-      let stdout_file = OpenOptions::new()
-          .read(true)
-          .write(true)
-          .create(true)
-          .truncate(true)
-          .open("/tmp/tacotron_upload_stdout.txt")?;
+    info!("Subprocess PID: {:?}", p.pid());
 
-      let stderr_file = OpenOptions::new()
-          .read(true)
-          .write(true)
-          .create(true)
-          .truncate(true)
-          .open("/tmp/tacotron_upload_stderr.txt")?;
+    let exit_status = p.wait()?;
 
-      let mut p = Popen::create(&command_parts, PopenConfig {
-        //stdout: Redirection::Pipe,
-        //stderr: Redirection::Pipe,
-        stdout: Redirection::File(stdout_file),
-        stderr: Redirection::File(stderr_file),
-        ..Default::default()
-      })?;
-
-      info!("Pid : {:?}", p.pid());
-
-      p.detach();
-
-    } else {
-      // NB: This is a blocking call.
-      /*let output = command_builder.output()?;
-
-      info!("Output status: {}", output.status);
-      info!("Stdout: {:?}", String::from_utf8(output.stdout));
-      error!("Stderr: {:?}", String::from_utf8(output.stderr));
-
-      if !output.status.success() {
-        bail!("Bad error code: {:?}", output.status);
-      }*/
-
-      let mut p = Popen::create(&command_parts, PopenConfig {
-        //stdout: Redirection::Pipe,
-        //stderr: Redirection::Pipe,
-        ..Default::default()
-      })?;
-
-      info!("Pid : {:?}", p.pid());
-
-      let exit_status = p.wait()?;
-
-      info!("Exit status: {:?}", exit_status);
-    }
+    info!("Subprocess exit status: {:?}", exit_status);
 
     Ok(())
   }
+}
+
+fn path_to_str<P: AsRef<Path>>(path: P) -> String {
+  path.as_ref().display().to_string()
 }

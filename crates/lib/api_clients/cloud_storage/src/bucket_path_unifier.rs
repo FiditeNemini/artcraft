@@ -44,6 +44,7 @@ impl BucketPathUnifier {
   // ==================== TTS MODELS (SYNTHESIZER + VOCODER) ==================== //
 
   // NB: Callers use "hash_file_sha2" as the file hash.
+  // NB: This is used for TT2 *and* VITS
   pub fn tts_synthesizer_path(&self, tts_synthesizer_file_hash: &str) -> PathBuf {
     let hashed_path = Self::hashed_directory_path(tts_synthesizer_file_hash);
     let model_filename = format!("{}.pt", &tts_synthesizer_file_hash);
@@ -53,6 +54,18 @@ impl BucketPathUnifier {
       .join(model_filename)
   }
 
+  // NB: Callers use "hash_file_sha2" as the file hash.
+  // NB: This is used for VITS traced models, the original model is uploaded with `tts_synthesizer_path()`
+  pub fn tts_traced_synthesizer_path(&self, tts_synthesizer_file_hash: &str) -> PathBuf {
+    let hashed_path = Self::hashed_directory_path(tts_synthesizer_file_hash);
+    let model_filename = format!("{}_traced.pt", &tts_synthesizer_file_hash);
+
+    self.tts_synthesizer_model_root
+        .join(hashed_path)
+        .join(model_filename)
+  }
+
+  // TODO(bt, 2023-04-03): I don't think we ever wound up using this?
   pub fn tts_zipped_synthesizer_path(&self, tts_synthesizer_file_hash: &str) -> PathBuf {
     let hashed_path = Self::hashed_directory_path(tts_synthesizer_file_hash);
     let model_filename = format!("{}.zip", &tts_synthesizer_file_hash);

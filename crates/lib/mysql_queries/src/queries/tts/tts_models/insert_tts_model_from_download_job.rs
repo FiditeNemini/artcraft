@@ -1,13 +1,16 @@
 use anyhow::anyhow;
 use chrono::Utc;
-use errors::AnyhowResult;
 use crate::queries::generic_download::job::list_available_generic_download_jobs::AvailableDownloadJob;
 use crate::tokens::Tokens;
+use enums::by_table::tts_models::tts_model_type::TtsModelType;
 use enums::common::visibility::Visibility;
+use errors::AnyhowResult;
 use sqlx::MySqlPool;
 use std::path::Path;
 
-pub struct Args<'a, P: AsRef<Path>> {
+pub struct InsertTtsModelFromDownloadJobArgs<'a, P: AsRef<Path>> {
+  pub tts_model_type: TtsModelType,
+
   pub title: &'a str,
 
   pub original_download_url: &'a str,
@@ -26,7 +29,7 @@ pub struct Args<'a, P: AsRef<Path>> {
 
 
 pub async fn insert_tts_model_from_download_job<P: AsRef<Path>>(
-  args: Args<'_, P>,
+  args: InsertTtsModelFromDownloadJobArgs<'_, P>,
 ) -> AnyhowResult<(u64, String)> {
 
   let model_token = Tokens::new_tts_model()?;
@@ -41,7 +44,7 @@ pub async fn insert_tts_model_from_download_job<P: AsRef<Path>>(
 INSERT INTO tts_models
 SET
   token = ?,
-  tts_model_type = "tacotron2",
+  tts_model_type = ?,
   title = ?,
   description_markdown = '',
   description_rendered_html = '',
@@ -54,6 +57,7 @@ SET
   file_size_bytes = ?
         "#,
       &model_token,
+      args.tts_model_type,
       args.title,
       args.creator_user_token,
       args.creator_ip_address,
