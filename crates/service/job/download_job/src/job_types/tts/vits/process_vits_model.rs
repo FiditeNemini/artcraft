@@ -94,7 +94,7 @@ pub async fn process_vits_model<'a, 'b>(
     error!("Problem uploading original model: {:?}", err);
     error!(" - Model file: {:?}", &original_model_file_path);
     error!(" - Traced model file: {:?}", &traced_model_file_path);
-    error!(" - Temp directory: {:?}", &traced_model_file_path);
+    error!(" - Temp directory: {:?}", &temp_dir);
     std::thread::sleep(Duration::from_secs(60_000)); // TODO: Debugging only
     safe_delete_temp_file(&original_model_file_path);
     safe_delete_temp_file(&traced_model_file_path);
@@ -112,11 +112,11 @@ pub async fn process_vits_model<'a, 'b>(
 
   redis_logger.log_status("uploading VITS TTS (traced) model")?;
 
-  if let Err(err) = job_state.bucket_client.upload_filename(&traced_model_bucket_path, &traced_model_bucket_path).await {
+  if let Err(err) = job_state.bucket_client.upload_filename(&traced_model_bucket_path, &traced_model_file_path).await {
     error!("Problem uploading traced model: {:?}", err);
     error!(" - Model file: {:?}", &original_model_file_path);
     error!(" - Traced model file: {:?}", &traced_model_file_path);
-    error!(" - Temp directory: {:?}", &traced_model_file_path);
+    error!(" - Temp directory: {:?}", &temp_dir);
     std::thread::sleep(Duration::from_secs(60_000)); // TODO: Debugging only
     safe_delete_temp_file(&original_model_file_path);
     safe_delete_temp_file(&traced_model_file_path);
