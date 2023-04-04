@@ -10,7 +10,7 @@ use enums::common::visibility::Visibility;
 use errors::AnyhowResult;
 use hashing::sha256::sha256_hash_file::sha256_hash_file;
 use jobs_common::redis_job_status_logger::RedisJobStatusLogger;
-use log::{info, warn};
+use log::{error, info, warn};
 use mysql_queries::queries::generic_download::job::list_available_generic_download_jobs::AvailableDownloadJob;
 use mysql_queries::queries::tts::tts_models::insert_tts_model_from_download_job::insert_tts_model_from_download_job;
 use mysql_queries::queries::tts::tts_models::insert_tts_model_from_download_job;
@@ -89,11 +89,12 @@ pub async fn process_vits_model<'a, 'b>(
 
   redis_logger.log_status("uploading VITS TTS model")?;
 
-  if let Err(e) = job_state.bucket_client.upload_filename(&model_bucket_path, &original_model_file_path).await {
+  if let Err(err) = job_state.bucket_client.upload_filename(&model_bucket_path, &original_model_file_path).await {
+    error!("Problem uploading original model: {:?}", err);
     safe_delete_temp_file(&original_model_file_path);
     safe_delete_temp_file(&traced_model_file_path);
     safe_delete_temp_directory(&temp_dir);
-    return Err(e);
+    return Err(err);
   }
 
   // ==================== UPLOAD TRACED MODEL FILE ==================== //
@@ -106,16 +107,18 @@ pub async fn process_vits_model<'a, 'b>(
 
   redis_logger.log_status("uploading VITS TTS (traced) model")?;
 
-  if let Err(e) = job_state.bucket_client.upload_filename(&traced_model_bucket_path, &traced_model_bucket_path).await {
+  if let Err(err) = job_state.bucket_client.upload_filename(&traced_model_bucket_path, &traced_model_bucket_path).await {
+    error!("Problem uploading traced model: {:?}", err);
     safe_delete_temp_file(&original_model_file_path);
     safe_delete_temp_file(&traced_model_file_path);
     safe_delete_temp_directory(&temp_dir);
-    return Err(e);
+    return Err(err);
   }
 
   // ==================== DELETE DOWNLOADED FILE ==================== //
 
   // NB: We should be using a tempdir, but to make absolutely certain we don't overflow the disk...
+  info!("Done uploading; deleting temporary files and paths...");
   safe_delete_temp_file(&original_model_file_path);
   safe_delete_temp_file(&traced_model_file_path);
   safe_delete_temp_directory(&temp_dir);
