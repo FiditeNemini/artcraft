@@ -36,7 +36,7 @@ use crate::job_types::vocoder::hifigan_tacotron::hifigan_model_check_command::Hi
 use crate::job_types::voice_conversion::softvc::softvc_model_check_command::SoftVcModelCheckCommand;
 use errors::AnyhowResult;
 use google_drive_common::google_drive_download_command::GoogleDriveDownloadCommand;
-use log::info;
+use log::{info, warn};
 use mysql_queries::mediators::badge_granter::BadgeGranter;
 use mysql_queries::mediators::firehose_publisher::FirehosePublisher;
 use r2d2_redis::RedisConnectionManager;
@@ -60,8 +60,21 @@ const DEFAULT_TEMP_DIR: &'static str = "/tmp";
 async fn main() -> AnyhowResult<()> {
   easyenv::init_all_with_default_logging(Some(DEFAULT_RUST_LOG));
 
+  // TODO: Deprecate pulling secrets from these two files and use the app-named env+secrets files (below) instead.
   let _ = dotenv::from_filename(".env-download-job").ok(); // NB: Specific to `download-job` app.
   let _ = dotenv::from_filename(".env-secrets").ok(); // NB: Secrets not to live in source control.
+
+  let _ = envvar::read_from_filename_and_paths(
+    "download-job.env",
+    &[".", "crates/service/job/download_job"])?;
+
+  let _ = envvar::read_from_filename_and_paths(
+    "download-job-secrets.env",
+    &[".", "crates/service/job/download_job"]
+  ).map_err(|err| {
+    // NB: Fail open.
+    warn!("Could not load app-specific secrets from env file (this might be fine, eg. provided by k8s): {:?}", err);
+  });
 
   info!("Obtaining hostname...");
 
@@ -243,13 +256,33 @@ async fn main() -> AnyhowResult<()> {
   };
 
   let vits_model_check_command = {
+    let root_directory = easyenv::get_env_string_required(
+      "VITS_MODEL_CHECK_ROOT_DIRECTORY")?;
+
+    let check_script = easyenv::get_env_string_or_default(
+      "VITS_MODEL_CHECK_COMMAND",
+      "export_ts.py");
+
+    let maybe_venv_command = easyenv::get_env_string_optional(
+      "VITS_MODEL_CHECK_MAYBE_VENV_COMMAND");
+
+    let maybe_docker_options = easyenv::get_env_string_optional(
+      "VITS_MODEL_CHECK_MAYBE_DOCKER_IMAGE")
+        .map(|image_name| {
+          DockerOptions {
+            image_name,
+            maybe_bind_mount: Some(DockerFilesystemMount::tmp_to_tmp()),
+            maybe_gpu: Some(DockerGpu::All),
+          }
+        });
+
     // TODO TODO TODO
     VitsModelCheckCommand::new(
-       "",
-      "",
+       root_directory,
+      check_script,
       None,
-      None,
-      None,
+      maybe_venv_command.as_deref(),
+      maybe_docker_options,
     )
   };
 

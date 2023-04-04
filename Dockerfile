@@ -221,11 +221,11 @@ RUN ldd storyteller-web
 
 # Without a .env file, Rust crashes "mysteriously" (ugh)
 RUN touch .env
-RUN touch .env-download-job
 RUN touch .env-secrets
 
 # Some services have default env files that live under their code directories
 # These should also be readable from the relative current path
+COPY crates/service/job/download_job/download-job.env .
 COPY crates/service/job/inference_job/inference-job.env .
 COPY crates/service/web/storyteller_web/storyteller-web.env .
 

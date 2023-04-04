@@ -2312,6 +2312,7 @@ dependencies = [
  "dotenv",
  "easyenv",
  "enums",
+ "envvar",
  "errors",
  "google_drive_common",
  "hashing",
