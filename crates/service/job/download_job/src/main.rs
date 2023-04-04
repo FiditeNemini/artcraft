@@ -276,7 +276,6 @@ async fn main() -> AnyhowResult<()> {
           }
         });
 
-    // TODO TODO TODO
     VitsModelCheckCommand::new(
        root_directory,
       check_script,
