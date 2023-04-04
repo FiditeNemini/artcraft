@@ -106,7 +106,9 @@ impl VitsModelCheckCommand {
     command.push_str(&path_to_str(device));
 
     command.push_str(" --test-string ");
+    command.push_str("'");
     command.push_str(&path_to_str(args.test_string));
+    command.push_str("'");
 
     // ===== End Python Args =====
 

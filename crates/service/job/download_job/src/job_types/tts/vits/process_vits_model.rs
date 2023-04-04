@@ -35,7 +35,10 @@ pub async fn process_vits_model<'a, 'b>(
   redis_logger.log_status("checking VITS model")?;
 
   let original_model_file_path = PathBuf::from(download_filename.clone());
-  let traced_model_file_path = original_model_file_path.join("_traced"); // NB: We'll be creating this.
+
+  // NB: We'll be creating the traced model in the "check" step and uploading it to GDrive along with the original.
+  let traced_model_file_path = PathBuf::from(format!("{:?}_traced", original_model_file_path));
+
   let config_path = PathBuf::from("configs/ljs_li44_tmbert_nmp_s1_arpa.json"); // TODO: This could be variable.
 
   let model_check_result = job_state.sidecar_configs.vits_model_check_command.execute_check(CheckArgs {
