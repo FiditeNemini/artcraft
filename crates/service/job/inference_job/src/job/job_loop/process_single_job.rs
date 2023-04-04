@@ -1,14 +1,14 @@
 use anyhow::anyhow;
-use crate::job_dependencies::JobDependencies;
+use crate::job::job_loop::process_single_job_error::ProcessSingleJobError;
 use crate::job::job_types::tts::process_single_tts_job::process_single_tts_job;
 use crate::job::job_types::vc::process_single_vc_job::process_single_vc_job;
+use crate::job_dependencies::JobDependencies;
 use enums::workers::generic_inference_type::GenericInferenceType;
 use errors::AnyhowResult;
 use log::{info, warn};
 use mysql_queries::queries::generic_inference::job::list_available_generic_inference_jobs::AvailableInferenceJob;
 use mysql_queries::queries::generic_inference::job::mark_generic_inference_job_pending_and_grab_lock::mark_generic_inference_job_pending_and_grab_lock;
 use mysql_queries::queries::generic_inference::job::mark_generic_inference_job_successfully_done::mark_generic_inference_job_successfully_done;
-use crate::job::job_steps::process_single_job_error::ProcessSingleJobError;
 
 pub async fn process_single_job(job_dependencies: &JobDependencies, job: &AvailableInferenceJob) -> Result<(), ProcessSingleJobError> {
   // TODO(bt, 2023-01-11): Restore an optional status logger

@@ -1,5 +1,5 @@
 use cloud_storage::bucket_client::BucketClient;
-use crate::job::job_steps::process_single_job_error::ProcessSingleJobError;
+use crate::job::job_loop::process_single_job_error::ProcessSingleJobError;
 use crate::util::scoped_temp_dir_creator::ScopedTempDirCreator;
 use jobs_common::job_progress_reporter::job_progress_reporter::JobProgressReporter;
 use log::{info, warn};

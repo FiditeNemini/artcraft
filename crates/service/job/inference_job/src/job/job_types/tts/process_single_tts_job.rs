@@ -1,13 +1,13 @@
 use anyhow::anyhow;
+use crate::job::job_loop::process_single_job_error::ProcessSingleJobError;
+use crate::job::job_types::tts::tacotron2_v2_early_fakeyou::process_job::ProcessJobArgs;
+use crate::job::job_types::tts::tacotron2_v2_early_fakeyou;
 use crate::job_dependencies::JobDependencies;
 use errors::AnyhowResult;
 use mysql_queries::column_types::tts_model_type::TtsModelType;
 use mysql_queries::queries::generic_inference::job::list_available_generic_inference_jobs::AvailableInferenceJob;
 use mysql_queries::queries::tts::tts_models::get_tts_model_for_inference_improved::{get_tts_model_for_inference_improved, TtsModelForInferenceRecord};
 use tokens::tokens::tts_models::TtsModelToken;
-use crate::job::job_steps::process_single_job_error::ProcessSingleJobError;
-use crate::job::job_types::tts::tacotron2_v2_early_fakeyou;
-use crate::job::job_types::tts::tacotron2_v2_early_fakeyou::process_job::ProcessJobArgs;
 
 pub async fn process_single_tts_job(job_dependencies: &JobDependencies, job: &AvailableInferenceJob) -> Result<(), ProcessSingleJobError> {
 
