@@ -1,23 +1,24 @@
 use anyhow::anyhow;
-use container_common::anyhow_result::AnyhowResult;
 use container_common::filesystem::check_file_exists::check_file_exists;
 use container_common::filesystem::safe_delete_temp_directory::safe_delete_temp_directory;
 use container_common::filesystem::safe_delete_temp_file::safe_delete_temp_file;
 use crate::JobState;
-use crate::job_steps::job_results::JobResults;
-use mysql_queries::queries::generic_download::job::list_available_generic_download_jobs::AvailableDownloadJob;
-use mysql_queries::queries::vocoder::insert_vocoder_model::{Args, insert_vocoder_model};
-use enums::common::vocoder_type::VocoderType;
+use crate::job_loop::job_results::JobResults;
+use enums::common::visibility::Visibility;
+use errors::AnyhowResult;
 use hashing::sha256::sha256_hash_file::sha256_hash_file;
 use jobs_common::redis_job_status_logger::RedisJobStatusLogger;
 use log::{info, warn};
+use mysql_queries::queries::generic_download::job::list_available_generic_download_jobs::AvailableDownloadJob;
+use mysql_queries::queries::tts::tts_models::insert_tts_model_from_download_job::insert_tts_model_from_download_job;
+use mysql_queries::queries::tts::tts_models::insert_tts_model_from_download_job;
 use std::fs::File;
 use std::io::Read;
 use std::path::PathBuf;
 use tempdir::TempDir;
 
 /// Returns the token of the entity.
-pub async fn process_hifigan_softvc_vocoder<'a, 'b>(
+pub async fn process_vits_model<'a, 'b>(
   job_state: &JobState,
   job: &AvailableDownloadJob,
   temp_dir: &TempDir,
@@ -29,15 +30,16 @@ pub async fn process_hifigan_softvc_vocoder<'a, 'b>(
 
   info!("Checking that model is valid...");
 
-  redis_logger.log_status("checking hifigan (softvc) model")?;
+  redis_logger.log_status("checking VITS model")?;
 
   let file_path = PathBuf::from(download_filename.clone());
 
   let output_metadata_fs_path = temp_dir.path().join("metadata.json");
 
-  let model_check_result = job_state.sidecar_configs.hifigan_softvc_model_check_command.execute(
+  let model_check_result = job_state.sidecar_configs.vits_model_check_command.execute(
     &file_path,
-    &output_metadata_fs_path
+    &output_metadata_fs_path,
+    false
   );
 
   if let Err(e) = model_check_result {
@@ -64,17 +66,17 @@ pub async fn process_hifigan_softvc_vocoder<'a, 'b>(
 
   // ==================== UPLOAD MODEL FILE ==================== //
 
-  info!("Uploading HifiGan (softvc) vocoder to GCS...");
+  info!("Uploading VITS TTS model to GCS...");
 
   let private_bucket_hash = sha256_hash_file(&download_filename)?;
 
   info!("File hash: {}", private_bucket_hash);
 
-  let model_bucket_path = job_state.bucket_path_unifier.vocoder_path(&private_bucket_hash);
+  let model_bucket_path = job_state.bucket_path_unifier.tts_synthesizer_path(&private_bucket_hash);
 
   info!("Destination bucket path: {:?}", &model_bucket_path);
 
-  redis_logger.log_status("uploading hifigan model")?;
+  redis_logger.log_status("uploading VITS TTS model")?;
 
   if let Err(e) = job_state.bucket_client.upload_filename(&model_bucket_path, &file_path).await {
     safe_delete_temp_file(&output_metadata_fs_path);
@@ -92,22 +94,22 @@ pub async fn process_hifigan_softvc_vocoder<'a, 'b>(
 
   // ==================== SAVE RECORDS ==================== //
 
-  info!("Saving model record...");
-  let (_id, model_token) = insert_vocoder_model(Args {
-    vocoder_type: VocoderType::HifiGanRocketVc, // NB: "rocket_vc" is an internal codename for softvc.
+  info!("Saving TTS model record...");
+
+  let (_id, model_token) = insert_tts_model_from_download_job(insert_tts_model_from_download_job::Args {
     title: &job.title,
     original_download_url: &job.download_url,
     original_filename: &download_filename,
     file_size_bytes: file_metadata.file_size_bytes,
     creator_user_token: &job.creator_user_token,
     creator_ip_address: &job.creator_ip_address,
-    creator_set_visibility: job.creator_set_visibility,
+    creator_set_visibility: Visibility::Public, // TODO: All models default to public at start
     private_bucket_hash: &private_bucket_hash,
     private_bucket_object_name: &model_bucket_path,
-    mysql_pool: &job_state.mysql_pool
+    mysql_pool: &job_state.mysql_pool,
   }).await?;
 
-  job_state.badge_granter.maybe_grant_softvc_vocoder_model_uploads_badge(&job.creator_user_token)
+  job_state.badge_granter.maybe_grant_tts_model_uploads_badge(&job.creator_user_token)
       .await
       .map_err(|e| {
         warn!("error maybe awarding badge: {:?}", e);
@@ -116,7 +118,7 @@ pub async fn process_hifigan_softvc_vocoder<'a, 'b>(
 
   Ok(JobResults {
     entity_token: Some(model_token),
-    entity_type: Some("hifigan_rocket_vc".to_string()), // NB: This may be different from `GenericDownloadType` in the future!
+    entity_type: Some("vits".to_string()), // NB: This may be different from `GenericDownloadType` in the future!
   })
 }
 

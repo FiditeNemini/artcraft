@@ -3,16 +3,12 @@ use config::is_bad_download_url::is_bad_download_url;
 use container_common::anyhow_result::AnyhowResult;
 use container_common::filesystem::safe_delete_temp_directory::safe_delete_temp_directory;
 use crate::JobState;
-use crate::job_types::hifigan::process_hifigan_vocoder::process_hifigan_vocoder;
-use crate::job_types::hifigan_softvc::process_hifigan_softvc_vocoder::process_hifigan_softvc_vocoder;
-use crate::job_types::softvc::process_softvc_model::process_softvc_model;
-use crate::job_types::tacotron::process_tacotron_model::process_tacotron_model;
+use crate::job_types::dispatch_job_to_handler::{dispatch_job_to_handler, DispatchJobToHandlerArgs};
+use jobs_common::redis_job_status_logger::RedisJobStatusLogger;
+use log::{info, warn};
 use mysql_queries::queries::generic_download::job::list_available_generic_download_jobs::AvailableDownloadJob;
 use mysql_queries::queries::generic_download::job::mark_generic_download_job_done::mark_generic_download_job_done;
 use mysql_queries::queries::generic_download::job::mark_generic_download_job_pending_and_grab_lock::mark_generic_download_job_pending_and_grab_lock;
-use enums::workers::generic_download_type::GenericDownloadType;
-use jobs_common::redis_job_status_logger::RedisJobStatusLogger;
-use log::{info, warn};
 use tempdir::TempDir;
 
 pub async fn process_single_job(job_state: &JobState, job: &AvailableDownloadJob) -> AnyhowResult<()> {
@@ -58,54 +54,21 @@ pub async fn process_single_job(job_state: &JobState, job: &AvailableDownloadJob
 
   // ==================== HANDLE DIFFERENT DOWNLOAD TYPES ==================== //
 
-  let mut entity_token : Option<String> = None;
-  let mut entity_type : Option<String> = None;
+  let result_details = dispatch_job_to_handler(DispatchJobToHandlerArgs {
+    job_runner_state: job_state,
+    job,
+    temp_dir: &temp_dir,
+    download_filename: &download_filename,
+    redis_logger: &mut redis_logger,
+  }).await?;
 
-  match job.download_type {
-    GenericDownloadType::HifiGan => {
-      let results = process_hifigan_vocoder(
-        job_state,
-        job,
-        &temp_dir,
-        &download_filename,
-        &mut redis_logger,
-      ).await?;
-      entity_token = results.entity_token.clone();
-      entity_type = results.entity_type.clone();
-    }
-    GenericDownloadType::HifiGanRocketVc => {
-      let results = process_hifigan_softvc_vocoder(
-        job_state,
-        job,
-        &temp_dir,
-        &download_filename,
-        &mut redis_logger,
-      ).await?;
-      entity_token = results.entity_token.clone();
-      entity_type = results.entity_type.clone();
-    }
-    GenericDownloadType::RocketVc => {
-      let results = process_softvc_model(
-        job_state,
-        job,
-        &temp_dir,
-        &download_filename,
-        &mut redis_logger,
-      ).await?;
-      entity_token = results.entity_token.clone();
-      entity_type = results.entity_type.clone();
-    }
-    GenericDownloadType::Tacotron2 => {
-      let results = process_tacotron_model(
-        job_state,
-        job,
-        &temp_dir,
-        &download_filename,
-        &mut redis_logger,
-      ).await?;
-      entity_token = results.entity_token.clone();
-      entity_type = results.entity_type.clone();
-    }
+  let mut entity_token: Option<String> = None;
+  let mut entity_type: Option<String> = None;
+
+  if let Some(result_details) = result_details {
+    // TODO: Cleanup
+    entity_token = Some(result_details.entity_token.clone());
+    entity_type = Some(result_details.entity_token.clone());
   }
 
   // =====================================================

@@ -1,13 +1,13 @@
-use container_common::anyhow_result::AnyhowResult;
 use log::info;
 use std::fs::OpenOptions;
 use std::path::Path;
 use subprocess::{Popen, PopenConfig, Redirection};
+use container_common::anyhow_result::AnyhowResult;
 use subprocess_common::docker_options::DockerOptions;
 
 /// This command is used to check tacotron for being a real model
 #[derive(Clone)]
-pub struct TacotronModelCheckCommand {
+pub struct VitsModelCheckCommand {
   /// Where the Tacotron code lives
   tacotron_root_code_directory: String,
   
@@ -20,7 +20,7 @@ pub struct TacotronModelCheckCommand {
   maybe_docker_options: Option<DockerOptions>,
 }
 
-impl TacotronModelCheckCommand {
+impl VitsModelCheckCommand {
   pub fn new(
     tacotron_root_code_directory: &str,
     maybe_virtual_env_activation_command: Option<&str>,

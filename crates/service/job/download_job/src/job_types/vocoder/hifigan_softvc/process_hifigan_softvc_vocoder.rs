@@ -1,23 +1,23 @@
 use anyhow::anyhow;
-use container_common::anyhow_result::AnyhowResult;
 use container_common::filesystem::check_file_exists::check_file_exists;
 use container_common::filesystem::safe_delete_temp_directory::safe_delete_temp_directory;
 use container_common::filesystem::safe_delete_temp_file::safe_delete_temp_file;
 use crate::JobState;
-use crate::job_steps::job_results::JobResults;
-use mysql_queries::queries::generic_download::job::list_available_generic_download_jobs::AvailableDownloadJob;
-use mysql_queries::queries::vocoder::insert_vocoder_model::{Args, insert_vocoder_model};
+use crate::job_loop::job_results::JobResults;
 use enums::common::vocoder_type::VocoderType;
+use errors::AnyhowResult;
 use hashing::sha256::sha256_hash_file::sha256_hash_file;
 use jobs_common::redis_job_status_logger::RedisJobStatusLogger;
 use log::{info, warn};
+use mysql_queries::queries::generic_download::job::list_available_generic_download_jobs::AvailableDownloadJob;
+use mysql_queries::queries::vocoder::insert_vocoder_model::{Args, insert_vocoder_model};
 use std::fs::File;
 use std::io::Read;
 use std::path::PathBuf;
 use tempdir::TempDir;
 
 /// Returns the token of the entity.
-pub async fn process_hifigan_vocoder<'a, 'b>(
+pub async fn process_hifigan_softvc_vocoder<'a, 'b>(
   job_state: &JobState,
   job: &AvailableDownloadJob,
   temp_dir: &TempDir,
@@ -29,13 +29,13 @@ pub async fn process_hifigan_vocoder<'a, 'b>(
 
   info!("Checking that model is valid...");
 
-  redis_logger.log_status("checking hifigan model")?;
+  redis_logger.log_status("checking hifigan (softvc) model")?;
 
   let file_path = PathBuf::from(download_filename.clone());
 
   let output_metadata_fs_path = temp_dir.path().join("metadata.json");
 
-  let model_check_result = job_state.sidecar_configs.hifigan_model_check_command.execute(
+  let model_check_result = job_state.sidecar_configs.hifigan_softvc_model_check_command.execute(
     &file_path,
     &output_metadata_fs_path
   );
@@ -64,7 +64,7 @@ pub async fn process_hifigan_vocoder<'a, 'b>(
 
   // ==================== UPLOAD MODEL FILE ==================== //
 
-  info!("Uploading HifiGan vocoder to GCS...");
+  info!("Uploading HifiGan (softvc) vocoder to GCS...");
 
   let private_bucket_hash = sha256_hash_file(&download_filename)?;
 
@@ -94,7 +94,7 @@ pub async fn process_hifigan_vocoder<'a, 'b>(
 
   info!("Saving model record...");
   let (_id, model_token) = insert_vocoder_model(Args {
-    vocoder_type: VocoderType::HifiGan,
+    vocoder_type: VocoderType::HifiGanRocketVc, // NB: "rocket_vc" is an internal codename for softvc.
     title: &job.title,
     original_download_url: &job.download_url,
     original_filename: &download_filename,
@@ -107,7 +107,7 @@ pub async fn process_hifigan_vocoder<'a, 'b>(
     mysql_pool: &job_state.mysql_pool
   }).await?;
 
-  job_state.badge_granter.maybe_grant_vocoder_model_uploads_badge(&job.creator_user_token)
+  job_state.badge_granter.maybe_grant_softvc_vocoder_model_uploads_badge(&job.creator_user_token)
       .await
       .map_err(|e| {
         warn!("error maybe awarding badge: {:?}", e);
@@ -116,7 +116,7 @@ pub async fn process_hifigan_vocoder<'a, 'b>(
 
   Ok(JobResults {
     entity_token: Some(model_token),
-    entity_type: Some("hifigan".to_string()), // NB: This may be different from `GenericDownloadType` in the future!
+    entity_type: Some("hifigan_rocket_vc".to_string()), // NB: This may be different from `GenericDownloadType` in the future!
   })
 }
 

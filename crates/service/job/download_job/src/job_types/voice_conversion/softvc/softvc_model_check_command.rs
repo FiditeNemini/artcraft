@@ -1,47 +1,49 @@
-use crate::AnyhowResult;
+use errors::AnyhowResult;
 use log::info;
 use std::path::Path;
 use subprocess::{Popen, PopenConfig};
 use subprocess_common::docker_options::DockerOptions;
 
-/// This command is used to check hifigan for being a real model
+/// This command is used to check softvc for being a real model
 #[derive(Clone)]
-pub struct HifiGanModelCheckCommand {
-  /// Where the HifiGan code lives
-  hifigan_root_code_directory: String,
+pub struct SoftVcModelCheckCommand {
+  /// Where the Tacotron code lives
+  softvc_root_code_directory: String,
   
   /// eg. `source python/bin/activate`
   maybe_virtual_env_activation_command: Option<String>,
   
-  hifigan_model_check_script_name: String,
+  softvc_model_check_script_name: String,
 
   /// If this is run under Docker (eg. in development), these are the options.
   maybe_docker_options: Option<DockerOptions>,
 }
 
-impl HifiGanModelCheckCommand {
+impl SoftVcModelCheckCommand {
   pub fn new(
-    hifigan_root_code_directory: &str,
+    softvc_root_code_directory: &str,
     maybe_virtual_env_activation_command: Option<&str>,
-    hifigan_model_check_script_name: &str,
+    softvc_model_check_script_name: &str,
     maybe_docker_options: Option<DockerOptions>,
   ) -> Self {
     Self {
-      hifigan_root_code_directory: hifigan_root_code_directory.to_string(),
+      softvc_root_code_directory: softvc_root_code_directory.to_string(),
       maybe_virtual_env_activation_command: maybe_virtual_env_activation_command.map(|s| s.to_string()),
-      hifigan_model_check_script_name: hifigan_model_check_script_name.to_string(),
+      softvc_model_check_script_name: softvc_model_check_script_name.to_string(),
       maybe_docker_options,
     }
   }
 
   pub fn execute<P: AsRef<Path>>(
     &self,
-    checkpoint_path: P,
+    synthesizer_checkpoint_path: P,
     output_metadata_filename: P,
   ) -> AnyhowResult<()> {
-
     let mut command = String::new();
-    command.push_str(&format!("cd {}", self.hifigan_root_code_directory));
+
+    command.push_str("echo 'test'");
+    command.push_str(" && ");
+    command.push_str(&format!("cd {}", self.softvc_root_code_directory));
 
     if let Some(venv_command) = self.maybe_virtual_env_activation_command.as_deref() {
       command.push_str(" && ");
@@ -51,9 +53,9 @@ impl HifiGanModelCheckCommand {
 
     command.push_str(" && ");
     command.push_str("python ");
-    command.push_str(&self.hifigan_model_check_script_name);
-    command.push_str(" --checkpoint_path ");
-    command.push_str(&checkpoint_path.as_ref().display().to_string());
+    command.push_str(&self.softvc_model_check_script_name);
+    command.push_str(" --synthesizer_checkpoint_path ");
+    command.push_str(&synthesizer_checkpoint_path.as_ref().display().to_string());
     command.push_str(" --output_metadata_filename ");
     command.push_str(&output_metadata_filename.as_ref().display().to_string());
 

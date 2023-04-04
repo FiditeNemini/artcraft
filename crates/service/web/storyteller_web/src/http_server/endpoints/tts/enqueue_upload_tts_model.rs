@@ -10,14 +10,14 @@ use config::bad_urls::is_bad_tts_model_download_url;
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::server_state::ServerState;
 use crate::validations::model_uploads::validate_model_title;
-use mysql_queries::queries::tts::tts_model_upload_jobs::insert_tts_model_upload_job::{insert_tts_model_upload_job, InsertTtsModelUploadJobArgs};
 use enums::common::visibility::Visibility;
+use enums::workers::generic_download_type::GenericDownloadType;
 use http_server_common::request::get_request_ip::get_request_ip;
 use log::warn;
+use mysql_queries::queries::generic_download::web::insert_generic_download_job::{insert_generic_download_job, InsertGenericDownloadJobArgs};
+use mysql_queries::queries::tts::tts_model_upload_jobs::insert_tts_model_upload_job::{insert_tts_model_upload_job, InsertTtsModelUploadJobArgs};
 use std::fmt;
 use std::sync::Arc;
-use enums::workers::generic_download_type::GenericDownloadType;
-use mysql_queries::queries::generic_download::web::insert_generic_download_job::{insert_generic_download_job, InsertGenericDownloadJobArgs};
 
 #[derive(Deserialize, Copy, Clone)]
 pub enum SupportedTtsModelType {

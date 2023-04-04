@@ -17,8 +17,8 @@
 
 #[macro_use] extern crate serde_derive;
 
+pub mod job_loop;
 pub mod job_state;
-pub mod job_steps;
 pub mod job_types;
 
 use cloud_storage::bucket_client::BucketClient;
@@ -26,18 +26,19 @@ use cloud_storage::bucket_path_unifier::BucketPathUnifier;
 use config::common_env::CommonEnv;
 use config::shared_constants::DEFAULT_MYSQL_CONNECTION_STRING;
 use config::shared_constants::DEFAULT_RUST_LOG;
-use container_common::anyhow_result::AnyhowResult;
 use container_common::filesystem::check_directory_exists::check_directory_exists;
+use crate::job_loop::main_loop::main_loop;
 use crate::job_state::{JobState, SidecarConfigs};
-use crate::job_steps::main_loop::main_loop;
-use crate::job_types::hifigan::hifigan_model_check_command::HifiGanModelCheckCommand;
-use crate::job_types::hifigan_softvc::hifigan_softvc_model_check_command::HifiGanSoftVcModelCheckCommand;
-use crate::job_types::softvc::softvc_model_check_command::SoftVcModelCheckCommand;
-use crate::job_types::tacotron::tacotron_model_check_command::TacotronModelCheckCommand;
-use mysql_queries::mediators::badge_granter::BadgeGranter;
-use mysql_queries::mediators::firehose_publisher::FirehosePublisher;
+use crate::job_types::tts::tacotron::tacotron_model_check_command::TacotronModelCheckCommand;
+use crate::job_types::tts::vits::vits_model_check_command::VitsModelCheckCommand;
+use crate::job_types::vocoder::hifigan_softvc::hifigan_softvc_model_check_command::HifiGanSoftVcModelCheckCommand;
+use crate::job_types::vocoder::hifigan_tacotron::hifigan_model_check_command::HifiGanModelCheckCommand;
+use crate::job_types::voice_conversion::softvc::softvc_model_check_command::SoftVcModelCheckCommand;
+use errors::AnyhowResult;
 use google_drive_common::google_drive_download_command::GoogleDriveDownloadCommand;
 use log::info;
+use mysql_queries::mediators::badge_granter::BadgeGranter;
+use mysql_queries::mediators::firehose_publisher::FirehosePublisher;
 use r2d2_redis::RedisConnectionManager;
 use r2d2_redis::r2d2;
 use sqlx::mysql::MySqlPoolOptions;
@@ -241,6 +242,16 @@ async fn main() -> AnyhowResult<()> {
     )
   };
 
+  let vits_model_check_command = {
+    // TODO TODO TODO
+    VitsModelCheckCommand::new(
+       "",
+      None,
+      "",
+      None,
+    )
+  };
+
   // =============== End Configure Python "Sidecars" ===============
 
   let temp_directory = PathBuf::from(temp_directory);
@@ -294,6 +305,7 @@ async fn main() -> AnyhowResult<()> {
       tacotron_model_check_command,
       hifigan_model_check_command,
       hifigan_softvc_model_check_command,
+      vits_model_check_command,
     },
     job_batch_wait_millis: common_env.job_batch_wait_millis,
     job_max_attempts: common_env.job_max_attempts as i32,
