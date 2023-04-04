@@ -18,6 +18,7 @@ use std::fs::File;
 use std::io::Read;
 use std::path::{Path, PathBuf};
 use tempdir::TempDir;
+use filesys::filename_concat::filename_concat;
 
 /// Returns the token of the entity.
 pub async fn process_vits_model<'a, 'b>(
@@ -37,7 +38,7 @@ pub async fn process_vits_model<'a, 'b>(
   let original_model_file_path = PathBuf::from(download_filename.clone());
 
   // NB: We'll be creating the traced model in the "check" step and uploading it to GDrive along with the original.
-  let traced_model_file_path = PathBuf::from(format!("{:?}_traced", original_model_file_path.as_os_str()));
+  let traced_model_file_path = PathBuf::from(filename_concat(&original_model_file_path, "_traced"));
 
   let config_path = PathBuf::from("configs/ljs_li44_tmbert_nmp_s1_arpa.json"); // TODO: This could be variable.
 

@@ -1,8 +1,7 @@
-//! files
+//! filesys
 //!
-//! The purpose of this library is to group common file (or in-memory file) operations.
-//! This crate is slightly higher level than the "filesys" crate and will contain more
-//! dependencies and file-specific features.
+//! The purpose of this library is to make basic filesystem operations easier.
+//! We won't be including content type or magic type features that incur a higher cost.
 //!
 
 // Never allow these
@@ -19,7 +18,5 @@
 #![allow(dead_code)]
 #![allow(non_snake_case)]
 
-pub mod directory_exists;
-pub mod file_exists;
-pub mod hash;
-pub mod mimetype;
+pub mod filename_concat;
+pub mod path_to_string;

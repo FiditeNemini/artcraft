@@ -1,4 +1,5 @@
 use crate::AnyhowResult;
+use filesys::path_to_string::path_to_string;
 use log::info;
 use std::path::{Path, PathBuf};
 use subprocess::{Popen, PopenConfig};
@@ -108,7 +109,7 @@ impl Tacotron2InferenceCommand {
   ) -> AnyhowResult<()> {
 
     let mut command = String::new();
-    command.push_str(&format!("cd {}", path_to_str(&self.tacotron_code_root_directory)));
+    command.push_str(&format!("cd {}", path_to_string(&self.tacotron_code_root_directory)));
 
     if let Some(venv_command) = self.maybe_virtual_env_activation_command.as_deref() {
       command.push_str(" && ");
@@ -123,12 +124,12 @@ impl Tacotron2InferenceCommand {
     command.push_str(" && ");
     command.push_str(python_binary);
     command.push_str(" ");
-    command.push_str(&path_to_str(&self.inference_script_name));
+    command.push_str(&path_to_string(&self.inference_script_name));
 
     // ===== Begin Python Inference Args =====
 
     command.push_str(" --synthesizer_checkpoint_path ");
-    command.push_str(&path_to_str(args.synthesizer_checkpoint_path));
+    command.push_str(&path_to_string(args.synthesizer_checkpoint_path));
 
     command.push_str(" --text_pipeline_type ");
     command.push_str(args.text_pipeline_type);
@@ -139,7 +140,7 @@ impl Tacotron2InferenceCommand {
         command.push_str("waveglow");
 
         command.push_str(" --waveglow_vocoder_checkpoint_path ");
-        command.push_str(&path_to_str(waveglow_vocoder_checkpoint_path));
+        command.push_str(&path_to_string(waveglow_vocoder_checkpoint_path));
       }
       VocoderForInferenceOption::HifiganSuperres {
         hifigan_vocoder_checkpoint_path,
@@ -149,10 +150,10 @@ impl Tacotron2InferenceCommand {
         command.push_str("hifigan-superres");
 
         command.push_str(" --hifigan_vocoder_checkpoint_path ");
-        command.push_str(&path_to_str(hifigan_vocoder_checkpoint_path));
+        command.push_str(&path_to_string(hifigan_vocoder_checkpoint_path));
 
         command.push_str(" --hifigan_superres_vocoder_checkpoint_path ");
-        command.push_str(&path_to_str(hifigan_superres_vocoder_checkpoint_path));
+        command.push_str(&path_to_string(hifigan_superres_vocoder_checkpoint_path));
       }
     }
 
@@ -169,16 +170,16 @@ impl Tacotron2InferenceCommand {
     }
 
     command.push_str(" --input_text_filename ");
-    command.push_str(&path_to_str(args.input_text_filename));
+    command.push_str(&path_to_string(args.input_text_filename));
 
     command.push_str(" --output_audio_filename ");
-    command.push_str(&path_to_str(args.output_audio_filename));
+    command.push_str(&path_to_string(args.output_audio_filename));
 
     command.push_str(" --output_spectrogram_filename ");
-    command.push_str(&path_to_str(args.output_spectrogram_filename));
+    command.push_str(&path_to_string(args.output_spectrogram_filename));
 
     command.push_str(" --output_metadata_filename ");
-    command.push_str(&path_to_str(args.output_metadata_filename));
+    command.push_str(&path_to_string(args.output_metadata_filename));
 
     // ===== End Python Inference Args =====
 
@@ -206,8 +207,4 @@ impl Tacotron2InferenceCommand {
 
     Ok(())
   }
-}
-
-fn path_to_str<P: AsRef<Path>>(path: P) -> String {
-  path.as_ref().display().to_string()
 }

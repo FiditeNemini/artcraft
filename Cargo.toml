@@ -30,6 +30,7 @@ members = [
   "crates/lib/envvar",
   "crates/lib/errors",
   "crates/lib/files",
+  "crates/lib/filesys",
   "crates/lib/hashing",
   "crates/lib/idempotency",
   "crates/lib/jobs_common",

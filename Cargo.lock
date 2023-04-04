@@ -2314,6 +2314,8 @@ dependencies = [
  "enums",
  "envvar",
  "errors",
+ "files",
+ "filesys",
  "google_drive_common",
  "hashing",
  "hostname",
@@ -2680,6 +2682,13 @@ dependencies = [
  "data-encoding",
  "infer 0.11.0",
  "ring 0.17.0-alpha.11",
+]
+
+[[package]]
+name = "filesys"
+version = "0.0.1"
+dependencies = [
+ "errors",
 ]
 
 [[package]]
@@ -3599,6 +3608,8 @@ dependencies = [
  "enums",
  "envvar",
  "errors",
+ "files",
+ "filesys",
  "hashing",
  "hostname",
  "hyper 0.14.24",
