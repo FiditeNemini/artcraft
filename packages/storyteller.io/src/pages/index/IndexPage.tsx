@@ -724,20 +724,20 @@ function IndexPage() {
           <div className="row g-4 g-md-5 align-items-center">
             <div className="col-12 col-md-6">
               <div>
-                <h1 className="fw-bold display-5 about-title">
-                  We’re building the future production cloud studio
+                <h1 className="fw-bold display-6 about-title">
+                  We're an interdiciplinary team building the one-person cloud
+                  studio
                 </h1>
                 <hr className="p-1 mt-4 text-red opacity-100 w-25" />
               </div>
             </div>
             <div className="col-12 col-md-6">
               <p className="fw-normal opacity-75">
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-                eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut
-                enim ad minim veniam, quis nostrud exercitation ullamco laboris
-                nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor
-                in reprehenderit in voluptate velit esse cillum dolore eu fugiat
-                nulla pariatur.
+                Our dream is to empower anyone to create full feature-length
+                content without institutional capital, large teams, huge amounts
+                of time, or a deep reservoir of highly specialized talent. We
+                want to empower everyone to turn their dreams into physical
+                form.
               </p>
             </div>
           </div>
@@ -831,7 +831,7 @@ function IndexPage() {
                 Backend Engineer / Rust Full Stack
               </p>
             </div>
-            <div className="col-6 col-md-3">
+            {/* <div className="col-6 col-md-3">
               <img
                 src="/images/team/placeholder-pfp.jpg"
                 className="img-fluid img-team mb-3"
@@ -848,21 +848,21 @@ function IndexPage() {
               />
               <p className="fw-semibold opacity-100 mb-0 fs-5">Rodrigo</p>
               <p className="team-role-text">Data Team</p>
-            </div>
+            </div> */}
           </div>
 
           <h2 className="mb-4 mt-5">Our Advisor</h2>
 
           <div className="row g-4 g-md-5">
-            <div className="col-6 col-md-3">
+            {/* <div className="col-6 col-md-3">
               <img
                 src="/images/team/placeholder-pfp.jpg"
                 className="img-fluid img-team opacity-50"
                 alt=""
               />
-            </div>
-            <div className="col-12 col-md-9 text-start d-flex flex-column justify-content-center">
-              <p className="fw-semibold opacity-100 mb-0 fs-5">
+            </div> */}
+            <div className="col-12 text-start d-flex flex-column justify-content-center">
+              <p className="fw-semibold opacity-100 mb-0 fs-5 mt-2">
                 Alex Wissner-Gross
               </p>
               <p className="team-role-text">Advisor</p>
