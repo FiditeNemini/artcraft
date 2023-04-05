@@ -169,7 +169,7 @@ function VcModelListPage(props: Props) {
 
                         <div>
                           <label className="sub-title">
-                            Your Uploaded Audio (5 files)
+                            Your Audio Collection (5 files)
                           </label>
                           <div className="d-flex flex-column gap-3">
                             <div className="input-icon-search">
