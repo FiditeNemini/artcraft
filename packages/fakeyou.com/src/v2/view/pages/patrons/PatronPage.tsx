@@ -13,7 +13,6 @@ interface Props {
 }
 
 function PatronPage(props: Props) {
-
   usePrefixedDocumentTitle("Thank you to our Patrons!");
 
   return (
@@ -21,7 +20,7 @@ function PatronPage(props: Props) {
       <div className="container py-5 pt-lg-0">
         <div className="row">
           <div className="col-12 col-lg-7 d-flex flex-column justify-content-center text-center text-lg-start px-3 px-md-2 px-lg-5 px-xl-3">
-            <motion.h1 className="display-5 fw-bold" variants={item}>
+            <motion.h1 className=" fw-bold" variants={item}>
               Thanks to our Patrons!
             </motion.h1>
             <motion.h3 className="mb-4 px-4 px-md-0" variants={item}>

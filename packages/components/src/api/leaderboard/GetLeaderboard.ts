@@ -2,14 +2,16 @@ import { ApiConfig } from "@storyteller/components";
 
 export interface Leaderboard {
   success: boolean,
-  tts_leaderboard: Array<LeaderboardEntryForList>
-  w2l_leaderboard: Array<LeaderboardEntryForList>
+  tts_leaderboard: Array<LeaderboardRow>
+  w2l_leaderboard: Array<LeaderboardRow>
 }
 
-export interface LeaderboardEntryForList {
+export interface LeaderboardRow {
   username: string,
   display_name: string,
   gravatar_hash: string,
+  default_avatar_index: number,
+  default_avatar_color_index: number,
   uploaded_count: number,
 }
 

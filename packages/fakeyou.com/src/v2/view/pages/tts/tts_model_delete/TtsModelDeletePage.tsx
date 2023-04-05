@@ -148,9 +148,7 @@ function TtsModelDeletePage(props: Props) {
   let creatorLink = <span />;
 
   if (!!ttsModel?.creator_display_name) {
-    const creatorUrl = WebUrl.userProfilePage(
-      ttsModel?.creator_display_name
-    );
+    const creatorUrl = WebUrl.userProfilePage(ttsModel?.creator_display_name);
     creatorLink = <Link to={creatorUrl}>{ttsModel?.creator_display_name}</Link>;
   }
 
@@ -218,7 +216,7 @@ function TtsModelDeletePage(props: Props) {
     <motion.div initial="hidden" animate="visible" variants={container}>
       <div className="container py-5 pb-4 px-lg-5 px-xl-3">
         <div className="d-flex flex-column">
-          <motion.h1 className="display-5 fw-bold mb-3" variants={item}>
+          <motion.h1 className=" fw-bold mb-3" variants={item}>
             {h1Title}
           </motion.h1>
           <motion.p variants={item}>

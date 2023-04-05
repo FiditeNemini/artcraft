@@ -219,17 +219,16 @@ function TtsResultViewPage(props: Props) {
   if (!!ttsInferenceResult.maybe_creator_user_token) {
     let creatorLink = `/profile/${ttsInferenceResult.maybe_creator_username}`;
     creatorDetails = (
-      <span>
+      <div className="d-flex align-items-center gap-2">
         <Gravatar
-          size={15}
+          size={32}
           username={ttsInferenceResult.maybe_creator_display_name || ""}
           email_hash={ttsInferenceResult.maybe_creator_gravatar_hash || ""}
         />
-        &nbsp;
         <Link to={creatorLink}>
           {ttsInferenceResult.maybe_creator_display_name}
         </Link>
-      </span>
+      </div>
     );
   }
 
@@ -237,19 +236,18 @@ function TtsResultViewPage(props: Props) {
   if (!!ttsInferenceResult.maybe_model_creator_user_token) {
     let modelCreatorLink = `/profile/${ttsInferenceResult.maybe_model_creator_username}`;
     modelCreatorDetails = (
-      <span>
+      <div className="d-flex align-items-center gap-2">
         <Gravatar
-          size={15}
+          size={32}
           username={ttsInferenceResult.maybe_model_creator_display_name || ""}
           email_hash={
             ttsInferenceResult.maybe_model_creator_gravatar_hash || ""
           }
         />
-        &nbsp;
         <Link to={modelCreatorLink}>
           {ttsInferenceResult.maybe_model_creator_display_name}
         </Link>
-      </span>
+      </div>
     );
   }
 
@@ -434,7 +432,7 @@ function TtsResultViewPage(props: Props) {
     <motion.div initial="hidden" animate="visible" variants={container}>
       <div className="container py-5">
         <div className="d-flex flex-column">
-          <motion.h1 className="display-5 fw-bold mb-2" variants={item}>
+          <motion.h1 className=" fw-bold mb-2" variants={item}>
             {headingTitle}
           </motion.h1>
           {/* Rate Result Buttons */}

@@ -44,7 +44,7 @@ function ContributeIndexPage(props: Props) {
           You make FakeYou better by contributing
         </Trans>
       </h5>
-      {t("pages.contributeIndex.introText")}
+      <div className="opacity-75">{t("pages.contributeIndex.introText")}</div>
     </>
   );
   const titleIcon = (
@@ -55,7 +55,7 @@ function ContributeIndexPage(props: Props) {
     <motion.div initial="hidden" animate="visible" variants={container}>
       {/* <div className="container py-5 px-md-4 px-lg-5 px-xl-3">
         <div className="d-flex flex-column">
-          <motion.h1 className="display-5 fw-bold" variants={item}>
+          <motion.h1 className=" fw-bold" variants={item}>
             {t("pages.contributeIndex.heroTitle")}
           </motion.h1>
           <motion.h3 className="mb-4" variants={item}>

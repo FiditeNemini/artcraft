@@ -230,7 +230,7 @@ function IndexPage() {
         </div>
         <div className="container mt-5 pt-5">
           <div className="row gx-5 flex-row-reverse gy-4">
-            <div className="col-lg-6 img-layers">
+            <div className="col-lg-6 img-layers d-none d-xl-block">
               <Tilt trackOnWindow={true} tiltReverse={true}>
                 <img
                   src="/images/screenshots/fakeyou-screen.webp"
@@ -244,8 +244,16 @@ function IndexPage() {
                 className="img-front-right img-mascot"
               />
             </div>
+            <div className="col-lg-6 d-xl-none">
+              <img
+                src="/images/screenshots/fakeyou-screen-mobile.webp"
+                alt="FakeYou"
+                className="img-fluid"
+              />
+            </div>
+
             <div className="col-lg-6 d-flex flex-column justify-content-center">
-              <h1 className="fw-bold display-5">FakeYou</h1>
+              <h1 className="fw-bold ">FakeYou</h1>
               <h4 className="fw-normal opacity-75 mb-4">
                 Used by millions of people every month
               </h4>
@@ -275,7 +283,7 @@ function IndexPage() {
       <div className="bg-dark section-2">
         <div className="container">
           <div className="row gx-5 gy-5">
-            <div className="col-lg-6 img-layers">
+            <div className="col-lg-6 img-layers d-none d-xl-block">
               <Tilt trackOnWindow={true} tiltReverse={true}>
                 <img
                   src="/images/screenshots/powerstream-screen.webp"
@@ -289,8 +297,16 @@ function IndexPage() {
                 className="img-front-left img-mascot"
               />
             </div>
+            <div className="col-lg-6 d-xl-none">
+              <img
+                src="/images/screenshots/powerstream-screen-mobile.webp"
+                alt="FakeYou"
+                className="img-fluid"
+              />
+            </div>
+
             <div className="col-lg-6 d-flex flex-column justify-content-center">
-              <h1 className="fw-bold display-5">PowerStream</h1>
+              <h1 className="fw-bold ">PowerStream</h1>
               <h4 className="fw-normal opacity-75 mb-4">
                 Twitch Streamers and Creators can engage and monetize
               </h4>
@@ -720,27 +736,18 @@ function IndexPage() {
           </Marquee>
         </div>
 
-        <div className="container py-5 mt-5">
-          <div className="row g-4 g-md-5 align-items-center">
-            <div className="col-12 col-md-6">
-              <div>
-                <h1 className="fw-bold display-6 about-title">
-                  We're an interdiciplinary team building the one-person cloud
-                  studio
-                </h1>
-                <hr className="p-1 mt-4 text-red opacity-100 w-25" />
-              </div>
-            </div>
-            <div className="col-12 col-md-6">
-              <p className="fw-normal opacity-75">
-                Our dream is to empower anyone to create full feature-length
-                content without institutional capital, large teams, huge amounts
-                of time, or a deep reservoir of highly specialized talent. We
-                want to empower everyone to turn their dreams into physical
-                form.
-              </p>
-            </div>
-          </div>
+        <div className="container py-5 text-center d-flex flex-column align-items-center mt-3">
+          <h1 className="fw-bold  about-title mt-5">
+            We’re building the future production cloud studio
+          </h1>
+          <p className="fw-normal opacity-75 mt-4">
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec quis
+            vehicula odio. Nulla non sem scelerisque, hendrerit libero sagittis,
+            rhoncus orci. Etiam in molestie augue. Donec lobortis tincidunt
+            massa, a posuere libero sagittis eget. Vivamus sagittis mauris non
+            tristique ornare. Pellentesque rhoncus ipsum magna, nec lacinia odio
+            sagittis et. Nunc aliquet cursus dui fermentum molestie.
+          </p>
         </div>
 
         <div className="container mt-md-5">

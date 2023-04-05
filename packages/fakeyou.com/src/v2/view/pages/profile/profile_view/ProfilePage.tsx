@@ -364,6 +364,8 @@ function ProfilePage(this: any, props: Props) {
                 size={150}
                 username={userData.display_name}
                 email_hash={userEmailHash}
+                avatarIndex={userData.default_avatar_index}
+                backgroundIndex={userData.default_avatar_color_index}
               />
             </div>
             <div className="border-3 text-center d-lg-none">
@@ -371,6 +373,8 @@ function ProfilePage(this: any, props: Props) {
                 size={100}
                 username={userData.display_name}
                 email_hash={userEmailHash}
+                avatarIndex={userData.default_avatar_index}
+                backgroundIndex={userData.default_avatar_color_index}
               />
             </div>
           </div>

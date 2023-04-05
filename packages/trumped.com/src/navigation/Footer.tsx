@@ -16,12 +16,12 @@ function Footer(props: Props) {
       </p>*/}
       <h2>Want more Donald Trump TTS?</h2>
       <p>
-        The best <a href="https://fakeyou.com">Donald Trump TTS</a> can be found
+        The best <a href="https://fakeyou.com/character/donald-trump">Donald Trump TTS</a> can be found
         at FakeYou.
       </p>
       <p>
         FakeYou is the world's best Text to Speech website and has thousands of
-        voices. Angry Donald J Trump, Sad DJ Trump, Hillary Clinton, Nixon, and
+        voices. Angry <a href="https://fakeyou.com/character/donald-trump">Donald J Trump AI Voice</a>, Sad DJ Trump, Hillary Clinton, Nixon, and
         so many others!
       </p>
       <p>

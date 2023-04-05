@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
@@ -30,20 +29,17 @@ function CheckoutSuccessPage(props: Props) {
           <div className="col-lg-6 px-md-2 ps-lg-5 ps-xl-2">
             <div className="text-center text-lg-start">
               <div>
-                <motion.h1
-                  className="display-5 fw-bold lh-1 mb-4"
-                  variants={item}
-                >
+                <motion.h1 className=" fw-bold lh-1 mb-4" variants={item}>
                   Thank you!
                 </motion.h1>
               </div>
               <br />
               <div>
                 <motion.p className="lead" variants={item}>
-                  We're grateful you're helping FakeYou build the future creative
-                  suite. We're building tools for small creators and have an eye 
-                  on building a full AI-powered Hollywood and music production 
-                  studio.
+                  We're grateful you're helping FakeYou build the future
+                  creative suite. We're building tools for small creators and
+                  have an eye on building a full AI-powered Hollywood and music
+                  production studio.
                 </motion.p>
                 <br />
                 <motion.p className="lead" variants={item}>
@@ -65,7 +61,6 @@ function CheckoutSuccessPage(props: Props) {
           </div>
         </div>
       </div>
-
     </motion.div>
   );
 }

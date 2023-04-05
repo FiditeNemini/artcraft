@@ -121,7 +121,7 @@ function W2lTemplateEditPage(props: Props) {
     <motion.div initial="hidden" animate="visible" variants={container}>
       <div className="container pt-5 pb-4 px-lg-5 px-xl-3">
         <div className="d-flex flex-column">
-          <h1 className="display-5 fw-bold">Edit Template</h1>
+          <h1 className=" fw-bold">Edit Template</h1>
         </div>
         <div className="mt-3">
           <BackLink link={templateLink} text="Back to template" />

@@ -262,15 +262,14 @@ function TtsModelViewPage(props: Props) {
   if (!!ttsModel?.creator_display_name) {
     const creatorUrl = WebUrl.userProfilePage(ttsModel?.creator_username);
     creatorLink = (
-      <span>
+      <div className="d-flex align-items-center gap-2">
         <Gravatar
-          size={15}
+          size={32}
           username={ttsModel.creator_display_name || ""}
           email_hash={ttsModel.creator_gravatar_hash || ""}
         />
-        &nbsp;
         <Link to={creatorUrl}>{ttsModel.creator_display_name}</Link>
-      </span>
+      </div>
     );
   }
 
@@ -586,15 +585,16 @@ function TtsModelViewPage(props: Props) {
         <tr>
           <th>Vocoder created by</th>
           <td>
-            <Gravatar
-              size={15}
-              username={ttsModel.maybe_custom_vocoder.creator_display_name}
-              email_hash={ttsModel.maybe_custom_vocoder.creator_gravatar_hash}
-            />
-            &nbsp;
-            <Link to={vocoderCreatorUrl}>
-              {ttsModel.maybe_custom_vocoder.creator_display_name}
-            </Link>
+            <div className="d-flex align-items-center gap-2">
+              <Gravatar
+                size={32}
+                username={ttsModel.maybe_custom_vocoder.creator_display_name}
+                email_hash={ttsModel.maybe_custom_vocoder.creator_gravatar_hash}
+              />
+              <Link to={vocoderCreatorUrl}>
+                {ttsModel.maybe_custom_vocoder.creator_display_name}
+              </Link>
+            </div>
           </td>
         </tr>
       </>
@@ -705,7 +705,7 @@ function TtsModelViewPage(props: Props) {
     <motion.div initial="hidden" animate="visible" variants={container}>
       <div className="container py-5">
         <div className="d-flex flex-column">
-          <motion.h1 className="display-5 fw-bold mb-3" variants={item}>
+          <motion.h1 className="fw-bold mb-3" variants={item}>
             {title}
           </motion.h1>
           {/* Rate Voice Model Buttons */}

@@ -1,7 +1,10 @@
 import React, { useState } from "react";
 import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
 import { DiscordLink } from "@storyteller/components/src/elements/DiscordLink";
-import { EnqueueRetrieval, EnqueueRetrievalIsOk } from "@storyteller/components/src/api/retrieval/EnqueueRetrieval";
+import {
+  EnqueueRetrieval,
+  EnqueueRetrievalIsOk,
+} from "@storyteller/components/src/api/retrieval/EnqueueRetrieval";
 import { useHistory } from "react-router-dom";
 import { v4 as uuidv4 } from "uuid";
 import { BackLink } from "../../_common/BackLink";
@@ -69,7 +72,7 @@ function UploadVocoderPage(props: Props) {
       idempotency_token: idempotencyToken,
       title: title,
       download_url: downloadUrl,
-      generic_download_type: 'hifigan',
+      generic_download_type: "hifigan",
     };
 
     const response = await EnqueueRetrieval(request);
@@ -86,7 +89,7 @@ function UploadVocoderPage(props: Props) {
     <motion.div initial="hidden" animate="visible" variants={container}>
       <div className="container pt-5 pb-4 px-md-4 px-lg-5 px-xl-3">
         <div className="d-flex flex-column">
-          <motion.h1 className="display-5 fw-bold" variants={item}>
+          <motion.h1 className=" fw-bold" variants={item}>
             Upload Vocoder Model
           </motion.h1>
           <motion.h4 variants={item}>Make your voice sound better!</motion.h4>
@@ -113,9 +116,9 @@ function UploadVocoderPage(props: Props) {
         </p>
 
         <p>
-          Once your vocoder is successfully uploaded, you'll be able to
-          add it to your voice models. Others will be able to use it too, and 
-          you'll get credited.
+          Once your vocoder is successfully uploaded, you'll be able to add it
+          to your voice models. Others will be able to use it too, and you'll
+          get credited.
         </p>
 
         {/* TODO TEMP (2022-03-08) <p>
@@ -130,7 +133,8 @@ function UploadVocoderPage(props: Props) {
             <div className="d-flex flex-column gap-4">
               <div>
                 <label className="sub-title">
-                  Vocoder Title, eg. "High Pitched Voices (trained on Powerpuff Girls, MLP, and various anime characters)"
+                  Vocoder Title, eg. "High Pitched Voices (trained on Powerpuff
+                  Girls, MLP, and various anime characters)"
                 </label>
                 <div className="form-group">
                   <input
@@ -163,7 +167,6 @@ function UploadVocoderPage(props: Props) {
                 <p className="help">{downloadUrlInvalidReason}</p>
               </div>
             </div>
-
           </div>
         </div>
 

@@ -18,7 +18,7 @@ import {
   faBook,
   faStar,
 } from "@fortawesome/free-solid-svg-icons";
-import { faDiscord, faPatreon } from "@fortawesome/free-brands-svg-icons";
+import { faDiscord } from "@fortawesome/free-brands-svg-icons";
 import { Logout } from "@storyteller/components/src/api/session/Logout";
 // import { Gravatar } from "@storyteller/components/src/elements/Gravatar";
 import {
@@ -96,8 +96,11 @@ function TopNav(props: Props) {
     };
     // TODO: We're having an outage and need to lower this.
     //const interval = setInterval(async () => fetch(), 15000);
-    const refreshInterval = Math.max(DEFAULT_QUEUE_REFRESH_INTERVAL_MILLIS, pendingTtsJobs.refresh_interval_millis);
-    console.log('new interval', refreshInterval);
+    const refreshInterval = Math.max(
+      DEFAULT_QUEUE_REFRESH_INTERVAL_MILLIS,
+      pendingTtsJobs.refresh_interval_millis
+    );
+    console.log("new interval", refreshInterval);
     const interval = setInterval(async () => fetch(), refreshInterval);
     fetch();
     return () => clearInterval(interval);
@@ -462,16 +465,6 @@ function TopNav(props: Props) {
                         <FontAwesomeIcon icon={faDiscord} className="me-2" />
                         {t("nav.TopNav.main.discordOption")}
                       </a>
-                    </li>
-                    <li data-bs-toggle="offcanvas">
-                      <Link
-                        className="dropdown-item"
-                        to="/patrons"
-                        title="to patron list"
-                      >
-                        <FontAwesomeIcon icon={faPatreon} className="me-2" />
-                        {t("nav.TopNav.main.patronsOption")}
-                      </Link>
                     </li>
                     <li data-bs-toggle="offcanvas">
                       <Link

@@ -7,6 +7,6 @@ export function usePrefixedDocumentTitle(title?: string) {
   // NB: Choice of a vertical bar "|" separator is due to conserving pixels, which *might* matter to SEO.
   // I haven't fully investigated the veracity of this, nor the position of prefixes, suffixes, etc.
   // https://www.searchenginejournal.com/pipe-or-dash-in-title-tag/378099/#close
-  const outputTitle = fixed.length === 0 ? DEFAULT_FOR_EMPTY_TITLE : `FakeYou | ${fixed}`;
+  const outputTitle = fixed.length === 0 ? DEFAULT_FOR_EMPTY_TITLE : `${fixed} | FakeYou`;
   useDocumentTitle(outputTitle);
 }

@@ -412,7 +412,7 @@ function W2lTemplateViewPage(props: Props) {
   return (
     <motion.div initial="hidden" animate="visible" variants={container}>
       <div className="container py-5 px-md-4 px-lg-5 px-xl-3">
-        <motion.h1 className="display-5 fw-bold" variants={item}>
+        <motion.h1 className=" fw-bold" variants={item}>
           Video Lip Sync Template
         </motion.h1>
         <motion.h4 variants={item}>Template: {w2lTemplate?.title}</motion.h4>

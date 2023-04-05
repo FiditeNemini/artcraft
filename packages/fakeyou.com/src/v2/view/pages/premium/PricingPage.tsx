@@ -38,9 +38,8 @@ function PricingPage(props: Props) {
 
   const beginStripeFlow = async (
     internal_plan_key: string,
-    analyticsName: string,
+    analyticsName: string
   ): Promise<boolean> => {
-
     switch (analyticsName) {
       case "plus":
         Analytics.premiumSelectPlanPlus();
@@ -64,7 +63,6 @@ function PricingPage(props: Props) {
       history.push(signupUrl);
 
       return false;
-
     } else if (props.sessionSubscriptionsWrapper.hasPaidFeatures()) {
       Analytics.premiumForwardToStripePortal();
       return await beginStripePortalFlow(); // NB: This redirects the user to Stripe
@@ -77,16 +75,19 @@ function PricingPage(props: Props) {
   usePrefixedDocumentTitle("Premium Deep Fake TTS");
 
   const environment = FakeYouFrontendEnvironment.getInstance();
-  const planKey = environment.useProductionStripePlans() ? "production" : "development";
+  const planKey = environment.useProductionStripePlans()
+    ? "production"
+    : "development";
 
-  const userHasPaidPremium = props.sessionSubscriptionsWrapper.hasPaidFeatures();
+  const userHasPaidPremium =
+    props.sessionSubscriptionsWrapper.hasPaidFeatures();
 
   let plusButtonText = "Buy Plus";
   let plusButtonDisabled = false;
 
   let proButtonText = "Buy Pro";
   let proButtonDisabled = false;
-  let proBorderCss = "rounded panel p-4 h-100"
+  let proBorderCss = "rounded panel p-4 h-100";
 
   let eliteButtonText = "Buy Elite";
   let eliteButtonDisabled = false;
@@ -122,10 +123,7 @@ function PricingPage(props: Props) {
     unsubscribeButton = (
       <>
         <div className="container pt-5 pb-3 text-center">
-          <motion.div
-            className="mt-4"
-            variants={item}
-          >
+          <motion.div className="mt-4" variants={item}>
             <button
               onClick={() => beginStripeFlow(unsubscribeKey, "unsubscribe")}
               className="btn btn-link w-100 fs-6"
@@ -140,30 +138,28 @@ function PricingPage(props: Props) {
 
   // Highlight the mid-tier plan if nothing is subscribed
   if (!userHasPaidPremium) {
-    proBorderCss = "rounded panel p-4 h-100  panel-border"
+    proBorderCss = "rounded panel p-4 h-100  panel-border";
   }
 
   return (
     <motion.div initial="hidden" animate="visible" variants={container}>
-      <div className="container pt-5 pb-3 text-center">
-        <motion.h1 className="display-5 fw-bold" variants={item}>
+      <div className="container pt-5 pb-4 text-center">
+        <motion.h1 className=" fw-bold" variants={item}>
           Pricing
         </motion.h1>
         {/* <p className="fs-5">
           By purchasing FakeYou premium, you help us build more!
         </p> */}
         <motion.div
-          className="alert alert-warning mt-4 alert-pricing"
+          className="alert alert-warning mt-4 alert-pricing mb-2"
           variants={item}
         >
           <FontAwesomeIcon icon={faHeart} className="text-red me-3" />
           By purchasing FakeYou premium, you help us build more!
         </motion.div>
       </div>
-      <div className="container mt-3 mb-5">
+      <div className="container mb-5">
         <div className="row gx-3 gy-4">
-
-
           {/* Starter Tier */}
           {/*<motion.div className="col-12 col-sm-6 col-lg-3" variants={panel}>
             <div className="rounded panel p-4 h-100">
@@ -172,7 +168,7 @@ function PricingPage(props: Props) {
               </h2>
 
 
-              <h2 className="display-5 fw-bold text-center my-5">
+              <h2 className=" fw-bold text-center my-5">
                 ${FYP.starter.price}
                 <span className="fs-5 opacity-75 fw-normal"> /month</span>
               </h2>
@@ -224,7 +220,9 @@ function PricingPage(props: Props) {
             <div className="rounded panel p-4 h-100">
               <h2 className="text-center my-2 fw-bold mb-4">{FYP.plus.tier}</h2>
               <button
-                onClick={() => beginStripeFlow(FYP.plus.internal_plan_key[planKey], "plus")}
+                onClick={() =>
+                  beginStripeFlow(FYP.plus.internal_plan_key[planKey], "plus")
+                }
                 className="btn btn-primary w-100 fs-6"
                 disabled={plusButtonDisabled}
               >
@@ -310,7 +308,7 @@ function PricingPage(props: Props) {
                 })} */}
               </ul>
               <hr className="my-4" />
-              <h6 className="text-center fw-normal">
+              <h6 className="text-center fw-normal opacity-50">
                 + Many more features coming soon!
               </h6>
             </div>
@@ -321,7 +319,9 @@ function PricingPage(props: Props) {
             <div className={proBorderCss}>
               <h2 className="text-center my-2 fw-bold mb-4">{FYP.pro.tier}</h2>
               <button
-                onClick={() => beginStripeFlow(FYP.pro.internal_plan_key[planKey], "pro")}
+                onClick={() =>
+                  beginStripeFlow(FYP.pro.internal_plan_key[planKey], "pro")
+                }
                 className="btn btn-primary w-100 fs-6"
                 disabled={proButtonDisabled}
               >
@@ -433,7 +433,7 @@ function PricingPage(props: Props) {
                 })} */}
               </ul>
               <hr className="my-4" />
-              <h6 className="text-center fw-normal">
+              <h6 className="text-center fw-normal opacity-50">
                 + Many more features coming soon!
               </h6>
             </div>
@@ -446,7 +446,9 @@ function PricingPage(props: Props) {
                 {FYP.elite.tier}
               </h2>
               <button
-                onClick={() => beginStripeFlow(FYP.elite.internal_plan_key[planKey], "elite")}
+                onClick={() =>
+                  beginStripeFlow(FYP.elite.internal_plan_key[planKey], "elite")
+                }
                 className="btn btn-primary w-100 fs-6"
                 disabled={eliteButtonDisabled}
               >
@@ -570,18 +572,16 @@ function PricingPage(props: Props) {
                 })} */}
               </ul>
               <hr className="my-4" />
-              <h6 className="text-center fw-normal">
+              <h6 className="text-center fw-normal opacity-50">
                 + Many more features coming soon!
               </h6>
             </div>
           </motion.div>
         </div>
 
-      <div className="container mt-3 mb-5">
-        <div className="row gx-3 gy-4">
-          {unsubscribeButton}
+        <div className="container mt-3 mb-5">
+          <div className="row gx-3 gy-4">{unsubscribeButton}</div>
         </div>
-      </div>
 
         {/* Starter Tier (to show for Latin American countries) */}
         {/* <div className="w-100 mt-4">

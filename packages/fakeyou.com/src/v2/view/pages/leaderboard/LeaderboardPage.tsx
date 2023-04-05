@@ -8,7 +8,7 @@ import {
   GetLeaderboardIsErr,
   GetLeaderboardIsOk,
   Leaderboard,
-  LeaderboardEntryForList,
+  LeaderboardRow,
   LeaderboardLookupError,
 } from "@storyteller/components/src/api/leaderboard/GetLeaderboard";
 import { DiscordLink2 } from "@storyteller/components/src/elements/DiscordLink2";
@@ -25,10 +25,10 @@ function LeaderboardPage(props: Props) {
     undefined
   );
   const [ttsLeaderboard, setTtsLeaderboard] = useState<
-    Array<LeaderboardEntryForList> | undefined
+    Array<LeaderboardRow> | undefined
   >(undefined);
   const [w2lLeaderboard, setW2lLeaderboard] = useState<
-    Array<LeaderboardEntryForList> | undefined
+    Array<LeaderboardRow> | undefined
   >(undefined);
   const [retryCount, setRetryCount] = useState(0);
 
@@ -70,13 +70,17 @@ function LeaderboardPage(props: Props) {
       ttsRows.push(
         <tr>
           <td className="lb-name">
-            <Link to={WebUrl.userProfilePage(ttsEntry.display_name)}>
+            <Link
+              to={WebUrl.userProfilePage(ttsEntry.display_name)}
+              className="d-flex align-items-center gap-2"
+            >
               <Gravatar
-                size={12}
+                size={32}
                 username={ttsEntry.display_name}
                 email_hash={ttsEntry.gravatar_hash}
+                avatarIndex={ttsEntry.default_avatar_index}
+                backgroundIndex={ttsEntry.default_avatar_color_index}
               />
-              &nbsp;
               {ttsEntry.display_name}
             </Link>
           </td>
@@ -93,13 +97,17 @@ function LeaderboardPage(props: Props) {
       w2lRows.push(
         <tr>
           <td className="lb-name">
-            <Link to={WebUrl.userProfilePage(w2lEntry.display_name)}>
+            <Link
+              to={WebUrl.userProfilePage(w2lEntry.display_name)}
+              className="d-flex align-items-center gap-2"
+            >
               <Gravatar
-                size={12}
+                size={32}
                 username={w2lEntry.display_name}
                 email_hash={w2lEntry.gravatar_hash}
+                avatarIndex={w2lEntry.default_avatar_index}
+                backgroundIndex={w2lEntry.default_avatar_color_index}
               />
-              &nbsp;
               {w2lEntry.display_name}
             </Link>
           </td>
@@ -113,7 +121,7 @@ function LeaderboardPage(props: Props) {
     <motion.div initial="hidden" animate="visible" variants={container}>
       <div className="container py-5 px-md-4 px-lg-5 px-xl-3">
         <div className="d-flex flex-column">
-          <motion.h1 className="display-5 fw-bold" variants={item}>
+          <motion.h1 className=" fw-bold" variants={item}>
             Leaderboard
           </motion.h1>
           <motion.h3 className="mb-4" variants={item}>

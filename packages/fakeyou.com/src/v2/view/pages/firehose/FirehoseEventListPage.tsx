@@ -29,6 +29,9 @@ interface FirehoseEventListResponsePayload {
 interface FirehoseEvent {
   event_token: string;
   event_type: string;
+
+  maybe_target_user_info?: TargetUserInfo;
+
   maybe_target_user_token?: string;
   maybe_target_username?: string;
   maybe_target_display_name?: string;
@@ -36,6 +39,15 @@ interface FirehoseEvent {
   maybe_target_entity_token?: string;
   created_at: string;
   updated_at: string;
+}
+
+interface TargetUserInfo {
+  user_token: string;
+  username: string;
+  display_name: string;
+  gravatar_hash: string;
+  default_avatar_index: number;
+  default_avatar_color_index: number;
 }
 
 interface Props {
@@ -95,7 +107,19 @@ function FirehoseEventListPage(props: Props) {
   firehoseEvents.slice(0, 16).forEach((event) => {
     let inner = <span />;
     let userLink = <span>Anonymous user</span>;
-    let gravatar = <span />;
+    let gravatar = (
+      <div className="me-2">
+        <Gravatar
+          size={32}
+          username={event.maybe_target_username}
+          email_hash={event.maybe_target_user_gravatar_hash}
+          avatarIndex={event.maybe_target_user_info?.default_avatar_index || 0}
+          backgroundIndex={
+            event.maybe_target_user_info?.default_avatar_color_index
+          }
+        />
+      </div>
+    );
 
     if (
       event.maybe_target_username !== undefined &&
@@ -106,11 +130,17 @@ function FirehoseEventListPage(props: Props) {
       let link = `/profile/${event.maybe_target_username}`;
       userLink = <Link to={link}>{event.maybe_target_display_name}</Link>;
       gravatar = (
-        <div className="me-1">
+        <div className="me-2">
           <Gravatar
-            size={22}
+            size={32}
             username={event.maybe_target_username}
             email_hash={event.maybe_target_user_gravatar_hash}
+            avatarIndex={
+              event.maybe_target_user_info?.default_avatar_index || 0
+            }
+            backgroundIndex={
+              event.maybe_target_user_info?.default_avatar_color_index
+            }
           />
         </div>
       );
@@ -122,7 +152,6 @@ function FirehoseEventListPage(props: Props) {
           <span className="d-flex align-items-center">
             <FontAwesomeIcon icon={faPenToSquare} className="me-3" />
             {gravatar}
-            &nbsp;
             {userLink}
             &nbsp;signed up for FakeYou!
           </span>
@@ -133,7 +162,6 @@ function FirehoseEventListPage(props: Props) {
           <span className="d-flex align-items-center">
             <FontAwesomeIcon icon={faAward} className="me-3" />
             {gravatar}
-            &nbsp;
             {userLink}
             &nbsp;got a badge!
           </span>
@@ -144,7 +172,6 @@ function FirehoseEventListPage(props: Props) {
           <span className="d-flex align-items-center">
             <FontAwesomeIcon icon={faPlay} className="me-3" />
             {gravatar}
-            &nbsp;
             {userLink}
             &nbsp;started TTS model upload
           </span>
@@ -155,7 +182,6 @@ function FirehoseEventListPage(props: Props) {
           <span className="d-flex align-items-center">
             <FontAwesomeIcon icon={faFlagCheckered} className="me-3" />
             {gravatar}
-            &nbsp;
             {userLink}
             &nbsp;completed TTS model upload
           </span>
@@ -166,7 +192,6 @@ function FirehoseEventListPage(props: Props) {
           <span className="d-flex align-items-center">
             <FontAwesomeIcon icon={faPlay} className="me-3" />
             {gravatar}
-            &nbsp;
             {userLink}
             &nbsp;started TTS
           </span>
@@ -177,7 +202,6 @@ function FirehoseEventListPage(props: Props) {
           <span className="d-flex align-items-center">
             <FontAwesomeIcon icon={faFlagCheckered} className="me-3" />
             {gravatar}
-            &nbsp;
             {userLink}
             &nbsp;completed TTS
           </span>
@@ -188,7 +212,6 @@ function FirehoseEventListPage(props: Props) {
           <span className="d-flex align-items-center">
             <FontAwesomeIcon icon={faPlay} className="me-3" />
             {gravatar}
-            &nbsp;
             {userLink}
             &nbsp;started uploading a lipsync template.
           </span>
@@ -199,7 +222,6 @@ function FirehoseEventListPage(props: Props) {
           <span className="d-flex align-items-center">
             <FontAwesomeIcon icon={faFlagCheckered} className="me-3" />
             {gravatar}
-            &nbsp;
             {userLink}
             &nbsp;finished uploading a lipsync template.
           </span>
@@ -210,7 +232,6 @@ function FirehoseEventListPage(props: Props) {
           <span className="d-flex align-items-center">
             <FontAwesomeIcon icon={faPlay} className="me-3" />
             {gravatar}
-            &nbsp;
             {userLink}
             &nbsp;started a W2L lipsync video
           </span>
@@ -221,7 +242,6 @@ function FirehoseEventListPage(props: Props) {
           <span className="d-flex align-items-center">
             <FontAwesomeIcon icon={faFlagCheckered} className="me-3" />
             {gravatar}
-            &nbsp;
             {userLink}
             &nbsp;completed a W2L lipsync video
           </span>
@@ -232,7 +252,6 @@ function FirehoseEventListPage(props: Props) {
           <span className="d-flex align-items-center">
             <FontAwesomeIcon icon={faTwitter} className="me-3" />
             {gravatar}
-            &nbsp;
             {userLink}
             &nbsp;mentioned us on twitter!
           </span>
@@ -243,7 +262,6 @@ function FirehoseEventListPage(props: Props) {
           <span className="d-flex align-items-center">
             <FontAwesomeIcon icon={faTwitter} className="me-3" />
             {gravatar}
-            &nbsp;
             {userLink}
             &nbsp;retweeted us!
           </span>
@@ -254,7 +272,6 @@ function FirehoseEventListPage(props: Props) {
           <span className="d-flex align-items-center">
             <FontAwesomeIcon icon={faDiscord} className="me-3" />
             {gravatar}
-            &nbsp;
             {userLink}
             &nbsp;joined discord!
           </span>
@@ -265,7 +282,6 @@ function FirehoseEventListPage(props: Props) {
           <span className="d-flex align-items-center">
             <FontAwesomeIcon icon={faDiscord} className="me-3" />
             {gravatar}
-            &nbsp;
             {userLink}
             &nbsp;sent a discord message
           </span>
@@ -276,7 +292,6 @@ function FirehoseEventListPage(props: Props) {
           <span className="d-flex align-items-center">
             <FontAwesomeIcon icon={faTwitch} className="me-3" />
             {gravatar}
-            &nbsp;
             {userLink}
             &nbsp;subscribed to us on twitch!
           </span>
@@ -287,7 +302,6 @@ function FirehoseEventListPage(props: Props) {
           <span className="d-flex align-items-center">
             <FontAwesomeIcon icon={faTwitch} className="me-3" />
             {gravatar}
-            &nbsp;
             {userLink}
             &nbsp;followed us on twitch!
           </span>
@@ -310,7 +324,7 @@ function FirehoseEventListPage(props: Props) {
     <motion.div initial="hidden" animate="visible" variants={container}>
       <div className="container py-5 px-md-4 px-lg-5 px-xl-3">
         <div className="d-flex flex-column">
-          <motion.h1 className="display-5 fw-bold" variants={item}>
+          <motion.h1 className=" fw-bold" variants={item}>
             Firehose Event Feed
           </motion.h1>
           <motion.h4 className="mb-4" variants={item}>
