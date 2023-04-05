@@ -741,7 +741,7 @@ function IndexPage() {
             <div className="col-12 col-md-6">
               <div>
                 <h1 className="fw-bold display-6 about-title">
-                  We're an interdiciplinary team building the one-person cloud
+                  We’re an interdiciplinary team building the one-person cloud
                   studio
                 </h1>
                 <hr className="p-1 mt-4 text-red opacity-100 w-25" />
@@ -749,11 +749,11 @@ function IndexPage() {
             </div>
             <div className="col-12 col-md-6">
               <p className="fw-normal opacity-75">
-                Our dream is to empower anyone to create full feature-length
+                Our mission is to empower anyone to create full feature-length
                 content from home without institutional capital, large teams, 
-                huge amounts of time, or a deep reservoir of highly specialized 
-                talent. We want to give everyone their turn in the director's 
-                seat and help turn their dreams into physical form.
+                huge amounts of time, or deep reservoirs of highly specialized 
+                talent. We give everyone their turn in the director’s 
+                seat and turn dreams into physical form.
               </p>
             </div>
           </div>
@@ -782,8 +782,8 @@ function IndexPage() {
                 plugged into the Atlanta art scene. In college he built a laser
                 projector and programmed it to play video games on the side of
                 skyscrapers. Today he’s working on disrupting Hollywood and the
-                music industry by bringing down cost structures such that anyone
-                can make high quality narrative film from home.
+                music industry and transforming narrative storytelling into something 
+                the likes of which we’ve never seen before.
               </p>
             </div>
           </div>
