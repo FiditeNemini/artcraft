@@ -226,6 +226,7 @@ CREATE TABLE tts_models (
   KEY index_private_bucket_hash (private_bucket_hash),
   KEY index_is_public_listing_approved (is_public_listing_approved),
   KEY index_is_locked_from_user_modification (is_locked_from_user_modification),
-  KEY index_is_locked_from_use (is_locked_from_use)
+  KEY index_is_locked_from_use (is_locked_from_use),
+  KEY index_tts_model_type (tts_model_type)
 
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;

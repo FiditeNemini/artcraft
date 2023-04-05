@@ -94,8 +94,6 @@ pub async fn process_vits_model<'a, 'b>(
     error!("Problem uploading original model: {:?}", err);
     error!(" - Model file: {:?}", &original_model_file_path);
     error!(" - Traced model file: {:?}", &traced_model_file_path);
-    error!(" - Temp directory: {:?}", &temp_dir);
-    std::thread::sleep(Duration::from_secs(60_000)); // TODO: Debugging only
     safe_delete_temp_file(&original_model_file_path);
     safe_delete_temp_file(&traced_model_file_path);
     safe_delete_temp_directory(&temp_dir);
@@ -116,8 +114,6 @@ pub async fn process_vits_model<'a, 'b>(
     error!("Problem uploading traced model: {:?}", err);
     error!(" - Model file: {:?}", &original_model_file_path);
     error!(" - Traced model file: {:?}", &traced_model_file_path);
-    error!(" - Temp directory: {:?}", &temp_dir);
-    std::thread::sleep(Duration::from_secs(60_000)); // TODO: Debugging only
     safe_delete_temp_file(&original_model_file_path);
     safe_delete_temp_file(&traced_model_file_path);
     safe_delete_temp_directory(&temp_dir);
