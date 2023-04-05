@@ -67,6 +67,7 @@ import { NewsPage } from "./pages/news/NewsPage";
 import { LandingPage } from "./pages/landing/LandingPage";
 import { ChannelsPage } from "./pages/channels/Channels";
 import { TrumpTtsPage } from "./pages/character/trump/TrumpTtsPage";
+import { InferenceJob } from "@storyteller/components/src/jobs/InferenceJob";
 //import { LandingPage } from "./pages/landing/LandingPage";
 //import { VcModelListPage } from "./pages/vc/vc_model_list/VcModelListPage";
 
@@ -93,6 +94,9 @@ interface Props {
 
   isShowingBootstrapLanguageNotice: boolean;
   clearBootstrapLanguageNotice: () => void;
+
+  enqueueInferenceJob: (jobToken: string) => void;
+  inferenceJobs: Array<InferenceJob>;
 
   enqueueTtsJob: (jobToken: string) => void;
   ttsInferenceJobs: Array<TtsInferenceJob>;
@@ -294,6 +298,7 @@ class PageContainer extends React.Component<Props, State> {
                   this.props.sessionSubscriptionsWrapper
                 }
                 enqueueTtsJob={this.props.enqueueTtsJob}
+                inferenceJobs={this.props.inferenceJobs}
                 ttsInferenceJobs={this.props.ttsInferenceJobs}
                 textBuffer={this.props.textBuffer}
                 setTextBuffer={this.props.setTextBuffer}
@@ -487,6 +492,7 @@ class PageContainer extends React.Component<Props, State> {
                   this.props.sessionSubscriptionsWrapper
                 }
                 enqueueTtsJob={this.props.enqueueTtsJob}
+                inferenceJobs={this.props.inferenceJobs}
                 ttsInferenceJobs={this.props.ttsInferenceJobs}
                 ttsModelUploadJobs={this.props.ttsModelUploadJobs}
                 w2lInferenceJobs={this.props.w2lInferenceJobs}
@@ -545,6 +551,8 @@ class PageContainer extends React.Component<Props, State> {
                 clearBootstrapLanguageNotice={
                   this.props.clearBootstrapLanguageNotice
                 }
+                enqueueInferenceJob={this.props.enqueueInferenceJob}
+                inferenceJobs={this.props.inferenceJobs}
                 enqueueTtsJob={this.props.enqueueTtsJob}
                 ttsInferenceJobs={this.props.ttsInferenceJobs}
                 ttsModelUploadJobs={this.props.ttsModelUploadJobs}

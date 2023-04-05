@@ -66,11 +66,13 @@ import { usePrefixedDocumentTitle } from "../../../../../common/UsePrefixedDocum
 import { RatingButtons } from "../../../_common/ratings/RatingButtons";
 import { RatingStats } from "../../../_common/ratings/RatingStats";
 import { CommentComponent } from "../../../_common/comments/CommentComponent";
+import { InferenceJob } from "@storyteller/components/src/jobs/InferenceJob";
 
 interface Props {
   sessionWrapper: SessionWrapper;
   sessionSubscriptionsWrapper: SessionSubscriptionsWrapper;
   enqueueTtsJob: (jobToken: string) => void;
+  inferenceJobs: Array<InferenceJob>;
   ttsInferenceJobs: Array<TtsInferenceJob>;
   textBuffer: string;
   setTextBuffer: (textBuffer: string) => void;
@@ -857,6 +859,7 @@ function TtsModelViewPage(props: Props) {
           Session TTS Results
         </h4>
         <SessionTtsInferenceResultList
+          inferenceJobs={props.inferenceJobs}
           ttsInferenceJobs={props.ttsInferenceJobs}
           sessionSubscriptionsWrapper={props.sessionSubscriptionsWrapper}
         />

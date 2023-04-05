@@ -1,34 +1,34 @@
 import { ApiConfig } from "../ApiConfig";
 
-export interface EnqueueRetrievalRequest {
+export interface EnqueueRemoteDownloadRequest {
   idempotency_token: string,
   title: string,
   download_url: string,
   generic_download_type: string,
 }
 
-export interface EnqueueRetrievalSuccessResponse {
+export interface EnqueueRemoteDownloadSuccessResponse {
   success: boolean,
   job_token: string,
 }
 
-export interface EnqueueRetrievalErrorResponse {
+export interface EnqueueRemoteDownloadErrorResponse {
   success: boolean,
 }
 
-type EnqueueRetrievalResponse = EnqueueRetrievalSuccessResponse | EnqueueRetrievalErrorResponse;
+type EnqueueRemoteDownloadResponse = EnqueueRemoteDownloadSuccessResponse | EnqueueRemoteDownloadErrorResponse;
 
-export function EnqueueRetrievalIsOk(response: EnqueueRetrievalResponse): response is EnqueueRetrievalSuccessResponse {
+export function EnqueueRemoteDownloadIsOk(response: EnqueueRemoteDownloadResponse): response is EnqueueRemoteDownloadSuccessResponse {
   return response?.success === true;
 }
 
-export function EnqueueRetrievalIsError(response: EnqueueRetrievalResponse): response is EnqueueRetrievalErrorResponse {
+export function EnqueueRemoteDownloadIsError(response: EnqueueRemoteDownloadResponse): response is EnqueueRemoteDownloadErrorResponse {
   return response?.success === false;
 }
 
-export async function EnqueueRetrieval(request: EnqueueRetrievalRequest) : Promise<EnqueueRetrievalResponse> 
+export async function EnqueueRemoteDownload(request: EnqueueRemoteDownloadRequest) : Promise<EnqueueRemoteDownloadResponse> 
 {
-  const endpoint = new ApiConfig().enqueueRetrievalJob();
+  const endpoint = new ApiConfig().enqueueRemoteDownloadJob();
   
   return fetch(endpoint, {
     method: 'POST',

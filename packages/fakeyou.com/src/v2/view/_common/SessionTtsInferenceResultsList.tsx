@@ -22,8 +22,10 @@ import {
   GetPendingTtsJobCountIsOk,
   GetPendingTtsJobCountSuccessResponse,
 } from "@storyteller/components/src/api/tts/GetPendingTtsJobCount";
+import { InferenceJob } from "@storyteller/components/src/jobs/InferenceJob";
 
 interface Props {
+  inferenceJobs: Array<InferenceJob>;
   ttsInferenceJobs: Array<TtsInferenceJob>;
   sessionSubscriptionsWrapper: SessionSubscriptionsWrapper;
 }
@@ -61,6 +63,123 @@ function SessionTtsInferenceResultList(props: Props) {
   }, [pendingTtsJobs]);
 
   let results: Array<JSX.Element> = [];
+
+  // TODO(bt,2023-04-08): Clean this utter garbage duplication up.
+
+  // ============================= GENERIC INFERENCE ============================= 
+
+  props.inferenceJobs.forEach((job) => {
+    if (!job.maybeResultToken) {
+      let cssStyle = "alert alert-secondary mb-0";
+      let stateDescription = "Pending...";
+
+      switch (job.jobState) {
+        case JobState.PENDING:
+        case JobState.UNKNOWN:
+          stateDescription =
+            job.maybeExtraStatusDescription == null
+              ? t("common.SessionTtsInferenceResults.progress.pending")
+              : job.maybeExtraStatusDescription;
+          break;
+        case JobState.STARTED:
+          cssStyle = "alert alert-success mb-0";
+          stateDescription =
+            job.maybeExtraStatusDescription == null
+              ? t("common.SessionTtsInferenceResults.progress.started")
+              : job.maybeExtraStatusDescription;
+          break;
+        case JobState.ATTEMPT_FAILED:
+          cssStyle = "alert alert-danger mb-0";
+          stateDescription = `Failed ${job.attemptCount} attempt(s). Will retry...`;
+          break;
+        case JobState.COMPLETE_FAILURE:
+        case JobState.DEAD:
+          cssStyle = "alert alert-danger mb-0";
+          // TODO(bt,2023-01-23): Translate when I can test it
+          stateDescription = t(
+            "common.SessionTtsInferenceResults.progress.dead"
+          );
+          break;
+        case JobState.COMPLETE_SUCCESS:
+          cssStyle = "message is-success mb-0";
+          // Not sure why we're here instead of other branch!
+          stateDescription = t(
+            "common.SessionTtsInferenceResults.progress.success"
+          );
+          break;
+      }
+
+      results.push(
+        <div key={job.jobToken}>
+          <div>
+            <div>
+              <motion.div className={cssStyle} variants={sessionItem}>
+                {stateDescription}
+              </motion.div>
+            </div>
+          </div>
+        </div>
+      );
+    } else {
+      let audioLink = new BucketConfig().getGcsUrl(
+        job.maybeResultPublicBucketMediaPath
+      );
+      let ttsPermalink = `/tts/result/${job.maybeResultToken}`;
+
+      let wavesurfers = <SessionTtsAudioPlayer filename={audioLink} />;
+
+      results.push(
+        <div key={job.jobToken}>
+          {/*<div className="message-header">
+              <p>{job.title}</p>
+              <button className="delete" aria-label="delete"></button>
+            </div>*/}
+          <div>
+            <motion.div
+              className="panel panel-tts-results p-4 gap-3 d-flex flex-column"
+              variants={sessionItem}
+            >
+              <div>
+                <h5 className="mb-2">{job.maybeModelTitle}</h5>
+                <p>{job.maybeRawInferenceText}</p>
+              </div>
+
+              {/* <audio
+                className="w-100"
+                controls
+                src={audioLink}
+                onClick={() => {
+                  Analytics.ttsClickResultInlinePlay();
+                }}
+              >
+                Your browser does not support the
+                <code>audio</code> element.
+              </audio> */}
+
+              {wavesurfers}
+
+              <div className="mt-2">
+                <Link
+                  to={ttsPermalink}
+                  onClick={() => {
+                    Analytics.ttsClickResultLink();
+                  }}
+                  className="fw-semibold"
+                >
+                  <FontAwesomeIcon icon={faLink} className="me-2" />
+                  {t("common.SessionTtsInferenceResults.result.shareDownload")}
+                </Link>
+              </div>
+            </motion.div>
+          </div>
+        </div>
+      );
+    }
+  });
+
+  // TODO(bt,2023-04-08): Clean this utter garbage duplication up.
+
+  // ============================= LEGACY TTS ============================= 
 
   props.ttsInferenceJobs.forEach((job) => {
     if (!job.maybeResultToken) {
@@ -170,6 +289,8 @@ function SessionTtsInferenceResultList(props: Props) {
       );
     }
   });
+
+  // ============================= END LEGACY TTS ============================= 
 
   let noResultsSection = (
     <div className="panel panel-inner text-center p-5 rounded-5 h-100">

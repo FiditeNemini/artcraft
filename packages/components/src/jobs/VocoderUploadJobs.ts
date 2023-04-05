@@ -1,4 +1,4 @@
-import { RetrievalJobStatus } from "../api/retrieval/GetRetrievalJobStatus";
+import { RemoteDownloadJobStatus } from "../api/remote_downloads/GetRemoteDownloadJobStatus";
 import { JobState, jobStateFromString } from "./JobStates";
 
 
@@ -30,7 +30,7 @@ export class VocoderUploadJob {
     }
   }
 
-  static fromResponse(response: RetrievalJobStatus) :  VocoderUploadJob {
+  static fromResponse(response: RemoteDownloadJobStatus) :  VocoderUploadJob {
     return new VocoderUploadJob(
       response.job_token,
       response.status,

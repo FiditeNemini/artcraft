@@ -28,6 +28,9 @@ function UploadTtsModelPage(props: Props) {
 
   const [downloadUrl, setDownloadUrl] = useState("");
   const [title, setTitle] = useState("");
+  const [modelType, setModelType] = useState("tacotron2"); // valid options: tacotron2, vits
+
+  // Form errors
   const [downloadUrlInvalidReason] = useState("");
   const [titleInvalidReason] = useState("");
 
@@ -65,6 +68,10 @@ function UploadTtsModelPage(props: Props) {
     return false;
   };
 
+  const handleModelTypeChange = (ev: React.FormEvent<HTMLSelectElement>) => {
+    setModelType((ev.target as HTMLSelectElement).value);
+  };
+
   const handleFormSubmit = (ev: React.FormEvent<HTMLFormElement>) => {
     ev.preventDefault();
 
@@ -77,6 +84,7 @@ function UploadTtsModelPage(props: Props) {
       idempotency_token: idempotencyToken,
       title: title,
       download_url: downloadUrl,
+      tts_model_type: modelType,
     };
 
     fetch(endpointUrl, {
@@ -176,6 +184,30 @@ function UploadTtsModelPage(props: Props) {
         <div className="container-panel py-5">
           <div className="panel p-3 py-4 p-lg-4">
             <div className="d-flex flex-column gap-4">
+
+              {/* Model Type */}
+              <div>
+                <label className="sub-title">
+                  TTS Model Type
+                </label>
+                <div className="control select">
+                  <select
+                    className="form-select"
+                    name="tts_model_type"
+                    onChange={handleModelTypeChange}
+                    value={modelType}
+                  >
+                    <option value="tacotron2">
+                      Tacotron 2
+                    </option>
+                    <option value="vits">
+                      VITS
+                    </option>
+                  </select>
+                </div>
+              </div>
+
+              {/* Title */}
               <div>
                 <label className="sub-title">
                   Title, eg. "Goku (Sean Schemmel)"
@@ -192,9 +224,7 @@ function UploadTtsModelPage(props: Props) {
                 <p className="help">{titleInvalidReason}</p>
               </div>
 
-              {/* 
-        https://drive.google.com/file/d/{TOKEN}/view?usp=sharing
-        */}
+              {/* Download URL */}
               <div>
                 <label className="sub-title">
                   Download URL, eg. Google Drive link
@@ -210,13 +240,8 @@ function UploadTtsModelPage(props: Props) {
                 </div>
                 <p className="help">{downloadUrlInvalidReason}</p>
               </div>
-            </div>
 
-            {/*<div className="field is-grouped">
-          <div className="control">
-            <button className="button is-link is-large is-fullwidth">Upload</button>
-          </div>
-        </div>*/}
+            </div>
           </div>
         </div>
 

@@ -10,7 +10,10 @@ export interface GenerateTtsAudioRequest {
 }
 
 export interface GenerateTtsAudioSuccess {
+  success: boolean,
   inference_job_token: string,
+  // Which queue to poll
+  inference_job_token_type?: string,
 }
 
 export interface GenerateTtsAudioError {
@@ -63,6 +66,7 @@ export async function GenerateTtsAudio(request: GenerateTtsAudioRequest) : Promi
     } else {
       return <GenerateTtsAudioSuccess> {
         inference_job_token: fullResponse.body.inference_job_token,
+        inference_job_token_type: fullResponse.body.inference_job_token_type,
       };
     }
   }) 
@@ -95,6 +99,7 @@ function maybeMapError(statuslike: StatusLike) : GenerateTtsAudioErrorType | und
 interface EndpointSuccessResponse {
   success: boolean,
   inference_job_token: string,
+  inference_job_token_type?: string,
 }
 
 interface EndpointErrorResponse {

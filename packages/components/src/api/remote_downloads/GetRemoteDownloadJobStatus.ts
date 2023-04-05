@@ -1,11 +1,11 @@
 import { ApiConfig } from "../ApiConfig";
 
-export interface GetRetrievalJobStatusSuccessResponse {
+export interface GetRemoteDownloadJobStatusSuccessResponse {
   success: boolean,
-  state: RetrievalJobStatus,
+  state: RemoteDownloadJobStatus,
 }
 
-export interface RetrievalJobStatus {
+export interface RemoteDownloadJobStatus {
   // Job primary key
   job_token: string,
 
@@ -24,23 +24,23 @@ export interface RetrievalJobStatus {
   updated_at: Date,
 }
 
-export interface GetRetrievalJobStatusErrorResponse {
+export interface GetRemoteDownloadJobStatusErrorResponse {
   success: boolean,
 }
 
-type GetRetrievalJobStatusResponse = GetRetrievalJobStatusSuccessResponse | GetRetrievalJobStatusErrorResponse;
+type GetRemoteDownloadJobStatusResponse = GetRemoteDownloadJobStatusSuccessResponse | GetRemoteDownloadJobStatusErrorResponse;
 
-export function GetRetrievalJobStatusIsOk(response: GetRetrievalJobStatusResponse): response is GetRetrievalJobStatusSuccessResponse {
+export function GetRemoteDownloadJobStatusIsOk(response: GetRemoteDownloadJobStatusResponse): response is GetRemoteDownloadJobStatusSuccessResponse {
   return response?.success === true;
 }
 
-export function GetRetrievalJobStatusIsError(response: GetRetrievalJobStatusResponse): response is GetRetrievalJobStatusErrorResponse {
+export function GetRemoteDownloadJobStatusIsError(response: GetRemoteDownloadJobStatusResponse): response is GetRemoteDownloadJobStatusErrorResponse {
   return response?.success === false;
 }
 
-export async function GetRetrievalJobStatus(jobToken: string) : Promise<GetRetrievalJobStatusResponse> 
+export async function GetRemoteDownloadJobStatus(jobToken: string) : Promise<GetRemoteDownloadJobStatusResponse> 
 {
-  const endpoint = new ApiConfig().getRetrievalJobStatus(jobToken);
+  const endpoint = new ApiConfig().getRemoteDownloadJobStatus(jobToken);
   
   return fetch(endpoint, {
     method: 'GET',

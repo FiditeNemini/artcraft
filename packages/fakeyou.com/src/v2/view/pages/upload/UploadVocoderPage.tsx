@@ -2,9 +2,9 @@ import React, { useState } from "react";
 import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
 import { DiscordLink } from "@storyteller/components/src/elements/DiscordLink";
 import {
-  EnqueueRetrieval,
-  EnqueueRetrievalIsOk,
-} from "@storyteller/components/src/api/retrieval/EnqueueRetrieval";
+  EnqueueRemoteDownload,
+  EnqueueRemoteDownloadIsOk,
+} from "@storyteller/components/src/api/remote_downloads/EnqueueRemoteDownload";
 import { useHistory } from "react-router-dom";
 import { v4 as uuidv4 } from "uuid";
 import { BackLink } from "../../_common/BackLink";
@@ -75,9 +75,9 @@ function UploadVocoderPage(props: Props) {
       generic_download_type: "hifigan",
     };
 
-    const response = await EnqueueRetrieval(request);
+    const response = await EnqueueRemoteDownload(request);
 
-    if (EnqueueRetrievalIsOk(response)) {
+    if (EnqueueRemoteDownloadIsOk(response)) {
       props.enqueueVocoderUploadJob(response.job_token);
       history.push("/");
     }

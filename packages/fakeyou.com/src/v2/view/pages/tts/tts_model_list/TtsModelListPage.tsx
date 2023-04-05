@@ -7,6 +7,7 @@ import { SessionTtsModelUploadResultList } from "../../../_common/SessionTtsMode
 import { SessionW2lInferenceResultList } from "../../../_common/SessionW2lInferenceResultsList";
 import { SessionW2lTemplateUploadResultList } from "../../../_common/SessionW2lTemplateUploadResultsList";
 import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
+import { InferenceJob } from "@storyteller/components/src/jobs/InferenceJob";
 import { TtsInferenceJob } from "@storyteller/components/src/jobs/TtsInferenceJobs";
 import { TtsModelUploadJob } from "@storyteller/components/src/jobs/TtsModelUploadJobs";
 import { W2lInferenceJob } from "@storyteller/components/src/jobs/W2lInferenceJobs";
@@ -91,8 +92,12 @@ interface Props {
   isShowingBootstrapLanguageNotice: boolean;
   clearBootstrapLanguageNotice: () => void;
 
+  enqueueInferenceJob: (jobToken: string) => void;
+  inferenceJobs: Array<InferenceJob>;
+
   enqueueTtsJob: (jobToken: string) => void;
   ttsInferenceJobs: Array<TtsInferenceJob>;
+
   ttsModelUploadJobs: Array<TtsModelUploadJob>;
   w2lInferenceJobs: Array<W2lInferenceJob>;
   w2lTemplateUploadJobs: Array<W2lTemplateUploadJob>;
@@ -292,7 +297,13 @@ function TtsModelListPage(props: Props) {
 
     if (GenerateTtsAudioIsOk(response)) {
       setMaybeTtsError(undefined);
-      props.enqueueTtsJob(response.inference_job_token);
+
+      if (response.inference_job_token_type === "generic") {
+        props.enqueueInferenceJob(response.inference_job_token);
+      } else {
+        props.enqueueTtsJob(response.inference_job_token);
+      }
+
     } else if (GenerateTtsAudioIsError(response)) {
       setMaybeTtsError(response.error);
     }
@@ -598,6 +609,7 @@ function TtsModelListPage(props: Props) {
                     </h4>
                     <div className="d-flex flex-column gap-3 session-tts-section">
                       <SessionTtsInferenceResultList
+                        inferenceJobs={props.inferenceJobs}
                         ttsInferenceJobs={props.ttsInferenceJobs}
                         sessionSubscriptionsWrapper={
                           props.sessionSubscriptionsWrapper

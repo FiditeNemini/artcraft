@@ -46,6 +46,7 @@ import { DynamicallyCategorizeModels } from "../../../../../model/categories/Syn
 
 import { usePrefixedDocumentTitle } from "../../../../../common/UsePrefixedDocumentTitle";
 import { SearchOmnibar } from "./search/SearchOmnibar";
+import { InferenceJob } from "@storyteller/components/src/jobs/InferenceJob";
 
 const PAGE_MODEL_TOKENS = new Set<string>([
   "TM:pmd1wm3kf6az", // Development: "Fake Donald Trump #1"
@@ -66,6 +67,7 @@ interface Props {
   sessionSubscriptionsWrapper: SessionSubscriptionsWrapper;
 
   enqueueTtsJob: (jobToken: string) => void;
+  inferenceJobs: Array<InferenceJob>;
   ttsInferenceJobs: Array<TtsInferenceJob>;
   ttsModelUploadJobs: Array<TtsModelUploadJob>;
   w2lInferenceJobs: Array<W2lInferenceJob>;
@@ -472,6 +474,7 @@ function TrumpTtsPage(props: Props) {
                     </h4>
                     <div className="d-flex flex-column gap-3 session-tts-section">
                       <SessionTtsInferenceResultList
+                        inferenceJobs={props.inferenceJobs}
                         ttsInferenceJobs={props.ttsInferenceJobs}
                         sessionSubscriptionsWrapper={
                           props.sessionSubscriptionsWrapper

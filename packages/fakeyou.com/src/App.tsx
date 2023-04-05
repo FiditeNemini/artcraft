@@ -35,15 +35,17 @@ import i18n from "i18next";
 import { initReactI18next } from "react-i18next";
 import { VocoderUploadJob } from "@storyteller/components/src/jobs/VocoderUploadJobs";
 import {
-  GetRetrievalJobStatus,
-  GetRetrievalJobStatusIsOk,
-} from "@storyteller/components/src/api/retrieval/GetRetrievalJobStatus";
+  GetRemoteDownloadJobStatus,
+  GetRemoteDownloadJobStatusIsOk,
+} from "@storyteller/components/src/api/remote_downloads/GetRemoteDownloadJobStatus";
 import { GetComputedTtsCategoryAssignmentsSuccessResponse } from "@storyteller/components/src/api/category/GetComputedTtsCategoryAssignments";
 import {
   AvailableLanguageKey,
   AVAILABLE_LANGUAGE_MAP,
   ENGLISH_LANGUAGE,
 } from "./_i18n/AvailableLanguageMap";
+import { InferenceJob } from "@storyteller/components/src/jobs/InferenceJob";
+import { GetModelInferenceJobStatus, GetModelInferenceJobStatusIsOk } from "@storyteller/components/src/api/model_inference/GetModelInferenceJobStatus";
 
 i18n
   .use(initReactI18next) // passes i18n down to react-i18next
@@ -126,6 +128,7 @@ interface State {
   isShowingBootstrapLanguageNotice: boolean;
 
   // Jobs enqueued during this browser session.
+  inferenceJobs: Array<InferenceJob>;
   ttsInferenceJobs: Array<TtsInferenceJob>;
   w2lInferenceJobs: Array<W2lInferenceJob>;
   ttsModelUploadJobs: Array<TtsModelUploadJob>;
@@ -185,6 +188,7 @@ class App extends React.Component<Props, State> {
       isShowingPleaseFollowNotice: showPleaseFollowNotice,
       isShowingBootstrapLanguageNotice: false,
 
+      inferenceJobs: [],
       ttsInferenceJobs: [],
       w2lInferenceJobs: [],
       ttsModelUploadJobs: [],
@@ -311,6 +315,40 @@ class App extends React.Component<Props, State> {
 
   clearBootstrapLanguageNotice = () => {
     this.setState({ isShowingBootstrapLanguageNotice: false });
+  };
+
+  checkInferenceJob = async (jobToken: string) => {
+    const lookupResult = await GetModelInferenceJobStatus(jobToken);
+
+    if (GetModelInferenceJobStatusIsOk(lookupResult)) {
+      let updatedJobs: Array<InferenceJob> = [];
+
+      this.state.inferenceJobs.forEach((existingJob) => {
+        if (
+          existingJob.jobToken !== lookupResult.state!.job_token ||
+          !jobStateCanChange(existingJob.jobState)
+        ) {
+          updatedJobs.push(existingJob);
+          return;
+        }
+
+        let updatedJob = InferenceJob.fromResponse(lookupResult.state!);
+        updatedJobs.push(updatedJob);
+      });
+
+      this.setState({
+        inferenceJobs: updatedJobs,
+      });
+    }
+  };
+
+  enqueueInferenceJob = (jobToken: string) => {
+    const newJob = new InferenceJob(jobToken);
+    let inferenceJobs = this.state.inferenceJobs.concat([newJob]);
+
+    this.setState({
+      inferenceJobs: inferenceJobs,
+    });
   };
 
   enqueueTtsJob = (jobToken: string) => {
@@ -531,9 +569,9 @@ class App extends React.Component<Props, State> {
   };
 
   checkVocoderUploadJob = async (jobToken: string) => {
-    const lookupResult = await GetRetrievalJobStatus(jobToken);
+    const lookupResult = await GetRemoteDownloadJobStatus(jobToken);
 
-    if (GetRetrievalJobStatusIsOk(lookupResult)) {
+    if (GetRemoteDownloadJobStatusIsOk(lookupResult)) {
       let updatedJobs: Array<VocoderUploadJob> = [];
 
       this.state.vocoderUploadJobs.forEach((existingJob) => {
@@ -556,6 +594,11 @@ class App extends React.Component<Props, State> {
   };
 
   pollJobs = () => {
+    this.state.inferenceJobs.forEach((job) => {
+      if (jobStateCanChange(job.jobState)) {
+        this.checkInferenceJob(job.jobToken);
+      }
+    });
     this.state.ttsInferenceJobs.forEach((job) => {
       if (jobStateCanChange(job.jobState)) {
         this.checkTtsJob(job.jobToken);
@@ -645,6 +688,8 @@ class App extends React.Component<Props, State> {
                     clearBootstrapLanguageNotice={
                       this.clearBootstrapLanguageNotice
                     }
+                    enqueueInferenceJob={this.enqueueInferenceJob}
+                    inferenceJobs={this.state.inferenceJobs}
                     enqueueTtsJob={this.enqueueTtsJob}
                     ttsInferenceJobs={this.state.ttsInferenceJobs}
                     enqueueW2lJob={this.enqueueW2lJob}

@@ -422,12 +422,24 @@ class ApiConfig {
     return `${this.getScheme()}://${this.getNewApiHost()}/voice_clone_requests/check`;
   }
 
-  enqueueRetrievalJob(): string {
-    return `${this.getScheme()}://${this.getNewApiHost()}/retrieval/enqueue`;
+  // =============== Generic Model Downloads ===============
+
+  enqueueRemoteDownloadJob(): string {
+    return `${this.getScheme()}://${this.getNewApiHost()}/v1/remote_downloads/enqueue`;
   }
 
-  getRetrievalJobStatus(jobToken: string): string {
-    return `${this.getScheme()}://${this.getNewApiHost()}/retrieval/job_status/${jobToken}`;
+  getRemoteDownloadJobStatus(jobToken: string): string {
+    return `${this.getScheme()}://${this.getNewApiHost()}/v1/remote_downloads/job_status/${jobToken}`;
+  }
+
+  // =============== Generic Model Inference ===============
+
+  getModelInferenceJobStatus(jobToken: string): string {
+    return `${this.getScheme()}://${this.getNewApiHost()}/v1/model_inference/job_status/${jobToken}`;
+  }
+
+  getPendingModelInferenceJobCount(): string {
+    return `${this.getScheme()}://${this.getNewApiHost()}/v1/model_inference/queue_length`;
   }
 
   // =============== User Ratings ===============

@@ -1,0 +1,85 @@
+import { ModelInferenceJobStatus } from "../api/model_inference/GetModelInferenceJobStatus";
+import { JobState, jobStateFromString } from "./JobStates";
+
+// NB: Many of these fields are optional despite the response payload containing them
+// This is because we create temporary placeholder objects with just the token.
+export class InferenceJob {
+  // PK
+  jobToken: string;
+
+  // Status
+  jobState: JobState;
+  maybeExtraStatusDescription: string | null;
+  attemptCount: number;
+
+  // Request
+  maybeModelType?: string;
+  maybeModelToken?: string;
+  maybeModelTitle?: string;
+  maybeRawInferenceText?: string;
+
+  // Result
+  maybeResultType: string | undefined | null;
+  maybeResultToken: string | undefined | null;
+  maybeResultPublicBucketMediaPath: string | undefined | null;
+
+  constructor(
+    // PK
+    jobToken: string, 
+    // Status
+    status: string = 'unknown',
+    maybeExtraStatusDescription: string | null = null,
+    attemptCount: number = 0,
+    // Request
+    maybeModelType: string | undefined = undefined,
+    maybeModelToken: string | undefined = undefined,
+    maybeModelTitle: string | undefined = undefined,
+    maybeRawInferenceText: string | undefined = undefined,
+    // Result
+    maybeResultEntityType: string | undefined | null = null,
+    maybeResultEntityToken: string | undefined | null = null,
+    maybeResultPublicBucketMediaPath: string | undefined | null = null,
+  ) {
+    this.jobToken = jobToken;
+    this.jobState = jobStateFromString(status);
+    this.maybeExtraStatusDescription = maybeExtraStatusDescription;
+    this.attemptCount = attemptCount;
+
+    if (!!maybeModelType) {
+      this.maybeModelTitle = maybeModelType;
+    }
+    if (!!maybeModelToken) {
+      this.maybeModelToken = maybeModelToken;
+    }
+    if (!!maybeModelTitle) {
+      this.maybeModelTitle = maybeModelTitle;
+    }
+
+    this.maybeRawInferenceText = maybeRawInferenceText;
+
+    if (!!maybeResultEntityType) {
+      this.maybeResultType = maybeResultEntityType;
+    }
+    if (!!maybeResultEntityToken) {
+      this.maybeResultToken = maybeResultEntityToken;
+    }
+
+    this.maybeResultPublicBucketMediaPath = maybeResultPublicBucketMediaPath;
+  }
+
+  static fromResponse(response: ModelInferenceJobStatus) : InferenceJob {
+    return new InferenceJob(
+      response.job_token,
+      response.status.status,
+      response.status.maybe_extra_status_description || null,
+      response.status.attempt_count || 0,
+      response.request.maybe_model_type,
+      response.request.maybe_model_token,
+      response.request.maybe_model_title,
+      response.request.maybe_raw_inference_text,
+      response.maybe_result?.entity_type,
+      response.maybe_result?.entity_token,
+      response.maybe_result?.maybe_public_bucket_media_path,
+    );
+  }
+}
