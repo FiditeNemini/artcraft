@@ -8,8 +8,12 @@ const fileTypes = ["MP3", "WAV", "FLAC"];
 
 function UploadComponent() {
   const [file, setFile] = useState<any>();
+  const [audioLink, setAudioLink] = useState<string>();
+
   const handleChange = (file: any) => {
     setFile(file);
+    const audioUrl = URL.createObjectURL(file);
+    setAudioLink(audioUrl ?? "");
   };
 
   const handleDragOver = (e: React.DragEvent<HTMLDivElement>): void => {
@@ -30,9 +34,6 @@ function UploadComponent() {
       : file
       ? `${Math.floor(file.size / 1024)} KB`
       : null;
-
-  let audioLink =
-    "https://storage.googleapis.com/vocodes-public/tts_inference_output/c/7/2/vocodes_c721a29c-c8e0-4499-9ddd-dac471269a5d.wav";
 
   return (
     <div className="d-flex flex-column gap-3">
@@ -91,13 +92,13 @@ function UploadComponent() {
       />
       {file ? (
         <div className="panel panel-inner rounded p-3">
-          <InputVcAudioPlayer filename={audioLink} />
+          <InputVcAudioPlayer filename={audioLink as string} />
         </div>
       ) : (
         <></>
       )}
       {file ? (
-        <div className="d-flex justify-content-lg-end mb-4 mb-lg-2">
+        <div className="d-flex mt-2 mb-4 mb-lg-3">
           <div className="form-check form-switch">
             <input
               className="form-check-input"

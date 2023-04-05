@@ -1128,6 +1128,60 @@ styles with important tags:
     background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='-4 -4 8 8'%3e%3ccircle r='3' fill='white'/%3e%3c/svg%3e") !important;
     border-color: $primary !important;
   }
+
+  .audio-recorder {
+    background-color: $primary;
+    box-shadow: none;
+    border-radius: 0.5rem;
+    transition: all 0.1s;
+    padding: 16px;
+    width: 48px;
+    font-size: 16px;
+
+    &:hover {
+      background-color: lighten($primary, 5%);
+      cursor: pointer;
+    }
+
+    img {
+      filter: brightness(0) saturate(100%) invert(99%) sepia(1%) saturate(792%)
+        hue-rotate(318deg) brightness(109%) contrast(101%);
+    }
+
+    &.recording {
+      border-radius: 0.5rem;
+      width: 100%;
+      transition: all 0.2s;
+      background-color: $input-dark;
+
+      &:hover {
+        background-color: $input-dark;
+        cursor: auto;
+      }
+
+      .audio-recorder-mic {
+        transition: all 0.2s;
+
+        &:hover {
+          opacity: 0.5;
+        }
+      }
+    }
+
+    .audio-recorder-timer,
+    .audio-recorder-status {
+      font-family: "Fira Sans", sans-serif;
+      font-size: 16px;
+    }
+
+    .audio-recorder-options {
+      transition: all 0.2s;
+
+      &:hover {
+        opacity: 0.5;
+      }
+    }
+  }
 }
 
 select {
@@ -1272,7 +1326,7 @@ textarea {
     }
 
     .session-tts-section {
-      height: 450px;
+      height: 500px;
     }
 
     .session-tts-section::-webkit-scrollbar {

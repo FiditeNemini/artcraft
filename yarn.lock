@@ -4382,6 +4382,7 @@ __metadata:
     pretty-num: ^0.5.2
     query-string: ^8.1.0
     react: ^16.13.1
+    react-audio-voice-recorder: ^1.0.5
     react-autocomplete: ^1.8.1
     react-dom: ^16.13.1
     react-drag-drop-files: ^2.3.9
@@ -16961,6 +16962,19 @@ __metadata:
   languageName: node
   linkType: hard
 
+"react-audio-voice-recorder@npm:^1.0.5":
+  version: 1.0.5
+  resolution: "react-audio-voice-recorder@npm:1.0.5"
+  dependencies:
+    react: ^18.2.0
+    react-dom: ^18.2.0
+  peerDependencies:
+    react: ">=16.2.0"
+    react-dom: ">=16.2.0"
+  checksum: 0f8c738cb63c4312412ba5b52aa777d0e545fe6942ddb10cbdf31807d3b8e7014bf6780401150f7e2da88f955e698cc4514f2ff195cfb3185bd6cddd0278d2f7
+  languageName: node
+  linkType: hard
+
 "react-autocomplete@npm:^1.8.1":
   version: 1.8.1
   resolution: "react-autocomplete@npm:1.8.1"
@@ -17017,6 +17031,18 @@ __metadata:
   peerDependencies:
     react: ^16.14.0
   checksum: 5a5c49da0f106b2655a69f96c622c347febcd10532db391c262b26aec225b235357d9da1834103457683482ab1b229af7a50f6927a6b70e53150275e31785544
+  languageName: node
+  linkType: hard
+
+"react-dom@npm:^18.2.0":
+  version: 18.2.0
+  resolution: "react-dom@npm:18.2.0"
+  dependencies:
+    loose-envify: ^1.1.0
+    scheduler: ^0.23.0
+  peerDependencies:
+    react: ^18.2.0
+  checksum: 7d323310bea3a91be2965f9468d552f201b1c27891e45ddc2d6b8f717680c95a75ae0bc1e3f5cf41472446a2589a75aed4483aee8169287909fcd59ad149e8cc
   languageName: node
   linkType: hard
 
@@ -17341,6 +17367,15 @@ __metadata:
     object-assign: ^4.1.1
     prop-types: ^15.6.2
   checksum: 8484f3ecb13414526f2a7412190575fc134da785c02695eb92bb6028c930bfe1c238d7be2a125088fec663cc7cda0a3623373c46807cf2c281f49c34b79881ac
+  languageName: node
+  linkType: hard
+
+"react@npm:^18.2.0":
+  version: 18.2.0
+  resolution: "react@npm:18.2.0"
+  dependencies:
+    loose-envify: ^1.1.0
+  checksum: 88e38092da8839b830cda6feef2e8505dec8ace60579e46aa5490fc3dc9bba0bd50336507dc166f43e3afc1c42939c09fe33b25fae889d6f402721dcd78fca1b
   languageName: node
   linkType: hard
 
@@ -18114,6 +18149,15 @@ __metadata:
     loose-envify: ^1.1.0
     object-assign: ^4.1.1
   checksum: 73e185a59e2ff5aa3609f5b9cb97ddd376f89e1610579d29939d952411ca6eb7a24907a4ea4556569dacb931467a1a4a56d94fe809ef713aa76748642cd96a6c
+  languageName: node
+  linkType: hard
+
+"scheduler@npm:^0.23.0":
+  version: 0.23.0
+  resolution: "scheduler@npm:0.23.0"
+  dependencies:
+    loose-envify: ^1.1.0
+  checksum: d79192eeaa12abef860c195ea45d37cbf2bbf5f66e3c4dcd16f54a7da53b17788a70d109ee3d3dde1a0fd50e6a8fc171f4300356c5aee4fc0171de526bf35f8a
   languageName: node
   linkType: hard
 

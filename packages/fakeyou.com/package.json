@@ -40,6 +40,7 @@
     "pretty-num": "^0.5.2",
     "query-string": "^8.1.0",
     "react": "^16.13.1",
+    "react-audio-voice-recorder": "^1.0.5",
     "react-autocomplete": "^1.8.1",
     "react-dom": "^16.13.1",
     "react-drag-drop-files": "^2.3.9",

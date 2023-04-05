@@ -19,6 +19,7 @@ import {
   faTrash,
 } from "@fortawesome/pro-solid-svg-icons";
 import UploadComponent from "./UploadComponent";
+import RecordComponent from "./RecordComponent";
 import { Link } from "react-router-dom";
 import { usePrefixedDocumentTitle } from "../../../../../common/UsePrefixedDocumentTitle";
 
@@ -70,16 +71,16 @@ function VcModelListPage(props: Props) {
     </div>
   );
 
-  let comingSoon = (
-    <div className="overflow-hidden">
-      <div className="panel panel-inner text-center p-5 rounded-5 h-100">
-        <div className="d-flex flex-column opacity-75 h-100 justify-content-center">
-          <FontAwesomeIcon icon={faTimer} className="fs-3 mb-3" />
-          <p>This feature is coming soon!</p>
-        </div>
-      </div>
-    </div>
-  );
+  // let comingSoon = (
+  //   <div className="overflow-hidden">
+  //     <div className="panel panel-inner text-center p-5 rounded-5 h-100">
+  //       <div className="d-flex flex-column opacity-75 h-100 justify-content-center">
+  //         <FontAwesomeIcon icon={faTimer} className="fs-3 mb-3" />
+  //         <p>This feature is coming soon!</p>
+  //       </div>
+  //     </div>
+  //   </div>
+  // );
 
   usePrefixedDocumentTitle("Voice Conversion");
 
@@ -160,7 +161,7 @@ function VcModelListPage(props: Props) {
                       <div className="d-flex flex-column gap-4 h-100">
                         <div>
                           <label className="sub-title">
-                            Select Input Audio
+                            Upload Input Audio
                           </label>
                           <div className="d-flex flex-column gap-3 upload-component">
                             <UploadComponent />
@@ -169,7 +170,7 @@ function VcModelListPage(props: Props) {
 
                         <div>
                           <label className="sub-title">
-                            Your Audio Collection (5 files)
+                            Or pick from your audio collection (5 files)
                           </label>
                           <div className="d-flex flex-column gap-3">
                             <div className="input-icon-search">
@@ -224,7 +225,38 @@ function VcModelListPage(props: Props) {
                       role="tabpanel"
                       aria-labelledby="w2lresults-tab"
                     >
-                      {comingSoon}
+                      <div className="d-flex flex-column gap-4 h-100">
+                        <div>
+                          <label className="sub-title">Record Audio</label>
+                          <div className="d-flex flex-column gap-3 upload-component">
+                            <RecordComponent />
+                          </div>
+                        </div>
+
+                        <div className="d-flex gap-3">
+                          <button
+                            className={speakButtonClass}
+                            onClick={handleLoading}
+                            type="submit"
+                            disabled={true}
+                          >
+                            <FontAwesomeIcon
+                              icon={faRightLeft}
+                              className="me-2"
+                            />
+                            Convert
+                            {loading && <LoadingIcon />}
+                          </button>
+                          <button
+                            className="btn btn-destructive w-100"
+                            onClick={handleClearClick}
+                            disabled={true}
+                          >
+                            <FontAwesomeIcon icon={faTrash} className="me-2" />
+                            Clear
+                          </button>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>
