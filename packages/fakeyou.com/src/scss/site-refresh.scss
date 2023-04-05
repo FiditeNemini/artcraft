@@ -1106,6 +1106,13 @@ styles with important tags:
       font-size: 42px;
     }
   }
+
+  .nav-vc {
+    flex-wrap: nowrap;
+    height: auto;
+    overflow-y: hidden;
+    overflow-x: auto;
+  }
 }
 
 select {

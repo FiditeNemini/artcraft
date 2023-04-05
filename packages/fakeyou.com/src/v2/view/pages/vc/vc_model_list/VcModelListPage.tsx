@@ -15,6 +15,7 @@ import {
   faLink,
   faMicrophone,
   faRightLeft,
+  faTimer,
   faTrash,
 } from "@fortawesome/pro-solid-svg-icons";
 import UploadComponent from "./UploadComponent";
@@ -69,6 +70,17 @@ function VcModelListPage(props: Props) {
     </div>
   );
 
+  let comingSoon = (
+    <div className="overflow-hidden">
+      <div className="panel panel-inner text-center p-5 rounded-5 h-100">
+        <div className="d-flex flex-column opacity-75 h-100 justify-content-center">
+          <FontAwesomeIcon icon={faTimer} className="fs-3 mb-3" />
+          <p>This feature is coming soon!</p>
+        </div>
+      </div>
+    </div>
+  );
+
   usePrefixedDocumentTitle("Voice Conversion");
 
   return (
@@ -107,60 +119,112 @@ function VcModelListPage(props: Props) {
               </div>
 
               <div className="row gx-5 gy-5">
-                <div className="col-12 col-lg-6 d-flex flex-column gap-3">
-                  <div className="d-flex flex-column gap-4 h-100">
-                    <div>
-                      <label className="sub-title">Select Input Audio</label>
-                      <div className="d-flex flex-column gap-3 upload-component">
-                        <UploadComponent />
-                      </div>
-                    </div>
+                <div className="col-12 col-lg-6 d-flex flex-column gap-4">
+                  <ul className="nav nav-tabs nav-vc" id="myTab" role="tablist">
+                    <li className="nav-item w-100" role="presentation">
+                      <button
+                        className="nav-link active w-100"
+                        id="ttsresults-tab"
+                        data-bs-toggle="tab"
+                        data-bs-target="#ttsresults"
+                        type="button"
+                        role="tab"
+                        aria-controls="ttsresults"
+                        aria-selected="true"
+                      >
+                        Pre-recorded
+                      </button>
+                    </li>
+                    <li className="nav-item w-100" role="presentation">
+                      <button
+                        className="nav-link w-100"
+                        id="w2lresults-tab"
+                        data-bs-toggle="tab"
+                        data-bs-target="#w2lresults"
+                        type="button"
+                        role="tab"
+                        aria-controls="w2lresults"
+                        aria-selected="false"
+                      >
+                        Microphone
+                      </button>
+                    </li>
+                  </ul>
+                  <div className="tab-content" id="myTabContent">
+                    <div
+                      className="tab-pane fade show active"
+                      id="ttsresults"
+                      role="tabpanel"
+                      aria-labelledby="ttsresults-tab"
+                    >
+                      <div className="d-flex flex-column gap-4 h-100">
+                        <div>
+                          <label className="sub-title">
+                            Select Input Audio
+                          </label>
+                          <div className="d-flex flex-column gap-3 upload-component">
+                            <UploadComponent />
+                          </div>
+                        </div>
 
-                    <div>
-                      <label className="sub-title">
-                        Your Uploaded Audio (5 files)
-                      </label>
-                      <div className="d-flex flex-column gap-3">
-                        <div className="input-icon-search">
-                          <span className="form-control-feedback">
-                            <FontAwesomeIcon icon={faFiles} />
-                          </span>
+                        <div>
+                          <label className="sub-title">
+                            Your Uploaded Audio (5 files)
+                          </label>
+                          <div className="d-flex flex-column gap-3">
+                            <div className="input-icon-search">
+                              <span className="form-control-feedback">
+                                <FontAwesomeIcon icon={faFiles} />
+                              </span>
 
-                          <Select
-                            value="test"
-                            classNames={SearchFieldClass}
-                            // On mobile, we don't want the onscreen keyboard to take up half the UI.
-                            autoFocus={false}
-                            isSearchable={false}
-                            // NB: The following settings improve upon performance.
-                            // See: https://github.com/JedWatson/react-select/issues/3128
-                            filterOption={createFilter({
-                              ignoreAccents: false,
-                            })}
-                          />
+                              <Select
+                                value="test"
+                                classNames={SearchFieldClass}
+                                // On mobile, we don't want the onscreen keyboard to take up half the UI.
+                                autoFocus={false}
+                                isSearchable={false}
+                                // NB: The following settings improve upon performance.
+                                // See: https://github.com/JedWatson/react-select/issues/3128
+                                filterOption={createFilter({
+                                  ignoreAccents: false,
+                                })}
+                              />
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="d-flex gap-3">
+                          <button
+                            className={speakButtonClass}
+                            onClick={handleLoading}
+                            type="submit"
+                            disabled={true}
+                          >
+                            <FontAwesomeIcon
+                              icon={faRightLeft}
+                              className="me-2"
+                            />
+                            Convert
+                            {loading && <LoadingIcon />}
+                          </button>
+                          <button
+                            className="btn btn-destructive w-100"
+                            onClick={handleClearClick}
+                            disabled={true}
+                          >
+                            <FontAwesomeIcon icon={faTrash} className="me-2" />
+                            Clear
+                          </button>
                         </div>
                       </div>
                     </div>
-
-                    <div className="d-flex gap-3">
-                      <button
-                        className={speakButtonClass}
-                        onClick={handleLoading}
-                        type="submit"
-                        disabled={true}
-                      >
-                        <FontAwesomeIcon icon={faRightLeft} className="me-2" />
-                        Convert
-                        {loading && <LoadingIcon />}
-                      </button>
-                      <button
-                        className="btn btn-destructive w-100"
-                        onClick={handleClearClick}
-                        disabled={true}
-                      >
-                        <FontAwesomeIcon icon={faTrash} className="me-2" />
-                        Clear
-                      </button>
+                    <div
+                      className="tab-pane fade"
+                      id="w2lresults"
+                      role="tabpanel"
+                      aria-labelledby="w2lresults-tab"
+                    >
+                      {comingSoon}
                     </div>
                   </div>
                 </div>
@@ -174,8 +238,8 @@ function VcModelListPage(props: Props) {
                       Session VC Results
                     </h4>
                     <div className="d-flex flex-column gap-3 session-tts-section">
-                      {/* {noResultsSection} */}
-                      <motion.div
+                      {noResultsSection}
+                      {/* <motion.div
                         className="panel panel-tts-results p-4 gap-3 d-flex flex-column"
                         variants={sessionItem}
                       >
@@ -190,7 +254,7 @@ function VcModelListPage(props: Props) {
                             Details
                           </Link>
                         </div>
-                      </motion.div>
+                      </motion.div> */}
                     </div>
                   </div>
                 </div>
