@@ -12,6 +12,7 @@ use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::server_state::ServerState;
 use enums::common::visibility::Visibility;
 use enums::workers::generic_inference_type::GenericInferenceType;
+use errors::AnyhowResult;
 use http_server_common::request::get_request_api_token::get_request_api_token;
 use http_server_common::request::get_request_header_optional::get_request_header_optional;
 use http_server_common::request::get_request_ip::get_request_ip;
@@ -230,11 +231,27 @@ pub async fn infer_tts_handler(
 
   // ==================== CHECK TTS MODEL EXISTENCE / SETTINGS==================== //
 
-  let is_authorized = check_if_authorized_to_use_model(
+  let tts_model_lookup_result = get_model_with_caching(
     &request.tts_model_token,
-    maybe_user_session.as_ref(),
     &server_state.redis_ttl_cache,
-    &mut mysql_connection,
+    &mut mysql_connection
+  ).await;
+
+  let tts_model = match tts_model_lookup_result {
+    Ok(Some(model)) => model,
+    Ok(None) => {
+      warn!("Model could not be found: {}", request.tts_model_token);
+      return Err(InferTtsError::NotFound);
+    }
+    Err(err) => {
+      warn!("Error loading TTS model: {:?}", err);
+      return Err(InferTtsError::ServerError);
+    }
+  };
+
+  let is_authorized = check_if_authorized_to_use_model(
+    maybe_user_session.as_ref(),
+    &tts_model,
   ).await;
 
   if !is_authorized {
@@ -409,14 +426,11 @@ pub fn validate_inference_text(text: &str) -> Result<(), String> {
 
 // TODO: Read from in-memory TTS List cache first (!!!) for further performance savings
 
-/// If the model is private, determine if the user can use the model.
-/// This is designed to fail closed (read: actually open!) rather than hit resources.
-async fn check_if_authorized_to_use_model(
+async fn get_model_with_caching(
   model_token: &str,
-  maybe_user_session: Option<&UserSessionExtended>,
   redis_ttl_cache: &RedisTtlCache,
   mysql_connection: &mut PoolConnection<MySql>,
-) -> bool {
+) -> AnyhowResult<Option<TtsModelRecord>> {
 
   let model_token2 = model_token.clone();
 
@@ -435,28 +449,23 @@ async fn check_if_authorized_to_use_model(
   let mut redis_ttl_cache_connection = match redis_ttl_cache.get_connection() {
     Ok(connection) => connection,
     Err(err) => {
+      // NB: Fail open (potentially dangerous).
       error!("Can't get redis cache: {:?}", err);
-      return true; // TODO/FIXME: Failing open is probably a bad choice.
+      return get_tts_model().await;
     }
   };
 
-  let model_query_result = redis_ttl_cache_connection.lazy_load_if_not_cached(&cache_key, move || {
+  redis_ttl_cache_connection.lazy_load_if_not_cached(&cache_key, move || {
     get_tts_model()
-  }).await;
+  }).await
+}
 
-  let tts_model : TtsModelRecord = match model_query_result {
-    Ok(Some(tts_model)) => tts_model,
-    Ok(None) => {
-      error!("Couldn't find TTS model");
-      //return Err(InferTtsError::NotFound);
-      return true; // TODO/FIXME: Failing open is probably a bad choice.
-    }
-    Err(err) => {
-      error!("Error querying for model: {:?}", err);
-      //return Err(InferTtsError::ServerError);
-      return true; // TODO/FIXME: Failing open is probably a bad choice.
-    }
-  };
+/// If the model is private, determine if the user can use the model.
+/// This is designed to fail closed (read: actually open!) rather than hit resources.
+async fn check_if_authorized_to_use_model(
+  maybe_user_session: Option<&UserSessionExtended>,
+  tts_model: &TtsModelRecord,
+) -> bool {
 
   match tts_model.creator_set_visibility {
     Visibility::Public => return true,

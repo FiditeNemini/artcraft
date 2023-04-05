@@ -5,10 +5,11 @@
 
 use anyhow::anyhow;
 use chrono::{DateTime, Utc};
-use errors::AnyhowResult;
 use crate::column_types::vocoder_type::VocoderType;
 use crate::helpers::boolean_converters::i8_to_bool;
+use enums::by_table::tts_models::tts_model_type::TtsModelType;
 use enums::common::visibility::Visibility;
+use errors::AnyhowResult;
 use log::warn;
 use sqlx::pool::PoolConnection;
 use sqlx::{MySql, MySqlPool};
@@ -19,7 +20,7 @@ use sqlx::{MySql, MySqlPool};
 #[derive(Serialize, Deserialize, Clone)]
 pub struct TtsModelRecord {
   pub model_token: String,
-  pub tts_model_type: String,
+  pub tts_model_type: TtsModelType,
 
   /// NB: text_pipeline_type may not always be present in the database.
   pub text_pipeline_type: Option<String>,
@@ -195,7 +196,7 @@ async fn select_including_deleted(
         r#"
 SELECT
     tts.token as model_token,
-    tts.tts_model_type,
+    tts.tts_model_type as `tts_model_type: enums::by_table::tts_models::tts_model_type::TtsModelType`,
     tts.text_pipeline_type,
     tts.text_preprocessing_algorithm,
     tts.maybe_default_pretrained_vocoder,
@@ -271,7 +272,7 @@ async fn select_without_deleted(
         r#"
 SELECT
     tts.token as model_token,
-    tts.tts_model_type,
+    tts.tts_model_type as `tts_model_type: enums::by_table::tts_models::tts_model_type::TtsModelType`,
     tts.text_pipeline_type,
     tts.text_preprocessing_algorithm,
     tts.maybe_default_pretrained_vocoder,
@@ -344,7 +345,7 @@ WHERE
 #[derive(Serialize)]
 struct InternalTtsModelRecordRaw {
   pub model_token: String,
-  pub tts_model_type: String,
+  pub tts_model_type: TtsModelType,
   pub text_pipeline_type: Option<String>,
   pub maybe_default_pretrained_vocoder: Option<String>,
   pub text_preprocessing_algorithm: String,

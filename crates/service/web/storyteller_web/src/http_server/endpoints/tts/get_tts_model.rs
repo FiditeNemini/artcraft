@@ -11,6 +11,7 @@ use chrono::{DateTime, Utc};
 use crate::server_state::ServerState;
 use crate::user_avatars::default_avatar_color_from_username::default_avatar_color_from_username;
 use crate::user_avatars::default_avatar_from_username::default_avatar_from_username;
+use enums::by_table::tts_models::tts_model_type::TtsModelType;
 use enums::common::visibility::Visibility;
 use http_server_common::response::serialize_as_json_error::serialize_as_json_error;
 use log::warn;
@@ -42,7 +43,7 @@ pub struct GetTtsModelSuccessResponse {
 #[derive(Serialize)]
 pub struct TtsModelInfo {
   pub model_token: String,
-  pub tts_model_type: String,
+  pub tts_model_type: TtsModelType,
 
   /// Named text pipeline/algorithm, eg. "legacy_fakeyou", "english_v1", "spanish_v2", etc.
   ///
