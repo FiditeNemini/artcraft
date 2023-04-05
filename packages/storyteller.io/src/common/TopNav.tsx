@@ -172,8 +172,6 @@ function TopNav(props: Props) {
                 Music
               </a>
             </li>
-
-            {/* NB: Hiding this for now.
             <li>
               <a
                 id="nav-btn-5"
@@ -183,7 +181,7 @@ function TopNav(props: Props) {
               >
                 Our Team
               </a>
-            </li>*/}
+            </li>
           </ul>
 
           <div className="col-md-3 text-end">
@@ -247,11 +245,11 @@ function TopNav(props: Props) {
                 </a>
               </li>
 
-              {/* <li className="nav-link">
+              <li className="nav-link">
                 <a onClick={menuToggle} href="#team" data-scroll-to>
                   Our Team
                 </a>
-              </li> */}
+              </li>
               <li className="mt-4">
                 <a
                   onClick={menuToggle}

@@ -158,7 +158,7 @@ function IndexPage() {
               <div id="hero-btn" className="pt-4 mt-3">
                 <a
                   className="btn btn-primary d-inline-flex"
-                  href="#film"
+                  href="#social"
                   data-scroll-to
                 >
                   <span>Explore Storyteller</span>
@@ -213,7 +213,6 @@ function IndexPage() {
           </Tippy>
         </div>
       </div>
-
       <div id="social" className="bg-light section-2">
         <div>
           <Marquee gradient={false} speed={100}>
@@ -281,7 +280,6 @@ function IndexPage() {
           </div>
         </div>
       </div>
-
       <div className="bg-dark section-2">
         <div className="container">
           <div className="row gx-5 gy-5">
@@ -335,7 +333,6 @@ function IndexPage() {
           </div>
         </div>
       </div>
-
       <div
         id="film"
         className="bg-light section"
@@ -360,7 +357,7 @@ function IndexPage() {
           <h1 className="fw-bold display-4 about-title mt-5">
             Be Your Own Hollywood
           </h1>
-          <h4 className="fw-normal opacity-75 mt-3">
+          <h4 className="fw-normal opacity-75 mt-3 lh-base">
             Storyteller&apos;s generative AI engine empowers anyone to be a film
             director or movie star.
           </h4>
@@ -432,19 +429,26 @@ function IndexPage() {
           </div>
         </div>
       </div>
-
       <div className="bg-dark section-2">
         <div className="container">
           <div className="row gx-4 gy-4 gx-lg-5 gy-lg-5 mb-5">
             <div className="col-12 col-md-6 d-flex flex-column justify-content-center">
               <video
-                src="/video/webpage-demo-1-640.mp4"
                 autoPlay={true}
                 playsInline={true}
                 loop={true}
                 muted={true}
-                className="img-fluid img-border"
-              ></video>
+                className="ratio ratio-16x9 img-border"
+              >
+                <source
+                  src="/video/webpage-demo-1-640.webm"
+                  type="video/webm"
+                ></source>
+                <source
+                  src="/video/webpage-demo-1-640.mp4"
+                  type="video/mp4"
+                ></source>
+              </video>
             </div>
             <div className="col-12 col-md-6 d-flex flex-column justify-content-center">
               <div className="p-lg-4 align-items-start justify-content-center fs-6 h-auto">
@@ -461,13 +465,21 @@ function IndexPage() {
           <div className="row gx-4 gy-4 gx-lg-5 gy-lg-5 flex-row-reverse mb-5">
             <div className="col-12 col-md-6 d-flex flex-column justify-content-center">
               <video
-                src="/video/webpage-demo-2-640.mp4"
                 autoPlay={true}
                 playsInline={true}
                 loop={true}
                 muted={true}
-                className="img-fluid img-border"
-              ></video>
+                className="ratio ratio-16x9 img-border"
+              >
+                <source
+                  src="/video/webpage-demo-2-640.webm"
+                  type="video/webm"
+                ></source>
+                <source
+                  src="/video/webpage-demo-2-640.mp4"
+                  type="video/mp4"
+                ></source>
+              </video>
             </div>
             <div className="col-12 col-md-6 d-flex flex-column justify-content-center">
               <div className="p-lg-4 align-items-start justify-content-center fs-6 h-auto">
@@ -484,13 +496,21 @@ function IndexPage() {
           <div className="row gx-4 gy-4 gx-lg-5 gy-lg-5">
             <div className="col-12 col-md-6 d-flex flex-column justify-content-center">
               <video
-                src="/video/webpage-demo-3-640.mp4"
                 autoPlay={true}
                 playsInline={true}
                 loop={true}
                 muted={true}
-                className="img-fluid img-border"
-              ></video>
+                className="ratio ratio-16x9 img-border"
+              >
+                <source
+                  src="/video/webpage-demo-3-640.webm"
+                  type="video/webm"
+                ></source>
+                <source
+                  src="/video/webpage-demo-3-640.mp4"
+                  type="video/mp4"
+                ></source>
+              </video>
             </div>
             <div className="col-12 col-md-6 d-flex flex-column justify-content-center">
               <div className="p-lg-4 align-items-start justify-content-center fs-6 h-auto">
@@ -508,7 +528,6 @@ function IndexPage() {
           </div>
         </div>
       </div>
-
       <div className="bg-hero-2">
         <div className="d-flex justify-content-center">
           {/* <img
@@ -605,20 +624,31 @@ function IndexPage() {
           </Tippy>
         </div>
 
-        <div className="shape-2"></div>
-        <div className="shape-3-container" data-scroll data-scroll-speed="3">
+        <div className="shape-2 d-none d-lg-block"></div>
+        <div
+          className="shape-3-container d-none d-lg-block"
+          data-scroll
+          data-scroll-speed="3"
+        >
           <div className="shape-3"></div>
         </div>
 
-        <div className="shape-1-container" data-scroll data-scroll-speed="3">
+        <div
+          className="shape-1-container d-none d-lg-block"
+          data-scroll
+          data-scroll-speed="3"
+        >
           <div className="shape-1"></div>
         </div>
 
-        <div className="shape-4-container" data-scroll data-scroll-speed="2">
+        <div
+          className="shape-4-container d-none d-lg-block"
+          data-scroll
+          data-scroll-speed="2"
+        >
           <div className="shape-4"></div>
         </div>
       </div>
-
       <div
         id="music"
         className="bg-light section"
@@ -647,7 +677,7 @@ function IndexPage() {
           <h1 className="fw-bold display-4 about-title mt-5">
             Top the Billboard Charts
           </h1>
-          <h4 className="fw-normal opacity-75 mt-3">
+          <h4 className="fw-normal opacity-75 mt-3 lh-base">
             Our technology can turn anyone into a musician.
           </h4>
         </div>
@@ -690,7 +720,6 @@ function IndexPage() {
         </div>
       </div>
 
-      {/* NB: We're not quite ready to show our deck yet. But we're going to be filling this out silently.
       <div id="team" className="bg-light section-2">
         <div>
           <Marquee gradient={false} speed={120}>
@@ -721,34 +750,73 @@ function IndexPage() {
           </p>
         </div>
 
-        <div className="container mt-4">
-          <div className="row g-4 g-md-5">
-            <div className="col-6 col-md-3">
+        <div className="container mt-md-5">
+          <h2 className="mb-4">The Team</h2>
+
+          <div className="row g-4 g-md-5 mb-4">
+            <div className="col-6 col-md-3 mb-0">
               <img
-                src="/images/team/placeholder-pfp.jpg"
-                className="img-fluid img-team mb-3 opacity-50"
+                src="/images/team/brandon.webp"
+                className="img-fluid img-team"
                 alt=""
               />
-              <p className="fw-semibold opacity-100 mb-0">Brandon</p>
-              <p className="team-role-text">Founder / Backend</p>
             </div>
+            <div className="col-12 col-md-9 text-start d-flex flex-column justify-content-center">
+              <p className="fw-semibold opacity-100 mb-0 fs-5">
+                Brandon Thomas
+              </p>
+              <p className="team-role-text">Founder and CEO</p>
+              {/* <hr className="mt-0 my-4" /> */}
+              <p className="fw-normal opacity-75 mt-1 mb-0">
+                Brandon worked 8 years as a distributed systems engineer at
+                Square. He’s spent the last decade making indie films and being
+                plugged into the Atlanta art scene. In college he built a laser
+                projector and programmed it to play video games on the side of
+                skyscrapers. Today he’s working on disrupting Hollywood and the
+                music industry by bringing down cost structures such that anyone
+                can make film from home.
+              </p>
+            </div>
+          </div>
+
+          <div className="row g-4 gx-md-5 gy-md-4 pb-4 pt-3 pt-md-5">
             <div className="col-6 col-md-3">
               <img
-                src="/images/team/placeholder-pfp.jpg"
-                className="img-fluid img-team mb-3 opacity-50"
-                alt=""
-              />
-              <p className="fw-semibold opacity-100 mb-0">Scott</p>
-              <p className="team-role-text">3D Artist</p>
-            </div>
-            <div className="col-6 col-md-3">
-              <img
-                src="/images/team/paul.webp"
+                src="/images/team/ozzy.webp"
                 className="img-fluid img-team mb-3"
                 alt=""
               />
-              <p className="fw-semibold opacity-100 mb-0">Paul</p>
-              <p className="team-role-text">Systems / Devops Engineer</p>
+              <p className="fw-semibold opacity-100 mb-0 fs-5">Ozzy</p>
+              <p className="team-role-text">Machine Learning Engineer</p>
+            </div>
+            <div className="col-6 col-md-3">
+              <img
+                src="/images/team/michael.webp"
+                className="img-fluid img-team mb-3"
+                alt=""
+              />
+              <p className="fw-semibold opacity-100 mb-0 fs-5">Michael</p>
+              <p className="team-role-text">Machine Learning Engineer</p>
+            </div>
+            <div className="col-6 col-md-3">
+              <img
+                src="/images/team/ramiro.webp"
+                className="img-fluid img-team mb-3"
+                alt=""
+              />
+              <p className="fw-semibold opacity-100 mb-0 fs-5">Ramiro</p>
+              <p className="team-role-text">Machine Learning Engineer</p>
+            </div>
+            <div className="col-6 col-md-3">
+              <img
+                src="/images/team/scott.webp"
+                className="img-fluid img-team mb-3"
+                alt=""
+              />
+              <p className="fw-semibold opacity-100 mb-0 fs-5">Scott</p>
+              <p className="team-role-text">
+                Chief Creative Officer / Technical 3D Artist
+              </p>
             </div>
             <div className="col-6 col-md-3">
               <img
@@ -756,50 +824,66 @@ function IndexPage() {
                 className="img-fluid img-team mb-3"
                 alt=""
               />
-              <p className="fw-semibold opacity-100 mb-0">Bombay</p>
-              <p className="team-role-text">Web Design / Frontend </p>
+              <p className="fw-semibold opacity-100 mb-0 fs-5">Bombay</p>
+              <p className="team-role-text">UI / Frontend Engineer </p>
+            </div>
+            <div className="col-6 col-md-3">
+              <img
+                src="/images/team/paul.webp"
+                className="img-fluid img-team mb-3"
+                alt=""
+              />
+              <p className="fw-semibold opacity-100 mb-0 fs-5">Paul</p>
+              <p className="team-role-text">
+                Backend Engineer / Rust Full Stack
+              </p>
+            </div>
+            {/* <div className="col-6 col-md-3">
+              <img
+                src="/images/team/placeholder-pfp.jpg"
+                className="img-fluid img-team mb-3"
+                alt=""
+              />
+              <p className="fw-semibold opacity-100 mb-0 fs-5">Jose</p>
+              <p className="team-role-text">Data Team</p>
             </div>
             <div className="col-6 col-md-3">
               <img
                 src="/images/team/placeholder-pfp.jpg"
-                className="img-fluid img-team mb-3 opacity-50"
+                className="img-fluid img-team mb-3"
                 alt=""
               />
-              <p className="fw-semibold opacity-100 mb-0">Michael</p>
-              <p className="team-role-text">ML</p>
-            </div>
-            <div className="col-6 col-md-3">
+              <p className="fw-semibold opacity-100 mb-0 fs-5">Rodrigo</p>
+              <p className="team-role-text">Data Team</p>
+            </div> */}
+          </div>
+
+          <h2 className="mb-4 mt-5">Our Advisor</h2>
+
+          <div className="row g-4 g-md-5">
+            {/* <div className="col-6 col-md-3">
               <img
                 src="/images/team/placeholder-pfp.jpg"
-                className="img-fluid img-team mb-3 opacity-50"
+                className="img-fluid img-team opacity-50"
                 alt=""
               />
-              <p className="fw-semibold opacity-100 mb-0">Jose</p>
-              <p className="team-role-text">ML</p>
-            </div>
-            <div className="col-6 col-md-3">
-              <img
-                src="/images/team/placeholder-pfp.jpg"
-                className="img-fluid img-team mb-3 opacity-50"
-                alt=""
-              />
-              <p className="fw-semibold opacity-100 mb-0">Rodrigo</p>
-              <p className="team-role-text">ML</p>
-            </div>
-            <div className="col-6 col-md-3">
-              <img
-                src="/images/team/placeholder-pfp.jpg"
-                className="img-fluid img-team mb-3 opacity-50"
-                alt=""
-              />
-              <p className="fw-semibold opacity-100 mb-0">Someone</p>
-              <p className="team-role-text">Role Title</p>
+            </div> */}
+            <div className="col-12 text-start d-flex flex-column justify-content-center">
+              <p className="fw-semibold opacity-100 mb-0 fs-5 mt-2">
+                Alex Wissner-Gross
+              </p>
+              <p className="team-role-text">Advisor</p>
+              {/* <hr className="mt-0 my-4" /> */}
+              <p className="fw-normal opacity-75 mt-1 mb-0">
+                Alex was the last person to graduate from MIT with a triple
+                major, and he’s led a combined 1B of startup exits.{" "}
+                <br className="d-none d-md-block" />
+                We’re hoping we’re his first decacorn exit.
+              </p>
             </div>
           </div>
         </div>
       </div>
-      */}
-
       <div id="mentions" className="bg-light section-2">
         <div>
           <Marquee gradient={false} speed={120}>
@@ -980,7 +1064,6 @@ function IndexPage() {
           </Swiper>
         </div>
       </div>
-
       <div id="contact" className="bg-light section-2 pb-0">
         <div className="container text-center">
           <h4 className="opacity-75 position-relative zi-2 mb-1">Contact Us</h4>
