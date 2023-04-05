@@ -750,10 +750,10 @@ function IndexPage() {
             <div className="col-12 col-md-6">
               <p className="fw-normal opacity-75">
                 Our dream is to empower anyone to create full feature-length
-                content without institutional capital, large teams, huge amounts
-                of time, or a deep reservoir of highly specialized talent. We
-                want to empower everyone to turn their dreams into physical
-                form.
+                content from home without institutional capital, large teams, 
+                huge amounts of time, or a deep reservoir of highly specialized 
+                talent. We want to give everyone their turn in the director's 
+                seat and help turn their dreams into physical form.
               </p>
             </div>
           </div>
@@ -777,13 +777,13 @@ function IndexPage() {
               <p className="team-role-text">Founder and CEO</p>
               {/* <hr className="mt-0 my-4" /> */}
               <p className="fw-normal opacity-75 mt-1 mb-0">
-                Brandon worked 8 years as a distributed systems engineer at
-                Square. He’s spent the last decade making indie films and being
+                Brandon worked 8 years as a distributed systems and AI/ML engineer 
+                at Square. He’s spent the last decade making indie films and being
                 plugged into the Atlanta art scene. In college he built a laser
                 projector and programmed it to play video games on the side of
                 skyscrapers. Today he’s working on disrupting Hollywood and the
                 music industry by bringing down cost structures such that anyone
-                can make film from home.
+                can make high quality narrative film from home.
               </p>
             </div>
           </div>
