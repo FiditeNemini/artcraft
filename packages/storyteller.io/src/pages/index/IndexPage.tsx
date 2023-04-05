@@ -867,22 +867,23 @@ function IndexPage() {
             </div> */}
           </div>
 
+          {/* NB(bt): Need to ask Alex if we can add this.
           <h2 className="mb-4 mt-5">Our Advisor</h2>
 
           <div className="row g-4 g-md-5">
-            {/* <div className="col-6 col-md-3">
+            {/ * <div className="col-6 col-md-3">
               <img
                 src="/images/team/placeholder-pfp.jpg"
                 className="img-fluid img-team opacity-50"
                 alt=""
               />
-            </div> */}
+            </div> * /}
             <div className="col-12 text-start d-flex flex-column justify-content-center">
               <p className="fw-semibold opacity-100 mb-0 fs-5 mt-2">
                 Alex Wissner-Gross
               </p>
               <p className="team-role-text">Advisor</p>
-              {/* <hr className="mt-0 my-4" /> */}
+              {/ * <hr className="mt-0 my-4" /> * /}
               <p className="fw-normal opacity-75 mt-1 mb-0">
                 Alex was the last person to graduate from MIT with a triple
                 major, and he’s led a combined 1B of startup exits.{" "}
@@ -891,6 +892,7 @@ function IndexPage() {
               </p>
             </div>
           </div>
+          */}
         </div>
       </div>
       <div id="mentions" className="bg-light section-2">
