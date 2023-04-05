@@ -1,9 +1,9 @@
+use actix_helpers::route_builder::RouteBuilder;
 use actix_http::body::MessageBody;
 use actix_service::ServiceFactory;
 use actix_web::dev::{ServiceRequest, ServiceResponse};
 use actix_web::error::Error;
 use actix_web::{App, web, HttpResponse};
-use actix_helpers::route_builder::RouteBuilder;
 use billing_component::default_routes::add_suggested_stripe_billing_routes;
 use crate::http_server::endpoints::api_tokens::create_api_token::create_api_token_handler;
 use crate::http_server::endpoints::api_tokens::delete_api_token::delete_api_token_handler;
@@ -15,6 +15,9 @@ use crate::http_server::endpoints::categories::tts::assign_tts_category::assign_
 use crate::http_server::endpoints::categories::tts::list_fully_computed_assigned_tts_categories::list_fully_computed_assigned_tts_categories::list_fully_computed_assigned_tts_categories_handler;
 use crate::http_server::endpoints::categories::tts::list_tts_categories::list_tts_categories_handler;
 use crate::http_server::endpoints::categories::tts::list_tts_model_assigned_categories::list_tts_model_assigned_categories_handler;
+use crate::http_server::endpoints::comments::create_comment_handler::create_comment_handler;
+use crate::http_server::endpoints::comments::delete_comment_handler::delete_comment_handler;
+use crate::http_server::endpoints::comments::list_comments_handler::list_comments_handler;
 use crate::http_server::endpoints::download_job::enqueue_generic_download::enqueue_generic_download_handler;
 use crate::http_server::endpoints::download_job::get_generic_upload_job_status::get_generic_download_job_status_handler;
 use crate::http_server::endpoints::events::list_events::list_events_handler;
@@ -54,12 +57,13 @@ use crate::http_server::endpoints::stubs::app_model_downloads::get_app_model_dow
 use crate::http_server::endpoints::stubs::app_news::get_app_news_handler;
 use crate::http_server::endpoints::stubs::app_plans::get_app_plans_handler;
 use crate::http_server::endpoints::stubs::post_app_analytics::post_app_analytics_handler;
+use crate::http_server::endpoints::subscriptions::unsubscribe_reason::set_unsubscribe_reason_handler;
 use crate::http_server::endpoints::trending::list_trending_tts_models::list_trending_tts_models_handler;
 use crate::http_server::endpoints::tts::delete_tts_model::delete_tts_model_handler;
 use crate::http_server::endpoints::tts::delete_tts_result::delete_tts_inference_result_handler;
 use crate::http_server::endpoints::tts::edit_tts_model::edit_tts_model_handler;
 use crate::http_server::endpoints::tts::edit_tts_result::edit_tts_inference_result_handler;
-use crate::http_server::endpoints::tts::enqueue_infer_tts::infer_tts_handler;
+use crate::http_server::endpoints::tts::enqueue_infer_tts_handler::enqueue_infer_tts_handler::enqueue_infer_tts_handler;
 use crate::http_server::endpoints::tts::enqueue_upload_tts_model::upload_tts_model_handler;
 use crate::http_server::endpoints::tts::get_pending_tts_inference_job_count::get_pending_tts_inference_job_count_handler;
 use crate::http_server::endpoints::tts::get_tts_inference_job_status::get_tts_inference_job_status_handler;
@@ -103,13 +107,9 @@ use crate::http_server::endpoints::w2l::list_user_w2l_inference_results::list_us
 use crate::http_server::endpoints::w2l::list_user_w2l_templates::list_user_w2l_templates_handler;
 use crate::http_server::endpoints::w2l::list_w2l_templates::list_w2l_templates_handler;
 use crate::http_server::endpoints::w2l::set_w2l_template_mod_approval::set_w2l_template_mod_approval_handler;
-use crate::http_server::endpoints::subscriptions::unsubscribe_reason::set_unsubscribe_reason_handler;
 use users_component::default_routes::add_suggested_api_v1_account_creation_and_session_routes;
 use users_component::endpoints::edit_profile_handler::edit_profile_handler;
 use users_component::endpoints::get_profile_handler::get_profile_handler;
-use crate::http_server::endpoints::comments::create_comment_handler::create_comment_handler;
-use crate::http_server::endpoints::comments::delete_comment_handler::delete_comment_handler;
-use crate::http_server::endpoints::comments::list_comments_handler::list_comments_handler;
 
 pub fn add_routes<T, B> (app: App<T, B>) -> App<T, B>
   where
@@ -354,7 +354,7 @@ fn add_tts_routes<T, B> (app: App<T, B>) -> App<T, B>
       )
       .service(
         web::resource("/inference")
-            .route(web::post().to(infer_tts_handler))
+            .route(web::post().to(enqueue_infer_tts_handler))
             .route(web::head().to(|| HttpResponse::Ok()))
       )
       .service(

@@ -12,32 +12,29 @@ use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::server_state::ServerState;
 use enums::common::visibility::Visibility;
 use enums::workers::generic_inference_type::GenericInferenceType;
-use errors::AnyhowResult;
 use http_server_common::request::get_request_api_token::get_request_api_token;
 use http_server_common::request::get_request_header_optional::get_request_header_optional;
 use http_server_common::request::get_request_ip::get_request_ip;
-use log::{error, info, warn};
+use log::{info, warn};
 use mysql_queries::payloads::generic_inference_args::{GenericInferenceArgs, PolymorphicInferenceArgs};
 use mysql_queries::queries::generic_inference::web::insert_generic_inference_job::{insert_generic_inference_job, InsertGenericInferenceArgs};
 use mysql_queries::queries::tts::tts_inference_jobs::insert_tts_inference_job::TtsInferenceJobInsertBuilder;
-use mysql_queries::queries::tts::tts_models::get_tts_model::{get_tts_model_by_token_using_connection, TtsModelRecord};
+use mysql_queries::queries::tts::tts_models::get_tts_model::TtsModelRecord;
 use mysql_queries::tokens::Tokens;
 use r2d2_redis::redis::Commands;
 use rand::Rng;
 use rand::seq::SliceRandom;
-use redis_caching::redis_ttl_cache::RedisTtlCache;
-use redis_common::redis_cache_keys::RedisCacheKeys;
 use redis_common::redis_keys::RedisKeys;
-use sqlx::MySql;
-use sqlx::pool::PoolConnection;
 use std::fmt;
 use std::sync::Arc;
+use enums::by_table::tts_models::tts_model_type::TtsModelType;
 use tokens::jobs::inference::InferenceJobToken;
 use tokens::tokens::tts_models::TtsModelToken;
 use tokens::users::user::UserToken;
 use tts_common::priority::{FAKEYOU_INVESTOR_PRIORITY_LEVEL, FAKEYOU_DEFAULT_VALID_API_TOKEN_PRIORITY_LEVEL};
 use user_input_common::check_for_slurs::contains_slurs;
 use users_component::utils::user_session_extended::UserSessionExtended;
+use crate::http_server::endpoints::tts::enqueue_infer_tts_handler::get_model_with_caching::get_model_with_caching;
 
 // TODO: Temporary for investor demo
 const STORYTELLER_DEMO_COOKIE_NAME : &'static str = "storyteller_demo";
@@ -62,8 +59,21 @@ pub struct InferTtsRequest {
 pub struct InferTtsSuccessResponse {
   pub success: bool,
   pub inference_job_token: String,
-  // TODO: This is the new generic inference job system
-  pub generic_inference_job_token: Option<InferenceJobToken>,
+  // This is the type of inference job token returned.
+  pub inference_job_token_type: InferenceJobTokenType,
+}
+
+/// Tell the frontend how to deal with the tts queue.
+#[derive(Serialize)]
+pub enum InferenceJobTokenType {
+  /// Legacy TTS inference job
+  #[serde(rename = "legacy_tts")]
+  LegacyTts,
+
+  /// Modern shared inference type (everything will use this in the
+  /// future, and this endpoint will die.)
+  #[serde(rename = "generic")]
+  Generic,
 }
 
 #[derive(Debug)]
@@ -106,7 +116,7 @@ impl fmt::Display for InferTtsError {
   }
 }
 
-pub async fn infer_tts_handler(
+pub async fn enqueue_infer_tts_handler(
   http_request: HttpRequest,
   request: web::Json<InferTtsRequest>,
   server_state: web::Data<Arc<ServerState>>) -> Result<HttpResponse, InferTtsError>
@@ -295,7 +305,7 @@ pub async fn infer_tts_handler(
     }
   }
 
-  // ==================== CHECK AND PERFORM TTS ==================== //
+  // ==================== CHECK AND PREPARE TTS ==================== //
 
   let mut redis = server_state.redis_pool
       .get()
@@ -320,42 +330,22 @@ pub async fn infer_tts_handler(
       .or(maybe_user_preferred_visibility)
       .unwrap_or(Visibility::Public);
 
-  // This token is returned to the client.
-  let job_token = Tokens::new_tts_inference_job()
-      .map_err(|_e| {
-        warn!("Error creating token");
-        InferTtsError::ServerError
-      })?;
+  // ==================== ENQUEUE APPROPRIATE TTS TYPE ==================== //
 
-  info!("Creating tts inference job record...");
+  let use_new_job_system = match tts_model.tts_model_type {
+    TtsModelType::Tacotron2 => server_state.flags.enable_enqueue_generic_tts_job,
+    TtsModelType::VITS => true,
+  };
 
-  let query_result = TtsInferenceJobInsertBuilder::new_for_fakeyou_request()
-      .set_job_token(&job_token)
-      .set_uuid_idempotency_token(&request.uuid_idempotency_token)
-      .set_model_token(&request.tts_model_token)
-      .set_raw_inference_text(&inference_text)
-      .set_maybe_creator_user_token(maybe_user_token.as_deref())
-      .set_creator_ip_address(&ip_address)
-      .set_creator_set_visibility(set_visibility.to_str())
-      .set_priority_level(priority_level)
-      .set_max_duration_seconds(plan.tts_max_duration_seconds())
-      .set_is_from_api(is_from_api)
-      .set_is_debug_request(is_debug_request)
-      .insert(&server_state.mysql_pool)
-      .await;
+  let job_token;
+  let job_token_type;
 
-  match query_result {
-    Ok(_) => {},
-    Err(err) => {
-      warn!("New tts inference job creation DB error: {:?}", err);
-      return Err(InferTtsError::ServerError);
-    }
-  }
+  if use_new_job_system {
+    // This branch uses the `generic-inference-job` service and tables.
+    info!("Creating tts inference job record (new generic job system)...");
 
-  let mut maybe_generic_inference_job_token = None;
-
-  if server_state.flags.enable_enqueue_generic_tts_job {
     let generic_inference_job_token = InferenceJobToken::generate();
+
     let maybe_creator_user_token_typed = maybe_user_token
         .as_deref()
         .map(|token| UserToken::new_from_str(token));
@@ -388,7 +378,44 @@ pub async fn infer_tts_handler(
       }
     }
 
-    maybe_generic_inference_job_token = Some(generic_inference_job_token);
+    job_token = generic_inference_job_token.to_string();
+    job_token_type = InferenceJobTokenType::Generic;
+
+  } else {
+    // This branch uses the `tts-inference-job` service and tables.
+    info!("Creating tts inference job record (legacy job system)...");
+
+    // This token is returned to the client.
+    job_token = Tokens::new_tts_inference_job()
+        .map_err(|_e| {
+          warn!("Error creating token");
+          InferTtsError::ServerError
+        })?;
+
+    let query_result = TtsInferenceJobInsertBuilder::new_for_fakeyou_request()
+        .set_job_token(&job_token)
+        .set_uuid_idempotency_token(&request.uuid_idempotency_token)
+        .set_model_token(&request.tts_model_token)
+        .set_raw_inference_text(&inference_text)
+        .set_maybe_creator_user_token(maybe_user_token.as_deref())
+        .set_creator_ip_address(&ip_address)
+        .set_creator_set_visibility(set_visibility.to_str())
+        .set_priority_level(priority_level)
+        .set_max_duration_seconds(plan.tts_max_duration_seconds())
+        .set_is_from_api(is_from_api)
+        .set_is_debug_request(is_debug_request)
+        .insert(&server_state.mysql_pool)
+        .await;
+
+    match query_result {
+      Ok(_) => {},
+      Err(err) => {
+        warn!("New tts inference job creation DB error: {:?}", err);
+        return Err(InferTtsError::ServerError);
+      }
+    }
+
+    job_token_type = InferenceJobTokenType::LegacyTts;
   }
 
   server_state.firehose_publisher.enqueue_tts_inference(maybe_user_token.as_deref(), &job_token, &request.tts_model_token)
@@ -401,7 +428,7 @@ pub async fn infer_tts_handler(
   let response = InferTtsSuccessResponse {
     success: true,
     inference_job_token: job_token.to_string(),
-    generic_inference_job_token: maybe_generic_inference_job_token,
+    inference_job_token_type: job_token_type,
   };
 
   let body = serde_json::to_string(&response)
@@ -422,42 +449,6 @@ pub fn validate_inference_text(text: &str) -> Result<(), String> {
   }
 
   Ok(())
-}
-
-// TODO: Read from in-memory TTS List cache first (!!!) for further performance savings
-
-async fn get_model_with_caching(
-  model_token: &str,
-  redis_ttl_cache: &RedisTtlCache,
-  mysql_connection: &mut PoolConnection<MySql>,
-) -> AnyhowResult<Option<TtsModelRecord>> {
-
-  let model_token2 = model_token.clone();
-
-  let get_tts_model = move || {
-    // NB: async closures are not yet stable in Rust, so we include an async block.
-    async move {
-      get_tts_model_by_token_using_connection(
-        &model_token2,
-        true,
-        mysql_connection).await
-    }
-  };
-
-  let cache_key = RedisCacheKeys::get_tts_model_endpoint(model_token);
-
-  let mut redis_ttl_cache_connection = match redis_ttl_cache.get_connection() {
-    Ok(connection) => connection,
-    Err(err) => {
-      // NB: Fail open (potentially dangerous).
-      error!("Can't get redis cache: {:?}", err);
-      return get_tts_model().await;
-    }
-  };
-
-  redis_ttl_cache_connection.lazy_load_if_not_cached(&cache_key, move || {
-    get_tts_model()
-  }).await
 }
 
 /// If the model is private, determine if the user can use the model.
