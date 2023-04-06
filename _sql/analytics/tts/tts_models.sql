@@ -72,9 +72,10 @@ order by r.use_count desc
 --
 select
     m.token,
+    m.title,
+    m.user_ratings_positive_count / m.user_ratings_total_count as rating,
     m.text_pipeline_type,
     m.ietf_language_tag,
-    m.title,
     u.username,
     r.use_count,
     m.created_at,
@@ -94,6 +95,7 @@ from (
               on m.token = r.model_token
          join users as u
               on u.token = m.creator_user_token
+         where m.ietf_language_tag IN ('en', 'en-US', 'en-AU', 'en-CA', 'en-GB')
 order by r.use_count desc
     limit 100;
 
