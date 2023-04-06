@@ -50,15 +50,6 @@ pub struct JobDependencies {
   // In-process cache of database lookup records, etc.
   pub caches: JobCaches,
 
-  // Waveglow vocoder filename
-  pub waveglow_vocoder_model_filename: String,
-
-  // Hifigan vocoder filename
-  pub hifigan_vocoder_model_filename: String,
-
-  // Hifigan super resolution vocoder filename
-  pub hifigan_superres_vocoder_model_filename: String,
-
   // Sleep between batches
   pub job_batch_wait_millis: u64,
 
@@ -123,13 +114,26 @@ impl JobDependencies {
 /// Per-job type details
 pub struct JobTypeDetails {
   pub tacotron2_old_vocodes: Tacotron2VocodesDetails,
+  pub vits: VitsDetails,
   //pub tacotron2_modern: ...,
-  //pub vits: ...,
   //pub softvc: ...,
   //pub so_vits_svc: ...,
 }
 
 /// "Old" TT2 (vocodes-era)
 pub struct Tacotron2VocodesDetails {
+  pub maybe_docker_image_sha: Option<String>,
+
+  /// Common pretrained waveglow vocoder filename
+  pub waveglow_vocoder_model_filename: String,
+
+  /// Common pretrained hifigan vocoder filename
+  pub hifigan_vocoder_model_filename: String,
+
+  /// Common pretrained hifigan super resolution vocoder filename
+  pub hifigan_superres_vocoder_model_filename: String,
+}
+
+pub struct VitsDetails {
   pub maybe_docker_image_sha: Option<String>,
 }

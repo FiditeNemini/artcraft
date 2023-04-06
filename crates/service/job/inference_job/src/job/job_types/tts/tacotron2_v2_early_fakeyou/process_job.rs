@@ -49,7 +49,7 @@ pub async fn process_job(args: ProcessJobArgs<'_>) -> Result<(), ProcessSingleJo
   // ==================== CONFIRM OR DOWNLOAD WAVEGLOW VOCODER MODEL ==================== //
 
   let waveglow_vocoder_model_fs_path = {
-    let waveglow_vocoder_model_filename = args.job_dependencies.waveglow_vocoder_model_filename.clone();
+    let waveglow_vocoder_model_filename = args.job_dependencies.job_type_details.tacotron2_old_vocodes.waveglow_vocoder_model_filename.clone();
     let waveglow_vocoder_model_fs_path = args.job_dependencies.semi_persistent_cache.tts_pretrained_vocoder_model_path(&waveglow_vocoder_model_filename);
     let waveglow_vocoder_model_object_path = args.job_dependencies.bucket_path_unifier.tts_pretrained_vocoders_path(&waveglow_vocoder_model_filename);
 
@@ -70,7 +70,7 @@ pub async fn process_job(args: ProcessJobArgs<'_>) -> Result<(), ProcessSingleJo
   // ==================== CONFIRM OR DOWNLOAD HIFIGAN (NORMAL) VOCODER MODEL ==================== //
 
   let pretrained_hifigan_vocoder_model_fs_path = {
-    let hifigan_vocoder_model_filename = args.job_dependencies.hifigan_vocoder_model_filename.clone();
+    let hifigan_vocoder_model_filename = args.job_dependencies.job_type_details.tacotron2_old_vocodes.hifigan_vocoder_model_filename.clone();
     let hifigan_vocoder_model_fs_path = args.job_dependencies.semi_persistent_cache.tts_pretrained_vocoder_model_path(&hifigan_vocoder_model_filename);
     let hifigan_vocoder_model_object_path = args.job_dependencies.bucket_path_unifier.tts_pretrained_vocoders_path(&hifigan_vocoder_model_filename);
 
@@ -91,7 +91,7 @@ pub async fn process_job(args: ProcessJobArgs<'_>) -> Result<(), ProcessSingleJo
   // ==================== CONFIRM OR DOWNLOAD HIFIGAN (SUPERRES) VOCODER MODEL ==================== //
 
   let hifigan_superres_vocoder_model_fs_path = {
-    let hifigan_superres_vocoder_model_filename = args.job_dependencies.hifigan_superres_vocoder_model_filename.clone();
+    let hifigan_superres_vocoder_model_filename = args.job_dependencies.job_type_details.tacotron2_old_vocodes.hifigan_superres_vocoder_model_filename.clone();
     let hifigan_superres_vocoder_model_fs_path = args.job_dependencies.semi_persistent_cache.tts_pretrained_vocoder_model_path(&hifigan_superres_vocoder_model_filename);
     let hifigan_superres_vocoder_model_object_path = args.job_dependencies.bucket_path_unifier.tts_pretrained_vocoders_path(&hifigan_superres_vocoder_model_filename);
 

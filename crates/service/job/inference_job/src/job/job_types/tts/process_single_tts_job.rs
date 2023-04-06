@@ -1,7 +1,8 @@
 use anyhow::anyhow;
 use crate::job::job_loop::process_single_job_error::ProcessSingleJobError;
 use crate::job::job_types::tts::tacotron2_v2_early_fakeyou::process_job::ProcessJobArgs;
-use crate::job::job_types::tts::tacotron2_v2_early_fakeyou;
+use crate::job::job_types::tts::vits::process_job::VitsProcessJobArgs;
+use crate::job::job_types::tts::{tacotron2_v2_early_fakeyou, vits};
 use crate::job_dependencies::JobDependencies;
 use enums::by_table::tts_models::tts_model_type::TtsModelType;
 use errors::AnyhowResult;
@@ -16,6 +17,8 @@ pub async fn process_single_tts_job(job_dependencies: &JobDependencies, job: &Av
     Some(model_token) => TtsModelToken::new_from_str(model_token),
   };
 
+  // TODO: Move common checks for slurs, etc. here.
+
   let raw_inference_text = job.maybe_raw_inference_text
       .as_deref()
       .ok_or(ProcessSingleJobError::Other(anyhow!("no inference text")))?;
@@ -26,8 +29,8 @@ pub async fn process_single_tts_job(job_dependencies: &JobDependencies, job: &Av
       .await
       .map_err(|err| ProcessSingleJobError::Other(anyhow!("database error: {:?}", err)))?;
 
-
 // TODO: Attempt to grab job lock
+
 //  // ==================== ATTEMPT TO GRAB JOB LOCK ==================== //
 //
 //  info!("Attempting to grab lock for job: {}", job.inference_job_token);
@@ -67,7 +70,7 @@ pub async fn process_single_tts_job(job_dependencies: &JobDependencies, job: &Av
       }).await?;
     }
     TtsModelType::Vits => {
-      let _r = tacotron2_v2_early_fakeyou::process_job::process_job(ProcessJobArgs {
+      let _r = vits::process_job::process_job(VitsProcessJobArgs {
         job_dependencies,
         job,
         tts_model: &tts_model,

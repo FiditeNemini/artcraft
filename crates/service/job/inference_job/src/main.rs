@@ -30,7 +30,7 @@ use container_common::filesystem::check_directory_exists::check_directory_exists
 use crate::job::job_loop::job_stats::JobStats;
 use crate::job::job_loop::main_loop::main_loop;
 use crate::job::job_types::tts::tacotron2_v2_early_fakeyou::tacotron_inference_command::TacotronInferenceCommand;
-use crate::job_dependencies::{JobCaches, JobDependencies, JobTypeDetails, JobWorkerDetails, Tacotron2VocodesDetails};
+use crate::job_dependencies::{JobCaches, JobDependencies, JobTypeDetails, JobWorkerDetails, Tacotron2VocodesDetails, VitsDetails};
 use crate::util::scoped_temp_dir_creator::ScopedTempDirCreator;
 use jobs_common::job_progress_reporter::job_progress_reporter::JobProgressReporterBuilder;
 use jobs_common::job_progress_reporter::noop_job_progress_reporter::NoOpJobProgressReporterBuilder;
@@ -263,9 +263,6 @@ async fn main() -> AnyhowResult<()> {
     bucket_path_unifier: BucketPathUnifier::default_paths(),
     semi_persistent_cache,
     firehose_publisher,
-    waveglow_vocoder_model_filename,
-    hifigan_vocoder_model_filename,
-    hifigan_superres_vocoder_model_filename,
     job_batch_wait_millis: common_env.job_batch_wait_millis,
     job_max_attempts: common_env.job_max_attempts as u16,
     job_batch_size: common_env.job_batch_size,
@@ -276,7 +273,13 @@ async fn main() -> AnyhowResult<()> {
     job_type_details: JobTypeDetails {
       tacotron2_old_vocodes: Tacotron2VocodesDetails {
         maybe_docker_image_sha: easyenv::get_env_string_optional("TACOTRON2_VOCODES_DOCKER_IMAGE_SHA"),
+        waveglow_vocoder_model_filename,
+        hifigan_vocoder_model_filename,
+        hifigan_superres_vocoder_model_filename,
       },
+      vits: VitsDetails {
+        maybe_docker_image_sha: easyenv::get_env_string_optional("VITS_DOCKER_IMAGE_SHA"),
+      }
     },
   };
 
