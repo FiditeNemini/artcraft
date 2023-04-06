@@ -98,7 +98,7 @@ function UploadComponent() {
         <></>
       )}
       {file ? (
-        <div className="d-flex mt-2 mb-4 mb-lg-3">
+        <div className="d-flex mb-4 mb-lg-3">
           <div className="form-check form-switch">
             <input
               className="form-check-input"

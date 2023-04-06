@@ -125,12 +125,12 @@ function VcModelListPage(props: Props) {
                     <li className="nav-item w-100" role="presentation">
                       <button
                         className="nav-link active w-100"
-                        id="ttsresults-tab"
+                        id="prerecorded-tab"
                         data-bs-toggle="tab"
-                        data-bs-target="#ttsresults"
+                        data-bs-target="#prerecorded"
                         type="button"
                         role="tab"
-                        aria-controls="ttsresults"
+                        aria-controls="prerecorded"
                         aria-selected="true"
                       >
                         Pre-recorded
@@ -139,12 +139,12 @@ function VcModelListPage(props: Props) {
                     <li className="nav-item w-100" role="presentation">
                       <button
                         className="nav-link w-100"
-                        id="w2lresults-tab"
+                        id="recordaudio-tab"
                         data-bs-toggle="tab"
-                        data-bs-target="#w2lresults"
+                        data-bs-target="#recordaudio"
                         type="button"
                         role="tab"
-                        aria-controls="w2lresults"
+                        aria-controls="recordaudio"
                         aria-selected="false"
                       >
                         Microphone
@@ -154,9 +154,9 @@ function VcModelListPage(props: Props) {
                   <div className="tab-content" id="myTabContent">
                     <div
                       className="tab-pane fade show active"
-                      id="ttsresults"
+                      id="prerecorded"
                       role="tabpanel"
-                      aria-labelledby="ttsresults-tab"
+                      aria-labelledby="prerecorded-tab"
                     >
                       <div className="d-flex flex-column gap-4 h-100">
                         <div>
@@ -221,9 +221,9 @@ function VcModelListPage(props: Props) {
                     </div>
                     <div
                       className="tab-pane fade"
-                      id="w2lresults"
+                      id="recordaudio"
                       role="tabpanel"
-                      aria-labelledby="w2lresults-tab"
+                      aria-labelledby="recordaudio-tab"
                     >
                       <div className="d-flex flex-column gap-4 h-100">
                         <div>
