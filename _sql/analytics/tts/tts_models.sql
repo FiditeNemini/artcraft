@@ -12,9 +12,9 @@ select
     m.title,
     u.username,
     r.use_count,
+    m.created_at,
     m.user_deleted_at,
-    m.mod_deleted_at,
-    m.created_at
+    m.mod_deleted_at
 from (
          select model_token, count(*) as use_count
          from tts_results
@@ -65,6 +65,38 @@ from (
 order by r.use_count desc
     limit 25;
 
+
+--
+-- Top models binned by IP address.
+-- Should give us a look at demand independent of model quality / repeated use.
+--
+select
+    m.token,
+    m.text_pipeline_type,
+    m.ietf_language_tag,
+    m.title,
+    u.username,
+    r.use_count,
+    m.created_at,
+    m.user_deleted_at,
+    m.mod_deleted_at
+from (
+        select model_token, count(*) as use_count
+        from (
+            select model_token, creator_ip_address
+            from tts_results
+            where created_at > (CURDATE() - INTERVAL 12 HOUR)
+            group by model_token, creator_ip_address
+        ) as x
+        group by model_token
+     ) as r
+         join tts_models as m
+              on m.token = r.model_token
+         join users as u
+              on u.token = m.creator_user_token
+order by r.use_count desc
+    limit 100;
+
 --
 -- Top 20 ***NEW*** models to share in #announcements
 -- Can be scoped by creator.
@@ -77,9 +109,9 @@ select
     m.title,
     u.username,
     r.use_count,
+    m.created_at,
     m.user_deleted_at,
-    m.mod_deleted_at,
-    m.created_at
+    m.mod_deleted_at
 from (
          select model_token, count(*) as use_count
          from tts_results
@@ -106,9 +138,9 @@ select
     m.title,
     u.username,
     r.use_count,
+    m.created_at,
     m.user_deleted_at,
-    m.mod_deleted_at,
-    m.created_at
+    m.mod_deleted_at
 from (
     select model_token, count(*) as use_count
     from tts_results
@@ -139,9 +171,9 @@ select
     m.ietf_language_tag,
     u.username,
     r.use_count,
+    m.created_at,
     m.user_deleted_at,
-    m.mod_deleted_at,
-    m.created_at
+    m.mod_deleted_at
 from (
          select model_token, count(*) as use_count
          from tts_results
@@ -165,9 +197,9 @@ select
     m.ietf_language_tag,
     u.username,
     r.use_count,
+    m.created_at,
     m.user_deleted_at,
-    m.mod_deleted_at,
-    m.created_at
+    m.mod_deleted_at
 from (
     select model_token, count(*) as use_count
     from tts_results
@@ -193,9 +225,9 @@ select
     m.ietf_language_tag,
     u.username,
     r.use_count,
+    m.created_at,
     m.user_deleted_at,
-    m.mod_deleted_at,
-    m.created_at
+    m.mod_deleted_at
 from (
     select model_token, count(*) as use_count
     from tts_results
@@ -225,8 +257,8 @@ select
     m.ietf_language_tag,
     u.username,
     r.use_count,
-    m.user_deleted_at,
-    m.created_at
+    m.created_at,
+    m.user_deleted_at
 from (
          select model_token, count(*) as use_count
          from tts_results
@@ -257,9 +289,9 @@ select
     m.ietf_language_tag,
     u.username,
     r.use_count,
+    m.created_at,
     m.user_deleted_at,
-    m.mod_deleted_at,
-    m.created_at
+    m.mod_deleted_at
 from (
          select model_token, count(*) as use_count
          from tts_results
