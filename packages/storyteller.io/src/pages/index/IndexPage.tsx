@@ -741,7 +741,7 @@ function IndexPage() {
             <div className="col-12 col-md-6">
               <div>
                 <h1 className="fw-bold display-6 about-title">
-                  We’re an interdiciplinary team building the one-person cloud
+                  We’re an interdisciplinary team building the one-person cloud
                   studio
                 </h1>
                 <hr className="p-1 mt-4 text-red opacity-100 w-25" />
@@ -844,7 +844,7 @@ function IndexPage() {
               />
               <p className="fw-semibold opacity-100 mb-0 fs-5">Paul</p>
               <p className="team-role-text">
-                Backend Engineer / Rust Full Stack
+                Systems Engineer
               </p>
             </div>
             {/* <div className="col-6 col-md-3">
