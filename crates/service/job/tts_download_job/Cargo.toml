@@ -18,6 +18,7 @@ path = "src/main.rs"
 cloud_storage = { path = "../../../lib/api_clients/cloud_storage" }
 config = { path = "../../../lib/deprecated/config" }
 container_common = { path = "../../../lib/deprecated/container_common" }
+enums = { path = "../../../_types/enums" }
 google_drive_common = { path = "../../../lib/api_clients/google_drive_common" }
 hashing = { path = "../../../lib/hashing" }
 jobs_common = { path = "../../../lib/jobs_common" }

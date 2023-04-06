@@ -4,14 +4,14 @@
 #![forbid(unused_variables)]
 
 use chrono::{Utc, DateTime};
+use crate::helpers::boolean_converters::i8_to_bool;
+use enums::by_table::tts_models::tts_model_type::TtsModelType;
 use enums::common::vocoder_type::VocoderType;
 use log::warn;
 use sqlx::MySqlPool;
 use sqlx;
 use tokens::tokens::tts_models::TtsModelToken;
 use tokens::users::user::UserToken;
-use crate::column_types::tts_model_type::TtsModelType;
-use crate::helpers::boolean_converters::i8_to_bool;
 
 // TODO: Can probably just reuse another query.
 // TODO(bt, 2023-03-20): There are now three copies of this query. Kill with fire.
@@ -92,7 +92,7 @@ pub async fn get_tts_model_for_inference_improved(
         r#"
 SELECT
     tts.token as `model_token: tokens::tokens::tts_models::TtsModelToken`,
-    tts.tts_model_type as `tts_model_type: crate::column_types::tts_model_type::TtsModelType`,
+    tts.tts_model_type as `tts_model_type: enums::by_table::tts_models::tts_model_type::TtsModelType`,
     tts.text_pipeline_type,
 
     tts.use_default_mel_multiply_factor,

@@ -28,7 +28,12 @@ use container_common::filesystem::safe_delete_temp_directory::safe_delete_temp_d
 use container_common::filesystem::safe_delete_temp_file::safe_delete_temp_file;
 use crate::script_execution::tacotron_model_check_command::TacotronModelCheckCommand;
 use crate::script_execution::talknet_model_check_command::TalknetModelCheckCommand;
-use mysql_queries::column_types::tts_model_type::TtsModelType;
+use enums::by_table::tts_models::tts_model_type::TtsModelType;
+use google_drive_common::google_drive_download_command::GoogleDriveDownloadCommand;
+use hashing::sha256::sha256_hash_file::sha256_hash_file;
+use jobs_common::noop_logger::NoOpLogger;
+use jobs_common::redis_job_status_logger::RedisJobStatusLogger;
+use log::{warn, info, error};
 use mysql_queries::mediators::badge_granter::BadgeGranter;
 use mysql_queries::mediators::firehose_publisher::FirehosePublisher;
 use mysql_queries::queries::tts::tts_download_jobs::tts_download_job_queries::TtsUploadJobRecord;
@@ -37,11 +42,6 @@ use mysql_queries::queries::tts::tts_download_jobs::tts_download_job_queries::in
 use mysql_queries::queries::tts::tts_download_jobs::tts_download_job_queries::mark_tts_upload_job_done;
 use mysql_queries::queries::tts::tts_download_jobs::tts_download_job_queries::mark_tts_upload_job_failure;
 use mysql_queries::queries::tts::tts_download_jobs::tts_download_job_queries::query_tts_upload_job_records;
-use google_drive_common::google_drive_download_command::GoogleDriveDownloadCommand;
-use hashing::sha256::sha256_hash_file::sha256_hash_file;
-use jobs_common::noop_logger::NoOpLogger;
-use jobs_common::redis_job_status_logger::RedisJobStatusLogger;
-use log::{warn, info};
 use r2d2_redis::RedisConnectionManager;
 use r2d2_redis::r2d2;
 use sqlx::MySqlPool;
@@ -352,18 +352,15 @@ async fn process_job(downloader: &Downloader, job: &TtsUploadJobRecord) -> Anyho
   };
 
   let model_type = if download_filename.to_lowercase().ends_with("zip") {
-    TtsModelType::Talknet
+    // TODO: Finish supporting TalkNet
+    warn!("File ends with `.zip`. Unsupported model type!");
+    return Err(anyhow!("File ends with `.zip`. Unsupported model type!"));
   } else {
+    // NB: This isn't a guarantee that this is the model type.
     TtsModelType::Tacotron2
   };
 
   info!("Uploaded model type: {:?}", model_type);
-
-  if model_type == TtsModelType::Talknet {
-    // TODO: Finish supporting TalkNet
-    warn!("Unsupported model type");
-    return Err(anyhow!("unsupported model type"));
-  }
 
   // ==================== RUN MODEL CHECK ==================== //
 
@@ -388,18 +385,10 @@ async fn process_job(downloader: &Downloader, job: &TtsUploadJobRecord) -> Anyho
         safe_delete_temp_directory(&temp_dir);
       }
     },
-    TtsModelType::Talknet => {
-      let result = downloader.talknet_tts_check.execute(
-        &file_path,
-        &output_metadata_fs_path,
-        false,
-      );
-
-      if let Err(e) = result {
-        safe_delete_temp_file(&file_path);
-        safe_delete_temp_directory(&temp_dir);
-      }
-    },
+    _ => {
+      error!("Wrong model type for tts-download-job: {:?}", &model_type);
+      return Err(anyhow!("Wrong model type for tts-download-job: {:?}", &model_type));;
+    }
   }
 
   // ==================== CHECK ALL FILES EXIST AND GET METADATA ==================== //

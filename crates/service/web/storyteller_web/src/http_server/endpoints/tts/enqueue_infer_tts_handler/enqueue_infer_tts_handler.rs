@@ -334,7 +334,7 @@ pub async fn enqueue_infer_tts_handler(
 
   let use_new_job_system = match tts_model.tts_model_type {
     TtsModelType::Tacotron2 => server_state.flags.enable_enqueue_generic_tts_job,
-    TtsModelType::VITS => true,
+    TtsModelType::Vits => true,
   };
 
   let job_token;

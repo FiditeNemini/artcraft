@@ -18,6 +18,9 @@ CREATE TABLE generic_inference_jobs (
   -- ========== INFERENCE DETAILS ==========
 
   -- Type of inference
+  -- Examples (may not be up to date):
+  --  * text_to_speech
+  --  * voice_conversion
   inference_type VARCHAR(32) NOT NULL,
 
   -- Polymorphic arguments payload that depends on the type of inference job.

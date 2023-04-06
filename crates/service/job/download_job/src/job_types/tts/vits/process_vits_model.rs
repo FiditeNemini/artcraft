@@ -133,7 +133,7 @@ pub async fn process_vits_model<'a, 'b>(
   info!("Saving TTS model record...");
 
   let (_id, model_token) = insert_tts_model_from_download_job(insert_tts_model_from_download_job::InsertTtsModelFromDownloadJobArgs {
-    tts_model_type: TtsModelType::VITS,
+    tts_model_type: TtsModelType::Vits,
     title: &job.title,
     original_download_url: &job.download_url,
     original_filename: &download_filename,
@@ -155,6 +155,6 @@ pub async fn process_vits_model<'a, 'b>(
 
   Ok(JobResults {
     entity_token: Some(model_token),
-    entity_type: Some(TtsModelType::VITS.to_string()), // NB: This may be different from `GenericDownloadType` in the future!
+    entity_type: Some(TtsModelType::Vits.to_string()), // NB: This may be different from `GenericDownloadType` in the future!
   })
 }
