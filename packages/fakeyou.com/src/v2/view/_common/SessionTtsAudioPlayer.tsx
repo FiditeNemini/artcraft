@@ -46,6 +46,7 @@ function SessionTtsAudioPlayer(props: Props) {
       </button>
       <div className="w-100 h-100 overflow-hidden">
         <Wavesurfer
+          key={props.filename}
           onFinish={handleFinish}
           pos={position}
           src={props.filename}
