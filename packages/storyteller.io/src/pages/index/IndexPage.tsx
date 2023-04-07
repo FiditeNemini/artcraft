@@ -857,7 +857,7 @@ function IndexPage() {
             </div>
             <div className="col-6 col-md-3">
               <img
-                src="/images/team/placeholder-pfp.jpg"
+                src="/images/team/rodrigo.webp"
                 className="img-fluid img-team mb-3"
                 alt=""
               />
