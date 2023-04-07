@@ -750,10 +750,10 @@ function IndexPage() {
             <div className="col-12 col-md-6">
               <p className="fw-normal opacity-75">
                 Our mission is to empower anyone to create full feature-length
-                content from home without institutional capital, large teams, 
-                huge amounts of time, or deep reservoirs of highly specialized 
-                talent. We give everyone their turn in the director’s 
-                seat and turn dreams into physical form.
+                content from home without institutional capital, large teams,
+                huge amounts of time, or deep reservoirs of highly specialized
+                talent. We give everyone their turn in the director’s seat and
+                turn dreams into physical form.
               </p>
             </div>
           </div>
@@ -777,13 +777,14 @@ function IndexPage() {
               <p className="team-role-text">Founder and CEO</p>
               {/* <hr className="mt-0 my-4" /> */}
               <p className="fw-normal opacity-75 mt-1 mb-0">
-                Brandon worked 8 years as a distributed systems and AI/ML engineer 
-                at Square. He’s spent the last decade making indie films and being
-                plugged into the Atlanta art scene. In college he built a laser
-                projector and programmed it to play video games on the side of
-                skyscrapers. Today he’s working on disrupting Hollywood and the
-                music industry and transforming narrative storytelling into something 
-                the likes of which we’ve never seen before.
+                Brandon worked 8 years as a distributed systems and AI/ML
+                engineer at Square. He’s spent the last decade making indie
+                films and being plugged into the Atlanta art scene. In college
+                he built a laser projector and programmed it to play video games
+                on the side of skyscrapers. Today he’s working on disrupting
+                Hollywood and the music industry and transforming narrative
+                storytelling into something the likes of which we’ve never seen
+                before.
               </p>
             </div>
           </div>
@@ -843,13 +844,11 @@ function IndexPage() {
                 alt=""
               />
               <p className="fw-semibold opacity-100 mb-0 fs-5">Paul</p>
-              <p className="team-role-text">
-                Systems Engineer
-              </p>
+              <p className="team-role-text">Systems Engineer</p>
             </div>
-            {/* <div className="col-6 col-md-3">
+            <div className="col-6 col-md-3">
               <img
-                src="/images/team/placeholder-pfp.jpg"
+                src="/images/team/jose.webp"
                 className="img-fluid img-team mb-3"
                 alt=""
               />
@@ -858,13 +857,13 @@ function IndexPage() {
             </div>
             <div className="col-6 col-md-3">
               <img
-                src="/images/team/placeholder-pfp.jpg"
+                src="/images/team/rodrigo.webp"
                 className="img-fluid img-team mb-3"
                 alt=""
               />
               <p className="fw-semibold opacity-100 mb-0 fs-5">Rodrigo</p>
               <p className="team-role-text">Data Team</p>
-            </div> */}
+            </div>
           </div>
 
           {/* NB(bt): Need to ask Alex if we can add this.
