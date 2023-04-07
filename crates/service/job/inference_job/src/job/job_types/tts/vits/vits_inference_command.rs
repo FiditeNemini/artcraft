@@ -7,11 +7,11 @@ use subprocess_common::docker_options::DockerOptions;
 
 /// This command is used to run tacotron2 (v1 "early fakeyou") inference
 #[derive(Clone)]
-pub struct Tacotron2InferenceCommand {
-  /// Where the TT2 code lives
-  tacotron_code_root_directory: PathBuf,
+pub struct VitsInferenceCommand {
+  /// Where the VITS code lives
+  vits_root_code_directory: PathBuf,
 
-  /// The name of the inference script, eg. `vocodes_inference_updated.py`
+  /// The name of the check/process script, eg. `infer_ts.py`
   inference_script_name: PathBuf,
 
   /// eg. `source python/bin/activate`
@@ -24,92 +24,55 @@ pub struct Tacotron2InferenceCommand {
   maybe_docker_options: Option<DockerOptions>,
 }
 
-#[derive(Clone)]
-pub enum VocoderForInferenceOption<P: AsRef<Path>> {
-  Waveglow {
-    waveglow_vocoder_checkpoint_path: P,
-  },
-  HifiganSuperres {
-    hifigan_vocoder_checkpoint_path: P,
-    hifigan_superres_vocoder_checkpoint_path: P,
-  }
+pub enum Device {
+  Cuda,
+  Cpu,
 }
 
-pub enum MelMultiplyFactor {
-  // NB: Default is typically "1.4"
-  DefaultMultiplyFactor,
-  // Custom values tend to range from 1.1 to 1.5
-  CustomMultiplyFactor(f64),
-}
+pub struct VitsInferenceArgs<P: AsRef<Path>> {
+  /// --checkpoint: input path of the model checkpoint
+  pub model_checkpoint_path: P,
 
-pub struct InferenceArgs <'a, P: AsRef<Path>> {
-  //# Model parameters
-  //parser.add_argument('--synthesizer_checkpoint_path', type=str, help='path the TTS synthesizer model', required=True)
-  //parser.add_argument('--text_pipeline_type', type=str, help='', required=True)
-  //parser.add_argument('--vocoder_type', type=str, help='', required=True)
-  //parser.add_argument('--waveglow_vocoder_checkpoint_path', type=str, help='path the TTS vocoder model')
-  //parser.add_argument('--hifigan_vocoder_checkpoint_path', type=str, help='path the TTS vocoder model')
-  //parser.add_argument('--hifigan_superres_vocoder_checkpoint_path', type=str, help='path the TTS vocoder model')
+  /// --config: path of the hparams json file
+  pub config_path: P,
 
-  pub synthesizer_checkpoint_path: P,
-  pub text_pipeline_type: &'a str, // TODO: Enum
+  /// --device: cpu or cuda
+  pub device: Device,
 
-  pub vocoder: VocoderForInferenceOption<P>,
-
-  //pub vocoder_type: &'a str,
-  //pub waveglow_vocoder_checkpoint_path: Option<P>,
-  //pub hifigan_vocoder_checkpoint_path: Optin<P>,
-  //pub hifigan_superres_vocoder_checkpoint_path: Option<P>,
-
-  //# Optional mel scaling before vocoding
-  //parser.add_argument('--use_default_mel_multiply_factor', type=bool, help='', action='store_true')
-  //parser.add_argument('--maybe_custom_mel_multiply_factor', type=int, help='')
-  //pub use_default_mel_multiply_factor: bool,
-  //pub maybe_custom_mel_multiply_factor: Option<f32>,
-  pub maybe_mel_multiply_factor: Option<MelMultiplyFactor>,
-
-  //# Premium features
-  //parser.add_argument('--max_decoder_steps', type=int, help='')
-  pub max_decoder_steps: u32,
-
-  //# User input
-  //parser.add_argument('--input_text_filename', type=str, help='path the file containing text to run', required=True)
+  /// --input-text-filename: input file containing the inference text
   pub input_text_filename: P,
 
-  //# Output files
-  //parser.add_argument('--output_audio_filename', type=str, help='where to save result audio', required=True)
-  //parser.add_argument('--output_spectrogram_filename', type=str, help='where to save result spectrogram', required=True)
-  //parser.add_argument('--output_metadata_filename', type=str, help='where to save extra metadata', required=True)
-
+  /// --output-audio-filename: resulting inference output audio file
   pub output_audio_filename: P,
-  pub output_spectrogram_filename: P,
+
+  /// --output-metadata-filename: resulting inference output metadata file
   pub output_metadata_filename: P,
 }
 
-impl Tacotron2InferenceCommand {
+impl VitsInferenceCommand {
   pub fn new<P: AsRef<Path>>(
-    tacotron_code_root_directory: P,
+    vits_root_code_directory: P,
+    inference_script_name: P,
     maybe_override_python_interpreter: Option<&str>,
     maybe_virtual_env_activation_command: Option<&str>,
-    inference_script_name: P,
     maybe_docker_options: Option<DockerOptions>,
   ) -> Self {
     Self {
-      tacotron_code_root_directory: tacotron_code_root_directory.as_ref().to_path_buf(),
-      maybe_override_python_interpreter: maybe_override_python_interpreter.map(|s| s.to_string()),
-      maybe_virtual_env_activation_command: maybe_virtual_env_activation_command.map(|s| s.to_string()),
+      vits_root_code_directory: vits_root_code_directory.as_ref().to_path_buf(),
       inference_script_name: inference_script_name.as_ref().to_path_buf(),
+      maybe_virtual_env_activation_command: maybe_virtual_env_activation_command.map(|s| s.to_string()),
+      maybe_override_python_interpreter: maybe_override_python_interpreter.map(|s| s.to_string()),
       maybe_docker_options,
     }
   }
 
   pub fn execute_inference<P: AsRef<Path>>(
     &self,
-    args: InferenceArgs<'_, P>,
+    args: VitsInferenceArgs<P>,
   ) -> AnyhowResult<()> {
 
     let mut command = String::new();
-    command.push_str(&format!("cd {}", path_to_string(&self.tacotron_code_root_directory)));
+    command.push_str(&format!("cd {}", path_to_string(&self.vits_root_code_directory)));
 
     if let Some(venv_command) = self.maybe_virtual_env_activation_command.as_deref() {
       command.push_str(" && ");
@@ -126,62 +89,32 @@ impl Tacotron2InferenceCommand {
     command.push_str(" ");
     command.push_str(&path_to_string(&self.inference_script_name));
 
-    // ===== Begin Python Inference Args =====
+    // ===== Begin Python Args =====
 
-    command.push_str(" --synthesizer_checkpoint_path ");
-    command.push_str(&path_to_string(args.synthesizer_checkpoint_path));
+    command.push_str(" --checkpoint ");
+    command.push_str(&path_to_string(args.model_checkpoint_path));
 
-    command.push_str(" --text_pipeline_type ");
-    command.push_str(args.text_pipeline_type);
+    command.push_str(" --config ");
+    command.push_str(&path_to_string(args.config_path));
 
-    match args.vocoder {
-      VocoderForInferenceOption::Waveglow { waveglow_vocoder_checkpoint_path } => {
-        command.push_str(" --vocoder_type ");
-        command.push_str("waveglow");
+    let device = match args.device {
+      Device::Cuda => "cuda",
+      Device::Cpu => "cpu",
+    };
 
-        command.push_str(" --waveglow_vocoder_checkpoint_path ");
-        command.push_str(&path_to_string(waveglow_vocoder_checkpoint_path));
-      }
-      VocoderForInferenceOption::HifiganSuperres {
-        hifigan_vocoder_checkpoint_path,
-        hifigan_superres_vocoder_checkpoint_path
-      } => {
-        command.push_str(" --vocoder_type ");
-        command.push_str("hifigan-superres");
+    command.push_str(" --device ");
+    command.push_str(&path_to_string(device));
 
-        command.push_str(" --hifigan_vocoder_checkpoint_path ");
-        command.push_str(&path_to_string(hifigan_vocoder_checkpoint_path));
-
-        command.push_str(" --hifigan_superres_vocoder_checkpoint_path ");
-        command.push_str(&path_to_string(hifigan_superres_vocoder_checkpoint_path));
-      }
-    }
-
-    match args.maybe_mel_multiply_factor {
-      None => {}
-      Some(MelMultiplyFactor::DefaultMultiplyFactor) => {
-        command.push_str(" --maybe_custom_mel_multiply_factor ");
-        //command.push_str("True");
-      }
-      Some(MelMultiplyFactor::CustomMultiplyFactor(factor)) => {
-        command.push_str(" --custom_mel_multiply_factor ");
-        command.push_str(&factor.to_string());
-      }
-    }
-
-    command.push_str(" --input_text_filename ");
+    command.push_str(" --input-text-filename ");
     command.push_str(&path_to_string(args.input_text_filename));
 
-    command.push_str(" --output_audio_filename ");
+    command.push_str(" --output-audio-filename ");
     command.push_str(&path_to_string(args.output_audio_filename));
 
-    command.push_str(" --output_spectrogram_filename ");
-    command.push_str(&path_to_string(args.output_spectrogram_filename));
-
-    command.push_str(" --output_metadata_filename ");
+    command.push_str(" --output-metadata-filename ");
     command.push_str(&path_to_string(args.output_metadata_filename));
 
-    // ===== End Python Inference Args =====
+    // ===== End Python Args =====
 
     if let Some(docker_options) = self.maybe_docker_options.as_ref() {
       command = docker_options.to_command_string(&command);

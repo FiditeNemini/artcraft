@@ -248,7 +248,6 @@ pub async fn process_job(args: ProcessJobArgs<'_>) -> Result<(), ProcessSingleJo
 
   // ==================== RUN INFERENCE SCRIPT ==================== //
 
-  //let tacotron_code_root_directory = "/home/bt/dev/storyteller/storyteller-ml/tts/tacotron2_v1_early_fakeyou";
   let tacotron_code_root_directory = "/models/tts";
   //let python = Some("python3");
   let python = None;
@@ -352,7 +351,7 @@ pub async fn process_job(args: ProcessJobArgs<'_>) -> Result<(), ProcessSingleJo
     &args.job_dependencies.mysql_pool,
     JobType::GenericInferenceJob(&job),
     &text_hash,
-    pretrained_vocoder,
+    Some(pretrained_vocoder),
     &audio_result_object_path,
     &spectrogram_result_object_path,
     file_metadata.file_size_bytes,

@@ -13,6 +13,7 @@ use r2d2_redis::RedisConnectionManager;
 use r2d2_redis::r2d2;
 use sqlx::MySqlPool;
 use std::path::PathBuf;
+use crate::job::job_types::tts::vits::vits_inference_command::VitsInferenceCommand;
 
 pub struct JobDependencies {
   pub download_temp_directory: PathBuf,
@@ -135,5 +136,5 @@ pub struct Tacotron2VocodesDetails {
 }
 
 pub struct VitsDetails {
-  pub maybe_docker_image_sha: Option<String>,
+  pub inference_command: VitsInferenceCommand,
 }

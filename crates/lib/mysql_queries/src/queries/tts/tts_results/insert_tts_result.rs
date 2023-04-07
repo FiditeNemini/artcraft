@@ -24,7 +24,7 @@ pub async fn insert_tts_result<P: AsRef<Path>>(
   pool: &MySqlPool,
   job: JobType<'_>,
   text_hash: &str,
-  pretrained_vocoder_used: VocoderType,
+  maybe_pretrained_vocoder_used: Option<VocoderType>,
   bucket_audio_results_path: P,
   bucket_spectrogram_results_path: P,
   file_size_bytes: u64,
@@ -45,6 +45,9 @@ pub async fn insert_tts_result<P: AsRef<Path>>(
       .as_ref()
       .display()
       .to_string();
+
+  let maybe_pretrained_vocoder_used = maybe_pretrained_vocoder_used
+      .map(|v| v.to_str());
 
   let raw_inference_text;
   let maybe_creator_user_token;
@@ -165,7 +168,7 @@ SET
         "#,
       inference_result_token,
       tts_model_token,
-      pretrained_vocoder_used.to_str(),
+      maybe_pretrained_vocoder_used,
       raw_inference_text,
       text_hash,
       normalized_inference_text,

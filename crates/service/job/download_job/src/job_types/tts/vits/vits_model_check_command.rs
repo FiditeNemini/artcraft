@@ -1,4 +1,5 @@
 use container_common::anyhow_result::AnyhowResult;
+use filesys::path_to_string::path_to_string;
 use log::info;
 use std::fs::OpenOptions;
 use std::path::{Path, PathBuf};
@@ -69,7 +70,7 @@ impl VitsModelCheckCommand {
   ) -> AnyhowResult<()> {
 
     let mut command = String::new();
-    command.push_str(&format!("cd {}", path_to_str(&self.vits_root_code_directory)));
+    command.push_str(&format!("cd {}", path_to_string(&self.vits_root_code_directory)));
 
     if let Some(venv_command) = self.maybe_virtual_env_activation_command.as_deref() {
       command.push_str(" && ");
@@ -84,18 +85,18 @@ impl VitsModelCheckCommand {
     command.push_str(" && ");
     command.push_str(python_binary);
     command.push_str(" ");
-    command.push_str(&path_to_str(&self.check_script_name));
+    command.push_str(&path_to_string(&self.check_script_name));
 
     // ===== Begin Python Args =====
 
     command.push_str(" --out-path ");
-    command.push_str(&path_to_str(args.traced_model_output_path));
+    command.push_str(&path_to_string(args.traced_model_output_path));
 
     command.push_str(" --checkpoint ");
-    command.push_str(&path_to_str(args.model_checkpoint_path));
+    command.push_str(&path_to_string(args.model_checkpoint_path));
 
     command.push_str(" --config ");
-    command.push_str(&path_to_str(args.config_path));
+    command.push_str(&path_to_string(args.config_path));
 
     let device = match args.device {
       Device::Cuda => "cuda",
@@ -103,11 +104,11 @@ impl VitsModelCheckCommand {
     };
 
     command.push_str(" --device ");
-    command.push_str(&path_to_str(device));
+    command.push_str(&path_to_string(device));
 
     command.push_str(" --test-string ");
     command.push_str("'");
-    command.push_str(&path_to_str(args.test_string));
+    command.push_str(&path_to_string(args.test_string));
     command.push_str("'");
 
     // ===== End Python Args =====
@@ -136,8 +137,4 @@ impl VitsModelCheckCommand {
 
     Ok(())
   }
-}
-
-fn path_to_str<P: AsRef<Path>>(path: P) -> String {
-  path.as_ref().display().to_string()
 }

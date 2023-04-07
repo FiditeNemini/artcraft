@@ -8,6 +8,7 @@ use crate::job_types::tts::vits::vits_model_check_command::{CheckArgs, Device};
 use enums::by_table::tts_models::tts_model_type::TtsModelType;
 use enums::common::visibility::Visibility;
 use errors::AnyhowResult;
+use filesys::filename_concat::filename_concat;
 use hashing::sha256::sha256_hash_file::sha256_hash_file;
 use jobs_common::redis_job_status_logger::RedisJobStatusLogger;
 use log::{error, info, warn};
@@ -19,7 +20,6 @@ use std::io::Read;
 use std::path::{Path, PathBuf};
 use std::time::Duration;
 use tempdir::TempDir;
-use filesys::filename_concat::filename_concat;
 
 /// Returns the token of the entity.
 pub async fn process_vits_model<'a, 'b>(

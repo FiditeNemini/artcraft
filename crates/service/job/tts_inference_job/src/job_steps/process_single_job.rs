@@ -406,7 +406,7 @@ pub async fn process_single_job(
     &job_args.mysql_pool,
     JobType::TtsJob(&job),
     &text_hash,
-    pretrained_vocoder,
+    Some(pretrained_vocoder),
     &audio_result_object_path,
     &spectrogram_result_object_path,
     file_metadata.file_size_bytes,

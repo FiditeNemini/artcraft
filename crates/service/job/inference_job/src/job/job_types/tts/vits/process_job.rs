@@ -5,9 +5,11 @@ use container_common::filesystem::safe_delete_temp_file::safe_delete_temp_file;
 use crate::job::job_loop::process_single_job_error::ProcessSingleJobError;
 use crate::job::job_types::tts::tacotron2_v2_early_fakeyou::seconds_to_decoder_steps::seconds_to_decoder_steps;
 use crate::job::job_types::tts::tacotron2_v2_early_fakeyou::tacotron2_inference_command::{InferenceArgs, MelMultiplyFactor, Tacotron2InferenceCommand, VocoderForInferenceOption};
+use crate::job::job_types::tts::vits::vits_inference_command::{Device, VitsInferenceArgs, VitsInferenceCommand};
 use crate::job_dependencies::JobDependencies;
 use crate::util::maybe_download_file_from_bucket::maybe_download_file_from_bucket;
 use errors::AnyhowResult;
+use filesys::filename_concat::filename_concat;
 use hashing::sha256::sha256_hash_string::sha256_hash_string;
 use log::{error, info};
 use mysql_queries::column_types::vocoder_type::VocoderType;
@@ -108,112 +110,35 @@ pub async fn process_job(args: VitsProcessJobArgs<'_>) -> Result<(), ProcessSing
   info!("Running TTS inference...");
 
   info!("Expected output audio filename: {:?}", &output_audio_fs_path);
-  //info!("Expected output spectrogram filename: {:?}", &output_spectrogram_fs_path);
   info!("Expected output metadata filename: {:?}", &output_metadata_fs_path);
+  //info!("Expected output spectrogram filename: {:?}", &output_spectrogram_fs_path);
 
-  let mut pretrained_vocoder = VocoderType::HifiGanSuperResolution;
-  if let Some(default_vocoder) = tts_model.maybe_default_pretrained_vocoder.as_deref() {
-    pretrained_vocoder = VocoderType::from_str(default_vocoder)
-        .map_err(|e| ProcessSingleJobError::Other(e))?;
-  }
-
-  info!("With pretrained vocoder: {:?}", pretrained_vocoder);
-
-  // TODO: Clean up the vocoder selection logic to make this crystal clear.
-  let mut vocoder_option = match pretrained_vocoder {
-    // We most likely will *not* use WaveGlow.
-    VocoderType::WaveGlow => {
-      VocoderForInferenceOption::Waveglow {
-        waveglow_vocoder_checkpoint_path: &waveglow_vocoder_model_fs_path
-      }
-    }
-    VocoderType::HifiGanSuperResolution => {
-      VocoderForInferenceOption::HifiganSuperres {
-        hifigan_vocoder_checkpoint_path: &pretrained_hifigan_vocoder_model_fs_path,
-        hifigan_superres_vocoder_checkpoint_path: &hifigan_superres_vocoder_model_fs_path,
-      }
-    }
-  };
-
-  if let Some(ref custom_vocoder_path) = custom_vocoder_fs_path {
-      info!("using custom user-trained HiFi-GAN vocoder: {:?}", custom_vocoder_fs_path);
-      vocoder_option = VocoderForInferenceOption::HifiganSuperres {
-        hifigan_vocoder_checkpoint_path: custom_vocoder_path,
-        hifigan_superres_vocoder_checkpoint_path: &hifigan_superres_vocoder_model_fs_path,
-      };
-  };
-
-  let text_pipeline_type_or_guess = tts_model.text_pipeline_type
-      .as_deref()
-      // NB: If there's an error deserializing, turn it to None.
-      .and_then(|pipeline_type| TextPipelineType::from_str(pipeline_type).ok())
-      .unwrap_or_else(|| guess_text_pipeline_heuristic(Some(tts_model.created_at)));
-
-  info!("With text pipeline type `{:?} ` (or guess: {:?})",
-    &tts_model.text_pipeline_type,
-    &text_pipeline_type_or_guess);
-
+  // TODO: Limit output length for premium.
   // NB: Tacotron operates on decoder steps. 1000 steps is the default and correlates to
   //  roughly 12 seconds max. Here we map seconds to decoder steps.
-  let max_decoder_steps = seconds_to_decoder_steps(job.max_duration_seconds);
+  //let max_decoder_steps = seconds_to_decoder_steps(job.max_duration_seconds);
 
-  // NB: Docker options are for development, not production.
-  let mut maybe_docker_options = None;
-
-  if let Some(docker_sha) = args.job_dependencies.job_type_details.tacotron2_old_vocodes.maybe_docker_image_sha.as_deref() {
-    maybe_docker_options = Some(DockerOptions {
-      image_name: docker_sha.to_string(),
-      maybe_bind_mount: Some(DockerFilesystemMount {
-        local_filesystem: "/tmp".to_string(),
-        container_filesystem: "/tmp".to_string(),
-      }),
-      maybe_gpu: Some(DockerGpu::All),
-    })
-  }
 
   // ==================== RUN INFERENCE SCRIPT ==================== //
 
-  //let tacotron_code_root_directory = "/home/bt/dev/storyteller/storyteller-ml/tts/tacotron2_v1_early_fakeyou";
-  let tacotron_code_root_directory = "/models/tts";
-  //let python = Some("python3");
-  let python = None;
+  let config_path = PathBuf::from("configs/ljs_li44_tmbert_nmp_s1_arpa.json"); // TODO: This could be variable.
 
-  let inference_command = Tacotron2InferenceCommand::new(
-    tacotron_code_root_directory,
-    python,
-    Some("source python/bin/activate"),
-    "vocodes_inference_updated.py",
-    maybe_docker_options,
-  );
-
-  let mut maybe_mel_multiply_factor = None;
-
-  if let Some(factor) = tts_model.maybe_custom_mel_multiply_factor {
-    maybe_mel_multiply_factor = Some(MelMultiplyFactor::CustomMultiplyFactor(factor));
-  } else if tts_model.use_default_mel_multiply_factor {
-    maybe_mel_multiply_factor = Some(MelMultiplyFactor::DefaultMultiplyFactor);
-  }
-
-  let _r = inference_command.execute_inference(InferenceArgs {
-    synthesizer_checkpoint_path: &tts_synthesizer_fs_path,
-    text_pipeline_type: text_pipeline_type_or_guess.to_str(),
-    vocoder: vocoder_option,
-    maybe_mel_multiply_factor,
-    max_decoder_steps,
+  let _r = args.job_dependencies.job_type_details.vits.inference_command.execute_inference(VitsInferenceArgs {
+    model_checkpoint_path: &vits_traced_synthesizer_fs_path,
+    config_path: &config_path,
+    device: Device::Cuda,
     input_text_filename: &text_input_fs_path,
     output_audio_filename: &output_audio_fs_path,
-    output_spectrogram_filename: &output_spectrogram_fs_path,
     output_metadata_filename: &output_metadata_fs_path,
   });
-
 
   // ==================== CHECK ALL FILES EXIST AND GET METADATA ==================== //
 
   info!("Checking that output files exist...");
 
   check_file_exists(&output_audio_fs_path).map_err(|e| ProcessSingleJobError::Other(e))?;
-  check_file_exists(&output_spectrogram_fs_path).map_err(|e| ProcessSingleJobError::Other(e))?;
   check_file_exists(&output_metadata_fs_path).map_err(|e| ProcessSingleJobError::Other(e))?;
+  //check_file_exists(&output_spectrogram_fs_path).map_err(|e| ProcessSingleJobError::Other(e))?;
 
   let file_metadata = read_metadata_file(&output_metadata_fs_path)
       .map_err(|e| ProcessSingleJobError::Other(e))?;
@@ -274,15 +199,16 @@ pub async fn process_job(args: VitsProcessJobArgs<'_>) -> Result<(), ProcessSing
   info!("Saving tts inference record...");
 
   // NB: The stupid DB field for spectrograms is not nullable, so we'll just set empty string.
-  const FAKE_SPECTROGRAM_PATH : PathBuf = PathBuf::from("");
+  let fake_spectrogram_path = PathBuf::from("");
+  const NO_PRETRAINED_VOCODER : Option<VocoderType> = None;
 
   let (id, inference_result_token) = insert_tts_result(
     &args.job_dependencies.mysql_pool,
     JobType::GenericInferenceJob(&job),
     &text_hash,
-    pretrained_vocoder,
+    NO_PRETRAINED_VOCODER,
     &audio_result_object_path,
-    &FAKE_SPECTROGRAM_PATH, // NB: No spectogram!
+    &fake_spectrogram_path, // NB: No spectogram!
     file_metadata.file_size_bytes,
     file_metadata.duration_millis.unwrap_or(0),
     args.job_dependencies.worker_details.is_on_prem,

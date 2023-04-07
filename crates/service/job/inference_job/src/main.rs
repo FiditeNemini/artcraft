@@ -45,6 +45,8 @@ use r2d2_redis::r2d2;
 use sqlx::mysql::MySqlPoolOptions;
 use std::path::PathBuf;
 use std::time::Duration;
+use subprocess_common::docker_options::{DockerFilesystemMount, DockerGpu, DockerOptions};
+use crate::job::job_types::tts::vits::vits_inference_command::VitsInferenceCommand;
 
 // Buckets (shared config)
 const ENV_ACCESS_KEY : &'static str = "ACCESS_KEY";
@@ -278,7 +280,7 @@ async fn main() -> AnyhowResult<()> {
         hifigan_superres_vocoder_model_filename,
       },
       vits: VitsDetails {
-        maybe_docker_image_sha: easyenv::get_env_string_optional("VITS_DOCKER_IMAGE_SHA"),
+        inference_command: vits_inference_command()?,
       }
     },
   };
@@ -286,4 +288,37 @@ async fn main() -> AnyhowResult<()> {
   main_loop(job_dependencies).await;
 
   Ok(())
+}
+
+fn vits_inference_command() -> AnyhowResult<VitsInferenceCommand> {
+  let root_directory = easyenv::get_env_string_required(
+    "VITS_INFERENCE_ROOT_DIRECTORY")?;
+
+  let inference_script = easyenv::get_env_string_or_default(
+    "VITS_INFERENCE_SCRIPT",
+    "infer_ts_job.py");
+
+  let maybe_venv_command = easyenv::get_env_string_optional(
+    "VITS_INFERENCE_MAYBE_VENV_COMMAND");
+
+  let maybe_python_interpreter = easyenv::get_env_string_optional(
+    "VITS_INFERENCE_MAYBE_PYTHON_INTERPRETER");
+
+  let maybe_docker_options = easyenv::get_env_string_optional(
+    "VITS_INFERENCE_MAYBE_DOCKER_IMAGE_SHA")
+      .map(|image_name| {
+        DockerOptions {
+          image_name,
+          maybe_bind_mount: Some(DockerFilesystemMount::tmp_to_tmp()),
+          maybe_gpu: Some(DockerGpu::All),
+        }
+      });
+
+  Ok(VitsInferenceCommand::new(
+    root_directory,
+    inference_script,
+    maybe_python_interpreter.as_deref(),
+    maybe_venv_command.as_deref(),
+    maybe_docker_options,
+  ))
 }
