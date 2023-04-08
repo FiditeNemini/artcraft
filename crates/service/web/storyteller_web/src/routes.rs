@@ -127,7 +127,7 @@ pub fn add_routes<T, B> (app: App<T, B>) -> App<T, B>
   app = add_w2l_routes(app); /* /w2l */
   app = add_web_vc_routes(app); /* /v1/voice_conversion */
   app = add_vocoder_routes(app); /* /vocoder */
-  app = add_retrieval_routes(app); /* /retrieval (aka. "generic_download_jobs") */
+  app = add_remote_download_routes(app); /* /v1/remote_downloads (prev. /retrieval, aka. "generic_download_jobs") */
   app = add_category_routes(app); /* /category */
   app = add_user_profile_routes(app); /* /user */
   app = add_api_token_routes(app); /* /api_tokens */
@@ -622,7 +622,7 @@ fn add_vocoder_routes<T, B> (app: App<T, B>) -> App<T, B>
 
 // ==================== RETRIEVAL ROUTES ("GENERIC_DOWNLOAD_JOBS") ====================
 
-fn add_retrieval_routes<T, B> (app: App<T, B>) -> App<T, B>
+fn add_remote_download_routes<T, B> (app: App<T, B>) -> App<T, B>
   where
       B: MessageBody,
       T: ServiceFactory<
@@ -633,19 +633,14 @@ fn add_retrieval_routes<T, B> (app: App<T, B>) -> App<T, B>
         InitError = (),
       >,
 {
-  app.service(
-    web::scope("/retrieval")
-        .service(
-          web::resource("/enqueue")
-              .route(web::post().to(enqueue_generic_download_handler))
-              .route(web::head().to(|| HttpResponse::Ok()))
-        )
-        .service(
-          web::resource("/job_status/{token}")
-              .route(web::get().to(get_generic_download_job_status_handler))
-              .route(web::head().to(|| HttpResponse::Ok()))
-        )
-  )
+  RouteBuilder::from_app(app)
+      // NB: These are the new route names
+      .add_post("/v1/remote_download/enqueue", enqueue_generic_download_handler)
+      .add_get("/v1/remote_download/job_status/{token}", get_generic_download_job_status_handler)
+      // NB: These are the old, deprecated route names that should be removed
+      .add_post("/retrieval/enqueue", enqueue_generic_download_handler)
+      .add_get("/retrieval/job_status/{token}", get_generic_download_job_status_handler)
+      .into_app()
 }
 
 // ==================== CATEGORY ROUTES ====================
