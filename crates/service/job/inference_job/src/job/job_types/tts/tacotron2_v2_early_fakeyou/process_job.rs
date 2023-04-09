@@ -244,6 +244,7 @@ pub async fn process_job(args: ProcessJobArgs<'_>) -> Result<JobSuccessResult, P
         local_filesystem: "/tmp".to_string(),
         container_filesystem: "/tmp".to_string(),
       }),
+      maybe_environment_variables: None,
       maybe_gpu: Some(DockerGpu::All),
     })
   }

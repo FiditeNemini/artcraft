@@ -45,7 +45,7 @@ use r2d2_redis::r2d2;
 use sqlx::mysql::MySqlPoolOptions;
 use std::path::PathBuf;
 use std::time::Duration;
-use subprocess_common::docker_options::{DockerFilesystemMount, DockerGpu, DockerOptions};
+use subprocess_common::docker_options::{DockerEnvironmentVariable, DockerFilesystemMount, DockerGpu, DockerOptions};
 use crate::job::job_types::tts::vits::vits_inference_command::VitsInferenceCommand;
 
 // Buckets (shared config)
@@ -307,12 +307,21 @@ fn vits_inference_command() -> AnyhowResult<VitsInferenceCommand> {
   let maybe_huggingface_dataset_cache = easyenv::get_env_string_optional(
     "HF_DATASETS_CACHE");
 
+  let maybe_docker_env_vars = maybe_huggingface_dataset_cache.as_deref()
+      .map(|cache_directory| {
+        vec![
+          DockerEnvironmentVariable::new("HF_HOME", cache_directory),
+          DockerEnvironmentVariable::new("HF_DATASETS_CACHE", cache_directory),
+        ]
+      });
+
   let maybe_docker_options = easyenv::get_env_string_optional(
     "VITS_INFERENCE_MAYBE_DOCKER_IMAGE_SHA")
       .map(|image_name| {
         DockerOptions {
           image_name,
           maybe_bind_mount: Some(DockerFilesystemMount::tmp_to_tmp()),
+          maybe_environment_variables: maybe_docker_env_vars,
           maybe_gpu: Some(DockerGpu::All),
         }
       });
