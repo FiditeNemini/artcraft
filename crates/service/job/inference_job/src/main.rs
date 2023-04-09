@@ -304,6 +304,9 @@ fn vits_inference_command() -> AnyhowResult<VitsInferenceCommand> {
   let maybe_python_interpreter = easyenv::get_env_string_optional(
     "VITS_INFERENCE_MAYBE_PYTHON_INTERPRETER");
 
+  let maybe_huggingface_dataset_cache = easyenv::get_env_string_optional(
+    "HF_DATASETS_CACHE");
+
   let maybe_docker_options = easyenv::get_env_string_optional(
     "VITS_INFERENCE_MAYBE_DOCKER_IMAGE_SHA")
       .map(|image_name| {
@@ -319,6 +322,7 @@ fn vits_inference_command() -> AnyhowResult<VitsInferenceCommand> {
     inference_script,
     maybe_python_interpreter.as_deref(),
     maybe_venv_command.as_deref(),
+    maybe_huggingface_dataset_cache.as_deref(),
     maybe_docker_options,
   ))
 }

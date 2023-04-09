@@ -1,3 +1,4 @@
+use std::ffi::{OsStr, OsString};
 use crate::AnyhowResult;
 use filesys::path_to_string::path_to_string;
 use log::info;
@@ -19,6 +20,9 @@ pub struct VitsInferenceCommand {
 
   /// eg. `python3`
   maybe_override_python_interpreter: Option<String>,
+
+  /// The directory huggingface should cache models
+  maybe_huggingface_cache_dir: Option<String>,
 
   /// If this is run under Docker (eg. in development), these are the options.
   maybe_docker_options: Option<DockerOptions>,
@@ -55,12 +59,14 @@ impl VitsInferenceCommand {
     inference_script_name: P,
     maybe_override_python_interpreter: Option<&str>,
     maybe_virtual_env_activation_command: Option<&str>,
+    maybe_huggingface_cache_directory: Option<&str>,
     maybe_docker_options: Option<DockerOptions>,
   ) -> Self {
     Self {
       vits_root_code_directory: vits_root_code_directory.as_ref().to_path_buf(),
       inference_script_name: inference_script_name.as_ref().to_path_buf(),
       maybe_virtual_env_activation_command: maybe_virtual_env_activation_command.map(|s| s.to_string()),
+      maybe_huggingface_cache_dir: maybe_huggingface_cache_directory.map(|s| s.to_string()),
       maybe_override_python_interpreter: maybe_override_python_interpreter.map(|s| s.to_string()),
       maybe_docker_options,
     }
@@ -127,6 +133,14 @@ impl VitsInferenceCommand {
       "-c",
       &command
     ];
+
+    let mut config = PopenConfig::default();
+
+    if let Some(cache_dir) = self.maybe_huggingface_cache_dir.as_deref() {
+      let name = OsString::from("HF_DATASETS_CACHE");
+      let value = OsString::from(cache_dir);
+      config.env = Some(vec![(name, value)])
+    }
 
     let mut p = Popen::create(&command_parts, PopenConfig {
       ..Default::default()
