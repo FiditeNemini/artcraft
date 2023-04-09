@@ -149,6 +149,7 @@ impl VitsInferenceCommand {
 
     if let Some(cache_dir) = self.maybe_nltk_cache_dir.as_deref() {
       env_vars.push((OsString::from("NLTK_DATA"), OsString::from(cache_dir)));
+      env_vars.push((OsString::from("NLTK_DATA_PATH"), OsString::from(cache_dir)));
     }
 
     let mut config = PopenConfig::default();

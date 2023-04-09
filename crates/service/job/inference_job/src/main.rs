@@ -319,6 +319,7 @@ fn vits_inference_command() -> AnyhowResult<VitsInferenceCommand> {
 
   if let Some(cache_dir) = maybe_nltk_data_cache.as_deref() {
     docker_env_vars.push(DockerEnvVar::new("NLTK_DATA", cache_dir));
+    docker_env_vars.push(DockerEnvVar::new("NLTK_DATA_PATH", cache_dir));
   }
 
   let maybe_docker_env_vars =
