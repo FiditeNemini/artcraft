@@ -137,9 +137,11 @@ impl VitsInferenceCommand {
     let mut config = PopenConfig::default();
 
     if let Some(cache_dir) = self.maybe_huggingface_cache_dir.as_deref() {
-      let name = OsString::from("HF_DATASETS_CACHE");
-      let value = OsString::from(cache_dir);
-      config.env = Some(vec![(name, value)])
+      config.env = Some(vec![
+        // NB: Docs point to `HF_DATASETS_CACHE`, but the lib code references `HF_HOME`.
+        (OsString::from("HF_DATASETS_CACHE"), OsString::from(cache_dir)),
+        (OsString::from("HF_HOME"), OsString::from(cache_dir)),
+      ])
     }
 
     let mut p = Popen::create(&command_parts, PopenConfig {
