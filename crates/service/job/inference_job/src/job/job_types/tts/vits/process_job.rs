@@ -22,9 +22,11 @@ use std::io::Read;
 use std::path::{Path, PathBuf};
 use subprocess_common::docker_options::{DockerFilesystemMount, DockerGpu, DockerOptions};
 use tempdir::TempDir;
+use enums::by_table::generic_inference_jobs::inference_result_type::InferenceResultType;
 use tts_common::clean_symbols::clean_symbols;
 use tts_common::text_pipelines::guess_pipeline::guess_text_pipeline_heuristic;
 use tts_common::text_pipelines::text_pipeline_type::TextPipelineType;
+use crate::job::job_loop::job_success_result::{JobSuccessResult, ResultEntity};
 
 /// Text starting with this will be treated as a test request.
 /// This allows the request to bypass the model cache and query the latest TTS model.
@@ -38,7 +40,7 @@ pub struct VitsProcessJobArgs<'a> {
   pub raw_inference_text: &'a str,
 }
 
-pub async fn process_job(args: VitsProcessJobArgs<'_>) -> Result<(), ProcessSingleJobError> {
+pub async fn process_job(args: VitsProcessJobArgs<'_>) -> Result<JobSuccessResult, ProcessSingleJobError> {
   let job = args.job;
   let tts_model = args.tts_model;
   let raw_inference_text = args.raw_inference_text;
@@ -245,7 +247,12 @@ pub async fn process_job(args: VitsProcessJobArgs<'_>) -> Result<(), ProcessSing
   info!("Job {:?} complete success! Downloaded, ran inference, and uploaded. Saved model record: {}, Result Token: {}",
         job.id, id, &inference_result_token);
 
-  Ok(())
+  Ok(JobSuccessResult {
+    maybe_result_entity: Some(ResultEntity {
+      entity_type: InferenceResultType::TextToSpeech,
+      entity_token: inference_result_token
+    }),
+  })
 }
 
 #[derive(Deserialize, Default)]

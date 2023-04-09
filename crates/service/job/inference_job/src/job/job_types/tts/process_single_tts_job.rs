@@ -9,8 +9,9 @@ use errors::AnyhowResult;
 use mysql_queries::queries::generic_inference::job::list_available_generic_inference_jobs::AvailableInferenceJob;
 use mysql_queries::queries::tts::tts_models::get_tts_model_for_inference_improved::{get_tts_model_for_inference_improved, TtsModelForInferenceRecord};
 use tokens::tokens::tts_models::TtsModelToken;
+use crate::job::job_loop::job_success_result::JobSuccessResult;
 
-pub async fn process_single_tts_job(job_dependencies: &JobDependencies, job: &AvailableInferenceJob) -> Result<(), ProcessSingleJobError> {
+pub async fn process_single_tts_job(job_dependencies: &JobDependencies, job: &AvailableInferenceJob) -> Result<JobSuccessResult, ProcessSingleJobError> {
 
   let tts_model_token = match job.maybe_model_token.as_deref() {
     None => return Err(ProcessSingleJobError::Other(anyhow!("no model token on job"))),
@@ -60,25 +61,25 @@ pub async fn process_single_tts_job(job_dependencies: &JobDependencies, job: &Av
     Some(model) => model,
   };
 
-  match tts_model.tts_model_type {
+  let job_success_result = match tts_model.tts_model_type {
     TtsModelType::Tacotron2 => {
-      let _r = tacotron2_v2_early_fakeyou::process_job::process_job(ProcessJobArgs {
+      tacotron2_v2_early_fakeyou::process_job::process_job(ProcessJobArgs {
         job_dependencies,
         job,
         tts_model: &tts_model,
         raw_inference_text,
-      }).await?;
+      }).await?
     }
     TtsModelType::Vits => {
-      let _r = vits::process_job::process_job(VitsProcessJobArgs {
+      vits::process_job::process_job(VitsProcessJobArgs {
         job_dependencies,
         job,
         tts_model: &tts_model,
         raw_inference_text,
-      }).await?;
+      }).await?
     }
-  }
+  };
 
-  Ok(())
+  Ok(job_success_result)
 }
 

@@ -2,6 +2,7 @@ use anyhow::anyhow;
 use container_common::filesystem::check_file_exists::check_file_exists;
 use container_common::filesystem::safe_delete_temp_directory::safe_delete_temp_directory;
 use container_common::filesystem::safe_delete_temp_file::safe_delete_temp_file;
+use crate::job::job_loop::job_success_result::{JobSuccessResult, ResultEntity};
 use crate::job::job_loop::process_single_job_error::ProcessSingleJobError;
 use crate::job::job_types::tts::tacotron2_v2_early_fakeyou::seconds_to_decoder_steps::seconds_to_decoder_steps;
 use crate::job::job_types::tts::tacotron2_v2_early_fakeyou::tacotron2_inference_command::{InferenceArgs, MelMultiplyFactor, Tacotron2InferenceCommand, VocoderForInferenceOption};
@@ -20,6 +21,7 @@ use std::io::Read;
 use std::path::PathBuf;
 use subprocess_common::docker_options::{DockerFilesystemMount, DockerGpu, DockerOptions};
 use tempdir::TempDir;
+use enums::by_table::generic_inference_jobs::inference_result_type::InferenceResultType;
 use tts_common::clean_symbols::clean_symbols;
 use tts_common::text_pipelines::guess_pipeline::guess_text_pipeline_heuristic;
 use tts_common::text_pipelines::text_pipeline_type::TextPipelineType;
@@ -36,7 +38,7 @@ pub struct ProcessJobArgs<'a> {
   pub raw_inference_text: &'a str,
 }
 
-pub async fn process_job(args: ProcessJobArgs<'_>) -> Result<(), ProcessSingleJobError> {
+pub async fn process_job(args: ProcessJobArgs<'_>) -> Result<JobSuccessResult, ProcessSingleJobError> {
   let job = args.job;
   let tts_model = args.tts_model;
   let raw_inference_text = args.raw_inference_text;
@@ -390,7 +392,12 @@ pub async fn process_job(args: ProcessJobArgs<'_>) -> Result<(), ProcessSingleJo
   info!("Job {:?} complete success! Downloaded, ran inference, and uploaded. Saved model record: {}, Result Token: {}",
         job.id, id, &inference_result_token);
 
-  Ok(())
+  Ok(JobSuccessResult {
+    maybe_result_entity: Some(ResultEntity {
+      entity_type: InferenceResultType::TextToSpeech,
+      entity_token: inference_result_token
+    }),
+  })
 }
 
 #[derive(Deserialize, Default)]

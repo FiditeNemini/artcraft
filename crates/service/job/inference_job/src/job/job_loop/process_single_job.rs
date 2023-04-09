@@ -6,9 +6,11 @@ use crate::job_dependencies::JobDependencies;
 use enums::by_table::generic_inference_jobs::inference_category::InferenceCategory;
 use errors::AnyhowResult;
 use log::{info, warn};
+use enums::by_table::generic_inference_jobs::inference_result_type::InferenceResultType;
 use mysql_queries::queries::generic_inference::job::list_available_generic_inference_jobs::AvailableInferenceJob;
 use mysql_queries::queries::generic_inference::job::mark_generic_inference_job_pending_and_grab_lock::mark_generic_inference_job_pending_and_grab_lock;
 use mysql_queries::queries::generic_inference::job::mark_generic_inference_job_successfully_done::mark_generic_inference_job_successfully_done;
+use crate::job::job_loop::job_success_result::ResultEntity;
 
 pub async fn process_single_job(job_dependencies: &JobDependencies, job: &AvailableInferenceJob) -> Result<(), ProcessSingleJobError> {
   // TODO(bt, 2023-01-11): Restore an optional status logger
@@ -38,75 +40,34 @@ pub async fn process_single_job(job_dependencies: &JobDependencies, job: &Availa
 
   // ==================== HANDLE DIFFERENT INFERENCE TYPES ==================== //
 
-  let mut entity_token : Option<String> = None;
-  let mut entity_type : Option<String> = None;
+  let mut maybe_result_entity : Option<ResultEntity>;
 
-  match job.inference_category {
+  let job_success_result = match job.inference_category {
     InferenceCategory::TextToSpeech => {
-      // TODO
-      entity_type = Some("todo".to_string()); // TODO
-      entity_token = Some("todo".to_string()); // TODO
-
-      let _r = process_single_tts_job(job_dependencies, job).await?;
+      process_single_tts_job(job_dependencies, job).await?
     }
     InferenceCategory::VoiceConversion => {
-      // TODO
-      let _r = process_single_vc_job(job_dependencies, job).await?;
+      process_single_vc_job(job_dependencies, job).await?
     }
-//    GenericDownloadType::HifiGan => {
-//      let results = process_hifigan_vocoder(
-//        job_state,
-//        job,
-//        &temp_dir,
-//        &download_filename,
-//        &mut redis_logger,
-//      ).await?;
-//      entity_token = results.entity_token.clone();
-//      entity_type = results.entity_type.clone();
-//    }
-//    GenericDownloadType::HifiGanRocketVc => {
-//      let results = process_hifigan_softvc_vocoder(
-//        job_state,
-//        job,
-//        &temp_dir,
-//        &download_filename,
-//        &mut redis_logger,
-//      ).await?;
-//      entity_token = results.entity_token.clone();
-//      entity_type = results.entity_type.clone();
-//    }
-//    GenericDownloadType::RocketVc => {
-//      let results = process_softvc_model(
-//        job_state,
-//        job,
-//        &temp_dir,
-//        &download_filename,
-//        &mut redis_logger,
-//      ).await?;
-//      entity_token = results.entity_token.clone();
-//      entity_type = results.entity_type.clone();
-//    }
-//    GenericDownloadType::Tacotron2 => {
-//      let results = process_tacotron_model(
-//        job_state,
-//        job,
-//        &temp_dir,
-//        &download_filename,
-//        &mut redis_logger,
-//      ).await?;
-//      entity_token = results.entity_token.clone();
-//      entity_type = results.entity_type.clone();
-//    }
-  }
+  };
+
+  let maybe_entity_type = job_success_result.maybe_result_entity
+      .as_ref()
+      .map(|result_entity| result_entity.entity_type);
+
+  let maybe_entity_token = job_success_result.maybe_result_entity
+      .as_ref()
+      .map(|result_entity| result_entity.entity_token.as_str());
 
   // =====================================================
 
   info!("Marking job complete...");
+
   mark_generic_inference_job_successfully_done(
     &job_dependencies.mysql_pool,
     job,
-    entity_type.as_deref(),
-    entity_token.as_deref(),
+    maybe_entity_type,
+    maybe_entity_token,
   ).await
       .map_err(|err| ProcessSingleJobError::Other(anyhow!("database error: {:?}", err)))?;
 

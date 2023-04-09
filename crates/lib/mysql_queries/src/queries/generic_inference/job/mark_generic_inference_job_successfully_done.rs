@@ -1,12 +1,13 @@
 use anyhow::anyhow;
-use errors::AnyhowResult;
 use crate::queries::generic_inference::job::list_available_generic_inference_jobs::AvailableInferenceJob;
+use enums::by_table::generic_inference_jobs::inference_result_type::InferenceResultType;
+use errors::AnyhowResult;
 use sqlx::MySqlPool;
 
 pub async fn mark_generic_inference_job_successfully_done(
   pool: &MySqlPool,
   job: &AvailableInferenceJob,
-  maybe_entity_type: Option<&str>,
+  maybe_entity_type: Option<InferenceResultType>,
   maybe_entity_token: Option<&str>,
 ) -> AnyhowResult<()>
 {

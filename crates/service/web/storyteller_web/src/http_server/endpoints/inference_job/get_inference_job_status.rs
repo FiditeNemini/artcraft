@@ -36,6 +36,12 @@ pub struct GetInferenceJobStatusPathInfo {
 }
 
 #[derive(Serialize)]
+pub struct GetInferenceJobStatusSuccessResponse {
+  pub success: bool,
+  pub state: InferenceJobStatusResponsePayload,
+}
+
+#[derive(Serialize)]
 pub struct InferenceJobStatusResponsePayload {
   pub job_token: InferenceJobToken,
 
@@ -49,7 +55,6 @@ pub struct InferenceJobStatusResponsePayload {
 
 #[derive(Serialize)]
 pub struct RequestDetailsResponse {
-  // TODO: Rename this inference_category (!!!) and add model_type.
   pub inference_category: InferenceCategory,
   pub maybe_model_type: Option<String>,
   pub maybe_model_token: Option<String>,
@@ -78,13 +83,7 @@ pub struct ResultDetailsResponse {
   pub entity_token: String,
 
   /// NB: This is only for audio- or video- type results.
-  pub maybe_public_bucket_wav_media_path: Option<String>,
-}
-
-#[derive(Serialize)]
-pub struct GetInferenceJobStatusSuccessResponse {
-  pub success: bool,
-  pub state: InferenceJobStatusResponsePayload,
+  pub maybe_public_bucket_media_path: Option<String>,
 }
 
 #[derive(Debug)]
@@ -180,7 +179,7 @@ pub async fn get_inference_job_status_handler(
       ResultDetailsResponse {
         entity_type: result_details.entity_type,
         entity_token: result_details.entity_token,
-        maybe_public_bucket_wav_media_path: None, // TODO: This will require a new field
+        maybe_public_bucket_media_path: None, // TODO: This will require a new field
       }
     }),
     created_at: record.created_at,
