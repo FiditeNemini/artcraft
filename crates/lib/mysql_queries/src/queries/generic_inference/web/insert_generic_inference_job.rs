@@ -12,9 +12,11 @@ pub struct InsertGenericInferenceArgs<'a> {
   pub uuid_idempotency_token: &'a str,
 
   pub inference_category: InferenceCategory,
+  pub maybe_model_type: Option<&'a str>,
+  pub maybe_model_token: Option<&'a str>,
+
   pub maybe_inference_args: Option<GenericInferenceArgs>,
   pub maybe_raw_inference_text: Option<&'a str>,
-  pub maybe_model_token: Option<&'a str>,
 
   pub maybe_creator_user_token: Option<&'a UserToken>,
   pub creator_ip_address: &'a str,
@@ -38,7 +40,9 @@ SET
   uuid_idempotency_token = ?,
 
   inference_category = ?,
+  maybe_model_type = ?,
   maybe_model_token = ?,
+
   maybe_inference_args = ?,
   maybe_raw_inference_text = ?,
 
@@ -55,7 +59,8 @@ SET
         args.uuid_idempotency_token,
 
         args.inference_category.to_str(),
-        args.maybe_model_token.map(|t| t.to_string()),
+        args.maybe_model_type,
+        args.maybe_model_token,
 
         serialized_args_payload,
         args.maybe_raw_inference_text,

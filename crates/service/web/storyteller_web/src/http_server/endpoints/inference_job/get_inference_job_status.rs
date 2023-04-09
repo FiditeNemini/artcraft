@@ -10,6 +10,7 @@ use chrono::{DateTime, Utc};
 use crate::AnyhowResult;
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::server_state::ServerState;
+use enums::by_table::generic_inference_jobs::inference_category::InferenceCategory;
 use log::{info, warn, log, error};
 use mysql_queries::queries::generic_inference::web::get_inference_job_status::get_inference_job_status;
 use mysql_queries::queries::tts::tts_inference_jobs::get_tts_inference_job_status::get_tts_inference_job_status;
@@ -49,7 +50,7 @@ pub struct InferenceJobStatusResponsePayload {
 #[derive(Serialize)]
 pub struct RequestDetailsResponse {
   // TODO: Rename this inference_category (!!!) and add model_type.
-  pub inference_category: String,
+  pub inference_category: InferenceCategory,
   pub maybe_model_type: Option<String>,
   pub maybe_model_token: Option<String>,
 
@@ -165,8 +166,8 @@ pub async fn get_inference_job_status_handler(
   let record_for_response = InferenceJobStatusResponsePayload {
     job_token: record.job_token,
     request: RequestDetailsResponse {
-      inference_category: record.request_details.inference_type,
-      maybe_model_type: None, // TODO: This will require a new field
+      inference_category: record.request_details.inference_category,
+      maybe_model_type: record.request_details.maybe_model_type,
       maybe_model_token: record.request_details.maybe_model_token,
       title: "AI Model".to_string(), // TODO: This will require polymorphic joins
       maybe_raw_inference_text: record.request_details.maybe_raw_inference_text,

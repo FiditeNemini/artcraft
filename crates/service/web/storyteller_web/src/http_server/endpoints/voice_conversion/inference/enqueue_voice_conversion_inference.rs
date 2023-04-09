@@ -10,17 +10,17 @@ use crate::configs::plans::get_correct_plan_for_session::get_correct_plan_for_se
 use crate::http_server::endpoints::investor_demo::demo_cookie::request_has_demo_cookie;
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::server_state::ServerState;
-use mysql_queries::queries::generic_inference::web::insert_generic_inference_job::{InsertGenericInferenceArgs, insert_generic_inference_job};
+use enums::by_table::generic_inference_jobs::inference_category::InferenceCategory;
 use enums::common::visibility::Visibility;
-use enums::workers::generic_inference_type::GenericInferenceType;
 use http_server_common::request::get_request_header_optional::get_request_header_optional;
 use http_server_common::request::get_request_ip::get_request_ip;
 use log::{info, warn};
+use mysql_queries::payloads::generic_inference_args::{GenericInferenceArgs, PolymorphicInferenceArgs};
+use mysql_queries::queries::generic_inference::web::insert_generic_inference_job::{InsertGenericInferenceArgs, insert_generic_inference_job};
 use r2d2_redis::redis::Commands;
 use redis_common::redis_keys::RedisKeys;
 use std::fmt;
 use std::sync::Arc;
-use mysql_queries::payloads::generic_inference_args::{GenericInferenceArgs, PolymorphicInferenceArgs};
 use tokens::files::media_upload::MediaUploadToken;
 use tokens::jobs::inference::InferenceJobToken;
 use tokens::users::user::UserToken;
@@ -222,16 +222,17 @@ pub async fn enqueue_voice_conversion_inference_handler(
   let query_result = insert_generic_inference_job(InsertGenericInferenceArgs {
     job_token: &job_token,
     uuid_idempotency_token: &request.uuid_idempotency_token,
-    inference_category: GenericInferenceType::VoiceConversion,
+    inference_category: InferenceCategory::VoiceConversion,
+    maybe_model_type: None, // TODO(bt, 2023-04-08): Add this.
+    maybe_model_token: Some(&model_token),
     maybe_inference_args: Some(GenericInferenceArgs {
-      inference_type: Some(GenericInferenceType::VoiceConversion),
+      inference_category: Some(InferenceCategory::VoiceConversion),
       args: Some(PolymorphicInferenceArgs::VoiceConversionInferenceArgs {
         model_token: Some(VoiceConversionModelToken::new_from_str(&model_token)),
         maybe_media_token: Some(MediaUploadToken::new_from_str(&media_token)),
       }),
     }),
     maybe_raw_inference_text: None,
-    maybe_model_token: Some(&model_token),
     maybe_creator_user_token: maybe_user_token.as_ref(),
     creator_ip_address: &ip_address,
     creator_set_visibility: set_visibility,

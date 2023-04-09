@@ -11,9 +11,9 @@ use crate::http_server::endpoints::investor_demo::demo_cookie::request_has_demo_
 use crate::http_server::endpoints::tts::enqueue_infer_tts_handler::get_model_with_caching::get_model_with_caching;
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::server_state::ServerState;
+use enums::by_table::generic_inference_jobs::inference_category::InferenceCategory;
 use enums::by_table::tts_models::tts_model_type::TtsModelType;
 use enums::common::visibility::Visibility;
-use enums::workers::generic_inference_type::GenericInferenceType;
 use http_server_common::request::get_request_api_token::get_request_api_token;
 use http_server_common::request::get_request_header_optional::get_request_header_optional;
 use http_server_common::request::get_request_ip::get_request_ip;
@@ -368,15 +368,16 @@ pub async fn enqueue_infer_tts_handler(
     let query_result = insert_generic_inference_job(InsertGenericInferenceArgs {
       job_token: &generic_inference_job_token,
       uuid_idempotency_token: &request.uuid_idempotency_token,
-      inference_category: GenericInferenceType::TextToSpeech,
+      inference_category: InferenceCategory::TextToSpeech,
+      maybe_model_type: None, // TODO(bt, 2023-04-08): Add this
+      maybe_model_token: Some(request.tts_model_token.as_str()),
       maybe_inference_args: Some(GenericInferenceArgs {
-        inference_type: Some(GenericInferenceType::TextToSpeech),
+        inference_category: Some(InferenceCategory::TextToSpeech),
         args: Some(PolymorphicInferenceArgs::TextToSpeechInferenceArgs {
           model_token: Some(TtsModelToken::new_from_str(&request.tts_model_token)),
         }),
       }),
       maybe_raw_inference_text: Some(inference_text.as_str()),
-      maybe_model_token: Some(request.tts_model_token.as_str()),
       maybe_creator_user_token: maybe_creator_user_token_typed.as_ref(),
       creator_ip_address: &ip_address,
       creator_set_visibility: set_visibility,
