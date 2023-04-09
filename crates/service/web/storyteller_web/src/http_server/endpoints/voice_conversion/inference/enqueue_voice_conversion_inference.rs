@@ -222,7 +222,7 @@ pub async fn enqueue_voice_conversion_inference_handler(
   let query_result = insert_generic_inference_job(InsertGenericInferenceArgs {
     job_token: &job_token,
     uuid_idempotency_token: &request.uuid_idempotency_token,
-    inference_type: GenericInferenceType::VoiceConversion,
+    inference_category: GenericInferenceType::VoiceConversion,
     maybe_inference_args: Some(GenericInferenceArgs {
       inference_type: Some(GenericInferenceType::VoiceConversion),
       args: Some(PolymorphicInferenceArgs::VoiceConversionInferenceArgs {

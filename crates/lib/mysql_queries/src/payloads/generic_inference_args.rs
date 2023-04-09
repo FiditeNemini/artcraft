@@ -1,4 +1,4 @@
-use enums::workers::generic_inference_type::GenericInferenceType;
+use enums::by_table::generic_inference_jobs::inference_category::InferenceCategory;
 use tokens::files::media_upload::MediaUploadToken;
 use tokens::tokens::tts_models::TtsModelToken;
 use tokens::voice_conversion::model::VoiceConversionModelToken;
@@ -7,8 +7,8 @@ use tokens::voice_conversion::model::VoiceConversionModelToken;
 /// This should act somewhat like a serialized protobuf stored inside a record.
 #[derive(Clone, Serialize, Deserialize)]
 pub struct GenericInferenceArgs {
-  /// The type of inference (probably also present in a top-level field)
-  pub inference_type: Option<GenericInferenceType>,
+  /// The category of inference (probably also present in a top-level field)
+  pub inference_category: Option<InferenceCategory>,
 
   /// REQUIRED.
   /// Actual type-specific arguments.
@@ -37,11 +37,15 @@ pub enum PolymorphicInferenceArgs {
 #[cfg(test)]
 mod tests {
   use crate::payloads::generic_inference_args::{GenericInferenceArgs, PolymorphicInferenceArgs};
+  use enums::by_table::generic_inference_jobs::inference_category::InferenceCategory;
+  use tokens::files::media_upload::MediaUploadToken;
+  use tokens::tokens::tts_models::TtsModelToken;
+  use tokens::voice_conversion::model::VoiceConversionModelToken;
 
   #[test]
   fn typical_tts_args_serialize() {
     let args = GenericInferenceArgs {
-      inference_type: Some(GenericInferenceType::VoiceConversion),
+      inference_category: Some(InferenceCategory::VoiceConversion),
       args: Some(PolymorphicInferenceArgs::TextToSpeechInferenceArgs {
         model_token: Some(TtsModelToken::new_from_str("tts_model_token")),
       }),
@@ -51,20 +55,16 @@ mod tests {
 
     // NB: Assert the serialized form. If this changes and the test breaks, be careful about migrating.
     assert_eq!(json,
-               r#"{"inference_type":"voice_conversion","args":{"TextToSpeechInferenceArgs":{"model_token":"tts_model_token"}}}"#.to_string());
+               r#"{"inference_category":"voice_conversion","args":{"TextToSpeechInferenceArgs":{"model_token":"tts_model_token"}}}"#.to_string());
 
     // NB: Make sure we don't overflow the DB field capacity (TEXT column).
     assert!(json.len() < 1000);
   }
-  use enums::workers::generic_inference_type::GenericInferenceType;
-  use tokens::files::media_upload::MediaUploadToken;
-  use tokens::tokens::tts_models::TtsModelToken;
-  use tokens::voice_conversion::model::VoiceConversionModelToken;
 
   #[test]
   fn typical_voice_conversion_args_serialize() {
     let args = GenericInferenceArgs {
-      inference_type: Some(GenericInferenceType::VoiceConversion),
+      inference_category: Some(InferenceCategory::VoiceConversion),
       args: Some(PolymorphicInferenceArgs::VoiceConversionInferenceArgs {
         model_token: Some(VoiceConversionModelToken::new_from_str("vc_model_token")),
         maybe_media_token: Some(MediaUploadToken::new_from_str("media_token")),
@@ -75,7 +75,7 @@ mod tests {
 
     // NB: Assert the serialized form. If this changes and the test breaks, be careful about migrating.
     assert_eq!(json,
-      r#"{"inference_type":"voice_conversion","args":{"VoiceConversionInferenceArgs":{"model_token":"vc_model_token","maybe_media_token":"media_token"}}}"#.to_string());
+      r#"{"inference_category":"voice_conversion","args":{"VoiceConversionInferenceArgs":{"model_token":"vc_model_token","maybe_media_token":"media_token"}}}"#.to_string());
 
     // NB: Make sure we don't overflow the DB field capacity (TEXT column).
     assert!(json.len() < 1000);
@@ -90,7 +90,7 @@ mod tests {
     assert_eq!(json, "null");
 
     args = Some(GenericInferenceArgs {
-      inference_type: Some(GenericInferenceType::VoiceConversion),
+      inference_category: Some(InferenceCategory::VoiceConversion),
       args: Some(PolymorphicInferenceArgs::VoiceConversionInferenceArgs {
         model_token: Some(VoiceConversionModelToken::new_from_str("vc_model_token")),
         maybe_media_token: Some(MediaUploadToken::new_from_str("media_token")),
@@ -101,7 +101,7 @@ mod tests {
 
     // NB: Assert the serialized form. If this changes and the test breaks, be careful about migrating.
     assert_eq!(json,
-               r#"{"inference_type":"voice_conversion","args":{"VoiceConversionInferenceArgs":{"model_token":"vc_model_token","maybe_media_token":"media_token"}}}"#.to_string());
+               r#"{"inference_category":"voice_conversion","args":{"VoiceConversionInferenceArgs":{"model_token":"vc_model_token","maybe_media_token":"media_token"}}}"#.to_string());
 
     // NB: Make sure we don't overflow the DB field capacity (TEXT column).
     assert!(json.len() < 1000);

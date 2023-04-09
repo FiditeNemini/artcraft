@@ -3,8 +3,8 @@ use chrono::Utc;
 use crate::column_types::job_status::JobStatus;
 use crate::helpers::boolean_converters::i8_to_bool;
 use crate::queries::generic_inference::job::_keys::GenericInferenceJobId;
+use enums::by_table::generic_inference_jobs::inference_category::InferenceCategory;
 use enums::common::visibility::Visibility;
-use enums::workers::generic_inference_type::GenericInferenceType;
 use errors::AnyhowResult;
 use sqlx::mysql::MySqlArguments;
 use sqlx::{MySql, MySqlPool};
@@ -21,11 +21,14 @@ pub struct AvailableInferenceJob {
 
   pub uuid_idempotency_token: String, // TODO: This is temporarily being used for upload paths.
 
-  // Inference information
-  pub inference_type: GenericInferenceType,
+  // Inference class
+  pub inference_category: InferenceCategory,
+  pub maybe_model_type: Option<String>, // TODO: Strongly type.
+  pub maybe_model_token: Option<String>,
+
+  // Inference details
   pub maybe_inference_args: Option<String>,
   pub maybe_raw_inference_text: Option<String>,
-  pub maybe_model_token: Option<String>,
 
   // User information to propagate downstream
   pub maybe_creator_user_token: Option<String>,
@@ -60,7 +63,7 @@ pub struct ListAvailableGenericInferenceJobArgs<'a> {
   pub num_records: u32,
   pub is_debug_worker: bool,
   pub sort_by_priority: bool,
-  pub maybe_scope_by_job_type: Option<BTreeSet<GenericInferenceType>>,
+  pub maybe_scope_by_job_category: Option<BTreeSet<InferenceCategory>>,
   pub mysql_pool: &'a MySqlPool,
 }
 
@@ -69,9 +72,9 @@ pub async fn list_available_generic_inference_jobs(
 )
   -> AnyhowResult<Vec<AvailableInferenceJob>>
 {
-  let ALL_TYPES = GenericInferenceType::all_variants();
+  let ALL_TYPES = InferenceCategory::all_variants();
 
-  let inference_types = args.maybe_scope_by_job_type
+  let inference_types = args.maybe_scope_by_job_category
       .as_ref()
       .map(|types| types.clone())
       .unwrap_or(ALL_TYPES);
@@ -94,11 +97,12 @@ pub async fn list_available_generic_inference_jobs(
           maybe_creator_user_token: record.maybe_creator_user_token,
           creator_set_visibility: Visibility::from_str(&record.creator_set_visibility)
               .map_err(|e| anyhow!("error: {:?}", e))?, // TODO/FIXME: This is a gross fix.
-          inference_type: GenericInferenceType::from_str(&record.inference_type)
+          inference_category: InferenceCategory::from_str(&record.inference_category)
               .map_err(|e| anyhow!("error: {:?}", e))?, // TODO/FIXME: This is a gross fix.
+          maybe_model_type: record.maybe_model_type,
+          maybe_model_token: record.maybe_model_token,
           maybe_inference_args: record.maybe_inference_args,
           maybe_raw_inference_text: record.maybe_raw_inference_text,
-          maybe_model_token: record.maybe_model_token,
           status: JobStatus::from_str(&record.status)?,
           attempt_count: record.attempt_count,
           priority_level: record.priority_level,
@@ -122,7 +126,7 @@ pub async fn list_available_generic_inference_jobs(
   Ok(job_records)
 }
 
-async fn list_sorted_by_id(args: ListAvailableGenericInferenceJobArgs<'_>, inference_types: BTreeSet<GenericInferenceType>) -> Result<Vec<AvailableInferenceJobRawInternal>, sqlx::Error> {
+async fn list_sorted_by_id(args: ListAvailableGenericInferenceJobArgs<'_>, inference_categories: BTreeSet<InferenceCategory>) -> Result<Vec<AvailableInferenceJobRawInternal>, sqlx::Error> {
   // NB: Can't be type checked because of WHERE IN clause with dynamic contents
 
   // Also had to remove the following typing:
@@ -138,10 +142,12 @@ SELECT
   token as inference_job_token,
   uuid_idempotency_token,
 
-  inference_type,
+  inference_category,
+  maybe_model_type,
+  maybe_model_token,
+
   maybe_inference_args,
   maybe_raw_inference_text,
-  maybe_model_token,
 
   maybe_creator_user_token,
   creator_ip_address,
@@ -170,7 +176,7 @@ WHERE
     (
       inference_type IN ({})
     )
-  "#, to_where_in_predicate(&inference_types)));
+  "#, to_where_in_predicate(&inference_categories)));
 
   query.push_str(r#"
   AND
@@ -199,7 +205,7 @@ WHERE
       .await
 }
 
-async fn list_sorted_by_priority(args: ListAvailableGenericInferenceJobArgs<'_>, inference_types: BTreeSet<GenericInferenceType>) -> Result<Vec<AvailableInferenceJobRawInternal>, sqlx::Error> {
+async fn list_sorted_by_priority(args: ListAvailableGenericInferenceJobArgs<'_>, inference_categories: BTreeSet<InferenceCategory>) -> Result<Vec<AvailableInferenceJobRawInternal>, sqlx::Error> {
   // NB: Can't be type checked because of WHERE IN clause with dynamic contents
 
   // Also had to remove the following typing:
@@ -215,10 +221,12 @@ SELECT
   token as inference_job_token,
   uuid_idempotency_token,
 
-  inference_type,
+  inference_category,
+  maybe_model_type,
+  maybe_model_token,
+
   maybe_inference_args,
   maybe_raw_inference_text,
-  maybe_model_token,
 
   maybe_creator_user_token,
   creator_ip_address,
@@ -248,7 +256,7 @@ WHERE
     (
       inference_type IN ({})
     )
-  "#, to_where_in_predicate(&inference_types)));
+  "#, to_where_in_predicate(&inference_categories)));
 
   query.push_str(r#"
   AND
@@ -287,11 +295,13 @@ struct AvailableInferenceJobRawInternal {
   pub uuid_idempotency_token: String,
 
   // Inference information
-  //pub inference_type: GenericInferenceType,
-  pub inference_type: String,
+  //pub inference_category: InferenceCategory,
+  pub inference_category: String,
+  pub maybe_model_type: Option<String>,
+  pub maybe_model_token: Option<String>,
+
   pub maybe_inference_args: Option<String>,
   pub maybe_raw_inference_text: Option<String>,
-  pub maybe_model_token: Option<String>,
 
   // User information to propagate downstream
   pub maybe_creator_user_token: Option<String>,
@@ -321,8 +331,8 @@ struct AvailableInferenceJobRawInternal {
 
 /// Return a comma-separated predicate, since SQLx does not yet support WHERE IN(?) for Vec<T>, etc.
 /// Issue: https://github.com/launchbadge/sqlx/issues/875
-fn to_where_in_predicate(types: &BTreeSet<GenericInferenceType>) -> String {
-  let mut vec = types.iter()
+fn to_where_in_predicate(categories: &BTreeSet<InferenceCategory>) -> String {
+  let mut vec = categories.iter()
       .map(|ty| ty.to_str())
       .map(|ty| format!("\"{}\"", ty))
       .collect::<Vec<String>>();
@@ -333,7 +343,7 @@ fn to_where_in_predicate(types: &BTreeSet<GenericInferenceType>) -> String {
 #[cfg(test)]
 mod tests {
   use crate::queries::generic_inference::job::list_available_generic_inference_jobs::to_where_in_predicate;
-  use enums::workers::generic_inference_type::GenericInferenceType;
+  use enums::by_table::generic_inference_jobs::inference_category::InferenceCategory;
   use std::collections::BTreeSet;
 
   #[test]
@@ -344,15 +354,15 @@ mod tests {
 
     // Some
     let types = BTreeSet::from([
-      GenericInferenceType::VoiceConversion,
+      InferenceCategory::VoiceConversion,
     ]);
 
-    assert_eq!(to_where_in_predicate(&types), "voice_conversion".to_string());
+    assert_eq!(to_where_in_predicate(&types), "\"voice_conversion\"".to_string());
     // All
     let types = BTreeSet::from([
-      GenericInferenceType::TextToSpeech,
-      GenericInferenceType::VoiceConversion,
+      InferenceCategory::TextToSpeech,
+      InferenceCategory::VoiceConversion,
     ]);
-    assert_eq!(to_where_in_predicate(&types), "text_to_speech, voice_conversion".to_string());
+    assert_eq!(to_where_in_predicate(&types), "\"text_to_speech\", \"voice_conversion\"".to_string());
   }
 }

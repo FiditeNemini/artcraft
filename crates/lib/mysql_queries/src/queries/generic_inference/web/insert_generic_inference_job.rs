@@ -1,7 +1,7 @@
 use anyhow::anyhow;
 use crate::payloads::generic_inference_args::GenericInferenceArgs;
+use enums::by_table::generic_inference_jobs::inference_category::InferenceCategory;
 use enums::common::visibility::Visibility;
-use enums::workers::generic_inference_type::GenericInferenceType;
 use errors::AnyhowResult;
 use sqlx::MySqlPool;
 use tokens::jobs::inference::InferenceJobToken;
@@ -11,7 +11,7 @@ pub struct InsertGenericInferenceArgs<'a> {
   pub job_token: &'a InferenceJobToken,
   pub uuid_idempotency_token: &'a str,
 
-  pub inference_type: GenericInferenceType,
+  pub inference_category: InferenceCategory,
   pub maybe_inference_args: Option<GenericInferenceArgs>,
   pub maybe_raw_inference_text: Option<&'a str>,
   pub maybe_model_token: Option<&'a str>,
@@ -37,10 +37,10 @@ SET
   token = ?,
   uuid_idempotency_token = ?,
 
-  inference_type = ?,
+  inference_category = ?,
+  maybe_model_token = ?,
   maybe_inference_args = ?,
   maybe_raw_inference_text = ?,
-  maybe_model_token = ?,
 
   maybe_creator_user_token = ?,
   creator_ip_address = ?,
@@ -54,10 +54,11 @@ SET
         args.job_token.as_str(),
         args.uuid_idempotency_token,
 
-        args.inference_type.to_str(),
+        args.inference_category.to_str(),
+        args.maybe_model_token.map(|t| t.to_string()),
+
         serialized_args_payload,
         args.maybe_raw_inference_text,
-        args.maybe_model_token.map(|t| t.to_string()),
 
         args.maybe_creator_user_token.map(|t| t.to_string()),
         args.creator_ip_address,

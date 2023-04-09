@@ -29,7 +29,7 @@ pub async fn main_loop(job_dependencies: JobDependencies) {
       num_records: job_dependencies.job_batch_size,
       is_debug_worker: false, // TODO
       sort_by_priority,
-      maybe_scope_by_job_type: None, // TODO
+      maybe_scope_by_job_category: None, // TODO
       mysql_pool: &job_dependencies.mysql_pool,
     }).await;
 

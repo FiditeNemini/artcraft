@@ -26,7 +26,7 @@ pub async fn process_single_job(job_dependencies: &JobDependencies, job: &Availa
     return Ok(())
   }
 
-  info!("Beginning work on {:?} = {}", job.inference_type, job.inference_job_token);
+  info!("Beginning work on {:?} = {}", job.inference_category, job.inference_job_token);
 
   // ==================== SETUP TEMP DIRS ==================== //
 
@@ -41,7 +41,7 @@ pub async fn process_single_job(job_dependencies: &JobDependencies, job: &Availa
   let mut entity_token : Option<String> = None;
   let mut entity_type : Option<String> = None;
 
-  match job.inference_type {
+  match job.inference_category {
     GenericInferenceType::TextToSpeech => {
       // TODO
       entity_type = Some("todo".to_string()); // TODO

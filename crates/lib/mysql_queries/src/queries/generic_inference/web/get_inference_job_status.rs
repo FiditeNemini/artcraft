@@ -1,5 +1,6 @@
 use anyhow::anyhow;
 use chrono::{DateTime, Utc};
+use enums::by_table::generic_inference_jobs::inference_category::InferenceCategory;
 use errors::AnyhowResult;
 use log::warn;
 use sqlx::MySqlPool;
@@ -19,8 +20,8 @@ pub struct GenericInferenceJobStatus {
 }
 
 pub struct RequestDetails {
-  // TODO: Rename this to inference category!
-  pub inference_type: String,
+  pub inference_category: InferenceCategory,
+  pub maybe_model_type: Option<String>, // TODO: Strongly type
   pub maybe_model_token: Option<String>,
 
   /// TTS input. In the future, perhaps voice conversion SST
@@ -46,7 +47,8 @@ SELECT
     jobs.status,
     jobs.attempt_count,
 
-    jobs.inference_type,
+    jobs.inference_category as `inference_category: enums::by_table::generic_inference_jobs::inference_category::InferenceCategory`,
+    jobs.maybe_model_type,
     jobs.maybe_model_token,
     jobs.maybe_raw_inference_text,
 
@@ -95,7 +97,8 @@ WHERE jobs.token = ?
     status: record.status,
     attempt_count: record.attempt_count,
     request_details: RequestDetails {
-      inference_type: record.inference_type,
+      inference_category: record.inference_category,
+      maybe_model_type: record.maybe_model_type,
       maybe_model_token: record.maybe_model_token,
       maybe_raw_inference_text: record.maybe_raw_inference_text,
     },
@@ -111,7 +114,8 @@ struct RawGenericInferenceJobStatus {
   pub status: String,
   pub attempt_count: u16,
 
-  pub inference_type: String,
+  pub inference_category: InferenceCategory,
+  pub maybe_model_type: Option<String>,
   pub maybe_model_token: Option<String>,
   pub maybe_raw_inference_text: Option<String>,
 
