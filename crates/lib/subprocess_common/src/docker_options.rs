@@ -3,7 +3,7 @@
 pub struct DockerOptions {
   pub image_name: String,
   pub maybe_bind_mount: Option<DockerFilesystemMount>,
-  pub maybe_environment_variables: Option<Vec<DockerEnvironmentVariable>>,
+  pub maybe_environment_variables: Option<Vec<DockerEnvVar>>,
   pub maybe_gpu: Option<DockerGpu>,
 }
 
@@ -14,7 +14,7 @@ pub struct DockerFilesystemMount {
 }
 
 #[derive(Clone)]
-pub struct DockerEnvironmentVariable {
+pub struct DockerEnvVar {
   pub name: String,
   pub value: String,
 }
@@ -39,7 +39,7 @@ impl DockerFilesystemMount {
   }
 }
 
-impl DockerEnvironmentVariable {
+impl DockerEnvVar {
   pub fn new(name: &str, value: &str) -> Self {
     Self {
       name: name.to_string(),
@@ -94,7 +94,7 @@ impl DockerOptions {
 
 #[cfg(test)]
 mod tests {
-  use crate::docker_options::{DockerEnvironmentVariable, DockerFilesystemMount, DockerGpu, DockerOptions};
+  use crate::docker_options::{DockerEnvVar, DockerFilesystemMount, DockerGpu, DockerOptions};
 
   #[test]
   fn test_command() {
@@ -105,8 +105,8 @@ mod tests {
         container_filesystem: "/container".to_string(),
       }),
       maybe_environment_variables: Some(vec![
-        DockerEnvironmentVariable { name: "FOO".to_string(), value: "1".to_string() },
-        DockerEnvironmentVariable { name: "BAR".to_string(), value: "2".to_string() },
+        DockerEnvVar { name: "FOO".to_string(), value: "1".to_string() },
+        DockerEnvVar { name: "BAR".to_string(), value: "2".to_string() },
       ]),
       maybe_gpu: Some(DockerGpu::All),
     };

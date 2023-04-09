@@ -45,7 +45,7 @@ use r2d2_redis::r2d2;
 use sqlx::mysql::MySqlPoolOptions;
 use std::path::PathBuf;
 use std::time::Duration;
-use subprocess_common::docker_options::{DockerEnvironmentVariable, DockerFilesystemMount, DockerGpu, DockerOptions};
+use subprocess_common::docker_options::{DockerEnvVar, DockerFilesystemMount, DockerGpu, DockerOptions};
 use crate::job::job_types::tts::vits::vits_inference_command::VitsInferenceCommand;
 
 // Buckets (shared config)
@@ -307,13 +307,22 @@ fn vits_inference_command() -> AnyhowResult<VitsInferenceCommand> {
   let maybe_huggingface_dataset_cache = easyenv::get_env_string_optional(
     "HF_DATASETS_CACHE");
 
-  let maybe_docker_env_vars = maybe_huggingface_dataset_cache.as_deref()
-      .map(|cache_directory| {
-        vec![
-          DockerEnvironmentVariable::new("HF_HOME", cache_directory),
-          DockerEnvironmentVariable::new("HF_DATASETS_CACHE", cache_directory),
-        ]
-      });
+  let maybe_nltk_data_cache = easyenv::get_env_string_optional(
+    "NLTK_DATA");
+
+  let mut docker_env_vars = Vec::new();
+
+  if let Some(cache_dir) = maybe_huggingface_dataset_cache.as_deref() {
+    docker_env_vars.push(DockerEnvVar::new("HF_DATASETS_CACHE", cache_dir));
+    docker_env_vars.push(DockerEnvVar::new("HF_HOME", cache_dir));
+  }
+
+  if let Some(cache_dir) = maybe_nltk_data_cache.as_deref() {
+    docker_env_vars.push(DockerEnvVar::new("NLTK_DATA", cache_dir));
+  }
+
+  let maybe_docker_env_vars =
+      if docker_env_vars.is_empty() { None } else { Some(docker_env_vars) };
 
   let maybe_docker_options = easyenv::get_env_string_optional(
     "VITS_INFERENCE_MAYBE_DOCKER_IMAGE_SHA")
@@ -332,6 +341,7 @@ fn vits_inference_command() -> AnyhowResult<VitsInferenceCommand> {
     maybe_python_interpreter.as_deref(),
     maybe_venv_command.as_deref(),
     maybe_huggingface_dataset_cache.as_deref(),
+    maybe_nltk_data_cache.as_deref(),
     maybe_docker_options,
   ))
 }

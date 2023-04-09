@@ -24,6 +24,9 @@ pub struct VitsInferenceCommand {
   /// The directory huggingface should cache models
   maybe_huggingface_cache_dir: Option<String>,
 
+  /// The directory nltk should cache models
+  maybe_nltk_cache_dir: Option<String>,
+
   /// If this is run under Docker (eg. in development), these are the options.
   maybe_docker_options: Option<DockerOptions>,
 }
@@ -60,6 +63,7 @@ impl VitsInferenceCommand {
     maybe_override_python_interpreter: Option<&str>,
     maybe_virtual_env_activation_command: Option<&str>,
     maybe_huggingface_cache_directory: Option<&str>,
+    maybe_nltk_cache_directory: Option<&str>,
     maybe_docker_options: Option<DockerOptions>,
   ) -> Self {
     Self {
@@ -67,6 +71,7 @@ impl VitsInferenceCommand {
       inference_script_name: inference_script_name.as_ref().to_path_buf(),
       maybe_virtual_env_activation_command: maybe_virtual_env_activation_command.map(|s| s.to_string()),
       maybe_huggingface_cache_dir: maybe_huggingface_cache_directory.map(|s| s.to_string()),
+      maybe_nltk_cache_dir: maybe_nltk_cache_directory.map(|s| s.to_string()),
       maybe_override_python_interpreter: maybe_override_python_interpreter.map(|s| s.to_string()),
       maybe_docker_options,
     }
@@ -134,19 +139,25 @@ impl VitsInferenceCommand {
       &command
     ];
 
-    let mut config = PopenConfig::default();
+    let mut env_vars = Vec::new();
 
     if let Some(cache_dir) = self.maybe_huggingface_cache_dir.as_deref() {
-      config.env = Some(vec![
-        // NB: Docs point to `HF_DATASETS_CACHE`, but the lib code references `HF_HOME`.
-        (OsString::from("HF_DATASETS_CACHE"), OsString::from(cache_dir)),
-        (OsString::from("HF_HOME"), OsString::from(cache_dir)),
-      ])
+      // NB: Docs point to `HF_DATASETS_CACHE`, but the lib code references `HF_HOME`.
+      env_vars.push((OsString::from("HF_DATASETS_CACHE"), OsString::from(cache_dir)));
+      env_vars.push((OsString::from("HF_HOME"), OsString::from(cache_dir)));
     }
 
-    let mut p = Popen::create(&command_parts, PopenConfig {
-      ..Default::default()
-    })?;
+    if let Some(cache_dir) = self.maybe_nltk_cache_dir.as_deref() {
+      env_vars.push((OsString::from("NLTK_DATA"), OsString::from(cache_dir)));
+    }
+
+    let mut config = PopenConfig::default();
+
+    if !env_vars.is_empty() {
+      config.env = Some(env_vars);
+    }
+
+    let mut p = Popen::create(&command_parts, config)?;
 
     info!("Subprocess PID: {:?}", p.pid());
 
