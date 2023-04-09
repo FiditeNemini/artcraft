@@ -174,7 +174,7 @@ FROM generic_inference_jobs"#.to_string();
   query.push_str(&format!(r#"
 WHERE
     (
-      inference_type IN ({})
+      inference_category IN ({})
     )
   "#, to_where_in_predicate(&inference_categories)));
 
@@ -211,7 +211,7 @@ async fn list_sorted_by_priority(args: ListAvailableGenericInferenceJobArgs<'_>,
   // Also had to remove the following typing:
   //id as `id: crate::queries::generic_inference::job::_keys::GenericInferenceJobId`,
   //token AS `inference_job_token: tokens::jobs::inference::InferenceJobToken`,
-  //inference_type as `inference_type: enums::workers::generic_inference_type::GenericInferenceType`,
+  //inference_category as `inference_category: enums::workers::generic_inference_type::GenericInferenceType`,
   //creator_set_visibility as `creator_set_visibility: enums::common::visibility::Visibility`,
   //status as `status: crate::column_types::job_status::JobStatus`,
 
@@ -254,7 +254,7 @@ FROM generic_inference_jobs"#.to_string();
   query.push_str(&format!(r#"
 WHERE
     (
-      inference_type IN ({})
+      inference_category IN ({})
     )
   "#, to_where_in_predicate(&inference_categories)));
 

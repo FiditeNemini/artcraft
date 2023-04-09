@@ -3,7 +3,7 @@ use crate::job::job_loop::process_single_job_error::ProcessSingleJobError;
 use crate::job::job_types::tts::process_single_tts_job::process_single_tts_job;
 use crate::job::job_types::vc::process_single_vc_job::process_single_vc_job;
 use crate::job_dependencies::JobDependencies;
-use enums::workers::generic_inference_type::GenericInferenceType;
+use enums::by_table::generic_inference_jobs::inference_category::InferenceCategory;
 use errors::AnyhowResult;
 use log::{info, warn};
 use mysql_queries::queries::generic_inference::job::list_available_generic_inference_jobs::AvailableInferenceJob;
@@ -42,14 +42,14 @@ pub async fn process_single_job(job_dependencies: &JobDependencies, job: &Availa
   let mut entity_type : Option<String> = None;
 
   match job.inference_category {
-    GenericInferenceType::TextToSpeech => {
+    InferenceCategory::TextToSpeech => {
       // TODO
       entity_type = Some("todo".to_string()); // TODO
       entity_token = Some("todo".to_string()); // TODO
 
       let _r = process_single_tts_job(job_dependencies, job).await?;
     }
-    GenericInferenceType::VoiceConversion => {
+    InferenceCategory::VoiceConversion => {
       // TODO
       let _r = process_single_vc_job(job_dependencies, job).await?;
     }
