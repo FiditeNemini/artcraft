@@ -68,12 +68,12 @@ impl DockerOptions {
     let env_vars = match self.maybe_environment_variables {
       None => "".to_string(),
       Some(ref env_vars) => {
-        let env_vars = env_vars.iter()
+        env_vars.iter()
             .map(|var| format!("{}={}", &var.name, &var.value))
             .map(|var_assignment| var_assignment.trim().to_string())
+            .map(|var_assignment| format!(" --env {} ", var_assignment))
             .collect::<Vec<String>>()
-            .join(",");
-        format!(" --env {}", env_vars)
+            .join("")
       }
     };
 
