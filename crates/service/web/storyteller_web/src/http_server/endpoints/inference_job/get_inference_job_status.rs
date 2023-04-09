@@ -53,9 +53,8 @@ pub struct RequestDetailsResponse {
   pub inference_category: InferenceCategory,
   pub maybe_model_type: Option<String>,
   pub maybe_model_token: Option<String>,
-
-  /// Title of the model
-  pub title: String,
+  /// Title of the model, if it has one
+  pub maybe_model_title: Option<String>,
 
   /// If the result was TTS, this is the raw inference text.
   pub maybe_raw_inference_text: Option<String>,
@@ -169,7 +168,7 @@ pub async fn get_inference_job_status_handler(
       inference_category: record.request_details.inference_category,
       maybe_model_type: record.request_details.maybe_model_type,
       maybe_model_token: record.request_details.maybe_model_token,
-      title: "AI Model".to_string(), // TODO: This will require polymorphic joins
+      maybe_model_title: Some("AI Model".to_string()), // TODO: This will require polymorphic joins
       maybe_raw_inference_text: record.request_details.maybe_raw_inference_text,
     },
     status: StatusDetailsResponse {
