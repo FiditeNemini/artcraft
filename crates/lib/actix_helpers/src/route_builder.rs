@@ -47,7 +47,7 @@ impl <T, B> RouteBuilder<T, B>
     self.app
   }
 
-  /// Add an HTTP GET route.
+  /// Add an HTTP GET route. This also adds the HEAD request for CORS.
   pub fn add_get<F, S, R>(mut self, path: &str, handler: F) -> Self
     where
         F: Handler<S, R>,
@@ -63,7 +63,7 @@ impl <T, B> RouteBuilder<T, B>
     self
   }
 
-  /// Add an HTTP POST route.
+  /// Add an HTTP POST route. This also adds the HEAD request for CORS.
   pub fn add_post<F, S, R>(mut self, path: &str, handler: F) -> Self
     where
         F: Handler<S, R>,

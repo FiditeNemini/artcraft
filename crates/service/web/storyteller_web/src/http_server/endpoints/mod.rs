@@ -4,6 +4,7 @@ pub mod comments;
 pub mod download_job;
 pub mod events;
 pub mod flags;
+pub mod inference_job;
 pub mod investor_demo;
 pub mod leaderboard;
 pub mod media_uploads;

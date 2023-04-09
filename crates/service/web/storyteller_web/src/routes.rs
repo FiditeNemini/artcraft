@@ -23,6 +23,7 @@ use crate::http_server::endpoints::download_job::get_generic_upload_job_status::
 use crate::http_server::endpoints::events::list_events::list_events_handler;
 use crate::http_server::endpoints::flags::design_refresh_flag::disable_design_refresh_flag_handler::disable_design_refresh_flag_handler;
 use crate::http_server::endpoints::flags::design_refresh_flag::enable_design_refresh_flag_handler::enable_design_refresh_flag_handler;
+use crate::http_server::endpoints::inference_job::get_pending_inference_job_count::get_pending_inference_job_count_handler;
 use crate::http_server::endpoints::investor_demo::disable_demo_mode_handler::disable_demo_mode_handler;
 use crate::http_server::endpoints::investor_demo::enable_demo_mode_handler::enable_demo_mode_handler;
 use crate::http_server::endpoints::leaderboard::get_leaderboard::leaderboard_handler;
@@ -110,6 +111,7 @@ use crate::http_server::endpoints::w2l::set_w2l_template_mod_approval::set_w2l_t
 use users_component::default_routes::add_suggested_api_v1_account_creation_and_session_routes;
 use users_component::endpoints::edit_profile_handler::edit_profile_handler;
 use users_component::endpoints::get_profile_handler::get_profile_handler;
+use crate::http_server::endpoints::inference_job::get_inference_job_status::get_inference_job_status_handler;
 
 pub fn add_routes<T, B> (app: App<T, B>) -> App<T, B>
   where
@@ -147,6 +149,13 @@ pub fn add_routes<T, B> (app: App<T, B>) -> App<T, B>
       .add_get("/v1/comments/list/{entity_type}/{entity_token}", list_comments_handler)
       .add_post("/v1/comments/new", create_comment_handler)
       .add_post("/v1/comments/delete/{comment_token}", delete_comment_handler)
+      .into_app();
+
+  // ==================== "Generic" Inference ====================
+
+  let mut app = RouteBuilder::from_app(app)
+      .add_get("/v1/model_inference/job_status/{token}", get_inference_job_status_handler)
+      .add_get("/v1/model_inference/queue_length", get_pending_inference_job_count_handler)
       .into_app();
 
   // ==================== COMPONENTS ====================

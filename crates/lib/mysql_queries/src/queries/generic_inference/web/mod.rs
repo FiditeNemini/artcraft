@@ -1,2 +1,3 @@
-pub mod get_generic_inference_job_status;
+pub mod get_inference_job_status;
+pub mod get_pending_inference_job_count;
 pub mod insert_generic_inference_job;

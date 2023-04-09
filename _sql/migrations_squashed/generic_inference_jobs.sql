@@ -17,11 +17,15 @@ CREATE TABLE generic_inference_jobs (
 
   -- ========== INFERENCE DETAILS ==========
 
+  -- TODO: Rename this inference_category and add `maybe_model_type`
   -- Type of inference
   -- Examples (may not be up to date):
   --  * text_to_speech
   --  * voice_conversion
   inference_type VARCHAR(32) NOT NULL,
+
+  -- TODO: Add `maybe_model_type` here
+  -- TODO: Move maybe_model_token here
 
   -- Polymorphic arguments payload that depends on the type of inference job.
   -- TEXT = 65,535 bytes (64 KiB), ~= 4 bytes per UTF-8 character, ~ 16383 characters.
@@ -87,6 +91,7 @@ CREATE TABLE generic_inference_jobs (
   --   - (There will be future levels for paid Twitch and social FakeYou rewards.)
   priority_level SMALLINT UNSIGNED NOT NULL DEFAULT 0,
 
+  -- TODO: add is_for_storyteller_product
   is_from_premium_user BOOLEAN NOT NULL DEFAULT FALSE,
   is_from_api_user BOOLEAN NOT NULL DEFAULT FALSE,
   is_for_twitch BOOLEAN NOT NULL DEFAULT FALSE,

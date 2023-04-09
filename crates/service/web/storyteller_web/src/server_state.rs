@@ -9,12 +9,14 @@ use crate::http_server::endpoints::tts::list_tts_models::TtsModelRecordForRespon
 use crate::http_server::web_utils::redis_rate_limiter::RedisRateLimiter;
 use crate::threads::db_health_checker_thread::db_health_check_status::HealthCheckStatus;
 use crate::util::encrypted_sort_id::SortKeyCrypto;
+use crate::util::troll_user_bans::troll_user_ban_list::TrollUserBanList;
+use memory_caching::single_item_ttl_cache::SingleItemTtlCache;
 use mysql_queries::mediators::badge_granter::BadgeGranter;
 use mysql_queries::mediators::firehose_publisher::FirehosePublisher;
+use mysql_queries::queries::generic_inference::web::get_pending_inference_job_count::InferenceQueueLengthResult;
 use mysql_queries::queries::model_categories::list_categories_query_builder::CategoryList;
 use mysql_queries::queries::tts::tts_inference_jobs::get_pending_tts_inference_job_count::TtsQueueLengthResult;
 use mysql_queries::queries::w2l::w2l_templates::list_w2l_templates::W2lTemplateRecordForList;
-use memory_caching::single_item_ttl_cache::SingleItemTtlCache;
 use r2d2_redis::{r2d2, RedisConnectionManager};
 use redis_caching::redis_ttl_cache::RedisTtlCache;
 use reusable_types::server_environment::ServerEnvironment;
@@ -22,7 +24,6 @@ use sqlx::MySqlPool;
 use url_config::third_party_url_redirector::ThirdPartyUrlRedirector;
 use users_component::utils::session_checker::SessionChecker;
 use users_component::utils::session_cookie_manager::SessionCookieManager;
-use crate::util::troll_user_bans::troll_user_ban_list::TrollUserBanList;
 
 /// State that is injected into every endpoint.
 pub struct ServerState {
@@ -146,6 +147,11 @@ pub struct InMemoryCaches {
   /// This is approximately O(n^3) and recursively generates all super-category membership.
   pub tts_model_category_assignments: SingleItemTtlCache<ModelTokensByCategoryToken>,
 
+  /// Generic inference queue length
+  /// The frontend will consult a distributed cache and use the monotonic DB time as a
+  /// vector clock.
+  pub inference_queue_length: SingleItemTtlCache<InferenceQueueLengthResult>,
+
   /// TTS queue length
   /// The frontend will consult a distributed cache and use the monotonic DB time as a
   /// vector clock.
@@ -168,11 +174,18 @@ pub struct StaticFeatureFlags {
   /// Used to bring the service back online slowly.
   pub global_429_pushback_filter_enabled: bool,
 
+  /// Disable the live `/v1/model_inference/queue_length` endpoint for all users and serve a static value instead.
+  pub disable_inference_queue_length_endpoint: bool,
+
   /// Disable the live `/tts/queue_length` endpoint for all users and serve a static value instead.
   pub disable_tts_queue_length_endpoint: bool,
 
   /// Disable the live `/tts/list` endpoint for all users and serve a static value instead.
   pub disable_tts_model_list_endpoint: bool,
+
+  /// Tell the frontend client how fast to refresh their view of the pending inference count.
+  /// During an attack, we may want this to go extremely slow.
+  pub frontend_pending_inference_refresh_interval_millis: u64,
 
   /// Tell the frontend client how fast to refresh their view of the pending TTS count.
   /// During an attack, we may want this to go extremely slow.

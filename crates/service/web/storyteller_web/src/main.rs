@@ -296,6 +296,10 @@ async fn main() -> AnyhowResult<()> {
     easyenv::get_env_duration_seconds_or_default("LEADERBOARD_CACHE_TTL_SECONDS", Duration::from_secs(60))
   );
 
+  let inference_queue_length_cache = SingleItemTtlCache::create_with_duration(
+    easyenv::get_env_duration_seconds_or_default("INFERENCE_QUEUE_LENGTH_CACHE_TTL_SECONDS", Duration::from_secs(30))
+  );
+
   // NB: This secret really isn't too important.
   // We can even rotate it without too much impact to users.
   let sort_key_crypto_secret =
@@ -370,8 +374,10 @@ async fn main() -> AnyhowResult<()> {
   let service_feature_flags = StaticFeatureFlags {
     // Permanent (control plane / safety) flags
     global_429_pushback_filter_enabled: easyenv::get_env_bool_or_default("FF_GLOBAL_429_PUSHBACK_FILTER_ENABLED", false),
+    disable_inference_queue_length_endpoint: easyenv::get_env_bool_or_default("FF_DISABLE_INFERENCE_QUEUE_LENGTH_ENDPOINT", false),
     disable_tts_queue_length_endpoint: easyenv::get_env_bool_or_default("FF_DISABLE_TTS_QUEUE_LENGTH_ENDPOINT", false),
     disable_tts_model_list_endpoint: easyenv::get_env_bool_or_default("FF_DISABLE_TTS_MODEL_LIST_ENDPOINT", false),
+    frontend_pending_inference_refresh_interval_millis: easyenv::get_env_num("FF_FRONTEND_PENDING_INFERENCE_REFRESH_INTERVAL_MILLIS", 15_000)?,
     frontend_pending_tts_refresh_interval_millis: easyenv::get_env_num("FF_FRONTEND_PENDING_TTS_REFRESH_INTERVAL_MILLIS", 15_000)?,
     troll_ban_user_percent: easyenv::get_env_num("FF_TROLL_BANNED_USER_PERCENT", 0)?,
 
@@ -438,6 +444,7 @@ async fn main() -> AnyhowResult<()> {
       tts_queue_length: tts_queue_length_cache,
       tts_model_category_assignments: tts_model_category_assignments_cache,
       leaderboard: leaderboard_cache,
+      inference_queue_length: inference_queue_length_cache,
     },
     twitch_oauth: TwitchOauth {
       secrets: TwitchOauthSecrets {
