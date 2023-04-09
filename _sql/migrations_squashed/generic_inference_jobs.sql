@@ -17,15 +17,21 @@ CREATE TABLE generic_inference_jobs (
 
   -- ========== INFERENCE DETAILS ==========
 
-  -- TODO: Rename this inference_category and add `maybe_model_type`
-  -- Type of inference
+  -- Broad category of inference
   -- Examples (may not be up to date):
   --  * text_to_speech
   --  * voice_conversion
-  inference_type VARCHAR(32) NOT NULL,
+  inference_category VARCHAR(32) NOT NULL,
 
-  -- TODO: Add `maybe_model_type` here
-  -- TODO: Move maybe_model_token here
+  -- Potential part of the composite foreign key to the primary model being used, if any.
+  -- This will normally live in `maybe_inference_args`, but in this case, it's useful for
+  -- running easy database analytical queries.
+  maybe_model_type VARCHAR(32) DEFAULT NULL,
+
+  -- Potential part of the composite foreign key to the primary model being used, if any.
+  -- This will normally live in `maybe_inference_args`, but in this case, it's useful for
+  -- running easy database analytical queries.
+  maybe_model_token VARCHAR(32) DEFAULT NULL,
 
   -- Polymorphic arguments payload that depends on the type of inference job.
   -- TEXT = 65,535 bytes (64 KiB), ~= 4 bytes per UTF-8 character, ~ 16383 characters.
@@ -34,11 +40,6 @@ CREATE TABLE generic_inference_jobs (
   -- For text-based workloads, the raw, unprocessed user input.
   -- TEXT = 65,535 bytes (64 KiB), ~= 4 bytes per UTF-8 character, ~ 16383 characters.
   maybe_raw_inference_text TEXT DEFAULT NULL,
-
-  -- Potential foreign key to the primary model being used, if any.
-  -- This will normally live in `maybe_inference_args`, but in this case, it's useful for
-  -- running easy database analytical queries.
-  maybe_model_token VARCHAR(32) DEFAULT NULL,
 
   -- ========== SUCCESS CASE ==========
 
@@ -153,7 +154,9 @@ CREATE TABLE generic_inference_jobs (
   PRIMARY KEY (id),
   UNIQUE KEY (token),
   UNIQUE KEY (uuid_idempotency_token),
-  KEY index_inference_type (inference_type),
+  KEY index_inference_category (inference_category),
+  KEY index_maybe_model_type_and_maybe_model_token (maybe_model_type, maybe_model_token),
+  KEY index_maybe_model_type (maybe_model_type),
   KEY fk_maybe_model_token (maybe_model_token),
   KEY fk_on_success_result_entity_token (on_success_result_entity_token),
   KEY fk_maybe_creator_user_token (maybe_creator_user_token),
