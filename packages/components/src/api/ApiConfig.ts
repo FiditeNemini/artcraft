@@ -32,75 +32,45 @@ enum Domain {
 }
 
 class ApiConfig {
-  domain: Domain;
   useSsl: boolean;
-  v2ApiHost: string;
+  apiHost: string;
 
   constructor() {
     let useSsl = true;
-    let domain = Domain.Unknown;
-    let v2ApiHost = "api.fakeyou.com";
+    let apiHost = "api.fakeyou.com";
 
     switch (document.location.host) {
-      case 'fakeyou.com':
-        domain = Domain.FakeYou;
-        v2ApiHost = "api.fakeyou.com";
+      case "fakeyou.com":
+      case "staging.fakeyou.com":
+        apiHost = "api.fakeyou.com";
         break;
-      case 'storyteller.io':
-        domain = Domain.Storyteller;
-        v2ApiHost = "api.storyteller.io";
+      case "storyteller.ai":
+      case "staging.storyteller.ai":
+        apiHost = "api.storyteller.ai";
         break;
-      case 'dev.fakeyou.com':
-        domain = Domain.DevFakeYou;
-        v2ApiHost = "api.dev.fakeyou.com";
+      case "storyteller.stream":
+        apiHost = "api.storyteller.stream";
         break;
-      case 'dev.storyteller.io':
-        domain = Domain.DevStoryteller;
-        v2ApiHost = "api.dev.storyteller.io";
+      case "dev.fakeyou.com":
+        // NB: for dev machines with nginx proxies
+        apiHost = "api.dev.fakeyou.com";
+        break;
+      case "dev.fakeyou.com:7001":
+        // NB: for dev machines without nginx proxies
+        apiHost = "api.dev.fakeyou.com:12345";
+        useSsl = false;
         break;
       default: 
         if (document.location.host.includes("localhost")) {
           // NB: `localhost` seems to have problems with cookies.
-          // I've added jungle.horse as a localhost mapped domain in /etc/hosts,
-          // This should be the preferred mechanism for local testing.
-          domain = Domain.Localhost;
-          useSsl = false;
-        } else if (document.location.host.includes("jungle.horse")) {
-          // NB: Local dev.
-          domain = Domain.JungleHorse;
           useSsl = document.location.protocol === "https:";
-        } else if (document.location.host.includes("vo.codes")) {
-          domain = Domain.Vocodes;
-        } else if (document.location.host.includes("fakeyou.com")) {
-          domain = Domain.FakeYou;
-        } else if (document.location.host.includes("storyteller.io")) {
-          domain = Domain.Storyteller;
-        } else if (document.location.host.includes("storyteller.stream")) {
-          domain = Domain.StorytellerStream;
+          apiHost = "localhost:12345";
         }
-
-        if (domain === Domain.Storyteller) {
-          v2ApiHost = "api.storyteller.io";
-        } else if (domain === Domain.StorytellerStream) {
-          v2ApiHost = "api.storyteller.stream";
-        } else if (
-          !useSsl &&
-          (domain === Domain.Localhost || domain === Domain.JungleHorse)
-        ) {
-          v2ApiHost = "api.dev.fakeyou.com";
-          useSsl = false;
-        } else if (domain === Domain.JungleHorse) {
-          // TODO: Clean up these branches
-          v2ApiHost = "api.jungle.horse";
-        }
+        break;
     }
 
-    //v2ApiHost = "api.dev.fakeyou.com:12345";
-    //useSsl = false;
-
-    this.domain = domain;
     this.useSsl = useSsl;
-    this.v2ApiHost = v2ApiHost;
+    this.apiHost = apiHost;
   }
 
   speakEndpoint(): string {
@@ -112,65 +82,65 @@ class ApiConfig {
   }
 
   createAccount(): string {
-    return `${this.getScheme()}://${this.getNewApiHost()}/create_account`;
+    return `${this.getApiOrigin()}/create_account`;
   }
 
   login(): string {
-    return `${this.getScheme()}://${this.getNewApiHost()}/login`;
+    return `${this.getApiOrigin()}/login`;
   }
 
   logout(): string {
-    return `${this.getScheme()}://${this.getNewApiHost()}/logout`;
+    return `${this.getApiOrigin()}/logout`;
   }
 
   sessionDetails(): string {
-    return `${this.getScheme()}://${this.getNewApiHost()}/session`;
+    return `${this.getApiOrigin()}/session`;
   }
 
   listTts(): string {
-    return `${this.getScheme()}://${this.getNewApiHost()}/tts/list`;
+    return `${this.getApiOrigin()}/tts/list`;
   }
 
   getPendingTtsJobCount(): string {
-    return `${this.getScheme()}://${this.getNewApiHost()}/tts/queue_length`;
+    return `${this.getApiOrigin()}/tts/queue_length`;
   }
 
   viewTtsModel(modelSlug: string): string {
-    return `${this.getScheme()}://${this.getNewApiHost()}/tts/model/${modelSlug}`;
+    return `${this.getApiOrigin()}/tts/model/${modelSlug}`;
   }
 
   deleteTtsModel(modelToken: string): string {
-    return `${this.getScheme()}://${this.getNewApiHost()}/tts/model/${modelToken}/delete`;
+    return `${this.getApiOrigin()}/tts/model/${modelToken}/delete`;
   }
 
   editTtsModel(modelToken: string): string {
-    return `${this.getScheme()}://${this.getNewApiHost()}/tts/model/${modelToken}/edit`;
+    return `${this.getApiOrigin()}/tts/model/${modelToken}/edit`;
   }
 
   getTtsModelUseCount(modelToken: string): string {
-    return `${this.getScheme()}://${this.getNewApiHost()}/tts/model/${modelToken}/count`;
+    return `${this.getApiOrigin()}/tts/model/${modelToken}/count`;
   }
 
   viewTtsInferenceResult(token: string): string {
-    return `${this.getScheme()}://${this.getNewApiHost()}/tts/result/${token}`;
+    return `${this.getApiOrigin()}/tts/result/${token}`;
   }
 
   deleteTtsInferenceResult(resultToken: string): string {
-    return `${this.getScheme()}://${this.getNewApiHost()}/tts/result/${resultToken}/delete`;
+    return `${this.getApiOrigin()}/tts/result/${resultToken}/delete`;
   }
 
   editTtsInferenceResult(resultToken: string): string {
-    return `${this.getScheme()}://${this.getNewApiHost()}/tts/result/${resultToken}/edit`;
+    return `${this.getApiOrigin()}/tts/result/${resultToken}/edit`;
   }
 
   listTtsModelsForUser(username: string): string {
-    return `${this.getScheme()}://${this.getNewApiHost()}/user/${username}/tts_models`;
+    return `${this.getApiOrigin()}/user/${username}/tts_models`;
   }
 
   listTtsInferenceResultsForUser(
     params: ListTtsInferenceResultsForUserArgs
   ): string {
-    const base_url = `${this.getScheme()}://${this.getNewApiHost()}/user/${
+    const base_url = `${this.getApiOrigin()}/user/${
       params.username
     }/tts_results`;
 
@@ -199,27 +169,27 @@ class ApiConfig {
   }
 
   getTtsInferenceJobState(jobToken: string): string {
-    return `${this.getScheme()}://${this.getNewApiHost()}/tts/job/${jobToken}`;
+    return `${this.getApiOrigin()}/tts/job/${jobToken}`;
   }
 
   getTtsModelUploadJobState(jobToken: string): string {
-    return `${this.getScheme()}://${this.getNewApiHost()}/tts/upload_model_job/${jobToken}`;
+    return `${this.getApiOrigin()}/tts/upload_model_job/${jobToken}`;
   }
 
   uploadTts(): string {
-    return `${this.getScheme()}://${this.getNewApiHost()}/tts/upload`;
+    return `${this.getApiOrigin()}/tts/upload`;
   }
 
   uploadW2l(): string {
-    return `${this.getScheme()}://${this.getNewApiHost()}/w2l/upload`;
+    return `${this.getApiOrigin()}/w2l/upload`;
   }
 
   listW2l(): string {
-    return `${this.getScheme()}://${this.getNewApiHost()}/w2l/list`;
+    return `${this.getApiOrigin()}/w2l/list`;
   }
 
   viewW2l(templateToken: string): string {
-    return `${this.getScheme()}://${this.getNewApiHost()}/w2l/template/${templateToken}`;
+    return `${this.getApiOrigin()}/w2l/template/${templateToken}`;
   }
 
   viewW2lTemplate(templateToken: string): string {
@@ -227,65 +197,65 @@ class ApiConfig {
   }
 
   editW2lTemplate(templateToken: string): string {
-    return `${this.getScheme()}://${this.getNewApiHost()}/w2l/template/${templateToken}/edit`;
+    return `${this.getApiOrigin()}/w2l/template/${templateToken}/edit`;
   }
 
   deleteW2lTemplate(templateToken: string): string {
-    return `${this.getScheme()}://${this.getNewApiHost()}/w2l/template/${templateToken}/delete`;
+    return `${this.getApiOrigin()}/w2l/template/${templateToken}/delete`;
   }
 
   getW2lTemplateUseCount(templateSlug: string): string {
-    return `${this.getScheme()}://${this.getNewApiHost()}/w2l/template/${templateSlug}/count`;
+    return `${this.getApiOrigin()}/w2l/template/${templateSlug}/count`;
   }
 
   moderateW2l(templateSlug: string): string {
-    return `${this.getScheme()}://${this.getNewApiHost()}/w2l/template/${templateSlug}/moderate`;
+    return `${this.getApiOrigin()}/w2l/template/${templateSlug}/moderate`;
   }
 
   viewW2lInferenceResult(token: string): string {
-    return `${this.getScheme()}://${this.getNewApiHost()}/w2l/result/${token}`;
+    return `${this.getApiOrigin()}/w2l/result/${token}`;
   }
 
   editW2lInferenceResult(token: string): string {
-    return `${this.getScheme()}://${this.getNewApiHost()}/w2l/result/${token}/edit`;
+    return `${this.getApiOrigin()}/w2l/result/${token}/edit`;
   }
 
   deleteW2lInferenceResult(resultToken: string): string {
-    return `${this.getScheme()}://${this.getNewApiHost()}/w2l/result/${resultToken}/delete`;
+    return `${this.getApiOrigin()}/w2l/result/${resultToken}/delete`;
   }
 
   inferTts(): string {
-    return `${this.getScheme()}://${this.getNewApiHost()}/tts/inference`;
+    return `${this.getApiOrigin()}/tts/inference`;
   }
 
   inferW2l(): string {
-    return `${this.getScheme()}://${this.getNewApiHost()}/w2l/inference`;
+    return `${this.getApiOrigin()}/w2l/inference`;
   }
 
   getProfile(username: string): string {
-    return `${this.getScheme()}://${this.getNewApiHost()}/user/${username}/profile`;
+    return `${this.getApiOrigin()}/user/${username}/profile`;
   }
 
   editProfile(username: string): string {
-    return `${this.getScheme()}://${this.getNewApiHost()}/user/${username}/edit_profile`;
+    return `${this.getApiOrigin()}/user/${username}/edit_profile`;
   }
 
   listW2lTemplatesForUser(username: string): string {
-    return `${this.getScheme()}://${this.getNewApiHost()}/user/${username}/w2l_templates`;
+    return `${this.getApiOrigin()}/user/${username}/w2l_templates`;
   }
 
   getW2lInferenceJobState(jobToken: string): string {
-    return `${this.getScheme()}://${this.getNewApiHost()}/w2l/job/${jobToken}`;
+    return `${this.getApiOrigin()}/w2l/job/${jobToken}`;
   }
 
   getW2lTemplateUploadJobState(jobToken: string): string {
-    return `${this.getScheme()}://${this.getNewApiHost()}/w2l/upload_template_job/${jobToken}`;
+    return `${this.getApiOrigin()}/w2l/upload_template_job/${jobToken}`;
   }
 
   listW2lInferenceResultsForUser(
     params: ListTtsInferenceResultsForUserArgs
   ): string {
-    const base_url = `${this.getScheme()}://${this.getNewApiHost()}/user/${
+    const base_url = `${this.getApiOrigin()}/user/${
       params.username
     }/w2l_results`;
 
@@ -314,220 +284,213 @@ class ApiConfig {
   }
 
   listVocoderModels(): string {
-    return `${this.getScheme()}://${this.getNewApiHost()}/vocoder/list`;
+    return `${this.getApiOrigin()}/vocoder/list`;
   }
 
   getVocoderModel(vocoderToken: string): string {
-    return `${this.getScheme()}://${this.getNewApiHost()}/vocoder/model/${vocoderToken}`;
+    return `${this.getApiOrigin()}/vocoder/model/${vocoderToken}`;
   }
 
   createCategory(): string {
-    return `${this.getScheme()}://${this.getNewApiHost()}/category/create`;
+    return `${this.getApiOrigin()}/category/create`;
   }
 
   getCategory(categoryToken: string): string {
-    return `${this.getScheme()}://${this.getNewApiHost()}/category/view/${categoryToken}`;
+    return `${this.getApiOrigin()}/category/view/${categoryToken}`;
   }
 
   assignTtsCategory(): string {
-    return `${this.getScheme()}://${this.getNewApiHost()}/category/assign/tts`;
+    return `${this.getApiOrigin()}/category/assign/tts`;
   }
 
   listTtsCategories(): string {
     // TODO: Move to /v1
-    return `${this.getScheme()}://${this.getNewApiHost()}/category/list/tts`;
+    return `${this.getApiOrigin()}/category/list/tts`;
   }
 
   listTtsCategoriesForModel(ttsModelToken: string): string {
-    return `${this.getScheme()}://${this.getNewApiHost()}/category/assignments/tts/${ttsModelToken}`;
+    return `${this.getApiOrigin()}/category/assignments/tts/${ttsModelToken}`;
   }
 
   getComputedTtsCategoryAssignments(): string {
-    return `${this.getScheme()}://${this.getNewApiHost()}/v1/category/computed_assignments/tts`;
+    return `${this.getApiOrigin()}/v1/category/computed_assignments/tts`;
   }
 
   firehoseEvents(): string {
-    return `${this.getScheme()}://${this.getNewApiHost()}/events`;
+    return `${this.getApiOrigin()}/events`;
   }
 
   getLeaderboard(): string {
-    return `${this.getScheme()}://${this.getNewApiHost()}/leaderboard`;
+    return `${this.getApiOrigin()}/leaderboard`;
   }
 
   getModerationIpBanList(): string {
-    return `${this.getScheme()}://${this.getNewApiHost()}/moderation/ip_bans/list`;
+    return `${this.getApiOrigin()}/moderation/ip_bans/list`;
   }
 
   createModerationIpBan(): string {
-    return `${this.getScheme()}://${this.getNewApiHost()}/moderation/ip_bans/add`;
+    return `${this.getApiOrigin()}/moderation/ip_bans/add`;
   }
 
   getModerationIpBan(ipAddress: string): string {
-    return `${this.getScheme()}://${this.getNewApiHost()}/moderation/ip_bans/${ipAddress}`;
+    return `${this.getApiOrigin()}/moderation/ip_bans/${ipAddress}`;
   }
 
   deleteModerationIpBan(ipAddress: string): string {
-    return `${this.getScheme()}://${this.getNewApiHost()}/moderation/ip_bans/${ipAddress}/delete`;
+    return `${this.getApiOrigin()}/moderation/ip_bans/${ipAddress}/delete`;
   }
 
   banUser(): string {
-    return `${this.getScheme()}://${this.getNewApiHost()}/moderation/user_bans/manage_ban`;
+    return `${this.getApiOrigin()}/moderation/user_bans/manage_ban`;
   }
 
   getModerationUserList(): string {
-    return `${this.getScheme()}://${this.getNewApiHost()}/moderation/user/list`;
+    return `${this.getApiOrigin()}/moderation/user/list`;
   }
 
   getTtsVoiceInventoryStats(): string {
-    return `${this.getScheme()}://${this.getNewApiHost()}/moderation/stats/tts_voices`;
+    return `${this.getApiOrigin()}/moderation/stats/tts_voices`;
   }
 
   getTtsInferenceStats(): string {
-    return `${this.getScheme()}://${this.getNewApiHost()}/moderation/jobs/tts_inference_queue_stats`;
+    return `${this.getApiOrigin()}/moderation/jobs/tts_inference_queue_stats`;
   }
 
   killTtsInferenceJobs(): string {
-    return `${this.getScheme()}://${this.getNewApiHost()}/moderation/jobs/kill_tts_inference_jobs`;
+    return `${this.getApiOrigin()}/moderation/jobs/kill_tts_inference_jobs`;
   }
 
   getW2lInferenceStats(): string {
-    return `${this.getScheme()}://${this.getNewApiHost()}/moderation/jobs/w2l_inference_queue_stats`;
+    return `${this.getApiOrigin()}/moderation/jobs/w2l_inference_queue_stats`;
   }
 
   getModerationPendingW2lTemplates(): string {
-    return `${this.getScheme()}://${this.getNewApiHost()}/moderation/pending/w2l_templates`;
+    return `${this.getApiOrigin()}/moderation/pending/w2l_templates`;
   }
 
   getModerationTtsCategoryList(): string {
-    return `${this.getScheme()}://${this.getNewApiHost()}/moderation/categories/tts/list`;
+    return `${this.getApiOrigin()}/moderation/categories/tts/list`;
   }
 
   moderatorEditCategory(categoryToken: string): string {
-    return `${this.getScheme()}://${this.getNewApiHost()}/moderation/categories/${categoryToken}/edit`;
+    return `${this.getApiOrigin()}/moderation/categories/${categoryToken}/edit`;
   }
 
   moderatorSetCategoryDeletionState(categoryToken: string): string {
-    return `${this.getScheme()}://${this.getNewApiHost()}/moderation/categories/${categoryToken}/delete`;
+    return `${this.getApiOrigin()}/moderation/categories/${categoryToken}/delete`;
   }
 
   detectLocale(): string {
-    return `${this.getScheme()}://${this.getNewApiHost()}/detect_locale`;
+    return `${this.getApiOrigin()}/detect_locale`;
   }
 
   createVoiceCloneRequest(): string {
-    return `${this.getScheme()}://${this.getNewApiHost()}/voice_clone_requests/create`;
+    return `${this.getApiOrigin()}/voice_clone_requests/create`;
   }
 
   checkVoiceCloneRequest(): string {
-    return `${this.getScheme()}://${this.getNewApiHost()}/voice_clone_requests/check`;
+    return `${this.getApiOrigin()}/voice_clone_requests/check`;
   }
 
   // =============== Generic Model Downloads ===============
 
   enqueueRemoteDownloadJob(): string {
-    return `${this.getScheme()}://${this.getNewApiHost()}/v1/remote_downloads/enqueue`;
+    return `${this.getApiOrigin()}/v1/remote_downloads/enqueue`;
   }
 
   getRemoteDownloadJobStatus(jobToken: string): string {
-    return `${this.getScheme()}://${this.getNewApiHost()}/v1/remote_downloads/job_status/${jobToken}`;
+    return `${this.getApiOrigin()}/v1/remote_downloads/job_status/${jobToken}`;
   }
 
   // =============== Generic Model Inference ===============
 
   getModelInferenceJobStatus(jobToken: string): string {
-    return `${this.getScheme()}://${this.getNewApiHost()}/v1/model_inference/job_status/${jobToken}`;
+    return `${this.getApiOrigin()}/v1/model_inference/job_status/${jobToken}`;
   }
 
   getPendingModelInferenceJobCount(): string {
-    return `${this.getScheme()}://${this.getNewApiHost()}/v1/model_inference/queue_length`;
+    return `${this.getApiOrigin()}/v1/model_inference/queue_length`;
   }
 
   // =============== User Ratings ===============
 
   getUserRating(args: GetUserRatingArgs): string {
-    return `${this.getScheme()}://${this.getNewApiHost()}/v1/user_rating/view/${args.entity_type}/${args.entity_token}`;
+    return `${this.getApiOrigin()}/v1/user_rating/view/${args.entity_type}/${args.entity_token}`;
   }
 
   setUserRating(): string {
-    return `${this.getScheme()}://${this.getNewApiHost()}/v1/user_rating/rate`;
+    return `${this.getApiOrigin()}/v1/user_rating/rate`;
   }
 
   // =============== Comments ===============
 
   commentCreate(): string {
-    return `${this.getScheme()}://${this.getNewApiHost()}/v1/comments/new`;
+    return `${this.getApiOrigin()}/v1/comments/new`;
   }
 
   commentList(entityType: string, entityToken: string): string {
-    return `${this.getScheme()}://${this.getNewApiHost()}/v1/comments/list/${entityType}/${entityToken}`;
+    return `${this.getApiOrigin()}/v1/comments/list/${entityType}/${entityToken}`;
   }
 
   commentDelete(commentToken: string): string {
-    return `${this.getScheme()}://${this.getNewApiHost()}/v1/comments/delete/${commentToken}`;
+    return `${this.getApiOrigin()}/v1/comments/delete/${commentToken}`;
   }
 
   // =============== Storyteller-specific ===============
 
   listTwitchEventRules(): string {
-    return `${this.getScheme()}://${this.getNewApiHost()}/twitch/event_rule/list`;
+    return `${this.getApiOrigin()}/twitch/event_rule/list`;
   }
 
   createTwitchEventRule(): string {
-    return `${this.getScheme()}://${this.getNewApiHost()}/twitch/event_rule/create`;
+    return `${this.getApiOrigin()}/twitch/event_rule/create`;
   }
 
   reorderTwitchEventRules(): string {
-    return `${this.getScheme()}://${this.getNewApiHost()}/twitch/event_rule/reorder`;
+    return `${this.getApiOrigin()}/twitch/event_rule/reorder`;
   }
 
   getTwitchEventRule(eventRuleToken: string): string {
-    return `${this.getScheme()}://${this.getNewApiHost()}/twitch/event_rule/${eventRuleToken}/info`;
+    return `${this.getApiOrigin()}/twitch/event_rule/${eventRuleToken}/info`;
   }
 
   editTwitchEventRule(eventRuleToken: string): string {
-    return `${this.getScheme()}://${this.getNewApiHost()}/twitch/event_rule/${eventRuleToken}/update`;
+    return `${this.getApiOrigin()}/twitch/event_rule/${eventRuleToken}/update`;
   }
 
   deleteTwitchEventRule(eventRuleToken: string): string {
-    return `${this.getScheme()}://${this.getNewApiHost()}/twitch/event_rule/${eventRuleToken}/delete`;
+    return `${this.getApiOrigin()}/twitch/event_rule/${eventRuleToken}/delete`;
   }
 
   // =============== Twitch OAuth ===============
 
   checkTwitchOauthStatus(): string {
-    return `${this.getScheme()}://${this.getNewApiHost()}/twitch/oauth/check`;
+    return `${this.getApiOrigin()}/twitch/oauth/check`;
   }
 
   obsEventsWebsocket(twitchUsername: string): string {
-    if (this.domain === Domain.Localhost) {
-      return `ws://localhost:54321/obs/${twitchUsername}`;
-    } else if (this.domain === Domain.JungleHorse) {
-      return `ws://ws.jungle.horse:54321/obs/${twitchUsername}`;
-    } else {
-      return `wss://ws.storyteller.io/obs/${twitchUsername}`;
-    }
-    //return `wss://ws.jungle.horse/obs/${twitchUsername}`;
-    //return `wss://obs.storyteller.io/obs/${twitchUsername}`;
+    //return `ws://localhost:54321/obs/${twitchUsername}`;
+    return `wss://ws.storyteller.io/obs/${twitchUsername}`;
   }
 
   // =============== Premium ===============
 
   listActiveSubscriptions(): string {
-    return `${this.getScheme()}://${this.getNewApiHost()}/v1/billing/active_subscriptions`;
+    return `${this.getApiOrigin()}/v1/billing/active_subscriptions`;
   }
 
   createStripeCheckoutRedirect(): string {
-    return `${this.getScheme()}://${this.getNewApiHost()}/v1/stripe/checkout/create_redirect`;
+    return `${this.getApiOrigin()}/v1/stripe/checkout/create_redirect`;
   }
 
   createStripePortalRedirect(): string {
-    return `${this.getScheme()}://${this.getNewApiHost()}/v1/stripe/portal/create_redirect`;
+    return `${this.getApiOrigin()}/v1/stripe/portal/create_redirect`;
   }
 
   // =============== Server ===============
 
   getServerInfo(): string {
-    return `${this.getScheme()}://${this.getNewApiHost()}/server_info`;
+    return `${this.getApiOrigin()}/server_info`;
   }
 
   // =============== Helper ===============
@@ -536,8 +499,12 @@ class ApiConfig {
     return this.useSsl ? "https" : "http";
   }
 
-  private getNewApiHost(): string {
-    return this.v2ApiHost;
+  private getApiHost(): string {
+    return this.apiHost;
+  }
+
+  private getApiOrigin(): string {
+    return `${this.getScheme()}://${this.getApiHost()}`;
   }
 }
 
