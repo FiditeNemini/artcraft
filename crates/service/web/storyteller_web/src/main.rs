@@ -117,7 +117,7 @@ async fn main() -> AnyhowResult<()> {
 
   let _ = envvar::read_from_filename_and_paths(
     "storyteller-web.env",
-    &[".", "crates/service/web/storyteller_web"])?;
+    &[".", "./config", "crates/service/web/storyteller_web/config"])?;
 
   let common_env = CommonEnv::read_from_env()?;
 

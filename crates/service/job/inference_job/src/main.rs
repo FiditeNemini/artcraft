@@ -80,11 +80,11 @@ async fn main() -> AnyhowResult<()> {
 
   let _ = envvar::read_from_filename_and_paths(
     "inference-job.env",
-    &[".", "crates/service/job/inference_job"])?;
+    &[".", "./config", "crates/service/job/inference_job/config"])?;
 
   let _ = envvar::read_from_filename_and_paths(
     "inference-job-secrets.env",
-    &[".", "crates/service/job/inference_job"]
+    &[".", "./config", "crates/service/job/inference_job/config"]
   ).map_err(|err| {
     // NB: Fail open.
     warn!("Could not load app-specific secrets from env file (this might be fine, eg. provided by k8s): {:?}", err);
