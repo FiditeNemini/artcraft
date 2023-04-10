@@ -395,11 +395,11 @@ class ApiConfig {
   // =============== Generic Model Downloads ===============
 
   enqueueRemoteDownloadJob(): string {
-    return `${this.getApiOrigin()}/v1/remote_downloads/enqueue`;
+    return `${this.getApiOrigin()}/v1/remote_download/enqueue`;
   }
 
   getRemoteDownloadJobStatus(jobToken: string): string {
-    return `${this.getApiOrigin()}/v1/remote_downloads/job_status/${jobToken}`;
+    return `${this.getApiOrigin()}/v1/remote_download/job_status/${jobToken}`;
   }
 
   // =============== Generic Model Inference ===============

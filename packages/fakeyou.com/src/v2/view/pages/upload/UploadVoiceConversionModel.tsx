@@ -12,15 +12,15 @@ import { Link } from "react-router-dom";
 import { WebUrl } from "../../../../common/WebUrl";
 import { motion } from "framer-motion";
 import { container, item, panel } from "../../../../data/animation";
-import { VocoderUploadJob } from "@storyteller/components/src/jobs/VocoderUploadJobs";
-import { SessionVocoderUploadResultList } from "../../_common/SessionVocoderUploadResultsList";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faMicrophoneStand } from "@fortawesome/pro-solid-svg-icons";
+import { VoiceConversionModelUploadJob } from "@storyteller/components/src/jobs/VoiceConversionModelUploadJob";
+import { SessionVoiceConversionModelUploadResultList } from "../../_common/SessionVoiceConversionModelUploadResultsList";
 
 interface Props {
   sessionWrapper: SessionWrapper;
   enqueueVoiceConversionModelUploadJob: (jobToken: string) => void;
-  voiceConversionModelUploadJobs: Array<number>; // TODO
+  voiceConversionModelUploadJobs: Array<VoiceConversionModelUploadJob>;
 }
 
 function UploadVoiceConversionModel(props: Props) {
@@ -74,7 +74,7 @@ function UploadVoiceConversionModel(props: Props) {
       idempotency_token: idempotencyToken,
       title: title,
       download_url: downloadUrl,
-      generic_download_type: "hifigan",
+      generic_download_type: "so_vits_svc",
     };
 
     const response = await EnqueueRemoteDownload(request);
@@ -170,12 +170,9 @@ function UploadVoiceConversionModel(props: Props) {
         </motion.div>
       </motion.form>
 
-      
-      {/*
-      <SessionVocoderUploadResultList
-        vocoderUploadJobs={props.vocoderUploadJobs}
+      <SessionVoiceConversionModelUploadResultList
+        voiceConversionModelUploadJobs={props.voiceConversionModelUploadJobs}
       />
-      */}
     </motion.div>
   );
 }

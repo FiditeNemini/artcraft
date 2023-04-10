@@ -20,6 +20,7 @@ import { TtsModelDeletePage } from "./pages/tts/tts_model_delete/TtsModelDeleteP
 import { TtsModelEditPage } from "./pages/tts/tts_model_edit/TtsModelEditPage";
 import { TtsModelUploadJob } from "@storyteller/components/src/jobs/TtsModelUploadJobs";
 import { VocoderUploadJob } from "@storyteller/components/src/jobs/VocoderUploadJobs";
+import { VoiceConversionModelUploadJob } from "@storyteller/components/src/jobs/VoiceConversionModelUploadJob";
 import { TtsModelViewPage } from "./pages/tts/tts_model_view/TtsModelViewPage";
 import { TtsResultDeletePage } from "./pages/tts/tts_result_delete/TtsResultDeletePage";
 import { TtsResultViewPage } from "./pages/tts/tts_result_view/TtsResultViewPage";
@@ -111,8 +112,13 @@ interface Props {
   enqueueW2lTemplateUploadJob: (jobToken: string) => void;
   w2lTemplateUploadJobs: Array<W2lTemplateUploadJob>;
 
+  // TODO: Begin to unify generic download jobs (vocoder, voice conversion, ...)
   enqueueVocoderUploadJob: (jobToken: string) => void;
   vocoderUploadJobs: Array<VocoderUploadJob>;
+
+  // TODO: Begin to unify generic download jobs (vocoder, voice conversion, ...)
+  enqueueVoiceConversionModelUploadJob: (jobToken: string) => void;
+  voiceConversionModelUploadJobs: Array<VoiceConversionModelUploadJob>;
 
   textBuffer: string;
   setTextBuffer: (textBuffer: string) => void;
@@ -378,8 +384,8 @@ class PageContainer extends React.Component<Props, State> {
             <Route path="/upload/voice_conversion">
               <UploadVoiceConversionModel
                 sessionWrapper={this.props.sessionWrapper}
-                voiceConversionModelUploadJobs={[]}
-                enqueueVoiceConversionModelUploadJob={this.props.enqueueTtsModelUploadJob}
+                voiceConversionModelUploadJobs={this.props.voiceConversionModelUploadJobs}
+                enqueueVoiceConversionModelUploadJob={this.props.enqueueVoiceConversionModelUploadJob}
               />
             </Route>
 
