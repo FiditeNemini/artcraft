@@ -127,6 +127,7 @@ async fn main() -> AnyhowResult<()> {
             DockerOptions {
               image_name,
               maybe_bind_mount: Some(DockerFilesystemMount::tmp_to_tmp()),
+              maybe_environment_variables: None,
               maybe_gpu: None,
             }
           });
@@ -156,6 +157,7 @@ async fn main() -> AnyhowResult<()> {
           DockerOptions {
             image_name,
             maybe_bind_mount: Some(DockerFilesystemMount::tmp_to_tmp()),
+            maybe_environment_variables: None,
             maybe_gpu: Some(DockerGpu::All),
           }
         });
@@ -185,6 +187,7 @@ async fn main() -> AnyhowResult<()> {
           DockerOptions {
             image_name,
             maybe_bind_mount: Some(DockerFilesystemMount::tmp_to_tmp()),
+            maybe_environment_variables: None,
             maybe_gpu: Some(DockerGpu::All),
           }
         });
@@ -214,6 +217,7 @@ async fn main() -> AnyhowResult<()> {
           DockerOptions {
             image_name,
             maybe_bind_mount: Some(DockerFilesystemMount::tmp_to_tmp()),
+            maybe_environment_variables: None,
             maybe_gpu: Some(DockerGpu::All),
           }
         });
@@ -243,6 +247,7 @@ async fn main() -> AnyhowResult<()> {
           DockerOptions {
             image_name,
             maybe_bind_mount: Some(DockerFilesystemMount::tmp_to_tmp()),
+            maybe_environment_variables: None,
             maybe_gpu: Some(DockerGpu::All),
           }
         });
@@ -275,6 +280,7 @@ async fn main() -> AnyhowResult<()> {
           DockerOptions {
             image_name,
             maybe_bind_mount: Some(DockerFilesystemMount::tmp_to_tmp()),
+            maybe_environment_variables: None,
             maybe_gpu: Some(DockerGpu::All),
           }
         });
