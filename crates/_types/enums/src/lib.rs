@@ -32,4 +32,3 @@ mod macros;
 
 pub mod by_table;
 pub mod common;
-pub mod workers;

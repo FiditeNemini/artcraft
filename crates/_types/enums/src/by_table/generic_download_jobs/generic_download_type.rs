@@ -69,7 +69,7 @@ impl GenericDownloadType {
 
 #[cfg(test)]
 mod tests {
-  use crate::workers::generic_download_type::GenericDownloadType;
+  use crate::by_table::generic_download_jobs::generic_download_type::GenericDownloadType;
   use crate::test_helpers::assert_serialization;
 
   #[test]

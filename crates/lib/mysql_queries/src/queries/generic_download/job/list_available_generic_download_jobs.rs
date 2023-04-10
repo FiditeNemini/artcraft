@@ -1,11 +1,11 @@
 use anyhow::anyhow;
 use chrono::Utc;
-use errors::AnyhowResult;
 use crate::column_types::job_status::JobStatus;
 use crate::queries::generic_download::job::_keys::GenericDownloadJobId;
 use crate::tokens::Tokens;
+use enums::by_table::generic_download_jobs::generic_download_type::GenericDownloadType;
 use enums::common::visibility::Visibility;
-use enums::workers::generic_download_type::GenericDownloadType;
+use errors::AnyhowResult;
 use sqlx::MySqlPool;
 use std::path::Path;
 use tokens::jobs::download::DownloadJobToken;
@@ -47,7 +47,7 @@ SELECT
   creator_ip_address,
   creator_set_visibility as `creator_set_visibility: enums::common::visibility::Visibility`,
 
-  download_type as `download_type: enums::workers::generic_download_type::GenericDownloadType`,
+  download_type as `download_type: enums::by_table::generic_download_jobs::generic_download_type::GenericDownloadType`,
   download_url,
   title,
 
