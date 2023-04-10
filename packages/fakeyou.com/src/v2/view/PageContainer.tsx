@@ -70,6 +70,7 @@ import { TrumpTtsPage } from "./pages/character/trump/TrumpTtsPage";
 import { InferenceJob } from "@storyteller/components/src/jobs/InferenceJob";
 //import { LandingPage } from "./pages/landing/LandingPage";
 import { VcModelListPage } from "./pages/vc/vc_model_list/VcModelListPage";
+import { UploadVoiceConversionModel } from "./pages/upload/UploadVoiceConversionModel";
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -371,6 +372,14 @@ class PageContainer extends React.Component<Props, State> {
                 sessionWrapper={this.props.sessionWrapper}
                 ttsModelUploadJobs={this.props.ttsModelUploadJobs}
                 enqueueTtsModelUploadJob={this.props.enqueueTtsModelUploadJob}
+              />
+            </Route>
+
+            <Route path="/upload/voice_conversion">
+              <UploadVoiceConversionModel
+                sessionWrapper={this.props.sessionWrapper}
+                voiceConversionModelUploadJobs={[]}
+                enqueueVoiceConversionModelUploadJob={this.props.enqueueTtsModelUploadJob}
               />
             </Route>
 
