@@ -10,7 +10,7 @@ use hashing::sha256::sha256_hash_file::sha256_hash_file;
 use jobs_common::redis_job_status_logger::RedisJobStatusLogger;
 use log::{info, warn};
 use mysql_queries::queries::generic_download::job::list_available_generic_download_jobs::AvailableDownloadJob;
-use mysql_queries::queries::voice_conversion::models::insert_voice_conversion_model_from_download_job::{Args, insert_voice_conversion_model_from_download_job};
+use mysql_queries::queries::voice_conversion::models::insert_voice_conversion_model_from_download_job::{InsertVoiceConversionModelArgs, insert_voice_conversion_model_from_download_job};
 use std::fs::File;
 use std::io::Read;
 use std::path::PathBuf;
@@ -94,7 +94,7 @@ pub async fn process_softvc_model<'a, 'b>(
 
   info!("Saving Soft VC record...");
 
-  let (_id, model_token) = insert_voice_conversion_model_from_download_job(Args {
+  let (_id, model_token) = insert_voice_conversion_model_from_download_job(InsertVoiceConversionModelArgs {
     title: &job.title,
     original_download_url: &job.download_url,
     original_filename: &download_filename,

@@ -4,9 +4,12 @@ use errors::AnyhowResult;
 use enums::common::visibility::Visibility;
 use sqlx::MySqlPool;
 use std::path::Path;
+use enums::by_table::voice_conversion_models::voice_conversion_model_type::VoiceConversionModelType;
 use tokens::voice_conversion::model::VoiceConversionModelToken;
 
-pub struct Args<'a, P: AsRef<Path>> {
+pub struct InsertVoiceConversionModelArgs<'a, P: AsRef<Path>> {
+  pub model_type: VoiceConversionModelType,
+
   pub title: &'a str,
 
   pub original_download_url: &'a str,
@@ -25,7 +28,7 @@ pub struct Args<'a, P: AsRef<Path>> {
 
 
 pub async fn insert_voice_conversion_model_from_download_job<P: AsRef<Path>>(
-  args: Args<'_, P>,
+  args: InsertVoiceConversionModelArgs<'_, P>,
 ) -> AnyhowResult<(u64, VoiceConversionModelToken)> {
 
   let model_token = VoiceConversionModelToken::generate();
@@ -41,7 +44,7 @@ pub async fn insert_voice_conversion_model_from_download_job<P: AsRef<Path>>(
 INSERT INTO voice_conversion_models
 SET
   token = ?,
-  model_type = "rocket_vc",
+  model_type = ?,
   title = ?,
   description_markdown = '',
   description_rendered_html = '',
@@ -54,6 +57,7 @@ SET
   file_size_bytes = ?
         "#,
       &model_token,
+      args.model_type.to_str(),
       args.title,
       args.creator_user_token,
       args.creator_ip_address,
