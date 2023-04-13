@@ -118,6 +118,7 @@ impl SoVitsSvcModelCheckCommand {
     //command.push_str(python_binary);
     //command.push_str(" ");
 
+    command.push_str(" && ");
     command.push_str(&path_to_string(&self.check_script_name));
     command.push_str(" onnx "); // NB: Onnx command to check model validity
 
