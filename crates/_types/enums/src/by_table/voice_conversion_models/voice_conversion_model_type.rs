@@ -12,10 +12,11 @@ use strum::EnumIter;
 #[cfg_attr(test, derive(EnumIter, EnumCount))]
 #[derive(Clone, Copy, Eq, PartialEq, Hash, Ord, PartialOrd, Deserialize, Serialize)]
 pub enum VoiceConversionModelType {
+  #[serde(rename = "soft_vc")]
+  SoftVc,
+
   #[serde(rename = "so_vits_svc")]
   SoVitsSvc,
-  //#[serde(rename = "soft_vc")]
-  //SoftVc,
 }
 
 // TODO(bt, 2022-12-21): This desperately needs MySQL integration tests!
@@ -26,12 +27,14 @@ impl_mysql_enum_coders!(VoiceConversionModelType);
 impl VoiceConversionModelType {
   pub fn to_str(&self) -> &'static str {
     match self {
+      Self::SoftVc => "soft_vc",
       Self::SoVitsSvc => "so_vits_svc",
     }
   }
 
   pub fn from_str(value: &str) -> Result<Self, String> {
     match value {
+      "soft_vc" => Ok(Self::SoftVc),
       "so_vits_svc" => Ok(Self::SoVitsSvc),
       _ => Err(format!("invalid value: {:?}", value)),
     }
@@ -41,6 +44,7 @@ impl VoiceConversionModelType {
     // NB: BTreeSet is sorted
     // NB: BTreeSet::from() isn't const, but not worth using LazyStatic, etc.
     BTreeSet::from([
+      Self::SoftVc,
       Self::SoVitsSvc,
     ])
   }
@@ -53,6 +57,7 @@ mod tests {
 
   #[test]
   fn test_serialization() {
+    assert_serialization(VoiceConversionModelType::SoftVc, "soft_vc");
     assert_serialization(VoiceConversionModelType::SoVitsSvc, "so_vits_svc");
   }
 
@@ -63,6 +68,7 @@ mod tests {
 
   #[test]
   fn from_str() {
+    assert_eq!(VoiceConversionModelType::from_str("soft_vc").unwrap(), VoiceConversionModelType::SoftVc);
     assert_eq!(VoiceConversionModelType::from_str("so_vits_svc").unwrap(), VoiceConversionModelType::SoVitsSvc);
   }
 
@@ -70,7 +76,8 @@ mod tests {
   fn all_variants() {
     // Static check
     let mut variants = VoiceConversionModelType::all_variants();
-    assert_eq!(variants.len(), 1);
+    assert_eq!(variants.len(), 2);
+    assert_eq!(variants.pop_first(), Some(VoiceConversionModelType::SoftVc));
     assert_eq!(variants.pop_first(), Some(VoiceConversionModelType::SoVitsSvc));
     assert_eq!(variants.pop_first(), None);
 

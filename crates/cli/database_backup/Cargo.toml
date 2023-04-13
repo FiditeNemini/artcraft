@@ -25,7 +25,7 @@ clap = "2.34.0" # TODO: This is really out of date, but has conflicts when updat
 # TODO/NB: Commenting out clap4 as it prevents windows builds
 # NB: clap4 = { package = "clap", version = "4.0" }
 dotenv = "0.15.0"
-easyenv = "0.0.6"
+easyenv = "0.0.9"
 hostname = "0.3.1"
 log = "0.4.14"
 

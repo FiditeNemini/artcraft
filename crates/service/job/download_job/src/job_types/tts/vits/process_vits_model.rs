@@ -8,6 +8,7 @@ use crate::job_types::tts::vits::vits_model_check_command::{CheckArgs, Device};
 use enums::by_table::tts_models::tts_model_type::TtsModelType;
 use enums::common::visibility::Visibility;
 use errors::AnyhowResult;
+use filesys::file_size::file_size;
 use filesys::filename_concat::filename_concat;
 use hashing::sha256::sha256_hash_file::sha256_hash_file;
 use jobs_common::redis_job_status_logger::RedisJobStatusLogger;
@@ -64,7 +65,7 @@ pub async fn process_vits_model<'a, 'b>(
 
   check_file_exists(&traced_model_file_path)?;
 
-  // TODO: get model sizes
+  let file_size_bytes = file_size(&original_model_file_path)?;
 
   // let file_metadata = match read_metadata_file(&output_metadata_fs_path) {
   //   Ok(metadata) => metadata,
@@ -137,7 +138,7 @@ pub async fn process_vits_model<'a, 'b>(
     title: &job.title,
     original_download_url: &job.download_url,
     original_filename: &download_filename,
-    file_size_bytes: 0, // TODO: Get file sizes!
+    file_size_bytes,
     creator_user_token: &job.creator_user_token,
     creator_ip_address: &job.creator_ip_address,
     creator_set_visibility: Visibility::Public, // TODO: All models default to public at start

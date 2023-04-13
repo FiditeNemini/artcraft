@@ -46,6 +46,7 @@ use std::ops::Deref;
 use std::path::PathBuf;
 use std::time::Duration;
 use subprocess_common::docker_options::{DockerFilesystemMount, DockerGpu, DockerOptions};
+use crate::job_types::voice_conversion::so_vits_svc::so_vits_svc_model_check_command::SoVitsSvcModelCheckCommand;
 
 // Buckets
 const ENV_ACCESS_KEY : &'static str = "ACCESS_KEY";
@@ -344,6 +345,7 @@ async fn main() -> AnyhowResult<()> {
     sidecar_configs: SidecarConfigs {
       google_drive_downloader,
       softvc_model_check_command,
+      so_vits_svc_model_check_command: SoVitsSvcModelCheckCommand::from_env()?,
       tacotron_model_check_command,
       hifigan_model_check_command,
       hifigan_softvc_model_check_command,

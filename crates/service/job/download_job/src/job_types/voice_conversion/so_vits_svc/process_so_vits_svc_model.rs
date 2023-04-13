@@ -4,24 +4,25 @@ use container_common::filesystem::safe_delete_temp_directory::safe_delete_temp_d
 use container_common::filesystem::safe_delete_temp_file::safe_delete_temp_file;
 use crate::JobState;
 use crate::job_loop::job_results::JobResults;
-use crate::job_types::tts::vits::vits_model_check_command::{CheckArgs, Device};
+use crate::job_types::voice_conversion::so_vits_svc::so_vits_svc_model_check_command::{CheckArgs, Device};
 use enums::by_table::tts_models::tts_model_type::TtsModelType;
+use enums::by_table::voice_conversion_models::voice_conversion_model_type::VoiceConversionModelType;
 use enums::common::visibility::Visibility;
 use errors::AnyhowResult;
-use filesys::filename_concat::filename_concat;
+use filesys::file_size::file_size;
+use filesys::filename_concat::{filename_concat, filename_concat_pathbuf};
 use hashing::sha256::sha256_hash_file::sha256_hash_file;
 use jobs_common::redis_job_status_logger::RedisJobStatusLogger;
 use log::{error, info, warn};
 use mysql_queries::queries::generic_download::job::list_available_generic_download_jobs::AvailableDownloadJob;
 use mysql_queries::queries::tts::tts_models::insert_tts_model_from_download_job::insert_tts_model_from_download_job;
 use mysql_queries::queries::tts::tts_models::insert_tts_model_from_download_job;
+use mysql_queries::queries::voice_conversion::models::insert_voice_conversion_model_from_download_job::{insert_voice_conversion_model_from_download_job, InsertVoiceConversionModelArgs};
 use std::fs::File;
 use std::io::Read;
 use std::path::{Path, PathBuf};
 use std::time::Duration;
 use tempdir::TempDir;
-use enums::by_table::voice_conversion_models::voice_conversion_model_type::VoiceConversionModelType;
-use mysql_queries::queries::voice_conversion::models::insert_voice_conversion_model_from_download_job::{insert_voice_conversion_model_from_download_job, InsertVoiceConversionModelArgs};
 
 /// Returns the token of the entity.
 pub async fn process_so_vits_svc_model<'a, 'b>(
@@ -40,22 +41,21 @@ pub async fn process_so_vits_svc_model<'a, 'b>(
 
   let original_model_file_path = PathBuf::from(download_filename.clone());
 
-  // NB: We'll be creating the traced model in the "check" step and uploading it to GDrive along with the original.
-  let traced_model_file_path = PathBuf::from(filename_concat(&original_model_file_path, "_traced"));
+  // NB: We're using onnx just to test validity of model
+  let onnx_model_file_path = filename_concat_pathbuf(&original_model_file_path, ".onnx");
 
   let config_path = PathBuf::from("configs/ljs_li44_tmbert_nmp_s1_arpa.json"); // TODO: This could be variable.
 
   let model_check_result = job_state.sidecar_configs.so_vits_svc_model_check_command.execute_check(CheckArgs {
-    traced_model_output_path: &traced_model_file_path,
-    model_checkpoint_path: &original_model_file_path,
+    input_path: &original_model_file_path,
+    output_path: &onnx_model_file_path,
     config_path: &config_path,
     device: Device::Cuda,
-    test_string: "this is a test of model inference",
   });
 
   if let Err(e) = model_check_result {
     safe_delete_temp_file(&original_model_file_path);
-    safe_delete_temp_file(&traced_model_file_path);
+    safe_delete_temp_file(&onnx_model_file_path);
     safe_delete_temp_directory(&temp_dir);
     return Err(anyhow!("model check error: {:?}", e));
   }
@@ -64,19 +64,9 @@ pub async fn process_so_vits_svc_model<'a, 'b>(
 
   info!("Checking that output traced model file exists...");
 
-  check_file_exists(&traced_model_file_path)?;
+  check_file_exists(&onnx_model_file_path)?;
 
-  // TODO: get model sizes
-
-  // let file_metadata = match read_metadata_file(&output_metadata_fs_path) {
-  //   Ok(metadata) => metadata,
-  //   Err(e) => {
-  //     safe_delete_temp_file(&file_path);
-  //     safe_delete_temp_file(&output_metadata_fs_path);
-  //     safe_delete_temp_directory(&temp_dir);
-  //     return Err(e);
-  //   }
-  // };
+  let file_size_bytes = file_size(&original_model_file_path)?;
 
   // ==================== UPLOAD ORIGINAL MODEL FILE ==================== //
 
@@ -90,34 +80,12 @@ pub async fn process_so_vits_svc_model<'a, 'b>(
 
   info!("Destination bucket path: {:?}", &model_bucket_path);
 
-  redis_logger.log_status("uploading VITS TTS model")?;
+  redis_logger.log_status("uploading so-vits-svc TTS model")?;
 
   if let Err(err) = job_state.bucket_client.upload_filename(&model_bucket_path, &original_model_file_path).await {
     error!("Problem uploading original model: {:?}", err);
-    error!(" - Model file: {:?}", &original_model_file_path);
-    error!(" - Traced model file: {:?}", &traced_model_file_path);
     safe_delete_temp_file(&original_model_file_path);
-    safe_delete_temp_file(&traced_model_file_path);
-    safe_delete_temp_directory(&temp_dir);
-    return Err(err);
-  }
-
-  // ==================== UPLOAD TRACED MODEL FILE ==================== //
-
-  info!("Uploading VITS TTS (traced) model to GCS...");
-
-  let traced_model_bucket_path = job_state.bucket_path_unifier.tts_traced_synthesizer_path(&private_bucket_hash);
-
-  info!("Destination bucket path: {:?}", &traced_model_bucket_path);
-
-  redis_logger.log_status("uploading VITS TTS (traced) model")?;
-
-  if let Err(err) = job_state.bucket_client.upload_filename(&traced_model_bucket_path, &traced_model_file_path).await {
-    error!("Problem uploading traced model: {:?}", err);
-    error!(" - Model file: {:?}", &original_model_file_path);
-    error!(" - Traced model file: {:?}", &traced_model_file_path);
-    safe_delete_temp_file(&original_model_file_path);
-    safe_delete_temp_file(&traced_model_file_path);
+    safe_delete_temp_file(&onnx_model_file_path);
     safe_delete_temp_directory(&temp_dir);
     return Err(err);
   }
@@ -127,19 +95,19 @@ pub async fn process_so_vits_svc_model<'a, 'b>(
   // NB: We should be using a tempdir, but to make absolutely certain we don't overflow the disk...
   info!("Done uploading; deleting temporary files and paths...");
   safe_delete_temp_file(&original_model_file_path);
-  safe_delete_temp_file(&traced_model_file_path);
+  safe_delete_temp_file(&onnx_model_file_path);
   safe_delete_temp_directory(&temp_dir);
 
   // ==================== SAVE RECORDS ==================== //
 
-  info!("Saving TTS model record...");
+  info!("Saving Voice Conversion model record...");
 
   let (_id, model_token) = insert_voice_conversion_model_from_download_job(InsertVoiceConversionModelArgs {
     model_type: VoiceConversionModelType::SoVitsSvc,
     title: &job.title,
     original_download_url: &job.download_url,
     original_filename: &download_filename,
-    file_size_bytes: 0, // TODO: Get file sizes!
+    file_size_bytes,
     creator_user_token: &job.creator_user_token,
     creator_ip_address: &job.creator_ip_address,
     creator_set_visibility: Visibility::Public, // TODO: All models default to public at start

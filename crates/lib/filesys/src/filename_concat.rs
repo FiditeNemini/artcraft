@@ -1,4 +1,4 @@
-use std::path::Path;
+use std::path::{Path, PathBuf};
 use crate::path_to_string::path_to_string;
 
 /// Concatenate filenames while preserving path information. Do not join paths as directories.
@@ -13,6 +13,10 @@ pub fn filename_concat<P: AsRef<Path>, Q: AsRef<Path>>(part_1: P, part_2: Q) -> 
   let suffix= path_to_string(part_2);
   base.push_str(&suffix);
   base
+}
+
+pub fn filename_concat_pathbuf<P: AsRef<Path>, Q: AsRef<Path>>(part_1: P, part_2: Q) -> PathBuf {
+  PathBuf::from(filename_concat(part_1, part_2))
 }
 
 #[cfg(test)]

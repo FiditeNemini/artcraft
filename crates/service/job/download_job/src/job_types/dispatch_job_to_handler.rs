@@ -9,6 +9,7 @@ use enums::by_table::generic_download_jobs::generic_download_type::GenericDownlo
 use jobs_common::redis_job_status_logger::RedisJobStatusLogger;
 use mysql_queries::queries::generic_download::job::list_available_generic_download_jobs::AvailableDownloadJob;
 use tempdir::TempDir;
+use crate::job_types::voice_conversion::so_vits_svc::process_so_vits_svc_model::process_so_vits_svc_model;
 
 pub struct DispatchJobToHandlerArgs<'a, 'b: 'a> {
   pub job_runner_state: &'a JobState,

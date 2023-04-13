@@ -12,6 +12,7 @@ use r2d2_redis::RedisConnectionManager;
 use r2d2_redis::r2d2;
 use sqlx::MySqlPool;
 use std::path::PathBuf;
+use crate::job_types::voice_conversion::so_vits_svc::so_vits_svc_model_check_command::SoVitsSvcModelCheckCommand;
 
 pub struct JobState {
   pub download_temp_directory: PathBuf,
@@ -45,6 +46,7 @@ pub struct JobState {
 pub struct SidecarConfigs {
   pub google_drive_downloader: GoogleDriveDownloadCommand,
   pub softvc_model_check_command: SoftVcModelCheckCommand,
+  pub so_vits_svc_model_check_command: SoVitsSvcModelCheckCommand,
   pub tacotron_model_check_command: TacotronModelCheckCommand,
   pub hifigan_model_check_command: HifiGanModelCheckCommand,
   pub hifigan_softvc_model_check_command: HifiGanSoftVcModelCheckCommand,

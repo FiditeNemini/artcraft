@@ -15,6 +15,7 @@ use std::fs::File;
 use std::io::Read;
 use std::path::PathBuf;
 use tempdir::TempDir;
+use enums::by_table::voice_conversion_models::voice_conversion_model_type::VoiceConversionModelType;
 
 /// Returns the token of the entity.
 pub async fn process_softvc_model<'a, 'b>(
@@ -95,6 +96,7 @@ pub async fn process_softvc_model<'a, 'b>(
   info!("Saving Soft VC record...");
 
   let (_id, model_token) = insert_voice_conversion_model_from_download_job(InsertVoiceConversionModelArgs {
+    model_type: VoiceConversionModelType::SoftVc,
     title: &job.title,
     original_download_url: &job.download_url,
     original_filename: &download_filename,

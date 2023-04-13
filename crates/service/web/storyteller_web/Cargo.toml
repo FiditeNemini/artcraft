@@ -54,7 +54,7 @@ base64 = "0.13.0"
 chrono = { version = "0.4.19", features = ["serde"] }
 derive_more = "0.99.14"
 dotenv = "0.15.0"
-easyenv = "0.0.6"
+easyenv = "0.0.9"
 hex = "0.4.3"
 hostname = "0.3.1"
 lazy_static = "1.4.0"
