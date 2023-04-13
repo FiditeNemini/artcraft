@@ -44,7 +44,7 @@ pub async fn process_so_vits_svc_model<'a, 'b>(
   // NB: We're using onnx just to test validity of model
   let onnx_model_file_path = filename_concat_pathbuf(&original_model_file_path, ".onnx");
 
-  let config_path = PathBuf::from("configs/ljs_li44_tmbert_nmp_s1_arpa.json"); // TODO: This could be variable.
+  let config_path = PathBuf::from("/models/voice_conversion/so-vits-svc/src/so_vits_svc_fork/configs_template/config_template.json"); // TODO: This could be variable.
 
   let model_check_result = job_state.sidecar_configs.so_vits_svc_model_check_command.execute_check(CheckArgs {
     input_path: &original_model_file_path,
