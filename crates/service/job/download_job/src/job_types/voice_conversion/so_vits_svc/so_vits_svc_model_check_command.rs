@@ -121,7 +121,7 @@ impl SoVitsSvcModelCheckCommand {
 
     // ===== Begin Python Args =====
 
-    command.push_str(" --model_path ");
+    command.push_str(" --model-path ");
     command.push_str(&path_to_string(args.model_path));
     command.push_str(" --output-path ");
     command.push_str(&path_to_string(args.output_path));
