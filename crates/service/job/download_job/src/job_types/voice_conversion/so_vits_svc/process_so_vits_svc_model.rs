@@ -41,30 +41,31 @@ pub async fn process_so_vits_svc_model<'a, 'b>(
 
   let original_model_file_path = PathBuf::from(download_filename.clone());
 
-  // NB: We're using onnx just to test validity of model
-  let onnx_model_file_path = filename_concat_pathbuf(&original_model_file_path, ".onnx");
-
-  let config_path = PathBuf::from("/models/voice_conversion/so-vits-svc/src/so_vits_svc_fork/configs_template/config_template.json"); // TODO: This could be variable.
+  //let config_path = PathBuf::from("/models/voice_conversion/so-vits-svc/src/so_vits_svc_fork/configs_template/config_template.json"); // TODO: This could be variable.
+  let config_path = PathBuf::from("/models/voice_conversion/so-vits-svc/example_config.json"); // TODO: This could be variable.
+  let input_wav_path = PathBuf::from("/models/voice_conversion/so-vits-svc/example.wav"); // TODO: This could be variable.
+  let output_wav_path = temp_dir.path().join("output.wav");
 
   let model_check_result = job_state.sidecar_configs.so_vits_svc_model_check_command.execute_check(CheckArgs {
-    input_path: &original_model_file_path,
-    output_path: &onnx_model_file_path,
+    model_path: &original_model_file_path,
+    input_path: &input_wav_path,
+    output_path: &output_wav_path,
     config_path: &config_path,
     device: Device::Cuda,
   });
 
   if let Err(e) = model_check_result {
     safe_delete_temp_file(&original_model_file_path);
-    safe_delete_temp_file(&onnx_model_file_path);
+    safe_delete_temp_file(&output_wav_path);
     safe_delete_temp_directory(&temp_dir);
     return Err(anyhow!("model check error: {:?}", e));
   }
 
   // ==================== CHECK ALL FILES EXIST AND GET METADATA ==================== //
 
-  info!("Checking that output traced model file exists...");
+  info!("Checking that output wav file exists...");
 
-  check_file_exists(&onnx_model_file_path)?;
+  check_file_exists(&output_wav_path)?;
 
   let file_size_bytes = file_size(&original_model_file_path)?;
 
@@ -85,7 +86,7 @@ pub async fn process_so_vits_svc_model<'a, 'b>(
   if let Err(err) = job_state.bucket_client.upload_filename(&model_bucket_path, &original_model_file_path).await {
     error!("Problem uploading original model: {:?}", err);
     safe_delete_temp_file(&original_model_file_path);
-    safe_delete_temp_file(&onnx_model_file_path);
+    safe_delete_temp_file(&output_wav_path);
     safe_delete_temp_directory(&temp_dir);
     return Err(err);
   }
@@ -95,7 +96,7 @@ pub async fn process_so_vits_svc_model<'a, 'b>(
   // NB: We should be using a tempdir, but to make absolutely certain we don't overflow the disk...
   info!("Done uploading; deleting temporary files and paths...");
   safe_delete_temp_file(&original_model_file_path);
-  safe_delete_temp_file(&onnx_model_file_path);
+  safe_delete_temp_file(&output_wav_path);
   safe_delete_temp_directory(&temp_dir);
 
   // ==================== SAVE RECORDS ==================== //

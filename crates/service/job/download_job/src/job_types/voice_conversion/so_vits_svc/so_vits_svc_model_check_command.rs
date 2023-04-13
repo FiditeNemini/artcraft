@@ -31,17 +31,20 @@ pub enum Device {
 }
 
 pub struct CheckArgs<P: AsRef<Path>> {
-  /// --input-path: model path
+  /// --model-path: model path
+  pub model_path: P,
+
+  /// (positional arg): input wav path
   pub input_path: P,
 
   /// --config-path: path of the hparams json file
   pub config_path: P,
 
-  /// --device: cpu or cuda
-  pub device: Device,
-
   /// --output_path: output path of converting model to onnx (which we use to test validity)
   pub output_path: P,
+
+  /// --device: cpu or cuda
+  pub device: Device,
 }
 
 impl SoVitsSvcModelCheckCommand {
@@ -110,28 +113,21 @@ impl SoVitsSvcModelCheckCommand {
       command.push_str(" ");
     }
 
-    //let python_binary = self.maybe_override_python_interpreter
-    //    .as_deref()
-    //    .unwrap_or("python");
-
-    //command.push_str(" && ");
-    //command.push_str(python_binary);
-    //command.push_str(" ");
-
+    // NB: We can't use `onnx` for model integrity checking (that might take long anyway), so
+    // we'll just run inference instead. That's flexible and works.
     command.push_str(" && ");
     command.push_str(&path_to_string(&self.check_script_name));
-    command.push_str(" onnx "); // NB: Onnx command to check model validity
+    command.push_str(" infer ");
 
     // ===== Begin Python Args =====
 
-    command.push_str(" --input-path ");
-    command.push_str(&path_to_string(args.input_path));
+    command.push_str(" --model_path ");
+    command.push_str(&path_to_string(args.model_path));
+    command.push_str(" --output-path ");
+    command.push_str(&path_to_string(args.output_path));
 
     command.push_str(" --config-path ");
     command.push_str(&path_to_string(args.config_path));
-
-    command.push_str(" --output-path ");
-    command.push_str(&path_to_string(args.output_path));
 
     let device = match args.device {
       Device::Cuda => "cuda",
@@ -140,6 +136,11 @@ impl SoVitsSvcModelCheckCommand {
 
     command.push_str(" --device ");
     command.push_str(&path_to_string(device));
+
+    // NB: Input wav path is not a named arg
+    command.push_str(" ");
+    command.push_str(&path_to_string(args.input_path));
+    command.push_str(" ");
 
     // ===== End Python Args =====
 
