@@ -7,15 +7,16 @@ use strum::IntoEnumIterator;
 pub enum LevelOption {
   BlankBlue,
   BlankRed,
-  NewsStation,
+  FakeCnn,
   FantasyStorytelling,
+  CartoonNewsStation,
   VirtualMusician,
   AiUpscaledDeepFake,
 }
 
 impl Default for LevelOption {
   fn default() -> Self {
-    Self::BlankBlue
+    Self::FakeCnn
   }
 }
 
@@ -24,8 +25,9 @@ impl LevelOption {
     match self {
       Self::BlankBlue => "Blank (Blue)",
       Self::BlankRed => "Blank (Red)",
-      Self::NewsStation => "News Station",
+      Self::FakeCnn => "Fake CNN",
       Self::FantasyStorytelling => "Fantasy Storytelling",
+      Self::CartoonNewsStation => "Cartoon News Station",
       Self::VirtualMusician => "Virtual Musician",
       Self::AiUpscaledDeepFake => "AI Upscaled Deep Fake (Unreal -> DeepFaceLive)",
     }
@@ -35,7 +37,8 @@ impl LevelOption {
     match self {
       Self::BlankBlue => "blank_blue",
       Self::BlankRed => "blank_red",
-      Self::NewsStation => "news_station",
+      Self::FakeCnn => "fake_cnn",
+      Self::CartoonNewsStation => "cartoon_news_station",
       Self::FantasyStorytelling => "fantasy_storytelling",
       Self::VirtualMusician => "virtual_musician",
       Self::AiUpscaledDeepFake => "ai_upscaled_deep_fake",
