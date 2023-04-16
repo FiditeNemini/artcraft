@@ -71,13 +71,13 @@ pub async fn process_so_vits_svc_model<'a, 'b>(
 
   // ==================== UPLOAD ORIGINAL MODEL FILE ==================== //
 
-  info!("Uploading VITS TTS model to GCS...");
+  info!("Uploading so-vits-svc voice conversion model to GCS...");
 
   let private_bucket_hash = sha256_hash_file(&download_filename)?;
 
   info!("File hash: {}", private_bucket_hash);
 
-  let model_bucket_path = job_state.bucket_path_unifier.tts_synthesizer_path(&private_bucket_hash);
+  let model_bucket_path = job_state.bucket_path_unifier.so_vits_svc_model_path(&private_bucket_hash);
 
   info!("Destination bucket path: {:?}", &model_bucket_path);
 

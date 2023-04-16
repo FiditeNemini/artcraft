@@ -19,6 +19,7 @@ pub struct BucketPathUnifier {
   pub w2l_end_bump_root: PathBuf,
   // VC
   pub softvc_model_root: PathBuf,
+  pub so_vits_svc_model_root: PathBuf,
 }
 
 impl BucketPathUnifier {
@@ -38,6 +39,7 @@ impl BucketPathUnifier {
       w2l_end_bump_root: PathBuf::from("/w2l_end_bumps"),
       // VC
       softvc_model_root: PathBuf::from("/user_uploaded_softvc_models"),
+      so_vits_svc_model_root: PathBuf::from("/user_uploaded_so_vits_svc_models"),
     }
   }
 
@@ -203,6 +205,16 @@ impl BucketPathUnifier {
         .join(model_filename)
   }
 
+  // NB: Callers use "hash_file_sha2" as the file hash.
+  pub fn so_vits_svc_model_path(&self, so_vits_svc_model_file_hash: &str) -> PathBuf {
+    let hashed_path = Self::hashed_directory_path(so_vits_svc_model_file_hash);
+    let model_filename = format!("{}.pt", &so_vits_svc_model_file_hash);
+
+    self.so_vits_svc_model_root
+        .join(hashed_path)
+        .join(model_filename)
+  }
+
   // ==================== UTILITY ==================== //
 
   pub fn hashed_directory_path(file_hash: &str) -> String {
@@ -230,6 +242,7 @@ mod tests {
       w2l_end_bump_root: PathBuf::from("/test_path_w2l_end_bumps"),
       // VOICE CONVERSION
       softvc_model_root: PathBuf::from("/test_path_softvc_models"),
+      so_vits_svc_model_root: PathBuf::from("/test_path_so_vits_svc_models"),
     }
   }
 
@@ -335,6 +348,13 @@ mod tests {
     let paths = get_instance();
     assert_eq!(paths.softvc_model_path("foobar").to_str().unwrap(),
                "/test_path_softvc_models/f/o/o/foobar.pt");
+  }
+
+  #[test]
+  fn test_so_vits_svc_model_path() {
+    let paths = get_instance();
+    assert_eq!(paths.so_vits_svc_model_path("foobar").to_str().unwrap(),
+               "/test_path_so_vits_svc_models/f/o/o/foobar.pt");
   }
 
   #[test]
