@@ -7,6 +7,7 @@ use tokens::tokens::tts_models::TtsModelToken;
 #[derive(Copy, Clone, Eq, PartialEq, Debug)]
 #[derive(EnumIter)]
 pub enum FakeYouVoiceOption {
+  AndersonCooper,
   HanashiV3,
   HanashiV2,
   // NB: Hanashi v1 has strokes.
@@ -17,7 +18,7 @@ pub enum FakeYouVoiceOption {
 
 impl Default for FakeYouVoiceOption {
   fn default() -> Self {
-    Self::HanashiV3
+    Self::AndersonCooper
   }
 }
 
@@ -25,6 +26,7 @@ impl FakeYouVoiceOption {
 
   pub fn variant_name(&self) -> &'static str {
     match self {
+      FakeYouVoiceOption::AndersonCooper => "Anderson Cooper",
       FakeYouVoiceOption::HanashiV3 => "Hanashi (v3)",
       FakeYouVoiceOption::HanashiV2 => "Hanashi (v2)",
       FakeYouVoiceOption::HanashiV1 => "Hanashi (v1)",
@@ -34,6 +36,7 @@ impl FakeYouVoiceOption {
 
   pub fn tts_model_token_str(&self) -> &'static str {
     match self {
+      FakeYouVoiceOption::AndersonCooper => "TM:5mk6h46emvhk",
       FakeYouVoiceOption::HanashiV3 => "TM:5hc38cg7cdtm",
       FakeYouVoiceOption::HanashiV2 => "TM:zcd4qzrwacq0",
       FakeYouVoiceOption::HanashiV1 => "TM:npxv6rgtddmv",
