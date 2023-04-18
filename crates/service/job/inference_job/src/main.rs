@@ -29,7 +29,8 @@ use container_common::anyhow_result::AnyhowResult;
 use container_common::filesystem::check_directory_exists::check_directory_exists;
 use crate::job::job_loop::job_stats::JobStats;
 use crate::job::job_loop::main_loop::main_loop;
-use crate::job::job_types::tts::tacotron2_v2_early_fakeyou::tacotron_inference_command::TacotronInferenceCommand;
+use crate::job::job_types::tts::tacotron2_v2_early_fakeyou::tacotron2_inference_command::Tacotron2InferenceCommand;
+use crate::job::job_types::tts::vits::vits_inference_command::VitsInferenceCommand;
 use crate::job_dependencies::{JobCaches, JobDependencies, JobTypeDetails, JobWorkerDetails, Tacotron2VocodesDetails, VitsDetails};
 use crate::util::scoped_temp_dir_creator::ScopedTempDirCreator;
 use jobs_common::job_progress_reporter::job_progress_reporter::JobProgressReporterBuilder;
@@ -46,7 +47,6 @@ use sqlx::mysql::MySqlPoolOptions;
 use std::path::PathBuf;
 use std::time::Duration;
 use subprocess_common::docker_options::{DockerEnvVar, DockerFilesystemMount, DockerGpu, DockerOptions};
-use crate::job::job_types::tts::vits::vits_inference_command::VitsInferenceCommand;
 
 // Buckets (shared config)
 const ENV_ACCESS_KEY : &'static str = "ACCESS_KEY";
@@ -59,10 +59,6 @@ const ENV_PUBLIC_BUCKET_NAME : &'static str = "PUBLIC_BUCKET_NAME";
 
 // Where models and other assets get downloaded to.
 const ENV_SEMIPERSISTENT_CACHE_DIR : &'static str = "SEMIPERSISTENT_CACHE_DIR";
-
-// Python code
-const ENV_CODE_DIRECTORY : &'static str = "TTS_CODE_DIRECTORY";
-const ENV_INFERENCE_SCRIPT_NAME : &'static str = "TTS_INFERENCE_SCRIPT_NAME";
 
 // HTTP sidecar
 const ENV_TTS_INFERENCE_SIDECAR_HOSTNAME: &'static str = "TTS_INFERENCE_SIDECAR_HOSTNAME";
@@ -137,14 +133,6 @@ async fn main() -> AnyhowResult<()> {
     None,
     Some(bucket_timeout),
   )?;
-
-  let py_code_directory = easyenv::get_env_string_required(ENV_CODE_DIRECTORY)?;
-  let py_script_name = easyenv::get_env_string_required(ENV_INFERENCE_SCRIPT_NAME)?;
-
-  let tts_inference_command = TacotronInferenceCommand::new(
-    &py_code_directory,
-    &py_script_name,
-  );
 
   let temp_directory = easyenv::get_env_string_or_default(
     "DOWNLOAD_TEMP_DIR",
@@ -248,7 +236,6 @@ async fn main() -> AnyhowResult<()> {
     job_progress_reporter,
     public_bucket_client,
     private_bucket_client,
-    tts_inference_command,
     job_stats: JobStats::new(),
     newrelic_client,
     newrelic_disabled,
@@ -274,7 +261,7 @@ async fn main() -> AnyhowResult<()> {
     maybe_minimum_priority,
     job_type_details: JobTypeDetails {
       tacotron2_old_vocodes: Tacotron2VocodesDetails {
-        maybe_docker_image_sha: easyenv::get_env_string_optional("TACOTRON2_VOCODES_DOCKER_IMAGE_SHA"),
+        inference_command: Tacotron2InferenceCommand::from_env()?,
         waveglow_vocoder_model_filename,
         hifigan_vocoder_model_filename,
         hifigan_superres_vocoder_model_filename,

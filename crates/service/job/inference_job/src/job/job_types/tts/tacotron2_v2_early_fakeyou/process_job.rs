@@ -234,34 +234,8 @@ pub async fn process_job(args: ProcessJobArgs<'_>) -> Result<JobSuccessResult, P
   //  roughly 12 seconds max. Here we map seconds to decoder steps.
   let max_decoder_steps = seconds_to_decoder_steps(job.max_duration_seconds);
 
-  // NB: Docker options are for development, not production.
-  let mut maybe_docker_options = None;
-
-  if let Some(docker_sha) = args.job_dependencies.job_type_details.tacotron2_old_vocodes.maybe_docker_image_sha.as_deref() {
-    maybe_docker_options = Some(DockerOptions {
-      image_name: docker_sha.to_string(),
-      maybe_bind_mount: Some(DockerFilesystemMount {
-        local_filesystem: "/tmp".to_string(),
-        container_filesystem: "/tmp".to_string(),
-      }),
-      maybe_environment_variables: None,
-      maybe_gpu: Some(DockerGpu::All),
-    })
-  }
-
   // ==================== RUN INFERENCE SCRIPT ==================== //
 
-  let tacotron_code_root_directory = "/models/tts";
-  //let python = Some("python3");
-  let python = None;
-
-  let inference_command = Tacotron2InferenceCommand::new(
-    tacotron_code_root_directory,
-    python,
-    Some("source python/bin/activate"),
-    "vocodes_inference_updated.py",
-    maybe_docker_options,
-  );
 
   let mut maybe_mel_multiply_factor = None;
 
@@ -271,7 +245,7 @@ pub async fn process_job(args: ProcessJobArgs<'_>) -> Result<JobSuccessResult, P
     maybe_mel_multiply_factor = Some(MelMultiplyFactor::DefaultMultiplyFactor);
   }
 
-  let _r = inference_command.execute_inference(InferenceArgs {
+  let _r = args.job_dependencies.job_type_details.tacotron2_old_vocodes.inference_command.execute_inference(InferenceArgs {
     synthesizer_checkpoint_path: &tts_synthesizer_fs_path,
     text_pipeline_type: text_pipeline_type_or_guess.to_str(),
     vocoder: vocoder_option,

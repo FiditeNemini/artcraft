@@ -1,7 +1,8 @@
 use cloud_storage::bucket_client::BucketClient;
 use cloud_storage::bucket_path_unifier::BucketPathUnifier;
 use crate::job::job_loop::job_stats::JobStats;
-use crate::job::job_types::tts::tacotron2_v2_early_fakeyou::tacotron_inference_command::TacotronInferenceCommand;
+use crate::job::job_types::tts::tacotron2_v2_early_fakeyou::tacotron2_inference_command::Tacotron2InferenceCommand;
+use crate::job::job_types::tts::vits::vits_inference_command::VitsInferenceCommand;
 use crate::util::scoped_temp_dir_creator::ScopedTempDirCreator;
 use jobs_common::job_progress_reporter::job_progress_reporter::JobProgressReporterBuilder;
 use jobs_common::semi_persistent_cache_dir::SemiPersistentCacheDir;
@@ -13,7 +14,6 @@ use r2d2_redis::RedisConnectionManager;
 use r2d2_redis::r2d2;
 use sqlx::MySqlPool;
 use std::path::PathBuf;
-use crate::job::job_types::tts::vits::vits_inference_command::VitsInferenceCommand;
 
 pub struct JobDependencies {
   pub download_temp_directory: PathBuf,
@@ -39,8 +39,6 @@ pub struct JobDependencies {
   pub semi_persistent_cache: SemiPersistentCacheDir,
 
   pub job_stats: JobStats,
-
-  pub tts_inference_command: TacotronInferenceCommand,
 
   pub newrelic_client: NewRelicClient,
 
@@ -123,7 +121,7 @@ pub struct JobTypeDetails {
 
 /// "Old" TT2 (vocodes-era)
 pub struct Tacotron2VocodesDetails {
-  pub maybe_docker_image_sha: Option<String>,
+  pub inference_command: Tacotron2InferenceCommand,
 
   /// Common pretrained waveglow vocoder filename
   pub waveglow_vocoder_model_filename: String,

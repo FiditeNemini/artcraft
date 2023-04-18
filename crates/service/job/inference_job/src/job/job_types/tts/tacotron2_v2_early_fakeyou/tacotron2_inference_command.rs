@@ -3,7 +3,7 @@ use filesys::path_to_string::path_to_string;
 use log::info;
 use std::path::{Path, PathBuf};
 use subprocess::{Popen, PopenConfig};
-use subprocess_common::docker_options::DockerOptions;
+use subprocess_common::docker_options::{DockerFilesystemMount, DockerGpu, DockerOptions};
 
 /// This command is used to run tacotron2 (v1 "early fakeyou") inference
 #[derive(Clone)]
@@ -43,46 +43,40 @@ pub enum MelMultiplyFactor {
 }
 
 pub struct InferenceArgs <'a, P: AsRef<Path>> {
-  //# Model parameters
-  //parser.add_argument('--synthesizer_checkpoint_path', type=str, help='path the TTS synthesizer model', required=True)
-  //parser.add_argument('--text_pipeline_type', type=str, help='', required=True)
-  //parser.add_argument('--vocoder_type', type=str, help='', required=True)
-  //parser.add_argument('--waveglow_vocoder_checkpoint_path', type=str, help='path the TTS vocoder model')
-  //parser.add_argument('--hifigan_vocoder_checkpoint_path', type=str, help='path the TTS vocoder model')
-  //parser.add_argument('--hifigan_superres_vocoder_checkpoint_path', type=str, help='path the TTS vocoder model')
+  // Model parameters
 
+  /// Arg: --synthesizer_checkpoint_path
   pub synthesizer_checkpoint_path: P,
+
+  /// Arg: --text_pipeline_type
   pub text_pipeline_type: &'a str, // TODO: Enum
 
+  /// Arg: --vocoder_type
   pub vocoder: VocoderForInferenceOption<P>,
 
-  //pub vocoder_type: &'a str,
-  //pub waveglow_vocoder_checkpoint_path: Option<P>,
-  //pub hifigan_vocoder_checkpoint_path: Optin<P>,
-  //pub hifigan_superres_vocoder_checkpoint_path: Option<P>,
-
-  //# Optional mel scaling before vocoding
-  //parser.add_argument('--use_default_mel_multiply_factor', type=bool, help='', action='store_true')
-  //parser.add_argument('--maybe_custom_mel_multiply_factor', type=int, help='')
-  //pub use_default_mel_multiply_factor: bool,
-  //pub maybe_custom_mel_multiply_factor: Option<f32>,
+  /// Optional mel scaling before vocoding
+  /// Args: --use_default_mel_multiply_factor and --maybe_custom_mel_multiply_factor
   pub maybe_mel_multiply_factor: Option<MelMultiplyFactor>,
 
-  //# Premium features
-  //parser.add_argument('--max_decoder_steps', type=int, help='')
+  // Premium features
+
+  /// Arg: --max_decoder_steps, determines inference length
   pub max_decoder_steps: u32,
 
-  //# User input
-  //parser.add_argument('--input_text_filename', type=str, help='path the file containing text to run', required=True)
+  // User input
+
+  /// Arg: input_text_filename, path to file containing text to run inference on
   pub input_text_filename: P,
 
-  //# Output files
-  //parser.add_argument('--output_audio_filename', type=str, help='where to save result audio', required=True)
-  //parser.add_argument('--output_spectrogram_filename', type=str, help='where to save result spectrogram', required=True)
-  //parser.add_argument('--output_metadata_filename', type=str, help='where to save extra metadata', required=True)
+  // Output files
 
+  /// Arg: --output_audio_filename, where to save audio result
   pub output_audio_filename: P,
+
+  /// Arg: --output_spectrogram_filename, where to save spectrogram result
   pub output_spectrogram_filename: P,
+
+  /// Arg: --output_metadata_filename, where to save extra metadata
   pub output_metadata_filename: P,
 }
 
@@ -101,6 +95,40 @@ impl Tacotron2InferenceCommand {
       inference_script_name: inference_script_name.as_ref().to_path_buf(),
       maybe_docker_options,
     }
+  }
+
+  pub fn from_env() -> AnyhowResult<Self> {
+    let root_code_directory = easyenv::get_env_pathbuf_required(
+      "TT2_LEGACY_ROOT_DIRECTORY")?;
+
+    let inference_script_name = easyenv::get_env_pathbuf_or_default(
+      "TT2_LEGACY_INFERENCE_SCRIPT",
+      "vocodes_inference_updated.py");
+
+    let maybe_virtual_env_activation_command = easyenv::get_env_string_optional(
+      "TT2_LEGACY_MAYBE_VENV_ACTIVATION_COMMAND");
+
+    let maybe_override_python_interpreter = easyenv::get_env_string_optional(
+      "TT2_LEGACY_MAYBE_PYTHON_INTERPRETER");
+
+    let maybe_docker_options = easyenv::get_env_string_optional(
+      "TT2_LEGACY_MAYBE_DOCKER_IMAGE_SHA")
+        .map(|image_name| {
+          DockerOptions {
+            image_name,
+            maybe_bind_mount: Some(DockerFilesystemMount::tmp_to_tmp()),
+            maybe_environment_variables: None,
+            maybe_gpu: Some(DockerGpu::All),
+          }
+        });
+
+    Ok(Self {
+      tacotron_code_root_directory: root_code_directory,
+      inference_script_name,
+      maybe_virtual_env_activation_command,
+      maybe_override_python_interpreter,
+      maybe_docker_options,
+    })
   }
 
   pub fn execute_inference<P: AsRef<Path>>(
