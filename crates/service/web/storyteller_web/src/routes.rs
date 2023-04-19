@@ -529,7 +529,7 @@ fn add_web_vc_routes<T, B> (app: App<T, B>) -> App<T, B>
               .route(web::head().to(|| HttpResponse::Ok()))
         )
         .service(
-          web::resource("/model/list")
+          web::resource("/model_list")
               .route(web::get().to(list_voice_conversion_models_handler))
               .route(web::head().to(|| HttpResponse::Ok()))
         )

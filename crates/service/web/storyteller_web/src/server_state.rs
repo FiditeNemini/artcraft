@@ -6,6 +6,7 @@ use crate::http_server::endpoints::categories::tts::list_fully_computed_assigned
 use crate::http_server::endpoints::categories::tts::list_tts_categories::DisplayCategory;
 use crate::http_server::endpoints::leaderboard::get_leaderboard::LeaderboardInfo;
 use crate::http_server::endpoints::tts::list_tts_models::TtsModelRecordForResponse;
+use crate::http_server::endpoints::voice_conversion::models::list_voice_conversion_models::VoiceConversionModel;
 use crate::http_server::web_utils::redis_rate_limiter::RedisRateLimiter;
 use crate::threads::db_health_checker_thread::db_health_check_status::HealthCheckStatus;
 use crate::util::encrypted_sort_id::SortKeyCrypto;
@@ -24,7 +25,6 @@ use sqlx::MySqlPool;
 use url_config::third_party_url_redirector::ThirdPartyUrlRedirector;
 use users_component::utils::session_checker::SessionChecker;
 use users_component::utils::session_cookie_manager::SessionCookieManager;
-use crate::http_server::endpoints::voice_conversion::models::list_voice_conversion_models::VoiceConversionModel;
 
 /// State that is injected into every endpoint.
 pub struct ServerState {
@@ -187,7 +187,7 @@ pub struct StaticFeatureFlags {
   /// Disable the live `/tts/list` endpoint for all users and serve a static value instead.
   pub disable_tts_model_list_endpoint: bool,
 
-  /// Disable the live `/v1/voice_conversion/model/list` endpoint for all users and serve a static value instead.
+  /// Disable the live `/v1/voice_conversion/model_list` endpoint for all users and serve a static value instead.
   pub disable_voice_conversion_model_list_endpoint: bool,
 
   /// Tell the frontend client how fast to refresh their view of the pending inference count.
