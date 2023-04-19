@@ -23,6 +23,7 @@ use crate::http_server::endpoints::download_job::get_generic_upload_job_status::
 use crate::http_server::endpoints::events::list_events::list_events_handler;
 use crate::http_server::endpoints::flags::design_refresh_flag::disable_design_refresh_flag_handler::disable_design_refresh_flag_handler;
 use crate::http_server::endpoints::flags::design_refresh_flag::enable_design_refresh_flag_handler::enable_design_refresh_flag_handler;
+use crate::http_server::endpoints::inference_job::get_inference_job_status::get_inference_job_status_handler;
 use crate::http_server::endpoints::inference_job::get_pending_inference_job_count::get_pending_inference_job_count_handler;
 use crate::http_server::endpoints::investor_demo::disable_demo_mode_handler::disable_demo_mode_handler;
 use crate::http_server::endpoints::investor_demo::enable_demo_mode_handler::enable_demo_mode_handler;
@@ -92,6 +93,7 @@ use crate::http_server::endpoints::vocoders::list_vocoders::list_vocoders_handle
 use crate::http_server::endpoints::voice_clone_requests::check_if_voice_clone_request_submitted::check_if_voice_clone_request_submitted_handler;
 use crate::http_server::endpoints::voice_clone_requests::create_voice_clone_request::create_voice_clone_request_handler;
 use crate::http_server::endpoints::voice_conversion::inference::enqueue_voice_conversion_inference::enqueue_voice_conversion_inference_handler;
+use crate::http_server::endpoints::voice_conversion::models::list_voice_conversion_models::list_voice_conversion_models_handler;
 use crate::http_server::endpoints::w2l::delete_w2l_result::delete_w2l_inference_result_handler;
 use crate::http_server::endpoints::w2l::delete_w2l_template::delete_w2l_template_handler;
 use crate::http_server::endpoints::w2l::edit_w2l_result::edit_w2l_inference_result_handler;
@@ -111,7 +113,6 @@ use crate::http_server::endpoints::w2l::set_w2l_template_mod_approval::set_w2l_t
 use users_component::default_routes::add_suggested_api_v1_account_creation_and_session_routes;
 use users_component::endpoints::edit_profile_handler::edit_profile_handler;
 use users_component::endpoints::get_profile_handler::get_profile_handler;
-use crate::http_server::endpoints::inference_job::get_inference_job_status::get_inference_job_status_handler;
 
 pub fn add_routes<T, B> (app: App<T, B>) -> App<T, B>
   where
@@ -527,14 +528,14 @@ fn add_web_vc_routes<T, B> (app: App<T, B>) -> App<T, B>
               .route(web::post().to(enqueue_voice_conversion_inference_handler))
               .route(web::head().to(|| HttpResponse::Ok()))
         )
+        .service(
+          web::resource("/model/list")
+              .route(web::get().to(list_voice_conversion_models_handler))
+              .route(web::head().to(|| HttpResponse::Ok()))
+        )
         //.service(
         //  web::resource("/upload")
         //      .route(web::post().to(upload_w2l_template_handler))
-        //      .route(web::head().to(|| HttpResponse::Ok()))
-        //)
-        //.service(
-        //  web::resource("/list")
-        //      .route(web::get().to(list_w2l_templates_handler))
         //      .route(web::head().to(|| HttpResponse::Ok()))
         //)
         //.service(

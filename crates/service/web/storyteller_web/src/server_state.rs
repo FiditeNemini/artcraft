@@ -24,6 +24,7 @@ use sqlx::MySqlPool;
 use url_config::third_party_url_redirector::ThirdPartyUrlRedirector;
 use users_component::utils::session_checker::SessionChecker;
 use users_component::utils::session_cookie_manager::SessionCookieManager;
+use crate::http_server::endpoints::voice_conversion::models::list_voice_conversion_models::VoiceConversionModel;
 
 /// State that is injected into every endpoint.
 pub struct ServerState {
@@ -132,8 +133,11 @@ pub struct RedisRateLimiters {
 /// In-memory caches with TTL-based eviction.
 #[derive(Clone)]
 pub struct InMemoryCaches {
-  /// Contains a list of all voices.
-  pub voice_list: SingleItemTtlCache<Vec<TtsModelRecordForResponse>>,
+  /// Contains a list of all TTS models.
+  pub tts_model_list: SingleItemTtlCache<Vec<TtsModelRecordForResponse>>,
+
+  /// Contains a list of all voice conversion models.
+  pub voice_conversion_model_list: SingleItemTtlCache<Vec<VoiceConversionModel>>,
 
   /// Contains a list of all W2L templates.
   pub w2l_template_list: SingleItemTtlCache<Vec<W2lTemplateRecordForList>>,
@@ -182,6 +186,9 @@ pub struct StaticFeatureFlags {
 
   /// Disable the live `/tts/list` endpoint for all users and serve a static value instead.
   pub disable_tts_model_list_endpoint: bool,
+
+  /// Disable the live `/v1/voice_conversion/model/list` endpoint for all users and serve a static value instead.
+  pub disable_voice_conversion_model_list_endpoint: bool,
 
   /// Tell the frontend client how fast to refresh their view of the pending inference count.
   /// During an attack, we may want this to go extremely slow.

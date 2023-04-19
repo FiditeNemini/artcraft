@@ -377,6 +377,7 @@ async fn main() -> AnyhowResult<()> {
     disable_inference_queue_length_endpoint: easyenv::get_env_bool_or_default("FF_DISABLE_INFERENCE_QUEUE_LENGTH_ENDPOINT", false),
     disable_tts_queue_length_endpoint: easyenv::get_env_bool_or_default("FF_DISABLE_TTS_QUEUE_LENGTH_ENDPOINT", false),
     disable_tts_model_list_endpoint: easyenv::get_env_bool_or_default("FF_DISABLE_TTS_MODEL_LIST_ENDPOINT", false),
+    disable_voice_conversion_model_list_endpoint: easyenv::get_env_bool_or_default("FF_DISABLE_VOICE_CONVERSION_MODEL_LIST_ENDPOINT", false),
     frontend_pending_inference_refresh_interval_millis: easyenv::get_env_num("FF_FRONTEND_PENDING_INFERENCE_REFRESH_INTERVAL_MILLIS", 15_000)?,
     frontend_pending_tts_refresh_interval_millis: easyenv::get_env_num("FF_FRONTEND_PENDING_TTS_REFRESH_INTERVAL_MILLIS", 15_000)?,
     troll_ban_user_percent: easyenv::get_env_num("FF_TROLL_BANNED_USER_PERCENT", 0)?,
@@ -438,7 +439,11 @@ async fn main() -> AnyhowResult<()> {
     sort_key_crypto,
     static_api_token_set,
     caches: InMemoryCaches {
-      voice_list: voice_list_cache,
+      tts_model_list: voice_list_cache,
+      voice_conversion_model_list: SingleItemTtlCache::create_with_duration(
+        easyenv::get_env_duration_seconds_or_default(
+          "VOICE_CONVERSION_MODEL_LIST_CACHE_TTL_SECONDS",
+          Duration::from_secs(60))),
       w2l_template_list: w2l_template_cache,
       database_tts_category_list: database_tts_category_list_cache,
       tts_queue_length: tts_queue_length_cache,

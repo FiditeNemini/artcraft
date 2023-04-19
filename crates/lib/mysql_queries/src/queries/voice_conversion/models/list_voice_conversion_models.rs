@@ -1,0 +1,193 @@
+use anyhow::anyhow;
+use chrono::{DateTime, Utc};
+use crate::helpers::boolean_converters::i8_to_bool;
+use enums::by_table::voice_conversion_models::voice_conversion_model_type::VoiceConversionModelType;
+use enums::common::visibility::Visibility;
+use errors::AnyhowResult;
+use log::{warn, info};
+use sqlx::pool::PoolConnection;
+use sqlx::{MySql, MySqlPool};
+use tokens::users::user::UserToken;
+use tokens::voice_conversion::model::VoiceConversionModelToken;
+
+#[derive(Serialize)]
+pub struct VoiceConversionModelRecordForList {
+  pub token: VoiceConversionModelToken,
+  pub model_type: VoiceConversionModelType,
+
+  pub title: String,
+
+  pub ietf_language_tag: String,
+  pub ietf_primary_language_subtag: String,
+
+  pub creator_user_token: UserToken,
+  pub creator_username: String,
+  pub creator_display_name: String,
+  pub creator_gravatar_hash: String,
+
+  pub is_front_page_featured: bool,
+
+  // TODO(bt, 2023-04-18): Need columns for ratings
+  //pub user_ratings_positive_count: u32,
+  //pub user_ratings_negative_count: u32,
+  //pub user_ratings_total_count: u32, // NB: Does not include "neutral" ratings.
+
+  pub creator_set_visibility: Visibility,
+
+  pub created_at: DateTime<Utc>,
+  pub updated_at: DateTime<Utc>,
+}
+
+// FIXME: This is the old style of query scoping and shouldn't be copied.
+
+pub async fn list_voice_conversion_models(
+  mysql_pool: &MySqlPool,
+  scope_creator_username: Option<&str>,
+) -> AnyhowResult<Vec<VoiceConversionModelRecordForList>> {
+  let mut connection = mysql_pool.acquire().await?;
+  list_voice_conversion_models_with_connection(&mut connection, scope_creator_username).await
+}
+
+pub async fn list_voice_conversion_models_with_connection(
+  mysql_connection: &mut PoolConnection<MySql>,
+  scope_creator_username: Option<&str>,
+) -> AnyhowResult<Vec<VoiceConversionModelRecordForList>> {
+
+  let maybe_models = match scope_creator_username {
+    Some(username) => {
+      list_voice_conversion_models_creator_scoped(mysql_connection, username)
+        .await
+    },
+    None => {
+      list_voice_conversion_models_for_all_creators(mysql_connection)
+        .await
+    },
+  };
+
+  let models : Vec<RawVoiceConversionModelRecord> = match maybe_models {
+    Ok(models) => models,
+    Err(err) => {
+      match err {
+        RowNotFound => {
+          return Ok(Vec::new());
+        },
+        _ => {
+          warn!("vc model list query error: {:?}", err);
+          return Err(anyhow!("vc model list query error"));
+        }
+      }
+    }
+  };
+
+  Ok(models.into_iter()
+    .map(|model| {
+      VoiceConversionModelRecordForList {
+        token: model.token,
+        model_type: model.model_type,
+        creator_user_token: model.creator_user_token,
+        creator_username: model.creator_username,
+        creator_display_name: model.creator_display_name,
+        creator_gravatar_hash: model.creator_gravatar_hash,
+        title: model.title,
+        ietf_language_tag: model.ietf_language_tag,
+        ietf_primary_language_subtag: model.ietf_primary_language_subtag,
+        is_front_page_featured: i8_to_bool(model.is_front_page_featured),
+        creator_set_visibility: model.creator_set_visibility,
+        created_at: model.created_at,
+        updated_at: model.updated_at,
+      }
+    })
+    .collect::<Vec<VoiceConversionModelRecordForList>>())
+}
+
+async fn list_voice_conversion_models_for_all_creators(
+  mysql_connection: &mut PoolConnection<MySql>,
+) -> AnyhowResult<Vec<RawVoiceConversionModelRecord>> {
+  Ok(sqlx::query_as!(
+      RawVoiceConversionModelRecord,
+        r#"
+SELECT
+    vc.token as `token: tokens::voice_conversion::model::VoiceConversionModelToken`,
+    vc.model_type as `model_type: enums::by_table::voice_conversion_models::voice_conversion_model_type::VoiceConversionModelType`,
+    vc.creator_user_token as `creator_user_token: tokens::users::user::UserToken`,
+    users.username as creator_username,
+    users.display_name as creator_display_name,
+    users.email_gravatar_hash as creator_gravatar_hash,
+    vc.title,
+    vc.ietf_language_tag,
+    vc.ietf_primary_language_subtag,
+    vc.is_front_page_featured,
+    vc.creator_set_visibility as `creator_set_visibility: enums::common::visibility::Visibility`,
+    vc.created_at,
+    vc.updated_at
+FROM voice_conversion_models as vc
+JOIN users
+    ON users.token = vc.creator_user_token
+WHERE
+    vc.user_deleted_at IS NULL
+    AND vc.mod_deleted_at IS NULL
+        "#)
+      .fetch_all(mysql_connection)
+      .await?)
+}
+
+async fn list_voice_conversion_models_creator_scoped(
+  mysql_connection: &mut PoolConnection<MySql>,
+  scope_creator_username: &str,
+) -> AnyhowResult<Vec<RawVoiceConversionModelRecord>> {
+  Ok(sqlx::query_as!(
+      RawVoiceConversionModelRecord,
+        r#"
+SELECT
+    vc.token as `token: tokens::voice_conversion::model::VoiceConversionModelToken`,
+    vc.model_type as `model_type: enums::by_table::voice_conversion_models::voice_conversion_model_type::VoiceConversionModelType`,
+    vc.creator_user_token as `creator_user_token: tokens::users::user::UserToken`,
+    users.username as creator_username,
+    users.display_name as creator_display_name,
+    users.email_gravatar_hash as creator_gravatar_hash,
+    vc.title,
+    vc.ietf_language_tag,
+    vc.ietf_primary_language_subtag,
+    vc.is_front_page_featured,
+    vc.creator_set_visibility as `creator_set_visibility: enums::common::visibility::Visibility`,
+    vc.created_at,
+    vc.updated_at
+FROM voice_conversion_models as vc
+JOIN users
+    ON users.token = vc.creator_user_token
+WHERE
+    users.username = ?
+    AND vc.user_deleted_at IS NULL
+    AND vc.mod_deleted_at IS NULL
+        "#,
+      scope_creator_username)
+      .fetch_all(mysql_connection)
+      .await?)
+}
+
+struct RawVoiceConversionModelRecord {
+  pub token: VoiceConversionModelToken,
+  pub model_type: VoiceConversionModelType,
+
+  pub title: String,
+
+  pub ietf_language_tag: String,
+  pub ietf_primary_language_subtag: String,
+
+  pub creator_user_token: UserToken,
+  pub creator_username: String,
+  pub creator_display_name: String,
+  pub creator_gravatar_hash: String,
+
+  pub is_front_page_featured: i8, // bool
+
+  // TODO(bt, 2023-04-18): Need columns for ratings
+  //pub user_ratings_positive_count: u32,
+  //pub user_ratings_negative_count: u32,
+  //pub user_ratings_total_count: u32, // NB: Does not include "neutral" ratings.
+
+  pub creator_set_visibility: Visibility,
+
+  pub created_at: DateTime<Utc>,
+  pub updated_at: DateTime<Utc>,
+}

@@ -9,75 +9,83 @@ use actix_web::{web, HttpResponse, HttpRequest};
 use chrono::{DateTime, Utc};
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::server_state::ServerState;
+use enums::by_table::voice_conversion_models::voice_conversion_model_type::VoiceConversionModelType;
 use enums::common::visibility::Visibility;
 use errors::AnyhowResult;
 use lexical_sort::natural_lexical_cmp;
-use log::{info, warn, error};
-use mysql_queries::queries::tts::tts_category_assignments::fetch_and_build_tts_model_category_map::fetch_and_build_tts_model_category_map_with_connection;
-use mysql_queries::queries::tts::tts_models::list_tts_models::list_tts_models_with_connection;
+use log::{warn, error, debug};
 use mysql_queries::queries::users::user_sessions::get_user_session_by_token::SessionUserRecord;
+use mysql_queries::queries::voice_conversion::models::list_voice_conversion_models::list_voice_conversion_models_with_connection;
 use sqlx::MySql;
 use sqlx::pool::PoolConnection;
-use std::collections::HashSet;
 use std::fmt;
 use std::sync::Arc;
+use tokens::users::user::UserToken;
+use tokens::voice_conversion::model::VoiceConversionModelToken;
 
 #[derive(Serialize, Clone)]
-pub struct TtsModelRecordForResponse {
-  pub model_token: String,
-  pub tts_model_type: String,
-  pub creator_user_token: String,
-  pub creator_username: String,
-  pub creator_display_name: String,
-  pub creator_gravatar_hash: String,
+pub struct VoiceConversionModel {
+  pub token: VoiceConversionModelToken,
+  pub model_type: VoiceConversionModelType,
   pub title: String,
+
+  pub creator: CreatorDetails,
+  pub creator_set_visibility: Visibility,
+
   pub ietf_language_tag: String,
   pub ietf_primary_language_subtag: String,
   pub is_front_page_featured: bool,
-  pub is_twitch_featured: bool,
-  pub maybe_suggested_unique_bot_command: Option<String>,
 
-  pub creator_set_visibility: Visibility,
+  // TODO: Add user ratings.
+  //pub user_ratings: UserRatingsStats,
 
-  pub user_ratings: UserRatingsStats,
-
-  /// Category assignments
-  /// From non-deleted, mod-approved categories only
-  pub category_tokens: HashSet<String>,
+  // TODO: Add categories.
+  ///// Category assignments
+  ///// From non-deleted, mod-approved categories only
+  //pub category_tokens: HashSet<String>,
 
   pub created_at: DateTime<Utc>,
   pub updated_at: DateTime<Utc>,
 }
 
 #[derive(Serialize, Clone)]
-pub struct UserRatingsStats {
-  pub positive_count: u32,
-  pub negative_count: u32,
-  /// Total count does not take into account "neutral" ratings.
-  pub total_count: u32,
+pub struct CreatorDetails {
+  pub user_token: UserToken,
+  pub username: String,
+  pub display_name: String,
+  pub gravatar_hash: String,
 }
 
+// TODO: Add user ratings.
+//#[derive(Serialize, Clone)]
+//pub struct UserRatingsStats {
+//  pub positive_count: u32,
+//  pub negative_count: u32,
+//  /// Total count does not take into account "neutral" ratings.
+//  pub total_count: u32,
+//}
+
 #[derive(Serialize)]
-pub struct ListTtsModelsSuccessResponse {
+pub struct ListVoiceConversionModelsSuccessResponse {
   pub success: bool,
-  pub models: Vec<TtsModelRecordForResponse>,
+  pub models: Vec<VoiceConversionModel>,
 }
 
 #[derive(Debug)]
-pub enum ListTtsModelsError {
+pub enum ListVoiceConversionModelsError {
   ServerError,
 }
 
-impl ResponseError for ListTtsModelsError {
+impl ResponseError for ListVoiceConversionModelsError {
   fn status_code(&self) -> StatusCode {
     match *self {
-      ListTtsModelsError::ServerError=> StatusCode::INTERNAL_SERVER_ERROR,
+      ListVoiceConversionModelsError::ServerError=> StatusCode::INTERNAL_SERVER_ERROR,
     }
   }
 
   fn error_response(&self) -> HttpResponse {
     let error_reason = match self {
-      ListTtsModelsError::ServerError => "server error".to_string(),
+      ListVoiceConversionModelsError::ServerError => "server error".to_string(),
     };
 
     to_simple_json_error(&error_reason, self.status_code())
@@ -85,30 +93,30 @@ impl ResponseError for ListTtsModelsError {
 }
 
 // NB: Not using derive_more::Display since Clion doesn't understand it.
-impl fmt::Display for ListTtsModelsError {
+impl fmt::Display for ListVoiceConversionModelsError {
   fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
     write!(f, "{:?}", self)
   }
 }
 
-pub async fn list_tts_models_handler(
+pub async fn list_voice_conversion_models_handler(
   http_request: HttpRequest,
-  server_state: web::Data<Arc<ServerState>>) -> Result<HttpResponse, ListTtsModelsError>
+  server_state: web::Data<Arc<ServerState>>) -> Result<HttpResponse, ListVoiceConversionModelsError>
 {
-  if server_state.flags.disable_tts_model_list_endpoint {
+  if server_state.flags.disable_voice_conversion_model_list_endpoint {
     // NB: Despite the cache being a powerful protector of the database (this is an expensive query),
     // if the cache goes stale during an outage, there is no protection. This feature flag lets us
     // shut off all traffic to the endpoint.
-    return render_response_busy(ListTtsModelsSuccessResponse {
+    return render_response_busy(ListVoiceConversionModelsSuccessResponse {
       success: true,
       models: Vec::new(),
     });
   }
 
-  let maybe_models = server_state.caches.tts_model_list.grab_copy_without_bump_if_unexpired()
+  let maybe_models = server_state.caches.voice_conversion_model_list.grab_copy_without_bump_if_unexpired()
       .map_err(|e| {
         error!("Error consulting cache: {:?}", e);
-        ListTtsModelsError::ServerError
+        ListVoiceConversionModelsError::ServerError
       })?;
 
   // NB: We don't know if we need a MySQL connection, so don't grab one unless we do.
@@ -116,17 +124,16 @@ pub async fn list_tts_models_handler(
 
   let models = match maybe_models {
     Some(models) => {
-      info!("Serving TTS models from cache");
+      debug!("Serving voice conversion models from cache");
       models
     },
     None => {
-      info!("Populating TTS models from database");
-
+      debug!("Populating voice conversion models from database");
       let mut mysql_connection = server_state.mysql_pool.acquire()
           .await
           .map_err(|e| {
             warn!("Could not acquire DB pool: {:?}", e);
-            ListTtsModelsError::ServerError
+            ListVoiceConversionModelsError::ServerError
           })?;
 
       // TODO: Fail open in case the DB is down. Pull from expired cache if query fails.
@@ -134,15 +141,15 @@ pub async fn list_tts_models_handler(
           .await
           .map_err(|e| {
             error!("Error querying database: {:?}", e);
-            ListTtsModelsError::ServerError
+            ListVoiceConversionModelsError::ServerError
           })?;
 
       maybe_mysql_connection = Some(mysql_connection);
 
-      server_state.caches.tts_model_list.store_copy(&models)
+      server_state.caches.voice_conversion_model_list.store_copy(&models)
           .map_err(|e| {
             error!("Error storing cache: {:?}", e);
-            ListTtsModelsError::ServerError
+            ListVoiceConversionModelsError::ServerError
           })?;
 
       models
@@ -162,7 +169,7 @@ pub async fn list_tts_models_handler(
     }
   }.map_err(|e| {
     warn!("Session checker error: {:?}", e);
-    ListTtsModelsError::ServerError
+    ListVoiceConversionModelsError::ServerError
   })?;
 
   let maybe_session_user_token = maybe_user_session
@@ -174,50 +181,49 @@ pub async fn list_tts_models_handler(
         match model.creator_set_visibility {
           Visibility::Public => true,
           Visibility::Hidden | Visibility::Private => maybe_session_user_token
-              .map(|token| token == model.creator_user_token.as_str())
+              .map(|token| token == model.creator.user_token.as_str())
               .unwrap_or(false),
         }
       })
       .collect();
 
-  render_response_ok(ListTtsModelsSuccessResponse {
+  render_response_ok(ListVoiceConversionModelsSuccessResponse {
     success: true,
     models,
   })
 }
 
-pub fn render_response_busy(response: ListTtsModelsSuccessResponse) -> Result<HttpResponse, ListTtsModelsError> {
+pub fn render_response_busy(response: ListVoiceConversionModelsSuccessResponse) -> Result<HttpResponse, ListVoiceConversionModelsError> {
   let body = render_response_payload(response)?;
   Ok(HttpResponse::TooManyRequests()
       .content_type("application/json")
       .body(body))
 }
 
-pub fn render_response_ok(response: ListTtsModelsSuccessResponse) -> Result<HttpResponse, ListTtsModelsError> {
+pub fn render_response_ok(response: ListVoiceConversionModelsSuccessResponse) -> Result<HttpResponse, ListVoiceConversionModelsError> {
   let body = render_response_payload(response)?;
   Ok(HttpResponse::Ok()
       .content_type("application/json")
       .body(body))
 }
 
-pub fn render_response_payload(response: ListTtsModelsSuccessResponse) -> Result<String, ListTtsModelsError> {
+pub fn render_response_payload(response: ListVoiceConversionModelsSuccessResponse) -> Result<String, ListVoiceConversionModelsError> {
   let body = serde_json::to_string(&response)
       .map_err(|e| {
         error!("error returning response: {:?}",  e);
-        ListTtsModelsError::ServerError
+        ListVoiceConversionModelsError::ServerError
       })?;
   Ok(body)
 }
 
-async fn get_all_models(mysql_connection: &mut PoolConnection<MySql>) -> AnyhowResult<Vec<TtsModelRecordForResponse>> {
-  let mut models = list_tts_models_with_connection(
+async fn get_all_models(mysql_connection: &mut PoolConnection<MySql>) -> AnyhowResult<Vec<VoiceConversionModel>> {
+  let mut models = list_voice_conversion_models_with_connection(
     mysql_connection,
     None,
-    false
   ).await?;
 
-  let model_categories_map
-      = fetch_and_build_tts_model_category_map_with_connection(mysql_connection).await?;
+  //let model_categories_map
+  //    = fetch_and_build_voice_conversion_model_category_map_with_connection(mysql_connection).await?;
 
   // Make the list nice for human readers.
   models.sort_by(|a, b|
@@ -225,34 +231,35 @@ async fn get_all_models(mysql_connection: &mut PoolConnection<MySql>) -> AnyhowR
 
   let models_for_response = models.into_iter()
       .map(|model| {
-        let model_token = model.model_token.clone();
-        TtsModelRecordForResponse {
-          model_token: model.model_token,
-          tts_model_type: model.tts_model_type,
-          creator_user_token: model.creator_user_token,
-          creator_username: model.creator_username,
-          creator_display_name: model.creator_display_name,
-          creator_gravatar_hash: model.creator_gravatar_hash,
+        VoiceConversionModel {
+          token: model.token,
+          model_type: model.model_type,
           title: model.title,
+          creator: CreatorDetails {
+            user_token: model.creator_user_token,
+            username: model.creator_username,
+            display_name: model.creator_display_name,
+            gravatar_hash: model.creator_gravatar_hash,
+          },
+          creator_set_visibility: model.creator_set_visibility,
           ietf_language_tag: model.ietf_language_tag,
           ietf_primary_language_subtag: model.ietf_primary_language_subtag,
           is_front_page_featured: model.is_front_page_featured,
-          is_twitch_featured: model.is_twitch_featured,
-          maybe_suggested_unique_bot_command: model.maybe_suggested_unique_bot_command,
-          creator_set_visibility: model.creator_set_visibility,
-          user_ratings: UserRatingsStats {
-            positive_count: model.user_ratings_positive_count,
-            negative_count: model.user_ratings_negative_count,
-            total_count: model.user_ratings_total_count,
-          },
-          category_tokens: model_categories_map.model_to_category_tokens.get(&model_token)
-              .map(|hash| hash.clone())
-              .unwrap_or(HashSet::new()),
+          // TODO: Add user ratings
+          //user_ratings: UserRatingsStats {
+          //  positive_count: model.user_ratings_positive_count,
+          //  negative_count: model.user_ratings_negative_count,
+          //  total_count: model.user_ratings_total_count,
+          //},
+          // TODO: Add categories
+          //category_tokens: model_categories_map.model_to_category_tokens.get(&model_token)
+          //    .map(|hash| hash.clone())
+          //    .unwrap_or(HashSet::new()),
           created_at: model.created_at,
           updated_at: model.updated_at,
         }
       })
-      .collect::<Vec<TtsModelRecordForResponse>>();
+      .collect::<Vec<VoiceConversionModel>>();
 
   Ok(models_for_response)
 }
