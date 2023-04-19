@@ -47,6 +47,7 @@ import {
 import { InferenceJob } from "@storyteller/components/src/jobs/InferenceJob";
 import { GetModelInferenceJobStatus, GetModelInferenceJobStatusIsOk } from "@storyteller/components/src/api/model_inference/GetModelInferenceJobStatus";
 import { VoiceConversionModelUploadJob } from "@storyteller/components/src/jobs/VoiceConversionModelUploadJob";
+import { VoiceConversionModelListItem } from "@storyteller/components/src/api/voice_conversion/ListVoiceConversionModels";
 
 i18n
   .use(initReactI18next) // passes i18n down to react-i18next
@@ -139,6 +140,9 @@ interface State {
 
   // Current text entered
   textBuffer: string;
+
+  voiceConversionModels: VoiceConversionModelListItem[];
+  maybeSelectedVoiceConversionModel?: VoiceConversionModelListItem;
 }
 
 function newVocodes() {
@@ -199,6 +203,9 @@ class App extends React.Component<Props, State> {
       voiceConversionModelUploadJobs: [],
 
       textBuffer: "",
+
+      voiceConversionModels: [],
+      maybeSelectedVoiceConversionModel: undefined,
     };
   }
 
@@ -319,6 +326,14 @@ class App extends React.Component<Props, State> {
   clearBootstrapLanguageNotice = () => {
     this.setState({ isShowingBootstrapLanguageNotice: false });
   };
+
+  setAllVoiceConversionModels = (models: VoiceConversionModelListItem[]) => {
+    this.setState({ voiceConversionModels: models })
+  }
+
+  setMaybeSelectedVoiceConversionModel =(model?: VoiceConversionModelListItem) => {
+    this.setState({ maybeSelectedVoiceConversionModel: model })
+  }
 
   checkInferenceJob = async (jobToken: string) => {
     const lookupResult = await GetModelInferenceJobStatus(jobToken);
@@ -776,6 +791,11 @@ class App extends React.Component<Props, State> {
                     }
                     selectedTtsLanguageScope={this.props.selectedTtsLanguageScope}
                     setSelectedTtsLanguageScope={this.props.setSelectedTtsLanguageScope}
+
+                    voiceConversionModels={this.state.voiceConversionModels}
+                    setVoiceConversionModels={this.setAllVoiceConversionModels}
+                    maybeSelectedVoiceConversionModel={this.state.maybeSelectedVoiceConversionModel}
+                    setMaybeSelectedVoiceConversionModel={this.setMaybeSelectedVoiceConversionModel}
                   />
                 </Route>
               </Switch>

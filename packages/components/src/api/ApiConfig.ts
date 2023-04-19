@@ -392,6 +392,12 @@ class ApiConfig {
     return `${this.getApiOrigin()}/voice_clone_requests/check`;
   }
 
+  // =============== Voice Conversion ===============
+
+  listVoiceConversionModels(): string {
+    return `${this.getApiOrigin()}/v1/voice_conversion/model_list`;
+  }
+
   // =============== Generic Model Downloads ===============
 
   enqueueRemoteDownloadJob(): string {

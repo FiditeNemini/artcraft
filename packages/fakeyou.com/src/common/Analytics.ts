@@ -21,6 +21,7 @@ class Analytics {
   private static readonly TTS_RESULT = "tts_result";
   private static readonly UI = "ui";
   private static readonly TOPBAR = "topbar";
+  private static readonly VOICE_CONVERSION = "voice_conversion";
 
   // ========== USER ==========
 
@@ -218,6 +219,12 @@ class Analytics {
 
   static ttsResultPageClickShareWhatsapp() {
     Analytics.sendCategorizedEvent(this.TTS_RESULT, 'click_share_whatsapp');
+  }
+
+  // ========== VOICE CONVERSION ==========
+
+  static ttsOpenPrimaryVoiceConversionSelectMenu() {
+    Analytics.sendCategorizedEvent(this.VOICE_CONVERSION, 'open_primary_voice_select_menu');
   }
 
   // ========== UI ==========

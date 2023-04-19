@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
 import { t } from "i18next";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { motion } from "framer-motion";
-import { container, panel, sessionItem } from "../../../../../data/animation";
+import { container, panel } from "../../../../../data/animation";
 import { SessionSubscriptionsWrapper } from "@storyteller/components/src/session/SessionSubscriptionsWrapper";
 import { VcPageHero } from "./VcPageHero";
 import Select, { createFilter } from "react-select";
@@ -12,24 +12,65 @@ import {
   faBarsStaggered,
   faFiles,
   faHeadphones,
-  faLink,
   faMicrophone,
   faRightLeft,
-  faTimer,
   faTrash,
 } from "@fortawesome/pro-solid-svg-icons";
 import UploadComponent from "./UploadComponent";
 import RecordComponent from "./RecordComponent";
-import { Link } from "react-router-dom";
 import { usePrefixedDocumentTitle } from "../../../../../common/UsePrefixedDocumentTitle";
+import { ListVoiceConversionModels, VoiceConversionModelListItem } from "@storyteller/components/src/api/voice_conversion/ListVoiceConversionModels";
+import { VcModelListSearch } from "./VcModelListSearch";
 
 interface Props {
   sessionWrapper: SessionWrapper;
   sessionSubscriptionsWrapper: SessionSubscriptionsWrapper;
+
+  voiceConversionModels: Array<VoiceConversionModelListItem>;
+  setVoiceConversionModels: (ttsVoices: Array<VoiceConversionModelListItem>) => void;
+
+  maybeSelectedVoiceConversionModel?: VoiceConversionModelListItem;
+  setMaybeSelectedVoiceConversionModel: (maybeSelectedVoiceConversionModel: VoiceConversionModelListItem) => void;
 }
 
 function VcModelListPage(props: Props) {
   const [loading, setLoading] = useState(false);
+
+  usePrefixedDocumentTitle("Voice Conversion");
+
+  let {
+    setVoiceConversionModels,
+    voiceConversionModels,
+    maybeSelectedVoiceConversionModel,
+    setMaybeSelectedVoiceConversionModel,
+  } = props;
+
+  const ttsModelsLoaded = voiceConversionModels.length > 0;
+
+  const listModels = useCallback(async () => {
+    if (ttsModelsLoaded) {
+      return; // Already queried.
+    }
+    const models = await ListVoiceConversionModels();
+    if (models) {
+      setVoiceConversionModels(models);
+      if (!maybeSelectedVoiceConversionModel && models.length > 0) {
+        let model = models[0];
+        const featuredModels = models.filter((m) => m.is_front_page_featured);
+        if (featuredModels.length > 0) {
+          // Random featured model
+          model =
+            featuredModels[Math.floor(Math.random() * featuredModels.length)];
+        }
+        setMaybeSelectedVoiceConversionModel(model);
+      }
+    }
+  }, [
+    setVoiceConversionModels,
+    maybeSelectedVoiceConversionModel,
+    setMaybeSelectedVoiceConversionModel,
+    ttsModelsLoaded,
+  ]);
 
   const handleLoading = () => {
     setLoading(true);
@@ -39,11 +80,14 @@ function VcModelListPage(props: Props) {
   };
 
   useEffect(() => {
+    listModels();
     const timeout = setTimeout(() => {
       setLoading(false);
     }, 2000);
     return () => clearTimeout(timeout);
-  }, []);
+  }, [
+    handleLoading
+  ]);
 
   const speakButtonClass = loading
     ? "btn btn-primary w-100 disabled"
@@ -82,8 +126,6 @@ function VcModelListPage(props: Props) {
   //   </div>
   // );
 
-  usePrefixedDocumentTitle("Voice Conversion");
-
   return (
     <motion.div initial="hidden" animate="visible" variants={container}>
       <VcPageHero
@@ -100,23 +142,20 @@ function VcModelListPage(props: Props) {
             >
               {/* Explore Rollout */}
               <label className="sub-title">
-                Choose Target Voice (XX to choose from)
+                Choose Target Voice ({voiceConversionModels.length} to choose from)
               </label>
               <div className="input-icon-search pb-4">
                 <span className="form-control-feedback">
                   <FontAwesomeIcon icon={faMicrophone} />
                 </span>
 
-                <Select
-                  value="test"
-                  classNames={SearchFieldClass}
-                  // On mobile, we don't want the onscreen keyboard to take up half the UI.
-                  autoFocus={false}
-                  isSearchable={false}
-                  // NB: The following settings improve upon performance.
-                  // See: https://github.com/JedWatson/react-select/issues/3128
-                  filterOption={createFilter({ ignoreAccents: false })}
-                />
+                <VcModelListSearch
+                  voiceConversionModels={props.voiceConversionModels}
+                  setVoiceConversionModels={props.setVoiceConversionModels}
+                  maybeSelectedVoiceConversionModel={props.maybeSelectedVoiceConversionModel}
+                  setMaybeSelectedVoiceConversionModel={props.setMaybeSelectedVoiceConversionModel}
+                  />
+
               </div>
 
               <div className="row gx-5 gy-5">

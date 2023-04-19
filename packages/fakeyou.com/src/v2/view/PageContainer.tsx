@@ -72,6 +72,7 @@ import { InferenceJob } from "@storyteller/components/src/jobs/InferenceJob";
 //import { LandingPage } from "./pages/landing/LandingPage";
 import { VcModelListPage } from "./pages/vc/vc_model_list/VcModelListPage";
 import { UploadVoiceConversionModel } from "./pages/upload/UploadVoiceConversionModel";
+import { VoiceConversionModelListItem } from "@storyteller/components/src/api/voice_conversion/ListVoiceConversionModels";
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -149,6 +150,12 @@ interface Props {
 
   selectedTtsLanguageScope: string;
   setSelectedTtsLanguageScope: (selectedTtsLanguageScope: string) => void;
+
+  voiceConversionModels: Array<VoiceConversionModelListItem>;
+  setVoiceConversionModels: (ttsVoices: Array<VoiceConversionModelListItem>) => void;
+
+  maybeSelectedVoiceConversionModel?: VoiceConversionModelListItem;
+  setMaybeSelectedVoiceConversionModel: (maybeSelectedVoiceConversionModel: VoiceConversionModelListItem) => void;
 }
 
 interface State {}
@@ -486,6 +493,10 @@ class PageContainer extends React.Component<Props, State> {
                 sessionSubscriptionsWrapper={
                   this.props.sessionSubscriptionsWrapper
                 }
+                voiceConversionModels={this.props.voiceConversionModels}
+                setVoiceConversionModels={this.props.setVoiceConversionModels}
+                maybeSelectedVoiceConversionModel={this.props.maybeSelectedVoiceConversionModel}
+                setMaybeSelectedVoiceConversionModel={this.props.setMaybeSelectedVoiceConversionModel}
               />
             </Route>
 
