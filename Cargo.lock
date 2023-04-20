@@ -752,6 +752,7 @@ dependencies = [
  "errors",
  "fakeyou_client",
  "files",
+ "filesys",
  "hashing",
  "http_server_common",
  "idempotency",

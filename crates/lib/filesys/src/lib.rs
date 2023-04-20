@@ -18,6 +18,8 @@
 #![allow(dead_code)]
 #![allow(non_snake_case)]
 
+pub mod file_exists;
 pub mod file_size;
 pub mod filename_concat;
 pub mod path_to_string;
+pub mod directory_exists;

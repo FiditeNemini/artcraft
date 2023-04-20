@@ -21,6 +21,7 @@ enums = { path = "../../_types/enums" }
 errors = { path = "../../lib/errors" }
 fakeyou_client = { path = "../../lib/api_clients/fakeyou_client" }
 files = { path = "../../lib/files" }
+filesys = { path = "../../lib/filesys" }
 hashing = { path = "../../lib/hashing" }
 http_server_common = { path = "../../lib/deprecated/http_server_common" }
 idempotency = { path = "../../lib/idempotency" }
