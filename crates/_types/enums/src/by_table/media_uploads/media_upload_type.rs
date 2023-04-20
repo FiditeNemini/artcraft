@@ -15,6 +15,10 @@ use strum::EnumIter;
 pub enum MediaUploadType {
   /// Audio files: wav, mp3, etc.
   Audio,
+
+  /// Image files: png, jpeg, etc.
+  Image,
+
   /// Video files: mp4, etc.
   Video,
 }
@@ -28,6 +32,7 @@ impl MediaUploadType {
   pub fn to_str(&self) -> &'static str {
     match self {
       Self::Audio => "audio",
+      Self::Image => "image",
       Self::Video => "video",
     }
   }
@@ -35,6 +40,7 @@ impl MediaUploadType {
   pub fn from_str(value: &str) -> Result<Self, String> {
     match value {
       "audio" => Ok(Self::Audio),
+      "image" => Ok(Self::Image),
       "video" => Ok(Self::Video),
       _ => Err(format!("invalid value: {:?}", value)),
     }
@@ -49,18 +55,21 @@ mod tests {
   #[test]
   fn test_serialization() {
     assert_serialization(MediaUploadType::Audio, "audio");
+    assert_serialization(MediaUploadType::Image, "image");
     assert_serialization(MediaUploadType::Video, "video");
   }
 
   #[test]
   fn test_to_str() {
     assert_eq!(MediaUploadType::Audio.to_str(), "audio");
+    assert_eq!(MediaUploadType::Image.to_str(), "image");
     assert_eq!(MediaUploadType::Video.to_str(), "video");
   }
 
   #[test]
   fn test_from_str() {
     assert_eq!(MediaUploadType::from_str("audio").unwrap(), MediaUploadType::Audio);
+    assert_eq!(MediaUploadType::from_str("image").unwrap(), MediaUploadType::Image);
     assert_eq!(MediaUploadType::from_str("video").unwrap(), MediaUploadType::Video);
     assert!(MediaUploadType::from_str("foo").is_err());
   }
