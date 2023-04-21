@@ -6,9 +6,13 @@ import { InputVcAudioPlayer } from "../../../../_common/InputVcAudioPlayer";
 import { v4 as uuidv4 } from "uuid";
 import { UploadMedia, UploadMediaIsOk, UploadMediaRequest } from "@storyteller/components/src/api/upload/UploadMedia";
 
-const fileTypes = ["MP3", "WAV", "FLAC"];
+const FILE_TYPES = ["MP3", "WAV", "FLAC"];
 
-function UploadComponent() {
+interface Props {
+  setMediaUploadToken: (token: string) => void,
+}
+
+function UploadComponent(props: Props) {
   const [file, setFile] = useState<any>(undefined);
   const [audioLink, setAudioLink] = useState<string>();
   const [isUploadDisabled, setIsUploadDisabled] = useState<boolean>(false);
@@ -49,6 +53,8 @@ function UploadComponent() {
 
     if (UploadMediaIsOk(result)) {
       setIsUploadDisabled(true);
+      props.setMediaUploadToken(result.upload_token);
+      console.log('TOKEN', result.upload_token)
     }
   };
 
@@ -65,7 +71,7 @@ function UploadComponent() {
       <FileUploader
         handleChange={handleChange}
         name="file"
-        types={fileTypes}
+        types={FILE_TYPES}
         maxSize={50}
         children={
           <div
@@ -105,7 +111,7 @@ function UploadComponent() {
                     </p>
                   ) : (
                     <p className="opacity-50">
-                      {fileTypes.join(", ").toString()} supported
+                      {FILE_TYPES.join(", ").toString()} supported
                     </p>
                   )}
                 </div>

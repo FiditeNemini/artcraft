@@ -402,6 +402,10 @@ class ApiConfig {
     return `${this.getApiOrigin()}/v1/voice_conversion/model_list`;
   }
 
+  enqueueVoiceConversion(): string {
+    return `${this.getApiOrigin()}/v1/voice_conversion/inference`;
+  }
+
   // =============== Generic Model Downloads ===============
 
   enqueueRemoteDownloadJob(): string {

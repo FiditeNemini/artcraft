@@ -3,6 +3,7 @@ import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapp
 import { t } from "i18next";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { motion } from "framer-motion";
+import { v4 as uuidv4 } from "uuid";
 import { container, panel } from "../../../../../data/animation";
 import { SessionSubscriptionsWrapper } from "@storyteller/components/src/session/SessionSubscriptionsWrapper";
 import { VcPageHero } from "./components/VcPageHero";
@@ -21,6 +22,8 @@ import RecordComponent from "./components/RecordComponent";
 import { usePrefixedDocumentTitle } from "../../../../../common/UsePrefixedDocumentTitle";
 import { ListVoiceConversionModels, VoiceConversionModelListItem } from "@storyteller/components/src/api/voice_conversion/ListVoiceConversionModels";
 import { VcModelListSearch } from "./components/VcModelListSearchComponent";
+import { EnqueueVoiceConversion, EnqueueVoiceConversionRequest } from "@storyteller/components/src/api/voice_conversion/EnqueueVoiceConversion";
+import { EnqueueRemoteDownloadIsOk } from "@storyteller/components/src/api/remote_downloads/EnqueueRemoteDownload";
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -35,6 +38,11 @@ interface Props {
 
 function VcModelListPage(props: Props) {
   const [loading, setLoading] = useState(false);
+
+  const [mediaUploadToken, setMediaUploadToken] = useState<string|undefined>(undefined);
+
+  // Auto generated
+  const [idempotencyToken, setIdempotencyToken] = useState(uuidv4());
 
   usePrefixedDocumentTitle("Voice Conversion");
 
@@ -89,19 +97,41 @@ function VcModelListPage(props: Props) {
     handleLoading
   ]);
 
-  const speakButtonClass = loading
-    ? "btn btn-primary w-100 disabled"
-    : "btn btn-primary w-100";
-
   const handleClearClick = (ev: React.FormEvent<HTMLButtonElement>) => {
     ev.preventDefault();
 
     return false;
   };
 
+  const handleVoiceConversion = async () => {
+    if (props.maybeSelectedVoiceConversionModel === undefined || mediaUploadToken === undefined) {
+      return;
+    }
+
+    let request : EnqueueVoiceConversionRequest = {
+      uuid_idempotency_token: idempotencyToken,
+      voice_conversion_model_token: props.maybeSelectedVoiceConversionModel.token,
+      source_media_upload_token: mediaUploadToken,
+    };
+
+    let result = await EnqueueVoiceConversion(request);
+
+    if (EnqueueRemoteDownloadIsOk(result)) {
+      console.log("successful enqueue");
+    }
+  };
+
+
   const handleFormSubmit = async (ev: React.FormEvent<HTMLFormElement>) => {
     ev.preventDefault();
   };
+
+  const speakButtonClass = loading
+    ? "btn btn-primary w-100 disabled"
+    : "btn btn-primary w-100";
+
+  const canBeginConversion = mediaUploadToken !== undefined && props.maybeSelectedVoiceConversionModel !== undefined;
+  console.log('canBeginConversion', canBeginConversion, mediaUploadToken, props.maybeSelectedVoiceConversionModel);
 
   let noResultsSection = (
     <div className="panel panel-inner text-center p-5 rounded-5 h-100">
@@ -203,7 +233,9 @@ function VcModelListPage(props: Props) {
                             Upload Input Audio
                           </label>
                           <div className="d-flex flex-column gap-3 upload-component">
-                            <UploadComponent />
+                            <UploadComponent 
+                              setMediaUploadToken={setMediaUploadToken}
+                            />
                           </div>
                         </div>
 
@@ -236,9 +268,9 @@ function VcModelListPage(props: Props) {
                         <div className="d-flex gap-3">
                           <button
                             className={speakButtonClass}
-                            onClick={handleLoading}
+                            onClick={handleVoiceConversion}
                             type="submit"
-                            disabled={true}
+                            disabled={!canBeginConversion}
                           >
                             <FontAwesomeIcon
                               icon={faRightLeft}
@@ -277,7 +309,7 @@ function VcModelListPage(props: Props) {
                             className={speakButtonClass}
                             onClick={handleLoading}
                             type="submit"
-                            disabled={true}
+                            disabled={!canBeginConversion}
                           >
                             <FontAwesomeIcon
                               icon={faRightLeft}
