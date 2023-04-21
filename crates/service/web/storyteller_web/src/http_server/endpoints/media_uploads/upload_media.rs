@@ -146,24 +146,16 @@ pub async fn upload_media_handler(
       .map(|bytes| get_mimetype_for_bytes(bytes.as_ref()))
       .flatten();
 
-  let maybe_hash = upload_media_request.file_bytes
-      .as_ref()
-      .map(|bytes| hash_bytes_sha2(bytes.as_ref()))
-      .transpose()
+  let bytes = match upload_media_request.file_bytes {
+    None => return Err(UploadMediaError::BadInput("missing file contents".to_string())),
+    Some(bytes) => bytes,
+  };
+
+  let hash = hash_bytes_sha2(&bytes)
       .map_err(|io_error| {
         warn!("Problem hashing bytes: {:?}", io_error);
         return UploadMediaError::ServerError;
       })?;
-
-  let hash = match maybe_hash {
-    None => return Err(UploadMediaError::BadInput("invalid file".to_string())),
-    Some(hash) => hash,
-  };
-
-  let bytes = match upload_media_request.file_bytes {
-    None => return Err(UploadMediaError::BadInput("invalid file".to_string())),
-    Some(bytes) => bytes,
-  };
 
   let file_size_bytes = bytes.len();
 
