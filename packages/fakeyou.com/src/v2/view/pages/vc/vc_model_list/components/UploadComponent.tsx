@@ -3,15 +3,22 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React, { useState } from "react";
 import { FileUploader } from "react-drag-drop-files";
 import { InputVcAudioPlayer } from "../../../../_common/InputVcAudioPlayer";
+import { v4 as uuidv4 } from "uuid";
+import { UploadMedia, UploadMediaIsOk, UploadMediaRequest } from "@storyteller/components/src/api/upload/UploadMedia";
 
 const fileTypes = ["MP3", "WAV", "FLAC"];
 
 function UploadComponent() {
-  const [file, setFile] = useState<any>();
+  const [file, setFile] = useState<any>(undefined);
   const [audioLink, setAudioLink] = useState<string>();
+  const [isUploadDisabled, setIsUploadDisabled] = useState<boolean>(false);
+
+  // Auto generated
+  const [idempotencyToken, setIdempotencyToken] = useState(uuidv4());
 
   const handleChange = (file: any) => {
     setFile(file);
+    setIdempotencyToken(uuidv4());
     const audioUrl = URL.createObjectURL(file);
     setAudioLink(audioUrl ?? "");
   };
@@ -26,6 +33,23 @@ function UploadComponent() {
     e.preventDefault();
     e.stopPropagation();
     e.currentTarget.classList.remove("upload-zone-drag");
+  };
+
+  const handleUploadFile = async () => {
+    if (file === undefined) {
+      return false;
+    }
+
+    const request : UploadMediaRequest = {
+      uuid_idempotency_token: idempotencyToken,
+      file: file,
+    }
+
+    let result = await UploadMedia(request);
+
+    if (UploadMediaIsOk(result)) {
+      setIsUploadDisabled(true);
+    }
   };
 
   const fileSize =
@@ -97,7 +121,7 @@ function UploadComponent() {
       ) : (
         <></>
       )}
-      {file ? (
+      {/*file ? (
         <div className="d-flex mb-4 mb-lg-3">
           <div className="form-check form-switch">
             <input
@@ -113,7 +137,27 @@ function UploadComponent() {
         </div>
       ) : (
         <></>
+      )*/}
+
+      {file ? (
+        <div className="d-flex gap-3">
+          <button
+            className="btn btn-primary w-100"
+            onClick={() => { handleUploadFile(); }}
+            type="submit"
+            disabled={isUploadDisabled}
+          >
+            <FontAwesomeIcon
+              icon={faFileArrowUp}
+              className="me-2"
+            />
+            Upload Audio
+          </button>
+        </div>
+      ) : (
+        <></>
       )}
+
     </div>
   );
 }

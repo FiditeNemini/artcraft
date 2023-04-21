@@ -392,6 +392,10 @@ class ApiConfig {
     return `${this.getApiOrigin()}/voice_clone_requests/check`;
   }
 
+  uploadMedia(): string {
+    return `${this.getApiOrigin()}/v1/media_uploads/upload`;
+  }
+
   // =============== Voice Conversion ===============
 
   listVoiceConversionModels(): string {

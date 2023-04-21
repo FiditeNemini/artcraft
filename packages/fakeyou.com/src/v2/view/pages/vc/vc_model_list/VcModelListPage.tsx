@@ -20,7 +20,7 @@ import UploadComponent from "./components/UploadComponent";
 import RecordComponent from "./components/RecordComponent";
 import { usePrefixedDocumentTitle } from "../../../../../common/UsePrefixedDocumentTitle";
 import { ListVoiceConversionModels, VoiceConversionModelListItem } from "@storyteller/components/src/api/voice_conversion/ListVoiceConversionModels";
-import { VcModelListSearch } from "./components/VcModelListSearch";
+import { VcModelListSearch } from "./components/VcModelListSearchComponent";
 
 interface Props {
   sessionWrapper: SessionWrapper;
