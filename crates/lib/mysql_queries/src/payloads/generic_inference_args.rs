@@ -8,35 +8,61 @@ use tokens::voice_conversion::model::VoiceConversionModelToken;
 #[derive(Clone, Serialize, Deserialize)]
 pub struct GenericInferenceArgs {
   /// The category of inference (probably also present in a top-level field)
-  pub inference_category: Option<InferenceCategory>,
+  #[serde(rename = "cat")] // NB: DO NOT CHANGE. It could break live jobs. Renamed to consume fewer bytes
+  #[serde(alias = "inference_category")]
+  pub inference_category: Option<InferenceCategoryAbbreviated>,
 
   /// REQUIRED.
   /// Actual type-specific arguments.
   pub args: Option<PolymorphicInferenceArgs>,
 }
 
+/// Same as `InferenceCategory`, but serialized in fewer characters
+/// Do not change the values.
+#[derive(Clone, Copy, Eq, PartialEq, Hash, Ord, PartialOrd, Deserialize, Serialize)]
+pub enum InferenceCategoryAbbreviated {
+  #[serde(rename = "tts")] // NB: DO NOT CHANGE. It could break live jobs. Renamed to be fewer bytes.
+  #[serde(alias = "text_to_speech")]
+  TextToSpeech,
+
+  #[serde(rename = "vc")] // NB: DO NOT CHANGE. It could break live jobs. Renamed to be fewer bytes.
+  #[serde(alias = "voice_conversion")]
+  VoiceConversion,
+}
+
 #[derive(Clone, Serialize, Deserialize)]
 pub enum PolymorphicInferenceArgs {
   TextToSpeechInferenceArgs {
-    /// REQUIRED.
-    /// The text to speech model to use.
-    model_token: Option<TtsModelToken>,
+    // No arguments yet.
+    // It might be best to just not include this when not used.
   },
   VoiceConversionInferenceArgs {
-    /// REQUIRED.
-    /// The voice conversion model to use.
-    model_token: Option<VoiceConversionModelToken>,
-
-    /// OPTIONAL.
+    /// OPTIONAL. (*Technically required until we add other inference inputs - eg TTS audio out, stems, etc.)
     /// If set, the media file to use as the source in the conversion.
     /// It's "optional" in case we use other types of records in the future.
     maybe_media_token: Option<MediaUploadToken>,
   },
 }
 
+impl InferenceCategoryAbbreviated {
+  pub fn from_inference_category(category: InferenceCategory) -> Self {
+    match category {
+      InferenceCategory::TextToSpeech => Self::TextToSpeech,
+      InferenceCategory::VoiceConversion => Self::VoiceConversion,
+    }
+  }
+
+  pub fn to_inference_category(self) -> InferenceCategory {
+    match self {
+      Self::TextToSpeech => InferenceCategory::TextToSpeech,
+      Self::VoiceConversion => InferenceCategory::VoiceConversion,
+    }
+  }
+}
+
 #[cfg(test)]
 mod tests {
-  use crate::payloads::generic_inference_args::{GenericInferenceArgs, PolymorphicInferenceArgs};
+  use crate::payloads::generic_inference_args::{GenericInferenceArgs, InferenceCategoryAbbreviated, PolymorphicInferenceArgs};
   use enums::by_table::generic_inference_jobs::inference_category::InferenceCategory;
   use tokens::files::media_upload::MediaUploadToken;
   use tokens::tokens::tts_models::TtsModelToken;
@@ -45,17 +71,15 @@ mod tests {
   #[test]
   fn typical_tts_args_serialize() {
     let args = GenericInferenceArgs {
-      inference_category: Some(InferenceCategory::VoiceConversion),
+      inference_category: Some(InferenceCategoryAbbreviated::VoiceConversion),
       args: Some(PolymorphicInferenceArgs::TextToSpeechInferenceArgs {
-        model_token: Some(TtsModelToken::new_from_str("tts_model_token")),
       }),
     };
 
     let json = serde_json::ser::to_string(&args).unwrap();
 
     // NB: Assert the serialized form. If this changes and the test breaks, be careful about migrating.
-    assert_eq!(json,
-               r#"{"inference_category":"voice_conversion","args":{"TextToSpeechInferenceArgs":{"model_token":"tts_model_token"}}}"#.to_string());
+    assert_eq!(json, r#"{"cat":"vc","args":{"TextToSpeechInferenceArgs":{}}}"#.to_string());
 
     // NB: Make sure we don't overflow the DB field capacity (TEXT column).
     assert!(json.len() < 1000);
@@ -64,9 +88,8 @@ mod tests {
   #[test]
   fn typical_voice_conversion_args_serialize() {
     let args = GenericInferenceArgs {
-      inference_category: Some(InferenceCategory::VoiceConversion),
+      inference_category: Some(InferenceCategoryAbbreviated::VoiceConversion),
       args: Some(PolymorphicInferenceArgs::VoiceConversionInferenceArgs {
-        model_token: Some(VoiceConversionModelToken::new_from_str("vc_model_token")),
         maybe_media_token: Some(MediaUploadToken::new_from_str("media_token")),
       }),
     };
@@ -75,7 +98,7 @@ mod tests {
 
     // NB: Assert the serialized form. If this changes and the test breaks, be careful about migrating.
     assert_eq!(json,
-      r#"{"inference_category":"voice_conversion","args":{"VoiceConversionInferenceArgs":{"model_token":"vc_model_token","maybe_media_token":"media_token"}}}"#.to_string());
+      r#"{"cat":"vc","args":{"VoiceConversionInferenceArgs":{"maybe_media_token":"media_token"}}}"#.to_string());
 
     // NB: Make sure we don't overflow the DB field capacity (TEXT column).
     assert!(json.len() < 1000);
@@ -90,9 +113,8 @@ mod tests {
     assert_eq!(json, "null");
 
     args = Some(GenericInferenceArgs {
-      inference_category: Some(InferenceCategory::VoiceConversion),
+      inference_category: Some(InferenceCategoryAbbreviated::VoiceConversion),
       args: Some(PolymorphicInferenceArgs::VoiceConversionInferenceArgs {
-        model_token: Some(VoiceConversionModelToken::new_from_str("vc_model_token")),
         maybe_media_token: Some(MediaUploadToken::new_from_str("media_token")),
       }),
     });
@@ -101,7 +123,7 @@ mod tests {
 
     // NB: Assert the serialized form. If this changes and the test breaks, be careful about migrating.
     assert_eq!(json,
-               r#"{"inference_category":"voice_conversion","args":{"VoiceConversionInferenceArgs":{"model_token":"vc_model_token","maybe_media_token":"media_token"}}}"#.to_string());
+               r#"{"cat":"vc","args":{"VoiceConversionInferenceArgs":{"maybe_media_token":"media_token"}}}"#.to_string());
 
     // NB: Make sure we don't overflow the DB field capacity (TEXT column).
     assert!(json.len() < 1000);

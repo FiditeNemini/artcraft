@@ -15,7 +15,7 @@ use enums::common::visibility::Visibility;
 use http_server_common::request::get_request_header_optional::get_request_header_optional;
 use http_server_common::request::get_request_ip::get_request_ip;
 use log::{info, warn};
-use mysql_queries::payloads::generic_inference_args::{GenericInferenceArgs, PolymorphicInferenceArgs};
+use mysql_queries::payloads::generic_inference_args::{GenericInferenceArgs, InferenceCategoryAbbreviated, PolymorphicInferenceArgs};
 use mysql_queries::queries::generic_inference::web::insert_generic_inference_job::{InsertGenericInferenceArgs, insert_generic_inference_job};
 use r2d2_redis::redis::Commands;
 use redis_common::redis_keys::RedisKeys;
@@ -227,9 +227,8 @@ pub async fn enqueue_voice_conversion_inference_handler(
     maybe_model_type: None, // TODO(bt, 2023-04-08): Add this.
     maybe_model_token: Some(model_token.as_str()),
     maybe_inference_args: Some(GenericInferenceArgs {
-      inference_category: Some(InferenceCategory::VoiceConversion),
+      inference_category: Some(InferenceCategoryAbbreviated::VoiceConversion),
       args: Some(PolymorphicInferenceArgs::VoiceConversionInferenceArgs {
-        model_token: Some(model_token.clone()), // FIXME: Because of previous borrow
         maybe_media_token: Some(media_token),
       }),
     }),

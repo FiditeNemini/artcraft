@@ -18,7 +18,7 @@ use http_server_common::request::get_request_api_token::get_request_api_token;
 use http_server_common::request::get_request_header_optional::get_request_header_optional;
 use http_server_common::request::get_request_ip::get_request_ip;
 use log::{info, warn};
-use mysql_queries::payloads::generic_inference_args::{GenericInferenceArgs, PolymorphicInferenceArgs};
+use mysql_queries::payloads::generic_inference_args::{GenericInferenceArgs, InferenceCategoryAbbreviated};
 use mysql_queries::queries::generic_inference::web::insert_generic_inference_job::{insert_generic_inference_job, InsertGenericInferenceArgs};
 use mysql_queries::queries::tts::tts_inference_jobs::insert_tts_inference_job::TtsInferenceJobInsertBuilder;
 use mysql_queries::queries::tts::tts_models::get_tts_model::TtsModelRecord;
@@ -29,7 +29,6 @@ use rand::seq::SliceRandom;
 use redis_common::redis_keys::RedisKeys;
 use std::fmt;
 use std::sync::Arc;
-use tokens::tokens::tts_models::TtsModelToken;
 use tokens::users::user::UserToken;
 use tts_common::priority::{FAKEYOU_INVESTOR_PRIORITY_LEVEL, FAKEYOU_DEFAULT_VALID_API_TOKEN_PRIORITY_LEVEL};
 use user_input_common::check_for_slurs::contains_slurs;
@@ -368,10 +367,8 @@ pub async fn enqueue_infer_tts_handler(
       maybe_model_type: None, // TODO(bt, 2023-04-08): Add this
       maybe_model_token: Some(request.tts_model_token.as_str()),
       maybe_inference_args: Some(GenericInferenceArgs {
-        inference_category: Some(InferenceCategory::TextToSpeech),
-        args: Some(PolymorphicInferenceArgs::TextToSpeechInferenceArgs {
-          model_token: Some(TtsModelToken::new_from_str(&request.tts_model_token)),
-        }),
+        inference_category: Some(InferenceCategoryAbbreviated::TextToSpeech),
+        args: None, // NB: We don't need to encode any args yet.
       }),
       maybe_raw_inference_text: Some(inference_text.as_str()),
       maybe_creator_user_token: maybe_creator_user_token_typed.as_ref(),
