@@ -22,7 +22,7 @@ use files::hash::hash_bytes_sha2;
 use files::mimetype::{get_mimetype_for_bytes, get_mimetype_for_bytes_or_default};
 use http_server_common::request::get_request_ip::get_request_ip;
 use http_server_common::response::serialize_as_json_error::serialize_as_json_error;
-use log::{info, warn, log};
+use log::{info, warn, log, error};
 use media::decode_basic_audio_info::decode_basic_audio_info;
 use regex::Regex;
 use sqlx::error::DatabaseError;
@@ -35,6 +35,7 @@ use symphonia::core::formats::FormatOptions;
 use symphonia::core::io::{MediaSourceStream, ReadOnlySource};
 use symphonia::core::meta::MetadataOptions;
 use symphonia::core::probe::Hint;
+use mysql_queries::queries::media_uploads::get_media_upload_by_uuid::{get_media_upload_by_uuid, get_media_upload_by_uuid_with_connection};
 use tokens::files::media_upload::MediaUploadToken;
 
 #[derive(Serialize)]
@@ -81,11 +82,19 @@ pub async fn upload_media_handler(
   mut multipart_payload: Multipart,
 ) -> Result<HttpResponse, UploadMediaError> {
 
+  let mut mysql_connection = server_state.mysql_pool
+      .acquire()
+      .await
+      .map_err(|err| {
+        warn!("MySql pool error: {:?}", err);
+        UploadMediaError::ServerError
+      })?;
+
   // ==================== READ SESSION ==================== //
 
   let maybe_user_session = server_state
       .session_checker
-      .maybe_get_user_session(&http_request, &server_state.mysql_pool)
+      .maybe_get_user_session_from_connection(&http_request, &mut mysql_connection)
       .await
       .map_err(|e| {
         warn!("Session checker error: {:?}", e);
@@ -124,6 +133,27 @@ pub async fn upload_media_handler(
 
   let uuid_idempotency_token = upload_media_request.uuid_idempotency_token
       .ok_or(UploadMediaError::BadInput("no uuid".to_string()))?;
+
+  let maybe_existing_upload =
+      get_media_upload_by_uuid_with_connection(&uuid_idempotency_token, &mut mysql_connection)
+          .await;
+
+  match maybe_existing_upload {
+    Err(err) => {
+      error!("Error checking for previous upload: {:?}", err);
+      return Err(UploadMediaError::ServerError);
+    }
+    Ok(Some(upload)) => {
+      // File already uploaded and frontend didn't protect us.
+      return render_ok_response(UploadMediaSuccessResponse {
+        success: true,
+        upload_token: upload.token,
+      });
+    }
+    Ok(None) => {
+      // Proceed.
+    }
+  }
 
   if let Err(reason) = validate_idempotency_token_format(&uuid_idempotency_token) {
     return Err(UploadMediaError::BadInput(reason));
@@ -271,15 +301,18 @@ pub async fn upload_media_handler(
         UploadMediaError::ServerError
       })?;
 
-  let response = UploadMediaSuccessResponse {
+  render_ok_response(UploadMediaSuccessResponse {
     success: true,
     upload_token: token,
-  };
+  })
+}
 
+
+fn render_ok_response(response: UploadMediaSuccessResponse) -> Result<HttpResponse, UploadMediaError> {
   let body = serde_json::to_string(&response)
       .map_err(|e| UploadMediaError::ServerError)?;
 
-  Ok(HttpResponse::Ok()
+  return Ok(HttpResponse::Ok()
       .content_type("application/json")
-      .body(body))
+      .body(body));
 }
