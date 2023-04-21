@@ -34,8 +34,11 @@ const DEBUG_HEADER_NAME : &'static str = "enable_debug_mode";
 #[derive(Deserialize)]
 pub struct EnqueueVoiceConversionInferenceRequest {
   uuid_idempotency_token: String,
-  voice_conversion_model_token: String,
-  source_media_token: String,
+  voice_conversion_model_token: VoiceConversionModelToken,
+
+  // TODO: Make media upload token optional and allow result audio to be re-used as well
+  source_media_upload_token: MediaUploadToken,
+
   creator_set_visibility: Option<Visibility>,
   is_storyteller_demo: Option<bool>,
 }
@@ -179,8 +182,8 @@ pub async fn enqueue_voice_conversion_inference_handler(
   // ==================== CHECK AND ENQUEUE VOICE CONVERSION ==================== //
 
   // TODO(bt): CHECK DATABASE!
-  let model_token = request.voice_conversion_model_token.to_string();
-  let media_token = request.source_media_token.to_string();
+  let model_token = request.voice_conversion_model_token.clone();
+  let media_token = request.source_media_upload_token.clone();
 
   let mut redis = server_state.redis_pool
       .get()
@@ -189,7 +192,7 @@ pub async fn enqueue_voice_conversion_inference_handler(
         EnqueueVoiceConversionInferenceError::ServerError
       })?;
 
-  let redis_count_key = RedisKeys::web_vc_model_usage_count(&model_token);
+  let redis_count_key = RedisKeys::web_vc_model_usage_count(model_token.as_str());
 
   redis.incr(&redis_count_key, 1)
       .map_err(|e| {
@@ -207,7 +210,6 @@ pub async fn enqueue_voice_conversion_inference_handler(
       .or(maybe_user_preferred_visibility)
       .unwrap_or(Visibility::Public);
 
-  let job_token = InferenceJobToken::generate();
 
   info!("Creating voice conversion inference job record...");
 
@@ -220,16 +222,15 @@ pub async fn enqueue_voice_conversion_inference_handler(
   //  - INFERENCE JOB(2) -> Get it working with TTS too, and update the frontend
 
   let query_result = insert_generic_inference_job(InsertGenericInferenceArgs {
-    job_token: &job_token,
     uuid_idempotency_token: &request.uuid_idempotency_token,
     inference_category: InferenceCategory::VoiceConversion,
     maybe_model_type: None, // TODO(bt, 2023-04-08): Add this.
-    maybe_model_token: Some(&model_token),
+    maybe_model_token: Some(model_token.as_str()),
     maybe_inference_args: Some(GenericInferenceArgs {
       inference_category: Some(InferenceCategory::VoiceConversion),
       args: Some(PolymorphicInferenceArgs::VoiceConversionInferenceArgs {
-        model_token: Some(VoiceConversionModelToken::new_from_str(&model_token)),
-        maybe_media_token: Some(MediaUploadToken::new_from_str(&media_token)),
+        model_token: Some(model_token.clone()), // FIXME: Because of previous borrow
+        maybe_media_token: Some(media_token),
       }),
     }),
     maybe_raw_inference_text: None,
@@ -241,13 +242,13 @@ pub async fn enqueue_voice_conversion_inference_handler(
     mysql_pool: &server_state.mysql_pool,
   }).await;
 
-  match query_result {
-    Ok(_) => {},
+  let job_token = match query_result {
+    Ok((job_token, _id)) => job_token,
     Err(err) => {
       warn!("New generic inference job creation DB error: {:?}", err);
       return Err(EnqueueVoiceConversionInferenceError::ServerError);
     }
-  }
+  };
 
   server_state.firehose_publisher.enqueue_vc_inference(
     maybe_user_token.as_ref(),

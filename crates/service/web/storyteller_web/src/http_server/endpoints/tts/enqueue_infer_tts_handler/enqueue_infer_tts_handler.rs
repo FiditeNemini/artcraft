@@ -29,7 +29,6 @@ use rand::seq::SliceRandom;
 use redis_common::redis_keys::RedisKeys;
 use std::fmt;
 use std::sync::Arc;
-use tokens::jobs::inference::InferenceJobToken;
 use tokens::tokens::tts_models::TtsModelToken;
 use tokens::users::user::UserToken;
 use tts_common::priority::{FAKEYOU_INVESTOR_PRIORITY_LEVEL, FAKEYOU_DEFAULT_VALID_API_TOKEN_PRIORITY_LEVEL};
@@ -359,14 +358,11 @@ pub async fn enqueue_infer_tts_handler(
     // This branch uses the `generic-inference-job` service and tables.
     info!("Creating tts inference job record (new generic job system)...");
 
-    let generic_inference_job_token = InferenceJobToken::generate();
-
     let maybe_creator_user_token_typed = maybe_user_token
         .as_deref()
         .map(|token| UserToken::new_from_str(token));
 
     let query_result = insert_generic_inference_job(InsertGenericInferenceArgs {
-      job_token: &generic_inference_job_token,
       uuid_idempotency_token: &request.uuid_idempotency_token,
       inference_category: InferenceCategory::TextToSpeech,
       maybe_model_type: None, // TODO(bt, 2023-04-08): Add this
@@ -386,15 +382,15 @@ pub async fn enqueue_infer_tts_handler(
       mysql_pool: &server_state.mysql_pool,
     }).await;
 
-    match query_result {
-      Ok(_) => {},
+    let inference_job_token = match query_result {
+      Ok((inference_job_token, _id)) => inference_job_token,
       Err(err) => {
         warn!("New (generic) tts inference job creation DB error: {:?}", err);
         return Err(InferTtsError::ServerError);
       }
-    }
+    };
 
-    job_token = generic_inference_job_token.to_string();
+    job_token = inference_job_token.to_string();
     job_token_type = InferenceJobTokenType::Generic;
 
   } else {

@@ -8,7 +8,6 @@ use tokens::jobs::inference::InferenceJobToken;
 use tokens::users::user::UserToken;
 
 pub struct InsertGenericInferenceArgs<'a> {
-  pub job_token: &'a InferenceJobToken,
   pub uuid_idempotency_token: &'a str,
 
   pub inference_category: InferenceCategory,
@@ -28,7 +27,9 @@ pub struct InsertGenericInferenceArgs<'a> {
   pub mysql_pool: &'a MySqlPool,
 }
 
-pub async fn insert_generic_inference_job(args: InsertGenericInferenceArgs<'_>) -> AnyhowResult<u64> {
+pub async fn insert_generic_inference_job(args: InsertGenericInferenceArgs<'_>) -> AnyhowResult<(InferenceJobToken, u64)> {
+  let job_token = InferenceJobToken::generate();
+
   let serialized_args_payload = serde_json::ser::to_string(&args.maybe_inference_args)
       .map_err(|_e| anyhow!("could not encode inference args"))?;
 
@@ -55,7 +56,7 @@ SET
 
   status = "pending"
         "#,
-        args.job_token.as_str(),
+        job_token.as_str(),
         args.uuid_idempotency_token,
 
         args.inference_category.to_str(),
@@ -84,5 +85,5 @@ SET
     }
   };
 
-  Ok(record_id)
+  Ok((job_token, record_id))
 }
