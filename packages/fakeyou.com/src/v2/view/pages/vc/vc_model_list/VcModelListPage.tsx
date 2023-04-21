@@ -5,7 +5,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { motion } from "framer-motion";
 import { container, panel } from "../../../../../data/animation";
 import { SessionSubscriptionsWrapper } from "@storyteller/components/src/session/SessionSubscriptionsWrapper";
-import { VcPageHero } from "./VcPageHero";
+import { VcPageHero } from "./components/VcPageHero";
 import Select, { createFilter } from "react-select";
 import { SearchFieldClass } from "../../tts/tts_model_list/search/components/SearchFieldClass";
 import {
@@ -16,11 +16,11 @@ import {
   faRightLeft,
   faTrash,
 } from "@fortawesome/pro-solid-svg-icons";
-import UploadComponent from "./UploadComponent";
-import RecordComponent from "./RecordComponent";
+import UploadComponent from "./components/UploadComponent";
+import RecordComponent from "./components/RecordComponent";
 import { usePrefixedDocumentTitle } from "../../../../../common/UsePrefixedDocumentTitle";
 import { ListVoiceConversionModels, VoiceConversionModelListItem } from "@storyteller/components/src/api/voice_conversion/ListVoiceConversionModels";
-import { VcModelListSearch } from "./VcModelListSearch";
+import { VcModelListSearch } from "./components/VcModelListSearch";
 
 interface Props {
   sessionWrapper: SessionWrapper;

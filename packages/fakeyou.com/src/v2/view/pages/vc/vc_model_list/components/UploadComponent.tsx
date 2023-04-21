@@ -2,7 +2,7 @@ import { faFileArrowUp, faFileAudio } from "@fortawesome/pro-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React, { useState } from "react";
 import { FileUploader } from "react-drag-drop-files";
-import { InputVcAudioPlayer } from "../../../_common/InputVcAudioPlayer";
+import { InputVcAudioPlayer } from "../../../../_common/InputVcAudioPlayer";
 
 const fileTypes = ["MP3", "WAV", "FLAC"];
 

@@ -1,10 +1,10 @@
 import { VoiceConversionModelListItem } from "@storyteller/components/src/api/voice_conversion/ListVoiceConversionModels";
 import React from "react";
 import Select, { createFilter } from "react-select";
-import { SearchFieldClass } from "../../tts/tts_model_list/search/components/SearchFieldClass";
-import { FastReactSelectOption } from "../../../_common/react_select/FastReactSelectOption";
-import { Analytics } from "../../../../../common/Analytics";
-import { FixedSingleValueSelectOption } from "../../../_common/react_select/FixedSingleValueSelectOption";
+import { SearchFieldClass } from "../../../tts/tts_model_list/search/components/SearchFieldClass";
+import { FastReactSelectOption } from "../../../../_common/react_select/FastReactSelectOption";
+import { Analytics } from "../../../../../../common/Analytics";
+import { FixedSingleValueSelectOption } from "../../../../_common/react_select/FixedSingleValueSelectOption";
 
 interface Props {
   voiceConversionModels: Array<VoiceConversionModelListItem>;

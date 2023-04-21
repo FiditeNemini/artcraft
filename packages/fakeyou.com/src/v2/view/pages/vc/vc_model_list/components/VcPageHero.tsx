@@ -11,9 +11,9 @@ import {
   faArrowRight,
   faWaveformLines,
 } from "@fortawesome/pro-solid-svg-icons";
-import { Analytics } from "../../../../../common/Analytics";
-import { WebUrl } from "../../../../../common/WebUrl";
-import { PageHeaderWithImage } from "../../../_common/PageHeaderWithImage";
+import { Analytics } from "../../../../../../common/Analytics";
+import { WebUrl } from "../../../../../../common/WebUrl";
+import { PageHeaderWithImage } from "../../../../_common/PageHeaderWithImage";
 
 interface Props {
   sessionWrapper: SessionWrapper;

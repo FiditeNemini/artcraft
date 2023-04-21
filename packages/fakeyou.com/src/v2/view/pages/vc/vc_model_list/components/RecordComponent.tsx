@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useAudioRecorder } from "react-audio-voice-recorder";
-import { InputVcAudioPlayer } from "../../../_common/InputVcAudioPlayer";
+import { InputVcAudioPlayer } from "../../../../_common/InputVcAudioPlayer";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faMicrophone } from "@fortawesome/pro-solid-svg-icons";
 
