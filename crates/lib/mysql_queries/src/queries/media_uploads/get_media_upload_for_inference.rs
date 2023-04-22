@@ -91,6 +91,7 @@ WHERE
       original_duration_millis: upload.original_duration_millis as u32,
       maybe_extra_file_modification_info: upload.maybe_extra_file_modification_info
           .as_deref()
+          .filter(|info| !info.trim().is_empty())
           .map(|info| MediaUploadModificationDetails::from_json(info))
           .transpose()?,
       creator_set_visibility: upload.creator_set_visibility,
