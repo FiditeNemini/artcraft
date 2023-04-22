@@ -1,5 +1,7 @@
 use std::path::Path;
 
+/// Check if the path exists and if it's a directory.
+#[inline]
 pub fn directory_exists<P: AsRef<Path>>(path: P) -> bool {
   let path_ref = path.as_ref();
   if !path_ref.exists() {

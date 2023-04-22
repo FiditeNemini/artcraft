@@ -1,3 +1,4 @@
+use std::fs;
 use anyhow::anyhow;
 use buckets::public::media_uploads::original_file::MediaUploadOriginalFilePath;
 use buckets::public::voice_conversion_results::original_file::VoiceConversionResultOriginalFilePath;
@@ -23,6 +24,7 @@ use std::io::Read;
 use std::path::{Path, PathBuf};
 use subprocess_common::docker_options::{DockerFilesystemMount, DockerGpu, DockerOptions};
 use tempdir::TempDir;
+use filesys::create_dir_all_if_missing::create_dir_all_if_missing;
 use tokens::files::media_upload::MediaUploadToken;
 use tokens::users::user::UserToken;
 
@@ -51,6 +53,12 @@ pub async fn process_job(args: SoVitsSvcProcessJobArgs<'_>) -> Result<JobSuccess
 
   let so_vits_svc_fs_path = {
     let so_vits_svc_fs_path = args.job_dependencies.semi_persistent_cache.voice_conversion_model_path(vc_model.token.as_str());
+
+    create_dir_all_if_missing(args.job_dependencies.semi_persistent_cache.voice_conversion_model_directory())
+        .map_err(|e| {
+          error!("could not create model storage directory: {:?}", e);
+          ProcessSingleJobError::from_io_error(e)
+        })?;
 
     let so_vits_svc_model_object_path  = args.job_dependencies.bucket_path_unifier.so_vits_svc_model_path(&vc_model.private_bucket_hash);
 
