@@ -1,4 +1,5 @@
 use anyhow::anyhow;
+use log::warn;
 use buckets::public::media_uploads::original_file::MediaUploadOriginalFilePath;
 use errors::AnyhowResult;
 use crate::payloads::media_upload_modification_details::MediaUploadModificationDetails;
@@ -8,8 +9,12 @@ use sqlx::MySqlPool;
 use tokens::files::media_upload::MediaUploadToken;
 use tokens::users::user::UserToken;
 
+/// Used to give user-facing order to logged in user inference requests
+pub struct SyntheticIdRecord {
+  pub next_id: i64,
+}
+
 pub struct Args <'a> {
-  pub token: &'a MediaUploadToken,
   pub uuid_idempotency_token: &'a str,
 
   pub media_type: MediaUploadType,
@@ -36,7 +41,68 @@ pub struct Args <'a> {
   pub mysql_pool: &'a MySqlPool,
 }
 
-pub async fn insert_media_upload(args: Args<'_>) -> AnyhowResult<u64> {
+pub async fn insert_media_upload(args: Args<'_>) -> AnyhowResult<(MediaUploadToken, u64)> {
+
+  let mut maybe_creator_synthetic_id : Option<u64> = None;
+
+  let mut transaction = args.mysql_pool.begin().await?;
+
+  if let Some(creator_user_token) = args.maybe_creator_user_token.as_deref() {
+    let query_result = sqlx::query!(
+        r#"
+INSERT INTO media_upload_synthetic_ids
+SET
+  user_token = ?,
+  next_id = 1
+ON DUPLICATE KEY UPDATE
+  user_token = ?,
+  next_id = next_id + 1
+        "#,
+      creator_user_token,
+      creator_user_token
+    )
+        .execute(&mut transaction)
+        .await;
+
+    match query_result {
+      Ok(_) => {},
+      Err(err) => {
+        //transaction.rollback().await?;
+        warn!("Transaction failure: {:?}", err);
+      }
+    }
+
+    let query_result = sqlx::query_as!(
+    SyntheticIdRecord,
+        r#"
+SELECT
+  next_id
+FROM
+  media_upload_synthetic_ids
+WHERE
+  user_token = ?
+LIMIT 1
+        "#,
+      creator_user_token,
+    )
+        .fetch_one(&mut transaction)
+        .await;
+
+    let record : SyntheticIdRecord = match query_result {
+      Ok(record) => record,
+      Err(err) => {
+        warn!("Transaction failure: {:?}", err);
+        transaction.rollback().await?;
+        return Err(anyhow!("Transaction failure: {:?}", err));
+      }
+    };
+
+    let next_id = record.next_id as u64;
+    maybe_creator_synthetic_id = Some(next_id);
+  }
+
+  let media_token = MediaUploadToken::generate();
+
   let query = sqlx::query!(
         r#"
 INSERT INTO media_uploads
@@ -60,13 +126,13 @@ SET
   extra_file_modification_info = ?,
 
   maybe_creator_user_token = ?,
+  maybe_creator_synthetic_id = ?,
   maybe_creator_anonymous_visitor_token = ?,
   creator_ip_address = ?,
-  creator_set_visibility = ?,
+  creator_set_visibility = ?
 
-  maybe_creator_synthetic_id = ?
         "#,
-        args.token,
+        media_token.as_str(),
         args.uuid_idempotency_token,
 
         args.media_type,
@@ -85,18 +151,17 @@ SET
         "", // TODO: args.extra_file_modification_info,
 
         args.maybe_creator_user_token,
+        maybe_creator_synthetic_id,
         args.maybe_creator_anonymous_visitor_token,
         args.creator_ip_address,
         args.creator_set_visibility.to_str(),
-
-        args.maybe_creator_synthetic_id,
     );
 
-  let query_result = query.execute(args.mysql_pool)
+  let query_result = query.execute(&mut transaction)
       .await;
 
   match query_result {
-    Ok(res) => Ok(res.last_insert_id()),
+    Ok(res) => Ok((media_token, res.last_insert_id())),
     Err(err) => Err(anyhow!("error inserting new media upload: {:?}", err)),
   }
 }

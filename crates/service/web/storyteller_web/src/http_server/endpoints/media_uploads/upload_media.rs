@@ -169,8 +169,6 @@ pub async fn upload_media_handler(
   let maybe_user_token = maybe_user_session
       .map(|session| session.get_strongly_typed_user_token());
 
-  let token = MediaUploadToken::generate();
-
   let maybe_mimetype = upload_media_request.file_bytes
       .as_ref()
       .map(|bytes| get_mimetype_for_bytes(bytes.as_ref()))
