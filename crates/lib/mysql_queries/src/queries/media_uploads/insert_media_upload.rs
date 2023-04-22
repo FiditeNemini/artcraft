@@ -1,7 +1,7 @@
 use anyhow::anyhow;
 use buckets::public::media_uploads::original_file::MediaUploadOriginalFilePath;
 use errors::AnyhowResult;
-use crate::payloads::media_upload_details::MediaUploadDetails;
+use crate::payloads::media_upload_modification_details::MediaUploadModificationDetails;
 use enums::by_table::media_uploads::media_upload_type::MediaUploadType;
 use enums::common::visibility::Visibility;
 use sqlx::MySqlPool;
@@ -24,7 +24,7 @@ pub struct Args <'a> {
   pub checksum_sha2: &'a str,
 
   pub public_upload_path: &'a MediaUploadOriginalFilePath,
-  pub extra_file_modification_info: MediaUploadDetails,
+  pub extra_file_modification_info: MediaUploadModificationDetails,
 
   pub maybe_creator_user_token: Option<&'a UserToken>,
   pub maybe_creator_anonymous_visitor_token: Option<&'a str>,

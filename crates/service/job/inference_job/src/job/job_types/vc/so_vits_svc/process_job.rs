@@ -23,6 +23,8 @@ use std::io::Read;
 use std::path::{Path, PathBuf};
 use subprocess_common::docker_options::{DockerFilesystemMount, DockerGpu, DockerOptions};
 use tempdir::TempDir;
+use buckets::public::media_uploads::original_file::MediaUploadOriginalFilePath;
+use mysql_queries::queries::media_uploads::get_media_upload_for_inference::get_media_upload_for_inference;
 use tokens::files::media_upload::MediaUploadToken;
 use tts_common::clean_symbols::clean_symbols;
 use tts_common::text_pipelines::guess_pipeline::guess_text_pipeline_heuristic;
@@ -32,6 +34,7 @@ pub struct SoVitsSvcProcessJobArgs<'a> {
   pub job_dependencies: &'a JobDependencies,
   pub job: &'a AvailableInferenceJob,
   pub vc_model: &'a VoiceConversionModelForInference,
+  pub media_upload_token: &'a MediaUploadToken,
   //pub media_upload_token: &'a MediaUploadToken,
 }
 
@@ -80,6 +83,46 @@ pub async fn process_job(args: SoVitsSvcProcessJobArgs<'_>) -> Result<JobSuccess
 
   // ==================== DOWNLOAD MEDIA FILE ==================== //
 
+  let maybe_media_upload_result = get_media_upload_for_inference(args.media_upload_token, &args.job_dependencies.mysql_pool).await;
+
+  let media_upload = match maybe_media_upload_result {
+    Ok(Some(media_upload)) => media_upload,
+    Ok(None) => {
+      error!("no media upload record found for token: {:?}", args.media_upload_token);
+      return Err(ProcessSingleJobError::Other(anyhow!("no media upload record found for token: {:?}", args.media_upload_token)));
+    },
+    Err(err) => {
+      error!("error fetching media upload record from db: {:?}", err);
+      return Err(ProcessSingleJobError::Other(err));
+    },
+  };
+
+  // TODO: If already transcoded, download the transcoded file instead.
+  // TODO: Turn this into a general utility.
+
+  let original_media_upload_fs_path = {
+    let original_media_upload_fs_path = temp_dir.path().join("original.bin");
+
+    let media_upload_bucket_path =
+        MediaUploadOriginalFilePath::from_object_hash(&media_upload.public_bucket_directory_hash);
+
+    let bucket_object_path = media_upload_bucket_path.to_full_object_pathbuf();
+
+    info!("Downloading media to bucket path: {:?}", &bucket_object_path);
+
+    maybe_download_file_from_bucket(
+      "media upload (original file)",
+      &original_media_upload_fs_path,
+      &bucket_object_path,
+      &args.job_dependencies.private_bucket_client,
+      &mut job_progress_reporter,
+      "downloading",
+      job.id.0,
+      &args.job_dependencies.scoped_temp_dir_creator,
+    ).await?;
+
+    original_media_upload_fs_path
+  };
 
   // ==================== TRANSCODE MEDIA (IF NECESSARY) ==================== //
 
@@ -91,9 +134,7 @@ pub async fn process_job(args: SoVitsSvcProcessJobArgs<'_>) -> Result<JobSuccess
       .map_err(|e| ProcessSingleJobError::Other(e))?;
 
   let config_path = PathBuf::from("/models/voice_conversion/so-vits-svc/example_config.json"); // TODO: This could be variable.
-  //let input_wav_path = PathBuf::from("/models/voice_conversion/so-vits-svc/example.wav"); // TODO: This could be variable.
-
-  let output_wav_path = temp_dir.path().join("output.wav");
+  let input_wav_path = original_media_upload_fs_path;
 
   let output_audio_fs_path = temp_dir.path().join("output.wav");
   let output_metadata_fs_path = temp_dir.path().join("metadata.json");
@@ -113,18 +154,22 @@ pub async fn process_job(args: SoVitsSvcProcessJobArgs<'_>) -> Result<JobSuccess
 
   // ==================== RUN INFERENCE SCRIPT ==================== //
 
-  let model_check_result = args.job_dependencies.job_type_details.so_vits_svc.inference_command.execute_check(InferenceArgs {
-    model_path: &so_vits_svc_fs_path,
-    input_path: &input_wav_path,
-    output_path: &output_wav_path,
-    config_path: &config_path,
-    device: Device::Cuda,
-  });
+  let model_check_result = args.job_dependencies
+      .job_type_details
+      .so_vits_svc
+      .inference_command
+      .execute_check(InferenceArgs {
+        model_path: &so_vits_svc_fs_path,
+        input_path: &input_wav_path,
+        output_path: &output_audio_fs_path,
+        config_path: &config_path,
+        device: Device::Cuda,
+      });
 
   if let Err(err) = model_check_result {
     error!("Inference failed: {:?}", err);
-    safe_delete_temp_file(&so_vits_svc_fs_path);
-    safe_delete_temp_file(&output_wav_path);
+    safe_delete_temp_file(&input_wav_path);
+    safe_delete_temp_file(&output_audio_fs_path);
     safe_delete_temp_directory(&temp_dir);
     return Err(ProcessSingleJobError::Other(err));
   }

@@ -4,7 +4,9 @@ use enums::by_table::voice_conversion_models::voice_conversion_model_type::Voice
 use crate::job::job_loop::process_single_job_error::ProcessSingleJobError;
 use crate::job_dependencies::JobDependencies;
 use errors::AnyhowResult;
+use mysql_queries::payloads::generic_inference_args::PolymorphicInferenceArgs;
 use mysql_queries::queries::generic_inference::job::list_available_generic_inference_jobs::AvailableInferenceJob;
+use mysql_queries::queries::media_uploads::get_media_upload_for_inference::get_media_upload_for_inference;
 use mysql_queries::queries::voice_conversion::inference::get_voice_conversion_model_for_inference::get_voice_conversion_model_for_inference;
 use crate::job::job_loop::job_success_result::JobSuccessResult;
 use crate::job::job_types::vc::so_vits_svc;
@@ -37,6 +39,23 @@ pub async fn process_single_vc_job(job_dependencies: &JobDependencies, job: &Ava
 
   // TODO: Attempt to grab job lock
 
+  let maybe_media_upload_token = job.maybe_inference_args
+      .as_ref()
+      .map(|args| args.args)
+      .flatten()
+      .map(|args| {
+        match args {
+          PolymorphicInferenceArgs::TextToSpeechInferenceArgs { .. } => None,
+          PolymorphicInferenceArgs::VoiceConversionInferenceArgs { maybe_media_token } => maybe_media_token.clone(),
+        }
+      })
+      .flatten();
+
+  let media_upload_token = match maybe_media_upload_token {
+    None => return Err(ProcessSingleJobError::Other(anyhow!("no associated media upload for vc job: {:?}", job.inference_job_token))),
+    Some(token) => token,
+  };
+
   let job_success_result = match vc_model.model_type {
     VoiceConversionModelType::SoftVc => {
       // TODO
@@ -49,6 +68,7 @@ pub async fn process_single_vc_job(job_dependencies: &JobDependencies, job: &Ava
         job_dependencies,
         job,
         vc_model: &vc_model,
+        media_upload_token: &media_upload_token,
       }).await?
     }
   };

@@ -12,6 +12,7 @@ use std::collections::BTreeSet;
 use std::future::Future;
 use std::path::Path;
 use tokens::jobs::inference::InferenceJobToken;
+use crate::payloads::generic_inference_args::GenericInferenceArgs;
 
 /// table: generic_inference_jobs
 #[derive(Debug)]
@@ -27,7 +28,7 @@ pub struct AvailableInferenceJob {
   pub maybe_model_token: Option<String>,
 
   // Inference details
-  pub maybe_inference_args: Option<String>,
+  pub maybe_inference_args: Option<GenericInferenceArgs>,
   pub maybe_raw_inference_text: Option<String>,
 
   // User information to propagate downstream
@@ -101,7 +102,10 @@ pub async fn list_available_generic_inference_jobs(
               .map_err(|e| anyhow!("error: {:?}", e))?, // TODO/FIXME: This is a gross fix.
           maybe_model_type: record.maybe_model_type,
           maybe_model_token: record.maybe_model_token,
-          maybe_inference_args: record.maybe_inference_args,
+          maybe_inference_args: record.maybe_inference_args
+              .as_deref()
+              .map(|args| GenericInferenceArgs::from_json(args))
+              .transpose()?,
           maybe_raw_inference_text: record.maybe_raw_inference_text,
           status: JobStatus::from_str(&record.status)?,
           attempt_count: record.attempt_count,

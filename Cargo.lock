@@ -3645,6 +3645,7 @@ name = "inference-job"
 version = "0.0.1"
 dependencies = [
  "anyhow",
+ "buckets",
  "chrono",
  "clap",
  "cloud_storage",

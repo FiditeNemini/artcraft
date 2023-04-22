@@ -14,7 +14,7 @@ use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::server_state::ServerState;
 use crate::validations::model_uploads::validate_model_title;
 use crate::validations::validate_idempotency_token_format::validate_idempotency_token_format;
-use mysql_queries::payloads::media_upload_details::MediaUploadDetails;
+use mysql_queries::payloads::media_upload_modification_details::MediaUploadModificationDetails;
 use mysql_queries::queries::media_uploads::insert_media_upload::{Args, insert_media_upload};
 use enums::by_table::media_uploads::media_upload_type::MediaUploadType;
 use enums::common::visibility::Visibility;
@@ -276,7 +276,7 @@ pub async fn upload_media_handler(
     maybe_original_frame_height: None,
     checksum_sha2: &hash,
     public_upload_path: &public_upload_path,
-    extra_file_modification_info: MediaUploadDetails {}, // TODO
+    extra_file_modification_info: MediaUploadModificationDetails {}, // TODO
     maybe_creator_user_token: maybe_user_token.as_ref(),
     maybe_creator_anonymous_visitor_token: None,
     creator_ip_address: &ip_address,

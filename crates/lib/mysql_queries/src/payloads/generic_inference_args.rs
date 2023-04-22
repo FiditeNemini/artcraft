@@ -1,4 +1,5 @@
 use enums::by_table::generic_inference_jobs::inference_category::InferenceCategory;
+use errors::AnyhowResult;
 use tokens::files::media_upload::MediaUploadToken;
 use tokens::tokens::tts_models::TtsModelToken;
 use tokens::voice_conversion::model::VoiceConversionModelToken;
@@ -42,6 +43,17 @@ pub enum PolymorphicInferenceArgs {
     /// It's "optional" in case we use other types of records in the future.
     maybe_media_token: Option<MediaUploadToken>,
   },
+}
+
+impl GenericInferenceArgs {
+
+  pub fn from_json(json: &str) -> AnyhowResult<Self> {
+    Ok(serde_json::from_str(json)?)
+  }
+
+  pub fn to_json(&self) -> AnyhowResult<String> {
+    Ok(serde_json::to_string(self)?)
+  }
 }
 
 impl InferenceCategoryAbbreviated {

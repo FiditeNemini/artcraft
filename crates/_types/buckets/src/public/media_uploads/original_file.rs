@@ -1,6 +1,7 @@
 use crate::public::media_uploads::directory::MediaUploadDirectory;
 use crate::public::public_path::PublicPath;
 use crockford::crockford_entropy_lower;
+use std::path::PathBuf;
 
 const ORIGINAL_FILE_BASENAME : &'static str = "original_upload.bin";
 
@@ -37,6 +38,10 @@ impl MediaUploadOriginalFilePath {
     &self.full_object_path
   }
 
+  pub fn to_full_object_pathbuf(&self) -> PathBuf {
+    PathBuf::from(&self.full_object_path)
+  }
+
   pub fn get_directory(&self) -> &MediaUploadDirectory {
     &self.directory
   }
@@ -53,6 +58,7 @@ impl MediaUploadOriginalFilePath {
 #[cfg(test)]
 mod tests {
   use crate::public::media_uploads::original_file::MediaUploadOriginalFilePath;
+  use std::path::PathBuf;
 
   #[test]
   pub fn generate_new_entropy() {
@@ -65,6 +71,12 @@ mod tests {
   pub fn get_full_object_path_str() {
     let file = MediaUploadOriginalFilePath::from_object_hash("abcdefghijk");
     assert_eq!(file.get_full_object_path_str(), "/media_upload/a/b/c/d/e/abcdefghijk/original_upload.bin");
+  }
+
+  #[test]
+  pub fn to_full_object_pathbuf() {
+    let file = MediaUploadOriginalFilePath::from_object_hash("abcdefghijk");
+    assert_eq!(file.to_full_object_pathbuf(), PathBuf::from("/media_upload/a/b/c/d/e/abcdefghijk/original_upload.bin"));
   }
 
   #[test]
