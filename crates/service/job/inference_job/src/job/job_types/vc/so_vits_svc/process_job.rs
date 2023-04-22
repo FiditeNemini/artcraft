@@ -117,7 +117,7 @@ pub async fn process_job(args: SoVitsSvcProcessJobArgs<'_>) -> Result<JobSuccess
       "media upload (original file)",
       &original_media_upload_fs_path,
       &bucket_object_path,
-      &args.job_dependencies.private_bucket_client,
+      &args.job_dependencies.public_bucket_client,
       &mut job_progress_reporter,
       "downloading",
       job.id.0,
