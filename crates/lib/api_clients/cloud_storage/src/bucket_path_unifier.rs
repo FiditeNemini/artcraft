@@ -20,6 +20,7 @@ pub struct BucketPathUnifier {
   // VC
   pub softvc_model_root: PathBuf,
   pub so_vits_svc_model_root: PathBuf,
+  pub vc_inference_output_root: PathBuf,
 }
 
 impl BucketPathUnifier {
@@ -40,6 +41,7 @@ impl BucketPathUnifier {
       // VC
       softvc_model_root: PathBuf::from("/user_uploaded_softvc_models"),
       so_vits_svc_model_root: PathBuf::from("/user_uploaded_so_vits_svc_models"),
+      vc_inference_output_root: PathBuf::from("/vc_inference_output"),
     }
   }
 
@@ -215,6 +217,19 @@ impl BucketPathUnifier {
         .join(model_filename)
   }
 
+  // ==================== VOICE CONVERSION INFERENCE OUTPUT ==================== //
+
+  // NB: Callers use job uuid_idempotency_token, which seems *bad*
+  pub fn voice_conversion_inference_wav_audio_output_path(&self, vc_inference_output_uuid: &str) -> PathBuf {
+    let hashed_path = Self::hashed_directory_path(vc_inference_output_uuid);
+    let audio_filename = format!("fakeyou_{}.wav", &vc_inference_output_uuid);
+
+    self.vc_inference_output_root
+        .join(hashed_path)
+        .join(audio_filename)
+  }
+
+
   // ==================== UTILITY ==================== //
 
   pub fn hashed_directory_path(file_hash: &str) -> String {
@@ -243,6 +258,7 @@ mod tests {
       // VOICE CONVERSION
       softvc_model_root: PathBuf::from("/test_path_softvc_models"),
       so_vits_svc_model_root: PathBuf::from("/test_path_so_vits_svc_models"),
+      vc_inference_output_root: PathBuf::from("/test_path_vc_output"),
     }
   }
 
@@ -355,6 +371,13 @@ mod tests {
     let paths = get_instance();
     assert_eq!(paths.so_vits_svc_model_path("foobar").to_str().unwrap(),
                "/test_path_so_vits_svc_models/f/o/o/foobar.pt");
+  }
+
+  #[test]
+  fn test_vc_inference_wav_audio_output_path() {
+    let paths = get_instance();
+    assert_eq!(paths.voice_conversion_inference_wav_audio_output_path("foobar").to_str().unwrap(),
+               "/test_path_vc_output/f/o/o/fakeyou_foobar.wav");
   }
 
   #[test]

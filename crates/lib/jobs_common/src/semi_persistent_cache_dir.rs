@@ -11,6 +11,8 @@ pub struct SemiPersistentCacheDir {
   tts_pretrained_vocoder_model_root: PathBuf, // Pretrained, non-user uploaded vocoders
   vocoder_model_root: PathBuf, // User-uploaded vocoders
 
+  voice_conversion_model_root: PathBuf,
+
   w2l_model_root: PathBuf,
   w2l_end_bump_root: PathBuf,
   w2l_face_templates_root: PathBuf,
@@ -35,6 +37,8 @@ impl SemiPersistentCacheDir {
       tts_synthesizer_model_root: cache_root.join("tts/synthesizer_models/"),
       tts_pretrained_vocoder_model_root: cache_root.join("tts/vocoder_models_pretrained/"),
       vocoder_model_root: cache_root.join("tts/user_uploaded_vocoder_models/"),
+
+      voice_conversion_model_root: cache_root.join("voice_conversion/models/"),
 
       w2l_model_root: cache_root.join("w2l/models/"),
       w2l_end_bump_root: cache_root.join("w2l/end_bumps/"),
@@ -89,6 +93,23 @@ impl SemiPersistentCacheDir {
 
   pub fn create_custom_vocoder_model_path(&self) -> AnyhowResult<()> {
     let _ = fs::create_dir_all(self.custom_vocoder_model_directory())?;
+    Ok(())
+  }
+
+  // ==================== VOICE CONVERSION MODELS ====================
+
+  /// We cache voice conversion models here.
+  /// We'll likely need to LRU cache them.
+  pub fn voice_conversion_model_path<P: AsRef<Path>>(&self, model_filename: P) -> PathBuf {
+    self.voice_conversion_model_root.join(model_filename)
+  }
+
+  pub fn voice_conversion_model_directory(&self) -> &Path {
+    &self.voice_conversion_model_root
+  }
+
+  pub fn create_voice_conversion_model_path(&self) -> AnyhowResult<()> {
+    let _ = fs::create_dir_all(self.voice_conversion_model_directory())?;
     Ok(())
   }
 

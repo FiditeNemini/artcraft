@@ -14,6 +14,7 @@ use r2d2_redis::RedisConnectionManager;
 use r2d2_redis::r2d2;
 use sqlx::MySqlPool;
 use std::path::PathBuf;
+use crate::job::job_types::vc::so_vits_svc::so_vits_svc_inference_command::SoVitsSvcInferenceCommand;
 
 pub struct JobDependencies {
   pub download_temp_directory: PathBuf,
@@ -114,9 +115,9 @@ impl JobDependencies {
 pub struct JobTypeDetails {
   pub tacotron2_old_vocodes: Tacotron2VocodesDetails,
   pub vits: VitsDetails,
+  pub so_vits_svc: SoVitsSvcDetails,
   //pub tacotron2_modern: ...,
   //pub softvc: ...,
-  //pub so_vits_svc: ...,
 }
 
 /// "Old" TT2 (vocodes-era)
@@ -135,4 +136,8 @@ pub struct Tacotron2VocodesDetails {
 
 pub struct VitsDetails {
   pub inference_command: VitsInferenceCommand,
+}
+
+pub struct SoVitsSvcDetails {
+  pub inference_command: SoVitsSvcInferenceCommand,
 }

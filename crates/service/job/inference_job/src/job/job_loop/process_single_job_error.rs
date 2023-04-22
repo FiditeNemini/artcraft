@@ -5,6 +5,8 @@ use anyhow::anyhow;
 pub enum ProcessSingleJobError {
   /// The filesystem is out of space and we need to free it up.
   FilesystemFull,
+  /// The job is invalid (bad state, etc.)
+  InvalidJob(anyhow::Error),
   /// This is any other kind of error.
   /// It might be important, we just haven't special cased it yet.
   Other(anyhow::Error),
