@@ -1,5 +1,5 @@
-use crate::public::media_uploads::directory::MediaUploadDirectory;
 use crate::public::public_path::PublicPath;
+use crate::public::voice_conversion_results::directory::VoiceConversionResultDirectory;
 use crockford::crockford_entropy_lower;
 use std::path::PathBuf;
 
@@ -12,7 +12,7 @@ const ORIGINAL_FILE_SUFFIX : &'static str = ".wav";
 /// It may have derivative files (down samples, crops, etc.) that live alongside it.
 #[derive(Clone)]
 pub struct VoiceConversionResultOriginalFilePath {
-  directory: MediaUploadDirectory,
+  directory: VoiceConversionResultDirectory,
   basename: String,
   full_object_path: String,
 }
@@ -28,7 +28,7 @@ impl VoiceConversionResultOriginalFilePath {
 
   pub fn from_object_hash(hash: &str) -> Self {
     // TODO: Path construction could be cleaner.
-    let directory = MediaUploadDirectory::from_object_hash(hash);
+    let directory = VoiceConversionResultDirectory::from_public_bucket_directory_hash(hash);
     let basename = format!("{}{}{}", ORIGINAL_FILE_PREFIX, hash, ORIGINAL_FILE_SUFFIX);
     let full_object_path = format!("{}/{}{}{}", directory.get_directory_path_str(), ORIGINAL_FILE_PREFIX, hash, ORIGINAL_FILE_SUFFIX);
     Self {
@@ -46,7 +46,7 @@ impl VoiceConversionResultOriginalFilePath {
     PathBuf::from(&self.full_object_path)
   }
 
-  pub fn get_directory(&self) -> &MediaUploadDirectory {
+  pub fn get_directory(&self) -> &VoiceConversionResultDirectory {
     &self.directory
   }
 
@@ -74,19 +74,19 @@ mod tests {
   #[test]
   pub fn get_full_object_path_str() {
     let file = VoiceConversionResultOriginalFilePath::from_object_hash("abcdefghijk");
-    assert_eq!(file.get_full_object_path_str(), "/media_upload/a/b/c/d/e/abcdefghijk/fakeyou_abcdefghijk.wav");
+    assert_eq!(file.get_full_object_path_str(), "/voice_conversion/a/b/c/d/e/abcdefghijk/fakeyou_abcdefghijk.wav");
   }
 
   #[test]
   pub fn to_full_object_pathbuf() {
     let file = VoiceConversionResultOriginalFilePath::from_object_hash("abcdefghijk");
-    assert_eq!(file.to_full_object_pathbuf(), PathBuf::from("/media_upload/a/b/c/d/e/abcdefghijk/fakeyou_abcdefghijk.wav"));
+    assert_eq!(file.to_full_object_pathbuf(), PathBuf::from("/voice_conversion/a/b/c/d/e/abcdefghijk/fakeyou_abcdefghijk.wav"));
   }
 
   #[test]
   pub fn get_full_object_path_str_short_name() {
     let file = VoiceConversionResultOriginalFilePath::from_object_hash("foo");
-    assert_eq!(file.get_full_object_path_str(), "/media_upload/f/o/foo/fakeyou_foo.wav");
+    assert_eq!(file.get_full_object_path_str(), "/voice_conversion/f/o/foo/fakeyou_foo.wav");
   }
 
   #[test]
