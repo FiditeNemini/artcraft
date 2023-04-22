@@ -24,6 +24,7 @@ use std::path::{Path, PathBuf};
 use subprocess_common::docker_options::{DockerFilesystemMount, DockerGpu, DockerOptions};
 use tempdir::TempDir;
 use buckets::public::media_uploads::original_file::MediaUploadOriginalFilePath;
+use buckets::public::voice_conversion_results::original_file::VoiceConversionResultOriginalFilePath;
 use mysql_queries::queries::media_uploads::get_media_upload_for_inference::get_media_upload_for_inference;
 use tokens::files::media_upload::MediaUploadToken;
 use tts_common::clean_symbols::clean_symbols;
@@ -192,15 +193,16 @@ pub async fn process_job(args: SoVitsSvcProcessJobArgs<'_>) -> Result<JobSuccess
   job_progress_reporter.log_status("uploading result")
       .map_err(|e| ProcessSingleJobError::Other(e))?;
 
-  let audio_result_object_path = args.job_dependencies.bucket_path_unifier.voice_conversion_inference_wav_audio_output_path(
-    &job.uuid_idempotency_token); // TODO: Don't use this!
+  let result_bucket_location = VoiceConversionResultOriginalFilePath::generate_new();
 
-  info!("Audio destination bucket path: {:?}", &audio_result_object_path);
+  let result_bucket_object_pathbuf = result_bucket_location.to_full_object_pathbuf();
+
+  info!("Audio destination bucket path: {:?}", &result_bucket_object_pathbuf);
 
   info!("Uploading audio...");
 
   args.job_dependencies.public_bucket_client.upload_filename_with_content_type(
-    &audio_result_object_path,
+    &result_bucket_object_pathbuf,
     &output_audio_fs_path,
     "audio/wav")
       .await
@@ -235,7 +237,7 @@ pub async fn process_job(args: SoVitsSvcProcessJobArgs<'_>) -> Result<JobSuccess
 
   let worker_name = args.job_dependencies.get_worker_name();
 
-  info!("Saving tts inference record...");
+  info!("Saving vc inference record...");
 
   // NB: The stupid DB field for spectrograms is not nullable, so we'll just set empty string.
   let fake_spectrogram_path = PathBuf::from("");
