@@ -24,6 +24,7 @@ pub(crate) enum EntityType {
   TtsRenderTask, // NB: aichatbot / sqlite
   User,
   VoiceConversionModel,
+  VoiceConversionResult,
   W2lTemplate,
 }
 
@@ -41,7 +42,8 @@ impl EntityType {
       Self::TtsModel => "TM:", // NB: Old-style prefix, do not use for future tokens.
       Self::TtsRenderTask => "tts_task_",
       Self::User => "U:", // NB: Old-style prefix, do not use for future tokens.
-      Self::VoiceConversionModel => "voco_",
+      Self::VoiceConversionModel => "vcm_",
+      Self::VoiceConversionResult => "vcr_",
       Self::W2lTemplate => "WT:", // NB: Old-style prefix, do not use for future tokens.
     }
   }

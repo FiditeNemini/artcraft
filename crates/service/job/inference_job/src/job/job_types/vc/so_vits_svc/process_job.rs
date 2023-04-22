@@ -1,4 +1,6 @@
 use anyhow::anyhow;
+use buckets::public::media_uploads::original_file::MediaUploadOriginalFilePath;
+use buckets::public::voice_conversion_results::original_file::VoiceConversionResultOriginalFilePath;
 use container_common::filesystem::check_file_exists::check_file_exists;
 use container_common::filesystem::safe_delete_temp_directory::safe_delete_temp_directory;
 use container_common::filesystem::safe_delete_temp_file::safe_delete_temp_file;
@@ -12,31 +14,23 @@ use errors::AnyhowResult;
 use filesys::filename_concat::filename_concat;
 use hashing::sha256::sha256_hash_string::sha256_hash_string;
 use log::{error, info};
-use mysql_queries::column_types::vocoder_type::VocoderType;
 use mysql_queries::queries::generic_inference::job::list_available_generic_inference_jobs::AvailableInferenceJob;
-use mysql_queries::queries::tts::tts_inference_jobs::mark_tts_inference_job_done::mark_tts_inference_job_done;
-use mysql_queries::queries::tts::tts_models::get_tts_model_for_inference_improved::TtsModelForInferenceRecord;
-use mysql_queries::queries::tts::tts_results::insert_tts_result::{insert_tts_result, JobType};
+use mysql_queries::queries::media_uploads::get_media_upload_for_inference::get_media_upload_for_inference;
 use mysql_queries::queries::voice_conversion::inference::get_voice_conversion_model_for_inference::VoiceConversionModelForInference;
+use mysql_queries::queries::voice_conversion::results::insert_voice_conversion_result::{insert_voice_conversion_result, InsertArgs};
 use std::fs::File;
 use std::io::Read;
 use std::path::{Path, PathBuf};
 use subprocess_common::docker_options::{DockerFilesystemMount, DockerGpu, DockerOptions};
 use tempdir::TempDir;
-use buckets::public::media_uploads::original_file::MediaUploadOriginalFilePath;
-use buckets::public::voice_conversion_results::original_file::VoiceConversionResultOriginalFilePath;
-use mysql_queries::queries::media_uploads::get_media_upload_for_inference::get_media_upload_for_inference;
 use tokens::files::media_upload::MediaUploadToken;
-use tts_common::clean_symbols::clean_symbols;
-use tts_common::text_pipelines::guess_pipeline::guess_text_pipeline_heuristic;
-use tts_common::text_pipelines::text_pipeline_type::TextPipelineType;
+use tokens::users::user::UserToken;
 
 pub struct SoVitsSvcProcessJobArgs<'a> {
   pub job_dependencies: &'a JobDependencies,
   pub job: &'a AvailableInferenceJob,
   pub vc_model: &'a VoiceConversionModelForInference,
   pub media_upload_token: &'a MediaUploadToken,
-  //pub media_upload_token: &'a MediaUploadToken,
 }
 
 pub async fn process_job(args: SoVitsSvcProcessJobArgs<'_>) -> Result<JobSuccessResult, ProcessSingleJobError> {
@@ -239,25 +233,20 @@ pub async fn process_job(args: SoVitsSvcProcessJobArgs<'_>) -> Result<JobSuccess
 
   info!("Saving vc inference record...");
 
-  // NB: The stupid DB field for spectrograms is not nullable, so we'll just set empty string.
-  let fake_spectrogram_path = PathBuf::from("");
-  const NO_PRETRAINED_VOCODER : Option<VocoderType> = None;
-
-  let (id, inference_result_token) = insert_tts_result(
-    &args.job_dependencies.mysql_pool,
-    JobType::GenericInferenceJob(&job),
-    &text_hash,
-    NO_PRETRAINED_VOCODER,
-    &audio_result_object_path,
-    &fake_spectrogram_path, // NB: No spectogram!
-    file_metadata.file_size_bytes,
-    file_metadata.duration_millis.unwrap_or(0),
-    args.job_dependencies.worker_details.is_on_prem,
-    &worker_name,
-    args.job_dependencies.worker_details.is_debug_worker)
+  let (inference_result_token, id) = insert_voice_conversion_result(InsertArgs {
+    pool: &args.job_dependencies.mysql_pool,
+    job: &job,
+    bucket_audio_results_path: &output_audio_fs_path,
+    file_size_bytes: file_metadata.file_size_bytes,
+    duration_millis: file_metadata.duration_millis.unwrap_or(0),
+    is_on_prem: args.job_dependencies.worker_details.is_on_prem,
+    worker_hostname: &worker_name,
+    is_debug_worker: args.job_dependencies.worker_details.is_debug_worker
+  })
       .await
       .map_err(|e| ProcessSingleJobError::Other(e))?;
 
+  // TODO:
   //info!("Marking job complete...");
   //mark_tts_inference_job_done(
   //  &args.job_dependencies.mysql_pool,
@@ -270,10 +259,14 @@ pub async fn process_job(args: SoVitsSvcProcessJobArgs<'_>) -> Result<JobSuccess
 
   info!("TTS Done. Original text was: {:?}", &job.maybe_raw_inference_text);
 
-  args.job_dependencies.firehose_publisher.tts_inference_finished(
-    job.maybe_creator_user_token.as_deref(),
-    tts_model.model_token.as_str(),
-    &inference_result_token)
+  // TODO: Update upstream to be strongly typed
+  let maybe_user_token = job.maybe_creator_user_token.as_deref()
+      .map(|token| UserToken::new_from_str(token));
+
+  args.job_dependencies.firehose_publisher.vc_inference_finished(
+    maybe_user_token.as_deref(),
+    &job.inference_job_token,
+    inference_result_token.as_str())
       .await
       .map_err(|e| {
         error!("error publishing event: {:?}", e);
@@ -288,8 +281,8 @@ pub async fn process_job(args: SoVitsSvcProcessJobArgs<'_>) -> Result<JobSuccess
 
   Ok(JobSuccessResult {
     maybe_result_entity: Some(ResultEntity {
-      entity_type: InferenceResultType::TextToSpeech,
-      entity_token: inference_result_token
+      entity_type: InferenceResultType::VoiceConversion,
+      entity_token: inference_result_token.to_string(),
     }),
   })
 }
