@@ -160,8 +160,12 @@ SET
   let query_result = query.execute(&mut transaction)
       .await;
 
-  match query_result {
-    Ok(res) => Ok((media_token, res.last_insert_id())),
-    Err(err) => Err(anyhow!("error inserting new media upload: {:?}", err)),
-  }
+  let result_tuple  = match query_result {
+    Ok(res) => (media_token, res.last_insert_id()),
+    Err(err) => return Err(anyhow!("error inserting new media upload: {:?}", err)),
+  };
+
+  transaction.commit().await?;
+
+  Ok(result_tuple)
 }
