@@ -260,8 +260,7 @@ pub async fn upload_media_handler(
         UploadMediaError::ServerError
       })?;
 
-  let record_id = insert_media_upload(Args {
-    token: &token,
+  let (token, record_id) = insert_media_upload(Args {
     uuid_idempotency_token: &uuid_idempotency_token,
     media_type: media_upload_type,
     maybe_original_filename: upload_media_request.file_name.as_deref(),
@@ -288,7 +287,7 @@ pub async fn upload_media_handler(
         UploadMediaError::ServerError
       })?;
 
-  info!("new media upload id: {}", record_id);
+  info!("new media upload id: {} token: {:?}", record_id, &token);
 
   server_state.firehose_publisher.publish_media_uploaded(
     maybe_user_token.as_ref(),
