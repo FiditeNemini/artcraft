@@ -50,17 +50,36 @@ CREATE TABLE voice_conversion_results (
 
   -- ========== BUCKET STORAGE ==========
 
+  -- The hash lets us reconstitute the bucket directory
+  -- location (which stores potentially several files)
+  public_bucket_hash VARCHAR(64) NOT NULL,
+
+  -- Whether we're storing a wav result file.
+  bucket_has_wav BOOLEAN NOT NULL DEFAULT FALSE,
+
+  -- Whether we're storing a mp3 result file.
+  bucket_has_mp3 BOOLEAN NOT NULL DEFAULT FALSE,
+
+  -- Whether we're storing a mp4 result file.
+  bucket_has_mp4 BOOLEAN NOT NULL DEFAULT FALSE,
+
+  -- Whether we're storing a webm result file.
+  bucket_has_webm BOOLEAN NOT NULL DEFAULT FALSE,
+
+  -- Whether we're storing a spectrogram json file.
+  bucket_has_spectrogram BOOLEAN NOT NULL DEFAULT FALSE,
+
   -- Full path where the wav, spectrogram, video, etc. are located.
-  public_bucket_directory_full_path VARCHAR(255) NOT NULL,
+  --public_bucket_directory_full_path VARCHAR(255) NOT NULL,
 
   -- Name of the wav audio file (if it exists)
-  public_bucket_wav_audio_object_name VARCHAR(255) NOT NULL,
+  --public_bucket_wav_audio_object_name VARCHAR(255) NOT NULL,
 
   -- Name of the spectrogram (if it exists)
-  public_bucket_spectrogram_object_name VARCHAR(255) NOT NULL,
+  --public_bucket_spectrogram_object_name VARCHAR(255) NOT NULL,
 
   -- Name of the video (if it exists)
-  public_bucket_video_object_name VARCHAR(255) NOT NULL,
+  --public_bucket_video_object_name VARCHAR(255) NOT NULL,
 
   -- ========== METADATA ==========
 
