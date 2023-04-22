@@ -103,6 +103,13 @@ function VcModelListPage(props: Props) {
     return false;
   };
 
+  const interceptModelChange = (maybeSelectedVoiceConversionModel: VoiceConversionModelListItem) => {
+    if (maybeSelectedVoiceConversionModel !== props.maybeSelectedVoiceConversionModel) {
+      setIdempotencyToken(uuidv4());
+    }
+    props.setMaybeSelectedVoiceConversionModel(maybeSelectedVoiceConversionModel);
+  }
+
   const handleVoiceConversion = async () => {
     if (props.maybeSelectedVoiceConversionModel === undefined || mediaUploadToken === undefined) {
       return;
@@ -183,7 +190,7 @@ function VcModelListPage(props: Props) {
                   voiceConversionModels={props.voiceConversionModels}
                   setVoiceConversionModels={props.setVoiceConversionModels}
                   maybeSelectedVoiceConversionModel={props.maybeSelectedVoiceConversionModel}
-                  setMaybeSelectedVoiceConversionModel={props.setMaybeSelectedVoiceConversionModel}
+                  setMaybeSelectedVoiceConversionModel={interceptModelChange}
                   />
 
               </div>
