@@ -66,21 +66,21 @@ impl SoVitsSvcInferenceCommand {
 
   pub fn from_env() -> AnyhowResult<Self> {
     let so_vits_svc_root_code_directory = easyenv::get_env_pathbuf_required(
-      "SO_VITS_SVC_MODEL_CHECK_ROOT_DIRECTORY")?;
+      "SO_VITS_SVC_INFERENCE_ROOT_DIRECTORY")?;
 
     // NB: The command is installed (typically as `svc`) rather than called as a python script.
     let check_script_name = easyenv::get_env_pathbuf_or_default(
-      "SO_VITS_SVC_MODEL_CHECK_COMMAND",
+      "SO_VITS_SVC_INFERENCE_COMMAND",
       "svc");
 
     let maybe_virtual_env_activation_command = easyenv::get_env_string_optional(
-      "SO_VITS_SVC_MODEL_CHECK_MAYBE_VENV_COMMAND");
+      "SO_VITS_SVC_INFERENCE_MAYBE_VENV_COMMAND");
 
     //let maybe_override_python_interpreter = easyenv::get_env_string_optional(
     //  "SO_VITS_SVC_MODEL_CHECK_MAYBE_PYTHON_INTERPRETER");
 
     let maybe_docker_options = easyenv::get_env_string_optional(
-      "SO_VITS_SVC_MODEL_CHECK_MAYBE_DOCKER_IMAGE")
+      "SO_VITS_SVC_INFERENCE_MAYBE_DOCKER_IMAGE")
         .map(|image_name| {
           DockerOptions {
             image_name,
