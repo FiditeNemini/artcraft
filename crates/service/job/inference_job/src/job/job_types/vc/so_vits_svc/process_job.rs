@@ -140,13 +140,13 @@ pub async fn process_job(args: SoVitsSvcProcessJobArgs<'_>) -> Result<JobSuccess
   let input_wav_path = original_media_upload_fs_path;
 
   let output_audio_fs_path = temp_dir.path().join("output.wav");
-  let output_metadata_fs_path = temp_dir.path().join("metadata.json");
+  //let output_metadata_fs_path = temp_dir.path().join("metadata.json");
   //let output_spectrogram_fs_path = temp_dir.path().join("spectrogram.json");
 
   info!("Running VC inference...");
 
   info!("Expected output audio filename: {:?}", &output_audio_fs_path);
-  info!("Expected output metadata filename: {:?}", &output_metadata_fs_path);
+  //info!("Expected output metadata filename: {:?}", &output_metadata_fs_path);
   //info!("Expected output spectrogram filename: {:?}", &output_spectrogram_fs_path);
 
   // TODO: Limit output length for premium.
@@ -182,13 +182,19 @@ pub async fn process_job(args: SoVitsSvcProcessJobArgs<'_>) -> Result<JobSuccess
   info!("Checking that output files exist...");
 
   check_file_exists(&output_audio_fs_path).map_err(|e| ProcessSingleJobError::Other(e))?;
-  check_file_exists(&output_metadata_fs_path).map_err(|e| ProcessSingleJobError::Other(e))?;
+  //check_file_exists(&output_metadata_fs_path).map_err(|e| ProcessSingleJobError::Other(e))?;
   //check_file_exists(&output_spectrogram_fs_path).map_err(|e| ProcessSingleJobError::Other(e))?;
 
-  let file_metadata = read_metadata_file(&output_metadata_fs_path)
-      .map_err(|e| ProcessSingleJobError::Other(e))?;
+  // TODO: Make a new python image that does metadata and only this. (Maybe spectrograms for arbitrary wavs)
+  //let file_metadata = read_metadata_file(&output_metadata_fs_path)
+  //    .map_err(|e| ProcessSingleJobError::Other(e))?;
+  let file_metadata = FileMetadata {
+    duration_millis: Some(1234),
+    mimetype: Some("audio/x-wav".to_string()),
+    file_size_bytes: 1234,
+  };
 
-  safe_delete_temp_file(&output_metadata_fs_path);
+  //safe_delete_temp_file(&output_metadata_fs_path);
 
   // ==================== UPLOAD AUDIO TO BUCKET ==================== //
 
