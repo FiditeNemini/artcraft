@@ -2,9 +2,6 @@
 -- noinspection SqlNoDataSourceInspectionForFile
 -- noinspection SqlResolveForFile
 
--- These columns are no longer useful.
--- It's better to store booleans for each type of file we store and calculate the paths.
-
 ALTER TABLE voice_conversion_results DROP COLUMN public_bucket_hash;
 ALTER TABLE voice_conversion_results DROP COLUMN bucket_has_wav;
 ALTER TABLE voice_conversion_results DROP COLUMN bucket_has_mp3;

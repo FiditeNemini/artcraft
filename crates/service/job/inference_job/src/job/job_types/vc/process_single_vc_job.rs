@@ -41,7 +41,7 @@ pub async fn process_single_vc_job(job_dependencies: &JobDependencies, job: &Ava
 
   let maybe_media_upload_token = job.maybe_inference_args
       .as_ref()
-      .map(|args| args.args)
+      .map(|args| args.args.as_ref())
       .flatten()
       .map(|args| {
         match args {

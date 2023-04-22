@@ -31,7 +31,7 @@ use crate::job::job_loop::job_stats::JobStats;
 use crate::job::job_loop::main_loop::main_loop;
 use crate::job::job_types::tts::tacotron2_v2_early_fakeyou::tacotron2_inference_command::Tacotron2InferenceCommand;
 use crate::job::job_types::tts::vits::vits_inference_command::VitsInferenceCommand;
-use crate::job_dependencies::{JobCaches, JobDependencies, JobTypeDetails, JobWorkerDetails, Tacotron2VocodesDetails, VitsDetails};
+use crate::job_dependencies::{JobCaches, JobDependencies, JobTypeDetails, JobWorkerDetails, SoVitsSvcDetails, Tacotron2VocodesDetails, VitsDetails};
 use crate::util::scoped_temp_dir_creator::ScopedTempDirCreator;
 use jobs_common::job_progress_reporter::job_progress_reporter::JobProgressReporterBuilder;
 use jobs_common::job_progress_reporter::noop_job_progress_reporter::NoOpJobProgressReporterBuilder;
@@ -47,6 +47,7 @@ use sqlx::mysql::MySqlPoolOptions;
 use std::path::PathBuf;
 use std::time::Duration;
 use subprocess_common::docker_options::{DockerEnvVar, DockerFilesystemMount, DockerGpu, DockerOptions};
+use crate::job::job_types::vc::so_vits_svc::so_vits_svc_inference_command::SoVitsSvcInferenceCommand;
 
 // Buckets (shared config)
 const ENV_ACCESS_KEY : &'static str = "ACCESS_KEY";
@@ -268,7 +269,10 @@ async fn main() -> AnyhowResult<()> {
       },
       vits: VitsDetails {
         inference_command: vits_inference_command()?,
-      }
+      },
+      so_vits_svc: SoVitsSvcDetails {
+        inference_command: SoVitsSvcInferenceCommand::from_env()?,
+      },
     },
   };
 

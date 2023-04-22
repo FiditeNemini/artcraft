@@ -14,10 +14,10 @@ pub struct SyntheticIdRecord {
   pub next_id: i64,
 }
 
-pub struct InsertArgs<'a, P> where P: AsRef<Path> {
+pub struct InsertArgs<'a> {
   pub pool: &'a MySqlPool,
   pub job: &'a AvailableInferenceJob,
-  pub bucket_audio_results_path: P,
+  pub public_bucket_hash: &'a str,
   pub file_size_bytes: u64,
   pub duration_millis: u64,
   pub is_on_prem: bool,
@@ -25,8 +25,8 @@ pub struct InsertArgs<'a, P> where P: AsRef<Path> {
   pub is_debug_worker: bool,
 }
 
-pub async fn insert_voice_conversion_result<P: AsRef<Path>>(
-  args: InsertArgs<'_, P>
+pub async fn insert_voice_conversion_result(
+  args: InsertArgs<'_>
 ) -> AnyhowResult<(VoiceConversionResultToken, u64)>
 {
   let result_token = VoiceConversionResultToken::generate();
@@ -89,15 +89,9 @@ LIMIT 1
     maybe_creator_synthetic_id = Some(next_id);
   }
 
-  let bucket_audio_result_path = &args.bucket_audio_results_path
-      .as_ref()
-      .display()
-      .to_string();
-
   let vc_model_token = args.job.maybe_model_token.as_deref();
   let creator_ip_address = args.job.creator_ip_address.as_str();
   let creator_set_visibility = args.job.creator_set_visibility.clone();
-
 
   let record_id = {
     let query_result = sqlx::query!(
@@ -115,7 +109,8 @@ SET
   creator_ip_address = ?,
   creator_set_visibility = ?,
 
-  public_bucket_wav_audio_path = ?,
+  public_bucket_hash = ?,
+  bucket_has_wav = true,
 
   file_size_bytes = ?,
   duration_millis = ?,
@@ -124,7 +119,7 @@ SET
   generated_by_worker = ?,
   is_debug_request = ?
         "#,
-      result_token.to_str(),
+      result_token.as_str(),
 
       args.job.maybe_model_token,
       "",
@@ -135,7 +130,7 @@ SET
       args.job.creator_ip_address,
       args.job.creator_set_visibility.to_str(),
 
-      bucket_audio_result_path,
+      args.public_bucket_hash,
 
       args.file_size_bytes,
       args.duration_millis,

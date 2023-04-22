@@ -236,7 +236,7 @@ pub async fn process_job(args: SoVitsSvcProcessJobArgs<'_>) -> Result<JobSuccess
   let (inference_result_token, id) = insert_voice_conversion_result(InsertArgs {
     pool: &args.job_dependencies.mysql_pool,
     job: &job,
-    bucket_audio_results_path: &output_audio_fs_path,
+    public_bucket_hash: result_bucket_location.get_object_hash(),
     file_size_bytes: file_metadata.file_size_bytes,
     duration_millis: file_metadata.duration_millis.unwrap_or(0),
     is_on_prem: args.job_dependencies.worker_details.is_on_prem,
@@ -264,7 +264,7 @@ pub async fn process_job(args: SoVitsSvcProcessJobArgs<'_>) -> Result<JobSuccess
       .map(|token| UserToken::new_from_str(token));
 
   args.job_dependencies.firehose_publisher.vc_inference_finished(
-    maybe_user_token.as_deref(),
+    maybe_user_token.as_ref(),
     &job.inference_job_token,
     inference_result_token.as_str())
       .await

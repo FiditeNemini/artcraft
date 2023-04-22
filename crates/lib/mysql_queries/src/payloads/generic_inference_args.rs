@@ -6,7 +6,7 @@ use tokens::voice_conversion::model::VoiceConversionModelToken;
 
 /// Used to encode extra state for the `generic_inference_jobs` table.
 /// This should act somewhat like a serialized protobuf stored inside a record.
-#[derive(Clone, Serialize, Deserialize)]
+#[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct GenericInferenceArgs {
   /// The category of inference (probably also present in a top-level field)
   #[serde(rename = "cat")] // NB: DO NOT CHANGE. It could break live jobs. Renamed to consume fewer bytes
@@ -20,7 +20,7 @@ pub struct GenericInferenceArgs {
 
 /// Same as `InferenceCategory`, but serialized in fewer characters
 /// Do not change the values.
-#[derive(Clone, Copy, Eq, PartialEq, Hash, Ord, PartialOrd, Deserialize, Serialize)]
+#[derive(Clone, Copy, Debug, Eq, PartialEq, Hash, Ord, PartialOrd, Deserialize, Serialize)]
 pub enum InferenceCategoryAbbreviated {
   #[serde(rename = "tts")] // NB: DO NOT CHANGE. It could break live jobs. Renamed to be fewer bytes.
   #[serde(alias = "text_to_speech")]
@@ -31,7 +31,7 @@ pub enum InferenceCategoryAbbreviated {
   VoiceConversion,
 }
 
-#[derive(Clone, Serialize, Deserialize)]
+#[derive(Clone, Debug, Serialize, Deserialize)]
 pub enum PolymorphicInferenceArgs {
   TextToSpeechInferenceArgs {
     // No arguments yet.
