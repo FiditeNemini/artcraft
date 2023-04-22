@@ -7,6 +7,19 @@ pub enum UserBadge {
   // Granted for early vocodes users.
   EarlyUser,
 
+  // Granted for uploading voice conversion models
+  VoiceConversionModelUploader1,
+  VoiceConversionModelUploader5,
+  VoiceConversionModelUploader10,
+  VoiceConversionModelUploader20,
+  VoiceConversionModelUploader50,
+  VoiceConversionModelUploader100,
+  VoiceConversionModelUploader150,
+  VoiceConversionModelUploader200,
+  VoiceConversionModelUploader250,
+  VoiceConversionModelUploader500,
+  VoiceConversionModelUploader1000,
+
   // Granted for uploading tts models
   TtsModelUploader1,
   TtsModelUploader5,
@@ -78,6 +91,19 @@ impl UserBadge {
   pub fn to_db_value(&self) -> &'static str {
     match self {
       UserBadge::EarlyUser => "early_user",
+
+      UserBadge::VoiceConversionModelUploader1 => "vc_model_uploader_1",
+      UserBadge::VoiceConversionModelUploader5 => "vc_model_uploader_5",
+      UserBadge::VoiceConversionModelUploader10 => "vc_model_uploader_10",
+      UserBadge::VoiceConversionModelUploader20 => "vc_model_uploader_20",
+      UserBadge::VoiceConversionModelUploader50 => "vc_model_uploader_50",
+      UserBadge::VoiceConversionModelUploader100 => "vc_model_uploader_100",
+      UserBadge::VoiceConversionModelUploader150 => "vc_model_uploader_150",
+      UserBadge::VoiceConversionModelUploader200 => "vc_model_uploader_200",
+      UserBadge::VoiceConversionModelUploader250 => "vc_model_uploader_250",
+      UserBadge::VoiceConversionModelUploader500 => "vc_model_uploader_500",
+      UserBadge::VoiceConversionModelUploader1000 => "vc_model_uploader_1000",
+
       UserBadge::TtsModelUploader1 => "tts_model_uploader_1",
       UserBadge::TtsModelUploader5 => "tts_model_uploader_5",
       UserBadge::TtsModelUploader10 => "tts_model_uploader_10",
@@ -142,6 +168,19 @@ impl UserBadge {
     match self {
       UserBadge::EarlyUser => UserBadgeType::EarlyUser,
 
+      UserBadge::VoiceConversionModelUploader1
+      | UserBadge::VoiceConversionModelUploader5
+      | UserBadge::VoiceConversionModelUploader10
+      | UserBadge::VoiceConversionModelUploader20
+      | UserBadge::VoiceConversionModelUploader50
+      | UserBadge::VoiceConversionModelUploader100
+      | UserBadge::VoiceConversionModelUploader150
+      | UserBadge::VoiceConversionModelUploader200
+      | UserBadge::VoiceConversionModelUploader250
+      | UserBadge::VoiceConversionModelUploader500
+      | UserBadge::VoiceConversionModelUploader1000
+        => UserBadgeType::VoiceConversionModelUploader,
+
       UserBadge::TtsModelUploader1
         | UserBadge::TtsModelUploader5
         | UserBadge::TtsModelUploader10
@@ -190,7 +229,8 @@ impl UserBadge {
         | UserBadge::W2lTemplateUploader1000
         | UserBadge::W2lTemplateUploader2000
         | UserBadge::W2lTemplateUploader5000
-        | UserBadge::W2lTemplateUploader10000 => UserBadgeType::W2lTemplateUploader,
+        | UserBadge::W2lTemplateUploader10000
+          => UserBadgeType::W2lTemplateUploader,
     }
   }
 }

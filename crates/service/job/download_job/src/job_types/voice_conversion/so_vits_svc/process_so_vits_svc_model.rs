@@ -117,7 +117,7 @@ pub async fn process_so_vits_svc_model<'a, 'b>(
     mysql_pool: &job_state.mysql_pool,
   }).await?;
 
-  job_state.badge_granter.maybe_grant_tts_model_uploads_badge(&job.creator_user_token)
+  job_state.badge_granter.maybe_grant_voice_conversion_model_uploads_badge(&job.creator_user_token)
       .await
       .map_err(|e| {
         warn!("error maybe awarding badge: {:?}", e);
