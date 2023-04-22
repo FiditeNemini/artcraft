@@ -1,12 +1,9 @@
 use anyhow::anyhow;
 use crate::queries::generic_inference::job::list_available_generic_inference_jobs::AvailableInferenceJob;
-use crate::queries::tts::tts_inference_jobs::list_available_tts_inference_jobs::AvailableTtsInferenceJob;
-use crate::tokens::Tokens;
 use errors::AnyhowResult;
 use log::warn;
 use sqlx::MySqlPool;
 use sqlx;
-use std::path::Path;
 use tokens::tokens::voice_conversion_results::VoiceConversionResultToken;
 
 /// Used to give user-facing order to logged in user inference requests
@@ -66,7 +63,7 @@ ON DUPLICATE KEY UPDATE
 SELECT
   next_id
 FROM
-  tts_result_synthetic_ids
+  voice_conversion_result_synthetic_ids
 WHERE
   user_token = ?
 LIMIT 1
