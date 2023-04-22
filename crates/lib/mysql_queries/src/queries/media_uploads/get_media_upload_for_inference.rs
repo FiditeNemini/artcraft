@@ -93,7 +93,10 @@ WHERE
           .as_deref()
           .filter(|info| !info.trim().is_empty())
           .map(|info| MediaUploadModificationDetails::from_json(info))
-          .transpose()?,
+          .transpose()
+          .map_err(|err| {
+            anyhow!("Error parsing field `maybe_extra_file_modification_info` from JSON: {:?}", err)
+          })?,
       creator_set_visibility: upload.creator_set_visibility,
       created_at: upload.created_at,
       updated_at: upload.updated_at,
