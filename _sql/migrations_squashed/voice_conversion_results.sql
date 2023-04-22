@@ -69,18 +69,6 @@ CREATE TABLE voice_conversion_results (
   -- Whether we're storing a spectrogram json file.
   bucket_has_spectrogram BOOLEAN NOT NULL DEFAULT FALSE,
 
-  -- Full path where the wav, spectrogram, video, etc. are located.
-  --public_bucket_directory_full_path VARCHAR(255) NOT NULL,
-
-  -- Name of the wav audio file (if it exists)
-  --public_bucket_wav_audio_object_name VARCHAR(255) NOT NULL,
-
-  -- Name of the spectrogram (if it exists)
-  --public_bucket_spectrogram_object_name VARCHAR(255) NOT NULL,
-
-  -- Name of the video (if it exists)
-  --public_bucket_video_object_name VARCHAR(255) NOT NULL,
-
   -- ========== METADATA ==========
 
   file_size_bytes INT(10) NOT NULL DEFAULT 0,
