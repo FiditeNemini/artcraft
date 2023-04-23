@@ -25,11 +25,11 @@ datetimes = { path = "../../../lib/datetimes" }
 enums = { path = "../../../_types/enums" }
 envvar = { path = "../../../lib/envvar" }
 errors = { path = "../../../lib/errors" }
-files = { path = "../../../lib/files" }
+files = { path = "../../../lib/files/files" }
 google_drive_common = { path = "../../../lib/api_clients/google_drive_common" }
 http_server_common = { path = "../../../lib/deprecated/http_server_common" }
 jobs_common = { path = "../../../lib/jobs_common" }
-media = { path = "../../../lib/media" }
+media = { path = "../../../lib/files/media" }
 memory_caching = { path = "../../../lib/caching/memory_caching" }
 mysql_queries = { path = "../../../lib/mysql_queries" }
 redis_caching = { path = "../../../lib/caching/redis_caching" }

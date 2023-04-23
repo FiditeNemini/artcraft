@@ -20,7 +20,7 @@ config = { path = "../../../lib/deprecated/config" }
 container_common = { path = "../../../lib/deprecated/container_common" }
 enums = { path = "../../../_types/enums" }
 google_drive_common = { path = "../../../lib/api_clients/google_drive_common" }
-hashing = { path = "../../../lib/hashing" }
+hashing = { path = "../../../lib/files/hashing" }
 jobs_common = { path = "../../../lib/jobs_common" }
 mysql_queries = { path = "../../../lib/mysql_queries" }
 tts_common = { path = "../../../lib/tts_common" }

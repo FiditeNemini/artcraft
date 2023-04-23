@@ -15,7 +15,7 @@ path = "src/lib.rs"
 
 [dependencies]
 # Internal
-errors = { path = "../../lib/errors" }
+errors = { path = "../../errors" }
 
 # External
 data-encoding = "2.3.2"

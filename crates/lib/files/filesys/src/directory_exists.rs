@@ -21,13 +21,13 @@ mod tests {
   #[test]
   fn test_directory_exists() {
     // Common directories
-    assert_eq!(true, directory_exists("."));
+    assert_eq!(true, directory_exists("../../../../.."));
     assert_eq!(true, directory_exists("./"));
     assert_eq!(true, directory_exists("../"));
     assert_eq!(true, directory_exists("/"));
 
     // As PathBuf
-    assert_eq!(true, directory_exists(PathBuf::from(".")));
+    assert_eq!(true, directory_exists(PathBuf::from("../../../../..")));
     assert_eq!(true, directory_exists(PathBuf::from("./")));
     assert_eq!(true, directory_exists(PathBuf::from("../")));
     assert_eq!(true, directory_exists(PathBuf::from("/")));
