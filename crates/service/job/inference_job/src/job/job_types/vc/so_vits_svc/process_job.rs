@@ -15,7 +15,7 @@ use filesys::create_dir_all_if_missing::create_dir_all_if_missing;
 use filesys::file_size::file_size;
 use filesys::filename_concat::filename_concat;
 use hashing::sha256::sha256_hash_string::sha256_hash_string;
-use log::{error, info};
+use log::{error, info, warn};
 use media::decode_basic_audio_info::decode_basic_audio_file_info;
 use mimetypes::mimetype_for_file::get_mimetype_for_file;
 use mysql_queries::queries::generic_inference::job::list_available_generic_inference_jobs::AvailableInferenceJob;
@@ -200,9 +200,12 @@ pub async fn process_job(args: SoVitsSvcProcessJobArgs<'_>) -> Result<JobSuccess
   let audio_info = decode_basic_audio_file_info(&output_audio_fs_path, maybe_mimetype.as_deref(), None)
       .map_err(|err| ProcessSingleJobError::Other(err))?;
 
-  // TODO: Make a new python image that does metadata and only this. (Maybe spectrograms for arbitrary wavs)
-  //let file_metadata = read_metadata_file(&output_metadata_fs_path)
-  //    .map_err(|e| ProcessSingleJobError::Other(e))?;
+  if audio_info.required_full_decode {
+    warn!("Required a full decode of the output data to get duration! That's inefficient!");
+  }
+
+  // TODO: Make a new python image that generates spectrograms from any audio file.
+
   let file_metadata = FileMetadata {
     duration_millis: audio_info.duration_millis,
     mimetype: maybe_mimetype,
@@ -321,11 +324,4 @@ struct FileMetadata {
   pub duration_millis: Option<u64>,
   pub mimetype: Option<String>,
   pub file_size_bytes: u64,
-}
-
-fn read_metadata_file(filename: &PathBuf) -> AnyhowResult<FileMetadata> {
-  let mut file = File::open(filename)?;
-  let mut buffer = String::new();
-  file.read_to_string(&mut buffer)?;
-  Ok(serde_json::from_str(&buffer)?)
 }
