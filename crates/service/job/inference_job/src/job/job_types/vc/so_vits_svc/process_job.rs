@@ -262,6 +262,7 @@ pub async fn process_job(args: SoVitsSvcProcessJobArgs<'_>) -> Result<JobSuccess
   // ==================== SAVE RECORDS ==================== //
 
   let worker_name = args.job_dependencies.get_worker_name();
+  let worker_cluster = args.job_dependencies.get_worker_name(); // TODO: Propagate actual cluster name
 
   info!("Saving vc inference record...");
 
@@ -273,6 +274,7 @@ pub async fn process_job(args: SoVitsSvcProcessJobArgs<'_>) -> Result<JobSuccess
     duration_millis: file_metadata.duration_millis.unwrap_or(0),
     is_on_prem: args.job_dependencies.worker_details.is_on_prem,
     worker_hostname: &worker_name,
+    worker_cluster: &worker_cluster,
     is_debug_worker: args.job_dependencies.worker_details.is_debug_worker
   })
       .await

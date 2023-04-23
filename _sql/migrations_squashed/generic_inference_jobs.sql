@@ -33,6 +33,15 @@ CREATE TABLE generic_inference_jobs (
   -- running easy database analytical queries.
   maybe_model_token VARCHAR(32) DEFAULT NULL,
 
+  -- If the inference job takes some other kind of entity, this will be the token
+  -- Not all inference jobs have record-like input sources.
+  maybe_input_source_token VARCHAR(32) DEFAULT NULL,
+
+  -- If the inference job takes some other kind of entity, this will be the type of the
+  -- token. For now, this is just `media_upload`.
+  -- Not all inference jobs have record-like input sources.
+  maybe_input_source_token_type VARCHAR(32) DEFAULT NULL,
+
   -- Polymorphic arguments payload that depends on the type of inference job.
   -- TEXT = 65,535 bytes (64 KiB), ~= 4 bytes per UTF-8 character, ~ 16383 characters.
   maybe_inference_args TEXT DEFAULT NULL,
@@ -158,6 +167,8 @@ CREATE TABLE generic_inference_jobs (
   KEY index_maybe_model_type_and_maybe_model_token (maybe_model_type, maybe_model_token),
   KEY index_maybe_model_type (maybe_model_type),
   KEY fk_maybe_model_token (maybe_model_token),
+  KEY fk_maybe_input_source_token (maybe_input_source_token),
+  KEY fk_maybe_input_source_token_and_type (maybe_input_source_token, maybe_input_source_token_type),
   KEY fk_on_success_result_entity_token (on_success_result_entity_token),
   KEY fk_maybe_creator_user_token (maybe_creator_user_token),
   KEY index_creator_ip_address (creator_ip_address),

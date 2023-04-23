@@ -20,6 +20,7 @@ pub struct InsertArgs<'a> {
   pub duration_millis: u64,
   pub is_on_prem: bool,
   pub worker_hostname: &'a str,
+  pub worker_cluster: &'a str,
   pub is_debug_worker: bool,
 }
 
@@ -117,6 +118,7 @@ SET
 
   is_generated_on_prem = ?,
   generated_by_worker = ?,
+  generated_by_cluster = ?,
   is_debug_request = ?
         "#,
       result_token.as_str(),
@@ -139,6 +141,7 @@ SET
 
       args.is_on_prem,
       args.worker_hostname,
+      args.worker_cluster,
       args.is_debug_worker,
     )
         .execute(&mut transaction)
