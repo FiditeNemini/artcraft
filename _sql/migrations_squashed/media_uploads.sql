@@ -64,17 +64,10 @@ CREATE TABLE media_uploads (
   -- as well as any transcodings, downsamplings, etc.
   public_bucket_directory_hash  VARCHAR(32) NOT NULL,
 
-  -- TODO(bt, 2022-12-20): Before landing, rename this field be better and indicate this
-  --  is a *directory*. Add a second field to contain the default file name.
-  -- The directory this media is uploaded to will be exclusive for this file.
-  -- Only this given record will live in this bucket, but the directory may include
-  -- other transcodings or truncations.
-  public_bucket_directory_full_path VARCHAR(255) NOT NULL,
-
   -- We'll likely transcode (and potentially truncate) most media given to us.
   -- This will store a json-encoded struct that details the changes.
   -- TEXT = 65,535 bytes (64 KiB), ~= 4 bytes per UTF-8 character, ~ 16383 characters.
-  extra_file_modification_info TEXT DEFAULT NULL,
+  maybe_extra_file_modification_info TEXT DEFAULT NULL,
 
   -- ========== CREATOR DETAILS AND PREFERENCES ==========
 
