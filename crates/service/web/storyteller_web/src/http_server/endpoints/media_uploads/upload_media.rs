@@ -19,7 +19,7 @@ use enums::common::visibility::Visibility;
 use http_server_common::request::get_request_ip::get_request_ip;
 use http_server_common::response::serialize_as_json_error::serialize_as_json_error;
 use log::{info, warn, log, error};
-use media::decode_basic_audio_info::decode_basic_audio_info;
+use media::decode_basic_audio_info::decode_basic_audio_bytes_info;
 use mimetypes::mimetype_for_bytes::get_mimetype_for_bytes;
 use mysql_queries::payloads::media_upload_modification_details::MediaUploadModificationDetails;
 use mysql_queries::queries::media_uploads::get_media_upload_by_uuid::{get_media_upload_by_uuid, get_media_upload_by_uuid_with_connection};
@@ -215,7 +215,7 @@ pub async fn upload_media_handler(
     };
 
     if media_upload_type.is_some() {
-      let basic_info = decode_basic_audio_info(
+      let basic_info = decode_basic_audio_bytes_info(
         bytes.as_ref(),
         Some(mimetype),
         None

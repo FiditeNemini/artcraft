@@ -25,7 +25,9 @@ errors = { path = "../../../lib/errors" }
 filesys = { path = "../../../lib/files/filesys" }
 hashing = { path = "../../../lib/files/hashing" }
 jobs_common = { path = "../../../lib/jobs_common" }
+media = { path = "../../../lib/files/media" }
 memory_caching = { path = "../../../lib/caching/memory_caching" }
+mimetypes = { path = "../../../lib/files/mimetypes" }
 mysql_queries = { path = "../../../lib/mysql_queries" }
 subprocess_common = { path = "../../../lib/subprocess_common" }
 tokens = { path = "../../../_types/tokens" }

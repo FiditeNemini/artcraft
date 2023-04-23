@@ -1,5 +1,7 @@
+use std::fs::File;
 use errors::AnyhowResult;
-use std::io::Cursor;
+use std::io::{BufReader, Cursor};
+use std::path::Path;
 use symphonia::core::audio::SampleBuffer;
 use symphonia::core::formats::{FormatOptions, FormatReader, Track};
 use symphonia::core::io::{MediaSourceStream, ReadOnlySource};
@@ -18,7 +20,7 @@ pub struct BasicAudioInfo {
 
 /// Decode audio info from an audio or video file containing audio streams.
 /// This handles multiple formats and codecs.
-pub fn decode_basic_audio_info(
+pub fn decode_basic_audio_bytes_info(
   audio_bytes: &[u8],
   maybe_mimetype: Option<&str>,
   maybe_extension: Option<&str>,
@@ -28,9 +30,37 @@ pub fn decode_basic_audio_info(
   let bytes = audio_bytes.to_vec();
   let reader = Cursor::new(bytes);
   let source = ReadOnlySource::new(reader);
-  let mss = MediaSourceStream::new(Box::new(source), Default::default());
+  let media_source_stream = MediaSourceStream::new(Box::new(source), Default::default());
+
+  decode_basic_audio_info_inner(media_source_stream, maybe_mimetype, maybe_extension)
+}
+
+/// Decode audio info from an audio or video file containing audio streams.
+/// This handles multiple formats and codecs.
+pub fn decode_basic_audio_file_info<P: AsRef<Path>>(
+  file_path: P,
+  maybe_mimetype: Option<&str>,
+  maybe_extension: Option<&str>,
+) -> AnyhowResult<BasicAudioInfo> {
+
+  let file = File::open(file_path)?;
+  let file_reader = BufReader::new(file);
+
+  //let reader = Cursor::new(file_reader);
+  let source = ReadOnlySource::new(file_reader);
+  let media_source_stream = MediaSourceStream::new(Box::new(source), Default::default());
+
+  decode_basic_audio_info_inner(media_source_stream, maybe_mimetype, maybe_extension)
+}
+
+fn decode_basic_audio_info_inner(
+  media_source_stream: MediaSourceStream,
+  maybe_mimetype: Option<&str>,
+  maybe_extension: Option<&str>,
+) -> AnyhowResult<BasicAudioInfo> {
 
   let mut hint = Hint::new();
+
   if let Some(extension) = maybe_extension {
     hint.with_extension(extension);
   }
@@ -44,7 +74,7 @@ pub fn decode_basic_audio_info(
 
   // Probe the media source.
   let probed = symphonia::default::get_probe()
-      .format(&hint, mss, &fmt_opts, &meta_opts)?;
+      .format(&hint, media_source_stream, &fmt_opts, &meta_opts)?;
 
   let mut format = probed.format;
 
@@ -202,12 +232,12 @@ fn read_duration(format: &mut Box<dyn FormatReader>) -> AnyhowResult<Option<u64>
 mod tests {
   use std::path::PathBuf;
   use errors::AnyhowResult;
-  use crate::decode_basic_audio_info::decode_basic_audio_info;
+  use crate::decode_basic_audio_info::decode_basic_audio_bytes_info;
 
   fn test_file(path_from_repo_root: &str) -> PathBuf {
     // https://doc.rust-lang.org/cargo/reference/environment-variables.html
     let mut path = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
-    path.push(format!("../../../{}", path_from_repo_root));
+    path.push(format!("../../../../{}", path_from_repo_root));
     path
   }
 
@@ -224,7 +254,7 @@ mod tests {
       // It might be faster to use ffmpeg's estimation method.
       let path = test_file("test_data/audio/aac/golden_sun_elemental_stars_cyanne.aac");
       let bytes = std::fs::read(path)?;
-      let info = decode_basic_audio_info(&bytes, None, None)?;
+      let info = decode_basic_audio_bytes_info(&bytes, None, None)?;
       assert_eq!(info.codec_name, Some("aac".to_string()));
       assert_eq!(info.duration_millis, Some(40128));
       assert_eq!(info.required_full_decode, true);
@@ -235,7 +265,7 @@ mod tests {
     fn flac() -> AnyhowResult<()> {
       let path = test_file("test_data/audio/flac/zelda_ocarina_small_item.flac");
       let bytes = std::fs::read(path)?;
-      let info = decode_basic_audio_info(&bytes, None, None)?;
+      let info = decode_basic_audio_bytes_info(&bytes, None, None)?;
       assert_eq!(info.codec_name, Some("flac".to_string()));
       assert_eq!(info.duration_millis, Some(5120));
       assert_eq!(info.required_full_decode, false);
@@ -248,7 +278,7 @@ mod tests {
       let bytes = std::fs::read(path)?;
       let incorrect_mimetype = Some("audio/wav");
       let incorrect_extension = Some("wav");
-      let info = decode_basic_audio_info(&bytes, incorrect_mimetype, incorrect_extension)?;
+      let info = decode_basic_audio_bytes_info(&bytes, incorrect_mimetype, incorrect_extension)?;
       assert_eq!(info.codec_name, Some("flac".to_string()));
       assert_eq!(info.duration_millis, Some(5120));
       assert_eq!(info.required_full_decode, false);
@@ -260,7 +290,7 @@ mod tests {
     fn m4a() -> AnyhowResult<()> {
       let path = test_file("test_data/audio/m4a/super_mario_bros_lost_life.m4a");
       let bytes = std::fs::read(path)?;
-      let info = decode_basic_audio_info(&bytes, None, None)?;
+      let info = decode_basic_audio_bytes_info(&bytes, None, None)?;
       assert_eq!(info.codec_name, Some("alac".to_string()));
       assert_eq!(info.duration_millis, Some(5493));
       assert_eq!(info.required_full_decode, false);
@@ -272,7 +302,7 @@ mod tests {
     fn mp3() -> AnyhowResult<()> {
       let path = test_file("test_data/audio/mp3/super_mario_rpg_beware_the_forests_mushrooms.mp3");
       let bytes = std::fs::read(path)?;
-      let info = decode_basic_audio_info(&bytes, None, None)?;
+      let info = decode_basic_audio_bytes_info(&bytes, None, None)?;
       assert_eq!(info.codec_name, Some("mp3".to_string()));
       assert_eq!(info.duration_millis, Some(15023));
       assert_eq!(info.required_full_decode, false);
@@ -286,7 +316,7 @@ mod tests {
       //   length          : 4.94
       let path = test_file("test_data/audio/ogg/banjo-kazooie_jiggy_appearance.ogg");
       let bytes = std::fs::read(path)?;
-      let info = decode_basic_audio_info(&bytes, None, None)?;
+      let info = decode_basic_audio_bytes_info(&bytes, None, None)?;
       assert_eq!(info.codec_name, Some("vorbis".to_string()));
       assert_eq!(info.duration_millis, Some(4903)); // NB: This disagrees with ffprobe, but it's pretty close.
       assert_eq!(info.required_full_decode, true);
@@ -297,7 +327,7 @@ mod tests {
     fn wav_pcm_s16le_16khz() -> AnyhowResult<()> {
       let path = test_file("test_data/audio/wav/sm64_mario_its_me.wav");
       let bytes = std::fs::read(path)?;
-      let info = decode_basic_audio_info(&bytes, None, None)?;
+      let info = decode_basic_audio_bytes_info(&bytes, None, None)?;
       assert_eq!(info.codec_name, Some("pcm_s16le".to_string()));
       assert_eq!(info.duration_millis, Some(1891));
       assert_eq!(info.required_full_decode, false);
@@ -308,7 +338,7 @@ mod tests {
     fn wav_pcm_s16le_44khz() -> AnyhowResult<()> {
       let path = test_file("test_data/audio/wav/smrpg_correct.wav");
       let bytes = std::fs::read(path)?;
-      let info = decode_basic_audio_info(&bytes, None, None)?;
+      let info = decode_basic_audio_bytes_info(&bytes, None, None)?;
       assert_eq!(info.codec_name, Some("pcm_s16le".to_string()));
       assert_eq!(info.duration_millis, Some(847));
       assert_eq!(info.required_full_decode, false);
@@ -319,7 +349,7 @@ mod tests {
     fn wav_pcm_f32() -> AnyhowResult<()> {
       let path = test_file("test_data/audio/wav/smrpg_battlestart_f32.wav");
       let bytes = std::fs::read(path)?;
-      let info = decode_basic_audio_info(&bytes, None, None)?;
+      let info = decode_basic_audio_bytes_info(&bytes, None, None)?;
       assert_eq!(info.codec_name, Some("pcm_f32le".to_string()));
       assert_eq!(info.duration_millis, Some(708));
       assert_eq!(info.required_full_decode, false);
@@ -330,7 +360,7 @@ mod tests {
     fn wav_unsigned() -> AnyhowResult<()> {
       let path = test_file("test_data/audio/wav/smrpg_item_mushroom_8u.wav");
       let bytes = std::fs::read(path)?;
-      let info = decode_basic_audio_info(&bytes, None, None)?;
+      let info = decode_basic_audio_bytes_info(&bytes, None, None)?;
       assert_eq!(info.codec_name, Some("pcm_u8".to_string()));
       assert_eq!(info.duration_millis, Some(1741));
       assert_eq!(info.required_full_decode, false);
@@ -345,7 +375,7 @@ mod tests {
     fn mkv_h264_video_opus_audio() -> AnyhowResult<()> {
       let path = test_file("test_data/video/mkv/fake_you.mkv");
       let bytes = std::fs::read(path)?;
-      let info = decode_basic_audio_info(&bytes, None, None)?;
+      let info = decode_basic_audio_bytes_info(&bytes, None, None)?;
       assert_eq!(info.codec_name, Some("opus".to_string()));
       assert_eq!(info.duration_millis, Some(15007));
       assert_eq!(info.required_full_decode, false);
@@ -356,7 +386,7 @@ mod tests {
     fn mov_h264_video_aac_audio() -> AnyhowResult<()> {
       let path = test_file("test_data/video/mov/majoras_mask_intro.mov");
       let bytes = std::fs::read(path)?;
-      let info = decode_basic_audio_info(&bytes, None, None)?;
+      let info = decode_basic_audio_bytes_info(&bytes, None, None)?;
       assert_eq!(info.codec_name, Some("aac".to_string()));
       assert_eq!(info.duration_millis, Some(30128));
       assert_eq!(info.required_full_decode, false);
@@ -367,7 +397,7 @@ mod tests {
     fn mp4_h264_video_aac_audio() -> AnyhowResult<()> {
       let path = test_file("test_data/video/mp4/golden_sun_garoh.mp4");
       let bytes = std::fs::read(path)?;
-      let info = decode_basic_audio_info(&bytes, None, None)?;
+      let info = decode_basic_audio_bytes_info(&bytes, None, None)?;
       assert_eq!(info.codec_name, Some("aac".to_string()));
       assert_eq!(info.duration_millis, Some(15295));
       assert_eq!(info.required_full_decode, false);
@@ -378,7 +408,7 @@ mod tests {
     fn webm_vp9_video_opus_audio() -> AnyhowResult<()> {
       let path = test_file("test_data/video/webm/laser_pong.webm");
       let bytes = std::fs::read(path)?;
-      let info = decode_basic_audio_info(&bytes, None, None)?;
+      let info = decode_basic_audio_bytes_info(&bytes, None, None)?;
       assert_eq!(info.codec_name, Some("opus".to_string()));
       assert_eq!(info.duration_millis, Some(10016));
       assert_eq!(info.required_full_decode, false);

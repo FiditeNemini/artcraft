@@ -1,4 +1,3 @@
-use std::fs;
 use anyhow::anyhow;
 use buckets::public::media_uploads::original_file::MediaUploadOriginalFilePath;
 use buckets::public::voice_conversion_results::original_file::VoiceConversionResultOriginalFilePath;
@@ -12,19 +11,23 @@ use crate::job_dependencies::JobDependencies;
 use crate::util::maybe_download_file_from_bucket::maybe_download_file_from_bucket;
 use enums::by_table::generic_inference_jobs::inference_result_type::InferenceResultType;
 use errors::AnyhowResult;
+use filesys::create_dir_all_if_missing::create_dir_all_if_missing;
+use filesys::file_size::file_size;
 use filesys::filename_concat::filename_concat;
 use hashing::sha256::sha256_hash_string::sha256_hash_string;
 use log::{error, info};
+use media::decode_basic_audio_info::decode_basic_audio_file_info;
+use mimetypes::mimetype_for_file::get_mimetype_for_file;
 use mysql_queries::queries::generic_inference::job::list_available_generic_inference_jobs::AvailableInferenceJob;
 use mysql_queries::queries::media_uploads::get_media_upload_for_inference::get_media_upload_for_inference;
 use mysql_queries::queries::voice_conversion::inference::get_voice_conversion_model_for_inference::VoiceConversionModelForInference;
 use mysql_queries::queries::voice_conversion::results::insert_voice_conversion_result::{insert_voice_conversion_result, InsertArgs};
 use std::fs::File;
+use std::fs;
 use std::io::Read;
 use std::path::{Path, PathBuf};
 use subprocess_common::docker_options::{DockerFilesystemMount, DockerGpu, DockerOptions};
 use tempdir::TempDir;
-use filesys::create_dir_all_if_missing::create_dir_all_if_missing;
 use tokens::files::media_upload::MediaUploadToken;
 use tokens::users::user::UserToken;
 
@@ -185,13 +188,25 @@ pub async fn process_job(args: SoVitsSvcProcessJobArgs<'_>) -> Result<JobSuccess
   //check_file_exists(&output_metadata_fs_path).map_err(|e| ProcessSingleJobError::Other(e))?;
   //check_file_exists(&output_spectrogram_fs_path).map_err(|e| ProcessSingleJobError::Other(e))?;
 
+  info!("Interrogating result file properties...");
+
+  let file_size_bytes = file_size(&output_audio_fs_path)
+      .map_err(|err| ProcessSingleJobError::Other(err))?;
+
+  let maybe_mimetype = get_mimetype_for_file(&output_audio_fs_path)
+      .map_err(|err| ProcessSingleJobError::from_io_error(err))?
+      .map(|mime| mime.to_string());
+
+  let audio_info = decode_basic_audio_file_info(&output_audio_fs_path, maybe_mimetype.as_deref(), None)
+      .map_err(|err| ProcessSingleJobError::Other(err))?;
+
   // TODO: Make a new python image that does metadata and only this. (Maybe spectrograms for arbitrary wavs)
   //let file_metadata = read_metadata_file(&output_metadata_fs_path)
   //    .map_err(|e| ProcessSingleJobError::Other(e))?;
   let file_metadata = FileMetadata {
-    duration_millis: Some(1234),
-    mimetype: Some("audio/x-wav".to_string()),
-    file_size_bytes: 1234,
+    duration_millis: audio_info.duration_millis,
+    mimetype: maybe_mimetype,
+    file_size_bytes,
   };
 
   //safe_delete_temp_file(&output_metadata_fs_path);
