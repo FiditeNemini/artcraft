@@ -14,11 +14,13 @@ CREATE TABLE voice_conversion_results (
   -- The TTS model that was used
   model_token VARCHAR(32) NOT NULL,
 
-  -- If set, specifies which vocoder was used.
-  maybe_vocoder_token VARCHAR(64) DEFAULT NULL,
-
- -- Which media token was used (can be audio or video)
+ -- Which media token was used as input (can be audio or video), potentially
+ -- from a wide number of tables (eg. media_uploads, tts_results, etc.)
   media_token VARCHAR(32) NOT NULL,
+
+  -- For now we just support the `media_uploads` table, but we may grow to
+  -- support media inputs from other areas of the system (eg. tts, video, etc.)
+  media_token_type VARCHAR(32) NOT NULL,
 
   -- ========== CREATOR DETAILS ==========
 
@@ -79,12 +81,18 @@ CREATE TABLE voice_conversion_results (
   -- If true, the request was routed to a special "debug" worker.
   is_debug_request BOOLEAN NOT NULL DEFAULT FALSE,
 
+  -- Whether we generated this result from our own data center (vs. cloud).
   is_generated_on_prem BOOLEAN NOT NULL DEFAULT FALSE,
+
+  -- Worker hostname (linux hostname, k8s pod name)
   generated_by_worker VARCHAR(255) DEFAULT NULL,
+
+  -- Cluster name (k8s)
+  generated_by_cluster VARCHAR(255) DEFAULT NULL,
 
   -- ========== MODERATION DETAILS ==========
 
-  -- The last user (possibily moderator) that made changes.
+  -- The last user (possibly moderator) that made changes.
   -- See the future audit logs table for better info and accounting.
   maybe_last_update_user_token VARCHAR(32) DEFAULT NULL,
 
@@ -101,8 +109,8 @@ CREATE TABLE voice_conversion_results (
   PRIMARY KEY (id),
   UNIQUE KEY (token),
   KEY fk_model_token (model_token),
-  KEY fk_maybe_vocoder_token (maybe_vocoder_token),
   KEY fk_media_token (media_token),
+  KEY fk_media_token_and_media_token_type (media_token, media_token_type),
   KEY fk_maybe_creator_user_token (maybe_creator_user_token),
   KEY fk_maybe_creator_anonymous_visitor_token (maybe_creator_anonymous_visitor_token),
   KEY index_creator_ip_address (creator_ip_address),
