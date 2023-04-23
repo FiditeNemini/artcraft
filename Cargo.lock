@@ -751,7 +751,6 @@ dependencies = [
  "enums",
  "errors",
  "fakeyou_client",
- "files",
  "filesys",
  "hashing",
  "http_server_common",
@@ -2315,7 +2314,6 @@ dependencies = [
  "enums",
  "envvar",
  "errors",
- "files",
  "filesys",
  "google_drive_common",
  "hashing",
@@ -2708,15 +2706,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c3fcf0cee53519c866c09b5de1f6c56ff9d647101f81c1964fa632e148896cdf"
 dependencies = [
  "instant",
-]
-
-[[package]]
-name = "files"
-version = "0.0.1"
-dependencies = [
- "data-encoding",
- "infer 0.11.0",
- "ring 0.17.0-alpha.11",
 ]
 
 [[package]]
@@ -3656,7 +3645,6 @@ dependencies = [
  "enums",
  "envvar",
  "errors",
- "files",
  "filesys",
  "hashing",
  "hostname",
@@ -6560,11 +6548,11 @@ dependencies = [
  "enums",
  "envvar",
  "errors",
- "files",
  "futures 0.1.31",
  "futures 0.3.26",
  "futures-util",
  "google_drive_common",
+ "hashing",
  "hex",
  "hmac 0.10.1",
  "hostname",
@@ -6584,6 +6572,7 @@ dependencies = [
  "md-5",
  "media",
  "memory_caching",
+ "mimetypes",
  "mysql_queries",
  "native-tls",
  "newrelic-telemetry",

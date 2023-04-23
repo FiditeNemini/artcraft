@@ -16,12 +16,11 @@ use crate::validations::model_uploads::validate_model_title;
 use crate::validations::validate_idempotency_token_format::validate_idempotency_token_format;
 use enums::by_table::media_uploads::media_upload_type::MediaUploadType;
 use enums::common::visibility::Visibility;
-use files::hash::hash_bytes_sha2;
-use files::mimetype::{get_mimetype_for_bytes, get_mimetype_for_bytes_or_default};
 use http_server_common::request::get_request_ip::get_request_ip;
 use http_server_common::response::serialize_as_json_error::serialize_as_json_error;
 use log::{info, warn, log, error};
 use media::decode_basic_audio_info::decode_basic_audio_info;
+use mimetypes::mimetype_for_bytes::get_mimetype_for_bytes;
 use mysql_queries::payloads::media_upload_modification_details::MediaUploadModificationDetails;
 use mysql_queries::queries::media_uploads::get_media_upload_by_uuid::{get_media_upload_by_uuid, get_media_upload_by_uuid_with_connection};
 use mysql_queries::queries::media_uploads::insert_media_upload::{Args, insert_media_upload};
@@ -36,6 +35,7 @@ use symphonia::core::formats::FormatOptions;
 use symphonia::core::io::{MediaSourceStream, ReadOnlySource};
 use symphonia::core::meta::MetadataOptions;
 use symphonia::core::probe::Hint;
+use hashing::sha256::sha256_hash_bytes::sha256_hash_bytes;
 use tokens::files::media_upload::MediaUploadToken;
 
 #[derive(Serialize)]
@@ -179,7 +179,7 @@ pub async fn upload_media_handler(
     Some(bytes) => bytes,
   };
 
-  let hash = hash_bytes_sha2(&bytes)
+  let hash = sha256_hash_bytes(&bytes)
       .map_err(|io_error| {
         warn!("Problem hashing bytes: {:?}", io_error);
         return UploadMediaError::ServerError;

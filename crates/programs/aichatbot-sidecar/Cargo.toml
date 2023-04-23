@@ -20,7 +20,6 @@ concurrency = { path = "../../lib/concurrency" }
 enums = { path = "../../_types/enums" }
 errors = { path = "../../lib/errors" }
 fakeyou_client = { path = "../../lib/api_clients/fakeyou_client" }
-files = { path = "../../lib/files/files" }
 filesys = { path = "../../lib/files/filesys" }
 hashing = { path = "../../lib/files/hashing" }
 http_server_common = { path = "../../lib/deprecated/http_server_common" }
