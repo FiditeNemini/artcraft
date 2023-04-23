@@ -102,7 +102,7 @@ SET
   model_token = ?,
 
   media_token = ?,
-  media_token_type= ?,
+  media_token_type = ?,
 
   maybe_creator_user_token = ?,
   maybe_creator_synthetic_id = ?,

@@ -12,6 +12,7 @@ use crate::http_server::endpoints::tts::enqueue_infer_tts_handler::get_model_wit
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::server_state::ServerState;
 use enums::by_table::generic_inference_jobs::inference_category::InferenceCategory;
+use enums::by_table::generic_inference_jobs::inference_model_type::InferenceModelType;
 use enums::by_table::tts_models::tts_model_type::TtsModelType;
 use enums::common::visibility::Visibility;
 use http_server_common::request::get_request_api_token::get_request_api_token;
@@ -353,6 +354,11 @@ pub async fn enqueue_infer_tts_handler(
   let job_token;
   let job_token_type;
 
+  let model_type = match tts_model.tts_model_type {
+    TtsModelType::Tacotron2 => InferenceModelType::Tacotron2,
+    TtsModelType::Vits => InferenceModelType::Vits,
+  };
+
   if use_new_job_system {
     // This branch uses the `generic-inference-job` service and tables.
     info!("Creating tts inference job record (new generic job system)...");
@@ -364,13 +370,15 @@ pub async fn enqueue_infer_tts_handler(
     let query_result = insert_generic_inference_job(InsertGenericInferenceArgs {
       uuid_idempotency_token: &request.uuid_idempotency_token,
       inference_category: InferenceCategory::TextToSpeech,
-      maybe_model_type: None, // TODO(bt, 2023-04-08): Add this
+      maybe_model_type: Some(model_type),
       maybe_model_token: Some(request.tts_model_token.as_str()),
+      maybe_input_source_token: None, // NB: TTS doesn't have input media
+      maybe_input_source_token_type: None, // NB: TTS doesn't have input media
+      maybe_raw_inference_text: Some(inference_text.as_str()),
       maybe_inference_args: Some(GenericInferenceArgs {
         inference_category: Some(InferenceCategoryAbbreviated::TextToSpeech),
         args: None, // NB: We don't need to encode any args yet.
       }),
-      maybe_raw_inference_text: Some(inference_text.as_str()),
       maybe_creator_user_token: maybe_creator_user_token_typed.as_ref(),
       creator_ip_address: &ip_address,
       creator_set_visibility: set_visibility,

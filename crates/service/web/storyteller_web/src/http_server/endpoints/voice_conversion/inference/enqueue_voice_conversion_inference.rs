@@ -21,6 +21,8 @@ use r2d2_redis::redis::Commands;
 use redis_common::redis_keys::RedisKeys;
 use std::fmt;
 use std::sync::Arc;
+use enums::by_table::generic_inference_jobs::inference_input_source_token_type::InferenceInputSourceTokenType;
+use enums::by_table::generic_inference_jobs::inference_model_type::InferenceModelType;
 use tokens::files::media_upload::MediaUploadToken;
 use tokens::jobs::inference::InferenceJobToken;
 use tokens::users::user::UserToken;
@@ -224,15 +226,17 @@ pub async fn enqueue_voice_conversion_inference_handler(
   let query_result = insert_generic_inference_job(InsertGenericInferenceArgs {
     uuid_idempotency_token: &request.uuid_idempotency_token,
     inference_category: InferenceCategory::VoiceConversion,
-    maybe_model_type: None, // TODO(bt, 2023-04-08): Add this.
+    maybe_model_type: Some(InferenceModelType::SoVitsSvc),
     maybe_model_token: Some(model_token.as_str()),
+    maybe_input_source_token: Some(media_token.as_str()),
+    maybe_input_source_token_type: Some(InferenceInputSourceTokenType::MediaUpload),
+    maybe_raw_inference_text: None, // NB: Voice conversion isn't TTS, so there's no text.
     maybe_inference_args: Some(GenericInferenceArgs {
       inference_category: Some(InferenceCategoryAbbreviated::VoiceConversion),
       args: Some(PolymorphicInferenceArgs::VoiceConversionInferenceArgs {
-        maybe_media_token: Some(media_token),
+        maybe_media_token: Some(media_token.clone()),
       }),
     }),
-    maybe_raw_inference_text: None,
     maybe_creator_user_token: maybe_user_token.as_ref(),
     creator_ip_address: &ip_address,
     creator_set_visibility: set_visibility,

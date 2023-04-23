@@ -273,12 +273,11 @@ pub async fn upload_media_handler(
     maybe_original_frame_height: None,
     checksum_sha2: &hash,
     public_upload_path: &public_upload_path,
-    extra_file_modification_info: MediaUploadModificationDetails {}, // TODO
+    maybe_extra_file_modification_info: None,
     maybe_creator_user_token: maybe_user_token.as_ref(),
     maybe_creator_anonymous_visitor_token: None,
     creator_ip_address: &ip_address,
     creator_set_visibility,
-    maybe_creator_synthetic_id: None, // TODO: Don't forget about this.
     mysql_pool: &server_state.mysql_pool,
   })
       .await

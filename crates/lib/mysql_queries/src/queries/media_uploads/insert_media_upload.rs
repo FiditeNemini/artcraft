@@ -29,14 +29,12 @@ pub struct Args <'a> {
   pub checksum_sha2: &'a str,
 
   pub public_upload_path: &'a MediaUploadOriginalFilePath,
-  pub extra_file_modification_info: MediaUploadModificationDetails,
+  pub maybe_extra_file_modification_info: Option<MediaUploadModificationDetails>,
 
   pub maybe_creator_user_token: Option<&'a UserToken>,
   pub maybe_creator_anonymous_visitor_token: Option<&'a str>,
   pub creator_ip_address: &'a str,
   pub creator_set_visibility: Visibility,
-
-  pub maybe_creator_synthetic_id: Option<u64>,
 
   pub mysql_pool: &'a MySqlPool,
 }
@@ -103,6 +101,11 @@ LIMIT 1
 
   let media_token = MediaUploadToken::generate();
 
+  let maybe_extra_file_modification_info = args.maybe_extra_file_modification_info
+      .clone() // FIXME
+      .map(|info| info.to_json())
+      .transpose()?;
+
   let query = sqlx::query!(
         r#"
 INSERT INTO media_uploads
@@ -122,8 +125,8 @@ SET
   checksum_sha2 = ?,
 
   public_bucket_directory_hash = ?,
-  public_bucket_directory_full_path = ?,
-  extra_file_modification_info = ?,
+
+  maybe_extra_file_modification_info = ?,
 
   maybe_creator_user_token = ?,
   maybe_creator_synthetic_id = ?,
@@ -147,8 +150,8 @@ SET
         args.checksum_sha2,
 
         args.public_upload_path.get_object_hash(),
-        args.public_upload_path.get_full_object_path_str(),
-        "", // TODO: args.extra_file_modification_info,
+
+        maybe_extra_file_modification_info,
 
         args.maybe_creator_user_token,
         maybe_creator_synthetic_id,

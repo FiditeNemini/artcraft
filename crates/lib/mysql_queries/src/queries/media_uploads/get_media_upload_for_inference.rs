@@ -59,7 +59,7 @@ SELECT
     mu.public_bucket_directory_hash,
     mu.original_file_size_bytes,
     mu.original_duration_millis,
-    mu.extra_file_modification_info as maybe_extra_file_modification_info,
+    mu.maybe_extra_file_modification_info,
     mu.creator_set_visibility as `creator_set_visibility: enums::common::visibility::Visibility`,
     mu.created_at,
     mu.updated_at
