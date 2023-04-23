@@ -9,6 +9,7 @@ pub mod trending_model_analytics;
 pub mod tts_models;
 pub mod user_ratings;
 pub mod voice_conversion_models;
+pub mod voice_conversion_results;
 
 // ===== Sqlite =====
 pub mod tts_render_tasks;

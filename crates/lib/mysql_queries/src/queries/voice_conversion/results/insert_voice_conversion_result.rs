@@ -4,6 +4,7 @@ use errors::AnyhowResult;
 use log::warn;
 use sqlx::MySqlPool;
 use sqlx;
+use enums::by_table::voice_conversion_results::voice_conversion_media_token_type::VoiceConversionMediaTokenType;
 use tokens::tokens::voice_conversion_results::VoiceConversionResultToken;
 
 /// Used to give user-facing order to logged in user inference requests
@@ -98,7 +99,9 @@ SET
   token = ?,
 
   model_token = ?,
+
   media_token = ?,
+  media_token_type= ?,
 
   maybe_creator_user_token = ?,
   maybe_creator_synthetic_id = ?,
@@ -119,7 +122,9 @@ SET
       result_token.as_str(),
 
       args.job.maybe_model_token,
-      "",
+
+      "", // TODO
+      VoiceConversionMediaTokenType::MediaUpload.to_str(),
 
       args.job.maybe_creator_user_token,
       maybe_creator_synthetic_id,
