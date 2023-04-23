@@ -32,8 +32,13 @@ group by model_token
 order by attempts desc
     limit 50;
 
+-- Kill all low priority pending, waiting, and in-progress jobs
+update tts_inference_jobs
+set status = 'dead'
+where status IN ('pending', 'started', 'attempt_failed')
+  and priority_level IN (0, 1);
 
--- Kill pending jobs
+-- Kill all pending jobs
 update tts_inference_jobs
 set status = 'dead'
 where status = 'pending';
