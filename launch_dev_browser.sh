@@ -16,12 +16,16 @@ launch_linux() {
 
 launch_mac() {
   # See https://stackoverflow.com/a/58658101
+  # NB: '7001' port is being chosen because something on the system is hogging port 7000.
+  # chrome://flags/#unsafely-treat-insecure-origin-as-secure - allow microphone recording
+  # otherwise getUserMedia() / navigator.mediaDevices will not function
   open -na "Google Chrome" --args \
     --disable-site-isolation-trials \
     --disable-web-security \
     --ignore-certificate-errors \
+    --unsafely-treat-insecure-origin-as-secure="http://dev.fakeyou.com:7001" \
     --user-data-dir="${CHROME_DIR}" \
-    https://dev.fakeyou.com
+    http://dev.fakeyou.com:7001
 }
 
 case $OSTYPE in 
