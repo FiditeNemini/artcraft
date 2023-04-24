@@ -31,7 +31,11 @@ function RecordedAudioComponent(props: RecorderProps) {
   );
 }
 
-export default function RecordComponent() {
+interface Props {
+  setMediaUploadToken: (token: string) => void,
+}
+
+export default function RecordComponent(props: Props) {
   const { startRecording, stopRecording, recordingBlob, isRecording } =
     useAudioRecorder();
 
@@ -56,7 +60,7 @@ export default function RecordComponent() {
       if (UploadAudioIsOk(result)) {
         //setIsUploadDisabled(true);
         //ggprops.setMediaUploadToken(result.upload_token);
-        console.log('TOKEN', result.upload_token)
+        props.setMediaUploadToken(result.upload_token);
       }
     })();
   }, [recordingBlob])

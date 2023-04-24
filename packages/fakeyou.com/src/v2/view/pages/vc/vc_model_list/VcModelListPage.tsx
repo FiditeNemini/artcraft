@@ -308,14 +308,16 @@ function VcModelListPage(props: Props) {
                         <div>
                           <label className="sub-title">Record Audio</label>
                           <div className="d-flex flex-column gap-3 upload-component">
-                            <RecordComponent />
+                            <RecordComponent 
+                              setMediaUploadToken={setMediaUploadToken}
+                            />
                           </div>
                         </div>
 
                         <div className="d-flex gap-3">
                           <button
                             className={speakButtonClass}
-                            onClick={handleLoading}
+                            onClick={handleVoiceConversion}
                             type="submit"
                             disabled={!canBeginConversion}
                           >
