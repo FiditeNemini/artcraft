@@ -15,7 +15,7 @@ use enums::common::visibility::Visibility;
 use http_server_common::request::get_request_header_optional::get_request_header_optional;
 use http_server_common::request::get_request_ip::get_request_ip;
 use log::{info, warn};
-use mysql_queries::payloads::generic_inference_args::{GenericInferenceArgs, InferenceCategoryAbbreviated, PolymorphicInferenceArgs};
+use mysql_queries::payloads::generic_inference_args::{GenericInferenceArgs, InferenceCategoryAbbreviated};
 use mysql_queries::queries::generic_inference::web::insert_generic_inference_job::{InsertGenericInferenceArgs, insert_generic_inference_job};
 use r2d2_redis::redis::Commands;
 use redis_common::redis_keys::RedisKeys;
@@ -233,9 +233,7 @@ pub async fn enqueue_voice_conversion_inference_handler(
     maybe_raw_inference_text: None, // NB: Voice conversion isn't TTS, so there's no text.
     maybe_inference_args: Some(GenericInferenceArgs {
       inference_category: Some(InferenceCategoryAbbreviated::VoiceConversion),
-      args: Some(PolymorphicInferenceArgs::VoiceConversionInferenceArgs {
-        maybe_media_token: Some(media_token.clone()),
-      }),
+      args: None, // NB: We don't need to encode args yet (but will soon)
     }),
     maybe_creator_user_token: maybe_user_token.as_ref(),
     creator_ip_address: &ip_address,
