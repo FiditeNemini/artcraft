@@ -129,6 +129,9 @@ pub async fn handle_upload(
   let maybe_user_token = maybe_user_session
       .map(|session| session.get_strongly_typed_user_token());
 
+  let maybe_file_size_bytes = upload_media_request.file_bytes.as_ref().map(|bytes| bytes.len());
+  info!("Upload maybe filesize: {:?}", maybe_file_size_bytes);
+
   let maybe_mimetype = upload_media_request.file_bytes
       .as_ref()
       .map(|bytes| get_mimetype_for_bytes(bytes.as_ref()))

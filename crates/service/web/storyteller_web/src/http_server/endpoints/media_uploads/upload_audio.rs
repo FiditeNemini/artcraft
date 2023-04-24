@@ -22,6 +22,13 @@ static ALLOWED_MIME_TYPES : Lazy<HashSet<&'static str>> = Lazy::new(|| {
     "audio/ogg",
     "audio/x-flac",
     "audio/x-wav",
+
+    // This might be the only way to allow browser recording
+    // https://air.ghost.io/recording-to-an-audio-file-using-html5-and-js/
+    // Chrome: "audio/webm;codecs=opus"
+    // Firefox: "audio/ogg;codecs=opus"
+    "audio/webm",
+    "video/webm",
   ])
 });
 
