@@ -12,23 +12,23 @@ export default function RecordComponent() {
   const { startRecording, stopRecording, recordingBlob, isRecording } =
     useAudioRecorder();
 
-  const addAudioElement = (blob: any) => {
+  const handleStopRecording = (blob: any) => {
     stopRecording();
-    setLoading(true);
 
     if (recordingBlob) {
+      console.log('blob', recordingBlob);
       const url = URL.createObjectURL(recordingBlob);
       setAudioLink(url);
       setRecorded(true);
-      setLoading(false);
-      return;
     }
+
+    setLoading(!recordingBlob);
   };
 
   return (
     <div className="d-flex flex-column gap-3" id="record-audio">
       {isRecording ? (
-        <button className="btn btn-secondary" onClick={addAudioElement}>
+        <button className="btn btn-secondary" onClick={handleStopRecording}>
           {loading ? (
             <div className="d-flex align-items-center">
               <div className="spinner-border spinner-border-sm" role="status">
