@@ -12,6 +12,7 @@ pub static FREE_LOGGED_OUT_PLAN : Lazy<Plan> = Lazy::new(|| {
         .is_synthetic_plan(true)
         .plan_category(PlanCategory::Free)
         .tts_base_priority_level(FAKEYOU_ANONYMOUS_PRIORITY_LEVEL)
+        .web_vc_base_priority_level(FAKEYOU_ANONYMOUS_PRIORITY_LEVEL)
         .build()
 });
 
@@ -22,6 +23,7 @@ pub static FREE_LOGGED_OUT_FIRST_TRY_PLAN : Lazy<Plan> = Lazy::new(|| {
         .is_synthetic_plan(true)
         .plan_category(PlanCategory::Free)
         .tts_base_priority_level(FAKEYOU_LOGGED_IN_PRIORITY_LEVEL) // NB: Same as logged-in free users.
+        .web_vc_base_priority_level(FAKEYOU_LOGGED_IN_PRIORITY_LEVEL) // NB: Same as logged-in free users.
         .build()
 });
 
@@ -32,6 +34,7 @@ pub static FREE_LOGGED_IN_PLAN : Lazy<Plan> = Lazy::new(|| {
         .is_synthetic_plan(true)
         .plan_category(PlanCategory::Free)
         .tts_base_priority_level(FAKEYOU_LOGGED_IN_PRIORITY_LEVEL)
+        .web_vc_base_priority_level(FAKEYOU_LOGGED_IN_PRIORITY_LEVEL)
         .build()
 });
 
@@ -43,6 +46,7 @@ pub static LOYALTY_PLANS : Lazy<HashSet<Plan>> = Lazy::new(|| {
         .is_synthetic_plan(true)
         .plan_category(PlanCategory::LoyaltyReward)
         .tts_base_priority_level(2)
+        .web_vc_base_priority_level(2)
         .tts_max_duration_seconds(30)
         .build());
 
@@ -100,6 +104,7 @@ pub static PRODUCTION_PREMIUM_PLANS: Lazy<HashSet<Plan>> = Lazy::new(|| {
         .stripe_price_id("price_1M4jDCEU5se17MekOaJ92HYX")
         .cost_per_month_dollars(7)
         .tts_base_priority_level(20)
+        .web_vc_base_priority_level(20)
         .tts_max_duration_seconds(30)
         .build());
 
@@ -109,6 +114,7 @@ pub static PRODUCTION_PREMIUM_PLANS: Lazy<HashSet<Plan>> = Lazy::new(|| {
         .stripe_price_id("price_1M4jEQEU5se17MeksNfA0EKm")
         .cost_per_month_dollars(15)
         .tts_base_priority_level(30)
+        .web_vc_base_priority_level(30)
         .tts_max_duration_seconds(60 * 2)
         .build());
 
@@ -118,6 +124,7 @@ pub static PRODUCTION_PREMIUM_PLANS: Lazy<HashSet<Plan>> = Lazy::new(|| {
         .stripe_price_id("price_1M4jFREU5se17Mekc8pQaSKB")
         .cost_per_month_dollars(25)
         .tts_base_priority_level(40)
+        .web_vc_base_priority_level(40)
         .tts_max_duration_seconds(60 * 5)
         .build());
 
@@ -129,6 +136,7 @@ pub static PRODUCTION_PREMIUM_PLANS: Lazy<HashSet<Plan>> = Lazy::new(|| {
         .stripe_price_id("price_1M4jGPEU5se17Mek2FiztNE5")
         .cost_per_month_dollars(3)
         .tts_base_priority_level(10)
+        .web_vc_base_priority_level(10)
         .tts_max_duration_seconds(30)
         .build());
 
