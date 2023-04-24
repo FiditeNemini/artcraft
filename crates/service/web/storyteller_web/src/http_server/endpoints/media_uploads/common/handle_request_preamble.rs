@@ -1,104 +1,66 @@
-use actix_http::Error;
-use actix_http::http::header;
-use actix_multipart::Multipart;
-use actix_web::HttpResponseBuilder;
-use actix_web::cookie::Cookie;
-use actix_web::error::ResponseError;
-use actix_web::http::StatusCode;
 use actix_web::web::BytesMut;
-use actix_web::{Responder, web, HttpResponse, error, HttpRequest};
+use actix_web::{HttpRequest, web};
 use buckets::public::media_uploads::original_file::MediaUploadOriginalFilePath;
-use config::bad_urls::is_bad_tts_model_download_url;
 use crate::http_server::endpoints::media_uploads::common::drain_multipart_request::drain_multipart_request;
-use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
+use crate::http_server::endpoints::media_uploads::common::upload_error::UploadError;
 use crate::server_state::ServerState;
-use crate::validations::model_uploads::validate_model_title;
 use crate::validations::validate_idempotency_token_format::validate_idempotency_token_format;
 use enums::by_table::media_uploads::media_upload_type::MediaUploadType;
 use enums::common::visibility::Visibility;
 use hashing::sha256::sha256_hash_bytes::sha256_hash_bytes;
 use http_server_common::request::get_request_ip::get_request_ip;
-use http_server_common::response::serialize_as_json_error::serialize_as_json_error;
-use log::{info, warn, log, error};
+use log::{error, info, warn};
 use media::decode_basic_audio_info::decode_basic_audio_bytes_info;
 use mimetypes::mimetype_for_bytes::get_mimetype_for_bytes;
-use mysql_queries::payloads::media_upload_modification_details::MediaUploadModificationDetails;
 use mysql_queries::queries::media_uploads::get_media_upload_by_uuid::{get_media_upload_by_uuid, get_media_upload_by_uuid_with_connection};
 use mysql_queries::queries::media_uploads::insert_media_upload::{Args, insert_media_upload};
-use regex::Regex;
-use sqlx::error::DatabaseError;
-use sqlx::error::Error::Database;
-use sqlx::mysql::MySqlDatabaseError;
-use std::fmt;
-use std::io::{BufReader, Cursor};
+use std::collections::HashSet;
 use std::sync::Arc;
-use symphonia::core::formats::FormatOptions;
-use symphonia::core::io::{MediaSourceStream, ReadOnlySource};
-use symphonia::core::meta::MetadataOptions;
-use symphonia::core::probe::Hint;
+use actix_multipart::Multipart;
 use tokens::files::media_upload::MediaUploadToken;
 
-#[derive(Serialize)]
-pub struct UploadMediaSuccessResponse {
-  pub success: bool,
-  pub upload_token: MediaUploadToken,
+pub enum SuccessCase {
+  MediaAlreadyUploaded {
+    existing_upload_token: MediaUploadToken,
+  },
+  MediaSuccessfullyUploaded {
+    upload_token: MediaUploadToken,
+  }
 }
 
-#[derive(Debug, Serialize)]
-pub enum UploadMediaError {
-  BadInput(String),
-  NotAuthorized,
-  MustBeLoggedIn,
-  ServerError,
-  RateLimited,
-}
-
-impl ResponseError for UploadMediaError {
-  fn status_code(&self) -> StatusCode {
-    match *self {
-      UploadMediaError::BadInput(_) => StatusCode::BAD_REQUEST,
-      UploadMediaError::NotAuthorized => StatusCode::UNAUTHORIZED,
-      UploadMediaError::MustBeLoggedIn => StatusCode::UNAUTHORIZED,
-      UploadMediaError::ServerError => StatusCode::INTERNAL_SERVER_ERROR,
-      UploadMediaError::RateLimited => StatusCode::TOO_MANY_REQUESTS,
+impl SuccessCase {
+  pub fn to_media_token(self) -> MediaUploadToken {
+    match self {
+      SuccessCase::MediaAlreadyUploaded { existing_upload_token } => existing_upload_token,
+      SuccessCase::MediaSuccessfullyUploaded { upload_token } => upload_token,
     }
   }
-
-  fn error_response(&self) -> HttpResponse {
-    serialize_as_json_error(self)
-  }
 }
 
-// NB: Not using derive_more::Display since Clion doesn't understand it.
-impl fmt::Display for UploadMediaError {
-  fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-    write!(f, "{:?}", self)
-  }
-}
-
-pub async fn upload_media_handler(
-  http_request: HttpRequest,
-  server_state: web::Data<Arc<ServerState>>,
+pub async fn handle_request_preamble(
+  http_request: &HttpRequest,
+  server_state: &web::Data<Arc<ServerState>>,
   mut multipart_payload: Multipart,
-) -> Result<HttpResponse, UploadMediaError> {
+  allowed_mimetypes: &HashSet<&'static str>,
+) -> Result<SuccessCase, UploadError> {
 
   let mut mysql_connection = server_state.mysql_pool
       .acquire()
       .await
       .map_err(|err| {
-        warn!("MySql pool error: {:?}", err);
-        UploadMediaError::ServerError
+        error!("MySql pool error: {:?}", err);
+        UploadError::ServerError
       })?;
 
   // ==================== READ SESSION ==================== //
 
   let maybe_user_session = server_state
       .session_checker
-      .maybe_get_user_session_from_connection(&http_request, &mut mysql_connection)
+      .maybe_get_user_session_from_connection(http_request, &mut mysql_connection)
       .await
       .map_err(|e| {
-        warn!("Session checker error: {:?}", e);
-        UploadMediaError::ServerError
+        error!("Session checker error: {:?}", e);
+        UploadError::ServerError
       })?;
 
   // ==================== RATE LIMIT ==================== //
@@ -107,18 +69,18 @@ pub async fn upload_media_handler(
     None => &server_state.redis_rate_limiters.logged_out,
     Some(ref user) => {
       if user.is_banned {
-        return Err(UploadMediaError::NotAuthorized);
+        return Err(UploadError::NotAuthorized);
       }
       &server_state.redis_rate_limiters.logged_in
     },
   };
 
   if let Err(_err) = rate_limiter.rate_limit_request(&http_request) {
-    return Err(UploadMediaError::RateLimited);
+    return Err(UploadError::RateLimited);
   }
 
   if let Err(_err) = server_state.redis_rate_limiters.model_upload.rate_limit_request(&http_request) {
-    return Err(UploadMediaError::RateLimited);
+    return Err(UploadError::RateLimited);
   }
 
   // ==================== READ MULTIPART REQUEST ==================== //
@@ -127,12 +89,11 @@ pub async fn upload_media_handler(
       .await
       .map_err(|e| {
         // TODO: Error handling could be nicer.
-        UploadMediaError::BadInput("bad request".to_string())
+        UploadError::BadInput("bad request".to_string())
       })?;
 
-
   let uuid_idempotency_token = upload_media_request.uuid_idempotency_token
-      .ok_or(UploadMediaError::BadInput("no uuid".to_string()))?;
+      .ok_or(UploadError::BadInput("no uuid".to_string()))?;
 
   let maybe_existing_upload =
       get_media_upload_by_uuid_with_connection(&uuid_idempotency_token, &mut mysql_connection)
@@ -141,13 +102,12 @@ pub async fn upload_media_handler(
   match maybe_existing_upload {
     Err(err) => {
       error!("Error checking for previous upload: {:?}", err);
-      return Err(UploadMediaError::ServerError);
+      return Err(UploadError::ServerError);
     }
     Ok(Some(upload)) => {
       // File already uploaded and frontend didn't protect us.
-      return render_ok_response(UploadMediaSuccessResponse {
-        success: true,
-        upload_token: upload.token,
+      return Ok(SuccessCase::MediaAlreadyUploaded {
+        existing_upload_token: upload.token,
       });
     }
     Ok(None) => {
@@ -156,7 +116,7 @@ pub async fn upload_media_handler(
   }
 
   if let Err(reason) = validate_idempotency_token_format(&uuid_idempotency_token) {
-    return Err(UploadMediaError::BadInput(reason));
+    return Err(UploadError::BadInput(reason));
   }
 
   let creator_set_visibility = maybe_user_session
@@ -175,23 +135,29 @@ pub async fn upload_media_handler(
       .flatten();
 
   let bytes = match upload_media_request.file_bytes {
-    None => return Err(UploadMediaError::BadInput("missing file contents".to_string())),
+    None => return Err(UploadError::BadInput("missing file contents".to_string())),
     Some(bytes) => bytes,
   };
 
   let hash = sha256_hash_bytes(&bytes)
       .map_err(|io_error| {
-        warn!("Problem hashing bytes: {:?}", io_error);
-        return UploadMediaError::ServerError;
+        error!("Problem hashing bytes: {:?}", io_error);
+        return UploadError::ServerError;
       })?;
 
   let file_size_bytes = bytes.len();
+
 
   let mut maybe_duration_millis = None;
   let mut maybe_codec_name = None;
   let mut media_upload_type = None;
 
   if let Some(mimetype) = maybe_mimetype.as_deref() {
+
+    if !allowed_mimetypes.contains(mimetype) {
+      return Err(UploadError::BadInput("unpermitted mime type".to_string()));
+    }
+
     // NB: .aiff (audio/aiff) isn't supported by Symphonia:
     //  It contains uncompressed PCM-encoded audio similar to wav.
     //  See: https://github.com/pdeljanov/Symphonia/issues/75
@@ -221,7 +187,7 @@ pub async fn upload_media_handler(
         None
       ).map_err(|e| {
         warn!("file decoding error: {:?}", e);
-        UploadMediaError::BadInput("could not decode file".to_string())
+        UploadError::BadInput("could not decode file".to_string())
       })?;
 
       maybe_duration_millis = basic_info.duration_millis;
@@ -233,7 +199,7 @@ pub async fn upload_media_handler(
     Some(m) => m,
     None => {
       warn!("Invalid mimetype: {:?}", maybe_mimetype);
-      return Err(UploadMediaError::BadInput(format!("Bad mimetype: {:?}", maybe_mimetype)))
+      return Err(UploadError::BadInput(format!("unknown mimetype: {:?}", maybe_mimetype)))
     },
   };
 
@@ -242,7 +208,7 @@ pub async fn upload_media_handler(
     Some(m) => m,
     None => {
       warn!("Missing mimetype!");
-      return Err(UploadMediaError::BadInput("Missing mimetype".to_string()));
+      return Err(UploadError::BadInput("Missing mimetype".to_string()));
     },
   };
 
@@ -253,14 +219,14 @@ pub async fn upload_media_handler(
   server_state.public_bucket_client.upload_file_with_content_type(
     public_upload_path.get_full_object_path_str(),
     bytes.as_ref(),
-    &mime_type)
+    mime_type)
       .await
       .map_err(|e| {
         warn!("Upload media bytes to bucket error: {:?}", e);
-        UploadMediaError::ServerError
+        UploadError::ServerError
       })?;
 
-  let (token, record_id) = insert_media_upload(Args {
+  let (token, record_id) = insert_media_upload(Args{
     uuid_idempotency_token: &uuid_idempotency_token,
     media_type: media_upload_type,
     maybe_original_filename: upload_media_request.file_name.as_deref(),
@@ -283,7 +249,7 @@ pub async fn upload_media_handler(
       .await
       .map_err(|err| {
         warn!("New generic download creation DB error: {:?}", err);
-        UploadMediaError::ServerError
+        UploadError::ServerError
       })?;
 
   info!("new media upload id: {} token: {:?}", record_id, &token);
@@ -294,21 +260,10 @@ pub async fn upload_media_handler(
       .await
       .map_err(|e| {
         warn!("error publishing event: {:?}", e);
-        UploadMediaError::ServerError
+        UploadError::ServerError
       })?;
 
-  render_ok_response(UploadMediaSuccessResponse {
-    success: true,
+  Ok(SuccessCase::MediaSuccessfullyUploaded {
     upload_token: token,
   })
-}
-
-
-fn render_ok_response(response: UploadMediaSuccessResponse) -> Result<HttpResponse, UploadMediaError> {
-  let body = serde_json::to_string(&response)
-      .map_err(|e| UploadMediaError::ServerError)?;
-
-  return Ok(HttpResponse::Ok()
-      .content_type("application/json")
-      .body(body));
 }
