@@ -3,11 +3,11 @@
 /category*   /index.html   200
 /channel*   /index.html   200
 /channels*   /index.html   200
+/character*   /index.html   200
 /checkout_cancel*   /index.html   200
 /checkout_success*   /index.html   200
 /clone*   /index.html   200
 /coming-soon*   /index.html   200
-/character*   /index.html   200
 /contribute*   /index.html   200
 /firehose*   /index.html   200
 /guide*   /index.html   200
@@ -34,6 +34,7 @@
 /twitch*   /index.html   200
 /upload*   /index.html   200
 /video*   /index.html   200
+/voice-conversion*   /index.html   200
 /w2l*   /index.html   200
 # This is for YCombinator.
 # This is the *OLD* video for Summer 2022. We'll re-edit.
