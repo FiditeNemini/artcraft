@@ -125,8 +125,8 @@ SET
 
       args.job.maybe_model_token,
 
-      "", // TODO
-      VoiceConversionMediaTokenType::MediaUpload.to_str(),
+      args.job.maybe_input_source_token,
+      VoiceConversionMediaTokenType::MediaUpload.to_str(), //args.job.maybe_input_source_token_type,
 
       args.job.maybe_creator_user_token,
       maybe_creator_synthetic_id,

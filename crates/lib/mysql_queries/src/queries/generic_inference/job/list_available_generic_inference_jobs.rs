@@ -24,8 +24,12 @@ pub struct AvailableInferenceJob {
 
   // Inference class
   pub inference_category: InferenceCategory,
+
   pub maybe_model_type: Option<String>, // TODO: Strongly type.
   pub maybe_model_token: Option<String>,
+
+  pub maybe_input_source_token: Option<String>,
+  pub maybe_input_source_token_type: Option<String>,
 
   // Inference details
   pub maybe_inference_args: Option<GenericInferenceArgs>,
@@ -102,6 +106,8 @@ pub async fn list_available_generic_inference_jobs(
               .map_err(|e| anyhow!("error: {:?}", e))?, // TODO/FIXME: This is a gross fix.
           maybe_model_type: record.maybe_model_type,
           maybe_model_token: record.maybe_model_token,
+          maybe_input_source_token: record.maybe_input_source_token,
+          maybe_input_source_token_type: record.maybe_input_source_token_type,
           maybe_inference_args: record.maybe_inference_args
               .as_deref()
               .map(|args| GenericInferenceArgs::from_json(args))
@@ -149,6 +155,9 @@ SELECT
   inference_category,
   maybe_model_type,
   maybe_model_token,
+
+  maybe_input_source_token,
+  maybe_input_source_token_type,
 
   maybe_inference_args,
   maybe_raw_inference_text,
@@ -229,6 +238,9 @@ SELECT
   maybe_model_type,
   maybe_model_token,
 
+  maybe_input_source_token,
+  maybe_input_source_token_type,
+
   maybe_inference_args,
   maybe_raw_inference_text,
 
@@ -301,8 +313,12 @@ struct AvailableInferenceJobRawInternal {
   // Inference information
   //pub inference_category: InferenceCategory,
   pub inference_category: String,
+
   pub maybe_model_type: Option<String>,
   pub maybe_model_token: Option<String>,
+
+  pub maybe_input_source_token: Option<String>,
+  pub maybe_input_source_token_type: Option<String>,
 
   pub maybe_inference_args: Option<String>,
   pub maybe_raw_inference_text: Option<String>,
