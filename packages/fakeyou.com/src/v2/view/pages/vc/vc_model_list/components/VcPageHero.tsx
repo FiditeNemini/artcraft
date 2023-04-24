@@ -2,7 +2,6 @@ import React, { useMemo } from "react";
 import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
 import { SessionSubscriptionsWrapper } from "@storyteller/components/src/session/SessionSubscriptionsWrapper";
 import { Link } from "react-router-dom";
-import { Trans } from "react-i18next";
 import { t } from "i18next";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {

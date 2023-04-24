@@ -80,12 +80,12 @@ function VcModelListPage(props: Props) {
     ttsModelsLoaded,
   ]);
 
-  const handleLoading = () => {
+  const handleLoading = useCallback(() => {
     setLoading(true);
     setTimeout(() => {
       setLoading(false);
     }, 2000);
-  };
+  }, []);
 
   useEffect(() => {
     listModels();
@@ -94,7 +94,8 @@ function VcModelListPage(props: Props) {
     }, 2000);
     return () => clearTimeout(timeout);
   }, [
-    handleLoading
+    handleLoading,
+    listModels,
   ]);
 
   const handleClearClick = (ev: React.FormEvent<HTMLButtonElement>) => {

@@ -21,7 +21,7 @@ function VcModelListSearch(props: Props) {
     // TODO: Cache a lookup table
     //const maybeNewVoiceConversionModel = props.allVoiceConversionModelsByTokenMap.get(token);
     const maybeNewVoiceConversionModel = props.voiceConversionModels.find((voiceConversionModel) => {
-      return voiceConversionModel.token == voiceConversionModelToken;
+      return voiceConversionModel.token === voiceConversionModelToken;
     });
     if (maybeNewVoiceConversionModel !== undefined) {
       props.setMaybeSelectedVoiceConversionModel(maybeNewVoiceConversionModel);

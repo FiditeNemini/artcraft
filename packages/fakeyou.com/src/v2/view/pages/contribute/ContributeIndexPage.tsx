@@ -13,15 +13,13 @@ import {
   faImage,
   faTags,
   faHandsHelping,
-  faChartArea,
-  faMicrophoneAlt,
 } from "@fortawesome/free-solid-svg-icons";
 import { motion } from "framer-motion";
 import { container, item, panel } from "../../../../data/animation";
 import { usePrefixedDocumentTitle } from "../../../../common/UsePrefixedDocumentTitle";
 import { PageHeader } from "../../_common/PageHeader";
 import { faHandHoldingHeart } from "@fortawesome/pro-solid-svg-icons";
-import { faMicrophone, faMicrophoneStand } from "@fortawesome/pro-duotone-svg-icons";
+import { faMicrophoneStand } from "@fortawesome/pro-duotone-svg-icons";
 import { faWaveformLines } from "@fortawesome/pro-regular-svg-icons";
 
 interface Props {
