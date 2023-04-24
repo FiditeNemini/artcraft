@@ -1,8 +1,10 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
+import { v4 as uuidv4 } from "uuid";
 import { useAudioRecorder } from "react-audio-voice-recorder";
 import { InputVcAudioPlayer } from "../../../../_common/InputVcAudioPlayer";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faMicrophone } from "@fortawesome/pro-solid-svg-icons";
+import { UploadAudio, UploadAudioIsOk, UploadAudioRequest } from "@storyteller/components/src/api/upload/UploadAudio";
 
 interface RecorderProps {
   recordingBlob: any;
@@ -33,7 +35,34 @@ export default function RecordComponent() {
   const { startRecording, stopRecording, recordingBlob, isRecording } =
     useAudioRecorder();
 
-  const handleStopRecording = (blob: any) => {
+  useEffect(() => {
+    // NB: This is used to detect changes to `recordingBlob` and upload them
+    if (!recordingBlob) {
+      return;
+    }
+
+    (async () => {
+      let idempotencyToken = uuidv4();
+
+      console.log('blob', recordingBlob)
+
+      const request : UploadAudioRequest = {
+        uuid_idempotency_token: idempotencyToken,
+        file: recordingBlob,
+      }
+
+      let result = await UploadAudio(request);
+
+      if (UploadAudioIsOk(result)) {
+        //setIsUploadDisabled(true);
+        //ggprops.setMediaUploadToken(result.upload_token);
+        console.log('TOKEN', result.upload_token)
+      }
+    })();
+  }, [recordingBlob])
+
+
+  const handleStopRecording = async (blob: any) => {
     stopRecording();
   };
 
