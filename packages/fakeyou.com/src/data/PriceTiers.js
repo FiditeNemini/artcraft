@@ -15,10 +15,10 @@ const FAKEYOU_PRICES = {
       title: "Text to Speech",
       features: ["Unlimited generation", "Up to 12 seconds audio"],
     },
-    // vcweb: {
-    //   title: "VC Web",
-    //   features: ["Up to 12 seconds audio"],
-    // },
+    vc: {
+      title: "Voice to Voice",
+      features: ["Up to 3 minutes audio"],
+    },
     // vcapp: {
     //   title: "VC App",
     //   features: [
@@ -48,6 +48,10 @@ const FAKEYOU_PRICES = {
     tts: {
       title: "Text to Speech",
       features: ["Unlimited generation", "Up to 30 seconds audio"],
+    },
+    vc: {
+      title: "Voice to Voice",
+      features: ["Up to 4 minutes of audio"],
     },
     // vcweb: {
     //   title: "VC Web",
@@ -85,6 +89,13 @@ const FAKEYOU_PRICES = {
         "Unlimited generation",
         "Up to 1 minute audio",
         //"Generate MP3 file",
+        "Upload private models",
+      ],
+    },
+    vc: {
+      title: "Voice to Voice",
+      features: [
+        "Up to 5 minutes of audio",
         "Upload private models",
       ],
     },
@@ -137,6 +148,14 @@ const FAKEYOU_PRICES = {
         //"Generate MP3 file",
         "Upload private models",
         "Share private models",
+      ],
+    },
+    vc: {
+      title: "Voice to Voice",
+      features: [
+        "Unlimited audio", 
+        "Upload private models", 
+        "Share private models"
       ],
     },
     channels: {

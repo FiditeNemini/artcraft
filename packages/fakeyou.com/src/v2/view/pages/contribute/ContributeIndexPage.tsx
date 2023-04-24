@@ -14,12 +14,15 @@ import {
   faTags,
   faHandsHelping,
   faChartArea,
+  faMicrophoneAlt,
 } from "@fortawesome/free-solid-svg-icons";
 import { motion } from "framer-motion";
 import { container, item, panel } from "../../../../data/animation";
 import { usePrefixedDocumentTitle } from "../../../../common/UsePrefixedDocumentTitle";
 import { PageHeader } from "../../_common/PageHeader";
 import { faHandHoldingHeart } from "@fortawesome/pro-solid-svg-icons";
+import { faMicrophone, faMicrophoneStand } from "@fortawesome/pro-duotone-svg-icons";
+import { faWaveformLines } from "@fortawesome/pro-regular-svg-icons";
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -94,6 +97,12 @@ function ContributeIndexPage(props: Props) {
             </p>
             <div className="row gx-3 gy-3">
               <div className="col-12 col-md-6">
+                <Link to="/upload/voice_conversion" className="btn btn-primary w-100">
+                  <FontAwesomeIcon icon={faMicrophoneStand} className="me-3" />
+                  Upload Voice Conversion Model
+                </Link>
+              </div>
+              <div className="col-12 col-md-6">
                 <Link to="/upload/tts" className="btn btn-primary w-100">
                   <FontAwesomeIcon icon={faVolumeHigh} className="me-3" />
                   {t("pages.contributeIndex.buttonUploadVoice")}
@@ -101,7 +110,7 @@ function ContributeIndexPage(props: Props) {
               </div>
               <div className="col-12 col-md-6">
                 <Link to="/upload/vocoder" className="btn btn-primary w-100">
-                  <FontAwesomeIcon icon={faChartArea} className="me-3" />
+                  <FontAwesomeIcon icon={faWaveformLines} className="me-3" />
                   Upload Vocoder
                 </Link>
               </div>

@@ -121,7 +121,7 @@ function LandingPage(props: Props) {
           </motion.p>
         </div>
         <motion.div
-          className="d-flex flex-column flex-md-row gap-3 justify-content-center my-4 w-100"
+          className="d-flex flex-column flex-md-row gap-3 justify-content-center mt-4 mb-1 w-100"
           variants={item}
         >
           {upgradeButton}
@@ -132,7 +132,7 @@ function LandingPage(props: Props) {
       </div>
 
       <motion.div className="container mt-5 mb-5" variants={panel}>
-        <div className="row pt-1 pt-lg-5 gy-5">
+        <div className="row pt-lg-5 gy-5">
           <div className="col-12 col-md-6 text-center">
             <Link
               to="/tts"
@@ -165,12 +165,12 @@ function LandingPage(props: Props) {
               <div className="panel p-4 mt-5 mt-lg-0 panel-select">
                 <img
                   className="img-fluid img-product img-channels"
-                  src="/mascot/channels.webp"
-                  alt="Channels"
+                  src="/mascot/VC-img.webp"
+                  alt="Voice Conversion"
                 />
-                <h2 className="fw-bold text-white">Channels</h2>
+                <h2 className="fw-bold text-white">Voice Conversion</h2>
                 <h6 className="fw-normal opacity-75 text-white">
-                  Watch AI Generated Streams
+                  Speak as your favorite characters
                 </h6>
                 <div className="mt-3">
                   <div className="fw-medium">

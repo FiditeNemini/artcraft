@@ -258,8 +258,8 @@ function PricingPage(props: Props) {
                     </li>
                   );
                 })}
-                {/*<li className="fw-semibold">{FYP.plus.vcweb.title}</li>
-                {FYP.plus.vcweb.features.map((e: any) => {
+                <li className="fw-semibold">{FYP.plus.vc.title}</li>
+                {FYP.plus.vc.features.map((e: any) => {
                   return (
                     <li key={e}>
                       <FontAwesomeIcon
@@ -270,6 +270,7 @@ function PricingPage(props: Props) {
                     </li>
                   );
                 })}
+                {/*
                 <li className="fw-semibold">{FYP.plus.vcapp.title}</li>
                 {FYP.plus.vcapp.features.map((e: any) => {
                   return (
@@ -347,6 +348,20 @@ function PricingPage(props: Props) {
 
                 <li className="fw-semibold">{FYP.pro.tts.title}</li>
                 {FYP.pro.tts.features.map((e: any) => {
+                  return (
+                    <li key={e}>
+                      <FontAwesomeIcon
+                        icon={faCheck}
+                        className="text-red me-3"
+                      />
+                      {e}
+                    </li>
+                  );
+                })}
+
+
+                <li className="fw-semibold">{FYP.pro.vc.title}</li>
+                {FYP.pro.vc.features.map((e: any) => {
                   return (
                     <li key={e}>
                       <FontAwesomeIcon
@@ -474,6 +489,19 @@ function PricingPage(props: Props) {
 
                 <li className="fw-semibold">{FYP.elite.tts.title}</li>
                 {FYP.elite.tts.features.map((e: any) => {
+                  return (
+                    <li key={e}>
+                      <FontAwesomeIcon
+                        icon={faCheck}
+                        className="text-red me-3"
+                      />
+                      {e}
+                    </li>
+                  );
+                })}
+
+                <li className="fw-semibold">{FYP.elite.vc.title}</li>
+                {FYP.elite.vc.features.map((e: any) => {
                   return (
                     <li key={e}>
                       <FontAwesomeIcon

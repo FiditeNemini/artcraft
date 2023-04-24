@@ -20,6 +20,7 @@ import { TtsModelDeletePage } from "./pages/tts/tts_model_delete/TtsModelDeleteP
 import { TtsModelEditPage } from "./pages/tts/tts_model_edit/TtsModelEditPage";
 import { TtsModelUploadJob } from "@storyteller/components/src/jobs/TtsModelUploadJobs";
 import { VocoderUploadJob } from "@storyteller/components/src/jobs/VocoderUploadJobs";
+import { VoiceConversionModelUploadJob } from "@storyteller/components/src/jobs/VoiceConversionModelUploadJob";
 import { TtsModelViewPage } from "./pages/tts/tts_model_view/TtsModelViewPage";
 import { TtsResultDeletePage } from "./pages/tts/tts_result_delete/TtsResultDeletePage";
 import { TtsResultViewPage } from "./pages/tts/tts_result_view/TtsResultViewPage";
@@ -69,7 +70,9 @@ import { ChannelsPage } from "./pages/channels/Channels";
 import { TrumpTtsPage } from "./pages/character/trump/TrumpTtsPage";
 import { InferenceJob } from "@storyteller/components/src/jobs/InferenceJob";
 //import { LandingPage } from "./pages/landing/LandingPage";
-//import { VcModelListPage } from "./pages/vc/vc_model_list/VcModelListPage";
+import { VcModelListPage } from "./pages/vc/vc_model_list/VcModelListPage";
+import { UploadVoiceConversionModel } from "./pages/upload/UploadVoiceConversionModel";
+import { VoiceConversionModelListItem } from "@storyteller/components/src/api/voice_conversion/ListVoiceConversionModels";
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -110,8 +113,13 @@ interface Props {
   enqueueW2lTemplateUploadJob: (jobToken: string) => void;
   w2lTemplateUploadJobs: Array<W2lTemplateUploadJob>;
 
+  // TODO: Begin to unify generic download jobs (vocoder, voice conversion, ...)
   enqueueVocoderUploadJob: (jobToken: string) => void;
   vocoderUploadJobs: Array<VocoderUploadJob>;
+
+  // TODO: Begin to unify generic download jobs (vocoder, voice conversion, ...)
+  enqueueVoiceConversionModelUploadJob: (jobToken: string) => void;
+  voiceConversionModelUploadJobs: Array<VoiceConversionModelUploadJob>;
 
   textBuffer: string;
   setTextBuffer: (textBuffer: string) => void;
@@ -142,6 +150,12 @@ interface Props {
 
   selectedTtsLanguageScope: string;
   setSelectedTtsLanguageScope: (selectedTtsLanguageScope: string) => void;
+
+  voiceConversionModels: Array<VoiceConversionModelListItem>;
+  setVoiceConversionModels: (ttsVoices: Array<VoiceConversionModelListItem>) => void;
+
+  maybeSelectedVoiceConversionModel?: VoiceConversionModelListItem;
+  setMaybeSelectedVoiceConversionModel: (maybeSelectedVoiceConversionModel: VoiceConversionModelListItem) => void;
 }
 
 interface State {}
@@ -374,6 +388,14 @@ class PageContainer extends React.Component<Props, State> {
               />
             </Route>
 
+            <Route path="/upload/voice_conversion">
+              <UploadVoiceConversionModel
+                sessionWrapper={this.props.sessionWrapper}
+                voiceConversionModelUploadJobs={this.props.voiceConversionModelUploadJobs}
+                enqueueVoiceConversionModelUploadJob={this.props.enqueueVoiceConversionModelUploadJob}
+              />
+            </Route>
+
             <Route path="/upload/vocoder" exact={true}>
               <UploadVocoderPage
                 sessionWrapper={this.props.sessionWrapper}
@@ -462,6 +484,19 @@ class PageContainer extends React.Component<Props, State> {
                 sessionSubscriptionsWrapper={
                   this.props.sessionSubscriptionsWrapper
                 }
+              />
+            </Route>
+
+            <Route path="/voice-conversion">
+              <VcModelListPage
+                sessionWrapper={this.props.sessionWrapper}
+                sessionSubscriptionsWrapper={
+                  this.props.sessionSubscriptionsWrapper
+                }
+                voiceConversionModels={this.props.voiceConversionModels}
+                setVoiceConversionModels={this.props.setVoiceConversionModels}
+                maybeSelectedVoiceConversionModel={this.props.maybeSelectedVoiceConversionModel}
+                setMaybeSelectedVoiceConversionModel={this.props.setMaybeSelectedVoiceConversionModel}
               />
             </Route>
 
@@ -588,28 +623,6 @@ class PageContainer extends React.Component<Props, State> {
                 }
               />
             </Route>
-
-            {/* TODO(bt, 2023-01-11): Not ready to launch voice conversion yet
-            <Route path="/voice-conversion">
-              <VcModelListPage
-                sessionWrapper={this.props.sessionWrapper}
-                sessionSubscriptionsWrapper={
-                  this.props.sessionSubscriptionsWrapper
-                }
-              />
-            </Route>
-              */}
-
-            {/* TODO(bt, 2023-01-11): Not ready to launch voice conversion yet
-            <Route path="/">
-              <LandingPage
-                sessionWrapper={this.props.sessionWrapper}
-                sessionSubscriptionsWrapper={
-                  this.props.sessionSubscriptionsWrapper
-                }
-              />
-            </Route>
-              */}
           </Switch>
 
           <FooterNav sessionWrapper={this.props.sessionWrapper} />

@@ -1063,6 +1063,125 @@ styles with important tags:
   .gravatar-img {
     pointer-events: none;
   }
+
+  .upload-component {
+    overflow-x: hidden;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+
+    .panel {
+      box-shadow: none !important;
+    }
+
+    .upload-zone {
+      height: 100%;
+      border: dashed 2px rgba($white, 0.12) !important;
+      border-radius: 0.5rem;
+      transition: 0.1s all;
+
+      &:hover {
+        background-color: lighten($panel, 6%);
+        cursor: pointer;
+      }
+    }
+
+    .upload-zone-drag {
+      background-color: $white !important;
+    }
+
+    .filename {
+      display: block;
+      max-width: 230px;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+    }
+
+    .supported-files {
+      font-size: 12px;
+    }
+
+    .upload-icon {
+      font-size: 42px;
+    }
+  }
+
+  .nav-vc {
+    flex-wrap: nowrap;
+    height: auto;
+    overflow-y: hidden;
+    overflow-x: auto;
+  }
+
+  .form-check-input,
+  .form-check-label {
+    cursor: pointer;
+  }
+
+  .form-switch .form-check-input:focus {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='-4 -4 8 8'%3e%3ccircle r='3' fill='rgba%280, 0, 0, 0.25'/%3e%3c/svg%3e");
+    box-shadow: none !important;
+    border-color: $white;
+  }
+
+  .form-check-input:checked {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='-4 -4 8 8'%3e%3ccircle r='3' fill='white'/%3e%3c/svg%3e") !important;
+    border-color: $primary !important;
+  }
+
+  .audio-recorder {
+    background-color: $primary;
+    box-shadow: none;
+    border-radius: 0.5rem;
+    transition: all 0.1s;
+    padding: 16px;
+    width: 48px;
+    font-size: 16px;
+
+    &:hover {
+      background-color: lighten($primary, 5%);
+      cursor: pointer;
+    }
+
+    img {
+      filter: brightness(0) saturate(100%) invert(99%) sepia(1%) saturate(792%)
+        hue-rotate(318deg) brightness(109%) contrast(101%);
+    }
+
+    &.recording {
+      border-radius: 0.5rem;
+      width: 100%;
+      transition: all 0.2s;
+      background-color: $input-dark;
+
+      &:hover {
+        background-color: $input-dark;
+        cursor: auto;
+      }
+
+      .audio-recorder-mic {
+        transition: all 0.2s;
+
+        &:hover {
+          opacity: 0.5;
+        }
+      }
+    }
+
+    .audio-recorder-timer,
+    .audio-recorder-status {
+      font-family: "Fira Sans", sans-serif;
+      font-size: 16px;
+    }
+
+    .audio-recorder-options {
+      transition: all 0.2s;
+
+      &:hover {
+        opacity: 0.5;
+      }
+    }
+  }
 }
 
 select {
@@ -1207,7 +1326,7 @@ textarea {
     }
 
     .session-tts-section {
-      height: 450px;
+      height: 480px;
     }
 
     .session-tts-section::-webkit-scrollbar {
@@ -1225,6 +1344,12 @@ textarea {
 
       &:hover {
         background-color: lighten($secondary, 5%);
+      }
+    }
+
+    .upload-component {
+      .filename {
+        max-width: 320px;
       }
     }
   }

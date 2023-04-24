@@ -46,6 +46,8 @@ import {
 } from "./_i18n/AvailableLanguageMap";
 import { InferenceJob } from "@storyteller/components/src/jobs/InferenceJob";
 import { GetModelInferenceJobStatus, GetModelInferenceJobStatusIsOk } from "@storyteller/components/src/api/model_inference/GetModelInferenceJobStatus";
+import { VoiceConversionModelUploadJob } from "@storyteller/components/src/jobs/VoiceConversionModelUploadJob";
+import { VoiceConversionModelListItem } from "@storyteller/components/src/api/voice_conversion/ListVoiceConversionModels";
 
 i18n
   .use(initReactI18next) // passes i18n down to react-i18next
@@ -134,9 +136,13 @@ interface State {
   ttsModelUploadJobs: Array<TtsModelUploadJob>;
   w2lTemplateUploadJobs: Array<W2lTemplateUploadJob>;
   vocoderUploadJobs: Array<VocoderUploadJob>;
+  voiceConversionModelUploadJobs: Array<VoiceConversionModelUploadJob>;
 
   // Current text entered
   textBuffer: string;
+
+  voiceConversionModels: VoiceConversionModelListItem[];
+  maybeSelectedVoiceConversionModel?: VoiceConversionModelListItem;
 }
 
 function newVocodes() {
@@ -194,8 +200,12 @@ class App extends React.Component<Props, State> {
       ttsModelUploadJobs: [],
       w2lTemplateUploadJobs: [],
       vocoderUploadJobs: [],
+      voiceConversionModelUploadJobs: [],
 
       textBuffer: "",
+
+      voiceConversionModels: [],
+      maybeSelectedVoiceConversionModel: undefined,
     };
   }
 
@@ -316,6 +326,14 @@ class App extends React.Component<Props, State> {
   clearBootstrapLanguageNotice = () => {
     this.setState({ isShowingBootstrapLanguageNotice: false });
   };
+
+  setAllVoiceConversionModels = (models: VoiceConversionModelListItem[]) => {
+    this.setState({ voiceConversionModels: models })
+  }
+
+  setMaybeSelectedVoiceConversionModel =(model?: VoiceConversionModelListItem) => {
+    this.setState({ maybeSelectedVoiceConversionModel: model })
+  }
 
   checkInferenceJob = async (jobToken: string) => {
     const lookupResult = await GetModelInferenceJobStatus(jobToken);
@@ -593,6 +611,40 @@ class App extends React.Component<Props, State> {
     }
   };
 
+  enqueueVoiceConversionModelUploadJob = (jobToken: string) => {
+    const newJob = new VoiceConversionModelUploadJob(jobToken);
+    let uploadJobs = this.state.voiceConversionModelUploadJobs.concat([newJob]);
+
+    this.setState({
+      voiceConversionModelUploadJobs: uploadJobs,
+    });
+  };
+
+  checkVoiceConversionModelUploadJob = async (jobToken: string) => {
+    const lookupResult = await GetRemoteDownloadJobStatus(jobToken);
+
+    if (GetRemoteDownloadJobStatusIsOk(lookupResult)) {
+      let updatedJobs: Array<VocoderUploadJob> = [];
+
+      this.state.voiceConversionModelUploadJobs.forEach((existingJob) => {
+        if (
+          existingJob.jobToken !== lookupResult.state!.job_token ||
+          !jobStateCanChange(existingJob.jobState)
+        ) {
+          updatedJobs.push(existingJob);
+          return;
+        }
+
+        let updatedJob = VoiceConversionModelUploadJob.fromResponse(lookupResult.state!);
+        updatedJobs.push(updatedJob);
+      });
+
+      this.setState({
+        voiceConversionModelUploadJobs: updatedJobs,
+      });
+    }
+  };
+
   pollJobs = () => {
     this.state.inferenceJobs.forEach((job) => {
       if (jobStateCanChange(job.jobState)) {
@@ -622,6 +674,11 @@ class App extends React.Component<Props, State> {
     this.state.vocoderUploadJobs.forEach((job) => {
       if (jobStateCanChange(job.jobState)) {
         this.checkVocoderUploadJob(job.jobToken);
+      }
+    });
+    this.state.voiceConversionModelUploadJobs.forEach((job) => {
+      if (jobStateCanChange(job.jobState)) {
+        this.checkVoiceConversionModelUploadJob(job.jobToken);
       }
     });
   };
@@ -702,6 +759,8 @@ class App extends React.Component<Props, State> {
                     w2lTemplateUploadJobs={this.state.w2lTemplateUploadJobs}
                     enqueueVocoderUploadJob={this.enqueueVocoderUploadJob}
                     vocoderUploadJobs={this.state.vocoderUploadJobs}
+                    enqueueVoiceConversionModelUploadJob={this.enqueueVoiceConversionModelUploadJob}
+                    voiceConversionModelUploadJobs={this.state.voiceConversionModelUploadJobs}
                     textBuffer={this.state.textBuffer}
                     setTextBuffer={this.setTextBuffer}
                     clearTextBuffer={this.clearTextBuffer}
@@ -732,6 +791,11 @@ class App extends React.Component<Props, State> {
                     }
                     selectedTtsLanguageScope={this.props.selectedTtsLanguageScope}
                     setSelectedTtsLanguageScope={this.props.setSelectedTtsLanguageScope}
+
+                    voiceConversionModels={this.state.voiceConversionModels}
+                    setVoiceConversionModels={this.setAllVoiceConversionModels}
+                    maybeSelectedVoiceConversionModel={this.state.maybeSelectedVoiceConversionModel}
+                    setMaybeSelectedVoiceConversionModel={this.setMaybeSelectedVoiceConversionModel}
                   />
                 </Route>
               </Switch>

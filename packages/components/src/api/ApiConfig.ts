@@ -392,14 +392,34 @@ class ApiConfig {
     return `${this.getApiOrigin()}/voice_clone_requests/check`;
   }
 
+  // =============== File Uploads ===============
+
+  uploadAudio(): string {
+    return `${this.getApiOrigin()}/v1/media_uploads/upload_audio`;
+  }
+
+  uploadMedia(): string {
+    return `${this.getApiOrigin()}/v1/media_uploads/upload`;
+  }
+
+  // =============== Voice Conversion ===============
+
+  listVoiceConversionModels(): string {
+    return `${this.getApiOrigin()}/v1/voice_conversion/model_list`;
+  }
+
+  enqueueVoiceConversion(): string {
+    return `${this.getApiOrigin()}/v1/voice_conversion/inference`;
+  }
+
   // =============== Generic Model Downloads ===============
 
   enqueueRemoteDownloadJob(): string {
-    return `${this.getApiOrigin()}/v1/remote_downloads/enqueue`;
+    return `${this.getApiOrigin()}/v1/remote_download/enqueue`;
   }
 
   getRemoteDownloadJobStatus(jobToken: string): string {
-    return `${this.getApiOrigin()}/v1/remote_downloads/job_status/${jobToken}`;
+    return `${this.getApiOrigin()}/v1/remote_download/job_status/${jobToken}`;
   }
 
   // =============== Generic Model Inference ===============
