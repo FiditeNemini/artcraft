@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import { FileUploader } from "react-drag-drop-files";
 import { InputVcAudioPlayer } from "../../../../_common/InputVcAudioPlayer";
 import { v4 as uuidv4 } from "uuid";
-import { UploadMedia, UploadMediaIsOk, UploadMediaRequest } from "@storyteller/components/src/api/upload/UploadMedia";
+import { UploadAudio, UploadAudioIsOk, UploadAudioRequest } from "@storyteller/components/src/api/upload/UploadAudio";
 
 const FILE_TYPES = ["MP3", "WAV", "FLAC"];
 
@@ -44,14 +44,14 @@ function UploadComponent(props: Props) {
       return false;
     }
 
-    const request : UploadMediaRequest = {
+    const request : UploadAudioRequest = {
       uuid_idempotency_token: idempotencyToken,
       file: file,
     }
 
-    let result = await UploadMedia(request);
+    let result = await UploadAudio(request);
 
-    if (UploadMediaIsOk(result)) {
+    if (UploadAudioIsOk(result)) {
       setIsUploadDisabled(true);
       props.setMediaUploadToken(result.upload_token);
       console.log('TOKEN', result.upload_token)
