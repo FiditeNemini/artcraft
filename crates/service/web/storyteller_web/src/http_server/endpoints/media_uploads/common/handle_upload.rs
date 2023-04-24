@@ -37,7 +37,7 @@ impl SuccessCase {
   }
 }
 
-pub async fn handle_request_preamble(
+pub async fn handle_upload(
   http_request: &HttpRequest,
   server_state: &web::Data<Arc<ServerState>>,
   mut multipart_payload: Multipart,
@@ -146,7 +146,6 @@ pub async fn handle_request_preamble(
       })?;
 
   let file_size_bytes = bytes.len();
-
 
   let mut maybe_duration_millis = None;
   let mut maybe_codec_name = None;
