@@ -23,6 +23,7 @@ pub struct RequestDetails {
   pub inference_category: InferenceCategory,
   pub maybe_model_type: Option<String>, // TODO: Strongly type
   pub maybe_model_token: Option<String>,
+  pub maybe_model_title: Option<String>,
 
   /// TTS input. In the future, perhaps voice conversion SST
   pub maybe_raw_inference_text: Option<String>,
@@ -65,16 +66,22 @@ SELECT
     jobs.on_success_result_entity_type as maybe_result_entity_type,
     jobs.on_success_result_entity_token as maybe_result_entity_token,
 
-    vc.public_bucket_hash as maybe_voice_conversion_public_bucket_hash,
-    tts.public_bucket_wav_audio_path as maybe_tts_public_bucket_path,
+    tts_models.title as maybe_tts_model_title,
+    voice_conversion_models.title as maybe_voice_conversion_model_title,
+
+    tts_results.public_bucket_wav_audio_path as maybe_tts_public_bucket_path,
+    voice_conversion_results.public_bucket_hash as maybe_voice_conversion_public_bucket_hash,
 
     jobs.created_at,
     jobs.updated_at
 
 FROM generic_inference_jobs as jobs
 
-LEFT OUTER JOIN voice_conversion_results AS vc ON jobs.on_success_result_entity_token = vc.token
-LEFT OUTER JOIN tts_results AS tts ON jobs.on_success_result_entity_token = tts.token
+LEFT OUTER JOIN tts_models ON jobs.maybe_model_token = tts_models.token
+LEFT OUTER JOIN voice_conversion_models ON jobs.maybe_model_token = voice_conversion_models.token
+
+LEFT OUTER JOIN tts_results ON jobs.on_success_result_entity_token = tts_results.token
+LEFT OUTER JOIN voice_conversion_results ON jobs.on_success_result_entity_token = voice_conversion_results.token
 
 WHERE jobs.token = ?
         "#,
@@ -92,6 +99,11 @@ WHERE jobs.token = ?
         return Err(anyhow!("error querying job record: {:?}", err));
       }
     }
+  };
+
+  let maybe_model_title = match record.inference_category {
+    InferenceCategory::TextToSpeech => record.maybe_tts_model_title.as_deref(),
+    InferenceCategory::VoiceConversion => record.maybe_voice_conversion_model_title.as_deref(),
   };
 
   // NB: A bit of a hack. We store TTS results with a full path.
@@ -127,6 +139,7 @@ WHERE jobs.token = ?
       inference_category: record.inference_category,
       maybe_model_type: record.maybe_model_type,
       maybe_model_token: record.maybe_model_token,
+      maybe_model_title: maybe_model_title.map(|title| title.to_string()),
       maybe_raw_inference_text: record.maybe_raw_inference_text,
     },
     maybe_result_details,
@@ -148,6 +161,9 @@ struct RawGenericInferenceJobStatus {
 
   pub maybe_result_entity_type: Option<String>,
   pub maybe_result_entity_token: Option<String>,
+
+  pub maybe_tts_model_title: Option<String>,
+  pub maybe_voice_conversion_model_title: Option<String>,
 
   pub maybe_voice_conversion_public_bucket_hash: Option<String>, // NB: This is the bucket hash.
   pub maybe_tts_public_bucket_path: Option<String>, // NB: This isn't the bucket path, but the whole hash.

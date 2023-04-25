@@ -170,7 +170,7 @@ pub async fn get_inference_job_status_handler(
       inference_category: record.request_details.inference_category,
       maybe_model_type: record.request_details.maybe_model_type,
       maybe_model_token: record.request_details.maybe_model_token,
-      maybe_model_title: Some("AI Model".to_string()), // TODO: This will require polymorphic joins
+      maybe_model_title: record.request_details.maybe_model_title,
       maybe_raw_inference_text: record.request_details.maybe_raw_inference_text,
     },
     status: StatusDetailsResponse {
