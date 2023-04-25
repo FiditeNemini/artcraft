@@ -10,6 +10,16 @@ pub struct UploadMediaRequest {
   pub uuid_idempotency_token: Option<String>,
   pub file_name: Option<String>,
   pub file_bytes: Option<BytesMut>,
+  pub media_source: MediaSource,
+}
+
+/// Where the frontend tells us the file came from.
+#[derive(Eq, PartialEq)]
+pub enum MediaSource {
+  Unknown,
+  UserFile,
+  /// Eg. the web audio API in Javascript.
+  UserDeviceApi,
 }
 
 /// Pull common parts out of multipart media HTTP requests, typically for handling file uploads.
@@ -17,6 +27,7 @@ pub async fn drain_multipart_request(mut multipart_payload: Multipart) -> Anyhow
   let mut uuid_idempotency_token = None;
   let mut file_bytes = None;
   let mut file_name = None;
+  let mut media_source = None;
 
   while let Ok(Some(mut field)) = multipart_payload.try_next().await {
     let mut field_name = None;
@@ -45,13 +56,33 @@ pub async fn drain_multipart_request(mut multipart_payload: Multipart) -> Anyhow
               e
             })?;
       },
+      Some("source") => {
+        media_source = read_multipart_field_as_text(&mut field).await
+            .map_err(|e| {
+              warn!("Error reading source: {:}", e);
+              e
+            })?;
+      },
       _ => continue,
     }
   }
+
+  let media_source = match media_source.as_deref() {
+    Some("device") => MediaSource::UserDeviceApi,
+    Some("file") => MediaSource::UserFile,
+    _ => {
+      if file_name.as_deref() == Some("blob") {
+        MediaSource::UserDeviceApi
+      } else {
+        MediaSource::Unknown
+      }
+    },
+  };
 
   Ok(UploadMediaRequest {
     uuid_idempotency_token,
     file_name,
     file_bytes,
+    media_source,
   })
 }

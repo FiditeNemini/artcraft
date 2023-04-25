@@ -19,8 +19,15 @@ CREATE TABLE media_uploads (
 
   -- Type of media:
   --   * 'audio' for wav, mp3, etc.
+  --   * 'image' for png, jpg, etc.
   --   * 'video' for a variety of video types.
   media_type VARCHAR(16) NOT NULL,
+
+  -- Where the media originated.
+  --   * 'file' for user file uploads
+  --   * 'device_api' for user device API sessions (eg. browser+microphone)
+  --   * 'unknown' for unknown source
+  media_source VARCHAR(16) NOT NULL,
 
   -- The original filename of the media
   maybe_original_filename VARCHAR(255) DEFAULT NULL,

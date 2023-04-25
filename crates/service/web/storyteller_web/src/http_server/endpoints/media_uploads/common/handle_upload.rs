@@ -1,7 +1,7 @@
 use actix_web::web::BytesMut;
 use actix_web::{HttpRequest, web};
 use buckets::public::media_uploads::original_file::MediaUploadOriginalFilePath;
-use crate::http_server::endpoints::media_uploads::common::drain_multipart_request::drain_multipart_request;
+use crate::http_server::endpoints::media_uploads::common::drain_multipart_request::{drain_multipart_request, MediaSource};
 use crate::http_server::endpoints::media_uploads::common::upload_error::UploadError;
 use crate::server_state::ServerState;
 use crate::validations::validate_idempotency_token_format::validate_idempotency_token_format;
@@ -17,6 +17,7 @@ use mysql_queries::queries::media_uploads::insert_media_upload::{Args, insert_me
 use std::collections::HashSet;
 use std::sync::Arc;
 use actix_multipart::Multipart;
+use enums::by_table::media_uploads::media_upload_source::MediaUploadSource;
 use tokens::files::media_upload::MediaUploadToken;
 
 pub enum SuccessCase {
@@ -205,6 +206,12 @@ pub async fn handle_upload(
     },
   };
 
+  let media_upload_source = match upload_media_request.media_source {
+    MediaSource::Unknown => MediaUploadSource::Unknown,
+    MediaSource::UserFile => MediaUploadSource::File,
+    MediaSource::UserDeviceApi => MediaUploadSource::DeviceApi,
+  };
+
   // TODO: Clean up code
   let mime_type = match maybe_mimetype {
     Some(m) => m,
@@ -231,6 +238,7 @@ pub async fn handle_upload(
   let (token, record_id) = insert_media_upload(Args{
     uuid_idempotency_token: &uuid_idempotency_token,
     media_type: media_upload_type,
+    media_source: media_upload_source,
     maybe_original_filename: upload_media_request.file_name.as_deref(),
     original_file_size_bytes: file_size_bytes as u64,
     maybe_original_duration_millis: maybe_duration_millis,

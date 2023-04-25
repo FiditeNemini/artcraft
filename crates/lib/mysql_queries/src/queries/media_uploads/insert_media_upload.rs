@@ -6,6 +6,7 @@ use crate::payloads::media_upload_modification_details::MediaUploadModificationD
 use enums::by_table::media_uploads::media_upload_type::MediaUploadType;
 use enums::common::visibility::Visibility;
 use sqlx::MySqlPool;
+use enums::by_table::media_uploads::media_upload_source::MediaUploadSource;
 use tokens::files::media_upload::MediaUploadToken;
 use tokens::users::user::UserToken;
 
@@ -18,6 +19,8 @@ pub struct Args <'a> {
   pub uuid_idempotency_token: &'a str,
 
   pub media_type: MediaUploadType,
+  pub media_source: MediaUploadSource,
+
   pub maybe_original_filename: Option<&'a str>,
   pub original_file_size_bytes: u64,
   pub maybe_original_duration_millis: Option<u64>,
@@ -114,6 +117,8 @@ SET
   uuid_idempotency_token = ?,
 
   media_type = ?,
+  media_source = ?,
+
   maybe_original_filename = ?,
   original_file_size_bytes = ?,
   original_duration_millis = ?,
@@ -139,6 +144,8 @@ SET
         args.uuid_idempotency_token,
 
         args.media_type,
+        args.media_source,
+
         args.maybe_original_filename,
         args.original_file_size_bytes,
         args.maybe_original_duration_millis.unwrap_or(0),
