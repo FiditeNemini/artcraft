@@ -25,6 +25,7 @@ import { VcModelListSearch } from "./components/VcModelListSearchComponent";
 import { EnqueueVoiceConversion, EnqueueVoiceConversionIsSuccess, EnqueueVoiceConversionRequest } from "@storyteller/components/src/api/voice_conversion/EnqueueVoiceConversion";
 import { Analytics } from "../../../../../common/Analytics";
 import { FrontendInferenceJobType, InferenceJob } from "@storyteller/components/src/jobs/InferenceJob";
+import { SessionVoiceConversionResultsList } from "../../../_common/SessionVoiceConversionResultsList";
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -357,7 +358,11 @@ function VcModelListPage(props: Props) {
                       Session VC Results
                     </h4>
                     <div className="d-flex flex-column gap-3 session-tts-section">
-                      {noResultsSection}
+                      <SessionVoiceConversionResultsList 
+                        inferenceJobs={props.inferenceJobs}
+                        sessionSubscriptionsWrapper={props.sessionSubscriptionsWrapper}
+                      />
+                      {/*{noResultsSection}*/}
                       {/* <motion.div
                         className="panel panel-tts-results p-4 gap-3 d-flex flex-column"
                         variants={sessionItem}
