@@ -127,7 +127,11 @@ function FooterNav(props: Props) {
             <div className="py-2 col-12 col-lg-3 d-flex flex-column gap-2 gap-lg-3 align-items-center align-items-lg-start">
               <p className="fw-bold">AI Tools</p>
               <li>
-                <Link to="/">Text to Speech</Link>
+                <Link to="/tts">Text to Speech</Link>
+              </li>
+
+              <li>
+                <Link to="/voice-conversion">Voice Conversion</Link>
               </li>
 
               <li>
