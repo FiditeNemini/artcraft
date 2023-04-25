@@ -27,6 +27,7 @@ use std::borrow::BorrowMut;
 use std::fmt;
 use std::ops::Deref;
 use std::sync::Arc;
+use buckets::public::voice_conversion_results::original_file::VoiceConversionResultOriginalFilePath;
 use tokens::jobs::inference::InferenceJobToken;
 
 /// For the URL PathInfo
@@ -161,6 +162,8 @@ pub async fn get_inference_job_status_handler(
     },
   };
 
+  let inference_category = record.request_details.inference_category.clone();
+
   let record_for_response = InferenceJobStatusResponsePayload {
     job_token: record.job_token,
     request: RequestDetailsResponse {
@@ -176,10 +179,22 @@ pub async fn get_inference_job_status_handler(
       attempt_count: record.attempt_count as u8,
     },
     maybe_result: record.maybe_result_details.map(|result_details| {
+      let public_bucket_media_path = match inference_category {
+        InferenceCategory::TextToSpeech => {
+          // NB: TTS results receive the legacy treatment where their table only reports the full bucket path
+          result_details.public_bucket_location_or_hash
+        }
+        InferenceCategory::VoiceConversion => {
+          VoiceConversionResultOriginalFilePath::from_object_hash(&result_details.public_bucket_location_or_hash)
+              .get_full_object_path_str()
+              .to_string()
+        }
+      };
+
       ResultDetailsResponse {
         entity_type: result_details.entity_type,
         entity_token: result_details.entity_token,
-        maybe_public_bucket_media_path: None, // TODO: This will require a new field
+        maybe_public_bucket_media_path: Some(public_bucket_media_path),
       }
     }),
     created_at: record.created_at,

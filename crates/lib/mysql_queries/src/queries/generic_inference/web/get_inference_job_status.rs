@@ -31,6 +31,13 @@ pub struct RequestDetails {
 pub struct ResultDetails {
   pub entity_type: String,
   pub entity_token: String,
+
+  /// The bucket storage hash (for vc) or full path (for tts)
+  pub public_bucket_location_or_hash: String,
+
+  /// Whether the location is a full path (for tts) or a hash (for vc) that
+  /// needs to be reconstructed into a path.
+  pub public_bucket_location_is_hash: bool,
 }
 
 /// Look up job status.
@@ -38,6 +45,9 @@ pub struct ResultDetails {
 pub async fn get_inference_job_status(job_token: &InferenceJobToken, mysql_pool: &MySqlPool)
   -> AnyhowResult<Option<GenericInferenceJobStatus>>
 {
+  // NB(bt): jobs.uuid_idempotency_token is the current way to reconstruct the hash of the
+  // TTS result since we don't store a bucket hash on the table. This is an ugly hack :(
+
   let maybe_status = sqlx::query_as!(
       RawGenericInferenceJobStatus,
         r#"
@@ -55,10 +65,16 @@ SELECT
     jobs.on_success_result_entity_type as maybe_result_entity_type,
     jobs.on_success_result_entity_token as maybe_result_entity_token,
 
+    vc.public_bucket_hash as maybe_voice_conversion_public_bucket_hash,
+    tts.public_bucket_wav_audio_path as maybe_tts_public_bucket_path,
+
     jobs.created_at,
     jobs.updated_at
 
 FROM generic_inference_jobs as jobs
+
+LEFT OUTER JOIN voice_conversion_results AS vc ON jobs.on_success_result_entity_token = vc.token
+LEFT OUTER JOIN tts_results AS tts ON jobs.on_success_result_entity_token = tts.token
 
 WHERE jobs.token = ?
         "#,
@@ -78,17 +94,28 @@ WHERE jobs.token = ?
     }
   };
 
+  // NB: A bit of a hack. We store TTS results with a full path.
+  // Going forward, all other record types will store a hash.
+  let (bucket_path_is_hash, maybe_public_bucket_hash) = match record.inference_category {
+    InferenceCategory::TextToSpeech => (false, record.maybe_tts_public_bucket_path.as_deref()),
+    InferenceCategory::VoiceConversion => (true, record.maybe_voice_conversion_public_bucket_hash.as_deref()),
+  };
+
   let maybe_result_details = record
       .maybe_result_entity_type
       .as_deref()
       .and_then(|entity_type| {
         record.maybe_result_entity_token
             .as_deref()
-            .map(|entity_token| {
-              ResultDetails {
-                entity_type: entity_type.to_string(),
-                entity_token: entity_token.to_string(),
-              }
+            .and_then(|entity_token| {
+              maybe_public_bucket_hash.map(|public_bucket_hash| {
+                ResultDetails {
+                  entity_type: entity_type.to_string(),
+                  entity_token: entity_token.to_string(),
+                  public_bucket_location_or_hash: public_bucket_hash.to_string(),
+                  public_bucket_location_is_hash: bucket_path_is_hash,
+                }
+              })
             })
       });
 
@@ -121,6 +148,9 @@ struct RawGenericInferenceJobStatus {
 
   pub maybe_result_entity_type: Option<String>,
   pub maybe_result_entity_token: Option<String>,
+
+  pub maybe_voice_conversion_public_bucket_hash: Option<String>, // NB: This is the bucket hash.
+  pub maybe_tts_public_bucket_path: Option<String>, // NB: This isn't the bucket path, but the whole hash.
 
   pub created_at: DateTime<Utc>,
   pub updated_at: DateTime<Utc>,
