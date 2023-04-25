@@ -68,7 +68,7 @@ import { NewsPage } from "./pages/news/NewsPage";
 import { LandingPage } from "./pages/landing/LandingPage";
 import { ChannelsPage } from "./pages/channels/Channels";
 import { TrumpTtsPage } from "./pages/character/trump/TrumpTtsPage";
-import { InferenceJob } from "@storyteller/components/src/jobs/InferenceJob";
+import { FrontendInferenceJobType, InferenceJob } from "@storyteller/components/src/jobs/InferenceJob";
 //import { LandingPage } from "./pages/landing/LandingPage";
 import { VcModelListPage } from "./pages/vc/vc_model_list/VcModelListPage";
 import { UploadVoiceConversionModel } from "./pages/upload/UploadVoiceConversionModel";
@@ -98,7 +98,7 @@ interface Props {
   isShowingBootstrapLanguageNotice: boolean;
   clearBootstrapLanguageNotice: () => void;
 
-  enqueueInferenceJob: (jobToken: string) => void;
+  enqueueInferenceJob: (jobToken: string, frontendInferenceJobType: FrontendInferenceJobType) => void;
   inferenceJobs: Array<InferenceJob>;
 
   enqueueTtsJob: (jobToken: string) => void;
@@ -497,6 +497,8 @@ class PageContainer extends React.Component<Props, State> {
                 setVoiceConversionModels={this.props.setVoiceConversionModels}
                 maybeSelectedVoiceConversionModel={this.props.maybeSelectedVoiceConversionModel}
                 setMaybeSelectedVoiceConversionModel={this.props.setMaybeSelectedVoiceConversionModel}
+                enqueueInferenceJob={this.props.enqueueInferenceJob}
+                inferenceJobs={this.props.inferenceJobs}
               />
             </Route>
 

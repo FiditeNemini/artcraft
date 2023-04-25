@@ -227,6 +227,10 @@ class Analytics {
     Analytics.sendCategorizedEvent(this.VOICE_CONVERSION, 'open_primary_voice_select_menu');
   }
 
+  static voiceConversionGenerate(modelToken: string) {
+    Analytics.sendCategorizedEvent(this.VOICE_CONVERSION, 'generate_vc', modelToken);
+  }
+
   // ========== UI ==========
 
   static uiTurnOnAnimations() {

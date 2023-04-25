@@ -1,11 +1,19 @@
 import { ModelInferenceJobStatus } from "../api/model_inference/GetModelInferenceJobStatus";
 import { JobState, jobStateFromString } from "./JobStates";
 
+// Type of inference job (specified by the frontend, not backend)
+export enum FrontendInferenceJobType {
+  TextToSpeech,
+  VoiceConversion,
+}
+
 // NB: Many of these fields are optional despite the response payload containing them
 // This is because we create temporary placeholder objects with just the token.
 export class InferenceJob {
   // PK
   jobToken: string;
+
+  frontendJobType: FrontendInferenceJobType;
 
   // Status
   jobState: JobState;
@@ -26,6 +34,8 @@ export class InferenceJob {
   constructor(
     // PK
     jobToken: string, 
+    // Frontend state
+    frontendJobType: FrontendInferenceJobType,
     // Status
     status: string = 'unknown',
     maybeExtraStatusDescription: string | null = null,
@@ -41,6 +51,7 @@ export class InferenceJob {
     maybeResultPublicBucketMediaPath: string | undefined | null = null,
   ) {
     this.jobToken = jobToken;
+    this.frontendJobType = frontendJobType;
     this.jobState = jobStateFromString(status);
     this.maybeExtraStatusDescription = maybeExtraStatusDescription;
     this.attemptCount = attemptCount;
@@ -67,9 +78,10 @@ export class InferenceJob {
     this.maybeResultPublicBucketMediaPath = maybeResultPublicBucketMediaPath;
   }
 
-  static fromResponse(response: ModelInferenceJobStatus) : InferenceJob {
+  static fromResponse(response: ModelInferenceJobStatus, frontendJobType: FrontendInferenceJobType) : InferenceJob {
     return new InferenceJob(
       response.job_token,
+      frontendJobType,
       response.status.status,
       response.status.maybe_extra_status_description || null,
       response.status.attempt_count || 0,

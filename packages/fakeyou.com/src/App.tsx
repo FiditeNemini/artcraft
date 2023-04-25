@@ -44,7 +44,7 @@ import {
   AVAILABLE_LANGUAGE_MAP,
   ENGLISH_LANGUAGE,
 } from "./_i18n/AvailableLanguageMap";
-import { InferenceJob } from "@storyteller/components/src/jobs/InferenceJob";
+import { FrontendInferenceJobType, InferenceJob } from "@storyteller/components/src/jobs/InferenceJob";
 import { GetModelInferenceJobStatus, GetModelInferenceJobStatusIsOk } from "@storyteller/components/src/api/model_inference/GetModelInferenceJobStatus";
 import { VoiceConversionModelUploadJob } from "@storyteller/components/src/jobs/VoiceConversionModelUploadJob";
 import { VoiceConversionModelListItem } from "@storyteller/components/src/api/voice_conversion/ListVoiceConversionModels";
@@ -350,7 +350,11 @@ class App extends React.Component<Props, State> {
           return;
         }
 
-        let updatedJob = InferenceJob.fromResponse(lookupResult.state!);
+        let updatedJob = InferenceJob.fromResponse(
+          lookupResult.state!, 
+          existingJob.frontendJobType
+        );
+
         updatedJobs.push(updatedJob);
       });
 
@@ -360,8 +364,8 @@ class App extends React.Component<Props, State> {
     }
   };
 
-  enqueueInferenceJob = (jobToken: string) => {
-    const newJob = new InferenceJob(jobToken);
+  enqueueInferenceJob = (jobToken: string, frontendJobType: FrontendInferenceJobType) => {
+    const newJob = new InferenceJob(jobToken, frontendJobType);
     let inferenceJobs = this.state.inferenceJobs.concat([newJob]);
 
     this.setState({

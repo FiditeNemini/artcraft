@@ -48,8 +48,6 @@ export default function RecordComponent(props: Props) {
     (async () => {
       let idempotencyToken = uuidv4();
 
-      console.log('blob', recordingBlob)
-
       const request : UploadAudioRequest = {
         uuid_idempotency_token: idempotencyToken,
         file: recordingBlob,

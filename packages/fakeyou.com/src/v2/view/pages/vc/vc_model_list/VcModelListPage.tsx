@@ -22,8 +22,9 @@ import RecordComponent from "./components/RecordComponent";
 import { usePrefixedDocumentTitle } from "../../../../../common/UsePrefixedDocumentTitle";
 import { ListVoiceConversionModels, VoiceConversionModelListItem } from "@storyteller/components/src/api/voice_conversion/ListVoiceConversionModels";
 import { VcModelListSearch } from "./components/VcModelListSearchComponent";
-import { EnqueueVoiceConversion, EnqueueVoiceConversionRequest } from "@storyteller/components/src/api/voice_conversion/EnqueueVoiceConversion";
-import { EnqueueRemoteDownloadIsOk } from "@storyteller/components/src/api/remote_downloads/EnqueueRemoteDownload";
+import { EnqueueVoiceConversion, EnqueueVoiceConversionIsSuccess, EnqueueVoiceConversionRequest } from "@storyteller/components/src/api/voice_conversion/EnqueueVoiceConversion";
+import { Analytics } from "../../../../../common/Analytics";
+import { FrontendInferenceJobType, InferenceJob } from "@storyteller/components/src/jobs/InferenceJob";
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -34,6 +35,9 @@ interface Props {
 
   maybeSelectedVoiceConversionModel?: VoiceConversionModelListItem;
   setMaybeSelectedVoiceConversionModel: (maybeSelectedVoiceConversionModel: VoiceConversionModelListItem) => void;
+
+  enqueueInferenceJob: (jobToken: string, frontendInferenceJobType: FrontendInferenceJobType) => void;
+  inferenceJobs: Array<InferenceJob>;
 }
 
 function VcModelListPage(props: Props) {
@@ -122,10 +126,12 @@ function VcModelListPage(props: Props) {
       source_media_upload_token: mediaUploadToken,
     };
 
+    Analytics.voiceConversionGenerate(props.maybeSelectedVoiceConversionModel.token);
+
     let result = await EnqueueVoiceConversion(request);
 
-    if (EnqueueRemoteDownloadIsOk(result)) {
-      console.log("successful enqueue");
+    if (EnqueueVoiceConversionIsSuccess(result)) {
+      props.enqueueInferenceJob(result.inference_job_token, FrontendInferenceJobType.VoiceConversion);
     }
   };
 
