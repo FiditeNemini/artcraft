@@ -479,15 +479,6 @@ class PageContainer extends React.Component<Props, State> {
               <PatronPage sessionWrapper={this.props.sessionWrapper} />
             </Route>
 
-            <Route path="/landing_temp">
-              <LandingPage
-                sessionWrapper={this.props.sessionWrapper}
-                sessionSubscriptionsWrapper={
-                  this.props.sessionSubscriptionsWrapper
-                }
-              />
-            </Route>
-
             <Route path="/voice-conversion">
               <VcModelListPage
                 sessionWrapper={this.props.sessionWrapper}
@@ -567,7 +558,7 @@ class PageContainer extends React.Component<Props, State> {
               />
             </Route>
 
-            <Route path="/">
+            <Route path="/tts" exact={true}>
               <TtsModelListPage
                 sessionWrapper={this.props.sessionWrapper}
                 sessionSubscriptionsWrapper={
@@ -625,6 +616,15 @@ class PageContainer extends React.Component<Props, State> {
                 selectedTtsLanguageScope={this.props.selectedTtsLanguageScope}
                 setSelectedTtsLanguageScope={
                   this.props.setSelectedTtsLanguageScope
+                }
+              />
+            </Route>
+
+            <Route path="/" exact={true}>
+              <LandingPage
+                sessionWrapper={this.props.sessionWrapper}
+                sessionSubscriptionsWrapper={
+                  this.props.sessionSubscriptionsWrapper
                 }
               />
             </Route>

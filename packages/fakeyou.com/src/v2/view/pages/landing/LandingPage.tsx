@@ -109,14 +109,16 @@ function LandingPage(props: Props) {
             className="display-4 fw-bold lh-2 mb-3 zi-2"
             variants={item}
           >
-            Text to Speech,
+            AI Music,
             <br />
-            Voice, and AI Tools
+            Text to Speech, 
+            <br />
+            and Creator Tools
           </motion.h1>
         </div>
         <div>
           <motion.p className="lead mw-lead mb-3 px-2" variants={item}>
-            Use FakeYou deep fake technology to say stuff with your favorite
+            Use FakeYou deep fake technology to make movies and music with your favorite
             characters.
           </motion.p>
         </div>
@@ -159,7 +161,7 @@ function LandingPage(props: Props) {
           </div>
           <div className="col-12 col-md-6 text-center">
             <Link
-              to="/channels"
+              to="/voice-conversion"
               className="w-100 d-flex flex-column align-items-center"
             >
               <div className="panel p-4 mt-5 mt-lg-0 panel-select">
@@ -168,7 +170,7 @@ function LandingPage(props: Props) {
                   src="/mascot/VC-img.webp"
                   alt="Voice Conversion"
                 />
-                <h2 className="fw-bold text-white">Voice Conversion</h2>
+                <h2 className="fw-bold text-white">Music &amp; Voice Conversion</h2>
                 <h6 className="fw-normal opacity-75 text-white">
                   Speak as your favorite characters
                 </h6>
@@ -203,6 +205,7 @@ function LandingPage(props: Props) {
         </div>
       </motion.div>
 
+      {/*
       <motion.div className="container-panel py-5" variants={panel}>
         <div className="d-flex flex-column align-items-center text-center"></div>
         <div className="d-flex justify-content-center">
@@ -255,6 +258,7 @@ function LandingPage(props: Props) {
           </div>
         </div>
       </motion.div>
+      */}
 
       <motion.div className="container-panel my-5 py-5" variants={panel}>
         <div className="panel p-3 p-lg-4 d-flex flex-column align-items-center justify-content-center">
