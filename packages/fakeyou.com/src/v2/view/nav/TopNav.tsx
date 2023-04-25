@@ -357,7 +357,7 @@ function TopNav(props: Props) {
                   </Link>
                 </li>
 
-                <li data-bs-toggle="offcanvas" className="nav-item">
+                {/*<li data-bs-toggle="offcanvas" className="nav-item">
                   <Link
                     to={WebUrl.newsPage()}
                     onClick={() => {
@@ -368,7 +368,7 @@ function TopNav(props: Props) {
                     <FontAwesomeIcon icon={faTvRetro} className="me-2" />
                     {t("nav.TopNav.main.newsLink")}
                   </Link>
-                </li>
+                  </li>*/}
 
                 <li className="nav-item dropdown">
                   {/* TODO(echelon): Fix the build warnings about href not being accessible. */}
