@@ -189,7 +189,7 @@ pub async fn handle_upload(
     if media_upload_type.is_some() {
       let basic_info = decode_basic_audio_bytes_info(
         bytes.as_ref(),
-        if mimetype == "video/webm" { None } else { Some(mimetype) },
+        Some(mimetype),
         None
       ).map_err(|e| {
         warn!("file decoding error: {:?}", e);
