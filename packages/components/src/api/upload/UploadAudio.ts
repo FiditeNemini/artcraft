@@ -2,6 +2,7 @@ import { ApiConfig } from "../ApiConfig";
 
 export interface UploadAudioRequest {
   uuid_idempotency_token: string,
+  source?: string, // eg. "device", "file"
   file: any,
 }
 
@@ -32,6 +33,10 @@ export async function UploadAudio(request: UploadAudioRequest) : Promise<UploadA
 
   formData.append('uuid_idempotency_token', request.uuid_idempotency_token);
   formData.append('file', request.file);
+
+  if (request.source !== undefined) {
+    formData.append('source', request.source);
+  }
 
   return fetch(endpoint, {
     method: 'POST',

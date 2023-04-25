@@ -53,6 +53,7 @@ export default function RecordComponent(props: Props) {
       const request : UploadAudioRequest = {
         uuid_idempotency_token: idempotencyToken,
         file: recordingBlob,
+        source: 'device',
       }
 
       let result = await UploadAudio(request);

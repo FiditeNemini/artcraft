@@ -47,6 +47,7 @@ function UploadComponent(props: Props) {
     const request : UploadAudioRequest = {
       uuid_idempotency_token: idempotencyToken,
       file: file,
+      source: 'file',
     }
 
     let result = await UploadAudio(request);
