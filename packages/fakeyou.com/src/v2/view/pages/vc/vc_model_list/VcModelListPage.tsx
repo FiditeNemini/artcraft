@@ -86,27 +86,26 @@ function VcModelListPage(props: Props) {
     ttsModelsLoaded,
   ]);
 
-  const handleLoading = useCallback(() => {
+  /*const handleLoading = useCallback(() => {
     setLoading(true);
     setTimeout(() => {
       setLoading(false);
     }, 2000);
-  }, []);
+  }, []);*/
 
   useEffect(() => {
     listModels();
-    const timeout = setTimeout(() => {
-      setLoading(false);
-    }, 2000);
-    return () => clearTimeout(timeout);
+    //const timeout = setTimeout(() => {
+    //  setLoading(false);
+    //}, 2000);
+    //return () => clearTimeout(timeout);
   }, [
-    handleLoading,
+    //handleLoading,
     listModels,
   ]);
 
   const handleClearClick = (ev: React.FormEvent<HTMLButtonElement>) => {
     ev.preventDefault();
-
     return false;
   };
 
@@ -232,7 +231,7 @@ function VcModelListPage(props: Props) {
                           </div>
                         </div>
 
-                        <div>
+                        {/*<div>
                           <label className="sub-title">
                             Or pick from your audio collection (5 files)
                           </label>
@@ -256,7 +255,7 @@ function VcModelListPage(props: Props) {
                               />
                             </div>
                           </div>
-                        </div>
+                              </div>*/}
 
                         <div className="d-flex gap-3">
                           <button
