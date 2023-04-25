@@ -36,6 +36,7 @@ enum FirehoseEvent {
   GenericDownloadCompleted,
 
   MediaUploaded,
+  DeviceMediaRecorded,
 
   CommentCreated,
 
@@ -66,6 +67,7 @@ impl FirehoseEvent {
       FirehoseEvent::GenericDownloadStarted => "generic_download_started",
       FirehoseEvent::GenericDownloadCompleted => "generic_download_completed",
       FirehoseEvent::MediaUploaded => "media_uploaded",
+      FirehoseEvent::DeviceMediaRecorded => "device_media_recorded",
 
       FirehoseEvent::CommentCreated => "comment_created",
 
@@ -242,6 +244,16 @@ impl FirehosePublisher {
   pub async fn publish_media_uploaded(&self, maybe_user_token: Option<&UserToken>, upload_token: &MediaUploadToken) -> AnyhowResult<()> {
     let _record_id = self.insert(
       FirehoseEvent::MediaUploaded,
+      maybe_user_token.map(|u| u.as_str()),
+      Some(upload_token.as_str()),
+      Some(upload_token.as_str()),
+    ).await?;
+    Ok(())
+  }
+
+  pub async fn publish_device_media_recorded(&self, maybe_user_token: Option<&UserToken>, upload_token: &MediaUploadToken) -> AnyhowResult<()> {
+    let _record_id = self.insert(
+      FirehoseEvent::DeviceMediaRecorded,
       maybe_user_token.map(|u| u.as_str()),
       Some(upload_token.as_str()),
       Some(upload_token.as_str()),

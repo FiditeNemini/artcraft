@@ -267,14 +267,23 @@ pub async fn handle_upload(
 
   info!("new media upload id: {} token: {:?}", record_id, &token);
 
-  server_state.firehose_publisher.publish_media_uploaded(
-    maybe_user_token.as_ref(),
-    &token)
-      .await
-      .map_err(|e| {
-        warn!("error publishing event: {:?}", e);
-        UploadError::ServerError
-      })?;
+  let firehose_result = match media_upload_source {
+    MediaUploadSource::DeviceApi => {
+      server_state.firehose_publisher.publish_device_media_recorded(
+        maybe_user_token.as_ref(),
+        &token).await
+    }
+    _ => {
+      server_state.firehose_publisher.publish_media_uploaded(
+        maybe_user_token.as_ref(),
+        &token).await
+    }
+  };
+
+  let _r = firehose_result.map_err(|e| {
+    warn!("error publishing event: {:?}", e);
+    UploadError::ServerError
+  })?;
 
   Ok(SuccessCase::MediaSuccessfullyUploaded {
     upload_token: token,

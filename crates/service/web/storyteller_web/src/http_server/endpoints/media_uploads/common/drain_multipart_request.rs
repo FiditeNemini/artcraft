@@ -14,7 +14,7 @@ pub struct UploadMediaRequest {
 }
 
 /// Where the frontend tells us the file came from.
-#[derive(Eq, PartialEq)]
+#[derive(Eq, PartialEq, Clone, Copy)]
 pub enum MediaSource {
   Unknown,
   UserFile,
