@@ -100,6 +100,7 @@ interface Props {
 
   enqueueInferenceJob: (jobToken: string, frontendInferenceJobType: FrontendInferenceJobType) => void;
   inferenceJobs: Array<InferenceJob>;
+  inferenceJobsByCategory: Map<FrontendInferenceJobType, Array<InferenceJob>>;
 
   enqueueTtsJob: (jobToken: string) => void;
   ttsInferenceJobs: Array<TtsInferenceJob>;
@@ -499,6 +500,7 @@ class PageContainer extends React.Component<Props, State> {
                 setMaybeSelectedVoiceConversionModel={this.props.setMaybeSelectedVoiceConversionModel}
                 enqueueInferenceJob={this.props.enqueueInferenceJob}
                 inferenceJobs={this.props.inferenceJobs}
+                inferenceJobsByCategory={this.props.inferenceJobsByCategory}
               />
             </Route>
 
@@ -590,6 +592,7 @@ class PageContainer extends React.Component<Props, State> {
                 }
                 enqueueInferenceJob={this.props.enqueueInferenceJob}
                 inferenceJobs={this.props.inferenceJobs}
+                inferenceJobsByCategory={this.props.inferenceJobsByCategory}
                 enqueueTtsJob={this.props.enqueueTtsJob}
                 ttsInferenceJobs={this.props.ttsInferenceJobs}
                 ttsModelUploadJobs={this.props.ttsModelUploadJobs}

@@ -39,6 +39,7 @@ interface Props {
 
   enqueueInferenceJob: (jobToken: string, frontendInferenceJobType: FrontendInferenceJobType) => void;
   inferenceJobs: Array<InferenceJob>;
+  inferenceJobsByCategory: Map<FrontendInferenceJobType, Array<InferenceJob>>;
 }
 
 function VcModelListPage(props: Props) {
@@ -147,19 +148,6 @@ function VcModelListPage(props: Props) {
 
   const canBeginConversion = mediaUploadToken !== undefined && props.maybeSelectedVoiceConversionModel !== undefined;
   console.log('canBeginConversion', canBeginConversion, mediaUploadToken, props.maybeSelectedVoiceConversionModel);
-
-  let noResultsSection = (
-    <div className="panel panel-inner text-center p-5 rounded-5 h-100">
-      <div className="d-flex flex-column opacity-75 h-100 justify-content-center">
-        <FontAwesomeIcon icon={faHeadphones} className="fs-3 mb-3" />
-        <h5 className="fw-semibold">
-          {t("common.SessionTtsInferenceResults.noResults.title")}
-        </h5>
-        <p>{t("common.SessionTtsInferenceResults.noResults.subtitle")}</p>
-      </div>
-    </div>
-  );
-
 
   return (
     <motion.div initial="hidden" animate="visible" variants={container}>
@@ -349,7 +337,7 @@ function VcModelListPage(props: Props) {
                     </h4>
                     <div className="d-flex flex-column gap-3 session-tts-section">
                       <SessionVoiceConversionResultsList 
-                        inferenceJobs={props.inferenceJobs}
+                        inferenceJobs={props.inferenceJobsByCategory.get(FrontendInferenceJobType.VoiceConversion)!}
                         sessionSubscriptionsWrapper={props.sessionSubscriptionsWrapper}
                       />
                     </div>

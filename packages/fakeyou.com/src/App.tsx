@@ -770,6 +770,7 @@ class App extends React.Component<Props, State> {
                     }
                     enqueueInferenceJob={this.enqueueInferenceJob}
                     inferenceJobs={this.state.inferenceJobs}
+                    inferenceJobsByCategory={this.state.inferenceJobsByCategory}
                     enqueueTtsJob={this.enqueueTtsJob}
                     ttsInferenceJobs={this.state.ttsInferenceJobs}
                     enqueueW2lJob={this.enqueueW2lJob}

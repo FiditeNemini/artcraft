@@ -94,6 +94,7 @@ interface Props {
 
   enqueueInferenceJob: (jobToken: string, frontendInferenceJobType: FrontendInferenceJobType) => void;
   inferenceJobs: Array<InferenceJob>;
+  inferenceJobsByCategory: Map<FrontendInferenceJobType, Array<InferenceJob>>;
 
   enqueueTtsJob: (jobToken: string) => void;
   ttsInferenceJobs: Array<TtsInferenceJob>;
@@ -609,7 +610,7 @@ function TtsModelListPage(props: Props) {
                     </h4>
                     <div className="d-flex flex-column gap-3 session-tts-section">
                       <SessionTtsInferenceResultList
-                        inferenceJobs={props.inferenceJobs}
+                        inferenceJobs={props.inferenceJobsByCategory.get(FrontendInferenceJobType.TextToSpeech)!}
                         ttsInferenceJobs={props.ttsInferenceJobs}
                         sessionSubscriptionsWrapper={
                           props.sessionSubscriptionsWrapper
