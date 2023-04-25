@@ -9,6 +9,7 @@ import {
   faClock,
   faLink,
   faHeadphonesSimple,
+  faDownload,
 } from "@fortawesome/free-solid-svg-icons";
 import { motion } from "framer-motion";
 import { container, sessionItem } from "../../../data/animation";
@@ -122,9 +123,11 @@ function SessionVoiceConversionResultsList(props: Props) {
       let audioLink = new BucketConfig().getGcsUrl(
         job.maybeResultPublicBucketMediaPath
       );
-      let ttsPermalink = `/tts/result/${job.maybeResultToken}`;
+      //let ttsPermalink = `/tts/result/${job.maybeResultToken}`;
 
       let wavesurfers = <SessionTtsAudioPlayer filename={audioLink} />;
+
+      let audioDownloadFilename = `fakeyou-${job.jobToken}.wav`;
 
       results.push(
         <div key={job.jobToken}>
@@ -157,7 +160,7 @@ function SessionVoiceConversionResultsList(props: Props) {
               {wavesurfers}
 
               <div className="mt-2">
-                <Link
+                {/*<Link
                   to={ttsPermalink}
                   onClick={() => {
                     Analytics.ttsClickResultLink();
@@ -166,7 +169,19 @@ function SessionVoiceConversionResultsList(props: Props) {
                 >
                   <FontAwesomeIcon icon={faLink} className="me-2" />
                   {t("common.SessionTtsInferenceResults.result.shareDownload")}
-                </Link>
+                </Link>*/}
+
+                <a
+                  className=" btn btn-primary w-100 mt-4"
+                  href={audioLink}
+                  onClick={() => {
+                    Analytics.voiceConversionClickDownload();
+                  }}
+                  download={audioDownloadFilename}
+                >
+                  <FontAwesomeIcon icon={faDownload} className="me-2" />
+                  Download File{" "}
+                </a>
               </div>
             </motion.div>
           </div>

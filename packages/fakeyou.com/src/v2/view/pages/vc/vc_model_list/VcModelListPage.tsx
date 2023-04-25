@@ -160,16 +160,6 @@ function VcModelListPage(props: Props) {
     </div>
   );
 
-  // let comingSoon = (
-  //   <div className="overflow-hidden">
-  //     <div className="panel panel-inner text-center p-5 rounded-5 h-100">
-  //       <div className="d-flex flex-column opacity-75 h-100 justify-content-center">
-  //         <FontAwesomeIcon icon={faTimer} className="fs-3 mb-3" />
-  //         <p>This feature is coming soon!</p>
-  //       </div>
-  //     </div>
-  //   </div>
-  // );
 
   return (
     <motion.div initial="hidden" animate="visible" variants={container}>
@@ -362,23 +352,6 @@ function VcModelListPage(props: Props) {
                         inferenceJobs={props.inferenceJobs}
                         sessionSubscriptionsWrapper={props.sessionSubscriptionsWrapper}
                       />
-                      {/*{noResultsSection}*/}
-                      {/* <motion.div
-                        className="panel panel-tts-results p-4 gap-3 d-flex flex-column"
-                        variants={sessionItem}
-                      >
-                        <div>
-                          <h5 className="mb-2">Title</h5>
-                          <p>text</p>
-                        </div>
-                        (wavesurfer)
-                        <div className="mt-2">
-                          <Link to="/voice-conversion" className="fw-semibold">
-                            <FontAwesomeIcon icon={faLink} className="me-2" />
-                            Details
-                          </Link>
-                        </div>
-                      </motion.div> */}
                     </div>
                   </div>
                 </div>
