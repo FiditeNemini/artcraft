@@ -1,4 +1,4 @@
-import { faFileArrowUp, faFileAudio } from "@fortawesome/pro-solid-svg-icons";
+import { faFileArrowUp, faFileAudio, faTrash } from "@fortawesome/pro-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React, { useState } from "react";
 import { FileUploader } from "react-drag-drop-files";
@@ -24,6 +24,7 @@ function UploadComponent(props: Props) {
   const [idempotencyToken, setIdempotencyToken] = useState(uuidv4());
 
   const handleChange = (file: any) => {
+    console.log('handle change');
     setFile(file);
     setIdempotencyToken(uuidv4());
     const audioUrl = URL.createObjectURL(file);
@@ -44,6 +45,9 @@ function UploadComponent(props: Props) {
   };
 
   const handleClear = () => {
+    setFile(null);
+    setAudioLink("");
+    setIdempotencyToken(uuidv4());
     props.setMediaUploadToken(undefined); // clear
     props.setFormIsCleared(true);
   };
@@ -168,6 +172,14 @@ function UploadComponent(props: Props) {
               className="me-2"
             />
             Upload Audio
+          </button>
+
+          <button
+            className="btn btn-destructive w-100"
+            onClick={handleClear}
+          >
+            <FontAwesomeIcon icon={faTrash} className="me-2" />
+            Clear
           </button>
         </div>
       ) : (
