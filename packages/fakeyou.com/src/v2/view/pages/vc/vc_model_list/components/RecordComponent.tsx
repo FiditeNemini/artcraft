@@ -12,6 +12,8 @@ interface Props {
 
   formIsCleared: boolean,
   setFormIsCleared: (cleared: boolean) => void,
+
+  setCanConvert: (canConvert: boolean) => void,
 }
 
 export default function RecordComponent(props: Props) {
@@ -45,17 +47,20 @@ export default function RecordComponent(props: Props) {
 
   const handleStartRecording = async () => {
     startRecording();
+    props.setCanConvert(false);
   };
 
   const handleStopRecording = async (blob: any) => {
     stopRecording();
     props.setFormIsCleared(false);
+    props.setCanConvert(false);
   };
 
   const handleClear = () => {
     stopRecording();
     props.setMediaUploadToken(undefined); // clear
     props.setFormIsCleared(true);
+    props.setCanConvert(false);
   };
 
   const handleUpload = async () => {
@@ -69,6 +74,8 @@ export default function RecordComponent(props: Props) {
 
     if (UploadAudioIsOk(result)) {
       props.setMediaUploadToken(result.upload_token);
+      props.setFormIsCleared(false);
+      props.setCanConvert(true);
     }
   }
 

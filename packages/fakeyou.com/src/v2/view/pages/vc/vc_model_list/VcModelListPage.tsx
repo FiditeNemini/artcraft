@@ -221,6 +221,7 @@ function VcModelListPage(props: Props) {
                               setMediaUploadToken={setMediaUploadToken}
                               formIsCleared={formIsCleared}
                               setFormIsCleared={setFormIsCleared}
+                              setCanConvert={setCanConvert}
                             />
                           </div>
                         </div>
@@ -289,10 +290,10 @@ function VcModelListPage(props: Props) {
                               setMediaUploadToken={setMediaUploadToken}
                               formIsCleared={formIsCleared}
                               setFormIsCleared={setFormIsCleared}
+                              setCanConvert={setCanConvert}
                             />
                           </div>
                         </div>
-
 
                         <div>
                           <label className="sub-title">
