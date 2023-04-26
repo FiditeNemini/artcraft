@@ -1,3 +1,4 @@
+use std::ffi::OsString;
 use container_common::anyhow_result::AnyhowResult;
 use filesys::path_to_string::path_to_string;
 use log::info;
@@ -21,11 +22,20 @@ pub struct SoVitsSvcModelCheckCommand {
   /// eg. `source python/bin/activate`
   maybe_virtual_env_activation_command: Option<String>,
 
-  ///// eg. `python3`
-  //maybe_override_python_interpreter: Option<String>,
+  /// Optional default config file to use
+  maybe_default_config_path: Option<PathBuf>,
+
+  /// Optional default test wav file to use
+  maybe_default_test_wav_path: Option<PathBuf>,
 
   /// If this is run under Docker (eg. in development), these are the options.
   maybe_docker_options: Option<DockerOptions>,
+
+  /// Supposedly where HF caches models it downloads (have not verified this!)
+  maybe_huggingface_cache_dir: Option<PathBuf>,
+
+  /// Supposedly where NLTK caches models it downloads (have not verified this!)
+  maybe_nltk_cache_dir: Option<PathBuf>,
 }
 
 #[derive(Clone)]
@@ -47,10 +57,12 @@ pub struct CheckArgs<P: AsRef<Path>> {
   pub model_path: P,
 
   /// (positional arg): input wav path
-  pub input_path: P,
+  /// This can fall back to a default value set at construction.
+  pub maybe_input_path: Option<P>,
 
   /// --config-path: path of the hparams json file
-  pub config_path: P,
+  /// This can fall back to a default value set at construction.
+  pub maybe_config_path: Option<P>,
 
   /// --output_path: output path of converting model to onnx (which we use to test validity)
   pub output_path: P,
@@ -64,13 +76,21 @@ impl SoVitsSvcModelCheckCommand {
     so_vits_svc_root_code_directory: P,
     executable_or_command: ExecutableOrCommand,
     maybe_virtual_env_activation_command: Option<&str>,
+    maybe_default_config_path: Option<P>,
+    maybe_default_test_wav_path: Option<P>,
     maybe_docker_options: Option<DockerOptions>,
+    maybe_huggingface_cache_dir: Option<P>,
+    maybe_nltk_cache_dir: Option<P>,
   ) -> Self {
     Self {
       so_vits_svc_root_code_directory: so_vits_svc_root_code_directory.as_ref().to_path_buf(),
       executable_or_command,
       maybe_virtual_env_activation_command: maybe_virtual_env_activation_command.map(|s| s.to_string()),
+      maybe_default_config_path: maybe_default_config_path.map(|p| p.as_ref().to_path_buf()),
+      maybe_default_test_wav_path: maybe_default_test_wav_path.map(|p| p.as_ref().to_path_buf()),
       maybe_docker_options,
+      maybe_huggingface_cache_dir: maybe_huggingface_cache_dir.map(|s| s.as_ref().to_path_buf()),
+      maybe_nltk_cache_dir: maybe_nltk_cache_dir.map(|s| s.as_ref().to_path_buf()),
     }
   }
 
@@ -98,8 +118,17 @@ impl SoVitsSvcModelCheckCommand {
     let maybe_virtual_env_activation_command = easyenv::get_env_string_optional(
       "SO_VITS_SVC_MODEL_CHECK_MAYBE_VENV_COMMAND");
 
-    //let maybe_override_python_interpreter = easyenv::get_env_string_optional(
-    //  "SO_VITS_SVC_MODEL_CHECK_MAYBE_PYTHON_INTERPRETER");
+    let maybe_default_config_path = easyenv::get_env_pathbuf_optional(
+      "SO_VITS_SVC_MODEL_CHECK_MAYBE_DEFAULT_CONFIG_PATH");
+
+    let maybe_default_test_wav_path = easyenv::get_env_pathbuf_optional(
+      "SO_VITS_SVC_MODEL_CHECK_MAYBE_DEFAULT_TEST_WAV_PATH");
+
+    let maybe_huggingface_cache_dir =
+        easyenv::get_env_pathbuf_optional("HF_DATASETS_CACHE");
+
+    let maybe_nltk_cache_dir =
+        easyenv::get_env_pathbuf_optional("NLTK_DATA");
 
     let maybe_docker_options = easyenv::get_env_string_optional(
       "SO_VITS_SVC_MODEL_CHECK_MAYBE_DOCKER_IMAGE")
@@ -117,6 +146,10 @@ impl SoVitsSvcModelCheckCommand {
       executable_or_command,
       maybe_virtual_env_activation_command,
       maybe_docker_options,
+      maybe_default_config_path,
+      maybe_default_test_wav_path,
+      maybe_huggingface_cache_dir,
+      maybe_nltk_cache_dir,
     })
   }
 
@@ -156,8 +189,16 @@ impl SoVitsSvcModelCheckCommand {
     command.push_str(" --output-path ");
     command.push_str(&path_to_string(args.output_path));
 
+    let config_path = match args.maybe_config_path {
+      Some(path) => path.as_ref().to_path_buf(),
+      None => match self.maybe_default_config_path.as_deref() {
+        Some(path) => path.to_path_buf(),
+        None => return Err(anyhow!("no config path supplied")),
+      }
+    };
+
     command.push_str(" --config-path ");
-    command.push_str(&path_to_string(args.config_path));
+    command.push_str(&path_to_string(config_path));
 
     let device = match args.device {
       Device::Cuda => "cuda",
@@ -167,9 +208,17 @@ impl SoVitsSvcModelCheckCommand {
     command.push_str(" --device ");
     command.push_str(&path_to_string(device));
 
+    let input_path = match args.maybe_input_path {
+      Some(path) => path.as_ref().to_path_buf(),
+      None => match self.maybe_default_test_wav_path.as_deref() {
+        Some(path) => path.to_path_buf(),
+        None => return Err(anyhow!("no test wav path supplied")),
+      }
+    };
+
     // NB: Input wav path is not a named arg
     command.push_str(" ");
-    command.push_str(&path_to_string(args.input_path));
+    command.push_str(&path_to_string(input_path));
     command.push_str(" ");
 
     // ===== End Python Args =====
@@ -186,9 +235,37 @@ impl SoVitsSvcModelCheckCommand {
       &command
     ];
 
-    let mut p = Popen::create(&command_parts, PopenConfig {
-      ..Default::default()
-    })?;
+    let mut maybe_cache_dirs = Vec::new();
+
+    if let Some(cache_dir) = self.maybe_huggingface_cache_dir.as_deref() {
+      maybe_cache_dirs.push((
+        OsString::from("HF_DATASETS_CACHE"),
+        OsString::from(cache_dir),
+      ));
+      maybe_cache_dirs.push((
+        OsString::from("HF_HOME"),
+        OsString::from(cache_dir),
+      ));
+    }
+
+    if let Some(cache_dir) = self.maybe_nltk_cache_dir.as_deref() {
+      maybe_cache_dirs.push((
+        OsString::from("NLTK_DATA"),
+        OsString::from(cache_dir),
+      ));
+      maybe_cache_dirs.push((
+        OsString::from("NLTK_DATA_PATH"),
+        OsString::from(cache_dir),
+      ));
+    }
+
+    let mut config = PopenConfig::default();
+
+    if !maybe_cache_dirs.is_empty() {
+      config.env = Some(maybe_cache_dirs);
+    }
+
+    let mut p = Popen::create(&command_parts, config)?;
 
     info!("Subprocess PID: {:?}", p.pid());
 

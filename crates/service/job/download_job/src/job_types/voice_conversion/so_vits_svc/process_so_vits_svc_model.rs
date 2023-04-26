@@ -41,16 +41,15 @@ pub async fn process_so_vits_svc_model<'a, 'b>(
 
   let original_model_file_path = PathBuf::from(download_filename.clone());
 
-  //let config_path = PathBuf::from("/models/voice_conversion/so-vits-svc/src/so_vits_svc_fork/configs_template/config_template.json"); // TODO: This could be variable.
-  let config_path = PathBuf::from("/models/voice_conversion/so-vits-svc/example_config.json"); // TODO: This could be variable.
-  let input_wav_path = PathBuf::from("/models/voice_conversion/so-vits-svc/example.wav"); // TODO: This could be variable.
+  //let config_path = PathBuf::from("/models/voice_conversion/so-vits-svc/example_config.json"); // TODO: This could be variable.
+  //let input_wav_path = PathBuf::from("/models/voice_conversion/so-vits-svc/example.wav"); // TODO: This could be variable.
   let output_wav_path = temp_dir.path().join("output.wav");
 
   let model_check_result = job_state.sidecar_configs.so_vits_svc_model_check_command.execute_check(CheckArgs {
     model_path: &original_model_file_path,
-    input_path: &input_wav_path,
+    maybe_input_path: None,
     output_path: &output_wav_path,
-    config_path: &config_path,
+    maybe_config_path: None,
     device: Device::Cuda,
   });
 
