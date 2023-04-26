@@ -7,31 +7,6 @@ import { faMicrophone, faUpload } from "@fortawesome/pro-solid-svg-icons";
 import { UploadAudio, UploadAudioIsOk, UploadAudioRequest } from "@storyteller/components/src/api/upload/UploadAudio";
 import { faRightLeft, faTrash } from "@fortawesome/free-solid-svg-icons";
 
-interface RecorderProps {
-  recordingBlob: any;
-}
-
-function RecordedAudioComponent(props: RecorderProps) {
-
-  // Only generate the URL on change.
-  const audioLink = useMemo(() => {
-    if (!props.recordingBlob) {
-      return;
-    }
-    return URL.createObjectURL(props.recordingBlob);
-  }, [props.recordingBlob]);
-
-  if (!props.recordingBlob) {
-    return <></>;
-  }
-
-  return (
-    <div className="panel panel-inner rounded p-3">
-      <InputVcAudioPlayer filename={audioLink as string} />
-    </div>
-  );
-}
-
 interface Props {
   setMediaUploadToken: (token?: string) => void,
 
@@ -156,6 +131,31 @@ export default function RecordComponent(props: Props) {
         ) 
       }
 
+    </div>
+  );
+}
+
+interface RecorderProps {
+  recordingBlob: any;
+}
+
+function RecordedAudioComponent(props: RecorderProps) {
+
+  // Only generate the URL on change.
+  const audioLink = useMemo(() => {
+    if (!props.recordingBlob) {
+      return;
+    }
+    return URL.createObjectURL(props.recordingBlob);
+  }, [props.recordingBlob]);
+
+  if (!props.recordingBlob) {
+    return <></>;
+  }
+
+  return (
+    <div className="panel panel-inner rounded p-3">
+      <InputVcAudioPlayer filename={audioLink as string} />
     </div>
   );
 }

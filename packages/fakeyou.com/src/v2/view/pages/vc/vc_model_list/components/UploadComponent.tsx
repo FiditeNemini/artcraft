@@ -9,7 +9,10 @@ import { UploadAudio, UploadAudioIsOk, UploadAudioRequest } from "@storyteller/c
 const FILE_TYPES = ["MP3", "WAV", "FLAC"];
 
 interface Props {
-  setMediaUploadToken: (token: string) => void,
+  setMediaUploadToken: (token?: string) => void,
+
+  formIsCleared: boolean,
+  setFormIsCleared: (cleared: boolean) => void,
 }
 
 function UploadComponent(props: Props) {
@@ -25,6 +28,7 @@ function UploadComponent(props: Props) {
     setIdempotencyToken(uuidv4());
     const audioUrl = URL.createObjectURL(file);
     setAudioLink(audioUrl ?? "");
+    props.setFormIsCleared(false);
   };
 
   const handleDragOver = (e: React.DragEvent<HTMLDivElement>): void => {
@@ -37,6 +41,11 @@ function UploadComponent(props: Props) {
     e.preventDefault();
     e.stopPropagation();
     e.currentTarget.classList.remove("upload-zone-drag");
+  };
+
+  const handleClear = () => {
+    props.setMediaUploadToken(undefined); // clear
+    props.setFormIsCleared(true);
   };
 
   const handleUploadFile = async () => {

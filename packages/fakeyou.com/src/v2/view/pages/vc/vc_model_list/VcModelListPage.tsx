@@ -219,6 +219,8 @@ function VcModelListPage(props: Props) {
                           <div className="d-flex flex-column gap-3 upload-component">
                             <UploadComponent 
                               setMediaUploadToken={setMediaUploadToken}
+                              formIsCleared={formIsCleared}
+                              setFormIsCleared={setFormIsCleared}
                             />
                           </div>
                         </div>
@@ -249,28 +251,28 @@ function VcModelListPage(props: Props) {
                           </div>
                               </div>*/}
 
-                        <div className="">
-
+                        <div>
                           <label className="sub-title">
-                            Upload Input Audio
+                            Convert Audio
                           </label>
-                          </div>
-                        <div className="d-flex gap-3">
-                          <button
-                            className={speakButtonClass}
-                            onClick={handleVoiceConversion}
-                            type="submit"
-                            disabled={!enableConvertButton}
-                          >
-                            <FontAwesomeIcon
-                              icon={faRightLeft}
-                              className="me-2"
-                            />
-                            Convert
-                            {loading && <LoadingIcon />}
-                          </button>
 
+                          <div className="d-flex gap-3">
+                            <button
+                              className={speakButtonClass}
+                              onClick={handleVoiceConversion}
+                              type="submit"
+                              disabled={!enableConvertButton}
+                            >
+                              <FontAwesomeIcon
+                                icon={faRightLeft}
+                                className="me-2"
+                              />
+                              Convert
+                              {loading && <LoadingIcon />}
+                            </button>
+                          </div>
                         </div>
+
                       </div>
                     </div>
                     <div
@@ -291,29 +293,29 @@ function VcModelListPage(props: Props) {
                           </div>
                         </div>
 
-                        <div className="d-flex gap-3">
-                          <button
-                            className={speakButtonClass}
-                            onClick={handleVoiceConversion}
-                            type="submit"
-                            disabled={!enableConvertButton}
-                          >
-                            <FontAwesomeIcon
-                              icon={faRightLeft}
-                              className="me-2"
-                            />
-                            Convert
-                            {loading && <LoadingIcon />}
-                          </button>
-                          <button
-                            className="btn btn-destructive w-100"
-                            onClick={handleClearClick}
-                            disabled={true}
-                          >
-                            <FontAwesomeIcon icon={faTrash} className="me-2" />
-                            Clear
-                          </button>
+
+                        <div>
+                          <label className="sub-title">
+                            Convert Audio
+                          </label>
+
+                          <div className="d-flex gap-3">
+                            <button
+                              className={speakButtonClass}
+                              onClick={handleVoiceConversion}
+                              type="submit"
+                              disabled={!enableConvertButton}
+                            >
+                              <FontAwesomeIcon
+                                icon={faRightLeft}
+                                className="me-2"
+                              />
+                              Convert
+                              {loading && <LoadingIcon />}
+                            </button>
+                          </div>
                         </div>
+
                       </div>
                     </div>
                   </div>
