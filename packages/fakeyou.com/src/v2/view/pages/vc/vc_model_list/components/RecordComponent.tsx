@@ -3,8 +3,9 @@ import { v4 as uuidv4 } from "uuid";
 import { useAudioRecorder } from "react-audio-voice-recorder";
 import { InputVcAudioPlayer } from "../../../../_common/InputVcAudioPlayer";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faMicrophone } from "@fortawesome/pro-solid-svg-icons";
+import { faMicrophone, faUpload } from "@fortawesome/pro-solid-svg-icons";
 import { UploadAudio, UploadAudioIsOk, UploadAudioRequest } from "@storyteller/components/src/api/upload/UploadAudio";
+import { faRightLeft, faTrash } from "@fortawesome/free-solid-svg-icons";
 
 interface RecorderProps {
   recordingBlob: any;
@@ -33,6 +34,9 @@ function RecordedAudioComponent(props: RecorderProps) {
 
 interface Props {
   setMediaUploadToken: (token: string) => void,
+
+  formIsCleared: boolean,
+  setFormIsCleared: (cleared: boolean) => void,
 }
 
 export default function RecordComponent(props: Props) {
@@ -45,29 +49,58 @@ export default function RecordComponent(props: Props) {
       return;
     }
 
-    (async () => {
-      let idempotencyToken = uuidv4();
+    //(async () => {
+    //  let idempotencyToken = uuidv4();
 
-      const request : UploadAudioRequest = {
-        uuid_idempotency_token: idempotencyToken,
-        file: recordingBlob,
-        source: 'device',
-      }
+    //  const request : UploadAudioRequest = {
+    //    uuid_idempotency_token: idempotencyToken,
+    //    file: recordingBlob,
+    //    source: 'device',
+    //  }
 
-      let result = await UploadAudio(request);
+    //  let result = await UploadAudio(request);
 
-      if (UploadAudioIsOk(result)) {
-        //setIsUploadDisabled(true);
-        //ggprops.setMediaUploadToken(result.upload_token);
-        props.setMediaUploadToken(result.upload_token);
-      }
-    })();
+    //  if (UploadAudioIsOk(result)) {
+    //    //setIsUploadDisabled(true);
+    //    //ggprops.setMediaUploadToken(result.upload_token);
+    //    props.setMediaUploadToken(result.upload_token);
+    //  }
+    //})();
   }, [recordingBlob])
 
+  const handleStartRecording = async () => {
+    startRecording();
+    props.setFormIsCleared(false);
+  };
 
   const handleStopRecording = async (blob: any) => {
     stopRecording();
   };
+
+  const handleClear = () => {
+    stopRecording();
+    props.setFormIsCleared(true);
+  };
+
+  const handleUpload = async () => {
+    const request : UploadAudioRequest = {
+      uuid_idempotency_token: uuidv4(), // TODO: only send on change.
+      file: recordingBlob,
+      source: 'device',
+    }
+
+    let result = await UploadAudio(request);
+
+    if (UploadAudioIsOk(result)) {
+      //setIsUploadDisabled(true);
+      //ggprops.setMediaUploadToken(result.upload_token);
+      props.setMediaUploadToken(result.upload_token);
+    }
+  }
+
+  const speakButtonClass = false
+    ? "btn btn-primary w-100 disabled"
+    : "btn btn-primary w-100";
 
   return (
     <div className="d-flex flex-column gap-3" id="record-audio">
@@ -84,13 +117,46 @@ export default function RecordComponent(props: Props) {
           </div>
         </button>
       ) : (
-        <button className="btn btn-secondary" onClick={startRecording}>
+        <button className="btn btn-secondary" onClick={handleStartRecording}>
           <FontAwesomeIcon icon={faMicrophone} className="me-2" />
           Start Recording
         </button>
       )}
 
-      <RecordedAudioComponent recordingBlob={recordingBlob} />
+      {props.formIsCleared ? (
+          <></>
+        ) : (
+
+          <>
+            <RecordedAudioComponent recordingBlob={recordingBlob} />
+
+            <div className="d-flex gap-3">
+              <button
+                className={speakButtonClass}
+                onClick={handleUpload}
+                type="submit"
+                disabled={false}
+              >
+                <FontAwesomeIcon
+                  icon={faUpload}
+                  className="me-2"
+                />
+                Upload
+              </button>
+              <button
+                className="btn btn-destructive w-100"
+                onClick={handleClear}
+                disabled={false}
+              >
+                <FontAwesomeIcon icon={faTrash} className="me-2" />
+                Clear
+              </button>
+            </div>
+          </>
+        )
+
+      }
+
     </div>
   );
 }

@@ -44,11 +44,15 @@ interface Props {
 
 function VcModelListPage(props: Props) {
   const [loading, setLoading] = useState(false);
+  const [canConvert, setCanConvert] = useState(false);
 
   const [mediaUploadToken, setMediaUploadToken] = useState<string|undefined>(undefined);
 
   // Auto generated
   const [idempotencyToken, setIdempotencyToken] = useState(uuidv4());
+
+  // UI hack
+  const [formIsCleared, setFormIsCleared] = useState(false);
 
   usePrefixedDocumentTitle("Voice Conversion");
 
@@ -136,7 +140,6 @@ function VcModelListPage(props: Props) {
     }
   };
 
-
   const handleFormSubmit = async (ev: React.FormEvent<HTMLFormElement>) => {
     ev.preventDefault();
   };
@@ -145,8 +148,9 @@ function VcModelListPage(props: Props) {
     ? "btn btn-primary w-100 disabled"
     : "btn btn-primary w-100";
 
-  const canBeginConversion = mediaUploadToken !== undefined && props.maybeSelectedVoiceConversionModel !== undefined;
-  console.log('canBeginConversion', canBeginConversion, mediaUploadToken, props.maybeSelectedVoiceConversionModel);
+  const enableConvertButton = canConvert 
+    && mediaUploadToken !== undefined 
+    && props.maybeSelectedVoiceConversionModel !== undefined;
 
   return (
     <motion.div initial="hidden" animate="visible" variants={container}>
@@ -257,12 +261,18 @@ function VcModelListPage(props: Props) {
                           </div>
                               </div>*/}
 
+                        <div className="">
+
+                          <label className="sub-title">
+                            Upload Input Audio
+                          </label>
+                          </div>
                         <div className="d-flex gap-3">
                           <button
                             className={speakButtonClass}
                             onClick={handleVoiceConversion}
                             type="submit"
-                            disabled={!canBeginConversion}
+                            disabled={!enableConvertButton}
                           >
                             <FontAwesomeIcon
                               icon={faRightLeft}
@@ -271,14 +281,7 @@ function VcModelListPage(props: Props) {
                             Convert
                             {loading && <LoadingIcon />}
                           </button>
-                          <button
-                            className="btn btn-destructive w-100"
-                            onClick={handleClearClick}
-                            disabled={true}
-                          >
-                            <FontAwesomeIcon icon={faTrash} className="me-2" />
-                            Clear
-                          </button>
+
                         </div>
                       </div>
                     </div>
@@ -294,6 +297,8 @@ function VcModelListPage(props: Props) {
                           <div className="d-flex flex-column gap-3 upload-component">
                             <RecordComponent 
                               setMediaUploadToken={setMediaUploadToken}
+                              formIsCleared={formIsCleared}
+                              setFormIsCleared={setFormIsCleared}
                             />
                           </div>
                         </div>
@@ -303,7 +308,7 @@ function VcModelListPage(props: Props) {
                             className={speakButtonClass}
                             onClick={handleVoiceConversion}
                             type="submit"
-                            disabled={!canBeginConversion}
+                            disabled={!enableConvertButton}
                           >
                             <FontAwesomeIcon
                               icon={faRightLeft}
