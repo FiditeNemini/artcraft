@@ -177,7 +177,9 @@ RUN du -hsc * | sort -hr
 # =============================================================
 
 # Final image
-FROM ubuntu:jammy as final
+#FROM ubuntu:jammy as final
+# TODO(bt,2023-04-26): This is only necessary for download-job and inference-job
+FROM nvidia/cuda:12.0.1-runtime-ubuntu22.04 as final
 
 # See: https://github.com/opencontainers/image-spec/blob/master/annotations.md
 LABEL org.opencontainers.image.title='Storyteller Rust'
@@ -235,7 +237,11 @@ COPY crates/service/web/storyteller_web/config/storyteller-web.common.env .
 COPY crates/service/web/storyteller_web/config/storyteller-web.production.env .
 
 # Need python to make use of other containers' venv
+# TODO(bt,2023-04-26): This is only necessary for download-job and inference-job
 RUN apt-get update && DEBIAN_FRONTEND=noninteractive TZ=Etc/UTC apt-get install -y \
+    ffmpeg \
+    libsndfile1 \
+    nvidia-driver-515 \
     python3-pip \
     python3.10 \
     python3.10-venv \
