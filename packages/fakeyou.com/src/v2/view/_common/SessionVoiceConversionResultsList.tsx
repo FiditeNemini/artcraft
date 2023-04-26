@@ -7,7 +7,6 @@ import { JobState } from "@storyteller/components/src/jobs/JobStates";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faClock,
-  faLink,
   faHeadphonesSimple,
   faDownload,
 } from "@fortawesome/free-solid-svg-icons";

@@ -39,7 +39,6 @@ import "tippy.js/animations/shift-away.css";
 import { ThirdPartyLinks } from "@storyteller/components/src/constants/ThirdPartyLinks";
 import { Analytics } from "../../../common/Analytics";
 import { faMicrophoneLines, faWaveformLines } from "@fortawesome/pro-solid-svg-icons";
-import { faTvRetro } from "@fortawesome/pro-regular-svg-icons";
 
 // TODO: This is duplicated in SessionTtsInferenceResultsList !
 // Default to querying every 15 seconds, but make it configurable serverside

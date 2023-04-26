@@ -1,21 +1,15 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
-import { t } from "i18next";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { motion } from "framer-motion";
 import { v4 as uuidv4 } from "uuid";
 import { container, panel } from "../../../../../data/animation";
 import { SessionSubscriptionsWrapper } from "@storyteller/components/src/session/SessionSubscriptionsWrapper";
 import { VcPageHero } from "./components/VcPageHero";
-import Select, { createFilter } from "react-select";
-import { SearchFieldClass } from "../../tts/tts_model_list/search/components/SearchFieldClass";
 import {
   faBarsStaggered,
-  faFiles,
-  faHeadphones,
   faMicrophone,
   faRightLeft,
-  faTrash,
 } from "@fortawesome/pro-solid-svg-icons";
 import UploadComponent from "./components/UploadComponent";
 import RecordComponent from "./components/RecordComponent";
@@ -45,7 +39,6 @@ interface Props {
 function VcModelListPage(props: Props) {
   usePrefixedDocumentTitle("Voice Conversion");
 
-  const [loading, setLoading] = useState(false);
   const [canConvert, setCanConvert] = useState(false);
 
   const [mediaUploadToken, setMediaUploadToken] = useState<string|undefined>(undefined);
@@ -95,11 +88,6 @@ function VcModelListPage(props: Props) {
     listModels();
   }, [listModels]);
 
-  const handleClearClick = (ev: React.FormEvent<HTMLButtonElement>) => {
-    ev.preventDefault();
-    return false;
-  };
-
   const changeConvertIdempotencyToken = () => {
     setConvertIdempotencyToken(uuidv4());
   }
@@ -134,6 +122,8 @@ function VcModelListPage(props: Props) {
   const handleFormSubmit = async (ev: React.FormEvent<HTMLFormElement>) => {
     ev.preventDefault();
   };
+
+  const loading = false; // TODO: Remove.
 
   const speakButtonClass = loading
     ? "btn btn-primary w-100 disabled"

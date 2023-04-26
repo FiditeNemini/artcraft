@@ -9,11 +9,6 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faUsers,
   faStar,
-  faShapes,
-  faMicrophoneAlt,
-  faPaintBrush,
-  faPersonRunning,
-  faMusic,
   faArrowRight,
   faUser,
 } from "@fortawesome/free-solid-svg-icons";

@@ -1,11 +1,11 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { useAudioRecorder } from "react-audio-voice-recorder";
 import { InputVcAudioPlayer } from "../../../../_common/InputVcAudioPlayer";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faMicrophone, faUpload } from "@fortawesome/pro-solid-svg-icons";
 import { UploadAudio, UploadAudioIsOk, UploadAudioRequest } from "@storyteller/components/src/api/upload/UploadAudio";
-import { faRightLeft, faTrash } from "@fortawesome/free-solid-svg-icons";
+import { faTrash } from "@fortawesome/free-solid-svg-icons";
 
 interface Props {
   setMediaUploadToken: (token?: string) => void,
