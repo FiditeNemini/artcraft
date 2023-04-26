@@ -3,6 +3,7 @@ use filesys::path_to_string::path_to_string;
 use log::info;
 use std::fs::OpenOptions;
 use std::path::{Path, PathBuf};
+use anyhow::anyhow;
 use subprocess::{Popen, PopenConfig, Redirection};
 use subprocess_common::docker_options::{DockerFilesystemMount, DockerGpu, DockerOptions};
 
@@ -12,8 +13,10 @@ pub struct SoVitsSvcInferenceCommand {
   /// Where the so-vits-svc code lives
   so_vits_svc_root_code_directory: PathBuf,
 
-  /// The name of the check/process script, eg. `export_ts.py`
-  inference_script_name: PathBuf,
+  // /// The name of the check/process script, eg. `export_ts.py`
+  // inference_script_name: PathBuf,
+
+  executable_or_command: ExecutableOrCommand,
 
   /// eg. `source python/bin/activate`
   maybe_virtual_env_activation_command: Option<String>,
@@ -23,6 +26,15 @@ pub struct SoVitsSvcInferenceCommand {
 
   /// If this is run under Docker (eg. in development), these are the options.
   maybe_docker_options: Option<DockerOptions>,
+}
+
+#[derive(Clone)]
+pub enum ExecutableOrCommand {
+  /// Eg. `infer.py`
+  Executable(PathBuf),
+
+  /// Eg. `python3 -m so_vits_svc_fork.fakeyou_infer`
+  Command(String),
 }
 
 pub enum Device {
@@ -50,16 +62,14 @@ pub struct InferenceArgs<P: AsRef<Path>> {
 impl SoVitsSvcInferenceCommand {
   pub fn new<P: AsRef<Path>>(
     so_vits_svc_root_code_directory: P,
-    inference_script_name: P,
-    //maybe_override_python_interpreter: Option<&str>,
+    executable_or_command: ExecutableOrCommand,
     maybe_virtual_env_activation_command: Option<&str>,
     maybe_docker_options: Option<DockerOptions>,
   ) -> Self {
     Self {
       so_vits_svc_root_code_directory: so_vits_svc_root_code_directory.as_ref().to_path_buf(),
-      inference_script_name: inference_script_name.as_ref().to_path_buf(),
+      executable_or_command,
       maybe_virtual_env_activation_command: maybe_virtual_env_activation_command.map(|s| s.to_string()),
-      //maybe_override_python_interpreter: maybe_override_python_interpreter.map(|s| s.to_string()),
       maybe_docker_options,
     }
   }
@@ -69,9 +79,21 @@ impl SoVitsSvcInferenceCommand {
       "SO_VITS_SVC_INFERENCE_ROOT_DIRECTORY")?;
 
     // NB: The command is installed (typically as `svc`) rather than called as a python script.
-    let inference_script_name = easyenv::get_env_pathbuf_or_default(
-      "SO_VITS_SVC_INFERENCE_COMMAND",
-      "svc");
+    // Lately we've had to call it as `python3 -m so_vits_svc_fork.fakeyou_infer`
+    let maybe_inference_command = easyenv::get_env_string_optional(
+      "SO_VITS_SVC_INFERENCE_COMMAND");
+
+    // Optional, eg. `./infer.py`. Typically we'll use the command form instead.
+    let maybe_inference_executable = easyenv::get_env_pathbuf_optional(
+      "SO_VITS_SVC_INFERENCE_EXECUTABLE");
+
+    let executable_or_command = match maybe_inference_command {
+      Some(command) => ExecutableOrCommand::Command(command),
+      None => match maybe_inference_executable {
+        Some(executable) => ExecutableOrCommand::Executable(executable),
+        None => return Err(anyhow!("neither command nor executable passed")),
+      },
+    };
 
     let maybe_virtual_env_activation_command = easyenv::get_env_string_optional(
       "SO_VITS_SVC_INFERENCE_MAYBE_VENV_COMMAND");
@@ -92,9 +114,8 @@ impl SoVitsSvcInferenceCommand {
 
     Ok(Self {
       so_vits_svc_root_code_directory,
-      inference_script_name,
+      executable_or_command,
       maybe_virtual_env_activation_command,
-      //maybe_override_python_interpreter,
       maybe_docker_options,
     })
   }
@@ -116,9 +137,17 @@ impl SoVitsSvcInferenceCommand {
     // NB: We can't use `onnx` for model integrity checking (that might take long anyway), so
     // we'll just run inference instead. That's flexible and works.
     command.push_str(" && ");
-    //command.push_str(&path_to_string(&self.inference_script_name));
-    //command.push_str(" infer ");
-    command.push_str(" python3 -m so_vits_svc_fork.fakeyou_infer ");
+
+    match self.executable_or_command {
+      ExecutableOrCommand::Executable(ref executable) => {
+        command.push_str(&path_to_string(executable));
+        command.push_str(" infer ");
+      }
+      ExecutableOrCommand::Command(ref cmd) => {
+        command.push_str(cmd);
+        command.push_str(" ");
+      }
+    }
 
     // ===== Begin Python Args =====
 
