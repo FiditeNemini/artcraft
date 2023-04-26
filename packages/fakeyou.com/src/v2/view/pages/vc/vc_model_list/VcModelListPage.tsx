@@ -1,29 +1,25 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
-import { t } from "i18next";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { motion } from "framer-motion";
 import { v4 as uuidv4 } from "uuid";
 import { container, panel } from "../../../../../data/animation";
 import { SessionSubscriptionsWrapper } from "@storyteller/components/src/session/SessionSubscriptionsWrapper";
 import { VcPageHero } from "./components/VcPageHero";
-import Select, { createFilter } from "react-select";
-import { SearchFieldClass } from "../../tts/tts_model_list/search/components/SearchFieldClass";
 import {
   faBarsStaggered,
-  faFiles,
-  faHeadphones,
   faMicrophone,
   faRightLeft,
-  faTrash,
 } from "@fortawesome/pro-solid-svg-icons";
 import UploadComponent from "./components/UploadComponent";
 import RecordComponent from "./components/RecordComponent";
 import { usePrefixedDocumentTitle } from "../../../../../common/UsePrefixedDocumentTitle";
 import { ListVoiceConversionModels, VoiceConversionModelListItem } from "@storyteller/components/src/api/voice_conversion/ListVoiceConversionModels";
 import { VcModelListSearch } from "./components/VcModelListSearchComponent";
-import { EnqueueVoiceConversion, EnqueueVoiceConversionRequest } from "@storyteller/components/src/api/voice_conversion/EnqueueVoiceConversion";
-import { EnqueueRemoteDownloadIsOk } from "@storyteller/components/src/api/remote_downloads/EnqueueRemoteDownload";
+import { EnqueueVoiceConversion, EnqueueVoiceConversionIsSuccess, EnqueueVoiceConversionRequest } from "@storyteller/components/src/api/voice_conversion/EnqueueVoiceConversion";
+import { Analytics } from "../../../../../common/Analytics";
+import { FrontendInferenceJobType, InferenceJob } from "@storyteller/components/src/jobs/InferenceJob";
+import { SessionVoiceConversionResultsList } from "../../../_common/SessionVoiceConversionResultsList";
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -34,17 +30,25 @@ interface Props {
 
   maybeSelectedVoiceConversionModel?: VoiceConversionModelListItem;
   setMaybeSelectedVoiceConversionModel: (maybeSelectedVoiceConversionModel: VoiceConversionModelListItem) => void;
+
+  enqueueInferenceJob: (jobToken: string, frontendInferenceJobType: FrontendInferenceJobType) => void;
+  inferenceJobs: Array<InferenceJob>;
+  inferenceJobsByCategory: Map<FrontendInferenceJobType, Array<InferenceJob>>;
 }
 
 function VcModelListPage(props: Props) {
-  const [loading, setLoading] = useState(false);
+  usePrefixedDocumentTitle("Voice Conversion");
+
+  const [canConvert, setCanConvert] = useState(false);
 
   const [mediaUploadToken, setMediaUploadToken] = useState<string|undefined>(undefined);
 
-  // Auto generated
-  const [idempotencyToken, setIdempotencyToken] = useState(uuidv4());
+  const [convertIdempotencyToken, setConvertIdempotencyToken] = useState(uuidv4());
 
-  usePrefixedDocumentTitle("Voice Conversion");
+  // NB: Something of a UI hack here.
+  // The 3rd party microphone component doesn't let you clear it, so we emulate form clearing
+  // with this variable.
+  const [formIsCleared, setFormIsCleared] = useState(false);
 
   let {
     setVoiceConversionModels,
@@ -53,10 +57,10 @@ function VcModelListPage(props: Props) {
     setMaybeSelectedVoiceConversionModel,
   } = props;
 
-  const ttsModelsLoaded = voiceConversionModels.length > 0;
+  const vcModelsLoaded = voiceConversionModels.length > 0;
 
   const listModels = useCallback(async () => {
-    if (ttsModelsLoaded) {
+    if (vcModelsLoaded) {
       return; // Already queried.
     }
     const models = await ListVoiceConversionModels();
@@ -77,36 +81,20 @@ function VcModelListPage(props: Props) {
     setVoiceConversionModels,
     maybeSelectedVoiceConversionModel,
     setMaybeSelectedVoiceConversionModel,
-    ttsModelsLoaded,
+    vcModelsLoaded,
   ]);
-
-  const handleLoading = useCallback(() => {
-    setLoading(true);
-    setTimeout(() => {
-      setLoading(false);
-    }, 2000);
-  }, []);
 
   useEffect(() => {
     listModels();
-    const timeout = setTimeout(() => {
-      setLoading(false);
-    }, 2000);
-    return () => clearTimeout(timeout);
-  }, [
-    handleLoading,
-    listModels,
-  ]);
+  }, [listModels]);
 
-  const handleClearClick = (ev: React.FormEvent<HTMLButtonElement>) => {
-    ev.preventDefault();
-
-    return false;
-  };
+  const changeConvertIdempotencyToken = () => {
+    setConvertIdempotencyToken(uuidv4());
+  }
 
   const interceptModelChange = (maybeSelectedVoiceConversionModel: VoiceConversionModelListItem) => {
     if (maybeSelectedVoiceConversionModel !== props.maybeSelectedVoiceConversionModel) {
-      setIdempotencyToken(uuidv4());
+      changeConvertIdempotencyToken();
     }
     props.setMaybeSelectedVoiceConversionModel(maybeSelectedVoiceConversionModel);
   }
@@ -117,52 +105,33 @@ function VcModelListPage(props: Props) {
     }
 
     let request : EnqueueVoiceConversionRequest = {
-      uuid_idempotency_token: idempotencyToken,
+      uuid_idempotency_token: convertIdempotencyToken,
       voice_conversion_model_token: props.maybeSelectedVoiceConversionModel.token,
       source_media_upload_token: mediaUploadToken,
     };
 
+    Analytics.voiceConversionGenerate(props.maybeSelectedVoiceConversionModel.token);
+
     let result = await EnqueueVoiceConversion(request);
 
-    if (EnqueueRemoteDownloadIsOk(result)) {
-      console.log("successful enqueue");
+    if (EnqueueVoiceConversionIsSuccess(result)) {
+      props.enqueueInferenceJob(result.inference_job_token, FrontendInferenceJobType.VoiceConversion);
     }
   };
-
 
   const handleFormSubmit = async (ev: React.FormEvent<HTMLFormElement>) => {
     ev.preventDefault();
   };
 
+  const loading = false; // TODO: Remove.
+
   const speakButtonClass = loading
     ? "btn btn-primary w-100 disabled"
     : "btn btn-primary w-100";
 
-  const canBeginConversion = mediaUploadToken !== undefined && props.maybeSelectedVoiceConversionModel !== undefined;
-  console.log('canBeginConversion', canBeginConversion, mediaUploadToken, props.maybeSelectedVoiceConversionModel);
-
-  let noResultsSection = (
-    <div className="panel panel-inner text-center p-5 rounded-5 h-100">
-      <div className="d-flex flex-column opacity-75 h-100 justify-content-center">
-        <FontAwesomeIcon icon={faHeadphones} className="fs-3 mb-3" />
-        <h5 className="fw-semibold">
-          {t("common.SessionTtsInferenceResults.noResults.title")}
-        </h5>
-        <p>{t("common.SessionTtsInferenceResults.noResults.subtitle")}</p>
-      </div>
-    </div>
-  );
-
-  // let comingSoon = (
-  //   <div className="overflow-hidden">
-  //     <div className="panel panel-inner text-center p-5 rounded-5 h-100">
-  //       <div className="d-flex flex-column opacity-75 h-100 justify-content-center">
-  //         <FontAwesomeIcon icon={faTimer} className="fs-3 mb-3" />
-  //         <p>This feature is coming soon!</p>
-  //       </div>
-  //     </div>
-  //   </div>
-  // );
+  const enableConvertButton = canConvert 
+    && mediaUploadToken !== undefined 
+    && props.maybeSelectedVoiceConversionModel !== undefined;
 
   return (
     <motion.div initial="hidden" animate="visible" variants={container}>
@@ -243,11 +212,15 @@ function VcModelListPage(props: Props) {
                           <div className="d-flex flex-column gap-3 upload-component">
                             <UploadComponent 
                               setMediaUploadToken={setMediaUploadToken}
+                              formIsCleared={formIsCleared}
+                              setFormIsCleared={setFormIsCleared}
+                              setCanConvert={setCanConvert}
+                              changeConvertIdempotencyToken={changeConvertIdempotencyToken}
                             />
                           </div>
                         </div>
 
-                        <div>
+                        {/*<div>
                           <label className="sub-title">
                             Or pick from your audio collection (5 files)
                           </label>
@@ -271,31 +244,30 @@ function VcModelListPage(props: Props) {
                               />
                             </div>
                           </div>
+                              </div>*/}
+
+                        <div>
+                          <label className="sub-title">
+                            Convert Audio
+                          </label>
+
+                          <div className="d-flex gap-3">
+                            <button
+                              className={speakButtonClass}
+                              onClick={handleVoiceConversion}
+                              type="submit"
+                              disabled={!enableConvertButton}
+                            >
+                              <FontAwesomeIcon
+                                icon={faRightLeft}
+                                className="me-2"
+                              />
+                              Convert
+                              {loading && <LoadingIcon />}
+                            </button>
+                          </div>
                         </div>
 
-                        <div className="d-flex gap-3">
-                          <button
-                            className={speakButtonClass}
-                            onClick={handleVoiceConversion}
-                            type="submit"
-                            disabled={!canBeginConversion}
-                          >
-                            <FontAwesomeIcon
-                              icon={faRightLeft}
-                              className="me-2"
-                            />
-                            Convert
-                            {loading && <LoadingIcon />}
-                          </button>
-                          <button
-                            className="btn btn-destructive w-100"
-                            onClick={handleClearClick}
-                            disabled={true}
-                          >
-                            <FontAwesomeIcon icon={faTrash} className="me-2" />
-                            Clear
-                          </button>
-                        </div>
                       </div>
                     </div>
                     <div
@@ -308,33 +280,38 @@ function VcModelListPage(props: Props) {
                         <div>
                           <label className="sub-title">Record Audio</label>
                           <div className="d-flex flex-column gap-3 upload-component">
-                            <RecordComponent />
+                            <RecordComponent 
+                              setMediaUploadToken={setMediaUploadToken}
+                              formIsCleared={formIsCleared}
+                              setFormIsCleared={setFormIsCleared}
+                              setCanConvert={setCanConvert}
+                              changeConvertIdempotencyToken={changeConvertIdempotencyToken}
+                            />
                           </div>
                         </div>
 
-                        <div className="d-flex gap-3">
-                          <button
-                            className={speakButtonClass}
-                            onClick={handleLoading}
-                            type="submit"
-                            disabled={!canBeginConversion}
-                          >
-                            <FontAwesomeIcon
-                              icon={faRightLeft}
-                              className="me-2"
-                            />
-                            Convert
-                            {loading && <LoadingIcon />}
-                          </button>
-                          <button
-                            className="btn btn-destructive w-100"
-                            onClick={handleClearClick}
-                            disabled={true}
-                          >
-                            <FontAwesomeIcon icon={faTrash} className="me-2" />
-                            Clear
-                          </button>
+                        <div>
+                          <label className="sub-title">
+                            Convert Audio
+                          </label>
+
+                          <div className="d-flex gap-3">
+                            <button
+                              className={speakButtonClass}
+                              onClick={handleVoiceConversion}
+                              type="submit"
+                              disabled={!enableConvertButton}
+                            >
+                              <FontAwesomeIcon
+                                icon={faRightLeft}
+                                className="me-2"
+                              />
+                              Convert
+                              {loading && <LoadingIcon />}
+                            </button>
+                          </div>
                         </div>
+
                       </div>
                     </div>
                   </div>
@@ -349,23 +326,10 @@ function VcModelListPage(props: Props) {
                       Session VC Results
                     </h4>
                     <div className="d-flex flex-column gap-3 session-tts-section">
-                      {noResultsSection}
-                      {/* <motion.div
-                        className="panel panel-tts-results p-4 gap-3 d-flex flex-column"
-                        variants={sessionItem}
-                      >
-                        <div>
-                          <h5 className="mb-2">Title</h5>
-                          <p>text</p>
-                        </div>
-                        (wavesurfer)
-                        <div className="mt-2">
-                          <Link to="/voice-conversion" className="fw-semibold">
-                            <FontAwesomeIcon icon={faLink} className="me-2" />
-                            Details
-                          </Link>
-                        </div>
-                      </motion.div> */}
+                      <SessionVoiceConversionResultsList 
+                        inferenceJobs={props.inferenceJobsByCategory.get(FrontendInferenceJobType.VoiceConversion)!}
+                        sessionSubscriptionsWrapper={props.sessionSubscriptionsWrapper}
+                      />
                     </div>
                   </div>
                 </div>

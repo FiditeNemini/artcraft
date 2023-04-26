@@ -1,4 +1,4 @@
-import { faFileArrowUp, faFileAudio } from "@fortawesome/pro-solid-svg-icons";
+import { faFileArrowUp, faFileAudio, faTrash } from "@fortawesome/pro-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React, { useState } from "react";
 import { FileUploader } from "react-drag-drop-files";
@@ -9,7 +9,13 @@ import { UploadAudio, UploadAudioIsOk, UploadAudioRequest } from "@storyteller/c
 const FILE_TYPES = ["MP3", "WAV", "FLAC"];
 
 interface Props {
-  setMediaUploadToken: (token: string) => void,
+  setMediaUploadToken: (token?: string) => void,
+
+  formIsCleared: boolean,
+  setFormIsCleared: (cleared: boolean) => void,
+
+  setCanConvert: (canConvert: boolean) => void,
+  changeConvertIdempotencyToken: () => void,
 }
 
 function UploadComponent(props: Props) {
@@ -21,10 +27,14 @@ function UploadComponent(props: Props) {
   const [idempotencyToken, setIdempotencyToken] = useState(uuidv4());
 
   const handleChange = (file: any) => {
+    console.log('handle change');
     setFile(file);
     setIdempotencyToken(uuidv4());
     const audioUrl = URL.createObjectURL(file);
     setAudioLink(audioUrl ?? "");
+    props.setFormIsCleared(false);
+    props.setCanConvert(false);
+    props.changeConvertIdempotencyToken();
   };
 
   const handleDragOver = (e: React.DragEvent<HTMLDivElement>): void => {
@@ -39,6 +49,16 @@ function UploadComponent(props: Props) {
     e.currentTarget.classList.remove("upload-zone-drag");
   };
 
+  const handleClear = () => {
+    setFile(null);
+    setAudioLink("");
+    setIdempotencyToken(uuidv4());
+    props.setMediaUploadToken(undefined); // clear
+    props.setFormIsCleared(true);
+    props.setCanConvert(false);
+    props.changeConvertIdempotencyToken();
+  };
+
   const handleUploadFile = async () => {
     if (file === undefined) {
       return false;
@@ -47,6 +67,7 @@ function UploadComponent(props: Props) {
     const request : UploadAudioRequest = {
       uuid_idempotency_token: idempotencyToken,
       file: file,
+      source: 'file',
     }
 
     let result = await UploadAudio(request);
@@ -54,7 +75,8 @@ function UploadComponent(props: Props) {
     if (UploadAudioIsOk(result)) {
       setIsUploadDisabled(true);
       props.setMediaUploadToken(result.upload_token);
-      console.log('TOKEN', result.upload_token)
+      props.setFormIsCleared(false);
+      props.setCanConvert(true);
     }
   };
 
@@ -158,6 +180,14 @@ function UploadComponent(props: Props) {
               className="me-2"
             />
             Upload Audio
+          </button>
+
+          <button
+            className="btn btn-destructive w-100"
+            onClick={handleClear}
+          >
+            <FontAwesomeIcon icon={faTrash} className="me-2" />
+            Clear
           </button>
         </div>
       ) : (

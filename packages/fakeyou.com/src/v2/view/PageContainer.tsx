@@ -68,7 +68,7 @@ import { NewsPage } from "./pages/news/NewsPage";
 import { LandingPage } from "./pages/landing/LandingPage";
 import { ChannelsPage } from "./pages/channels/Channels";
 import { TrumpTtsPage } from "./pages/character/trump/TrumpTtsPage";
-import { InferenceJob } from "@storyteller/components/src/jobs/InferenceJob";
+import { FrontendInferenceJobType, InferenceJob } from "@storyteller/components/src/jobs/InferenceJob";
 //import { LandingPage } from "./pages/landing/LandingPage";
 import { VcModelListPage } from "./pages/vc/vc_model_list/VcModelListPage";
 import { UploadVoiceConversionModel } from "./pages/upload/UploadVoiceConversionModel";
@@ -98,8 +98,9 @@ interface Props {
   isShowingBootstrapLanguageNotice: boolean;
   clearBootstrapLanguageNotice: () => void;
 
-  enqueueInferenceJob: (jobToken: string) => void;
+  enqueueInferenceJob: (jobToken: string, frontendInferenceJobType: FrontendInferenceJobType) => void;
   inferenceJobs: Array<InferenceJob>;
+  inferenceJobsByCategory: Map<FrontendInferenceJobType, Array<InferenceJob>>;
 
   enqueueTtsJob: (jobToken: string) => void;
   ttsInferenceJobs: Array<TtsInferenceJob>;
@@ -478,15 +479,6 @@ class PageContainer extends React.Component<Props, State> {
               <PatronPage sessionWrapper={this.props.sessionWrapper} />
             </Route>
 
-            <Route path="/landing_temp">
-              <LandingPage
-                sessionWrapper={this.props.sessionWrapper}
-                sessionSubscriptionsWrapper={
-                  this.props.sessionSubscriptionsWrapper
-                }
-              />
-            </Route>
-
             <Route path="/voice-conversion">
               <VcModelListPage
                 sessionWrapper={this.props.sessionWrapper}
@@ -497,6 +489,9 @@ class PageContainer extends React.Component<Props, State> {
                 setVoiceConversionModels={this.props.setVoiceConversionModels}
                 maybeSelectedVoiceConversionModel={this.props.maybeSelectedVoiceConversionModel}
                 setMaybeSelectedVoiceConversionModel={this.props.setMaybeSelectedVoiceConversionModel}
+                enqueueInferenceJob={this.props.enqueueInferenceJob}
+                inferenceJobs={this.props.inferenceJobs}
+                inferenceJobsByCategory={this.props.inferenceJobsByCategory}
               />
             </Route>
 
@@ -563,7 +558,7 @@ class PageContainer extends React.Component<Props, State> {
               />
             </Route>
 
-            <Route path="/">
+            <Route path="/tts" exact={true}>
               <TtsModelListPage
                 sessionWrapper={this.props.sessionWrapper}
                 sessionSubscriptionsWrapper={
@@ -588,6 +583,7 @@ class PageContainer extends React.Component<Props, State> {
                 }
                 enqueueInferenceJob={this.props.enqueueInferenceJob}
                 inferenceJobs={this.props.inferenceJobs}
+                inferenceJobsByCategory={this.props.inferenceJobsByCategory}
                 enqueueTtsJob={this.props.enqueueTtsJob}
                 ttsInferenceJobs={this.props.ttsInferenceJobs}
                 ttsModelUploadJobs={this.props.ttsModelUploadJobs}
@@ -620,6 +616,15 @@ class PageContainer extends React.Component<Props, State> {
                 selectedTtsLanguageScope={this.props.selectedTtsLanguageScope}
                 setSelectedTtsLanguageScope={
                   this.props.setSelectedTtsLanguageScope
+                }
+              />
+            </Route>
+
+            <Route path="/" exact={true}>
+              <LandingPage
+                sessionWrapper={this.props.sessionWrapper}
+                sessionSubscriptionsWrapper={
+                  this.props.sessionSubscriptionsWrapper
                 }
               />
             </Route>

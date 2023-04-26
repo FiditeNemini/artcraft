@@ -44,7 +44,7 @@ import {
   AVAILABLE_LANGUAGE_MAP,
   ENGLISH_LANGUAGE,
 } from "./_i18n/AvailableLanguageMap";
-import { InferenceJob } from "@storyteller/components/src/jobs/InferenceJob";
+import { FrontendInferenceJobType, InferenceJob } from "@storyteller/components/src/jobs/InferenceJob";
 import { GetModelInferenceJobStatus, GetModelInferenceJobStatusIsOk } from "@storyteller/components/src/api/model_inference/GetModelInferenceJobStatus";
 import { VoiceConversionModelUploadJob } from "@storyteller/components/src/jobs/VoiceConversionModelUploadJob";
 import { VoiceConversionModelListItem } from "@storyteller/components/src/api/voice_conversion/ListVoiceConversionModels";
@@ -130,13 +130,16 @@ interface State {
   isShowingBootstrapLanguageNotice: boolean;
 
   // Jobs enqueued during this browser session.
-  inferenceJobs: Array<InferenceJob>;
   ttsInferenceJobs: Array<TtsInferenceJob>;
   w2lInferenceJobs: Array<W2lInferenceJob>;
   ttsModelUploadJobs: Array<TtsModelUploadJob>;
   w2lTemplateUploadJobs: Array<W2lTemplateUploadJob>;
   vocoderUploadJobs: Array<VocoderUploadJob>;
   voiceConversionModelUploadJobs: Array<VoiceConversionModelUploadJob>;
+
+  // Generic inference jobs.
+  inferenceJobs: Array<InferenceJob>;
+  inferenceJobsByCategory: Map<FrontendInferenceJobType, Array<InferenceJob>>;
 
   // Current text entered
   textBuffer: string;
@@ -150,6 +153,13 @@ function newVocodes() {
   const twitter = /twitter/i.test(navigator.userAgent || "");
   const alphaCookie = document.cookie.includes("enable-alpha");
   return discord || twitter || alphaCookie;
+}
+
+function initInferenceJobsByCategoryMap() : Map<FrontendInferenceJobType, InferenceJob[]> {
+    let inferenceJobsByCategory = new Map();
+    inferenceJobsByCategory.set(FrontendInferenceJobType.TextToSpeech, []);
+    inferenceJobsByCategory.set(FrontendInferenceJobType.VoiceConversion, []);
+    return inferenceJobsByCategory;
 }
 
 function isMacOs() {
@@ -176,6 +186,8 @@ class App extends React.Component<Props, State> {
 
     let showPleaseFollowNotice = false;
 
+    let inferenceJobsByCategory = initInferenceJobsByCategoryMap();
+
     this.state = {
       enableAlpha: enableAlpha,
       migrationMode: migrationMode,
@@ -194,13 +206,15 @@ class App extends React.Component<Props, State> {
       isShowingPleaseFollowNotice: showPleaseFollowNotice,
       isShowingBootstrapLanguageNotice: false,
 
-      inferenceJobs: [],
       ttsInferenceJobs: [],
       w2lInferenceJobs: [],
       ttsModelUploadJobs: [],
       w2lTemplateUploadJobs: [],
       vocoderUploadJobs: [],
       voiceConversionModelUploadJobs: [],
+
+      inferenceJobs: [],
+      inferenceJobsByCategory: inferenceJobsByCategory,
 
       textBuffer: "",
 
@@ -338,6 +352,8 @@ class App extends React.Component<Props, State> {
   checkInferenceJob = async (jobToken: string) => {
     const lookupResult = await GetModelInferenceJobStatus(jobToken);
 
+    let inferenceJobsByCategory = initInferenceJobsByCategoryMap();
+
     if (GetModelInferenceJobStatusIsOk(lookupResult)) {
       let updatedJobs: Array<InferenceJob> = [];
 
@@ -347,21 +363,28 @@ class App extends React.Component<Props, State> {
           !jobStateCanChange(existingJob.jobState)
         ) {
           updatedJobs.push(existingJob);
+          inferenceJobsByCategory.get(existingJob.frontendJobType)?.push(existingJob);
           return;
         }
 
-        let updatedJob = InferenceJob.fromResponse(lookupResult.state!);
+        let updatedJob = InferenceJob.fromResponse(
+          lookupResult.state!, 
+          existingJob.frontendJobType
+        );
+
         updatedJobs.push(updatedJob);
+        inferenceJobsByCategory.get(updatedJob.frontendJobType)?.push(existingJob);
       });
 
       this.setState({
         inferenceJobs: updatedJobs,
+        inferenceJobsByCategory: inferenceJobsByCategory,
       });
     }
   };
 
-  enqueueInferenceJob = (jobToken: string) => {
-    const newJob = new InferenceJob(jobToken);
+  enqueueInferenceJob = (jobToken: string, frontendJobType: FrontendInferenceJobType) => {
+    const newJob = new InferenceJob(jobToken, frontendJobType);
     let inferenceJobs = this.state.inferenceJobs.concat([newJob]);
 
     this.setState({
@@ -747,6 +770,7 @@ class App extends React.Component<Props, State> {
                     }
                     enqueueInferenceJob={this.enqueueInferenceJob}
                     inferenceJobs={this.state.inferenceJobs}
+                    inferenceJobsByCategory={this.state.inferenceJobsByCategory}
                     enqueueTtsJob={this.enqueueTtsJob}
                     ttsInferenceJobs={this.state.ttsInferenceJobs}
                     enqueueW2lJob={this.enqueueW2lJob}

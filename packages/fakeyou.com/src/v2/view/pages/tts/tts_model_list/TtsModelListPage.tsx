@@ -7,7 +7,7 @@ import { SessionTtsModelUploadResultList } from "../../../_common/SessionTtsMode
 import { SessionW2lInferenceResultList } from "../../../_common/SessionW2lInferenceResultsList";
 import { SessionW2lTemplateUploadResultList } from "../../../_common/SessionW2lTemplateUploadResultsList";
 import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
-import { InferenceJob } from "@storyteller/components/src/jobs/InferenceJob";
+import { FrontendInferenceJobType, InferenceJob } from "@storyteller/components/src/jobs/InferenceJob";
 import { TtsInferenceJob } from "@storyteller/components/src/jobs/TtsInferenceJobs";
 import { TtsModelUploadJob } from "@storyteller/components/src/jobs/TtsModelUploadJobs";
 import { W2lInferenceJob } from "@storyteller/components/src/jobs/W2lInferenceJobs";
@@ -92,8 +92,9 @@ interface Props {
   isShowingBootstrapLanguageNotice: boolean;
   clearBootstrapLanguageNotice: () => void;
 
-  enqueueInferenceJob: (jobToken: string) => void;
+  enqueueInferenceJob: (jobToken: string, frontendInferenceJobType: FrontendInferenceJobType) => void;
   inferenceJobs: Array<InferenceJob>;
+  inferenceJobsByCategory: Map<FrontendInferenceJobType, Array<InferenceJob>>;
 
   enqueueTtsJob: (jobToken: string) => void;
   ttsInferenceJobs: Array<TtsInferenceJob>;
@@ -299,7 +300,7 @@ function TtsModelListPage(props: Props) {
       setMaybeTtsError(undefined);
 
       if (response.inference_job_token_type === "generic") {
-        props.enqueueInferenceJob(response.inference_job_token);
+        props.enqueueInferenceJob(response.inference_job_token, FrontendInferenceJobType.TextToSpeech);
       } else {
         props.enqueueTtsJob(response.inference_job_token);
       }
@@ -609,7 +610,7 @@ function TtsModelListPage(props: Props) {
                     </h4>
                     <div className="d-flex flex-column gap-3 session-tts-section">
                       <SessionTtsInferenceResultList
-                        inferenceJobs={props.inferenceJobs}
+                        inferenceJobs={props.inferenceJobsByCategory.get(FrontendInferenceJobType.TextToSpeech)!}
                         ttsInferenceJobs={props.ttsInferenceJobs}
                         sessionSubscriptionsWrapper={
                           props.sessionSubscriptionsWrapper

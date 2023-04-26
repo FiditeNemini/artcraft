@@ -38,8 +38,7 @@ import "tippy.js/dist/tippy.css";
 import "tippy.js/animations/shift-away.css";
 import { ThirdPartyLinks } from "@storyteller/components/src/constants/ThirdPartyLinks";
 import { Analytics } from "../../../common/Analytics";
-import { faWaveformLines } from "@fortawesome/pro-solid-svg-icons";
-import { faTvRetro } from "@fortawesome/pro-regular-svg-icons";
+import { faMicrophoneLines, faWaveformLines } from "@fortawesome/pro-solid-svg-icons";
 
 // TODO: This is duplicated in SessionTtsInferenceResultsList !
 // Default to querying every 15 seconds, but make it configurable serverside
@@ -357,7 +356,7 @@ function TopNav(props: Props) {
                   </Link>
                 </li>
 
-                <li data-bs-toggle="offcanvas" className="nav-item">
+                {/*<li data-bs-toggle="offcanvas" className="nav-item">
                   <Link
                     to={WebUrl.newsPage()}
                     onClick={() => {
@@ -368,7 +367,7 @@ function TopNav(props: Props) {
                     <FontAwesomeIcon icon={faTvRetro} className="me-2" />
                     {t("nav.TopNav.main.newsLink")}
                   </Link>
-                </li>
+                  </li>*/}
 
                 <li className="nav-item dropdown">
                   {/* TODO(echelon): Fix the build warnings about href not being accessible. */}
@@ -388,7 +387,7 @@ function TopNav(props: Props) {
                     aria-labelledby="offcanvasNavbarLgDropdown-tts"
                   >
                     <li data-bs-toggle="offcanvas">
-                      <Link className="dropdown-item" to="/">
+                      <Link className="dropdown-item" to="/tts">
                         <FontAwesomeIcon
                           icon={faWaveformLines}
                           className="me-2"
@@ -396,7 +395,6 @@ function TopNav(props: Props) {
                         {t("nav.TopNav.main.ttsOption")}
                       </Link>
                     </li>
-                    {/* TODO(bt, 2023-01-11): Not ready to launch voice conversion
                     <li data-bs-toggle="offcanvas">
                       <Link className="dropdown-item" to="/voice-conversion">
                         <FontAwesomeIcon
@@ -407,7 +405,6 @@ function TopNav(props: Props) {
                         Voice Conversion
                       </Link>
                     </li>
-                    */}
                     <li data-bs-toggle="offcanvas">
                       <Link className="dropdown-item" to="/video">
                         <FontAwesomeIcon icon={faVideo} className="me-2" />
