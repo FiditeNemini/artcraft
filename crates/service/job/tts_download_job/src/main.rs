@@ -417,7 +417,7 @@ async fn process_job(downloader: &Downloader, job: &TtsUploadJobRecord) -> Anyho
 
   let synthesizer_model_bucket_path = match model_type {
     TtsModelType::Tacotron2 => downloader.bucket_path_unifier.tts_synthesizer_path(&private_bucket_hash),
-    TtsModelType::Talknet => downloader.bucket_path_unifier.tts_zipped_synthesizer_path(&private_bucket_hash),
+    TtsModelType::Vits => unreachable!("we don't download VITS models with tts-download-job; use download-job"),
   };
 
   info!("Destination bucket path: {:?}", &synthesizer_model_bucket_path);
