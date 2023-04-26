@@ -118,7 +118,7 @@ impl SoVitsSvcInferenceCommand {
     command.push_str(" && ");
     //command.push_str(&path_to_string(&self.inference_script_name));
     //command.push_str(" infer ");
-    command.push_str(" python3 fakeyou_infer.py ");
+    command.push_str(" python3 -m so_vits_svc_fork.fakeyou_infer ");
 
     // ===== Begin Python Args =====
 
