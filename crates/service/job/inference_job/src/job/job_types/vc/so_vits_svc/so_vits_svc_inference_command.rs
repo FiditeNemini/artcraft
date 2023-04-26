@@ -1,3 +1,4 @@
+use std::ffi::OsString;
 use container_common::anyhow_result::AnyhowResult;
 use filesys::path_to_string::path_to_string;
 use log::info;
@@ -13,19 +14,18 @@ pub struct SoVitsSvcInferenceCommand {
   /// Where the so-vits-svc code lives
   so_vits_svc_root_code_directory: PathBuf,
 
-  // /// The name of the check/process script, eg. `export_ts.py`
-  // inference_script_name: PathBuf,
-
+  /// A single executable script or a much larger bash command.
+  /// eg. `infer.py` vs `python3 -m so_vits_svc_fork.__main__`
   executable_or_command: ExecutableOrCommand,
 
   /// eg. `source python/bin/activate`
   maybe_virtual_env_activation_command: Option<String>,
 
-  ///// eg. `python3`
-  //maybe_override_python_interpreter: Option<String>,
-
   /// If this is run under Docker (eg. in development), these are the options.
   maybe_docker_options: Option<DockerOptions>,
+
+  maybe_huggingface_cache_dir: Option<PathBuf>,
+  maybe_nltk_cache_dir: Option<PathBuf>,
 }
 
 #[derive(Clone)]
@@ -65,12 +65,16 @@ impl SoVitsSvcInferenceCommand {
     executable_or_command: ExecutableOrCommand,
     maybe_virtual_env_activation_command: Option<&str>,
     maybe_docker_options: Option<DockerOptions>,
+    maybe_huggingface_cache_dir: Option<P>,
+    maybe_nltk_cache_dir: Option<P>,
   ) -> Self {
     Self {
       so_vits_svc_root_code_directory: so_vits_svc_root_code_directory.as_ref().to_path_buf(),
       executable_or_command,
       maybe_virtual_env_activation_command: maybe_virtual_env_activation_command.map(|s| s.to_string()),
       maybe_docker_options,
+      maybe_huggingface_cache_dir: maybe_huggingface_cache_dir.map(|s| s.as_ref().to_path_buf()),
+      maybe_nltk_cache_dir: maybe_nltk_cache_dir.map(|s| s.as_ref().to_path_buf()),
     }
   }
 
@@ -98,8 +102,11 @@ impl SoVitsSvcInferenceCommand {
     let maybe_virtual_env_activation_command = easyenv::get_env_string_optional(
       "SO_VITS_SVC_INFERENCE_MAYBE_VENV_COMMAND");
 
-    //let maybe_override_python_interpreter = easyenv::get_env_string_optional(
-    //  "SO_VITS_SVC_MODEL_CHECK_MAYBE_PYTHON_INTERPRETER");
+    let maybe_huggingface_cache_dir =
+        easyenv::get_env_pathbuf_optional("HF_DATASETS_CACHE");
+
+    let maybe_nltk_cache_dir =
+        easyenv::get_env_pathbuf_optional("NLTK_DATA");
 
     let maybe_docker_options = easyenv::get_env_string_optional(
       "SO_VITS_SVC_INFERENCE_MAYBE_DOCKER_IMAGE")
@@ -117,6 +124,8 @@ impl SoVitsSvcInferenceCommand {
       executable_or_command,
       maybe_virtual_env_activation_command,
       maybe_docker_options,
+      maybe_huggingface_cache_dir,
+      maybe_nltk_cache_dir,
     })
   }
 
@@ -186,9 +195,29 @@ impl SoVitsSvcInferenceCommand {
       &command
     ];
 
-    let mut p = Popen::create(&command_parts, PopenConfig {
-      ..Default::default()
-    })?;
+    let mut maybe_cache_dirs = Vec::new();
+
+    if let Some(cache_dir) = self.maybe_huggingface_cache_dir.as_deref() {
+      maybe_cache_dirs.push((
+        OsString::from("HF_DATASETS_CACHE"),
+        OsString::from(cache_dir),
+      ));
+    }
+
+    if let Some(cache_dir) = self.maybe_nltk_cache_dir.as_deref() {
+      maybe_cache_dirs.push((
+        OsString::from("NLTK_DATA"),
+        OsString::from(cache_dir),
+      ));
+    }
+
+    let mut config = PopenConfig::default();
+
+    if !maybe_cache_dirs.is_empty() {
+      config.env = Some(maybe_cache_dirs);
+    }
+
+    let mut p = Popen::create(&command_parts, config)?;
 
     info!("Subprocess PID: {:?}", p.pid());
 
