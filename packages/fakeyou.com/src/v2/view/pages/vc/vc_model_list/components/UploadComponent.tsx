@@ -15,6 +15,7 @@ interface Props {
   setFormIsCleared: (cleared: boolean) => void,
 
   setCanConvert: (canConvert: boolean) => void,
+  changeConvertIdempotencyToken: () => void,
 }
 
 function UploadComponent(props: Props) {
@@ -33,6 +34,7 @@ function UploadComponent(props: Props) {
     setAudioLink(audioUrl ?? "");
     props.setFormIsCleared(false);
     props.setCanConvert(false);
+    props.changeConvertIdempotencyToken();
   };
 
   const handleDragOver = (e: React.DragEvent<HTMLDivElement>): void => {
@@ -54,6 +56,7 @@ function UploadComponent(props: Props) {
     props.setMediaUploadToken(undefined); // clear
     props.setFormIsCleared(true);
     props.setCanConvert(false);
+    props.changeConvertIdempotencyToken();
   };
 
   const handleUploadFile = async () => {

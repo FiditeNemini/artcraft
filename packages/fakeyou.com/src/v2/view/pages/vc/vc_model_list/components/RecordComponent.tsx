@@ -14,6 +14,7 @@ interface Props {
   setFormIsCleared: (cleared: boolean) => void,
 
   setCanConvert: (canConvert: boolean) => void,
+  changeConvertIdempotencyToken: () => void,
 }
 
 export default function RecordComponent(props: Props) {
@@ -61,6 +62,7 @@ export default function RecordComponent(props: Props) {
     props.setMediaUploadToken(undefined); // clear
     props.setFormIsCleared(true);
     props.setCanConvert(false);
+    props.changeConvertIdempotencyToken();
   };
 
   const handleUpload = async () => {
@@ -76,6 +78,7 @@ export default function RecordComponent(props: Props) {
       props.setMediaUploadToken(result.upload_token);
       props.setFormIsCleared(false);
       props.setCanConvert(true);
+      props.changeConvertIdempotencyToken();
     }
   }
 

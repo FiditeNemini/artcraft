@@ -50,8 +50,7 @@ function VcModelListPage(props: Props) {
 
   const [mediaUploadToken, setMediaUploadToken] = useState<string|undefined>(undefined);
 
-  // Auto generated
-  const [idempotencyToken, setIdempotencyToken] = useState(uuidv4());
+  const [convertIdempotencyToken, setConvertIdempotencyToken] = useState(uuidv4());
 
   // NB: Something of a UI hack here.
   // The 3rd party microphone component doesn't let you clear it, so we emulate form clearing
@@ -101,9 +100,13 @@ function VcModelListPage(props: Props) {
     return false;
   };
 
+  const changeConvertIdempotencyToken = () => {
+    setConvertIdempotencyToken(uuidv4());
+  }
+
   const interceptModelChange = (maybeSelectedVoiceConversionModel: VoiceConversionModelListItem) => {
     if (maybeSelectedVoiceConversionModel !== props.maybeSelectedVoiceConversionModel) {
-      setIdempotencyToken(uuidv4());
+      changeConvertIdempotencyToken();
     }
     props.setMaybeSelectedVoiceConversionModel(maybeSelectedVoiceConversionModel);
   }
@@ -114,7 +117,7 @@ function VcModelListPage(props: Props) {
     }
 
     let request : EnqueueVoiceConversionRequest = {
-      uuid_idempotency_token: idempotencyToken,
+      uuid_idempotency_token: convertIdempotencyToken,
       voice_conversion_model_token: props.maybeSelectedVoiceConversionModel.token,
       source_media_upload_token: mediaUploadToken,
     };
@@ -222,6 +225,7 @@ function VcModelListPage(props: Props) {
                               formIsCleared={formIsCleared}
                               setFormIsCleared={setFormIsCleared}
                               setCanConvert={setCanConvert}
+                              changeConvertIdempotencyToken={changeConvertIdempotencyToken}
                             />
                           </div>
                         </div>
@@ -291,6 +295,7 @@ function VcModelListPage(props: Props) {
                               formIsCleared={formIsCleared}
                               setFormIsCleared={setFormIsCleared}
                               setCanConvert={setCanConvert}
+                              changeConvertIdempotencyToken={changeConvertIdempotencyToken}
                             />
                           </div>
                         </div>
