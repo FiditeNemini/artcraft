@@ -27,18 +27,34 @@ pub fn read_from_filename<P: AsRef<Path>>(filename: P) -> AnyhowResult<PathBuf> 
 
 /// Try loading in an environment file across many search paths (first found wins).
 /// Returns an error if no file could be read or if in attempting to read a file there was an error.
-pub fn read_from_filename_and_paths<P: AsRef<Path>>(filename: P, paths: &[P]) -> AnyhowResult<()> {
+pub fn read_from_filename_and_paths<P: AsRef<Path>, Q: AsRef<Path>>(filename: P, paths: &[Q]) -> AnyhowResult<()> {
+  if do_read_from_filename_and_paths(&filename, paths)? {
+    Ok(())
+  } else {
+    Err(anyhow!("No env file existed for filename {:?} in the search paths {:?}",
+      filename.as_ref(),
+      paths.iter().map(|p| p.as_ref().to_path_buf()).collect::<Vec<PathBuf>>()))
+  }
+}
+
+/// Try loading in an environment file across many search paths (first found wins).
+/// Returns okay if no file was read, or an error if in attempting to read a file there was an error.
+/// Returns boolean reflecting whether a file was read.
+pub fn maybe_read_from_filename_and_paths<P: AsRef<Path>, Q: AsRef<Path>>(filename: P, paths: &[Q]) -> AnyhowResult<bool> {
+  Ok(do_read_from_filename_and_paths(filename, paths)?)
+}
+
+pub fn do_read_from_filename_and_paths<P: AsRef<Path>, Q: AsRef<Path>>(filename: P, paths: &[Q]) -> AnyhowResult<bool> {
   for path in paths.iter() {
     let path = path.as_ref().join(filename.as_ref());
 
     if path.exists() && path.is_file() {
       log::info!("Attempting to read env vars from file: {:?}", path);
       let path = std::fs::canonicalize(path)?;
-      return Ok(dotenv::from_path(path)?);
+      dotenv::from_path(path)?;
+      return Ok(true);
     }
   }
 
-  Err(anyhow!("No env file existed for filename {:?} in the search paths {:?}",
-    filename.as_ref(),
-    paths.iter().map(|p| p.as_ref().to_path_buf()).collect::<Vec<PathBuf>>()))
+  Ok(false)
 }

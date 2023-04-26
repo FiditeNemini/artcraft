@@ -227,7 +227,7 @@ RUN touch .env-secrets
 # These should also be readable from the relative current path
 COPY crates/service/job/download_job/config/download-job.env .
 COPY crates/service/job/inference_job/config/inference-job.env .
-COPY crates/service/web/storyteller_web/config/storyteller-web.env .
+COPY crates/service/web/storyteller_web/config/storyteller-web.common.env .
 
 EXPOSE 8080
 CMD LD_LIBRARY_PATH=/usr/lib /storyteller-web

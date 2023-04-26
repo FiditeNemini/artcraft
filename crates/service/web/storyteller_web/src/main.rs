@@ -85,6 +85,7 @@ use sqlx::mysql::MySqlPoolOptions;
 use std::sync::Arc;
 use std::time::Duration;
 use tokio::runtime::Runtime;
+use bootstrap::bootstrap::{bootstrap, BootstrapArgs};
 use twitch_common::twitch_secrets::TwitchSecrets;
 use url_config::third_party_url_redirector::ThirdPartyUrlRedirector;
 use users_component::utils::session_checker::SessionChecker;
@@ -109,15 +110,22 @@ const ENV_AUDIO_UPLOADS_BUCKET_ROOT : &'static str = "AUDIO_UPLOADS_BUCKET_ROOT"
 
 #[actix_web::main]
 async fn main() -> AnyhowResult<()> {
-  easyenv::init_all_with_default_logging(Some(DEFAULT_RUST_LOG));
 
-  // NB: Do not check this secrets-containing dotenv file into VCS.
-  // This file should only contain *development* secrets, never production.
-  let _ = dotenv::from_filename(".env-secrets").ok();
+  let container_environment = bootstrap(BootstrapArgs {
+    app_name: "storyteller-web",
+    default_logging_override: Some(DEFAULT_RUST_LOG),
+    config_search_directories: &[".", "./config", "crates/service/web/storyteller_web/config"],
+  })?;
 
-  let _ = envvar::read_from_filename_and_paths(
-    "storyteller-web.env",
-    &[".", "./config", "crates/service/web/storyteller_web/config"])?;
+//  easyenv::init_all_with_default_logging(Some(DEFAULT_RUST_LOG));
+//
+//  // NB: Do not check this secrets-containing dotenv file into VCS.
+//  // This file should only contain *development* secrets, never production.
+//  let _ = dotenv::from_filename(".env-secrets").ok();
+//
+//  let _ = envvar::read_from_filename_and_paths(
+//    "storyteller-web.env",
+//    &[".", "./config", "crates/service/web/storyteller_web/config"])?;
 
   let common_env = CommonEnv::read_from_env()?;
 

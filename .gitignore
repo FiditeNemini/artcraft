@@ -13,6 +13,7 @@ secrets.yaml
 _develop/tools/.secrets
 _develop/tools/db_secrets.toml
 twitch_secrets.toml
+crates/service/web/storyteller_web/config/storyteller-web.development-secrets.env
 
 # New env secrets (per-app)
 *-secrets.env

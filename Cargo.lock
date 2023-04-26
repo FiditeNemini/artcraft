@@ -1248,6 +1248,19 @@ dependencies = [
 ]
 
 [[package]]
+name = "bootstrap"
+version = "0.0.1"
+dependencies = [
+ "dotenv",
+ "easyenv",
+ "envvar",
+ "errors",
+ "hostname",
+ "log",
+ "server_environment",
+]
+
+[[package]]
 name = "brotli-sys"
 version = "0.3.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -6075,6 +6088,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "server_environment"
+version = "0.0.1"
+dependencies = [
+ "dotenv",
+ "easyenv",
+ "envvar",
+ "errors",
+ "log",
+]
+
+[[package]]
 name = "servo-fontconfig"
 version = "0.5.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -6536,6 +6560,7 @@ dependencies = [
  "base64 0.13.0",
  "bcrypt",
  "billing_component",
+ "bootstrap",
  "buckets",
  "chrono",
  "cloud_storage",

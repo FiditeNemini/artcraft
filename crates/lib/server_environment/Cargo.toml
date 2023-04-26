@@ -1,0 +1,27 @@
+[package]
+name = "server_environment"
+edition = "2018"
+version = "0.0.1"
+authors = [
+    "Brandon Thomas <bt@brand.io>",
+    "Brandon Thomas <echelon@gmail.com>",
+]
+publish = false
+
+[lib]
+# NB: Didn't even bother checking for "server_environment" crate. We wouldn't use it.
+name = "server_environment"
+path = "src/lib.rs"
+
+[dependencies]
+# Internal
+envvar = { path = "../envvar" }
+errors = { path = "../errors" }
+
+# External
+dotenv = "0.15.0"
+easyenv = "0.0.9"
+log = "0.4.14"
+
+[dev-dependencies]
+# None yet
