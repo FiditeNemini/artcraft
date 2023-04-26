@@ -117,16 +117,6 @@ async fn main() -> AnyhowResult<()> {
     config_search_directories: &[".", "./config", "crates/service/web/storyteller_web/config"],
   })?;
 
-//  easyenv::init_all_with_default_logging(Some(DEFAULT_RUST_LOG));
-//
-//  // NB: Do not check this secrets-containing dotenv file into VCS.
-//  // This file should only contain *development* secrets, never production.
-//  let _ = dotenv::from_filename(".env-secrets").ok();
-//
-//  let _ = envvar::read_from_filename_and_paths(
-//    "storyteller-web.env",
-//    &[".", "./config", "crates/service/web/storyteller_web/config"])?;
-
   let common_env = CommonEnv::read_from_env()?;
 
   info!("Obtaining hostname...");

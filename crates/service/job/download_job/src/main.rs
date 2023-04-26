@@ -21,6 +21,7 @@ pub mod job_loop;
 pub mod job_state;
 pub mod job_types;
 
+use bootstrap::bootstrap::{bootstrap, BootstrapArgs};
 use cloud_storage::bucket_client::BucketClient;
 use cloud_storage::bucket_path_unifier::BucketPathUnifier;
 use config::common_env::CommonEnv;
@@ -33,6 +34,7 @@ use crate::job_types::tts::tacotron::tacotron_model_check_command::TacotronModel
 use crate::job_types::tts::vits::vits_model_check_command::VitsModelCheckCommand;
 use crate::job_types::vocoder::hifigan_softvc::hifigan_softvc_model_check_command::HifiGanSoftVcModelCheckCommand;
 use crate::job_types::vocoder::hifigan_tacotron::hifigan_model_check_command::HifiGanModelCheckCommand;
+use crate::job_types::voice_conversion::so_vits_svc::so_vits_svc_model_check_command::SoVitsSvcModelCheckCommand;
 use crate::job_types::voice_conversion::softvc::softvc_model_check_command::SoftVcModelCheckCommand;
 use errors::AnyhowResult;
 use google_drive_common::google_drive_download_command::GoogleDriveDownloadCommand;
@@ -46,7 +48,6 @@ use std::ops::Deref;
 use std::path::PathBuf;
 use std::time::Duration;
 use subprocess_common::docker_options::{DockerFilesystemMount, DockerGpu, DockerOptions};
-use crate::job_types::voice_conversion::so_vits_svc::so_vits_svc_model_check_command::SoVitsSvcModelCheckCommand;
 
 // Buckets
 const ENV_ACCESS_KEY : &'static str = "ACCESS_KEY";
@@ -59,23 +60,30 @@ const DEFAULT_TEMP_DIR: &'static str = "/tmp";
 
 #[tokio::main]
 async fn main() -> AnyhowResult<()> {
-  easyenv::init_all_with_default_logging(Some(DEFAULT_RUST_LOG));
 
-  // TODO: Deprecate pulling secrets from these two files and use the app-named env+secrets files (below) instead.
-  let _ = dotenv::from_filename(".env-download-job").ok(); // NB: Specific to `download-job` app.
-  let _ = dotenv::from_filename(".env-secrets").ok(); // NB: Secrets not to live in source control.
+  let container_environment = bootstrap(BootstrapArgs {
+    app_name: "download-job",
+    default_logging_override: Some(DEFAULT_RUST_LOG),
+    config_search_directories: &[".", "./config", "crates/service/job/download_job/config"],
+  })?;
 
-  let _ = envvar::read_from_filename_and_paths(
-    "download-job.env",
-    &[".", "./config", "crates/service/job/download_job/config"])?;
-
-  let _ = envvar::read_from_filename_and_paths(
-    "download-job-secrets.env",
-    &[".", "./config", "crates/service/job/download_job/config"]
-  ).map_err(|err| {
-    // NB: Fail open.
-    warn!("Could not load app-specific secrets from env file (this might be fine, eg. provided by k8s): {:?}", err);
-  });
+//  easyenv::init_all_with_default_logging(Some(DEFAULT_RUST_LOG));
+//
+//  // TODO: Deprecate pulling secrets from these two files and use the app-named env+secrets files (below) instead.
+//  let _ = dotenv::from_filename(".env-download-job").ok(); // NB: Specific to `download-job` app.
+//  let _ = dotenv::from_filename(".env-secrets").ok(); // NB: Secrets not to live in source control.
+//
+//  let _ = envvar::read_from_filename_and_paths(
+//    "download-job.env",
+//    &[".", "./config", "crates/service/job/download_job/config"])?;
+//
+//  let _ = envvar::read_from_filename_and_paths(
+//    "download-job-secrets.env",
+//    &[".", "./config", "crates/service/job/download_job/config"]
+//  ).map_err(|err| {
+//    // NB: Fail open.
+//    warn!("Could not load app-specific secrets from env file (this might be fine, eg. provided by k8s): {:?}", err);
+//  });
 
   info!("Obtaining hostname...");
 

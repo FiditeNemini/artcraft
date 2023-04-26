@@ -2317,6 +2317,7 @@ name = "download-job"
 version = "0.0.1"
 dependencies = [
  "anyhow",
+ "bootstrap",
  "chrono",
  "clap",
  "cloud_storage",
@@ -3647,6 +3648,7 @@ name = "inference-job"
 version = "0.0.1"
 dependencies = [
  "anyhow",
+ "bootstrap",
  "buckets",
  "chrono",
  "clap",
