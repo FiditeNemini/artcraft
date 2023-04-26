@@ -46,6 +46,7 @@ use r2d2_redis::r2d2;
 use sqlx::mysql::MySqlPoolOptions;
 use std::path::PathBuf;
 use std::time::Duration;
+use bootstrap::bootstrap::{bootstrap, BootstrapArgs};
 use subprocess_common::docker_options::{DockerEnvVar, DockerFilesystemMount, DockerGpu, DockerOptions};
 use crate::job::job_types::vc::so_vits_svc::so_vits_svc_inference_command::SoVitsSvcInferenceCommand;
 
@@ -68,24 +69,31 @@ const DEFAULT_TEMP_DIR: &'static str = "/tmp";
 
 #[tokio::main]
 async fn main() -> AnyhowResult<()> {
-  easyenv::init_all_with_default_logging(Some(DEFAULT_RUST_LOG));
 
-  // TODO: Deprecate
-  // NB: Do not check this secrets-containing dotenv file into VCS.
-  // This file should only contain *development* secrets, never production.
-  let _ = dotenv::from_filename(".env-secrets").ok();
+  let container_environment = bootstrap(BootstrapArgs {
+    app_name: "inference-job",
+    default_logging_override: Some(DEFAULT_RUST_LOG),
+    config_search_directories: &[".", "./config", "crates/service/job/inference_job/config"],
+  })?;
 
-  let _ = envvar::read_from_filename_and_paths(
-    "inference-job.env",
-    &[".", "./config", "crates/service/job/inference_job/config"])?;
-
-  let _ = envvar::read_from_filename_and_paths(
-    "inference-job-secrets.env",
-    &[".", "./config", "crates/service/job/inference_job/config"]
-  ).map_err(|err| {
-    // NB: Fail open.
-    warn!("Could not load app-specific secrets from env file (this might be fine, eg. provided by k8s): {:?}", err);
-  });
+//  easyenv::init_all_with_default_logging(Some(DEFAULT_RUST_LOG));
+//
+//  // TODO: Deprecate
+//  // NB: Do not check this secrets-containing dotenv file into VCS.
+//  // This file should only contain *development* secrets, never production.
+//  let _ = dotenv::from_filename(".env-secrets").ok();
+//
+//  let _ = envvar::read_from_filename_and_paths(
+//    "inference-job.env",
+//    &[".", "./config", "crates/service/job/inference_job/config"])?;
+//
+//  let _ = envvar::read_from_filename_and_paths(
+//    "inference-job-secrets.env",
+//    &[".", "./config", "crates/service/job/inference_job/config"]
+//  ).map_err(|err| {
+//    // NB: Fail open.
+//    warn!("Could not load app-specific secrets from env file (this might be fine, eg. provided by k8s): {:?}", err);
+//  });
 
   info!("Obtaining worker hostname...");
 
