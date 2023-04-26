@@ -21,6 +21,9 @@ pub struct SoVitsSvcInferenceCommand {
   /// eg. `source python/bin/activate`
   maybe_virtual_env_activation_command: Option<String>,
 
+  /// Optional default config file to use
+  maybe_default_config_path: Option<PathBuf>,
+
   /// If this is run under Docker (eg. in development), these are the options.
   maybe_docker_options: Option<DockerOptions>,
 
@@ -50,7 +53,8 @@ pub struct InferenceArgs<P: AsRef<Path>> {
   pub input_path: P,
 
   /// --config-path: path of the hparams json file
-  pub config_path: P,
+  /// This can fall back to a default value set at construction.
+  pub maybe_config_path: Option<P>,
 
   /// --output_path: output path of converting model to onnx (which we use to test validity)
   pub output_path: P,
@@ -64,6 +68,7 @@ impl SoVitsSvcInferenceCommand {
     so_vits_svc_root_code_directory: P,
     executable_or_command: ExecutableOrCommand,
     maybe_virtual_env_activation_command: Option<&str>,
+    maybe_default_config_path: Option<P>,
     maybe_docker_options: Option<DockerOptions>,
     maybe_huggingface_cache_dir: Option<P>,
     maybe_nltk_cache_dir: Option<P>,
@@ -72,6 +77,7 @@ impl SoVitsSvcInferenceCommand {
       so_vits_svc_root_code_directory: so_vits_svc_root_code_directory.as_ref().to_path_buf(),
       executable_or_command,
       maybe_virtual_env_activation_command: maybe_virtual_env_activation_command.map(|s| s.to_string()),
+      maybe_default_config_path: maybe_default_config_path.map(|p| p.as_ref().to_path_buf()),
       maybe_docker_options,
       maybe_huggingface_cache_dir: maybe_huggingface_cache_dir.map(|s| s.as_ref().to_path_buf()),
       maybe_nltk_cache_dir: maybe_nltk_cache_dir.map(|s| s.as_ref().to_path_buf()),
@@ -101,6 +107,9 @@ impl SoVitsSvcInferenceCommand {
 
     let maybe_virtual_env_activation_command = easyenv::get_env_string_optional(
       "SO_VITS_SVC_INFERENCE_MAYBE_VENV_COMMAND");
+
+    let maybe_default_config_path = easyenv::get_env_pathbuf_optional(
+      "SO_VITS_SVC_INFERENCE_MAYBE_DEFAULT_CONFIG_PATH");
 
     let maybe_huggingface_cache_dir =
         easyenv::get_env_pathbuf_optional("HF_DATASETS_CACHE");
@@ -140,6 +149,7 @@ impl SoVitsSvcInferenceCommand {
       so_vits_svc_root_code_directory,
       executable_or_command,
       maybe_virtual_env_activation_command,
+      maybe_default_config_path,
       maybe_docker_options,
       maybe_huggingface_cache_dir,
       maybe_nltk_cache_dir,
@@ -182,8 +192,16 @@ impl SoVitsSvcInferenceCommand {
     command.push_str(" --output-path ");
     command.push_str(&path_to_string(args.output_path));
 
+    let config_path = match args.maybe_config_path {
+      Some(path) => path.as_ref().to_path_buf(),
+      None => match self.maybe_default_config_path.as_deref() {
+        Some(path) => path.to_path_buf(),
+        None => return Err(anyhow!("no config path supplied")),
+      }
+    };
+
     command.push_str(" --config-path ");
-    command.push_str(&path_to_string(args.config_path));
+    command.push_str(&path_to_string(config_path));
 
     let device = match args.device {
       Device::Cuda => "cuda",

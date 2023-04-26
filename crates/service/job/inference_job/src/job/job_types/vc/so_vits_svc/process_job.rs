@@ -139,7 +139,7 @@ pub async fn process_job(args: SoVitsSvcProcessJobArgs<'_>) -> Result<JobSuccess
   job_progress_reporter.log_status("running inference")
       .map_err(|e| ProcessSingleJobError::Other(e))?;
 
-  let config_path = PathBuf::from("/models/voice_conversion/so-vits-svc/example_config.json"); // TODO: This could be variable.
+  //let config_path = PathBuf::from("/models/voice_conversion/so-vits-svc/example_config.json"); // TODO: This could be variable.
   let input_wav_path = original_media_upload_fs_path;
 
   let output_audio_fs_path = temp_dir.path().join("output.wav");
@@ -168,7 +168,7 @@ pub async fn process_job(args: SoVitsSvcProcessJobArgs<'_>) -> Result<JobSuccess
         model_path: &so_vits_svc_fs_path,
         input_path: &input_wav_path,
         output_path: &output_audio_fs_path,
-        config_path: &config_path,
+        maybe_config_path: None,
         device: Device::Cuda,
       });
 
