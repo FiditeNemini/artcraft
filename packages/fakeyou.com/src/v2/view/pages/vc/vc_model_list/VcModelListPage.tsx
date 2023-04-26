@@ -43,6 +43,8 @@ interface Props {
 }
 
 function VcModelListPage(props: Props) {
+  usePrefixedDocumentTitle("Voice Conversion");
+
   const [loading, setLoading] = useState(false);
   const [canConvert, setCanConvert] = useState(false);
 
@@ -51,10 +53,10 @@ function VcModelListPage(props: Props) {
   // Auto generated
   const [idempotencyToken, setIdempotencyToken] = useState(uuidv4());
 
-  // UI hack
+  // NB: Something of a UI hack here.
+  // The 3rd party microphone component doesn't let you clear it, so we emulate form clearing
+  // with this variable.
   const [formIsCleared, setFormIsCleared] = useState(false);
-
-  usePrefixedDocumentTitle("Voice Conversion");
 
   let {
     setVoiceConversionModels,
@@ -63,10 +65,10 @@ function VcModelListPage(props: Props) {
     setMaybeSelectedVoiceConversionModel,
   } = props;
 
-  const ttsModelsLoaded = voiceConversionModels.length > 0;
+  const vcModelsLoaded = voiceConversionModels.length > 0;
 
   const listModels = useCallback(async () => {
-    if (ttsModelsLoaded) {
+    if (vcModelsLoaded) {
       return; // Already queried.
     }
     const models = await ListVoiceConversionModels();
@@ -87,26 +89,12 @@ function VcModelListPage(props: Props) {
     setVoiceConversionModels,
     maybeSelectedVoiceConversionModel,
     setMaybeSelectedVoiceConversionModel,
-    ttsModelsLoaded,
+    vcModelsLoaded,
   ]);
-
-  /*const handleLoading = useCallback(() => {
-    setLoading(true);
-    setTimeout(() => {
-      setLoading(false);
-    }, 2000);
-  }, []);*/
 
   useEffect(() => {
     listModels();
-    //const timeout = setTimeout(() => {
-    //  setLoading(false);
-    //}, 2000);
-    //return () => clearTimeout(timeout);
-  }, [
-    //handleLoading,
-    listModels,
-  ]);
+  }, [listModels]);
 
   const handleClearClick = (ev: React.FormEvent<HTMLButtonElement>) => {
     ev.preventDefault();

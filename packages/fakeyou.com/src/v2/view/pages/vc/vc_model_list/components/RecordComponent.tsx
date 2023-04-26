@@ -33,7 +33,7 @@ function RecordedAudioComponent(props: RecorderProps) {
 }
 
 interface Props {
-  setMediaUploadToken: (token: string) => void,
+  setMediaUploadToken: (token?: string) => void,
 
   formIsCleared: boolean,
   setFormIsCleared: (cleared: boolean) => void,
@@ -70,15 +70,16 @@ export default function RecordComponent(props: Props) {
 
   const handleStartRecording = async () => {
     startRecording();
-    props.setFormIsCleared(false);
   };
 
   const handleStopRecording = async (blob: any) => {
     stopRecording();
+    props.setFormIsCleared(false);
   };
 
   const handleClear = () => {
     stopRecording();
+    props.setMediaUploadToken(undefined); // clear
     props.setFormIsCleared(true);
   };
 
@@ -92,15 +93,16 @@ export default function RecordComponent(props: Props) {
     let result = await UploadAudio(request);
 
     if (UploadAudioIsOk(result)) {
-      //setIsUploadDisabled(true);
-      //ggprops.setMediaUploadToken(result.upload_token);
       props.setMediaUploadToken(result.upload_token);
     }
   }
 
-  const speakButtonClass = false
-    ? "btn btn-primary w-100 disabled"
-    : "btn btn-primary w-100";
+  const enableMediaReview = !props.formIsCleared && recordingBlob !== undefined;
+  const enableUploadButton = !props.formIsCleared && recordingBlob !== undefined && !isRecording;
+
+  const speakButtonClass = enableUploadButton
+    ? "btn btn-primary w-100"
+    : "btn btn-primary w-100 disabled";
 
   return (
     <div className="d-flex flex-column gap-3" id="record-audio">
@@ -123,10 +125,7 @@ export default function RecordComponent(props: Props) {
         </button>
       )}
 
-      {props.formIsCleared ? (
-          <></>
-        ) : (
-
+      {enableMediaReview ? (
           <>
             <RecordedAudioComponent recordingBlob={recordingBlob} />
 
@@ -135,7 +134,7 @@ export default function RecordComponent(props: Props) {
                 className={speakButtonClass}
                 onClick={handleUpload}
                 type="submit"
-                disabled={false}
+                disabled={!enableUploadButton}
               >
                 <FontAwesomeIcon
                   icon={faUpload}
@@ -146,15 +145,15 @@ export default function RecordComponent(props: Props) {
               <button
                 className="btn btn-destructive w-100"
                 onClick={handleClear}
-                disabled={false}
               >
                 <FontAwesomeIcon icon={faTrash} className="me-2" />
                 Clear
               </button>
             </div>
           </>
-        )
-
+        ) : (
+          <></>
+        ) 
       }
 
     </div>
