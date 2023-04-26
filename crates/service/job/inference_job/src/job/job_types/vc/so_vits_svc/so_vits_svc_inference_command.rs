@@ -202,11 +202,19 @@ impl SoVitsSvcInferenceCommand {
         OsString::from("HF_DATASETS_CACHE"),
         OsString::from(cache_dir),
       ));
+      maybe_cache_dirs.push((
+        OsString::from("HF_HOME"),
+        OsString::from(cache_dir),
+      ));
     }
 
     if let Some(cache_dir) = self.maybe_nltk_cache_dir.as_deref() {
       maybe_cache_dirs.push((
         OsString::from("NLTK_DATA"),
+        OsString::from(cache_dir),
+      ));
+      maybe_cache_dirs.push((
+        OsString::from("NLTK_DATA_PATH"),
         OsString::from(cache_dir),
       ));
     }
