@@ -127,7 +127,7 @@ impl SoVitsSvcInferenceCommand {
 
           let maybe_environment_variables =
               if docker_env_vars.is_empty() { None } else { Some(docker_env_vars) };
-          
+
           DockerOptions {
             image_name,
             maybe_bind_mount: Some(DockerFilesystemMount::tmp_to_tmp()),

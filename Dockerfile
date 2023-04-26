@@ -234,5 +234,13 @@ COPY crates/service/job/inference_job/config/inference-job.production.env .
 COPY crates/service/web/storyteller_web/config/storyteller-web.common.env .
 COPY crates/service/web/storyteller_web/config/storyteller-web.production.env .
 
+# Need python to make use of other containers' venv
+RUN apt-get update && DEBIAN_FRONTEND=noninteractive TZ=Etc/UTC apt-get install -y \
+    python3-pip \
+    python3.10 \
+    python3.10-venv \
+    --no-install-recommends \
+    && apt-get clean autoclean && apt-get autoremove -y && rm -rf /var/lib/{apt,dpkg,cache,log}/
+
 EXPOSE 8080
 CMD LD_LIBRARY_PATH=/usr/lib /storyteller-web
