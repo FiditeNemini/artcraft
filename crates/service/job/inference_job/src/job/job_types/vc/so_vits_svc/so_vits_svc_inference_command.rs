@@ -6,7 +6,7 @@ use std::fs::OpenOptions;
 use std::path::{Path, PathBuf};
 use anyhow::anyhow;
 use subprocess::{Popen, PopenConfig, Redirection};
-use subprocess_common::docker_options::{DockerFilesystemMount, DockerGpu, DockerOptions};
+use subprocess_common::docker_options::{DockerEnvVar, DockerFilesystemMount, DockerGpu, DockerOptions};
 
 /// This command is used to check tacotron for being a real model
 #[derive(Clone)]
@@ -111,10 +111,27 @@ impl SoVitsSvcInferenceCommand {
     let maybe_docker_options = easyenv::get_env_string_optional(
       "SO_VITS_SVC_INFERENCE_MAYBE_DOCKER_IMAGE")
         .map(|image_name| {
+          let mut docker_env_vars = Vec::new();
+
+          if let Some(cache_dir) = maybe_huggingface_cache_dir.as_deref() {
+            let cache_dir = cache_dir.to_string_lossy().to_string();
+            docker_env_vars.push(DockerEnvVar::new("HF_DATASETS_CACHE", &cache_dir));
+            docker_env_vars.push(DockerEnvVar::new("HF_HOME", &cache_dir));
+          }
+
+          if let Some(cache_dir) = maybe_nltk_cache_dir.as_deref() {
+            let cache_dir = cache_dir.to_string_lossy().to_string();
+            docker_env_vars.push(DockerEnvVar::new("NLTK_DATA", &cache_dir));
+            docker_env_vars.push(DockerEnvVar::new("NLTK_DATA_PATH", &cache_dir));
+          }
+
+          let maybe_environment_variables =
+              if docker_env_vars.is_empty() { None } else { Some(docker_env_vars) };
+          
           DockerOptions {
             image_name,
             maybe_bind_mount: Some(DockerFilesystemMount::tmp_to_tmp()),
-            maybe_environment_variables: None,
+            maybe_environment_variables,
             maybe_gpu: Some(DockerGpu::All),
           }
         });
