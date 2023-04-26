@@ -225,9 +225,14 @@ RUN touch .env-secrets
 
 # Some services have default env files that live under their code directories
 # These should also be readable from the relative current path
-COPY crates/service/job/download_job/config/download-job.development.env .
-COPY crates/service/job/inference_job/config/inference-job.development.env .
+COPY crates/service/job/download_job/config/download-job.common.env .
+COPY crates/service/job/download_job/config/download-job.production.env .
+
+COPY crates/service/job/inference_job/config/inference-job.common.env .
+COPY crates/service/job/inference_job/config/inference-job.production.env .
+
 COPY crates/service/web/storyteller_web/config/storyteller-web.common.env .
+COPY crates/service/web/storyteller_web/config/storyteller-web.production.env .
 
 EXPOSE 8080
 CMD LD_LIBRARY_PATH=/usr/lib /storyteller-web
