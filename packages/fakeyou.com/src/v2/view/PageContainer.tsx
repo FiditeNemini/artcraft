@@ -68,11 +68,15 @@ import { NewsPage } from "./pages/news/NewsPage";
 import { LandingPage } from "./pages/landing/LandingPage";
 import { ChannelsPage } from "./pages/channels/Channels";
 import { TrumpTtsPage } from "./pages/character/trump/TrumpTtsPage";
-import { FrontendInferenceJobType, InferenceJob } from "@storyteller/components/src/jobs/InferenceJob";
+import {
+  FrontendInferenceJobType,
+  InferenceJob,
+} from "@storyteller/components/src/jobs/InferenceJob";
 //import { LandingPage } from "./pages/landing/LandingPage";
 import { VcModelListPage } from "./pages/vc/vc_model_list/VcModelListPage";
 import { UploadVoiceConversionModel } from "./pages/upload/UploadVoiceConversionModel";
 import { VoiceConversionModelListItem } from "@storyteller/components/src/api/voice_conversion/ListVoiceConversionModels";
+import { GrimesPage } from "./pages/contest/GrimesPage";
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -98,7 +102,10 @@ interface Props {
   isShowingBootstrapLanguageNotice: boolean;
   clearBootstrapLanguageNotice: () => void;
 
-  enqueueInferenceJob: (jobToken: string, frontendInferenceJobType: FrontendInferenceJobType) => void;
+  enqueueInferenceJob: (
+    jobToken: string,
+    frontendInferenceJobType: FrontendInferenceJobType
+  ) => void;
   inferenceJobs: Array<InferenceJob>;
   inferenceJobsByCategory: Map<FrontendInferenceJobType, Array<InferenceJob>>;
 
@@ -153,10 +160,14 @@ interface Props {
   setSelectedTtsLanguageScope: (selectedTtsLanguageScope: string) => void;
 
   voiceConversionModels: Array<VoiceConversionModelListItem>;
-  setVoiceConversionModels: (ttsVoices: Array<VoiceConversionModelListItem>) => void;
+  setVoiceConversionModels: (
+    ttsVoices: Array<VoiceConversionModelListItem>
+  ) => void;
 
   maybeSelectedVoiceConversionModel?: VoiceConversionModelListItem;
-  setMaybeSelectedVoiceConversionModel: (maybeSelectedVoiceConversionModel: VoiceConversionModelListItem) => void;
+  setMaybeSelectedVoiceConversionModel: (
+    maybeSelectedVoiceConversionModel: VoiceConversionModelListItem
+  ) => void;
 }
 
 interface State {}
@@ -392,8 +403,12 @@ class PageContainer extends React.Component<Props, State> {
             <Route path="/upload/voice_conversion">
               <UploadVoiceConversionModel
                 sessionWrapper={this.props.sessionWrapper}
-                voiceConversionModelUploadJobs={this.props.voiceConversionModelUploadJobs}
-                enqueueVoiceConversionModelUploadJob={this.props.enqueueVoiceConversionModelUploadJob}
+                voiceConversionModelUploadJobs={
+                  this.props.voiceConversionModelUploadJobs
+                }
+                enqueueVoiceConversionModelUploadJob={
+                  this.props.enqueueVoiceConversionModelUploadJob
+                }
               />
             </Route>
 
@@ -487,8 +502,12 @@ class PageContainer extends React.Component<Props, State> {
                 }
                 voiceConversionModels={this.props.voiceConversionModels}
                 setVoiceConversionModels={this.props.setVoiceConversionModels}
-                maybeSelectedVoiceConversionModel={this.props.maybeSelectedVoiceConversionModel}
-                setMaybeSelectedVoiceConversionModel={this.props.setMaybeSelectedVoiceConversionModel}
+                maybeSelectedVoiceConversionModel={
+                  this.props.maybeSelectedVoiceConversionModel
+                }
+                setMaybeSelectedVoiceConversionModel={
+                  this.props.setMaybeSelectedVoiceConversionModel
+                }
                 enqueueInferenceJob={this.props.enqueueInferenceJob}
                 inferenceJobs={this.props.inferenceJobs}
                 inferenceJobsByCategory={this.props.inferenceJobsByCategory}
@@ -497,6 +516,10 @@ class PageContainer extends React.Component<Props, State> {
 
             <Route path="/about">
               <AboutPage />
+            </Route>
+
+            <Route path="/grimes">
+              <GrimesPage />
             </Route>
 
             <Route path="/terms">
