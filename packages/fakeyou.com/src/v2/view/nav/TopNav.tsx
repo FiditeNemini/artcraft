@@ -224,7 +224,7 @@ function TopNav(props: Props) {
 
   return (
     <div>
-      <div className="top-bar d-none d-lg-flex">
+      {/* <div className="top-bar d-none d-lg-flex">
         <div className="container d-flex align-items-center">
           <div className="d-flex gap-4 flex-grow-1">
             <Link
@@ -253,22 +253,7 @@ function TopNav(props: Props) {
             </a>
           </div>
           <div className="d-flex gap-3 align-items-center">
-            {/* <p className="top-bar-text">
-              Online Users: <span className="fw-bold text-red">1,204</span>
-            </p> */}
-
-            {/* <Tippy
-              content={`${
-                darkModes ? "Toggle Light Mode" : "Toggle Dark Mode"
-              }`}
-            >
-              <button
-                className={`btn btn-toggle ${darkModes ? "dark" : ""}`}
-                onClick={() => toggleDarkMode()}
-              >
-                <FontAwesomeIcon icon={darkModes ? faSun : faMoon} />
-              </button>
-            </Tippy> */}
+            
             <Tippy
               content={`${
                 lowSpecView ? "Turn on animations" : "Turn off animations"
@@ -292,7 +277,7 @@ function TopNav(props: Props) {
             </p>
           </div>
         </div>
-      </div>
+      </div> */}
 
       <nav
         className="navbar navbar-expand-lg navbar-dark pt-3"
@@ -362,7 +347,7 @@ function TopNav(props: Props) {
                     onClick={() => {
                       Analytics.topbarClickNews();
                     }}
-                    className="nav-link nav-link-red"
+                    className="nav-link"
                   >
                     <FontAwesomeIcon icon={faTvRetro} className="me-2" />
                     {t("nav.TopNav.main.newsLink")}
