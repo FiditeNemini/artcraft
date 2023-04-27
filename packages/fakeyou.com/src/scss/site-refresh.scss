@@ -809,6 +809,14 @@ styles with important tags:
     }
   }
 
+  .footer-bar {
+    font-size: 14px;
+    padding: 0.6rem 0;
+    background-color: lighten($panel, 2%);
+    border-bottom: 1px solid;
+    border-color: rgba($white, 0.04);
+  }
+
   .result-text {
     font-size: 18px;
   }

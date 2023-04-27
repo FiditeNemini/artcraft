@@ -2,7 +2,6 @@ import React, { useCallback, useEffect, useState } from "react";
 import { GitSha } from "@storyteller/components/src/elements/GitSha";
 import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
 import { Link } from "react-router-dom";
-
 import { ModerationIcon } from "../_icons/ModerationIcon";
 import { WebUrl } from "../../../common/WebUrl";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -18,6 +17,13 @@ import {
   GetServerInfoIsOk,
   GetServerInfoSuccessResponse,
 } from "@storyteller/components/src/api/server/GetServerInfo";
+import {
+  GetPendingTtsJobCount,
+  GetPendingTtsJobCountIsOk,
+  GetPendingTtsJobCountSuccessResponse,
+} from "@storyteller/components/src/api/tts/GetPendingTtsJobCount";
+
+const DEFAULT_QUEUE_REFRESH_INTERVAL_MILLIS = 15000;
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -38,6 +44,37 @@ function FooterNav(props: Props) {
   useEffect(() => {
     getServerInfo();
   }, [getServerInfo]);
+
+  const [pendingTtsJobs, setPendingTtsJobs] =
+    useState<GetPendingTtsJobCountSuccessResponse>({
+      success: true,
+      pending_job_count: 0,
+      cache_time: new Date(0), // NB: Epoch is used for vector clock's initial state
+      refresh_interval_millis: DEFAULT_QUEUE_REFRESH_INTERVAL_MILLIS,
+    });
+
+  useEffect(() => {
+    const fetch = async () => {
+      const response = await GetPendingTtsJobCount();
+      if (GetPendingTtsJobCountIsOk(response)) {
+        if (
+          response.cache_time.getTime() > pendingTtsJobs.cache_time.getTime()
+        ) {
+          setPendingTtsJobs(response);
+        }
+      }
+    };
+    // TODO: We're having an outage and need to lower this.
+    //const interval = setInterval(async () => fetch(), 15000);
+    const refreshInterval = Math.max(
+      DEFAULT_QUEUE_REFRESH_INTERVAL_MILLIS,
+      pendingTtsJobs.refresh_interval_millis
+    );
+    console.log("new interval", refreshInterval);
+    const interval = setInterval(async () => fetch(), refreshInterval);
+    fetch();
+    return () => clearInterval(interval);
+  }, [pendingTtsJobs]);
 
   let moderationLink = <span />;
 
@@ -71,11 +108,13 @@ function FooterNav(props: Props) {
   return (
     <div>
       <footer id="footer">
+        <div className="footer-bar text-center text-lg-start">
+          <div className="container fw-medium">
+            TTS Queued:{" "}
+            <span className="text-red">{pendingTtsJobs.pending_job_count}</span>
+          </div>
+        </div>
         <div className="container py-5">
-          {/* <div className="pb-4">
-            <hr />
-          </div> */}
-
           <div className="row gx-5 gy-5">
             <div className="col-12 col-lg-3 d-flex flex-column gap-4 align-items-center align-items-lg-start">
               <Link to="/">
