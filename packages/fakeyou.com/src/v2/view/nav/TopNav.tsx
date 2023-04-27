@@ -38,7 +38,10 @@ import "tippy.js/dist/tippy.css";
 import "tippy.js/animations/shift-away.css";
 import { ThirdPartyLinks } from "@storyteller/components/src/constants/ThirdPartyLinks";
 import { Analytics } from "../../../common/Analytics";
-import { faMicrophoneLines, faWaveformLines } from "@fortawesome/pro-solid-svg-icons";
+import {
+  faMicrophoneLines,
+  faWaveformLines,
+} from "@fortawesome/pro-solid-svg-icons";
 
 // TODO: This is duplicated in SessionTtsInferenceResultsList !
 // Default to querying every 15 seconds, but make it configurable serverside
@@ -224,7 +227,7 @@ function TopNav(props: Props) {
 
   return (
     <div>
-      {/* <div className="top-bar d-none d-lg-flex">
+      <div className="top-bar d-none d-lg-flex">
         <div className="container d-flex align-items-center">
           <div className="d-flex gap-4 flex-grow-1">
             <Link
@@ -253,7 +256,6 @@ function TopNav(props: Props) {
             </a>
           </div>
           <div className="d-flex gap-3 align-items-center">
-            
             <Tippy
               content={`${
                 lowSpecView ? "Turn on animations" : "Turn off animations"
@@ -277,7 +279,7 @@ function TopNav(props: Props) {
             </p>
           </div>
         </div>
-      </div> */}
+      </div>
 
       <nav
         className="navbar navbar-expand-lg navbar-dark pt-3"
