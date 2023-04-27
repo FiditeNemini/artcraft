@@ -2,7 +2,7 @@
 # https://github.com/actions/starter-workflows/ci/docker-publish.yml
 # If using base images, don't forget to add READ access, eg. from a package settings page like:
 # https://github.com/orgs/storytold/packages/container/docker-base-images-rust-ssl/settings/actions_access
-name: "[CPU] Publish Docker Container to GHCR"
+name: "[CPU] Build GHCR Docker artifact"
 on:
   push:
     branches:
