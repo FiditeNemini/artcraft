@@ -66,6 +66,7 @@ function GrimesPage(props: Props) {
             <p>Description of the contest here...</p>
             <div>
               <h2 className="mb-4 fw-semibold">Prize Pool</h2>
+              <h5 className="mb-4 fw-semibold">$20,000 Total</h5>
               <p>
                 1. Top Grimes AI Song
                 <br />
