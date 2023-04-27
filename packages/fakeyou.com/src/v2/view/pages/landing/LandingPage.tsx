@@ -297,7 +297,7 @@ function LandingPage(props: Props) {
                   loop={true}
                   muted={true}
                 >
-                  <source src="/videos/tts-video.webm" type="video/webm" />
+                  <source src="/videos/tts-video.mp4" type="video/mp4" />
                 </video>
               </div>
               <img
@@ -404,21 +404,29 @@ function LandingPage(props: Props) {
             src="/images/landing/hanashi-before.webp"
             alt="hanashi before"
             className="hanashi-before d-none d-lg-block"
+            width={311}
+            height={311}
           />
           <img
             src="/images/landing/chevrons-grey.webp"
             alt="grey chevrons"
             className="chevrons-grey d-none d-lg-block"
+            width={127}
+            height={108}
           />
           <img
             src="/images/landing/chevrons-red.webp"
             alt="red chevrons"
             className="chevrons-red d-none d-lg-block"
+            width={127}
+            height={108}
           />
           <img
             src="/images/landing/hanashi-after.webp"
             alt="hanashi after"
             className="hanashi-after d-none d-lg-block"
+            width={311}
+            height={311}
           />
         </div>
       </div>
