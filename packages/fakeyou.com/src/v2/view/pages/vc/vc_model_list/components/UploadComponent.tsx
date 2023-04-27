@@ -1,21 +1,29 @@
-import { faFileArrowUp, faFileAudio, faTrash } from "@fortawesome/pro-solid-svg-icons";
+import {
+  faFileArrowUp,
+  faFileAudio,
+  faTrash,
+} from "@fortawesome/pro-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React, { useState } from "react";
 import { FileUploader } from "react-drag-drop-files";
 import { InputVcAudioPlayer } from "../../../../_common/InputVcAudioPlayer";
 import { v4 as uuidv4 } from "uuid";
-import { UploadAudio, UploadAudioIsOk, UploadAudioRequest } from "@storyteller/components/src/api/upload/UploadAudio";
+import {
+  UploadAudio,
+  UploadAudioIsOk,
+  UploadAudioRequest,
+} from "@storyteller/components/src/api/upload/UploadAudio";
 
-const FILE_TYPES = ["MP3", "WAV", "FLAC"];
+const FILE_TYPES = ["MP3", "WAV", "FLAC", "OGG"];
 
 interface Props {
-  setMediaUploadToken: (token?: string) => void,
+  setMediaUploadToken: (token?: string) => void;
 
-  formIsCleared: boolean,
-  setFormIsCleared: (cleared: boolean) => void,
+  formIsCleared: boolean;
+  setFormIsCleared: (cleared: boolean) => void;
 
-  setCanConvert: (canConvert: boolean) => void,
-  changeConvertIdempotencyToken: () => void,
+  setCanConvert: (canConvert: boolean) => void;
+  changeConvertIdempotencyToken: () => void;
 }
 
 function UploadComponent(props: Props) {
@@ -27,7 +35,7 @@ function UploadComponent(props: Props) {
   const [idempotencyToken, setIdempotencyToken] = useState(uuidv4());
 
   const handleChange = (file: any) => {
-    console.log('handle change');
+    console.log("handle change");
     setFile(file);
     setIdempotencyToken(uuidv4());
     const audioUrl = URL.createObjectURL(file);
@@ -64,11 +72,11 @@ function UploadComponent(props: Props) {
       return false;
     }
 
-    const request : UploadAudioRequest = {
+    const request: UploadAudioRequest = {
       uuid_idempotency_token: idempotencyToken,
       file: file,
-      source: 'file',
-    }
+      source: "file",
+    };
 
     let result = await UploadAudio(request);
 
@@ -171,21 +179,17 @@ function UploadComponent(props: Props) {
         <div className="d-flex gap-3">
           <button
             className="btn btn-primary w-100"
-            onClick={() => { handleUploadFile(); }}
+            onClick={() => {
+              handleUploadFile();
+            }}
             type="submit"
             disabled={isUploadDisabled}
           >
-            <FontAwesomeIcon
-              icon={faFileArrowUp}
-              className="me-2"
-            />
+            <FontAwesomeIcon icon={faFileArrowUp} className="me-2" />
             Upload Audio
           </button>
 
-          <button
-            className="btn btn-destructive w-100"
-            onClick={handleClear}
-          >
+          <button className="btn btn-destructive w-100" onClick={handleClear}>
             <FontAwesomeIcon icon={faTrash} className="me-2" />
             Clear
           </button>
@@ -193,7 +197,6 @@ function UploadComponent(props: Props) {
       ) : (
         <></>
       )}
-
     </div>
   );
 }
