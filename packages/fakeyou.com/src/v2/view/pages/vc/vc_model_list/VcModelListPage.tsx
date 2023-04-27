@@ -32,7 +32,6 @@ import {
   InferenceJob,
 } from "@storyteller/components/src/jobs/InferenceJob";
 import { SessionVoiceConversionResultsList } from "../../../_common/SessionVoiceConversionResultsList";
-import { Link } from "react-router-dom";
 
 interface Props {
   sessionWrapper: SessionWrapper;

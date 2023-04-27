@@ -13,7 +13,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { faDiscord, faTwitter } from "@fortawesome/free-brands-svg-icons";
 import { WebUrl } from "../../../../common/WebUrl";
-import { faTrophyStar } from "@fortawesome/pro-solid-svg-icons";
+// import { faTrophyStar } from "@fortawesome/pro-solid-svg-icons";
 // import {
 //   faFileArrowUp,
 //   faMicrophone,
