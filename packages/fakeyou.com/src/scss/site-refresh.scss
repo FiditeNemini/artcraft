@@ -1076,6 +1076,55 @@ styles with important tags:
     pointer-events: none;
   }
 
+  .upload-component {
+    overflow-x: hidden;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+
+    .panel {
+      box-shadow: none !important;
+    }
+
+    .upload-zone {
+      height: 100%;
+      border: dashed 2px rgba($white, 0.12) !important;
+      border-radius: 0.5rem;
+      transition: 0.1s all;
+
+      &:hover {
+        background-color: lighten($panel, 6%);
+        cursor: pointer;
+      }
+    }
+
+    .upload-zone-drag {
+      background-color: $white !important;
+    }
+
+    .filename {
+      display: block;
+      max-width: 230px;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+    }
+
+    .supported-files {
+      font-size: 12px;
+    }
+
+    .upload-icon {
+      font-size: 42px;
+    }
+  }
+
+  .nav-vc {
+    flex-wrap: nowrap;
+    height: auto;
+    overflow-y: hidden;
+    overflow-x: auto;
+  }
+
   .video-container {
     border: 2px solid;
     border-color: #ffffff20;
