@@ -7,10 +7,8 @@ import { container, panel } from "../../../../../data/animation";
 import { SessionSubscriptionsWrapper } from "@storyteller/components/src/session/SessionSubscriptionsWrapper";
 import { VcPageHero } from "./components/VcPageHero";
 import {
-  faArrowRight,
   faBarsStaggered,
   faMicrophone,
-  faMoneyBill,
   faRightLeft,
 } from "@fortawesome/pro-solid-svg-icons";
 import UploadComponent from "./components/UploadComponent";
