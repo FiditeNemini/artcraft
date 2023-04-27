@@ -180,6 +180,7 @@ function VcModelListPage(props: Props) {
         sessionSubscriptionsWrapper={props.sessionSubscriptionsWrapper}
       />
 
+      {/*
       <motion.div variants={panel} className="container">
         <div className="alert alert-info fs-6">
           <FontAwesomeIcon icon={faMoneyBill} className="me-2" />
@@ -197,6 +198,7 @@ function VcModelListPage(props: Props) {
           </a>
         </div>
       </motion.div>
+      */}
 
       <motion.div className="container-panel pb-5 mb-4" variants={panel}>
         <div className="panel p-3 py-4 p-md-4">
