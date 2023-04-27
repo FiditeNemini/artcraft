@@ -20,6 +20,7 @@ static ALLOWED_MIME_TYPES : Lazy<HashSet<&'static str>> = Lazy::new(|| {
     "audio/m4a",
     "audio/mpeg",
     "audio/ogg",
+    "audio/opus",
     "audio/x-flac",
     "audio/x-wav",
 
