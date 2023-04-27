@@ -373,7 +373,7 @@ class App extends React.Component<Props, State> {
         );
 
         updatedJobs.push(updatedJob);
-        inferenceJobsByCategory.get(updatedJob.frontendJobType)?.push(existingJob);
+        inferenceJobsByCategory.get(updatedJob.frontendJobType)?.push(updatedJob);
       });
 
       this.setState({
