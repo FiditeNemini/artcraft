@@ -108,16 +108,13 @@ function FooterNav(props: Props) {
   return (
     <div>
       <footer id="footer">
-        <div className="top-bar d-none d-lg-flex">
-          <div className="container d-flex align-items-center">
-            {pendingTtsJobs.pending_job_count}
+        <div className="footer-bar text-center text-lg-start">
+          <div className="container fw-medium">
+            TTS Queued:{" "}
+            <span className="text-red">{pendingTtsJobs.pending_job_count}</span>
           </div>
         </div>
         <div className="container py-5">
-          {/* <div className="pb-4">
-            <hr />
-          </div> */}
-
           <div className="row gx-5 gy-5">
             <div className="col-12 col-lg-3 d-flex flex-column gap-4 align-items-center align-items-lg-start">
               <Link to="/">
