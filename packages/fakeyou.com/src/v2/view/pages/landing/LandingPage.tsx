@@ -105,7 +105,7 @@ function LandingPage(props: Props) {
     <motion.div initial="hidden" animate="visible" variants={container}>
       <div className="container pb-5 pb-lg-0 pt-lg-2 px-md-5 px-lg-5 px-xl-3">
         {/* Grimes Contest Alert */}
-        <div className="alert alert-info fs-6">
+        {/* <div className="alert alert-info fs-6">
           <FontAwesomeIcon icon={faTrophyStar} className="me-2" />
           <span className="fw-medium">
             Participate in our $20k prize pool AI Grimes Song Contest!
@@ -113,7 +113,7 @@ function LandingPage(props: Props) {
           <Link to="/grimes" className="fw-semibold ms-2">
             See details <FontAwesomeIcon icon={faArrowRight} className="ms-1" />
           </Link>
-        </div>
+        </div> */}
 
         <div className="row flex-md-row-reverse">
           <div className="col-12 col-lg-5 p-md-0 d-flex justify-content-center">
