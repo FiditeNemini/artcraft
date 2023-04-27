@@ -202,7 +202,10 @@ function LandingPage(props: Props) {
         <h2 className="fw-bold mb-4">AI Tools</h2>
         <div className="row g-4 position-relative">
           <div className="col-12 col-md-4">
-            <div className="panel panel-select d-flex flex-column align-items-center">
+            <Link
+              to="/tts"
+              className="panel panel-select d-flex flex-column align-items-center"
+            >
               <div className="d-flex px-4 pt-4 align-items-center w-100">
                 <div className="flex-grow-1">
                   <h3 className="fw-bold text-white mb-1">Text to Speech</h3>
@@ -220,10 +223,13 @@ function LandingPage(props: Props) {
                 src="/images/landing/select-tts.webp"
                 alt="Text to speech"
               />
-            </div>
+            </Link>
           </div>
           <div className="col-12 col-md-4">
-            <div className="panel panel-select d-flex flex-column align-items-center">
+            <Link
+              to="/voice-conversion"
+              className="panel panel-select d-flex flex-column align-items-center"
+            >
               <div className="d-flex px-4 pt-4 align-items-center w-100">
                 <div className="flex-grow-1">
                   <h3 className="fw-bold text-white mb-1">Voice to Voice</h3>
@@ -241,10 +247,13 @@ function LandingPage(props: Props) {
                 src="/images/landing/select-vc.webp"
                 alt="Voice Conversion"
               />
-            </div>
+            </Link>
           </div>
           <div className="col-12 col-md-4">
-            <div className="panel panel-select d-flex flex-column align-items-center">
+            <Link
+              to="/video"
+              className="panel panel-select d-flex flex-column align-items-center"
+            >
               <div className="d-flex px-4 pt-4 align-items-center w-100">
                 <div className="flex-grow-1">
                   <h3 className="fw-bold text-white mb-1">Video Lip Sync</h3>
@@ -262,7 +271,7 @@ function LandingPage(props: Props) {
                 src="/images/landing/select-w2l.webp"
                 alt="Video Lip Sync"
               />
-            </div>
+            </Link>
           </div>
           <img
             src="/images/landing/bg-dots.webp"
