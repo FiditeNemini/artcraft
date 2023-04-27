@@ -163,7 +163,7 @@ COPY --from=builder /usr/lib/x86_64-linux-gnu/libcrypto.*          /lib/x86_64-l
 COPY container_includes/ /container_includes
 
 # Make sure all the links resolve
-RUN ldd storyteller-web
+RUN ldd inference-job
 
 # Without a .env file, Rust crashes "mysteriously" (ugh)
 RUN touch .env
