@@ -1,3 +1,4 @@
+use std::env;
 use std::ffi::OsString;
 use container_common::anyhow_result::AnyhowResult;
 use filesys::path_to_string::path_to_string;
@@ -230,9 +231,9 @@ impl SoVitsSvcInferenceCommand {
       &command
     ];
 
-    let mut maybe_cache_dirs = Vec::new();
+    let mut env_vars = Vec::new();
 
-    if let Some(cache_dir) = self.maybe_huggingface_cache_dir.as_deref() {
+    /*if let Some(cache_dir) = self.maybe_huggingface_cache_dir.as_deref() {
       maybe_cache_dirs.push((
         OsString::from("HF_DATASETS_CACHE"),
         OsString::from(cache_dir),
@@ -252,12 +253,20 @@ impl SoVitsSvcInferenceCommand {
         OsString::from("NLTK_DATA_PATH"),
         OsString::from(cache_dir),
       ));
+    }*/
+
+    // Copy all environment variables from the parent process.
+    for (env_key, env_value) in env::vars() {
+      env_vars.push((
+        OsString::from(env_key),
+        OsString::from(env_value),
+      ));
     }
 
     let mut config = PopenConfig::default();
 
-    if !maybe_cache_dirs.is_empty() {
-      config.env = Some(maybe_cache_dirs);
+    if !env_vars.is_empty() {
+      config.env = Some(env_vars);
     }
 
     let mut p = Popen::create(&command_parts, config)?;
