@@ -97,7 +97,7 @@ function LandingPage(props: Props) {
 
   return (
     <motion.div initial="hidden" animate="visible" variants={container}>
-      <div className="container pb-md-4 pt-lg-4 mb-2 px-md-5 px-lg-5 px-xl-3">
+      <div className="container pb-md-3 pt-lg-3 mb-2 px-md-5 px-lg-5 px-xl-3">
         <div className="row flex-md-row-reverse">
           <div className="col-12 col-lg-5 p-md-0 d-flex justify-content-center">
             <img
@@ -108,7 +108,7 @@ function LandingPage(props: Props) {
             />
           </div>
           <div className="col-12 col-lg-7 d-flex flex-column justify-content-center flex-reverse px-md-5 px-lg-3">
-            <h1 className="fw-bold display-4 text-center text-lg-start px-md-5 px-lg-0">
+            <h1 className="fw-bold display-5 text-center text-lg-start px-md-5 px-lg-0">
               Text to Speech, Voice Conversion & AI Tools
             </h1>
             <p className="lead opacity-75 pb-4 text-center text-lg-start px-md-5 px-lg-0">
