@@ -161,7 +161,13 @@ pub async fn handle_upload(
   if let Some(mimetype) = maybe_mimetype.as_deref() {
 
     if !allowed_mimetypes.contains(mimetype) {
-      return Err(UploadError::BadInput("unpermitted mime type".to_string()));
+      // NB: Don't let our error message inject malicious strings
+      let filtered_mimetype = mimetype
+          .chars()
+          .filter(|c| c.is_ascii())
+          .filter(|c| c.is_alphanumeric() || *c == '/')
+          .collect::<String>();
+      return Err(UploadError::BadInput(format!("unpermitted mime type: {}", &filtered_mimetype)));
     }
 
     // NB: .aiff (audio/aiff) isn't supported by Symphonia:
