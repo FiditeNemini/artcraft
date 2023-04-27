@@ -131,7 +131,8 @@ RUN du -hsc * | sort -hr
 # Final image
 #FROM ubuntu:jammy as final
 # TODO(bt,2023-04-26): This is only necessary for download-job and inference-job
-FROM nvidia/cuda:12.0.1-runtime-ubuntu22.04 as final
+#FROM nvidia/cuda:12.0.1-runtime-ubuntu22.04 as final # Same image as so-vits-svc
+FROM nvidia/cuda:12.1.0-runtime-ubuntu22.04 as final
 
 # See: https://github.com/opencontainers/image-spec/blob/master/annotations.md
 LABEL org.opencontainers.image.title='Storyteller Rust (GPU)'
