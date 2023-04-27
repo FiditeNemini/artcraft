@@ -63,7 +63,9 @@ function GrimesPage(props: Props) {
         <div className="panel p-3 p-lg-4 load-hidden mt-5 mt-lg-0">
           <h1 className="panel-title fw-bold">Contest Details</h1>
           <div className="py-6 d-flex flex-column gap-4">
-            <p>Description of the contest here...</p>
+            <p>
+              Write a general description of the contest here... (what is it)
+            </p>
             <div>
               <h2 className="mb-4 fw-semibold">Prize Pool</h2>
               <h5 className="mb-4 fw-semibold">$20,000 Total</h5>
