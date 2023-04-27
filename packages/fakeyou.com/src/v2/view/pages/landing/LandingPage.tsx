@@ -13,6 +13,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { faDiscord, faTwitter } from "@fortawesome/free-brands-svg-icons";
 import { WebUrl } from "../../../../common/WebUrl";
+import { faMicrophone, faRightLeft } from "@fortawesome/pro-solid-svg-icons";
 // import { Analytics } from "../../../../../common/Analytics";
 
 interface Props {
@@ -97,7 +98,7 @@ function LandingPage(props: Props) {
 
   return (
     <motion.div initial="hidden" animate="visible" variants={container}>
-      <div className="container pb-md-5 pt-lg-5 mb-4 px-md-5 px-lg-5 px-xl-3">
+      <div className="container pb-5 pb-lg-0 pt-lg-2 px-md-5 px-lg-5 px-xl-3">
         <div className="row flex-md-row-reverse">
           <div className="col-12 col-lg-5 p-md-0 d-flex justify-content-center">
             <img
@@ -108,10 +109,10 @@ function LandingPage(props: Props) {
             />
           </div>
           <div className="col-12 col-lg-7 d-flex flex-column justify-content-center flex-reverse px-md-5 px-lg-3">
-            <h1 className="fw-bold display-4 text-center text-lg-start px-md-5 px-lg-0">
+            <h1 className="fw-bold display-5 text-center text-lg-start px-md-5 px-lg-0">
               Text to Speech, Voice Conversion & AI Tools
             </h1>
-            <p className="lead opacity-75 pb-4 text-center text-lg-start px-md-5 px-lg-0">
+            <p className="lead opacity-75 pb-4 text-center text-lg-start px-md-5 px-lg-0 pe-lg-5">
               Generate audio or videos of your favorite characters saying
               anything you want with FakeYou's deep fake tech.
             </p>
@@ -121,6 +122,175 @@ function LandingPage(props: Props) {
               {viewPricingButton}
               {myProfileButton}
             </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="container-panel pb-5 mb-5">
+        <div className="panel p-3 py-4 p-md-4">
+          <div className="d-flex gap-4">
+            <form
+              className="w-100 d-flex flex-column"
+              // onSubmit={handleFormSubmit}
+            >
+              <div className="row gx-5 gy-5">
+                <div className="col-12 d-flex flex-column gap-4">
+                  <div>
+                    <label className="sub-title">
+                      Choose Target Voice (xxx to choose from)
+                    </label>
+                    <div className="input-icon-search pb-4">
+                      <span className="form-control-feedback">
+                        <FontAwesomeIcon icon={faMicrophone} />
+                      </span>
+
+                      {/* <VcModelListSearch
+                  voiceConversionModels={props.voiceConversionModels}
+                  setVoiceConversionModels={props.setVoiceConversionModels}
+                  maybeSelectedVoiceConversionModel={
+                    props.maybeSelectedVoiceConversionModel
+                  }
+                  setMaybeSelectedVoiceConversionModel={interceptModelChange}
+                /> */}
+                    </div>
+                  </div>
+
+                  <ul className="nav nav-tabs nav-vc" id="myTab" role="tablist">
+                    <li className="nav-item w-100" role="presentation">
+                      <button
+                        className="nav-link active w-100"
+                        id="prerecorded-tab"
+                        data-bs-toggle="tab"
+                        data-bs-target="#prerecorded"
+                        type="button"
+                        role="tab"
+                        aria-controls="prerecorded"
+                        aria-selected="true"
+                      >
+                        Pre-recorded
+                      </button>
+                    </li>
+                    <li className="nav-item w-100" role="presentation">
+                      <button
+                        className="nav-link w-100"
+                        id="recordaudio-tab"
+                        data-bs-toggle="tab"
+                        data-bs-target="#recordaudio"
+                        type="button"
+                        role="tab"
+                        aria-controls="recordaudio"
+                        aria-selected="false"
+                      >
+                        Microphone
+                      </button>
+                    </li>
+                  </ul>
+                  <div className="tab-content" id="myTabContent">
+                    <div
+                      className="tab-pane fade show active"
+                      id="prerecorded"
+                      role="tabpanel"
+                      aria-labelledby="prerecorded-tab"
+                    >
+                      <div className="d-flex flex-column gap-4 h-100">
+                        <div>
+                          <label className="sub-title">
+                            Upload Input Audio
+                          </label>
+                          <div className="d-flex flex-column gap-3 upload-component">
+                            {/* <UploadComponent
+                              setMediaUploadToken={setMediaUploadToken}
+                              formIsCleared={formIsCleared}
+                              setFormIsCleared={setFormIsCleared}
+                              setCanConvert={setCanConvert}
+                              changeConvertIdempotencyToken={
+                                changeConvertIdempotencyToken
+                              }
+                            /> */}
+                          </div>
+                        </div>
+
+                        {/*<div>
+                          <label className="sub-title">
+                            Or pick from your audio collection (5 files)
+                          </label>
+                          <div className="d-flex flex-column gap-3">
+                            <div className="input-icon-search">
+                              <span className="form-control-feedback">
+                                <FontAwesomeIcon icon={faFiles} />
+                              </span>
+
+                              <Select
+                                value="test"
+                                classNames={SearchFieldClass}
+                                // On mobile, we don't want the onscreen keyboard to take up half the UI.
+                                autoFocus={false}
+                                isSearchable={false}
+                                // NB: The following settings improve upon performance.
+                                // See: https://github.com/JedWatson/react-select/issues/3128
+                                filterOption={createFilter({
+                                  ignoreAccents: false,
+                                })}
+                              />
+                            </div>
+                          </div>
+                              </div>*/}
+
+                        <div>
+                          <label className="sub-title">Convert Audio</label>
+
+                          <div className="d-flex gap-3">
+                            <button className="btn btn-primary w-100">
+                              <FontAwesomeIcon
+                                icon={faRightLeft}
+                                className="me-2"
+                              />
+                              Convert
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      className="tab-pane fade"
+                      id="recordaudio"
+                      role="tabpanel"
+                      aria-labelledby="recordaudio-tab"
+                    >
+                      <div className="d-flex flex-column gap-4 h-100">
+                        <div>
+                          <label className="sub-title">Record Audio</label>
+                          <div className="d-flex flex-column gap-3 upload-component">
+                            {/* <RecordComponent
+                              setMediaUploadToken={setMediaUploadToken}
+                              formIsCleared={formIsCleared}
+                              setFormIsCleared={setFormIsCleared}
+                              setCanConvert={setCanConvert}
+                              changeConvertIdempotencyToken={
+                                changeConvertIdempotencyToken
+                              }
+                            /> */}
+                          </div>
+                        </div>
+                        <div>
+                          <label className="sub-title">Convert Audio</label>
+
+                          <div className="d-flex gap-3">
+                            <button className="btn btn-primary w-100">
+                              <FontAwesomeIcon
+                                icon={faRightLeft}
+                                className="me-2"
+                              />
+                              Convert
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </form>
           </div>
         </div>
       </div>
@@ -153,7 +323,7 @@ function LandingPage(props: Props) {
             <div className="panel panel-select d-flex flex-column align-items-center">
               <div className="d-flex px-4 pt-4 align-items-center w-100">
                 <div className="flex-grow-1">
-                  <h3 className="fw-bold text-white mb-1">Voice Conversion</h3>
+                  <h3 className="fw-bold text-white mb-1">Voice to Voice</h3>
                   <h6 className="fw-normal opacity-75 text-white">
                     Speak as someone else
                   </h6>
@@ -228,21 +398,24 @@ function LandingPage(props: Props) {
           <div className="col-12 col-md-6 col-lg-5 d-flex flex-column justify-content-center gap-3">
             <h2 className="fw-bold">Make your favorite characters talk</h2>
             <p className="opacity-75">
-              Our AI-powered text to speech service lets you choose your
-              favorite character's voice and input any text to hear them say it.
+              Our AI-powered text-to-speech and voice transformer tools let you
+              convert your text or voice into your favorite character's voice.
               Perfect for content creators and anyone looking to add personality
               to their messages.
             </p>
-            <div className="d-flex mt-3">
+            <div className="d-flex mt-3 gap-3">
               <Link to="/tts" className="btn btn-primary">
-                Generate text-to-speech
+                Text-to-Speech
+              </Link>
+              <Link to="/tts" className="btn btn-primary">
+                Voice Transformer
               </Link>
             </div>
           </div>
         </div>
       </div>
 
-      <div className="container section px-md-5 px-xl-3">
+      {/* <div className="container section px-md-5 px-xl-3">
         <div className="row g-4 g-lg-5">
           <div className="col-12 col-md-6 col-lg-7">
             <div className="position-relative">
@@ -278,7 +451,7 @@ function LandingPage(props: Props) {
             </div>
           </div>
         </div>
-      </div>
+      </div> */}
 
       <div className="d-flex flex-column section align-items-center panel rounded-0 my-5">
         <div className="d-flex flex-column align-items-center text-center cta-container">
