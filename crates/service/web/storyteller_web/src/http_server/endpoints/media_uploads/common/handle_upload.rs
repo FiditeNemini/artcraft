@@ -183,6 +183,7 @@ pub async fn handle_upload(
       "audio/m4a" /* .m4a */ => Some(MediaUploadType::Audio),
       "audio/mpeg" /* .mp3 */ => Some(MediaUploadType::Audio),
       "audio/ogg" /* .ogg */ => Some(MediaUploadType::Audio),
+      "audio/opus" /* .opus */ => Some(MediaUploadType::Audio),
       "audio/x-flac" /* .flac */ => Some(MediaUploadType::Audio),
       "audio/x-wav" /* .wav */ => Some(MediaUploadType::Audio),
       // Video
