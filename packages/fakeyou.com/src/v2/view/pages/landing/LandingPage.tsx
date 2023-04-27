@@ -98,7 +98,7 @@ function LandingPage(props: Props) {
 
   return (
     <motion.div initial="hidden" animate="visible" variants={container}>
-      <div className="container pb-md-0 pt-lg-2 px-md-5 px-lg-5 px-xl-3">
+      <div className="container pb-5 pb-lg-0 pt-lg-2 px-md-5 px-lg-5 px-xl-3">
         <div className="row flex-md-row-reverse">
           <div className="col-12 col-lg-5 p-md-0 d-flex justify-content-center">
             <img
@@ -112,7 +112,7 @@ function LandingPage(props: Props) {
             <h1 className="fw-bold display-5 text-center text-lg-start px-md-5 px-lg-0">
               Text to Speech, Voice Conversion & AI Tools
             </h1>
-            <p className="lead opacity-75 pb-4 text-center text-lg-start px-md-5 px-lg-0">
+            <p className="lead opacity-75 pb-4 text-center text-lg-start px-md-5 px-lg-0 pe-lg-5">
               Generate audio or videos of your favorite characters saying
               anything you want with FakeYou's deep fake tech.
             </p>
