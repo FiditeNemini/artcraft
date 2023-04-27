@@ -97,7 +97,7 @@ function LandingPage(props: Props) {
 
   return (
     <motion.div initial="hidden" animate="visible" variants={container}>
-      <div className="container pb-md-5 pt-lg-5 mb-4 px-md-5 px-lg-5 px-xl-3">
+      <div className="container pb-md-4 pt-lg-4 mb-2 px-md-5 px-lg-5 px-xl-3">
         <div className="row flex-md-row-reverse">
           <div className="col-12 col-lg-5 p-md-0 d-flex justify-content-center">
             <img
@@ -153,7 +153,7 @@ function LandingPage(props: Props) {
             <div className="panel panel-select d-flex flex-column align-items-center">
               <div className="d-flex px-4 pt-4 align-items-center w-100">
                 <div className="flex-grow-1">
-                  <h3 className="fw-bold text-white mb-1">Voice Conversion</h3>
+                  <h3 className="fw-bold text-white mb-1">Voice to Voice</h3>
                   <h6 className="fw-normal opacity-75 text-white">
                     Speak as someone else
                   </h6>
@@ -228,21 +228,24 @@ function LandingPage(props: Props) {
           <div className="col-12 col-md-6 col-lg-5 d-flex flex-column justify-content-center gap-3">
             <h2 className="fw-bold">Make your favorite characters talk</h2>
             <p className="opacity-75">
-              Our AI-powered text to speech service lets you choose your
-              favorite character's voice and input any text to hear them say it.
+              Our AI-powered text-to-speech and voice transformer tools let you
+              convert your text or voice into your favorite character's voice.
               Perfect for content creators and anyone looking to add personality
               to their messages.
             </p>
-            <div className="d-flex mt-3">
+            <div className="d-flex mt-3 gap-3">
               <Link to="/tts" className="btn btn-primary">
-                Generate text-to-speech
+                Text-to-Speech
+              </Link>
+              <Link to="/tts" className="btn btn-primary">
+                Voice Transformer
               </Link>
             </div>
           </div>
         </div>
       </div>
 
-      <div className="container section px-md-5 px-xl-3">
+      {/* <div className="container section px-md-5 px-xl-3">
         <div className="row g-4 g-lg-5">
           <div className="col-12 col-md-6 col-lg-7">
             <div className="position-relative">
@@ -278,7 +281,7 @@ function LandingPage(props: Props) {
             </div>
           </div>
         </div>
-      </div>
+      </div> */}
 
       <div className="d-flex flex-column section align-items-center panel rounded-0 my-5">
         <div className="d-flex flex-column align-items-center text-center cta-container">
