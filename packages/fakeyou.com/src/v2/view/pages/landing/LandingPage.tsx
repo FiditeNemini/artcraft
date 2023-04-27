@@ -310,7 +310,7 @@ function LandingPage(props: Props) {
               <Link to="/tts" className="btn btn-primary">
                 Text to Speech
               </Link>
-              <Link to="/tts" className="btn btn-primary">
+              <Link to="/voice-conversion" className="btn btn-primary">
                 Voice to Voice
               </Link>
             </div>
