@@ -2,7 +2,7 @@
 # https://github.com/actions/starter-workflows/ci/docker-publish.yml
 # If using base images, don't forget to add READ access, eg. from a package settings page like:
 # https://github.com/orgs/storytold/packages/container/docker-base-images-rust-ssl/settings/actions_access
-name: Publish Docker Container to GHCR
+name: [GPU] Publish Docker Container to GHCR
 on:
   push:
     branches:
@@ -10,7 +10,7 @@ on:
       #- $default-branch
       - master
 env:
-  IMAGE_NAME: storyteller-rust
+  IMAGE_NAME: storyteller-rust-gpu
 
 jobs:
   # Push image to GitHub Packages.
@@ -63,7 +63,8 @@ jobs:
           registry: ghcr.io
           username: ${{ github.actor }} # username: ${{ github.repository_owner }}
           password: ${{ secrets.GITHUB_TOKEN }}
-          image_name: storytold/storyteller-rust
+          image_name: storytold/storyteller-rust-gpu
+          dockerfile: service_gpu.Dockerfile
           # NB: The `git_push_tag: true` option does not work as expected, so we put the sha in `image_tag`:
           # https://github.com/whoan/docker-build-with-cache-action/issues/72
           image_tag: latest,${{ github.sha }},${{ steps.vars.outputs.sha_short }}

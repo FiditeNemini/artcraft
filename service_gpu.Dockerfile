@@ -1,0 +1,192 @@
+# ================================================================
+# =============== (1) set up core rust build image ===============
+# ================================================================
+
+# Custom base image
+# Make sure to add this repository so it has read acces to the base image:
+# https://github.com/orgs/storytold/packages/container/docker-base-images-rust-ssl/settings/actions_access
+# FROM ghcr.io/storytold/docker-base-images-rust-ssl:d94ce4350c3b as rust-build
+FROM ubuntu:jammy as rust-base
+
+# NB: This can be "stable" or another version.
+ARG RUST_TOOLCHAIN="1.66.0"
+
+WORKDIR /tmp
+
+# NB: cmake is required for freetype-sys-0.13.1, which in turn has only been added for egui.
+# NB: fontconfig is required by servo-fontconfig-sys, which is in the dependency chain for egui.
+# NB: libfontconfig-dev is required by servo-fontconfig-sys, which is in the dependency chain for egui.
+# NB: pkg-config and libssl are for container TLS; we may switch to rustls in the future.
+RUN apt-get update \
+    && DEBIAN_FRONTEND=noninteractive TZ=Etc/UTC apt-get install -y \
+        build-essential \
+        cmake \
+        curl \
+        fontconfig \
+        libfontconfig1-dev \
+        libssl-dev \
+        pkg-config
+
+# NB: Fix for fontconfig (servo-fontconfig-sys): https://github.com/alacritty/alacritty/issues/4423#issuecomment-727277235
+# TODO(bt, 2023-02-23): This has not been verified to work yet.
+RUN export PKG_CONFIG_PATH=/usr/lib/x86_64-linux-gnu/pkgconfig
+
+# Install Rust
+RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs \
+    | sh  -s -- --default-toolchain $RUST_TOOLCHAIN -y
+
+# Install correct Rust version
+#RUN $HOME/.cargo/bin/rustup install $RUST_VERSION
+#RUN $HOME/.cargo/bin/rustup default $RUST_VERSION
+
+# Report Rust version for build debugging
+RUN $HOME/.cargo/bin/rustup show
+RUN $HOME/.cargo/bin/rustc --version
+RUN $HOME/.cargo/bin/cargo --version
+
+# Cargo Chef does Rust build caching: https://github.com/LukeMathWalker/cargo-chef
+# TODO(bt,2023-03-08): builds are failing with "no space left on device"; disabling build caching
+#RUN $HOME/.cargo/bin/cargo install cargo-chef --locked
+
+# ======================================================================
+# =============== (2) use cargo-chef to "plan" the build ===============
+# ======================================================================
+
+FROM rust-base AS planner
+
+# NB: Copying in everything does not appear to impact cached builds if irrelevant files are changed (at least at this step)
+# TODO(bt,2023-03-08): builds are failing with "no space left on device"; disabling build caching
+#COPY . .
+# TODO(bt,2023-03-08): builds are failing with "no space left on device"; disabling build caching
+#RUN $HOME/.cargo/bin/cargo chef prepare --recipe-path recipe.json
+
+# ======================================================================================================
+# =============== (3) "cook" the libraries (cacheable), then run the app build and tests ===============
+# ======================================================================================================
+
+FROM rust-base AS builder
+
+# TODO(bt,2023-03-08): builds are failing with "no space left on device"; disabling build caching
+#COPY --from=planner /tmp/recipe.json recipe.json
+
+# NB: This step builds and caches the dependencies as its own layer.
+# TODO(bt,2023-03-08): builds are failing with "no space left on device"; disabling build caching
+#RUN $HOME/.cargo/bin/cargo chef cook --release --recipe-path recipe.json
+
+# NB: Now we build and test our code.
+COPY Cargo.lock .
+COPY Cargo.toml .
+COPY crates/ ./crates
+COPY db/ ./db
+COPY test_data/ ./test_data
+COPY container_includes/ ./container_includes
+
+# Print a report on disk space
+#RUN echo "Disk usage at root (before tests):"
+#RUN du -hsc / | sort -hr
+RUN echo "Disk usage at current directory (before tests):"
+RUN pwd
+RUN du -hsc * | sort -hr
+
+# Run all of the tests
+#RUN SQLX_OFFLINE=true \
+#  LD_LIBRARY_PATH=/usr/lib:${LD_LIBRARY_PATH} \
+#  $HOME/.cargo/bin/cargo test
+
+# Print a report on disk space
+#RUN echo "Disk usage at root (after tests):"
+#RUN du -hsc / | sort -hr
+RUN echo "Disk usage at current directory (after tests):"
+RUN pwd
+RUN du -hsc * | sort -hr
+
+# Build all the binaries that run on GPU, including "dummy-service".
+RUN SQLX_OFFLINE=true \
+  LD_LIBRARY_PATH=/usr/lib:${LD_LIBRARY_PATH} \
+  $HOME/.cargo/bin/cargo build \
+  --release \
+  --bin dummy-service
+
+RUN SQLX_OFFLINE=true \
+  LD_LIBRARY_PATH=/usr/lib:${LD_LIBRARY_PATH} \
+  $HOME/.cargo/bin/cargo build \
+  --release \
+  --bin download-job
+
+RUN SQLX_OFFLINE=true \
+  LD_LIBRARY_PATH=/usr/lib:${LD_LIBRARY_PATH} \
+  $HOME/.cargo/bin/cargo build \
+  --release \
+  --bin inference-job
+
+# Print a report on disk space
+RUN echo "Disk usage at current directory (after all builds):"
+RUN pwd
+RUN du -hsc * | sort -hr
+
+# =============================================================
+# =============== (4) construct the final image ===============
+# =============================================================
+
+# Final image
+#FROM ubuntu:jammy as final
+# TODO(bt,2023-04-26): This is only necessary for download-job and inference-job
+FROM nvidia/cuda:12.0.1-runtime-ubuntu22.04 as final
+
+# See: https://github.com/opencontainers/image-spec/blob/master/annotations.md
+LABEL org.opencontainers.image.title='Storyteller Rust (GPU)'
+LABEL org.opencontainers.image.authors='bt@brand.io, echelon@gmail.com'
+LABEL org.opencontainers.image.description='All of the binaries from the Rust monorepo (GPU)'
+LABEL org.opencontainers.image.documentation='https://github.com/storytold/storyteller-web'
+LABEL org.opencontainers.image.source='https://github.com/storytold/storyteller-web'
+LABEL org.opencontainers.image.url='https://github.com/storytold/storyteller-web'
+
+WORKDIR /
+
+# Give the container its version so it can report over HTTP.
+ARG GIT_SHA
+RUN echo -n ${GIT_SHA} > GIT_SHA
+
+# Copy all the binaries.
+COPY --from=builder /tmp/target/release/dummy-service /
+COPY --from=builder /tmp/target/release/download-job /
+COPY --from=builder /tmp/target/release/inference-job /
+
+# SSL certs are required for crypto
+COPY --from=builder /etc/ssl /etc/ssl
+
+# Required dynamically linked libraries
+COPY --from=builder /usr/lib/x86_64-linux-gnu/libssl.*             /lib/x86_64-linux-gnu/
+COPY --from=builder /usr/lib/x86_64-linux-gnu/libcrypto.*          /lib/x86_64-linux-gnu/
+
+# Container includes
+COPY container_includes/ /container_includes
+
+# Make sure all the links resolve
+RUN ldd storyteller-web
+
+# Without a .env file, Rust crashes "mysteriously" (ugh)
+RUN touch .env
+RUN touch .env-secrets
+
+# Some services have default env files that live under their code directories
+# These should also be readable from the relative current path
+COPY crates/service/job/download_job/config/download-job.common.env .
+COPY crates/service/job/download_job/config/download-job.production.env .
+
+COPY crates/service/job/inference_job/config/inference-job.common.env .
+COPY crates/service/job/inference_job/config/inference-job.production.env .
+
+# Need python to make use of other containers' venv
+# TODO(bt,2023-04-26): This is only necessary for download-job and inference-job
+RUN apt-get update && DEBIAN_FRONTEND=noninteractive TZ=Etc/UTC apt-get install -y \
+    ffmpeg \
+    libsndfile1 \
+    nvidia-driver-515 \
+    python3-pip \
+    python3.10 \
+    python3.10-venv \
+    --no-install-recommends \
+    && apt-get clean autoclean && apt-get autoremove -y && rm -rf /var/lib/{apt,dpkg,cache,log}/
+
+EXPOSE 8080

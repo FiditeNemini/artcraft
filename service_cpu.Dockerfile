@@ -123,18 +123,6 @@ RUN SQLX_OFFLINE=true \
   LD_LIBRARY_PATH=/usr/lib:${LD_LIBRARY_PATH} \
   $HOME/.cargo/bin/cargo build \
   --release \
-  --bin download-job
-
-RUN SQLX_OFFLINE=true \
-  LD_LIBRARY_PATH=/usr/lib:${LD_LIBRARY_PATH} \
-  $HOME/.cargo/bin/cargo build \
-  --release \
-  --bin inference-job
-
-RUN SQLX_OFFLINE=true \
-  LD_LIBRARY_PATH=/usr/lib:${LD_LIBRARY_PATH} \
-  $HOME/.cargo/bin/cargo build \
-  --release \
   --bin tts-download-job
 
 RUN SQLX_OFFLINE=true \
@@ -177,14 +165,12 @@ RUN du -hsc * | sort -hr
 # =============================================================
 
 # Final image
-#FROM ubuntu:jammy as final
-# TODO(bt,2023-04-26): This is only necessary for download-job and inference-job
-FROM nvidia/cuda:12.0.1-runtime-ubuntu22.04 as final
+FROM ubuntu:jammy as final
 
 # See: https://github.com/opencontainers/image-spec/blob/master/annotations.md
-LABEL org.opencontainers.image.title='Storyteller Rust'
+LABEL org.opencontainers.image.title='Storyteller Rust (CPU)'
 LABEL org.opencontainers.image.authors='bt@brand.io, echelon@gmail.com'
-LABEL org.opencontainers.image.description='All of the binaries from the Rust monorepo'
+LABEL org.opencontainers.image.description='All of the binaries from the Rust monorepo (CPU)'
 LABEL org.opencontainers.image.documentation='https://github.com/storytold/storyteller-web'
 LABEL org.opencontainers.image.source='https://github.com/storytold/storyteller-web'
 LABEL org.opencontainers.image.url='https://github.com/storytold/storyteller-web'
@@ -195,12 +181,12 @@ WORKDIR /
 ARG GIT_SHA
 RUN echo -n ${GIT_SHA} > GIT_SHA
 
-# Copy all the binaries.
+# Copy all the binaries (except those that need a GPU):
 COPY --from=builder /tmp/target/release/storyteller-web /
 COPY --from=builder /tmp/target/release/dummy-service /
 COPY --from=builder /tmp/target/release/analytics-job /
-COPY --from=builder /tmp/target/release/download-job /
-COPY --from=builder /tmp/target/release/inference-job /
+
+# Legacy apps:
 COPY --from=builder /tmp/target/release/tts-download-job /
 COPY --from=builder /tmp/target/release/tts-inference-job /
 COPY --from=builder /tmp/target/release/w2l-download-job /
@@ -227,26 +213,8 @@ RUN touch .env-secrets
 
 # Some services have default env files that live under their code directories
 # These should also be readable from the relative current path
-COPY crates/service/job/download_job/config/download-job.common.env .
-COPY crates/service/job/download_job/config/download-job.production.env .
-
-COPY crates/service/job/inference_job/config/inference-job.common.env .
-COPY crates/service/job/inference_job/config/inference-job.production.env .
-
 COPY crates/service/web/storyteller_web/config/storyteller-web.common.env .
 COPY crates/service/web/storyteller_web/config/storyteller-web.production.env .
-
-# Need python to make use of other containers' venv
-# TODO(bt,2023-04-26): This is only necessary for download-job and inference-job
-RUN apt-get update && DEBIAN_FRONTEND=noninteractive TZ=Etc/UTC apt-get install -y \
-    ffmpeg \
-    libsndfile1 \
-    nvidia-driver-515 \
-    python3-pip \
-    python3.10 \
-    python3.10-venv \
-    --no-install-recommends \
-    && apt-get clean autoclean && apt-get autoremove -y && rm -rf /var/lib/{apt,dpkg,cache,log}/
 
 EXPOSE 8080
 CMD LD_LIBRARY_PATH=/usr/lib /storyteller-web
