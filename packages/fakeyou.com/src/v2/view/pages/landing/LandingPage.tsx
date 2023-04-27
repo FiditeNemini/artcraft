@@ -13,6 +13,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { faDiscord, faTwitter } from "@fortawesome/free-brands-svg-icons";
 import { WebUrl } from "../../../../common/WebUrl";
+import { faMicrophone, faRightLeft } from "@fortawesome/pro-solid-svg-icons";
 // import { Analytics } from "../../../../../common/Analytics";
 
 interface Props {
@@ -97,7 +98,7 @@ function LandingPage(props: Props) {
 
   return (
     <motion.div initial="hidden" animate="visible" variants={container}>
-      <div className="container pb-md-3 pt-lg-3 mb-2 px-md-5 px-lg-5 px-xl-3">
+      <div className="container pb-md-0 pt-lg-2 px-md-5 px-lg-5 px-xl-3">
         <div className="row flex-md-row-reverse">
           <div className="col-12 col-lg-5 p-md-0 d-flex justify-content-center">
             <img
@@ -121,6 +122,175 @@ function LandingPage(props: Props) {
               {viewPricingButton}
               {myProfileButton}
             </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="container-panel pb-5 mb-5">
+        <div className="panel p-3 py-4 p-md-4">
+          <div className="d-flex gap-4">
+            <form
+              className="w-100 d-flex flex-column"
+              // onSubmit={handleFormSubmit}
+            >
+              <div className="row gx-5 gy-5">
+                <div className="col-12 d-flex flex-column gap-4">
+                  <div>
+                    <label className="sub-title">
+                      Choose Target Voice (xxx to choose from)
+                    </label>
+                    <div className="input-icon-search pb-4">
+                      <span className="form-control-feedback">
+                        <FontAwesomeIcon icon={faMicrophone} />
+                      </span>
+
+                      {/* <VcModelListSearch
+                  voiceConversionModels={props.voiceConversionModels}
+                  setVoiceConversionModels={props.setVoiceConversionModels}
+                  maybeSelectedVoiceConversionModel={
+                    props.maybeSelectedVoiceConversionModel
+                  }
+                  setMaybeSelectedVoiceConversionModel={interceptModelChange}
+                /> */}
+                    </div>
+                  </div>
+
+                  <ul className="nav nav-tabs nav-vc" id="myTab" role="tablist">
+                    <li className="nav-item w-100" role="presentation">
+                      <button
+                        className="nav-link active w-100"
+                        id="prerecorded-tab"
+                        data-bs-toggle="tab"
+                        data-bs-target="#prerecorded"
+                        type="button"
+                        role="tab"
+                        aria-controls="prerecorded"
+                        aria-selected="true"
+                      >
+                        Pre-recorded
+                      </button>
+                    </li>
+                    <li className="nav-item w-100" role="presentation">
+                      <button
+                        className="nav-link w-100"
+                        id="recordaudio-tab"
+                        data-bs-toggle="tab"
+                        data-bs-target="#recordaudio"
+                        type="button"
+                        role="tab"
+                        aria-controls="recordaudio"
+                        aria-selected="false"
+                      >
+                        Microphone
+                      </button>
+                    </li>
+                  </ul>
+                  <div className="tab-content" id="myTabContent">
+                    <div
+                      className="tab-pane fade show active"
+                      id="prerecorded"
+                      role="tabpanel"
+                      aria-labelledby="prerecorded-tab"
+                    >
+                      <div className="d-flex flex-column gap-4 h-100">
+                        <div>
+                          <label className="sub-title">
+                            Upload Input Audio
+                          </label>
+                          <div className="d-flex flex-column gap-3 upload-component">
+                            {/* <UploadComponent
+                              setMediaUploadToken={setMediaUploadToken}
+                              formIsCleared={formIsCleared}
+                              setFormIsCleared={setFormIsCleared}
+                              setCanConvert={setCanConvert}
+                              changeConvertIdempotencyToken={
+                                changeConvertIdempotencyToken
+                              }
+                            /> */}
+                          </div>
+                        </div>
+
+                        {/*<div>
+                          <label className="sub-title">
+                            Or pick from your audio collection (5 files)
+                          </label>
+                          <div className="d-flex flex-column gap-3">
+                            <div className="input-icon-search">
+                              <span className="form-control-feedback">
+                                <FontAwesomeIcon icon={faFiles} />
+                              </span>
+
+                              <Select
+                                value="test"
+                                classNames={SearchFieldClass}
+                                // On mobile, we don't want the onscreen keyboard to take up half the UI.
+                                autoFocus={false}
+                                isSearchable={false}
+                                // NB: The following settings improve upon performance.
+                                // See: https://github.com/JedWatson/react-select/issues/3128
+                                filterOption={createFilter({
+                                  ignoreAccents: false,
+                                })}
+                              />
+                            </div>
+                          </div>
+                              </div>*/}
+
+                        <div>
+                          <label className="sub-title">Convert Audio</label>
+
+                          <div className="d-flex gap-3">
+                            <button className="btn btn-primary w-100">
+                              <FontAwesomeIcon
+                                icon={faRightLeft}
+                                className="me-2"
+                              />
+                              Convert
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      className="tab-pane fade"
+                      id="recordaudio"
+                      role="tabpanel"
+                      aria-labelledby="recordaudio-tab"
+                    >
+                      <div className="d-flex flex-column gap-4 h-100">
+                        <div>
+                          <label className="sub-title">Record Audio</label>
+                          <div className="d-flex flex-column gap-3 upload-component">
+                            {/* <RecordComponent
+                              setMediaUploadToken={setMediaUploadToken}
+                              formIsCleared={formIsCleared}
+                              setFormIsCleared={setFormIsCleared}
+                              setCanConvert={setCanConvert}
+                              changeConvertIdempotencyToken={
+                                changeConvertIdempotencyToken
+                              }
+                            /> */}
+                          </div>
+                        </div>
+                        <div>
+                          <label className="sub-title">Convert Audio</label>
+
+                          <div className="d-flex gap-3">
+                            <button className="btn btn-primary w-100">
+                              <FontAwesomeIcon
+                                icon={faRightLeft}
+                                className="me-2"
+                              />
+                              Convert
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </form>
           </div>
         </div>
       </div>

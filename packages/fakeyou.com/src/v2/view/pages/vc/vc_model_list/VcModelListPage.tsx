@@ -14,11 +14,21 @@ import {
 import UploadComponent from "./components/UploadComponent";
 import RecordComponent from "./components/RecordComponent";
 import { usePrefixedDocumentTitle } from "../../../../../common/UsePrefixedDocumentTitle";
-import { ListVoiceConversionModels, VoiceConversionModelListItem } from "@storyteller/components/src/api/voice_conversion/ListVoiceConversionModels";
+import {
+  ListVoiceConversionModels,
+  VoiceConversionModelListItem,
+} from "@storyteller/components/src/api/voice_conversion/ListVoiceConversionModels";
 import { VcModelListSearch } from "./components/VcModelListSearchComponent";
-import { EnqueueVoiceConversion, EnqueueVoiceConversionIsSuccess, EnqueueVoiceConversionRequest } from "@storyteller/components/src/api/voice_conversion/EnqueueVoiceConversion";
+import {
+  EnqueueVoiceConversion,
+  EnqueueVoiceConversionIsSuccess,
+  EnqueueVoiceConversionRequest,
+} from "@storyteller/components/src/api/voice_conversion/EnqueueVoiceConversion";
 import { Analytics } from "../../../../../common/Analytics";
-import { FrontendInferenceJobType, InferenceJob } from "@storyteller/components/src/jobs/InferenceJob";
+import {
+  FrontendInferenceJobType,
+  InferenceJob,
+} from "@storyteller/components/src/jobs/InferenceJob";
 import { SessionVoiceConversionResultsList } from "../../../_common/SessionVoiceConversionResultsList";
 
 interface Props {
@@ -26,12 +36,19 @@ interface Props {
   sessionSubscriptionsWrapper: SessionSubscriptionsWrapper;
 
   voiceConversionModels: Array<VoiceConversionModelListItem>;
-  setVoiceConversionModels: (ttsVoices: Array<VoiceConversionModelListItem>) => void;
+  setVoiceConversionModels: (
+    ttsVoices: Array<VoiceConversionModelListItem>
+  ) => void;
 
   maybeSelectedVoiceConversionModel?: VoiceConversionModelListItem;
-  setMaybeSelectedVoiceConversionModel: (maybeSelectedVoiceConversionModel: VoiceConversionModelListItem) => void;
+  setMaybeSelectedVoiceConversionModel: (
+    maybeSelectedVoiceConversionModel: VoiceConversionModelListItem
+  ) => void;
 
-  enqueueInferenceJob: (jobToken: string, frontendInferenceJobType: FrontendInferenceJobType) => void;
+  enqueueInferenceJob: (
+    jobToken: string,
+    frontendInferenceJobType: FrontendInferenceJobType
+  ) => void;
   inferenceJobs: Array<InferenceJob>;
   inferenceJobsByCategory: Map<FrontendInferenceJobType, Array<InferenceJob>>;
 }
@@ -41,9 +58,13 @@ function VcModelListPage(props: Props) {
 
   const [canConvert, setCanConvert] = useState(false);
 
-  const [mediaUploadToken, setMediaUploadToken] = useState<string|undefined>(undefined);
+  const [mediaUploadToken, setMediaUploadToken] = useState<string | undefined>(
+    undefined
+  );
 
-  const [convertIdempotencyToken, setConvertIdempotencyToken] = useState(uuidv4());
+  const [convertIdempotencyToken, setConvertIdempotencyToken] = useState(
+    uuidv4()
+  );
 
   // NB: Something of a UI hack here.
   // The 3rd party microphone component doesn't let you clear it, so we emulate form clearing
@@ -90,32 +111,48 @@ function VcModelListPage(props: Props) {
 
   const changeConvertIdempotencyToken = () => {
     setConvertIdempotencyToken(uuidv4());
-  }
+  };
 
-  const interceptModelChange = (maybeSelectedVoiceConversionModel: VoiceConversionModelListItem) => {
-    if (maybeSelectedVoiceConversionModel !== props.maybeSelectedVoiceConversionModel) {
+  const interceptModelChange = (
+    maybeSelectedVoiceConversionModel: VoiceConversionModelListItem
+  ) => {
+    if (
+      maybeSelectedVoiceConversionModel !==
+      props.maybeSelectedVoiceConversionModel
+    ) {
       changeConvertIdempotencyToken();
     }
-    props.setMaybeSelectedVoiceConversionModel(maybeSelectedVoiceConversionModel);
-  }
+    props.setMaybeSelectedVoiceConversionModel(
+      maybeSelectedVoiceConversionModel
+    );
+  };
 
   const handleVoiceConversion = async () => {
-    if (props.maybeSelectedVoiceConversionModel === undefined || mediaUploadToken === undefined) {
+    if (
+      props.maybeSelectedVoiceConversionModel === undefined ||
+      mediaUploadToken === undefined
+    ) {
       return;
     }
 
-    let request : EnqueueVoiceConversionRequest = {
+    let request: EnqueueVoiceConversionRequest = {
       uuid_idempotency_token: convertIdempotencyToken,
-      voice_conversion_model_token: props.maybeSelectedVoiceConversionModel.token,
+      voice_conversion_model_token:
+        props.maybeSelectedVoiceConversionModel.token,
       source_media_upload_token: mediaUploadToken,
     };
 
-    Analytics.voiceConversionGenerate(props.maybeSelectedVoiceConversionModel.token);
+    Analytics.voiceConversionGenerate(
+      props.maybeSelectedVoiceConversionModel.token
+    );
 
     let result = await EnqueueVoiceConversion(request);
 
     if (EnqueueVoiceConversionIsSuccess(result)) {
-      props.enqueueInferenceJob(result.inference_job_token, FrontendInferenceJobType.VoiceConversion);
+      props.enqueueInferenceJob(
+        result.inference_job_token,
+        FrontendInferenceJobType.VoiceConversion
+      );
     }
   };
 
@@ -129,9 +166,10 @@ function VcModelListPage(props: Props) {
     ? "btn btn-primary w-100 disabled"
     : "btn btn-primary w-100";
 
-  const enableConvertButton = canConvert 
-    && mediaUploadToken !== undefined 
-    && props.maybeSelectedVoiceConversionModel !== undefined;
+  const enableConvertButton =
+    canConvert &&
+    mediaUploadToken !== undefined &&
+    props.maybeSelectedVoiceConversionModel !== undefined;
 
   return (
     <motion.div initial="hidden" animate="visible" variants={container}>
@@ -149,7 +187,8 @@ function VcModelListPage(props: Props) {
             >
               {/* Explore Rollout */}
               <label className="sub-title">
-                Choose Target Voice ({voiceConversionModels.length} to choose from)
+                Choose Target Voice ({voiceConversionModels.length} to choose
+                from)
               </label>
               <div className="input-icon-search pb-4">
                 <span className="form-control-feedback">
@@ -159,10 +198,11 @@ function VcModelListPage(props: Props) {
                 <VcModelListSearch
                   voiceConversionModels={props.voiceConversionModels}
                   setVoiceConversionModels={props.setVoiceConversionModels}
-                  maybeSelectedVoiceConversionModel={props.maybeSelectedVoiceConversionModel}
+                  maybeSelectedVoiceConversionModel={
+                    props.maybeSelectedVoiceConversionModel
+                  }
                   setMaybeSelectedVoiceConversionModel={interceptModelChange}
-                  />
-
+                />
               </div>
 
               <div className="row gx-5 gy-5">
@@ -210,12 +250,14 @@ function VcModelListPage(props: Props) {
                             Upload Input Audio
                           </label>
                           <div className="d-flex flex-column gap-3 upload-component">
-                            <UploadComponent 
+                            <UploadComponent
                               setMediaUploadToken={setMediaUploadToken}
                               formIsCleared={formIsCleared}
                               setFormIsCleared={setFormIsCleared}
                               setCanConvert={setCanConvert}
-                              changeConvertIdempotencyToken={changeConvertIdempotencyToken}
+                              changeConvertIdempotencyToken={
+                                changeConvertIdempotencyToken
+                              }
                             />
                           </div>
                         </div>
@@ -247,9 +289,7 @@ function VcModelListPage(props: Props) {
                               </div>*/}
 
                         <div>
-                          <label className="sub-title">
-                            Convert Audio
-                          </label>
+                          <label className="sub-title">Convert Audio</label>
 
                           <div className="d-flex gap-3">
                             <button
@@ -267,7 +307,6 @@ function VcModelListPage(props: Props) {
                             </button>
                           </div>
                         </div>
-
                       </div>
                     </div>
                     <div
@@ -280,20 +319,20 @@ function VcModelListPage(props: Props) {
                         <div>
                           <label className="sub-title">Record Audio</label>
                           <div className="d-flex flex-column gap-3 upload-component">
-                            <RecordComponent 
+                            <RecordComponent
                               setMediaUploadToken={setMediaUploadToken}
                               formIsCleared={formIsCleared}
                               setFormIsCleared={setFormIsCleared}
                               setCanConvert={setCanConvert}
-                              changeConvertIdempotencyToken={changeConvertIdempotencyToken}
+                              changeConvertIdempotencyToken={
+                                changeConvertIdempotencyToken
+                              }
                             />
                           </div>
                         </div>
 
                         <div>
-                          <label className="sub-title">
-                            Convert Audio
-                          </label>
+                          <label className="sub-title">Convert Audio</label>
 
                           <div className="d-flex gap-3">
                             <button
@@ -311,7 +350,6 @@ function VcModelListPage(props: Props) {
                             </button>
                           </div>
                         </div>
-
                       </div>
                     </div>
                   </div>
@@ -326,9 +364,15 @@ function VcModelListPage(props: Props) {
                       Session VC Results
                     </h4>
                     <div className="d-flex flex-column gap-3 session-tts-section">
-                      <SessionVoiceConversionResultsList 
-                        inferenceJobs={props.inferenceJobsByCategory.get(FrontendInferenceJobType.VoiceConversion)!}
-                        sessionSubscriptionsWrapper={props.sessionSubscriptionsWrapper}
+                      <SessionVoiceConversionResultsList
+                        inferenceJobs={
+                          props.inferenceJobsByCategory.get(
+                            FrontendInferenceJobType.VoiceConversion
+                          )!
+                        }
+                        sessionSubscriptionsWrapper={
+                          props.sessionSubscriptionsWrapper
+                        }
                       />
                     </div>
                   </div>
