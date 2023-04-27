@@ -219,7 +219,7 @@ function VcModelListPage(props: Props) {
                         aria-controls="prerecorded"
                         aria-selected="true"
                       >
-                        Pre-recorded
+                        Upload
                       </button>
                     </li>
                     <li className="nav-item w-100" role="presentation">
