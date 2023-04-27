@@ -187,7 +187,7 @@ function VcModelListPage(props: Props) {
           <span className="fw-medium">
             We're paying you for new voice-to-voice model submissions!
           </span>
-          <a href="httpsL//discord.gg/fakeyou" className="fw-semibold ms-2">
+          <a href="https://discord.gg/fakeyou" className="fw-semibold ms-2">
             Join our Discord{" "}
             <FontAwesomeIcon icon={faArrowRight} className="ms-1" />
           </a>
