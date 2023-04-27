@@ -126,7 +126,8 @@ function LandingPage(props: Props) {
           </div>
           <div className="col-12 col-lg-7 d-flex flex-column justify-content-center flex-reverse px-md-5 px-lg-3">
             <h1 className="fw-bold display-5 text-center text-lg-start px-md-5 px-lg-0">
-              Text to Speech, Voice Conversion & AI Tools
+              AI Music, Text to Speech,
+              <br />& Voice Transformation
             </h1>
             <p className="lead opacity-75 pb-4 text-center text-lg-start px-md-5 px-lg-0 pe-lg-5">
               Generate audio or videos of your favorite characters saying
