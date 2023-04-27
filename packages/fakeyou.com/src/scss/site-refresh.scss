@@ -1247,6 +1247,11 @@ styles with important tags:
       transition: 0.2s all;
       transform: scale(1.05);
     }
+
+    &:hover .btn {
+      transition: 0.2s all;
+      background-color: lighten($primary, 5%);
+    }
   }
 }
 
