@@ -148,8 +148,8 @@ impl SoVitsSvcInferenceCommand {
           }
 
           if let Some(hubert_path) = maybe_hubert_path.as_deref() {
-            let cache_dir = cache_dir.to_string_lossy().to_string();
-            docker_env_vars.push(DockerEnvVar::new("HUBERT_PATH", &cache_dir));
+            let hubert_path = hubert_path.to_string_lossy().to_string();
+            docker_env_vars.push(DockerEnvVar::new("HUBERT_PATH", &hubert_path));
           }
 
           let maybe_environment_variables =
