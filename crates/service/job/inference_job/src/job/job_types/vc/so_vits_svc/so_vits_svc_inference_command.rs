@@ -1,11 +1,11 @@
-use std::env;
-use std::ffi::OsString;
+use anyhow::anyhow;
 use container_common::anyhow_result::AnyhowResult;
 use filesys::path_to_string::path_to_string;
 use log::info;
+use std::env;
+use std::ffi::OsString;
 use std::fs::OpenOptions;
 use std::path::{Path, PathBuf};
-use anyhow::anyhow;
 use subprocess::{Popen, PopenConfig, Redirection};
 use subprocess_common::docker_options::{DockerEnvVar, DockerFilesystemMount, DockerGpu, DockerOptions};
 
@@ -27,6 +27,9 @@ pub struct SoVitsSvcInferenceCommand {
 
   /// If this is run under Docker (eg. in development), these are the options.
   maybe_docker_options: Option<DockerOptions>,
+
+  /// Where to cache hubert. We send this to the model via HUBERT_PATH env var.
+  maybe_hubert_path: Option<PathBuf>,
 
   maybe_huggingface_cache_dir: Option<PathBuf>,
   maybe_nltk_cache_dir: Option<PathBuf>,
@@ -75,6 +78,7 @@ impl SoVitsSvcInferenceCommand {
     maybe_virtual_env_activation_command: Option<&str>,
     maybe_default_config_path: Option<P>,
     maybe_docker_options: Option<DockerOptions>,
+    maybe_hubert_path: Option<P>,
     maybe_huggingface_cache_dir: Option<P>,
     maybe_nltk_cache_dir: Option<P>,
   ) -> Self {
@@ -84,6 +88,7 @@ impl SoVitsSvcInferenceCommand {
       maybe_virtual_env_activation_command: maybe_virtual_env_activation_command.map(|s| s.to_string()),
       maybe_default_config_path: maybe_default_config_path.map(|p| p.as_ref().to_path_buf()),
       maybe_docker_options,
+      maybe_hubert_path: maybe_hubert_path.map(|s| s.as_ref().to_path_buf()),
       maybe_huggingface_cache_dir: maybe_huggingface_cache_dir.map(|s| s.as_ref().to_path_buf()),
       maybe_nltk_cache_dir: maybe_nltk_cache_dir.map(|s| s.as_ref().to_path_buf()),
     }
@@ -115,6 +120,9 @@ impl SoVitsSvcInferenceCommand {
 
     let maybe_default_config_path = easyenv::get_env_pathbuf_optional(
       "SO_VITS_SVC_INFERENCE_MAYBE_DEFAULT_CONFIG_PATH");
+
+    let maybe_hubert_path =
+        easyenv::get_env_pathbuf_optional("HUBERT_PATH");
 
     let maybe_huggingface_cache_dir =
         easyenv::get_env_pathbuf_optional("HF_DATASETS_CACHE");
@@ -156,6 +164,7 @@ impl SoVitsSvcInferenceCommand {
       maybe_virtual_env_activation_command,
       maybe_default_config_path,
       maybe_docker_options,
+      maybe_hubert_path,
       maybe_huggingface_cache_dir,
       maybe_nltk_cache_dir,
     })
@@ -264,10 +273,21 @@ impl SoVitsSvcInferenceCommand {
     }*/
 
     // Copy all environment variables from the parent process.
+    // This is necessary to send all the kubernetes settings for Nvidia / CUDA.
     for (env_key, env_value) in env::vars() {
       env_vars.push((
         OsString::from(env_key),
         OsString::from(env_value),
+      ));
+    }
+
+    // In production / k8s, we should get this env var from the deployment and handle it
+    // more generally when copying over all environment variables, but in local development
+    // we're explicit since it may not be set outside of config files.
+    if let Some(hubert_path) = self.maybe_hubert_path.as_ref() {
+      env_vars.push((
+        OsString::from("HUBERT_PATH"),
+        OsString::from(hubert_path),
       ));
     }
 
