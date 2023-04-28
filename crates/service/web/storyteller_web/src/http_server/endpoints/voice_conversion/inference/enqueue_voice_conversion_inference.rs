@@ -15,7 +15,7 @@ use enums::common::visibility::Visibility;
 use http_server_common::request::get_request_header_optional::get_request_header_optional;
 use http_server_common::request::get_request_ip::get_request_ip;
 use log::{info, warn};
-use mysql_queries::payloads::generic_inference_args::{GenericInferenceArgs, InferenceCategoryAbbreviated};
+use mysql_queries::payloads::generic_inference_args::{GenericInferenceArgs, InferenceCategoryAbbreviated, PolymorphicInferenceArgs};
 use mysql_queries::queries::generic_inference::web::insert_generic_inference_job::{InsertGenericInferenceArgs, insert_generic_inference_job};
 use r2d2_redis::redis::Commands;
 use redis_common::redis_keys::RedisKeys;
@@ -43,6 +43,11 @@ pub struct EnqueueVoiceConversionInferenceRequest {
 
   creator_set_visibility: Option<Visibility>,
   is_storyteller_demo: Option<bool>,
+
+  /// Argument for so-vits-svc
+  /// The python model defaults to true, but that sounds awful,
+  /// so we default to false unless specified.
+  auto_predict_f0: Option<bool>,
 }
 
 #[derive(Serialize)]
@@ -215,13 +220,13 @@ pub async fn enqueue_voice_conversion_inference_handler(
 
   info!("Creating voice conversion inference job record...");
 
+  let mut maybe_args = None;
 
-  // TODO TODO TODO TODO --- InferenceArgs. ! This is where the media token will live.
-  //  - Also maybe move reusable_types stuff to `_types` as a manner of cleanup
-  //  - Also figure out which serializable types are giving the DB trouble. Wasn't this solved?
-  //     I don't want to call to_str, as_str, etc. everywhere.
-  //  - INFERENCE JOB(1) -> Voice Conversion (w/ Docker sidecar)
-  //  - INFERENCE JOB(2) -> Get it working with TTS too, and update the frontend
+  if let Some(auto_predict_f0) = request.auto_predict_f0 {
+    maybe_args = Some(PolymorphicInferenceArgs::Vc {
+      auto_predict_f0: Some(auto_predict_f0),
+    });
+  }
 
   let query_result = insert_generic_inference_job(InsertGenericInferenceArgs {
     uuid_idempotency_token: &request.uuid_idempotency_token,
@@ -233,7 +238,7 @@ pub async fn enqueue_voice_conversion_inference_handler(
     maybe_raw_inference_text: None, // NB: Voice conversion isn't TTS, so there's no text.
     maybe_inference_args: Some(GenericInferenceArgs {
       inference_category: Some(InferenceCategoryAbbreviated::VoiceConversion),
-      args: None, // NB: We don't need to encode args yet (but will soon)
+      args: maybe_args,
     }),
     maybe_creator_user_token: maybe_user_token.as_ref(),
     creator_ip_address: &ip_address,

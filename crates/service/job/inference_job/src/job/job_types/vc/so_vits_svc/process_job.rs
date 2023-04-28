@@ -28,6 +28,7 @@ use std::io::Read;
 use std::path::{Path, PathBuf};
 use subprocess_common::docker_options::{DockerFilesystemMount, DockerGpu, DockerOptions};
 use tempdir::TempDir;
+use mysql_queries::payloads::generic_inference_args::PolymorphicInferenceArgs;
 use tokens::files::media_upload::MediaUploadToken;
 use tokens::users::user::UserToken;
 
@@ -157,6 +158,17 @@ pub async fn process_job(args: SoVitsSvcProcessJobArgs<'_>) -> Result<JobSuccess
   //  roughly 12 seconds max. Here we map seconds to decoder steps.
   //let max_decoder_steps = seconds_to_decoder_steps(job.max_duration_seconds);
 
+  // If not specified by the user, turn off auto prediction. It sounds awful.
+  let auto_predict_f0 = job.maybe_inference_args
+      .as_ref()
+      .map(|args| args.args.as_ref())
+      .flatten()
+      .map(|args| match args {
+        PolymorphicInferenceArgs::Tts { .. } => None,
+        PolymorphicInferenceArgs::Vc { auto_predict_f0 } => *auto_predict_f0,
+      })
+      .flatten()
+      .unwrap_or(false);
 
   // ==================== RUN INFERENCE SCRIPT ==================== //
 
@@ -170,6 +182,7 @@ pub async fn process_job(args: SoVitsSvcProcessJobArgs<'_>) -> Result<JobSuccess
         output_path: &output_audio_fs_path,
         maybe_config_path: None,
         device: Device::Cuda,
+        auto_predict_f0,
       });
 
   if let Err(err) = model_check_result {

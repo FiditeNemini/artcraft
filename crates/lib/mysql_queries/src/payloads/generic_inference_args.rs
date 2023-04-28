@@ -15,6 +15,7 @@ pub struct GenericInferenceArgs {
 
   /// REQUIRED.
   /// Actual type-specific arguments.
+  #[serde(skip_serializing_if = "Option::is_none")]
   pub args: Option<PolymorphicInferenceArgs>,
 }
 
@@ -33,15 +34,18 @@ pub enum InferenceCategoryAbbreviated {
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub enum PolymorphicInferenceArgs {
-  TextToSpeechInferenceArgs {
+  /// Text to speech. (Short name to save space when serializing.)
+  Tts {
     // No arguments yet.
     // It might be best to just not include this when not used.
   },
-  VoiceConversionInferenceArgs {
-    /// OPTIONAL. (*Technically required until we add other inference inputs - eg TTS audio out, stems, etc.)
-    /// If set, the media file to use as the source in the conversion.
-    /// It's "optional" in case we use other types of records in the future.
-    maybe_media_token: Option<MediaUploadToken>,
+  /// Voice conversion. (Short name to save space when serializing.)
+  Vc {
+    /// Argument for so-vits-svc
+    /// The python model defaults to true, but that sounds awful,
+    /// so we default to false unless specified.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    auto_predict_f0: Option<bool>,
   },
 }
 
@@ -84,14 +88,14 @@ mod tests {
   fn typical_tts_args_serialize() {
     let args = GenericInferenceArgs {
       inference_category: Some(InferenceCategoryAbbreviated::VoiceConversion),
-      args: Some(PolymorphicInferenceArgs::TextToSpeechInferenceArgs {
+      args: Some(PolymorphicInferenceArgs::Tts {
       }),
     };
 
     let json = serde_json::ser::to_string(&args).unwrap();
 
     // NB: Assert the serialized form. If this changes and the test breaks, be careful about migrating.
-    assert_eq!(json, r#"{"cat":"vc","args":{"TextToSpeechInferenceArgs":{}}}"#.to_string());
+    assert_eq!(json, r#"{"cat":"vc","args":{"Tts":{}}}"#.to_string());
 
     // NB: Make sure we don't overflow the DB field capacity (TEXT column).
     assert!(json.len() < 1000);
@@ -101,8 +105,8 @@ mod tests {
   fn typical_voice_conversion_args_serialize() {
     let args = GenericInferenceArgs {
       inference_category: Some(InferenceCategoryAbbreviated::VoiceConversion),
-      args: Some(PolymorphicInferenceArgs::VoiceConversionInferenceArgs {
-        maybe_media_token: Some(MediaUploadToken::new_from_str("media_token")),
+      args: Some(PolymorphicInferenceArgs::Vc {
+        auto_predict_f0: Some(false),
       }),
     };
 
@@ -110,7 +114,26 @@ mod tests {
 
     // NB: Assert the serialized form. If this changes and the test breaks, be careful about migrating.
     assert_eq!(json,
-      r#"{"cat":"vc","args":{"VoiceConversionInferenceArgs":{"maybe_media_token":"media_token"}}}"#.to_string());
+      r#"{"cat":"vc","args":{"Vc":{"auto_predict_f0":false}}}"#.to_string());
+
+    // NB: Make sure we don't overflow the DB field capacity (TEXT column).
+    assert!(json.len() < 1000);
+  }
+
+  #[test]
+  fn voice_conversion_args_do_not_serialize_none() {
+    let args = GenericInferenceArgs {
+      inference_category: Some(InferenceCategoryAbbreviated::VoiceConversion),
+      args: Some(PolymorphicInferenceArgs::Vc {
+        auto_predict_f0: None, // NB: Do not serialize
+      }),
+    };
+
+    let json = serde_json::ser::to_string(&args).unwrap();
+
+    // NB: Assert the serialized form. If this changes and the test breaks, be careful about migrating.
+    assert_eq!(json,
+               r#"{"cat":"vc","args":{"Vc":{}}}"#.to_string());
 
     // NB: Make sure we don't overflow the DB field capacity (TEXT column).
     assert!(json.len() < 1000);
@@ -126,8 +149,8 @@ mod tests {
 
     args = Some(GenericInferenceArgs {
       inference_category: Some(InferenceCategoryAbbreviated::VoiceConversion),
-      args: Some(PolymorphicInferenceArgs::VoiceConversionInferenceArgs {
-        maybe_media_token: Some(MediaUploadToken::new_from_str("media_token")),
+      args: Some(PolymorphicInferenceArgs::Vc {
+        auto_predict_f0: Some(true),
       }),
     });
 
@@ -135,7 +158,7 @@ mod tests {
 
     // NB: Assert the serialized form. If this changes and the test breaks, be careful about migrating.
     assert_eq!(json,
-               r#"{"cat":"vc","args":{"VoiceConversionInferenceArgs":{"maybe_media_token":"media_token"}}}"#.to_string());
+               r#"{"cat":"vc","args":{"Vc":{"auto_predict_f0":true}}}"#.to_string());
 
     // NB: Make sure we don't overflow the DB field capacity (TEXT column).
     assert!(json.len() < 1000);

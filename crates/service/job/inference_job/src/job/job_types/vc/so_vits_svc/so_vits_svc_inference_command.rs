@@ -60,6 +60,10 @@ pub struct InferenceArgs<P: AsRef<Path>> {
   /// --output_path: output path of converting model to onnx (which we use to test validity)
   pub output_path: P,
 
+  /// --auto-predict-f0: turn on or off fundamental frequency auto prediction
+  /// This sounds better when left off, but it defaults to *ON* if not specified.
+  pub auto_predict_f0: bool,
+
   /// --device: cpu or cuda
   pub device: Device,
 }
@@ -203,6 +207,10 @@ impl SoVitsSvcInferenceCommand {
 
     command.push_str(" --config-path ");
     command.push_str(&path_to_string(config_path));
+
+    command.push_str(" --auto-predict-f0 ");
+    command.push_str(if args.auto_predict_f0 { "true" } else { "false" });
+    command.push_str(" ");
 
     let device = match args.device {
       Device::Cuda => "cuda",
