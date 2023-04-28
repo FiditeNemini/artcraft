@@ -147,6 +147,11 @@ impl SoVitsSvcInferenceCommand {
             docker_env_vars.push(DockerEnvVar::new("NLTK_DATA_PATH", &cache_dir));
           }
 
+          if let Some(hubert_path) = maybe_hubert_path.as_deref() {
+            let cache_dir = cache_dir.to_string_lossy().to_string();
+            docker_env_vars.push(DockerEnvVar::new("HUBERT_PATH", &cache_dir));
+          }
+
           let maybe_environment_variables =
               if docker_env_vars.is_empty() { None } else { Some(docker_env_vars) };
 
@@ -284,7 +289,7 @@ impl SoVitsSvcInferenceCommand {
     // In production / k8s, we should get this env var from the deployment and handle it
     // more generally when copying over all environment variables, but in local development
     // we're explicit since it may not be set outside of config files.
-    if let Some(hubert_path) = self.maybe_hubert_path.as_ref() {
+    if let Some(hubert_path) = self.maybe_hubert_path.as_deref() {
       env_vars.push((
         OsString::from("HUBERT_PATH"),
         OsString::from(hubert_path),
