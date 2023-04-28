@@ -161,7 +161,7 @@ impl SoVitsSvcInferenceCommand {
     })
   }
 
-  pub fn execute_check<P: AsRef<Path>>(
+  pub fn execute_inference<P: AsRef<Path>>(
     &self,
     args: InferenceArgs<P>,
   ) -> AnyhowResult<()> {

@@ -176,7 +176,7 @@ pub async fn process_job(args: SoVitsSvcProcessJobArgs<'_>) -> Result<JobSuccess
       .job_type_details
       .so_vits_svc
       .inference_command
-      .execute_check(InferenceArgs {
+      .execute_inference(InferenceArgs {
         model_path: &so_vits_svc_fs_path,
         input_path: &input_wav_path,
         output_path: &output_audio_fs_path,
