@@ -1,23 +1,29 @@
-import React, { useEffect, useMemo } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { useAudioRecorder } from "react-audio-voice-recorder";
 import { InputVcAudioPlayer } from "../../../../_common/InputVcAudioPlayer";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faMicrophone, faUpload } from "@fortawesome/pro-solid-svg-icons";
-import { UploadAudio, UploadAudioIsOk, UploadAudioRequest } from "@storyteller/components/src/api/upload/UploadAudio";
-import { faTrash } from "@fortawesome/free-solid-svg-icons";
+import { faFileArrowUp, faMicrophone } from "@fortawesome/pro-solid-svg-icons";
+import {
+  UploadAudio,
+  UploadAudioIsOk,
+  UploadAudioRequest,
+} from "@storyteller/components/src/api/upload/UploadAudio";
+import { faCheck, faTrash } from "@fortawesome/free-solid-svg-icons";
 
 interface Props {
-  setMediaUploadToken: (token?: string) => void,
+  setMediaUploadToken: (token?: string) => void;
 
-  formIsCleared: boolean,
-  setFormIsCleared: (cleared: boolean) => void,
+  formIsCleared: boolean;
+  setFormIsCleared: (cleared: boolean) => void;
 
-  setCanConvert: (canConvert: boolean) => void,
-  changeConvertIdempotencyToken: () => void,
+  setCanConvert: (canConvert: boolean) => void;
+  changeConvertIdempotencyToken: () => void;
 }
 
 export default function RecordComponent(props: Props) {
+  const [uploadLoading, setUploadLoading] = useState(false);
+  const [isUploadDisabled, setIsUploadDisabled] = useState<boolean>(false);
   const { startRecording, stopRecording, recordingBlob, isRecording } =
     useAudioRecorder();
 
@@ -44,7 +50,7 @@ export default function RecordComponent(props: Props) {
     //    props.setMediaUploadToken(result.upload_token);
     //  }
     //})();
-  }, [recordingBlob])
+  }, [recordingBlob]);
 
   const handleStartRecording = async () => {
     startRecording();
@@ -55,6 +61,7 @@ export default function RecordComponent(props: Props) {
     stopRecording();
     props.setFormIsCleared(false);
     props.setCanConvert(false);
+    setIsUploadDisabled(false);
   };
 
   const handleClear = () => {
@@ -66,11 +73,13 @@ export default function RecordComponent(props: Props) {
   };
 
   const handleUpload = async () => {
-    const request : UploadAudioRequest = {
+    const request: UploadAudioRequest = {
       uuid_idempotency_token: uuidv4(), // TODO: only send on change.
       file: recordingBlob,
-      source: 'device',
-    }
+      source: "device",
+    };
+
+    setUploadLoading(true);
 
     let result = await UploadAudio(request);
 
@@ -79,15 +88,19 @@ export default function RecordComponent(props: Props) {
       props.setFormIsCleared(false);
       props.setCanConvert(true);
       props.changeConvertIdempotencyToken();
+      setIsUploadDisabled(true);
     }
-  }
+
+    setUploadLoading(false);
+  };
 
   const enableMediaReview = !props.formIsCleared && recordingBlob !== undefined;
-  const enableUploadButton = !props.formIsCleared && recordingBlob !== undefined && !isRecording;
+  const enableUploadButton =
+    !props.formIsCleared && recordingBlob !== undefined && !isRecording;
 
-  const speakButtonClass = enableUploadButton
-    ? "btn btn-primary w-100"
-    : "btn btn-primary w-100 disabled";
+  const speakButtonClass = isUploadDisabled
+    ? "btn btn-uploaded w-100 disabled"
+    : "btn btn-primary w-100";
 
   return (
     <div className="d-flex flex-column gap-3" id="record-audio">
@@ -111,36 +124,40 @@ export default function RecordComponent(props: Props) {
       )}
 
       {enableMediaReview ? (
-          <>
-            <RecordedAudioComponent recordingBlob={recordingBlob} />
+        <>
+          <RecordedAudioComponent recordingBlob={recordingBlob} />
 
-            <div className="d-flex gap-3">
-              <button
-                className={speakButtonClass}
-                onClick={handleUpload}
-                type="submit"
-                disabled={!enableUploadButton}
-              >
-                <FontAwesomeIcon
-                  icon={faUpload}
-                  className="me-2"
-                />
-                Upload
-              </button>
-              <button
-                className="btn btn-destructive w-100"
-                onClick={handleClear}
-              >
-                <FontAwesomeIcon icon={faTrash} className="me-2" />
-                Clear
-              </button>
-            </div>
-          </>
-        ) : (
-          <></>
-        ) 
-      }
-
+          <div className="d-flex gap-3">
+            <button
+              className={speakButtonClass}
+              onClick={handleUpload}
+              type="submit"
+              disabled={
+                isUploadDisabled || uploadLoading || !enableUploadButton
+              }
+            >
+              {isUploadDisabled ? (
+                <>
+                  <FontAwesomeIcon icon={faCheck} className="me-2" />
+                  Uploaded
+                </>
+              ) : (
+                <>
+                  <FontAwesomeIcon icon={faFileArrowUp} className="me-2" />
+                  Upload Audio
+                </>
+              )}
+              {uploadLoading && <LoadingIcon />}
+            </button>
+            <button className="btn btn-destructive w-100" onClick={handleClear}>
+              <FontAwesomeIcon icon={faTrash} className="me-2" />
+              Clear
+            </button>
+          </div>
+        </>
+      ) : (
+        <></>
+      )}
     </div>
   );
 }
@@ -150,7 +167,6 @@ interface RecorderProps {
 }
 
 function RecordedAudioComponent(props: RecorderProps) {
-
   // Only generate the URL on change.
   const audioLink = useMemo(() => {
     if (!props.recordingBlob) {
@@ -169,6 +185,19 @@ function RecordedAudioComponent(props: RecorderProps) {
     </div>
   );
 }
+
+const LoadingIcon: React.FC = () => {
+  return (
+    <>
+      <span
+        className="spinner-border spinner-border-sm ms-3"
+        role="status"
+        aria-hidden="true"
+      ></span>
+      <span className="visually-hidden">Loading...</span>
+    </>
+  );
+};
 
 /*
   In case you'd like to update colors of the icons just follow the instruction here:
