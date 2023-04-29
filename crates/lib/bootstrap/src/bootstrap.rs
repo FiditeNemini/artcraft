@@ -11,18 +11,31 @@ pub struct BootstrapArgs<'a, P: AsRef<Path>> {
   /// If the RUST_LOG env var is set, it will take precedence over this setting.
   pub default_logging_override: Option<&'a str>,
 
+  /// Where to look for env conf files.
   pub config_search_directories: &'a [P],
 }
 
 /// Information about how the application is deployed.
 #[derive(Clone)]
 pub struct ContainerEnvironment {
+  /// Whether the app is running in development or production.
+  /// Set with the env var `SERVER_ENVIRONMENT`.
   pub server_environment: ServerEnvironment,
+
+  /// The worker hostname, using OS hostname detection.
+  /// If not determined, it will be set to the synthetic
+  /// value `{app_name}-unknown`.
   pub hostname: String,
+
+  /// The kubernetes cluster name.
+  /// Set with the env var `K8S_CLUSTER_NAME`.
   pub cluster_name: String,
 
   /// Whether the container is operating on-premises.
-  /// False if the container is deployed to the cloud.
+  /// False by default. Should be false if the container is
+  /// deployed to the cloud or run locally in development.
+  /// Should only be true for "data centers" we operate.
+  /// Set with the env var `IS_ON_PREM`.
   pub is_on_prem: bool,
 }
 
