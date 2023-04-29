@@ -147,8 +147,20 @@ CREATE TABLE generic_inference_jobs (
   -- Optional internal-only debugging information in the case of failure.
   internal_debugging_failure_reason VARCHAR(512) DEFAULT NULL,
 
+  -- TODO: Remove once `assigned_worker` column is added
+  --   and existing queries for this column are removed.
   -- The last worker (hostname or pod name) to touch the job, either in the case of success or failure.
   last_assigned_worker VARCHAR(255) DEFAULT NULL,
+
+  -- Worker hostname (linux hostname, k8s pod name)
+  -- Assigned when a worker picks up the job
+  -- Reassigned if the job fails and gets picked up again
+  assigned_worker VARCHAR(128) DEFAULT NULL,
+
+  -- Cluster name (k8s)
+  -- Assigned when a worker picks up the job
+  -- Reassigned if the job fails and gets picked up again
+  assigned_cluster VARCHAR(128) DEFAULT NULL,
 
   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -158,6 +170,12 @@ CREATE TABLE generic_inference_jobs (
   -- Failures because of permissions require human intervention => [retry_at=null].
   -- Failures because of invalid files are dead => [status=dead].
   retry_at TIMESTAMP NULL,
+
+  -- Set when the job first starts executing
+  first_started_at TIMESTAMP NULL,
+
+  -- Set when the job is successfully completed
+  successfully_completed_at TIMESTAMP NULL,
 
   -- INDICES --
   PRIMARY KEY (id),
