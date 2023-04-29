@@ -1941,16 +1941,6 @@
     },
     "query": "\nSELECT count(*) as count\nFROM tts_models\nWHERE\n  creator_user_token = ?\nLIMIT 1\n        "
   },
-  "0b86d78efc5490fdc3141dec06a1b615bc0ab18863cf5f590ccef7b41af3bb1a": {
-    "describe": {
-      "columns": [],
-      "nullable": [],
-      "parameters": {
-        "Right": 3
-      }
-    },
-    "query": "\nUPDATE generic_inference_jobs\nSET\n  status = \"complete_success\",\n  on_success_result_entity_type = ?,\n  on_success_result_entity_token = ?,\n  failure_reason = NULL,\n  internal_debugging_failure_reason = NULL,\n  retry_at = NULL\nWHERE id = ?\n        "
-  },
   "0caed749627ff22ae1cea52621a375156259a731e8070459593082b80d463491": {
     "describe": {
       "columns": [
@@ -3298,16 +3288,6 @@
     },
     "query": "\nUPDATE generic_download_jobs\nSET\n  status = ?,\n  failure_reason = ?,\n  retry_at = NOW() + interval 2 minute\nWHERE id = ?\n        "
   },
-  "30e2231d86079707a37de71e7d9d754526f38863081db7fbc91064b1973283eb": {
-    "describe": {
-      "columns": [],
-      "nullable": [],
-      "parameters": {
-        "Right": 1
-      }
-    },
-    "query": "\nUPDATE generic_inference_jobs\nSET\n  status = 'started',\n  attempt_count = attempt_count + 1,\n  retry_at = NOW() + interval 2 minute\nWHERE id = ?\n        "
-  },
   "314904656a333caa75a8644e73f4d338b7bd6f68c7ea9e37b5bc7f7b257bf34d": {
     "describe": {
       "columns": [
@@ -3947,6 +3927,16 @@
     },
     "query": "\nUPDATE generic_inference_jobs\nSET\n  status = ?,\n  failure_reason = ?,\n  internal_debugging_failure_reason = ?,\n  retry_at = NOW() + interval 2 minute\nWHERE id = ?\n        "
   },
+  "3e0c1b88d7c4f1b4d754ee2c6e32b99e72ac810d0da2a7e57fbf2aa8e9a9939a": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Right": 3
+      }
+    },
+    "query": "\nUPDATE generic_inference_jobs\nSET\n  status = \"complete_success\",\n  on_success_result_entity_type = ?,\n  on_success_result_entity_token = ?,\n  failure_reason = NULL,\n  internal_debugging_failure_reason = NULL,\n  retry_at = NULL,\n  successfully_completed_at = NOW()\nWHERE id = ?\n        "
+  },
   "40a3301e9a3201e74d49b6b339f67291e2ae22d315188401708609ac2d28a68c": {
     "describe": {
       "columns": [],
@@ -3956,44 +3946,6 @@
       }
     },
     "query": "\nUPDATE tts_results\nSET\n  mod_deleted_at = NULL,\n  maybe_mod_user_token = ?\nWHERE\n  token = ?\nLIMIT 1\n        "
-  },
-  "41555780b0bd96b3cef8f59938c021d2011ea7bfdb79950893b1c81727bdb27c": {
-    "describe": {
-      "columns": [
-        {
-          "name": "id",
-          "ordinal": 0,
-          "type_info": {
-            "char_set": 63,
-            "flags": {
-              "bits": 515
-            },
-            "max_size": 20,
-            "type": "LongLong"
-          }
-        },
-        {
-          "name": "status",
-          "ordinal": 1,
-          "type_info": {
-            "char_set": 224,
-            "flags": {
-              "bits": 393
-            },
-            "max_size": 64,
-            "type": "String"
-          }
-        }
-      ],
-      "nullable": [
-        false,
-        false
-      ],
-      "parameters": {
-        "Right": 1
-      }
-    },
-    "query": "\nSELECT\n  id,\n  status\nFROM generic_inference_jobs\nWHERE id = ?\nFOR UPDATE\n        "
   },
   "417dd070beeaf6ccd86852b7e99bf7fda5c5b15da4a3bcc066a0e2bb90ca7df1": {
     "describe": {
@@ -7524,6 +7476,57 @@
     },
     "query": "\nSELECT\n    users.token as `user_token: tokens::users::user::UserToken`,\n    username,\n    display_name,\n    email_gravatar_hash,\n    profile_markdown,\n    profile_rendered_html,\n    user_role_slug,\n    disable_gravatar,\n    preferred_tts_result_visibility as `preferred_tts_result_visibility: enums::common::visibility::Visibility`,\n    preferred_w2l_result_visibility as `preferred_w2l_result_visibility: enums::common::visibility::Visibility`,\n    discord_username,\n    twitch_username,\n    twitter_username,\n    patreon_username,\n    github_username,\n    cashapp_username,\n    website_url,\n    is_banned,\n    maybe_mod_comments,\n    maybe_mod_user_token,\n    created_at\nFROM users\nWHERE\n    users.username = ?\n    AND users.user_deleted_at IS NULL\n    AND users.mod_deleted_at IS NULL\n        "
   },
+  "593f27e96257dd615bd389f5ecc65d2e5e6334fcad8eca384ad5c49849d5ed18": {
+    "describe": {
+      "columns": [
+        {
+          "name": "id",
+          "ordinal": 0,
+          "type_info": {
+            "char_set": 63,
+            "flags": {
+              "bits": 515
+            },
+            "max_size": 20,
+            "type": "LongLong"
+          }
+        },
+        {
+          "name": "status",
+          "ordinal": 1,
+          "type_info": {
+            "char_set": 224,
+            "flags": {
+              "bits": 393
+            },
+            "max_size": 64,
+            "type": "String"
+          }
+        },
+        {
+          "name": "attempt_count",
+          "ordinal": 2,
+          "type_info": {
+            "char_set": 63,
+            "flags": {
+              "bits": 1
+            },
+            "max_size": 3,
+            "type": "Long"
+          }
+        }
+      ],
+      "nullable": [
+        false,
+        false,
+        false
+      ],
+      "parameters": {
+        "Right": 1
+      }
+    },
+    "query": "\nSELECT\n  id,\n  status,\n  attempt_count\nFROM generic_download_jobs\nWHERE id = ?\nFOR UPDATE\n        "
+  },
   "5a61f5860baf016e1ecaecf8773d7cbd03abb930c501ce30863f802eeebf2df1": {
     "describe": {
       "columns": [
@@ -7568,16 +7571,6 @@
       }
     },
     "query": "\nINSERT INTO twitch_channel_point_events\nSET\n    sender_twitch_user_id = ?,\n    sender_twitch_username = ?,\n    sender_twitch_username_lowercase = ?,\n    destination_channel_id = ?,\n    destination_channel_name = ?,\n    title = ?,\n    prompt = ?,\n    user_text_input = ?,\n    redemption_id = ?,\n    reward_id = ?,\n    reward_cost = ?,\n    is_sub_only = ?,\n    max_per_stream = ?,\n    max_per_user_per_stream = ?\n        "
-  },
-  "606ce5749caabb61cd7ff5b90ef8f29269cc9ec6455ea428ba63366b2b6d2fb3": {
-    "describe": {
-      "columns": [],
-      "nullable": [],
-      "parameters": {
-        "Right": 1
-      }
-    },
-    "query": "\nUPDATE generic_download_jobs\nSET\n  status = 'started',\n  attempt_count = attempt_count + 1,\n  retry_at = NOW() + interval 2 minute\nWHERE id = ?\n        "
   },
   "6098826a8ada75442be5b7ac1d0199694e01c5959666f59986cd8b2ed6f51882": {
     "describe": {
@@ -9361,6 +9354,16 @@
     },
     "query": "\nSELECT *\nFROM tts_model_upload_jobs\nWHERE\n  (\n    status IN (\"pending\", \"attempt_failed\")\n  )\n  AND\n  (\n    retry_at IS NULL\n    OR\n    retry_at < CURRENT_TIMESTAMP\n  )\n  LIMIT ?\n        "
   },
+  "7b2cbcc19549a9fa4882c57a52ad39a3f7fd8f65e31f487553cea2158b4e7208": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Right": 3
+      }
+    },
+    "query": "\nUPDATE generic_download_jobs\nSET\n  status = \"complete_success\",\n  on_success_downloaded_entity_token = ?,\n  on_success_downloaded_entity_type = ?,\n  failure_reason = NULL,\n  retry_at = NULL,\n  successfully_completed_at = NOW()\nWHERE id = ?\n        "
+  },
   "7cd0ad5d7b9a2c393f799beadc1e0a6bc85d952e07a1b82a52115b99be40ff6d": {
     "describe": {
       "columns": [
@@ -9555,44 +9558,6 @@
     },
     "query": "\nSELECT\n    w2l.token as template_token,\n    w2l.template_type,\n    w2l.creator_user_token,\n    users.username as creator_username,\n    users.display_name as creator_display_name,\n    w2l.title,\n    w2l.frame_width,\n    w2l.frame_height,\n    w2l.duration_millis,\n    w2l.maybe_public_bucket_preview_image_object_name,\n    w2l.maybe_public_bucket_preview_video_object_name,\n    w2l.is_public_listing_approved,\n    w2l.created_at,\n    w2l.updated_at\nFROM w2l_templates as w2l\nJOIN users\n    ON users.token = w2l.creator_user_token\nWHERE\n    w2l.user_deleted_at IS NULL\n    AND w2l.mod_deleted_at IS NULL\n        "
   },
-  "7fcef4b4803a49b15ad4c07a53f32abd5a248e9961cc4fc87aac2fd905f332b2": {
-    "describe": {
-      "columns": [
-        {
-          "name": "id",
-          "ordinal": 0,
-          "type_info": {
-            "char_set": 63,
-            "flags": {
-              "bits": 515
-            },
-            "max_size": 20,
-            "type": "LongLong"
-          }
-        },
-        {
-          "name": "status",
-          "ordinal": 1,
-          "type_info": {
-            "char_set": 224,
-            "flags": {
-              "bits": 393
-            },
-            "max_size": 64,
-            "type": "String"
-          }
-        }
-      ],
-      "nullable": [
-        false,
-        false
-      ],
-      "parameters": {
-        "Right": 1
-      }
-    },
-    "query": "\nSELECT\n  id,\n  status\nFROM generic_download_jobs\nWHERE id = ?\nFOR UPDATE\n        "
-  },
   "80e8ad515ab8fbfadc12463b87059a1eb6554be32527729d6075fc46c966630c": {
     "describe": {
       "columns": [],
@@ -9602,6 +9567,16 @@
       }
     },
     "query": "\nINSERT INTO twitch_oauth_tokens\nSET\n  internal_token = ?,\n  oauth_refresh_grouping_token = ?,\n  maybe_user_token = ?,\n  twitch_user_id = ?,\n  twitch_username = ?,\n  twitch_username_lowercase = ?,\n  access_token = ?,\n  maybe_refresh_token = ?,\n  refresh_count = ?,\n  token_type = ?,\n  expires_in_seconds = ?,\n  has_bits_read = ?,\n  has_channel_read_redemptions= ?,\n  has_channel_read_subscriptions = ?,\n  has_chat_edit = ?,\n  has_chat_read = ?,\n  ip_address_creation = ?,\n  expires_at = DATE_ADD(NOW(), INTERVAL ? SECOND)\n        "
+  },
+  "816c6cfb3e7395b7cd02eaf9ac38e91c46fef67a222578942c3e44dd7938a9e1": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Right": 3
+      }
+    },
+    "query": "\nUPDATE generic_download_jobs\nSET\n  status = 'started',\n  assigned_worker = ?,\n  assigned_cluster = ?,\n  attempt_count = attempt_count + 1,\n  retry_at = NOW() + interval 2 minute\nWHERE id = ?\n        "
   },
   "841bc537a29ef871056edc136231ebbeea65c83b5ee7eab769da275842a0fbb7": {
     "describe": {
@@ -10484,6 +10459,16 @@
     },
     "query": "\nINSERT INTO stripe_webhook_event_logs\nSET\n  stripe_event_id = ?,\n  stripe_event_type = ?,\n  maybe_stripe_event_entity_id = ?,\n  maybe_stripe_customer_id = ?,\n  stripe_event_created_at = ?,\n  stripe_is_production = ?,\n  maybe_user_token = ?,\n  action_was_taken = ?,\n  should_ignore_retry = ?\n        "
   },
+  "8951eb0c858fc803312db719820e8a2ae1446a9c741dc8a6874b8ae213793cfa": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Right": 3
+      }
+    },
+    "query": "\nUPDATE generic_download_jobs\nSET\n  status = \"complete_failure\",\n  on_success_downloaded_entity_token = ?,\n  on_success_downloaded_entity_type = ?,\n  failure_reason = NULL,\n  retry_at = NULL\nWHERE id = ?\n        "
+  },
   "89b66d91d1f2cd5c9871671b21a90e77d9041572a90cc6be6dd49845424677fa": {
     "describe": {
       "columns": [],
@@ -11096,6 +11081,16 @@
       }
     },
     "query": "\nUPDATE tts_results\nSET\n  user_deleted_at = CURRENT_TIMESTAMP\nWHERE\n  token = ?\nLIMIT 1\n        "
+  },
+  "98752fdd6d26c88db17ccfe4cc17fef21f36b102c27b3950500e0c659982ed7b": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Right": 3
+      }
+    },
+    "query": "\nUPDATE generic_inference_jobs\nSET\n  status = 'started',\n  assigned_worker = ?,\n  assigned_cluster = ?,\n  attempt_count = attempt_count + 1,\n  retry_at = NOW() + interval 2 minute\nWHERE id = ?\n        "
   },
   "9a879f76345ef5682b995f99026fac8b2f4c64c8ec4bb078187d1e53effcfbaf": {
     "describe": {
@@ -11827,16 +11822,6 @@
     },
     "query": "\nSELECT\n    tts_results.token as tts_result_token,\n\n    tts_results.raw_inference_text,\n\n    tts_results.model_token as tts_model_token,\n    tts_models.title as tts_model_title,\n\n    tts_results.maybe_pretrained_vocoder_used,\n\n    users.token as maybe_creator_user_token,\n    users.username as maybe_creator_username,\n    users.display_name as maybe_creator_display_name,\n    users.email_gravatar_hash as maybe_creator_gravatar_hash,\n    users.is_banned as maybe_creator_is_banned,\n\n    model_users.token as maybe_model_creator_user_token,\n    model_users.username as maybe_model_creator_username,\n    model_users.display_name as maybe_model_creator_display_name,\n    model_users.email_gravatar_hash as maybe_model_creator_gravatar_hash,\n    model_users.is_banned as maybe_model_creator_is_banned,\n\n    tts_results.public_bucket_wav_audio_path,\n    tts_results.public_bucket_spectrogram_path,\n\n    tts_results.creator_set_visibility,\n\n    tts_results.generated_by_worker,\n    tts_results.is_debug_request,\n\n    tts_results.file_size_bytes,\n    tts_results.duration_millis,\n    tts_results.created_at,\n    tts_results.updated_at,\n\n    tts_results.creator_ip_address,\n    tts_results.user_deleted_at,\n    tts_results.mod_deleted_at\n\nFROM tts_results\nLEFT OUTER JOIN tts_models\n  ON tts_results.model_token = tts_models.token\nLEFT OUTER JOIN users\n  ON tts_results.maybe_creator_user_token = users.token\nLEFT OUTER JOIN users as model_users\n  ON tts_models.creator_user_token = model_users.token\nWHERE\n    tts_results.token = ?\n    AND tts_results.user_deleted_at IS NULL\n    AND tts_results.mod_deleted_at IS NULL\n        "
   },
-  "a5f71046248950e796d18af49dbe172c2c0fd563579c5c72afcb238bdc6542b9": {
-    "describe": {
-      "columns": [],
-      "nullable": [],
-      "parameters": {
-        "Right": 4
-      }
-    },
-    "query": "\nUPDATE generic_download_jobs\nSET\n  status = ?,\n  on_success_downloaded_entity_token = ?,\n  on_success_downloaded_entity_type = ?,\n  failure_reason = NULL,\n  retry_at = NULL\nWHERE id = ?\n        "
-  },
   "a60b239dff945c0089ded216dc6b4ea1bd7acb2125671bebdd34e5e1312270ce": {
     "describe": {
       "columns": [
@@ -12195,6 +12180,57 @@
       }
     },
     "query": "\nUPDATE tts_models\nSET\n  user_ratings_total_count = (\n    SELECT COUNT(*)\n    FROM user_ratings\n    WHERE entity_type = \"tts_model\"\n    AND entity_token = ?\n    AND rating_value IN (\"positive\", \"negative\")\n  ),\n  user_ratings_positive_count = (\n    SELECT COUNT(*)\n    FROM user_ratings\n    WHERE entity_type = \"tts_model\"\n    AND entity_token = ?\n    AND rating_value = \"positive\"\n  ),\n  user_ratings_negative_count = (\n    SELECT COUNT(*)\n    FROM user_ratings\n    WHERE entity_type = \"tts_model\"\n    AND entity_token = ?\n    AND rating_value = \"negative\"\n  ),\n  version = version + 1\n\nWHERE\n  token = ?\nLIMIT 1\n        "
+  },
+  "ac418c3cc88b47381a9e8defd7f32ccc3977e2d2fedf6f66d8397d4477b34253": {
+    "describe": {
+      "columns": [
+        {
+          "name": "id",
+          "ordinal": 0,
+          "type_info": {
+            "char_set": 63,
+            "flags": {
+              "bits": 515
+            },
+            "max_size": 20,
+            "type": "LongLong"
+          }
+        },
+        {
+          "name": "status",
+          "ordinal": 1,
+          "type_info": {
+            "char_set": 224,
+            "flags": {
+              "bits": 393
+            },
+            "max_size": 64,
+            "type": "String"
+          }
+        },
+        {
+          "name": "attempt_count",
+          "ordinal": 2,
+          "type_info": {
+            "char_set": 63,
+            "flags": {
+              "bits": 33
+            },
+            "max_size": 5,
+            "type": "Short"
+          }
+        }
+      ],
+      "nullable": [
+        false,
+        false,
+        false
+      ],
+      "parameters": {
+        "Right": 1
+      }
+    },
+    "query": "\nSELECT\n  id,\n  status,\n  attempt_count\nFROM generic_inference_jobs\nWHERE id = ?\nFOR UPDATE\n        "
   },
   "ad0dfcca42406d0fe109056f2238ff2a48e2b0f287f86dbaf36363e3a9624ba2": {
     "describe": {
@@ -13305,6 +13341,16 @@
       }
     },
     "query": "\nSELECT count(*) as count\nFROM w2l_templates\nWHERE\n  creator_user_token = ?\nLIMIT 1\n        "
+  },
+  "c2daf40fd0ca9d892ac19be067b23d35439e67d42d5b1d14c24b706da6f0d836": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Right": 3
+      }
+    },
+    "query": "\nUPDATE generic_inference_jobs\nSET\n  status = 'started',\n  assigned_worker = ?,\n  assigned_cluster = ?,\n  attempt_count = attempt_count + 1,\n  retry_at = NOW() + interval 2 minute,\n  first_started_at = NOW()\nWHERE id = ?\n        "
   },
   "c4640a618e1d179fa95adce67a329818f8b1626ac88fa76dbb871b8788136191": {
     "describe": {
@@ -16435,6 +16481,16 @@
       }
     },
     "query": "\nSELECT\n    mu.token as `token: tokens::files::media_upload::MediaUploadToken`,\n    mu.media_type as `media_type: enums::by_table::media_uploads::media_upload_type::MediaUploadType`,\n    mu.maybe_original_filename,\n    mu.original_file_size_bytes,\n    mu.original_duration_millis,\n    mu.creator_set_visibility as `creator_set_visibility: enums::common::visibility::Visibility`,\n    mu.created_at,\n    mu.updated_at\nFROM media_uploads as mu\nWHERE\n    mu.maybe_creator_user_token = ?\n    AND mu.maybe_creator_user_token IS NOT NULL\n    AND mu.media_type = ?\n    AND mu.user_deleted_at IS NULL\n    AND mu.mod_deleted_at IS NULL\nORDER BY id DESC\nLIMIT 25\n        "
+  },
+  "f6012a4bb2dbb9cb92539252881ec56b633a95f537547efb800f821ee54eba5f": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Right": 3
+      }
+    },
+    "query": "\nUPDATE generic_download_jobs\nSET\n  status = 'started',\n  assigned_worker = ?,\n  assigned_cluster = ?,\n  attempt_count = attempt_count + 1,\n  retry_at = NOW() + interval 2 minute,\n  first_started_at = NOW()\nWHERE id = ?\n        "
   },
   "f75b713d166398ebea2bdbde4e416dc8eb2c48dba4aa9bd164bcf5bc77237ce1": {
     "describe": {
