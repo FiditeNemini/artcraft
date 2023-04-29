@@ -39,6 +39,7 @@ use crate::job_types::voice_conversion::softvc::softvc_model_check_command::Soft
 use errors::AnyhowResult;
 use google_drive_common::google_drive_download_command::GoogleDriveDownloadCommand;
 use log::{info, warn};
+use mysql_queries::common_inputs::container_environment_arg::ContainerEnvironmentArg;
 use mysql_queries::mediators::badge_granter::BadgeGranter;
 use mysql_queries::mediators::firehose_publisher::FirehosePublisher;
 use r2d2_redis::RedisConnectionManager;
@@ -340,7 +341,6 @@ async fn main() -> AnyhowResult<()> {
     firehose_publisher: firehose_publisher.clone(), // NB: Also safe
   };
 
-
   let job_state = JobState {
     download_temp_directory: temp_directory,
     mysql_pool,
@@ -362,6 +362,11 @@ async fn main() -> AnyhowResult<()> {
     job_batch_wait_millis: common_env.job_batch_wait_millis,
     job_max_attempts: common_env.job_max_attempts as i32,
     no_op_logger_millis: common_env.no_op_logger_millis,
+    container: container_environment.clone(),
+    container_db: ContainerEnvironmentArg {
+      hostname: container_environment.hostname,
+      cluster_name: container_environment.cluster_name,
+    }
   };
 
   main_loop(job_state).await;

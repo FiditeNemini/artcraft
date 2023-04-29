@@ -20,7 +20,8 @@ SET
   on_success_result_entity_token = ?,
   failure_reason = NULL,
   internal_debugging_failure_reason = NULL,
-  retry_at = NULL
+  retry_at = NULL,
+  successfully_completed_at = NOW()
 WHERE id = ?
         "#,
         maybe_entity_type,

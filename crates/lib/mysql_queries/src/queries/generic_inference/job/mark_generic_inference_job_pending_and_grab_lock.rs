@@ -1,6 +1,7 @@
 use anyhow::anyhow;
-use errors::AnyhowResult;
+use crate::common_inputs::container_environment_arg::ContainerEnvironmentArg;
 use crate::queries::generic_inference::job::_keys::GenericInferenceJobId;
+use errors::AnyhowResult;
 use sqlx::MySqlPool;
 use sqlx;
 
@@ -10,11 +11,13 @@ use sqlx;
 pub struct GenericInferenceJobLockRecord {
   id: i64,
   status: String,
+  attempt_count: u16,
 }
 
 pub async fn mark_generic_inference_job_pending_and_grab_lock(
   pool: &MySqlPool,
-  job_id: GenericInferenceJobId
+  job_id: GenericInferenceJobId,
+  container_environment: &ContainerEnvironmentArg,
 ) -> AnyhowResult<bool> {
 
   // NB: We use transactions and "SELECT ... FOR UPDATE" to simulate mutexes.
@@ -25,7 +28,8 @@ pub async fn mark_generic_inference_job_pending_and_grab_lock(
         r#"
 SELECT
   id,
-  status
+  status,
+  attempt_count
 FROM generic_inference_jobs
 WHERE id = ?
 FOR UPDATE
@@ -64,19 +68,45 @@ FOR UPDATE
     return Ok(false);
   }
 
-  let _acquire_lock = sqlx::query!(
+  if record.attempt_count == 0 {
+    let _acquire_lock = sqlx::query!(
         r#"
 UPDATE generic_inference_jobs
 SET
   status = 'started',
+  assigned_worker = ?,
+  assigned_cluster = ?,
+  attempt_count = attempt_count + 1,
+  retry_at = NOW() + interval 2 minute,
+  first_started_at = NOW()
+WHERE id = ?
+        "#,
+        &container_environment.hostname,
+        &container_environment.cluster_name,
+        job_id.0,
+    )
+        .execute(&mut transaction)
+        .await?;
+  } else {
+    let _acquire_lock = sqlx::query!(
+        r#"
+UPDATE generic_inference_jobs
+SET
+  status = 'started',
+  assigned_worker = ?,
+  assigned_cluster = ?,
   attempt_count = attempt_count + 1,
   retry_at = NOW() + interval 2 minute
 WHERE id = ?
         "#,
+        &container_environment.hostname,
+        &container_environment.cluster_name,
         job_id.0,
     )
-      .execute(&mut transaction)
-      .await?;
+        .execute(&mut transaction)
+        .await?;
+  }
+
 
   transaction.commit().await?;
 

@@ -19,6 +19,7 @@ pub mod job;
 pub mod util;
 pub mod job_dependencies;
 
+use bootstrap::bootstrap::{bootstrap, BootstrapArgs};
 use clap::{App, Arg};
 use cloud_storage::bucket_client::BucketClient;
 use cloud_storage::bucket_path_unifier::BucketPathUnifier;
@@ -31,6 +32,7 @@ use crate::job::job_loop::job_stats::JobStats;
 use crate::job::job_loop::main_loop::main_loop;
 use crate::job::job_types::tts::tacotron2_v2_early_fakeyou::tacotron2_inference_command::Tacotron2InferenceCommand;
 use crate::job::job_types::tts::vits::vits_inference_command::VitsInferenceCommand;
+use crate::job::job_types::vc::so_vits_svc::so_vits_svc_inference_command::SoVitsSvcInferenceCommand;
 use crate::job_dependencies::{JobCaches, JobDependencies, JobTypeDetails, JobWorkerDetails, SoVitsSvcDetails, Tacotron2VocodesDetails, VitsDetails};
 use crate::util::scoped_temp_dir_creator::ScopedTempDirCreator;
 use jobs_common::job_progress_reporter::job_progress_reporter::JobProgressReporterBuilder;
@@ -39,6 +41,7 @@ use jobs_common::job_progress_reporter::redis_job_progress_reporter::RedisJobPro
 use jobs_common::semi_persistent_cache_dir::SemiPersistentCacheDir;
 use log::{error, info, warn};
 use memory_caching::multi_item_ttl_cache::MultiItemTtlCache;
+use mysql_queries::common_inputs::container_environment_arg::ContainerEnvironmentArg;
 use mysql_queries::mediators::firehose_publisher::FirehosePublisher;
 use newrelic_telemetry::ClientBuilder;
 use r2d2_redis::RedisConnectionManager;
@@ -46,9 +49,7 @@ use r2d2_redis::r2d2;
 use sqlx::mysql::MySqlPoolOptions;
 use std::path::PathBuf;
 use std::time::Duration;
-use bootstrap::bootstrap::{bootstrap, BootstrapArgs};
 use subprocess_common::docker_options::{DockerEnvVar, DockerFilesystemMount, DockerGpu, DockerOptions};
-use crate::job::job_types::vc::so_vits_svc::so_vits_svc_inference_command::SoVitsSvcInferenceCommand;
 
 // Buckets (shared config)
 const ENV_ACCESS_KEY : &'static str = "ACCESS_KEY";
@@ -282,6 +283,11 @@ async fn main() -> AnyhowResult<()> {
         inference_command: SoVitsSvcInferenceCommand::from_env()?,
       },
     },
+    container: container_environment.clone(),
+    container_db: ContainerEnvironmentArg {
+      hostname: container_environment.hostname,
+      cluster_name: container_environment.cluster_name,
+    }
   };
 
   main_loop(job_dependencies).await;

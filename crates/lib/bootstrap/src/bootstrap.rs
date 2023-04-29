@@ -19,7 +19,7 @@ pub struct BootstrapArgs<'a, P: AsRef<Path>> {
 pub struct ContainerEnvironment {
   pub server_environment: ServerEnvironment,
   pub hostname: String,
-  //pub cluster_name: String,
+  pub cluster_name: String,
 }
 
 /// Environment variable for server environment.
@@ -67,9 +67,12 @@ pub fn bootstrap<P: AsRef<Path>>(args: BootstrapArgs<'_, P>) -> AnyhowResult<Con
     info!("Environment config file {} was read: {}", &config_file, was_read);
   }
 
+  let cluster_name = easyenv::get_env_string_optional("K8S_CLUSTER_NAME")
+      .unwrap_or("unknown-cluster".to_string());
+
   Ok(ContainerEnvironment {
     server_environment,
     hostname: server_hostname,
-    //cluster_name: "".to_string(),
+    cluster_name,
   })
 }

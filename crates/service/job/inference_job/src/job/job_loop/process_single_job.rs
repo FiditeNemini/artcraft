@@ -19,8 +19,11 @@ pub async fn process_single_job(job_dependencies: &JobDependencies, job: &Availa
 
   // ==================== ATTEMPT TO GRAB JOB LOCK ==================== //
 
-  let lock_acquired = mark_generic_inference_job_pending_and_grab_lock(&job_dependencies.mysql_pool, job.id)
-      .await
+  let lock_acquired = mark_generic_inference_job_pending_and_grab_lock(
+    &job_dependencies.mysql_pool,
+    job.id,
+    &job_dependencies.container_db,
+  ).await
       .map_err(|err| ProcessSingleJobError::Other(anyhow!("database error: {:?}", err)))?;
 
   if !lock_acquired {

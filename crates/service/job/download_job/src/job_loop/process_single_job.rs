@@ -17,7 +17,11 @@ pub async fn process_single_job(job_state: &JobState, job: &AvailableDownloadJob
 
   // ==================== ATTEMPT TO GRAB JOB LOCK ==================== //
 
-  let lock_acquired = mark_generic_download_job_pending_and_grab_lock(&job_state.mysql_pool, job.id).await?;
+  let lock_acquired = mark_generic_download_job_pending_and_grab_lock(
+    &job_state.mysql_pool,
+    job.id,
+    &job_state.container_db,
+  ).await?;
 
   if !lock_acquired {
     warn!("Could not acquire job lock for: {}", &job.id.0);
