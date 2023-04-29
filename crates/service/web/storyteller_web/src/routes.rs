@@ -28,6 +28,8 @@ use crate::http_server::endpoints::inference_job::get_pending_inference_job_coun
 use crate::http_server::endpoints::investor_demo::disable_demo_mode_handler::disable_demo_mode_handler;
 use crate::http_server::endpoints::investor_demo::enable_demo_mode_handler::enable_demo_mode_handler;
 use crate::http_server::endpoints::leaderboard::get_leaderboard::leaderboard_handler;
+use crate::http_server::endpoints::media_uploads::list_user_media_uploads_of_type::list_user_media_uploads_of_type_handler;
+use crate::http_server::endpoints::media_uploads::upload_audio::upload_audio_handler;
 use crate::http_server::endpoints::media_uploads::upload_media::upload_media_handler;
 use crate::http_server::endpoints::misc::default_route_404::default_route_404;
 use crate::http_server::endpoints::misc::detect_locale_handler::detect_locale_handler;
@@ -55,6 +57,7 @@ use crate::http_server::endpoints::moderation::user_roles::set_user_role::set_us
 use crate::http_server::endpoints::moderation::users::list_users::list_users_handler;
 use crate::http_server::endpoints::service::health_check_handler::get_health_check_handler;
 use crate::http_server::endpoints::service::public_info_handler::get_public_info_handler;
+use crate::http_server::endpoints::stats::get_unified_queue_stats::get_unified_queue_stats_handler;
 use crate::http_server::endpoints::stubs::app_model_downloads::get_app_model_downloads_handler;
 use crate::http_server::endpoints::stubs::app_news::get_app_news_handler;
 use crate::http_server::endpoints::stubs::app_plans::get_app_plans_handler;
@@ -113,8 +116,6 @@ use crate::http_server::endpoints::w2l::set_w2l_template_mod_approval::set_w2l_t
 use users_component::default_routes::add_suggested_api_v1_account_creation_and_session_routes;
 use users_component::endpoints::edit_profile_handler::edit_profile_handler;
 use users_component::endpoints::get_profile_handler::get_profile_handler;
-use crate::http_server::endpoints::media_uploads::list_user_media_uploads_of_type::list_user_media_uploads_of_type_handler;
-use crate::http_server::endpoints::media_uploads::upload_audio::upload_audio_handler;
 
 pub fn add_routes<T, B> (app: App<T, B>) -> App<T, B>
   where
@@ -159,6 +160,12 @@ pub fn add_routes<T, B> (app: App<T, B>) -> App<T, B>
   let mut app = RouteBuilder::from_app(app)
       .add_get("/v1/model_inference/job_status/{token}", get_inference_job_status_handler)
       .add_get("/v1/model_inference/queue_length", get_pending_inference_job_count_handler)
+      .into_app();
+
+  // ==================== Stats ====================
+
+  let mut app = RouteBuilder::from_app(app)
+      .add_get("/v1/stats/queues", get_unified_queue_stats_handler)
       .into_app();
 
   // ==================== COMPONENTS ====================

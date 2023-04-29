@@ -22,6 +22,7 @@ use r2d2_redis::{r2d2, RedisConnectionManager};
 use redis_caching::redis_ttl_cache::RedisTtlCache;
 use reusable_types::server_environment::ServerEnvironment;
 use sqlx::MySqlPool;
+use mysql_queries::queries::stats::get_unified_queue_stats::UnifiedQueueStatsResult;
 use url_config::third_party_url_redirector::ThirdPartyUrlRedirector;
 use users_component::utils::session_checker::SessionChecker;
 use users_component::utils::session_cookie_manager::SessionCookieManager;
@@ -151,6 +152,11 @@ pub struct InMemoryCaches {
   /// This is approximately O(n^3) and recursively generates all super-category membership.
   pub tts_model_category_assignments: SingleItemTtlCache<ModelTokensByCategoryToken>,
 
+  /// Stats on generic inference queue and legacy TTS queue (combined).
+  /// The frontend will consult a distributed cache and use the monotonic DB time as a
+  /// vector clock.
+  pub queue_stats: SingleItemTtlCache<UnifiedQueueStatsResult>,
+
   /// Generic inference queue length
   /// The frontend will consult a distributed cache and use the monotonic DB time as a
   /// vector clock.
@@ -178,6 +184,9 @@ pub struct StaticFeatureFlags {
   /// Used to bring the service back online slowly.
   pub global_429_pushback_filter_enabled: bool,
 
+  /// Disable the live `/v1/stats/queues` endpoint for all users and serve a static value instead.
+  pub disable_unified_queue_stats_endpoint: bool,
+
   /// Disable the live `/v1/model_inference/queue_length` endpoint for all users and serve a static value instead.
   pub disable_inference_queue_length_endpoint: bool,
 
@@ -189,6 +198,10 @@ pub struct StaticFeatureFlags {
 
   /// Disable the live `/v1/voice_conversion/model_list` endpoint for all users and serve a static value instead.
   pub disable_voice_conversion_model_list_endpoint: bool,
+
+  /// Tell the frontend client how fast to refresh their view of queue stats.
+  /// During an attack, we may want this to go extremely slow.
+  pub frontend_unified_queue_stats_refresh_interval_millis: u64,
 
   /// Tell the frontend client how fast to refresh their view of the pending inference count.
   /// During an attack, we may want this to go extremely slow.

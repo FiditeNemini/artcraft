@@ -11,6 +11,7 @@ pub mod media_uploads;
 pub mod misc;
 pub mod moderation;
 pub mod service;
+pub mod stats;
 pub mod stubs;
 pub mod subscriptions;
 pub mod trending;
