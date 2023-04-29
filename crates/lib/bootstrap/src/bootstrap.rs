@@ -70,6 +70,8 @@ pub fn bootstrap<P: AsRef<Path>>(args: BootstrapArgs<'_, P>) -> AnyhowResult<Con
 
   info!("Is on premises? {}", is_on_prem);
 
+  // TODO(bt, 2023-04-29): Determine if we want the "debug worker" flag, or if we'd rather
+  //  have a "passive" flag + job routing system.
   // Debug workers only process special debug requests. They're silent otherwise.
   // Non-debug workers ignore debug requests. This is so we can deploy special code
   // to debug nodes (typically just one, perhaps even ephemerally).
