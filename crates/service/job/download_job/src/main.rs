@@ -12,7 +12,7 @@
 #![allow(dead_code)]
 #![allow(non_snake_case)]
 
-// Strict
+// Strict AF
 //#![forbid(warnings)]
 
 #[macro_use] extern crate serde_derive;
