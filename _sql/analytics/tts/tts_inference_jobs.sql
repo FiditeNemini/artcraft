@@ -2,9 +2,6 @@
 -- noinspection SqlNoDataSourceInspectionForFile
 -- noinspection SqlResolveForFile
 
--- Kill pending jobs
-update tts_inference_jobs set status = 'dead' where status = 'pending';
-
 -- Total pending jobs
 select count(*)
 from tts_inference_jobs
@@ -31,22 +28,6 @@ where status = 'pending'
 group by model_token
 order by attempts desc
     limit 50;
-
--- Kill all low priority pending, waiting, and in-progress jobs
-update tts_inference_jobs
-set status = 'dead'
-where status IN ('pending', 'started', 'attempt_failed')
-  and priority_level IN (0, 1);
-
--- Kill all pending jobs
-update tts_inference_jobs
-set status = 'dead'
-where status = 'pending';
-
--- Kill all waiting and in-progress jobs
-update tts_inference_jobs
-set status = 'dead'
-where status IN ('pending', 'started', 'attempt_failed');
 
 -- Sample the pending inference text
 select creator_ip_address,
