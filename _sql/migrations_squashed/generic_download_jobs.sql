@@ -90,6 +90,16 @@ CREATE TABLE generic_download_jobs (
   -- If there is a failure, tell the user why.
   failure_reason VARCHAR(512) DEFAULT NULL,
 
+  -- Worker hostname (linux hostname, k8s pod name)
+  -- Assigned when a worker picks up the job
+  -- Reassigned if the job fails and gets picked up again
+  assigned_worker VARCHAR(128) DEFAULT NULL,
+
+  -- Cluster name (k8s)
+  -- Assigned when a worker picks up the job
+  -- Reassigned if the job fails and gets picked up again
+  assigned_cluster VARCHAR(128) DEFAULT NULL,
+
   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 
@@ -98,6 +108,12 @@ CREATE TABLE generic_download_jobs (
   -- Failures because of permissions require human intervention => [retry_at=null].
   -- Failures because of invalid files are dead => [status=dead].
   retry_at TIMESTAMP NULL,
+
+  -- Set when the job first starts executing
+  first_started_at TIMESTAMP NULL,
+
+  -- Set when the job is successfully completed
+  successfully_completed_at TIMESTAMP NULL,
 
   -- INDICES --
   PRIMARY KEY (id),
