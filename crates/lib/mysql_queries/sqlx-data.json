@@ -2722,6 +2722,16 @@
     },
     "query": "\nUPDATE user_sessions\nSET deleted_at = CURRENT_TIMESTAMP()\nWHERE\n    token = ?\n    AND deleted_at IS NULL\n        "
   },
+  "2177f29265040bda6bb4418b521679fcbc372a73620415f4812c45fbb03d5933": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Right": 4
+      }
+    },
+    "query": "\nUPDATE generic_download_jobs\nSET\n  status = \"complete_failure\",\n  on_success_downloaded_entity_token = ?,\n  on_success_downloaded_entity_type = ?,\n  failure_reason = NULL,\n  success_execution_millis = ?,\n  retry_at = NULL\nWHERE id = ?\n        "
+  },
   "218b3fe667b34bfa158bb7d4f600a3b91a22460adf566dcdf6ce540006e6c684": {
     "describe": {
       "columns": [],
@@ -3632,6 +3642,16 @@
     },
     "query": "\nUPDATE\n    ip_address_bans\nSET\n    mod_user_token = ?,\n    deleted_at = NULL\nWHERE\n    ip_address = ?\nLIMIT 1\n        "
   },
+  "348d5965a6e4038cbe00acdf0ad1eb1d26dc85d70834c6c86f802daa5a2d7794": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Right": 4
+      }
+    },
+    "query": "\nUPDATE generic_inference_jobs\nSET\n  status = \"complete_success\",\n  on_success_result_entity_type = ?,\n  on_success_result_entity_token = ?,\n  failure_reason = NULL,\n  internal_debugging_failure_reason = NULL,\n  success_execution_millis = ?,\n  retry_at = NULL,\n  successfully_completed_at = NOW()\nWHERE id = ?\n        "
+  },
   "359be6ce263afd62fc748c14c06c62ded5ed59fc0a9d1186967028af400d7d61": {
     "describe": {
       "columns": [
@@ -3926,16 +3946,6 @@
       }
     },
     "query": "\nUPDATE generic_inference_jobs\nSET\n  status = ?,\n  failure_reason = ?,\n  internal_debugging_failure_reason = ?,\n  retry_at = NOW() + interval 2 minute\nWHERE id = ?\n        "
-  },
-  "3e0c1b88d7c4f1b4d754ee2c6e32b99e72ac810d0da2a7e57fbf2aa8e9a9939a": {
-    "describe": {
-      "columns": [],
-      "nullable": [],
-      "parameters": {
-        "Right": 3
-      }
-    },
-    "query": "\nUPDATE generic_inference_jobs\nSET\n  status = \"complete_success\",\n  on_success_result_entity_type = ?,\n  on_success_result_entity_token = ?,\n  failure_reason = NULL,\n  internal_debugging_failure_reason = NULL,\n  retry_at = NULL,\n  successfully_completed_at = NOW()\nWHERE id = ?\n        "
   },
   "40a3301e9a3201e74d49b6b339f67291e2ae22d315188401708609ac2d28a68c": {
     "describe": {
@@ -9354,16 +9364,6 @@
     },
     "query": "\nSELECT *\nFROM tts_model_upload_jobs\nWHERE\n  (\n    status IN (\"pending\", \"attempt_failed\")\n  )\n  AND\n  (\n    retry_at IS NULL\n    OR\n    retry_at < CURRENT_TIMESTAMP\n  )\n  LIMIT ?\n        "
   },
-  "7b2cbcc19549a9fa4882c57a52ad39a3f7fd8f65e31f487553cea2158b4e7208": {
-    "describe": {
-      "columns": [],
-      "nullable": [],
-      "parameters": {
-        "Right": 3
-      }
-    },
-    "query": "\nUPDATE generic_download_jobs\nSET\n  status = \"complete_success\",\n  on_success_downloaded_entity_token = ?,\n  on_success_downloaded_entity_type = ?,\n  failure_reason = NULL,\n  retry_at = NULL,\n  successfully_completed_at = NOW()\nWHERE id = ?\n        "
-  },
   "7cd0ad5d7b9a2c393f799beadc1e0a6bc85d952e07a1b82a52115b99be40ff6d": {
     "describe": {
       "columns": [
@@ -10459,16 +10459,6 @@
     },
     "query": "\nINSERT INTO stripe_webhook_event_logs\nSET\n  stripe_event_id = ?,\n  stripe_event_type = ?,\n  maybe_stripe_event_entity_id = ?,\n  maybe_stripe_customer_id = ?,\n  stripe_event_created_at = ?,\n  stripe_is_production = ?,\n  maybe_user_token = ?,\n  action_was_taken = ?,\n  should_ignore_retry = ?\n        "
   },
-  "8951eb0c858fc803312db719820e8a2ae1446a9c741dc8a6874b8ae213793cfa": {
-    "describe": {
-      "columns": [],
-      "nullable": [],
-      "parameters": {
-        "Right": 3
-      }
-    },
-    "query": "\nUPDATE generic_download_jobs\nSET\n  status = \"complete_failure\",\n  on_success_downloaded_entity_token = ?,\n  on_success_downloaded_entity_type = ?,\n  failure_reason = NULL,\n  retry_at = NULL\nWHERE id = ?\n        "
-  },
   "89b66d91d1f2cd5c9871671b21a90e77d9041572a90cc6be6dd49845424677fa": {
     "describe": {
       "columns": [],
@@ -11071,6 +11061,16 @@
       }
     },
     "query": "\nSELECT\n    vc.token as `token: tokens::voice_conversion::model::VoiceConversionModelToken`,\n    vc.model_type as `model_type: enums::by_table::voice_conversion_models::voice_conversion_model_type::VoiceConversionModelType`,\n\n    vc.title,\n    vc.private_bucket_hash,\n\n    vc.created_at,\n    vc.updated_at,\n    vc.user_deleted_at,\n    vc.mod_deleted_at\n\nFROM voice_conversion_models as vc\n\nWHERE vc.token = ?\n        "
+  },
+  "9602cbbd0eac176d596ee2b66695274bffbf12947848d3bc9d75e1a9553d8934": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Right": 4
+      }
+    },
+    "query": "\nUPDATE generic_download_jobs\nSET\n  status = \"complete_success\",\n  on_success_downloaded_entity_token = ?,\n  on_success_downloaded_entity_type = ?,\n  failure_reason = NULL,\n  success_execution_millis = ?,\n  retry_at = NULL,\n  successfully_completed_at = NOW()\nWHERE id = ?\n        "
   },
   "961f792c24bee6009e3e8a215561db932871a53c48839b8cb80292de00e7b2e1": {
     "describe": {

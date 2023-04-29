@@ -1,3 +1,4 @@
+use std::time::Instant;
 use anyhow::anyhow;
 use crate::job::job_loop::process_single_job_error::ProcessSingleJobError;
 use crate::job::job_types::tts::process_single_tts_job::process_single_tts_job;
@@ -33,6 +34,8 @@ pub async fn process_single_job(job_dependencies: &JobDependencies, job: &Availa
 
   info!("Beginning work on {:?} = {}", job.inference_category, job.inference_job_token);
 
+  let job_start_time = Instant::now();
+
   // ==================== SETUP TEMP DIRS ==================== //
 
   let temp_dir = format!("temp_{}", job.id.0);
@@ -64,6 +67,10 @@ pub async fn process_single_job(job_dependencies: &JobDependencies, job: &Availa
 
   // =====================================================
 
+  let job_duration = Instant::now().duration_since(job_start_time);
+
+  info!("Job took duration to complete: {:?}", &job_duration);
+
   info!("Marking job complete...");
 
   mark_generic_inference_job_successfully_done(
@@ -71,6 +78,7 @@ pub async fn process_single_job(job_dependencies: &JobDependencies, job: &Availa
     job,
     maybe_entity_type,
     maybe_entity_token,
+    job_duration,
   ).await
       .map_err(|err| ProcessSingleJobError::Other(anyhow!("database error: {:?}", err)))?;
 

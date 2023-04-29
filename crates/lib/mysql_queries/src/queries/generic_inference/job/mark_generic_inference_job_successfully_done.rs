@@ -3,14 +3,20 @@ use crate::queries::generic_inference::job::list_available_generic_inference_job
 use enums::by_table::generic_inference_jobs::inference_result_type::InferenceResultType;
 use errors::AnyhowResult;
 use sqlx::MySqlPool;
+use std::time::Duration;
 
 pub async fn mark_generic_inference_job_successfully_done(
   pool: &MySqlPool,
   job: &AvailableInferenceJob,
   maybe_entity_type: Option<InferenceResultType>,
   maybe_entity_token: Option<&str>,
+  job_duration: Duration,
 ) -> AnyhowResult<()>
 {
+  // NB: MySql's unsigned int (32 bits) can store integers up to 4,294,967,295.
+  // Given milliseconds, this is ~49.71 days, which should be plenty for us.
+  let truncated_execution_millis = job_duration.as_millis() as u32;
+
   let query_result = sqlx::query!(
         r#"
 UPDATE generic_inference_jobs
@@ -20,12 +26,14 @@ SET
   on_success_result_entity_token = ?,
   failure_reason = NULL,
   internal_debugging_failure_reason = NULL,
+  success_execution_millis = ?,
   retry_at = NULL,
   successfully_completed_at = NOW()
 WHERE id = ?
         "#,
         maybe_entity_type,
         maybe_entity_token,
+        truncated_execution_millis,
         job.id.0,
     )
       .execute(pool)

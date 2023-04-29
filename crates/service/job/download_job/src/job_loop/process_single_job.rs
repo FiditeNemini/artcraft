@@ -1,3 +1,4 @@
+use std::time::Instant;
 use anyhow::anyhow;
 use config::is_bad_download_url::is_bad_download_url;
 use container_common::anyhow_result::AnyhowResult;
@@ -29,6 +30,8 @@ pub async fn process_single_job(job_state: &JobState, job: &AvailableDownloadJob
   }
 
   info!("Beginning work on {:?} = {} | {}", job.download_type, job.download_job_token, job.download_url);
+
+  let job_start_time = Instant::now();
 
   // ==================== SETUP TEMP DIRS ==================== //
 
@@ -77,13 +80,19 @@ pub async fn process_single_job(job_state: &JobState, job: &AvailableDownloadJob
 
   // =====================================================
 
+  let job_duration = Instant::now().duration_since(job_start_time);
+
+  info!("Job took duration to complete: {:?}", &job_duration);
+
   info!("Marking job complete...");
+
   mark_generic_download_job_done(
     &job_state.mysql_pool,
     job,
     true,
     entity_token.as_deref(),
     entity_type.as_deref(),
+    job_duration,
   ).await?;
 
   info!("Saved model record: {} - {}", job.id.0, &job.download_job_token);
