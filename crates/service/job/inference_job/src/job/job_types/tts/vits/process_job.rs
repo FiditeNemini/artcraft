@@ -196,8 +196,6 @@ pub async fn process_job(args: VitsProcessJobArgs<'_>) -> Result<JobSuccessResul
   let text_hash = sha256_hash_string(&cleaned_inference_text)
       .map_err(|e| ProcessSingleJobError::Other(e))?;
 
-  let worker_name = args.job_dependencies.get_worker_name();
-
   info!("Saving tts inference record...");
 
   // NB: The stupid DB field for spectrograms is not nullable, so we'll just set empty string.
@@ -214,20 +212,10 @@ pub async fn process_job(args: VitsProcessJobArgs<'_>) -> Result<JobSuccessResul
     file_metadata.file_size_bytes,
     file_metadata.duration_millis.unwrap_or(0),
     args.job_dependencies.worker_details.is_on_prem,
-    &worker_name,
+    &args.job_dependencies.container.hostname,
     args.job_dependencies.worker_details.is_debug_worker)
       .await
       .map_err(|e| ProcessSingleJobError::Other(e))?;
-
-  //info!("Marking job complete...");
-  //mark_tts_inference_job_done(
-  //  &args.job_dependencies.mysql_pool,
-  //  JobIdType::GenericJob(job.id),
-  //  true,
-  //  Some(&inference_result_token),
-  //  &worker_name)
-  //    .await
-  //    .map_err(|e| ProcessSingleJobError::Other(e))?;
 
   info!("TTS Done. Original text was: {:?}", &job.maybe_raw_inference_text);
 

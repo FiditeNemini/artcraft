@@ -38,6 +38,10 @@ pub fn bootstrap<P: AsRef<Path>>(args: BootstrapArgs<'_, P>) -> AnyhowResult<Con
 
   info!("Currently deployed in environment: {:?}",&server_environment);
 
+  // TODO(bt, 2023-04-29): There was an old note in `inference-job` about setting special k8s
+  //  variables so we can debug on-prem workers? Something gets conflated maybe and makes it hard
+  //  to determine which on-prem worker generates the result? Not a big priority until we have
+  //  on-prem workloads again.
   let server_hostname = hostname::get()
       .ok()
       .and_then(|h| h.into_string().ok())

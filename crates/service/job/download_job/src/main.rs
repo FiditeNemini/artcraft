@@ -68,32 +68,7 @@ async fn main() -> AnyhowResult<()> {
     config_search_directories: &[".", "./config", "crates/service/job/download_job/config"],
   })?;
 
-//  easyenv::init_all_with_default_logging(Some(DEFAULT_RUST_LOG));
-//
-//  // TODO: Deprecate pulling secrets from these two files and use the app-named env+secrets files (below) instead.
-//  let _ = dotenv::from_filename(".env-download-job").ok(); // NB: Specific to `download-job` app.
-//  let _ = dotenv::from_filename(".env-secrets").ok(); // NB: Secrets not to live in source control.
-//
-//  let _ = envvar::read_from_filename_and_paths(
-//    "download-job.env",
-//    &[".", "./config", "crates/service/job/download_job/config"])?;
-//
-//  let _ = envvar::read_from_filename_and_paths(
-//    "download-job-secrets.env",
-//    &[".", "./config", "crates/service/job/download_job/config"]
-//  ).map_err(|err| {
-//    // NB: Fail open.
-//    warn!("Could not load app-specific secrets from env file (this might be fine, eg. provided by k8s): {:?}", err);
-//  });
-
-  info!("Obtaining hostname...");
-
-  let server_hostname = hostname::get()
-    .ok()
-    .and_then(|h| h.into_string().ok())
-    .unwrap_or("generic-download-job".to_string());
-
-  info!("Hostname: {}", &server_hostname);
+  info!("Hostname: {}", &container_environment.hostname);
 
   // Bucket stuff
   let access_key = easyenv::get_env_string_required(ENV_ACCESS_KEY)?;

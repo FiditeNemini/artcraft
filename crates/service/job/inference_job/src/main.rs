@@ -77,31 +77,7 @@ async fn main() -> AnyhowResult<()> {
     config_search_directories: &[".", "./config", "crates/service/job/inference_job/config"],
   })?;
 
-//  easyenv::init_all_with_default_logging(Some(DEFAULT_RUST_LOG));
-//
-//  // TODO: Deprecate
-//  // NB: Do not check this secrets-containing dotenv file into VCS.
-//  // This file should only contain *development* secrets, never production.
-//  let _ = dotenv::from_filename(".env-secrets").ok();
-//
-//  let _ = envvar::read_from_filename_and_paths(
-//    "inference-job.env",
-//    &[".", "./config", "crates/service/job/inference_job/config"])?;
-//
-//  let _ = envvar::read_from_filename_and_paths(
-//    "inference-job-secrets.env",
-//    &[".", "./config", "crates/service/job/inference_job/config"]
-//  ).map_err(|err| {
-//    // NB: Fail open.
-//    warn!("Could not load app-specific secrets from env file (this might be fine, eg. provided by k8s): {:?}", err);
-//  });
-
-  info!("Obtaining worker hostname...");
-
-  let server_hostname = hostname::get()
-      .ok()
-      .and_then(|h| h.into_string().ok())
-      .unwrap_or("inference-job".to_string());
+  info!("Hostname: {}", &container_environment.hostname);
 
   // NB: These are non-standard env vars we're injecting ourselves.
   let k8s_node_name = easyenv::get_env_string_optional("K8S_NODE_NAME");
@@ -111,7 +87,6 @@ async fn main() -> AnyhowResult<()> {
   // Only our local workers will set this to true.
   let is_on_prem = easyenv::get_env_bool_or_default("IS_ON_PREM", false);
 
-  info!("Hostname: {}", &server_hostname);
   info!("Is on-premises: {}", is_on_prem);
 
   // Bucket stuff (shared)
@@ -251,9 +226,6 @@ async fn main() -> AnyhowResult<()> {
     newrelic_disabled,
     worker_details: JobWorkerDetails {
       is_on_prem,
-      worker_hostname: server_hostname.clone(),
-      k8s_node_name,
-      k8s_pod_name,
       is_debug_worker,
     },
     caches: JobCaches {

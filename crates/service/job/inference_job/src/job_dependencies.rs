@@ -91,29 +91,10 @@ pub struct JobWorkerDetails {
 
   // The worker is "on-premises".
   pub is_on_prem: bool,
-
-  // Hostname, node name, pod name, etc. for the worker.
-  // These might have fallback values and aren't guaranteed to be exact.
-  pub worker_hostname: String,
-  pub k8s_node_name: Option<String>,
-  pub k8s_pod_name: Option<String>,
 }
 
 pub struct JobCaches {
   pub tts_model_record_cache: MultiItemTtlCache<String, TtsModelForInferenceRecord>,
-}
-
-impl JobDependencies {
-
-  /// Get the best name for the worker.
-  pub fn get_worker_name(&self) -> String {
-    // Default to showing the k8s node (machine) name, if possible, as this benefits
-    // debugging on-prem workloads.
-    self.worker_details.k8s_node_name.as_deref()
-        .or(self.worker_details.k8s_pod_name.as_deref())
-        .map(|name| name.to_string())
-        .unwrap_or_else(|| self.worker_details.worker_hostname.clone())
-  }
 }
 
 /// Per-job type details

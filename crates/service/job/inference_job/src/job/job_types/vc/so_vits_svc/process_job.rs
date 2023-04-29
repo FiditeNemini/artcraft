@@ -274,9 +274,6 @@ pub async fn process_job(args: SoVitsSvcProcessJobArgs<'_>) -> Result<JobSuccess
 
   // ==================== SAVE RECORDS ==================== //
 
-  let worker_name = args.job_dependencies.get_worker_name();
-  let worker_cluster = args.job_dependencies.get_worker_name(); // TODO: Propagate actual cluster name
-
   info!("Saving vc inference record...");
 
   let (inference_result_token, id) = insert_voice_conversion_result(InsertArgs {
@@ -286,23 +283,12 @@ pub async fn process_job(args: SoVitsSvcProcessJobArgs<'_>) -> Result<JobSuccess
     file_size_bytes: file_metadata.file_size_bytes,
     duration_millis: file_metadata.duration_millis.unwrap_or(0),
     is_on_prem: args.job_dependencies.worker_details.is_on_prem,
-    worker_hostname: &worker_name,
-    worker_cluster: &worker_cluster,
+    worker_hostname: &args.job_dependencies.container.hostname,
+    worker_cluster: &args.job_dependencies.container.cluster_name,
     is_debug_worker: args.job_dependencies.worker_details.is_debug_worker
   })
       .await
       .map_err(|e| ProcessSingleJobError::Other(e))?;
-
-  // TODO:
-  //info!("Marking job complete...");
-  //mark_tts_inference_job_done(
-  //  &args.job_dependencies.mysql_pool,
-  //  JobIdType::GenericJob(job.id),
-  //  true,
-  //  Some(&inference_result_token),
-  //  &worker_name)
-  //    .await
-  //    .map_err(|e| ProcessSingleJobError::Other(e))?;
 
   info!("TTS Done. Original text was: {:?}", &job.maybe_raw_inference_text);
 
