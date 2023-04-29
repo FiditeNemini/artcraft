@@ -90,6 +90,12 @@ CREATE TABLE generic_download_jobs (
   -- If there is a failure, tell the user why.
   failure_reason VARCHAR(512) DEFAULT NULL,
 
+  -- On success, we populate how long the job execution took in milliseconds.
+  -- We have this because 1) the job system timestamps are second-resolution,
+  -- and 2) the structure of the jobs executor may change, potentially changing
+  -- derived execution time analytics with it.
+  success_execution_millis INT(10) UNSIGNED DEFAULT NULL,
+
   -- Worker hostname (linux hostname, k8s pod name)
   -- Assigned when a worker picks up the job
   -- Reassigned if the job fails and gets picked up again

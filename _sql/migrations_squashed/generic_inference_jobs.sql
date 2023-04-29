@@ -147,6 +147,12 @@ CREATE TABLE generic_inference_jobs (
   -- Optional internal-only debugging information in the case of failure.
   internal_debugging_failure_reason VARCHAR(512) DEFAULT NULL,
 
+  -- On success, we populate how long the job execution took in milliseconds.
+  -- We have this because 1) the job system timestamps are second-resolution,
+  -- and 2) the structure of the jobs executor may change, potentially changing
+  -- derived execution time analytics with it.
+  success_execution_millis INT(10) UNSIGNED DEFAULT NULL,
+
   -- TODO: Remove once `assigned_worker` column is added
   --   and existing queries for this column are removed.
   -- The last worker (hostname or pod name) to touch the job, either in the case of success or failure.
