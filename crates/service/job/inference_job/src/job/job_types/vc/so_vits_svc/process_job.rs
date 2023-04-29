@@ -282,7 +282,7 @@ pub async fn process_job(args: SoVitsSvcProcessJobArgs<'_>) -> Result<JobSuccess
     public_bucket_hash: result_bucket_location.get_object_hash(),
     file_size_bytes: file_metadata.file_size_bytes,
     duration_millis: file_metadata.duration_millis.unwrap_or(0),
-    is_on_prem: args.job_dependencies.worker_details.is_on_prem,
+    is_on_prem: args.job_dependencies.container.is_on_prem,
     worker_hostname: &args.job_dependencies.container.hostname,
     worker_cluster: &args.job_dependencies.container.cluster_name,
     is_debug_worker: args.job_dependencies.worker_details.is_debug_worker

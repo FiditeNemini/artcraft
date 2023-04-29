@@ -211,7 +211,7 @@ pub async fn process_job(args: VitsProcessJobArgs<'_>) -> Result<JobSuccessResul
     &fake_spectrogram_path, // NB: No spectogram!
     file_metadata.file_size_bytes,
     file_metadata.duration_millis.unwrap_or(0),
-    args.job_dependencies.worker_details.is_on_prem,
+    args.job_dependencies.container.is_on_prem,
     &args.job_dependencies.container.hostname,
     args.job_dependencies.worker_details.is_debug_worker)
       .await

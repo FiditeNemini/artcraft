@@ -20,6 +20,10 @@ pub struct ContainerEnvironment {
   pub server_environment: ServerEnvironment,
   pub hostname: String,
   pub cluster_name: String,
+
+  /// Whether the container is operating on-premises.
+  /// False if the container is deployed to the cloud.
+  pub is_on_prem: bool,
 }
 
 /// Environment variable for server environment.
@@ -49,6 +53,41 @@ pub fn bootstrap<P: AsRef<Path>>(args: BootstrapArgs<'_, P>) -> AnyhowResult<Con
 
   info!("With hostname: {:?}", &server_hostname);
 
+  let cluster_name = easyenv::get_env_string_optional("K8S_CLUSTER_NAME")
+      .unwrap_or("unknown-cluster".to_string());
+
+  info!("With cluster name: {:?}", &cluster_name);
+
+  // TODO(bt, 2023-04-29): These were old variables in `inference-job` that probably never got used,
+  //  but adding these is a good idea for tracking which jobs are assigned where.
+  // NB: These are non-standard env vars we're injecting ourselves.
+  // let k8s_node_name = easyenv::get_env_string_optional("K8S_NODE_NAME");
+  // let k8s_pod_name = easyenv::get_env_string_optional("K8S_POD_NAME");
+
+  // NB: It'll be worthwhile to see how much compute is happening at our local on-premises cluster
+  // Only our local workers will set this to true.
+  let is_on_prem = easyenv::get_env_bool_or_default("IS_ON_PREM", false);
+
+  info!("Is on premises? {}", is_on_prem);
+
+  // Debug workers only process special debug requests. They're silent otherwise.
+  // Non-debug workers ignore debug requests. This is so we can deploy special code
+  // to debug nodes (typically just one, perhaps even ephemerally).
+  //let is_debug_worker = easyenv::get_env_bool_or_default("IS_DEBUG_WORKER", false);
+  //info!("Is debug worker? {}", is_debug_worker);
+
+  load_env_config_files(server_environment, &args)?;
+
+  Ok(ContainerEnvironment {
+    server_environment,
+    hostname: server_hostname,
+    cluster_name,
+    is_on_prem,
+  })
+}
+
+fn load_env_config_files<P: AsRef<Path>>(server_environment: ServerEnvironment, args: &BootstrapArgs<'_, P>) -> AnyhowResult<()> {
+
   let env_config_file_names = match server_environment {
     ServerEnvironment::Development => vec![
       format!("{}.common.env", &args.app_name),
@@ -61,22 +100,15 @@ pub fn bootstrap<P: AsRef<Path>>(args: BootstrapArgs<'_, P>) -> AnyhowResult<Con
     ],
   };
 
-  for config_file in env_config_file_names.into_iter() {
-    info!("Loading environment variable config file: {}", &config_file);
+  for env_config_file in env_config_file_names.into_iter() {
+    info!("Loading environment variable config file: {}", &env_config_file);
 
     let was_read = envvar::maybe_read_from_filename_and_paths(
-      &config_file,
+      &env_config_file,
       args.config_search_directories)?;
 
-    info!("Environment config file {} was read: {}", &config_file, was_read);
+    info!("Environment config file {} was read: {}", &env_config_file, was_read);
   }
 
-  let cluster_name = easyenv::get_env_string_optional("K8S_CLUSTER_NAME")
-      .unwrap_or("unknown-cluster".to_string());
-
-  Ok(ContainerEnvironment {
-    server_environment,
-    hostname: server_hostname,
-    cluster_name,
-  })
+  Ok(())
 }

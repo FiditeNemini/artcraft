@@ -83,12 +83,6 @@ async fn main() -> AnyhowResult<()> {
   let k8s_node_name = easyenv::get_env_string_optional("K8S_NODE_NAME");
   let k8s_pod_name = easyenv::get_env_string_optional("K8S_POD_NAME");
 
-  // NB: It'll be worthwhile to see how much compute is happening at our local on-premises cluster
-  // Only our local workers will set this to true.
-  let is_on_prem = easyenv::get_env_bool_or_default("IS_ON_PREM", false);
-
-  info!("Is on-premises: {}", is_on_prem);
-
   // Bucket stuff (shared)
   let access_key = easyenv::get_env_string_required(ENV_ACCESS_KEY)?;
   let secret_key = easyenv::get_env_string_required(ENV_SECRET_KEY)?;
@@ -225,7 +219,6 @@ async fn main() -> AnyhowResult<()> {
     newrelic_client,
     newrelic_disabled,
     worker_details: JobWorkerDetails {
-      is_on_prem,
       is_debug_worker,
     },
     caches: JobCaches {

@@ -88,9 +88,6 @@ pub struct JobWorkerDetails {
   // Non-debug workers ignore debug requests. This is so we can deploy special code
   // to debug nodes (typically just one, perhaps even ephemerally).
   pub is_debug_worker: bool,
-
-  // The worker is "on-premises".
-  pub is_on_prem: bool,
 }
 
 pub struct JobCaches {
