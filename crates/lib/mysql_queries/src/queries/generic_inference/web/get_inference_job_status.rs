@@ -12,6 +12,11 @@ pub struct GenericInferenceJobStatus {
   pub status: String,
   pub attempt_count: u16,
 
+  pub maybe_assigned_worker: Option<String>,
+  pub maybe_assigned_cluster: Option<String>,
+
+  pub maybe_first_started_at: Option<DateTime<Utc>>,
+
   pub request_details: RequestDetails,
   pub maybe_result_details: Option<ResultDetails>,
 
@@ -39,6 +44,8 @@ pub struct ResultDetails {
   /// Whether the location is a full path (for tts) or a hash (for vc) that
   /// needs to be reconstructed into a path.
   pub public_bucket_location_is_hash: bool,
+
+  pub maybe_successfully_completed_at: Option<DateTime<Utc>>,
 }
 
 /// Look up job status.
@@ -72,8 +79,14 @@ SELECT
     tts_results.public_bucket_wav_audio_path as maybe_tts_public_bucket_path,
     voice_conversion_results.public_bucket_hash as maybe_voice_conversion_public_bucket_hash,
 
+    jobs.assigned_worker as maybe_assigned_worker,
+    jobs.assigned_cluster as maybe_assigned_cluster,
+
     jobs.created_at,
-    jobs.updated_at
+    jobs.updated_at,
+
+    jobs.first_started_at as maybe_first_started_at,
+    jobs.successfully_completed_at as maybe_successfully_completed_at
 
 FROM generic_inference_jobs as jobs
 
@@ -126,6 +139,7 @@ WHERE jobs.token = ?
                   entity_token: entity_token.to_string(),
                   public_bucket_location_or_hash: public_bucket_hash.to_string(),
                   public_bucket_location_is_hash: bucket_path_is_hash,
+                  maybe_successfully_completed_at: record.maybe_successfully_completed_at.clone(),
                 }
               })
             })
@@ -135,6 +149,9 @@ WHERE jobs.token = ?
     job_token: record.job_token,
     status: record.status,
     attempt_count: record.attempt_count,
+    maybe_assigned_worker: record.maybe_assigned_worker,
+    maybe_assigned_cluster: record.maybe_assigned_cluster,
+    maybe_first_started_at: record.maybe_first_started_at,
     request_details: RequestDetails {
       inference_category: record.inference_category,
       maybe_model_type: record.maybe_model_type,
@@ -168,7 +185,13 @@ struct RawGenericInferenceJobStatus {
   pub maybe_voice_conversion_public_bucket_hash: Option<String>, // NB: This is the bucket hash.
   pub maybe_tts_public_bucket_path: Option<String>, // NB: This isn't the bucket path, but the whole hash.
 
+  pub maybe_assigned_worker: Option<String>,
+  pub maybe_assigned_cluster: Option<String>,
+
   pub created_at: DateTime<Utc>,
   pub updated_at: DateTime<Utc>,
+
+  pub maybe_first_started_at: Option<DateTime<Utc>>,
+  pub maybe_successfully_completed_at: Option<DateTime<Utc>>,
 }
 

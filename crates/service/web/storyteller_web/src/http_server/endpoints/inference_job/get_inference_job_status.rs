@@ -6,6 +6,7 @@ use actix_web::error::ResponseError;
 use actix_web::http::StatusCode;
 use actix_web::web::Path;
 use actix_web::{Responder, web, HttpResponse, error, HttpRequest, HttpMessage};
+use buckets::public::voice_conversion_results::original_file::VoiceConversionResultOriginalFilePath;
 use chrono::{DateTime, Utc};
 use crate::AnyhowResult;
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
@@ -27,7 +28,6 @@ use std::borrow::BorrowMut;
 use std::fmt;
 use std::ops::Deref;
 use std::sync::Arc;
-use buckets::public::voice_conversion_results::original_file::VoiceConversionResultOriginalFilePath;
 use tokens::jobs::inference::InferenceJobToken;
 
 /// For the URL PathInfo
@@ -75,6 +75,11 @@ pub struct StatusDetailsResponse {
   /// This can denote inference progress, and the Python code can write to it.
   pub maybe_extra_status_description: Option<String>,
 
+  pub maybe_assigned_worker: Option<String>,
+  pub maybe_assigned_cluster: Option<String>,
+
+  pub maybe_first_started_at: Option<DateTime<Utc>>,
+
   pub attempt_count: u8,
 }
 
@@ -85,6 +90,8 @@ pub struct ResultDetailsResponse {
 
   /// NB: This is only for audio- or video- type results.
   pub maybe_public_bucket_media_path: Option<String>,
+
+  pub maybe_successfully_completed_at: Option<DateTime<Utc>>,
 }
 
 #[derive(Debug)]
@@ -176,6 +183,9 @@ pub async fn get_inference_job_status_handler(
     status: StatusDetailsResponse {
       status: record.status,
       maybe_extra_status_description,
+      maybe_assigned_worker: record.maybe_assigned_worker,
+      maybe_assigned_cluster: record.maybe_assigned_cluster,
+      maybe_first_started_at: record.maybe_first_started_at,
       attempt_count: record.attempt_count as u8,
     },
     maybe_result: record.maybe_result_details.map(|result_details| {
@@ -195,6 +205,7 @@ pub async fn get_inference_job_status_handler(
         entity_type: result_details.entity_type,
         entity_token: result_details.entity_token,
         maybe_public_bucket_media_path: Some(public_bucket_media_path),
+        maybe_successfully_completed_at: result_details.maybe_successfully_completed_at,
       }
     }),
     created_at: record.created_at,
