@@ -99,7 +99,7 @@ mod tests {
   #[test]
   fn test_command() {
     let command = DockerOptions {
-      image_name: "MY_IMAAGE".to_string(),
+      image_name: "MY_IMAGE".to_string(),
       maybe_bind_mount: Some(DockerFilesystemMount {
         local_filesystem: "/local".to_string(),
         container_filesystem: "/container".to_string(),
@@ -111,7 +111,7 @@ mod tests {
       maybe_gpu: Some(DockerGpu::All),
     };
 
-    assert_eq!("docker run --rm  --env FOO=1,BAR=2  --mount type=bind,source=/local,target=/container   --gpus all  MY_IMAAGE /bin/bash -c \"echo wat\"",
+    assert_eq!("docker run --rm  --env FOO=1  --env BAR=2   --mount type=bind,source=/local,target=/container   --gpus all  MY_IMAGE /bin/bash -c \"echo wat\"",
                command.to_command_string("echo wat"));
   }
 }

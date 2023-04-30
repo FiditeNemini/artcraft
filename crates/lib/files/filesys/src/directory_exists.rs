@@ -33,8 +33,8 @@ mod tests {
     assert_eq!(true, directory_exists(PathBuf::from("/")));
 
     // Other directories
-    assert_eq!(true, directory_exists("../../../test_data/audio/flac"));
-    assert_eq!(true, directory_exists(PathBuf::from("../../../test_data/audio/flac")));
+    assert_eq!(true, directory_exists("../../../../test_data/audio/flac"));
+    assert_eq!(true, directory_exists(PathBuf::from("../../../../test_data/audio/flac")));
   }
 
   #[test]

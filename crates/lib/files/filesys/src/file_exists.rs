@@ -18,8 +18,8 @@ mod tests {
 
   #[test]
   fn test_file_exists() {
-    assert_eq!(true, file_exists("../../../test_data/audio/flac/zelda_ocarina_small_item.flac"));
-    assert_eq!(true, file_exists(PathBuf::from("../../../test_data/audio/flac/zelda_ocarina_small_item.flac")));
+    assert_eq!(true, file_exists("../../../../test_data/audio/flac/zelda_ocarina_small_item.flac"));
+    assert_eq!(true, file_exists(PathBuf::from("../../../../test_data/audio/flac/zelda_ocarina_small_item.flac")));
   }
 
   #[test]
