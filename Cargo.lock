@@ -4123,6 +4123,7 @@ dependencies = [
  "errors",
  "log",
  "symphonia",
+ "symphonia-format-mkv 0.5.2",
 ]
 
 [[package]]
@@ -6752,12 +6753,12 @@ dependencies = [
  "symphonia-codec-opus",
  "symphonia-codec-pcm",
  "symphonia-codec-vorbis",
- "symphonia-core",
+ "symphonia-core 0.5.0",
  "symphonia-format-isomp4",
- "symphonia-format-mkv",
+ "symphonia-format-mkv 0.5.0",
  "symphonia-format-ogg",
  "symphonia-format-wav",
- "symphonia-metadata",
+ "symphonia-metadata 0.5.0",
 ]
 
 [[package]]
@@ -6766,9 +6767,9 @@ version = "0.5.0"
 source = "git+https://github.com/pdeljanov/Symphonia.git?rev=e1a70095c4409478c1ded499fb8dd4afa540fb90#e1a70095c4409478c1ded499fb8dd4afa540fb90"
 dependencies = [
  "log",
- "symphonia-core",
- "symphonia-metadata",
- "symphonia-utils-xiph",
+ "symphonia-core 0.5.0",
+ "symphonia-metadata 0.5.0",
+ "symphonia-utils-xiph 0.5.0",
 ]
 
 [[package]]
@@ -6779,8 +6780,8 @@ dependencies = [
  "bitflags",
  "lazy_static",
  "log",
- "symphonia-core",
- "symphonia-metadata",
+ "symphonia-core 0.5.0",
+ "symphonia-metadata 0.5.0",
 ]
 
 [[package]]
@@ -6790,7 +6791,7 @@ source = "git+https://github.com/pdeljanov/Symphonia.git?rev=e1a70095c4409478c1d
 dependencies = [
  "lazy_static",
  "log",
- "symphonia-core",
+ "symphonia-core 0.5.0",
 ]
 
 [[package]]
@@ -6799,7 +6800,7 @@ version = "0.5.0"
 source = "git+https://github.com/pdeljanov/Symphonia.git?rev=e1a70095c4409478c1ded499fb8dd4afa540fb90#e1a70095c4409478c1ded499fb8dd4afa540fb90"
 dependencies = [
  "log",
- "symphonia-core",
+ "symphonia-core 0.5.0",
 ]
 
 [[package]]
@@ -6808,7 +6809,7 @@ version = "0.0.1"
 source = "git+https://github.com/pdeljanov/Symphonia.git?rev=e1a70095c4409478c1ded499fb8dd4afa540fb90#e1a70095c4409478c1ded499fb8dd4afa540fb90"
 dependencies = [
  "log",
- "symphonia-core",
+ "symphonia-core 0.5.0",
 ]
 
 [[package]]
@@ -6817,7 +6818,7 @@ version = "0.5.0"
 source = "git+https://github.com/pdeljanov/Symphonia.git?rev=e1a70095c4409478c1ded499fb8dd4afa540fb90#e1a70095c4409478c1ded499fb8dd4afa540fb90"
 dependencies = [
  "log",
- "symphonia-core",
+ "symphonia-core 0.5.0",
 ]
 
 [[package]]
@@ -6826,8 +6827,8 @@ version = "0.5.0"
 source = "git+https://github.com/pdeljanov/Symphonia.git?rev=e1a70095c4409478c1ded499fb8dd4afa540fb90#e1a70095c4409478c1ded499fb8dd4afa540fb90"
 dependencies = [
  "log",
- "symphonia-core",
- "symphonia-utils-xiph",
+ "symphonia-core 0.5.0",
+ "symphonia-utils-xiph 0.5.0",
 ]
 
 [[package]]
@@ -6843,15 +6844,28 @@ dependencies = [
 ]
 
 [[package]]
+name = "symphonia-core"
+version = "0.5.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "6b9567e2d8a5f866b2f94f5d366d811e0c6826babcff6d37de9e1a6690d38869"
+dependencies = [
+ "arrayvec 0.7.2",
+ "bitflags",
+ "bytemuck",
+ "lazy_static",
+ "log",
+]
+
+[[package]]
 name = "symphonia-format-isomp4"
 version = "0.5.0"
 source = "git+https://github.com/pdeljanov/Symphonia.git?rev=e1a70095c4409478c1ded499fb8dd4afa540fb90#e1a70095c4409478c1ded499fb8dd4afa540fb90"
 dependencies = [
  "encoding_rs",
  "log",
- "symphonia-core",
- "symphonia-metadata",
- "symphonia-utils-xiph",
+ "symphonia-core 0.5.0",
+ "symphonia-metadata 0.5.0",
+ "symphonia-utils-xiph 0.5.0",
 ]
 
 [[package]]
@@ -6861,9 +6875,22 @@ source = "git+https://github.com/pdeljanov/Symphonia.git?rev=e1a70095c4409478c1d
 dependencies = [
  "lazy_static",
  "log",
- "symphonia-core",
- "symphonia-metadata",
- "symphonia-utils-xiph",
+ "symphonia-core 0.5.0",
+ "symphonia-metadata 0.5.0",
+ "symphonia-utils-xiph 0.5.0",
+]
+
+[[package]]
+name = "symphonia-format-mkv"
+version = "0.5.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "1bd22f2def8c8f078495ad66111648bfc7d5222ee33774f2077cb665588f3119"
+dependencies = [
+ "lazy_static",
+ "log",
+ "symphonia-core 0.5.2",
+ "symphonia-metadata 0.5.2",
+ "symphonia-utils-xiph 0.5.2",
 ]
 
 [[package]]
@@ -6872,9 +6899,9 @@ version = "0.5.0"
 source = "git+https://github.com/pdeljanov/Symphonia.git?rev=e1a70095c4409478c1ded499fb8dd4afa540fb90#e1a70095c4409478c1ded499fb8dd4afa540fb90"
 dependencies = [
  "log",
- "symphonia-core",
- "symphonia-metadata",
- "symphonia-utils-xiph",
+ "symphonia-core 0.5.0",
+ "symphonia-metadata 0.5.0",
+ "symphonia-utils-xiph 0.5.0",
 ]
 
 [[package]]
@@ -6883,8 +6910,8 @@ version = "0.5.0"
 source = "git+https://github.com/pdeljanov/Symphonia.git?rev=e1a70095c4409478c1ded499fb8dd4afa540fb90#e1a70095c4409478c1ded499fb8dd4afa540fb90"
 dependencies = [
  "log",
- "symphonia-core",
- "symphonia-metadata",
+ "symphonia-core 0.5.0",
+ "symphonia-metadata 0.5.0",
 ]
 
 [[package]]
@@ -6895,7 +6922,19 @@ dependencies = [
  "encoding_rs",
  "lazy_static",
  "log",
- "symphonia-core",
+ "symphonia-core 0.5.0",
+]
+
+[[package]]
+name = "symphonia-metadata"
+version = "0.5.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "acd35c263223ef6161000be79b124a75de3e065eea563bf3ef169b3e94c7bb2e"
+dependencies = [
+ "encoding_rs",
+ "lazy_static",
+ "log",
+ "symphonia-core 0.5.2",
 ]
 
 [[package]]
@@ -6903,8 +6942,18 @@ name = "symphonia-utils-xiph"
 version = "0.5.0"
 source = "git+https://github.com/pdeljanov/Symphonia.git?rev=e1a70095c4409478c1ded499fb8dd4afa540fb90#e1a70095c4409478c1ded499fb8dd4afa540fb90"
 dependencies = [
- "symphonia-core",
- "symphonia-metadata",
+ "symphonia-core 0.5.0",
+ "symphonia-metadata 0.5.0",
+]
+
+[[package]]
+name = "symphonia-utils-xiph"
+version = "0.5.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "ce340a6c33ac06cb42de01220308ec056e8a2a3d5cc664aaf34567392557136b"
+dependencies = [
+ "symphonia-core 0.5.2",
+ "symphonia-metadata 0.5.2",
 ]
 
 [[package]]

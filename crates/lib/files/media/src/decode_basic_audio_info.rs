@@ -1,15 +1,19 @@
-use std::fs::File;
+use crate::decode_webm_opus_info::decode_mkv_or_webm;
+use crate::open_media_source_stream::{open_bytes_media_source_stream, open_file_media_source_stream};
 use errors::AnyhowResult;
-use std::io::{BufReader, Cursor};
-use std::path::Path;
+use std::path::{Path, PathBuf};
 use symphonia::core::audio::SampleBuffer;
 use symphonia::core::formats::{FormatOptions, FormatReader, Track};
-use symphonia::core::io::{MediaSourceStream, ReadOnlySource};
+use symphonia::core::io::MediaSourceStream;
 use symphonia::core::meta::MetadataOptions;
 use symphonia::core::probe::Hint;
 
 // Returned if nothing could be decoded
-const NO_AUDIO_INFO : BasicAudioInfo = BasicAudioInfo { duration_millis: None, codec_name: None, required_full_decode: false };
+const NO_AUDIO_INFO : BasicAudioInfo = BasicAudioInfo {
+  duration_millis: None,
+  codec_name: None,
+  required_full_decode: false
+};
 
 #[derive(Clone)]
 pub struct BasicAudioInfo {
@@ -18,21 +22,22 @@ pub struct BasicAudioInfo {
   pub required_full_decode: bool,
 }
 
+enum OriginalMediaSource<'a> {
+  FileBytes(&'a [u8]),
+  FilePath(PathBuf),
+}
+
 /// Decode audio info from an audio or video file containing audio streams.
 /// This handles multiple formats and codecs.
 pub fn decode_basic_audio_bytes_info(
   audio_bytes: &[u8],
   maybe_mimetype: Option<&str>,
   maybe_extension: Option<&str>,
-) -> AnyhowResult<BasicAudioInfo> {
-
-  // FIXME(bt, 2022-12-21): This is horribly inefficient.
-  let bytes = audio_bytes.to_vec();
-  let reader = Cursor::new(bytes);
-  let source = ReadOnlySource::new(reader);
-  let media_source_stream = MediaSourceStream::new(Box::new(source), Default::default());
-
-  decode_basic_audio_info_inner(media_source_stream, maybe_mimetype, maybe_extension)
+) -> AnyhowResult<BasicAudioInfo>
+{
+  let media_source_stream = open_bytes_media_source_stream(audio_bytes)?;
+  let original_media_source = OriginalMediaSource::FileBytes(audio_bytes);
+  decode_basic_audio_info_inner(media_source_stream, maybe_mimetype, maybe_extension, original_media_source)
 }
 
 /// Decode audio info from an audio or video file containing audio streams.
@@ -41,22 +46,19 @@ pub fn decode_basic_audio_file_info<P: AsRef<Path>>(
   file_path: P,
   maybe_mimetype: Option<&str>,
   maybe_extension: Option<&str>,
-) -> AnyhowResult<BasicAudioInfo> {
+) -> AnyhowResult<BasicAudioInfo>
+{
+  let media_source_stream = open_file_media_source_stream(&file_path)?;
+  let original_media_source = OriginalMediaSource::FilePath(file_path.as_ref().to_path_buf());
 
-  let file = File::open(file_path)?;
-  let file_reader = BufReader::new(file);
-
-  //let reader = Cursor::new(file_reader);
-  let source = ReadOnlySource::new(file_reader);
-  let media_source_stream = MediaSourceStream::new(Box::new(source), Default::default());
-
-  decode_basic_audio_info_inner(media_source_stream, maybe_mimetype, maybe_extension)
+  decode_basic_audio_info_inner(media_source_stream, maybe_mimetype, maybe_extension, original_media_source)
 }
 
 fn decode_basic_audio_info_inner(
   media_source_stream: MediaSourceStream,
   maybe_mimetype: Option<&str>,
   maybe_extension: Option<&str>,
+  original_media_source: OriginalMediaSource<'_>,
 ) -> AnyhowResult<BasicAudioInfo> {
 
   let mut hint = Hint::new();
@@ -96,6 +98,21 @@ fn decode_basic_audio_info_inner(
       });
 
   let maybe_codec_name = get_codec_short_name(&audio_track);
+
+  if maybe_track_duration.is_none() && maybe_codec_name.as_deref() == Some("opus") {
+    // NB: Symphonia doesn't properly support webm containers with opus at time of writing (2023-04-30),
+    // so we use some additional libraries to handle it. This requires a second file
+    // read for now.
+    let media_source_stream = match original_media_source {
+      OriginalMediaSource::FileBytes(bytes) => open_bytes_media_source_stream(bytes)?,
+      OriginalMediaSource::FilePath(path) => open_file_media_source_stream(&path)?,
+    };
+
+    let mut info = decode_mkv_or_webm(media_source_stream)?;
+    info.codec_name = maybe_codec_name;
+
+    return Ok(info);
+  }
 
   let mut required_full_decode = false;
 
@@ -241,11 +258,13 @@ mod tests {
     path
   }
 
-  mod browser_data {
+  // NB: The following tests make assertions on data that gets uploaded to us from the browser APIs.
+  mod browser_api_data {
+    use crate::decode_basic_audio_info::decode_basic_audio_file_info;
     use super::*;
 
     #[test]
-    fn chromium_upload() -> AnyhowResult<()> {
+    fn chromium_upload_webm_with_opus_audio() -> AnyhowResult<()> {
       // NB: Browser mimetype is "video/webm"
       // NB: ffprobe -i output:
       // Input #0, matroska,webm, from 'test_data/browser_api_recording/chromium_web_audio_upload.bin':
@@ -254,11 +273,10 @@ mod tests {
       //   Duration: N/A, start: 0.000000, bitrate: N/A
       //   Stream #0:0(eng): Audio: opus, 48000 Hz, mono, fltp (default)
       let path = test_file("test_data/browser_api_recording/chromium_web_audio_upload.bin");
-      let bytes = std::fs::read(path)?;
-      let info = decode_basic_audio_bytes_info(&bytes, None, None)?;
+      let info = decode_basic_audio_file_info(path, None, None)?;
       assert_eq!(info.codec_name, Some("opus".to_string()));
       assert_eq!(info.required_full_decode, true);
-      assert_eq!(info.duration_millis, Some(1234));
+      assert_eq!(info.duration_millis, Some(9119));
       Ok(())
     }
   }
