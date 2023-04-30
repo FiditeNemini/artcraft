@@ -134,74 +134,98 @@ function ModerationTtsCategoryListPage(props: Props) {
 
       {errorFlash}
 
-      <div className="control">
-        <strong>Show Unapproved:</strong>
-        &nbsp;
-        <label className="radio">
+      <div>
+        <strong className="me-3">Show Unapproved:</strong>
+        <div className="form-check form-check-inline">
           <input
+            className="form-check-input"
             type="radio"
             name="unapproved"
             value="include"
             checked={unapprovedView === ListTtsCategoriesTriState.Include}
             onChange={handleUnapprovedChange}
+            id="include1"
           />
-          Include
-        </label>
-        <label className="radio">
+          <label htmlFor="include1" className="form-check-label">
+            Include
+          </label>
+        </div>
+
+        <div className="form-check form-check-inline">
           <input
+            className="form-check-input"
             type="radio"
             name="unapproved"
             value="exclude"
             checked={unapprovedView === ListTtsCategoriesTriState.Exclude}
             onChange={handleUnapprovedChange}
+            id="exclude1"
           />
-          Exclude
-        </label>
-        <label className="radio">
+          <label htmlFor="exclude1" className="form-check-label">
+            Exclude
+          </label>
+        </div>
+
+        <div className="form-check form-check-inline">
           <input
+            className="form-check-input"
             type="radio"
             name="unapproved"
             value="only"
             checked={unapprovedView === ListTtsCategoriesTriState.Only}
             onChange={handleUnapprovedChange}
+            id="only1"
           />
-          Only
-        </label>
+          <label htmlFor="only1" className="form-check-label">
+            Only
+          </label>
+        </div>
       </div>
 
-      <div className="control">
-        <strong>Show Deleted:</strong>
-        &nbsp;
-        <label className="radio">
+      <div>
+        <strong className="me-3">Show Deleted:</strong>
+        <div className="form-check form-check-inline">
           <input
+            className="form-check-input"
             type="radio"
             name="deleted"
             value="include"
             checked={deletedView === ListTtsCategoriesTriState.Include}
             onChange={handleDeletedChange}
+            id="include2"
           />
-          Include
-        </label>
-        <label className="radio">
+          <label htmlFor="include2" className="form-check-label">
+            Include
+          </label>
+        </div>
+        <div className="form-check form-check-inline">
           <input
+            className="form-check-input"
             type="radio"
             name="deleted"
             value="exclude"
             checked={deletedView === ListTtsCategoriesTriState.Exclude}
             onChange={handleDeletedChange}
+            id="exclude2"
           />
-          Exclude
-        </label>
-        <label className="radio">
+          <label htmlFor="exclude2" className="form-check-label">
+            Exclude
+          </label>
+        </div>
+        <div className="form-check form-check-inline">
           <input
+            className="form-check-input"
             type="radio"
             name="deleted"
             value="only"
             checked={deletedView === ListTtsCategoriesTriState.Only}
             onChange={handleDeletedChange}
+            id="only2"
           />
-          Only
-        </label>
+          <label htmlFor="only2" className="form-check-label">
+            Only
+          </label>
+        </div>
       </div>
 
       <br />
