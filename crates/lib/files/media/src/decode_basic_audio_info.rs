@@ -13,8 +13,8 @@ const NO_AUDIO_INFO : BasicAudioInfo = BasicAudioInfo { duration_millis: None, c
 
 #[derive(Clone)]
 pub struct BasicAudioInfo {
-  pub duration_millis: Option<u64>,
   pub codec_name: Option<String>,
+  pub duration_millis: Option<u64>,
   pub required_full_decode: bool,
 }
 
@@ -239,6 +239,28 @@ mod tests {
     let mut path = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
     path.push(format!("../../../../{}", path_from_repo_root));
     path
+  }
+
+  mod browser_data {
+    use super::*;
+
+    #[test]
+    fn chromium_upload() -> AnyhowResult<()> {
+      // NB: Browser mimetype is "video/webm"
+      // NB: ffprobe -i output:
+      // Input #0, matroska,webm, from 'test_data/browser_api_recording/chromium_web_audio_upload.bin':
+      //   Metadata:
+      //     encoder         : Chrome
+      //   Duration: N/A, start: 0.000000, bitrate: N/A
+      //   Stream #0:0(eng): Audio: opus, 48000 Hz, mono, fltp (default)
+      let path = test_file("test_data/browser_api_recording/chromium_web_audio_upload.bin");
+      let bytes = std::fs::read(path)?;
+      let info = decode_basic_audio_bytes_info(&bytes, None, None)?;
+      assert_eq!(info.codec_name, Some("opus".to_string()));
+      assert_eq!(info.required_full_decode, true);
+      assert_eq!(info.duration_millis, Some(1234));
+      Ok(())
+    }
   }
 
   mod audio {
