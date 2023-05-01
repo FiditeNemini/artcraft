@@ -19,6 +19,7 @@ use mysql_queries::queries::tts::tts_results::insert_tts_result::{insert_tts_res
 use std::fs::File;
 use std::io::Read;
 use std::path::PathBuf;
+use std::time::Instant;
 use subprocess_common::docker_options::{DockerFilesystemMount, DockerGpu, DockerOptions};
 use tempdir::TempDir;
 use enums::by_table::generic_inference_jobs::inference_result_type::InferenceResultType;
@@ -245,6 +246,8 @@ pub async fn process_job(args: ProcessJobArgs<'_>) -> Result<JobSuccessResult, P
     maybe_mel_multiply_factor = Some(MelMultiplyFactor::DefaultMultiplyFactor);
   }
 
+  let inference_start_time = Instant::now();
+
   let _r = args.job_dependencies.job_type_details.tacotron2_old_vocodes.inference_command.execute_inference(InferenceArgs {
     synthesizer_checkpoint_path: &tts_synthesizer_fs_path,
     text_pipeline_type: text_pipeline_type_or_guess.to_str(),
@@ -257,6 +260,9 @@ pub async fn process_job(args: ProcessJobArgs<'_>) -> Result<JobSuccessResult, P
     output_metadata_filename: &output_metadata_fs_path,
   });
 
+  let inference_duration = Instant::now().duration_since(inference_start_time);
+
+  info!("Inference took duration to complete: {:?}", &inference_duration);
 
   // ==================== CHECK ALL FILES EXIST AND GET METADATA ==================== //
 
@@ -360,6 +366,7 @@ pub async fn process_job(args: ProcessJobArgs<'_>) -> Result<JobSuccessResult, P
       entity_type: InferenceResultType::TextToSpeech,
       entity_token: inference_result_token
     }),
+    inference_duration,
   })
 }
 

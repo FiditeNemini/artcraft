@@ -3642,16 +3642,6 @@
     },
     "query": "\nUPDATE\n    ip_address_bans\nSET\n    mod_user_token = ?,\n    deleted_at = NULL\nWHERE\n    ip_address = ?\nLIMIT 1\n        "
   },
-  "348d5965a6e4038cbe00acdf0ad1eb1d26dc85d70834c6c86f802daa5a2d7794": {
-    "describe": {
-      "columns": [],
-      "nullable": [],
-      "parameters": {
-        "Right": 4
-      }
-    },
-    "query": "\nUPDATE generic_inference_jobs\nSET\n  status = \"complete_success\",\n  on_success_result_entity_type = ?,\n  on_success_result_entity_token = ?,\n  failure_reason = NULL,\n  internal_debugging_failure_reason = NULL,\n  success_execution_millis = ?,\n  retry_at = NULL,\n  successfully_completed_at = NOW()\nWHERE id = ?\n        "
-  },
   "359be6ce263afd62fc748c14c06c62ded5ed59fc0a9d1186967028af400d7d61": {
     "describe": {
       "columns": [
@@ -12182,6 +12172,16 @@
       }
     },
     "query": "\nSELECT count(*) as count\nFROM vocoder_models\nWHERE\n  creator_user_token = ?\n  AND vocoder_type = 'hifigan'\nLIMIT 1\n        "
+  },
+  "a8b3d7a21327028a7c5230139d74f0fa79f4d09ef3ce51f2d31caf378e9a5b19": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Right": 5
+      }
+    },
+    "query": "\nUPDATE generic_inference_jobs\nSET\n  status = \"complete_success\",\n  on_success_result_entity_type = ?,\n  on_success_result_entity_token = ?,\n  failure_reason = NULL,\n  internal_debugging_failure_reason = NULL,\n  success_execution_millis = ?,\n  success_inference_execution_millis = ?,\n  retry_at = NULL,\n  successfully_completed_at = NOW()\nWHERE id = ?\n        "
   },
   "a8eda5d3d5fe44ccb2447b0fc5fa094ac22ec53b1a87b6895fb1a48254f55f51": {
     "describe": {

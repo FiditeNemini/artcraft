@@ -20,6 +20,7 @@ use mysql_queries::queries::tts::tts_results::insert_tts_result::{insert_tts_res
 use std::fs::File;
 use std::io::Read;
 use std::path::{Path, PathBuf};
+use std::time::Instant;
 use subprocess_common::docker_options::{DockerFilesystemMount, DockerGpu, DockerOptions};
 use tempdir::TempDir;
 use enums::by_table::generic_inference_jobs::inference_result_type::InferenceResultType;
@@ -125,6 +126,8 @@ pub async fn process_job(args: VitsProcessJobArgs<'_>) -> Result<JobSuccessResul
 
   let config_path = PathBuf::from("configs/ljs_li44_tmbert_nmp_s1_arpa.json"); // TODO: This could be variable.
 
+  let inference_start_time = Instant::now();
+
   let _r = args.job_dependencies.job_type_details.vits.inference_command.execute_inference(VitsInferenceArgs {
     model_checkpoint_path: &vits_traced_synthesizer_fs_path,
     config_path: &config_path,
@@ -133,6 +136,10 @@ pub async fn process_job(args: VitsProcessJobArgs<'_>) -> Result<JobSuccessResul
     output_audio_filename: &output_audio_fs_path,
     output_metadata_filename: &output_metadata_fs_path,
   });
+
+  let inference_duration = Instant::now().duration_since(inference_start_time);
+
+  info!("Inference took duration to complete: {:?}", &inference_duration);
 
   // ==================== CHECK ALL FILES EXIST AND GET METADATA ==================== //
 
@@ -240,6 +247,7 @@ pub async fn process_job(args: VitsProcessJobArgs<'_>) -> Result<JobSuccessResul
       entity_type: InferenceResultType::TextToSpeech,
       entity_token: inference_result_token
     }),
+    inference_duration,
   })
 }
 

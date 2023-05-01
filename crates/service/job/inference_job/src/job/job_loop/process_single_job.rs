@@ -68,7 +68,9 @@ pub async fn process_single_job(job_dependencies: &JobDependencies, job: &Availa
   // =====================================================
 
   let job_duration = Instant::now().duration_since(job_start_time);
+  let inference_duration = job_success_result.inference_duration;
 
+  info!("Job inference took duration to complete: {:?}", &inference_duration);
   info!("Job took duration to complete: {:?}", &job_duration);
 
   info!("Marking job complete...");
@@ -79,6 +81,7 @@ pub async fn process_single_job(job_dependencies: &JobDependencies, job: &Availa
     maybe_entity_type,
     maybe_entity_token,
     job_duration,
+    inference_duration,
   ).await
       .map_err(|err| ProcessSingleJobError::Other(anyhow!("database error: {:?}", err)))?;
 

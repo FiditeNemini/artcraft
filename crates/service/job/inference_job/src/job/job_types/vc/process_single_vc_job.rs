@@ -1,3 +1,4 @@
+use std::time::Duration;
 use anyhow::anyhow;
 use log::warn;
 use enums::by_table::voice_conversion_models::voice_conversion_model_type::VoiceConversionModelType;
@@ -66,6 +67,7 @@ pub async fn process_single_vc_job(job_dependencies: &JobDependencies, job: &Ava
       // TODO
       JobSuccessResult {
         maybe_result_entity: None,
+        inference_duration: Duration::from_secs(0),
       }
     }
     VoiceConversionModelType::SoVitsSvc => {

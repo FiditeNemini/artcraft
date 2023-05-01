@@ -26,6 +26,7 @@ use std::fs::File;
 use std::fs;
 use std::io::Read;
 use std::path::{Path, PathBuf};
+use std::time::Instant;
 use subprocess_common::docker_options::{DockerFilesystemMount, DockerGpu, DockerOptions};
 use tempdir::TempDir;
 use mysql_queries::payloads::generic_inference_args::PolymorphicInferenceArgs;
@@ -172,6 +173,8 @@ pub async fn process_job(args: SoVitsSvcProcessJobArgs<'_>) -> Result<JobSuccess
 
   // ==================== RUN INFERENCE SCRIPT ==================== //
 
+  let inference_start_time = Instant::now();
+
   let model_check_result = args.job_dependencies
       .job_type_details
       .so_vits_svc
@@ -184,6 +187,10 @@ pub async fn process_job(args: SoVitsSvcProcessJobArgs<'_>) -> Result<JobSuccess
         device: Device::Cuda,
         auto_predict_f0,
       });
+
+  let inference_duration = Instant::now().duration_since(inference_start_time);
+
+  info!("Inference took duration to complete: {:?}", &inference_duration);
 
   if let Err(err) = model_check_result {
     error!("Inference failed: {:?}", err);
@@ -317,6 +324,7 @@ pub async fn process_job(args: SoVitsSvcProcessJobArgs<'_>) -> Result<JobSuccess
       entity_type: InferenceResultType::VoiceConversion,
       entity_token: inference_result_token.to_string(),
     }),
+    inference_duration,
   })
 }
 
