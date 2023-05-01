@@ -1,22 +1,53 @@
-use std::time::Instant;
 use anyhow::anyhow;
+use crate::job::job_loop::determine_dependency_status::{DependencyStatus, determine_dependency_status};
+use crate::job::job_loop::job_success_result::ResultEntity;
 use crate::job::job_loop::process_single_job_error::ProcessSingleJobError;
+use crate::job::job_loop::process_single_job_success_case::ProcessSingleJobSuccessCase;
 use crate::job::job_types::tts::process_single_tts_job::process_single_tts_job;
 use crate::job::job_types::vc::process_single_vc_job::process_single_vc_job;
 use crate::job_dependencies::JobDependencies;
 use enums::by_table::generic_inference_jobs::inference_category::InferenceCategory;
+use enums::by_table::generic_inference_jobs::inference_result_type::InferenceResultType;
 use errors::AnyhowResult;
 use log::{info, warn};
-use enums::by_table::generic_inference_jobs::inference_result_type::InferenceResultType;
 use mysql_queries::queries::generic_inference::job::list_available_generic_inference_jobs::AvailableInferenceJob;
 use mysql_queries::queries::generic_inference::job::mark_generic_inference_job_pending_and_grab_lock::mark_generic_inference_job_pending_and_grab_lock;
 use mysql_queries::queries::generic_inference::job::mark_generic_inference_job_successfully_done::mark_generic_inference_job_successfully_done;
-use crate::job::job_loop::job_success_result::ResultEntity;
+use std::time::Instant;
 
-pub async fn process_single_job(job_dependencies: &JobDependencies, job: &AvailableInferenceJob) -> Result<(), ProcessSingleJobError> {
+const COLD_CACHE_MAX_SKIP : u64 = 3;
+
+pub async fn process_single_job(
+  job_dependencies: &JobDependencies,
+  job: &AvailableInferenceJob,
+) -> Result<ProcessSingleJobSuccessCase, ProcessSingleJobError> {
+
   // TODO(bt, 2023-01-11): Restore an optional status logger
   //let mut redis = job_dependencies.redis_pool.get()?;
   //let mut redis_logger = RedisJobStatusLogger::new_generic_download(&mut redis, job.download_job_token.as_str());
+
+  let dependency_status = determine_dependency_status(job_dependencies, job)
+      .await
+      .map_err(|err| ProcessSingleJobError::Other(anyhow!("database or cache error: {:?}", err)))?;
+
+  if !dependency_status.models_already_on_filesystem {
+    match dependency_status.maybe_model_token {
+      None => {} // No model token, proceed
+      Some(model_token) => {
+        let count = job_dependencies
+            .caches
+            .model_cache_counter
+            .increment_count(&model_token)
+            .map_err(|err| ProcessSingleJobError::Other(anyhow!("cache counter increment error: {:?}", err)))?;
+
+        if count < COLD_CACHE_MAX_SKIP {
+          warn!("model file is not present in the filesystem cache: {:?}, skipping iteration # {}",
+            model_token, count);
+          return Ok(ProcessSingleJobSuccessCase::JobTemporarilySkippedFilesAbsent);
+        }
+      }
+    }
+  }
 
   // ==================== ATTEMPT TO GRAB JOB LOCK ==================== //
 
@@ -103,5 +134,5 @@ pub async fn process_single_job(job_dependencies: &JobDependencies, job: &Availa
 
   info!("Job done: {}", job.id.0);
 
-  Ok(())
+  Ok(ProcessSingleJobSuccessCase::JobCompleted)
 }

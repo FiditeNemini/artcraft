@@ -51,6 +51,7 @@ use r2d2_redis::r2d2;
 use sqlx::mysql::MySqlPoolOptions;
 use std::path::PathBuf;
 use std::time::Duration;
+use memory_caching::ttl_key_counter::TtlKeyCounter;
 use subprocess_common::docker_options::{DockerEnvVar, DockerFilesystemMount, DockerGpu, DockerOptions};
 
 // Buckets (shared config)
@@ -169,10 +170,6 @@ async fn main() -> AnyhowResult<()> {
     mysql_pool: mysql_pool.clone(), // NB: MySqlPool is clone/send/sync safe
   };
 
-  let model_cache_duration = std::time::Duration::from_millis(
-    easyenv::get_env_num("TTS_MODEL_RECORD_CACHE_MILLIS", 300_000)?, // Five minutes
-  );
-
   let license_key = easyenv::get_env_string_required("NEWRELIC_API_KEY")?;
 
   let newrelic_disabled = easyenv::get_env_bool_or_default("IS_NEWRELIC_DISABLED", false);
@@ -224,7 +221,24 @@ async fn main() -> AnyhowResult<()> {
       is_debug_worker,
     },
     caches: JobCaches {
-      tts_model_record_cache: MultiItemTtlCache::create_with_duration(model_cache_duration),
+      tts_model_record_cache: MultiItemTtlCache::create_with_duration(
+        easyenv::get_env_duration_seconds_or_default(
+          "TTS_MODEL_RECORD_CACHE_SECONDS",
+          Duration::from_secs(60*5)
+        ),
+      ),
+      vc_model_record_cache: MultiItemTtlCache::create_with_duration(
+        easyenv::get_env_duration_seconds_or_default(
+        "VC_MODEL_RECORD_CACHE_SECONDS",
+        Duration::from_secs(60)
+        ),
+      ),
+      model_cache_counter: TtlKeyCounter::create_with_duration(
+        easyenv::get_env_duration_seconds_or_default(
+          "TTL_KEY_COUNTER_CACHE_SECONDS",
+          Duration::from_secs(60 * 5)
+        ),
+      ),
     },
     bucket_path_unifier: BucketPathUnifier::default_paths(),
     semi_persistent_cache,

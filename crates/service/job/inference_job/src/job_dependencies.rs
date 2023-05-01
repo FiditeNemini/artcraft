@@ -11,12 +11,14 @@ use jobs_common::semi_persistent_cache_dir::SemiPersistentCacheDir;
 use memory_caching::multi_item_ttl_cache::MultiItemTtlCache;
 use mysql_queries::common_inputs::container_environment_arg::ContainerEnvironmentArg;
 use mysql_queries::mediators::firehose_publisher::FirehosePublisher;
-use mysql_queries::queries::tts::tts_models::get_tts_model_for_inference::TtsModelForInferenceRecord;
+use mysql_queries::queries::tts::tts_models::get_tts_model_for_inference_improved::TtsModelForInferenceRecord;
+use mysql_queries::queries::voice_conversion::inference::get_voice_conversion_model_for_inference::VoiceConversionModelForInference;
 use newrelic_telemetry::Client as NewRelicClient;
 use r2d2_redis::RedisConnectionManager;
 use r2d2_redis::r2d2;
 use sqlx::MySqlPool;
 use std::path::PathBuf;
+use memory_caching::ttl_key_counter::TtlKeyCounter;
 
 pub struct JobDependencies {
   pub download_temp_directory: PathBuf,
@@ -92,6 +94,11 @@ pub struct JobWorkerDetails {
 
 pub struct JobCaches {
   pub tts_model_record_cache: MultiItemTtlCache<String, TtsModelForInferenceRecord>,
+  pub vc_model_record_cache: MultiItemTtlCache<String, VoiceConversionModelForInference>,
+
+  /// Skip processing models if they're not on the filesystem.
+  /// If the counter elapses a delta, proceed with calculation.
+  pub model_cache_counter: TtlKeyCounter,
 }
 
 /// Per-job type details

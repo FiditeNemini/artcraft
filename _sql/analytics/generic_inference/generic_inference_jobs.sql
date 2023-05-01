@@ -29,7 +29,9 @@ from (
         jobs.maybe_input_source_token,
         m.media_source,
         m.maybe_original_mime_type as mime_type,
-        TRUNCATE(jobs.success_execution_millis / 1000 / 60, 2) as execution_minutes,
+        TRUNCATE(jobs.success_execution_millis / 1000 / 60, 2) as execution_mins,
+        TRUNCATE(jobs.success_inference_execution_millis / 1000 / 60, 2) as inference_mins,
+        TRUNCATE((jobs.success_execution_millis - jobs.success_inference_execution_millis) / 1000 / 60, 2) as extra_mins,
         jobs.success_execution_millis as execution_millis,
         m.original_duration_millis as duration_millis,
         jobs.success_execution_millis / m.original_duration_millis as ratio
@@ -40,10 +42,11 @@ from (
             m.token = jobs.maybe_input_source_token
     where status != 'pending'
     and success_execution_millis IS NOT NULL
+    and success_inference_execution_millis IS NOT NULL
     order by id desc
         limit 50
 ) as t
-order by execution_minutes desc;
+order by execution_mins desc;
 
 
 -- Get pending so-vits-svc jobs
