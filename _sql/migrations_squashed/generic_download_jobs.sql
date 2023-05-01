@@ -96,6 +96,10 @@ CREATE TABLE generic_download_jobs (
   -- derived execution time analytics with it.
   success_execution_millis INT(10) UNSIGNED DEFAULT NULL,
 
+  -- This is only the inference portion and does not include downloads, uploads,
+  -- or any subsequent processing.
+  success_inference_execution_millis INT(10) UNSIGNED DEFAULT NULL,
+
   -- Worker hostname (linux hostname, k8s pod name)
   -- Assigned when a worker picks up the job
   -- Reassigned if the job fails and gets picked up again

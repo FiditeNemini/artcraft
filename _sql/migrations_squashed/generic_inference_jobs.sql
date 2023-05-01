@@ -153,6 +153,10 @@ CREATE TABLE generic_inference_jobs (
   -- derived execution time analytics with it.
   success_execution_millis INT(10) UNSIGNED DEFAULT NULL,
 
+  -- This is only the inference portion and does not include downloads, uploads,
+  -- or any subsequent processing.
+  success_inference_execution_millis INT(10) UNSIGNED DEFAULT NULL,
+
   -- TODO: Remove once `assigned_worker` column is added
   --   and existing queries for this column are removed.
   -- The last worker (hostname or pod name) to touch the job, either in the case of success or failure.

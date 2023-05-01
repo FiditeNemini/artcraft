@@ -15,7 +15,10 @@ and success_execution_millis IS NOT NULL
 order by id desc
 limit 50;
 
--- Same, but with usernames
+
+-- Detailed report on most recent jobs, ordered by worst performing.
+-- TODO: Determine if the problem is in downloading models. Make sure the job timer doesn't include
+--   sections where models / files get downloaded.
 select *
 from (
     select
@@ -41,6 +44,7 @@ from (
         limit 50
 ) as t
 order by execution_minutes desc;
+
 
 -- Get pending so-vits-svc jobs
 select count(*)
