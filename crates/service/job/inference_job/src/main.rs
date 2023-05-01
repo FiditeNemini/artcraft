@@ -240,6 +240,8 @@ async fn main() -> AnyhowResult<()> {
         ),
       ),
     },
+    cold_filesystem_cache_starvation_threshold:
+      easyenv::get_env_num("COLD_FILESYSTEM_CACHE_STARVATION_THRESHOLD", 3)?,
     bucket_path_unifier: BucketPathUnifier::default_paths(),
     semi_persistent_cache,
     firehose_publisher,
@@ -268,7 +270,7 @@ async fn main() -> AnyhowResult<()> {
     container_db: ContainerEnvironmentArg {
       hostname: container_environment.hostname,
       cluster_name: container_environment.cluster_name,
-    }
+    },
   };
 
   main_loop(job_dependencies).await;

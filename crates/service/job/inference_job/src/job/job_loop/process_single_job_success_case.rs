@@ -8,4 +8,8 @@ pub enum ProcessSingleJobSuccessCase {
   /// not being present on the filesystem of this worker. Another worker might pick
   /// up the job, or we might return to it later ourselves.
   JobTemporarilySkippedFilesAbsent,
+
+  /// The lock for the job could not be obtained. Another worker might have it.
+  /// If that workload fails, we could conceivably pick it up again in the future.
+  LockNotObtained,
 }

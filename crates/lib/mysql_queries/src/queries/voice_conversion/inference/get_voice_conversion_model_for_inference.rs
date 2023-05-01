@@ -15,6 +15,7 @@ use tokens::tokens::tts_models::TtsModelToken;
 use tokens::users::user::UserToken;
 use tokens::voice_conversion::model::VoiceConversionModelToken;
 
+#[derive(Clone)]
 pub struct VoiceConversionModelForInference {
   pub token: VoiceConversionModelToken,
   pub model_type: VoiceConversionModelType,

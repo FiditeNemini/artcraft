@@ -15,8 +15,6 @@ use mysql_queries::queries::generic_inference::job::mark_generic_inference_job_p
 use mysql_queries::queries::generic_inference::job::mark_generic_inference_job_successfully_done::mark_generic_inference_job_successfully_done;
 use std::time::Instant;
 
-const COLD_CACHE_MAX_SKIP : u64 = 3;
-
 pub async fn process_single_job(
   job_dependencies: &JobDependencies,
   job: &AvailableInferenceJob,
@@ -40,9 +38,9 @@ pub async fn process_single_job(
             .increment_count(&model_token)
             .map_err(|err| ProcessSingleJobError::Other(anyhow!("cache counter increment error: {:?}", err)))?;
 
-        if count < COLD_CACHE_MAX_SKIP {
-          warn!("model file is not present in the filesystem cache: {:?}, skipping iteration # {}",
-            model_token, count);
+        if count < job_dependencies.cold_filesystem_cache_starvation_threshold {
+          warn!("model file is not present in the filesystem cache: {:?}, skipping iteration # {} (will continue after {})",
+            model_token, count, job_dependencies.cold_filesystem_cache_starvation_threshold);
           return Ok(ProcessSingleJobSuccessCase::JobTemporarilySkippedFilesAbsent);
         }
       }
@@ -60,7 +58,7 @@ pub async fn process_single_job(
 
   if !lock_acquired {
     warn!("Could not acquire job lock for: {}", &job.id.0);
-    return Ok(())
+    return Ok(ProcessSingleJobSuccessCase::LockNotObtained)
   }
 
   info!("Beginning work on {:?} = {}", job.inference_category, job.inference_job_token);

@@ -73,7 +73,7 @@ pub async fn determine_dependency_status(job_dependencies: &JobDependencies, job
     Some(path) => file_exists(path),
   };
 
-  OK(DependencyStatus {
+  Ok(DependencyStatus {
     maybe_inference_model: maybe_model,
     maybe_model_token,
     models_already_on_filesystem,

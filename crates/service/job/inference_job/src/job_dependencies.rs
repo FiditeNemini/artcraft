@@ -54,6 +54,9 @@ pub struct JobDependencies {
   // In-process cache of database lookup records, etc.
   pub caches: JobCaches,
 
+  // How many times to skip jobs (on cold filesystem cache) before proceeding with execution.
+  pub cold_filesystem_cache_starvation_threshold: u64,
+
   // Sleep between batches
   pub job_batch_wait_millis: u64,
 
