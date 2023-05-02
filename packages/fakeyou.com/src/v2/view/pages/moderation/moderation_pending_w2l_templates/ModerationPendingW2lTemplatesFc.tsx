@@ -1,19 +1,25 @@
-import React, { useCallback, useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
-import { SessionWrapper } from '@storyteller/components/src/session/SessionWrapper';
-import { Gravatar } from '@storyteller/components/src/elements/Gravatar';
-import { formatDistance } from 'date-fns';
-import { WebUrl } from '../../../../../common/WebUrl';
-import { BackLink } from '../../../_common/BackLink';
-import { GetPendingW2lTemplates, GetPendingW2lTemplatesIsOk, PendingW2lTemplatesEntryForList } from '@storyteller/components/src/api/moderation/w2l/GetPendingW2lTemplates';
-import { PhotoVideoIcon } from '../../../_icons/PhotoVideoIcon';
+import React, { useCallback, useEffect, useState } from "react";
+import { Link } from "react-router-dom";
+import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
+import { Gravatar } from "@storyteller/components/src/elements/Gravatar";
+import { formatDistance } from "date-fns";
+import { WebUrl } from "../../../../../common/WebUrl";
+import { BackLink } from "../../../_common/BackLink";
+import {
+  GetPendingW2lTemplates,
+  GetPendingW2lTemplatesIsOk,
+  PendingW2lTemplatesEntryForList,
+} from "@storyteller/components/src/api/moderation/w2l/GetPendingW2lTemplates";
+import { PhotoVideoIcon } from "../../../_icons/PhotoVideoIcon";
 
 interface Props {
-  sessionWrapper: SessionWrapper,
+  sessionWrapper: SessionWrapper;
 }
 
 function ModerationPendingW2lTemplatesFc(props: Props) {
-  const [templates, setTemplates] = useState<Array<PendingW2lTemplatesEntryForList>>([]);
+  const [templates, setTemplates] = useState<
+    Array<PendingW2lTemplatesEntryForList>
+  >([]);
 
   const getUsers = useCallback(async () => {
     const response = await GetPendingW2lTemplates();
@@ -21,16 +27,14 @@ function ModerationPendingW2lTemplatesFc(props: Props) {
     if (GetPendingW2lTemplatesIsOk(response)) {
       setTemplates(response.templates);
     }
-
   }, []);
 
   useEffect(() => {
     getUsers();
   }, [getUsers]);
 
-
   if (!templates) {
-    return <div />
+    return <div />;
   }
 
   if (!props.sessionWrapper.canApproveW2lTemplates()) {
@@ -38,12 +42,14 @@ function ModerationPendingW2lTemplatesFc(props: Props) {
   }
 
   const now = new Date();
-  let rows : Array<JSX.Element> = [];
+  let rows: Array<JSX.Element> = [];
 
-  templates.forEach(template=> {
+  templates.forEach((template) => {
     const createTime = new Date(template.created_at);
-    const relativeCreateTime = formatDistance(createTime, now, { addSuffix: true });
-    
+    const relativeCreateTime = formatDistance(createTime, now, {
+      addSuffix: true,
+    });
+
     rows.push(
       <tr key={template.template_token}>
         <td>
@@ -55,7 +61,11 @@ function ModerationPendingW2lTemplatesFc(props: Props) {
         </td>
         <td>
           <Link to={WebUrl.userProfilePage(template.creator_display_name)}>
-            <Gravatar username={template.creator_display_name} email_hash={template.creator_gravatar_hash} size={12} />
+            <Gravatar
+              username={template.creator_display_name}
+              email_hash={template.creator_gravatar_hash}
+              size={12}
+            />
             &nbsp;
             {template.creator_display_name}
           </Link>
@@ -63,12 +73,12 @@ function ModerationPendingW2lTemplatesFc(props: Props) {
         <td>{template.template_type}</td>
         <td>{relativeCreateTime}</td>
       </tr>
-    )
+    );
   });
 
   return (
-    <div>
-      <h1 className="title is-1"> Unapproved W2L Templates </h1>
+    <div className="container pt-5">
+      <h1 className="fw-bold"> Unapproved W2L Templates </h1>
 
       <BackLink link={WebUrl.moderationMain()} text="Back to moderation" />
 
@@ -82,22 +92,22 @@ function ModerationPendingW2lTemplatesFc(props: Props) {
       <br />
 
       <p>
-        Don't delete templates unless they overwhelmingly break the rules. 
-        Users can use templates in private without them necessarily being approved for public use.
+        Don't delete templates unless they overwhelmingly break the rules. Users
+        can use templates in private without them necessarily being approved for
+        public use.
       </p>
 
       <br />
 
       <p>
-        Setting approved = TRUE will show the template on the main site for everyone to use.
-        Setting approved = FALSE will still let the author and people directly accessing via 
-        URL to use the template, but will not make it public. 
-        It will also remove it from the moderation queue.
+        Setting approved = TRUE will show the template on the main site for
+        everyone to use. Setting approved = FALSE will still let the author and
+        people directly accessing via URL to use the template, but will not make
+        it public. It will also remove it from the moderation queue.
       </p>
 
-
       <br />
-      
+
       <table className="table is-fullwidth">
         <thead>
           <tr>
@@ -107,12 +117,10 @@ function ModerationPendingW2lTemplatesFc(props: Props) {
             <th>Created At</th>
           </tr>
         </thead>
-        <tbody>
-          {rows}
-        </tbody>
+        <tbody>{rows}</tbody>
       </table>
     </div>
-  )
+  );
 }
 
 export { ModerationPendingW2lTemplatesFc };
