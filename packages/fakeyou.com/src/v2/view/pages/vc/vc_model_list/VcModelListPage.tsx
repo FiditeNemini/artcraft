@@ -55,7 +55,7 @@ interface Props {
 
 function VcModelListPage(props: Props) {
   usePrefixedDocumentTitle("Voice Conversion");
-
+  const [convertLoading, setConvertLoading] = useState(false);
   const [canConvert, setCanConvert] = useState(false);
 
   const [mediaUploadToken, setMediaUploadToken] = useState<string | undefined>(
@@ -135,6 +135,8 @@ function VcModelListPage(props: Props) {
       return;
     }
 
+    setConvertLoading(true);
+
     let request: EnqueueVoiceConversionRequest = {
       uuid_idempotency_token: convertIdempotencyToken,
       voice_conversion_model_token:
@@ -154,15 +156,15 @@ function VcModelListPage(props: Props) {
         FrontendInferenceJobType.VoiceConversion
       );
     }
+
+    setConvertLoading(false);
   };
 
   const handleFormSubmit = async (ev: React.FormEvent<HTMLFormElement>) => {
     ev.preventDefault();
   };
 
-  const loading = false; // TODO: Remove.
-
-  const speakButtonClass = loading
+  const speakButtonClass = convertLoading
     ? "btn btn-primary w-100 disabled"
     : "btn btn-primary w-100";
 
@@ -323,7 +325,7 @@ function VcModelListPage(props: Props) {
                                 className="me-2"
                               />
                               Convert
-                              {loading && <LoadingIcon />}
+                              {convertLoading && <LoadingIcon />}
                             </button>
                           </div>
                         </div>
@@ -366,7 +368,7 @@ function VcModelListPage(props: Props) {
                                 className="me-2"
                               />
                               Convert
-                              {loading && <LoadingIcon />}
+                              {convertLoading && <LoadingIcon />}
                             </button>
                           </div>
                         </div>

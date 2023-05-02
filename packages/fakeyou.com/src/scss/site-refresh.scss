@@ -1282,6 +1282,12 @@ select {
   background-color: $danger !important;
 }
 
+.btn-uploaded {
+  background-color: lighten($secondary, 5%) !important;
+  border-color: lighten($secondary, 5%) !important;
+  color: $white !important;
+}
+
 .video-card-title,
 .video-card-text {
   color: $white !important;

@@ -1,4 +1,5 @@
 import {
+  faCheck,
   faFileArrowUp,
   faFileAudio,
   faTrash,
@@ -30,6 +31,7 @@ function UploadComponent(props: Props) {
   const [file, setFile] = useState<any>(undefined);
   const [audioLink, setAudioLink] = useState<string>();
   const [isUploadDisabled, setIsUploadDisabled] = useState<boolean>(false);
+  const [uploadLoading, setUploadLoading] = useState(false);
 
   // Auto generated
   const [idempotencyToken, setIdempotencyToken] = useState(uuidv4());
@@ -43,6 +45,7 @@ function UploadComponent(props: Props) {
     props.setFormIsCleared(false);
     props.setCanConvert(false);
     props.changeConvertIdempotencyToken();
+    setIsUploadDisabled(false);
   };
 
   const handleDragOver = (e: React.DragEvent<HTMLDivElement>): void => {
@@ -61,6 +64,7 @@ function UploadComponent(props: Props) {
     setFile(null);
     setAudioLink("");
     setIdempotencyToken(uuidv4());
+    setIsUploadDisabled(false);
     props.setMediaUploadToken(undefined); // clear
     props.setFormIsCleared(true);
     props.setCanConvert(false);
@@ -71,6 +75,8 @@ function UploadComponent(props: Props) {
     if (file === undefined) {
       return false;
     }
+
+    setUploadLoading(true);
 
     const request: UploadAudioRequest = {
       uuid_idempotency_token: idempotencyToken,
@@ -86,6 +92,8 @@ function UploadComponent(props: Props) {
       props.setFormIsCleared(false);
       props.setCanConvert(true);
     }
+
+    setUploadLoading(false);
   };
 
   const fileSize =
@@ -94,6 +102,10 @@ function UploadComponent(props: Props) {
       : file
       ? `${Math.floor(file.size / 1024)} KB`
       : null;
+
+  const uploadBtnClass = isUploadDisabled
+    ? "btn btn-uploaded w-100 disabled"
+    : "btn btn-primary w-100";
 
   return (
     <div className="d-flex flex-column gap-3">
@@ -178,15 +190,25 @@ function UploadComponent(props: Props) {
       {file ? (
         <div className="d-flex gap-3">
           <button
-            className="btn btn-primary w-100"
+            className={uploadBtnClass}
             onClick={() => {
               handleUploadFile();
             }}
             type="submit"
-            disabled={isUploadDisabled}
+            disabled={uploadLoading || isUploadDisabled}
           >
-            <FontAwesomeIcon icon={faFileArrowUp} className="me-2" />
-            Upload Audio
+            {isUploadDisabled ? (
+              <>
+                <FontAwesomeIcon icon={faCheck} className="me-2" />
+                Uploaded
+              </>
+            ) : (
+              <>
+                <FontAwesomeIcon icon={faFileArrowUp} className="me-2" />
+                Upload Audio
+              </>
+            )}
+            {uploadLoading && <LoadingIcon />}
           </button>
 
           <button className="btn btn-destructive w-100" onClick={handleClear}>
@@ -200,5 +222,18 @@ function UploadComponent(props: Props) {
     </div>
   );
 }
+
+const LoadingIcon: React.FC = () => {
+  return (
+    <>
+      <span
+        className="spinner-border spinner-border-sm ms-3"
+        role="status"
+        aria-hidden="true"
+      ></span>
+      <span className="visually-hidden">Loading...</span>
+    </>
+  );
+};
 
 export default UploadComponent;
