@@ -6,6 +6,7 @@ use std::env;
 use std::ffi::OsString;
 use std::fs::OpenOptions;
 use std::path::{Path, PathBuf};
+use std::time::Duration;
 use subprocess::{Popen, PopenConfig, Redirection};
 use subprocess_common::docker_options::{DockerEnvVar, DockerFilesystemMount, DockerGpu, DockerOptions};
 
@@ -33,6 +34,9 @@ pub struct SoVitsSvcInferenceCommand {
 
   maybe_huggingface_cache_dir: Option<PathBuf>,
   maybe_nltk_cache_dir: Option<PathBuf>,
+
+  /// If the execution should be ended after a certain point.
+  maybe_execution_timeout: Option<Duration>,
 }
 
 #[derive(Clone)]
@@ -81,6 +85,7 @@ impl SoVitsSvcInferenceCommand {
     maybe_hubert_path: Option<P>,
     maybe_huggingface_cache_dir: Option<P>,
     maybe_nltk_cache_dir: Option<P>,
+    maybe_execution_timeout: Option<Duration>,
   ) -> Self {
     Self {
       so_vits_svc_root_code_directory: so_vits_svc_root_code_directory.as_ref().to_path_buf(),
@@ -91,6 +96,7 @@ impl SoVitsSvcInferenceCommand {
       maybe_hubert_path: maybe_hubert_path.map(|s| s.as_ref().to_path_buf()),
       maybe_huggingface_cache_dir: maybe_huggingface_cache_dir.map(|s| s.as_ref().to_path_buf()),
       maybe_nltk_cache_dir: maybe_nltk_cache_dir.map(|s| s.as_ref().to_path_buf()),
+      maybe_execution_timeout,
     }
   }
 
@@ -129,6 +135,9 @@ impl SoVitsSvcInferenceCommand {
 
     let maybe_nltk_cache_dir =
         easyenv::get_env_pathbuf_optional("NLTK_DATA");
+
+    let maybe_execution_timeout =
+        easyenv::get_env_duration_seconds_optional("SO_VITS_SVC_TIMEOUT_SECONDS");
 
     let maybe_docker_options = easyenv::get_env_string_optional(
       "SO_VITS_SVC_INFERENCE_MAYBE_DOCKER_IMAGE")
@@ -172,6 +181,7 @@ impl SoVitsSvcInferenceCommand {
       maybe_hubert_path,
       maybe_huggingface_cache_dir,
       maybe_nltk_cache_dir,
+      maybe_execution_timeout,
     })
   }
 
@@ -306,9 +316,17 @@ impl SoVitsSvcInferenceCommand {
 
     info!("Subprocess PID: {:?}", p.pid());
 
-    let exit_status = p.wait()?;
-
-    info!("Subprocess exit status: {:?}", exit_status);
+    match self.maybe_execution_timeout {
+      None => {
+        let exit_status = p.wait()?;
+        info!("Subprocess exit status: {:?}", exit_status);
+      }
+      Some(timeout) => {
+        info!("Executing with timeout: {:?}", &timeout);
+        let exit_status = p.wait_timeout(timeout.clone())?;
+        info!("Subprocess timed exit status: {:?}", exit_status);
+      }
+    }
 
     Ok(())
   }

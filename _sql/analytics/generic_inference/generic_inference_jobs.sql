@@ -24,6 +24,7 @@ from (
          select
              jobs.created_at,
              jobs.id,
+             jobs.attempt_count as attempts,
              u.username,
              jobs.assigned_worker,
              jobs.assigned_cluster,
@@ -44,10 +45,10 @@ from (
                  m.token = jobs.maybe_input_source_token
          where
              jobs.status != 'pending'
-        AND jobs.created_at > NOW() - INTERVAL 5 MINUTE
+        AND jobs.created_at > NOW() - INTERVAL 10 MINUTE
          order by id desc
              limit 5000
-) as t
+     ) as t
 order by execution_mins desc;
 
 
