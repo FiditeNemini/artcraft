@@ -27,6 +27,7 @@ from (
         jobs.assigned_worker,
         jobs.assigned_cluster,
         jobs.maybe_input_source_token,
+        jobs.maybe_model_token,
         m.media_source,
         m.maybe_original_mime_type as mime_type,
         TRUNCATE(jobs.success_execution_millis / 1000 / 60, 2) as execution_mins,
@@ -43,7 +44,7 @@ from (
     where status != 'pending'
     and success_execution_millis IS NOT NULL
     and success_inference_execution_millis IS NOT NULL
-    order by id desc
+    order by maybe_model_token desc
         limit 50
 ) as t
 order by execution_mins desc;

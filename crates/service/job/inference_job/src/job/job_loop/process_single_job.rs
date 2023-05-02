@@ -61,7 +61,10 @@ pub async fn process_single_job(
     return Ok(ProcessSingleJobSuccessCase::LockNotObtained)
   }
 
-  info!("Beginning work on {:?} = {}", job.inference_category, job.inference_job_token);
+  info!("Beginning work on job ({}): {:?}", job.id.0, job.inference_job_token);
+  info!("Job category: {:?}", job.inference_category);
+  info!("Job model type: {:?}", job.maybe_model_type);
+  info!("Job model token: {:?}", job.maybe_model_token);
 
   let job_start_time = Instant::now();
 
@@ -130,7 +133,7 @@ pub async fn process_single_job(
   // TODO(bt, 2023-01-11): Restore optional Redis logging
   //redis_logger.log_status("done")?;
 
-  info!("Job done: {}", job.id.0);
+  info!("Job done: {} : {:?}", job.id.0, job.inference_job_token);
 
   Ok(ProcessSingleJobSuccessCase::JobCompleted)
 }
