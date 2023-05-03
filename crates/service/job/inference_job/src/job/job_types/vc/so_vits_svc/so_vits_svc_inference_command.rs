@@ -7,7 +7,7 @@ use std::ffi::OsString;
 use std::fs::OpenOptions;
 use std::path::{Path, PathBuf};
 use std::time::Duration;
-use subprocess::{Popen, PopenConfig, Redirection};
+use subprocess::{ExitStatus, Popen, PopenConfig, Redirection};
 use subprocess_common::docker_options::{DockerEnvVar, DockerFilesystemMount, DockerGpu, DockerOptions};
 
 /// This command is used to check tacotron for being a real model
@@ -324,7 +324,14 @@ impl SoVitsSvcInferenceCommand {
       Some(timeout) => {
         info!("Executing with timeout: {:?}", &timeout);
         let exit_status = p.wait_timeout(timeout.clone())?;
-        info!("Subprocess timed exit status: {:?}", exit_status);
+
+        if exit_status.is_none() {
+          // NB: If the program didn't successfully terminate, kill it.
+          info!("Subprocess didn't end after timeout: {:?}; terminating...", &timeout);
+          let _r = p.terminate()?;
+        } else {
+          info!("Subprocess timed wait exit status: {:?}", exit_status);
+        }
       }
     }
 
