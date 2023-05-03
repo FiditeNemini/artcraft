@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { container } from "../../../../data/animation";
@@ -101,6 +101,17 @@ function LandingPage(props: Props) {
     }
   }
 
+  const randomHeroImage = useMemo(() => {
+    const images = [
+      // Main Images:
+      // "mascot/kitsune_pose2.webp",
+      // "mascot/kitsune_wizard.webp",
+      "mascot/may4th.webp",
+    ];
+
+    return images[Math.floor(Math.random() * images.length)];
+  }, []);
+
   return (
     <motion.div initial="hidden" animate="visible" variants={container}>
       <div className="container pb-5 pb-lg-0 pt-lg-2 px-md-5 px-lg-5 px-xl-3">
@@ -118,7 +129,7 @@ function LandingPage(props: Props) {
         <div className="row flex-md-row-reverse">
           <div className="col-12 col-lg-5 p-md-0 d-flex justify-content-center">
             <img
-              src="/mascot/kitsune_pose2.webp"
+              src={randomHeroImage}
               alt="FakeYou Mascot"
               width={450}
               className="img-fluid"
