@@ -183,7 +183,7 @@ COPY crates/service/job/inference_job/config/inference-job.production.env .
 RUN apt-get update && DEBIAN_FRONTEND=noninteractive TZ=Etc/UTC apt-get install -y \
     ffmpeg \
     libsndfile1 \
-    nvidia-driver-515 \
+    nvidia-driver-530 \
     python3-pip \
     python3.10 \
     python3.10-venv \
