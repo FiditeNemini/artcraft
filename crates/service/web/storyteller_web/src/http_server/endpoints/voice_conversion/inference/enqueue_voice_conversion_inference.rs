@@ -31,7 +31,11 @@ use tts_common::priority::FAKEYOU_INVESTOR_PRIORITY_LEVEL;
 
 /// Debug requests can get routed to special "debug-only" workers, which can
 /// be used to trial new code, run debugging, etc.
-const DEBUG_HEADER_NAME : &'static str = "enable_debug_mode";
+const DEBUG_HEADER_NAME : &'static str = "enable-debug-mode";
+
+/// The routing tag header can send workloads to particular k8s hosts.
+/// This is useful for catching the live logs or intercepting the job.
+const ROUTING_TAG_HEADER_NAME : &'static str = "routing-tag";
 
 #[derive(Deserialize)]
 pub struct EnqueueVoiceConversionInferenceRequest {
@@ -158,10 +162,15 @@ pub async fn enqueue_voice_conversion_inference_handler(
     }
   }
 
-  // ==================== DEBUG MODE ==================== //
+  // ==================== DEBUG MODE + ROUTING TAG ==================== //
 
-  let is_debug_request = get_request_header_optional(&http_request, DEBUG_HEADER_NAME)
-      .is_some();
+  let is_debug_request =
+      get_request_header_optional(&http_request, DEBUG_HEADER_NAME)
+          .is_some();
+
+  let maybe_routing_tag=
+      get_request_header_optional(&http_request, ROUTING_TAG_HEADER_NAME)
+          .map(|routing_tag| routing_tag.trim().to_string());
 
   // ==================== RATE LIMIT ==================== //
 
@@ -245,6 +254,7 @@ pub async fn enqueue_voice_conversion_inference_handler(
     creator_set_visibility: set_visibility,
     priority_level,
     is_debug_request,
+    maybe_routing_tag: maybe_routing_tag.as_deref(),
     mysql_pool: &server_state.mysql_pool,
   }).await;
 

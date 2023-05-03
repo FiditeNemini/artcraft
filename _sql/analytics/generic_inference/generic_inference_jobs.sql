@@ -45,7 +45,7 @@ from (
                  m.token = jobs.maybe_input_source_token
          where
              jobs.status != 'pending'
-        AND jobs.created_at > NOW() - INTERVAL 10 MINUTE
+        AND jobs.created_at > NOW() - INTERVAL 30 MINUTE
          order by id desc
              limit 5000
      ) as t

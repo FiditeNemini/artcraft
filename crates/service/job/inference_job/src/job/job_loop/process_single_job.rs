@@ -24,11 +24,28 @@ pub async fn process_single_job(
   //let mut redis = job_dependencies.redis_pool.get()?;
   //let mut redis_logger = RedisJobStatusLogger::new_generic_download(&mut redis, job.download_job_token.as_str());
 
+  let mut force_execution = false;
+
+  // Some jobs have "routing tags". These ensure that jobs only execute on certain hosts.
+  // This is typically for debugging or development.
+  if let Some(routing_tag) = job.maybe_routing_tag.as_deref() {
+    let routing_tag = routing_tag.to_lowercase();
+    let hostname = job_dependencies.container.hostname.to_ascii_lowercase();
+
+    if hostname.starts_with(&routing_tag) {
+      info!("Job has routing tag ({}) for execution on this host ({})", routing_tag, hostname);
+      force_execution = true;
+    } else {
+      info!("Job routing tag ({}) doesn't match hostname ({}); skipping...", routing_tag, hostname);
+      return Ok(ProcessSingleJobSuccessCase::JobSkippedForRoutingTagMismatch);
+    }
+  }
+
   let dependency_status = determine_dependency_status(job_dependencies, job)
       .await
       .map_err(|err| ProcessSingleJobError::Other(anyhow!("database or cache error: {:?}", err)))?;
 
-  if !dependency_status.models_already_on_filesystem {
+  if !force_execution && !dependency_status.models_already_on_filesystem {
     match dependency_status.maybe_model_token {
       None => {} // No model token, proceed
       Some(model_token) => {

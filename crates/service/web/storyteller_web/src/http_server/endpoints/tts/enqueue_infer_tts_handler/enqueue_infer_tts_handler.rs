@@ -54,6 +54,11 @@ const DEBUG_HEADER_NAME : &'static str = "enable-debug-mode";
 /// It'll be used to help test TT2 on the new system before it is rolled out for everyone.
 const NEW_JOB_SYSTEM_HEADER_NAME : &'static str = "new-job-system";
 
+/// The routing tag header can send workloads to particular k8s hosts.
+/// This is useful for catching the live logs or intercepting the job.
+/// NB: This is only for the new job system.
+const ROUTING_TAG_HEADER_NAME : &'static str = "routing-tag";
+
 const USER_FAKEYOU_USER_TOKEN : &'static str = "U:N5J8JXPW9BTYX";
 const USER_NEWS_STORY_USER_TOKEN : &'static str = "U:XAWRARC1N89X6";
 
@@ -224,6 +229,10 @@ pub async fn enqueue_infer_tts_handler(
   let use_new_job_system_for_request  = get_request_header_optional(&http_request, NEW_JOB_SYSTEM_HEADER_NAME)
       .is_some();
 
+  let maybe_routing_tag=
+      get_request_header_optional(&http_request, ROUTING_TAG_HEADER_NAME)
+          .map(|routing_tag| routing_tag.trim().to_string());
+
   // ==================== RATE LIMIT ==================== //
 
   if !disable_rate_limiter {
@@ -384,6 +393,7 @@ pub async fn enqueue_infer_tts_handler(
       creator_set_visibility: set_visibility,
       priority_level,
       is_debug_request,
+      maybe_routing_tag: maybe_routing_tag.as_deref(),
       mysql_pool: &server_state.mysql_pool,
     }).await;
 

@@ -3927,6 +3927,16 @@
     },
     "query": "\nUPDATE users\nSET\n    profile_markdown = ?,\n    profile_rendered_html = ?,\n    discord_username = ?,\n    twitter_username = ?,\n    twitch_username = ?,\n    github_username = ?,\n    cashapp_username = ?,\n    website_url = ?,\n    version = version + 1\n\nWHERE users.token = ?\nLIMIT 1\n        "
   },
+  "3d01dbb4b3fa766a56d2f4d956ce0da7cd7e1c23c46ff1cbed578c9cd30c8e25": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Right": 15
+      }
+    },
+    "query": "\nINSERT INTO generic_inference_jobs\nSET\n  token = ?,\n  uuid_idempotency_token = ?,\n\n  inference_category = ?,\n  maybe_model_type = ?,\n  maybe_model_token = ?,\n\n  maybe_input_source_token = ?,\n  maybe_input_source_token_type = ?,\n\n  maybe_raw_inference_text = ?,\n\n  maybe_inference_args = ?,\n\n  maybe_creator_user_token = ?,\n  creator_ip_address = ?,\n  creator_set_visibility = ?,\n\n  priority_level = ?,\n  is_debug_request = ?,\n  maybe_routing_tag = ?,\n\n  status = \"pending\"\n        "
+  },
   "3e0387ef5d2569da801274c3ca80524e2b59b7eea577c1c96a28c186fb4fa0ea": {
     "describe": {
       "columns": [],
@@ -8418,16 +8428,6 @@
       }
     },
     "query": "\nSELECT\n    jobs.token as `job_token: tokens::jobs::download::DownloadJobToken`,\n\n    jobs.status,\n    jobs.attempt_count,\n    jobs.on_success_downloaded_entity_token as maybe_downloaded_entity_token,\n    jobs.on_success_downloaded_entity_type as maybe_downloaded_entity_type,\n\n    jobs.created_at,\n    jobs.updated_at\n\nFROM generic_download_jobs as jobs\n\nWHERE jobs.token = ?\n        "
-  },
-  "7208d62c30125be3ff649e0bdf71cc090f1f52195053503f2a1383a713229684": {
-    "describe": {
-      "columns": [],
-      "nullable": [],
-      "parameters": {
-        "Right": 14
-      }
-    },
-    "query": "\nINSERT INTO generic_inference_jobs\nSET\n  token = ?,\n  uuid_idempotency_token = ?,\n\n  inference_category = ?,\n  maybe_model_type = ?,\n  maybe_model_token = ?,\n\n  maybe_input_source_token = ?,\n  maybe_input_source_token_type = ?,\n\n  maybe_raw_inference_text = ?,\n\n  maybe_inference_args = ?,\n\n  maybe_creator_user_token = ?,\n  creator_ip_address = ?,\n  creator_set_visibility = ?,\n\n  priority_level = ?,\n  is_debug_request = ?,\n\n  status = \"pending\"\n        "
   },
   "73558104936aab6add2d9c789b368b5f155f1fe01d32e7314f2f120422866f54": {
     "describe": {

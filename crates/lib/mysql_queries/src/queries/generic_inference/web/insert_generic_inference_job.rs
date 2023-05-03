@@ -29,6 +29,7 @@ pub struct InsertGenericInferenceArgs<'a> {
 
   pub priority_level: u8,
   pub is_debug_request: bool,
+  pub maybe_routing_tag: Option<&'a str>,
 
   pub mysql_pool: &'a MySqlPool,
 }
@@ -38,6 +39,14 @@ pub async fn insert_generic_inference_job(args: InsertGenericInferenceArgs<'_>) 
 
   let serialized_args_payload = serde_json::ser::to_string(&args.maybe_inference_args)
       .map_err(|_e| anyhow!("could not encode inference args"))?;
+
+  // The routing tag column is VARCHAR(32), so we should truncate.
+  let maybe_routing_tag = args.maybe_routing_tag
+      .map(|routing_tag| {
+        let mut routing_tag = routing_tag.trim().to_string();
+        routing_tag.truncate(32);
+        routing_tag
+      });
 
   let query = sqlx::query!(
         r#"
@@ -63,6 +72,7 @@ SET
 
   priority_level = ?,
   is_debug_request = ?,
+  maybe_routing_tag = ?,
 
   status = "pending"
         "#,
@@ -86,6 +96,7 @@ SET
         args.creator_set_visibility.to_str(),
         args.priority_level,
         args.is_debug_request,
+        maybe_routing_tag,
     );
 
   let query_result = query.execute(args.mysql_pool)
