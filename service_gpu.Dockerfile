@@ -180,10 +180,11 @@ COPY crates/service/job/inference_job/config/inference-job.production.env .
 
 # Need python to make use of other containers' venv
 # TODO(bt,2023-04-26): This is only necessary for download-job and inference-job
-# NB(bt,2023-05-04): Installing lsof, htop, and other debugging tools
+# NB(bt,2023-05-04): Installing lsof, htop, ripgrep, as debugging tools
 RUN apt-get update && DEBIAN_FRONTEND=noninteractive TZ=Etc/UTC apt-get install -y \
-    lsof \
     htop \
+    lsof \
+    ripgrep \
     ffmpeg \
     libsndfile1 \
     nvidia-driver-530 \
