@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React from "react";
 import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
 import { SessionSubscriptionsWrapper } from "@storyteller/components/src/session/SessionSubscriptionsWrapper";
 import { Link } from "react-router-dom";
@@ -21,31 +21,6 @@ interface Props {
 }
 
 export function TtsPageHero(props: Props) {
-  const randomImage = useMemo(() => {
-    const images = [
-      // Main Images:
-      "mascot/kitsune_pose2.webp",
-      "mascot/kitsune_wizard.webp",
-
-      // Seasonal Images:
-      // "mascot/halloween_1.webp",
-      // "mascot/halloween_2.webp",
-      // "mascot/halloween_3.webp",
-      // "mascot/xmas_1.webp",
-      // "mascot/xmas_2.webp",
-      // "mascot/xmas_3.webp",
-      // "mascot/xmas_4.webp",
-      // "mascot/chinese_new_year.webp",
-      //"mascot/superbowl-KCC.webp",
-      //"mascot/superbowl-PE.webp",
-      //"mascot/valentines.webp",
-      // "mascot/st_patricks.webp",
-      //"mascot/april_fools.webp",
-    ];
-
-    return images[Math.floor(Math.random() * images.length)];
-  }, []);
-
   let signUpButton = <></>;
   let viewPricingButton = <></>;
   let upgradeButton = <></>;
@@ -139,10 +114,12 @@ export function TtsPageHero(props: Props) {
     </>
   );
 
+  const ttsImage = "/mascot/kitsune_pose2.webp";
+
   return (
     <>
       <PageHeaderWithImage
-        headerImage={randomImage}
+        headerImage={ttsImage}
         titleIcon={titleIcon}
         title={title}
         subText={subText}
