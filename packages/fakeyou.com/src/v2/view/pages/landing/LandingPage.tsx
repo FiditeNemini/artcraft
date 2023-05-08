@@ -104,9 +104,9 @@ function LandingPage(props: Props) {
   const randomHeroImage = useMemo(() => {
     const images = [
       // Main Images:
-      // "mascot/kitsune_pose2.webp",
-      // "mascot/kitsune_wizard.webp",
-      "mascot/may4th.webp",
+      "mascot/kitsune_pose2.webp",
+      "mascot/kitsune_wizard.webp",
+      // "mascot/may4th.webp",
     ];
 
     return images[Math.floor(Math.random() * images.length)];
