@@ -32,11 +32,10 @@ from (
              jobs.maybe_model_token,
              m.media_source,
              m.maybe_original_mime_type as mime_type,
-             TRUNCATE(m.original_duration_millis / 1000 / 60, 2) as input_mins,
              TRUNCATE(jobs.success_execution_millis / 1000 / 60, 2) as execution_mins,
              TRUNCATE(jobs.success_inference_execution_millis / 1000 / 60, 2) as inference_mins,
              TRUNCATE((jobs.success_execution_millis - jobs.success_inference_execution_millis) / 1000 / 60, 2) as extra_mins,
-             jobs.success_execution_millis as execution_millis,
+             TRUNCATE(m.original_duration_millis / 1000 / 60, 2) as input_mins,
              jobs.success_execution_millis / m.original_duration_millis as ratio
          from generic_inference_jobs AS jobs
                   left join users AS u on
