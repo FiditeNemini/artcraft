@@ -68,7 +68,7 @@ function CommunityCommissionsPage(props: Props) {
         </div>
       </div>
 
-      <motion.div className="container-panel pt-5 pb-5" variants={panel}>
+      <motion.div className="container-panel pt-lg-5 pb-5" variants={panel}>
         <div className="panel p-3 p-lg-4 load-hidden mt-5 mt-lg-0">
           <h1 className="panel-title fw-bold">Details</h1>
           <div className="py-6 d-flex flex-column gap-4">
