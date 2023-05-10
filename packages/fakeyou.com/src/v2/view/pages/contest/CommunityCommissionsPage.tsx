@@ -99,8 +99,10 @@ function CommunityCommissionsPage(props: Props) {
             <a
               href="https://docs.google.com/document/d/1BBmBNt04ceT8JB8Qgr02_c4yKzXg4WDZ3Kl8fJVlQE0"
               className="btn btn-primary"
+              target="_blank"
+              rel="noreferrer"
             >
-              Start Training Voice Models
+              Start Creating Voice Models
             </a>
           </div>
         </div>
