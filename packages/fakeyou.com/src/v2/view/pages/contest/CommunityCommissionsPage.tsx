@@ -35,7 +35,7 @@ function CommunityCommissionsPage(props: Props) {
                 >
                   Voice to Voice
                   <br />
-                  Community Commission
+                  Community Commissions
                 </motion.h1>
               </div>
               <div>
