@@ -76,7 +76,7 @@ import {
 import { VcModelListPage } from "./pages/vc/vc_model_list/VcModelListPage";
 import { UploadVoiceConversionModel } from "./pages/upload/UploadVoiceConversionModel";
 import { VoiceConversionModelListItem } from "@storyteller/components/src/api/voice_conversion/ListVoiceConversionModels";
-import { GrimesPage } from "./pages/contest/GrimesPage";
+import { CommunityCommissionsPage } from "./pages/contest/CommunityCommissionsPage";
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -518,8 +518,8 @@ class PageContainer extends React.Component<Props, State> {
               <AboutPage />
             </Route>
 
-            <Route path="/grimes">
-              <GrimesPage />
+            <Route path="/commissions">
+              <CommunityCommissionsPage />
             </Route>
 
             <Route path="/terms">
