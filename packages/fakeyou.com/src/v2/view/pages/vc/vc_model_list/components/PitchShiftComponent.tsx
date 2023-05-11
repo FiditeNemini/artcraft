@@ -46,9 +46,9 @@ function PitchShiftComponent({
       {...props}
       style={{
         ...props.style,
-        height: "6px",
+        height: "8px",
         width: "100%",
-        backgroundColor: "#ddd",
+        backgroundColor: "#3c3c50",
         borderRadius: "4px",
       }}
     >
@@ -75,7 +75,7 @@ function PitchShiftComponent({
           justifyContent: "center",
           alignItems: "center",
           outline: "none",
-          boxShadow: "0px 0px 40px rgba(0, 0, 0, 0.5)", // Add soft shadow on hover
+          boxShadow: "0px 0px 10px rgba(0, 0, 0, 0.15)", // Add soft shadow on hover
         }}
       ></div>
     </Tippy>
