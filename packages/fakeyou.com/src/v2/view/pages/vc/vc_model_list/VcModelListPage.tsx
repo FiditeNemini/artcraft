@@ -294,7 +294,7 @@ function VcModelListPage(props: Props) {
                         </div>
 
                         <div>
-                          <label className="sub-title">Pitch Shift</label>
+                          <label className="sub-title">Pitch Control</label>
                           <div className="d-flex flex-column gap-3">
                             <PitchShiftComponent
                               min={-36}
@@ -375,7 +375,7 @@ function VcModelListPage(props: Props) {
                         </div>
 
                         <div>
-                          <label className="sub-title">Pitch Shift</label>
+                          <label className="sub-title">Pitch Control</label>
                           <div className="d-flex flex-column gap-3">
                             <PitchShiftComponent
                               min={-36}

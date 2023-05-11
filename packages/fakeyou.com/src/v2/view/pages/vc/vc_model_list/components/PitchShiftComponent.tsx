@@ -56,7 +56,7 @@ function PitchShiftComponent({
     </div>
   );
 
-  const renderThumb = ({ props, isDragged }: any) => (
+  const renderThumb = ({ props, isDragged, isHovered }: any) => (
     <Tippy
       content="Semitones"
       placement="bottom"
@@ -67,14 +67,15 @@ function PitchShiftComponent({
         {...props}
         style={{
           ...props.style,
-          height: "24px",
-          width: "24px",
+          height: "22px",
+          width: "22px",
           borderRadius: "50%",
-          backgroundColor: "#62627f",
+          backgroundColor: isHovered ? "#fff" : "#e66462",
           display: "flex",
           justifyContent: "center",
           alignItems: "center",
           outline: "none",
+          boxShadow: "0px 0px 40px rgba(0, 0, 0, 0.5)", // Add soft shadow on hover
         }}
       ></div>
     </Tippy>
