@@ -13,7 +13,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { faDiscord, faTwitter } from "@fortawesome/free-brands-svg-icons";
 import { WebUrl } from "../../../../common/WebUrl";
-// import { faTrophyStar } from "@fortawesome/pro-solid-svg-icons";
+import { faMoneyBill } from "@fortawesome/pro-solid-svg-icons";
 // import {
 //   faFileArrowUp,
 //   faMicrophone,
@@ -115,16 +115,17 @@ function LandingPage(props: Props) {
   return (
     <motion.div initial="hidden" animate="visible" variants={container}>
       <div className="container pb-5 pb-lg-0 pt-lg-2 px-md-5 px-lg-5 px-xl-3">
-        {/* Grimes Contest Alert */}
-        {/* <div className="alert alert-info fs-6">
-          <FontAwesomeIcon icon={faTrophyStar} className="me-2" />
+        {/* Community Commissions Alert */}
+        <div className="alert alert-info fs-6">
+          <FontAwesomeIcon icon={faMoneyBill} className="me-2" />
           <span className="fw-medium">
-            Participate in our $20k prize pool AI Grimes Song Contest!
+            Get rewarded from our $15k prize pool for creating Voice to Voice
+            models!
           </span>
-          <Link to="/grimes" className="fw-semibold ms-2">
+          <Link to="/commissions" className="fw-semibold ms-2">
             See details <FontAwesomeIcon icon={faArrowRight} className="ms-1" />
           </Link>
-        </div> */}
+        </div>
 
         <div className="row flex-md-row-reverse">
           <div className="col-12 col-lg-5 p-md-0 d-flex justify-content-center">
