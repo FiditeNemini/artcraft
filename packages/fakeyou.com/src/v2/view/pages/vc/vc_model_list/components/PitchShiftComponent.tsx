@@ -46,9 +46,9 @@ function PitchShiftComponent({
       {...props}
       style={{
         ...props.style,
-        height: "8px",
+        height: "10px",
         width: "100%",
-        backgroundColor: "#3c3c50",
+        backgroundColor: "#414155",
         borderRadius: "4px",
       }}
     >
