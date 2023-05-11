@@ -34,6 +34,7 @@ import {
 } from "@storyteller/components/src/jobs/InferenceJob";
 import { SessionVoiceConversionResultsList } from "../../../_common/SessionVoiceConversionResultsList";
 import { Link } from "react-router-dom";
+import PitchShiftComponent from "./components/PitchShiftComponent";
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -62,6 +63,7 @@ function VcModelListPage(props: Props) {
 
   const [convertLoading, setConvertLoading] = useState(false);
   const [canConvert, setCanConvert] = useState(false);
+  const [semitones, setSemitones] = useState(0);
 
   const [mediaUploadToken, setMediaUploadToken] = useState<string | undefined>(
     undefined
@@ -172,6 +174,10 @@ function VcModelListPage(props: Props) {
 
   const handleFormSubmit = async (ev: React.FormEvent<HTMLFormElement>) => {
     ev.preventDefault();
+  };
+
+  const handlePitchChange = (value: any) => {
+    setSemitones(value);
   };
 
   const speakButtonClass = convertLoading
@@ -287,6 +293,18 @@ function VcModelListPage(props: Props) {
                           </div>
                         </div>
 
+                        <div>
+                          <label className="sub-title">Pitch Shift</label>
+                          <div className="d-flex flex-column gap-3">
+                            <PitchShiftComponent
+                              min={-36}
+                              max={36}
+                              step={1}
+                              value={semitones}
+                              onChange={handlePitchChange}
+                            />
+                          </div>
+                        </div>
                         {/*<div>
                           <label className="sub-title">
                             Or pick from your audio collection (5 files)
@@ -357,6 +375,19 @@ function VcModelListPage(props: Props) {
                         </div>
 
                         <div>
+                          <label className="sub-title">Pitch Shift</label>
+                          <div className="d-flex flex-column gap-3">
+                            <PitchShiftComponent
+                              min={-36}
+                              max={36}
+                              step={1}
+                              value={semitones}
+                              onChange={handlePitchChange}
+                            />
+                          </div>
+                        </div>
+
+                        <div>
                           <label className="sub-title">Convert Audio</label>
 
                           <div className="d-flex gap-3">
@@ -388,7 +419,7 @@ function VcModelListPage(props: Props) {
                       />
                       Session V2V Results
                     </h4>
-                    <div className="d-flex flex-column gap-3 session-tts-section">
+                    <div className="d-flex flex-column gap-3 session-tts-section session-vc-section">
                       <SessionVoiceConversionResultsList
                         inferenceJobs={
                           props.inferenceJobsByCategory.get(
