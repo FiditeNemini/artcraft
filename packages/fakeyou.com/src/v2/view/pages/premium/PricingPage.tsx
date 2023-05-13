@@ -92,7 +92,7 @@ function PricingPage(props: Props) {
   let eliteButtonText = "Buy Elite";
   let eliteButtonDisabled = false;
 
-  let unsubscribeButton = <></>;
+  let unsubscribeSection = <></>;
 
   if (userHasPaidPremium) {
     let unsubscribeKey = FYP.plus.internal_plan_key[planKey]; // NB: Default to something (I don't think this matters to Stripe.)
@@ -120,17 +120,21 @@ function PricingPage(props: Props) {
       eliteButtonText = "Switch to Elite";
     }
 
-    unsubscribeButton = (
+    unsubscribeSection = (
       <>
-        <div className="container pt-5 pb-3 text-center">
-          <motion.div className="mt-4" variants={item}>
-            <button
-              onClick={() => beginStripeFlow(unsubscribeKey, "unsubscribe")}
-              className="btn btn-link w-100 fs-6"
-            >
-              Unsubscribe
-            </button>
-          </motion.div>
+        <div className="panel p-4 mt-5 rounded">
+          <h4 className="fw-semibold mb-3">Cancel My Subscription</h4>
+          <p className="mb-4 fs-14">
+            Upon cancellation, your subscription to FakeYou's premium features
+            will be terminated at the end of your current term, which means you
+            will no longer have access to these exclusive functionalities.
+          </p>
+          <button
+            onClick={() => beginStripeFlow(unsubscribeKey, "unsubscribe")}
+            className="btn btn-destructive"
+          >
+            Cancel Subscription
+          </button>
         </div>
       </>
     );
@@ -358,7 +362,6 @@ function PricingPage(props: Props) {
                     </li>
                   );
                 })}
-
 
                 <li className="fw-semibold">{FYP.pro.vc.title}</li>
                 {FYP.pro.vc.features.map((e: any) => {
@@ -607,9 +610,7 @@ function PricingPage(props: Props) {
           </motion.div>
         </div>
 
-        <div className="container mt-3 mb-5">
-          <div className="row gx-3 gy-4">{unsubscribeButton}</div>
-        </div>
+        {unsubscribeSection}
 
         {/* Starter Tier (to show for Latin American countries) */}
         {/* <div className="w-100 mt-4">
