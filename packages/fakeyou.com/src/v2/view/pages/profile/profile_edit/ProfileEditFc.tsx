@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { ApiConfig } from "@storyteller/components";
-import { useHistory } from "react-router-dom";
+import { Link, useHistory } from "react-router-dom";
 import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
 import { Gravatar } from "@storyteller/components/src/elements/Gravatar";
 import { useParams } from "react-router-dom";
@@ -261,7 +261,7 @@ function ProfileEditFc(props: Props) {
                         name="preferred_tts_result_visibility"
                         onChange={handlePreferredTtsResultVisibilityChange}
                         value={preferredTtsResultVisibility}
-                        className="form-select"
+                        className="form-select rounded"
                       >
                         <option value="public">
                           Public (visible from your profile)
@@ -282,7 +282,7 @@ function ProfileEditFc(props: Props) {
                         name="preferred_w2l_result_visibility"
                         onChange={handlePreferredW2lResultVisibilityChange}
                         value={preferredW2lResultVisibility}
-                        className="form-select"
+                        className="form-select rounded"
                       >
                         <option value="public">
                           Public (visible from your profile)
@@ -512,15 +512,18 @@ function ProfileEditFc(props: Props) {
         </fieldset>
       </motion.form>
 
-      <motion.div className="container py-5" variants={item}>
-        <p>More profile and account features coming soon:</p>
-        <ul>
-          <li>Fully private models and templates</li>
-          <li>Sharing preferences (private, friends, auto-expire, etc.)</li>
-          <li>Website preferences</li>
-          <li>Custom avatar / profile pic uploads</li>
-          <li>Email change, password change, and password reset</li>
-        </ul>
+      <motion.div className="container-panel pt-5" variants={item}>
+        <div className="panel p-4 mt-5">
+          <h4 className="fw-semibold mb-3">Cancel My Subscription</h4>
+          <p className="mb-4 fs-14">
+            You can cancel your subscription at the bottom of the pricing page.
+          </p>
+          <div className="d-flex">
+            <Link to="/pricing" className="btn btn-secondary">
+              Go to pricing page
+            </Link>
+          </div>
+        </div>
       </motion.div>
     </motion.div>
   );
