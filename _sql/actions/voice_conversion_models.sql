@@ -28,7 +28,10 @@ where token IN (
     'vcm_84qa0an44p8p',
     'vcm_9xx4v5qz5fbg',
     'vcm_7zp2b2hs2at2',
-    'vcm_xam9m9my0bgz'
+    'vcm_zhvk0mnnb7zp',
+    'vcm_1vc4scq9qp6m',
+    'vcm_sr1b54mwy0ym',
+    'vcm_qx96y8aasydk'
 );
 
 -- Remove duplicate models
@@ -40,7 +43,10 @@ where token IN (
     'vcm_6w21em1bs7q3',
     'vcm_sbhvyj7926w4',
     'vcm_anv469g89adz',
-    'vcm_xsx5yx585c7x'
+    'vcm_xsx5yx585c7x',
+    'vcm_dpahzjjpkf18',
+    'vcm_y09dqe6zgwyk',
+    'vcm_xrp96dwgppv2'
 );
 
 

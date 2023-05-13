@@ -56,3 +56,15 @@ select count(*)
 from generic_inference_jobs
 where maybe_model_type = 'so_vits_svc'
   and status='pending';
+
+
+-- Get jobs that have routing tags
+select
+    id,
+    maybe_input_source_token,
+    maybe_creator_user_token,
+    maybe_routing_tag,
+    status
+from generic_inference_jobs
+where maybe_routing_tag IS NOT NULL
+    limit 10;
