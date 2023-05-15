@@ -7,6 +7,7 @@ use actix_web::error::ResponseError;
 use actix_web::http::StatusCode;
 use actix_web::{web, HttpResponse, HttpRequest};
 use crate::configs::plans::get_correct_plan_for_session::get_correct_plan_for_session;
+use crate::configs::plans::plan::Plan;
 use crate::http_server::endpoints::investor_demo::demo_cookie::request_has_demo_cookie;
 use crate::http_server::endpoints::tts::enqueue_infer_tts_handler::get_model_with_caching::get_model_with_caching;
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
@@ -61,6 +62,9 @@ const ROUTING_TAG_HEADER_NAME : &'static str = "routing-tag";
 
 const USER_FAKEYOU_USER_TOKEN : &'static str = "U:N5J8JXPW9BTYX";
 const USER_NEWS_STORY_USER_TOKEN : &'static str = "U:XAWRARC1N89X6";
+
+/// Safety guard against plans supporting too lengthy TTS inference text.
+const MAX_TTS_LENGTH : usize = 10_000;
 
 #[derive(Deserialize)]
 pub struct InferTtsRequest {
@@ -298,7 +302,7 @@ pub async fn enqueue_infer_tts_handler(
 
   let mut inference_text = request.inference_text.trim().to_string();
 
-  if let Err(reason) = validate_inference_text(&inference_text) {
+  if let Err(reason) = validate_inference_text(&inference_text, &plan) {
     return Err(InferTtsError::BadInput(reason));
   }
 
@@ -466,12 +470,16 @@ pub async fn enqueue_infer_tts_handler(
     .body(body))
 }
 
-pub fn validate_inference_text(text: &str) -> Result<(), String> {
+pub fn validate_inference_text(text: &str, plan: &Plan) -> Result<(), String> {
   if text.len() < 3 {
     return Err("text is too short".to_string());
   }
 
-  if text.len() > 1024 {
+  if text.len() > plan.tts_max_character_length() {
+    return Err("text is too long".to_string());
+  }
+
+  if text.len() > MAX_TTS_LENGTH {
     return Err("text is too long".to_string());
   }
 

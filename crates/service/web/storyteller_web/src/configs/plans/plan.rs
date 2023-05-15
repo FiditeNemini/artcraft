@@ -46,6 +46,7 @@ pub struct Plan {
 
     tts_base_priority_level: u8,
     tts_max_duration: Duration,
+    tts_max_character_length: usize,
     tts_can_generate_mp3: bool, // TODO: This feature doesn't exist yet.
     tts_can_upload_private_models: bool,
     tts_can_share_private_models: bool,
@@ -82,6 +83,7 @@ impl Plan {
             is_synthetic_plan: builder.is_synthetic_plan,
             tts_base_priority_level: builder.tts_base_priority_level,
             tts_max_duration: builder.tts_max_duration,
+            tts_max_character_length: builder.tts_max_character_length,
             tts_can_generate_mp3: builder.tts_can_generate_mp3,
             tts_can_upload_private_models: builder.tts_can_upload_private_models,
             tts_can_share_private_models: builder.tts_can_share_private_models,
@@ -140,6 +142,10 @@ impl Plan {
         self.tts_max_duration.num_seconds() as i32
     }
 
+    pub fn tts_max_character_length(&self) -> usize {
+        self.tts_max_character_length
+    }
+
     pub fn web_vc_base_priority_level(&self) -> u8 {
         self.web_vc_base_priority_level
     }
@@ -160,6 +166,7 @@ pub struct PlanBuilder {
 
     tts_base_priority_level: u8,
     tts_max_duration: Duration,
+    tts_max_character_length: usize,
     tts_can_generate_mp3: bool,
     tts_can_upload_private_models: bool,
     tts_can_share_private_models: bool,
@@ -199,6 +206,8 @@ impl PlanBuilder {
             // TTS
             tts_base_priority_level : TTS_DEFAULT_PRIORITY_LEVEL,
             tts_max_duration: Duration::seconds(TTS_DEFAULT_DURATION_SECONDS),
+            // NB: 1024 was the global (all plan) character limit until 2023-05-15 !
+            tts_max_character_length: 1024,
             tts_can_generate_mp3 : false,
             tts_can_upload_private_models: false,
             tts_can_share_private_models : false,
@@ -260,6 +269,11 @@ impl PlanBuilder {
 
     pub fn tts_max_duration_seconds(mut self, value: i64) -> Self {
         self.tts_max_duration = Duration::seconds(value);
+        self
+    }
+
+    pub fn tts_max_character_length(mut self, value: usize) -> Self {
+        self.tts_max_character_length = value;
         self
     }
 
