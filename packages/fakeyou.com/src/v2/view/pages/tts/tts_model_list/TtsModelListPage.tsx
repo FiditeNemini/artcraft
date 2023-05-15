@@ -466,7 +466,9 @@ function TtsModelListPage(props: Props) {
   }
 
   // NB: If the text is too long, don't allow submission
-  let remainingCharactersButtonDisabled = props.textBuffer.trim().length > 1024;
+  let remainingCharactersButtonDisabled = props.textBuffer.trim().length > 
+    props.sessionSubscriptionsWrapper.ttsMaximumLength();
+
   let noTextInputButtonDisabled = props.textBuffer.trim() === "";
 
   const speakButtonClass = loading

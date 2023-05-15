@@ -25,10 +25,22 @@ export class SessionSubscriptionsWrapper {
     return new SessionSubscriptionsWrapper();
   }
 
+  public ttsMaximumLength() : number {
+    if (this.hasActiveEliteSubscription()) {
+      return 4096;
+    } else if (this.hasActiveProSubscription()) {
+      return 3072;
+    } else if (this.hasActivePlusSubscription()) {
+      return 2048;
+    } else if (this.hasLoyaltyProgram()) {
+      return 2048;
+    }
+    return 1024;
+  }
+
   public hasFreeOrPaidPremiumFeatures() : boolean {
     return this.hasLoyaltyProgram() || this.hasPaidFeatures();
   }
-
 
   public hasLoyaltyProgram() : boolean {
     return !!this.listActiveSubscriptionResponse?.maybe_loyalty_program;
