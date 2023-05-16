@@ -6,6 +6,8 @@ use log::{error, info, warn};
 use mysql_queries::queries::generic_inference::job::list_available_generic_inference_jobs::{AvailableInferenceJob, list_available_generic_inference_jobs, ListAvailableGenericInferenceJobArgs};
 use mysql_queries::queries::generic_inference::job::mark_generic_inference_job_failure::mark_generic_inference_job_failure;
 use std::time::Duration;
+use crate::job::job_loop::clear_full_filesystem::clear_full_filesystem;
+use crate::job::job_loop::process_single_job_error::ProcessSingleJobError;
 
 // Job runner timeouts (guards MySQL)
 const START_TIMEOUT_MILLIS : u64 = 500;
@@ -83,7 +85,9 @@ async fn process_job_batch(job_dependencies: &JobDependencies, jobs: Vec<Availab
       Ok(_) => {},
       Err(e) => {
         warn!("Failure to process job: {:?}", e);
+
         let failure_reason = "";
+
         let _r = mark_generic_inference_job_failure(
           &job_dependencies.mysql_pool,
           &job,
@@ -91,6 +95,15 @@ async fn process_job_batch(job_dependencies: &JobDependencies, jobs: Vec<Availab
           failure_reason,
           job_dependencies.job_max_attempts
         ).await;
+
+        match e {
+          ProcessSingleJobError::Other(_) => {} // No-op
+          ProcessSingleJobError::FilesystemFull => {
+            warn!("Clearing full filesystem...");
+            clear_full_filesystem(&job_dependencies.semi_persistent_cache)?;
+          }
+          ProcessSingleJobError::InvalidJob(_) => {}
+        }
       }
     }
   }
