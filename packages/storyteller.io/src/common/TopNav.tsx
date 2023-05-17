@@ -145,11 +145,21 @@ function TopNav(props: Props) {
             <li>
               <a
                 id="nav-btn-4"
+                href="#vision"
+                className="nav-link"
+                data-scroll-to
+              >
+                Vision
+              </a>
+            </li>
+            <li>
+              <a
+                id="nav-btn-4"
                 href="#social"
                 className="nav-link"
                 data-scroll-to
               >
-                Social AI
+                Products
               </a>
             </li>
             <li>

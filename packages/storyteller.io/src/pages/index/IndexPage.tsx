@@ -35,20 +35,17 @@ import "swiper/css";
 import "swiper/css/pagination";
 import { Autoplay, Pagination } from "swiper";
 import Tilt from "react-parallax-tilt";
+import { Link } from "react-router-dom";
 
 function IndexPage() {
   // NB: React video bug:
   // https://stackoverflow.com/questions/61510160/why-muted-attribute-on-video-tag-is-ignored-in-react
   // https://stackoverflow.com/questions/61510160/why-muted-attribute-on-video-tag-is-ignored-in-react
-  const videoRef: any = useRef(null);
+  const videoRefMain: any = useRef(null);
+  const videoRefBG: any = useRef(null);
 
   // Title Animation
   useEffect(() => {
-    const splitTitle = new SplitType("#hero-title", {
-      types: "chars",
-      charClass: "title-split",
-    });
-
     const splitTitleOutline = new SplitType("#hero-title-outline", {
       types: "words",
       wordClass: "title-outline-split",
@@ -57,30 +54,7 @@ function IndexPage() {
     console.log(splitTitleOutline);
 
     var tl = gsap.timeline({ delay: 0.2 });
-    tl.to(
-      splitTitle.chars,
-      {
-        delay: 0,
-        duration: 0.4,
-        y: 0,
-        opacity: 1,
-        stagger: 0.03,
-        ease: "expo",
-      },
-      "<"
-    );
-    tl.to(
-      splitTitleOutline.words,
-      {
-        delay: 0,
-        duration: 0.5,
-        y: 0,
-        scale: 1,
-        opacity: 1,
-        ease: "expo",
-      },
-      "<"
-    );
+
     tl.to(
       "#sub-title",
       {
@@ -108,17 +82,30 @@ function IndexPage() {
   }, []);
 
   useEffect(() => {
-    if (!!videoRef.current) {
-      videoRef.current.setAttribute("muted", "true");
-      videoRef.current.setAttribute("autoplay", "true");
-      videoRef.current.setAttribute("loop", "true");
-      videoRef.current.setAttribute("playsinline", "true");
-      videoRef.current.setAttribute("disablepictureinpicture", "true");
-      videoRef.current.setAttribute("preload", "auto");
-      videoRef.current.muted = true;
-      videoRef.current.play();
+    if (!!videoRefBG.current) {
+      videoRefBG.current.setAttribute("muted", "true");
+      videoRefBG.current.setAttribute("autoplay", "true");
+      videoRefBG.current.setAttribute("loop", "true");
+      videoRefBG.current.setAttribute("playsinline", "true");
+      videoRefBG.current.setAttribute("disablepictureinpicture", "true");
+      videoRefBG.current.setAttribute("preload", "auto");
+      videoRefBG.current.muted = true;
+      videoRefBG.current.play();
     }
-  }, [videoRef]);
+  }, [videoRefBG]);
+
+  useEffect(() => {
+    if (!!videoRefMain.current) {
+      videoRefMain.current.setAttribute("muted", "true");
+      videoRefMain.current.setAttribute("autoplay", "true");
+      videoRefMain.current.setAttribute("loop", "true");
+      videoRefMain.current.setAttribute("playsinline", "true");
+      videoRefMain.current.setAttribute("disablepictureinpicture", "true");
+      videoRefMain.current.setAttribute("preload", "auto");
+      videoRefMain.current.muted = true;
+      videoRefMain.current.play();
+    }
+  }, [videoRefMain]);
 
   return (
     <div data-scroll-section data-scroll-repeat="true">
@@ -129,101 +116,58 @@ function IndexPage() {
         data-scroll-repeat="true"
         data-scroll-call="home"
       >
-        <video className="bg-video" ref={videoRef}>
-          <source src="/hero/brandon-hyperjail.webm" type="video/webm"></source>
-          <source src="/hero/brandon-hyperjail.mp4" type="video/mp4"></source>
-        </video>
-        <div className="bg-overlay">
-          <div className="container">
-            <div className="hero-title-container">
-              {/* Desktop Title */}
-              <h1
-                id="hero-title"
-                className="hero-title mb-0 d-none d-lg-block nowrap"
+        {/* <video className="bg-video" ref={videoRefBG}>
+          <source src="/hero/bg-video.mp4" type="video/mp4"></source>
+        </video> */}
+
+        <div className="container pt-5">
+          <div className="d-flex flex-column mt-5 pt-5 align-items-center text-center gap-3 mb-3">
+            <h1 id="hero-title" className="hero-title text-center">
+              <span className="hero-title-one align-items-center zi-2">
+                Enabling Anyone to Create High Quality Movies and Music with AI
+              </span>
+            </h1>
+            <p id="sub-title" className="hero-sub-title">
+              We are combining generative AI and User Generated Content to
+              radically democratize both audio and video production.
+            </p>
+            <div id="hero-btn" className="d-flex gap-3">
+              <a
+                className="btn btn-primary d-inline-flex"
+                href="#social"
+                data-scroll-to
               >
-                <span className="hero-title-one align-items-center zi-2">
-                  The Future of Storytelling
-                </span>
-              </h1>
-              {/* Mobile Title */}
-              <h1 className="hero-title d-lg-none">
-                <span className="hero-title-one align-items-center zi-2">
-                  The Future of Storytelling
-                </span>
-              </h1>
-              <p id="sub-title" className="hero-sub-title">
-                We’re scientists, engineers, and creatives building the future
-                AI cloud production studio.
-              </p>
-              <div id="hero-btn" className="pt-4 mt-3">
-                <a
-                  className="btn btn-primary d-inline-flex"
-                  href="#social"
-                  data-scroll-to
-                >
-                  <span>Explore Storyteller</span>
-                </a>
+                <span>Explore Storyteller</span>
+              </a>
+            </div>
+          </div>
+
+          <div className="pt-5 d-flex justify-content-center video-bottom">
+            <div className="ratio ratio-16x9 hero-video-container">
+              <div className="hero-video">
+                <video ref={videoRefMain}>
+                  <source
+                    src="/hero/storyteller-hero.mp4"
+                    type="video/mp4"
+                  ></source>
+                </video>
               </div>
             </div>
           </div>
         </div>
-
-        <div
-          className="d-none d-xl-flex social-icons flex-column gap-4 align-items-center"
-          data-scroll
-          data-scroll-speed="8"
-          data-scroll-direction="horizontal"
-          data-scroll-position="top"
-        >
-          <Tippy content="Discord" placement="right">
-            <a
-              href={ThirdPartyLinks.FAKEYOU_DISCORD}
-              rel="noreferrer"
-              target="_blank"
-            >
-              <FontAwesomeIcon icon={faDiscord} />
-            </a>
-          </Tippy>
-          <Tippy content="Twitch" placement="right">
-            <a
-              href="https://twitch.tv/FakeYouLabs"
-              rel="noreferrer"
-              target="_blank"
-            >
-              <FontAwesomeIcon icon={faTwitch} />
-            </a>
-          </Tippy>
-          <Tippy content="Facebook" placement="right">
-            <a
-              href="https://facebook.com/FakeYouAi"
-              rel="noreferrer"
-              target="_blank"
-            >
-              <FontAwesomeIcon icon={faFacebook} />
-            </a>
-          </Tippy>
-          <Tippy content="Twitter" placement="right">
-            <a
-              href="https://twitter.com/intent/follow?screen_name=FakeYouApp"
-              rel="noreferrer"
-              target="_blank"
-            >
-              <FontAwesomeIcon icon={faTwitter} />
-            </a>
-          </Tippy>
-        </div>
       </div>
+
       <div id="social" className="bg-light section-2">
         <div>
           <Marquee gradient={false} speed={100}>
             <h1 className="marquee-title d-flex gap-3 gap-md-4 gap-lg-5 mt-0 mb-lg-5">
-              <span>Social AI</span>
+              <span>FakeYou</span>
               <span className="text-red">\</span>
-              <span className="text-outline">Social AI</span>
+              <span className="text-outline">FakeYou</span>
               <span className="text-red">\</span>
-              <span>Social AI</span>
+              <span>FakeYou</span>
               <span className="text-red">\</span>
-              <span className="text-outline">Social AI</span>
+              <span className="text-outline">FakeYou</span>
               <span className="text-red me-3 me-md-4 me-lg-5">\</span>
             </h1>
           </Marquee>
