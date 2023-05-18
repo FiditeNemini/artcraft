@@ -1265,6 +1265,10 @@ styles with important tags:
   .fs-14 {
     font-size: 14px;
   }
+
+  .alert-info {
+    font-size: 14px;
+  }
 }
 
 select {
@@ -1333,12 +1337,6 @@ textarea {
 .input-icon .form-control-feedback {
   color: $white !important;
 }
-
-// input {
-//   background-color: $input !important;
-//   border-color: $input !important;
-//   color: $white !important;
-// }
 
 .img-product {
   &.img-tts {
@@ -1427,6 +1425,10 @@ textarea {
     .section {
       padding-top: 7rem;
       padding-bottom: 7rem;
+    }
+
+    .alert-info {
+      font-size: 16px;
     }
   }
 }

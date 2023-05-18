@@ -9,7 +9,6 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faVolumeHigh,
   faVideo,
-  faUpload,
   faImage,
   faTags,
   faHandsHelping,
@@ -18,7 +17,10 @@ import { motion } from "framer-motion";
 import { container, item, panel } from "../../../../data/animation";
 import { usePrefixedDocumentTitle } from "../../../../common/UsePrefixedDocumentTitle";
 import { PageHeader } from "../../_common/PageHeader";
-import { faHandHoldingHeart } from "@fortawesome/pro-solid-svg-icons";
+import {
+  faFileArrowUp,
+  faHandHoldingHeart,
+} from "@fortawesome/pro-solid-svg-icons";
 import { faMicrophoneStand } from "@fortawesome/pro-duotone-svg-icons";
 import { faWaveformLines } from "@fortawesome/pro-regular-svg-icons";
 
@@ -76,14 +78,14 @@ function ContributeIndexPage(props: Props) {
         titleIcon={titleIcon}
       />
 
-      <motion.div className="container-panel pt-2 pb-5" variants={panel}>
-        <div className="panel p-3 p-lg-4 mt-3">
-          <h2 className="panel-title fw-bold">
-            <FontAwesomeIcon icon={faUpload} className="me-3" />
+      <motion.div className="container-panel pb-3" variants={panel}>
+        <div className="panel p-3 p-lg-4">
+          <h2 className="fw-bold">
+            <FontAwesomeIcon icon={faFileArrowUp} className="me-3" />
             {t("pages.contributeIndex.headingUploadModels")}
           </h2>
-          <div className="py-6 d-flex flex-column gap-4">
-            <p className="text-center text-lg-start">
+          <div className="d-flex flex-column gap-4">
+            <p className="text-center text-lg-start mb-3">
               <Trans i18nKey="pages.contributeIndex.describeUploadModels">
                 Create new voices and video templates for FakeYou.
                 <DiscordLink
@@ -95,9 +97,12 @@ function ContributeIndexPage(props: Props) {
             </p>
             <div className="row gx-3 gy-3">
               <div className="col-12 col-md-6">
-                <Link to="/upload/voice_conversion" className="btn btn-primary w-100">
+                <Link
+                  to="/upload/voice_conversion"
+                  className="btn btn-primary w-100"
+                >
                   <FontAwesomeIcon icon={faMicrophoneStand} className="me-3" />
-                  Upload Voice Conversion Model
+                  Upload Voice to Voice Model
                 </Link>
               </div>
               <div className="col-12 col-md-6">
@@ -129,14 +134,14 @@ function ContributeIndexPage(props: Props) {
         </div>
       </motion.div>
 
-      <motion.div className="container-panel pt-3 pb-5" variants={item}>
+      <motion.div className="container-panel pt-3 pb-3" variants={item}>
         <div className="panel p-3 p-lg-4 mt-lg-0">
-          <h2 className="panel-title fw-bold">
+          <h2 className="fw-bold">
             <FontAwesomeIcon icon={faTags} className="me-3" />
             {categoryHeading}
           </h2>
-          <div className="py-6 d-flex flex-column gap-4">
-            <p className="text-center text-lg-start">
+          <div className="d-flex flex-column gap-4">
+            <p className="text-center text-lg-start mb-3">
               {t("pages.contributeIndex.describeSuggest")}
             </p>
             <div className="d-flex gap-3">
@@ -150,13 +155,13 @@ function ContributeIndexPage(props: Props) {
           </div>
         </div>
       </motion.div>
-      <div className="container-panel pt-3 pb-5">
+      <div className="container-panel pt-3">
         <div className="panel p-3 p-lg-4 load-hidden mt-lg-0">
-          <h2 className="panel-title fw-bold">
+          <h2 className="fw-bold">
             <FontAwesomeIcon icon={faHandsHelping} className="me-3" />
             {t("pages.contributeIndex.headingMore")}
           </h2>
-          <div className="py-6 d-flex flex-column gap-4">
+          <div className="d-flex flex-column gap-4">
             <p className="text-center text-lg-start">
               <Trans i18nKey="pages.contributeIndex.describeMore">
                 Want to contribute code, design, or data science?

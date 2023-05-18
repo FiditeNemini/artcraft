@@ -89,14 +89,14 @@ function UploadVoiceConversionModel(props: Props) {
 
   return (
     <motion.div initial="hidden" animate="visible" variants={container}>
-      <div className="container pt-5 pb-4 px-md-4 px-lg-5 px-xl-3">
+      <div className="container pt-5 pb-3 px-md-4 px-lg-5 px-xl-3">
         <div className="d-flex flex-column">
           <motion.h1 className=" fw-bold" variants={item}>
-            Upload Voice Conversion Model
-            {" "}
-            <FontAwesomeIcon icon={faMicrophoneStand} className="me-3" />
+            Upload Voice to Voice Model
           </motion.h1>
-          <motion.h4 variants={item}>Transform your voice into another!</motion.h4>
+          <motion.h4 variants={item}>
+            Transform your voice into another!
+          </motion.h4>
           <motion.div className="my-3" variants={item}>
             <BackLink
               link={WebUrl.contributePage()}
@@ -120,7 +120,7 @@ function UploadVoiceConversionModel(props: Props) {
         </p>
 
         <p>
-          Once your voice conversion model is successfully uploaded, you'll be 
+          Once your voice conversion model is successfully uploaded, you'll be
           able to use it from the main page. Others will be able to use it too,
           and you'll get credited.
         </p>
