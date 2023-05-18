@@ -41,6 +41,11 @@ p {
   font-weight: 400;
 }
 
+li {
+  font-size: 18px;
+  line-height: 1.6;
+}
+
 ::-moz-selection {
   /* Code for Firefox */
   color: $white;

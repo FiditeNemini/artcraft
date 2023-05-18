@@ -174,17 +174,10 @@ function IndexPage() {
         <div className="container mt-5 pt-5">
           <div className="row gx-5 flex-row-reverse gy-4">
             <div className="col-lg-6 img-layers d-none d-xl-block">
-              <Tilt trackOnWindow={true} tiltReverse={true}>
-                <img
-                  src="/images/screenshots/fakeyou-screen.webp"
-                  alt="FakeYou"
-                  className="img-fluid img-back"
-                />
-              </Tilt>
               <img
-                src="/images/fakeyou-mascot.webp"
+                src="/images/screenshots/fakeyou-screen.webp"
                 alt="FakeYou"
-                className="img-front-right img-mascot"
+                className="img-fluid img-back"
               />
             </div>
             <div className="col-lg-6 d-xl-none">
@@ -196,19 +189,23 @@ function IndexPage() {
             </div>
 
             <div className="col-lg-6 d-flex flex-column justify-content-center">
-              <h1 className="fw-bold ">FakeYou</h1>
+              <h1 className="fw-bold ">Text to Speech</h1>
               <h4 className="fw-normal opacity-75 mb-4">
-                Used by millions of people every month
+                Our flagship, launched in April, 2022
               </h4>
-              <p>
-                We've built a social platform for deep learning and generative
-                models. FakeYou is a place where creators can upload and manage
-                a variety of deep fake models: speech, music, lipsyncing, and
-                more. Every day, artists and musicians use our tools to their to
-                dub their creative work. We offer paid voice cloning services,
-                an API with free and paid tiers, and in the future, our users
-                will be able to monetize their own voices.
-              </p>
+              <ul>
+                <li>
+                  Type in text, and get an audio recording of a selected voice
+                </li>
+                <li>
+                  Over 3,000 user-generated voices of celebrities, characters
+                  from film/television, and musicians
+                </li>
+                <li>
+                  Users have created new episodes of their favorite cartoons,
+                  taught classroom lessons on history, and made brand new music
+                </li>
+              </ul>
               <div>
                 <a
                   href="https://fakeyou.com"
@@ -227,17 +224,10 @@ function IndexPage() {
         <div className="container">
           <div className="row gx-5 gy-5">
             <div className="col-lg-6 img-layers d-none d-xl-block">
-              <Tilt trackOnWindow={true} tiltReverse={true}>
-                <img
-                  src="/images/screenshots/powerstream-screen.webp"
-                  alt="FakeYou"
-                  className="img-fluid img-back"
-                />
-              </Tilt>
               <img
-                src="/images/powerstream-mascot.webp"
+                src="/images/screenshots/powerstream-screen.webp"
                 alt="FakeYou"
-                className="img-front-left img-mascot"
+                className="img-fluid"
               />
             </div>
             <div className="col-lg-6 d-xl-none">
@@ -249,27 +239,28 @@ function IndexPage() {
             </div>
 
             <div className="col-lg-6 d-flex flex-column justify-content-center">
-              <h1 className="fw-bold ">PowerStream</h1>
+              <h1 className="fw-bold ">Voice to Voice</h1>
               <h4 className="fw-normal opacity-75 mb-4">
-                Twitch Streamers and Creators can engage and monetize
+                Launched in April, 2023
               </h4>
-              <p>
-                It’s tough to build an audience on Twitch. It's even tougher to
-                earn an income. We've built the most comprehensive and engaging
-                donation system for Twitch to date, letting audience members pay
-                to use Deep Fake voices and emotes in their favorite streamers'
-                live broadcasts. Get started with your channel! There's nothing
-                to install. It's the easiest, most engaging, most fun system for
-                Twitch yet. And it earns you money!
-              </p>
+              <ul>
+                <li>
+                  Upload an audio recording of speech, and transform the voice
+                  into someone else
+                </li>
+                <li>
+                  Rapidly growing library of voices supported by our community
+                </li>
+                <li>Supported by our success TTS engine</li>
+              </ul>
               <div>
                 <a
-                  href="https://power.stream"
+                  href="https://fakeyou.com/voice-conversion"
                   rel="noreferrer"
                   target="_blank"
                   className="btn btn-primary mt-4"
                 >
-                  <span>Add to your stream now!</span>
+                  <span>Go to FakeYou.com</span>
                 </a>
               </div>
             </div>
