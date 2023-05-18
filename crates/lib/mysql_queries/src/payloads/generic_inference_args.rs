@@ -58,16 +58,16 @@ pub enum PolymorphicInferenceArgs {
     #[serde(skip_serializing_if = "Option::is_none")]
     auto_predict_f0: Option<bool>,
 
-    /// Argument for so-vits-svc
-    /// The python model defaults to true, but that sounds awful,
-    /// so we default to false unless specified.
+    /// Argument for so-vits-svc (-fm / --f0-method)
+    /// Crepe, dio, harvest, etc.
+    /// If unspecified, the model defaults to crepe
     #[serde(rename = "fm")] // NB: DO NOT CHANGE. It could break live jobs. Renamed to be fewer bytes.
     #[serde(skip_serializing_if = "Option::is_none")]
     override_f0_method: Option<FundamentalFrequencyMethodForJob>,
 
-    /// Argument for so-vits-svc
-    /// The python model defaults to true, but that sounds awful,
-    /// so we default to false unless specified.
+    /// Argument for so-vits-svc (-t / --transpose)
+    /// Pitch control.
+    /// If unspecified, the model uses "0".
     #[serde(rename = "t")] // NB: DO NOT CHANGE. It could break live jobs. Renamed to be fewer bytes.
     #[serde(skip_serializing_if = "Option::is_none")]
     transpose: Option<i32>,

@@ -8,6 +8,7 @@ use std::fs::OpenOptions;
 use std::path::{Path, PathBuf};
 use std::time::Duration;
 use subprocess::{ExitStatus, Popen, PopenConfig, Redirection};
+use mysql_queries::payloads::generic_inference_args::FundamentalFrequencyMethodForJob;
 use subprocess_common::docker_options::{DockerEnvVar, DockerFilesystemMount, DockerGpu, DockerOptions};
 
 /// This command is used to check tacotron for being a real model
@@ -70,6 +71,12 @@ pub struct InferenceArgs<P: AsRef<Path>> {
   /// --auto-predict-f0: turn on or off fundamental frequency auto prediction
   /// This sounds better when left off, but it defaults to *ON* if not specified.
   pub auto_predict_f0: bool,
+
+  /// --f0-method: f0 prediction method
+  pub maybe_override_f0_method: Option<FundamentalFrequencyMethodForJob>,
+
+  /// --transpose: pitch adjustment
+  pub maybe_transpose: Option<i32>,
 
   /// --device: cpu or cuda
   pub device: Device,
@@ -235,6 +242,24 @@ impl SoVitsSvcInferenceCommand {
     command.push_str(" --auto-predict-f0 ");
     command.push_str(if args.auto_predict_f0 { "true" } else { "false" });
     command.push_str(" ");
+
+    if let Some(transpose) = args.maybe_transpose {
+      let value = transpose.to_string();
+      command.push_str(" --transpose ");
+      command.push_str(&value);
+      command.push_str(" ");
+    }
+
+    if let Some(f0_method) = args.maybe_override_f0_method {
+      let method = match f0_method {
+        FundamentalFrequencyMethodForJob::Crepe => "crepe",
+        FundamentalFrequencyMethodForJob::Dio => "dio",
+        FundamentalFrequencyMethodForJob::Harvest => "harvest",
+      };
+      command.push_str(" --f0-method ");
+      command.push_str(&method);
+      command.push_str(" ");
+    }
 
     let device = match args.device {
       Device::Cuda => "cuda",

@@ -155,21 +155,36 @@ pub async fn process_job(args: SoVitsSvcProcessJobArgs<'_>) -> Result<JobSuccess
   //info!("Expected output spectrogram filename: {:?}", &output_spectrogram_fs_path);
 
   // TODO: Limit output length for premium.
-  // NB: Tacotron operates on decoder steps. 1000 steps is the default and correlates to
-  //  roughly 12 seconds max. Here we map seconds to decoder steps.
-  //let max_decoder_steps = seconds_to_decoder_steps(job.max_duration_seconds);
 
-  // If not specified by the user, turn off auto prediction. It sounds awful.
-  let auto_predict_f0 = job.maybe_inference_args
+  let maybe_args = job.maybe_inference_args
       .as_ref()
       .map(|args| args.args.as_ref())
-      .flatten()
+      .flatten();
+
+
+  // If not specified by the user, turn off auto prediction. It sounds awful.
+  let auto_predict_f0 = maybe_args
       .map(|args| match args {
         PolymorphicInferenceArgs::Tts { .. } => None,
-        PolymorphicInferenceArgs::Vc { auto_predict_f0 } => *auto_predict_f0,
+        PolymorphicInferenceArgs::Vc { auto_predict_f0, .. } => *auto_predict_f0,
       })
       .flatten()
       .unwrap_or(false);
+
+  let maybe_transpose = maybe_args
+      .map(|args| match args {
+        PolymorphicInferenceArgs::Tts { .. } => None,
+        PolymorphicInferenceArgs::Vc { transpose, .. } => *transpose,
+      })
+      .flatten();
+
+  let maybe_override_f0_method = maybe_args
+      .map(|args| match args {
+        PolymorphicInferenceArgs::Tts { .. } => None,
+        PolymorphicInferenceArgs::Vc { override_f0_method, .. } =>
+          *override_f0_method,
+      })
+      .flatten();
 
   // ==================== RUN INFERENCE SCRIPT ==================== //
 
@@ -186,6 +201,8 @@ pub async fn process_job(args: SoVitsSvcProcessJobArgs<'_>) -> Result<JobSuccess
         maybe_config_path: None,
         device: Device::Cuda,
         auto_predict_f0,
+        maybe_override_f0_method,
+        maybe_transpose,
       });
 
   let inference_duration = Instant::now().duration_since(inference_start_time);
