@@ -101,7 +101,7 @@ function LandingPage(props: Props) {
               <Link to="/upload/voice_conversion" className="btn btn-secondary">
                 <span className="d-flex align-items-center">
                   <FontAwesomeIcon icon={faFileArrowUp} className="me-2" />
-                  Upload V2V Model
+                  Upload VTV Model
                 </span>
               </Link>
             </div>
