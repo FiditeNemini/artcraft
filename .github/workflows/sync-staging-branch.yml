@@ -16,12 +16,12 @@ jobs:
           persist-credentials: false
       - name: sync master to staging
         run: |
-          echo "syncing master to staging; using git..."
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
           git checkout -b staging
       - name: push changes
-        uses: ad-m/github-push-action@master
+        #uses: ad-m/github-push-action@master
+        uses: ad-m/github-push-action@0fafdd62b84042d49ec0cb92d9cac7f7ce4ec79e
         with:
           # Note: Github does not allow the default access token to push to 
           # protected branches. Using a PAT with permissions can bypass this, 
