@@ -382,7 +382,7 @@ function VcModelListPage(props: Props) {
                         icon={faBarsStaggered}
                         className="me-3"
                       />
-                      Session VC Results
+                      Session VTV Results
                     </h4>
                     <div className="d-flex flex-column gap-3 session-tts-section">
                       <SessionVoiceConversionResultsList
