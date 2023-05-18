@@ -184,13 +184,16 @@ function VcModelListPage(props: Props) {
       />
 
       <motion.div variants={panel} className="container">
-        <div className="alert alert-info fs-6">
+        <div className="alert alert-info">
           <FontAwesomeIcon icon={faMoneyBill} className="me-2" />
           <span className="fw-medium">
             Get rewarded from our $15k prize pool for creating Voice to Voice
             models!
           </span>
-          <Link to="/commissions" className="fw-semibold ms-2">
+          <Link
+            to="/commissions"
+            className="fw-semibold ms-2 d-inline-flex align-items-center"
+          >
             See details <FontAwesomeIcon icon={faArrowRight} className="ms-1" />
           </Link>
         </div>

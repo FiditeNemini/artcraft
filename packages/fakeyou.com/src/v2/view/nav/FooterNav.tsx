@@ -170,7 +170,7 @@ function FooterNav(props: Props) {
               </li>
 
               <li>
-                <Link to="/voice-conversion">Voice Conversion</Link>
+                <Link to="/voice-conversion">Voice to Voice</Link>
               </li>
 
               <li>
@@ -181,7 +181,7 @@ function FooterNav(props: Props) {
               <p className="fw-bold">Community</p>
 
               <li>
-                <Link to="/contribute">Upload</Link>
+                <Link to="/contribute">Upload Models</Link>
               </li>
 
               <li>

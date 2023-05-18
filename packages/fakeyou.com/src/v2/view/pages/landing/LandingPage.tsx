@@ -13,7 +13,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { faDiscord, faTwitter } from "@fortawesome/free-brands-svg-icons";
 import { WebUrl } from "../../../../common/WebUrl";
-import { faMoneyBill } from "@fortawesome/pro-solid-svg-icons";
+import { faFileArrowUp, faMoneyBill } from "@fortawesome/pro-solid-svg-icons";
 // import {
 //   faFileArrowUp,
 //   faMicrophone,
@@ -31,6 +31,7 @@ function LandingPage(props: Props) {
   let viewPricingButton = <></>;
   let upgradeButton = <></>;
   let myProfileButton = <></>;
+  let uploadModelSection = <></>;
 
   if (!props.sessionWrapper.isLoggedIn()) {
     signUpButton = (
@@ -82,6 +83,41 @@ function LandingPage(props: Props) {
         </Link>
       </>
     );
+
+    uploadModelSection = (
+      <>
+        <h2 className="fw-bold mb-4 mt-5 pt-4">Upload Models</h2>
+        <div className="panel p-4 rounded">
+          <div className="row gy-3 zi-2">
+            <div className="col-12 col-lg-4">
+              <Link to="/upload/tts" className="btn btn-secondary">
+                <span className="d-flex align-items-center">
+                  <FontAwesomeIcon icon={faFileArrowUp} className="me-2" />
+                  Upload TTS Model
+                </span>
+              </Link>
+            </div>
+            <div className="col-12 col-lg-4">
+              <Link to="/upload/voice_conversion" className="btn btn-secondary">
+                <span className="d-flex align-items-center">
+                  <FontAwesomeIcon icon={faFileArrowUp} className="me-2" />
+                  Upload V2V Model
+                </span>
+              </Link>
+            </div>
+            <div className="col-12 col-lg-4">
+              <Link to="/upload/w2l_photo" className="btn btn-secondary">
+                <span className="d-flex align-items-center">
+                  <FontAwesomeIcon icon={faFileArrowUp} className="me-2" />
+                  Upload W2L Model
+                </span>
+              </Link>
+            </div>
+          </div>
+        </div>
+      </>
+    );
+
     if (!props.sessionSubscriptionsWrapper.hasPaidFeatures()) {
       upgradeButton = (
         <>
@@ -116,13 +152,16 @@ function LandingPage(props: Props) {
     <motion.div initial="hidden" animate="visible" variants={container}>
       <div className="container pb-5 pb-lg-0 pt-lg-2 px-md-5 px-lg-5 px-xl-3">
         {/* Community Commissions Alert */}
-        <div className="alert alert-info fs-6">
+        <div className="alert alert-info">
           <FontAwesomeIcon icon={faMoneyBill} className="me-2" />
           <span className="fw-medium">
             Get rewarded from our $15k prize pool for creating Voice to Voice
             models!
           </span>
-          <Link to="/commissions" className="fw-semibold ms-2">
+          <Link
+            to="/commissions"
+            className="fw-semibold ms-2 d-inline-flex align-items-center"
+          >
             See details <FontAwesomeIcon icon={faArrowRight} className="ms-1" />
           </Link>
         </div>
@@ -297,6 +336,8 @@ function LandingPage(props: Props) {
             className="dots-left-bottom"
           />
         </div>
+
+        {uploadModelSection}
       </div>
 
       <div className="container section mt-4 px-md-5 px-xl-3">

@@ -39,6 +39,7 @@ import "tippy.js/animations/shift-away.css";
 import { ThirdPartyLinks } from "@storyteller/components/src/constants/ThirdPartyLinks";
 import { Analytics } from "../../../common/Analytics";
 import {
+  faFileArrowUp,
   faMicrophoneLines,
   faWaveformLines,
 } from "@fortawesome/pro-solid-svg-icons";
@@ -390,13 +391,27 @@ function TopNav(props: Props) {
                           className="me-2"
                         />
                         {"  "}
-                        Voice Conversion
+                        Voice to Voice
                       </Link>
                     </li>
                     <li data-bs-toggle="offcanvas">
                       <Link className="dropdown-item" to="/video">
                         <FontAwesomeIcon icon={faVideo} className="me-2" />
                         {t("nav.TopNav.main.videoOption")}
+                      </Link>
+                    </li>
+                    <hr className="my-2" />
+                    <li data-bs-toggle="offcanvas">
+                      <Link
+                        className="dropdown-item"
+                        to="/contribute"
+                        title="to Upload page"
+                      >
+                        <FontAwesomeIcon
+                          icon={faFileArrowUp}
+                          className="me-2"
+                        />
+                        Upload Models
                       </Link>
                     </li>
                   </ul>

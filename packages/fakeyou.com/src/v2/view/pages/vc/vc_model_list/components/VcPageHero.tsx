@@ -9,6 +9,7 @@ import {
   faUser,
   faArrowRight,
   faWaveformLines,
+  faMicrophoneLines,
 } from "@fortawesome/pro-solid-svg-icons";
 import { Analytics } from "../../../../../../common/Analytics";
 import { WebUrl } from "../../../../../../common/WebUrl";
@@ -101,8 +102,10 @@ export function VcPageHero(props: Props) {
     }
   }
 
-  const titleIcon = <FontAwesomeIcon icon={faWaveformLines} className="me-3" />;
-  const title = <>Voice Conversion</>;
+  const titleIcon = (
+    <FontAwesomeIcon icon={faMicrophoneLines} className="me-3" />
+  );
+  const title = <>Voice to Voice</>;
   const subText = (
     <>Use this tool to change your voice into your favorite characters.</>
   );
