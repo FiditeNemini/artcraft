@@ -35,7 +35,6 @@ import "swiper/css";
 import "swiper/css/pagination";
 import { Autoplay, Pagination } from "swiper";
 import Tilt from "react-parallax-tilt";
-import { Link } from "react-router-dom";
 
 function IndexPage() {
   // NB: React video bug:
@@ -121,7 +120,7 @@ function IndexPage() {
         </video> */}
 
         <div className="container pt-5">
-          <div className="d-flex flex-column mt-5 pt-5 align-items-center text-center gap-3 mb-3">
+          <div className="d-flex flex-column mt-5 pt-3 pt-lg-5 align-items-center text-center gap-3 mb-3">
             <h1 id="hero-title" className="hero-title text-center">
               <span className="hero-title-one align-items-center zi-2">
                 Enabling Anyone to Create High Quality Movies and Music with AI
