@@ -32,6 +32,16 @@ pub enum InferenceCategoryAbbreviated {
   VoiceConversion,
 }
 
+#[derive(Serialize, Deserialize, Clone, Copy, Debug)]
+pub enum FundamentalFrequencyMethodForJob {
+  #[serde(rename = "c")] // NB: DO NOT CHANGE. It could break live jobs. Renamed to be fewer bytes.
+  Crepe,
+  #[serde(rename = "d")] // NB: DO NOT CHANGE. It could break live jobs. Renamed to be fewer bytes.
+  Dio,
+  #[serde(rename = "h")] // NB: DO NOT CHANGE. It could break live jobs. Renamed to be fewer bytes.
+  Harvest,
+}
+
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub enum PolymorphicInferenceArgs {
   /// Text to speech. (Short name to save space when serializing.)
@@ -44,8 +54,23 @@ pub enum PolymorphicInferenceArgs {
     /// Argument for so-vits-svc
     /// The python model defaults to true, but that sounds awful,
     /// so we default to false unless specified.
+    #[serde(rename = "a")] // NB: DO NOT CHANGE. It could break live jobs. Renamed to be fewer bytes.
     #[serde(skip_serializing_if = "Option::is_none")]
     auto_predict_f0: Option<bool>,
+
+    /// Argument for so-vits-svc
+    /// The python model defaults to true, but that sounds awful,
+    /// so we default to false unless specified.
+    #[serde(rename = "fm")] // NB: DO NOT CHANGE. It could break live jobs. Renamed to be fewer bytes.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    override_f0_method: Option<FundamentalFrequencyMethodForJob>,
+
+    /// Argument for so-vits-svc
+    /// The python model defaults to true, but that sounds awful,
+    /// so we default to false unless specified.
+    #[serde(rename = "t")] // NB: DO NOT CHANGE. It could break live jobs. Renamed to be fewer bytes.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    transpose: Option<i32>,
   },
 }
 
@@ -78,7 +103,7 @@ impl InferenceCategoryAbbreviated {
 
 #[cfg(test)]
 mod tests {
-  use crate::payloads::generic_inference_args::{GenericInferenceArgs, InferenceCategoryAbbreviated, PolymorphicInferenceArgs};
+  use crate::payloads::generic_inference_args::{FundamentalFrequencyMethodForJob, GenericInferenceArgs, InferenceCategoryAbbreviated, PolymorphicInferenceArgs};
   use enums::by_table::generic_inference_jobs::inference_category::InferenceCategory;
   use tokens::files::media_upload::MediaUploadToken;
   use tokens::tokens::tts_models::TtsModelToken;
@@ -107,6 +132,8 @@ mod tests {
       inference_category: Some(InferenceCategoryAbbreviated::VoiceConversion),
       args: Some(PolymorphicInferenceArgs::Vc {
         auto_predict_f0: Some(false),
+        override_f0_method: None,
+        transpose: None,
       }),
     };
 
@@ -114,7 +141,28 @@ mod tests {
 
     // NB: Assert the serialized form. If this changes and the test breaks, be careful about migrating.
     assert_eq!(json,
-      r#"{"cat":"vc","args":{"Vc":{"auto_predict_f0":false}}}"#.to_string());
+      r#"{"cat":"vc","args":{"Vc":{"a":false}}}"#.to_string());
+
+    // NB: Make sure we don't overflow the DB field capacity (TEXT column).
+    assert!(json.len() < 1000);
+  }
+
+  #[test]
+  fn many_voice_conversion_args_serialize() {
+    let args = GenericInferenceArgs {
+      inference_category: Some(InferenceCategoryAbbreviated::VoiceConversion),
+      args: Some(PolymorphicInferenceArgs::Vc {
+        auto_predict_f0: Some(false),
+        override_f0_method: Some(FundamentalFrequencyMethodForJob::Dio),
+        transpose: Some(-1),
+      }),
+    };
+
+    let json = serde_json::ser::to_string(&args).unwrap();
+
+    // NB: Assert the serialized form. If this changes and the test breaks, be careful about migrating.
+    assert_eq!(json,
+               r#"{"cat":"vc","args":{"Vc":{"a":false,"fm":"d","t":-1}}}"#.to_string());
 
     // NB: Make sure we don't overflow the DB field capacity (TEXT column).
     assert!(json.len() < 1000);
@@ -126,6 +174,8 @@ mod tests {
       inference_category: Some(InferenceCategoryAbbreviated::VoiceConversion),
       args: Some(PolymorphicInferenceArgs::Vc {
         auto_predict_f0: None, // NB: Do not serialize
+        override_f0_method: None,
+        transpose: None,
       }),
     };
 
@@ -151,6 +201,8 @@ mod tests {
       inference_category: Some(InferenceCategoryAbbreviated::VoiceConversion),
       args: Some(PolymorphicInferenceArgs::Vc {
         auto_predict_f0: Some(true),
+        override_f0_method: None,
+        transpose: None,
       }),
     });
 
@@ -158,7 +210,7 @@ mod tests {
 
     // NB: Assert the serialized form. If this changes and the test breaks, be careful about migrating.
     assert_eq!(json,
-               r#"{"cat":"vc","args":{"Vc":{"auto_predict_f0":true}}}"#.to_string());
+               r#"{"cat":"vc","args":{"Vc":{"a":true}}}"#.to_string());
 
     // NB: Make sure we don't overflow the DB field capacity (TEXT column).
     assert!(json.len() < 1000);

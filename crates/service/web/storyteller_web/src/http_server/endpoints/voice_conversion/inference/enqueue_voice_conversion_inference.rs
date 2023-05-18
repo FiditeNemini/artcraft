@@ -15,7 +15,7 @@ use enums::common::visibility::Visibility;
 use http_server_common::request::get_request_header_optional::get_request_header_optional;
 use http_server_common::request::get_request_ip::get_request_ip;
 use log::{info, warn};
-use mysql_queries::payloads::generic_inference_args::{GenericInferenceArgs, InferenceCategoryAbbreviated, PolymorphicInferenceArgs};
+use mysql_queries::payloads::generic_inference_args::{FundamentalFrequencyMethodForJob, GenericInferenceArgs, InferenceCategoryAbbreviated, PolymorphicInferenceArgs};
 use mysql_queries::queries::generic_inference::web::insert_generic_inference_job::{InsertGenericInferenceArgs, insert_generic_inference_job};
 use r2d2_redis::redis::Commands;
 use redis_common::redis_keys::RedisKeys;
@@ -52,6 +52,24 @@ pub struct EnqueueVoiceConversionInferenceRequest {
   /// The python model defaults to true, but that sounds awful,
   /// so we default to false unless specified.
   auto_predict_f0: Option<bool>,
+
+  /// Argument for so-vits-svc
+  /// f0 estimation
+  override_f0_method: Option<FundamentalFrequencyMethod>,
+
+  /// Argument for so-vits-svc
+  /// Pitch controls for so-vits-svc
+  transpose: Option<i32>,
+}
+
+#[derive(Deserialize, Clone, Copy)]
+pub enum FundamentalFrequencyMethod {
+  #[serde(rename = "crepe")]
+  Crepe,
+  #[serde(rename = "dio")]
+  Dio,
+  #[serde(rename = "harvest")]
+  Harvest,
 }
 
 #[derive(Serialize)]
@@ -231,9 +249,19 @@ pub async fn enqueue_voice_conversion_inference_handler(
 
   let mut maybe_args = None;
 
-  if let Some(auto_predict_f0) = request.auto_predict_f0 {
+  let set_args = request.auto_predict_f0.is_some()
+      || request.transpose.is_some()
+      || request.override_f0_method.is_some();
+
+  if set_args {
     maybe_args = Some(PolymorphicInferenceArgs::Vc {
-      auto_predict_f0: Some(auto_predict_f0),
+      auto_predict_f0: request.auto_predict_f0,
+      override_f0_method: request.override_f0_method.map(|f| match f {
+        FundamentalFrequencyMethod::Crepe => FundamentalFrequencyMethodForJob::Crepe,
+        FundamentalFrequencyMethod::Dio => FundamentalFrequencyMethodForJob::Dio,
+        FundamentalFrequencyMethod::Harvest => FundamentalFrequencyMethodForJob::Harvest,
+      }),
+      transpose: request.transpose,
     });
   }
 
