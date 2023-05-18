@@ -23,6 +23,7 @@ import {
 import { VcModelListSearch } from "./components/VcModelListSearchComponent";
 import {
   EnqueueVoiceConversion,
+  EnqueueVoiceConversionFrequencyMethod,
   EnqueueVoiceConversionIsSuccess,
   EnqueueVoiceConversionRequest,
 } from "@storyteller/components/src/api/voice_conversion/EnqueueVoiceConversion";
@@ -58,6 +59,7 @@ interface Props {
 
 function VcModelListPage(props: Props) {
   usePrefixedDocumentTitle("Voice Conversion");
+
   const [convertLoading, setConvertLoading] = useState(false);
   const [canConvert, setCanConvert] = useState(false);
 
@@ -68,6 +70,11 @@ function VcModelListPage(props: Props) {
   const [convertIdempotencyToken, setConvertIdempotencyToken] = useState(
     uuidv4()
   );
+
+  const [maybeF0MethodOverride, setMaybeF0MethodOverride] = 
+    useState<EnqueueVoiceConversionFrequencyMethod | undefined>(undefined);
+
+  const [maybePitchTranspose, setMaybePitchTranspose] = useState<number>(0);
 
   // NB: Something of a UI hack here.
   // The 3rd party microphone component doesn't let you clear it, so we emulate form clearing
