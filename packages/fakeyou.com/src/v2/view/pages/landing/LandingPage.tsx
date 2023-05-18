@@ -91,26 +91,20 @@ function LandingPage(props: Props) {
           <div className="row gy-3 zi-2">
             <div className="col-12 col-lg-4">
               <Link to="/upload/tts" className="btn btn-secondary">
-                <span className="d-flex align-items-center">
-                  <FontAwesomeIcon icon={faFileArrowUp} className="me-2" />
-                  Upload TTS Model
-                </span>
+                <FontAwesomeIcon icon={faFileArrowUp} className="me-2" />
+                Upload TTS Model
               </Link>
             </div>
             <div className="col-12 col-lg-4">
               <Link to="/upload/voice_conversion" className="btn btn-secondary">
-                <span className="d-flex align-items-center">
-                  <FontAwesomeIcon icon={faFileArrowUp} className="me-2" />
-                  Upload VTV Model
-                </span>
+                <FontAwesomeIcon icon={faFileArrowUp} className="me-2" />
+                Upload V2V Model
               </Link>
             </div>
             <div className="col-12 col-lg-4">
               <Link to="/upload/w2l_photo" className="btn btn-secondary">
-                <span className="d-flex align-items-center">
-                  <FontAwesomeIcon icon={faFileArrowUp} className="me-2" />
-                  Upload W2L Model
-                </span>
+                <FontAwesomeIcon icon={faFileArrowUp} className="me-2" />
+                Upload W2L Model
               </Link>
             </div>
           </div>
@@ -158,10 +152,7 @@ function LandingPage(props: Props) {
             Get rewarded from our $15k prize pool for creating Voice to Voice
             models!
           </span>
-          <Link
-            to="/commissions"
-            className="fw-semibold ms-2 d-inline-flex align-items-center"
-          >
+          <Link to="/commissions" className="fw-semibold ms-2">
             See details <FontAwesomeIcon icon={faArrowRight} className="ms-1" />
           </Link>
         </div>
@@ -178,7 +169,8 @@ function LandingPage(props: Props) {
           <div className="col-12 col-lg-7 d-flex flex-column justify-content-center flex-reverse px-md-5 px-lg-3">
             <h1 className="fw-bold display-5 text-center text-lg-start px-md-5 px-lg-0">
               AI Music, Text to Speech,
-              <br />& Voice Transformation
+              <br />
+              and Voice to Voice
             </h1>
             <p className="lead opacity-75 pb-4 text-center text-lg-start px-md-5 px-lg-0 pe-lg-5">
               Generate audio or videos of your favorite characters saying

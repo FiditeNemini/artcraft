@@ -79,13 +79,13 @@ function ContributeIndexPage(props: Props) {
       />
 
       <motion.div className="container-panel pb-3" variants={panel}>
-        <div className="panel p-3 p-lg-4">
+        <div className="panel p-3 py-4 p-md-4 text-center text-lg-start">
           <h2 className="fw-bold">
             <FontAwesomeIcon icon={faFileArrowUp} className="me-3" />
             {t("pages.contributeIndex.headingUploadModels")}
           </h2>
-          <div className="d-flex flex-column gap-4">
-            <p className="text-center text-lg-start mb-3">
+          <div className="d-flex flex-column">
+            <p className="mb-4">
               <Trans i18nKey="pages.contributeIndex.describeUploadModels">
                 Create new voices and video templates for FakeYou.
                 <DiscordLink
@@ -135,13 +135,13 @@ function ContributeIndexPage(props: Props) {
       </motion.div>
 
       <motion.div className="container-panel pt-3 pb-3" variants={item}>
-        <div className="panel p-3 p-lg-4 mt-lg-0">
+        <div className="panel p-3 py-4 p-md-4 text-center text-lg-start">
           <h2 className="fw-bold">
             <FontAwesomeIcon icon={faTags} className="me-3" />
             {categoryHeading}
           </h2>
-          <div className="d-flex flex-column gap-4">
-            <p className="text-center text-lg-start mb-3">
+          <div className="d-flex flex-column">
+            <p className="text-center text-lg-start mb-4">
               {t("pages.contributeIndex.describeSuggest")}
             </p>
             <div className="d-flex gap-3">
@@ -156,12 +156,12 @@ function ContributeIndexPage(props: Props) {
         </div>
       </motion.div>
       <div className="container-panel pt-3">
-        <div className="panel p-3 p-lg-4 load-hidden mt-lg-0">
+        <div className="panel p-3 py-4 p-md-4 text-center text-lg-start">
           <h2 className="fw-bold">
             <FontAwesomeIcon icon={faHandsHelping} className="me-3" />
             {t("pages.contributeIndex.headingMore")}
           </h2>
-          <div className="d-flex flex-column gap-4">
+          <div className="d-flex flex-column">
             <p className="text-center text-lg-start">
               <Trans i18nKey="pages.contributeIndex.describeMore">
                 Want to contribute code, design, or data science?
