@@ -8,7 +8,6 @@ import {
   faStar,
   faUser,
   faArrowRight,
-  faWaveformLines,
   faMicrophoneLines,
 } from "@fortawesome/pro-solid-svg-icons";
 import { Analytics } from "../../../../../../common/Analytics";
