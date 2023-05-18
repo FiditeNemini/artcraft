@@ -9,7 +9,6 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faVolumeHigh,
   faVideo,
-  faUpload,
   faImage,
   faTags,
   faHandsHelping,
