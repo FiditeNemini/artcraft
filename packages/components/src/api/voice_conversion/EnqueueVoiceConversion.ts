@@ -1,9 +1,19 @@
 import { ApiConfig } from "@storyteller/components";
 
+export enum EnqueueVoiceConversionFrequencyMethod {
+  Crepe = "crepe",
+  Dio = "dio",
+  Harvest = "harvest",
+}
+
 export interface EnqueueVoiceConversionRequest {
   uuid_idempotency_token: string,
   voice_conversion_model_token: string,
   source_media_upload_token: string,
+
+  // Optional args
+  override_f0_method?: EnqueueVoiceConversionFrequencyMethod,
+  transpose?: number,
 }
 
 export interface EnqueueVoiceConversionSuccessResponse {
