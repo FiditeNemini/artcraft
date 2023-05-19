@@ -7,10 +7,8 @@ import { container, panel } from "../../../../../data/animation";
 import { SessionSubscriptionsWrapper } from "@storyteller/components/src/session/SessionSubscriptionsWrapper";
 import { VcPageHero } from "./components/VcPageHero";
 import {
-  faArrowRight,
   faBarsStaggered,
   faMicrophone,
-  faMoneyBill,
   faRightLeft,
 } from "@fortawesome/pro-solid-svg-icons";
 import UploadComponent from "./components/UploadComponent";
@@ -32,7 +30,6 @@ import {
   InferenceJob,
 } from "@storyteller/components/src/jobs/InferenceJob";
 import { SessionVoiceConversionResultsList } from "../../../_common/SessionVoiceConversionResultsList";
-import { Link } from "react-router-dom";
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -183,7 +180,7 @@ function VcModelListPage(props: Props) {
         sessionSubscriptionsWrapper={props.sessionSubscriptionsWrapper}
       />
 
-      <motion.div variants={panel} className="container">
+      {/* <motion.div variants={panel} className="container">
         <div className="alert alert-info">
           <FontAwesomeIcon icon={faMoneyBill} className="me-2" />
           <span className="fw-medium">
@@ -194,7 +191,7 @@ function VcModelListPage(props: Props) {
             See details <FontAwesomeIcon icon={faArrowRight} className="ms-1" />
           </Link>
         </div>
-      </motion.div>
+      </motion.div> */}
 
       <motion.div className="container-panel pb-5 mb-4" variants={panel}>
         <div className="panel p-3 py-4 p-md-4">
