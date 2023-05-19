@@ -193,7 +193,36 @@ pub async fn handle_upload(
       _ => None,
     };
 
-    if media_upload_type.is_some() {
+    let do_decode = match mimetype {
+      "audio/opus" => {
+        // TODO/FIXME(bt, 2023-05-19): Symphonia is currently broken for Firefox's opus.
+        //  We're on an off-master branch that may resolve the problem in the future, but for now
+        //  it panics as follows:
+        //
+        //   [2023-05-19T10:25:34Z INFO  symphonia_core::probe] found a possible format marker within [4f, 67, 67, 53, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, d4, c5] @ 0+2 bytes.
+        //   [2023-05-19T10:25:34Z INFO  symphonia_core::probe] found the format marker [4f, 67, 67, 53] @ 0+2 bytes.
+        //   [2023-05-19T10:25:34Z DEBUG symphonia_format_ogg::page] grow page buffer to 8192 bytes
+        //   [2023-05-19T10:25:34Z INFO  symphonia_format_ogg::demuxer] starting new physical stream
+        //   [2023-05-19T10:25:34Z INFO  symphonia_format_ogg::demuxer] selected opus mapper for stream with serial=0x19aac5d4
+        //   [2023-05-19T10:25:34Z INFO  media::decode_basic_audio_info] Probed!
+        //   [2023-05-19T10:25:34Z INFO  media::decode_basic_audio_info] Find audio track...
+        //   [2023-05-19T10:25:34Z INFO  media::decode_basic_audio_info] Found audio track (maybe)
+        //   [2023-05-19T10:25:34Z INFO  media::decode_basic_audio_info] Maybe track duration: None
+        //   [2023-05-19T10:25:34Z INFO  media::decode_basic_audio_info] Maybe codec short name: Some("opus")
+        //   [2023-05-19T10:25:34Z INFO  media::decode_basic_audio_info] Opus handler
+        //   [2023-05-19T10:25:34Z INFO  media::decode_basic_audio_info] Media source stream
+        //   [2023-05-19T10:25:34Z INFO  media::decode_webm_opus_info] decode_mkv : options...
+        //   [2023-05-19T10:25:34Z INFO  media::decode_webm_opus_info] decode_mkv : try_read...
+        //   [2023-05-19T10:25:34Z DEBUG symphonia_format_mkv::ebml] element with tag: 4F67
+        //   thread 'actix-rt|system:0|arbiter:1' panicked at 'assertion failed: `(left == right)`
+        //     left: `Unknown`,
+        //    right: `Ebml`: EBML element type must be checked before calling this function', /Users/bt/.cargo/git/checkouts/symphonia-8fbe6c90fc095688/e1a7009/symphonia-format-mkv/src/ebml.rs:335:9
+        false
+      }
+      _ => true,
+    };
+
+    if do_decode && media_upload_type.is_some() {
       let basic_info = decode_basic_audio_bytes_info(
         bytes.as_ref(),
         Some(mimetype),
