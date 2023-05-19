@@ -51,9 +51,9 @@ function PitchEstimateMethodComponent(props: PitchShiftProps) {
   }
 
   const options : DropdownOption[] = [
+    { label: "DIO", value: EnqueueVoiceConversionFrequencyMethod.Dio },
     { label: "CREPE", value: EnqueueVoiceConversionFrequencyMethod.Crepe }, 
     { label: "Harvest", value: EnqueueVoiceConversionFrequencyMethod.Harvest },
-    { label: "DIO", value: EnqueueVoiceConversionFrequencyMethod.Dio },
   ];
 
   const selectedOption = options.find((option) => option.value === props.pitchMethod) || options[0];
