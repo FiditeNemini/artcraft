@@ -42,7 +42,7 @@ SELECT
       FROM generic_inference_jobs
       WHERE status IN ("pending", "attempt_failed")
     ) as g
-  ) as legacy_tts_job_count,
+  ) as generic_job_count,
   (
     SELECT
       COUNT(distinct token) as legacy_tts_job_count
@@ -57,7 +57,7 @@ SELECT
       FROM tts_inference_jobs
       WHERE status IN ("pending", "attempt_failed")
     ) as t
-  ) as generic_job_count,
+  ) as legacy_tts_job_count,
   NOW() as present_time;
         "#,
     )
