@@ -156,6 +156,41 @@ function IndexPage() {
         </div>
       </div>
 
+      <div id="vision" className="bg-light section-2">
+        <div>
+          <Marquee gradient={false} speed={100}>
+            <h1 className="marquee-title d-flex gap-3 gap-md-4 gap-lg-5 mt-0 mb-lg-5">
+              <span>Vision</span>
+              <span className="text-red">\</span>
+              <span className="text-outline">Vision</span>
+              <span className="text-red">\</span>
+              <span>Vision</span>
+              <span className="text-red">\</span>
+              <span className="text-outline">Vision</span>
+              <span className="text-red">\</span>
+              <span>Vision</span>
+              <span className="text-red">\</span>
+              <span className="text-outline">Vision</span>
+              <span className="text-red me-3 me-md-4 me-lg-5">\</span>
+            </h1>
+          </Marquee>
+        </div>
+
+        <div className="container py-5 text-center d-flex flex-column align-items-center mt-3">
+          <img src="/images/vision.webp" className="w-25 mb-4" alt="" />
+          <h1 className="fw-bold display-6 about-title mt-4 px-lg-5">
+            We envision a future where a single creator can make content that
+            rivals modern Hollywood studios
+          </h1>
+          <hr className="p-1 mt-4 mb-5 text-red opacity-100 w-25" />
+          <p className="fs-5 w-50">
+            Where more media is generated every day than all of human history In
+            which the technical mastery behind creativity becomes so accessible,
+            that even a child could create a masterpiece
+          </p>
+        </div>
+      </div>
+
       <div id="social" className="bg-light section-2">
         <div>
           <Marquee gradient={false} speed={100}>
@@ -263,6 +298,47 @@ function IndexPage() {
                   <span>Go to FakeYou.com</span>
                 </a>
               </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div className="container mt-5 pt-5">
+        <div className="row gx-5 flex-row-reverse gy-4">
+          <div className="col-lg-6 img-layers d-none d-xl-block">
+            <img
+              src="/images/screenshots/fakeyou-screen.webp"
+              alt="FakeYou"
+              className="img-fluid img-back"
+            />
+          </div>
+          <div className="col-lg-6 d-xl-none">
+            <img
+              src="/images/screenshots/fakeyou-screen-mobile.webp"
+              alt="FakeYou"
+              className="img-fluid"
+            />
+          </div>
+
+          <div className="col-lg-6 d-flex flex-column justify-content-center">
+            <h1 className="fw-bold ">Video Lip Sync</h1>
+            <h4 className="fw-normal opacity-75 mb-4">
+              Launched in April 2022
+            </h4>
+            <ul>
+              <li>
+                Upload an audio recording of speech, and an image and generate
+                animation of a character speaking
+              </li>
+            </ul>
+            <div>
+              <a
+                href="https://fakeyou.com/w2l"
+                rel="noreferrer"
+                target="_blank"
+                className="btn btn-primary mt-4"
+              >
+                <span>Go to FakeYou.com</span>
+              </a>
             </div>
           </div>
         </div>
