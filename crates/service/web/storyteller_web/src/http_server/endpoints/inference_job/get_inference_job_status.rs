@@ -30,6 +30,12 @@ use std::ops::Deref;
 use std::sync::Arc;
 use tokens::jobs::inference::InferenceJobToken;
 
+/// For certain jobs or job classes (eg. non-premium), we kill the jobs if the user hasn't
+/// maintained a keepalive. This prevents wasted work when users who are unlikely to return
+/// navigate away. Premium users have accounts and can always return to the site, so they
+/// typically do not require keepalive.
+const JOB_KEEPALIVE_TTL_SECONDS : usize = 60 * 3;
+
 /// For the URL PathInfo
 #[derive(Deserialize)]
 pub struct GetInferenceJobStatusPathInfo {
@@ -81,6 +87,10 @@ pub struct StatusDetailsResponse {
   pub maybe_first_started_at: Option<DateTime<Utc>>,
 
   pub attempt_count: u8,
+
+  /// Whether the frontend needs to maintain a keepalive check.
+  /// This is typically only for non-premium users.
+  pub requires_keepalive: bool,
 }
 
 #[derive(Serialize)]
@@ -157,6 +167,7 @@ pub async fn get_inference_job_status_handler(
         GetInferenceJobStatusError::ServerError
       })?;
 
+  // TODO(bt,2023-05-21): Make async.
   let extra_status_key = RedisKeys::generic_inference_extra_status_info(path.token.as_str());
   let maybe_extra_status_description : Option<String> = match redis.get(&extra_status_key) {
     Ok(Some(status)) => {
@@ -168,6 +179,21 @@ pub async fn get_inference_job_status_handler(
       None // Fail open
     },
   };
+
+  if record.is_keepalive_required {
+    // TODO(bt,2023-05-21): Make async.
+    let keepalive_key = RedisKeys::generic_inference_keepalive(path.token.as_str());
+    let _: Option<String> = match redis.set_ex(&extra_status_key, "1", JOB_KEEPALIVE_TTL_SECONDS) {
+      Ok(Some(status)) => {
+        Some(status)
+      },
+      Ok(None) => None,
+      Err(e) => {
+        error!("redis error setting job keepalive: {:?}", e);
+        None // Fail open (which in this case is bad! it will kill jobs if cluster has many jobs / is slow!)
+      },
+    };
+  }
 
   let inference_category = record.request_details.inference_category.clone();
 
@@ -187,6 +213,7 @@ pub async fn get_inference_job_status_handler(
       maybe_assigned_cluster: record.maybe_assigned_cluster,
       maybe_first_started_at: record.maybe_first_started_at,
       attempt_count: record.attempt_count as u8,
+      requires_keepalive: record.is_keepalive_required,
     },
     maybe_result: record.maybe_result_details.map(|result_details| {
       let public_bucket_media_path = match inference_category {

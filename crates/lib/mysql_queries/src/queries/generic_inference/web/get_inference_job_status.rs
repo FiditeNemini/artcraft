@@ -5,6 +5,7 @@ use errors::AnyhowResult;
 use log::warn;
 use sqlx::MySqlPool;
 use tokens::jobs::inference::InferenceJobToken;
+use crate::helpers::boolean_converters::i8_to_bool;
 
 pub struct GenericInferenceJobStatus {
   pub job_token: InferenceJobToken,
@@ -19,6 +20,8 @@ pub struct GenericInferenceJobStatus {
 
   pub request_details: RequestDetails,
   pub maybe_result_details: Option<ResultDetails>,
+
+  pub is_keepalive_required: bool,
 
   pub created_at: DateTime<Utc>,
   pub updated_at: DateTime<Utc>,
@@ -81,6 +84,8 @@ SELECT
 
     jobs.assigned_worker as maybe_assigned_worker,
     jobs.assigned_cluster as maybe_assigned_cluster,
+
+    jobs.is_keepalive_required,
 
     jobs.created_at,
     jobs.updated_at,
@@ -160,6 +165,7 @@ WHERE jobs.token = ?
       maybe_raw_inference_text: record.maybe_raw_inference_text,
     },
     maybe_result_details,
+    is_keepalive_required: i8_to_bool(record.is_keepalive_required),
     created_at: record.created_at,
     updated_at: record.updated_at,
   }))
@@ -187,6 +193,8 @@ struct RawGenericInferenceJobStatus {
 
   pub maybe_assigned_worker: Option<String>,
   pub maybe_assigned_cluster: Option<String>,
+
+  pub is_keepalive_required: i8,
 
   pub created_at: DateTime<Utc>,
   pub updated_at: DateTime<Utc>,

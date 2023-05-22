@@ -44,6 +44,11 @@ impl RedisKeys {
     format!("genericInferenceExtraStatus:{}", inference_job_token)
   }
 
+  /// Keep alive for certain generic inference jobs
+  pub fn generic_inference_keepalive(inference_job_token: &str) -> String {
+    format!("genericInferenceKeepAlive:{}", inference_job_token)
+  }
+
   /// We write extra in-progress status information to keys.
   /// These keys should have a TTL.
   pub fn tts_inference_extra_status_info(inference_job_token: &str) -> String {
