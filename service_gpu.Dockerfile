@@ -184,6 +184,7 @@ COPY crates/service/job/inference_job/config/inference-job.production.env .
 RUN apt-get update && DEBIAN_FRONTEND=noninteractive TZ=Etc/UTC apt-get install -y \
     ffmpeg \
     htop \
+    less \
     libsndfile1 \
     lsof \
     ripgrep \
