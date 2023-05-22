@@ -59,7 +59,7 @@ pub async fn process_job(args: VitsProcessJobArgs<'_>) -> Result<JobSuccessResul
   // ==================== CONFIRM OR DOWNLOAD VITS SYNTHESIZER MODEL ==================== //
 
   let vits_traced_synthesizer_fs_path = {
-    let vits_traced_synthesizer_fs_path = args.job_dependencies.semi_persistent_cache.tts_synthesizer_model_path(tts_model.model_token.as_str());
+    let vits_traced_synthesizer_fs_path = args.job_dependencies.fs.semi_persistent_cache.tts_synthesizer_model_path(tts_model.model_token.as_str());
 
     // NB: We're using traced models, not the original model files.
     // We generate these at time of upload from the original model files.
@@ -74,7 +74,7 @@ pub async fn process_job(args: VitsProcessJobArgs<'_>) -> Result<JobSuccessResul
       &mut job_progress_reporter,
       "downloading synthesizer",
       job.id.0,
-      &args.job_dependencies.scoped_temp_dir_creator,
+      &args.job_dependencies.fs.scoped_temp_dir_creator,
     ).await?;
 
     vits_traced_synthesizer_fs_path

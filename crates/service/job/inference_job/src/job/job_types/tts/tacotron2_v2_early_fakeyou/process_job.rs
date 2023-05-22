@@ -53,7 +53,7 @@ pub async fn process_job(args: ProcessJobArgs<'_>) -> Result<JobSuccessResult, P
 
   let waveglow_vocoder_model_fs_path = {
     let waveglow_vocoder_model_filename = args.job_dependencies.job_type_details.tacotron2_old_vocodes.waveglow_vocoder_model_filename.clone();
-    let waveglow_vocoder_model_fs_path = args.job_dependencies.semi_persistent_cache.tts_pretrained_vocoder_model_path(&waveglow_vocoder_model_filename);
+    let waveglow_vocoder_model_fs_path = args.job_dependencies.fs.semi_persistent_cache.tts_pretrained_vocoder_model_path(&waveglow_vocoder_model_filename);
     let waveglow_vocoder_model_object_path = args.job_dependencies.bucket_path_unifier.tts_pretrained_vocoders_path(&waveglow_vocoder_model_filename);
 
     maybe_download_file_from_bucket(
@@ -64,7 +64,7 @@ pub async fn process_job(args: ProcessJobArgs<'_>) -> Result<JobSuccessResult, P
       &mut job_progress_reporter,
       "downloading vocoder (1 of 3)",
       job.id.0,
-      &args.job_dependencies.scoped_temp_dir_creator,
+      &args.job_dependencies.fs.scoped_temp_dir_creator,
     ).await?;
 
     waveglow_vocoder_model_fs_path
@@ -74,7 +74,7 @@ pub async fn process_job(args: ProcessJobArgs<'_>) -> Result<JobSuccessResult, P
 
   let pretrained_hifigan_vocoder_model_fs_path = {
     let hifigan_vocoder_model_filename = args.job_dependencies.job_type_details.tacotron2_old_vocodes.hifigan_vocoder_model_filename.clone();
-    let hifigan_vocoder_model_fs_path = args.job_dependencies.semi_persistent_cache.tts_pretrained_vocoder_model_path(&hifigan_vocoder_model_filename);
+    let hifigan_vocoder_model_fs_path = args.job_dependencies.fs.semi_persistent_cache.tts_pretrained_vocoder_model_path(&hifigan_vocoder_model_filename);
     let hifigan_vocoder_model_object_path = args.job_dependencies.bucket_path_unifier.tts_pretrained_vocoders_path(&hifigan_vocoder_model_filename);
 
     maybe_download_file_from_bucket(
@@ -85,7 +85,7 @@ pub async fn process_job(args: ProcessJobArgs<'_>) -> Result<JobSuccessResult, P
       &mut job_progress_reporter,
       "downloading vocoder (2 of 3)",
       job.id.0,
-      &args.job_dependencies.scoped_temp_dir_creator,
+      &args.job_dependencies.fs.scoped_temp_dir_creator,
     ).await?;
 
     hifigan_vocoder_model_fs_path
@@ -95,7 +95,7 @@ pub async fn process_job(args: ProcessJobArgs<'_>) -> Result<JobSuccessResult, P
 
   let hifigan_superres_vocoder_model_fs_path = {
     let hifigan_superres_vocoder_model_filename = args.job_dependencies.job_type_details.tacotron2_old_vocodes.hifigan_superres_vocoder_model_filename.clone();
-    let hifigan_superres_vocoder_model_fs_path = args.job_dependencies.semi_persistent_cache.tts_pretrained_vocoder_model_path(&hifigan_superres_vocoder_model_filename);
+    let hifigan_superres_vocoder_model_fs_path = args.job_dependencies.fs.semi_persistent_cache.tts_pretrained_vocoder_model_path(&hifigan_superres_vocoder_model_filename);
     let hifigan_superres_vocoder_model_object_path = args.job_dependencies.bucket_path_unifier.tts_pretrained_vocoders_path(&hifigan_superres_vocoder_model_filename);
 
     maybe_download_file_from_bucket(
@@ -106,7 +106,7 @@ pub async fn process_job(args: ProcessJobArgs<'_>) -> Result<JobSuccessResult, P
       &mut job_progress_reporter,
       "downloading vocoder (3 of 3)",
       job.id.0,
-      &args.job_dependencies.scoped_temp_dir_creator,
+      &args.job_dependencies.fs.scoped_temp_dir_creator,
     ).await?;
 
     hifigan_superres_vocoder_model_fs_path
@@ -117,7 +117,7 @@ pub async fn process_job(args: ProcessJobArgs<'_>) -> Result<JobSuccessResult, P
   let custom_vocoder_fs_path = match &tts_model.maybe_custom_vocoder {
     None => None,
     Some(vocoder) => {
-      let custom_vocoder_fs_path = args.job_dependencies.semi_persistent_cache.custom_vocoder_model_path(&vocoder.vocoder_token);
+      let custom_vocoder_fs_path = args.job_dependencies.fs.semi_persistent_cache.custom_vocoder_model_path(&vocoder.vocoder_token);
       let custom_vocoder_object_path  = args.job_dependencies.bucket_path_unifier.vocoder_path(&vocoder.vocoder_private_bucket_hash);
 
       maybe_download_file_from_bucket(
@@ -128,7 +128,7 @@ pub async fn process_job(args: ProcessJobArgs<'_>) -> Result<JobSuccessResult, P
         &mut job_progress_reporter,
         "downloading user vocoder",
         job.id.0,
-        &args.job_dependencies.scoped_temp_dir_creator,
+        &args.job_dependencies.fs.scoped_temp_dir_creator,
       ).await?;
 
       Some(custom_vocoder_fs_path)
@@ -138,7 +138,7 @@ pub async fn process_job(args: ProcessJobArgs<'_>) -> Result<JobSuccessResult, P
   // ==================== CONFIRM OR DOWNLOAD TTS SYNTHESIZER MODEL ==================== //
 
   let tts_synthesizer_fs_path = {
-    let tts_synthesizer_fs_path = args.job_dependencies.semi_persistent_cache.tts_synthesizer_model_path(tts_model.model_token.as_str());
+    let tts_synthesizer_fs_path = args.job_dependencies.fs.semi_persistent_cache.tts_synthesizer_model_path(tts_model.model_token.as_str());
     let tts_synthesizer_object_path  = args.job_dependencies.bucket_path_unifier.tts_synthesizer_path(&tts_model.private_bucket_hash);
 
     maybe_download_file_from_bucket(
@@ -149,7 +149,7 @@ pub async fn process_job(args: ProcessJobArgs<'_>) -> Result<JobSuccessResult, P
       &mut job_progress_reporter,
       "downloading synthesizer",
       job.id.0,
-      &args.job_dependencies.scoped_temp_dir_creator,
+      &args.job_dependencies.fs.scoped_temp_dir_creator,
     ).await?;
 
     tts_synthesizer_fs_path

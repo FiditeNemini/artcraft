@@ -21,8 +21,8 @@ use std::path::PathBuf;
 use memory_caching::ttl_key_counter::TtlKeyCounter;
 
 pub struct JobDependencies {
-  pub download_temp_directory: PathBuf,
-  pub scoped_temp_dir_creator: ScopedTempDirCreator,
+  /// Filesystem info and utils
+  pub fs: FileSystemDetails,
 
   pub mysql_pool: MySqlPool,
 
@@ -43,7 +43,6 @@ pub struct JobDependencies {
   pub firehose_publisher: FirehosePublisher,
 
   pub bucket_path_unifier: BucketPathUnifier,
-  pub semi_persistent_cache: SemiPersistentCacheDir,
 
   pub job_stats: JobStats,
 
@@ -88,6 +87,24 @@ pub struct JobDependencies {
 
   pub container: ContainerEnvironment,
   pub container_db: ContainerEnvironmentArg, // Same info, but for database.
+}
+
+pub struct FileSystemDetails {
+  /// Temporary directory for storing downloads
+  /// (In prod, typically model files from GCS / NFS PVC mount)
+  pub temp_directory_downloads: PathBuf,
+
+  /// Temporary directory for storing work
+  /// (In prod, typically python inference outputs / emptyDir mount)
+  pub temp_directory_work: PathBuf,
+
+  // TODO: Rename
+  /// Creates workspaces for scratch files
+  pub scoped_temp_dir_creator: ScopedTempDirCreator,
+
+  // TODO: Rename
+  /// Organizes downloaded files
+  pub semi_persistent_cache: SemiPersistentCacheDir,
 }
 
 pub struct JobWorkerDetails {

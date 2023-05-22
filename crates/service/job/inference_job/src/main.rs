@@ -35,14 +35,16 @@ use crate::job::job_loop::main_loop::main_loop;
 use crate::job::job_types::tts::tacotron2_v2_early_fakeyou::tacotron2_inference_command::Tacotron2InferenceCommand;
 use crate::job::job_types::tts::vits::vits_inference_command::VitsInferenceCommand;
 use crate::job::job_types::vc::so_vits_svc::so_vits_svc_inference_command::SoVitsSvcInferenceCommand;
-use crate::job_dependencies::{JobCaches, JobDependencies, JobTypeDetails, JobWorkerDetails, SoVitsSvcDetails, Tacotron2VocodesDetails, VitsDetails};
+use crate::job_dependencies::{FileSystemDetails, JobCaches, JobDependencies, JobTypeDetails, JobWorkerDetails, SoVitsSvcDetails, Tacotron2VocodesDetails, VitsDetails};
 use crate::util::scoped_temp_dir_creator::ScopedTempDirCreator;
+use filesys::create_dir_all_if_missing::create_dir_all_if_missing;
 use jobs_common::job_progress_reporter::job_progress_reporter::JobProgressReporterBuilder;
 use jobs_common::job_progress_reporter::noop_job_progress_reporter::NoOpJobProgressReporterBuilder;
 use jobs_common::job_progress_reporter::redis_job_progress_reporter::RedisJobProgressReporterBuilder;
 use jobs_common::semi_persistent_cache_dir::SemiPersistentCacheDir;
 use log::{error, info, warn};
 use memory_caching::multi_item_ttl_cache::MultiItemTtlCache;
+use memory_caching::ttl_key_counter::TtlKeyCounter;
 use mysql_queries::common_inputs::container_environment_arg::ContainerEnvironmentArg;
 use mysql_queries::mediators::firehose_publisher::FirehosePublisher;
 use newrelic_telemetry::ClientBuilder;
@@ -51,7 +53,6 @@ use r2d2_redis::r2d2;
 use sqlx::mysql::MySqlPoolOptions;
 use std::path::PathBuf;
 use std::time::Duration;
-use memory_caching::ttl_key_counter::TtlKeyCounter;
 use subprocess_common::docker_options::{DockerEnvVar, DockerFilesystemMount, DockerGpu, DockerOptions};
 
 // Buckets (shared config)
@@ -63,13 +64,8 @@ const ENV_REGION_NAME : &'static str = "REGION_NAME";
 const ENV_PRIVATE_BUCKET_NAME : &'static str = "PRIVATE_BUCKET_NAME";
 const ENV_PUBLIC_BUCKET_NAME : &'static str = "PUBLIC_BUCKET_NAME";
 
-// Where models and other assets get downloaded to.
-const ENV_SEMIPERSISTENT_CACHE_DIR : &'static str = "SEMIPERSISTENT_CACHE_DIR";
-
 // HTTP sidecar
 const ENV_TTS_INFERENCE_SIDECAR_HOSTNAME: &'static str = "TTS_INFERENCE_SIDECAR_HOSTNAME";
-
-const DEFAULT_TEMP_DIR: &'static str = "/tmp";
 
 #[tokio::main]
 async fn main() -> AnyhowResult<()> {
@@ -116,13 +112,35 @@ async fn main() -> AnyhowResult<()> {
     Some(bucket_timeout),
   )?;
 
-  let temp_directory = easyenv::get_env_string_or_default(
-    "DOWNLOAD_TEMP_DIR",
-    DEFAULT_TEMP_DIR);
+  // Where we download models and resources to (typically a shared NFS volume in prod).
+  let temp_directory_downloads = easyenv::get_env_pathbuf_or_default(
+    "TEMP_DIR_DOWNLOADS",
+    PathBuf::from("/tmp/downloads")
+  );
 
-  let temp_directory = PathBuf::from(temp_directory);
+  // Where we store scratch files for workloads (temporary processing).
+  let temp_directory_work = easyenv::get_env_pathbuf_or_default(
+    "TEMP_DIR_WORK",
+    PathBuf::from("/tmp/work")
+  );
 
-  check_directory_exists(&temp_directory)?;
+  if !container_environment.server_environment.is_deployed_in_production() {
+    warn!("Creating temporary directories for non-production / development only!");
+    create_dir_all_if_missing(&temp_directory_downloads)?;
+    create_dir_all_if_missing(&temp_directory_work)?;
+  }
+
+  check_directory_exists(&temp_directory_downloads)?;
+  check_directory_exists(&temp_directory_work)?;
+
+  let semi_persistent_cache =
+      SemiPersistentCacheDir::configured_root(&temp_directory_downloads);
+
+  info!("Creating pod semi-persistent cache dirs...");
+  semi_persistent_cache.create_custom_vocoder_model_path()?;
+  semi_persistent_cache.create_tts_pretrained_vocoder_model_path()?;
+  semi_persistent_cache.create_tts_synthesizer_model_path()?;
+  semi_persistent_cache.create_voice_conversion_model_path()?;
 
   let db_connection_string =
       easyenv::get_env_string_or_default(
@@ -137,18 +155,6 @@ async fn main() -> AnyhowResult<()> {
       .await?;
 
   let common_env = CommonEnv::read_from_env()?;
-
-  let persistent_cache_path = easyenv::get_env_string_or_default(
-    ENV_SEMIPERSISTENT_CACHE_DIR,
-    "/tmp");
-
-  let semi_persistent_cache =
-      SemiPersistentCacheDir::configured_root(&persistent_cache_path);
-
-  info!("Creating pod semi-persistent cache dirs...");
-  semi_persistent_cache.create_tts_synthesizer_model_path()?;
-  semi_persistent_cache.create_tts_pretrained_vocoder_model_path()?;
-  semi_persistent_cache.create_custom_vocoder_model_path()?;
 
   let waveglow_vocoder_model_filename = easyenv::get_env_string_or_default(
     "TTS_WAVEGLOW_VOCODER_MODEL_FILENAME", "waveglow.pth");
@@ -217,8 +223,12 @@ async fn main() -> AnyhowResult<()> {
       };
 
   let job_dependencies = JobDependencies {
-    scoped_temp_dir_creator: ScopedTempDirCreator::for_directory(&temp_directory),
-    download_temp_directory: temp_directory,
+    fs: FileSystemDetails {
+      temp_directory_downloads: temp_directory_downloads.clone(),
+      temp_directory_work,
+      scoped_temp_dir_creator: ScopedTempDirCreator::for_directory(&temp_directory_downloads),
+      semi_persistent_cache,
+    },
     mysql_pool,
     maybe_redis_pool: None, // TODO(bt, 2023-01-11): See note in JobDependencies
     maybe_keepalive_redis_pool,
@@ -254,7 +264,6 @@ async fn main() -> AnyhowResult<()> {
     cold_filesystem_cache_starvation_threshold:
       easyenv::get_env_num("COLD_FILESYSTEM_CACHE_STARVATION_THRESHOLD", 3)?,
     bucket_path_unifier: BucketPathUnifier::default_paths(),
-    semi_persistent_cache,
     firehose_publisher,
     job_batch_wait_millis: common_env.job_batch_wait_millis,
     job_max_attempts: common_env.job_max_attempts as u16,

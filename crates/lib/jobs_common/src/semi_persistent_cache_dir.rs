@@ -29,8 +29,8 @@ impl SemiPersistentCacheDir {
     Self::configured_root("/file_cache/")
   }
 
-  pub fn configured_root(root_path: &str) -> Self {
-    let cache_root = PathBuf::from(root_path);
+  pub fn configured_root<P: AsRef<Path>>(root_path: P) -> Self {
+    let cache_root = root_path.as_ref().to_path_buf();
     Self {
       cache_root: cache_root.clone(),
 

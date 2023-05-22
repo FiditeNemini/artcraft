@@ -42,6 +42,7 @@ pub async fn determine_dependency_status(job_dependencies: &JobDependencies, job
         TtsModelType::Tacotron2 => {
           maybe_model_token = Some(model.model_token.to_string());
           Some(job_dependencies
+              .fs
               .semi_persistent_cache
               .tts_synthesizer_model_path(model.model_token.as_str()))
         }
@@ -58,6 +59,7 @@ pub async fn determine_dependency_status(job_dependencies: &JobDependencies, job
         VoiceConversionModelType::SoVitsSvc => {
           maybe_model_token = Some(model.token.to_string());
           Some(job_dependencies
+              .fs
               .semi_persistent_cache
               .voice_conversion_model_path(model.token.as_str()))
         }

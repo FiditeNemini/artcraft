@@ -124,7 +124,7 @@ pub async fn process_single_job(
   // ==================== SETUP TEMP DIRS ==================== //
 
   let temp_dir = format!("temp_{}", job.id.0);
-  let temp_dir = job_dependencies.scoped_temp_dir_creator.new_tempdir(&temp_dir)
+  let temp_dir = job_dependencies.fs.scoped_temp_dir_creator.new_tempdir(&temp_dir)
       .map_err(|err| ProcessSingleJobError::Other(anyhow!("filesystem error: {:?}", err)))?;
 
   let _p = temp_dir.path(); // TODO: Just so the build doesn't complain about unused. Remove.

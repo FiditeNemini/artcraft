@@ -57,9 +57,9 @@ pub async fn process_job(args: SoVitsSvcProcessJobArgs<'_>) -> Result<JobSuccess
   // ==================== CONFIRM OR DOWNLOAD SO-VITS-SVC SYNTHESIZER MODEL ==================== //
 
   let so_vits_svc_fs_path = {
-    let so_vits_svc_fs_path = args.job_dependencies.semi_persistent_cache.voice_conversion_model_path(vc_model.token.as_str());
+    let so_vits_svc_fs_path = args.job_dependencies.fs.semi_persistent_cache.voice_conversion_model_path(vc_model.token.as_str());
 
-    create_dir_all_if_missing(args.job_dependencies.semi_persistent_cache.voice_conversion_model_directory())
+    create_dir_all_if_missing(args.job_dependencies.fs.semi_persistent_cache.voice_conversion_model_directory())
         .map_err(|e| {
           error!("could not create model storage directory: {:?}", e);
           ProcessSingleJobError::from_io_error(e)
@@ -75,7 +75,7 @@ pub async fn process_job(args: SoVitsSvcProcessJobArgs<'_>) -> Result<JobSuccess
       &mut job_progress_reporter,
       "downloading so-vits-svc model",
       job.id.0,
-      &args.job_dependencies.scoped_temp_dir_creator,
+      &args.job_dependencies.fs.scoped_temp_dir_creator,
     ).await?;
 
     so_vits_svc_fs_path
@@ -126,7 +126,7 @@ pub async fn process_job(args: SoVitsSvcProcessJobArgs<'_>) -> Result<JobSuccess
       &mut job_progress_reporter,
       "downloading",
       job.id.0,
-      &args.job_dependencies.scoped_temp_dir_creator,
+      &args.job_dependencies.fs.scoped_temp_dir_creator,
     ).await?;
 
     original_media_upload_fs_path

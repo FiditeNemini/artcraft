@@ -123,7 +123,7 @@ async fn process_job_batch(job_dependencies: &JobDependencies, jobs: Vec<Availab
           // Post failure handling
           ProcessSingleJobError::FilesystemFull => {
             warn!("Clearing full filesystem...");
-            clear_full_filesystem(&job_dependencies.semi_persistent_cache)?;
+            clear_full_filesystem(&job_dependencies.fs.semi_persistent_cache)?;
           }
           // No-op
           ProcessSingleJobError::Other(_) => {}
