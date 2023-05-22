@@ -101,6 +101,13 @@ CREATE TABLE generic_inference_jobs (
   --   - (There will be future levels for paid Twitch and social FakeYou rewards.)
   priority_level SMALLINT UNSIGNED NOT NULL DEFAULT 0,
 
+  -- For non-premium workloads (or some other workloads), we may require that the
+  -- user remains on the website. This will help us kill jobs if the user leaves.
+  -- The state for this keepalive signal will be job-type dependent and may live
+  -- in Redis or some other system. Typically the frontend job status polling will
+  -- populate this keepalive signal (eg. in a Redis key with TTL).
+  is_keepalive_required BOOLEAN NOT NULL DEFAULT FALSE,
+
   -- TODO: add is_for_storyteller_product
   is_from_premium_user BOOLEAN NOT NULL DEFAULT FALSE,
   is_from_api_user BOOLEAN NOT NULL DEFAULT FALSE,
