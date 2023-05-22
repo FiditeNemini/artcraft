@@ -36,7 +36,7 @@ function App() {
         containerRef={containerRef}
       >
         <BrowserRouter>
-          <div data-scroll-container ref={containerRef}>
+          <div data-scroll-container ref={containerRef} id="scroller">
             <div>
               <TopNav />
               <Switch>
