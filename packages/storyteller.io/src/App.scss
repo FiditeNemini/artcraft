@@ -910,7 +910,6 @@ $font: montserrat, sans-serif;
       display: block;
       height: 25%;
       height: calc(100% / 4);
-      min-height: 50px;
       position: relative;
       opacity: 0;
 
@@ -927,17 +926,17 @@ $font: montserrat, sans-serif;
           width: 100%;
         }
 
-        &:after {
-          content: "";
-          position: absolute;
-          bottom: 0;
-          left: 50%;
-          width: 0%;
-          transform: translateX(-50%);
-          height: 3px;
-          background: $color-link;
-          transition: 0.35s;
-        }
+        // &:after {
+        //   content: "";
+        //   position: absolute;
+        //   bottom: 0;
+        //   left: 50%;
+        //   width: 0%;
+        //   transform: translateX(-50%);
+        //   height: 3px;
+        //   background: $color-link;
+        //   transition: 0.35s;
+        // }
       }
     }
   }
@@ -1154,6 +1153,11 @@ span.swiper-pagination-bullet.swiper-pagination-bullet-active {
   padding-top: 2px;
   line-height: 1.4;
   margin-bottom: 0;
+}
+
+#hero-title {
+  opacity: 0;
+  transform: translate(-8rem, 0);
 }
 
 #sub-title {

@@ -230,6 +230,11 @@ function TopNav(props: Props) {
                 </a>
               </li>
               <li className="nav-link">
+                <a onClick={menuToggle} href="#vision" data-scroll-to>
+                  Vision
+                </a>
+              </li>
+              <li className="nav-link">
                 <a onClick={menuToggle} href="#products" data-scroll-to>
                   Products
                 </a>
@@ -259,10 +264,10 @@ function TopNav(props: Props) {
         </div>
       </nav>
 
-      <a href="#home" className={backToTop} data-scroll-to>
+      {/* <a href="#home" className={backToTop} data-scroll-to>
         <div className="btt-shape"></div>
         Back to Top
-      </a>
+      </a> */}
     </>
   );
 }

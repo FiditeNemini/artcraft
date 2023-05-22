@@ -89,3 +89,9 @@ html.has-scroll-dragging {
   right: auto;
   bottom: 0;
 }
+
+@media (max-width: 992px) {
+  #scroller {
+    will-change: initial;
+  }
+}

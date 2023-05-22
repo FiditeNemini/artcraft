@@ -23,6 +23,18 @@ function IndexPage() {
     const tl = gsap.timeline({ delay: 0.2 });
 
     tl.to(
+      "#hero-title",
+      {
+        delay: 0,
+        duration: 0.8,
+        x: 0,
+        scale: 1,
+        opacity: 1,
+        ease: "expo",
+      },
+      "<"
+    );
+    tl.to(
       "#sub-title",
       {
         delay: 0,
@@ -196,7 +208,7 @@ function IndexPage() {
             rivals modern Hollywood studios
           </h1>
           <hr className="p-1 mt-5 mb-5 text-red opacity-100 w-25" />
-          <div className="panel p-5 d-flex justify-content-center w-50">
+          <div className="panel p-4 p-lg-5 d-flex justify-content-center about-title">
             <p className="fs-5 mb-0">
               Where more media is generated every day than all of human history.
               In which the technical mastery behind creativity becomes so
@@ -435,7 +447,7 @@ function IndexPage() {
           </div>
         </div> */}
 
-        <div className="container pb-5 mb-5">
+        <div className="container pb-lg-5 mb-lg-5">
           <div className="research-swiper">
             <div className="row gy-0">
               <div className="col-12 col-lg-4">
