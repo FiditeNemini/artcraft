@@ -43,7 +43,10 @@ pub struct AvailableInferenceJob {
   // Job information
   pub status: JobStatus,
   pub attempt_count: u16,
+
   pub priority_level: u16,
+  pub is_keepalive_required: bool,
+
   pub is_from_premium_user: bool,
   pub is_from_api_user: bool,
   pub is_for_twitch: bool,
@@ -116,6 +119,7 @@ pub async fn list_available_generic_inference_jobs(
           status: JobStatus::from_str(&record.status)?,
           attempt_count: record.attempt_count,
           priority_level: record.priority_level,
+          is_keepalive_required: i8_to_bool(record.is_keepalive_required),
           is_from_premium_user: i8_to_bool(record.is_from_premium_user),
           is_from_api_user: i8_to_bool(record.is_from_api_user),
           is_for_twitch: i8_to_bool(record.is_for_twitch),
@@ -167,9 +171,11 @@ SELECT
   creator_set_visibility,
 
   status,
-
   attempt_count,
+
   priority_level,
+  is_keepalive_required,
+
   is_from_premium_user,
   is_from_api_user,
   is_for_twitch,
@@ -249,9 +255,11 @@ SELECT
   creator_set_visibility,
 
   status,
-
   attempt_count,
+
   priority_level,
+  is_keepalive_required,
+
   is_from_premium_user,
   is_from_api_user,
   is_for_twitch,
@@ -333,7 +341,10 @@ struct AvailableInferenceJobRawInternal {
   //pub status: JobStatus,
   pub status: String,
   pub attempt_count: u16,
+
   pub priority_level: u16,
+  pub is_keepalive_required: i8,
+
   pub is_from_premium_user: i8,
   pub is_from_api_user: i8,
   pub is_for_twitch: i8,

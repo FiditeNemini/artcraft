@@ -30,6 +30,7 @@ media = { path = "../../../lib/files/media" }
 memory_caching = { path = "../../../lib/caching/memory_caching" }
 mimetypes = { path = "../../../lib/files/mimetypes" }
 mysql_queries = { path = "../../../lib/mysql_queries" }
+redis_common = { path = "../../../lib/redis_common" }
 subprocess_common = { path = "../../../lib/subprocess_common" }
 tokens = { path = "../../../_types/tokens" }
 tts_common = { path = "../../../lib/tts_common" }

@@ -9,10 +9,14 @@ use crate::job_dependencies::JobDependencies;
 use enums::by_table::generic_inference_jobs::inference_category::InferenceCategory;
 use enums::by_table::generic_inference_jobs::inference_result_type::InferenceResultType;
 use errors::AnyhowResult;
-use log::{info, warn};
+use log::{error, info, warn};
 use mysql_queries::queries::generic_inference::job::list_available_generic_inference_jobs::AvailableInferenceJob;
 use mysql_queries::queries::generic_inference::job::mark_generic_inference_job_pending_and_grab_lock::mark_generic_inference_job_pending_and_grab_lock;
 use mysql_queries::queries::generic_inference::job::mark_generic_inference_job_successfully_done::mark_generic_inference_job_successfully_done;
+use r2d2_redis::RedisConnectionManager;
+use r2d2_redis::r2d2::PooledConnection;
+use r2d2_redis::redis::Commands;
+use redis_common::redis_keys::RedisKeys;
 use std::time::Instant;
 
 pub async fn process_single_job(
@@ -20,8 +24,14 @@ pub async fn process_single_job(
   job: &AvailableInferenceJob,
 ) -> Result<ProcessSingleJobSuccessCase, ProcessSingleJobError> {
 
+  let mut maybe_redis = job_dependencies
+      .maybe_redis_pool
+      .as_ref()
+      .map(|redis| redis.get())
+      .transpose()
+      .map_err(|err| ProcessSingleJobError::Other(anyhow!("redis pool error: {:?}", err)))?;
+
   // TODO(bt, 2023-01-11): Restore an optional status logger
-  //let mut redis = job_dependencies.redis_pool.get()?;
   //let mut redis_logger = RedisJobStatusLogger::new_generic_download(&mut redis, job.download_job_token.as_str());
 
   let mut force_execution = false;
@@ -84,6 +94,32 @@ pub async fn process_single_job(
   info!("Job model token: {:?}", job.maybe_model_token);
 
   let job_start_time = Instant::now();
+
+  // ==================== HANDLE KEEPALIVE (OPTIONAL) ==================== //
+
+  if job.is_keepalive_required {
+    match &mut maybe_redis {
+      None => {
+        warn!("Keepalive is required for this job, but we do not have Redis configured to check!")
+      }
+      Some(redis) => {
+        let keepalive_key =
+            RedisKeys::generic_inference_keepalive(job.inference_job_token.as_str());
+
+        let _ : Option<String> = match redis.get(&keepalive_key) {
+          Ok(None) => {
+            warn!("Job keepalive elapsed: {:?}", job.inference_job_token);
+            return Err(ProcessSingleJobError::KeepAliveElapsed)
+          },
+          Ok(Some(value)) => Some(value),
+          Err(e) => {
+            error!("redis keepalive key check error: {:?}", e);
+            None // Fail open
+          },
+        };
+      }
+    }
+  }
 
   // ==================== SETUP TEMP DIRS ==================== //
 

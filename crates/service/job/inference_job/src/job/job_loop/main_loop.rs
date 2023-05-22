@@ -1,13 +1,14 @@
+use crate::job::job_loop::clear_full_filesystem::clear_full_filesystem;
 use crate::job::job_loop::process_single_job::process_single_job;
+use crate::job::job_loop::process_single_job_error::ProcessSingleJobError;
 use crate::job_dependencies::JobDependencies;
 use errors::AnyhowResult;
 use jobs_common::noop_logger::NoOpLogger;
 use log::{error, info, warn};
 use mysql_queries::queries::generic_inference::job::list_available_generic_inference_jobs::{AvailableInferenceJob, list_available_generic_inference_jobs, ListAvailableGenericInferenceJobArgs};
+use mysql_queries::queries::generic_inference::job::mark_generic_inference_job_completely_failed::mark_generic_inference_job_completely_failed;
 use mysql_queries::queries::generic_inference::job::mark_generic_inference_job_failure::mark_generic_inference_job_failure;
 use std::time::Duration;
-use crate::job::job_loop::clear_full_filesystem::clear_full_filesystem;
-use crate::job::job_loop::process_single_job_error::ProcessSingleJobError;
 
 // Job runner timeouts (guards MySQL)
 const START_TIMEOUT_MILLIS : u64 = 500;
@@ -86,23 +87,43 @@ async fn process_job_batch(job_dependencies: &JobDependencies, jobs: Vec<Availab
       Err(e) => {
         warn!("Failure to process job: {:?}", e);
 
-        let failure_reason = "";
+        let (permanent_failure, failure_reason) = match e {
+          // Permanent failures
+          ProcessSingleJobError::KeepAliveElapsed => (true, "keepalive elapsed"),
+          ProcessSingleJobError::InvalidJob(_) => (true, "invalid job"),
 
-        let _r = mark_generic_inference_job_failure(
-          &job_dependencies.mysql_pool,
-          &job,
-          failure_reason,
-          failure_reason,
-          job_dependencies.job_max_attempts
-        ).await;
+          // Non-permanent failures
+          ProcessSingleJobError::FilesystemFull => (false, "worker filesystem full"),
+          ProcessSingleJobError::Other(_) => (false, ""),
+        };
+
+        if permanent_failure {
+          let _r = mark_generic_inference_job_completely_failed(
+            &job_dependencies.mysql_pool,
+            &job,
+            Some(failure_reason),
+            Some(failure_reason),
+          ).await;
+        } else {
+          let _r = mark_generic_inference_job_failure(
+            &job_dependencies.mysql_pool,
+            &job,
+            failure_reason,
+            failure_reason,
+            job_dependencies.job_max_attempts
+          ).await;
+        }
 
         match e {
-          ProcessSingleJobError::Other(_) => {} // No-op
+          // Post failure handling
           ProcessSingleJobError::FilesystemFull => {
             warn!("Clearing full filesystem...");
             clear_full_filesystem(&job_dependencies.semi_persistent_cache)?;
           }
+          // No-op
+          ProcessSingleJobError::Other(_) => {}
           ProcessSingleJobError::InvalidJob(_) => {}
+          ProcessSingleJobError::KeepAliveElapsed => {}
         }
       }
     }

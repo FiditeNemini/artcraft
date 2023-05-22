@@ -3673,6 +3673,7 @@ dependencies = [
  "mysql_queries",
  "newrelic-telemetry",
  "r2d2_redis",
+ "redis_common",
  "serde",
  "serde_derive",
  "serde_json",

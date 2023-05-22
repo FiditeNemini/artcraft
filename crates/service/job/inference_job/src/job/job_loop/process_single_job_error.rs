@@ -7,6 +7,8 @@ pub enum ProcessSingleJobError {
   FilesystemFull,
   /// The job is invalid (bad state, etc.)
   InvalidJob(anyhow::Error),
+  /// The job's keepalive signal has elapsed, so the job needs to be killed.
+  KeepAliveElapsed,
   /// This is any other kind of error.
   /// It might be important, we just haven't special cased it yet.
   Other(anyhow::Error),
