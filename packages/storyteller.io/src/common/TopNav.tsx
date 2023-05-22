@@ -155,7 +155,7 @@ function TopNav(props: Props) {
             <li>
               <a
                 id="nav-btn-4"
-                href="#social"
+                href="#products"
                 className="nav-link"
                 data-scroll-to
               >
@@ -165,21 +165,11 @@ function TopNav(props: Props) {
             <li>
               <a
                 id="nav-btn-2"
-                href="#film"
+                href="#research"
                 className="nav-link"
                 data-scroll-to
               >
-                Film
-              </a>
-            </li>
-            <li>
-              <a
-                id="nav-btn-3"
-                href="#music"
-                className="nav-link"
-                data-scroll-to
-              >
-                Music
+                Research
               </a>
             </li>
             <li>
@@ -189,7 +179,7 @@ function TopNav(props: Props) {
                 className="nav-link"
                 data-scroll-to
               >
-                Our Team
+                Team
               </a>
             </li>
           </ul>
@@ -240,24 +230,18 @@ function TopNav(props: Props) {
                 </a>
               </li>
               <li className="nav-link">
-                <a onClick={menuToggle} href="#social" data-scroll-to>
-                  Social AI
+                <a onClick={menuToggle} href="#products" data-scroll-to>
+                  Products
                 </a>
               </li>
               <li className="nav-link">
-                <a onClick={menuToggle} href="#film" data-scroll-to>
-                  Film
+                <a onClick={menuToggle} href="#research" data-scroll-to>
+                  Research
                 </a>
               </li>
-              <li className="nav-link">
-                <a onClick={menuToggle} href="#music" data-scroll-to>
-                  Music
-                </a>
-              </li>
-
               <li className="nav-link">
                 <a onClick={menuToggle} href="#team" data-scroll-to>
-                  Our Team
+                  Team
                 </a>
               </li>
               <li className="mt-4">

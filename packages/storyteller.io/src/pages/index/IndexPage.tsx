@@ -1,40 +1,15 @@
-import {
-  faDiscord,
-  faFacebook,
-  faTwitch,
-  faTwitter,
-} from "@fortawesome/free-brands-svg-icons";
-import {
-  faBookOpen,
-  faClapperboard,
-  faCube,
-  faDrum,
-  faPaintbrush,
-  faPersonWalkingArrowRight,
-} from "@fortawesome/free-solid-svg-icons";
-import {
-  faUserCowboy,
-  faPaintbrushPencil,
-  faMicrophoneStand,
-  faWaveformLines,
-  faMusic,
-  faUserMusic,
-} from "@fortawesome/pro-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import React, { useState } from "react";
 import Marquee from "react-fast-marquee";
-import Tippy from "@tippyjs/react";
 import "tippy.js/dist/tippy.css";
-// import AudioSample from "./AudioSample";
 import { useEffect, useRef } from "react";
 import gsap from "gsap";
-import SplitType from "split-type";
-// import Scene from "./Scene";
-import { ThirdPartyLinks } from "@storyteller/components/src/constants/ThirdPartyLinks";
 import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/css";
 import "swiper/css/pagination";
-import { Autoplay, Pagination } from "swiper";
-import Tilt from "react-parallax-tilt";
+import { Autoplay, Pagination, FreeMode, Navigation, Thumbs } from "swiper";
+import "swiper/css/free-mode";
+import "swiper/css/navigation";
+import "swiper/css/thumbs";
 
 function IndexPage() {
   // NB: React video bug:
@@ -45,19 +20,12 @@ function IndexPage() {
 
   // Title Animation
   useEffect(() => {
-    const splitTitleOutline = new SplitType("#hero-title-outline", {
-      types: "words",
-      wordClass: "title-outline-split",
-    });
-
-    console.log(splitTitleOutline);
-
-    var tl = gsap.timeline({ delay: 0.2 });
+    const tl = gsap.timeline({ delay: 0.2 });
 
     tl.to(
       "#sub-title",
       {
-        delay: 0.4,
+        delay: 0,
         duration: 0.8,
         x: 0,
         scale: 1,
@@ -69,7 +37,7 @@ function IndexPage() {
     tl.to(
       "#hero-btn",
       {
-        delay: 0.2,
+        delay: 0,
         duration: 0.8,
         x: 0,
         scale: 1,
@@ -105,6 +73,51 @@ function IndexPage() {
       videoRefMain.current.play();
     }
   }, [videoRefMain]);
+
+  const [thumbsSwiper, setThumbsSwiper] = useState<any>(null);
+
+  const teamMembers = [
+    {
+      name: "Ozzy",
+      role: "Machine Learning Engineer",
+      imageSrc: "/images/team/ozzy.webp",
+    },
+    {
+      name: "Michael",
+      role: "Machine Learning Engineer",
+      imageSrc: "/images/team/michael.webp",
+    },
+    {
+      name: "Ramiro",
+      role: "Machine Learning Engineer",
+      imageSrc: "/images/team/ramiro.webp",
+    },
+    {
+      name: "Scott",
+      role: "CCO / Technical 3D Artist",
+      imageSrc: "/images/team/scott.webp",
+    },
+    {
+      name: "Bombay",
+      role: "UI / Frontend Engineer",
+      imageSrc: "/images/team/bombay.webp",
+    },
+    {
+      name: "Paul",
+      role: "Systems Engineer",
+      imageSrc: "/images/team/paul.webp",
+    },
+    {
+      name: "Jose",
+      role: "Data Team",
+      imageSrc: "/images/team/jose.webp",
+    },
+    {
+      name: "Rodrigo",
+      role: "Data Team",
+      imageSrc: "/images/team/rodrigo.webp",
+    },
+  ];
 
   return (
     <div data-scroll-section data-scroll-repeat="true">
@@ -177,21 +190,23 @@ function IndexPage() {
         </div>
 
         <div className="container py-5 text-center d-flex flex-column align-items-center mt-3">
-          <img src="/images/vision.webp" className="w-25 mb-4" alt="" />
+          <img src="/images/vision.webp" className="mb-4" alt="" width={315} />
           <h1 className="fw-bold display-6 about-title mt-4 px-lg-5">
             We envision a future where a single creator can make content that
             rivals modern Hollywood studios
           </h1>
-          <hr className="p-1 mt-4 mb-5 text-red opacity-100 w-25" />
-          <p className="fs-5 w-50">
-            Where more media is generated every day than all of human history In
-            which the technical mastery behind creativity becomes so accessible,
-            that even a child could create a masterpiece
-          </p>
+          <hr className="p-1 mt-5 mb-5 text-red opacity-100 w-25" />
+          <div className="panel p-5 d-flex justify-content-center w-50">
+            <p className="fs-5 mb-0">
+              Where more media is generated every day than all of human history.
+              In which the technical mastery behind creativity becomes so
+              accessible, that even a child could create a masterpiece.
+            </p>
+          </div>
         </div>
       </div>
 
-      <div id="social" className="bg-light section-2">
+      <div id="products" className="bg-light section-2">
         <div>
           <Marquee gradient={false} speed={100}>
             <h1 className="marquee-title d-flex gap-3 gap-md-4 gap-lg-5 mt-0 mb-lg-5">
@@ -207,19 +222,12 @@ function IndexPage() {
           </Marquee>
         </div>
         <div className="container mt-5 pt-5">
-          <div className="row gx-5 flex-row-reverse gy-4">
-            <div className="col-lg-6 img-layers d-none d-xl-block">
+          <div className="row gx-5 flex-row-reverse gy-5">
+            <div className="col-lg-6">
               <img
-                src="/images/screenshots/fakeyou-screen.webp"
+                src="/images/screenshots/fakeyou-tts-screen.webp"
                 alt="FakeYou"
-                className="img-fluid img-back"
-              />
-            </div>
-            <div className="col-lg-6 d-xl-none">
-              <img
-                src="/images/screenshots/fakeyou-screen-mobile.webp"
-                alt="FakeYou"
-                className="img-fluid"
+                className="img-fluid rounded border-frame"
               />
             </div>
 
@@ -258,18 +266,11 @@ function IndexPage() {
       <div className="bg-dark section-2">
         <div className="container">
           <div className="row gx-5 gy-5">
-            <div className="col-lg-6 img-layers d-none d-xl-block">
+            <div className="col-lg-6">
               <img
-                src="/images/screenshots/powerstream-screen.webp"
+                src="/images/screenshots/fakeyou-v2v-screen.webp"
                 alt="FakeYou"
-                className="img-fluid"
-              />
-            </div>
-            <div className="col-lg-6 d-xl-none">
-              <img
-                src="/images/screenshots/powerstream-screen-mobile.webp"
-                alt="FakeYou"
-                className="img-fluid"
+                className="img-fluid rounded border-frame"
               />
             </div>
 
@@ -290,7 +291,7 @@ function IndexPage() {
               </ul>
               <div>
                 <a
-                  href="https://fakeyou.com/voice-conversion"
+                  href="https://fakeyou.com/"
                   rel="noreferrer"
                   target="_blank"
                   className="btn btn-primary mt-4"
@@ -302,78 +303,73 @@ function IndexPage() {
           </div>
         </div>
       </div>
-      <div className="container mt-5 pt-5">
-        <div className="row gx-5 flex-row-reverse gy-4">
-          <div className="col-lg-6 img-layers d-none d-xl-block">
-            <img
-              src="/images/screenshots/fakeyou-screen.webp"
-              alt="FakeYou"
-              className="img-fluid img-back"
-            />
-          </div>
-          <div className="col-lg-6 d-xl-none">
-            <img
-              src="/images/screenshots/fakeyou-screen-mobile.webp"
-              alt="FakeYou"
-              className="img-fluid"
-            />
-          </div>
 
-          <div className="col-lg-6 d-flex flex-column justify-content-center">
-            <h1 className="fw-bold ">Video Lip Sync</h1>
-            <h4 className="fw-normal opacity-75 mb-4">
-              Launched in April 2022
-            </h4>
-            <ul>
-              <li>
-                Upload an audio recording of speech, and an image and generate
-                animation of a character speaking
-              </li>
-            </ul>
-            <div>
-              <a
-                href="https://fakeyou.com/w2l"
-                rel="noreferrer"
-                target="_blank"
-                className="btn btn-primary mt-4"
-              >
-                <span>Go to FakeYou.com</span>
-              </a>
+      {/* <div className="bg-light section-2">
+        <div className="container">
+          <div className="row gx-5 flex-row-reverse gy-5">
+            <div className="col-lg-6">
+              <img
+                src="/images/screenshots/fakeyou-v2v-screen.webp"
+                alt="FakeYou"
+                className="img-fluid rounded border-frame"
+              />
+            </div>
+
+            <div className="col-lg-6 d-flex flex-column justify-content-center">
+              <h1 className="fw-bold ">Video Lip Sync</h1>
+              <h4 className="fw-normal opacity-75 mb-4">
+                Launched in April 2022
+              </h4>
+              <ul>
+                <li>
+                  Upload an audio recording of speech, and an image and generate
+                  animation of a character speaking
+                </li>
+              </ul>
+              <div>
+                <a
+                  href="https://fakeyou.com/"
+                  rel="noreferrer"
+                  target="_blank"
+                  className="btn btn-primary mt-4"
+                >
+                  <span>Go to FakeYou.com</span>
+                </a>
+              </div>
             </div>
           </div>
         </div>
-      </div>
+      </div> */}
+
       <div
-        id="film"
-        className="bg-light section"
+        id="research"
+        className="bg-dark section"
         data-scroll
         data-scroll-repeat="true"
-        data-scroll-call="film"
+        data-scroll-call="research"
       >
         <Marquee gradient={false} speed={100}>
           <h1 className="marquee-title d-flex gap-3 gap-md-4 gap-lg-5 mt-0 my-lg-5">
-            <span className="text-outline">Storyteller</span>
+            <span className="text-outline">Research</span>
             <span className="text-red">\</span>
-            <span>Storyteller</span>
+            <span>Research</span>
             <span className="text-red">\</span>
-            <span className="text-outline">Storyteller</span>
+            <span className="text-outline">Research</span>
             <span className="text-red">\</span>
-            <span>Storyteller</span>
+            <span>Research</span>
             <span className="text-red me-3 me-md-4 me-lg-5">\</span>
           </h1>
         </Marquee>
 
-        <div className="container py-5 text-center d-flex flex-column align-items-center mt-3">
-          <h1 className="fw-bold display-4 about-title mt-5">
-            Be Your Own Hollywood
-          </h1>
-          <h4 className="fw-normal opacity-75 mt-3 lh-base">
-            Storyteller&apos;s generative AI engine empowers anyone to be a film
-            director or movie star.
+        <div className="container pt-5 text-center d-flex flex-column align-items-center">
+          <h1 className="fw-bold display-4 about-title mt-5">Experiments</h1>
+          <h4 className="fw-normal opacity-75 mt-2 lh-base">
+            As AI is still an emergent technology, our team finds itself
+            curiously exploring its capabilities.
           </h4>
         </div>
 
-        <div className="about-cards-container mt-4 mb-5">
+        {/* <div className="about-cards-container mt-4 mb-5">
           <div className="container text-center d-flex flex-column align-items-center">
             <div className="row gx-4 gy-5 pt-4 position-relative">
               <div className="col-12 col-md-6 col-lg-3">
@@ -437,115 +433,94 @@ function IndexPage() {
               </div>
             </div>
           </div>
-        </div>
-      </div>
-      <div className="bg-dark section-2">
-        <div className="container">
-          <div className="row gx-4 gy-4 gx-lg-5 gy-lg-5 mb-5">
-            <div className="col-12 col-md-6 d-flex flex-column justify-content-center">
-              <video
-                autoPlay={true}
-                playsInline={true}
-                loop={true}
-                muted={true}
-                className="ratio ratio-16x9 img-border"
-              >
-                <source
-                  src="/video/webpage-demo-1-640.webm"
-                  type="video/webm"
-                ></source>
-                <source
-                  src="/video/webpage-demo-1-640.mp4"
-                  type="video/mp4"
-                ></source>
-              </video>
-            </div>
-            <div className="col-12 col-md-6 d-flex flex-column justify-content-center">
-              <div className="p-lg-4 align-items-start justify-content-center fs-6 h-auto">
-                <h3 className="pb-3">Volumetric Capture</h3>
-                <p className="mb-0">
-                  Use one or more cameras to build a 3D volumetric capture of
-                  your actors. In the future, we'll be upscaling from
-                  VGA-resolution depth maps to full 4K.
-                </p>
-              </div>
-            </div>
-          </div>
+        </div> */}
 
-          <div className="row gx-4 gy-4 gx-lg-5 gy-lg-5 flex-row-reverse mb-5">
-            <div className="col-12 col-md-6 d-flex flex-column justify-content-center">
-              <video
-                autoPlay={true}
-                playsInline={true}
-                loop={true}
-                muted={true}
-                className="ratio ratio-16x9 img-border"
-              >
-                <source
-                  src="/video/webpage-demo-2-640.webm"
-                  type="video/webm"
-                ></source>
-                <source
-                  src="/video/webpage-demo-2-640.mp4"
-                  type="video/mp4"
-                ></source>
-              </video>
-            </div>
-            <div className="col-12 col-md-6 d-flex flex-column justify-content-center">
-              <div className="p-lg-4 align-items-start justify-content-center fs-6 h-auto">
-                <h3 className="pb-3">Motion Capture</h3>
-                <p className="mb-0">
-                  Community-contributed models, sets, and scenarios can be
-                  controlled with webcam, Kinect, or motion capture systems and
-                  directed remotely from the web.
-                </p>
+        <div className="container pb-5 mb-5">
+          <div className="research-swiper">
+            <div className="row gy-0">
+              <div className="col-12 col-lg-4">
+                <Swiper
+                  onSwiper={(swiper: any) => setThumbsSwiper(swiper)}
+                  loop={false}
+                  direction="vertical"
+                  slidesPerView={4}
+                  spaceBetween={16}
+                  freeMode={true}
+                  watchSlidesProgress={true}
+                  modules={[FreeMode, Navigation, Thumbs]}
+                  allowTouchMove={false}
+                  preventInteractionOnTransition={true}
+                  className="research-swiper-thumb-container"
+                >
+                  <SwiperSlide>Facial Tracking</SwiperSlide>
+                  <SwiperSlide>3D Character Automated Lip-syncing</SwiperSlide>
+                  <SwiperSlide>Motion Capture</SwiperSlide>
+                  <SwiperSlide>GPT-Driven 24-hour News Cycle</SwiperSlide>
+                </Swiper>
               </div>
-            </div>
-          </div>
-
-          <div className="row gx-4 gy-4 gx-lg-5 gy-lg-5">
-            <div className="col-12 col-md-6 d-flex flex-column justify-content-center">
-              <video
-                autoPlay={true}
-                playsInline={true}
-                loop={true}
-                muted={true}
-                className="ratio ratio-16x9 img-border"
-              >
-                <source
-                  src="/video/webpage-demo-3-640.webm"
-                  type="video/webm"
-                ></source>
-                <source
-                  src="/video/webpage-demo-3-640.mp4"
-                  type="video/mp4"
-                ></source>
-              </video>
-            </div>
-            <div className="col-12 col-md-6 d-flex flex-column justify-content-center">
-              <div className="p-lg-4 align-items-start justify-content-center fs-6 h-auto">
-                <h3 className="pb-3">
-                  Fake Faces, Voices, and Corrected Motion
-                </h3>
-                <p className="mb-0">
-                  We couldn't hire Elon Musk, but that didn't stop us and it
-                  won't stop you. Change your actors faces and voices to fit
-                  your needs. Tweak their movements and posture &mdash; even the
-                  location and lighting &mdash; all post capture.
-                </p>
+              <div className="col-12 col-lg-8">
+                <Swiper
+                  loop={true}
+                  navigation={false}
+                  thumbs={{ swiper: thumbsSwiper }}
+                  modules={[FreeMode, Navigation, Thumbs]}
+                  className="research-swiper-video-container"
+                >
+                  <SwiperSlide>
+                    <div className="ratio ratio-16x9">
+                      <video
+                        src="/video/Facetrack.mp4"
+                        autoPlay
+                        muted
+                        loop
+                      ></video>
+                    </div>
+                  </SwiperSlide>
+                  <SwiperSlide>
+                    <div className="ratio ratio-16x9">
+                      <div className="ratio ratio-16x9">
+                        <video
+                          src="/video/Automatic-Lipsync.mp4"
+                          autoPlay
+                          muted
+                          loop
+                        ></video>
+                      </div>
+                    </div>
+                  </SwiperSlide>
+                  <SwiperSlide>
+                    <div className="ratio ratio-16x9">
+                      <div className="ratio ratio-16x9">
+                        <video
+                          src="/video/Mocap.mp4"
+                          autoPlay
+                          muted
+                          loop
+                        ></video>
+                      </div>
+                    </div>
+                  </SwiperSlide>
+                  <SwiperSlide>
+                    <div className="ratio ratio-16x9">
+                      <div className="ratio ratio-16x9">
+                        <video
+                          src="/video/News.mp4"
+                          autoPlay
+                          muted
+                          loop
+                        ></video>
+                      </div>
+                    </div>
+                  </SwiperSlide>
+                </Swiper>
               </div>
             </div>
           </div>
         </div>
       </div>
-      <div className="bg-hero-2">
+
+      {/* <div className="bg-hero-2">
         <div className="d-flex justify-content-center">
-          {/* <img
-              id="hero-img"
-              className="hero-img"
-              src="/hero/hero-img.webp"
-              alt="Storyteller HyperJail"
-            /> */}
 
           <div
             className="hero-img roko"
@@ -658,77 +633,7 @@ function IndexPage() {
         >
           <div className="shape-4"></div>
         </div>
-      </div>
-      <div
-        id="music"
-        className="bg-light section"
-        data-scroll
-        data-scroll-repeat="true"
-        data-scroll-call="music"
-      >
-        <Marquee gradient={false} speed={100}>
-          <h1 className="marquee-title d-flex gap-3 gap-md-4 gap-lg-5 mt-0 my-lg-5">
-            <span className="text-outline">Music</span>
-            <span className="text-red">\</span>
-            <span>Music</span>
-            <span className="text-red">\</span>
-            <span className="text-outline">Music</span>
-            <span className="text-red">\</span>
-            <span>Music</span>
-            <span className="text-red">\</span>
-            <span className="text-outline">Music</span>
-            <span className="text-red">\</span>
-            <span>Music</span>
-            <span className="text-red me-3 me-md-4 me-lg-5">\</span>
-          </h1>
-        </Marquee>
-
-        <div className="container py-5 text-center d-flex flex-column align-items-center mt-3">
-          <h1 className="fw-bold display-4 about-title mt-5">
-            Top the Billboard Charts
-          </h1>
-          <h4 className="fw-normal opacity-75 mt-3 lh-base">
-            Our technology can turn anyone into a musician.
-          </h4>
-        </div>
-
-        <div className="about-cards-container mt-4 mb-5">
-          <div className="container text-center d-flex flex-column align-items-center">
-            <div className="row gx-4 gy-5 pt-4 position-relative">
-              <div className="col-12 col-md-6 col-lg-3">
-                <p className="fw-normal card bg-dark-solid pt-5 about-card">
-                  <FontAwesomeIcon
-                    icon={faMicrophoneStand}
-                    className="about-icon"
-                  />
-                  Generate AI Vocals from new or existing artists
-                </p>
-              </div>
-              <div className="col-12 col-md-6 col-lg-3">
-                <p className="fw-normal card bg-dark-solid pt-5 about-card">
-                  <FontAwesomeIcon
-                    icon={faWaveformLines}
-                    className="about-icon"
-                  />
-                  Swap and transform existing vocals into entirely new ones
-                </p>
-              </div>
-              <div className="col-12 col-md-6 col-lg-3">
-                <p className="fw-normal card bg-dark-solid pt-5 about-card">
-                  <FontAwesomeIcon icon={faMusic} className="about-icon" />
-                  Generate lyrics, beat, and melody
-                </p>
-              </div>
-              <div className="col-12 col-md-6 col-lg-3">
-                <p className="fw-normal card bg-dark-solid pt-5 about-card">
-                  <FontAwesomeIcon icon={faUserMusic} className="about-icon" />
-                  Take the stage with virtual artists powered by AI animation
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+      </div> */}
 
       <div id="team" className="bg-light section-2">
         <div>
@@ -758,7 +663,7 @@ function IndexPage() {
               </div>
             </div>
             <div className="col-12 col-md-6">
-              <p className="fw-normal opacity-75">
+              <p className="fw-normal opacity-75 mb-0">
                 Our mission is to empower anyone to create full feature-length
                 content from home without institutional capital, large teams,
                 huge amounts of time, or deep reservoirs of highly specialized
@@ -769,111 +674,58 @@ function IndexPage() {
           </div>
         </div>
 
-        <div className="container mt-md-5">
-          <h2 className="mb-4">The Team</h2>
+        <div className="container mt-md-5 pt-5">
+          <h1 className="mb-4">The Team</h1>
 
-          <div className="row g-4 g-md-5 mb-4">
-            <div className="col-6 col-md-3 mb-0">
-              <img
-                src="/images/team/brandon.webp"
-                className="img-fluid img-team"
-                alt=""
-              />
-            </div>
-            <div className="col-12 col-md-9 text-start d-flex flex-column justify-content-center">
-              <p className="fw-semibold opacity-100 mb-0 fs-5">
-                Brandon Thomas
-              </p>
-              <p className="team-role-text">Founder and CEO</p>
-              {/* <hr className="mt-0 my-4" /> */}
-              <p className="fw-normal opacity-75 mt-1 mb-0">
-                Brandon worked 8 years as a distributed systems and AI/ML
-                engineer at Square. He’s spent the last decade making indie
-                films and being plugged into the Atlanta art scene. In college
-                he built a laser projector and programmed it to play video games
-                on the side of skyscrapers. Today he’s working on disrupting
-                Hollywood and the music industry and transforming narrative
-                storytelling into something the likes of which we’ve never seen
-                before.
-              </p>
+          <div className="panel">
+            <div className="row g-4 g-md-5">
+              <div className="col-6 col-md-3 mb-0">
+                <img
+                  src="/images/team/brandon.webp"
+                  className="img-fluid img-team img-brandon"
+                  alt=""
+                />
+              </div>
+              <div className="col-12 col-md-9 text-start d-flex flex-column justify-content-center">
+                <div className="p-3 ps-md-0">
+                  <p className="fw-semibold opacity-100 mb-0 fs-5">
+                    Brandon Thomas
+                  </p>
+                  <p className="team-role-text">Founder and CEO</p>
+                  <hr className="my-3 w-25 opacity-25" />
+                  <p className="fw-normal opacity-75 mt-3 mb-0">
+                    Brandon worked 8 years as a distributed systems and AI/ML
+                    engineer at Square. He’s spent the last decade making indie
+                    films and being plugged into the Atlanta art scene. In
+                    college he built a laser projector and programmed it to play
+                    video games on the side of skyscrapers. Today he’s working
+                    on disrupting Hollywood and the music industry and
+                    transforming narrative storytelling into something the likes
+                    of which we’ve never seen before.
+                  </p>
+                </div>
+              </div>
             </div>
           </div>
 
-          <div className="row g-4 gx-md-5 gy-md-4 pb-4 pt-3 pt-md-5">
-            <div className="col-6 col-md-3">
-              <img
-                src="/images/team/ozzy.webp"
-                className="img-fluid img-team mb-3"
-                alt=""
-              />
-              <p className="fw-semibold opacity-100 mb-0 fs-5">Ozzy</p>
-              <p className="team-role-text">Machine Learning Engineer</p>
-            </div>
-            <div className="col-6 col-md-3">
-              <img
-                src="/images/team/michael.webp"
-                className="img-fluid img-team mb-3"
-                alt=""
-              />
-              <p className="fw-semibold opacity-100 mb-0 fs-5">Michael</p>
-              <p className="team-role-text">Machine Learning Engineer</p>
-            </div>
-            <div className="col-6 col-md-3">
-              <img
-                src="/images/team/ramiro.webp"
-                className="img-fluid img-team mb-3"
-                alt=""
-              />
-              <p className="fw-semibold opacity-100 mb-0 fs-5">Ramiro</p>
-              <p className="team-role-text">Machine Learning Engineer</p>
-            </div>
-            <div className="col-6 col-md-3">
-              <img
-                src="/images/team/scott.webp"
-                className="img-fluid img-team mb-3"
-                alt=""
-              />
-              <p className="fw-semibold opacity-100 mb-0 fs-5">Scott</p>
-              <p className="team-role-text">
-                Chief Creative Officer / Technical 3D Artist
-              </p>
-            </div>
-            <div className="col-6 col-md-3">
-              <img
-                src="/images/team/bombay.webp"
-                className="img-fluid img-team mb-3"
-                alt=""
-              />
-              <p className="fw-semibold opacity-100 mb-0 fs-5">Bombay</p>
-              <p className="team-role-text">UI / Frontend Engineer </p>
-            </div>
-            <div className="col-6 col-md-3">
-              <img
-                src="/images/team/paul.webp"
-                className="img-fluid img-team mb-3"
-                alt=""
-              />
-              <p className="fw-semibold opacity-100 mb-0 fs-5">Paul</p>
-              <p className="team-role-text">Systems Engineer</p>
-            </div>
-            <div className="col-6 col-md-3">
-              <img
-                src="/images/team/jose.webp"
-                className="img-fluid img-team mb-3"
-                alt=""
-              />
-              <p className="fw-semibold opacity-100 mb-0 fs-5">Jose</p>
-              <p className="team-role-text">Data Team</p>
-            </div>
-            <div className="col-6 col-md-3">
-              <img
-                src="/images/team/rodrigo.webp"
-                className="img-fluid img-team mb-3"
-                alt=""
-              />
-              <p className="fw-semibold opacity-100 mb-0 fs-5">Rodrigo</p>
-              <p className="team-role-text">Data Team</p>
-            </div>
+          <div className="row g-3 gx-lg-5 gy-md-5 pb-4 pt-3 pt-md-5">
+            {teamMembers.map((member, index) => (
+              <div className="col-6 col-md-3" key={index}>
+                <div className="panel h-100">
+                  <img
+                    src={member.imageSrc}
+                    className="img-fluid img-team"
+                    alt=""
+                  />
+                  <div className="p-3 p-lg-4">
+                    <p className="fw-semibold opacity-100 mb-0 fs-5">
+                      {member.name}
+                    </p>
+                    <p className="team-role-text">{member.role}</p>
+                  </div>
+                </div>
+              </div>
+            ))}
           </div>
 
           {/* NB(bt): Need to ask Alex if we can add this.

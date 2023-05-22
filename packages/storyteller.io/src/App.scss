@@ -1049,6 +1049,49 @@ span.swiper-pagination-bullet.swiper-pagination-bullet-active {
   opacity: 1;
 }
 
+.research-swiper {
+  height: 100%;
+
+  .research-swiper-thumb-container {
+    max-height: 500px;
+
+    .swiper-slide {
+      display: flex;
+      align-items: center;
+      border-radius: 0.5rem !important;
+      height: 60px !important;
+      background-color: $secondary;
+      padding: 2rem 1.5rem;
+      cursor: pointer;
+      border: 2px solid;
+      border-color: $secondary;
+      transition: 0.2s all;
+
+      &:hover {
+        background-color: rgb(37, 37, 56);
+        border-color: lighten($secondary, 10%);
+      }
+    }
+
+    .swiper-slide-thumb-active {
+      background-color: #161624 !important;
+      border-color: $primary !important;
+    }
+  }
+
+  .research-swiper-video-container {
+    border-radius: 0.5rem;
+    border: 2px solid;
+    border-color: rgba(#4d4d66, 1);
+
+    .swiper-slide {
+      video {
+        object-fit: cover;
+      }
+    }
+  }
+}
+
 :root {
   --swiper-theme-color: #fa6b68 !important;
 }
@@ -1089,44 +1132,28 @@ span.swiper-pagination-bullet.swiper-pagination-bullet-active {
   }
 }
 
-.img-team {
-  border-radius: 0.5rem;
+.border-frame {
   border: 2px solid;
-  border-color: rgba(#4d4d66, 1);
+  border-color: $secondary;
+}
+
+.panel {
+  background-color: #181827;
+  border-radius: 0.5rem;
+  overflow: hidden;
+  border: 2px solid;
+  border-color: $secondary;
+}
+
+.img-team {
+  border-bottom: 2px solid;
+  border-color: $secondary;
 }
 
 .team-role-text {
   padding-top: 2px;
   line-height: 1.4;
-}
-
-.img-layers {
-  display: flex;
-  position: relative;
-
-  .img-front-right {
-    position: absolute;
-    max-width: 380px;
-    right: -14%;
-    bottom: 12%;
-  }
-
-  .img-front-left {
-    position: absolute;
-    max-width: 380px;
-    left: -14%;
-    bottom: 12%;
-  }
-
-  .img-back {
-    border-radius: 0.5rem;
-    border: 2px solid;
-    border-color: rgba(#4d4d66, 0.25);
-  }
-
-  .img-mascot {
-    filter: drop-shadow(0px 0px 50px rgba(0, 0, 0, 0.95));
-  }
+  margin-bottom: 0;
 }
 
 #sub-title {
@@ -1342,5 +1369,12 @@ span.swiper-pagination-bullet.swiper-pagination-bullet-active {
       padding: 0.8rem 1.8rem;
       font-size: 15px;
     }
+  }
+
+  .img-brandon {
+    border-bottom-right-radius: 0.5rem;
+    border-color: $secondary !important;
+    border-bottom: 2px solid;
+    border-right: 2px solid;
   }
 }
