@@ -396,6 +396,7 @@ pub async fn enqueue_infer_tts_handler(
       creator_ip_address: &ip_address,
       creator_set_visibility: set_visibility,
       priority_level,
+      requires_keepalive: false, // TODO: We may want this to be the case in the future.
       is_debug_request,
       maybe_routing_tag: maybe_routing_tag.as_deref(),
       mysql_pool: &server_state.mysql_pool,

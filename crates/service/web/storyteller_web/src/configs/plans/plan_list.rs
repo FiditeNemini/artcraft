@@ -14,6 +14,7 @@ pub static FREE_LOGGED_OUT_PLAN : Lazy<Plan> = Lazy::new(|| {
         .tts_base_priority_level(FAKEYOU_ANONYMOUS_PRIORITY_LEVEL)
         .tts_max_character_length(1024)
         .web_vc_base_priority_level(FAKEYOU_ANONYMOUS_PRIORITY_LEVEL)
+        .web_vc_requires_frontend_keepalive(true)
         .build()
 });
 
@@ -26,6 +27,7 @@ pub static FREE_LOGGED_OUT_FIRST_TRY_PLAN : Lazy<Plan> = Lazy::new(|| {
         .tts_base_priority_level(FAKEYOU_LOGGED_IN_PRIORITY_LEVEL) // NB: Same as logged-in free users.
         .tts_max_character_length(1024)
         .web_vc_base_priority_level(FAKEYOU_LOGGED_IN_PRIORITY_LEVEL) // NB: Same as logged-in free users.
+        .web_vc_requires_frontend_keepalive(true)
         .build()
 });
 
@@ -38,6 +40,7 @@ pub static FREE_LOGGED_IN_PLAN : Lazy<Plan> = Lazy::new(|| {
         .tts_base_priority_level(FAKEYOU_LOGGED_IN_PRIORITY_LEVEL)
         .tts_max_character_length(1024)
         .web_vc_base_priority_level(FAKEYOU_LOGGED_IN_PRIORITY_LEVEL)
+        .web_vc_requires_frontend_keepalive(true)
         .build()
 });
 
@@ -52,6 +55,7 @@ pub static LOYALTY_PLANS : Lazy<HashSet<Plan>> = Lazy::new(|| {
         .tts_max_character_length(2048)
         .tts_max_duration_seconds(30)
         .web_vc_base_priority_level(2)
+        .web_vc_requires_frontend_keepalive(false)
         .build());
 
     plans
@@ -72,6 +76,7 @@ pub static DEVELOPMENT_PREMIUM_PLANS: Lazy<HashSet<Plan>> = Lazy::new(|| {
         .tts_base_priority_level(20)
         .tts_max_character_length(2048)
         .tts_max_duration_seconds(30)
+        .web_vc_requires_frontend_keepalive(false)
         .build());
 
     plans.insert(PlanBuilder::new("development_fakeyou_pro")
@@ -83,6 +88,7 @@ pub static DEVELOPMENT_PREMIUM_PLANS: Lazy<HashSet<Plan>> = Lazy::new(|| {
         .tts_base_priority_level(30)
         .tts_max_character_length(2048)
         .tts_max_duration_seconds(60 * 2)
+        .web_vc_requires_frontend_keepalive(false)
         .build());
 
     plans.insert(PlanBuilder::new("development_fakeyou_elite")
@@ -94,6 +100,7 @@ pub static DEVELOPMENT_PREMIUM_PLANS: Lazy<HashSet<Plan>> = Lazy::new(|| {
         .tts_base_priority_level(40)
         .tts_max_character_length(2048)
         .tts_max_duration_seconds(60 * 5)
+        .web_vc_requires_frontend_keepalive(false)
         .build());
 
     plans
@@ -114,6 +121,7 @@ pub static PRODUCTION_PREMIUM_PLANS: Lazy<HashSet<Plan>> = Lazy::new(|| {
         .tts_max_character_length(2048)
         .tts_max_duration_seconds(30)
         .web_vc_base_priority_level(20)
+        .web_vc_requires_frontend_keepalive(false)
         .build());
 
     plans.insert(PlanBuilder::new("fakeyou_pro")
@@ -125,6 +133,7 @@ pub static PRODUCTION_PREMIUM_PLANS: Lazy<HashSet<Plan>> = Lazy::new(|| {
         .tts_max_character_length(3072)
         .tts_max_duration_seconds(60 * 2)
         .web_vc_base_priority_level(30)
+        .web_vc_requires_frontend_keepalive(false)
         .build());
 
     plans.insert(PlanBuilder::new("fakeyou_elite")
@@ -136,6 +145,7 @@ pub static PRODUCTION_PREMIUM_PLANS: Lazy<HashSet<Plan>> = Lazy::new(|| {
         .tts_max_character_length(4096)
         .tts_max_duration_seconds(60 * 5)
         .web_vc_base_priority_level(40)
+        .web_vc_requires_frontend_keepalive(false)
         .build());
 
     // ========== Spanish plans ==========
@@ -147,8 +157,24 @@ pub static PRODUCTION_PREMIUM_PLANS: Lazy<HashSet<Plan>> = Lazy::new(|| {
         .cost_per_month_dollars(3)
         .tts_base_priority_level(10)
         .web_vc_base_priority_level(10)
+        .web_vc_requires_frontend_keepalive(false)
         .tts_max_duration_seconds(30)
         .build());
+
+    plans
+});
+
+/// Only free plans
+pub static FREE_PLANS_BY_SLUG : Lazy<HashMap<String, Plan>> = Lazy::new(|| {
+    let mut plans = HashMap::new();
+
+    fn add_plan(plans: &mut HashMap<String, Plan>, plan: &Plan) {
+        plans.insert(plan.plan_slug().to_string(), plan.clone());
+    }
+
+    add_plan(&mut plans, &FREE_LOGGED_OUT_PLAN);
+    add_plan(&mut plans, &FREE_LOGGED_OUT_FIRST_TRY_PLAN);
+    add_plan(&mut plans, &FREE_LOGGED_IN_PLAN);
 
     plans
 });
@@ -243,7 +269,7 @@ pub static PLANS_BY_STRIPE_PRICE_ID : Lazy<HashMap<String, Plan>> = Lazy::new(||
 mod test {
     use crate::configs::plans::plan::Plan;
     use crate::configs::plans::plan_category::PlanCategory;
-    use crate::configs::plans::plan_list::{ALL_PLANS_BY_SLUG, DEVELOPMENT_PREMIUM_PLANS, DEVELOPMENT_PREMIUM_PLANS_BY_SLUG, LOYALTY_PLANS, LOYALTY_PLANS_BY_SLUG, PLANS_BY_STRIPE_PRICE_ID, PLANS_BY_STRIPE_PRODUCT_ID, PRODUCTION_PREMIUM_PLANS, PRODUCTION_PREMIUM_PLANS_BY_SLUG};
+    use crate::configs::plans::plan_list::{ALL_PLANS_BY_SLUG, DEVELOPMENT_PREMIUM_PLANS, DEVELOPMENT_PREMIUM_PLANS_BY_SLUG, FREE_PLANS_BY_SLUG, LOYALTY_PLANS, LOYALTY_PLANS_BY_SLUG, PLANS_BY_STRIPE_PRICE_ID, PLANS_BY_STRIPE_PRODUCT_ID, PRODUCTION_PREMIUM_PLANS, PRODUCTION_PREMIUM_PLANS_BY_SLUG};
     use speculoos::prelude::*;
 
     // NB: We're being extremely careful in this test and all those that follow, essentially
@@ -371,6 +397,25 @@ mod test {
         assert_eq!(30, ALL_PLANS_BY_SLUG.get("development_fakeyou_plus").unwrap().tts_max_duration().num_seconds());
         assert_eq!(120, ALL_PLANS_BY_SLUG.get("development_fakeyou_pro").unwrap().tts_max_duration().num_seconds());
         assert_eq!(300, ALL_PLANS_BY_SLUG.get("development_fakeyou_elite").unwrap().tts_max_duration().num_seconds());
+    }
+
+    // =================== TYPICAL FEATURE BEHAVIORS (SUBJECT TO CHANGE) =================== //
+
+    #[test]
+    fn test_assert_web_vc_keepalive_forced() {
+        FREE_PLANS_BY_SLUG.iter().for_each(|(price_id, plan)| {
+            assert!(plan.web_vc_requires_frontend_keepalive());
+        });
+    }
+
+    #[test]
+    fn test_assert_web_vc_no_keepalive() {
+        LOYALTY_PLANS_BY_SLUG.iter().for_each(|(price_id, plan)| {
+            assert!(!plan.web_vc_requires_frontend_keepalive());
+        });
+        PRODUCTION_PREMIUM_PLANS_BY_SLUG.iter().for_each(|(price_id, plan)| {
+            assert!(!plan.web_vc_requires_frontend_keepalive());
+        });
     }
 
     // =================== THE FOLLOWING TESTS SHOULD NOT NEED TO CHANGE MUCH =================== //

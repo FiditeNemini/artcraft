@@ -28,6 +28,8 @@ pub struct InsertGenericInferenceArgs<'a> {
   pub creator_set_visibility: Visibility,
 
   pub priority_level: u8,
+  pub requires_keepalive: bool,
+
   pub is_debug_request: bool,
   pub maybe_routing_tag: Option<&'a str>,
 
@@ -71,6 +73,8 @@ SET
   creator_set_visibility = ?,
 
   priority_level = ?,
+  is_keepalive_required = ?,
+
   is_debug_request = ?,
   maybe_routing_tag = ?,
 
@@ -94,7 +98,10 @@ SET
         args.maybe_creator_user_token.map(|t| t.to_string()),
         args.creator_ip_address,
         args.creator_set_visibility.to_str(),
+
         args.priority_level,
+        args.requires_keepalive,
+
         args.is_debug_request,
         maybe_routing_tag,
     );

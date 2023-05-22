@@ -55,6 +55,8 @@ pub struct Plan {
 
     web_vc_base_priority_level: u8,
 
+    web_vc_requires_frontend_keepalive: bool,
+
     // ========== Features for Real Time Voice Conversion ==========
 
     vc_max_concurrent_models: u32,
@@ -88,6 +90,7 @@ impl Plan {
             tts_can_upload_private_models: builder.tts_can_upload_private_models,
             tts_can_share_private_models: builder.tts_can_share_private_models,
             web_vc_base_priority_level: builder.web_vc_base_priority_level,
+            web_vc_requires_frontend_keepalive: builder.web_vc_requires_frontend_keepalive,
             vc_max_concurrent_models: builder.vc_max_concurrent_models,
             vc_pre_recorded_time_limit: builder.vc_pre_recorded_time_limit,
             vc_pre_recorded_time_is_unlimited: builder.vc_pre_recorded_time_is_unlimited,
@@ -149,6 +152,10 @@ impl Plan {
     pub fn web_vc_base_priority_level(&self) -> u8 {
         self.web_vc_base_priority_level
     }
+
+    pub fn web_vc_requires_frontend_keepalive(&self) -> bool {
+        self.web_vc_requires_frontend_keepalive
+    }
 }
 
 /// Builder pattern for Plans.
@@ -174,6 +181,8 @@ pub struct PlanBuilder {
     // ========== Features for Web Voice Conversion ==========
 
     web_vc_base_priority_level: u8,
+
+    web_vc_requires_frontend_keepalive: bool,
 
     // ========== Features for Real Time Voice Conversion ==========
 
@@ -214,6 +223,7 @@ impl PlanBuilder {
 
             // VC (WEB)
             web_vc_base_priority_level: VC_DEFAULT_PRIORITY_LEVEL,
+            web_vc_requires_frontend_keepalive: true,
 
             // VC (REALTIME)
             vc_max_concurrent_models: VC_DEFAULT_MAX_CONCURRENT_MODELS,
@@ -294,6 +304,11 @@ impl PlanBuilder {
 
     pub fn web_vc_base_priority_level(mut self, value: u8) -> Self {
         self.web_vc_base_priority_level = value;
+        self
+    }
+
+    pub fn web_vc_requires_frontend_keepalive(mut self, value: bool) -> Self {
+        self.web_vc_requires_frontend_keepalive = value;
         self
     }
 
