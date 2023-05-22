@@ -44,9 +44,9 @@ function TopNav(props: Props) {
     ? "container-fluid nav-scroll"
     : "container-fluid";
 
-  const backToTop = showTopBtn
-    ? "btn-to-top nav-link show"
-    : "btn-to-top nav-link";
+  // const backToTop = showTopBtn
+  //   ? "btn-to-top nav-link show"
+  //   : "btn-to-top nav-link";
 
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
