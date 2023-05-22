@@ -24,7 +24,9 @@ from (
          select
              jobs.created_at,
              jobs.id,
+             jobs.status,
              jobs.attempt_count as attempts,
+             jobs.internal_debugging_failure_reason as i_failure_reason,
              u.username,
              jobs.assigned_worker,
              jobs.assigned_cluster,

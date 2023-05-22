@@ -10,6 +10,20 @@ pub async fn mark_generic_inference_job_completely_failed(
   maybe_internal_debugging_failure_reason: Option<&str>,
 ) -> AnyhowResult<()>
 {
+  let mut maybe_public_failure_reason
+      = maybe_public_failure_reason.map(|reason| {
+        let mut reason = reason.trim().to_string();
+        reason.truncate(512); // Max length of column is 512
+        reason
+      });
+
+  let mut maybe_internal_debugging_failure_reason
+      = maybe_internal_debugging_failure_reason.map(|reason| {
+        let mut reason = reason.trim().to_string();
+        reason.truncate(512); // Max length of column is 512
+        reason
+      });
+
   let query_result = sqlx::query!(
         r#"
 UPDATE generic_inference_jobs
@@ -20,8 +34,8 @@ SET
   retry_at = NULL
 WHERE id = ?
         "#,
-        maybe_public_failure_reason,
-        maybe_internal_debugging_failure_reason,
+        maybe_public_failure_reason.as_deref(),
+        maybe_internal_debugging_failure_reason.as_deref(),
         job.id.0,
     )
       .execute(pool)

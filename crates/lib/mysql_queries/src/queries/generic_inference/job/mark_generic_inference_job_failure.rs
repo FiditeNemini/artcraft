@@ -8,13 +8,23 @@ use sqlx;
 pub async fn mark_generic_inference_job_failure(
   pool: &MySqlPool,
   job: &AvailableInferenceJob,
-  failure_reason: &str,
+  maybe_public_failure_reason: Option<&str>,
   internal_debugging_failure_reason: &str,
   max_attempts: u16
 ) -> AnyhowResult<()> {
 
   // statuses: "attempt_failed", "complete_failure", "dead"
   let mut next_status = "attempt_failed";
+
+  let mut maybe_public_failure_reason = maybe_public_failure_reason.map(|reason| {
+    let mut reason = reason.trim().to_string();
+    reason.truncate(512); // Max length of column is 512
+    reason
+  });
+
+  // Max length of column is 512
+  let mut internal_debugging_failure_reason = internal_debugging_failure_reason.trim().to_string();
+  internal_debugging_failure_reason.truncate(512);
 
   if job.attempt_count >= max_attempts {
     // NB: Job attempt count is incremented at start
@@ -32,8 +42,8 @@ SET
 WHERE id = ?
         "#,
         next_status,
-        failure_reason,
-        internal_debugging_failure_reason,
+        maybe_public_failure_reason.as_deref(),
+        &internal_debugging_failure_reason,
         job.id.0,
     )
       .execute(pool)

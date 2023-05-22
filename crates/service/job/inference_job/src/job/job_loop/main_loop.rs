@@ -87,29 +87,34 @@ async fn process_job_batch(job_dependencies: &JobDependencies, jobs: Vec<Availab
       Err(e) => {
         warn!("Failure to process job: {:?}", e);
 
-        let (permanent_failure, failure_reason) = match e {
-          // Permanent failures
-          ProcessSingleJobError::KeepAliveElapsed => (true, "keepalive elapsed"),
-          ProcessSingleJobError::InvalidJob(_) => (true, "invalid job"),
+        let (permanent_failure, internal_failure_reason, maybe_public_failure_reason) =
+            match e {
+              // Permanent failures
+              ProcessSingleJobError::KeepAliveElapsed =>
+                (true, "keepalive elapsed".to_string(), Some("keepalive elapsed")),
+              ProcessSingleJobError::InvalidJob(ref err) =>
+                (true, format!("InvalidJob: {:?}", err), Some("invalid job")),
 
-          // Non-permanent failures
-          ProcessSingleJobError::FilesystemFull => (false, "worker filesystem full"),
-          ProcessSingleJobError::Other(_) => (false, ""),
-        };
+              // Non-permanent failures
+              ProcessSingleJobError::FilesystemFull =>
+                (false, "worker filesystem full".to_string(), Some("worker filesystem full")),
+              ProcessSingleJobError::Other(ref err) =>
+                (false, format!("OtherErr: {:?}", err), None),
+            };
 
         if permanent_failure {
           let _r = mark_generic_inference_job_completely_failed(
             &job_dependencies.mysql_pool,
             &job,
-            Some(failure_reason),
-            Some(failure_reason),
+            maybe_public_failure_reason,
+            Some(&internal_failure_reason),
           ).await;
         } else {
           let _r = mark_generic_inference_job_failure(
             &job_dependencies.mysql_pool,
             &job,
-            failure_reason,
-            failure_reason,
+            maybe_public_failure_reason,
+            &internal_failure_reason,
             job_dependencies.job_max_attempts
           ).await;
         }
