@@ -99,8 +99,9 @@ pub struct FileSystemDetails {
   pub temp_directory_work: PathBuf,
 
   // TODO: Rename
-  /// Creates workspaces for scratch files
-  pub scoped_temp_dir_creator: ScopedTempDirCreator,
+  /// Creates temp directories for scratch files
+  pub scoped_temp_dir_creator_for_downloads: ScopedTempDirCreator,
+  pub scoped_temp_dir_creator_for_work: ScopedTempDirCreator,
 
   // TODO: Rename
   /// Organizes downloaded files

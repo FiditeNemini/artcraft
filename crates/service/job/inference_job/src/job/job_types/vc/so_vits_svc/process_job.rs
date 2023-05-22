@@ -75,7 +75,7 @@ pub async fn process_job(args: SoVitsSvcProcessJobArgs<'_>) -> Result<JobSuccess
       &mut job_progress_reporter,
       "downloading so-vits-svc model",
       job.id.0,
-      &args.job_dependencies.fs.scoped_temp_dir_creator,
+      &args.job_dependencies.fs.scoped_temp_dir_creator_for_downloads,
     ).await?;
 
     so_vits_svc_fs_path
@@ -83,10 +83,13 @@ pub async fn process_job(args: SoVitsSvcProcessJobArgs<'_>) -> Result<JobSuccess
 
   // ==================== TEMP DIR ==================== //
 
-  let temp_dir = format!("temp_vits_tts_inference_{}", job.id.0);
+  let work_temp_dir = format!("temp_vits_tts_inference_{}", job.id.0);
 
   // NB: TempDir exists until it goes out of scope, at which point it should delete from filesystem.
-  let temp_dir = TempDir::new(&temp_dir)
+  let work_temp_dir = args.job_dependencies
+      .fs
+      .scoped_temp_dir_creator_for_work
+      .new_tempdir(&work_temp_dir)
       .map_err(|e| ProcessSingleJobError::from_io_error(e))?;
 
   // ==================== DOWNLOAD MEDIA FILE ==================== //
@@ -109,7 +112,7 @@ pub async fn process_job(args: SoVitsSvcProcessJobArgs<'_>) -> Result<JobSuccess
   // TODO: Turn this into a general utility.
 
   let original_media_upload_fs_path = {
-    let original_media_upload_fs_path = temp_dir.path().join("original.bin");
+    let original_media_upload_fs_path = work_temp_dir.path().join("original.bin");
 
     let media_upload_bucket_path =
         MediaUploadOriginalFilePath::from_object_hash(&media_upload.public_bucket_directory_hash);
@@ -126,7 +129,7 @@ pub async fn process_job(args: SoVitsSvcProcessJobArgs<'_>) -> Result<JobSuccess
       &mut job_progress_reporter,
       "downloading",
       job.id.0,
-      &args.job_dependencies.fs.scoped_temp_dir_creator,
+      &args.job_dependencies.fs.scoped_temp_dir_creator_for_work,
     ).await?;
 
     original_media_upload_fs_path
@@ -144,7 +147,7 @@ pub async fn process_job(args: SoVitsSvcProcessJobArgs<'_>) -> Result<JobSuccess
   //let config_path = PathBuf::from("/models/voice_conversion/so-vits-svc/example_config.json"); // TODO: This could be variable.
   let input_wav_path = original_media_upload_fs_path;
 
-  let output_audio_fs_path = temp_dir.path().join("output.wav");
+  let output_audio_fs_path = work_temp_dir.path().join("output.wav");
   //let output_metadata_fs_path = temp_dir.path().join("metadata.json");
   //let output_spectrogram_fs_path = temp_dir.path().join("spectrogram.json");
 
@@ -213,7 +216,7 @@ pub async fn process_job(args: SoVitsSvcProcessJobArgs<'_>) -> Result<JobSuccess
     error!("Inference failed: {:?}", err);
     safe_delete_temp_file(&input_wav_path);
     safe_delete_temp_file(&output_audio_fs_path);
-    safe_delete_temp_directory(&temp_dir);
+    safe_delete_temp_directory(&work_temp_dir);
     return Err(ProcessSingleJobError::Other(err));
   }
 
@@ -294,7 +297,7 @@ pub async fn process_job(args: SoVitsSvcProcessJobArgs<'_>) -> Result<JobSuccess
   // ==================== DELETE DOWNLOADED FILE ==================== //
 
   // NB: We should be using a tempdir, but to make absolutely certain we don't overflow the disk...
-  safe_delete_temp_directory(&temp_dir);
+  safe_delete_temp_directory(&work_temp_dir);
 
   // ==================== SAVE RECORDS ==================== //
 

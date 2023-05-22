@@ -64,7 +64,7 @@ pub async fn process_job(args: ProcessJobArgs<'_>) -> Result<JobSuccessResult, P
       &mut job_progress_reporter,
       "downloading vocoder (1 of 3)",
       job.id.0,
-      &args.job_dependencies.fs.scoped_temp_dir_creator,
+      &args.job_dependencies.fs.scoped_temp_dir_creator_for_downloads,
     ).await?;
 
     waveglow_vocoder_model_fs_path
@@ -85,7 +85,7 @@ pub async fn process_job(args: ProcessJobArgs<'_>) -> Result<JobSuccessResult, P
       &mut job_progress_reporter,
       "downloading vocoder (2 of 3)",
       job.id.0,
-      &args.job_dependencies.fs.scoped_temp_dir_creator,
+      &args.job_dependencies.fs.scoped_temp_dir_creator_for_downloads,
     ).await?;
 
     hifigan_vocoder_model_fs_path
@@ -106,7 +106,7 @@ pub async fn process_job(args: ProcessJobArgs<'_>) -> Result<JobSuccessResult, P
       &mut job_progress_reporter,
       "downloading vocoder (3 of 3)",
       job.id.0,
-      &args.job_dependencies.fs.scoped_temp_dir_creator,
+      &args.job_dependencies.fs.scoped_temp_dir_creator_for_downloads,
     ).await?;
 
     hifigan_superres_vocoder_model_fs_path
@@ -128,7 +128,7 @@ pub async fn process_job(args: ProcessJobArgs<'_>) -> Result<JobSuccessResult, P
         &mut job_progress_reporter,
         "downloading user vocoder",
         job.id.0,
-        &args.job_dependencies.fs.scoped_temp_dir_creator,
+        &args.job_dependencies.fs.scoped_temp_dir_creator_for_downloads,
       ).await?;
 
       Some(custom_vocoder_fs_path)
@@ -149,7 +149,7 @@ pub async fn process_job(args: ProcessJobArgs<'_>) -> Result<JobSuccessResult, P
       &mut job_progress_reporter,
       "downloading synthesizer",
       job.id.0,
-      &args.job_dependencies.fs.scoped_temp_dir_creator,
+      &args.job_dependencies.fs.scoped_temp_dir_creator_for_downloads,
     ).await?;
 
     tts_synthesizer_fs_path

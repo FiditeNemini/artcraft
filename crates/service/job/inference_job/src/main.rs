@@ -136,6 +136,7 @@ async fn main() -> AnyhowResult<()> {
   let semi_persistent_cache =
       SemiPersistentCacheDir::configured_root(&temp_directory_downloads);
 
+  // TODO(bt,2023.05.22): create_all_paths() for some subset of jobs.
   info!("Creating pod semi-persistent cache dirs...");
   semi_persistent_cache.create_custom_vocoder_model_path()?;
   semi_persistent_cache.create_tts_pretrained_vocoder_model_path()?;
@@ -225,8 +226,9 @@ async fn main() -> AnyhowResult<()> {
   let job_dependencies = JobDependencies {
     fs: FileSystemDetails {
       temp_directory_downloads: temp_directory_downloads.clone(),
-      temp_directory_work,
-      scoped_temp_dir_creator: ScopedTempDirCreator::for_directory(&temp_directory_downloads),
+      temp_directory_work: temp_directory_work.clone(),
+      scoped_temp_dir_creator_for_downloads: ScopedTempDirCreator::for_directory(&temp_directory_downloads),
+      scoped_temp_dir_creator_for_work: ScopedTempDirCreator::for_directory(&temp_directory_work),
       semi_persistent_cache,
     },
     mysql_pool,
