@@ -24,8 +24,8 @@ pub async fn process_single_job(
   job: &AvailableInferenceJob,
 ) -> Result<ProcessSingleJobSuccessCase, ProcessSingleJobError> {
 
-  let mut maybe_redis = job_dependencies
-      .maybe_redis_pool
+  let mut maybe_keepalive_redis = job_dependencies
+      .maybe_keepalive_redis_pool
       .as_ref()
       .map(|redis| redis.get())
       .transpose()
@@ -98,7 +98,7 @@ pub async fn process_single_job(
   // ==================== HANDLE KEEPALIVE (OPTIONAL) ==================== //
 
   if job.is_keepalive_required {
-    match &mut maybe_redis {
+    match &mut maybe_keepalive_redis {
       None => {
         warn!("Keepalive is required for this job, but we do not have Redis configured to check!")
       }

@@ -33,6 +33,8 @@ pub struct JobDependencies {
   //  connect to production Redis easily (requires lots of setup - ghosttunnel or something + IP rules)
   pub maybe_redis_pool: Option<r2d2::Pool<RedisConnectionManager>>,
 
+  pub maybe_keepalive_redis_pool: Option<r2d2::Pool<RedisConnectionManager>>,
+
   pub job_progress_reporter: Box<dyn JobProgressReporterBuilder>,
 
   pub private_bucket_client: BucketClient,

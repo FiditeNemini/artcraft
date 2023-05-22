@@ -206,11 +206,22 @@ async fn main() -> AnyhowResult<()> {
     }
   };
 
+  let maybe_keepalive_redis_pool =
+      match easyenv::get_env_string_optional("REDIS_FOR_KEEPALIVE_URL") {
+        None => None,
+        Some(redis_url) => {
+          let redis_manager = RedisConnectionManager::new(redis_url)?;
+          let redis_pool = r2d2::Pool::builder().build(redis_manager)?;
+          Some(redis_pool)
+        }
+      };
+
   let job_dependencies = JobDependencies {
     scoped_temp_dir_creator: ScopedTempDirCreator::for_directory(&temp_directory),
     download_temp_directory: temp_directory,
     mysql_pool,
     maybe_redis_pool: None, // TODO(bt, 2023-01-11): See note in JobDependencies
+    maybe_keepalive_redis_pool,
     job_progress_reporter,
     public_bucket_client,
     private_bucket_client,
