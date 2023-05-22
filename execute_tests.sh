@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -euxo pipefail
+
 echo 'Running tests...'
 
 # TODO: Fix 'fakeyou_client' and 'billing_component'
