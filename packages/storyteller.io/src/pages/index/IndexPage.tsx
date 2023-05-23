@@ -185,17 +185,17 @@ function IndexPage() {
         <div>
           <Marquee gradient={false} speed={100}>
             <h1 className="marquee-title d-flex gap-3 gap-md-4 gap-lg-5 mt-0 mb-lg-5">
-              <span>Vision</span>
+              <span>Mission</span>
               <span className="text-red">\</span>
-              <span className="text-outline">Vision</span>
+              <span className="text-outline">Mission</span>
               <span className="text-red">\</span>
-              <span>Vision</span>
+              <span>Mission</span>
               <span className="text-red">\</span>
-              <span className="text-outline">Vision</span>
+              <span className="text-outline">Mission</span>
               <span className="text-red">\</span>
-              <span>Vision</span>
+              <span>Mission</span>
               <span className="text-red">\</span>
-              <span className="text-outline">Vision</span>
+              <span className="text-outline">Mission</span>
               <span className="text-red me-3 me-md-4 me-lg-5">\</span>
             </h1>
           </Marquee>
@@ -204,15 +204,18 @@ function IndexPage() {
         <div className="container py-5 text-center d-flex flex-column align-items-center mt-3">
           <img src="/images/vision.webp" className="mb-4" alt="" width={315} />
           <h1 className="fw-bold display-6 about-title mt-4 px-lg-5">
-            We envision a future where a single creator can make content that
+            We’re building a future where individual creators can make content that
             rivals modern Hollywood studios
           </h1>
           <hr className="p-1 mt-5 mb-5 text-red opacity-100 w-25" />
           <div className="panel p-4 p-lg-5 d-flex justify-content-center about-title">
             <p className="fs-5 mb-0">
-              Where more media is generated every day than all of human history.
-              In which the technical mastery behind creativity becomes so
-              accessible, that even a child could create a masterpiece.
+              Where more media is generated every single day than in all of
+              previous human history.
+
+              A future in which the technical mastery behind creativity
+              becomes so accessible, that even a child could create a
+              masterpiece.
             </p>
           </div>
         </div>
@@ -268,7 +271,7 @@ function IndexPage() {
                   target="_blank"
                   className="btn btn-primary mt-4"
                 >
-                  <span>Go to FakeYou.com</span>
+                  <span>Visit FakeYou.com</span>
                 </a>
               </div>
             </div>
@@ -308,7 +311,7 @@ function IndexPage() {
                   target="_blank"
                   className="btn btn-primary mt-4"
                 >
-                  <span>Go to FakeYou.com</span>
+                  <span>Visit FakeYou.com</span>
                 </a>
               </div>
             </div>
@@ -345,7 +348,7 @@ function IndexPage() {
                   target="_blank"
                   className="btn btn-primary mt-4"
                 >
-                  <span>Go to FakeYou.com</span>
+                  <span>Visit FakeYou.com</span>
                 </a>
               </div>
             </div>
@@ -374,10 +377,9 @@ function IndexPage() {
         </Marquee>
 
         <div className="container pt-5 text-center d-flex flex-column align-items-center">
-          <h1 className="fw-bold display-4 about-title mt-5">Experiments</h1>
+          <h1 className="fw-bold display-4 about-title mt-5">Storyteller Labs</h1>
           <h4 className="fw-normal opacity-75 mt-2 lh-base">
-            As AI is still an emergent technology, our team finds itself
-            curiously exploring its capabilities.
+            We’re building sophisticated animation capabilities for both AI and human actors
           </h4>
         </div>
 
