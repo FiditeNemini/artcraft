@@ -210,7 +210,7 @@ function IndexPage() {
           <hr className="p-1 mt-5 mb-5 text-red opacity-100 w-25" />
           <div className="panel p-4 p-lg-5 d-flex justify-content-center about-title">
             <p className="fs-5 mb-0">
-              Where more media is generated every single day than in all of
+              “Where more media is generated every single day than in all of
               previous human history.
 
               A future in which the technical mastery behind creativity
