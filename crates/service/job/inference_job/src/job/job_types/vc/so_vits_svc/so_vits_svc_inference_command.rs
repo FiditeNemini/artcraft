@@ -279,7 +279,7 @@ impl SoVitsSvcInferenceCommand {
     command.push_str(&path_to_string(device));
 
     if let Some(enable_hacky_fix) = self.enable_hacky_fix {
-      command.push_str(" --hacky_fix ");
+      command.push_str(" --hacky-fix ");
       command.push_str(if enable_hacky_fix { "true" } else { "false" } );
       command.push_str(" ");
     }
