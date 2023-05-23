@@ -467,8 +467,8 @@ function IndexPage() {
                   className="research-swiper-thumb-container"
                 >
                   <SwiperSlide>Facial Tracking</SwiperSlide>
-                  <SwiperSlide>3D Character Automated Lip-syncing</SwiperSlide>
                   <SwiperSlide>Motion Capture</SwiperSlide>
+                  <SwiperSlide>AI-Powered Automated Lip-syncing</SwiperSlide>
                   <SwiperSlide>GPT-Driven 24-hour News Cycle</SwiperSlide>
                 </Swiper>
               </div>
@@ -494,7 +494,7 @@ function IndexPage() {
                     <div className="ratio ratio-16x9">
                       <div className="ratio ratio-16x9">
                         <video
-                          src="/video/Automatic-Lipsync.mp4"
+                          src="/video/Mocap.mp4"
                           autoPlay
                           muted
                           loop
@@ -506,7 +506,7 @@ function IndexPage() {
                     <div className="ratio ratio-16x9">
                       <div className="ratio ratio-16x9">
                         <video
-                          src="/video/Mocap.mp4"
+                          src="/video/Automatic-Lipsync.mp4"
                           autoPlay
                           muted
                           loop
