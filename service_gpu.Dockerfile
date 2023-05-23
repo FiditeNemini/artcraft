@@ -182,12 +182,14 @@ COPY crates/service/job/inference_job/config/inference-job.production.env .
 # TODO(bt,2023-04-26): This is only necessary for download-job and inference-job
 # NB(bt,2023-05-04): Installing lsof, htop, ripgrep, as debugging tools
 # net-tools: netstat, for debugging process network connections
+# psmisc: fuser, for determining which things users have opennetstat, for debugging process network connections
 RUN apt-get update && DEBIAN_FRONTEND=noninteractive TZ=Etc/UTC apt-get install -y \
     ffmpeg \
     htop \
     less \
     libsndfile1 \
     lsof \
+    psmisc \
     net-tools \
     ripgrep \
     tmux \

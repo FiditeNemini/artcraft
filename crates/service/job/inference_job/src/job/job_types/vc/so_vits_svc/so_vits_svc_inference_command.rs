@@ -38,6 +38,9 @@ pub struct SoVitsSvcInferenceCommand {
 
   /// If the execution should be ended after a certain point.
   maybe_execution_timeout: Option<Duration>,
+
+  /// Enable optional "hacky fixes" in the code.
+  enable_hacky_fix: Option<bool>,
 }
 
 #[derive(Clone)]
@@ -93,6 +96,7 @@ impl SoVitsSvcInferenceCommand {
     maybe_huggingface_cache_dir: Option<P>,
     maybe_nltk_cache_dir: Option<P>,
     maybe_execution_timeout: Option<Duration>,
+    enable_hacky_fix: Option<bool>,
   ) -> Self {
     Self {
       so_vits_svc_root_code_directory: so_vits_svc_root_code_directory.as_ref().to_path_buf(),
@@ -104,6 +108,7 @@ impl SoVitsSvcInferenceCommand {
       maybe_huggingface_cache_dir: maybe_huggingface_cache_dir.map(|s| s.as_ref().to_path_buf()),
       maybe_nltk_cache_dir: maybe_nltk_cache_dir.map(|s| s.as_ref().to_path_buf()),
       maybe_execution_timeout,
+      enable_hacky_fix,
     }
   }
 
@@ -142,6 +147,9 @@ impl SoVitsSvcInferenceCommand {
 
     let maybe_nltk_cache_dir =
         easyenv::get_env_pathbuf_optional("NLTK_DATA");
+
+    let enable_hacky_fix =
+        easyenv::get_env_bool_optional("SO_VITS_SVC_ENABLE_HACKY_FIX");
 
     let maybe_execution_timeout =
         easyenv::get_env_duration_seconds_optional("SO_VITS_SVC_TIMEOUT_SECONDS");
@@ -189,6 +197,7 @@ impl SoVitsSvcInferenceCommand {
       maybe_huggingface_cache_dir,
       maybe_nltk_cache_dir,
       maybe_execution_timeout,
+      enable_hacky_fix,
     })
   }
 
@@ -268,6 +277,12 @@ impl SoVitsSvcInferenceCommand {
 
     command.push_str(" --device ");
     command.push_str(&path_to_string(device));
+
+    if let Some(enable_hacky_fix) = self.enable_hacky_fix {
+      command.push_str(" --hacky_fix ");
+      command.push_str(if enable_hacky_fix { "true" } else { "false" } );
+      command.push_str(" ");
+    }
 
     // NB: Input wav path is not a named arg
     command.push_str(" ");
