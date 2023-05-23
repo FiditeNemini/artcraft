@@ -191,6 +191,7 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive TZ=Etc/UTC apt-get install 
     net-tools \
     ripgrep \
     tmux \
+    vim \
     nvidia-driver-530 \
     python3-pip \
     python3.10 \
