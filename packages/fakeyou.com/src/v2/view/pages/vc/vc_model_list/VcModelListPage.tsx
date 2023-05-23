@@ -21,6 +21,7 @@ import {
 import { VcModelListSearch } from "./components/VcModelListSearchComponent";
 import {
   EnqueueVoiceConversion,
+  EnqueueVoiceConversionFrequencyMethod,
   EnqueueVoiceConversionIsSuccess,
   EnqueueVoiceConversionRequest,
 } from "@storyteller/components/src/api/voice_conversion/EnqueueVoiceConversion";
@@ -30,6 +31,9 @@ import {
   InferenceJob,
 } from "@storyteller/components/src/jobs/InferenceJob";
 import { SessionVoiceConversionResultsList } from "../../../_common/SessionVoiceConversionResultsList";
+import { Link } from "react-router-dom";
+import PitchShiftComponent from "./components/PitchShiftComponent";
+import PitchEstimateMethodComponent from "./components/PitchEstimateMethodComponent";
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -55,6 +59,7 @@ interface Props {
 
 function VcModelListPage(props: Props) {
   usePrefixedDocumentTitle("Voice Conversion");
+
   const [convertLoading, setConvertLoading] = useState(false);
   const [canConvert, setCanConvert] = useState(false);
 
@@ -65,6 +70,11 @@ function VcModelListPage(props: Props) {
   const [convertIdempotencyToken, setConvertIdempotencyToken] = useState(
     uuidv4()
   );
+
+  const [maybeF0MethodOverride, setMaybeF0MethodOverride] = 
+    useState<EnqueueVoiceConversionFrequencyMethod | undefined>(undefined);
+
+  const [semitones, setSemitones] = useState(0);
 
   // NB: Something of a UI hack here.
   // The 3rd party microphone component doesn't let you clear it, so we emulate form clearing
@@ -144,6 +154,14 @@ function VcModelListPage(props: Props) {
       source_media_upload_token: mediaUploadToken,
     };
 
+    if (semitones !== 0) {
+      request.transpose = semitones;
+    }
+
+    if (maybeF0MethodOverride !== undefined) {
+      request.override_f0_method = maybeF0MethodOverride;
+    }
+
     Analytics.voiceConversionGenerate(
       props.maybeSelectedVoiceConversionModel.token
     );
@@ -162,6 +180,16 @@ function VcModelListPage(props: Props) {
 
   const handleFormSubmit = async (ev: React.FormEvent<HTMLFormElement>) => {
     ev.preventDefault();
+  };
+
+  const handlePitchChange = (value: any) => {
+    setSemitones(value);
+    changeConvertIdempotencyToken();
+  };
+
+  const handlePitchMethodChange = (value: any) => {
+    setMaybeF0MethodOverride(value);
+    changeConvertIdempotencyToken();
   };
 
   const speakButtonClass = convertLoading
@@ -277,6 +305,26 @@ function VcModelListPage(props: Props) {
                           </div>
                         </div>
 
+                        <div>
+                          <label className="sub-title">Pitch Control</label>
+                          <div className="d-flex flex-column gap-3">
+                            <div>
+                              <PitchEstimateMethodComponent
+                                pitchMethod={maybeF0MethodOverride}
+                                onMethodChange={handlePitchMethodChange}
+                              />
+                            </div>
+                            <div>
+                              <PitchShiftComponent
+                                min={-36}
+                                max={36}
+                                step={1}
+                                value={semitones}
+                                onPitchChange={handlePitchChange}
+                              />
+                            </div>
+                          </div>
+                        </div>
                         {/*<div>
                           <label className="sub-title">
                             Or pick from your audio collection (5 files)
@@ -347,6 +395,27 @@ function VcModelListPage(props: Props) {
                         </div>
 
                         <div>
+                          <label className="sub-title">Pitch Control</label>
+                          <div className="d-flex flex-column gap-3">
+                            <div>
+                              <PitchEstimateMethodComponent
+                                pitchMethod={maybeF0MethodOverride}
+                                onMethodChange={handlePitchMethodChange}
+                              />
+                            </div>
+                            <div>
+                              <PitchShiftComponent
+                                min={-36}
+                                max={36}
+                                step={1}
+                                value={semitones}
+                                onPitchChange={handlePitchChange}
+                              />
+                            </div>
+                          </div>
+                        </div>
+
+                        <div>
                           <label className="sub-title">Convert Audio</label>
 
                           <div className="d-flex gap-3">
@@ -378,7 +447,7 @@ function VcModelListPage(props: Props) {
                       />
                       Session V2V Results
                     </h4>
-                    <div className="d-flex flex-column gap-3 session-tts-section">
+                    <div className="d-flex flex-column gap-3 session-tts-section session-vc-section">
                       <SessionVoiceConversionResultsList
                         inferenceJobs={
                           props.inferenceJobsByCategory.get(

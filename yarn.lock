@@ -4387,6 +4387,7 @@ __metadata:
     react-dom: ^16.13.1
     react-drag-drop-files: ^2.3.9
     react-i18next: ^11.15.4
+    react-range: ^1.8.14
     react-reveal: ^1.2.2
     react-router-dom: ^5.2.0
     react-scripts: 5.0.0
@@ -17129,6 +17130,16 @@ __metadata:
     react: ^15.0.0 || ^16.0.0 || ^17.0.0 || ^18.0.0
     react-dom: ^15.0.0 || ^16.0.0 || ^17.0.0 || ^18.0.0
   checksum: 74c28dfa77abb9bedde0f83b919e4f3f8694e66f5c90228bd5f72c05b128dedf06cbc3bd30461aa29c5a2139539977cc7628fa7b31ebdbfb536d8a666e8fd494
+  languageName: node
+  linkType: hard
+
+"react-range@npm:^1.8.14":
+  version: 1.8.14
+  resolution: "react-range@npm:1.8.14"
+  peerDependencies:
+    react: ^16.8.0-0 || ^17.0.0-0 || ^18.0.0-0
+    react-dom: ^16.8.0-0 || ^17.0.0-0 || ^18.0.0-0
+  checksum: 7020c011dc293db46ede9b7cb014dbfe71d59f96aad9cf9b12e9de26c2b600c504e11d39368af8c539c4a3dc1f93e966745063e0b494c388c28fbadd338164bb
   languageName: node
   linkType: hard
 
