@@ -70,6 +70,8 @@ function VcModelListPage(props: Props) {
     uuidv4()
   );
 
+  const [autoConvertF0, setAutoConvertF0] = useState(false);
+
   const [maybeF0MethodOverride, setMaybeF0MethodOverride] = 
     useState<EnqueueVoiceConversionFrequencyMethod | undefined>(undefined);
 
@@ -161,6 +163,10 @@ function VcModelListPage(props: Props) {
       request.override_f0_method = maybeF0MethodOverride;
     }
 
+    if (autoConvertF0) {
+      request.auto_predict_f0 = true;
+    }
+
     Analytics.voiceConversionGenerate(
       props.maybeSelectedVoiceConversionModel.token
     );
@@ -189,6 +195,13 @@ function VcModelListPage(props: Props) {
   const handlePitchMethodChange = (value: any) => {
     setMaybeF0MethodOverride(value);
     changeConvertIdempotencyToken();
+  };
+
+  const handleAutoF0Change = (
+    ev: React.FormEvent<HTMLInputElement>
+  ) => {
+    const value = (ev.target as HTMLInputElement).checked;
+    setAutoConvertF0(value);
   };
 
   const speakButtonClass = convertLoading
@@ -322,6 +335,18 @@ function VcModelListPage(props: Props) {
                                 onPitchChange={handlePitchChange}
                               />
                             </div>
+                            <div className="form-check">
+                              <input 
+                                id="autoF0Checkbox" 
+                                className="form-check-input" 
+                                type="checkbox" 
+                                checked={autoConvertF0}
+                                onChange={handleAutoF0Change}
+                                />
+                              <label className="form-check-label" htmlFor="autoF0Checkbox">
+                                Auto F0 (off for singing, on for speech)
+                              </label>
+                            </div>
                           </div>
                         </div>
                         {/*<div>
@@ -410,6 +435,18 @@ function VcModelListPage(props: Props) {
                                 value={semitones}
                                 onPitchChange={handlePitchChange}
                               />
+                            </div>
+                            <div className="form-check">
+                              <input 
+                                id="autoF0CheckboxMic" 
+                                className="form-check-input" 
+                                type="checkbox" 
+                                checked={autoConvertF0}
+                                onChange={handleAutoF0Change}
+                                />
+                              <label className="form-check-label" htmlFor="autoF0CheckboxMic">
+                                Auto F0 (off for singing, on for speech)
+                              </label>
                             </div>
                           </div>
                         </div>

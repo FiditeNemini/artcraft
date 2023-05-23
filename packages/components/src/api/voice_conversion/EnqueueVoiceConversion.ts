@@ -12,6 +12,7 @@ export interface EnqueueVoiceConversionRequest {
   source_media_upload_token: string,
 
   // Optional args
+  auto_predict_f0?: boolean,
   override_f0_method?: EnqueueVoiceConversionFrequencyMethod,
   transpose?: number,
 }
