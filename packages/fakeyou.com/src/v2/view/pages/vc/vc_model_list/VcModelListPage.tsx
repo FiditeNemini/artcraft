@@ -202,6 +202,7 @@ function VcModelListPage(props: Props) {
   ) => {
     const value = (ev.target as HTMLInputElement).checked;
     setAutoConvertF0(value);
+    changeConvertIdempotencyToken();
   };
 
   const speakButtonClass = convertLoading
