@@ -317,7 +317,7 @@ pub async fn process_job(args: SoVitsSvcProcessJobArgs<'_>) -> Result<JobSuccess
       .await
       .map_err(|e| ProcessSingleJobError::Other(e))?;
 
-  info!("TTS Done. Original text was: {:?}", &job.maybe_raw_inference_text);
+  info!("VC Done.");
 
   // TODO: Update upstream to be strongly typed
   let maybe_user_token = job.maybe_creator_user_token.as_deref()

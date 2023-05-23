@@ -23,6 +23,7 @@ select *
 from (
          select
              jobs.created_at,
+             jobs.first_started_at,
              jobs.id,
              jobs.status,
              jobs.attempt_count as attempts,
@@ -52,6 +53,9 @@ from (
              limit 5000
      ) as t
 order by execution_mins desc;
+
+order by first_started_at asc;
+order by assigned_worker desc, execution_mins desc;
 
 
 -- Get pending so-vits-svc jobs
