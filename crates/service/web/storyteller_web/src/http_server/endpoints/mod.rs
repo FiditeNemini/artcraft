@@ -10,6 +10,7 @@ pub mod leaderboard;
 pub mod media_uploads;
 pub mod misc;
 pub mod moderation;
+pub mod password_reset;
 pub mod service;
 pub mod stats;
 pub mod stubs;

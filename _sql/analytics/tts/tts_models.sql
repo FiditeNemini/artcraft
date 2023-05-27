@@ -125,7 +125,7 @@ from (
          join users as u
               on u.token = m.creator_user_token
 where m.created_at > ( CURDATE() - INTERVAL 31 DAY )
-  AND u.username IN ( 'vegito1089', 'justinjohn0306')
+  -- AND u.username IN ( 'vegito1089', 'justinjohn0306')
 order by r.use_count desc
     limit 100;
 

@@ -13,6 +13,52 @@ select count(*) from user_subscriptions;
 -- NB: "active" status users are current, treating "past_due" as active too (for now)
 select count(*) from user_subscriptions where maybe_stripe_subscription_status NOT IN ("canceled", "incomplete", "incomplete_expired");
 
+-- ==================== TTS + VC + W2L ====================
+
+-- Make sure the time intervals are the same!
+SELECT
+    username,
+    count(*) as total_use_count
+FROM (
+   SELECT
+        u.username as username,
+        j.token as token
+    FROM users AS u
+    JOIN tts_inference_jobs AS j
+        ON u.token = j.maybe_creator_user_token
+        WHERE u.token IN (
+            SELECT DISTINCT user_token
+            FROM user_subscriptions
+        )
+        AND j.created_at > NOW() - INTERVAL 1 DAY
+   UNION
+        SELECT
+            u.username as username,
+            j.token as token
+        FROM users AS u
+            JOIN generic_inference_jobs AS j
+        ON u.token = j.maybe_creator_user_token
+        WHERE u.token IN (
+            SELECT DISTINCT user_token
+            FROM user_subscriptions
+            )
+          AND j.created_at > NOW() - INTERVAL 1 DAY
+    UNION
+        SELECT
+            u.username as username,
+            j.token as token
+        FROM users AS u
+             JOIN w2l_inference_jobs AS j
+        ON u.token = j.maybe_creator_user_token
+        WHERE u.token IN (
+            SELECT DISTINCT user_token
+            FROM user_subscriptions
+            )
+        AND j.created_at > NOW() - INTERVAL 1 DAY
+) as t
+GROUP BY username
+ORDER BY total_use_count desc
+
 -- ==================== TEXT TO SPEECH====================
 
 -- All paid subscribers generating results in the last week
@@ -23,7 +69,7 @@ on u.token = j.maybe_creator_user_token
 WHERE u.token IN (
     select distinct user_token
     from user_subscriptions
-    where maybe_stripe_subscription_status NOT IN ("canceled", "incomplete", "incomplete_expired")
+    -- where maybe_stripe_subscription_status NOT IN ("canceled", "incomplete", "incomplete_expired")
 )
 AND j.created_at > NOW() - interval 7 day
 GROUP BY u.username

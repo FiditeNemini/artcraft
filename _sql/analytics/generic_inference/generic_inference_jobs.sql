@@ -52,10 +52,11 @@ from (
          order by id desc
              limit 5000
      ) as t
+order by execution_mins desc;
+
 order by assigned_worker desc, first_started_at asc;
 
 order by first_started_at asc;
-order by execution_mins desc;
 
 order by assigned_worker desc, execution_mins desc;
 
