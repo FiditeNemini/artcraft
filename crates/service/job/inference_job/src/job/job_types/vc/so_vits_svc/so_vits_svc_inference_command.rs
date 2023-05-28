@@ -2,14 +2,30 @@ use anyhow::anyhow;
 use container_common::anyhow_result::AnyhowResult;
 use filesys::path_to_string::path_to_string;
 use log::info;
+use mysql_queries::payloads::generic_inference_args::FundamentalFrequencyMethodForJob;
+use std::collections::HashSet;
 use std::env;
 use std::ffi::OsString;
 use std::fs::OpenOptions;
 use std::path::{Path, PathBuf};
 use std::time::Duration;
 use subprocess::{ExitStatus, Popen, PopenConfig, Redirection};
-use mysql_queries::payloads::generic_inference_args::FundamentalFrequencyMethodForJob;
 use subprocess_common::docker_options::{DockerEnvVar, DockerFilesystemMount, DockerGpu, DockerOptions};
+
+// These environment vars are not copied over to the subprocess
+// TODO/FIXME(bt, 2023-05-28): This is horrific security!
+static IGNORED_ENVIRONMENT_VARS : Lazy<HashSet<String>> = Lazy::new(|| {
+  let env_var_names= [
+    "MYSQL_URL",
+    "ACCESS_KEY",
+    "SECRET_KEY",
+    "NEWRELIC_API_KEY",
+  ];
+
+  env_var_names.iter()
+      .map(|value| value.to_string())
+      .collect::<HashSet<String>>()
+});
 
 /// This command is used to check tacotron for being a real model
 #[derive(Clone)]
@@ -330,6 +346,9 @@ impl SoVitsSvcInferenceCommand {
     // Copy all environment variables from the parent process.
     // This is necessary to send all the kubernetes settings for Nvidia / CUDA.
     for (env_key, env_value) in env::vars() {
+      if IGNORED_ENVIRONMENT_VARS.contains(&env_key) {
+        continue;
+      }
       env_vars.push((
         OsString::from(env_key),
         OsString::from(env_value),
