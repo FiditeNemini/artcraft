@@ -3,6 +3,7 @@ use container_common::anyhow_result::AnyhowResult;
 use filesys::path_to_string::path_to_string;
 use log::info;
 use mysql_queries::payloads::generic_inference_args::FundamentalFrequencyMethodForJob;
+use once_cell::sync::Lazy;
 use std::collections::HashSet;
 use std::env;
 use std::ffi::OsString;

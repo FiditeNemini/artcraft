@@ -3672,6 +3672,7 @@ dependencies = [
  "mimetypes",
  "mysql_queries",
  "newrelic-telemetry",
+ "once_cell",
  "r2d2_redis",
  "redis_common",
  "serde",
