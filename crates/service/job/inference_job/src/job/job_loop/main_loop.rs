@@ -9,10 +9,14 @@ use mysql_queries::queries::generic_inference::job::list_available_generic_infer
 use mysql_queries::queries::generic_inference::job::mark_generic_inference_job_completely_failed::mark_generic_inference_job_completely_failed;
 use mysql_queries::queries::generic_inference::job::mark_generic_inference_job_failure::mark_generic_inference_job_failure;
 use std::time::Duration;
+use filesys::file_exists::file_exists;
 
 // Job runner timeouts (guards MySQL)
 const START_TIMEOUT_MILLIS : u64 = 500;
 const INCREASE_TIMEOUT_MILLIS : u64 = 1000;
+
+/// Pause file millis
+const PAUSE_FILE_EXISTS_WAIT_MILLIS : u64 = 1000 * 30;
 
 pub async fn main_loop(job_dependencies: JobDependencies) {
   let mut noop_logger = NoOpLogger::new(job_dependencies.no_op_logger_millis as i64);
@@ -22,6 +26,13 @@ pub async fn main_loop(job_dependencies: JobDependencies) {
   let mut sort_by_priority_count = 0;
 
   loop {
+    if let Some(pause_file) = job_dependencies.fs.maybe_pause_file.as_deref() {
+      while file_exists(pause_file) {
+        warn!("Pause file exists. Pausing until deleted: {:?}", pause_file);
+        std::thread::sleep(Duration::from_millis(PAUSE_FILE_EXISTS_WAIT_MILLIS));
+      }
+    }
+
     // Don't completely starve low-priority jobs
     if sort_by_priority_count >= job_dependencies.low_priority_starvation_prevention_every_nth {
       sort_by_priority_count = 0;

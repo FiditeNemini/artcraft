@@ -30,7 +30,7 @@ FROM (
             SELECT DISTINCT user_token
             FROM user_subscriptions
         )
-        AND j.created_at > NOW() - INTERVAL 1 DAY
+        AND j.created_at > NOW() - INTERVAL 31 DAY
    UNION
         SELECT
             u.username as username,
@@ -42,7 +42,7 @@ FROM (
             SELECT DISTINCT user_token
             FROM user_subscriptions
             )
-          AND j.created_at > NOW() - INTERVAL 1 DAY
+          AND j.created_at > NOW() - INTERVAL 31 DAY
     UNION
         SELECT
             u.username as username,
@@ -54,7 +54,7 @@ FROM (
             SELECT DISTINCT user_token
             FROM user_subscriptions
             )
-        AND j.created_at > NOW() - INTERVAL 1 DAY
+        AND j.created_at > NOW() - INTERVAL 31 DAY
 ) as t
 GROUP BY username
 ORDER BY total_use_count desc

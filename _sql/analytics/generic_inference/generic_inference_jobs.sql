@@ -29,7 +29,7 @@ from (
              jobs.attempt_count as attempts,
              trim(replace(replace(jobs.internal_debugging_failure_reason, "\n", ""), "\r", ""))
                  as i_failure_reason,
-             u.username,
+             -- u.username,
              jobs.assigned_worker,
              jobs.assigned_cluster,
              jobs.maybe_input_source_token,

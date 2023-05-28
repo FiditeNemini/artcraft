@@ -227,6 +227,7 @@ async fn main() -> AnyhowResult<()> {
     fs: FileSystemDetails {
       temp_directory_downloads: temp_directory_downloads.clone(),
       temp_directory_work: temp_directory_work.clone(),
+      maybe_pause_file: easyenv::get_env_pathbuf_optional("PAUSE_FILE"),
       scoped_temp_dir_creator_for_downloads: ScopedTempDirCreator::for_directory(&temp_directory_downloads),
       scoped_temp_dir_creator_for_work: ScopedTempDirCreator::for_directory(&temp_directory_work),
       semi_persistent_cache,
