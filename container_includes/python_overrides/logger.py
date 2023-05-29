@@ -1,12 +1,3 @@
-"""
-Python's default logger may be causing lock contention issues.
-
-We've seen tremendous slowdown in so-vits-svc, and the logging crate
-seems to be one of the big contributors.
-
-Other projects are seeing this as well:
-https://github.com/kubernetes-client/python/issues/1867
-"""
 
 import os
 

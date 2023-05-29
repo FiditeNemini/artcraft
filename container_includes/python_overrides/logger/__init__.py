@@ -1,3 +1,14 @@
+"""
+NB(bt, 2023-05-28): Python's default logger may be causing lock
+contention issues in Kubernetes.
+
+We've seen tremendous slowdown in so-vits-svc, and the logging
+crate seems to be one of the big contributors.
+
+Other projects are seeing this as well:
+https://github.com/kubernetes-client/python/issues/1867
+"""
+
 # Copyright 2001-2019 by Vinay Sajip. All Rights Reserved.
 #
 # Permission to use, copy, modify, and distribute this software and its
@@ -27,6 +38,94 @@ import sys, os, time, io, re, traceback, warnings, weakref, collections.abc
 
 from string import Template
 from string import Formatter as StrFormatter
+
+
+class FakeYouLogger:
+    # FakeYou-specific
+    def __init__(self):
+        self.level = _get_log_level()
+        self.handlers = []  # We don't care about this complexity
+        self.flush = True
+        pass
+
+    # noinspection PyPep8Naming
+    def setLevel(self, level):
+        self.level = level
+
+    # noinspection PyPep8Naming
+    def addHandler(self, *args):
+        pass
+
+    def warning(self, *args):
+        print(args, flush=self.flush)
+
+    def warn(self, *args):
+        print(args, flush=self.flush)
+
+    def info(self, *args):
+        print(args, flush=self.flush)
+
+    def debug(self, *args):
+        print(args, flush=self.flush)
+
+
+#---------------------------------------------------------------------------
+#   Level related stuff
+#---------------------------------------------------------------------------
+#
+# Default levels and level names, these can be replaced with any positive set
+# of values having corresponding names. There is a pseudo-level, NOTSET, which
+# is only really there as a lower limit for user-defined levels. Handlers and
+# loggers are initialized with NOTSET so that they will log all messages, even
+# at user-defined levels.
+#
+
+CRITICAL = 50
+FATAL = CRITICAL
+ERROR = 40
+WARNING = 30
+WARN = WARNING
+INFO = 20
+DEBUG = 10
+NOTSET = 0
+
+_levelToName = {
+    CRITICAL: 'CRITICAL',
+    ERROR: 'ERROR',
+    WARNING: 'WARNING',
+    INFO: 'INFO',
+    DEBUG: 'DEBUG',
+    NOTSET: 'NOTSET',
+}
+_nameToLevel = {
+    'CRITICAL': CRITICAL,
+    'FATAL': FATAL,
+    'ERROR': ERROR,
+    'WARN': WARNING,
+    'WARNING': WARNING,
+    'INFO': INFO,
+    'DEBUG': DEBUG,
+    'NOTSET': NOTSET,
+}
+
+
+def _get_log_level():
+    # FakeYou-specific
+    level = os.getenv("PYTHON_LOG_LEVEL")
+    if not level or type(level) is not str:
+        return WARN
+    level = level.strip().upper()
+    if level in _nameToLevel:
+        return _nameToLevel[level]
+    return WARN
+
+
+LOGGER = FakeYouLogger()
+
+
+# noinspection PyPep8Naming
+def getFakeYouLogger(*args):
+    return LOGGER
 
 
 __all__ = ['BASIC_FORMAT', 'BufferingFormatter', 'CRITICAL', 'DEBUG', 'ERROR',
@@ -77,44 +176,6 @@ logMultiprocessing = True
 #
 logProcesses = True
 
-#---------------------------------------------------------------------------
-#   Level related stuff
-#---------------------------------------------------------------------------
-#
-# Default levels and level names, these can be replaced with any positive set
-# of values having corresponding names. There is a pseudo-level, NOTSET, which
-# is only really there as a lower limit for user-defined levels. Handlers and
-# loggers are initialized with NOTSET so that they will log all messages, even
-# at user-defined levels.
-#
-
-CRITICAL = 50
-FATAL = CRITICAL
-ERROR = 40
-WARNING = 30
-WARN = WARNING
-INFO = 20
-DEBUG = 10
-NOTSET = 0
-
-_levelToName = {
-    CRITICAL: 'CRITICAL',
-    ERROR: 'ERROR',
-    WARNING: 'WARNING',
-    INFO: 'INFO',
-    DEBUG: 'DEBUG',
-    NOTSET: 'NOTSET',
-}
-_nameToLevel = {
-    'CRITICAL': CRITICAL,
-    'FATAL': FATAL,
-    'ERROR': ERROR,
-    'WARN': WARNING,
-    'WARNING': WARNING,
-    'INFO': INFO,
-    'DEBUG': DEBUG,
-    'NOTSET': NOTSET,
-}
 
 def getLevelName(level):
     """
@@ -1323,6 +1384,8 @@ class Manager(object):
         logger and fix up the parent/child references which pointed to the
         placeholder to now point to the logger.
         """
+        return getFakeYouLogger()
+
         rv = None
         if not isinstance(name, str):
             raise TypeError('A logger name must be a string')
@@ -2074,6 +2137,8 @@ def getLogger(name=None):
 
     If no name is specified, return the root logger.
     """
+    return getFakeYouLogger()
+
     if not name or isinstance(name, str) and name == root.name:
         return root
     return Logger.manager.getLogger(name)
