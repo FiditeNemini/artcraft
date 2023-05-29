@@ -49,7 +49,7 @@ class FakeYouLogger:
         self.level = _get_log_level()
         self.handlers = []  # We don't care about this complexity
         self.flush = _get_flush_setting()
-        pass
+        print(f'FakeYouLogger: level={self.level}, flush={self.flush}')
 
     # noinspection PyPep8Naming
     def setLevel(self, level):
@@ -161,7 +161,9 @@ def _get_log_level():
         return _DEFAULT_LOG_LEVEL
     level = level.strip().upper()
     if level in _nameToLevel:
-        return _nameToLevel[level]
+        val = _nameToLevel[level]
+        print(f'PYTHON_LOG_LEVEL: {level} = {val}')
+        return val
     return _DEFAULT_LOG_LEVEL
 
 
