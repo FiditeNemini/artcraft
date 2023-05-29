@@ -7,6 +7,9 @@ crate seems to be one of the big contributors.
 
 Other projects are seeing this as well:
 https://github.com/kubernetes-client/python/issues/1867
+
+The following logger is a modified version from the `python3.10`
+package in the `nvidia/cuda:12.1.0-runtime-ubuntu22.04` image.
 """
 
 # Copyright 2001-2019 by Vinay Sajip. All Rights Reserved.
