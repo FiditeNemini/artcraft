@@ -60,23 +60,56 @@ class FakeYouLogger:
         return self.level
 
     # noinspection PyPep8Naming
-    def addHandler(self, *args):
-        pass
-
-    def warn(self, *args):
-        if self.level <= WARN:
-            print('warn', args, flush=self.flush)
-
-    def info(self, *args):
-        if self.level <= INFO:
-            print('info', args, flush=self.flush)
+    def isEnabledFor(self, level):
+        return self.level <= level
 
     def debug(self, *args):
         if self.level <= DEBUG:
             print('debug', args, flush=self.flush)
 
+    def info(self, *args):
+        if self.level <= INFO:
+            print('info', args, flush=self.flush)
+
+    def warn(self, *args):
+        if self.level <= WARN:
+            print('warn', args, flush=self.flush)
+
+    def error(self, *args):
+        if self.level <= ERROR:
+            print('error', args, flush=self.flush)
+
+    def critical(self, *args):
+        if self.level <= CRITICAL:
+            print('critical', args, flush=self.flush)
+
+    def log(self, level, *args):
+        if self.level <= level:
+            print('log', level, args, flush=self.flush)
+
+    # TODO: findCaller(), makeRecord(), handle(), callHandlers(),
+    #   _log(), __repr__(), __reduce__()
+
+    # noinspection PyPep8Naming
+    def addHandler(self, *args):
+        pass
+
+    # noinspection PyPep8Naming
+    def removeHandler(self, *args):
+        pass
+
+    # noinspection PyPep8Naming
+    def hasHandlers(self, *args):
+        return False
+
+    # noinspection PyPep8Naming
+    def getChild(self, *args):
+        return self
+
     # Method aliases
     warning = warn
+    exception = error
+    fatal = critical
 
 
 #---------------------------------------------------------------------------
