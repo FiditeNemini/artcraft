@@ -201,4 +201,8 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive TZ=Etc/UTC apt-get install 
     --no-install-recommends \
     && apt-get clean autoclean && apt-get autoremove -y && rm -rf /var/lib/{apt,dpkg,cache,log}/
 
+# NB(bt,2023-05-28): Python logging may be slowing down in k8s
+# See: https://github.com/kubernetes-client/python/issues/1867
+COPY container_includes/python_overrides/logger/__init__.py /usr/lib/python3.10/logging/__init__.py
+
 EXPOSE 8080
