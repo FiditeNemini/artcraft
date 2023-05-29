@@ -45,7 +45,7 @@ class FakeYouLogger:
     def __init__(self):
         self.level = _get_log_level()
         self.handlers = []  # We don't care about this complexity
-        self.flush = True
+        self.flush = _get_flush_setting()
         pass
 
     # noinspection PyPep8Naming
@@ -57,16 +57,20 @@ class FakeYouLogger:
         pass
 
     def warning(self, *args):
-        print(args, flush=self.flush)
+        if self.level >= WARN:
+            print('warning', args, flush=self.flush)
 
     def warn(self, *args):
-        print(args, flush=self.flush)
+        if self.level >= WARN:
+            print('warn', args, flush=self.flush)
 
     def info(self, *args):
-        print(args, flush=self.flush)
+        if self.level >= INFO:
+            print('info', args, flush=self.flush)
 
     def debug(self, *args):
-        print(args, flush=self.flush)
+        if self.level >= DEBUG:
+            print('debug', args, flush=self.flush)
 
 
 #---------------------------------------------------------------------------
@@ -108,16 +112,44 @@ _nameToLevel = {
     'NOTSET': NOTSET,
 }
 
+_DEFAULT_LOG_LEVEL = WARN
+
 
 def _get_log_level():
     # FakeYou-specific
     level = os.getenv("PYTHON_LOG_LEVEL")
     if not level or type(level) is not str:
-        return WARN
+        return _DEFAULT_LOG_LEVEL
     level = level.strip().upper()
     if level in _nameToLevel:
         return _nameToLevel[level]
-    return WARN
+    return _DEFAULT_LOG_LEVEL
+
+
+_strToBool = {
+    'false': False,
+    'f': False,
+    'no': False,
+    '0': False,
+
+    'true': True,
+    't': True,
+    'yes': True,
+    '1': True,
+}
+
+_DEFAULT_FLUSH_SETTING = True  # NB: This might slow the code down.
+
+
+def _get_flush_setting():
+    # FakeYou-specific
+    setting = os.getenv("PYTHON_FLUSH_LOGS")
+    if not setting or type(setting) is not str:
+        return _DEFAULT_FLUSH_SETTING
+    setting = setting.strip().lower()
+    if setting in _strToBool:
+        return _strToBool[setting]
+    return _DEFAULT_FLUSH_SETTING
 
 
 LOGGER = FakeYouLogger()
