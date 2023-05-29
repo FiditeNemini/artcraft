@@ -56,6 +56,10 @@ class FakeYouLogger:
         self.level = level
 
     # noinspection PyPep8Naming
+    def getEffectiveLevel(self):
+        return self.level
+
+    # noinspection PyPep8Naming
     def addHandler(self, *args):
         pass
 
