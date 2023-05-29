@@ -56,21 +56,20 @@ class FakeYouLogger:
     def addHandler(self, *args):
         pass
 
-    def warning(self, *args):
-        if self.level >= WARN:
-            print('warning', args, flush=self.flush)
-
     def warn(self, *args):
-        if self.level >= WARN:
+        if self.level <= WARN:
             print('warn', args, flush=self.flush)
 
     def info(self, *args):
-        if self.level >= INFO:
+        if self.level <= INFO:
             print('info', args, flush=self.flush)
 
     def debug(self, *args):
-        if self.level >= DEBUG:
+        if self.level <= DEBUG:
             print('debug', args, flush=self.flush)
+
+    # Method aliases
+    warning = warn
 
 
 #---------------------------------------------------------------------------
