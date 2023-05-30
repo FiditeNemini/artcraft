@@ -16,7 +16,10 @@ function IndexPage() {
   // https://stackoverflow.com/questions/61510160/why-muted-attribute-on-video-tag-is-ignored-in-react
   // https://stackoverflow.com/questions/61510160/why-muted-attribute-on-video-tag-is-ignored-in-react
   const videoRefMain: any = useRef(null);
-  const videoRefBG: any = useRef(null);
+  const videoRef1: any = useRef(null);
+  const videoRef2: any = useRef(null);
+  const videoRef3: any = useRef(null);
+  const videoRef4: any = useRef(null);
 
   // Title Animation
   useEffect(() => {
@@ -61,19 +64,6 @@ function IndexPage() {
   }, []);
 
   useEffect(() => {
-    if (!!videoRefBG.current) {
-      videoRefBG.current.setAttribute("muted", "true");
-      videoRefBG.current.setAttribute("autoplay", "true");
-      videoRefBG.current.setAttribute("loop", "true");
-      videoRefBG.current.setAttribute("playsinline", "true");
-      videoRefBG.current.setAttribute("disablepictureinpicture", "true");
-      videoRefBG.current.setAttribute("preload", "auto");
-      videoRefBG.current.muted = true;
-      videoRefBG.current.play();
-    }
-  }, [videoRefBG]);
-
-  useEffect(() => {
     if (!!videoRefMain.current) {
       videoRefMain.current.setAttribute("muted", "true");
       videoRefMain.current.setAttribute("autoplay", "true");
@@ -85,6 +75,58 @@ function IndexPage() {
       videoRefMain.current.play();
     }
   }, [videoRefMain]);
+
+  useEffect(() => {
+    if (!!videoRef1.current) {
+      videoRefMain.current.setAttribute("muted", "true");
+      videoRefMain.current.setAttribute("autoplay", "true");
+      videoRefMain.current.setAttribute("loop", "true");
+      videoRefMain.current.setAttribute("playsinline", "true");
+      videoRefMain.current.setAttribute("disablepictureinpicture", "true");
+      videoRefMain.current.setAttribute("preload", "auto");
+      videoRefMain.current.muted = true;
+      videoRefMain.current.play();
+    }
+  }, [videoRef1]);
+
+  useEffect(() => {
+    if (!!videoRef2.current) {
+      videoRef2.current.setAttribute("muted", "true");
+      videoRef2.current.setAttribute("autoplay", "true");
+      videoRef2.current.setAttribute("loop", "true");
+      videoRef2.current.setAttribute("playsinline", "true");
+      videoRef2.current.setAttribute("disablepictureinpicture", "true");
+      videoRef2.current.setAttribute("preload", "auto");
+      videoRef2.current.muted = true;
+      videoRef2.current.play();
+    }
+  }, [videoRef2]);
+
+  useEffect(() => {
+    if (!!videoRef3.current) {
+      videoRef3.current.setAttribute("muted", "true");
+      videoRef3.current.setAttribute("autoplay", "true");
+      videoRef3.current.setAttribute("loop", "true");
+      videoRef3.current.setAttribute("playsinline", "true");
+      videoRef3.current.setAttribute("disablepictureinpicture", "true");
+      videoRef3.current.setAttribute("preload", "auto");
+      videoRef3.current.muted = true;
+      videoRef3.current.play();
+    }
+  }, [videoRef3]);
+
+  useEffect(() => {
+    if (!!videoRef4.current) {
+      videoRef4.current.setAttribute("muted", "true");
+      videoRef4.current.setAttribute("autoplay", "true");
+      videoRef4.current.setAttribute("loop", "true");
+      videoRef4.current.setAttribute("playsinline", "true");
+      videoRef4.current.setAttribute("disablepictureinpicture", "true");
+      videoRef4.current.setAttribute("preload", "auto");
+      videoRef4.current.muted = true;
+      videoRef4.current.play();
+    }
+  }, [videoRef4]);
 
   const [thumbsSwiper, setThumbsSwiper] = useState<any>(null);
 
@@ -158,7 +200,7 @@ function IndexPage() {
             <div id="hero-btn" className="d-flex gap-3">
               <a
                 className="btn btn-primary d-inline-flex"
-                href="#social"
+                href="#vision"
                 data-scroll-to
               >
                 <span>Explore Storyteller</span>
@@ -202,19 +244,17 @@ function IndexPage() {
         </div>
 
         <div className="container py-5 text-center d-flex flex-column align-items-center mt-3">
-          <img src="/images/vision.webp" className="mb-4" alt="" width={315} />
+          <img src="/images/vision.webp" className="mb-4" alt="" width={325} />
           <h1 className="fw-bold display-6 about-title mt-4 px-lg-5">
-            We’re building a future where individual creators can make content that
-            rivals modern Hollywood studios
+            We’re building a future where individual creators can make content
+            that rivals modern Hollywood studios
           </h1>
           <hr className="p-1 mt-5 mb-5 text-red opacity-100 w-25" />
           <div className="panel p-4 p-lg-5 d-flex justify-content-center about-title">
             <p className="fs-5 mb-0">
-              “A future where more media is generated every single day than
-              in all of previous human history.
-
-              Where the technical mastery behind creativity
-              becomes so accessible, that even a child could create a
+              “A future where more media is generated every single day than in
+              all of previous human history. Where the technical mastery behind
+              creativity becomes so accessible, that even a child could create a
               masterpiece.”
             </p>
           </div>
@@ -377,9 +417,12 @@ function IndexPage() {
         </Marquee>
 
         <div className="container pt-5 text-center d-flex flex-column align-items-center">
-          <h1 className="fw-bold display-4 about-title mt-5">Storyteller Labs</h1>
+          <h1 className="fw-bold display-4 about-title mt-5">
+            Storyteller Labs
+          </h1>
           <h4 className="fw-normal opacity-75 mt-2 lh-base">
-            We’re building sophisticated animation capabilities for both AI and human actors
+            We’re building sophisticated animation capabilities for both AI and
+            human actors
           </h4>
         </div>
 
@@ -484,6 +527,7 @@ function IndexPage() {
                     <div className="ratio ratio-16x9">
                       <video
                         src="/video/Facetrack.mp4"
+                        ref={videoRef1}
                         autoPlay
                         muted
                         loop
@@ -495,6 +539,7 @@ function IndexPage() {
                       <div className="ratio ratio-16x9">
                         <video
                           src="/video/Mocap.mp4"
+                          ref={videoRef2}
                           autoPlay
                           muted
                           loop
@@ -507,6 +552,7 @@ function IndexPage() {
                       <div className="ratio ratio-16x9">
                         <video
                           src="/video/Automatic-Lipsync.mp4"
+                          ref={videoRef3}
                           autoPlay
                           muted
                           loop
@@ -519,6 +565,7 @@ function IndexPage() {
                       <div className="ratio ratio-16x9">
                         <video
                           src="/video/News.mp4"
+                          ref={videoRef4}
                           autoPlay
                           muted
                           loop
