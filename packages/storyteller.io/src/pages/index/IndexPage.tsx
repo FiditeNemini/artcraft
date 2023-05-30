@@ -758,11 +758,19 @@ function IndexPage() {
                     Brandon worked 8 years as a distributed systems and AI/ML
                     engineer at Square. He’s spent the last decade making indie
                     films and being plugged into the Atlanta art scene. In
-                    college he built a laser projector and programmed it to play
-                    video games on the side of skyscrapers. Today he’s working
-                    on disrupting Hollywood and the music industry and
-                    transforming narrative storytelling into something the likes
-                    of which we’ve never seen before.
+                    college he built a{" "}
+                    <a
+                      href="https://www.youtube.com/watch?v=x034jVB1avs"
+                      target="_blank"
+                      rel="noreferrer"
+                      className="text-red"
+                    >
+                      laser projector
+                    </a>{" "}
+                    and programmed it to play video games on the side of
+                    skyscrapers. Today he’s working on disrupting Hollywood and
+                    the music industry and transforming narrative storytelling
+                    into something the likes of which we’ve never seen before.
                   </p>
                 </div>
               </div>
