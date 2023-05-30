@@ -398,13 +398,13 @@ function IndexPage() {
 
       <div
         id="research"
-        className="bg-dark section"
+        className="bg-dark section-2"
         data-scroll
         data-scroll-repeat="true"
         data-scroll-call="research"
       >
         <Marquee gradient={false} speed={100}>
-          <h1 className="marquee-title d-flex gap-3 gap-md-4 gap-lg-5 mt-0 my-lg-5">
+          <h1 className="marquee-title d-flex gap-3 gap-md-4 gap-lg-5 mt-0 mb-lg-5">
             <span className="text-outline">Research</span>
             <span className="text-red">\</span>
             <span>Research</span>
@@ -735,7 +735,7 @@ function IndexPage() {
           </div>
         </div>
 
-        <div className="container mt-md-5 pt-5">
+        <div className="container mt-md-5">
           <h1 className="mb-4">The Team</h1>
 
           <div className="panel">
