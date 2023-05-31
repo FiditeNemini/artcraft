@@ -101,11 +101,16 @@ function VcModelListSearch(props: Props) {
     }
     let modelType = <></>;
     if (data.modelType !== undefined) {
-      modelType = (
-        <span className="badge-model badge-model-svc ms-1">
-          {data.modelType}
-        </span>
-      );
+      if (data.modelType === "so_vits_svc") {
+        modelType = (
+          <span className="badge-model badge-model-svc ms-1">SVC</span>
+        );
+      }
+      if (data.modelType === "rvc") {
+        modelType = (
+          <span className="badge-model badge-model-rvc ms-1">RVC</span>
+        );
+      }
     }
     return (
       <div className="d-inline-flex align-items-center gap-1">
