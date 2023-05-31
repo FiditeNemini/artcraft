@@ -8,21 +8,26 @@ import { FixedSingleValueSelectOption } from "../../../../_common/react_select/F
 
 interface Props {
   voiceConversionModels: Array<VoiceConversionModelListItem>;
-  setVoiceConversionModels: (ttsVoices: Array<VoiceConversionModelListItem>) => void;
+  setVoiceConversionModels: (
+    ttsVoices: Array<VoiceConversionModelListItem>
+  ) => void;
 
   maybeSelectedVoiceConversionModel?: VoiceConversionModelListItem;
-  setMaybeSelectedVoiceConversionModel: (maybeSelectedVoiceConversionModel: VoiceConversionModelListItem) => void;
+  setMaybeSelectedVoiceConversionModel: (
+    maybeSelectedVoiceConversionModel: VoiceConversionModelListItem
+  ) => void;
 }
 
 function VcModelListSearch(props: Props) {
-
   const handleChange = (option: any, actionMeta: any) => {
     const voiceConversionModelToken = option?.value;
     // TODO: Cache a lookup table
     //const maybeNewVoiceConversionModel = props.allVoiceConversionModelsByTokenMap.get(token);
-    const maybeNewVoiceConversionModel = props.voiceConversionModels.find((voiceConversionModel) => {
-      return voiceConversionModel.token === voiceConversionModelToken;
-    });
+    const maybeNewVoiceConversionModel = props.voiceConversionModels.find(
+      (voiceConversionModel) => {
+        return voiceConversionModel.token === voiceConversionModelToken;
+      }
+    );
     if (maybeNewVoiceConversionModel !== undefined) {
       props.setMaybeSelectedVoiceConversionModel(maybeNewVoiceConversionModel);
     }
@@ -32,16 +37,19 @@ function VcModelListSearch(props: Props) {
     label: string;
     value: string;
     creatorName?: string;
+    modelType?: string;
   }
 
-  let options : DropdownOption[] = props.voiceConversionModels 
-    .map((voiceConversionModel) => {
+  let options: DropdownOption[] = props.voiceConversionModels.map(
+    (voiceConversionModel) => {
       return {
         label: voiceConversionModel.title,
         value: voiceConversionModel.token,
         creatorName: voiceConversionModel.creator.display_name,
+        modelType: voiceConversionModel.model_type,
       };
-    });
+    }
+  );
 
   let selectedOption = options.find(
     (option) => option.value === props.maybeSelectedVoiceConversionModel?.token
@@ -83,20 +91,29 @@ function VcModelListSearch(props: Props) {
   }
 
   // Function to build the options themselves, so we can introduce extra elements.
-  const formatOptionLabel = (data: DropdownOption, formatOptionLabelMeta: any) => {
-    let creatorName = <></>
+  const formatOptionLabel = (
+    data: DropdownOption,
+    formatOptionLabelMeta: any
+  ) => {
+    let creatorName = <></>;
     if (data.creatorName !== undefined) {
-      creatorName = (
-        <span className="opacity-50">
-        {" "} — {data.creatorName}
+      creatorName = <span className="opacity-50"> — {data.creatorName}</span>;
+    }
+    let modelType = <></>;
+    if (data.modelType !== undefined) {
+      modelType = (
+        <span className="badge-model badge-model-svc ms-1">
+          {data.modelType}
         </span>
       );
     }
     return (
-      <div>
-        {data.label}{creatorName}
+      <div className="d-inline-flex align-items-center gap-1">
+        {data.label}
+        {modelType}
+        {creatorName}
       </div>
-    )
+    );
   };
 
   return (
@@ -110,7 +127,6 @@ function VcModelListSearch(props: Props) {
           Analytics.ttsOpenPrimaryVoiceConversionSelectMenu();
         }}
         autoFocus={false}
-
         isLoading={isLoading}
         isSearchable={true}
         // NB: The following settings improve upon performance.
@@ -125,7 +141,7 @@ function VcModelListSearch(props: Props) {
         formatOptionLabel={formatOptionLabel}
       />
     </>
-  )
+  );
 }
 
 export { VcModelListSearch };

@@ -656,6 +656,28 @@ styles with important tags:
     }
   }
 
+  .badge-model {
+    display: flex;
+    align-items: center;
+    font-weight: 600;
+    font-size: 12px;
+    padding: 2px 6px;
+    border: none;
+    border-radius: 50px;
+    opacity: 0.85;
+    max-height: 18px;
+
+    &.badge-model-svc {
+      background-color: #beebe7;
+      color: #175e5f;
+    }
+
+    &.badge-model-rvc {
+      background-color: #fcddc7;
+      color: #933b1d;
+    }
+  }
+
   .rounded-circle {
     border-radius: 50px;
   }
