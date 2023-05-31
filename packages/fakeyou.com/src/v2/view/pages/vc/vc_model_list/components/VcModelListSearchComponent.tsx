@@ -103,17 +103,17 @@ function VcModelListSearch(props: Props) {
     if (data.modelType !== undefined) {
       if (data.modelType === "so_vits_svc") {
         modelType = (
-          <span className="badge-model badge-model-svc ms-1">SVC</span>
+          <span className="badge-model badge-model-svc ms-2">SVC</span>
         );
       }
       if (data.modelType === "rvc") {
         modelType = (
-          <span className="badge-model badge-model-rvc ms-1">RVC</span>
+          <span className="badge-model badge-model-rvc ms-2">RVC</span>
         );
       }
     }
     return (
-      <div className="d-inline-flex align-items-center gap-1">
+      <div>
         {data.label}
         {modelType}
         {creatorName}
