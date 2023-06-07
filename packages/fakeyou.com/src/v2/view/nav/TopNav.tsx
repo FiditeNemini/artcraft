@@ -28,8 +28,8 @@ import { ThirdPartyLinks } from "@storyteller/components/src/constants/ThirdPart
 import { Analytics } from "../../../common/Analytics";
 import {
   faFileArrowUp,
-  faMicrophoneLines,
-  faWaveformLines,
+  faMessageDots,
+  faMicrophoneStand,
 } from "@fortawesome/pro-solid-svg-icons";
 
 // TODO: This is duplicated in SessionTtsInferenceResultsList !
@@ -297,7 +297,7 @@ function TopNav(props: Props) {
                     <li data-bs-toggle="offcanvas">
                       <Link className="dropdown-item" to="/tts">
                         <FontAwesomeIcon
-                          icon={faWaveformLines}
+                          icon={faMessageDots}
                           className="me-2"
                         />
                         {t("nav.TopNav.main.ttsOption")}
@@ -306,10 +306,9 @@ function TopNav(props: Props) {
                     <li data-bs-toggle="offcanvas">
                       <Link className="dropdown-item" to="/voice-conversion">
                         <FontAwesomeIcon
-                          icon={faMicrophoneLines}
+                          icon={faMicrophoneStand}
                           className="me-2"
                         />
-                        {"  "}
                         Voice to Voice
                       </Link>
                     </li>
