@@ -76,6 +76,13 @@ function FooterNav(props: Props) {
     return () => clearInterval(interval);
   }, [pendingTtsJobs]);
 
+  let myDataLink = WebUrl.signupPage();
+
+  if (props.sessionWrapper.isLoggedIn()) {
+    let username = props.sessionWrapper.getUsername() as string; // NB: Should be present if logged in
+    myDataLink = WebUrl.userProfilePage(username);
+  }
+
   let moderationLink = <span />;
 
   if (props.sessionWrapper.canBanUsers()) {
@@ -176,12 +183,22 @@ function FooterNav(props: Props) {
               <li>
                 <Link to="/video">Video Lipsync</Link>
               </li>
+
+              <li>
+                <Link to="/contribute">Upload Models</Link>
+              </li>
             </div>
             <div className="py-2 col-12 col-lg-3 d-flex flex-column gap-2 gap-lg-3 align-items-center align-items-lg-start">
               <p className="fw-bold">Community</p>
 
               <li>
-                <Link to="/contribute">Upload Models</Link>
+                <a
+                  href={ThirdPartyLinks.FAKEYOU_DISCORD}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Discord
+                </a>
               </li>
 
               <li>
@@ -189,7 +206,11 @@ function FooterNav(props: Props) {
               </li>
 
               <li>
-                <Link to="/firehose">Feed</Link>
+                <Link to="/guide">Guide</Link>
+              </li>
+
+              <li>
+                <Link to={myDataLink}>My Data</Link>
               </li>
             </div>
             <div className="py-2 col-12 col-lg-3 d-flex flex-column gap-2 gap-lg-3 align-items-center align-items-lg-start">

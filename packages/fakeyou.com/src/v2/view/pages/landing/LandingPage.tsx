@@ -161,7 +161,8 @@ function LandingPage(props: Props) {
             <img
               src={randomHeroImage}
               alt="FakeYou Mascot"
-              width={450}
+              height={440}
+              width={447}
               className="img-fluid"
             />
           </div>
@@ -353,7 +354,7 @@ function LandingPage(props: Props) {
             </div>
           </div>
           <div className="col-12 col-md-6 col-lg-5 d-flex flex-column justify-content-center gap-3">
-            <h2 className="fw-bold">Make your favorite characters talk</h2>
+            <h2 className="fw-bold">Speak as your favorite characters</h2>
             <p className="opacity-75">
               Our AI-powered text-to-speech and voice conversion tools let you
               convert your text or voice into your favorite character's voice.
@@ -410,7 +411,7 @@ function LandingPage(props: Props) {
         </div>
       </div> */}
 
-      <div className="d-flex flex-column section align-items-center panel rounded-0 my-5">
+      {/* <div className="d-flex flex-column section align-items-center panel rounded-0 my-5">
         <div className="d-flex flex-column align-items-center text-center cta-container">
           <div className="d-flex d-lg-none align-items-center mb-4 cta-mobile">
             <img
@@ -474,9 +475,9 @@ function LandingPage(props: Props) {
             height={311}
           />
         </div>
-      </div>
+      </div> */}
 
-      <div className="section pb-5">
+      <div className="py-4">
         <div className="container text-center community-container">
           <div className="panel px-4 py-5 d-flex flex-column align-items-center community-container rounded">
             <h2 className="fw-bold mb-2">Join the Community</h2>
@@ -508,7 +509,7 @@ function LandingPage(props: Props) {
           <img
             src="/images/landing/bg-dots.webp"
             alt="background dots"
-            className="dots-right-top me-3"
+            className="dots-left-bottom me-3"
           />
         </div>
       </div>
