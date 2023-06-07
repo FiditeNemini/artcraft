@@ -247,7 +247,7 @@ function LandingPage(props: Props) {
         </div>
       </div> */}
 
-      <div className="container py-3 px-md-5 px-xl-3">
+      <div className="container pt-2 pb-3 px-md-5 px-xl-3">
         <h2 className="fw-bold mb-4">AI Tools</h2>
         <div className="row g-4 position-relative">
           <div className="col-12 col-md-4">
