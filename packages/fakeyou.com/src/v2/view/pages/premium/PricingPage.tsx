@@ -314,7 +314,7 @@ function PricingPage(props: Props) {
               </ul>
               <hr className="my-4" />
               <h6 className="text-center fw-normal opacity-50">
-                + Many more features coming soon!
+                + Future feature updates
               </h6>
             </div>
           </motion.div>
@@ -412,7 +412,7 @@ function PricingPage(props: Props) {
                   );
                 })}
 
-                <li className="fw-semibold">{FYP.pro.channels.title}</li>
+                {/* <li className="fw-semibold">{FYP.pro.channels.title}</li>
                 {FYP.pro.channels.features.map((e: any) => {
                   return (
                     <li key={e}>
@@ -423,7 +423,7 @@ function PricingPage(props: Props) {
                       {e}
                     </li>
                   );
-                })}
+                })} */}
 
                 {/*<li className="fw-semibold">{FYP.pro.api.title}</li>
                 {FYP.pro.api.features.map((e: any) => {
@@ -452,7 +452,7 @@ function PricingPage(props: Props) {
               </ul>
               <hr className="my-4" />
               <h6 className="text-center fw-normal opacity-50">
-                + Many more features coming soon!
+                + Future feature updates
               </h6>
             </div>
           </motion.div>
@@ -552,7 +552,7 @@ function PricingPage(props: Props) {
                   );
                 })}
 
-                <li className="fw-semibold">{FYP.elite.channels.title}</li>
+                {/* <li className="fw-semibold">{FYP.elite.channels.title}</li>
                 {FYP.elite.channels.features.map((e: any) => {
                   return (
                     <li key={e}>
@@ -563,7 +563,7 @@ function PricingPage(props: Props) {
                       {e}
                     </li>
                   );
-                })}
+                })} */}
 
                 {/*<li className="fw-semibold">{FYP.elite.api.title}</li>
                 {FYP.elite.api.features.map((e: any) => {
@@ -604,7 +604,7 @@ function PricingPage(props: Props) {
               </ul>
               <hr className="my-4" />
               <h6 className="text-center fw-normal opacity-50">
-                + Many more features coming soon!
+                + Future feature updates
               </h6>
             </div>
           </motion.div>
