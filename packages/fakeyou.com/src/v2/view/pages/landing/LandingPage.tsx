@@ -13,7 +13,12 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { faDiscord, faTwitter } from "@fortawesome/free-brands-svg-icons";
 import { WebUrl } from "../../../../common/WebUrl";
-import { faFileArrowUp } from "@fortawesome/pro-solid-svg-icons";
+import {
+  faFileArrowUp,
+  faMessageDots,
+  faMicrophoneStand,
+  faVideo,
+} from "@fortawesome/pro-solid-svg-icons";
 // import {
 //   faFileArrowUp,
 //   faMicrophone,
@@ -143,7 +148,7 @@ function LandingPage(props: Props) {
 
   return (
     <motion.div initial="hidden" animate="visible" variants={container}>
-      <div className="container pb-5 pb-lg-0 pt-lg-2 px-md-5 px-lg-5 px-xl-3">
+      <div className="container pb-5 pb-lg-0 pt-lg-4 px-md-5 px-lg-5 px-xl-3">
         {/* Community Commissions Alert */}
         {/* <div className="alert alert-info">
           <FontAwesomeIcon icon={faMoneyBill} className="me-2" />
@@ -242,7 +247,7 @@ function LandingPage(props: Props) {
         </div>
       </div> */}
 
-      <div className="container pb-5 px-md-5 px-xl-3">
+      <div className="container py-3 px-md-5 px-xl-3">
         <h2 className="fw-bold mb-4">AI Tools</h2>
         <div className="row g-4 position-relative">
           <div className="col-12 col-md-4">
@@ -250,23 +255,27 @@ function LandingPage(props: Props) {
               to="/tts"
               className="panel panel-select d-flex flex-column align-items-center"
             >
-              <div className="d-flex px-4 pt-4 align-items-center w-100">
+              <div className="d-flex p-4 align-items-center w-100">
                 <div className="flex-grow-1">
-                  <h3 className="fw-bold text-white mb-1">Text to Speech</h3>
-                  <h6 className="fw-normal opacity-75 text-white">
-                    Generate audio from text
-                  </h6>
+                  <FontAwesomeIcon
+                    icon={faMessageDots}
+                    className="text-white product-icon mb-3"
+                  />
+                  <div className="d-flex align-items-center">
+                    <div className="flex-grow-1">
+                      <h3 className="fw-bold text-white mb-1">
+                        Text to Speech
+                      </h3>
+                      <h6 className="fw-normal opacity-75 text-white">
+                        Generate audio from text
+                      </h6>
+                    </div>
+                    <Link to="/tts" className="btn btn-square">
+                      <FontAwesomeIcon icon={faArrowRight} />
+                    </Link>
+                  </div>
                 </div>
-                <Link to="/tts" className="btn btn-square">
-                  <FontAwesomeIcon icon={faArrowRight} />
-                </Link>
               </div>
-
-              <img
-                className="img-fluid"
-                src="/images/landing/select-tts.webp"
-                alt="Text to speech"
-              />
             </Link>
           </div>
           <div className="col-12 col-md-4">
@@ -274,23 +283,27 @@ function LandingPage(props: Props) {
               to="/voice-conversion"
               className="panel panel-select d-flex flex-column align-items-center"
             >
-              <div className="d-flex px-4 pt-4 align-items-center w-100">
+              <div className="d-flex p-4 align-items-center w-100">
                 <div className="flex-grow-1">
-                  <h3 className="fw-bold text-white mb-1">Voice to Voice</h3>
-                  <h6 className="fw-normal opacity-75 text-white">
-                    Speak as someone else
-                  </h6>
+                  <FontAwesomeIcon
+                    icon={faMicrophoneStand}
+                    className="text-white product-icon mb-3"
+                  />
+                  <div className="d-flex align-items-center">
+                    <div className="flex-grow-1">
+                      <h3 className="fw-bold text-white mb-1">
+                        Voice to Voice
+                      </h3>
+                      <h6 className="fw-normal opacity-75 text-white">
+                        Speak as someone else
+                      </h6>
+                    </div>
+                    <Link to="/tts" className="btn btn-square">
+                      <FontAwesomeIcon icon={faArrowRight} />
+                    </Link>
+                  </div>
                 </div>
-                <Link to="/voice-conversion" className="btn btn-square">
-                  <FontAwesomeIcon icon={faArrowRight} />
-                </Link>
               </div>
-
-              <img
-                className="img-fluid"
-                src="/images/landing/select-vc.webp"
-                alt="Voice Conversion"
-              />
             </Link>
           </div>
           <div className="col-12 col-md-4">
@@ -298,23 +311,27 @@ function LandingPage(props: Props) {
               to="/video"
               className="panel panel-select d-flex flex-column align-items-center"
             >
-              <div className="d-flex px-4 pt-4 align-items-center w-100">
+              <div className="d-flex p-4 align-items-center w-100">
                 <div className="flex-grow-1">
-                  <h3 className="fw-bold text-white mb-1">Video Lip Sync</h3>
-                  <h6 className="fw-normal opacity-75 text-white">
-                    Lip sync video to audio
-                  </h6>
+                  <FontAwesomeIcon
+                    icon={faVideo}
+                    className="text-white product-icon mb-3"
+                  />
+                  <div className="d-flex align-items-center">
+                    <div className="flex-grow-1">
+                      <h3 className="fw-bold text-white mb-1">
+                        Video Lip Sync
+                      </h3>
+                      <h6 className="fw-normal opacity-75 text-white">
+                        Lip sync video to audio
+                      </h6>
+                    </div>
+                    <Link to="/tts" className="btn btn-square">
+                      <FontAwesomeIcon icon={faArrowRight} />
+                    </Link>
+                  </div>
                 </div>
-                <Link to="/video" className="btn btn-square">
-                  <FontAwesomeIcon icon={faArrowRight} />
-                </Link>
               </div>
-
-              <img
-                className="img-fluid"
-                src="/images/landing/select-w2l.webp"
-                alt="Video Lip Sync"
-              />
             </Link>
           </div>
           <img
@@ -322,17 +339,12 @@ function LandingPage(props: Props) {
             alt="background dots"
             className="dots-right-top"
           />
-          <img
-            src="/images/landing/bg-dots.webp"
-            alt="background dots"
-            className="dots-left-bottom"
-          />
         </div>
 
         {uploadModelSection}
       </div>
 
-      <div className="container section mt-4 px-md-5 px-xl-3">
+      <div className="container section px-md-5 px-xl-3">
         <div className="row g-4 g-lg-5 flex-row-reverse">
           <div className="col-12 col-md-6 col-lg-7">
             <div className="position-relative">

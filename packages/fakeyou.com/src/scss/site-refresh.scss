@@ -1267,7 +1267,6 @@ styles with important tags:
   .panel-select {
     transition: 0.2s all;
     border-radius: 0.5rem !important;
-    height: 280px;
     border-width: 2px !important;
     overflow: hidden;
     z-index: 2;
@@ -1382,17 +1381,21 @@ textarea {
   color: $white !important;
 }
 
-.img-product {
-  &.img-tts {
-    margin-top: -82px;
-    max-height: 240px;
-  }
-
-  &.img-channels {
-    margin-top: -82px;
-    max-height: 240px;
-  }
+.product-icon {
+  font-size: 2.8rem;
 }
+
+// .img-product {
+//   &.img-tts {
+//     margin-top: -82px;
+//     max-height: 240px;
+//   }
+
+//   &.img-channels {
+//     margin-top: -82px;
+//     max-height: 240px;
+//   }
+// }
 
 .index-title {
   line-height: 5;
