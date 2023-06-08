@@ -9,7 +9,7 @@ import {
   faStar,
   faUser,
   faArrowRight,
-  faWaveformLines,
+  faMessageDots,
 } from "@fortawesome/pro-solid-svg-icons";
 import { Analytics } from "../../../../../common/Analytics";
 import { WebUrl } from "../../../../../common/WebUrl";
@@ -96,7 +96,9 @@ export function TtsPageHero(props: Props) {
     }
   }
 
-  const titleIcon = <FontAwesomeIcon icon={faWaveformLines} className="me-3" />;
+  const titleIcon = (
+    <FontAwesomeIcon icon={faMessageDots} className="me-3 me-lg-4" />
+  );
   const title = <>{t("tts.TtsModelListPage.heroSection.title")}</>;
   const subText = (
     <>

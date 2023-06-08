@@ -14,11 +14,11 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faChevronLeft,
   faChevronRight,
-  faFilm,
 } from "@fortawesome/free-solid-svg-icons";
 import { motion } from "framer-motion";
 import { usePrefixedDocumentTitle } from "../../../../../common/UsePrefixedDocumentTitle";
 import { PageHeader } from "../../../_common/PageHeader";
+import { faVideo } from "@fortawesome/pro-solid-svg-icons";
 
 const Fade = require("react-reveal/Fade");
 
@@ -200,7 +200,7 @@ function W2lTemplateListPage(props: Props) {
 
   const title = <>Video Lip Sync Templates</>;
   const subText = <>{extraDetails}</>;
-  const titleIcon = <FontAwesomeIcon icon={faFilm} className="me-3" />;
+  const titleIcon = <FontAwesomeIcon icon={faVideo} className="me-3 me-lg-4" />;
 
   return (
     <motion.div initial="hidden" animate="visible" variants={container}>
