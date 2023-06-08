@@ -298,7 +298,7 @@ function LandingPage(props: Props) {
                         Speak as someone else
                       </h6>
                     </div>
-                    <Link to="/tts" className="btn btn-square">
+                    <Link to="/voice-conversion" className="btn btn-square">
                       <FontAwesomeIcon icon={faArrowRight} />
                     </Link>
                   </div>
@@ -326,7 +326,7 @@ function LandingPage(props: Props) {
                         Lip sync video to audio
                       </h6>
                     </div>
-                    <Link to="/tts" className="btn btn-square">
+                    <Link to="/video" className="btn btn-square">
                       <FontAwesomeIcon icon={faArrowRight} />
                     </Link>
                   </div>
