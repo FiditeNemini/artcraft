@@ -8,13 +8,9 @@ import {
   faPlus,
   faUsers,
   faVideo,
-  faList,
   faTrophy,
-  faUpload,
   faUser,
   faSignOutAlt,
-  faComputer,
-  faLaptop,
   faBook,
   faStar,
 } from "@fortawesome/free-solid-svg-icons";
@@ -26,22 +22,14 @@ import {
   GetPendingTtsJobCountIsOk,
   GetPendingTtsJobCountSuccessResponse,
 } from "@storyteller/components/src/api/tts/GetPendingTtsJobCount";
-import {
-  container,
-  item,
-  panel,
-  image,
-  sessionItem,
-} from "../../../data/animation";
-import Tippy from "@tippyjs/react";
 import "tippy.js/dist/tippy.css";
 import "tippy.js/animations/shift-away.css";
 import { ThirdPartyLinks } from "@storyteller/components/src/constants/ThirdPartyLinks";
 import { Analytics } from "../../../common/Analytics";
 import {
   faFileArrowUp,
-  faMicrophoneLines,
-  faWaveformLines,
+  faMessageDots,
+  faMicrophoneStand,
 } from "@fortawesome/pro-solid-svg-icons";
 
 // TODO: This is duplicated in SessionTtsInferenceResultsList !
@@ -56,17 +44,6 @@ interface Props {
 }
 
 function TopNav(props: Props) {
-  // const defaultColourView = window.localStorage.getItem("darkMode");
-  const defaultLowSpecView = window.localStorage.getItem("lowSpec");
-
-  // const [darkModes, toggleDarkModes] = useState(
-  //   defaultColourView === "false" ? true : false
-  // );
-
-  const [lowSpecView, toggleLowSpecs] = useState(
-    defaultLowSpecView === "false" ? true : false
-  );
-
   let history = useHistory();
 
   let myDataLink = WebUrl.signupPage();
@@ -108,52 +85,6 @@ function TopNav(props: Props) {
     fetch();
     return () => clearInterval(interval);
   }, [pendingTtsJobs]);
-
-  // const toggleDarkMode = () => {
-  //   window.localStorage.setItem("darkMode", darkModes ? "true" : "false");
-
-  //   toggleDarkModes(!darkModes);
-  // };
-
-  const toggleLowSpec = () => {
-    window.localStorage.setItem("lowSpec", lowSpecView ? "true" : "false");
-
-    toggleLowSpecs(!lowSpecView);
-
-    if (lowSpecView === false) {
-      image.hidden.opacity = 1;
-      image.hidden.x = 0;
-      panel.hidden.y = 0;
-      item.hidden.y = 0;
-      sessionItem.hidden.x = 0;
-      panel.hidden.opacity = 1;
-      item.hidden.opacity = 1;
-      container.hidden.opacity = 1;
-      sessionItem.hidden.opacity = 1;
-      Analytics.uiTurnOnAnimations();
-    } else {
-      image.hidden.opacity = 0;
-      image.hidden.x = 15;
-      panel.hidden.y = 15;
-      item.hidden.y = 15;
-      sessionItem.hidden.x = 15;
-      panel.hidden.opacity = 0;
-      item.hidden.opacity = 0;
-      container.hidden.opacity = 0;
-      sessionItem.hidden.opacity = 0;
-      Analytics.uiTurnOffAnimations();
-    }
-  };
-
-  useEffect(() => {
-    // Logic for dark mode toggle
-    // if (darkModes) document.getElementById("main")!.classList.add("dark-mode");
-    // else document.getElementById("main")!.classList.remove("dark-mode");
-
-    // Logic for the animation toggle
-    if (lowSpecView) document.getElementById("main")!.classList.add("low-spec");
-    else document.getElementById("main")!.classList.remove("low-spec");
-  });
 
   const logoutHandler = async () => {
     await Logout();
@@ -332,19 +263,6 @@ function TopNav(props: Props) {
             </div>
             <div className="offcanvas-body">
               <ul className="navbar-nav justify-content-start align-items-lg-center flex-grow-1 gap-2 gap-lg-0">
-                <li data-bs-toggle="offcanvas" className="nav-item">
-                  <Link
-                    to={WebUrl.pricingPageWithReferer("topnav")}
-                    onClick={() => {
-                      Analytics.topbarClickPricing();
-                    }}
-                    className="nav-link"
-                  >
-                    <FontAwesomeIcon icon={faStar} className="me-2" />
-                    {t("nav.TopNav.main.pricingLink")}
-                  </Link>
-                </li>
-
                 {/*<li data-bs-toggle="offcanvas" className="nav-item">
                   <Link
                     to={WebUrl.newsPage()}
@@ -369,7 +287,8 @@ function TopNav(props: Props) {
                     aria-expanded="false"
                   >
                     <FontAwesomeIcon icon={faPlus} className="me-2" />
-                    {t("nav.TopNav.main.createDropdown")}
+                    {/* {t("nav.TopNav.main.createDropdown")} */}
+                    AI Tools
                   </a>
                   <ul
                     className="dropdown-menu"
@@ -378,7 +297,7 @@ function TopNav(props: Props) {
                     <li data-bs-toggle="offcanvas">
                       <Link className="dropdown-item" to="/tts">
                         <FontAwesomeIcon
-                          icon={faWaveformLines}
+                          icon={faMessageDots}
                           className="me-2"
                         />
                         {t("nav.TopNav.main.ttsOption")}
@@ -387,10 +306,9 @@ function TopNav(props: Props) {
                     <li data-bs-toggle="offcanvas">
                       <Link className="dropdown-item" to="/voice-conversion">
                         <FontAwesomeIcon
-                          icon={faMicrophoneLines}
+                          icon={faMicrophoneStand}
                           className="me-2"
                         />
-                        {"  "}
                         Voice to Voice
                       </Link>
                     </li>
@@ -435,26 +353,6 @@ function TopNav(props: Props) {
                     aria-labelledby="offcanvasNavbarLgDropdown-community"
                   >
                     <li data-bs-toggle="offcanvas">
-                      <Link
-                        className="dropdown-item"
-                        to="/contribute"
-                        title="to Upload page"
-                      >
-                        <FontAwesomeIcon icon={faUpload} className="me-2" />
-                        {t("nav.TopNav.main.contributeOption")}
-                      </Link>
-                    </li>
-                    <li data-bs-toggle="offcanvas">
-                      <Link
-                        className="dropdown-item"
-                        to="/leaderboard"
-                        title="to leaderboard"
-                      >
-                        <FontAwesomeIcon icon={faTrophy} className="me-2" />
-                        {t("nav.TopNav.main.leaderboardOption")}
-                      </Link>
-                    </li>
-                    <li data-bs-toggle="offcanvas">
                       <a
                         className="dropdown-item"
                         href={ThirdPartyLinks.FAKEYOU_DISCORD}
@@ -466,6 +364,18 @@ function TopNav(props: Props) {
                         {t("nav.TopNav.main.discordOption")}
                       </a>
                     </li>
+
+                    <li data-bs-toggle="offcanvas">
+                      <Link
+                        className="dropdown-item"
+                        to="/leaderboard"
+                        title="to leaderboard"
+                      >
+                        <FontAwesomeIcon icon={faTrophy} className="me-2" />
+                        {t("nav.TopNav.main.leaderboardOption")}
+                      </Link>
+                    </li>
+
                     <li data-bs-toggle="offcanvas">
                       <Link
                         className="dropdown-item"
@@ -476,16 +386,7 @@ function TopNav(props: Props) {
                         {t("nav.TopNav.main.guideOption")}
                       </Link>
                     </li>
-                    <li data-bs-toggle="offcanvas">
-                      <Link
-                        className="dropdown-item"
-                        to="/firehose"
-                        title="to feed"
-                      >
-                        <FontAwesomeIcon icon={faList} className="me-2" />
-                        {t("nav.TopNav.main.feedOption")}
-                      </Link>
-                    </li>
+
                     <hr className="dropdown-divider" />
                     <li data-bs-toggle="offcanvas">
                       <Link
@@ -498,6 +399,19 @@ function TopNav(props: Props) {
                       </Link>
                     </li>
                   </ul>
+                </li>
+
+                <li data-bs-toggle="offcanvas" className="nav-item">
+                  <Link
+                    to={WebUrl.pricingPageWithReferer("topnav")}
+                    onClick={() => {
+                      Analytics.topbarClickPricing();
+                    }}
+                    className="nav-link"
+                  >
+                    <FontAwesomeIcon icon={faStar} className="me-2" />
+                    {t("nav.TopNav.main.pricingLink")}
+                  </Link>
                 </li>
 
                 <li data-bs-toggle="offcanvas" className="nav-item d-lg-none">
@@ -559,47 +473,6 @@ function TopNav(props: Props) {
                         {pendingTtsJobs.pending_job_count}
                       </span>
                     </div>
-                  </div>
-                </li>
-
-                <li className="d-lg-none">
-                  <hr className="dropdown-divider dropdown-divider-white" />
-                </li>
-
-                <li className="ps-3 d-lg-none">
-                  <div className="d-flex gap-4 py-2">
-                    <div className="top-bar-text mobile">
-                      {t("nav.TopNav.topbar.options")}:
-                    </div>
-                    {/* <Tippy
-                      content={`${
-                        darkModes ? "Toggle Light Mode" : "Toggle Dark Mode"
-                      }`}
-                    >
-                      <button
-                        className={`btn btn-toggle ${darkModes ? "dark" : ""}`}
-                        onClick={() => toggleDarkMode()}
-                      >
-                        <FontAwesomeIcon icon={darkModes ? faSun : faMoon} />
-                      </button>
-                    </Tippy> */}
-                    <Tippy
-                      content={`${
-                        lowSpecView
-                          ? "Turn on animations"
-                          : "Turn off animations"
-                      }`}
-                    >
-                      <button
-                        className="btn btn-toggle"
-                        onClick={() => toggleLowSpec()}
-                      >
-                        <FontAwesomeIcon
-                          icon={lowSpecView ? faComputer : faLaptop}
-                          className={`${lowSpecView ? "" : ""}`}
-                        />
-                      </button>
-                    </Tippy>
                   </div>
                 </li>
 

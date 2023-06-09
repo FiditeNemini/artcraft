@@ -94,18 +94,15 @@ const FAKEYOU_PRICES = {
     },
     vc: {
       title: "Voice to Voice",
-      features: [
-        "Up to 5 minutes of audio",
-        "Upload private models",
-      ],
+      features: ["Up to 5 minutes of audio", "Upload private models"],
     },
-    channels: {
-      title: "Video Channels",
-      features: [
-        "Ad-free (coming soon)",
-        "Interactive features (coming soon)",
-      ],
-    },
+    // channels: {
+    //   title: "Video Channels",
+    //   features: [
+    //     "Ad-free (coming soon)",
+    //     "Interactive features (coming soon)",
+    //   ],
+    // },
     // vcweb: {
     //   title: "VC Web",
     //   features: ["Up to 30 seconds audio", "Push to play", "Generate MP3 file"],
@@ -153,20 +150,20 @@ const FAKEYOU_PRICES = {
     vc: {
       title: "Voice to Voice",
       features: [
-        "Unlimited audio", 
-        "Upload private models", 
-        "Share private models"
+        "Unlimited audio",
+        "Upload private models",
+        "Share private models",
       ],
     },
-    channels: {
-      title: "Video Channels",
-      features: [
-        "Influence creative direction",
-        "Ad-free (coming soon)",
-        "Interactive features (coming soon)",
-        "Build your own channel (coming soon)",
-      ],
-    },
+    // channels: {
+    //   title: "Video Channels",
+    //   features: [
+    //     "Influence creative direction",
+    //     "Ad-free (coming soon)",
+    //     "Interactive features (coming soon)",
+    //     "Build your own channel (coming soon)",
+    //   ],
+    // },
     // vcweb: {
     //   title: "VC Web",
     //   features: ["Up to 7 minutes audio", "Push to play", "Generate MP3 file"],

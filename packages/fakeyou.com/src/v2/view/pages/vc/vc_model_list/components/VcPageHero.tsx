@@ -8,7 +8,7 @@ import {
   faStar,
   faUser,
   faArrowRight,
-  faMicrophoneLines,
+  faMicrophoneStand,
 } from "@fortawesome/pro-solid-svg-icons";
 import { Analytics } from "../../../../../../common/Analytics";
 import { WebUrl } from "../../../../../../common/WebUrl";
@@ -102,7 +102,7 @@ export function VcPageHero(props: Props) {
   }
 
   const titleIcon = (
-    <FontAwesomeIcon icon={faMicrophoneLines} className="me-3" />
+    <FontAwesomeIcon icon={faMicrophoneStand} className="me-3 me-lg-4" />
   );
   const title = <>Voice to Voice</>;
   const subText = (
