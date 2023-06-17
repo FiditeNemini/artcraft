@@ -1,6 +1,5 @@
 pub mod clear_full_filesystem;
 pub mod determine_dependency_status;
-pub mod job_stats;
 pub mod job_success_result;
 pub mod main_loop;
 pub mod process_single_job;

@@ -94,24 +94,32 @@ async fn process_job_batch(job_dependencies: &JobDependencies, jobs: Vec<Availab
   for job in jobs.into_iter() {
     let result = process_single_job(job_dependencies, &job).await;
     match result {
-      Ok(_) => {},
+      Ok(_) => {
+        let _stats = job_dependencies.job_stats.increment_success_count().ok();
+      },
       Err(e) => {
         warn!("Failure to process job: {:?}", e);
 
-        let (permanent_failure, internal_failure_reason, maybe_public_failure_reason) =
+        let (permanent_failure, increment_fail_count, internal_failure_reason, maybe_public_failure_reason) =
             match e {
               // Permanent failures
               ProcessSingleJobError::KeepAliveElapsed =>
-                (true, "keepalive elapsed".to_string(), Some("keepalive elapsed")),
+                (true, true, "keepalive elapsed".to_string(), Some("keepalive elapsed")),
               ProcessSingleJobError::InvalidJob(ref err) =>
-                (true, format!("InvalidJob: {:?}", err), Some("invalid job")),
+                (true, false, format!("InvalidJob: {:?}", err), Some("invalid job")),
 
               // Non-permanent failures
               ProcessSingleJobError::FilesystemFull =>
-                (false, "worker filesystem full".to_string(), Some("worker filesystem full")),
+                (false, true, "worker filesystem full".to_string(), Some("worker filesystem full")),
               ProcessSingleJobError::Other(ref err) =>
-                (false, format!("OtherErr: {:?}", err), None),
+                (false, true, format!("OtherErr: {:?}", err), None),
             };
+
+        if increment_fail_count {
+          // NB: We only increment the fail count for events that may indicate the job server is stuck.
+          let stats = job_dependencies.job_stats.increment_failure_count().ok();
+          warn!("Failure stats: {:?}", stats);
+        }
 
         if permanent_failure {
           let _r = mark_generic_inference_job_completely_failed(

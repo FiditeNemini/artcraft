@@ -1,14 +1,15 @@
 use bootstrap::bootstrap::ContainerEnvironment;
 use cloud_storage::bucket_client::BucketClient;
 use cloud_storage::bucket_path_unifier::BucketPathUnifier;
-use crate::job::job_loop::job_stats::JobStats;
 use crate::job::job_types::tts::tacotron2_v2_early_fakeyou::tacotron2_inference_command::Tacotron2InferenceCommand;
 use crate::job::job_types::tts::vits::vits_inference_command::VitsInferenceCommand;
 use crate::job::job_types::vc::so_vits_svc::so_vits_svc_inference_command::SoVitsSvcInferenceCommand;
 use crate::util::scoped_temp_dir_creator::ScopedTempDirCreator;
 use jobs_common::job_progress_reporter::job_progress_reporter::JobProgressReporterBuilder;
+use jobs_common::job_stats::JobStats;
 use jobs_common::semi_persistent_cache_dir::SemiPersistentCacheDir;
 use memory_caching::multi_item_ttl_cache::MultiItemTtlCache;
+use memory_caching::ttl_key_counter::TtlKeyCounter;
 use mysql_queries::common_inputs::container_environment_arg::ContainerEnvironmentArg;
 use mysql_queries::mediators::firehose_publisher::FirehosePublisher;
 use mysql_queries::queries::tts::tts_models::get_tts_model_for_inference_improved::TtsModelForInferenceRecord;
@@ -18,7 +19,6 @@ use r2d2_redis::RedisConnectionManager;
 use r2d2_redis::r2d2;
 use sqlx::MySqlPool;
 use std::path::PathBuf;
-use memory_caching::ttl_key_counter::TtlKeyCounter;
 
 pub struct JobDependencies {
   /// Filesystem info and utils

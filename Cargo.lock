@@ -3797,6 +3797,7 @@ dependencies = [
  "anyhow",
  "chrono",
  "container_common",
+ "errors",
  "log",
  "r2d2_redis",
  "redis_common",
