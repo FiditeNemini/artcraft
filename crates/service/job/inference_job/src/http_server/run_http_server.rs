@@ -27,6 +27,8 @@ pub fn run_http_server(args: CreateServerArgs) -> AnyhowResult<Server>
 
   let server_state = HttpServerSharedState {
     job_stats: args.job_stats.clone(),
+    consecutive_failure_unhealthy_threshold:
+      easyenv::get_env_num("CONSECUTIVE_FAILURE_UNHEALTHY_THRESHOLD", 3)?,
   };
 
   let server_state_arc = web::Data::new(Arc::new(server_state));

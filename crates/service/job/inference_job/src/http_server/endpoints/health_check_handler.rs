@@ -63,9 +63,6 @@ pub async fn get_health_check_handler(
         HealthCheckError::ServerError
       })?;
 
-  // TODO: Configurability
-  let is_healthy = job_stats.consecutive_failure_count < 10;
-
   let total_tries = job_stats.total_failure_count.saturating_add(job_stats.total_success_count);
 
   let total_success_ratio = if total_tries > 0 {
@@ -79,6 +76,9 @@ pub async fn get_health_check_handler(
   } else {
     0.0
   };
+
+  let is_healthy =
+      job_stats.consecutive_failure_count < server_state.consecutive_failure_unhealthy_threshold;
 
   let response = HealthCheckResponse {
     success: true,
