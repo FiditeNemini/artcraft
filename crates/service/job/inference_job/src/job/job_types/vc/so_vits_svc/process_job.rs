@@ -193,7 +193,7 @@ pub async fn process_job(args: SoVitsSvcProcessJobArgs<'_>) -> Result<JobSuccess
 
   let inference_start_time = Instant::now();
 
-  let model_check_result = args.job_dependencies
+  let command_exit_status = args.job_dependencies
       .job_type_details
       .so_vits_svc
       .inference_command
@@ -212,12 +212,12 @@ pub async fn process_job(args: SoVitsSvcProcessJobArgs<'_>) -> Result<JobSuccess
 
   info!("Inference took duration to complete: {:?}", &inference_duration);
 
-  if let Err(err) = model_check_result {
-    error!("Inference failed: {:?}", err);
+  if !command_exit_status.is_success() {
+    error!("Inference failed: {:?}", command_exit_status);
     safe_delete_temp_file(&input_wav_path);
     safe_delete_temp_file(&output_audio_fs_path);
     safe_delete_temp_directory(&work_temp_dir);
-    return Err(ProcessSingleJobError::Other(err));
+    return Err(ProcessSingleJobError::Other(anyhow!("CommandExitStatus: {:?}", command_exit_status)));
   }
 
   // ==================== CHECK ALL FILES EXIST AND GET METADATA ==================== //

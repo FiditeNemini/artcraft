@@ -12,6 +12,7 @@ use std::path::{Path, PathBuf};
 use std::time::Duration;
 use subprocess::{ExitStatus, Popen, PopenConfig, Redirection};
 use subprocess_common::docker_options::{DockerEnvVar, DockerFilesystemMount, DockerGpu, DockerOptions};
+use crate::job::job_loop::command_exit_status::CommandExitStatus;
 
 // These environment vars are not copied over to the subprocess
 // TODO/FIXME(bt, 2023-05-28): This is horrific security!
@@ -221,7 +222,17 @@ impl SoVitsSvcInferenceCommand {
   pub fn execute_inference<P: AsRef<Path>>(
     &self,
     args: InferenceArgs<P>,
-  ) -> AnyhowResult<()> {
+  ) -> CommandExitStatus {
+    match self.do_execute_inference(args) {
+      Ok(exit_status) => exit_status,
+      Err(error) => CommandExitStatus::FailureWithReason { reason: format!("error: {:?}", error) },
+    }
+  }
+
+  fn do_execute_inference<P: AsRef<Path>>(
+    &self,
+    args: InferenceArgs<P>,
+  ) -> AnyhowResult<CommandExitStatus> {
 
     let mut command = String::new();
     command.push_str(&format!("cd {}", path_to_string(&self.so_vits_svc_root_code_directory)));
@@ -380,21 +391,25 @@ impl SoVitsSvcInferenceCommand {
       None => {
         let exit_status = p.wait()?;
         info!("Subprocess exit status: {:?}", exit_status);
+        Ok(CommandExitStatus::from_exit_status(exit_status))
       }
       Some(timeout) => {
         info!("Executing with timeout: {:?}", &timeout);
         let exit_status = p.wait_timeout(timeout.clone())?;
 
-        if exit_status.is_none() {
-          // NB: If the program didn't successfully terminate, kill it.
-          info!("Subprocess didn't end after timeout: {:?}; terminating...", &timeout);
-          let _r = p.terminate()?;
-        } else {
-          info!("Subprocess timed wait exit status: {:?}", exit_status);
+        match exit_status {
+          None => {
+            // NB: If the program didn't successfully terminate, kill it.
+            info!("Subprocess didn't end after timeout: {:?}; terminating...", &timeout);
+            let _r = p.terminate()?;
+            Ok(CommandExitStatus::Timeout)
+          }
+          Some(exit_status) => {
+            info!("Subprocess timed wait exit status: {:?}", exit_status);
+            Ok(CommandExitStatus::from_exit_status(exit_status))
+          }
         }
       }
     }
-
-    Ok(())
   }
 }
