@@ -20,4 +20,5 @@
 
 pub mod extractors;
 pub mod middleware;
+pub mod response_serializers;
 pub mod route_builder;

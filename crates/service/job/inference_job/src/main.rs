@@ -17,9 +17,10 @@
 
 #[macro_use] extern crate serde_derive;
 
+pub mod http_server;
 pub mod job;
-pub mod util;
 pub mod job_dependencies;
+pub mod util;
 
 use bootstrap::bootstrap::{bootstrap, BootstrapArgs};
 use clap::{App, Arg};
@@ -54,6 +55,7 @@ use sqlx::mysql::MySqlPoolOptions;
 use std::path::PathBuf;
 use std::time::Duration;
 use subprocess_common::docker_options::{DockerEnvVar, DockerFilesystemMount, DockerGpu, DockerOptions};
+use crate::http_server::run_http_server::run_http_server;
 
 // Buckets (shared config)
 const ENV_ACCESS_KEY : &'static str = "ACCESS_KEY";
@@ -295,6 +297,8 @@ async fn main() -> AnyhowResult<()> {
       cluster_name: container_environment.cluster_name,
     },
   };
+
+  //run_http_server(&job_dependencies).await?;
 
   main_loop(job_dependencies).await;
 

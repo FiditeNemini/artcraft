@@ -32,7 +32,20 @@ impl JobStats {
          inner: Arc::new(RwLock::new(JobStatsInner::default())),
       }
    }
-   
+
+   pub fn get_status(&self) -> AnyhowResult<SuccessAndFailureStats> {
+      // NB: lock errors can't be moved between threads, so we change their type
+      let mut lock = self.inner.read()
+          .map_err(|e| anyhow!("lock read error: {:?}", e))?;
+
+      Ok(SuccessAndFailureStats {
+         total_success_count: lock.total_success_count,
+         total_failure_count: lock.total_failure_count,
+         consecutive_success_count: lock.consecutive_success_count,
+         consecutive_failure_count: lock.consecutive_failure_count,
+      })
+   }
+
    pub fn increment_failure_count(&self) -> AnyhowResult<SuccessAndFailureStats> {
       // NB: lock errors can't be moved between threads, so we change their type
       let mut lock = self.inner.write()

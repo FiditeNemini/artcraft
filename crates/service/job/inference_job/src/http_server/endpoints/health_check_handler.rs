@@ -1,0 +1,86 @@
+use actix_helpers::response_serializers::error_to_json_http_response::error_to_json_http_response;
+use actix_web::error::ResponseError;
+use actix_web::http::StatusCode;
+use actix_web::http::header::ContentType;
+use actix_web::{web, HttpResponse, HttpRequest};
+use crate::http_server::http_server_shared_state::HttpServerSharedState;
+use log::error;
+use std::sync::Arc;
+
+// =============== Success Response ===============
+
+#[derive(Serialize)]
+pub struct HealthCheckResponse {
+  pub success: bool,
+  pub is_healthy: bool,
+
+  pub consecutive_success_count: u64,
+  pub total_success_count: u64,
+
+  pub consecutive_failure_count: u64,
+  pub total_failure_count: u64,
+}
+
+
+// =============== Error Response ===============
+
+#[derive(Debug, Serialize)]
+pub enum HealthCheckError {
+  ServerError,
+}
+
+impl ResponseError for HealthCheckError {
+  fn status_code(&self) -> StatusCode {
+    match *self {
+      HealthCheckError::ServerError => StatusCode::INTERNAL_SERVER_ERROR,
+    }
+  }
+
+  fn error_response(&self) -> HttpResponse {
+    error_to_json_http_response(self)
+  }
+}
+
+// NB: Not using derive_more::Display since Clion doesn't understand it.
+impl std::fmt::Display for HealthCheckError {
+  fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+    write!(f, "{:?}", self)
+  }
+}
+
+// =============== Handler ===============
+
+pub async fn get_health_check_handler(
+  _http_request: HttpRequest,
+  server_state: web::Data<Arc<HttpServerSharedState>>
+) -> Result<HttpResponse, HealthCheckError> {
+  let job_stats = server_state.job_stats.get_status()
+      .map_err(|e| {
+        error!("Error serving health check status: {:?}", e);
+        HealthCheckError::ServerError
+      })?;
+
+  let is_healthy = job_stats.consecutive_failure_count < 10;
+
+  let response = HealthCheckResponse {
+    success: true,
+    is_healthy,
+    consecutive_failure_count: job_stats.consecutive_failure_count,
+    total_failure_count: job_stats.total_failure_count,
+    consecutive_success_count: job_stats.consecutive_success_count,
+    total_success_count: job_stats.total_success_count,
+  };
+
+  let body = serde_json::to_string(&response)
+      .map_err(|e| HealthCheckError::ServerError)?;
+
+  if is_healthy {
+    Ok(HttpResponse::Ok()
+        .content_type(ContentType::json())
+        .body(body))
+  } else {
+    Ok(HttpResponse::InternalServerError()
+        .content_type(ContentType::json())
+        .body(body))
+  }
+}

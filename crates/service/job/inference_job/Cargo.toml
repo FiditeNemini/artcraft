@@ -15,6 +15,7 @@ path = "src/main.rs"
 [dependencies]
 
 # Internal
+actix_helpers = { path = "../../../lib/actix_helpers" }
 bootstrap = { path = "../../../lib/bootstrap" }
 buckets = { path = "../../../_types/buckets" }
 cloud_storage = { path = "../../../lib/api_clients/cloud_storage" }
@@ -67,6 +68,9 @@ tokio = { version = "1.6.0", features = ["macros"] }
 # NB: Hyper is just for HTTP client use in jobs. I'd use Actix client, but I need tokio runtime
 # NB: Furthermore, the Tokio runtime is old, so I have to use an older Hyper.
 hyper = { version = "0.14.14" }
+
+# HTTP Server
+actix-web = "4.0.0-beta.10"
 
 # Serialization
 serde = "1.0.125"
