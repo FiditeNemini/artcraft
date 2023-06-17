@@ -14,11 +14,14 @@ pub struct HealthCheckResponse {
   pub success: bool,
   pub is_healthy: bool,
 
+  pub consecutive_failure_count: u64,
   pub consecutive_success_count: u64,
+
+  pub total_failure_count: u64,
   pub total_success_count: u64,
 
-  pub consecutive_failure_count: u64,
-  pub total_failure_count: u64,
+  pub total_failure_ratio: f32,
+  pub total_success_ratio: f32,
 }
 
 
@@ -60,15 +63,32 @@ pub async fn get_health_check_handler(
         HealthCheckError::ServerError
       })?;
 
+  // TODO: Configurability
   let is_healthy = job_stats.consecutive_failure_count < 10;
+
+  let total_tries = job_stats.total_failure_count.saturating_add(job_stats.total_success_count);
+
+  let total_success_ratio = if total_tries > 0 {
+    (job_stats.total_success_count as f32) / (total_tries as f32)
+  } else {
+    0.0
+  };
+
+  let total_failure_ratio = if total_tries > 0 {
+    1.0 - total_success_ratio
+  } else {
+    0.0
+  };
 
   let response = HealthCheckResponse {
     success: true,
     is_healthy,
     consecutive_failure_count: job_stats.consecutive_failure_count,
-    total_failure_count: job_stats.total_failure_count,
     consecutive_success_count: job_stats.consecutive_success_count,
+    total_failure_count: job_stats.total_failure_count,
     total_success_count: job_stats.total_success_count,
+    total_failure_ratio,
+    total_success_ratio,
   };
 
   let body = serde_json::to_string(&response)

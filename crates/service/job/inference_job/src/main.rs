@@ -56,6 +56,7 @@ use std::path::PathBuf;
 use std::time::Duration;
 use subprocess_common::docker_options::{DockerEnvVar, DockerFilesystemMount, DockerGpu, DockerOptions};
 use crate::http_server::run_http_server::run_http_server;
+use crate::http_server::run_http_server::CreateServerArgs;
 
 // Buckets (shared config)
 const ENV_ACCESS_KEY : &'static str = "ACCESS_KEY";
@@ -69,7 +70,8 @@ const ENV_PUBLIC_BUCKET_NAME : &'static str = "PUBLIC_BUCKET_NAME";
 // HTTP sidecar
 const ENV_TTS_INFERENCE_SIDECAR_HOSTNAME: &'static str = "TTS_INFERENCE_SIDECAR_HOSTNAME";
 
-#[tokio::main]
+//#[tokio::main]
+#[actix_web::main]
 async fn main() -> AnyhowResult<()> {
 
   let container_environment = bootstrap(BootstrapArgs {
@@ -225,6 +227,13 @@ async fn main() -> AnyhowResult<()> {
         }
       };
 
+  let job_stats = JobStats::new();
+
+  let create_server_args = CreateServerArgs {
+    container_environment: container_environment.clone(),
+    job_stats: job_stats.clone(),
+  };
+
   let job_dependencies = JobDependencies {
     fs: FileSystemDetails {
       temp_directory_downloads: temp_directory_downloads.clone(),
@@ -240,7 +249,7 @@ async fn main() -> AnyhowResult<()> {
     job_progress_reporter,
     public_bucket_client,
     private_bucket_client,
-    job_stats: JobStats::new(),
+    job_stats,
     newrelic_client,
     newrelic_disabled,
     worker_details: JobWorkerDetails {
@@ -298,7 +307,16 @@ async fn main() -> AnyhowResult<()> {
     },
   };
 
-  //run_http_server(&job_dependencies).await?;
+  std::thread::spawn(move || {
+    let http_server_handle = run_http_server(create_server_args);
+
+    let runtime = actix_web::rt::System::new();
+
+    runtime.block_on(http_server_handle)
+  });
+
+  //tokio::spawn(http_server_handle);
+
 
   main_loop(job_dependencies).await;
 
