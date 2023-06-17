@@ -18,7 +18,7 @@ pub struct CreateServerArgs {
   pub job_stats: JobStats,
 }
 
-pub async fn run_http_server(args: CreateServerArgs) -> AnyhowResult<Server>
+pub fn run_http_server(args: CreateServerArgs) -> AnyhowResult<Server>
 {
   // HTTP server args
   let bind_address = easyenv::get_env_string_or_default("HTTP_BIND_ADDRESS", DEFAULT_BIND_ADDRESS);
@@ -60,4 +60,9 @@ pub async fn run_http_server(args: CreateServerArgs) -> AnyhowResult<Server>
       .run();
 
   Ok(handle)
+}
+
+pub async fn launch_http_server(args: CreateServerArgs) -> AnyhowResult<()> {
+  run_http_server(args)?.await?;
+  Ok(())
 }

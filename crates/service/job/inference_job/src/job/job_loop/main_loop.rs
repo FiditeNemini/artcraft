@@ -25,7 +25,7 @@ pub async fn main_loop(job_dependencies: JobDependencies) {
   let mut sort_by_priority = true;
   let mut sort_by_priority_count = 0;
 
-  loop {
+  while !job_dependencies.application_shutdown.get() {
     if let Some(pause_file) = job_dependencies.fs.maybe_pause_file.as_deref() {
       while file_exists(pause_file) {
         warn!("Pause file exists. Pausing until deleted: {:?}", pause_file);
@@ -85,6 +85,8 @@ pub async fn main_loop(job_dependencies: JobDependencies) {
 
     std::thread::sleep(Duration::from_millis(job_dependencies.job_batch_wait_millis));
   }
+
+  warn!("Job runner main loop is shut down.");
 }
 
 // TODO: A common interface/trait for each submodule (tts, webvc) to declare how to determine if the job is "ready".

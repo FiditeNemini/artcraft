@@ -19,6 +19,7 @@ use r2d2_redis::RedisConnectionManager;
 use r2d2_redis::r2d2;
 use sqlx::MySqlPool;
 use std::path::PathBuf;
+use concurrency::relaxed_atomic_bool::RelaxedAtomicBool;
 
 pub struct JobDependencies {
   /// Filesystem info and utils
@@ -87,6 +88,10 @@ pub struct JobDependencies {
 
   pub container: ContainerEnvironment,
   pub container_db: ContainerEnvironmentArg, // Same info, but for database.
+
+  // The application can be shut down from another thread.
+  // Checking this will determine if the application needs to exit (true = exit).
+  pub application_shutdown: RelaxedAtomicBool,
 }
 
 pub struct FileSystemDetails {

@@ -26,11 +26,14 @@ use bootstrap::bootstrap::{bootstrap, BootstrapArgs};
 use clap::{App, Arg};
 use cloud_storage::bucket_client::BucketClient;
 use cloud_storage::bucket_path_unifier::BucketPathUnifier;
+use concurrency::relaxed_atomic_bool::RelaxedAtomicBool;
 use config::common_env::CommonEnv;
 use config::shared_constants::DEFAULT_MYSQL_CONNECTION_STRING;
 use config::shared_constants::DEFAULT_RUST_LOG;
 use container_common::anyhow_result::AnyhowResult;
 use container_common::filesystem::check_directory_exists::check_directory_exists;
+use crate::http_server::run_http_server::CreateServerArgs;
+use crate::http_server::run_http_server::launch_http_server;
 use crate::job::job_loop::main_loop::main_loop;
 use crate::job::job_types::tts::tacotron2_v2_early_fakeyou::tacotron2_inference_command::Tacotron2InferenceCommand;
 use crate::job::job_types::tts::vits::vits_inference_command::VitsInferenceCommand;
@@ -55,8 +58,6 @@ use sqlx::mysql::MySqlPoolOptions;
 use std::path::PathBuf;
 use std::time::Duration;
 use subprocess_common::docker_options::{DockerEnvVar, DockerFilesystemMount, DockerGpu, DockerOptions};
-use crate::http_server::run_http_server::run_http_server;
-use crate::http_server::run_http_server::CreateServerArgs;
 
 // Buckets (shared config)
 const ENV_ACCESS_KEY : &'static str = "ACCESS_KEY";
@@ -227,6 +228,10 @@ async fn main() -> AnyhowResult<()> {
         }
       };
 
+  // NB: Threading eats the Ctrl-C signal, so we're going to send application shutdown across
+  // threads with an atomic bool.
+  let application_shutdown = RelaxedAtomicBool::new(false);
+
   let job_stats = JobStats::new();
 
   let create_server_args = CreateServerArgs {
@@ -305,18 +310,19 @@ async fn main() -> AnyhowResult<()> {
       hostname: container_environment.hostname,
       cluster_name: container_environment.cluster_name,
     },
+    application_shutdown: application_shutdown.clone(),
   };
 
   std::thread::spawn(move || {
-    let http_server_handle = run_http_server(create_server_args);
+    let actix_runtime = actix_web::rt::System::new();
+    let http_server_handle = launch_http_server(create_server_args);
 
-    let runtime = actix_web::rt::System::new();
+    actix_runtime.block_on(http_server_handle)
+        .expect("HTTP server should not exit.");
 
-    runtime.block_on(http_server_handle)
+    warn!("Server thread is shut down.");
+    application_shutdown.set(true);
   });
-
-  //tokio::spawn(http_server_handle);
-
 
   main_loop(job_dependencies).await;
 
