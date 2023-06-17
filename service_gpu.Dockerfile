@@ -181,23 +181,27 @@ COPY crates/service/job/inference_job/config/inference-job.production.env .
 # Need python to make use of other containers' venv
 # TODO(bt,2023-04-26): This is only necessary for download-job and inference-job
 # NB(bt,2023-05-04): Installing lsof, htop, ripgrep, as debugging tools
-# net-tools: netstat, for debugging process network connections
-# psmisc: fuser, for determining which things users have opennetstat, for debugging process network connections
+# - net-tools: netstat, for debugging process network connections
+# - psmisc: fuser, for determining which things users have opennetstat, for debugging process network connections
+# - libnvidia-container: these are installed to attempt to fix https://github.com/NVIDIA/nvidia-docker/issues/1618#issuecomment-1120104007
 RUN apt-get update && DEBIAN_FRONTEND=noninteractive TZ=Etc/UTC apt-get install -y \
     ffmpeg \
     htop \
     less \
+    libnvidia-container-dev \
+    libnvidia-container-tools \
+    libnvidia-container1 \
     libsndfile1 \
     lsof \
-    psmisc \
     net-tools \
-    ripgrep \
-    tmux \
-    vim \
     nvidia-driver-530 \
+    psmisc \
     python3-pip \
     python3.10 \
     python3.10-venv \
+    ripgrep \
+    tmux \
+    vim \
     --no-install-recommends \
     && apt-get clean autoclean && apt-get autoremove -y && rm -rf /var/lib/{apt,dpkg,cache,log}/
 
