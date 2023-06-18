@@ -108,7 +108,8 @@ async fn process_job_batch(job_dependencies: &JobDependencies, jobs: Vec<Availab
         };
 
         if increment_success_count {
-          let _stats = job_dependencies.job_stats.increment_success_count().ok();
+          let stats = job_dependencies.job_stats.increment_success_count().ok();
+          warn!("Success stats: {:?}", stats);
         }
       },
       Err(e) => {
