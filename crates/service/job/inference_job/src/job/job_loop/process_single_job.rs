@@ -88,6 +88,8 @@ pub async fn process_single_job(
     return Ok(ProcessSingleJobSuccessCase::LockNotObtained)
   }
 
+  println!("\n  ----------------------------------------- JOB START -----------------------------------------  \n");
+
   info!("Beginning work on job ({}): {:?}", job.id.0, job.inference_job_token);
   info!("Job category: {:?}", job.inference_category);
   info!("Job model type: {:?}", job.maybe_model_type);
