@@ -10,6 +10,7 @@ use mysql_queries::queries::generic_inference::job::mark_generic_inference_job_c
 use mysql_queries::queries::generic_inference::job::mark_generic_inference_job_failure::mark_generic_inference_job_failure;
 use std::time::Duration;
 use filesys::file_exists::file_exists;
+use crate::job::job_loop::process_single_job_success_case::ProcessSingleJobSuccessCase;
 
 // Job runner timeouts (guards MySQL)
 const START_TIMEOUT_MILLIS : u64 = 500;
@@ -96,8 +97,19 @@ async fn process_job_batch(job_dependencies: &JobDependencies, jobs: Vec<Availab
   for job in jobs.into_iter() {
     let result = process_single_job(job_dependencies, &job).await;
     match result {
-      Ok(_) => {
-        let _stats = job_dependencies.job_stats.increment_success_count().ok();
+      Ok(success_case) => {
+        info!("Job loop iteration \"success\": {:?}", success_case);
+
+        let increment_success_count = match success_case {
+          ProcessSingleJobSuccessCase::JobCompleted => true,
+          ProcessSingleJobSuccessCase::JobTemporarilySkippedFilesAbsent => false,
+          ProcessSingleJobSuccessCase::JobSkippedForRoutingTagMismatch => false,
+          ProcessSingleJobSuccessCase::LockNotObtained => false,
+        };
+
+        if increment_success_count {
+          let _stats = job_dependencies.job_stats.increment_success_count().ok();
+        }
       },
       Err(e) => {
         warn!("Failure to process job: {:?}", e);
