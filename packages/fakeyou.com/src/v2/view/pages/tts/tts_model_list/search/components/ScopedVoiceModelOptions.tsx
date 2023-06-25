@@ -62,9 +62,10 @@ export function ScopedVoiceModelOptions(props: Props) {
     label: string;
     value: string;
     creatorName?: string;
+    modelType?: string;
   }
 
-  let options : DropdownOption[] = leafiestCategoryModels
+  let options: DropdownOption[] = leafiestCategoryModels
     .filter((ttsModel) => {
       // Scope to currently selected language
       if (props.selectedTtsLanguageScope === "*") {
@@ -79,6 +80,7 @@ export function ScopedVoiceModelOptions(props: Props) {
         label: ttsModel.title,
         value: ttsModel.model_token,
         creatorName: ttsModel.creator_display_name,
+        modelType: ttsModel.tts_model_type,
       };
     });
 
@@ -95,6 +97,7 @@ export function ScopedVoiceModelOptions(props: Props) {
       label: "Select voice...",
       value: "*",
       creatorName: undefined,
+      modelType: undefined,
     };
   }
 
@@ -111,6 +114,7 @@ export function ScopedVoiceModelOptions(props: Props) {
       label: "Loading...",
       value: "*",
       creatorName: undefined,
+      modelType: undefined,
     };
   } else if (options.length === 0) {
     // NB: Perhaps the user has refined their search to be too narrow (langauge + category)
@@ -118,6 +122,7 @@ export function ScopedVoiceModelOptions(props: Props) {
       label: "No results (remove some filters)",
       value: "*",
       creatorName: undefined,
+      modelType: undefined,
     };
   }
 
@@ -131,20 +136,29 @@ export function ScopedVoiceModelOptions(props: Props) {
   let select;
 
   // Function to build the options themselves, so we can introduce extra elements.
-  const formatOptionLabel = (data: DropdownOption, formatOptionLabelMeta: any) => {
-    let creatorName = <></>
+  const formatOptionLabel = (
+    data: DropdownOption,
+    formatOptionLabelMeta: any
+  ) => {
+    let creatorName = <></>;
     if (data.creatorName !== undefined) {
-      creatorName = (
-        <span className="opacity-50">
-        {" "} — {data.creatorName}
-        </span>
-      );
+      creatorName = <span className="opacity-50"> — {data.creatorName}</span>;
+    }
+    let modelType = <></>;
+    if (data.modelType !== undefined) {
+      if (data.modelType === "tacotron2") {
+        modelType = (
+          <span className="badge-model badge-model-tt2 ms-2">TT2</span>
+        );
+      }
     }
     return (
       <div>
-        {data.label}{creatorName}
+        {data.label}
+        {modelType}
+        {creatorName}
       </div>
-    )
+    );
   };
 
   // TODO: Cleanup
