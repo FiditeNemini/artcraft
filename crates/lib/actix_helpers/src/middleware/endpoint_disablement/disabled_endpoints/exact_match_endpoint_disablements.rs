@@ -41,6 +41,10 @@ impl ExactMatchEndpointDisablements {
   pub fn endpoint_is_disabled(&self, endpoint: &str) -> bool {
     self.endpoints.contains(endpoint)
   }
+
+  pub fn len(&self) -> usize {
+    self.endpoints.len()
+  }
 }
 
 #[cfg(test)]
@@ -62,5 +66,8 @@ pub mod tests {
     assert_eq!(endpoints.endpoint_is_disabled("/foo/"), false);
     assert_eq!(endpoints.endpoint_is_disabled("/foo/bar"), false);
     assert_eq!(endpoints.endpoint_is_disabled("/this/is/a/test/again"), false);
+
+    // Stats
+    assert_eq!(endpoints.len(), 2);
   }
 }

@@ -42,6 +42,10 @@ impl PrefixEndpointDisablements {
     self.endpoint_prefixes.iter()
         .any(|prefix| endpoint.starts_with(prefix))
   }
+
+  pub fn len(&self) -> usize {
+    self.endpoint_prefixes.len()
+  }
 }
 
 #[cfg(test)]
@@ -67,5 +71,8 @@ pub mod tests {
     assert_eq!(endpoints.endpoint_is_disabled("/"), false);
     assert_eq!(endpoints.endpoint_is_disabled("/bar"), false);
     assert_eq!(endpoints.endpoint_is_disabled("/this/is/not/a/test"), false);
+
+    // Metadata
+    assert_eq!(endpoints.len(), 2);
   }
 }
