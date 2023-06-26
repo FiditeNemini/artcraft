@@ -1,5 +1,5 @@
-use crate::middleware::ip_filter::ip_ban_list::ip_ban_list::IpBanList;
-use crate::middleware::ip_filter::ip_ban_list::load_ip_set_from_file::load_ip_set_from_file;
+use crate::middleware::banned_ip_filter::ip_ban_list::ip_ban_list::IpBanList;
+use crate::middleware::banned_ip_filter::ip_ban_list::load_ip_set_from_file::load_ip_set_from_file;
 use errors::AnyhowResult;
 use std::path::Path;
 
@@ -32,7 +32,7 @@ fn ignore_path(path: &Path) -> bool {
 #[cfg(test)]
 mod tests {
   use std::path::{Path, PathBuf};
-  use crate::middleware::ip_filter::ip_ban_list::load_ip_ban_list_from_directory::{ignore_path, load_ip_ban_list_from_directory};
+  use crate::middleware::banned_ip_filter::ip_ban_list::load_ip_ban_list_from_directory::{ignore_path, load_ip_ban_list_from_directory};
 
   fn test_file(path_from_repo_root: &str) -> PathBuf {
     // https://doc.rust-lang.org/cargo/reference/environment-variables.html

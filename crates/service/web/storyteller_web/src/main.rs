@@ -33,13 +33,16 @@ pub mod util;
 pub mod validations;
 
 use actix_cors::Cors;
+use actix_helpers::middleware::banned_cidr_filter::banned_cidr_filter::BannedCidrFilter;
+use actix_helpers::middleware::banned_cidr_filter::banned_cidr_set::BannedCidrSet;
+use actix_helpers::middleware::banned_cidr_filter::load_cidr_ban_set_from_file::load_cidr_ban_set_from_file;
+use actix_helpers::middleware::banned_ip_filter::banned_ip_filter::BannedIpFilter;
+use actix_helpers::middleware::banned_ip_filter::ip_ban_list::ip_ban_list::IpBanList;
+use actix_helpers::middleware::banned_ip_filter::ip_ban_list::load_ip_ban_list_from_directory::load_ip_ban_list_from_directory;
 use actix_helpers::middleware::endpoint_disablement::disabled_endpoints::disabled_endpoints::DisabledEndpoints;
 use actix_helpers::middleware::endpoint_disablement::disabled_endpoints::exact_match_endpoint_disablements::ExactMatchEndpointDisablements;
 use actix_helpers::middleware::endpoint_disablement::disabled_endpoints::prefix_endpoint_disablements::PrefixEndpointDisablements;
 use actix_helpers::middleware::endpoint_disablement::endpoint_disablement_middleware::EndpointDisablementFilter;
-use actix_helpers::middleware::ip_filter::ip_ban_list::ip_ban_list::IpBanList;
-use actix_helpers::middleware::ip_filter::ip_ban_list::load_ip_ban_list_from_directory::load_ip_ban_list_from_directory;
-use actix_helpers::middleware::ip_filter::ip_filter_middleware::IpFilter;
 use actix_http::http;
 use actix_web::middleware::{Logger, DefaultHeaders};
 use actix_web::{HttpServer, web, HttpResponse, App, middleware};
@@ -88,9 +91,6 @@ use sqlx::mysql::MySqlPoolOptions;
 use std::sync::Arc;
 use std::time::Duration;
 use tokio::runtime::Runtime;
-use actix_helpers::middleware::banned_cidr_filter::banned_cidr_filter::BannedCidrFilter;
-use actix_helpers::middleware::banned_cidr_filter::banned_cidr_set::BannedCidrSet;
-use actix_helpers::middleware::banned_cidr_filter::load_cidr_ban_set_from_file::load_cidr_ban_set_from_file;
 use twitch_common::twitch_secrets::TwitchSecrets;
 use url_config::third_party_url_redirector::ThirdPartyUrlRedirector;
 use users_component::utils::session_checker::SessionChecker;
@@ -625,7 +625,7 @@ pub async fn serve(server_state: ServerState) -> AnyhowResult<()>
         .header("X-Build-Sha", server_state_arc.server_info.build_sha.clone()))
       .wrap(PushbackFilter::new(&server_state_arc.flags.clone()))
       .wrap(EndpointDisablementFilter::new(disablements.clone()))
-      .wrap(IpFilter::new(ip_ban_list))
+      .wrap(BannedIpFilter::new(ip_ban_list))
       .wrap(BannedCidrFilter::new(cidr_ban_set))
       .wrap(Logger::new(&log_format)
         .exclude("/liveness")

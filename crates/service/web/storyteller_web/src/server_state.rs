@@ -1,5 +1,5 @@
 use actix_helpers::middleware::banned_cidr_filter::banned_cidr_set::BannedCidrSet;
-use actix_helpers::middleware::ip_filter::ip_ban_list::ip_ban_list::IpBanList;
+use actix_helpers::middleware::banned_ip_filter::ip_ban_list::ip_ban_list::IpBanList;
 use billing_component::stripe::stripe_config::StripeConfig;
 use cloud_storage::bucket_client::BucketClient;
 use crate::StaticApiTokenSet;

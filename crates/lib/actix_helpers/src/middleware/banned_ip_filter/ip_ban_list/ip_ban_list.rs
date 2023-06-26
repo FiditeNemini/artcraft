@@ -1,4 +1,4 @@
-use crate::middleware::ip_filter::ip_ban_list::ip_set::IpSet;
+use crate::middleware::banned_ip_filter::ip_ban_list::ip_set::IpSet;
 use errors::{anyhow, AnyhowResult};
 use std::collections::HashMap;
 use std::sync::{Arc, RwLock};
@@ -70,8 +70,8 @@ impl IpBanList {
 
 #[cfg(test)]
 mod tests {
-  use crate::middleware::ip_filter::ip_ban_list::ip_ban_list::IpBanList;
-  use crate::middleware::ip_filter::ip_ban_list::ip_set::IpSet;
+  use crate::middleware::banned_ip_filter::ip_ban_list::ip_ban_list::IpBanList;
+  use crate::middleware::banned_ip_filter::ip_ban_list::ip_set::IpSet;
 
   #[test]
   fn test_contains_ip() {

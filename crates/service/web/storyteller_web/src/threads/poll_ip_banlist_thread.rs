@@ -1,5 +1,5 @@
-use actix_helpers::middleware::ip_filter::ip_ban_list::ip_ban_list::IpBanList;
-use actix_helpers::middleware::ip_filter::ip_ban_list::ip_set::IpSet;
+use actix_helpers::middleware::banned_ip_filter::ip_ban_list::ip_ban_list::IpBanList;
+use actix_helpers::middleware::banned_ip_filter::ip_ban_list::ip_set::IpSet;
 use mysql_queries::queries::ip_bans::list_ip_bans::list_ip_bans;
 use errors::AnyhowResult;
 use log::{debug, error, info};
