@@ -1,4 +1,8 @@
 # (Attack on 2023-06-25, 120M+ requests over several IPs)
+# This is https://fakeyou.com/profile/casey123, which is the iMyPhone app.
+# They've been "using" us as a white label provider for their own TTS
+# for months. I'm tired of them pushing our service over for a
+# measly $25/mo.
 # ASN Information for 47.253.34.68
 # ASN: 45102
 # Organization: Alibaba US Technology Co. Ltd.
@@ -6,6 +10,7 @@
 47.252.0.0/15
 
 # (Attack on 2023-06-25, 7.18M requests)
+# This is https://fakeyou.com/profile/isams (???)
 # ASN Information for 23.94.202.37
 # ASN: 36352
 # Organization: ColoCrossing
@@ -15,4 +20,3 @@
 # ISP: RackNerd LLC
 # Domain: racknerd.com
 23.94.128.0/17
-
