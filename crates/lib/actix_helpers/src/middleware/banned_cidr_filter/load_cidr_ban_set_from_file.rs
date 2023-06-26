@@ -1,12 +1,12 @@
-use crate::middleware::cidr_filter::cidr_ban_set::CidrBanSet;
+use cidr_utils::cidr::IpCidr;
+use crate::middleware::banned_cidr_filter::banned_cidr_set::BannedCidrSet;
 use errors::AnyhowResult;
 use std::collections::HashSet;
 use std::fs::File;
 use std::io::{BufRead, BufReader};
 use std::path::Path;
-use cidr_utils::cidr::IpCidr;
 
-pub fn load_cidr_ban_set_from_file<P: AsRef<Path>>(path: P) -> AnyhowResult<CidrBanSet> {
+pub fn load_cidr_ban_set_from_file<P: AsRef<Path>>(path: P) -> AnyhowResult<BannedCidrSet> {
   let file = File::open(path)?;
   let reader = BufReader::new(file);
 
@@ -16,7 +16,7 @@ pub fn load_cidr_ban_set_from_file<P: AsRef<Path>>(path: P) -> AnyhowResult<Cidr
       .filter(|line| !(line.starts_with("#") || line.is_empty()))
       .collect::<HashSet<String>>();
 
-  let cidr_bans = CidrBanSet::new();
+  let cidr_bans = BannedCidrSet::new();
 
   for line in lines.iter() {
     let _ = cidr_bans.add_cidr(IpCidr::from_str(line)?)?;
@@ -27,11 +27,11 @@ pub fn load_cidr_ban_set_from_file<P: AsRef<Path>>(path: P) -> AnyhowResult<Cidr
 
 #[cfg(test)]
 mod tests {
-  use crate::middleware::cidr_filter::load_cidr_ban_set_from_file::load_cidr_ban_set_from_file;
+  use crate::middleware::banned_cidr_filter::load_cidr_ban_set_from_file::load_cidr_ban_set_from_file;
+  use errors::AnyhowResult;
   use std::net::IpAddr;
   use std::path::PathBuf;
   use std::str::FromStr;
-  use errors::AnyhowResult;
 
   fn test_file(path_from_repo_root: &str) -> PathBuf {
     // https://doc.rust-lang.org/cargo/reference/environment-variables.html

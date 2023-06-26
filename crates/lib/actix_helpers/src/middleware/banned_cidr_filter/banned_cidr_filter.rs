@@ -1,8 +1,8 @@
 use actix_web::Error;
 use actix_web::dev::{Service, Transform};
 use actix_web::dev::{ServiceRequest, ServiceResponse};
-use crate::middleware::cidr_filter::cidr_ban_set::CidrBanSet;
-use crate::middleware::cidr_filter::cidr_filter_middleware::CidrFilterMiddleware;
+use crate::middleware::banned_cidr_filter::banned_cidr_filter_middleware::BannedCidrFilterMiddleware;
+use crate::middleware::banned_cidr_filter::banned_cidr_set::BannedCidrSet;
 use futures_util::future::{ok, Ready};
 
 // There are two steps in middleware processing.
@@ -11,19 +11,19 @@ use futures_util::future::{ok, Ready};
 // 2. Middleware's call method gets called with normal request.
 
 #[derive(Clone)]
-pub struct CidrFilter {
-  cidr_bans: CidrBanSet,
+pub struct BannedCidrFilter {
+  cidr_bans: BannedCidrSet,
 }
 
-impl CidrFilter {
-  pub fn new(cidr_bans: CidrBanSet) -> Self {
+impl BannedCidrFilter {
+  pub fn new(cidr_bans: BannedCidrSet) -> Self {
     Self {
       cidr_bans,
     }
   }
 }
 
-impl<S> Transform<S, ServiceRequest> for CidrFilter
+impl<S> Transform<S, ServiceRequest> for BannedCidrFilter
   where
       S: Service<ServiceRequest, Response = ServiceResponse, Error = Error>,
       S::Future: 'static,
@@ -31,11 +31,11 @@ impl<S> Transform<S, ServiceRequest> for CidrFilter
   type Response = ServiceResponse;
   type Error = Error;
   type InitError = ();
-  type Transform = CidrFilterMiddleware<S>;
+  type Transform = BannedCidrFilterMiddleware<S>;
   type Future = Ready<Result<Self::Transform, Self::InitError>>;
 
   fn new_transform(&self, service: S) -> Self::Future {
-    ok(CidrFilterMiddleware { service, cidr_bans: self.cidr_bans.clone() })
+    ok(BannedCidrFilterMiddleware { service, cidr_bans: self.cidr_bans.clone() })
   }
 }
 

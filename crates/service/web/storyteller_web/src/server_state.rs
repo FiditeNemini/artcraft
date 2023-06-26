@@ -1,4 +1,4 @@
-use actix_helpers::middleware::cidr_filter::cidr_ban_set::CidrBanSet;
+use actix_helpers::middleware::banned_cidr_filter::banned_cidr_set::BannedCidrSet;
 use actix_helpers::middleware::ip_filter::ip_ban_list::ip_ban_list::IpBanList;
 use billing_component::stripe::stripe_config::StripeConfig;
 use cloud_storage::bucket_client::BucketClient;
@@ -73,7 +73,7 @@ pub struct ServerState {
 
   pub ip_ban_list: IpBanList,
 
-  pub cidr_ban_set: CidrBanSet,
+  pub cidr_ban_set: BannedCidrSet,
 
   pub troll_bans: TrollBans,
 

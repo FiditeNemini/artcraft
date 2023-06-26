@@ -33,9 +33,6 @@ pub mod util;
 pub mod validations;
 
 use actix_cors::Cors;
-use actix_helpers::middleware::cidr_filter::cidr_ban_set::CidrBanSet;
-use actix_helpers::middleware::cidr_filter::cidr_filter::CidrFilter;
-use actix_helpers::middleware::cidr_filter::load_cidr_ban_set_from_file::load_cidr_ban_set_from_file;
 use actix_helpers::middleware::endpoint_disablement::disabled_endpoints::disabled_endpoints::DisabledEndpoints;
 use actix_helpers::middleware::endpoint_disablement::disabled_endpoints::exact_match_endpoint_disablements::ExactMatchEndpointDisablements;
 use actix_helpers::middleware::endpoint_disablement::disabled_endpoints::prefix_endpoint_disablements::PrefixEndpointDisablements;
@@ -91,6 +88,9 @@ use sqlx::mysql::MySqlPoolOptions;
 use std::sync::Arc;
 use std::time::Duration;
 use tokio::runtime::Runtime;
+use actix_helpers::middleware::banned_cidr_filter::banned_cidr_filter::BannedCidrFilter;
+use actix_helpers::middleware::banned_cidr_filter::banned_cidr_set::BannedCidrSet;
+use actix_helpers::middleware::banned_cidr_filter::load_cidr_ban_set_from_file::load_cidr_ban_set_from_file;
 use twitch_common::twitch_secrets::TwitchSecrets;
 use url_config::third_party_url_redirector::ThirdPartyUrlRedirector;
 use users_component::utils::session_checker::SessionChecker;
@@ -524,14 +524,14 @@ fn load_static_container_ip_bans() -> IpBanList {
   ip_ban_list
 }
 
-fn load_cidr_bans() -> CidrBanSet {
+fn load_cidr_bans() -> BannedCidrSet {
   let cidr_ban_file = easyenv::get_env_string_or_default(
     "CIDR_BAN_FILE",
     "./container_includes/banned_cidrs/banned_cidrs.txt"
   );
 
   let cidr_bans = load_cidr_ban_set_from_file(cidr_ban_file)
-      .unwrap_or(CidrBanSet::new());
+      .unwrap_or(BannedCidrSet::new());
 
   info!("CIDR bans loaded : {} CIDRs, {} addresses total",
     cidr_bans.total_cidr_count().unwrap_or(0),
@@ -626,7 +626,7 @@ pub async fn serve(server_state: ServerState) -> AnyhowResult<()>
       .wrap(PushbackFilter::new(&server_state_arc.flags.clone()))
       .wrap(EndpointDisablementFilter::new(disablements.clone()))
       .wrap(IpFilter::new(ip_ban_list))
-      .wrap(CidrFilter::new(cidr_ban_set))
+      .wrap(BannedCidrFilter::new(cidr_ban_set))
       .wrap(Logger::new(&log_format)
         .exclude("/liveness")
         .exclude("/readiness"))

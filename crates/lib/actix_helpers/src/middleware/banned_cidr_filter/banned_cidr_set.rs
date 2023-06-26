@@ -7,11 +7,11 @@ use std::net::IpAddr;
 use std::sync::{Arc, RwLock};
 
 #[derive(Clone)]
-pub struct CidrBanSet {
+pub struct BannedCidrSet {
   cidr_set: Arc<RwLock<HashSet<IpCidr>>>
 }
 
-impl CidrBanSet {
+impl BannedCidrSet {
   pub fn new() -> Self {
     Self {
       cidr_set: Arc::new(RwLock::new(HashSet::new()))
@@ -69,7 +69,7 @@ impl CidrBanSet {
 #[cfg(test)]
 mod tests {
   use cidr_utils::cidr::IpCidr;
-  use crate::middleware::cidr_filter::cidr_ban_set::CidrBanSet;
+  use crate::middleware::banned_cidr_filter::banned_cidr_set::BannedCidrSet;
   use std::net::IpAddr;
   use std::str::FromStr;
   use errors::AnyhowResult;
@@ -84,7 +84,7 @@ mod tests {
 
   #[test]
   fn single_small_cidr_banned() -> AnyhowResult<()> {
-    let ban_set = CidrBanSet::new();
+    let ban_set = BannedCidrSet::new();
 
     ban_set.add_cidr(to_cidr("127.0.0.0/24")).expect("cdr add failed");
 
@@ -108,7 +108,7 @@ mod tests {
 
   #[test]
   fn single_big_cidr_banned() -> AnyhowResult<()> {
-    let ban_set = CidrBanSet::new();
+    let ban_set = BannedCidrSet::new();
 
     ban_set.add_cidr(to_cidr("127.0.0.0/8")).expect("cdr add failed");
 
@@ -139,7 +139,7 @@ mod tests {
 
   #[test]
   fn multiple_cidrs_banned() -> AnyhowResult<()> {
-    let ban_set = CidrBanSet::new();
+    let ban_set = BannedCidrSet::new();
 
     ban_set.add_cidr(to_cidr("127.0.0.0/24")).expect("cdr add failed");
     ban_set.add_cidr(to_cidr("192.168.1.0/24")).expect("cdr add failed");

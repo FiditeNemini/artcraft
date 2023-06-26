@@ -2,19 +2,19 @@ use actix_web::Error;
 use actix_web::dev::Service;
 use actix_web::dev::{ServiceRequest, ServiceResponse};
 use crate::extractors::get_service_request_ip_address::get_service_request_ip_address;
-use crate::middleware::cidr_filter::cidr_ban_set::CidrBanSet;
+use crate::middleware::banned_cidr_filter::banned_cidr_set::BannedCidrSet;
 use crate::middleware::ip_filter::banned_error::BannedError;
 use futures_util::future::{err, Either, Ready};
 use std::net::IpAddr;
 use std::str::FromStr;
 use std::task::{Context, Poll};
 
-pub struct CidrFilterMiddleware<S> {
+pub struct BannedCidrFilterMiddleware<S> {
   pub (crate) service: S,
-  pub (crate) cidr_bans: CidrBanSet,
+  pub (crate) cidr_bans: BannedCidrSet,
 }
 
-impl<S> Service<ServiceRequest> for CidrFilterMiddleware<S>
+impl<S> Service<ServiceRequest> for BannedCidrFilterMiddleware<S>
   where
       S: Service<ServiceRequest, Response = ServiceResponse, Error = Error>,
       S::Future: 'static,
