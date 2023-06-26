@@ -33,6 +33,9 @@ pub mod util;
 pub mod validations;
 
 use actix_cors::Cors;
+use actix_helpers::middleware::cidr_filter::cidr_ban_set::CidrBanSet;
+use actix_helpers::middleware::cidr_filter::cidr_filter::CidrFilter;
+use actix_helpers::middleware::cidr_filter::load_cidr_ban_set_from_file::load_cidr_ban_set_from_file;
 use actix_helpers::middleware::endpoint_disablement::disabled_endpoints::disabled_endpoints::DisabledEndpoints;
 use actix_helpers::middleware::endpoint_disablement::disabled_endpoints::exact_match_endpoint_disablements::ExactMatchEndpointDisablements;
 use actix_helpers::middleware::endpoint_disablement::disabled_endpoints::prefix_endpoint_disablements::PrefixEndpointDisablements;
@@ -49,6 +52,7 @@ use billing_component::stripe::traits::internal_product_to_stripe_lookup::Intern
 use billing_component::stripe::traits::internal_session_cache_purge::InternalSessionCachePurge;
 use billing_component::stripe::traits::internal_subscription_product_lookup::InternalSubscriptionProductLookup;
 use billing_component::stripe::traits::internal_user_lookup::InternalUserLookup;
+use bootstrap::bootstrap::{bootstrap, BootstrapArgs};
 use cloud_storage::bucket_client::BucketClient;
 use config::common_env::CommonEnv;
 use config::shared_constants::DEFAULT_MYSQL_CONNECTION_STRING;
@@ -67,6 +71,8 @@ use crate::threads::db_health_checker_thread::db_health_check_status::HealthChec
 use crate::threads::db_health_checker_thread::db_health_checker_thread::db_health_checker_thread;
 use crate::threads::poll_ip_banlist_thread::poll_ip_bans;
 use crate::util::encrypted_sort_id::SortKeyCrypto;
+use crate::util::troll_user_bans::load_troll_user_ban_list_from_directory::load_user_token_ban_list_from_directory;
+use crate::util::troll_user_bans::troll_user_ban_list::TrollUserBanList;
 use errors::AnyhowResult;
 use futures::Future;
 use http_server_common::cors::{build_cors_config, build_production_cors_config};
@@ -85,13 +91,10 @@ use sqlx::mysql::MySqlPoolOptions;
 use std::sync::Arc;
 use std::time::Duration;
 use tokio::runtime::Runtime;
-use bootstrap::bootstrap::{bootstrap, BootstrapArgs};
 use twitch_common::twitch_secrets::TwitchSecrets;
 use url_config::third_party_url_redirector::ThirdPartyUrlRedirector;
 use users_component::utils::session_checker::SessionChecker;
 use users_component::utils::session_cookie_manager::SessionCookieManager;
-use crate::util::troll_user_bans::load_troll_user_ban_list_from_directory::load_user_token_ban_list_from_directory;
-use crate::util::troll_user_bans::troll_user_ban_list::TrollUserBanList;
 
 const DEFAULT_BIND_ADDRESS : &'static str = "0.0.0.0:12345";
 
@@ -322,6 +325,8 @@ async fn main() -> AnyhowResult<()> {
   let ip_ban_list = load_static_container_ip_bans();
   let ip_ban_list2 = ip_ban_list.clone();
 
+  let cidr_ban_set = load_cidr_bans();
+
   let user_token_troll_bans = load_troll_user_token_bans();
   let ip_address_troll_bans = load_ip_address_troll_bans();
 
@@ -468,6 +473,7 @@ async fn main() -> AnyhowResult<()> {
       redirect_landing_finished_url: twitch_oauth_redirect_landing_finished_url,
     },
     ip_ban_list,
+    cidr_ban_set,
     troll_bans: TrollBans {
       user_tokens: user_token_troll_bans,
       ip_addresses: ip_address_troll_bans,
@@ -518,6 +524,22 @@ fn load_static_container_ip_bans() -> IpBanList {
   ip_ban_list
 }
 
+fn load_cidr_bans() -> CidrBanSet {
+  let cidr_ban_file = easyenv::get_env_string_or_default(
+    "CIDR_BAN_FILE",
+    "./container_includes/banned_cidrs/banned_cidrs.txt"
+  );
+
+  let cidr_bans = load_cidr_ban_set_from_file(cidr_ban_file)
+      .unwrap_or(CidrBanSet::new());
+
+  info!("CIDR bans loaded : {} CIDRs, {} addresses total",
+    cidr_bans.total_cidr_count().unwrap_or(0),
+    cidr_bans.total_ip_address_count().unwrap_or(0));
+
+  cidr_bans
+}
+
 // NB: Some users abuse our service.
 // Instead of outright banning them, we can change the function of the service.
 fn load_troll_user_token_bans() -> TrollUserBanList {
@@ -566,6 +588,7 @@ pub async fn serve(server_state: ServerState) -> AnyhowResult<()>
   HttpServer::new(move || {
     // NB: Safe to clone due to internal arc
     let ip_ban_list = server_state_arc.ip_ban_list.clone();
+    let cidr_ban_set= server_state_arc.cidr_ban_set.clone();
 
     // NB: Dynamic dispatch needs to be wrapped with Arc.
     let product_lookup : Arc<dyn InternalSubscriptionProductLookup> = Arc::new(StripeInternalSubscriptionProductLookupImpl {});
@@ -603,6 +626,7 @@ pub async fn serve(server_state: ServerState) -> AnyhowResult<()>
       .wrap(PushbackFilter::new(&server_state_arc.flags.clone()))
       .wrap(EndpointDisablementFilter::new(disablements.clone()))
       .wrap(IpFilter::new(ip_ban_list))
+      .wrap(CidrFilter::new(cidr_ban_set))
       .wrap(Logger::new(&log_format)
         .exclude("/liveness")
         .exclude("/readiness"))

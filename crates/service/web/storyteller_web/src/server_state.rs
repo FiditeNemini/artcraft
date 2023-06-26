@@ -1,3 +1,4 @@
+use actix_helpers::middleware::cidr_filter::cidr_ban_set::CidrBanSet;
 use actix_helpers::middleware::ip_filter::ip_ban_list::ip_ban_list::IpBanList;
 use billing_component::stripe::stripe_config::StripeConfig;
 use cloud_storage::bucket_client::BucketClient;
@@ -16,13 +17,13 @@ use mysql_queries::mediators::badge_granter::BadgeGranter;
 use mysql_queries::mediators::firehose_publisher::FirehosePublisher;
 use mysql_queries::queries::generic_inference::web::get_pending_inference_job_count::InferenceQueueLengthResult;
 use mysql_queries::queries::model_categories::list_categories_query_builder::CategoryList;
+use mysql_queries::queries::stats::get_unified_queue_stats::UnifiedQueueStatsResult;
 use mysql_queries::queries::tts::tts_inference_jobs::get_pending_tts_inference_job_count::TtsQueueLengthResult;
 use mysql_queries::queries::w2l::w2l_templates::list_w2l_templates::W2lTemplateRecordForList;
 use r2d2_redis::{r2d2, RedisConnectionManager};
 use redis_caching::redis_ttl_cache::RedisTtlCache;
 use reusable_types::server_environment::ServerEnvironment;
 use sqlx::MySqlPool;
-use mysql_queries::queries::stats::get_unified_queue_stats::UnifiedQueueStatsResult;
 use url_config::third_party_url_redirector::ThirdPartyUrlRedirector;
 use users_component::utils::session_checker::SessionChecker;
 use users_component::utils::session_cookie_manager::SessionCookieManager;
@@ -71,6 +72,8 @@ pub struct ServerState {
   pub sort_key_crypto: SortKeyCrypto,
 
   pub ip_ban_list: IpBanList,
+
+  pub cidr_ban_set: CidrBanSet,
 
   pub troll_bans: TrollBans,
 
