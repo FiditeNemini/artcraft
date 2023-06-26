@@ -1,0 +1,17 @@
+# (Attack on 2023-06-25, 120M+ requests over several IPs)
+# ASN Information for 47.253.34.68
+# ASN: 45102
+# Organization: Alibaba US Technology Co. Ltd.
+# ASN IP Range: 47.252.0.0/15
+47.252.0.0/15
+
+# (Attack on 2023-06-25, 7.18M requests)
+# ASN Information for 23.94.202.37
+# ASN: 36352
+# Organization: ColoCrossing
+# ASN IP Range: 23.94.128.0/17
+# Known Proxy: yes
+# Proxy Type: DCH
+# ISP: RackNerd LLC
+# Domain: racknerd.com
+23.94.128.0/17
