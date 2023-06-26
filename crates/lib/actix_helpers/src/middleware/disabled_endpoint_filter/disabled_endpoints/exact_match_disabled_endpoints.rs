@@ -4,20 +4,20 @@ use std::fs::File;
 use std::io::{BufRead, BufReader};
 use std::path::Path;
 
-pub struct PrefixEndpointDisablements {
-  endpoint_prefixes: HashSet<String>
+pub struct ExactMatchDisabledEndpoints {
+  endpoints: HashSet<String>
 }
 
-impl PrefixEndpointDisablements {
+impl ExactMatchDisabledEndpoints {
   pub fn new() -> Self {
     Self {
-      endpoint_prefixes: HashSet::new()
+      endpoints: HashSet::new()
     }
   }
 
-  pub fn from_set(endpoint_prefixes: HashSet<String>) -> Self {
+  pub fn from_set(endpoints: HashSet<String>) -> Self {
     Self {
-      endpoint_prefixes,
+      endpoints,
     }
   }
 
@@ -35,26 +35,25 @@ impl PrefixEndpointDisablements {
   }
 
   pub fn add_endpoint(&mut self, endpoint: String) -> bool {
-    self.endpoint_prefixes.insert(endpoint)
+    self.endpoints.insert(endpoint)
   }
 
   pub fn endpoint_is_disabled(&self, endpoint: &str) -> bool {
-    self.endpoint_prefixes.iter()
-        .any(|prefix| endpoint.starts_with(prefix))
+    self.endpoints.contains(endpoint)
   }
 
   pub fn len(&self) -> usize {
-    self.endpoint_prefixes.len()
+    self.endpoints.len()
   }
 }
 
 #[cfg(test)]
 pub mod tests {
-  use crate::middleware::endpoint_disablement::disabled_endpoints::prefix_endpoint_disablements::PrefixEndpointDisablements;
+  use crate::middleware::disabled_endpoint_filter::disabled_endpoints::exact_match_disabled_endpoints::ExactMatchDisabledEndpoints;
 
   #[test]
   fn test_endpoint_is_disabled() {
-    let mut endpoints = PrefixEndpointDisablements::new();
+    let mut endpoints = ExactMatchDisabledEndpoints::new();
     endpoints.add_endpoint("/foo".to_string());
     endpoints.add_endpoint("/this/is/a/test".to_string());
 
@@ -62,17 +61,13 @@ pub mod tests {
     assert_eq!(endpoints.endpoint_is_disabled("/foo"), true);
     assert_eq!(endpoints.endpoint_is_disabled("/this/is/a/test"), true);
 
-    // Also disabled due to "starts with"
-    assert_eq!(endpoints.endpoint_is_disabled("/foo/"), true);
-    assert_eq!(endpoints.endpoint_is_disabled("/foo/bar"), true);
-    assert_eq!(endpoints.endpoint_is_disabled("/this/is/a/test/again"), true);
-
     // Not disabled
-    assert_eq!(endpoints.endpoint_is_disabled("/"), false);
     assert_eq!(endpoints.endpoint_is_disabled("/bar"), false);
-    assert_eq!(endpoints.endpoint_is_disabled("/this/is/not/a/test"), false);
+    assert_eq!(endpoints.endpoint_is_disabled("/foo/"), false);
+    assert_eq!(endpoints.endpoint_is_disabled("/foo/bar"), false);
+    assert_eq!(endpoints.endpoint_is_disabled("/this/is/a/test/again"), false);
 
-    // Metadata
+    // Stats
     assert_eq!(endpoints.len(), 2);
   }
 }

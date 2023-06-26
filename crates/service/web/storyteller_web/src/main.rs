@@ -39,10 +39,6 @@ use actix_helpers::middleware::banned_cidr_filter::load_cidr_ban_set_from_file::
 use actix_helpers::middleware::banned_ip_filter::banned_ip_filter::BannedIpFilter;
 use actix_helpers::middleware::banned_ip_filter::ip_ban_list::ip_ban_list::IpBanList;
 use actix_helpers::middleware::banned_ip_filter::ip_ban_list::load_ip_ban_list_from_directory::load_ip_ban_list_from_directory;
-use actix_helpers::middleware::endpoint_disablement::disabled_endpoints::disabled_endpoints::DisabledEndpoints;
-use actix_helpers::middleware::endpoint_disablement::disabled_endpoints::exact_match_endpoint_disablements::ExactMatchEndpointDisablements;
-use actix_helpers::middleware::endpoint_disablement::disabled_endpoints::prefix_endpoint_disablements::PrefixEndpointDisablements;
-use actix_helpers::middleware::endpoint_disablement::endpoint_disablement_middleware::EndpointDisablementFilter;
 use actix_http::http;
 use actix_web::middleware::{Logger, DefaultHeaders};
 use actix_web::{HttpServer, web, HttpResponse, App, middleware};
@@ -91,6 +87,10 @@ use sqlx::mysql::MySqlPoolOptions;
 use std::sync::Arc;
 use std::time::Duration;
 use tokio::runtime::Runtime;
+use actix_helpers::middleware::disabled_endpoint_filter::disabled_endpoint_filter::DisabledEndpointFilter;
+use actix_helpers::middleware::disabled_endpoint_filter::disabled_endpoints::disabled_endpoints::DisabledEndpoints;
+use actix_helpers::middleware::disabled_endpoint_filter::disabled_endpoints::exact_match_disabled_endpoints::ExactMatchDisabledEndpoints;
+use actix_helpers::middleware::disabled_endpoint_filter::disabled_endpoints::prefix_disabled_endpoints::PrefixDisabledEndpoints;
 use twitch_common::twitch_secrets::TwitchSecrets;
 use url_config::third_party_url_redirector::ThirdPartyUrlRedirector;
 use users_component::utils::session_checker::SessionChecker;
@@ -498,15 +498,15 @@ fn read_disabled_endpoints() -> DisabledEndpoints {
     "DISABLED_ENDPOINTS_FILE_EXACT_MATCH",
     "./container_includes/disabled_endpoints/endpoint_exact_matches.txt");
 
-  let exact = ExactMatchEndpointDisablements::load_from_file(exact_filename)
-      .unwrap_or(ExactMatchEndpointDisablements::new()); // NB: Fail open
+  let exact = ExactMatchDisabledEndpoints::load_from_file(exact_filename)
+      .unwrap_or(ExactMatchDisabledEndpoints::new()); // NB: Fail open
 
   let prefix_filename = easyenv::get_env_string_or_default(
     "DISABLED_ENDPOINTS_FILE_PREFIX_MATCH",
     "./container_includes/disabled_endpoints/endpoint_prefixes.txt");
 
-  let prefix = PrefixEndpointDisablements::load_from_file(prefix_filename)
-      .unwrap_or(PrefixEndpointDisablements::new()); // NB: Fail open
+  let prefix = PrefixDisabledEndpoints::load_from_file(prefix_filename)
+      .unwrap_or(PrefixDisabledEndpoints::new()); // NB: Fail open
 
   info!("Disabled endpoints by exact match: {}", exact.len());
   info!("Disabled endpoints by prefix: {}", prefix.len());
@@ -627,7 +627,7 @@ pub async fn serve(server_state: ServerState) -> AnyhowResult<()>
         .header("X-Backend-Hostname", &hostname)
         .header("X-Build-Sha", server_state_arc.server_info.build_sha.clone()))
       .wrap(PushbackFilter::new(&server_state_arc.flags.clone()))
-      .wrap(EndpointDisablementFilter::new(disabled_endpoints.clone()))
+      .wrap(DisabledEndpointFilter::new(disabled_endpoints.clone()))
       .wrap(BannedIpFilter::new(ip_ban_list))
       .wrap(BannedCidrFilter::new(cidr_ban_set))
       .wrap(Logger::new(&log_format)
