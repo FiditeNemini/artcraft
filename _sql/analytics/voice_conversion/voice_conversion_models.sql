@@ -34,4 +34,5 @@ left join users AS u on
     u.token = vc.creator_user_token
 where
     vc.user_deleted_at IS NULL
-    and vc.mod_deleted_at IS NULL;
+    and vc.mod_deleted_at IS NULL
+order by vc.title DESC;
