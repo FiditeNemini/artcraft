@@ -35,4 +35,4 @@ left join users AS u on
 where
     vc.user_deleted_at IS NULL
     and vc.mod_deleted_at IS NULL
-order by vc.title DESC;
+order by vc.original_download_url ASC;

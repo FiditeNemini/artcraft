@@ -64,7 +64,28 @@ where token IN (
     'vcm_1h9b4v6nxmf5',
     'vcm_781bzn81qf6k',
     'vcm_w0xjjsexktby',
-    'vcm_awsq3q4c711w'
+    'vcm_awsq3q4c711w',
+    'vcm_kttxt7wgb6s6',
+    'vcm_ets26z5fpt8d',
+    'vcm_wjrw59wmwcrr',
+    'vcm_bebgka17n0sr',
+    'vcm_6mj0x3qd7yfd',
+    'vcm_b71ke4fm61nx',
+    'vcm_srz3gas5ra4d',
+    'vcm_k64jj2t2j05b',
+    'vcm_140rd035642m',
+    'vcm_5y93wgr90s91',
+    'vcm_jwp6p08byjn9',
+    'vcm_ets26z5fpt8d',
+    'vcm_7yfwzsyvrpq4',
+    'vcm_f1vq0hp0tes2',
+    'vcm_9f05kg36q4fg',
+    'vcm_1xs9c2sgykgy',
+    'vcm_hnd9z2fxq661',
+    'vcm_jxd74xhcszry',
+    'vcm_tvk0g6dwg3yv',
+    'vcm_vrsdv4ahterx',
+    'vcm_e2debszbm8vt'
 );
 
 -- Remove duplicate models
