@@ -21,6 +21,7 @@ interface Props {
 }
 
 function LeaderboardPage(props: Props) {
+  console.log('💥 seems good?');
   const [leaderboard, setLeaderboard] = useState<Leaderboard | undefined>(
     undefined
   );

@@ -8,7 +8,7 @@ import { ProfileW2lInferenceResultsListFc } from "./Profile_W2lInferenceResultLi
 import { ProfileW2lTemplateListFc } from "./Profile_W2lTemplateListFc";
 import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
 import { SessionSubscriptionsWrapper } from "@storyteller/components/src/session/SessionSubscriptionsWrapper";
-import { useParams } from "react-router-dom";
+import { Route, Switch, useParams, useRouteMatch } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faDiscord,
@@ -52,6 +52,7 @@ interface Props {
 
 function ProfilePage(this: any, props: Props) {
   const { username }: { username: string } = useParams();
+  let { path, url } = useRouteMatch();
 
   const [userData, setUserData] = useState<User | undefined>(undefined);
   const [notFoundState, setNotFoundState] = useState<boolean>(false);
@@ -341,16 +342,52 @@ function ProfilePage(this: any, props: Props) {
     profileRows.push(<div key="cashapp">{cashAppLink}</div>);
   }
 
-  let badges = <div>None yet</div>;
+  const Badges = ({}) => {
+    return userData.badges.length ? <ul>{userData.badges.map((badge) => <li key={badge.slug}>{badge.title}</li>)}</ul> : <div>None yet</div>
+  };
 
-  if (userData.badges.length !== 0) {
-    let badgeList: Array<JSX.Element> = [];
-    userData.badges.forEach((badge) => {
-      badgeList.push(<li key={badge.slug}>{badge.title}</li>);
-    });
-    badges = <ul>{badgeList}</ul>;
-  }
+  // let badges = <div>None yet</div>;
 
+  // if (userData.badges.length !== 0) {
+  //  let badgeList: Array<JSX.Element> = [];
+  //  userData.badges.forEach((badge) => {
+  //    badgeList.push(<li key={badge.slug}>{badge.title}</li>);
+  //  });
+  //  badges = <ul>{badgeList}</ul>;
+  // }
+
+  const Comments = (commentProps: any) => <div className="mt-3 mt-lg-0">
+    <CommentComponent { ...commentProps }/>
+  </div>;
+
+  const tabs = [
+    { Component: ProfileTtsInferenceResultsListFc, val: 'ttsresults', txt: 'TTS Results' },
+    { Component: ProfileW2lInferenceResultsListFc, val: 'w2lresults', txt: 'Lipsync Results' },
+    { Component: ProfileTtsModelListFc, val: 'uploadedtts', txt: 'Uploaded TTS Models' },
+    { Component: ProfileTtsModelListFc, val: 'uploadedw2l', txt: 'Uploaded Templates' },
+    { Component: Badges, val: 'badges', txt: 'Badges' },
+    { Component: Comments, val: 'comments', txt: 'Comments' }
+  ];
+
+  const tabLinks = tabs.map(({ val, txt },key) => <li {...{ className: 'nav-item', key, role: 'presentation' }}>
+    <Link {...{ 'aria-controls': val, 'aria-selected': true, className: 'nav-link active', id: `${val}-tab`, role: 'tab', to: `${url}/${val}` }}>
+        { txt }
+      </Link>
+  </li>);
+
+
+  const tabPanels = tabs.map(({ Component, val },key) => <Route {...{  key, path: `${path}/${val}` }}>
+    <div
+      // className="tab-pane fade p-3 p-lg-4"
+      // id="comments"
+      // role="tabpanel"
+      // aria-labelledby="comments-tab"
+    >
+      <Component username={userData.username}/>
+    </div>
+  </Route>);
+
+  console.log('🌎',url,tabPanels)
   return (
     <motion.div initial="hidden" animate="visible" variants={container}>
       <div className="container pt-5 pb-4 px-lg-5 px-xl-3">
@@ -407,146 +444,12 @@ function ProfilePage(this: any, props: Props) {
             id="myTab"
             role="tablist"
           >
-            <li className="nav-item" role="presentation">
-              <button
-                className="nav-link active"
-                id="ttsresults-tab"
-                data-bs-toggle="tab"
-                data-bs-target="#ttsresults"
-                type="button"
-                role="tab"
-                aria-controls="ttsresults"
-                aria-selected="true"
-              >
-                TTS Results
-              </button>
-            </li>
-            <li className="nav-item" role="presentation">
-              <button
-                className="nav-link"
-                id="w2lresults-tab"
-                data-bs-toggle="tab"
-                data-bs-target="#w2lresults"
-                type="button"
-                role="tab"
-                aria-controls="w2lresults"
-                aria-selected="false"
-              >
-                Lipsync Results
-              </button>
-            </li>
-            <li className="nav-item" role="presentation">
-              <button
-                className="nav-link"
-                id="uploadedtts-tab"
-                data-bs-toggle="tab"
-                data-bs-target="#uploadedtts"
-                type="button"
-                role="tab"
-                aria-controls="uploadedtts"
-                aria-selected="false"
-              >
-                Uploaded TTS Models
-              </button>
-            </li>
-            <li className="nav-item" role="presentation">
-              <button
-                className="nav-link"
-                id="uploadedw2l-tab"
-                data-bs-toggle="tab"
-                data-bs-target="#uploadedw2l"
-                type="button"
-                role="tab"
-                aria-controls="uploadedw2l"
-                aria-selected="false"
-              >
-                Uploaded Templates
-              </button>
-            </li>
-            <li className="nav-item" role="presentation">
-              <button
-                className="nav-link"
-                id="badges-tab"
-                data-bs-toggle="tab"
-                data-bs-target="#badges"
-                type="button"
-                role="tab"
-                aria-controls="badges"
-                aria-selected="false"
-              >
-                Badges
-              </button>
-            </li>
-            <li className="nav-item" role="presentation">
-              <button
-                className="nav-link"
-                id="comments-tab"
-                data-bs-toggle="tab"
-                data-bs-target="#comments"
-                type="button"
-                role="tab"
-                aria-controls="comments"
-                aria-selected="false"
-              >
-                Comments
-              </button>
-            </li>
+            { tabLinks }
           </ul>
           <div className="tab-content" id="myTabContent">
-            <div
-              className="tab-pane fade show active"
-              id="ttsresults"
-              role="tabpanel"
-              aria-labelledby="ttsresults-tab"
-            >
-              <ProfileTtsInferenceResultsListFc username={userData.username} />
-            </div>
-            <div
-              className="tab-pane fade p-3 p-lg-4"
-              id="w2lresults"
-              role="tabpanel"
-              aria-labelledby="w2lresults-tab"
-            >
-              <ProfileW2lInferenceResultsListFc username={userData.username} />
-            </div>
-            <div
-              className="tab-pane fade p-3 p-lg-4"
-              id="uploadedtts"
-              role="tabpanel"
-              aria-labelledby="uploadedtts-tab"
-            >
-              <ProfileTtsModelListFc username={userData.username} />
-            </div>
-            <div
-              className="tab-pane fade p-3 p-lg-4"
-              id="uploadedw2l"
-              role="tabpanel"
-              aria-labelledby="uploadedw2l-tab"
-            >
-              <ProfileW2lTemplateListFc username={userData.username} />
-            </div>
-            <div
-              className="tab-pane fade p-3 p-lg-4"
-              id="badges"
-              role="tabpanel"
-              aria-labelledby="badges-tab"
-            >
-              {badges}
-            </div>
-            <div
-              className="tab-pane fade p-3 p-lg-4"
-              id="comments"
-              role="tabpanel"
-              aria-labelledby="comments-tab"
-            >
-              <div className="mt-3 mt-lg-0">
-                <CommentComponent
-                  entityType="user"
-                  entityToken={userData?.user_token}
-                  sessionWrapper={props.sessionWrapper}
-                />
-              </div>
-            </div>
+            <Switch>
+              { tabPanels }
+            </Switch>
           </div>
         </div>
       </motion.div>
