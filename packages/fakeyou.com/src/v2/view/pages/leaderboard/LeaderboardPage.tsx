@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { WebUrl } from "../../../../common/WebUrl";
+import { WebUrl } from "common/WebUrl";
 import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
 import { Gravatar } from "@storyteller/components/src/elements/Gravatar";
 import {
@@ -13,8 +13,8 @@ import {
 } from "@storyteller/components/src/api/leaderboard/GetLeaderboard";
 import { DiscordLink2 } from "@storyteller/components/src/elements/DiscordLink2";
 import { motion } from "framer-motion";
-import { container, item, panel } from "../../../../data/animation";
-import { usePrefixedDocumentTitle } from "../../../../common/UsePrefixedDocumentTitle";
+import { container, item, panel } from "data/animation";
+import { usePrefixedDocumentTitle } from "common/UsePrefixedDocumentTitle";
 
 interface Props {
   sessionWrapper: SessionWrapper;
