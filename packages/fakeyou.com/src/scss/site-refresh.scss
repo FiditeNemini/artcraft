@@ -492,6 +492,10 @@ styles with important tags:
 
   .form-check {
     margin-bottom: 0.3rem;
+
+    .form-check-input {
+      margin-right: 10px;
+    }
   }
 
   .form-check-input:checked {
