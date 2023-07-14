@@ -17,3 +17,9 @@ update w2l_template_upload_jobs
 set status='dead'
 where status='pending'
   and download_url LIKE '%tiktok%';
+
+
+-- Kill all pending jobs
+update w2l_template_upload_jobs
+set status='dead'
+where status IN ('pending', 'started', 'attempt_failed');
