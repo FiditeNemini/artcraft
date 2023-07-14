@@ -490,6 +490,14 @@ styles with important tags:
     list-style: none;
   }
 
+  .form-check {
+    margin-bottom: 0.3rem;
+
+    .form-check-input {
+      margin-right: 10px;
+    }
+  }
+
   .form-check-input:checked {
     background-color: $primary;
     border-color: $primary;

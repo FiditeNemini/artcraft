@@ -77,6 +77,7 @@ import { VcModelListPage } from "./pages/vc/vc_model_list/VcModelListPage";
 import { UploadVoiceConversionModel } from "./pages/upload/UploadVoiceConversionModel";
 import { VoiceConversionModelListItem } from "@storyteller/components/src/api/voice_conversion/ListVoiceConversionModels";
 import { CommunityCommissionsPage } from "./pages/contest/CommunityCommissionsPage";
+import { ProductUsageInfoPage } from "./pages/product_usage_info/ProductUsageInfoPage";
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -492,6 +493,12 @@ class PageContainer extends React.Component<Props, State> {
 
             <Route path="/patrons">
               <PatronPage sessionWrapper={this.props.sessionWrapper} />
+            </Route>
+
+            <Route path="/product-usage">
+              <ProductUsageInfoPage
+                sessionWrapper={this.props.sessionWrapper}
+              />
             </Route>
 
             <Route path="/voice-conversion">
