@@ -12,6 +12,11 @@ use strum::EnumIter;
 #[cfg_attr(test, derive(EnumIter, EnumCount))]
 #[derive(Clone, Copy, Eq, PartialEq, Hash, Ord, PartialOrd, Deserialize, Serialize)]
 pub enum VoiceConversionModelType {
+  // We're skipping RVC "v1" models as "v2" are much higher quality.
+  // Future incompatible upgrades may deserve a different enum variant.
+  #[serde(rename = "rvc_v2")]
+  RvcV2,
+
   #[serde(rename = "soft_vc")]
   SoftVc,
 
@@ -27,6 +32,7 @@ impl_mysql_enum_coders!(VoiceConversionModelType);
 impl VoiceConversionModelType {
   pub fn to_str(&self) -> &'static str {
     match self {
+      Self::RvcV2 => "rvc_v2",
       Self::SoftVc => "soft_vc",
       Self::SoVitsSvc => "so_vits_svc",
     }
@@ -34,6 +40,7 @@ impl VoiceConversionModelType {
 
   pub fn from_str(value: &str) -> Result<Self, String> {
     match value {
+      "rvc_v2" => Ok(Self::RvcV2),
       "soft_vc" => Ok(Self::SoftVc),
       "so_vits_svc" => Ok(Self::SoVitsSvc),
       _ => Err(format!("invalid value: {:?}", value)),
@@ -44,6 +51,7 @@ impl VoiceConversionModelType {
     // NB: BTreeSet is sorted
     // NB: BTreeSet::from() isn't const, but not worth using LazyStatic, etc.
     BTreeSet::from([
+      Self::RvcV2,
       Self::SoftVc,
       Self::SoVitsSvc,
     ])
@@ -57,17 +65,21 @@ mod tests {
 
   #[test]
   fn test_serialization() {
+    assert_serialization(VoiceConversionModelType::RvcV2, "rvc_v2");
     assert_serialization(VoiceConversionModelType::SoftVc, "soft_vc");
     assert_serialization(VoiceConversionModelType::SoVitsSvc, "so_vits_svc");
   }
 
   #[test]
   fn to_str() {
+    assert_eq!(VoiceConversionModelType::RvcV2.to_str(), "rvc_v2");
+    assert_eq!(VoiceConversionModelType::SoftVc.to_str(), "soft_vc");
     assert_eq!(VoiceConversionModelType::SoVitsSvc.to_str(), "so_vits_svc");
   }
 
   #[test]
   fn from_str() {
+    assert_eq!(VoiceConversionModelType::from_str("rvc_v2").unwrap(), VoiceConversionModelType::RvcV2);
     assert_eq!(VoiceConversionModelType::from_str("soft_vc").unwrap(), VoiceConversionModelType::SoftVc);
     assert_eq!(VoiceConversionModelType::from_str("so_vits_svc").unwrap(), VoiceConversionModelType::SoVitsSvc);
   }
@@ -76,7 +88,8 @@ mod tests {
   fn all_variants() {
     // Static check
     let mut variants = VoiceConversionModelType::all_variants();
-    assert_eq!(variants.len(), 2);
+    assert_eq!(variants.len(), 3);
+    assert_eq!(variants.pop_first(), Some(VoiceConversionModelType::RvcV2));
     assert_eq!(variants.pop_first(), Some(VoiceConversionModelType::SoftVc));
     assert_eq!(variants.pop_first(), Some(VoiceConversionModelType::SoVitsSvc));
     assert_eq!(variants.pop_first(), None);

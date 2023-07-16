@@ -53,6 +53,9 @@ pub async fn determine_dependency_status(job_dependencies: &JobDependencies, job
     }
     MaybeInferenceModel::VcModel(ref model) => {
       match model.model_type {
+        VoiceConversionModelType::RvcV2 => {
+          None // TODO(bt, 2023-07-16): Handle RVCv2.
+        }
         VoiceConversionModelType::SoftVc => {
           None
         }

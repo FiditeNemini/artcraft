@@ -1,5 +1,4 @@
 use anyhow::anyhow;
-use chrono::Utc;
 use errors::AnyhowResult;
 use enums::common::visibility::Visibility;
 use sqlx::MySqlPool;
