@@ -4,6 +4,7 @@ use container_common::filesystem::safe_delete_temp_directory::safe_delete_temp_d
 use container_common::filesystem::safe_delete_temp_file::safe_delete_temp_file;
 use crate::JobState;
 use crate::job_loop::job_results::JobResults;
+use enums::by_table::voice_conversion_models::voice_conversion_model_type::VoiceConversionModelType;
 use enums::common::visibility::Visibility;
 use errors::AnyhowResult;
 use hashing::sha256::sha256_hash_file::sha256_hash_file;
@@ -15,7 +16,6 @@ use std::fs::File;
 use std::io::Read;
 use std::path::PathBuf;
 use tempdir::TempDir;
-use enums::by_table::voice_conversion_models::voice_conversion_model_type::VoiceConversionModelType;
 
 /// Returns the token of the entity.
 pub async fn process_softvc_model<'a, 'b>(

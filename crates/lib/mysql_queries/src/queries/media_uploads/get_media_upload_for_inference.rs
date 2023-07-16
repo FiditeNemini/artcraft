@@ -1,17 +1,13 @@
 use anyhow::anyhow;
 use chrono::{DateTime, Utc};
-use crate::helpers::boolean_converters::i8_to_bool;
 use crate::payloads::media_upload_modification_details::MediaUploadModificationDetails;
 use enums::by_table::media_uploads::media_upload_type::MediaUploadType;
-use enums::by_table::voice_conversion_models::voice_conversion_model_type::VoiceConversionModelType;
 use enums::common::visibility::Visibility;
 use errors::AnyhowResult;
-use log::{warn, info, error};
+use log::error;
 use sqlx::pool::PoolConnection;
 use sqlx::{MySql, MySqlPool};
 use tokens::files::media_upload::MediaUploadToken;
-use tokens::users::user::UserToken;
-use tokens::voice_conversion::model::VoiceConversionModelToken;
 
 pub struct MediaUploadRecordForInference {
   pub token: MediaUploadToken,

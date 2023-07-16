@@ -5,23 +5,16 @@ use container_common::filesystem::safe_delete_temp_file::safe_delete_temp_file;
 use crate::JobState;
 use crate::job_loop::job_results::JobResults;
 use crate::job_types::voice_conversion::so_vits_svc::so_vits_svc_model_check_command::{CheckArgs, Device};
-use enums::by_table::tts_models::tts_model_type::TtsModelType;
 use enums::by_table::voice_conversion_models::voice_conversion_model_type::VoiceConversionModelType;
 use enums::common::visibility::Visibility;
 use errors::AnyhowResult;
 use filesys::file_size::file_size;
-use filesys::filename_concat::{filename_concat, filename_concat_pathbuf};
 use hashing::sha256::sha256_hash_file::sha256_hash_file;
 use jobs_common::redis_job_status_logger::RedisJobStatusLogger;
 use log::{error, info, warn};
 use mysql_queries::queries::generic_download::job::list_available_generic_download_jobs::AvailableDownloadJob;
-use mysql_queries::queries::tts::tts_models::insert_tts_model_from_download_job::insert_tts_model_from_download_job;
-use mysql_queries::queries::tts::tts_models::insert_tts_model_from_download_job;
 use mysql_queries::queries::voice_conversion::models::insert_voice_conversion_model_from_download_job::{insert_voice_conversion_model_from_download_job, InsertVoiceConversionModelArgs};
-use std::fs::File;
-use std::io::Read;
-use std::path::{Path, PathBuf};
-use std::time::Duration;
+use std::path::PathBuf;
 use tempdir::TempDir;
 
 /// Returns the token of the entity.

@@ -4,7 +4,7 @@ use crate::helpers::boolean_converters::i8_to_bool;
 use enums::by_table::voice_conversion_models::voice_conversion_model_type::VoiceConversionModelType;
 use enums::common::visibility::Visibility;
 use errors::AnyhowResult;
-use log::{warn, info};
+use log::warn;
 use sqlx::pool::PoolConnection;
 use sqlx::{MySql, MySqlPool};
 use tokens::users::user::UserToken;
