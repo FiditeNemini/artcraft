@@ -28,6 +28,7 @@ function UploadVoiceConversionModel(props: Props) {
   const [title, setTitle] = useState("");
   const [downloadUrlInvalidReason] = useState("");
   const [titleInvalidReason] = useState("");
+  const [modelType, setModelType] = useState("so_vits_svc"); // valid options: "so_vits_svc", "rvc_v2"
 
   if (!props.sessionWrapper.isLoggedIn()) {
     return (
@@ -56,6 +57,10 @@ function UploadVoiceConversionModel(props: Props) {
     return false;
   };
 
+  const handleModelTypeChange = (ev: React.FormEvent<HTMLSelectElement>) => {
+    setModelType((ev.target as HTMLSelectElement).value);
+  };
+
   const handleTitleChange = (ev: React.FormEvent<HTMLInputElement>) => {
     ev.preventDefault();
     const titleValue = (ev.target as HTMLInputElement).value;
@@ -72,7 +77,7 @@ function UploadVoiceConversionModel(props: Props) {
       idempotency_token: idempotencyToken,
       title: title,
       download_url: downloadUrl,
-      generic_download_type: "so_vits_svc",
+      generic_download_type: modelType,
     };
 
     const response = await EnqueueRemoteDownload(request);
@@ -128,6 +133,30 @@ function UploadVoiceConversionModel(props: Props) {
         <div className="container-panel py-5">
           <div className="panel p-3 py-4 p-lg-4">
             <div className="d-flex flex-column gap-4">
+
+              {/* Model Type */}
+              <div>
+                <label className="sub-title">
+                  Voice-to-Voice Model Type
+                </label>
+                <div className="control select">
+                  <select
+                    className="form-select"
+                    name="tts_model_type"
+                    onChange={handleModelTypeChange}
+                    value={modelType}
+                  >
+                    <option value="so_vits_svc">
+                      so-vits-svc
+                    </option>
+                    <option value="rvc_v2">
+                      rvc (v2)
+                    </option>
+                  </select>
+                </div>
+              </div>
+
+              {/* Title */}
               <div>
                 <label className="sub-title">
                   Voice Conversion Title, eg. "Jim Varney", "Donald Trump", etc.
@@ -144,6 +173,7 @@ function UploadVoiceConversionModel(props: Props) {
                 <p className="help">{titleInvalidReason}</p>
               </div>
 
+              {/* Download URL */}
               <div>
                 <label className="sub-title">
                   Download URL, eg. Google Drive link
