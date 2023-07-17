@@ -28,6 +28,9 @@ pub async fn process_rvc_v2_model<'a, 'b>(
 
   // ==================== RUN MODEL CHECK ==================== //
 
+  // TODO: Unzip bundled index files.
+  // TODO: Handle models without an index file!? (Maybe we'll be lazy and _not_.)
+
   info!("Checking that model is valid...");
 
   redis_logger.log_status("checking rvc (v2) model")?;
@@ -35,16 +38,14 @@ pub async fn process_rvc_v2_model<'a, 'b>(
   let original_model_file_path = PathBuf::from("/home/bt/models/rvc_v2/AnneBoonchuy.pth");
   let original_model_index_file_path = PathBuf::from("/home/bt/models/rvc_v2/added_IVF119_Flat_nprobe_1_AnneBoonchuy_v2.index");
 
-  //let config_path = PathBuf::from("/models/voice_conversion/so-vits-svc/example_config.json"); // TODO: This could be variable.
-  //let input_wav_path = PathBuf::from("/models/voice_conversion/so-vits-svc/example.wav"); // TODO: This could be variable.
+  //let input_wav_path = PathBuf::from("input.wav"); // NB: Bundled with repo
   let output_wav_path = temp_dir.path().join("output.wav");
 
   let model_check_result = job_state.sidecar_configs.rvc_v2_model_check_command.execute_check(CheckArgs {
     model_path: &original_model_file_path,
     model_index_path: &original_model_index_file_path,
-    maybe_input_path: None,
+    maybe_input_path: None, //Some(&input_wav_path),
     output_path: &output_wav_path,
-    //maybe_config_path: None,
     //device: Device::Cuda,
   });
 

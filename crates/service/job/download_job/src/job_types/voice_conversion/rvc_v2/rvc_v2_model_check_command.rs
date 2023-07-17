@@ -126,7 +126,7 @@ impl RvcV2ModelCheckCommand {
     //    easyenv::get_env_pathbuf_optional("NLTK_DATA");
 
     let maybe_docker_options = easyenv::get_env_string_optional(
-      "SO_VITS_SVC_MODEL_CHECK_MAYBE_DOCKER_IMAGE")
+      "RVC_V2_MODEL_CHECK_MAYBE_DOCKER_IMAGE")
         .map(|image_name| {
           DockerOptions {
             image_name,
@@ -195,6 +195,9 @@ impl RvcV2ModelCheckCommand {
         None => return Err(anyhow!("no test wav path supplied")),
       }
     };
+
+    command.push_str(" --input_audio_filename ");
+    command.push_str(&path_to_string(input_path));
 
     // ===== End Python Args =====
 
