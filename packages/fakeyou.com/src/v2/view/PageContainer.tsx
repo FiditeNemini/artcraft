@@ -78,6 +78,7 @@ import { UploadVoiceConversionModel } from "./pages/upload/UploadVoiceConversion
 import { VoiceConversionModelListItem } from "@storyteller/components/src/api/voice_conversion/ListVoiceConversionModels";
 import { CommunityCommissionsPage } from "./pages/contest/CommunityCommissionsPage";
 import { ProductUsageInfoPage } from "./pages/product_usage_info/ProductUsageInfoPage";
+import { VoiceDesignerPage } from "./pages/voice_designer/VoiceDesignerPage";
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -543,6 +544,10 @@ class PageContainer extends React.Component<Props, State> {
 
             <Route path="/old">
               <VocodesPage />
+            </Route>
+
+            <Route path="/voice-designer">
+              <VoiceDesignerPage />
             </Route>
 
             <Route path="/character/donald-trump">
