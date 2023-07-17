@@ -34,6 +34,7 @@ use crate::job_types::tts::tacotron::tacotron_model_check_command::TacotronModel
 use crate::job_types::tts::vits::vits_model_check_command::VitsModelCheckCommand;
 use crate::job_types::vocoder::hifigan_softvc::hifigan_softvc_model_check_command::HifiGanSoftVcModelCheckCommand;
 use crate::job_types::vocoder::hifigan_tacotron::hifigan_model_check_command::HifiGanModelCheckCommand;
+use crate::job_types::voice_conversion::rvc_v2::rvc_v2_model_check_command::RvcV2ModelCheckCommand;
 use crate::job_types::voice_conversion::so_vits_svc::so_vits_svc_model_check_command::SoVitsSvcModelCheckCommand;
 use crate::job_types::voice_conversion::softvc::softvc_model_check_command::SoftVcModelCheckCommand;
 use errors::AnyhowResult;
@@ -327,6 +328,7 @@ async fn main() -> AnyhowResult<()> {
     badge_granter,
     sidecar_configs: SidecarConfigs {
       google_drive_downloader,
+      rvc_v2_model_check_command: RvcV2ModelCheckCommand::from_env()?,
       softvc_model_check_command,
       so_vits_svc_model_check_command: SoVitsSvcModelCheckCommand::from_env()?,
       tacotron_model_check_command,

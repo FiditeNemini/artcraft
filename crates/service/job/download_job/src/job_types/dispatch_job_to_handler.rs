@@ -9,6 +9,7 @@ use enums::by_table::generic_download_jobs::generic_download_type::GenericDownlo
 use jobs_common::redis_job_status_logger::RedisJobStatusLogger;
 use mysql_queries::queries::generic_download::job::list_available_generic_download_jobs::AvailableDownloadJob;
 use tempdir::TempDir;
+use crate::job_types::voice_conversion::rvc_v2::process_rvc_v2_model::process_rvc_v2_model;
 use crate::job_types::voice_conversion::so_vits_svc::process_so_vits_svc_model::process_so_vits_svc_model;
 
 pub struct DispatchJobToHandlerArgs<'a, 'b: 'a> {
@@ -57,6 +58,17 @@ pub async fn dispatch_job_to_handler<'a, 'b: 'a>(args: DispatchJobToHandlerArgs<
     }
     GenericDownloadType::RocketVc => {
       let results = process_softvc_model(
+        args.job_runner_state,
+        args.job,
+        args.temp_dir,
+        args.download_filename,
+        args.redis_logger,
+      ).await?;
+      entity_token = results.entity_token.clone();
+      entity_type = results.entity_type.clone();
+    }
+    GenericDownloadType::RvcV2 => {
+      let results = process_rvc_v2_model(
         args.job_runner_state,
         args.job,
         args.temp_dir,

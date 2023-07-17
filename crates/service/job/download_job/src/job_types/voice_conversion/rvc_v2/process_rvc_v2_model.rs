@@ -1,0 +1,140 @@
+use anyhow::anyhow;
+use container_common::filesystem::check_file_exists::check_file_exists;
+use container_common::filesystem::safe_delete_temp_directory::safe_delete_temp_directory;
+use container_common::filesystem::safe_delete_temp_file::safe_delete_temp_file;
+use crate::JobState;
+use crate::job_loop::job_results::JobResults;
+use crate::job_types::voice_conversion::rvc_v2::rvc_v2_model_check_command::CheckArgs;
+use crockford::crockford_entropy_lower;
+use enums::by_table::voice_conversion_models::voice_conversion_model_type::VoiceConversionModelType;
+use enums::common::visibility::Visibility;
+use errors::AnyhowResult;
+use filesys::file_size::file_size;
+use jobs_common::redis_job_status_logger::RedisJobStatusLogger;
+use log::{error, info, warn};
+use mysql_queries::queries::generic_download::job::list_available_generic_download_jobs::AvailableDownloadJob;
+use mysql_queries::queries::voice_conversion::models::insert_voice_conversion_model_from_download_job::{insert_voice_conversion_model_from_download_job, InsertVoiceConversionModelArgs};
+use std::path::PathBuf;
+use tempdir::TempDir;
+
+/// Returns the token of the entity.
+pub async fn process_rvc_v2_model<'a, 'b>(
+  job_state: &JobState,
+  job: &AvailableDownloadJob,
+  temp_dir: &TempDir,
+  download_filename: &str,
+  redis_logger: &'a mut RedisJobStatusLogger<'b>,
+) -> AnyhowResult<JobResults> {
+
+  // ==================== RUN MODEL CHECK ==================== //
+
+  info!("Checking that model is valid...");
+
+  redis_logger.log_status("checking rvc (v2) model")?;
+
+  let original_model_file_path = PathBuf::from("/home/bt/models/rvc_v2/AnneBoonchuy.pth");
+  let original_model_index_file_path = PathBuf::from("/home/bt/models/rvc_v2/added_IVF119_Flat_nprobe_1_AnneBoonchuy_v2.index");
+
+  //let config_path = PathBuf::from("/models/voice_conversion/so-vits-svc/example_config.json"); // TODO: This could be variable.
+  //let input_wav_path = PathBuf::from("/models/voice_conversion/so-vits-svc/example.wav"); // TODO: This could be variable.
+  let output_wav_path = temp_dir.path().join("output.wav");
+
+  let model_check_result = job_state.sidecar_configs.rvc_v2_model_check_command.execute_check(CheckArgs {
+    model_path: &original_model_file_path,
+    model_index_path: &original_model_index_file_path,
+    maybe_input_path: None,
+    output_path: &output_wav_path,
+    //maybe_config_path: None,
+    //device: Device::Cuda,
+  });
+
+  if let Err(e) = model_check_result {
+    safe_delete_temp_file(&original_model_file_path);
+    safe_delete_temp_file(&original_model_index_file_path);
+    safe_delete_temp_file(&output_wav_path);
+    safe_delete_temp_directory(&temp_dir);
+    return Err(anyhow!("model check error: {:?}", e));
+  }
+
+  // ==================== CHECK ALL FILES EXIST AND GET METADATA ==================== //
+
+  info!("Checking that output wav file exists...");
+
+  check_file_exists(&output_wav_path)?;
+
+  let file_size_bytes = file_size(&original_model_file_path)?;
+
+  // ==================== UPLOAD ORIGINAL MODEL FILE ==================== //
+
+  info!("Uploading rvc (v2) voice conversion model to GCS...");
+
+  //let private_bucket_hash = sha256_hash_file(&download_filename)?;
+  let private_bucket_hash = crockford_entropy_lower(64);
+
+  info!("Entropic bucket hash: {}", private_bucket_hash);
+
+  let model_bucket_path = job_state.bucket_path_unifier.rvc_v2_model_path(&private_bucket_hash);
+  let model_index_bucket_path = job_state.bucket_path_unifier.rvc_v2_model_index_path(&private_bucket_hash);
+
+  info!("Destination bucket path (model): {:?}", &model_bucket_path);
+  info!("Destination bucket path (index): {:?}", &model_index_bucket_path);
+
+  redis_logger.log_status("uploading rvc (v2) TTS model")?;
+
+  if let Err(err) = job_state.bucket_client.upload_filename(&model_bucket_path, &original_model_file_path).await {
+    error!("Problem uploading model file: {:?}", err);
+    safe_delete_temp_file(&original_model_file_path);
+    safe_delete_temp_file(&original_model_index_file_path);
+    safe_delete_temp_file(&output_wav_path);
+    safe_delete_temp_directory(&temp_dir);
+    return Err(err);
+  }
+
+  if let Err(err) = job_state.bucket_client.upload_filename(&model_index_bucket_path, &original_model_index_file_path).await {
+    error!("Problem uploading index file: {:?}", err);
+    safe_delete_temp_file(&original_model_file_path);
+    safe_delete_temp_file(&original_model_index_file_path);
+    safe_delete_temp_file(&output_wav_path);
+    safe_delete_temp_directory(&temp_dir);
+    return Err(err);
+  }
+
+  // ==================== DELETE DOWNLOADED FILE ==================== //
+
+  // NB: We should be using a tempdir, but to make absolutely certain we don't overflow the disk...
+  info!("Done uploading; deleting temporary files and paths...");
+  safe_delete_temp_file(&original_model_file_path);
+  safe_delete_temp_file(&original_model_index_file_path);
+  safe_delete_temp_file(&output_wav_path);
+  safe_delete_temp_directory(&temp_dir);
+
+  // ==================== SAVE RECORDS ==================== //
+
+  info!("Saving Voice Conversion model record...");
+
+  let (_id, model_token) = insert_voice_conversion_model_from_download_job(InsertVoiceConversionModelArgs {
+    model_type: VoiceConversionModelType::RvcV2,
+    title: &job.title,
+    original_download_url: &job.download_url,
+    original_filename: &download_filename,
+    file_size_bytes,
+    creator_user_token: &job.creator_user_token,
+    creator_ip_address: &job.creator_ip_address,
+    creator_set_visibility: Visibility::Public, // TODO: All models default to public at start
+    private_bucket_hash: &private_bucket_hash,
+    private_bucket_object_name: "", // TODO: This should go away.
+    mysql_pool: &job_state.mysql_pool,
+  }).await?;
+
+  job_state.badge_granter.maybe_grant_voice_conversion_model_uploads_badge(&job.creator_user_token)
+      .await
+      .map_err(|e| {
+        warn!("error maybe awarding badge: {:?}", e);
+        anyhow!("error maybe awarding badge")
+      })?;
+
+  Ok(JobResults {
+    entity_token: Some(model_token.to_string()),
+    entity_type: Some(VoiceConversionModelType::RvcV2.to_string()), // NB: This may be different from `GenericDownloadType` in the future!
+  })
+}

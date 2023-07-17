@@ -7,7 +7,7 @@ use subprocess_common::docker_options::DockerOptions;
 /// This command is used to check softvc for being a real model
 #[derive(Clone)]
 pub struct SoftVcModelCheckCommand {
-  /// Where the Tacotron code lives
+  /// Where the code lives
   softvc_root_code_directory: String,
   
   /// eg. `source python/bin/activate`

@@ -38,6 +38,11 @@ pub enum GenericDownloadType {
   #[sqlx(rename = "rocket_vc")]
   RocketVc,
 
+  /// RVC (v2) voice conversion models
+  #[serde(rename = "rvc_v2")]
+  #[sqlx(rename = "rvc_v2")]
+  RvcV2,
+
   /// so-vits-svc voice conversion models
   #[serde(rename = "so_vits_svc")]
   #[sqlx(rename = "so_vits_svc")]
@@ -62,6 +67,7 @@ impl GenericDownloadType {
       Self::HifiGanRocketVc => "hifigan_rocket_vc",
       Self::HifiGanSoVitsSvc => "hifigan_so_vits_svc",
       Self::RocketVc => "rocket_vc",
+      Self::RvcV2 => "rvc_v2",
       Self::SoVitsSvc => "so_vits_svc",
       Self::Tacotron2 => "tacotron2",
       Self::Vits => "vits",
@@ -74,6 +80,7 @@ impl GenericDownloadType {
       "hifigan_rocket_vc" => Ok(Self::HifiGanRocketVc),
       "hifigan_so_vits_svc" => Ok(Self::HifiGanSoVitsSvc),
       "rocket_vc" => Ok(Self::RocketVc),
+      "rvc_v2" => Ok(Self::RvcV2),
       "so_vits_svc" => Ok(Self::SoVitsSvc),
       "tacotron2" => Ok(Self::Tacotron2),
       "vits" => Ok(Self::Vits),
@@ -93,6 +100,7 @@ mod tests {
     assert_serialization(GenericDownloadType::HifiGanRocketVc, "hifigan_rocket_vc");
     assert_serialization(GenericDownloadType::HifiGanSoVitsSvc, "hifigan_so_vits_svc");
     assert_serialization(GenericDownloadType::RocketVc, "rocket_vc");
+    assert_serialization(GenericDownloadType::RvcV2, "rvc_v2");
     assert_serialization(GenericDownloadType::SoVitsSvc, "so_vits_svc");
     assert_serialization(GenericDownloadType::Tacotron2, "tacotron2");
     assert_serialization(GenericDownloadType::Vits, "vits");
@@ -104,6 +112,7 @@ mod tests {
     assert_eq!(GenericDownloadType::HifiGanRocketVc.to_str(), "hifigan_rocket_vc");
     assert_eq!(GenericDownloadType::HifiGanSoVitsSvc.to_str(), "hifigan_so_vits_svc");
     assert_eq!(GenericDownloadType::RocketVc.to_str(), "rocket_vc");
+    assert_eq!(GenericDownloadType::RvcV2.to_str(), "rvc_v2");
     assert_eq!(GenericDownloadType::SoVitsSvc.to_str(), "so_vits_svc");
     assert_eq!(GenericDownloadType::Tacotron2.to_str(), "tacotron2");
     assert_eq!(GenericDownloadType::Vits.to_str(), "vits");
@@ -115,6 +124,7 @@ mod tests {
     assert_eq!(GenericDownloadType::from_str("hifigan_rocket_vc").unwrap(), GenericDownloadType::HifiGanRocketVc);
     assert_eq!(GenericDownloadType::from_str("hifigan_so_vits_svc").unwrap(), GenericDownloadType::HifiGanSoVitsSvc);
     assert_eq!(GenericDownloadType::from_str("rocket_vc").unwrap(), GenericDownloadType::RocketVc);
+    assert_eq!(GenericDownloadType::from_str("rvc_v2").unwrap(), GenericDownloadType::RvcV2);
     assert_eq!(GenericDownloadType::from_str("so_vits_svc").unwrap(), GenericDownloadType::SoVitsSvc);
     assert_eq!(GenericDownloadType::from_str("tacotron2").unwrap(), GenericDownloadType::Tacotron2);
     assert_eq!(GenericDownloadType::from_str("vits").unwrap(), GenericDownloadType::Vits);

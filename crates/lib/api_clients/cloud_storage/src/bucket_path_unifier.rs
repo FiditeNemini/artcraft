@@ -18,6 +18,7 @@ pub struct BucketPathUnifier {
   pub w2l_model_root: PathBuf,
   pub w2l_end_bump_root: PathBuf,
   // VC
+  pub rvc_v2_model_root: PathBuf,
   pub softvc_model_root: PathBuf,
   pub so_vits_svc_model_root: PathBuf,
   pub vc_inference_output_root: PathBuf,
@@ -39,6 +40,7 @@ impl BucketPathUnifier {
       w2l_model_root: PathBuf::from("/w2l_pretrained_models"),
       w2l_end_bump_root: PathBuf::from("/w2l_end_bumps"),
       // VC
+      rvc_v2_model_root: PathBuf::from("/user_uploaded_rvc_v2_models"),
       softvc_model_root: PathBuf::from("/user_uploaded_softvc_models"),
       so_vits_svc_model_root: PathBuf::from("/user_uploaded_so_vits_svc_models"),
       vc_inference_output_root: PathBuf::from("/vc_inference_output"),
@@ -197,6 +199,26 @@ impl BucketPathUnifier {
 
   // ==================== VOICE CONVERSION MODELS ==================== //
 
+  // NB: Entropic hash is not based on file hash and is shared between .pth and .index files.
+  pub fn rvc_v2_model_index_path(&self, entropic_hash: &str) -> PathBuf {
+    let hashed_path = Self::hashed_directory_path(entropic_hash);
+    let model_index_filename = format!("{}.index", &entropic_hash);
+
+    self.rvc_v2_model_root
+        .join(hashed_path)
+        .join(model_index_filename)
+  }
+
+  // NB: Entropic hash is not based on file hash and is shared between .pth and .index files.
+  pub fn rvc_v2_model_path(&self, entropic_hash: &str) -> PathBuf {
+    let hashed_path = Self::hashed_directory_path(entropic_hash);
+    let model_filename = format!("{}.pt", &entropic_hash);
+
+    self.rvc_v2_model_root
+        .join(hashed_path)
+        .join(model_filename)
+  }
+
   // NB: Callers use "hash_file_sha2" as the file hash.
   pub fn softvc_model_path(&self, softvc_model_file_hash: &str) -> PathBuf {
     let hashed_path = Self::hashed_directory_path(softvc_model_file_hash);
@@ -256,6 +278,7 @@ mod tests {
       w2l_model_root: PathBuf::from("/test_path_w2l_pretrained_models"),
       w2l_end_bump_root: PathBuf::from("/test_path_w2l_end_bumps"),
       // VOICE CONVERSION
+      rvc_v2_model_root: PathBuf::from("/test_path_rvc_v2_models"),
       softvc_model_root: PathBuf::from("/test_path_softvc_models"),
       so_vits_svc_model_root: PathBuf::from("/test_path_so_vits_svc_models"),
       vc_inference_output_root: PathBuf::from("/test_path_vc_output"),
@@ -357,6 +380,17 @@ mod tests {
     // It also handles capitalization
     assert_eq!(paths.w2l_inference_video_output_path("TYPE:ABCDEF").to_str().unwrap(),
                "/test_path_w2l_output/a/b/c/vocodes_video_TYPEABCDEF.mp4");
+  }
+
+  #[test]
+  fn test_rvc_model_and_index_paths() {
+    let paths = get_instance();
+    let entropic_hash = "entropic";
+    assert_eq!(paths.rvc_v2_model_path(entropic_hash).to_str().unwrap(),
+               "/test_path_rvc_v2_models/e/n/t/entropic.pt");
+
+    assert_eq!(paths.rvc_v2_model_index_path(entropic_hash).to_str().unwrap(),
+               "/test_path_rvc_v2_models/e/n/t/entropic.index");
   }
 
   #[test]

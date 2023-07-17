@@ -5,6 +5,7 @@ use crate::job_types::tts::tacotron::tacotron_model_check_command::TacotronModel
 use crate::job_types::tts::vits::vits_model_check_command::VitsModelCheckCommand;
 use crate::job_types::vocoder::hifigan_softvc::hifigan_softvc_model_check_command::HifiGanSoftVcModelCheckCommand;
 use crate::job_types::vocoder::hifigan_tacotron::hifigan_model_check_command::HifiGanModelCheckCommand;
+use crate::job_types::voice_conversion::rvc_v2::rvc_v2_model_check_command::RvcV2ModelCheckCommand;
 use crate::job_types::voice_conversion::so_vits_svc::so_vits_svc_model_check_command::SoVitsSvcModelCheckCommand;
 use crate::job_types::voice_conversion::softvc::softvc_model_check_command::SoftVcModelCheckCommand;
 use google_drive_common::google_drive_download_command::GoogleDriveDownloadCommand;
@@ -50,6 +51,7 @@ pub struct JobState {
 /// Configurations and interfaces to code deployed as sidecars or container mounts.
 pub struct SidecarConfigs {
   pub google_drive_downloader: GoogleDriveDownloadCommand,
+  pub rvc_v2_model_check_command: RvcV2ModelCheckCommand,
   pub softvc_model_check_command: SoftVcModelCheckCommand,
   pub so_vits_svc_model_check_command: SoVitsSvcModelCheckCommand,
   pub tacotron_model_check_command: TacotronModelCheckCommand,

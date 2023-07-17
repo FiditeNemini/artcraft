@@ -2340,6 +2340,7 @@ dependencies = [
  "cloud_storage",
  "config",
  "container_common",
+ "crockford",
  "dotenv",
  "easyenv",
  "enums",
