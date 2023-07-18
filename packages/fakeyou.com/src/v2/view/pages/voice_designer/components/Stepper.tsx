@@ -31,7 +31,7 @@ const Stepper: React.FC<StepperProps> = ({ steps, currentStep }) => {
           </div>
           {index !== steps.length - 1 && (
             <div
-              className={`stepper-line ${index < currentStep ? "active" : ""}`}
+              className={`stepper-line ${index <= currentStep ? "active" : ""}`}
             />
           )}
         </div>

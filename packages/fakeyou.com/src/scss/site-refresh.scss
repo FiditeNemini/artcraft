@@ -1170,6 +1170,14 @@ styles with important tags:
     }
   }
 
+  .file-size {
+    font-size: 14px;
+    color: rgba($white, 0.75);
+    padding: 4px 8px;
+    border-radius: 5px;
+    background-color: $secondary;
+  }
+
   .nav-vc {
     flex-wrap: nowrap;
     height: auto;
@@ -1327,6 +1335,10 @@ styles with important tags:
     font-weight: 500 !important;
   }
 
+  .bg-stepper {
+    background-color: lighten($panel, 4%);
+  }
+
   .stepper-container {
     width: 100%;
     display: flex;
@@ -1334,14 +1346,14 @@ styles with important tags:
     align-items: center;
 
     .stepper-number {
-      font-size: 16px;
+      font-size: 22px;
       font-weight: 600;
       display: flex;
       align-items: center;
       justify-content: center;
-      width: 32px;
-      height: 32px;
-      min-width: 32px;
+      width: 36px;
+      height: 36px;
+      min-width: 36px;
       background-color: $secondary;
       border-radius: 48px;
       opacity: 0.4;
@@ -1370,6 +1382,7 @@ styles with important tags:
       height: 3px;
       background: $secondary;
       transition: all 0.2s;
+      min-width: 80px;
 
       &.active {
         background-color: $primary;
@@ -1498,6 +1511,11 @@ textarea {
 
     .p-lg-4 {
       padding: 2rem !important;
+    }
+
+    .px-lg-4 {
+      padding-left: 2rem !important;
+      padding-right: 2rem !important;
     }
 
     .lead {
