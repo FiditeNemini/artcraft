@@ -34,3 +34,4 @@ build_shared_sqlite_database_library() {
 
 build_shared_mysql_database_library
 build_shared_sqlite_database_library
+
