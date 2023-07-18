@@ -54,12 +54,20 @@ function VoiceDesignerPage(this: any) {
 
       <Panel>
         {/* Stepper */}
-        <Stepper steps={steps} currentStep={currentStep} />
+        <div className="p-3 px-lg-4 bg-stepper">
+          <Stepper steps={steps} currentStep={currentStep} />
+        </div>
 
-        <div className="my-4">{displayStep(currentStep)}</div>
+        <div className="p-3 py-4 p-md-4">{displayStep(currentStep)}</div>
 
         {/* Navigation Controls */}
-        <StepperControls onBack={handleBack} onNext={handleNext} />
+
+        <StepperControls
+          steps={steps}
+          currentStep={currentStep}
+          onBack={handleBack}
+          onNext={handleNext}
+        />
       </Panel>
     </motion.div>
   );
