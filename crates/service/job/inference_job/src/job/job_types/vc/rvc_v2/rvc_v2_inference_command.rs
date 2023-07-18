@@ -57,12 +57,12 @@ pub enum ExecutableOrCommand {
   Command(String),
 }
 
-pub struct InferenceArgs<P: AsRef<Path>> {
+pub struct InferenceArgs<P: AsRef<Path>, Q: AsRef<Path>> {
   /// --model_path: model path
   pub model_path: P,
 
   /// --model_index_path: model index path
-  pub model_index_path: P,
+  pub maybe_model_index_path: Option<Q>,
 
   /// --input_audio_filename: input wav path
   pub input_path: P,
@@ -141,9 +141,9 @@ impl RvcV2InferenceCommand {
     })
   }
 
-  pub fn execute_inference<P: AsRef<Path>>(
+  pub fn execute_inference<P: AsRef<Path>, Q: AsRef<Path>>(
     &self,
-    args: InferenceArgs<P>,
+    args: InferenceArgs<P, Q>,
   ) -> CommandExitStatus {
     match self.do_execute_inference(args) {
       Ok(exit_status) => exit_status,
@@ -151,9 +151,9 @@ impl RvcV2InferenceCommand {
     }
   }
 
-  fn do_execute_inference<P: AsRef<Path>>(
+  fn do_execute_inference<P: AsRef<Path>, Q: AsRef<Path>>(
     &self,
-    args: InferenceArgs<P>,
+    args: InferenceArgs<P, Q>,
   ) -> AnyhowResult<CommandExitStatus> {
 
     let mut command = String::new();
@@ -185,8 +185,10 @@ impl RvcV2InferenceCommand {
     command.push_str(" --model_path ");
     command.push_str(&path_to_string(args.model_path));
 
-    command.push_str(" --model_index_path ");
-    command.push_str(&path_to_string(args.model_index_path));
+    if let Some(model_index_path) = args.maybe_model_index_path {
+      command.push_str(" --model_index_path ");
+      command.push_str(&path_to_string(model_index_path));
+    }
 
     command.push_str(" --input_audio_filename ");
     command.push_str(&path_to_string(args.input_path));

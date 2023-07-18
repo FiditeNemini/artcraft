@@ -50,12 +50,12 @@ pub enum ExecutableOrCommand {
 //  Cpu,
 //}
 
-pub struct CheckArgs<P: AsRef<Path>> {
+pub struct CheckArgs<P: AsRef<Path>, Q: AsRef<Path>> {
   /// --model_path: model path
   pub model_path: P,
 
   /// --model_index_path: model index path
-  pub model_index_path: P,
+  pub maybe_model_index_path: Option<Q>,
 
   /// --input_audio_filename: input wav path
   /// If absent, we'll use a default test wav file
@@ -148,9 +148,9 @@ impl RvcV2ModelCheckCommand {
     })
   }
 
-  pub fn execute_check<P: AsRef<Path>>(
+  pub fn execute_check<P: AsRef<Path>, Q: AsRef<Path>>(
     &self,
-    args: CheckArgs<P>,
+    args: CheckArgs<P, Q>,
   ) -> AnyhowResult<()> {
 
     let mut command = String::new();
@@ -182,8 +182,10 @@ impl RvcV2ModelCheckCommand {
     command.push_str(" --model_path ");
     command.push_str(&path_to_string(args.model_path));
 
-    command.push_str(" --model_index_path ");
-    command.push_str(&path_to_string(args.model_index_path));
+    if let Some(model_index_path) = args.maybe_model_index_path {
+      command.push_str(" --model_index_path ");
+      command.push_str(&path_to_string(model_index_path));
+    }
 
     command.push_str(" --output_audio_filename ");
     command.push_str(&path_to_string(args.output_path));

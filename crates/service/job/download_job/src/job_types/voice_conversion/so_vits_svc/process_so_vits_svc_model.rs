@@ -104,6 +104,7 @@ pub async fn process_so_vits_svc_model<'a, 'b>(
     creator_user_token: &job.creator_user_token,
     creator_ip_address: &job.creator_ip_address,
     creator_set_visibility: Visibility::Public, // TODO: All models default to public at start
+    has_index_file: false,
     private_bucket_hash: &private_bucket_hash,
     private_bucket_object_name: "", // TODO: This should go away.
     mysql_pool: &job_state.mysql_pool,

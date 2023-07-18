@@ -16,6 +16,7 @@ use mysql_queries::queries::generic_download::job::list_available_generic_downlo
 use mysql_queries::queries::voice_conversion::models::insert_voice_conversion_model_from_download_job::{insert_voice_conversion_model_from_download_job, InsertVoiceConversionModelArgs};
 use std::path::PathBuf;
 use tempdir::TempDir;
+use container_common::filesystem::safe_delete_possible_temp_file::safe_delete_possible_temp_file;
 
 /// Returns the token of the entity.
 pub async fn process_rvc_v2_model<'a, 'b>(
@@ -36,14 +37,15 @@ pub async fn process_rvc_v2_model<'a, 'b>(
   redis_logger.log_status("checking rvc (v2) model")?;
 
   let original_model_file_path = PathBuf::from("/home/bt/models/rvc_v2/AnneBoonchuy.pth");
-  let original_model_index_file_path = PathBuf::from("/home/bt/models/rvc_v2/added_IVF119_Flat_nprobe_1_AnneBoonchuy_v2.index");
+  //let original_model_index_file_path = PathBuf::from("/home/bt/models/rvc_v2/added_IVF119_Flat_nprobe_1_AnneBoonchuy_v2.index");
+  let original_model_index_file_path : Option<PathBuf> = None;
 
   //let input_wav_path = PathBuf::from("input.wav"); // NB: Bundled with repo
   let output_wav_path = temp_dir.path().join("output.wav");
 
   let model_check_result = job_state.sidecar_configs.rvc_v2_model_check_command.execute_check(CheckArgs {
     model_path: &original_model_file_path,
-    model_index_path: &original_model_index_file_path,
+    maybe_model_index_path: original_model_index_file_path.as_deref(),
     maybe_input_path: None, //Some(&input_wav_path),
     output_path: &output_wav_path,
     //device: Device::Cuda,
@@ -51,7 +53,7 @@ pub async fn process_rvc_v2_model<'a, 'b>(
 
   if let Err(e) = model_check_result {
     safe_delete_temp_file(&original_model_file_path);
-    safe_delete_temp_file(&original_model_index_file_path);
+    safe_delete_possible_temp_file(original_model_index_file_path.as_deref());
     safe_delete_temp_file(&output_wav_path);
     safe_delete_temp_directory(&temp_dir);
     return Err(anyhow!("model check error: {:?}", e));
@@ -69,35 +71,40 @@ pub async fn process_rvc_v2_model<'a, 'b>(
 
   info!("Uploading rvc (v2) voice conversion model to GCS...");
 
-  //let private_bucket_hash = sha256_hash_file(&download_filename)?;
   let private_bucket_hash = crockford_entropy_lower(64);
 
   info!("Entropic bucket hash: {}", private_bucket_hash);
 
   let model_bucket_path = job_state.bucket_path_unifier.rvc_v2_model_path(&private_bucket_hash);
-  let model_index_bucket_path = job_state.bucket_path_unifier.rvc_v2_model_index_path(&private_bucket_hash);
 
   info!("Destination bucket path (model): {:?}", &model_bucket_path);
-  info!("Destination bucket path (index): {:?}", &model_index_bucket_path);
 
   redis_logger.log_status("uploading rvc (v2) TTS model")?;
 
   if let Err(err) = job_state.bucket_client.upload_filename(&model_bucket_path, &original_model_file_path).await {
     error!("Problem uploading model file: {:?}", err);
     safe_delete_temp_file(&original_model_file_path);
-    safe_delete_temp_file(&original_model_index_file_path);
+    safe_delete_possible_temp_file(original_model_index_file_path.as_deref());
     safe_delete_temp_file(&output_wav_path);
     safe_delete_temp_directory(&temp_dir);
     return Err(err);
   }
 
-  if let Err(err) = job_state.bucket_client.upload_filename(&model_index_bucket_path, &original_model_index_file_path).await {
-    error!("Problem uploading index file: {:?}", err);
-    safe_delete_temp_file(&original_model_file_path);
-    safe_delete_temp_file(&original_model_index_file_path);
-    safe_delete_temp_file(&output_wav_path);
-    safe_delete_temp_directory(&temp_dir);
-    return Err(err);
+  // ==================== UPLOAD ORIGINAL MODEL INDEX FILE ==================== //
+
+  if let Some(original_index_file_path) = original_model_index_file_path.as_deref() {
+    let model_index_bucket_path = job_state.bucket_path_unifier.rvc_v2_model_index_path(&private_bucket_hash);
+
+    info!("Destination bucket path (index): {:?}", &model_index_bucket_path);
+
+    if let Err(err) = job_state.bucket_client.upload_filename(&model_index_bucket_path, &original_index_file_path).await {
+      error!("Problem uploading index file: {:?}", err);
+      safe_delete_temp_file(&original_model_file_path);
+      safe_delete_temp_file(&original_index_file_path);
+      safe_delete_temp_file(&output_wav_path);
+      safe_delete_temp_directory(&temp_dir);
+      return Err(err);
+    }
   }
 
   // ==================== DELETE DOWNLOADED FILE ==================== //
@@ -105,7 +112,7 @@ pub async fn process_rvc_v2_model<'a, 'b>(
   // NB: We should be using a tempdir, but to make absolutely certain we don't overflow the disk...
   info!("Done uploading; deleting temporary files and paths...");
   safe_delete_temp_file(&original_model_file_path);
-  safe_delete_temp_file(&original_model_index_file_path);
+  safe_delete_possible_temp_file(original_model_index_file_path.as_deref());
   safe_delete_temp_file(&output_wav_path);
   safe_delete_temp_directory(&temp_dir);
 
@@ -122,6 +129,7 @@ pub async fn process_rvc_v2_model<'a, 'b>(
     creator_user_token: &job.creator_user_token,
     creator_ip_address: &job.creator_ip_address,
     creator_set_visibility: Visibility::Public, // TODO: All models default to public at start
+    has_index_file: original_model_index_file_path.is_some(),
     private_bucket_hash: &private_bucket_hash,
     private_bucket_object_name: "", // TODO: This should go away.
     mysql_pool: &job_state.mysql_pool,

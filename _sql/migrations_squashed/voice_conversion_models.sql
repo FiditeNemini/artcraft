@@ -39,6 +39,12 @@ CREATE TABLE voice_conversion_models (
   -- (Not that it matters apart from categorization, since voice conversion is universal.)
   ietf_primary_language_subtag VARCHAR(12) NOT NULL DEFAULT 'en',
 
+  -- ========== EXTRA MODEL INFO ==========
+
+  -- RVC (v2) specific - whether the model has an index file associated with it
+  -- These files improve the quality of the results.
+  has_index_file BOOLEAN NOT NULL DEFAULT FALSE,
+
   -- ========== MODEL PLACEMENT ==========
 
   -- Whether the voice features on the front of FakeYou

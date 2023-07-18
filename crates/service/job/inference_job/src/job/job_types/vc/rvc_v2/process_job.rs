@@ -1,3 +1,4 @@
+use std::path::PathBuf;
 use anyhow::anyhow;
 use buckets::public::media_uploads::original_file::MediaUploadOriginalFilePath;
 use buckets::public::voice_conversion_results::original_file::VoiceConversionResultOriginalFilePath;
@@ -73,33 +74,36 @@ pub async fn process_job(args: RvcV2ProcessJobArgs<'_>) -> Result<JobSuccessResu
 
   // ==================== CONFIRM OR DOWNLOAD RVC (v2) MODEL INDICES ==================== //
 
-  // TODO: Index files are optional
+  // Index files are optional
+  let mut maybe_rvc_v2_model_index_fs_path: Option<PathBuf> = None;
 
-  let rvc_v2_model_index_fs_path = {
-    let filename = format!("{}.index", vc_model.token.as_str());
-    let fs_path = args.job_dependencies.fs.semi_persistent_cache.voice_conversion_model_path(&filename);
+  if vc_model.has_index_file {
+    maybe_rvc_v2_model_index_fs_path = {
+      let filename = format!("{}.index", vc_model.token.as_str());
+      let fs_path = args.job_dependencies.fs.semi_persistent_cache.voice_conversion_model_path(&filename);
 
-    create_dir_all_if_missing(args.job_dependencies.fs.semi_persistent_cache.voice_conversion_model_directory())
-        .map_err(|e| {
-          error!("could not create model storage directory: {:?}", e);
-          ProcessSingleJobError::from_io_error(e)
-        })?;
+      create_dir_all_if_missing(args.job_dependencies.fs.semi_persistent_cache.voice_conversion_model_directory())
+          .map_err(|e| {
+            error!("could not create model storage directory: {:?}", e);
+            ProcessSingleJobError::from_io_error(e)
+          })?;
 
-    let model_index_object_path = args.job_dependencies.bucket_path_unifier.rvc_v2_model_index_path(&vc_model.private_bucket_hash);
+      let model_index_object_path = args.job_dependencies.bucket_path_unifier.rvc_v2_model_index_path(&vc_model.private_bucket_hash);
 
-    maybe_download_file_from_bucket(
-      "rvc (v2) model index",
-      &fs_path,
-      &model_index_object_path,
-      &args.job_dependencies.private_bucket_client,
-      &mut job_progress_reporter,
-      "downloading rvc (v2) model index",
-      job.id.0,
-      &args.job_dependencies.fs.scoped_temp_dir_creator_for_downloads,
-    ).await?;
+      maybe_download_file_from_bucket(
+        "rvc (v2) model index",
+        &fs_path,
+        &model_index_object_path,
+        &args.job_dependencies.private_bucket_client,
+        &mut job_progress_reporter,
+        "downloading rvc (v2) model index",
+        job.id.0,
+        &args.job_dependencies.fs.scoped_temp_dir_creator_for_downloads,
+      ).await?;
 
-    fs_path
-  };
+      Some(fs_path)
+    };
+  }
 
   // ==================== TEMP DIR ==================== //
 
@@ -220,7 +224,7 @@ pub async fn process_job(args: RvcV2ProcessJobArgs<'_>) -> Result<JobSuccessResu
       .inference_command
       .execute_inference(InferenceArgs {
         model_path: &rvc_v2_model_fs_path,
-        model_index_path: &rvc_v2_model_index_fs_path,
+        maybe_model_index_path: maybe_rvc_v2_model_index_fs_path,
         input_path: &input_wav_path,
         output_path: &output_audio_fs_path,
       });
