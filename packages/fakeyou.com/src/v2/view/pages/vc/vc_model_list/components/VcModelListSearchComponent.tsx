@@ -106,9 +106,9 @@ function VcModelListSearch(props: Props) {
           <span className="badge-model badge-model-svc ms-2">SVC</span>
         );
       }
-      if (data.modelType === "rvc") {
+      if (data.modelType === "rvc_v2") {
         modelType = (
-          <span className="badge-model badge-model-rvc ms-2">RVC</span>
+          <span className="badge-model badge-model-rvc ms-2">RVCv2</span>
         );
       }
     }
