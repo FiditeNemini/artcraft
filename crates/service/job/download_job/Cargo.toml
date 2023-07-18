@@ -27,6 +27,7 @@ filesys = { path = "../../../lib/files/filesys" }
 google_drive_common = { path = "../../../lib/api_clients/google_drive_common" }
 hashing = { path = "../../../lib/files/hashing" }
 jobs_common = { path = "../../../lib/jobs_common" }
+mimetypes = { path = "../../../lib/files/mimetypes" }
 mysql_queries = { path = "../../../lib/mysql_queries" }
 reusable_types = { path = "../../../_types/reusable_types" }
 subprocess_common = { path = "../../../lib/subprocess_common" }
@@ -46,6 +47,7 @@ lfu = "0.2.5"
 log = "0.4.14"
 subprocess = "0.2.6"
 tempdir = "0.3.7"
+zip = "0.6.6"
 
 # MySql Database
 # "offline" supports typesafe builds without a live database
