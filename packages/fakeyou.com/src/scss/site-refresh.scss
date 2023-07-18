@@ -1326,6 +1326,57 @@ styles with important tags:
     color: rgba($white, 0.85) !important;
     font-weight: 500 !important;
   }
+
+  .stepper-container {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    .stepper-number {
+      font-size: 16px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 32px;
+      height: 32px;
+      min-width: 32px;
+      background-color: $secondary;
+      border-radius: 48px;
+      opacity: 0.4;
+      transition: all 0.2s;
+
+      &.active {
+        background-color: $primary;
+        opacity: 1;
+      }
+    }
+
+    .stepper-description {
+      font-size: 18px;
+      font-weight: 600;
+      white-space: nowrap;
+      opacity: 0.4;
+      transition: all 0.2s;
+
+      &.active {
+        opacity: 1;
+      }
+    }
+
+    .stepper-line {
+      flex-grow: 1;
+      height: 3px;
+      background: $secondary;
+      transition: all 0.2s;
+
+      &.active {
+        background-color: $primary;
+        opacity: 1;
+      }
+    }
+  }
 }
 
 select {
