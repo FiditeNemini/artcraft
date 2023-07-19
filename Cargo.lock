@@ -884,6 +884,14 @@ dependencies = [
 ]
 
 [[package]]
+name = "archives"
+version = "0.0.1"
+dependencies = [
+ "errors",
+ "zip",
+]
+
+[[package]]
 name = "arrayref"
 version = "0.3.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
