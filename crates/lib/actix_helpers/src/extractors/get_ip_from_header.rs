@@ -1,5 +1,5 @@
-use actix_http::http::HeaderMap;
-use actix_web::http::HeaderName;
+use actix_http::header::HeaderMap;
+use actix_http::header::HeaderName;
 use std::str::FromStr;
 
 pub (crate) fn get_ip_from_header(headers: &HeaderMap, header_name: &str) -> Option<String> {

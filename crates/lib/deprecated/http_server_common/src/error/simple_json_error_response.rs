@@ -30,9 +30,9 @@ struct SimpleGenericJsonError {
 
 #[cfg(test)]
 mod tests {
+  use actix_http::body::{BoxBody, MessageBody};
   use crate::error::simple_json_error_response::simple_json_error_response;
   use actix_web::http::StatusCode;
-  use actix_http::body::AnyBody;
 
   #[test]
   pub fn serialization() {
@@ -43,13 +43,10 @@ mod tests {
     assert_eq!(response.status(), StatusCode::TOO_MANY_REQUESTS);
 
     let body = response.into_body();
-    match body {
-      AnyBody::Bytes(bytes) => {
-        let bytes = bytes.to_vec();
-        let body = String::from_utf8(bytes).unwrap();
-        assert_eq!(body, "{\"success\":false,\"error_reason\":\"foo\"}");
-      }
-      _ => panic!("this failed"),
-    }
+
+    let bytes = body.try_into_bytes().expect("bytes should extract");
+    let body = String::from_utf8(bytes.to_vec()).unwrap();
+
+    assert_eq!(body, "{\"success\":false,\"error_reason\":\"foo\"}");
   }
 }

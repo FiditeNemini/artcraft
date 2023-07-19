@@ -1,4 +1,4 @@
-use actix_http::body::Body;
+use actix_http::body::BoxBody;
 use actix_http::header::CONTENT_TYPE;
 use actix_web::http::StatusCode;
 use actix_web::http::header::ContentType;
@@ -20,7 +20,7 @@ impl ResponseError for DisabledError {
     StatusCode::TOO_MANY_REQUESTS
   }
 
-  fn error_response(&self) -> HttpResponse<Body> {
+  fn error_response(&self) -> HttpResponse<BoxBody> {
     // NB: I'm setting a string error because I mistakenly got caught by this in local dev
     // and couldn't figure out the issue for a bit. At least I can grep for this string.
     // However, I need to balance this requirement with not cluing in those that are banned.
