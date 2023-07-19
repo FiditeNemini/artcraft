@@ -4,6 +4,7 @@
 //#![forbid(unused_variables)]
 
 use chrono::{Utc, DateTime};
+use crate::helpers::boolean_converters::i8_to_bool;
 use enums::by_table::voice_conversion_models::voice_conversion_model_type::VoiceConversionModelType;
 use log::warn;
 use sqlx::MySqlPool;
@@ -20,6 +21,9 @@ pub struct VoiceConversionModelForInference {
   //pub creator_user_token: UserToken,
   //pub creator_username: String,
   //pub creator_display_name: String,
+
+  // (rvc_v2 models:) whether the model also has an associated index file.
+  pub has_index_file: bool,
 
   pub private_bucket_hash: String,
 
@@ -63,6 +67,7 @@ SELECT
     vc.model_type as `model_type: enums::by_table::voice_conversion_models::voice_conversion_model_type::VoiceConversionModelType`,
 
     vc.title,
+    vc.has_index_file,
     vc.private_bucket_hash,
 
     vc.created_at,
@@ -104,6 +109,7 @@ WHERE vc.token = ?
     token: model.token,
     model_type: model.model_type,
     title: model.title,
+    has_index_file: i8_to_bool(model.has_index_file),
     private_bucket_hash: model.private_bucket_hash,
     created_at: model.created_at,
     updated_at: model.updated_at,
@@ -121,6 +127,8 @@ struct InternalVoiceConversionModelForInferenceRaw {
   //creator_user_token: UserToken,
   //creator_username: String,
   //creator_display_name: String,
+
+  has_index_file: i8,
 
   private_bucket_hash: String,
 

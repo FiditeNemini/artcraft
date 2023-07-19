@@ -19,6 +19,9 @@ pub struct InsertVoiceConversionModelArgs<'a, P: AsRef<Path>> {
   pub creator_ip_address: &'a str,
   pub creator_set_visibility: Visibility,
 
+  /// (For rvc_v2 models) - whether the model has an associated `.index` file.
+  pub has_index_file: bool,
+
   pub private_bucket_hash: &'a str,
   pub private_bucket_object_name: P,
 
@@ -51,6 +54,7 @@ SET
   ip_address_creation = ?,
   ip_address_last_update = ?,
   original_download_url = ?,
+  has_index_file = ?,
   private_bucket_hash = ?,
   private_bucket_object_name = ?,
   file_size_bytes = ?
@@ -62,6 +66,7 @@ SET
       args.creator_ip_address,
       args.creator_ip_address,
       args.original_download_url,
+      args.has_index_file,
       args.private_bucket_hash,
       private_bucket_object_name,
       args.file_size_bytes

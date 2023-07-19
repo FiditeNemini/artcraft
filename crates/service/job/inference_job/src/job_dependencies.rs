@@ -20,6 +20,7 @@ use r2d2_redis::r2d2;
 use sqlx::MySqlPool;
 use std::path::PathBuf;
 use concurrency::relaxed_atomic_bool::RelaxedAtomicBool;
+use crate::job::job_types::vc::rvc_v2::rvc_v2_inference_command::RvcV2InferenceCommand;
 
 pub struct JobDependencies {
   /// Filesystem info and utils
@@ -139,6 +140,7 @@ pub struct JobCaches {
 pub struct JobTypeDetails {
   pub tacotron2_old_vocodes: Tacotron2VocodesDetails,
   pub vits: VitsDetails,
+  pub rvc_v2: RvcV2Details,
   pub so_vits_svc: SoVitsSvcDetails,
   //pub tacotron2_modern: ...,
   //pub softvc: ...,
@@ -160,6 +162,10 @@ pub struct Tacotron2VocodesDetails {
 
 pub struct VitsDetails {
   pub inference_command: VitsInferenceCommand,
+}
+
+pub struct RvcV2Details {
+  pub inference_command: RvcV2InferenceCommand,
 }
 
 pub struct SoVitsSvcDetails {

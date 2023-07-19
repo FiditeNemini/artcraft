@@ -65,6 +65,11 @@ pub struct AvailableInferenceJob {
   pub created_at: chrono::DateTime<Utc>,
   pub updated_at: chrono::DateTime<Utc>,
   pub retry_at: Option<chrono::DateTime<Utc>>,
+
+  /// "Keep alive" signals may have a race condition where Redis doesn't set the timestamp
+  /// in time. If so, we'll compare `created_at` versus `now` with some reasonable delta
+  /// (perhaps 30 sec).
+  pub database_clock: chrono::DateTime<Utc>,
 }
 
 pub struct ListAvailableGenericInferenceJobArgs<'a> {
@@ -129,6 +134,7 @@ pub async fn list_available_generic_inference_jobs(
           created_at: record.created_at,
           updated_at: record.updated_at,
           retry_at: record.retry_at,
+          database_clock: record.database_clock,
         };
         Ok(record)
       })
@@ -187,7 +193,9 @@ SELECT
 
   created_at,
   updated_at,
-  retry_at
+  retry_at,
+  NOW() as database_clock
+
 FROM generic_inference_jobs"#.to_string();
 
   query.push_str(&format!(r#"
@@ -271,7 +279,9 @@ SELECT
 
   created_at,
   updated_at,
-  retry_at
+  retry_at,
+  NOW() as database_clock
+
 FROM generic_inference_jobs"#.to_string();
 
 
@@ -358,6 +368,8 @@ struct AvailableInferenceJobRawInternal {
   pub created_at: chrono::DateTime<Utc>,
   pub updated_at: chrono::DateTime<Utc>,
   pub retry_at: Option<chrono::DateTime<Utc>>,
+
+  pub database_clock: chrono::DateTime<Utc>,
 }
 
 /// Return a comma-separated predicate, since SQLx does not yet support WHERE IN(?) for Vec<T>, etc.

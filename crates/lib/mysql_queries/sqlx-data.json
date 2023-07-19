@@ -131,7 +131,7 @@
             "flags": {
               "bits": 1
             },
-            "max_size": 10,
+            "max_size": 11,
             "type": "Long"
           }
         },
@@ -143,7 +143,7 @@
             "flags": {
               "bits": 1
             },
-            "max_size": 10,
+            "max_size": 11,
             "type": "Long"
           }
         },
@@ -155,7 +155,7 @@
             "flags": {
               "bits": 1
             },
-            "max_size": 10,
+            "max_size": 11,
             "type": "Long"
           }
         },
@@ -984,7 +984,7 @@
             "flags": {
               "bits": 1
             },
-            "max_size": 10,
+            "max_size": 11,
             "type": "Long"
           }
         },
@@ -996,7 +996,7 @@
             "flags": {
               "bits": 1
             },
-            "max_size": 10,
+            "max_size": 11,
             "type": "Long"
           }
         },
@@ -1008,7 +1008,7 @@
             "flags": {
               "bits": 1
             },
-            "max_size": 10,
+            "max_size": 11,
             "type": "Long"
           }
         },
@@ -1710,7 +1710,7 @@
             "flags": {
               "bits": 1
             },
-            "max_size": 10,
+            "max_size": 11,
             "type": "Long"
           }
         },
@@ -1722,7 +1722,7 @@
             "flags": {
               "bits": 1
             },
-            "max_size": 10,
+            "max_size": 11,
             "type": "Long"
           }
         },
@@ -1734,7 +1734,7 @@
             "flags": {
               "bits": 1
             },
-            "max_size": 10,
+            "max_size": 11,
             "type": "Long"
           }
         },
@@ -2632,7 +2632,7 @@
             "flags": {
               "bits": 1
             },
-            "max_size": 3,
+            "max_size": 11,
             "type": "Long"
           }
         },
@@ -2721,6 +2721,16 @@
       }
     },
     "query": "\nUPDATE user_sessions\nSET deleted_at = CURRENT_TIMESTAMP()\nWHERE\n    token = ?\n    AND deleted_at IS NULL\n        "
+  },
+  "1e85e546684feffc151a26b0495b9ab8aa4ee5f1627464a9872e9c357ba1dc7a": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Right": 11
+      }
+    },
+    "query": "\nINSERT INTO voice_conversion_models\nSET\n  token = ?,\n  model_type = ?,\n  title = ?,\n  description_markdown = '',\n  description_rendered_html = '',\n  creator_user_token = ?,\n  ip_address_creation = ?,\n  ip_address_last_update = ?,\n  original_download_url = ?,\n  has_index_file = ?,\n  private_bucket_hash = ?,\n  private_bucket_object_name = ?,\n  file_size_bytes = ?\n        "
   },
   "2177f29265040bda6bb4418b521679fcbc372a73620415f4812c45fbb03d5933": {
     "describe": {
@@ -3502,7 +3512,7 @@
             "flags": {
               "bits": 1
             },
-            "max_size": 3,
+            "max_size": 11,
             "type": "Long"
           }
         },
@@ -4030,7 +4040,7 @@
             "flags": {
               "bits": 1
             },
-            "max_size": 10,
+            "max_size": 11,
             "type": "Long"
           }
         },
@@ -4042,7 +4052,7 @@
             "flags": {
               "bits": 1
             },
-            "max_size": 10,
+            "max_size": 11,
             "type": "Long"
           }
         },
@@ -4054,7 +4064,7 @@
             "flags": {
               "bits": 1
             },
-            "max_size": 10,
+            "max_size": 11,
             "type": "Long"
           }
         },
@@ -6529,7 +6539,7 @@
             "flags": {
               "bits": 1
             },
-            "max_size": 10,
+            "max_size": 11,
             "type": "Long"
           }
         },
@@ -6541,7 +6551,7 @@
             "flags": {
               "bits": 1
             },
-            "max_size": 10,
+            "max_size": 11,
             "type": "Long"
           }
         },
@@ -6553,7 +6563,7 @@
             "flags": {
               "bits": 1
             },
-            "max_size": 10,
+            "max_size": 11,
             "type": "Long"
           }
         },
@@ -6565,7 +6575,7 @@
             "flags": {
               "bits": 1
             },
-            "max_size": 10,
+            "max_size": 11,
             "type": "Long"
           }
         },
@@ -7045,7 +7055,7 @@
             "flags": {
               "bits": 1
             },
-            "max_size": 3,
+            "max_size": 11,
             "type": "Long"
           }
         },
@@ -7135,7 +7145,7 @@
             "flags": {
               "bits": 1
             },
-            "max_size": 3,
+            "max_size": 11,
             "type": "Long"
           }
         },
@@ -7562,7 +7572,7 @@
             "flags": {
               "bits": 1
             },
-            "max_size": 3,
+            "max_size": 11,
             "type": "Long"
           }
         }
@@ -7728,7 +7738,7 @@
             "flags": {
               "bits": 1
             },
-            "max_size": 10,
+            "max_size": 11,
             "type": "Long"
           }
         },
@@ -7740,7 +7750,7 @@
             "flags": {
               "bits": 1
             },
-            "max_size": 10,
+            "max_size": 11,
             "type": "Long"
           }
         },
@@ -7752,7 +7762,7 @@
             "flags": {
               "bits": 1
             },
-            "max_size": 10,
+            "max_size": 11,
             "type": "Long"
           }
         },
@@ -8412,7 +8422,7 @@
             "flags": {
               "bits": 1
             },
-            "max_size": 3,
+            "max_size": 11,
             "type": "Long"
           }
         },
@@ -9328,7 +9338,7 @@
             "flags": {
               "bits": 1
             },
-            "max_size": 3,
+            "max_size": 11,
             "type": "Long"
           }
         },
@@ -9488,7 +9498,7 @@
             "flags": {
               "bits": 1
             },
-            "max_size": 10,
+            "max_size": 11,
             "type": "Long"
           }
         },
@@ -9500,7 +9510,7 @@
             "flags": {
               "bits": 1
             },
-            "max_size": 10,
+            "max_size": 11,
             "type": "Long"
           }
         },
@@ -9512,7 +9522,7 @@
             "flags": {
               "bits": 1
             },
-            "max_size": 10,
+            "max_size": 11,
             "type": "Long"
           }
         },
@@ -10987,122 +10997,6 @@
     },
     "query": "\nSELECT\n  token,\n\n  maybe_user_token,\n  email_address,\n  discord_username,\n\n  is_for_private_use,\n  is_for_public_use,\n\n  is_for_studio,\n  is_for_twitch_tts,\n  is_for_api_use,\n  is_for_music,\n  is_for_games,\n  is_for_other,\n  optional_notes_on_use,\n\n  is_own_voice,\n  is_third_party_voice,\n  optional_notes_on_subject,\n\n  has_clean_audio_recordings,\n  has_good_microphone,\n\n  optional_questions,\n  optional_extra_comments,\n\n  created_at,\n  updated_at\nFROM voice_clone_requests\nWHERE\n  token = ?\n        "
   },
-  "92e9cf7643a44b8485863b2c0b373badd1c08f3898f0776e6d8f837a1ce2db73": {
-    "describe": {
-      "columns": [
-        {
-          "name": "token: tokens::voice_conversion::model::VoiceConversionModelToken",
-          "ordinal": 0,
-          "type_info": {
-            "char_set": 224,
-            "flags": {
-              "bits": 4229
-            },
-            "max_size": 128,
-            "type": "VarString"
-          }
-        },
-        {
-          "name": "model_type: enums::by_table::voice_conversion_models::voice_conversion_model_type::VoiceConversionModelType",
-          "ordinal": 1,
-          "type_info": {
-            "char_set": 224,
-            "flags": {
-              "bits": 4233
-            },
-            "max_size": 128,
-            "type": "VarString"
-          }
-        },
-        {
-          "name": "title",
-          "ordinal": 2,
-          "type_info": {
-            "char_set": 224,
-            "flags": {
-              "bits": 4225
-            },
-            "max_size": 1020,
-            "type": "VarString"
-          }
-        },
-        {
-          "name": "private_bucket_hash",
-          "ordinal": 3,
-          "type_info": {
-            "char_set": 224,
-            "flags": {
-              "bits": 4233
-            },
-            "max_size": 256,
-            "type": "String"
-          }
-        },
-        {
-          "name": "created_at",
-          "ordinal": 4,
-          "type_info": {
-            "char_set": 63,
-            "flags": {
-              "bits": 1153
-            },
-            "max_size": 19,
-            "type": "Timestamp"
-          }
-        },
-        {
-          "name": "updated_at",
-          "ordinal": 5,
-          "type_info": {
-            "char_set": 63,
-            "flags": {
-              "bits": 9345
-            },
-            "max_size": 19,
-            "type": "Timestamp"
-          }
-        },
-        {
-          "name": "user_deleted_at",
-          "ordinal": 6,
-          "type_info": {
-            "char_set": 63,
-            "flags": {
-              "bits": 128
-            },
-            "max_size": 19,
-            "type": "Timestamp"
-          }
-        },
-        {
-          "name": "mod_deleted_at",
-          "ordinal": 7,
-          "type_info": {
-            "char_set": 63,
-            "flags": {
-              "bits": 128
-            },
-            "max_size": 19,
-            "type": "Timestamp"
-          }
-        }
-      ],
-      "nullable": [
-        false,
-        false,
-        false,
-        false,
-        false,
-        false,
-        true,
-        true
-      ],
-      "parameters": {
-        "Right": 1
-      }
-    },
-    "query": "\nSELECT\n    vc.token as `token: tokens::voice_conversion::model::VoiceConversionModelToken`,\n    vc.model_type as `model_type: enums::by_table::voice_conversion_models::voice_conversion_model_type::VoiceConversionModelType`,\n\n    vc.title,\n    vc.private_bucket_hash,\n\n    vc.created_at,\n    vc.updated_at,\n    vc.user_deleted_at,\n    vc.mod_deleted_at\n\nFROM voice_conversion_models as vc\n\nWHERE vc.token = ?\n        "
-  },
   "9602cbbd0eac176d596ee2b66695274bffbf12947848d3bc9d75e1a9553d8934": {
     "describe": {
       "columns": [],
@@ -11380,7 +11274,7 @@
             "flags": {
               "bits": 1
             },
-            "max_size": 3,
+            "max_size": 11,
             "type": "Long"
           }
         },
@@ -11751,7 +11645,7 @@
             "flags": {
               "bits": 1
             },
-            "max_size": 10,
+            "max_size": 11,
             "type": "Long"
           }
         },
@@ -11763,7 +11657,7 @@
             "flags": {
               "bits": 1
             },
-            "max_size": 10,
+            "max_size": 11,
             "type": "Long"
           }
         },
@@ -11862,6 +11756,135 @@
       }
     },
     "query": "\nSELECT\n    tts_results.token as tts_result_token,\n\n    tts_results.raw_inference_text,\n\n    tts_results.model_token as tts_model_token,\n    tts_models.title as tts_model_title,\n\n    tts_results.maybe_pretrained_vocoder_used,\n\n    users.token as maybe_creator_user_token,\n    users.username as maybe_creator_username,\n    users.display_name as maybe_creator_display_name,\n    users.email_gravatar_hash as maybe_creator_gravatar_hash,\n    users.is_banned as maybe_creator_is_banned,\n\n    model_users.token as maybe_model_creator_user_token,\n    model_users.username as maybe_model_creator_username,\n    model_users.display_name as maybe_model_creator_display_name,\n    model_users.email_gravatar_hash as maybe_model_creator_gravatar_hash,\n    model_users.is_banned as maybe_model_creator_is_banned,\n\n    tts_results.public_bucket_wav_audio_path,\n    tts_results.public_bucket_spectrogram_path,\n\n    tts_results.creator_set_visibility,\n\n    tts_results.generated_by_worker,\n    tts_results.is_debug_request,\n\n    tts_results.file_size_bytes,\n    tts_results.duration_millis,\n    tts_results.created_at,\n    tts_results.updated_at,\n\n    tts_results.creator_ip_address,\n    tts_results.user_deleted_at,\n    tts_results.mod_deleted_at\n\nFROM tts_results\nLEFT OUTER JOIN tts_models\n  ON tts_results.model_token = tts_models.token\nLEFT OUTER JOIN users\n  ON tts_results.maybe_creator_user_token = users.token\nLEFT OUTER JOIN users as model_users\n  ON tts_models.creator_user_token = model_users.token\nWHERE\n    tts_results.token = ?\n    AND tts_results.user_deleted_at IS NULL\n    AND tts_results.mod_deleted_at IS NULL\n        "
+  },
+  "a3bf15836dd3ff381f2bd64363e7cdbb6e899be9c106216075331e2eae30884c": {
+    "describe": {
+      "columns": [
+        {
+          "name": "token: tokens::voice_conversion::model::VoiceConversionModelToken",
+          "ordinal": 0,
+          "type_info": {
+            "char_set": 224,
+            "flags": {
+              "bits": 4229
+            },
+            "max_size": 128,
+            "type": "VarString"
+          }
+        },
+        {
+          "name": "model_type: enums::by_table::voice_conversion_models::voice_conversion_model_type::VoiceConversionModelType",
+          "ordinal": 1,
+          "type_info": {
+            "char_set": 224,
+            "flags": {
+              "bits": 4233
+            },
+            "max_size": 128,
+            "type": "VarString"
+          }
+        },
+        {
+          "name": "title",
+          "ordinal": 2,
+          "type_info": {
+            "char_set": 224,
+            "flags": {
+              "bits": 4225
+            },
+            "max_size": 1020,
+            "type": "VarString"
+          }
+        },
+        {
+          "name": "has_index_file",
+          "ordinal": 3,
+          "type_info": {
+            "char_set": 63,
+            "flags": {
+              "bits": 1
+            },
+            "max_size": 1,
+            "type": "Tiny"
+          }
+        },
+        {
+          "name": "private_bucket_hash",
+          "ordinal": 4,
+          "type_info": {
+            "char_set": 224,
+            "flags": {
+              "bits": 4233
+            },
+            "max_size": 256,
+            "type": "String"
+          }
+        },
+        {
+          "name": "created_at",
+          "ordinal": 5,
+          "type_info": {
+            "char_set": 63,
+            "flags": {
+              "bits": 1153
+            },
+            "max_size": 19,
+            "type": "Timestamp"
+          }
+        },
+        {
+          "name": "updated_at",
+          "ordinal": 6,
+          "type_info": {
+            "char_set": 63,
+            "flags": {
+              "bits": 9345
+            },
+            "max_size": 19,
+            "type": "Timestamp"
+          }
+        },
+        {
+          "name": "user_deleted_at",
+          "ordinal": 7,
+          "type_info": {
+            "char_set": 63,
+            "flags": {
+              "bits": 128
+            },
+            "max_size": 19,
+            "type": "Timestamp"
+          }
+        },
+        {
+          "name": "mod_deleted_at",
+          "ordinal": 8,
+          "type_info": {
+            "char_set": 63,
+            "flags": {
+              "bits": 128
+            },
+            "max_size": 19,
+            "type": "Timestamp"
+          }
+        }
+      ],
+      "nullable": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        true,
+        true
+      ],
+      "parameters": {
+        "Right": 1
+      }
+    },
+    "query": "\nSELECT\n    vc.token as `token: tokens::voice_conversion::model::VoiceConversionModelToken`,\n    vc.model_type as `model_type: enums::by_table::voice_conversion_models::voice_conversion_model_type::VoiceConversionModelType`,\n\n    vc.title,\n    vc.has_index_file,\n    vc.private_bucket_hash,\n\n    vc.created_at,\n    vc.updated_at,\n    vc.user_deleted_at,\n    vc.mod_deleted_at\n\nFROM voice_conversion_models as vc\n\nWHERE vc.token = ?\n        "
   },
   "a60b239dff945c0089ded216dc6b4ea1bd7acb2125671bebdd34e5e1312270ce": {
     "describe": {
@@ -11974,16 +11997,6 @@
       }
     },
     "query": "\nUPDATE generic_inference_jobs\nSET\n  status = \"complete_success\",\n  on_success_result_entity_type = ?,\n  on_success_result_entity_token = ?,\n  failure_reason = NULL,\n  internal_debugging_failure_reason = NULL,\n  success_execution_millis = ?,\n  success_inference_execution_millis = ?,\n  retry_at = NULL,\n  successfully_completed_at = NOW()\nWHERE id = ?\n        "
-  },
-  "a8eda5d3d5fe44ccb2447b0fc5fa094ac22ec53b1a87b6895fb1a48254f55f51": {
-    "describe": {
-      "columns": [],
-      "nullable": [],
-      "parameters": {
-        "Right": 10
-      }
-    },
-    "query": "\nINSERT INTO voice_conversion_models\nSET\n  token = ?,\n  model_type = ?,\n  title = ?,\n  description_markdown = '',\n  description_rendered_html = '',\n  creator_user_token = ?,\n  ip_address_creation = ?,\n  ip_address_last_update = ?,\n  original_download_url = ?,\n  private_bucket_hash = ?,\n  private_bucket_object_name = ?,\n  file_size_bytes = ?\n        "
   },
   "a993e289a631846abd26185d6a78ba37e10ce98782d00fd4aecb4a4a5502ad38": {
     "describe": {
@@ -12172,7 +12185,7 @@
             "flags": {
               "bits": 1
             },
-            "max_size": 3,
+            "max_size": 11,
             "type": "Long"
           }
         },
@@ -12443,7 +12456,7 @@
             "flags": {
               "bits": 1
             },
-            "max_size": 3,
+            "max_size": 11,
             "type": "Long"
           }
         },
@@ -12735,7 +12748,7 @@
             "flags": {
               "bits": 1
             },
-            "max_size": 10,
+            "max_size": 11,
             "type": "Long"
           }
         },
@@ -12747,7 +12760,7 @@
             "flags": {
               "bits": 1
             },
-            "max_size": 10,
+            "max_size": 11,
             "type": "Long"
           }
         },
@@ -12759,7 +12772,7 @@
             "flags": {
               "bits": 1
             },
-            "max_size": 10,
+            "max_size": 11,
             "type": "Long"
           }
         },
@@ -12771,7 +12784,7 @@
             "flags": {
               "bits": 1
             },
-            "max_size": 10,
+            "max_size": 11,
             "type": "Long"
           }
         },
@@ -13030,7 +13043,7 @@
             "flags": {
               "bits": 1
             },
-            "max_size": 10,
+            "max_size": 11,
             "type": "Long"
           }
         },
@@ -13042,7 +13055,7 @@
             "flags": {
               "bits": 1
             },
-            "max_size": 10,
+            "max_size": 11,
             "type": "Long"
           }
         },
@@ -13054,7 +13067,7 @@
             "flags": {
               "bits": 1
             },
-            "max_size": 10,
+            "max_size": 11,
             "type": "Long"
           }
         },
@@ -13774,7 +13787,7 @@
             "flags": {
               "bits": 1
             },
-            "max_size": 10,
+            "max_size": 11,
             "type": "Long"
           }
         },
@@ -13786,7 +13799,7 @@
             "flags": {
               "bits": 1
             },
-            "max_size": 10,
+            "max_size": 11,
             "type": "Long"
           }
         },
@@ -14131,7 +14144,7 @@
             "flags": {
               "bits": 1
             },
-            "max_size": 3,
+            "max_size": 11,
             "type": "Long"
           }
         },
@@ -14813,7 +14826,7 @@
             "flags": {
               "bits": 1
             },
-            "max_size": 3,
+            "max_size": 11,
             "type": "Long"
           }
         },
@@ -14971,7 +14984,7 @@
             "flags": {
               "bits": 1
             },
-            "max_size": 10,
+            "max_size": 11,
             "type": "Long"
           }
         },
@@ -14983,7 +14996,7 @@
             "flags": {
               "bits": 1
             },
-            "max_size": 10,
+            "max_size": 11,
             "type": "Long"
           }
         },
@@ -14995,7 +15008,7 @@
             "flags": {
               "bits": 1
             },
-            "max_size": 10,
+            "max_size": 11,
             "type": "Long"
           }
         },
@@ -16143,7 +16156,7 @@
             "flags": {
               "bits": 1
             },
-            "max_size": 3,
+            "max_size": 11,
             "type": "Long"
           }
         },

@@ -110,8 +110,19 @@ pub async fn process_single_job(
 
         let _ : Option<String> = match redis.get(&keepalive_key) {
           Ok(None) => {
-            warn!("Job keepalive elapsed: {:?}", job.inference_job_token);
-            return Err(ProcessSingleJobError::KeepAliveElapsed)
+            // NB: There's a chance that we're racing the keepalive function.
+            // As a second check, we'll compare the database clock versus the `created_at`.
+            // If the delta is small, we'll allow it.
+            let delta = job.database_clock.signed_duration_since(job.created_at);
+            let delta = delta.num_seconds();
+
+            if delta < 60 && delta > -60 {
+              warn!("could not get redis keepalive, but time was within delta seconds: {}", delta);
+              None // Allow it
+            } else {
+              warn!("Job keepalive elapsed: {:?}", job.inference_job_token);
+              return Err(ProcessSingleJobError::KeepAliveElapsed)
+            }
           },
           Ok(Some(value)) => Some(value),
           Err(e) => {

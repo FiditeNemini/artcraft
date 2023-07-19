@@ -1,8 +1,9 @@
 use anyhow::anyhow;
 use crate::job::job_loop::job_success_result::JobSuccessResult;
 use crate::job::job_loop::process_single_job_error::ProcessSingleJobError;
+use crate::job::job_types::vc::rvc_v2::process_job::RvcV2ProcessJobArgs;
 use crate::job::job_types::vc::so_vits_svc::process_job::SoVitsSvcProcessJobArgs;
-use crate::job::job_types::vc::so_vits_svc;
+use crate::job::job_types::vc::{rvc_v2, so_vits_svc};
 use crate::job_dependencies::JobDependencies;
 use enums::by_table::voice_conversion_models::voice_conversion_model_type::VoiceConversionModelType;
 use mysql_queries::queries::generic_inference::job::list_available_generic_inference_jobs::AvailableInferenceJob;
@@ -60,18 +61,12 @@ pub async fn process_single_vc_job(job_dependencies: &JobDependencies, job: &Ava
 
   let job_success_result = match vc_model.model_type {
     VoiceConversionModelType::RvcV2 => {
-      // TODO(bt,2023-07-16): Handle RVC
-      JobSuccessResult {
-        maybe_result_entity: None,
-        inference_duration: Duration::from_secs(0),
-      }
-    }
-    VoiceConversionModelType::SoftVc => {
-      // TODO
-      JobSuccessResult {
-        maybe_result_entity: None,
-        inference_duration: Duration::from_secs(0),
-      }
+      rvc_v2::process_job::process_job(RvcV2ProcessJobArgs {
+        job_dependencies,
+        job,
+        vc_model: &vc_model,
+        media_upload_token: &media_upload_token,
+      }).await?
     }
     VoiceConversionModelType::SoVitsSvc => {
       so_vits_svc::process_job::process_job(SoVitsSvcProcessJobArgs {
@@ -80,6 +75,10 @@ pub async fn process_single_vc_job(job_dependencies: &JobDependencies, job: &Ava
         vc_model: &vc_model,
         media_upload_token: &media_upload_token,
       }).await?
+    }
+    VoiceConversionModelType::SoftVc => {
+      // TODO: Not yet implemented.
+      JobSuccessResult { maybe_result_entity: None, inference_duration: Duration::from_secs(0) }
     }
   };
 
