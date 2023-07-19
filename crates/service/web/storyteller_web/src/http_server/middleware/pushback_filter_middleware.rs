@@ -11,10 +11,15 @@ use actix_web::{ResponseError, HttpMessage, HttpRequest, HttpResponseBuilder};
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::server_state::StaticFeatureFlags;
 use errors::AnyhowResult;
+use futures_core::ready;
 use futures_util::future::{err, ok, Either, Ready};
 use http_server_common::request::get_request_ip::get_service_request_ip;
 use log::warn;
+use pin_project_lite::pin_project;
+use std::future::Future;
 use std::io::Write;
+use std::marker::PhantomData;
+use std::pin::Pin;
 use std::task::{Context, Poll};
 
 // There are two steps in middleware processing.
@@ -62,12 +67,12 @@ impl PushbackFilter {
   }
 }
 
-impl<S> Transform<S, ServiceRequest> for PushbackFilter
+impl<S, B> Transform<S, ServiceRequest> for PushbackFilter
   where
-      S: Service<ServiceRequest, Response = ServiceResponse, Error = Error>,
+      S: Service<ServiceRequest, Response = ServiceResponse<B>, Error = Error>,
       S::Future: 'static,
 {
-  type Response = ServiceResponse;
+  type Response = ServiceResponse<B>;
   type Error = Error;
   type InitError = ();
   type Transform = PushbackFilterMiddleware<S>;
@@ -83,19 +88,21 @@ pub struct PushbackFilterMiddleware<S> {
   feature_flags: StaticFeatureFlags,
 }
 
-impl<S> Service<ServiceRequest> for PushbackFilterMiddleware<S>
+impl<S, B> Service<ServiceRequest> for PushbackFilterMiddleware<S>
   where
-      S: Service<ServiceRequest, Response = ServiceResponse, Error = Error>,
+      S: Service<ServiceRequest, Response = ServiceResponse<B>, Error = Error>,
       S::Future: 'static,
 {
-  type Response = ServiceResponse;
+  type Response = ServiceResponse<B>;
   type Error = Error;
   type Future = Either<S::Future, Ready<Result<Self::Response, Self::Error>>>;
 
-  // alternatively(?), actix_service::forward_ready!(service);
-  fn poll_ready(&self, cx: &mut Context) -> Poll<Result<(), Self::Error>> {
-    self.service.poll_ready(cx)
-  }
+  //// alternatively(?), actix_service::forward_ready!(service);
+  //fn poll_ready(&self, cx: &mut Context) -> Poll<Result<(), Self::Error>> {
+  //  self.service.poll_ready(cx)
+  //}
+
+  actix_service::forward_ready!(service);
 
   fn call(&self, req: ServiceRequest) -> Self::Future {
     // NB: Ordinarily the filter should be disabled.

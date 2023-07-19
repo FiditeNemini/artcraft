@@ -23,12 +23,12 @@ impl BannedCidrFilter {
   }
 }
 
-impl<S> Transform<S, ServiceRequest> for BannedCidrFilter
+impl<S, B> Transform<S, ServiceRequest> for BannedCidrFilter
   where
-      S: Service<ServiceRequest, Response = ServiceResponse, Error = Error>,
+      S: Service<ServiceRequest, Response = ServiceResponse<B>, Error = Error>,
       S::Future: 'static,
 {
-  type Response = ServiceResponse;
+  type Response = ServiceResponse<B>;
   type Error = Error;
   type InitError = ();
   type Transform = BannedCidrFilterMiddleware<S>;
