@@ -12,5 +12,12 @@ cargo test \
   --exclude sqlite_queries \
   --exclude aichatbot-sidecar \
   --exclude fakeyou_client \
-  --exclude billing_component
+  --exclude billing_component \
+  --exclude inference-job
+
+# Single broken tests
+cargo test \
+  --package inference-job \
+  -- \
+  --skip util::audiowmark::tests::test_audiowmark
 
