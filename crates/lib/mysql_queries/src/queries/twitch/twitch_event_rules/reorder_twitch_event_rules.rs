@@ -1,6 +1,5 @@
 use anyhow::anyhow;
 use errors::AnyhowResult;
-use log::error;
 use once_cell::sync::Lazy;
 use regex::Regex;
 use sqlx::MySqlPool;

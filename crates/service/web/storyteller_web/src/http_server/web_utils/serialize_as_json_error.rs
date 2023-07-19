@@ -1,4 +1,4 @@
-use actix_http::http::{StatusCode, header};
+use actix_http::header::CONTENT_TYPE;
 use actix_web::HttpResponse;
 use actix_web::HttpResponseBuilder;
 use actix_web::error::ResponseError;
@@ -16,6 +16,6 @@ pub fn serialize_as_json_error<T>(
   };
 
   HttpResponseBuilder::new(error_payload.status_code())
-      .set_header(header::CONTENT_TYPE, "application/json")
+      .set_header(CONTENT_TYPE, "application/json")
       .body(body)
 }

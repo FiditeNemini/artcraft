@@ -1,4 +1,3 @@
-use actix_http::http::StatusCode;
 use actix_web::{HttpResponse, HttpRequest, Responder, get};
 use log::warn;
 

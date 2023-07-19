@@ -1,9 +1,9 @@
 use actix_http::StatusCode;
-use actix_http::http::{header, HeaderMap, HeaderValue};
-use actix_http::{error, body::Body, Response};
+use actix_http::body::BoxBody;
+use actix_http::header::HeaderName;
+use actix_http::{error, Response};
 use actix_web::dev::{Service, Transform};
 use actix_web::dev::{ServiceRequest, ServiceResponse};
-use actix_web::http::HeaderName;
 use actix_web::http::header::USER_AGENT;
 use actix_web::web::{BytesMut, Buf, BufMut};
 use actix_web::{Error, HttpResponse};
@@ -13,9 +13,9 @@ use crate::server_state::StaticFeatureFlags;
 use errors::AnyhowResult;
 use futures_util::future::{err, ok, Either, Ready};
 use http_server_common::request::get_request_ip::get_service_request_ip;
+use log::warn;
 use std::io::Write;
 use std::task::{Context, Poll};
-use log::warn;
 
 // There are two steps in middleware processing.
 // 1. Middleware initialization, middleware factory gets called with
@@ -39,7 +39,7 @@ impl ResponseError for PushbackError {
     StatusCode::TOO_MANY_REQUESTS
   }
 
-  fn error_response(&self) -> HttpResponse<Body> {
+  fn error_response(&self) -> HttpResponse<BoxBody> {
     // NB: I'm setting a string error code because I mistakenly got caught by this in local dev
     // and couldn't figure out the issue for a bit. At least I can grep for this string.
     // However, I need to balance this requirement with not cluing in those that are banned.
