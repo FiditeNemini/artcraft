@@ -1,4 +1,5 @@
 use actix_helpers::route_builder::RouteBuilder;
+use actix_http::body::MessageBody;
 use actix_service::ServiceFactory;
 use actix_web::dev::{ServiceRequest, ServiceResponse};
 use actix_web::error::Error;
@@ -116,12 +117,13 @@ use users_component::default_routes::add_suggested_api_v1_account_creation_and_s
 use users_component::endpoints::edit_profile_handler::edit_profile_handler;
 use users_component::endpoints::get_profile_handler::get_profile_handler;
 
-pub fn add_routes<T> (app: App<T>) -> App<T>
+pub fn add_routes<T, B> (app: App<T>) -> App<T>
   where
+      B: MessageBody,
       T: ServiceFactory<
         ServiceRequest,
         Config = (),
-        Response = ServiceResponse,
+        Response = ServiceResponse<B>,
         Error = Error,
         InitError = (),
       >,
@@ -209,12 +211,13 @@ pub fn add_routes<T> (app: App<T>) -> App<T>
 
 // ==================== MODERATOR ROUTES ====================
 
-fn add_moderator_routes<T> (app: App<T>) -> App<T>
+fn add_moderator_routes<T, B> (app: App<T>) -> App<T>
   where
+      B: MessageBody,
       T: ServiceFactory<
         ServiceRequest,
         Config = (),
-        Response = ServiceResponse,
+        Response = ServiceResponse<B>,
         Error = Error,
         InitError = (),
       >,
@@ -350,12 +353,13 @@ fn add_moderator_routes<T> (app: App<T>) -> App<T>
 
 // ==================== TTS ROUTES ====================
 
-fn add_tts_routes<T> (app: App<T>) -> App<T>
+fn add_tts_routes<T, B> (app: App<T>) -> App<T>
   where
+      B: MessageBody,
       T: ServiceFactory<
         ServiceRequest,
         Config = (),
-        Response = ServiceResponse,
+        Response = ServiceResponse<B>,
         Error = Error,
         InitError = (),
       >,
@@ -432,12 +436,13 @@ fn add_tts_routes<T> (app: App<T>) -> App<T>
 
 // ==================== WAV2LIP ROUTES ====================
 
-fn add_w2l_routes<T> (app: App<T>) -> App<T>
+fn add_w2l_routes<T, B> (app: App<T>) -> App<T>
   where
+      B: MessageBody,
       T: ServiceFactory<
         ServiceRequest,
         Config = (),
-        Response = ServiceResponse,
+        Response = ServiceResponse<B>,
         Error = Error,
         InitError = (),
       >,
@@ -514,12 +519,13 @@ fn add_w2l_routes<T> (app: App<T>) -> App<T>
 
 // ==================== WEB VOICE CONVERSION ROUTES ====================
 
-fn add_web_vc_routes<T> (app: App<T>) -> App<T>
+fn add_web_vc_routes<T, B> (app: App<T>) -> App<T>
   where
+      B: MessageBody,
       T: ServiceFactory<
         ServiceRequest,
         Config = (),
-        Response = ServiceResponse,
+        Response = ServiceResponse<B>,
         Error = Error,
         InitError = (),
       >,
@@ -597,12 +603,13 @@ fn add_web_vc_routes<T> (app: App<T>) -> App<T>
 
 // ==================== VOCODER ROUTES ====================
 
-fn add_vocoder_routes<T> (app: App<T>) -> App<T>
+fn add_vocoder_routes<T, B> (app: App<T>) -> App<T>
   where
+      B: MessageBody,
       T: ServiceFactory<
         ServiceRequest,
         Config = (),
-        Response = ServiceResponse,
+        Response = ServiceResponse<B>,
         Error = Error,
         InitError = (),
       >,
@@ -634,12 +641,13 @@ fn add_vocoder_routes<T> (app: App<T>) -> App<T>
 
 // ==================== RETRIEVAL ROUTES ("GENERIC_DOWNLOAD_JOBS") ====================
 
-fn add_remote_download_routes<T> (app: App<T>) -> App<T>
+fn add_remote_download_routes<T, B> (app: App<T>) -> App<T>
   where
+      B: MessageBody,
       T: ServiceFactory<
         ServiceRequest,
         Config = (),
-        Response = ServiceResponse,
+        Response = ServiceResponse<B>,
         Error = Error,
         InitError = (),
       >,
@@ -656,12 +664,13 @@ fn add_remote_download_routes<T> (app: App<T>) -> App<T>
 
 // ==================== CATEGORY ROUTES ====================
 
-fn add_category_routes<T> (app: App<T>) -> App<T>
+fn add_category_routes<T, B> (app: App<T>) -> App<T>
   where
+      B: MessageBody,
       T: ServiceFactory<
         ServiceRequest,
         Config = (),
-        Response = ServiceResponse,
+        Response = ServiceResponse<B>,
         Error = Error,
         InitError = (),
       >,
@@ -726,12 +735,13 @@ fn add_category_routes<T> (app: App<T>) -> App<T>
 
 // ==================== USER PROFILE ROUTES ====================
 
-fn add_user_profile_routes<T> (app: App<T>) -> App<T>
+fn add_user_profile_routes<T, B> (app: App<T>) -> App<T>
   where
+      B: MessageBody,
       T: ServiceFactory<
         ServiceRequest,
         Config = (),
-        Response = ServiceResponse,
+        Response = ServiceResponse<B>,
         Error = Error,
         InitError = (),
       >,
@@ -773,12 +783,13 @@ fn add_user_profile_routes<T> (app: App<T>) -> App<T>
 
 // ==================== API TOKEN ROUTES ====================
 
-fn add_api_token_routes<T> (app: App<T>) -> App<T>
+fn add_api_token_routes<T, B> (app: App<T>) -> App<T>
   where
+      B: MessageBody,
       T: ServiceFactory<
         ServiceRequest,
         Config = (),
-        Response = ServiceResponse,
+        Response = ServiceResponse<B>,
         Error = Error,
         InitError = (),
       >,
@@ -805,12 +816,13 @@ fn add_api_token_routes<T> (app: App<T>) -> App<T>
 
 // ==================== API TOKEN ROUTES ====================
 
-fn add_voice_clone_request_routes<T> (app: App<T>) -> App<T>
+fn add_voice_clone_request_routes<T, B> (app: App<T>) -> App<T>
   where
+      B: MessageBody,
       T: ServiceFactory<
         ServiceRequest,
         Config = (),
-        Response = ServiceResponse,
+        Response = ServiceResponse<B>,
         Error = Error,
         InitError = (),
       >,
@@ -829,12 +841,13 @@ fn add_voice_clone_request_routes<T> (app: App<T>) -> App<T>
 
 // ==================== INVESTOR DEMO MODE ====================
 
-fn add_investor_demo_routes<T> (app: App<T>) -> App<T>
+fn add_investor_demo_routes<T, B> (app: App<T>) -> App<T>
   where
+      B: MessageBody,
       T: ServiceFactory<
         ServiceRequest,
         Config = (),
-        Response = ServiceResponse,
+        Response = ServiceResponse<B>,
         Error = Error,
         InitError = (),
       >,
@@ -853,12 +866,13 @@ fn add_investor_demo_routes<T> (app: App<T>) -> App<T>
 
 // ==================== FLAG ROUTES ====================
 
-fn add_flag_routes<T> (app: App<T>) -> App<T>
+fn add_flag_routes<T, B> (app: App<T>) -> App<T>
   where
+      B: MessageBody,
       T: ServiceFactory<
         ServiceRequest,
         Config = (),
-        Response = ServiceResponse,
+        Response = ServiceResponse<B>,
         Error = Error,
         InitError = (),
       >,
@@ -879,12 +893,13 @@ fn add_flag_routes<T> (app: App<T>) -> App<T>
 
 // ==================== DESKTOP APP ROUTES ====================
 
-fn add_desktop_app_routes<T> (app: App<T>) -> App<T>
+fn add_desktop_app_routes<T, B> (app: App<T>) -> App<T>
     where
+        B: MessageBody,
         T: ServiceFactory<
             ServiceRequest,
             Config = (),
-            Response = ServiceResponse,
+            Response = ServiceResponse<B>,
             Error = Error,
             InitError = (),
         >,
@@ -911,12 +926,13 @@ fn add_desktop_app_routes<T> (app: App<T>) -> App<T>
 
 // ==================== MEDIA UPLOAD ROUTES ====================
 
-fn add_media_upload_routes<T> (app: App<T>) -> App<T>
+fn add_media_upload_routes<T, B> (app: App<T>) -> App<T>
   where
+      B: MessageBody,
       T: ServiceFactory<
         ServiceRequest,
         Config = (),
-        Response = ServiceResponse,
+        Response = ServiceResponse<B>,
         Error = Error,
         InitError = (),
       >,
@@ -939,12 +955,13 @@ fn add_media_upload_routes<T> (app: App<T>) -> App<T>
 
 // ==================== TRENDING ROUTES ====================
 
-fn add_trending_routes<T> (app: App<T>) -> App<T>
+fn add_trending_routes<T, B> (app: App<T>) -> App<T>
   where
+      B: MessageBody,
       T: ServiceFactory<
         ServiceRequest,
         Config = (),
-        Response = ServiceResponse,
+        Response = ServiceResponse<B>,
         Error = Error,
         InitError = (),
       >,
@@ -958,12 +975,13 @@ fn add_trending_routes<T> (app: App<T>) -> App<T>
 }
 // ==================== USER RATING ROUTES ====================
 
-fn add_user_rating_routes<T> (app: App<T>) -> App<T>
+fn add_user_rating_routes<T, B> (app: App<T>) -> App<T>
   where
+      B: MessageBody,
       T: ServiceFactory<
         ServiceRequest,
         Config = (),
-        Response = ServiceResponse,
+        Response = ServiceResponse<B>,
         Error = Error,
         InitError = (),
       >,
@@ -985,12 +1003,13 @@ fn add_user_rating_routes<T> (app: App<T>) -> App<T>
 // TODO: Maybe move these into an "oauth-gateway" type http service.
 //  We'll want the domain to have reputation and not confuse people.
 //  It'll also be nice to accrue all oauth things here.
-fn add_twitch_routes<T> (app: App<T>) -> App<T>
+fn add_twitch_routes<T, B> (app: App<T>) -> App<T>
   where
+      B: MessageBody,
       T: ServiceFactory<
         ServiceRequest,
         Config = (),
-        Response = ServiceResponse,
+        Response = ServiceResponse<B>,
         Error = Error,
         InitError = (),
       >,
@@ -1045,12 +1064,13 @@ fn add_twitch_routes<T> (app: App<T>) -> App<T>
 }
 
 // ============= SUBSCRIPTION ROUTES ===================
-fn add_subscription_routes<T> (app: App<T>) -> App<T>
+fn add_subscription_routes<T, B> (app: App<T>) -> App<T>
   where
+      B: MessageBody,
       T: ServiceFactory<
         ServiceRequest,
         Config = (),
-        Response = ServiceResponse,
+        Response = ServiceResponse<B>,
         Error = Error,
         InitError = (),
       >,

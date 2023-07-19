@@ -1,3 +1,4 @@
+use actix_http::body::MessageBody;
 use actix_service::ServiceFactory;
 use actix_web::dev::{Handler, ServiceRequest, ServiceResponse};
 use actix_web::error::Error;
@@ -8,12 +9,13 @@ use actix_web::{App, web, HttpResponse, FromRequest, Responder};
 // TODO: Add tests.
 
 /// Build routes more concisely.
-pub struct RouteBuilder<T>
+pub struct RouteBuilder<T, B>
 where
+    B: MessageBody,
     T: ServiceFactory<
       ServiceRequest,
       Config = (),
-      Response = ServiceResponse,
+      Response = ServiceResponse<B>,
       Error = Error,
       InitError = (),
     >,
@@ -21,12 +23,13 @@ where
   app: App<T>,
 }
 
-impl <T> RouteBuilder<T>
+impl <T, B> RouteBuilder<T, B>
   where
+      B: MessageBody,
       T: ServiceFactory<
         ServiceRequest,
         Config = (),
-        Response = ServiceResponse,
+        Response = ServiceResponse<B>,
         Error = Error,
         InitError = (),
       >,
