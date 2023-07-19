@@ -2,10 +2,11 @@ use container_common::anyhow_result::AnyhowResult;
 use crate::JobState;
 use crate::job_loop::process_single_job::process_single_job;
 use jobs_common::noop_logger::NoOpLogger;
-use log::warn;
+use log::{error, warn};
 use mysql_queries::queries::generic_download::job::list_available_generic_download_jobs::{AvailableDownloadJob, list_available_generic_download_jobs};
 use mysql_queries::queries::generic_download::job::mark_generic_download_job_failure::mark_generic_download_job_failure;
 use std::time::Duration;
+use anyhow::anyhow;
 
 // Job runner timeouts (guards MySQL)
 const START_TIMEOUT_MILLIS : u64 = 500;
@@ -17,6 +18,12 @@ pub async fn main_loop(job_state: JobState) {
   let mut noop_logger = NoOpLogger::new(job_state.no_op_logger_millis as i64);
 
   loop {
+    let gpu_is_missing = job_state.nvidia_smi_health_check_status.get_gpu_is_missing();
+    if gpu_is_missing {
+      error!("nvidia-smi health check failed; exiting program!");
+      panic!("nvidia-smi health check failed; exiting program!");
+    }
+
     let num_records = 1;
     let maybe_available_jobs = list_available_generic_download_jobs(&job_state.mysql_pool, num_records).await;
 
@@ -57,6 +64,11 @@ pub async fn main_loop(job_state: JobState) {
 
 async fn process_jobs(job_state: &JobState, jobs: Vec<AvailableDownloadJob>) -> AnyhowResult<()> {
   for job in jobs.into_iter() {
+    let gpu_is_missing = job_state.nvidia_smi_health_check_status.get_gpu_is_missing();
+    if gpu_is_missing {
+      return Err(anyhow!("nvidia-smi health check failed"));
+    }
+
     let result = process_single_job(job_state, &job).await;
     match result {
       Ok(_) => {},

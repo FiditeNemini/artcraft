@@ -8,6 +8,7 @@ use crate::job_types::vocoder::hifigan_tacotron::hifigan_model_check_command::Hi
 use crate::job_types::voice_conversion::rvc_v2::rvc_v2_model_check_command::RvcV2ModelCheckCommand;
 use crate::job_types::voice_conversion::so_vits_svc::so_vits_svc_model_check_command::SoVitsSvcModelCheckCommand;
 use crate::job_types::voice_conversion::softvc::softvc_model_check_command::SoftVcModelCheckCommand;
+use crate::threads::nvidia_smi_checker::nvidia_smi_health_check_status::NvidiaSmiHealthCheckStatus;
 use google_drive_common::google_drive_download_command::GoogleDriveDownloadCommand;
 use mysql_queries::common_inputs::container_environment_arg::ContainerEnvironmentArg;
 use mysql_queries::mediators::badge_granter::BadgeGranter;
@@ -28,6 +29,8 @@ pub struct JobState {
   pub badge_granter: BadgeGranter,
 
   pub bucket_path_unifier: BucketPathUnifier,
+
+  pub nvidia_smi_health_check_status: NvidiaSmiHealthCheckStatus,
 
   pub sidecar_configs: SidecarConfigs,
 

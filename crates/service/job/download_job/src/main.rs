@@ -20,6 +20,7 @@
 pub mod job_loop;
 pub mod job_state;
 pub mod job_types;
+pub mod threads;
 
 use bootstrap::bootstrap::{bootstrap, BootstrapArgs};
 use cloud_storage::bucket_client::BucketClient;
@@ -39,7 +40,7 @@ use crate::job_types::voice_conversion::so_vits_svc::so_vits_svc_model_check_com
 use crate::job_types::voice_conversion::softvc::softvc_model_check_command::SoftVcModelCheckCommand;
 use errors::AnyhowResult;
 use google_drive_common::google_drive_download_command::GoogleDriveDownloadCommand;
-use log::{info, warn};
+use log::info;
 use mysql_queries::common_inputs::container_environment_arg::ContainerEnvironmentArg;
 use mysql_queries::mediators::badge_granter::BadgeGranter;
 use mysql_queries::mediators::firehose_publisher::FirehosePublisher;
@@ -49,7 +50,10 @@ use sqlx::mysql::MySqlPoolOptions;
 use std::ops::Deref;
 use std::path::PathBuf;
 use std::time::Duration;
+use tokio::runtime::Runtime;
 use subprocess_common::docker_options::{DockerFilesystemMount, DockerGpu, DockerOptions};
+use crate::threads::nvidia_smi_checker::nvidia_smi_health_check_status::NvidiaSmiHealthCheckStatus;
+use crate::threads::nvidia_smi_checker::nvidia_smi_health_check_thread::nvidia_smi_health_check_thread;
 
 // Buckets
 const ENV_ACCESS_KEY : &'static str = "ACCESS_KEY";
@@ -317,6 +321,21 @@ async fn main() -> AnyhowResult<()> {
     firehose_publisher: firehose_publisher.clone(), // NB: Also safe
   };
 
+  let tokio_runtime = Runtime::new()?;
+
+  info!("Spawning nvidia-smi health checker.");
+
+  let nvidia_smi_health_check_status = NvidiaSmiHealthCheckStatus::new();
+  let nvidia_smi_health_check_status2 = nvidia_smi_health_check_status.clone();
+
+  tokio_runtime.spawn(async move {
+    nvidia_smi_health_check_thread(
+      nvidia_smi_health_check_status2,
+      easyenv::get_env_duration_seconds_or_default("NVIDIA_HEALTH_CHECK_TIMEOUT_SECONDS", Duration::from_secs(30)),
+    ).await;
+  });
+
+
   let job_state = JobState {
     download_temp_directory: temp_directory,
     mysql_pool,
@@ -324,6 +343,7 @@ async fn main() -> AnyhowResult<()> {
     bucket_client,
     bucket_path_unifier: BucketPathUnifier::default_paths(),
     bucket_root_tts_model_uploads: bucket_root.to_string(),
+    nvidia_smi_health_check_status,
     firehose_publisher,
     badge_granter,
     sidecar_configs: SidecarConfigs {
