@@ -39,7 +39,6 @@ use actix_helpers::middleware::banned_cidr_filter::load_cidr_ban_set_from_file::
 use actix_helpers::middleware::banned_ip_filter::banned_ip_filter::BannedIpFilter;
 use actix_helpers::middleware::banned_ip_filter::ip_ban_list::ip_ban_list::IpBanList;
 use actix_helpers::middleware::banned_ip_filter::ip_ban_list::load_ip_ban_list_from_directory::load_ip_ban_list_from_directory;
-use actix_http::http;
 use actix_web::middleware::{Logger, DefaultHeaders};
 use actix_web::{HttpServer, web, HttpResponse, App, middleware};
 use anyhow::anyhow;

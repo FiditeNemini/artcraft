@@ -1,4 +1,4 @@
-use actix_http::http::header;
+use actix_http::header::CONTENT_TYPE;
 use actix_web::HttpResponseBuilder;
 use actix_web::http::StatusCode;
 use actix_web::{HttpResponse, ResponseError};
@@ -25,6 +25,6 @@ pub fn to_simple_json_error(
   };
 
   HttpResponseBuilder::new(status_code)
-      .set_header(header::CONTENT_TYPE, "application/json")
+      .set_header(CONTENT_TYPE, "application/json")
       .body(body)
 }

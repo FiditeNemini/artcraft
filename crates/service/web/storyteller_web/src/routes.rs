@@ -117,7 +117,7 @@ use users_component::default_routes::add_suggested_api_v1_account_creation_and_s
 use users_component::endpoints::edit_profile_handler::edit_profile_handler;
 use users_component::endpoints::get_profile_handler::get_profile_handler;
 
-pub fn add_routes<T, B> (app: App<T, B>) -> App<T, B>
+pub fn add_routes<T, B> (app: App<T>) -> App<T>
   where
       B: MessageBody,
       T: ServiceFactory<
@@ -211,7 +211,7 @@ pub fn add_routes<T, B> (app: App<T, B>) -> App<T, B>
 
 // ==================== MODERATOR ROUTES ====================
 
-fn add_moderator_routes<T, B> (app: App<T, B>) -> App<T, B>
+fn add_moderator_routes<T, B> (app: App<T>) -> App<T>
   where
       B: MessageBody,
       T: ServiceFactory<
@@ -353,7 +353,7 @@ fn add_moderator_routes<T, B> (app: App<T, B>) -> App<T, B>
 
 // ==================== TTS ROUTES ====================
 
-fn add_tts_routes<T, B> (app: App<T, B>) -> App<T, B>
+fn add_tts_routes<T, B> (app: App<T>) -> App<T>
   where
       B: MessageBody,
       T: ServiceFactory<
@@ -436,7 +436,7 @@ fn add_tts_routes<T, B> (app: App<T, B>) -> App<T, B>
 
 // ==================== WAV2LIP ROUTES ====================
 
-fn add_w2l_routes<T, B> (app: App<T, B>) -> App<T, B>
+fn add_w2l_routes<T, B> (app: App<T>) -> App<T>
   where
       B: MessageBody,
       T: ServiceFactory<
@@ -519,7 +519,7 @@ fn add_w2l_routes<T, B> (app: App<T, B>) -> App<T, B>
 
 // ==================== WEB VOICE CONVERSION ROUTES ====================
 
-fn add_web_vc_routes<T, B> (app: App<T, B>) -> App<T, B>
+fn add_web_vc_routes<T, B> (app: App<T>) -> App<T>
   where
       B: MessageBody,
       T: ServiceFactory<
@@ -603,7 +603,7 @@ fn add_web_vc_routes<T, B> (app: App<T, B>) -> App<T, B>
 
 // ==================== VOCODER ROUTES ====================
 
-fn add_vocoder_routes<T, B> (app: App<T, B>) -> App<T, B>
+fn add_vocoder_routes<T, B> (app: App<T>) -> App<T>
   where
       B: MessageBody,
       T: ServiceFactory<
@@ -641,7 +641,7 @@ fn add_vocoder_routes<T, B> (app: App<T, B>) -> App<T, B>
 
 // ==================== RETRIEVAL ROUTES ("GENERIC_DOWNLOAD_JOBS") ====================
 
-fn add_remote_download_routes<T, B> (app: App<T, B>) -> App<T, B>
+fn add_remote_download_routes<T, B> (app: App<T>) -> App<T>
   where
       B: MessageBody,
       T: ServiceFactory<
@@ -664,7 +664,7 @@ fn add_remote_download_routes<T, B> (app: App<T, B>) -> App<T, B>
 
 // ==================== CATEGORY ROUTES ====================
 
-fn add_category_routes<T, B> (app: App<T, B>) -> App<T, B>
+fn add_category_routes<T, B> (app: App<T>) -> App<T>
   where
       B: MessageBody,
       T: ServiceFactory<
@@ -735,7 +735,7 @@ fn add_category_routes<T, B> (app: App<T, B>) -> App<T, B>
 
 // ==================== USER PROFILE ROUTES ====================
 
-fn add_user_profile_routes<T, B> (app: App<T, B>) -> App<T, B>
+fn add_user_profile_routes<T, B> (app: App<T>) -> App<T>
   where
       B: MessageBody,
       T: ServiceFactory<
@@ -783,7 +783,7 @@ fn add_user_profile_routes<T, B> (app: App<T, B>) -> App<T, B>
 
 // ==================== API TOKEN ROUTES ====================
 
-fn add_api_token_routes<T, B> (app: App<T, B>) -> App<T, B>
+fn add_api_token_routes<T, B> (app: App<T>) -> App<T>
   where
       B: MessageBody,
       T: ServiceFactory<
@@ -816,7 +816,7 @@ fn add_api_token_routes<T, B> (app: App<T, B>) -> App<T, B>
 
 // ==================== API TOKEN ROUTES ====================
 
-fn add_voice_clone_request_routes<T, B> (app: App<T, B>) -> App<T, B>
+fn add_voice_clone_request_routes<T, B> (app: App<T>) -> App<T>
   where
       B: MessageBody,
       T: ServiceFactory<
@@ -841,7 +841,7 @@ fn add_voice_clone_request_routes<T, B> (app: App<T, B>) -> App<T, B>
 
 // ==================== INVESTOR DEMO MODE ====================
 
-fn add_investor_demo_routes<T, B> (app: App<T, B>) -> App<T, B>
+fn add_investor_demo_routes<T, B> (app: App<T>) -> App<T>
   where
       B: MessageBody,
       T: ServiceFactory<
@@ -866,7 +866,7 @@ fn add_investor_demo_routes<T, B> (app: App<T, B>) -> App<T, B>
 
 // ==================== FLAG ROUTES ====================
 
-fn add_flag_routes<T, B> (app: App<T, B>) -> App<T, B>
+fn add_flag_routes<T, B> (app: App<T>) -> App<T>
   where
       B: MessageBody,
       T: ServiceFactory<
@@ -893,7 +893,7 @@ fn add_flag_routes<T, B> (app: App<T, B>) -> App<T, B>
 
 // ==================== DESKTOP APP ROUTES ====================
 
-fn add_desktop_app_routes<T, B> (app: App<T, B>) -> App<T, B>
+fn add_desktop_app_routes<T, B> (app: App<T>) -> App<T>
     where
         B: MessageBody,
         T: ServiceFactory<
@@ -926,7 +926,7 @@ fn add_desktop_app_routes<T, B> (app: App<T, B>) -> App<T, B>
 
 // ==================== MEDIA UPLOAD ROUTES ====================
 
-fn add_media_upload_routes<T, B> (app: App<T, B>) -> App<T, B>
+fn add_media_upload_routes<T, B> (app: App<T>) -> App<T>
   where
       B: MessageBody,
       T: ServiceFactory<
@@ -955,7 +955,7 @@ fn add_media_upload_routes<T, B> (app: App<T, B>) -> App<T, B>
 
 // ==================== TRENDING ROUTES ====================
 
-fn add_trending_routes<T, B> (app: App<T, B>) -> App<T, B>
+fn add_trending_routes<T, B> (app: App<T>) -> App<T>
   where
       B: MessageBody,
       T: ServiceFactory<
@@ -975,7 +975,7 @@ fn add_trending_routes<T, B> (app: App<T, B>) -> App<T, B>
 }
 // ==================== USER RATING ROUTES ====================
 
-fn add_user_rating_routes<T, B> (app: App<T, B>) -> App<T, B>
+fn add_user_rating_routes<T, B> (app: App<T>) -> App<T>
   where
       B: MessageBody,
       T: ServiceFactory<
@@ -1003,7 +1003,7 @@ fn add_user_rating_routes<T, B> (app: App<T, B>) -> App<T, B>
 // TODO: Maybe move these into an "oauth-gateway" type http service.
 //  We'll want the domain to have reputation and not confuse people.
 //  It'll also be nice to accrue all oauth things here.
-fn add_twitch_routes<T, B> (app: App<T, B>) -> App<T, B>
+fn add_twitch_routes<T, B> (app: App<T>) -> App<T>
   where
       B: MessageBody,
       T: ServiceFactory<
@@ -1064,7 +1064,7 @@ fn add_twitch_routes<T, B> (app: App<T, B>) -> App<T, B>
 }
 
 // ============= SUBSCRIPTION ROUTES ===================
-fn add_subscription_routes<T, B> (app: App<T, B>) -> App<T, B>
+fn add_subscription_routes<T, B> (app: App<T>) -> App<T>
   where
       B: MessageBody,
       T: ServiceFactory<

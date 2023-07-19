@@ -7,26 +7,28 @@ use crate::middleware::banned_ip_filter::banned_error::BannedError;
 use futures_util::future::{err, Either, Ready};
 use std::net::IpAddr;
 use std::str::FromStr;
-use std::task::{Context, Poll};
+//use std::task::{Context, Poll};
 
 pub struct BannedCidrFilterMiddleware<S> {
   pub (crate) service: S,
   pub (crate) cidr_bans: BannedCidrSet,
 }
 
-impl<S> Service<ServiceRequest> for BannedCidrFilterMiddleware<S>
+impl<S, B> Service<ServiceRequest> for BannedCidrFilterMiddleware<S>
   where
-      S: Service<ServiceRequest, Response = ServiceResponse, Error = Error>,
+      S: Service<ServiceRequest, Response = ServiceResponse<B>, Error = Error>,
       S::Future: 'static,
 {
-  type Response = ServiceResponse;
+  type Response = ServiceResponse<B>;
   type Error = Error;
   type Future = Either<S::Future, Ready<Result<Self::Response, Self::Error>>>;
 
-  // alternatively(?), actix_service::forward_ready!(service);
-  fn poll_ready(&self, cx: &mut Context) -> Poll<Result<(), Self::Error>> {
-    self.service.poll_ready(cx)
-  }
+  //// alternatively(?), actix_service::forward_ready!(service);
+  //fn poll_ready(&self, cx: &mut Context) -> Poll<Result<(), Self::Error>> {
+  //  self.service.poll_ready(cx)
+  //}
+
+  actix_service::forward_ready!(service);
 
   fn call(&self, request: ServiceRequest) -> Self::Future {
     let ip_address = get_service_request_ip_address(&request);

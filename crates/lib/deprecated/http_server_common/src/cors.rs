@@ -1,5 +1,4 @@
 use actix_cors::Cors;
-use actix_http::http;
 use log::info;
 use reusable_types::server_environment::ServerEnvironment;
 
@@ -38,11 +37,11 @@ fn do_build_cors_config(is_production: bool) -> Cors {
   cors.allowed_methods(vec!["GET", "POST", "OPTIONS", "DELETE"])
       .supports_credentials()
       .allowed_headers(vec![
-        http::header::ACCEPT,
-        http::header::ACCESS_CONTROL_ALLOW_ORIGIN, // Tabulator Ajax
-        http::header::CONTENT_TYPE,
-        http::header::ACCESS_CONTROL_ALLOW_CREDENTIALS, // https://stackoverflow.com/a/46412839
-        http::header::HeaderName::from_static("x-requested-with") // Tabulator Ajax sends
+        actix_http::header::ACCEPT,
+        actix_http::header::ACCESS_CONTROL_ALLOW_ORIGIN, // Tabulator Ajax
+        actix_http::header::CONTENT_TYPE,
+        actix_http::header::ACCESS_CONTROL_ALLOW_CREDENTIALS, // https://stackoverflow.com/a/46412839
+        actix_http::header::HeaderName::from_static("x-requested-with") // Tabulator Ajax sends
       ])
       .max_age(3600)
 }
@@ -204,6 +203,7 @@ pub fn add_development_only(cors: Cors) -> Cors {
 #[cfg(test)]
 mod tests {
   use actix_cors::Cors;
+  use actix_http::body::{BoxBody, EitherBody};
   use actix_web::dev::{Service, ServiceRequest, ServiceResponse, Transform};
   use actix_web::http::StatusCode;
   use actix_web::test::TestRequest;
@@ -212,7 +212,7 @@ mod tests {
   use reusable_types::server_environment::ServerEnvironment;
   use speculoos::{assert_that, asserting};
 
-  async fn make_test_request(cors: &Cors, hostname: &str) -> ServiceResponse {
+  async fn make_test_request(cors: &Cors, hostname: &str) -> ServiceResponse<EitherBody<BoxBody>> {
     let cors= cors.new_transform(test::ok_service())
         .await
         .unwrap();

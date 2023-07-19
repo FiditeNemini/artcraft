@@ -17,7 +17,6 @@ pub mod endpoints_ws;
 pub mod server_state;
 
 use actix_cors::Cors;
-use actix_http::http;
 use actix_web::middleware::{Logger, DefaultHeaders};
 use actix_web::{HttpServer, web, HttpResponse, App};
 use config::shared_constants::DEFAULT_MYSQL_CONNECTION_STRING;

@@ -52,7 +52,7 @@ pub async fn logout_handler(
   mysql_pool: web::Data<MySqlPool>,
 ) -> Result<HttpResponse, LogoutError>
 {
-  let delete_cookie = match http_request.cookie("session") {
+  let mut delete_cookie = match http_request.cookie("session") {
     Some(cookie) => {
       match session_cookie_manager.decode_session_token(&cookie) {
         Err(e) => {
@@ -77,8 +77,11 @@ pub async fn logout_handler(
   let body = serde_json::to_string(&response)
     .map_err(|_e| LogoutError::ServerError)?;
 
+  // Mark cookie for deletion
+  delete_cookie.make_removal();
+
   Ok(HttpResponse::Ok()
-    .del_cookie(&delete_cookie)
+    .cookie(delete_cookie)
     .content_type("application/json")
     .body(body))
 }

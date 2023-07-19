@@ -1,9 +1,9 @@
 use actix_http::StatusCode;
-use actix_http::http::{header, HeaderMap, HeaderValue};
-use actix_http::{error, body::Body, Response};
+use actix_http::body::BoxBody;
+use actix_http::header::HeaderName;
+use actix_http::{error, Response};
 use actix_web::dev::{Service, Transform};
 use actix_web::dev::{ServiceRequest, ServiceResponse};
-use actix_web::http::HeaderName;
 use actix_web::http::header::USER_AGENT;
 use actix_web::web::{BytesMut, Buf, BufMut};
 use actix_web::{Error, HttpResponse};
@@ -11,11 +11,16 @@ use actix_web::{ResponseError, HttpMessage, HttpRequest, HttpResponseBuilder};
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::server_state::StaticFeatureFlags;
 use errors::AnyhowResult;
+use futures_core::ready;
 use futures_util::future::{err, ok, Either, Ready};
 use http_server_common::request::get_request_ip::get_service_request_ip;
-use std::io::Write;
-use std::task::{Context, Poll};
 use log::warn;
+use pin_project_lite::pin_project;
+use std::future::Future;
+use std::io::Write;
+use std::marker::PhantomData;
+use std::pin::Pin;
+use std::task::{Context, Poll};
 
 // There are two steps in middleware processing.
 // 1. Middleware initialization, middleware factory gets called with
@@ -39,7 +44,7 @@ impl ResponseError for PushbackError {
     StatusCode::TOO_MANY_REQUESTS
   }
 
-  fn error_response(&self) -> HttpResponse<Body> {
+  fn error_response(&self) -> HttpResponse<BoxBody> {
     // NB: I'm setting a string error code because I mistakenly got caught by this in local dev
     // and couldn't figure out the issue for a bit. At least I can grep for this string.
     // However, I need to balance this requirement with not cluing in those that are banned.
@@ -62,12 +67,12 @@ impl PushbackFilter {
   }
 }
 
-impl<S> Transform<S, ServiceRequest> for PushbackFilter
+impl<S, B> Transform<S, ServiceRequest> for PushbackFilter
   where
-      S: Service<ServiceRequest, Response = ServiceResponse, Error = Error>,
+      S: Service<ServiceRequest, Response = ServiceResponse<B>, Error = Error>,
       S::Future: 'static,
 {
-  type Response = ServiceResponse;
+  type Response = ServiceResponse<B>;
   type Error = Error;
   type InitError = ();
   type Transform = PushbackFilterMiddleware<S>;
@@ -83,19 +88,21 @@ pub struct PushbackFilterMiddleware<S> {
   feature_flags: StaticFeatureFlags,
 }
 
-impl<S> Service<ServiceRequest> for PushbackFilterMiddleware<S>
+impl<S, B> Service<ServiceRequest> for PushbackFilterMiddleware<S>
   where
-      S: Service<ServiceRequest, Response = ServiceResponse, Error = Error>,
+      S: Service<ServiceRequest, Response = ServiceResponse<B>, Error = Error>,
       S::Future: 'static,
 {
-  type Response = ServiceResponse;
+  type Response = ServiceResponse<B>;
   type Error = Error;
   type Future = Either<S::Future, Ready<Result<Self::Response, Self::Error>>>;
 
-  // alternatively(?), actix_service::forward_ready!(service);
-  fn poll_ready(&self, cx: &mut Context) -> Poll<Result<(), Self::Error>> {
-    self.service.poll_ready(cx)
-  }
+  //// alternatively(?), actix_service::forward_ready!(service);
+  //fn poll_ready(&self, cx: &mut Context) -> Poll<Result<(), Self::Error>> {
+  //  self.service.poll_ready(cx)
+  //}
+
+  actix_service::forward_ready!(service);
 
   fn call(&self, req: ServiceRequest) -> Self::Future {
     // NB: Ordinarily the filter should be disabled.
