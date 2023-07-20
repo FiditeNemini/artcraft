@@ -72,8 +72,6 @@ impl PretrainedHubertModel {
 
     info!("Finished downloading hubert file to {:?}", &self.filesystem_path);
 
-    safe_delete_temp_directory(&temp_dir);
-
     Ok(())
   }
 }
