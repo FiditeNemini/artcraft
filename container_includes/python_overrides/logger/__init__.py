@@ -53,6 +53,11 @@ class FakeYouLogger:
 
     # noinspection PyPep8Naming
     def setLevel(self, level):
+        # NB(bt,2023-07-20): rvc-v2 dependencies seem to set a string level
+        # Not sure if this is where they're doing it.
+        if level is not int:
+            print('error', 'setLevel not an int:', level)
+            level = 30 # Warn.
         self.level = level
 
     # noinspection PyPep8Naming
