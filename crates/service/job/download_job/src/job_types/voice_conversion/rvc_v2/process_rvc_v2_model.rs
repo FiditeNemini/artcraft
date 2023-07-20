@@ -40,9 +40,13 @@ pub async fn process_rvc_v2_model<'a, 'b>(
 
   // ==================== DETERMINE FILE CONTENTS ==================== //
 
+  info!("Determining download file contents: {:?}", &download_filename);
+
   let original_download_file_path = PathBuf::from(download_filename.clone());
 
   let download_contents = extract_rvc_files(&original_download_file_path, temp_dir)?;
+
+  info!("Contents of downloaded RVC model: {:?}", &download_contents);
 
   let original_model_file_path;
   let maybe_original_model_index_file_path: Option<PathBuf>; // TODO RENAME MAYBE

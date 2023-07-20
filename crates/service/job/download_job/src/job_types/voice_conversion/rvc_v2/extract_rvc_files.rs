@@ -1,10 +1,11 @@
 use errors::AnyhowResult;
 use std::path::{Path, PathBuf};
-use log::warn;
+use log::{info, warn};
 use tempdir::TempDir;
 use container_common::filesystem::safe_delete_temp_file::safe_delete_temp_file;
 use mimetypes::mimetype_for_file::get_mimetype_for_file;
 
+#[derive(Debug)]
 pub enum DownloadedRvcFile {
   /// Error - wrong file type was uploaded
   InvalidModel,
@@ -29,6 +30,8 @@ pub fn extract_rvc_files(download_file: &Path, temp_dir: &TempDir) -> AnyhowResu
     return Ok(DownloadedRvcFile::InvalidModel);
   }
 
+  info!("Opening download archive: {:?}", &download_file);
+
   let file = std::fs::File::open(download_file)?;
   let reader = std::io::BufReader::new(file);
   let mut archive = zip::ZipArchive::new(reader)?;
@@ -51,6 +54,8 @@ pub fn extract_rvc_files(download_file: &Path, temp_dir: &TempDir) -> AnyhowResu
   let mut maybe_path_to_model = None;
   let mut maybe_path_to_index = None;
 
+  info!("Reading archive contents...");
+
   for i in 0..archive.len() {
     let mut file = archive.by_index(i)?;
     let filename = file.name().to_lowercase();
@@ -66,6 +71,8 @@ pub fn extract_rvc_files(download_file: &Path, temp_dir: &TempDir) -> AnyhowResu
     } else {
       continue;
     }
+
+    info!("Extracting item {} to {:?} ...", i, &temp_file_path);
 
     let mut outfile = std::fs::File::create(&temp_file_path)?;
     std::io::copy(&mut file, &mut outfile)?;
