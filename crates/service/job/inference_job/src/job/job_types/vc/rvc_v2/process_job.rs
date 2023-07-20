@@ -1,4 +1,3 @@
-use std::path::PathBuf;
 use anyhow::anyhow;
 use buckets::public::media_uploads::original_file::MediaUploadOriginalFilePath;
 use buckets::public::voice_conversion_results::original_file::VoiceConversionResultOriginalFilePath;
@@ -20,6 +19,7 @@ use mysql_queries::queries::generic_inference::job::list_available_generic_infer
 use mysql_queries::queries::media_uploads::get_media_upload_for_inference::get_media_upload_for_inference;
 use mysql_queries::queries::voice_conversion::inference::get_voice_conversion_model_for_inference::VoiceConversionModelForInference;
 use mysql_queries::queries::voice_conversion::results::insert_voice_conversion_result::{insert_voice_conversion_result, InsertArgs};
+use std::path::PathBuf;
 use std::time::Instant;
 use tokens::files::media_upload::MediaUploadToken;
 use tokens::users::user::UserToken;
@@ -40,9 +40,16 @@ pub async fn process_job(args: RvcV2ProcessJobArgs<'_>) -> Result<JobSuccessResu
       .new_generic_inference(job.inference_job_token.as_str())
       .map_err(|e| ProcessSingleJobError::Other(anyhow!(e)))?;
 
-  // ==================== CONFIRM OR DOWNLOAD RVC (v2) DEPENDENCIES ==================== //
+  // ==================== DOWNLOAD HUBERT ==================== //
 
-  // TODO: Figure out where to get hubert from.
+  args.job_dependencies.pretrained_models.rvc_v2_hubert.download_if_not_on_filesystem(
+    &args.job_dependencies.private_bucket_client,
+    &args.job_dependencies.fs.scoped_temp_dir_creator_for_downloads)
+      .await
+      .map_err(|e| {
+        error!("could not download hubert: {:?}", e);
+        ProcessSingleJobError::from_anyhow_error(e)
+      })?;
 
   // ==================== CONFIRM OR DOWNLOAD RVC (v2) MODEL ==================== //
 
@@ -178,8 +185,6 @@ pub async fn process_job(args: RvcV2ProcessJobArgs<'_>) -> Result<JobSuccessResu
   info!("Running RVC (v2) VC inference...");
 
   info!("Expected output audio filename: {:?}", &output_audio_fs_path);
-  //info!("Expected output metadata filename: {:?}", &output_metadata_fs_path);
-  //info!("Expected output spectrogram filename: {:?}", &output_spectrogram_fs_path);
 
   // TODO: Limit output length for premium.
 
@@ -187,32 +192,6 @@ pub async fn process_job(args: RvcV2ProcessJobArgs<'_>) -> Result<JobSuccessResu
       .as_ref()
       .map(|args| args.args.as_ref())
       .flatten();
-
-  // TODO: Other inference args
-
-//  // If not specified by the user, turn off auto prediction. It sounds awful.
-//  let auto_predict_f0 = maybe_args
-//      .map(|args| match args {
-//        PolymorphicInferenceArgs::Tts { .. } => None,
-//        PolymorphicInferenceArgs::Vc { auto_predict_f0, .. } => *auto_predict_f0,
-//      })
-//      .flatten()
-//      .unwrap_or(false);
-//
-//  let maybe_transpose = maybe_args
-//      .map(|args| match args {
-//        PolymorphicInferenceArgs::Tts { .. } => None,
-//        PolymorphicInferenceArgs::Vc { transpose, .. } => *transpose,
-//      })
-//      .flatten();
-//
-//  let maybe_override_f0_method = maybe_args
-//      .map(|args| match args {
-//        PolymorphicInferenceArgs::Tts { .. } => None,
-//        PolymorphicInferenceArgs::Vc { override_f0_method, .. } =>
-//          *override_f0_method,
-//      })
-//      .flatten();
 
   // ==================== RUN INFERENCE SCRIPT ==================== //
 
@@ -225,6 +204,7 @@ pub async fn process_job(args: RvcV2ProcessJobArgs<'_>) -> Result<JobSuccessResu
       .execute_inference(InferenceArgs {
         model_path: &rvc_v2_model_fs_path,
         maybe_model_index_path: maybe_rvc_v2_model_index_fs_path,
+        hubert_path: &args.job_dependencies.pretrained_models.rvc_v2_hubert.filesystem_path,
         input_path: &input_wav_path,
         output_path: &output_audio_fs_path,
       });

@@ -64,6 +64,9 @@ pub struct InferenceArgs<P: AsRef<Path>, Q: AsRef<Path>> {
   /// --model_index_path: model index path
   pub maybe_model_index_path: Option<Q>,
 
+  /// --hubert_model_path: path to the hubert model on the filesystem
+  pub hubert_path: P,
+
   /// --input_audio_filename: input wav path
   pub input_path: P,
 
@@ -189,6 +192,9 @@ impl RvcV2InferenceCommand {
       command.push_str(" --model_index_path ");
       command.push_str(&path_to_string(model_index_path));
     }
+
+    command.push_str(" --hubert_model_path ");
+    command.push_str(&path_to_string(args.hubert_path));
 
     command.push_str(" --input_audio_filename ");
     command.push_str(&path_to_string(args.input_path));

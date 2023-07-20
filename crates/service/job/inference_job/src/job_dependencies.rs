@@ -20,6 +20,7 @@ use r2d2_redis::r2d2;
 use sqlx::MySqlPool;
 use std::path::PathBuf;
 use concurrency::relaxed_atomic_bool::RelaxedAtomicBool;
+use crate::job::job_types::vc::rvc_v2::pretrained_hubert_model::PretrainedHubertModel;
 use crate::job::job_types::vc::rvc_v2::rvc_v2_inference_command::RvcV2InferenceCommand;
 
 pub struct JobDependencies {
@@ -87,6 +88,8 @@ pub struct JobDependencies {
   // Details for each job type (grouped by the job type)
   pub job_type_details: JobTypeDetails,
 
+  pub pretrained_models: PretrainedModels,
+
   pub container: ContainerEnvironment,
   pub container_db: ContainerEnvironmentArg, // Same info, but for database.
 
@@ -134,6 +137,10 @@ pub struct JobCaches {
   /// Skip processing models if they're not on the filesystem.
   /// If the counter elapses a delta, proceed with calculation.
   pub model_cache_counter: TtlKeyCounter,
+}
+
+pub struct PretrainedModels {
+  pub rvc_v2_hubert: PretrainedHubertModel,
 }
 
 /// Per-job type details
