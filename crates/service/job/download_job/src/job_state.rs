@@ -10,6 +10,7 @@ use crate::job_types::voice_conversion::rvc_v2::rvc_v2_model_check_command::RvcV
 use crate::job_types::voice_conversion::so_vits_svc::so_vits_svc_model_check_command::SoVitsSvcModelCheckCommand;
 use crate::job_types::voice_conversion::softvc::softvc_model_check_command::SoftVcModelCheckCommand;
 use crate::threads::nvidia_smi_checker::nvidia_smi_health_check_status::NvidiaSmiHealthCheckStatus;
+use enums::by_table::generic_download_jobs::generic_download_type::GenericDownloadType;
 use google_drive_common::google_drive_download_command::GoogleDriveDownloadCommand;
 use mysql_queries::common_inputs::container_environment_arg::ContainerEnvironmentArg;
 use mysql_queries::mediators::badge_granter::BadgeGranter;
@@ -17,9 +18,13 @@ use mysql_queries::mediators::firehose_publisher::FirehosePublisher;
 use r2d2_redis::RedisConnectionManager;
 use r2d2_redis::r2d2;
 use sqlx::MySqlPool;
+use std::collections::BTreeSet;
 use std::path::PathBuf;
 
 pub struct JobState {
+  /// The types of downloads this instance of the job will handle.
+  pub download_types: BTreeSet<GenericDownloadType>,
+
   pub download_temp_directory: PathBuf,
   pub mysql_pool: MySqlPool,
 

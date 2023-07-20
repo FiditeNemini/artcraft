@@ -1,3 +1,4 @@
+use anyhow::anyhow;
 use container_common::anyhow_result::AnyhowResult;
 use crate::JobState;
 use crate::job_loop::process_single_job::process_single_job;
@@ -6,7 +7,6 @@ use log::{error, warn};
 use mysql_queries::queries::generic_download::job::list_available_generic_download_jobs::{AvailableDownloadJob, list_available_generic_download_jobs};
 use mysql_queries::queries::generic_download::job::mark_generic_download_job_failure::mark_generic_download_job_failure;
 use std::time::Duration;
-use anyhow::anyhow;
 
 // Job runner timeouts (guards MySQL)
 const START_TIMEOUT_MILLIS : u64 = 500;
@@ -25,7 +25,11 @@ pub async fn main_loop(job_state: JobState) {
     }
 
     let num_records = 1;
-    let maybe_available_jobs = list_available_generic_download_jobs(&job_state.mysql_pool, num_records).await;
+
+    let maybe_available_jobs = list_available_generic_download_jobs(
+      &job_state.mysql_pool,
+      num_records,
+      &job_state.download_types).await;
 
     let jobs = match maybe_available_jobs {
       Ok(jobs) => jobs,

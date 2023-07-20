@@ -1,13 +1,11 @@
-use anyhow::anyhow;
 use chrono::Utc;
 use crate::column_types::job_status::JobStatus;
 use crate::queries::generic_download::job::_keys::GenericDownloadJobId;
-use crate::tokens::Tokens;
 use enums::by_table::generic_download_jobs::generic_download_type::GenericDownloadType;
 use enums::common::visibility::Visibility;
 use errors::AnyhowResult;
 use sqlx::MySqlPool;
-use std::path::Path;
+use std::collections::BTreeSet;
 use tokens::jobs::download::DownloadJobToken;
 
 /// table: generic_download_jobs
@@ -33,12 +31,11 @@ pub struct AvailableDownloadJob {
   pub retry_at: Option<chrono::DateTime<Utc>>,
 }
 
-pub async fn list_available_generic_download_jobs(pool: &MySqlPool, num_records: u32)
+pub async fn list_available_generic_download_jobs(pool: &MySqlPool, num_records: u32, download_types: &BTreeSet<GenericDownloadType>)
   -> AnyhowResult<Vec<AvailableDownloadJob>>
 {
-  let job_records = sqlx::query_as!(
-      AvailableDownloadJobRawInternal,
-        r#"
+
+  let mut query = String::from(r#"
 SELECT
   id,
   token AS `download_job_token: tokens::jobs::download::DownloadJobToken`,
@@ -69,11 +66,20 @@ WHERE
     OR
     retry_at < CURRENT_TIMESTAMP
   )
-  ORDER BY id ASC
-  LIMIT ?
-        "#,
-      num_records,
-    )
+  "#);
+
+  if let Some(clause) = download_type_clause(download_types) {
+    query.push_str(" AND ");
+    query.push_str(&clause);
+    query.push_str(" ");
+  }
+
+  query.push_str(&format!(r#"
+    ORDER BY id ASC
+    LIMIT {}
+  "#, num_records));
+
+  let mut job_records = sqlx::query_as::<_, AvailableDownloadJobRawInternal>(&query)
       .fetch_all(pool)
       .await?;
 
@@ -101,7 +107,21 @@ WHERE
   Ok(job_records)
 }
 
-#[derive(Debug)]
+fn download_type_clause(download_types: &BTreeSet<GenericDownloadType>) -> Option<String> {
+  if download_types.is_empty() {
+    return None;
+  }
+
+  let download_types = download_types.into_iter()
+      .map(|download_type| download_type.to_str())
+      .map(|download_type| format!("\"{}\"", download_type))
+      .collect::<Vec<_>>()
+      .join(", ");
+
+  Some(format!("download_type IN ( {} )", download_types))
+}
+
+#[derive(Debug, sqlx::FromRow)]
 struct AvailableDownloadJobRawInternal {
   pub id: i64,
   pub download_job_token: DownloadJobToken,
@@ -121,4 +141,24 @@ struct AvailableDownloadJobRawInternal {
   pub created_at: chrono::DateTime<Utc>,
   pub updated_at: chrono::DateTime<Utc>,
   pub retry_at: Option<chrono::DateTime<Utc>>,
+}
+
+
+#[cfg(test)]
+mod tests {
+  use std::collections::BTreeSet;
+  use enums::by_table::generic_download_jobs::generic_download_type::GenericDownloadType;
+  use crate::queries::generic_download::job::list_available_generic_download_jobs::download_type_clause;
+
+  #[test]
+  fn test_download_types_with_clause() {
+    let clause = download_type_clause(&BTreeSet::from([GenericDownloadType::HifiGan, GenericDownloadType::RvcV2]));
+    assert_eq!(clause.as_deref(), Some("download_type IN ( \"hifigan\", \"rvc_v2\" )"));
+  }
+
+  #[test]
+  fn test_download_types_with_clause_absent() {
+    let clause = download_type_clause(&BTreeSet::from([]));
+    assert_eq!(clause, None);
+  }
 }

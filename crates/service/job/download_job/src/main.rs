@@ -23,6 +23,7 @@ pub mod job_types;
 pub mod threads;
 pub mod util;
 
+use std::collections::BTreeSet;
 use bootstrap::bootstrap::{bootstrap, BootstrapArgs};
 use cloud_storage::bucket_client::BucketClient;
 use cloud_storage::bucket_path_unifier::BucketPathUnifier;
@@ -55,6 +56,7 @@ use std::path::PathBuf;
 use std::time::Duration;
 use subprocess_common::docker_options::{DockerFilesystemMount, DockerGpu, DockerOptions};
 use tokio::runtime::Runtime;
+use enums::by_table::generic_download_jobs::generic_download_type::GenericDownloadType;
 use crate::job_types::voice_conversion::rvc_v2::pretrained_hubert_model::PretrainedHubertModel;
 
 // Buckets
@@ -337,7 +339,17 @@ async fn main() -> AnyhowResult<()> {
     ).await;
   });
 
+  let mut download_types = BTreeSet::new();
+
+  download_types.insert(GenericDownloadType::RvcV2);
+  download_types.insert(GenericDownloadType::SoVitsSvc);
+  //download_types.insert(GenericDownloadType::Vits);
+  //download_types.insert(GenericDownloadType::HifiGan);
+
+  info!("Looking up download jobs of type {:?}", download_types);
+
   let job_state = JobState {
+    download_types,
     download_temp_directory: temp_directory,
     mysql_pool,
     redis_pool,
