@@ -34,21 +34,21 @@ pub struct AvailableDownloadJob {
 pub async fn list_available_generic_download_jobs(pool: &MySqlPool, num_records: u32, download_types: &BTreeSet<GenericDownloadType>)
   -> AnyhowResult<Vec<AvailableDownloadJob>>
 {
-
+  // NB/TODO(bt,2023-07-20): Non-statically typed SQL can't do type annotations AFAIK
   let mut query = String::from(r#"
 SELECT
   id,
-  token AS `download_job_token: tokens::jobs::download::DownloadJobToken`,
+  token,
 
   creator_user_token,
   creator_ip_address,
-  creator_set_visibility as `creator_set_visibility: enums::common::visibility::Visibility`,
+  creator_set_visibility,
 
-  download_type as `download_type: enums::by_table::generic_download_jobs::generic_download_type::GenericDownloadType`,
+  download_type,
   download_url,
   title,
 
-  status as `status: crate::column_types::job_status::JobStatus`,
+  status,
   attempt_count,
   failure_reason,
 
@@ -87,14 +87,20 @@ WHERE
       .map(|record : AvailableDownloadJobRawInternal| {
         AvailableDownloadJob {
           id: GenericDownloadJobId(record.id),
-          download_job_token: record.download_job_token,
+          download_job_token: DownloadJobToken::new(record.token),
           creator_ip_address: record.creator_ip_address,
           creator_user_token: record.creator_user_token,
-          creator_set_visibility: record.creator_set_visibility,
-          download_type: record.download_type,
+          // NB: Failure case for parsing visibility - default to private
+          creator_set_visibility: Visibility::from_str(&record.creator_set_visibility)
+              .unwrap_or(Visibility::Private),
+          // NB: Failure case for parsing download type - unhandled model type
+          download_type: GenericDownloadType::from_str(&record.download_type)
+              .unwrap_or(GenericDownloadType::RocketVc),
           download_url: record.download_url,
           title: record.title,
-          status: record.status,
+          // NB: Failure case for parsing download type - dead job
+          status: JobStatus::from_str(&record.status)
+              .unwrap_or(JobStatus::Dead),
           attempt_count: record.attempt_count,
           failure_reason: record.failure_reason,
           created_at: record.created_at,
@@ -124,17 +130,17 @@ fn download_type_clause(download_types: &BTreeSet<GenericDownloadType>) -> Optio
 #[derive(Debug, sqlx::FromRow)]
 struct AvailableDownloadJobRawInternal {
   pub id: i64,
-  pub download_job_token: DownloadJobToken,
+  pub token: String,
 
   pub creator_user_token: String,
   pub creator_ip_address: String,
-  pub creator_set_visibility: Visibility,
+  pub creator_set_visibility: String,
 
-  pub download_type: GenericDownloadType,
+  pub download_type: String,
   pub download_url: String,
   pub title: String,
 
-  pub status: JobStatus,
+  pub status: String,
   pub attempt_count: i32,
   pub failure_reason: Option<String>,
 
