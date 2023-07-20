@@ -33,7 +33,10 @@ pub async fn process_rvc_v2_model<'a, 'b>(
 
   // ==================== DOWNLOAD HUBERT ==================== //
 
-  let hubert_path = PathBuf::from("/home/bt/models/hubert_rvc_v2/hubert_base.pt");
+  job_state.pretrained_models.rvc_v2_hubert.download_if_not_on_filesystem(
+    &job_state.bucket_client,
+    temp_dir,
+  ).await?;
 
   // ==================== DETERMINE FILE CONTENTS ==================== //
 
@@ -69,7 +72,7 @@ pub async fn process_rvc_v2_model<'a, 'b>(
   let model_check_result = job_state.sidecar_configs.rvc_v2_model_check_command.execute_check(CheckArgs {
     model_path: &original_model_file_path,
     maybe_model_index_path: maybe_original_model_index_file_path.as_deref(),
-    hubert_path: &hubert_path,
+    hubert_path: &job_state.pretrained_models.rvc_v2_hubert.filesystem_path,
     maybe_input_path: None,
     output_path: &output_wav_path,
   });

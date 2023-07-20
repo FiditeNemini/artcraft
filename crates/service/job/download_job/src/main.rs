@@ -21,6 +21,7 @@ pub mod job_loop;
 pub mod job_state;
 pub mod job_types;
 pub mod threads;
+pub mod util;
 
 use bootstrap::bootstrap::{bootstrap, BootstrapArgs};
 use cloud_storage::bucket_client::BucketClient;
@@ -30,7 +31,7 @@ use config::shared_constants::DEFAULT_MYSQL_CONNECTION_STRING;
 use config::shared_constants::DEFAULT_RUST_LOG;
 use container_common::filesystem::check_directory_exists::check_directory_exists;
 use crate::job_loop::main_loop::main_loop;
-use crate::job_state::{JobState, SidecarConfigs};
+use crate::job_state::{JobState, PretrainedModels, SidecarConfigs};
 use crate::job_types::tts::tacotron::tacotron_model_check_command::TacotronModelCheckCommand;
 use crate::job_types::tts::vits::vits_model_check_command::VitsModelCheckCommand;
 use crate::job_types::vocoder::hifigan_softvc::hifigan_softvc_model_check_command::HifiGanSoftVcModelCheckCommand;
@@ -38,6 +39,8 @@ use crate::job_types::vocoder::hifigan_tacotron::hifigan_model_check_command::Hi
 use crate::job_types::voice_conversion::rvc_v2::rvc_v2_model_check_command::RvcV2ModelCheckCommand;
 use crate::job_types::voice_conversion::so_vits_svc::so_vits_svc_model_check_command::SoVitsSvcModelCheckCommand;
 use crate::job_types::voice_conversion::softvc::softvc_model_check_command::SoftVcModelCheckCommand;
+use crate::threads::nvidia_smi_checker::nvidia_smi_health_check_status::NvidiaSmiHealthCheckStatus;
+use crate::threads::nvidia_smi_checker::nvidia_smi_health_check_thread::nvidia_smi_health_check_thread;
 use errors::AnyhowResult;
 use google_drive_common::google_drive_download_command::GoogleDriveDownloadCommand;
 use log::info;
@@ -50,10 +53,9 @@ use sqlx::mysql::MySqlPoolOptions;
 use std::ops::Deref;
 use std::path::PathBuf;
 use std::time::Duration;
-use tokio::runtime::Runtime;
 use subprocess_common::docker_options::{DockerFilesystemMount, DockerGpu, DockerOptions};
-use crate::threads::nvidia_smi_checker::nvidia_smi_health_check_status::NvidiaSmiHealthCheckStatus;
-use crate::threads::nvidia_smi_checker::nvidia_smi_health_check_thread::nvidia_smi_health_check_thread;
+use tokio::runtime::Runtime;
+use crate::job_types::voice_conversion::rvc_v2::pretrained_hubert_model::PretrainedHubertModel;
 
 // Buckets
 const ENV_ACCESS_KEY : &'static str = "ACCESS_KEY";
@@ -355,6 +357,9 @@ async fn main() -> AnyhowResult<()> {
       hifigan_softvc_model_check_command,
       vits_model_check_command,
     },
+    pretrained_models: PretrainedModels {
+      rvc_v2_hubert: PretrainedHubertModel::from_env(),
+    },
     job_batch_wait_millis: common_env.job_batch_wait_millis,
     job_max_attempts: common_env.job_max_attempts as i32,
     no_op_logger_millis: common_env.no_op_logger_millis,
@@ -362,7 +367,7 @@ async fn main() -> AnyhowResult<()> {
     container_db: ContainerEnvironmentArg {
       hostname: container_environment.hostname,
       cluster_name: container_environment.cluster_name,
-    }
+    },
   };
 
   main_loop(job_state).await;

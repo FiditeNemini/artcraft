@@ -25,7 +25,6 @@ pub struct RvcV2ModelCheckCommand {
 
   /// If this is run under Docker (eg. in development), these are the options.
   maybe_docker_options: Option<DockerOptions>,
-
 }
 
 #[derive(Clone)]
@@ -101,12 +100,6 @@ impl RvcV2ModelCheckCommand {
 
     let maybe_default_test_wav_path = easyenv::get_env_pathbuf_optional(
       "RVC_V2_MODEL_CHECK_MAYBE_DEFAULT_TEST_WAV_PATH");
-
-    // NB: For now rvc-v2 is all that uses this hubert, but other models
-    // may (re)use it in the future.
-    let pretrained_hubert_bucket_path = easyenv::get_env_string_or_default(
-      "RVC_V2_PRETRAINED_HUBERT_BUCKET_PATH",
-      "/vocodes-private-uploads/hubert_pretrained/rvc_v2_hubert_base.pt");
 
     let maybe_docker_options = easyenv::get_env_string_optional(
       "RVC_V2_MODEL_CHECK_MAYBE_DOCKER_IMAGE")

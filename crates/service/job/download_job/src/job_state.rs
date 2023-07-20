@@ -5,6 +5,7 @@ use crate::job_types::tts::tacotron::tacotron_model_check_command::TacotronModel
 use crate::job_types::tts::vits::vits_model_check_command::VitsModelCheckCommand;
 use crate::job_types::vocoder::hifigan_softvc::hifigan_softvc_model_check_command::HifiGanSoftVcModelCheckCommand;
 use crate::job_types::vocoder::hifigan_tacotron::hifigan_model_check_command::HifiGanModelCheckCommand;
+use crate::job_types::voice_conversion::rvc_v2::pretrained_hubert_model::PretrainedHubertModel;
 use crate::job_types::voice_conversion::rvc_v2::rvc_v2_model_check_command::RvcV2ModelCheckCommand;
 use crate::job_types::voice_conversion::so_vits_svc::so_vits_svc_model_check_command::SoVitsSvcModelCheckCommand;
 use crate::job_types::voice_conversion::softvc::softvc_model_check_command::SoftVcModelCheckCommand;
@@ -34,6 +35,8 @@ pub struct JobState {
 
   pub sidecar_configs: SidecarConfigs,
 
+  pub pretrained_models: PretrainedModels,
+
   // Root to store TTS results
   pub bucket_root_tts_model_uploads: String,
 
@@ -49,6 +52,10 @@ pub struct JobState {
 
   pub container: ContainerEnvironment,
   pub container_db: ContainerEnvironmentArg, // Same info, but for database.
+}
+
+pub struct PretrainedModels {
+  pub rvc_v2_hubert: PretrainedHubertModel,
 }
 
 /// Configurations and interfaces to code deployed as sidecars or container mounts.
