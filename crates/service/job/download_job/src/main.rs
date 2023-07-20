@@ -335,7 +335,6 @@ async fn main() -> AnyhowResult<()> {
     ).await;
   });
 
-
   let job_state = JobState {
     download_temp_directory: temp_directory,
     mysql_pool,

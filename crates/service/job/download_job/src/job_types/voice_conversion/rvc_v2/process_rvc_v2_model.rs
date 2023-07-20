@@ -31,6 +31,10 @@ pub async fn process_rvc_v2_model<'a, 'b>(
   info!("Processing model file...");
   redis_logger.log_status("checking rvc (v2) model")?;
 
+  // ==================== DOWNLOAD HUBERT ==================== //
+
+  let hubert_path = PathBuf::from("/home/bt/models/hubert_rvc_v2/hubert_base.pt");
+
   // ==================== DETERMINE FILE CONTENTS ==================== //
 
   let original_download_file_path = PathBuf::from(download_filename.clone());
@@ -65,6 +69,7 @@ pub async fn process_rvc_v2_model<'a, 'b>(
   let model_check_result = job_state.sidecar_configs.rvc_v2_model_check_command.execute_check(CheckArgs {
     model_path: &original_model_file_path,
     maybe_model_index_path: maybe_original_model_index_file_path.as_deref(),
+    hubert_path: &hubert_path,
     maybe_input_path: None,
     output_path: &output_wav_path,
   });
