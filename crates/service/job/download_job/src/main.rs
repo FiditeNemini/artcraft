@@ -341,6 +341,7 @@ async fn main() -> AnyhowResult<()> {
 
   let mut download_types = BTreeSet::new();
 
+  // NB(bt,2023-07-20): Disabling hifigan (did it work at all?)
   download_types.insert(GenericDownloadType::RvcV2);
   download_types.insert(GenericDownloadType::SoVitsSvc);
   //download_types.insert(GenericDownloadType::Vits);
