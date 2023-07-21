@@ -119,7 +119,7 @@ async fn process_job_batch(job_dependencies: &JobDependencies, jobs: Vec<Availab
             match e {
               // Permanent failures
               ProcessSingleJobError::KeepAliveElapsed =>
-                (true, true, "keepalive elapsed".to_string(), Some("keepalive elapsed")),
+                (true, false, "keepalive elapsed".to_string(), Some("keepalive elapsed")),
               ProcessSingleJobError::InvalidJob(ref err) =>
                 (true, false, format!("InvalidJob: {:?}", err), Some("invalid job")),
 
