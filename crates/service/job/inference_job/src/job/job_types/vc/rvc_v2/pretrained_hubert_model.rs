@@ -1,13 +1,13 @@
 use anyhow::anyhow;
 use cloud_storage::bucket_client::BucketClient;
 use container_common::filesystem::safe_delete_temp_directory::safe_delete_temp_directory;
+use crate::util::scoped_temp_dir_creator::ScopedTempDirCreator;
 use errors::AnyhowResult;
 use filesys::create_dir_all_if_missing::create_dir_all_if_missing;
 use filesys::file_exists::file_exists;
 use log::{error, info};
 use std::path::PathBuf;
-use tempdir::TempDir;
-use crate::util::scoped_temp_dir_creator::ScopedTempDirCreator;
+use filesys::rename_across_devices::rename_across_devices;
 
 #[derive(Clone)]
 pub struct PretrainedHubertModel {
@@ -71,7 +71,7 @@ impl PretrainedHubertModel {
 
     info!("Renaming hubert file from {:?} to {:?}!", &temp_path, &self.filesystem_path);
 
-    std::fs::rename(&temp_path, &self.filesystem_path)
+    rename_across_devices(&temp_path, &self.filesystem_path)
         .map_err(|e| {
           error!("could rename hubert model on disk: {:?}", e);
           safe_delete_temp_directory(&temp_dir);
