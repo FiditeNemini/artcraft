@@ -56,7 +56,7 @@ async fn run_nvidia_smi() ->ExitStatus {
   let mut config = PopenConfig::default();
 
   // NB: We don't want this going to the rust process' stdout (the default Redirect::None),
-  // so we pipe it and block for it.
+  // so we pipe it and ignore it.
   config.stdout = Redirection::Pipe;
   config.stderr = Redirection::Pipe;
 
