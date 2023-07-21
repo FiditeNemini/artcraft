@@ -1,6 +1,5 @@
 import {
   faFileArrowUp,
-  faFileAudio,
   faTrash,
   faWaveform,
 } from "@fortawesome/pro-solid-svg-icons";
@@ -14,6 +13,7 @@ import {
   UploadAudioIsOk,
   UploadAudioRequest,
 } from "@storyteller/components/src/api/upload/UploadAudio";
+import { useUploadedFiles } from "hooks/FileStore";
 
 const FILE_TYPES = ["MP3", "WAV", "FLAC", "OGG"];
 
@@ -26,9 +26,12 @@ interface Props {
 }
 
 function VoiceDesignerUploadComponent(props: Props) {
-  const [files, setFiles] = useState<any[]>([]);
-  const [audioLinks, setAudioLinks] = useState<string[]>([]);
   const [isUploadDisabled, setIsUploadDisabled] = useState<boolean>(false);
+
+  const files = useUploadedFiles((state: any) => state.files);
+  const setFiles = useUploadedFiles((state: any) => state.setFiles);
+  const audioLinks = useUploadedFiles((state: any) => state.audioLinks);
+  const setAudioLinks = useUploadedFiles((state: any) => state.setAudioLinks);
 
   // Auto generated
   const [idempotencyToken, setIdempotencyToken] = useState(uuidv4());
@@ -117,7 +120,7 @@ function VoiceDesignerUploadComponent(props: Props) {
       </h4>
       {files.length > 0 ? (
         <div className="d-flex flex-column gap-3">
-          {files.map((file, index) => (
+          {files.map((file: any, index: any) => (
             <div key={index} className="panel panel-inner rounded p-3">
               <div className="d-flex flex-column gap-2">
                 <div className="d-flex align-items-center">
