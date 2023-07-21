@@ -3,7 +3,7 @@ use log::{error, warn};
 use log::{debug, info};
 use std::thread;
 use std::time::Duration;
-use subprocess::{ExitStatus, Popen, PopenConfig};
+use subprocess::{ExitStatus, Popen, PopenConfig, Redirection};
 
 pub async fn nvidia_smi_health_check_thread(
   health_check_status: NvidiaSmiHealthCheckStatus,
@@ -53,7 +53,12 @@ async fn run_nvidia_smi() ->ExitStatus {
     "nvidia-smi",
   ];
 
-  let config = PopenConfig::default();
+  let mut config = PopenConfig::default();
+
+  // NB: We don't want this going to the rust process' stdout (the default Redirect::None),
+  // so we pipe it and block for it.
+  config.stdout = Redirection::Pipe;
+  config.stderr = Redirection::Pipe;
 
   let mut handle = match Popen::create(&command_parts, config) {
     Ok(handle) => handle,
