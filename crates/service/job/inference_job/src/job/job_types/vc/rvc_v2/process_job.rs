@@ -42,6 +42,8 @@ pub async fn process_job(args: RvcV2ProcessJobArgs<'_>) -> Result<JobSuccessResu
 
   // ==================== DOWNLOAD HUBERT ==================== //
 
+  info!("Download RVC hubert model (if not present)...");
+
   args.job_dependencies.pretrained_models.rvc_v2_hubert.download_if_not_on_filesystem(
     &args.job_dependencies.private_bucket_client,
     &args.job_dependencies.fs.scoped_temp_dir_creator_for_downloads)
@@ -52,6 +54,8 @@ pub async fn process_job(args: RvcV2ProcessJobArgs<'_>) -> Result<JobSuccessResu
       })?;
 
   // ==================== CONFIRM OR DOWNLOAD RVC (v2) MODEL ==================== //
+
+  info!("Download RVC model (if not present)...");
 
   let rvc_v2_model_fs_path = {
     let filename = format!("{}.pt", vc_model.token.as_str());
@@ -85,6 +89,8 @@ pub async fn process_job(args: RvcV2ProcessJobArgs<'_>) -> Result<JobSuccessResu
   let mut maybe_rvc_v2_model_index_fs_path: Option<PathBuf> = None;
 
   if vc_model.has_index_file {
+    info!("Download RVC index (if not present)...");
+
     maybe_rvc_v2_model_index_fs_path = {
       let filename = format!("{}.index", vc_model.token.as_str());
       let fs_path = args.job_dependencies.fs.semi_persistent_cache.voice_conversion_model_path(&filename);
@@ -125,6 +131,8 @@ pub async fn process_job(args: RvcV2ProcessJobArgs<'_>) -> Result<JobSuccessResu
 
   // ==================== DOWNLOAD MEDIA FILE ==================== //
 
+  info!("Download media for RVC voice conversion...");
+
   let maybe_media_upload_result = get_media_upload_for_inference(args.media_upload_token, &args.job_dependencies.mysql_pool).await;
 
   let media_upload = match maybe_media_upload_result {
@@ -150,7 +158,7 @@ pub async fn process_job(args: RvcV2ProcessJobArgs<'_>) -> Result<JobSuccessResu
 
     let bucket_object_path = media_upload_bucket_path.to_full_object_pathbuf();
 
-    info!("Downloading media to bucket path: {:?}", &bucket_object_path);
+    info!("Downloading media from bucket path: {:?}", &bucket_object_path);
 
     maybe_download_file_from_bucket(
       "media upload (original file)",
@@ -171,6 +179,8 @@ pub async fn process_job(args: RvcV2ProcessJobArgs<'_>) -> Result<JobSuccessResu
   // TODO
 
   // ==================== SETUP FOR INFERENCE ==================== //
+
+  info!("Ready for RVC (v2) inference...");
 
   job_progress_reporter.log_status("running inference")
       .map_err(|e| ProcessSingleJobError::Other(e))?;

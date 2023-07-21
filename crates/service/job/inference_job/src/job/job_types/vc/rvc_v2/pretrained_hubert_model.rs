@@ -4,7 +4,7 @@ use container_common::filesystem::safe_delete_temp_directory::safe_delete_temp_d
 use errors::AnyhowResult;
 use filesys::create_dir_all_if_missing::create_dir_all_if_missing;
 use filesys::file_exists::file_exists;
-use log::info;
+use log::{error, info};
 use std::path::PathBuf;
 use tempdir::TempDir;
 use crate::util::scoped_temp_dir_creator::ScopedTempDirCreator;
@@ -27,7 +27,8 @@ impl PretrainedHubertModel {
     // may (re)use it in the future.
     let filesystem_path = easyenv::get_env_pathbuf_or_default(
       "RVC_V2_PRETRAINED_HUBERT_FILESYSTEM_PATH",
-      "/tmp/hubert/rvc_v2_hubert_base.pt");
+      // NB: For now this path is on the shared SMB drive in GKE K8S
+      "/tmp/downloads/hubert/rvc_v2_hubert_base.pt");
 
     Self {
       cloud_bucket_path,
@@ -61,6 +62,7 @@ impl PretrainedHubertModel {
     bucket_client.download_file_to_disk(&self.cloud_bucket_path, &temp_path)
         .await
         .map_err(|e| {
+          error!("could not download hubert model to disk: {:?}", e);
           safe_delete_temp_directory(&temp_dir);
           anyhow!("couldn't download cloud object to disk: {:?}", e)
         })?;
@@ -71,6 +73,7 @@ impl PretrainedHubertModel {
 
     std::fs::rename(&temp_path, &self.filesystem_path)
         .map_err(|e| {
+          error!("could rename hubert model on disk: {:?}", e);
           safe_delete_temp_directory(&temp_dir);
           anyhow!("couldn't rename disk files: {:?}", e)
         })?;
