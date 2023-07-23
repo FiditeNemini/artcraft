@@ -92,7 +92,7 @@ WHERE vc.token = ?
           return Ok(None);
         },
         _ => {
-          warn!("tts model query error: {:?}", err);
+          warn!("voice conversion model query error: {:?}", err);
           return Err(VoiceConversionModelForInferenceError::DatabaseError {
             reason: format!("Mysql error: {:?}", err)
           });

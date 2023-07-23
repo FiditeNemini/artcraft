@@ -105,7 +105,7 @@ pub async fn list_tts_models_handler(
     });
   }
 
-  let maybe_models = server_state.caches.tts_model_list.grab_copy_without_bump_if_unexpired()
+  let maybe_models = server_state.caches.ephemeral.tts_model_list.grab_copy_without_bump_if_unexpired()
       .map_err(|e| {
         error!("Error consulting cache: {:?}", e);
         ListTtsModelsError::ServerError
@@ -139,7 +139,7 @@ pub async fn list_tts_models_handler(
 
       maybe_mysql_connection = Some(mysql_connection);
 
-      server_state.caches.tts_model_list.store_copy(&models)
+      server_state.caches.ephemeral.tts_model_list.store_copy(&models)
           .map_err(|e| {
             error!("Error storing cache: {:?}", e);
             ListTtsModelsError::ServerError

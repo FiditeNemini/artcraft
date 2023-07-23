@@ -61,6 +61,7 @@ pub async fn list_w2l_templates_handler(
 
   let maybe_templates = server_state
       .caches
+      .ephemeral
       .w2l_template_list
       .grab_copy_without_bump_if_unexpired()
       .map_err(|e| {
@@ -89,7 +90,7 @@ pub async fn list_w2l_templates_handler(
         }
       };
 
-      server_state.caches.w2l_template_list.store_copy(&templates)
+      server_state.caches.ephemeral.w2l_template_list.store_copy(&templates)
           .map_err(|e| {
             error!("error storing cache: {:?}", e);
             ListW2lTemplatesError::ServerError

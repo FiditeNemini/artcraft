@@ -62,7 +62,7 @@ use crate::configs::static_api_tokens::{StaticApiTokenConfig, StaticApiTokens, S
 use crate::http_server::middleware::pushback_filter_middleware::PushbackFilter;
 use crate::http_server::web_utils::redis_rate_limiter::RedisRateLimiter;
 use crate::routes::add_routes;
-use crate::server_state::{ServerState, EnvConfig, TwitchOauthSecrets, TwitchOauth, RedisRateLimiters, InMemoryCaches, StripeSettings, ServerInfo, StaticFeatureFlags, TrollBans};
+use crate::server_state::{ServerState, EnvConfig, TwitchOauthSecrets, TwitchOauth, RedisRateLimiters, InMemoryCaches, StripeSettings, ServerInfo, StaticFeatureFlags, TrollBans, DurableInMemoryCaches, EphemeralInMemoryCaches};
 use crate::threads::db_health_checker_thread::db_health_check_status::HealthCheckStatus;
 use crate::threads::db_health_checker_thread::db_health_checker_thread::db_health_checker_thread;
 use crate::threads::poll_ip_banlist_thread::poll_ip_bans;
@@ -95,6 +95,8 @@ use twitch_common::twitch_secrets::TwitchSecrets;
 use url_config::third_party_url_redirector::ThirdPartyUrlRedirector;
 use users_component::utils::session_checker::SessionChecker;
 use users_component::utils::session_cookie_manager::SessionCookieManager;
+use crate::memory_cache::model_token_to_info_cache::ModelTokenToInfoCache;
+use crate::threads::poll_model_token_info_thread::poll_model_token_info_thread;
 
 const DEFAULT_BIND_ADDRESS : &'static str = "0.0.0.0:12345";
 
@@ -330,12 +332,16 @@ async fn main() -> AnyhowResult<()> {
   let user_token_troll_bans = load_troll_user_token_bans();
   let ip_address_troll_bans = load_ip_address_troll_bans();
 
+  let model_token_info_cache = ModelTokenToInfoCache::new();
+  let model_token_info_cache2 = model_token_info_cache.clone();
+
   // Background jobs.
 
   let health_check_status = HealthCheckStatus::new();
   let health_check_status2 = health_check_status.clone();
   let mysql_pool3 = pool.clone();
   let mysql_pool4 = pool.clone();
+  let mysql_pool5 = pool.clone();
 
   let tokio_runtime = Runtime::new()?;
 
@@ -354,6 +360,13 @@ async fn main() -> AnyhowResult<()> {
   tokio_runtime.spawn(async {
     poll_ip_bans(ip_ban_list2, mysql_pool4).await;
   });
+
+  info!("Spawning token info cache polling thread.");
+
+  tokio_runtime.spawn(async {
+    poll_model_token_info_thread(model_token_info_cache2, mysql_pool5).await;
+  });
+
 
   let stripe_configs = StripeConfig {
     checkout: StripeCheckoutConfigs {
@@ -448,21 +461,26 @@ async fn main() -> AnyhowResult<()> {
     sort_key_crypto,
     static_api_token_set,
     caches: InMemoryCaches {
-      tts_model_list: voice_list_cache,
-      voice_conversion_model_list: SingleItemTtlCache::create_with_duration(
-        easyenv::get_env_duration_seconds_or_default(
-          "VOICE_CONVERSION_MODEL_LIST_CACHE_TTL_SECONDS",
-          Duration::from_secs(60))),
-      w2l_template_list: w2l_template_cache,
-      database_tts_category_list: database_tts_category_list_cache,
-      tts_queue_length: tts_queue_length_cache,
-      tts_model_category_assignments: tts_model_category_assignments_cache,
-      leaderboard: leaderboard_cache,
-      inference_queue_length: inference_queue_length_cache,
-      queue_stats: SingleItemTtlCache::create_with_duration(
-        easyenv::get_env_duration_seconds_or_default(
-          "QUEUE_STATS_CACHE_TTL_SECONDS",
-          Duration::from_secs(60))),
+      durable: DurableInMemoryCaches {
+        model_token_info: model_token_info_cache,
+      },
+      ephemeral: EphemeralInMemoryCaches {
+        tts_model_list: voice_list_cache,
+        voice_conversion_model_list: SingleItemTtlCache::create_with_duration(
+          easyenv::get_env_duration_seconds_or_default(
+            "VOICE_CONVERSION_MODEL_LIST_CACHE_TTL_SECONDS",
+            Duration::from_secs(60))),
+        w2l_template_list: w2l_template_cache,
+        database_tts_category_list: database_tts_category_list_cache,
+        tts_queue_length: tts_queue_length_cache,
+        tts_model_category_assignments: tts_model_category_assignments_cache,
+        leaderboard: leaderboard_cache,
+        inference_queue_length: inference_queue_length_cache,
+        queue_stats: SingleItemTtlCache::create_with_duration(
+          easyenv::get_env_duration_seconds_or_default(
+            "QUEUE_STATS_CACHE_TTL_SECONDS",
+            Duration::from_secs(60))),
+      }
     },
     twitch_oauth: TwitchOauth {
       secrets: TwitchOauthSecrets {

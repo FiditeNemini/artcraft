@@ -1,16 +1,9 @@
+use crate::queries::voice_conversion::model_info_lite::model_info_lite::VoiceConversionModelInfoLite;
 use enums::by_table::voice_conversion_models::voice_conversion_model_type::VoiceConversionModelType;
 use errors::AnyhowResult;
 use sqlx::pool::PoolConnection;
 use sqlx::{MySql, MySqlPool};
 use tokens::voice_conversion::model::VoiceConversionModelToken;
-
-/// This is meant to be used for quick in-memory caches,
-/// particularly the one that serves the voice conversion enqueue API.
-#[derive(Serialize)]
-pub struct VoiceConversionModelInfoLite {
-  pub token: VoiceConversionModelToken,
-  pub model_type: VoiceConversionModelType,
-}
 
 pub async fn list_voice_conversion_model_info_lite(
   mysql_pool: &MySqlPool,

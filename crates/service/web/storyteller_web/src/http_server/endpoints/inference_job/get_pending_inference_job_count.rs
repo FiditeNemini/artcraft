@@ -65,7 +65,7 @@ pub async fn get_pending_inference_job_count_handler(
     });
   }
 
-  let maybe_cached = server_state.caches.inference_queue_length.grab_copy_without_bump_if_unexpired()
+  let maybe_cached = server_state.caches.ephemeral.inference_queue_length.grab_copy_without_bump_if_unexpired()
       .map_err(|e| {
         error!("error consulting cache: {:?}", e);
         GetPendingInferenceJobCountError::ServerError
@@ -88,7 +88,7 @@ pub async fn get_pending_inference_job_count_handler(
         Err(err) => {
           warn!("error querying database / inserting into cache: {:?}", err);
 
-          let maybe_cached = server_state.caches.inference_queue_length.grab_even_expired_and_bump()
+          let maybe_cached = server_state.caches.ephemeral.inference_queue_length.grab_even_expired_and_bump()
               .map_err(|err| {
                 error!("error consulting cache (even expired): {:?}", err);
                 GetPendingInferenceJobCountError::ServerError
@@ -102,7 +102,7 @@ pub async fn get_pending_inference_job_count_handler(
 
         // Happy path...
         Ok(count_result) => {
-          server_state.caches.inference_queue_length.store_copy(&count_result)
+          server_state.caches.ephemeral.inference_queue_length.store_copy(&count_result)
               .map_err(|e| {
                 error!("error storing cache: {:?}", e);
                 GetPendingInferenceJobCountError::ServerError

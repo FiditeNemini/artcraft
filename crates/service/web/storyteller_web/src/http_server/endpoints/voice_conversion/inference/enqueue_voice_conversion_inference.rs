@@ -9,20 +9,25 @@ use actix_web::{web, HttpResponse, HttpRequest};
 use crate::configs::plans::get_correct_plan_for_session::get_correct_plan_for_session;
 use crate::http_server::endpoints::investor_demo::demo_cookie::request_has_demo_cookie;
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
+use crate::memory_cache::model_token_to_info_cache::{ModelInfoLite, ModelTokenToInfoCache};
 use crate::server_state::ServerState;
 use enums::by_table::generic_inference_jobs::inference_category::InferenceCategory;
+use enums::by_table::generic_inference_jobs::inference_input_source_token_type::InferenceInputSourceTokenType;
+use enums::by_table::generic_inference_jobs::inference_model_type::InferenceModelType;
+use enums::by_table::voice_conversion_models::voice_conversion_model_type::VoiceConversionModelType;
 use enums::common::visibility::Visibility;
 use http_server_common::request::get_request_header_optional::get_request_header_optional;
 use http_server_common::request::get_request_ip::get_request_ip;
-use log::{info, warn};
+use log::{error, info, warn};
 use mysql_queries::payloads::generic_inference_args::{FundamentalFrequencyMethodForJob, GenericInferenceArgs, InferenceCategoryAbbreviated, PolymorphicInferenceArgs};
 use mysql_queries::queries::generic_inference::web::insert_generic_inference_job::{InsertGenericInferenceArgs, insert_generic_inference_job};
+use mysql_queries::queries::voice_conversion::model_info_lite::get_voice_conversion_model_info_lite::get_voice_conversion_model_info_lite_with_connection;
 use r2d2_redis::redis::Commands;
 use redis_common::redis_keys::RedisKeys;
+use sqlx::MySql;
+use sqlx::pool::PoolConnection;
 use std::fmt;
 use std::sync::Arc;
-use enums::by_table::generic_inference_jobs::inference_input_source_token_type::InferenceInputSourceTokenType;
-use enums::by_table::generic_inference_jobs::inference_model_type::InferenceModelType;
 use tokens::files::media_upload::MediaUploadToken;
 use tokens::jobs::inference::InferenceJobToken;
 use tokens::users::user::UserToken;
@@ -213,16 +218,24 @@ pub async fn enqueue_voice_conversion_inference_handler(
     }
   }
 
-  // ==================== CHECK AND ENQUEUE VOICE CONVERSION ==================== //
+  // ==================== LOOK UP MODEL INFO ==================== //
 
   // TODO(bt): CHECK DATABASE!
   let model_token = request.voice_conversion_model_token.clone();
   let media_token = request.source_media_upload_token.clone();
 
+  let model_info_lite  = lookup_model_info(
+    &model_token,
+    &server_state.caches.durable.model_token_info,
+    &mut mysql_connection
+  ).await?;
+
+  // ==================== CHECK AND ENQUEUE VOICE CONVERSION ==================== //
+
   let mut redis = server_state.redis_pool
       .get()
       .map_err(|e| {
-        warn!("redis error: {:?}", e);
+        error!("redis error: {:?}", e);
         EnqueueVoiceConversionInferenceError::ServerError
       })?;
 
@@ -268,7 +281,7 @@ pub async fn enqueue_voice_conversion_inference_handler(
   let query_result = insert_generic_inference_job(InsertGenericInferenceArgs {
     uuid_idempotency_token: &request.uuid_idempotency_token,
     inference_category: InferenceCategory::VoiceConversion,
-    maybe_model_type: Some(InferenceModelType::SoVitsSvc), // TODO/FIXME: This is stupidly wrong.
+    maybe_model_type: Some(model_info_lite.model_type),
     maybe_model_token: Some(model_token.as_str()),
     maybe_input_source_token: Some(media_token.as_str()),
     maybe_input_source_token_type: Some(InferenceInputSourceTokenType::MediaUpload),
@@ -315,4 +328,65 @@ pub async fn enqueue_voice_conversion_inference_handler(
   Ok(HttpResponse::Ok()
     .content_type("application/json")
     .body(body))
+}
+
+async fn lookup_model_info(
+  model_token: &VoiceConversionModelToken,
+  cache: &ModelTokenToInfoCache,
+  mysql_connection: &mut PoolConnection<MySql>,
+) -> Result<ModelInfoLite, EnqueueVoiceConversionInferenceError> {
+  let maybe_model_token_info = cache
+      .get_info(model_token.as_str())
+      .map_err(|err| {
+        error!("in-memory cache error: {:?}", err);
+        EnqueueVoiceConversionInferenceError::ServerError
+      })?;
+
+  let model_token_info = match maybe_model_token_info {
+    Some(info) => info,
+    None => {
+      let result = get_voice_conversion_model_info_lite_with_connection(
+        model_token.as_str(), mysql_connection)
+          .await
+          .map_err(|err| {
+            error!("model lookup error: {:?}", err);
+            EnqueueVoiceConversionInferenceError::ServerError
+          })?;
+
+      match result {
+        Some(info) => {
+          let model_type = match info.model_type {
+            VoiceConversionModelType::RvcV2 => InferenceModelType::RvcV2,
+            VoiceConversionModelType::SoVitsSvc => InferenceModelType::SoVitsSvc,
+            VoiceConversionModelType::SoftVc => {
+              // SoftVC is unsupported
+              return Err(EnqueueVoiceConversionInferenceError::BadInput("wrong model type".to_string()));
+            }
+          };
+
+          let model_info = ModelInfoLite {
+            inference_category: InferenceCategory::VoiceConversion,
+            model_type,
+          };
+
+          cache.insert_one(model_token.as_str(), &model_info)
+              .map_err(|err| {
+                error!("cache insertion error: {:?}", err);
+                EnqueueVoiceConversionInferenceError::ServerError
+              })?;
+
+          model_info
+        }
+        None => {
+          // NB: Fail open for now.
+          ModelInfoLite {
+            inference_category: InferenceCategory::VoiceConversion,
+            model_type: InferenceModelType::SoVitsSvc,
+          }
+        }
+      }
+    }
+  };
+
+  Ok(model_token_info)
 }

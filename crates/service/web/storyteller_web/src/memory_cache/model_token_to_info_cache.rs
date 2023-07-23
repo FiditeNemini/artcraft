@@ -25,22 +25,22 @@ impl ModelTokenToInfoCache {
     }
   }
 
-  pub fn insert_one(&self, token: &str, info: ModelInfoLite) -> AnyhowResult<()> {
+  pub fn insert_one(&self, token: &str, info: &ModelInfoLite) -> AnyhowResult<()> {
     match self.database.write() {
       Err(err) => return Err(anyhow!("lock err: {:?}", err)),
       Ok(mut lock) => {
-        lock.insert(token.to_string(), info);
+        lock.insert(token.to_string(), info.clone());
       }
     }
     Ok(())
   }
 
-  pub fn insert_many(&self, records: Vec<(&str, ModelInfoLite)>) -> AnyhowResult<()> {
+  pub fn insert_many(&self, records: Vec<(String, ModelInfoLite)>) -> AnyhowResult<()> {
     match self.database.write() {
       Err(err) => return Err(anyhow!("lock err: {:?}", err)),
       Ok(mut lock) => {
         for (token, info) in records.into_iter() {
-          lock.insert(token.to_string(), info);
+          lock.insert(token, info);
         }
       }
     }

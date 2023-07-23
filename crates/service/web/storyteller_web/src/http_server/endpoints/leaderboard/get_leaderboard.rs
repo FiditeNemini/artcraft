@@ -84,7 +84,7 @@ pub async fn leaderboard_handler(
   server_state: web::Data<Arc<ServerState>>
 ) -> Result<HttpResponse, LeaderboardErrorResponse> {
 
-  let maybe_cached = server_state.caches.leaderboard.grab_copy_without_bump_if_unexpired()
+  let maybe_cached = server_state.caches.ephemeral.leaderboard.grab_copy_without_bump_if_unexpired()
       .map_err(|e| {
         error!("error consulting cache: {:?}", e);
         LeaderboardErrorResponse::server_error()
@@ -108,7 +108,7 @@ pub async fn leaderboard_handler(
         Err(err) => {
           warn!("error querying database / inserting into cache: {:?}", err);
 
-          let maybe_cached = server_state.caches.leaderboard.grab_even_expired_and_bump()
+          let maybe_cached = server_state.caches.ephemeral.leaderboard.grab_even_expired_and_bump()
               .map_err(|err| {
                 error!("error consulting cache (even expired): {:?}", err);
                 LeaderboardErrorResponse::server_error()
@@ -122,7 +122,7 @@ pub async fn leaderboard_handler(
 
         // Happy path...
         Ok(leaderboard_info) => {
-          server_state.caches.leaderboard.store_copy(&leaderboard_info)
+          server_state.caches.ephemeral.leaderboard.store_copy(&leaderboard_info)
               .map_err(|e| {
                 error!("error storing cache: {:?}", e);
                 LeaderboardErrorResponse::server_error()

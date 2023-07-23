@@ -79,7 +79,7 @@ pub async fn get_unified_queue_stats_handler(
     });
   }
 
-  let maybe_cached = server_state.caches.queue_stats.grab_copy_without_bump_if_unexpired()
+  let maybe_cached = server_state.caches.ephemeral.queue_stats.grab_copy_without_bump_if_unexpired()
       .map_err(|e| {
         error!("error consulting cache: {:?}", e);
         GetUnifiedQueueStatsError::ServerError
@@ -102,7 +102,7 @@ pub async fn get_unified_queue_stats_handler(
         Err(err) => {
           warn!("error querying database / inserting into cache: {:?}", err);
 
-          let maybe_cached = server_state.caches.queue_stats.grab_even_expired_and_bump()
+          let maybe_cached = server_state.caches.ephemeral.queue_stats.grab_even_expired_and_bump()
               .map_err(|err| {
                 error!("error consulting cache (even expired): {:?}", err);
                 GetUnifiedQueueStatsError::ServerError
@@ -116,7 +116,7 @@ pub async fn get_unified_queue_stats_handler(
 
         // Happy path...
         Ok(stats_result) => {
-          server_state.caches.queue_stats.store_copy(&stats_result)
+          server_state.caches.ephemeral.queue_stats.store_copy(&stats_result)
               .map_err(|e| {
                 error!("error storing cache: {:?}", e);
                 GetUnifiedQueueStatsError::ServerError

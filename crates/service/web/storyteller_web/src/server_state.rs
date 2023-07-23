@@ -27,6 +27,7 @@ use sqlx::MySqlPool;
 use url_config::third_party_url_redirector::ThirdPartyUrlRedirector;
 use users_component::utils::session_checker::SessionChecker;
 use users_component::utils::session_cookie_manager::SessionCookieManager;
+use crate::memory_cache::model_token_to_info_cache::ModelTokenToInfoCache;
 
 /// State that is injected into every endpoint.
 pub struct ServerState {
@@ -134,9 +135,23 @@ pub struct RedisRateLimiters {
   pub model_upload: RedisRateLimiter,
 }
 
-/// In-memory caches with TTL-based eviction.
+/// In-memory caches of several types.
 #[derive(Clone)]
 pub struct InMemoryCaches {
+  pub durable: DurableInMemoryCaches,
+  pub ephemeral: EphemeralInMemoryCaches,
+}
+
+/// Durable caches
+#[derive(Clone)]
+pub struct DurableInMemoryCaches {
+  /// Lightweight model token (for generic inference) metadata
+  pub model_token_info: ModelTokenToInfoCache,
+}
+
+/// In-memory caches with TTL-based eviction.
+#[derive(Clone)]
+pub struct EphemeralInMemoryCaches {
   /// Contains a list of all TTS models.
   pub tts_model_list: SingleItemTtlCache<Vec<TtsModelRecordForResponse>>,
 
@@ -178,7 +193,6 @@ pub struct StripeSettings {
   pub config: StripeConfig,
   pub client: stripe::Client,
 }
-
 
 /// Flags set at service startup
 #[derive(Clone)]

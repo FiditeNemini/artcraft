@@ -40,7 +40,7 @@ pub async fn list_fully_computed_assigned_tts_categories_handler(
   _http_request: HttpRequest,
   server_state: web::Data<Arc<ServerState>>) -> Result<HttpResponse, ListFullyComputedAssignedTtsCategoriesError>
 {
-  let maybe_category_assignments = server_state.caches.tts_model_category_assignments.grab_copy_without_bump_if_unexpired()
+  let maybe_category_assignments = server_state.caches.ephemeral.tts_model_category_assignments.grab_copy_without_bump_if_unexpired()
       .map_err(|e| {
         error!("Error consulting cache: {:?}", e);
         ListFullyComputedAssignedTtsCategoriesError::ServerError
@@ -53,11 +53,11 @@ pub async fn list_fully_computed_assigned_tts_categories_handler(
     },
     None => {
       let category_assignments = query_and_construct_payload(
-        &server_state.caches.database_tts_category_list,
+        &server_state.caches.ephemeral.database_tts_category_list,
         &server_state.mysql_pool)
           .await?;
 
-      server_state.caches.tts_model_category_assignments.store_copy(&category_assignments)
+      server_state.caches.ephemeral.tts_model_category_assignments.store_copy(&category_assignments)
           .map_err(|e| {
             error!("Error storing cache: {:?}", e);
             ListFullyComputedAssignedTtsCategoriesError::ServerError

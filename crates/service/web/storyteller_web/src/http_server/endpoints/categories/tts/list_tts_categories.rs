@@ -95,7 +95,7 @@ pub async fn list_tts_categories_handler(
   server_state: web::Data<Arc<ServerState>>) -> Result<HttpResponse, ListTtsCategoriesError>
 {
   let database_categories = list_cached_tts_categories_for_public_dropdown_db_pool(
-    &server_state.caches.database_tts_category_list, &server_state.mysql_pool)
+    &server_state.caches.ephemeral.database_tts_category_list, &server_state.mysql_pool)
       .await
       .map_err(|e| {
         error!("error querying categories from db/cache: {:?}", e);
