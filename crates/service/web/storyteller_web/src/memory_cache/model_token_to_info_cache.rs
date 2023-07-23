@@ -13,6 +13,7 @@ pub struct ModelInfoLite {
 
 /// Model token to type will never change, so we can cache them indefinitely.
 /// This is for generic inference jobs only.
+#[derive(Clone)]
 pub struct ModelTokenToInfoCache {
   database: Arc<RwLock<HashMap<String, ModelInfoLite>>>,
 }
