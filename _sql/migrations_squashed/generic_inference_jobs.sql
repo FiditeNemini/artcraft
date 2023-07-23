@@ -26,6 +26,13 @@ CREATE TABLE generic_inference_jobs (
   -- Potential part of the composite foreign key to the primary model being used, if any.
   -- This will normally live in `maybe_inference_args`, but in this case, it's useful for
   -- running easy database analytical queries.
+  --
+  -- Examples (may not be up to date):
+  --    * rvc_v2
+  --    * so_vits_svc
+  --    * tacotron2
+  --    * vits
+  --
   maybe_model_type VARCHAR(32) DEFAULT NULL,
 
   -- Potential part of the composite foreign key to the primary model being used, if any.

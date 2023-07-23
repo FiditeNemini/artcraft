@@ -18,6 +18,9 @@ use strum::EnumIter;
 #[cfg_attr(test, derive(EnumIter, EnumCount))]
 #[derive(Clone, Copy, Eq, PartialEq, Hash, Ord, PartialOrd, Deserialize, Serialize)]
 pub enum InferenceModelType {
+  #[serde(rename = "rvc_v2")]
+  RvcV2,
+
   #[serde(rename = "so_vits_svc")]
   SoVitsSvc,
 
@@ -37,6 +40,7 @@ impl_mysql_enum_coders!(InferenceModelType);
 impl InferenceModelType {
   pub fn to_str(&self) -> &'static str {
     match self {
+      Self::RvcV2 => "rvc_v2",
       Self::SoVitsSvc => "so_vits_svc",
       Self::Tacotron2 => "tacotron2",
       Self::Vits => "vits",
@@ -45,6 +49,7 @@ impl InferenceModelType {
 
   pub fn from_str(value: &str) -> Result<Self, String> {
     match value {
+      "rvc_v2" => Ok(Self::RvcV2),
       "so_vits_svc" => Ok(Self::SoVitsSvc),
       "tacotron2" => Ok(Self::Tacotron2),
       "vits" => Ok(Self::Vits),
@@ -56,6 +61,7 @@ impl InferenceModelType {
     // NB: BTreeSet is sorted
     // NB: BTreeSet::from() isn't const, but not worth using LazyStatic, etc.
     BTreeSet::from([
+      InferenceModelType::RvcV2,
       InferenceModelType::SoVitsSvc,
       InferenceModelType::Tacotron2,
       InferenceModelType::Vits,
@@ -70,6 +76,7 @@ mod tests {
 
   #[test]
   fn test_serialization() {
+    assert_serialization(InferenceModelType::RvcV2, "rvc_v2");
     assert_serialization(InferenceModelType::SoVitsSvc, "so_vits_svc");
     assert_serialization(InferenceModelType::Tacotron2, "tacotron2");
     assert_serialization(InferenceModelType::Vits, "vits");
@@ -77,6 +84,7 @@ mod tests {
 
   #[test]
   fn to_str() {
+    assert_eq!(InferenceModelType::RvcV2.to_str(), "rvc_v2");
     assert_eq!(InferenceModelType::SoVitsSvc.to_str(), "so_vits_svc");
     assert_eq!(InferenceModelType::Tacotron2.to_str(), "tacotron2");
     assert_eq!(InferenceModelType::Vits.to_str(), "vits");
@@ -84,6 +92,7 @@ mod tests {
 
   #[test]
   fn from_str() {
+    assert_eq!(InferenceModelType::from_str("rvc_v2").unwrap(), InferenceModelType::RvcV2);
     assert_eq!(InferenceModelType::from_str("so_vits_svc").unwrap(), InferenceModelType::SoVitsSvc);
     assert_eq!(InferenceModelType::from_str("tacotron2").unwrap(), InferenceModelType::Tacotron2);
     assert_eq!(InferenceModelType::from_str("vits").unwrap(), InferenceModelType::Vits);
@@ -93,7 +102,8 @@ mod tests {
   fn all_variants() {
     // Static check
     let mut variants = InferenceModelType::all_variants();
-    assert_eq!(variants.len(), 3);
+    assert_eq!(variants.len(), 4);
+    assert_eq!(variants.pop_first(), Some(InferenceModelType::RvcV2));
     assert_eq!(variants.pop_first(), Some(InferenceModelType::SoVitsSvc));
     assert_eq!(variants.pop_first(), Some(InferenceModelType::Tacotron2));
     assert_eq!(variants.pop_first(), Some(InferenceModelType::Vits));

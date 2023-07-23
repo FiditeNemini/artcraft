@@ -268,7 +268,7 @@ pub async fn enqueue_voice_conversion_inference_handler(
   let query_result = insert_generic_inference_job(InsertGenericInferenceArgs {
     uuid_idempotency_token: &request.uuid_idempotency_token,
     inference_category: InferenceCategory::VoiceConversion,
-    maybe_model_type: Some(InferenceModelType::SoVitsSvc),
+    maybe_model_type: Some(InferenceModelType::SoVitsSvc), // TODO/FIXME: This is stupidly wrong.
     maybe_model_token: Some(model_token.as_str()),
     maybe_input_source_token: Some(media_token.as_str()),
     maybe_input_source_token_type: Some(InferenceInputSourceTokenType::MediaUpload),
