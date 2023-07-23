@@ -12008,6 +12008,44 @@
     },
     "query": "\nINSERT INTO user_ratings\nSET\n  user_token = ?,\n  entity_type = ?,\n  entity_token = ?,\n  rating_value = ?,\n  vote_ip_address = ?,\n  version = 1\n\nON DUPLICATE KEY UPDATE\n  rating_value = ?,\n  vote_ip_address = ?,\n  version = version + 1\n        "
   },
+  "ab3e30d9edcc111f3138e251bcb7c388e55eb3a6c42c2aeba7ddf38e43a42fe5": {
+    "describe": {
+      "columns": [
+        {
+          "name": "token: tokens::voice_conversion::model::VoiceConversionModelToken",
+          "ordinal": 0,
+          "type_info": {
+            "char_set": 224,
+            "flags": {
+              "bits": 4229
+            },
+            "max_size": 128,
+            "type": "VarString"
+          }
+        },
+        {
+          "name": "model_type: enums::by_table::voice_conversion_models::voice_conversion_model_type::VoiceConversionModelType",
+          "ordinal": 1,
+          "type_info": {
+            "char_set": 224,
+            "flags": {
+              "bits": 4233
+            },
+            "max_size": 128,
+            "type": "VarString"
+          }
+        }
+      ],
+      "nullable": [
+        false,
+        false
+      ],
+      "parameters": {
+        "Right": 0
+      }
+    },
+    "query": "\nSELECT\n    vc.token as `token: tokens::voice_conversion::model::VoiceConversionModelToken`,\n    vc.model_type as `model_type: enums::by_table::voice_conversion_models::voice_conversion_model_type::VoiceConversionModelType`\nFROM voice_conversion_models as vc\n        "
+  },
   "ab6f25eb0f6340d49aa705835ed428434d8b6ab14b0740f6a5ebe7841b9ece20": {
     "describe": {
       "columns": [],
@@ -16436,6 +16474,44 @@
       }
     },
     "query": "\nUPDATE users\nSET\n    profile_markdown = ?,\n    profile_rendered_html = ?,\n    preferred_tts_result_visibility = ?,\n    preferred_w2l_result_visibility = ?,\n    discord_username = ?,\n    twitter_username = ?,\n    twitch_username = ?,\n    github_username = ?,\n    cashapp_username = ?,\n    website_url = ?,\n    ip_address_last_update = ?,\n    version = version + 1\n\nWHERE users.token = ?\nLIMIT 1\n        "
+  },
+  "fac4eb5af4c9ee2f7c5c4aa92ef1d658eb4f658b94289df23f24ffcd45236b93": {
+    "describe": {
+      "columns": [
+        {
+          "name": "token: tokens::voice_conversion::model::VoiceConversionModelToken",
+          "ordinal": 0,
+          "type_info": {
+            "char_set": 224,
+            "flags": {
+              "bits": 4229
+            },
+            "max_size": 128,
+            "type": "VarString"
+          }
+        },
+        {
+          "name": "model_type: enums::by_table::voice_conversion_models::voice_conversion_model_type::VoiceConversionModelType",
+          "ordinal": 1,
+          "type_info": {
+            "char_set": 224,
+            "flags": {
+              "bits": 4233
+            },
+            "max_size": 128,
+            "type": "VarString"
+          }
+        }
+      ],
+      "nullable": [
+        false,
+        false
+      ],
+      "parameters": {
+        "Right": 1
+      }
+    },
+    "query": "\nSELECT\n    vc.token as `token: tokens::voice_conversion::model::VoiceConversionModelToken`,\n    vc.model_type as `model_type: enums::by_table::voice_conversion_models::voice_conversion_model_type::VoiceConversionModelType`\nFROM voice_conversion_models as vc\nWHERE vc.token = ?\n        "
   },
   "fb3b4c13ef5ef662e808c85fbdf28a98de14af5390c206e074aa8a4ac67a90fe": {
     "describe": {
