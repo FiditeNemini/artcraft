@@ -258,7 +258,7 @@ class App extends React.Component<Props, State> {
 
   querySession = async () => {
     const sessionWrapper = await SessionWrapper.lookupSession();
-    const username = sessionWrapper.getUsername();
+    const username = sessionWrapper.getDisplayName();
     if (username !== undefined) {
       posthog.identify(username, {});
     }
