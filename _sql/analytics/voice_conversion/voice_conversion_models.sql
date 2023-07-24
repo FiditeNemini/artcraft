@@ -35,7 +35,9 @@ left join users AS u on
 where
     vc.user_deleted_at IS NULL
     and vc.mod_deleted_at IS NULL
-order by vc.original_download_url ASC;
+order by vc.title asc;
+
+-- order by vc.original_download_url ASC;
 
 --
 -- Top 100 voice conversion models by use count

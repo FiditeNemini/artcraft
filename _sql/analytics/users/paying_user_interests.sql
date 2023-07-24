@@ -37,7 +37,7 @@ FROM (
         x.use_count > 10;
 
 
--- The first voice a paying customer uses
+-- The first TTS voice a paying customer uses
 -- TODO: List *all* of the voices a paying customer uses before they subscribe, not just the first.
 -- select first row of partially aggregate query: https://stackoverflow.com/a/73157541
 SELECT *
@@ -77,6 +77,48 @@ FROM (
          GROUP BY t.token
      ) AS z
 ORDER BY use_count desc
+
+
+-- The first VC voice a paying customer uses
+-- TODO: List *all* of the voices a paying customer uses before they subscribe, not just the first.
+-- select first row of partially aggregate query: https://stackoverflow.com/a/73157541
+SELECT *
+FROM (
+         SELECT
+             m.token,
+             m.title,
+             count(*) as use_count,
+             m.created_at,
+             m.user_deleted_at,
+             m.mod_deleted_at
+         FROM voice_conversion_models AS m
+                  JOIN
+              (
+                  SELECT
+                      model_token
+                  FROM (
+                           SELECT
+                               maybe_model_token as model_token,
+                               maybe_creator_user_token,
+                               row_number() over(partition by maybe_creator_user_token order by id asc) as rownum
+                           FROM
+                               generic_inference_jobs
+                           WHERE maybe_model_token IS NOT NULL
+                           AND maybe_creator_user_token IN
+                                 (
+                                     select distinct user_token
+                                     from user_subscriptions
+                                     where created_at > (CURDATE() - INTERVAL 2 DAY)
+                                 )
+                       ) AS x
+                  WHERE rownum = 1
+                  ORDER BY model_token desc
+              ) AS y
+              ON m.token = y.model_token
+         GROUP BY m.token
+     ) AS z
+ORDER BY use_count desc
+
 
 -- The last voice a paying customer uses
 -- select first row of partially aggregate query: https://stackoverflow.com/a/73157541
