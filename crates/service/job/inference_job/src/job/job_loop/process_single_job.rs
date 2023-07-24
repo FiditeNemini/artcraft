@@ -19,17 +19,6 @@ pub async fn process_single_job(
   job_dependencies: &JobDependencies,
   job: &AvailableInferenceJob,
 ) -> Result<ProcessSingleJobSuccessCase, ProcessSingleJobError> {
-
-  let mut maybe_keepalive_redis = job_dependencies
-      .maybe_keepalive_redis_pool
-      .as_ref()
-      .map(|redis| redis.get())
-      .transpose()
-      .map_err(|err| ProcessSingleJobError::Other(anyhow!("redis pool error: {:?}", err)))?;
-
-  // TODO(bt, 2023-01-11): Restore an optional status logger
-  //let mut redis_logger = RedisJobStatusLogger::new_generic_download(&mut redis, job.download_job_token.as_str());
-
   let mut force_execution = false;
 
   // Some jobs have "routing tags". These ensure that jobs only execute on certain hosts.
@@ -84,12 +73,43 @@ pub async fn process_single_job(
     return Ok(ProcessSingleJobSuccessCase::LockNotObtained)
   }
 
+  process_single_job_wrap_with_logs(job_dependencies, job).await
+}
+
+async fn process_single_job_wrap_with_logs(
+  job_dependencies: &JobDependencies,
+  job: &AvailableInferenceJob,
+) -> Result<ProcessSingleJobSuccessCase, ProcessSingleJobError> {
+
   println!("\n  ----------------------------------------- JOB START -----------------------------------------  \n");
 
   info!("Beginning work on job ({}): {:?}", job.id.0, job.inference_job_token);
   info!("Job category: {:?}", job.inference_category);
   info!("Job model type: {:?}", job.maybe_model_type);
   info!("Job model token: {:?}", job.maybe_model_token);
+
+  let result = do_process_single_job(job_dependencies, job).await;
+
+  println!("\n  ----------------------------------------- JOB END -----------------------------------------  \n");
+
+  result
+}
+
+async fn do_process_single_job(
+  job_dependencies: &JobDependencies,
+  job: &AvailableInferenceJob,
+) -> Result<ProcessSingleJobSuccessCase, ProcessSingleJobError> {
+
+  // TODO(bt, 2023-07-23): Redis pool management probably belongs at near the outermost loop.
+  let mut maybe_keepalive_redis = job_dependencies
+      .maybe_keepalive_redis_pool
+      .as_ref()
+      .map(|redis| redis.get())
+      .transpose()
+      .map_err(|err| ProcessSingleJobError::Other(anyhow!("redis pool error: {:?}", err)))?;
+
+  // TODO(bt, 2023-01-11): Restore an optional status logger
+  //let mut redis_logger = RedisJobStatusLogger::new_generic_download(&mut redis, job.download_job_token.as_str());
 
   let job_start_time = Instant::now();
 
