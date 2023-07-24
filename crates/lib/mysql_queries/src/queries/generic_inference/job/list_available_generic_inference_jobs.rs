@@ -11,6 +11,7 @@ use sqlx::{MySql, MySqlPool};
 use std::collections::BTreeSet;
 use std::future::Future;
 use std::path::Path;
+use enums::by_table::generic_inference_jobs::inference_model_type::InferenceModelType;
 use tokens::jobs::inference::InferenceJobToken;
 use crate::payloads::generic_inference_args::GenericInferenceArgs;
 
@@ -76,7 +77,8 @@ pub struct ListAvailableGenericInferenceJobArgs<'a> {
   pub num_records: u32,
   pub is_debug_worker: bool,
   pub sort_by_priority: bool,
-  pub maybe_scope_by_job_category: Option<BTreeSet<InferenceCategory>>,
+  pub maybe_scope_by_model_type: Option<&'a BTreeSet<InferenceModelType>>,
+  pub maybe_scope_by_job_category: Option<&'a BTreeSet<InferenceCategory>>,
   pub mysql_pool: &'a MySqlPool,
 }
 
@@ -85,17 +87,18 @@ pub async fn list_available_generic_inference_jobs(
 )
   -> AnyhowResult<Vec<AvailableInferenceJob>>
 {
-  let ALL_TYPES = InferenceCategory::all_variants();
-
-  let inference_types = args.maybe_scope_by_job_category
-      .as_ref()
+  let model_types = args.maybe_scope_by_model_type
       .map(|types| types.clone())
-      .unwrap_or(ALL_TYPES);
+      .unwrap_or(InferenceModelType::all_variants()); // NB: All model types
+
+  let inference_categories = args.maybe_scope_by_job_category
+        .map(|types| types.clone())
+        .unwrap_or(InferenceCategory::all_variants()); // NB: All categories
 
   let query = if args.sort_by_priority {
-    list_sorted_by_priority(args, inference_types).await
+    list_sorted_by_priority(args, model_types, inference_categories).await
   } else {
-    list_sorted_by_id(args, inference_types).await
+    list_sorted_by_id(args, model_types, inference_categories).await
   };
 
   let job_records = query?;
@@ -146,7 +149,7 @@ pub async fn list_available_generic_inference_jobs(
   Ok(job_records)
 }
 
-async fn list_sorted_by_id(args: ListAvailableGenericInferenceJobArgs<'_>, inference_categories: BTreeSet<InferenceCategory>) -> Result<Vec<AvailableInferenceJobRawInternal>, sqlx::Error> {
+async fn list_sorted_by_id(args: ListAvailableGenericInferenceJobArgs<'_>, model_types: BTreeSet<InferenceModelType>, inference_categories: BTreeSet<InferenceCategory>) -> Result<Vec<AvailableInferenceJobRawInternal>, sqlx::Error> {
   // NB: Can't be type checked because of WHERE IN clause with dynamic contents
 
   // Also had to remove the following typing:
@@ -199,11 +202,18 @@ SELECT
 FROM generic_inference_jobs"#.to_string();
 
   query.push_str(&format!(r#"
-WHERE
+    WHERE
+    (
+      maybe_model_type IN ({})
+    )
+  "#, model_type_predicate(&model_types)));
+
+  query.push_str(&format!(r#"
+    and
     (
       inference_category IN ({})
     )
-  "#, to_where_in_predicate(&inference_categories)));
+  "#, inference_category_predicate(&inference_categories)));
 
   query.push_str(r#"
   AND
@@ -232,7 +242,7 @@ WHERE
       .await
 }
 
-async fn list_sorted_by_priority(args: ListAvailableGenericInferenceJobArgs<'_>, inference_categories: BTreeSet<InferenceCategory>) -> Result<Vec<AvailableInferenceJobRawInternal>, sqlx::Error> {
+async fn list_sorted_by_priority(args: ListAvailableGenericInferenceJobArgs<'_>, model_types: BTreeSet<InferenceModelType>, inference_categories: BTreeSet<InferenceCategory>) -> Result<Vec<AvailableInferenceJobRawInternal>, sqlx::Error> {
   // NB: Can't be type checked because of WHERE IN clause with dynamic contents
 
   // Also had to remove the following typing:
@@ -284,13 +294,19 @@ SELECT
 
 FROM generic_inference_jobs"#.to_string();
 
+  query.push_str(&format!(r#"
+    WHERE
+    (
+      maybe_model_type IN ({})
+    )
+  "#, model_type_predicate(&model_types)));
 
   query.push_str(&format!(r#"
-WHERE
+    and
     (
       inference_category IN ({})
     )
-  "#, to_where_in_predicate(&inference_categories)));
+  "#, inference_category_predicate(&inference_categories)));
 
   query.push_str(r#"
   AND
@@ -374,7 +390,18 @@ struct AvailableInferenceJobRawInternal {
 
 /// Return a comma-separated predicate, since SQLx does not yet support WHERE IN(?) for Vec<T>, etc.
 /// Issue: https://github.com/launchbadge/sqlx/issues/875
-fn to_where_in_predicate(categories: &BTreeSet<InferenceCategory>) -> String {
+fn model_type_predicate(types: &BTreeSet<InferenceModelType>) -> String {
+  let mut vec = types.iter()
+      .map(|ty| ty.to_str())
+      .map(|ty| format!("\"{}\"", ty))
+      .collect::<Vec<String>>();
+  vec.sort(); // NB: For the benefit of tests.
+  vec.join(", ")
+}
+
+/// Return a comma-separated predicate, since SQLx does not yet support WHERE IN(?) for Vec<T>, etc.
+/// Issue: https://github.com/launchbadge/sqlx/issues/875
+fn inference_category_predicate(categories: &BTreeSet<InferenceCategory>) -> String {
   let mut vec = categories.iter()
       .map(|ty| ty.to_str())
       .map(|ty| format!("\"{}\"", ty))
@@ -385,27 +412,49 @@ fn to_where_in_predicate(categories: &BTreeSet<InferenceCategory>) -> String {
 
 #[cfg(test)]
 mod tests {
-  use crate::queries::generic_inference::job::list_available_generic_inference_jobs::to_where_in_predicate;
+  use crate::queries::generic_inference::job::list_available_generic_inference_jobs::{inference_category_predicate, model_type_predicate};
   use enums::by_table::generic_inference_jobs::inference_category::InferenceCategory;
+  use enums::by_table::generic_inference_jobs::inference_model_type::InferenceModelType;
   use std::collections::BTreeSet;
 
   #[test]
-  fn test_where_in_clause() {
+  fn test_model_type_predicate() {
     // None
     let types = BTreeSet::from([]);
-    assert_eq!(to_where_in_predicate(&types), "".to_string());
+    assert_eq!(model_type_predicate(&types), "".to_string());
+
+    // One
+    let types = BTreeSet::from([
+      InferenceModelType::RvcV2,
+    ]);
+
+    assert_eq!(model_type_predicate(&types), "\"rvc_v2\"".to_string());
+
+    // Multiple
+    let types = BTreeSet::from([
+      InferenceModelType::RvcV2,
+      InferenceModelType::SoVitsSvc,
+    ]);
+    assert_eq!(model_type_predicate(&types), "\"rvc_v2\", \"so_vits_svc\"".to_string());
+  }
+
+  #[test]
+  fn test_inference_category_predicate() {
+    // None
+    let types = BTreeSet::from([]);
+    assert_eq!(inference_category_predicate(&types), "".to_string());
 
     // Some
     let types = BTreeSet::from([
       InferenceCategory::VoiceConversion,
     ]);
 
-    assert_eq!(to_where_in_predicate(&types), "\"voice_conversion\"".to_string());
+    assert_eq!(inference_category_predicate(&types), "\"voice_conversion\"".to_string());
     // All
     let types = BTreeSet::from([
       InferenceCategory::TextToSpeech,
       InferenceCategory::VoiceConversion,
     ]);
-    assert_eq!(to_where_in_predicate(&types), "\"text_to_speech\", \"voice_conversion\"".to_string());
+    assert_eq!(inference_category_predicate(&types), "\"text_to_speech\", \"voice_conversion\"".to_string());
   }
 }

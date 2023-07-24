@@ -7,6 +7,7 @@ use crate::job::job_types::tts::vits::vits_inference_command::VitsInferenceComma
 use crate::job::job_types::vc::rvc_v2::pretrained_hubert_model::PretrainedHubertModel;
 use crate::job::job_types::vc::rvc_v2::rvc_v2_inference_command::RvcV2InferenceCommand;
 use crate::job::job_types::vc::so_vits_svc::so_vits_svc_inference_command::SoVitsSvcInferenceCommand;
+use crate::util::scoped_execution::ScopedExecution;
 use crate::util::scoped_temp_dir_creator::ScopedTempDirCreator;
 use jobs_common::job_progress_reporter::job_progress_reporter::JobProgressReporterBuilder;
 use jobs_common::job_stats::JobStats;
@@ -24,6 +25,10 @@ use sqlx::MySqlPool;
 use std::path::PathBuf;
 
 pub struct JobDependencies {
+  /// The job should only run on these types of models.
+  /// This is provided at job start.
+  pub scoped_execution: ScopedExecution,
+
   /// Filesystem info and utils
   pub fs: FileSystemDetails,
 
