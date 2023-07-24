@@ -18,10 +18,10 @@ import {
   GetServerInfoSuccessResponse,
 } from "@storyteller/components/src/api/server/GetServerInfo";
 import {
-  GetPendingTtsJobCount,
-  GetPendingTtsJobCountIsOk,
-  GetPendingTtsJobCountSuccessResponse,
-} from "@storyteller/components/src/api/tts/GetPendingTtsJobCount";
+  GetQueueStats,
+  GetQueueStatsIsOk,
+  GetQueueStatsSuccessResponse,
+} from "@storyteller/components/src/api/stats/queues/GetQueueStats";
 
 const DEFAULT_QUEUE_REFRESH_INTERVAL_MILLIS = 15000;
 
@@ -45,22 +45,27 @@ function FooterNav(props: Props) {
     getServerInfo();
   }, [getServerInfo]);
 
-  const [pendingTtsJobs, setPendingTtsJobs] =
-    useState<GetPendingTtsJobCountSuccessResponse>({
+  const [queueStats, setQueueStats] =
+    useState<GetQueueStatsSuccessResponse>({
       success: true,
-      pending_job_count: 0,
       cache_time: new Date(0), // NB: Epoch is used for vector clock's initial state
       refresh_interval_millis: DEFAULT_QUEUE_REFRESH_INTERVAL_MILLIS,
+      inference: {
+        pending_job_count: 0,
+      },
+      legacy_tts: {
+        pending_job_count: 0,
+      },
     });
 
   useEffect(() => {
     const fetch = async () => {
-      const response = await GetPendingTtsJobCount();
-      if (GetPendingTtsJobCountIsOk(response)) {
+      const response = await GetQueueStats();
+      if (GetQueueStatsIsOk(response)) {
         if (
-          response.cache_time.getTime() > pendingTtsJobs.cache_time.getTime()
+          response.cache_time.getTime() > queueStats.cache_time.getTime()
         ) {
-          setPendingTtsJobs(response);
+          setQueueStats(response);
         }
       }
     };
@@ -68,13 +73,12 @@ function FooterNav(props: Props) {
     //const interval = setInterval(async () => fetch(), 15000);
     const refreshInterval = Math.max(
       DEFAULT_QUEUE_REFRESH_INTERVAL_MILLIS,
-      pendingTtsJobs.refresh_interval_millis
+      queueStats.refresh_interval_millis
     );
-    console.log("new interval", refreshInterval);
     const interval = setInterval(async () => fetch(), refreshInterval);
     fetch();
     return () => clearInterval(interval);
-  }, [pendingTtsJobs]);
+  }, [queueStats]);
 
   let myDataLink = WebUrl.signupPage();
 
@@ -118,7 +122,10 @@ function FooterNav(props: Props) {
         <div className="footer-bar text-center text-lg-start">
           <div className="container fw-medium">
             TTS Queued:{" "}
-            <span className="text-red">{pendingTtsJobs.pending_job_count}</span>
+            <span className="text-red">{queueStats.legacy_tts.pending_job_count}</span>
+            {" "}
+            V2V Queued:{" "}
+            <span className="text-red">{queueStats.inference.pending_job_count}</span>
           </div>
         </div>
         <div className="container py-5">

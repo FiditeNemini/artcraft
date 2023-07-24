@@ -97,6 +97,10 @@ class ApiConfig {
     return `${this.getApiOrigin()}/session`;
   }
 
+  getQueueStats(): string {
+    return `${this.getApiOrigin()}/v1/stats/queues`;
+  }
+
   listTts(): string {
     return `${this.getApiOrigin()}/tts/list`;
   }
