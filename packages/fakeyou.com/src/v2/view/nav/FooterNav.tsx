@@ -117,7 +117,7 @@ function FooterNav(props: Props) {
     <div>
       <footer id="footer">
         <div className="footer-bar text-center text-lg-start">
-          <div className="container fw-medium d-flex gap-2">
+          <div className="container fw-medium d-flex gap-2 justify-content-center justify-content-lg-start">
             <div>
               TTS Queued:{" "}
               <span className="text-red">
