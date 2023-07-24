@@ -78,3 +78,22 @@ select
 from generic_inference_jobs
 where maybe_routing_tag IS NOT NULL
     limit 10;
+
+
+
+-- Debug that we're setting the correct metadata on jobs
+-- For some reasons storyteller-web is enqueuing the wrong type!
+select
+    jobs.id,
+    jobs.token,
+    jobs.maybe_model_type as jobs_model_type,
+    jobs.maybe_model_token as jobs_model_token,
+    models.token as model_token,
+    models.model_type as model_type
+from generic_inference_jobs as jobs
+left outer join voice_conversion_models as models
+on jobs.maybe_model_token = models.token
+order by jobs.id
+desc
+limit 500;
+

@@ -116,12 +116,12 @@ pub async fn get_model_record_from_cacheable_query(job_dependencies: &JobDepende
       match maybe_model {
         Some(model) => MaybeInferenceModel::VcModel(model),
         None => {
-          let maybe_tts_model = get_voice_conversion_model_for_inference(
+          let maybe_vc_model = get_voice_conversion_model_for_inference(
             &job_dependencies.mysql_pool, token)
               .await
               .map_err(|err| anyhow!("database error: {:?}", err))?;
 
-          match maybe_tts_model {
+          match maybe_vc_model {
             Some(model) => {
               let token = token.to_string();
               let _r = job_dependencies.caches.vc_model_record_cache.store_copy(&token, &model)?;

@@ -40,11 +40,15 @@ pub async fn main_loop(job_dependencies: JobDependencies) {
       sort_by_priority = false;
     }
 
+    let maybe_scoped_model_types = job_dependencies.scoped_execution.get_scoped_model_types();
+
+    info!("Querying inference jobs scoped to model types: {:?}", maybe_scoped_model_types);
+
     let maybe_available_jobs = list_available_generic_inference_jobs(ListAvailableGenericInferenceJobArgs {
       num_records: job_dependencies.job_batch_size,
       is_debug_worker: false, // TODO
       sort_by_priority,
-      maybe_scope_by_model_type: job_dependencies.scoped_execution.get_scoped_model_types(),
+      maybe_scope_by_model_type: maybe_scoped_model_types,
       maybe_scope_by_job_category: None,
       mysql_pool: &job_dependencies.mysql_pool,
     }).await;
