@@ -19,6 +19,9 @@ pub async fn poll_model_token_info_thread(
 
   std::thread::sleep(startup_wait);
 
+  // TODO(bt,2023-07-23): This only handles voice conversion models for now.
+  //  We should pick up TTS models when they run on this job system
+
   loop {
     debug!("Job fetching token info...");
 
@@ -45,7 +48,7 @@ pub async fn poll_model_token_info_thread(
 
       let info = ModelInfoLite {
         inference_category: InferenceCategory::VoiceConversion,
-        model_type: InferenceModelType::RvcV2,
+        model_type,
       };
 
       token_info_items.push((token_info.token.to_string(), info));
