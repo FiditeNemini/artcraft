@@ -44,10 +44,12 @@ export class SessionWrapper {
     return this.sessionStateResponse?.logged_in || false;
   }
 
+  // Username is all lowercase
   public getUsername() : string | undefined {
     return this.sessionStateResponse?.user?.username;
   }
 
+  // Display name has capitalization
   public getDisplayName() : string | undefined {
     return this.sessionStateResponse?.user?.display_name;
   }
