@@ -33,6 +33,7 @@ from (
              jobs.assigned_worker,
              jobs.assigned_cluster,
              jobs.maybe_input_source_token,
+             jobs.maybe_model_type,
              jobs.maybe_model_token,
              m.media_source,
              m.maybe_original_mime_type as mime_type,
@@ -50,7 +51,7 @@ from (
              jobs.status != 'pending'
         AND jobs.created_at > NOW() - INTERVAL 20 MINUTE
          order by id desc
-             limit 5000
+             limit 200
      ) as t
 order by execution_mins desc;
 
@@ -95,5 +96,5 @@ left outer join voice_conversion_models as models
 on jobs.maybe_model_token = models.token
 order by jobs.id
 desc
-limit 500;
+limit 100;
 

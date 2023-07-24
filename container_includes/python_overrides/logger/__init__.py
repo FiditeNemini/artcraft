@@ -57,7 +57,7 @@ class FakeYouLogger:
         # Not sure if this is where they're doing it.
         if level is not int:
             print('error', 'setLevel not an int:', level)
-            level = 30 # Warn.
+            level = 20 # Info.
         self.level = level
 
     # noinspection PyPep8Naming

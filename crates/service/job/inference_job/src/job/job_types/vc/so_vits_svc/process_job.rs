@@ -10,26 +10,17 @@ use crate::job::job_types::vc::so_vits_svc::so_vits_svc_inference_command::{Devi
 use crate::job_dependencies::JobDependencies;
 use crate::util::maybe_download_file_from_bucket::maybe_download_file_from_bucket;
 use enums::by_table::generic_inference_jobs::inference_result_type::InferenceResultType;
-use errors::AnyhowResult;
 use filesys::create_dir_all_if_missing::create_dir_all_if_missing;
 use filesys::file_size::file_size;
-use filesys::filename_concat::filename_concat;
-use hashing::sha256::sha256_hash_string::sha256_hash_string;
 use log::{error, info, warn};
 use media::decode_basic_audio_info::decode_basic_audio_file_info;
 use mimetypes::mimetype_for_file::get_mimetype_for_file;
+use mysql_queries::payloads::generic_inference_args::PolymorphicInferenceArgs;
 use mysql_queries::queries::generic_inference::job::list_available_generic_inference_jobs::AvailableInferenceJob;
-use mysql_queries::queries::media_uploads::get_media_upload_for_inference::get_media_upload_for_inference;
+use mysql_queries::queries::media_uploads::get_media_upload_for_inference::{get_media_upload_for_inference, MediaUploadRecordForInference};
 use mysql_queries::queries::voice_conversion::inference::get_voice_conversion_model_for_inference::VoiceConversionModelForInference;
 use mysql_queries::queries::voice_conversion::results::insert_voice_conversion_result::{insert_voice_conversion_result, InsertArgs};
-use std::fs::File;
-use std::fs;
-use std::io::Read;
-use std::path::{Path, PathBuf};
 use std::time::Instant;
-use subprocess_common::docker_options::{DockerFilesystemMount, DockerGpu, DockerOptions};
-use tempdir::TempDir;
-use mysql_queries::payloads::generic_inference_args::PolymorphicInferenceArgs;
 use tokens::files::media_upload::MediaUploadToken;
 use tokens::users::user::UserToken;
 
@@ -38,6 +29,7 @@ pub struct SoVitsSvcProcessJobArgs<'a> {
   pub job: &'a AvailableInferenceJob,
   pub vc_model: &'a VoiceConversionModelForInference,
   pub media_upload_token: &'a MediaUploadToken,
+  pub media_upload: &'a MediaUploadRecordForInference,
 }
 
 pub async fn process_job(args: SoVitsSvcProcessJobArgs<'_>) -> Result<JobSuccessResult, ProcessSingleJobError> {
@@ -94,19 +86,7 @@ pub async fn process_job(args: SoVitsSvcProcessJobArgs<'_>) -> Result<JobSuccess
 
   // ==================== DOWNLOAD MEDIA FILE ==================== //
 
-  let maybe_media_upload_result = get_media_upload_for_inference(args.media_upload_token, &args.job_dependencies.mysql_pool).await;
-
-  let media_upload = match maybe_media_upload_result {
-    Ok(Some(media_upload)) => media_upload,
-    Ok(None) => {
-      error!("no media upload record found for token: {:?}", args.media_upload_token);
-      return Err(ProcessSingleJobError::Other(anyhow!("no media upload record found for token: {:?}", args.media_upload_token)));
-    },
-    Err(err) => {
-      error!("error fetching media upload record from db: {:?}", err);
-      return Err(ProcessSingleJobError::Other(err));
-    },
-  };
+  info!("Download media for so-vits-svc voice conversion...");
 
   // TODO: If already transcoded, download the transcoded file instead.
   // TODO: Turn this into a general utility.
@@ -115,7 +95,7 @@ pub async fn process_job(args: SoVitsSvcProcessJobArgs<'_>) -> Result<JobSuccess
     let original_media_upload_fs_path = work_temp_dir.path().join("original.bin");
 
     let media_upload_bucket_path =
-        MediaUploadOriginalFilePath::from_object_hash(&media_upload.public_bucket_directory_hash);
+        MediaUploadOriginalFilePath::from_object_hash(&args.media_upload.public_bucket_directory_hash);
 
     let bucket_object_path = media_upload_bucket_path.to_full_object_pathbuf();
 

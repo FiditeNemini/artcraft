@@ -9,6 +9,8 @@ use enums::by_table::voice_conversion_models::voice_conversion_model_type::Voice
 use mysql_queries::queries::generic_inference::job::list_available_generic_inference_jobs::AvailableInferenceJob;
 use mysql_queries::queries::voice_conversion::inference::get_voice_conversion_model_for_inference::get_voice_conversion_model_for_inference;
 use std::time::Duration;
+use log::{error, info};
+use mysql_queries::queries::media_uploads::get_media_upload_for_inference::get_media_upload_for_inference;
 use tokens::files::media_upload::MediaUploadToken;
 
 pub async fn process_single_vc_job(job_dependencies: &JobDependencies, job: &AvailableInferenceJob) -> Result<JobSuccessResult, ProcessSingleJobError> {
@@ -59,6 +61,25 @@ pub async fn process_single_vc_job(job_dependencies: &JobDependencies, job: &Ava
     Some(token) => token,
   };
 
+  let maybe_media_upload_result =
+      get_media_upload_for_inference(&media_upload_token, &job_dependencies.mysql_pool).await;
+
+  let media_upload = match maybe_media_upload_result {
+    Ok(Some(media_upload)) => media_upload,
+    Ok(None) => {
+      error!("no media upload record found for token: {:?}", media_upload_token);
+      return Err(ProcessSingleJobError::Other(anyhow!("no media upload record found for token: {:?}", media_upload_token)));
+    },
+    Err(err) => {
+      error!("error fetching media upload record from db: {:?}", err);
+      return Err(ProcessSingleJobError::Other(err));
+    },
+  };
+
+  info!("Source media upload file size (bytes): {}", &media_upload.original_file_size_bytes);
+  info!("Source media upload duration (millis): {}", &media_upload.original_duration_millis);
+  info!("Source media upload duration (seconds): {}", (media_upload.original_duration_millis as f32 / 1000.0));
+
   let job_success_result = match vc_model.model_type {
     VoiceConversionModelType::RvcV2 => {
       rvc_v2::process_job::process_job(RvcV2ProcessJobArgs {
@@ -66,6 +87,7 @@ pub async fn process_single_vc_job(job_dependencies: &JobDependencies, job: &Ava
         job,
         vc_model: &vc_model,
         media_upload_token: &media_upload_token,
+        media_upload: &media_upload,
       }).await?
     }
     VoiceConversionModelType::SoVitsSvc => {
@@ -74,6 +96,7 @@ pub async fn process_single_vc_job(job_dependencies: &JobDependencies, job: &Ava
         job,
         vc_model: &vc_model,
         media_upload_token: &media_upload_token,
+        media_upload: &media_upload,
       }).await?
     }
     VoiceConversionModelType::SoftVc => {

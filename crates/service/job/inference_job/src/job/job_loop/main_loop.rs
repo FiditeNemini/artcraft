@@ -42,8 +42,6 @@ pub async fn main_loop(job_dependencies: JobDependencies) {
 
     let maybe_scoped_model_types = job_dependencies.scoped_execution.get_scoped_model_types();
 
-    info!("Querying inference jobs scoped to model types: {:?}", maybe_scoped_model_types);
-
     let maybe_available_jobs = list_available_generic_inference_jobs(ListAvailableGenericInferenceJobArgs {
       num_records: job_dependencies.job_batch_size,
       is_debug_worker: false, // TODO
@@ -67,7 +65,12 @@ pub async fn main_loop(job_dependencies: JobDependencies) {
     };
 
     if jobs.is_empty() {
-      noop_logger.log_message_after_awhile("No jobs picked up from database!");
+      let message = format!(
+        "No jobs picked up from database! Querying scoped to model types: {:?}",
+        maybe_scoped_model_types);
+
+      noop_logger.log_message_after_awhile(&message);
+
       std::thread::sleep(Duration::from_millis(job_dependencies.job_batch_wait_millis));
       error_timeout_millis = START_TIMEOUT_MILLIS; // reset
       continue;
