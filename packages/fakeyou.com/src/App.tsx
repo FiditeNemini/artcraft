@@ -48,6 +48,7 @@ import { FrontendInferenceJobType, InferenceJob } from "@storyteller/components/
 import { GetModelInferenceJobStatus, GetModelInferenceJobStatusIsOk } from "@storyteller/components/src/api/model_inference/GetModelInferenceJobStatus";
 import { VoiceConversionModelUploadJob } from "@storyteller/components/src/jobs/VoiceConversionModelUploadJob";
 import { VoiceConversionModelListItem } from "@storyteller/components/src/api/voice_conversion/ListVoiceConversionModels";
+import posthog from 'posthog-js'
 
 i18n
   .use(initReactI18next) // passes i18n down to react-i18next
@@ -257,6 +258,10 @@ class App extends React.Component<Props, State> {
 
   querySession = async () => {
     const sessionWrapper = await SessionWrapper.lookupSession();
+    const username = sessionWrapper.getUsername();
+    if (username !== undefined) {
+      posthog.identify(username, {});
+    }
     this.setState({
       sessionWrapper: sessionWrapper,
     });
