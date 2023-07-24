@@ -13,6 +13,7 @@ import {
 import { BackLink } from "../../../_common/BackLink";
 import { motion } from "framer-motion";
 import { container, item, panel } from "../../../../../data/animation";
+import posthog from 'posthog-js'
 
 const DEFAULT_VISIBILITY = "public";
 
@@ -24,6 +25,8 @@ function W2lTemplateEditPage(props: Props) {
   let { templateToken }: { templateToken: string } = useParams();
 
   const history = useHistory();
+
+  posthog.capture('$pageview');
 
   const [w2lTemplate, setW2lTemplate] = useState<W2lTemplate | undefined>(
     undefined

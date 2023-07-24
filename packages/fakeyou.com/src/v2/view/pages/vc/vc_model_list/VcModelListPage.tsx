@@ -33,6 +33,7 @@ import {
 import { SessionVoiceConversionResultsList } from "../../../_common/SessionVoiceConversionResultsList";
 import PitchShiftComponent from "./components/PitchShiftComponent";
 import PitchEstimateMethodComponent from "./components/PitchEstimateMethodComponent";
+import posthog from 'posthog-js'
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -58,6 +59,7 @@ interface Props {
 
 function VcModelListPage(props: Props) {
   usePrefixedDocumentTitle("Voice Conversion");
+  posthog.capture('$pageview');
 
   const [convertLoading, setConvertLoading] = useState(false);
   const [canConvert, setCanConvert] = useState(false);

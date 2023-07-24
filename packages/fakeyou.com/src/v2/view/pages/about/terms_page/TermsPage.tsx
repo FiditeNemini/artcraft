@@ -4,10 +4,12 @@ import { container, item, panel, image } from "../../../../../data/animation";
 import { ThirdPartyLinks } from "@storyteller/components/src/constants/ThirdPartyLinks";
 import { Link } from "react-router-dom";
 import { usePrefixedDocumentTitle } from "../../../../../common/UsePrefixedDocumentTitle";
+import posthog from 'posthog-js'
 
 interface Props {}
 
 function TermsPage(props: Props) {
+  posthog.capture('$pageview');
   usePrefixedDocumentTitle("Terms of Use");
 
   return (

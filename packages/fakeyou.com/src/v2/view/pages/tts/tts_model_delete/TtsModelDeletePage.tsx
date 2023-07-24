@@ -6,6 +6,7 @@ import { useParams, Link, useHistory } from "react-router-dom";
 import { BackLink } from "../../../_common/BackLink";
 import { motion } from "framer-motion";
 import { container, item, panel } from "../../../../../data/animation";
+import posthog from 'posthog-js'
 
 interface TtsModelViewResponsePayload {
   success: boolean;
@@ -45,6 +46,7 @@ interface Props {
 }
 
 function TtsModelDeletePage(props: Props) {
+  posthog.capture('$pageview');
   const history = useHistory();
 
   let { token } = useParams() as { token: string };

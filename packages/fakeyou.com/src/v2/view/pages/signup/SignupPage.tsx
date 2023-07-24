@@ -17,6 +17,7 @@ import queryString from "query-string";
 import { WebUrl } from "../../../../common/WebUrl";
 import { BeginStripeCheckoutFlow } from "../../../../common/BeginStripeCheckoutFlow";
 import { usePrefixedDocumentTitle } from "../../../../common/UsePrefixedDocumentTitle";
+import posthog from 'posthog-js'
 
 enum FieldTriState {
   EMPTY_FALSE,
@@ -57,6 +58,7 @@ function SignupPage(props: Props) {
 
   const handleUsernameChange = (ev: React.FormEvent<HTMLInputElement>) => {
     ev.preventDefault();
+    posthog.capture('$pageview');
 
     const newUsername = (ev.target as HTMLInputElement).value;
 

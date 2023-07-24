@@ -3,10 +3,12 @@ import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { container, item, image, panel } from "../../../../../data/animation";
 import { usePrefixedDocumentTitle } from "../../../../../common/UsePrefixedDocumentTitle";
+import posthog from 'posthog-js'
 
 interface Props {}
 
 function AboutPage(props: Props) {
+  posthog.capture('$pageview');
   usePrefixedDocumentTitle("About Us");
 
   return (

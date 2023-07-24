@@ -2,10 +2,12 @@ import React from "react";
 import { motion } from "framer-motion";
 import { container, item, panel } from "../../../../../data/animation";
 import { usePrefixedDocumentTitle } from "../../../../../common/UsePrefixedDocumentTitle";
+import posthog from 'posthog-js'
 
 interface Props {}
 
 function PrivacyPage(props: Props) {
+  posthog.capture('$pageview');
   usePrefixedDocumentTitle("Privacy Statement");
 
   return (

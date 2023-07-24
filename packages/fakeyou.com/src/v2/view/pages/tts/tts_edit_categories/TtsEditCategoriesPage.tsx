@@ -34,6 +34,7 @@ import {
 import { useParams, Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { container, item, panel } from "../../../../../data/animation";
+import posthog from 'posthog-js'
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -41,6 +42,7 @@ interface Props {
 
 function TtsEditCategoriesPage(props: Props) {
   let { token } = useParams() as { token: string };
+  posthog.capture('$pageview');
 
   const [ttsModel, setTtsModel] = useState<TtsModel | undefined>(undefined);
   const [notFoundState, setNotFoundState] = useState<boolean>(false);

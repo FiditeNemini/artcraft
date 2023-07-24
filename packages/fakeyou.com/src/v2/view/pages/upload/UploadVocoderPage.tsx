@@ -14,6 +14,7 @@ import { motion } from "framer-motion";
 import { container, item, panel } from "../../../../data/animation";
 import { VocoderUploadJob } from "@storyteller/components/src/jobs/VocoderUploadJobs";
 import { SessionVocoderUploadResultList } from "../../_common/SessionVocoderUploadResultsList";
+import posthog from 'posthog-js'
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -22,6 +23,7 @@ interface Props {
 }
 
 function UploadVocoderPage(props: Props) {
+  posthog.capture('$pageview');
   let history = useHistory();
 
   const [downloadUrl, setDownloadUrl] = useState("");

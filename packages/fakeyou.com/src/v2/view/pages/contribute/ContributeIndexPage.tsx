@@ -23,6 +23,7 @@ import {
 } from "@fortawesome/pro-solid-svg-icons";
 import { faMicrophoneStand } from "@fortawesome/pro-duotone-svg-icons";
 import { faWaveformLines } from "@fortawesome/pro-regular-svg-icons";
+import posthog from 'posthog-js'
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -38,6 +39,7 @@ function ContributeIndexPage(props: Props) {
     : t("pages.contributeIndex.buttonSuggestCategory");
 
   usePrefixedDocumentTitle("Contribute to FakeYou");
+  posthog.capture('$pageview');
 
   const title = <>{t("pages.contributeIndex.heroTitle")}</>;
   const subText = (

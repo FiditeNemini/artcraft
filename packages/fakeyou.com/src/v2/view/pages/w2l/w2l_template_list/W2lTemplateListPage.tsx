@@ -19,6 +19,7 @@ import { motion } from "framer-motion";
 import { usePrefixedDocumentTitle } from "../../../../../common/UsePrefixedDocumentTitle";
 import { PageHeader } from "../../../_common/PageHeader";
 import { faVideo } from "@fortawesome/pro-solid-svg-icons";
+import posthog from 'posthog-js'
 
 const Fade = require("react-reveal/Fade");
 
@@ -52,6 +53,8 @@ interface Props {
 function W2lTemplateListPage(props: Props) {
   const [w2lTemplates, setW2lTemplates] = useState<Array<W2lTemplate>>([]);
   const [currentPageIndex, setCurrentPageIndex] = useState(0);
+
+  posthog.capture('$pageview');
 
   useEffect(() => {
     const api = new ApiConfig();

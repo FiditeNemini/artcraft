@@ -41,6 +41,7 @@ import { BackLink } from "../../../_common/BackLink";
 import { TextExpander } from "../../../_common/TextExpander";
 import { usePrefixedDocumentTitle } from "../../../../../common/UsePrefixedDocumentTitle";
 import { CommentComponent } from "../../../_common/comments/CommentComponent";
+import posthog from 'posthog-js'
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -48,6 +49,7 @@ interface Props {
 
 function TtsResultViewPage(props: Props) {
   let { token }: { token: string } = useParams();
+  posthog.capture('$pageview');
 
   const [ttsInferenceResult, setTtsInferenceResult] = useState<
     TtsResult | undefined

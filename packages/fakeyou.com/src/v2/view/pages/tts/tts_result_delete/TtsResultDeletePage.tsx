@@ -6,6 +6,7 @@ import { Gravatar } from "@storyteller/components/src/elements/Gravatar";
 import { WebUrl } from "../../../../../common/WebUrl";
 import { motion } from "framer-motion";
 import { container, item, panel } from "../../../../../data/animation";
+import posthog from 'posthog-js'
 
 interface TtsInferenceResultResponsePayload {
   success: boolean;
@@ -53,6 +54,7 @@ interface Props {
 
 function TtsResultDeletePage(props: Props) {
   const history = useHistory();
+  posthog.capture('$pageview');
 
   let { token }: { token: string } = useParams();
 

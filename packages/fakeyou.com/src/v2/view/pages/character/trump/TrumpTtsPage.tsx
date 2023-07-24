@@ -47,6 +47,7 @@ import { DynamicallyCategorizeModels } from "../../../../../model/categories/Syn
 import { usePrefixedDocumentTitle } from "../../../../../common/UsePrefixedDocumentTitle";
 import { SearchOmnibar } from "./search/SearchOmnibar";
 import { InferenceJob } from "@storyteller/components/src/jobs/InferenceJob";
+import posthog from 'posthog-js'
 
 const PAGE_MODEL_TOKENS = new Set<string>([
   "TM:pmd1wm3kf6az", // Development: "Fake Donald Trump #1"
@@ -107,6 +108,7 @@ function TrumpTtsPage(props: Props) {
   //Loading spinning icon
   const [loading, setLoading] = useState(false);
   const [isAudioLimitAlertVisible, setAudioLimitAlertVisible] = useState(false);
+  posthog.capture('$pageview');
 
   usePrefixedDocumentTitle("Donald Trump TTS and Donald Trump AI Voice");
 

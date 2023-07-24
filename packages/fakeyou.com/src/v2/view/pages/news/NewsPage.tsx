@@ -11,6 +11,7 @@ import { WebUrl } from "../../../../common/WebUrl";
 import { DiscordLink2 } from "@storyteller/components/src/elements/DiscordLink2";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faStar } from "@fortawesome/pro-solid-svg-icons";
+import posthog from 'posthog-js'
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -43,7 +44,7 @@ const TWITCH_CHANNEL = "FakeYouLabs";
 
 function NewsPage(props: Props) {
   usePrefixedDocumentTitle("AI News");
-  console.log("Channels page regenerated");
+  posthog.capture('$pageview');
 
   //const [stream, setStream] = useState<StreamInfo>({
   //  broadcaster_name: "",

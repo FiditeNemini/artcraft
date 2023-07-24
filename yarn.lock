@@ -4379,6 +4379,7 @@ __metadata:
     howler: ^2.2.0
     i18next: ^21.6.11
     js-cookie: ^3.0.1
+    posthog-js: ^1.73.1
     pretty-num: ^0.5.2
     query-string: ^8.1.0
     react: ^16.13.1
@@ -10425,6 +10426,13 @@ __metadata:
     setimmediate: ^1.0.5
     ua-parser-js: ^0.7.18
   checksum: e3a18508c303934aa1d3d891c13e127d071d8c5c557fa886d982fd71ebf6ac713cb7fa8cbd805b0c50fe1be80eea276125c8cc00d7d48460572738e0d71123ac
+  languageName: node
+  linkType: hard
+
+"fflate@npm:^0.4.1":
+  version: 0.4.8
+  resolution: "fflate@npm:0.4.8"
+  checksum: 29d8cbe44d5e7f53e7f5a160ac7f9cc025480c7b3bfd85c5f898cbe20dfa2dad4732daa534982664bf30b35896a90af44ea33ede5d94c5ffd1b8b0c0a0a56ca2
   languageName: node
   linkType: hard
 
@@ -16552,6 +16560,15 @@ __metadata:
     picocolors: ^1.0.0
     source-map-js: ^1.0.1
   checksum: b78abdd89c10f7b48f4bdcd376104a19d6e9c7495ab521729bdb3df315af6c211360e9f06887ad3bc0ab0f61a04b91d68ea11462997c79cced58b9ccd66fac07
+  languageName: node
+  linkType: hard
+
+"posthog-js@npm:^1.73.1":
+  version: 1.73.1
+  resolution: "posthog-js@npm:1.73.1"
+  dependencies:
+    fflate: ^0.4.1
+  checksum: 0490caeed064502e8acc0c5d13ac09cb67b612dbf921ed0e0f203aabb0d48fee103b9821dd87bea34aabac2a0919b1d76f64b611d16968cd63ab768e1381bc00
   languageName: node
   linkType: hard
 

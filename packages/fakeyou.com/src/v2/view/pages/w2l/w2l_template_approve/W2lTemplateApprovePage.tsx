@@ -12,6 +12,7 @@ import { GetW2lTemplateUseCount } from "@storyteller/components/src/api/w2l/GetW
 import { BackLink } from "../../../_common/BackLink";
 import { motion } from "framer-motion";
 import { container, item, panel } from "../../../../../data/animation";
+import posthog from 'posthog-js'
 
 const DEFAULT_APPROVED_STATE = true;
 
@@ -21,6 +22,8 @@ interface Props {
 
 function W2lTemplateApprovePage(props: Props) {
   const history = useHistory();
+
+  posthog.capture('$pageview');
 
   let { templateToken }: { templateToken: string } = useParams();
 

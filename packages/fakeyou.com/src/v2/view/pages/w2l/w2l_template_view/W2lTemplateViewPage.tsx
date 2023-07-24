@@ -28,6 +28,7 @@ import { container, item, panel } from "../../../../../data/animation";
 import { ThirdPartyLinks } from "@storyteller/components/src/constants/ThirdPartyLinks";
 import { usePrefixedDocumentTitle } from "../../../../../common/UsePrefixedDocumentTitle";
 import { CommentComponent } from "../../../_common/comments/CommentComponent";
+import posthog from 'posthog-js'
 
 interface EnqueueJobResponsePayload {
   success: boolean;
@@ -42,6 +43,8 @@ interface Props {
 
 function W2lTemplateViewPage(props: Props) {
   let { templateSlug }: { templateSlug: string } = useParams();
+
+  posthog.capture('$pageview');
 
   // Ajax
   const [w2lTemplate, setW2lTemplate] = useState<W2lTemplate | undefined>(

@@ -31,6 +31,7 @@ import {
   faMessageDots,
   faMicrophoneStand,
 } from "@fortawesome/pro-solid-svg-icons";
+import posthog from 'posthog-js'
 
 // TODO: This is duplicated in SessionTtsInferenceResultsList !
 // Default to querying every 15 seconds, but make it configurable serverside
@@ -90,6 +91,7 @@ function TopNav(props: Props) {
     await Logout();
     props.querySessionCallback();
     props.querySessionSubscriptionsCallback();
+    posthog.reset();
     Analytics.accountLogout();
     history.push("/");
   };

@@ -14,6 +14,7 @@ import {
 import { faDiscord, faTwitter } from "@fortawesome/free-brands-svg-icons";
 import { WebUrl } from "../../../../common/WebUrl";
 import { faFileArrowUp } from "@fortawesome/pro-solid-svg-icons";
+import posthog from 'posthog-js'
 // import {
 //   faFileArrowUp,
 //   faMicrophone,
@@ -27,6 +28,8 @@ interface Props {
 }
 
 function LandingPage(props: Props) {
+  posthog.capture('$pageview');
+
   let signUpButton = <></>;
   let viewPricingButton = <></>;
   let upgradeButton = <></>;

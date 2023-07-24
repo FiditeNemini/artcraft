@@ -1,10 +1,13 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import posthog from 'posthog-js'
+
 
 interface Props {
 }
 
 function VocodesPage(props: Props) {
+  posthog.capture('$pageview');
   return (
     <div className="content is-medium">
 

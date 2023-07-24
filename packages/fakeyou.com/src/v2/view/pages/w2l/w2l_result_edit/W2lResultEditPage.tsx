@@ -7,6 +7,7 @@ import { VisibleIconFc } from "../../../_icons/VisibleIcon";
 import { HiddenIconFc } from "../../../_icons/HiddenIcon";
 import { motion } from "framer-motion";
 import { container, item, panel } from "../../../../../data/animation";
+import posthog from 'posthog-js'
 
 const DEFAULT_VISIBILITY = "public";
 
@@ -58,6 +59,7 @@ interface Props {
 
 function W2lResultEditPage(props: Props) {
   let { token }: { token: string } = useParams();
+  posthog.capture('$pageview');
 
   const history = useHistory();
 

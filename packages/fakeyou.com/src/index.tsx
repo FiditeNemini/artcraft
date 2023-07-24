@@ -2,6 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import * as serviceWorker from './serviceWorker';
 import AppTranslated from './AppTranslated';
+import posthog from 'posthog-js'
 
 const IS_IOS : boolean = /iPad|iPhone|iPod/.test(navigator.platform || "");
 
@@ -28,6 +29,9 @@ bootstrapJs.setAttribute("crossorigin", "anonymous");
 bootstrapJs.setAttribute("integrity", "sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p");
 bootstrapJs.setAttribute("src", "https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js");
 document.getElementsByTagName("body")[0].appendChild(bootstrapJs);
+
+// Posthog analytics
+posthog.init('phc_x6IRdmevMt4XAoJqx9tCmwDiaQkEkD48c0aLmuXMOvu', { api_host: 'https://app.posthog.com' })
 
 ReactDOM.render(
   <React.StrictMode>

@@ -13,6 +13,7 @@ import { motion } from "framer-motion";
 import { container, panel } from "../../../../data/animation";
 import { Analytics } from "../../../../common/Analytics";
 import { usePrefixedDocumentTitle } from "../../../../common/UsePrefixedDocumentTitle";
+import posthog from 'posthog-js'
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -22,6 +23,7 @@ interface Props {
 
 function LoginPage(props: Props) {
   let history = useHistory();
+  posthog.capture('$pageview');
 
   const [password, setPassword] = useState("");
   const [usernameOrEmail, setUsernameOrEmail] = useState("");
