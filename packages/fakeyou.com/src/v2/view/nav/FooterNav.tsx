@@ -45,26 +45,23 @@ function FooterNav(props: Props) {
     getServerInfo();
   }, [getServerInfo]);
 
-  const [queueStats, setQueueStats] =
-    useState<GetQueueStatsSuccessResponse>({
-      success: true,
-      cache_time: new Date(0), // NB: Epoch is used for vector clock's initial state
-      refresh_interval_millis: DEFAULT_QUEUE_REFRESH_INTERVAL_MILLIS,
-      inference: {
-        pending_job_count: 0,
-      },
-      legacy_tts: {
-        pending_job_count: 0,
-      },
-    });
+  const [queueStats, setQueueStats] = useState<GetQueueStatsSuccessResponse>({
+    success: true,
+    cache_time: new Date(0), // NB: Epoch is used for vector clock's initial state
+    refresh_interval_millis: DEFAULT_QUEUE_REFRESH_INTERVAL_MILLIS,
+    inference: {
+      pending_job_count: 0,
+    },
+    legacy_tts: {
+      pending_job_count: 0,
+    },
+  });
 
   useEffect(() => {
     const fetch = async () => {
       const response = await GetQueueStats();
       if (GetQueueStatsIsOk(response)) {
-        if (
-          response.cache_time.getTime() > queueStats.cache_time.getTime()
-        ) {
+        if (response.cache_time.getTime() > queueStats.cache_time.getTime()) {
           setQueueStats(response);
         }
       }
@@ -120,12 +117,20 @@ function FooterNav(props: Props) {
     <div>
       <footer id="footer">
         <div className="footer-bar text-center text-lg-start">
-          <div className="container fw-medium">
-            TTS Queued:{" "}
-            <span className="text-red">{queueStats.legacy_tts.pending_job_count}</span>
-            {" "}
-            V2V Queued:{" "}
-            <span className="text-red">{queueStats.inference.pending_job_count}</span>
+          <div className="container fw-medium d-flex gap-2">
+            <div>
+              TTS Queued:{" "}
+              <span className="text-red">
+                {queueStats.legacy_tts.pending_job_count}
+              </span>
+            </div>
+            <span className="opacity-25">•</span>
+            <div>
+              V2V Queued:{" "}
+              <span className="text-red">
+                {queueStats.inference.pending_job_count}
+              </span>
+            </div>
           </div>
         </div>
         <div className="container py-5">
