@@ -36,3 +36,28 @@ where
     vc.user_deleted_at IS NULL
     and vc.mod_deleted_at IS NULL
 order by vc.original_download_url ASC;
+
+--
+-- Top 100 voice conversion models by use count
+-- (jobs table, not results table)
+--
+select
+    m.token,
+    m.title,
+    u.username,
+    r.use_count,
+    m.created_at,
+    m.user_deleted_at,
+    m.mod_deleted_at
+from (
+         select maybe_model_token, count(*) as use_count
+         from generic_inference_jobs
+         where maybe_model_token IS NOT NULL
+         group by maybe_model_token
+     ) as r
+         join voice_conversion_models as m
+              on m.token = r.maybe_model_token
+         join users as u
+              on u.token = m.creator_user_token
+order by r.use_count desc
+    limit 100;
