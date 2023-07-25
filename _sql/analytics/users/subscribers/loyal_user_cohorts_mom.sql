@@ -24,7 +24,7 @@ FROM (
              SELECT DISTINCT user_token
              FROM user_subscriptions
          )
-           AND j.created_at BETWEEN '2023-01-01 00:00:00' AND '2023-02-01 00:00:00'
+           AND j.created_at BETWEEN '2022-12-01 00:00:00' AND '2023-01-01 00:00:00'
          UNION
          SELECT
              u.username as username,
@@ -36,7 +36,7 @@ FROM (
              SELECT DISTINCT user_token
              FROM user_subscriptions
              )
-           AND j.created_at BETWEEN '2023-01-01 00:00:00' AND '2023-02-01 00:00:00'
+           AND j.created_at BETWEEN '2022-12-01 00:00:00' AND '2023-01-01 00:00:00'
          UNION
          SELECT
              u.username as username,
@@ -48,8 +48,9 @@ FROM (
              SELECT DISTINCT user_token
              FROM user_subscriptions
              )
-           AND j.created_at BETWEEN '2023-01-01 00:00:00' AND '2023-02-01 00:00:00'
+           AND j.created_at BETWEEN '2022-12-01 00:00:00' AND '2023-01-01 00:00:00'
      ) as t
 GROUP BY username
-ORDER BY total_use_count desc
+ORDER BY total_use_count desc;
+
 

@@ -28,3 +28,9 @@ where id IN (
     or subscriptions.status = 'past_due'
 )
 group by address_country
+
+
+-- Histogram
+select address_country, count(*)
+from customers
+group by address_country
