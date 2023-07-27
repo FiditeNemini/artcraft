@@ -9,6 +9,10 @@ impl RedisCacheKeys {
     format!("get_tts_model:{}", model_token)
   }
 
+  pub fn get_unified_queue_stats_endpoint() -> &'static str {
+    "q_stats"
+  }
+
   pub fn session_record_light(session_token: &str) -> String {
     format!("ses_light:{}", session_token)
   }

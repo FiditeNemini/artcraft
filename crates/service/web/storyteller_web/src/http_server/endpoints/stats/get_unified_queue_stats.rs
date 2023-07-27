@@ -6,8 +6,9 @@ use errors::AnyhowResult;
 use hyper::StatusCode;
 use log::{debug, error, info, warn};
 use mysql_queries::queries::generic_inference::web::get_pending_inference_job_count::get_pending_inference_job_count;
+use mysql_queries::queries::stats::get_unified_queue_stats::{get_unified_queue_stats, UnifiedQueueStatsResult};
+use redis_common::redis_cache_keys::RedisCacheKeys;
 use std::sync::Arc;
-use mysql_queries::queries::stats::get_unified_queue_stats::get_unified_queue_stats;
 
 #[derive(Serialize)]
 pub struct GetUnifiedQueueStatsSuccessResponse {
@@ -87,14 +88,38 @@ pub async fn get_unified_queue_stats_handler(
 
   let stats_result = match maybe_cached {
     Some(cached) => {
+      debug!("serving from in-memory cache");
       cached
     },
     None => {
-      debug!("populating unified queue stats from database");
+      debug!("populating unified queue stats from Redis *OR* database");
 
-      let stats_query_result = get_unified_queue_stats(
-        &server_state.mysql_pool
-      ).await;
+      let mysql_pool = server_state.mysql_pool.clone();
+
+      let get_stats = move || {
+        // NB: async closures are not yet stable in Rust, so we include an async block.
+        async move {
+          debug!("querying from database...");
+          get_unified_queue_stats(
+            &mysql_pool
+          ).await
+        }
+      };
+
+      // NB(2023-07-27): Double layers of caching (in-memory + Redis) is probably exorbitant, but this seems fine for now.
+      // This endpoint's query (even when in-memory cached across the cluster) was causing the DB CPU to hit 100%.
+      let stats_query_result = match server_state.redis_ttl_cache.get_connection() {
+        Err(err) => {
+          warn!("Error loading Redis connection from TTL cache (calling DB instead): {:?}", err);
+          get_stats().await
+        }
+        Ok(mut redis_ttl_cache) => {
+          let cache_key = RedisCacheKeys::get_unified_queue_stats_endpoint();
+          redis_ttl_cache.lazy_load_if_not_cached(&cache_key, move || {
+            get_stats()
+          }).await
+        }
+      };
 
       match stats_query_result {
         // If the database misbehaves (eg. DDoS), let's stop spamming it.
@@ -115,7 +140,7 @@ pub async fn get_unified_queue_stats_handler(
         }
 
         // Happy path...
-        Ok(stats_result) => {
+        Ok(Some(stats_result)) => {
           server_state.caches.ephemeral.queue_stats.store_copy(&stats_result)
               .map_err(|e| {
                 error!("error storing cache: {:?}", e);
@@ -123,6 +148,16 @@ pub async fn get_unified_queue_stats_handler(
               })?;
 
           stats_result
+        }
+
+        Ok(None) => {
+          // NB: This should be impossible since the DB always returns "Some"
+          // (We artificially wrapped the result in Option<T>.)
+          UnifiedQueueStatsResult {
+            generic_job_count: 10_000,
+            legacy_tts_job_count: 10_000,
+            present_time: NaiveDateTime::from_timestamp(0, 0),
+          }
         }
       }
     },

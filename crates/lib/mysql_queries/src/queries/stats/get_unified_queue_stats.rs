@@ -3,7 +3,7 @@ use crate::helpers::numeric_converters::try_i64_to_u64_or_min;
 use errors::AnyhowResult;
 use sqlx::MySqlPool;
 
-#[derive(Clone)]
+#[derive(Serialize, Deserialize, Clone)]
 pub struct UnifiedQueueStatsResult {
   pub generic_job_count: u64,
   pub legacy_tts_job_count: u64,
@@ -16,9 +16,11 @@ struct QueryResultInternal {
   present_time: NaiveDateTime,
 }
 
+// NB: Returning Option<T> is a hack to fit with outer Redis caching.
+// I'm only doing this because I'm in a hurry. Don't do this.
 pub async fn get_unified_queue_stats(
   pool: &MySqlPool,
-) -> AnyhowResult<UnifiedQueueStatsResult> {
+) -> AnyhowResult<Option<UnifiedQueueStatsResult>> {
   // NB (1): We query as a union since "started" jobs can get picked off mid-run and go stale
   // forever. We currently have no automated means of collecting those jobs.
   // NB (2): We query the server timestamp so we can cache the results.
@@ -64,9 +66,9 @@ SELECT
       .fetch_one(pool)
       .await?;
 
-  Ok(UnifiedQueueStatsResult {
+  Ok(Some(UnifiedQueueStatsResult {
     generic_job_count: try_i64_to_u64_or_min(result.generic_job_count.unwrap_or(0)),
     legacy_tts_job_count: try_i64_to_u64_or_min(result.legacy_tts_job_count.unwrap_or(0)),
     present_time: result.present_time,
-  })
+  }))
 }
