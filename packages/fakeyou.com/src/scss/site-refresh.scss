@@ -731,6 +731,14 @@ styles with important tags:
     // }
   }
 
+  .bg-translucent {
+    background-color: rgba(#1a1a27, 0.8);
+  }
+
+  .modal-open {
+    overflow-y: hidden;
+  }
+
   .input-icon-search {
     .form-control-feedback {
       padding: 12px 18px;

@@ -12,7 +12,7 @@ import { UploadSamples } from "./components/steps/UploadSamples";
 import { VoiceDetails } from "./components/steps/VoiceDetails";
 import { Complete } from "./components/steps/Complete";
 
-function VoiceDesignerPage(this: any) {
+function VoiceDesignerPage() {
   usePrefixedDocumentTitle("Voice Designer");
 
   const [currentStep, setCurrentStep] = useState(0);
