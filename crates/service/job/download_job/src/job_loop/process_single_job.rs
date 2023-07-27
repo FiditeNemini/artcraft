@@ -13,8 +13,6 @@ use mysql_queries::queries::generic_download::job::mark_generic_download_job_pen
 use tempdir::TempDir;
 
 pub async fn process_single_job(job_state: &JobState, job: &AvailableDownloadJob) -> AnyhowResult<()> {
-  let mut redis = job_state.redis_pool.get()?;
-  let mut redis_logger = RedisJobStatusLogger::new_generic_download(&mut redis, job.download_job_token.as_str());
 
   // ==================== ATTEMPT TO GRAB JOB LOCK ==================== //
 
@@ -29,7 +27,33 @@ pub async fn process_single_job(job_state: &JobState, job: &AvailableDownloadJob
     return Ok(())
   }
 
-  info!("Beginning work on {:?} = {} | {}", job.download_type, job.download_job_token, job.download_url);
+  process_single_job_wrap_with_logs(job_state, job).await
+}
+
+async fn process_single_job_wrap_with_logs(
+  job_state: &JobState,
+  job: &AvailableDownloadJob,
+) -> AnyhowResult<()> {
+
+  println!("\n  ----------------------------------------- JOB START -----------------------------------------  \n");
+
+  info!("Beginning work download ({}): {:?}", job.id.0, job.download_job_token);
+  info!("Download Type: {:?}", job.download_type);
+  info!("Title: {:?}", job.title);
+  info!("Download URL: {:?}", job.download_url);
+
+  let result = do_process_single_job(job_state, job).await;
+
+  println!("\n  ----------------------------------------- JOB END -----------------------------------------  \n");
+
+  result
+}
+
+pub async fn do_process_single_job(job_state: &JobState, job: &AvailableDownloadJob) -> AnyhowResult<()> {
+
+  // TODO(bt, 2023-07-27): Redis pool management probably belongs at near the outermost loop.
+  let mut redis = job_state.redis_pool.get()?;
+  let mut redis_logger = RedisJobStatusLogger::new_generic_download(&mut redis, job.download_job_token.as_str());
 
   let job_start_time = Instant::now();
 
