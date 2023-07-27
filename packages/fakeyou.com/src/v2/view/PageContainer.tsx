@@ -579,6 +579,10 @@ class PageContainer extends React.Component<Props, State> {
               <VoiceDesignerPage />
             </Route>
 
+            <Route path="/generate-speech">
+              <GenerateSpeechPage />
+            </Route>
+
             <Route path="/character/donald-trump">
               <TrumpTtsPage
                 sessionWrapper={this.props.sessionWrapper}
