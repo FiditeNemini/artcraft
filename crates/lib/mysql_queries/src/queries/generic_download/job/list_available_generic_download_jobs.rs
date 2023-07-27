@@ -31,9 +31,17 @@ pub struct AvailableDownloadJob {
   pub retry_at: Option<chrono::DateTime<Utc>>,
 }
 
-pub async fn list_available_generic_download_jobs(pool: &MySqlPool, num_records: u32, download_types: &BTreeSet<GenericDownloadType>)
+pub async fn list_available_generic_download_jobs(
+  pool: &MySqlPool,
+  num_records: u32,
+  maybe_scoped_download_types: Option<&BTreeSet<GenericDownloadType>>
+)
   -> AnyhowResult<Vec<AvailableDownloadJob>>
 {
+  let download_types = maybe_scoped_download_types
+      .map(|types| types.clone())
+      .unwrap_or(GenericDownloadType::all_variants()); // NB: All model types
+
   // NB/TODO(bt,2023-07-20): Non-statically typed SQL can't do type annotations AFAIK
   let mut query = String::from(r#"
 SELECT
@@ -68,7 +76,7 @@ WHERE
   )
   "#);
 
-  if let Some(clause) = download_type_clause(download_types) {
+  if let Some(clause) = download_type_clause(&download_types) {
     query.push_str(" AND ");
     query.push_str(&clause);
     query.push_str(" ");

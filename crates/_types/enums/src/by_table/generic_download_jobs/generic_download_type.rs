@@ -1,3 +1,9 @@
+use std::collections::BTreeSet;
+
+#[cfg(test)]
+use strum::EnumCount;
+#[cfg(test)]
+use strum::EnumIter;
 
 // TODO: Use macro-derived impls
 
@@ -8,6 +14,7 @@
 /// These types are present in the HTTP API and database columns as serialized here.
 ///
 /// DO NOT CHANGE VALUES WITHOUT A MIGRATION STRATEGY.
+#[cfg_attr(test, derive(EnumIter, EnumCount))]
 #[derive(Clone, Copy, Eq, PartialEq, Debug, Deserialize, Serialize, sqlx::Type, Hash, Ord, PartialOrd)]
 pub enum GenericDownloadType {
   /// NB: Note - this is hifigan for Tacotron2.
@@ -87,6 +94,21 @@ impl GenericDownloadType {
       _ => Err(format!("invalid value: {:?}", value)),
     }
   }
+
+  pub fn all_variants() -> BTreeSet<Self> {
+    // NB: BTreeSet is sorted
+    // NB: BTreeSet::from() isn't const, but not worth using LazyStatic, etc.
+    BTreeSet::from([
+      Self::HifiGan,
+      Self::HifiGanRocketVc,
+      Self::HifiGanSoVitsSvc,
+      Self::RocketVc,
+      Self::RvcV2,
+      Self::SoVitsSvc,
+      Self::Tacotron2,
+      Self::Vits,
+    ])
+  }
 }
 
 #[cfg(test)]
@@ -128,5 +150,25 @@ mod tests {
     assert_eq!(GenericDownloadType::from_str("so_vits_svc").unwrap(), GenericDownloadType::SoVitsSvc);
     assert_eq!(GenericDownloadType::from_str("tacotron2").unwrap(), GenericDownloadType::Tacotron2);
     assert_eq!(GenericDownloadType::from_str("vits").unwrap(), GenericDownloadType::Vits);
+  }
+
+  #[test]
+  fn all_variants() {
+    // Static check
+    let mut variants = GenericDownloadType::all_variants();
+    assert_eq!(variants.len(), 8);
+    assert_eq!(variants.pop_first(), Some(GenericDownloadType::HifiGan));
+    assert_eq!(variants.pop_first(), Some(GenericDownloadType::HifiGanRocketVc));
+    assert_eq!(variants.pop_first(), Some(GenericDownloadType::HifiGanSoVitsSvc));
+    assert_eq!(variants.pop_first(), Some(GenericDownloadType::RocketVc));
+    assert_eq!(variants.pop_first(), Some(GenericDownloadType::RvcV2));
+    assert_eq!(variants.pop_first(), Some(GenericDownloadType::SoVitsSvc));
+    assert_eq!(variants.pop_first(), Some(GenericDownloadType::Tacotron2));
+    assert_eq!(variants.pop_first(), Some(GenericDownloadType::Vits));
+    assert_eq!(variants.pop_first(), None);
+
+    // Generated check
+    use strum::IntoEnumIterator;
+    assert_eq!(GenericDownloadType::all_variants().len(), GenericDownloadType::iter().len());
   }
 }

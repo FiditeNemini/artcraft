@@ -1,16 +1,16 @@
 use crate::job::job_loop::clear_full_filesystem::clear_full_filesystem;
 use crate::job::job_loop::process_single_job::process_single_job;
 use crate::job::job_loop::process_single_job_error::ProcessSingleJobError;
+use crate::job::job_loop::process_single_job_success_case::ProcessSingleJobSuccessCase;
 use crate::job_dependencies::JobDependencies;
 use errors::AnyhowResult;
+use filesys::file_exists::file_exists;
 use jobs_common::noop_logger::NoOpLogger;
 use log::{error, info, warn};
 use mysql_queries::queries::generic_inference::job::list_available_generic_inference_jobs::{AvailableInferenceJob, list_available_generic_inference_jobs, ListAvailableGenericInferenceJobArgs};
 use mysql_queries::queries::generic_inference::job::mark_generic_inference_job_completely_failed::mark_generic_inference_job_completely_failed;
 use mysql_queries::queries::generic_inference::job::mark_generic_inference_job_failure::mark_generic_inference_job_failure;
 use std::time::Duration;
-use filesys::file_exists::file_exists;
-use crate::job::job_loop::process_single_job_success_case::ProcessSingleJobSuccessCase;
 
 // Job runner timeouts (guards MySQL)
 const START_TIMEOUT_MILLIS : u64 = 500;

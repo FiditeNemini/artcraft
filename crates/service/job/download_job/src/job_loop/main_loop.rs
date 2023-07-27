@@ -24,12 +24,14 @@ pub async fn main_loop(job_state: JobState) {
       panic!("nvidia-smi health check failed; exiting program!");
     }
 
+    let maybe_scoped_download_types = job_state.scoped_downloads.get_scoped_model_types();
+
     let num_records = 1;
 
     let maybe_available_jobs = list_available_generic_download_jobs(
       &job_state.mysql_pool,
       num_records,
-      &job_state.download_types).await;
+      maybe_scoped_download_types).await;
 
     let jobs = match maybe_available_jobs {
       Ok(jobs) => jobs,

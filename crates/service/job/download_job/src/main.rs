@@ -37,11 +37,13 @@ use crate::job_types::tts::tacotron::tacotron_model_check_command::TacotronModel
 use crate::job_types::tts::vits::vits_model_check_command::VitsModelCheckCommand;
 use crate::job_types::vocoder::hifigan_softvc::hifigan_softvc_model_check_command::HifiGanSoftVcModelCheckCommand;
 use crate::job_types::vocoder::hifigan_tacotron::hifigan_model_check_command::HifiGanModelCheckCommand;
+use crate::job_types::voice_conversion::rvc_v2::pretrained_hubert_model::PretrainedHubertModel;
 use crate::job_types::voice_conversion::rvc_v2::rvc_v2_model_check_command::RvcV2ModelCheckCommand;
 use crate::job_types::voice_conversion::so_vits_svc::so_vits_svc_model_check_command::SoVitsSvcModelCheckCommand;
 use crate::job_types::voice_conversion::softvc::softvc_model_check_command::SoftVcModelCheckCommand;
 use crate::threads::nvidia_smi_checker::nvidia_smi_health_check_status::NvidiaSmiHealthCheckStatus;
 use crate::threads::nvidia_smi_checker::nvidia_smi_health_check_thread::nvidia_smi_health_check_thread;
+use crate::util::scoped_downloads::ScopedDownloads;
 use errors::AnyhowResult;
 use google_drive_common::google_drive_download_command::GoogleDriveDownloadCommand;
 use log::info;
@@ -56,8 +58,6 @@ use std::path::PathBuf;
 use std::time::Duration;
 use subprocess_common::docker_options::{DockerFilesystemMount, DockerGpu, DockerOptions};
 use tokio::runtime::Runtime;
-use enums::by_table::generic_download_jobs::generic_download_type::GenericDownloadType;
-use crate::job_types::voice_conversion::rvc_v2::pretrained_hubert_model::PretrainedHubertModel;
 
 // Buckets
 const ENV_ACCESS_KEY : &'static str = "ACCESS_KEY";
@@ -339,18 +339,8 @@ async fn main() -> AnyhowResult<()> {
     ).await;
   });
 
-  let mut download_types = BTreeSet::new();
-
-  // NB(bt,2023-07-20): Disabling hifigan (did it work at all?)
-  download_types.insert(GenericDownloadType::RvcV2);
-  download_types.insert(GenericDownloadType::SoVitsSvc);
-  //download_types.insert(GenericDownloadType::Vits);
-  //download_types.insert(GenericDownloadType::HifiGan);
-
-  info!("Looking up download jobs of type {:?}", download_types);
-
   let job_state = JobState {
-    download_types,
+    scoped_downloads: ScopedDownloads::new_from_env()?,
     download_temp_directory: temp_directory,
     mysql_pool,
     redis_pool,

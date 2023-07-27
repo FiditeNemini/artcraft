@@ -4,13 +4,13 @@ use crate::job_types::tts::tacotron::process_tacotron_model::process_tacotron_mo
 use crate::job_types::tts::vits::process_vits_model::process_vits_model;
 use crate::job_types::vocoder::hifigan_softvc::process_hifigan_softvc_vocoder::process_hifigan_softvc_vocoder;
 use crate::job_types::vocoder::hifigan_tacotron::process_hifigan_vocoder::process_hifigan_vocoder;
+use crate::job_types::voice_conversion::rvc_v2::process_rvc_v2_model::process_rvc_v2_model;
+use crate::job_types::voice_conversion::so_vits_svc::process_so_vits_svc_model::process_so_vits_svc_model;
 use crate::job_types::voice_conversion::softvc::process_softvc_model::process_softvc_model;
 use enums::by_table::generic_download_jobs::generic_download_type::GenericDownloadType;
 use jobs_common::redis_job_status_logger::RedisJobStatusLogger;
 use mysql_queries::queries::generic_download::job::list_available_generic_download_jobs::AvailableDownloadJob;
 use tempdir::TempDir;
-use crate::job_types::voice_conversion::rvc_v2::process_rvc_v2_model::process_rvc_v2_model;
-use crate::job_types::voice_conversion::so_vits_svc::process_so_vits_svc_model::process_so_vits_svc_model;
 
 pub struct DispatchJobToHandlerArgs<'a, 'b: 'a> {
   pub job_runner_state: &'a JobState,
