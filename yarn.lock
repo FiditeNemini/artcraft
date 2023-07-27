@@ -4399,6 +4399,7 @@ __metadata:
     typescript: ^3.7.5
     uuid: ^8.3.2
     wavesurfer.js: ^6.4.0
+    zustand: ^4.3.9
   languageName: unknown
   linkType: soft
 
@@ -4500,7 +4501,6 @@ __metadata:
     craco: ^0.0.3
     lerna: ^4.0.0
     yarn: ^1.22.19
-    zustand: ^4.3.9
   languageName: unknown
   linkType: soft
 
