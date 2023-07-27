@@ -35,3 +35,14 @@ where token IN (
         and created_at > NOW() - INTERVAL 15 DAY
     ) as x
 );
+
+
+-- Kill bad pending downloads
+-- eg. awful voices, like Hitler
+
+update generic_download_jobs
+set
+    status='dead',
+    download_url = CONCAT('NOPE', download_url)
+where token = 'jdown_ssape40dxbfgvhtsmedt34418x'
+limit 1;
