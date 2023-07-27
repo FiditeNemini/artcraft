@@ -1598,3 +1598,11 @@ textarea {
     }
   }
 }
+
+@media (max-width: 768px) {
+  .fakeyou-refresh {
+    .prev-step {
+      display: none !important;
+    }
+  }
+}

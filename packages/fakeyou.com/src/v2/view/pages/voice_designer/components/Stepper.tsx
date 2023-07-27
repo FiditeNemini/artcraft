@@ -13,7 +13,7 @@ const Stepper: React.FC<StepperProps> = ({ steps, currentStep }) => {
           key={index}
           className={`position-relative d-flex ${
             index !== steps.length - 1 ? "w-100" : ""
-          } align-items-center gap-3`}
+          } align-items-center gap-3 ${index < currentStep ? "prev-step" : ""}`}
         >
           <div
             className={`stepper-number ${
