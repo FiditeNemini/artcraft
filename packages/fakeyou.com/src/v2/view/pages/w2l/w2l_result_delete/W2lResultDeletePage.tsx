@@ -10,7 +10,7 @@ import {
 } from "@storyteller/components/src/api/w2l/GetW2lResult";
 import { motion } from "framer-motion";
 import { container, item, panel } from "../../../../../data/animation";
-import posthog from 'posthog-js'
+import { PosthogClient } from "@storyteller/components/src/analytics/PosthogClient";
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -18,7 +18,7 @@ interface Props {
 
 function W2lResultDeletePage(props: Props) {
   const history = useHistory();
-  posthog.capture('$pageview');
+  PosthogClient.recordPageview();
 
   let { token } = useParams() as { token: string };
 

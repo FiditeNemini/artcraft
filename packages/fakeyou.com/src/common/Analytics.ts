@@ -1,4 +1,4 @@
-import posthog from 'posthog-js'
+import { PosthogClient } from "@storyteller/components/src/analytics/PosthogClient";
 
 /**
  * Send Analytics to Google Analytics.
@@ -284,7 +284,7 @@ class Analytics {
   }
 
   private static sendCategorizedEvent(eventCategory: string, actionName: string, eventLabel?: string, value?: number) {
-    posthog.capture(actionName);
+    PosthogClient.recordAction(actionName);
 
     gtag('event', actionName, {
       'event_category': eventCategory,

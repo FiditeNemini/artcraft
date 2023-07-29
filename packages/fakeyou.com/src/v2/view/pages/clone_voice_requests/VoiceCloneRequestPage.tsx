@@ -26,13 +26,13 @@ import { WebUrl } from "../../../../common/WebUrl";
 import { motion } from "framer-motion";
 import { container, item, image, panel } from "../../../../data/animation";
 import { usePrefixedDocumentTitle } from "../../../../common/UsePrefixedDocumentTitle";
-import posthog from 'posthog-js'
+import { PosthogClient } from "@storyteller/components/src/analytics/PosthogClient";
 
 interface Props {}
 
 function VoiceCloneRequestPage(props: Props) {
   usePrefixedDocumentTitle("Create a Custom Voice Clone with Deep Fake TTS");
-  posthog.capture('$pageview');
+  PosthogClient.recordPageview();
 
   // Contact
   const [emailAddress, setEmailAddress] = useState("");

@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { container, item, image } from "../../../../data/animation";
 import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
-import posthog from 'posthog-js'
+import { PosthogClient } from "@storyteller/components/src/analytics/PosthogClient";
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -11,7 +11,7 @@ interface Props {
 }
 
 function CheckoutCancelPage(props: Props) {
-  posthog.capture('$pageview');
+  PosthogClient.recordPageview();
 
   return (
     <motion.div initial="hidden" animate="visible" variants={container}>

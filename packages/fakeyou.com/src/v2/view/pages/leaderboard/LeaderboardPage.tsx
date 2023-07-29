@@ -15,7 +15,7 @@ import { DiscordLink2 } from "@storyteller/components/src/elements/DiscordLink2"
 import { motion } from "framer-motion";
 import { container, item, panel } from "data/animation";
 import { usePrefixedDocumentTitle } from "common/UsePrefixedDocumentTitle";
-import posthog from 'posthog-js'
+import { PosthogClient } from "@storyteller/components/src/analytics/PosthogClient";
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -33,7 +33,7 @@ function LeaderboardPage(props: Props) {
   >(undefined);
   const [retryCount, setRetryCount] = useState(0);
   
-  posthog.capture('$pageview');
+  PosthogClient.recordPageview();
 
   const getLeaderboard = useCallback(async () => {
     const leaderboardReponse = await GetLeaderboard();

@@ -67,7 +67,7 @@ import { RatingButtons } from "../../../_common/ratings/RatingButtons";
 import { RatingStats } from "../../../_common/ratings/RatingStats";
 import { CommentComponent } from "../../../_common/comments/CommentComponent";
 import { InferenceJob } from "@storyteller/components/src/jobs/InferenceJob";
-import posthog from 'posthog-js'
+import { PosthogClient } from "@storyteller/components/src/analytics/PosthogClient";
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -82,7 +82,7 @@ interface Props {
 
 function TtsModelViewPage(props: Props) {
   let { token } = useParams() as { token: string };
-  posthog.capture('$pageview');
+  PosthogClient.recordPageview();
 
   const [ttsModel, setTtsModel] = useState<TtsModel | undefined>(undefined);
   const [ttsModelUseCount, setTtsModelUseCount] = useState<number | undefined>(

@@ -21,7 +21,7 @@ import {
 import { BackLink } from "../../../_common/BackLink";
 import { motion } from "framer-motion";
 import { container, item, panel } from "../../../../../data/animation";
-import posthog from 'posthog-js'
+import { PosthogClient } from "@storyteller/components/src/analytics/PosthogClient";
 
 const DEFAULT_VISIBILITY = "public";
 
@@ -62,7 +62,7 @@ interface UserPayload {
 
 function ProfileEditFc(props: Props) {
   const { username } = useParams() as { username: string };
-  posthog.capture('$pageview');
+  PosthogClient.recordPageview();
   
   const userProfilePage = `/profile/${username}`;
 

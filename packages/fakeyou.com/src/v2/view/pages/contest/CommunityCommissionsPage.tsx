@@ -6,13 +6,13 @@ import { usePrefixedDocumentTitle } from "../../../../common/UsePrefixedDocument
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faWaveformLines } from "@fortawesome/pro-solid-svg-icons";
 import { faDiscord } from "@fortawesome/free-brands-svg-icons";
-import posthog from 'posthog-js'
+import { PosthogClient } from "@storyteller/components/src/analytics/PosthogClient";
 
 interface Props {}
 
 function CommunityCommissionsPage(props: Props) {
   usePrefixedDocumentTitle("Voice to Voice Community Commissions");
-  posthog.capture('$pageview');
+  PosthogClient.recordPageview();
 
   return (
     <motion.div initial="hidden" animate="visible" variants={container}>

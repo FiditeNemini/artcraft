@@ -14,7 +14,7 @@ import { motion } from "framer-motion";
 import { container, item, panel } from "../../../../data/animation";
 import { VoiceConversionModelUploadJob } from "@storyteller/components/src/jobs/VoiceConversionModelUploadJob";
 import { SessionVoiceConversionModelUploadResultList } from "../../_common/SessionVoiceConversionModelUploadResultsList";
-import posthog from 'posthog-js'
+import { PosthogClient } from "@storyteller/components/src/analytics/PosthogClient";
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -24,7 +24,7 @@ interface Props {
 
 function UploadVoiceConversionModel(props: Props) {
   let history = useHistory();
-  posthog.capture('$pageview');
+  PosthogClient.recordPageview();
 
   const [downloadUrl, setDownloadUrl] = useState("");
   const [title, setTitle] = useState("");

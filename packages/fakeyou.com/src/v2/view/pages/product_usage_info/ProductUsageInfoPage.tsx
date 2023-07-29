@@ -3,7 +3,7 @@ import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapp
 import { motion } from "framer-motion";
 import { container, panel } from "data/animation";
 import { usePrefixedDocumentTitle } from "common/UsePrefixedDocumentTitle";
-import posthog from 'posthog-js'
+import { PosthogClient } from "@storyteller/components/src/analytics/PosthogClient";
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -47,7 +47,7 @@ const radioButtonsWhy = [
 
 function ProductUsageInfoPage(props: Props) {
   usePrefixedDocumentTitle("Product Usage Survey");
-  posthog.capture('$pageview');
+  PosthogClient.recordPageview();
 
   const [selectedOptionWho, setSelectedOptionWho] = useState("");
   const [selectedOptionWhy, setSelectedOptionWhy] = useState("");

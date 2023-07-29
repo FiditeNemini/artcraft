@@ -9,7 +9,7 @@ import { BackLink } from "../../_common/BackLink";
 import { WebUrl } from "../../../../common/WebUrl";
 import { motion } from "framer-motion";
 import { container, item, panel } from "../../../../data/animation";
-import posthog from 'posthog-js'
+import { PosthogClient } from "@storyteller/components/src/analytics/PosthogClient";
 
 interface W2lTemplateUploadJobResponsePayload {
   success: boolean;
@@ -24,7 +24,7 @@ interface Props {
 
 function UploadW2lVideoPage(props: Props) {
   let history = useHistory();
-  posthog.capture('$pageview');
+  PosthogClient.recordPageview();
 
   const [downloadUrl, setDownloadUrl] = useState("");
   const [title, setTitle] = useState("");

@@ -7,7 +7,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
 import { motion } from "framer-motion";
 import { container, item, panel } from "../../../../../data/animation";
-import posthog from 'posthog-js'
+import { PosthogClient } from "@storyteller/components/src/analytics/PosthogClient";
 
 const DEFAULT_VISIBILITY = "public";
 
@@ -59,7 +59,7 @@ interface Props {
 
 function TtsResultEditPage(props: Props) {
   let { token }: { token: string } = useParams();
-  posthog.capture('$pageview');
+  PosthogClient.recordPageview();
 
   const history = useHistory();
 

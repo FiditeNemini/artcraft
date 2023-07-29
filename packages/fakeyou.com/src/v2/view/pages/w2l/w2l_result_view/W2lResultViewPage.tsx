@@ -21,7 +21,7 @@ import { motion } from "framer-motion";
 import { container, item, panel } from "../../../../../data/animation";
 import { usePrefixedDocumentTitle } from "../../../../../common/UsePrefixedDocumentTitle";
 import { CommentComponent } from "../../../_common/comments/CommentComponent";
-import posthog from 'posthog-js'
+import { PosthogClient } from "@storyteller/components/src/analytics/PosthogClient";
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -30,7 +30,7 @@ interface Props {
 function W2lResultViewPage(props: Props) {
   let { token } = useParams() as { token: string };
 
-  posthog.capture('$pageview');
+  PosthogClient.recordPageview();
 
   const [w2lInferenceResult, setW2lInferenceResult] = useState<
     W2lResult | undefined
