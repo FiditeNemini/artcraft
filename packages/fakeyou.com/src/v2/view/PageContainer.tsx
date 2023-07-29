@@ -6,6 +6,7 @@ import { LoginPage } from "./pages/login/LoginPage";
 import { ModerationFc } from "./pages/moderation/moderation_main/ModerationFc";
 import { ModerationIpBanListFc } from "./pages/moderation/moderation_ip_ban_list/ModerationIpBanListFc";
 import { ModerationViewIpBanFc } from "./pages/moderation/moderation_view_ip_ban/ModerationViewIpBanFc";
+import { LipsyncEditor } from "./pages/lipsync";
 import { FooterNav } from "./nav/FooterNav";
 import { TopNav } from "./nav/TopNav";
 import { ProfileEditFc } from "./pages/profile/profile_edit/ProfileEditFc";
@@ -427,6 +428,10 @@ class PageContainer extends React.Component<Props, State> {
 
             <Route path="/category/create">
               <CreateCategoryPage sessionWrapper={this.props.sessionWrapper} />
+            </Route>
+
+            <Route path="/dev-lipsync">
+              <LipsyncEditor />
             </Route>
 
             <Route path="/moderation/user/list">
