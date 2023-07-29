@@ -40,7 +40,7 @@ import { motion } from "framer-motion";
 import { usePrefixedDocumentTitle } from "../../../../../common/UsePrefixedDocumentTitle";
 import { faCalendarAlt } from "@fortawesome/pro-solid-svg-icons";
 import { CommentComponent } from "../../../_common/comments/CommentComponent";
-import posthog from 'posthog-js'
+import { PosthogClient } from "@storyteller/components/src/analytics/PosthogClient";
 
 interface Props {
    sessionWrapper: SessionWrapper;
@@ -53,7 +53,7 @@ interface Props {
 
 function ProfilePage(this: any, props: Props) {
    const { username }: { username: string } = useParams();
-   posthog.capture('$pageview');
+   PosthogClient.recordPageview();
 
    const { pathname } = useLocation();
    const { url } = useRouteMatch();

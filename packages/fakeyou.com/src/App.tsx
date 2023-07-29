@@ -10,6 +10,7 @@ import { Language } from "@storyteller/components/src/i18n/Language";
 import { BrowserRouter, Route, Switch } from "react-router-dom";
 import { PageContainer } from "./v2/view/PageContainer";
 import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
+import { PosthogClient } from "@storyteller/components/src/analytics/PosthogClient";
 import { SessionSubscriptionsWrapper } from "@storyteller/components/src/session/SessionSubscriptionsWrapper";
 import {
   TtsInferenceJob,
@@ -48,7 +49,6 @@ import { FrontendInferenceJobType, InferenceJob } from "@storyteller/components/
 import { GetModelInferenceJobStatus, GetModelInferenceJobStatusIsOk } from "@storyteller/components/src/api/model_inference/GetModelInferenceJobStatus";
 import { VoiceConversionModelUploadJob } from "@storyteller/components/src/jobs/VoiceConversionModelUploadJob";
 import { VoiceConversionModelListItem } from "@storyteller/components/src/api/voice_conversion/ListVoiceConversionModels";
-import posthog from 'posthog-js'
 
 i18n
   .use(initReactI18next) // passes i18n down to react-i18next
@@ -260,7 +260,9 @@ class App extends React.Component<Props, State> {
     const sessionWrapper = await SessionWrapper.lookupSession();
     const username = sessionWrapper.getDisplayName();
     if (username !== undefined) {
-      posthog.identify(username, {});
+      // Track only logged-in users (for now)
+      PosthogClient.enablePosthog();
+      PosthogClient.setUsername(username);
     }
     this.setState({
       sessionWrapper: sessionWrapper,

@@ -17,7 +17,7 @@ import { Analytics } from "../../../../common/Analytics";
 import { WebUrl } from "../../../../common/WebUrl";
 import { BeginStripeCheckoutFlow } from "../../../../common/BeginStripeCheckoutFlow";
 import { usePrefixedDocumentTitle } from "../../../../common/UsePrefixedDocumentTitle";
-import posthog from 'posthog-js'
+import { PosthogClient } from "@storyteller/components/src/analytics/PosthogClient";
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -26,7 +26,7 @@ interface Props {
 
 function PricingPage(props: Props) {
   let history = useHistory();
-  posthog.capture('$pageview');
+  PosthogClient.recordPageview();
 
   const beginStripePortalFlow = async (): Promise<boolean> => {
     const response = await CreateStripePortalRedirect();

@@ -11,7 +11,7 @@ import { Link } from "react-router-dom";
 import { WebUrl } from "../../../../common/WebUrl";
 import { motion } from "framer-motion";
 import { container, item, panel } from "../../../../data/animation";
-import posthog from 'posthog-js'
+import { PosthogClient } from "@storyteller/components/src/analytics/PosthogClient";
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -26,7 +26,7 @@ interface TtsModelUploadJobResponsePayload {
 
 function UploadTtsModelPage(props: Props) {
   let history = useHistory();
-  posthog.capture('$pageview');
+  PosthogClient.recordPageview();
 
   const [downloadUrl, setDownloadUrl] = useState("");
   const [title, setTitle] = useState("");

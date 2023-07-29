@@ -13,7 +13,7 @@ import {
 import { BackLink } from "../../../_common/BackLink";
 import { motion } from "framer-motion";
 import { container, item, panel } from "../../../../../data/animation";
-import posthog from 'posthog-js'
+import { PosthogClient } from "@storyteller/components/src/analytics/PosthogClient";
 
 const DEFAULT_VISIBILITY = "public";
 
@@ -26,7 +26,7 @@ function W2lTemplateEditPage(props: Props) {
 
   const history = useHistory();
 
-  posthog.capture('$pageview');
+  PosthogClient.recordPageview();
 
   const [w2lTemplate, setW2lTemplate] = useState<W2lTemplate | undefined>(
     undefined

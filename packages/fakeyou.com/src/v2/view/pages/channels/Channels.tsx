@@ -5,7 +5,7 @@ import { SessionSubscriptionsWrapper } from "@storyteller/components/src/session
 import { usePrefixedDocumentTitle } from "../../../../common/UsePrefixedDocumentTitle";
 import { Link } from "react-router-dom";
 import { container, item } from "../../../../data/animation";
-import posthog from 'posthog-js'
+import { PosthogClient } from "@storyteller/components/src/analytics/PosthogClient";
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -14,7 +14,7 @@ interface Props {
 
 function ChannelsPage(props: Props) {
   usePrefixedDocumentTitle("Channels");
-  posthog.capture('$pageview');
+  PosthogClient.recordPageview();
 
   let videoBlock = (
     <motion.div className="col-12 col-sm-6 col-md-4" variants={item}>

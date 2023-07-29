@@ -66,7 +66,7 @@ import { usePrefixedDocumentTitle } from "../../../../../common/UsePrefixedDocum
 import { RatingButtons } from "../../../_common/ratings/RatingButtons";
 import { RatingStats } from "../../../_common/ratings/RatingStats";
 import { SearchOmnibar } from "./search/SearchOmnibar";
-import posthog from 'posthog-js'
+import { PosthogClient } from "@storyteller/components/src/analytics/PosthogClient";
 
 export interface EnqueueJobResponsePayload {
   success: boolean;
@@ -135,7 +135,7 @@ interface Props {
 }
 
 function TtsModelListPage(props: Props) {
-  posthog.capture('$pageview');
+  PosthogClient.recordPageview();
 
   //Loading spinning icon
   const [loading, setLoading] = useState(false);

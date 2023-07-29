@@ -8,7 +8,7 @@ import { motion } from "framer-motion";
 import { container, item, image, panel } from "../../../../data/animation";
 import { ThirdPartyLinks } from "@storyteller/components/src/constants/ThirdPartyLinks";
 import { usePrefixedDocumentTitle } from "../../../../common/UsePrefixedDocumentTitle";
-import posthog from 'posthog-js'
+import { PosthogClient } from "@storyteller/components/src/analytics/PosthogClient";
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -16,7 +16,7 @@ interface Props {
 
 function PatronPage(props: Props) {
   usePrefixedDocumentTitle("Thank you to our Patrons!");
-  posthog.capture('$pageview');
+  PosthogClient.recordPageview();
 
   return (
     <motion.div initial="hidden" animate="visible" variants={container}>

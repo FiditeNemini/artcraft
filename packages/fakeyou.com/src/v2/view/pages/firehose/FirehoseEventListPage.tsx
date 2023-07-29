@@ -18,7 +18,7 @@ import {
 import { motion } from "framer-motion";
 import { duration, delay, container, item } from "../../../../data/animation";
 import { usePrefixedDocumentTitle } from "../../../../common/UsePrefixedDocumentTitle";
-import posthog from 'posthog-js'
+import { PosthogClient } from "@storyteller/components/src/analytics/PosthogClient";
 
 const Fade = require("react-reveal/Fade");
 
@@ -64,7 +64,7 @@ function FirehoseEventListPage(props: Props) {
   const fetchEvents = () => {
     const api = new ApiConfig();
     const endpointUrl = api.firehoseEvents();
-    posthog.capture('$pageview');
+    PosthogClient.recordPageview();
 
     fetch(endpointUrl, {
       method: "GET",

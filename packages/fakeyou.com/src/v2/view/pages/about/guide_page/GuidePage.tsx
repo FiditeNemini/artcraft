@@ -4,12 +4,12 @@ import { container, item, panel, image } from "../../../../../data/animation";
 import { Link } from "react-router-dom";
 import { DiscordLink2 } from "@storyteller/components/src/elements/DiscordLink2";
 import { usePrefixedDocumentTitle } from "../../../../../common/UsePrefixedDocumentTitle";
-import posthog from 'posthog-js'
+import { PosthogClient } from "@storyteller/components/src/analytics/PosthogClient";
 
 interface Props {}
 
 function GuidePage(props: Props) {
-  posthog.capture('$pageview');
+  PosthogClient.recordPageview();
   usePrefixedDocumentTitle("Guide to all things Deep Fake");
 
   return (

@@ -4,7 +4,7 @@ import { SessionWrapper } from '@storyteller/components/src/session/SessionWrapp
 import { TtsModelUploadJob } from '@storyteller/components/src/jobs/TtsModelUploadJobs';
 import { W2lTemplateUploadJob } from '@storyteller/components/src/jobs/W2lTemplateUploadJobs';
 import { v4 } from 'uuid';
-import posthog from 'posthog-js'
+import { PosthogClient } from "@storyteller/components/src/analytics/PosthogClient";
 
 enum UploadType {
   TTS_MODEL,
@@ -146,7 +146,7 @@ class UploadComponent extends React.Component<Props, State> {
   }
 
   public render() {
-    posthog.capture('$pageview');
+    PosthogClient.recordPageview();
 
     if (!this.props.sessionWrapper.isLoggedIn()) {
       return (

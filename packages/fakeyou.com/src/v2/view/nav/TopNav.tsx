@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { t } from "i18next";
 import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
+import { PosthogClient } from "@storyteller/components/src/analytics/PosthogClient";
 import { Link, useHistory } from "react-router-dom";
 import { WebUrl } from "../../../common/WebUrl";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -31,7 +32,6 @@ import {
   faMessageDots,
   faMicrophoneStand,
 } from "@fortawesome/pro-solid-svg-icons";
-import posthog from 'posthog-js'
 
 // TODO: This is duplicated in SessionTtsInferenceResultsList !
 // Default to querying every 15 seconds, but make it configurable serverside
@@ -91,7 +91,7 @@ function TopNav(props: Props) {
     await Logout();
     props.querySessionCallback();
     props.querySessionSubscriptionsCallback();
-    posthog.reset();
+    PosthogClient.reset();
     Analytics.accountLogout();
     history.push("/");
   };

@@ -38,7 +38,7 @@ import {
 import { motion } from "framer-motion";
 import { container, item, panel } from "../../../../../data/animation";
 import { faFunction } from "@fortawesome/pro-solid-svg-icons";
-import posthog from 'posthog-js'
+import { PosthogClient } from "@storyteller/components/src/analytics/PosthogClient";
 
 const DEFAULT_VISIBILITY = "public";
 
@@ -54,7 +54,7 @@ interface Props {
 
 function TtsModelEditPage(props: Props) {
   let { token } = useParams() as { token: string };
-  posthog.capture('$pageview');
+  PosthogClient.recordPageview();
 
   const history = useHistory();
 

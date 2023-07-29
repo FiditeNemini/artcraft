@@ -11,7 +11,7 @@ import {
 import { BackLink } from "../../../_common/BackLink";
 import { motion } from "framer-motion";
 import { container, item, panel } from "../../../../../data/animation";
-import posthog from 'posthog-js'
+import { PosthogClient } from "@storyteller/components/src/analytics/PosthogClient";
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -44,7 +44,7 @@ function ProfileBanFc(props: Props) {
   }, [username, getUserProfile]);
 
   const handleFormSubmit = (ev: React.FormEvent<HTMLFormElement>): boolean => {
-    posthog.capture('$pageview');
+    PosthogClient.recordPageview();
     ev.preventDefault();
 
     const api = new ApiConfig();

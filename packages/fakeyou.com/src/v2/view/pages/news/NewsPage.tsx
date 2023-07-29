@@ -5,13 +5,12 @@ import { SessionSubscriptionsWrapper } from "@storyteller/components/src/session
 import { container, item } from "../../../../data/animation";
 import { usePrefixedDocumentTitle } from "../../../../common/UsePrefixedDocumentTitle";
 import { TwitchPlayer, TwitchChat } from "react-twitch-embed";
-//import axios from "axios";
 import { Link } from "react-router-dom";
 import { WebUrl } from "../../../../common/WebUrl";
 import { DiscordLink2 } from "@storyteller/components/src/elements/DiscordLink2";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faStar } from "@fortawesome/pro-solid-svg-icons";
-import posthog from 'posthog-js'
+import { PosthogClient } from "@storyteller/components/src/analytics/PosthogClient";
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -44,7 +43,7 @@ const TWITCH_CHANNEL = "FakeYouLabs";
 
 function NewsPage(props: Props) {
   usePrefixedDocumentTitle("AI News");
-  posthog.capture('$pageview');
+  PosthogClient.recordPageview();
 
   //const [stream, setStream] = useState<StreamInfo>({
   //  broadcaster_name: "",

@@ -12,7 +12,7 @@ import { BackLink } from "../../_common/BackLink";
 import { WebUrl } from "../../../../common/WebUrl";
 import { motion } from "framer-motion";
 import { container, item, panel } from "../../../../data/animation";
-import posthog from 'posthog-js'
+import { PosthogClient } from "@storyteller/components/src/analytics/PosthogClient";
 
 const DEFAULT_CAN_DIRECTLY_HAVE_MODELS = true;
 const DEFAULT_CAN_HAVE_SUBCATEGORIES = false;
@@ -24,7 +24,7 @@ interface Props {
 
 function CreateCategoryPage(props: Props) {
   let history = useHistory();
-  posthog.capture('$pageview');
+  PosthogClient.recordPageview();
 
   // Request
   const [name, setName] = useState("");
