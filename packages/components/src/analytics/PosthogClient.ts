@@ -21,6 +21,7 @@ export class PosthogClient {
   }
 
   public static isEnabled() : boolean {
+    // Posthog is too expensive
     //return PosthogClient.POSTHOG_ENABLED;
     return false;
   }
