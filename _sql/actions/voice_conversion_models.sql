@@ -95,7 +95,12 @@ set
     maybe_mod_comments = 'takedown request'
 where token IN (
     'vcm_2af74np3jh6q',
-    'vcm_8kk7355dc184'
+    'vcm_8kk7355dc184',
+    'vcm_nsh89pcx4569',
+    'vcm_q7ewn3yym4gy',
+    'vcm_cwngb21xsf66',
+    'vcm_jmzjrky179cm',
+    'vcm_hj6a1nt1yvh9'
 );
 
 

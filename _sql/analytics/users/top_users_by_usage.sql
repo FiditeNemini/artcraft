@@ -14,7 +14,8 @@ ON u.token = j.maybe_creator_user_token
 SELECT
     t.maybe_creator_user_token as user_token,
     u.username,
-    count(*) as usage_count
+    count(*) as usage_count,
+    u.created_at
 FROM tts_results as t
 JOIN users as u
 ON u.token = t.maybe_creator_user_token
