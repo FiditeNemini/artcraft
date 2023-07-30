@@ -10,17 +10,19 @@ export class PosthogClient {
   private static POSTHOG_ENABLED : boolean = false;
 
   public static enablePosthog() {
-    if (PosthogClient.isEnabled()) {
-      return;
-    }
-    PosthogClient.POSTHOG_ENABLED = true;
-    posthog.init('phc_x6IRdmevMt4XAoJqx9tCmwDiaQkEkD48c0aLmuXMOvu', { 
-      api_host: 'https://app.posthog.com' 
-    })
+    // Posthog is too expensive
+    //if (PosthogClient.isEnabled()) {
+    //  return;
+    //}
+    //PosthogClient.POSTHOG_ENABLED = true;
+    //posthog.init('phc_x6IRdmevMt4XAoJqx9tCmwDiaQkEkD48c0aLmuXMOvu', { 
+    //  api_host: 'https://app.posthog.com' 
+    //})
   }
 
   public static isEnabled() : boolean {
-    return PosthogClient.POSTHOG_ENABLED;
+    //return PosthogClient.POSTHOG_ENABLED;
+    return false;
   }
 
   public static setUsername(username: string) {
