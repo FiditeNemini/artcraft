@@ -1115,6 +1115,57 @@
     },
     "query": "\nINSERT INTO audit_logs\nSET\n  token = ?,\n  entity_type = ?,\n  entity_token = ?,\n  entity_action = ?,\n  maybe_actor_user_token = ?,\n  maybe_actor_anonymous_visitor_token = '',\n  is_actor_moderator = ?,\n  actor_ip_address = ?\n        "
   },
+  "074307d7cd5c9a6f27e4d5ecce3072dcd13914a6f7f5f27f0f7232ae6c4813b4": {
+    "describe": {
+      "columns": [
+        {
+          "name": "queue_type",
+          "ordinal": 0,
+          "type_info": {
+            "char_set": 224,
+            "flags": {
+              "bits": 128
+            },
+            "max_size": 128,
+            "type": "VarString"
+          }
+        },
+        {
+          "name": "pending_job_count",
+          "ordinal": 1,
+          "type_info": {
+            "char_set": 63,
+            "flags": {
+              "bits": 129
+            },
+            "max_size": 21,
+            "type": "LongLong"
+          }
+        },
+        {
+          "name": "present_time",
+          "ordinal": 2,
+          "type_info": {
+            "char_set": 224,
+            "flags": {
+              "bits": 1
+            },
+            "max_size": 76,
+            "type": "Datetime"
+          }
+        }
+      ],
+      "nullable": [
+        true,
+        false,
+        false
+      ],
+      "parameters": {
+        "Right": 0
+      }
+    },
+    "query": "\nSELECT\n    maybe_model_type as queue_type,\n    count(*) as pending_job_count,\n    NOW() as present_time\n FROM (\n    SELECT\n        token,\n        maybe_model_type\n    FROM generic_inference_jobs\n    WHERE status IN (\"pending\", \"attempt_failed\")\n    AND maybe_model_type IS NOT NULL\n    UNION\n    SELECT\n        token,\n        maybe_model_type\n    FROM generic_inference_jobs\n    WHERE status IN (\"started\")\n    AND created_at > (CURDATE() - INTERVAL 15 MINUTE)\n    AND maybe_model_type IS NOT NULL\n) as generic_inner\nGROUP BY queue_type\nUNION\nSELECT\n    \"legacy_tts\" as queue_type,\n    count(*) as pending_job_count,\n    NOW() as present_time\nFROM (\n     SELECT\n         token\n     FROM tts_inference_jobs\n     WHERE status IN (\"pending\", \"attempt_failed\")\n     UNION\n     SELECT\n         token\n     FROM tts_inference_jobs\n     WHERE status IN (\"started\")\n     AND created_at > (CURDATE() - INTERVAL 15 MINUTE)\n) as legacy_inner\nGROUP BY queue_type\n        "
+  },
   "079ea2dd582d061db2e824833bf47e60523aed758aefb6a317f29611b8344ab8": {
     "describe": {
       "columns": [],
@@ -6958,57 +7009,6 @@
       }
     },
     "query": "\nSELECT\n    vocoder.token as vocoder_token,\n    vocoder.vocoder_type as `vocoder_type: enums::common::vocoder_type::VocoderType`,\n\n    vocoder.creator_user_token,\n    users.username as creator_username,\n    users.display_name as creator_display_name,\n    users.email_gravatar_hash as creator_gravatar_hash,\n    users.is_banned as creator_is_banned,\n\n    vocoder.title,\n    vocoder.description_markdown,\n    vocoder.description_rendered_html,\n    vocoder.is_staff_recommended,\n\n    vocoder.is_mod_disabled_from_public_use,\n    vocoder.is_mod_disabled_from_author_use,\n    vocoder.is_mod_author_editing_locked,\n\n    vocoder.creator_set_visibility as `creator_set_visibility: enums::common::visibility::Visibility`,\n\n    vocoder.created_at,\n    vocoder.updated_at,\n\n    vocoder.creator_ip_address_creation,\n    vocoder.creator_ip_address_last_update,\n    vocoder.mod_deleted_at,\n    vocoder.user_deleted_at\n\nFROM vocoder_models as vocoder\nJOIN users\n    ON users.token = vocoder.creator_user_token\nWHERE\n    vocoder.token = ?\n    AND vocoder.user_deleted_at IS NULL\n    AND vocoder.mod_deleted_at IS NULL\n        "
-  },
-  "54206968b4bcfb60f79186ad19667b8c40170345fa006a3033948304783044fe": {
-    "describe": {
-      "columns": [
-        {
-          "name": "generic_job_count",
-          "ordinal": 0,
-          "type_info": {
-            "char_set": 63,
-            "flags": {
-              "bits": 128
-            },
-            "max_size": 21,
-            "type": "LongLong"
-          }
-        },
-        {
-          "name": "legacy_tts_job_count",
-          "ordinal": 1,
-          "type_info": {
-            "char_set": 63,
-            "flags": {
-              "bits": 128
-            },
-            "max_size": 21,
-            "type": "LongLong"
-          }
-        },
-        {
-          "name": "present_time",
-          "ordinal": 2,
-          "type_info": {
-            "char_set": 63,
-            "flags": {
-              "bits": 129
-            },
-            "max_size": 19,
-            "type": "Datetime"
-          }
-        }
-      ],
-      "nullable": [
-        true,
-        true,
-        false
-      ],
-      "parameters": {
-        "Right": 0
-      }
-    },
-    "query": "\nSELECT\n  (\n    SELECT\n      COUNT(distinct token) as generic_job_count\n    FROM\n    (\n      SELECT token\n      FROM generic_inference_jobs\n      WHERE status = \"started\"\n      AND created_at > (CURDATE() - INTERVAL 5 MINUTE)\n    UNION\n      SELECT token\n      FROM generic_inference_jobs\n      WHERE status IN (\"pending\", \"attempt_failed\")\n    ) as g\n  ) as generic_job_count,\n  (\n    SELECT\n      COUNT(distinct token) as legacy_tts_job_count\n    FROM\n    (\n      SELECT token\n      FROM tts_inference_jobs\n      WHERE status = \"started\"\n      AND created_at > (CURDATE() - INTERVAL 5 MINUTE)\n    UNION\n      SELECT token\n      FROM tts_inference_jobs\n      WHERE status IN (\"pending\", \"attempt_failed\")\n    ) as t\n  ) as legacy_tts_job_count,\n  NOW() as present_time;\n        "
   },
   "551749bc153f9c8683a3a1ca5bb50744322aac046db34327501cf991485c4dee": {
     "describe": {
