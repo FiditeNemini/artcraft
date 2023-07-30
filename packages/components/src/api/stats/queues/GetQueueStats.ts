@@ -9,7 +9,14 @@ export interface GetQueueStatsSuccessResponse {
 }
 
 export interface InferenceInfo {
+  total_pending_job_count: number,
   pending_job_count: number,
+  by_queue: ByQueueStats,
+}
+
+export interface ByQueueStats {
+  pending_svc_jobs: number,
+  pending_rvc_jobs: number,
 }
 
 export interface LegacyTtsInfo {

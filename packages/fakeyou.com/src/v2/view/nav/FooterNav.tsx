@@ -126,9 +126,15 @@ function FooterNav(props: Props) {
             </div>
             <span className="opacity-25">•</span>
             <div>
-              V2V Queued:{" "}
+              RVC Queued:{" "}
               <span className="text-red">
-                {queueStats.inference.pending_job_count}
+                {queueStats.inference.by_queue.pending_rvc_jobs}
+              </span>
+            </div>
+            <div>
+              SVC Queued:{" "}
+              <span className="text-red">
+                {queueStats.inference.by_queue.pending_svc_jobs}
               </span>
             </div>
           </div>
