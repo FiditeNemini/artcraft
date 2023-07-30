@@ -7,3 +7,7 @@ update generic_inference_jobs set status = 'dead' where maybe_routing_tag IS NOT
 
 -- Get pending jobs
 select count(*) from generic_inference_jobs where status = 'pending';
+
+update generic_inference_jobs
+set status = 'dead'
+where status IN ('pending', 'started', 'attempt_failed');
