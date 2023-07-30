@@ -10,7 +10,7 @@ impl RedisCacheKeys {
   }
 
   pub fn get_unified_queue_stats_endpoint() -> &'static str {
-    "q_stats"
+    "q_stats_2" // NB: Schema changed, hence _2
   }
 
   pub fn session_record_light(session_token: &str) -> String {

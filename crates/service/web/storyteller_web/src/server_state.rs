@@ -6,9 +6,11 @@ use crate::StaticApiTokenSet;
 use crate::http_server::endpoints::categories::tts::list_fully_computed_assigned_tts_categories::list_fully_computed_assigned_tts_categories::ModelTokensByCategoryToken;
 use crate::http_server::endpoints::categories::tts::list_tts_categories::DisplayCategory;
 use crate::http_server::endpoints::leaderboard::get_leaderboard::LeaderboardInfo;
+use crate::http_server::endpoints::stats::result_transformer::CacheableQueueStats;
 use crate::http_server::endpoints::tts::list_tts_models::TtsModelRecordForResponse;
 use crate::http_server::endpoints::voice_conversion::models::list_voice_conversion_models::VoiceConversionModel;
 use crate::http_server::web_utils::redis_rate_limiter::RedisRateLimiter;
+use crate::memory_cache::model_token_to_info_cache::ModelTokenToInfoCache;
 use crate::threads::db_health_checker_thread::db_health_check_status::HealthCheckStatus;
 use crate::util::encrypted_sort_id::SortKeyCrypto;
 use crate::util::troll_user_bans::troll_user_ban_list::TrollUserBanList;
@@ -17,7 +19,6 @@ use mysql_queries::mediators::badge_granter::BadgeGranter;
 use mysql_queries::mediators::firehose_publisher::FirehosePublisher;
 use mysql_queries::queries::generic_inference::web::get_pending_inference_job_count::InferenceQueueLengthResult;
 use mysql_queries::queries::model_categories::list_categories_query_builder::CategoryList;
-use mysql_queries::queries::stats::get_unified_queue_stats::UnifiedQueueStatsResult;
 use mysql_queries::queries::tts::tts_inference_jobs::get_pending_tts_inference_job_count::TtsQueueLengthResult;
 use mysql_queries::queries::w2l::w2l_templates::list_w2l_templates::W2lTemplateRecordForList;
 use r2d2_redis::{r2d2, RedisConnectionManager};
@@ -27,7 +28,6 @@ use sqlx::MySqlPool;
 use url_config::third_party_url_redirector::ThirdPartyUrlRedirector;
 use users_component::utils::session_checker::SessionChecker;
 use users_component::utils::session_cookie_manager::SessionCookieManager;
-use crate::memory_cache::model_token_to_info_cache::ModelTokenToInfoCache;
 
 /// State that is injected into every endpoint.
 pub struct ServerState {
@@ -173,7 +173,7 @@ pub struct EphemeralInMemoryCaches {
   /// Stats on generic inference queue and legacy TTS queue (combined).
   /// The frontend will consult a distributed cache and use the monotonic DB time as a
   /// vector clock.
-  pub queue_stats: SingleItemTtlCache<UnifiedQueueStatsResult>,
+  pub queue_stats: SingleItemTtlCache<CacheableQueueStats>,
 
   /// Generic inference queue length
   /// The frontend will consult a distributed cache and use the monotonic DB time as a

@@ -1,12 +1,13 @@
 use actix_web::{HttpRequest, HttpResponse, ResponseError, web};
 use chrono::NaiveDateTime;
 use crate::ServerState;
+use crate::http_server::endpoints::stats::result_transformer::{CacheableQueueStats, database_result_to_cacheable};
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use errors::AnyhowResult;
 use hyper::StatusCode;
 use log::{debug, error, info, warn};
 use mysql_queries::queries::generic_inference::web::get_pending_inference_job_count::get_pending_inference_job_count;
-use mysql_queries::queries::stats::get_unified_queue_stats::{get_unified_queue_stats, UnifiedQueueStatsResult};
+use mysql_queries::queries::stats::get_unified_queue_stats::{get_unified_queue_stats, QueueStatsRow};
 use redis_common::redis_cache_keys::RedisCacheKeys;
 use std::sync::Arc;
 
@@ -106,7 +107,7 @@ pub async fn get_unified_queue_stats_handler(
         GetUnifiedQueueStatsError::ServerError
       })?;
 
-  let stats_result = match maybe_cached {
+  let cacheable_stats_result = match maybe_cached {
     Some(cached) => {
       debug!("serving from in-memory cache");
       cached
@@ -120,9 +121,14 @@ pub async fn get_unified_queue_stats_handler(
         // NB: async closures are not yet stable in Rust, so we include an async block.
         async move {
           debug!("querying from database...");
-          get_unified_queue_stats(
+
+          let db_result = get_unified_queue_stats(
             &mysql_pool
-          ).await
+          ).await;
+
+          db_result
+              .map(|db_result| database_result_to_cacheable(db_result))
+              .map(|cacheable_result| Some(cacheable_result)) // TODO/FIXME: Make a better redis cache
         }
       };
 
@@ -160,43 +166,35 @@ pub async fn get_unified_queue_stats_handler(
         }
 
         // Happy path...
-        Ok(Some(stats_result)) => {
-          server_state.caches.ephemeral.queue_stats.store_copy(&stats_result)
+        Ok(Some(cacheable_stats)) => {
+          server_state.caches.ephemeral.queue_stats.store_copy(&cacheable_stats)
               .map_err(|e| {
                 error!("error storing cache: {:?}", e);
                 GetUnifiedQueueStatsError::ServerError
               })?;
-
-          stats_result
+          cacheable_stats
         }
 
-        Ok(None) => {
-          // NB: This should be impossible since the DB always returns "Some"
-          // (We artificially wrapped the result in Option<T>.)
-          UnifiedQueueStatsResult {
-            generic_job_count: 10_000,
-            legacy_tts_job_count: 10_000,
-            present_time: NaiveDateTime::from_timestamp(0, 0),
-          }
-        }
+        // TODO/FIXME(bt,2023-07-30): This match arm should never happen.
+        Ok(None) => CacheableQueueStats::default()
       }
     },
   };
 
   render_response_ok(GetUnifiedQueueStatsSuccessResponse {
     success: true,
-    cache_time: stats_result.present_time,
+    cache_time: cacheable_stats_result.cache_time,
     refresh_interval_millis: server_state.flags.frontend_pending_inference_refresh_interval_millis,
     inference: ModernInferenceQueueStats {
-      total_pending_job_count: stats_result.generic_job_count,
-      pending_job_count: stats_result.generic_job_count,
+      total_pending_job_count: cacheable_stats_result.queues.total_generic,
+      pending_job_count: cacheable_stats_result.queues.total_generic,
       by_queue: ByQueueStats {
-        pending_svc_jobs: 0,
-        pending_rvc_jobs: 0,
+        pending_svc_jobs: cacheable_stats_result.queues.so_vits_svc,
+        pending_rvc_jobs: cacheable_stats_result.queues.rvc_v2,
       }
     },
     legacy_tts: LegacyQueueDetails { 
-      pending_job_count: stats_result.legacy_tts_job_count 
+      pending_job_count: cacheable_stats_result.queues.legacy_tts,
     },
   })
 }

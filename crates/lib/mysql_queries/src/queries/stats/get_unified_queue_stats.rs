@@ -4,15 +4,15 @@ use errors::AnyhowResult;
 use sqlx::MySqlPool;
 
 #[derive(Serialize, Deserialize, Clone)]
-pub struct UnifiedQueueStatsResult {
-  pub generic_job_count: u64,
-  pub legacy_tts_job_count: u64,
+pub struct QueueStatsRow {
+  pub queue_type: String,
+  pub pending_job_count: u64,
   pub present_time: NaiveDateTime,
 }
 
-struct QueryResultInternal {
-  generic_job_count: Option<i64>,
-  legacy_tts_job_count: Option<i64>,
+struct QueueStatsRowInternal {
+  queue_type: Option<String>, // FIXME: Shouldn't be nullable
+  pending_job_count: i64,
   present_time: NaiveDateTime,
 }
 
@@ -20,55 +20,63 @@ struct QueryResultInternal {
 // I'm only doing this because I'm in a hurry. Don't do this.
 pub async fn get_unified_queue_stats(
   pool: &MySqlPool,
-) -> AnyhowResult<Option<UnifiedQueueStatsResult>> {
+) -> AnyhowResult<Vec<QueueStatsRow>> {
   // NB (1): We query as a union since "started" jobs can get picked off mid-run and go stale
   // forever. We currently have no automated means of collecting those jobs.
   // NB (2): We query the server timestamp so we can cache the results.
   // The frontend can then monotonically adjust the count based on timestamp by ignoring
   // past times.
-  let result : QueryResultInternal = sqlx::query_as!(
-      QueryResultInternal,
+  let rows : Vec<QueueStatsRowInternal> = sqlx::query_as!(
+      QueueStatsRowInternal,
         r#"
 SELECT
-  (
+    maybe_model_type as queue_type,
+    count(*) as pending_job_count,
+    NOW() as present_time
+ FROM (
     SELECT
-      COUNT(distinct token) as generic_job_count
-    FROM
-    (
-      SELECT token
-      FROM generic_inference_jobs
-      WHERE status = "started"
-      AND created_at > (CURDATE() - INTERVAL 5 MINUTE)
+        token,
+        maybe_model_type
+    FROM generic_inference_jobs
+    WHERE status IN ("pending", "attempt_failed")
+    AND maybe_model_type IS NOT NULL
     UNION
-      SELECT token
-      FROM generic_inference_jobs
-      WHERE status IN ("pending", "attempt_failed")
-    ) as g
-  ) as generic_job_count,
-  (
     SELECT
-      COUNT(distinct token) as legacy_tts_job_count
-    FROM
-    (
-      SELECT token
-      FROM tts_inference_jobs
-      WHERE status = "started"
-      AND created_at > (CURDATE() - INTERVAL 5 MINUTE)
-    UNION
-      SELECT token
-      FROM tts_inference_jobs
-      WHERE status IN ("pending", "attempt_failed")
-    ) as t
-  ) as legacy_tts_job_count,
-  NOW() as present_time;
+        token,
+        maybe_model_type
+    FROM generic_inference_jobs
+    WHERE status IN ("started")
+    AND created_at > (CURDATE() - INTERVAL 15 MINUTE)
+    AND maybe_model_type IS NOT NULL
+) as generic_inner
+GROUP BY queue_type
+UNION
+SELECT
+    "legacy_tts" as queue_type,
+    count(*) as pending_job_count,
+    NOW() as present_time
+FROM (
+     SELECT
+         token
+     FROM tts_inference_jobs
+     WHERE status IN ("pending", "attempt_failed")
+     UNION
+     SELECT
+         token
+     FROM tts_inference_jobs
+     WHERE status IN ("started")
+     AND created_at > (CURDATE() - INTERVAL 15 MINUTE)
+) as legacy_inner
+GROUP BY queue_type
         "#,
     )
-      .fetch_one(pool)
+      .fetch_all(pool)
       .await?;
 
-  Ok(Some(UnifiedQueueStatsResult {
-    generic_job_count: try_i64_to_u64_or_min(result.generic_job_count.unwrap_or(0)),
-    legacy_tts_job_count: try_i64_to_u64_or_min(result.legacy_tts_job_count.unwrap_or(0)),
-    present_time: result.present_time,
-  }))
+  Ok(rows.into_iter().map(|row|
+    QueueStatsRow {
+      queue_type: row.queue_type.unwrap_or_else(|| "unknown".to_string()),
+      pending_job_count: try_i64_to_u64_or_min(row.pending_job_count),
+      present_time: row.present_time,
+  }).collect::<Vec<_>>())
 }

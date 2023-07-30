@@ -135,7 +135,7 @@ UNION
              WHERE status IN ("started")
              AND created_at > (CURDATE() - INTERVAL 15 MINUTE)
         ) as legacy_inner
-        GROUP BY queue_type
+        GROUP BY queue_type;
 
 -- Generic inference jobs + legacy TTS (this was a production endpoint)
 -- OLD QUERY: Queues as columns
