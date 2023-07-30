@@ -50,7 +50,12 @@ function FooterNav(props: Props) {
     cache_time: new Date(0), // NB: Epoch is used for vector clock's initial state
     refresh_interval_millis: DEFAULT_QUEUE_REFRESH_INTERVAL_MILLIS,
     inference: {
+      total_pending_job_count: 0,
       pending_job_count: 0,
+      by_queue: {
+        pending_svc_jobs: 0,
+        pending_rvc_jobs: 0,
+      }
     },
     legacy_tts: {
       pending_job_count: 0,
