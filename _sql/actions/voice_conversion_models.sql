@@ -85,7 +85,37 @@ where token IN (
     'vcm_jxd74xhcszry',
     'vcm_tvk0g6dwg3yv',
     'vcm_vrsdv4ahterx',
-    'vcm_e2debszbm8vt'
+    'vcm_e2debszbm8vt',
+    'vcm_rh98fw9a9an1',
+    'vcm_2bvd1gmysaxf',
+    'vcm_2cqq1j33y2hr',
+    'vcm_ysj7kwb96kcp',
+    'vcm_ef0eaneyr72p',
+    'vcm_t59d7vdxtqs4',
+    'vcm_90hrepevshtg',
+    'vcm_4st9ex13vnbh',
+    'vcm_30fne697qhab',
+    'vcm_qy7evy03p6tg',
+    'vcm_775eze19tv0n',
+    'vcm_4bzkfvaexbv3',
+    'vcm_08v2tdga8v93',
+    'vcm_whxeyxzw12q6',
+    'vcm_0rj5b6npxfkh',
+    'vcm_hv22emyfkex4',
+    'vcm_a1fmtgthezs0',
+    'vcm_z9fpz1p5bpr2',
+    'vcm_2y8ck2dbppkq',
+    'vcm_0c9h3mzc4kre',
+    'vcm_m0z3tt4gytm9'
+);
+
+-- Remove older models replaced by new versions
+update voice_conversion_models
+set
+    mod_deleted_at = NOW(),
+    maybe_mod_comments = 'replaced with new version'
+where token IN (
+    'vcm_gdg3najz6j3g'
 );
 
 -- Remove duplicate models
