@@ -98,3 +98,76 @@ order by jobs.id
 desc
 limit 100;
 
+-- Generic inference jobs + legacy TTS (this is a production endpoint)
+-- UPDATED QUERY: Queues as named rows
+        SELECT
+            maybe_model_type as queue_type,
+            count(*) as pending_job_count,
+            NOW() as present_time
+        FROM (
+            SELECT
+                token,
+                maybe_model_type
+            FROM generic_inference_jobs
+            WHERE status IN ("pending", "attempt_failed")
+            UNION
+            SELECT
+                token,
+                maybe_model_type
+            FROM generic_inference_jobs
+            WHERE status IN ("started")
+            AND created_at > (CURDATE() - INTERVAL 15 MINUTE)
+        ) as generic_inner
+        GROUP BY queue_type
+UNION
+        SELECT
+            "legacy_tts" as queue_type,
+            count(*) as pending_job_count,
+            NOW() as present_time
+        FROM
+        (
+             SELECT token
+             FROM tts_inference_jobs
+             WHERE status IN ("pending", "attempt_failed")
+             UNION
+             SELECT token
+             FROM tts_inference_jobs
+             WHERE status IN ("started")
+             AND created_at > (CURDATE() - INTERVAL 15 MINUTE)
+        ) as legacy_inner
+        GROUP BY queue_type
+
+-- Generic inference jobs + legacy TTS (this was a production endpoint)
+-- OLD QUERY: Queues as columns
+SELECT
+(
+    SELECT
+        COUNT(distinct token) as generic_job_count
+    FROM
+        (
+            SELECT token
+            FROM generic_inference_jobs
+            WHERE status = "started"
+              AND created_at > (CURDATE() - INTERVAL 5 MINUTE)
+            UNION
+            SELECT token
+            FROM generic_inference_jobs
+            WHERE status IN ("pending", "attempt_failed")
+        ) as g
+) as generic_job_count,
+(
+    SELECT
+        COUNT(distinct token) as legacy_tts_job_count
+    FROM
+        (
+            SELECT token
+            FROM tts_inference_jobs
+            WHERE status = "started"
+              AND created_at > (CURDATE() - INTERVAL 5 MINUTE)
+            UNION
+            SELECT token
+            FROM tts_inference_jobs
+            WHERE status IN ("pending", "attempt_failed")
+        ) as t
+) as legacy_tts_job_count,
+NOW() as present_time;

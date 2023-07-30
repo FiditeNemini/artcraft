@@ -19,20 +19,31 @@ pub struct GetUnifiedQueueStatsSuccessResponse {
   /// During an attack, we may want this to go extremely slow.
   pub refresh_interval_millis: u64,
 
-  pub inference: TtsQueueStats,
-  pub legacy_tts: TtsQueueStats,
+  pub inference: ModernInferenceQueueStats,
+  pub legacy_tts: LegacyQueueDetails,
 }
 
 #[derive(Serialize)]
-pub struct TtsQueueStats {
+pub struct LegacyQueueDetails {
   pub pending_job_count: u64,
 }
 
 #[derive(Serialize)]
-pub struct InferenceQueueStats {
+pub struct ModernInferenceQueueStats {
+  pub total_pending_job_count: u64,
+
+  #[deprecated(note="the frontend uses this field, but we should switch to total_pending_job_count")]
   pub pending_job_count: u64,
+
+  pub by_queue: ByQueueStats,
 }
 
+#[derive(Serialize)]
+pub struct ByQueueStats {
+  pub pending_svc_jobs: u64,
+  pub pending_rvc_jobs: u64,
+  //pub pending_face_animation_jobs: u64,
+}
 
 #[derive(Debug)]
 pub enum GetUnifiedQueueStatsError {
@@ -75,8 +86,17 @@ pub async fn get_unified_queue_stats_handler(
       success: true,
       cache_time: NaiveDateTime::from_timestamp(0, 0),
       refresh_interval_millis: server_state.flags.frontend_unified_queue_stats_refresh_interval_millis,
-      inference: TtsQueueStats { pending_job_count: 10_000 },
-      legacy_tts: TtsQueueStats { pending_job_count: 10_000 },
+      inference: ModernInferenceQueueStats {
+        total_pending_job_count: 10_000,
+        pending_job_count: 10_000,
+        by_queue: ByQueueStats {
+          pending_svc_jobs: 10_000,
+          pending_rvc_jobs: 10_000,
+        }
+      },
+      legacy_tts: LegacyQueueDetails {
+        pending_job_count: 10_000,
+      },
     });
   }
 
@@ -167,8 +187,17 @@ pub async fn get_unified_queue_stats_handler(
     success: true,
     cache_time: stats_result.present_time,
     refresh_interval_millis: server_state.flags.frontend_pending_inference_refresh_interval_millis,
-    inference: TtsQueueStats { pending_job_count: stats_result.generic_job_count },
-    legacy_tts: TtsQueueStats { pending_job_count: stats_result.legacy_tts_job_count },
+    inference: ModernInferenceQueueStats {
+      total_pending_job_count: stats_result.generic_job_count,
+      pending_job_count: stats_result.generic_job_count,
+      by_queue: ByQueueStats {
+        pending_svc_jobs: 0,
+        pending_rvc_jobs: 0,
+      }
+    },
+    legacy_tts: LegacyQueueDetails { 
+      pending_job_count: stats_result.legacy_tts_job_count 
+    },
   })
 }
 
