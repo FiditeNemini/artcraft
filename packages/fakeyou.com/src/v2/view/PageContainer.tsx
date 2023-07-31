@@ -79,6 +79,7 @@ import { UploadVoiceConversionModel } from "./pages/upload/UploadVoiceConversion
 import { VoiceConversionModelListItem } from "@storyteller/components/src/api/voice_conversion/ListVoiceConversionModels";
 import { CommunityCommissionsPage } from "./pages/contest/CommunityCommissionsPage";
 import { ProductUsageInfoPage } from "./pages/product_usage_info/ProductUsageInfoPage";
+import VcModelViewPage from "./pages/vc/vc_model_view/VcModelViewPage";
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -524,6 +525,10 @@ class PageContainer extends React.Component<Props, State> {
                 inferenceJobs={this.props.inferenceJobs}
                 inferenceJobsByCategory={this.props.inferenceJobsByCategory}
               />
+            </Route>
+
+            <Route path="/voice-conversion/:token">
+              <VcModelViewPage />
             </Route>
 
             <Route path="/about">
