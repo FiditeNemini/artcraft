@@ -502,6 +502,15 @@ class PageContainer extends React.Component<Props, State> {
               />
             </Route>
 
+            <Route path="/voice-conversion/:token">
+              <VcModelViewPage
+                sessionSubscriptionsWrapper={
+                  this.props.sessionSubscriptionsWrapper
+                }
+                inferenceJobsByCategory={this.props.inferenceJobsByCategory}
+              />
+            </Route>
+
             <Route path="/voice-conversion">
               <VcModelListPage
                 sessionWrapper={this.props.sessionWrapper}
@@ -520,10 +529,6 @@ class PageContainer extends React.Component<Props, State> {
                 inferenceJobs={this.props.inferenceJobs}
                 inferenceJobsByCategory={this.props.inferenceJobsByCategory}
               />
-            </Route>
-
-            <Route path="/voice-conversion/:token">
-              <VcModelViewPage />
             </Route>
 
             <Route path="/about">

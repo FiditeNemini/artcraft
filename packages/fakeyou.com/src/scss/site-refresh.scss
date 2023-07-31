@@ -662,6 +662,13 @@ styles with important tags:
       background-color: #fff3cd;
       color: #664d03;
     }
+
+    &.badge-tag {
+      font-size: 13px;
+      padding: 6px 12px;
+      background-color: $input-dark;
+      color: $white;
+    }
   }
 
   .badge-model {
