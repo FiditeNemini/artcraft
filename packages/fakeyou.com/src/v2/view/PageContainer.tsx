@@ -547,16 +547,6 @@ class PageContainer extends React.Component<Props, State> {
               />
             </Route>
 
-            <Route path="/voice-conversion/:token">
-              <VcModelViewPage
-                sessionWrapper={this.props.sessionWrapper}
-                sessionSubscriptionsWrapper={
-                  this.props.sessionSubscriptionsWrapper
-                }
-                inferenceJobsByCategory={this.props.inferenceJobsByCategory}
-              />
-            </Route>
-
             <Route path="/about">
               <AboutPage />
             </Route>
