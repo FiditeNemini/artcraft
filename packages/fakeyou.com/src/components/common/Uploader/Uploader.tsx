@@ -1,21 +1,16 @@
 import React from "react";
-import { FileUploader } from "react-drag-drop-files";
 import { faCheck, faFileArrowUp, faFileAudio, faTrash } from "@fortawesome/pro-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { FontAwesomeIcon as Icon } from "@fortawesome/react-fontawesome";
 import { InputVcAudioPlayer } from "v2/view/_common/InputVcAudioPlayer";
 import LoadingIcon from "./LoadingIcon";
+import './Uploader.scss'
 
 const FILE_TYPES = ["MP3", "WAV", "FLAC", "OGG"];
-
-interface Idempotency { token: any; set: (file?: any) => void; }
 
 interface Props {
   audioLink?: string;
   file?: any;
-  fileSet?: (file?: any) => void;
-  canConvertSet?: (canConvert: boolean) => void;
   handleUploadFile?: () => void;
-  idempotency?: Idempotency;
   onChange?: (file?: any) => void;
   onClear?: (file?: any) => void;
   uploading?: boolean;
@@ -24,18 +19,25 @@ interface Props {
 
 const n = () => {};
 
-export default function Uploader({ audioLink = "", file, fileSet = n, canConvertSet = n, handleUploadFile = n, idempotency = { token: '', set: n }, onChange = n, onClear = n, uploading = false, uploadDisabled = false }: Props) {
+export default function Uploader({ audioLink = "", file, handleUploadFile = n, onChange = n, onClear = n, uploading = false, uploadDisabled = false }: Props) {
 
-  const handleChange = (file: any) => {
-    onChange({ target: { name: 'uploader', value: file }});
+  const fileChange = ({ target }: { target: any }) => {
+    onChange({ target: { name: 'uploader', value: target.files[0] }});
   };
 
   const handleClear = () => { onClear(); };
+  const onDragDrop = (e: any) => { e.preventDefault(); e.stopPropagation(); };
 
   const onDragEvent = (onOff: number) => (e: React.DragEvent<HTMLDivElement>): void => {
-    e.preventDefault();
-    e.stopPropagation();
+    onDragDrop(e);
     e.currentTarget.classList[onOff ? "add" : "remove" ]("upload-zone-drag");
+  };
+
+  const onDrop = (e: React.DragEvent<HTMLDivElement>): void =>  {
+    onDragDrop(e);
+    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+      onChange({ target: { name: 'uploader', value: e.dataTransfer.files[0] }});
+    }
   };
 
   const fileSize =
@@ -50,14 +52,11 @@ export default function Uploader({ audioLink = "", file, fileSet = n, canConvert
     : "btn btn-primary w-100";
 
   return (
-    <div className="d-flex flex-column gap-3">
-      {/* Usage refer to https://github.com/KarimMokhtar/react-drag-drop-files */}
-      <FileUploader {...{ handleChange, maxSize: 50, name: "file", types: FILE_TYPES }}
-        children={
-          <div {...{ className: "panel panel-inner upload-zone d-flex align-items-center p-3",
-          onDragLeave: onDragEvent(1), onDragOver: onDragEvent(0) }}>
-            <div className="me-4">
-            <FontAwesomeIcon {...{ className: "upload-icon", icon: file ? faFileAudio : faFileArrowUp }}/>
+    <div {...{ className: "fy-uploader d-flex flex-column gap-3", onDragLeave: onDragEvent(1), onDragOver: onDragEvent(0), onDrop }}>
+      <input { ...{ name: 'file', onChange: fileChange, type: 'file', id: 'file' }} />
+      <label {...{ className: "panel panel-inner upload-zone d-flex align-items-center p-3", htmlFor: "file"}} >
+          <div className="me-4">
+            <Icon {...{ className: "upload-icon", icon: file ? faFileAudio : faFileArrowUp }}/>
             </div>
             <div>
               <div className="pb-0">
@@ -90,20 +89,18 @@ export default function Uploader({ audioLink = "", file, fileSet = n, canConvert
                 </div>
               </div>
             </div>
-          </div>
-        }
-      />
+      </label>
       { file && <>
         <div className="panel panel-inner rounded p-3">
           <InputVcAudioPlayer {...{ filename: audioLink as string }}/>
         </div>
         <div className="d-flex gap-3">
           <button {...{ className: uploadBtnClass, disabled: uploading || uploadDisabled, onClick: () => handleUploadFile(), type: "submit", }}>
-            <FontAwesomeIcon {...{ className: "me-2", icon: uploadDisabled ? faCheck : faFileArrowUp, }}/>
+            <Icon {...{ className: "me-2", icon: uploadDisabled ? faCheck : faFileArrowUp, }}/>
             { uploading && <LoadingIcon /> }
           </button>
           <button className="btn btn-destructive w-100" onClick={handleClear}>
-            <FontAwesomeIcon icon={faTrash} className="me-2" />
+            <Icon icon={faTrash} className="me-2" />
             Clear
           </button>
         </div>
