@@ -1,3 +1,4 @@
+import useId from './useId';
 import useUploader from './useUploader';
 
-export { useUploader };
+export { useId, useUploader };

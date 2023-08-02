@@ -1,6 +1,6 @@
 import React from "react";
 import { useUploader } from "hooks";
-import { Uploader } from "components/common";
+import { AudioUploader, ImageUploader } from "components/common";
 import { PageHeader } from "components/layout";
 import './LipsyncEditor.scss';
 
@@ -46,26 +46,33 @@ const Title = ({ ...rest }) => {
 };
 
 export default function LipsyncEditor({ ...rest }) {
-  const { file: audioFile, ...uploader } = useUploader({});
+  const audioProps = useUploader({ debug: true });
+  const imageProps = useUploader({});
 
   const subText = "Select an image with a clear face, or one of our existing templates, then choose either text to speech or uploaded audio(eg. music). Then you can generate a beautifully lipsynced video.";
   const headerProps = {
-    childProps: { audioFile },
+    childProps: { audioProps, imageProps },
     titleComponent: Title,
     subText,
     showButtons: false
   };
+  console.log("👁",imageProps);
 
 	return <div>
     <PageHeader { ...headerProps }/>
-      <div className="container">
-        <div className="panel d-flex p-md-4">
-          <div {...{ className: "col-12 col-lg-6" }}>
+      <div {...{ className: "container" }}>
+        <div {...{ className: "lipsync-editor panel" }}>
+          <div {...{ className: "grid-title" }}>
             <h5>Image</h5>
           </div>
-          <div {...{ className: "col-12 col-lg-6" }}>
+          <div {...{ className: "grid-title" }}>
             <h5>Audio</h5>
-            <Uploader {...{ file: audioFile, ...uploader }}/>
+          </div>
+          <div {...{ className: "grid-square lipsync-audio" }}>
+            <ImageUploader {...imageProps}/>
+          </div>
+          <div {...{ className: "grid-square" }}>
+            <AudioUploader {...audioProps}/>
           </div>
         </div>
       </div>

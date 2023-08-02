@@ -5,19 +5,20 @@ import { UploadAudio, UploadAudioIsOk, UploadAudioRequest } from "@storyteller/c
 const n = (o: any) => o;
 
 interface Props {
-   formClearedSet?: (cleared: boolean) => void;
+  debug?: boolean;
+  formClearedSet?: (cleared: boolean) => void;
 }
 
-export default function useUploader({ formClearedSet = n }: Props) {
-   const [file, fileSet] = useState<any>(undefined);
-   const [audioLink, audioLinkSet] = useState<string>();
-   const [uploading, uploadingSet] = useState(false);
-   const [uploadDisabled, uploadDisabledSet] = useState<boolean>(false);
-   const [mediaUploadToken, mediaUploadTokenSet] = useState<string | undefined>(undefined);
-   const [convertIdempotencyToken, convertIdempotencyTokenSet] = useState(uuidv4());
-   const [canConvert, canConvertSet] = useState(false);
-   const [iToken, iTokenSet] = useState(uuidv4());  // Auto generated
-   const resetIToken = () => iTokenSet(uuidv4());
+export default function useUploader({ debug, formClearedSet = n }: Props) {
+  const [file, fileSet] = useState<any>(undefined);
+  const [blob, blobSet] = useState<string>();
+  const [uploading, uploadingSet] = useState(false);
+  const [uploadDisabled, uploadDisabledSet] = useState<boolean>(false);
+  const [mediaUploadToken, mediaUploadTokenSet] = useState<string | undefined>(undefined);
+  const [convertIdempotencyToken, convertIdempotencyTokenSet] = useState(uuidv4());
+  const [canConvert, canConvertSet] = useState(false);
+  const [iToken, iTokenSet] = useState(uuidv4());  // Auto generated
+  const resetIToken = () => iTokenSet(uuidv4());
 
   const handleUploadFile = async () => {
     if (file === undefined) { return false; }
@@ -41,14 +42,15 @@ export default function useUploader({ formClearedSet = n }: Props) {
 
     uploadingSet(false);
   };
-  const inputChange = (file?: any) => {
+  const inputChange = (inputFile?: any) => {
+    console.log("🍡",inputFile);
     convertIdempotencyTokenSet(uuidv4());
-    fileSet(file || null);
-    audioLinkSet(file ? URL.createObjectURL(file) : "");
+    fileSet(inputFile || null);
+    blobSet(inputFile ? URL.createObjectURL(inputFile) : "");
     canConvertSet(false);
     resetIToken();
     uploadDisabledSet(false);
-    formClearedSet(!file);
+    formClearedSet(!inputFile);
   };
   const onChange = ({ target = {} }: { target: any }) => {
     inputChange(target.value);
@@ -58,5 +60,5 @@ export default function useUploader({ formClearedSet = n }: Props) {
     mediaUploadTokenSet(undefined);
   };
 
-   return { audioLink, canConvert, convertIdempotencyToken, file, fileSet, handleUploadFile, idempotency: { token: iToken, set: iTokenSet}, mediaUploadToken, mediaUploadTokenSet, onChange, onClear, resetIToken, uploading, uploadDisabled, uploadingSet };
+   return { blob, canConvert, convertIdempotencyToken, file, fileSet, handleUploadFile, idempotency: { token: iToken, set: iTokenSet}, mediaUploadToken, mediaUploadTokenSet, onChange, onClear, resetIToken, uploading, uploadDisabled, uploadingSet };
 };

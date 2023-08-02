@@ -1,3 +1,29 @@
+.lipsync-editor {
+	display: grid;
+	grid-template-columns: repeat(2, 1fr);
+	grid-gap: 1rem;
+
+	.grid-square {
+		aspect-ratio: 1;
+		padding-bottom: 1rem;
+		&:nth-child(odd) {
+			padding-left: 1rem;
+		}
+		&:nth-child(even) {
+			padding-right: 1rem;
+		}
+	}
+
+
+
+
+	// div.grid-square { aspect-ratio: 1 }
+	.fy-uploader { height: 100%; }
+	.lipsync-audio {
+		label { height: 100% }
+	}
+}
+
 .progress-header {
 	display: flex;
 	align-items: center;
