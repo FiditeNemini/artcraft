@@ -31,7 +31,7 @@ export default function ShareButton(props: ShareButtonProps) {
         theme="fakeyou"
         arrow={false}
       >
-        <button className="btn-share" onClick={copyToClipboard} type="button">
+        <button className="btn-action" onClick={copyToClipboard} type="button">
           <span>
             <FontAwesomeIcon icon={faLink} className="me-2" />
           </span>
