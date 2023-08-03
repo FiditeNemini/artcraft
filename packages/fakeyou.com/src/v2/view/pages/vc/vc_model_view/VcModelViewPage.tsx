@@ -1,18 +1,28 @@
+import React, { useState } from "react";
 import {
   faBarsStaggered,
-  faDeleteLeft,
+  faEdit,
+  faEye,
+  faMemoCircleInfo,
+  faMessages,
+  faTrash,
   faVolumeHigh,
 } from "@fortawesome/pro-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { FrontendInferenceJobType } from "@storyteller/components/src/jobs/InferenceJob";
 import Panel from "components/common/Panel";
-import React from "react";
 import { Link, useParams } from "react-router-dom";
 import { SessionVoiceConversionResultsList } from "v2/view/_common/SessionVoiceConversionResultsList";
 import { SessionSubscriptionsWrapper } from "@storyteller/components/src/session/SessionSubscriptionsWrapper";
 import PageHeaderModelView from "components/common/PageHeaderModelView";
+import { CommentComponent } from "v2/view/_common/comments/CommentComponent";
+import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
+import { RatingButtons } from "v2/view/_common/ratings/RatingButtons";
+import { RatingStats } from "v2/view/_common/ratings/RatingStats";
+import ShareButton from "components/common/ShareButton";
 
 interface VcModelViewPageProps {
+  sessionWrapper: SessionWrapper;
   sessionSubscriptionsWrapper: SessionSubscriptionsWrapper;
   inferenceJobsByCategory: any;
 }
@@ -27,15 +37,59 @@ export default function VcModelViewPage(props: VcModelViewPageProps) {
         <span className="badge-model badge-model-rvc fs-6">RVCv2</span>
       </div>
       <p>
-        V2V model created by <Link to="/">Vegito1089</Link>
+        V2V model by <Link to="/">Vegito1089</Link>
       </p>
     </div>
   );
   const tags = ["Speaking", "English", "Character", "Singing", "Spanish"];
 
+  let modelCreatorLink = <Link to="">Creator Name</Link>;
+  let modelTitle = title;
+  let modelUseCount = 10000;
+  let modelLanguage = "English";
+  let modelType = "RVCv2";
+  let modelUploadDate = "2021-09-10T06:15:04Z";
+  let modelVisibility = (
+    <div>
+      <FontAwesomeIcon icon={faEye} className="me-2" />
+      Public
+    </div>
+  );
+
+  const voiceDetails = [
+    { label: "Creator", value: modelCreatorLink },
+    { label: "Title", value: modelTitle },
+    { label: "Use count", value: modelUseCount },
+    { label: "Spoken language", value: modelLanguage },
+    { label: "Model type", value: modelType },
+    { label: "Upload date (UTC)", value: modelUploadDate },
+    { label: "Visibility", value: modelVisibility },
+  ];
+
+  let ratingButtons = <></>;
+  if (props.sessionWrapper.isLoggedIn()) {
+    ratingButtons = (
+      <RatingButtons entity_type="v2v_model" entity_token="test" />
+    );
+  }
+
+  let ratingStats = (
+    <RatingStats positive_votes={100} negative_votes={0} total_votes={100} />
+  );
+
+  const shareUrl = window.location.href;
+  const shareButton = <ShareButton url={shareUrl} />;
+
   return (
     <div>
-      <PageHeaderModelView title={title} subText={subText} tags={tags} />
+      <PageHeaderModelView
+        title={title}
+        subText={subText}
+        tags={tags}
+        ratingBtn={ratingButtons}
+        ratingStats={ratingStats}
+        extras={shareButton}
+      />
 
       <Panel padding mb>
         <div className="row g-5">
@@ -45,29 +99,7 @@ export default function VcModelViewPage(props: VcModelViewPageProps) {
               Use Voice
             </h4>
             {/* have to replace this below with Voice conversion stuff instead of the textarea */}
-            <form onSubmit={() => {}}>
-              <textarea
-                onChange={() => {}}
-                value={""}
-                className="form-control"
-                placeholder="Textual shenanigans go here..."
-                rows={6}
-              ></textarea>
-              <div className="d-flex gap-3 mt-3">
-                <button className="btn btn-primary w-100">
-                  <FontAwesomeIcon icon={faVolumeHigh} className="me-2" />
-                  Speak
-                </button>
-
-                <button
-                  className="btn btn-destructive w-100"
-                  onClick={() => {}}
-                >
-                  <FontAwesomeIcon icon={faDeleteLeft} className="me-2" />
-                  Clear
-                </button>
-              </div>
-            </form>
+            <div className="opacity-50">voice to voice components here</div>
           </div>
           <div className="col-12 col-lg-6">
             <h4 className="mb-3">
@@ -87,12 +119,45 @@ export default function VcModelViewPage(props: VcModelViewPageProps) {
           </div>
         </div>
       </Panel>
-      <Panel padding>
-        <h4 className="text-center text-lg-start mb-4">
-          <FontAwesomeIcon icon={faBarsStaggered} className="me-3" />
-          Voice Details
+      <Panel padding mb>
+        <h4 className="mb-4">
+          <FontAwesomeIcon icon={faMemoCircleInfo} className="me-3" />
+          Voice Model Details
         </h4>
-        lol
+        <table className="table">
+          <tbody>
+            {voiceDetails.map((item, index) => (
+              <tr key={index}>
+                <th scope="row" className="fw-semibold">
+                  {item.label}
+                </th>
+                <td>{item.value}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+        {/* Model Edit Buttons */}
+        <div className="d-flex flex-column flex-md-row gap-3 mt-5">
+          <Link className={"btn btn-secondary w-100"} to="">
+            <FontAwesomeIcon icon={faEdit} className="me-2" />
+            Edit Model Details
+          </Link>
+          <Link className="btn btn-destructive w-100" to="">
+            <FontAwesomeIcon icon={faTrash} className="me-2" />
+            Delete Model
+          </Link>
+        </div>
+      </Panel>
+      <Panel padding>
+        <h4 className="mb-4">
+          <FontAwesomeIcon icon={faMessages} className="me-3" />
+          Comments
+        </h4>
+        <CommentComponent
+          entityType="user"
+          entityToken="test"
+          sessionWrapper={props.sessionWrapper}
+        />
       </Panel>
     </div>
   );
