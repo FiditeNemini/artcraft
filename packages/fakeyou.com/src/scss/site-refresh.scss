@@ -869,18 +869,18 @@ styles with important tags:
     font-weight: 500;
     font-size: 17px;
     background-color: lighten($secondary, 4%);
-    border-radius: 50px;
+    border-radius: 0.5rem;
     border: none;
     padding: 6px 20px;
     color: rgba($white, 0.5);
     transition: 0.1s all;
 
     &.left {
-      border-radius: 50px 0px 0px 50px;
+      border-radius: 0.5rem 0px 0px 0.5rem;
     }
 
     &.right {
-      border-radius: 0px 50px 50px 5px;
+      border-radius: 0px 0.5rem 0.5rem 0px;
     }
 
     &.rated {
@@ -890,6 +890,25 @@ styles with important tags:
 
     &:hover {
       background-color: lighten($secondary, 10%);
+    }
+  }
+
+  .btn-share {
+    font-weight: 500;
+    font-size: 14px;
+    background-color: lighten($secondary, 4%);
+    border-radius: 0.5rem;
+    border: none;
+    padding: 8.25px 20px;
+    color: $white;
+    transition: 0.1s all;
+
+    &:hover {
+      background-color: lighten($secondary, 10%);
+    }
+
+    &:active {
+      background-color: lighten($secondary, 15%);
     }
   }
 
