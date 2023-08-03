@@ -1,6 +1,9 @@
 @import "scss/colours.scss";
 
 .fy-image-uploader {
+	display: flex;
+	justify-content: center;
+	align-items: center;
 	overflow: hidden;
 	height: 100%;
 	width: 100%;
@@ -11,12 +14,26 @@
 		border-radius: .5rem;
 		object-fit: cover;
 	}
-
-	.file-details {
+	.image-upload-label, .upload-details {
 		background-color: rgba($panel, .85);
+		position: absolute;
+	}
+	.image-upload-label {
+		border-radius: .5rem .5rem 0 0;
+		display: flex;
+		width: 100%;
+		top: 0;
+		padding: 1rem;
+	}
+
+	.upload-details {
 		top: 1rem;
 		left: 1rem;
 		width: calc(100% - 2rem);
-		position: absolute;
+	}
+
+	.image-placeholder {
+		// background-color: red;
+		fill: $secondary;
 	}
 }

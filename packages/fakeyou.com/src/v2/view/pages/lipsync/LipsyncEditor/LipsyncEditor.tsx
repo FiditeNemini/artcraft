@@ -4,14 +4,10 @@ import { AudioUploader, ImageUploader } from "components/common";
 import { PageHeader } from "components/layout";
 import './LipsyncEditor.scss';
 
-// interface Props {
-//   titleIcon?: JSX.Element;
-//   extra?: React.ComponentType;
-//   title?: string;
-//   subText: string;
-//   showButtons: boolean;
-//   actionButtons?: JSX.Element;
-// }
+interface Props {
+  audioFile?: any;
+  imageFile?: any;
+}
 
 const ProgressCheck = ({ disabled = false }: {disabled?: boolean}) => <svg>
   { !disabled && <polyline {...{
@@ -24,6 +20,7 @@ const ProgressCheck = ({ disabled = false }: {disabled?: boolean}) => <svg>
 </svg>;
 
 const Title = ({ ...rest }) => {
+  const { audioFile, imageFile } = rest;
   console.log('🥚',rest)
   return <div {...{ className: 'progress-header' }}>
     <h1 {...{ className: "fw-bold text-center text-md-start progress-heading" }}>
@@ -31,11 +28,11 @@ const Title = ({ ...rest }) => {
     </h1>
     <ul {...{ className: 'async-progress-tracker' }}>
       <li>
-        <ProgressCheck {...{}}/>
+        <ProgressCheck {...{ disabled: imageFile }}/>
         Image
       </li>
       <li>
-        <ProgressCheck {...{ disabled: false }}/>
+        <ProgressCheck {...{ disabled: audioFile }}/>
         Audio
       </li>
     </ul>
@@ -51,7 +48,7 @@ export default function LipsyncEditor({ ...rest }) {
 
   const subText = "Select an image with a clear face, or one of our existing templates, then choose either text to speech or uploaded audio(eg. music). Then you can generate a beautifully lipsynced video.";
   const headerProps = {
-    childProps: { audioProps, imageProps },
+    childProps: { audioFile: !audioProps.file, imageFile: !imageProps.file },
     titleComponent: Title,
     subText,
     showButtons: false
@@ -62,10 +59,10 @@ export default function LipsyncEditor({ ...rest }) {
     <PageHeader { ...headerProps }/>
       <div {...{ className: "container" }}>
         <div {...{ className: "lipsync-editor panel" }}>
-          <div {...{ className: "grid-title" }}>
+          <div {...{ className: "grid-heading" }}>
             <h5>Image</h5>
           </div>
-          <div {...{ className: "grid-title" }}>
+          <div {...{ className: "grid-heading" }}>
             <h5>Audio</h5>
           </div>
           <div {...{ className: "grid-square lipsync-audio" }}>

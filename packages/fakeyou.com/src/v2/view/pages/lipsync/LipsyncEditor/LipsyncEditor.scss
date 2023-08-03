@@ -1,17 +1,38 @@
 .lipsync-editor {
 	display: grid;
-	grid-template-columns: repeat(2, 1fr);
+	grid-template-columns: repeat(2, minmax(0, 1fr));
 	grid-gap: 1rem;
 
-	.grid-square {
-		aspect-ratio: 1;
-		padding-bottom: 1rem;
+	.grid-heading, .grid-square {
 		&:nth-child(odd) {
 			padding-left: 1rem;
 		}
 		&:nth-child(even) {
 			padding-right: 1rem;
 		}
+	}
+
+	.grid-heading {
+		display: flex;
+		align-items: center;
+		// background-color: blue;
+		// padding-left: 1rem;
+		h5 {
+			margin: 1rem 0 0;
+			// background: red;
+			line-height: 1em;
+		}
+	}
+
+	.grid-square {
+		aspect-ratio: 1;
+		padding-bottom: 1rem;
+		// &:nth-child(odd) {
+		// 	padding-left: 1rem;
+		// }
+		// &:nth-child(even) {
+		// 	padding-right: 1rem;
+		// }
 	}
 
 
