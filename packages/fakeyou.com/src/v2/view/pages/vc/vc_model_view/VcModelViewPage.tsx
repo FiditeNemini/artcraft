@@ -24,6 +24,7 @@ import PageContainer from "components/common/PageContainer/PageContainer";
 
 interface VcModelViewPageProps {
   sessionWrapper: SessionWrapper;
+  sessionWrapper: SessionWrapper;
   sessionSubscriptionsWrapper: SessionSubscriptionsWrapper;
   inferenceJobsByCategory: any;
 }
@@ -38,6 +39,7 @@ export default function VcModelViewPage(props: VcModelViewPageProps) {
         <span className="badge-model badge-model-rvc fs-6">RVCv2</span>
       </div>
       <p>
+        V2V model by <Link to="/">Vegito1089</Link>
         V2V model by <Link to="/">Vegito1089</Link>
       </p>
     </div>
@@ -81,8 +83,45 @@ export default function VcModelViewPage(props: VcModelViewPageProps) {
   const shareUrl = window.location.href;
   const shareButton = <ShareButton url={shareUrl} />;
 
+  let modelCreatorLink = <Link to="">Creator Name</Link>;
+  let modelTitle = title;
+  let modelUseCount = 10000;
+  let modelLanguage = "English";
+  let modelType = "RVCv2";
+  let modelUploadDate = "2021-09-10T06:15:04Z";
+  let modelVisibility = (
+    <div>
+      <FontAwesomeIcon icon={faEye} className="me-2" />
+      Public
+    </div>
+  );
+
+  const voiceDetails = [
+    { label: "Creator", value: modelCreatorLink },
+    { label: "Title", value: modelTitle },
+    { label: "Use count", value: modelUseCount },
+    { label: "Spoken language", value: modelLanguage },
+    { label: "Model type", value: modelType },
+    { label: "Upload date (UTC)", value: modelUploadDate },
+    { label: "Visibility", value: modelVisibility },
+  ];
+
+  let ratingButtons = <></>;
+  if (props.sessionWrapper.isLoggedIn()) {
+    ratingButtons = (
+      <RatingButtons entity_type="v2v_model" entity_token="test" />
+    );
+  }
+
+  let ratingStats = (
+    <RatingStats positive_votes={100} negative_votes={0} total_votes={100} />
+  );
+
+  const shareUrl = window.location.href;
+  const shareButton = <ShareButton url={shareUrl} />;
+
   return (
-    <PageContainer>
+    <div>
       <PageHeaderModelView
         title={title}
         subText={subText}
