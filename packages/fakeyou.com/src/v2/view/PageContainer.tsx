@@ -509,6 +509,7 @@ class PageContainer extends React.Component<Props, State> {
 
             <Route path="/voice-conversion/:token">
               <VcModelViewPage
+                sessionWrapper={this.props.sessionWrapper}
                 sessionSubscriptionsWrapper={
                   this.props.sessionSubscriptionsWrapper
                 }
