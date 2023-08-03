@@ -39,9 +39,12 @@ export default function PageHeaderModelView(props: PageHeaderModelViewProps) {
         <div className="d-flex flex-column flex-lg-row flex-column-reverse gap-3">
           <div className="d-flex gap-3">
             {props.ratingBtn}
-            {props.extras}
+            <div className="d-lg-none">{props.extras}</div>
           </div>
           {props.ratingStats}
+          <div className="flex-grow-1 d-none d-lg-flex justify-content-end">
+            {props.extras}
+          </div>
         </div>
       </Panel>
     </div>
