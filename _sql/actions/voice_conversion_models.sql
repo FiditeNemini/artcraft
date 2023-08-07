@@ -130,7 +130,8 @@ where token IN (
     'vcm_q7ewn3yym4gy',
     'vcm_cwngb21xsf66',
     'vcm_jmzjrky179cm',
-    'vcm_hj6a1nt1yvh9'
+    'vcm_hj6a1nt1yvh9',
+    'vcm_6wwx1e3cd48s'
 );
 
 
