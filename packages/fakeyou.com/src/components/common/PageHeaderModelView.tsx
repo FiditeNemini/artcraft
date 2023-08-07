@@ -13,7 +13,7 @@ interface PageHeaderModelViewProps {
 
 export default function PageHeaderModelView(props: PageHeaderModelViewProps) {
   return (
-    <div className="pt-3 pb-4">
+    <div className="pt-2 pt-lg-4 pb-4">
       <Panel padding>
         <div className="row gy-3">
           <div className="col-12 col-lg-8">
