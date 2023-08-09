@@ -1,17 +1,15 @@
-import AudioUploader from './AudioUploader';
-import ImageUploader from './ImageUploader';
-import UpLab from './UpLab';
-import UploadActions from './UploadActions';
-import UploadDetails from './UploadDetails';
-import Uploader from './Uploader';
-import UploadLabel from './UploadLabel';
+import AudioInput from './AudioInput';
+import ImageInput from './ImageInput';
+import FileActions from './FileActions';
+import FileDetails from './FileDetails';
+import FileWrapper from './FileWrapper';
+import FileLabel from './FileLabel';
 
 export {
-	AudioUploader,
-	ImageUploader,
-	UpLab,
-	UploadActions,
-	UploadDetails,
-	Uploader,
-	UploadLabel
+	AudioInput,
+	ImageInput,
+	FileActions,
+	FileDetails,
+	FileWrapper,
+	FileLabel
 };

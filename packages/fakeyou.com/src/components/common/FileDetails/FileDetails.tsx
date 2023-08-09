@@ -1,15 +1,16 @@
 import React from 'react';
 import { FontAwesomeIcon as Icon } from "@fortawesome/react-fontawesome";
 import { faTrash } from "@fortawesome/pro-solid-svg-icons";
-import "./UploadDetails.scss";
+import "./FileDetails.scss";
 
 interface Props {
+  clear?: (file?: any) => void;
   file?: any;
-  handleClear?: (x?: any) => void;
+  hideClearDetails?: boolean;
   icon?: any;
 }
 
-export default function UploadDetails({ file, handleClear = () => {}, icon }: Props) {
+export default function FileDetails({ clear = () => {}, file, hideClearDetails, icon }: Props) {
   const fileSize =
     file && file.size >= 1024 * 1024
       ? (file.size / 1024 / 1024).toFixed(2) + " MB"
@@ -28,8 +29,8 @@ export default function UploadDetails({ file, handleClear = () => {}, icon }: Pr
       </span>
       <u className="fw-medium opacity-100 ms-1">Change file</u>
     </div>
-    <button {...{ className: "upload-details-clear btn btn-destructive align-items-center justify-content-center", onClick: e => { e.preventDefault(); handleClear() } }}>
-      <Icon {...{ icon: faTrash }}/>
-    </button>
+    { !hideClearDetails && <button {...{ className: "upload-details-clear btn btn-destructive align-items-center justify-content-center", onClick: e => { e.preventDefault(); clear() } }}>
+          <Icon {...{ icon: faTrash }}/>
+    </button> }
   </div>;
 };

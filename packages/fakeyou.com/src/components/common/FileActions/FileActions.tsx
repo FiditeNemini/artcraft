@@ -12,7 +12,7 @@ interface Props {
 
 const n = () => {};
 
-export default function UploadActions({ clear = n,  upload = n, successful, working }: Props) {
+export default function FileActions({ clear = n,  upload = n, successful, working }: Props) {
   const uploadBtnClass = successful ? "btn btn-uploaded w-100 disabled" : "btn btn-primary w-100";
 
   return <div className="d-flex gap-3">

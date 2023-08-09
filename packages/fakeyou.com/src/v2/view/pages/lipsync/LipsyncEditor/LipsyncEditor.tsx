@@ -1,6 +1,6 @@
 import React from "react";
 import { useUploader } from "hooks";
-import { AudioUploader, ImageUploader } from "components/common";
+import { AudioInput, ImageInput } from "components/common";
 import { PageHeader } from "components/layout";
 import './LipsyncEditor.scss';
 
@@ -65,10 +65,10 @@ export default function LipsyncEditor({ ...rest }) {
             <h5>Audio</h5>
           </div>
           <div {...{ className: "grid-square lipsync-audio" }}>
-            <ImageUploader {...imageProps}/>
+            <ImageInput {...imageProps}/>
           </div>
           <div {...{ className: "grid-square" }}>
-            <AudioUploader {...audioProps}/>
+            <AudioInput {...{ ...audioProps, hideActions: true } }/>
           </div>
         </div>
       </div>

@@ -4,31 +4,30 @@ const n = (o: any) => o;
 
 interface Props {
   debug?: any;
-  formClearedSet?: (cleared: boolean) => void;
   onChange?: (file: any) => void;
   onClear?: (x?: any) => void;
-  onUpload?: (file: any) => boolean;
+  onSubmit?: (file: any) => boolean;
 }
 
-export default function useUploader({ debug, onChange = n, onClear = n, onUpload = n }: Props) {
+export default function useUploader({ debug, onChange = n, onClear = n, onSubmit = n }: Props) {
   const [file, fileSet] = useState<any>(undefined);
   const [blob, blobSet] = useState<string>();
   const [working, workingSet] = useState(false);
-  const [successful, successfulSet] = useState<boolean>(false);
+  const [success, successSet] = useState<boolean>(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
   const submit = async () => {
     if (file === undefined) { return false; }
-    const onUploadResult = await onUpload(file);
+    const onUploadResult = await onSubmit(file);
     workingSet(true);
-    if (onUploadResult) { successfulSet(true); }
-    successfulSet(false);
+    if (onUploadResult) { successSet(true); }
+    successSet(false);
   };
   const fileChange = (inputFile?: any) => {
     onChange(file);
     fileSet(inputFile || null);
     blobSet(inputFile ? URL.createObjectURL(inputFile) : "");
-    successfulSet(false);
+    successSet(false);
   };
   const inputChange = ({ target = {} }: { target: any }) => {
     fileChange(target.value);
@@ -43,13 +42,12 @@ export default function useUploader({ debug, onChange = n, onClear = n, onUpload
     blob,
     clear,
     file,
-    fileSet,
     inputProps: {
       onChange: inputChange,
       inputRef
     },
     submit,
-    successful,
+    success,
     working,
   };
 };
