@@ -1,37 +1,34 @@
 import React from "react";
 import { InputVcAudioPlayer } from "v2/view/_common/InputVcAudioPlayer";
 import { UploadActions, UploadDetails, Uploader, UploadLabel } from 'components/common';
+import { faFileAudio } from "@fortawesome/pro-solid-svg-icons";
 import './AudioUploader.scss'
 
 const fileTypes = ["MP3", "WAV", "FLAC", "OGG"];
 
 interface Props {
   blob?: string;
-  disabled?: boolean;
+  clear?: (file?: any) => void;
   file?: any;
-  handleUpload?: () => void;
-  onChange?: (file?: any) => void;
-  onClear?: (file?: any) => void;
+  inputProps?: any;
+  success?: boolean;
+  upload?: () => void;
   uploading?: boolean;
 }
 
 const n = () => {};
 
-export default function AudioUploader({ blob = "", disabled = false, file, handleUpload = n, onChange = n, onClear = n, uploading = false }: Props) {
+export default function AudioUploader({ blob = "", clear = n, file, inputProps, success = false, upload = n, uploading = false }: Props) {
 
-  const handleClear = () => { onClear(); };
-
-  return <>
-    <Uploader {...{ onChange, panelClass: 'p-3' }}>
-      <UploadLabel {...{ file, fileTypes }}>
-        <UploadDetails {...{ file }}/>
-      </UploadLabel>
+  return <div {...{ className: "fy-audio-uploader" }}>
+    <Uploader {...{ ...inputProps, panelClass: 'p-3' }}>
+     { file ? <UploadDetails {...{ clear, icon: faFileAudio, file }}/> : <UploadLabel {...{ fileTypes }}/> }
     </Uploader>
       { file && <>
-        <div className="panel panel-inner rounded p-3">
+        <div {...{ className: "panel panel-inner rounded p-3" }}>
           <InputVcAudioPlayer {...{ filename: blob as string }}/>
         </div>
-        <UploadActions {...{ disabled, handleClear, handleUpload, uploading }}/>
+        <UploadActions {...{ clear, success, upload, uploading }}/>
       </> }
-  </>;
+  </div>;
 };

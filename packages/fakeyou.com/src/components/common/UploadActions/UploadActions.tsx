@@ -4,23 +4,23 @@ import { faCheck, faFileArrowUp, faTrash } from "@fortawesome/pro-solid-svg-icon
 import LoadingIcon from "./LoadingIcon";
 
 interface Props {
-  disabled?: boolean;
-  handleClear?: (x?: any) => void;
-  handleUpload?: (x?: any) => void;
-  uploading?: boolean;
+  clear?: (x?: any) => void;
+  upload?: (x?: any) => void;
+  successful?: boolean;
+  working?: boolean;
 }
 
 const n = () => {};
 
-export default function UploadActions({ disabled, handleClear = n, handleUpload = n, uploading }: Props) {
-  const uploadBtnClass = disabled ? "btn btn-uploaded w-100 disabled" : "btn btn-primary w-100";
+export default function UploadActions({ clear = n,  upload = n, successful, working }: Props) {
+  const uploadBtnClass = successful ? "btn btn-uploaded w-100 disabled" : "btn btn-primary w-100";
 
   return <div className="d-flex gap-3">
-    <button {...{ className: uploadBtnClass, disabled: uploading || disabled, onClick: () => handleUpload(), type: "submit", }}>
-      <Icon {...{ className: "me-2", icon: disabled ? faCheck : faFileArrowUp, }}/>
-      { uploading && <LoadingIcon /> }
+    <button {...{ className: uploadBtnClass, disabled: working || successful, onClick: () => upload(), type: "submit", }}>
+      <Icon {...{ className: "me-2", icon: successful ? faCheck : faFileArrowUp, }}/>
+      { working && <LoadingIcon /> }
     </button>
-    <button {...{ className: "btn btn-destructive w-100", onClick: handleClear }}>
+    <button {...{ className: "btn btn-destructive w-100", onClick: clear }}>
       <Icon icon={faTrash} className="me-2" />
       Clear
     </button>

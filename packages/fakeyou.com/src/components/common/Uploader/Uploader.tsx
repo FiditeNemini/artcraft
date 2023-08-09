@@ -5,15 +5,18 @@ import './Uploader.scss'
 interface Props {
   children?: JSX.Element|JSX.Element[];
   containerClass?: string;
+  inputRef: any;
   onChange: (file?: any) => void;
   panelClass?: string;
 };
 
-export default function Uploader({ children, containerClass, onChange, panelClass }: Props) {
+export default function Uploader({ children, containerClass, inputRef, onChange, panelClass, }: Props) {
   const id = 'uploader-' + useId();
 
-  const fileChange = ({ target }: { target: any }) => {
-    onChange({ target: { name: 'uploader', value: target.files[0] }});
+  const fileChange = (e: any) => {
+    console.log("🧑🏻‍🎤",e.target.files);
+     e.preventDefault();
+    onChange({ target: { name: 'uploader', value: e.target.files[0] }});
   };
 
   const onDragDrop = (e: any) => { e.preventDefault(); e.stopPropagation(); };
@@ -31,8 +34,8 @@ export default function Uploader({ children, containerClass, onChange, panelClas
   };
 
   return <div {...{ className: `fy-uploader${ containerClass ? " " + containerClass : "" }`, onDragLeave: onDragEvent(1), onDragOver: onDragEvent(0), onDrop }}>
-    <input { ...{ name: "file", onChange: fileChange, type: "file", id }} />
-    <label {...{ className: `panel panel-inner upload-zone d-flex align-items-center${ panelClass ? " " + panelClass : "" }`, htmlFor: id }} >
+    <input { ...{ name: "file", onChange: fileChange, type: "file", id, onClick: e => console.log('👨🏿‍🚒',e.target), ref: inputRef }} />
+    <label {...{ className: `panel panel-inner d-flex align-items-center${ panelClass ? " " + panelClass : "" }`, htmlFor: id }} >
       { children }
     </label>
   </div>;

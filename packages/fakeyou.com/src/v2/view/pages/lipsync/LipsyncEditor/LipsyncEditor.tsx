@@ -4,10 +4,10 @@ import { AudioUploader, ImageUploader } from "components/common";
 import { PageHeader } from "components/layout";
 import './LipsyncEditor.scss';
 
-interface Props {
-  audioFile?: any;
-  imageFile?: any;
-}
+// interface Props {
+//   audioFile?: any;
+//   imageFile?: any;
+// }
 
 const ProgressCheck = ({ disabled = false }: {disabled?: boolean}) => <svg>
   { !disabled && <polyline {...{
@@ -21,7 +21,7 @@ const ProgressCheck = ({ disabled = false }: {disabled?: boolean}) => <svg>
 
 const Title = ({ ...rest }) => {
   const { audioFile, imageFile } = rest;
-  console.log('🥚',rest)
+
   return <div {...{ className: 'progress-header' }}>
     <h1 {...{ className: "fw-bold text-center text-md-start progress-heading" }}>
       Generate a lipsync
@@ -43,7 +43,7 @@ const Title = ({ ...rest }) => {
 };
 
 export default function LipsyncEditor({ ...rest }) {
-  const audioProps = useUploader({ debug: true });
+  const audioProps = useUploader({ debug: 'audio useUploader' });
   const imageProps = useUploader({});
 
   const subText = "Select an image with a clear face, or one of our existing templates, then choose either text to speech or uploaded audio(eg. music). Then you can generate a beautifully lipsynced video.";
@@ -53,7 +53,6 @@ export default function LipsyncEditor({ ...rest }) {
     subText,
     showButtons: false
   };
-  console.log("👁",imageProps);
 
 	return <div>
     <PageHeader { ...headerProps }/>

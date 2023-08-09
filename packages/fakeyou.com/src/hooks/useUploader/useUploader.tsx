@@ -1,64 +1,55 @@
-import { useState } from 'react';
-import { v4 as uuidv4 } from "uuid";
-import { UploadAudio, UploadAudioIsOk, UploadAudioRequest } from "@storyteller/components/src/api/upload/UploadAudio";
+import { useRef, useState } from 'react';
 
 const n = (o: any) => o;
 
 interface Props {
-  debug?: boolean;
+  debug?: any;
   formClearedSet?: (cleared: boolean) => void;
+  onChange?: (file: any) => void;
+  onClear?: (x?: any) => void;
+  onUpload?: (file: any) => boolean;
 }
 
-export default function useUploader({ debug, formClearedSet = n }: Props) {
+export default function useUploader({ debug, onChange = n, onClear = n, onUpload = n }: Props) {
   const [file, fileSet] = useState<any>(undefined);
   const [blob, blobSet] = useState<string>();
-  const [uploading, uploadingSet] = useState(false);
-  const [uploadDisabled, uploadDisabledSet] = useState<boolean>(false);
-  const [mediaUploadToken, mediaUploadTokenSet] = useState<string | undefined>(undefined);
-  const [convertIdempotencyToken, convertIdempotencyTokenSet] = useState(uuidv4());
-  const [canConvert, canConvertSet] = useState(false);
-  const [iToken, iTokenSet] = useState(uuidv4());  // Auto generated
-  const resetIToken = () => iTokenSet(uuidv4());
+  const [working, workingSet] = useState(false);
+  const [successful, successfulSet] = useState<boolean>(false);
+  const inputRef = useRef<HTMLInputElement>(null);
 
-  const handleUploadFile = async () => {
+  const submit = async () => {
     if (file === undefined) { return false; }
-
-    uploadingSet(true);
-
-    const request: UploadAudioRequest = {
-       uuid_idempotency_token: iToken,
-       file: file,
-       source: "file",
-    };
-
-    let result = await UploadAudio(request);
-
-    if (UploadAudioIsOk(result)) {
-       uploadDisabledSet(true);
-       mediaUploadTokenSet(result.upload_token);
-       formClearedSet(false);
-       canConvertSet(true);
-    }
-
-    uploadingSet(false);
+    const onUploadResult = await onUpload(file);
+    workingSet(true);
+    if (onUploadResult) { successfulSet(true); }
+    successfulSet(false);
   };
-  const inputChange = (inputFile?: any) => {
-    console.log("🍡",inputFile);
-    convertIdempotencyTokenSet(uuidv4());
+  const fileChange = (inputFile?: any) => {
+    onChange(file);
     fileSet(inputFile || null);
     blobSet(inputFile ? URL.createObjectURL(inputFile) : "");
-    canConvertSet(false);
-    resetIToken();
-    uploadDisabledSet(false);
-    formClearedSet(!inputFile);
+    successfulSet(false);
   };
-  const onChange = ({ target = {} }: { target: any }) => {
-    inputChange(target.value);
+  const inputChange = ({ target = {} }: { target: any }) => {
+    fileChange(target.value);
   };
-  const onClear = () => {
-    inputChange();
-    mediaUploadTokenSet(undefined);
+  const clear = () => {
+    if (inputRef?.current?.value) inputRef.current.value = '';
+    fileChange();
+    onClear();
   };
 
-   return { blob, canConvert, convertIdempotencyToken, file, fileSet, handleUploadFile, idempotency: { token: iToken, set: iTokenSet}, mediaUploadToken, mediaUploadTokenSet, onChange, onClear, resetIToken, uploading, uploadDisabled, uploadingSet };
+  return { 
+    blob,
+    clear,
+    file,
+    fileSet,
+    inputProps: {
+      onChange: inputChange,
+      inputRef
+    },
+    submit,
+    successful,
+    working,
+  };
 };
