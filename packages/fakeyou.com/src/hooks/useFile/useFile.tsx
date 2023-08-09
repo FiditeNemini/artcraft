@@ -9,7 +9,7 @@ interface Props {
   onSubmit?: (file: any) => boolean;
 }
 
-export default function useUploader({ debug, onChange = n, onClear = n, onSubmit = n }: Props) {
+export default function useFile({ debug, onChange = n, onClear = n, onSubmit = n }: Props) {
   const [file, fileSet] = useState<any>(undefined);
   const [blob, blobSet] = useState<string>();
   const [working, workingSet] = useState(false);

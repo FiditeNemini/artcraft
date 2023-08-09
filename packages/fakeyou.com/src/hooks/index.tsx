@@ -1,5 +1,5 @@
+import useFile from './useFile';
 import useId from './useId';
 import useIdempotency from './useIdempotency';
-import useUploader from './useUploader';
 
-export { useId, useIdempotency, useUploader };
+export { useFile, useId, useIdempotency };

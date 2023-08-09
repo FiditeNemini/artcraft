@@ -1,5 +1,5 @@
 import React from "react";
-import { useUploader } from "hooks";
+import { useFile } from "hooks";
 import { AudioInput, ImageInput } from "components/common";
 import { PageHeader } from "components/layout";
 import './LipsyncEditor.scss';
@@ -43,8 +43,8 @@ const Title = ({ ...rest }) => {
 };
 
 export default function LipsyncEditor({ ...rest }) {
-  const audioProps = useUploader({ debug: 'audio useUploader' });
-  const imageProps = useUploader({});
+  const audioProps = useFile({ debug: 'audio useFile' });
+  const imageProps = useFile({});
 
   const subText = "Select an image with a clear face, or one of our existing templates, then choose either text to speech or uploaded audio(eg. music). Then you can generate a beautifully lipsynced video.";
   const headerProps = {
