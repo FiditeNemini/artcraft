@@ -121,7 +121,7 @@ export default function VcModelViewPage(props: VcModelViewPageProps) {
   const shareButton = <ShareButton url={shareUrl} />;
 
   return (
-    <div>
+    <PageContainer>
       <PageHeaderModelView
         title={title}
         subText={subText}
