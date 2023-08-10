@@ -109,6 +109,80 @@ where token IN (
     'vcm_m0z3tt4gytm9'
 );
 
+-- Remove duplicate models (2)
+update voice_conversion_models
+set
+    mod_deleted_at = NOW(),
+    maybe_mod_comments = 'duplicate model'
+where token IN (
+    'vcm_v790w43dv3ce',
+    'vcm_xmzm7eextc3n',
+    'vcm_r3b91dr0eta5',
+    'vcm_p1rpmfmckd5c',
+    'vcm_cpajdgenjfw7',
+    'vcm_qchjs52fsr9y',
+    'vcm_pkkjy8c6cpt3',
+    'vcm_f8ra6j8d6wgv',
+    'vcm_mhsz9bjn19tw',
+    'vcm_btd5zab2jdqv',
+    'vcm_q5evptaaqne3',
+    'vcm_wqtqs4gj2zmj',
+    'vcm_14rv35fct2ay',
+    'vcm_418j0h41qy8a',
+    'vcm_3m5m6bpm0rt2',
+    'vcm_gdw4krmaxpza',
+    'vcm_b3xhdb8zymvf',
+    'vcm_aak9m6nvj3am',
+    'vcm_mcw5kn21bbjh',
+    'vcm_fydr6ts21mtf',
+    'vcm_zpw560jzyqpw',
+    'vcm_w24wcctnxbxf',
+    'vcm_ya5tpzdcvvcz',
+    'vcm_1ctmgrjtn1j7',
+    'vcm_rk8fycc0reb2',
+    'vcm_e2c8942vky34',
+    'vcm_wevg8cf3hcw8',
+    'vcm_6hzbyg453xb9',
+    'vcm_xqfffshe2g0q',
+    'vcm_32j1zmcvn61n'
+);
+
+
+-- Remove duplicate models (3)
+update voice_conversion_models
+set
+    mod_deleted_at = NOW(),
+    maybe_mod_comments = 'duplicate model'
+where token IN (
+    'vcm_46sbq0r9hfjk',
+    'vcm_k8nseqy8jyte',
+    'vcm_gs8qam6npe46',
+    'vcm_djh15g49cxm8',
+    'vcm_d7zygjnp35my',
+    'vcm_334yqeq11rpm',
+    'vcm_6m3b6121318k',
+    'vcm_a419w7gw6jrt',
+    'vcm_wtyszwjwq0ts',
+    'vcm_0q9t2azhqvf1',
+    'vcm_fx2k40ffzjqg',
+    'vcm_wvjqmzd8y4mt',
+    'vcm_b2635v3p50je',
+    'vcm_zfyr07z2d0rb',
+    'vcm_yn2sn5j2jwed',
+    'vcm_z596ja3yvyy9',
+    'vcm_a1p854bn1sjs',
+    'vcm_fv24vmr93805',
+    'vcm_0y7vsc2e9s3r',
+    'vcm_5aqzq0d246rm',
+    'vcm_trvge62x7je9',
+    'vcm_sghga68kwggk',
+    'vcm_raxcc33pj608',
+    'vcm_a66b3va0sj64',
+    'vcm_bd1rjawqypw6',
+    'vcm_evzff14n721p',
+    'vcm_jnrr4ht9f42f'
+);
+
 -- Remove older models replaced by new versions
 update voice_conversion_models
 set
