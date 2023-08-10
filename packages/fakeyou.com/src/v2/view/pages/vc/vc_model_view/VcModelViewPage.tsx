@@ -20,6 +20,7 @@ import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapp
 import { RatingButtons } from "v2/view/_common/ratings/RatingButtons";
 import { RatingStats } from "v2/view/_common/ratings/RatingStats";
 import ShareButton from "components/common/ShareButton/ShareButton";
+import PageContainer from "components/common/PageContainer/PageContainer";
 
 interface VcModelViewPageProps {
   sessionWrapper: SessionWrapper;
@@ -81,7 +82,7 @@ export default function VcModelViewPage(props: VcModelViewPageProps) {
   const shareButton = <ShareButton url={shareUrl} />;
 
   return (
-    <div>
+    <PageContainer>
       <PageHeaderModelView
         title={title}
         subText={subText}
@@ -159,6 +160,6 @@ export default function VcModelViewPage(props: VcModelViewPageProps) {
           sessionWrapper={props.sessionWrapper}
         />
       </Panel>
-    </div>
+    </PageContainer>
   );
 }
