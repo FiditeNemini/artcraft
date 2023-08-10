@@ -147,7 +147,6 @@ where token IN (
     'vcm_32j1zmcvn61n'
 );
 
-
 -- Remove duplicate models (3)
 update voice_conversion_models
 set
@@ -181,6 +180,84 @@ where token IN (
     'vcm_bd1rjawqypw6',
     'vcm_evzff14n721p',
     'vcm_jnrr4ht9f42f'
+);
+
+-- Remove duplicate models (4)
+update voice_conversion_models
+set
+    mod_deleted_at = NOW(),
+    maybe_mod_comments = 'duplicate model'
+where token IN (
+    'vcm_ds2pz63sagan',
+    'vcm_wkczgvq2fjqq',
+    'vcm_z8137w1rddse',
+    'vcm_gknzxybf4erw',
+    'vcm_z0m1qtmawccn',
+    'vcm_yek6pmgvbb1s',
+    'vcm_qqhnjwsjrvnx',
+    'vcm_8fetm7qz94cp',
+    'vcm_kz1zm1d269j0',
+    'vcm_rfnkc8g5gbbv',
+    'vcm_4ncqxetfe7dm',
+    'vcm_qkpfem2a153n',
+    'vcm_z5jkd9r4cawf',
+    'vcm_vgh6ja6zzj0p',
+    'vcm_bd473tdrrzhk',
+    'vcm_2k7tmx3ndd3y',
+    'vcm_weyxz516dd2m',
+    'vcm_1j4kpjvgsj6k',
+    'vcm_211g17ea44fw',
+    'vcm_7zkbj6be0yr5',
+    'vcm_nnaaxeqy4xj6',
+    'vcm_wp7sgtz6mhc4',
+    'vcm_h5w7fzhxcpxm',
+    'vcm_7d5rxpqkjy07',
+    'vcm_9vhjvrptygfz',
+    'vcm_4qbbawahnkvb',
+    'vcm_am870m8162at',
+    'vcm_cftdb5227qt5',
+    'vcm_m7vv1mcxfxvm',
+    'vcm_qn8vsvvh1rqc',
+    'vcm_erhvqjvk1dsk',
+    'vcm_4zs8tdrw971e',
+    'vcm_4zs8tdrw971e',
+    'vcm_z8htjaejr1wx',
+    'vcm_99wdsazefjwr',
+    'vcm_k1at1sbepvqv',
+    'vcm_xcp34f5d7ygs',
+    'vcm_8v8srq9sx7cq',
+    'vcm_f2yf7bxmk8h5',
+    'vcm_gvtrjte4as1s',
+    'vcm_2s0y50avy43b',
+    'vcm_r638ygfxkpmq',
+    'vcm_1ttm6pxcpqna',
+    'vcm_0ytfkxh6pm4f',
+    'vcm_zderdrfmgq6c',
+    'vcm_jvdpr6mtddb8',
+    'vcm_9tvcv961g09x',
+    'vcm_aynpmxbhpy7n',
+    'vcm_2gzsjb5bdsdq',
+    'vcm_a0vep64tz56n',
+    'vcm_zt4hgc9pyv11',
+    'vcm_szfxm0crd8y8',
+    'vcm_3q89kba3cy5z',
+    'vcm_ywpwnhk4pv4x',
+    'vcm_4he8jjmengb3',
+    'vcm_jpdfswn0empy',
+    'vcm_2nztkt3rgm1q',
+    'vcm_q5gyxf5a11zf',
+    'vcm_sa7k9ycne147',
+    'vcm_p6gxtj9qefsg',
+    'vcm_j2fvzdyachtw',
+    'vcm_ecbv0rhc6br3',
+    'vcm_jrgwspz2wt7p',
+    'vcm_f5b4j3rt180n',
+    'vcm_pzajxdfcjfpa',
+    'vcm_rq4f2cbbm6j1',
+    'vcm_rdmfpbnab47w',
+    'vcm_03dtk4xtggm6',
+    'vcm_zx7mdkh9s9qb',
+    'vcm_e0megdtf71x6'
 );
 
 -- Remove older models replaced by new versions
