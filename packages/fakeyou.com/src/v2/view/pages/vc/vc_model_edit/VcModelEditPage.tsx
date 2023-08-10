@@ -6,6 +6,7 @@ import Panel from "components/common/Panel/Panel";
 import { faEye, faFilePen, faSave } from "@fortawesome/pro-solid-svg-icons";
 import PageHeaderModelView from "components/layout/PageHeaderModelView/PageHeaderModelView";
 import Button from "components/common/Button/Button";
+import PageContainer from "components/common/PageContainer/PageContainer";
 
 interface VcModelEditPageProps {
   sessionWrapper: SessionWrapper;
@@ -29,7 +30,7 @@ const visibility = [
 export default function VcModelEditPage(props: VcModelEditPageProps) {
   let { token } = useParams() as { token: string };
   return (
-    <div>
+    <PageContainer>
       <PageHeaderModelView
         title="Solid Snake"
         subText="Solid Snake"
@@ -66,6 +67,6 @@ export default function VcModelEditPage(props: VcModelEditPageProps) {
           <Button label="Share Link" icon={faSave} onClick={handleSave} />
         </div>
       </Panel>
-    </div>
+    </PageContainer>
   );
 }
