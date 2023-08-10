@@ -1,0 +1,27 @@
+# Persist clippy check configurations:
+# https://github.com/ericseppanen/cargo-cranky 
+# Clippy doesn't allow this (yet):
+# https://github.com/rust-lang/rust-clippy/issues/6625
+deny = [
+  # Rust
+  "unsafe_code", # We may remove this if needed
+
+  # Clippy
+  "clippy::redundant_static_lifetimes",
+]
+
+warn = [
+  # Clippy
+  "clippy::empty_structs_with_brackets",
+  "clippy::cast_possible_truncation",
+]
+
+allow = [
+  # Rust
+  "missing_docs", # Not everything needs documentation
+
+  # Clippy
+  "clippy::double_comparisons",
+  "clippy::single_char_pattern", # This is like punishing trailing commas
+]
+
