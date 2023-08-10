@@ -131,7 +131,17 @@ where token IN (
     'vcm_cwngb21xsf66',
     'vcm_jmzjrky179cm',
     'vcm_hj6a1nt1yvh9',
-    'vcm_6wwx1e3cd48s'
+    'vcm_6wwx1e3cd48s',
+    'vcm_pc76gc1xh7jg',
+    'vcm_gb0p1wmtk9wp',
+    'vcm_pbs955dvaeq6',
+    'vcm_x2wyzr6h6539',
+    'vcm_py7qwz310qff',
+    'vcm_k01bqvh0dseq',
+    'vcm_5m4dsn2fwa0q',
+    'vcm_hn9m98g1am3z',
+    'vcm_f9168tyyn6ex',
+    'vcm_03y9w4h99r1h'
 );
 
 
