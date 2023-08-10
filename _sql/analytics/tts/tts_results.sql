@@ -31,6 +31,29 @@ from (
 ) as sample
 where sample.is_generated_on_prem IS TRUE;
 
+-- Histogram of days of content per day
+select
+    date(created_at) as created_date,
+    sum(duration_millis) / 1000 / 60 / 60 / 24 as days
+from tts_results
+group by created_date
+
+-- Histogram of days of content per day (range)
+select
+    date(created_at) as created_date,
+    sum(duration_millis) / 1000 / 60 / 60 / 24 as days
+from tts_results
+where date(created_at) >= "2023-01-01"
+group by created_date
+
+-- Histogram of days of content per day (range)
+-- Maybe non-tablescan?
+select
+    date(created_at) as created_date,
+    sum(duration_millis) / 1000 / 60 / 60 / 24 as days
+from tts_results
+where created_at > (CURDATE() - INTERVAL 30 DAY)
+group by created_date
 
 -- Find TTS results for a single model
 select count(*) from tts_results

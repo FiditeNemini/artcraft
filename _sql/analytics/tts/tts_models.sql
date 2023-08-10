@@ -307,6 +307,21 @@ from (
 order by m.created_at desc
     limit 100;
 
+-- Histogram of model contributions
+select
+    date(created_at) as created_date,
+    count(*) as model_count
+from tts_models
+group by created_date
+
+-- Histogram of model contributions (within range)
+select
+    date(created_at) as created_date,
+    count(*) as model_count
+from tts_models
+where created_at > (CURDATE() - INTERVAL 5 DAY)
+group by created_date
+
 --
 -- Models deleted recently (voice actor take down)
 --
