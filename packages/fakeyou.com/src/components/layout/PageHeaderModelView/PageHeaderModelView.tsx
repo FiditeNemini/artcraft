@@ -1,5 +1,5 @@
 import React from "react";
-import Panel from "./Panel";
+import Panel from "../../common/Panel/Panel";
 
 interface PageHeaderModelViewProps {
   titleIcon?: React.ReactNode;
