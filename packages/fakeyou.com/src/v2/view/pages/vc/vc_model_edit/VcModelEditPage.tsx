@@ -1,10 +1,11 @@
 import React from "react";
 import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
 import { useParams } from "react-router-dom";
-import { Input, TextArea, Select } from "components/common/Input/Input";
+import { Input, TextArea, Select } from "components/common/Inputs/Inputs";
 import Panel from "components/common/Panel/Panel";
-import { faEye, faFilePen } from "@fortawesome/pro-solid-svg-icons";
+import { faEye, faFilePen, faSave } from "@fortawesome/pro-solid-svg-icons";
 import PageHeaderModelView from "components/layout/PageHeaderModelView/PageHeaderModelView";
+import Button from "components/common/Button/Button";
 
 interface VcModelEditPageProps {
   sessionWrapper: SessionWrapper;
@@ -12,6 +13,10 @@ interface VcModelEditPageProps {
 
 const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
   console.log(event.target.value);
+};
+
+const handleSave = (e: React.MouseEvent<HTMLButtonElement>) => {
+  console.log("save");
 };
 
 const savebtn = <button className="btn btn-primary">Save Changes</button>;
@@ -51,11 +56,14 @@ export default function VcModelEditPage(props: VcModelEditPageProps) {
           />
 
           <Select
+            isSearchable={false}
             icon={faEye}
             defaultValue={visibility[0]}
             options={visibility}
             label="Visibility"
           />
+
+          <Button label="Share Link" icon={faSave} onClick={handleSave} />
         </div>
       </Panel>
     </div>
