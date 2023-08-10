@@ -440,7 +440,7 @@ styles with important tags:
     .form-control-feedback {
       position: absolute;
       z-index: 2;
-      width: 2.375rem;
+      width: 2.75rem;
       // height: 2.375rem;
       // line-height: 2.69rem;
       text-align: center;
@@ -759,7 +759,7 @@ styles with important tags:
     padding-left: 2.25rem;
     padding-right: 0.5rem;
     background-color: $input-dark;
-    border-radius: 50px;
+    border-radius: 0.5rem;
     border-color: $input-dark !important;
     box-shadow: none;
     cursor: pointer;
