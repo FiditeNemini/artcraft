@@ -79,6 +79,7 @@ import { VoiceConversionModelListItem } from "@storyteller/components/src/api/vo
 import { CommunityCommissionsPage } from "./pages/contest/CommunityCommissionsPage";
 import { ProductUsageInfoPage } from "./pages/product_usage_info/ProductUsageInfoPage";
 import VcModelViewPage from "./pages/vc/vc_model_view/VcModelViewPage";
+import VcModelEditPage from "./pages/vc/vc_model_edit/VcModelEditPage";
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -500,6 +501,10 @@ class PageContainer extends React.Component<Props, State> {
               <ProductUsageInfoPage
                 sessionWrapper={this.props.sessionWrapper}
               />
+            </Route>
+
+            <Route path="/voice-conversion/:token/edit">
+              <VcModelEditPage sessionWrapper={this.props.sessionWrapper} />
             </Route>
 
             <Route path="/voice-conversion/:token">
