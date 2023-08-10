@@ -37,6 +37,37 @@ where
     and vc.mod_deleted_at IS NULL
 order by vc.title asc;
 
+-- Inventory duplicate non-deleted models
+select
+    vc.id,
+    vc.token,
+    vc.model_type,
+    vc.title,
+    u.username,
+    vc.original_download_url,
+    vc.created_at,
+    vc.updated_at
+from voice_conversion_models as vc
+         left join users AS u on
+            u.token = vc.creator_user_token
+where vc.original_download_url IN (
+    select original_download_url from (
+      select original_download_url,
+             count(*) as duplicate_count
+      from voice_conversion_models
+      where user_deleted_at IS NULL
+        and mod_deleted_at IS NULL
+      group by original_download_url
+      order by original_download_url desc
+    ) as duplicates
+    where duplicate_count > 1
+)
+and vc.user_deleted_at IS NULL
+and vc.mod_deleted_at IS NULL
+order by
+    vc.original_download_url asc,
+    id asc;
+
 -- order by vc.original_download_url ASC;
 
 --
