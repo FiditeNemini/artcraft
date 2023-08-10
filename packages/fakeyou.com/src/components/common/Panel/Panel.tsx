@@ -6,17 +6,17 @@ interface PanelProps {
   children: React.ReactNode;
   padding?: boolean;
   mb?: boolean;
+  mt?: boolean;
 }
 
-export default function Panel(props: PanelProps) {
+export default function Panel({ children, padding, mb, mt }: PanelProps) {
   return (
     <motion.div className="container-panel" variants={panel}>
       <div
-        className={`panel ${props.padding ? "p-3 py-4 p-md-4" : ""} ${
-          props.mb ? "mb-4" : ""
-        }`}
+        className={`panel ${padding ? "p-3 py-4 p-md-4" : ""}
+        ${mb ? "mb-4" : ""} ${mt ? "mt-4" : ""}`}
       >
-        {props.children}
+        {children}
       </div>
     </motion.div>
   );
