@@ -10,16 +10,16 @@ import {
 } from "@fortawesome/pro-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { FrontendInferenceJobType } from "@storyteller/components/src/jobs/InferenceJob";
-import Panel from "components/common/Panel";
+import Panel from "components/common/Panel/Panel";
 import { Link, useParams } from "react-router-dom";
 import { SessionVoiceConversionResultsList } from "v2/view/_common/SessionVoiceConversionResultsList";
 import { SessionSubscriptionsWrapper } from "@storyteller/components/src/session/SessionSubscriptionsWrapper";
-import PageHeaderModelView from "components/common/PageHeaderModelView";
+import PageHeaderModelView from "components/layout/PageHeaderModelView/PageHeaderModelView";
 import { CommentComponent } from "v2/view/_common/comments/CommentComponent";
 import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
 import { RatingButtons } from "v2/view/_common/ratings/RatingButtons";
 import { RatingStats } from "v2/view/_common/ratings/RatingStats";
-import ShareButton from "components/common/ShareButton";
+import ShareButton from "components/common/ShareButton/ShareButton";
 
 interface VcModelViewPageProps {
   sessionWrapper: SessionWrapper;
