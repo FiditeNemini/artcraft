@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import Tippy from "@tippyjs/react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faLink } from "@fortawesome/pro-solid-svg-icons";
+import Button from "../Button/Button";
 
 interface ShareButtonProps {
   url: string;
@@ -31,12 +32,15 @@ export default function ShareButton(props: ShareButtonProps) {
         theme="fakeyou"
         arrow={false}
       >
-        <button className="btn-action" onClick={copyToClipboard} type="button">
-          <span>
-            <FontAwesomeIcon icon={faLink} className="me-2" />
-          </span>
-          Share Link
-        </button>
+        <div>
+          <Button
+            label="Share Link"
+            icon={faLink}
+            secondary
+            small
+            onClick={copyToClipboard}
+          />
+        </div>
       </Tippy>
     </div>
   );
