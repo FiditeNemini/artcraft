@@ -80,6 +80,7 @@ import { CommunityCommissionsPage } from "./pages/contest/CommunityCommissionsPa
 import { ProductUsageInfoPage } from "./pages/product_usage_info/ProductUsageInfoPage";
 import VcModelViewPage from "./pages/vc/vc_model_view/VcModelViewPage";
 import VcModelEditPage from "./pages/vc/vc_model_edit/VcModelEditPage";
+import VcModelDeletePage from "./pages/vc/vc_model_delete/VcModelDeletePage";
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -501,6 +502,10 @@ class PageContainer extends React.Component<Props, State> {
               <ProductUsageInfoPage
                 sessionWrapper={this.props.sessionWrapper}
               />
+            </Route>
+
+            <Route path="/voice-conversion/:token/delete">
+              <VcModelDeletePage sessionWrapper={this.props.sessionWrapper} />
             </Route>
 
             <Route path="/voice-conversion/:token/edit">

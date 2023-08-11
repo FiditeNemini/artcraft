@@ -79,6 +79,18 @@ export default function PageHeaderModelView({
           </div>
         </Panel>
       )}
+
+      {view === "delete" && (
+        <Panel padding>
+          <div className="d-flex">
+            <div className="flex-grow-1">
+              <h2 className="fw-bold mb-0">
+                {icon}Delete {modelType} Model
+              </h2>
+            </div>
+          </div>
+        </Panel>
+      )}
     </div>
   );
 }
