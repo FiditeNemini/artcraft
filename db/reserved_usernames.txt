@@ -29,6 +29,57 @@ jungle_horse
 junglehorse
 voxelcam
 
+# Possible uses
+# See https://www.wired.com/story/by-seizing-music-elon-musk-shows-he-doesnt-know-what-made-twitter-good/
+album
+albums
+animation
+animations
+anime
+animes
+art
+artistic
+cartoon
+cartoons
+film
+films
+franchise
+franchises
+game
+games
+gif
+gifs
+media
+medias
+medium
+mediums
+movie
+movies
+music
+narrative
+narratives
+photo
+photos
+picture
+pictures
+playlist
+playlists
+plot
+plots
+sequel
+series
+song
+songs
+stories
+story
+track
+tracks
+trilogy
+video
+videos
+writing
+writings
+
 # Hypothetical brands/products
 generative
 generatv
@@ -40,10 +91,14 @@ admin
 administrator
 administrators
 admins
+avatar
+avatars
 employee
 employees
 employer
 employers
+handle
+handles
 member
 members
 mod
@@ -53,6 +108,8 @@ mods
 official
 staff
 user
+username
+usernames
 users
 verified
 
@@ -89,6 +146,7 @@ voice_ai
 voice_mod
 voiceai
 voicemod
+wombo
 
 # Existing frontend pages (frontend repo)
 about
