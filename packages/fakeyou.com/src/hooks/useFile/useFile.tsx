@@ -21,7 +21,7 @@ export default function useFile({ debug, onChange = n, onClear = n, onSubmit = n
     const onUploadResult = await onSubmit(file);
     workingSet(true);
     if (onUploadResult) { successSet(true); }
-    successSet(false);
+    else successSet(false);
   };
   const fileChange = (inputFile?: any) => {
     onChange(file);
