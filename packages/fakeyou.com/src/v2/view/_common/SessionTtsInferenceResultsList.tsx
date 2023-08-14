@@ -11,8 +11,7 @@ import {
   faLink,
   faHeadphonesSimple,
 } from "@fortawesome/free-solid-svg-icons";
-import { motion } from "framer-motion";
-import { container, sessionItem } from "../../../data/animation";
+
 import { SessionSubscriptionsWrapper } from "@storyteller/components/src/session/SessionSubscriptionsWrapper";
 import { Analytics } from "../../../common/Analytics";
 import { SessionTtsAudioPlayer } from "./SessionTtsAudioPlayer";
@@ -56,7 +55,10 @@ function SessionTtsInferenceResultList(props: Props) {
     };
     // TODO: We're having an outage and need to lower this.
     //const interval = setInterval(async () => fetch(), 15000);
-    const refreshInterval = Math.max(DEFAULT_QUEUE_REFRESH_INTERVAL_MILLIS, pendingTtsJobs.refresh_interval_millis);
+    const refreshInterval = Math.max(
+      DEFAULT_QUEUE_REFRESH_INTERVAL_MILLIS,
+      pendingTtsJobs.refresh_interval_millis
+    );
     const interval = setInterval(async () => fetch(), refreshInterval);
     fetch();
     return () => clearInterval(interval);
@@ -66,7 +68,7 @@ function SessionTtsInferenceResultList(props: Props) {
 
   // TODO(bt,2023-04-08): Clean this utter garbage duplication up.
 
-  // ============================= GENERIC INFERENCE ============================= 
+  // ============================= GENERIC INFERENCE =============================
 
   props.inferenceJobs.forEach((job) => {
     if (!job.maybeResultToken) {
@@ -113,9 +115,7 @@ function SessionTtsInferenceResultList(props: Props) {
         <div key={job.jobToken}>
           <div>
             <div>
-              <motion.div className={cssStyle} variants={sessionItem}>
-                {stateDescription}
-              </motion.div>
+              <div className={cssStyle}>{stateDescription}</div>
             </div>
           </div>
         </div>
@@ -135,10 +135,7 @@ function SessionTtsInferenceResultList(props: Props) {
               <button className="delete" aria-label="delete"></button>
             </div>*/}
           <div>
-            <motion.div
-              className="panel panel-tts-results p-4 gap-3 d-flex flex-column"
-              variants={sessionItem}
-            >
+            <div className="panel panel-tts-results p-4 gap-3 d-flex flex-column">
               <div>
                 <h5 className="mb-2">{job.maybeModelTitle}</h5>
                 <p>{job.maybeRawInferenceText}</p>
@@ -170,7 +167,7 @@ function SessionTtsInferenceResultList(props: Props) {
                   {t("common.SessionTtsInferenceResults.result.shareDownload")}
                 </Link>
               </div>
-            </motion.div>
+            </div>
           </div>
         </div>
       );
@@ -179,7 +176,7 @@ function SessionTtsInferenceResultList(props: Props) {
 
   // TODO(bt,2023-04-08): Clean this utter garbage duplication up.
 
-  // ============================= LEGACY TTS ============================= 
+  // ============================= LEGACY TTS =============================
 
   props.ttsInferenceJobs.forEach((job) => {
     if (!job.maybeResultToken) {
@@ -226,9 +223,7 @@ function SessionTtsInferenceResultList(props: Props) {
         <div key={job.jobToken}>
           <div>
             <div>
-              <motion.div className={cssStyle} variants={sessionItem}>
-                {stateDescription}
-              </motion.div>
+              <div className={cssStyle}>{stateDescription}</div>
             </div>
           </div>
         </div>
@@ -248,10 +243,7 @@ function SessionTtsInferenceResultList(props: Props) {
               <button className="delete" aria-label="delete"></button>
             </div>*/}
           <div>
-            <motion.div
-              className="panel panel-tts-results p-4 gap-3 d-flex flex-column"
-              variants={sessionItem}
-            >
+            <div className="panel panel-tts-results p-4 gap-3 d-flex flex-column">
               <div>
                 <h5 className="mb-2">{job.title}</h5>
                 <p>{job.rawInferenceText}</p>
@@ -283,14 +275,14 @@ function SessionTtsInferenceResultList(props: Props) {
                   {t("common.SessionTtsInferenceResults.result.shareDownload")}
                 </Link>
               </div>
-            </motion.div>
+            </div>
           </div>
         </div>
       );
     }
   });
 
-  // ============================= END LEGACY TTS ============================= 
+  // ============================= END LEGACY TTS =============================
 
   let noResultsSection = (
     <div className="panel panel-inner text-center p-5 rounded-5 h-100">
@@ -317,10 +309,7 @@ function SessionTtsInferenceResultList(props: Props) {
   ) {
     upgradeNotice = (
       <div className="d-flex flex-column gap-3 sticky-top zi-2">
-        <motion.div
-          className="alert alert-warning alert-cta mb-0"
-          variants={sessionItem}
-        >
+        <div className="alert alert-warning alert-cta mb-0">
           <FontAwesomeIcon icon={faClock} className="me-2" />
           <Trans i18nKey="common.SessionTtsInferenceResults.premium.ad">
             Don't want to wait? Step to the back of the line with a{" "}
@@ -336,7 +325,7 @@ function SessionTtsInferenceResultList(props: Props) {
           </Trans>{" "}
           (TTS Queued:{" "}
           <span className="text-red">~{pendingTtsJobs.pending_job_count}</span>)
-        </motion.div>
+        </div>
       </div>
     );
   }
@@ -345,14 +334,14 @@ function SessionTtsInferenceResultList(props: Props) {
   results.reverse();
 
   return (
-    <motion.div initial="hidden" animate="visible" variants={container}>
+    <div>
       <div>
         <div className="d-flex flex-column gap-3">
           {upgradeNotice}
           <div className="d-flex flex-column gap-3">{results}</div>
         </div>
       </div>
-    </motion.div>
+    </div>
   );
 }
 

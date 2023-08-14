@@ -9,8 +9,7 @@ import {
   User,
 } from "@storyteller/components/src/api/user/GetUserByUsername";
 import { BackLink } from "../../../_common/BackLink";
-import { motion } from "framer-motion";
-import { container, item, panel } from "../../../../../data/animation";
+
 import { PosthogClient } from "@storyteller/components/src/analytics/PosthogClient";
 
 interface Props {
@@ -111,17 +110,15 @@ function ProfileBanFc(props: Props) {
   let isDisabled = userData === undefined;
 
   return (
-    <motion.div initial="hidden" animate="visible" variants={container}>
+    <div>
       <div className="container pt-5 pb-4 px-lg-5 px-xl-3">
-        <motion.h1 className=" fw-bold mb-3" variants={item}>
-          Profile &amp; Preferences
-        </motion.h1>
-        <motion.div variants={item}>
+        <h1 className=" fw-bold mb-3">Profile &amp; Preferences</h1>
+        <div>
           <BackLink link={viewLinkUrl} text="Back to profile" />
-        </motion.div>
+        </div>
       </div>
 
-      <motion.form onSubmit={handleFormSubmit} variants={panel}>
+      <form onSubmit={handleFormSubmit}>
         <fieldset disabled={isDisabled}>
           <div className="container-panel py-5">
             <div className="panel p-3 p-lg-4">
@@ -164,21 +161,21 @@ function ProfileBanFc(props: Props) {
             </div>
           </div>
 
-          <motion.div className="container" variants={item}>
+          <div className="container">
             <button className="btn btn-primary w-100">Update Ban</button>
-          </motion.div>
+          </div>
         </fieldset>
-      </motion.form>
+      </form>
 
-      <motion.div className="container py-5" variants={item}>
+      <div className="container py-5">
         <p>Notes on banned users:</p>
         <ul>
           <li></li>
           <li></li>
           <li></li>
         </ul>
-      </motion.div>
-    </motion.div>
+      </div>
+    </div>
   );
 }
 

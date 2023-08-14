@@ -23,8 +23,7 @@ import { GetW2lTemplateUseCount } from "@storyteller/components/src/api/w2l/GetW
 import { BackLink } from "../../../_common/BackLink";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEdit, faTrash } from "@fortawesome/free-solid-svg-icons";
-import { motion } from "framer-motion";
-import { container, item, panel } from "../../../../../data/animation";
+
 import { ThirdPartyLinks } from "@storyteller/components/src/constants/ThirdPartyLinks";
 import { usePrefixedDocumentTitle } from "../../../../../common/UsePrefixedDocumentTitle";
 import { CommentComponent } from "../../../_common/comments/CommentComponent";
@@ -228,7 +227,7 @@ function W2lTemplateViewPage(props: Props) {
   ) {
     moderatorRows = (
       <>
-        <motion.div className="container-panel pt-3 pb-5" variants={item}>
+        <div className="container-panel pt-3 pb-5">
           <div className="panel p-3 p-lg-4">
             <h2 className="panel-title fw-bold">Moderator Details</h2>
             <div className="py-6">
@@ -274,7 +273,7 @@ function W2lTemplateViewPage(props: Props) {
               </table>
             </div>
           </div>
-        </motion.div>
+        </div>
       </>
     );
   }
@@ -384,7 +383,7 @@ function W2lTemplateViewPage(props: Props) {
   if (!!w2lTemplate?.description_rendered_html) {
     templateDescription = (
       <>
-        <motion.div className="container-panel pt-3 pb-5" variants={panel}>
+        <div className="container-panel pt-3 pb-5">
           <div className="panel p-3 p-lg-4">
             <h2 className="panel-title fw-bold">Model Description</h2>
             <div className="py-6">
@@ -396,7 +395,7 @@ function W2lTemplateViewPage(props: Props) {
               />
             </div>
           </div>
-        </motion.div>
+        </div>
       </>
     );
   }
@@ -413,18 +412,16 @@ function W2lTemplateViewPage(props: Props) {
     );
 
   return (
-    <motion.div initial="hidden" animate="visible" variants={container}>
+    <div>
       <div className="container py-5 px-md-4 px-lg-5 px-xl-3">
-        <motion.h1 className=" fw-bold" variants={item}>
-          Video Lip Sync Template
-        </motion.h1>
-        <motion.h4 variants={item}>Template: {w2lTemplate?.title}</motion.h4>
-        <motion.div className="pt-3" variants={item}>
+        <h1 className=" fw-bold">Video Lip Sync Template</h1>
+        <h4>Template: {w2lTemplate?.title}</h4>
+        <div className="pt-3">
           <BackLink link={WebUrl.w2lListPage()} text="Back to all templates" />
-        </motion.div>
+        </div>
       </div>
 
-      <motion.form onSubmit={handleInferenceFormSubmit} variants={panel}>
+      <form onSubmit={handleInferenceFormSubmit}>
         <div className="container-panel pt-4 pb-5">
           <div className="panel p-3 p-lg-4">
             <h2 className="panel-title fw-bold">Upload Audio</h2>
@@ -460,11 +457,11 @@ function W2lTemplateViewPage(props: Props) {
             </div>
           </div>
         </div>
-      </motion.form>
+      </form>
 
-      <motion.div variants={panel}>{templateDescription}</motion.div>
+      <div>{templateDescription}</div>
 
-      <motion.div className="container-panel pt-3 pb-5" variants={panel}>
+      <div className="container-panel pt-3 pb-5">
         <div className="panel p-3 p-lg-4">
           <h2 className="panel-title fw-bold">Template Details</h2>
           <div className="py-6">
@@ -494,9 +491,9 @@ function W2lTemplateViewPage(props: Props) {
             </table>
           </div>
         </div>
-      </motion.div>
+      </div>
 
-      <motion.div className="container-panel pt-3 pb-5" variants={panel}>
+      <div className="container-panel pt-3 pb-5">
         <div className="panel p-3 p-lg-4">
           <h2 className="panel-title fw-bold">Media Details</h2>
           <div className="py-6">
@@ -528,25 +525,25 @@ function W2lTemplateViewPage(props: Props) {
             </table>
           </div>
         </div>
-      </motion.div>
+      </div>
 
-      <motion.div variants={panel}>{moderatorRows}</motion.div>
+      <div>{moderatorRows}</div>
 
-      <motion.div className="container" variants={item}>
+      <div className="container">
         <div className="d-flex flex-column flex-lg-row gap-3">
           {editButton}
           {approveButton}
           {deleteButton}
         </div>
-      </motion.div>
+      </div>
 
-      <motion.div variants={item}>
+      <div>
         <div className="container pt-4 pb-5">
           <ReportDiscordLink />
         </div>
-      </motion.div>
+      </div>
 
-      <motion.div className="container-panel pt-4 pb-5" variants={item}>
+      <div className="container-panel pt-4 pb-5">
         <div className="panel p-3 p-lg-4">
           <h2 className="fw-bold panel-title">Comments</h2>
           <div className="py-6">
@@ -557,12 +554,12 @@ function W2lTemplateViewPage(props: Props) {
             />
           </div>
         </div>
-      </motion.div>
+      </div>
 
       <SessionW2lInferenceResultList
         w2lInferenceJobs={props.w2lInferenceJobs}
       />
-    </motion.div>
+    </div>
   );
 }
 

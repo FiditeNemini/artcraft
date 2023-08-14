@@ -9,8 +9,7 @@ import {
 } from "@storyteller/components/src/api/session/CreateSession";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faUser, faKey } from "@fortawesome/free-solid-svg-icons";
-import { motion } from "framer-motion";
-import { container, panel } from "../../../../data/animation";
+
 import { Analytics } from "../../../../common/Analytics";
 import { usePrefixedDocumentTitle } from "../../../../common/UsePrefixedDocumentTitle";
 import { PosthogClient } from "@storyteller/components/src/analytics/PosthogClient";
@@ -89,11 +88,8 @@ function LoginPage(props: Props) {
   }
 
   return (
-    <motion.div initial="hidden" animate="visible" variants={container}>
-      <motion.div
-        className="container-panel pb-5 pt-lg-5 my-lg-5 login-panel"
-        variants={panel}
-      >
+    <div>
+      <div className="container-panel pb-5 pt-lg-5 my-lg-5 login-panel">
         <div className="panel p-3 p-lg-4 load-hidden mt-5 mt-lg-0 px-md-4">
           <h1 className="panel-title fw-bold">Login</h1>
           <div className="py-6">
@@ -138,10 +134,7 @@ function LoginPage(props: Props) {
                 <button className="btn btn-primary w-100 mt-2">Login</button>
                 <p>
                   Don’t have an account? &nbsp;
-                  <Link
-                    to={WebUrl.signupPage()}
-                    className="text-link"
-                  >
+                  <Link to={WebUrl.signupPage()} className="text-link">
                     Create an account now.
                   </Link>
                 </p>
@@ -149,8 +142,8 @@ function LoginPage(props: Props) {
             </form>
           </div>
         </div>
-      </motion.div>
-    </motion.div>
+      </div>
+    </div>
   );
 }
 

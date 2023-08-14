@@ -24,8 +24,7 @@ import {
   faEyeSlash,
   faUser,
 } from "@fortawesome/free-solid-svg-icons";
-import { motion } from "framer-motion";
-import { container, item, panel } from "../../../../../data/animation";
+
 import { Analytics } from "../../../../../common/Analytics";
 import {
   TwitterShareButton,
@@ -431,12 +430,10 @@ function TtsResultViewPage(props: Props) {
   );
 
   return (
-    <motion.div initial="hidden" animate="visible" variants={container}>
+    <div>
       <div className="container py-5">
         <div className="d-flex flex-column">
-          <motion.h1 className=" fw-bold mb-2" variants={item}>
-            {headingTitle}
-          </motion.h1>
+          <h1 className=" fw-bold mb-2">{headingTitle}</h1>
           {/* Rate Result Buttons */}
           {/* Commented out because not ready yet. */}
           {/*<div className="d-flex gap-3">
@@ -478,16 +475,16 @@ function TtsResultViewPage(props: Props) {
             </div>
           </div>*/}
 
-          <motion.p className="mb-3 result-text pt-2">
+          <p className="mb-3 result-text pt-2">
             <TextExpander
               text={ttsInferenceResult.raw_inference_text}
               cutLength={240}
             />
-          </motion.p>
+          </p>
         </div>
       </div>
 
-      <motion.div className="container-panel pt-3 pb-5" variants={panel}>
+      <div className="container-panel pt-3 pb-5">
         <div className="panel p-3 p-lg-4">
           {subtitle}
           <div className="py-6">
@@ -495,7 +492,7 @@ function TtsResultViewPage(props: Props) {
             {downloadButton}
           </div>
         </div>
-      </motion.div>
+      </div>
 
       {/* Without wavesurfer, 
       <audio
@@ -505,18 +502,16 @@ function TtsResultViewPage(props: Props) {
             <code>audio</code> element.
       </audio>*/}
 
-      <motion.div className="container-panel pt-3 pb-5" variants={item}>
-        {socialSharing}
-      </motion.div>
+      <div className="container-panel pt-3 pb-5">{socialSharing}</div>
 
-      <motion.div className="container-panel pt-3 pb-5" variants={panel}>
+      <div className="container-panel pt-3 pb-5">
         <div className="panel p-3 p-lg-4">
           <h2 className="panel-title fw-bold">Spectrogram</h2>
           <SpectrogramImage spectrogramJsonLink={spectrogramLink} />
         </div>
-      </motion.div>
+      </div>
 
-      <motion.div className="container-panel pt-3 pb-5" variants={panel}>
+      <div className="container-panel pt-3 pb-5">
         <div className="panel p-3 p-lg-4">
           <h2 className="panel-title fw-bold">Result Details</h2>
           <div className="py-6">
@@ -552,9 +547,9 @@ function TtsResultViewPage(props: Props) {
             </table>
           </div>
         </div>
-      </motion.div>
+      </div>
 
-      <motion.div className="container-panel pt-3 pb-5" variants={panel}>
+      <div className="container-panel pt-3 pb-5">
         <div className="panel p-3 p-lg-4">
           <h2 className="panel-title fw-bold">Model Used</h2>
           <div className="py-6">
@@ -584,25 +579,25 @@ function TtsResultViewPage(props: Props) {
             </table>
           </div>
         </div>
-      </motion.div>
+      </div>
 
-      <motion.div variants={panel}>{moderatorRows}</motion.div>
+      <div>{moderatorRows}</div>
 
-      <motion.div className="container pb-5" variants={item}>
+      <div className="container pb-5">
         <div className="d-flex flex-column flex-md-row gap-3 mb-4">
           {editButton}
           {deleteButton}
         </div>
-        <motion.p className="text-center text-lg-start" variants={item}>
+        <p className="text-center text-lg-start">
           <ReportDiscordLink />
-        </motion.p>
+        </p>
 
-        <motion.div className="pt-5" variants={item}>
+        <div className="pt-5">
           <BackLink link="/" text="Back to all models" />
-        </motion.div>
-      </motion.div>
+        </div>
+      </div>
 
-      <motion.div className="container-panel pt-4 pb-5" variants={item}>
+      <div className="container-panel pt-4 pb-5">
         <div className="panel p-3 p-lg-4">
           <h2 className="fw-bold panel-title">Comments</h2>
           <div className="py-6">
@@ -613,8 +608,8 @@ function TtsResultViewPage(props: Props) {
             />
           </div>
         </div>
-      </motion.div>
-    </motion.div>
+      </div>
+    </div>
   );
 }
 

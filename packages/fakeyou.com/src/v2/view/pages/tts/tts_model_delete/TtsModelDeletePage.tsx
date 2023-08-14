@@ -4,8 +4,7 @@ import { WebUrl } from "../../../../../common/WebUrl";
 import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
 import { useParams, Link, useHistory } from "react-router-dom";
 import { BackLink } from "../../../_common/BackLink";
-import { motion } from "framer-motion";
-import { container, item, panel } from "../../../../../data/animation";
+
 import { PosthogClient } from "@storyteller/components/src/analytics/PosthogClient";
 
 interface TtsModelViewResponsePayload {
@@ -215,19 +214,17 @@ function TtsModelDeletePage(props: Props) {
   }
 
   return (
-    <motion.div initial="hidden" animate="visible" variants={container}>
+    <div>
       <div className="container py-5 pb-4 px-lg-5 px-xl-3">
         <div className="d-flex flex-column">
-          <motion.h1 className=" fw-bold mb-3" variants={item}>
-            {h1Title}
-          </motion.h1>
-          <motion.p variants={item}>
+          <h1 className=" fw-bold mb-3">{h1Title}</h1>
+          <p>
             <BackLink link={modelLink} text="Back to model" />
-          </motion.p>
+          </p>
         </div>
       </div>
 
-      <motion.form onSubmit={handleDeleteFormSubmit} variants={panel}>
+      <form onSubmit={handleDeleteFormSubmit}>
         <div className="container-panel pt-4 pb-5">
           <div className="panel p-3 py-4 p-lg-4">
             <table className="table">
@@ -273,14 +270,12 @@ function TtsModelDeletePage(props: Props) {
           </div>
         </div>
 
-        <motion.div className="container pb-5" variants={item}>
+        <div className="container pb-5">
           <button className={buttonCss}>{buttonTitle}</button>
-          <motion.label className="pt-4" variants={item}>
-            {formLabel}
-          </motion.label>
-        </motion.div>
-      </motion.form>
-    </motion.div>
+          <label className="pt-4">{formLabel}</label>
+        </div>
+      </form>
+    </div>
   );
 }
 

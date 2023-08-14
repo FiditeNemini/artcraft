@@ -8,8 +8,7 @@ import {
   GetW2lResultIsOk,
   W2lResult,
 } from "@storyteller/components/src/api/w2l/GetW2lResult";
-import { motion } from "framer-motion";
-import { container, item, panel } from "../../../../../data/animation";
+
 import { PosthogClient } from "@storyteller/components/src/analytics/PosthogClient";
 
 interface Props {
@@ -106,17 +105,15 @@ function W2lResultDeletePage(props: Props) {
   const durationSeconds = (w2lInferenceResult?.duration_millis || 0) / 1000;
 
   return (
-    <motion.div initial="hidden" animate="visible" variants={container}>
+    <div>
       <div className="container pt-5 pb-4 px-md-4 px-lg-5 px-xl-3">
-        <motion.h1 className=" fw-bold" variants={item}>
-          {h1Title}
-        </motion.h1>
-        <motion.div className="pt-3" variants={item}>
+        <h1 className=" fw-bold">{h1Title}</h1>
+        <div className="pt-3">
           <Link to={templateResultLink}>&lt; Back to result</Link>
-        </motion.div>
+        </div>
       </div>
 
-      <motion.form onSubmit={handleDeleteFormSubmit} variants={panel}>
+      <form onSubmit={handleDeleteFormSubmit}>
         <div className="container-panel pt-4 pb-5">
           <div className="panel p-3 py-4 p-lg-4">
             <table className="table">
@@ -148,14 +145,12 @@ function W2lResultDeletePage(props: Props) {
           </div>
         </div>
 
-        <motion.div className="container pb-5" variants={item}>
+        <div className="container pb-5">
           <button className={buttonCss}>{buttonTitle}</button>
-          <motion.p className="pt-4" variants={item}>
-            {formLabel}
-          </motion.p>
-        </motion.div>
-      </motion.form>
-    </motion.div>
+          <p className="pt-4">{formLabel}</p>
+        </div>
+      </form>
+    </div>
   );
 }
 

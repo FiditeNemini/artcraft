@@ -1,6 +1,5 @@
 import React from "react";
-import { motion } from "framer-motion";
-import { container, item, panel } from "../../../../../data/animation";
+
 import { usePrefixedDocumentTitle } from "../../../../../common/UsePrefixedDocumentTitle";
 import { PosthogClient } from "@storyteller/components/src/analytics/PosthogClient";
 
@@ -11,25 +10,19 @@ function PrivacyPage(props: Props) {
   usePrefixedDocumentTitle("Privacy Statement");
 
   return (
-    <motion.div initial="hidden" animate="visible" variants={container}>
+    <div>
       <div className="container pb-0 pt-5 pb-lg-5 px-md-4 px-lg-5 px-xl-3">
         <div className="d-flex flex-column">
-          <motion.h1
-            className=" fw-bold text-center text-lg-start"
-            variants={item}
-          >
+          <h1 className=" fw-bold text-center text-lg-start">
             FakeYou Privacy Statement
-          </motion.h1>
-          <motion.h4
-            className="mt-1 mb-4 opacity-75 text-center text-lg-start"
-            variants={item}
-          >
+          </h1>
+          <h4 className="mt-1 mb-4 opacity-75 text-center text-lg-start">
             Updated: November 18, 2022
-          </motion.h4>
+          </h4>
         </div>
       </div>
 
-      <motion.div className="container-panel pt-4 pb-5" variants={panel}>
+      <div className="container-panel pt-4 pb-5">
         <div className="panel p-3 p-lg-4 load-hidden mt-5 mt-lg-0">
           <h1 className="panel-title fw-bold">FakeYou and You</h1>
           <div className="py-6 d-flex flex-column gap-4">
@@ -1216,8 +1209,8 @@ function PrivacyPage(props: Props) {
             </p>
           </div>
         </div>
-      </motion.div>
-    </motion.div>
+      </div>
+    </div>
   );
 }
 

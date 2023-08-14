@@ -1,8 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { JobState } from "@storyteller/components/src/jobs/JobStates";
-import { motion } from "framer-motion";
-import { container, sessionItem, item } from "../../../data/animation";
+
 import { VoiceConversionModelUploadJob } from "@storyteller/components/src/jobs/VoiceConversionModelUploadJob";
 
 interface Props {
@@ -53,15 +52,12 @@ function SessionVoiceConversionModelUploadResultList(props: Props) {
 
       results.push(
         <div key={job.jobToken}>
-          <motion.div
-            className="panel py-4 p-3 p-lg-4 gap-4"
-            variants={sessionItem}
-          >
+          <div className="panel py-4 p-3 p-lg-4 gap-4">
             Complete!
             <Link to={permalink} className="btn btn-primary ms-4">
               See &amp; use voice conversion model
             </Link>
-          </motion.div>
+          </div>
         </div>
       );
     }
@@ -70,19 +66,19 @@ function SessionVoiceConversionModelUploadResultList(props: Props) {
   let title = <span />;
   if (results.length !== 0) {
     title = (
-      <motion.h2 className="text-center text-lg-start fw-bold" variants={item}>
+      <h2 className="text-center text-lg-start fw-bold">
         Voice Conversion Model Upload Status
-      </motion.h2>
+      </h2>
     );
   }
 
   return (
-    <motion.div initial="hidden" animate="visible" variants={container}>
+    <div>
       <div className="container-panel pt-4 pb-5">
         <div className="pb-4">{title}</div>
         <div className="d-flex flex-column gap-4">{results}</div>
       </div>
-    </motion.div>
+    </div>
   );
 }
 

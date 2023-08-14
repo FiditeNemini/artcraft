@@ -7,8 +7,7 @@ import { useHistory } from "react-router-dom";
 import { v4 as uuidv4 } from "uuid";
 import { BackLink } from "../../_common/BackLink";
 import { WebUrl } from "../../../../common/WebUrl";
-import { motion } from "framer-motion";
-import { container, item, panel } from "../../../../data/animation";
+
 import { PosthogClient } from "@storyteller/components/src/analytics/PosthogClient";
 
 interface W2lTemplateUploadJobResponsePayload {
@@ -93,29 +92,27 @@ function UploadW2lVideoPage(props: Props) {
   };
 
   return (
-    <motion.div initial="hidden" animate="visible" variants={container}>
+    <div>
       <div className="container pt-5 pb-3 px-md-4 px-lg-5 px-xl-3">
         <div className="d-flex flex-column">
-          <motion.h1 className=" fw-bold" variants={item}>
-            Upload Video (w2l template)
-          </motion.h1>
-          <motion.div className="my-3" variants={item}>
+          <h1 className=" fw-bold">Upload Video (w2l template)</h1>
+          <div className="my-3">
             <BackLink
               link={WebUrl.contributePage()}
               text="Back to contribute page"
             />
-          </motion.div>
+          </div>
         </div>
       </div>
 
-      <motion.div className="container px-md-4 px-lg-5 px-xl-3" variants={item}>
+      <div className="container px-md-4 px-lg-5 px-xl-3">
         <p>
           The videos you upload can be used for lipsyncing with audio using the
           Wav2Lip model.
         </p>
-      </motion.div>
+      </div>
 
-      <motion.form onSubmit={handleFormSubmit} variants={panel}>
+      <form onSubmit={handleFormSubmit}>
         <div className="container-panel py-5">
           <div className="panel p-3 py-4 p-lg-4">
             <div className="d-flex flex-column gap-4">
@@ -157,21 +154,21 @@ function UploadW2lVideoPage(props: Props) {
           </div>
         </div>
 
-        <motion.div className="container pb-5" variants={item}>
+        <div className="container pb-5">
           <button className="btn btn-primary w-100">Upload</button>
-        </motion.div>
+        </div>
 
         {/*<div className="field is-grouped">
           <div className="control">
             <button className="button is-link is-large is-fullwidth">Upload</button>
           </div>
         </div>*/}
-      </motion.form>
+      </form>
 
       <SessionW2lTemplateUploadResultList
         w2lTemplateUploadJobs={props.w2lTemplateUploadJobs}
       />
-    </motion.div>
+    </div>
   );
 }
 

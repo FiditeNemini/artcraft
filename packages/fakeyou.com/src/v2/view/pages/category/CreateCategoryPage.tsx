@@ -10,8 +10,7 @@ import {
 } from "@storyteller/components/src/api/category/CreateCategory";
 import { BackLink } from "../../_common/BackLink";
 import { WebUrl } from "../../../../common/WebUrl";
-import { motion } from "framer-motion";
-import { container, item, panel } from "../../../../data/animation";
+
 import { PosthogClient } from "@storyteller/components/src/analytics/PosthogClient";
 
 const DEFAULT_CAN_DIRECTLY_HAVE_MODELS = true;
@@ -195,35 +194,33 @@ function CreateCategoryPage(props: Props) {
   if (props.sessionWrapper.canEditCategories()) {
     moderateCategoriesLink = (
       <>
-        <motion.div className="container pt-4 pb-5" variants={item}>
+        <div className="container pt-4 pb-5">
           <Link
             to={WebUrl.moderationTtsCategoryList()}
             className="btn btn-secondary w-100"
           >
             Moderate categories
           </Link>
-        </motion.div>
+        </div>
       </>
     );
   }
 
   return (
-    <motion.div initial="hidden" animate="visible" variants={container}>
+    <div>
       <div className="container pb-4 pt-5 px-md-4 px-lg-5 px-xl-3">
-        <motion.h1 className=" fw-bold" variants={item}>
-          {categoryActionName} Category
-        </motion.h1>
-        <motion.div className="pt-3" variants={item}>
+        <h1 className=" fw-bold">{categoryActionName} Category</h1>
+        <div className="pt-3">
           <BackLink
             link={WebUrl.contributePage()}
             text="Back to contribute page"
           />
-        </motion.div>
+        </div>
       </div>
 
       {errorFlash}
 
-      <motion.form onSubmit={handleFormSubmit} variants={panel}>
+      <form onSubmit={handleFormSubmit}>
         <div className="container-panel pt-4 pb-5">
           <div className="panel p-3 py-4 p-lg-4">
             <div className="d-flex flex-column gap-4">
@@ -259,15 +256,15 @@ function CreateCategoryPage(props: Props) {
           </div>
         </div>
 
-        <motion.div className="container" variants={item}>
+        <div className="container">
           <button className="btn btn-primary w-100">
             {categoryActionName}
           </button>
-        </motion.div>
-      </motion.form>
+        </div>
+      </form>
 
       {moderateCategoriesLink}
-    </motion.div>
+    </div>
   );
 }
 

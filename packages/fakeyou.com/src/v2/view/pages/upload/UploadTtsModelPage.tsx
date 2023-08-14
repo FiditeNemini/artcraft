@@ -9,8 +9,7 @@ import { v4 as uuidv4 } from "uuid";
 import { BackLink } from "../../_common/BackLink";
 import { Link } from "react-router-dom";
 import { WebUrl } from "../../../../common/WebUrl";
-import { motion } from "framer-motion";
-import { container, item, panel } from "../../../../data/animation";
+
 import { PosthogClient } from "@storyteller/components/src/analytics/PosthogClient";
 
 interface Props {
@@ -120,23 +119,21 @@ function UploadTtsModelPage(props: Props) {
   };
 
   return (
-    <motion.div initial="hidden" animate="visible" variants={container}>
+    <div>
       <div className="container pt-5 pb-4 px-md-4 px-lg-5 px-xl-3">
         <div className="d-flex flex-column">
-          <motion.h1 className=" fw-bold" variants={item}>
-            Upload Voice (TTS Model)
-          </motion.h1>
-          <motion.h4 variants={item}>This works just like YouTube!</motion.h4>
-          <motion.div className="my-3" variants={item}>
+          <h1 className=" fw-bold">Upload Voice (TTS Model)</h1>
+          <h4>This works just like YouTube!</h4>
+          <div className="my-3">
             <BackLink
               link={WebUrl.contributePage()}
               text="Back to contribute page"
             />
-          </motion.div>
+          </div>
         </div>
       </div>
 
-      <motion.div className="container px-md-4 px-lg-5 px-xl-3" variants={item}>
+      <div className="container px-md-4 px-lg-5 px-xl-3">
         <div className="alert alert-primary">
           <strong>Content Creator Rewards!</strong>
           {/*<p>You can help FakeYou grow by uploading Tacotron2 models. 
@@ -149,12 +146,9 @@ function UploadTtsModelPage(props: Props) {
             featured roles in Discord, queue priority, and more!
           </div>
         </div>
-      </motion.div>
+      </div>
 
-      <motion.div
-        className="container pt-3 d-flex flex-column gap-3 px-md-4 px-lg-5 px-xl-3"
-        variants={item}
-      >
+      <div className="container pt-3 d-flex flex-column gap-3 px-md-4 px-lg-5 px-xl-3">
         <p>
           If you're new to voice cloning, join our{" "}
           <span>
@@ -180,18 +174,15 @@ function UploadTtsModelPage(props: Props) {
         Please do not upload voices that you didn't train yourself or voices of individuals
         who wish to not be voice cloned. We'll post a list of banned voices soon.
       </p>*/}
-      </motion.div>
+      </div>
 
-      <motion.form onSubmit={handleFormSubmit} variants={panel}>
+      <form onSubmit={handleFormSubmit}>
         <div className="container-panel py-5">
           <div className="panel p-3 py-4 p-lg-4">
             <div className="d-flex flex-column gap-4">
-
               {/* Model Type */}
               <div>
-                <label className="sub-title">
-                  TTS Model Type
-                </label>
+                <label className="sub-title">TTS Model Type</label>
                 <div className="control select">
                   <select
                     className="form-select"
@@ -199,12 +190,8 @@ function UploadTtsModelPage(props: Props) {
                     onChange={handleModelTypeChange}
                     value={modelType}
                   >
-                    <option value="tacotron2">
-                      Tacotron 2
-                    </option>
-                    <option value="vits">
-                      VITS
-                    </option>
+                    <option value="tacotron2">Tacotron 2</option>
+                    <option value="vits">VITS</option>
                   </select>
                 </div>
               </div>
@@ -242,20 +229,19 @@ function UploadTtsModelPage(props: Props) {
                 </div>
                 <p className="help">{downloadUrlInvalidReason}</p>
               </div>
-
             </div>
           </div>
         </div>
 
-        <motion.div className="container pb-5" variants={item}>
+        <div className="container pb-5">
           <button className="btn btn-primary w-100">Upload</button>
-        </motion.div>
-      </motion.form>
+        </div>
+      </form>
 
       <SessionTtsModelUploadResultList
         modelUploadJobs={props.ttsModelUploadJobs}
       />
-    </motion.div>
+    </div>
   );
 }
 

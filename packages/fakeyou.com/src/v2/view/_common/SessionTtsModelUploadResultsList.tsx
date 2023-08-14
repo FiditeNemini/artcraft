@@ -2,8 +2,6 @@ import React from "react";
 import { Link } from "react-router-dom";
 import { JobState } from "@storyteller/components/src/jobs/JobStates";
 import { TtsModelUploadJob } from "@storyteller/components/src/jobs/TtsModelUploadJobs";
-import { motion } from "framer-motion";
-import { container, sessionItem, item } from "../../../data/animation";
 
 interface Props {
   modelUploadJobs: Array<TtsModelUploadJob>;
@@ -53,15 +51,12 @@ function SessionTtsModelUploadResultList(props: Props) {
 
       results.push(
         <div key={job.jobToken}>
-          <motion.div
-            className="panel py-4 p-3 p-lg-4 gap-4"
-            variants={sessionItem}
-          >
+          <div className="panel py-4 p-3 p-lg-4 gap-4">
             Complete!
             <Link to={ttsPermalink} className="btn btn-primary ms-4">
               See &amp; use TTS model
             </Link>
-          </motion.div>
+          </div>
         </div>
       );
     }
@@ -70,9 +65,9 @@ function SessionTtsModelUploadResultList(props: Props) {
   let title = <span />;
   if (results.length !== 0) {
     title = (
-      <motion.h2 className="text-center text-lg-start fw-bold" variants={item}>
+      <h2 className="text-center text-lg-start fw-bold">
         TTS Model Upload Status
-      </motion.h2>
+      </h2>
     );
   }
 
@@ -83,12 +78,12 @@ function SessionTtsModelUploadResultList(props: Props) {
   }
 
   return (
-    <motion.div initial="hidden" animate="visible" variants={container}>
+    <div>
       <div className="container-panel pt-4 pb-5">
         <div className="pb-4">{title}</div>
         <div className="d-flex flex-column gap-4">{results}</div>
       </div>
-    </motion.div>
+    </div>
   );
 }
 

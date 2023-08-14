@@ -7,7 +7,10 @@ import { SessionTtsModelUploadResultList } from "../../../_common/SessionTtsMode
 import { SessionW2lInferenceResultList } from "../../../_common/SessionW2lInferenceResultsList";
 import { SessionW2lTemplateUploadResultList } from "../../../_common/SessionW2lTemplateUploadResultsList";
 import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
-import { FrontendInferenceJobType, InferenceJob } from "@storyteller/components/src/jobs/InferenceJob";
+import {
+  FrontendInferenceJobType,
+  InferenceJob,
+} from "@storyteller/components/src/jobs/InferenceJob";
 import { TtsInferenceJob } from "@storyteller/components/src/jobs/TtsInferenceJobs";
 import { TtsModelUploadJob } from "@storyteller/components/src/jobs/TtsModelUploadJobs";
 import { W2lInferenceJob } from "@storyteller/components/src/jobs/W2lInferenceJobs";
@@ -44,8 +47,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { GenericNotice } from "./notices/GenericNotice";
 import { DiscordLink2 } from "@storyteller/components/src/elements/DiscordLink2";
-import { motion } from "framer-motion";
-import { container, panel } from "../../../../../data/animation";
+
 import { SessionSubscriptionsWrapper } from "@storyteller/components/src/session/SessionSubscriptionsWrapper";
 import { TtsPageHero } from "./TtsPageHero";
 import { Analytics } from "../../../../../common/Analytics";
@@ -93,7 +95,10 @@ interface Props {
   isShowingBootstrapLanguageNotice: boolean;
   clearBootstrapLanguageNotice: () => void;
 
-  enqueueInferenceJob: (jobToken: string, frontendInferenceJobType: FrontendInferenceJobType) => void;
+  enqueueInferenceJob: (
+    jobToken: string,
+    frontendInferenceJobType: FrontendInferenceJobType
+  ) => void;
   inferenceJobs: Array<InferenceJob>;
   inferenceJobsByCategory: Map<FrontendInferenceJobType, Array<InferenceJob>>;
 
@@ -303,11 +308,13 @@ function TtsModelListPage(props: Props) {
       setMaybeTtsError(undefined);
 
       if (response.inference_job_token_type === "generic") {
-        props.enqueueInferenceJob(response.inference_job_token, FrontendInferenceJobType.TextToSpeech);
+        props.enqueueInferenceJob(
+          response.inference_job_token,
+          FrontendInferenceJobType.TextToSpeech
+        );
       } else {
         props.enqueueTtsJob(response.inference_job_token);
       }
-
     } else if (GenerateTtsAudioIsError(response)) {
       setMaybeTtsError(response.error);
     }
@@ -469,7 +476,8 @@ function TtsModelListPage(props: Props) {
   }
 
   // NB: If the text is too long, don't allow submission
-  let remainingCharactersButtonDisabled = props.textBuffer.trim().length > 
+  let remainingCharactersButtonDisabled =
+    props.textBuffer.trim().length >
     props.sessionSubscriptionsWrapper.ttsMaximumLength();
 
   let noTextInputButtonDisabled = props.textBuffer.trim() === "";
@@ -499,7 +507,7 @@ function TtsModelListPage(props: Props) {
   }
 
   return (
-    <motion.div initial="hidden" animate="visible" variants={container}>
+    <div>
       {bootstrapLanguageNotice}
 
       {pleaseFollowNotice}
@@ -515,7 +523,7 @@ function TtsModelListPage(props: Props) {
         sessionSubscriptionsWrapper={props.sessionSubscriptionsWrapper}
       />
 
-      <motion.div className="container-panel pb-5 mb-4" variants={panel}>
+      <div className="container-panel pb-5 mb-4">
         <div className="panel p-3 py-4 p-md-4">
           <i className="fas fa-volume-high"></i>
 
@@ -615,7 +623,11 @@ function TtsModelListPage(props: Props) {
                     </h4>
                     <div className="d-flex flex-column gap-3 session-tts-section">
                       <SessionTtsInferenceResultList
-                        inferenceJobs={props.inferenceJobsByCategory.get(FrontendInferenceJobType.TextToSpeech)!}
+                        inferenceJobs={
+                          props.inferenceJobsByCategory.get(
+                            FrontendInferenceJobType.TextToSpeech
+                          )!
+                        }
                         ttsInferenceJobs={props.ttsInferenceJobs}
                         sessionSubscriptionsWrapper={
                           props.sessionSubscriptionsWrapper
@@ -633,7 +645,7 @@ function TtsModelListPage(props: Props) {
         {/* <div className="pt-5">
           <BackLink link="/" text="Back to main page" />
         </div> */}
-      </motion.div>
+      </div>
 
       <SessionW2lInferenceResultList
         w2lInferenceJobs={props.w2lInferenceJobs}
@@ -646,7 +658,7 @@ function TtsModelListPage(props: Props) {
       <SessionTtsModelUploadResultList
         modelUploadJobs={props.ttsModelUploadJobs}
       />
-    </motion.div>
+    </div>
   );
 }
 

@@ -3,19 +3,13 @@ import { ApiConfig } from "@storyteller/components";
 import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
 import { Link } from "react-router-dom";
 import { BucketConfig } from "@storyteller/components/src/api/BucketConfig";
-import {
-  distance,
-  duration,
-  container,
-  item,
-  panel,
-} from "../../../../../data/animation";
+import { distance, duration } from "../../../../../data/animation";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faChevronLeft,
   faChevronRight,
 } from "@fortawesome/free-solid-svg-icons";
-import { motion } from "framer-motion";
+
 import { usePrefixedDocumentTitle } from "../../../../../common/UsePrefixedDocumentTitle";
 import { PageHeader } from "../../../_common/PageHeader";
 import { faVideo } from "@fortawesome/pro-solid-svg-icons";
@@ -206,7 +200,7 @@ function W2lTemplateListPage(props: Props) {
   const titleIcon = <FontAwesomeIcon icon={faVideo} className="me-3 me-lg-4" />;
 
   return (
-    <motion.div initial="hidden" animate="visible" variants={container}>
+    <div>
       <PageHeader
         title={title}
         subText={subText}
@@ -214,7 +208,7 @@ function W2lTemplateListPage(props: Props) {
         titleIcon={titleIcon}
       />
 
-      <motion.div className="container" variants={item}>
+      <div className="container">
         <div className="d-flex  w-100 gap-3 mb-4">
           <button
             className="btn btn-secondary w-100 d-flex align-items-center justify-content-center"
@@ -234,9 +228,9 @@ function W2lTemplateListPage(props: Props) {
             <FontAwesomeIcon icon={faChevronRight} className="ms-2" />
           </button>
         </div>
-      </motion.div>
+      </div>
 
-      <motion.div className="container-panel" variants={panel}>
+      <div className="container-panel">
         <div className="panel p-3 p-lg-4">
           <Fade bottom cascade duration={duration} distance={distance}>
             <div className="row gy-3 gx-3 gx-md-4 gy-md-4 w2l-ani">
@@ -244,9 +238,9 @@ function W2lTemplateListPage(props: Props) {
             </div>
           </Fade>
         </div>
-      </motion.div>
+      </div>
 
-      <motion.div className="container" variants={item}>
+      <div className="container">
         <div className="d-flex w-100 gap-3 my-4">
           <button
             className="btn btn-secondary w-100 d-flex align-items-center justify-content-center"
@@ -266,15 +260,15 @@ function W2lTemplateListPage(props: Props) {
             <FontAwesomeIcon icon={faChevronRight} className="ms-2" />
           </button>
         </div>
-      </motion.div>
+      </div>
 
-      <motion.div className="container pb-5" variants={item}>
+      <div className="container pb-5">
         <p>
           This feature is based on Wav2Lip by by Prajwal, K R and Mukhopadhyay,
           Rudrabha and Namboodiri, Vinay P. and Jawahar, C.V.
         </p>
-      </motion.div>
-    </motion.div>
+      </div>
+    </div>
   );
 }
 
