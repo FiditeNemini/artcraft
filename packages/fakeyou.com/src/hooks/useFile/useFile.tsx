@@ -6,7 +6,7 @@ interface Props {
   debug?: any;
   onChange?: (file: any) => void;
   onClear?: (x?: any) => void;
-  onSubmit?: (file: any) => boolean;
+  onSubmit?: (file: any) => Promise<boolean>;
 }
 
 export default function useFile({ debug, onChange = n, onClear = n, onSubmit = n }: Props) {
