@@ -31,8 +31,7 @@ import {
   faDeleteLeft,
   faVolumeHigh,
 } from "@fortawesome/free-solid-svg-icons";
-import { motion } from "framer-motion";
-import { container, panel } from "../../../../../data/animation";
+
 import { SessionSubscriptionsWrapper } from "@storyteller/components/src/session/SessionSubscriptionsWrapper";
 import { TtsPageHero } from "./TrumpTtsPageHero";
 import { Analytics } from "../../../../../common/Analytics";
@@ -167,7 +166,7 @@ function TrumpTtsPage(props: Props) {
 
         let trumpModels = models.filter((model) => {
           return PAGE_MODEL_TOKENS.has(model.model_token);
-        })
+        });
 
         let model = trumpModels[Math.floor(Math.random() * trumpModels.length)];
 
@@ -366,24 +365,27 @@ function TrumpTtsPage(props: Props) {
 
   let trumpModels = props.ttsModels.filter((model) => {
     return PAGE_MODEL_TOKENS.has(model.model_token);
-  })
+  });
 
   let maybeSelectedModel = props.maybeSelectedTtsModel;
 
-  if (maybeSelectedModel !== undefined && !PAGE_MODEL_TOKENS.has(maybeSelectedModel.model_token)) {
-    // If we don't select a trump model by default (which is rare), the list will be empty. 
+  if (
+    maybeSelectedModel !== undefined &&
+    !PAGE_MODEL_TOKENS.has(maybeSelectedModel.model_token)
+  ) {
+    // If we don't select a trump model by default (which is rare), the list will be empty.
     // We'll set it here.
     maybeSelectedModel = trumpModels[0];
   }
 
   return (
-    <motion.div initial="hidden" animate="visible" variants={container}>
+    <div>
       <TtsPageHero
         sessionWrapper={props.sessionWrapper}
         sessionSubscriptionsWrapper={props.sessionSubscriptionsWrapper}
       />
 
-      <motion.div className="container-panel pb-5 mb-4" variants={panel}>
+      <div className="container-panel pb-5 mb-4">
         <div className="panel p-3 py-4 p-md-4">
           <i className="fas fa-volume-high"></i>
 
@@ -490,8 +492,8 @@ function TrumpTtsPage(props: Props) {
             </form>
           </div>
         </div>
-      </motion.div>
-    </motion.div>
+      </div>
+    </div>
   );
 }
 

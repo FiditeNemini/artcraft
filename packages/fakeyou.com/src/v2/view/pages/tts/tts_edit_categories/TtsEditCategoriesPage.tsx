@@ -32,8 +32,7 @@ import {
   faXmark,
 } from "@fortawesome/free-solid-svg-icons";
 import { useParams, Link } from "react-router-dom";
-import { motion } from "framer-motion";
-import { container, item, panel } from "../../../../../data/animation";
+
 import { PosthogClient } from "@storyteller/components/src/analytics/PosthogClient";
 
 interface Props {
@@ -259,25 +258,20 @@ function TtsEditCategoriesPage(props: Props) {
   }
 
   return (
-    <motion.div initial="hidden" animate="visible" variants={container}>
+    <div>
       <div className="container py-5 pb-4 px-lg-5 px-xl-3">
         <div className="d-flex flex-column">
-          <motion.h1 className=" fw-bold" variants={item}>
-            Edit Categories
-          </motion.h1>
-          <motion.h4 className="mb-4" variants={item}>
-            {" "}
-            TTS Model: {ttsModel.title}{" "}
-          </motion.h4>
-          <motion.p variants={item}>
+          <h1 className=" fw-bold">Edit Categories</h1>
+          <h4 className="mb-4"> TTS Model: {ttsModel.title} </h4>
+          <p>
             <BackLink link={modelLink} text="Back to model" />
-          </motion.p>
+          </p>
         </div>
       </div>
 
       {errorFlash}
 
-      <motion.div className="container-panel py-5" variants={panel}>
+      <div className="container-panel py-5">
         <div className="panel p-3 p-lg-4">
           <h2 className="panel-title fw-bold">Current categories</h2>
           <div className="py-6">
@@ -287,9 +281,9 @@ function TtsEditCategoriesPage(props: Props) {
             </ul>
           </div>
         </div>
-      </motion.div>
+      </div>
 
-      <motion.div className="container-panel pt-3 pb-5" variants={panel}>
+      <div className="container-panel pt-3 pb-5">
         <div className="panel p-3 p-lg-4">
           <h2 className="panel-title fw-bold">Add new category</h2>
           <div className="py-6">
@@ -307,8 +301,8 @@ function TtsEditCategoriesPage(props: Props) {
             </div>
           </div>
         </div>
-      </motion.div>
-    </motion.div>
+      </div>
+    </div>
   );
 }
 

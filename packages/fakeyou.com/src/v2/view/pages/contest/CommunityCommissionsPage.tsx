@@ -1,7 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { motion } from "framer-motion";
-import { container, item, panel } from "../../../../data/animation";
+
 import { usePrefixedDocumentTitle } from "../../../../common/UsePrefixedDocumentTitle";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faWaveformLines } from "@fortawesome/pro-solid-svg-icons";
@@ -15,7 +14,7 @@ function CommunityCommissionsPage(props: Props) {
   PosthogClient.recordPageview();
 
   return (
-    <motion.div initial="hidden" animate="visible" variants={container}>
+    <div>
       <div className="container pt-3 pt-lg-5 pb-5">
         <div className="row gx-3 align-items-center">
           <div className="col-lg-5">
@@ -31,14 +30,11 @@ function CommunityCommissionsPage(props: Props) {
           <div className="col-lg-7 px-md-2 ps-lg-5 ps-xl-2">
             <div className="text-center text-lg-start">
               <div>
-                <motion.h1
-                  className=" fw-bold lh-1 mb-4 display-5"
-                  variants={item}
-                >
+                <h1 className=" fw-bold lh-1 mb-4 display-5">
                   Voice to Voice
                   <br />
                   Community Commissions
-                </motion.h1>
+                </h1>
               </div>
               <div>
                 <p className="lead">
@@ -70,7 +66,7 @@ function CommunityCommissionsPage(props: Props) {
         </div>
       </div>
 
-      <motion.div className="container-panel pt-lg-5 pb-5" variants={panel}>
+      <div className="container-panel pt-lg-5 pb-5">
         <div className="panel p-3 p-lg-4 load-hidden mt-5 mt-lg-0">
           <h1 className="panel-title fw-bold">Details</h1>
           <div className="py-6 d-flex flex-column gap-4">
@@ -108,8 +104,8 @@ function CommunityCommissionsPage(props: Props) {
             </a>
           </div>
         </div>
-      </motion.div>
-    </motion.div>
+      </div>
+    </div>
   );
 }
 

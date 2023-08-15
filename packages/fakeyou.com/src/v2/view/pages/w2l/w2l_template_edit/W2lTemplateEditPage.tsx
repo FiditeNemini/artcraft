@@ -11,8 +11,7 @@ import {
   W2lTemplate,
 } from "@storyteller/components/src/api/w2l/GetW2lTemplate";
 import { BackLink } from "../../../_common/BackLink";
-import { motion } from "framer-motion";
-import { container, item, panel } from "../../../../../data/animation";
+
 import { PosthogClient } from "@storyteller/components/src/analytics/PosthogClient";
 
 const DEFAULT_VISIBILITY = "public";
@@ -121,7 +120,7 @@ function W2lTemplateEditPage(props: Props) {
     visibility === "public" ? <VisibleIconFc /> : <HiddenIconFc />;
 
   return (
-    <motion.div initial="hidden" animate="visible" variants={container}>
+    <div>
       <div className="container pt-5 pb-4 px-lg-5 px-xl-3">
         <div className="d-flex flex-column">
           <h1 className=" fw-bold">Edit Template</h1>
@@ -131,7 +130,7 @@ function W2lTemplateEditPage(props: Props) {
         </div>
       </div>
 
-      <motion.form onSubmit={handleFormSubmit} variants={panel}>
+      <form onSubmit={handleFormSubmit}>
         <fieldset disabled={isDisabled}>
           <div className="container-panel pt-4 pb-5">
             <div className="panel p-3 py-4 p-lg-4">
@@ -187,12 +186,12 @@ function W2lTemplateEditPage(props: Props) {
             </div>
           </div>
 
-          <motion.div className="container pb-5" variants={item}>
+          <div className="container pb-5">
             <button className="btn btn-primary w-100">Update Template</button>
-          </motion.div>
+          </div>
         </fieldset>
-      </motion.form>
-    </motion.div>
+      </form>
+    </div>
   );
 }
 

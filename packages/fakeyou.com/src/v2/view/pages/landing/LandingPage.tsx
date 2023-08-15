@@ -1,7 +1,6 @@
 import React, { useMemo } from "react";
 import { Link } from "react-router-dom";
-import { motion } from "framer-motion";
-import { container } from "../../../../data/animation";
+
 import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
 import { SessionSubscriptionsWrapper } from "@storyteller/components/src/session/SessionSubscriptionsWrapper";
 import { t } from "i18next";
@@ -145,7 +144,7 @@ function LandingPage(props: Props) {
   }, []);
 
   return (
-    <motion.div initial="hidden" animate="visible" variants={container}>
+    <div>
       <div className="container pb-5 pb-lg-0 pt-lg-4 px-md-5 px-lg-5 px-xl-3">
         {/* Community Commissions Alert */}
         {/* <div className="alert alert-info">
@@ -516,7 +515,7 @@ function LandingPage(props: Props) {
           />
         </div>
       </div>
-    </motion.div>
+    </div>
   );
 }
 

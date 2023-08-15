@@ -10,8 +10,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faUser, faEnvelope, faKey } from "@fortawesome/free-solid-svg-icons";
 import { Link, useHistory } from "react-router-dom";
 import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
-import { motion } from "framer-motion";
-import { container, panel } from "../../../../data/animation";
+
 import { Analytics } from "../../../../common/Analytics";
 import queryString from "query-string";
 import { WebUrl } from "../../../../common/WebUrl";
@@ -71,8 +70,7 @@ function SignupPage(props: Props) {
         usernameInvalidReason = t("account.SignUpPage.errors.usernameTooShort");
       } else if (newUsername.length > 15) {
         usernameValid = FieldTriState.FALSE;
-        usernameInvalidReason = t("account.SignUpPage.errors.usernameTooLong")
-
+        usernameInvalidReason = t("account.SignUpPage.errors.usernameTooLong");
       } else {
         usernameValid = FieldTriState.TRUE;
       }
@@ -100,7 +98,6 @@ function SignupPage(props: Props) {
       } else if (!newEmail.includes("@")) {
         emailValid = FieldTriState.FALSE;
         emailInvalidReason = t("account.SignUpPage.errors.emailInvalid");
-
       } else {
         emailValid = FieldTriState.TRUE;
       }
@@ -133,8 +130,9 @@ function SignupPage(props: Props) {
 
       if (newPassword !== passwordConfirmation) {
         passwordConfirmationValid = FieldTriState.FALSE;
-        passwordConfirmationInvalidReason = t("account.SignUpPage.errors.passwordsDoNotMatch");
-
+        passwordConfirmationInvalidReason = t(
+          "account.SignUpPage.errors.passwordsDoNotMatch"
+        );
       } else {
         passwordConfirmationValid = FieldTriState.TRUE;
         passwordConfirmationInvalidReason = "";
@@ -163,7 +161,9 @@ function SignupPage(props: Props) {
     if (newPasswordConfirmation.length > 1) {
       if (newPasswordConfirmation !== password) {
         passwordConfirmationValid = FieldTriState.FALSE;
-        passwordConfirmationInvalidReason = t("account.SignUpPage.errors.passwordsDoNotMatch");
+        passwordConfirmationInvalidReason = t(
+          "account.SignUpPage.errors.passwordsDoNotMatch"
+        );
       } else {
         passwordConfirmationValid = FieldTriState.TRUE;
         passwordConfirmationInvalidReason = "";
@@ -254,7 +254,7 @@ function SignupPage(props: Props) {
   };
 
   const afterSignupRedirect = async () => {
-    const maybeInternalPlanKey = parsedQueryString['sub'] as string | undefined;
+    const maybeInternalPlanKey = parsedQueryString["sub"] as string | undefined;
 
     if (maybeInternalPlanKey !== undefined) {
       return await BeginStripeCheckoutFlow(maybeInternalPlanKey);
@@ -264,7 +264,7 @@ function SignupPage(props: Props) {
     history.push(redirectUrl);
 
     return true;
-  }
+  };
 
   usePrefixedDocumentTitle("Create an account");
 
@@ -346,11 +346,8 @@ function SignupPage(props: Props) {
   }
 
   return (
-    <motion.div initial="hidden" animate="visible" variants={container}>
-      <motion.div
-        className="container-panel pb-5 pt-lg-5 my-lg-5 login-panel"
-        variants={panel}
-      >
+    <div>
+      <div className="container-panel pb-5 pt-lg-5 my-lg-5 login-panel">
         <div className="panel p-3 p-lg-4 load-hidden mt-5 mt-lg-0 px-md-4">
           <h1 className="panel-title fw-bold ">
             {t("account.SignUpPage.signUpTitle")}
@@ -369,7 +366,9 @@ function SignupPage(props: Props) {
                     <input
                       className={usernameInputClass}
                       type="text"
-                      placeholder={t("account.SignUpPage.inputs.usernamePlaceholder")}
+                      placeholder={t(
+                        "account.SignUpPage.inputs.usernamePlaceholder"
+                      )}
                       value={username}
                       onChange={handleUsernameChange}
                     />
@@ -387,7 +386,9 @@ function SignupPage(props: Props) {
                     <input
                       className={emailInputClass}
                       type="email"
-                      placeholder={t("account.SignUpPage.inputs.emailPlaceholder")}
+                      placeholder={t(
+                        "account.SignUpPage.inputs.emailPlaceholder"
+                      )}
                       value={email}
                       onChange={handleEmailChange}
                     />
@@ -405,7 +406,9 @@ function SignupPage(props: Props) {
                     <input
                       className={passwordInputClass}
                       type="password"
-                      placeholder={t("account.SignUpPage.inputs.passwordPlaceholder")}
+                      placeholder={t(
+                        "account.SignUpPage.inputs.passwordPlaceholder"
+                      )}
                       value={password}
                       onChange={handlePasswordChange}
                     />
@@ -423,7 +426,9 @@ function SignupPage(props: Props) {
                     <input
                       className={passwordConfirmationInputClass}
                       type="password"
-                      placeholder={t("account.SignUpPage.inputs.passwordConfirmPlaceholder")}
+                      placeholder={t(
+                        "account.SignUpPage.inputs.passwordConfirmPlaceholder"
+                      )}
                       value={passwordConfirmation}
                       onChange={handlePasswordConfirmationChange}
                     />
@@ -451,8 +456,8 @@ function SignupPage(props: Props) {
             </form>
           </div>
         </div>
-      </motion.div>
-    </motion.div>
+      </div>
+    </div>
   );
 }
 

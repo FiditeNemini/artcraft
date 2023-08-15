@@ -35,8 +35,7 @@ import {
   TEXT_PIPELINE_NAMES,
   TEXT_PIPELINE_NAMES_FOR_MODERATORS,
 } from "@storyteller/components/src/constants/TextPipeline";
-import { motion } from "framer-motion";
-import { container, item, panel } from "../../../../../data/animation";
+
 import { faFunction } from "@fortawesome/pro-solid-svg-icons";
 import { PosthogClient } from "@storyteller/components/src/analytics/PosthogClient";
 
@@ -468,19 +467,17 @@ function TtsModelEditPage(props: Props) {
   }
 
   return (
-    <motion.div initial="hidden" animate="visible" variants={container}>
+    <div>
       <div className="container py-5 pb-4 px-lg-5 px-xl-3">
         <div className="d-flex flex-column">
-          <motion.h1 className=" fw-bold mb-3" variants={item}>
-            Edit Model
-          </motion.h1>
-          <motion.p variants={item}>
+          <h1 className=" fw-bold mb-3">Edit Model</h1>
+          <p>
             <BackLink link={modelLink} text="Back to model" />
-          </motion.p>
+          </p>
         </div>
       </div>
 
-      <motion.form onSubmit={handleFormSubmit} variants={panel}>
+      <form onSubmit={handleFormSubmit}>
         <fieldset disabled={isDisabled}>
           <div className="container-panel pt-4 pb-5">
             <div className="panel p-3 py-4 p-lg-4">
@@ -627,12 +624,12 @@ function TtsModelEditPage(props: Props) {
             </div>
           </div>
 
-          <motion.div className="container pb-5" variants={item}>
+          <div className="container pb-5">
             <button className="btn btn-primary w-100">Update</button>
-          </motion.div>
+          </div>
         </fieldset>
-      </motion.form>
-    </motion.div>
+      </form>
+    </div>
   );
 }
 

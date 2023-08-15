@@ -13,8 +13,7 @@ import {
   faTags,
   faHandsHelping,
 } from "@fortawesome/free-solid-svg-icons";
-import { motion } from "framer-motion";
-import { container, item, panel } from "../../../../data/animation";
+
 import { usePrefixedDocumentTitle } from "../../../../common/UsePrefixedDocumentTitle";
 import { PageHeader } from "../../_common/PageHeader";
 import {
@@ -57,20 +56,20 @@ function ContributeIndexPage(props: Props) {
   );
 
   return (
-    <motion.div initial="hidden" animate="visible" variants={container}>
+    <div>
       {/* <div className="container py-5 px-md-4 px-lg-5 px-xl-3">
         <div className="d-flex flex-column">
-          <motion.h1 className=" fw-bold" variants={item}>
+          <h1 className=" fw-bold" >
             {t("pages.contributeIndex.heroTitle")}
-          </motion.h1>
-          <motion.h3 className="mb-4" variants={item}>
+          </h1>
+          <h3 className="mb-4" >
             <Trans i18nKey="pages.contributeIndex.heroSubtitle">
               You make FakeYou <strong>better</strong> by contributing
             </Trans>
-          </motion.h3>
-          <motion.p className="pb-4" variants={item}>
+          </h3>
+          <p className="pb-4" >
             {t("pages.contributeIndex.introText")}
-          </motion.p>
+          </p>
         </div>
       </div> */}
       <PageHeader
@@ -80,7 +79,7 @@ function ContributeIndexPage(props: Props) {
         titleIcon={titleIcon}
       />
 
-      <motion.div className="container-panel pb-3" variants={panel}>
+      <div className="container-panel pb-3">
         <div className="panel p-3 py-4 p-md-4 text-center text-lg-start">
           <h2 className="fw-bold">
             <FontAwesomeIcon icon={faFileArrowUp} className="me-3" />
@@ -134,9 +133,9 @@ function ContributeIndexPage(props: Props) {
             </div>
           </div>
         </div>
-      </motion.div>
+      </div>
 
-      <motion.div className="container-panel pt-3 pb-3" variants={item}>
+      <div className="container-panel pt-3 pb-3">
         <div className="panel p-3 py-4 p-md-4 text-center text-lg-start">
           <h2 className="fw-bold">
             <FontAwesomeIcon icon={faTags} className="me-3" />
@@ -156,7 +155,7 @@ function ContributeIndexPage(props: Props) {
             </div>
           </div>
         </div>
-      </motion.div>
+      </div>
       <div className="container-panel pt-3">
         <div className="panel p-3 py-4 p-md-4 text-center text-lg-start">
           <h2 className="fw-bold">
@@ -177,7 +176,7 @@ function ContributeIndexPage(props: Props) {
           </div>
         </div>
       </div>
-    </motion.div>
+    </div>
   );
 }
 

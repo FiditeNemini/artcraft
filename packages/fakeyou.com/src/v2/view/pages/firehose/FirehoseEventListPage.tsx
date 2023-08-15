@@ -15,8 +15,8 @@ import {
   faDiscord,
   faTwitch,
 } from "@fortawesome/free-brands-svg-icons";
-import { motion } from "framer-motion";
-import { duration, delay, container, item } from "../../../../data/animation";
+import { duration, delay } from "../../../../data/animation";
+
 import { usePrefixedDocumentTitle } from "../../../../common/UsePrefixedDocumentTitle";
 import { PosthogClient } from "@storyteller/components/src/analytics/PosthogClient";
 
@@ -59,7 +59,6 @@ function FirehoseEventListPage(props: Props) {
   const [firehoseEvents, setFirehoseEvents] = useState<Array<FirehoseEvent>>(
     []
   );
-
 
   const fetchEvents = () => {
     const api = new ApiConfig();
@@ -324,19 +323,17 @@ function FirehoseEventListPage(props: Props) {
   usePrefixedDocumentTitle("Firehose Event Feed");
 
   return (
-    <motion.div initial="hidden" animate="visible" variants={container}>
+    <div>
       <div className="container py-5 px-md-4 px-lg-5 px-xl-3">
         <div className="d-flex flex-column">
-          <motion.h1 className=" fw-bold" variants={item}>
-            Firehose Event Feed
-          </motion.h1>
-          <motion.h4 className="mb-4" variants={item}>
+          <h1 className=" fw-bold">Firehose Event Feed</h1>
+          <h4 className="mb-4">
             The latest FakeYou events refreshed every few seconds.
-          </motion.h4>
-          <motion.p className="lead" variants={item}>
+          </h4>
+          <p className="lead">
             As you can see, we're really popular. But we owe it to you, our
             users. Thank you!
-          </motion.p>
+          </p>
         </div>
       </div>
 
@@ -345,7 +342,7 @@ function FirehoseEventListPage(props: Props) {
           <ul className="firehose-ul d-flex flex-column gap-3">{eventItems}</ul>
         </Fade>
       </div>
-    </motion.div>
+    </div>
   );
 }
 

@@ -5,8 +5,7 @@ import { useParams, Link, useHistory } from "react-router-dom";
 import { WebUrl } from "../../../../../common/WebUrl";
 import { VisibleIconFc } from "../../../_icons/VisibleIcon";
 import { HiddenIconFc } from "../../../_icons/HiddenIcon";
-import { motion } from "framer-motion";
-import { container, item, panel } from "../../../../../data/animation";
+
 import { PosthogClient } from "@storyteller/components/src/analytics/PosthogClient";
 
 const DEFAULT_VISIBILITY = "public";
@@ -148,17 +147,15 @@ function W2lResultEditPage(props: Props) {
     visibility === "public" ? <VisibleIconFc /> : <HiddenIconFc />;
 
   return (
-    <motion.div initial="hidden" animate="visible" variants={container}>
+    <div>
       <div className="container pb-4 pt-5 px-md-4 px-lg-5 px-xl-3">
-        <motion.h1 className=" fw-bold" variants={item}>
-          Edit Result Visibility
-        </motion.h1>
-        <motion.div className="pt-3" variants={item}>
+        <h1 className=" fw-bold">Edit Result Visibility</h1>
+        <div className="pt-3">
           <Link to={resultLink}>&lt; Back to result </Link>
-        </motion.div>
+        </div>
       </div>
 
-      <motion.form onSubmit={handleFormSubmit} variants={panel}>
+      <form onSubmit={handleFormSubmit}>
         <div className="container-panel pt-4 pb-5">
           <div className="panel p-3 py-4 p-lg-4">
             <fieldset disabled={isDisabled}>
@@ -183,11 +180,11 @@ function W2lResultEditPage(props: Props) {
             </fieldset>
           </div>
         </div>
-        <motion.div className="container pb-5" variants={item}>
+        <div className="container pb-5">
           <button className="btn btn-primary w-100">Update</button>
-        </motion.div>
-      </motion.form>
-    </motion.div>
+        </div>
+      </form>
+    </div>
   );
 }
 

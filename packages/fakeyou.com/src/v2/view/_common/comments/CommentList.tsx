@@ -3,8 +3,7 @@ import { formatDistance } from "date-fns";
 import { Comment } from "@storyteller/components/src/api/comments/ListComments";
 import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
 import { SafeDeleteCommentButton } from "./SafeDeleteCommentButton";
-import { motion } from "framer-motion";
-import { container, item } from "../../../../data/animation";
+
 import { Gravatar } from "@storyteller/components/src/elements/Gravatar";
 import { Link } from "react-router-dom";
 
@@ -60,7 +59,7 @@ function CommentList(props: Props) {
     let profileLink = `/profile/${comment.username}`;
 
     rows.push(
-      <motion.tr key={comment.token} variants={item}>
+      <tr key={comment.token}>
         <td className="px-0">
           <div className="d-flex gap-3 py-3">
             <Gravatar size={40} email_hash={comment.user_gravatar_hash} />
@@ -91,19 +90,14 @@ function CommentList(props: Props) {
             </div>
           </div>
         </td>
-      </motion.tr>
+      </tr>
     );
   });
 
   return (
-    <motion.table
-      className="table mb-0"
-      initial="hidden"
-      animate="visible"
-      variants={container}
-    >
+    <table className="table mb-0">
       <tbody>{rows}</tbody>
-    </motion.table>
+    </table>
   );
 }
 
