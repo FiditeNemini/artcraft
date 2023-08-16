@@ -1,19 +1,15 @@
-import React, { useState } from "react";
+import React from "react";
 import {
-  faBarsStaggered,
   faEdit,
   faEye,
   faMemo,
   faMemoCircleInfo,
   faMessages,
   faTrash,
-  faVolumeHigh,
 } from "@fortawesome/pro-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { FrontendInferenceJobType } from "@storyteller/components/src/jobs/InferenceJob";
 import Panel from "components/common/Panel/Panel";
 import { Link, useParams } from "react-router-dom";
-import { SessionVoiceConversionResultsList } from "v2/view/_common/SessionVoiceConversionResultsList";
 import { SessionSubscriptionsWrapper } from "@storyteller/components/src/session/SessionSubscriptionsWrapper";
 import PageHeaderModelView from "components/layout/PageHeaderModelView/PageHeaderModelView";
 import { CommentComponent } from "v2/view/_common/comments/CommentComponent";
@@ -22,8 +18,10 @@ import { RatingButtons } from "v2/view/_common/ratings/RatingButtons";
 import { RatingStats } from "v2/view/_common/ratings/RatingStats";
 import ShareButton from "components/common/ShareButton/ShareButton";
 import PageContainer from "components/common/PageContainer/PageContainer";
+import VcGenerateAudioPanel from "../VcGenerateAudioPanel";
 
 interface VcModelViewPageProps {
+  setMaybeSelectedInferenceJob: any;
   sessionWrapper: SessionWrapper;
   sessionWrapper: SessionWrapper;
   sessionSubscriptionsWrapper: SessionSubscriptionsWrapper;
@@ -148,34 +146,16 @@ export default function VcModelViewPage(props: VcModelViewPageProps) {
         extras={shareButton}
       />
 
-      <Panel padding mb>
-        <div className="row g-5">
-          <div className="col-12 col-lg-6">
-            <h4 className="mb-3">
-              <FontAwesomeIcon icon={faVolumeHigh} className="me-3" />
-              Use Voice
-            </h4>
-            {/* have to replace this below with Voice conversion stuff instead of the textarea */}
-            <div className="opacity-50">voice to voice components here</div>
-          </div>
-          <div className="col-12 col-lg-6">
-            <h4 className="mb-3">
-              <FontAwesomeIcon icon={faBarsStaggered} className="me-3" />
-              Session V2V Results
-            </h4>
-            <div className="d-flex flex-column gap-3 session-tts-section session-vc-section">
-              <SessionVoiceConversionResultsList
-                inferenceJobs={
-                  props.inferenceJobsByCategory.get(
-                    FrontendInferenceJobType.VoiceConversion
-                  )!
-                }
-                sessionSubscriptionsWrapper={props.sessionSubscriptionsWrapper}
-              />
-            </div>
-          </div>
-        </div>
-      </Panel>
+      <VcGenerateAudioPanel
+        inferenceJobsByCategory={props.inferenceJobsByCategory}
+        sessionSubscriptionsWrapper={props.sessionSubscriptionsWrapper}
+        sessionWrapper={props.sessionWrapper}
+        setVoiceConversionModels={() => {}}
+        voiceConversionModels={[]}
+        setMaybeSelectedVoiceConversionModel={() => {}}
+        enqueueInferenceJob={() => {}}
+        inferenceJobs={[]}
+      />
 
       {modelDescription && (
         <Panel padding mb>

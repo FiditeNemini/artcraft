@@ -524,6 +524,9 @@ class PageContainer extends React.Component<Props, State> {
                   this.props.sessionSubscriptionsWrapper
                 }
                 inferenceJobsByCategory={this.props.inferenceJobsByCategory}
+                setMaybeSelectedInferenceJob={
+                  this.props.maybeSelectedVoiceConversionModel
+                }
               />
             </Route>
 
