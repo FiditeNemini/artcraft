@@ -3,6 +3,7 @@ import {
   faBarsStaggered,
   faEdit,
   faEye,
+  faMemo,
   faMemoCircleInfo,
   faMessages,
   faTrash,
@@ -48,6 +49,7 @@ export default function VcModelViewPage(props: VcModelViewPageProps) {
 
   let modelCreatorLink = <Link to="">Creator Name</Link>;
   let modelTitle = title;
+  let modelDescription = "This is a description of the model";
   let modelUseCount = 10000;
   let modelLanguage = "English";
   let modelType = "RVCv2";
@@ -58,6 +60,12 @@ export default function VcModelViewPage(props: VcModelViewPageProps) {
       Public
     </div>
   );
+  let modelCreatorBanned = "good standing";
+  let modelCreationIp = "0.0.0.0.0";
+  let modelUpdateIp = "0.0.0.0.0";
+  let frontPageFeatured = "no";
+  let moderatorDeletedAt = "not deleted";
+  let userDeletedAt = "not deleted";
 
   const voiceDetails = [
     { label: "Creator", value: modelCreatorLink },
@@ -67,6 +75,15 @@ export default function VcModelViewPage(props: VcModelViewPageProps) {
     { label: "Model type", value: modelType },
     { label: "Upload date (UTC)", value: modelUploadDate },
     { label: "Visibility", value: modelVisibility },
+  ];
+
+  const voiceDetailsModerator = [
+    { label: "Creator is banned?", value: modelCreatorBanned },
+    { label: "Creation IP address", value: modelCreationIp },
+    { label: "Update IP address", value: modelUpdateIp },
+    { label: "Mod deleted at (UTC)", value: moderatorDeletedAt },
+    { label: "User deleted at (UTC)", value: userDeletedAt },
+    { label: "Front page featured?", value: frontPageFeatured },
   ];
 
   let ratingButtons = <></>;
@@ -159,6 +176,17 @@ export default function VcModelViewPage(props: VcModelViewPageProps) {
           </div>
         </div>
       </Panel>
+
+      {modelDescription && (
+        <Panel padding mb>
+          <h4 className="mb-4">
+            <FontAwesomeIcon icon={faMemo} className="me-3" />
+            Description
+          </h4>
+          <p>{modelDescription}</p>
+        </Panel>
+      )}
+
       <Panel padding mb>
         <h4 className="mb-4">
           <FontAwesomeIcon icon={faMemoCircleInfo} className="me-3" />
@@ -174,20 +202,32 @@ export default function VcModelViewPage(props: VcModelViewPageProps) {
                 <td>{item.value}</td>
               </tr>
             ))}
+            {props.sessionWrapper.canBanUsers() &&
+              voiceDetailsModerator.map((item, index) => (
+                <tr key={index}>
+                  <th scope="row" className="fw-semibold">
+                    {item.label}
+                  </th>
+                  <td>{item.value}</td>
+                </tr>
+              ))}
           </tbody>
         </table>
-        {/* Model Edit Buttons */}
-        <div className="d-flex flex-column flex-md-row gap-3 mt-5">
-          <Link className={"btn btn-secondary w-100"} to="">
-            <FontAwesomeIcon icon={faEdit} className="me-2" />
-            Edit Model Details
-          </Link>
-          <Link className="btn btn-destructive w-100" to="">
-            <FontAwesomeIcon icon={faTrash} className="me-2" />
-            Delete Model
-          </Link>
-        </div>
+
+        {props.sessionWrapper.canBanUsers() && (
+          <div className="d-flex flex-column flex-md-row gap-3 mt-5">
+            <Link className={"btn btn-secondary w-100"} to="">
+              <FontAwesomeIcon icon={faEdit} className="me-2" />
+              Edit Model Details
+            </Link>
+            <Link className="btn btn-destructive w-100" to="">
+              <FontAwesomeIcon icon={faTrash} className="me-2" />
+              Delete Model
+            </Link>
+          </div>
+        )}
       </Panel>
+
       <Panel padding>
         <h4 className="mb-4">
           <FontAwesomeIcon icon={faMessages} className="me-3" />
