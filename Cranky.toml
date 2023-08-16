@@ -6,14 +6,30 @@ deny = [
   # Rust
   "unsafe_code", # We may remove this if needed
 
-  # Clippy "serious" lints
+  # Clippy - "serious" lints
   "clippy::borrow_interior_mutable_const", # Seems dangerous to allow this. Eg. `const F = Lazy::new()`;
-  "clippy::cast_possible_truncation", # Seems dangerous, eg f64 to u64.
 
-  # Clippy "aesthetic" lints
+  # Clippy - bad math
+  #"clippy::cast_possible_truncation", # Seems dangerous, eg f64 to u64.
+  #"clippy::cast_possible_wrap",
+
+  # Clippy - pointer safety / readability / correctness
+  "clippy::as_ptr_cast_mut",
+  "clippy::borrow_as_ptr",
+  "clippy::borrow_deref_ref",
+
+  # Clippy - "aesthetic" lints
   "clippy::clone_double_ref", # Lint: feels safer/hygienic to disallow this, but I'm not strongly opposed.
+  "clippy::double_comparisons", # Lint: readability
   "clippy::empty_structs_with_brackets", # Lint: {} feels less aesthetic than ;
+  "clippy::implicit_clone", # Lint: Recommendation here seems more idiomatic.
+  "clippy::option_option", # Lint: Don't ever Option<Option<T>>! Enums instead.
   "clippy::redundant_static_lifetimes", # Lint: feels more modern to elide static lifetimes
+  "clippy::zero_sized_map_values", # Lint: use a HashSet instead of HashMap<T, ()>.
+
+  # Possible:
+  # "clippy::ptr_arg",
+  # "clippy::too_many_lines" (note: this is configurable)
 ]
 
 warn = [
@@ -24,8 +40,7 @@ allow = [
   "missing_docs", # Not everything needs documentation. Too much documentation is bad. Literate code.
 
   # Clippy
-  "clippy::double_comparisons",
-  "clippy::if_same_then_else", # I don't think this is valid. There are cases this is clearer.
-  "clippy::single_char_pattern", # This is like punishing trailing commas
+  "clippy::if_same_then_else", # There are cases this is clearer! Branches may have notes / considerations.
+  "clippy::single_char_pattern", # This is like punishing trailing commas. Chars are dumb.
 ]
 
