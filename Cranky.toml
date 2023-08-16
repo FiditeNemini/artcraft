@@ -18,6 +18,14 @@ deny = [
   "clippy::borrow_as_ptr",
   "clippy::borrow_deref_ref",
 
+  # Clippy - performance
+  "clippy::cmp_owned",
+  "clippy::useless_vec",
+  "clippy::format_in_format_args",
+  #"clippy::redundant_clone",
+  #"clippy::unnecessary_to_owned",
+  #"clippy::vec_init_then_push",
+
   # Clippy - "aesthetic" lints
   "clippy::clone_double_ref", # Lint: feels safer/hygienic to disallow this, but I'm not strongly opposed.
   "clippy::double_comparisons", # Lint: readability
@@ -43,4 +51,3 @@ allow = [
   "clippy::if_same_then_else", # There are cases this is clearer! Branches may have notes / considerations.
   "clippy::single_char_pattern", # This is like punishing trailing commas. Chars are dumb.
 ]
-
