@@ -3,9 +3,7 @@ use errors::AnyhowResult;
 /// Any additional changes to the original file (such as resampling, format conversion)
 /// are saved and persisted to the DB.
 #[derive(Clone, Serialize, Deserialize)]
-pub struct MediaUploadModificationDetails {
-  // TODO
-}
+pub struct MediaUploadModificationDetails; // TODO: Inner fields
 
 impl MediaUploadModificationDetails {
 

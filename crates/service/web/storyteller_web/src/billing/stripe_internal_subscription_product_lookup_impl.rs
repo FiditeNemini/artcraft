@@ -5,7 +5,7 @@ const SUBSCRIPTION_CATEGORY : &str = "fakeyou";
 
 /// A simple Actix injectable action
 #[derive(Clone, Copy)]
-pub struct StripeInternalSubscriptionProductLookupImpl {}
+pub struct StripeInternalSubscriptionProductLookupImpl;
 
 impl InternalSubscriptionProductLookup for StripeInternalSubscriptionProductLookupImpl {
     fn lookup_internal_product_from_stripe_product_id(&self, stripe_product_id: &str) -> Result<Option<InternalSubscriptionProduct>, InternalProductLookupError> {

@@ -49,8 +49,6 @@ pub struct ScrapedWebArticle {
 
 // TODO: Other types - threaded discussions (HN, Reddit), video essays (CNN, YouTube), etc.
 //  then return these in an enum container.
-pub struct ScrapedThreadedDiscussion {
-}
+pub struct ScrapedThreadedDiscussion;
 
-pub struct ScrapedVideo {
-}
+pub struct ScrapedVideo;

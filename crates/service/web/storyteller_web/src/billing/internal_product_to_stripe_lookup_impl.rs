@@ -4,7 +4,7 @@ use reusable_types::server_environment::ServerEnvironment;
 
 /// A simple Actix injectable action
 #[derive(Clone, Copy)]
-pub struct InternalProductToStripeLookupImpl {}
+pub struct InternalProductToStripeLookupImpl;
 
 impl InternalProductToStripeLookup for InternalProductToStripeLookupImpl {
     fn lookup_stripe_product_from_internal_product_key(&self, server_environment: ServerEnvironment, internal_product_key: &str) -> Result<Option<StripeProduct>, StripeProductLookupError> {

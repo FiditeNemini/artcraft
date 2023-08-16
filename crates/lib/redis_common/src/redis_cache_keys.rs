@@ -1,7 +1,7 @@
 
 /// Redis cache keys likely need to be shared across microservice boundaries, hence being defined here.
 /// Note that the caching system might mangle these keys further.
-pub struct RedisCacheKeys {}
+pub struct RedisCacheKeys;
 
 impl RedisCacheKeys {
 

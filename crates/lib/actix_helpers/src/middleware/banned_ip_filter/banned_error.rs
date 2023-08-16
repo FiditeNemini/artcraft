@@ -5,7 +5,7 @@ use actix_web::http::header::ContentType;
 use actix_web::{HttpResponse, HttpResponseBuilder, ResponseError};
 
 #[derive(Debug)]
-pub struct BannedError {}
+pub struct BannedError;
 
 impl std::fmt::Display for BannedError {
   fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {

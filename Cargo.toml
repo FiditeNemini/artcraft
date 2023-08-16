@@ -16,7 +16,7 @@ members = [
   # Shared libraries
   "crates/lib/actix_helpers",
   "crates/lib/api_clients/cloud_storage",
-  "crates/lib/api_clients/fakeyou_client",
+  #"crates/lib/api_clients/fakeyou_client",
   "crates/lib/api_clients/google_drive_common",
   "crates/lib/api_clients/twitch_common",
   "crates/lib/bootstrap",
@@ -40,7 +40,7 @@ members = [
   "crates/lib/mysql_queries",
   "crates/lib/redis_common",
   "crates/lib/server_environment",
-  "crates/lib/sqlite_queries",
+  #"crates/lib/sqlite_queries",
   "crates/lib/sqlx_mysql_helpers",
   "crates/lib/subprocess_common",
   "crates/lib/tts_common",
@@ -49,7 +49,7 @@ members = [
   "crates/lib/web_scrapers",
 
   # Programs: Desktop apps
-  "crates/programs/aichatbot-sidecar",
+  #"crates/programs/aichatbot-sidecar",
 
   # Services: API servers, jobs, workers, etc.
   "crates/service/job/analytics_job",

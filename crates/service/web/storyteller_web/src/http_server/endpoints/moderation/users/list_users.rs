@@ -17,10 +17,9 @@ use sqlx::mysql::MySqlDatabaseError;
 use std::fmt;
 use std::sync::Arc;
 
+// TODO: Implement the endpoint
 #[derive(Deserialize)]
-pub struct ListUsersRequest {
-  // TODO: Implement the endpoint
-}
+pub struct ListUsersRequest;
 
 #[derive(Serialize)]
 pub struct ListUsersResponse {

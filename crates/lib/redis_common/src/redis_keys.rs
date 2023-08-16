@@ -1,5 +1,5 @@
 /// Centralize all of the Redis key naming and dereferencing.
-pub struct RedisKeys {}
+pub struct RedisKeys;
 
 impl RedisKeys {
 

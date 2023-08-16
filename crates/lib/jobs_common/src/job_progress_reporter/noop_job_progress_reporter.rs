@@ -2,10 +2,10 @@ use container_common::anyhow_result::AnyhowResult;
 use crate::job_progress_reporter::job_progress_reporter::{JobProgressReporter, JobProgressReporterBuilder};
 
 /// A job progress reporter that does no work and has zero database dependencies.
-pub struct NoOpJobProgressReporterBuilder {}
+pub struct NoOpJobProgressReporterBuilder;
 
 /// A job progress reporter that does no work and has zero database dependencies.
-pub struct NoOpJobProgressReporter {}
+pub struct NoOpJobProgressReporter;
 
 impl NoOpJobProgressReporterBuilder {
   fn create_instance() -> AnyhowResult<Box<dyn JobProgressReporter>> {

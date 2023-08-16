@@ -8,21 +8,20 @@ deny = [
 
   # Clippy "serious" lints
   "clippy::borrow_interior_mutable_const", # Seems dangerous to allow this. Eg. `const F = Lazy::new()`;
+  "clippy::cast_possible_truncation", # Seems dangerous, eg f64 to u64.
 
   # Clippy "aesthetic" lints
-  "clippy::clone_double_ref", # Lint: feels hygienic
-  "clippy::redundant_static_lifetimes", # Lint: feels more modern
+  "clippy::clone_double_ref", # Lint: feels safer/hygienic to disallow this, but I'm not strongly opposed.
+  "clippy::empty_structs_with_brackets", # Lint: {} feels less aesthetic than ;
+  "clippy::redundant_static_lifetimes", # Lint: feels more modern to elide static lifetimes
 ]
 
 warn = [
-  # Clippy
-  "clippy::empty_structs_with_brackets",
-  "clippy::cast_possible_truncation",
 ]
 
 allow = [
   # Rust
-  "missing_docs", # Not everything needs documentation
+  "missing_docs", # Not everything needs documentation. Too much documentation is bad. Literate code.
 
   # Clippy
   "clippy::double_comparisons",

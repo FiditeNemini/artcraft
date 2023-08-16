@@ -16,15 +16,13 @@ use sqlx::mysql::MySqlDatabaseError;
 use std::fmt;
 use std::sync::Arc;
 
+// TODO: Implement the endpoint
 #[derive(Deserialize)]
-pub struct ListBannedUsersRequest {
-  // TODO: Implement the endpoint
-}
+pub struct ListBannedUsersRequest;
 
+// TODO: Implement the endpoint
 #[derive(Serialize)]
-pub struct ListBannedUsersResponse {
-  // TODO: Implement the endpoint
-}
+pub struct ListBannedUsersResponse;
 
 #[derive(Serialize, Debug)]
 pub struct ListBannedUsersErrorResponse {

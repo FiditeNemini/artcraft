@@ -6,8 +6,7 @@ use std::fs::OpenOptions;
 
 /// This command is used to generate ffmpeg previews for videos.
 #[derive(Clone)]
-pub struct ImagemagickGeneratePreviewImageCommand {
-}
+pub struct ImagemagickGeneratePreviewImageCommand;
 
 impl ImagemagickGeneratePreviewImageCommand {
   pub fn new() -> Self {
