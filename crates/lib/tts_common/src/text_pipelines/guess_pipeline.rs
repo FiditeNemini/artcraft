@@ -4,7 +4,7 @@ use once_cell::sync::Lazy;
 use crate::text_pipelines::text_pipeline_type::TextPipelineType;
 
 // TODO: This is not yet popularized
-const ENGLISH_V1_EPOCH_STR : &'static str = "2023-01-01T00:00:00.00Z";
+const ENGLISH_V1_EPOCH_STR : &str = "2023-01-01T00:00:00.00Z";
 
 /// Date we consider to switch models to "english_v1" instead of "legacy_fakeyou"
 static ENGLISH_V1_EPOCH : Lazy<DateTime<Utc>> = Lazy::new(|| {

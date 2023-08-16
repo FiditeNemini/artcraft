@@ -60,7 +60,7 @@ impl fmt::Display for DetectLocaleError {
 
 // =============== Handler ===============
 
-pub const FORCE_LOCALE_COOKIE_HEADER_NAME : &'static str = "force-locale";
+pub const FORCE_LOCALE_COOKIE_HEADER_NAME : &str = "force-locale";
 
 pub async fn detect_locale_handler(
   http_request: HttpRequest,

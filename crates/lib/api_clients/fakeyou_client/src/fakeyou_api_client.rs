@@ -9,8 +9,8 @@ use std::sync::Arc;
 use std::time::Duration;
 use log::{error, warn};
 
-const AUTHORIZATION_HEADER: &'static str = "Authorization";
-const SESSION_COOKIE_NAME : &'static str = "session";
+const AUTHORIZATION_HEADER: &str = "Authorization";
+const SESSION_COOKIE_NAME : &str = "session";
 
 /// A client to consume FakeYou's API via API sessions (vs user sessions).
 pub struct FakeYouApiClient {

@@ -7,11 +7,11 @@ use crate::server_state::ServerState;
 use log::info;
 use std::sync::Arc;
 
-const CONTENT_TYPE : &'static str = "text/html; charset=utf-8";
+const CONTENT_TYPE : &str = "text/html; charset=utf-8";
 
-const ENABLE_LINK : &'static str = "<a href=\"/alpha?enable=true\">I want Vocodes 2.0</a>";
-const DISABLE_LINK : &'static str = "<a href=\"/alpha?enable=false\">I don't want Vocodes 2.0</a>";
-const STATUS_LINK : &'static str = "<a href=\"/alpha\">status</a>";
+const ENABLE_LINK : &str = "<a href=\"/alpha?enable=true\">I want Vocodes 2.0</a>";
+const DISABLE_LINK : &str = "<a href=\"/alpha?enable=false\">I don't want Vocodes 2.0</a>";
+const STATUS_LINK : &str = "<a href=\"/alpha\">status</a>";
 
 
 #[derive(Deserialize)]

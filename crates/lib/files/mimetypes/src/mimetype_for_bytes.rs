@@ -1,5 +1,5 @@
 
-const DEFAULT_BINARY_MIMETYPE : &'static str = "application/octet-stream";
+const DEFAULT_BINARY_MIMETYPE : &str = "application/octet-stream";
 
 pub fn get_mimetype_for_bytes(bytes: &[u8]) -> Option<&'static str> {
   infer::get(bytes)

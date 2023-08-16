@@ -14,7 +14,7 @@ use crate::env_args::env_args;
 use errors::AnyhowResult;
 use http_server_common::cors::build_cors_config;
 
-pub const DEFAULT_RUST_LOG: &'static str = concat!(
+pub const DEFAULT_RUST_LOG: &str = concat!(
   "debug,",
   "actix_web=info,",
   "hyper::proto::h1::io=warn,",

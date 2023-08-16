@@ -31,7 +31,7 @@ use crate::job::job_loop::job_success_result::{JobSuccessResult, ResultEntity};
 
 /// Text starting with this will be treated as a test request.
 /// This allows the request to bypass the model cache and query the latest TTS model.
-const TEST_REQUEST_TEXT: &'static str = "This is a test request.";
+const TEST_REQUEST_TEXT: &str = "This is a test request.";
 
 
 pub struct VitsProcessJobArgs<'a> {

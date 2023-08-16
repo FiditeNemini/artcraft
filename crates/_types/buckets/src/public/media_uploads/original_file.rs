@@ -3,7 +3,7 @@ use crate::public::public_path::PublicPath;
 use crockford::crockford_entropy_lower;
 use std::path::PathBuf;
 
-const ORIGINAL_FILE_BASENAME : &'static str = "original_upload.bin";
+const ORIGINAL_FILE_BASENAME : &str = "original_upload.bin";
 
 // TODO: Generate these from a macro.
 

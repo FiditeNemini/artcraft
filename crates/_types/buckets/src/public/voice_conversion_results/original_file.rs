@@ -3,8 +3,8 @@ use crate::public::voice_conversion_results::directory::VoiceConversionResultDir
 use crockford::crockford_entropy_lower;
 use std::path::PathBuf;
 
-const ORIGINAL_FILE_PREFIX : &'static str = "fakeyou_";
-const ORIGINAL_FILE_SUFFIX : &'static str = ".wav";
+const ORIGINAL_FILE_PREFIX : &str = "fakeyou_";
+const ORIGINAL_FILE_SUFFIX : &str = ".wav";
 
 // TODO: Generate these from a macro.
 

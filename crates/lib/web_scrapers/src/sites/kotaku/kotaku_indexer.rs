@@ -5,7 +5,7 @@ use errors::AnyhowResult;
 use log::warn;
 use rss::Channel;
 
-const KOTAKU_RSS: &'static str = "https://kotaku.com/rss";
+const KOTAKU_RSS: &str = "https://kotaku.com/rss";
 
 // TODO: Rename foo_feed() or foo_rss(), etc.
 pub async fn kotaku_indexer() -> AnyhowResult<Vec<WebScrapingTarget>> {

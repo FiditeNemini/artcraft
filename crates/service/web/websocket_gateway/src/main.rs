@@ -47,7 +47,7 @@ use twitch_common::twitch_secrets::TwitchSecrets;
 use twitch_oauth2::tokens::UserTokenBuilder;
 use twitch_oauth2::{AppAccessToken, Scope, TwitchToken, tokens::errors::AppAccessTokenError, ClientId, ClientSecret};
 
-const DEFAULT_BIND_ADDRESS : &'static str = "0.0.0.0:54321";
+const DEFAULT_BIND_ADDRESS : &str = "0.0.0.0:54321";
 
 #[actix_web::main]
 //#[tokio::main]

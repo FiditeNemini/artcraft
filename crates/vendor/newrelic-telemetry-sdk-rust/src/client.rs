@@ -17,8 +17,8 @@ use std::pin::Pin;
 use std::thread;
 use std::time::Duration;
 
-const VERSION: &'static str = env!("CARGO_PKG_VERSION");
-const TRACE_API_PATH: &'static str = "trace/v1";
+const VERSION: &str = env!("CARGO_PKG_VERSION");
+const TRACE_API_PATH: &str = "trace/v1";
 
 /// Types that can be sent to a New Relic ingest API
 ///

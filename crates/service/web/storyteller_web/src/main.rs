@@ -17,8 +17,8 @@
 #[macro_use] extern crate magic_crypt;
 #[macro_use] extern crate serde_derive;
 
-pub const RESERVED_USERNAMES : &'static str = include_str!("../../../../../includes/binary_includes/reserved_usernames.txt");
-pub const RESERVED_SUBSTRINGS : &'static str = include_str!("../../../../../includes/binary_includes/reserved_usernames_including.txt");
+pub const RESERVED_USERNAMES : &str = include_str!("../../../../../includes/binary_includes/reserved_usernames.txt");
+pub const RESERVED_SUBSTRINGS : &str = include_str!("../../../../../includes/binary_includes/reserved_usernames_including.txt");
 
 pub mod billing;
 pub mod configs;
@@ -98,20 +98,20 @@ use users_component::utils::session_cookie_manager::SessionCookieManager;
 use crate::memory_cache::model_token_to_info_cache::ModelTokenToInfoCache;
 use crate::threads::poll_model_token_info_thread::poll_model_token_info_thread;
 
-const DEFAULT_BIND_ADDRESS : &'static str = "0.0.0.0:12345";
+const DEFAULT_BIND_ADDRESS : &str = "0.0.0.0:12345";
 
 // Buckets (shared config)
-const ENV_ACCESS_KEY : &'static str = "ACCESS_KEY";
-const ENV_SECRET_KEY : &'static str = "SECRET_KEY";
-const ENV_REGION_NAME : &'static str = "REGION_NAME";
+const ENV_ACCESS_KEY : &str = "ACCESS_KEY";
+const ENV_SECRET_KEY : &str = "SECRET_KEY";
+const ENV_REGION_NAME : &str = "REGION_NAME";
 
 // Buckets (private data)
-const ENV_PRIVATE_BUCKET_NAME : &'static str = "W2L_PRIVATE_DOWNLOAD_BUCKET_NAME";
+const ENV_PRIVATE_BUCKET_NAME : &str = "W2L_PRIVATE_DOWNLOAD_BUCKET_NAME";
 // Buckets (public data)
-const ENV_PUBLIC_BUCKET_NAME : &'static str = "W2L_PUBLIC_DOWNLOAD_BUCKET_NAME";
+const ENV_PUBLIC_BUCKET_NAME : &str = "W2L_PUBLIC_DOWNLOAD_BUCKET_NAME";
 
 // Various bucket roots
-const ENV_AUDIO_UPLOADS_BUCKET_ROOT : &'static str = "AUDIO_UPLOADS_BUCKET_ROOT";
+const ENV_AUDIO_UPLOADS_BUCKET_ROOT : &str = "AUDIO_UPLOADS_BUCKET_ROOT";
 
 #[actix_web::main]
 async fn main() -> AnyhowResult<()> {

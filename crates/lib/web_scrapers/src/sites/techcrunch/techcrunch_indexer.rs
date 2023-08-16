@@ -7,11 +7,11 @@ use rss::Channel;
 use std::ops::Deref;
 
 // NB: Feed contains ~20 items.
-const MAIN_RSS_FEED : &'static str = "https://techcrunch.com/feed/";
+const MAIN_RSS_FEED : &str = "https://techcrunch.com/feed/";
 
-const VENTURE_FEED : &'static str = "https://techcrunch.com/category/venture/feed/";
+const VENTURE_FEED : &str = "https://techcrunch.com/category/venture/feed/";
 
-const STARTUPS_FEED : &'static str = "https://techcrunch.com/category/startups/feed/";
+const STARTUPS_FEED : &str = "https://techcrunch.com/category/startups/feed/";
 
 #[derive(Copy, Clone, Debug, EnumIter, EnumCount)]
 pub enum TechcrunchFeed {

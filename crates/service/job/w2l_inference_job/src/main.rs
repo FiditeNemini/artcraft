@@ -55,24 +55,24 @@ use std::time::Duration;
 use tempdir::TempDir;
 
 // Buckets (shared config)
-const ENV_ACCESS_KEY : &'static str = "ACCESS_KEY";
-const ENV_SECRET_KEY : &'static str = "SECRET_KEY";
-const ENV_REGION_NAME : &'static str = "REGION_NAME";
+const ENV_ACCESS_KEY : &str = "ACCESS_KEY";
+const ENV_SECRET_KEY : &str = "SECRET_KEY";
+const ENV_REGION_NAME : &str = "REGION_NAME";
 
 // Buckets (private data)
-const ENV_PRIVATE_BUCKET_NAME : &'static str = "W2L_PRIVATE_DOWNLOAD_BUCKET_NAME";
+const ENV_PRIVATE_BUCKET_NAME : &str = "W2L_PRIVATE_DOWNLOAD_BUCKET_NAME";
 // Buckets (public data)
-const ENV_PUBLIC_BUCKET_NAME : &'static str = "W2L_PUBLIC_DOWNLOAD_BUCKET_NAME";
+const ENV_PUBLIC_BUCKET_NAME : &str = "W2L_PUBLIC_DOWNLOAD_BUCKET_NAME";
 
 // Where models and other assets get downloaded to.
-const ENV_SEMIPERSISTENT_CACHE_DIR : &'static str = "SEMIPERSISTENT_CACHE_DIR";
+const ENV_SEMIPERSISTENT_CACHE_DIR : &str = "SEMIPERSISTENT_CACHE_DIR";
 
 // Python code
-const ENV_CODE_DIRECTORY : &'static str = "W2L_CODE_DIRECTORY";
-const ENV_MODEL_CHECKPOINT : &'static str = "W2L_MODEL_CHECKPOINT";
-const ENV_INFERENCE_SCRIPT_NAME : &'static str = "W2L_INFERENCE_SCRIPT_NAME";
+const ENV_CODE_DIRECTORY : &str = "W2L_CODE_DIRECTORY";
+const ENV_MODEL_CHECKPOINT : &str = "W2L_MODEL_CHECKPOINT";
+const ENV_INFERENCE_SCRIPT_NAME : &str = "W2L_INFERENCE_SCRIPT_NAME";
 
-const DEFAULT_TEMP_DIR: &'static str = "/tmp";
+const DEFAULT_TEMP_DIR: &str = "/tmp";
 
 struct Inferencer {
   pub download_temp_directory: PathBuf,

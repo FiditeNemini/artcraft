@@ -40,7 +40,7 @@ pub struct ContainerEnvironment {
 }
 
 /// Environment variable for server environment.
-const SERVER_ENVIRONMENT : &'static str = "SERVER_ENVIRONMENT";
+const SERVER_ENVIRONMENT : &str = "SERVER_ENVIRONMENT";
 
 pub fn bootstrap<P: AsRef<Path>>(args: BootstrapArgs<'_, P>) -> AnyhowResult<ContainerEnvironment> {
   easyenv::init_all_with_default_logging(args.default_logging_override);

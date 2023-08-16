@@ -1,7 +1,7 @@
 use billing_component::stripe::traits::internal_subscription_product_lookup::{InternalProductLookupError, InternalSubscriptionProduct, InternalSubscriptionProductLookup};
 use crate::configs::plans::plan_list::{PLANS_BY_STRIPE_PRICE_ID, PLANS_BY_STRIPE_PRODUCT_ID};
 
-const SUBSCRIPTION_CATEGORY : &'static str = "fakeyou";
+const SUBSCRIPTION_CATEGORY : &str = "fakeyou";
 
 /// A simple Actix injectable action
 #[derive(Clone, Copy)]

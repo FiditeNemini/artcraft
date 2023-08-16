@@ -5,7 +5,7 @@ use std::sync::{Arc, Mutex};
 use std::time::Duration;
 
 /// NB: There's only ONE ITEM of ONE TYPE in the cache. We can use a single key.
-const CACHE_KEY : &'static str = "ITEM";
+const CACHE_KEY : &str = "ITEM";
 
 /// Store a single payload in the cache
 /// There's only ONE ITEM of ONE TYPE in the cache.

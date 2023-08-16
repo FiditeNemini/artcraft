@@ -9,7 +9,7 @@ use std::collections::HashSet;
 use std::thread;
 use std::time::Duration;
 
-const DYNAMIC_BAN_LIST_NAME : &'static str = "DYNAMIC_POLLING_IP_BAN_LIST";
+const DYNAMIC_BAN_LIST_NAME : &str = "DYNAMIC_POLLING_IP_BAN_LIST";
 
 pub async fn poll_ip_bans(
   ip_ban_list: IpBanList,

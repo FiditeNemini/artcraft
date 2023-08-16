@@ -56,13 +56,13 @@ use std::time::Duration;
 use tempdir::TempDir;
 
 // Buckets
-const ENV_ACCESS_KEY : &'static str = "ACCESS_KEY";
-const ENV_SECRET_KEY : &'static str = "SECRET_KEY";
-const ENV_REGION_NAME : &'static str = "REGION_NAME";
-const ENV_BUCKET_NAME : &'static str = "TTS_DOWNLOAD_BUCKET_NAME";
-const ENV_BUCKET_ROOT : &'static str = "TTS_DOWNLOAD_BUCKET_ROOT";
+const ENV_ACCESS_KEY : &str = "ACCESS_KEY";
+const ENV_SECRET_KEY : &str = "SECRET_KEY";
+const ENV_REGION_NAME : &str = "REGION_NAME";
+const ENV_BUCKET_NAME : &str = "TTS_DOWNLOAD_BUCKET_NAME";
+const ENV_BUCKET_ROOT : &str = "TTS_DOWNLOAD_BUCKET_ROOT";
 
-const DEFAULT_TEMP_DIR: &'static str = "/tmp";
+const DEFAULT_TEMP_DIR: &str = "/tmp";
 
 struct Downloader {
   pub download_temp_directory: PathBuf,

@@ -10,7 +10,7 @@ use std::sync::Arc;
 use bootstrap::bootstrap::ContainerEnvironment;
 use jobs_common::job_stats::JobStats;
 
-const DEFAULT_BIND_ADDRESS : &'static str = "0.0.0.0:12345";
+const DEFAULT_BIND_ADDRESS : &str = "0.0.0.0:12345";
 const DEFAULT_NUM_WORKERS : usize = 4;
 
 pub struct CreateServerArgs {

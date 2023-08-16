@@ -24,9 +24,9 @@ use std::sync::Arc;
 use mysql_queries::queries::w2l::w2l_inference_jobs::insert_w2l_inference_job_extended::{insert_w2l_inference_job_extended, InsertW2lInferenceJobExtendedArgs};
 use mysql_queries::queries::w2l::w2l_templates::check_w2l_template_exists::check_w2l_template_exists;
 
-const BUCKET_AUDIO_FILE_NAME : &'static str = "input_audio_file";
-const BUCKET_IMAGE_FILE_NAME: &'static str = "input_image_file";
-const BUCKET_VIDEO_FILE_NAME : &'static str = "input_video_file";
+const BUCKET_AUDIO_FILE_NAME : &str = "input_audio_file";
+const BUCKET_IMAGE_FILE_NAME: &str = "input_image_file";
+const BUCKET_VIDEO_FILE_NAME : &str = "input_video_file";
 
 const MIN_BYTES : usize = 10;
 const MAX_BYTES : usize = 1024 * 1024 * 20;

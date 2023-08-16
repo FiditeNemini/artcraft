@@ -1,5 +1,5 @@
 
-pub const DEFAULT_INVESTOR_REDIRECT : &'static str = "https://fakeyou.com";
+pub const DEFAULT_INVESTOR_REDIRECT : &str = "https://fakeyou.com";
 
 pub fn redirect_is_allowed(redirect_url: &str) -> bool {
   match redirect_url {

@@ -58,24 +58,24 @@ use std::time::Duration;
 use tempdir::TempDir;
 
 // Buckets (shared config)
-const ENV_ACCESS_KEY : &'static str = "ACCESS_KEY";
-const ENV_SECRET_KEY : &'static str = "SECRET_KEY";
-const ENV_REGION_NAME : &'static str = "REGION_NAME";
+const ENV_ACCESS_KEY : &str = "ACCESS_KEY";
+const ENV_SECRET_KEY : &str = "SECRET_KEY";
+const ENV_REGION_NAME : &str = "REGION_NAME";
 
 // Buckets (private data)
-const ENV_PRIVATE_BUCKET_NAME : &'static str = "W2L_PRIVATE_DOWNLOAD_BUCKET_NAME";
+const ENV_PRIVATE_BUCKET_NAME : &str = "W2L_PRIVATE_DOWNLOAD_BUCKET_NAME";
 // Buckets (public data)
-const ENV_PUBLIC_BUCKET_NAME : &'static str = "W2L_PUBLIC_DOWNLOAD_BUCKET_NAME";
+const ENV_PUBLIC_BUCKET_NAME : &str = "W2L_PUBLIC_DOWNLOAD_BUCKET_NAME";
 
 // Various bucket roots
-const ENV_DOWNLOAD_BUCKET_ROOT : &'static str = "W2L_DOWNLOAD_BUCKET_ROOT";
+const ENV_DOWNLOAD_BUCKET_ROOT : &str = "W2L_DOWNLOAD_BUCKET_ROOT";
 
 // Python code
-const ENV_CODE_DIRECTORY : &'static str = "W2L_CODE_DIRECTORY";
-const ENV_MODEL_CHECKPOINT : &'static str = "W2L_MODEL_CHECKPOINT";
-const ENV_DOWNLOAD_SCRIPT_NAME : &'static str = "W2L_DOWNLOAD_SCRIPT_NAME";
+const ENV_CODE_DIRECTORY : &str = "W2L_CODE_DIRECTORY";
+const ENV_MODEL_CHECKPOINT : &str = "W2L_MODEL_CHECKPOINT";
+const ENV_DOWNLOAD_SCRIPT_NAME : &str = "W2L_DOWNLOAD_SCRIPT_NAME";
 
-const DEFAULT_TEMP_DIR: &'static str = "/tmp";
+const DEFAULT_TEMP_DIR: &str = "/tmp";
 
 struct Downloader {
   pub download_temp_directory: PathBuf,

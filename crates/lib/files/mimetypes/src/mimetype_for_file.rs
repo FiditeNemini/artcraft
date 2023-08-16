@@ -1,6 +1,6 @@
 use std::path::Path;
 
-const DEFAULT_BINARY_MIMETYPE : &'static str = "application/octet-stream";
+const DEFAULT_BINARY_MIMETYPE : &str = "application/octet-stream";
 
 pub fn get_mimetype_for_file<P: AsRef<Path>>(file: P) -> std::io::Result<Option<&'static str>> {
   infer::get_from_path(file)

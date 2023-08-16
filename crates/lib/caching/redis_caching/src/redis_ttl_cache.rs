@@ -7,7 +7,7 @@ use errors::AnyhowResult;
 
 const DEFAULT_TTL_SECONDS : usize = 60;
 
-const REDIS_KEY_PREFIX : &'static str = "_c";
+const REDIS_KEY_PREFIX : &str = "_c";
 
 // TODO: Async Redis
 

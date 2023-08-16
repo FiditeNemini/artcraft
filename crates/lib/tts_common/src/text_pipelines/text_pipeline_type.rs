@@ -47,11 +47,11 @@ pub enum TextPipelineType {
 }
 
 // TODO: Sucks to redefine enum variants. `serde_variant` looks like a fix, but it's GPL3.
-const LEGACY_FAKEYOU : &'static str = "legacy_fakeyou";
-const ENGLISH_V1 : &'static str = "english_v1";
-const SPANISH_V1 : &'static str = "spanish_v1";
-const SPANISH_V2 : &'static str = "spanish_v2";
-const SYNTHETIC_LEGACY_FAKEYOU_2 : &'static str = "legacy_fakeyou_2";
+const LEGACY_FAKEYOU : &str = "legacy_fakeyou";
+const ENGLISH_V1 : &str = "english_v1";
+const SPANISH_V1 : &str = "spanish_v1";
+const SPANISH_V2 : &str = "spanish_v2";
+const SYNTHETIC_LEGACY_FAKEYOU_2 : &str = "legacy_fakeyou_2";
 
 impl TextPipelineType {
 

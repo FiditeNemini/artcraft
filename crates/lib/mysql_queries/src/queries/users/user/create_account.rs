@@ -34,9 +34,9 @@ pub async fn create_account(
   args: CreateAccountArgs<'_>,
 ) -> Result<CreateAccountSuccessResult, CreateAccountError>
 {
-  const INITIAL_PROFILE_MARKDOWN : &'static str = "";
-  const INITIAL_PROFILE_RENDERED_HTML : &'static str = "";
-  const INITIAL_USER_ROLE: &'static str = "user";
+  const INITIAL_PROFILE_MARKDOWN : &str = "";
+  const INITIAL_PROFILE_RENDERED_HTML : &str = "";
+  const INITIAL_USER_ROLE: &str = "user";
 
   let user_token = Tokens::new_user()
       .map_err(|_e| {

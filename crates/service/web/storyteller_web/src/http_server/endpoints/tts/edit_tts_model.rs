@@ -27,8 +27,8 @@ use tts_common::text_pipelines::text_pipeline_type::TextPipelineType;
 use user_input_common::check_for_slurs::contains_slurs;
 use user_input_common::markdown_to_html::markdown_to_html;
 
-const DEFAULT_IETF_LANGUAGE_TAG : &'static str = "en-US";
-const DEFAULT_IETF_PRIMARY_LANGUAGE_SUBTAG : &'static str = "en";
+const DEFAULT_IETF_LANGUAGE_TAG : &str = "en-US";
+const DEFAULT_IETF_PRIMARY_LANGUAGE_SUBTAG : &str = "en";
 
 /// For the URL PathInfo
 #[derive(Deserialize)]

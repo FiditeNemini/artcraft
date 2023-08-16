@@ -6,15 +6,15 @@ use log::warn;
 use rss::Channel;
 
 // NB: Contains nearly 70 items
-const RSS_TOP_STORIES : &'static str = "http://rss.cnn.com/rss/cnn_topstories.rss";
+const RSS_TOP_STORIES : &str = "http://rss.cnn.com/rss/cnn_topstories.rss";
 
-const RSS_WORLD : &'static str = "http://rss.cnn.com/rss/cnn_world.rss";
+const RSS_WORLD : &str = "http://rss.cnn.com/rss/cnn_world.rss";
 
-const RSS_US : &'static str = "http://rss.cnn.com/rss/cnn_us.rss";
+const RSS_US : &str = "http://rss.cnn.com/rss/cnn_us.rss";
 
-const RSS_TECH : &'static str = "http://rss.cnn.com/rss/cnn_tech.rss";
+const RSS_TECH : &str = "http://rss.cnn.com/rss/cnn_tech.rss";
 
-const RSS_ENTERTAINMENT : &'static str = "http://rss.cnn.com/rss/cnn_showbiz.rss";
+const RSS_ENTERTAINMENT : &str = "http://rss.cnn.com/rss/cnn_showbiz.rss";
 
 #[derive(Copy, Clone, Debug, EnumIter, EnumCount)]
 pub enum CnnFeed {

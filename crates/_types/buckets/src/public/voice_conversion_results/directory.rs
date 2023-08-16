@@ -4,7 +4,7 @@ use crate::util::hashed_directory_path_long_string::hashed_directory_path_long_s
 // TODO: Generate these from a macro.
 
 // TODO: Use a central path registry for quick reference
-const DIRECTORY: &'static str = "/voice_conversion";
+const DIRECTORY: &str = "/voice_conversion";
 
 /// Directory for voice conversion results.
 /// Each result gets its own directory so that we can store the result

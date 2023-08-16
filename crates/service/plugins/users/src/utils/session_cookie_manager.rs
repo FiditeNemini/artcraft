@@ -23,7 +23,7 @@ use std::collections::BTreeMap;
  */
 const COOKIE_VERSION : u32 = 2;
 
-const SESSION_COOKIE_NAME : &'static str = "session";
+const SESSION_COOKIE_NAME : &str = "session";
 
 // TODO(echelon,2022-08-29): Make a CryptedCookieManager that this uses.
 // TODO(echelon,2022-08-29): Fix how domains and "secure" cookies are handled

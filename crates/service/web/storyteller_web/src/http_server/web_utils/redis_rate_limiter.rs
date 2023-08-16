@@ -9,7 +9,7 @@ use limitation::{Limiter, Error};
 use log::info;
 
 /// If this HTTP header is set, the rate limiter can be bypassed (eg. for debugging)
-const RATE_LIMIT_BYPASS_HEADER : &'static str = "limitless";
+const RATE_LIMIT_BYPASS_HEADER : &str = "limitless";
 
 #[derive(Clone)] // NB: Limiter is `Clone`
 pub struct RedisRateLimiter {

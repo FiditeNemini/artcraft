@@ -4,9 +4,9 @@ use errors::AnyhowResult;
 use log::warn;
 use rss::Channel;
 
-const RSS_WORLD_NEWS : &'static str = "https://www.theguardian.com/world/rss";
+const RSS_WORLD_NEWS : &str = "https://www.theguardian.com/world/rss";
 
-const RSS_TECHNOLOGY : &'static str = "https://www.theguardian.com/technology/rss";
+const RSS_TECHNOLOGY : &str = "https://www.theguardian.com/technology/rss";
 
 // TODO: This hasn't been tested.
 

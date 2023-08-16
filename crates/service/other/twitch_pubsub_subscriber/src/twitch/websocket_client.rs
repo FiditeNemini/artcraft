@@ -18,9 +18,9 @@ use twitch_api2::pubsub;
 // Reference javascript Twitch Websocket client:
 // https://github.com/twitchdev/pubsub-javascript-sample/blob/main/main.js
 
-const WEBSOCKET_GATEWAY : &'static str = "wss://pubsub-edge.twitch.tv";
+const WEBSOCKET_GATEWAY : &str = "wss://pubsub-edge.twitch.tv";
 
-const PING_COMMAND : &'static str = "{ \"type\": \"PING\" }";
+const PING_COMMAND : &str = "{ \"type\": \"PING\" }";
 
 pub struct TwitchWebsocketClient {
   socket: Option<WebSocketStream<MaybeTlsStream<TcpStream>>>,

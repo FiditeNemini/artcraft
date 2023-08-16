@@ -5,7 +5,7 @@ use crockford::crockford_entropy_lower;
 // TODO: Generate these from a macro.
 
 // TODO: Use a central path registry for quick reference
-const MEDIA_UPLOAD_DIRECTORY : &'static str = "/media_upload";
+const MEDIA_UPLOAD_DIRECTORY : &str = "/media_upload";
 
 /// Directory for user media uploads.
 /// Each uploaded file gets its own directory so that we can store the original

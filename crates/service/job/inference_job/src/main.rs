@@ -62,16 +62,16 @@ use std::time::Duration;
 use subprocess_common::docker_options::{DockerEnvVar, DockerFilesystemMount, DockerGpu, DockerOptions};
 
 // Buckets (shared config)
-const ENV_ACCESS_KEY : &'static str = "ACCESS_KEY";
-const ENV_SECRET_KEY : &'static str = "SECRET_KEY";
-const ENV_REGION_NAME : &'static str = "REGION_NAME";
+const ENV_ACCESS_KEY : &str = "ACCESS_KEY";
+const ENV_SECRET_KEY : &str = "SECRET_KEY";
+const ENV_REGION_NAME : &str = "REGION_NAME";
 
 // Bucket names
-const ENV_PRIVATE_BUCKET_NAME : &'static str = "PRIVATE_BUCKET_NAME";
-const ENV_PUBLIC_BUCKET_NAME : &'static str = "PUBLIC_BUCKET_NAME";
+const ENV_PRIVATE_BUCKET_NAME : &str = "PRIVATE_BUCKET_NAME";
+const ENV_PUBLIC_BUCKET_NAME : &str = "PUBLIC_BUCKET_NAME";
 
 // HTTP sidecar
-const ENV_TTS_INFERENCE_SIDECAR_HOSTNAME: &'static str = "TTS_INFERENCE_SIDECAR_HOSTNAME";
+const ENV_TTS_INFERENCE_SIDECAR_HOSTNAME: &str = "TTS_INFERENCE_SIDECAR_HOSTNAME";
 
 //#[tokio::main]
 #[actix_web::main]

@@ -66,25 +66,25 @@ use std::path::PathBuf;
 use std::time::Duration;
 
 // Buckets (shared config)
-const ENV_ACCESS_KEY : &'static str = "ACCESS_KEY";
-const ENV_SECRET_KEY : &'static str = "SECRET_KEY";
-const ENV_REGION_NAME : &'static str = "REGION_NAME";
+const ENV_ACCESS_KEY : &str = "ACCESS_KEY";
+const ENV_SECRET_KEY : &str = "SECRET_KEY";
+const ENV_REGION_NAME : &str = "REGION_NAME";
 
 // Bucket names
-const ENV_PRIVATE_BUCKET_NAME : &'static str = "PRIVATE_BUCKET_NAME";
-const ENV_PUBLIC_BUCKET_NAME : &'static str = "PUBLIC_BUCKET_NAME";
+const ENV_PRIVATE_BUCKET_NAME : &str = "PRIVATE_BUCKET_NAME";
+const ENV_PUBLIC_BUCKET_NAME : &str = "PUBLIC_BUCKET_NAME";
 
 // Where models and other assets get downloaded to.
-const ENV_SEMIPERSISTENT_CACHE_DIR : &'static str = "SEMIPERSISTENT_CACHE_DIR";
+const ENV_SEMIPERSISTENT_CACHE_DIR : &str = "SEMIPERSISTENT_CACHE_DIR";
 
 // Python code
-const ENV_CODE_DIRECTORY : &'static str = "TTS_CODE_DIRECTORY";
-const ENV_INFERENCE_SCRIPT_NAME : &'static str = "TTS_INFERENCE_SCRIPT_NAME";
+const ENV_CODE_DIRECTORY : &str = "TTS_CODE_DIRECTORY";
+const ENV_INFERENCE_SCRIPT_NAME : &str = "TTS_INFERENCE_SCRIPT_NAME";
 
 // HTTP sidecar
-const ENV_TTS_INFERENCE_SIDECAR_HOSTNAME: &'static str = "TTS_INFERENCE_SIDECAR_HOSTNAME";
+const ENV_TTS_INFERENCE_SIDECAR_HOSTNAME: &str = "TTS_INFERENCE_SIDECAR_HOSTNAME";
 
-const DEFAULT_TEMP_DIR: &'static str = "/tmp";
+const DEFAULT_TEMP_DIR: &str = "/tmp";
 
 #[tokio::main]
 async fn main() -> AnyhowResult<()> {

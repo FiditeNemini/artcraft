@@ -36,11 +36,11 @@ use tts_common::priority::FAKEYOU_INVESTOR_PRIORITY_LEVEL;
 
 /// Debug requests can get routed to special "debug-only" workers, which can
 /// be used to trial new code, run debugging, etc.
-const DEBUG_HEADER_NAME : &'static str = "enable-debug-mode";
+const DEBUG_HEADER_NAME : &str = "enable-debug-mode";
 
 /// The routing tag header can send workloads to particular k8s hosts.
 /// This is useful for catching the live logs or intercepting the job.
-const ROUTING_TAG_HEADER_NAME : &'static str = "routing-tag";
+const ROUTING_TAG_HEADER_NAME : &str = "routing-tag";
 
 #[derive(Deserialize)]
 pub struct EnqueueVoiceConversionInferenceRequest {

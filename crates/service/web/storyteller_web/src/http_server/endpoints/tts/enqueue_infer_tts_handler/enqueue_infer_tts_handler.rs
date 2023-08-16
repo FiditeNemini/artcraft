@@ -37,7 +37,7 @@ use user_input_common::check_for_slurs::contains_slurs;
 use users_component::utils::user_session_extended::UserSessionExtended;
 
 // TODO: Temporary for investor demo
-const STORYTELLER_DEMO_COOKIE_NAME : &'static str = "storyteller_demo";
+const STORYTELLER_DEMO_COOKIE_NAME : &str = "storyteller_demo";
 
 /// Debug requests mean different things, depending on the type of worker (the legacy
 /// tts-inference-job vs. the new inference-job):
@@ -49,19 +49,19 @@ const STORYTELLER_DEMO_COOKIE_NAME : &'static str = "storyteller_demo";
 ///    anything in the code. (There's a new system for routing requests called
 ///    "routing tags" that is independent of this flag.)
 ///
-const DEBUG_HEADER_NAME : &'static str = "enable-debug-mode";
+const DEBUG_HEADER_NAME : &str = "enable-debug-mode";
 
 /// Requests with this header can be forced onto the new jobs system.
 /// It'll be used to help test TT2 on the new system before it is rolled out for everyone.
-const NEW_JOB_SYSTEM_HEADER_NAME : &'static str = "new-job-system";
+const NEW_JOB_SYSTEM_HEADER_NAME : &str = "new-job-system";
 
 /// The routing tag header can send workloads to particular k8s hosts.
 /// This is useful for catching the live logs or intercepting the job.
 /// NB: This is only for the new job system.
-const ROUTING_TAG_HEADER_NAME : &'static str = "routing-tag";
+const ROUTING_TAG_HEADER_NAME : &str = "routing-tag";
 
-const USER_FAKEYOU_USER_TOKEN : &'static str = "U:N5J8JXPW9BTYX";
-const USER_NEWS_STORY_USER_TOKEN : &'static str = "U:XAWRARC1N89X6";
+const USER_FAKEYOU_USER_TOKEN : &str = "U:N5J8JXPW9BTYX";
+const USER_NEWS_STORY_USER_TOKEN : &str = "U:XAWRARC1N89X6";
 
 /// Safety guard against plans supporting too lengthy TTS inference text.
 const MAX_TTS_LENGTH : usize = 10_000;

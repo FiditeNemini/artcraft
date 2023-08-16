@@ -1,7 +1,7 @@
 use actix_web::cookie::{Cookie, CookieBuilder};
 use crate::server_state::ServerState;
 
-const REFRESH_COOKIE_NAME : &'static str = "refresh";
+const REFRESH_COOKIE_NAME : &str = "refresh";
 
 pub fn build_design_refresh_cookie(server_state: &ServerState, enable: bool) -> CookieBuilder {
   let value = if enable { "true" } else { "false " };
