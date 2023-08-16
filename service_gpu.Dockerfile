@@ -77,9 +77,8 @@ FROM rust-base AS builder
 COPY Cargo.lock .
 COPY Cargo.toml .
 COPY crates/ ./crates
-COPY db/ ./db
+COPY includes/ ./includes
 COPY test_data/ ./test_data
-COPY container_includes/ ./container_includes
 
 # Print a report on disk space
 #RUN echo "Disk usage at root (before tests):"
@@ -161,7 +160,7 @@ COPY --from=builder /usr/lib/x86_64-linux-gnu/libssl.*             /lib/x86_64-l
 COPY --from=builder /usr/lib/x86_64-linux-gnu/libcrypto.*          /lib/x86_64-linux-gnu/
 
 # Container includes
-COPY container_includes/ /container_includes
+COPY includes/ /includes
 
 # Make sure all the links resolve
 RUN ldd inference-job
@@ -207,6 +206,6 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive TZ=Etc/UTC apt-get install 
 
 # NB(bt,2023-05-28): Python logging may be slowing down in k8s
 # See: https://github.com/kubernetes-client/python/issues/1867
-COPY container_includes/python_overrides/logger/__init__.py /usr/lib/python3.10/logging/__init__.py
+COPY includes/container_includes/python_overrides/logger/__init__.py /usr/lib/python3.10/logging/__init__.py
 
 EXPOSE 8080

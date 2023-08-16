@@ -17,8 +17,8 @@
 #[macro_use] extern crate magic_crypt;
 #[macro_use] extern crate serde_derive;
 
-pub const RESERVED_USERNAMES : &'static str = include_str!("../../../../../db/reserved_usernames.txt");
-pub const RESERVED_SUBSTRINGS : &'static str = include_str!("../../../../../db/reserved_usernames_including.txt");
+pub const RESERVED_USERNAMES : &'static str = include_str!("../../../../../includes/binary_includes/reserved_usernames.txt");
+pub const RESERVED_SUBSTRINGS : &'static str = include_str!("../../../../../includes/binary_includes/reserved_usernames_including.txt");
 
 pub mod billing;
 pub mod configs;
@@ -514,14 +514,14 @@ fn read_static_api_tokens() -> StaticApiTokenSet {
 fn read_disabled_endpoints() -> DisabledEndpoints {
   let exact_filename = easyenv::get_env_string_or_default(
     "DISABLED_ENDPOINTS_FILE_EXACT_MATCH",
-    "./container_includes/disabled_endpoints/endpoint_exact_matches.txt");
+    "./includes/container_includes/disabled_endpoints/endpoint_exact_matches.txt");
 
   let exact = ExactMatchDisabledEndpoints::load_from_file(exact_filename)
       .unwrap_or(ExactMatchDisabledEndpoints::new()); // NB: Fail open
 
   let prefix_filename = easyenv::get_env_string_or_default(
     "DISABLED_ENDPOINTS_FILE_PREFIX_MATCH",
-    "./container_includes/disabled_endpoints/endpoint_prefixes.txt");
+    "./includes/container_includes/disabled_endpoints/endpoint_prefixes.txt");
 
   let prefix = PrefixDisabledEndpoints::load_from_file(prefix_filename)
       .unwrap_or(PrefixDisabledEndpoints::new()); // NB: Fail open
@@ -535,7 +535,7 @@ fn read_disabled_endpoints() -> DisabledEndpoints {
 fn load_static_container_ip_bans() -> IpBanList {
   let ip_ban_directory = easyenv::get_env_string_or_default(
     "IP_BAN_DIRECTORY",
-    "./container_includes/banned_ip_addresses"
+    "./includes/container_includes/banned_ip_addresses"
   );
 
   let ip_ban_list = load_ip_ban_list_from_directory(ip_ban_directory)
@@ -548,7 +548,7 @@ fn load_static_container_ip_bans() -> IpBanList {
 fn load_cidr_bans() -> BannedCidrSet {
   let cidr_ban_file = easyenv::get_env_string_or_default(
     "CIDR_BAN_FILE",
-    "./container_includes/banned_cidrs/banned_cidrs.txt"
+    "./includes/container_includes/banned_cidrs/banned_cidrs.txt"
   );
 
   let cidr_bans = load_cidr_ban_set_from_file(cidr_ban_file)
@@ -566,7 +566,7 @@ fn load_cidr_bans() -> BannedCidrSet {
 fn load_troll_user_token_bans() -> TrollUserBanList {
   let user_token_troll_ban_directory = easyenv::get_env_string_or_default(
     "USER_TOKEN_TROLL_BAN_DIRECTORY",
-    "./container_includes/troll_bans/user_token_troll_bans"
+    "./includes/container_includes/troll_bans/user_token_troll_bans"
   );
 
   let troll_ban_list = load_user_token_ban_list_from_directory(user_token_troll_ban_directory)
@@ -581,7 +581,7 @@ fn load_troll_user_token_bans() -> TrollUserBanList {
 fn load_ip_address_troll_bans() -> IpBanList {
   let ip_ban_directory = easyenv::get_env_string_or_default(
     "IP_TROLL_BAN_DIRECTORY",
-    "./container_includes/troll_bans/ip_address_troll_bans"
+    "./includes/container_includes/troll_bans/ip_address_troll_bans"
   );
 
   let ip_ban_list = load_ip_ban_list_from_directory(ip_ban_directory)

@@ -77,9 +77,8 @@ FROM rust-base AS builder
 COPY Cargo.lock .
 COPY Cargo.toml .
 COPY crates/ ./crates
-COPY db/ ./db
+COPY includes/ ./includes
 COPY test_data/ ./test_data
-COPY container_includes/ ./container_includes
 
 # Print a report on disk space
 #RUN echo "Disk usage at root (before tests):"
@@ -202,7 +201,7 @@ COPY --from=builder /usr/lib/x86_64-linux-gnu/libssl.*             /lib/x86_64-l
 COPY --from=builder /usr/lib/x86_64-linux-gnu/libcrypto.*          /lib/x86_64-linux-gnu/
 
 # Container includes
-COPY container_includes/ /container_includes
+COPY includes/ /includes
 
 # Make sure all the links resolve
 RUN ldd storyteller-web
