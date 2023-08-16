@@ -32,7 +32,7 @@ pub async fn process_softvc_model<'a, 'b>(
 
   redis_logger.log_status("checking rocket vc model")?; // NB: "rocket vc" is a codename
 
-  let file_path = PathBuf::from(download_filename.clone());
+  let file_path = PathBuf::from(download_filename);
 
   let output_metadata_fs_path = temp_dir.path().join("metadata.json");
 

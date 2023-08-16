@@ -37,7 +37,7 @@ pub async fn process_vits_model<'a, 'b>(
 
   redis_logger.log_status("checking VITS model")?;
 
-  let original_model_file_path = PathBuf::from(download_filename.clone());
+  let original_model_file_path = PathBuf::from(download_filename);
 
   // NB: We'll be creating the traced model in the "check" step and uploading it to GDrive along with the original.
   let traced_model_file_path = PathBuf::from(filename_concat(&original_model_file_path, "_traced"));

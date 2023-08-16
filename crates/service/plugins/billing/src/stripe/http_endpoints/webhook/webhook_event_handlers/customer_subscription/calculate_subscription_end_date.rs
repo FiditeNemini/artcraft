@@ -5,10 +5,10 @@ use reusable_types::stripe::stripe_subscription_status::StripeSubscriptionStatus
 use std::ops::{Add, Sub};
 
 // Push back the expiration date.
-const SUBSCRIPTION_GRACE_DAYS : Lazy<Duration> = Lazy::new(|| Duration::days(2));
+static SUBSCRIPTION_GRACE_DAYS : Lazy<Duration> = Lazy::new(|| Duration::days(2));
 
 // Set canceled subscriptions back in time over a year, which is the maximum billing period + grace.
-const BACKDATE_TERMINATION_DAYS : Lazy<Duration> = Lazy::new(|| Duration::days(370));
+static BACKDATE_TERMINATION_DAYS : Lazy<Duration> = Lazy::new(|| Duration::days(370));
 
 #[inline]
 pub fn calculate_subscription_end_date(subscription_summary: &SubscriptionSummary) -> NaiveDateTime {

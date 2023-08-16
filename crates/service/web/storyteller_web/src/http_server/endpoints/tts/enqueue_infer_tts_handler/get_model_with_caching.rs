@@ -14,7 +14,8 @@ pub async fn get_model_with_caching(
   mysql_connection: &mut PoolConnection<MySql>,
 ) -> AnyhowResult<Option<TtsModelRecord>> {
 
-  let model_token2 = model_token.clone();
+  // NB: Copy due to move. Not a cloned ref due to clippy lint
+  let model_token2 = model_token.to_string();
 
   let get_tts_model = move || {
     // NB: async closures are not yet stable in Rust, so we include an async block.

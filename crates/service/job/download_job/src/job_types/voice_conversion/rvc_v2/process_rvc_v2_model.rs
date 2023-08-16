@@ -42,7 +42,7 @@ pub async fn process_rvc_v2_model<'a, 'b>(
 
   info!("Determining download file contents: {:?}", &download_filename);
 
-  let original_download_file_path = PathBuf::from(download_filename.clone());
+  let original_download_file_path = PathBuf::from(download_filename);
 
   let download_contents = extract_rvc_files(&original_download_file_path, temp_dir)?;
 

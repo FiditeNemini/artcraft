@@ -32,7 +32,7 @@ pub async fn process_so_vits_svc_model<'a, 'b>(
 
   redis_logger.log_status("checking so-vits-svc model")?;
 
-  let original_model_file_path = PathBuf::from(download_filename.clone());
+  let original_model_file_path = PathBuf::from(download_filename);
 
   //let config_path = PathBuf::from("/models/voice_conversion/so-vits-svc/example_config.json"); // TODO: This could be variable.
   //let input_wav_path = PathBuf::from("/models/voice_conversion/so-vits-svc/example.wav"); // TODO: This could be variable.

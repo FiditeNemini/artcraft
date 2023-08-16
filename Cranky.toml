@@ -6,8 +6,12 @@ deny = [
   # Rust
   "unsafe_code", # We may remove this if needed
 
-  # Clippy
-  "clippy::redundant_static_lifetimes",
+  # Clippy "serious" lints
+  "clippy::borrow_interior_mutable_const", # Seems dangerous to allow this. Eg. `const F = Lazy::new()`;
+
+  # Clippy "aesthetic" lints
+  "clippy::clone_double_ref", # Lint: feels hygienic
+  "clippy::redundant_static_lifetimes", # Lint: feels more modern
 ]
 
 warn = [
@@ -22,6 +26,7 @@ allow = [
 
   # Clippy
   "clippy::double_comparisons",
+  "clippy::if_same_then_else", # I don't think this is valid. There are cases this is clearer.
   "clippy::single_char_pattern", # This is like punishing trailing commas
 ]
 
