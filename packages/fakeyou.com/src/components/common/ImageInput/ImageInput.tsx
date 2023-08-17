@@ -1,4 +1,5 @@
-import React from "react";
+import React, { useState } from "react";
+import { a, useSpring } from '@react-spring/web';
 import { FileDetails, FileWrapper, FileLabel } from "components/common";
 import "./ImageInput.scss";
 
@@ -11,6 +12,7 @@ interface Props {
   hideActions?: boolean;
   hideClearDetails?: boolean;
   inputProps?: any;
+  onRest?: () => void;
   success?: boolean;
   submit?: () => void;
   working?: boolean;
@@ -19,11 +21,19 @@ interface Props {
 
 const n = () => {};
 
-export default function ImageInput({ blob = "", clear = n, file, hideActions, hideClearDetails, inputProps, success = false, submit = n, working = false, ...rest }: Props) {
+export default function ImageInput({ blob = "", clear = n, file, hideActions, hideClearDetails, inputProps, onRest = n, success = false, submit = n, working = false, ...rest }: Props) {
+  const [loaded,loadedSet] = useState<number>();
+  const onLoad = () => loadedSet(1);
+  const style = useSpring({
+    config: { mass: 1, tension: 120, friction: 14 },
+    onRest,
+    opacity: loaded ? 1 : 0
+  });
+
   return <FileWrapper {...{ fileTypes, ...inputProps, ...rest }}>
     <div {...{ className: "fy-image-uploader" }}>
       { file ? <>
-        <img {...{ alt: "file preview", className: "file-preview", src: blob }} />
+        <a.img {...{ alt: "file preview", className: "file-preview", onLoad, src: blob, style }} />
         <FileDetails {...{ file, hideClearDetails }}/>
       </> : <>
         <svg {...{ className: "image-placeholder", height: 400, viewBox: "0 0 300 300", width: 400 }}>

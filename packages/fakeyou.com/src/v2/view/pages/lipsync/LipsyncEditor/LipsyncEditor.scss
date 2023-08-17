@@ -47,8 +47,10 @@
 
 .progress-header {
 	display: flex;
+	flex-wrap: wrap;
 	align-items: center;
-	margin-bottom: 1rem;
+	margin: 1rem 0;
+	// padding: 1rem;
 
 	.progress-heading {
 		display: inline-block;
@@ -70,13 +72,19 @@
 		}
 
 		svg {
-			border: 2px solid #fff;
-			border-radius: 50%;
+			// background-color: red;
+			// border: 2px solid #fff;
+			// border-radius: 50%;
 			margin-right: .5rem;
 			height: 2rem;
 			width: 2rem;
 			stroke: white;
 		}
+	}
+
+	.progress-description {
+		margin-top: 1rem;
+		width: 100%;
 	}
 
 	button {
