@@ -76,6 +76,7 @@ order by
 --
 select
     m.token,
+    m.model_type,
     m.title,
     u.username,
     r.use_count,
@@ -94,6 +95,63 @@ from (
               on u.token = m.creator_user_token
 order by r.use_count desc
     limit 100;
+
+
+--
+-- Top 100 voice conversion models by use count (NON DELETED)
+-- (jobs table, not results table)
+--
+select
+    m.token,
+    m.model_type,
+    m.title,
+    u.username,
+    r.use_count,
+    m.created_at
+from (
+     select maybe_model_token, count(*) as use_count
+     from generic_inference_jobs
+     where maybe_model_token IS NOT NULL
+     group by maybe_model_token
+) as r
+join voice_conversion_models as m
+    on m.token = r.maybe_model_token
+join users as u
+    on u.token = m.creator_user_token
+where m.user_deleted_at IS NULL
+and m.mod_deleted_at IS NULL
+order by r.use_count desc
+limit 100;
+
+
+--
+-- Top 100 voice conversion models by use count (NON DELETED, LAST 7 DAYS)
+-- (jobs table, not results table)
+--
+select
+    m.token,
+    m.model_type,
+    m.title,
+    u.username,
+    r.use_count,
+    m.created_at
+from (
+    select maybe_model_token, count(*) as use_count
+    from generic_inference_jobs
+    where maybe_model_token IS NOT NULL
+    and created_at > ( CURDATE() - INTERVAL 7 day)
+    group by maybe_model_token
+) as r
+join voice_conversion_models as m
+    on m.token = r.maybe_model_token
+join users as u
+    on u.token = m.creator_user_token
+where m.user_deleted_at IS NULL
+  and m.mod_deleted_at IS NULL
+order by r.use_count desc
+    limit 100;
+
+
 
 -- Histogram of model contributions
 select
