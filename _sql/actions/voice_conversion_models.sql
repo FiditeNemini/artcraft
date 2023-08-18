@@ -269,7 +269,7 @@ where token IN (
     'vcm_gdg3najz6j3g'
 );
 
--- Remove duplicate models
+-- Remove takedown request models
 update voice_conversion_models
 set
     mod_deleted_at = NOW(),
@@ -292,7 +292,17 @@ where token IN (
     'vcm_5m4dsn2fwa0q',
     'vcm_hn9m98g1am3z',
     'vcm_f9168tyyn6ex',
-    'vcm_03y9w4h99r1h'
+    'vcm_03y9w4h99r1h',
+    'vcm_yr9f1s0xc7pc',
+    'vcm_45767r26a9bb',
+    'vcm_rq3cvp3x3hnh',
+    'vcm_ng1nz8d67z4v',
+    'vcm_f5arabzrk4en',
+    'vcm_d379600cr8yx',
+    'vcm_p7m9jw1krrkr',
+    'vcm_x7v3m9mcvten',
+    'vcm_6r057m7594bv',
+    'vcm_wkm9e42d3spm'
 );
 
 
