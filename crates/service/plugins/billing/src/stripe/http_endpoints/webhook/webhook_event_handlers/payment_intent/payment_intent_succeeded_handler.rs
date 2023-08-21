@@ -23,9 +23,9 @@ pub fn payment_intent_succeeded_handler(payment_intent: &PaymentIntent) -> Resul
       .map(|t| t.to_string());
 
   Ok(StripeWebhookSummary {
-    maybe_user_token: maybe_user_token,
+    maybe_user_token,
     maybe_event_entity_id: Some(payment_intent_id),
-    maybe_stripe_customer_id: maybe_stripe_customer_id,
+    maybe_stripe_customer_id,
     action_was_taken: false,
     should_ignore_retry: false,
   })

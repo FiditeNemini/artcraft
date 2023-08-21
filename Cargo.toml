@@ -68,4 +68,7 @@ members = [
   "crates/service/plugins/billing",
   "crates/service/plugins/inference_workloads",
   "crates/service/plugins/users",
+
+  # Vendored code
+  "crates/vendor/newrelic-telemetry-sdk-rust",
 ]

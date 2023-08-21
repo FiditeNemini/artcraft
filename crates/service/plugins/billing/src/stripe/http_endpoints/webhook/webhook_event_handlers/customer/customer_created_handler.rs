@@ -17,7 +17,7 @@ pub fn customer_created_handler(customer: &Customer) -> Result<StripeWebhookSumm
       .map(|t| t.to_string());
 
   Ok(StripeWebhookSummary {
-    maybe_user_token: maybe_user_token,
+    maybe_user_token,
     maybe_event_entity_id: Some(customer_id.clone()),
     maybe_stripe_customer_id: Some(customer_id.clone()),
     action_was_taken: false,
