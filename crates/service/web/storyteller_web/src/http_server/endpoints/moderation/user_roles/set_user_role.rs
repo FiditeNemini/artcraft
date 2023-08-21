@@ -102,7 +102,7 @@ pub async fn set_user_role_handler(
       .await
       .map_err(|err| {
         warn!("error listing roles: {:?}", err);
-        return SetUserRoleError::ServerError;
+        SetUserRoleError::ServerError
       })?;
 
   let role_exists = user_roles.into_iter()

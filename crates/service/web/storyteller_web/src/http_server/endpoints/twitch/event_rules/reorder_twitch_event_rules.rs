@@ -114,7 +114,7 @@ pub async fn reorder_twitch_event_rules_handler(
       .await
       .map_err(|e| {
         error!("Error with query: {:?}", e);
-        return ReorderTwitchEventRulesError::ServerError;
+        ReorderTwitchEventRulesError::ServerError
       })?;
 
   // Here we check that the input set is entirely valid.
@@ -150,7 +150,7 @@ pub async fn reorder_twitch_event_rules_handler(
       .await
       .map_err(|err| {
         error!("Error with query: {:?}", err);
-        return ReorderTwitchEventRulesError::ServerError;
+        ReorderTwitchEventRulesError::ServerError
       })?;
 
 

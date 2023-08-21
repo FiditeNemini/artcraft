@@ -112,7 +112,7 @@ pub async fn list_user_w2l_inference_results_handler(
     let cursor = server_state.sort_key_crypto.decrypt_id(cursor)
         .map_err(|e| {
           warn!("crypto error: {:?}", e);
-          return ListW2lInferenceResultsForUserError::ServerError
+          ListW2lInferenceResultsForUserError::ServerError
         })?;
     Some(cursor)
   } else {
@@ -148,7 +148,7 @@ pub async fn list_user_w2l_inference_results_handler(
     let cursor = server_state.sort_key_crypto.encrypt_id(id as u64)
         .map_err(|e| {
           warn!("crypto error: {:?}", e);
-          return ListW2lInferenceResultsForUserError::ServerError
+          ListW2lInferenceResultsForUserError::ServerError
         })?;
     Some(cursor)
   } else {
@@ -159,7 +159,7 @@ pub async fn list_user_w2l_inference_results_handler(
     let cursor = server_state.sort_key_crypto.encrypt_id(id as u64)
         .map_err(|e| {
           warn!("crypto error: {:?}", e);
-          return ListW2lInferenceResultsForUserError::ServerError
+          ListW2lInferenceResultsForUserError::ServerError
         })?;
     Some(cursor)
   } else {

@@ -43,9 +43,9 @@ impl LeasePayload {
     let pair = (pieces.get(0), pieces.get(1));
 
     if let (Some(k), Some(v)) = pair {
-      return Ok(Self::from_string_id(k, v))
+      Ok(Self::from_string_id(k, v))
     } else {
-      return Err(anyhow!("Invalid payload: {}", payload));
+      Err(anyhow!("Invalid payload: {}", payload))
     }
   }
 }

@@ -113,7 +113,7 @@ pub async fn kill_tts_inference_jobs_handler(
       .await
       .map_err(|e| {
         error!("Error with query: {:?}", e);
-        return KillTtsInferenceJobsError::ServerError;
+        KillTtsInferenceJobsError::ServerError
       })?;
 
   let response = KillTtsInferenceJobsResponse {

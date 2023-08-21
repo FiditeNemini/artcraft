@@ -149,7 +149,7 @@ pub async fn handle_upload(
   let hash = sha256_hash_bytes(&bytes)
       .map_err(|io_error| {
         error!("Problem hashing bytes: {:?}", io_error);
-        return UploadError::ServerError;
+        UploadError::ServerError
       })?;
 
   let file_size_bytes = bytes.len();

@@ -26,15 +26,18 @@ deny = [
   #"clippy::unnecessary_to_owned",
   #"clippy::vec_init_then_push",
 
-  # Clippy - "aesthetic" lints
+  # Clippy - "ergonomic" / "usage" lints
+  "clippy::option_option", # Lint: Don't ever Option<Option<T>>! Enums instead.
+  "clippy::zero_sized_map_values", # Lint: use a HashSet instead of HashMap<T, ()>.
+
+  # Clippy - "aesthetic" / "style" lints
   "clippy::clone_double_ref", # Lint: feels safer/hygienic to disallow this, but I'm not strongly opposed.
   "clippy::double_comparisons", # Lint: readability
   "clippy::empty_structs_with_brackets", # Lint: {} feels less aesthetic than ;
   "clippy::implicit_clone", # Lint: Recommendation here seems more idiomatic.
-  "clippy::option_option", # Lint: Don't ever Option<Option<T>>! Enums instead.
+  "clippy::needless_return", # Lint: not the worst offender, but let's try to keep unnecessary returns out.
   "clippy::redundant_field_names", # Lint: Duplicate names is a burden when reading: you wonder why they're dupes.
   "clippy::redundant_static_lifetimes", # Lint: feels more modern to elide static lifetimes
-  "clippy::zero_sized_map_values", # Lint: use a HashSet instead of HashMap<T, ()>.
 
   # Possible:
   # "clippy::ptr_arg",

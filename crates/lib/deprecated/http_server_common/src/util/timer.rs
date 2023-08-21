@@ -63,16 +63,15 @@ impl MultiBenchmarkingTimer {
   pub fn mark_begin(&mut self) {
     if self.start_timer.is_some() {
       warn!("Start timer has already been set.");
-      return;
+    } else {
+      self.start_timer = Some(Instant::now());
     }
-    self.start_timer = Some(Instant::now());
   }
 
   pub fn mark_end(&mut self) {
     match self.start_timer {
       None => {
         warn!("Start timer was never started.");
-        return;
       }
       Some(start_time) => {
         let end = Instant::now();

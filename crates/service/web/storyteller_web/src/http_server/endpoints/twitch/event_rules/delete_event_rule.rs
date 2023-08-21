@@ -100,7 +100,7 @@ pub async fn delete_twitch_event_rule_handler(
       .await
       .map_err(|e| {
         error!("Error with query: {:?}", e);
-        return DeleteTwitchEventRuleError::ServerError;
+        DeleteTwitchEventRuleError::ServerError
       })?;
 
   if twitch_event_rule.is_none() {
@@ -117,7 +117,7 @@ pub async fn delete_twitch_event_rule_handler(
       .await
       .map_err(|e| {
         error!("Error with query: {:?}", e);
-        return DeleteTwitchEventRuleError::ServerError;
+        DeleteTwitchEventRuleError::ServerError
       });
 
   let response = DeleteTwitchEventRuleResponse {

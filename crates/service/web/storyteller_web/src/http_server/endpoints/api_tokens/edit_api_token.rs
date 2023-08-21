@@ -105,7 +105,7 @@ pub async fn edit_api_token_handler(
       .await
       .map_err(|e| {
         warn!("Error querying tokens: {:?}", e);
-        return EditApiTokenError::ServerError;
+        EditApiTokenError::ServerError
       })?;
 
   let valid_token = tokens.iter()
@@ -128,7 +128,7 @@ pub async fn edit_api_token_handler(
       .await
       .map_err(|e| {
         error!("Error with query: {:?}", e);
-        return EditApiTokenError::ServerError;
+        EditApiTokenError::ServerError
       });
 
   let response = EditApiTokenResponse {

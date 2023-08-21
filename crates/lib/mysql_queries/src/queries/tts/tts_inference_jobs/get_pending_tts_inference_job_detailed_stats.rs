@@ -71,7 +71,7 @@ FROM
         Ok(None)
       },
       _ => {
-        return Err(anyhow!("error querying tts stats: {:?}", err))
+        Err(anyhow!("error querying tts stats: {:?}", err))
       }
     }
   }

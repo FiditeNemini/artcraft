@@ -112,7 +112,7 @@ pub fn recursive_category_to_model_map(model_category_map: &ModelTokenToCategory
 }
 
 fn find_category_ancestors(category_token: &ModelCategoryToken, token_to_category_map: &CategoryTokenToCategoryMap) -> HashSet<ModelCategoryToken> {
-  return recursively_find_category_ancestors(category_token, token_to_category_map);
+  recursively_find_category_ancestors(category_token, token_to_category_map)
 }
 
 fn recursively_find_category_ancestors(

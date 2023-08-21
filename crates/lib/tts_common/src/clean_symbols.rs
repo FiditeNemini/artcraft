@@ -148,7 +148,7 @@ pub fn clean_symbols(input_text: &str) -> String {
         if let Some(replace) = REPLACEMENTS.get(segment) {
           return replace.as_str();
         }
-        return segment;
+        segment
       })
       .collect::<Vec<&str>>();
 

@@ -104,7 +104,7 @@ pub async fn get_generic_download_job_status_handler(
       .await
       .map_err(|err| {
         warn!("error querying job record: {:?}", err);
-        return GetGenericDownloadJobStatusError::ServerError
+        GetGenericDownloadJobStatusError::ServerError
       })?;
 
   let job_status = match maybe_job_status {

@@ -110,7 +110,7 @@ pub async fn list_user_tts_inference_results_handler(
     let cursor = server_state.sort_key_crypto.decrypt_id(cursor)
         .map_err(|e| {
           warn!("crypto error: {:?}", e);
-          return ListTtsInferenceResultsForUserError::ServerError
+          ListTtsInferenceResultsForUserError::ServerError
         })?;
     Some(cursor)
   } else {
@@ -143,7 +143,7 @@ pub async fn list_user_tts_inference_results_handler(
     let cursor = server_state.sort_key_crypto.encrypt_id(id as u64)
         .map_err(|e| {
           warn!("crypto error: {:?}", e);
-          return ListTtsInferenceResultsForUserError::ServerError
+          ListTtsInferenceResultsForUserError::ServerError
         })?;
     Some(cursor)
   } else {
@@ -154,7 +154,7 @@ pub async fn list_user_tts_inference_results_handler(
     let cursor = server_state.sort_key_crypto.encrypt_id(id as u64)
         .map_err(|e| {
           warn!("crypto error: {:?}", e);
-          return ListTtsInferenceResultsForUserError::ServerError
+          ListTtsInferenceResultsForUserError::ServerError
         })?;
     Some(cursor)
   } else {

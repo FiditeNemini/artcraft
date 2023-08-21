@@ -179,7 +179,7 @@ pub async fn get_profile_handler(
     let badges = maybe_badges
         .unwrap_or_else(|err| {
           warn!("Error querying badges: {:?}", err);
-          return Vec::new(); // NB: Fine if this fails. Not sure why it would.
+          Vec::new() // NB: Fine if this fails. Not sure why it would.
         });
 
     maybe_user_data = Some(RedisCacheData {

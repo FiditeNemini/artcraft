@@ -40,7 +40,7 @@ LIMIT 1
     let query_result = query.execute(mysql_pool).await;
 
     match query_result {
-      Err(err) => return Err(anyhow!("Error updating Twitch Event Rule: {:?}", err)),
+      Err(err) => Err(anyhow!("Error updating Twitch Event Rule: {:?}", err)),
       Ok(_r) => Ok(()),
     }
   }

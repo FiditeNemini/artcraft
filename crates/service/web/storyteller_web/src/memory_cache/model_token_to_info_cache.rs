@@ -49,7 +49,7 @@ impl ModelTokenToInfoCache {
 
   pub fn get_info(&self, token: &str) -> AnyhowResult<Option<ModelInfoLite>> {
     match self.database.read() {
-      Err(err) => return Err(anyhow!("lock err: {:?}", err)),
+      Err(err) => Err(anyhow!("lock err: {:?}", err)),
       Ok(lock) => {
         Ok(lock.get(token).map(|item| item.clone()))
       }

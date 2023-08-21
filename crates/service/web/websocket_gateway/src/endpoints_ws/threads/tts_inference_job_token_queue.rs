@@ -20,20 +20,20 @@ impl TtsInferenceJobTokenQueue {
   pub fn enqueue_token(&self, job_token: &str) -> AnyhowResult<()> {
     match self.queue.lock() {
       Err(e) => {
-        return Err(anyhow!("poisoned mutex: {:?}", e));
+        Err(anyhow!("poisoned mutex: {:?}", e))
       },
       Ok(mut queue) => {
         queue.push_back(job_token.to_string());
+        Ok(())
       },
     }
-    Ok(())
   }
 
   /// Pop a job token from the queue
   pub fn dequeue_token(&self) -> AnyhowResult<Option<String>> {
     match self.queue.lock() {
       Err(e) => {
-        return Err(anyhow!("poisoned mutex: {:?}", e));
+        Err(anyhow!("poisoned mutex: {:?}", e))
       },
       Ok(mut queue) => {
         Ok(queue.pop_front())

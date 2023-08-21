@@ -113,7 +113,7 @@ pub async fn edit_twitch_event_rule_handler(
       .await
       .map_err(|e| {
         error!("Error with query: {:?}", e);
-        return EditTwitchEventRuleError::ServerError;
+        EditTwitchEventRuleError::ServerError
       })?;
 
   if twitch_event_rule.is_none() {
@@ -132,8 +132,8 @@ pub async fn edit_twitch_event_rule_handler(
 
   let mut event_match_predicate = serde_json::to_string(&event_match_predicate)
       .map_err(|e| {
-        return EditTwitchEventRuleError::BadInput(
-          "improper EventMatchPredicate".to_string());
+        EditTwitchEventRuleError::BadInput(
+          "improper EventMatchPredicate".to_string())
       })?;
 
   let event_response = request.event_response
@@ -145,8 +145,8 @@ pub async fn edit_twitch_event_rule_handler(
 
   let mut event_response = serde_json::to_string(&event_response)
       .map_err(|e| {
-        return EditTwitchEventRuleError::BadInput(
-          "improper EventResponse".to_string());
+        EditTwitchEventRuleError::BadInput(
+          "improper EventResponse".to_string())
       })?;
 
   let update_builder = UpdateTwitchEventRuleBuilder {
@@ -161,7 +161,7 @@ pub async fn edit_twitch_event_rule_handler(
       .await
       .map_err(|e| {
         error!("Error with query: {:?}", e);
-        return EditTwitchEventRuleError::ServerError;
+        EditTwitchEventRuleError::ServerError
       });
 
   let response = EditTwitchEventRuleResponse {

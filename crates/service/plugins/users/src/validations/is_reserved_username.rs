@@ -35,7 +35,7 @@ fn is_reserved_substring(username: &str) -> bool {
     }
   }
 
-  return false;
+  false
 }
 
 #[cfg(test)]

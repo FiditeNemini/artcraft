@@ -103,7 +103,7 @@ pub async fn delete_api_token_handler(
       .await
       .map_err(|e| {
         warn!("Error querying tokens: {:?}", e);
-        return DeleteApiTokenError::ServerError;
+        DeleteApiTokenError::ServerError
       })?;
 
   let valid_token = tokens.iter()
@@ -125,7 +125,7 @@ pub async fn delete_api_token_handler(
       .await
       .map_err(|e| {
         error!("Error with query: {:?}", e);
-        return DeleteApiTokenError::ServerError;
+        DeleteApiTokenError::ServerError
       });
 
   let response = DeleteApiTokenResponse {

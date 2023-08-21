@@ -110,8 +110,8 @@ pub async fn create_twitch_event_rule_handler(
 
   let mut event_match_predicate = serde_json::to_string(&event_match_predicate)
       .map_err(|e| {
-        return CreateTwitchEventRuleError::BadInput(
-          "improper EventMatchPredicate".to_string());
+        CreateTwitchEventRuleError::BadInput(
+          "improper EventMatchPredicate".to_string())
       })?;
 
   let event_response = request.event_response
@@ -120,8 +120,8 @@ pub async fn create_twitch_event_rule_handler(
 
   let mut event_response = serde_json::to_string(&event_response)
       .map_err(|e| {
-        return CreateTwitchEventRuleError::BadInput(
-          "improper EventResponse".to_string());
+        CreateTwitchEventRuleError::BadInput(
+          "improper EventResponse".to_string())
       })?;
 
   let insert_builder = InsertTwitchEventRuleBuilder {
