@@ -8,20 +8,23 @@ tab_spaces = 2
 # Only Unix
 newline_style = "unix"
 
-# We won't change any vendor code.
-# Note: This appears not to work in stable, so it's necessary to run `cargo +nightly fmt`.
-ignore = [
-  "vendor"
-]
+# NB(bt,2023-08-21): This is still nightly-only. Disabled.
+# # We won't change any vendor code.
+# # Note: This appears not to work in stable, so it's necessary to run `cargo +nightly fmt`.
+# ignore = [
+#   "vendor"
+# ]
 
-# Item-level imports makes for better diffs and fewer merge conflicts.
-# Another suitable option is "Module", but that's not the default either.
-# (This is commented out for now to reduce the first round of rustfmt diffs, but will be enabled.)
-imports_granularity = "Item"
+# NB(bt,2023-08-21): This is still nightly-only. Disabled.
+# # Item-level imports makes for better diffs and fewer merge conflicts.
+# # Another suitable option is "Module", but that's not the default either.
+# # (This is commented out for now to reduce the first round of rustfmt diffs, but will be enabled.)
+# imports_granularity = "Item"
 
-# It's better to keep stdlib, crate (self), and external crates separate.
-# (This is commented out for now to reduce the first round of rustfmt diffs, but will be enabled.)
-group_imports = "StdExternalCrate"
+# NB(bt,2023-08-21): This is still nightly-only. Disabled.
+# # It's better to keep stdlib, crate (self), and external crates separate.
+# # (This is commented out for now to reduce the first round of rustfmt diffs, but will be enabled.)
+# group_imports = "StdExternalCrate"
 
 # The default is wrong
 match_block_trailing_comma = true
