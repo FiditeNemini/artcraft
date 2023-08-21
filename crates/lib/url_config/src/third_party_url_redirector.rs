@@ -40,8 +40,10 @@ impl ThirdPartyUrlRedirector {
         let redirect_hostname = match (self.environment, request_hostname.as_str()) {
             (ServerEnvironment::Production, "api.fakeyou.com") => "fakeyou.com",
             (ServerEnvironment::Production, "api.storyteller.io") => "storyteller.io",
+            (ServerEnvironment::Production, "api.storyteller.ai") => "storyteller.ai",
             (ServerEnvironment::Development, "api.dev.fakeyou.com") => "dev.fakeyou.com",
             (ServerEnvironment::Development, "api.dev.storyteller.io") => "dev.storyteller.io",
+            (ServerEnvironment::Development, "api.dev.storyteller.ai") => "dev.storyteller.ai",
             (ServerEnvironment::Development, hostname ) => {
                 // Handle localhost with ports.
                 let parts = hostname.split(":")
@@ -103,6 +105,14 @@ mod tests {
     }
 
     #[test]
+    fn test_development_storyteller_ai_redirect() {
+        let redirector = ThirdPartyUrlRedirector::new(ServerEnvironment::Development);
+        let http_request  = request_with_host("api.dev.storyteller.ai");
+        let result = redirector.frontend_redirect_url_for_path(&http_request, "/something");
+        assert_eq!("https://dev.storyteller.ai/something", result.unwrap());
+    }
+
+    #[test]
     fn test_development_localhost_redirect() {
         let redirector = ThirdPartyUrlRedirector::new(ServerEnvironment::Development);
         let http_request  = request_with_host("localhost:8000");
@@ -124,6 +134,14 @@ mod tests {
         let http_request  = request_with_host("api.storyteller.io");
         let result = redirector.frontend_redirect_url_for_path(&http_request, "/account");
         assert_eq!("https://storyteller.io/account", result.unwrap());
+    }
+
+    #[test]
+    fn test_production_storyteller_ai_redirect() {
+        let redirector = ThirdPartyUrlRedirector::new(ServerEnvironment::Production);
+        let http_request  = request_with_host("api.storyteller.ai");
+        let result = redirector.frontend_redirect_url_for_path(&http_request, "/account");
+        assert_eq!("https://storyteller.ai/account", result.unwrap());
     }
 
     #[test]
