@@ -3,7 +3,6 @@ use actix_web::http::Uri;
 use anyhow::anyhow;
 use http_server_common::request::get_request_host::get_request_host;
 use reusable_types::server_environment::ServerEnvironment;
-use std::ops::Deref;
 use std::str::FromStr;
 
 /// Multi-environment configuration for 3rd party redirects, eg. Stripe checkout flow and
@@ -51,7 +50,6 @@ impl ThirdPartyUrlRedirector {
                 let maybe_host = parts.get(0).map(|s| *s);
                 let maybe_port = parts
                     .get(1)
-                    .map(|p| p.deref())
                     .map(|p| u32::from_str(p))
                     .transpose()?;
 

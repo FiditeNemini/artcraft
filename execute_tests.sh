@@ -9,11 +9,11 @@ echo 'Running tests...'
 
 cargo test \
   --workspace \
-  --exclude sqlite_queries \
   --exclude aichatbot-sidecar \
-  --exclude fakeyou_client \
   --exclude billing_component \
-  --exclude inference-job
+  --exclude fakeyou_client \
+  --exclude inference-job \
+  --exclude sqlite_queries
 
 # Single broken tests
 cargo test \
@@ -21,3 +21,4 @@ cargo test \
   -- \
   --skip util::audiowmark::tests::test_audiowmark
 
+echo 'Tests passed.'

@@ -32,6 +32,7 @@ deny = [
   "clippy::empty_structs_with_brackets", # Lint: {} feels less aesthetic than ;
   "clippy::implicit_clone", # Lint: Recommendation here seems more idiomatic.
   "clippy::option_option", # Lint: Don't ever Option<Option<T>>! Enums instead.
+  "clippy::redundant_field_names", # Lint: Duplicate names is a burden when reading: you wonder why they're dupes.
   "clippy::redundant_static_lifetimes", # Lint: feels more modern to elide static lifetimes
   "clippy::zero_sized_map_values", # Lint: use a HashSet instead of HashMap<T, ()>.
 
@@ -45,6 +46,7 @@ warn = [
 
 allow = [
   # Rust
+  "deprecated", # Other systems can handle deprecated code instead of the linter
   "missing_docs", # Not everything needs documentation. Too much documentation is bad. Literate code.
 
   # Clippy
