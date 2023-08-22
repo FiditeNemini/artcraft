@@ -49,7 +49,19 @@ import { FrontendInferenceJobType, InferenceJob } from "@storyteller/components/
 import { GetModelInferenceJobStatus, GetModelInferenceJobStatusIsOk } from "@storyteller/components/src/api/model_inference/GetModelInferenceJobStatus";
 import { VoiceConversionModelUploadJob } from "@storyteller/components/src/jobs/VoiceConversionModelUploadJob";
 import { VoiceConversionModelListItem } from "@storyteller/components/src/api/voice_conversion/ListVoiceConversionModels";
+import HttpBackend from 'i18next-http-backend'
 
+// NB: We're transitioning over to this instance of i18n-next that loads translations over HTTP from Json Files.
+// The old i18n-next instance (see below) bakes in translations into the compiled javascript blob.
+// This new instance uses the Locize paid service to manage translation strings on their website. It's automated, 
+// can easily sync to version control, and makes translation easy to maintain across a wide number of languages.
+export const i18n2 = i18n.createInstance();
+
+// OLD i18n-next instance
+// This instance of i18n-next should not be used for new translations going forward.
+// All of the translations behind this instance are backed into the javascript app at compile time and are manually
+// curated and managed, which is a maintainability nightmare. In time, the above 'i18n2' instance will take over
+// and we can remove this instance.
 i18n
   .use(initReactI18next) // passes i18n down to react-i18next
   .init({
@@ -57,7 +69,6 @@ i18n
     // (tip move them in a JSON file and import them,
     // or even better, manage them via a UI: https://react.i18next.com/guides/multiple-translation-files#manage-your-translations-with-a-management-gui)
     resources: FAKEYOU_MERGED_TRANSLATIONS,
-    //lng: 'en', // if you're using a language detector, do not define the lng option
     fallbackLng: "en",
 
     // For finding 'Trans' component keys.
@@ -66,6 +77,17 @@ i18n
     interpolation: {
       escapeValue: false, // react already safes from xss => https://www.i18next.com/translation-function/interpolation#unescape
     },
+  });
+
+i18n2
+  .use(HttpBackend)
+  .init({
+    fallbackLng: "en",
+    debug: true,
+    backend: {
+      // This is the path localizations are loaded from.
+      loadPath: '/locales/{{lng}}/{{ns}}.json',
+    }
   });
 
 enum MigrationMode {
@@ -305,6 +327,7 @@ class App extends React.Component<Props, State> {
       });
 
       i18n.changeLanguage(preferredLanguage.languageCode);
+      i18n2.changeLanguage(preferredLanguage.languageCode);
     }
   };
 

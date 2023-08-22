@@ -36,6 +36,7 @@
     "framer-motion": "^6.5.1",
     "howler": "^2.2.0",
     "i18next": "^21.6.11",
+    "i18next-browser-languagedetector": "^7.1.0",
     "js-cookie": "^3.0.1",
     "posthog-js": "^1.73.1",
     "pretty-num": "^0.5.2",

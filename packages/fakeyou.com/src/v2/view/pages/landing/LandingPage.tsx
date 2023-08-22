@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
 import { SessionSubscriptionsWrapper } from "@storyteller/components/src/session/SessionSubscriptionsWrapper";
 import { t } from "i18next";
+import { i18n2 } from "../../../../App";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faStar,
@@ -28,6 +29,9 @@ interface Props {
 
 function LandingPage(props: Props) {
   PosthogClient.recordPageview();
+
+  i18n2.loadNamespaces("LandingPage");
+  const t2 = i18n2.getFixedT(null, "LandingPage");
 
   let signUpButton = <></>;
   let viewPricingButton = <></>;
@@ -170,13 +174,11 @@ function LandingPage(props: Props) {
           </div>
           <div className="col-12 col-lg-7 d-flex flex-column justify-content-center flex-reverse px-md-5 px-lg-3">
             <h1 className="fw-bold display-5 text-center text-lg-start px-md-5 px-lg-0">
-              AI Music, Text to Speech,
-              <br />
-              and Voice to Voice
+              {t2('hero.top')}
             </h1>
             <p className="lead opacity-75 pb-4 text-center text-lg-start px-md-5 px-lg-0 pe-lg-5">
-              Generate audio or videos of your favorite characters saying
-              anything you want with FakeYou's deep fake tech.
+              {t2('hero.bottom')}
+             
             </p>
             <div className="d-flex flex-column flex-md-row gap-3 mt-3 mb-4 w-100 justify-content-center justify-content-lg-start">
               {upgradeButton}
