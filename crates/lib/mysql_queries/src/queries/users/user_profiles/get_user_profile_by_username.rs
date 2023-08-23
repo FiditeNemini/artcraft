@@ -1,15 +1,11 @@
 use anyhow::anyhow;
 use chrono::{DateTime, Utc};
-use errors::AnyhowResult;
 use crate::helpers::boolean_converters::i8_to_bool;
 use enums::common::visibility::Visibility;
-use log::{info, warn, log};
-use sqlx::error::DatabaseError;
-use sqlx::error::Error::Database;
-use sqlx::mysql::MySqlDatabaseError;
+use errors::AnyhowResult;
+use log::{warn, log};
 use sqlx::pool::PoolConnection;
 use sqlx::{MySqlPool, MySql};
-use std::sync::Arc;
 use tokens::users::user::UserToken;
 
 // TODO: Make non-`Serialize` and make the HTTP endpoints do the work

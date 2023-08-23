@@ -6,6 +6,7 @@
 use actix_web::error::ResponseError;
 use actix_web::http::StatusCode;
 use actix_web::{web, HttpResponse, HttpRequest};
+use crate::http_server::common_responses::user_details_lite::{DefaultAvatarInfo, UserDetailsLight};
 use crate::http_server::web_utils::serialize_as_json_error::serialize_as_json_error;
 use crate::server_state::ServerState;
 use crate::user_avatars::default_avatar_color_from_username::default_avatar_color_from_username;
@@ -17,6 +18,7 @@ use mysql_queries::queries::w2l::stats::calculate_w2l_template_leaderboard::calc
 use sqlx::MySqlPool;
 use std::fmt;
 use std::sync::Arc;
+use tokens::users::user::UserToken;
 
 #[derive(Serialize)]
 pub struct LeaderboardResponse {
@@ -27,15 +29,28 @@ pub struct LeaderboardResponse {
 
 #[derive(Clone, Serialize)]
 pub struct LeaderboardRow {
-  pub creator_user_token: String,
-
-  pub username: String,
-  pub display_name: String,
-  pub gravatar_hash: String,
-  pub default_avatar_index: u8,
-  pub default_avatar_color_index: u8,
+  pub user: UserDetailsLight,
 
   pub uploaded_count: i64,
+
+  #[deprecated(note="switch to UserDetailsLight")]
+  pub creator_user_token: String,
+
+  #[deprecated(note="switch to UserDetailsLight")]
+  pub username: String,
+
+  #[deprecated(note="switch to UserDetailsLight")]
+
+  pub display_name: String,
+
+  #[deprecated(note="switch to UserDetailsLight")]
+  pub gravatar_hash: String,
+
+  #[deprecated(note="switch to UserDetailsLight")]
+  pub default_avatar_index: u8,
+
+  #[deprecated(note="switch to UserDetailsLight")]
+  pub default_avatar_color_index: u8,
 }
 
 #[derive(Serialize, Debug)]
@@ -173,12 +188,19 @@ async fn query_leaderboard(mysql_pool: &MySqlPool) -> AnyhowResult<LeaderboardIn
       .await?
       .into_iter()
       .map(|record| LeaderboardRow {
-        creator_user_token: record.creator_user_token,
+        creator_user_token: record.creator_user_token.clone(), // NB: Cloned because of ref use
         username: record.username.to_string(), // NB: Cloned because of ref use for avatar below
-        display_name: record.display_name,
-        gravatar_hash: record.gravatar_hash,
+        display_name: record.display_name.to_string(), // Cloned because of `UserDetailsLight`
+        gravatar_hash: record.gravatar_hash.to_string(),
         default_avatar_index: default_avatar_from_username(&record.username),
         default_avatar_color_index: default_avatar_color_from_username(&record.username),
+        user: UserDetailsLight {
+          user_token: UserToken::new_from_str(&record.creator_user_token),
+          username: record.username.to_string(), // NB: Cloned because of ref use for avatar below
+          display_name: record.display_name,
+          gravatar_hash: record.gravatar_hash,
+          default_avatar: DefaultAvatarInfo::from_username(&record.username),
+        },
         uploaded_count: record.uploaded_count,
       })
       .collect();
@@ -187,12 +209,19 @@ async fn query_leaderboard(mysql_pool: &MySqlPool) -> AnyhowResult<LeaderboardIn
       .await?
       .into_iter()
       .map(|record| LeaderboardRow {
-        creator_user_token: record.creator_user_token,
+        creator_user_token: record.creator_user_token.clone(), // NB: Cloned because of ref use
         username: record.username.to_string(), // NB: Cloned because of ref use for avatar below
-        display_name: record.display_name,
-        gravatar_hash: record.gravatar_hash,
+        display_name: record.display_name.clone(), // Cloned because of ref use.
+        gravatar_hash: record.gravatar_hash.clone(), // Cloned because of ref use.
         default_avatar_index: default_avatar_from_username(&record.username),
         default_avatar_color_index: default_avatar_color_from_username(&record.username),
+        user: UserDetailsLight {
+          user_token: UserToken::new_from_str(&record.creator_user_token),
+          username: record.username.to_string(), // NB: Cloned because of ref use for avatar below
+          display_name: record.display_name,
+          gravatar_hash: record.gravatar_hash,
+          default_avatar: DefaultAvatarInfo::from_username(&record.username),
+        },
         uploaded_count: record.uploaded_count,
       })
       .collect();

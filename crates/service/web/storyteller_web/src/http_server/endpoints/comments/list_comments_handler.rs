@@ -20,6 +20,7 @@ use std::fmt;
 use std::sync::Arc;
 use tokens::tokens::comments::CommentToken;
 use tokens::users::user::UserToken;
+use crate::http_server::common_responses::user_details_lite::{DefaultAvatarInfo, UserDetailsLight};
 
 /// For the URL PathInfo
 #[derive(Deserialize)]
@@ -38,12 +39,7 @@ pub struct ListCommentsSuccessResponse {
 pub struct Comment {
   pub token: CommentToken,
 
-  pub user_token: UserToken,
-  pub username: String,
-  pub user_display_name: String,
-  pub user_gravatar_hash: String,
-  pub default_avatar_index: u8,
-  pub default_avatar_color_index: u8,
+  pub user: UserDetailsLight,
 
   pub comment_markdown: String,
   pub comment_rendered_html: String,
@@ -53,6 +49,24 @@ pub struct Comment {
   pub created_at: DateTime<Utc>,
   pub updated_at: DateTime<Utc>,
   pub maybe_edited_at: Option<DateTime<Utc>>,
+
+  #[deprecated(note="switch to UserDetailsLight")]
+  pub user_token: UserToken,
+
+  #[deprecated(note="switch to UserDetailsLight")]
+  pub username: String,
+
+  #[deprecated(note="switch to UserDetailsLight")]
+  pub user_display_name: String,
+
+  #[deprecated(note="switch to UserDetailsLight")]
+  pub user_gravatar_hash: String,
+
+  #[deprecated(note="switch to UserDetailsLight")]
+  pub default_avatar_index: u8,
+
+  #[deprecated(note="switch to UserDetailsLight")]
+  pub default_avatar_color_index: u8,
 }
 
 // TODO
@@ -119,6 +133,13 @@ pub async fn list_comments_handler(
     comments: comments.into_iter()
         .map(|comment| Comment {
           token: comment.token,
+          user: UserDetailsLight {
+            user_token: comment.user_token.clone(),
+            username: comment.username.to_string(), // NB: Cloned because of ref use for avatar below
+            display_name: comment.user_display_name.clone(),
+            gravatar_hash: comment.user_gravatar_hash.clone(),
+            default_avatar: DefaultAvatarInfo::from_username(&comment.username),
+          },
           user_token: comment.user_token,
           username: comment.username.to_string(), // NB: Cloned because of ref use for avatar below
           user_display_name: comment.user_display_name,
