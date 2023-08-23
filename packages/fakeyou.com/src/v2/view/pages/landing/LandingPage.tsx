@@ -484,11 +484,8 @@ function LandingPage(props: Props) {
       <div className="py-4">
         <div className="container text-center community-container">
           <div className="panel px-4 py-5 d-flex flex-column align-items-center community-container rounded">
-            <h2 className="fw-bold mb-2">Join the Community</h2>
-            <p className="opacity-75">
-              We'd love to chat with you! Please join us in Discord if you have
-              any questions.
-            </p>
+            <h2 className="fw-bold mb-2">{t2("community.heading")}</h2>
+            <p className="opacity-75">{t2("community.text")}</p>
             <div className="d-flex mt-4 gap-3">
               <a
                 href="https://discord.gg/fakeyou"
@@ -497,7 +494,7 @@ function LandingPage(props: Props) {
                 className="btn btn-discord"
               >
                 <FontAwesomeIcon icon={faDiscord} className="me-2" />
-                Discord
+                {t2("community.discordButton")}
               </a>
               <a
                 href="https://twitter.com/intent/follow?screen_name=FakeYouApp"
@@ -506,7 +503,7 @@ function LandingPage(props: Props) {
                 className="btn btn-twitter"
               >
                 <FontAwesomeIcon icon={faTwitter} className="me-2" />
-                Twitter
+                {t2("community.twitterButton")}
               </a>
             </div>
           </div>

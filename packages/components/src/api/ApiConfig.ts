@@ -57,8 +57,10 @@ class ApiConfig {
         break;
       case "dev.fakeyou.com:7001":
         // NB: for dev machines without nginx proxies
-        apiHost = "api.dev.fakeyou.com:12345";
-        useSsl = false;
+        //apiHost = "api.dev.fakeyou.com:12345";
+        //useSsl = false;
+        useSsl = true;
+        apiHost = "api.fakeyou.com";
         break;
       default: 
         if (document.location.host.includes("localhost")) {

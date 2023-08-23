@@ -1,4 +1,10 @@
 {
+  "community": {
+    "discordButton": "Discord",
+    "heading": "Junte-se à comunidade",
+    "text": "Adoraríamos conversar com você! Junte-se a nós no Discord se tiver alguma dúvida.",
+    "twitterButton": "Twitter"
+  },
   "hero": {
     "bottom": "Gere áudio ou vídeos de seus personagens favoritos dizendo o que quiser com a tecnologia deep fake do FakeYou.",
     "top": "Música AI, texto em fala e voz em voz"
