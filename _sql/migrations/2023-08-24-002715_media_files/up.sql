@@ -23,11 +23,13 @@ CREATE TABLE media_files (
   origin_category VARCHAR(16) NOT NULL,
 
   -- For inference that can be tied back to a model, the type of model.
+  --   * 'sad_talker', which doesn't have a value for maybe_origin_model_token (!!!)
+  --   * (more tome come)
   maybe_origin_model_type VARCHAR(32) DEFAULT NULL,
 
   -- For inference that can be tied back to a model, the token of the model.
   -- For zero shot models, this may be set as the token for the vector.
-  maybe_origin_model_token VARCHAR(32) NOT NULL,
+  maybe_origin_model_token VARCHAR(32) DEFAULT NULL,
 
   -- The original filename of the media (if uploaded by a user)
   maybe_origin_filename VARCHAR(255) DEFAULT NULL,
