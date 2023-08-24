@@ -17,6 +17,7 @@ pub(crate) enum EntityType {
   Comment,
   DownloadJob,
   InferenceJob,
+  MediaFile,
   MediaUpload,
   ModelCategory,
   NewsStory, // NB: aichatbot / sqlite
@@ -36,6 +37,7 @@ impl EntityType {
       Self::Comment => "comment_",
       Self::DownloadJob => "jdown_", // NB: Was "JGUP:"
       Self::InferenceJob => "jinf_",
+      Self::MediaFile => "m_",
       Self::MediaUpload => "mu_",
       Self::ModelCategory => "CAT:", // NB: Old-style prefix, do not use for future tokens.
       Self::NewsStory => "news_story_",

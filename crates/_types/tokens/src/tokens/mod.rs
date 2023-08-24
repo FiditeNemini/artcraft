@@ -1,6 +1,7 @@
 // ===== For MySQL =====
 pub mod audit_logs;
 pub mod comments;
+pub mod media_files;
 pub mod model_categories;
 pub mod tts_models;
 pub mod voice_conversion_results;
