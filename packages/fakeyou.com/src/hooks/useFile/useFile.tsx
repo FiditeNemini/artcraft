@@ -6,7 +6,7 @@ interface Props {
   debug?: any;
   onChange?: (file: any) => void;
   onClear?: (x?: any) => void;
-  onSubmit?: (file: any) => Promise<boolean>;
+  onSubmit?: (file: any) => Promise<boolean | undefined> | Promise<void>;
 }
 
 export default function useFile({ debug, onChange = n, onClear = n, onSubmit = n }: Props) {
@@ -18,8 +18,8 @@ export default function useFile({ debug, onChange = n, onClear = n, onSubmit = n
 
   const submit = async () => {
     if (file === undefined) { return false; }
-    const onUploadResult = await onSubmit(file);
     workingSet(true);
+    const onUploadResult = await onSubmit(file);
     if (onUploadResult) { successSet(true); }
     else successSet(false);
   };

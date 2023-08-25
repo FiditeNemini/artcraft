@@ -4,6 +4,7 @@ import FileActions from './FileActions';
 import FileDetails from './FileDetails';
 import FileWrapper from './FileWrapper';
 import FileLabel from './FileLabel';
+import Spinner from './Spinner';
 
 export {
 	AudioInput,
@@ -11,5 +12,6 @@ export {
 	FileActions,
 	FileDetails,
 	FileWrapper,
-	FileLabel
+	FileLabel,
+	Spinner
 };

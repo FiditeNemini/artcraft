@@ -1,11 +1,11 @@
 import React, { useState } from "react";
 import { animated, useChain, useSpring, useSpringRef, useTransition } from '@react-spring/web';
 import { useFile } from "hooks";
-import { AudioInput, ImageInput } from "components/common";
+import { AudioInput, ImageInput, Spinner } from "components/common";
 import DynamicButton from './DynamicButton';
 import './LipsyncEditor.scss';
 
-interface LipSyncProps { audioProps: any, imageProps: any, ready: any, style: any };
+interface LipSyncProps { audioProps: any, imageProps: any, toggle: any, style: any };
 
 const SuccessPage = ({ audioProps, imageProps, style }: LipSyncProps )  => <animated.div {...{ className: "lipsync-success", style }}>
   <h1 className=" fw-bold text-center text-lg-start">
@@ -17,7 +17,9 @@ const SuccessPage = ({ audioProps, imageProps, style }: LipSyncProps )  => <anim
   </video>
 </animated.div>;
 
-const InputPage = ({ audioProps, imageProps, ready, style }: LipSyncProps )  => <animated.div {...{ className: "lipsync-editor", style }}>
+const InputPage = ({ audioProps, imageProps, toggle, style }: LipSyncProps )  => {
+
+  return <animated.div {...{ className: "lipsync-editor", style }}>
   <div {...{ className: "grid-heading" }}>
     <h5>Image</h5>
   </div>
@@ -25,15 +27,19 @@ const InputPage = ({ audioProps, imageProps, ready, style }: LipSyncProps )  => 
     <h5>Audio</h5>
   </div>
   <div {...{ className: "grid-square lipsync-audio" }}>
-    <ImageInput {...{ ...imageProps, onRest: () => ready.image(imageProps.file ? true : false) }}/>
+    <ImageInput {...{ ...imageProps, onRest: () => toggle.image(imageProps.file ? true : false) }}/>
   </div>
   <div {...{ className: "grid-square" }}>
-    <AudioInput {...{ ...audioProps, onRest: () => ready.audio(audioProps.file ? true : false), hideActions: true } }/>
+    <AudioInput {...{ ...audioProps, onRest: (p:any,c:any,item:any,l:any) => {
+      console.log("🍑",!!audioProps.file);
+      toggle.audio(!!audioProps.file);
+    }, hideActions: true } }/>
+    <Spinner />
   </div>
-</animated.div>;
+</animated.div>};
 
 const WorkingPage = ({ audioProps, imageProps, style }: LipSyncProps ) => <animated.div {...{ className: "lipsync-editor", style }}>
-  Hi smile :)
+ <Spinner/>
 </animated.div>;
 
 const ProgressCheck = ({ disabled = false, refB }: {disabled?: boolean, refB: any }) => {
@@ -45,7 +51,6 @@ const ProgressCheck = ({ disabled = false, refB }: {disabled?: boolean, refB: an
     <circle {...{ cx: 16, cy: 16, r: 15, strokeWidth: "2", }}/>
     { <polyline {...{
       fill: 'none',
-      // points: '7 16 12 20 20 10',
       points: '9.5 18 14.5 22 22.5 12',
       strokeLinecap: 'round',
       strokeLinejoin: 'round',
@@ -95,13 +100,17 @@ const Title = ({ ...rest }) => {
 export default function LipsyncEditor({ ...rest }) {
   const [imageReady,imageReadySet] = useState<boolean>(false);
   const [audioReady,audioReadySet] = useState<boolean>(false);
-  const readyMedia = (m:number,t:boolean) => () => {
-    console.log("🥒",m,t);
-    [imageReadySet,audioReadySet][m](t)};
-  const onSubmit = async () => true;
-  const audioProps = useFile({ debug: 'audio useFile',onClear: () => readyMedia(1,false), onSubmit });
-  const imageProps = useFile({ onClear: () => readyMedia(0,false), onSubmit });
-  console.log("😎",imageReady,audioReady);
+  const readyMedia = (m:number) => (t:boolean) => [imageReadySet,audioReadySet][m](t);
+  const onSubmit = async () => {
+    await new Promise(resolve => {
+        setTimeout(function () {
+            resolve();
+        }, 6000);
+    });
+    return true;
+  };
+  const audioProps = useFile({ debug: 'audio useFile', onSubmit });
+  const imageProps = useFile({ onSubmit });
   const headerProps = {
     audioProps,
     audioReady,
@@ -130,7 +139,7 @@ export default function LipsyncEditor({ ...rest }) {
             return <Page {...{ 
               audioProps,
               imageProps,
-              ready: { audio: readyMedia(1,true), image: readyMedia(0,true) },
+              toggle: { audio: readyMedia(1), image: readyMedia(0) },
               style 
             }}/>
           }) }

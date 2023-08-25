@@ -1,5 +1,5 @@
 import React from "react";
-import { a, useSpring } from '@react-spring/web';
+import { a, useSpring, useTransition } from '@react-spring/web';
 import { InputVcAudioPlayer } from "v2/view/_common/InputVcAudioPlayer";
 import { FileActions, FileDetails, FileLabel, FileWrapper } from 'components/common';
 import { faFileAudio } from "@fortawesome/pro-solid-svg-icons";
@@ -24,21 +24,24 @@ interface Props {
 const n = () => {};
 
 export default function AudioInput({ blob = "", clear = n, file, hideActions, hideClearDetails, inputProps, onRest = n, success = false, submit = n, working = false, ...rest }: Props) {
-  const style = useSpring({
-    config: { mass: 1, tension: 120, friction: 14 },
+
+  const transitions = useTransition(file, {
+    config: { tension: 120,  friction: 15 },
+    from: { opacity: 0 },
+    enter: { opacity: 1 },
+    leave: { opacity: 0 },
     onRest,
-    opacity: file ? 1 : 0
   });
 
   return <div {...{ className: "fy-audio-uploader" }}>
     <FileWrapper {...{ fileTypes, ...inputProps, panelClass: "p-3", ...rest }}>
      { file ? <FileDetails {...{ clear, hideClearDetails, icon: faFileAudio, file }}/> : <FileLabel {...{ fileTypes }}/> }
     </FileWrapper>
-      { file && <>
-        <a.div {...{ className: "panel panel-inner rounded p-3", style }}>
+      { transitions((style, i) => i ? <a.div {...{ className: "audio-details", style }}>
+        <div {...{ className: "panel panel-inner rounded p-3" }}>
           <InputVcAudioPlayer {...{ filename: blob as string }}/>
-        </a.div>
+        </div>
         { !hideActions && <FileActions {...{ clear, success, submit, working }}/> }
-      </> }
+      </a.div> : null ) }
   </div>;
 };
