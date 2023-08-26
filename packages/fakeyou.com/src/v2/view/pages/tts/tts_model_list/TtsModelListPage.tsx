@@ -45,9 +45,8 @@ import {
   faGlobe,
   faVolumeHigh,
 } from "@fortawesome/free-solid-svg-icons";
-import { GenericNotice } from "./notices/GenericNotice";
-import { DiscordLink2 } from "@storyteller/components/src/elements/DiscordLink2";
-
+// import { GenericNotice } from "./notices/GenericNotice";
+// import { DiscordLink2 } from "@storyteller/components/src/elements/DiscordLink2";
 import { SessionSubscriptionsWrapper } from "@storyteller/components/src/session/SessionSubscriptionsWrapper";
 import { TtsPageHero } from "./TtsPageHero";
 import { Analytics } from "../../../../../common/Analytics";
@@ -419,21 +418,21 @@ function TtsModelListPage(props: Props) {
     />
   ) : undefined;
 
-  let dollars = "$150 USD";
+  // let dollars = "$150 USD";
 
-  const bootstrapLanguageNotice = props.isShowingBootstrapLanguageNotice ? (
-    <GenericNotice
-      title={t("notices.HelpBootstrapLanguage.title")}
-      body={
-        <Trans i18nKey="notices.HelpBootstrapLanguage.body">
-          We don't have enough voices in this language yet. Please help us build
-          your favorite characters. Join our <DiscordLink2 /> and we'll teach
-          you how. We'll pay {dollars} you per voice, too!
-        </Trans>
-      }
-      clearNotice={props.clearBootstrapLanguageNotice}
-    />
-  ) : undefined;
+  // const bootstrapLanguageNotice = props.isShowingBootstrapLanguageNotice ? (
+  //   <GenericNotice
+  //     title={t("notices.HelpBootstrapLanguage.title")}
+  //     body={
+  //       <Trans i18nKey="notices.HelpBootstrapLanguage.body">
+  //         We don't have enough voices in this language yet. Please help us build
+  //         your favorite characters. Join our <DiscordLink2 /> and we'll teach
+  //         you how. We'll pay {dollars} you per voice, too!
+  //       </Trans>
+  //     }
+  //     clearNotice={props.clearBootstrapLanguageNotice}
+  //   />
+  // ) : undefined;
 
   // Show errors on TTS failure
   let maybeError = <></>;
@@ -508,7 +507,7 @@ function TtsModelListPage(props: Props) {
 
   return (
     <div>
-      {bootstrapLanguageNotice}
+      {/* {bootstrapLanguageNotice} */}
 
       {pleaseFollowNotice}
 
