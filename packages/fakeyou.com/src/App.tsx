@@ -83,7 +83,7 @@ i18n2
   .use(HttpBackend)
   .init({
     fallbackLng: "en",
-    debug: true,
+    debug: false,
     backend: {
       // This is the path localizations are loaded from.
       loadPath: '/locales/{{lng}}/{{ns}}.json',
