@@ -1,0 +1,10 @@
+# 101soundboards.com is running their service through ours
+# They have created several user accounts, and at one point were creating hundreds on demand.
+# Example accounts:
+# - https://fakeyou.com/profile/101soundboards
+# - https://fakeyou.com/profile/102soundboards
+# - https://fakeyou.com/profile/talktalktalk (banned 2023-08-28)
+
+# Note(1): 101soundboards seems to use US-based Digital Ocean to run their TTS.
+# Note(2): the creator is based in the UK and uses an IP address starting with '82.1.%'
+

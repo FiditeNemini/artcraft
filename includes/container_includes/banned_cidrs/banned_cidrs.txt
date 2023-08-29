@@ -20,3 +20,23 @@
 # ISP: RackNerd LLC
 # Domain: racknerd.com
 23.94.128.0/17
+
+# 101soundboards.com
+# This is yet another 101soundboards user:
+# https://fakeyou.com/profile/talktalktalk
+# (They have previously created thousands of users, but seem to have settled on this one.)
+# Joined: 2023-07-20
+# Count of results as of 2023-08-28: 235,894.
+# ASN Information for 159.223.117.239
+# ASN: 14061
+# Organization: DigitalOcean LLC
+# ISP: DigitalOcean LLC
+# Domain: digitalocean.com
+# City: North Bergen
+# State: New Jersey
+# Country: United States of America
+# Postal Code: 07047
+# Time Zone: -04:00
+# Note(1): this might have a wide blast radius and take out all the 24/7 AI streams.
+# Note(2): the creator is based in the UK and uses an IP address starting with '82.1.%'
+# 159.223.0.0/16 -- NOTE: Commented out until we need to result to extreme measures.
