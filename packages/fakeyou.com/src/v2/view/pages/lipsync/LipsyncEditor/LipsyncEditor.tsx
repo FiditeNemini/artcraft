@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { animated, useChain, useSpring, useSpringRef, useTransition } from '@react-spring/web';
+import { animated, useSpring, useTransition } from '@react-spring/web';
 import { useFile } from "hooks";
 import { AudioInput, ImageInput, Spinner } from "components/common";
 import DynamicButton from './DynamicButton';
@@ -7,10 +7,12 @@ import './LipsyncEditor.scss';
 
 interface LipSyncProps { audioProps: any, imageProps: any, toggle: any, style: any };
 
+const softSpring = { config: { mass: 1, tension: 80, friction: 10 } }
+
 const SuccessPage = ({ audioProps, imageProps, style }: LipSyncProps )  => <animated.div {...{ className: "lipsync-success", style }}>
-  <h1 className=" fw-bold text-center text-lg-start">
-    Lipsync Result
-  </h1>
+  <h3 className=" fw-bold text-center text-lg-start">
+    Result
+  </h3>
   <video width="100%" height="auto" controls={true} className="rounded">
     <source src="https://pics.vics.pics/3027969248.mp4" />
     Your device doesn't support video.
@@ -31,53 +33,53 @@ const InputPage = ({ audioProps, imageProps, toggle, style }: LipSyncProps )  =>
   </div>
   <div {...{ className: "grid-square" }}>
     <AudioInput {...{ ...audioProps, onRest: (p:any,c:any,item:any,l:any) => {
-      console.log("🍑",!!audioProps.file);
       toggle.audio(!!audioProps.file);
     }, hideActions: true } }/>
-    <Spinner />
   </div>
 </animated.div>};
 
-const WorkingPage = ({ audioProps, imageProps, style }: LipSyncProps ) => <animated.div {...{ className: "lipsync-editor", style }}>
- <Spinner/>
+const WorkingPage = ({ audioProps, imageProps, style }: LipSyncProps ) => <animated.div {...{ className: "lipsync-working", style }}>
+  <div {...{ className: "lipsync-working-notice" }}>
+    <h2>Working ...</h2>
+    <Spinner />
+  </div>
 </animated.div>;
 
-const ProgressCheck = ({ disabled = false, refB }: {disabled?: boolean, refB: any }) => {
+const ProgressLi = ({ children, disabled = false }: { children?: any, disabled?: boolean }) => {
   const style = useSpring({
-    config: { mass: 1, tension: 160, friction: 5 },
-    // opacity: disabled ? .25 : 1
-  });
-  return <animated.svg {...{ style }}>
-    <circle {...{ cx: 16, cy: 16, r: 15, strokeWidth: "2", }}/>
-    { <polyline {...{
-      fill: 'none',
-      points: '9.5 18 14.5 22 22.5 12',
-      strokeLinecap: 'round',
-      strokeLinejoin: 'round',
-      strokeWidth: '4',
-    }}/> }
-  </animated.svg>;
-};
-
-const ProgressLi = ({ children, disabled = false }: { children?: any, disabled?: boolean}) => {
-  const refA = useSpringRef();
-  const refB = useSpringRef();
-  useChain([refA, refB]);
-  const style = useSpring({
-    config: { mass: 1, tension: 80, friction: 10 },
+    ...softSpring,
     opacity: disabled ? .25 : 1
   });
   return <animated.li {...{ style }}>
-    <ProgressCheck {...{ disabled, refB }}/>
+    <svg>
+      <circle {...{ cx: 16, cy: 16, r: 15, strokeWidth: "2", }}/>
+      { <polyline {...{
+        fill: 'none',
+        points: '9.5 18 14.5 22 22.5 12',
+        strokeLinecap: 'round',
+        strokeLinejoin: 'round',
+        strokeWidth: '4',
+      }}/> }
+    </svg>
     { children }
   </animated.li>
 };
 
 const Title = ({ ...rest }) => {
-  const { audioProps, audioReady, imageProps, imageReady, submit } = rest;
+  const { audioProps, audioReady, imageProps, imageReady, index, submit } = rest;
   const noAudio = !audioReady || !audioProps.file;
   const noImg = !imageReady || !imageProps.file;
   const incomplete = noAudio || noImg;
+  const working = imageProps.working && audioProps.working;
+
+  const slides = ["Generate",<Spinner />,"Make another"];
+
+  const onClick = () => {
+    if (imageProps.success && audioProps.success) {
+      imageProps.clear(); audioProps.clear();
+    } else if (!incomplete && !working) submit();
+  };
+
   return <div {...{ className: 'progress-header' }}>
     <h1 {...{ className: "fw-bold text-center text-md-start progress-heading" }}>
       Lip Service
@@ -90,9 +92,9 @@ const Title = ({ ...rest }) => {
         Audio
       </ProgressLi>
     </ul>
-    <DynamicButton {...{ disabled: incomplete || (imageProps.success && audioProps.success), onClick: submit }}>Generate</DynamicButton>
+    <DynamicButton {...{ disabled: incomplete || working, onClick, slides, index }}/>
     <p {...{ className: 'progress-description' }}> 
-    Select an image with a clear face, or one of our existing templates, then choose either text to speech or uploaded audio(eg. music). Then you can generate a beautifully lipsynced video.
+      Select and image with a clear face, and an audio sample, and generate a lipsynced video.
     </p>
   </div>
 };
@@ -111,37 +113,37 @@ export default function LipsyncEditor({ ...rest }) {
   };
   const audioProps = useFile({ debug: 'audio useFile', onSubmit });
   const imageProps = useFile({ onSubmit });
+  const index = audioProps.status === imageProps.status ? audioProps.status : -1;
   const headerProps = {
     audioProps,
     audioReady,
     imageProps,
     imageReady,
+    index,
     submit: () => {
       audioProps.submit(); imageProps.submit();
     }
   };
 
-  const index = imageProps.success && audioProps.success ? 2 : imageProps.working && audioProps.working ? 1 : 0;
-
   const transitions = useTransition(index, {
-    config: { tension: 130,  friction: 20 },
-    from: { opacity: 0 },
-    enter: { opacity: 1 },
-    leave: { opacity: 0 },
+    ...softSpring,
+    from: { opacity: 0, position: "absolute" },
+    enter: { opacity: 1, position: "relative" },
+    leave: { opacity: 0, position: "absolute" },
   });
 
 	return <div>
       <div {...{ className: "container" }}>
-        <Title { ...headerProps }/>
-        <div {...{ className: "panel" }}>
+        <div {...{ className: "panel lipsync-panel" }}>
+          <Title { ...headerProps }/>
           { transitions((style, i) => {
             const Page = [InputPage,WorkingPage,SuccessPage][i];
-            return <Page {...{ 
+            return i > -1 ? <Page {...{ 
               audioProps,
               imageProps,
               toggle: { audio: readyMedia(1), image: readyMedia(0) },
               style 
-            }}/>
+            }}/> : null
           }) }
         </div>
       </div>

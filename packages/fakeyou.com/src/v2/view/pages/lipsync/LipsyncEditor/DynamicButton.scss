@@ -1,0 +1,15 @@
+.fy-dynamic-button {
+	height: 3rem;
+	appearance: none;
+	border-radius: 0.5rem;
+	border: none;
+	color: #fff;
+    outline: none;
+    padding: 10px 20px;
+    position: relative;
+
+	.button-slide {
+		// position: absolute;
+		width: fit-content;
+	}
+}

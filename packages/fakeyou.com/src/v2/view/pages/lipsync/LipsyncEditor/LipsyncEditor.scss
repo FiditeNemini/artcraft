@@ -27,18 +27,10 @@
 	.grid-square {
 		aspect-ratio: 1;
 		padding-bottom: 1rem;
-		// &:nth-child(odd) {
-		// 	padding-left: 1rem;
-		// }
-		// &:nth-child(even) {
-		// 	padding-right: 1rem;
-		// }
+		
+		.fy-uploader { height: 100% }
 	}
 
-
-
-
-	// div.grid-square { aspect-ratio: 1 }
 	.fy-image-uploader { height: 100%; }
 	.lipsync-audio {
 		label { height: 100% }
@@ -49,8 +41,8 @@
 	display: flex;
 	flex-wrap: wrap;
 	align-items: center;
-	margin: 1rem 0;
-	// padding: 1rem;
+	// margin: 1rem 0;
+	padding: 1rem;
 
 	.progress-heading {
 		display: inline-block;
@@ -93,4 +85,25 @@
 		// flex-grow: 1;
 		width: fit-content;
 	}
+}
+
+.lipsync-panel { position: relative; height: fit-content; }
+
+// .lipsync-editor, .lipsync-working, .lipsync-success {
+// 	position: absolute;
+// }
+
+.lipsync-working, .lipsync-working-notice {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.lipsync-working-notice {
+	flex-direction: column;
+	margin: 5rem;
+}
+
+.lipsync-success {
+	padding: .5rem 1rem 1rem;
 }
