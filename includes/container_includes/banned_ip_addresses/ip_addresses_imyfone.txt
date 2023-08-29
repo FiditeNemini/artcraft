@@ -25,7 +25,10 @@
 # Creator IP address (Hong Kong):
 103.84.136.95
 
-# They're using thousands of IPs: residential Comcast, proxies, etc. from all over the world.
+# They sent 120M+ requests on 2023-06-25 from a US Alibaba data center (47.252.0.0/15).
+# This is blocked in the CIDR blocks.
+
+# They're now using thousands of IPs: residential Comcast, proxies, etc. from all over the world.
 # California, Ohio, Australia, Indonesia, China, England, Mexico, Nepal, India.
 # Damn. This will be whack-a-mole.
 # For now, ban the accounts as they crop up (there is only one so far - casey123!)
