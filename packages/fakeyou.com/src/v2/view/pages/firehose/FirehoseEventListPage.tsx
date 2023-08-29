@@ -6,7 +6,6 @@ import { Link } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faPlay,
-  faFlagCheckered,
   faAward,
   faPenToSquare,
 } from "@fortawesome/free-solid-svg-icons";
@@ -19,6 +18,15 @@ import { duration, delay } from "../../../../data/animation";
 
 import { usePrefixedDocumentTitle } from "../../../../common/UsePrefixedDocumentTitle";
 import { PosthogClient } from "@storyteller/components/src/analytics/PosthogClient";
+import {
+  faDownload,
+  faMessageDots,
+  faMicrophone,
+  faQuoteLeft,
+  faUpload,
+  faVideo,
+  faWaveformLines,
+} from "@fortawesome/pro-solid-svg-icons";
 
 const Fade = require("react-reveal/Fade");
 
@@ -172,7 +180,7 @@ function FirehoseEventListPage(props: Props) {
       case "tts_model_upload_started":
         inner = (
           <span className="d-flex align-items-center">
-            <FontAwesomeIcon icon={faPlay} className="me-3" />
+            <FontAwesomeIcon icon={faMessageDots} className="me-3" />
             {gravatar}
             {userLink}
             &nbsp;started TTS model upload
@@ -182,7 +190,7 @@ function FirehoseEventListPage(props: Props) {
       case "tts_model_upload_completed":
         inner = (
           <span className="d-flex align-items-center">
-            <FontAwesomeIcon icon={faFlagCheckered} className="me-3" />
+            <FontAwesomeIcon icon={faMessageDots} className="me-3" />
             {gravatar}
             {userLink}
             &nbsp;completed TTS model upload
@@ -192,7 +200,7 @@ function FirehoseEventListPage(props: Props) {
       case "tts_inference_started":
         inner = (
           <span className="d-flex align-items-center">
-            <FontAwesomeIcon icon={faPlay} className="me-3" />
+            <FontAwesomeIcon icon={faMessageDots} className="me-3" />
             {gravatar}
             {userLink}
             &nbsp;started TTS
@@ -202,7 +210,7 @@ function FirehoseEventListPage(props: Props) {
       case "tts_inference_completed":
         inner = (
           <span className="d-flex align-items-center">
-            <FontAwesomeIcon icon={faFlagCheckered} className="me-3" />
+            <FontAwesomeIcon icon={faMessageDots} className="me-3" />
             {gravatar}
             {userLink}
             &nbsp;completed TTS
@@ -222,7 +230,7 @@ function FirehoseEventListPage(props: Props) {
       case "w2l_template_upload_completed":
         inner = (
           <span className="d-flex align-items-center">
-            <FontAwesomeIcon icon={faFlagCheckered} className="me-3" />
+            <FontAwesomeIcon icon={faVideo} className="me-3" />
             {gravatar}
             {userLink}
             &nbsp;finished uploading a lipsync template.
@@ -232,7 +240,7 @@ function FirehoseEventListPage(props: Props) {
       case "w2l_inference_started":
         inner = (
           <span className="d-flex align-items-center">
-            <FontAwesomeIcon icon={faPlay} className="me-3" />
+            <FontAwesomeIcon icon={faVideo} className="me-3" />
             {gravatar}
             {userLink}
             &nbsp;started a W2L lipsync video
@@ -242,7 +250,7 @@ function FirehoseEventListPage(props: Props) {
       case "w2l_inference_completed":
         inner = (
           <span className="d-flex align-items-center">
-            <FontAwesomeIcon icon={faFlagCheckered} className="me-3" />
+            <FontAwesomeIcon icon={faVideo} className="me-3" />
             {gravatar}
             {userLink}
             &nbsp;completed a W2L lipsync video
@@ -306,6 +314,76 @@ function FirehoseEventListPage(props: Props) {
             {gravatar}
             {userLink}
             &nbsp;followed us on twitch!
+          </span>
+        );
+        break;
+      case "vc_inference_started":
+        inner = (
+          <span className="d-flex align-items-center">
+            <FontAwesomeIcon icon={faWaveformLines} className="me-3" />
+            {gravatar}
+            {userLink}
+            &nbsp;started a voice conversion
+          </span>
+        );
+        break;
+      case "vc_inference_completed":
+        inner = (
+          <span className="d-flex align-items-center">
+            <FontAwesomeIcon icon={faWaveformLines} className="me-3" />
+            {gravatar}
+            {userLink}
+            &nbsp;completed a voice conversion
+          </span>
+        );
+        break;
+      case "generic_download_started":
+        inner = (
+          <span className="d-flex align-items-center">
+            <FontAwesomeIcon icon={faDownload} className="me-3" />
+            {gravatar}
+            {userLink}
+            &nbsp;downloaded
+          </span>
+        );
+        break;
+      case "generic_download_completed":
+        inner = (
+          <span className="d-flex align-items-center">
+            <FontAwesomeIcon icon={faDownload} className="me-3" />
+            {gravatar}
+            {userLink}
+            &nbsp;completed a download
+          </span>
+        );
+        break;
+      case "media_uploaded":
+        inner = (
+          <span className="d-flex align-items-center">
+            <FontAwesomeIcon icon={faUpload} className="me-3" />
+            {gravatar}
+            {userLink}
+            &nbsp;uploaded a media file
+          </span>
+        );
+        break;
+      case "device_media_recorded":
+        inner = (
+          <span className="d-flex align-items-center">
+            <FontAwesomeIcon icon={faMicrophone} className="me-3" />
+            {gravatar}
+            {userLink}
+            &nbsp;recorded an audio/video
+          </span>
+        );
+        break;
+      case "comment_created":
+        inner = (
+          <span className="d-flex align-items-center">
+            <FontAwesomeIcon icon={faQuoteLeft} className="me-3" />
+            {gravatar}
+            {userLink}
+            &nbsp;added a comment
           </span>
         );
         break;
