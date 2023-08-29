@@ -1,10 +1,8 @@
 import React, { useMemo } from "react";
 import { Link } from "react-router-dom";
-
 import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
 import { SessionSubscriptionsWrapper } from "@storyteller/components/src/session/SessionSubscriptionsWrapper";
-import { t } from "i18next";
-import { i18n2 } from "../../../../App";
+import { useLocalize } from 'hooks';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faStar,
@@ -30,8 +28,7 @@ interface Props {
 function LandingPage(props: Props) {
   PosthogClient.recordPageview();
 
-  i18n2.loadNamespaces("LandingPage");
-  const t2 = i18n2.getFixedT(null, "LandingPage");
+  const { t: t2, oldT: t } = useLocalize("LandingPage");
 
   let signUpButton = <></>;
   let viewPricingButton = <></>;
