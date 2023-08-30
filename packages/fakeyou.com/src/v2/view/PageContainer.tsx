@@ -200,7 +200,7 @@ class PageContainer extends React.Component<
     const shouldRenderNavs = location.pathname === "/";
 
     return (
-      <div id="wrapper">
+      <div id="wrapper" className="no-padding">
         <div id="overlay"></div>
         <SideNav />
 

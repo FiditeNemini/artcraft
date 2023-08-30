@@ -13,6 +13,7 @@ import { faDiscord, faTwitter } from "@fortawesome/free-brands-svg-icons";
 import { WebUrl } from "../../../../common/WebUrl";
 import { faFileArrowUp } from "@fortawesome/pro-solid-svg-icons";
 import { PosthogClient } from "@storyteller/components/src/analytics/PosthogClient";
+import { FooterNav } from "v2/view/nav/FooterNav";
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -504,6 +505,8 @@ function LandingPage(props: Props) {
           />
         </div>
       </div>
+
+      <FooterNav sessionWrapper={props.sessionWrapper} />
     </div>
   );
 }
