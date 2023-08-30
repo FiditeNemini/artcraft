@@ -4,15 +4,14 @@ local development setup
 Ubuntu 22.04
 ------------
 
-
-### Install Javascript things
+### Install NPM and Yarn
 
 ```bash
 sudo apt install npm
 sudo npm install --global yarn
 ```
 
-### Run the website(s)
+### Develop and run locally
 
 Install dependencies
 
@@ -29,12 +28,14 @@ yarn start-fakeyou
 MacOS
 -----
 
+### Install NPM and Yarn
+
 ```bash
 sudo apt install npm
 sudo npm install --global yarn
 ```
 
-### Run the website(s)
+### Develop and run locally
 
 Install dependencies
 
