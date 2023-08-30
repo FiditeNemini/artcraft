@@ -82,6 +82,8 @@ import { ProductUsageInfoPage } from "./pages/product_usage_info/ProductUsageInf
 import VcModelViewPage from "./pages/vc/vc_model_view/VcModelViewPage";
 import VcModelEditPage from "./pages/vc/vc_model_edit/VcModelEditPage";
 import VcModelDeletePage from "./pages/vc/vc_model_delete/VcModelDeletePage";
+import SideNav from "components/layout/SideNav/SideNav";
+import MobileMenu from "components/layout/MobileMenu/MobileMenu";
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -188,19 +190,21 @@ class PageContainer extends React.Component<Props, State> {
 
   public render() {
     return (
-      <div id="main" className="mainwrap">
-        <div id="viewable">
-          <TopNav
+      <div id="wrapper">
+        <div id="overlay"></div>
+        <SideNav />
+
+        {/* <TopNav
             logoutHandler={this.logout}
             sessionWrapper={this.props.sessionWrapper}
             querySessionCallback={this.props.querySessionAction}
             querySessionSubscriptionsCallback={
               this.props.querySessionSubscriptionsAction
             }
-          />
+          /> */}
 
-          <ScrollToTop />
-
+        <div id="page-content-wrapper">
+          <MobileMenu />
           <Switch>
             <Route path="/firehose">
               <FirehoseEventListPage
@@ -688,9 +692,9 @@ class PageContainer extends React.Component<Props, State> {
               />
             </Route>
           </Switch>
-
-          <FooterNav sessionWrapper={this.props.sessionWrapper} />
         </div>
+
+        {/* <FooterNav sessionWrapper={this.props.sessionWrapper} /> */}
       </div>
     );
   }
