@@ -870,7 +870,6 @@ styles with important tags:
     font-size: 17px;
     background-color: lighten($secondary, 4%);
     border-radius: 0.5rem;
-    border-radius: 0.5rem;
     border: none;
     padding: 6px 20px;
     color: rgba($white, 0.5);
@@ -878,11 +877,9 @@ styles with important tags:
 
     &.left {
       border-radius: 0.5rem 0px 0px 0.5rem;
-      border-radius: 0.5rem 0px 0px 0.5rem;
     }
 
     &.right {
-      border-radius: 0px 0.5rem 0.5rem 0px;
       border-radius: 0px 0.5rem 0.5rem 0px;
     }
 
