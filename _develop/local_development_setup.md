@@ -4,14 +4,25 @@ local development setup
 Ubuntu 22.04
 ------------
 
-### Install NPM and Yarn
+### Development setup
+
+Install NPM and Yarn
 
 ```bash
 sudo apt install npm
 sudo npm install --global yarn
 ```
 
-### Develop and run locally
+Add the following to your hosts file (`/etc/hosts`) : 
+
+```
+127.0.0.1    dev.fakeyou.com
+127.0.0.1    api.dev.fakeyou.com
+127.0.0.1    dev.storyteller.ai
+127.0.0.1    api.dev.storyteller.ai
+```
+
+### Run locally
 
 Install dependencies
 
@@ -28,14 +39,25 @@ yarn start-fakeyou
 MacOS
 -----
 
-### Install NPM and Yarn
+### Development setup
+
+Install NPM and Yarn
 
 ```bash
 sudo apt install npm
 sudo npm install --global yarn
 ```
 
-### Develop and run locally
+Add the following to your hosts file (`/etc/hosts`) : 
+
+```
+127.0.0.1    dev.fakeyou.com
+127.0.0.1    api.dev.fakeyou.com
+127.0.0.1    dev.storyteller.ai
+127.0.0.1    api.dev.storyteller.ai
+```
+
+### Run locally
 
 Install dependencies
 
