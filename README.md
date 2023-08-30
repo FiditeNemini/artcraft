@@ -32,5 +32,5 @@ storyteller-frontend
 ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠉⠉⠉⠉⠁⠀⠀⠀⠀⠉⠙⠛⠛⠉⠀⠀
 ```
 
-Documentation [lives here](_/develop).
+Documentation [lives here](./_develop).
 
