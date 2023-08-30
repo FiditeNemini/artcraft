@@ -7,14 +7,17 @@ import { ModerationFc } from "./pages/moderation/moderation_main/ModerationFc";
 import { ModerationIpBanListFc } from "./pages/moderation/moderation_ip_ban_list/ModerationIpBanListFc";
 import { ModerationViewIpBanFc } from "./pages/moderation/moderation_view_ip_ban/ModerationViewIpBanFc";
 import { LipsyncEditor } from "./pages/lipsync";
-import { FooterNav } from "./nav/FooterNav";
-import { TopNav } from "./nav/TopNav";
 import { ProfileEditFc } from "./pages/profile/profile_edit/ProfileEditFc";
 import { ProfilePage } from "./pages/profile/profile_view/ProfilePage";
 import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
 import { SessionSubscriptionsWrapper } from "@storyteller/components/src/session/SessionSubscriptionsWrapper";
 import { SignupPage } from "./pages/signup/SignupPage";
-import { Switch, Route } from "react-router-dom";
+import {
+  Switch,
+  Route,
+  withRouter,
+  RouteComponentProps,
+} from "react-router-dom";
 import { TermsPage } from "./pages/about/terms_page/TermsPage";
 import { TtsInferenceJob, W2lInferenceJob } from "../../App";
 import { TtsModelDeletePage } from "./pages/tts/tts_model_delete/TtsModelDeletePage";
@@ -54,7 +57,6 @@ import { ModerationTtsCategoryEditPage } from "./pages/moderation/categories/Mod
 import { ModerationCategoryDeletePage } from "./pages/moderation/categories/ModerationCategoryDeletePage";
 import { TtsCategoryType } from "../../AppWrapper";
 import { PatronPage } from "./pages/patrons/PatronPage";
-import ScrollToTop from "./_common/ScrollToTop";
 import { Language } from "@storyteller/components/src/i18n/Language";
 import { VoiceCloneRequestPage } from "./pages/clone_voice_requests/VoiceCloneRequestPage";
 import { VocodesPage } from "./pages/vocodes/VocodesPage";
@@ -84,6 +86,7 @@ import VcModelEditPage from "./pages/vc/vc_model_edit/VcModelEditPage";
 import VcModelDeletePage from "./pages/vc/vc_model_delete/VcModelDeletePage";
 import SideNav from "components/layout/SideNav/SideNav";
 import MobileMenu from "components/layout/MobileMenu/MobileMenu";
+import { TopNav } from "./nav/TopNav";
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -179,8 +182,11 @@ interface Props {
 
 interface State {}
 
-class PageContainer extends React.Component<Props, State> {
-  constructor(props: Props) {
+class PageContainer extends React.Component<
+  Props & RouteComponentProps,
+  State
+> {
+  constructor(props: Props & RouteComponentProps) {
     super(props);
 
     this.state = {};
@@ -189,19 +195,25 @@ class PageContainer extends React.Component<Props, State> {
   logout = () => {};
 
   public render() {
+    const { location } = this.props;
+
+    const shouldRenderNavs = location.pathname === "/";
+
     return (
       <div id="wrapper">
         <div id="overlay"></div>
         <SideNav />
 
-        {/* <TopNav
+        {shouldRenderNavs && (
+          <TopNav
             logoutHandler={this.logout}
             sessionWrapper={this.props.sessionWrapper}
             querySessionCallback={this.props.querySessionAction}
             querySessionSubscriptionsCallback={
               this.props.querySessionSubscriptionsAction
             }
-          /> */}
+          />
+        )}
 
         <div id="page-content-wrapper">
           <MobileMenu />
@@ -693,11 +705,9 @@ class PageContainer extends React.Component<Props, State> {
             </Route>
           </Switch>
         </div>
-
-        {/* <FooterNav sessionWrapper={this.props.sessionWrapper} /> */}
       </div>
     );
   }
 }
 
-export { PageContainer };
+export default withRouter(PageContainer);

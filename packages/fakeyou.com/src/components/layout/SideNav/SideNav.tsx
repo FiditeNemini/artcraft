@@ -9,16 +9,18 @@ import {
 } from "@fortawesome/pro-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Button from "components/common/Button/Button";
-import React, { useEffect } from "react";
-import { Link, NavLink } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { Link, NavLink, useRouteMatch } from "react-router-dom";
 
 interface SideNavProps {}
 
 export default function SideNav(props: SideNavProps) {
+  const [windowWidth, setWindowWidth] = useState(window.innerWidth);
+
   const handleNavLinkClick = () => {
     const wrapper = document.getElementById("wrapper");
 
-    if (window.innerWidth < 1200) {
+    if (window.innerWidth < 992) {
       if (wrapper) {
         wrapper.classList.toggle("toggled");
       }
@@ -33,7 +35,7 @@ export default function SideNav(props: SideNavProps) {
       if (
         (!wrapper?.contains(event.target as Node) ||
           overlay?.contains(event.target as Node)) &&
-        window.innerWidth < 1200
+        window.innerWidth < 992
       ) {
         wrapper?.classList.remove("toggled");
       }
@@ -46,8 +48,44 @@ export default function SideNav(props: SideNavProps) {
     };
   }, []);
 
+  const matchHome = useRouteMatch({
+    path: "/",
+    exact: true,
+  });
+
+  useEffect(() => {
+    // Update window width on resize
+    const handleResize = () => {
+      setWindowWidth(window.innerWidth);
+    };
+
+    window.addEventListener("resize", handleResize);
+
+    return () => {
+      // Cleanup listener on unmount
+      window.removeEventListener("resize", handleResize);
+    };
+  }, []);
+
+  const shouldShowSidebar = windowWidth >= 992 && matchHome;
+
+  useEffect(() => {
+    const wrapper = document.getElementById("wrapper");
+
+    if (windowWidth >= 992) {
+      if (matchHome) {
+        wrapper?.classList.add("no-padding");
+      } else {
+        wrapper?.classList.remove("no-padding");
+      }
+    }
+  }, [matchHome, windowWidth]);
+
   return (
-    <div id="sidebar-wrapper">
+    <div
+      id="sidebar-wrapper"
+      className={`sidebar ${shouldShowSidebar ? "" : "visible"}`}
+    >
       <ul className="sidebar-nav">
         <div className="sidebar-brand">
           <Link to="/">

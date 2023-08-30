@@ -2,7 +2,7 @@ import React, { useMemo } from "react";
 import { Link } from "react-router-dom";
 import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
 import { SessionSubscriptionsWrapper } from "@storyteller/components/src/session/SessionSubscriptionsWrapper";
-import { useLocalize } from 'hooks';
+import { useLocalize } from "hooks";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faStar,
@@ -13,12 +13,6 @@ import { faDiscord, faTwitter } from "@fortawesome/free-brands-svg-icons";
 import { WebUrl } from "../../../../common/WebUrl";
 import { faFileArrowUp } from "@fortawesome/pro-solid-svg-icons";
 import { PosthogClient } from "@storyteller/components/src/analytics/PosthogClient";
-// import {
-//   faFileArrowUp,
-//   faMicrophone,
-//   faRightLeft,
-// } from "@fortawesome/pro-solid-svg-icons";
-// import { Analytics } from "../../../../../common/Analytics";
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -171,11 +165,10 @@ function LandingPage(props: Props) {
           </div>
           <div className="col-12 col-lg-7 d-flex flex-column justify-content-center flex-reverse px-md-5 px-lg-3">
             <h1 className="fw-bold display-5 text-center text-lg-start px-md-5 px-lg-0">
-              {t2('hero.top')}
+              {t2("hero.top")}
             </h1>
             <p className="lead opacity-75 pb-4 text-center text-lg-start px-md-5 px-lg-0 pe-lg-5">
-              {t2('hero.bottom')}
-             
+              {t2("hero.bottom")}
             </p>
             <div className="d-flex flex-column flex-md-row gap-3 mt-3 mb-4 w-100 justify-content-center justify-content-lg-start">
               {upgradeButton}

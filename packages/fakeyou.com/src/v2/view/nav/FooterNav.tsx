@@ -55,7 +55,7 @@ function FooterNav(props: Props) {
       by_queue: {
         pending_svc_jobs: 0,
         pending_rvc_jobs: 0,
-      }
+      },
     },
     legacy_tts: {
       pending_job_count: 0,

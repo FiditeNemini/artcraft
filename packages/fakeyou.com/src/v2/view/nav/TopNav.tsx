@@ -160,7 +160,7 @@ function TopNav(props: Props) {
   }
 
   return (
-    <div>
+    <div className="d-none d-lg-block">
       {/* <div className="top-bar d-none d-lg-flex">
         <div className="container d-flex align-items-center">
           <div className="d-flex gap-4 flex-grow-1">

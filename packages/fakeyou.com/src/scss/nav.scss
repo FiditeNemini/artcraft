@@ -131,6 +131,23 @@
   display: block;
 }
 
+.no-padding {
+  padding-left: 0 !important;
+}
+
+.sidebar {
+  transform: translateX(
+    -100%
+  ); /* move the sidebar out of the screen to the left */
+  transition: transform 0.3s ease-out; /* transition effect */
+  /* other necessary styles for the sidebar */
+}
+
+/* Visible state for the sidebar */
+.sidebar.visible {
+  transform: translateX(0); /* sidebar occupies its regular position */
+}
+
 @media (min-width: 992px) {
   #wrapper {
     padding-left: 260px;
