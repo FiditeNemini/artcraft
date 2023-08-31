@@ -49,18 +49,30 @@ class ApiConfig {
         apiHost = "api.storyteller.ai";
         break;
       case "storyteller.stream":
+        // Storyteller.stream is deprecated and will be decommissioned in the future.
         apiHost = "api.storyteller.stream";
+        break;
+      case "devproxy.fakeyou.com":
+      case "devproxy.fakeyou.com:7000":
+      case "devproxy.fakeyou.com:7001":
+        apiHost = "api.fakeyou.com";
+        useSsl = true;
+        break;
+      case "devproxy.storyteller.ai":
+      case "devproxy.storyteller.ai:7000":
+      case "devproxy.storyteller.ai:7001":
+        apiHost = "api.storyteller.ai";
+        useSsl = true;
         break;
       case "dev.fakeyou.com":
         // NB: for dev machines with nginx proxies
         apiHost = "api.dev.fakeyou.com";
         break;
+      case "dev.fakeyou.com:7000":
       case "dev.fakeyou.com:7001":
         // NB: for dev machines without nginx proxies
-        //apiHost = "api.dev.fakeyou.com:12345";
-        //useSsl = false;
-        useSsl = true;
-        apiHost = "api.fakeyou.com";
+        apiHost = "api.dev.fakeyou.com:12345";
+        useSsl = false;
         break;
       default: 
         if (document.location.host.includes("localhost")) {
