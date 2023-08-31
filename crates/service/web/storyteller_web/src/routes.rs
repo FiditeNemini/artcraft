@@ -116,6 +116,7 @@ use crate::http_server::endpoints::w2l::set_w2l_template_mod_approval::set_w2l_t
 use users_component::default_routes::add_suggested_api_v1_account_creation_and_session_routes;
 use users_component::endpoints::edit_profile_handler::edit_profile_handler;
 use users_component::endpoints::get_profile_handler::get_profile_handler;
+use crate::http_server::endpoints::animation::enqueue_lipsync_animation::enqueue_lipsync_animation_handler;
 
 pub fn add_routes<T, B> (app: App<T>) -> App<T>
   where
@@ -153,6 +154,12 @@ pub fn add_routes<T, B> (app: App<T>) -> App<T>
       .add_get("/v1/comments/list/{entity_type}/{entity_token}", list_comments_handler)
       .add_post("/v1/comments/new", create_comment_handler)
       .add_post("/v1/comments/delete/{comment_token}", delete_comment_handler)
+      .into_app();
+
+  // ==================== Animations ====================
+
+  let mut app = RouteBuilder::from_app(app)
+      .add_post("/v1/animation/face_animation/create", enqueue_lipsync_animation_handler)
       .into_app();
 
   // ==================== "Generic" Inference ====================
