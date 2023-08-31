@@ -14,6 +14,7 @@ use mysql_queries::queries::generic_inference::job::mark_generic_inference_job_s
 use r2d2_redis::redis::Commands;
 use redis_common::redis_keys::RedisKeys;
 use std::time::Instant;
+use crate::job::job_types::lipsync::process_single_lipsync_job::process_single_lipsync_job;
 
 pub async fn process_single_job(
   job_dependencies: &JobDependencies,
@@ -167,6 +168,9 @@ async fn do_process_single_job(
   let mut maybe_result_entity : Option<ResultEntity>;
 
   let job_success_result = match job.inference_category {
+    InferenceCategory::LipsyncAnimation => {
+      process_single_lipsync_job(job_dependencies, job).await?
+    }
     InferenceCategory::TextToSpeech => {
       process_single_tts_job(job_dependencies, job).await?
     }
