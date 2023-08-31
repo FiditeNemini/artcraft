@@ -430,6 +430,12 @@ class ApiConfig {
     return `${this.getApiOrigin()}/v1/voice_conversion/inference`;
   }
 
+  // =============== Face Animation ===============
+
+  enqueueFaceAnimation(): string {
+    return `${this.getApiOrigin()}/v1/animation/face_animation/create`;
+  }
+
   // =============== Generic Model Downloads ===============
 
   enqueueRemoteDownloadJob(): string {
