@@ -21,6 +21,23 @@ group by creator_ip_address
 order by attempts desc
 limit 50;
 
+-- Top (IP addresses, usernames) making requests
+select distinct j.creator_ip_address, u.username, count(*) as attempts
+from tts_inference_jobs AS j
+left outer join users AS u
+on u.token = j.maybe_creator_user_token
+where j.status = 'pending'
+group by j.creator_ip_address, u.username
+order by attempts desc
+    limit 50;
+
+-- Find a job by an IP
+select *
+from tts_inference_jobs
+where status = 'pending'
+and creator_ip_address = '185.14.97.173'
+limit 1;
+
 -- Top voices in requests
 select distinct model_token, count(*) as attempts
 from tts_inference_jobs
