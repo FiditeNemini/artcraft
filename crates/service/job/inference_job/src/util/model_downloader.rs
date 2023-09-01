@@ -1,48 +1,25 @@
 use anyhow::anyhow;
+use async_trait::async_trait;
 use cloud_storage::bucket_client::BucketClient;
 use container_common::filesystem::safe_delete_temp_directory::safe_delete_temp_directory;
 use crate::util::scoped_temp_dir_creator::ScopedTempDirCreator;
 use errors::AnyhowResult;
 use filesys::create_dir_all_if_missing::create_dir_all_if_missing;
 use filesys::file_exists::file_exists;
-use log::{error, info};
-use std::path::{Path, PathBuf};
-use async_trait::async_trait;
 use filesys::rename_across_devices::rename_across_devices;
-
-// /// Implementing this implies we can return an instance constructed from environment variables.
-// /// This isn't to be manually used, but rather with a macro.
-// trait FromEnv {
-//   fn from_env() -> Box<dyn Self>;
-// }
-
+use log::{error, info};
+use std::path::Path;
 
 #[async_trait]
 pub trait ModelDownloader {
-  //fn from_env() -> Self {
-  //  // NB: For now rvc-v2 is all that uses this hubert, but other models
-  //  // may (re)use it in the future.
-  //  let cloud_bucket_path = easyenv::get_env_string_or_default(
-  //    "RVC_V2_PRETRAINED_HUBERT_BUCKET_PATH",
-  //    "/hubert_pretrained/rvc_v2_hubert_base.pt");
 
-  //  // NB: For now rvc-v2 is all that uses this hubert, but other models
-  //  // may (re)use it in the future.
-  //  let filesystem_path = easyenv::get_env_pathbuf_or_default(
-  //    "RVC_V2_PRETRAINED_HUBERT_FILESYSTEM_PATH",
-  //    // NB: For now this path is on the shared SMB drive in GKE K8S
-  //    "/tmp/downloads/hubert/rvc_v2_hubert_base.pt");
-
-  //  Self {
-  //    cloud_bucket_path,
-  //    filesystem_path,
-  //  }
-  //}
-
+  /// Model name (for info! status logging).
   fn get_model_name(&self) -> &str;
 
+  /// Path the model is located in GCS.
   fn get_cloud_bucket_path(&self) -> &str;
 
+  /// Where to keep the model file on the worker filesystem.
   fn get_filesystem_path(&self) -> &Path;
 
   async fn download_if_not_on_filesystem(
@@ -100,9 +77,25 @@ pub trait ModelDownloader {
   }
 }
 
+
+// TODO(bt, 2023-08-31): Find a way to export this macro without it leveraging macro_export and
+//  being exported as root-level `crate::impl_model_downloader`
 #[macro_export]
-macro_rules! downloader {
-  ($struct_name:ident) => {
+macro_rules! impl_model_downloader {
+  (
+    // Struct name for the downloader
+    $struct_name:ident,
+    // name of the model (for debugging)
+    $model_name:literal,
+    // Environment variable to read in cloud bucket path override
+    $bucket_path_env_var_name:literal,
+    // Default cloud bucket path
+    $bucket_path_default:literal,
+    // Environment variable to read in filesystem path override
+    $filesystem_path_env_var_name:literal,
+    // Default filesystem path
+    $filesystem_path_default:literal
+  ) => {
 
     #[derive(Debug, Clone)]
     struct $struct_name {
@@ -121,6 +114,36 @@ macro_rules! downloader {
       }
       fn get_filesystem_path(&self) -> &std::path::Path {
         &self.filesystem_path
+      }
+    }
+
+    // NB: Implementing Default mostly for macro testing purposes.
+    impl Default for $struct_name {
+      fn default() -> $struct_name {
+        $struct_name {
+          model_name: $model_name.to_string(),
+          cloud_bucket_path: $bucket_path_default.to_string(),
+          filesystem_path: std::path::PathBuf::from($filesystem_path_default),
+        }
+      }
+    }
+
+    impl $struct_name {
+      fn from_env() -> $struct_name {
+
+        let cloud_bucket_path = easyenv::get_env_string_or_default(
+          $bucket_path_env_var_name,
+          $bucket_path_default);
+
+        let filesystem_path = easyenv::get_env_pathbuf_or_default(
+          $filesystem_path_env_var_name,
+          $filesystem_path_default);
+
+        $struct_name {
+          model_name: $model_name.to_string(),
+          cloud_bucket_path,
+          filesystem_path,
+        }
       }
     }
   }
