@@ -20,7 +20,10 @@ use mysql_queries::queries::generic_inference::job::list_available_generic_infer
 use mysql_queries::queries::voice_conversion::results::insert_voice_conversion_result::{insert_voice_conversion_result, InsertArgs};
 use std::path::PathBuf;
 use std::time::Instant;
+use mysql_queries::payloads::generic_inference_args::generic_inference_args::{GenericInferenceArgs, InferenceCategoryAbbreviated, PolymorphicInferenceArgs};
+use mysql_queries::payloads::generic_inference_args::lipsync_payload::{LipsyncAnimationAudioSource, LipsyncAnimationImageSource};
 use tokens::users::user::UserToken;
+use crate::job::job_types::lipsync::sad_talker::validate_job::validate_job;
 
 pub struct SadTalkerProcessJobArgs<'a> {
   pub job_dependencies: &'a JobDependencies,
@@ -36,7 +39,11 @@ pub async fn process_job(args: SadTalkerProcessJobArgs<'_>) -> Result<JobSuccess
       .new_generic_inference(job.inference_job_token.as_str())
       .map_err(|e| ProcessSingleJobError::Other(anyhow!(e)))?;
 
-  // ==================== DOWNLOAD HUBERT ==================== //
+  // ==================== UNPACK + VALIDATE INFERENCE ARGS ==================== //
+
+  let job_args = validate_job(job)?;
+
+  // ==================== CONFIRM OR DOWNLOAD SAD TALKER MODELS (SEVERAL) ==================== //
 
   info!("Download models (if not present)...");
 
@@ -52,71 +59,6 @@ pub async fn process_job(args: SadTalkerProcessJobArgs<'_>) -> Result<JobSuccess
     }
   }
 
-  /*// ==================== CONFIRM OR DOWNLOAD RVC (v2) MODEL ==================== //
-
-  //info!("Download RVC model (if not present)...");
-
-  let rvc_v2_model_fs_path = {
-    let filename = format!("{}.pt", vc_model.token.as_str());
-    let fs_path = args.job_dependencies.fs.semi_persistent_cache.voice_conversion_model_path(&filename);
-
-    create_dir_all_if_missing(args.job_dependencies.fs.semi_persistent_cache.voice_conversion_model_directory())
-        .map_err(|e| {
-          error!("could not create model storage directory: {:?}", e);
-          ProcessSingleJobError::from_io_error(e)
-        })?;
-
-    let model_object_path = args.job_dependencies.bucket_path_unifier.rvc_v2_model_path(&vc_model.private_bucket_hash);
-
-    maybe_download_file_from_bucket(
-      "rvc (v2) model",
-      &fs_path,
-      &model_object_path,
-      &args.job_dependencies.private_bucket_client,
-      &mut job_progress_reporter,
-      "downloading rvc (v2) model",
-      job.id.0,
-      &args.job_dependencies.fs.scoped_temp_dir_creator_for_downloads,
-    ).await?;
-
-    fs_path
-  };
-
-  // ==================== CONFIRM OR DOWNLOAD RVC (v2) MODEL INDICES ==================== //
-
-  // Index files are optional
-  let mut maybe_rvc_v2_model_index_fs_path: Option<PathBuf> = None;
-
-  if vc_model.has_index_file {
-    info!("Download RVC index (if not present)...");
-
-    maybe_rvc_v2_model_index_fs_path = {
-      let filename = format!("{}.index", vc_model.token.as_str());
-      let fs_path = args.job_dependencies.fs.semi_persistent_cache.voice_conversion_model_path(&filename);
-
-      create_dir_all_if_missing(args.job_dependencies.fs.semi_persistent_cache.voice_conversion_model_directory())
-          .map_err(|e| {
-            error!("could not create model storage directory: {:?}", e);
-            ProcessSingleJobError::from_io_error(e)
-          })?;
-
-      let model_index_object_path = args.job_dependencies.bucket_path_unifier.rvc_v2_model_index_path(&vc_model.private_bucket_hash);
-
-      maybe_download_file_from_bucket(
-        "rvc (v2) model index",
-        &fs_path,
-        &model_index_object_path,
-        &args.job_dependencies.private_bucket_client,
-        &mut job_progress_reporter,
-        "downloading rvc (v2) model index",
-        job.id.0,
-        &args.job_dependencies.fs.scoped_temp_dir_creator_for_downloads,
-      ).await?;
-
-      Some(fs_path)
-    };
-  }
-
   // ==================== TEMP DIR ==================== //
 
   let work_temp_dir = format!("temp_rvc_v2_inference_{}", job.id.0);
@@ -128,14 +70,35 @@ pub async fn process_job(args: SadTalkerProcessJobArgs<'_>) -> Result<JobSuccess
       .new_tempdir(&work_temp_dir)
       .map_err(|e| ProcessSingleJobError::from_io_error(e))?;
 
-  // ==================== DOWNLOAD MEDIA FILE ==================== //
 
-  info!("Download media for RVC voice conversion...");
+  // ==================== DECIDE WHAT TYPE OF AUDIO TO DOWNLOAD ==================== //
+
+  match job_args.audio_source {
+    LipsyncAnimationAudioSource::F(media_file_token) => {}
+    LipsyncAnimationAudioSource::U(media_upload_token) => {}
+    LipsyncAnimationAudioSource::T(tts_result_token) => {}
+    LipsyncAnimationAudioSource::V(voice_conversion_result_token) => {}
+  }
+
+  // ==================== DECIDE WHAT TYPE OF IMAGE TO DOWNLOAD ==================== //
+
+
+  match job_args.image_source {
+    LipsyncAnimationImageSource::F(media_file_token) => {}
+    LipsyncAnimationImageSource::U(media_upload_token) => {}
+  }
+
+
+  /*
+
+  // ==================== DOWNLOAD IMAGE MEDIA FILE ==================== //
+
+  info!("Download image media file ...");
 
   // TODO: If already transcoded, download the transcoded file instead.
   // TODO: Turn this into a general utility.
 
-  let original_media_upload_fs_path = {
+  let image_media_upload_fs_path = {
     let original_media_upload_fs_path = work_temp_dir.path().join("original.bin");
 
     let media_upload_bucket_path =
@@ -171,7 +134,7 @@ pub async fn process_job(args: SadTalkerProcessJobArgs<'_>) -> Result<JobSuccess
       .map_err(|e| ProcessSingleJobError::Other(e))?;
 
   //let config_path = PathBuf::from("/models/voice_conversion/so-vits-svc/example_config.json"); // TODO: This could be variable.
-  let input_wav_path = original_media_upload_fs_path;
+  let input_wav_path = image_media_upload_fs_path;
 
   let output_audio_fs_path = work_temp_dir.path().join("output.wav");
   //let output_metadata_fs_path = temp_dir.path().join("metadata.json");
