@@ -18,7 +18,7 @@ use filesys::rename_across_devices::rename_across_devices;
 
 
 #[async_trait]
-trait ModelDownloader {
+pub trait ModelDownloader {
   //fn from_env() -> Self {
   //  // NB: For now rvc-v2 is all that uses this hubert, but other models
   //  // may (re)use it in the future.
@@ -100,25 +100,26 @@ trait ModelDownloader {
   }
 }
 
-
-macro_rules! impl_model_downloader {
+#[macro_export]
+macro_rules! downloader {
   ($struct_name:ident) => {
+
     #[derive(Debug, Clone)]
     struct $struct_name {
       pub model_name: String,
       pub cloud_bucket_path: String,
-      pub filesystem_path: PathBuf,
+      pub filesystem_path: std::path::PathBuf,
     }
 
-    #[async_trait]
-    impl ModelDownloader for $struct_name {
+    #[async_trait::async_trait]
+    impl crate::util::model_downloader::ModelDownloader for $struct_name {
       fn get_model_name(&self) -> &str {
         &self.model_name
       }
       fn get_cloud_bucket_path(&self) -> &str {
         &self.cloud_bucket_path
       }
-      fn get_filesystem_path(&self) -> &Path {
+      fn get_filesystem_path(&self) -> &std::path::Path {
         &self.filesystem_path
       }
     }
