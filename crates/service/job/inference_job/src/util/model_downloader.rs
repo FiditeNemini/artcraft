@@ -10,6 +10,7 @@ use filesys::rename_across_devices::rename_across_devices;
 use log::{error, info};
 use std::path::Path;
 
+/// Helper utility for downloading pretrained models from GCS.
 #[async_trait]
 pub trait ModelDownloader {
 
