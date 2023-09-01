@@ -11,6 +11,7 @@ use crate::http_server::endpoints::investor_demo::demo_cookie::request_has_demo_
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::server_state::ServerState;
 use enums::by_table::generic_inference_jobs::inference_category::InferenceCategory;
+use enums::by_table::generic_inference_jobs::inference_model_type::InferenceModelType;
 use enums::common::visibility::Visibility;
 use http_server_common::request::get_request_header_optional::get_request_header_optional;
 use http_server_common::request::get_request_ip::get_request_ip;
@@ -273,7 +274,7 @@ pub async fn enqueue_lipsync_animation_handler(
   let query_result = insert_generic_inference_job(InsertGenericInferenceArgs {
     uuid_idempotency_token: &request.uuid_idempotency_token,
     inference_category: InferenceCategory::LipsyncAnimation,
-    maybe_model_type: None, // NB: Model is static during inference
+    maybe_model_type: Some(InferenceModelType::SadTalker), // NB: Model is static during inference
     maybe_model_token: None, // NB: Model is static during inference
     maybe_input_source_token: None, // TODO: Introduce a second foreign key ?
     maybe_input_source_token_type: None, // TODO: Introduce a second foreign key ?

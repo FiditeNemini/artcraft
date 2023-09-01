@@ -11,7 +11,8 @@ use log::{error, info};
 use std::path::Path;
 
 /// Helper utility for downloading pretrained models from GCS.
-#[async_trait]
+#[async_trait(?Send)] // NB: Marking async_trait as not needing Sync/Send. Hopefully this doesn't blow up on us.
+//#[async_trait]
 pub trait ModelDownloader {
 
   /// Model name (for info! status logging).
@@ -99,7 +100,7 @@ macro_rules! impl_model_downloader {
   ) => {
 
     #[derive(Debug, Clone)]
-    struct $struct_name {
+    pub struct $struct_name {
       pub model_name: String,
       pub cloud_bucket_path: String,
       pub filesystem_path: std::path::PathBuf,

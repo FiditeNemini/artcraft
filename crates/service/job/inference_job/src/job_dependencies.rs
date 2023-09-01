@@ -2,6 +2,7 @@ use bootstrap::bootstrap::ContainerEnvironment;
 use cloud_storage::bucket_client::BucketClient;
 use cloud_storage::bucket_path_unifier::BucketPathUnifier;
 use concurrency::relaxed_atomic_bool::RelaxedAtomicBool;
+use crate::job::job_types::lipsync::sad_talker::model_downloaders::SadTalkerDownloaders;
 use crate::job::job_types::tts::tacotron2_v2_early_fakeyou::tacotron2_inference_command::Tacotron2InferenceCommand;
 use crate::job::job_types::tts::vits::vits_inference_command::VitsInferenceCommand;
 use crate::job::job_types::vc::rvc_v2::pretrained_hubert_model::PretrainedHubertModel;
@@ -154,6 +155,7 @@ pub struct JobTypeDetails {
   pub vits: VitsDetails,
   pub rvc_v2: RvcV2Details,
   pub so_vits_svc: SoVitsSvcDetails,
+  pub sad_talker: SadTalkerDetails,
   //pub tacotron2_modern: ...,
   //pub softvc: ...,
 }
@@ -182,4 +184,8 @@ pub struct RvcV2Details {
 
 pub struct SoVitsSvcDetails {
   pub inference_command: SoVitsSvcInferenceCommand,
+}
+
+pub struct SadTalkerDetails {
+  pub downloaders: SadTalkerDownloaders,
 }

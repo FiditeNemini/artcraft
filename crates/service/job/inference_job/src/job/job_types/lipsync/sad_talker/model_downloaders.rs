@@ -1,4 +1,4 @@
-
+use crate::util::model_downloader::ModelDownloader;
 crate::impl_model_downloader!(
   SadTalkerModelFirstMapping,
   "sad talker model first mapping",
@@ -64,7 +64,7 @@ crate::impl_model_downloader!(
 );
 
 crate::impl_model_downloader!(
-  SadTalker,
+  SadTalkerEnhancerParsenet,
   "sad talker enhancer parsenet",
   "SAD_ENHANCER_PARSENET_BUCKET_PATH",
   "/animation_sadtalker/enhancer/parsing_parsenet.pth",
@@ -72,8 +72,44 @@ crate::impl_model_downloader!(
   "/tmp/downloads/sadtalker/parsing_parsenet.pth"
 );
 
+pub struct SadTalkerDownloaders {
+  pub model_first_mapping: SadTalkerModelFirstMapping,
+  pub model_second_mapping: SadTalkerModelSecondMapping,
+  pub model_first_tensor: SadTalkerModelFirstTensor,
+  pub model_second_tensor: SadTalkerModelSecondTensor,
+  pub enhancer_alignment: SadTalkerEnhancerAlignment,
+  pub enhancer_resnet: SadTalkerEnhancerResnet,
+  pub enhancer_gfpgan: SadTalkerEnhancerGfpgan,
+  pub enhancer_parsenet: SadTalkerEnhancerParsenet,
+}
 
+impl SadTalkerDownloaders {
+  pub fn build_all_from_env() -> Self {
+    Self {
+      model_first_mapping: SadTalkerModelFirstMapping::from_env(),
+      model_second_mapping: SadTalkerModelSecondMapping::from_env(),
+      model_first_tensor: SadTalkerModelFirstTensor::from_env(),
+      model_second_tensor: SadTalkerModelSecondTensor::from_env(),
+      enhancer_alignment: SadTalkerEnhancerAlignment::from_env(),
+      enhancer_resnet: SadTalkerEnhancerResnet::from_env(),
+      enhancer_gfpgan: SadTalkerEnhancerGfpgan::from_env(),
+      enhancer_parsenet: SadTalkerEnhancerParsenet::from_env(),
+    }
+  }
 
+  pub fn all_downloaders(&self) -> Vec<&dyn ModelDownloader> {
+    vec![
+      &self.model_first_mapping,
+      &self.model_second_mapping,
+      &self.model_first_tensor,
+      &self.model_second_tensor,
+      &self.enhancer_alignment,
+      &self.enhancer_resnet,
+      &self.enhancer_gfpgan,
+      &self.enhancer_parsenet,
+    ]
+  }
+}
 
 #[cfg(test)]
 mod test {

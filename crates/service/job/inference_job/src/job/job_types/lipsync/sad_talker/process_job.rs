@@ -1,4 +1,5 @@
 use anyhow::anyhow;
+use crate::util::model_downloader::ModelDownloader;
 use buckets::public::media_uploads::original_file::MediaUploadOriginalFilePath;
 use buckets::public::voice_conversion_results::original_file::VoiceConversionResultOriginalFilePath;
 use container_common::filesystem::check_file_exists::check_file_exists;
@@ -28,8 +29,8 @@ pub struct SadTalkerProcessJobArgs<'a> {
 
 pub async fn process_job(args: SadTalkerProcessJobArgs<'_>) -> Result<JobSuccessResult, ProcessSingleJobError> {
   let job = args.job;
+  let deps = args.job_dependencies;
 
-  /*
   let mut job_progress_reporter = args.job_dependencies
       .job_progress_reporter
       .new_generic_inference(job.inference_job_token.as_str())
@@ -37,18 +38,21 @@ pub async fn process_job(args: SadTalkerProcessJobArgs<'_>) -> Result<JobSuccess
 
   // ==================== DOWNLOAD HUBERT ==================== //
 
-  info!("Download RVC hubert model (if not present)...");
+  info!("Download models (if not present)...");
 
-  args.job_dependencies.pretrained_models.rvc_v2_hubert.download_if_not_on_filesystem(
-    &args.job_dependencies.private_bucket_client,
-    &args.job_dependencies.fs.scoped_temp_dir_creator_for_downloads)
-      .await
-      .map_err(|e| {
-        error!("could not download hubert: {:?}", e);
-        ProcessSingleJobError::from_anyhow_error(e)
-      })?;
+  for downloader in deps.job_type_details.sad_talker.downloaders.all_downloaders() {
+    let result = downloader.download_if_not_on_filesystem(
+      &args.job_dependencies.private_bucket_client,
+      &args.job_dependencies.fs.scoped_temp_dir_creator_for_downloads,
+    ).await;
 
-  // ==================== CONFIRM OR DOWNLOAD RVC (v2) MODEL ==================== //
+    if let Err(e) = result {
+      error!("could not download: {:?}", e);
+      return Err(ProcessSingleJobError::from_anyhow_error(e))
+    }
+  }
+
+  /*// ==================== CONFIRM OR DOWNLOAD RVC (v2) MODEL ==================== //
 
   //info!("Download RVC model (if not present)...");
 
