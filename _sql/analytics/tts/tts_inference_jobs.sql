@@ -35,7 +35,7 @@ order by attempts desc
 select *
 from tts_inference_jobs
 where status = 'pending'
-and creator_ip_address = '185.14.97.173'
+and creator_ip_address = '186.188.28.73'
 limit 1;
 
 -- Top voices in requests

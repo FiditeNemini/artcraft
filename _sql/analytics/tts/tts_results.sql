@@ -119,7 +119,7 @@ WHERE
 
 --- Search for 101soundboards.com using us
 SELECT
-    r.maybe_creator_user_token, r.creator_ip_address
+    r.maybe_creator_user_token, r.creator_ip_address, r.raw_inference_text
 FROM
     tts_results as r
         LEFT OUTER JOIN
