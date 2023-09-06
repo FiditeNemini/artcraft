@@ -22,6 +22,7 @@ use std::path::PathBuf;
 use std::time::Instant;
 use mysql_queries::payloads::generic_inference_args::generic_inference_args::{GenericInferenceArgs, InferenceCategoryAbbreviated, PolymorphicInferenceArgs};
 use mysql_queries::payloads::generic_inference_args::lipsync_payload::{LipsyncAnimationAudioSource, LipsyncAnimationImageSource};
+use mysql_queries::queries::voice_conversion::results::get_voice_conversion_result::get_voice_conversion_result;
 use tokens::users::user::UserToken;
 use crate::job::job_types::lipsync::sad_talker::validate_job::validate_job;
 
@@ -77,7 +78,15 @@ pub async fn process_job(args: SadTalkerProcessJobArgs<'_>) -> Result<JobSuccess
     LipsyncAnimationAudioSource::F(media_file_token) => {}
     LipsyncAnimationAudioSource::U(media_upload_token) => {}
     LipsyncAnimationAudioSource::T(tts_result_token) => {}
-    LipsyncAnimationAudioSource::V(voice_conversion_result_token) => {}
+    LipsyncAnimationAudioSource::V(voice_conversion_result_token) => {
+      let voice_conversion_result = get_voice_conversion_result(
+        voice_conversion_result_token,
+        false,
+        &args.job_dependencies.mysql_pool,
+      ).await;
+
+      // TODO ...
+    }
   }
 
   // ==================== DECIDE WHAT TYPE OF IMAGE TO DOWNLOAD ==================== //

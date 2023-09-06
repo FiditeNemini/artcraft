@@ -1,1 +1,2 @@
+pub mod get_voice_conversion_result;
 pub mod insert_voice_conversion_result;
