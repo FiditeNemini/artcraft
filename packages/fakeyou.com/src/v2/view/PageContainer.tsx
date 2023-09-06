@@ -202,7 +202,14 @@ class PageContainer extends React.Component<
     return (
       <div id="wrapper" className="no-padding">
         <div id="overlay"></div>
-        <SideNav />
+        <SideNav
+          sessionWrapper={this.props.sessionWrapper}
+          logoutHandler={this.logout}
+          querySessionCallback={this.props.querySessionAction}
+          querySessionSubscriptionsCallback={
+            this.props.querySessionSubscriptionsAction
+          }
+        />
 
         {shouldRenderNavs && (
           <TopNav
