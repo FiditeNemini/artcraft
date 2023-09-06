@@ -223,7 +223,7 @@ class PageContainer extends React.Component<
         )}
 
         <div id="page-content-wrapper">
-          <MobileMenu />
+          <MobileMenu sessionWrapper={this.props.sessionWrapper} />
           <Switch>
             <Route path="/firehose">
               <FirehoseEventListPage

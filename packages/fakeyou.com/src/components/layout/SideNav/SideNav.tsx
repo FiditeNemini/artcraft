@@ -20,7 +20,6 @@ import {
 } from "@storyteller/components/src/api/stats/queues/GetQueueStats";
 import { WebUrl } from "common/WebUrl";
 import { Logout } from "@storyteller/components/src/api/session/Logout";
-import { t } from "i18next";
 import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
 
 const DEFAULT_QUEUE_REFRESH_INTERVAL_MILLIS = 15000;
@@ -154,14 +153,24 @@ export default function SideNav(props: SideNavProps) {
         label="Login"
         small
         secondary
-        onClick={() => history.push("/login")}
+        onClick={() => {
+          history.push("/login");
+          handleNavLinkClick();
+        }}
       />
     </>
   );
 
   let signupOrLogOutButton = (
     <>
-      <Button label="Sign Up" small onClick={() => history.push("/signup")} />
+      <Button
+        label="Sign Up"
+        small
+        onClick={() => {
+          history.push("/signup");
+          handleNavLinkClick();
+        }}
+      />
     </>
   );
 
@@ -182,7 +191,10 @@ export default function SideNav(props: SideNavProps) {
           label="Profile"
           small
           secondary
-          onClick={() => history.push(url)}
+          onClick={() => {
+            history.push(url);
+            handleNavLinkClick();
+          }}
         />
       </>
     );
@@ -196,6 +208,7 @@ export default function SideNav(props: SideNavProps) {
           danger
           onClick={async () => {
             await logoutHandler();
+            handleNavLinkClick();
           }}
         />
       </>
@@ -209,7 +222,7 @@ export default function SideNav(props: SideNavProps) {
     >
       <ul className="sidebar-nav">
         <div className="sidebar-brand">
-          <Link to="/">
+          <Link to="/" onClick={handleNavLinkClick}>
             <img
               src="/fakeyou/FakeYou-Logo.png"
               alt="FakeYou: Cartoon and Celebrity Text to Speech"

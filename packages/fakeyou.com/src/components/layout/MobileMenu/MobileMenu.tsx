@@ -2,8 +2,17 @@ import React from "react";
 import "./MobileMenu.scss";
 import Button from "components/common/Button/Button";
 import { faBars } from "@fortawesome/pro-solid-svg-icons";
+import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
+import { useHistory } from "react-router-dom";
+import { WebUrl } from "common/WebUrl";
+import { faUser } from "@fortawesome/pro-solid-svg-icons";
 
-export default function MobileMenu() {
+interface MobileMenuProps {
+  sessionWrapper: SessionWrapper;
+}
+
+export default function MobileMenu(props: MobileMenuProps) {
+  let history = useHistory();
   const handleMenuButtonClick = () => {
     const wrapper = document.getElementById("wrapper");
 
@@ -13,6 +22,33 @@ export default function MobileMenu() {
       }
     }
   };
+
+  const loggedIn = props.sessionWrapper.isLoggedIn();
+
+  let signupOrProfileButton = (
+    <>
+      <Button label="Sign Up" small onClick={() => history.push("/signup")} />
+    </>
+  );
+
+  if (loggedIn) {
+    let displayName = props.sessionWrapper.getDisplayName();
+    if (displayName === undefined) {
+      displayName = "My Account";
+    }
+    let url = WebUrl.userProfilePage(displayName);
+    signupOrProfileButton = (
+      <>
+        <Button
+          icon={faUser}
+          label="Profile"
+          small
+          secondary
+          onClick={() => history.push(url)}
+        />
+      </>
+    );
+  }
 
   return (
     <div className="mobile-menu-container d-lg-none">
@@ -35,7 +71,7 @@ export default function MobileMenu() {
             />
           </div>
           <div className="d-flex col-4 justify-content-end">
-            <Button label="Sign Up" small onClick={handleMenuButtonClick} />
+            {signupOrProfileButton}
           </div>
         </div>
       </div>
