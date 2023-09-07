@@ -87,6 +87,7 @@ import VcModelDeletePage from "./pages/vc/vc_model_delete/VcModelDeletePage";
 import SideNav from "components/layout/SideNav/SideNav";
 import MobileMenu from "components/layout/MobileMenu/MobileMenu";
 import { TopNav } from "./nav/TopNav";
+import { TestingPage } from "./pages/testing/TestingPage";
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -575,6 +576,14 @@ class PageContainer extends React.Component<
 
             <Route path="/about">
               <AboutPage />
+            </Route>
+
+            <Route path="/testing">
+              <TestingPage 
+                enqueueInferenceJob={this.props.enqueueInferenceJob}
+                inferenceJobs={this.props.inferenceJobs}
+                inferenceJobsByCategory={this.props.inferenceJobsByCategory}
+              />
             </Route>
 
             <Route path="/commissions">
