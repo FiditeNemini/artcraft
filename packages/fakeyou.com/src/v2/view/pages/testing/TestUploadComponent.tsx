@@ -197,11 +197,6 @@ function TestUploadComponent(props: Props) {
           </div>
         }
       />
-      {file ? (
-        <>FILE !!!!</>
-      ) : (
-        <></>
-      )}
 
       {file ? (
         <div className="d-flex gap-3">

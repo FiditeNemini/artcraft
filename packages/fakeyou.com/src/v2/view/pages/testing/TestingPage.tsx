@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 
 import { usePrefixedDocumentTitle } from "../../../../common/UsePrefixedDocumentTitle";
 import { PosthogClient } from "@storyteller/components/src/analytics/PosthogClient";
@@ -24,15 +24,20 @@ function TestingPage(props: Props) {
   PosthogClient.recordPageview();
   usePrefixedDocumentTitle("Testing");
 
+  const [audioToken, setAudioToken] = useState<string|undefined>(undefined);
+  const [imageToken, setImageToken] = useState<string|undefined>(undefined);
+
   const doTest = async () => {
     let request: EnqueueFaceAnimationRequest = {
       uuid_idempotency_token: uuidv4(),
       audio_source: {
-        maybe_voice_conversion_result_token: "todo",
+        //maybe_voice_conversion_result_token: "todo",
         //maybe_media_file_token: "audio_media_token",
+        maybe_media_upload_token: audioToken,
       },
       image_source: {
-        maybe_media_file_token: "image_media_token",
+        //maybe_media_file_token: "image_media_token",
+        maybe_media_upload_token: imageToken,
       },
     };
 
@@ -46,6 +51,11 @@ function TestingPage(props: Props) {
     }
   };
 
+  const generateButtonDisabled = !!!audioToken || !!!imageToken;
+  const generateButtonClass = generateButtonDisabled
+    ? "btn btn-uploaded w-100 disabled"
+    : "btn btn-primary w-100";
+
   return (
     <div>
       <div className="container-panel pt-4 pb-5">
@@ -54,33 +64,55 @@ function TestingPage(props: Props) {
         <br />
         <br />
 
+        <h2>Audio</h2>
         <TestUploadComponent
           uploadTypeLabel={"Audio"}
           uploadTypesAllowed={["MP3", "WAV", "FLAC", "OGG"]}
-          setMediaUploadToken={() => {}}
+          setMediaUploadToken={(token) => { setAudioToken(token) }}
           formIsCleared={false}
           setFormIsCleared={() => {}}
           setCanConvert={() => {}}
           changeConvertIdempotencyToken={() => {}}
         />
+
+        {audioToken ? (
+          <>
+          <br />
+          <div>Audio upload token: {audioToken}</div>
+          </>
+        ) : (<></>)}
         
         <br />
         <br />
 
+        <h2>Image</h2>
         <TestUploadComponent
           uploadTypeLabel={"Image"}
           uploadTypesAllowed={["JPG", "PNG"]}
-          setMediaUploadToken={() => {}}
+          setMediaUploadToken={(token) => { setImageToken(token) }}
           formIsCleared={false}
           setFormIsCleared={() => {}}
           setCanConvert={() => {}}
           changeConvertIdempotencyToken={() => {}}
         />
 
+        {imageToken ? (
+          <>
+          <br />
+          <div>Image upload token: {imageToken}</div>
+          </>
+        ) : (<></>)}
+        
         <br />
         <br />
 
-        <button onClick={() => doTest()}>Test the thing</button>
+        <h2>Generate Result </h2>
+        <button 
+          disabled={generateButtonDisabled}
+          className={generateButtonClass}
+          onClick={() => doTest()}>
+            Test the thing
+        </button>
       </div>
     </div>
   );
