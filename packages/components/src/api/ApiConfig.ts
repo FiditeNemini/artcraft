@@ -402,6 +402,14 @@ class ApiConfig {
     return `${this.getApiOrigin()}/v1/media_uploads/upload_audio`;
   }
 
+  uploadImage(): string {
+    return `${this.getApiOrigin()}/v1/media_uploads/upload_image`;
+  }
+
+  uploadVideo(): string {
+    return `${this.getApiOrigin()}/v1/media_uploads/upload_video`;
+  }
+
   uploadMedia(): string {
     return `${this.getApiOrigin()}/v1/media_uploads/upload`;
   }

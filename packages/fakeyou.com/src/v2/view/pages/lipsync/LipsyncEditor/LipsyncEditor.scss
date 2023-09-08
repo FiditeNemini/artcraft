@@ -87,7 +87,7 @@
 	}
 }
 
-.lipsync-panel { position: relative; height: fit-content; }
+.lipsync-panel { position: relative; height: fit-content; overflow: hidden; }
 
 // .lipsync-editor, .lipsync-working, .lipsync-success {
 // 	position: absolute;
@@ -97,7 +97,16 @@
 	display: flex;
 	align-items: center;
 	justify-content: center;
+	width: 100%;
 }
+
+// .lipsync-working-notice {
+// 	background-color: red;
+// }
+
+// .lipsync-working {
+// 	background-color: green;
+// }
 
 .lipsync-working-notice {
 	flex-direction: column;

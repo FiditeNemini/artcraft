@@ -6,6 +6,7 @@ import { LoginPage } from "./pages/login/LoginPage";
 import { ModerationFc } from "./pages/moderation/moderation_main/ModerationFc";
 import { ModerationIpBanListFc } from "./pages/moderation/moderation_ip_ban_list/ModerationIpBanListFc";
 import { ModerationViewIpBanFc } from "./pages/moderation/moderation_view_ip_ban/ModerationViewIpBanFc";
+import { Media } from "./pages/media";
 import { LipsyncEditor } from "./pages/lipsync";
 import { FooterNav } from "./nav/FooterNav";
 import { TopNav } from "./nav/TopNav";
@@ -431,7 +432,11 @@ class PageContainer extends React.Component<Props, State> {
             </Route>
 
             <Route path="/dev-lipsync">
-              <LipsyncEditor />
+              <LipsyncEditor {...{ enqueueInferenceJob: this.props.enqueueInferenceJob }} />
+            </Route>
+
+            <Route path="/media/:token">
+              <Media/>
             </Route>
 
             <Route path="/moderation/user/list">
