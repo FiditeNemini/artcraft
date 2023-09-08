@@ -26,8 +26,13 @@ function TestingPage(props: Props) {
   const doTest = async () => {
     let request: EnqueueFaceAnimationRequest = {
       uuid_idempotency_token: uuidv4(),
-      audio_token: "audio_token",
-      image_token: "video_token",
+      audio_source: {
+        maybe_voice_conversion_result_token: "todo",
+        //maybe_media_file_token: "audio_media_token",
+      },
+      image_source: {
+        maybe_media_file_token: "image_media_token",
+      },
     };
 
     let result = await EnqueueFaceAnimation(request);

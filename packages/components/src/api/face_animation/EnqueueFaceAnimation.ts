@@ -1,10 +1,23 @@
 import { ApiConfig } from "@storyteller/components";
 
+export interface AudioSource {
+  maybe_media_file_token?: string,
+  maybe_media_upload_token?: string,
+  maybe_tts_result_token?: string,
+  maybe_voice_conversion_result_token?: string,
+}
+
+export interface ImageSource {
+  maybe_media_file_token?: string,
+  maybe_media_upload_token?: string,
+}
+
+
 export interface EnqueueFaceAnimationRequest {
   uuid_idempotency_token: string,
 
-  audio_token: string,
-  image_token: string,
+  audio_source: AudioSource,
+  image_source: ImageSource,
 }
 
 export interface EnqueueFaceAnimationSuccessResponse {
