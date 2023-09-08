@@ -9,6 +9,7 @@ import {
 } from "@storyteller/components/src/api/face_animation/EnqueueFaceAnimation";
 import { v4 as uuidv4 } from "uuid";
 import { FrontendInferenceJobType, InferenceJob } from "@storyteller/components/src/jobs/InferenceJob";
+import TestUploadComponent from "./TestUploadComponent";
 
 interface Props {
   enqueueInferenceJob: (
@@ -49,6 +50,35 @@ function TestingPage(props: Props) {
     <div>
       <div className="container-panel pt-4 pb-5">
         <h1>Testing Page</h1>
+
+        <br />
+        <br />
+
+        <TestUploadComponent
+          uploadTypeLabel={"Audio"}
+          uploadTypesAllowed={["MP3", "WAV", "FLAC", "OGG"]}
+          setMediaUploadToken={() => {}}
+          formIsCleared={false}
+          setFormIsCleared={() => {}}
+          setCanConvert={() => {}}
+          changeConvertIdempotencyToken={() => {}}
+        />
+        
+        <br />
+        <br />
+
+        <TestUploadComponent
+          uploadTypeLabel={"Image"}
+          uploadTypesAllowed={["JPG", "PNG"]}
+          setMediaUploadToken={() => {}}
+          formIsCleared={false}
+          setFormIsCleared={() => {}}
+          setCanConvert={() => {}}
+          changeConvertIdempotencyToken={() => {}}
+        />
+
+        <br />
+        <br />
 
         <button onClick={() => doTest()}>Test the thing</button>
       </div>

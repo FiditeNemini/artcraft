@@ -416,6 +416,10 @@ class ApiConfig {
     return `${this.getApiOrigin()}/v1/media_uploads/upload_audio`;
   }
 
+  uploadImage(): string {
+    return `${this.getApiOrigin()}/v1/media_uploads/upload_image`;
+  }
+
   uploadMedia(): string {
     return `${this.getApiOrigin()}/v1/media_uploads/upload`;
   }
