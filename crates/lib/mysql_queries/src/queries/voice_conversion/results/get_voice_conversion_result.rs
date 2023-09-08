@@ -5,7 +5,6 @@
 
 use anyhow::anyhow;
 use chrono::{DateTime, Utc};
-use crate::column_types::vocoder_type::VocoderType;
 use crate::helpers::boolean_converters::{nullable_i8_to_bool, i8_to_bool};
 use enums::common::visibility::Visibility;
 use errors::AnyhowResult;
@@ -14,6 +13,9 @@ use sqlx::MySqlPool;
 use tokens::tokens::voice_conversion_results::VoiceConversionResultToken;
 use tokens::users::user::UserToken;
 use tokens::voice_conversion::model::VoiceConversionModelToken;
+
+// TODO(bt, 2023-09-07): I lazily copied this code from `get_tts_result` and didn't validate the query or the fields.
+//  Once this is used in production flows, this should be spot checked.
 
 pub struct VoiceConversionResult {
   pub voice_conversion_result_token: VoiceConversionResultToken,
@@ -44,9 +46,6 @@ pub struct VoiceConversionResult {
   pub file_size_bytes: u32,
   pub duration_millis: u32,
 
-  //pub model_is_mod_approved: bool, // converted
-  //pub maybe_mod_user_token: Option<String>,
-
   pub created_at: DateTime<Utc>,
   pub updated_at: DateTime<Utc>,
 
@@ -72,13 +71,13 @@ pub struct VoiceConversionResultRecordRaw {
   pub voice_conversion_model_title: Option<String>,
 
   pub maybe_creator_is_banned: Option<i8>,
-  pub maybe_creator_user_token: Option<String>,
+  pub maybe_creator_user_token: Option<UserToken>,
   pub maybe_creator_username: Option<String>,
   pub maybe_creator_display_name: Option<String>,
   pub maybe_creator_gravatar_hash: Option<String>,
 
   pub maybe_model_creator_is_banned: Option<i8>,
-  pub maybe_model_creator_user_token: Option<String>,
+  pub maybe_model_creator_user_token: Option<UserToken>,
   pub maybe_model_creator_username: Option<String>,
   pub maybe_model_creator_display_name: Option<String>,
   pub maybe_model_creator_gravatar_hash: Option<String>,
@@ -93,9 +92,6 @@ pub struct VoiceConversionResultRecordRaw {
 
   pub file_size_bytes: i32,
   pub duration_millis: i32,
-
-  //pub model_is_mod_approved: i8, // needs convert
-  //pub maybe_mod_user_token: Option<String>,
 
   pub created_at: DateTime<Utc>,
   pub updated_at: DateTime<Utc>,
@@ -113,9 +109,9 @@ pub async fn get_voice_conversion_result(
 ) -> AnyhowResult<Option<VoiceConversionResult>> {
 
   let maybe_record = if can_see_deleted {
-    select_including_deleted(tts_result_token, mysql_pool).await
+    select_including_deleted(voice_conversion_result_token, mysql_pool).await
   } else {
-    select_without_deleted(tts_result_token, mysql_pool).await
+    select_without_deleted(voice_conversion_result_token, mysql_pool).await
   };
 
   let ir : VoiceConversionResultRecordRaw = match maybe_record {
@@ -134,18 +130,11 @@ pub async fn get_voice_conversion_result(
     }
   };
 
-  let mut pretrained_vocoder = None;
-  if let Some(vocoder) = ir.maybe_pretrained_vocoder_used.as_deref() {
-    pretrained_vocoder = Some(VocoderType::from_str(vocoder)?);
-  }
-
   let ir_for_response = VoiceConversionResult {
-    tts_result_token: ir.tts_result_token,
+    voice_conversion_result_token: ir.voice_conversion_result_token,
 
-    raw_inference_text: ir.raw_inference_text,
-
-    tts_model_token: ir.tts_model_token,
-    tts_model_title: ir.tts_model_title,
+    voice_conversion_model_token: ir.voice_conversion_model_token,
+    voice_conversion_model_title: ir.voice_conversion_model_title,
 
     maybe_creator_user_token: ir.maybe_creator_user_token,
     maybe_creator_username: ir.maybe_creator_username,
@@ -157,12 +146,9 @@ pub async fn get_voice_conversion_result(
     maybe_model_creator_display_name: ir.maybe_model_creator_display_name,
     maybe_model_creator_gravatar_hash: ir.maybe_model_creator_gravatar_hash,
 
-    //model_is_mod_approved: if ir.model_is_mod_approved == 0 { false } else { true },
-
-    public_bucket_wav_audio_path: ir.public_bucket_wav_audio_path,
-    public_bucket_spectrogram_path: ir.public_bucket_spectrogram_path,
-
     // NB: Fail open/public since we're already looking at it
+    public_bucket_hash: ir.public_bucket_hash,
+
     creator_set_visibility: Visibility::from_str(&ir.creator_set_visibility)
         .unwrap_or(Visibility::Public),
 
@@ -191,126 +177,116 @@ pub async fn get_voice_conversion_result(
 }
 
 async fn select_including_deleted(
-  tts_result_token: &str,
+  voice_conversion_result_token: &str,
   mysql_pool: &MySqlPool
 ) -> Result<VoiceConversionResultRecordRaw, sqlx::Error> {
   sqlx::query_as!(
       VoiceConversionResultRecordRaw,
         r#"
 SELECT
-    tts_results.token as tts_result_token,
+    voice_conversion_results.token as `voice_conversion_result_token: tokens::tokens::voice_conversion_results::VoiceConversionResultToken`,
 
-    tts_results.raw_inference_text,
+    voice_conversion_results.model_token as `voice_conversion_model_token: tokens::voice_conversion::model::VoiceConversionModelToken`,
+    voice_conversion_models.title as voice_conversion_model_title,
 
-    tts_results.model_token as tts_model_token,
-    tts_models.title as tts_model_title,
-
-    tts_results.maybe_pretrained_vocoder_used,
-
-    users.token as maybe_creator_user_token,
+    users.token as `maybe_creator_user_token: tokens::users::user::UserToken`,
     users.username as maybe_creator_username,
     users.display_name as maybe_creator_display_name,
     users.email_gravatar_hash as maybe_creator_gravatar_hash,
     users.is_banned as maybe_creator_is_banned,
 
-    model_users.token as maybe_model_creator_user_token,
+    model_users.token as `maybe_model_creator_user_token: tokens::users::user::UserToken`,
     model_users.username as maybe_model_creator_username,
     model_users.display_name as maybe_model_creator_display_name,
     model_users.email_gravatar_hash as maybe_model_creator_gravatar_hash,
     model_users.is_banned as maybe_model_creator_is_banned,
 
-    tts_results.public_bucket_wav_audio_path,
-    tts_results.public_bucket_spectrogram_path,
+    voice_conversion_results.public_bucket_hash,
 
-    tts_results.creator_set_visibility,
+    voice_conversion_results.creator_set_visibility,
 
-    tts_results.generated_by_worker,
-    tts_results.is_debug_request,
+    voice_conversion_results.generated_by_worker,
+    voice_conversion_results.is_debug_request,
 
-    tts_results.file_size_bytes,
-    tts_results.duration_millis,
-    tts_results.created_at,
-    tts_results.updated_at,
+    voice_conversion_results.file_size_bytes,
+    voice_conversion_results.duration_millis,
+    voice_conversion_results.created_at,
+    voice_conversion_results.updated_at,
 
-    tts_results.creator_ip_address,
-    tts_results.user_deleted_at,
-    tts_results.mod_deleted_at
+    voice_conversion_results.creator_ip_address,
+    voice_conversion_results.user_deleted_at,
+    voice_conversion_results.mod_deleted_at
 
-FROM tts_results
-LEFT OUTER JOIN tts_models
-  ON tts_results.model_token = tts_models.token
+FROM voice_conversion_results
+LEFT OUTER JOIN voice_conversion_models
+  ON voice_conversion_results.model_token = voice_conversion_models.token
 LEFT OUTER JOIN users
-  ON tts_results.maybe_creator_user_token = users.token
+  ON voice_conversion_results.maybe_creator_user_token = users.token
 LEFT OUTER JOIN users as model_users
-  ON tts_models.creator_user_token = model_users.token
+  ON voice_conversion_models.creator_user_token = model_users.token
 WHERE
-    tts_results.token = ?
+    voice_conversion_results.token = ?
         "#,
-      tts_result_token
+      voice_conversion_result_token
     )
       .fetch_one(mysql_pool)
       .await // TODO: This will return error if it doesn't exist
 }
 
 async fn select_without_deleted(
-  tts_result_token: &str,
+  voice_conversion_result_token: &str,
   mysql_pool: &MySqlPool
 ) -> Result<VoiceConversionResultRecordRaw, sqlx::Error> {
   sqlx::query_as!(
       VoiceConversionResultRecordRaw,
         r#"
 SELECT
-    tts_results.token as tts_result_token,
+    voice_conversion_results.token as `voice_conversion_result_token: tokens::tokens::voice_conversion_results::VoiceConversionResultToken`,
 
-    tts_results.raw_inference_text,
+    voice_conversion_results.model_token as `voice_conversion_model_token: tokens::voice_conversion::model::VoiceConversionModelToken`,
+    voice_conversion_models.title as voice_conversion_model_title,
 
-    tts_results.model_token as tts_model_token,
-    tts_models.title as tts_model_title,
-
-    tts_results.maybe_pretrained_vocoder_used,
-
-    users.token as maybe_creator_user_token,
+    users.token as `maybe_creator_user_token: tokens::users::user::UserToken`,
     users.username as maybe_creator_username,
     users.display_name as maybe_creator_display_name,
     users.email_gravatar_hash as maybe_creator_gravatar_hash,
     users.is_banned as maybe_creator_is_banned,
 
-    model_users.token as maybe_model_creator_user_token,
+    model_users.token as `maybe_model_creator_user_token: tokens::users::user::UserToken`,
     model_users.username as maybe_model_creator_username,
     model_users.display_name as maybe_model_creator_display_name,
     model_users.email_gravatar_hash as maybe_model_creator_gravatar_hash,
     model_users.is_banned as maybe_model_creator_is_banned,
 
-    tts_results.public_bucket_wav_audio_path,
-    tts_results.public_bucket_spectrogram_path,
+    voice_conversion_results.public_bucket_hash,
 
-    tts_results.creator_set_visibility,
+    voice_conversion_results.creator_set_visibility,
 
-    tts_results.generated_by_worker,
-    tts_results.is_debug_request,
+    voice_conversion_results.generated_by_worker,
+    voice_conversion_results.is_debug_request,
 
-    tts_results.file_size_bytes,
-    tts_results.duration_millis,
-    tts_results.created_at,
-    tts_results.updated_at,
+    voice_conversion_results.file_size_bytes,
+    voice_conversion_results.duration_millis,
+    voice_conversion_results.created_at,
+    voice_conversion_results.updated_at,
 
-    tts_results.creator_ip_address,
-    tts_results.user_deleted_at,
-    tts_results.mod_deleted_at
+    voice_conversion_results.creator_ip_address,
+    voice_conversion_results.user_deleted_at,
+    voice_conversion_results.mod_deleted_at
 
-FROM tts_results
-LEFT OUTER JOIN tts_models
-  ON tts_results.model_token = tts_models.token
+FROM voice_conversion_results
+LEFT OUTER JOIN voice_conversion_models
+  ON voice_conversion_results.model_token = voice_conversion_models.token
 LEFT OUTER JOIN users
-  ON tts_results.maybe_creator_user_token = users.token
+  ON voice_conversion_results.maybe_creator_user_token = users.token
 LEFT OUTER JOIN users as model_users
-  ON tts_models.creator_user_token = model_users.token
+  ON voice_conversion_models.creator_user_token = model_users.token
 WHERE
-    tts_results.token = ?
-    AND tts_results.user_deleted_at IS NULL
-    AND tts_results.mod_deleted_at IS NULL
+    voice_conversion_results.token = ?
+    AND voice_conversion_results.user_deleted_at IS NULL
+    AND voice_conversion_results.mod_deleted_at IS NULL
         "#,
-      tts_result_token
+      voice_conversion_result_token
     )
       .fetch_one(mysql_pool)
       .await // TODO: This will return error if it doesn't exist
