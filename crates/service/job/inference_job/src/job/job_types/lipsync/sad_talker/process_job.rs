@@ -20,9 +20,10 @@ use mysql_queries::queries::generic_inference::job::list_available_generic_infer
 use mysql_queries::queries::voice_conversion::results::insert_voice_conversion_result::{insert_voice_conversion_result, InsertArgs};
 use std::path::PathBuf;
 use std::time::Instant;
+use errors::AnyhowResult;
 use mysql_queries::payloads::generic_inference_args::generic_inference_args::{GenericInferenceArgs, InferenceCategoryAbbreviated, PolymorphicInferenceArgs};
 use mysql_queries::payloads::generic_inference_args::lipsync_payload::{LipsyncAnimationAudioSource, LipsyncAnimationImageSource};
-use mysql_queries::queries::voice_conversion::results::get_voice_conversion_result::get_voice_conversion_result;
+use mysql_queries::queries::voice_conversion::results::get_voice_conversion_result_for_inference::get_voice_conversion_result_for_inference;
 use tokens::users::user::UserToken;
 use crate::job::job_types::lipsync::sad_talker::validate_job::validate_job;
 
@@ -74,18 +75,39 @@ pub async fn process_job(args: SadTalkerProcessJobArgs<'_>) -> Result<JobSuccess
 
   // ==================== DECIDE WHAT TYPE OF AUDIO TO DOWNLOAD ==================== //
 
+  let audio_bucket_path;
+
   match job_args.audio_source {
-    LipsyncAnimationAudioSource::F(media_file_token) => {}
-    LipsyncAnimationAudioSource::U(media_upload_token) => {}
-    LipsyncAnimationAudioSource::T(tts_result_token) => {}
+    LipsyncAnimationAudioSource::F(media_file_token) => {
+      return Err(ProcessSingleJobError::from_anyhow_error(anyhow!("not yet implemented")))
+    }
+    LipsyncAnimationAudioSource::U(media_upload_token) => {
+      return Err(ProcessSingleJobError::from_anyhow_error(anyhow!("not yet implemented")))
+    }
+    LipsyncAnimationAudioSource::T(tts_result_token) => {
+      return Err(ProcessSingleJobError::from_anyhow_error(anyhow!("not yet implemented")))
+    }
     LipsyncAnimationAudioSource::V(voice_conversion_result_token) => {
-      let voice_conversion_result = get_voice_conversion_result(
+      let voice_conversion_result = get_voice_conversion_result_for_inference(
         voice_conversion_result_token,
         false,
         &args.job_dependencies.mysql_pool,
       ).await;
 
-      // TODO ...
+      let voice_conversion_result = match voice_conversion_result {
+        Ok(Some(result)) => result,
+        Ok(None) => {
+          warn!("could not find voice conversion result: {:?}", voice_conversion_result_token);
+          return Err(ProcessSingleJobError::from_anyhow_error(
+            anyhow!("could not find voice conversion result: {:?}", voice_conversion_result_token)))
+        }
+        Err(e) => {
+          error!("could not query voice conversion result: {:?}", e);
+          return Err(ProcessSingleJobError::from_anyhow_error(e))
+        }
+      };
+
+      audio_bucket_path = VoiceConversionResultOriginalFilePath::from_object_hash(&voice_conversion_result.public_bucket_hash);
     }
   }
 
