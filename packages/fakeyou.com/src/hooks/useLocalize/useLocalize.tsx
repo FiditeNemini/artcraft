@@ -1,18 +1,17 @@
 import { t as oldT } from "i18next";
+import { useTranslation } from 'react-i18next';
 import { i18n2 } from "App";
 
 export default function useLocalize(nameSpace: string) {
-  const { getFixedT, loadNamespaces, ...rest } = i18n2;
-
-  loadNamespaces(nameSpace);
+  const { t, ...translation } = useTranslation(nameSpace,{ i18n: i18n2, useSuspense: false });
 
   return { 
-    ...rest,
     oldT,
-    t: (key: string, placeholder = '') => {
-      let str = getFixedT(null, nameSpace)(key);
+      t: (key: string, placeholder = '') => {
+      let str = t(key);
       return str === key ? placeholder : str;
     },
+    ...translation
   };
 };
 
