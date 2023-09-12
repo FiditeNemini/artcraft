@@ -292,8 +292,8 @@ pub async fn handle_upload(
     maybe_original_mime_type: maybe_mimetype,
     maybe_original_audio_encoding: maybe_codec_name.as_deref(),
     maybe_original_video_encoding: None,
-    maybe_original_frame_width: None,
-    maybe_original_frame_height: None,
+    maybe_original_frame_width: None, // TODO
+    maybe_original_frame_height: None, // TODO
     checksum_sha2: &hash,
     public_upload_path: &public_upload_path,
     maybe_extra_file_modification_info: None,

@@ -117,6 +117,7 @@ use users_component::default_routes::add_suggested_api_v1_account_creation_and_s
 use users_component::endpoints::edit_profile_handler::edit_profile_handler;
 use users_component::endpoints::get_profile_handler::get_profile_handler;
 use crate::http_server::endpoints::animation::enqueue_lipsync_animation::enqueue_lipsync_animation_handler;
+use crate::http_server::endpoints::media_uploads::upload_image::upload_image_handler;
 
 pub fn add_routes<T, B> (app: App<T>) -> App<T>
   where
@@ -951,6 +952,10 @@ fn add_media_upload_routes<T, B> (app: App<T>) -> App<T>
       )
       .service(web::resource("/upload_audio")
           .route(web::post().to(upload_audio_handler))
+          .route(web::head().to(|| HttpResponse::Ok()))
+      )
+      .service(web::resource("/upload_image")
+          .route(web::post().to(upload_image_handler))
           .route(web::head().to(|| HttpResponse::Ok()))
       )
       .service(web::resource("/by_session/{media_type}")
