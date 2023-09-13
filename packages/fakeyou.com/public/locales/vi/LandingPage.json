@@ -1,0 +1,51 @@
+{
+  "community": {
+    "button": {
+      "discord": "Discord",
+      "twitter": "Twitter"
+    },
+    "text": "Chúng tôi muốn trò chuyện với bạn! Hãy tham gia cùng chúng tôi trong Discord nếu bạn có bất kỳ câu hỏi nào.",
+    "title": "Tham gia vào cộng đồng"
+  },
+  "context": {
+    "button": {
+      "tts": "Chuyển văn bản thành giọng nói",
+      "v2v": "Giọng nói thành giọng nói"
+    },
+    "text": "Các công cụ chuyển đổi văn bản thành giọng nói và giọng nói được hỗ trợ bởi AI của chúng tôi cho phép bạn chuyển đổi văn bản hoặc giọng nói của mình thành giọng nói của nhân vật bạn yêu thích. Hoàn hảo cho người sáng tạo nội dung và bất kỳ ai muốn thêm cá tính vào thông điệp của mình.",
+    "title": "Nói như nhân vật yêu thích của bạn"
+  },
+  "cta": {
+    "button": {
+      "tts": "Chuyển văn bản thành giọng nói",
+      "v2v": "Giọng nói thành giọng nói"
+    },
+    "text": "Chuyển đổi tin nhắn và giọng nói của bạn thành giọng nói của nhân vật bạn yêu thích chỉ bằng vài cú nhấp chuột.",
+    "title": "Tạo âm thanh của bạn"
+  },
+  "hero": {
+    "button": {
+      "pricing": "Xem giá",
+      "profile": "Xem hồ sơ của tôi",
+      "signUp": "Đăng ký",
+      "upgradePlan": "Kế hoạch nâng cấp"
+    },
+    "text": "Tạo âm thanh hoặc video về các nhân vật yêu thích của bạn nói bất cứ điều gì bạn muốn bằng công nghệ giả sâu của FakeYou.",
+    "title": "Âm nhạc AI, Chuyển văn bản thành giọng nói và Giọng nói thành giọng nói"
+  },
+  "products": {
+    "title": "Công cụ AI",
+    "tts": {
+      "text": "Tạo âm thanh từ văn bản",
+      "title": "Chuyển văn bản thành giọng nói"
+    },
+    "v2v": {
+      "text": "Nói bằng giọng khác",
+      "title": "Giọng nói thành giọng nói"
+    },
+    "w2l": {
+      "text": "Hát nhép video thành âm thanh",
+      "title": "Hát nhép video"
+    }
+  }
+}
