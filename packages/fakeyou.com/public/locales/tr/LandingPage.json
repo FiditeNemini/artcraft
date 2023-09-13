@@ -1,0 +1,51 @@
+{
+  "community": {
+    "button": {
+      "discord": "Anlaşmazlık",
+      "twitter": "heyecan"
+    },
+    "text": "Sizinle sohbet etmeyi çok isteriz! Sorularınız varsa lütfen Discord'da bize katılın.",
+    "title": "Topluluğa katıl"
+  },
+  "context": {
+    "button": {
+      "tts": "Konuşma metni",
+      "v2v": "Sesten Sese"
+    },
+    "text": "Yapay zeka destekli metinden konuşmaya ve ses dönüştürme araçlarımız, metninizi veya sesinizi en sevdiğiniz karakterin sesine dönüştürmenize olanak tanır. İçerik oluşturucular ve mesajlarına kişilik katmak isteyen herkes için mükemmeldir.",
+    "title": "Favori karakterleriniz gibi konuşun"
+  },
+  "cta": {
+    "button": {
+      "tts": "Konuşma metni",
+      "v2v": "Sesten Sese"
+    },
+    "text": "Sadece birkaç tıklamayla mesajlarınızı ve konuşma sesinizi en sevdiğiniz karakterin sesine dönüştürün.",
+    "title": "Sesinizi Oluşturun"
+  },
+  "hero": {
+    "button": {
+      "pricing": "Fiyatlandırmayı Görüntüle",
+      "profile": "Profilimi görüntüle",
+      "signUp": "Üye olmak",
+      "upgradePlan": "Yükseltme Planı"
+    },
+    "text": "FakeYou'nun derin sahte teknolojisiyle favori karakterlerinizin istediğiniz her şeyi söyleyen seslerini veya videolarını oluşturun.",
+    "title": "AI Müzik, Metinden Konuşmaya ve Sesten Sese"
+  },
+  "products": {
+    "title": "Yapay Zeka Araçları",
+    "tts": {
+      "text": "Metinden ses oluştur",
+      "title": "Konuşma metni"
+    },
+    "v2v": {
+      "text": "Başka bir sesle konuş",
+      "title": "Sesten Sese"
+    },
+    "w2l": {
+      "text": "Videoyu sese dudak senkronizasyonu",
+      "title": "Video Dudak Senkronizasyonu"
+    }
+  }
+}
