@@ -1,12 +1,51 @@
 {
   "community": {
-    "discordButton": "Discord",
-    "heading": "Join the Community",
+    "button": {
+      "discord": "Discord",
+      "twitter": "Twitter"
+    },
     "text": "We'd love to chat with you! Please join us in Discord if you have any questions.",
-    "twitterButton": "Twitter"
+    "title": "Join the Community"
+  },
+  "context": {
+    "button": {
+      "tts": "Text to Speech",
+      "v2v": "Voice to Voice"
+    },
+    "text": "Our AI-powered text-to-speech and voice conversion tools let you convert your text or voice into your favorite character's voice. Perfect for content creators and anyone looking to add personality to their messages.",
+    "title": "Speak as your favorite characters"
+  },
+  "cta": {
+    "button": {
+      "tts": "Text to Speech",
+      "v2v": "Voice to Voice"
+    },
+    "text": "Transform your messages and speaking voice into your favorite character's voice with just a few clicks.",
+    "title": "Generate Your Audio"
   },
   "hero": {
-    "bottom": "Generate audio or videos of your favorite characters saying anything you want with FakeYou's deep fake tech.",
-    "top": "AI Music, Text to Speech, and Voice to Voice"
+    "button": {
+      "pricing": "View Pricing",
+      "profile": "View my Profile",
+      "signUp": "Sign Up",
+      "upgradePlan": "Upgrade Plan"
+    },
+    "text": "Generate audio or videos of your favorite characters saying anything you want with FakeYou's deep fake tech.",
+    "title": "AI Music, Text to Speech, and Voice to Voice"
+  },
+  "products": {
+    "title": "AI Tools",
+    "tts": {
+      "text": "Generate audio from text",
+      "title": "Text to Speech"
+    },
+    "v2v": {
+      "text": "Speak in another voice",
+      "title": "Voice to Voice"
+    },
+    "w2l": {
+      "text": "Lip sync video to audio",
+      "title": "Video Lip Sync"
+    }
   }
 }

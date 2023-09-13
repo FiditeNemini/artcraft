@@ -1,0 +1,51 @@
+{
+  "community": {
+    "button": {
+      "discord": "Discord",
+      "twitter": "Twitter"
+    },
+    "text": "Nous serions ravis de discuter avec vous ! Veuillez nous rejoindre sur Discord si vous avez des questions.",
+    "title": "Rejoignez la communauté"
+  },
+  "context": {
+    "button": {
+      "tts": "Texte pour parler",
+      "v2v": "Voix à voix"
+    },
+    "text": "Nos outils de conversion de synthèse vocale et de voix basés sur l'IA vous permettent de convertir votre texte ou votre voix dans la voix de votre personnage préféré. Parfait pour les créateurs de contenu et tous ceux qui cherchent à ajouter de la personnalité à leurs messages.",
+    "title": "Parlez comme vos personnages préférés"
+  },
+  "cta": {
+    "button": {
+      "tts": "Texte pour parler",
+      "v2v": "Voix à voix"
+    },
+    "text": "Transformez vos messages et votre voix en la voix de votre personnage préféré en quelques clics.",
+    "title": "Générez votre audio"
+  },
+  "hero": {
+    "button": {
+      "pricing": "Voir les prix",
+      "profile": "Voir mon profil",
+      "signUp": "S'inscrire",
+      "upgradePlan": "Plan de mise à niveau"
+    },
+    "text": "Générez de l'audio ou des vidéos de vos personnages préférés disant tout ce que vous voulez avec la technologie Deep Fake de FakeYou.",
+    "title": "Musique AI, synthèse vocale et voix à voix"
+  },
+  "products": {
+    "title": "Outils d'IA",
+    "tts": {
+      "text": "Générer de l'audio à partir du texte",
+      "title": "Texte pour parler"
+    },
+    "v2v": {
+      "text": "Parle d'une autre voix",
+      "title": "Voix à voix"
+    },
+    "w2l": {
+      "text": "Synchronisation labiale de la vidéo avec l'audio",
+      "title": "Synchronisation labiale vidéo"
+    }
+  }
+}
