@@ -10,9 +10,9 @@
   "infoPrivacyPolicy": "Privacy Policy",
   "infoTerms": "Terms of Use",
   "infoTitle": "Info",
-  "productTitle": "AI Tools",
   "productTts": "Text to Speech",
   "productUploadModels": "Upload Models",
   "productVc": "Voice to Voice",
-  "productVideo": "Video Lip Sync"
+  "productVideo": "Video Lip Sync",
+  "productsTitle": "AI Tools"
 }

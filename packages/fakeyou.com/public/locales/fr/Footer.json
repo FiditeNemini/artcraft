@@ -9,9 +9,9 @@
   "infoPrivacyPolicy": "politique de confidentialité",
   "infoTerms": "Conditions d'utilisation",
   "infoTitle": "Info",
-  "productTitle": "Outils d'IA",
   "productTts": "Texte pour parler",
   "productUploadModels": "Télécharger des modèles",
   "productVc": "Voix à voix",
-  "productVideo": "Synchronisation labiale vidéo"
+  "productVideo": "Synchronisation labiale vidéo",
+  "productsTitle": "Outils d'IA"
 }

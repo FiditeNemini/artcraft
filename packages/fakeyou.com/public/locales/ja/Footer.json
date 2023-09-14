@@ -9,9 +9,9 @@
   "infoPrivacyPolicy": "プライバシーポリシー",
   "infoTerms": "利用規約",
   "infoTitle": "情報",
-  "productTitle": "AIツール",
   "productTts": "テキスト読み上げ",
   "productUploadModels": "モデルのアップロード",
   "productVc": "声から声へ",
-  "productVideo": "ビデオリップシンク"
+  "productVideo": "ビデオリップシンク",
+  "productsTitle": "AIツール"
 }

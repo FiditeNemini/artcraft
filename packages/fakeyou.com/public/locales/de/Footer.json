@@ -9,9 +9,9 @@
   "infoPrivacyPolicy": "Datenschutzrichtlinie",
   "infoTerms": "Nutzungsbedingungen",
   "infoTitle": "Die Info",
-  "productTitle": "KI-Tools",
   "productTts": "Text zu Sprache",
   "productUploadModels": "Modelle hochladen",
   "productVc": "Stimme zu Stimme",
-  "productVideo": "Video-Lippensynchronisation"
+  "productVideo": "Video-Lippensynchronisation",
+  "productsTitle": "KI-Tools"
 }
