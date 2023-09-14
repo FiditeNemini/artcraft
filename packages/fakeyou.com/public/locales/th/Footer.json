@@ -1,20 +1,17 @@
 {
-  "buttonLogOut": "ออกจากระบบ",
-  "buttonLogin": "เข้าสู่ระบบ",
-  "buttonSignUp": "สมัครสมาชิก",
   "communityGuide": "แนะนำ",
   "communityLeaderboard": "ลีดเดอร์บอร์ด",
   "communityProfile": "โพรไฟล์ของฉัน",
   "communityTitle": "สังคม",
   "infoAbout": "เกี่ยวกับ",
   "infoApiDocs": "เอกสาร API",
+  "infoPricing": "ราคา",
   "infoPrivacyPolicy": "นโยบายความเป็นส่วนตัว",
   "infoTerms": "ข้อกำหนดการใช้งาน",
   "infoTitle": "ข้อมูล",
-  "pricingTitle": "ราคา",
+  "productTitle": "เครื่องมือ AI",
   "productTts": "ข้อความเป็นคำพูด",
   "productUploadModels": "อัพโหลดโมเดล",
   "productVc": "เสียงเป็นเสียง",
-  "productVideo": "วิดีโอลิปซิงค์",
-  "productsTitle": "เครื่องมือ AI"
+  "productVideo": "วิดีโอลิปซิงค์"
 }

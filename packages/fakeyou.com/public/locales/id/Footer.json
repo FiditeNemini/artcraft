@@ -1,20 +1,17 @@
 {
-  "buttonLogOut": "Keluar",
-  "buttonLogin": "Gabung",
-  "buttonSignUp": "Mendaftar",
   "communityGuide": "Memandu",
   "communityLeaderboard": "Papan peringkat",
   "communityProfile": "Profil saya",
   "communityTitle": "Masyarakat",
   "infoAbout": "Tentang",
   "infoApiDocs": "Dokumen API",
+  "infoPricing": "Harga",
   "infoPrivacyPolicy": "Kebijakan pribadi",
   "infoTerms": "Syarat Penggunaan",
   "infoTitle": "Informasi",
-  "pricingTitle": "Harga",
+  "productTitle": "Alat AI",
   "productTts": "Teks pidato",
   "productUploadModels": "Unggah Model",
   "productVc": "Suara ke Suara",
-  "productVideo": "Sinkronisasi Bibir Video",
-  "productsTitle": "Alat AI"
+  "productVideo": "Sinkronisasi Bibir Video"
 }
