@@ -243,10 +243,9 @@ function FooterNav(props: Props) {
               <p className="fw-bold">{t("infoTitle")}</p>
               <li>
                 <Link to={WebUrl.pricingPageWithReferer("footer")}>
-                  {t("pricingTitle")}
+                  {t("infoPricing")}
                 </Link>
               </li>
-
               <li>
                 <Link to={WebUrl.aboutUsPage()}>{t("infoAbout")}</Link>
               </li>
