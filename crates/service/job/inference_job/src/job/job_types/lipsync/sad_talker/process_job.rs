@@ -9,7 +9,6 @@ use crate::job::job_loop::process_single_job_error::ProcessSingleJobError;
 use crate::job::job_types::lipsync::sad_talker::download_audio_file::download_audio_file;
 use crate::job::job_types::lipsync::sad_talker::download_image_file::download_image_file;
 use crate::job::job_types::lipsync::sad_talker::validate_job::validate_job;
-use crate::job::job_types::vc::rvc_v2::rvc_v2_inference_command::InferenceArgs;
 use crate::job_dependencies::JobDependencies;
 use crate::util::maybe_download_file_from_bucket::maybe_download_file_from_bucket;
 use crate::util::model_downloader::ModelDownloader;
@@ -29,6 +28,7 @@ use std::path::PathBuf;
 use std::thread;
 use std::time::{Duration, Instant};
 use tokens::users::user::UserToken;
+use crate::job::job_types::lipsync::sad_talker::sad_talker_inference_command::InferenceArgs;
 
 pub struct SadTalkerProcessJobArgs<'a> {
   pub job_dependencies: &'a JobDependencies,
@@ -78,7 +78,7 @@ pub async fn process_job(args: SadTalkerProcessJobArgs<'_>) -> Result<JobSuccess
 
   // ==================== QUERY AND DOWNLOAD FILES ==================== //
 
-  let audio_bucket_path= download_audio_file(
+  let audio_path = download_audio_file(
     &job_args.audio_source,
     &args.job_dependencies.public_bucket_client,
     &mut job_progress_reporter,
@@ -88,9 +88,9 @@ pub async fn process_job(args: SadTalkerProcessJobArgs<'_>) -> Result<JobSuccess
     &deps.mysql_pool
   ).await?;
 
-  info!("Audio file: {:?}", audio_bucket_path.filesystem_path);
+  info!("Audio file: {:?}", audio_path.filesystem_path);
 
-  let image_bucket_path = download_image_file(
+  let image_path = download_image_file(
     &job_args.image_source,
     &args.job_dependencies.public_bucket_client,
     &mut job_progress_reporter,
@@ -100,7 +100,7 @@ pub async fn process_job(args: SadTalkerProcessJobArgs<'_>) -> Result<JobSuccess
     &deps.mysql_pool
   ).await?;
 
-  info!("Image file: {:?}", image_bucket_path.filesystem_path);
+  info!("Image file: {:?}", image_path.filesystem_path);
 
   // ==================== TRANSCODE MEDIA (IF NECESSARY) ==================== //
 
@@ -113,18 +113,11 @@ pub async fn process_job(args: SadTalkerProcessJobArgs<'_>) -> Result<JobSuccess
   job_progress_reporter.log_status("running inference")
       .map_err(|e| ProcessSingleJobError::Other(e))?;
 
-  /*
+  let output_video_fs_path = work_temp_dir.path().join("output.mp4");
 
-  //let config_path = PathBuf::from("/models/voice_conversion/so-vits-svc/example_config.json"); // TODO: This could be variable.
-  let input_wav_path = image_media_upload_fs_path;
+  info!("Running SadTalker inference...");
 
-  let output_audio_fs_path = work_temp_dir.path().join("output.wav");
-  //let output_metadata_fs_path = temp_dir.path().join("metadata.json");
-  //let output_spectrogram_fs_path = temp_dir.path().join("spectrogram.json");
-
-  info!("Running RVC (v2) VC inference...");
-
-  info!("Expected output audio filename: {:?}", &output_audio_fs_path);
+  info!("Expected output video filename: {:?}", &output_video_fs_path);
 
   // TODO: Limit output length for premium.
 
@@ -135,18 +128,19 @@ pub async fn process_job(args: SadTalkerProcessJobArgs<'_>) -> Result<JobSuccess
 
   // ==================== RUN INFERENCE SCRIPT ==================== //
 
+  let workdir = work_temp_dir.path().to_path_buf();
+
   let inference_start_time = Instant::now();
 
   let command_exit_status = args.job_dependencies
       .job_type_details
-      .rvc_v2
+      .sad_talker
       .inference_command
       .execute_inference(InferenceArgs {
-        model_path: &rvc_v2_model_fs_path,
-        maybe_model_index_path: maybe_rvc_v2_model_index_fs_path,
-        hubert_path: &args.job_dependencies.pretrained_models.rvc_v2_hubert.filesystem_path,
-        input_path: &input_wav_path,
-        output_path: &output_audio_fs_path,
+        input_audio: &audio_path.filesystem_path,
+        input_image: &image_path.filesystem_path,
+        work_dir: &workdir,
+        output_file: &output_video_fs_path,
       });
 
   let inference_duration = Instant::now().duration_since(inference_start_time);
@@ -155,30 +149,34 @@ pub async fn process_job(args: SadTalkerProcessJobArgs<'_>) -> Result<JobSuccess
 
   if !command_exit_status.is_success() {
     error!("Inference failed: {:?}", command_exit_status);
-    safe_delete_temp_file(&input_wav_path);
-    safe_delete_temp_file(&output_audio_fs_path);
+    safe_delete_temp_file(&audio_path.filesystem_path);
+    safe_delete_temp_file(&image_path.filesystem_path);
+    safe_delete_temp_file(&output_video_fs_path);
     safe_delete_temp_directory(&work_temp_dir);
     return Err(ProcessSingleJobError::Other(anyhow!("CommandExitStatus: {:?}", command_exit_status)));
   }
 
   // ==================== CHECK ALL FILES EXIST AND GET METADATA ==================== //
 
-  info!("Checking that output files exist...");
+  info!("Checking that output file exists: {:?} ...", output_video_fs_path);
 
-  check_file_exists(&output_audio_fs_path).map_err(|e| ProcessSingleJobError::Other(e))?;
-  //check_file_exists(&output_metadata_fs_path).map_err(|e| ProcessSingleJobError::Other(e))?;
-  //check_file_exists(&output_spectrogram_fs_path).map_err(|e| ProcessSingleJobError::Other(e))?;
+  check_file_exists(&output_video_fs_path).map_err(|e| ProcessSingleJobError::Other(e))?;
 
   info!("Interrogating result file properties...");
 
-  let file_size_bytes = file_size(&output_audio_fs_path)
+  let file_size_bytes = file_size(&output_video_fs_path)
       .map_err(|err| ProcessSingleJobError::Other(err))?;
 
-  let maybe_mimetype = get_mimetype_for_file(&output_audio_fs_path)
+  let maybe_mimetype = get_mimetype_for_file(&output_video_fs_path)
       .map_err(|err| ProcessSingleJobError::from_io_error(err))?
       .map(|mime| mime.to_string());
 
-  let audio_info = decode_basic_audio_file_info(&output_audio_fs_path, maybe_mimetype.as_deref(), None)
+
+  info!("TEST FILE...");
+
+  thread::sleep(Duration::from_secs(300));
+
+  /*let audio_info = decode_basic_audio_file_info(&output_video_fs_path, maybe_mimetype.as_deref(), None)
       .map_err(|err| ProcessSingleJobError::Other(err))?;
 
   if audio_info.required_full_decode {
@@ -210,12 +208,12 @@ pub async fn process_job(args: SadTalkerProcessJobArgs<'_>) -> Result<JobSuccess
 
   args.job_dependencies.public_bucket_client.upload_filename_with_content_type(
     &result_bucket_object_pathbuf,
-    &output_audio_fs_path,
+    &output_video_fs_path,
     "audio/wav")
       .await
       .map_err(|e| ProcessSingleJobError::Other(e))?;
 
-  safe_delete_temp_file(&output_audio_fs_path);
+  safe_delete_temp_file(&output_video_fs_path);
 
 //  // ==================== UPLOAD SPECTROGRAM TO BUCKETS ==================== //
 //

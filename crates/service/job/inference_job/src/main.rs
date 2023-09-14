@@ -61,6 +61,7 @@ use sqlx::mysql::MySqlPoolOptions;
 use std::path::PathBuf;
 use std::time::Duration;
 use subprocess_common::docker_options::{DockerEnvVar, DockerFilesystemMount, DockerGpu, DockerOptions};
+use crate::job::job_types::lipsync::sad_talker::sad_talker_inference_command::SadTalkerInferenceCommand;
 
 // Buckets (shared config)
 const ENV_ACCESS_KEY : &str = "ACCESS_KEY";
@@ -313,6 +314,7 @@ async fn main() -> AnyhowResult<()> {
       },
       sad_talker: SadTalkerDetails {
         downloaders: SadTalkerDownloaders::build_all_from_env(),
+        inference_command: SadTalkerInferenceCommand::from_env()?,
       },
     },
     pretrained_models: PretrainedModels {

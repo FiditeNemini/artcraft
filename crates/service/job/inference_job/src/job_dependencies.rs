@@ -24,6 +24,7 @@ use r2d2_redis::RedisConnectionManager;
 use r2d2_redis::r2d2;
 use sqlx::MySqlPool;
 use std::path::PathBuf;
+use crate::job::job_types::lipsync::sad_talker::sad_talker_inference_command::SadTalkerInferenceCommand;
 
 pub struct JobDependencies {
   /// The job should only run on these types of models.
@@ -188,4 +189,5 @@ pub struct SoVitsSvcDetails {
 
 pub struct SadTalkerDetails {
   pub downloaders: SadTalkerDownloaders,
+  pub inference_command: SadTalkerInferenceCommand,
 }
