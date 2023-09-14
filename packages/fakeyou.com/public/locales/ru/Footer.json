@@ -9,9 +9,9 @@
   "infoPrivacyPolicy": "политика конфиденциальности",
   "infoTerms": "Условия эксплуатации",
   "infoTitle": "Информация",
-  "productTitle": "Инструменты искусственного интеллекта",
   "productTts": "Текст в речь",
   "productUploadModels": "Загрузить модели",
   "productVc": "Голос в голос",
-  "productVideo": "Видео синхронизация губ"
+  "productVideo": "Видео синхронизация губ",
+  "productsTitle": "Инструменты искусственного интеллекта"
 }
