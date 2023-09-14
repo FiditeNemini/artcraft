@@ -1,1 +1,25 @@
-{}
+{
+  "communityText": "우리는 당신과 이야기를 나누고 싶습니다! 질문이 있으시면 Discord에 참여해주세요.",
+  "communityTitle": "커뮤니티에 가입하세요",
+  "contextButtonTts": "텍스트 음성 변환",
+  "contextButtonVc": "음성 대 음성",
+  "contextText": "AI 기반의 텍스트 음성 변환 및 음성 변환 도구를 사용하면 텍스트나 음성을 좋아하는 캐릭터의 음성으로 변환할 수 있습니다. 콘텐츠 제작자와 메시지에 개성을 더하고 싶은 모든 사람에게 적합합니다.",
+  "contextTitle": "좋아하는 캐릭터로 말해보세요",
+  "ctaButtonTts": "텍스트 음성 변환",
+  "ctaButtonVc": "음성 대 음성",
+  "ctaText": "몇 번의 클릭만으로 메시지와 말하는 음성을 좋아하는 캐릭터의 음성으로 변환할 수 있습니다.",
+  "ctaTitle": "오디오 생성",
+  "heroButtonPricing": "가격 보기",
+  "heroButtonProfile": "내 프로필 보기",
+  "heroButtonSignUp": "가입하기",
+  "heroButtonUpgradePlan": "업그레이드 계획",
+  "heroText": "FakeYou의 심층 페이크 기술을 사용하여 좋아하는 캐릭터가 원하는 것을 말하는 오디오 또는 비디오를 생성하세요.",
+  "heroTitle": "AI 음악, 텍스트 음성 변환, 음성 변환",
+  "productTtsText": "텍스트에서 오디오 생성",
+  "productTtsTitle": "텍스트 음성 변환",
+  "productVcText": "다른 목소리로 말해보세요",
+  "productVcTitle": "음성 대 음성",
+  "productVideoText": "비디오를 오디오로 립싱크",
+  "productVideoTitle": "비디오 립싱크",
+  "productsTitle": "AI 도구"
+}
