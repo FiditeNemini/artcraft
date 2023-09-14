@@ -46,7 +46,7 @@ function LandingPage(props: Props) {
           // }}
         >
           <button type="button" className="btn btn-primary w-100">
-            {t("hero.button.signUp", "...")}
+            {t("heroButtonSignUp")}
             <FontAwesomeIcon icon={faArrowRight} className="ms-2" />
           </button>
         </Link>
@@ -62,7 +62,7 @@ function LandingPage(props: Props) {
         >
           <button type="button" className="btn btn-secondary w-100">
             <FontAwesomeIcon icon={faStar} className="me-2" />
-            {t("hero.button.pricing", "...")}
+            {t("heroButtonPricing")}
           </button>
         </Link>
       </>
@@ -81,7 +81,7 @@ function LandingPage(props: Props) {
         >
           <button type="button" className="btn btn-secondary w-100">
             <FontAwesomeIcon icon={faUser} className="me-2" />
-            {t("hero.button.profile", "...")}
+            {t("heroButtonProfile")}
           </button>
         </Link>
       </>
@@ -126,7 +126,7 @@ function LandingPage(props: Props) {
           >
             <button type="button" className="btn btn-primary w-100">
               <FontAwesomeIcon icon={faStar} className="me-2" />
-              {t("hero.button.upgradePlan", "...")}
+              {t("heroButtonUpgradePlan")}
             </button>
           </Link>
         </>
@@ -171,10 +171,10 @@ function LandingPage(props: Props) {
           </div>
           <div className="col-12 col-lg-7 d-flex flex-column justify-content-center flex-reverse px-md-5 px-lg-3">
             <h1 className="fw-bold display-5 text-center text-lg-start px-md-5 px-lg-0">
-              {t("hero.title")}
+              {t("heroTitle")}
             </h1>
             <p className="lead opacity-75 pb-4 text-center text-lg-start px-md-5 px-lg-0 pe-lg-5">
-              {t("hero.text")}
+              {t("heroText")}
             </p>
             <div className="d-flex flex-column flex-md-row gap-3 mt-3 mb-4 w-100 justify-content-center justify-content-lg-start">
               {upgradeButton}
@@ -243,7 +243,7 @@ function LandingPage(props: Props) {
       </div> */}
 
       <div className="container pb-4 px-md-5 px-xl-3">
-        <h2 className="fw-bold mb-4">{t("products.title", "...")}</h2>
+        <h2 className="fw-bold mb-4">{t("productsTitle")}</h2>
         <div className="row g-4 position-relative">
           <div className="col-12 col-md-4">
             <Link
@@ -253,10 +253,10 @@ function LandingPage(props: Props) {
               <div className="d-flex px-4 pt-4 align-items-center w-100">
                 <div className="flex-grow-1">
                   <h3 className="fw-bold text-white mb-1">
-                    {t("products.tts.title", "...")}
+                    {t("productTtsTitle")}
                   </h3>
                   <h6 className="fw-normal opacity-75 text-white">
-                    {t("products.tts.text", "...")}
+                    {t("productTtsText")}
                   </h6>
                 </div>
                 <Link to="/tts" className="btn btn-square">
@@ -279,10 +279,10 @@ function LandingPage(props: Props) {
               <div className="d-flex px-4 pt-4 align-items-center w-100">
                 <div className="flex-grow-1">
                   <h3 className="fw-bold text-white mb-1">
-                    {t("products.v2v.title", "...")}
+                    {t("productVcTitle")}
                   </h3>
                   <h6 className="fw-normal opacity-75 text-white">
-                    {t("products.v2v.text", "...")}
+                    {t("productVcText")}
                   </h6>
                 </div>
                 <Link to="/voice-conversion" className="btn btn-square">
@@ -305,10 +305,10 @@ function LandingPage(props: Props) {
               <div className="d-flex px-4 pt-4 align-items-center w-100">
                 <div className="flex-grow-1">
                   <h3 className="fw-bold text-white mb-1">
-                    {t("products.w2l.title", "...")}
+                    {t("productVideoTitle")}
                   </h3>
                   <h6 className="fw-normal opacity-75 text-white">
-                    {t("products.w2l.text", "...")}
+                    {t("productVideoText")}
                   </h6>
                 </div>
                 <Link to="/video" className="btn btn-square">
@@ -360,14 +360,14 @@ function LandingPage(props: Props) {
             </div>
           </div>
           <div className="col-12 col-md-6 col-lg-5 d-flex flex-column justify-content-center gap-3">
-            <h2 className="fw-bold">{t("context.title", "...")}</h2>
-            <p className="opacity-75">{t("context.text", "...")}</p>
+            <h2 className="fw-bold">{t("contextTitle")}</h2>
+            <p className="opacity-75">{t("contextText")}</p>
             <div className="d-flex mt-3 gap-3">
               <Link to="/tts" className="btn btn-primary">
-                {t("context.button.tts", "...")}
+                {t("contextButtonTts")}
               </Link>
               <Link to="/voice-conversion" className="btn btn-primary">
-                {t("context.button.v2v", "...")}
+                {t("contextButtonVc")}
               </Link>
             </div>
           </div>
@@ -434,14 +434,14 @@ function LandingPage(props: Props) {
               height={200}
             />
           </div>
-          <h2 className="fw-bold">{t("cta.title", "...")}</h2>
-          <p className="mw-300 opacity-75">{t("cta.text", "...")}</p>
+          <h2 className="fw-bold">{t("ctaTitle")}</h2>
+          <p className="mw-300 opacity-75">{t("ctaText")}</p>
           <div className="d-flex gap-3 justify-content-center mt-4">
             <Link to="/tts" className="btn btn-primary">
-              {t("cta.button.tts", "...")}
+              {t("ctaButtonTts")}
             </Link>
             <Link to="/voice-conversion" className="btn btn-primary">
-              {t("cta.button.v2v", "...")}
+              {t("ctaButtonVc")}
             </Link>
           </div>
           <img
@@ -478,8 +478,8 @@ function LandingPage(props: Props) {
       <div className="py-4">
         <div className="container text-center community-container">
           <div className="panel px-4 py-5 d-flex flex-column align-items-center community-container rounded">
-            <h2 className="fw-bold mb-2">{t("community.title")}</h2>
-            <p className="opacity-75">{t("community.text")}</p>
+            <h2 className="fw-bold mb-2">{t("communityTitle")}</h2>
+            <p className="opacity-75">{t("communityText")}</p>
             <div className="d-flex mt-4 gap-3">
               <a
                 href="https://discord.gg/fakeyou"
@@ -488,7 +488,7 @@ function LandingPage(props: Props) {
                 className="btn btn-discord"
               >
                 <FontAwesomeIcon icon={faDiscord} className="me-2" />
-                {t("community.button.discord")}
+                {t("communityButtonDiscord")}
               </a>
               <a
                 href="https://twitter.com/intent/follow?screen_name=FakeYouApp"
@@ -497,7 +497,7 @@ function LandingPage(props: Props) {
                 className="btn btn-twitter"
               >
                 <FontAwesomeIcon icon={faTwitter} className="me-2" />
-                {t("community.button.twitter")}
+                {t("communityButtonTwitter")}
               </a>
             </div>
           </div>

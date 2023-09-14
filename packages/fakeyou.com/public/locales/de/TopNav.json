@@ -1,0 +1,29 @@
+{
+  "button": {
+    "logOut": "Ausloggen",
+    "login": "Anmeldung",
+    "signUp": "Melden Sie sich an"
+  },
+  "community": {
+    "guide": "Führung",
+    "leaderboard": "Bestenliste",
+    "title": "Gemeinschaft",
+    "uploadModels": "Mein Profil"
+  },
+  "info": {
+    "about": "Um",
+    "apiDocs": "API-Dokumente",
+    "privacyPolicy": "Datenschutzrichtlinie",
+    "title": "Die Info"
+  },
+  "pricing": {
+    "title": "Preisgestaltung"
+  },
+  "products": {
+    "title": "KI-Tools",
+    "tts": "Text zu Sprache",
+    "uploadModels": "Modelle hochladen",
+    "v2v": "Stimme zu Stimme",
+    "w2l": "Video-Lippensynchronisation"
+  }
+}

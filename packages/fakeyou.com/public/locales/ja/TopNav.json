@@ -1,0 +1,29 @@
+{
+  "button": {
+    "logOut": "ログアウト",
+    "login": "ログイン",
+    "signUp": "サインアップ"
+  },
+  "community": {
+    "guide": "ガイド",
+    "leaderboard": "リーダーボード",
+    "title": "コミュニティ",
+    "uploadModels": "私のプロフィール"
+  },
+  "info": {
+    "about": "について",
+    "apiDocs": "APIドキュメント",
+    "privacyPolicy": "プライバシーポリシー",
+    "title": "情報"
+  },
+  "pricing": {
+    "title": "価格設定"
+  },
+  "products": {
+    "title": "AIツール",
+    "tts": "テキスト読み上げ",
+    "uploadModels": "モデルのアップロード",
+    "v2v": "声から声へ",
+    "w2l": "ビデオリップシンク"
+  }
+}

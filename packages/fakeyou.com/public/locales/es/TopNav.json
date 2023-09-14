@@ -1,0 +1,29 @@
+{
+  "button": {
+    "logOut": "Cerrar sesión",
+    "login": "Acceso",
+    "signUp": "Inscribirse"
+  },
+  "community": {
+    "guide": "Guía",
+    "leaderboard": "Tabla de clasificación",
+    "title": "Comunidad",
+    "uploadModels": "Mi perfil"
+  },
+  "info": {
+    "about": "Acerca de",
+    "apiDocs": "Documentos API",
+    "privacyPolicy": "política de privacidad",
+    "title": "Información"
+  },
+  "pricing": {
+    "title": "Precios"
+  },
+  "products": {
+    "title": "Herramientas de IA",
+    "tts": "Texto a voz",
+    "uploadModels": "Subir modelos",
+    "v2v": "Voz a Voz",
+    "w2l": "Sincronización de labios de vídeo"
+  }
+}

@@ -1,0 +1,29 @@
+{
+  "button": {
+    "logOut": "প্রস্থান",
+    "login": "প্রবেশ করুন",
+    "signUp": "নিবন্ধন করুন"
+  },
+  "community": {
+    "guide": "গাইড",
+    "leaderboard": "লিডারবোর্ড",
+    "title": "সম্প্রদায়",
+    "uploadModels": "আমার প্রোফাইল"
+  },
+  "info": {
+    "about": "সম্পর্কিত",
+    "apiDocs": "API ডক্স",
+    "privacyPolicy": "গোপনীয়তা নীতি",
+    "title": "তথ্য"
+  },
+  "pricing": {
+    "title": "মূল্য নির্ধারণ"
+  },
+  "products": {
+    "title": "এআই টুলস",
+    "tts": "টেক্সট টু স্পিচ",
+    "uploadModels": "আপলোড মডেল",
+    "v2v": "ভয়েস টু ভয়েস",
+    "w2l": "ভিডিও লিপ সিঙ্ক"
+  }
+}

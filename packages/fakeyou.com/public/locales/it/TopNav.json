@@ -1,0 +1,29 @@
+{
+  "button": {
+    "logOut": "Disconnettersi",
+    "login": "Login",
+    "signUp": "Iscrizione"
+  },
+  "community": {
+    "guide": "Guida",
+    "leaderboard": "Classifica",
+    "title": "Comunità",
+    "uploadModels": "Il mio profilo"
+  },
+  "info": {
+    "about": "Di",
+    "apiDocs": "Documenti API",
+    "privacyPolicy": "politica sulla riservatezza",
+    "title": "Informazioni"
+  },
+  "pricing": {
+    "title": "Prezzi"
+  },
+  "products": {
+    "title": "Strumenti di intelligenza artificiale",
+    "tts": "Sintesi vocale da testo",
+    "uploadModels": "Carica modelli",
+    "v2v": "Da voce a voce",
+    "w2l": "Sincronizzazione labiale video"
+  }
+}

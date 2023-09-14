@@ -1,0 +1,29 @@
+{
+  "button": {
+    "logOut": "登出",
+    "login": "登录",
+    "signUp": "报名"
+  },
+  "community": {
+    "guide": "指导",
+    "leaderboard": "排行榜",
+    "title": "社区",
+    "uploadModels": "我的简历"
+  },
+  "info": {
+    "about": "关于",
+    "apiDocs": "API文档",
+    "privacyPolicy": "隐私政策",
+    "title": "信息"
+  },
+  "pricing": {
+    "title": "价钱"
+  },
+  "products": {
+    "title": "人工智能工具",
+    "tts": "文字转语音",
+    "uploadModels": "上传模型",
+    "v2v": "语音到语音",
+    "w2l": "视频唇形同步"
+  }
+}

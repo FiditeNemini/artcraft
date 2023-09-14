@@ -1,0 +1,29 @@
+{
+  "button": {
+    "logOut": "로그 아웃",
+    "login": "로그인",
+    "signUp": "가입하기"
+  },
+  "community": {
+    "guide": "가이드",
+    "leaderboard": "리더보드",
+    "title": "지역 사회",
+    "uploadModels": "내 프로필"
+  },
+  "info": {
+    "about": "에 대한",
+    "apiDocs": "API 문서",
+    "privacyPolicy": "개인 정보 정책",
+    "title": "정보"
+  },
+  "pricing": {
+    "title": "가격"
+  },
+  "products": {
+    "title": "AI 도구",
+    "tts": "텍스트 음성 변환",
+    "uploadModels": "모델 업로드",
+    "v2v": "음성 대 음성",
+    "w2l": "비디오 립싱크"
+  }
+}

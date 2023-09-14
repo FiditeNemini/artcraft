@@ -1,0 +1,29 @@
+{
+  "button": {
+    "logOut": "Đăng xuất",
+    "login": "Đăng nhập",
+    "signUp": "Đăng ký"
+  },
+  "community": {
+    "guide": "Hướng dẫn",
+    "leaderboard": "Bảng xếp hạng",
+    "title": "Cộng đồng",
+    "uploadModels": "Thông tin của tôi"
+  },
+  "info": {
+    "about": "Về",
+    "apiDocs": "Tài liệu API",
+    "privacyPolicy": "Chính sách bảo mật",
+    "title": "Thông tin"
+  },
+  "pricing": {
+    "title": "Định giá"
+  },
+  "products": {
+    "title": "Công cụ AI",
+    "tts": "Chuyển văn bản thành giọng nói",
+    "uploadModels": "Tải lên mô hình",
+    "v2v": "Giọng nói thành giọng nói",
+    "w2l": "Hát nhép video"
+  }
+}
