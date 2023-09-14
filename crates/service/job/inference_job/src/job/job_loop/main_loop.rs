@@ -130,6 +130,8 @@ async fn process_job_batch(job_dependencies: &JobDependencies, jobs: Vec<Availab
                 (true, false, "keepalive elapsed".to_string(), Some("keepalive elapsed")),
               ProcessSingleJobError::InvalidJob(ref err) =>
                 (true, false, format!("InvalidJob: {:?}", err), Some("invalid job")),
+              ProcessSingleJobError::NotYetImplemented =>
+                (true, false, "not yet implemented".to_string(), Some("not yet implemented")),
 
               // Non-permanent failures
               ProcessSingleJobError::FilesystemFull =>
@@ -171,6 +173,7 @@ async fn process_job_batch(job_dependencies: &JobDependencies, jobs: Vec<Availab
           ProcessSingleJobError::Other(_) => {}
           ProcessSingleJobError::InvalidJob(_) => {}
           ProcessSingleJobError::KeepAliveElapsed => {}
+          ProcessSingleJobError::NotYetImplemented => {}
         }
       }
     }

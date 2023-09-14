@@ -1,5 +1,4 @@
 use anyhow::anyhow;
-use crate::util::model_downloader::ModelDownloader;
 use buckets::public::media_uploads::original_file::MediaUploadOriginalFilePath;
 use buckets::public::voice_conversion_results::original_file::VoiceConversionResultOriginalFilePath;
 use container_common::filesystem::check_file_exists::check_file_exists;
@@ -7,25 +6,29 @@ use container_common::filesystem::safe_delete_temp_directory::safe_delete_temp_d
 use container_common::filesystem::safe_delete_temp_file::safe_delete_temp_file;
 use crate::job::job_loop::job_success_result::{JobSuccessResult, ResultEntity};
 use crate::job::job_loop::process_single_job_error::ProcessSingleJobError;
+use crate::job::job_types::lipsync::sad_talker::download_audio_file::download_audio_file;
+use crate::job::job_types::lipsync::sad_talker::download_image_file::download_image_file;
+use crate::job::job_types::lipsync::sad_talker::validate_job::validate_job;
 use crate::job::job_types::vc::rvc_v2::rvc_v2_inference_command::InferenceArgs;
 use crate::job_dependencies::JobDependencies;
 use crate::util::maybe_download_file_from_bucket::maybe_download_file_from_bucket;
+use crate::util::model_downloader::ModelDownloader;
 use enums::by_table::generic_inference_jobs::inference_result_type::InferenceResultType;
+use errors::AnyhowResult;
 use filesys::create_dir_all_if_missing::create_dir_all_if_missing;
 use filesys::file_size::file_size;
 use log::{error, info, warn};
 use media::decode_basic_audio_info::decode_basic_audio_file_info;
 use mimetypes::mimetype_for_file::get_mimetype_for_file;
-use mysql_queries::queries::generic_inference::job::list_available_generic_inference_jobs::AvailableInferenceJob;
-use mysql_queries::queries::voice_conversion::results::insert_voice_conversion_result::{insert_voice_conversion_result, InsertArgs};
-use std::path::PathBuf;
-use std::time::Instant;
-use errors::AnyhowResult;
 use mysql_queries::payloads::generic_inference_args::generic_inference_args::{GenericInferenceArgs, InferenceCategoryAbbreviated, PolymorphicInferenceArgs};
 use mysql_queries::payloads::generic_inference_args::lipsync_payload::{LipsyncAnimationAudioSource, LipsyncAnimationImageSource};
+use mysql_queries::queries::generic_inference::job::list_available_generic_inference_jobs::AvailableInferenceJob;
 use mysql_queries::queries::voice_conversion::results::get_voice_conversion_result_for_inference::get_voice_conversion_result_for_inference;
+use mysql_queries::queries::voice_conversion::results::insert_voice_conversion_result::{insert_voice_conversion_result, InsertArgs};
+use std::path::PathBuf;
+use std::thread;
+use std::time::{Duration, Instant};
 use tokens::users::user::UserToken;
-use crate::job::job_types::lipsync::sad_talker::validate_job::validate_job;
 
 pub struct SadTalkerProcessJobArgs<'a> {
   pub job_dependencies: &'a JobDependencies,
@@ -73,88 +76,31 @@ pub async fn process_job(args: SadTalkerProcessJobArgs<'_>) -> Result<JobSuccess
       .map_err(|e| ProcessSingleJobError::from_io_error(e))?;
 
 
-  // ==================== DECIDE WHAT TYPE OF AUDIO TO DOWNLOAD ==================== //
+  // ==================== QUERY AND DOWNLOAD FILES ==================== //
 
-  let audio_bucket_path;
+  let audio_bucket_path= download_audio_file(
+    &job_args.audio_source,
+    &args.job_dependencies.public_bucket_client,
+    &mut job_progress_reporter,
+    job,
+    &args.job_dependencies.fs.scoped_temp_dir_creator_for_work,
+    &work_temp_dir,
+    &deps.mysql_pool
+  ).await?;
 
-  match job_args.audio_source {
-    LipsyncAnimationAudioSource::F(media_file_token) => {
-      // TODO(bt, 2023-09-08): Implement
-      return Err(ProcessSingleJobError::from_anyhow_error(anyhow!("not yet implemented")))
-    }
-    LipsyncAnimationAudioSource::U(media_upload_token) => {
-      // TODO(bt, 2023-09-08): Implement
-      return Err(ProcessSingleJobError::from_anyhow_error(anyhow!("not yet implemented")))
-    }
-    LipsyncAnimationAudioSource::T(tts_result_token) => {
-      // TODO(bt, 2023-09-08): Implement
-      return Err(ProcessSingleJobError::from_anyhow_error(anyhow!("not yet implemented")))
-    }
-    LipsyncAnimationAudioSource::V(voice_conversion_result_token) => {
-      let voice_conversion_result = get_voice_conversion_result_for_inference(
-        voice_conversion_result_token,
-        false,
-        &args.job_dependencies.mysql_pool,
-      ).await;
+  info!("Audio file: {:?}", audio_bucket_path.filesystem_path);
 
-      let voice_conversion_result = match voice_conversion_result {
-        Ok(Some(result)) => result,
-        Ok(None) => {
-          warn!("could not find voice conversion result: {:?}", voice_conversion_result_token);
-          return Err(ProcessSingleJobError::from_anyhow_error(
-            anyhow!("could not find voice conversion result: {:?}", voice_conversion_result_token)))
-        }
-        Err(e) => {
-          error!("could not query voice conversion result: {:?}", e);
-          return Err(ProcessSingleJobError::from_anyhow_error(e))
-        }
-      };
+  let image_bucket_path = download_image_file(
+    &job_args.image_source,
+    &args.job_dependencies.public_bucket_client,
+    &mut job_progress_reporter,
+    job,
+    &args.job_dependencies.fs.scoped_temp_dir_creator_for_work,
+    &work_temp_dir,
+    &deps.mysql_pool
+  ).await?;
 
-      audio_bucket_path = VoiceConversionResultOriginalFilePath::from_object_hash(&voice_conversion_result.public_bucket_hash);
-    }
-  }
-
-  // ==================== DECIDE WHAT TYPE OF IMAGE TO DOWNLOAD ==================== //
-
-
-  match job_args.image_source {
-    LipsyncAnimationImageSource::F(media_file_token) => {}
-    LipsyncAnimationImageSource::U(media_upload_token) => {}
-  }
-
-
-  /*
-
-  // ==================== DOWNLOAD IMAGE MEDIA FILE ==================== //
-
-  info!("Download image media file ...");
-
-  // TODO: If already transcoded, download the transcoded file instead.
-  // TODO: Turn this into a general utility.
-
-  let image_media_upload_fs_path = {
-    let original_media_upload_fs_path = work_temp_dir.path().join("original.bin");
-
-    let media_upload_bucket_path =
-        MediaUploadOriginalFilePath::from_object_hash(&args.media_upload.public_bucket_directory_hash);
-
-    let bucket_object_path = media_upload_bucket_path.to_full_object_pathbuf();
-
-    info!("Downloading media from bucket path: {:?}", &bucket_object_path);
-
-    maybe_download_file_from_bucket(
-      "media upload (original file)",
-      &original_media_upload_fs_path,
-      &bucket_object_path,
-      &args.job_dependencies.public_bucket_client,
-      &mut job_progress_reporter,
-      "downloading",
-      job.id.0,
-      &args.job_dependencies.fs.scoped_temp_dir_creator_for_work,
-    ).await?;
-
-    original_media_upload_fs_path
-  };
+  info!("Image file: {:?}", image_bucket_path.filesystem_path);
 
   // ==================== TRANSCODE MEDIA (IF NECESSARY) ==================== //
 
@@ -162,10 +108,12 @@ pub async fn process_job(args: SadTalkerProcessJobArgs<'_>) -> Result<JobSuccess
 
   // ==================== SETUP FOR INFERENCE ==================== //
 
-  info!("Ready for RVC (v2) inference...");
+  info!("Ready for SadTalker inference...");
 
   job_progress_reporter.log_status("running inference")
       .map_err(|e| ProcessSingleJobError::Other(e))?;
+
+  /*
 
   //let config_path = PathBuf::from("/models/voice_conversion/so-vits-svc/example_config.json"); // TODO: This could be variable.
   let input_wav_path = image_media_upload_fs_path;
