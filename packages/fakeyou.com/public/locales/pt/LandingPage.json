@@ -1,1 +1,25 @@
-{}
+{
+  "communityText": "Adoraríamos conversar com você! Junte-se a nós no Discord se tiver alguma dúvida.",
+  "communityTitle": "Junte-se à comunidade",
+  "contextButtonTts": "Texto para fala",
+  "contextButtonVc": "Voz para Voz",
+  "contextText": "Nossas ferramentas de conversão de texto em fala e voz com tecnologia de IA permitem que você converta seu texto ou voz na voz do seu personagem favorito. Perfeito para criadores de conteúdo e qualquer pessoa que queira adicionar personalidade às suas mensagens.",
+  "contextTitle": "Fale como seus personagens favoritos",
+  "ctaButtonTts": "Texto para fala",
+  "ctaButtonVc": "Voz para Voz",
+  "ctaText": "Transforme suas mensagens e sua voz na voz do seu personagem favorito com apenas alguns cliques.",
+  "ctaTitle": "Gere seu áudio",
+  "heroButtonPricing": "Ver preços",
+  "heroButtonProfile": "Veja meu perfil",
+  "heroButtonSignUp": "Inscrever-se",
+  "heroButtonUpgradePlan": "Plano de atualização",
+  "heroText": "Gere áudio ou vídeos de seus personagens favoritos dizendo o que quiser com a tecnologia deep fake do FakeYou.",
+  "heroTitle": "Música AI, texto em fala e voz em voz",
+  "productTtsText": "Gerar áudio a partir de texto",
+  "productTtsTitle": "Texto para fala",
+  "productVcText": "Fale com outra voz",
+  "productVcTitle": "Voz para Voz",
+  "productVideoText": "Sincronização labial de vídeo com áudio",
+  "productVideoTitle": "Sincronização labial de vídeo",
+  "productsTitle": "Ferramentas de IA"
+}
