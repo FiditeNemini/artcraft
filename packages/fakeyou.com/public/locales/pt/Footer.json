@@ -1,20 +1,17 @@
 {
-  "buttonLogOut": "Sair",
-  "buttonLogin": "Conecte-se",
-  "buttonSignUp": "Inscrever-se",
   "communityGuide": "Guia",
   "communityLeaderboard": "Entre os melhores",
   "communityProfile": "Meu perfil",
   "communityTitle": "Comunidade",
   "infoAbout": "Sobre",
   "infoApiDocs": "Documentos da API",
+  "infoPricing": "Preços",
   "infoPrivacyPolicy": "política de Privacidade",
   "infoTerms": "Termos de uso",
   "infoTitle": "Informações",
-  "pricingTitle": "Preços",
+  "productTitle": "Ferramentas de IA",
   "productTts": "Texto para fala",
   "productUploadModels": "Carregar modelos",
   "productVc": "Voz para Voz",
-  "productVideo": "Sincronização labial de vídeo",
-  "productsTitle": "Ferramentas de IA"
+  "productVideo": "Sincronização labial de vídeo"
 }

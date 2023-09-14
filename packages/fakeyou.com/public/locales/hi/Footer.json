@@ -1,20 +1,17 @@
 {
-  "buttonLogOut": "लॉग आउट",
-  "buttonLogin": "लॉग इन करें",
-  "buttonSignUp": "साइन अप करें",
   "communityGuide": "मार्गदर्शक",
   "communityLeaderboard": "लीडरबोर्ड",
   "communityProfile": "मेरी प्रोफाइल",
   "communityTitle": "समुदाय",
   "infoAbout": "के बारे में",
   "infoApiDocs": "एपीआई दस्तावेज़",
+  "infoPricing": "मूल्य निर्धारण",
   "infoPrivacyPolicy": "गोपनीयता नीति",
   "infoTerms": "उपयोग की शर्तें",
   "infoTitle": "जानकारी",
-  "pricingTitle": "मूल्य निर्धारण",
+  "productTitle": "एआई उपकरण",
   "productTts": "भाषण के पाठ",
   "productUploadModels": "मॉडल अपलोड करें",
   "productVc": "आवाज से आवाज",
-  "productVideo": "वीडियो लिप सिंक",
-  "productsTitle": "एआई उपकरण"
+  "productVideo": "वीडियो लिप सिंक"
 }

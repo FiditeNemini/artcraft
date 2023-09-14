@@ -1,31 +1,21 @@
 {
-  "button": {
-    "logOut": "Log Out",
-    "login": "Login",
-    "signUp": "Sign Up"
-  },
-  "community": {
-    "discord": "Discord",
-    "guide": "Guide",
-    "leaderboard": "Leaderboard",
-    "title": "Community",
-    "uploadModels": "My Profile"
-  },
-  "info": {
-    "about": "About",
-    "apiDocs": "API Docs",
-    "privacyPolicy": "Privacy Policy",
-    "terms": "Terms of Use",
-    "title": "Info"
-  },
-  "pricing": {
-    "title": "Pricing"
-  },
-  "products": {
-    "title": "AI Tools",
-    "tts": "Text to Speech",
-    "uploadModels": "Upload Models",
-    "v2v": "Voice to Voice",
-    "w2l": "Video Lip Sync"
-  }
+  "buttonLogOut": "Log Out",
+  "buttonLogin": "Login",
+  "buttonSignUp": "Sign Up",
+  "communityDiscord": "Discord",
+  "communityGuide": "Guide",
+  "communityLeaderboard": "Leaderboard",
+  "communityProfile": "My Profile",
+  "communityTitle": "Community",
+  "infoAbout": "About",
+  "infoApiDocs": "API Docs",
+  "infoPrivacyPolicy": "Privacy Policy",
+  "infoTerms": "Terms of Use",
+  "infoTitle": "Info",
+  "pricingTitle": "Pricing",
+  "productTts": "Text to Speech",
+  "productUploadModels": "Upload Models",
+  "productVc": "Voice to Voice",
+  "productVideo": "Video Lip Sync",
+  "productsTitle": "AI Tools"
 }
