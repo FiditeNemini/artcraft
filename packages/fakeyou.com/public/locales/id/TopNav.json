@@ -1,0 +1,29 @@
+{
+  "button": {
+    "logOut": "Keluar",
+    "login": "Gabung",
+    "signUp": "Mendaftar"
+  },
+  "community": {
+    "guide": "Memandu",
+    "leaderboard": "Papan peringkat",
+    "title": "Masyarakat",
+    "uploadModels": "Profil saya"
+  },
+  "info": {
+    "about": "Tentang",
+    "apiDocs": "Dokumen API",
+    "privacyPolicy": "Kebijakan pribadi",
+    "title": "Informasi"
+  },
+  "pricing": {
+    "title": "Harga"
+  },
+  "products": {
+    "title": "Alat AI",
+    "tts": "Teks pidato",
+    "uploadModels": "Unggah Model",
+    "v2v": "Suara ke Suara",
+    "w2l": "Sinkronisasi Bibir Video"
+  }
+}

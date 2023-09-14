@@ -5,11 +5,11 @@
     "signUp": "Sign Up"
   },
   "community": {
+    "discord": "Discord",
+    "guide": "Guide",
+    "leaderboard": "Leaderboard",
     "title": "Community",
-    "tts": "Discord",
-    "uploadModels": "My Profile",
-    "v2v": "Leaderboard",
-    "w2l": "Guide"
+    "uploadModels": "My Profile"
   },
   "info": {
     "about": "About",

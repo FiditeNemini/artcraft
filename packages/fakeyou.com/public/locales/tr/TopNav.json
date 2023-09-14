@@ -1,0 +1,29 @@
+{
+  "button": {
+    "logOut": "Çıkış Yap",
+    "login": "Giriş yapmak",
+    "signUp": "Üye olmak"
+  },
+  "community": {
+    "guide": "Rehber",
+    "leaderboard": "Liderler Sıralaması",
+    "title": "Toplum",
+    "uploadModels": "Benim profilim"
+  },
+  "info": {
+    "about": "Hakkında",
+    "apiDocs": "API Dokümanları",
+    "privacyPolicy": "Gizlilik Politikası",
+    "title": "Bilgi"
+  },
+  "pricing": {
+    "title": "Fiyatlandırma"
+  },
+  "products": {
+    "title": "Yapay Zeka Araçları",
+    "tts": "Konuşma metni",
+    "uploadModels": "Modelleri Yükle",
+    "v2v": "Sesten Sese",
+    "w2l": "Video Dudak Senkronizasyonu"
+  }
+}

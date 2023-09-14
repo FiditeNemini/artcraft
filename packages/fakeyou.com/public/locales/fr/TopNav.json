@@ -1,0 +1,29 @@
+{
+  "button": {
+    "logOut": "Se déconnecter",
+    "login": "Se connecter",
+    "signUp": "S'inscrire"
+  },
+  "community": {
+    "guide": "Guide",
+    "leaderboard": "Classement",
+    "title": "Communauté",
+    "uploadModels": "Mon profil"
+  },
+  "info": {
+    "about": "À propos",
+    "apiDocs": "Documentation sur l'API",
+    "privacyPolicy": "politique de confidentialité",
+    "title": "Info"
+  },
+  "pricing": {
+    "title": "Tarifs"
+  },
+  "products": {
+    "title": "Outils d'IA",
+    "tts": "Texte pour parler",
+    "uploadModels": "Télécharger des modèles",
+    "v2v": "Voix à voix",
+    "w2l": "Synchronisation labiale vidéo"
+  }
+}
