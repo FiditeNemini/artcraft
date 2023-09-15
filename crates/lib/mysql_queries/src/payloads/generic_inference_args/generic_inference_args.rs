@@ -1,8 +1,6 @@
+use crate::payloads::generic_inference_args::lipsync_payload::{LipsyncAnimationAudioSource, LipsyncAnimationImageSource, LipsyncArgs};
 use enums::by_table::generic_inference_jobs::inference_category::InferenceCategory;
 use errors::AnyhowResult;
-use tokens::files::media_upload::MediaUploadToken;
-use tokens::tokens::tts_models::TtsModelToken;
-use tokens::voice_conversion::model::VoiceConversionModelToken;
 
 /// Used to encode extra state for the `generic_inference_jobs` table.
 /// This should act somewhat like a serialized protobuf stored inside a record.
@@ -23,6 +21,10 @@ pub struct GenericInferenceArgs {
 /// Do not change the values.
 #[derive(Clone, Copy, Debug, Eq, PartialEq, Hash, Ord, PartialOrd, Deserialize, Serialize)]
 pub enum InferenceCategoryAbbreviated {
+  #[serde(rename = "la")] // NB: DO NOT CHANGE. It could break live jobs. Renamed to be fewer bytes.
+  #[serde(alias = "lipsync_animation")]
+  LipsyncAnimation,
+
   #[serde(rename = "tts")] // NB: DO NOT CHANGE. It could break live jobs. Renamed to be fewer bytes.
   #[serde(alias = "text_to_speech")]
   TextToSpeech,
@@ -44,6 +46,10 @@ pub enum FundamentalFrequencyMethodForJob {
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub enum PolymorphicInferenceArgs {
+  /// Lipsync Animation (Short name to save  space when serializing)
+  /// This is SadTalker, not Wav2Lip.
+  La (LipsyncArgs),
+
   /// Text to speech. (Short name to save space when serializing.)
   Tts {
     // No arguments yet.
@@ -74,6 +80,7 @@ pub enum PolymorphicInferenceArgs {
   },
 }
 
+
 impl GenericInferenceArgs {
 
   pub fn from_json(json: &str) -> AnyhowResult<Self> {
@@ -88,6 +95,7 @@ impl GenericInferenceArgs {
 impl InferenceCategoryAbbreviated {
   pub fn from_inference_category(category: InferenceCategory) -> Self {
     match category {
+      InferenceCategory::LipsyncAnimation => Self::LipsyncAnimation,
       InferenceCategory::TextToSpeech => Self::TextToSpeech,
       InferenceCategory::VoiceConversion => Self::VoiceConversion,
     }
@@ -95,6 +103,7 @@ impl InferenceCategoryAbbreviated {
 
   pub fn to_inference_category(self) -> InferenceCategory {
     match self {
+      Self::LipsyncAnimation => InferenceCategory::LipsyncAnimation,
       Self::TextToSpeech => InferenceCategory::TextToSpeech,
       Self::VoiceConversion => InferenceCategory::VoiceConversion,
     }
@@ -103,11 +112,27 @@ impl InferenceCategoryAbbreviated {
 
 #[cfg(test)]
 mod tests {
-  use crate::payloads::generic_inference_args::{FundamentalFrequencyMethodForJob, GenericInferenceArgs, InferenceCategoryAbbreviated, PolymorphicInferenceArgs};
-  use enums::by_table::generic_inference_jobs::inference_category::InferenceCategory;
-  use tokens::files::media_upload::MediaUploadToken;
-  use tokens::tokens::tts_models::TtsModelToken;
-  use tokens::voice_conversion::model::VoiceConversionModelToken;
+  use crate::payloads::generic_inference_args::generic_inference_args::{FundamentalFrequencyMethodForJob, GenericInferenceArgs, InferenceCategoryAbbreviated, PolymorphicInferenceArgs};
+  use crate::payloads::generic_inference_args::lipsync_payload::{LipsyncAnimationAudioSource, LipsyncAnimationImageSource, LipsyncArgs};
+
+  #[test]
+  fn typical_lipsync_animation_args_serialize() {
+    let args = GenericInferenceArgs {
+      inference_category: Some(InferenceCategoryAbbreviated::LipsyncAnimation),
+      args: Some(PolymorphicInferenceArgs::La(LipsyncArgs {
+        maybe_audio_source: Some(LipsyncAnimationAudioSource::U("foo".to_string())),
+        maybe_image_source: Some(LipsyncAnimationImageSource::F("bar".to_string())),
+      })),
+    };
+
+    let json = serde_json::ser::to_string(&args).unwrap();
+
+    // NB: Assert the serialized form. If this changes and the test breaks, be careful about migrating.
+    assert_eq!(json, r#"{"cat":"la","args":{"La":{"a":{"U":"foo"},"i":{"F":"bar"}}}}"#.to_string());
+
+    // NB: Make sure we don't overflow the DB field capacity (TEXT column).
+    assert!(json.len() < 1000);
+  }
 
   #[test]
   fn typical_tts_args_serialize() {

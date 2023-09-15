@@ -34,12 +34,13 @@ use container_common::filesystem::check_directory_exists::check_directory_exists
 use crate::http_server::run_http_server::CreateServerArgs;
 use crate::http_server::run_http_server::launch_http_server;
 use crate::job::job_loop::main_loop::main_loop;
+use crate::job::job_types::lipsync::sad_talker::model_downloaders::SadTalkerDownloaders;
 use crate::job::job_types::tts::tacotron2_v2_early_fakeyou::tacotron2_inference_command::Tacotron2InferenceCommand;
 use crate::job::job_types::tts::vits::vits_inference_command::VitsInferenceCommand;
 use crate::job::job_types::vc::rvc_v2::pretrained_hubert_model::PretrainedHubertModel;
 use crate::job::job_types::vc::rvc_v2::rvc_v2_inference_command::RvcV2InferenceCommand;
 use crate::job::job_types::vc::so_vits_svc::so_vits_svc_inference_command::SoVitsSvcInferenceCommand;
-use crate::job_dependencies::{FileSystemDetails, JobCaches, JobDependencies, JobTypeDetails, JobWorkerDetails, PretrainedModels, RvcV2Details, SoVitsSvcDetails, Tacotron2VocodesDetails, VitsDetails};
+use crate::job_dependencies::{FileSystemDetails, JobCaches, JobDependencies, JobTypeDetails, JobWorkerDetails, PretrainedModels, RvcV2Details, SadTalkerDetails, SoVitsSvcDetails, Tacotron2VocodesDetails, VitsDetails};
 use crate::util::scoped_execution::ScopedExecution;
 use crate::util::scoped_temp_dir_creator::ScopedTempDirCreator;
 use filesys::create_dir_all_if_missing::create_dir_all_if_missing;
@@ -60,6 +61,7 @@ use sqlx::mysql::MySqlPoolOptions;
 use std::path::PathBuf;
 use std::time::Duration;
 use subprocess_common::docker_options::{DockerEnvVar, DockerFilesystemMount, DockerGpu, DockerOptions};
+use crate::job::job_types::lipsync::sad_talker::sad_talker_inference_command::SadTalkerInferenceCommand;
 
 // Buckets (shared config)
 const ENV_ACCESS_KEY : &str = "ACCESS_KEY";
@@ -309,6 +311,10 @@ async fn main() -> AnyhowResult<()> {
       },
       rvc_v2: RvcV2Details {
         inference_command: RvcV2InferenceCommand::from_env()?,
+      },
+      sad_talker: SadTalkerDetails {
+        downloaders: SadTalkerDownloaders::build_all_from_env(),
+        inference_command: SadTalkerInferenceCommand::from_env()?,
       },
     },
     pretrained_models: PretrainedModels {

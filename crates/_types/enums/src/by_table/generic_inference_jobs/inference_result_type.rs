@@ -17,6 +17,11 @@ use strum::EnumIter;
 #[cfg_attr(test, derive(EnumIter, EnumCount))]
 #[derive(Clone, Copy, Eq, PartialEq, Hash, Ord, PartialOrd, Deserialize, Serialize)]
 pub enum InferenceResultType {
+  /// Result is stored in the "media_files" table.
+  /// (The upstream model could have produced any type of media - image, video, audio. That is irrelevant.)
+  #[serde(rename = "media_file")]
+  MediaFile,
+
   #[serde(rename = "text_to_speech")]
   TextToSpeech,
 
@@ -32,6 +37,7 @@ impl_mysql_enum_coders!(InferenceResultType);
 impl InferenceResultType {
   pub fn to_str(&self) -> &'static str {
     match self {
+      Self::MediaFile => "media_file",
       Self::TextToSpeech => "text_to_speech",
       Self::VoiceConversion => "voice_conversion",
     }
@@ -39,6 +45,7 @@ impl InferenceResultType {
 
   pub fn from_str(value: &str) -> Result<Self, String> {
     match value {
+      "media_file" => Ok(Self::MediaFile),
       "text_to_speech" => Ok(Self::TextToSpeech),
       "voice_conversion" => Ok(Self::VoiceConversion),
       _ => Err(format!("invalid value: {:?}", value)),
@@ -49,6 +56,7 @@ impl InferenceResultType {
     // NB: BTreeSet is sorted
     // NB: BTreeSet::from() isn't const, but not worth using LazyStatic, etc.
     BTreeSet::from([
+      InferenceResultType::MediaFile,
       InferenceResultType::TextToSpeech,
       InferenceResultType::VoiceConversion,
     ])
@@ -62,18 +70,21 @@ mod tests {
 
   #[test]
   fn test_serialization() {
+    assert_serialization(InferenceResultType::MediaFile, "media_file");
     assert_serialization(InferenceResultType::TextToSpeech, "text_to_speech");
     assert_serialization(InferenceResultType::VoiceConversion, "voice_conversion");
   }
 
   #[test]
   fn to_str() {
+    assert_eq!(InferenceResultType::MediaFile.to_str(), "media_file");
     assert_eq!(InferenceResultType::TextToSpeech.to_str(), "text_to_speech");
     assert_eq!(InferenceResultType::VoiceConversion.to_str(), "voice_conversion");
   }
 
   #[test]
   fn from_str() {
+    assert_eq!(InferenceResultType::from_str("media_file").unwrap(), InferenceResultType::MediaFile);
     assert_eq!(InferenceResultType::from_str("text_to_speech").unwrap(), InferenceResultType::TextToSpeech);
     assert_eq!(InferenceResultType::from_str("voice_conversion").unwrap(), InferenceResultType::VoiceConversion);
   }
@@ -82,7 +93,8 @@ mod tests {
   fn all_variants() {
     // Static check
     let mut variants = InferenceResultType::all_variants();
-    assert_eq!(variants.len(), 2);
+    assert_eq!(variants.len(), 3);
+    assert_eq!(variants.pop_first(), Some(InferenceResultType::MediaFile));
     assert_eq!(variants.pop_first(), Some(InferenceResultType::TextToSpeech));
     assert_eq!(variants.pop_first(), Some(InferenceResultType::VoiceConversion));
     assert_eq!(variants.pop_first(), None);
