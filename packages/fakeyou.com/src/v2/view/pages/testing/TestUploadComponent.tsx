@@ -34,7 +34,6 @@ interface Props {
 
 function TestUploadComponent(props: Props) {
   const [file, setFile] = useState<any>(undefined);
-  const [fileLink, setFileLink] = useState<string>();
   const [isUploadDisabled, setIsUploadDisabled] = useState<boolean>(false);
   const [uploadLoading, setUploadLoading] = useState(false);
 
@@ -45,8 +44,6 @@ function TestUploadComponent(props: Props) {
     console.log("handle change");
     setFile(file);
     setIdempotencyToken(uuidv4());
-    const audioUrl = URL.createObjectURL(file);
-    setFileLink(audioUrl ?? "");
     props.setFormIsCleared(false);
     props.setCanConvert(false);
     props.changeConvertIdempotencyToken();
@@ -67,7 +64,6 @@ function TestUploadComponent(props: Props) {
 
   const handleClear = () => {
     setFile(null);
-    setFileLink("");
     setIdempotencyToken(uuidv4());
     setIsUploadDisabled(false);
     props.setMediaUploadToken(undefined); // clear
