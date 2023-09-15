@@ -142,10 +142,6 @@ CREATE TABLE media_files (
 
   -- ========== INFERENCE METADATA, DC, ROUTING, DEBUGGING ==========
 
-  -- If true, the request was routed to a special "debug" worker.
-  -- Or perhaps uploaded with a debug flag.
-  is_debug BOOLEAN NOT NULL DEFAULT FALSE,
-
   -- For inference and processing, whether we generated this result from
   -- our own data center (vs. cloud).
   is_generated_on_prem BOOLEAN NOT NULL DEFAULT FALSE,
@@ -154,6 +150,7 @@ CREATE TABLE media_files (
   -- Worker hostname (linux hostname, k8s pod name)
   generated_by_worker VARCHAR(255) DEFAULT NULL,
 
+  -- For inference or processing, which cluster handled the processing.
   -- Cluster name (k8s)
   generated_by_cluster VARCHAR(255) DEFAULT NULL,
 

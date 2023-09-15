@@ -26,7 +26,6 @@ pub struct InsertArgs<'a> {
   pub is_on_prem: bool,
   pub worker_hostname: &'a str,
   pub worker_cluster: &'a str,
-  pub is_debug_worker: bool,
 }
 
 pub async fn insert_media_file_from_face_animation(
@@ -91,8 +90,11 @@ SET
   creator_set_visibility = ?,
 
   maybe_creator_file_synthetic_id = ?,
-  maybe_creator_category_synthetic_id = ?
+  maybe_creator_category_synthetic_id = ?,
 
+  is_generated_on_prem = ?,
+  generated_by_worker = ?,
+  generated_by_cluster = ?
 
         "#,
       result_token.as_str(),
@@ -116,21 +118,13 @@ SET
       maybe_creator_file_synthetic_id,
       maybe_creator_category_synthetic_id,
 
-
-
-
-      /*args.is_on_prem,
+      args.is_on_prem,
       args.worker_hostname,
-      args.worker_cluster,
-      args.is_debug_worker,*/
+      args.worker_cluster
     )
         .execute(&mut transaction)
         .await;
 
-    /*is_generated_on_prem = ?,
-    generated_by_worker = ?,
-    generated_by_cluster = ?,
-    is_debug_request = ?*/
     let record_id = match query_result {
       Ok(res) => {
         res.last_insert_id()

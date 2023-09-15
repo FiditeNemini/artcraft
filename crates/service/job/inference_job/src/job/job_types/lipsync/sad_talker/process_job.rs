@@ -211,7 +211,6 @@ pub async fn process_job(args: SadTalkerProcessJobArgs<'_>) -> Result<JobSuccess
     is_on_prem: args.job_dependencies.container.is_on_prem,
     worker_hostname: &args.job_dependencies.container.hostname,
     worker_cluster: &args.job_dependencies.container.cluster_name,
-    is_debug_worker: args.job_dependencies.worker_details.is_debug_worker
   })
       .await
       .map_err(|e| ProcessSingleJobError::Other(e))?;
