@@ -1,0 +1,153 @@
+use anyhow::anyhow;
+use crate::queries::generic_inference::job::list_available_generic_inference_jobs::AvailableInferenceJob;
+use crate::queries::generic_synthetic_ids::transactional_increment_generic_synthetic_id::transactional_increment_generic_synthetic_id;
+use enums::by_table::generic_synthetic_ids::id_category::IdCategory;
+use errors::AnyhowResult;
+use sqlx::MySqlPool;
+use sqlx;
+use enums::by_table::media_files::media_file_origin_category::MediaFileOriginCategory;
+use enums::by_table::media_files::media_file_origin_model_type::MediaFileOriginModelType;
+use enums::by_table::media_files::media_file_type::MediaFileType;
+use tokens::tokens::media_files::MediaFileToken;
+use tokens::users::user::UserToken;
+
+pub struct InsertArgs<'a> {
+  pub pool: &'a MySqlPool,
+  pub job: &'a AvailableInferenceJob,
+
+  pub maybe_mime_type: Option<&'a str>,
+  pub file_size_bytes: u64,
+  pub sha256_checksum: &'a str,
+  // TODO: Media duration.
+  //pub duration_millis: u64,
+
+  pub public_bucket_directory_hash: &'a str,
+
+  pub is_on_prem: bool,
+  pub worker_hostname: &'a str,
+  pub worker_cluster: &'a str,
+  pub is_debug_worker: bool,
+}
+
+pub async fn insert_media_file_from_face_animation(
+  args: InsertArgs<'_>
+) -> AnyhowResult<(MediaFileToken, u64)>
+{
+  let result_token = MediaFileToken::generate();
+
+  let mut maybe_creator_file_synthetic_id : Option<u64> = None;
+  let mut maybe_creator_category_synthetic_id : Option<u64> = None;
+
+  let mut transaction = args.pool.begin().await?;
+
+  if let Some(creator_user_token) = args.job.maybe_creator_user_token.as_deref() {
+    let user_token = UserToken::new_from_str(creator_user_token);
+
+    let next_media_file_id = transactional_increment_generic_synthetic_id(
+      &user_token,
+      IdCategory::MediaFile,
+      &mut transaction
+    ).await?;
+
+    let next_lipsync_id = transactional_increment_generic_synthetic_id(
+      &user_token,
+      IdCategory::LipsyncAnimation,
+      &mut transaction
+    ).await?;
+
+    maybe_creator_file_synthetic_id = Some(next_media_file_id);
+    maybe_creator_category_synthetic_id = Some(next_lipsync_id);
+  }
+
+  let vc_model_token = args.job.maybe_model_token.as_deref();
+  let creator_ip_address = args.job.creator_ip_address.as_str();
+  let creator_set_visibility = args.job.creator_set_visibility.clone();
+
+  const ORIGIN_CATEGORY : MediaFileOriginCategory = MediaFileOriginCategory::Inference;
+  const ORIGIN_MODEL_TYPE : MediaFileOriginModelType = MediaFileOriginModelType::SadTalker;
+  const MEDIA_TYPE : MediaFileType = MediaFileType::Video;
+
+  let record_id = {
+    let query_result = sqlx::query!(
+        r#"
+INSERT INTO media_files
+SET
+  token = ?,
+
+  origin_category = ?,
+  maybe_origin_model_type = ?,
+
+  media_type = ?,
+  maybe_mime_type = ?,
+  file_size_bytes = ?,
+
+  checksum_sha2 = ?,
+
+  public_bucket_directory_hash = ?,
+
+  maybe_creator_user_token = ?,
+  creator_ip_address = ?,
+
+  creator_set_visibility = ?,
+
+  maybe_creator_file_synthetic_id = ?,
+  maybe_creator_category_synthetic_id = ?,
+
+  file_size_bytes = ?,
+  duration_millis = ?,
+
+  is_generated_on_prem = ?,
+  generated_by_worker = ?,
+  generated_by_cluster = ?,
+  is_debug_request = ?
+        "#,
+      result_token.as_str(),
+
+      ORIGIN_CATEGORY.as_str(),
+      ORIGIN_MODEL_TYPE.as_str(),
+
+      MEDIA_TYPE.as_str(),
+      args.maybe_mime_type,
+      args.file_size_bytes,
+
+      args.sha256_checksum,
+
+      args.public_bucket_directory_hash,
+
+      args.job.maybe_creator_user_token,
+      args.job.creator_ip_address,
+
+      args.job.creator_set_visibility.to_str(),
+
+      maybe_creator_file_synthetic_id,
+      maybe_creator_category_synthetic_id,
+
+
+
+
+      args.is_on_prem,
+      args.worker_hostname,
+      args.worker_cluster,
+      args.is_debug_worker,
+    )
+        .execute(&mut transaction)
+        .await;
+
+    let record_id = match query_result {
+      Ok(res) => {
+        res.last_insert_id()
+      },
+      Err(err) => {
+        // TODO: handle better
+        //transaction.rollback().await?;
+        return Err(anyhow!("Mysql error: {:?}", err));
+      }
+    };
+
+    record_id
+  };
+
+  transaction.commit().await?;
+
+  Ok((result_token, record_id))
+}

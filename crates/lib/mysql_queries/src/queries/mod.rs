@@ -4,6 +4,7 @@ pub mod billing;
 pub mod comments;
 pub mod generic_download;
 pub mod generic_inference;
+pub mod generic_synthetic_ids;
 pub mod health_check;
 pub mod ip_bans;
 pub mod media_files;

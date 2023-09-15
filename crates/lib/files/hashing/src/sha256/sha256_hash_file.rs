@@ -3,8 +3,9 @@ use data_encoding::HEXLOWER_PERMISSIVE;
 use errors::AnyhowResult;
 use std::fs::File;
 use std::io::BufReader;
+use std::path::Path;
 
-pub fn sha256_hash_file(filename: &str) -> AnyhowResult<String> {
+pub fn sha256_hash_file<P: AsRef<Path>>(filename: P) -> AnyhowResult<String> {
   let input = File::open(filename)?;
   let reader = BufReader::new(input);
   let digest = sha256_digest_buffer(reader)?;

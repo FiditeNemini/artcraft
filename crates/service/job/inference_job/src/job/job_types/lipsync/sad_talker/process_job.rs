@@ -1,6 +1,5 @@
 use anyhow::anyhow;
-use buckets::public::media_uploads::original_file::MediaUploadOriginalFilePath;
-use buckets::public::voice_conversion_results::original_file::VoiceConversionResultOriginalFilePath;
+use buckets::public::media_files::original_file::MediaFileBucketPath;
 use container_common::filesystem::check_file_exists::check_file_exists;
 use container_common::filesystem::safe_delete_temp_directory::safe_delete_temp_directory;
 use container_common::filesystem::safe_delete_temp_file::safe_delete_temp_file;
@@ -8,28 +7,19 @@ use crate::job::job_loop::job_success_result::{JobSuccessResult, ResultEntity};
 use crate::job::job_loop::process_single_job_error::ProcessSingleJobError;
 use crate::job::job_types::lipsync::sad_talker::download_audio_file::download_audio_file;
 use crate::job::job_types::lipsync::sad_talker::download_image_file::download_image_file;
+use crate::job::job_types::lipsync::sad_talker::sad_talker_inference_command::InferenceArgs;
 use crate::job::job_types::lipsync::sad_talker::validate_job::validate_job;
 use crate::job_dependencies::JobDependencies;
-use crate::util::maybe_download_file_from_bucket::maybe_download_file_from_bucket;
 use crate::util::model_downloader::ModelDownloader;
 use enums::by_table::generic_inference_jobs::inference_result_type::InferenceResultType;
-use errors::AnyhowResult;
-use filesys::create_dir_all_if_missing::create_dir_all_if_missing;
 use filesys::file_size::file_size;
-use log::{error, info, warn};
-use media::decode_basic_audio_info::decode_basic_audio_file_info;
+use hashing::sha256::sha256_hash_file::sha256_hash_file;
+use log::{error, info};
 use mimetypes::mimetype_for_file::get_mimetype_for_file;
-use mysql_queries::payloads::generic_inference_args::generic_inference_args::{GenericInferenceArgs, InferenceCategoryAbbreviated, PolymorphicInferenceArgs};
-use mysql_queries::payloads::generic_inference_args::lipsync_payload::{LipsyncAnimationAudioSource, LipsyncAnimationImageSource};
 use mysql_queries::queries::generic_inference::job::list_available_generic_inference_jobs::AvailableInferenceJob;
-use mysql_queries::queries::voice_conversion::results::get_voice_conversion_result_for_inference::get_voice_conversion_result_for_inference;
-use mysql_queries::queries::voice_conversion::results::insert_voice_conversion_result::{insert_voice_conversion_result, InsertArgs};
-use std::path::PathBuf;
-use std::thread;
-use std::time::{Duration, Instant};
-use buckets::public::media_files::original_file::MediaFileBucketPath;
+use mysql_queries::queries::media_files::insert_media_file_from_face_animation::{insert_media_file_from_face_animation, InsertArgs};
+use std::time::Instant;
 use tokens::users::user::UserToken;
-use crate::job::job_types::lipsync::sad_talker::sad_talker_inference_command::InferenceArgs;
 
 pub struct SadTalkerProcessJobArgs<'a> {
   pub job_dependencies: &'a JobDependencies,
@@ -173,6 +163,10 @@ pub async fn process_job(args: SadTalkerProcessJobArgs<'_>) -> Result<JobSuccess
       .map(|mime| mime.to_string())
       .ok_or(ProcessSingleJobError::Other(anyhow!("Mimetype could not be determined")))?;
 
+  let file_checksum = sha256_hash_file(&output_video_fs_path)
+      .map_err(|err| {
+        ProcessSingleJobError::Other(anyhow!("Error hashing file: {:?}", err))
+      })?;
 
   // ==================== UPLOAD AUDIO TO BUCKET ==================== //
 
@@ -205,13 +199,13 @@ pub async fn process_job(args: SadTalkerProcessJobArgs<'_>) -> Result<JobSuccess
 
   info!("Saving SadTalker result (media_files table record) ...");
 
-  /* TODO
-  let (inference_result_token, id) = insert_voice_conversion_result(InsertArgs {
+  let (media_file_token, id) = insert_media_file_from_face_animation(InsertArgs {
     pool: &args.job_dependencies.mysql_pool,
     job: &job,
-    public_bucket_hash: result_bucket_location.get_object_hash(),
+    maybe_mime_type: Some(&mimetype),
     file_size_bytes,
-    duration_millis: 0,
+    sha256_checksum: &file_checksum,
+    public_bucket_directory_hash: result_bucket_location.get_object_hash(),
     is_on_prem: args.job_dependencies.container.is_on_prem,
     worker_hostname: &args.job_dependencies.container.hostname,
     worker_cluster: &args.job_dependencies.container.cluster_name,
@@ -219,8 +213,6 @@ pub async fn process_job(args: SadTalkerProcessJobArgs<'_>) -> Result<JobSuccess
   })
       .await
       .map_err(|e| ProcessSingleJobError::Other(e))?;
-      
-   */
 
   info!("SadTalker Done.");
 
@@ -231,7 +223,7 @@ pub async fn process_job(args: SadTalkerProcessJobArgs<'_>) -> Result<JobSuccess
   args.job_dependencies.firehose_publisher.lipsync_animation_finished(
     maybe_user_token.as_ref(),
     &job.inference_job_token,
-    inference_result_token.as_str())
+    media_file_token.as_str())
       .await
       .map_err(|e| {
         error!("error publishing event: {:?}", e);
@@ -242,12 +234,12 @@ pub async fn process_job(args: SadTalkerProcessJobArgs<'_>) -> Result<JobSuccess
       .map_err(|e| ProcessSingleJobError::Other(e))?;
 
   info!("Job {:?} complete success! Downloaded, ran inference, and uploaded. Saved model record: {}, Result Token: {}",
-        job.id, id, &inference_result_token);
+        job.id, id, &media_file_token);
 
   Ok(JobSuccessResult {
     maybe_result_entity: Some(ResultEntity {
       entity_type: InferenceResultType::MediaFile,
-      entity_token: inference_result_token.to_string(),
+      entity_token: media_file_token.to_string(),
     }),
     inference_duration,
   })
