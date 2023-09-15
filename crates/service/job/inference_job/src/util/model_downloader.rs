@@ -35,6 +35,9 @@ pub trait ModelDownloader {
       return Ok(());
     }
 
+    info!("Model not on filesystem: {}", self.get_model_name());
+    info!("Needs to be in: {:?}", self.get_filesystem_path());
+
     if let Some(parent_directory_path) = filesystem_path.parent() {
       create_dir_all_if_missing(parent_directory_path)?;
     }

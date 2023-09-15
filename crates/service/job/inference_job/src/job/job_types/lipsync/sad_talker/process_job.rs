@@ -43,7 +43,14 @@ pub async fn process_job(args: SadTalkerProcessJobArgs<'_>) -> Result<JobSuccess
 
   info!("Download models (if not present)...");
 
+  let mut i : usize = 0;
+
   for downloader in deps.job_type_details.sad_talker.downloaders.all_downloaders() {
+
+    // Temporary debugging
+    info!("Downloader {}", i);
+    i = i + 1;
+
     let result = downloader.download_if_not_on_filesystem(
       &args.job_dependencies.private_bucket_client,
       &args.job_dependencies.fs.scoped_temp_dir_creator_for_downloads,
@@ -57,7 +64,7 @@ pub async fn process_job(args: SadTalkerProcessJobArgs<'_>) -> Result<JobSuccess
 
   // ==================== TEMP DIR ==================== //
 
-  let work_temp_dir = format!("temp_rvc_v2_inference_{}", job.id.0);
+  let work_temp_dir = format!("temp_sad_talker_inference_{}", job.id.0);
 
   // NB: TempDir exists until it goes out of scope, at which point it should delete from filesystem.
   let work_temp_dir = args.job_dependencies
