@@ -172,8 +172,6 @@ pub async fn process_job(args: SadTalkerProcessJobArgs<'_>) -> Result<JobSuccess
         ProcessSingleJobError::Other(anyhow!("Error hashing file: {:?}", err))
       })?;
 
-  std::thread::sleep(Duration::from_secs(50));
-
   // ==================== UPLOAD AUDIO TO BUCKET ==================== //
 
   job_progress_reporter.log_status("uploading result")
