@@ -10,8 +10,13 @@ import {
 import { v4 as uuidv4 } from "uuid";
 import { FrontendInferenceJobType, InferenceJob } from "@storyteller/components/src/jobs/InferenceJob";
 import TestUploadComponent from "./TestUploadComponent";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faBarsStaggered } from "@fortawesome/free-solid-svg-icons";
+import { TestPageResultList } from "./TestPageResultList";
+import { SessionSubscriptionsWrapper } from "@storyteller/components/src/session/SessionSubscriptionsWrapper";
 
 interface Props {
+  sessionSubscriptionsWrapper: SessionSubscriptionsWrapper;
   enqueueInferenceJob: (
     jobToken: string,
     frontendInferenceJobType: FrontendInferenceJobType
@@ -46,7 +51,7 @@ function TestingPage(props: Props) {
     if (EnqueueFaceAnimationIsSuccess(result)) {
       props.enqueueInferenceJob(
         result.inference_job_token,
-        FrontendInferenceJobType.VoiceConversion
+        FrontendInferenceJobType.FaceAnimation
       );
     }
   };
@@ -113,6 +118,31 @@ function TestingPage(props: Props) {
           onClick={() => doTest()}>
             Test the thing
         </button>
+
+        <br />
+        <br />
+
+        <h4 className="text-center text-lg-start">
+          <FontAwesomeIcon
+            icon={faBarsStaggered}
+            className="me-3"
+          />
+          Session Results
+        </h4>
+        <div className="d-flex flex-column gap-3 session-tts-section session-vc-section">
+          <TestPageResultList
+            inferenceJobs={
+              props.inferenceJobsByCategory.get(
+                FrontendInferenceJobType.FaceAnimation
+              )!
+            }
+            sessionSubscriptionsWrapper={
+              props.sessionSubscriptionsWrapper
+            }
+          />
+        </div>
+
+
       </div>
     </div>
   );

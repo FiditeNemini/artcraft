@@ -533,6 +533,9 @@ class PageContainer extends React.Component<Props, State> {
 
             <Route path="/testing">
               <TestingPage 
+                sessionSubscriptionsWrapper={
+                  this.props.sessionSubscriptionsWrapper
+                }
                 enqueueInferenceJob={this.props.enqueueInferenceJob}
                 inferenceJobs={this.props.inferenceJobs}
                 inferenceJobsByCategory={this.props.inferenceJobsByCategory}

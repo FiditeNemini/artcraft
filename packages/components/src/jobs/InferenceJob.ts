@@ -3,6 +3,7 @@ import { JobState, jobStateFromString } from "./JobStates";
 
 // Type of inference job (specified by the frontend, not backend)
 export enum FrontendInferenceJobType {
+  FaceAnimation,
   TextToSpeech,
   VoiceConversion,
 }
