@@ -153,15 +153,19 @@ pub async fn process_job(args: SadTalkerProcessJobArgs<'_>) -> Result<JobSuccess
 
   check_file_exists(&output_video_fs_path).map_err(|e| ProcessSingleJobError::Other(e))?;
 
-  info!("Interrogating result file properties...");
+  info!("Interrogating result file size ...");
 
   let file_size_bytes = file_size(&output_video_fs_path)
       .map_err(|err| ProcessSingleJobError::Other(err))?;
+
+  info!("Interrogating result mimetype ...");
 
   let mimetype = get_mimetype_for_file(&output_video_fs_path)
       .map_err(|err| ProcessSingleJobError::from_io_error(err))?
       .map(|mime| mime.to_string())
       .ok_or(ProcessSingleJobError::Other(anyhow!("Mimetype could not be determined")))?;
+
+  info!("Calculating sha256...");
 
   let file_checksum = sha256_hash_file(&output_video_fs_path)
       .map_err(|err| {
