@@ -46,6 +46,12 @@ pub struct SadTalkerInferenceCommand {
 
   /// If the execution should be ended after a certain point.
   maybe_execution_timeout: Option<Duration>,
+
+
+  /// Inference arg.
+  /// --checkpoint_dir: optional location for checkpoints directory
+  pub alternate_checkpoint_dir: Option<PathBuf>,
+
 }
 
 #[derive(Clone)]
@@ -81,6 +87,7 @@ impl SadTalkerInferenceCommand {
     maybe_default_config_path: Option<P>,
     maybe_docker_options: Option<DockerOptions>,
     maybe_execution_timeout: Option<Duration>,
+    alternate_checkpoint_dir: Option<PathBuf>
   ) -> Self {
     Self {
       sad_talker_root_code_directory: sad_talker_root_code_directory.as_ref().to_path_buf(),
@@ -89,6 +96,7 @@ impl SadTalkerInferenceCommand {
       maybe_default_config_path: maybe_default_config_path.map(|p| p.as_ref().to_path_buf()),
       maybe_docker_options,
       maybe_execution_timeout,
+      alternate_checkpoint_dir,
     }
   }
 
@@ -131,6 +139,10 @@ impl SadTalkerInferenceCommand {
           }
         });
 
+    // Override for --checkpoint_dir at inference time
+    let alternate_checkpoint_dir = easyenv::get_env_pathbuf_optional(
+      "SAD_TALKER_ALTERNATE_CHECKPOINT_PATH");
+
     Ok(Self {
       sad_talker_root_code_directory,
       executable_or_command,
@@ -138,6 +150,7 @@ impl SadTalkerInferenceCommand {
       maybe_default_config_path,
       maybe_docker_options,
       maybe_execution_timeout,
+      alternate_checkpoint_dir,
     })
   }
 
@@ -191,6 +204,11 @@ impl SadTalkerInferenceCommand {
 
     command.push_str(" --result_file ");
     command.push_str(&path_to_string(args.output_file));
+
+    if let Some(dir) = self.alternate_checkpoint_dir.as_ref() {
+      command.push_str(" --checkpoint_dir ");
+      command.push_str(&path_to_string(dir));
+    }
 
     // ===== End Python Args =====
 
