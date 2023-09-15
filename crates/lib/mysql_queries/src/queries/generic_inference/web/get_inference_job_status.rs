@@ -41,7 +41,7 @@ pub struct ResultDetails {
   pub entity_type: String,
   pub entity_token: String,
 
-  /// The bucket storage hash (for vc) or full path (for tts)
+  /// The bucket storage hash (for vc and media_files) or full path (for tts)
   pub public_bucket_location_or_hash: String,
 
   /// Whether the location is a full path (for tts) or a hash (for vc) that
@@ -81,6 +81,7 @@ SELECT
 
     tts_results.public_bucket_wav_audio_path as maybe_tts_public_bucket_path,
     voice_conversion_results.public_bucket_hash as maybe_voice_conversion_public_bucket_hash,
+    media_files.public_bucket_directory_hash as maybe_media_file_public_bucket_directory_hash,
 
     jobs.assigned_worker as maybe_assigned_worker,
     jobs.assigned_cluster as maybe_assigned_cluster,
@@ -100,6 +101,7 @@ LEFT OUTER JOIN voice_conversion_models ON jobs.maybe_model_token = voice_conver
 
 LEFT OUTER JOIN tts_results ON jobs.on_success_result_entity_token = tts_results.token
 LEFT OUTER JOIN voice_conversion_results ON jobs.on_success_result_entity_token = voice_conversion_results.token
+LEFT OUTER JOIN media_files ON jobs.on_success_result_entity_token = media_files.token
 
 WHERE jobs.token = ?
         "#,
@@ -128,7 +130,7 @@ WHERE jobs.token = ?
   // NB: A bit of a hack. We store TTS results with a full path.
   // Going forward, all other record types will store a hash.
   let (bucket_path_is_hash, maybe_public_bucket_hash) = match record.inference_category {
-    InferenceCategory::LipsyncAnimation => (true, Some("todo")), // TODO - these values are wrong
+    InferenceCategory::LipsyncAnimation => (true, record.maybe_media_file_public_bucket_directory_hash.as_deref()),
     InferenceCategory::TextToSpeech => (false, record.maybe_tts_public_bucket_path.as_deref()),
     InferenceCategory::VoiceConversion => (true, record.maybe_voice_conversion_public_bucket_hash.as_deref()),
   };
@@ -192,6 +194,7 @@ struct RawGenericInferenceJobStatus {
 
   pub maybe_voice_conversion_public_bucket_hash: Option<String>, // NB: This is the bucket hash.
   pub maybe_tts_public_bucket_path: Option<String>, // NB: This isn't the bucket path, but the whole hash.
+  pub maybe_media_file_public_bucket_directory_hash: Option<String>, // NB: This is the bucket directory hash
 
   pub maybe_assigned_worker: Option<String>,
   pub maybe_assigned_cluster: Option<String>,
