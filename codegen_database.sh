@@ -32,6 +32,9 @@ build_shared_sqlite_database_library() {
   popd
 }
 
+echo 'mysql prepare'
 build_shared_mysql_database_library
+
+echo 'sqlite prepare'
 build_shared_sqlite_database_library
 
