@@ -140,6 +140,23 @@ CREATE TABLE media_files (
   -- We should also build an audit table to supersede this.
   maybe_mod_user_token VARCHAR(32) DEFAULT NULL,
 
+  -- ========== INFERENCE METADATA, DC, ROUTING, DEBUGGING ==========
+
+  -- If true, the request was routed to a special "debug" worker.
+  -- Or perhaps uploaded with a debug flag.
+  is_debug BOOLEAN NOT NULL DEFAULT FALSE,
+
+  -- For inference and processing, whether we generated this result from
+  -- our own data center (vs. cloud).
+  is_generated_on_prem BOOLEAN NOT NULL DEFAULT FALSE,
+
+  -- For inference or processing, which worker handled the processing.
+  -- Worker hostname (linux hostname, k8s pod name)
+  generated_by_worker VARCHAR(255) DEFAULT NULL,
+
+  -- Cluster name (k8s)
+  generated_by_cluster VARCHAR(255) DEFAULT NULL,
+
   -- ========== TIMESTAMPS ==========
 
   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,

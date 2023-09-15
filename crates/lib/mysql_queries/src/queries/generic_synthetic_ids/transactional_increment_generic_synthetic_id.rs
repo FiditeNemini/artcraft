@@ -8,11 +8,12 @@ use tokens::users::user::UserToken;
 pub async fn transactional_increment_generic_synthetic_id(
   user_token: &UserToken,
   id_category: IdCategory,
-  transaction: &mut Transaction<MySql>,
+  transaction: &mut Transaction<'_, MySql>,
 ) -> AnyhowResult<u64> {
   let id_category_str = id_category.to_str();
 
-  let query_result = sqlx::query!(
+  {
+    let query_result = sqlx::query!(
         r#"
 INSERT INTO generic_synthetic_ids
 SET
@@ -29,14 +30,15 @@ ON DUPLICATE KEY UPDATE
       user_token,
       id_category_str
     )
-      .execute(transaction)
-      .await;
+        .execute(&mut *transaction) // TODO/FIXME WTF THIS IS SO GROSS
+        .await;
 
-  match query_result {
-    Ok(_) => {},
-    Err(err) => {
-      //transaction.rollback().await?;
-      warn!("Transaction failure: {:?}", err);
+    match query_result {
+      Ok(_) => {},
+      Err(err) => {
+        //transaction.rollback().await?;
+        warn!("Transaction failure: {:?}", err);
+      }
     }
   }
 
@@ -48,21 +50,22 @@ SELECT
 FROM
   generic_synthetic_ids
 WHERE
-  user_token = ?,
+  user_token = ?
+AND
   id_category = ?
 LIMIT 1
         "#,
       user_token,
       id_category_str,
     )
-      .fetch_one(transaction)
+      .fetch_one(&mut *transaction)
       .await;
 
   let record : SyntheticIdRecord = match query_result {
     Ok(record) => record,
     Err(err) => {
       warn!("Transaction failure: {:?}", err);
-      transaction.rollback().await?;
+      //transaction.rollback().await?;
       return Err(anyhow!("Generic synthetic id transaction failure: {:?}", err));
     }
   };

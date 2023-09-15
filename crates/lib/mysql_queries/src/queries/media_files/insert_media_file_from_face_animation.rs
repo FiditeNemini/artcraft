@@ -91,22 +91,16 @@ SET
   creator_set_visibility = ?,
 
   maybe_creator_file_synthetic_id = ?,
-  maybe_creator_category_synthetic_id = ?,
+  maybe_creator_category_synthetic_id = ?
 
-  file_size_bytes = ?,
-  duration_millis = ?,
 
-  is_generated_on_prem = ?,
-  generated_by_worker = ?,
-  generated_by_cluster = ?,
-  is_debug_request = ?
         "#,
       result_token.as_str(),
 
-      ORIGIN_CATEGORY.as_str(),
-      ORIGIN_MODEL_TYPE.as_str(),
+      ORIGIN_CATEGORY.to_str(),
+      ORIGIN_MODEL_TYPE.to_str(),
 
-      MEDIA_TYPE.as_str(),
+      MEDIA_TYPE.to_str(),
       args.maybe_mime_type,
       args.file_size_bytes,
 
@@ -125,14 +119,18 @@ SET
 
 
 
-      args.is_on_prem,
+      /*args.is_on_prem,
       args.worker_hostname,
       args.worker_cluster,
-      args.is_debug_worker,
+      args.is_debug_worker,*/
     )
         .execute(&mut transaction)
         .await;
 
+    /*is_generated_on_prem = ?,
+    generated_by_worker = ?,
+    generated_by_cluster = ?,
+    is_debug_request = ?*/
     let record_id = match query_result {
       Ok(res) => {
         res.last_insert_id()

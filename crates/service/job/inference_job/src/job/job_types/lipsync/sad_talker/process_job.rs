@@ -18,7 +18,7 @@ use log::{error, info};
 use mimetypes::mimetype_for_file::get_mimetype_for_file;
 use mysql_queries::queries::generic_inference::job::list_available_generic_inference_jobs::AvailableInferenceJob;
 use mysql_queries::queries::media_files::insert_media_file_from_face_animation::{insert_media_file_from_face_animation, InsertArgs};
-use std::time::Instant;
+use std::time::{Duration, Instant};
 use tokens::users::user::UserToken;
 
 pub struct SadTalkerProcessJobArgs<'a> {
@@ -167,6 +167,8 @@ pub async fn process_job(args: SadTalkerProcessJobArgs<'_>) -> Result<JobSuccess
       .map_err(|err| {
         ProcessSingleJobError::Other(anyhow!("Error hashing file: {:?}", err))
       })?;
+
+  std::thread::sleep(Duration::from_secs(50));
 
   // ==================== UPLOAD AUDIO TO BUCKET ==================== //
 
