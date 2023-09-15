@@ -27,6 +27,7 @@ use mysql_queries::queries::voice_conversion::results::insert_voice_conversion_r
 use std::path::PathBuf;
 use std::thread;
 use std::time::{Duration, Instant};
+use buckets::public::media_files::original_file::MediaFileBucketPath;
 use tokens::users::user::UserToken;
 use crate::job::job_types::lipsync::sad_talker::sad_talker_inference_command::InferenceArgs;
 
@@ -167,87 +168,50 @@ pub async fn process_job(args: SadTalkerProcessJobArgs<'_>) -> Result<JobSuccess
   let file_size_bytes = file_size(&output_video_fs_path)
       .map_err(|err| ProcessSingleJobError::Other(err))?;
 
-  let maybe_mimetype = get_mimetype_for_file(&output_video_fs_path)
+  let mimetype = get_mimetype_for_file(&output_video_fs_path)
       .map_err(|err| ProcessSingleJobError::from_io_error(err))?
-      .map(|mime| mime.to_string());
+      .map(|mime| mime.to_string())
+      .ok_or(ProcessSingleJobError::Other(anyhow!("Mimetype could not be determined")))?;
 
-
-  info!("TEST FILE...");
-
-  thread::sleep(Duration::from_secs(300));
-
-  /*let audio_info = decode_basic_audio_file_info(&output_video_fs_path, maybe_mimetype.as_deref(), None)
-      .map_err(|err| ProcessSingleJobError::Other(err))?;
-
-  if audio_info.required_full_decode {
-    warn!("Required a full decode of the output data to get duration! That's inefficient!");
-  }
-
-  // TODO: Make a new python image that generates spectrograms from any audio file.
-
-  let file_metadata = FileMetadata {
-    duration_millis: audio_info.duration_millis,
-    mimetype: maybe_mimetype,
-    file_size_bytes,
-  };
-
-  //safe_delete_temp_file(&output_metadata_fs_path);
 
   // ==================== UPLOAD AUDIO TO BUCKET ==================== //
 
   job_progress_reporter.log_status("uploading result")
       .map_err(|e| ProcessSingleJobError::Other(e))?;
 
-  let result_bucket_location = VoiceConversionResultOriginalFilePath::generate_new();
+  let result_bucket_location = MediaFileBucketPath::generate_new();
 
   let result_bucket_object_pathbuf = result_bucket_location.to_full_object_pathbuf();
 
   info!("Audio destination bucket path: {:?}", &result_bucket_object_pathbuf);
 
-  info!("Uploading audio...");
+  info!("Uploading media ...");
 
   args.job_dependencies.public_bucket_client.upload_filename_with_content_type(
     &result_bucket_object_pathbuf,
     &output_video_fs_path,
-    "audio/wav")
+    &mimetype) // TODO: We should check the mimetype to make sure bad payloads can't get uploaded
       .await
       .map_err(|e| ProcessSingleJobError::Other(e))?;
 
+  // ==================== DELETE TEMP FILES ==================== //
+
   safe_delete_temp_file(&output_video_fs_path);
-
-//  // ==================== UPLOAD SPECTROGRAM TO BUCKETS ==================== //
-//
-//  let spectrogram_result_object_path = args.job_dependencies.bucket_path_unifier.tts_inference_spectrogram_output_path(
-//    &job.uuid_idempotency_token); // TODO: Don't use this!
-//
-//  info!("Spectrogram destination bucket path: {:?}", &spectrogram_result_object_path);
-//
-//  info!("Uploading spectrogram...");
-//
-//  args.job_dependencies.public_bucket_client.upload_filename_with_content_type(
-//    &spectrogram_result_object_path,
-//    &output_spectrogram_fs_path,
-//    "application/json")
-//      .await
-//      .map_err(|e| ProcessSingleJobError::Other(e))?;
-//
-//  safe_delete_temp_file(&output_spectrogram_fs_path);
-
-  // ==================== DELETE DOWNLOADED FILE ==================== //
 
   // NB: We should be using a tempdir, but to make absolutely certain we don't overflow the disk...
   safe_delete_temp_directory(&work_temp_dir);
 
   // ==================== SAVE RECORDS ==================== //
 
-  info!("Saving vc inference record...");
+  info!("Saving SadTalker result (media_files table record) ...");
 
+  /* TODO
   let (inference_result_token, id) = insert_voice_conversion_result(InsertArgs {
     pool: &args.job_dependencies.mysql_pool,
     job: &job,
     public_bucket_hash: result_bucket_location.get_object_hash(),
-    file_size_bytes: file_metadata.file_size_bytes,
-    duration_millis: file_metadata.duration_millis.unwrap_or(0),
+    file_size_bytes,
+    duration_millis: 0,
     is_on_prem: args.job_dependencies.container.is_on_prem,
     worker_hostname: &args.job_dependencies.container.hostname,
     worker_cluster: &args.job_dependencies.container.cluster_name,
@@ -255,14 +219,16 @@ pub async fn process_job(args: SadTalkerProcessJobArgs<'_>) -> Result<JobSuccess
   })
       .await
       .map_err(|e| ProcessSingleJobError::Other(e))?;
+      
+   */
 
-  info!("VC Done.");
+  info!("SadTalker Done.");
 
   // TODO: Update upstream to be strongly typed
   let maybe_user_token = job.maybe_creator_user_token.as_deref()
       .map(|token| UserToken::new_from_str(token));
 
-  args.job_dependencies.firehose_publisher.vc_inference_finished(
+  args.job_dependencies.firehose_publisher.lipsync_animation_finished(
     maybe_user_token.as_ref(),
     &job.inference_job_token,
     inference_result_token.as_str())
@@ -280,30 +246,9 @@ pub async fn process_job(args: SadTalkerProcessJobArgs<'_>) -> Result<JobSuccess
 
   Ok(JobSuccessResult {
     maybe_result_entity: Some(ResultEntity {
-      entity_type: InferenceResultType::VoiceConversion,
+      entity_type: InferenceResultType::MediaFile,
       entity_token: inference_result_token.to_string(),
     }),
     inference_duration,
   })
-
-   */
-
-
-  // TODO - REMOVE -
-  let inference_start_time = Instant::now();
-  let inference_duration = Instant::now().duration_since(inference_start_time);
-  Ok(JobSuccessResult {
-    maybe_result_entity: Some(ResultEntity {
-      entity_type: InferenceResultType::VoiceConversion,
-      entity_token: "todo".to_string(),
-    }),
-    inference_duration,
-  })
-}
-
-#[derive(Deserialize, Default)]
-struct FileMetadata {
-  pub duration_millis: Option<u64>,
-  pub mimetype: Option<String>,
-  pub file_size_bytes: u64,
 }

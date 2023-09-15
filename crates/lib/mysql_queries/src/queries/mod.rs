@@ -6,6 +6,7 @@ pub mod generic_download;
 pub mod generic_inference;
 pub mod health_check;
 pub mod ip_bans;
+pub mod media_files;
 pub mod media_uploads;
 pub mod model_categories;
 pub mod public_event_feed;

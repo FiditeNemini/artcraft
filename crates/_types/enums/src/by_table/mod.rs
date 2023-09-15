@@ -3,6 +3,7 @@ pub mod audit_logs;
 pub mod comments;
 pub mod generic_download_jobs;
 pub mod generic_inference_jobs;
+pub mod generic_synthetic_ids;
 pub mod media_files;
 pub mod media_uploads;
 pub mod model_categories;

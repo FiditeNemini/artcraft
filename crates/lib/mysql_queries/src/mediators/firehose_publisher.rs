@@ -236,6 +236,17 @@ impl FirehosePublisher {
     Ok(())
   }
 
+  // TODO: Change result token type.
+  pub async fn lipsync_animation_finished(&self, maybe_user_token: Option<&UserToken>, inference_job_token: &InferenceJobToken, result_token: &str) -> AnyhowResult<()> {
+    let _record_id = self.insert(
+      FirehoseEvent::LipsyncAnimationCompleted,
+      maybe_user_token.map(|u| u.as_str()),
+      Some(inference_job_token.as_str()), // TODO: Is this pointing to the right entity?
+      Some(result_token)
+    ).await?;
+    Ok(())
+  }
+
   pub async fn enqueue_generic_download(&self, user_token: &str, job_token: &str) -> AnyhowResult<()> {
     let _record_id = self.insert(
       FirehoseEvent::GenericDownloadStarted,
