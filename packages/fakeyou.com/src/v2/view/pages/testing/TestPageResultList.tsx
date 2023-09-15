@@ -1,19 +1,15 @@
 import React, { useEffect, useState } from "react";
 import { t } from "i18next";
-import { Trans } from "react-i18next";
-import { Link } from "react-router-dom";
 import { BucketConfig } from "@storyteller/components/src/api/BucketConfig";
 import { JobState } from "@storyteller/components/src/jobs/JobStates";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
-  faClock,
   faHeadphonesSimple,
   faDownload,
 } from "@fortawesome/free-solid-svg-icons";
 
 import { SessionSubscriptionsWrapper } from "@storyteller/components/src/session/SessionSubscriptionsWrapper";
 import { Analytics } from "../../../../common/Analytics";
-import { WebUrl } from "../../../../common/WebUrl";
 import {
   GetPendingTtsJobCount,
   GetPendingTtsJobCountIsOk,
