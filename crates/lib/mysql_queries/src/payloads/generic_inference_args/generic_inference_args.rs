@@ -122,6 +122,7 @@ mod tests {
       args: Some(PolymorphicInferenceArgs::La(LipsyncArgs {
         maybe_audio_source: Some(LipsyncAnimationAudioSource::U("foo".to_string())),
         maybe_image_source: Some(LipsyncAnimationImageSource::F("bar".to_string())),
+        maybe_face_enhancer: None,
       })),
     };
 

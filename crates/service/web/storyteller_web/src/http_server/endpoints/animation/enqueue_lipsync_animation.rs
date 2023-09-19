@@ -47,6 +47,14 @@ pub struct EnqueueLipsyncAnimationRequest {
 
   /// SadTalker: parameter to animate the full body.
   animate_full_body: Option<bool>,
+
+  /// SadTalker: parameter to enhance the face using gfpgan.
+  /// If `enhance_face_with` is set, it will take precedence over this arg.
+  enhance_face: Option<bool>,
+
+  /// SadTalker: parameter to enhance the face using gfpgan or RestoreFormer.
+  /// If `enhance_face` is set, this `enhance_face_with` argument will take precedence over it.
+  enhance_face_with: Option<String>,
 }
 
 /// Treated as an enum. Only one of these may be set.
@@ -269,6 +277,8 @@ pub async fn enqueue_lipsync_animation_handler(
   let maybe_args = Some(PolymorphicInferenceArgs::La(LipsyncArgs {
     maybe_audio_source: Some(audio_source),
     maybe_image_source: Some(image_source),
+    maybe_face_enhancer: None,
+    maybe_pose_style: None,
   }));
 
   let query_result = insert_generic_inference_job(InsertGenericInferenceArgs {
