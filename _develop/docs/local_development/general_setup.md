@@ -4,6 +4,12 @@ FakeYou dev setup (bare metal)
 This document describes how to run the FakeYou infrastructure on your development 
 machine's bare metal (no containers). 
 
+The applications (binary targets) you might be interested in running include:
+
+- `storyteller-web`, the HTTP API server
+- `download-job`, which downloads models from the web and stores them in GCS
+- `inference-job`, which downloads models from GCS and executes them
+
 Database Setup
 --------------
 
@@ -67,40 +73,6 @@ To run pending migrations, execute the following:
 diesel migration run
 ```
 
-If you're simply developing against the backend, this will be the only step you need to perform. 
-
-To revert the last 3 migrations:
-
-```bash
-diesel migration revert -n 3
-```
-
-To reset the entire database (drop, migrate), run:
-
-```bash
-diesel database reset
-```
-
-### Server Query Codegen
-
-We use SQLx instead of Diesel in the production server. It's typesafe
-SQL instead of an ORM like Diesel.
-
-SQLx connects to a database to derive type information, but obviously
-cannot do this for builds in CI. In order to cache the types, we build
-and check in a cache file (necessary for builds):
-
-```bash
-SQLX_OFFLINE=true cargo sqlx prepare
-```
-
-Now that we have multiple binaries, it's required to include all the queries in the main
-binary so we can generate the cached queries as a single target. That's then executed
-with:
-
-```bash
-SQLX_OFFLINE=true cargo sqlx prepare -- --bin storyteller-web
-```
 
 ### [Fix] Sqlx Error on Linux when Performing Schema Migrations
 
