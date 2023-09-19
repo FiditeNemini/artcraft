@@ -1,11 +1,11 @@
 import React from "react";
 import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
-import { motion } from "framer-motion";
+
 import { SessionSubscriptionsWrapper } from "@storyteller/components/src/session/SessionSubscriptionsWrapper";
 import { usePrefixedDocumentTitle } from "../../../../common/UsePrefixedDocumentTitle";
 import { Link } from "react-router-dom";
-import { container, item } from "../../../../data/animation";
-import posthog from 'posthog-js'
+
+import { PosthogClient } from "@storyteller/components/src/analytics/PosthogClient";
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -14,10 +14,10 @@ interface Props {
 
 function ChannelsPage(props: Props) {
   usePrefixedDocumentTitle("Channels");
-  posthog.capture('$pageview');
+  PosthogClient.recordPageview();
 
   let videoBlock = (
-    <motion.div className="col-12 col-sm-6 col-md-4" variants={item}>
+    <div className="col-12 col-sm-6 col-md-4">
       <Link to="/">
         <div className="ratio ratio-16x9 channel-thumbnail">
           <img
@@ -40,19 +40,12 @@ function ChannelsPage(props: Props) {
           </div>
         </div>
       </Link>
-    </motion.div>
+    </div>
   );
 
   return (
-    <motion.div
-      className="container py-2 py-lg-5 px-md-4 px-lg-5 px-xl-3"
-      initial="hidden"
-      animate="visible"
-      variants={container}
-    >
-      <motion.h1 className=" fw-bold mb-4" variants={item}>
-        Channels
-      </motion.h1>
+    <div className="container py-2 py-lg-5 px-md-4 px-lg-5 px-xl-3">
+      <h1 className=" fw-bold mb-4">Channels</h1>
 
       <div className="row gy-4">
         {videoBlock}
@@ -65,7 +58,7 @@ function ChannelsPage(props: Props) {
         {videoBlock}
         {videoBlock}
       </div>
-    </motion.div>
+    </div>
   );
 }
 

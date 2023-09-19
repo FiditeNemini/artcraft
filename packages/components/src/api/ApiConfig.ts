@@ -49,12 +49,26 @@ class ApiConfig {
         apiHost = "api.storyteller.ai";
         break;
       case "storyteller.stream":
+        // Storyteller.stream is deprecated and will be decommissioned in the future.
         apiHost = "api.storyteller.stream";
+        break;
+      case "devproxy.fakeyou.com":
+      case "devproxy.fakeyou.com:7000":
+      case "devproxy.fakeyou.com:7001":
+        apiHost = "api.fakeyou.com";
+        useSsl = true;
+        break;
+      case "devproxy.storyteller.ai":
+      case "devproxy.storyteller.ai:7000":
+      case "devproxy.storyteller.ai:7001":
+        apiHost = "api.storyteller.ai";
+        useSsl = true;
         break;
       case "dev.fakeyou.com":
         // NB: for dev machines with nginx proxies
         apiHost = "api.dev.fakeyou.com";
         break;
+      case "dev.fakeyou.com:7000":
       case "dev.fakeyou.com:7001":
         // NB: for dev machines without nginx proxies
         apiHost = "api.dev.fakeyou.com:12345";
@@ -422,6 +436,12 @@ class ApiConfig {
 
   enqueueVoiceConversion(): string {
     return `${this.getApiOrigin()}/v1/voice_conversion/inference`;
+  }
+
+  // =============== Face Animation ===============
+
+  enqueueFaceAnimation(): string {
+    return `${this.getApiOrigin()}/v1/animation/face_animation/create`;
   }
 
   // =============== Generic Model Downloads ===============

@@ -1,10 +1,8 @@
 import React, { useMemo } from "react";
 import { Link } from "react-router-dom";
-import { motion } from "framer-motion";
-import { container } from "../../../../data/animation";
 import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
 import { SessionSubscriptionsWrapper } from "@storyteller/components/src/session/SessionSubscriptionsWrapper";
-import { t } from "i18next";
+import { useLocalize } from 'hooks';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faStar,
@@ -14,7 +12,7 @@ import {
 import { faDiscord, faTwitter } from "@fortawesome/free-brands-svg-icons";
 import { WebUrl } from "../../../../common/WebUrl";
 import { faFileArrowUp } from "@fortawesome/pro-solid-svg-icons";
-import posthog from 'posthog-js'
+import { PosthogClient } from "@storyteller/components/src/analytics/PosthogClient";
 // import {
 //   faFileArrowUp,
 //   faMicrophone,
@@ -28,7 +26,9 @@ interface Props {
 }
 
 function LandingPage(props: Props) {
-  posthog.capture('$pageview');
+  PosthogClient.recordPageview();
+
+  const { t: t2, oldT: t } = useLocalize("LandingPage");
 
   let signUpButton = <></>;
   let viewPricingButton = <></>;
@@ -145,7 +145,7 @@ function LandingPage(props: Props) {
   }, []);
 
   return (
-    <motion.div initial="hidden" animate="visible" variants={container}>
+    <div>
       <div className="container pb-5 pb-lg-0 pt-lg-4 px-md-5 px-lg-5 px-xl-3">
         {/* Community Commissions Alert */}
         {/* <div className="alert alert-info">
@@ -171,13 +171,11 @@ function LandingPage(props: Props) {
           </div>
           <div className="col-12 col-lg-7 d-flex flex-column justify-content-center flex-reverse px-md-5 px-lg-3">
             <h1 className="fw-bold display-5 text-center text-lg-start px-md-5 px-lg-0">
-              AI Music, Text to Speech,
-              <br />
-              and Voice to Voice
+              {t2('hero.top')}
             </h1>
             <p className="lead opacity-75 pb-4 text-center text-lg-start px-md-5 px-lg-0 pe-lg-5">
-              Generate audio or videos of your favorite characters saying
-              anything you want with FakeYou's deep fake tech.
+              {t2('hero.bottom')}
+             
             </p>
             <div className="d-flex flex-column flex-md-row gap-3 mt-3 mb-4 w-100 justify-content-center justify-content-lg-start">
               {upgradeButton}
@@ -483,11 +481,8 @@ function LandingPage(props: Props) {
       <div className="py-4">
         <div className="container text-center community-container">
           <div className="panel px-4 py-5 d-flex flex-column align-items-center community-container rounded">
-            <h2 className="fw-bold mb-2">Join the Community</h2>
-            <p className="opacity-75">
-              We'd love to chat with you! Please join us in Discord if you have
-              any questions.
-            </p>
+            <h2 className="fw-bold mb-2">{t2("community.heading")}</h2>
+            <p className="opacity-75">{t2("community.text")}</p>
             <div className="d-flex mt-4 gap-3">
               <a
                 href="https://discord.gg/fakeyou"
@@ -496,7 +491,7 @@ function LandingPage(props: Props) {
                 className="btn btn-discord"
               >
                 <FontAwesomeIcon icon={faDiscord} className="me-2" />
-                Discord
+                {t2("community.discordButton")}
               </a>
               <a
                 href="https://twitter.com/intent/follow?screen_name=FakeYouApp"
@@ -505,7 +500,7 @@ function LandingPage(props: Props) {
                 className="btn btn-twitter"
               >
                 <FontAwesomeIcon icon={faTwitter} className="me-2" />
-                Twitter
+                {t2("community.twitterButton")}
               </a>
             </div>
           </div>
@@ -516,7 +511,7 @@ function LandingPage(props: Props) {
           />
         </div>
       </div>
-    </motion.div>
+    </div>
   );
 }
 

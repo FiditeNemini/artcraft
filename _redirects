@@ -31,6 +31,7 @@
 /signup*   /index.html   200
 /stream*   /index.html   200
 /terms*   /index.html   200
+/testing*   /index.html   200
 /tts*   /index.html   200
 /tts_configs*   /index.html   200
 /twitch*   /index.html   200

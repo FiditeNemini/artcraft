@@ -17,11 +17,10 @@ import {
 import { MetaTags } from "../../../../../common/MetaTags";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faDownload, faEdit, faTrash } from "@fortawesome/free-solid-svg-icons";
-import { motion } from "framer-motion";
-import { container, item, panel } from "../../../../../data/animation";
+
 import { usePrefixedDocumentTitle } from "../../../../../common/UsePrefixedDocumentTitle";
 import { CommentComponent } from "../../../_common/comments/CommentComponent";
-import posthog from 'posthog-js'
+import { PosthogClient } from "@storyteller/components/src/analytics/PosthogClient";
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -30,7 +29,7 @@ interface Props {
 function W2lResultViewPage(props: Props) {
   let { token } = useParams() as { token: string };
 
-  posthog.capture('$pageview');
+  PosthogClient.recordPageview();
 
   const [w2lInferenceResult, setW2lInferenceResult] = useState<
     W2lResult | undefined
@@ -264,24 +263,19 @@ function W2lResultViewPage(props: Props) {
     );
   }
   return (
-    <motion.div initial="hidden" animate="visible" variants={container}>
+    <div>
       <div className="container py-5 px-md-4 px-lg-5 px-xl-3">
-        <motion.h1
-          className=" fw-bold text-center text-lg-start"
-          variants={item}
-        >
-          Lipsync Result
-        </motion.h1>
+        <h1 className=" fw-bold text-center text-lg-start">Lipsync Result</h1>
       </div>
 
-      <motion.div className="container" variants={item}>
+      <div className="container">
         <video width="100%" height="auto" controls={true} className="rounded">
           <source src={videoLink} />
           Your device doesn't support video.
         </video>
-      </motion.div>
+      </div>
 
-      <motion.div className="container pt-4 pb-5" variants={item}>
+      <div className="container pt-4 pb-5">
         <a
           className="btn btn-primary w-100"
           href={videoLink}
@@ -291,9 +285,9 @@ function W2lResultViewPage(props: Props) {
           <FontAwesomeIcon icon={faDownload} className="me-2" />
           Download File
         </a>
-      </motion.div>
+      </div>
 
-      <motion.div className="container-panel pt-5 pb-5" variants={panel}>
+      <div className="container-panel pt-5 pb-5">
         <div className="panel p-3 p-lg-4">
           <h2 className="panel-title fw-bold">Result Details</h2>
           <div className="py-6">
@@ -315,9 +309,9 @@ function W2lResultViewPage(props: Props) {
             </table>
           </div>
         </div>
-      </motion.div>
+      </div>
 
-      <motion.div className="container-panel pt-3 pb-5" variants={panel}>
+      <div className="container-panel pt-3 pb-5">
         <div className="panel p-3 p-lg-4">
           <h2 className="panel-title fw-bold"> Template Details </h2>
           <div className="py-6">
@@ -344,21 +338,21 @@ function W2lResultViewPage(props: Props) {
             </table>
           </div>
         </div>
-      </motion.div>
+      </div>
 
-      <motion.div variants={panel}>{moderatorRows}</motion.div>
+      <div>{moderatorRows}</div>
 
-      <motion.div className="container pb-5" variants={item}>
+      <div className="container pb-5">
         <div className="d-flex gap-3 flex-column flex-md-row">
           {editButton}
           {deleteButton}
         </div>
-        <motion.div className="mt-4" variants={item}>
+        <div className="mt-4">
           <ReportDiscordLink />
-        </motion.div>
-      </motion.div>
+        </div>
+      </div>
 
-      <motion.div className="container-panel pt-4 pb-5" variants={item}>
+      <div className="container-panel pt-4 pb-5">
         <div className="panel p-3 p-lg-4">
           <h2 className="fw-bold panel-title">Comments</h2>
           <div className="py-6">
@@ -369,8 +363,8 @@ function W2lResultViewPage(props: Props) {
             />
           </div>
         </div>
-      </motion.div>
-    </motion.div>
+      </div>
+    </div>
   );
 }
 

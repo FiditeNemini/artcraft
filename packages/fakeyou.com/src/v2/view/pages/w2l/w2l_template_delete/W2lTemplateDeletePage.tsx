@@ -10,9 +10,8 @@ import {
 } from "@storyteller/components/src/api/w2l/GetW2lTemplate";
 import { GetW2lTemplateUseCount } from "@storyteller/components/src/api/w2l/GetW2lTemplateUseCount";
 import { BackLink } from "../../../_common/BackLink";
-import { motion } from "framer-motion";
-import { container, item, panel } from "../../../../../data/animation";
-import posthog from 'posthog-js'
+
+import { PosthogClient } from "@storyteller/components/src/analytics/PosthogClient";
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -21,7 +20,7 @@ interface Props {
 function W2lTemplateDeletePage(props: Props) {
   const history = useHistory();
 
-  posthog.capture('$pageview');
+  PosthogClient.recordPageview();
 
   let { templateToken }: { templateToken: string } = useParams();
 
@@ -172,19 +171,17 @@ function W2lTemplateDeletePage(props: Props) {
   }
 
   return (
-    <motion.div initial="hidden" animate="visible" variants={container}>
+    <div>
       <div className="container pt-5 pb-4 px-lg-5 px-xl-3">
         <div className="d-flex flex-column">
-          <motion.h1 className=" fw-bold" variants={item}>
-            {h1Title}
-          </motion.h1>
+          <h1 className=" fw-bold">{h1Title}</h1>
         </div>
-        <motion.div className="pt-3" variants={item}>
+        <div className="pt-3">
           <BackLink link={templateLink} text="Back to template" />
-        </motion.div>
+        </div>
       </div>
 
-      <motion.form onSubmit={handleDeleteFormSubmit} variants={panel}>
+      <form onSubmit={handleDeleteFormSubmit}>
         <div className="container-panel pt-4 pb-5">
           <div className="panel p-3 py-4 p-lg-4">
             <table className="table">
@@ -222,14 +219,14 @@ function W2lTemplateDeletePage(props: Props) {
           </div>
         </div>
 
-        <motion.div className="container" variants={item}>
+        <div className="container">
           <button className={buttonCss}>{buttonTitle}</button>
-        </motion.div>
-        <motion.div className="container pb-5" variants={item}>
+        </div>
+        <div className="container pb-5">
           <p className="pt-4">{formLabel}</p>
-        </motion.div>
-      </motion.form>
-    </motion.div>
+        </div>
+      </form>
+    </div>
   );
 }
 

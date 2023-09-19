@@ -5,9 +5,8 @@ import { useParams, Link, useHistory } from "react-router-dom";
 import { WebUrl } from "../../../../../common/WebUrl";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
-import { motion } from "framer-motion";
-import { container, item, panel } from "../../../../../data/animation";
-import posthog from 'posthog-js'
+
+import { PosthogClient } from "@storyteller/components/src/analytics/PosthogClient";
 
 const DEFAULT_VISIBILITY = "public";
 
@@ -59,7 +58,7 @@ interface Props {
 
 function TtsResultEditPage(props: Props) {
   let { token }: { token: string } = useParams();
-  posthog.capture('$pageview');
+  PosthogClient.recordPageview();
 
   const history = useHistory();
 
@@ -152,17 +151,15 @@ function TtsResultEditPage(props: Props) {
     );
 
   return (
-    <motion.div initial="hidden" animate="visible" variants={container}>
+    <div>
       <div className="container pt-5 pb-4 px-lg-5 px-xl-3">
-        <motion.h1 className=" fw-bold mb-3" variants={item}>
-          Edit Result Visibility
-        </motion.h1>
-        <motion.div variants={item}>
+        <h1 className=" fw-bold mb-3">Edit Result Visibility</h1>
+        <div>
           <Link to={resultLink}>&lt; Back to result</Link>
-        </motion.div>
+        </div>
       </div>
 
-      <motion.form onSubmit={handleFormSubmit} variants={panel}>
+      <form onSubmit={handleFormSubmit}>
         <fieldset disabled={isDisabled}>
           <div className="container-panel pt-4 pb-5">
             <div className="panel p-3 py-4 p-lg-4">
@@ -186,12 +183,12 @@ function TtsResultEditPage(props: Props) {
               </div>
             </div>
           </div>
-          <motion.div className="container" variants={item}>
+          <div className="container">
             <button className="btn btn-primary w-100 mb-5">Update</button>
-          </motion.div>
+          </div>
         </fieldset>
-      </motion.form>
-    </motion.div>
+      </form>
+    </div>
   );
 }
 

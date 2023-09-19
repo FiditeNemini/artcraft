@@ -12,10 +12,9 @@ import {
   LeaderboardLookupError,
 } from "@storyteller/components/src/api/leaderboard/GetLeaderboard";
 import { DiscordLink2 } from "@storyteller/components/src/elements/DiscordLink2";
-import { motion } from "framer-motion";
-import { container, item, panel } from "data/animation";
+
 import { usePrefixedDocumentTitle } from "common/UsePrefixedDocumentTitle";
-import posthog from 'posthog-js'
+import { PosthogClient } from "@storyteller/components/src/analytics/PosthogClient";
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -32,8 +31,8 @@ function LeaderboardPage(props: Props) {
     Array<LeaderboardRow> | undefined
   >(undefined);
   const [retryCount, setRetryCount] = useState(0);
-  
-  posthog.capture('$pageview');
+
+  PosthogClient.recordPageview();
 
   const getLeaderboard = useCallback(async () => {
     const leaderboardReponse = await GetLeaderboard();
@@ -121,23 +120,19 @@ function LeaderboardPage(props: Props) {
   }
 
   return (
-    <motion.div initial="hidden" animate="visible" variants={container}>
+    <div>
       <div className="container py-5 px-md-4 px-lg-5 px-xl-3">
         <div className="d-flex flex-column">
-          <motion.h1 className=" fw-bold" variants={item}>
-            Leaderboard
-          </motion.h1>
-          <motion.h3 className="mb-4" variants={item}>
-            Our most frequent contributors!
-          </motion.h3>
-          <motion.p className="lead" variants={item}>
+          <h1 className=" fw-bold">Leaderboard</h1>
+          <h3 className="mb-4">Our most frequent contributors!</h3>
+          <p className="lead">
             Want to be on the leaderboard?{" "}
             <DiscordLink2>Join our Discord</DiscordLink2> and learn more!
-          </motion.p>
+          </p>
         </div>
       </div>
 
-      <motion.div className="container-panel pt-5 pb-5" variants={panel}>
+      <div className="container-panel pt-5 pb-5">
         <div className="panel p-3 p-lg-4">
           <h2 className="panel-title fw-bold">TTS Models Uploaded</h2>
           <div className="py-6">
@@ -146,9 +141,9 @@ function LeaderboardPage(props: Props) {
             </table>
           </div>
         </div>
-      </motion.div>
+      </div>
 
-      <motion.div className="container-panel pt-3 pb-5" variants={panel}>
+      <div className="container-panel pt-3 pb-5">
         <div className="panel p-3 p-lg-4">
           <h2 className="panel-title fw-bold">W2L Templates Uploaded</h2>
           <div className="py-6">
@@ -157,8 +152,8 @@ function LeaderboardPage(props: Props) {
             </table>
           </div>
         </div>
-      </motion.div>
-    </motion.div>
+      </div>
+    </div>
   );
 }
 

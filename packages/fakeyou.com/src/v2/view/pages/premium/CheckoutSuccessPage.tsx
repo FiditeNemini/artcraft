@@ -1,9 +1,8 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { motion } from "framer-motion";
-import { container, item, image } from "../../../../data/animation";
+
 import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
-import posthog from 'posthog-js'
+import { PosthogClient } from "@storyteller/components/src/analytics/PosthogClient";
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -11,47 +10,42 @@ interface Props {
 }
 
 function CheckoutSuccessPage(props: Props) {
-  posthog.capture('$pageview');
+  PosthogClient.recordPageview();
 
   return (
-    <motion.div initial="hidden" animate="visible" variants={container}>
+    <div>
       <div className="container mb-4">
         <div className="row gx-3 flex-lg-row-reverse align-items-center">
           <div className="col-lg-6">
             <div className="d-flex justify-content-center">
-              <motion.img
+              <img
                 src="/mascot/kitsune_pose3.webp"
                 className="img-fluid"
                 width="516"
                 height="444"
                 alt="FakeYou Kitsune Mascot!"
-                variants={image}
               />
             </div>
           </div>
           <div className="col-lg-6 px-md-2 ps-lg-5 ps-xl-2">
             <div className="text-center text-lg-start">
               <div>
-                <motion.h1 className=" fw-bold lh-1 mb-4" variants={item}>
-                  Thank you!
-                </motion.h1>
+                <h1 className=" fw-bold lh-1 mb-4">Thank you!</h1>
               </div>
               <br />
               <div>
-                <motion.p className="lead" variants={item}>
+                <p className="lead">
                   We're grateful you're helping FakeYou build the future
                   creative suite. We're building tools for small creators and
                   have an eye on building a full AI-powered Hollywood and music
                   production studio.
-                </motion.p>
+                </p>
                 <br />
-                <motion.p className="lead" variants={item}>
-                  Your support helps us immensely!
-                </motion.p>
+                <p className="lead">Your support helps us immensely!</p>
                 <br />
-                <motion.p className="lead" variants={item}>
+                <p className="lead">
                   Please give it a few minutes for your purchase to take effect.
-                </motion.p>
+                </p>
               </div>
             </div>
           </div>
@@ -64,7 +58,7 @@ function CheckoutSuccessPage(props: Props) {
           </div>
         </div>
       </div>
-    </motion.div>
+    </div>
   );
 }
 

@@ -1,6 +1,4 @@
 import React from "react";
-import { motion } from "framer-motion";
-import { image } from "../../../data/animation";
 
 interface Props {
   headerImage: string;
@@ -17,11 +15,10 @@ function PageHeaderWithImage(props: Props) {
       <div className="panel">
         <div className="row gx-3 flex-md-row-reverse">
           <div className="col-12 col-md-5 hero-img-container d-none d-md-block">
-            <motion.img
+            <img
               src={props.headerImage}
               className="hero-img"
-              alt="Hero Image"
-              variants={image}
+              alt="Hero Header"
             />
           </div>
           <div className="col-12 col-md-7">

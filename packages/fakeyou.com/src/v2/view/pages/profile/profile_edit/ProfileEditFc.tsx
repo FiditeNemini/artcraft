@@ -19,9 +19,8 @@ import {
   faGlobe,
 } from "@fortawesome/free-solid-svg-icons";
 import { BackLink } from "../../../_common/BackLink";
-import { motion } from "framer-motion";
-import { container, item, panel } from "../../../../../data/animation";
-import posthog from 'posthog-js'
+
+import { PosthogClient } from "@storyteller/components/src/analytics/PosthogClient";
 
 const DEFAULT_VISIBILITY = "public";
 
@@ -62,8 +61,8 @@ interface UserPayload {
 
 function ProfileEditFc(props: Props) {
   const { username } = useParams() as { username: string };
-  posthog.capture('$pageview');
-  
+  PosthogClient.recordPageview();
+
   const userProfilePage = `/profile/${username}`;
 
   const history = useHistory();
@@ -237,17 +236,15 @@ function ProfileEditFc(props: Props) {
     );
 
   return (
-    <motion.div initial="hidden" animate="visible" variants={container}>
+    <div>
       <div className="container pt-5 pb-4 px-lg-5 px-xl-3">
-        <motion.h1 className=" fw-bold mb-3" variants={item}>
-          Profile &amp; Preferences
-        </motion.h1>
-        <motion.div variants={item}>
+        <h1 className=" fw-bold mb-3">Profile &amp; Preferences</h1>
+        <div>
           <BackLink link={viewLinkUrl} text="Back to profile" />
-        </motion.div>
+        </div>
       </div>
 
-      <motion.form onSubmit={handleFormSubmit} variants={panel}>
+      <form onSubmit={handleFormSubmit}>
         <fieldset disabled={isDisabled}>
           <div className="container-panel py-5">
             <div className="panel p-3 p-lg-4">
@@ -301,7 +298,7 @@ function ProfileEditFc(props: Props) {
             </div>
           </div>
 
-          <motion.div className="container-panel pt-3 pb-5" variants={panel}>
+          <div className="container-panel pt-3 pb-5">
             <div className="panel p-3 p-lg-4">
               <h2 className="panel-title fw-bold">Profile Picture</h2>
               <div className="py-6">
@@ -323,9 +320,9 @@ function ProfileEditFc(props: Props) {
                 </p>
               </div>
             </div>
-          </motion.div>
+          </div>
 
-          <motion.div className="container-panel pt-3 pb-5" variants={panel}>
+          <div className="container-panel pt-3 pb-5">
             <div className="panel p-3 p-lg-4">
               <h2 className="panel-title fw-bold">Profile Details</h2>
               <div className="py-6">
@@ -507,15 +504,15 @@ function ProfileEditFc(props: Props) {
                 </div>
               </div>
             </div>
-          </motion.div>
+          </div>
 
-          <motion.div className="container" variants={item}>
+          <div className="container">
             <button className="btn btn-primary w-100">Update</button>
-          </motion.div>
+          </div>
         </fieldset>
-      </motion.form>
+      </form>
 
-      <motion.div className="container-panel pt-5" variants={item}>
+      <div className="container-panel pt-5">
         <div className="panel p-4 mt-5">
           <h4 className="fw-semibold mb-3">Cancel My Subscription</h4>
           <p className="mb-4 fs-14">
@@ -527,8 +524,8 @@ function ProfileEditFc(props: Props) {
             </Link>
           </div>
         </div>
-      </motion.div>
-    </motion.div>
+      </div>
+    </div>
   );
 }
 

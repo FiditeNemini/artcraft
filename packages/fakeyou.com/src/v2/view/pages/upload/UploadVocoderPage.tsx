@@ -10,11 +10,10 @@ import { v4 as uuidv4 } from "uuid";
 import { BackLink } from "../../_common/BackLink";
 import { Link } from "react-router-dom";
 import { WebUrl } from "../../../../common/WebUrl";
-import { motion } from "framer-motion";
-import { container, item, panel } from "../../../../data/animation";
+
 import { VocoderUploadJob } from "@storyteller/components/src/jobs/VocoderUploadJobs";
 import { SessionVocoderUploadResultList } from "../../_common/SessionVocoderUploadResultsList";
-import posthog from 'posthog-js'
+import { PosthogClient } from "@storyteller/components/src/analytics/PosthogClient";
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -23,7 +22,7 @@ interface Props {
 }
 
 function UploadVocoderPage(props: Props) {
-  posthog.capture('$pageview');
+  PosthogClient.recordPageview();
   let history = useHistory();
 
   const [downloadUrl, setDownloadUrl] = useState("");
@@ -88,26 +87,21 @@ function UploadVocoderPage(props: Props) {
   };
 
   return (
-    <motion.div initial="hidden" animate="visible" variants={container}>
+    <div>
       <div className="container pt-5 pb-4 px-md-4 px-lg-5 px-xl-3">
         <div className="d-flex flex-column">
-          <motion.h1 className=" fw-bold" variants={item}>
-            Upload Vocoder Model
-          </motion.h1>
-          <motion.h4 variants={item}>Make your voice sound better!</motion.h4>
-          <motion.div className="my-3" variants={item}>
+          <h1 className=" fw-bold">Upload Vocoder Model</h1>
+          <h4>Make your voice sound better!</h4>
+          <div className="my-3">
             <BackLink
               link={WebUrl.contributePage()}
               text="Back to contribute page"
             />
-          </motion.div>
+          </div>
         </div>
       </div>
 
-      <motion.div
-        className="container pt-3 d-flex flex-column gap-3 px-md-4 px-lg-5 px-xl-3"
-        variants={item}
-      >
+      <div className="container pt-3 d-flex flex-column gap-3 px-md-4 px-lg-5 px-xl-3">
         <p>
           If you're new to voice cloning, join our{" "}
           <span>
@@ -127,9 +121,9 @@ function UploadVocoderPage(props: Props) {
         Please do not upload voices that you didn't train yourself or voices of individuals
         who wish to not be voice cloned. We'll post a list of banned voices soon.
       </p>*/}
-      </motion.div>
+      </div>
 
-      <motion.form onSubmit={handleFormSubmit} variants={panel}>
+      <form onSubmit={handleFormSubmit}>
         <div className="container-panel py-5">
           <div className="panel p-3 py-4 p-lg-4">
             <div className="d-flex flex-column gap-4">
@@ -172,15 +166,15 @@ function UploadVocoderPage(props: Props) {
           </div>
         </div>
 
-        <motion.div className="container pb-5" variants={item}>
+        <div className="container pb-5">
           <button className="btn btn-primary w-100">Upload</button>
-        </motion.div>
-      </motion.form>
+        </div>
+      </form>
 
       <SessionVocoderUploadResultList
         vocoderUploadJobs={props.vocoderUploadJobs}
       />
-    </motion.div>
+    </div>
   );
 }
 

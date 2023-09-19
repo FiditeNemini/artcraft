@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { motion } from "framer-motion";
+
 import { v4 as uuidv4 } from "uuid";
-import { container, panel } from "../../../../../data/animation";
+
 import { SessionSubscriptionsWrapper } from "@storyteller/components/src/session/SessionSubscriptionsWrapper";
 import { VcPageHero } from "./components/VcPageHero";
 import {
@@ -33,7 +33,7 @@ import {
 import { SessionVoiceConversionResultsList } from "../../../_common/SessionVoiceConversionResultsList";
 import PitchShiftComponent from "./components/PitchShiftComponent";
 import PitchEstimateMethodComponent from "./components/PitchEstimateMethodComponent";
-import posthog from 'posthog-js'
+import { PosthogClient } from "@storyteller/components/src/analytics/PosthogClient";
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -59,7 +59,7 @@ interface Props {
 
 function VcModelListPage(props: Props) {
   usePrefixedDocumentTitle("Voice Conversion");
-  posthog.capture('$pageview');
+  PosthogClient.recordPageview();
 
   const [convertLoading, setConvertLoading] = useState(false);
   const [canConvert, setCanConvert] = useState(false);
@@ -74,8 +74,9 @@ function VcModelListPage(props: Props) {
 
   const [autoConvertF0, setAutoConvertF0] = useState(false);
 
-  const [maybeF0MethodOverride, setMaybeF0MethodOverride] = 
-    useState<EnqueueVoiceConversionFrequencyMethod | undefined>(undefined);
+  const [maybeF0MethodOverride, setMaybeF0MethodOverride] = useState<
+    EnqueueVoiceConversionFrequencyMethod | undefined
+  >(undefined);
 
   const [semitones, setSemitones] = useState(0);
 
@@ -199,9 +200,7 @@ function VcModelListPage(props: Props) {
     changeConvertIdempotencyToken();
   };
 
-  const handleAutoF0Change = (
-    ev: React.FormEvent<HTMLInputElement>
-  ) => {
+  const handleAutoF0Change = (ev: React.FormEvent<HTMLInputElement>) => {
     const value = (ev.target as HTMLInputElement).checked;
     setAutoConvertF0(value);
     changeConvertIdempotencyToken();
@@ -217,13 +216,13 @@ function VcModelListPage(props: Props) {
     props.maybeSelectedVoiceConversionModel !== undefined;
 
   return (
-    <motion.div initial="hidden" animate="visible" variants={container}>
+    <div>
       <VcPageHero
         sessionWrapper={props.sessionWrapper}
         sessionSubscriptionsWrapper={props.sessionSubscriptionsWrapper}
       />
 
-      {/* <motion.div variants={panel} className="container">
+      {/* <div  className="container">
         <div className="alert alert-info">
           <FontAwesomeIcon icon={faMoneyBill} className="me-2" />
           <span className="fw-medium">
@@ -234,9 +233,9 @@ function VcModelListPage(props: Props) {
             See details <FontAwesomeIcon icon={faArrowRight} className="ms-1" />
           </Link>
         </div>
-      </motion.div> */}
+      </div> */}
 
-      <motion.div className="container-panel pb-5 mb-4" variants={panel}>
+      <div className="container-panel pb-5 mb-4">
         <div className="panel p-3 py-4 p-md-4">
           <div className="d-flex gap-4">
             <form
@@ -339,14 +338,17 @@ function VcModelListPage(props: Props) {
                               />
                             </div>
                             <div className="form-check">
-                              <input 
-                                id="autoF0Checkbox" 
-                                className="form-check-input" 
-                                type="checkbox" 
+                              <input
+                                id="autoF0Checkbox"
+                                className="form-check-input"
+                                type="checkbox"
                                 checked={autoConvertF0}
                                 onChange={handleAutoF0Change}
-                                />
-                              <label className="form-check-label" htmlFor="autoF0Checkbox">
+                              />
+                              <label
+                                className="form-check-label"
+                                htmlFor="autoF0Checkbox"
+                              >
                                 Auto F0 (off for singing, on for speech)
                               </label>
                             </div>
@@ -440,14 +442,17 @@ function VcModelListPage(props: Props) {
                               />
                             </div>
                             <div className="form-check">
-                              <input 
-                                id="autoF0CheckboxMic" 
-                                className="form-check-input" 
-                                type="checkbox" 
+                              <input
+                                id="autoF0CheckboxMic"
+                                className="form-check-input"
+                                type="checkbox"
                                 checked={autoConvertF0}
                                 onChange={handleAutoF0Change}
-                                />
-                              <label className="form-check-label" htmlFor="autoF0CheckboxMic">
+                              />
+                              <label
+                                className="form-check-label"
+                                htmlFor="autoF0CheckboxMic"
+                              >
                                 Auto F0 (off for singing, on for speech)
                               </label>
                             </div>
@@ -508,8 +513,8 @@ function VcModelListPage(props: Props) {
         {/* <div className="pt-5">
           <BackLink link="/" text="Back to main page" />
         </div> */}
-      </motion.div>
-    </motion.div>
+      </div>
+    </div>
   );
 }
 

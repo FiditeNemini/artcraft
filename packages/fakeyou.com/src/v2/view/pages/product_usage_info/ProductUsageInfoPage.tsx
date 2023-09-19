@@ -1,9 +1,8 @@
 import React, { useState } from "react";
 import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
-import { motion } from "framer-motion";
-import { container, panel } from "data/animation";
+
 import { usePrefixedDocumentTitle } from "common/UsePrefixedDocumentTitle";
-import posthog from 'posthog-js'
+import { PosthogClient } from "@storyteller/components/src/analytics/PosthogClient";
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -47,7 +46,7 @@ const radioButtonsWhy = [
 
 function ProductUsageInfoPage(props: Props) {
   usePrefixedDocumentTitle("Product Usage Survey");
-  posthog.capture('$pageview');
+  PosthogClient.recordPageview();
 
   const [selectedOptionWho, setSelectedOptionWho] = useState("");
   const [selectedOptionWhy, setSelectedOptionWhy] = useState("");
@@ -61,11 +60,8 @@ function ProductUsageInfoPage(props: Props) {
   };
 
   return (
-    <motion.div initial="hidden" animate="visible" variants={container}>
-      <motion.div
-        className="container-panel pt-lg-5 my-lg-5 login-panel"
-        variants={panel}
-      >
+    <div>
+      <div className="container-panel pt-lg-5 my-lg-5 login-panel">
         <div className="panel p-4 p-lg-4 mt-5 mt-lg-0 px-md-4">
           <h2 className="fw-bold pb-0">Product Usage Survey</h2>
           <hr className="my-4" />
@@ -138,8 +134,8 @@ function ProductUsageInfoPage(props: Props) {
             <button className="btn btn-primary">Submit</button>
           </form>
         </div>
-      </motion.div>
-    </motion.div>
+      </div>
+    </div>
   );
 }
 

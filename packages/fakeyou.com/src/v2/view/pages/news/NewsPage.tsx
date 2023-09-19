@@ -1,17 +1,16 @@
 import React, { useEffect } from "react";
 import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
-import { motion } from "framer-motion";
+
 import { SessionSubscriptionsWrapper } from "@storyteller/components/src/session/SessionSubscriptionsWrapper";
-import { container, item } from "../../../../data/animation";
+
 import { usePrefixedDocumentTitle } from "../../../../common/UsePrefixedDocumentTitle";
 import { TwitchPlayer, TwitchChat } from "react-twitch-embed";
-//import axios from "axios";
 import { Link } from "react-router-dom";
 import { WebUrl } from "../../../../common/WebUrl";
 import { DiscordLink2 } from "@storyteller/components/src/elements/DiscordLink2";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faStar } from "@fortawesome/pro-solid-svg-icons";
-import posthog from 'posthog-js'
+import { PosthogClient } from "@storyteller/components/src/analytics/PosthogClient";
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -44,7 +43,7 @@ const TWITCH_CHANNEL = "FakeYouLabs";
 
 function NewsPage(props: Props) {
   usePrefixedDocumentTitle("AI News");
-  posthog.capture('$pageview');
+  PosthogClient.recordPageview();
 
   //const [stream, setStream] = useState<StreamInfo>({
   //  broadcaster_name: "",
@@ -113,18 +112,18 @@ function NewsPage(props: Props) {
   }
 
   return (
-    <motion.div initial="hidden" animate="visible" variants={container}>
+    <div>
       <div className="container-panel py-1 py-lg-4 px-md-4 px-lg-5 px-xl-3">
         <div className="row gx-3 gy-3">
           <div className="col-12 col-lg-8 d-flex flex-column gap-3">
             {/* <div className="d-flex flex-column ms-3 ms-lg-0">
-              <motion.h1 className="fw-bold" variants={item}>
+              <h1 className="fw-bold" >
                 Media Feed
-              </motion.h1>
+              </h1>
             </div> */}
 
             {/* Feed Content */}
-            <motion.div variants={item} className="d-flex flex-column gap-3">
+            <div className="d-flex flex-column gap-3">
               <TwitchPlayer
                 channel={TWITCH_CHANNEL}
                 width="100%"
@@ -178,7 +177,7 @@ function NewsPage(props: Props) {
                   Want to give us feedback? Please join our <DiscordLink2 />.
                 </p>
               </div>
-            </motion.div>
+            </div>
           </div>
 
           {/* Side column */}
@@ -192,7 +191,7 @@ function NewsPage(props: Props) {
           </div>
         </div>
       </div>
-    </motion.div>
+    </div>
   );
 }
 

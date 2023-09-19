@@ -10,11 +10,10 @@ import { v4 as uuidv4 } from "uuid";
 import { BackLink } from "../../_common/BackLink";
 import { Link } from "react-router-dom";
 import { WebUrl } from "../../../../common/WebUrl";
-import { motion } from "framer-motion";
-import { container, item, panel } from "../../../../data/animation";
+
 import { VoiceConversionModelUploadJob } from "@storyteller/components/src/jobs/VoiceConversionModelUploadJob";
 import { SessionVoiceConversionModelUploadResultList } from "../../_common/SessionVoiceConversionModelUploadResultsList";
-import posthog from 'posthog-js'
+import { PosthogClient } from "@storyteller/components/src/analytics/PosthogClient";
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -24,7 +23,7 @@ interface Props {
 
 function UploadVoiceConversionModel(props: Props) {
   let history = useHistory();
-  posthog.capture('$pageview');
+  PosthogClient.recordPageview();
 
   const [downloadUrl, setDownloadUrl] = useState("");
   const [title, setTitle] = useState("");
@@ -93,28 +92,21 @@ function UploadVoiceConversionModel(props: Props) {
   };
 
   return (
-    <motion.div initial="hidden" animate="visible" variants={container}>
+    <div>
       <div className="container pt-5 pb-3 px-md-4 px-lg-5 px-xl-3">
         <div className="d-flex flex-column">
-          <motion.h1 className=" fw-bold" variants={item}>
-            Upload Voice to Voice Model
-          </motion.h1>
-          <motion.h4 variants={item}>
-            Transform your voice into another!
-          </motion.h4>
-          <motion.div className="my-3" variants={item}>
+          <h1 className=" fw-bold">Upload Voice to Voice Model</h1>
+          <h4>Transform your voice into another!</h4>
+          <div className="my-3">
             <BackLink
               link={WebUrl.contributePage()}
               text="Back to contribute page"
             />
-          </motion.div>
+          </div>
         </div>
       </div>
 
-      <motion.div
-        className="container pt-3 d-flex flex-column gap-3 px-md-4 px-lg-5 px-xl-3"
-        variants={item}
-      >
+      <div className="container pt-3 d-flex flex-column gap-3 px-md-4 px-lg-5 px-xl-3">
         <p>
           If you're new to voice cloning, join our{" "}
           <span>
@@ -129,18 +121,15 @@ function UploadVoiceConversionModel(props: Props) {
           able to use it from the main page. Others will be able to use it too,
           and you'll get credited.
         </p>
-      </motion.div>
+      </div>
 
-      <motion.form onSubmit={handleFormSubmit} variants={panel}>
+      <form onSubmit={handleFormSubmit}>
         <div className="container-panel py-5">
           <div className="panel p-3 py-4 p-lg-4">
             <div className="d-flex flex-column gap-4">
-
               {/* Model Type */}
               <div>
-                <label className="sub-title">
-                  Voice-to-Voice Model Type
-                </label>
+                <label className="sub-title">Voice-to-Voice Model Type</label>
                 <div className="control select">
                   <select
                     className="form-select"
@@ -148,12 +137,8 @@ function UploadVoiceConversionModel(props: Props) {
                     onChange={handleModelTypeChange}
                     value={modelType}
                   >
-                    <option value="so_vits_svc">
-                      so-vits-svc
-                    </option>
-                    <option value="rvc_v2">
-                      rvc (v2)
-                    </option>
+                    <option value="so_vits_svc">so-vits-svc</option>
+                    <option value="rvc_v2">rvc (v2)</option>
                   </select>
                 </div>
               </div>
@@ -195,15 +180,15 @@ function UploadVoiceConversionModel(props: Props) {
           </div>
         </div>
 
-        <motion.div className="container pb-5" variants={item}>
+        <div className="container pb-5">
           <button className="btn btn-primary w-100">Upload</button>
-        </motion.div>
-      </motion.form>
+        </div>
+      </form>
 
       <SessionVoiceConversionModelUploadResultList
         voiceConversionModelUploadJobs={props.voiceConversionModelUploadJobs}
       />
-    </motion.div>
+    </div>
   );
 }
 

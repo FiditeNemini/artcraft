@@ -2,8 +2,6 @@ import React from "react";
 import { Link } from "react-router-dom";
 import { JobState } from "@storyteller/components/src/jobs/JobStates";
 import { W2lTemplateUploadJob } from "@storyteller/components/src/jobs/W2lTemplateUploadJobs";
-import { motion } from "framer-motion";
-import { container, item, sessionItem } from "../../../data/animation";
 
 interface Props {
   w2lTemplateUploadJobs: Array<W2lTemplateUploadJob>;
@@ -55,15 +53,12 @@ function SessionW2lTemplateUploadResultList(props: Props) {
 
       results.push(
         <div key={job.jobToken}>
-          <motion.div
-            className="panel py-4 p-3 p-lg-4 gap-4"
-            variants={sessionItem}
-          >
+          <div className="panel py-4 p-3 p-lg-4 gap-4">
             Complete!
             <Link to={w2lPermalink} className="btn btn-primary ms-4">
               See &amp; use template
             </Link>
-          </motion.div>
+          </div>
         </div>
       );
     }
@@ -72,9 +67,9 @@ function SessionW2lTemplateUploadResultList(props: Props) {
   let title = <span />;
   if (results.length !== 0) {
     title = (
-      <motion.h2 className="text-center text-lg-start fw-bold" variants={item}>
+      <h2 className="text-center text-lg-start fw-bold">
         W2L Template Upload Status
-      </motion.h2>
+      </h2>
     );
   }
 
@@ -85,12 +80,12 @@ function SessionW2lTemplateUploadResultList(props: Props) {
   }
 
   return (
-    <motion.div initial="hidden" animate="visible" variants={container}>
+    <div>
       <div className="container-panel pt-4 pb-5">
         <div className="pb-4">{title}</div>
         <div className="d-flex flex-column gap-4">{results}</div>
       </div>
-    </motion.div>
+    </div>
   );
 }
 

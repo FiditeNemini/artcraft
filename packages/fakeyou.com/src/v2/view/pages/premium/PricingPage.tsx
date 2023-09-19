@@ -10,14 +10,13 @@ import {
   CreateStripePortalRedirectIsError,
   CreateStripePortalRedirectIsSuccess,
 } from "@storyteller/components/src/api/premium/CreateStripePortalRedirect";
-import { motion } from "framer-motion";
-import { container, item, panel } from "../../../../data/animation";
+
 import { FakeYouFrontendEnvironment } from "@storyteller/components/src/env/FakeYouFrontendEnvironment";
 import { Analytics } from "../../../../common/Analytics";
 import { WebUrl } from "../../../../common/WebUrl";
 import { BeginStripeCheckoutFlow } from "../../../../common/BeginStripeCheckoutFlow";
 import { usePrefixedDocumentTitle } from "../../../../common/UsePrefixedDocumentTitle";
-import posthog from 'posthog-js'
+import { PosthogClient } from "@storyteller/components/src/analytics/PosthogClient";
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -26,7 +25,7 @@ interface Props {
 
 function PricingPage(props: Props) {
   let history = useHistory();
-  posthog.capture('$pageview');
+  PosthogClient.recordPageview();
 
   const beginStripePortalFlow = async (): Promise<boolean> => {
     const response = await CreateStripePortalRedirect();
@@ -148,26 +147,21 @@ function PricingPage(props: Props) {
   }
 
   return (
-    <motion.div initial="hidden" animate="visible" variants={container}>
+    <div>
       <div className="container pt-5 pb-4 text-center">
-        <motion.h1 className=" fw-bold" variants={item}>
-          Pricing
-        </motion.h1>
+        <h1 className=" fw-bold">Pricing</h1>
         {/* <p className="fs-5">
           By purchasing FakeYou premium, you help us build more!
         </p> */}
-        <motion.div
-          className="alert alert-warning mt-4 alert-pricing mb-2"
-          variants={item}
-        >
+        <div className="alert alert-warning mt-4 alert-pricing mb-2">
           <FontAwesomeIcon icon={faHeart} className="text-red me-3" />
           By purchasing FakeYou premium, you help us build more!
-        </motion.div>
+        </div>
       </div>
       <div className="container mb-5">
         <div className="row gx-3 gy-4">
           {/* Starter Tier */}
-          {/*<motion.div className="col-12 col-sm-6 col-lg-3" variants={panel}>
+          {/*<div className="col-12 col-sm-6 col-lg-3" >
             <div className="rounded panel p-4 h-100">
               <h2 className="text-center my-2 fw-bold mb-4">
                 {FYP.starter.tier}
@@ -218,11 +212,11 @@ function PricingPage(props: Props) {
                 })}
               </ul>
             </div>
-          </motion.div>
+          </div>
               */}
 
           {/* Plus Tier */}
-          <motion.div className="col-12 col-sm-6 col-lg-4" variants={panel}>
+          <div className="col-12 col-sm-6 col-lg-4">
             <div className="rounded panel p-4 h-100">
               <h2 className="text-center my-2 fw-bold mb-4">{FYP.plus.tier}</h2>
               <button
@@ -319,10 +313,10 @@ function PricingPage(props: Props) {
                 + Future feature updates
               </h6>
             </div>
-          </motion.div>
+          </div>
 
           {/* Pro Tier */}
-          <motion.div className="col-12 col-sm-6 col-lg-4" variants={panel}>
+          <div className="col-12 col-sm-6 col-lg-4">
             <div className={proBorderCss}>
               <h2 className="text-center my-2 fw-bold mb-4">{FYP.pro.tier}</h2>
               <button
@@ -457,10 +451,10 @@ function PricingPage(props: Props) {
                 + Future feature updates
               </h6>
             </div>
-          </motion.div>
+          </div>
 
           {/* Elite Tier */}
-          <motion.div className="col-12 col-sm-6 col-lg-4" variants={panel}>
+          <div className="col-12 col-sm-6 col-lg-4">
             <div className="rounded panel p-4 h-100">
               <h2 className="text-center my-2 fw-bold mb-4">
                 {FYP.elite.tier}
@@ -609,7 +603,7 @@ function PricingPage(props: Props) {
                 + Future feature updates
               </h6>
             </div>
-          </motion.div>
+          </div>
         </div>
 
         {unsubscribeSection}
@@ -719,7 +713,7 @@ function PricingPage(props: Props) {
           </div>
         </div> */}
       </div>
-    </motion.div>
+    </div>
   );
 }
 

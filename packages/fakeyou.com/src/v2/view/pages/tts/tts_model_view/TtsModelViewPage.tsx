@@ -48,8 +48,7 @@ import {
   faBarsStaggered,
   faLock,
 } from "@fortawesome/free-solid-svg-icons";
-import { motion } from "framer-motion";
-import { container, item, panel } from "../../../../../data/animation";
+
 import { SessionSubscriptionsWrapper } from "@storyteller/components/src/session/SessionSubscriptionsWrapper";
 import {
   TwitterShareButton,
@@ -67,7 +66,7 @@ import { RatingButtons } from "../../../_common/ratings/RatingButtons";
 import { RatingStats } from "../../../_common/ratings/RatingStats";
 import { CommentComponent } from "../../../_common/comments/CommentComponent";
 import { InferenceJob } from "@storyteller/components/src/jobs/InferenceJob";
-import posthog from 'posthog-js'
+import { PosthogClient } from "@storyteller/components/src/analytics/PosthogClient";
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -82,7 +81,7 @@ interface Props {
 
 function TtsModelViewPage(props: Props) {
   let { token } = useParams() as { token: string };
-  posthog.capture('$pageview');
+  PosthogClient.recordPageview();
 
   const [ttsModel, setTtsModel] = useState<TtsModel | undefined>(undefined);
   const [ttsModelUseCount, setTtsModelUseCount] = useState<number | undefined>(
@@ -344,7 +343,7 @@ function TtsModelViewPage(props: Props) {
   if (!!ttsModel?.description_rendered_html) {
     modelDescription = (
       <>
-        <motion.div className="container-panel pt-3 pb-5" variants={panel}>
+        <div className="container-panel pt-3 pb-5">
           <div className="panel p-3 p-lg-4">
             <h2 className="panel-title fw-bold">Model Description</h2>
             <div className="py-6">
@@ -355,7 +354,7 @@ function TtsModelViewPage(props: Props) {
               />
             </div>
           </div>
-        </motion.div>
+        </div>
       </>
     );
   }
@@ -416,7 +415,7 @@ function TtsModelViewPage(props: Props) {
 
     modelCategoriesSection = (
       <>
-        <motion.div className="container-panel pt-3 pb-5" variants={panel}>
+        <div className="container-panel pt-3 pb-5">
           <div className="panel p-3 p-lg-4">
             <h2 className="panel-title fw-bold">Model Categories</h2>
             <div className="py-6">
@@ -424,7 +423,7 @@ function TtsModelViewPage(props: Props) {
               {editModelCategoriesButton}
             </div>
           </div>
-        </motion.div>
+        </div>
       </>
     );
   }
@@ -706,12 +705,10 @@ function TtsModelViewPage(props: Props) {
   //const createdAtRelative = createdAt !== undefined ? formatDistance(createdAt, new Date(), { addSuffix: true }) : undefined;
 
   return (
-    <motion.div initial="hidden" animate="visible" variants={container}>
+    <div>
       <div className="container py-5">
         <div className="d-flex flex-column">
-          <motion.h1 className="fw-bold mb-3" variants={item}>
-            {title}
-          </motion.h1>
+          <h1 className="fw-bold mb-3">{title}</h1>
           {/* Rate Voice Model Buttons */}
           <div className="d-flex gap-3">
             {ratingButtons}
@@ -723,16 +720,16 @@ function TtsModelViewPage(props: Props) {
             />
           </div>
         </div>
-        <motion.div className="mb-3 mt-4 pt-2" variants={item}>
+        <div className="mb-3 mt-4 pt-2">
           <BackLink link="/" text="Back to all models" />
-        </motion.div>
+        </div>
       </div>
 
       <div>{modelDescription}</div>
 
       <div>{modelCategoriesSection}</div>
 
-      <motion.div className="container-panel pt-3 pb-5" variants={panel}>
+      <div className="container-panel pt-3 pb-5">
         <div className="panel p-3 p-lg-4">
           <h2 className="panel-title fw-bold">TTS Model Details</h2>
           <div className="py-6">
@@ -781,9 +778,9 @@ function TtsModelViewPage(props: Props) {
             </table>
           </div>
         </div>
-      </motion.div>
+      </div>
 
-      <motion.div className="container-panel pt-3 pb-5" variants={panel}>
+      <div className="container-panel pt-3 pb-5">
         <div className="panel p-3 p-lg-4">
           <h2 className="panel-title fw-bold">Vocoder Details</h2>
           <div className="py-6">
@@ -792,18 +789,18 @@ function TtsModelViewPage(props: Props) {
             </table>
           </div>
         </div>
-      </motion.div>
+      </div>
 
-      <motion.div variants={panel}>{moderatorRows}</motion.div>
+      <div>{moderatorRows}</div>
 
-      <motion.div className="container pb-4" variants={panel}>
+      <div className="container pb-4">
         <div className="d-flex flex-column flex-md-row gap-3">
           {editModelButton}
           {deleteModelButton}
         </div>
-      </motion.div>
+      </div>
 
-      <motion.div className="container-panel py-5" variants={panel}>
+      <div className="container-panel py-5">
         <div className="panel p-3 p-lg-4">
           <h2 className="panel-title fw-bold">Use Model</h2>
           <div className="py-6">
@@ -832,17 +829,15 @@ function TtsModelViewPage(props: Props) {
             </form>
           </div>
         </div>
-      </motion.div>
+      </div>
 
-      <motion.div className="container-panel pt-4 pb-5" variants={item}>
-        {socialSharing}
-      </motion.div>
+      <div className="container-panel pt-4 pb-5">{socialSharing}</div>
 
-      <motion.div className="container pb-5" variants={item}>
+      <div className="container pb-5">
         <BackLink link="/" text="Back to all models" />
-      </motion.div>
+      </div>
 
-      <motion.div className="container-panel pt-4 pb-5" variants={item}>
+      <div className="container-panel pt-4 pb-5">
         <div className="panel p-3 p-lg-4">
           <h2 className="fw-bold panel-title">Comments</h2>
           <div className="py-6">
@@ -853,9 +848,9 @@ function TtsModelViewPage(props: Props) {
             />
           </div>
         </div>
-      </motion.div>
+      </div>
 
-      <motion.div className="container" variants={item}>
+      <div className="container">
         <h4 className="text-center text-lg-start mb-4">
           <FontAwesomeIcon icon={faBarsStaggered} className="me-3" />
           Session TTS Results
@@ -865,8 +860,8 @@ function TtsModelViewPage(props: Props) {
           ttsInferenceJobs={props.ttsInferenceJobs}
           sessionSubscriptionsWrapper={props.sessionSubscriptionsWrapper}
         />
-      </motion.div>
-    </motion.div>
+      </div>
+    </div>
   );
 }
 

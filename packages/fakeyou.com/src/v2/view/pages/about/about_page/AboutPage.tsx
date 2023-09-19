@@ -1,51 +1,47 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { motion } from "framer-motion";
-import { container, item, image, panel } from "../../../../../data/animation";
+
 import { usePrefixedDocumentTitle } from "../../../../../common/UsePrefixedDocumentTitle";
-import posthog from 'posthog-js'
+import { PosthogClient } from "@storyteller/components/src/analytics/PosthogClient";
 
 interface Props {}
 
 function AboutPage(props: Props) {
-  posthog.capture('$pageview');
+  PosthogClient.recordPageview();
   usePrefixedDocumentTitle("About Us");
 
   return (
-    <motion.div initial="hidden" animate="visible" variants={container}>
+    <div>
       <div className="container mb-4">
         <div className="row gx-3 flex-lg-row-reverse align-items-center">
           <div className="col-lg-6">
             <div className="d-flex justify-content-center">
-              <motion.img
+              <img
                 src="/mascot/kitsune_pose3.webp"
                 className="img-fluid"
                 width="516"
                 height="444"
                 alt="FakeYou Kitsune Mascot!"
-                variants={image}
               />
             </div>
           </div>
           <div className="col-lg-6 px-md-2 ps-lg-5 ps-xl-2">
             <div className="text-center text-lg-start">
               <div>
-                <motion.h1 className=" fw-bold lh-1 mb-4" variants={item}>
-                  A Glimpse of the Future
-                </motion.h1>
+                <h1 className=" fw-bold lh-1 mb-4">A Glimpse of the Future</h1>
               </div>
               <div>
-                <motion.p className="lead" variants={item}>
+                <p className="lead">
                   We're building FakeYou as just one component of a broad set of
                   production and creative tooling.
-                </motion.p>
+                </p>
               </div>
             </div>
           </div>
         </div>
       </div>
 
-      <motion.div className="container-panel pt-4 pb-5" variants={panel}>
+      <div className="container-panel pt-4 pb-5">
         <div className="panel p-3 p-lg-4 load-hidden mt-5 mt-lg-0">
           <h1 className="panel-title fw-bold">About FakeYou</h1>
           <div className="py-6 d-flex flex-column gap-4">
@@ -306,8 +302,8 @@ function AboutPage(props: Props) {
             </div>
           </div>
         </div>
-      </motion.div>
-    </motion.div>
+      </div>
+    </div>
   );
 }
 

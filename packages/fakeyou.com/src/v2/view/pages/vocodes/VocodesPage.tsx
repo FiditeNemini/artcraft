@@ -1,13 +1,13 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import posthog from 'posthog-js'
+import { PosthogClient } from "@storyteller/components/src/analytics/PosthogClient";
 
 
 interface Props {
 }
 
 function VocodesPage(props: Props) {
-  posthog.capture('$pageview');
+  PosthogClient.recordPageview();
   return (
     <div className="content is-medium">
 

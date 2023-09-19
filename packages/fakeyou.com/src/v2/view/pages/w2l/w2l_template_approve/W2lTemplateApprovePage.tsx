@@ -10,9 +10,8 @@ import {
 } from "@storyteller/components/src/api/w2l/GetW2lTemplate";
 import { GetW2lTemplateUseCount } from "@storyteller/components/src/api/w2l/GetW2lTemplateUseCount";
 import { BackLink } from "../../../_common/BackLink";
-import { motion } from "framer-motion";
-import { container, item, panel } from "../../../../../data/animation";
-import posthog from 'posthog-js'
+
+import { PosthogClient } from "@storyteller/components/src/analytics/PosthogClient";
 
 const DEFAULT_APPROVED_STATE = true;
 
@@ -23,7 +22,7 @@ interface Props {
 function W2lTemplateApprovePage(props: Props) {
   const history = useHistory();
 
-  posthog.capture('$pageview');
+  PosthogClient.recordPageview();
 
   let { templateToken }: { templateToken: string } = useParams();
 
@@ -121,19 +120,17 @@ function W2lTemplateApprovePage(props: Props) {
   }
 
   return (
-    <motion.div initial="hidden" animate="visible" variants={container}>
+    <div>
       <div className="container pt-5 pb-4 px-lg-5 px-xl-3">
         <div className="d-flex flex-column">
-          <motion.h1 className=" fw-bold" variants={item}>
-            {h1Title}
-          </motion.h1>
+          <h1 className=" fw-bold">{h1Title}</h1>
         </div>
-        <motion.div className="pt-3" variants={item}>
+        <div className="pt-3">
           <BackLink link={templateLink} text="Back to template" />
-        </motion.div>
+        </div>
       </div>
 
-      <motion.div className="container-panel pt-4 pb-5" variants={panel}>
+      <div className="container-panel pt-4 pb-5">
         <div className="panel p-3 py-4 p-lg-4">
           <table className="table">
             <thead>
@@ -166,9 +163,9 @@ function W2lTemplateApprovePage(props: Props) {
             </tbody>
           </table>
         </div>
-      </motion.div>
+      </div>
 
-      <motion.form onSubmit={handleApproveFormSubmit} variants={panel}>
+      <form onSubmit={handleApproveFormSubmit}>
         <div className="container-panel pt-1 pb-5">
           <div className="panel p-3 py-4 p-lg-4">
             <label className="sub-title">
@@ -190,11 +187,11 @@ function W2lTemplateApprovePage(props: Props) {
             </div>
           </div>
         </div>
-        <motion.div className="container pb-5" variants={item}>
+        <div className="container pb-5">
           <button className="btn btn-primary w-100">Moderate</button>
-        </motion.div>
-      </motion.form>
-    </motion.div>
+        </div>
+      </form>
+    </div>
   );
 }
 

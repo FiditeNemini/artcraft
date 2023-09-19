@@ -23,16 +23,14 @@ import {
 } from "@storyteller/components/src/api/clone_requests/CheckVoiceCloneApplication";
 import { Link } from "react-router-dom";
 import { WebUrl } from "../../../../common/WebUrl";
-import { motion } from "framer-motion";
-import { container, item, image, panel } from "../../../../data/animation";
 import { usePrefixedDocumentTitle } from "../../../../common/UsePrefixedDocumentTitle";
-import posthog from 'posthog-js'
+import { PosthogClient } from "@storyteller/components/src/analytics/PosthogClient";
 
 interface Props {}
 
 function VoiceCloneRequestPage(props: Props) {
   usePrefixedDocumentTitle("Create a Custom Voice Clone with Deep Fake TTS");
-  posthog.capture('$pageview');
+  PosthogClient.recordPageview();
 
   // Contact
   const [emailAddress, setEmailAddress] = useState("");
@@ -251,32 +249,27 @@ function VoiceCloneRequestPage(props: Props) {
         <div className="row gx-3 flex-lg-row-reverse align-items-center">
           <div className="col-lg-6">
             <div className="d-flex justify-content-center">
-              <motion.img
+              <img
                 src="/mascot/kitsune_pose4.webp"
                 className="img-fluid"
                 width="516"
                 height="472"
                 alt="FakeYou Mascot"
-                variants={image}
               />
             </div>
           </div>
           <div className="col-lg-6 px-3 px-md-2 px-lg-5 px-xl-2">
             <div className="text-center text-lg-start">
-              <motion.h1 className=" fw-bold lh-1" variants={item}>
-                Professionally Clone Your Voice
-              </motion.h1>
-              <motion.h3 className="mb-4" variants={item}>
-                (or any voice) for just $70
-              </motion.h3>
+              <h1 className=" fw-bold lh-1">Professionally Clone Your Voice</h1>
+              <h3 className="mb-4">(or any voice) for just $70</h3>
               <div className="d-flex flex-column justify-content-center">
-                <motion.h3 className="px-5 px-md-0" variants={item}>
+                <h3 className="px-5 px-md-0">
                   Want a Custom Voice You Can Use?
-                </motion.h3>
-                <motion.p className="lead" variants={item}>
+                </h3>
+                <p className="lead">
                   For Music, Videos, Twitch Rewards, API, Friends, Family…
                   whatever you want!
-                </motion.p>
+                </p>
               </div>
             </div>
           </div>
@@ -342,10 +335,10 @@ function VoiceCloneRequestPage(props: Props) {
   }
 
   return (
-    <motion.div initial="hidden" animate="visible" variants={container}>
+    <div>
       {header}
 
-      <motion.div className="container-panel pt-4 pb-5" variants={panel}>
+      <div className="container-panel pt-4 pb-5">
         <div className="panel p-3 p-lg-4 load-hidden mt-5 mt-lg-0">
           <h1 className="panel-title fw-bold">Clone Your Voice</h1>
           <div className="py-6">
@@ -658,8 +651,8 @@ function VoiceCloneRequestPage(props: Props) {
             </div>
           </div>
         </div>
-      </motion.div>
-    </motion.div>
+      </div>
+    </div>
   );
 }
 

@@ -4,8 +4,6 @@ import { W2lInferenceJob } from "../../../App";
 import { JobState } from "@storyteller/components/src/jobs/JobStates";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faList } from "@fortawesome/free-solid-svg-icons";
-import { motion } from "framer-motion";
-import { container, item, sessionItem } from "../../../data/animation";
 
 interface Props {
   w2lInferenceJobs: Array<W2lInferenceJob>;
@@ -47,9 +45,7 @@ function SessionW2lInferenceResultList(props: Props) {
 
       results.push(
         <div key={job.jobToken}>
-          <motion.div className="alert alert-primary" variants={sessionItem}>
-            {stateDescription}
-          </motion.div>
+          <div className="alert alert-primary">{stateDescription}</div>
         </div>
       );
     } else {
@@ -57,15 +53,12 @@ function SessionW2lInferenceResultList(props: Props) {
 
       results.push(
         <div key={job.jobToken}>
-          <motion.div
-            className="panel py-4 p-3 p-lg-4 gap-4"
-            variants={sessionItem}
-          >
+          <div className="panel py-4 p-3 p-lg-4 gap-4">
             Complete!{" "}
             <Link to={w2lPermalink} className="btn btn-primary ms-4">
               Permalink &amp; download
             </Link>
-          </motion.div>
+          </div>
         </div>
       );
     }
@@ -74,10 +67,10 @@ function SessionW2lInferenceResultList(props: Props) {
   let title = <span />;
   if (results.length !== 0) {
     title = (
-      <motion.h2 className="text-center text-lg-start fw-bold" variants={item}>
+      <h2 className="text-center text-lg-start fw-bold">
         <FontAwesomeIcon icon={faList} className="me-3" />
         Session W2L Results
-      </motion.h2>
+      </h2>
     );
   }
 
@@ -88,12 +81,12 @@ function SessionW2lInferenceResultList(props: Props) {
   }
 
   return (
-    <motion.div initial="hidden" animate="visible" variants={container}>
+    <div>
       <div className="container-panel pt-4 pb-5">
         <div className="pb-4">{title}</div>
         <div className="d-flex flex-column gap-4">{results}</div>
       </div>
-    </motion.div>
+    </div>
   );
 }
 

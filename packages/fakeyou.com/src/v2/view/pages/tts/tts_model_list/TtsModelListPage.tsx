@@ -7,7 +7,10 @@ import { SessionTtsModelUploadResultList } from "../../../_common/SessionTtsMode
 import { SessionW2lInferenceResultList } from "../../../_common/SessionW2lInferenceResultsList";
 import { SessionW2lTemplateUploadResultList } from "../../../_common/SessionW2lTemplateUploadResultsList";
 import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
-import { FrontendInferenceJobType, InferenceJob } from "@storyteller/components/src/jobs/InferenceJob";
+import {
+  FrontendInferenceJobType,
+  InferenceJob,
+} from "@storyteller/components/src/jobs/InferenceJob";
 import { TtsInferenceJob } from "@storyteller/components/src/jobs/TtsInferenceJobs";
 import { TtsModelUploadJob } from "@storyteller/components/src/jobs/TtsModelUploadJobs";
 import { W2lInferenceJob } from "@storyteller/components/src/jobs/W2lInferenceJobs";
@@ -42,10 +45,8 @@ import {
   faGlobe,
   faVolumeHigh,
 } from "@fortawesome/free-solid-svg-icons";
-import { GenericNotice } from "./notices/GenericNotice";
-import { DiscordLink2 } from "@storyteller/components/src/elements/DiscordLink2";
-import { motion } from "framer-motion";
-import { container, panel } from "../../../../../data/animation";
+// import { GenericNotice } from "./notices/GenericNotice";
+// import { DiscordLink2 } from "@storyteller/components/src/elements/DiscordLink2";
 import { SessionSubscriptionsWrapper } from "@storyteller/components/src/session/SessionSubscriptionsWrapper";
 import { TtsPageHero } from "./TtsPageHero";
 import { Analytics } from "../../../../../common/Analytics";
@@ -66,7 +67,7 @@ import { usePrefixedDocumentTitle } from "../../../../../common/UsePrefixedDocum
 import { RatingButtons } from "../../../_common/ratings/RatingButtons";
 import { RatingStats } from "../../../_common/ratings/RatingStats";
 import { SearchOmnibar } from "./search/SearchOmnibar";
-import posthog from 'posthog-js'
+import { PosthogClient } from "@storyteller/components/src/analytics/PosthogClient";
 
 export interface EnqueueJobResponsePayload {
   success: boolean;
@@ -93,7 +94,10 @@ interface Props {
   isShowingBootstrapLanguageNotice: boolean;
   clearBootstrapLanguageNotice: () => void;
 
-  enqueueInferenceJob: (jobToken: string, frontendInferenceJobType: FrontendInferenceJobType) => void;
+  enqueueInferenceJob: (
+    jobToken: string,
+    frontendInferenceJobType: FrontendInferenceJobType
+  ) => void;
   inferenceJobs: Array<InferenceJob>;
   inferenceJobsByCategory: Map<FrontendInferenceJobType, Array<InferenceJob>>;
 
@@ -135,7 +139,7 @@ interface Props {
 }
 
 function TtsModelListPage(props: Props) {
-  posthog.capture('$pageview');
+  PosthogClient.recordPageview();
 
   //Loading spinning icon
   const [loading, setLoading] = useState(false);
@@ -303,11 +307,13 @@ function TtsModelListPage(props: Props) {
       setMaybeTtsError(undefined);
 
       if (response.inference_job_token_type === "generic") {
-        props.enqueueInferenceJob(response.inference_job_token, FrontendInferenceJobType.TextToSpeech);
+        props.enqueueInferenceJob(
+          response.inference_job_token,
+          FrontendInferenceJobType.TextToSpeech
+        );
       } else {
         props.enqueueTtsJob(response.inference_job_token);
       }
-
     } else if (GenerateTtsAudioIsError(response)) {
       setMaybeTtsError(response.error);
     }
@@ -412,21 +418,21 @@ function TtsModelListPage(props: Props) {
     />
   ) : undefined;
 
-  let dollars = "$150 USD";
+  // let dollars = "$150 USD";
 
-  const bootstrapLanguageNotice = props.isShowingBootstrapLanguageNotice ? (
-    <GenericNotice
-      title={t("notices.HelpBootstrapLanguage.title")}
-      body={
-        <Trans i18nKey="notices.HelpBootstrapLanguage.body">
-          We don't have enough voices in this language yet. Please help us build
-          your favorite characters. Join our <DiscordLink2 /> and we'll teach
-          you how. We'll pay {dollars} you per voice, too!
-        </Trans>
-      }
-      clearNotice={props.clearBootstrapLanguageNotice}
-    />
-  ) : undefined;
+  // const bootstrapLanguageNotice = props.isShowingBootstrapLanguageNotice ? (
+  //   <GenericNotice
+  //     title={t("notices.HelpBootstrapLanguage.title")}
+  //     body={
+  //       <Trans i18nKey="notices.HelpBootstrapLanguage.body">
+  //         We don't have enough voices in this language yet. Please help us build
+  //         your favorite characters. Join our <DiscordLink2 /> and we'll teach
+  //         you how. We'll pay {dollars} you per voice, too!
+  //       </Trans>
+  //     }
+  //     clearNotice={props.clearBootstrapLanguageNotice}
+  //   />
+  // ) : undefined;
 
   // Show errors on TTS failure
   let maybeError = <></>;
@@ -469,7 +475,8 @@ function TtsModelListPage(props: Props) {
   }
 
   // NB: If the text is too long, don't allow submission
-  let remainingCharactersButtonDisabled = props.textBuffer.trim().length > 
+  let remainingCharactersButtonDisabled =
+    props.textBuffer.trim().length >
     props.sessionSubscriptionsWrapper.ttsMaximumLength();
 
   let noTextInputButtonDisabled = props.textBuffer.trim() === "";
@@ -499,8 +506,8 @@ function TtsModelListPage(props: Props) {
   }
 
   return (
-    <motion.div initial="hidden" animate="visible" variants={container}>
-      {bootstrapLanguageNotice}
+    <div>
+      {/* {bootstrapLanguageNotice} */}
 
       {pleaseFollowNotice}
 
@@ -515,7 +522,7 @@ function TtsModelListPage(props: Props) {
         sessionSubscriptionsWrapper={props.sessionSubscriptionsWrapper}
       />
 
-      <motion.div className="container-panel pb-5 mb-4" variants={panel}>
+      <div className="container-panel pb-5 mb-4">
         <div className="panel p-3 py-4 p-md-4">
           <i className="fas fa-volume-high"></i>
 
@@ -615,7 +622,11 @@ function TtsModelListPage(props: Props) {
                     </h4>
                     <div className="d-flex flex-column gap-3 session-tts-section">
                       <SessionTtsInferenceResultList
-                        inferenceJobs={props.inferenceJobsByCategory.get(FrontendInferenceJobType.TextToSpeech)!}
+                        inferenceJobs={
+                          props.inferenceJobsByCategory.get(
+                            FrontendInferenceJobType.TextToSpeech
+                          )!
+                        }
                         ttsInferenceJobs={props.ttsInferenceJobs}
                         sessionSubscriptionsWrapper={
                           props.sessionSubscriptionsWrapper
@@ -633,7 +644,7 @@ function TtsModelListPage(props: Props) {
         {/* <div className="pt-5">
           <BackLink link="/" text="Back to main page" />
         </div> */}
-      </motion.div>
+      </div>
 
       <SessionW2lInferenceResultList
         w2lInferenceJobs={props.w2lInferenceJobs}
@@ -646,7 +657,7 @@ function TtsModelListPage(props: Props) {
       <SessionTtsModelUploadResultList
         modelUploadJobs={props.ttsModelUploadJobs}
       />
-    </motion.div>
+    </div>
   );
 }
 

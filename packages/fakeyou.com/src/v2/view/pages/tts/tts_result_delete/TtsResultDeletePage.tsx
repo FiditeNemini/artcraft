@@ -4,9 +4,8 @@ import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapp
 import { useParams, Link, useHistory } from "react-router-dom";
 import { Gravatar } from "@storyteller/components/src/elements/Gravatar";
 import { WebUrl } from "../../../../../common/WebUrl";
-import { motion } from "framer-motion";
-import { container, item, panel } from "../../../../../data/animation";
-import posthog from 'posthog-js'
+
+import { PosthogClient } from "@storyteller/components/src/analytics/PosthogClient";
 
 interface TtsInferenceResultResponsePayload {
   success: boolean;
@@ -54,7 +53,7 @@ interface Props {
 
 function TtsResultDeletePage(props: Props) {
   const history = useHistory();
-  posthog.capture('$pageview');
+  PosthogClient.recordPageview();
 
   let { token }: { token: string } = useParams();
 
@@ -187,17 +186,15 @@ function TtsResultDeletePage(props: Props) {
     : "Delete TTS Result (hides from everyone but mods)";
 
   return (
-    <motion.div initial="hidden" animate="visible" variants={container}>
+    <div>
       <div className="container pt-5 pb-4 px-lg-5 px-xl-3">
-        <motion.h1 className=" fw-bold mb-3" variants={item}>
-          {h1Title}
-        </motion.h1>
-        <motion.div variants={item}>
+        <h1 className=" fw-bold mb-3">{h1Title}</h1>
+        <div>
           <Link to={resultLink}>&lt; Back to result</Link>
-        </motion.div>
+        </div>
       </div>
 
-      <motion.form onSubmit={handleDeleteFormSubmit} variants={panel}>
+      <form onSubmit={handleDeleteFormSubmit}>
         <div className="container-panel pt-4 pb-5">
           <div className="panel p-3 p-lg-4">
             <table className="table tts-result-table">
@@ -241,14 +238,12 @@ function TtsResultDeletePage(props: Props) {
           </div>
         </div>
 
-        <motion.div className="container pb-5" variants={item}>
+        <div className="container pb-5">
           <button className=" btn btn-primary w-100">{buttonTitle}</button>
-          <motion.p className="mt-4" variants={item}>
-            {formLabel}
-          </motion.p>
-        </motion.div>
-      </motion.form>
-    </motion.div>
+          <p className="mt-4">{formLabel}</p>
+        </div>
+      </form>
+    </div>
   );
 }
 

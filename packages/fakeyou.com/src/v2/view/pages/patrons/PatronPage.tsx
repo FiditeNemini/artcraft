@@ -4,11 +4,10 @@ import { PATRONS } from "../../../../data/Patrons";
 import { PatreonLink } from "@storyteller/components/src/elements/PatreonLink";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPatreon } from "@fortawesome/free-brands-svg-icons";
-import { motion } from "framer-motion";
-import { container, item, image, panel } from "../../../../data/animation";
+
 import { ThirdPartyLinks } from "@storyteller/components/src/constants/ThirdPartyLinks";
 import { usePrefixedDocumentTitle } from "../../../../common/UsePrefixedDocumentTitle";
-import posthog from 'posthog-js'
+import { PosthogClient } from "@storyteller/components/src/analytics/PosthogClient";
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -16,28 +15,23 @@ interface Props {
 
 function PatronPage(props: Props) {
   usePrefixedDocumentTitle("Thank you to our Patrons!");
-  posthog.capture('$pageview');
+  PosthogClient.recordPageview();
 
   return (
-    <motion.div initial="hidden" animate="visible" variants={container}>
+    <div>
       <div className="container py-5 pt-lg-0">
         <div className="row">
           <div className="col-12 col-lg-7 d-flex flex-column justify-content-center text-center text-lg-start px-3 px-md-2 px-lg-5 px-xl-3">
-            <motion.h1 className=" fw-bold" variants={item}>
-              Thanks to our Patrons!
-            </motion.h1>
-            <motion.h3 className="mb-4 px-4 px-md-0" variants={item}>
+            <h1 className=" fw-bold">Thanks to our Patrons!</h1>
+            <h3 className="mb-4 px-4 px-md-0">
               Our Patrons help support our work.
-            </motion.h3>
-            <motion.p className="lead mb-5" variants={item}>
+            </h3>
+            <p className="lead mb-5">
               Our Patrons help pay offset (but not completely cover) our
               expensive server bills.
-            </motion.p>
+            </p>
 
-            <motion.div
-              className="d-flex justify-content-center justify-content-lg-start"
-              variants={item}
-            >
+            <div className="d-flex justify-content-center justify-content-lg-start">
               <a
                 href={ThirdPartyLinks.FAKEYOU_PATREON}
                 target="_blank"
@@ -47,22 +41,21 @@ function PatronPage(props: Props) {
                 <FontAwesomeIcon icon={faPatreon} className="me-2" />
                 Support us on Patreon
               </a>
-            </motion.div>
+            </div>
           </div>
           <div className="col-12 col-lg-5 d-flex flex-column align-items-center">
-            <motion.img
+            <img
               className="img-fluid mt-5 mw-50"
               src="/mascot/kitsune_pose7.webp"
               alt="FakeYou Mascot"
               width="423"
               height="387"
-              variants={image}
             />
           </div>
         </div>
       </div>
 
-      <motion.div className="container-panel pb-5" variants={panel}>
+      <div className="container-panel pb-5">
         <div className="panel p-3 p-lg-4">
           <h1 className="panel-title fw-bold">Our Patrons</h1>
           <div className="py-6">
@@ -81,9 +74,9 @@ function PatronPage(props: Props) {
             </div>
           </div>
         </div>
-      </motion.div>
+      </div>
 
-      <motion.div className="container pb-5" variants={item}>
+      <div className="container pb-5">
         <div>
           <p>
             Patrons will get first looks at new features, get dedicated access
@@ -95,8 +88,8 @@ function PatronPage(props: Props) {
             <PatreonLink text="donating on Patreon" iconAfterText={true} />
           </p>
         </div>
-      </motion.div>
-    </motion.div>
+      </div>
+    </div>
   );
 }
 

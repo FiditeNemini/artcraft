@@ -6,7 +6,6 @@ import { Link } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faPlay,
-  faFlagCheckered,
   faAward,
   faPenToSquare,
 } from "@fortawesome/free-solid-svg-icons";
@@ -15,10 +14,19 @@ import {
   faDiscord,
   faTwitch,
 } from "@fortawesome/free-brands-svg-icons";
-import { motion } from "framer-motion";
-import { duration, delay, container, item } from "../../../../data/animation";
+import { duration, delay } from "../../../../data/animation";
+
 import { usePrefixedDocumentTitle } from "../../../../common/UsePrefixedDocumentTitle";
-import posthog from 'posthog-js'
+import { PosthogClient } from "@storyteller/components/src/analytics/PosthogClient";
+import {
+  faDownload,
+  faMessageDots,
+  faMicrophone,
+  faQuoteLeft,
+  faUpload,
+  faVideo,
+  faWaveformLines,
+} from "@fortawesome/pro-solid-svg-icons";
 
 const Fade = require("react-reveal/Fade");
 
@@ -60,11 +68,10 @@ function FirehoseEventListPage(props: Props) {
     []
   );
 
-
   const fetchEvents = () => {
     const api = new ApiConfig();
     const endpointUrl = api.firehoseEvents();
-    posthog.capture('$pageview');
+    PosthogClient.recordPageview();
 
     fetch(endpointUrl, {
       method: "GET",
@@ -173,7 +180,7 @@ function FirehoseEventListPage(props: Props) {
       case "tts_model_upload_started":
         inner = (
           <span className="d-flex align-items-center">
-            <FontAwesomeIcon icon={faPlay} className="me-3" />
+            <FontAwesomeIcon icon={faMessageDots} className="me-3" />
             {gravatar}
             {userLink}
             &nbsp;started TTS model upload
@@ -183,7 +190,7 @@ function FirehoseEventListPage(props: Props) {
       case "tts_model_upload_completed":
         inner = (
           <span className="d-flex align-items-center">
-            <FontAwesomeIcon icon={faFlagCheckered} className="me-3" />
+            <FontAwesomeIcon icon={faMessageDots} className="me-3" />
             {gravatar}
             {userLink}
             &nbsp;completed TTS model upload
@@ -193,7 +200,7 @@ function FirehoseEventListPage(props: Props) {
       case "tts_inference_started":
         inner = (
           <span className="d-flex align-items-center">
-            <FontAwesomeIcon icon={faPlay} className="me-3" />
+            <FontAwesomeIcon icon={faMessageDots} className="me-3" />
             {gravatar}
             {userLink}
             &nbsp;started TTS
@@ -203,7 +210,7 @@ function FirehoseEventListPage(props: Props) {
       case "tts_inference_completed":
         inner = (
           <span className="d-flex align-items-center">
-            <FontAwesomeIcon icon={faFlagCheckered} className="me-3" />
+            <FontAwesomeIcon icon={faMessageDots} className="me-3" />
             {gravatar}
             {userLink}
             &nbsp;completed TTS
@@ -223,7 +230,7 @@ function FirehoseEventListPage(props: Props) {
       case "w2l_template_upload_completed":
         inner = (
           <span className="d-flex align-items-center">
-            <FontAwesomeIcon icon={faFlagCheckered} className="me-3" />
+            <FontAwesomeIcon icon={faVideo} className="me-3" />
             {gravatar}
             {userLink}
             &nbsp;finished uploading a lipsync template.
@@ -233,7 +240,7 @@ function FirehoseEventListPage(props: Props) {
       case "w2l_inference_started":
         inner = (
           <span className="d-flex align-items-center">
-            <FontAwesomeIcon icon={faPlay} className="me-3" />
+            <FontAwesomeIcon icon={faVideo} className="me-3" />
             {gravatar}
             {userLink}
             &nbsp;started a W2L lipsync video
@@ -243,7 +250,7 @@ function FirehoseEventListPage(props: Props) {
       case "w2l_inference_completed":
         inner = (
           <span className="d-flex align-items-center">
-            <FontAwesomeIcon icon={faFlagCheckered} className="me-3" />
+            <FontAwesomeIcon icon={faVideo} className="me-3" />
             {gravatar}
             {userLink}
             &nbsp;completed a W2L lipsync video
@@ -310,6 +317,76 @@ function FirehoseEventListPage(props: Props) {
           </span>
         );
         break;
+      case "vc_inference_started":
+        inner = (
+          <span className="d-flex align-items-center">
+            <FontAwesomeIcon icon={faWaveformLines} className="me-3" />
+            {gravatar}
+            {userLink}
+            &nbsp;started a voice conversion
+          </span>
+        );
+        break;
+      case "vc_inference_completed":
+        inner = (
+          <span className="d-flex align-items-center">
+            <FontAwesomeIcon icon={faWaveformLines} className="me-3" />
+            {gravatar}
+            {userLink}
+            &nbsp;completed a voice conversion
+          </span>
+        );
+        break;
+      case "generic_download_started":
+        inner = (
+          <span className="d-flex align-items-center">
+            <FontAwesomeIcon icon={faDownload} className="me-3" />
+            {gravatar}
+            {userLink}
+            &nbsp;downloaded
+          </span>
+        );
+        break;
+      case "generic_download_completed":
+        inner = (
+          <span className="d-flex align-items-center">
+            <FontAwesomeIcon icon={faDownload} className="me-3" />
+            {gravatar}
+            {userLink}
+            &nbsp;completed a download
+          </span>
+        );
+        break;
+      case "media_uploaded":
+        inner = (
+          <span className="d-flex align-items-center">
+            <FontAwesomeIcon icon={faUpload} className="me-3" />
+            {gravatar}
+            {userLink}
+            &nbsp;uploaded a media file
+          </span>
+        );
+        break;
+      case "device_media_recorded":
+        inner = (
+          <span className="d-flex align-items-center">
+            <FontAwesomeIcon icon={faMicrophone} className="me-3" />
+            {gravatar}
+            {userLink}
+            &nbsp;recorded an audio/video
+          </span>
+        );
+        break;
+      case "comment_created":
+        inner = (
+          <span className="d-flex align-items-center">
+            <FontAwesomeIcon icon={faQuoteLeft} className="me-3" />
+            {gravatar}
+            {userLink}
+            &nbsp;added a comment
+          </span>
+        );
+        break;
       default:
         return;
     }
@@ -324,19 +401,17 @@ function FirehoseEventListPage(props: Props) {
   usePrefixedDocumentTitle("Firehose Event Feed");
 
   return (
-    <motion.div initial="hidden" animate="visible" variants={container}>
+    <div>
       <div className="container py-5 px-md-4 px-lg-5 px-xl-3">
         <div className="d-flex flex-column">
-          <motion.h1 className=" fw-bold" variants={item}>
-            Firehose Event Feed
-          </motion.h1>
-          <motion.h4 className="mb-4" variants={item}>
+          <h1 className=" fw-bold">Firehose Event Feed</h1>
+          <h4 className="mb-4">
             The latest FakeYou events refreshed every few seconds.
-          </motion.h4>
-          <motion.p className="lead" variants={item}>
+          </h4>
+          <p className="lead">
             As you can see, we're really popular. But we owe it to you, our
             users. Thank you!
-          </motion.p>
+          </p>
         </div>
       </div>
 
@@ -345,7 +420,7 @@ function FirehoseEventListPage(props: Props) {
           <ul className="firehose-ul d-flex flex-column gap-3">{eventItems}</ul>
         </Fade>
       </div>
-    </motion.div>
+    </div>
   );
 }
 
