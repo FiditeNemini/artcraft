@@ -1,5 +1,7 @@
 # Local Kubernetes environment for standing up the APIs and their dependencies
 
+(These are Paul's notes.)
+
 - Install minikube, kubectl, docker, and musl from your OS package manager
 - `rustup target add x86_64-unknown-linux-musl`
 - `cargo build --release --bin storyteller-web --target=x86_64-unknown-linux-musl`

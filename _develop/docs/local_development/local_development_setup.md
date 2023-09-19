@@ -1,17 +1,8 @@
-dev setup
-=========
+FakeYou dev setup (bare metal)
+==============================
 
-[Back to main README](../../README.md)
-
-## Debugging and Fixing CUDA/PyTorch
-
-See this spreadsheet for previous battles with version incompatibility:
-https://docs.google.com/spreadsheets/d/1BEdLmwOzo3r83-iJn9sj6co1VT92t3lIeJ-lNH25bdQ/edit#gid=0
-
-Ubuntu might upgrade the driver by accident, and it might need reinstallation. Who knows.
-This stuff is a nightmare.
-
-## Database Setup
+Database Setup
+--------------
 
 ### Mac Install
 
@@ -33,7 +24,7 @@ libsqlite3-dev
 pkgconf # if using openssl instead of rustls
 ```
 
-### Migrations
+### Migrations (Mac + Linux)
 
 To manage the database and perform migrations, install the Rust tools diesel and sqlx.
 
@@ -43,7 +34,6 @@ Diesel is an ORM, which is dumb, so we use sqlx as at-compile-time typesafe SQL.
 The CLI is necessary to perform codegen:
 
 ```
-sudo apt-get install libmysqlclient-dev
 cargo install sqlx-cli --no-default-features --features rustls,mysql,sqlite
 ```
 
@@ -67,7 +57,7 @@ cargo install diesel_cli \
   --features mysql
 ```
 
-#### Sqlx Error on Linux when Performing Schema Migrations
+### Sqlx Error on Linux when Performing Schema Migrations
 
 You might get this error message during migration,
 
@@ -78,15 +68,14 @@ thread 'main' panicked at 'internal error: entered unreachable code: Mysql only 
 note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
 ```
 
-I haven't found the cause (it doesn't happen on Mac), but the migrations appear to work regardless of the error message.
+I haven't found the cause (it doesn't happen on Mac), but the migrations appear to work regardless 
+of this error message. You can essentially ignore it.
 
-#### Linux database notes
+### Fixing Linux database problems
 
-If MySql in local dev can't be connected to, reset the accounts:
+- If MySql in local dev can't be connected to, [reset the accounts](https://linuxconfig.org/how-to-reset-root-mysql-mariadb-password-on-ubuntu-20-04-focal-fossa-linux).
 
-https://linuxconfig.org/how-to-reset-root-mysql-mariadb-password-on-ubuntu-20-04-focal-fossa-linux
-
-#### MySql on Ubuntu 22.04
+### MySql on Ubuntu 22.04
 
 Should work largely out of the box. We'll need a dev account:
 
@@ -101,7 +90,7 @@ GRANT ALL PRIVILEGES ON storyteller.* TO 'storyteller'@'localhost';
 
 Then verify with `./dev_mysql_connect.sh`
 
-#### Fixing dev MySql on Ubuntu 20.04
+### Fixing dev MySql on Ubuntu 20.04
 
 For some reason, the MySql default install on 20.04 gave me a bunch of trouble.
 

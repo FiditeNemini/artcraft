@@ -44,3 +44,6 @@ Our Rust monorepo, which serves both our API surface area and our downloadable c
                /_|.-'\ ,".             '.'`__'-( \
                  / ,"'"\,'               `/  `-.|" 
 ```
+
+- [documentation](./_develop/docs)
+- [tools, misc](./_develop)

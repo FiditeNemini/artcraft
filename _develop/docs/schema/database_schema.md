@@ -1,6 +1,8 @@
 database schema
 ================
 
+(This is woefully incomplete and unmaintained.)
+
 Twitch Model
 ------------
 
