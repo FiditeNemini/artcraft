@@ -13,8 +13,6 @@
   "vcConvertLabel": "แปลงเสียง",
   "vcPitchControlLabel": "การควบคุมระดับเสียง",
   "vcRecordAudioLabel": "บันทึกเสียง",
-  "vcResultsPanelSubText": "เสียงที่สร้างขึ้นจะปรากฏที่นี่",
-  "vcResultsPanelText": "ยังไม่มีผลลัพธ์",
   "vcResultsTitle": "ผลลัพธ์เซสชัน V2V",
   "vcTabRecord": "ไมโครโฟน",
   "vcTabUpload": "ที่อัพโหลด",

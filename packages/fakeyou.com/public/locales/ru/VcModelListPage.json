@@ -13,8 +13,6 @@
   "vcConvertLabel": "Конвертировать аудио",
   "vcPitchControlLabel": "Управление по каналу тангажа",
   "vcRecordAudioLabel": "Запись аудио",
-  "vcResultsPanelSubText": "Здесь появится сгенерированный звук.",
-  "vcResultsPanelText": "Пока нет результатов",
   "vcResultsTitle": "Результаты сеанса V2V",
   "vcTabRecord": "Микрофон",
   "vcTabUpload": "Загрузить",

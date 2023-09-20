@@ -13,8 +13,6 @@
   "vcConvertLabel": "转换音频",
   "vcPitchControlLabel": "变桨控制",
   "vcRecordAudioLabel": "录制音频",
-  "vcResultsPanelSubText": "生成的音频将出现在此处。",
-  "vcResultsPanelText": "还没有结果",
   "vcResultsTitle": "会议 V2V 结果",
   "vcTabRecord": "麦克风",
   "vcTabUpload": "上传",

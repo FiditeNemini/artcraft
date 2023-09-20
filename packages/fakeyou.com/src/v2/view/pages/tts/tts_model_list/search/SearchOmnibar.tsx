@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import { t } from "i18next";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { TtsCategoryType } from "../../../../../../AppWrapper";
 import { TtsModelListItem } from "@storyteller/components/src/api/tts/ListTtsModels";
@@ -8,6 +7,7 @@ import { faChevronDown, faChevronUp } from "@fortawesome/pro-duotone-svg-icons";
 import { ScopedVoiceModelOptions } from "./components/ScopedVoiceModelOptions";
 import { VoiceCountLabel } from "./components/VoiceCountLabel";
 import { Analytics } from "../../../../../../common/Analytics";
+import { useLocalize } from "hooks";
 
 interface Props {
   allTtsCategories: TtsCategoryType[];
@@ -31,6 +31,7 @@ interface Props {
 }
 
 export function SearchOmnibar(props: Props) {
+  const { t } = useLocalize("TtsModelListPage");
   const [isOpen, setIsOpen] = useState(false);
 
   const handleClickExplore = () => {
@@ -79,7 +80,7 @@ export function SearchOmnibar(props: Props) {
               icon={isOpen ? faChevronUp : faChevronDown}
               className="me-2"
             />
-            {t("tts.TtsModelListPage.exploreModal.exploreModalOpenButton")}
+            {t("ttsButtonExplore")}
           </button>
         </div>
       </div>

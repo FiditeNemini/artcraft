@@ -5,7 +5,7 @@ import { LanguageOptions } from "../filters/LanguageOptions";
 import { TtsCategoryType } from "../../../../../../../AppWrapper";
 import { TtsModelListItem } from "@storyteller/components/src/api/tts/ListTtsModels";
 import { CategoryOptions } from "../filters/CategoryOptions";
-import { t } from "i18next";
+import { useLocalize } from "hooks";
 
 interface Props {
   allTtsCategories: TtsCategoryType[];
@@ -29,6 +29,7 @@ interface Props {
 }
 
 export function ExploreVoicesTray(props: Props) {
+  const { t } = useLocalize("TtsModelListPage");
   const {
     allTtsCategories,
     allTtsCategoriesByTokenMap,
@@ -88,9 +89,7 @@ export function ExploreVoicesTray(props: Props) {
     <div>
       <div className="row gx-3 gy-3">
         <div className="col-12 col-lg-3 input-icon-search">
-          <label className="sub-title">
-            {t("tts.TtsModelListPage.exploreModal.languageLabel")}
-          </label>
+          <label className="sub-title">{t("ttsExploreLanguageLabel")}</label>
           <LanguageOptions
             selectedTtsLanguageScope={props.selectedTtsLanguageScope}
             setSelectedTtsLanguageScope={props.setSelectedTtsLanguageScope}
@@ -100,7 +99,7 @@ export function ExploreVoicesTray(props: Props) {
         <div className="col-12 col-md-12 col-lg-9 input-icon-search">
           <div className="d-flex align-items-start">
             <label className="sub-title flex-grow-1">
-              {t("tts.TtsModelListPage.exploreModal.categoryLabel")}
+              {t("ttsExploreCategoryLabel")}
             </label>
             <button
               className="ms-3 fw-medium btn-link"
@@ -110,7 +109,7 @@ export function ExploreVoicesTray(props: Props) {
               type="button"
             >
               <FontAwesomeIcon icon={faEraser} className="me-2" />
-              {t("tts.TtsModelListPage.exploreModal.clearCategoryFilterButton")}
+              {t("ttsExploreButtonClearFilter")}
             </button>
           </div>
 

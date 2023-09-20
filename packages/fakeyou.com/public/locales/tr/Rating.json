@@ -1,0 +1,9 @@
+{
+  "buttonBad": "Bu ses kötü geliyor",
+  "buttonGood": "Bu ses kulağa hoş geliyor",
+  "ratingBad": "Ses Kulağa Kötü Geliyor",
+  "ratingGood": "Ses Kulağa İyi Geliyor",
+  "ratingGreat": "Sesi harika geliyor",
+  "ratingLabel": "Değerlendirme:",
+  "ratingOk": "Ses Kulağa Sorunsuz Geliyor"
+}

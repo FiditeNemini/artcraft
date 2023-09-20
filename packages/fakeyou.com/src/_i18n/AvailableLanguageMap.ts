@@ -53,7 +53,7 @@ export const AVAILABLE_LANGUAGE_MAP: Record<
     languageNameLocalized: "Español",
     flags: ["🇪🇸", "🇲🇽"],
     flagsMore: ["🇨🇴", "🇦🇷"],
-    showPleaseFollowNotice: true,
+    showPleaseFollowNotice: false,
     showBootstrapLanguageNotice: false,
   },
   ar: {
@@ -72,7 +72,7 @@ export const AVAILABLE_LANGUAGE_MAP: Record<
     languageNameLocalized: "Deutsch",
     flags: ["🇩🇪"],
     showPleaseFollowNotice: false,
-    showBootstrapLanguageNotice: true,
+    showBootstrapLanguageNotice: false,
   },
   fr: {
     language: Language.French,
@@ -81,7 +81,7 @@ export const AVAILABLE_LANGUAGE_MAP: Record<
     languageNameLocalized: "Français",
     flags: ["🇫🇷"],
     showPleaseFollowNotice: false,
-    showBootstrapLanguageNotice: true,
+    showBootstrapLanguageNotice: false,
   },
   hi: {
     language: Language.Hindi,
@@ -90,7 +90,7 @@ export const AVAILABLE_LANGUAGE_MAP: Record<
     languageNameLocalized: "Hindi",
     flags: [],
     showPleaseFollowNotice: false,
-    showBootstrapLanguageNotice: true,
+    showBootstrapLanguageNotice: false,
   },
   id: {
     language: Language.Indonesian,
@@ -99,7 +99,7 @@ export const AVAILABLE_LANGUAGE_MAP: Record<
     languageNameLocalized: "Indonesian",
     flags: [],
     showPleaseFollowNotice: false,
-    showBootstrapLanguageNotice: true,
+    showBootstrapLanguageNotice: false,
   },
   it: {
     language: Language.Italian,
@@ -117,7 +117,7 @@ export const AVAILABLE_LANGUAGE_MAP: Record<
     languageNameLocalized: "Japanese",
     flags: [],
     showPleaseFollowNotice: false,
-    showBootstrapLanguageNotice: true,
+    showBootstrapLanguageNotice: false,
   },
   ko: {
     language: Language.Korean,
@@ -126,7 +126,7 @@ export const AVAILABLE_LANGUAGE_MAP: Record<
     languageNameLocalized: "Korean",
     flags: [],
     showPleaseFollowNotice: false,
-    showBootstrapLanguageNotice: true,
+    showBootstrapLanguageNotice: false,
   },
   pt: {
     language: Language.Portuguese,
@@ -134,8 +134,8 @@ export const AVAILABLE_LANGUAGE_MAP: Record<
     languageName: "Portuguese",
     languageNameLocalized: "Português",
     flags: ["🇵🇹", "🇧🇷"],
-    showPleaseFollowNotice: true,
-    showBootstrapLanguageNotice: true,
+    showPleaseFollowNotice: false,
+    showBootstrapLanguageNotice: false,
   },
   tr: {
     language: Language.Turkish,
@@ -144,7 +144,7 @@ export const AVAILABLE_LANGUAGE_MAP: Record<
     languageNameLocalized: "Türk",
     flags: ["🇹🇷"],
     showPleaseFollowNotice: false,
-    showBootstrapLanguageNotice: true,
+    showBootstrapLanguageNotice: false,
   },
   vi: {
     language: Language.Vietnamese,
@@ -153,7 +153,7 @@ export const AVAILABLE_LANGUAGE_MAP: Record<
     languageNameLocalized: "Vietnamese",
     flags: [],
     showPleaseFollowNotice: false,
-    showBootstrapLanguageNotice: true,
+    showBootstrapLanguageNotice: false,
   },
   zh: {
     language: Language.ChineseSimplified,
@@ -162,7 +162,7 @@ export const AVAILABLE_LANGUAGE_MAP: Record<
     languageNameLocalized: "Chinese Simplified",
     flags: [],
     showPleaseFollowNotice: false,
-    showBootstrapLanguageNotice: true,
+    showBootstrapLanguageNotice: false,
   },
   th: {
     language: Language.Thai,

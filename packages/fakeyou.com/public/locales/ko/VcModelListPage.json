@@ -13,8 +13,6 @@
   "vcConvertLabel": "오디오 변환",
   "vcPitchControlLabel": "피치 제어",
   "vcRecordAudioLabel": "오디오 녹음",
-  "vcResultsPanelSubText": "생성된 오디오가 여기에 표시됩니다.",
-  "vcResultsPanelText": "아직 결과가 없습니다",
   "vcResultsTitle": "세션 V2V 결과",
   "vcTabRecord": "마이크로폰",
   "vcTabUpload": "업로드",

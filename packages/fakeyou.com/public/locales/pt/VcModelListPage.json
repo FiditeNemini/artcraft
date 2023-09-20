@@ -13,8 +13,6 @@
   "vcConvertLabel": "Converter áudio",
   "vcPitchControlLabel": "Controle de pitch",
   "vcRecordAudioLabel": "Gravar audio",
-  "vcResultsPanelSubText": "O áudio gerado aparecerá aqui.",
-  "vcResultsPanelText": "Ainda não há resultados",
   "vcResultsTitle": "Resultados da sessão V2V",
   "vcTabRecord": "Microfone",
   "vcTabUpload": "Carregar",

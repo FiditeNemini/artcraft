@@ -13,8 +13,6 @@
   "vcConvertLabel": "Chuyển đổi âm thanh",
   "vcPitchControlLabel": "Kiểm soát sân",
   "vcRecordAudioLabel": "Ghi âm",
-  "vcResultsPanelSubText": "Âm thanh được tạo sẽ xuất hiện ở đây.",
-  "vcResultsPanelText": "Chưa có kết quả",
   "vcResultsTitle": "Kết quả phiên V2V",
   "vcTabRecord": "Cái mic cờ rô",
   "vcTabUpload": "Tải lên",

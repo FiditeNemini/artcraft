@@ -13,8 +13,6 @@
   "vcConvertLabel": "Konversi Audio",
   "vcPitchControlLabel": "Kontrol Nada",
   "vcRecordAudioLabel": "Suara rekaman",
-  "vcResultsPanelSubText": "Audio yang dihasilkan akan muncul di sini.",
-  "vcResultsPanelText": "Belum ada hasil",
   "vcResultsTitle": "Hasil Sesi V2V",
   "vcTabRecord": "Mikropon",
   "vcTabUpload": "Mengunggah",

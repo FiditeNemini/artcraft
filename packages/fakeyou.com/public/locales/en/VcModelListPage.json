@@ -13,8 +13,6 @@
   "vcConvertLabel": "Convert Audio",
   "vcPitchControlLabel": "Pitch Control",
   "vcRecordAudioLabel": "Record Audio",
-  "vcResultsPanelSubText": "Generated audio will appear here.",
-  "vcResultsPanelText": "No results yet",
   "vcResultsTitle": "Session V2V Results",
   "vcTabRecord": "Microphone",
   "vcTabUpload": "Upload",

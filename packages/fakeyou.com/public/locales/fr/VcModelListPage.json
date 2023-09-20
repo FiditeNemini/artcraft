@@ -13,8 +13,6 @@
   "vcConvertLabel": "Convertir l'audio",
   "vcPitchControlLabel": "Contrôle du pas",
   "vcRecordAudioLabel": "Enregistrement audio",
-  "vcResultsPanelSubText": "L'audio généré apparaîtra ici.",
-  "vcResultsPanelText": "Aucun résultat pour l'instant",
   "vcResultsTitle": "Résultats de la session V2V",
   "vcTabRecord": "Microphone",
   "vcTabUpload": "Télécharger",

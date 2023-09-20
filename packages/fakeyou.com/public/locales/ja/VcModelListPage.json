@@ -13,8 +13,6 @@
   "vcConvertLabel": "オーディオを変換する",
   "vcPitchControlLabel": "ピッチコントロール",
   "vcRecordAudioLabel": "レコードオーディオ",
-  "vcResultsPanelSubText": "生成された音声がここに表示されます。",
-  "vcResultsPanelText": "まだ結果はありません",
   "vcResultsTitle": "セッション V2V の結果",
   "vcTabRecord": "マイクロフォン",
   "vcTabUpload": "アップロード",
