@@ -1,5 +1,4 @@
 import React from "react";
-import { t } from "i18next";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faFrown,
