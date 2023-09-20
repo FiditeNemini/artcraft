@@ -1,5 +1,27 @@
 {
-  "hero": {
-    "title": "Text to Speech"
-  }
+  "heroButtonPricing": "View Pricing",
+  "heroButtonProfile": "View my Profile",
+  "heroButtonSignUp": "Sign Up",
+  "heroButtonUpgradePlan": "Upgrade Plan",
+  "heroText": "Turn text into your favorite character's speaking voice.",
+  "heroTitle": "Text to Speech",
+  "ttsButtonClear": "Clear",
+  "ttsButtonExplore": "Explore Voices",
+  "ttsButtonRandom": "Random Voice",
+  "ttsButtonSpeak": "Speak",
+  "ttsDetailsLanguageLabel": "Language:",
+  "ttsDetailsRatingButtonBad": "This voice sounds bad",
+  "ttsDetailsRatingButtonGood": "This voice sounds good",
+  "ttsDetailsRatingGood": "Voice Sounds Good",
+  "ttsDetailsRatingGreat": "Voice Sounds Great",
+  "ttsDetailsRatingLabel": "Rating:",
+  "ttsDetailsRatingOk": "Voice Sounds Okay",
+  "ttsDetailsViewLink": "See more details",
+  "ttsResultsPanelSubText": "Generated audio will appear here.",
+  "ttsResultsPanelText": "No results yet",
+  "ttsResultsTitle": "Session TTS Results",
+  "ttsTextInputLabel": "Your Text",
+  "ttsTextInputPlaceholder": "Enter the text you want character to say here...",
+  "ttsVoiceLabel": "Voice (number to choose from)",
+  "ttsTooManyRequests": "<b>You're sending too many requests!</b> Slow down a little. We have to slow things down a little when the server gets busy."
 }
