@@ -150,10 +150,15 @@ To start the HTTP API server,
 ```bash
 cargo run --bin storyteller-web
 ```
-
 Note that this compiles and runs the "development" binary. It's faster and easier to debug than the
 optimized "production" build. To build a fully optimized production release,
 run `cargo build --release --bin storyteller-web` . Note that this will take much longer.
+
+Ask Brandon for the .download-job.development-secrets.env and place it in
+crates/service/job/download_job/config
+
+Ask Brandon for the .inference-job.development-secrets.env and place it in
+crates/service/job/inference_job/config
 
 To download some ML models, run:
 
