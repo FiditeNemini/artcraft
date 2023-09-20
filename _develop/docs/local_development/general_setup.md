@@ -134,17 +134,32 @@ file (located at `/etc/hosts`) to include the following configuration lines:
 127.0.0.1    devproxy.storyteller.ai
 ```
 
-### (9) Run one or more applications:
+### (9a) Install Redis
+
+```
+sudo apt install redis
+```
+
+### (9b) Run one or more applications:
+DO NOT CHECK THESE TWO FILES INTO THE REPO
+Ask Brandon for the .env-secrets and .storteller-web.development-secrets.env and place it in the root of the folder.
 
 To start the HTTP API server,
 
 ```bash
 cargo run --bin storyteller-web
 ```
-
 Note that this compiles and runs the "development" binary. It's faster and easier to debug than the
 optimized "production" build. To build a fully optimized production release,
 run `cargo build --release --bin storyteller-web` . Note that this will take much longer.
+
+DO NOT CHECK THESE TWO FILES INTO THE REPO
+
+Ask Brandon for the .download-job.development-secrets.env and place it in
+crates/service/job/download_job/config
+
+Ask Brandon for the .inference-job.development-secrets.env and place it in
+crates/service/job/inference_job/config
 
 To download some ML models, run:
 
