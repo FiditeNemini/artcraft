@@ -141,9 +141,8 @@ sudo apt install redis
 ```
 
 ### (9b) Run one or more applications:
-Ask Brandon for the .env-secrets and .storteller-web.development-secrets.env and place it in the root of the folder.
-
 DO NOT CHECK THESE TWO FILES INTO THE REPO
+Ask Brandon for the .env-secrets and .storteller-web.development-secrets.env and place it in the root of the folder.
 
 To start the HTTP API server,
 
@@ -153,6 +152,8 @@ cargo run --bin storyteller-web
 Note that this compiles and runs the "development" binary. It's faster and easier to debug than the
 optimized "production" build. To build a fully optimized production release,
 run `cargo build --release --bin storyteller-web` . Note that this will take much longer.
+
+DO NOT CHECK THESE TWO FILES INTO THE REPO
 
 Ask Brandon for the .download-job.development-secrets.env and place it in
 crates/service/job/download_job/config
