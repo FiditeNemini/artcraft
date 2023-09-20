@@ -1,9 +1,24 @@
 import React, { useState } from "react";
 import { animated, useSpring, useTransition } from '@react-spring/web';
-import { useFile, useIdempotency } from "hooks";
+import { v4 as uuidv4 } from "uuid";
+import { useFile } from "hooks";
 import { AudioInput, ImageInput, Spinner } from "components/common";
 import DynamicButton from './DynamicButton';
-import { Upload } from "@storyteller/components/src/api/upload/upload";
+import {
+  UploadAudio,
+  // UploadAudioIsOk,
+  // UploadAudioRequest,
+} from "@storyteller/components/src/api/upload/UploadAudio";
+import {
+  UploadImage,
+  // UploadImageIsOk,
+  // UploadImageRequest,
+} from "@storyteller/components/src/api/upload/UploadImage";
+import {
+  EnqueueFaceAnimation,
+  // EnqueueFaceAnimationIsSuccess,
+  // EnqueueFaceAnimationRequest,
+} from "@storyteller/components/src/api/face_animation/EnqueueFaceAnimation";
 import { FrontendInferenceJobType } from "@storyteller/components/src/jobs/InferenceJob";
 import './LipsyncEditor.scss';
 
@@ -106,13 +121,6 @@ const Title = ({ ...rest }) => {
   </div>
 };
 
-const fakeAPI = async (anything: any) => { // this just simulates the unifinished apis
-  await new Promise(resolve => {
-      setTimeout(() => resolve({ success: true }), 3000);
-  });
-  return { success: true, inference_job_token: "fake", upload_token: "also fake", };
-};
-
 export default function LipsyncEditor({ enqueueInferenceJob, ...rest }: EditorProps) {
 
   // the ready states are set by functions which run after the upload input animation is completed, which then illuminates the respective checkmark in a staggered way to draw attention to the workflow, and reduces concurrent animations
@@ -120,54 +128,52 @@ export default function LipsyncEditor({ enqueueInferenceJob, ...rest }: EditorPr
   const [imageReady,imageReadySet] = useState<boolean>(false);
   const [audioReady,audioReadySet] = useState<boolean>(false);
   const readyMedia = (m:number) => (t:boolean) => [imageReadySet,audioReadySet][m](t);
-
-  const idempotency = useIdempotency();
   const audioProps = useFile({}); // contains upload inout state and controls, see docs
   const imageProps = useFile({}); // contains upload inout state and controls, see docs
   const [index,indexSet] = useState<number>(0); // index  = slideshow slide position
-  const [audioUploadToken,audioUploadTokenSet] = useState<string>();
-  const [imageUploadToken,imageUploadTokenSet] = useState<string>();
 
   const makeRequest = (mode: number) => ({
-      uuid_idempotency_token: idempotency.token,
+      uuid_idempotency_token: uuidv4(),
       file: mode ? imageProps.file : audioProps.file,
       source: "file",
       type: mode ? "image" : "audio" 
   });
+
+  const upImageAndMerge = async (audio: any) => ({ audio, image: await UploadImage(makeRequest(1)) });
 
   const submit = async () => {
     if (!audioProps.file) return false;
 
     indexSet(1); // set audio working page
 
-    Upload(makeRequest(0)) // start audio (0) upload
+    UploadAudio(makeRequest(0)) // start audio (0) upload
     .then(res => {
-      if ("success" in res) {
-        audioUploadTokenSet(res.upload_token); // audio token stored
-        idempotency.reset(); // reset token for new request, I don't know if this needs to happen
+      if ("upload_token" in res) {
         indexSet(2); // set image working page
       }
-      return fakeAPI(makeRequest(1)); // start image (1) upload, replace with Upload(imageRequest)
+      return upImageAndMerge(res); // start image (1) upload, replace with Upload(imageRequest)
     })
-    .then(res => {
-      if ("success" in res) {
-        imageUploadTokenSet(res.upload_token); // image token stored
-        idempotency.reset(); 
+    .then(responses => {
+      console.log("🌅",responses);
+      if ("upload_token" in responses.image) {
         indexSet(3); // set face animator API working page
+        return EnqueueFaceAnimation({
+          uuid_idempotency_token: uuidv4(),
+          audio_source: {
+            maybe_media_upload_token: responses.audio.upload_token,
+          },
+          image_source: {
+            maybe_media_upload_token: responses.image.upload_token,
+          },
+        });
       }
-      return fakeAPI({ 
-        source_audio_media_upload_token: audioUploadToken, 
-        source_image_media_upload_token: imageUploadToken, 
-        uuid_idempotency_token: idempotency.token
-      });
     })
     .then(res => {
-      if ("success" in res) {
-      // this breaks because I don't get a real token
-      // enqueueInferenceJob(res.inference_job_token,FrontendInferenceJobType.FaceAnimation);
-        idempotency.reset();
-        indexSet(4); // set face animator API working page
-      }
+      console.log("🎆",res);
+      // if ("success" in res) {
+      //   console.log("💒",res);
+      //   indexSet(4); // set face animator API working page
+      // }
     })
     .catch(e => {
       return { success : false };
