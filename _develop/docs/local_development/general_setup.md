@@ -134,7 +134,16 @@ file (located at `/etc/hosts`) to include the following configuration lines:
 127.0.0.1    devproxy.storyteller.ai
 ```
 
-### (9) Run one or more applications:
+### (9a) Install Redis
+
+```
+sudo apt install redis
+```
+
+### (9b) Run one or more applications:
+Ask Brandon for the .env-secrets and .storteller-web.development-secrets.env and place it in the root of the folder.
+
+DO NOT CHECK THESE TWO FILES INTO THE REPO
 
 To start the HTTP API server,
 
