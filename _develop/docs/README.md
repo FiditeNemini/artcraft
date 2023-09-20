@@ -1,8 +1,9 @@
 README
 ======
 
-This directory contains a collection of documentation on running the backend.
-
+This directory contains a collection of (hopefully organized and up to date) documentation on 
+running the various backend pieces, development setup, production maintenance, etc. Check out 
+all the markdown documents in this directory tree for information organized by topic.
 
 Development / Setup
 -------------------
