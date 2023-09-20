@@ -1,6 +1,4 @@
 import React, { useEffect, useCallback, useState } from "react";
-import { t } from "i18next";
-import { Trans } from "react-i18next";
 import { Link } from "react-router-dom";
 import { SessionTtsInferenceResultList } from "../../../_common/SessionTtsInferenceResultsList";
 import { SessionTtsModelUploadResultList } from "../../../_common/SessionTtsModelUploadResultsList";
@@ -68,6 +66,7 @@ import { RatingButtons } from "../../../_common/ratings/RatingButtons";
 import { RatingStats } from "../../../_common/ratings/RatingStats";
 import { SearchOmnibar } from "./search/SearchOmnibar";
 import { PosthogClient } from "@storyteller/components/src/analytics/PosthogClient";
+import { useLocalize } from "hooks";
 
 export interface EnqueueJobResponsePayload {
   success: boolean;
@@ -140,6 +139,8 @@ interface Props {
 
 function TtsModelListPage(props: Props) {
   PosthogClient.recordPageview();
+
+  const { t } = useLocalize("TtsModelListPage");
 
   //Loading spinning icon
   const [loading, setLoading] = useState(false);
@@ -442,13 +443,7 @@ function TtsModelListPage(props: Props) {
     switch (maybeTtsError) {
       case GenerateTtsAudioErrorType.TooManyRequests:
         hasMessage = true;
-        message = (
-          <Trans i18nKey="pages.ttsList.errorTooManyRequests">
-            <strong>You're sending too many requests!</strong>
-            Slow down a little. We have to slow things down a little when the
-            server gets busy.
-          </Trans>
-        );
+        message = <>{t("tts.TtsModelListPage.errors.tooManyRequests")}</>;
         break;
       case GenerateTtsAudioErrorType.ServerError |
         GenerateTtsAudioErrorType.BadRequest |
@@ -576,13 +571,10 @@ function TtsModelListPage(props: Props) {
                       onChange={handleChangeText}
                       className="form-control text-message h-100"
                       value={props.textBuffer}
-                      placeholder={t(
-                        "tts.TtsModelListPage.form.textInputHint",
-                        {
-                          voice:
-                            props.maybeSelectedTtsModel?.title || "the voice",
-                        }
-                      )}
+                      // placeholder={t("ttsTextInputPlaceholder", {
+                      //   voice:
+                      //     props.maybeSelectedTtsModel?.title || "the voice",
+                      // })}
                     ></textarea>
                     {audioLimitAlert}
                     <div className="d-flex gap-3">
