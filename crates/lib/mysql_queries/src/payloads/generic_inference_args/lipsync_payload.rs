@@ -111,6 +111,7 @@ mod tests {
       maybe_audio_source: Some(LipsyncAnimationAudioSource::media_file_token("audio_media_file")),
       maybe_image_source: Some(LipsyncAnimationImageSource::media_file_token("image_media_file")),
       maybe_face_enhancer: None,
+      maybe_pose_style: None,
     };
     let json = serde_json::ser::to_string(&args).unwrap();
     assert_eq!(json, r#"{"a":{"F":"audio_media_file"},"i":{"F":"image_media_file"}}"#.to_string());
@@ -122,6 +123,7 @@ mod tests {
       maybe_audio_source: Some(LipsyncAnimationAudioSource::media_upload_token("audio_media_upload")),
       maybe_image_source: Some(LipsyncAnimationImageSource::media_upload_token("image_media_upload")),
       maybe_face_enhancer: None,
+      maybe_pose_style: None,
     };
     let json = serde_json::ser::to_string(&args).unwrap();
     assert_eq!(json, r#"{"a":{"U":"audio_media_upload"},"i":{"U":"image_media_upload"}}"#.to_string());
@@ -133,6 +135,7 @@ mod tests {
       maybe_audio_source: Some(LipsyncAnimationAudioSource::tts_result_token("audio_tts_result")),
       maybe_image_source: Some(LipsyncAnimationImageSource::media_upload_token("image_media_upload")),
       maybe_face_enhancer: None,
+      maybe_pose_style: None,
     };
     let json = serde_json::ser::to_string(&args).unwrap();
     assert_eq!(json, r#"{"a":{"T":"audio_tts_result"},"i":{"U":"image_media_upload"}}"#.to_string());
@@ -144,6 +147,7 @@ mod tests {
       maybe_audio_source: Some(LipsyncAnimationAudioSource::voice_conversion_result_token("audio_voice_conversion_result")),
       maybe_image_source: Some(LipsyncAnimationImageSource::media_upload_token("image_media_upload")),
       maybe_face_enhancer: None,
+      maybe_pose_style: None,
     };
     let json = serde_json::ser::to_string(&args).unwrap();
     assert_eq!(json, r#"{"a":{"V":"audio_voice_conversion_result"},"i":{"U":"image_media_upload"}}"#.to_string());
@@ -155,6 +159,7 @@ mod tests {
       maybe_audio_source: None,
       maybe_image_source: None,
       maybe_face_enhancer: Some(FaceEnhancer::G),
+      maybe_pose_style: None,
     };
     let json = serde_json::ser::to_string(&args).unwrap();
     assert_eq!(json, r#"{"f":"G"}"#.to_string());
@@ -166,6 +171,7 @@ mod tests {
       maybe_audio_source: None,
       maybe_image_source: None,
       maybe_face_enhancer: Some(FaceEnhancer::R),
+      maybe_pose_style: None,
     };
     let json = serde_json::ser::to_string(&args).unwrap();
     assert_eq!(json, r#"{"f":"R"}"#.to_string());
