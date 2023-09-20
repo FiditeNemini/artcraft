@@ -13,7 +13,8 @@ The applications (binary targets) you might be interested in running include:
 Linux Setup (tested on Ubuntu 22.04)
 ------------------------------------
 
-1) Install Rust [using this guide](https://www.rust-lang.org/learn/get-started).
+1) Install Rust [using this guide](https://www.rust-lang.org/learn/get-started). If it asks, you'll want "stable"
+    Rust, not "nightly" Rust. If it doesn't ask, it defaults to "stable".
 
 2) Install the following libraries and MySQL server:
 
@@ -65,7 +66,6 @@ Linux Setup (tested on Ubuntu 22.04)
     You might get a scary message about `"Encountered unknown type for Mysql: enum"` -- you can ignore this 
     error (see below).
 
-
 6) (optional) Install the SQLx CLI (if doing database development)
 
     ```bash
@@ -76,10 +76,63 @@ Linux Setup (tested on Ubuntu 22.04)
     Diesel is an immature ORM, which isn't a good tech bet, so we use sqlx as at-compile-time
     typesafe SQL.
 
+7) Install hosts file:
+
+    If you're developing against the frontend, it'll target development domains (eg. `dev.fakeyou.com`) instead 
+    of `127.0.0.1` or `localhost`. You can make your machine route domains to localhost by editing your hosts 
+    file (located at `/etc/hosts`) to include the following configuration lines:
+
+    ```
+    127.0.0.1    dev.fakeyou.com
+    127.0.0.1    api.dev.fakeyou.com
+    127.0.0.1    devproxy.fakeyou.com
+
+    127.0.0.1    dev.storyteller.ai
+    127.0.0.1    api.dev.storyteller.ai
+    127.0.0.1    devproxy.storyteller.ai
+    ```
+
+8) Run one or more applications:
+
+   To start the HTTP API server,
+
+    ```bash
+    cargo run --bin storyteller-web
+    ```
+
+   Note that this compiles and runs the "development" binary. It's faster and easier to debug than the
+   optimized "production" build. To build a fully optimized production release,
+   run `cargo build --release --bin storyteller-web` . Note that this will take much longer.
+
+   To download some ML models, run:
+
+    ```bash
+    cargo run --bin download-job
+    cargo run --bin tts-download-job
+    ```
+
+   If you want to run both the HTTP API and the jobs, you'll need to run both processes in different
+   terminals or tmux sessions.
+
+   Note also that the configurations pointing to the ML monorepo must be set up for each application.
+   Additionally, some development secrets may be needed (ask the team to share).
+
+   To execute ML inference, run:
+
+    ```bash
+    cargo run --bin inference-job
+    cargo run --bin tts-inference-job
+    ```
+
+   Again, note that the configurations pointing to the ML monorepo must be set up for each application.
+   Additionally, some development secrets may be needed (ask the team to share).
+
+
 Mac Setup (tested on Apple M2 Silicon)
 --------------------------------------
 
-1) Install Rust [using this guide](https://www.rust-lang.org/learn/get-started).
+1) Install Rust [using this guide](https://www.rust-lang.org/learn/get-started). If it asks, you'll want "stable"
+   Rust, not "nightly" Rust. If it doesn't ask, it defaults to "stable".
 
 2) Install MySQL server:
 
@@ -146,6 +199,58 @@ Mac Setup (tested on Apple M2 Silicon)
     We'll be using diesel to manage the migrations, but sqlx within the app to actually perform queries.
     Diesel is an immature ORM, which isn't a good tech bet, so we use sqlx as at-compile-time
     typesafe SQL.
+
+7) Install hosts file:
+
+    If you're developing against the frontend, it'll target development domains (eg. `dev.fakeyou.com`) instead
+    of `127.0.0.1` or `localhost`. You can make your machine route domains to localhost by editing your hosts
+    file (located at `/etc/hosts`) to include the following configuration lines:
+
+    ```
+    127.0.0.1    dev.fakeyou.com
+    127.0.0.1    api.dev.fakeyou.com
+    127.0.0.1    devproxy.fakeyou.com
+
+    127.0.0.1    dev.storyteller.ai
+    127.0.0.1    api.dev.storyteller.ai
+    127.0.0.1    devproxy.storyteller.ai
+    ```
+
+8) Run one or more applications:
+
+    To start the HTTP API server,
+
+    ```bash
+    cargo run --bin storyteller-web
+    ```
+   
+    Note that this compiles and runs the "development" binary. It's faster and easier to debug than the 
+    optimized "production" build. To build a fully optimized production release, 
+    run `cargo build --release --bin storyteller-web` . Note that this will take much longer.
+
+    To download some ML models, run:
+
+    ```bash
+    cargo run --bin download-job
+    cargo run --bin tts-download-job
+    ```
+   
+    If you want to run both the HTTP API and the jobs, you'll need to run both processes in different 
+    terminals or tmux sessions.
+
+    Note also that the configurations pointing to the ML monorepo must be set up for each application.
+    Additionally, some development secrets may be needed (ask the team to share).
+
+    To execute ML inference, run:
+
+    ```bash
+    cargo run --bin inference-job
+    cargo run --bin tts-inference-job
+    ```
+
+    Again, note that the configurations pointing to the ML monorepo must be set up for each application.
+    Additionally, some development secrets may be needed (ask the team to share).
+
 
 Windows Setup
 -------------
