@@ -1,10 +1,12 @@
 use anyhow::anyhow;
 use chrono::NaiveDateTime;
+use sqlx::MySqlPool;
+
 use errors::AnyhowResult;
-use crate::tokens::Tokens;
 use reusable_types::stripe::stripe_recurring_interval::StripeRecurringInterval;
 use reusable_types::stripe::stripe_subscription_status::StripeSubscriptionStatus;
-use sqlx::MySqlPool;
+
+use crate::tokens::Tokens;
 
 // TODO: Make a trait with default impls to handle common query concerns.
 

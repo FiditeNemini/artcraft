@@ -1,10 +1,12 @@
-use crate::shared_state::job_state::JobState;
-use crate::workers::news_stories::phase_3::news_story_audio_preprocessing::process_single_item::process_single_item;
-use log::{debug, error};
-use sqlite_queries::queries::by_table::news_story_productions::list::list_news_story_productions_awaiting_audio_generation::list_news_story_productions_awaiting_audio_generation;
 use std::sync::Arc;
 use std::thread;
 use std::time::Duration;
+
+use log::{debug, error};
+use sqlite_queries::queries::by_table::news_story_productions::list::list_news_story_productions_awaiting_audio_generation::list_news_story_productions_awaiting_audio_generation;
+
+use crate::shared_state::job_state::JobState;
+use crate::workers::news_stories::phase_3::news_story_audio_preprocessing::process_single_item::process_single_item;
 
 /// Split text into text segments fit for rendering.
 pub async fn news_story_audio_preprocessing_main_loop(job_state: Arc<JobState>) {

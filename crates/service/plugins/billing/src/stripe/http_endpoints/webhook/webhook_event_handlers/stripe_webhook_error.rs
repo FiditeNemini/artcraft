@@ -1,9 +1,11 @@
 //! Returned by the webhook endpoint, but also dispatched event handler functions.
 
-use actix_web::http::StatusCode;
-use actix_web::{HttpResponse, ResponseError};
-use http_server_common::response::serialize_as_json_error::serialize_as_json_error;
 use std::fmt;
+
+use actix_web::{HttpResponse, ResponseError};
+use actix_web::http::StatusCode;
+
+use http_server_common::response::serialize_as_json_error::serialize_as_json_error;
 
 #[derive(Debug, Serialize)]
 pub enum StripeWebhookError {

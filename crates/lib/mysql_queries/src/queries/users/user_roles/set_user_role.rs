@@ -1,6 +1,7 @@
 use anyhow::anyhow;
-use errors::AnyhowResult;
 use sqlx::MySqlPool;
+
+use errors::AnyhowResult;
 use tokens::users::user::UserToken;
 
 pub async fn set_user_role(

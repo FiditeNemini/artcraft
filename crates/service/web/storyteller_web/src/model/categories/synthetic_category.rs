@@ -1,5 +1,4 @@
 use enums::by_table::model_categories::model_type::ModelType;
-use tokens::tokens::model_categories::ModelCategoryToken;
 
 #[derive(Clone, Eq, PartialEq, Hash, Debug)]
 pub struct SyntheticCategory {

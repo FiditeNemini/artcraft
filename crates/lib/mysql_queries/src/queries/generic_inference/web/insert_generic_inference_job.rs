@@ -1,13 +1,15 @@
 use anyhow::anyhow;
-use crate::payloads::generic_inference_args::generic_inference_args::GenericInferenceArgs;
+use sqlx::MySqlPool;
+
 use enums::by_table::generic_inference_jobs::inference_category::InferenceCategory;
 use enums::by_table::generic_inference_jobs::inference_input_source_token_type::InferenceInputSourceTokenType;
 use enums::by_table::generic_inference_jobs::inference_model_type::InferenceModelType;
 use enums::common::visibility::Visibility;
 use errors::AnyhowResult;
-use sqlx::MySqlPool;
 use tokens::jobs::inference::InferenceJobToken;
 use tokens::users::user::UserToken;
+
+use crate::payloads::generic_inference_args::generic_inference_args::GenericInferenceArgs;
 
 pub struct InsertGenericInferenceArgs<'a> {
   pub uuid_idempotency_token: &'a str,

@@ -1,9 +1,10 @@
 use anyhow::anyhow;
-use crate::queries::generic_inference::job::_keys::GenericInferenceJobId;
-use crate::queries::tts::tts_inference_jobs::_keys::TtsInferenceJobId;
-use errors::AnyhowResult;
-use sqlx::MySqlPool;
 use sqlx;
+use sqlx::MySqlPool;
+
+use errors::AnyhowResult;
+
+use crate::queries::tts::tts_inference_jobs::_keys::TtsInferenceJobId;
 
 pub async fn mark_tts_inference_job_done(
   pool: &MySqlPool,

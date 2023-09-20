@@ -1,4 +1,4 @@
-use std::{io, process::Command, path::{Path, PathBuf}, string::String};
+use std::{io, path::Path, process::Command, string::String};
 
 pub fn audiowmark_add<P>(in_path: P, strength: u8, message: [u8;16], out_path: P) -> Result<String, io::Error>
 where P: AsRef<Path> {
@@ -66,8 +66,11 @@ where P: AsRef<Path> {
 
 #[cfg(test)]
 mod tests {
-use super::*;
-fn test_file(path_from_repo_root: &str) -> PathBuf {
+  use std::path::PathBuf;
+
+  use super::*;
+
+  fn test_file(path_from_repo_root: &str) -> PathBuf {
     // https://doc.rust-lang.org/cargo/reference/environment-variables.html
     let mut path = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
     path.push(format!("../../../../{}", path_from_repo_root));

@@ -1,16 +1,19 @@
 use std::time::Instant;
+
 use anyhow::anyhow;
+use log::{info, warn};
+use tempdir::TempDir;
+
 use config::is_bad_download_url::is_bad_download_url;
 use container_common::anyhow_result::AnyhowResult;
 use container_common::filesystem::safe_delete_temp_directory::safe_delete_temp_directory;
-use crate::JobState;
-use crate::job_types::dispatch_job_to_handler::{dispatch_job_to_handler, DispatchJobToHandlerArgs};
 use jobs_common::redis_job_status_logger::RedisJobStatusLogger;
-use log::{info, warn};
 use mysql_queries::queries::generic_download::job::list_available_generic_download_jobs::AvailableDownloadJob;
 use mysql_queries::queries::generic_download::job::mark_generic_download_job_done::mark_generic_download_job_done;
 use mysql_queries::queries::generic_download::job::mark_generic_download_job_pending_and_grab_lock::mark_generic_download_job_pending_and_grab_lock;
-use tempdir::TempDir;
+
+use crate::job_types::dispatch_job_to_handler::{dispatch_job_to_handler, DispatchJobToHandlerArgs};
+use crate::JobState;
 
 pub async fn process_single_job(job_state: &JobState, job: &AvailableDownloadJob) -> AnyhowResult<()> {
 

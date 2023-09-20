@@ -1,9 +1,8 @@
-use container_common::anyhow_result::AnyhowResult;
+use stripe::Customer;
+
 use crate::stripe::helpers::common_metadata_keys::METADATA_USER_TOKEN;
 use crate::stripe::http_endpoints::webhook::webhook_event_handlers::stripe_webhook_error::StripeWebhookError;
 use crate::stripe::http_endpoints::webhook::webhook_event_handlers::stripe_webhook_summary::StripeWebhookSummary;
-use log::warn;
-use stripe::Customer;
 
 // Handle event type: 'customer.deleted'
 pub fn customer_deleted_handler(customer: &Customer) -> Result<StripeWebhookSummary, StripeWebhookError> {

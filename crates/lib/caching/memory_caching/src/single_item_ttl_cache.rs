@@ -1,8 +1,10 @@
-use anyhow::bail;
-use errors::AnyhowResult;
-use lru_time_cache::LruCache;
 use std::sync::{Arc, Mutex};
 use std::time::Duration;
+
+use anyhow::bail;
+use lru_time_cache::LruCache;
+
+use errors::AnyhowResult;
 
 /// NB: There's only ONE ITEM of ONE TYPE in the cache. We can use a single key.
 const CACHE_KEY : &str = "ITEM";
@@ -73,6 +75,7 @@ impl <T: Clone + ?Sized> SingleItemTtlCache<T> {
 mod tests {
   use std::thread;
   use std::time::Duration;
+
   use crate::single_item_ttl_cache::SingleItemTtlCache;
 
   #[test]

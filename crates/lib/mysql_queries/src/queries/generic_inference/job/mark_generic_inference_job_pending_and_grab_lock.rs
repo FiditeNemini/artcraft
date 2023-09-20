@@ -1,9 +1,11 @@
 use anyhow::anyhow;
+use sqlx;
+use sqlx::MySqlPool;
+
+use errors::AnyhowResult;
+
 use crate::common_inputs::container_environment_arg::ContainerEnvironmentArg;
 use crate::queries::generic_inference::job::_keys::GenericInferenceJobId;
-use errors::AnyhowResult;
-use sqlx::MySqlPool;
-use sqlx;
 
 // TODO(2022-02-09): It's unclear how stuck "pending" jobs don't become perma-dead
 //  I think this logic is flawed and the job system needs to pick up stuck "pending" jobs.

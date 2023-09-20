@@ -1,11 +1,10 @@
-#[cfg(test)]
-use mockall::{automock, mock, predicate::*};
+use std::error::Error;
+use std::fmt::{Display, Formatter};
 
 use actix_web::HttpRequest;
 use async_trait::async_trait;
-use sqlx::MySqlPool;
-use std::error::Error;
-use std::fmt::{Display, Formatter};
+#[cfg(test)]
+use mockall::automock;
 
 /// Errors for this component are not strongly typed.
 #[derive(Debug)]

@@ -1,10 +1,11 @@
 use anyhow::anyhow;
-use errors::AnyhowResult;
 use log::error;
 use log::warn;
-use r2d2_redis::RedisConnectionManager;
 use r2d2_redis::r2d2::PooledConnection;
 use r2d2_redis::redis::Commands;
+use r2d2_redis::RedisConnectionManager;
+
+use errors::AnyhowResult;
 use redis_common::payloads::obs_active_payload::ObsActivePayload;
 use redis_common::redis_keys::RedisKeys;
 

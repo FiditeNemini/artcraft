@@ -1,13 +1,14 @@
-use anyhow::Error;
-use crate::threads::db_health_checker_thread::db_health_check_status::HealthCheckStatus;
-use mysql_queries::queries::health_check::health_check_query::{health_check_db, HealthCheckResult};
-use log::debug;
-use log::error;
-use log::info;
-use log::warn;
-use sqlx::MySqlPool;
 use std::thread;
 use std::time::Duration;
+
+use log::debug;
+use log::error;
+use log::warn;
+use sqlx::MySqlPool;
+
+use mysql_queries::queries::health_check::health_check_query::health_check_db;
+
+use crate::threads::db_health_checker_thread::db_health_check_status::HealthCheckStatus;
 
 pub async fn db_health_checker_thread(
   health_check_status: HealthCheckStatus,

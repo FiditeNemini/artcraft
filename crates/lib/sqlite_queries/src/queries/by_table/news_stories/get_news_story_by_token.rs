@@ -1,5 +1,5 @@
-use log::{error, warn};
 use errors::{anyhow, AnyhowResult};
+use log::{error, warn};
 use sqlx::SqlitePool;
 use tokens::tokens::news_stories::NewsStoryToken;
 

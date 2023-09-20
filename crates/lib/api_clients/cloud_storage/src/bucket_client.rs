@@ -1,3 +1,6 @@
+use std::path::Path;
+use std::time::Duration;
+
 use anyhow::anyhow;
 use anyhow::bail;
 use log::info;
@@ -5,13 +8,8 @@ use log::warn;
 use s3::bucket::Bucket;
 use s3::creds::Credentials;
 use s3::region::Region;
-use std::io::Read;
-use std::path::{PathBuf, Path};
-use std::str::FromStr;
-use std::time::Duration;
 use tokio::fs::File;
-use tokio::io::AsyncBufReadExt;
-use tokio::io::{AsyncBufRead, BufReader, AsyncReadExt};
+use tokio::io::AsyncReadExt;
 
 #[derive(Clone)]
 pub struct BucketClient {

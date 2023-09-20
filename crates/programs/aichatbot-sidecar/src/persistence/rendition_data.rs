@@ -1,4 +1,5 @@
 use std::path::Path;
+
 use errors::AnyhowResult;
 
 /// For serializing OpenAI GPT requests.

@@ -1,13 +1,15 @@
 use actix_http::header;
-use actix_web::web::Query;
 use actix_web::{HttpRequest, HttpResponse, web};
+use actix_web::web::Query;
+
+use url_config::third_party_url_redirector::ThirdPartyUrlRedirector;
+
 use crate::stripe::http_endpoints::customer_portal::stripe_create_customer_portal_session_error::CreateCustomerPortalSessionError;
 use crate::stripe::http_endpoints::customer_portal::stripe_create_customer_portal_session_shared::stripe_create_customer_portal_session_shared;
 use crate::stripe::stripe_config::StripeConfig;
 use crate::stripe::traits::internal_product_to_stripe_lookup::InternalProductToStripeLookup;
 use crate::stripe::traits::internal_session_cache_purge::InternalSessionCachePurge;
 use crate::stripe::traits::internal_user_lookup::InternalUserLookup;
-use url_config::third_party_url_redirector::ThirdPartyUrlRedirector;
 
 // =============== Request ===============
 

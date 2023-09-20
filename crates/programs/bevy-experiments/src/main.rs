@@ -1,20 +1,15 @@
 //! Loads and renders a glTF file as a scene.
 
-use std::f32::consts::*;
 use core::time::Duration;
+use std::f32::consts::*;
 
 use bevy::{
-    pbr::{CascadeShadowConfigBuilder, DirectionalLightShadowMap},
-    prelude::*,
-    scene::SceneInstance,
-    animation::{AnimationClip, AnimationPlayer},
+  animation::{AnimationClip, AnimationPlayer},
+  pbr::{CascadeShadowConfigBuilder, DirectionalLightShadowMap},
+  prelude::*,
+  scene::SceneInstance,
 };
-
-
-
-use bevy::{
-    input::mouse::MouseMotion,
-};
+use bevy::input::mouse::MouseMotion;
 
 fn main() {
     App::new()

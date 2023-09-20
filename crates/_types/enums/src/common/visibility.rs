@@ -144,6 +144,7 @@ mod tests {
 
   mod serde_serialization {
     use crate::common::visibility::Visibility;
+
     use super::CompositeType;
 
     #[test]
@@ -166,6 +167,7 @@ mod tests {
 
   mod serde_deserialization {
     use crate::common::visibility::Visibility;
+
     use super::CompositeType;
 
     #[test]

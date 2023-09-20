@@ -1,6 +1,7 @@
-use chrono::{DateTime, Utc, Duration};
 use std::collections::HashMap;
 use std::hash::Hash;
+
+use chrono::{DateTime, Duration, Utc};
 
 /// How to handle cache miss events, as dictated by the `CacheMissStrategizer`.
 #[derive(Eq, PartialEq, Copy, Clone, Debug)]
@@ -121,7 +122,8 @@ impl <T: Hash + Eq> CacheMissStrategizer<T> {
 
 #[cfg(test)]
 mod tests {
-  use chrono::{Duration, Utc, DateTime};
+  use chrono::{DateTime, Duration, Utc};
+
   use crate::{CacheMissStrategizer, CacheMissStrategy};
 
   fn get_date(datetime: &str) -> DateTime<Utc> {

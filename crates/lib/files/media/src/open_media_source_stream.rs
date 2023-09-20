@@ -1,8 +1,10 @@
-use errors::AnyhowResult;
 use std::fs::File;
 use std::io::{BufReader, Cursor};
 use std::path::Path;
+
 use symphonia::core::io::{MediaSourceStream, ReadOnlySource};
+
+use errors::AnyhowResult;
 
 pub fn open_file_media_source_stream<P: AsRef<Path>>(file_path: P) -> AnyhowResult<MediaSourceStream> {
   let file = File::open(&file_path)?;

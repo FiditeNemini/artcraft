@@ -1,12 +1,11 @@
 //! Static FakeYou API tokens can be read from a config file.
 //! This will be a stopgap until we deploy the full system.
 
-use errors::AnyhowResult;
-use container_common::files::read_toml_file_to_struct::read_toml_file_to_struct;
-use log::{error, info};
 use std::collections::HashMap;
-use std::fs::File;
-use std::io::Read;
+
+use log::{error, info};
+
+use container_common::files::read_toml_file_to_struct::read_toml_file_to_struct;
 
 /// Config to pass to handlers
 pub struct StaticApiTokenSet {

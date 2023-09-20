@@ -1,8 +1,8 @@
 use actix_http::body::BoxBody;
 use actix_http::header::CONTENT_TYPE;
-use actix_web::http::StatusCode;
-use actix_web::http::header::ContentType;
 use actix_web::{HttpResponse, HttpResponseBuilder, ResponseError};
+use actix_web::http::header::ContentType;
+use actix_web::http::StatusCode;
 
 #[derive(Debug)]
 pub struct DisabledError;

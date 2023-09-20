@@ -1,7 +1,7 @@
 use actix_http::header::CONTENT_TYPE;
+use actix_web::error::ResponseError;
 use actix_web::HttpResponse;
 use actix_web::HttpResponseBuilder;
-use actix_web::error::ResponseError;
 use serde::Serialize;
 
 /// Turn error responses into JSON HTTP responses

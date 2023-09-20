@@ -1,6 +1,7 @@
 use anyhow::anyhow;
-use errors::AnyhowResult;
 use sqlx::MySqlPool;
+
+use errors::AnyhowResult;
 
 pub async fn delete_twitch_event_rule(
   event_rule_token: &str,

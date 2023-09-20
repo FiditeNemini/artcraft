@@ -1,7 +1,9 @@
-use errors::AnyhowResult;
-use log::info;
 use std::path::Path;
+
+use log::info;
 use subprocess::{Popen, PopenConfig};
+
+use errors::AnyhowResult;
 use subprocess_common::docker_options::DockerOptions;
 
 /// This command is used to check hifigan (softvc) for being a real model

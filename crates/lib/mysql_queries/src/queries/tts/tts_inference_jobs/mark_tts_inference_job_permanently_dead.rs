@@ -1,8 +1,10 @@
 use anyhow::anyhow;
-use errors::AnyhowResult;
-use crate::queries::tts::tts_inference_jobs::_keys::TtsInferenceJobId;
-use sqlx::MySqlPool;
 use sqlx;
+use sqlx::MySqlPool;
+
+use errors::AnyhowResult;
+
+use crate::queries::tts::tts_inference_jobs::_keys::TtsInferenceJobId;
 
 /// Mark a TTS job as dead ("do not ever retry").
 pub async fn mark_tts_inference_job_permanently_dead(

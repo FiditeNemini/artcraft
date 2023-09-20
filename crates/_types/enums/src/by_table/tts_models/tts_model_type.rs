@@ -1,6 +1,5 @@
 use serde::Deserialize;
 use serde::Serialize;
-
 #[cfg(test)]
 use strum::EnumCount;
 #[cfg(test)]

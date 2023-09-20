@@ -1,12 +1,13 @@
 use anyhow::anyhow;
-use errors::AnyhowResult;
-use crate::mediators::firehose_publisher::FirehosePublisher;
-use log::{warn,info};
-use reusable_types::achievements::user_badge::UserBadge;
+use log::warn;
+use sqlx::MySqlPool;
 use sqlx::error::Error::Database;
 use sqlx::mysql::MySqlQueryResult;
-use sqlx::{MySqlPool};
-use std::sync::Arc;
+
+use errors::AnyhowResult;
+use reusable_types::achievements::user_badge::UserBadge;
+
+use crate::mediators::firehose_publisher::FirehosePublisher;
 
 #[derive(Clone)]
 pub struct BadgeGranter {

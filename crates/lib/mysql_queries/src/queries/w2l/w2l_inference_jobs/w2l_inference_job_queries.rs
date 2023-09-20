@@ -2,14 +2,17 @@
 //! Sqlx's prepare needs a *single* binary to work against, so we need to
 //! include these in the main binary to generate all the queries.
 
-use anyhow::anyhow;
-use chrono::{Utc, DateTime};
-use errors::AnyhowResult;
-use crate::tokens::Tokens;
-use enums::common::visibility::Visibility;
-use log::{warn, info};
-use sqlx::MySqlPool;
 use std::path::Path;
+
+use anyhow::anyhow;
+use chrono::{DateTime, Utc};
+use log::warn;
+use sqlx::MySqlPool;
+
+use enums::common::visibility::Visibility;
+use errors::AnyhowResult;
+
+use crate::tokens::Tokens;
 
 // TODO(2022-08-04): These were moved into the 'mysql_queries' crate, but they need
 //  to be split up into several modules for better maintainability. cf the already moved

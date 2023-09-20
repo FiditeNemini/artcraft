@@ -1,4 +1,5 @@
 use actix_web::cookie::Cookie;
+
 use crate::server_state::ServerState;
 
 pub const ALPHA_COOKIE_NAME : &str = "enable-alpha";

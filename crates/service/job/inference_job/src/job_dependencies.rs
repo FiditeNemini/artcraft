@@ -1,15 +1,13 @@
+use std::path::PathBuf;
+
+use r2d2_redis::r2d2;
+use r2d2_redis::RedisConnectionManager;
+use sqlx::MySqlPool;
+
 use bootstrap::bootstrap::ContainerEnvironment;
 use cloud_storage::bucket_client::BucketClient;
 use cloud_storage::bucket_path_unifier::BucketPathUnifier;
 use concurrency::relaxed_atomic_bool::RelaxedAtomicBool;
-use crate::job::job_types::lipsync::sad_talker::model_downloaders::SadTalkerDownloaders;
-use crate::job::job_types::tts::tacotron2_v2_early_fakeyou::tacotron2_inference_command::Tacotron2InferenceCommand;
-use crate::job::job_types::tts::vits::vits_inference_command::VitsInferenceCommand;
-use crate::job::job_types::vc::rvc_v2::pretrained_hubert_model::PretrainedHubertModel;
-use crate::job::job_types::vc::rvc_v2::rvc_v2_inference_command::RvcV2InferenceCommand;
-use crate::job::job_types::vc::so_vits_svc::so_vits_svc_inference_command::SoVitsSvcInferenceCommand;
-use crate::util::scoped_execution::ScopedExecution;
-use crate::util::scoped_temp_dir_creator::ScopedTempDirCreator;
 use jobs_common::job_progress_reporter::job_progress_reporter::JobProgressReporterBuilder;
 use jobs_common::job_stats::JobStats;
 use jobs_common::semi_persistent_cache_dir::SemiPersistentCacheDir;
@@ -20,11 +18,16 @@ use mysql_queries::mediators::firehose_publisher::FirehosePublisher;
 use mysql_queries::queries::tts::tts_models::get_tts_model_for_inference_improved::TtsModelForInferenceRecord;
 use mysql_queries::queries::voice_conversion::inference::get_voice_conversion_model_for_inference::VoiceConversionModelForInference;
 use newrelic_telemetry::Client as NewRelicClient;
-use r2d2_redis::RedisConnectionManager;
-use r2d2_redis::r2d2;
-use sqlx::MySqlPool;
-use std::path::PathBuf;
+
+use crate::job::job_types::lipsync::sad_talker::model_downloaders::SadTalkerDownloaders;
 use crate::job::job_types::lipsync::sad_talker::sad_talker_inference_command::SadTalkerInferenceCommand;
+use crate::job::job_types::tts::tacotron2_v2_early_fakeyou::tacotron2_inference_command::Tacotron2InferenceCommand;
+use crate::job::job_types::tts::vits::vits_inference_command::VitsInferenceCommand;
+use crate::job::job_types::vc::rvc_v2::pretrained_hubert_model::PretrainedHubertModel;
+use crate::job::job_types::vc::rvc_v2::rvc_v2_inference_command::RvcV2InferenceCommand;
+use crate::job::job_types::vc::so_vits_svc::so_vits_svc_inference_command::SoVitsSvcInferenceCommand;
+use crate::util::scoped_execution::ScopedExecution;
+use crate::util::scoped_temp_dir_creator::ScopedTempDirCreator;
 
 pub struct JobDependencies {
   /// The job should only run on these types of models.

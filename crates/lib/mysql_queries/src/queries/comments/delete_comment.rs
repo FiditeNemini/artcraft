@@ -1,4 +1,5 @@
-use sqlx::{Executor, MySql, MySqlPool};
+use sqlx::{Executor, MySql};
+
 use errors::AnyhowResult;
 use tokens::tokens::comments::CommentToken;
 

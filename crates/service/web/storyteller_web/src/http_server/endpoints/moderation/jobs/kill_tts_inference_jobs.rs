@@ -1,18 +1,15 @@
-use actix_http::Error;
-use actix_web::HttpResponseBuilder;
-use actix_web::cookie::Cookie;
-use actix_web::error::ResponseError;
-use actix_web::http::StatusCode;
-use actix_web::web::{Path, Json};
-use actix_web::{Responder, web, HttpResponse, error, HttpRequest};
-use crate::server_state::ServerState;
-use mysql_queries::queries::tts::tts_inference_jobs::kill_tts_inference_jobs::{kill_tts_inference_jobs, JobStatus};
-use http_server_common::response::serialize_as_json_error::serialize_as_json_error;
-use log::{info, warn, log, error};
-use regex::Regex;
-use sqlx::MySqlPool;
 use std::fmt;
 use std::sync::Arc;
+
+use actix_web::{HttpRequest, HttpResponse, web};
+use actix_web::error::ResponseError;
+use actix_web::http::StatusCode;
+use log::{error, log, warn};
+
+use http_server_common::response::serialize_as_json_error::serialize_as_json_error;
+use mysql_queries::queries::tts::tts_inference_jobs::kill_tts_inference_jobs::{JobStatus, kill_tts_inference_jobs};
+
+use crate::server_state::ServerState;
 
 // =============== Request ===============
 

@@ -1,8 +1,9 @@
 //! These routes are recommended, but do not have to be used by consumers of the user system.
+use actix_web::{App, HttpResponse, web};
 use actix_web::body::MessageBody;
-use actix_web::dev::{ServiceRequest, ServiceResponse, ServiceFactory};
+use actix_web::dev::{ServiceFactory, ServiceRequest, ServiceResponse};
 use actix_web::error::Error;
-use actix_web::{App, web, HttpResponse};
+
 use crate::endpoints::create_account_handler::create_account_handler;
 use crate::endpoints::login_handler::login_handler;
 use crate::endpoints::logout_handler::logout_handler;

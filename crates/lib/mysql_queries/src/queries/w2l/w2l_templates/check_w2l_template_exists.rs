@@ -1,5 +1,6 @@
 use anyhow::anyhow;
 use sqlx::MySqlPool;
+
 use errors::AnyhowResult;
 
 /// Just to query for existence

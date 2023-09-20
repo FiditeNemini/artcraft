@@ -1,9 +1,12 @@
+use std::time::Duration;
+
 use anyhow::anyhow;
-use crate::queries::generic_inference::job::list_available_generic_inference_jobs::AvailableInferenceJob;
+use sqlx::MySqlPool;
+
 use enums::by_table::generic_inference_jobs::inference_result_type::InferenceResultType;
 use errors::AnyhowResult;
-use sqlx::MySqlPool;
-use std::time::Duration;
+
+use crate::queries::generic_inference::job::list_available_generic_inference_jobs::AvailableInferenceJob;
 
 pub async fn mark_generic_inference_job_successfully_done(
   pool: &MySqlPool,

@@ -1,7 +1,9 @@
-use crate::util::troll_user_bans::troll_user_set::TrollUserSet;
-use errors::{anyhow, AnyhowResult};
 use std::collections::HashMap;
 use std::sync::{Arc, RwLock};
+
+use errors::{anyhow, AnyhowResult};
+
+use crate::util::troll_user_bans::troll_user_set::TrollUserSet;
 
 #[derive(Clone)]
 pub struct TrollUserBanList {

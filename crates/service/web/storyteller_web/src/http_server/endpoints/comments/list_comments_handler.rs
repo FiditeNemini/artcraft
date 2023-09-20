@@ -3,24 +3,27 @@
 #![forbid(unused_mut)]
 #![forbid(unused_variables)]
 
+use std::fmt;
+use std::sync::Arc;
+
+use actix_web::{HttpRequest, HttpResponse, web};
 use actix_web::error::ResponseError;
 use actix_web::http::StatusCode;
 use actix_web::web::Path;
-use actix_web::{web, HttpResponse, HttpRequest};
 use chrono::{DateTime, Utc};
+use log::warn;
+
+use enums::by_table::comments::comment_entity_type::CommentEntityType;
+use mysql_queries::queries::comments::comment_entity_token::CommentEntityToken;
+use mysql_queries::queries::comments::list_comments_for_entity::list_comments_for_entity;
+use tokens::tokens::comments::CommentToken;
+use tokens::users::user::UserToken;
+
+use crate::http_server::common_responses::user_details_lite::{DefaultAvatarInfo, UserDetailsLight};
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::server_state::ServerState;
 use crate::user_avatars::default_avatar_color_from_username::default_avatar_color_from_username;
 use crate::user_avatars::default_avatar_from_username::default_avatar_from_username;
-use enums::by_table::comments::comment_entity_type::CommentEntityType;
-use log::warn;
-use mysql_queries::queries::comments::comment_entity_token::CommentEntityToken;
-use mysql_queries::queries::comments::list_comments_for_entity::list_comments_for_entity;
-use std::fmt;
-use std::sync::Arc;
-use tokens::tokens::comments::CommentToken;
-use tokens::users::user::UserToken;
-use crate::http_server::common_responses::user_details_lite::{DefaultAvatarInfo, UserDetailsLight};
 
 /// For the URL PathInfo
 #[derive(Deserialize)]

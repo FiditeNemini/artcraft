@@ -3,21 +3,24 @@
 #![forbid(unused_mut)]
 #![forbid(unused_variables)]
 
-use actix_web::error::ResponseError;
-use actix_web::http::StatusCode;
-use actix_web::{web, HttpResponse, HttpRequest};
-use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
-use crate::server_state::ServerState;
-use enums::by_table::comments::comment_entity_type::CommentEntityType;
-use http_server_common::request::get_request_ip::get_request_ip;
-use log::warn;
-use mysql_queries::queries::comments::comment_entity_token::CommentEntityToken;
-use mysql_queries::queries::comments::insert_comment::{insert_comment, InsertCommentArgs};
 use std::fmt;
 use std::sync::Arc;
+
+use actix_web::{HttpRequest, HttpResponse, web};
+use actix_web::error::ResponseError;
+use actix_web::http::StatusCode;
+use log::warn;
+
+use enums::by_table::comments::comment_entity_type::CommentEntityType;
+use http_server_common::request::get_request_ip::get_request_ip;
+use mysql_queries::queries::comments::comment_entity_token::CommentEntityToken;
+use mysql_queries::queries::comments::insert_comment::{insert_comment, InsertCommentArgs};
 use tokens::tokens::comments::CommentToken;
 use user_input_common::check_for_slurs::contains_slurs;
 use user_input_common::markdown_to_html::markdown_to_html;
+
+use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
+use crate::server_state::ServerState;
 
 #[derive(Deserialize)]
 pub struct CreateCommentRequest {

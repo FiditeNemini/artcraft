@@ -1,8 +1,10 @@
 use anyhow::anyhow;
-use errors::AnyhowResult;
-use container_common::token::random_uuid::generate_random_uuid;
-use crate::builders::RequiredOption;
 use sqlx::MySqlPool;
+
+use container_common::token::random_uuid::generate_random_uuid;
+use errors::AnyhowResult;
+
+use crate::builders::RequiredOption;
 
 pub struct TtsInferenceJobInsertBuilder {
   // ========== Required ==========

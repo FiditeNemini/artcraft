@@ -1,7 +1,9 @@
+use std::fmt;
+
 use actix_http::StatusCode;
 use actix_web::{HttpResponse, ResponseError};
+
 use http_server_common::response::serialize_as_json_error::serialize_as_json_error;
-use std::fmt;
 
 #[derive(Debug, Serialize, Eq, PartialEq)]
 pub enum CreateCheckoutSessionError {

@@ -1,12 +1,15 @@
-use crate::decode_webm_opus_info::decode_mkv_or_webm;
-use crate::open_media_source_stream::{open_bytes_media_source_stream, open_file_media_source_stream};
-use errors::AnyhowResult;
 use std::path::{Path, PathBuf};
+
 use symphonia::core::audio::SampleBuffer;
 use symphonia::core::formats::{FormatOptions, FormatReader, Track};
 use symphonia::core::io::MediaSourceStream;
 use symphonia::core::meta::MetadataOptions;
 use symphonia::core::probe::Hint;
+
+use errors::AnyhowResult;
+
+use crate::decode_webm_opus_info::decode_mkv_or_webm;
+use crate::open_media_source_stream::{open_bytes_media_source_stream, open_file_media_source_stream};
 
 // Returned if nothing could be decoded
 const NO_AUDIO_INFO : BasicAudioInfo = BasicAudioInfo {
@@ -248,7 +251,9 @@ fn read_duration(format: &mut Box<dyn FormatReader>) -> AnyhowResult<Option<u64>
 #[cfg(test)]
 mod tests {
   use std::path::PathBuf;
+
   use errors::AnyhowResult;
+
   use crate::decode_basic_audio_info::decode_basic_audio_bytes_info;
 
   fn test_file(path_from_repo_root: &str) -> PathBuf {
@@ -261,6 +266,7 @@ mod tests {
   // NB: The following tests make assertions on data that gets uploaded to us from the browser APIs.
   mod browser_api_data {
     use crate::decode_basic_audio_info::decode_basic_audio_file_info;
+
     use super::*;
 
     #[test]

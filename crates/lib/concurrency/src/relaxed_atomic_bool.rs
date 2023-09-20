@@ -29,6 +29,7 @@ impl RelaxedAtomicBool {
 mod tests {
   use std::thread;
   use std::time::{Duration, Instant};
+
   use crate::relaxed_atomic_bool::RelaxedAtomicBool;
 
   #[test]

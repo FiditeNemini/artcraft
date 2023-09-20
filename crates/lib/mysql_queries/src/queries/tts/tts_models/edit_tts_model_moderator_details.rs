@@ -3,9 +3,9 @@
 #![forbid(unused_mut)]
 #![forbid(unused_variables)]
 
-use sqlx::MySqlPool;
 use sqlx;
 use sqlx::mysql::MySqlQueryResult;
+use sqlx::MySqlPool;
 
 pub async fn edit_tts_model_moderator_details(
   mysql_pool: &MySqlPool,

@@ -1,13 +1,16 @@
+use std::path::Path;
+
 use anyhow::anyhow;
+use log::warn;
+use sqlx;
+use sqlx::MySqlPool;
+
 use errors::AnyhowResult;
+
 use crate::column_types::vocoder_type::VocoderType;
+use crate::queries::generic_inference::job::list_available_generic_inference_jobs::AvailableInferenceJob;
 use crate::queries::tts::tts_inference_jobs::list_available_tts_inference_jobs::AvailableTtsInferenceJob;
 use crate::tokens::Tokens;
-use log::warn;
-use sqlx::MySqlPool;
-use sqlx;
-use std::path::Path;
-use crate::queries::generic_inference::job::list_available_generic_inference_jobs::AvailableInferenceJob;
 
 /// Used to give user-facing order to logged in user inference requests
 pub struct SyntheticIdRecord {

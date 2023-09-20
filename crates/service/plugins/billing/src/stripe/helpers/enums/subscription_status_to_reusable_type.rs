@@ -1,5 +1,6 @@
-use reusable_types::stripe::stripe_subscription_status::StripeSubscriptionStatus;
 use stripe::SubscriptionStatus;
+
+use reusable_types::stripe::stripe_subscription_status::StripeSubscriptionStatus;
 
 pub fn subscription_status_to_reusable_type(subscription_status: SubscriptionStatus) -> StripeSubscriptionStatus {
   match subscription_status {
@@ -15,9 +16,11 @@ pub fn subscription_status_to_reusable_type(subscription_status: SubscriptionSta
 
 #[cfg(test)]
 pub mod tests {
-  use crate::stripe::helpers::enums::subscription_status_to_reusable_type::subscription_status_to_reusable_type;
-  use reusable_types::stripe::stripe_subscription_status::StripeSubscriptionStatus;
   use stripe::SubscriptionStatus;
+
+  use reusable_types::stripe::stripe_subscription_status::StripeSubscriptionStatus;
+
+  use crate::stripe::helpers::enums::subscription_status_to_reusable_type::subscription_status_to_reusable_type;
 
   #[test]
   fn test_type_conversion() {

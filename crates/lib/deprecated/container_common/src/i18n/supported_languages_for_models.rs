@@ -1,5 +1,6 @@
+use std::collections::{HashMap, HashSet};
+
 use once_cell::sync::Lazy;
-use std::collections::{HashSet, HashMap};
 
 /// These are language tags we try to support.
 static SUPPORTED_LANGUAGES_FOR_MODELS : Lazy<HashSet<String>> = Lazy::new(|| {

@@ -1,20 +1,16 @@
-use actix_http::Error;
-use actix_web::HttpResponseBuilder;
-use actix_web::cookie::Cookie;
-use actix_web::error::ResponseError;
-use actix_web::http::StatusCode;
-use actix_web::web::Path;
-use actix_web::{Responder, web, HttpResponse, error, HttpRequest};
-use chrono::{DateTime, Utc};
-use crate::http_server::web_utils::serialize_as_json_error::serialize_as_json_error;
-use crate::server_state::ServerState;
-use mysql_queries::queries::w2l::w2l_templates::list_pending_w2l_templates::list_pending_w2l_templates;
-use log::{info, warn, log};
-use sqlx::error::DatabaseError;
-use sqlx::error::Error::Database;
-use sqlx::mysql::MySqlDatabaseError;
 use std::fmt;
 use std::sync::Arc;
+
+use actix_web::{HttpRequest, HttpResponse, web};
+use actix_web::error::ResponseError;
+use actix_web::http::StatusCode;
+use chrono::{DateTime, Utc};
+use log::{log, warn};
+
+use mysql_queries::queries::w2l::w2l_templates::list_pending_w2l_templates::list_pending_w2l_templates;
+
+use crate::http_server::web_utils::serialize_as_json_error::serialize_as_json_error;
+use crate::server_state::ServerState;
 
 #[derive(Serialize)]
 pub struct GetPendingW2lTemplatesResponse {

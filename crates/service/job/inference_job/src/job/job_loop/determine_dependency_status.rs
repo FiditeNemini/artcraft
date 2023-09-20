@@ -1,15 +1,16 @@
 use anyhow::anyhow;
-use crate::job_dependencies::JobDependencies;
+use log::warn;
+
 use enums::by_table::generic_inference_jobs::inference_category::InferenceCategory;
 use enums::by_table::tts_models::tts_model_type::TtsModelType;
 use enums::by_table::voice_conversion_models::voice_conversion_model_type::VoiceConversionModelType;
 use errors::AnyhowResult;
 use filesys::file_exists::file_exists;
-use log::warn;
 use mysql_queries::queries::generic_inference::job::list_available_generic_inference_jobs::AvailableInferenceJob;
 use mysql_queries::queries::tts::tts_models::get_tts_model_for_inference_improved::{get_tts_model_for_inference_improved, TtsModelForInferenceRecord};
 use mysql_queries::queries::voice_conversion::inference::get_voice_conversion_model_for_inference::{get_voice_conversion_model_for_inference, VoiceConversionModelForInference};
-use std::path::PathBuf;
+
+use crate::job_dependencies::JobDependencies;
 
 pub struct DependencyStatus {
   /// The DB record for the model being used in this job.

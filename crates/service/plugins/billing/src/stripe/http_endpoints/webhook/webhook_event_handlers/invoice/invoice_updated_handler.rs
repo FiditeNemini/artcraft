@@ -1,10 +1,9 @@
-use container_common::anyhow_result::AnyhowResult;
+use stripe::Invoice;
+
 use crate::stripe::helpers::common_metadata_keys::METADATA_USER_TOKEN;
 use crate::stripe::helpers::expand_customer_id::expand_customer_id;
 use crate::stripe::http_endpoints::webhook::webhook_event_handlers::stripe_webhook_error::StripeWebhookError;
 use crate::stripe::http_endpoints::webhook::webhook_event_handlers::stripe_webhook_summary::StripeWebhookSummary;
-use log::warn;
-use stripe::Invoice;
 
 // Handle event type: 'invoice.updated'
 // Sent when a payment succeeds or fails.

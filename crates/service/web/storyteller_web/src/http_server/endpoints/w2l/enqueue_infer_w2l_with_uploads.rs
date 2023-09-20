@@ -3,26 +3,29 @@
 #![forbid(unused_mut)]
 #![forbid(unused_variables)]
 
+use std::fmt;
+use std::sync::Arc;
+
 use actix_multipart::Multipart;
+use actix_web::{HttpRequest, HttpResponse, ResponseError, web};
 use actix_web::http::StatusCode;
 use actix_web::web::BytesMut;
-use actix_web::{web, HttpResponse, HttpRequest, ResponseError};
+use futures::TryStreamExt;
+use log::{error, info, warn};
+use r2d2_redis::redis::Commands;
+
 use buckets::util::hash_to_bucket_path_string::hash_to_bucket_path_string;
 use container_common::token::random_uuid::generate_random_uuid;
+use enums::common::visibility::Visibility;
+use http_server_common::request::get_request_ip::get_request_ip;
+use mysql_queries::queries::w2l::w2l_inference_jobs::insert_w2l_inference_job_extended::{insert_w2l_inference_job_extended, InsertW2lInferenceJobExtendedArgs};
+use mysql_queries::queries::w2l::w2l_templates::check_w2l_template_exists::check_w2l_template_exists;
+use redis_common::redis_keys::RedisKeys;
+
 use crate::http_server::web_utils::read_multipart_field_bytes::checked_read_multipart_bytes;
 use crate::http_server::web_utils::read_multipart_field_bytes::read_multipart_field_as_text;
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::server_state::ServerState;
-use enums::common::visibility::Visibility;
-use futures::TryStreamExt;
-use http_server_common::request::get_request_ip::get_request_ip;
-use log::{warn, info, error};
-use r2d2_redis::redis::Commands;
-use redis_common::redis_keys::RedisKeys;
-use std::fmt;
-use std::sync::Arc;
-use mysql_queries::queries::w2l::w2l_inference_jobs::insert_w2l_inference_job_extended::{insert_w2l_inference_job_extended, InsertW2lInferenceJobExtendedArgs};
-use mysql_queries::queries::w2l::w2l_templates::check_w2l_template_exists::check_w2l_template_exists;
 
 const BUCKET_AUDIO_FILE_NAME : &str = "input_audio_file";
 const BUCKET_IMAGE_FILE_NAME: &str = "input_image_file";

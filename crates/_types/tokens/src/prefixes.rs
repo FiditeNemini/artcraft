@@ -53,10 +53,12 @@ impl EntityType {
 
 #[cfg(test)]
 mod tests {
-  use crate::prefixes::EntityType;
   use std::collections::HashSet;
+
   use strum::EnumCount;
   use strum::IntoEnumIterator;
+
+  use crate::prefixes::EntityType;
 
   #[test]
   fn test_all_prefixes_are_unique() {

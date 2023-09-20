@@ -1,6 +1,7 @@
 use anyhow::anyhow;
-use errors::AnyhowResult;
 use sqlx::MySqlPool;
+
+use errors::AnyhowResult;
 
 pub async fn update_user_record_with_new_stripe_customer_id(
     mysql_pool: &MySqlPool,

@@ -5,7 +5,6 @@ use strum::EnumCount;
 #[cfg(test)]
 use strum::EnumIter;
 
-
 /// Used in the `generic_synthetic_ids` table in `VARCHAR(32)` field `id_category`.
 ///
 /// This lets us create synthetic increment IDs on a per-user, per-category basis.

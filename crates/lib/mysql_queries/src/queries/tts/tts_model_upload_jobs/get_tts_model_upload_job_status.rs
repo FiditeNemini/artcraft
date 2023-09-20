@@ -1,6 +1,7 @@
 use anyhow::anyhow;
 use chrono::{DateTime, Utc};
 use sqlx::MySqlPool;
+
 use errors::AnyhowResult;
 
 pub struct TtsUploadModelJobStatusRecord {

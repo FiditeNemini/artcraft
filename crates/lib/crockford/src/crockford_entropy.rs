@@ -1,5 +1,6 @@
-use crate::{CROCKFORD_LOWERCASE_CHARSET, CROCKFORD_UPPERCASE_CHARSET};
 use rand::Rng;
+
+use crate::{CROCKFORD_LOWERCASE_CHARSET, CROCKFORD_UPPERCASE_CHARSET};
 
 // TODO: Modify these routines to filter out intra-string swear words.
 
@@ -26,6 +27,7 @@ fn crockford_entropy(length: usize, character_set: &[u8]) -> String {
 #[cfg(test)]
 mod tests {
   use std::collections::HashSet;
+
   use crate::crockford_entropy::{crockford_entropy_lower, crockford_entropy_upper};
 
   #[test]

@@ -1,5 +1,6 @@
 use anyhow::anyhow;
 use sqlx::MySqlPool;
+
 use errors::AnyhowResult;
 
 // NB: This is "toggle" instead of discrete functions for create/delete because this is

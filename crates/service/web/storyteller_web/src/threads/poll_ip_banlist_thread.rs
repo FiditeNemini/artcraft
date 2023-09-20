@@ -1,13 +1,14 @@
-use actix_helpers::middleware::banned_ip_filter::ip_ban_list::ip_ban_list::IpBanList;
-use actix_helpers::middleware::banned_ip_filter::ip_ban_list::ip_set::IpSet;
-use mysql_queries::queries::ip_bans::list_ip_bans::list_ip_bans;
-use errors::AnyhowResult;
-use log::{debug, error, info};
-use log::warn;
-use sqlx::MySqlPool;
 use std::collections::HashSet;
 use std::thread;
 use std::time::Duration;
+
+use log::{debug, error, info};
+use log::warn;
+use sqlx::MySqlPool;
+
+use actix_helpers::middleware::banned_ip_filter::ip_ban_list::ip_ban_list::IpBanList;
+use actix_helpers::middleware::banned_ip_filter::ip_ban_list::ip_set::IpSet;
+use mysql_queries::queries::ip_bans::list_ip_bans::list_ip_bans;
 
 const DYNAMIC_BAN_LIST_NAME : &str = "DYNAMIC_POLLING_IP_BAN_LIST";
 

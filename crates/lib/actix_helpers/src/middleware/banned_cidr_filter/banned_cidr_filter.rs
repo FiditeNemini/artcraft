@@ -1,9 +1,10 @@
-use actix_web::Error;
 use actix_web::dev::{Service, Transform};
 use actix_web::dev::{ServiceRequest, ServiceResponse};
+use actix_web::Error;
+use futures_util::future::{ok, Ready};
+
 use crate::middleware::banned_cidr_filter::banned_cidr_filter_middleware::BannedCidrFilterMiddleware;
 use crate::middleware::banned_cidr_filter::banned_cidr_set::BannedCidrSet;
-use futures_util::future::{ok, Ready};
 
 // There are two steps in middleware processing.
 // 1. Middleware initialization, middleware factory gets called with

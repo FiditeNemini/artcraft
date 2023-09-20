@@ -1,5 +1,6 @@
 use actix_cors::Cors;
 use log::info;
+
 use reusable_types::server_environment::ServerEnvironment;
 
 /// Return cors config for FakeYou / Vocodes / OBS / local development
@@ -204,13 +205,13 @@ pub fn add_development_only(cors: Cors) -> Cors {
 mod tests {
   use actix_cors::Cors;
   use actix_http::body::{BoxBody, EitherBody};
-  use actix_web::dev::{Service, ServiceRequest, ServiceResponse, Transform};
+  use actix_web::dev::{ServiceResponse, Transform};
   use actix_web::http::StatusCode;
   use actix_web::test::TestRequest;
-  use actix_web::{Error, test};
-  use crate::cors::build_cors_config;
+  use actix_web::test;
   use reusable_types::server_environment::ServerEnvironment;
-  use speculoos::{assert_that, asserting};
+  use speculoos::asserting;
+  use super::build_cors_config;
 
   async fn make_test_request(cors: &Cors, hostname: &str) -> ServiceResponse<EitherBody<BoxBody>> {
     let cors= cors.new_transform(test::ok_service())

@@ -1,8 +1,10 @@
+use std::sync::Arc;
+
 use async_openai::Client;
+use sqlx::{Pool, Sqlite};
+
 use crate::persistence::save_directory::SaveDirectory;
 use crate::shared_state::app_control_state::AppControlState;
-use sqlx::{Pool, Sqlite};
-use std::sync::Arc;
 
 #[derive(Clone)]
 pub struct ServerState {

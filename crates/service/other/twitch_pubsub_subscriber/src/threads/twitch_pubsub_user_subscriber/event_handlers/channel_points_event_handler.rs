@@ -1,19 +1,20 @@
+use std::sync::Arc;
+use std::sync::RwLock;
+
 use anyhow::anyhow;
+use log::info;
+use sqlx::MySql;
+use twitch_api2::pubsub::channel_points::{ChannelPointsChannelV1, ChannelPointsChannelV1Reply, Redemption};
+
 use container_common::anyhow_result::AnyhowResult;
 use container_common::collections::random_from_vec::random_from_vec;
-use crate::threads::twitch_pubsub_user_subscriber::subscriber_preferences_cache::{TwitchPubsubCachedState, TwitchEventRuleLight};
-use crate::threads::twitch_pubsub_user_subscriber::tts_writer::TtsWriter;
 use mysql_queries::column_types::twitch_event_category::TwitchEventCategory;
 use mysql_queries::complex_models::event_match_predicate::EventMatchPredicate;
 use mysql_queries::complex_models::event_responses::EventResponse;
 use mysql_queries::queries::twitch::twitch_pubsub::insert_channel_points::TwitchPubsubChannelPointsInsertBuilder;
-use log::info;
-use r2d2_redis::r2d2;
-use sqlx::MySql;
-use std::sync::Arc;
-use std::sync::RwLock;
-use twitch_api2::pubsub::TopicData;
-use twitch_api2::pubsub::channel_points::{ChannelPointsChannelV1, ChannelPointsChannelV1Reply, Redemption};
+
+use crate::threads::twitch_pubsub_user_subscriber::subscriber_preferences_cache::{TwitchEventRuleLight, TwitchPubsubCachedState};
+use crate::threads::twitch_pubsub_user_subscriber::tts_writer::TtsWriter;
 
 pub struct ChannelPointsEventHandler {
   twitch_subscriber_state: Arc<RwLock<TwitchPubsubCachedState>>,

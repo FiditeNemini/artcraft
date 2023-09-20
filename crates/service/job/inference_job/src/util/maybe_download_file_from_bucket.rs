@@ -1,10 +1,13 @@
+use std::path::Path;
+
+use log::{info, warn};
+
 use cloud_storage::bucket_client::BucketClient;
+use container_common::filesystem::safe_delete_temp_directory::safe_delete_temp_directory;
+use jobs_common::job_progress_reporter::job_progress_reporter::JobProgressReporter;
+
 use crate::job::job_loop::process_single_job_error::ProcessSingleJobError;
 use crate::util::scoped_temp_dir_creator::ScopedTempDirCreator;
-use jobs_common::job_progress_reporter::job_progress_reporter::JobProgressReporter;
-use log::{info, warn};
-use std::path::Path;
-use container_common::filesystem::safe_delete_temp_directory::safe_delete_temp_directory;
 
 // TODO(bt, 2022-07-15): Make a concrete type for bucket paths
 

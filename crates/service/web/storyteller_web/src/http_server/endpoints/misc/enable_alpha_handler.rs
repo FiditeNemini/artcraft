@@ -1,11 +1,12 @@
-use actix_web::cookie::Cookie;
+use std::sync::Arc;
+
+use actix_web::{get, HttpMessage, HttpRequest, HttpResponse, Responder, web};
 use actix_web::http::StatusCode;
 use actix_web::web::Query;
-use actix_web::{HttpResponse, HttpRequest, Responder, get, web, HttpMessage};
-use crate::http_server::endpoints::misc::alpha_cookie::{ALPHA_COOKIE_NAME, alpha_cookie};
-use crate::server_state::ServerState;
 use log::info;
-use std::sync::Arc;
+
+use crate::http_server::endpoints::misc::alpha_cookie::{alpha_cookie, ALPHA_COOKIE_NAME};
+use crate::server_state::ServerState;
 
 const CONTENT_TYPE : &str = "text/html; charset=utf-8";
 

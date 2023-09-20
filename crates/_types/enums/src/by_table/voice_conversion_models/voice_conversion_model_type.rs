@@ -5,7 +5,6 @@ use strum::EnumCount;
 #[cfg(test)]
 use strum::EnumIter;
 
-
 /// Used in the `voice_conversion_models` table in `VARCHAR(32)` field `model_type`.
 ///
 /// DO NOT CHANGE VALUES WITHOUT A MIGRATION STRATEGY.

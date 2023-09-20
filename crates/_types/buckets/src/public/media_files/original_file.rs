@@ -1,7 +1,9 @@
+use std::path::PathBuf;
+
+use crockford::crockford_entropy_lower;
+
 use crate::public::media_files::directory::MediaFileBucketDirectory;
 use crate::public::public_path::PublicPath;
-use crockford::crockford_entropy_lower;
-use std::path::PathBuf;
 
 const ORIGINAL_FILE_BASENAME : &str = "file.bin";
 
@@ -57,8 +59,9 @@ impl MediaFileBucketPath {
 
 #[cfg(test)]
 mod tests {
-  use crate::public::media_files::original_file::MediaFileBucketPath;
   use std::path::PathBuf;
+
+  use crate::public::media_files::original_file::MediaFileBucketPath;
 
   #[test]
   pub fn generate_new_entropy() {

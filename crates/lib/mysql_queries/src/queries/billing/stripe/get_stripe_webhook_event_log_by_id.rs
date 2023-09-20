@@ -1,10 +1,9 @@
 use anyhow::anyhow;
-use chrono::{DateTime, NaiveDateTime, Utc};
-use errors::AnyhowResult;
-use crate::helpers::boolean_converters::i8_to_bool;
-use log::warn;
-use reusable_types::stripe::stripe_subscription_status::StripeSubscriptionStatus;
 use sqlx::MySqlPool;
+
+use errors::AnyhowResult;
+
+use crate::helpers::boolean_converters::i8_to_bool;
 
 pub struct StripeWebhookEventLog {
   pub stripe_event_id: String,

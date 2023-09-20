@@ -1,22 +1,23 @@
+use std::io::Write;
+use std::sync::Arc;
+
 use async_openai::Client;
 use async_openai::error::OpenAIError;
 use async_openai::types::{CreateCompletionRequestArgs, CreateImageRequest, ImageData, ImageSize, ResponseFormat};
 use base64::{Engine as _, engine::general_purpose};
-use crate::persistence::image_generation_debug_data::ImageGenerationDebugData;
-use crate::persistence::load_scraped_result::load_scraped_result;
-use crate::persistence::rendition_data::RenditionData;
-use crate::persistence::save_directory::SaveDirectory;
-use crate::shared_state::job_state::JobState;
 use enums::by_table::web_rendition_targets::rendition_status::RenditionStatus;
 use errors::{anyhow, AnyhowResult};
 use log::{debug, error, info, warn};
 use sqlite_queries::queries::by_table::news_story_productions::list::news_story_production_item::NewsStoryProductionItem;
 use sqlite_queries::queries::by_table::news_story_productions::update::update_news_story_image_generation_status::Args;
 use sqlite_queries::queries::by_table::news_story_productions::update::update_news_story_image_generation_status::update_news_story_image_generation_status;
-use std::io::Write;
-use std::ops::Add;
-use std::sync::Arc;
 use web_scrapers::payloads::web_scraping_result::ScrapedWebArticle;
+
+use crate::persistence::image_generation_debug_data::ImageGenerationDebugData;
+use crate::persistence::load_scraped_result::load_scraped_result;
+use crate::persistence::rendition_data::RenditionData;
+use crate::persistence::save_directory::SaveDirectory;
+use crate::shared_state::job_state::JobState;
 
 pub async fn process_single_item(target: &NewsStoryProductionItem, job_state: &Arc<JobState>) -> AnyhowResult<()> {
 

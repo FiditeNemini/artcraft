@@ -5,11 +5,13 @@
 
 use anyhow::anyhow;
 use chrono::{DateTime, Utc};
-use errors::AnyhowResult;
-use crate::helpers::boolean_converters::{nullable_i8_to_optional_bool, i8_to_bool};
-use enums::common::visibility::Visibility;
 use log::warn;
 use sqlx::MySqlPool;
+
+use enums::common::visibility::Visibility;
+use errors::AnyhowResult;
+
+use crate::helpers::boolean_converters::{i8_to_bool, nullable_i8_to_optional_bool};
 
 // FIXME: This is the old style of query scoping and shouldn't be copied.
 //  The moderator-only fields are good practice, though.

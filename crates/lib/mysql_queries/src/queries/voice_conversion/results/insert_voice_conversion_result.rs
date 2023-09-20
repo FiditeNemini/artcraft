@@ -1,11 +1,13 @@
 use anyhow::anyhow;
-use crate::queries::generic_inference::job::list_available_generic_inference_jobs::AvailableInferenceJob;
-use errors::AnyhowResult;
 use log::warn;
-use sqlx::MySqlPool;
 use sqlx;
+use sqlx::MySqlPool;
+
 use enums::by_table::voice_conversion_results::voice_conversion_media_token_type::VoiceConversionMediaTokenType;
+use errors::AnyhowResult;
 use tokens::tokens::voice_conversion_results::VoiceConversionResultToken;
+
+use crate::queries::generic_inference::job::list_available_generic_inference_jobs::AvailableInferenceJob;
 
 /// Used to give user-facing order to logged in user inference requests
 pub struct SyntheticIdRecord {

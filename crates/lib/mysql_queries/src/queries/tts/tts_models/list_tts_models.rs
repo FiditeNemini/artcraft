@@ -1,11 +1,13 @@
 use anyhow::anyhow;
 use chrono::{DateTime, Utc};
-use crate::helpers::boolean_converters::i8_to_bool;
+use log::{info, warn};
+use sqlx::{MySql, MySqlPool};
+use sqlx::pool::PoolConnection;
+
 use enums::common::visibility::Visibility;
 use errors::AnyhowResult;
-use log::{warn, info};
-use sqlx::pool::PoolConnection;
-use sqlx::{MySql, MySqlPool};
+
+use crate::helpers::boolean_converters::i8_to_bool;
 
 // FIXME: This is the old style of query scoping and shouldn't be copied.
 

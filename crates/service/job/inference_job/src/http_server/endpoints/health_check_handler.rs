@@ -1,11 +1,14 @@
-use actix_helpers::response_serializers::error_to_json_http_response::error_to_json_http_response;
-use actix_web::error::ResponseError;
-use actix_web::http::StatusCode;
-use actix_web::http::header::ContentType;
-use actix_web::{web, HttpResponse, HttpRequest};
-use crate::http_server::http_server_shared_state::HttpServerSharedState;
-use log::error;
 use std::sync::Arc;
+
+use actix_web::{HttpRequest, HttpResponse, web};
+use actix_web::error::ResponseError;
+use actix_web::http::header::ContentType;
+use actix_web::http::StatusCode;
+use log::error;
+
+use actix_helpers::response_serializers::error_to_json_http_response::error_to_json_http_response;
+
+use crate::http_server::http_server_shared_state::HttpServerSharedState;
 
 // =============== Success Response ===============
 

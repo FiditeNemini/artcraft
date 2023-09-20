@@ -1,18 +1,20 @@
-use actix_http::{StatusCode, header};
-use actix_web::{HttpResponse, HttpRequest, web, ResponseError};
-use crate::server_state::ServerState;
-use mysql_queries::queries::twitch::twitch_oauth::insert::TwitchOauthTokenInsertBuilder;
-use http_server_common::request::get_request_ip::get_request_ip;
-use http_server_common::response::response_error_helpers::to_simple_json_error;
+use std::fmt;
+use std::sync::Arc;
+
+use actix_http::{header, StatusCode};
+use actix_web::{HttpRequest, HttpResponse, ResponseError, web};
 use log::error;
 use log::info;
 use log::warn;
-use std::fmt;
-use std::sync::Arc;
-use twitch_common::oauth_token_builder::get_oauth_token_builder;
-use twitch_oauth2::tokens::BearerTokenType::UserToken;
 use twitch_oauth2::{CsrfToken, TwitchToken};
+
+use http_server_common::request::get_request_ip::get_request_ip;
+use http_server_common::response::response_error_helpers::to_simple_json_error;
+use mysql_queries::queries::twitch::twitch_oauth::insert::TwitchOauthTokenInsertBuilder;
 use mysql_queries::tokens::Tokens;
+use twitch_common::oauth_token_builder::get_oauth_token_builder;
+
+use crate::server_state::ServerState;
 
 #[derive(Deserialize)]
 pub struct QueryParams {

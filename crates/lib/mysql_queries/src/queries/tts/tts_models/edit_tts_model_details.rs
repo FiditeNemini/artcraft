@@ -1,8 +1,10 @@
-use crate::column_types::vocoder_type::VocoderType;
-use enums::common::visibility::Visibility;
-use sqlx::MySqlPool;
-use sqlx::mysql::MySqlQueryResult;
 use sqlx;
+use sqlx::mysql::MySqlQueryResult;
+use sqlx::MySqlPool;
+
+use enums::common::visibility::Visibility;
+
+use crate::column_types::vocoder_type::VocoderType;
 
 pub async fn edit_tts_model_details_as_author(
   mysql_pool: &MySqlPool,

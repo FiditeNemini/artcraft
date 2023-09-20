@@ -1,10 +1,12 @@
-use cidr_utils::cidr::IpCidr;
-use cidr_utils::num_bigint::BigUint;
-use errors::{anyhow, AnyhowResult};
-use num_traits::cast::ToPrimitive;
 use std::collections::HashSet;
 use std::net::IpAddr;
 use std::sync::{Arc, RwLock};
+
+use cidr_utils::cidr::IpCidr;
+use cidr_utils::num_bigint::BigUint;
+use num_traits::cast::ToPrimitive;
+
+use errors::{anyhow, AnyhowResult};
 
 #[derive(Clone)]
 pub struct BannedCidrSet {
@@ -68,11 +70,14 @@ impl BannedCidrSet {
 
 #[cfg(test)]
 mod tests {
-  use cidr_utils::cidr::IpCidr;
-  use crate::middleware::banned_cidr_filter::banned_cidr_set::BannedCidrSet;
   use std::net::IpAddr;
   use std::str::FromStr;
+
+  use cidr_utils::cidr::IpCidr;
+
   use errors::AnyhowResult;
+
+  use crate::middleware::banned_cidr_filter::banned_cidr_set::BannedCidrSet;
 
   fn to_ip(ip_address: &str) -> IpAddr {
     IpAddr::from_str(ip_address).expect("ip should have parsed")

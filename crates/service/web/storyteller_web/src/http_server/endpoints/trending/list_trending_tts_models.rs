@@ -7,29 +7,21 @@
 //! belongs to. This saves an enormous amount of clientside CPU compute.
 //!
 
-use actix_web::error::ResponseError;
-use actix_web::http::StatusCode;
-use actix_web::{web, HttpResponse, HttpRequest};
-use chrono::{DateTime, Utc};
-use errors::AnyhowResult;
-use crate::model::cached_queries::list_cached_tts_categories_for_public_dropdown::list_cached_tts_categories_for_public_dropdown;
-use crate::model::categories::synthetic_category_list::SYNTHETIC_CATEGORY_LATEST_TTS_MODELS;
-use crate::server_state::ServerState;
-use mysql_queries::queries::model_categories::list_categories_query_builder::CategoryList;
-use mysql_queries::queries::trending_model_analytics::list_trending_tts_models::{list_trending_tts_models, list_trending_tts_models_with_pool};
-use mysql_queries::queries::tts::tts_category_assignments::fetch_and_build_tts_model_category_map::fetch_and_build_tts_model_category_map_with_connection;
-use mysql_queries::queries::tts::tts_models::list_tts_models::list_tts_models_with_connection;
-use enums::by_table::trending_model_analytics::window_name::WindowName;
-use http_server_common::response::serialize_as_json_error::serialize_as_json_error;
-use log::{info, error};
-use memory_caching::single_item_ttl_cache::SingleItemTtlCache;
-use sqlx::pool::PoolConnection;
-use sqlx::{MySql, MySqlPool};
-use std::collections::{BTreeMap, BTreeSet, HashMap, HashSet};
+use std::collections::HashMap;
 use std::fmt;
 use std::sync::Arc;
-use tokens::tokens::model_categories::ModelCategoryToken;
+
+use actix_web::{HttpRequest, HttpResponse, web};
+use actix_web::error::ResponseError;
+use actix_web::http::StatusCode;
+use log::error;
+
+use enums::by_table::trending_model_analytics::window_name::WindowName;
+use http_server_common::response::serialize_as_json_error::serialize_as_json_error;
+use mysql_queries::queries::trending_model_analytics::list_trending_tts_models::list_trending_tts_models_with_pool;
 use tokens::tokens::tts_models::TtsModelToken;
+
+use crate::server_state::ServerState;
 
 // TODO TODO TODO: This endpoint is not done!
 // TODO TODO TODO: This endpoint is not done!

@@ -1,6 +1,7 @@
+use std::path::PathBuf;
+
 use errors::AnyhowResult;
 use errors::bail;
-use std::path::PathBuf;
 
 #[deprecated(note = "this is a messy function and should be avoided")]
 pub (crate) fn hash_to_bucket_path(file_hash: &str,
@@ -28,8 +29,9 @@ pub (crate) fn hash_to_bucket_path(file_hash: &str,
 
 #[cfg(test)]
 mod tests {
-  use crate::util::hash_to_bucket_path::hash_to_bucket_path;
   use std::path::PathBuf;
+
+  use crate::util::hash_to_bucket_path::hash_to_bucket_path;
 
   #[test]
   fn test_bucket_without_root() {

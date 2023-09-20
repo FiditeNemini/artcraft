@@ -1,6 +1,7 @@
+use std::collections::HashSet;
+
 use crate::RESERVED_SUBSTRINGS;
 use crate::RESERVED_USERNAMES;
-use std::collections::HashSet;
 
 pub fn is_reserved_username(username: &str) -> bool {
   lazy_static! {

@@ -1,9 +1,10 @@
-use anyhow::anyhow;
-use container_common::anyhow_result::AnyhowResult;
+use std::time::Duration;
+
 use reqwest::Client;
 use reqwest::redirect::Policy;
-use std::time::Duration;
-use twitch_oauth2::{ClientId, ClientSecret, RefreshToken, AccessToken};
+use twitch_oauth2::{AccessToken, ClientId, ClientSecret, RefreshToken};
+
+use container_common::anyhow_result::AnyhowResult;
 
 /// Refresh OAuth tokens when they expire.
 /// NB: This can be cloned and passed around.

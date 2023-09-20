@@ -1,11 +1,12 @@
 use actix_web::HttpRequest;
 use async_trait::async_trait;
 use chrono::Utc;
-use billing_component::stripe::traits::internal_user_lookup::{InternalUserLookup, InternalUserLookupError, SubscriptionKey, UserMetadata};
-use crate::MySqlPool;
-use mysql_queries::queries::users::user_sessions::get_user_session_by_token::SessionUserRecord;
 use log::warn;
+
+use billing_component::stripe::traits::internal_user_lookup::{InternalUserLookup, InternalUserLookupError, SubscriptionKey, UserMetadata};
 use users_component::utils::session_checker::SessionChecker;
+
+use crate::MySqlPool;
 
 /// A simple Actix injectable action
 #[derive(Clone)]

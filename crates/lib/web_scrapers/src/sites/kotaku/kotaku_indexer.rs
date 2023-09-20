@@ -1,9 +1,10 @@
-use crate::payloads::web_scraping_target::WebScrapingTarget;
-use enums::common::sqlite::skip_reason::SkipReason;
-use enums::common::sqlite::web_content_type::WebContentType;
-use errors::AnyhowResult;
 use log::warn;
 use rss::Channel;
+
+use enums::common::sqlite::web_content_type::WebContentType;
+use errors::AnyhowResult;
+
+use crate::payloads::web_scraping_target::WebScrapingTarget;
 
 const KOTAKU_RSS: &str = "https://kotaku.com/rss";
 

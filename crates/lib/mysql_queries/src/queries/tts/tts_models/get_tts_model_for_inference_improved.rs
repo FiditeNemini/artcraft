@@ -3,15 +3,17 @@
 #![forbid(unused_mut)]
 #![forbid(unused_variables)]
 
-use chrono::{Utc, DateTime};
-use crate::helpers::boolean_converters::i8_to_bool;
+use chrono::{DateTime, Utc};
+use log::warn;
+use sqlx;
+use sqlx::MySqlPool;
+
 use enums::by_table::tts_models::tts_model_type::TtsModelType;
 use enums::common::vocoder_type::VocoderType;
-use log::warn;
-use sqlx::MySqlPool;
-use sqlx;
 use tokens::tokens::tts_models::TtsModelToken;
 use tokens::users::user::UserToken;
+
+use crate::helpers::boolean_converters::i8_to_bool;
 
 // TODO: Can probably just reuse another query.
 // TODO(bt, 2023-03-20): There are now three copies of this query. Kill with fire.

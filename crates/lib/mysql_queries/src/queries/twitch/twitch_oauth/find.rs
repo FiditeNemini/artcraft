@@ -2,11 +2,12 @@
 
 use anyhow::anyhow;
 use chrono::{DateTime, Utc};
-use errors::AnyhowResult;
-use crate::helpers::boolean_converters::i8_to_bool;
 use log::error;
-use log::warn;
 use sqlx::MySqlPool;
+
+use errors::AnyhowResult;
+
+use crate::helpers::boolean_converters::i8_to_bool;
 
 #[derive(Serialize, Clone)]
 pub struct TwitchOauthTokenRecord {

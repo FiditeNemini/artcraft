@@ -1,7 +1,10 @@
 use std::sync::Arc;
-use actix_web::http::StatusCode;
+
 use actix_web::{HttpRequest, HttpResponse, ResponseError, web};
+use actix_web::http::StatusCode;
+
 use http_server_common::response::serialize_as_json_error::serialize_as_json_error;
+
 use crate::server_state::ServerState;
 
 #[derive(Serialize)]

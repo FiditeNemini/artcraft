@@ -1,17 +1,13 @@
-use anyhow::anyhow;
-use chrono::Utc;
-use crate::queries::comments::comment_entity_token::CommentEntityToken;
-use enums::by_table::comments::comment_entity_type::CommentEntityType;
-use enums::common::visibility::Visibility;
-use errors::AnyhowResult;
-use sqlx::{Executor, MySql, MySqlPool};
 use std::marker::PhantomData;
-use std::path::Path;
+
+use anyhow::anyhow;
+use sqlx::{Executor, MySql};
+
+use errors::AnyhowResult;
 use tokens::tokens::comments::CommentToken;
-use tokens::tokens::tts_models::TtsModelToken;
-use tokens::tokens::w2l_templates::W2lTemplateToken;
 use tokens::users::user::UserToken;
-use tokens::voice_conversion::model::VoiceConversionModelToken;
+
+use crate::queries::comments::comment_entity_token::CommentEntityToken;
 
 pub struct InsertCommentArgs<'e, 'c, E>
   where E: 'e + Executor<'c, Database = MySql>

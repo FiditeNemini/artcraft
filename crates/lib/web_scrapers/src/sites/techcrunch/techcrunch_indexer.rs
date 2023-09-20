@@ -1,10 +1,13 @@
+use std::ops::Deref;
+
 use bytes::Bytes;
-use crate::payloads::web_scraping_target::WebScrapingTarget;
-use enums::common::sqlite::web_content_type::WebContentType;
-use errors::AnyhowResult;
 use log::warn;
 use rss::Channel;
-use std::ops::Deref;
+
+use enums::common::sqlite::web_content_type::WebContentType;
+use errors::AnyhowResult;
+
+use crate::payloads::web_scraping_target::WebScrapingTarget;
 
 // NB: Feed contains ~20 items.
 const MAIN_RSS_FEED : &str = "https://techcrunch.com/feed/";

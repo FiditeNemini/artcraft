@@ -17,10 +17,11 @@ pub fn extract_featured_image(document: &Html, image_selector: &Selector) -> Opt
 
 #[cfg(test)]
 mod tests {
+  use scraper::{Html, Selector};
+
   use crate::common_extractors::extract_featured_image::extract_featured_image;
   use crate::sites::cnn::cnn_article_scraper::CNN_FEATURED_IMAGE_SELECTOR;
   use crate::sites::techcrunch::techcrunch_article_scraper::TECHCRUNCH_FEATURED_IMAGE_SELECTOR;
-  use scraper::{Html, Selector};
 
   #[test]
   fn test_extract_cnn_with_video() {

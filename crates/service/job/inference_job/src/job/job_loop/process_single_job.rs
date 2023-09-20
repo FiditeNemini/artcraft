@@ -1,20 +1,23 @@
+use std::time::Instant;
+
 use anyhow::anyhow;
+use log::{error, info, warn};
+use r2d2_redis::redis::Commands;
+
+use enums::by_table::generic_inference_jobs::inference_category::InferenceCategory;
+use mysql_queries::queries::generic_inference::job::list_available_generic_inference_jobs::AvailableInferenceJob;
+use mysql_queries::queries::generic_inference::job::mark_generic_inference_job_pending_and_grab_lock::mark_generic_inference_job_pending_and_grab_lock;
+use mysql_queries::queries::generic_inference::job::mark_generic_inference_job_successfully_done::mark_generic_inference_job_successfully_done;
+use redis_common::redis_keys::RedisKeys;
+
 use crate::job::job_loop::determine_dependency_status::determine_dependency_status;
 use crate::job::job_loop::job_success_result::ResultEntity;
 use crate::job::job_loop::process_single_job_error::ProcessSingleJobError;
 use crate::job::job_loop::process_single_job_success_case::ProcessSingleJobSuccessCase;
+use crate::job::job_types::lipsync::process_single_lipsync_job::process_single_lipsync_job;
 use crate::job::job_types::tts::process_single_tts_job::process_single_tts_job;
 use crate::job::job_types::vc::process_single_vc_job::process_single_vc_job;
 use crate::job_dependencies::JobDependencies;
-use enums::by_table::generic_inference_jobs::inference_category::InferenceCategory;
-use log::{error, info, warn};
-use mysql_queries::queries::generic_inference::job::list_available_generic_inference_jobs::AvailableInferenceJob;
-use mysql_queries::queries::generic_inference::job::mark_generic_inference_job_pending_and_grab_lock::mark_generic_inference_job_pending_and_grab_lock;
-use mysql_queries::queries::generic_inference::job::mark_generic_inference_job_successfully_done::mark_generic_inference_job_successfully_done;
-use r2d2_redis::redis::Commands;
-use redis_common::redis_keys::RedisKeys;
-use std::time::Instant;
-use crate::job::job_types::lipsync::process_single_lipsync_job::process_single_lipsync_job;
 
 pub async fn process_single_job(
   job_dependencies: &JobDependencies,

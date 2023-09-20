@@ -1,9 +1,10 @@
 use anyhow::anyhow;
 use chrono::{DateTime, Utc};
-use errors::AnyhowResult;
-use log::{warn, info};
-use sqlx::{MySql, MySqlPool};
+use log::{info, warn};
+use sqlx::MySql;
 use sqlx::pool::PoolConnection;
+
+use errors::AnyhowResult;
 
 #[derive(Serialize, Deserialize, Clone)]
 pub struct UserBadgeForList {

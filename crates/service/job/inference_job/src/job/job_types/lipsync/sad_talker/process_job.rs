@@ -1,8 +1,20 @@
+use std::time::Instant;
+
 use anyhow::anyhow;
+use log::{error, info};
+
 use buckets::public::media_files::original_file::MediaFileBucketPath;
 use container_common::filesystem::check_file_exists::check_file_exists;
 use container_common::filesystem::safe_delete_temp_directory::safe_delete_temp_directory;
 use container_common::filesystem::safe_delete_temp_file::safe_delete_temp_file;
+use enums::by_table::generic_inference_jobs::inference_result_type::InferenceResultType;
+use filesys::file_size::file_size;
+use hashing::sha256::sha256_hash_file::sha256_hash_file;
+use mimetypes::mimetype_for_file::get_mimetype_for_file;
+use mysql_queries::queries::generic_inference::job::list_available_generic_inference_jobs::AvailableInferenceJob;
+use mysql_queries::queries::media_files::insert_media_file_from_face_animation::{insert_media_file_from_face_animation, InsertArgs};
+use tokens::users::user::UserToken;
+
 use crate::job::job_loop::job_success_result::{JobSuccessResult, ResultEntity};
 use crate::job::job_loop::process_single_job_error::ProcessSingleJobError;
 use crate::job::job_types::lipsync::sad_talker::download_audio_file::download_audio_file;
@@ -10,16 +22,6 @@ use crate::job::job_types::lipsync::sad_talker::download_image_file::download_im
 use crate::job::job_types::lipsync::sad_talker::sad_talker_inference_command::InferenceArgs;
 use crate::job::job_types::lipsync::sad_talker::validate_job::validate_job;
 use crate::job_dependencies::JobDependencies;
-use crate::util::model_downloader::ModelDownloader;
-use enums::by_table::generic_inference_jobs::inference_result_type::InferenceResultType;
-use filesys::file_size::file_size;
-use hashing::sha256::sha256_hash_file::sha256_hash_file;
-use log::{error, info};
-use mimetypes::mimetype_for_file::get_mimetype_for_file;
-use mysql_queries::queries::generic_inference::job::list_available_generic_inference_jobs::AvailableInferenceJob;
-use mysql_queries::queries::media_files::insert_media_file_from_face_animation::{insert_media_file_from_face_animation, InsertArgs};
-use std::time::{Duration, Instant};
-use tokens::users::user::UserToken;
 
 pub struct SadTalkerProcessJobArgs<'a> {
   pub job_dependencies: &'a JobDependencies,

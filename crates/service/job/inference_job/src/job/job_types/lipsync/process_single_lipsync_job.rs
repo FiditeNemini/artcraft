@@ -1,11 +1,13 @@
 use anyhow::anyhow;
-use crate::job::job_loop::job_success_result::JobSuccessResult;
-use crate::job::job_loop::process_single_job_error::ProcessSingleJobError;
-use crate::job::job_types::lipsync::sad_talker::process_job::SadTalkerProcessJobArgs;
-use crate::job::job_types::lipsync::sad_talker;
-use crate::job_dependencies::JobDependencies;
+
 use enums::by_table::generic_inference_jobs::inference_model_type::InferenceModelType;
 use mysql_queries::queries::generic_inference::job::list_available_generic_inference_jobs::AvailableInferenceJob;
+
+use crate::job::job_loop::job_success_result::JobSuccessResult;
+use crate::job::job_loop::process_single_job_error::ProcessSingleJobError;
+use crate::job::job_types::lipsync::sad_talker;
+use crate::job::job_types::lipsync::sad_talker::process_job::SadTalkerProcessJobArgs;
+use crate::job_dependencies::JobDependencies;
 
 pub async fn process_single_lipsync_job(job_dependencies: &JobDependencies, job: &AvailableInferenceJob) -> Result<JobSuccessResult, ProcessSingleJobError> {
 

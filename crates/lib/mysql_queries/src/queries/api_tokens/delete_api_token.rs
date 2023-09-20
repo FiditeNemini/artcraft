@@ -1,6 +1,7 @@
 use anyhow::anyhow;
-use errors::AnyhowResult;
 use sqlx::MySqlPool;
+
+use errors::AnyhowResult;
 
 pub async fn delete_api_token(
   user_token: &str,

@@ -1,8 +1,10 @@
+use std::collections::BTreeSet;
+
 use anyhow::anyhow;
+use log::info;
+
 use enums::by_table::generic_inference_jobs::inference_model_type::InferenceModelType;
 use errors::AnyhowResult;
-use std::collections::BTreeSet;
-use log::info;
 
 /// Execution can be scoped down to run on only certain model types or inference categories.
 #[derive(Clone)]
@@ -71,9 +73,11 @@ pub fn parse_model_types(comma_separated_types: &str) -> AnyhowResult<BTreeSet<I
 
 #[cfg(test)]
 mod tests {
-  use crate::util::scoped_execution::{parse_model_types, ScopedExecution};
-  use enums::by_table::generic_inference_jobs::inference_model_type::InferenceModelType;
   use std::collections::BTreeSet;
+
+  use enums::by_table::generic_inference_jobs::inference_model_type::InferenceModelType;
+
+  use crate::util::scoped_execution::{parse_model_types, ScopedExecution};
 
   #[test]
   fn test_parse() {

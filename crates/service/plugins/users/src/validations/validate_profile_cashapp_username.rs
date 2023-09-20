@@ -37,7 +37,7 @@ pub fn normalize_cashapp_username_for_storage(username: &str) -> String {
 
 #[cfg(test)]
 mod tests {
-  use crate::validations::validate_profile_cashapp_username::{validate_profile_cashapp_username, normalize_cashapp_username_for_storage};
+  use crate::validations::validate_profile_cashapp_username::{normalize_cashapp_username_for_storage, validate_profile_cashapp_username};
 
   #[test]
   fn valid_cases() {

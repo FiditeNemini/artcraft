@@ -1,6 +1,8 @@
-use crate::BANNED_SLURS;
-use once_cell::sync::Lazy;
 use std::collections::HashSet;
+
+use once_cell::sync::Lazy;
+
+use crate::BANNED_SLURS;
 use crate::latin_alphabet::latin_to_ascii;
 
 static BANNED_SLURS_SET : Lazy<HashSet<String>> = Lazy::new(|| {

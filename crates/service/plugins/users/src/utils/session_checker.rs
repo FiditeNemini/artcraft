@@ -4,17 +4,19 @@
 #![forbid(unused_variables)]
 
 use actix_web::HttpRequest;
-use crate::utils::session_cookie_manager::SessionCookieManager;
-use crate::utils::user_session_extended::{UserSessionExtended, UserSessionPreferences, UserSessionPremiumPlanInfo, UserSessionRoleAndPermissions, UserSessionSubscriptionPlan, UserSessionUserDetails};
+use log::warn;
+use sqlx::{Executor, MySql, MySqlPool};
+use sqlx::pool::PoolConnection;
+
+use errors::AnyhowResult;
 use mysql_queries::queries::users::user_sessions::get_user_session_by_token::{get_user_session_by_token, get_user_session_by_token_pooled_connection, SessionUserRecord};
 use mysql_queries::queries::users::user_sessions::get_user_session_by_token_light::{get_user_session_by_token_light, SessionRecord};
 use mysql_queries::queries::users::user_subscriptions::list_active_user_subscriptions::list_active_user_subscriptions;
-use errors::AnyhowResult;
-use log::warn;
 use redis_caching::redis_ttl_cache::{RedisTtlCache, RedisTtlCacheConnection};
 use redis_common::redis_cache_keys::RedisCacheKeys;
-use sqlx::pool::PoolConnection;
-use sqlx::{MySqlPool, MySql, Executor};
+
+use crate::utils::session_cookie_manager::SessionCookieManager;
+use crate::utils::user_session_extended::{UserSessionExtended, UserSessionPreferences, UserSessionPremiumPlanInfo, UserSessionRoleAndPermissions, UserSessionSubscriptionPlan, UserSessionUserDetails};
 
 #[derive(Clone)]
 pub struct SessionChecker {

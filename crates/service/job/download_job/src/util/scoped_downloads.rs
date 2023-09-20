@@ -1,8 +1,10 @@
+use std::collections::BTreeSet;
+
 use anyhow::anyhow;
+use log::info;
+
 use enums::by_table::generic_download_jobs::generic_download_type::GenericDownloadType;
 use errors::AnyhowResult;
-use log::info;
-use std::collections::BTreeSet;
 
 /// Download types can be scoped down to only certain model types or categories.
 #[derive(Clone)]
@@ -71,9 +73,11 @@ pub fn parse_download_types(comma_separated_types: &str) -> AnyhowResult<BTreeSe
 
 #[cfg(test)]
 mod tests {
-  use crate::util::scoped_downloads::{parse_download_types, ScopedDownloads};
-  use enums::by_table::generic_download_jobs::generic_download_type::GenericDownloadType;
   use std::collections::BTreeSet;
+
+  use enums::by_table::generic_download_jobs::generic_download_type::GenericDownloadType;
+
+  use crate::util::scoped_downloads::{parse_download_types, ScopedDownloads};
 
   #[test]
   fn test_parse() {

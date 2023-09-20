@@ -1,23 +1,16 @@
-use actix_http::Error;
-use actix_web::HttpResponseBuilder;
-use actix_web::cookie::Cookie;
+use std::fmt;
+use std::sync::Arc;
+
+use actix_web::{HttpMessage, HttpRequest, HttpResponse, web};
 use actix_web::error::ResponseError;
 use actix_web::http::StatusCode;
 use actix_web::web::Path;
-use actix_web::{Responder, web, HttpResponse, error, HttpRequest, HttpMessage};
-use chrono::{DateTime, Utc};
-use crate::AnyhowResult;
+use log::{info, log, warn};
+
+use mysql_queries::queries::w2l::w2l_templates::list_w2l_templates::{list_w2l_templates, W2lTemplateRecordForList};
+
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::server_state::ServerState;
-use mysql_queries::queries::w2l::w2l_templates::list_w2l_templates::{W2lTemplateRecordForList, list_w2l_templates};
-use log::{info, warn, log};
-use regex::Regex;
-use sqlx::MySqlPool;
-use sqlx::error::DatabaseError;
-use sqlx::error::Error::Database;
-use sqlx::mysql::MySqlDatabaseError;
-use std::fmt;
-use std::sync::Arc;
 
 /// For the URL PathInfo
 #[derive(Deserialize)]

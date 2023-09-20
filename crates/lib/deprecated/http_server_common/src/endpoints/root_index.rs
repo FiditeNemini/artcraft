@@ -1,8 +1,5 @@
 use actix_http::StatusCode;
 use actix_web::HttpResponse;
-
-
-
 use log::debug;
 
 pub async fn get_root_index() -> HttpResponse {

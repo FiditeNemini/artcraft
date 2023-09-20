@@ -1,4 +1,5 @@
 use std::path::{Path, PathBuf};
+
 use crate::path_to_string::path_to_string;
 
 /// Concatenate filenames while preserving path information. Do not join paths as directories.
@@ -21,7 +22,8 @@ pub fn filename_concat_pathbuf<P: AsRef<Path>, Q: AsRef<Path>>(part_1: P, part_2
 
 #[cfg(test)]
 mod tests {
-  use std::path::{PathBuf};
+  use std::path::PathBuf;
+
   use crate::filename_concat::filename_concat;
 
   // Layout: Base, Suffix, Expected Result

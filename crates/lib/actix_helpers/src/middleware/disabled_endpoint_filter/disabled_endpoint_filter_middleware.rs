@@ -1,9 +1,11 @@
-use actix_web::Error;
-use actix_web::dev::Service;
 use actix_web::dev::{ServiceRequest, ServiceResponse};
+use actix_web::dev::Service;
+use actix_web::Error;
+use futures_util::future::{Either, err, Ready};
+
 use crate::middleware::disabled_endpoint_filter::disabled_endpoints::disabled_endpoints::DisabledEndpoints;
 use crate::middleware::disabled_endpoint_filter::disabled_error::DisabledError;
-use futures_util::future::{err, Either, Ready};
+
 //use std::task::{Context, Poll};
 
 // There are two steps in middleware processing.

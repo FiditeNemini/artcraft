@@ -1,15 +1,17 @@
+use log::error;
+use sqlx::MySqlPool;
+use stripe::Subscription;
+
+use mysql_queries::queries::users::user_subscriptions::get_user_subscription_by_stripe_subscription_id::get_user_subscription_by_stripe_subscription_id;
+use mysql_queries::queries::users::user_subscriptions::upsert_user_subscription_by_stripe_id::UpsertUserSubscription;
+use reusable_types::stripe::stripe_subscription_status::StripeSubscriptionStatus;
+
 use crate::stripe::http_endpoints::webhook::webhook_event_handlers::customer_subscription::calculate_subscription_end_date::calculate_subscription_end_date;
 use crate::stripe::http_endpoints::webhook::webhook_event_handlers::customer_subscription::common::{UNKNOWN_SUBSCRIPTION_NAMESPACE, UNKNOWN_SUBSCRIPTION_PRODUCT_SLUG};
 use crate::stripe::http_endpoints::webhook::webhook_event_handlers::customer_subscription::subscription_event_extractor::subscription_summary_extractor;
 use crate::stripe::http_endpoints::webhook::webhook_event_handlers::stripe_webhook_error::StripeWebhookError;
 use crate::stripe::http_endpoints::webhook::webhook_event_handlers::stripe_webhook_summary::StripeWebhookSummary;
 use crate::stripe::traits::internal_subscription_product_lookup::InternalSubscriptionProductLookup;
-use mysql_queries::queries::users::user_subscriptions::get_user_subscription_by_stripe_subscription_id::get_user_subscription_by_stripe_subscription_id;
-use mysql_queries::queries::users::user_subscriptions::upsert_user_subscription_by_stripe_id::UpsertUserSubscription;
-use log::{error, warn};
-use reusable_types::stripe::stripe_subscription_status::StripeSubscriptionStatus;
-use sqlx::MySqlPool;
-use stripe::Subscription;
 
 /// Handle event type: 'customer.subscription.deleted'
 /// Sent when a customer’s subscription ends.

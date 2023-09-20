@@ -1,5 +1,5 @@
-use actix_web::http::StatusCode;
 use actix_web::{HttpResponse, HttpResponseBuilder};
+use actix_web::http::StatusCode;
 
 /// Convert a string and status code to a JSON error response.
 pub fn simple_json_error_response(
@@ -30,9 +30,10 @@ struct SimpleGenericJsonError {
 
 #[cfg(test)]
 mod tests {
-  use actix_http::body::{BoxBody, MessageBody};
-  use crate::error::simple_json_error_response::simple_json_error_response;
+  use actix_http::body::MessageBody;
   use actix_web::http::StatusCode;
+
+  use crate::error::simple_json_error_response::simple_json_error_response;
 
   #[test]
   pub fn serialization() {

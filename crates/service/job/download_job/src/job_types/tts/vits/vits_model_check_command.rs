@@ -1,9 +1,10 @@
+use std::path::{Path, PathBuf};
+
+use log::info;
+use subprocess::{Popen, PopenConfig};
+
 use container_common::anyhow_result::AnyhowResult;
 use filesys::path_to_string::path_to_string;
-use log::info;
-use std::fs::OpenOptions;
-use std::path::{Path, PathBuf};
-use subprocess::{Popen, PopenConfig, Redirection};
 use subprocess_common::docker_options::DockerOptions;
 
 /// This command is used to check tacotron for being a real model

@@ -1,8 +1,10 @@
-use crate::decode_basic_audio_info::BasicAudioInfo;
-use errors::{anyhow, AnyhowResult};
 use symphonia::core::formats::{FormatOptions, FormatReader};
 use symphonia::core::io::MediaSourceStream;
 use symphonia::default::formats::MkvReader;
+
+use errors::{anyhow, AnyhowResult};
+
+use crate::decode_basic_audio_info::BasicAudioInfo;
 
 pub fn decode_mkv_or_webm(
   media_source_stream: MediaSourceStream

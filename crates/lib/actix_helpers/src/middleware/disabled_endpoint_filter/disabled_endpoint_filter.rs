@@ -1,9 +1,10 @@
-use actix_web::Error;
 use actix_web::dev::{Service, Transform};
 use actix_web::dev::{ServiceRequest, ServiceResponse};
+use actix_web::Error;
+use futures_util::future::{ok, Ready};
+
 use crate::middleware::disabled_endpoint_filter::disabled_endpoint_filter_middleware::DisabledEndpointFilterMiddleware;
 use crate::middleware::disabled_endpoint_filter::disabled_endpoints::disabled_endpoints::DisabledEndpoints;
-use futures_util::future::{ok, Ready};
 
 // There are two steps in middleware processing.
 // 1. Middleware initialization, middleware factory gets called with

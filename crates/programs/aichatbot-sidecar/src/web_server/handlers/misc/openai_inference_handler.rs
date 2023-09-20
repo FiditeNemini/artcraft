@@ -1,10 +1,12 @@
 use std::sync::Arc;
+
 use actix_http::StatusCode;
 use actix_web::{HttpRequest, HttpResponse, ResponseError, web};
 use async_openai::Client;
 use async_openai::types::CreateCompletionRequestArgs;
-use log::{error, info};
 use http_server_common::response::serialize_as_json_error::serialize_as_json_error;
+use log::{error, info};
+
 use crate::shared_state::app_control_state::AppControlState;
 
 #[derive(Serialize)]

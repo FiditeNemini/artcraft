@@ -1,29 +1,24 @@
-use actix_http::Error;
-use actix_web::HttpResponseBuilder;
-use actix_web::cookie::Cookie;
+use std::fmt;
+use std::sync::Arc;
+
+use actix_web::{HttpRequest, HttpResponse, web};
 use actix_web::error::ResponseError;
 use actix_web::http::StatusCode;
 use actix_web::web::Path;
-use actix_web::{Responder, web, HttpResponse, error, HttpRequest};
-use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
-use crate::http_server::web_utils::response_success_helpers::simple_json_success;
-use crate::server_state::ServerState;
-use crate::util::delete_role_disambiguation::DeleteRole;
-use crate::util::delete_role_disambiguation::delete_role_disambiguation;
+use log::{log, warn};
+
+use http_server_common::request::get_request_ip::get_request_ip;
 use mysql_queries::queries::tts::tts_models::delete_tts_model_various_scopes::delete_tts_model_as_mod;
 use mysql_queries::queries::tts::tts_models::delete_tts_model_various_scopes::delete_tts_model_as_user;
 use mysql_queries::queries::tts::tts_models::delete_tts_model_various_scopes::undelete_tts_model_as_mod;
 use mysql_queries::queries::tts::tts_models::delete_tts_model_various_scopes::undelete_tts_model_as_user;
 use mysql_queries::queries::tts::tts_models::get_tts_model::get_tts_model_by_token;
-use http_server_common::request::get_request_ip::get_request_ip;
-use log::{info, warn, log};
-use regex::Regex;
-use sqlx::MySqlPool;
-use sqlx::error::DatabaseError;
-use sqlx::error::Error::Database;
-use sqlx::mysql::MySqlDatabaseError;
-use std::fmt;
-use std::sync::Arc;
+
+use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
+use crate::http_server::web_utils::response_success_helpers::simple_json_success;
+use crate::server_state::ServerState;
+use crate::util::delete_role_disambiguation::delete_role_disambiguation;
+use crate::util::delete_role_disambiguation::DeleteRole;
 
 /// For the URL PathInfo
 #[derive(Deserialize)]

@@ -3,25 +3,28 @@
 #![forbid(unused_mut)]
 #![forbid(unused_variables)]
 
+use std::fmt;
+use std::sync::Arc;
+
+use actix_web::{HttpRequest, HttpResponse, web};
 use actix_web::error::ResponseError;
 use actix_web::http::StatusCode;
 use actix_web::web::Path;
-use actix_web::{web, HttpResponse, HttpRequest};
 use chrono::{DateTime, Utc};
-use crate::server_state::ServerState;
-use crate::user_avatars::default_avatar_color_from_username::default_avatar_color_from_username;
-use crate::user_avatars::default_avatar_from_username::default_avatar_from_username;
+use log::warn;
+
 use enums::by_table::tts_models::tts_model_type::TtsModelType;
 use enums::common::visibility::Visibility;
 use http_server_common::response::serialize_as_json_error::serialize_as_json_error;
-use log::warn;
 use mysql_queries::column_types::vocoder_type::VocoderType;
 use mysql_queries::queries::tts::tts_models::get_tts_model::get_tts_model_by_token_using_connection;
 use redis_common::redis_cache_keys::RedisCacheKeys;
-use std::fmt;
-use std::sync::Arc;
 use tts_common::text_pipelines::guess_pipeline::guess_text_pipeline_heuristic;
 use tts_common::text_pipelines::text_pipeline_type::TextPipelineType;
+
+use crate::server_state::ServerState;
+use crate::user_avatars::default_avatar_color_from_username::default_avatar_color_from_username;
+use crate::user_avatars::default_avatar_from_username::default_avatar_from_username;
 
 // =============== Request ===============
 

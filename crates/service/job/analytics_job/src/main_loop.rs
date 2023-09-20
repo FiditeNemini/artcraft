@@ -1,8 +1,11 @@
+use std::time::Duration;
+
+use log::{error, info};
+
+use errors::AnyhowResult;
+
 use crate::job_state::JobState;
 use crate::jobs::calculate_model_analytics::calculate_model_analytics;
-use errors::AnyhowResult;
-use std::time::Duration;
-use log::{error, info};
 
 pub async fn main_loop(job_state: JobState) -> AnyhowResult<()> {
   loop {

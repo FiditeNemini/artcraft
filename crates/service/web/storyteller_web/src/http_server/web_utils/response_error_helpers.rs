@@ -1,7 +1,7 @@
 use actix_http::header::CONTENT_TYPE;
-use actix_web::HttpResponseBuilder;
+use actix_web::HttpResponse;
 use actix_web::http::StatusCode;
-use actix_web::{HttpResponse, ResponseError};
+use actix_web::HttpResponseBuilder;
 
 #[derive(Serialize)]
 pub struct SimpleGenericJsonError {

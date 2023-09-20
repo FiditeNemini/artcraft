@@ -1,10 +1,12 @@
 use anyhow::anyhow;
 use chrono::{DateTime, Utc};
-use enums::by_table::generic_inference_jobs::inference_category::InferenceCategory;
-use errors::AnyhowResult;
 use log::warn;
 use sqlx::MySqlPool;
+
+use enums::by_table::generic_inference_jobs::inference_category::InferenceCategory;
+use errors::AnyhowResult;
 use tokens::jobs::inference::InferenceJobToken;
+
 use crate::helpers::boolean_converters::i8_to_bool;
 
 pub struct GenericInferenceJobStatus {

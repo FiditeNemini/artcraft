@@ -1,12 +1,12 @@
-use actix_web::cookie::Cookie;
-use actix_web::http::header::LOCATION;
-use actix_web::web::Query;
-use actix_web::{HttpResponse, HttpRequest, Responder, get, web, HttpMessage};
-use crate::http_server::endpoints::misc::alpha_cookie::alpha_cookie;
-use crate::server_state::ServerState;
-use log::info;
 use std::ops::Deref;
 use std::sync::Arc;
+
+use actix_web::{get, HttpRequest, HttpResponse, Responder, web};
+use actix_web::http::header::LOCATION;
+use log::info;
+
+use crate::http_server::endpoints::misc::alpha_cookie::alpha_cookie;
+use crate::server_state::ServerState;
 
 #[get("/enable")]
 pub async fn enable_alpha_easy_handler(

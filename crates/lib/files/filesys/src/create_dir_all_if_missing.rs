@@ -1,5 +1,6 @@
-use crate::directory_exists::directory_exists;
 use std::path::Path;
+
+use crate::directory_exists::directory_exists;
 
 /// create_dir_all, but only if it doesn't already exist.
 /// (maybe this will miss permission errors.)

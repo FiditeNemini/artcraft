@@ -1,7 +1,9 @@
 use anyhow::anyhow;
 use sqlx::MySqlPool;
+
 use enums::common::visibility::Visibility;
 use errors::AnyhowResult;
+
 use crate::tokens::Tokens;
 
 pub struct InsertW2lInferenceJobExtendedArgs<'a> {

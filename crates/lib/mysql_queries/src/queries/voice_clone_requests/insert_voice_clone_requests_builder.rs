@@ -1,8 +1,9 @@
 use anyhow::anyhow;
-use errors::AnyhowResult;
-use crate::column_types::twitch_event_category::TwitchEventCategory;
-use crate::tokens::Tokens;
 use sqlx::MySqlPool;
+
+use errors::AnyhowResult;
+
+use crate::tokens::Tokens;
 
 pub struct InsertVoiceCloneRequestBuilder {
   pub uuid_idempotency_token: String,

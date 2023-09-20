@@ -3,11 +3,13 @@
 #![forbid(unused_mut)]
 #![forbid(unused_variables)]
 
-use chrono::{Utc, DateTime};
-use enums::common::vocoder_type::VocoderType;
+use chrono::{DateTime, Utc};
 use log::warn;
-use sqlx::MySqlPool;
 use sqlx;
+use sqlx::MySqlPool;
+
+use enums::common::vocoder_type::VocoderType;
+
 use crate::helpers::boolean_converters::i8_to_bool;
 
 // TODO: Can probably just reuse another query.

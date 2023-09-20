@@ -1,8 +1,8 @@
-use chrono::{DateTime, Utc};
-use crate::model::categories::synthetic_category::SyntheticCategory;
-use enums::by_table::model_categories::model_type::ModelType;
 use once_cell::sync::Lazy;
-use tokens::tokens::model_categories::ModelCategoryToken;
+
+use enums::by_table::model_categories::model_type::ModelType;
+
+use crate::model::categories::synthetic_category::SyntheticCategory;
 
 pub const SYNTHETIC_CATEGORY_LATEST_TTS_MODELS : SyntheticCategory = SyntheticCategory {
   category_token: "SYNTHETIC_CATEGORY:LATEST_MODELS",

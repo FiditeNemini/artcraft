@@ -5,7 +5,6 @@ use strum::EnumCount;
 #[cfg(test)]
 use strum::EnumIter;
 
-
 /// Used in the `generic_inference_jobs` table in `VARCHAR(32)` field `on_success_result_entity_type`.
 ///
 /// Our "generic inference" pipeline supports a wide variety of output types.

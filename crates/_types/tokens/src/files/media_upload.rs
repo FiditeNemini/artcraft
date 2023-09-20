@@ -1,7 +1,9 @@
-use crate::prefixes::EntityType;
+use std::fmt::Debug;
+
 use serde::Deserialize;
 use serde::Serialize;
-use std::fmt::Debug;
+
+use crate::prefixes::EntityType;
 
 // FIXME: I think that this file+module structure is an anti-pattern.
 //  In the future, we should create two top-level directories: /tokens and /ids, and each token or

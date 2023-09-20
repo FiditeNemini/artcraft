@@ -1,12 +1,11 @@
-use errors::AnyhowResult;
-use crate::composite_keys::by_table::user_ratings::user_rating_entity::UserRatingEntity;
-use enums::by_table::user_ratings::entity_type::UserRatingEntityType;
-use enums::by_table::user_ratings::rating_value::UserRatingValue;
 use sqlx::MySql;
 use sqlx::pool::PoolConnection;
-use tokens::tokens::tts_models::TtsModelToken;
-use tokens::tokens::w2l_templates::W2lTemplateToken;
+
+use enums::by_table::user_ratings::rating_value::UserRatingValue;
+use errors::AnyhowResult;
 use tokens::users::user::UserToken;
+
+use crate::composite_keys::by_table::user_ratings::user_rating_entity::UserRatingEntity;
 
 pub struct Args<'a> {
   pub user_token: &'a UserToken,

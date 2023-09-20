@@ -1,6 +1,17 @@
+use std::path::PathBuf;
+
+use r2d2_redis::r2d2;
+use r2d2_redis::RedisConnectionManager;
+use sqlx::MySqlPool;
+
 use bootstrap::bootstrap::ContainerEnvironment;
 use cloud_storage::bucket_client::BucketClient;
 use cloud_storage::bucket_path_unifier::BucketPathUnifier;
+use google_drive_common::google_drive_download_command::GoogleDriveDownloadCommand;
+use mysql_queries::common_inputs::container_environment_arg::ContainerEnvironmentArg;
+use mysql_queries::mediators::badge_granter::BadgeGranter;
+use mysql_queries::mediators::firehose_publisher::FirehosePublisher;
+
 use crate::job_types::tts::tacotron::tacotron_model_check_command::TacotronModelCheckCommand;
 use crate::job_types::tts::vits::vits_model_check_command::VitsModelCheckCommand;
 use crate::job_types::vocoder::hifigan_softvc::hifigan_softvc_model_check_command::HifiGanSoftVcModelCheckCommand;
@@ -11,14 +22,6 @@ use crate::job_types::voice_conversion::so_vits_svc::so_vits_svc_model_check_com
 use crate::job_types::voice_conversion::softvc::softvc_model_check_command::SoftVcModelCheckCommand;
 use crate::threads::nvidia_smi_checker::nvidia_smi_health_check_status::NvidiaSmiHealthCheckStatus;
 use crate::util::scoped_downloads::ScopedDownloads;
-use google_drive_common::google_drive_download_command::GoogleDriveDownloadCommand;
-use mysql_queries::common_inputs::container_environment_arg::ContainerEnvironmentArg;
-use mysql_queries::mediators::badge_granter::BadgeGranter;
-use mysql_queries::mediators::firehose_publisher::FirehosePublisher;
-use r2d2_redis::RedisConnectionManager;
-use r2d2_redis::r2d2;
-use sqlx::MySqlPool;
-use std::path::PathBuf;
 
 pub struct JobState {
   /// The job should only download these types of models.

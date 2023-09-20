@@ -1,11 +1,12 @@
 use anyhow::anyhow;
-use mysql_queries::queries::model_categories::list_categories_query_builder::{CategoryList, ListCategoriesQueryBuilder};
-use errors::AnyhowResult;
 use lexical_sort::natural_lexical_cmp;
-use log::{error};
-use memory_caching::single_item_ttl_cache::SingleItemTtlCache;
-use sqlx::pool::PoolConnection;
+use log::error;
 use sqlx::{MySql, MySqlPool};
+use sqlx::pool::PoolConnection;
+
+use errors::AnyhowResult;
+use memory_caching::single_item_ttl_cache::SingleItemTtlCache;
+use mysql_queries::queries::model_categories::list_categories_query_builder::{CategoryList, ListCategoriesQueryBuilder};
 
 /// Fetch from cache if available, otherwise fetch from DB.
 pub async fn list_cached_tts_categories_for_public_dropdown_db_pool(

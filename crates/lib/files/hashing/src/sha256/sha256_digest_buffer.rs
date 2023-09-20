@@ -1,6 +1,8 @@
-use errors::AnyhowResult;
-use ring::digest::{Context, Digest, SHA256};
 use std::io::Read;
+
+use ring::digest::{Context, Digest, SHA256};
+
+use errors::AnyhowResult;
 
 #[inline]
 pub fn sha256_digest_buffer<R: Read>(mut reader: R) -> AnyhowResult<Digest> {

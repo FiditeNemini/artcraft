@@ -15,13 +15,16 @@
 
 #[macro_use] extern crate serde_derive;
 
-pub mod caching;
-pub mod http_clients;
-pub mod job_steps;
-pub mod script_execution;
-pub mod util;
+use std::path::PathBuf;
+use std::time::Duration;
 
 use clap::{App, Arg};
+use log::{error, info, warn};
+use r2d2_redis::r2d2;
+use r2d2_redis::RedisConnectionManager;
+use sqlx::mysql::MySqlPoolOptions;
+use sqlx::MySqlPool;
+
 use cloud_storage::bucket_client::BucketClient;
 use cloud_storage::bucket_path_unifier::BucketPathUnifier;
 use config::common_env::CommonEnv;
@@ -30,26 +33,12 @@ use config::shared_constants::DEFAULT_RUST_LOG;
 use container_common::anyhow_result::AnyhowResult;
 use container_common::collections::multiple_random_from_vec::multiple_random_from_vec;
 use container_common::filesystem::check_directory_exists::check_directory_exists;
-use crate::caching::cache_miss_strategizer::CacheMissStrategizer;
-use crate::caching::cache_miss_strategizer::CacheMissStrategy;
-use crate::caching::cache_miss_strategizer_multi::SyncMultiCacheMissStrategizer;
-use crate::caching::virtual_lfu_cache::SyncVirtualLfuCache;
-use crate::http_clients::tts_inference_sidecar_client::TtsInferenceSidecarClient;
-use crate::http_clients::tts_sidecar_health_check_client::TtsSidecarHealthCheckClient;
-use crate::job_steps::health_check_trap::maybe_block_on_sidecar_health_check;
-use crate::job_steps::job_args::JobWorkerDetails;
-use crate::job_steps::job_args::{JobArgs, JobCaches, JobHttpClients};
-use crate::job_steps::process_single_job::process_single_job;
-use crate::job_steps::process_single_job_error::ProcessSingleJobError;
-use crate::script_execution::tacotron_inference_command::TacotronInferenceCommand;
-use crate::util::scoped_temp_dir_creator::ScopedTempDirCreator;
 use jobs_common::job_progress_reporter::job_progress_reporter::JobProgressReporterBuilder;
 use jobs_common::job_progress_reporter::noop_job_progress_reporter::NoOpJobProgressReporterBuilder;
 use jobs_common::job_progress_reporter::redis_job_progress_reporter::RedisJobProgressReporterBuilder;
 use jobs_common::job_stats::JobStats;
 use jobs_common::noop_logger::NoOpLogger;
 use jobs_common::semi_persistent_cache_dir::SemiPersistentCacheDir;
-use log::{warn, info, error};
 use memory_caching::multi_item_ttl_cache::MultiItemTtlCache;
 use mysql_queries::mediators::firehose_publisher::FirehosePublisher;
 use mysql_queries::queries::tts::tts_inference_jobs::list_available_tts_inference_jobs::{AvailableTtsInferenceJob, list_available_tts_inference_jobs, list_available_tts_inference_jobs_with_minimum_priority};
@@ -58,12 +47,26 @@ use mysql_queries::queries::tts::tts_inference_jobs::mark_tts_inference_job_perm
 use mysql_queries::queries::tts::tts_models::get_tts_model_for_inference::{get_tts_model_for_inference, TtsModelForInferenceError, TtsModelForInferenceRecord};
 use newrelic_telemetry::ClientBuilder;
 use newrelic_telemetry::Span;
-use r2d2_redis::RedisConnectionManager;
-use r2d2_redis::r2d2;
-use sqlx::MySqlPool;
-use sqlx::mysql::MySqlPoolOptions;
-use std::path::PathBuf;
-use std::time::Duration;
+
+use crate::caching::cache_miss_strategizer::CacheMissStrategizer;
+use crate::caching::cache_miss_strategizer::CacheMissStrategy;
+use crate::caching::cache_miss_strategizer_multi::SyncMultiCacheMissStrategizer;
+use crate::caching::virtual_lfu_cache::SyncVirtualLfuCache;
+use crate::http_clients::tts_inference_sidecar_client::TtsInferenceSidecarClient;
+use crate::http_clients::tts_sidecar_health_check_client::TtsSidecarHealthCheckClient;
+use crate::job_steps::health_check_trap::maybe_block_on_sidecar_health_check;
+use crate::job_steps::job_args::{JobArgs, JobCaches, JobHttpClients};
+use crate::job_steps::job_args::JobWorkerDetails;
+use crate::job_steps::process_single_job::process_single_job;
+use crate::job_steps::process_single_job_error::ProcessSingleJobError;
+use crate::script_execution::tacotron_inference_command::TacotronInferenceCommand;
+use crate::util::scoped_temp_dir_creator::ScopedTempDirCreator;
+
+pub mod caching;
+pub mod http_clients;
+pub mod job_steps;
+pub mod script_execution;
+pub mod util;
 
 // Buckets (shared config)
 const ENV_ACCESS_KEY : &str = "ACCESS_KEY";

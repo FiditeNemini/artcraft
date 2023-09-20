@@ -1,18 +1,18 @@
-use actix_web::{HttpRequest, web};
-use anyhow::anyhow;
-use container_common::anyhow_result::AnyhowResult;
+use std::collections::HashMap;
+use std::str::FromStr;
+
+use actix_web::HttpRequest;
+use log::{error, warn};
+use stripe::{CheckoutSession, CheckoutSessionMode, CreateCheckoutSession, CreateCheckoutSessionAutomaticTax, CreateCheckoutSessionLineItems, CreateCheckoutSessionPaymentIntentData, CreateCheckoutSessionSubscriptionData, CustomerId};
+
+use reusable_types::server_environment::ServerEnvironment;
+use url_config::third_party_url_redirector::ThirdPartyUrlRedirector;
+
 use crate::stripe::helpers::common_metadata_keys::{METADATA_EMAIL, METADATA_USER_TOKEN, METADATA_USERNAME};
 use crate::stripe::http_endpoints::checkout::create::stripe_create_checkout_session_error::CreateCheckoutSessionError;
 use crate::stripe::stripe_config::{FullUrlOrPath, StripeConfig};
-use crate::stripe::traits::internal_product_to_stripe_lookup::{InternalProductToStripeLookup, StripeProduct};
-use crate::stripe::traits::internal_user_lookup::{InternalUserLookup, UserMetadata};
-use log::{error, warn};
-use sqlx::MySqlPool;
-use std::collections::HashMap;
-use std::str::FromStr;
-use stripe::{CheckoutSession, CheckoutSessionMode, CreateCheckoutSession, CreateCheckoutSessionAutomaticTax, CreateCheckoutSessionLineItems, CreateCheckoutSessionPaymentIntentData, CreateCheckoutSessionSubscriptionData, CustomerId, ParseIdError};
-use reusable_types::server_environment::ServerEnvironment;
-use url_config::third_party_url_redirector::ThirdPartyUrlRedirector;
+use crate::stripe::traits::internal_product_to_stripe_lookup::InternalProductToStripeLookup;
+use crate::stripe::traits::internal_user_lookup::InternalUserLookup;
 
 /// Create a checkout session and return the URL
 /// If anything fails, treat it as a 500 server error.
@@ -182,16 +182,17 @@ pub async fn stripe_create_checkout_session_shared(
 
 #[cfg(test)]
 mod tests {
-  use actix_web::error::UrlencodedError::ContentType;
+  use mockall::predicate::*;
+  use tokio;
+
+  use reusable_types::server_environment::ServerEnvironment;
+  use url_config::third_party_url_redirector::ThirdPartyUrlRedirector;
+
   use crate::stripe::http_endpoints::checkout::create::stripe_create_checkout_session_error::CreateCheckoutSessionError;
   use crate::stripe::http_endpoints::checkout::create::stripe_create_checkout_session_shared::stripe_create_checkout_session_shared;
   use crate::stripe::stripe_config::{FullUrlOrPath, StripeCheckoutConfigs, StripeConfig, StripeCustomerPortalConfigs, StripeSecrets};
   use crate::stripe::traits::internal_product_to_stripe_lookup::{MockInternalProductToStripeLookup, StripeProduct};
   use crate::stripe::traits::internal_user_lookup::{MockInternalUserLookup, UserMetadata};
-  use mockall::predicate::*;
-  use tokio;
-  use reusable_types::server_environment::ServerEnvironment;
-  use url_config::third_party_url_redirector::ThirdPartyUrlRedirector;
 
   #[tokio::test]
   async fn test_success_case() {

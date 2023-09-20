@@ -3,10 +3,11 @@
 #![forbid(unused_mut)]
 #![forbid(unused_variables)]
 
-use crate::tokens::Tokens;
 use log::warn;
-use sqlx::MySqlPool;
 use sqlx::error::Error::Database;
+use sqlx::MySqlPool;
+
+use crate::tokens::Tokens;
 
 pub struct CreateAccountArgs<'a> {
   pub username: &'a str,

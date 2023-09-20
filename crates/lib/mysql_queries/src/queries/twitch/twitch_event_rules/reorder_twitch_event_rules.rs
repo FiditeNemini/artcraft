@@ -1,9 +1,11 @@
+use std::collections::HashMap;
+
 use anyhow::anyhow;
-use errors::AnyhowResult;
 use once_cell::sync::Lazy;
 use regex::Regex;
 use sqlx::MySqlPool;
-use std::collections::HashMap;
+
+use errors::AnyhowResult;
 
 /// Check that tokens are alphanumeric or can have colons.
 static SAFE_TOKENS_REGEX : Lazy<Regex> = Lazy::new(|| {

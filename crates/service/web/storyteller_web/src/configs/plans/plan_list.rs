@@ -1,9 +1,12 @@
+use std::collections::{HashMap, HashSet};
+
+use once_cell::sync::Lazy;
+
+use tts_common::priority::{FAKEYOU_ANONYMOUS_PRIORITY_LEVEL, FAKEYOU_LOGGED_IN_PRIORITY_LEVEL};
+
 use crate::configs::plans::plan::Plan;
 use crate::configs::plans::plan::PlanBuilder;
 use crate::configs::plans::plan_category::PlanCategory;
-use once_cell::sync::Lazy;
-use std::collections::{HashMap, HashSet};
-use tts_common::priority::{FAKEYOU_ANONYMOUS_PRIORITY_LEVEL, FAKEYOU_LOGGED_IN_PRIORITY_LEVEL};
 
 /// The plan for free logged-out users.
 /// This is declared at the top level because it may need to be referenced directly.
@@ -278,12 +281,13 @@ pub static PLANS_BY_STRIPE_PRICE_ID : Lazy<HashMap<String, Plan>> = Lazy::new(||
 
 #[cfg(test)]
 mod test {
-    use crate::configs::plans::plan::Plan;
-    use crate::configs::plans::plan_category::PlanCategory;
-    use crate::configs::plans::plan_list::{ALL_PLANS_BY_SLUG, DEVELOPMENT_PREMIUM_PLANS, DEVELOPMENT_PREMIUM_PLANS_BY_SLUG, FREE_PLANS_BY_SLUG, LOYALTY_PLANS, LOYALTY_PLANS_BY_SLUG, PLANS_BY_STRIPE_PRICE_ID, PLANS_BY_STRIPE_PRODUCT_ID, PRODUCTION_PREMIUM_PLANS, PRODUCTION_PREMIUM_PLANS_BY_SLUG};
-    use speculoos::prelude::*;
+  use speculoos::prelude::*;
 
-    // NB: We're being extremely careful in this test and all those that follow, essentially
+  use crate::configs::plans::plan::Plan;
+  use crate::configs::plans::plan_category::PlanCategory;
+  use crate::configs::plans::plan_list::{ALL_PLANS_BY_SLUG, DEVELOPMENT_PREMIUM_PLANS, DEVELOPMENT_PREMIUM_PLANS_BY_SLUG, FREE_PLANS_BY_SLUG, LOYALTY_PLANS, LOYALTY_PLANS_BY_SLUG, PLANS_BY_STRIPE_PRICE_ID, PLANS_BY_STRIPE_PRODUCT_ID, PRODUCTION_PREMIUM_PLANS, PRODUCTION_PREMIUM_PLANS_BY_SLUG};
+
+  // NB: We're being extremely careful in this test and all those that follow, essentially
     // making ourselves check twice when we make additions, removals, or other changes.
     #[test]
     fn test_number_of_plans_is_expected() {

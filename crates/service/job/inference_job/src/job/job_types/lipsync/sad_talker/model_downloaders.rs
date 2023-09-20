@@ -1,4 +1,5 @@
 use crate::util::model_downloader::ModelDownloader;
+
 crate::impl_model_downloader!(
   SadTalkerModelFirstMapping,
   "sad talker model first mapping",
@@ -114,6 +115,7 @@ impl SadTalkerDownloaders {
 #[cfg(test)]
 mod test {
   use std::path::Path;
+
   use crate::job::job_types::lipsync::sad_talker::model_downloaders::{SadTalkerModelFirstMapping, SadTalkerModelSecondMapping};
   use crate::util::model_downloader::ModelDownloader;
 

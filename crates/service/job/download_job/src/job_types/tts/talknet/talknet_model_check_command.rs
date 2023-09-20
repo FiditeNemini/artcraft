@@ -1,8 +1,10 @@
-use errors::AnyhowResult;
-use log::info;
 use std::fs::OpenOptions;
 use std::path::Path;
+
+use log::info;
 use subprocess::{Popen, PopenConfig, Redirection};
+
+use errors::AnyhowResult;
 
 /// This command is used to check talknet for being a real model
 #[derive(Clone)]

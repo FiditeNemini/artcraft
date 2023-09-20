@@ -1,6 +1,7 @@
 use chrono::{DateTime, Utc};
-use sqlx::{MySql, MySqlPool};
+use sqlx::MySql;
 use sqlx::pool::PoolConnection;
+
 use errors::AnyhowResult;
 
 pub struct ActiveUserSubscription {

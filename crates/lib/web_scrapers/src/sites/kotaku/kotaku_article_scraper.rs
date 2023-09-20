@@ -1,18 +1,16 @@
-use crate::common_extractors::extract_featured_image::extract_featured_image;
-use crate::common_extractors::extract_title::extract_title;
-use crate::payloads::web_scraping_result::{WebScrapingResult, ScrapedWebArticle};
-use crate::payloads::web_scraping_target::WebScrapingTarget;
+use std::ops::Deref;
+
+use chrono::{DateTime, LocalResult, TimeZone, Utc};
+use once_cell::sync::Lazy;
+use scraper::{Html, Selector};
+
 use enums::common::sqlite::web_content_type::WebContentType;
 use errors::{anyhow, AnyhowResult};
-use log::{error, warn};
-use once_cell::sync::Lazy;
-use rss::Channel;
-use scraper::{Html, Selector};
-use std::ops::{Add, Deref};
-use chrono::{DateTime, Duration, Local, LocalResult, NaiveDate, NaiveDateTime, TimeZone, Utc};
+
 use crate::common_extractors::extract_attribute::extract_attribute;
-use crate::common_extractors::extract_text::extract_text;
-use crate::utils::remove_timestamp_abbreviated_weekday_name::remove_timestamp_abbreviated_weekday_name;
+use crate::common_extractors::extract_featured_image::extract_featured_image;
+use crate::common_extractors::extract_title::extract_title;
+use crate::payloads::web_scraping_result::{ScrapedWebArticle, WebScrapingResult};
 
 /// The main article content container
 static ARTICLE_CONTENT_SELECTOR : Lazy<Selector> = Lazy::new(|| {

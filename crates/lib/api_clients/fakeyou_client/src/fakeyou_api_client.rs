@@ -1,13 +1,15 @@
-use backoff::future::retry;
-use backoff::{ExponentialBackoff, ExponentialBackoffBuilder};
-use crate::api::tts_inference::{CreateTtsInferenceRequest, CreateTtsInferenceResponse, TtsInferenceJobStatus};
-use crate::credentials::FakeYouCredentials;
-use errors::{anyhow, AnyhowError, AnyhowResult};
-use reqwest::cookie::Jar;
-use reqwest::{Client, ClientBuilder, RequestBuilder, StatusCode, Url};
 use std::sync::Arc;
 use std::time::Duration;
+
+use backoff::{ExponentialBackoff, ExponentialBackoffBuilder};
+use backoff::future::retry;
+use errors::{anyhow, AnyhowError, AnyhowResult};
 use log::{error, warn};
+use reqwest::{Client, ClientBuilder, RequestBuilder, StatusCode, Url};
+use reqwest::cookie::Jar;
+
+use crate::api::tts_inference::{CreateTtsInferenceRequest, CreateTtsInferenceResponse, TtsInferenceJobStatus};
+use crate::credentials::FakeYouCredentials;
 
 const AUTHORIZATION_HEADER: &str = "Authorization";
 const SESSION_COOKIE_NAME : &str = "session";

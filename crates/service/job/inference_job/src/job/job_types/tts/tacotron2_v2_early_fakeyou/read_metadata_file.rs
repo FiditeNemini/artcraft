@@ -1,7 +1,8 @@
-use errors::AnyhowResult;
 use std::fs::File;
 use std::io::Read;
 use std::path::PathBuf;
+
+use errors::AnyhowResult;
 
 #[derive(Deserialize, Default)]
 pub struct FileMetadata {

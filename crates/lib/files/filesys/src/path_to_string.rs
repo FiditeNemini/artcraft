@@ -7,7 +7,8 @@ pub fn path_to_string<P: AsRef<Path>>(path: P) -> String {
 
 #[cfg(test)]
 mod tests {
-  use std::path::{PathBuf};
+  use std::path::PathBuf;
+
   use crate::path_to_string::path_to_string;
 
   const TEST_CASES : [&'static str; 9] = [

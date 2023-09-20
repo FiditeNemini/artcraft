@@ -1,10 +1,10 @@
-use anyhow::anyhow;
 use chrono::{DateTime, Utc};
-use errors::AnyhowResult;
-use crate::helpers::boolean_converters::{i8_to_bool, nullable_i8_to_optional_bool};
-use log::{warn, info};
 use sqlx::{MySql, MySqlPool};
 use sqlx::pool::PoolConnection;
+
+use errors::AnyhowResult;
+
+use crate::helpers::boolean_converters::{i8_to_bool, nullable_i8_to_optional_bool};
 
 /// List of categories
 /// This is *NOT* paginated, as that defeats the purpose of having a category system.

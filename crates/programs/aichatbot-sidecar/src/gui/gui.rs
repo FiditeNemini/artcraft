@@ -1,6 +1,8 @@
 use std::sync::Arc;
+
 use eframe::egui;
 use log::{error, info};
+
 use crate::configs::fakeyou_voice_option::FakeYouVoiceOption;
 use crate::configs::level_option::LevelOption;
 use crate::shared_state::app_control_state::AppControlState;

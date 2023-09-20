@@ -13,39 +13,42 @@
 #[macro_use] extern crate magic_crypt;
 #[macro_use] extern crate serde_derive;
 
-pub mod endpoints_ws;
-pub mod server_state;
+use std::sync::Arc;
+use std::thread::sleep;
+use std::time::Duration;
 
 use actix_cors::Cors;
-use actix_web::middleware::{Logger, DefaultHeaders};
-use actix_web::{HttpServer, web, HttpResponse, App};
+use actix_web::{App, HttpResponse, HttpServer, web};
+use actix_web::middleware::{DefaultHeaders, Logger};
+use futures::executor::ThreadPool;
+use futures::Future;
+use limitation::Limiter;
+use log::info;
+use r2d2_redis::r2d2;
+use r2d2_redis::redis::Commands;
+use r2d2_redis::RedisConnectionManager;
+use sqlx::mysql::MySqlPoolOptions;
+use sqlx::MySqlPool;
+use tokio::runtime::{Builder, Handle, Runtime};
+use twitch_api2::pubsub;
+use twitch_api2::pubsub::Topic;
+use twitch_oauth2::{AppAccessToken, ClientId, ClientSecret, Scope, tokens::errors::AppAccessTokenError, TwitchToken};
+use twitch_oauth2::tokens::UserTokenBuilder;
+
 use config::shared_constants::DEFAULT_MYSQL_CONNECTION_STRING;
 use config::shared_constants::DEFAULT_REDIS_DATABASE_1_CONNECTION_STRING;
 use config::shared_constants::DEFAULT_RUST_LOG;
 use errors::AnyhowResult;
-use crate::endpoints_ws::obs_gateway_websocket_handler::obs_gateway_websocket_handler;
-use crate::server_state::{ObsGatewayServerState, EnvConfig, TwitchOauthSecrets, BackendsConfig, MultithreadingConfig};
-use futures::Future;
-use futures::executor::ThreadPool;
 use http_server_common::cors::build_production_cors_config;
 use http_server_common::endpoints::default_route_404::default_route_404;
 use http_server_common::endpoints::root_index::get_root_index;
-use limitation::Limiter;
-use log::{info};
-use r2d2_redis::RedisConnectionManager;
-use r2d2_redis::r2d2;
-use r2d2_redis::redis::Commands;
-use sqlx::MySqlPool;
-use sqlx::mysql::MySqlPoolOptions;
-use std::sync::Arc;
-use std::thread::sleep;
-use std::time::Duration;
-use tokio::runtime::{Builder, Handle, Runtime};
-use twitch_api2::pubsub::Topic;
-use twitch_api2::pubsub;
 use twitch_common::twitch_secrets::TwitchSecrets;
-use twitch_oauth2::tokens::UserTokenBuilder;
-use twitch_oauth2::{AppAccessToken, Scope, TwitchToken, tokens::errors::AppAccessTokenError, ClientId, ClientSecret};
+
+use crate::endpoints_ws::obs_gateway_websocket_handler::obs_gateway_websocket_handler;
+use crate::server_state::{BackendsConfig, EnvConfig, MultithreadingConfig, ObsGatewayServerState, TwitchOauthSecrets};
+
+pub mod endpoints_ws;
+pub mod server_state;
 
 const DEFAULT_BIND_ADDRESS : &str = "0.0.0.0:54321";
 

@@ -1,9 +1,8 @@
 use anyhow::anyhow;
-use chrono::{DateTime, Utc};
-use errors::AnyhowResult;
-use log::info;
-use log::warn;
 use sqlx::MySqlPool;
+
+use errors::AnyhowResult;
+
 use crate::tokens::Tokens;
 
 pub struct TwitchOauthTokenInsertBuilder {

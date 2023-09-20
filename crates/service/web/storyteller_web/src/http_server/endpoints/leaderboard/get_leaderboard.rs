@@ -3,22 +3,25 @@
 #![forbid(unused_mut)]
 #![forbid(unused_variables)]
 
+use std::fmt;
+use std::sync::Arc;
+
+use actix_web::{HttpRequest, HttpResponse, web};
 use actix_web::error::ResponseError;
 use actix_web::http::StatusCode;
-use actix_web::{web, HttpResponse, HttpRequest};
+use log::{debug, error, warn};
+use sqlx::MySqlPool;
+
+use errors::AnyhowResult;
+use mysql_queries::queries::tts::stats::calculate_tts_model_leaderboard::calculate_tts_model_leaderboard;
+use mysql_queries::queries::w2l::stats::calculate_w2l_template_leaderboard::calculate_w2l_template_leaderboard;
+use tokens::users::user::UserToken;
+
 use crate::http_server::common_responses::user_details_lite::{DefaultAvatarInfo, UserDetailsLight};
 use crate::http_server::web_utils::serialize_as_json_error::serialize_as_json_error;
 use crate::server_state::ServerState;
 use crate::user_avatars::default_avatar_color_from_username::default_avatar_color_from_username;
 use crate::user_avatars::default_avatar_from_username::default_avatar_from_username;
-use errors::AnyhowResult;
-use log::{debug, error, warn};
-use mysql_queries::queries::tts::stats::calculate_tts_model_leaderboard::calculate_tts_model_leaderboard;
-use mysql_queries::queries::w2l::stats::calculate_w2l_template_leaderboard::calculate_w2l_template_leaderboard;
-use sqlx::MySqlPool;
-use std::fmt;
-use std::sync::Arc;
-use tokens::users::user::UserToken;
 
 #[derive(Serialize)]
 pub struct LeaderboardResponse {

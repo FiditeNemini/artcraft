@@ -1,5 +1,6 @@
-use errors::AnyhowResult;
 use sqlx::MySqlPool;
+
+use errors::AnyhowResult;
 
 pub async fn delete_tts_model_as_user(
   tts_model_token: &str,

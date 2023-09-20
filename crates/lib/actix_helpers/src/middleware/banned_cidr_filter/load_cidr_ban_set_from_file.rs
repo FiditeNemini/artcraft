@@ -1,10 +1,13 @@
-use cidr_utils::cidr::IpCidr;
-use crate::middleware::banned_cidr_filter::banned_cidr_set::BannedCidrSet;
-use errors::AnyhowResult;
 use std::collections::HashSet;
 use std::fs::File;
 use std::io::{BufRead, BufReader};
 use std::path::Path;
+
+use cidr_utils::cidr::IpCidr;
+
+use errors::AnyhowResult;
+
+use crate::middleware::banned_cidr_filter::banned_cidr_set::BannedCidrSet;
 
 pub fn load_cidr_ban_set_from_file<P: AsRef<Path>>(path: P) -> AnyhowResult<BannedCidrSet> {
   let file = File::open(path)?;
@@ -27,11 +30,13 @@ pub fn load_cidr_ban_set_from_file<P: AsRef<Path>>(path: P) -> AnyhowResult<Bann
 
 #[cfg(test)]
 mod tests {
-  use crate::middleware::banned_cidr_filter::load_cidr_ban_set_from_file::load_cidr_ban_set_from_file;
-  use errors::AnyhowResult;
   use std::net::IpAddr;
   use std::path::PathBuf;
   use std::str::FromStr;
+
+  use errors::AnyhowResult;
+
+  use crate::middleware::banned_cidr_filter::load_cidr_ban_set_from_file::load_cidr_ban_set_from_file;
 
   fn test_file(path_from_repo_root: &str) -> PathBuf {
     // https://doc.rust-lang.org/cargo/reference/environment-variables.html

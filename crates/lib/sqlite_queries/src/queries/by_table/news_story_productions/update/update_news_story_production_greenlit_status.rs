@@ -1,7 +1,7 @@
 use enums::common::sqlite::awaitable_job_status::AwaitableJobStatus;
+use enums::common::sqlite::skip_reason::SkipReason;
 use errors::{anyhow, AnyhowResult};
 use sqlx::SqlitePool;
-use enums::common::sqlite::skip_reason::SkipReason;
 use tokens::tokens::news_stories::NewsStoryToken;
 
 pub struct Args <'a> {

@@ -1,10 +1,11 @@
 use anyhow::anyhow;
-use chrono::{DateTime, NaiveDateTime, Utc};
-use errors::AnyhowResult;
-use crate::helpers::boolean_converters::nullable_i8_to_optional_bool;
-use log::warn;
-use reusable_types::stripe::stripe_subscription_status::StripeSubscriptionStatus;
+use chrono::{DateTime, Utc};
 use sqlx::MySqlPool;
+
+use errors::AnyhowResult;
+use reusable_types::stripe::stripe_subscription_status::StripeSubscriptionStatus;
+
+use crate::helpers::boolean_converters::nullable_i8_to_optional_bool;
 
 pub struct UserSubscription {
   pub token: String,

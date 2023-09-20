@@ -1,6 +1,6 @@
 use anyhow::anyhow;
-use sqlx::mysql::MySqlQueryResult;
 use sqlx::MySqlPool;
+
 use enums::common::visibility::Visibility;
 use errors::AnyhowResult;
 

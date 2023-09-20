@@ -1,8 +1,9 @@
-use errors::AnyhowResult;
-use enums::by_table::trending_model_analytics::model_type::ModelType;
-use enums::by_table::trending_model_analytics::window_name::WindowName;
 use sqlx::MySql;
 use sqlx::pool::PoolConnection;
+
+use enums::by_table::trending_model_analytics::model_type::ModelType;
+use enums::by_table::trending_model_analytics::window_name::WindowName;
+use errors::AnyhowResult;
 use tokens::tokens::tts_models::TtsModelToken;
 
 // NB: Only TTS for now. New enum variants for other token types.

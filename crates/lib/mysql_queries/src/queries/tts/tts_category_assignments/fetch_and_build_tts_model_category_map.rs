@@ -3,12 +3,14 @@
 #![forbid(unused_mut)]
 #![forbid(unused_variables)]
 
+use std::collections::{HashMap, HashSet};
+
 use anyhow::anyhow;
-use errors::AnyhowResult;
 use log::warn;
-use sqlx::pool::PoolConnection;
 use sqlx::{MySql, MySqlPool};
-use std::collections::{HashSet, HashMap};
+use sqlx::pool::PoolConnection;
+
+use errors::AnyhowResult;
 
 /// Map of model_token => vec<category tokens>
 #[derive(Serialize, Default)]

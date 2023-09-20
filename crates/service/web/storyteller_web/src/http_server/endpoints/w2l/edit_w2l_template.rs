@@ -3,22 +3,25 @@
 #![forbid(unused_mut)]
 #![forbid(unused_variables)]
 
+use std::fmt;
+use std::sync::Arc;
+
+use actix_web::{HttpRequest, HttpResponse, web};
 use actix_web::error::ResponseError;
 use actix_web::http::StatusCode;
-use actix_web::web::{Path, Json};
-use actix_web::{web, HttpResponse, HttpRequest};
+use actix_web::web::{Json, Path};
+use log::{error, info, warn};
+
+use enums::common::visibility::Visibility;
+use http_server_common::request::get_request_ip::get_request_ip;
+use mysql_queries::queries::w2l::w2l_templates::edit_w2l_template::{CreatorOrModFields, edit_w2l_template, EditW2lTemplateArgs, ModFields};
+use mysql_queries::queries::w2l::w2l_templates::get_w2l_template::select_w2l_template_by_token;
+use user_input_common::check_for_slurs::contains_slurs;
+use user_input_common::markdown_to_html::markdown_to_html;
+
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::http_server::web_utils::response_success_helpers::simple_json_success;
 use crate::server_state::ServerState;
-use mysql_queries::queries::w2l::w2l_templates::get_w2l_template::select_w2l_template_by_token;
-use enums::common::visibility::Visibility;
-use http_server_common::request::get_request_ip::get_request_ip;
-use log::{error, info, warn};
-use std::fmt;
-use std::sync::Arc;
-use mysql_queries::queries::w2l::w2l_templates::edit_w2l_template::{CreatorOrModFields, edit_w2l_template, EditW2lTemplateArgs, ModFields};
-use user_input_common::check_for_slurs::contains_slurs;
-use user_input_common::markdown_to_html::markdown_to_html;
 
 /// For the URL PathInfo
 #[derive(Deserialize)]

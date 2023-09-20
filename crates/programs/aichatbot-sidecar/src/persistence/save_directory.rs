@@ -1,9 +1,11 @@
 use std::path::{Path, PathBuf};
-use log::info;
-use path_absolutize::Absolutize;
+
 use errors::{anyhow, AnyhowResult};
 use hashing::sha256::sha256_hash_string::sha256_hash_string;
+use log::info;
+use path_absolutize::Absolutize;
 use tokens::tokens::news_stories::NewsStoryToken;
+
 use crate::persistence::hashed_directory_path::hashed_directory_path;
 
 #[derive(Clone)]

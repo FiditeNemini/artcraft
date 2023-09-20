@@ -1,8 +1,10 @@
-use crate::anyhow_result::AnyhowResult;
-use serde::de::DeserializeOwned;
 use std::fs::File;
 use std::io::Read;
 use std::path::Path;
+
+use serde::de::DeserializeOwned;
+
+use crate::anyhow_result::AnyhowResult;
 
 /// Read a TOML file into a struct.
 pub fn read_toml_file_to_struct<D, P>(filename: P) -> AnyhowResult<D>
@@ -20,10 +22,12 @@ where
 
 #[cfg(test)]
 mod tests {
-  use crate::files::read_toml_file_to_struct::read_toml_file_to_struct;
-  use serde::Deserialize;
   use std::io::Write;
+
+  use serde::Deserialize;
   use tempfile::NamedTempFile;
+
+  use crate::files::read_toml_file_to_struct::read_toml_file_to_struct;
 
   #[derive(Deserialize)]
   struct TestStruct {

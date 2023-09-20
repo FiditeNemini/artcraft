@@ -1,7 +1,10 @@
-use crate::sha256::sha256_digest_buffer::sha256_digest_buffer;
-use data_encoding::HEXLOWER_PERMISSIVE;
 use std::io::BufReader;
+
+use data_encoding::HEXLOWER_PERMISSIVE;
+
 use errors::AnyhowResult;
+
+use crate::sha256::sha256_digest_buffer::sha256_digest_buffer;
 
 pub fn sha256_hash_bytes(bytes: &[u8]) -> AnyhowResult<String> {
   let reader = BufReader::new(bytes);

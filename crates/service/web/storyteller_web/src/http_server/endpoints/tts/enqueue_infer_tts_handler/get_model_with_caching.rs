@@ -1,10 +1,11 @@
-use errors::AnyhowResult;
 use log::error;
+use sqlx::MySql;
+use sqlx::pool::PoolConnection;
+
+use errors::AnyhowResult;
 use mysql_queries::queries::tts::tts_models::get_tts_model::{get_tts_model_by_token_using_connection, TtsModelRecord};
 use redis_caching::redis_ttl_cache::RedisTtlCache;
 use redis_common::redis_cache_keys::RedisCacheKeys;
-use sqlx::MySql;
-use sqlx::pool::PoolConnection;
 
 // TODO: Read from in-memory TTS List cache first (!!!) for further performance savings
 

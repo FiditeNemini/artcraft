@@ -1,10 +1,12 @@
-use anyhow::anyhow;
-use container_common::anyhow_result::AnyhowResult;
-use filesys::path_to_string::path_to_string;
-use log::info;
 use std::ffi::OsString;
 use std::path::{Path, PathBuf};
+
+use anyhow::anyhow;
+use log::info;
 use subprocess::{Popen, PopenConfig};
+
+use container_common::anyhow_result::AnyhowResult;
+use filesys::path_to_string::path_to_string;
 use subprocess_common::docker_options::{DockerFilesystemMount, DockerGpu, DockerOptions};
 
 /// This command is used to check tacotron for being a real model

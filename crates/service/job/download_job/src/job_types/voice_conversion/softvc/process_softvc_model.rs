@@ -1,21 +1,24 @@
+use std::fs::File;
+use std::io::Read;
+use std::path::PathBuf;
+
 use anyhow::anyhow;
+use log::{info, warn};
+use tempdir::TempDir;
+
 use container_common::filesystem::check_file_exists::check_file_exists;
 use container_common::filesystem::safe_delete_temp_directory::safe_delete_temp_directory;
 use container_common::filesystem::safe_delete_temp_file::safe_delete_temp_file;
-use crate::JobState;
-use crate::job_loop::job_results::JobResults;
 use enums::by_table::voice_conversion_models::voice_conversion_model_type::VoiceConversionModelType;
 use enums::common::visibility::Visibility;
 use errors::AnyhowResult;
 use hashing::sha256::sha256_hash_file::sha256_hash_file;
 use jobs_common::redis_job_status_logger::RedisJobStatusLogger;
-use log::{info, warn};
 use mysql_queries::queries::generic_download::job::list_available_generic_download_jobs::AvailableDownloadJob;
-use mysql_queries::queries::voice_conversion::models::insert_voice_conversion_model_from_download_job::{InsertVoiceConversionModelArgs, insert_voice_conversion_model_from_download_job};
-use std::fs::File;
-use std::io::Read;
-use std::path::PathBuf;
-use tempdir::TempDir;
+use mysql_queries::queries::voice_conversion::models::insert_voice_conversion_model_from_download_job::{insert_voice_conversion_model_from_download_job, InsertVoiceConversionModelArgs};
+
+use crate::job_loop::job_results::JobResults;
+use crate::JobState;
 
 /// Returns the token of the entity.
 pub async fn process_softvc_model<'a, 'b>(

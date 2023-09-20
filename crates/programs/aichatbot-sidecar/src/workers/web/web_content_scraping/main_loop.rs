@@ -1,23 +1,24 @@
-use crate::shared_state::job_state::JobState;
-use crate::workers::web::web_content_scraping::single_target::process_target_record::process_target_record;
+use std::sync::Arc;
+use std::thread;
+use std::time::Duration;
+
 use enums::by_table::web_scraping_targets::scraping_status::ScrapingStatus;
 use errors::AnyhowResult;
 use log::{debug, error, info};
 use rand::seq::SliceRandom;
 use rand::thread_rng;
 use sqlite_queries::queries::by_table::web_scraping_targets::insert_web_scraping_target::{Args, insert_web_scraping_target};
+use sqlite_queries::queries::by_table::web_scraping_targets::list::list_all_web_scraping_targets::list_all_web_scraping_targets;
 use sqlite_queries::queries::by_table::web_scraping_targets::list::web_scraping_target::WebScrapingTarget as WebScrapingTargetRecord;
 use sqlx::sqlite::SqlitePoolOptions;
-use std::future::Future;
-use std::sync::Arc;
-use std::thread;
-use std::time::Duration;
 use strum::IntoEnumIterator;
-use sqlite_queries::queries::by_table::web_scraping_targets::list::list_all_web_scraping_targets::list_all_web_scraping_targets;
 use web_scrapers::payloads::web_scraping_result::ScrapedWebArticle;
 use web_scrapers::payloads::web_scraping_target::WebScrapingTarget;
 use web_scrapers::sites::cnn::cnn_indexer::{cnn_indexer, CnnFeed};
 use web_scrapers::sites::techcrunch::techcrunch_indexer::{techcrunch_indexer, TechcrunchFeed};
+
+use crate::shared_state::job_state::JobState;
+use crate::workers::web::web_content_scraping::single_target::process_target_record::process_target_record;
 
 /// Follow up on articles tagged to be indexed by downloading and scraping their contents.
 pub async fn web_content_scraping_main_loop(job_state: Arc<JobState>) {

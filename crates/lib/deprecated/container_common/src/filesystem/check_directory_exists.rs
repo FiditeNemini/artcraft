@@ -1,6 +1,8 @@
-use anyhow::bail;
-use crate::anyhow_result::AnyhowResult;
 use std::path::PathBuf;
+
+use anyhow::bail;
+
+use crate::anyhow_result::AnyhowResult;
 
 pub fn check_directory_exists(path: &PathBuf) -> AnyhowResult<()> {
   if !path.exists() {

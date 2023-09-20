@@ -1,6 +1,7 @@
-use errors::AnyhowResult;
 use sqlx::MySql;
 use sqlx::pool::PoolConnection;
+
+use errors::AnyhowResult;
 use tokens::tokens::tts_models::TtsModelToken;
 
 pub async fn update_tts_model_ratings(

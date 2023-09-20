@@ -1,8 +1,7 @@
 use anyhow::anyhow;
-use errors::AnyhowResult;
-use log::warn;
 use sqlx::MySqlPool;
-use std::collections::{HashSet, HashMap};
+
+use errors::AnyhowResult;
 
 pub async fn edit_api_token(
   user_token: &str,

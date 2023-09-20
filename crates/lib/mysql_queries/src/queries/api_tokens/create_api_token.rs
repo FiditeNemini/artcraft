@@ -1,9 +1,11 @@
 use anyhow::anyhow;
+use sqlx;
+use sqlx::MySqlPool;
+
 use errors::AnyhowResult;
+
 use crate::queries::api_tokens::list_available_api_tokens_for_user::list_available_api_tokens_for_user;
 use crate::tokens::Tokens;
-use sqlx::MySqlPool;
-use sqlx;
 
 /// Create a new API token for the user.
 /// If the user has more than five tokens, delete the least recent.

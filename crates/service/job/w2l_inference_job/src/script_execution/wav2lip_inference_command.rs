@@ -1,9 +1,10 @@
-use crate::AnyhowResult;
-use log::{info,warn};
-use std::process::{Command, Stdio};
-use subprocess::{Popen, PopenConfig, Redirection};
 use std::fs::OpenOptions;
 use std::path::Path;
+
+use log::info;
+use subprocess::{Popen, PopenConfig, Redirection};
+
+use crate::AnyhowResult;
 
 /// This command is used to run inference.
 /// It uses preprocessed face files so that it's much faster.

@@ -1,6 +1,7 @@
-use crate::util::hash_to_bucket_path::hash_to_bucket_path;
-use errors::AnyhowResult;
 use errors::anyhow;
+use errors::AnyhowResult;
+
+use crate::util::hash_to_bucket_path::hash_to_bucket_path;
 
 #[deprecated(note = "this is a messy function and should be avoided")]
 pub fn hash_to_bucket_path_string(file_hash: &str,

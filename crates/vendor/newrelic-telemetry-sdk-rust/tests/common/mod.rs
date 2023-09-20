@@ -1,12 +1,3 @@
-///
-/// Copyright 2020 New Relic Corporation. All rights reserved.
-/// SPDX-License-Identifier: Apache-2.0
-///
-use flate2::read::GzDecoder;
-use hyper::service::{make_service_fn, service_fn};
-use hyper::{Body, Request, Server};
-use rand::seq::SliceRandom;
-use rand::thread_rng;
 use std::collections::HashMap;
 use std::io::Read;
 use std::net::{SocketAddr, TcpListener};
@@ -14,6 +5,16 @@ use std::str;
 use std::sync::{Arc, Mutex};
 use std::thread;
 use std::time::SystemTime;
+
+///
+/// Copyright 2020 New Relic Corporation. All rights reserved.
+/// SPDX-License-Identifier: Apache-2.0
+///
+use flate2::read::GzDecoder;
+use hyper::{Body, Request, Server};
+use hyper::service::{make_service_fn, service_fn};
+use rand::seq::SliceRandom;
+use rand::thread_rng;
 use tokio::runtime::Builder;
 
 macro_rules! assert_json_eq {

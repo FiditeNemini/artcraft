@@ -1,7 +1,9 @@
 use chrono::NaiveDateTime;
-use crate::helpers::numeric_converters::try_i64_to_u64_or_min;
-use errors::AnyhowResult;
 use sqlx::MySqlPool;
+
+use errors::AnyhowResult;
+
+use crate::helpers::numeric_converters::try_i64_to_u64_or_min;
 
 #[derive(Serialize, Deserialize, Clone)]
 pub struct QueueStatsRow {

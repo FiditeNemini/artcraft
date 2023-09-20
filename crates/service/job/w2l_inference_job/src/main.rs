@@ -11,10 +11,25 @@
 
 #[macro_use] extern crate serde_derive;
 
-mod script_execution;
+use std::fs::{File, metadata};
+use std::io::{BufReader, Read};
+use std::ops::Deref;
+use std::path::{Path, PathBuf};
+use std::process::Command;
+use std::thread;
+use std::time::Duration;
 
 use anyhow::anyhow;
 use chrono::Utc;
+use log::{info, warn};
+use r2d2_redis::r2d2;
+use r2d2_redis::r2d2::PooledConnection;
+use r2d2_redis::redis::Commands;
+use r2d2_redis::RedisConnectionManager;
+use sqlx::mysql::MySqlPoolOptions;
+use sqlx::MySqlPool;
+use tempdir::TempDir;
+
 use cloud_storage::bucket_client::BucketClient;
 use cloud_storage::bucket_path_unifier::BucketPathUnifier;
 use config::common_env::CommonEnv;
@@ -25,34 +40,22 @@ use container_common::filesystem::check_directory_exists::check_directory_exists
 use container_common::filesystem::check_file_exists::check_file_exists;
 use container_common::filesystem::safe_delete_temp_directory::safe_delete_temp_directory;
 use container_common::filesystem::safe_delete_temp_file::safe_delete_temp_file;
-use crate::script_execution::wav2lip_inference_command::Wav2LipInferenceCommand;
+use google_drive_common::google_drive_download_command::GoogleDriveDownloadCommand;
+use jobs_common::noop_logger::NoOpLogger;
+use jobs_common::redis_job_status_logger::RedisJobStatusLogger;
+use jobs_common::semi_persistent_cache_dir::SemiPersistentCacheDir;
 use mysql_queries::mediators::firehose_publisher::FirehosePublisher;
-use mysql_queries::queries::w2l::w2l_inference_jobs::w2l_inference_job_queries::W2lInferenceJobRecord;
 use mysql_queries::queries::w2l::w2l_inference_jobs::w2l_inference_job_queries::get_w2l_template_by_token;
 use mysql_queries::queries::w2l::w2l_inference_jobs::w2l_inference_job_queries::grab_job_lock_and_mark_pending;
 use mysql_queries::queries::w2l::w2l_inference_jobs::w2l_inference_job_queries::insert_w2l_result;
 use mysql_queries::queries::w2l::w2l_inference_jobs::w2l_inference_job_queries::mark_w2l_inference_job_done;
 use mysql_queries::queries::w2l::w2l_inference_jobs::w2l_inference_job_queries::mark_w2l_inference_job_failure;
 use mysql_queries::queries::w2l::w2l_inference_jobs::w2l_inference_job_queries::query_w2l_inference_job_records;
-use google_drive_common::google_drive_download_command::GoogleDriveDownloadCommand;
-use jobs_common::noop_logger::NoOpLogger;
-use jobs_common::redis_job_status_logger::RedisJobStatusLogger;
-use jobs_common::semi_persistent_cache_dir::SemiPersistentCacheDir;
-use log::{warn, info};
-use r2d2_redis::RedisConnectionManager;
-use r2d2_redis::r2d2::PooledConnection;
-use r2d2_redis::r2d2;
-use r2d2_redis::redis::Commands;
-use sqlx::MySqlPool;
-use sqlx::mysql::MySqlPoolOptions;
-use std::fs::{File, metadata};
-use std::io::{BufReader, Read};
-use std::ops::Deref;
-use std::path::{PathBuf, Path};
-use std::process::Command;
-use std::thread;
-use std::time::Duration;
-use tempdir::TempDir;
+use mysql_queries::queries::w2l::w2l_inference_jobs::w2l_inference_job_queries::W2lInferenceJobRecord;
+
+use crate::script_execution::wav2lip_inference_command::Wav2LipInferenceCommand;
+
+mod script_execution;
 
 // Buckets (shared config)
 const ENV_ACCESS_KEY : &str = "ACCESS_KEY";

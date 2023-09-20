@@ -1,6 +1,5 @@
 use serde::Deserialize;
 use serde::Serialize;
-
 #[cfg(test)]
 use strum::EnumCount;
 #[cfg(test)]
@@ -83,8 +82,8 @@ impl WebContentType {
 
 #[cfg(test)]
 mod tests {
-  use crate::test_helpers::assert_serialization;
   use crate::common::sqlite::web_content_type::WebContentType;
+  use crate::test_helpers::assert_serialization;
 
   mod serde {
     use super::*;

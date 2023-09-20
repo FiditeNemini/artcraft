@@ -1,5 +1,7 @@
-use crate::shared_state::job_state::JobState;
-use crate::workers::audio::fakeyou_audio_download::process_single_record::process_single_record;
+use std::sync::Arc;
+use std::thread;
+use std::time::Duration;
+
 use enums::by_table::tts_render_tasks::tts_render_status::TtsRenderStatus;
 use enums::by_table::web_scraping_targets::scraping_status::ScrapingStatus;
 use errors::AnyhowResult;
@@ -8,15 +10,14 @@ use sqlite_queries::queries::by_table::tts_render_tasks::list::list_tts_render_t
 use sqlite_queries::queries::by_table::tts_render_tasks::list::list_tts_render_tasks_awaiting_render::list_tts_render_tasks_awaiting_render;
 use sqlite_queries::queries::by_table::web_scraping_targets::insert_web_scraping_target::{Args, insert_web_scraping_target};
 use sqlx::sqlite::SqlitePoolOptions;
-use std::future::Future;
-use std::sync::Arc;
-use std::thread;
-use std::time::Duration;
 use strum::IntoEnumIterator;
 use web_scrapers::payloads::web_scraping_result::ScrapedWebArticle;
 use web_scrapers::payloads::web_scraping_target::WebScrapingTarget;
 use web_scrapers::sites::cnn::cnn_indexer::{cnn_indexer, CnnFeed};
 use web_scrapers::sites::techcrunch::techcrunch_indexer::{techcrunch_indexer, TechcrunchFeed};
+
+use crate::shared_state::job_state::JobState;
+use crate::workers::audio::fakeyou_audio_download::process_single_record::process_single_record;
 
 /// See if jobs are complete and download the audio.
 pub async fn fakeyou_audio_download_main_loop(job_state: Arc<JobState>) {

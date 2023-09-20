@@ -1,6 +1,8 @@
-use std::sync::{Arc, LockResult, RwLock};
+use std::sync::{Arc, RwLock};
+
 use concurrency::relaxed_atomic_bool::RelaxedAtomicBool;
 use errors::{anyhow, AnyhowResult};
+
 use crate::configs::fakeyou_voice_option::FakeYouVoiceOption;
 use crate::configs::level_option::LevelOption;
 

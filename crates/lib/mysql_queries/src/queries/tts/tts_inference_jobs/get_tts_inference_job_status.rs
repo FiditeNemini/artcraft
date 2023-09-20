@@ -1,7 +1,8 @@
 use anyhow::anyhow;
 use chrono::{DateTime, Utc};
-use errors::AnyhowResult;
 use sqlx::MySqlPool;
+
+use errors::AnyhowResult;
 
 #[derive(Serialize)]
 pub struct TtsInferenceJobStatusRecord {

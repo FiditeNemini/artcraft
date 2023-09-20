@@ -1,7 +1,9 @@
-use actix_web::HttpResponse;
+use std::fmt;
+
 use actix_web::error::ResponseError;
 use actix_web::http::StatusCode;
-use std::fmt;
+use actix_web::HttpResponse;
+
 use crate::error::simple_json_error_response::simple_json_error_response;
 
 /// Common server errors that should handle 90% of cases.

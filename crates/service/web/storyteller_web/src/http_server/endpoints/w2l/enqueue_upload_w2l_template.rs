@@ -3,20 +3,23 @@
 #![forbid(unused_mut)]
 #![forbid(unused_variables)]
 
+use std::fmt;
+use std::sync::Arc;
+
+use actix_web::{HttpRequest, HttpResponse, web};
 use actix_web::error::ResponseError;
 use actix_web::http::StatusCode;
-use actix_web::{web, HttpResponse, HttpRequest};
+use log::warn;
+
 use config::is_bad_video_download_url::is_bad_video_download_url;
+use enums::common::visibility::Visibility;
+use http_server_common::request::get_request_ip::get_request_ip;
+use mysql_queries::queries::w2l::w2l_template_upload_jobs::insert_w2l_template_upload_job::{insert_w2l_template_upload_job, InsertW2lTemplateUploadJobArgs};
+use user_input_common::check_for_slurs::contains_slurs;
+
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::server_state::ServerState;
 use crate::validations::model_uploads::validate_model_title;
-use mysql_queries::queries::w2l::w2l_template_upload_jobs::insert_w2l_template_upload_job::{insert_w2l_template_upload_job, InsertW2lTemplateUploadJobArgs};
-use enums::common::visibility::Visibility;
-use http_server_common::request::get_request_ip::get_request_ip;
-use log::warn;
-use std::fmt;
-use std::sync::Arc;
-use user_input_common::check_for_slurs::contains_slurs;
 
 #[derive(Deserialize)]
 pub enum W2lTemplateType {

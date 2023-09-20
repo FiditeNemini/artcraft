@@ -1,9 +1,14 @@
-use actix_web::error::ResponseError;
-use actix_web::error::UrlencodedError::ContentType;
-use actix_web::http::{header, StatusCode};
-use actix_web::web::{Bytes, Path};
-use actix_web::{web, HttpResponse, HttpRequest};
-use chrono::{DateTime, NaiveDateTime, Utc};
+use actix_web::{HttpRequest, HttpResponse, web};
+use actix_web::web::Bytes;
+use chrono::NaiveDateTime;
+use log::{error, info, warn};
+use sqlx::MySqlPool;
+use stripe::{EventObject, EventType, Webhook};
+
+use http_server_common::request::get_request_header_optional::get_request_header_optional;
+use mysql_queries::queries::billing::stripe::get_stripe_webhook_event_log_by_id::get_stripe_webhook_event_log_by_id;
+use mysql_queries::queries::billing::stripe::insert_stripe_webhook_event_log::InsertStripeWebhookEventLog;
+
 use crate::stripe::helpers::verify_stripe_webhook_ip_address::verify_stripe_webhook_ip_address;
 use crate::stripe::http_endpoints::webhook::webhook_event_handlers::charge::charge_succeeded_handler::charge_succeeded_handler;
 use crate::stripe::http_endpoints::webhook::webhook_event_handlers::checkout_session::checkout_session_completed_handler::checkout_session_completed_handler;
@@ -22,16 +27,6 @@ use crate::stripe::http_endpoints::webhook::webhook_event_handlers::stripe_webho
 use crate::stripe::http_endpoints::webhook::webhook_event_handlers::stripe_webhook_summary::StripeWebhookSummary;
 use crate::stripe::stripe_config::StripeConfig;
 use crate::stripe::traits::internal_subscription_product_lookup::InternalSubscriptionProductLookup;
-use mysql_queries::queries::billing::stripe::get_stripe_webhook_event_log_by_id::get_stripe_webhook_event_log_by_id;
-use mysql_queries::queries::billing::stripe::insert_stripe_webhook_event_log::InsertStripeWebhookEventLog;
-use http_server_common::request::get_request_header_optional::get_request_header_optional;
-use http_server_common::response::serialize_as_json_error::serialize_as_json_error;
-use http_server_common::util::timer::MultiBenchmarkingTimer;
-use log::{error, info, warn};
-use sqlx::MySqlPool;
-use std::collections::HashMap;
-use std::fmt;
-use stripe::{EventObject, EventType, PaymentIntentStatus, Webhook};
 
 #[derive(Serialize)]
 pub struct StripeWebhookSuccessResponse {

@@ -57,11 +57,11 @@ pub fn isize_to_unsigned_zeroing_negatives(num: isize) -> usize {
 
 #[cfg(test)]
 mod tests {
-  use crate::numerics::signed_to_unsigned::i8_to_unsigned_zeroing_negatives;
+  use crate::numerics::signed_to_unsigned::i128_to_unsigned_zeroing_negatives;
   use crate::numerics::signed_to_unsigned::i16_to_unsigned_zeroing_negatives;
   use crate::numerics::signed_to_unsigned::i32_to_unsigned_zeroing_negatives;
   use crate::numerics::signed_to_unsigned::i64_to_unsigned_zeroing_negatives;
-  use crate::numerics::signed_to_unsigned::i128_to_unsigned_zeroing_negatives;
+  use crate::numerics::signed_to_unsigned::i8_to_unsigned_zeroing_negatives;
   use crate::numerics::signed_to_unsigned::isize_to_unsigned_zeroing_negatives;
 
   #[test]

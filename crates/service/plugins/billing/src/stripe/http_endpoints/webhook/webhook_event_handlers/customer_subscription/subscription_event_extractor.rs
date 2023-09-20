@@ -1,15 +1,17 @@
 use anyhow::anyhow;
-use chrono::{DateTime, NaiveDateTime, Utc};
+use chrono::NaiveDateTime;
 use log::error;
+use stripe::{Subscription, SubscriptionStatus};
+
 use container_common::anyhow_result::AnyhowResult;
+use reusable_types::stripe::stripe_recurring_interval::StripeRecurringInterval;
+use reusable_types::stripe::stripe_subscription_status::StripeSubscriptionStatus;
+
 use crate::stripe::helpers::common_metadata_keys::METADATA_USER_TOKEN;
 use crate::stripe::helpers::enums::recurring_interval_to_reusable_type::recurring_interval_to_reusable_type;
 use crate::stripe::helpers::enums::subscription_status_to_reusable_type::subscription_status_to_reusable_type;
 use crate::stripe::helpers::expand_customer_id::expand_customer_id;
 use crate::stripe::helpers::expand_product_id::expand_product_id;
-use reusable_types::stripe::stripe_recurring_interval::StripeRecurringInterval;
-use reusable_types::stripe::stripe_subscription_status::StripeSubscriptionStatus;
-use stripe::{Price, RecurringInterval, Subscription, SubscriptionInterval, SubscriptionStatus};
 
 #[derive(Clone, Debug)]
 pub struct SubscriptionSummary {
@@ -111,10 +113,12 @@ pub fn subscription_summary_extractor(subscription: &Subscription) -> AnyhowResu
 
 #[cfg(test)]
 mod tests {
-  use crate::stripe::http_endpoints::webhook::webhook_event_handlers::customer_subscription::subscription_event_extractor::subscription_summary_extractor;
+  use stripe::Subscription;
+
   use reusable_types::stripe::stripe_recurring_interval::StripeRecurringInterval;
   use reusable_types::stripe::stripe_subscription_status::StripeSubscriptionStatus;
-  use stripe::Subscription;
+
+  use crate::stripe::http_endpoints::webhook::webhook_event_handlers::customer_subscription::subscription_event_extractor::subscription_summary_extractor;
 
   #[test]
   fn test_subscription_summary_extractor_on_create_event() {

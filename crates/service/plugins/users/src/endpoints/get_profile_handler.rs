@@ -3,28 +3,31 @@
 #![forbid(unused_mut)]
 #![forbid(unused_variables)]
 
+use std::fmt;
+
+use actix_web::{HttpRequest, HttpResponse, web};
 use actix_web::error::ResponseError;
 use actix_web::http::StatusCode;
 use actix_web::web::Path;
-use actix_web::{web, HttpResponse, HttpRequest};
 use chrono::{DateTime, Utc};
-use crate::utils::default_avatar_color_from_username::default_avatar_color_from_username;
-use crate::utils::default_avatar_from_username::default_avatar_from_username;
-use crate::utils::session_checker::SessionChecker;
+use log::{error, warn};
+use r2d2_redis::{r2d2, RedisConnectionManager};
+use r2d2_redis::r2d2::PooledConnection;
+use r2d2_redis::redis::Commands;
+use sqlx::MySqlPool;
+
 use enums::common::visibility::Visibility;
 use http_server_common::request::get_request_header_optional::get_request_header_optional;
 use http_server_common::response::serialize_as_json_error::serialize_as_json_error;
 use http_server_common::util::timer::MultiBenchmarkingTimer;
-use log::{error, warn};
-use mysql_queries::queries::users::user_badges::list_user_badges::UserBadgeForList;
 use mysql_queries::queries::users::user_badges::list_user_badges::list_user_badges;
+use mysql_queries::queries::users::user_badges::list_user_badges::UserBadgeForList;
 use mysql_queries::queries::users::user_profiles::get_user_profile_by_username::{get_user_profile_by_username_from_connection, UserProfileResult};
-use r2d2_redis::r2d2::PooledConnection;
-use r2d2_redis::redis::Commands;
-use r2d2_redis::{r2d2, RedisConnectionManager};
-use sqlx::MySqlPool;
-use std::fmt;
 use tokens::users::user::UserToken;
+
+use crate::utils::default_avatar_color_from_username::default_avatar_color_from_username;
+use crate::utils::default_avatar_from_username::default_avatar_from_username;
+use crate::utils::session_checker::SessionChecker;
 
 // TODO: This is duplicated in query_user_profile
 

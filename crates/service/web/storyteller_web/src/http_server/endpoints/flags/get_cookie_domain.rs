@@ -1,4 +1,5 @@
 use actix_web::HttpRequest;
+
 use http_server_common::request::get_request_host::get_request_host;
 
 /// Determine the appropriate host for SET COOKIE headers based on the request.

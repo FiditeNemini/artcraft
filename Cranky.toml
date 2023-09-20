@@ -39,6 +39,9 @@ deny = [
   "clippy::redundant_field_names", # Lint: Duplicate names is a burden when reading: you wonder why they're dupes.
   "clippy::redundant_static_lifetimes", # Lint: feels more modern to elide static lifetimes
 
+  # Rust
+  "unused_imports", # These are easy to automatically cull
+
   # Possible:
   # "clippy::ptr_arg",
   # "clippy::too_many_lines" (note: this is configurable)

@@ -1,10 +1,13 @@
-use std::ffi::{OsStr, OsString};
-use crate::AnyhowResult;
-use filesys::path_to_string::path_to_string;
-use log::info;
+use std::ffi::OsString;
 use std::path::{Path, PathBuf};
+
+use log::info;
 use subprocess::{Popen, PopenConfig};
+
+use filesys::path_to_string::path_to_string;
 use subprocess_common::docker_options::DockerOptions;
+
+use crate::AnyhowResult;
 
 /// This command is used to run tacotron2 (v1 "early fakeyou") inference
 #[derive(Clone)]

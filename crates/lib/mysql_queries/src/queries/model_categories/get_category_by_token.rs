@@ -1,9 +1,11 @@
 use anyhow::anyhow;
 use chrono::{DateTime, Utc};
-use errors::AnyhowResult;
-use crate::helpers::boolean_converters::{nullable_i8_to_optional_bool, i8_to_bool};
-use log::{info, warn, log};
+use log::warn;
 use sqlx::MySqlPool;
+
+use errors::AnyhowResult;
+
+use crate::helpers::boolean_converters::{i8_to_bool, nullable_i8_to_optional_bool};
 
 #[derive(Serialize)]
 pub struct ModelCategory {

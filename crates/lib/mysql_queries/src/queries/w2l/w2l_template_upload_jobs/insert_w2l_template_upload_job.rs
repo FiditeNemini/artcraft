@@ -1,7 +1,8 @@
 use anyhow::anyhow;
 use sqlx::MySqlPool;
+
 use errors::AnyhowResult;
-use sqlx::error::Error::Database;
+
 use crate::tokens::Tokens;
 
 pub struct InsertW2lTemplateUploadJobArgs<'a> {

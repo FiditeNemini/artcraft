@@ -31,7 +31,9 @@ pub fn default_avatar_from_username(username: &str) -> u8 {
 #[cfg(test)]
 mod tests {
   use std::collections::HashSet;
+
   use rand::distributions::{Alphanumeric, DistString};
+
   use crate::utils::default_avatar_from_username::default_avatar_from_username;
 
   #[test]

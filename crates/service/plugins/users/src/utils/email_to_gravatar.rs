@@ -1,4 +1,4 @@
-use md5::{Md5, Digest};
+use md5::{Digest, Md5};
 
 pub fn email_to_gravatar(email_address: &str) -> String {
   let email = email_address.trim().to_lowercase();

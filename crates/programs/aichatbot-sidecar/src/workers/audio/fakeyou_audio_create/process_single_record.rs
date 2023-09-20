@@ -1,4 +1,5 @@
-use crate::shared_state::job_state::JobState;
+use std::sync::Arc;
+
 use errors::{anyhow, AnyhowResult};
 use fakeyou_client::api::tts_inference::CreateTtsInferenceRequest;
 use idempotency::uuid::generate_random_uuid;
@@ -8,8 +9,9 @@ use sqlite_queries::queries::by_table::tts_render_tasks::update::update_tts_rend
 use sqlite_queries::queries::by_table::tts_render_tasks::update::update_tts_render_task_successfully_submitted::update_tts_render_task_successfully_submitted;
 use sqlite_queries::queries::by_table::tts_render_tasks::update::update_tts_render_task_unsuccessfully_submitted::Args as UnsuccessfulArgs;
 use sqlite_queries::queries::by_table::tts_render_tasks::update::update_tts_render_task_unsuccessfully_submitted::update_tts_render_task_unsuccessfully_submitted;
-use std::sync::Arc;
 use tokens::tokens::tts_models::TtsModelToken;
+
+use crate::shared_state::job_state::JobState;
 
 pub async fn process_single_record(target: &TtsRenderTask, job_state: &Arc<JobState>) -> AnyhowResult<()> {
 

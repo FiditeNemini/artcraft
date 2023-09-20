@@ -1,6 +1,7 @@
 use std::future::Future;
+use std::time::{Duration, Instant};
+
 use log::warn;
-use std::time::{Instant, Duration};
 use once_cell::sync::Lazy;
 use regex::Regex;
 

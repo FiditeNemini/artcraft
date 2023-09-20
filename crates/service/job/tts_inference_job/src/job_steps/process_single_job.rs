@@ -3,33 +3,36 @@
 #![forbid(unused_mut)]
 #![forbid(unused_variables)]
 
+use std::fs::File;
+use std::io::Read;
+use std::path::PathBuf;
+use std::time::{Instant, SystemTime, UNIX_EPOCH};
+
 use anyhow::anyhow;
+use log::{error, info, warn};
+use tempdir::TempDir;
+
 use container_common::anyhow_result::AnyhowResult;
 use container_common::filesystem::check_file_exists::check_file_exists;
 use container_common::filesystem::safe_delete_temp_directory::safe_delete_temp_directory;
 use container_common::filesystem::safe_delete_temp_file::safe_delete_temp_file;
 use container_common::token::random_uuid::generate_random_uuid;
-use crate::job_steps::download_file_from_bucket::maybe_download_file_from_bucket;
-use crate::job_steps::job_args::JobArgs;
-use crate::job_steps::process_single_job_error::ProcessSingleJobError;
-use crate::job_steps::seconds_to_decoder_steps::seconds_to_decoder_steps;
+use hashing::sha256::sha256_hash_string::sha256_hash_string;
 use mysql_queries::column_types::vocoder_type::VocoderType;
 use mysql_queries::queries::tts::tts_inference_jobs::list_available_tts_inference_jobs::AvailableTtsInferenceJob;
 use mysql_queries::queries::tts::tts_inference_jobs::mark_tts_inference_job_done::mark_tts_inference_job_done;
 use mysql_queries::queries::tts::tts_inference_jobs::mark_tts_inference_job_pending_and_grab_lock::mark_tts_inference_job_pending_and_grab_lock;
 use mysql_queries::queries::tts::tts_models::get_tts_model_for_inference::{get_tts_model_for_inference, TtsModelForInferenceRecord};
 use mysql_queries::queries::tts::tts_results::insert_tts_result::{insert_tts_result, JobType};
-use hashing::sha256::sha256_hash_string::sha256_hash_string;
-use log::{warn, info, error};
 use newrelic_telemetry::Span;
-use std::fs::File;
-use std::io::Read;
-use std::path::PathBuf;
-use std::time::{SystemTime, UNIX_EPOCH, Instant};
-use tempdir::TempDir;
 use tts_common::clean_symbols::clean_symbols;
 use tts_common::text_pipelines::guess_pipeline::guess_text_pipeline_heuristic;
 use tts_common::text_pipelines::text_pipeline_type::TextPipelineType;
+
+use crate::job_steps::download_file_from_bucket::maybe_download_file_from_bucket;
+use crate::job_steps::job_args::JobArgs;
+use crate::job_steps::process_single_job_error::ProcessSingleJobError;
+use crate::job_steps::seconds_to_decoder_steps::seconds_to_decoder_steps;
 
 /// Text starting with this will be treated as a test request.
 /// This allows the request to bypass the model cache and query the latest TTS model.

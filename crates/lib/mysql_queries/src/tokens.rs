@@ -1,5 +1,5 @@
-use errors::AnyhowResult;
 use container_common::token::random_prefix_crockford_token::random_prefix_crockford_token;
+use errors::AnyhowResult;
 
 /// Central place to define all the token types.
 // TODO: Make tokens strongly typed.

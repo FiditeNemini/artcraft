@@ -4,9 +4,11 @@
 
 use anyhow::anyhow;
 use chrono::Utc;
-use errors::AnyhowResult;
-use crate::tokens::Tokens;
 use sqlx::MySqlPool;
+
+use errors::AnyhowResult;
+
+use crate::tokens::Tokens;
 
 // TODO(2022-08-04): These were moved into the 'mysql_queries' crate, but they need
 //  to be split up into several modules for better maintainability. cf the already moved

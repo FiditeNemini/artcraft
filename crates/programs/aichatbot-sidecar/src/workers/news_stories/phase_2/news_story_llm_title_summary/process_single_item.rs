@@ -1,19 +1,21 @@
+use std::sync::Arc;
+
 use async_openai::Client;
 use async_openai::error::OpenAIError;
 use async_openai::types::CreateCompletionRequestArgs;
-use crate::gpt_prompts::concise_title_gpt_prompt::ConciseTitleGptPrompt;
-use crate::persistence::load_scraped_result::load_scraped_result;
-use crate::persistence::rendition_data::RenditionData;
-use crate::persistence::save_directory::SaveDirectory;
-use crate::shared_state::job_state::JobState;
 use enums::by_table::web_rendition_targets::rendition_status::RenditionStatus;
 use errors::{anyhow, AnyhowResult};
 use log::{error, info, warn};
 use sqlite_queries::queries::by_table::news_story_productions::list::news_story_production_item::NewsStoryProductionItem;
 use sqlite_queries::queries::by_table::news_story_productions::update::update_news_story_llm_title_summary_status::Args;
 use sqlite_queries::queries::by_table::news_story_productions::update::update_news_story_llm_title_summary_status::update_news_story_llm_title_summary_status;
-use std::sync::Arc;
 use web_scrapers::payloads::web_scraping_result::ScrapedWebArticle;
+
+use crate::gpt_prompts::concise_title_gpt_prompt::ConciseTitleGptPrompt;
+use crate::persistence::load_scraped_result::load_scraped_result;
+use crate::persistence::rendition_data::RenditionData;
+use crate::persistence::save_directory::SaveDirectory;
+use crate::shared_state::job_state::JobState;
 
 pub async fn process_single_item(target: &NewsStoryProductionItem, job_state: &Arc<JobState>) -> AnyhowResult<()> {
 

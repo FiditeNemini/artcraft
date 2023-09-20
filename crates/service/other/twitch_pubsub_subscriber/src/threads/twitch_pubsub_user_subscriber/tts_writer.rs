@@ -1,14 +1,15 @@
+use std::sync::Arc;
+
+use log::info;
+use r2d2_redis::r2d2;
+use r2d2_redis::redis::Commands;
+use r2d2_redis::RedisConnectionManager;
+use sqlx::MySql;
+
 use container_common::anyhow_result::AnyhowResult;
 use mysql_queries::queries::tts::tts_inference_jobs::insert_tts_inference_job::TtsInferenceJobInsertBuilder;
 use mysql_queries::tokens::Tokens;
-use log::info;
-use r2d2_redis::RedisConnectionManager;
-use r2d2_redis::r2d2;
-use r2d2_redis::redis::Commands;
 use redis_common::redis_keys::RedisKeys;
-use redis_common::shared_constants::STREAMER_TTS_JOB_QUEUE_TTL_SECONDS;
-use sqlx::MySql;
-use std::sync::Arc;
 use tts_common::priority::TWITCH_TTS_PRIORITY_LEVEL;
 use twitch_common::cheers::remove_cheers;
 use twitch_common::twitch_user_id::TwitchUserId;

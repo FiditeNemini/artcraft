@@ -1,9 +1,10 @@
 use anyhow::anyhow;
-use chrono::{Utc, DateTime};
-use errors::AnyhowResult;
-use crate::column_types::twitch_event_category::TwitchEventCategory;
-use crate::helpers::boolean_converters::i8_to_bool;
+use chrono::Utc;
 use sqlx::MySqlPool;
+
+use errors::AnyhowResult;
+
+use crate::helpers::boolean_converters::i8_to_bool;
 
 /// Lookup by voice clone request token
 pub async fn get_voice_clone_request_by_token(

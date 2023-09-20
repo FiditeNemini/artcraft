@@ -1,22 +1,16 @@
-use errors::AnyhowResult;
-use crate::endpoints_ws::threads::tts_inference_job_token_queue::TtsInferenceJobTokenQueue;
-use futures::Future;
-use futures::future::Ready;
-use futures_util::Stream;
+use std::thread::sleep;
+
 use futures_util::StreamExt;
 use log::error;
 use log::info;
-use r2d2_redis::RedisConnectionManager;
-use r2d2_redis::r2d2;
-use r2d2_redis::redis::{Commands, PubSub, Msg};
 use redis_async::Client as AsyncClient;
-use redis_common::redis_keys::RedisKeys;
-use std::pin::Pin;
-use std::sync::Arc;
-use std::thread::sleep;
-use time::Duration;
-use twitch_common::twitch_user_id::TwitchUserId;
+
 use container_common::thread::async_thread_kill_signal::AsyncThreadKillSignal;
+use errors::AnyhowResult;
+use redis_common::redis_keys::RedisKeys;
+use twitch_common::twitch_user_id::TwitchUserId;
+
+use crate::endpoints_ws::threads::tts_inference_job_token_queue::TtsInferenceJobTokenQueue;
 
 pub struct RedisPubsubEventListenerThread {
   twitch_user_id: TwitchUserId,

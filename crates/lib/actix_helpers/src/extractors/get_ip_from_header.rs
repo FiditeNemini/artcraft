@@ -1,6 +1,7 @@
+use std::str::FromStr;
+
 use actix_http::header::HeaderMap;
 use actix_http::header::HeaderName;
-use std::str::FromStr;
 
 pub (crate) fn get_ip_from_header(headers: &HeaderMap, header_name: &str) -> Option<String> {
   if let Ok(header_name) = HeaderName::from_str(header_name) {

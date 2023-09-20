@@ -14,6 +14,7 @@ pub fn file_exists<P: AsRef<Path>>(path: P) -> bool {
 #[cfg(test)]
 mod tests {
   use std::path::PathBuf;
+
   use crate::file_exists::file_exists;
 
   #[test]

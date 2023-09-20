@@ -1,8 +1,10 @@
 use anyhow::anyhow;
-use errors::AnyhowResult;
-use crate::tokens::Tokens;
-use log::{info, warn};
+use log::info;
 use sqlx::MySqlPool;
+
+use errors::AnyhowResult;
+
+use crate::tokens::Tokens;
 
 pub async fn create_user_session(user_token: &str, ip_address: &str, mysql_pool: &MySqlPool)
     -> AnyhowResult<String>

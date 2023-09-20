@@ -11,10 +11,23 @@
 
 #[macro_use] extern crate serde_derive;
 
-pub mod script_execution;
+use std::fs;
+use std::fs::File;
+use std::io::{BufReader, Error, Read};
+use std::ops::Deref;
+use std::path::{Path, PathBuf};
+use std::process::Command;
+use std::time::Duration;
 
 use anyhow::anyhow;
 use chrono::Utc;
+use log::{error, info, warn};
+use r2d2_redis::r2d2;
+use r2d2_redis::RedisConnectionManager;
+use sqlx::mysql::MySqlPoolOptions;
+use sqlx::MySqlPool;
+use tempdir::TempDir;
+
 use cloud_storage::bucket_client::BucketClient;
 use cloud_storage::bucket_path_unifier::BucketPathUnifier;
 use config::bad_urls::is_bad_tts_model_download_url;
@@ -26,34 +39,24 @@ use container_common::filesystem::check_directory_exists::check_directory_exists
 use container_common::filesystem::check_file_exists::check_file_exists;
 use container_common::filesystem::safe_delete_temp_directory::safe_delete_temp_directory;
 use container_common::filesystem::safe_delete_temp_file::safe_delete_temp_file;
-use crate::script_execution::tacotron_model_check_command::TacotronModelCheckCommand;
-use crate::script_execution::talknet_model_check_command::TalknetModelCheckCommand;
 use enums::by_table::tts_models::tts_model_type::TtsModelType;
 use google_drive_common::google_drive_download_command::GoogleDriveDownloadCommand;
 use hashing::sha256::sha256_hash_file::sha256_hash_file;
 use jobs_common::noop_logger::NoOpLogger;
 use jobs_common::redis_job_status_logger::RedisJobStatusLogger;
-use log::{warn, info, error};
 use mysql_queries::mediators::badge_granter::BadgeGranter;
 use mysql_queries::mediators::firehose_publisher::FirehosePublisher;
-use mysql_queries::queries::tts::tts_download_jobs::tts_download_job_queries::TtsUploadJobRecord;
 use mysql_queries::queries::tts::tts_download_jobs::tts_download_job_queries::grab_job_lock_and_mark_pending;
 use mysql_queries::queries::tts::tts_download_jobs::tts_download_job_queries::insert_tts_model;
 use mysql_queries::queries::tts::tts_download_jobs::tts_download_job_queries::mark_tts_upload_job_done;
 use mysql_queries::queries::tts::tts_download_jobs::tts_download_job_queries::mark_tts_upload_job_failure;
 use mysql_queries::queries::tts::tts_download_jobs::tts_download_job_queries::query_tts_upload_job_records;
-use r2d2_redis::RedisConnectionManager;
-use r2d2_redis::r2d2;
-use sqlx::MySqlPool;
-use sqlx::mysql::MySqlPoolOptions;
-use std::fs::File;
-use std::fs;
-use std::io::{BufReader, Read, Error};
-use std::ops::Deref;
-use std::path::{PathBuf, Path};
-use std::process::Command;
-use std::time::Duration;
-use tempdir::TempDir;
+use mysql_queries::queries::tts::tts_download_jobs::tts_download_job_queries::TtsUploadJobRecord;
+
+use crate::script_execution::tacotron_model_check_command::TacotronModelCheckCommand;
+use crate::script_execution::talknet_model_check_command::TalknetModelCheckCommand;
+
+pub mod script_execution;
 
 // Buckets
 const ENV_ACCESS_KEY : &str = "ACCESS_KEY";

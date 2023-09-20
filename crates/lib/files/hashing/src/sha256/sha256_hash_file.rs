@@ -1,9 +1,12 @@
-use crate::sha256::sha256_digest_buffer::sha256_digest_buffer;
-use data_encoding::HEXLOWER_PERMISSIVE;
-use errors::AnyhowResult;
 use std::fs::File;
 use std::io::BufReader;
 use std::path::Path;
+
+use data_encoding::HEXLOWER_PERMISSIVE;
+
+use errors::AnyhowResult;
+
+use crate::sha256::sha256_digest_buffer::sha256_digest_buffer;
 
 pub fn sha256_hash_file<P: AsRef<Path>>(filename: P) -> AnyhowResult<String> {
   let input = File::open(filename)?;

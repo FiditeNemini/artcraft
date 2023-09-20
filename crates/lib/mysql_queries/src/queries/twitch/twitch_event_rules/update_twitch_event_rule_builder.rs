@@ -1,7 +1,7 @@
 use anyhow::anyhow;
-use errors::AnyhowResult;
-use crate::tokens::Tokens;
 use sqlx::MySqlPool;
+
+use errors::AnyhowResult;
 
 // TODO: This doesn't handle sparse updates.
 

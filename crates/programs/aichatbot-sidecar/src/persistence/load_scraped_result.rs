@@ -1,6 +1,7 @@
-use crate::persistence::save_directory::SaveDirectory;
 use errors::AnyhowResult;
 use web_scrapers::payloads::web_scraping_result::ScrapedWebArticle;
+
+use crate::persistence::save_directory::SaveDirectory;
 
 pub async fn load_scraped_result(url: &str, save_directory: &SaveDirectory) -> AnyhowResult<ScrapedWebArticle> {
   let scrape_yaml_filename = save_directory.scrape_summary_file_for_webpage_url(url)?;

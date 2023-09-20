@@ -1,16 +1,14 @@
+use std::ops::Deref;
+
+use once_cell::sync::Lazy;
+use scraper::{Html, Selector};
+
+use enums::common::sqlite::web_content_type::WebContentType;
+use errors::AnyhowResult;
+
 use crate::common_extractors::extract_featured_image::extract_featured_image;
 use crate::common_extractors::extract_title::extract_title;
-use crate::payloads::web_scraping_result::{WebScrapingResult, ScrapedWebArticle};
-use crate::payloads::web_scraping_target::WebScrapingTarget;
-use enums::common::sqlite::web_content_type::WebContentType;
-use errors::{anyhow, AnyhowResult};
-use log::{error, warn};
-use once_cell::sync::Lazy;
-use rss::Channel;
-use scraper::{Html, Selector};
-use std::ops::Deref;
-use chrono::{DateTime, LocalResult, TimeZone, Utc};
-use crate::common_extractors::extract_attribute::extract_attribute;
+use crate::payloads::web_scraping_result::{ScrapedWebArticle, WebScrapingResult};
 
 /// The main article content container
 static ARTICLE_CONTENT_SELECTOR : Lazy<Selector> = Lazy::new(|| {

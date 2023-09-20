@@ -15,17 +15,19 @@
 // Strict
 //#![forbid(warnings)]
 
-pub mod job_state;
-pub mod jobs;
-pub mod main_loop;
+use log::info;
+use sqlx::mysql::MySqlPoolOptions;
 
 use config::shared_constants::DEFAULT_MYSQL_CONNECTION_STRING;
 use config::shared_constants::DEFAULT_RUST_LOG;
+use errors::AnyhowResult;
+
 use crate::job_state::{JobState, SleepConfigs};
 use crate::main_loop::main_loop;
-use errors::AnyhowResult;
-use log::info;
-use sqlx::mysql::MySqlPoolOptions;
+
+pub mod job_state;
+pub mod jobs;
+pub mod main_loop;
 
 #[tokio::main]
 async fn main() -> AnyhowResult<()> {

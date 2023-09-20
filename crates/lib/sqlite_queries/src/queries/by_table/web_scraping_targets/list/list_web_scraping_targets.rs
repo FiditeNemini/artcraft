@@ -1,8 +1,9 @@
-use crate::queries::by_table::web_scraping_targets::list::web_scraping_target::{RawInternalWebScrapingTarget, WebScrapingTarget};
 use enums::by_table::web_scraping_targets::scraping_status::ScrapingStatus;
 use enums::common::sqlite::web_content_type::WebContentType;
 use errors::{anyhow, AnyhowResult};
 use sqlx::SqlitePool;
+
+use crate::queries::by_table::web_scraping_targets::list::web_scraping_target::{RawInternalWebScrapingTarget, WebScrapingTarget};
 
 pub async fn list_web_scraping_targets(
   scraping_status: ScrapingStatus,

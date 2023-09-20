@@ -1,5 +1,6 @@
-use errors::AnyhowResult;
 use sqlx::MySqlPool;
+
+use errors::AnyhowResult;
 
 pub async fn delete_w2l_inference_result_as_user(
   inference_result_token: &str,

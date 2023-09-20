@@ -1,7 +1,7 @@
-use anyhow::anyhow;
-use chrono::{Utc, DateTime};
-use errors::AnyhowResult;
+use chrono::Utc;
 use sqlx::MySqlPool;
+
+use errors::AnyhowResult;
 
 /// table: api_tokens
 #[derive(Debug)]

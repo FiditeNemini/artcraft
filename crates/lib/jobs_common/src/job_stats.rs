@@ -1,6 +1,8 @@
-use anyhow::anyhow;
-use errors::AnyhowResult;
 use std::sync::{Arc, RwLock};
+
+use anyhow::anyhow;
+
+use errors::AnyhowResult;
 
 /// Job stats uses interior mutability to be easy to copy around.
 #[derive(Clone)]

@@ -8,14 +8,17 @@ mod common;
 
 #[cfg(feature = "blocking")]
 mod blocking {
-    use super::common;
-    use anyhow::Result;
-    use common::Endpoint;
-    use newrelic_telemetry::{blocking::Client, ClientBuilder, Span, SpanBatch};
-    use std::thread;
-    use std::time::Duration;
+  use std::thread;
+  use std::time::Duration;
 
-    pub fn setup() -> Result<(Endpoint, Client)> {
+  use anyhow::Result;
+
+  use common::Endpoint;
+  use newrelic_telemetry::{blocking::Client, ClientBuilder, Span, SpanBatch};
+
+  use super::common;
+
+  pub fn setup() -> Result<(Endpoint, Client)> {
         let _ = env_logger::builder().is_test(true).try_init();
 
         let endpoint = Endpoint::new();

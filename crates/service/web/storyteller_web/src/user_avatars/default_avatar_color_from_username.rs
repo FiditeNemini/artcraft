@@ -30,7 +30,9 @@ pub fn default_avatar_color_from_username(username: &str) -> u8 {
 #[cfg(test)]
 mod tests {
   use std::collections::HashSet;
+
   use rand::distributions::{Alphanumeric, DistString};
+
   use crate::user_avatars::default_avatar_color_from_username::default_avatar_color_from_username;
 
   #[test]

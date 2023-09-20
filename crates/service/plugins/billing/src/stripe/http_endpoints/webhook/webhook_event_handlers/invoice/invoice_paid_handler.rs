@@ -1,13 +1,15 @@
 use chrono::{DateTime, Utc};
+use log::error;
+use stripe::{Invoice, InvoiceLineItemType, InvoiceStatus, SubscriptionInterval};
+
 use container_common::anyhow_result::AnyhowResult;
+
 use crate::stripe::helpers::common_metadata_keys::METADATA_USER_TOKEN;
 use crate::stripe::helpers::expand_customer_id::expand_customer_id;
 use crate::stripe::helpers::expand_product_id::expand_product_id;
 use crate::stripe::helpers::expand_subscription_id::expand_subscription_id;
 use crate::stripe::http_endpoints::webhook::webhook_event_handlers::stripe_webhook_error::StripeWebhookError;
 use crate::stripe::http_endpoints::webhook::webhook_event_handlers::stripe_webhook_summary::StripeWebhookSummary;
-use log::error;
-use stripe::{Invoice, InvoiceLineItemType, InvoiceStatus, SubscriptionInterval};
 
 /// If we determine a subscription needs update, this is the struct we produce.
 /// This should be easily unit testable.
@@ -154,7 +156,9 @@ fn invoice_paid_extractor(invoice: &Invoice) -> AnyhowResult<Option<InvoicePaidD
 mod tests {
   use anyhow::bail;
   use stripe::Invoice;
+
   use container_common::anyhow_result::AnyhowResult;
+
   use crate::stripe::http_endpoints::webhook::webhook_event_handlers::invoice::invoice_paid_handler::invoice_paid_extractor;
   use crate::stripe::http_endpoints::webhook::webhook_event_handlers::invoice::invoice_paid_handler::InvoicePaidDetails;
 

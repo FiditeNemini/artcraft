@@ -1,9 +1,11 @@
-use crate::util::troll_user_bans::troll_user_set::TrollUserSet;
-use errors::AnyhowResult;
 use std::collections::HashSet;
 use std::fs::File;
 use std::io::{BufRead, BufReader};
 use std::path::Path;
+
+use errors::AnyhowResult;
+
+use crate::util::troll_user_bans::troll_user_set::TrollUserSet;
 
 pub fn load_user_token_set_from_file<P: AsRef<Path>>(path: P) -> AnyhowResult<TrollUserSet> {
   let file = File::open(path)?;
@@ -21,7 +23,9 @@ pub fn load_user_token_set_from_file<P: AsRef<Path>>(path: P) -> AnyhowResult<Tr
 #[cfg(test)]
 mod tests {
   use std::path::PathBuf;
+
   use tokens::users::user::UserToken;
+
   use crate::util::troll_user_bans::load_troll_user_set_from_file::load_user_token_set_from_file;
 
   fn test_file(path_from_repo_root: &str) -> PathBuf {

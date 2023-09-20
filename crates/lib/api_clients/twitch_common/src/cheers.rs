@@ -1,5 +1,6 @@
-use once_cell::sync::Lazy;
 use std::collections::HashSet;
+
+use once_cell::sync::Lazy;
 use regex::Regex;
 
 // NB: This can be used as a nice, succinct macro with once_cell:

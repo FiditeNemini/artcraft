@@ -1,12 +1,15 @@
+use std::collections::HashSet;
+use std::sync::Arc;
+
 use actix_multipart::Multipart;
 use actix_web::{HttpRequest, HttpResponse, web};
+use once_cell::sync::Lazy;
+
+use tokens::files::media_upload::MediaUploadToken;
+
 use crate::http_server::endpoints::media_uploads::common::handle_upload::handle_upload;
 use crate::http_server::endpoints::media_uploads::common::upload_error::UploadError;
 use crate::server_state::ServerState;
-use once_cell::sync::Lazy;
-use std::collections::HashSet;
-use std::sync::Arc;
-use tokens::files::media_upload::MediaUploadToken;
 
 #[derive(Serialize)]
 pub struct UploadMediaSuccessResponse {

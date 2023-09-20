@@ -3,20 +3,23 @@
 #![forbid(unused_mut)]
 #![forbid(unused_variables)]
 
+use std::fmt;
+use std::sync::Arc;
+
+use actix_web::{HttpRequest, HttpResponse, web};
 use actix_web::error::ResponseError;
 use actix_web::http::StatusCode;
-use actix_web::{web, HttpResponse, HttpRequest};
 use chrono::{DateTime, Utc};
-use crate::model::cached_queries::list_cached_tts_categories_for_public_dropdown::list_cached_tts_categories_for_public_dropdown_db_pool;
-use crate::model::categories::synthetic_category_list::SYNTHETIC_CATEGORY_LIST;
-use crate::server_state::ServerState;
+use log::error;
+
 use datetimes::CHRONO_DATETIME_UNIX_EPOCH;
 use enums::by_table::model_categories::model_type::ModelType;
 use http_server_common::response::serialize_as_json_error::serialize_as_json_error;
-use log::error;
-use std::fmt;
-use std::sync::Arc;
 use tokens::tokens::model_categories::ModelCategoryToken;
+
+use crate::model::cached_queries::list_cached_tts_categories_for_public_dropdown::list_cached_tts_categories_for_public_dropdown_db_pool;
+use crate::model::categories::synthetic_category_list::SYNTHETIC_CATEGORY_LIST;
+use crate::server_state::ServerState;
 
 // =============== Success Response ===============
 

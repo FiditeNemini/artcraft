@@ -1,6 +1,8 @@
-use std::sync::{RwLock, Arc, Mutex};
-use anyhow::anyhow;
 use std::collections::VecDeque;
+use std::sync::{Arc, Mutex};
+
+use anyhow::anyhow;
+
 use errors::AnyhowResult;
 
 // NB: Cloning will copy the internal mutex (interior mutability, threadsafe/sharable)

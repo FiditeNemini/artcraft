@@ -1,8 +1,9 @@
 use anyhow::anyhow;
+use sqlx::MySqlPool;
+
 use enums::by_table::generic_download_jobs::generic_download_type::GenericDownloadType;
 use enums::common::visibility::Visibility;
 use errors::AnyhowResult;
-use sqlx::MySqlPool;
 use tokens::jobs::download::DownloadJobToken;
 
 pub struct InsertGenericDownloadJobArgs<'a> {

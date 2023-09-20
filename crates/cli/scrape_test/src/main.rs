@@ -1,4 +1,5 @@
 use clap::{App, Arg};
+
 use errors::{anyhow, AnyhowResult};
 use web_scrapers::scrape_supported_webpage::scrape_supported_webpage;
 

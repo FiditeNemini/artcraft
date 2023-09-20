@@ -1,7 +1,9 @@
+use std::path::PathBuf;
+
+use crockford::crockford_entropy_lower;
+
 use crate::public::media_uploads::directory::MediaUploadDirectory;
 use crate::public::public_path::PublicPath;
-use crockford::crockford_entropy_lower;
-use std::path::PathBuf;
 
 const ORIGINAL_FILE_BASENAME : &str = "original_upload.bin";
 
@@ -57,8 +59,9 @@ impl MediaUploadOriginalFilePath {
 
 #[cfg(test)]
 mod tests {
-  use crate::public::media_uploads::original_file::MediaUploadOriginalFilePath;
   use std::path::PathBuf;
+
+  use crate::public::media_uploads::original_file::MediaUploadOriginalFilePath;
 
   #[test]
   pub fn generate_new_entropy() {

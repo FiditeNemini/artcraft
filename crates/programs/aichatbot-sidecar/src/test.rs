@@ -2,11 +2,12 @@
 //! This is for testing new functionality quickly without running the whole program.
 //!
 
-use sqlx::sqlite::SqlitePoolOptions;
 use async_openai::Client;
 use async_openai::types::{CreateImageRequest, ImageSize, ResponseFormat};
 use enums::common::sqlite::web_content_type::WebContentType;
 use errors::AnyhowResult;
+use sqlx::sqlite::SqlitePoolOptions;
+
 use crate::persistence::save_directory::SaveDirectory;
 use crate::startup_args::get_startup_args;
 use crate::workers::web::web_content_scraping::single_target::ingest_url_scrape_and_save::ingest_url_scrape_and_save;

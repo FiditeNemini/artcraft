@@ -1,7 +1,8 @@
 use log::info;
-use errors::AnyhowResult;
 use sqlx::MySql;
 use sqlx::pool::PoolConnection;
+
+use errors::AnyhowResult;
 use tokens::tokens::tts_models::TtsModelToken;
 
 /// List of all TTS model tokens.

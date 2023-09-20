@@ -1,8 +1,10 @@
 use anyhow::anyhow;
-use errors::AnyhowResult;
-use crate::queries::generic_download::job::list_available_generic_download_jobs::AvailableDownloadJob;
-use sqlx::MySqlPool;
 use sqlx;
+use sqlx::MySqlPool;
+
+use errors::AnyhowResult;
+
+use crate::queries::generic_download::job::list_available_generic_download_jobs::AvailableDownloadJob;
 
 /// Mark a single download job failure. The job may be re-run.
 pub async fn mark_generic_download_job_failure(

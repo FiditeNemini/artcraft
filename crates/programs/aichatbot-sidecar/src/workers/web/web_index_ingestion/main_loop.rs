@@ -1,12 +1,11 @@
-use crate::shared_state::job_state::JobState;
+use std::sync::Arc;
+use std::thread;
+use std::time::Duration;
+
 use errors::AnyhowResult;
 use log::{debug, error, info};
 use sqlite_queries::queries::by_table::web_scraping_targets::insert_web_scraping_target::{Args, insert_web_scraping_target};
 use sqlx::sqlite::SqlitePoolOptions;
-use std::future::Future;
-use std::sync::Arc;
-use std::thread;
-use std::time::Duration;
 use strum::IntoEnumIterator;
 use web_scrapers::payloads::web_scraping_result::ScrapedWebArticle;
 use web_scrapers::payloads::web_scraping_target::WebScrapingTarget;
@@ -14,6 +13,8 @@ use web_scrapers::sites::cnn::cnn_indexer::{cnn_indexer, CnnFeed};
 use web_scrapers::sites::gizmodo::gizmodo_indexer::gizmodo_indexer;
 use web_scrapers::sites::kotaku::kotaku_indexer::kotaku_indexer;
 use web_scrapers::sites::techcrunch::techcrunch_indexer::{techcrunch_indexer, TechcrunchFeed};
+
+use crate::shared_state::job_state::JobState;
 
 /// Download RSS feeds and index pages to determine which articles and content will be scraped (async/downstream of this)
 pub async fn web_index_ingestion_main_loop(job_state: Arc<JobState>) {

@@ -13,30 +13,32 @@
 #[macro_use] extern crate magic_crypt;
 #[macro_use] extern crate serde_derive;
 
-pub mod threads;
-pub mod twitch;
-pub mod util;
-
-use config::shared_constants::{DEFAULT_RUST_LOG, DEFAULT_REDIS_DATABASE_1_CONNECTION_STRING, DEFAULT_MYSQL_CONNECTION_STRING};
-use container_common::anyhow_result::AnyhowResult;
-use crate::threads::listen_for_active_obs_sessions::listen_for_active_obs_sessions_thread::ListenForActiveObsSessionThread;
-use crate::twitch::oauth::oauth_token_refresher::OauthTokenRefresher;
-use crate::twitch::websocket_client::TwitchWebsocketClient;
-use futures::executor::{ThreadPool, ThreadPoolBuilder};
-use futures::task::SpawnExt;
-use log::info;
-use r2d2_redis::RedisConnectionManager;
-use r2d2_redis::r2d2::Pool;
-use r2d2_redis::r2d2;
-use redis_common::redis_keys::RedisKeys;
-use sqlx::mysql::MySqlPoolOptions;
 use std::sync::Arc;
 use std::thread::sleep;
 use std::time::Duration;
-use tokio::runtime::{Builder, Runtime};
-use twitch_common::twitch_secrets::TwitchSecrets;
-use twitch_oauth2::{ClientId, ClientSecret, RefreshToken, AccessToken};
 
+use futures::executor::{ThreadPool, ThreadPoolBuilder};
+use futures::task::SpawnExt;
+use log::info;
+use r2d2_redis::r2d2;
+use r2d2_redis::r2d2::Pool;
+use r2d2_redis::RedisConnectionManager;
+use sqlx::mysql::MySqlPoolOptions;
+use tokio::runtime::{Builder, Runtime};
+use twitch_oauth2::{AccessToken, ClientId, ClientSecret, RefreshToken};
+
+use config::shared_constants::{DEFAULT_MYSQL_CONNECTION_STRING, DEFAULT_REDIS_DATABASE_1_CONNECTION_STRING, DEFAULT_RUST_LOG};
+use container_common::anyhow_result::AnyhowResult;
+use redis_common::redis_keys::RedisKeys;
+use twitch_common::twitch_secrets::TwitchSecrets;
+
+use crate::threads::listen_for_active_obs_sessions::listen_for_active_obs_sessions_thread::ListenForActiveObsSessionThread;
+use crate::twitch::oauth::oauth_token_refresher::OauthTokenRefresher;
+use crate::twitch::websocket_client::TwitchWebsocketClient;
+
+pub mod threads;
+pub mod twitch;
+pub mod util;
 
 #[tokio::main]
 pub async fn main() -> AnyhowResult<()> {

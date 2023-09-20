@@ -1,5 +1,5 @@
+use rand::{Rng, thread_rng};
 use rand::distributions::Alphanumeric;
-use rand::{thread_rng, Rng};
 
 /// Returns a random nonce for Twitch
 pub fn random_nonce(length: usize) -> String {

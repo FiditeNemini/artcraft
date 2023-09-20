@@ -1,11 +1,14 @@
-use crate::memory_cache::model_token_to_info_cache::{ModelInfoLite, ModelTokenToInfoCache};
+use std::time::Duration;
+
+use log::{debug, error, info};
+use sqlx::MySqlPool;
+
 use enums::by_table::generic_inference_jobs::inference_category::InferenceCategory;
 use enums::by_table::generic_inference_jobs::inference_model_type::InferenceModelType;
 use enums::by_table::voice_conversion_models::voice_conversion_model_type::VoiceConversionModelType;
-use log::{debug, error, info};
 use mysql_queries::queries::voice_conversion::model_info_lite::list_voice_conversion_model_info_lite::list_voice_conversion_model_info_lite;
-use sqlx::MySqlPool;
-use std::time::Duration;
+
+use crate::memory_cache::model_token_to_info_cache::{ModelInfoLite, ModelTokenToInfoCache};
 
 pub async fn poll_model_token_info_thread(
   model_token_info_cache: ModelTokenToInfoCache,

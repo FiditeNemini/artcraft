@@ -4,6 +4,7 @@
 #![forbid(unused_variables)]
 
 use sqlx::MySqlPool;
+
 use errors::AnyhowResult;
 
 pub struct Args<'a> {

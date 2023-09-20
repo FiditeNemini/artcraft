@@ -1,17 +1,20 @@
-use crate::job_state::JobState;
-use mysql_queries::queries::trending_model_analytics::upsert_trending_model_analytics::{Args, ModelToken, upsert_trending_model_analytics};
-use mysql_queries::queries::tts::tts_models::count_tts_model_uses::count_tts_model_uses;
-use mysql_queries::queries::tts::tts_models::count_tts_model_uses_total::count_tts_model_uses_total;
-use mysql_queries::queries::tts::tts_models::list_all_tts_model_tokens::{list_all_tts_model_tokens, TtsModelTokens};
-use errors::AnyhowResult;
+use std::time::Duration;
+
 use log::info;
 use rand::seq::SliceRandom;
 use rand::thread_rng;
 use sqlx::MySql;
 use sqlx::pool::PoolConnection;
-use std::time::Duration;
+
 use enums::by_table::trending_model_analytics::window_name::WindowName;
+use errors::AnyhowResult;
+use mysql_queries::queries::trending_model_analytics::upsert_trending_model_analytics::{Args, ModelToken, upsert_trending_model_analytics};
+use mysql_queries::queries::tts::tts_models::count_tts_model_uses::count_tts_model_uses;
+use mysql_queries::queries::tts::tts_models::count_tts_model_uses_total::count_tts_model_uses_total;
+use mysql_queries::queries::tts::tts_models::list_all_tts_model_tokens::{list_all_tts_model_tokens, TtsModelTokens};
 use tokens::tokens::tts_models::TtsModelToken;
+
+use crate::job_state::JobState;
 
 // TODO(bt, 2023-01-16): Make a job trait and make this an instance.
 //  Jobs can store state, batch progress, and not starve one another.

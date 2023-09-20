@@ -1,7 +1,9 @@
-use crate::middleware::banned_ip_filter::ip_ban_list::ip_set::IpSet;
-use errors::{anyhow, AnyhowResult};
 use std::collections::HashMap;
 use std::sync::{Arc, RwLock};
+
+use errors::{anyhow, AnyhowResult};
+
+use crate::middleware::banned_ip_filter::ip_ban_list::ip_set::IpSet;
 
 #[derive(Clone)]
 pub struct IpBanList {

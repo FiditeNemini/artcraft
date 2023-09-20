@@ -1,7 +1,9 @@
 use chrono::{DateTime, Utc};
-use errors::AnyhowResult;
-use crate::helpers::boolean_converters::i8_to_bool;
 use sqlx::MySqlPool;
+
+use errors::AnyhowResult;
+
+use crate::helpers::boolean_converters::i8_to_bool;
 
 /// NB: This is not to be shared externally.
 /// Only for trusted mods and staff.

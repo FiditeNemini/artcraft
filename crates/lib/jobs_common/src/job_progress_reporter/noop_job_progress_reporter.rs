@@ -1,4 +1,5 @@
 use container_common::anyhow_result::AnyhowResult;
+
 use crate::job_progress_reporter::job_progress_reporter::{JobProgressReporter, JobProgressReporterBuilder};
 
 /// A job progress reporter that does no work and has zero database dependencies.

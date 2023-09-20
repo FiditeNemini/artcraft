@@ -1,8 +1,8 @@
 use actix_http::body::MessageBody;
 use actix_service::ServiceFactory;
+use actix_web::{App, FromRequest, HttpResponse, Responder, web};
 use actix_web::dev::{Handler, ServiceRequest, ServiceResponse};
 use actix_web::error::Error;
-use actix_web::{App, web, HttpResponse, FromRequest, Responder};
 
 // TODO: Check that routes don't overlap.
 // TODO: Properly handle scoped routes in a nice DSL.

@@ -1,13 +1,15 @@
 use anyhow::anyhow;
 use chrono::{DateTime, Utc};
-use crate::payloads::media_upload_modification_details::MediaUploadModificationDetails;
+use log::error;
+use sqlx::{MySql, MySqlPool};
+use sqlx::pool::PoolConnection;
+
 use enums::by_table::media_uploads::media_upload_type::MediaUploadType;
 use enums::common::visibility::Visibility;
 use errors::AnyhowResult;
-use log::error;
-use sqlx::pool::PoolConnection;
-use sqlx::{MySql, MySqlPool};
 use tokens::files::media_upload::MediaUploadToken;
+
+use crate::payloads::media_upload_modification_details::MediaUploadModificationDetails;
 
 pub struct MediaUploadRecordForInference {
   pub token: MediaUploadToken,

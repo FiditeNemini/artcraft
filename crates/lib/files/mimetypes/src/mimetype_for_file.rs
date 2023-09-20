@@ -18,6 +18,7 @@ pub fn get_mimetype_for_file_or_default<P: AsRef<Path>>(file: P) -> std::io::Res
 #[cfg(test)]
 mod tests {
   use std::path::PathBuf;
+
   use crate::mimetype_for_file::get_mimetype_for_file;
 
   fn test_file(path_from_repo_root: &str) -> PathBuf {

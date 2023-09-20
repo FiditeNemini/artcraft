@@ -3,17 +3,19 @@
 #![forbid(unused_mut)]
 #![forbid(unused_variables)]
 
-use actix_web::HttpRequest;
+use std::collections::BTreeMap;
+
 use actix_web::cookie::Cookie;
+use actix_web::HttpRequest;
 use anyhow::anyhow;
-use errors::AnyhowResult;
 use hmac::Hmac;
 use hmac::NewMac;
 use jwt::SignWithKey;
 use jwt::VerifyWithKey;
 use log::warn;
 use sha2::Sha256;
-use std::collections::BTreeMap;
+
+use errors::AnyhowResult;
 
 /**
  * Cookie version history

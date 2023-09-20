@@ -1,8 +1,9 @@
 use anyhow::anyhow;
-use errors::AnyhowResult;
+use sqlx::{MySql, MySqlPool};
 use sqlx::mysql::MySqlArguments;
 use sqlx::query::Query;
-use sqlx::{MySqlPool, MySql};
+
+use errors::AnyhowResult;
 
 #[derive(Copy, Clone)]
 pub enum JobStatus {

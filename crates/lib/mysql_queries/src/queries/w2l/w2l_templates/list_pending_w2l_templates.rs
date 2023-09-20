@@ -1,7 +1,7 @@
 use anyhow::anyhow;
 use chrono::{DateTime, Utc};
-use log::warn;
 use sqlx::MySqlPool;
+
 use errors::AnyhowResult;
 
 pub struct PendingW2lTemplateRow {

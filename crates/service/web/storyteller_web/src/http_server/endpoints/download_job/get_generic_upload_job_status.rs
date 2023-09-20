@@ -1,28 +1,20 @@
-use actix_http::Error;
-use actix_web::HttpResponseBuilder;
-use actix_web::cookie::Cookie;
+use std::fmt;
+use std::sync::Arc;
+
+use actix_web::{HttpMessage, HttpRequest, HttpResponse, web};
 use actix_web::error::ResponseError;
 use actix_web::http::StatusCode;
 use actix_web::web::Path;
-use actix_web::{Responder, web, HttpResponse, error, HttpRequest, HttpMessage};
-use anyhow::anyhow;
 use chrono::{DateTime, Utc};
-use crate::AnyhowResult;
-use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
-use crate::server_state::ServerState;
-use mysql_queries::queries::generic_download::web::get_generic_download_job_status::{GenericDownloadJobStatus, get_generic_download_job_status};
-use http_server_common::response::serialize_as_json_error::serialize_as_json_error;
-use log::{info, warn, log};
+use log::{log, warn};
 use r2d2_redis::redis::Commands;
+
+use http_server_common::response::serialize_as_json_error::serialize_as_json_error;
+use mysql_queries::queries::generic_download::web::get_generic_download_job_status::get_generic_download_job_status;
 use redis_common::redis_keys::RedisKeys;
-use regex::Regex;
-use sqlx::MySqlPool;
-use sqlx::error::DatabaseError;
-use sqlx::error::Error::Database;
-use sqlx::mysql::MySqlDatabaseError;
-use std::fmt;
-use std::sync::Arc;
 use tokens::jobs::download::DownloadJobToken;
+
+use crate::server_state::ServerState;
 
 /// For the URL PathInfo
 #[derive(Deserialize)]

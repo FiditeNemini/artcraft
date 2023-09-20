@@ -1,6 +1,8 @@
-use chrono::NaiveDateTime;
-use mysql_queries::queries::stats::get_unified_queue_stats::QueueStatsRow;
 use std::collections::HashMap;
+
+use chrono::NaiveDateTime;
+
+use mysql_queries::queries::stats::get_unified_queue_stats::QueueStatsRow;
 
 #[derive(Serialize, Deserialize, Clone)]
 pub struct CacheableQueueStats {

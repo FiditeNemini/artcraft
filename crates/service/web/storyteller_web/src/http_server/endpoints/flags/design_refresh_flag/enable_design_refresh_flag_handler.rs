@@ -1,9 +1,11 @@
+use std::sync::Arc;
+
 use actix_http::StatusCode;
 use actix_web::{HttpRequest, HttpResponse, Responder, web};
-use crate::ServerState;
+
 use crate::http_server::endpoints::flags::design_refresh_flag::build_design_refresh_cookie::build_design_refresh_cookie;
 use crate::http_server::endpoints::flags::get_cookie_domain::get_set_cookie_domain;
-use std::sync::Arc;
+use crate::ServerState;
 
 pub async fn enable_design_refresh_flag_handler(
   http_request: HttpRequest,

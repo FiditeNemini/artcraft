@@ -18,6 +18,7 @@
 #![allow(non_snake_case)]
 
 use std::path::{Path, PathBuf};
+
 use errors::{anyhow, AnyhowResult};
 
 pub fn read_from_filename<P: AsRef<Path>>(filename: P) -> AnyhowResult<PathBuf> {

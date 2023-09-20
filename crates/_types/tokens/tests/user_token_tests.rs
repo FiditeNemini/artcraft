@@ -2,6 +2,7 @@
 
 use serde::Deserialize;
 use serde::Serialize;
+
 use tokens::users::user::UserToken;
 
 #[derive(Serialize, Deserialize, PartialEq, Debug)]
@@ -62,8 +63,9 @@ mod traits {
 }
 
 mod serialization {
-  use crate::CompositeType;
   use tokens::users::user::UserToken;
+
+  use crate::CompositeType;
 
   #[test]
   fn serialize() {
@@ -85,8 +87,9 @@ mod serialization {
 }
 
 mod deserialization {
-  use crate::CompositeType;
   use tokens::users::user::UserToken;
+
+  use crate::CompositeType;
 
   #[test]
   fn deserialize() {

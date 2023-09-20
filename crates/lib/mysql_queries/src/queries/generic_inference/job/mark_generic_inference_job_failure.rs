@@ -1,8 +1,10 @@
 use anyhow::anyhow;
-use errors::AnyhowResult;
-use crate::queries::generic_inference::job::list_available_generic_inference_jobs::AvailableInferenceJob;
-use sqlx::MySqlPool;
 use sqlx;
+use sqlx::MySqlPool;
+
+use errors::AnyhowResult;
+
+use crate::queries::generic_inference::job::list_available_generic_inference_jobs::AvailableInferenceJob;
 
 /// Mark a single inference job failure. The job may be re-run.
 pub async fn mark_generic_inference_job_failure(

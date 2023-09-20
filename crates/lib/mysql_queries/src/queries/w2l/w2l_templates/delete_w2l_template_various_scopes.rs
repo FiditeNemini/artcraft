@@ -1,5 +1,6 @@
-use errors::AnyhowResult;
 use sqlx::MySqlPool;
+
+use errors::AnyhowResult;
 
 pub async fn delete_w2l_template_as_user(
   template_token: &str,

@@ -3,9 +3,10 @@
 #![forbid(unused_mut)]
 
 use anyhow::anyhow;
-use errors::AnyhowResult;
 use log::warn;
 use sqlx::{Executor, MySql};
+
+use errors::AnyhowResult;
 
 #[derive(Clone, Serialize, Deserialize)]
 pub struct SessionRecord {

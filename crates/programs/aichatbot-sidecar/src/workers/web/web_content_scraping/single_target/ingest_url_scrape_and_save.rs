@@ -1,9 +1,11 @@
-use crate::persistence::save_directory::SaveDirectory;
+use std::io::Write;
+
 use enums::common::sqlite::web_content_type::WebContentType;
 use errors::AnyhowResult;
-use std::io::Write;
 use web_scrapers::payloads::web_scraping_result::WebScrapingResult;
 use web_scrapers::scrape_supported_webpage::scrape_supported_webpage;
+
+use crate::persistence::save_directory::SaveDirectory;
 
 pub async fn ingest_url_scrape_and_save(
   url: &str,

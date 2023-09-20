@@ -45,6 +45,7 @@ impl CommandExitStatus {
 #[cfg(test)]
 mod tests {
   use subprocess::ExitStatus;
+
   use crate::job::job_loop::command_exit_status::CommandExitStatus;
 
   #[test]

@@ -1,8 +1,9 @@
 use anyhow::anyhow;
-use errors::AnyhowResult;
 use log::warn;
-use sqlx::{MySql, MySqlPool};
+use sqlx::MySql;
 use sqlx::pool::PoolConnection;
+
+use errors::AnyhowResult;
 
 #[derive(Serialize, Clone)]
 pub struct TtsLeaderboardRecordForList {

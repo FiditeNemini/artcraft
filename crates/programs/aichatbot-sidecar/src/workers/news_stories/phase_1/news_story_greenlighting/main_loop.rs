@@ -1,10 +1,12 @@
-use crate::shared_state::job_state::JobState;
-use crate::workers::news_stories::phase_1::news_story_greenlighting::process_target_record::process_target_record;
-use log::{debug, error, info};
-use sqlite_queries::queries::by_table::news_story_productions::list::list_news_story_productions_awaiting_greenlight::list_news_story_productions_awaiting_greenlight;
 use std::sync::Arc;
 use std::thread;
 use std::time::Duration;
+
+use log::{debug, error, info};
+use sqlite_queries::queries::by_table::news_story_productions::list::list_news_story_productions_awaiting_greenlight::list_news_story_productions_awaiting_greenlight;
+
+use crate::shared_state::job_state::JobState;
+use crate::workers::news_stories::phase_1::news_story_greenlighting::process_target_record::process_target_record;
 
 /// Decide which potential news stories to greenlight
 pub async fn news_story_greenlighting_main_loop(job_state: Arc<JobState>) {

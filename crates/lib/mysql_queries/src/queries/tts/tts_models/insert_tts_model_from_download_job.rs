@@ -1,12 +1,13 @@
+use std::path::Path;
+
 use anyhow::anyhow;
-use chrono::Utc;
-use crate::queries::generic_download::job::list_available_generic_download_jobs::AvailableDownloadJob;
-use crate::tokens::Tokens;
+use sqlx::MySqlPool;
+
 use enums::by_table::tts_models::tts_model_type::TtsModelType;
 use enums::common::visibility::Visibility;
 use errors::AnyhowResult;
-use sqlx::MySqlPool;
-use std::path::Path;
+
+use crate::tokens::Tokens;
 
 pub struct InsertTtsModelFromDownloadJobArgs<'a, P: AsRef<Path>> {
   pub tts_model_type: TtsModelType,

@@ -1,19 +1,17 @@
 use anyhow::anyhow;
-use anyhow::bail;
-use container_common::anyhow_result::AnyhowResult;
-use crate::util::random_nonce::random_nonce;
 use futures_util::{SinkExt, StreamExt, TryStreamExt};
 use log::debug;
 use reqwest::Url;
-use std::sync::atomic::{AtomicBool, Ordering};
-use std::sync::{Arc, Mutex, PoisonError, MutexGuard};
-use std::time::Duration;
-use tokio::net::TcpStream;
 use tokio;
+use tokio::net::TcpStream;
+use tokio_tungstenite::{connect_async, MaybeTlsStream, WebSocketStream};
 use tokio_tungstenite::tungstenite::Message;
-use tokio_tungstenite::{connect_async, WebSocketStream, MaybeTlsStream};
-use twitch_api2::pubsub::{Response, TopicData, Topic, Topics};
+use twitch_api2::pubsub::{Response, Topics};
 use twitch_api2::pubsub;
+
+use container_common::anyhow_result::AnyhowResult;
+
+use crate::util::random_nonce::random_nonce;
 
 // Reference javascript Twitch Websocket client:
 // https://github.com/twitchdev/pubsub-javascript-sample/blob/main/main.js

@@ -1,26 +1,20 @@
-use actix_http::StatusCode;
+use std::io::Write;
+
 use actix_http::body::BoxBody;
 use actix_http::header::HeaderName;
-use actix_http::{error, Response};
+use actix_http::StatusCode;
+use actix_web::{Error, HttpResponse};
+use actix_web::{HttpMessage, ResponseError};
 use actix_web::dev::{Service, Transform};
 use actix_web::dev::{ServiceRequest, ServiceResponse};
 use actix_web::http::header::USER_AGENT;
-use actix_web::web::{BytesMut, Buf, BufMut};
-use actix_web::{Error, HttpResponse};
-use actix_web::{ResponseError, HttpMessage, HttpRequest, HttpResponseBuilder};
+use futures_util::future::{Either, err, ok, Ready};
+use log::warn;
+
+use http_server_common::request::get_request_ip::get_service_request_ip;
+
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::server_state::StaticFeatureFlags;
-use errors::AnyhowResult;
-use futures_core::ready;
-use futures_util::future::{err, ok, Either, Ready};
-use http_server_common::request::get_request_ip::get_service_request_ip;
-use log::warn;
-use pin_project_lite::pin_project;
-use std::future::Future;
-use std::io::Write;
-use std::marker::PhantomData;
-use std::pin::Pin;
-use std::task::{Context, Poll};
 
 // There are two steps in middleware processing.
 // 1. Middleware initialization, middleware factory gets called with

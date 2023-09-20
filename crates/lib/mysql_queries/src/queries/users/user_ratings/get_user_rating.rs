@@ -1,12 +1,14 @@
 use anyhow::anyhow;
 use chrono::{DateTime, Utc};
-use crate::composite_keys::by_table::user_ratings::user_rating_entity::UserRatingEntity;
-use enums::by_table::user_ratings::rating_value::UserRatingValue;
-use errors::AnyhowResult;
 use log::error;
 use sqlx::MySql;
 use sqlx::pool::PoolConnection;
+
+use enums::by_table::user_ratings::rating_value::UserRatingValue;
+use errors::AnyhowResult;
 use tokens::users::user::UserToken;
+
+use crate::composite_keys::by_table::user_ratings::user_rating_entity::UserRatingEntity;
 
 pub struct UserRating {
   pub rating_value: UserRatingValue,

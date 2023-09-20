@@ -1,8 +1,10 @@
 use std::future::Future;
-use r2d2_redis::RedisConnectionManager;
+
 use r2d2_redis::r2d2::{Pool, PooledConnection};
 use r2d2_redis::redis::Commands;
+use r2d2_redis::RedisConnectionManager;
 use serde::{Deserialize, Serialize};
+
 use errors::AnyhowResult;
 
 const DEFAULT_TTL_SECONDS : usize = 60;

@@ -1,6 +1,7 @@
+use std::sync::Arc;
+
 use crate::middleware::disabled_endpoint_filter::disabled_endpoints::exact_match_disabled_endpoints::ExactMatchDisabledEndpoints;
 use crate::middleware::disabled_endpoint_filter::disabled_endpoints::prefix_disabled_endpoints::PrefixDisabledEndpoints;
-use std::sync::Arc;
 
 #[derive(Clone)]
 pub struct DisabledEndpoints {

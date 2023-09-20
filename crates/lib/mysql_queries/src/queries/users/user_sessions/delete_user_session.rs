@@ -1,5 +1,6 @@
-use errors::AnyhowResult;
 use sqlx::MySqlPool;
+
+use errors::AnyhowResult;
 
 pub async fn delete_user_session(session_token: &str, mysql_pool: &MySqlPool) -> AnyhowResult<()> {
   let query_result = sqlx::query!(

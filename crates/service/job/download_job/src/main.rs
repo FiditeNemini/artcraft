@@ -17,13 +17,16 @@
 
 #[macro_use] extern crate serde_derive;
 
-pub mod job_loop;
-pub mod job_state;
-pub mod job_types;
-pub mod threads;
-pub mod util;
+use std::ops::Deref;
+use std::path::PathBuf;
+use std::time::Duration;
 
-use std::collections::BTreeSet;
+use log::info;
+use r2d2_redis::r2d2;
+use r2d2_redis::RedisConnectionManager;
+use sqlx::mysql::MySqlPoolOptions;
+use tokio::runtime::Runtime;
+
 use bootstrap::bootstrap::{bootstrap, BootstrapArgs};
 use cloud_storage::bucket_client::BucketClient;
 use cloud_storage::bucket_path_unifier::BucketPathUnifier;
@@ -31,6 +34,13 @@ use config::common_env::CommonEnv;
 use config::shared_constants::DEFAULT_MYSQL_CONNECTION_STRING;
 use config::shared_constants::DEFAULT_RUST_LOG;
 use container_common::filesystem::check_directory_exists::check_directory_exists;
+use errors::AnyhowResult;
+use google_drive_common::google_drive_download_command::GoogleDriveDownloadCommand;
+use mysql_queries::common_inputs::container_environment_arg::ContainerEnvironmentArg;
+use mysql_queries::mediators::badge_granter::BadgeGranter;
+use mysql_queries::mediators::firehose_publisher::FirehosePublisher;
+use subprocess_common::docker_options::{DockerFilesystemMount, DockerGpu, DockerOptions};
+
 use crate::job_loop::main_loop::main_loop;
 use crate::job_state::{JobState, PretrainedModels, SidecarConfigs};
 use crate::job_types::tts::tacotron::tacotron_model_check_command::TacotronModelCheckCommand;
@@ -44,20 +54,12 @@ use crate::job_types::voice_conversion::softvc::softvc_model_check_command::Soft
 use crate::threads::nvidia_smi_checker::nvidia_smi_health_check_status::NvidiaSmiHealthCheckStatus;
 use crate::threads::nvidia_smi_checker::nvidia_smi_health_check_thread::nvidia_smi_health_check_thread;
 use crate::util::scoped_downloads::ScopedDownloads;
-use errors::AnyhowResult;
-use google_drive_common::google_drive_download_command::GoogleDriveDownloadCommand;
-use log::info;
-use mysql_queries::common_inputs::container_environment_arg::ContainerEnvironmentArg;
-use mysql_queries::mediators::badge_granter::BadgeGranter;
-use mysql_queries::mediators::firehose_publisher::FirehosePublisher;
-use r2d2_redis::RedisConnectionManager;
-use r2d2_redis::r2d2;
-use sqlx::mysql::MySqlPoolOptions;
-use std::ops::Deref;
-use std::path::PathBuf;
-use std::time::Duration;
-use subprocess_common::docker_options::{DockerFilesystemMount, DockerGpu, DockerOptions};
-use tokio::runtime::Runtime;
+
+pub mod job_loop;
+pub mod job_state;
+pub mod job_types;
+pub mod threads;
+pub mod util;
 
 // Buckets
 const ENV_ACCESS_KEY : &str = "ACCESS_KEY";

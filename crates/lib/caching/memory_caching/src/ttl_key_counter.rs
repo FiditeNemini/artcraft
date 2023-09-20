@@ -1,8 +1,10 @@
-use anyhow::bail;
-use errors::AnyhowResult;
-use lru_time_cache::LruCache;
 use std::sync::{Arc, Mutex};
 use std::time::Duration;
+
+use anyhow::bail;
+use lru_time_cache::LruCache;
+
+use errors::AnyhowResult;
 
 /// Maintain counters for keys with a TTL
 #[derive(Clone)]
@@ -40,8 +42,9 @@ impl TtlKeyCounter {
 #[cfg(test)]
 mod tests {
   use std::thread;
-  use crate::ttl_key_counter::TtlKeyCounter;
   use std::time::Duration;
+
+  use crate::ttl_key_counter::TtlKeyCounter;
 
   #[test]
   fn test_key_first_count() {

@@ -1,8 +1,9 @@
-use crate::AnyhowResult;
-use log::{info,warn};
-use std::process::{Command, Stdio};
-use subprocess::{Popen, PopenConfig, Redirection};
 use std::fs::OpenOptions;
+
+use log::info;
+use subprocess::{Popen, PopenConfig, Redirection};
+
+use crate::AnyhowResult;
 
 /// This command is used to generate ffmpeg previews for videos.
 #[derive(Clone)]

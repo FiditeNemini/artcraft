@@ -1,15 +1,16 @@
+use std::sync::Arc;
+
 use actix_web::{HttpRequest, HttpResponse, ResponseError, web};
 use chrono::NaiveDateTime;
-use crate::ServerState;
+use hyper::StatusCode;
+use log::{debug, error, warn};
+
+use mysql_queries::queries::stats::get_unified_queue_stats::get_unified_queue_stats;
+use redis_common::redis_cache_keys::RedisCacheKeys;
+
 use crate::http_server::endpoints::stats::result_transformer::{CacheableQueueStats, database_result_to_cacheable};
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
-use errors::AnyhowResult;
-use hyper::StatusCode;
-use log::{debug, error, info, warn};
-use mysql_queries::queries::generic_inference::web::get_pending_inference_job_count::get_pending_inference_job_count;
-use mysql_queries::queries::stats::get_unified_queue_stats::{get_unified_queue_stats, QueueStatsRow};
-use redis_common::redis_cache_keys::RedisCacheKeys;
-use std::sync::Arc;
+use crate::ServerState;
 
 #[derive(Serialize)]
 pub struct GetUnifiedQueueStatsSuccessResponse {

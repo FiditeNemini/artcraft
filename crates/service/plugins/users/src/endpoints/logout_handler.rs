@@ -3,15 +3,18 @@
 #![forbid(unused_mut)]
 #![forbid(unused_variables)]
 
+use std::fmt;
+
+use actix_web::{HttpRequest, HttpResponse, web};
 use actix_web::error::ResponseError;
 use actix_web::http::StatusCode;
-use actix_web::{web, HttpResponse, HttpRequest};
-use crate::utils::session_cookie_manager::SessionCookieManager;
-use mysql_queries::queries::users::user_sessions::delete_user_session::delete_user_session;
-use http_server_common::response::response_error_helpers::to_simple_json_error;
 use log::warn;
 use sqlx::MySqlPool;
-use std::fmt;
+
+use http_server_common::response::response_error_helpers::to_simple_json_error;
+use mysql_queries::queries::users::user_sessions::delete_user_session::delete_user_session;
+
+use crate::utils::session_cookie_manager::SessionCookieManager;
 
 #[derive(Serialize)]
 pub struct LogoutSuccessResponse {

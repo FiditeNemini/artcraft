@@ -1,16 +1,18 @@
-use actix_web::http::StatusCode;
+use std::sync::Arc;
+
 use actix_web::{HttpRequest, HttpResponse, ResponseError, web};
-use crate::server_state::ServerState;
-use mysql_queries::composite_keys::by_table::user_ratings::user_rating_entity::UserRatingEntity;
-use mysql_queries::queries::users::user_ratings::get_user_rating::{Args, get_user_rating};
+use actix_web::http::StatusCode;
+use log::{error, info};
+
 use enums::by_table::user_ratings::entity_type::UserRatingEntityType;
 use enums::by_table::user_ratings::rating_value::UserRatingValue;
-use http_server_common::request::get_request_ip::get_request_ip;
 use http_server_common::response::serialize_as_json_error::serialize_as_json_error;
-use log::{error, info};
-use std::sync::Arc;
+use mysql_queries::composite_keys::by_table::user_ratings::user_rating_entity::UserRatingEntity;
+use mysql_queries::queries::users::user_ratings::get_user_rating::{Args, get_user_rating};
 use tokens::tokens::tts_models::TtsModelToken;
 use tokens::tokens::w2l_templates::W2lTemplateToken;
+
+use crate::server_state::ServerState;
 
 // =============== Request ===============
 

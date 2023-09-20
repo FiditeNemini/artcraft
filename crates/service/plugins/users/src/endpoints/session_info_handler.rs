@@ -3,14 +3,17 @@
 #![forbid(unused_mut)]
 #![forbid(unused_variables)]
 
+use std::fmt;
+
+use actix_web::{HttpRequest, HttpResponse, web};
 use actix_web::error::ResponseError;
 use actix_web::http::StatusCode;
-use actix_web::{web, HttpResponse, HttpRequest};
-use crate::utils::session_checker::SessionChecker;
-use http_server_common::response::response_error_helpers::to_simple_json_error;
 use log::warn;
 use sqlx::MySqlPool;
-use std::fmt;
+
+use http_server_common::response::response_error_helpers::to_simple_json_error;
+
+use crate::utils::session_checker::SessionChecker;
 
 #[derive(Serialize, Copy, Clone)]
 #[serde(rename_all = "snake_case")]

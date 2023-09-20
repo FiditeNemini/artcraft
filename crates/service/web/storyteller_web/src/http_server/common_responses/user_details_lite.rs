@@ -1,6 +1,7 @@
+use tokens::users::user::UserToken;
+
 use crate::user_avatars::default_avatar_color_from_username::default_avatar_color_from_username;
 use crate::user_avatars::default_avatar_from_username::default_avatar_from_username;
-use tokens::users::user::UserToken;
 
 /// Everything we need to refer to a user on the public web interface.
 #[derive(Clone, Serialize)]

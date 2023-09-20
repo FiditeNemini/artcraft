@@ -1,9 +1,8 @@
 use anyhow::anyhow;
-use errors::AnyhowResult;
-use log::info;
-use log::warn;
 use sqlx::MySql;
 use sqlx::pool::PoolConnection;
+
+use errors::AnyhowResult;
 
 pub struct UnsubscribeReasonInsertBuilder<'a> {
   unsubscribe_reason: &'a str,

@@ -1,24 +1,17 @@
-use actix_http::Error;
-use actix_web::HttpResponseBuilder;
-use actix_web::cookie::Cookie;
+use std::fmt;
+use std::sync::Arc;
+
+use actix_web::{HttpMessage, HttpRequest, HttpResponse, web};
 use actix_web::error::ResponseError;
 use actix_web::http::StatusCode;
 use actix_web::web::{Path, Query};
-use actix_web::{Responder, web, HttpResponse, error, HttpRequest, HttpMessage};
-use chrono::{DateTime, Utc};
-use crate::AnyhowResult;
-use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
-use crate::server_state::ServerState;
+use log::{info, log, warn};
+
 use mysql_queries::queries::w2l::w2l_results::list_w2l_inference_results_query_builder::ListW2lResultsQueryBuilder;
 use mysql_queries::queries::w2l::w2l_results::list_w2l_inference_results_query_builder::W2lInferenceRecordForList;
-use log::{info, warn, log};
-use regex::Regex;
-use sqlx::MySqlPool;
-use sqlx::error::DatabaseError;
-use sqlx::error::Error::Database;
-use sqlx::mysql::MySqlDatabaseError;
-use std::fmt;
-use std::sync::Arc;
+
+use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
+use crate::server_state::ServerState;
 
 /// For the URL PathInfo
 #[derive(Deserialize)]

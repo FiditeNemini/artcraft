@@ -1,9 +1,11 @@
 use anyhow::anyhow;
-use chrono::{Utc, DateTime};
+use chrono::Utc;
+use sqlx::MySqlPool;
+
 use errors::AnyhowResult;
+
 use crate::column_types::twitch_event_category::TwitchEventCategory;
 use crate::helpers::boolean_converters::i8_to_bool;
-use sqlx::MySqlPool;
 
 #[derive(Debug)]
 pub struct TwitchEventRule {

@@ -1,6 +1,7 @@
 use anyhow::anyhow;
-use errors::AnyhowResult;
 use sqlx::MySqlPool;
+
+use errors::AnyhowResult;
 
 pub async fn set_w2l_template_mod_approval(
   w2l_template_token: &str,

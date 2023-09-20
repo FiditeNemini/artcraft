@@ -1,9 +1,11 @@
-use crate::threads::nvidia_smi_checker::nvidia_smi_health_check_status::NvidiaSmiHealthCheckStatus;
-use log::{error, warn};
-use log::{debug, info};
 use std::thread;
 use std::time::Duration;
+
+use log::{error, warn};
+use log::debug;
 use subprocess::{ExitStatus, Popen, PopenConfig, Redirection};
+
+use crate::threads::nvidia_smi_checker::nvidia_smi_health_check_status::NvidiaSmiHealthCheckStatus;
 
 pub async fn nvidia_smi_health_check_thread(
   health_check_status: NvidiaSmiHealthCheckStatus,

@@ -1,24 +1,18 @@
-use actix_http::Error;
-use actix_web::HttpResponseBuilder;
-use actix_web::cookie::Cookie;
+use std::sync::Arc;
+
+use actix_web::{HttpMessage, HttpRequest, HttpResponse, web};
 use actix_web::error::ResponseError;
 use actix_web::http::StatusCode;
-use actix_web::{Responder, web, HttpResponse, error, HttpRequest, HttpMessage};
 use chrono::{DateTime, Utc};
-use crate::AnyhowResult;
+use derive_more::Display;
+use log::{error, log};
+
+use mysql_queries::queries::public_event_feed::list_public_event_feed_items::list_public_event_feed_items;
+
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::server_state::ServerState;
 use crate::user_avatars::default_avatar_color_from_username::default_avatar_color_from_username;
 use crate::user_avatars::default_avatar_from_username::default_avatar_from_username;
-use derive_more::{Display, Error};
-use log::{info, warn, log, error};
-use mysql_queries::queries::public_event_feed::list_public_event_feed_items::list_public_event_feed_items;
-use regex::Regex;
-use sqlx::MySqlPool;
-use sqlx::error::DatabaseError;
-use sqlx::error::Error::Database;
-use sqlx::mysql::MySqlDatabaseError;
-use std::sync::Arc;
 
 #[derive(Serialize)]
 pub struct EventRecord {

@@ -1,4 +1,4 @@
-use chrono::{DateTime, Utc, TimeZone, Duration};
+use chrono::{DateTime, Duration, TimeZone, Utc};
 use log::info;
 
 /// Log after periods of no work, but prevent spamming stdout.

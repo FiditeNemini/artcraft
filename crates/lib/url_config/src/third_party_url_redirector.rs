@@ -1,9 +1,11 @@
-use actix_web::HttpRequest;
+use std::str::FromStr;
+
 use actix_web::http::Uri;
+use actix_web::HttpRequest;
 use anyhow::anyhow;
+
 use http_server_common::request::get_request_host::get_request_host;
 use reusable_types::server_environment::ServerEnvironment;
-use std::str::FromStr;
 
 /// Multi-environment configuration for 3rd party redirects, eg. Stripe checkout flow and
 /// Twitch OAuth flow.
@@ -76,13 +78,15 @@ impl ThirdPartyUrlRedirector {
 
 #[cfg(test)]
 mod tests {
-    use actix_web::HttpRequest;
-    use actix_web::http::header::HOST;
-    use actix_web::test::TestRequest;
-    use reusable_types::server_environment::ServerEnvironment;
-    use crate::third_party_url_redirector::ThirdPartyUrlRedirector;
+  use actix_web::http::header::HOST;
+  use actix_web::HttpRequest;
+  use actix_web::test::TestRequest;
 
-    fn request_with_host(hostname: &str) -> HttpRequest {
+  use reusable_types::server_environment::ServerEnvironment;
+
+  use crate::third_party_url_redirector::ThirdPartyUrlRedirector;
+
+  fn request_with_host(hostname: &str) -> HttpRequest {
         TestRequest::default()
             .insert_header((HOST, hostname))
             .to_http_request()

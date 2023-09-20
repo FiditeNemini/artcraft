@@ -1,14 +1,17 @@
+use std::path::Path;
+
 use anyhow::anyhow;
 use async_trait::async_trait;
+use log::{error, info};
+
 use cloud_storage::bucket_client::BucketClient;
 use container_common::filesystem::safe_delete_temp_directory::safe_delete_temp_directory;
-use crate::util::scoped_temp_dir_creator::ScopedTempDirCreator;
 use errors::AnyhowResult;
 use filesys::create_dir_all_if_missing::create_dir_all_if_missing;
 use filesys::file_exists::file_exists;
 use filesys::rename_across_devices::rename_across_devices;
-use log::{error, info};
-use std::path::Path;
+
+use crate::util::scoped_temp_dir_creator::ScopedTempDirCreator;
 
 /// Helper utility for downloading pretrained models from GCS.
 #[async_trait(?Send)] // NB: Marking async_trait as not needing Sync/Send. Hopefully this doesn't blow up on us.

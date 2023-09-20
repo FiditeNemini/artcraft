@@ -20,10 +20,11 @@ pub fn extract_title(document: &Html, title_selector: &Selector) -> Option<Strin
 
 #[cfg(test)]
 mod tests {
+  use scraper::Html;
+
   use crate::common_extractors::extract_title::extract_title;
   use crate::sites::cnn::cnn_article_scraper::CNN_TITLE_SELECTOR;
   use crate::sites::techcrunch::techcrunch_article_scraper::TECHCRUNCH_TITLE_SELECTOR;
-  use scraper::{Html, Selector};
 
   #[test]
   fn test_extract_title_cnn() {

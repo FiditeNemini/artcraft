@@ -1,12 +1,14 @@
 use anyhow::anyhow;
 use chrono::{DateTime, Utc};
-use crate::helpers::boolean_converters::i8_to_bool;
+use log::warn;
+use sqlx::{MySql, MySqlPool};
+use sqlx::pool::PoolConnection;
+
 use enums::common::visibility::Visibility;
 use errors::AnyhowResult;
-use log::{warn, log};
-use sqlx::pool::PoolConnection;
-use sqlx::{MySqlPool, MySql};
 use tokens::users::user::UserToken;
+
+use crate::helpers::boolean_converters::i8_to_bool;
 
 // TODO: Make non-`Serialize` and make the HTTP endpoints do the work
 #[derive(Serialize, Deserialize, Clone)]

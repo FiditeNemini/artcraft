@@ -1,8 +1,11 @@
-use anyhow::anyhow;
-use crate::queries::generic_download::job::list_available_generic_download_jobs::AvailableDownloadJob;
-use errors::AnyhowResult;
-use sqlx::MySqlPool;
 use std::time::Duration;
+
+use anyhow::anyhow;
+use sqlx::MySqlPool;
+
+use errors::AnyhowResult;
+
+use crate::queries::generic_download::job::list_available_generic_download_jobs::AvailableDownloadJob;
 
 pub async fn mark_generic_download_job_done(
   pool: &MySqlPool,

@@ -1,7 +1,9 @@
+use std::path::Path;
+
+use errors::AnyhowResult;
+
 use crate::util::troll_user_bans::load_troll_user_set_from_file::load_user_token_set_from_file;
 use crate::util::troll_user_bans::troll_user_ban_list::TrollUserBanList;
-use errors::AnyhowResult;
-use std::path::Path;
 
 pub fn load_user_token_ban_list_from_directory<P: AsRef<Path>>(path: P) -> AnyhowResult<TrollUserBanList> {
   let user_token_ban_list = TrollUserBanList::new();
@@ -32,6 +34,7 @@ fn ignore_path(path: &Path) -> bool {
 #[cfg(test)]
 mod tests {
   use std::path::{Path, PathBuf};
+
   use crate::util::troll_user_bans::load_troll_user_ban_list_from_directory::{ignore_path, load_user_token_ban_list_from_directory};
 
   fn test_file(path_from_repo_root: &str) -> PathBuf {

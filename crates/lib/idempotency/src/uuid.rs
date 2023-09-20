@@ -15,6 +15,7 @@ mod tests {
 
   mod generate_random_uuid {
     use std::collections::HashSet;
+
     use super::*;
 
     #[test]

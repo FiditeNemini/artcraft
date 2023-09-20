@@ -1,8 +1,10 @@
-use anyhow::bail;
-use errors::AnyhowResult;
-use lru_time_cache::LruCache;
 use std::sync::{Arc, Mutex};
 use std::time::Duration;
+
+use anyhow::bail;
+use lru_time_cache::LruCache;
+
+use errors::AnyhowResult;
 
 /// Essentially a wrapper around LruCache.
 #[derive(Clone)]

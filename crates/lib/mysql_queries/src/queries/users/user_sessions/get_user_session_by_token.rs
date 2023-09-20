@@ -3,13 +3,15 @@
 #![forbid(unused_mut)]
 
 use anyhow::anyhow;
-use errors::AnyhowResult;
-use crate::helpers::boolean_converters::{nullable_i8_to_optional_bool, i8_to_bool, nullable_i8_to_bool_default_false};
-use enums::common::visibility::Visibility;
 use log::warn;
 use sqlx::{Executor, MySql};
 use sqlx::pool::PoolConnection;
+
+use enums::common::visibility::Visibility;
+use errors::AnyhowResult;
 use tokens::users::user::UserToken;
+
+use crate::helpers::boolean_converters::{i8_to_bool, nullable_i8_to_bool_default_false, nullable_i8_to_optional_bool};
 
 #[derive(Clone, Serialize, Deserialize)]
 pub struct SessionUserRecord {

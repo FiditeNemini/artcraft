@@ -3,26 +3,29 @@
 #![forbid(unused_mut)]
 #![forbid(unused_variables)]
 
+use std::collections::HashMap;
+use std::fmt;
+use std::fmt::Formatter;
+
+use actix_web::{HttpRequest, HttpResponse, web};
 use actix_web::error::ResponseError;
 use actix_web::http::StatusCode;
-use actix_web::{web, HttpResponse, HttpRequest};
+use log::{info, warn};
+use sqlx::MySqlPool;
+
+use http_server_common::request::get_request_ip::get_request_ip;
+use http_server_common::response::serialize_as_json_error::serialize_as_json_error;
+use mysql_queries::mediators::firehose_publisher::FirehosePublisher;
+use mysql_queries::queries::users::user::create_account::{create_account, CreateAccountArgs, CreateAccountError};
+use mysql_queries::queries::users::user_sessions::create_user_session::create_user_session;
+use mysql_queries::tokens::Tokens;
+use user_input_common::check_for_slurs::contains_slurs;
+
 use crate::utils::email_to_gravatar::email_to_gravatar;
 use crate::utils::session_cookie_manager::SessionCookieManager;
 use crate::validations::is_reserved_username::is_reserved_username;
 use crate::validations::validate_passwords::validate_passwords;
 use crate::validations::validate_username::validate_username;
-use mysql_queries::mediators::firehose_publisher::FirehosePublisher;
-use mysql_queries::queries::users::user::create_account::{create_account, CreateAccountArgs, CreateAccountError};
-use mysql_queries::queries::users::user_sessions::create_user_session::create_user_session;
-use mysql_queries::tokens::Tokens;
-use http_server_common::request::get_request_ip::get_request_ip;
-use http_server_common::response::serialize_as_json_error::serialize_as_json_error;
-use log::{info, warn};
-use sqlx::MySqlPool;
-use std::collections::HashMap;
-use std::fmt::Formatter;
-use std::fmt;
-use user_input_common::check_for_slurs::contains_slurs;
 
 #[derive(Deserialize)]
 pub struct CreateAccountRequest {

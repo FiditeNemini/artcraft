@@ -1,7 +1,9 @@
+use std::path::Path;
+
+use log::info;
+
 use errors::{anyhow, AnyhowResult};
 use server_environment::ServerEnvironment;
-use std::path::Path;
-use log::info;
 
 pub struct BootstrapArgs<'a, P: AsRef<Path>> {
   /// The name of the application or service

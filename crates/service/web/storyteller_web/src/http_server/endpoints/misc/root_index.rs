@@ -1,12 +1,11 @@
-use actix_web::Error;
-use actix_web::Responder;
-use actix_web::Result;
+use std::sync::Arc;
+
+use actix_web::HttpResponse;
 use actix_web::http::StatusCode;
 use actix_web::web::Data;
-use actix_web::{HttpResponse, HttpRequest, get};
-use crate::server_state::ServerState;
 use log::debug;
-use std::sync::Arc;
+
+use crate::server_state::ServerState;
 
 pub async fn get_root_index(server_state: Data<Arc<ServerState>>) -> HttpResponse {
   debug!("GET /"); // NB: Google load balancer hits this a lot, and it spams.

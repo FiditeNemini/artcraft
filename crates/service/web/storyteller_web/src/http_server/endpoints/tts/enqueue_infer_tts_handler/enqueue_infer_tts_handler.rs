@@ -3,15 +3,17 @@
 #![forbid(unused_mut)]
 #![forbid(unused_variables)]
 
+use std::fmt;
+use std::sync::Arc;
+
+use actix_web::{HttpRequest, HttpResponse, web};
 use actix_web::error::ResponseError;
 use actix_web::http::StatusCode;
-use actix_web::{web, HttpResponse, HttpRequest};
-use crate::configs::plans::get_correct_plan_for_session::get_correct_plan_for_session;
-use crate::configs::plans::plan::Plan;
-use crate::http_server::endpoints::investor_demo::demo_cookie::request_has_demo_cookie;
-use crate::http_server::endpoints::tts::enqueue_infer_tts_handler::get_model_with_caching::get_model_with_caching;
-use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
-use crate::server_state::ServerState;
+use log::{info, warn};
+use r2d2_redis::redis::Commands;
+use rand::Rng;
+use rand::seq::SliceRandom;
+
 use enums::by_table::generic_inference_jobs::inference_category::InferenceCategory;
 use enums::by_table::generic_inference_jobs::inference_model_type::InferenceModelType;
 use enums::by_table::tts_models::tts_model_type::TtsModelType;
@@ -19,22 +21,23 @@ use enums::common::visibility::Visibility;
 use http_server_common::request::get_request_api_token::get_request_api_token;
 use http_server_common::request::get_request_header_optional::get_request_header_optional;
 use http_server_common::request::get_request_ip::get_request_ip;
-use log::{info, warn};
 use mysql_queries::payloads::generic_inference_args::generic_inference_args::{GenericInferenceArgs, InferenceCategoryAbbreviated};
 use mysql_queries::queries::generic_inference::web::insert_generic_inference_job::{insert_generic_inference_job, InsertGenericInferenceArgs};
 use mysql_queries::queries::tts::tts_inference_jobs::insert_tts_inference_job::TtsInferenceJobInsertBuilder;
 use mysql_queries::queries::tts::tts_models::get_tts_model::TtsModelRecord;
 use mysql_queries::tokens::Tokens;
-use r2d2_redis::redis::Commands;
-use rand::Rng;
-use rand::seq::SliceRandom;
 use redis_common::redis_keys::RedisKeys;
-use std::fmt;
-use std::sync::Arc;
 use tokens::users::user::UserToken;
-use tts_common::priority::{FAKEYOU_INVESTOR_PRIORITY_LEVEL, FAKEYOU_DEFAULT_VALID_API_TOKEN_PRIORITY_LEVEL};
+use tts_common::priority::{FAKEYOU_DEFAULT_VALID_API_TOKEN_PRIORITY_LEVEL, FAKEYOU_INVESTOR_PRIORITY_LEVEL};
 use user_input_common::check_for_slurs::contains_slurs;
 use users_component::utils::user_session_extended::UserSessionExtended;
+
+use crate::configs::plans::get_correct_plan_for_session::get_correct_plan_for_session;
+use crate::configs::plans::plan::Plan;
+use crate::http_server::endpoints::investor_demo::demo_cookie::request_has_demo_cookie;
+use crate::http_server::endpoints::tts::enqueue_infer_tts_handler::get_model_with_caching::get_model_with_caching;
+use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
+use crate::server_state::ServerState;
 
 // TODO: Temporary for investor demo
 const STORYTELLER_DEMO_COOKIE_NAME : &str = "storyteller_demo";

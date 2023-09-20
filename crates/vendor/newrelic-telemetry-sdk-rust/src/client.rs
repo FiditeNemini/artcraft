@@ -1,21 +1,23 @@
-///
-/// Copyright 2020 New Relic Corporation. All rights reserved.
-/// SPDX-License-Identifier: Apache-2.0
-///
-use crate::span::SpanBatch;
-use anyhow::{anyhow, Result};
-use flate2::write::GzEncoder;
-use flate2::Compression;
-use hyper::client::HttpConnector;
-use hyper::header::{CONTENT_ENCODING, CONTENT_TYPE, USER_AGENT};
-use hyper::{Body, HeaderMap, Method, Request, Response, Uri};
-use hyper_tls::HttpsConnector;
-use log::{debug, error, info};
 use std::future::Future;
 use std::io::Write;
 use std::pin::Pin;
 use std::thread;
 use std::time::Duration;
+
+use anyhow::{anyhow, Result};
+use flate2::Compression;
+use flate2::write::GzEncoder;
+use hyper::{Body, HeaderMap, Method, Request, Response, Uri};
+use hyper::client::HttpConnector;
+use hyper::header::{CONTENT_ENCODING, CONTENT_TYPE, USER_AGENT};
+use hyper_tls::HttpsConnector;
+use log::{debug, error, info};
+
+///
+/// Copyright 2020 New Relic Corporation. All rights reserved.
+/// SPDX-License-Identifier: Apache-2.0
+///
+use crate::span::SpanBatch;
 
 const VERSION: &str = env!("CARGO_PKG_VERSION");
 const TRACE_API_PATH: &str = "trace/v1";
@@ -498,16 +500,18 @@ impl Client {
 
 #[cfg(feature = "blocking")]
 pub mod blocking {
-    use super::{ClientBuilder, SpanBatch};
-    use anyhow::Result;
-    use futures::future;
-    use log::warn;
-    use std::sync::mpsc;
-    use std::sync::Mutex;
-    use std::thread;
-    use tokio::runtime::Builder;
+  use std::sync::mpsc;
+  use std::sync::Mutex;
+  use std::thread;
 
-    enum SendableType {
+  use anyhow::Result;
+  use futures::future;
+  use log::warn;
+  use tokio::runtime::Builder;
+
+  use super::{ClientBuilder, SpanBatch};
+
+  enum SendableType {
         Spans(SpanBatch),
     }
 
@@ -577,15 +581,18 @@ pub mod blocking {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
-    use anyhow::Result;
-    use flate2::read::GzDecoder;
-    use hyper::header::{HeaderValue, CONTENT_ENCODING, CONTENT_TYPE, USER_AGENT};
-    use hyper::{Method, Response};
-    use std::fmt;
-    use std::io::Read;
-    use std::time::Duration;
-    pub struct TestBatch;
+  use std::fmt;
+  use std::io::Read;
+  use std::time::Duration;
+
+  use anyhow::Result;
+  use flate2::read::GzDecoder;
+  use hyper::{Method, Response};
+  use hyper::header::{CONTENT_ENCODING, CONTENT_TYPE, HeaderValue, USER_AGENT};
+
+  use super::*;
+
+  pub struct TestBatch;
 
     impl Sendable for TestBatch {
         fn uuid(&self) -> &str {

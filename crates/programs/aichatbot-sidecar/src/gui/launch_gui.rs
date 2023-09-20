@@ -1,9 +1,11 @@
+use std::sync::Arc;
+
+use eframe::egui;
+use errors::AnyhowResult;
+
 use crate::gui::gui::{AppGui, AppGuiArgs};
 use crate::shared_state::app_control_state::AppControlState;
 use crate::startup_args::StartupArgs;
-use eframe::egui;
-use errors::AnyhowResult;
-use std::sync::Arc;
 
 pub fn launch_gui(startup_args: StartupArgs, control_state: Arc<AppControlState>) -> AnyhowResult<()> {
   // Log to stdout (if you run with `RUST_LOG=debug`).

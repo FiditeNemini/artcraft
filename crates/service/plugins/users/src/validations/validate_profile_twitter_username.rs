@@ -37,7 +37,7 @@ pub fn normalize_twitter_username_for_storage(username: &str) -> String {
 
 #[cfg(test)]
 mod tests {
-  use crate::validations::validate_profile_twitter_username::{validate_profile_twitter_username, normalize_twitter_username_for_storage};
+  use crate::validations::validate_profile_twitter_username::{normalize_twitter_username_for_storage, validate_profile_twitter_username};
 
   #[test]
   fn valid_cases() {

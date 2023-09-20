@@ -1,8 +1,9 @@
 use std::path::PathBuf;
+
 use clap::{App, Arg, ArgMatches};
+use errors::{anyhow, AnyhowResult};
 use log::info;
 use path_absolutize::Absolutize;
-use errors::{anyhow, AnyhowResult};
 
 const DEFAULT_SAVE_DIRECTORY : &str = "runtime_data";
 

@@ -1,9 +1,11 @@
+use std::collections::HashMap;
+use std::sync::{Arc, RwLock};
+
 use anyhow::anyhow;
+
 use enums::by_table::generic_inference_jobs::inference_category::InferenceCategory;
 use enums::by_table::generic_inference_jobs::inference_model_type::InferenceModelType;
 use errors::AnyhowResult;
-use std::collections::HashMap;
-use std::sync::{Arc, LockResult, RwLock};
 
 #[derive(Clone)]
 pub struct ModelInfoLite {

@@ -1,19 +1,19 @@
+use std::collections::BTreeSet;
+
 use anyhow::anyhow;
 use chrono::Utc;
-use crate::column_types::job_status::JobStatus;
-use crate::helpers::boolean_converters::i8_to_bool;
-use crate::queries::generic_inference::job::_keys::GenericInferenceJobId;
+use sqlx::MySqlPool;
+
 use enums::by_table::generic_inference_jobs::inference_category::InferenceCategory;
+use enums::by_table::generic_inference_jobs::inference_model_type::InferenceModelType;
 use enums::common::visibility::Visibility;
 use errors::AnyhowResult;
-use sqlx::mysql::MySqlArguments;
-use sqlx::{MySql, MySqlPool};
-use std::collections::BTreeSet;
-use std::future::Future;
-use std::path::Path;
-use enums::by_table::generic_inference_jobs::inference_model_type::InferenceModelType;
 use tokens::jobs::inference::InferenceJobToken;
+
+use crate::column_types::job_status::JobStatus;
+use crate::helpers::boolean_converters::i8_to_bool;
 use crate::payloads::generic_inference_args::generic_inference_args::GenericInferenceArgs;
+use crate::queries::generic_inference::job::_keys::GenericInferenceJobId;
 
 /// table: generic_inference_jobs
 #[derive(Debug)]
@@ -416,10 +416,12 @@ fn inference_category_predicate(categories: &BTreeSet<InferenceCategory>) -> Str
 
 #[cfg(test)]
 mod tests {
-  use crate::queries::generic_inference::job::list_available_generic_inference_jobs::{inference_category_predicate, model_type_predicate};
+  use std::collections::BTreeSet;
+
   use enums::by_table::generic_inference_jobs::inference_category::InferenceCategory;
   use enums::by_table::generic_inference_jobs::inference_model_type::InferenceModelType;
-  use std::collections::BTreeSet;
+
+  use crate::queries::generic_inference::job::list_available_generic_inference_jobs::{inference_category_predicate, model_type_predicate};
 
   #[test]
   fn test_model_type_predicate() {

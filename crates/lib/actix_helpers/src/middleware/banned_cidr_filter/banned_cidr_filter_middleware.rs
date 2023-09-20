@@ -1,12 +1,15 @@
-use actix_web::Error;
-use actix_web::dev::Service;
+use std::net::IpAddr;
+use std::str::FromStr;
+
 use actix_web::dev::{ServiceRequest, ServiceResponse};
+use actix_web::dev::Service;
+use actix_web::Error;
+use futures_util::future::{Either, err, Ready};
+
 use crate::extractors::get_service_request_ip_address::get_service_request_ip_address;
 use crate::middleware::banned_cidr_filter::banned_cidr_set::BannedCidrSet;
 use crate::middleware::banned_ip_filter::banned_error::BannedError;
-use futures_util::future::{err, Either, Ready};
-use std::net::IpAddr;
-use std::str::FromStr;
+
 //use std::task::{Context, Poll};
 
 pub struct BannedCidrFilterMiddleware<S> {

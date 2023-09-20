@@ -1,5 +1,6 @@
 use actix_http::StatusCode;
 use actix_web::{HttpResponse, ResponseError};
+
 use http_server_common::response::serialize_as_json_error::serialize_as_json_error;
 
 #[derive(Debug, Serialize, Eq, PartialEq, Copy, Clone)]

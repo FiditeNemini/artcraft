@@ -1,8 +1,8 @@
+use std::sync::Arc;
+
 use r2d2_redis::{r2d2, RedisConnectionManager};
 use sqlx::MySqlPool;
-use std::sync::Arc;
 use tokio::runtime::Runtime;
-use twitch_oauth2::{ClientId, ClientSecret};
 
 /// State that is injected into every endpoint.
 #[derive(Clone)]

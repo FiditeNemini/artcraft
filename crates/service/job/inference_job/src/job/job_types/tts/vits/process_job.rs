@@ -1,33 +1,28 @@
+use std::fs::File;
+use std::io::Read;
+use std::path::PathBuf;
+use std::time::Instant;
+
 use anyhow::anyhow;
+use log::{error, info};
+use tempdir::TempDir;
+
 use container_common::filesystem::check_file_exists::check_file_exists;
 use container_common::filesystem::safe_delete_temp_directory::safe_delete_temp_directory;
 use container_common::filesystem::safe_delete_temp_file::safe_delete_temp_file;
-use crate::job::job_loop::process_single_job_error::ProcessSingleJobError;
-use crate::job::job_types::tts::tacotron2_v2_early_fakeyou::seconds_to_decoder_steps::seconds_to_decoder_steps;
-use crate::job::job_types::tts::tacotron2_v2_early_fakeyou::tacotron2_inference_command::{InferenceArgs, MelMultiplyFactor, Tacotron2InferenceCommand, VocoderForInferenceOption};
-use crate::job::job_types::tts::vits::vits_inference_command::{Device, VitsInferenceArgs, VitsInferenceCommand};
-use crate::job_dependencies::JobDependencies;
-use crate::util::maybe_download_file_from_bucket::maybe_download_file_from_bucket;
+use enums::by_table::generic_inference_jobs::inference_result_type::InferenceResultType;
 use errors::AnyhowResult;
-use filesys::filename_concat::filename_concat;
 use hashing::sha256::sha256_hash_string::sha256_hash_string;
-use log::{error, info};
 use mysql_queries::column_types::vocoder_type::VocoderType;
 use mysql_queries::queries::generic_inference::job::list_available_generic_inference_jobs::AvailableInferenceJob;
-use mysql_queries::queries::tts::tts_inference_jobs::mark_tts_inference_job_done::mark_tts_inference_job_done;
 use mysql_queries::queries::tts::tts_models::get_tts_model_for_inference_improved::TtsModelForInferenceRecord;
 use mysql_queries::queries::tts::tts_results::insert_tts_result::{insert_tts_result, JobType};
-use std::fs::File;
-use std::io::Read;
-use std::path::{Path, PathBuf};
-use std::time::Instant;
-use subprocess_common::docker_options::{DockerFilesystemMount, DockerGpu, DockerOptions};
-use tempdir::TempDir;
-use enums::by_table::generic_inference_jobs::inference_result_type::InferenceResultType;
-use tts_common::clean_symbols::clean_symbols;
-use tts_common::text_pipelines::guess_pipeline::guess_text_pipeline_heuristic;
-use tts_common::text_pipelines::text_pipeline_type::TextPipelineType;
+
 use crate::job::job_loop::job_success_result::{JobSuccessResult, ResultEntity};
+use crate::job::job_loop::process_single_job_error::ProcessSingleJobError;
+use crate::job::job_types::tts::vits::vits_inference_command::{Device, VitsInferenceArgs};
+use crate::job_dependencies::JobDependencies;
+use crate::util::maybe_download_file_from_bucket::maybe_download_file_from_bucket;
 
 /// Text starting with this will be treated as a test request.
 /// This allows the request to bypass the model cache and query the latest TTS model.

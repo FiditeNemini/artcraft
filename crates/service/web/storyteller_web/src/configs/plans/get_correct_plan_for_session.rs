@@ -1,9 +1,12 @@
-use chrono::Utc;
-use crate::configs::plans::plan::Plan;
-use crate::configs::plans::plan_list::{DEVELOPMENT_PREMIUM_PLANS, DEVELOPMENT_PREMIUM_PLANS_BY_SLUG, FREE_LOGGED_IN_PLAN, FREE_LOGGED_OUT_PLAN, LOYALTY_PLANS_BY_SLUG, PRODUCTION_PREMIUM_PLANS, PRODUCTION_PREMIUM_PLANS_BY_SLUG};
-use reusable_types::server_environment::ServerEnvironment;
 use std::ops::Deref;
-use users_component::utils::user_session_extended::{UserSessionExtended, UserSessionSubscriptionPlan};
+
+use chrono::Utc;
+
+use reusable_types::server_environment::ServerEnvironment;
+use users_component::utils::user_session_extended::UserSessionExtended;
+
+use crate::configs::plans::plan::Plan;
+use crate::configs::plans::plan_list::{DEVELOPMENT_PREMIUM_PLANS_BY_SLUG, FREE_LOGGED_IN_PLAN, FREE_LOGGED_OUT_PLAN, LOYALTY_PLANS_BY_SLUG, PRODUCTION_PREMIUM_PLANS_BY_SLUG};
 
 /// Look up the most appropriate plan for the session.
 /// This will probably grow to include a lot of factors.
@@ -61,11 +64,14 @@ fn loyalty_plan_if_available(
 #[cfg(test)]
 pub mod tests {
   use std::ops::{Add, Sub};
+
   use chrono::{Duration, Utc};
-  use crate::configs::plans::get_correct_plan_for_session::get_correct_plan_for_session;
-  use crate::configs::plans::plan_list::{ALL_PLANS_BY_SLUG, FREE_LOGGED_IN_PLAN, FREE_LOGGED_OUT_PLAN};
+
   use reusable_types::server_environment::ServerEnvironment;
   use users_component::utils::user_session_extended::{UserSessionExtended, UserSessionSubscriptionPlan};
+
+  use crate::configs::plans::get_correct_plan_for_session::get_correct_plan_for_session;
+  use crate::configs::plans::plan_list::{ALL_PLANS_BY_SLUG, FREE_LOGGED_IN_PLAN, FREE_LOGGED_OUT_PLAN};
 
   #[test]
   fn test_free_logged_out_plan() {

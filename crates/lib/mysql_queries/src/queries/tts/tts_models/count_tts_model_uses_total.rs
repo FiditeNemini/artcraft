@@ -1,9 +1,10 @@
 //! NB: This query is potentially long-lived and not suitable for low-latency HTTP endpoints.
 
-use errors::AnyhowResult;
 use log::info;
 use sqlx::MySql;
 use sqlx::pool::PoolConnection;
+
+use errors::AnyhowResult;
 use tokens::tokens::tts_models::TtsModelToken;
 
 pub struct TtsModelTotalUseCountInfo {

@@ -1,8 +1,10 @@
 use anyhow::anyhow;
-use errors::AnyhowResult;
-use crate::queries::tts::tts_inference_jobs::list_available_tts_inference_jobs::AvailableTtsInferenceJob;
-use sqlx::MySqlPool;
 use sqlx;
+use sqlx::MySqlPool;
+
+use errors::AnyhowResult;
+
+use crate::queries::tts::tts_inference_jobs::list_available_tts_inference_jobs::AvailableTtsInferenceJob;
 
 // TODO: Rerun time shouldn't be 1-minute!
 

@@ -1,9 +1,11 @@
-use crate::middleware::banned_ip_filter::ip_ban_list::ip_set::IpSet;
-use errors::AnyhowResult;
 use std::collections::HashSet;
 use std::fs::File;
 use std::io::{BufRead, BufReader};
 use std::path::Path;
+
+use errors::AnyhowResult;
+
+use crate::middleware::banned_ip_filter::ip_ban_list::ip_set::IpSet;
 
 pub fn load_ip_set_from_file<P: AsRef<Path>>(path: P) -> AnyhowResult<IpSet> {
   let file = File::open(path)?;
@@ -21,6 +23,7 @@ pub fn load_ip_set_from_file<P: AsRef<Path>>(path: P) -> AnyhowResult<IpSet> {
 #[cfg(test)]
 mod tests {
   use std::path::PathBuf;
+
   use crate::middleware::banned_ip_filter::ip_ban_list::load_ip_set_from_file::load_ip_set_from_file;
 
   fn test_file(path_from_repo_root: &str) -> PathBuf {

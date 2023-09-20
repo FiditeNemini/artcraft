@@ -1,8 +1,9 @@
-use errors::AnyhowResult;
 use std::collections::HashSet;
 use std::fs::File;
 use std::io::{BufRead, BufReader};
 use std::path::Path;
+
+use errors::AnyhowResult;
 
 pub struct PrefixDisabledEndpoints {
   endpoint_prefixes: HashSet<String>

@@ -1,9 +1,9 @@
 use anyhow::anyhow;
-use sqlx::error::Error::Database;
 use log::error;
+use sqlx::error::Error::Database;
 use sqlx::MySqlPool;
+
 use errors::AnyhowResult;
-use enums::common::visibility::Visibility;
 
 // FIXME: NB: This is an old query that was somewhat modernized when moved.
 //  All the same, do not copy this example!

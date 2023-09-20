@@ -3,13 +3,16 @@
 #![forbid(unused_mut)]
 #![forbid(unused_variables)]
 
+use std::path::Path;
+
 use anyhow::anyhow;
-use errors::AnyhowResult;
-use crate::tokens::Tokens;
+use sqlx::MySqlPool;
+
 use enums::common::visibility::Visibility;
 use enums::common::vocoder_type::VocoderType;
-use sqlx::MySqlPool;
-use std::path::Path;
+use errors::AnyhowResult;
+
+use crate::tokens::Tokens;
 
 pub struct Args<'a, P: AsRef<Path>> {
   pub vocoder_type: VocoderType,

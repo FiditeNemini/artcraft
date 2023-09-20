@@ -1,10 +1,12 @@
+use std::path::Path;
+
 use anyhow::anyhow;
+use hyper::{Body, Request};
+use hyper::client::Client;
+use log::info;
+
 use container_common::anyhow_result::AnyhowResult;
 use mysql_queries::column_types::vocoder_type::VocoderType;
-use hyper::client::Client;
-use hyper::{Body, Request};
-use log::info;
-use std::path::Path;
 
 pub struct TtsInferenceSidecarClient {
   hostname: String,

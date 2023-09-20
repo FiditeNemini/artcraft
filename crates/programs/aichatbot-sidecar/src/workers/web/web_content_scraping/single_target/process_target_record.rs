@@ -1,6 +1,5 @@
-use crate::shared_state::job_state::JobState;
-use crate::workers::web::web_content_scraping::single_target::filter_scraped_result_heuristics::filter_scraped_result_heuristics;
-use crate::workers::web::web_content_scraping::single_target::ingest_url_scrape_and_save::ingest_url_scrape_and_save;
+use std::sync::Arc;
+
 use enums::by_table::web_scraping_targets::scraping_status::ScrapingStatus;
 use errors::AnyhowResult;
 use log::error;
@@ -9,8 +8,11 @@ use sqlite_queries::queries::by_table::news_story_productions::insert_news_story
 use sqlite_queries::queries::by_table::web_scraping_targets::list::web_scraping_target::WebScrapingTarget as WebScrapingTargetRecord;
 use sqlite_queries::queries::by_table::web_scraping_targets::update_web_scraping_target::Args as ScrapingArgs;
 use sqlite_queries::queries::by_table::web_scraping_targets::update_web_scraping_target::update_web_scraping_target;
-use std::sync::Arc;
 use tokens::tokens::news_stories::NewsStoryToken;
+
+use crate::shared_state::job_state::JobState;
+use crate::workers::web::web_content_scraping::single_target::filter_scraped_result_heuristics::filter_scraped_result_heuristics;
+use crate::workers::web::web_content_scraping::single_target::ingest_url_scrape_and_save::ingest_url_scrape_and_save;
 
 pub async fn process_target_record(target: &WebScrapingTargetRecord, job_state: &Arc<JobState>) -> AnyhowResult<()> {
   let result = ingest_url_scrape_and_save(

@@ -1,40 +1,32 @@
+use std::sync::Arc;
+use std::thread::sleep;
+use std::time::Duration;
+
 use actix::prelude::*;
-use actix_rt::Runtime;
+use actix_web::{HttpRequest, HttpResponse, web};
 use actix_web::web::Path;
-use actix_web::{middleware, web, App, Error, HttpRequest, HttpResponse, HttpServer};
 use actix_web_actors::ws;
-use errors::AnyhowResult;
+use log::error;
+use log::info;
+use log::warn;
+use r2d2_redis::r2d2::PooledConnection;
+use r2d2_redis::redis::Commands;
+use r2d2_redis::RedisConnectionManager;
+use tokio::task::JoinHandle;
+
 use container_common::thread::async_thread_kill_signal::AsyncThreadKillSignal;
-use container_common::token::random_crockford_token::random_crockford_token;
+use errors::AnyhowResult;
+use http_server_common::error::common_server_error::CommonServerError;
+use mysql_queries::queries::twitch::twitch_oauth::find::TwitchOauthTokenFinder;
+use redis_common::redis_keys::RedisKeys;
+use redis_common::shared_constants::OBS_ACTIVE_TTL_SECONDS;
+use twitch_common::twitch_user_id::TwitchUserId;
+
 use crate::endpoints_ws::helpers::publish_active_browser_info::publish_active_browser_info;
 use crate::endpoints_ws::obs_gateway_websocket_handler::ResponseType::TtsEvent;
 use crate::endpoints_ws::threads::redis_pubsub_event_listener_thread::RedisPubsubEventListenerThread;
 use crate::endpoints_ws::threads::tts_inference_job_token_queue::TtsInferenceJobTokenQueue;
 use crate::server_state::ObsGatewayServerState;
-use mysql_queries::queries::twitch::twitch_oauth::find::{TwitchOauthTokenFinder, TwitchOauthTokenRecord};
-use futures_timer::Delay;
-use futures_util::FutureExt;
-use http_server_common::error::common_server_error::CommonServerError;
-use log::debug;
-use log::error;
-use log::info;
-use log::warn;
-use r2d2_redis::RedisConnectionManager;
-use r2d2_redis::r2d2::PooledConnection;
-use r2d2_redis::redis::Commands;
-use redis_common::payloads::obs_active_payload::ObsActivePayload;
-use redis_common::redis_keys::RedisKeys;
-use redis_common::shared_constants::OBS_ACTIVE_TTL_SECONDS;
-use std::sync::Arc;
-use std::thread::sleep;
-use std::time::Duration;
-use tokio::runtime::Handle;
-use tokio::task::JoinHandle;
-use twitch_api2::pubsub::Topic;
-use twitch_api2::pubsub::TopicData::ChannelPointsChannelV1;
-use twitch_api2::pubsub::channel_bits::ChannelBitsEventsV2Reply::BitsEvent;
-use twitch_api2::pubsub;
-use twitch_common::twitch_user_id::TwitchUserId;
 
 #[derive(Deserialize)]
 pub struct PathInfo {

@@ -1,7 +1,8 @@
 use anyhow::anyhow;
-use errors::AnyhowResult;
 use log::warn;
 use sqlx::MySqlPool;
+
+use errors::AnyhowResult;
 
 #[derive(Serialize, Clone)]
 pub struct OnPremWorkerStats {

@@ -1,22 +1,17 @@
-use actix_http::Error;
-use actix_web::HttpResponseBuilder;
-use actix_web::cookie::Cookie;
+use std::fmt;
+use std::sync::Arc;
+
+use actix_web::{HttpRequest, HttpResponse, web};
 use actix_web::error::ResponseError;
 use actix_web::http::StatusCode;
-use actix_web::{Responder, web, HttpResponse, error, HttpRequest};
-use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
+use log::{log, warn};
+
+use mysql_queries::queries::users::user::set_user_ban_status::{set_user_ban_status, SetUserBanStatsArgs};
+use mysql_queries::queries::users::user_profiles::get_user_profile_by_username::get_user_profile_by_username;
+
 use crate::http_server::web_utils::response_success_helpers::simple_json_success;
 use crate::http_server::web_utils::serialize_as_json_error::serialize_as_json_error;
 use crate::server_state::ServerState;
-use mysql_queries::queries::users::user::set_user_ban_status::{set_user_ban_status, SetUserBanStatsArgs};
-use mysql_queries::queries::users::user_profiles::get_user_profile_by_username::get_user_profile_by_username;
-use log::{info, warn, log};
-use regex::Regex;
-use sqlx::error::DatabaseError;
-use sqlx::error::Error::Database;
-use sqlx::mysql::MySqlDatabaseError;
-use std::fmt;
-use std::sync::Arc;
 
 #[derive(Deserialize)]
 pub struct BanUserRequest {

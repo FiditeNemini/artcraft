@@ -1,11 +1,13 @@
-use base64::{Config, CharacterSet};
+use std::io::Cursor;
+
+use base64::{CharacterSet, Config};
 use base64;
-use errors::AnyhowResult;
+use magic_crypt::{MagicCrypt256, MagicCryptTrait};
 use magic_crypt::generic_array::typenum::U256;
 use magic_crypt::new_magic_crypt;
-use magic_crypt::{MagicCryptTrait, MagicCrypt256};
 use rand::RngCore;
-use std::io::Cursor;
+
+use errors::AnyhowResult;
 
 // TODO: A protobuf would be more compact!
 /// This gets encrypted and sent to the frontend as an opaque handle.
@@ -70,7 +72,6 @@ impl SortKeyCrypto {
 #[cfg(test)]
 mod tests {
   use crate::util::encrypted_sort_id::SortKeyCrypto;
-  use std::collections::HashSet;
 
 //  #[test]
 //  fn encrypt_entropy_means_no_duplicate_values() {

@@ -1,10 +1,16 @@
-use actix_helpers::route_builder::RouteBuilder;
 use actix_http::body::MessageBody;
 use actix_service::ServiceFactory;
+use actix_web::{App, HttpResponse, web};
 use actix_web::dev::{ServiceRequest, ServiceResponse};
 use actix_web::error::Error;
-use actix_web::{App, web, HttpResponse};
+
+use actix_helpers::route_builder::RouteBuilder;
 use billing_component::default_routes::add_suggested_stripe_billing_routes;
+use users_component::default_routes::add_suggested_api_v1_account_creation_and_session_routes;
+use users_component::endpoints::edit_profile_handler::edit_profile_handler;
+use users_component::endpoints::get_profile_handler::get_profile_handler;
+
+use crate::http_server::endpoints::animation::enqueue_lipsync_animation::enqueue_lipsync_animation_handler;
 use crate::http_server::endpoints::api_tokens::create_api_token::create_api_token_handler;
 use crate::http_server::endpoints::api_tokens::delete_api_token::delete_api_token_handler;
 use crate::http_server::endpoints::api_tokens::edit_api_token::edit_api_token_handler;
@@ -30,6 +36,7 @@ use crate::http_server::endpoints::investor_demo::enable_demo_mode_handler::enab
 use crate::http_server::endpoints::leaderboard::get_leaderboard::leaderboard_handler;
 use crate::http_server::endpoints::media_uploads::list_user_media_uploads_of_type::list_user_media_uploads_of_type_handler;
 use crate::http_server::endpoints::media_uploads::upload_audio::upload_audio_handler;
+use crate::http_server::endpoints::media_uploads::upload_image::upload_image_handler;
 use crate::http_server::endpoints::media_uploads::upload_media::upload_media_handler;
 use crate::http_server::endpoints::misc::default_route_404::default_route_404;
 use crate::http_server::endpoints::misc::detect_locale_handler::detect_locale_handler;
@@ -101,7 +108,6 @@ use crate::http_server::endpoints::w2l::delete_w2l_result::delete_w2l_inference_
 use crate::http_server::endpoints::w2l::delete_w2l_template::delete_w2l_template_handler;
 use crate::http_server::endpoints::w2l::edit_w2l_result::edit_w2l_inference_result_handler;
 use crate::http_server::endpoints::w2l::edit_w2l_template::edit_w2l_template_handler;
-use crate::http_server::endpoints::w2l::enqueue_infer_w2l::infer_w2l_handler;
 use crate::http_server::endpoints::w2l::enqueue_infer_w2l_with_uploads::enqueue_infer_w2l_with_uploads;
 use crate::http_server::endpoints::w2l::enqueue_upload_w2l_template::upload_w2l_template_handler;
 use crate::http_server::endpoints::w2l::get_w2l_inference_job_status::get_w2l_inference_job_status_handler;
@@ -113,11 +119,6 @@ use crate::http_server::endpoints::w2l::list_user_w2l_inference_results::list_us
 use crate::http_server::endpoints::w2l::list_user_w2l_templates::list_user_w2l_templates_handler;
 use crate::http_server::endpoints::w2l::list_w2l_templates::list_w2l_templates_handler;
 use crate::http_server::endpoints::w2l::set_w2l_template_mod_approval::set_w2l_template_mod_approval_handler;
-use users_component::default_routes::add_suggested_api_v1_account_creation_and_session_routes;
-use users_component::endpoints::edit_profile_handler::edit_profile_handler;
-use users_component::endpoints::get_profile_handler::get_profile_handler;
-use crate::http_server::endpoints::animation::enqueue_lipsync_animation::enqueue_lipsync_animation_handler;
-use crate::http_server::endpoints::media_uploads::upload_image::upload_image_handler;
 
 pub fn add_routes<T, B> (app: App<T>) -> App<T>
   where

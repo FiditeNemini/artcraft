@@ -1,12 +1,15 @@
+use std::collections::BTreeSet;
+
 use chrono::Utc;
-use crate::column_types::job_status::JobStatus;
-use crate::queries::generic_download::job::_keys::GenericDownloadJobId;
+use sqlx::MySqlPool;
+
 use enums::by_table::generic_download_jobs::generic_download_type::GenericDownloadType;
 use enums::common::visibility::Visibility;
 use errors::AnyhowResult;
-use sqlx::MySqlPool;
-use std::collections::BTreeSet;
 use tokens::jobs::download::DownloadJobToken;
+
+use crate::column_types::job_status::JobStatus;
+use crate::queries::generic_download::job::_keys::GenericDownloadJobId;
 
 /// table: generic_download_jobs
 #[derive(Debug)]
@@ -161,7 +164,9 @@ struct AvailableDownloadJobRawInternal {
 #[cfg(test)]
 mod tests {
   use std::collections::BTreeSet;
+
   use enums::by_table::generic_download_jobs::generic_download_type::GenericDownloadType;
+
   use crate::queries::generic_download::job::list_available_generic_download_jobs::download_type_clause;
 
   #[test]

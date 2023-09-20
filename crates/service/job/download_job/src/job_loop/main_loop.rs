@@ -1,12 +1,15 @@
+use std::time::Duration;
+
 use anyhow::anyhow;
-use container_common::anyhow_result::AnyhowResult;
-use crate::JobState;
-use crate::job_loop::process_single_job::process_single_job;
-use jobs_common::noop_logger::NoOpLogger;
 use log::{error, warn};
+
+use container_common::anyhow_result::AnyhowResult;
+use jobs_common::noop_logger::NoOpLogger;
 use mysql_queries::queries::generic_download::job::list_available_generic_download_jobs::{AvailableDownloadJob, list_available_generic_download_jobs};
 use mysql_queries::queries::generic_download::job::mark_generic_download_job_failure::mark_generic_download_job_failure;
-use std::time::Duration;
+
+use crate::job_loop::process_single_job::process_single_job;
+use crate::JobState;
 
 // Job runner timeouts (guards MySQL)
 const START_TIMEOUT_MILLIS : u64 = 500;

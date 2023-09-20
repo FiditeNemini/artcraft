@@ -1,11 +1,14 @@
-use actix_web::http::StatusCode;
-use actix_web::{HttpRequest, HttpResponse, ResponseError, web};
-use http_server_common::request::get_request_ip::get_request_ip;
-use crate::server_state::ServerState;
-use mysql_queries::queries::users::user_subscriptions::insert_unsubscribe_reason::UnsubscribeReasonInsertBuilder;
-use http_server_common::response::serialize_as_json_error::serialize_as_json_error;
-use log::{error, info};
 use std::sync::Arc;
+
+use actix_web::{HttpRequest, HttpResponse, ResponseError, web};
+use actix_web::http::StatusCode;
+use log::{error, info};
+
+use http_server_common::request::get_request_ip::get_request_ip;
+use http_server_common::response::serialize_as_json_error::serialize_as_json_error;
+use mysql_queries::queries::users::user_subscriptions::insert_unsubscribe_reason::UnsubscribeReasonInsertBuilder;
+
+use crate::server_state::ServerState;
 
 // =============== Request ===============
 

@@ -1,9 +1,11 @@
-use container_common::anyhow_result::AnyhowResult;
-use crate::job_progress_reporter::job_progress_reporter::{JobProgressReporter, JobProgressReporterBuilder};
+use r2d2_redis::{r2d2, RedisConnectionManager};
 use r2d2_redis::r2d2::PooledConnection;
 use r2d2_redis::redis::Commands;
-use r2d2_redis::{r2d2, RedisConnectionManager};
+
+use container_common::anyhow_result::AnyhowResult;
 use redis_common::redis_keys::RedisKeys;
+
+use crate::job_progress_reporter::job_progress_reporter::{JobProgressReporter, JobProgressReporterBuilder};
 
 /// A job progress reporter that reports to Redis
 pub struct RedisJobProgressReporterBuilder {

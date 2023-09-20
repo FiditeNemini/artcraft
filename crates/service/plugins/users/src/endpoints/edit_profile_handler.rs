@@ -3,10 +3,27 @@
 #![forbid(unused_mut)]
 #![forbid(unused_variables)]
 
+use std::fmt;
+
+use actix_web::{HttpRequest, HttpResponse, web};
 use actix_web::error::ResponseError;
 use actix_web::http::StatusCode;
 use actix_web::web::Path;
-use actix_web::{web, HttpResponse, HttpRequest};
+use log::warn;
+use sqlx::MySqlPool;
+
+use enums::common::visibility::Visibility;
+use http_server_common::request::get_request_ip::get_request_ip;
+use http_server_common::response::serialize_as_json_error::serialize_as_json_error;
+use mysql_queries::queries::users::user_profiles::{edit_user_profile_as_account_holder, edit_user_profile_as_mod};
+use mysql_queries::queries::users::user_profiles::edit_user_profile_as_account_holder::edit_user_profile_as_account_holder;
+use mysql_queries::queries::users::user_profiles::edit_user_profile_as_mod::edit_user_profile_as_mod;
+use mysql_queries::queries::users::user_profiles::get_user_profile_by_username::get_user_profile_by_username;
+use redis_caching::redis_ttl_cache::RedisTtlCache;
+use redis_common::redis_cache_keys::RedisCacheKeys;
+use user_input_common::check_for_slurs::contains_slurs;
+use user_input_common::markdown_to_html::markdown_to_html;
+
 use crate::utils::session_checker::SessionChecker;
 use crate::validations::validate_profile_cashapp_username::{normalize_cashapp_username_for_storage, validate_profile_cashapp_username};
 use crate::validations::validate_profile_discord_username::validate_profile_discord_username;
@@ -14,20 +31,6 @@ use crate::validations::validate_profile_github_username::validate_profile_githu
 use crate::validations::validate_profile_twitch_username::validate_profile_twitch_username;
 use crate::validations::validate_profile_twitter_username::{normalize_twitter_username_for_storage, validate_profile_twitter_username};
 use crate::validations::validate_profile_website_url::validate_profile_website_url;
-use mysql_queries::queries::users::user_profiles::edit_user_profile_as_account_holder::edit_user_profile_as_account_holder;
-use mysql_queries::queries::users::user_profiles::edit_user_profile_as_mod::edit_user_profile_as_mod;
-use mysql_queries::queries::users::user_profiles::get_user_profile_by_username::get_user_profile_by_username;
-use mysql_queries::queries::users::user_profiles::{edit_user_profile_as_account_holder, edit_user_profile_as_mod};
-use enums::common::visibility::Visibility;
-use http_server_common::request::get_request_ip::get_request_ip;
-use http_server_common::response::serialize_as_json_error::serialize_as_json_error;
-use log::warn;
-use redis_caching::redis_ttl_cache::RedisTtlCache;
-use redis_common::redis_cache_keys::RedisCacheKeys;
-use sqlx::MySqlPool;
-use std::fmt;
-use user_input_common::check_for_slurs::contains_slurs;
-use user_input_common::markdown_to_html::markdown_to_html;
 
 /// For the URL PathInfo
 #[derive(Deserialize)]

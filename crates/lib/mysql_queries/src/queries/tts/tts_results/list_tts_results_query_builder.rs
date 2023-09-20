@@ -4,10 +4,11 @@
 //#![forbid(unused_variables)]
 
 use chrono::{DateTime, Utc};
-use config::shared_constants::DEFAULT_MYSQL_QUERY_RESULT_PAGE_SIZE;
-use errors::AnyhowResult;
-use enums::common::visibility::Visibility;
 use sqlx::MySqlPool;
+
+use config::shared_constants::DEFAULT_MYSQL_QUERY_RESULT_PAGE_SIZE;
+use enums::common::visibility::Visibility;
+use errors::AnyhowResult;
 
 #[derive(Serialize)]
 pub struct TtsInferenceListPage {

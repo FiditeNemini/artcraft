@@ -1,6 +1,7 @@
 //! These are columns where users can control the visibility of their data.
 
 use anyhow::anyhow;
+
 use errors::AnyhowResult;
 
 /// To use this in a query, the query must have type annotations.

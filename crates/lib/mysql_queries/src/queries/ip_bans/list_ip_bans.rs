@@ -1,8 +1,9 @@
 use anyhow::anyhow;
 use chrono::{DateTime, Utc};
-use errors::AnyhowResult;
 use log::warn;
 use sqlx::MySqlPool;
+
+use errors::AnyhowResult;
 
 #[derive(Serialize)]
 pub struct IpBanRecordForList {

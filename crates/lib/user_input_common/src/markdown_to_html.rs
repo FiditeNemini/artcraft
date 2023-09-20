@@ -1,4 +1,4 @@
-use pulldown_cmark::{Options, Parser, html};
+use pulldown_cmark::{html, Options, Parser};
 
 pub fn markdown_to_html(markdown_input: &str) -> String {
   // NB: CommonMark allows for HTML, including <script>! WTF!

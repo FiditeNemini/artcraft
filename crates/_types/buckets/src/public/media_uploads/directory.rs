@@ -1,6 +1,7 @@
+use crockford::crockford_entropy_lower;
+
 use crate::public::public_path::PublicPath;
 use crate::util::hashed_directory_path_long_string::hashed_directory_path_long_string;
-use crockford::crockford_entropy_lower;
 
 // TODO: Generate these from a macro.
 

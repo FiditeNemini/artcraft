@@ -1,10 +1,9 @@
 use anyhow::anyhow;
 use chrono::{DateTime, Utc};
-use crate::queries::comments::comment_entity_token::CommentEntityToken;
+use sqlx::{Executor, MySql};
+
 use enums::by_table::comments::comment_entity_type::CommentEntityType;
 use errors::AnyhowResult;
-use log::warn;
-use sqlx::{Executor, MySql, MySqlPool};
 use tokens::tokens::comments::CommentToken;
 use tokens::users::user::UserToken;
 

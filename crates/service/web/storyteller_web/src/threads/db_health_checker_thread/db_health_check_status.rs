@@ -1,9 +1,9 @@
+use std::sync::{Arc, RwLock};
+
 use anyhow::anyhow;
+use chrono::NaiveDateTime;
+
 use crate::AnyhowResult;
-use std::collections::HashSet;
-use std::collections::hash_map::RandomState;
-use std::sync::{RwLock, PoisonError, RwLockWriteGuard, RwLockReadGuard, Arc};
-use chrono::{Utc, DateTime, NaiveDateTime};
 
 #[derive(Clone)]
 pub struct HealthCheckStatus {

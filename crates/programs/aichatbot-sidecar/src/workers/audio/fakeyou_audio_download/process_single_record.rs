@@ -1,4 +1,6 @@
-use crate::shared_state::job_state::JobState;
+use std::io::Cursor;
+use std::sync::Arc;
+
 use errors::{anyhow, AnyhowResult};
 use fakeyou_client::api::tts_inference::{CreateTtsInferenceRequest, TtsInferenceJobStatusStatePayload};
 use fakeyou_client::get_audio_url::get_audio_url;
@@ -7,11 +9,11 @@ use media::decode_basic_audio_info::decode_basic_audio_bytes_info;
 use sqlite_queries::queries::by_table::tts_render_tasks::list::tts_render_task::TtsRenderTask;
 use sqlite_queries::queries::by_table::tts_render_tasks::update::update_tts_render_task_successfully_downloaded::Args;
 use sqlite_queries::queries::by_table::tts_render_tasks::update::update_tts_render_task_successfully_downloaded::update_tts_render_task_successfully_downloaded;
-use std::io::Cursor;
-use std::sync::Arc;
 use tokens::tokens::news_stories::NewsStoryToken;
 use tokens::tokens::tts_models::TtsModelToken;
 use tokens::tokens::tts_render_tasks::TtsRenderTaskToken;
+
+use crate::shared_state::job_state::JobState;
 
 pub async fn process_single_record(target: &TtsRenderTask, job_state: &Arc<JobState>) -> AnyhowResult<()> {
 

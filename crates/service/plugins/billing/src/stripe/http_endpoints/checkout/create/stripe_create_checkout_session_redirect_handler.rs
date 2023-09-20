@@ -1,23 +1,16 @@
-use actix_web::error::ResponseError;
-use actix_web::error::UrlencodedError::ContentType;
-use actix_web::http::{header, StatusCode};
-use actix_web::web::{Path, Query};
-use actix_web::{web, HttpResponse, HttpRequest};
-use chrono::{DateTime, Utc};
+use actix_web::{HttpRequest, HttpResponse, web};
+use actix_web::http::header;
+use actix_web::web::Query;
+
+use reusable_types::server_environment::ServerEnvironment;
+use url_config::third_party_url_redirector::ThirdPartyUrlRedirector;
+
 use crate::stripe::http_endpoints::checkout::create::stripe_create_checkout_session_error::CreateCheckoutSessionError;
 use crate::stripe::http_endpoints::checkout::create::stripe_create_checkout_session_shared::stripe_create_checkout_session_shared;
 use crate::stripe::stripe_config::StripeConfig;
 use crate::stripe::traits::internal_product_to_stripe_lookup::InternalProductToStripeLookup;
 use crate::stripe::traits::internal_session_cache_purge::InternalSessionCachePurge;
 use crate::stripe::traits::internal_user_lookup::InternalUserLookup;
-use http_server_common::response::serialize_as_json_error::serialize_as_json_error;
-use log::{error, warn};
-use reusable_types::server_environment::ServerEnvironment;
-use sqlx::MySqlPool;
-use std::collections::HashMap;
-use std::fmt;
-use stripe::{CheckoutSession, CheckoutSessionMode, CreateCheckoutSession, CreateCheckoutSessionLineItems};
-use url_config::third_party_url_redirector::ThirdPartyUrlRedirector;
 
 // =============== Request ===============
 

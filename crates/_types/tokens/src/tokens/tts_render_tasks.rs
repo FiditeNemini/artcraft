@@ -1,7 +1,9 @@
-use crate::prefixes::EntityType;
+use std::fmt::Debug;
+
 use serde::Deserialize;
 use serde::Serialize;
-use std::fmt::Debug;
+
+use crate::prefixes::EntityType;
 
 /// The primary key for TTS render tasks (Sqlite / AiChatBotSidecar)
 #[derive(Clone, PartialEq, Eq, sqlx::Type, Debug, Serialize, Deserialize)]

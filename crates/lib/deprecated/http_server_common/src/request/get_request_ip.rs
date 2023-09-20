@@ -1,9 +1,10 @@
+use std::str::FromStr;
+
 use actix_http::header::HeaderMap;
 use actix_http::header::HeaderName;
-use actix_web::HttpRequest;
 use actix_web::dev::ServiceRequest;
+use actix_web::HttpRequest;
 use log::debug;
-use std::str::FromStr;
 
 pub fn get_request_ip(request: &HttpRequest) -> String {
   let headers = request.headers();

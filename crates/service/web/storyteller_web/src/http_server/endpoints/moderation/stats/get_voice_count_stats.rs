@@ -1,21 +1,14 @@
-use actix_http::Error;
-use actix_web::HttpResponseBuilder;
-use actix_web::cookie::Cookie;
+use std::sync::Arc;
+
+use actix_web::{HttpRequest, HttpResponse, web};
 use actix_web::error::ResponseError;
 use actix_web::http::StatusCode;
-use actix_web::web::Path;
-use actix_web::{Responder, web, HttpResponse, error, HttpRequest};
-use chrono::{DateTime, Utc};
-use crate::http_server::web_utils::response_success_helpers::simple_json_success;
+use log::{log, warn};
+
+use mysql_queries::queries::stats::get_voice_count_stats::get_voice_count_stats;
+
 use crate::http_server::web_utils::serialize_as_json_error::serialize_as_json_error;
 use crate::server_state::ServerState;
-use mysql_queries::queries::stats::get_voice_count_stats::get_voice_count_stats;
-use log::{info, warn, log};
-use regex::Regex;
-use sqlx::error::DatabaseError;
-use sqlx::error::Error::Database;
-use sqlx::mysql::MySqlDatabaseError;
-use std::sync::Arc;
 
 #[derive(Serialize)]
 pub struct GetVoiceCountStatsResponse {

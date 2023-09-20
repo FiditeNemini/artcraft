@@ -1,18 +1,16 @@
 //! This service is meant to help with debugging.
 
+use actix_http::StatusCode;
+use actix_web::{App, HttpResponse, HttpServer, web};
+use actix_web::middleware::{Compress, DefaultHeaders, Logger};
+
+use actix_helpers::route_builder::RouteBuilder;
+use errors::AnyhowResult;
+
+use crate::env_args::env_args;
+
 pub mod env_args;
 pub mod handlers;
-
-use actix_http::body::MessageBody;
-use actix_helpers::route_builder::RouteBuilder;
-use actix_http::StatusCode;
-use actix_service::ServiceFactory;
-use actix_web::middleware::{Compress, DefaultHeaders, Logger};
-use actix_web::{App, HttpResponse, HttpServer, web};
-use actix_web::dev::{ServiceRequest, ServiceResponse};
-use crate::env_args::env_args;
-use errors::AnyhowResult;
-use http_server_common::cors::build_cors_config;
 
 pub const DEFAULT_RUST_LOG: &str = concat!(
   "debug,",

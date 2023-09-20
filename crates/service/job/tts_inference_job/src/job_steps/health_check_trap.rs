@@ -1,8 +1,10 @@
-use crate::http_clients::tts_sidecar_health_check_client::HealthState;
-use crate::http_clients::tts_sidecar_health_check_client::TtsSidecarHealthCheckClient;
-use log::{error, info};
 use std::cmp::min;
 use std::time::Duration;
+
+use log::{error, info};
+
+use crate::http_clients::tts_sidecar_health_check_client::HealthState;
+use crate::http_clients::tts_sidecar_health_check_client::TtsSidecarHealthCheckClient;
 
 // Health check timeouts
 const HEALTH_CHECK_START_TIMEOUT_MILLIS : u64 = 250;

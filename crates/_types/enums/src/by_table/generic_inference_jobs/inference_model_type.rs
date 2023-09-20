@@ -5,7 +5,6 @@ use strum::EnumCount;
 #[cfg(test)]
 use strum::EnumIter;
 
-
 /// Used in the `generic_inference_jobs` table in `VARCHAR(32)` field `maybe_model_type`.
 ///
 /// Our "generic inference" pipeline supports a wide variety of ML models and other media.

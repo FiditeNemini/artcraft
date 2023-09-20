@@ -1,7 +1,8 @@
-use log::info;
-use log::warn;
 use std::fs;
 use std::path::Path;
+
+use log::info;
+use log::warn;
 
 pub fn safe_delete_temp_directory<P: AsRef<Path>>(directory_path: P) {
   // NB: We should be using a tempdir, but to make absolutely certain we don't overflow the disk...

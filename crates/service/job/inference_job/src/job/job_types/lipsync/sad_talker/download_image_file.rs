@@ -1,20 +1,21 @@
+use std::path::PathBuf;
+
 use anyhow::anyhow;
+use log::{error, warn};
+use sqlx::MySqlPool;
+use tempdir::TempDir;
+
 use buckets::public::media_uploads::original_file::MediaUploadOriginalFilePath;
-use buckets::public::voice_conversion_results::original_file::VoiceConversionResultOriginalFilePath;
 use cloud_storage::bucket_client::BucketClient;
+use jobs_common::job_progress_reporter::job_progress_reporter::JobProgressReporter;
+use mysql_queries::payloads::generic_inference_args::lipsync_payload::LipsyncAnimationImageSource;
+use mysql_queries::queries::generic_inference::job::list_available_generic_inference_jobs::AvailableInferenceJob;
+use mysql_queries::queries::media_uploads::get_media_upload_for_inference::get_media_upload_for_inference;
+use tokens::files::media_upload::MediaUploadToken;
+
 use crate::job::job_loop::process_single_job_error::ProcessSingleJobError;
 use crate::util::maybe_download_file_from_bucket::maybe_download_file_from_bucket;
 use crate::util::scoped_temp_dir_creator::ScopedTempDirCreator;
-use jobs_common::job_progress_reporter::job_progress_reporter::JobProgressReporter;
-use log::{error, warn};
-use mysql_queries::payloads::generic_inference_args::lipsync_payload::{LipsyncAnimationAudioSource, LipsyncAnimationImageSource};
-use mysql_queries::queries::generic_inference::job::list_available_generic_inference_jobs::AvailableInferenceJob;
-use mysql_queries::queries::media_uploads::get_media_upload_for_inference::get_media_upload_for_inference;
-use mysql_queries::queries::voice_conversion::results::get_voice_conversion_result_for_inference::get_voice_conversion_result_for_inference;
-use sqlx::MySqlPool;
-use std::path::PathBuf;
-use tempdir::TempDir;
-use tokens::files::media_upload::MediaUploadToken;
 
 pub struct ImageFile {
   pub filesystem_path: PathBuf,

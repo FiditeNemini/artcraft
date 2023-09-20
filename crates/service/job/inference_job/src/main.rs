@@ -17,10 +17,13 @@
 
 #[macro_use] extern crate serde_derive;
 
-pub mod http_server;
-pub mod job;
-pub mod job_dependencies;
-pub mod util;
+use std::path::PathBuf;
+use std::time::Duration;
+
+use log::{info, warn};
+use r2d2_redis::r2d2;
+use r2d2_redis::RedisConnectionManager;
+use sqlx::mysql::MySqlPoolOptions;
 
 use bootstrap::bootstrap::{bootstrap, BootstrapArgs};
 use cloud_storage::bucket_client::BucketClient;
@@ -31,10 +34,24 @@ use config::shared_constants::DEFAULT_MYSQL_CONNECTION_STRING;
 use config::shared_constants::DEFAULT_RUST_LOG;
 use container_common::anyhow_result::AnyhowResult;
 use container_common::filesystem::check_directory_exists::check_directory_exists;
+use filesys::create_dir_all_if_missing::create_dir_all_if_missing;
+use jobs_common::job_progress_reporter::job_progress_reporter::JobProgressReporterBuilder;
+use jobs_common::job_progress_reporter::noop_job_progress_reporter::NoOpJobProgressReporterBuilder;
+use jobs_common::job_progress_reporter::redis_job_progress_reporter::RedisJobProgressReporterBuilder;
+use jobs_common::job_stats::JobStats;
+use jobs_common::semi_persistent_cache_dir::SemiPersistentCacheDir;
+use memory_caching::multi_item_ttl_cache::MultiItemTtlCache;
+use memory_caching::ttl_key_counter::TtlKeyCounter;
+use mysql_queries::common_inputs::container_environment_arg::ContainerEnvironmentArg;
+use mysql_queries::mediators::firehose_publisher::FirehosePublisher;
+use newrelic_telemetry::ClientBuilder;
+use subprocess_common::docker_options::{DockerEnvVar, DockerFilesystemMount, DockerGpu, DockerOptions};
+
 use crate::http_server::run_http_server::CreateServerArgs;
 use crate::http_server::run_http_server::launch_http_server;
 use crate::job::job_loop::main_loop::main_loop;
 use crate::job::job_types::lipsync::sad_talker::model_downloaders::SadTalkerDownloaders;
+use crate::job::job_types::lipsync::sad_talker::sad_talker_inference_command::SadTalkerInferenceCommand;
 use crate::job::job_types::tts::tacotron2_v2_early_fakeyou::tacotron2_inference_command::Tacotron2InferenceCommand;
 use crate::job::job_types::tts::vits::vits_inference_command::VitsInferenceCommand;
 use crate::job::job_types::vc::rvc_v2::pretrained_hubert_model::PretrainedHubertModel;
@@ -43,25 +60,11 @@ use crate::job::job_types::vc::so_vits_svc::so_vits_svc_inference_command::SoVit
 use crate::job_dependencies::{FileSystemDetails, JobCaches, JobDependencies, JobTypeDetails, JobWorkerDetails, PretrainedModels, RvcV2Details, SadTalkerDetails, SoVitsSvcDetails, Tacotron2VocodesDetails, VitsDetails};
 use crate::util::scoped_execution::ScopedExecution;
 use crate::util::scoped_temp_dir_creator::ScopedTempDirCreator;
-use filesys::create_dir_all_if_missing::create_dir_all_if_missing;
-use jobs_common::job_progress_reporter::job_progress_reporter::JobProgressReporterBuilder;
-use jobs_common::job_progress_reporter::noop_job_progress_reporter::NoOpJobProgressReporterBuilder;
-use jobs_common::job_progress_reporter::redis_job_progress_reporter::RedisJobProgressReporterBuilder;
-use jobs_common::job_stats::JobStats;
-use jobs_common::semi_persistent_cache_dir::SemiPersistentCacheDir;
-use log::{info, warn};
-use memory_caching::multi_item_ttl_cache::MultiItemTtlCache;
-use memory_caching::ttl_key_counter::TtlKeyCounter;
-use mysql_queries::common_inputs::container_environment_arg::ContainerEnvironmentArg;
-use mysql_queries::mediators::firehose_publisher::FirehosePublisher;
-use newrelic_telemetry::ClientBuilder;
-use r2d2_redis::RedisConnectionManager;
-use r2d2_redis::r2d2;
-use sqlx::mysql::MySqlPoolOptions;
-use std::path::PathBuf;
-use std::time::Duration;
-use subprocess_common::docker_options::{DockerEnvVar, DockerFilesystemMount, DockerGpu, DockerOptions};
-use crate::job::job_types::lipsync::sad_talker::sad_talker_inference_command::SadTalkerInferenceCommand;
+
+pub mod http_server;
+pub mod job;
+pub mod job_dependencies;
+pub mod util;
 
 // Buckets (shared config)
 const ENV_ACCESS_KEY : &str = "ACCESS_KEY";

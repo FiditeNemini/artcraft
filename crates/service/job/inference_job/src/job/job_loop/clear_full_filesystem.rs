@@ -1,6 +1,7 @@
+use log::warn;
+
 use container_common::collections::multiple_random_from_vec::multiple_random_from_vec;
 use errors::AnyhowResult;
-use log::warn;
 use jobs_common::semi_persistent_cache_dir::SemiPersistentCacheDir;
 
 pub fn clear_full_filesystem(cache_dir: &SemiPersistentCacheDir) -> AnyhowResult<()> {

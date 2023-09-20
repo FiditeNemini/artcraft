@@ -1,6 +1,6 @@
-use std::ops::Deref;
 use chrono::{DateTime, Utc};
 use once_cell::sync::Lazy;
+
 use crate::text_pipelines::text_pipeline_type::TextPipelineType;
 
 // TODO: This is not yet popularized
@@ -37,6 +37,7 @@ pub fn guess_text_pipeline_heuristic(maybe_model_created_at: Option<DateTime<Utc
 #[cfg(test)]
 mod tests {
   use chrono::{DateTime, Utc};
+
   use crate::text_pipelines::guess_pipeline::guess_text_pipeline_heuristic;
   use crate::text_pipelines::text_pipeline_type::TextPipelineType;
 

@@ -1,14 +1,16 @@
+use std::sync::Arc;
+
+use actix_web::{App, HttpResponse, HttpServer, web};
 use actix_web::dev::Server;
 use actix_web::middleware::Logger;
-use actix_web::{App, HttpResponse, HttpServer, middleware, web};
+use log::info;
+
+use bootstrap::bootstrap::ContainerEnvironment;
+use errors::AnyhowResult;
+use jobs_common::job_stats::JobStats;
+
 use crate::http_server::endpoints::health_check_handler::get_health_check_handler;
 use crate::http_server::http_server_shared_state::HttpServerSharedState;
-use crate::job_dependencies::JobDependencies;
-use errors::AnyhowResult;
-use log::info;
-use std::sync::Arc;
-use bootstrap::bootstrap::ContainerEnvironment;
-use jobs_common::job_stats::JobStats;
 
 const DEFAULT_BIND_ADDRESS : &str = "0.0.0.0:12345";
 const DEFAULT_NUM_WORKERS : usize = 4;

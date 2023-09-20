@@ -1,15 +1,17 @@
+use std::collections::HashMap;
+use std::fmt;
+use std::time::Duration;
+
+use anyhow::Result;
+use serde::{Serialize, Serializer};
+use uuid::Uuid;
+
 ///
 /// Copyright 2020 New Relic Corporation. All rights reserved.
 /// SPDX-License-Identifier: Apache-2.0
 ///
 use crate::attribute::Value;
 use crate::client::Sendable;
-use anyhow::Result;
-use serde::{Serialize, Serializer};
-use std::collections::HashMap;
-use std::fmt;
-use std::time::Duration;
-use uuid::Uuid;
 
 /// Represents a distributed tracing span.
 #[derive(serde::Serialize, Clone, Debug, PartialEq)]
@@ -216,13 +218,16 @@ impl fmt::Display for SpanBatch {
 
 #[cfg(test)]
 mod tests {
-    use super::{Sendable, Span, SpanBatch};
-    use crate::attribute::Value;
-    use anyhow::Result;
-    use serde_json::json;
-    use std::time::Duration;
+  use std::time::Duration;
 
-    macro_rules! assert_json_eq {
+  use anyhow::Result;
+  use serde_json::json;
+
+  use crate::attribute::Value;
+
+  use super::{Sendable, Span, SpanBatch};
+
+  macro_rules! assert_json_eq {
         ($x: expr, $y: expr) => {
             let (left, right) = ($x, $y);
             assert!(

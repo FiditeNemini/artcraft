@@ -1,25 +1,17 @@
-use actix_http::Error;
-use actix_web::HttpResponseBuilder;
-use actix_web::cookie::Cookie;
-use actix_web::error::ResponseError;
-use actix_web::http::StatusCode;
-use actix_web::web::{Path, Json};
-use actix_web::{Responder, web, HttpResponse, error, HttpRequest};
-use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
-use crate::http_server::web_utils::response_success_helpers::simple_json_success;
-use crate::server_state::ServerState;
-use mysql_queries::queries::model_categories::create_category::{create_category, CreateCategoryArgs};
-use mysql_queries::tokens::Tokens;
-use http_server_common::request::get_request_ip::get_request_ip;
-use http_server_common::response::serialize_as_json_error::serialize_as_json_error;
-use log::{info, warn, log};
-use regex::Regex;
-use sqlx::MySqlPool;
-use sqlx::error::DatabaseError;
-use sqlx::error::Error::Database;
-use sqlx::mysql::MySqlDatabaseError;
 use std::fmt;
 use std::sync::Arc;
+
+use actix_web::{HttpRequest, HttpResponse, web};
+use actix_web::error::ResponseError;
+use actix_web::http::StatusCode;
+use log::{log, warn};
+
+use http_server_common::request::get_request_ip::get_request_ip;
+use http_server_common::response::serialize_as_json_error::serialize_as_json_error;
+use mysql_queries::queries::model_categories::create_category::{create_category, CreateCategoryArgs};
+use mysql_queries::tokens::Tokens;
+
+use crate::server_state::ServerState;
 
 const DEFAULT_CAN_DIRECTLY_HAVE_MODELS : bool = true;
 const DEFAULT_CAN_HAVE_SUBCATEGORIES : bool = false;

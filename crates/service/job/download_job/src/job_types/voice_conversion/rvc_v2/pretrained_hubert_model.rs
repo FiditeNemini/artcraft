@@ -1,12 +1,14 @@
+use std::path::PathBuf;
+
 use anyhow::anyhow;
+use log::info;
+use tempdir::TempDir;
+
 use cloud_storage::bucket_client::BucketClient;
 use container_common::filesystem::safe_delete_temp_directory::safe_delete_temp_directory;
 use errors::AnyhowResult;
 use filesys::create_dir_all_if_missing::create_dir_all_if_missing;
 use filesys::file_exists::file_exists;
-use log::info;
-use std::path::PathBuf;
-use tempdir::TempDir;
 
 #[derive(Clone)]
 pub struct PretrainedHubertModel {

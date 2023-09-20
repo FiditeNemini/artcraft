@@ -217,10 +217,11 @@ impl From<bool> for Value {
 
 #[cfg(test)]
 mod tests {
-    use super::Value;
-    use serde_json::json;
+  use serde_json::json;
 
-    #[test]
+  use super::Value;
+
+  #[test]
     fn value_to_json() {
         // Attribute values should serialize to plain JSON values.
         assert_eq!(json!(Value::Int(-5)), json!(-5));

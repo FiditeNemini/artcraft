@@ -1,6 +1,8 @@
-use once_cell::sync::Lazy;
 use std::collections::HashMap;
+
+use once_cell::sync::Lazy;
 use unicode_segmentation::UnicodeSegmentation;
+
 use user_input_common::latin_alphabet::LATIN_TO_ASCII_CHARACTER_MAP;
 
 // Used to insert tables into hashmap
@@ -167,10 +169,10 @@ pub fn clean_symbols(input_text: &str) -> String {
 
 #[cfg(test)]
 mod tests {
-  use std::time::Instant;
   use chrono::{DateTime, Utc};
   use log::warn;
   use once_cell::sync::Lazy;
+
   use crate::clean_symbols::clean_symbols;
 
   const TIME_BOMB_EPOCH_STR : &str = "2023-11-01T00:00:00.00Z";

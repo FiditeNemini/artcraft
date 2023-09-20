@@ -1,12 +1,13 @@
 use anyhow::anyhow;
 use chrono::{DateTime, Utc};
-use crate::queries::comments::comment_entity_token::CommentEntityToken;
-use enums::by_table::comments::comment_entity_type::CommentEntityType;
-use errors::AnyhowResult;
 use log::warn;
 use sqlx::MySqlPool;
+
+use errors::AnyhowResult;
 use tokens::tokens::comments::CommentToken;
 use tokens::users::user::UserToken;
+
+use crate::queries::comments::comment_entity_token::CommentEntityToken;
 
 pub struct CommentForList {
   pub token: CommentToken,

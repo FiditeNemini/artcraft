@@ -1,26 +1,29 @@
-use anyhow::{anyhow, Error};
+use std::ops::Sub;
+use std::sync::{Arc, RwLock};
+use std::thread::sleep;
+use std::time::Duration;
+
+use anyhow::anyhow;
+use log::error;
+use log::info;
+use log::warn;
+use r2d2_redis::r2d2;
+use r2d2_redis::redis::Commands;
+use r2d2_redis::RedisConnectionManager;
+use sqlx::MySql;
+use time::Duration as  TimeDuration;
+use time::Instant;
+use twitch_api2::pubsub::{Response, TopicData, TwitchResponse};
+
 use container_common::anyhow_result::AnyhowResult;
 use container_common::thread::thread_id::ThreadId;
-use crate::twitch::constants::TWITCH_PING_CADENCE;
-use crate::twitch::oauth::oauth_token_refresher::OauthTokenRefresher;
-use crate::twitch::pubsub::build_pubsub_topics_for_user::build_pubsub_topics_for_user;
-use crate::twitch::websocket_client::TwitchWebsocketClient;
 use mysql_queries::complex_models::event_match_predicate::EventMatchPredicate;
 use mysql_queries::complex_models::event_responses::EventResponse;
 use mysql_queries::queries::tts::tts_inference_jobs::insert_tts_inference_job::TtsInferenceJobInsertBuilder;
 use mysql_queries::queries::twitch::twitch_event_rules::list_twitch_event_rules_for_user::list_twitch_event_rules_for_user;
-use mysql_queries::queries::twitch::twitch_oauth::find::{TwitchOauthTokenRecord, TwitchOauthTokenFinder};
+use mysql_queries::queries::twitch::twitch_oauth::find::{TwitchOauthTokenFinder, TwitchOauthTokenRecord};
 use mysql_queries::queries::twitch::twitch_oauth::insert::TwitchOauthTokenInsertBuilder;
-use mysql_queries::queries::twitch::twitch_pubsub::insert_bits::TwitchPubsubBitsInsertBuilder;
-use mysql_queries::queries::twitch::twitch_pubsub::insert_channel_points::TwitchPubsubChannelPointsInsertBuilder;
 use mysql_queries::tokens::Tokens;
-use log::debug;
-use log::error;
-use log::info;
-use log::warn;
-use r2d2_redis::RedisConnectionManager;
-use r2d2_redis::r2d2;
-use r2d2_redis::redis::Commands;
 use redis_common::payloads::lease_payload::LeasePayload;
 use redis_common::redis_keys::RedisKeys;
 use redis_common::shared_constants::LEASE_CHECK_PERIOD;
@@ -28,23 +31,18 @@ use redis_common::shared_constants::LEASE_RENEW_PERIOD;
 use redis_common::shared_constants::LEASE_TIMEOUT_SECONDS;
 use redis_common::shared_constants::OBS_ACTIVE_CHECK_PERIOD;
 use redis_common::shared_constants::STREAMER_TTS_JOB_QUEUE_TTL_SECONDS;
-use sqlx::MySql;
-use std::ops::Sub;
-use std::sync::{Arc, RwLock, PoisonError, RwLockWriteGuard};
-use std::thread::sleep;
-use std::time::Duration;
-use time::Duration as  TimeDuration;
-use time::Instant;
-use twitch_api2::pubsub::channel_bits::ChannelBitsEventsV2Reply;
-use twitch_api2::pubsub::channel_points::ChannelPointsChannelV1Reply;
-use twitch_api2::pubsub::{Response, TwitchResponse, TopicData};
 use twitch_common::cheers::remove_cheers;
 use twitch_common::twitch_user_id::TwitchUserId;
-use crate::threads::twitch_pubsub_user_subscriber::subscriber_preferences_cache::TwitchPubsubCachedState;
-use crate::threads::twitch_pubsub_user_subscriber::subscriber_preferences_cache::TwitchEventRuleLight;
-use crate::threads::twitch_pubsub_user_subscriber::event_handlers::channel_points_event_handler::ChannelPointsEventHandler;
-use crate::threads::twitch_pubsub_user_subscriber::tts_writer::TtsWriter;
+
 use crate::threads::twitch_pubsub_user_subscriber::event_handlers::bits_event_handler::BitsEventHandler;
+use crate::threads::twitch_pubsub_user_subscriber::event_handlers::channel_points_event_handler::ChannelPointsEventHandler;
+use crate::threads::twitch_pubsub_user_subscriber::subscriber_preferences_cache::TwitchEventRuleLight;
+use crate::threads::twitch_pubsub_user_subscriber::subscriber_preferences_cache::TwitchPubsubCachedState;
+use crate::threads::twitch_pubsub_user_subscriber::tts_writer::TtsWriter;
+use crate::twitch::constants::TWITCH_PING_CADENCE;
+use crate::twitch::oauth::oauth_token_refresher::OauthTokenRefresher;
+use crate::twitch::pubsub::build_pubsub_topics_for_user::build_pubsub_topics_for_user;
+use crate::twitch::websocket_client::TwitchWebsocketClient;
 
 // TODO: Publish events back to OBS thread
 // TODO: (cleanup) make the logic clearer to follow.

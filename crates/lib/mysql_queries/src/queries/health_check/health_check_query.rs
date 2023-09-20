@@ -1,7 +1,8 @@
 use anyhow::anyhow;
-use chrono::{Utc, DateTime, NaiveDateTime};
-use errors::AnyhowResult;
+use chrono::NaiveDateTime;
 use sqlx::MySqlPool;
+
+use errors::AnyhowResult;
 
 /// This just queries for current time. If it fails, we know the connection pool is dead.
 pub struct HealthCheckResult {

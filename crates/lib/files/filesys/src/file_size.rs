@@ -1,4 +1,5 @@
 use std::path::Path;
+
 use errors::{anyhow, AnyhowResult};
 
 /// Return the file size of the file.
@@ -18,6 +19,7 @@ pub fn file_size<P: AsRef<Path>>(filename: P) -> AnyhowResult<u64> {
 #[cfg(test)]
 mod tests {
   use std::path::PathBuf;
+
   use crate::file_size::file_size;
 
   fn test_file(path_from_repo_root: &str) -> PathBuf {
