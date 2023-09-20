@@ -5,18 +5,14 @@
   "heroButtonUpgradePlan": "Plan de mise à niveau",
   "heroText": "Utilisez cet outil pour changer votre voix en vos personnages préférés.",
   "heroTitle": "Voix à voix",
-  "vcButtonClear": "Clair",
   "vcButtonConvert": "Convertir",
-  "vcButtonStartRecord": "Commencer l'enregistrement",
-  "vcButtonStopRecord": "Arrête d'enregistrer",
-  "vcButtonUploadAudio": "Télécharger l'audio",
   "vcConvertLabel": "Convertir l'audio",
+  "vcPitchControlF0": "c'est parti pour chanter, c'est parti pour parler",
   "vcPitchControlLabel": "Contrôle du pas",
   "vcRecordAudioLabel": "Enregistrement audio",
   "vcResultsTitle": "Résultats de la session V2V",
   "vcTabRecord": "Microphone",
   "vcTabUpload": "Télécharger",
   "vcUploadFileLabel": "Télécharger l'audio d'entrée",
-  "vcUploadFileText": "<u><b>Télécharger un fichier</b></u> ou dépose-le ici",
-  "vcVoiceLabel": "Choisissez la voix cible (numéro au choix)"
+  "vcVoiceLabel": "Choisissez la voix cible ({{0}} au choix)"
 }

@@ -5,18 +5,14 @@
   "heroButtonUpgradePlan": "План обновления",
   "heroText": "Используйте этот инструмент, чтобы изменить свой голос на любимых персонажей.",
   "heroTitle": "Голос в голос",
-  "vcButtonClear": "Прозрачный",
   "vcButtonConvert": "Конвертировать",
-  "vcButtonStartRecord": "Начать запись",
-  "vcButtonStopRecord": "Остановить запись",
-  "vcButtonUploadAudio": "Загрузить аудио",
   "vcConvertLabel": "Конвертировать аудио",
+  "vcPitchControlF0": "выключено для пения, включено для речи",
   "vcPitchControlLabel": "Управление по каналу тангажа",
   "vcRecordAudioLabel": "Запись аудио",
   "vcResultsTitle": "Результаты сеанса V2V",
   "vcTabRecord": "Микрофон",
   "vcTabUpload": "Загрузить",
   "vcUploadFileLabel": "Загрузить входной аудиофайл",
-  "vcUploadFileText": "<u><b>Загрузить файл</b></u> или скинь сюда",
-  "vcVoiceLabel": "Выберите целевой голос (номер на выбор)"
+  "vcVoiceLabel": "Выберите целевой голос ({{0}} выбирать из)"
 }

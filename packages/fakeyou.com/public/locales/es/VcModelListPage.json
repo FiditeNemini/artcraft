@@ -5,18 +5,14 @@
   "heroButtonUpgradePlan": "Plan de actualización",
   "heroText": "Utilice esta herramienta para cambiar su voz a la de sus personajes favoritos.",
   "heroTitle": "Voz a Voz",
-  "vcButtonClear": "Claro",
   "vcButtonConvert": "Convertir",
-  "vcButtonStartRecord": "Empezar a grabar",
-  "vcButtonStopRecord": "Para de grabar",
-  "vcButtonUploadAudio": "Subir Audio",
   "vcConvertLabel": "Convertir audio",
+  "vcPitchControlF0": "Fuera para cantar, encendido para hablar.",
   "vcPitchControlLabel": "Control de tono",
   "vcRecordAudioLabel": "Grabar audio",
   "vcResultsTitle": "Resultados de la sesión V2V",
   "vcTabRecord": "Micrófono",
   "vcTabUpload": "Subir",
   "vcUploadFileLabel": "Cargar audio de entrada",
-  "vcUploadFileText": "<u><b>Cargar un archivo</b></u> o déjalo aquí",
-  "vcVoiceLabel": "Elija Target Voice (número para elegir)"
+  "vcVoiceLabel": "Elija la voz de destino ({{0}} Para escoger de)"
 }

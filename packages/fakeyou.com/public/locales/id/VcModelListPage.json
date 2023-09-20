@@ -5,18 +5,14 @@
   "heroButtonUpgradePlan": "Paket Peningkatan",
   "heroText": "Gunakan alat ini untuk mengubah suara Anda menjadi karakter favorit Anda.",
   "heroTitle": "Suara ke Suara",
-  "vcButtonClear": "Jernih",
   "vcButtonConvert": "Mengubah",
-  "vcButtonStartRecord": "Mulai merekam",
-  "vcButtonStopRecord": "Berhenti Merekam",
-  "vcButtonUploadAudio": "Unggah Audio",
   "vcConvertLabel": "Konversi Audio",
+  "vcPitchControlF0": "off untuk menyanyi, untuk pidato",
   "vcPitchControlLabel": "Kontrol Nada",
   "vcRecordAudioLabel": "Suara rekaman",
   "vcResultsTitle": "Hasil Sesi V2V",
   "vcTabRecord": "Mikropon",
   "vcTabUpload": "Mengunggah",
   "vcUploadFileLabel": "Unggah Audio Masukan",
-  "vcUploadFileText": "<u><b>Unggah file</b></u> atau letakkan di sini",
-  "vcVoiceLabel": "Pilih Suara Target (nomor yang dapat dipilih)"
+  "vcVoiceLabel": "Pilih Suara Sasaran ({{0}} untuk memilih dari)"
 }

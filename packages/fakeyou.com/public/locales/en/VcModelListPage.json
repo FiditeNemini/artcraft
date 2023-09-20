@@ -5,18 +5,14 @@
   "heroButtonUpgradePlan": "Upgrade Plan",
   "heroText": "Use this tool to change your voice into your favorite characters.",
   "heroTitle": "Voice to Voice",
-  "vcButtonClear": "Clear",
   "vcButtonConvert": "Convert",
-  "vcButtonStartRecord": "Start Recording",
-  "vcButtonStopRecord": "Stop Recording",
-  "vcButtonUploadAudio": "Upload Audio",
   "vcConvertLabel": "Convert Audio",
+  "vcPitchControlF0": "off for singing, on for speech",
   "vcPitchControlLabel": "Pitch Control",
   "vcRecordAudioLabel": "Record Audio",
   "vcResultsTitle": "Session V2V Results",
   "vcTabRecord": "Microphone",
   "vcTabUpload": "Upload",
   "vcUploadFileLabel": "Upload Input Audio",
-  "vcUploadFileText": "<u><b>Upload a file</b></u> or drop it here",
-  "vcVoiceLabel": "Choose Target Voice (number to choose from)"
+  "vcVoiceLabel": "Choose Target Voice ({{0}} to choose from)"
 }

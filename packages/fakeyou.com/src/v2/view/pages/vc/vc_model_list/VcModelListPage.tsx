@@ -246,8 +246,7 @@ function VcModelListPage(props: Props) {
             >
               {/* Explore Rollout */}
               <label className="sub-title">
-                Choose Target Voice ({voiceConversionModels.length} to choose
-                from)
+                {t("vcVoiceLabel", { 0: voiceConversionModels.length })}
               </label>
               <div className="input-icon-search pb-4">
                 <span className="form-control-feedback">
@@ -278,7 +277,7 @@ function VcModelListPage(props: Props) {
                         aria-controls="prerecorded"
                         aria-selected="true"
                       >
-                        Upload
+                        {t("vcTabUpload")}
                       </button>
                     </li>
                     <li className="nav-item w-100" role="presentation">
@@ -292,7 +291,7 @@ function VcModelListPage(props: Props) {
                         aria-controls="recordaudio"
                         aria-selected="false"
                       >
-                        Microphone
+                        {t("vcTabRecord")}
                       </button>
                     </li>
                   </ul>
@@ -306,7 +305,7 @@ function VcModelListPage(props: Props) {
                       <div className="d-flex flex-column gap-4 h-100">
                         <div>
                           <label className="sub-title">
-                            Upload Input Audio
+                            {t("vcUploadFileLabel")}
                           </label>
                           <div className="d-flex flex-column gap-3 upload-component">
                             <UploadComponent
@@ -322,7 +321,9 @@ function VcModelListPage(props: Props) {
                         </div>
 
                         <div>
-                          <label className="sub-title">Pitch Control</label>
+                          <label className="sub-title">
+                            {t("vcPitchControlLabel")}
+                          </label>
                           <div className="d-flex flex-column gap-3">
                             <div>
                               <PitchEstimateMethodComponent
@@ -351,7 +352,7 @@ function VcModelListPage(props: Props) {
                                 className="form-check-label"
                                 htmlFor="autoF0Checkbox"
                               >
-                                Auto F0 (off for singing, on for speech)
+                                Auto F0 ({t("vcPitchControlF0")})
                               </label>
                             </div>
                           </div>
@@ -383,7 +384,9 @@ function VcModelListPage(props: Props) {
                               </div>*/}
 
                         <div>
-                          <label className="sub-title">Convert Audio</label>
+                          <label className="sub-title">
+                            {t("vcConvertLabel")}
+                          </label>
 
                           <div className="d-flex gap-3">
                             <button
@@ -396,7 +399,7 @@ function VcModelListPage(props: Props) {
                                 icon={faRightLeft}
                                 className="me-2"
                               />
-                              Convert
+                              {t("vcButtonConvert")}
                               {convertLoading && <LoadingIcon />}
                             </button>
                           </div>
@@ -411,7 +414,9 @@ function VcModelListPage(props: Props) {
                     >
                       <div className="d-flex flex-column gap-4 h-100">
                         <div>
-                          <label className="sub-title">Record Audio</label>
+                          <label className="sub-title">
+                            {t("vcRecordAudioLabel")}
+                          </label>
                           <div className="d-flex flex-column gap-3 upload-component">
                             <RecordComponent
                               setMediaUploadToken={setMediaUploadToken}
@@ -426,7 +431,9 @@ function VcModelListPage(props: Props) {
                         </div>
 
                         <div>
-                          <label className="sub-title">Pitch Control</label>
+                          <label className="sub-title">
+                            {t("vcPitchControlLabel")}
+                          </label>
                           <div className="d-flex flex-column gap-3">
                             <div>
                               <PitchEstimateMethodComponent
@@ -455,14 +462,16 @@ function VcModelListPage(props: Props) {
                                 className="form-check-label"
                                 htmlFor="autoF0CheckboxMic"
                               >
-                                Auto F0 (off for singing, on for speech)
+                                Auto F0 ({t("vcPitchControlF0")})
                               </label>
                             </div>
                           </div>
                         </div>
 
                         <div>
-                          <label className="sub-title">Convert Audio</label>
+                          <label className="sub-title">
+                            {t("vcConvertLabel")}
+                          </label>
 
                           <div className="d-flex gap-3">
                             <button
@@ -475,7 +484,7 @@ function VcModelListPage(props: Props) {
                                 icon={faRightLeft}
                                 className="me-2"
                               />
-                              Convert
+                              {t("vcButtonConvert")}
                               {convertLoading && <LoadingIcon />}
                             </button>
                           </div>
@@ -491,7 +500,7 @@ function VcModelListPage(props: Props) {
                         icon={faBarsStaggered}
                         className="me-3"
                       />
-                      Session V2V Results
+                      {t("vcResultsTitle")}
                     </h4>
                     <div className="d-flex flex-column gap-3 session-tts-section session-vc-section">
                       <SessionVoiceConversionResultsList

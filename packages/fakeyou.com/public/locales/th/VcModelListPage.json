@@ -5,18 +5,15 @@
   "heroButtonUpgradePlan": "อัพเกรดแผน",
   "heroText": "ใช้เครื่องมือนี้เพื่อเปลี่ยนเสียงของคุณให้เป็นตัวละครที่คุณชื่นชอบ",
   "heroTitle": "แปลงเสียงเป็นอีกเสียง",
-  "vcButtonClear": "ชัดเจน",
+  "vcButtonClear": "ลบ",
   "vcButtonConvert": "แปลง",
-  "vcButtonStartRecord": "เริ่มการบันทึก",
-  "vcButtonStopRecord": "หยุดการบันทึก",
-  "vcButtonUploadAudio": "อัปโหลดเสียง",
   "vcConvertLabel": "แปลงเสียง",
+  "vcPitchControlF0": "ปิดเพื่อร้องเพลง เปิดเพื่อพูด",
   "vcPitchControlLabel": "การควบคุมระดับเสียง",
   "vcRecordAudioLabel": "บันทึกเสียง",
   "vcResultsTitle": "ผลลัพธ์เซสชัน V2V",
   "vcTabRecord": "ไมโครโฟน",
-  "vcTabUpload": "ที่อัพโหลด",
+  "vcTabUpload": "อัพโหลด",
   "vcUploadFileLabel": "อัปโหลดเสียงอินพุต",
-  "vcUploadFileText": "<u><b>อัปโหลดไฟล์</b></u> หรือวางไว้ที่นี่",
-  "vcVoiceLabel": "เลือกเสียงเป้าหมาย (จำนวนให้เลือก)"
+  "vcVoiceLabel": "เลือกเสียงเป้าหมาย ({{0}} ให้เลือก)"
 }

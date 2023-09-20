@@ -1,6 +1,4 @@
 import React, { useEffect, useState } from "react";
-import { t } from "i18next";
-import { Trans } from "react-i18next";
 import { Link } from "react-router-dom";
 import { BucketConfig } from "@storyteller/components/src/api/BucketConfig";
 import { JobState } from "@storyteller/components/src/jobs/JobStates";
@@ -21,6 +19,7 @@ import {
   GetPendingTtsJobCountSuccessResponse,
 } from "@storyteller/components/src/api/tts/GetPendingTtsJobCount";
 import { InferenceJob } from "@storyteller/components/src/jobs/InferenceJob";
+import { useLocalize } from "hooks";
 
 interface Props {
   inferenceJobs: Array<InferenceJob>;
@@ -32,6 +31,7 @@ interface Props {
 const DEFAULT_QUEUE_REFRESH_INTERVAL_MILLIS = 15000;
 
 function SessionVoiceConversionResultsList(props: Props) {
+  const { t } = useLocalize("SessionVoiceConversionResultsList");
   const [pendingTtsJobs, setPendingTtsJobs] =
     useState<GetPendingTtsJobCountSuccessResponse>({
       success: true,
@@ -78,34 +78,32 @@ function SessionVoiceConversionResultsList(props: Props) {
         case JobState.UNKNOWN:
           stateDescription =
             job.maybeExtraStatusDescription == null
-              ? t("common.SessionTtsInferenceResults.progress.pending")
+              ? t("resultsProgressPending")
               : job.maybeExtraStatusDescription;
           break;
         case JobState.STARTED:
           cssStyle = "alert alert-success mb-0";
           stateDescription =
             job.maybeExtraStatusDescription == null
-              ? t("common.SessionTtsInferenceResults.progress.started")
+              ? t("resultsProgressStarted")
               : job.maybeExtraStatusDescription;
           break;
         case JobState.ATTEMPT_FAILED:
           cssStyle = "alert alert-danger mb-0";
-          stateDescription = `Failed ${job.attemptCount} attempt(s). Will retry...`;
+          stateDescription = `${
+            (t("resultsProgressFail"), { 0: job.attemptCount || "0" })
+          }}`;
           break;
         case JobState.COMPLETE_FAILURE:
         case JobState.DEAD:
           cssStyle = "alert alert-danger mb-0";
           // TODO(bt,2023-01-23): Translate when I can test it
-          stateDescription = t(
-            "common.SessionTtsInferenceResults.progress.dead"
-          );
+          stateDescription = t("resultsProgressDead");
           break;
         case JobState.COMPLETE_SUCCESS:
           cssStyle = "message is-success mb-0";
           // Not sure why we're here instead of other branch!
-          stateDescription = t(
-            "common.SessionTtsInferenceResults.progress.success"
-          );
+          stateDescription = t("resultsProgressSuccess");
           break;
       }
 
@@ -176,7 +174,7 @@ function SessionVoiceConversionResultsList(props: Props) {
                   download={audioDownloadFilename}
                 >
                   <FontAwesomeIcon icon={faDownload} className="me-2" />
-                  Download File{" "}
+                  {t("resultsAudioDownload")}
                 </a>
               </div>
             </div>
@@ -190,10 +188,8 @@ function SessionVoiceConversionResultsList(props: Props) {
     <div className="panel panel-inner text-center p-5 rounded-5 h-100">
       <div className="d-flex flex-column opacity-75 h-100 justify-content-center">
         <FontAwesomeIcon icon={faHeadphonesSimple} className="fs-3 mb-3" />
-        <h5 className="fw-semibold">
-          {t("common.SessionTtsInferenceResults.noResults.title")}
-        </h5>
-        <p>{t("common.SessionTtsInferenceResults.noResults.subtitle")}</p>
+        <h5 className="fw-semibold">{t("resultsBlankText")}</h5>
+        <p>{t("resultsBlankSubText")}</p>
       </div>
     </div>
   );
@@ -213,19 +209,17 @@ function SessionVoiceConversionResultsList(props: Props) {
       <div className="d-flex flex-column gap-3 sticky-top zi-2">
         <div className="alert alert-warning alert-cta mb-0">
           <FontAwesomeIcon icon={faClock} className="me-2" />
-          <Trans i18nKey="common.SessionTtsInferenceResults.premium.ad">
-            Don't want to wait? Step to the back of the line with a{" "}
-            <Link
-              to={WebUrl.pricingPageWithReferer("nowait")}
-              onClick={() => {
-                Analytics.ttsTooSlowUpgradePremium();
-              }}
-              className="alert-link fw-semibold"
-            >
-              FakeYou membership.
-            </Link>
-          </Trans>{" "}
-          (TTS Queued:{" "}
+          {t("resultsUpgradeNotice")}{" "}
+          <Link
+            to={WebUrl.pricingPageWithReferer("nowait")}
+            onClick={() => {
+              Analytics.ttsTooSlowUpgradePremium();
+            }}
+            className="alert-link fw-semibold"
+          >
+            {t("resultsUpgradeLinkText")}
+          </Link>{" "}
+          ({t("resultsTtsQueued")}{" "}
           <span className="text-red">~{pendingTtsJobs.pending_job_count}</span>)
         </div>
       </div>

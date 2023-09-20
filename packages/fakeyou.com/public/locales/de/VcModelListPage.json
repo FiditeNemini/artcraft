@@ -5,18 +5,14 @@
   "heroButtonUpgradePlan": "Upgrade-Plan",
   "heroText": "Verwenden Sie dieses Tool, um Ihre Stimme in Ihre Lieblingscharaktere zu verwandeln.",
   "heroTitle": "Stimme zu Stimme",
-  "vcButtonClear": "Klar",
   "vcButtonConvert": "Konvertieren",
-  "vcButtonStartRecord": "Starte die Aufnahme",
-  "vcButtonStopRecord": "Höre auf, aufzunehmen",
-  "vcButtonUploadAudio": "Audio hochladen",
   "vcConvertLabel": "Audio konvertieren",
+  "vcPitchControlF0": "aus zum Singen, an zum Reden",
   "vcPitchControlLabel": "Tonhöhenregelung",
   "vcRecordAudioLabel": "Ton aufnehmen",
   "vcResultsTitle": "Ergebnisse der Sitzung V2V",
   "vcTabRecord": "Mikrofon",
   "vcTabUpload": "Hochladen",
   "vcUploadFileLabel": "Laden Sie Eingabeaudio hoch",
-  "vcUploadFileText": "<u><b>Eine Datei hochladen</b></u> oder lass es hier fallen",
-  "vcVoiceLabel": "Wählen Sie Zielstimme (Nummer zur Auswahl)"
+  "vcVoiceLabel": "Wählen Sie Zielstimme ({{0}} wählen von)"
 }

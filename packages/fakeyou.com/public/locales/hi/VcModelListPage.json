@@ -5,18 +5,14 @@
   "heroButtonUpgradePlan": "उन्नयन योजना",
   "heroText": "अपनी आवाज़ को अपने पसंदीदा पात्रों में बदलने के लिए इस टूल का उपयोग करें।",
   "heroTitle": "आवाज से आवाज",
-  "vcButtonClear": "स्पष्ट",
   "vcButtonConvert": "बदलना",
-  "vcButtonStartRecord": "रिकॉर्डिंग शुरू",
-  "vcButtonStopRecord": "रिकॉर्डिंग बंद करें",
-  "vcButtonUploadAudio": "ऑडियो अपलोड करें",
   "vcConvertLabel": "ऑडियो कनवर्ट करें",
+  "vcPitchControlF0": "गायन के लिए, भाषण के लिए",
   "vcPitchControlLabel": "पिच पर नियंत्रण",
   "vcRecordAudioLabel": "ध्वनि रिकॉर्ड करें",
   "vcResultsTitle": "सत्र V2V परिणाम",
   "vcTabRecord": "माइक्रोफ़ोन",
   "vcTabUpload": "डालना",
   "vcUploadFileLabel": "इनपुट ऑडियो अपलोड करें",
-  "vcUploadFileText": "<u><b>एक फ़ाइल अपलोड करें</b></u> या इसे यहीं छोड़ दें",
-  "vcVoiceLabel": "टारगेट वॉयस चुनें (चुनने के लिए नंबर)"
+  "vcVoiceLabel": "लक्ष्य ध्वनि चुनें ({{0}} से चुनने के लिए)"
 }

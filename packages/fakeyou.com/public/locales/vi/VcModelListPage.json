@@ -5,18 +5,14 @@
   "heroButtonUpgradePlan": "Kế hoạch nâng cấp",
   "heroText": "Sử dụng công cụ này để thay đổi giọng nói của bạn thành các nhân vật bạn yêu thích.",
   "heroTitle": "Giọng nói thành giọng nói",
-  "vcButtonClear": "Thông thoáng",
   "vcButtonConvert": "Chuyển thành",
-  "vcButtonStartRecord": "Bắt đầu ghi âm",
-  "vcButtonStopRecord": "Dừng ghi",
-  "vcButtonUploadAudio": "Tải lên âm thanh",
   "vcConvertLabel": "Chuyển đổi âm thanh",
+  "vcPitchControlF0": "tắt để hát, bật để phát biểu",
   "vcPitchControlLabel": "Kiểm soát sân",
   "vcRecordAudioLabel": "Ghi âm",
   "vcResultsTitle": "Kết quả phiên V2V",
   "vcTabRecord": "Cái mic cờ rô",
   "vcTabUpload": "Tải lên",
   "vcUploadFileLabel": "Tải lên âm thanh đầu vào",
-  "vcUploadFileText": "<u><b>Tải lên một tài liệu</b></u> hoặc thả nó ở đây",
-  "vcVoiceLabel": "Chọn Giọng nói mục tiêu (số để chọn)"
+  "vcVoiceLabel": "Chọn Giọng nói mục tiêu ({{0}} để lựa chọn)"
 }
