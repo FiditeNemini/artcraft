@@ -42,9 +42,9 @@ pub struct ModernInferenceQueueStats {
 
 #[derive(Serialize)]
 pub struct ByQueueStats {
-  pub pending_svc_jobs: u64,
+  pub pending_face_animation_jobs: u64,
   pub pending_rvc_jobs: u64,
-  //pub pending_face_animation_jobs: u64,
+  pub pending_svc_jobs: u64,
 }
 
 #[derive(Debug)]
@@ -92,8 +92,9 @@ pub async fn get_unified_queue_stats_handler(
         total_pending_job_count: 10_000,
         pending_job_count: 10_000,
         by_queue: ByQueueStats {
-          pending_svc_jobs: 10_000,
+          pending_face_animation_jobs: 10_000,
           pending_rvc_jobs: 10_000,
+          pending_svc_jobs: 10_000,
         }
       },
       legacy_tts: LegacyQueueDetails {
@@ -190,8 +191,9 @@ pub async fn get_unified_queue_stats_handler(
       total_pending_job_count: cacheable_stats_result.queues.total_generic,
       pending_job_count: cacheable_stats_result.queues.total_generic,
       by_queue: ByQueueStats {
-        pending_svc_jobs: cacheable_stats_result.queues.so_vits_svc,
+        pending_face_animation_jobs: cacheable_stats_result.queues.sad_talker,
         pending_rvc_jobs: cacheable_stats_result.queues.rvc_v2,
+        pending_svc_jobs: cacheable_stats_result.queues.so_vits_svc,
       }
     },
     legacy_tts: LegacyQueueDetails { 

@@ -24,6 +24,7 @@ pub struct Queues {
   pub legacy_tts: u64, // Tacotron2
   pub total_generic: u64, // Everything except Tacotron2 summed together
   pub rvc_v2: u64,
+  pub sad_talker: u64,
   pub so_vits_svc: u64,
 }
 
@@ -40,6 +41,7 @@ pub fn database_result_to_cacheable(database_records: Vec<QueueStatsRow>) -> Cac
   }
 
   let rvc_v2 = unwrap(queue_lengths.get("rvc_v2"));
+  let sad_talker = unwrap(queue_lengths.get("sad_talker"));
   let so_vits_svc = unwrap(queue_lengths.get("so_vits_svc"));
 
   let total_generic = rvc_v2 + so_vits_svc;
@@ -50,6 +52,7 @@ pub fn database_result_to_cacheable(database_records: Vec<QueueStatsRow>) -> Cac
       legacy_tts: unwrap(queue_lengths.get("legacy_tts")),
       total_generic,
       rvc_v2,
+      sad_talker,
       so_vits_svc,
     },
   }
