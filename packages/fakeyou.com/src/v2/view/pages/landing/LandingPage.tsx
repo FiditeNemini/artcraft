@@ -2,7 +2,7 @@ import React, { useMemo } from "react";
 import { Link } from "react-router-dom";
 import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
 import { SessionSubscriptionsWrapper } from "@storyteller/components/src/session/SessionSubscriptionsWrapper";
-import { useLocalize } from 'hooks';
+import { useLocalize } from "hooks";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faStar,
@@ -171,11 +171,10 @@ function LandingPage(props: Props) {
           </div>
           <div className="col-12 col-lg-7 d-flex flex-column justify-content-center flex-reverse px-md-5 px-lg-3">
             <h1 className="fw-bold display-5 text-center text-lg-start px-md-5 px-lg-0">
-              {t2('hero.top')}
+              {t2("hero.top")}
             </h1>
             <p className="lead opacity-75 pb-4 text-center text-lg-start px-md-5 px-lg-0 pe-lg-5">
-              {t2('hero.bottom')}
-             
+              {t2("hero.bottom")}
             </p>
             <div className="d-flex flex-column flex-md-row gap-3 mt-3 mb-4 w-100 justify-content-center justify-content-lg-start">
               {upgradeButton}
@@ -296,17 +295,17 @@ function LandingPage(props: Props) {
           </div>
           <div className="col-12 col-md-4">
             <Link
-              to="/video"
+              to="/face-animation"
               className="panel panel-select d-flex flex-column align-items-center"
             >
               <div className="d-flex px-4 pt-4 align-items-center w-100">
                 <div className="flex-grow-1">
-                  <h3 className="fw-bold text-white mb-1">Video Lip Sync</h3>
+                  <h3 className="fw-bold text-white mb-1">Face Animation</h3>
                   <h6 className="fw-normal opacity-75 text-white">
-                    Lip sync video to audio
+                    Create talking head videos
                   </h6>
                 </div>
-                <Link to="/video" className="btn btn-square">
+                <Link to="/face-animation" className="btn btn-square">
                   <FontAwesomeIcon icon={faArrowRight} />
                 </Link>
               </div>
@@ -316,6 +315,24 @@ function LandingPage(props: Props) {
                 src="/images/landing/select-w2l.webp"
                 alt="Video Lip Sync"
               />
+            </Link>
+          </div>
+          <div className="col-12 col-md-4">
+            <Link
+              to="/video"
+              className="panel panel-select d-flex flex-column align-items-center h-auto pb-4"
+            >
+              <div className="d-flex px-4 pt-4 align-items-center w-100">
+                <div className="flex-grow-1">
+                  <h3 className="fw-bold text-white mb-1">Video Lip Sync</h3>
+                  <h6 className="fw-normal opacity-75 text-white mb-0">
+                    Lip sync video to audio
+                  </h6>
+                </div>
+                <Link to="/video" className="btn btn-square">
+                  <FontAwesomeIcon icon={faArrowRight} />
+                </Link>
+              </div>
             </Link>
           </div>
           <img
