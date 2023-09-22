@@ -1,4 +1,4 @@
-pub mod audiowmark;
+pub mod common_commands;
 pub mod from_env;
 pub mod maybe_download_file_from_bucket;
 #[macro_use]

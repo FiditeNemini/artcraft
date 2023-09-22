@@ -58,6 +58,7 @@ use crate::job::job_types::vc::rvc_v2::pretrained_hubert_model::PretrainedHubert
 use crate::job::job_types::vc::rvc_v2::rvc_v2_inference_command::RvcV2InferenceCommand;
 use crate::job::job_types::vc::so_vits_svc::so_vits_svc_inference_command::SoVitsSvcInferenceCommand;
 use crate::job_dependencies::{FileSystemDetails, JobCaches, JobDependencies, JobTypeDetails, JobWorkerDetails, PretrainedModels, RvcV2Details, SadTalkerDetails, SoVitsSvcDetails, Tacotron2VocodesDetails, VitsDetails};
+use crate::util::common_commands::ffmpeg_logo_watermark_command::FfmpegLogoWatermarkCommand;
 use crate::util::scoped_execution::ScopedExecution;
 use crate::util::scoped_temp_dir_creator::ScopedTempDirCreator;
 
@@ -318,6 +319,7 @@ async fn main() -> AnyhowResult<()> {
       sad_talker: SadTalkerDetails {
         downloaders: SadTalkerDownloaders::build_all_from_env(),
         inference_command: SadTalkerInferenceCommand::from_env()?,
+        ffmpeg_watermark_command: FfmpegLogoWatermarkCommand::from_env()?,
       },
     },
     pretrained_models: PretrainedModels {

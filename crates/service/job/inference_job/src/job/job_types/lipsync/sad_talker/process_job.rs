@@ -22,6 +22,7 @@ use crate::job::job_types::lipsync::sad_talker::download_image_file::download_im
 use crate::job::job_types::lipsync::sad_talker::sad_talker_inference_command::InferenceArgs;
 use crate::job::job_types::lipsync::sad_talker::validate_job::validate_job;
 use crate::job_dependencies::JobDependencies;
+use crate::util::common_commands::ffmpeg_logo_watermark_command;
 
 pub struct SadTalkerProcessJobArgs<'a> {
   pub job_dependencies: &'a JobDependencies,
@@ -114,6 +115,7 @@ pub async fn process_job(args: SadTalkerProcessJobArgs<'_>) -> Result<JobSuccess
       .map_err(|e| ProcessSingleJobError::Other(e))?;
 
   let output_video_fs_path = work_temp_dir.path().join("output.mp4");
+  let output_video_fs_path_watermark = work_temp_dir.path().join("output_watermark.mp4");
 
   info!("Running SadTalker inference...");
 
@@ -156,27 +158,57 @@ pub async fn process_job(args: SadTalkerProcessJobArgs<'_>) -> Result<JobSuccess
     return Err(ProcessSingleJobError::Other(anyhow!("CommandExitStatus: {:?}", command_exit_status)));
   }
 
-  // ==================== CHECK ALL FILES EXIST AND GET METADATA ==================== //
+  // ==================== CHECK NON-WATERMARKED RESULT ==================== //
 
   info!("Checking that output file exists: {:?} ...", output_video_fs_path);
 
   check_file_exists(&output_video_fs_path).map_err(|e| ProcessSingleJobError::Other(e))?;
 
+  // ==================== WATERMARK ==================== //
+
+  info!("Adding watermark...");
+
+  let command_exit_status = args.job_dependencies
+      .job_type_details
+      .sad_talker
+      .ffmpeg_watermark_command
+      .execute_inference(ffmpeg_logo_watermark_command::InferenceArgs {
+        video_path: &output_video_fs_path,
+        maybe_override_logo_path: None,
+        alpha: 0.6,
+        output_path: &output_video_fs_path_watermark,
+      });
+
+  if !command_exit_status.is_success() {
+    error!("Watermark failed: {:?}", command_exit_status);
+    safe_delete_temp_file(&audio_path.filesystem_path);
+    safe_delete_temp_file(&image_path.filesystem_path);
+    safe_delete_temp_file(&output_video_fs_path);
+    safe_delete_temp_file(&output_video_fs_path_watermark);
+    safe_delete_temp_directory(&work_temp_dir);
+    return Err(ProcessSingleJobError::Other(anyhow!("CommandExitStatus: {:?}", command_exit_status)));
+  }
+
+  // ==================== CHECK ALL FILES EXIST AND GET METADATA ==================== //
+
+  info!("Checking that output watermark file exists: {:?} ...", output_video_fs_path_watermark);
+  check_file_exists(&output_video_fs_path_watermark).map_err(|e| ProcessSingleJobError::Other(e))?;
+
   info!("Interrogating result file size ...");
 
-  let file_size_bytes = file_size(&output_video_fs_path)
+  let file_size_bytes = file_size(&output_video_fs_path_watermark)
       .map_err(|err| ProcessSingleJobError::Other(err))?;
 
   info!("Interrogating result mimetype ...");
 
-  let mimetype = get_mimetype_for_file(&output_video_fs_path)
+  let mimetype = get_mimetype_for_file(&output_video_fs_path_watermark)
       .map_err(|err| ProcessSingleJobError::from_io_error(err))?
       .map(|mime| mime.to_string())
       .ok_or(ProcessSingleJobError::Other(anyhow!("Mimetype could not be determined")))?;
 
   info!("Calculating sha256...");
 
-  let file_checksum = sha256_hash_file(&output_video_fs_path)
+  let file_checksum = sha256_hash_file(&output_video_fs_path_watermark)
       .map_err(|err| {
         ProcessSingleJobError::Other(anyhow!("Error hashing file: {:?}", err))
       })?;
@@ -196,7 +228,7 @@ pub async fn process_job(args: SadTalkerProcessJobArgs<'_>) -> Result<JobSuccess
 
   args.job_dependencies.public_bucket_client.upload_filename_with_content_type(
     &result_bucket_object_pathbuf,
-    &output_video_fs_path,
+    &output_video_fs_path_watermark,
     &mimetype) // TODO: We should check the mimetype to make sure bad payloads can't get uploaded
       .await
       .map_err(|e| ProcessSingleJobError::Other(e))?;
@@ -204,6 +236,7 @@ pub async fn process_job(args: SadTalkerProcessJobArgs<'_>) -> Result<JobSuccess
   // ==================== DELETE TEMP FILES ==================== //
 
   safe_delete_temp_file(&output_video_fs_path);
+  safe_delete_temp_file(&output_video_fs_path_watermark);
 
   // NB: We should be using a tempdir, but to make absolutely certain we don't overflow the disk...
   safe_delete_temp_directory(&work_temp_dir);
