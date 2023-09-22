@@ -116,7 +116,7 @@ function FaceAnimationPage(props: Props) {
           disabled={generateButtonDisabled}
           className={generateButtonClass}
           onClick={() => doTest()}>
-            Test the thing
+            Generate Video
         </button>
 
         <br />

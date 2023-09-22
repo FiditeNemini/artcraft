@@ -55,6 +55,7 @@ function FooterNav(props: Props) {
       by_queue: {
         pending_svc_jobs: 0,
         pending_rvc_jobs: 0,
+        pending_face_animation_jobs: 0,
       }
     },
     legacy_tts: {
@@ -141,6 +142,12 @@ function FooterNav(props: Props) {
               SVC Queued:{" "}
               <span className="text-red">
                 {queueStats.inference.by_queue.pending_svc_jobs}
+              </span>
+            </div>
+            <div>
+              Animations Queued:{" "}
+              <span className="text-red">
+                {queueStats.inference.by_queue.pending_face_animation_jobs}
               </span>
             </div>
           </div>
