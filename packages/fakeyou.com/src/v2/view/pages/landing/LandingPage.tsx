@@ -11,7 +11,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { faDiscord, faTwitter } from "@fortawesome/free-brands-svg-icons";
 import { WebUrl } from "../../../../common/WebUrl";
-import { faFileArrowUp } from "@fortawesome/pro-solid-svg-icons";
+import { faFileArrowUp, faSparkles } from "@fortawesome/pro-solid-svg-icons";
 import { PosthogClient } from "@storyteller/components/src/analytics/PosthogClient";
 // import {
 //   faFileArrowUp,
@@ -250,7 +250,7 @@ function LandingPage(props: Props) {
               to="/tts"
               className="panel panel-select d-flex flex-column align-items-center"
             >
-              <div className="d-flex px-4 pt-4 align-items-center w-100">
+              <div className="d-flex px-4 pt-4 align-items-start w-100">
                 <div className="flex-grow-1">
                   <h3 className="fw-bold text-white mb-1">
                     {t("productTtsTitle")}
@@ -259,7 +259,7 @@ function LandingPage(props: Props) {
                     {t("productTtsText")}
                   </h6>
                 </div>
-                <Link to="/tts" className="btn btn-square">
+                <Link to="/tts" className="btn btn-square mt-1">
                   <FontAwesomeIcon icon={faArrowRight} />
                 </Link>
               </div>
@@ -276,7 +276,7 @@ function LandingPage(props: Props) {
               to="/voice-conversion"
               className="panel panel-select d-flex flex-column align-items-center"
             >
-              <div className="d-flex px-4 pt-4 align-items-center w-100">
+              <div className="d-flex px-4 pt-4 align-items-start w-100">
                 <div className="flex-grow-1">
                   <h3 className="fw-bold text-white mb-1">
                     {t("productVcTitle")}
@@ -285,7 +285,7 @@ function LandingPage(props: Props) {
                     {t("productVcText")}
                   </h6>
                 </div>
-                <Link to="/voice-conversion" className="btn btn-square">
+                <Link to="/voice-conversion" className="btn btn-square mt-1">
                   <FontAwesomeIcon icon={faArrowRight} />
                 </Link>
               </div>
@@ -299,19 +299,23 @@ function LandingPage(props: Props) {
           </div>
           <div className="col-12 col-md-4">
             <Link
-              to="/video"
+              to="/face-animation"
               className="panel panel-select d-flex flex-column align-items-center"
             >
-              <div className="d-flex px-4 pt-4 align-items-center w-100">
+              <div className="d-flex px-4 pt-4 align-items-start w-100">
                 <div className="flex-grow-1">
-                  <h3 className="fw-bold text-white mb-1">
-                    {t("productVideoTitle")}
-                  </h3>
+                  <h4 className="fw-bold text-white mb-1 d-flex align-items-center text-nowrap">
+                    <span className="badge-new mt-0 me-2">
+                      <FontAwesomeIcon icon={faSparkles} className="me-1" />
+                      NEW
+                    </span>
+                    Face Animation
+                  </h4>
                   <h6 className="fw-normal opacity-75 text-white">
-                    {t("productVideoText")}
+                    Create videos from audio
                   </h6>
                 </div>
-                <Link to="/video" className="btn btn-square">
+                <Link to="/face-animation" className="btn btn-square mt-1">
                   <FontAwesomeIcon icon={faArrowRight} />
                 </Link>
               </div>
@@ -321,6 +325,24 @@ function LandingPage(props: Props) {
                 src="/images/landing/select-w2l.webp"
                 alt="Video Lip Sync"
               />
+            </Link>
+          </div>
+          <div className="col-12 col-md-4">
+            <Link
+              to="/video"
+              className="panel panel-select d-flex flex-column align-items-center h-auto pb-4"
+            >
+              <div className="d-flex px-4 pt-4 align-items-center w-100">
+                <div className="flex-grow-1">
+                  <h3 className="fw-bold text-white mb-1">{t("productVideoTitle")}</h3>
+                  <h6 className="fw-normal opacity-75 text-white mb-0">
+                    {t("productVideoText")}
+                  </h6>
+                </div>
+                <Link to="/video" className="btn btn-square mt-1">
+                  <FontAwesomeIcon icon={faArrowRight} />
+                </Link>
+              </div>
             </Link>
           </div>
           <img
