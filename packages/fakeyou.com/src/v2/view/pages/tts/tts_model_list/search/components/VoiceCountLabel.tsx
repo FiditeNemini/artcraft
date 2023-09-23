@@ -1,5 +1,4 @@
 import React from "react";
-import { Trans } from "react-i18next";
 import { TtsModelListItem } from "@storyteller/components/src/api/tts/ListTtsModels";
 import { TtsCategoryType } from "../../../../../../../AppWrapper";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -8,6 +7,7 @@ import { Analytics } from "../../../../../../../common/Analytics";
 import { GetRandomArrayValue } from "@storyteller/components/src/utils/GetRandomArrayValue";
 import Tippy from "@tippyjs/react";
 import "tippy.js/dist/tippy.css";
+import { useLocalize } from "hooks";
 
 interface Props {
   allTtsModels: TtsModelListItem[];
@@ -22,6 +22,7 @@ interface Props {
 // component tree.
 
 export function VoiceCountLabel(props: Props) {
+  const { t } = useLocalize("TtsModelListPage");
   const { allTtsModels, ttsModelsByCategoryToken, selectedCategories } = props;
 
   const leafiestCategory = selectedCategories[selectedCategories.length - 1];
@@ -72,14 +73,9 @@ export function VoiceCountLabel(props: Props) {
     <>
       <div className="d-flex gap-2">
         <label className="sub-title">
-          <Trans
-            i18nKey="tts.TtsModelListPage.form.voicesLabel"
-            count={voiceCount}
-          >
-            Voice ({voiceCount} to choose from)
-          </Trans>
+          {t("ttsVoiceLabel", { 0: voiceCount })}
           <Tippy
-            content="Random Voice"
+            content={t("ttsButtonRandom")}
             hideOnClick
             placement="top"
             theme="fakeyou"

@@ -5,8 +5,8 @@ export interface AvailableLanguage {
   languageCode: string;
   languageName: string;
   languageNameLocalized?: string;
-  flags: string[],
-  flagsMore?: string[],
+  flags: string[];
+  flagsMore?: string[];
   showPleaseFollowNotice: boolean;
   showBootstrapLanguageNotice: boolean;
 }
@@ -23,8 +23,28 @@ export const ENGLISH_LANGUAGE: AvailableLanguage = {
 
 // These are the languages the website has been *translated* into.
 // This is *not* the list of TTS langauge categories.
-export type AvailableLanguageKey = "en" | "es" | "ar" | "de" | "fr" | "hi" | "id" | "it" | "ja" | "ko" | "pt" | "tr" | "vi" | "zh";
-export const AVAILABLE_LANGUAGE_MAP: Record<AvailableLanguageKey, AvailableLanguage> = {
+export type AvailableLanguageKey =
+  | "en"
+  | "es"
+  | "ar"
+  | "de"
+  | "fr"
+  | "hi"
+  | "id"
+  | "it"
+  | "ja"
+  | "ko"
+  | "pt"
+  | "tr"
+  | "vi"
+  | "zh"
+  | "th"
+  | "ru"
+  | "bn";
+export const AVAILABLE_LANGUAGE_MAP: Record<
+  AvailableLanguageKey,
+  AvailableLanguage
+> = {
   en: ENGLISH_LANGUAGE,
   es: {
     language: Language.Spanish,
@@ -33,7 +53,7 @@ export const AVAILABLE_LANGUAGE_MAP: Record<AvailableLanguageKey, AvailableLangu
     languageNameLocalized: "Español",
     flags: ["🇪🇸", "🇲🇽"],
     flagsMore: ["🇨🇴", "🇦🇷"],
-    showPleaseFollowNotice: true,
+    showPleaseFollowNotice: false,
     showBootstrapLanguageNotice: false,
   },
   ar: {
@@ -52,7 +72,7 @@ export const AVAILABLE_LANGUAGE_MAP: Record<AvailableLanguageKey, AvailableLangu
     languageNameLocalized: "Deutsch",
     flags: ["🇩🇪"],
     showPleaseFollowNotice: false,
-    showBootstrapLanguageNotice: true,
+    showBootstrapLanguageNotice: false,
   },
   fr: {
     language: Language.French,
@@ -61,7 +81,7 @@ export const AVAILABLE_LANGUAGE_MAP: Record<AvailableLanguageKey, AvailableLangu
     languageNameLocalized: "Français",
     flags: ["🇫🇷"],
     showPleaseFollowNotice: false,
-    showBootstrapLanguageNotice: true,
+    showBootstrapLanguageNotice: false,
   },
   hi: {
     language: Language.Hindi,
@@ -70,7 +90,7 @@ export const AVAILABLE_LANGUAGE_MAP: Record<AvailableLanguageKey, AvailableLangu
     languageNameLocalized: "Hindi",
     flags: [],
     showPleaseFollowNotice: false,
-    showBootstrapLanguageNotice: true,
+    showBootstrapLanguageNotice: false,
   },
   id: {
     language: Language.Indonesian,
@@ -79,7 +99,7 @@ export const AVAILABLE_LANGUAGE_MAP: Record<AvailableLanguageKey, AvailableLangu
     languageNameLocalized: "Indonesian",
     flags: [],
     showPleaseFollowNotice: false,
-    showBootstrapLanguageNotice: true,
+    showBootstrapLanguageNotice: false,
   },
   it: {
     language: Language.Italian,
@@ -97,7 +117,7 @@ export const AVAILABLE_LANGUAGE_MAP: Record<AvailableLanguageKey, AvailableLangu
     languageNameLocalized: "Japanese",
     flags: [],
     showPleaseFollowNotice: false,
-    showBootstrapLanguageNotice: true,
+    showBootstrapLanguageNotice: false,
   },
   ko: {
     language: Language.Korean,
@@ -106,7 +126,7 @@ export const AVAILABLE_LANGUAGE_MAP: Record<AvailableLanguageKey, AvailableLangu
     languageNameLocalized: "Korean",
     flags: [],
     showPleaseFollowNotice: false,
-    showBootstrapLanguageNotice: true,
+    showBootstrapLanguageNotice: false,
   },
   pt: {
     language: Language.Portuguese,
@@ -114,17 +134,17 @@ export const AVAILABLE_LANGUAGE_MAP: Record<AvailableLanguageKey, AvailableLangu
     languageName: "Portuguese",
     languageNameLocalized: "Português",
     flags: ["🇵🇹", "🇧🇷"],
-    showPleaseFollowNotice: true,
-    showBootstrapLanguageNotice: true,
+    showPleaseFollowNotice: false,
+    showBootstrapLanguageNotice: false,
   },
-  tr:  {
+  tr: {
     language: Language.Turkish,
     languageCode: "tr",
     languageName: "Turkish",
     languageNameLocalized: "Türk",
     flags: ["🇹🇷"],
     showPleaseFollowNotice: false,
-    showBootstrapLanguageNotice: true,
+    showBootstrapLanguageNotice: false,
   },
   vi: {
     language: Language.Vietnamese,
@@ -133,7 +153,7 @@ export const AVAILABLE_LANGUAGE_MAP: Record<AvailableLanguageKey, AvailableLangu
     languageNameLocalized: "Vietnamese",
     flags: [],
     showPleaseFollowNotice: false,
-    showBootstrapLanguageNotice: true,
+    showBootstrapLanguageNotice: false,
   },
   zh: {
     language: Language.ChineseSimplified,
@@ -142,13 +162,51 @@ export const AVAILABLE_LANGUAGE_MAP: Record<AvailableLanguageKey, AvailableLangu
     languageNameLocalized: "Chinese Simplified",
     flags: [],
     showPleaseFollowNotice: false,
-    showBootstrapLanguageNotice: true,
+    showBootstrapLanguageNotice: false,
+  },
+  th: {
+    language: Language.Thai,
+    languageCode: "th",
+    languageName: "Thai",
+    languageNameLocalized: "ไทย",
+    flags: [],
+    showPleaseFollowNotice: false,
+    showBootstrapLanguageNotice: false,
+  },
+  ru: {
+    language: Language.Russian,
+    languageCode: "ru",
+    languageName: "Russian",
+    languageNameLocalized: "Russian",
+    flags: [],
+    showPleaseFollowNotice: false,
+    showBootstrapLanguageNotice: false,
+  },
+  bn: {
+    language: Language.Bengali,
+    languageCode: "bn",
+    languageName: "Bengali",
+    languageNameLocalized: "Bengali",
+    flags: [],
+    showPleaseFollowNotice: false,
+    showBootstrapLanguageNotice: false,
   },
 };
 
 /// These are the languages TTS has been categorized into.
-export type AvailableTtsLanguageKey = "en" | "es" | "it" | "de" | "fr" | "pt" | "ar" | "tr";
-export const AVAILABLE_TTS_LANGUAGE_CATEGORY_MAP : Record<AvailableTtsLanguageKey, AvailableLanguage> = {
+export type AvailableTtsLanguageKey =
+  | "en"
+  | "es"
+  | "it"
+  | "de"
+  | "fr"
+  | "pt"
+  | "ar"
+  | "tr";
+export const AVAILABLE_TTS_LANGUAGE_CATEGORY_MAP: Record<
+  AvailableTtsLanguageKey,
+  AvailableLanguage
+> = {
   en: AVAILABLE_LANGUAGE_MAP["en"],
   es: AVAILABLE_LANGUAGE_MAP["es"],
   ar: AVAILABLE_LANGUAGE_MAP["ar"],
@@ -159,4 +217,4 @@ export const AVAILABLE_TTS_LANGUAGE_CATEGORY_MAP : Record<AvailableTtsLanguageKe
   tr: AVAILABLE_LANGUAGE_MAP["tr"],
 
   // ... additional languages the website hasn't been translated into.
-}
+};

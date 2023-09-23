@@ -2,8 +2,6 @@ import React from "react";
 import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
 import { SessionSubscriptionsWrapper } from "@storyteller/components/src/session/SessionSubscriptionsWrapper";
 import { Link } from "react-router-dom";
-import { Trans } from "react-i18next";
-import { t } from "i18next";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faStar,
@@ -14,6 +12,7 @@ import {
 import { Analytics } from "../../../../../common/Analytics";
 import { WebUrl } from "../../../../../common/WebUrl";
 import { PageHeaderWithImage } from "../../../_common/PageHeaderWithImage";
+import { useLocalize } from "hooks";
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -21,6 +20,8 @@ interface Props {
 }
 
 export function TtsPageHero(props: Props) {
+  const { t } = useLocalize("TtsModelListPage");
+
   let signUpButton = <></>;
   let viewPricingButton = <></>;
   let upgradeButton = <></>;
@@ -36,7 +37,7 @@ export function TtsPageHero(props: Props) {
           }}
         >
           <button type="button" className="btn btn-primary w-100">
-            {t("tts.TtsModelListPage.heroSection.buttons.signUp")}
+            {t("heroButtonSignUp")}
             <FontAwesomeIcon icon={faArrowRight} className="ms-2" />
           </button>
         </Link>
@@ -52,7 +53,7 @@ export function TtsPageHero(props: Props) {
         >
           <button type="button" className="btn btn-secondary w-100">
             <FontAwesomeIcon icon={faStar} className="me-2" />
-            {t("tts.TtsModelListPage.heroSection.buttons.viewPricing")}
+            {t("heroButtonPricing")}
           </button>
         </Link>
       </>
@@ -72,7 +73,7 @@ export function TtsPageHero(props: Props) {
         >
           <button type="button" className="btn btn-secondary w-100">
             <FontAwesomeIcon icon={faUser} className="me-2" />
-            View my profile
+            {t("heroButtonProfile")}
           </button>
         </Link>
       </>
@@ -88,7 +89,7 @@ export function TtsPageHero(props: Props) {
           >
             <button type="button" className="btn btn-primary w-100">
               <FontAwesomeIcon icon={faStar} className="me-2" />
-              Upgrade Plan
+              {t("heroButtonUpgradePlan")}
             </button>
           </Link>
         </>
@@ -99,14 +100,8 @@ export function TtsPageHero(props: Props) {
   const titleIcon = (
     <FontAwesomeIcon icon={faMessageDots} className="me-3 me-lg-4" />
   );
-  const title = <>{t("tts.TtsModelListPage.heroSection.title")}</>;
-  const subText = (
-    <>
-      <Trans i18nKey="tts.TtsModelListPage.heroSection.subtitle">
-        Use FakeYou's deepfake tech to say stuff with your favorite characters.
-      </Trans>
-    </>
-  );
+  const title = <>{t("heroTitle")}</>;
+  const subText = <>{t("heroText")}</>;
   const actionButtons = (
     <>
       {upgradeButton}

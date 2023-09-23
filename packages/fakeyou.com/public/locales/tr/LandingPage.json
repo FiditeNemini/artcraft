@@ -1,12 +1,27 @@
 {
-  "community": {
-    "discordButton": "Anlaşmazlık",
-    "heading": "Topluluğa katıl",
-    "text": "Sizinle sohbet etmeyi çok isteriz! Sorularınız varsa lütfen Discord'da bize katılın.",
-    "twitterButton": "heyecan"
-  },
-  "hero": {
-    "bottom": "FakeYou'nun derin sahte teknolojisiyle favori karakterlerinizin istediğiniz her şeyi söyleyen seslerini veya videolarını oluşturun.",
-    "top": "AI Müzik, Metinden Konuşmaya ve Sesten Sese"
-  }
+  "communityButtonDiscord": "Discord",
+  "communityButtonTwitter": "Twitter",
+  "communityText": "Sizinle sohbet etmeyi çok isteriz! Sorularınız varsa lütfen Discord'da bize katılın.",
+  "communityTitle": "Topluluğa katıl",
+  "contextButtonTts": "Konuşma metni",
+  "contextButtonVc": "Sesten Sese",
+  "contextText": "Yapay zeka destekli metinden konuşmaya ve ses dönüştürme araçlarımız, metninizi veya sesinizi en sevdiğiniz karakterin sesine dönüştürmenize olanak tanır. İçerik oluşturucular ve mesajlarına kişilik katmak isteyen herkes için mükemmeldir.",
+  "contextTitle": "Favori karakterleriniz gibi konuşun",
+  "ctaButtonTts": "Konuşma metni",
+  "ctaButtonVc": "Sesten Sese",
+  "ctaText": "Sadece birkaç tıklamayla mesajlarınızı ve konuşma sesinizi en sevdiğiniz karakterin sesine dönüştürün.",
+  "ctaTitle": "Sesinizi Oluşturun",
+  "heroButtonPricing": "Fiyatlandırmayı Görüntüle",
+  "heroButtonProfile": "Profilimi görüntüle",
+  "heroButtonSignUp": "Üye olmak",
+  "heroButtonUpgradePlan": "Yükseltme Planı",
+  "heroText": "Favori karakterlerinizin istediğiniz herhangi bir şeyi söylediği ses veya videoları oluşturmak için FakeYou'nun deepfake teknolojisini kullanın.",
+  "heroTitle": "AI Müzik, Metinden Konuşmaya ve Sesten Sese",
+  "productTtsText": "Metinden ses oluştur",
+  "productTtsTitle": "Konuşma metni",
+  "productVcText": "Başka bir sesle konuş",
+  "productVcTitle": "Sesten Sese",
+  "productVideoText": "Videoyu sese dudak senkronizasyonu",
+  "productVideoTitle": "Video Dudak Senkronizasyonu",
+  "productsTitle": "Yapay Zeka Araçları"
 }

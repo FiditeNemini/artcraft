@@ -1,12 +1,27 @@
 {
-  "community": {
-    "discordButton": "Zwietracht",
-    "heading": "Trete der Community bei",
-    "text": "Wir würden uns freuen, mit Ihnen zu chatten! Bitte treten Sie uns im Discord bei, wenn Sie Fragen haben.",
-    "twitterButton": "Twitter"
-  },
-  "hero": {
-    "bottom": "Generieren Sie mit der Deep-Fake-Technologie von FakeYou Audio- oder Videoaufnahmen Ihrer Lieblingscharaktere, die alles sagen, was Sie wollen.",
-    "top": "KI-Musik, Text-to-Speech und Voice-to-Voice"
-  }
+  "communityButtonDiscord": "Discord",
+  "communityButtonTwitter": "Twitter",
+  "communityText": "Wir würden uns freuen, mit Ihnen zu chatten! Bitte treten Sie uns im Discord bei, wenn Sie Fragen haben.",
+  "communityTitle": "Trete der Community bei",
+  "contextButtonTts": "Text zu Sprache",
+  "contextButtonVc": "Stimme zu Stimme",
+  "contextText": "Mit unseren KI-gestützten Text-zu-Sprache- und Sprachkonvertierungstools können Sie Ihren Text oder Ihre Stimme in die Stimme Ihres Lieblingscharakters umwandeln. Perfekt für Content-Ersteller und alle, die ihren Nachrichten Persönlichkeit verleihen möchten.",
+  "contextTitle": "Sprechen Sie als Ihre Lieblingscharaktere",
+  "ctaButtonTts": "Text zu Sprache",
+  "ctaButtonVc": "Stimme zu Stimme",
+  "ctaText": "Verwandeln Sie Ihre Nachrichten und Ihre Sprechstimme mit nur wenigen Klicks in die Stimme Ihres Lieblingscharakters.",
+  "ctaTitle": "Generieren Sie Ihr Audio",
+  "heroButtonPricing": "Preise anzeigen",
+  "heroButtonProfile": "Sehen Sie sich mein Profil an",
+  "heroButtonSignUp": "Melden Sie sich an",
+  "heroButtonUpgradePlan": "Upgrade-Plan",
+  "heroText": "Nutzen Sie die Deepfake-Technologie von FakeYou, um Audio- oder Videoaufnahmen Ihrer Lieblingscharaktere zu erstellen, die alles sagen, was Sie wollen.",
+  "heroTitle": "KI-Musik, Text-to-Speech und Voice-to-Voice",
+  "productTtsText": "Generieren Sie Audio aus Text",
+  "productTtsTitle": "Text zu Sprache",
+  "productVcText": "Sprechen Sie mit einer anderen Stimme",
+  "productVcTitle": "Stimme zu Stimme",
+  "productVideoText": "Lippensynchronisation von Video zu Audio",
+  "productVideoTitle": "Video-Lippensynchronisation",
+  "productsTitle": "KI-Tools"
 }

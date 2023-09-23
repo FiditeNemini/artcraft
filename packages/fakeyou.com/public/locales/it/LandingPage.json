@@ -1,12 +1,27 @@
 {
-  "community": {
-    "discordButton": "Discordia",
-    "heading": "Unisciti alla comunità",
-    "text": "Ci piacerebbe chiacchierare con te! Unisciti a noi su Discord se hai domande.",
-    "twitterButton": "Twitter"
-  },
-  "hero": {
-    "bottom": "Genera audio o video dei tuoi personaggi preferiti dicendo quello che vuoi con la profonda tecnologia falsa di FakeYou.",
-    "top": "Musica AI, sintesi vocale e voce a voce"
-  }
+  "communityButtonDiscord": "Discord",
+  "communityButtonTwitter": "Twitter",
+  "communityText": "Ci piacerebbe chiacchierare con te! Unisciti a noi su Discord se hai domande.",
+  "communityTitle": "Unisciti alla comunità",
+  "contextButtonTts": "Sintesi vocale da testo",
+  "contextButtonVc": "Da voce a voce",
+  "contextText": "I nostri strumenti di sintesi vocale e di conversione vocale basati sull'intelligenza artificiale ti consentono di convertire il tuo testo o la tua voce nella voce del tuo personaggio preferito. Perfetto per i creatori di contenuti e chiunque desideri aggiungere personalità ai propri messaggi.",
+  "contextTitle": "Parla come i tuoi personaggi preferiti",
+  "ctaButtonTts": "Sintesi vocale da testo",
+  "ctaButtonVc": "Da voce a voce",
+  "ctaText": "Trasforma i tuoi messaggi e la tua voce parlante nella voce del tuo personaggio preferito con pochi clic.",
+  "ctaTitle": "Genera il tuo audio",
+  "heroButtonPricing": "Visualizza i prezzi",
+  "heroButtonProfile": "Guarda il mio profilo",
+  "heroButtonSignUp": "Iscrizione",
+  "heroButtonUpgradePlan": "Piano di aggiornamento",
+  "heroText": "Usa la tecnologia deepfake di FakeYou per generare audio o video dei tuoi personaggi preferiti che dicono tutto quello che vuoi.",
+  "heroTitle": "Musica AI, sintesi vocale e voce a voce",
+  "productTtsText": "Genera audio dal testo",
+  "productTtsTitle": "Sintesi vocale da testo",
+  "productVcText": "Parla con un'altra voce",
+  "productVcTitle": "Da voce a voce",
+  "productVideoText": "Sincronizzazione labiale del video con l'audio",
+  "productVideoTitle": "Sincronizzazione labiale video",
+  "productsTitle": "Strumenti di intelligenza artificiale"
 }

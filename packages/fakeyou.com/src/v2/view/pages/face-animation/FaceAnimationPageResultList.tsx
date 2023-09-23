@@ -1,25 +1,21 @@
 import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { t } from "i18next";
 import { BucketConfig } from "@storyteller/components/src/api/BucketConfig";
 import { JobState } from "@storyteller/components/src/jobs/JobStates";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
-  faClock,
   faHeadphonesSimple,
   faDownload,
 } from "@fortawesome/free-solid-svg-icons";
 
 import { SessionSubscriptionsWrapper } from "@storyteller/components/src/session/SessionSubscriptionsWrapper";
-import { Analytics } from "../../../common/Analytics";
-import { SessionTtsAudioPlayer } from "./SessionTtsAudioPlayer";
-import { WebUrl } from "../../../common/WebUrl";
+import { Analytics } from "../../../../common/Analytics";
 import {
   GetPendingTtsJobCount,
   GetPendingTtsJobCountIsOk,
   GetPendingTtsJobCountSuccessResponse,
 } from "@storyteller/components/src/api/tts/GetPendingTtsJobCount";
 import { InferenceJob } from "@storyteller/components/src/jobs/InferenceJob";
-import { useLocalize } from "hooks";
 
 interface Props {
   inferenceJobs: Array<InferenceJob>;
@@ -30,8 +26,7 @@ interface Props {
 // Default to querying every 15 seconds, but make it configurable serverside
 const DEFAULT_QUEUE_REFRESH_INTERVAL_MILLIS = 15000;
 
-function SessionVoiceConversionResultsList(props: Props) {
-  const { t } = useLocalize("SessionVoiceConversionResultsList");
+function FaceAnimationPageResultList(props: Props) {
   const [pendingTtsJobs, setPendingTtsJobs] =
     useState<GetPendingTtsJobCountSuccessResponse>({
       success: true,
@@ -78,32 +73,34 @@ function SessionVoiceConversionResultsList(props: Props) {
         case JobState.UNKNOWN:
           stateDescription =
             job.maybeExtraStatusDescription == null
-              ? t("resultsProgressPending")
+              ? t("common.SessionTtsInferenceResults.progress.pending")
               : job.maybeExtraStatusDescription;
           break;
         case JobState.STARTED:
           cssStyle = "alert alert-success mb-0";
           stateDescription =
             job.maybeExtraStatusDescription == null
-              ? t("resultsProgressStarted")
+              ? t("common.SessionTtsInferenceResults.progress.started")
               : job.maybeExtraStatusDescription;
           break;
         case JobState.ATTEMPT_FAILED:
           cssStyle = "alert alert-danger mb-0";
-          stateDescription = `${
-            (t("resultsProgressFail"), { 0: job.attemptCount || "0" })
-          }}`;
+          stateDescription = `Failed ${job.attemptCount} attempt(s). Will retry...`;
           break;
         case JobState.COMPLETE_FAILURE:
         case JobState.DEAD:
           cssStyle = "alert alert-danger mb-0";
           // TODO(bt,2023-01-23): Translate when I can test it
-          stateDescription = t("resultsProgressDead");
+          stateDescription = t(
+            "common.SessionTtsInferenceResults.progress.dead"
+          );
           break;
         case JobState.COMPLETE_SUCCESS:
           cssStyle = "message is-success mb-0";
           // Not sure why we're here instead of other branch!
-          stateDescription = t("resultsProgressSuccess");
+          stateDescription = t(
+            "common.SessionTtsInferenceResults.progress.success"
+          );
           break;
       }
 
@@ -122,7 +119,8 @@ function SessionVoiceConversionResultsList(props: Props) {
       );
       //let ttsPermalink = `/tts/result/${job.maybeResultToken}`;
 
-      let wavesurfers = <SessionTtsAudioPlayer filename={audioLink} />;
+      //let wavesurfers = <SessionTtsAudioPlayer filename={audioLink} />;
+      let wavesurfers : string[] = [];
 
       let audioDownloadFilename = `fakeyou-${job.jobToken}.wav`;
 
@@ -174,7 +172,7 @@ function SessionVoiceConversionResultsList(props: Props) {
                   download={audioDownloadFilename}
                 >
                   <FontAwesomeIcon icon={faDownload} className="me-2" />
-                  {t("resultsAudioDownload")}
+                  Download File{" "}
                 </a>
               </div>
             </div>
@@ -188,42 +186,16 @@ function SessionVoiceConversionResultsList(props: Props) {
     <div className="panel panel-inner text-center p-5 rounded-5 h-100">
       <div className="d-flex flex-column opacity-75 h-100 justify-content-center">
         <FontAwesomeIcon icon={faHeadphonesSimple} className="fs-3 mb-3" />
-        <h5 className="fw-semibold">{t("resultsBlankText")}</h5>
-        <p>{t("resultsBlankSubText")}</p>
+        <h5 className="fw-semibold">
+          {t("common.SessionTtsInferenceResults.noResults.title")}
+        </h5>
+        <p>{t("common.SessionTtsInferenceResults.noResults.subtitle")}</p>
       </div>
     </div>
   );
 
   if (results.length === 0) {
     return <>{noResultsSection}</>;
-  }
-
-  let upgradeNotice = <></>;
-
-  // Ask non-premium users to upgrade
-  if (
-    results.length !== 0 &&
-    !props.sessionSubscriptionsWrapper.hasPaidFeatures()
-  ) {
-    upgradeNotice = (
-      <div className="d-flex flex-column gap-3 sticky-top zi-2">
-        <div className="alert alert-warning alert-cta mb-0">
-          <FontAwesomeIcon icon={faClock} className="me-2" />
-          {t("resultsUpgradeNotice")}{" "}
-          <Link
-            to={WebUrl.pricingPageWithReferer("nowait")}
-            onClick={() => {
-              Analytics.ttsTooSlowUpgradePremium();
-            }}
-            className="alert-link fw-semibold"
-          >
-            {t("resultsUpgradeLinkText")}
-          </Link>{" "}
-          ({t("resultsTtsQueued")}{" "}
-          <span className="text-red">~{pendingTtsJobs.pending_job_count}</span>)
-        </div>
-      </div>
-    );
   }
 
   // Users have requested reverse chronological results
@@ -233,7 +205,6 @@ function SessionVoiceConversionResultsList(props: Props) {
     <div>
       <div>
         <div className="d-flex flex-column gap-3">
-          {upgradeNotice}
           <div className="d-flex flex-column gap-3">{results}</div>
         </div>
       </div>
@@ -241,4 +212,4 @@ function SessionVoiceConversionResultsList(props: Props) {
   );
 }
 
-export { SessionVoiceConversionResultsList };
+export { FaceAnimationPageResultList };

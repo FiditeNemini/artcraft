@@ -81,6 +81,7 @@ import { VoiceConversionModelListItem } from "@storyteller/components/src/api/vo
 import { CommunityCommissionsPage } from "./pages/contest/CommunityCommissionsPage";
 import { ProductUsageInfoPage } from "./pages/product_usage_info/ProductUsageInfoPage";
 import { TestingPage } from "./pages/testing/TestingPage";
+import { FaceAnimationPage } from "./pages/face-animation/FaceAnimationPage";
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -543,6 +544,17 @@ class PageContainer extends React.Component<Props, State> {
 
             <Route path="/testing">
               <TestingPage 
+                sessionSubscriptionsWrapper={
+                  this.props.sessionSubscriptionsWrapper
+                }
+                enqueueInferenceJob={this.props.enqueueInferenceJob}
+                inferenceJobs={this.props.inferenceJobs}
+                inferenceJobsByCategory={this.props.inferenceJobsByCategory}
+              />
+            </Route>
+
+            <Route path="/face-animation">
+              <FaceAnimationPage
                 sessionSubscriptionsWrapper={
                   this.props.sessionSubscriptionsWrapper
                 }

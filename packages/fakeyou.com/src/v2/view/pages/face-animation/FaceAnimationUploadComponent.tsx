@@ -7,18 +7,22 @@ import {
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React, { useState } from "react";
 import { FileUploader } from "react-drag-drop-files";
-import { InputVcAudioPlayer } from "../../../../_common/InputVcAudioPlayer";
 import { v4 as uuidv4 } from "uuid";
 import {
   UploadAudio,
   UploadAudioIsOk,
   UploadAudioRequest,
 } from "@storyteller/components/src/api/upload/UploadAudio";
-import { useLocalize } from "hooks";
-
-const FILE_TYPES = ["MP3", "WAV", "FLAC", "OGG"];
+import {
+  UploadImage,
+  UploadImageIsOk,
+  UploadImageRequest,
+} from "@storyteller/components/src/api/upload/UploadImage";
 
 interface Props {
+  uploadTypeLabel: string,
+  uploadTypesAllowed: string[],
+
   setMediaUploadToken: (token?: string) => void;
 
   formIsCleared: boolean;
@@ -28,11 +32,8 @@ interface Props {
   changeConvertIdempotencyToken: () => void;
 }
 
-function UploadComponent(props: Props) {
-  const { t } = useLocalize("UploadComponent");
-
+function FaceAnimationUploadComponent(props: Props) {
   const [file, setFile] = useState<any>(undefined);
-  const [audioLink, setAudioLink] = useState<string>();
   const [isUploadDisabled, setIsUploadDisabled] = useState<boolean>(false);
   const [uploadLoading, setUploadLoading] = useState(false);
 
@@ -43,8 +44,6 @@ function UploadComponent(props: Props) {
     console.log("handle change");
     setFile(file);
     setIdempotencyToken(uuidv4());
-    const audioUrl = URL.createObjectURL(file);
-    setAudioLink(audioUrl ?? "");
     props.setFormIsCleared(false);
     props.setCanConvert(false);
     props.changeConvertIdempotencyToken();
@@ -65,7 +64,6 @@ function UploadComponent(props: Props) {
 
   const handleClear = () => {
     setFile(null);
-    setAudioLink("");
     setIdempotencyToken(uuidv4());
     setIsUploadDisabled(false);
     props.setMediaUploadToken(undefined); // clear
@@ -81,6 +79,21 @@ function UploadComponent(props: Props) {
 
     setUploadLoading(true);
 
+    // TODO/FIXME: Horrible way to control upload type.
+    switch (props.uploadTypeLabel.toLocaleLowerCase()) {
+      case "audio":
+        uploadAudio();
+        break;
+      case "image":
+        uploadImage();
+        break;
+    }
+
+
+    setUploadLoading(false);
+  };
+
+  const uploadAudio = async () => {
     const request: UploadAudioRequest = {
       uuid_idempotency_token: idempotencyToken,
       file: file,
@@ -95,9 +108,24 @@ function UploadComponent(props: Props) {
       props.setFormIsCleared(false);
       props.setCanConvert(true);
     }
+  }
 
-    setUploadLoading(false);
-  };
+  const uploadImage = async () => {
+    const request: UploadImageRequest = {
+      uuid_idempotency_token: idempotencyToken,
+      file: file,
+      source: "file",
+    };
+
+    let result = await UploadImage(request);
+
+    if (UploadImageIsOk(result)) {
+      setIsUploadDisabled(true);
+      props.setMediaUploadToken(result.upload_token);
+      props.setFormIsCleared(false);
+      props.setCanConvert(true);
+    }
+  }
 
   const fileSize =
     file && file.size >= 1024 * 1024
@@ -116,7 +144,7 @@ function UploadComponent(props: Props) {
       <FileUploader
         handleChange={handleChange}
         name="file"
-        types={FILE_TYPES}
+        types={props.uploadTypesAllowed}
         maxSize={50}
         children={
           <div
@@ -139,8 +167,8 @@ function UploadComponent(props: Props) {
                   </span>
                 ) : (
                   <>
-                    <u className="fw-medium">{t("uploadFileTextUpload")}</u>{" "}
-                    {t("uploadFileTextDrop")}
+                    <u className="fw-medium">Upload {props.uploadTypeLabel} file</u> or drop it
+                    here...
                   </>
                 )}
               </div>
@@ -152,13 +180,11 @@ function UploadComponent(props: Props) {
                         {file && `${file.name.split(".").pop().toUpperCase()}`}{" "}
                         file size: {fileSize}
                       </span>{" "}
-                      <u className="fw-medium opacity-100 ms-1">
-                        {t("uploadChangeFile")}
-                      </u>
+                      <u className="fw-medium opacity-100 ms-1">Change file</u>
                     </p>
                   ) : (
                     <p className="opacity-50">
-                      {FILE_TYPES.join(", ").toString()} supported
+                      {props.uploadTypesAllowed.join(", ").toString()} supported
                     </p>
                   )}
                 </div>
@@ -167,30 +193,6 @@ function UploadComponent(props: Props) {
           </div>
         }
       />
-      {file ? (
-        <div className="panel panel-inner rounded p-3">
-          <InputVcAudioPlayer filename={audioLink as string} />
-        </div>
-      ) : (
-        <></>
-      )}
-      {/*file ? (
-        <div className="d-flex mb-4 mb-lg-3">
-          <div className="form-check form-switch">
-            <input
-              className="form-check-input"
-              type="checkbox"
-              value=""
-              id="checkSave"
-            />
-            <label className="form-check-label opacity-75" htmlFor="checkSave">
-              Save audio to collection
-            </label>
-          </div>
-        </div>
-      ) : (
-        <></>
-      )*/}
 
       {file ? (
         <div className="d-flex gap-3">
@@ -205,12 +207,12 @@ function UploadComponent(props: Props) {
             {isUploadDisabled ? (
               <>
                 <FontAwesomeIcon icon={faCheck} className="me-2" />
-                {t("uploadButtonUploaded")}
+                Uploaded
               </>
             ) : (
               <>
                 <FontAwesomeIcon icon={faFileArrowUp} className="me-2" />
-                {t("uploadButtonUploadAudio")}
+                Upload Media
               </>
             )}
             {uploadLoading && <LoadingIcon />}
@@ -218,7 +220,7 @@ function UploadComponent(props: Props) {
 
           <button className="btn btn-destructive w-100" onClick={handleClear}>
             <FontAwesomeIcon icon={faTrash} className="me-2" />
-            {t("uploadButtonClear")}
+            Clear
           </button>
         </div>
       ) : (
@@ -241,4 +243,4 @@ const LoadingIcon: React.FC = () => {
   );
 };
 
-export default UploadComponent;
+export default FaceAnimationUploadComponent;
