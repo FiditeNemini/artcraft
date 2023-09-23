@@ -1,12 +1,12 @@
 {
   "community": {
-    "discordButton": "Discord",
+    "discordButton": "不和",
     "heading": "コミュニティに参加する",
     "text": "ぜひお話ししたいと思います!ご質問がございましたら、Discord にご参加ください。",
-    "twitterButton": "Twitter"
+    "twitterButton": "ツイッター"
   },
   "hero": {
-    "bottom": "FakeYou ディープ フェイク技術を使用して、お気に入りのキャラクターが言いたいことを言う音声やビデオを生成します。",
+    "bottom": "FakeYou のディープ フェイク技術を使用して、お気に入りのキャラクターが言いたいことを言う音声やビデオを生成します。",
     "top": "AI 音楽、テキスト読み上げ、音声変換"
   }
 }

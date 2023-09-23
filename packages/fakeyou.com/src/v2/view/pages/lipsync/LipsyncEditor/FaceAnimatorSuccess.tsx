@@ -19,11 +19,12 @@ interface Props {
   enqueueInferenceJob: any;
   sessionSubscriptionsWrapper: any;
   inferenceJobsByCategory: any;
+  t: any;
 }
 
 const DEFAULT_QUEUE_REFRESH_INTERVAL_MILLIS = 15000;
 
-export default function FaceAnimatorSuccess({ audioProps, imageProps, style, enqueueInferenceJob, sessionSubscriptionsWrapper, inferenceJobsByCategory }: Props) {
+export default function FaceAnimatorSuccess({ audioProps, imageProps, style, enqueueInferenceJob, sessionSubscriptionsWrapper, inferenceJobsByCategory, t }: Props) {
   const [pending, pendingSet] = useState<GetPendingTtsJobCountSuccessResponse>({
     success: true,
     pending_job_count: 0,
@@ -35,12 +36,12 @@ export default function FaceAnimatorSuccess({ audioProps, imageProps, style, enq
   const processStatus = (job: InferenceJob) => {
     switch (job.jobState) {
       case JobState.PENDING:
-      case JobState.UNKNOWN: return "Animation pending ...";
-      case JobState.STARTED: return "Animation in progress";
-      case JobState.ATTEMPT_FAILED: return `Animation failed ${job.attemptCount} attempt(s). Will retry...`;
+      case JobState.UNKNOWN: return t("status.animationPending");
+      case JobState.STARTED: return t("status.animationInProgress");
+      case JobState.ATTEMPT_FAILED: return t("status.animationPending",{ attemptCount: job.attemptCount });
       case JobState.COMPLETE_FAILURE:
-      case JobState.DEAD: return "Animation request dead.";
-      case JobState.COMPLETE_SUCCESS: return "Animation successful";
+      case JobState.DEAD: return t("status.animationDead");
+      case JobState.COMPLETE_SUCCESS: return t("status.animationSuccess");
     }
   };
 
@@ -73,7 +74,7 @@ export default function FaceAnimatorSuccess({ audioProps, imageProps, style, enq
           <h3>{ processStatus(job) }</h3>
           <span {...{ className: "job-id" }}>id: { job.jobToken }</span>
         </div> : <div>
-          <h3>Animation complete!</h3>
+          <h3>{ t("status.animationComplete") }</h3>
           <span {...{ className: "job-id" }}>id: { job.jobToken }</span>
           <a {...{
             className: "btn btn-primary w-100 mt-4",
@@ -82,7 +83,7 @@ export default function FaceAnimatorSuccess({ audioProps, imageProps, style, enq
             onClick:() => Analytics.voiceConversionClickDownload()
           }}>
             <FontAwesomeIcon icon={faDownload} className="me-2" />
-            Download File{" "}
+            { t("inputs.downloadFile") }
           </a>
         </div>).reverse()
     }</div>

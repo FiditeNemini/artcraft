@@ -1,0 +1,9 @@
+{
+  "buttonBad": "Diese Stimme klingt schlecht",
+  "buttonGood": "Diese Stimme klingt gut",
+  "ratingBad": "Stimme klingt schlecht",
+  "ratingGood": "Stimme klingt gut",
+  "ratingGreat": "Stimme klingt großartig",
+  "ratingLabel": "Bewertung:",
+  "ratingOk": "Die Stimme klingt in Ordnung"
+}

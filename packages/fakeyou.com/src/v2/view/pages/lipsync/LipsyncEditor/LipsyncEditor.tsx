@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { animated, useTransition } from '@react-spring/web';
 import { v4 as uuidv4 } from "uuid";
-import { useFile } from "hooks";
+import { useFile, useLocalize } from "hooks";
 import { AudioInput, ImageInput, Spinner } from "components/common";
 import { springs } from "resources";
 import {
@@ -27,7 +27,7 @@ import { SessionSubscriptionsWrapper } from "@storyteller/components/src/session
 import { FrontendInferenceJobType, InferenceJob } from "@storyteller/components/src/jobs/InferenceJob";
 
 
-interface LipSyncProps { audioProps: any, children?: any, imageProps: any, index: number, toggle: any, style: any, enqueueInferenceJob: any, sessionSubscriptionsWrapper: any, inferenceJobsByCategory: any, };
+interface LipSyncProps { audioProps: any, children?: any, imageProps: any, index: number, toggle: any, style: any, enqueueInferenceJob: any, sessionSubscriptionsWrapper: any, t: any, inferenceJobsByCategory: any, };
 interface EditorProps { 
   sessionSubscriptionsWrapper: SessionSubscriptionsWrapper;
   enqueueInferenceJob: (
@@ -40,14 +40,14 @@ interface EditorProps {
 
 const softSpring = { config: { mass: 1, tension: 80, friction: 10 } }
 
-const InputPage = ({ audioProps, imageProps, toggle, style }: LipSyncProps )  => {
+const InputPage = ({ audioProps, imageProps, toggle, style, t }: LipSyncProps )  => {
 
   return <animated.div {...{ className: "lipsync-editor", style }}>
   <div {...{ className: "grid-heading" }}>
-    <h5>Image</h5>
+    <h5>{ t("headings.image") }</h5>
   </div>
   <div {...{ className: "grid-heading" }}>
-    <h5>Audio</h5>
+    <h5>{ t("headings.audio") }</h5>
   </div>
   <div {...{ className: "grid-square lipsync-audio" }}>
     <ImageInput {...{ ...imageProps, onRest: () => toggle.image(imageProps.file ? true : false) }}/>
@@ -59,10 +59,9 @@ const InputPage = ({ audioProps, imageProps, toggle, style }: LipSyncProps )  =>
   </div>
 </animated.div>};
 
-const workStatus = ["","Uploading Audio","Uploading Image","Starting animation",""];
-// const jammy = ko => 
 
-const Working = ({ audioProps, imageProps, index, style }: LipSyncProps ) => {
+const Working = ({ audioProps, imageProps, index, style, t }: LipSyncProps ) => {
+  const workStatus = ["",t("status.uploadingAudio"),t("status.uploadingImage"),t("status.requestingAnimation"),""];
   const transitions = useTransition(index, {
     ...springs.soft,
     from: { opacity: 0, position: "absolute" },
@@ -80,6 +79,7 @@ const Working = ({ audioProps, imageProps, index, style }: LipSyncProps ) => {
 };
 
 export default function LipsyncEditor({ enqueueInferenceJob, sessionSubscriptionsWrapper, inferenceJobsByCategory, ...rest }: EditorProps) {
+  const { t } = useLocalize("FaceAnimator");
 
   // the ready states are set by functions which run after the upload input animation is completed, which then illuminates the respective checkmark in a staggered way to draw attention to the workflow, and reduces concurrent animations
 
@@ -139,7 +139,7 @@ export default function LipsyncEditor({ enqueueInferenceJob, sessionSubscription
     });
   };
   const page = index === 0 ? 0 : index === 4 ? 2 : 1;
-  const headerProps = { audioProps, audioReady, imageProps, imageReady, indexSet, page, submit };
+  const headerProps = { audioProps, audioReady, imageProps, imageReady, indexSet, page, submit , t};
 
   const transitions = useTransition(index, {
     ...softSpring,
@@ -161,6 +161,7 @@ export default function LipsyncEditor({ enqueueInferenceJob, sessionSubscription
               sessionSubscriptionsWrapper,
               inferenceJobsByCategory,
               index,
+              t,
               toggle: { audio: readyMedia(1), image: readyMedia(0) },
               style 
             }}/> : <></>

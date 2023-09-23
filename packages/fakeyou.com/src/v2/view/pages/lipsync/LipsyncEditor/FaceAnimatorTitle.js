@@ -25,13 +25,13 @@ const ProgressLi = ({ children, disabled = false }: { children?: any, disabled?:
 };
 
 export default function FaceAnimatorTitle({ ...rest }) {
-  const { audioProps, audioReady, imageProps, imageReady, indexSet, page, submit } = rest;
+  const { audioProps, audioReady, imageProps, imageReady, indexSet, page, submit, t } = rest;
   const noAudio = !audioReady || !audioProps.file;
   const noImg = !imageReady || !imageProps.file;
   const incomplete = noAudio || noImg;
   const working = imageProps.working && audioProps.working;
 
-  const slides = ["Generate",<Spinner />,"Make another"];
+  const slides = [t("inputs.generate"),<Spinner />,t("inputs.makeAnother")];
 
   const onClick = () => {
     if (page === 2) {
@@ -41,19 +41,19 @@ export default function FaceAnimatorTitle({ ...rest }) {
 
   return <div {...{ className: "progress-header" }}>
     <h1 {...{ className: "fw-bold text-center text-md-start progress-heading" }}>
-      Face Animator
+     { t("headings.title") }
     </h1>
     <ul {...{ className: 'async-progress-tracker' }}>
       <ProgressLi {...{ disabled: noImg }}>
-        Image
+        { t("headings.image") }
       </ProgressLi>
       <ProgressLi {...{ disabled: noAudio }}>
-        Audio
+        { t("headings.audio") }
       </ProgressLi>
     </ul>
     <DynamicButton {...{ disabled: incomplete || working, onClick, slides, index: page }}/>
     <p {...{ className: "progress-description" }}> 
-      Select and image with a clear face, and an audio sample, and generate a lipsynced video.
+      { t("headings.subtitle") }
     </p>
   </div>
 };

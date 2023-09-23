@@ -1,0 +1,12 @@
+{
+  "community": {
+    "discordButton": "不和谐",
+    "heading": "加入社区",
+    "text": "我们很乐意与您聊天！如果您有任何疑问，请加入我们的 Discord。",
+    "twitterButton": "推特"
+  },
+  "hero": {
+    "bottom": "使用 FakeYou 的深度假技术生成您最喜欢的角色的音频或视频，说出您想说的任何内容。",
+    "top": "AI 音乐、文字转语音、语音转语音"
+  }
+}

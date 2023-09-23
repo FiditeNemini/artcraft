@@ -1,12 +1,12 @@
 {
   "community": {
-    "discordButton": "Discord",
+    "discordButton": "Discordia",
     "heading": "Unete a la communidad",
     "text": "¡Nos encantaría charlar contigo! Únase a nosotros en Discord si tiene alguna pregunta.",
-    "twitterButton": "Twitter"
+    "twitterButton": "Gorjeo"
   },
   "hero": {
-    "bottom": "Genera audios o videos de tus personajes favoritos diciendo lo que quieras con la tecnología deep fake de FakeYou.",
-    "top": "Música con AI, texto a voz y voz a voz"
+    "bottom": "Genera audio o videos de tus personajes favoritos diciendo lo que quieras con la tecnología deep fake de FakeYou.",
+    "top": "Música con IA, texto a voz y voz a voz"
   }
 }
