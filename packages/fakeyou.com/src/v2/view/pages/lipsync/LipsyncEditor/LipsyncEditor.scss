@@ -111,8 +111,19 @@
 .lipsync-working-notice {
 	flex-direction: column;
 	margin: 5rem;
+
+	.working-title {
+		white-space: nowrap;
+	}
 }
 
 .lipsync-success {
 	padding: .5rem 1rem 1rem;
+
+	h3 { margin: 1rem auto 0 0; }
+
+	.job-id {
+		color: rgba(#fff, .66);
+		font-size: .75rem;
+	}
 }

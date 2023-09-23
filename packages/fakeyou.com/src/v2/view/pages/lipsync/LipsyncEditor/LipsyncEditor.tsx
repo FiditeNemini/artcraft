@@ -1,9 +1,9 @@
 import React, { useState } from "react";
-import { animated, useSpring, useTransition } from '@react-spring/web';
+import { animated, useTransition } from '@react-spring/web';
 import { v4 as uuidv4 } from "uuid";
 import { useFile } from "hooks";
 import { AudioInput, ImageInput, Spinner } from "components/common";
-import DynamicButton from './DynamicButton';
+import { springs } from "resources";
 import {
   UploadAudio,
   // UploadAudioIsOk,
@@ -19,23 +19,26 @@ import {
   // EnqueueFaceAnimationIsSuccess,
   // EnqueueFaceAnimationRequest,
 } from "@storyteller/components/src/api/face_animation/EnqueueFaceAnimation";
-import { FrontendInferenceJobType } from "@storyteller/components/src/jobs/InferenceJob";
+// import { FrontendInferenceJobType } from "@storyteller/components/src/jobs/InferenceJob";
+import FaceAnimatorTitle from './FaceAnimatorTitle';
+import FaceAnimatorSuccess from './FaceAnimatorSuccess';
 import './LipsyncEditor.scss';
+import { SessionSubscriptionsWrapper } from "@storyteller/components/src/session/SessionSubscriptionsWrapper";
+import { FrontendInferenceJobType, InferenceJob } from "@storyteller/components/src/jobs/InferenceJob";
 
-interface LipSyncProps { audioProps: any, children?: any, imageProps: any, toggle: any, style: any };
-interface EditorProps { enqueueInferenceJob: (
+
+interface LipSyncProps { audioProps: any, children?: any, imageProps: any, index: number, toggle: any, style: any, enqueueInferenceJob: any, sessionSubscriptionsWrapper: any, inferenceJobsByCategory: any, };
+interface EditorProps { 
+  sessionSubscriptionsWrapper: SessionSubscriptionsWrapper;
+  enqueueInferenceJob: (
     jobToken: string,
     frontendInferenceJobType: FrontendInferenceJobType
-  ) => void };
+  ) => void;
+  inferenceJobs: Array<InferenceJob>;
+  inferenceJobsByCategory: Map<FrontendInferenceJobType, Array<InferenceJob>>;
+};
 
 const softSpring = { config: { mass: 1, tension: 80, friction: 10 } }
-
-const SuccessPage = ({ audioProps, imageProps, style }: LipSyncProps )  => <animated.div {...{ className: "lipsync-success", style }}>
-  <h3 className=" fw-bold text-center text-lg-start">
-    Result
-  </h3>
-  Your animation is in progress.
-</animated.div>;
 
 const InputPage = ({ audioProps, imageProps, toggle, style }: LipSyncProps )  => {
 
@@ -56,72 +59,27 @@ const InputPage = ({ audioProps, imageProps, toggle, style }: LipSyncProps )  =>
   </div>
 </animated.div>};
 
-const Working = ({ audioProps, children = "", imageProps, style }: LipSyncProps ) => <animated.div {...{ className: "lipsync-working", style }}>
-  <div {...{ className: "lipsync-working-notice" }}>
-    <h2>{ children }</h2>
-    <Spinner />
-  </div>
-</animated.div>;
+const workStatus = ["","Uploading Audio","Uploading Image","Starting animation",""];
+// const jammy = ko => 
 
-const AudioWorking = (props: any) => <Working { ...props }>Uploading Audio ...</Working>;
-const ImageWorking = (props: any) => <Working { ...props }>Uploading Image ...</Working>;
-const AniWorking = (props: any) => <Working { ...props }>Starting animation ...</Working>;
-
-const ProgressLi = ({ children, disabled = false }: { children?: any, disabled?: boolean }) => {
-  const style = useSpring({
-    ...softSpring,
-    opacity: disabled ? .25 : 1
+const Working = ({ audioProps, imageProps, index, style }: LipSyncProps ) => {
+  const transitions = useTransition(index, {
+    ...springs.soft,
+    from: { opacity: 0, position: "absolute" },
+    enter: { opacity: 1, position: "relative" },
+    leave: { opacity: 0, position: "absolute" },
   });
-  return <animated.li {...{ style }}>
-    <svg>
-      <circle {...{ cx: 16, cy: 16, r: 15, strokeWidth: "2", }}/>
-      { <polyline {...{
-        fill: "none",
-        points: "9.5 18 14.5 22 22.5 12",
-        strokeLinecap: "round",
-        strokeLinejoin: "round",
-        strokeWidth: "4",
-      }}/> }
-    </svg>
-    { children }
-  </animated.li>
+  return <animated.div {...{ className: "lipsync-working", style }}>
+    <div {...{ className: "lipsync-working-notice" }}>
+      <h2 {...{ className: "working-title" }}> { transitions(({ opacity, position }, i) => {
+            return <animated.span {...{ className: "working-title-text", style: { opacity, position: position as any} }}>{ workStatus[index] } ...</animated.span>;
+          }) }</h2>
+      <Spinner />
+    </div>
+  </animated.div>;
 };
 
-const Title = ({ ...rest }) => {
-  const { audioProps, audioReady, imageProps, imageReady, index, submit } = rest;
-  const noAudio = !audioReady || !audioProps.file;
-  const noImg = !imageReady || !imageProps.file;
-  const incomplete = noAudio || noImg;
-  const working = imageProps.working && audioProps.working;
-
-  const slides = ["Generate",<Spinner />,<Spinner />,<Spinner />,"Make another"];
-
-  const onClick = () => {
-    if (imageProps.success && audioProps.success) {
-      imageProps.clear(); audioProps.clear();
-    } else if (!incomplete && !working) submit();
-  };
-
-  return <div {...{ className: "progress-header" }}>
-    <h1 {...{ className: "fw-bold text-center text-md-start progress-heading" }}>
-      Lip Service
-    </h1>
-    <ul {...{ className: 'async-progress-tracker' }}>
-      <ProgressLi {...{ disabled: noImg }}>
-        Image
-      </ProgressLi>
-      <ProgressLi {...{ disabled: noAudio }}>
-        Audio
-      </ProgressLi>
-    </ul>
-    <DynamicButton {...{ disabled: incomplete || working, onClick, slides, index }}/>
-    <p {...{ className: "progress-description" }}> 
-      Select and image with a clear face, and an audio sample, and generate a lipsynced video.
-    </p>
-  </div>
-};
-
-export default function LipsyncEditor({ enqueueInferenceJob, ...rest }: EditorProps) {
+export default function LipsyncEditor({ enqueueInferenceJob, sessionSubscriptionsWrapper, inferenceJobsByCategory, ...rest }: EditorProps) {
 
   // the ready states are set by functions which run after the upload input animation is completed, which then illuminates the respective checkmark in a staggered way to draw attention to the workflow, and reduces concurrent animations
 
@@ -154,7 +112,6 @@ export default function LipsyncEditor({ enqueueInferenceJob, ...rest }: EditorPr
       return upImageAndMerge(res); // start image (1) upload, replace with Upload(imageRequest)
     })
     .then(responses => {
-      console.log("🌅",responses);
       if ("upload_token" in responses.image) {
         indexSet(3); // set face animator API working page
         return EnqueueFaceAnimation({
@@ -169,18 +126,20 @@ export default function LipsyncEditor({ enqueueInferenceJob, ...rest }: EditorPr
       }
     })
     .then(res => {
-      console.log("🎆",res);
-      // if ("success" in res) {
-      //   console.log("💒",res);
-      //   indexSet(4); // set face animator API working page
-      // }
+      if  (res && res.inference_job_token) {
+        enqueueInferenceJob(
+          res.inference_job_token,
+          FrontendInferenceJobType.FaceAnimation
+        );
+        indexSet(4); // set face animator API working page
+      }
     })
     .catch(e => {
       return { success : false };
     });
   };
-
-  const headerProps = { audioProps, audioReady, imageProps, imageReady, index, submit };
+  const page = index === 0 ? 0 : index === 4 ? 2 : 1;
+  const headerProps = { audioProps, audioReady, imageProps, imageReady, indexSet, page, submit };
 
   const transitions = useTransition(index, {
     ...softSpring,
@@ -192,12 +151,16 @@ export default function LipsyncEditor({ enqueueInferenceJob, ...rest }: EditorPr
 	return <div>
       <div {...{ className: "container" }}>
         <div {...{ className: "panel lipsync-panel" }}>
-          <Title { ...headerProps }/>
+          <FaceAnimatorTitle { ...headerProps }/>
           { transitions((style, i) => {
-            const Page = [InputPage,AudioWorking,ImageWorking,AniWorking,SuccessPage][i];
+            const Page = [InputPage,Working,FaceAnimatorSuccess][page];
             return Page ? <Page {...{ 
               audioProps,
               imageProps,
+              enqueueInferenceJob,
+              sessionSubscriptionsWrapper,
+              inferenceJobsByCategory,
+              index,
               toggle: { audio: readyMedia(1), image: readyMedia(0) },
               style 
             }}/> : <></>

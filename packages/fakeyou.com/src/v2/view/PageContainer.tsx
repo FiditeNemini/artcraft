@@ -433,7 +433,12 @@ class PageContainer extends React.Component<Props, State> {
             </Route>
 
             <Route path="/dev-lipsync">
-              <LipsyncEditor {...{ enqueueInferenceJob: this.props.enqueueInferenceJob }} />
+              <LipsyncEditor {...{ 
+                enqueueInferenceJob: this.props.enqueueInferenceJob,
+                sessionSubscriptionsWrapper:  this.props.sessionSubscriptionsWrapper,
+                inferenceJobs: this.props.inferenceJobs,
+                inferenceJobsByCategory: this.props.inferenceJobsByCategory
+              }} />
             </Route>
 
             <Route path="/media/:token">

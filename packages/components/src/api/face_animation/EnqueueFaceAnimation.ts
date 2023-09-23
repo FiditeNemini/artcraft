@@ -20,24 +20,36 @@ export interface EnqueueFaceAnimationRequest {
   image_source: ImageSource,
 }
 
-export interface EnqueueFaceAnimationSuccessResponse {
+// export interface EnqueueFaceAnimationSuccessResponse {
+//   success: boolean,
+//   inference_job_token: string,
+// }
+
+// export interface EnqueueFaceAnimationErrorResponse {
+//   success: boolean,
+// }
+
+export interface EnqueueFaceAnimationResponse {
   success: boolean,
-  inference_job_token: string,
+  inference_job_token?: string,
 }
 
-export interface EnqueueFaceAnimationErrorResponse {
-  success: boolean,
-}
 
-type EnqueueFaceAnimationResponse = EnqueueFaceAnimationSuccessResponse | EnqueueFaceAnimationErrorResponse;
+const EnqueueFaceAnimationIsSuccess = (response: EnqueueFaceAnimationResponse) => response.inference_job_token;
+const EnqueueFaceAnimationIsError = (response: EnqueueFaceAnimationResponse) => !response.inference_job_token;
 
-export function EnqueueFaceAnimationIsSuccess(response: EnqueueFaceAnimationResponse): response is EnqueueFaceAnimationSuccessResponse {
-  return response?.success === true;
-}
+export { EnqueueFaceAnimationIsSuccess, EnqueueFaceAnimationIsError };
+// export EnqueueFaceAnimationIsSuccess;
+// export EnqueueFaceAnimationIsError;
 
-export function EnqueueFaceAnimationIsError(response: EnqueueFaceAnimationResponse): response is EnqueueFaceAnimationErrorResponse {
-  return response?.success === false;
-}
+
+// export function EnqueueFaceAnimationIsSuccess(response: EnqueueFaceAnimationResponse): response is EnqueueFaceAnimationSuccessResponse {
+//   return response?.success === true;
+// }
+
+// export function EnqueueFaceAnimationIsError(response: EnqueueFaceAnimationResponse): response is EnqueueFaceAnimationErrorResponse {
+//   return response?.success === false;
+// }
 
 export async function EnqueueFaceAnimation(request: EnqueueFaceAnimationRequest) : Promise<EnqueueFaceAnimationResponse> 
 {

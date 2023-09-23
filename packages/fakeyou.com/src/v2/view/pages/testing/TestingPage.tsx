@@ -48,7 +48,7 @@ function TestingPage(props: Props) {
 
     let result = await EnqueueFaceAnimation(request);
 
-    if (EnqueueFaceAnimationIsSuccess(result)) {
+    if (EnqueueFaceAnimationIsSuccess(result) && result.inference_job_token) {
       props.enqueueInferenceJob(
         result.inference_job_token,
         FrontendInferenceJobType.FaceAnimation
