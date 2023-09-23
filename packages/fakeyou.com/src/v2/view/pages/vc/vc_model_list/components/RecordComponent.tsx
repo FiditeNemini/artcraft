@@ -10,6 +10,7 @@ import {
   UploadAudioRequest,
 } from "@storyteller/components/src/api/upload/UploadAudio";
 import { faCheck, faTrash } from "@fortawesome/free-solid-svg-icons";
+import { useLocalize } from "hooks";
 
 interface Props {
   setMediaUploadToken: (token?: string) => void;
@@ -22,6 +23,7 @@ interface Props {
 }
 
 export default function RecordComponent(props: Props) {
+  const { t } = useLocalize("RecordComponent");
   const [uploadLoading, setUploadLoading] = useState(false);
   const [isUploadDisabled, setIsUploadDisabled] = useState<boolean>(false);
   const { startRecording, stopRecording, recordingBlob, isRecording } =
@@ -113,13 +115,13 @@ export default function RecordComponent(props: Props) {
             >
               <span className="visually-hidden">Recording...</span>
             </div>
-            Stop Recording
+            {t("recordButtonStop")}
           </div>
         </button>
       ) : (
         <button className="btn btn-secondary" onClick={handleStartRecording}>
           <FontAwesomeIcon icon={faMicrophone} className="me-2" />
-          Start Recording
+          {t("recordButtonStart")}
         </button>
       )}
 
@@ -139,19 +141,19 @@ export default function RecordComponent(props: Props) {
               {isUploadDisabled ? (
                 <>
                   <FontAwesomeIcon icon={faCheck} className="me-2" />
-                  Uploaded
+                  {t("recordButtonUploaded")}
                 </>
               ) : (
                 <>
                   <FontAwesomeIcon icon={faFileArrowUp} className="me-2" />
-                  Upload Audio
+                  {t("recordButtonUploadAudio")}
                 </>
               )}
               {uploadLoading && <LoadingIcon />}
             </button>
             <button className="btn btn-destructive w-100" onClick={handleClear}>
               <FontAwesomeIcon icon={faTrash} className="me-2" />
-              Clear
+              {t("recordButtonClear")}
             </button>
           </div>
         </>

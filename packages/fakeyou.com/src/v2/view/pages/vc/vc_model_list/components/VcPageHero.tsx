@@ -2,7 +2,6 @@ import React, { useMemo } from "react";
 import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
 import { SessionSubscriptionsWrapper } from "@storyteller/components/src/session/SessionSubscriptionsWrapper";
 import { Link } from "react-router-dom";
-import { t } from "i18next";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faStar,
@@ -13,6 +12,7 @@ import {
 import { Analytics } from "../../../../../../common/Analytics";
 import { WebUrl } from "../../../../../../common/WebUrl";
 import { PageHeaderWithImage } from "../../../../_common/PageHeaderWithImage";
+import { useLocalize } from "hooks";
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -20,6 +20,7 @@ interface Props {
 }
 
 export function VcPageHero(props: Props) {
+  const { t } = useLocalize("VcModelListPage");
   const randomImage = useMemo(() => {
     const images = ["mascot/vc.webp"];
 
@@ -41,7 +42,7 @@ export function VcPageHero(props: Props) {
           }}
         >
           <button type="button" className="btn btn-primary w-100">
-            {t("tts.TtsModelListPage.heroSection.buttons.signUp")}
+            {t("heroButtonSignUp")}
             <FontAwesomeIcon icon={faArrowRight} className="ms-2" />
           </button>
         </Link>
@@ -57,7 +58,7 @@ export function VcPageHero(props: Props) {
         >
           <button type="button" className="btn btn-secondary w-100">
             <FontAwesomeIcon icon={faStar} className="me-2" />
-            {t("tts.TtsModelListPage.heroSection.buttons.viewPricing")}
+            {t("heroButtonPricing")}
           </button>
         </Link>
       </>
@@ -77,7 +78,7 @@ export function VcPageHero(props: Props) {
         >
           <button type="button" className="btn btn-secondary w-100">
             <FontAwesomeIcon icon={faUser} className="me-2" />
-            View my profile
+            {t("heroButtonProfile")}
           </button>
         </Link>
       </>
@@ -93,7 +94,7 @@ export function VcPageHero(props: Props) {
           >
             <button type="button" className="btn btn-primary w-100">
               <FontAwesomeIcon icon={faStar} className="me-2" />
-              Upgrade Plan
+              {t("heroButtonUpgradePlan")}
             </button>
           </Link>
         </>
@@ -104,10 +105,8 @@ export function VcPageHero(props: Props) {
   const titleIcon = (
     <FontAwesomeIcon icon={faMicrophoneStand} className="me-3 me-lg-4" />
   );
-  const title = <>Voice to Voice</>;
-  const subText = (
-    <>Use this tool to change your voice into your favorite characters.</>
-  );
+  const title = <>{t("heroTitle")}</>;
+  const subText = <>{t("heroText")}</>;
   const actionButtons = (
     <>
       {upgradeButton}

@@ -22,6 +22,7 @@ import {
   GetQueueStatsIsOk,
   GetQueueStatsSuccessResponse,
 } from "@storyteller/components/src/api/stats/queues/GetQueueStats";
+import { useLocalize } from "hooks";
 
 const DEFAULT_QUEUE_REFRESH_INTERVAL_MILLIS = 15000;
 
@@ -30,6 +31,7 @@ interface Props {
 }
 
 function FooterNav(props: Props) {
+  const { t } = useLocalize("Footer");
   const [serverInfo, setServerInfo] = useState<
     GetServerInfoSuccessResponse | undefined
   >(undefined);
@@ -202,25 +204,25 @@ function FooterNav(props: Props) {
               </div>
             </div>
             <div className="py-2 col-12 col-lg-3 d-flex flex-column gap-2 gap-lg-3 align-items-center align-items-lg-start">
-              <p className="fw-bold">AI Tools</p>
+              <p className="fw-bold">{t("productsTitle")}</p>
               <li>
-                <Link to="/tts">Text to Speech</Link>
+                <Link to="/tts">{t("productTts")}</Link>
               </li>
 
               <li>
-                <Link to="/voice-conversion">Voice to Voice</Link>
+                <Link to="/voice-conversion">{t("productVc")}</Link>
               </li>
 
               <li>
-                <Link to="/video">Video Lipsync</Link>
+                <Link to="/video">{t("productVideo")}</Link>
               </li>
 
               <li>
-                <Link to="/contribute">Upload Models</Link>
+                <Link to="/contribute">{t("productUploadModels")}</Link>
               </li>
             </div>
             <div className="py-2 col-12 col-lg-3 d-flex flex-column gap-2 gap-lg-3 align-items-center align-items-lg-start">
-              <p className="fw-bold">Community</p>
+              <p className="fw-bold">{t("communityTitle")}</p>
 
               <li>
                 <a
@@ -228,43 +230,42 @@ function FooterNav(props: Props) {
                   target="_blank"
                   rel="noopener noreferrer"
                 >
-                  Discord
+                  {t("communityDiscord")}
                 </a>
               </li>
 
               <li>
-                <Link to="/leaderboard">Leaderboard</Link>
+                <Link to="/leaderboard">{t("communityLeaderboard")}</Link>
               </li>
 
               <li>
-                <Link to="/guide">Guide</Link>
+                <Link to="/guide">{t("communityGuide")}</Link>
               </li>
 
               <li>
-                <Link to={myDataLink}>My Data</Link>
+                <Link to={myDataLink}>{t("communityProfile")}</Link>
               </li>
             </div>
             <div className="py-2 col-12 col-lg-3 d-flex flex-column gap-2 gap-lg-3 align-items-center align-items-lg-start">
-              <p className="fw-bold">Info</p>
+              <p className="fw-bold">{t("infoTitle")}</p>
               <li>
                 <Link to={WebUrl.pricingPageWithReferer("footer")}>
-                  Pricing
+                  {t("infoPricing")}
                 </Link>
               </li>
-
               <li>
-                <Link to={WebUrl.aboutUsPage()}>About</Link>
+                <Link to={WebUrl.aboutUsPage()}>{t("infoAbout")}</Link>
               </li>
 
               <li>
-                <Link to={WebUrl.termsPage()}>Terms of Use</Link>
+                <Link to={WebUrl.termsPage()}>{t("infoTerms")}</Link>
               </li>
 
               <li>
-                <Link to={WebUrl.privacyPage()}>Privacy Policy</Link>
+                <Link to={WebUrl.privacyPage()}>{t("infoPrivacyPolicy")}</Link>
               </li>
               <li>
-                <a href={WebUrl.developerDocs()}>API Docs</a>
+                <a href={WebUrl.developerDocs()}>{t("infoApiDocs")}</a>
               </li>
             </div>
           </div>

@@ -1,6 +1,4 @@
 import React, { useEffect, useCallback, useState } from "react";
-import { t } from "i18next";
-import { Trans } from "react-i18next";
 import { Link } from "react-router-dom";
 import { SessionTtsInferenceResultList } from "../../../_common/SessionTtsInferenceResultsList";
 import { SessionTtsModelUploadResultList } from "../../../_common/SessionTtsModelUploadResultsList";
@@ -68,6 +66,7 @@ import { RatingButtons } from "../../../_common/ratings/RatingButtons";
 import { RatingStats } from "../../../_common/ratings/RatingStats";
 import { SearchOmnibar } from "./search/SearchOmnibar";
 import { PosthogClient } from "@storyteller/components/src/analytics/PosthogClient";
+import { useLocalize } from "hooks";
 
 export interface EnqueueJobResponsePayload {
   success: boolean;
@@ -140,6 +139,8 @@ interface Props {
 
 function TtsModelListPage(props: Props) {
   PosthogClient.recordPageview();
+
+  const { t } = useLocalize("TtsModelListPage");
 
   //Loading spinning icon
   const [loading, setLoading] = useState(false);
@@ -370,7 +371,7 @@ function TtsModelListPage(props: Props) {
         <div className="d-flex flex-column gap-3 flex-lg-row">
           <p>
             <FontAwesomeIcon icon={faGlobe} className="me-2" />
-            {t("tts.TtsModelListPage.languageLabel")}:{" "}
+            {t("ttsDetailsLanguageLabel")}{" "}
             <span className="fw-medium">{modelLanguage.languageName}</span>{" "}
             {/* We're not ready for use count yet. */}
             {/*| Use count:{" "}
@@ -385,9 +386,7 @@ function TtsModelListPage(props: Props) {
             }}
             className="d-flex align-items-center"
           >
-            <span className="fw-medium">
-              {t("tts.TtsModelListPage.voiceDetails.seeMoreDetails")}
-            </span>
+            <span className="fw-medium">{t("ttsDetailsViewLink")}</span>
             <FontAwesomeIcon icon={faArrowRight} className="ms-2" />
           </Link>
         </div>
@@ -442,13 +441,7 @@ function TtsModelListPage(props: Props) {
     switch (maybeTtsError) {
       case GenerateTtsAudioErrorType.TooManyRequests:
         hasMessage = true;
-        message = (
-          <Trans i18nKey="pages.ttsList.errorTooManyRequests">
-            <strong>You're sending too many requests!</strong>
-            Slow down a little. We have to slow things down a little when the
-            server gets busy.
-          </Trans>
-        );
+        message = <>{t("tts.TtsModelListPage.errors.tooManyRequests")}</>;
         break;
       case GenerateTtsAudioErrorType.ServerError |
         GenerateTtsAudioErrorType.BadRequest |
@@ -563,7 +556,7 @@ function TtsModelListPage(props: Props) {
                   <div className="d-flex flex-column gap-3 h-100">
                     <div className="d-flex gap-2">
                       <label className="sub-title pb-0">
-                        {t("tts.TtsModelListPage.form.yourTextLabel")}
+                        {t("ttsTextInputLabel")}
                       </label>
                       {/*<a href="/" className="ms-1">
                           <FontAwesomeIcon icon={faShuffle} />
@@ -576,13 +569,10 @@ function TtsModelListPage(props: Props) {
                       onChange={handleChangeText}
                       className="form-control text-message h-100"
                       value={props.textBuffer}
-                      placeholder={t(
-                        "tts.TtsModelListPage.form.textInputHint",
-                        {
-                          voice:
-                            props.maybeSelectedTtsModel?.title || "the voice",
-                        }
-                      )}
+                      placeholder={t("ttsTextInputPlaceholder", {
+                        character:
+                          props.maybeSelectedTtsModel?.title || "character",
+                      })}
                     ></textarea>
                     {audioLimitAlert}
                     <div className="d-flex gap-3">
@@ -596,7 +586,7 @@ function TtsModelListPage(props: Props) {
                         type="submit"
                       >
                         <FontAwesomeIcon icon={faVolumeHigh} className="me-2" />
-                        {t("tts.TtsModelListPage.form.buttons.speak")}
+                        {t("ttsButtonSpeak")}
 
                         {loading && <LoadingIcon />}
                       </button>
@@ -606,7 +596,7 @@ function TtsModelListPage(props: Props) {
                         disabled={noTextInputButtonDisabled}
                       >
                         <FontAwesomeIcon icon={faDeleteLeft} className="me-2" />
-                        {t("tts.TtsModelListPage.form.buttons.clear")}
+                        {t("ttsButtonClear")}
                       </button>
                     </div>
                   </div>
@@ -618,7 +608,7 @@ function TtsModelListPage(props: Props) {
                         icon={faBarsStaggered}
                         className="me-3"
                       />
-                      {t("tts.TtsModelListPage.sessionTtsResultsLabel")}
+                      {t("ttsResultsTitle")}
                     </h4>
                     <div className="d-flex flex-column gap-3 session-tts-section">
                       <SessionTtsInferenceResultList

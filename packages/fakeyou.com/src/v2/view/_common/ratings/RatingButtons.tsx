@@ -1,5 +1,4 @@
 import React, { useState, useCallback, useEffect } from "react";
-import { t } from "i18next";
 import {
   GetUserRating,
   GetUserRatingIsOk,
@@ -12,6 +11,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faThumbsDown, faThumbsUp } from "@fortawesome/free-solid-svg-icons";
 import Tippy from "@tippyjs/react";
 import "tippy.js/dist/tippy.css";
+import { useLocalize } from "hooks";
 
 interface Props {
   entity_type: string;
@@ -30,6 +30,8 @@ function RatingButtons(props: Props) {
   const [userRatingValue, setUserRatingValue] = useState<string | undefined>(
     undefined
   );
+
+  const { t } = useLocalize("Rating");
 
   const loadRating = useCallback(async () => {
     const request = {
@@ -79,8 +81,8 @@ function RatingButtons(props: Props) {
     downClasses += " rated";
   }
 
-  const upvoteTooltip = t("common.RatingButtons.voice.upvote");
-  const downvoteTooltip = t("common.RatingButtons.voice.downvote");
+  const upvoteTooltip = t("buttonGood");
+  const downvoteTooltip = t("buttonBad");
 
   return (
     <div className="d-flex">
