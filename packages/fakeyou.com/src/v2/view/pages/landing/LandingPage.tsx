@@ -13,6 +13,7 @@ import { faDiscord, faTwitter } from "@fortawesome/free-brands-svg-icons";
 import { WebUrl } from "../../../../common/WebUrl";
 import { faFileArrowUp, faSparkles } from "@fortawesome/pro-solid-svg-icons";
 import { PosthogClient } from "@storyteller/components/src/analytics/PosthogClient";
+import Alert from "components/common/Alert/Alert";
 // import {
 //   faFileArrowUp,
 //   faMicrophone,
@@ -147,17 +148,15 @@ function LandingPage(props: Props) {
   return (
     <div>
       <div className="container pb-5 pb-lg-0 pt-lg-4 px-md-5 px-lg-5 px-xl-3">
-        {/* Community Commissions Alert */}
-        {/* <div className="alert alert-info">
-          <FontAwesomeIcon icon={faMoneyBill} className="me-2" />
-          <span className="fw-medium">
-            Get rewarded from our $15k prize pool for creating Voice to Voice
-            models!
-          </span>
-          <Link to="/commissions" className="fw-semibold ms-2">
-            See details <FontAwesomeIcon icon={faArrowRight} className="ms-1" />
-          </Link>
-        </div> */}
+        {/* Face Animation Alert Banner */}
+        <Alert
+          id="face-animation-alert"
+          icon={faSparkles}
+          message="Have you tried our new Face Animator? Turn photos of faces into animated lip-synced videos with just a picture and some audio!"
+          alertVariant="primary"
+          link="/face-animation"
+          linkText="Try it now"
+        />
 
         <div className="row flex-md-row-reverse">
           <div className="col-12 col-lg-5 p-md-0 d-flex justify-content-center">
@@ -334,7 +333,9 @@ function LandingPage(props: Props) {
             >
               <div className="d-flex px-4 pt-4 align-items-center w-100">
                 <div className="flex-grow-1">
-                  <h3 className="fw-bold text-white mb-1">{t("productVideoTitle")}</h3>
+                  <h3 className="fw-bold text-white mb-1">
+                    {t("productVideoTitle")}
+                  </h3>
                   <h6 className="fw-normal opacity-75 text-white mb-0">
                     {t("productVideoText")}
                   </h6>
