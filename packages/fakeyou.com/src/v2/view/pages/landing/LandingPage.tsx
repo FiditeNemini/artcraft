@@ -153,7 +153,7 @@ function LandingPage(props: Props) {
           id="face-animation-alert"
           icon={faSparkles}
           message="Have you tried our new Face Animator? Turn photos of faces into animated lip-synced videos with just a picture and some audio!"
-          alertVariant="new"
+          alertVariant="primary"
           link="/face-animation"
           linkText="Try it now"
         />
