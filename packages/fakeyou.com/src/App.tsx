@@ -753,11 +753,6 @@ class App extends React.Component<Props, State> {
     return (
       <BrowserRouter>
         <div id="main" className="bg-gradient">
-          <div className="animation-wrapper">
-            <div className="particle particle-1"></div>
-            <div className="particle particle-2"></div>
-          </div>
-
           <div id="viewable">
             {/* This is the old vocodes1.0-compatible username and version switch
             <MigrationTopNav
