@@ -9,7 +9,6 @@ use subprocess::{Popen, PopenConfig};
 
 use container_common::anyhow_result::AnyhowResult;
 use filesys::path_to_string::path_to_string;
-use subprocess_common::docker_options::{DockerFilesystemMount, DockerGpu, DockerOptions};
 
 use crate::job::job_loop::command_exit_status::CommandExitStatus;
 

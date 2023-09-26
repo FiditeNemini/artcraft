@@ -23,9 +23,9 @@ mod string;
 mod num;
 
 /// Name of the environment variable Rust's env logger uses
-pub const ENV_RUST_LOG : &'static str = "RUST_LOG";
+pub const ENV_RUST_LOG : &str = "RUST_LOG";
 
-const DEFAULT_LOG_LEVEL: &'static str = "info";
+const DEFAULT_LOG_LEVEL: &str = "info";
 
 /// Errors with env variables.
 #[derive(Debug)]
