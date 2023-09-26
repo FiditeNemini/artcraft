@@ -2,6 +2,14 @@
 -- noinspection SqlNoDataSourceInspectionForFile
 -- noinspection SqlResolveForFile
 
+-- See how many jobs of each time were created in the last period
+select
+    distinct maybe_model_type as model_type,
+             count(*) as created
+from generic_inference_jobs
+where created_at > (CURDATE() - INTERVAL 60 MINUTE)
+group by maybe_model_type;
+
 -- See how long recent jobs are taking
 select
     id,
