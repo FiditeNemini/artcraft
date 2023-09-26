@@ -1986,8 +1986,6 @@ dependencies = [
 [[package]]
 name = "easyenv"
 version = "0.0.9"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "19f3d306adc28605287f6ded00f416af86373c9c576ce174b6bd2afd46d575a7"
 dependencies = [
  "dotenv",
  "env_logger 0.10.0",

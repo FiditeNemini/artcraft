@@ -17,6 +17,7 @@ path = "src/main.rs"
 # Internal
 config = { path = "../../../lib/deprecated/config" }
 container_common = { path = "../../../lib/deprecated/container_common" }
+easyenv = { path = "../../../lib/easyenv" }
 http_server_common = { path = "../../../lib/deprecated/http_server_common" }
 mysql_queries = { path = "../../../lib/mysql_queries" }
 redis_common = { path = "../../../lib/redis_common" }
@@ -29,7 +30,6 @@ base64 = "0.13.0"
 chrono = { version = "0.4.19", features = ["serde"] }
 derive_more = "0.99.14"
 dotenv = "0.15.0"
-easyenv = "0.0.9"
 futures-timer = "3.0.2"
 hex = "0.4.3"
 hostname = "0.3.1"

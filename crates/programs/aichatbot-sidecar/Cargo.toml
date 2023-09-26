@@ -17,6 +17,7 @@ path = "src/main.rs"
 # Internal
 actix_helpers = { path = "../../lib/actix_helpers" }
 concurrency = { path = "../../lib/concurrency" }
+easyenv = { path = "../../lib/easyenv" }
 enums = { path = "../../_types/enums" }
 errors = { path = "../../lib/errors" }
 fakeyou_client = { path = "../../lib/api_clients/fakeyou_client" }
@@ -34,7 +35,6 @@ base64 = "0.21.0"
 chrono = { version = "0.4.19", features = ["serde"] }
 clap = "2.34.0" # TODO: This is really out of date, but has conflicts when updated
 dotenv = "0.15.0"
-easyenv = "0.0.9"
 log = "0.4.14"
 once_cell = "1.9.0"
 path-absolutize = "3.0.14" # Absolute paths have not stabilized in Rust yet

@@ -23,6 +23,7 @@ cloud_storage = { path = "../../../lib/api_clients/cloud_storage" }
 config = { path = "../../../lib/deprecated/config" }
 container_common = { path = "../../../lib/deprecated/container_common" }
 datetimes = { path = "../../../lib/datetimes" }
+easyenv = { path = "../../../lib/easyenv" }
 enums = { path = "../../../_types/enums" }
 envvar = { path = "../../../lib/envvar" }
 errors = { path = "../../../lib/errors" }
@@ -56,7 +57,6 @@ base64 = "0.13.0"
 chrono = { version = "0.4.19", features = ["serde"] }
 derive_more = "0.99.14"
 dotenv = "0.15.0"
-easyenv = "0.0.9"
 hex = "0.4.3"
 hostname = "0.3.1"
 lazy_static = "1.4.0"

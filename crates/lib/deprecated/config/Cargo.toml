@@ -15,6 +15,9 @@ path = "src/lib.rs"
 # TODO: Remove these dependencies.
 #  These were introduced in refactoring. Config should have few, if any, dependencies.
 [dependencies]
+# Internal
+easyenv = { path = "../../../lib/easyenv" }
+
+# External
 anyhow = "1.0.40"
-easyenv = "0.0.9"
 url = "2.2.2"

@@ -1,0 +1,21 @@
+[package]
+name = "easyenv"
+edition = "2018"
+version = "0.0.9"
+authors = [
+  "Brandon Thomas <bt@brand.io>",
+  "Brandon Thomas <echelon@gmail.com>",
+]
+publish = false
+
+[lib]
+name = "easyenv"
+path = "src/lib.rs"
+
+[dependencies]
+dotenv = "0.15.0"
+env_logger = "0.10.0"
+log = "0.4.14"
+
+[dev-dependencies]
+# None yet

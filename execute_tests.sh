@@ -19,6 +19,7 @@ cargo test \
 cargo test \
   --package inference-job \
   -- \
-  --skip util::audiowmark::tests::test_audiowmark
+  --skip util::audiowmark::tests::test_audiowmark \
+  --skip util::common_commands::audiowmark::tests::test_audiowmark
 
 echo 'Tests passed.'
