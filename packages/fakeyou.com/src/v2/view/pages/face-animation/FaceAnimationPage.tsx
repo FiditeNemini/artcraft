@@ -50,7 +50,7 @@ function FaceAnimationPage(props: Props) {
 
     if (EnqueueFaceAnimationIsSuccess(result)) {
       props.enqueueInferenceJob(
-        result.inference_job_token,
+        result.inference_job_token!,
         FrontendInferenceJobType.FaceAnimation
       );
     }

@@ -6,6 +6,7 @@ import { LoginPage } from "./pages/login/LoginPage";
 import { ModerationFc } from "./pages/moderation/moderation_main/ModerationFc";
 import { ModerationIpBanListFc } from "./pages/moderation/moderation_ip_ban_list/ModerationIpBanListFc";
 import { ModerationViewIpBanFc } from "./pages/moderation/moderation_view_ip_ban/ModerationViewIpBanFc";
+import { Media } from "./pages/media";
 import { LipsyncEditor } from "./pages/lipsync";
 import { FooterNav } from "./nav/FooterNav";
 import { TopNav } from "./nav/TopNav";
@@ -80,7 +81,6 @@ import { VoiceConversionModelListItem } from "@storyteller/components/src/api/vo
 import { CommunityCommissionsPage } from "./pages/contest/CommunityCommissionsPage";
 import { ProductUsageInfoPage } from "./pages/product_usage_info/ProductUsageInfoPage";
 import { TestingPage } from "./pages/testing/TestingPage";
-import { FaceAnimationPage } from "./pages/face-animation/FaceAnimationPage";
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -432,8 +432,8 @@ class PageContainer extends React.Component<Props, State> {
               <CreateCategoryPage sessionWrapper={this.props.sessionWrapper} />
             </Route>
 
-            <Route path="/dev-lipsync">
-              <LipsyncEditor />
+            <Route path="/media/:token">
+              <Media/>
             </Route>
 
             <Route path="/moderation/user/list">
@@ -544,14 +544,12 @@ class PageContainer extends React.Component<Props, State> {
             </Route>
 
             <Route path="/face-animation">
-              <FaceAnimationPage
-                sessionSubscriptionsWrapper={
-                  this.props.sessionSubscriptionsWrapper
-                }
-                enqueueInferenceJob={this.props.enqueueInferenceJob}
-                inferenceJobs={this.props.inferenceJobs}
-                inferenceJobsByCategory={this.props.inferenceJobsByCategory}
-              />
+              <LipsyncEditor {...{ 
+                enqueueInferenceJob: this.props.enqueueInferenceJob,
+                sessionSubscriptionsWrapper:  this.props.sessionSubscriptionsWrapper,
+                inferenceJobs: this.props.inferenceJobs,
+                inferenceJobsByCategory: this.props.inferenceJobsByCategory
+              }} />
             </Route>
 
             <Route path="/commissions">

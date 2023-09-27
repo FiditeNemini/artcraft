@@ -1,4 +1,12 @@
 @import "scss/colours.scss";
+@import "scss/_breakpoint.scss";
+
+
+.image-upload-frame {
+	@include breakpoint(min-width 992px) {
+		aspect-ratio: 1/1;
+	}
+}
 
 .fy-image-uploader {
 	display: flex;
@@ -27,9 +35,10 @@
 	}
 
 	.upload-details {
-		top: 1rem;
-		left: 1rem;
-		width: calc(100% - 2rem);
+		top: 0;
+		width: 100%;
+		padding: 1rem;
+		border-radius: 0;
 	}
 
 	.image-placeholder {
