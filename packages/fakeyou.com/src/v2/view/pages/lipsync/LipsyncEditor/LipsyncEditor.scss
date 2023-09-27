@@ -2,98 +2,103 @@
 $under992: max-width 992px;
 
 .lipsync-editor {
-	padding: 1rem;
+  padding-top: 2rem;
 
-	.media-input-column {
-		display: inline-block;
-	}
-	@include breakpoint($under992) {
-		.media-input-column:first-of-type { margin-bottom: 1rem }
-	}
+  .media-input-column {
+    display: inline-block;
+  }
+  @include breakpoint($under992) {
+    .media-input-column:first-of-type {
+      margin-bottom: 1rem;
+    }
+  }
 }
 
 .progress-header {
-	display: flex;
-	flex-wrap: wrap;
-	align-items: center;
-	padding: 1rem;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  // padding: 1rem;
 
-	.progress-heading {
-		display: inline-block;
-		margin: auto 1rem auto 0;
-	}
+  .progress-heading {
+    display: inline-block;
+    margin: auto 1rem auto 0;
+  }
 
-	.async-progress-tracker {
-		display: inline-flex;
-		justify-content: space-around;
-		flex-grow: 1;
-		margin-right: 1rem;
-		padding-left: 0;
+  .async-progress-tracker {
+    display: inline-flex;
+    justify-content: space-around;
+    flex-grow: 1;
+    margin-right: 1rem;
+    padding-left: 0;
 
-		li {
-			display: flex;
-			align-items: center;
-			font-size: 1.25rem;
-			font-weight: 500;
-		}
+    li {
+      display: flex;
+      align-items: center;
+      font-size: 1.25rem;
+      font-weight: 500;
+    }
 
-		svg {
-			margin-right: .5rem;
-			height: 2rem;
-			width: 2rem;
-			stroke: white;
-		}
-	}
+    svg {
+      margin-right: 0.5rem;
+      height: 2rem;
+      width: 2rem;
+      stroke: white;
+    }
+  }
 
-	.progress-description {
-		margin-top: 1rem;
-		width: 100%;
-	}
+  .progress-description {
+    margin-top: 1rem;
+    width: 100%;
+  }
 
-	button {
-		margin: 0 0 0 auto;
-		background-color: #ccccff;
-		width: fit-content;
+  button {
+    margin: 0 0 0 auto;
+    background-color: #ccccff;
+    width: fit-content;
 
-		@include breakpoint($under992) {
-			margin: 1rem 0 0;
-			width: 100%;
+    @include breakpoint($under992) {
+      margin: 1rem 0 0;
+      width: 100%;
 
-			.button-slide {
-				width: 100%;
-			}
-		}
-	}
+      .button-slide {
+        width: 100%;
+      }
+    }
+  }
 }
 
-.lipsync-panel { 
-	position: relative; 
-	overflow: hidden; 
+.lipsync-panel {
+  position: relative;
+  overflow: hidden;
 }
 
-.lipsync-working, .lipsync-working-notice {
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	width: 100%;
+.lipsync-working,
+.lipsync-working-notice {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
 }
 
 .lipsync-working-notice {
-	flex-direction: column;
-	margin: 5rem;
+  flex-direction: column;
+  margin: 5rem;
 
-	.working-title {
-		white-space: nowrap;
-	}
+  .working-title {
+    white-space: nowrap;
+  }
 }
 
 .lipsync-success {
-	padding: .5rem 1rem 1rem;
+  padding: 0.5rem 1rem 1rem;
 
-	h3 { margin: 1rem auto 0 0; }
+  h3 {
+    margin: 1rem auto 0 0;
+  }
 
-	.job-id {
-		color: rgba(#fff, .66);
-		font-size: .75rem;
-	}
+  .job-id {
+    color: rgba(#fff, 0.66);
+    font-size: 0.75rem;
+  }
 }
