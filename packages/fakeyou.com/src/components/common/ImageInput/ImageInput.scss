@@ -1,4 +1,12 @@
 @import "scss/colours.scss";
+@import "scss/_breakpoint.scss";
+
+
+.image-upload-frame {
+	@include breakpoint(min-width 992px) {
+		aspect-ratio: 1/1;
+	}
+}
 
 .fy-image-uploader {
 	display: flex;

@@ -1,39 +1,14 @@
+@import "scss/_breakpoint.scss";
+$under992: max-width 992px;
+
 .lipsync-editor {
-	display: grid;
-	grid-template-columns: repeat(2, minmax(0, 1fr));
-	grid-gap: 1rem;
+	padding: 1rem;
 
-	.grid-heading, .grid-square {
-		&:nth-child(odd) {
-			padding-left: 1rem;
-		}
-		&:nth-child(even) {
-			padding-right: 1rem;
-		}
+	.media-input-column {
+		display: inline-block;
 	}
-
-	.grid-heading {
-		display: flex;
-		align-items: center;
-		// background-color: blue;
-		// padding-left: 1rem;
-		h5 {
-			margin: 1rem 0 0;
-			// background: red;
-			line-height: 1em;
-		}
-	}
-
-	.grid-square {
-		aspect-ratio: 1;
-		padding-bottom: 1rem;
-		
-		.fy-uploader { height: 100% }
-	}
-
-	.fy-image-uploader { height: 100%; }
-	.lipsync-audio {
-		label { height: 100% }
+	@include breakpoint($under992) {
+		.media-input-column:first-of-type { margin-bottom: 1rem }
 	}
 }
 
@@ -41,7 +16,6 @@
 	display: flex;
 	flex-wrap: wrap;
 	align-items: center;
-	// margin: 1rem 0;
 	padding: 1rem;
 
 	.progress-heading {
@@ -64,9 +38,6 @@
 		}
 
 		svg {
-			// background-color: red;
-			// border: 2px solid #fff;
-			// border-radius: 50%;
 			margin-right: .5rem;
 			height: 2rem;
 			width: 2rem;
@@ -82,16 +53,23 @@
 	button {
 		margin: 0 0 0 auto;
 		background-color: #ccccff;
-		// flex-grow: 1;
 		width: fit-content;
+
+		@include breakpoint($under992) {
+			margin: 1rem 0 0;
+			width: 100%;
+
+			.button-slide {
+				width: 100%;
+			}
+		}
 	}
 }
 
-.lipsync-panel { position: relative; height: fit-content; overflow: hidden; }
-
-// .lipsync-editor, .lipsync-working, .lipsync-success {
-// 	position: absolute;
-// }
+.lipsync-panel { 
+	position: relative; 
+	overflow: hidden; 
+}
 
 .lipsync-working, .lipsync-working-notice {
 	display: flex;
@@ -99,14 +77,6 @@
 	justify-content: center;
 	width: 100%;
 }
-
-// .lipsync-working-notice {
-// 	background-color: red;
-// }
-
-// .lipsync-working {
-// 	background-color: green;
-// }
 
 .lipsync-working-notice {
 	flex-direction: column;

@@ -30,7 +30,7 @@ export default function ImageInput({ blob = "", clear = n, file, hideActions, hi
     opacity: loaded ? 1 : 0
   });
 
-  return <FileWrapper {...{ fileTypes, ...inputProps, ...rest }}>
+  return <FileWrapper {...{ fileTypes, panelClass: "image-upload-frame", ...inputProps, ...rest }}>
     <div {...{ className: "fy-image-uploader" }}>
       { file ? <>
         <a.img {...{ alt: "file preview", className: "file-preview", onLoad, src: blob, style }} />

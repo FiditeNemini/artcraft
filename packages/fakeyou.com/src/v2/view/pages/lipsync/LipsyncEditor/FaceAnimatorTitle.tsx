@@ -51,7 +51,7 @@ export default function FaceAnimatorTitle({ ...rest }) {
         { t("headings.audio") }
       </ProgressLi>
     </ul>
-    <DynamicButton {...{ disabled: incomplete || working, onClick, slides, index: page }}/>
+    <DynamicButton {...{ className: "face-animation-submit", disabled: incomplete || working, onClick, slides, index: page }}/>
     <p {...{ className: "progress-description" }}> 
       { t("headings.subtitle") }
     </p>
