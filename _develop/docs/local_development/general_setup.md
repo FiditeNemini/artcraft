@@ -32,8 +32,7 @@ Mac: (Lost the list, but it should match Linux. Install Homebrew.)
 Ubuntu 22.04:
 
 ```bash
-sudo apt install \ 
-  jq \
+sudo apt install jq \
   libmysqlclient-dev \
   libsqlite3-dev \
   pkgconf
