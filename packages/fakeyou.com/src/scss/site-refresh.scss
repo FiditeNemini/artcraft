@@ -673,10 +673,10 @@ styles with important tags:
     font-weight: 600;
     font-size: 12px;
     padding: 2px 6px;
+    margin-top: -1px !important;
     border: none;
     border-radius: 0.3rem;
     opacity: 0.85;
-    max-height: 18px;
     background-color: #fff3d0;
     color: #833c00;
   }
