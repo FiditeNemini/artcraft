@@ -53,25 +53,6 @@ interface EditorProps {
 
 const softSpring = { config: { mass: 1, tension: 80, friction: 10 } };
 
-// const InputPage = ({ audioProps, imageProps, toggle, style, t }: LipSyncProps )  => {
-
-//   return <animated.div {...{ className: "lipsync-editor", style }}>
-//   <div {...{ className: "grid-heading" }}>
-//     <h5>{ t("headings.image") }</h5>
-//   </div>
-//   <div {...{ className: "grid-heading" }}>
-//     <h5>{ t("headings.audio") }</h5>
-//   </div>
-//   <div {...{ className: "grid-square lipsync-audio col-lg-6" }}>
-//     <ImageInput {...{ ...imageProps, onRest: () => toggle.image(imageProps.file ? true : false) }}/>
-//   </div>
-//   <div {...{ className: "grid-square col-lg-6" }}>
-//     <AudioInput {...{ ...audioProps, onRest: (p:any,c:any,item:any,l:any) => {
-//       toggle.audio(!!audioProps.file);
-//     }, hideActions: true } }/>
-//   </div>
-// </animated.div>};
-
 const InputPage = ({
   audioProps,
   imageProps,
