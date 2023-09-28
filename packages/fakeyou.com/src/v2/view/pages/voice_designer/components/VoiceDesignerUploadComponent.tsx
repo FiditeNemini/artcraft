@@ -13,7 +13,7 @@ import {
   UploadAudioIsOk,
   UploadAudioRequest,
 } from "@storyteller/components/src/api/upload/UploadAudio";
-import { useUploadedFiles } from "hooks/FileStore";
+import useUploadedFiles from "hooks/useUploadedFiles";
 
 const FILE_TYPES = ["MP3", "WAV", "FLAC", "OGG"];
 

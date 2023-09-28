@@ -12,4 +12,4 @@ const useUploadedFiles = create<UploadedFilesState>((set) => ({
   setAudioLinks: (audioLinks: string[]) => set({ audioLinks }),
 }));
 
-export { useUploadedFiles };
+export default useUploadedFiles;

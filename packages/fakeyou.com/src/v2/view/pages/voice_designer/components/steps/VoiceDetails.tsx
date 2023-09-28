@@ -4,7 +4,7 @@ import {
   faTags,
 } from "@fortawesome/pro-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { useVoiceDetailsStore } from "hooks/useVoiceDetailsStore";
+import useVoiceDetailsStore from "hooks/useVoiceDetailsStore/";
 import React from "react";
 import Select from "react-select";
 

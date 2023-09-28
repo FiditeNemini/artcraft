@@ -25,3 +25,5 @@ export const useVoiceDetailsStore = create<VoiceDetailsState>((set) => ({
   setDescription: (description) => set({ description }),
   setVisibility: (visibility) => set({ visibility }),
 }));
+
+export default useVoiceDetailsStore;
