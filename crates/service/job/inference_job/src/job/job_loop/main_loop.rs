@@ -135,6 +135,8 @@ async fn process_job_batch(job_dependencies: &JobDependencies, jobs: Vec<Availab
                 (true, false, format!("InvalidJob: {:?}", err), Some("invalid job")),
               ProcessSingleJobError::NotYetImplemented =>
                 (true, false, "not yet implemented".to_string(), Some("not yet implemented")),
+              ProcessSingleJobError::FaceDetectionFailure =>
+                (true, false, "face not detected".to_string(), Some("face not detected")),
 
               // Non-permanent failures
               ProcessSingleJobError::FilesystemFull =>
@@ -177,6 +179,7 @@ async fn process_job_batch(job_dependencies: &JobDependencies, jobs: Vec<Availab
           ProcessSingleJobError::InvalidJob(_) => {}
           ProcessSingleJobError::KeepAliveElapsed => {}
           ProcessSingleJobError::NotYetImplemented => {}
+          ProcessSingleJobError::FaceDetectionFailure => {}
         }
       }
     }

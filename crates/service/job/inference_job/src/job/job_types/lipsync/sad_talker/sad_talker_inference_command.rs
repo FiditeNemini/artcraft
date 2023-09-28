@@ -1,13 +1,14 @@
 use std::collections::HashSet;
 use std::env;
 use std::ffi::OsString;
+use std::fs::{File, read_to_string};
 use std::path::{Path, PathBuf};
 use std::time::Duration;
 
 use anyhow::anyhow;
-use log::info;
+use log::{error, info};
 use once_cell::sync::Lazy;
-use subprocess::{Popen, PopenConfig};
+use subprocess::{Exec, Popen, PopenConfig, Redirection};
 
 use container_common::anyhow_result::AnyhowResult;
 use filesys::path_to_string::path_to_string;
@@ -78,6 +79,8 @@ pub struct InferenceArgs<P: AsRef<Path>> {
 
   /// --result_file: path to final file output
   pub output_file: P,
+
+  pub stderr_output_file: P,
 
   // TODO: Other SadTalker args
 }
@@ -242,6 +245,11 @@ impl SadTalkerInferenceCommand {
     }
 
     let mut config = PopenConfig::default();
+
+    info!("stderr will be written to file: {:?}", args.stderr_output_file.as_ref());
+
+    let stderr_file = File::create(&args.stderr_output_file)?;
+    config.stderr = Redirection::File(stderr_file);
 
     if !env_vars.is_empty() {
       config.env = Some(env_vars);
