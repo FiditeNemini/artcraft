@@ -306,12 +306,12 @@ function LandingPage(props: Props) {
                   <h4 className="fw-bold text-white mb-1 d-flex align-items-center text-nowrap">
                     <span className="badge-new mt-0 me-2">
                       <FontAwesomeIcon icon={faSparkles} className="me-1" />
-                      NEW
+                      {t("productNewTag")}
                     </span>
-                    Face Animation
+                    {t("productFaceAnimatorTitle")}
                   </h4>
                   <h6 className="fw-normal opacity-75 text-white">
-                    Create videos from audio
+                    {t("productFaceAnimatorText")}
                   </h6>
                 </div>
                 <Link to="/face-animation" className="btn btn-square mt-1">
