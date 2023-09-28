@@ -8,6 +8,7 @@ import {
   faStar,
   faUser,
   faSignOutAlt,
+  faFaceViewfinder,
 } from "@fortawesome/pro-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Button from "components/common/Button/Button";
@@ -109,6 +110,7 @@ export default function SideNav(props: SideNavProps) {
       by_queue: {
         pending_svc_jobs: 0,
         pending_rvc_jobs: 0,
+        pending_face_animation_jobs: 0,
       },
     },
     legacy_tts: {
@@ -267,6 +269,19 @@ export default function SideNav(props: SideNavProps) {
         <li className="sidebar-heading">Video Generation</li>
         <li>
           <NavLink
+            to="/face-animation"
+            activeClassName="active-link"
+            onClick={handleNavLinkClick}
+          >
+            <FontAwesomeIcon
+              icon={faFaceViewfinder}
+              className="sidebar-heading-icon"
+            />
+            Face Animator
+          </NavLink>
+        </li>
+        <li>
+          <NavLink
             to="/video"
             activeClassName="active-link"
             onClick={handleNavLinkClick}
@@ -275,27 +290,36 @@ export default function SideNav(props: SideNavProps) {
             Video Lipsync
           </NavLink>
         </li>
+
         <hr className="mb-4 mt-3" />
         <li className="sidebar-heading">Community</li>
         <li>
-          <a href="https://fakeyou.com">
+          <a href="https://discord.gg/fakeyou" target="_blank" rel="noreferrer">
             <FontAwesomeIcon
               icon={faDiscord}
               className="sidebar-heading-icon"
             />
             Discord
           </a>
-          <a href="https://fakeyou.com">
+          <NavLink
+            to="/leaderboard"
+            activeClassName="active-link"
+            onClick={handleNavLinkClick}
+          >
             <FontAwesomeIcon icon={faTrophy} className="sidebar-heading-icon" />
             Leaderboard
-          </a>
-          <a href="https://fakeyou.com">
+          </NavLink>
+          <NavLink
+            to="/guide"
+            activeClassName="active-link"
+            onClick={handleNavLinkClick}
+          >
             <FontAwesomeIcon
               icon={faBookOpen}
               className="sidebar-heading-icon"
             />
             Guide
-          </a>
+          </NavLink>
         </li>
         <hr className="mb-3 mt-3" />
         <li>
@@ -327,6 +351,12 @@ export default function SideNav(props: SideNavProps) {
             SVC Queued:{" "}
             <span className="text-red">
               {queueStats.inference.by_queue.pending_svc_jobs}
+            </span>
+          </div>
+          <div>
+            Animations Queued:{" "}
+            <span className="text-red">
+              {queueStats.inference.by_queue.pending_face_animation_jobs}
             </span>
           </div>
         </li>
