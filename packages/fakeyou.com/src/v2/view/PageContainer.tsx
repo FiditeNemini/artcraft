@@ -82,6 +82,7 @@ import { ProductUsageInfoPage } from "./pages/product_usage_info/ProductUsageInf
 import { VoiceDesignerPage } from "./pages/voice_designer/VoiceDesignerPage";
 import { TestingPage } from "./pages/testing/TestingPage";
 import { FaceAnimationPage } from "./pages/face-animation/FaceAnimationPage";
+import { GenerateSpeechPage } from "./pages/generate_speech/GenerateSpeechPage";
 
 interface Props {
   sessionWrapper: SessionWrapper;
