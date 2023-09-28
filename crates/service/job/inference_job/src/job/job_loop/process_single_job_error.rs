@@ -3,6 +3,11 @@ use anyhow::anyhow;
 /// Error from processing a single job
 #[derive(Debug)]
 pub enum ProcessSingleJobError {
+  /// For inference jobs that are required to find faces, fail the job
+  /// immediately if no face is found. We can also surface the error to
+  /// the user in a friendly way.
+  /// Example job types: SadTalker, Wav2Lip.
+  FaceDetectionFailure,
   /// The filesystem is out of space and we need to free it up.
   FilesystemFull,
   /// The job is invalid (bad state, etc.)

@@ -1,7 +1,8 @@
+use std::fs::read_to_string;
 use std::time::Instant;
 
 use anyhow::anyhow;
-use log::{error, info};
+use log::{error, info, warn};
 
 use buckets::public::media_files::original_file::MediaFileBucketPath;
 use container_common::filesystem::check_file_exists::check_file_exists;
@@ -132,6 +133,8 @@ pub async fn process_job(args: SadTalkerProcessJobArgs<'_>) -> Result<JobSuccess
 
   let workdir = work_temp_dir.path().to_path_buf();
 
+  let stderr_output_file = work_temp_dir.path().join("stderr.txt");
+
   let inference_start_time = Instant::now();
 
   let command_exit_status = args.job_dependencies
@@ -143,6 +146,7 @@ pub async fn process_job(args: SadTalkerProcessJobArgs<'_>) -> Result<JobSuccess
         input_image: &image_path.filesystem_path,
         work_dir: &workdir,
         output_file: &output_video_fs_path,
+        stderr_output_file: &stderr_output_file,
       });
 
   let inference_duration = Instant::now().duration_since(inference_start_time);
@@ -151,11 +155,23 @@ pub async fn process_job(args: SadTalkerProcessJobArgs<'_>) -> Result<JobSuccess
 
   if !command_exit_status.is_success() {
     error!("Inference failed: {:?}", command_exit_status);
+
+    let mut error = ProcessSingleJobError::Other(anyhow!("CommandExitStatus: {:?}", command_exit_status));
+
+    if let Ok(contents) = read_to_string(&stderr_output_file) {
+      if contents.contains("can not detect the landmark from source image") {
+        warn!("Face not detected in source image");
+        error = ProcessSingleJobError::FaceDetectionFailure;
+      }
+    }
+
     safe_delete_temp_file(&audio_path.filesystem_path);
     safe_delete_temp_file(&image_path.filesystem_path);
     safe_delete_temp_file(&output_video_fs_path);
+    safe_delete_temp_file(&stderr_output_file);
     safe_delete_temp_directory(&work_temp_dir);
-    return Err(ProcessSingleJobError::Other(anyhow!("CommandExitStatus: {:?}", command_exit_status)));
+
+    return Err(error);
   }
 
   // ==================== CHECK NON-WATERMARKED RESULT ==================== //
