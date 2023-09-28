@@ -15,17 +15,17 @@ const StepperControls: React.FC<StepperControlsProps> = ({
 }) => {
   return (
     <>
-      {currentStep !== steps.length - 1 && (
+      {currentStep !== 3 && (
         <div className="p-3 pb-4 px-lg-4 pt-0 d-flex gap-3">
-          {currentStep !== 0 && (
+          {currentStep !== 0 && currentStep !== 2 && (
             <button className="btn btn-secondary w-100" onClick={onBack}>
               Back
             </button>
           )}
 
-          {currentStep !== steps.length - 1 && (
+          {currentStep < steps.length - 2 && (
             <button className="btn btn-primary w-100" onClick={onNext}>
-              {currentStep !== steps.length - 2 ? "Continue" : "Create Voice"}
+              {currentStep !== steps.length - 3 ? "Continue" : "Create Voice"}
             </button>
           )}
         </div>

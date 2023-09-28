@@ -4,6 +4,7 @@ import {
   faTags,
 } from "@fortawesome/pro-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { useVoiceDetailsStore } from "hooks/useVoiceDetailsStore";
 import React from "react";
 import Select from "react-select";
 
@@ -23,6 +24,19 @@ export const SearchFieldClass = {
 };
 
 function VoiceDetails() {
+  const {
+    name,
+    vocalType,
+    tags,
+    description,
+    visibility,
+    setName,
+    setVocalType,
+    setTags,
+    setDescription,
+    setVisibility,
+  } = useVoiceDetailsStore();
+
   return (
     <div className="d-flex flex-column gap-4">
       <div className="row gy-4">
@@ -32,6 +46,8 @@ function VoiceDetails() {
             className="form-control"
             type="text"
             placeholder="Voice name"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
           />
         </div>
         <div className="col-12 col-md-4">
@@ -40,7 +56,11 @@ function VoiceDetails() {
             <span className="form-control-feedback">
               <FontAwesomeIcon icon={faMicrophoneLines} />
             </span>
-            <Select classNames={SearchFieldClass} />
+            <Select
+              classNames={SearchFieldClass}
+              value={vocalType}
+              onChange={(e) => setVocalType(e.target.value)}
+            />
           </div>
         </div>
       </div>
@@ -51,7 +71,11 @@ function VoiceDetails() {
           <span className="form-control-feedback">
             <FontAwesomeIcon icon={faTags} />
           </span>
-          <Select classNames={SearchFieldClass} />
+          <Select
+            classNames={SearchFieldClass}
+            value={tags}
+            onChange={(e) => setTags(e.target.value)}
+          />
         </div>
       </div>
 
@@ -60,6 +84,8 @@ function VoiceDetails() {
         <textarea
           className="form-control"
           placeholder="Describe the voice - eg. Squeaky male cartoon character voice"
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
         />
       </div>
 
@@ -69,7 +95,11 @@ function VoiceDetails() {
           <span className="form-control-feedback">
             <FontAwesomeIcon icon={faEye} />
           </span>
-          <Select classNames={SearchFieldClass} />
+          <Select
+            classNames={SearchFieldClass}
+            value={visibility}
+            onChange={(e) => setVisibility(e.target.value)}
+          />
         </div>
       </div>
     </div>

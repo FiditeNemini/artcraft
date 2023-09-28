@@ -11,12 +11,18 @@ import { container } from "data/animation";
 import { UploadSamples } from "./components/steps/UploadSamples";
 import { VoiceDetails } from "./components/steps/VoiceDetails";
 import { Complete } from "./components/steps/Complete";
+import { Processing } from "./components/steps/Processing";
 
 function VoiceDesignerPage() {
   usePrefixedDocumentTitle("Voice Designer");
 
   const [currentStep, setCurrentStep] = useState(0);
-  const steps = ["Upload Samples", "Voice Details", "Complete"];
+  const steps = [
+    "Upload Samples",
+    "Voice Details",
+    "Process Voice",
+    "Complete",
+  ];
 
   const displayStep = (step: any) => {
     switch (step) {
@@ -25,6 +31,8 @@ function VoiceDesignerPage() {
       case 1:
         return <VoiceDetails />;
       case 2:
+        return <Processing />;
+      case 3:
         return <Complete />;
       default:
     }
@@ -36,8 +44,16 @@ function VoiceDesignerPage() {
     }
   };
 
-  const handleNext = () => {
-    if (currentStep < steps.length - 1) {
+  const handleNext = async () => {
+    if (currentStep === 1) {
+      // When moving from Voice Details to Processing
+      setCurrentStep(2); // Move to processing step immediately
+
+      // Simulating a 3-second delay to mimic API call
+      setTimeout(() => {
+        setCurrentStep(3);
+      }, 3000);
+    } else if (currentStep < steps.length - 1) {
       setCurrentStep(currentStep + 1);
     }
   };
