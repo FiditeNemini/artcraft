@@ -11,9 +11,11 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { faDiscord, faTwitter } from "@fortawesome/free-brands-svg-icons";
 import { WebUrl } from "../../../../common/WebUrl";
-import { faFileArrowUp } from "@fortawesome/pro-solid-svg-icons";
+import { faFileArrowUp, faSparkles } from "@fortawesome/pro-solid-svg-icons";
 import { PosthogClient } from "@storyteller/components/src/analytics/PosthogClient";
 import { FooterNav } from "v2/view/nav/FooterNav";
+import Alert from "components/common/Alert/Alert";
+// import { Analytics } from "../../../../../common/Analytics";
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -23,7 +25,7 @@ interface Props {
 function LandingPage(props: Props) {
   PosthogClient.recordPageview();
 
-  const { t: t2, oldT: t } = useLocalize("LandingPage");
+  const { t } = useLocalize("LandingPage");
 
   let signUpButton = <></>;
   let viewPricingButton = <></>;
@@ -41,7 +43,7 @@ function LandingPage(props: Props) {
           // }}
         >
           <button type="button" className="btn btn-primary w-100">
-            {t("tts.TtsModelListPage.heroSection.buttons.signUp")}
+            {t("heroButtonSignUp")}
             <FontAwesomeIcon icon={faArrowRight} className="ms-2" />
           </button>
         </Link>
@@ -57,7 +59,7 @@ function LandingPage(props: Props) {
         >
           <button type="button" className="btn btn-secondary w-100">
             <FontAwesomeIcon icon={faStar} className="me-2" />
-            {t("tts.TtsModelListPage.heroSection.buttons.viewPricing")}
+            {t("heroButtonPricing")}
           </button>
         </Link>
       </>
@@ -76,7 +78,7 @@ function LandingPage(props: Props) {
         >
           <button type="button" className="btn btn-secondary w-100">
             <FontAwesomeIcon icon={faUser} className="me-2" />
-            View my profile
+            {t("heroButtonProfile")}
           </button>
         </Link>
       </>
@@ -121,7 +123,7 @@ function LandingPage(props: Props) {
           >
             <button type="button" className="btn btn-primary w-100">
               <FontAwesomeIcon icon={faStar} className="me-2" />
-              Upgrade Plan
+              {t("heroButtonUpgradePlan")}
             </button>
           </Link>
         </>
@@ -142,17 +144,15 @@ function LandingPage(props: Props) {
   return (
     <div>
       <div className="container pb-5 pb-lg-0 pt-lg-4 px-md-5 px-lg-5 px-xl-3">
-        {/* Community Commissions Alert */}
-        {/* <div className="alert alert-info">
-          <FontAwesomeIcon icon={faMoneyBill} className="me-2" />
-          <span className="fw-medium">
-            Get rewarded from our $15k prize pool for creating Voice to Voice
-            models!
-          </span>
-          <Link to="/commissions" className="fw-semibold ms-2">
-            See details <FontAwesomeIcon icon={faArrowRight} className="ms-1" />
-          </Link>
-        </div> */}
+        {/* Face Animation Alert Banner */}
+        <Alert
+          id="face-animation-alert"
+          icon={faSparkles}
+          message="Have you tried our new Face Animator? Turn photos of faces into animated lip-synced videos with just a picture and some audio!"
+          alertVariant="new"
+          link="/face-animation"
+          linkText="Try it now"
+        />
 
         <div className="row flex-md-row-reverse">
           <div className="col-12 col-lg-5 p-md-0 d-flex justify-content-center">
@@ -166,10 +166,10 @@ function LandingPage(props: Props) {
           </div>
           <div className="col-12 col-lg-7 d-flex flex-column justify-content-center flex-reverse px-md-5 px-lg-3">
             <h1 className="fw-bold display-5 text-center text-lg-start px-md-5 px-lg-0">
-              {t2("hero.top")}
+              {t("heroTitle")}
             </h1>
             <p className="lead opacity-75 pb-4 text-center text-lg-start px-md-5 px-lg-0 pe-lg-5">
-              {t2("hero.bottom")}
+              {t("heroText")}
             </p>
             <div className="d-flex flex-column flex-md-row gap-3 mt-3 mb-4 w-100 justify-content-center justify-content-lg-start">
               {upgradeButton}
@@ -238,21 +238,23 @@ function LandingPage(props: Props) {
       </div> */}
 
       <div className="container pb-4 px-md-5 px-xl-3">
-        <h2 className="fw-bold mb-4">AI Tools</h2>
+        <h2 className="fw-bold mb-4">{t("productsTitle")}</h2>
         <div className="row g-4 position-relative">
           <div className="col-12 col-md-4">
             <Link
               to="/tts"
               className="panel panel-select d-flex flex-column align-items-center"
             >
-              <div className="d-flex px-4 pt-4 align-items-center w-100">
+              <div className="d-flex px-4 pt-4 align-items-start w-100">
                 <div className="flex-grow-1">
-                  <h3 className="fw-bold text-white mb-1">Text to Speech</h3>
+                  <h3 className="fw-bold text-white mb-1">
+                    {t("productTtsTitle")}
+                  </h3>
                   <h6 className="fw-normal opacity-75 text-white">
-                    Generate audio from text
+                    {t("productTtsText")}
                   </h6>
                 </div>
-                <Link to="/tts" className="btn btn-square">
+                <Link to="/tts" className="btn btn-square mt-1">
                   <FontAwesomeIcon icon={faArrowRight} />
                 </Link>
               </div>
@@ -269,14 +271,16 @@ function LandingPage(props: Props) {
               to="/voice-conversion"
               className="panel panel-select d-flex flex-column align-items-center"
             >
-              <div className="d-flex px-4 pt-4 align-items-center w-100">
+              <div className="d-flex px-4 pt-4 align-items-start w-100">
                 <div className="flex-grow-1">
-                  <h3 className="fw-bold text-white mb-1">Voice to Voice</h3>
+                  <h3 className="fw-bold text-white mb-1">
+                    {t("productVcTitle")}
+                  </h3>
                   <h6 className="fw-normal opacity-75 text-white">
-                    Speak as someone else
+                    {t("productVcText")}
                   </h6>
                 </div>
-                <Link to="/voice-conversion" className="btn btn-square">
+                <Link to="/voice-conversion" className="btn btn-square mt-1">
                   <FontAwesomeIcon icon={faArrowRight} />
                 </Link>
               </div>
@@ -290,17 +294,23 @@ function LandingPage(props: Props) {
           </div>
           <div className="col-12 col-md-4">
             <Link
-              to="/video"
+              to="/face-animation"
               className="panel panel-select d-flex flex-column align-items-center"
             >
-              <div className="d-flex px-4 pt-4 align-items-center w-100">
+              <div className="d-flex px-4 pt-4 align-items-start w-100">
                 <div className="flex-grow-1">
-                  <h3 className="fw-bold text-white mb-1">Video Lip Sync</h3>
+                  <h4 className="fw-bold text-white mb-1 d-flex align-items-center text-nowrap">
+                    <span className="badge-new mt-0 me-2">
+                      <FontAwesomeIcon icon={faSparkles} className="me-1" />
+                      NEW
+                    </span>
+                    Face Animation
+                  </h4>
                   <h6 className="fw-normal opacity-75 text-white">
-                    Lip sync video to audio
+                    Create videos from audio
                   </h6>
                 </div>
-                <Link to="/video" className="btn btn-square">
+                <Link to="/face-animation" className="btn btn-square mt-1">
                   <FontAwesomeIcon icon={faArrowRight} />
                 </Link>
               </div>
@@ -310,6 +320,26 @@ function LandingPage(props: Props) {
                 src="/images/landing/select-w2l.webp"
                 alt="Video Lip Sync"
               />
+            </Link>
+          </div>
+          <div className="col-12 col-md-4">
+            <Link
+              to="/video"
+              className="panel panel-select d-flex flex-column align-items-center h-auto pb-4"
+            >
+              <div className="d-flex px-4 pt-4 align-items-center w-100">
+                <div className="flex-grow-1">
+                  <h3 className="fw-bold text-white mb-1">
+                    {t("productVideoTitle")}
+                  </h3>
+                  <h6 className="fw-normal opacity-75 text-white mb-0">
+                    {t("productVideoText")}
+                  </h6>
+                </div>
+                <Link to="/video" className="btn btn-square mt-1">
+                  <FontAwesomeIcon icon={faArrowRight} />
+                </Link>
+              </div>
             </Link>
           </div>
           <img
@@ -349,19 +379,14 @@ function LandingPage(props: Props) {
             </div>
           </div>
           <div className="col-12 col-md-6 col-lg-5 d-flex flex-column justify-content-center gap-3">
-            <h2 className="fw-bold">Speak as your favorite characters</h2>
-            <p className="opacity-75">
-              Our AI-powered text-to-speech and voice conversion tools let you
-              convert your text or voice into your favorite character's voice.
-              Perfect for content creators and anyone looking to add personality
-              to their messages.
-            </p>
+            <h2 className="fw-bold">{t("contextTitle")}</h2>
+            <p className="opacity-75">{t("contextText")}</p>
             <div className="d-flex mt-3 gap-3">
               <Link to="/tts" className="btn btn-primary">
-                Text to Speech
+                {t("contextButtonTts")}
               </Link>
               <Link to="/voice-conversion" className="btn btn-primary">
-                Voice to Voice
+                {t("contextButtonVc")}
               </Link>
             </div>
           </div>
@@ -406,7 +431,7 @@ function LandingPage(props: Props) {
         </div>
       </div> */}
 
-      {/* <div className="d-flex flex-column section align-items-center panel rounded-0 my-5">
+      <div className="d-flex flex-column section align-items-center panel rounded-0 my-5">
         <div className="d-flex flex-column align-items-center text-center cta-container">
           <div className="d-flex d-lg-none align-items-center mb-4 cta-mobile">
             <img
@@ -428,17 +453,14 @@ function LandingPage(props: Props) {
               height={200}
             />
           </div>
-          <h2 className="fw-bold">Generate Your Audio</h2>
-          <p className="mw-300 opacity-75">
-            Transform your messages and speaking voice into your favorite
-            character's voice with just a few clicks.
-          </p>
+          <h2 className="fw-bold">{t("ctaTitle")}</h2>
+          <p className="mw-300 opacity-75">{t("ctaText")}</p>
           <div className="d-flex gap-3 justify-content-center mt-4">
             <Link to="/tts" className="btn btn-primary">
-              Text to speech
+              {t("ctaButtonTts")}
             </Link>
             <Link to="/voice-conversion" className="btn btn-primary">
-              Voice to Voice
+              {t("ctaButtonVc")}
             </Link>
           </div>
           <img
@@ -470,13 +492,13 @@ function LandingPage(props: Props) {
             height={311}
           />
         </div>
-      </div> */}
+      </div>
 
       <div className="py-4">
         <div className="container text-center community-container">
           <div className="panel px-4 py-5 d-flex flex-column align-items-center community-container rounded">
-            <h2 className="fw-bold mb-2">{t2("community.heading")}</h2>
-            <p className="opacity-75">{t2("community.text")}</p>
+            <h2 className="fw-bold mb-2">{t("communityTitle")}</h2>
+            <p className="opacity-75">{t("communityText")}</p>
             <div className="d-flex mt-4 gap-3">
               <a
                 href="https://discord.gg/fakeyou"
@@ -485,7 +507,7 @@ function LandingPage(props: Props) {
                 className="btn btn-discord"
               >
                 <FontAwesomeIcon icon={faDiscord} className="me-2" />
-                {t2("community.discordButton")}
+                {t("communityButtonDiscord")}
               </a>
               <a
                 href="https://twitter.com/intent/follow?screen_name=FakeYouApp"
@@ -494,7 +516,7 @@ function LandingPage(props: Props) {
                 className="btn btn-twitter"
               >
                 <FontAwesomeIcon icon={faTwitter} className="me-2" />
-                {t2("community.twitterButton")}
+                {t("communityButtonTwitter")}
               </a>
             </div>
           </div>

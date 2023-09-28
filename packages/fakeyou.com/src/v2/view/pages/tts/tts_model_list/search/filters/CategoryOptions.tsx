@@ -1,16 +1,13 @@
 import React from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faArrowRightLong,
-  faTags,
-} from "@fortawesome/free-solid-svg-icons";
+import { faArrowRightLong, faTags } from "@fortawesome/free-solid-svg-icons";
 import { TtsModelListItem } from "@storyteller/components/src/api/tts/ListTtsModels";
 import { TtsCategoryType } from "../../../../../../../AppWrapper";
 //import { useTranslation } from "react-i18next";
 import Select from "react-select";
 import { SearchFieldClass } from "../components/SearchFieldClass";
 import { Analytics } from "../../../../../../../common/Analytics";
-import { t } from "i18next";
+import { useLocalize } from "hooks";
 
 interface Props {
   allTtsCategories: TtsCategoryType[];
@@ -31,10 +28,11 @@ interface Props {
 
   handleChangeCategory: (level: number, maybeToken?: string) => void;
 
-  selectedTtsLanguageScope: string,
+  selectedTtsLanguageScope: string;
 }
 
 export function CategoryOptions(props: Props) {
+  const { t } = useLocalize("TtsModelListPage");
   const {
     ttsModelsByCategoryToken,
     dropdownCategories,
@@ -45,17 +43,16 @@ export function CategoryOptions(props: Props) {
   //const { t } = useTranslation();
 
   let categoryDropdowns = buildDropdowns(
-    dropdownCategories, 
+    t,
+    dropdownCategories,
     selectedCategories,
-    ttsModelsByCategoryToken, 
-    handleChangeCategory);
+    ttsModelsByCategoryToken,
+    handleChangeCategory
+  );
 
   const CATEGORY_SEPARATOR = (
     <div className="d-none d-md-flex align-items-center">
-      <FontAwesomeIcon
-          icon={faArrowRightLong}
-          className="fs-6 opacity-75"
-      />
+      <FontAwesomeIcon icon={faArrowRightLong} className="fs-6 opacity-75" />
     </div>
   );
 
@@ -79,10 +76,11 @@ export function CategoryOptions(props: Props) {
 // ========= Build dropdowns ========
 
 function buildDropdowns(
-  dropdownCategories: TtsCategoryType[][], 
-  selectedCategories: TtsCategoryType[], 
+  t: (key: string) => string,
+  dropdownCategories: TtsCategoryType[][],
+  selectedCategories: TtsCategoryType[],
   ttsModelsByCategoryToken: Map<string, Set<TtsModelListItem>>,
-  handleChangeCategory : (i: number, categoryToken?: string) => void,
+  handleChangeCategory: (i: number, categoryToken?: string) => void
 ) {
   if (dropdownCategories.length === 0 || ttsModelsByCategoryToken.size === 0) {
     // While the XHR requests are still completing, we may have nothing to build.
@@ -92,14 +90,14 @@ function buildDropdowns(
         <span className="form-control-feedback">
           <FontAwesomeIcon icon={faTags} />
         </span>
-        <Select 
+        <Select
           isLoading={true}
           options={[]}
           inputValue={"Loading..."}
           classNames={SearchFieldClass}
           className={"w-100"}
         />
-      </div>
+      </div>,
     ];
   }
 
@@ -131,7 +129,7 @@ function buildDropdowns(
         return {
           value: category.category_token,
           label: category.name_for_dropdown,
-        }
+        };
       });
 
     currentDropdownCategories.forEach((category) => {
@@ -162,26 +160,28 @@ function buildDropdowns(
       // No sense trying to build more.
       break;
     }
-    
-    let selectProps : any = {
+
+    let selectProps: any = {
       options: options,
       classNames: SearchFieldClass,
-      className:"w-100",
+      className: "w-100",
       autoFocus: false, // On mobile, we don't want the onscreen keyboard to take up half the UI.
       isSearchable: false, // On mobile, we don't want the onscreen keyboard to take up half the UI.
-      onMenuOpen: () => { Analytics.ttsOpenCategorySelectMenu() },
+      onMenuOpen: () => {
+        Analytics.ttsOpenCategorySelectMenu();
+      },
       onChange: (option: any) => handleChangeCategory(i, option?.value),
     };
 
     if (selectedCategoryOption === undefined) {
       // NB(bt, 2023-01-19): I'm not sure why we're having to do this to clear categories.
       // If I had more time to spend with this library, I might have a better solution than this hack.
-      selectProps['value'] = {
+      selectProps["value"] = {
         value: "*",
-        label: t("tts.TtsModelListPage.exploreModal.selectCategoryText"),
+        label: t("ttsExploreCategoryOptionText"),
       };
     } else {
-      selectProps['value'] = selectedCategoryOption;
+      selectProps["value"] = selectedCategoryOption;
     }
 
     categoryDropdowns.push(
@@ -190,8 +190,7 @@ function buildDropdowns(
           <span className="form-control-feedback">
             <FontAwesomeIcon icon={faTags} />
           </span>
-          <Select {... selectProps}
-          />
+          <Select {...selectProps} />
         </div>
       </React.Fragment>
     );

@@ -19,7 +19,7 @@ export default function FileDetails({ clear = () => {}, file, hideClearDetails, 
       : null;
 
   return <div {...{ className: "fy-uploader-layout upload-details" }}>
-    <Icon {...{ className: "fy-uploader-layout-icon", icon }}/>
+    { icon && <Icon {...{ className: "fy-uploader-layout-icon", icon }}/> }
     <div>
       <div {...{ className: "filename" }}>
         { file.name.slice(0, file.name.lastIndexOf(".")) }

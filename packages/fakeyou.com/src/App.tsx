@@ -182,14 +182,12 @@ function newVocodes() {
   return discord || twitter || alphaCookie;
 }
 
-function initInferenceJobsByCategoryMap(): Map<
-  FrontendInferenceJobType,
-  InferenceJob[]
-> {
-  let inferenceJobsByCategory = new Map();
-  inferenceJobsByCategory.set(FrontendInferenceJobType.TextToSpeech, []);
-  inferenceJobsByCategory.set(FrontendInferenceJobType.VoiceConversion, []);
-  return inferenceJobsByCategory;
+function initInferenceJobsByCategoryMap() : Map<FrontendInferenceJobType, InferenceJob[]> {
+    let inferenceJobsByCategory = new Map();
+    inferenceJobsByCategory.set(FrontendInferenceJobType.FaceAnimation, []);
+    inferenceJobsByCategory.set(FrontendInferenceJobType.TextToSpeech, []);
+    inferenceJobsByCategory.set(FrontendInferenceJobType.VoiceConversion, []);
+    return inferenceJobsByCategory;
 }
 
 function isMacOs() {

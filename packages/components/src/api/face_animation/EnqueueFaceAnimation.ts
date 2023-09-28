@@ -1,30 +1,55 @@
 import { ApiConfig } from "@storyteller/components";
 
+export interface AudioSource {
+  maybe_media_file_token?: string,
+  maybe_media_upload_token?: string,
+  maybe_tts_result_token?: string,
+  maybe_voice_conversion_result_token?: string,
+}
+
+export interface ImageSource {
+  maybe_media_file_token?: string,
+  maybe_media_upload_token?: string,
+}
+
+
 export interface EnqueueFaceAnimationRequest {
   uuid_idempotency_token: string,
 
-  audio_token: string,
-  image_token: string,
+  audio_source: AudioSource,
+  image_source: ImageSource,
 }
 
-export interface EnqueueFaceAnimationSuccessResponse {
+// export interface EnqueueFaceAnimationSuccessResponse {
+//   success: boolean,
+//   inference_job_token: string,
+// }
+
+// export interface EnqueueFaceAnimationErrorResponse {
+//   success: boolean,
+// }
+
+export interface EnqueueFaceAnimationResponse {
   success: boolean,
-  inference_job_token: string,
+  inference_job_token?: string,
 }
 
-export interface EnqueueFaceAnimationErrorResponse {
-  success: boolean,
-}
 
-type EnqueueFaceAnimationResponse = EnqueueFaceAnimationSuccessResponse | EnqueueFaceAnimationErrorResponse;
+const EnqueueFaceAnimationIsSuccess = (response: EnqueueFaceAnimationResponse) => response.inference_job_token;
+const EnqueueFaceAnimationIsError = (response: EnqueueFaceAnimationResponse) => !response.inference_job_token;
 
-export function EnqueueFaceAnimationIsSuccess(response: EnqueueFaceAnimationResponse): response is EnqueueFaceAnimationSuccessResponse {
-  return response?.success === true;
-}
+export { EnqueueFaceAnimationIsSuccess, EnqueueFaceAnimationIsError };
+// export EnqueueFaceAnimationIsSuccess;
+// export EnqueueFaceAnimationIsError;
 
-export function EnqueueFaceAnimationIsError(response: EnqueueFaceAnimationResponse): response is EnqueueFaceAnimationErrorResponse {
-  return response?.success === false;
-}
+
+// export function EnqueueFaceAnimationIsSuccess(response: EnqueueFaceAnimationResponse): response is EnqueueFaceAnimationSuccessResponse {
+//   return response?.success === true;
+// }
+
+// export function EnqueueFaceAnimationIsError(response: EnqueueFaceAnimationResponse): response is EnqueueFaceAnimationErrorResponse {
+//   return response?.success === false;
+// }
 
 export async function EnqueueFaceAnimation(request: EnqueueFaceAnimationRequest) : Promise<EnqueueFaceAnimationResponse> 
 {

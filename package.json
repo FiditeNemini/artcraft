@@ -33,6 +33,7 @@
     "lerna": "^4.0.0"
   },
   "dependencies": {
+    "@react-spring/types": "^9.7.3",
     "yarn": "^1.22.19"
   },
   "packageManager": "yarn@3.3.1"

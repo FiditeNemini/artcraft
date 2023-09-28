@@ -11,7 +11,7 @@ launch_linux() {
     --disable-web-security \
     --ignore-certificate-errors \
     --user-data-dir="${CHROME_DIR}" \
-    https://dev.fakeyou.com
+    http://dev.fakeyou.com:7000
 }
 
 launch_mac() {

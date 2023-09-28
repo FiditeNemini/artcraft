@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import { t } from "i18next";
 import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
 import { PosthogClient } from "@storyteller/components/src/analytics/PosthogClient";
 import { Link, useHistory } from "react-router-dom";
@@ -32,6 +31,7 @@ import {
   faMessageDots,
   faMicrophoneStand,
 } from "@fortawesome/pro-solid-svg-icons";
+import { useLocalize } from "hooks";
 
 // TODO: This is duplicated in SessionTtsInferenceResultsList !
 // Default to querying every 15 seconds, but make it configurable serverside
@@ -45,8 +45,8 @@ interface Props {
 }
 
 function TopNav(props: Props) {
+  const { t } = useLocalize("TopNav");
   let history = useHistory();
-
   let myDataLink = WebUrl.signupPage();
 
   if (props.sessionWrapper.isLoggedIn()) {
@@ -102,7 +102,7 @@ function TopNav(props: Props) {
     <>
       <Link to={WebUrl.loginPage()}>
         <span className="nav-login me-4" data-bs-toggle="offcanvas">
-          {t("nav.TopNav.buttons.login")}
+          {t("buttonLogin")}
         </span>
       </Link>
     </>
@@ -112,7 +112,7 @@ function TopNav(props: Props) {
     <>
       <Link to={WebUrl.signupPage()}>
         <button className="btn btn-primary" data-bs-toggle="offcanvas">
-          {t("nav.TopNav.buttons.signUp")}
+          {t("buttonSignUp")}
         </button>
       </Link>
     </>
@@ -152,70 +152,14 @@ function TopNav(props: Props) {
             await logoutHandler();
           }}
         >
-          <FontAwesomeIcon icon={faSignOutAlt} />{" "}
-          {t("nav.TopNav.buttons.logout")}
+          <FontAwesomeIcon icon={faSignOutAlt} /> {t("buttonLogOut")}
         </button>
       </>
     );
   }
 
   return (
-    <div className="d-none d-lg-block">
-      {/* <div className="top-bar d-none d-lg-flex">
-        <div className="container d-flex align-items-center">
-          <div className="d-flex gap-4 flex-grow-1">
-            <Link
-              className="top-bar-text"
-              to="/about"
-              onClick={() => {
-                Analytics.topbarClickAbout();
-              }}
-            >
-              {t("nav.TopNav.topbar.aboutLink")}
-            </Link>
-            <Link
-              className="top-bar-text"
-              to="/terms"
-              onClick={() => {
-                Analytics.topbarClickTerms();
-              }}
-            >
-              {t("nav.TopNav.topbar.termsLink")}
-            </Link>
-            <Link className="top-bar-text" to="/privacy">
-              {t("nav.TopNav.topbar.privacyLink")}
-            </Link>
-            <a className="top-bar-text" href={WebUrl.developerDocs()}>
-              {t("nav.TopNav.topbar.developersLink")}
-            </a>
-          </div>
-          <div className="d-flex gap-3 align-items-center">
-            
-            <Tippy
-              content={`${
-                lowSpecView ? "Turn on animations" : "Turn off animations"
-              }`}
-            >
-              <button
-                className="btn btn-toggle"
-                onClick={() => toggleLowSpec()}
-              >
-                <FontAwesomeIcon
-                  icon={lowSpecView ? faComputer : faLaptop}
-                  className={`${lowSpecView ? "" : ""}`}
-                />
-              </button>
-            </Tippy>
-            <p className="top-bar-text ms-2">
-              {t("nav.TopNav.topbar.ttsQueued")}:{" "}
-              <span className="fw-bold text-red">
-                {pendingTtsJobs.pending_job_count}
-              </span>
-            </p>
-          </div>
-        </div>
-      </div> */}
-
+    <div>
       <nav
         className="navbar navbar-expand-lg navbar-dark pt-3"
         aria-label="Offcanvas navbar large"
@@ -265,19 +209,6 @@ function TopNav(props: Props) {
             </div>
             <div className="offcanvas-body">
               <ul className="navbar-nav justify-content-start align-items-lg-center flex-grow-1 gap-2 gap-lg-0">
-                {/*<li data-bs-toggle="offcanvas" className="nav-item">
-                  <Link
-                    to={WebUrl.newsPage()}
-                    onClick={() => {
-                      Analytics.topbarClickNews();
-                    }}
-                    className="nav-link"
-                  >
-                    <FontAwesomeIcon icon={faTvRetro} className="me-2" />
-                    {t("nav.TopNav.main.newsLink")}
-                  </Link>
-                  </li>*/}
-
                 <li className="nav-item dropdown">
                   {/* TODO(echelon): Fix the build warnings about href not being accessible. */}
                   <a
@@ -289,8 +220,7 @@ function TopNav(props: Props) {
                     aria-expanded="false"
                   >
                     <FontAwesomeIcon icon={faPlus} className="me-2" />
-                    {/* {t("nav.TopNav.main.createDropdown")} */}
-                    AI Tools
+                    {t("productsTitle")}
                   </a>
                   <ul
                     className="dropdown-menu"
@@ -302,7 +232,7 @@ function TopNav(props: Props) {
                           icon={faMessageDots}
                           className="me-2"
                         />
-                        {t("nav.TopNav.main.ttsOption")}
+                        {t("productTts")}
                       </Link>
                     </li>
                     <li data-bs-toggle="offcanvas">
@@ -311,13 +241,13 @@ function TopNav(props: Props) {
                           icon={faMicrophoneStand}
                           className="me-2"
                         />
-                        Voice to Voice
+                        {t("productVc")}
                       </Link>
                     </li>
                     <li data-bs-toggle="offcanvas">
                       <Link className="dropdown-item" to="/video">
                         <FontAwesomeIcon icon={faVideo} className="me-2" />
-                        {t("nav.TopNav.main.videoOption")}
+                        {t("productVideo")}
                       </Link>
                     </li>
                     <hr className="my-2" />
@@ -331,7 +261,7 @@ function TopNav(props: Props) {
                           icon={faFileArrowUp}
                           className="me-2"
                         />
-                        Upload Models
+                        {t("productUploadModels")}
                       </Link>
                     </li>
                   </ul>
@@ -348,7 +278,7 @@ function TopNav(props: Props) {
                     aria-label="Community dropdown"
                   >
                     <FontAwesomeIcon icon={faUsers} className="me-2" />
-                    {t("nav.TopNav.main.communityDropdown")}
+                    {t("communityTitle")}
                   </a>
                   <ul
                     className="dropdown-menu"
@@ -363,7 +293,7 @@ function TopNav(props: Props) {
                         rel="noopener noreferrer"
                       >
                         <FontAwesomeIcon icon={faDiscord} className="me-2" />
-                        {t("nav.TopNav.main.discordOption")}
+                        {t("communityDiscord")}
                       </a>
                     </li>
 
@@ -374,7 +304,7 @@ function TopNav(props: Props) {
                         title="to leaderboard"
                       >
                         <FontAwesomeIcon icon={faTrophy} className="me-2" />
-                        {t("nav.TopNav.main.leaderboardOption")}
+                        {t("communityLeaderboard")}
                       </Link>
                     </li>
 
@@ -385,7 +315,7 @@ function TopNav(props: Props) {
                         title="to guide"
                       >
                         <FontAwesomeIcon icon={faBook} className="me-2" />
-                        {t("nav.TopNav.main.guideOption")}
+                        {t("communityGuide")}
                       </Link>
                     </li>
 
@@ -397,7 +327,7 @@ function TopNav(props: Props) {
                         title="my profile"
                       >
                         <FontAwesomeIcon icon={faUser} className="me-2" />
-                        {t("nav.TopNav.main.myDataOption")}
+                        {t("communityProfile")}
                       </Link>
                     </li>
                   </ul>
@@ -412,7 +342,7 @@ function TopNav(props: Props) {
                     className="nav-link"
                   >
                     <FontAwesomeIcon icon={faStar} className="me-2" />
-                    {t("nav.TopNav.main.pricingLink")}
+                    {t("pricingTitle")}
                   </Link>
                 </li>
 
@@ -423,7 +353,7 @@ function TopNav(props: Props) {
                     to="/about"
                     title="About Us"
                   >
-                    {t("nav.TopNav.topbar.aboutLink")}
+                    {t("infoAbout")}
                   </Link>
                 </li>
 
@@ -434,7 +364,7 @@ function TopNav(props: Props) {
                     title="Terms of Use"
                     to="/terms"
                   >
-                    {t("nav.TopNav.topbar.termsLink")}
+                    {t("infoTerms")}
                   </Link>
                 </li>
 
@@ -445,7 +375,7 @@ function TopNav(props: Props) {
                     title="Privacy Policy"
                     to="/privacy"
                   >
-                    {t("nav.TopNav.topbar.privacyLink")}
+                    {t("infoPrivacyPolicy")}
                   </Link>
                 </li>
 
@@ -457,25 +387,8 @@ function TopNav(props: Props) {
                     title="to API"
                     href={WebUrl.developerDocs()}
                   >
-                    {t("nav.TopNav.topbar.developersLink")}
+                    {t("infoApiDocs")}
                   </a>
-                </li>
-                <li className="d-lg-none">
-                  <hr className="dropdown-divider dropdown-divider-white" />
-                </li>
-
-                <li className="ps-3 d-lg-none">
-                  <div className="d-flex gap-4 py-2">
-                    {/* <p className="top-bar-text">
-                      Online: <span className="fw-bold text-red">1,204</span>
-                    </p> */}
-                    <div className="top-bar-text mobile">
-                      {t("nav.TopNav.topbar.ttsQueued")}:{" "}
-                      <span className="fw-bold text-red ">
-                        {pendingTtsJobs.pending_job_count}
-                      </span>
-                    </div>
-                  </div>
                 </li>
 
                 <li className="d-lg-none">

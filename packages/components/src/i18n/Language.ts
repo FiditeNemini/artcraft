@@ -13,6 +13,9 @@ enum Language {
   ChineseSimplified,
   Korean,
   Italian,
+  Thai,
+  Russian,
+  Bengali,
 }
 
-export { Language }
+export { Language };

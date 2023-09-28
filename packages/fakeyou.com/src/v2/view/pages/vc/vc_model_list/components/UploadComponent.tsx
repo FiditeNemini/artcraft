@@ -14,6 +14,7 @@ import {
   UploadAudioIsOk,
   UploadAudioRequest,
 } from "@storyteller/components/src/api/upload/UploadAudio";
+import { useLocalize } from "hooks";
 
 const FILE_TYPES = ["MP3", "WAV", "FLAC", "OGG"];
 
@@ -28,6 +29,8 @@ interface Props {
 }
 
 function UploadComponent(props: Props) {
+  const { t } = useLocalize("UploadComponent");
+
   const [file, setFile] = useState<any>(undefined);
   const [audioLink, setAudioLink] = useState<string>();
   const [isUploadDisabled, setIsUploadDisabled] = useState<boolean>(false);
@@ -136,8 +139,8 @@ function UploadComponent(props: Props) {
                   </span>
                 ) : (
                   <>
-                    <u className="fw-medium">Upload a file</u> or drop it
-                    here...
+                    <u className="fw-medium">{t("uploadFileTextUpload")}</u>{" "}
+                    {t("uploadFileTextDrop")}
                   </>
                 )}
               </div>
@@ -149,7 +152,9 @@ function UploadComponent(props: Props) {
                         {file && `${file.name.split(".").pop().toUpperCase()}`}{" "}
                         file size: {fileSize}
                       </span>{" "}
-                      <u className="fw-medium opacity-100 ms-1">Change file</u>
+                      <u className="fw-medium opacity-100 ms-1">
+                        {t("uploadChangeFile")}
+                      </u>
                     </p>
                   ) : (
                     <p className="opacity-50">
@@ -200,12 +205,12 @@ function UploadComponent(props: Props) {
             {isUploadDisabled ? (
               <>
                 <FontAwesomeIcon icon={faCheck} className="me-2" />
-                Uploaded
+                {t("uploadButtonUploaded")}
               </>
             ) : (
               <>
                 <FontAwesomeIcon icon={faFileArrowUp} className="me-2" />
-                Upload Audio
+                {t("uploadButtonUploadAudio")}
               </>
             )}
             {uploadLoading && <LoadingIcon />}
@@ -213,7 +218,7 @@ function UploadComponent(props: Props) {
 
           <button className="btn btn-destructive w-100" onClick={handleClear}>
             <FontAwesomeIcon icon={faTrash} className="me-2" />
-            Clear
+            {t("uploadButtonClear")}
           </button>
         </div>
       ) : (

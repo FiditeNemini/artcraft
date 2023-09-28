@@ -1,0 +1,20 @@
+{
+  "buttonLogOut": "Çıkış Yap",
+  "buttonLogin": "Giriş yapmak",
+  "buttonSignUp": "Üye olmak",
+  "communityGuide": "Rehber",
+  "communityLeaderboard": "Liderler Sıralaması",
+  "communityProfile": "Benim profilim",
+  "communityTitle": "Toplum",
+  "infoAbout": "Hakkında",
+  "infoApiDocs": "API Dokümanları",
+  "infoPrivacyPolicy": "Gizlilik Politikası",
+  "infoTerms": "Kullanım Şartları",
+  "infoTitle": "Bilgi",
+  "pricingTitle": "Fiyatlandırma",
+  "productTts": "Konuşma metni",
+  "productUploadModels": "Modelleri Yükle",
+  "productVc": "Sesten Sese",
+  "productVideo": "Video Dudak Senkronizasyonu",
+  "productsTitle": "Yapay Zeka Araçları"
+}

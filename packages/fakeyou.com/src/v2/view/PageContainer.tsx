@@ -6,6 +6,7 @@ import { LoginPage } from "./pages/login/LoginPage";
 import { ModerationFc } from "./pages/moderation/moderation_main/ModerationFc";
 import { ModerationIpBanListFc } from "./pages/moderation/moderation_ip_ban_list/ModerationIpBanListFc";
 import { ModerationViewIpBanFc } from "./pages/moderation/moderation_view_ip_ban/ModerationViewIpBanFc";
+import { Media } from "./pages/media";
 import { LipsyncEditor } from "./pages/lipsync";
 import { ProfileEditFc } from "./pages/profile/profile_edit/ProfileEditFc";
 import { ProfilePage } from "./pages/profile/profile_view/ProfilePage";
@@ -457,8 +458,8 @@ class PageContainer extends React.Component<
               <CreateCategoryPage sessionWrapper={this.props.sessionWrapper} />
             </Route>
 
-            <Route path="/dev-lipsync">
-              <LipsyncEditor />
+            <Route path="/media/:token">
+              <Media/>
             </Route>
 
             <Route path="/moderation/user/list">
@@ -580,10 +581,22 @@ class PageContainer extends React.Component<
 
             <Route path="/testing">
               <TestingPage 
+                sessionSubscriptionsWrapper={
+                  this.props.sessionSubscriptionsWrapper
+                }
                 enqueueInferenceJob={this.props.enqueueInferenceJob}
                 inferenceJobs={this.props.inferenceJobs}
                 inferenceJobsByCategory={this.props.inferenceJobsByCategory}
               />
+            </Route>
+
+            <Route path="/face-animation">
+              <LipsyncEditor {...{ 
+                enqueueInferenceJob: this.props.enqueueInferenceJob,
+                sessionSubscriptionsWrapper:  this.props.sessionSubscriptionsWrapper,
+                inferenceJobs: this.props.inferenceJobs,
+                inferenceJobsByCategory: this.props.inferenceJobsByCategory
+              }} />
             </Route>
 
             <Route path="/commissions">
