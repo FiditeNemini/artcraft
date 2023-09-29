@@ -83,9 +83,10 @@ CREATE TABLE tts_models (
   -- ========== UNSTRUCTURED METADATA ==========
 
   -- The full IETF BCP47 language tag (eg. en, en-US, es-419, ja-JP, pt, etc.)
+  -- The wide varchar space is because these language tags can become cumbersome, eg "hy-Latn-IT-arevela"
   ietf_language_tag VARCHAR(64) NOT NULL DEFAULT 'en',
 
-  -- The IETF BCP47 language tag's primary language subtag (eg. "es-419" becomes "es")
+  -- The IETF BCP47 language tag's primary language subtag (eg. "es-419" becomes "es" and "en-US" becomes "en")
   ietf_primary_language_subtag VARCHAR(12) NOT NULL DEFAULT 'en',
 
   -- The "name" of the voice model, which might be complicated.
