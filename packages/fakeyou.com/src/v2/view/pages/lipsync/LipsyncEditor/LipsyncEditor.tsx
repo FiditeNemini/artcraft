@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { animated, useTransition } from "@react-spring/web";
 import { v4 as uuidv4 } from "uuid";
 import { useFile, useLocalize } from "hooks";
-import { AudioInput, ImageInput, Spinner } from "components/common";
+import { AudioInput, Checkbox, ImageInput, NumberSlider, Radio, Spinner } from "components/common";
 import { springs } from "resources";
 import {
   UploadAudio,
@@ -30,16 +30,24 @@ import {
 } from "@storyteller/components/src/jobs/InferenceJob";
 
 interface LipSyncProps {
+  animationChange: any;
+  animationStyle: any;
   audioProps: any;
   children?: any;
+  cropChange: any;
+  cropping: any;
   imageProps: any;
   index: number;
-  toggle: any;
+  orientation: any;
+  orientationChange: any;
   style: any;
+  toggle: any;
   enqueueInferenceJob: any;
   sessionSubscriptionsWrapper: any;
   t: any;
   inferenceJobsByCategory: any;
+  watermark: any;
+  watermarkChange: any;
 }
 interface EditorProps {
   sessionSubscriptionsWrapper: SessionSubscriptionsWrapper;
@@ -54,37 +62,54 @@ interface EditorProps {
 const softSpring = { config: { mass: 1, tension: 80, friction: 10 } };
 
 const InputPage = ({
+  animationChange,
+  animationStyle,
   audioProps,
+  cropping,
+  cropChange,
   imageProps,
+  orientation,
+  orientationChange,
   toggle,
   style,
   t,
+  watermark,
+  watermarkChange,
 }: LipSyncProps) => {
-  return (
-    <animated.div {...{ className: "lipsync-editor row", style }}>
-      <div {...{ className: "media-input-column col-lg-6" }}>
-        <h5>{t("headings.image")}</h5>
-        <ImageInput
-          {...{
-            ...imageProps,
-            onRest: () => toggle.image(imageProps.file ? true : false),
-          }}
-        />
-      </div>
-      <div {...{ className: "media-input-column col-lg-6" }}>
-        <h5>{t("headings.audio")}</h5>
-        <AudioInput
-          {...{
-            ...audioProps,
-            onRest: (p: any, c: any, item: any, l: any) => {
-              toggle.audio(!!audioProps.file);
-            },
-            hideActions: true,
-          }}
-        />
-      </div>
-    </animated.div>
-  );
+
+  return  <animated.div {...{ className: "lipsync-editor row", style }}>
+    <div {...{ className: "media-input-column col-lg-6" }}>
+      <h5>{t("headings.image")}</h5>
+      <ImageInput
+        {...{
+          ...imageProps,
+          onRest: () => toggle.image(imageProps.file ? true : false),
+        }}
+      />
+      <label {...{ class: "sub-title", }}>Watermark</label>
+      <Checkbox {...{ checked: watermark, label: "Disable (premium only)", onChange: watermarkChange }}/>
+      <label {...{ class: "sub-title", }}>Orientation</label>
+      <Radio {...{ label: "Landscape", name: "landscape", onChange: orientationChange, value: orientation }}/>
+      <Radio {...{ label: "Portait", name: "portrait", onChange: orientationChange, value: orientation }}/>
+      <label {...{ class: "sub-title", }}>Cropping</label>
+      <Radio {...{ label: "Cropped", name: "cropped", onChange: cropChange, value: cropping }}/>
+      <Radio {...{ label: "Full size (Premium only)", name: "fullSize", onChange: cropChange, value: cropping }}/>
+      <label {...{ class: "sub-title", }}>Animation style</label>
+      <NumberSlider {...{ min: 0, max: 32, onChange: animationChange, value: animationStyle }}/>
+    </div>
+    <div {...{ className: "media-input-column col-lg-6" }}>
+      <h5>{t("headings.audio")}</h5>
+      <AudioInput
+        {...{
+          ...audioProps,
+          onRest: (p: any, c: any, item: any, l: any) => {
+            toggle.audio(!!audioProps.file);
+          },
+          hideActions: true,
+        }}
+      />
+    </div>
+  </animated.div>;
 };
 
 const Working = ({ audioProps, imageProps, index, style, t }: LipSyncProps) => {
@@ -143,6 +168,18 @@ export default function LipsyncEditor({
   const imageProps = useFile({}); // contains upload inout state and controls, see docs
   const [index, indexSet] = useState<number>(0); // index  = slideshow slide position
 
+
+  const [animationStyle,animationStyleSet] = useState(0);
+  const [cropping,croppingSet] = useState("cropped");
+  const [orientation,orientationSet] = useState("landscape");
+  const [watermark,watermarkSet] = useState(false);
+
+  const animationChange = ({ target }: any) => animationStyleSet(target.value);
+  const cropChange = ({ target }: any) => croppingSet(target.value);
+  const orientationChange = ({ target }: any) => orientationSet(target.value);
+  const watermarkChange = ({ target }: any) => watermarkSet(target.checked);
+  const clearInputs = () => { animationStyleSet(0); croppingSet("cropped"); orientationSet("landscape"); watermarkSet(false);  }
+
   const makeRequest = (mode: number) => ({
     uuid_idempotency_token: uuidv4(),
     file: mode ? imageProps.file : audioProps.file,
@@ -171,6 +208,10 @@ export default function LipsyncEditor({
         if ("upload_token" in responses.image) {
           indexSet(3); // set face animator API working page
           return EnqueueFaceAnimation({
+            // backend_animation_key: animationStyle,
+            // backend_cropping_key: cropping === "cropped",
+            // backend_orientation_key: orientation === "landscape",
+            // backend_watermark_key: watermark,
             uuid_idempotency_token: uuidv4(),
             audio_source: {
               maybe_media_upload_token: responses.audio.upload_token,
@@ -198,6 +239,7 @@ export default function LipsyncEditor({
   const headerProps = {
     audioProps,
     audioReady,
+    clearInputs,
     imageProps,
     imageReady,
     indexSet,
@@ -223,14 +265,22 @@ export default function LipsyncEditor({
             <Page
               {...{
                 audioProps,
-                imageProps,
+                animationStyle,
+                animationChange,
+                cropChange,
+                cropping,
                 enqueueInferenceJob,
+                imageProps,
+                orientation,
+                orientationChange,
                 sessionSubscriptionsWrapper,
                 inferenceJobsByCategory,
                 index,
                 t,
                 toggle: { audio: readyMedia(1), image: readyMedia(0) },
                 style,
+                watermark,
+                watermarkChange,
               }}
             />
           ) : (
