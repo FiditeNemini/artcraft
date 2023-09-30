@@ -9,7 +9,7 @@ use actix_web::http::StatusCode;
 use log::{info, warn};
 
 
-pub async pub async fn list_favorite_models() -> HttpResponse {
+pub async fn list_favorite_models() -> HttpResponse {
   // Implementation for listing favorite models
   HttpResponse::Ok().json("List of favorite models")
 }
