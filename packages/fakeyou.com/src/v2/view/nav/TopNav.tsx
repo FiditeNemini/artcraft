@@ -27,6 +27,7 @@ import "tippy.js/animations/shift-away.css";
 import { ThirdPartyLinks } from "@storyteller/components/src/constants/ThirdPartyLinks";
 import { Analytics } from "../../../common/Analytics";
 import {
+  faFaceViewfinder,
   faFileArrowUp,
   faMessageDots,
   faMicrophoneStand,
@@ -242,6 +243,15 @@ function TopNav(props: Props) {
                           className="me-2"
                         />
                         {t("productVc")}
+                      </Link>
+                    </li>
+                    <li data-bs-toggle="offcanvas">
+                      <Link className="dropdown-item" to="/face-animation">
+                        <FontAwesomeIcon
+                          icon={faFaceViewfinder}
+                          className="me-2"
+                        />
+                        {t("productFaceAnimator")}
                       </Link>
                     </li>
                     <li data-bs-toggle="offcanvas">
