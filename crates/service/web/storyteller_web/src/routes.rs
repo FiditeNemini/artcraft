@@ -181,7 +181,7 @@ pub fn add_routes<T, B> (app: App<T>) -> App<T>
 
   app = add_suggested_api_v1_account_creation_and_session_routes(app); // /create_account, /session, /login, /logout
   app = add_suggested_stripe_billing_routes(app); // /stripe, billing, webhooks, etc.
-
+ 
   // ==================== SERVICE ====================
   app.service(
     web::resource("/_status")
@@ -1094,4 +1094,19 @@ fn add_subscription_routes<T, B> (app: App<T>) -> App<T>
             .route(web::head().to(|| HttpResponse::Ok()))
         )
     )
+}
+
+// Rename to what you think makes sense
+fn add_zeroshot_routes<T,B> (app:APP<T>)-> App<T>
+  where 
+    B: MessageBody,
+    T: ServiceFactory<
+      ServiceRequest,
+      Config = (),
+      Response = ServiceResponse<B>,
+      Error = Error,
+      InitError = (),
+      >,
+      {
+        
 }
