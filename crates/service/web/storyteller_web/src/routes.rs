@@ -120,6 +120,28 @@ use crate::http_server::endpoints::w2l::list_user_w2l_templates::list_user_w2l_t
 use crate::http_server::endpoints::w2l::list_w2l_templates::list_w2l_templates_handler;
 use crate::http_server::endpoints::w2l::set_w2l_template_mod_approval::set_w2l_template_mod_approval_handler;
 
+use crate::http_server::endpoints::voice_designer::create_dataset::create_dataset;
+use crate::http_server::endpoints::voice_designer::update_dataset::update_dataset;
+use crate::http_server::endpoints::voice_designer::delete_dataset::delete_dataset;
+use crate::http_server::endpoints::voice_designer::list_samples_by_dataset::list_samples_by_dataset;
+
+use crate::http_server::endpoints::voice_designer::create_voice::create_voice;
+use crate::http_server::endpoints::voice_designer::update_voice::update_voice;
+use crate::http_server::endpoints::voice_designer::delete_voice::delete_voice;
+use crate::http_server::endpoints::voice_designer::list_available_voices::list_available_voices;
+
+use crate::http_server::endpoints::voice_designer::upload_sample::upload_sample;
+use crate::http_server::endpoints::voice_designer::delete_sample::delete_sample;
+// list sample by dataset
+
+use crate::http_server::endpoints::voice_designer::enqueue_tts_request::enqueue_tts_request;
+use crate::http_server::endpoints::voice_designer::enqueue_vc_request::enqueue_vc_request;
+
+use crate::http_server::endpoints::voice_designer::list_user_models::list_user_models;
+use crate::http_server::endpoints::voice_designer::list_voices_by_user::list_voices_by_user;
+use crate::http_server::endpoints::voice_designer::list_favorite_models::list_favorite_models;
+use crate::http_server::endpoints::voice_designer::search_voices::search_voices;
+
 pub fn add_routes<T, B> (app: App<T>) -> App<T>
   where
       B: MessageBody,
@@ -1096,8 +1118,8 @@ fn add_subscription_routes<T, B> (app: App<T>) -> App<T>
     )
 }
 
-// Rename to what you think makes sense
-fn add_zeroshot_routes<T,B> (app:APP<T>)-> App<T>
+// Rename to what you think makes
+fn add_voice_designer_routes<T,B> (app:App<T>)-> App<T>
   where 
     B: MessageBody,
     T: ServiceFactory<
@@ -1108,5 +1130,37 @@ fn add_zeroshot_routes<T,B> (app:APP<T>)-> App<T>
       InitError = (),
       >,
       {
-        
+        app.service(
+          web::scope("/v1/voice_designer")
+          .service(
+            web::scope("/datasets")
+                    .route("/create", web::post().to(create_dataset))
+                    .route("/{dataset_token}/update", web::post().to(update_dataset))
+                    .route("/{dataset_token}/delete", web::delete().to(delete_dataset))
+                    .route("/user/{user_token}/list", web::get().to(list_datasets_by_user))
+          .service(
+            web::scope("/voice")
+                    .route("/create", web::post().to(create_voice))
+                    .route("/{voice_token}/update", web::post().to(update_voice))
+                    .route("/{voice_token}/delete", web::delete().to(delete_voice))
+                    .route("/user/{user_token}/list", web::get().to(list_voices_by_user))
+          .service(
+            web::scope("/sample")
+                    .route("/upload", web::post().to(upload_sample))
+                    .route("/delete", web::delete().to(delete_sample))
+                    .route("/data_set/{data_set_token}/list", web::get().to(list_samples_by_dataset))
+                )
+          .service(
+            web::scope("/inference")
+                    .route("/enqueue_tts", web::post().to(enqueue_tts_request))
+                    .route("/enqueue_vc", web::post().to(enqueue_vc_request))
+                )
+          .service(
+            web::scope("/inventory")
+                  .route("/list", web::get().to(list_available_voices))
+                  .route("/user_list", web::get().to(list_user_models))
+                  .route("/favorites_list", web::get().to(list_favorite_models))
+                  .route("/search", web::get().to(search_voices))
+                ))))
 }
+
