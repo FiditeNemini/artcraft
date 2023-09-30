@@ -123,7 +123,7 @@ use crate::http_server::endpoints::w2l::set_w2l_template_mod_approval::set_w2l_t
 use crate::http_server::endpoints::voice_designer::create_dataset::create_dataset;
 use crate::http_server::endpoints::voice_designer::update_dataset::update_dataset;
 use crate::http_server::endpoints::voice_designer::delete_dataset::delete_dataset;
-use crate::http_server::endpoints::voice_designer::list_samples_by_dataset::list_samples_by_dataset;
+use crate::http_server::endpoints::voice_designer::list_datasets_by_user::list_datasets_by_user;
 
 use crate::http_server::endpoints::voice_designer::create_voice::create_voice;
 use crate::http_server::endpoints::voice_designer::update_voice::update_voice;
@@ -132,7 +132,7 @@ use crate::http_server::endpoints::voice_designer::list_available_voices::list_a
 
 use crate::http_server::endpoints::voice_designer::upload_sample::upload_sample;
 use crate::http_server::endpoints::voice_designer::delete_sample::delete_sample;
-// list sample by dataset
+use crate::http_server::endpoints::voice_designer::list_samples_by_dataset::list_samples_by_dataset;
 
 use crate::http_server::endpoints::voice_designer::enqueue_tts_request::enqueue_tts_request;
 use crate::http_server::endpoints::voice_designer::enqueue_vc_request::enqueue_vc_request;

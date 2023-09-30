@@ -9,7 +9,7 @@ use actix_web::http::StatusCode;
 use log::{info, warn};
 
 
-fn list_datasets_by_user(user_token: web::Path<String>) -> HttpResponse {
+pub async fn list_datasets_by_user(user_token: web::Path<String>) -> HttpResponse {
   // Implementation for listing datasets for a user
   HttpResponse::Ok().json(format!("List of datasets for user {}", user_token))
 }
