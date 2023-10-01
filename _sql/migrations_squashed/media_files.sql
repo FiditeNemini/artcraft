@@ -90,6 +90,12 @@ CREATE TABLE media_files (
   -- as well as any transcodings, downsamplings, etc.
   public_bucket_directory_hash  VARCHAR(32) NOT NULL,
 
+  -- An appended extension on the bucket filename.
+  -- If present, this will be appended to the end of the bucket filename to access the file.
+  -- To allow for flexibility, this extension typically will contain a leading period if
+  -- the file needs it (eg ".mp4" rather than "mp4")!
+  maybe_public_bucket_extension VARCHAR(16) DEFAULT NULL,
+
   -- NB: Removed, since this can be derived.
   -- The directory this media is uploaded to will be exclusive for this file.
   -- Only this given record will live in this bucket, but the directory may include
