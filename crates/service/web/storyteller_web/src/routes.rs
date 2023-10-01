@@ -1133,35 +1133,38 @@ fn add_voice_designer_routes<T,B> (app:App<T>)-> App<T>
       {
         app.service(
           web::scope("/v1/voice_designer")
-          .service(
-            web::scope("/datasets")
-                    .route("/create", web::post().to(create_dataset))
-                    .route("/{dataset_token}/update", web::post().to(update_dataset))
-                    .route("/{dataset_token}/delete", web::delete().to(delete_dataset))
-                    .route("/user/{user_token}/list", web::get().to(list_datasets_by_user))
-          .service(
-            web::scope("/voice")
-                    .route("/create", web::post().to(create_voice))
-                    .route("/{voice_token}/update", web::post().to(update_voice))
-                    .route("/{voice_token}/delete", web::delete().to(delete_voice))
-                    .route("/user/{user_token}/list", web::get().to(list_voices_by_user))
-          .service(
-            web::scope("/sample")
-                    .route("/upload", web::post().to(upload_sample))
-                    .route("/delete", web::delete().to(delete_sample))
-                    .route("/data_set/{data_set_token}/list", web::get().to(list_samples_by_dataset))
-                )
-          .service(
-            web::scope("/inference")
-                    .route("/enqueue_tts", web::post().to(enqueue_tts_request))
-                    .route("/enqueue_vc", web::post().to(enqueue_vc_request))
-                )
-          .service(
-            web::scope("/inventory")
-                  .route("/list", web::get().to(list_available_voices))
-                  .route("/user_list", web::get().to(list_user_models))
-                  .route("/favorites_list", web::get().to(list_favorite_models))
-                  .route("/search", web::get().to(search_voices))
-                ))))
+              .service(
+                  web::scope("/datasets")
+                      .route("/create", web::post().to(create_dataset))
+                      .route("/{dataset_token}/update", web::post().to(update_dataset))
+                      .route("/{dataset_token}/delete", web::delete().to(delete_dataset))
+                      .route("/user/{user_token}/list", web::get().to(list_datasets_by_user))
+              )
+              .service(
+                  web::scope("/voice")
+                      .route("/create", web::post().to(create_voice))
+                      .route("/{voice_token}/update", web::post().to(update_voice))
+                      .route("/{voice_token}/delete", web::delete().to(delete_voice))
+                      .route("/user/{user_token}/list", web::get().to(list_voices_by_user))
+              )
+              .service(
+                  web::scope("/sample")
+                      .route("/upload", web::post().to(upload_sample))
+                      .route("/delete", web::delete().to(delete_sample))
+                      .route("/data_set/{data_set_token}/list", web::get().to(list_samples_by_dataset))
+              )
+              .service(
+                  web::scope("/inference")
+                      .route("/enqueue_tts", web::post().to(enqueue_tts_request))
+                      .route("/enqueue_vc", web::post().to(enqueue_vc_request))
+              )
+              .service(
+                  web::scope("/inventory")
+                      .route("/list", web::get().to(list_available_voices))
+                      .route("/user_list", web::get().to(list_user_models))
+                      .route("/favorites_list", web::get().to(list_favorite_models))
+                      .route("/search", web::get().to(search_voices))
+              )
+      )      
 }
 
