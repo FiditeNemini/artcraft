@@ -125,6 +125,9 @@ mod tests {
         maybe_image_source: Some(LipsyncAnimationImageSource::F("bar".to_string())),
         maybe_face_enhancer: None,
         maybe_pose_style: None,
+        maybe_preprocess: None,
+        maybe_make_still: None,
+        maybe_remove_watermark: None,
       })),
     };
 
