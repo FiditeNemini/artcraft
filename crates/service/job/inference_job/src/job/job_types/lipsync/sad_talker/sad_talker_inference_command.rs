@@ -1,14 +1,14 @@
 use std::collections::HashSet;
 use std::env;
 use std::ffi::OsString;
-use std::fs::{File, read_to_string};
+use std::fs::File;
 use std::path::{Path, PathBuf};
 use std::time::Duration;
 
 use anyhow::anyhow;
-use log::{error, info};
+use log::info;
 use once_cell::sync::Lazy;
-use subprocess::{Exec, Popen, PopenConfig, Redirection};
+use subprocess::{Popen, PopenConfig, Redirection};
 
 use container_common::anyhow_result::AnyhowResult;
 use filesys::path_to_string::path_to_string;
