@@ -147,6 +147,9 @@ pub async fn process_job(args: SadTalkerProcessJobArgs<'_>) -> Result<JobSuccess
         work_dir: &workdir,
         output_file: &output_video_fs_path,
         stderr_output_file: &stderr_output_file,
+        make_still: job_args.make_still,
+        maybe_enhancer: job_args.enhancer.as_deref(),
+        maybe_preprocess: job_args.preprocess.as_deref(),
       });
 
   let inference_duration = Instant::now().duration_since(inference_start_time);
@@ -182,49 +185,56 @@ pub async fn process_job(args: SadTalkerProcessJobArgs<'_>) -> Result<JobSuccess
 
   // ==================== WATERMARK ==================== //
 
-  info!("Adding watermark...");
+  let mut finished_file = output_video_fs_path.clone();
 
-  let command_exit_status = args.job_dependencies
-      .job_type_details
-      .sad_talker
-      .ffmpeg_watermark_command
-      .execute_inference(ffmpeg_logo_watermark_command::InferenceArgs {
-        video_path: &output_video_fs_path,
-        maybe_override_logo_path: None,
-        alpha: 0.6,
-        output_path: &output_video_fs_path_watermark,
-      });
+  if !job_args.remove_watermark {
+    info!("Adding watermark...");
 
-  if !command_exit_status.is_success() {
-    error!("Watermark failed: {:?}", command_exit_status);
-    safe_delete_temp_file(&audio_path.filesystem_path);
-    safe_delete_temp_file(&image_path.filesystem_path);
-    safe_delete_temp_file(&output_video_fs_path);
-    safe_delete_temp_file(&output_video_fs_path_watermark);
-    safe_delete_temp_directory(&work_temp_dir);
-    return Err(ProcessSingleJobError::Other(anyhow!("CommandExitStatus: {:?}", command_exit_status)));
+    finished_file = output_video_fs_path_watermark.clone();
+
+    let command_exit_status = args.job_dependencies
+        .job_type_details
+        .sad_talker
+        .ffmpeg_watermark_command
+        .execute_inference(ffmpeg_logo_watermark_command::InferenceArgs {
+          video_path: &output_video_fs_path,
+          maybe_override_logo_path: None,
+          alpha: 0.6,
+          output_path: &output_video_fs_path_watermark,
+        });
+
+    if !command_exit_status.is_success() {
+      error!("Watermark failed: {:?}", command_exit_status);
+      safe_delete_temp_file(&audio_path.filesystem_path);
+      safe_delete_temp_file(&image_path.filesystem_path);
+      safe_delete_temp_file(&output_video_fs_path);
+      safe_delete_temp_file(&output_video_fs_path_watermark);
+      safe_delete_temp_directory(&work_temp_dir);
+      return Err(ProcessSingleJobError::Other(anyhow!("CommandExitStatus: {:?}", command_exit_status)));
+    }
   }
+
 
   // ==================== CHECK ALL FILES EXIST AND GET METADATA ==================== //
 
-  info!("Checking that output watermark file exists: {:?} ...", output_video_fs_path_watermark);
-  check_file_exists(&output_video_fs_path_watermark).map_err(|e| ProcessSingleJobError::Other(e))?;
+  info!("Checking that output watermark file exists: {:?} ...", finished_file);
+  check_file_exists(&finished_file).map_err(|e| ProcessSingleJobError::Other(e))?;
 
   info!("Interrogating result file size ...");
 
-  let file_size_bytes = file_size(&output_video_fs_path_watermark)
+  let file_size_bytes = file_size(&finished_file)
       .map_err(|err| ProcessSingleJobError::Other(err))?;
 
   info!("Interrogating result mimetype ...");
 
-  let mimetype = get_mimetype_for_file(&output_video_fs_path_watermark)
+  let mimetype = get_mimetype_for_file(&finished_file)
       .map_err(|err| ProcessSingleJobError::from_io_error(err))?
       .map(|mime| mime.to_string())
       .ok_or(ProcessSingleJobError::Other(anyhow!("Mimetype could not be determined")))?;
 
   info!("Calculating sha256...");
 
-  let file_checksum = sha256_hash_file(&output_video_fs_path_watermark)
+  let file_checksum = sha256_hash_file(&finished_file)
       .map_err(|err| {
         ProcessSingleJobError::Other(anyhow!("Error hashing file: {:?}", err))
       })?;
@@ -244,7 +254,7 @@ pub async fn process_job(args: SadTalkerProcessJobArgs<'_>) -> Result<JobSuccess
 
   args.job_dependencies.public_bucket_client.upload_filename_with_content_type(
     &result_bucket_object_pathbuf,
-    &output_video_fs_path_watermark,
+    &finished_file,
     &mimetype) // TODO: We should check the mimetype to make sure bad payloads can't get uploaded
       .await
       .map_err(|e| ProcessSingleJobError::Other(e))?;

@@ -10,16 +10,53 @@ pub struct LipsyncArgs {
   #[serde(skip_serializing_if = "Option::is_none")]
   pub maybe_image_source: Option<LipsyncAnimationImageSource>,
 
+  /// SadTalker --enhancer
   /// Which face enhancement algorithm to run.
   /// This makes the video larger in dimensions and higher quality.
   #[serde(rename = "f")] // NB: DO NOT CHANGE. It could break live jobs. Renamed to be fewer bytes.
   #[serde(skip_serializing_if = "Option::is_none")]
   pub maybe_face_enhancer: Option<FaceEnhancer>,
 
+  /// SadTalker --pose_style
   /// Number between [0, 46) to control pose.
-  #[serde(rename = "f")] // NB: DO NOT CHANGE. It could break live jobs. Renamed to be fewer bytes.
+  #[serde(rename = "y")] // NB: DO NOT CHANGE. It could break live jobs. Renamed to be fewer bytes.
   #[serde(skip_serializing_if = "Option::is_none")]
   pub maybe_pose_style: Option<u8>,
+
+  /// SadTalker --preprocess
+  #[serde(rename = "p")] // NB: DO NOT CHANGE. It could break live jobs. Renamed to be fewer bytes.
+  #[serde(skip_serializing_if = "Option::is_none")]
+  pub maybe_preprocess: Option<Preprocess>,
+
+  /// SadTalker --still
+  #[serde(rename = "s")] // NB: DO NOT CHANGE. It could break live jobs. Renamed to be fewer bytes.
+  #[serde(skip_serializing_if = "Option::is_none")]
+  pub maybe_make_still: Option<bool>,
+
+  /// Omit adding the watermark
+  #[serde(rename = "w")] // NB: DO NOT CHANGE. It could break live jobs. Renamed to be fewer bytes.
+  #[serde(skip_serializing_if = "Option::is_none")]
+  pub maybe_remove_watermark: Option<bool>,
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize)]
+pub enum Preprocess {
+  // NB: DO NOT CHANGE. It could break live jobs. Renamed to be fewer bytes.
+  /// "crop"
+  #[serde(rename = "C")] // NB: DO NOT CHANGE. It could break live jobs. Renamed to be fewer bytes.
+  C,
+  // NB: DO NOT CHANGE. It could break live jobs. Renamed to be fewer bytes.
+  /// "extcrop"
+  #[serde(rename = "EC")] // NB: DO NOT CHANGE. It could break live jobs. Renamed to be fewer bytes.
+  EC,
+  // NB: DO NOT CHANGE. It could break live jobs. Renamed to be fewer bytes.
+  /// "full"
+  #[serde(rename = "F")] // NB: DO NOT CHANGE. It could break live jobs. Renamed to be fewer bytes.
+  F,
+  // NB: DO NOT CHANGE. It could break live jobs. Renamed to be fewer bytes.
+  /// "extfull"
+  #[serde(rename = "EF")] // NB: DO NOT CHANGE. It could break live jobs. Renamed to be fewer bytes.
+  EF,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
@@ -112,6 +149,9 @@ mod tests {
       maybe_image_source: Some(LipsyncAnimationImageSource::media_file_token("image_media_file")),
       maybe_face_enhancer: None,
       maybe_pose_style: None,
+      maybe_preprocess: None,
+      maybe_make_still: None,
+      maybe_remove_watermark: None,
     };
     let json = serde_json::ser::to_string(&args).unwrap();
     assert_eq!(json, r#"{"a":{"F":"audio_media_file"},"i":{"F":"image_media_file"}}"#.to_string());
@@ -124,6 +164,9 @@ mod tests {
       maybe_image_source: Some(LipsyncAnimationImageSource::media_upload_token("image_media_upload")),
       maybe_face_enhancer: None,
       maybe_pose_style: None,
+      maybe_preprocess: None,
+      maybe_make_still: None,
+      maybe_remove_watermark: None,
     };
     let json = serde_json::ser::to_string(&args).unwrap();
     assert_eq!(json, r#"{"a":{"U":"audio_media_upload"},"i":{"U":"image_media_upload"}}"#.to_string());
@@ -136,6 +179,9 @@ mod tests {
       maybe_image_source: Some(LipsyncAnimationImageSource::media_upload_token("image_media_upload")),
       maybe_face_enhancer: None,
       maybe_pose_style: None,
+      maybe_preprocess: None,
+      maybe_make_still: None,
+      maybe_remove_watermark: None,
     };
     let json = serde_json::ser::to_string(&args).unwrap();
     assert_eq!(json, r#"{"a":{"T":"audio_tts_result"},"i":{"U":"image_media_upload"}}"#.to_string());
@@ -148,6 +194,9 @@ mod tests {
       maybe_image_source: Some(LipsyncAnimationImageSource::media_upload_token("image_media_upload")),
       maybe_face_enhancer: None,
       maybe_pose_style: None,
+      maybe_preprocess: None,
+      maybe_make_still: None,
+      maybe_remove_watermark: None,
     };
     let json = serde_json::ser::to_string(&args).unwrap();
     assert_eq!(json, r#"{"a":{"V":"audio_voice_conversion_result"},"i":{"U":"image_media_upload"}}"#.to_string());
@@ -160,6 +209,9 @@ mod tests {
       maybe_image_source: None,
       maybe_face_enhancer: Some(FaceEnhancer::G),
       maybe_pose_style: None,
+      maybe_preprocess: None,
+      maybe_make_still: None,
+      maybe_remove_watermark: None,
     };
     let json = serde_json::ser::to_string(&args).unwrap();
     assert_eq!(json, r#"{"f":"G"}"#.to_string());
@@ -172,6 +224,9 @@ mod tests {
       maybe_image_source: None,
       maybe_face_enhancer: Some(FaceEnhancer::R),
       maybe_pose_style: None,
+      maybe_preprocess: None,
+      maybe_make_still: None,
+      maybe_remove_watermark: None,
     };
     let json = serde_json::ser::to_string(&args).unwrap();
     assert_eq!(json, r#"{"f":"R"}"#.to_string());

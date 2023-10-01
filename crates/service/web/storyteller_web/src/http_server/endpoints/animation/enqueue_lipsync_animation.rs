@@ -16,7 +16,7 @@ use enums::common::visibility::Visibility;
 use http_server_common::request::get_request_header_optional::get_request_header_optional;
 use http_server_common::request::get_request_ip::get_request_ip;
 use mysql_queries::payloads::generic_inference_args::generic_inference_args::{GenericInferenceArgs, InferenceCategoryAbbreviated, PolymorphicInferenceArgs};
-use mysql_queries::payloads::generic_inference_args::lipsync_payload::{LipsyncAnimationAudioSource, LipsyncAnimationImageSource, LipsyncArgs};
+use mysql_queries::payloads::generic_inference_args::lipsync_payload::{FaceEnhancer, LipsyncAnimationAudioSource, LipsyncAnimationImageSource, LipsyncArgs, Preprocess};
 use mysql_queries::queries::generic_inference::web::insert_generic_inference_job::{insert_generic_inference_job, InsertGenericInferenceArgs};
 use tokens::files::media_upload::MediaUploadToken;
 use tokens::jobs::inference::InferenceJobToken;
@@ -48,16 +48,28 @@ pub struct EnqueueLipsyncAnimationRequest {
   creator_set_visibility: Option<Visibility>,
   is_storyteller_demo: Option<bool>,
 
-  /// SadTalker: parameter to animate the full body.
-  animate_full_body: Option<bool>,
+  /// SadTalker: cropping
+  crop: Option<CropMode>,
+
+  /// SadTalker: parameter to make the animation more still.
+  make_still: Option<bool>,
 
   /// SadTalker: parameter to enhance the face using gfpgan.
-  /// If `enhance_face_with` is set, it will take precedence over this arg.
-  enhance_face: Option<bool>,
+  high_quality: Option<bool>,
 
-  /// SadTalker: parameter to enhance the face using gfpgan or RestoreFormer.
-  /// If `enhance_face` is set, this `enhance_face_with` argument will take precedence over it.
-  enhance_face_with: Option<String>,
+  /// Remove the watermark
+  remove_watermark: Option<bool>,
+}
+
+#[derive(Deserialize, Copy, Clone)]
+#[serde(rename_all = "snake_case")]
+pub enum CropMode {
+  /// SadTalker: "extcrop", which appears to be a wider crop than the "crop" option
+  Crop,
+  /// SadTalker: "crop" (the default)
+  CloseCrop,
+  /// SadTalker: "full" (can't tell that "extfull" does any differently)
+  Full,
 }
 
 /// Treated as an enum. Only one of these may be set.
@@ -246,23 +258,6 @@ pub async fn enqueue_lipsync_animation_handler(
     }
   };
 
-  // ==================== CHECK AND ENQUEUE ANIMATION ==================== //
-
-  //let mut redis = server_state.redis_pool
-  //    .get()
-  //    .map_err(|e| {
-  //      error!("redis error: {:?}", e);
-  //      EnqueueLipsyncAnimationError::ServerError
-  //    })?;
-
-  //let redis_count_key = RedisKeys::web_vc_model_usage_count(model_token.as_str());
-
-  //redis.incr(&redis_count_key, 1)
-  //    .map_err(|e| {
-  //      warn!("redis error: {:?}", e);
-  //      EnqueueLipsyncAnimationError::ServerError
-  //    })?;
-
   let ip_address = get_request_ip(&http_request);
 
   let maybe_user_preferred_visibility : Option<Visibility> = maybe_user_session
@@ -273,16 +268,39 @@ pub async fn enqueue_lipsync_animation_handler(
       .or(maybe_user_preferred_visibility)
       .unwrap_or(Visibility::Public);
 
-
-  info!("Creating lipsync animation job record...");
-
-  // TODO: other SadTalker arguments.
-  let maybe_args = Some(PolymorphicInferenceArgs::La(LipsyncArgs {
+  let mut inference_args = LipsyncArgs {
     maybe_audio_source: Some(audio_source),
     maybe_image_source: Some(image_source),
     maybe_face_enhancer: None,
     maybe_pose_style: None,
-  }));
+    maybe_preprocess: None,
+    maybe_make_still: None,
+    maybe_remove_watermark: None,
+  };
+
+  if request.high_quality.unwrap_or(false) {
+    inference_args.maybe_face_enhancer = Some(FaceEnhancer::G); // "--enhancer gfpgan"
+  }
+
+  if let Some(crop_mode) = request.crop {
+    let crop_mode = match crop_mode {
+      CropMode::Crop => Preprocess::EC, // NB: "extcrop" is less of a close crop than "crop"
+      CropMode::CloseCrop => Preprocess::C,
+      CropMode::Full => Preprocess::F,
+    };
+
+    inference_args.maybe_preprocess = Some(crop_mode);
+  }
+
+  if request.make_still.unwrap_or(false) {
+    inference_args.maybe_make_still = Some(true);
+  }
+
+  if request.remove_watermark.unwrap_or(false) {
+    inference_args.maybe_remove_watermark = Some(true);
+  }
+
+  info!("Creating lipsync animation job record...");
 
   let query_result = insert_generic_inference_job(InsertGenericInferenceArgs {
     uuid_idempotency_token: &request.uuid_idempotency_token,
@@ -294,7 +312,7 @@ pub async fn enqueue_lipsync_animation_handler(
     maybe_raw_inference_text: None, // No text
     maybe_inference_args: Some(GenericInferenceArgs {
       inference_category: Some(InferenceCategoryAbbreviated::LipsyncAnimation),
-      args: maybe_args,
+      args: Some(PolymorphicInferenceArgs::La(inference_args)),
     }),
     maybe_creator_user_token: maybe_user_token.as_ref(),
     creator_ip_address: &ip_address,

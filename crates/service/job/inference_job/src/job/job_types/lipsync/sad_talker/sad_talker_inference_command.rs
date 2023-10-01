@@ -51,7 +51,6 @@ pub struct SadTalkerInferenceCommand {
   /// If the execution should be ended after a certain point.
   maybe_execution_timeout: Option<Duration>,
 
-
   /// Inference arg.
   /// --checkpoint_dir: optional location for checkpoints directory
   pub alternate_checkpoint_dir: Option<PathBuf>,
@@ -67,7 +66,7 @@ pub enum ExecutableOrCommand {
   Command(String),
 }
 
-pub struct InferenceArgs<P: AsRef<Path>> {
+pub struct InferenceArgs<'s, P: AsRef<Path>> {
   /// --driven_audio: path to the input audio
   pub input_audio: P,
 
@@ -81,6 +80,15 @@ pub struct InferenceArgs<P: AsRef<Path>> {
   pub output_file: P,
 
   pub stderr_output_file: P,
+
+  /// --still: less animation
+  pub make_still: bool,
+
+  /// --enhancer: "gfpgan"
+  pub maybe_enhancer: Option<&'s str>,
+
+  /// --preprocess: "crop", etc.
+  pub maybe_preprocess: Option<&'s str>,
 
   // TODO: Other SadTalker args
 }
@@ -210,6 +218,21 @@ impl SadTalkerInferenceCommand {
 
     command.push_str(" --result_file ");
     command.push_str(&path_to_string(args.output_file));
+
+    if let Some(preprocess) = args.maybe_preprocess.as_deref() {
+      command.push_str(" --preprocess ");
+      command.push_str(preprocess);
+      command.push_str(" ");
+    }
+    if let Some(enhancer) = args.maybe_enhancer.as_deref() {
+      command.push_str(" --enhancer ");
+      command.push_str(enhancer);
+      command.push_str(" ");
+    }
+
+    if args.make_still {
+      command.push_str(" --still ");
+    }
 
     if let Some(dir) = self.alternate_checkpoint_dir.as_ref() {
       command.push_str(" --checkpoint_dir ");
