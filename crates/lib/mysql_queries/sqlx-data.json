@@ -12708,7 +12708,32 @@
     },
     "query": "\nSELECT\n    vc.token as `token: tokens::voice_conversion::model::VoiceConversionModelToken`,\n    vc.model_type as `model_type: enums::by_table::voice_conversion_models::voice_conversion_model_type::VoiceConversionModelType`,\n\n    vc.title,\n    vc.has_index_file,\n    vc.private_bucket_hash,\n\n    vc.created_at,\n    vc.updated_at,\n    vc.user_deleted_at,\n    vc.mod_deleted_at\n\nFROM voice_conversion_models as vc\n\nWHERE vc.token = ?\n        "
   },
-  "a60b239dff945c0089ded216dc6b4ea1bd7acb2125671bebdd34e5e1312270ce": {
+  "a761a93d160803b7e6af0d0b16244678f3f0bfd346a8e9eb5bcfdb9c6b89bd5c": {
+    "describe": {
+      "columns": [
+        {
+          "name": "count",
+          "ordinal": 0,
+          "type_info": {
+            "char_set": 63,
+            "flags": {
+              "bits": 129
+            },
+            "max_size": 21,
+            "type": "LongLong"
+          }
+        }
+      ],
+      "nullable": [
+        false
+      ],
+      "parameters": {
+        "Right": 1
+      }
+    },
+    "query": "\nSELECT count(*) as count\nFROM vocoder_models\nWHERE\n  creator_user_token = ?\n  AND vocoder_type = 'hifigan'\nLIMIT 1\n        "
+  },
+  "a82fa4eb36528ebf52af2585cdda203476a4ba3645837c792830474fca2eda4f": {
     "describe": {
       "columns": [
         {
@@ -12783,32 +12808,7 @@
         "Right": 0
       }
     },
-    "query": "\nSELECT\n  users.username,\n  users.display_name,\n  users.email_gravatar_hash as gravatar_hash,\n  creator_user_token,\n  count(*) as uploaded_count\nFROM tts_models\nJOIN users\nON\n  users.token = creator_user_token\nWHERE\n  users.is_banned IS FALSE\n  AND tts_models.user_deleted_at IS NULL\n  AND tts_models.mod_deleted_at IS NULL\nGROUP BY creator_user_token\nORDER BY uploaded_count desc\nLIMIT 25;\n        "
-  },
-  "a761a93d160803b7e6af0d0b16244678f3f0bfd346a8e9eb5bcfdb9c6b89bd5c": {
-    "describe": {
-      "columns": [
-        {
-          "name": "count",
-          "ordinal": 0,
-          "type_info": {
-            "char_set": 63,
-            "flags": {
-              "bits": 129
-            },
-            "max_size": 21,
-            "type": "LongLong"
-          }
-        }
-      ],
-      "nullable": [
-        false
-      ],
-      "parameters": {
-        "Right": 1
-      }
-    },
-    "query": "\nSELECT count(*) as count\nFROM vocoder_models\nWHERE\n  creator_user_token = ?\n  AND vocoder_type = 'hifigan'\nLIMIT 1\n        "
+    "query": "\nSELECT\n  users.username,\n  users.display_name,\n  users.email_gravatar_hash as gravatar_hash,\n  creator_user_token,\n  count(*) as uploaded_count\nFROM tts_models\nJOIN users\nON\n  users.token = creator_user_token\nWHERE\n  users.is_banned IS FALSE\n  AND users.token NOT IN (\"U:DRB1SKEMKHT1J\")\n  AND tts_models.user_deleted_at IS NULL\n  AND tts_models.mod_deleted_at IS NULL\nGROUP BY creator_user_token\nORDER BY uploaded_count desc\nLIMIT 25;\n        "
   },
   "a8b3d7a21327028a7c5230139d74f0fa79f4d09ef3ce51f2d31caf378e9a5b19": {
     "describe": {
