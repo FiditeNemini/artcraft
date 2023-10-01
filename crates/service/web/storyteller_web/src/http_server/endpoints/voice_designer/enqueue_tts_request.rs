@@ -9,8 +9,6 @@ use actix_web::http::StatusCode;
 use log::{info, warn};
 
 
-
-
 pub async fn enqueue_tts_request() -> HttpResponse {
   // Implementation for enqueuing a TTS request
   HttpResponse::Ok().json("TTS request enqueued successfully")
