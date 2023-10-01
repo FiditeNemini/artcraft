@@ -28,8 +28,10 @@ pub async fn calculate_tts_model_leaderboard(
   mysql_pool: &mut PoolConnection<MySql>
 ) -> AnyhowResult<Vec<TtsLeaderboardRecordForList>> {
 
-  // NB: We're not requiring "is_public_listing_approved IS TRUE" for TTS models
+  // NB(1): We're not requiring "is_public_listing_approved IS TRUE" for TTS models
   // This is the opposite for W2L templates (for now at least)
+  // NB(2): We're excluding a few users (eg. Vegito's alternate account)
+  //  U:DRB1SKEMKHT1J - https://fakeyou.com/profile/bluefusion/uploaded-tts-models
   let maybe_results = sqlx::query_as!(
       TtsLeaderboardRecordForListRaw,
         r#"
@@ -45,6 +47,7 @@ ON
   users.token = creator_user_token
 WHERE
   users.is_banned IS FALSE
+  AND users.token NOT IN ("U:DRB1SKEMKHT1J")
   AND tts_models.user_deleted_at IS NULL
   AND tts_models.mod_deleted_at IS NULL
 GROUP BY creator_user_token
