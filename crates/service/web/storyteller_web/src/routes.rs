@@ -171,7 +171,8 @@ pub fn add_routes<T, B> (app: App<T>) -> App<T>
   app = add_trending_routes(app); /* /v1/trending/... */
   app = add_user_rating_routes(app); /* /v1/user_rating/... */
   app = add_subscription_routes(app); /* /v1/subscriptions/... */
-
+  app = add_voice_designer_routes(app); /* /v1/voice_designer */
+  
   // ==================== Comments ====================
 
   let mut app = RouteBuilder::from_app(app)
