@@ -24,3 +24,4 @@ pub mod vocoders;
 pub mod voice_clone_requests;
 pub mod voice_conversion;
 pub mod w2l;
+pub mod voice_designer;
