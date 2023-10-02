@@ -1,0 +1,23 @@
+{
+  "communityDiscord": "不和",
+  "communityGuide": "ガイド",
+  "communityLeaderboard": "リーダーボード",
+  "communityTitle": "コミュニティ",
+  "communityUploadModels": "モデルのアップロード",
+  "infoPricing": "価格設定",
+  "logOutButton": "ログアウト",
+  "loginButton": "ログイン",
+  "profileButton": "プロフィール",
+  "queueFaceAnimator": "キューに入れられたアニメーション",
+  "queueRvc": "RVC がキューに登録されました",
+  "queueSvc": "SVC がキューに登録されました",
+  "queueTitle": "サービスキュー",
+  "queueTts": "TTS がキューに登録されました",
+  "signUpButton": "サインアップ",
+  "speechTitle": "音声生成",
+  "speechTts": "テキスト読み上げ",
+  "speechVc": "声から声へ",
+  "videoFaceAnimator": "フェイスアニメーター",
+  "videoTitle": "ビデオ生成",
+  "videoW2l": "ビデオリップシンク"
+}

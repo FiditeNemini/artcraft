@@ -1,0 +1,23 @@
+{
+  "communityDiscord": "Discórdia",
+  "communityGuide": "Guia",
+  "communityLeaderboard": "Entre os melhores",
+  "communityTitle": "Comunidade",
+  "communityUploadModels": "Carregar modelos",
+  "infoPricing": "Preços",
+  "logOutButton": "Sair",
+  "loginButton": "Conecte-se",
+  "profileButton": "Perfil",
+  "queueFaceAnimator": "Animações na fila",
+  "queueRvc": "RVC na fila",
+  "queueSvc": "SVC na fila",
+  "queueTitle": "Filas de serviço",
+  "queueTts": "TTS na fila",
+  "signUpButton": "Inscrever-se",
+  "speechTitle": "Geração de fala",
+  "speechTts": "Texto para fala",
+  "speechVc": "Voz para Voz",
+  "videoFaceAnimator": "Animador facial",
+  "videoTitle": "Geração de Vídeo",
+  "videoW2l": "Sincronização labial de vídeo"
+}

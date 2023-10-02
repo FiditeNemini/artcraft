@@ -1,0 +1,23 @@
+{
+  "communityDiscord": "Discordia",
+  "communityGuide": "Guía",
+  "communityLeaderboard": "Tabla de clasificación",
+  "communityTitle": "Comunidad",
+  "communityUploadModels": "Subir modelos",
+  "infoPricing": "Precios",
+  "logOutButton": "Cerrar sesión",
+  "loginButton": "Acceso",
+  "profileButton": "Perfil",
+  "queueFaceAnimator": "Animaciones en cola",
+  "queueRvc": "RVC en cola",
+  "queueSvc": "SVC en cola",
+  "queueTitle": "Colas de servicio",
+  "queueTts": "TTS en cola",
+  "signUpButton": "Inscribirse",
+  "speechTitle": "Generación de voz",
+  "speechTts": "Texto a voz",
+  "speechVc": "Voz a Voz",
+  "videoFaceAnimator": "Animador de rostros",
+  "videoTitle": "Generación de vídeo",
+  "videoW2l": "Sincronización de labios de vídeo"
+}
