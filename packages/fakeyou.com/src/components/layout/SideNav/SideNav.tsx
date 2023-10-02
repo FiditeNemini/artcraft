@@ -3,7 +3,6 @@ import {
   faBookOpen,
   faMessageDots,
   faTrophy,
-  faVideo,
   faWaveformLines,
   faStar,
   faUser,
@@ -278,16 +277,6 @@ export default function SideNav(props: SideNavProps) {
               className="sidebar-heading-icon"
             />
             Face Animator
-          </NavLink>
-        </li>
-        <li>
-          <NavLink
-            to="/video"
-            activeClassName="active-link"
-            onClick={handleNavLinkClick}
-          >
-            <FontAwesomeIcon icon={faVideo} className="sidebar-heading-icon" />
-            Video Lipsync
           </NavLink>
         </li>
 
