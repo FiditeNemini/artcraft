@@ -3,6 +3,7 @@
     <words>
       <w>arpabet</w>
       <w>backfill</w>
+      <w>canonicalized</w>
       <w>cashapp</w>
       <w>cheermote</w>
       <w>cidrs</w>
@@ -22,6 +23,8 @@
       <w>hparams</w>
       <w>huggingface</w>
       <w>lipsync</w>
+      <w>mochi</w>
+      <w>nestedness</w>
       <w>pathbuf</w>
       <w>replayable</w>
       <w>retryably</w>
