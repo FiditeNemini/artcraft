@@ -227,7 +227,7 @@ pub async fn process_job(args: SadTalkerProcessJobArgs<'_>) -> Result<JobSuccess
 
   check_file_exists(&output_video_fs_path).map_err(|e| ProcessSingleJobError::Other(e))?;
 
-  // ==================== WATERMARK ==================== //
+  // ==================== OPTIONAL WATERMARK ==================== //
 
   let mut finished_file = output_video_fs_path.clone();
 
@@ -258,7 +258,6 @@ pub async fn process_job(args: SadTalkerProcessJobArgs<'_>) -> Result<JobSuccess
       return Err(ProcessSingleJobError::Other(anyhow!("CommandExitStatus: {:?}", command_exit_status)));
     }
   }
-
 
   // ==================== CHECK ALL FILES EXIST AND GET METADATA ==================== //
 
@@ -324,6 +323,7 @@ pub async fn process_job(args: SadTalkerProcessJobArgs<'_>) -> Result<JobSuccess
     file_size_bytes,
     sha256_checksum: &file_checksum,
     public_bucket_directory_hash: result_bucket_location.get_object_hash(),
+    maybe_public_bucket_extension: None, // TODO(bt,2023-10-02): Add extension '.mp4'
     is_on_prem: args.job_dependencies.container.is_on_prem,
     worker_hostname: &args.job_dependencies.container.hostname,
     worker_cluster: &args.job_dependencies.container.cluster_name,
