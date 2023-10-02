@@ -38,16 +38,18 @@ interface LipSyncProps {
   cropping: any;
   imageProps: any;
   index: number;
-  orientation: any;
-  orientationChange: any;
+  highQuality: any;
+  highQualityChange: any;
+  still: any;
+  stillChange: any;
   style: any;
   toggle: any;
   enqueueInferenceJob: any;
   sessionSubscriptionsWrapper: any;
   t: any;
   inferenceJobsByCategory: any;
-  watermark: any;
-  watermarkChange: any;
+  removeWatermark: any;
+  removeWatermarkChange: any;
 }
 interface EditorProps {
   sessionSubscriptionsWrapper: SessionSubscriptionsWrapper;
@@ -68,13 +70,15 @@ const InputPage = ({
   cropping,
   cropChange,
   imageProps,
-  orientation,
-  orientationChange,
+  highQuality,
+  highQualityChange,
+  still,
+  stillChange,
   toggle,
   style,
   t,
-  watermark,
-  watermarkChange,
+  removeWatermark,
+  removeWatermarkChange,
 }: LipSyncProps) => {
 
   return  <animated.div {...{ className: "lipsync-editor row", style }}>
@@ -87,13 +91,18 @@ const InputPage = ({
         }}
       />
       <label {...{ class: "sub-title", }}>Watermark</label>
-      <Checkbox {...{ checked: watermark, label: "Disable (premium only)", onChange: watermarkChange }}/>
-      <label {...{ class: "sub-title", }}>Orientation</label>
-      <Radio {...{ label: "Landscape", name: "landscape", onChange: orientationChange, value: orientation }}/>
-      <Radio {...{ label: "Portait", name: "portrait", onChange: orientationChange, value: orientation }}/>
+      <Checkbox {...{ checked: removeWatermark, label: "Remove (premium only)", onChange: removeWatermarkChange }}/>
+      
+      <label {...{ class: "sub-title", }}>Quality</label>
+      <Checkbox {...{ checked: highQuality, label: "High Quality", onChange: highQualityChange}}/>
+
       <label {...{ class: "sub-title", }}>Cropping</label>
-      <Radio {...{ label: "Cropped", name: "cropped", onChange: cropChange, value: cropping }}/>
-      <Radio {...{ label: "Full size (Premium only)", name: "fullSize", onChange: cropChange, value: cropping }}/>
+      <Radio {...{ label: "Full", name: "full", onChange: cropChange, value: cropping }}/>
+      <Radio {...{ label: "Crop", name: "crop", onChange: cropChange, value: cropping }}/>
+      <Radio {...{ label: "Close Crop", name: "close_crop", onChange: cropChange, value: cropping }}/>
+
+      <label {...{ class: "sub-title", }}>Make Animation More Still</label>
+      <Checkbox {...{ checked: still, label: "Still", onChange: stillChange}}/>
       <label {...{ class: "sub-title", }}>Animation style</label>
       <NumberSlider {...{ min: 0, max: 32, onChange: animationChange, value: animationStyle }}/>
     </div>
@@ -170,15 +179,17 @@ export default function LipsyncEditor({
 
 
   const [animationStyle,animationStyleSet] = useState(0);
-  const [cropping,croppingSet] = useState("cropped");
-  const [orientation,orientationSet] = useState("landscape");
-  const [watermark,watermarkSet] = useState(false);
+  const [cropping,croppingSet] = useState("full");
+  const [removeWatermark,removeWatermarkSet] = useState(false);
+  const [highQuality,highQualitySet] = useState(true);
+  const [still,stillSet] = useState(false);
 
   const animationChange = ({ target }: any) => animationStyleSet(target.value);
   const cropChange = ({ target }: any) => croppingSet(target.value);
-  const orientationChange = ({ target }: any) => orientationSet(target.value);
-  const watermarkChange = ({ target }: any) => watermarkSet(target.checked);
-  const clearInputs = () => { animationStyleSet(0); croppingSet("cropped"); orientationSet("landscape"); watermarkSet(false);  }
+  const removeWatermarkChange = ({ target }: any) => removeWatermarkSet(target.checked);
+  const highQualityChange = ({ target }: any) => highQualitySet(target.checked);
+  const stillChange = ({ target }: any) => stillSet(target.checked);
+  const clearInputs = () => { animationStyleSet(0); croppingSet("crop"); removeWatermarkSet(false);  }
 
   const makeRequest = (mode: number) => ({
     uuid_idempotency_token: uuidv4(),
@@ -219,6 +230,10 @@ export default function LipsyncEditor({
             image_source: {
               maybe_media_upload_token: responses.image.upload_token,
             },
+            crop: cropping,
+            make_still: still,
+            high_quality: highQuality,
+            remove_watermark: removeWatermark,
           });
         }
       })
@@ -271,16 +286,18 @@ export default function LipsyncEditor({
                 cropping,
                 enqueueInferenceJob,
                 imageProps,
-                orientation,
-                orientationChange,
+                highQuality,
+                highQualityChange,
+                still,
+                stillChange,
                 sessionSubscriptionsWrapper,
                 inferenceJobsByCategory,
                 index,
                 t,
                 toggle: { audio: readyMedia(1), image: readyMedia(0) },
                 style,
-                watermark,
-                watermarkChange,
+                removeWatermark,
+                removeWatermarkChange,
               }}
             />
           ) : (

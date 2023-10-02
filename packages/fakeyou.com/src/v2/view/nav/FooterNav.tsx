@@ -58,7 +58,7 @@ function FooterNav(props: Props) {
         pending_svc_jobs: 0,
         pending_rvc_jobs: 0,
         pending_face_animation_jobs: 0,
-      }
+      },
     },
     legacy_tts: {
       pending_job_count: 0,
@@ -211,6 +211,10 @@ function FooterNav(props: Props) {
 
               <li>
                 <Link to="/voice-conversion">{t("productVc")}</Link>
+              </li>
+
+              <li>
+                <Link to="/face-animation">{t("productFaceAnimator")}</Link>
               </li>
 
               <li>
