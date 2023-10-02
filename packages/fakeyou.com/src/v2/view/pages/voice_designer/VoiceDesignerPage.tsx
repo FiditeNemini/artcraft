@@ -17,12 +17,7 @@ function VoiceDesignerPage() {
   usePrefixedDocumentTitle("Voice Designer");
 
   const [currentStep, setCurrentStep] = useState(0);
-  const steps = [
-    "Upload Samples",
-    "Voice Details",
-    "Process Voice",
-    "Complete",
-  ];
+  const steps = ["Upload Samples", "Voice Details", "Processing", "Complete"];
 
   const displayStep = (step: any) => {
     switch (step) {
@@ -64,7 +59,7 @@ function VoiceDesignerPage() {
         headerImage="/mascot/kitsune_pose2.webp"
         titleIcon={<FontAwesomeIcon icon={faWaveform} className="me-3" />}
         title={<>Voice Designer</>}
-        subText={<>Upload and instantly clone your voice!</>}
+        subText={<>Upload audio samples and instantly clone your voice!</>}
         showButtons={false}
       />
 
