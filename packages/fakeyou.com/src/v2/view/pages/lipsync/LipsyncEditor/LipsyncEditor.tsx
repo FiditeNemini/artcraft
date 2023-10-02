@@ -1,7 +1,7 @@
 import React, { useState } from "react";
-import { animated, useTransition } from "@react-spring/web";
+import { animated, useSpring, useTransition } from "@react-spring/web";
 import { v4 as uuidv4 } from "uuid";
-import { useFile, useLocalize } from "hooks";
+import { useFile, useLocalize, useVideo } from "hooks";
 import { AudioInput, ImageInput, Spinner } from "components/common";
 import { springs } from "resources";
 import {
@@ -24,10 +24,9 @@ import FaceAnimatorTitle from "./FaceAnimatorTitle";
 import FaceAnimatorSuccess from "./FaceAnimatorSuccess";
 import "./LipsyncEditor.scss";
 import { SessionSubscriptionsWrapper } from "@storyteller/components/src/session/SessionSubscriptionsWrapper";
-import {
-  FrontendInferenceJobType,
-  InferenceJob,
-} from "@storyteller/components/src/jobs/InferenceJob";
+import { FrontendInferenceJobType,  InferenceJob } from "@storyteller/components/src/jobs/InferenceJob";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faPlay } from "@fortawesome/free-solid-svg-icons";
 
 interface LipSyncProps {
   audioProps: any;
@@ -60,31 +59,47 @@ const InputPage = ({
   style,
   t,
 }: LipSyncProps) => {
-  return (
-    <animated.div {...{ className: "lipsync-editor row", style }}>
-      <div {...{ className: "media-input-column col-lg-6" }}>
-        <h5>{t("headings.image")}</h5>
-        <ImageInput
-          {...{
-            ...imageProps,
-            onRest: () => toggle.image(imageProps.file ? true : false),
-          }}
-        />
+  const [tint,tintSet] = useState(true);
+  const [{ playCtrl },vidProps] = useVideo({ onEnded: () => tintSet(true) });
+  const tintSpring = useSpring({
+    onRest: () => { if (!tint) { playCtrl!(tintSet) }},
+    opacity: tint ? 1 : 0
+  });
+  const overlayClick = () => tintSet(!tint);
+
+
+  return <animated.div {...{ className: "lipsync-editor row", style }}>
+    <div {...{ className: "media-input-column col-lg-6" }}>
+      <h5>{t("headings.image")}</h5>
+      <ImageInput
+        {...{
+          ...imageProps,
+          onRest: () => toggle.image(imageProps.file ? true : false),
+        }}
+      />
+    </div>
+    <div {...{ className: "media-input-column col-lg-6" }}>
+      <h5>{t("headings.audio")}</h5>
+      <AudioInput
+        {...{
+          ...audioProps,
+          onRest: (p: any, c: any, item: any, l: any) => {
+            toggle.audio(!!audioProps.file);
+          },
+          hideActions: true,
+        }}
+      />
+      <div {...{ className: "video-frame" }}>
+        <video {...{ playsInline: true, ...vidProps }}>
+          <source src="/videos/face-animator-instruction-en.mp4" type="video/mp4" />
+        </video>
+        <animated.div {...{ className: "video-overlay", onClick: overlayClick, style: tintSpring }}>
+          <h6>Face Animator Sample</h6>
+          <FontAwesomeIcon icon={faPlay} />
+        </animated.div>
       </div>
-      <div {...{ className: "media-input-column col-lg-6" }}>
-        <h5>{t("headings.audio")}</h5>
-        <AudioInput
-          {...{
-            ...audioProps,
-            onRest: (p: any, c: any, item: any, l: any) => {
-              toggle.audio(!!audioProps.file);
-            },
-            hideActions: true,
-          }}
-        />
-      </div>
-    </animated.div>
-  );
+    </div>
+  </animated.div>;
 };
 
 const Working = ({ audioProps, imageProps, index, style, t }: LipSyncProps) => {
