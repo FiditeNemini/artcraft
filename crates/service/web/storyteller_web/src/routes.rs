@@ -174,7 +174,7 @@ pub fn add_routes<T, B> (app: App<T>) -> App<T>
   app = add_subscription_routes(app); /* /v1/subscriptions/... */
 
   // TODO find a long term feature flag solution, since this code is likely deployed into production we don't want the route found.
-  let enable_voice_designer_route = false;
+  let enable_voice_designer_route = true;
   if (enable_voice_designer_route) { 
     app = add_voice_designer_routes(app); /* /v1/voice_designer */
   }
