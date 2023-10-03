@@ -1,0 +1,12 @@
+@import "scss/colours.scss";
+
+.fy-checkbox {
+  background-color: $primary;
+  border-radius: .5rem;
+  cursor: pointer;
+  display: inline-block;
+  vertical-align: middle;
+  height: 2rem;
+  width: 2rem;
+  stroke: white;
+}

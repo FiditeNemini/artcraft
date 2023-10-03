@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { animated, useTransition } from "@react-spring/web";
 import { v4 as uuidv4 } from "uuid";
 import { useFile, useLocalize } from "hooks";
-import { AudioInput, Checkbox, ImageInput, NumberSlider, Radio, Spinner } from "components/common";
+import { AudioInput, Checkbox, ImageInput, NumberSlider, SegmentButtons, Spinner } from "components/common";
 import { springs } from "resources";
 import {
   UploadAudio,
@@ -97,9 +97,11 @@ const InputPage = ({
       <Checkbox {...{ checked: highQuality, label: "High Quality", onChange: highQualityChange}}/>
 
       <label {...{ class: "sub-title", }}>Cropping</label>
-      <Radio {...{ label: "Full", name: "full", onChange: cropChange, value: cropping }}/>
-      <Radio {...{ label: "Crop", name: "crop", onChange: cropChange, value: cropping }}/>
-      <Radio {...{ label: "Close Crop", name: "close_crop", onChange: cropChange, value: cropping }}/>
+      <SegmentButtons {...{
+        onChange: cropChange,
+        options: [{ label: "Full", value: "full" },{ label: "Crop", value: "crop" },{ label: "Close crop", value: "close_crop" }],
+        value: cropping
+      }}/>
 
       <label {...{ class: "sub-title", }}>Make Animation More Still</label>
       <Checkbox {...{ checked: still, label: "Still", onChange: stillChange}}/>
