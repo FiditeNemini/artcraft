@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import Tippy from "@tippyjs/react";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faLink } from "@fortawesome/pro-solid-svg-icons";
 import Button from "../Button/Button";
 

@@ -1,6 +1,6 @@
 import React from "react";
 import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
-import { useParams } from "react-router-dom";
+// import { useParams } from "react-router-dom";
 import { Input, TextArea, Select } from "components/common/Inputs/Inputs";
 import Panel from "components/common/Panel/Panel";
 import { faEye, faFilePen, faSave } from "@fortawesome/pro-solid-svg-icons";
@@ -28,7 +28,7 @@ const visibility = [
 ];
 
 export default function VcModelEditPage(props: VcModelEditPageProps) {
-  let { token } = useParams() as { token: string };
+  // let { token } = useParams() as { token: string };
   return (
     <PageContainer>
       <PageHeaderModelView

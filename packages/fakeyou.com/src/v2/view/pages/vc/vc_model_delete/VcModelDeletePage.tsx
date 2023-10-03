@@ -1,6 +1,6 @@
 import React from "react";
 import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
-import { useParams } from "react-router-dom";
+// import { useParams } from "react-router-dom";
 import Panel from "components/common/Panel/Panel";
 import { faSave, faTrash } from "@fortawesome/pro-solid-svg-icons";
 import PageHeaderModelView from "components/layout/PageHeaderModelView/PageHeaderModelView";
@@ -11,9 +11,9 @@ interface VcModelDeletePageProps {
   sessionWrapper: SessionWrapper;
 }
 
-const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-  console.log(event.target.value);
-};
+// const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+//   console.log(event.target.value);
+// };
 
 const handleSave = (e: React.MouseEvent<HTMLButtonElement>) => {
   console.log("save");
@@ -22,7 +22,7 @@ const handleSave = (e: React.MouseEvent<HTMLButtonElement>) => {
 const savebtn = <button className="btn btn-primary">Save Changes</button>;
 
 export default function VcModelDeletePage(props: VcModelDeletePageProps) {
-  let { token } = useParams() as { token: string };
+  // let { token } = useParams() as { token: string };
   return (
     <PageContainer>
       <PageHeaderModelView
