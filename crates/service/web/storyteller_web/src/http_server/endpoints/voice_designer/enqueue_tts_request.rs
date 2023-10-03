@@ -2,6 +2,9 @@
 #![forbid(unused_mut)]
 #![forbid(unused_variables)]
 
+use enums::by_table::generic_inference_jobs::inference_category::InferenceCategory;
+use mysql_queries::payloads::generic_inference_args::generic_inference_args::{GenericInferenceArgs, InferenceCategoryAbbreviated, PolymorphicInferenceArgs};
+
 use std::sync::Arc;
 use actix_web::{HttpRequest, HttpResponse, web};
 use actix_web::error::ResponseError;
@@ -12,14 +15,13 @@ use enums::by_table::generic_inference_jobs::inference_model_type::InferenceMode
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use tokens::jobs::inference::InferenceJobToken;
 use crate::server_state::ServerState;
-
-
+use mysql_queries::queries::generic_inference::web::insert_generic_inference_job::{insert_generic_inference_job, InsertGenericInferenceArgs};
 
 // TODO MOVE into own file.
 use std::fmt::Debug;
 use serde::Deserialize;
 use serde::Serialize;
-use crate::prefixes::EntityType;
+
 /// The primary key for embeddings for voice cloning inference jobs.
 #[derive(Clone, PartialEq, Eq, sqlx::Type, Debug, Serialize, Deserialize)]
 #[sqlx(transparent)]
@@ -122,7 +124,38 @@ pub async fn enqueue_tts_request(
 
 // enqueue a zero shot tts request here...
 
-// create the job record here! explore the table
+// create the job record here! explore the table insert the inference args in here as json! keep it short
+
+
+let query_result = insert_generic_inference_job(InsertGenericInferenceArgs {
+  uuid_idempotency_token: &request.uuid_idempotency_token,
+  inference_category: InferenceCategory::TextToSpeech,
+  maybe_model_type: Some(InferenceModelType::VallEX), // NB: Model is static during inference
+  maybe_model_token: None, // NB: Model is static during inference
+  maybe_input_source_token: None, // TODO: Introduce a second foreign key ?
+  maybe_input_source_token_type: None, // TODO: Introduce a second foreign key ?
+  maybe_raw_inference_text: None, // No text
+  maybe_inference_args: Some(GenericInferenceArgs {
+    inference_category: Some(InferenceCategoryAbbreviated::TextToSpeech),
+    args: Some(PolymorphicInferenceArgs::La(inference_args)),
+  }),
+  maybe_creator_user_token: maybe_user_token.as_ref(),
+  creator_ip_address: &ip_address,
+  creator_set_visibility: set_visibility,
+  priority_level,
+  requires_keepalive: plan.lipsync_requires_frontend_keepalive(),
+  is_debug_request,
+  maybe_routing_tag: maybe_routing_tag.as_deref(),
+  mysql_pool: &server_state.mysql_pool,
+}).await;
+
+let job_token = match query_result {
+  Ok((job_token, _id)) => job_token,
+  Err(err) => {
+    warn!("New generic inference job creation DB error: {:?}", err);
+    return Err(EnqueueLipsyncAnimationError::ServerError);
+  }
+};
 
 // Error handling 101 rust result type returned like so.
   //Ok(HttpResponse::Ok().json("TTS request enqueued successfully"))
