@@ -7,7 +7,6 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faPlus,
   faUsers,
-  faVideo,
   faTrophy,
   faUser,
   faSignOutAlt,
@@ -27,6 +26,7 @@ import "tippy.js/animations/shift-away.css";
 import { ThirdPartyLinks } from "@storyteller/components/src/constants/ThirdPartyLinks";
 import { Analytics } from "../../../common/Analytics";
 import {
+  faFaceViewfinder,
   faFileArrowUp,
   faMessageDots,
   faMicrophoneStand,
@@ -245,9 +245,12 @@ function TopNav(props: Props) {
                       </Link>
                     </li>
                     <li data-bs-toggle="offcanvas">
-                      <Link className="dropdown-item" to="/video">
-                        <FontAwesomeIcon icon={faVideo} className="me-2" />
-                        {t("productVideo")}
+                      <Link className="dropdown-item" to="/face-animation">
+                        <FontAwesomeIcon
+                          icon={faFaceViewfinder}
+                          className="me-2"
+                        />
+                        {t("productFaceAnimator")}
                       </Link>
                     </li>
                     <hr className="my-2" />

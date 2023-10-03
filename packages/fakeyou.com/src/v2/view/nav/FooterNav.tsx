@@ -214,7 +214,7 @@ function FooterNav(props: Props) {
               </li>
 
               <li>
-                <Link to="/video">{t("productVideo")}</Link>
+                <Link to="/face-animation">{t("productFaceAnimator")}</Link>
               </li>
 
               <li>
