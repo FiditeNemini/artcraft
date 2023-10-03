@@ -54,7 +54,6 @@ pub enum PolymorphicInferenceArgs {
 
   /// Text to speech. (Short name to save space when serializing.)
   Tts(TTSArgs)
-
     // No arguments yet.
     // It might be best to just not include this when not used.
     ,
@@ -142,12 +141,13 @@ mod tests {
     assert!(json.len() < 1000);
   }
 
+
+  // TODO FIX THIS TEST! MICHAEL
   #[test]
   fn typical_tts_args_serialize() {
     let args = GenericInferenceArgs {
       inference_category: Some(InferenceCategoryAbbreviated::VoiceConversion),
-      args: Some(PolymorphicInferenceArgs::Tts {
-      }),
+      args: Some(PolymorphicInferenceArgs::Tts()),
     };
 
     let json = serde_json::ser::to_string(&args).unwrap();
