@@ -28,6 +28,7 @@ envvar = { path = "../../../lib/envvar" }
 errors = { path = "../../../lib/errors" }
 filesys = { path = "../../../lib/files/filesys" }
 hashing = { path = "../../../lib/files/hashing" }
+images = { path = "../../../lib/files/images" }
 jobs_common = { path = "../../../lib/jobs_common" }
 media = { path = "../../../lib/files/media" }
 memory_caching = { path = "../../../lib/caching/memory_caching" }
@@ -35,6 +36,7 @@ mimetypes = { path = "../../../lib/files/mimetypes" }
 mysql_queries = { path = "../../../lib/mysql_queries" }
 redis_common = { path = "../../../lib/redis_common" }
 subprocess_common = { path = "../../../lib/subprocess_common" }
+testing = { path = "../../../lib/testing" }
 tokens = { path = "../../../_types/tokens" }
 tts_common = { path = "../../../lib/tts_common" }
 

@@ -16,17 +16,15 @@ use enums::common::visibility::Visibility;
 use http_server_common::request::get_request_header_optional::get_request_header_optional;
 use http_server_common::request::get_request_ip::get_request_ip;
 use mysql_queries::payloads::generic_inference_args::generic_inference_args::{GenericInferenceArgs, InferenceCategoryAbbreviated, PolymorphicInferenceArgs};
-use mysql_queries::payloads::generic_inference_args::lipsync_payload::{FaceEnhancer, LipsyncAnimationAudioSource, LipsyncAnimationImageSource, LipsyncArgs, Preprocess};
+use mysql_queries::payloads::generic_inference_args::lipsync_payload::{FaceEnhancer, LipsyncAnimationAudioSource, LipsyncAnimationImageSource, LipsyncArgs};
 use mysql_queries::queries::generic_inference::web::insert_generic_inference_job::{insert_generic_inference_job, InsertGenericInferenceArgs};
 use tokens::files::media_upload::MediaUploadToken;
 use tokens::jobs::inference::InferenceJobToken;
 use tokens::tokens::media_files::MediaFileToken;
 use tokens::tokens::voice_conversion_results::VoiceConversionResultToken;
 use tokens::users::user::UserToken;
-use tts_common::priority::FAKEYOU_INVESTOR_PRIORITY_LEVEL;
 
 use crate::configs::plans::get_correct_plan_for_session::get_correct_plan_for_session;
-use crate::http_server::endpoints::investor_demo::demo_cookie::request_has_demo_cookie;
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::server_state::ServerState;
 
@@ -46,10 +44,9 @@ pub struct EnqueueLipsyncAnimationRequest {
   image_source: ImageSource,
 
   creator_set_visibility: Option<Visibility>,
-  is_storyteller_demo: Option<bool>,
 
-  /// SadTalker: cropping
-  crop: Option<CropMode>,
+  ///// SadTalker: cropping
+  //crop: Option<CropMode>,
 
   /// SadTalker: parameter to make the animation more still.
   make_still: Option<bool>,
@@ -59,17 +56,48 @@ pub struct EnqueueLipsyncAnimationRequest {
 
   /// Remove the watermark
   remove_watermark: Option<bool>,
+
+  /// Size of the video to generate
+  dimensions: Option<FrameSize>,
 }
+
+//#[derive(Deserialize, Copy, Clone)]
+//#[serde(rename_all = "snake_case")]
+//pub enum CropMode {
+//  /// SadTalker: "extcrop", which appears to be a wider crop than the "crop" option
+//  Crop,
+//  /// SadTalker: "crop" (the default)
+//  CloseCrop,
+//  /// SadTalker: "full" (can't tell that "extfull" does any differently)
+//  Full,
+//}
 
 #[derive(Deserialize, Copy, Clone)]
 #[serde(rename_all = "snake_case")]
-pub enum CropMode {
-  /// SadTalker: "extcrop", which appears to be a wider crop than the "crop" option
-  Crop,
-  /// SadTalker: "crop" (the default)
-  CloseCrop,
-  /// SadTalker: "full" (can't tell that "extfull" does any differently)
-  Full,
+pub enum FrameSize {
+  /// Twitter horizontal = 1280x720
+  /// See: https://developer.twitter.com/en/docs/twitter-api/v1/media/upload-media/uploading-media/media-best-practices
+  TwitterLandscape,
+
+  /// Twitter vertical = 720x1280
+  TwitterPortrait,
+
+  /// Twitter square = 720x720
+  TwitterSquare,
+
+  // D-ID: 1000x1000
+  // Runway: 896x512
+  // Pika: 1024x576
+}
+
+impl FrameSize {
+  pub fn get_width_and_height(&self) -> (u32, u32) {
+    match self {
+      FrameSize::TwitterLandscape => (1280, 720),
+      FrameSize::TwitterPortrait => (720, 1280),
+      FrameSize::TwitterSquare => (720, 720),
+    }
+  }
 }
 
 /// Treated as an enum. Only one of these may be set.
@@ -137,7 +165,7 @@ pub async fn enqueue_lipsync_animation_handler(
   server_state: web::Data<Arc<ServerState>>) -> Result<HttpResponse, EnqueueLipsyncAnimationError>
 {
   let mut maybe_user_token : Option<UserToken> = None;
-  let mut priority_level ;
+  let priority_level ;
   let disable_rate_limiter = false; // NB: Careful!
 
   let mut mysql_connection = server_state.mysql_pool
@@ -171,32 +199,6 @@ pub async fn enqueue_lipsync_animation_handler(
   // TODO: Separate priority for animation.
   priority_level = plan.web_vc_base_priority_level();
 
-  // ==================== INVESTOR PRIORITY ==================== //
-
-  // TODO/TEMP: Give investors even more priority
-  let mut is_investor = false;
-
-  {
-    // TODO/TEMP: The storyteller.io website's AJAX calls will set this.
-    //  This is just for the YCombinator demo.
-    match request.is_storyteller_demo {
-      Some(true) => {
-        is_investor = true;
-      },
-      _ => {},
-    };
-
-    // TODO/TEMP: The storyteller.io website will redirect and establish this cookie.
-    //  This is just for the YCombinator demo.
-    if request_has_demo_cookie(&http_request) {
-      is_investor = true;
-    }
-
-    if is_investor {
-      priority_level = FAKEYOU_INVESTOR_PRIORITY_LEVEL;
-    }
-  }
-
   // ==================== DEBUG MODE + ROUTING TAG ==================== //
 
   let is_debug_request =
@@ -210,7 +212,7 @@ pub async fn enqueue_lipsync_animation_handler(
   // ==================== RATE LIMIT ==================== //
 
   if !disable_rate_limiter {
-    let mut rate_limiter = match maybe_user_session {
+    let rate_limiter = match maybe_user_session {
       None => &server_state.redis_rate_limiters.logged_out,
       Some(ref user) => {
         if user.role.is_banned {
@@ -219,11 +221,6 @@ pub async fn enqueue_lipsync_animation_handler(
         &server_state.redis_rate_limiters.logged_in
       },
     };
-
-    // TODO/TEMP
-    if is_investor {
-      rate_limiter = &server_state.redis_rate_limiters.logged_in;
-    }
 
     if let Err(_err) = rate_limiter.rate_limit_request(&http_request) {
       return Err(EnqueueLipsyncAnimationError::RateLimited);
@@ -276,20 +273,12 @@ pub async fn enqueue_lipsync_animation_handler(
     maybe_preprocess: None,
     maybe_make_still: None,
     maybe_remove_watermark: None,
+    maybe_resize_width: None,
+    maybe_resize_height: None,
   };
 
   if request.high_quality.unwrap_or(false) {
     inference_args.maybe_face_enhancer = Some(FaceEnhancer::G); // "--enhancer gfpgan"
-  }
-
-  if let Some(crop_mode) = request.crop {
-    let crop_mode = match crop_mode {
-      CropMode::Crop => Preprocess::EC, // NB: "extcrop" is less of a close crop than "crop"
-      CropMode::CloseCrop => Preprocess::C,
-      CropMode::Full => Preprocess::F,
-    };
-
-    inference_args.maybe_preprocess = Some(crop_mode);
   }
 
   if request.make_still.unwrap_or(false) {
@@ -299,6 +288,13 @@ pub async fn enqueue_lipsync_animation_handler(
   if request.remove_watermark.unwrap_or(false) {
     inference_args.maybe_remove_watermark = Some(true);
   }
+
+  let (width, height) = request.dimensions
+      .unwrap_or(FrameSize::TwitterLandscape)
+      .get_width_and_height();
+
+  inference_args.maybe_resize_width = Some(width);
+  inference_args.maybe_resize_height = Some(height);
 
   info!("Creating lipsync animation job record...");
 

@@ -34,9 +34,21 @@ pub struct LipsyncArgs {
   pub maybe_make_still: Option<bool>,
 
   /// Omit adding the watermark
-  #[serde(rename = "w")] // NB: DO NOT CHANGE. It could break live jobs. Renamed to be fewer bytes.
+  #[serde(rename = "m")] // NB: DO NOT CHANGE. It could break live jobs. Renamed to be fewer bytes.
   #[serde(skip_serializing_if = "Option::is_none")]
   pub maybe_remove_watermark: Option<bool>,
+
+  /// Resize width
+  /// NB: FOR TESTING ONLY
+  #[serde(rename = "w")] // NB: DO NOT CHANGE. It could break live jobs. Renamed to be fewer bytes.
+  #[serde(skip_serializing_if = "Option::is_none")]
+  pub maybe_resize_width: Option<u32>,
+
+  /// Resize height
+  /// NB: FOR TESTING ONLY
+  #[serde(rename = "h")] // NB: DO NOT CHANGE. It could break live jobs. Renamed to be fewer bytes.
+  #[serde(skip_serializing_if = "Option::is_none")]
+  pub maybe_resize_height: Option<u32>,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
@@ -152,6 +164,8 @@ mod tests {
       maybe_preprocess: None,
       maybe_make_still: None,
       maybe_remove_watermark: None,
+      maybe_resize_width: None,
+      maybe_resize_height: None,
     };
     let json = serde_json::ser::to_string(&args).unwrap();
     assert_eq!(json, r#"{"a":{"F":"audio_media_file"},"i":{"F":"image_media_file"}}"#.to_string());
@@ -167,6 +181,8 @@ mod tests {
       maybe_preprocess: None,
       maybe_make_still: None,
       maybe_remove_watermark: None,
+      maybe_resize_width: None,
+      maybe_resize_height: None,
     };
     let json = serde_json::ser::to_string(&args).unwrap();
     assert_eq!(json, r#"{"a":{"U":"audio_media_upload"},"i":{"U":"image_media_upload"}}"#.to_string());
@@ -182,6 +198,8 @@ mod tests {
       maybe_preprocess: None,
       maybe_make_still: None,
       maybe_remove_watermark: None,
+      maybe_resize_width: None,
+      maybe_resize_height: None,
     };
     let json = serde_json::ser::to_string(&args).unwrap();
     assert_eq!(json, r#"{"a":{"T":"audio_tts_result"},"i":{"U":"image_media_upload"}}"#.to_string());
@@ -197,6 +215,8 @@ mod tests {
       maybe_preprocess: None,
       maybe_make_still: None,
       maybe_remove_watermark: None,
+      maybe_resize_width: None,
+      maybe_resize_height: None,
     };
     let json = serde_json::ser::to_string(&args).unwrap();
     assert_eq!(json, r#"{"a":{"V":"audio_voice_conversion_result"},"i":{"U":"image_media_upload"}}"#.to_string());
@@ -212,6 +232,8 @@ mod tests {
       maybe_preprocess: None,
       maybe_make_still: None,
       maybe_remove_watermark: None,
+      maybe_resize_width: None,
+      maybe_resize_height: None,
     };
     let json = serde_json::ser::to_string(&args).unwrap();
     assert_eq!(json, r#"{"f":"G"}"#.to_string());
@@ -227,6 +249,8 @@ mod tests {
       maybe_preprocess: None,
       maybe_make_still: None,
       maybe_remove_watermark: None,
+      maybe_resize_width: None,
+      maybe_resize_height: None,
     };
     let json = serde_json::ser::to_string(&args).unwrap();
     assert_eq!(json, r#"{"f":"R"}"#.to_string());

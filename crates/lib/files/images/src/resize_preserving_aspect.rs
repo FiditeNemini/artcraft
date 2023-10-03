@@ -1,8 +1,21 @@
 use image::DynamicImage;
 use image::imageops::FilterType;
 
-pub fn resize_preserving_aspect(source_image: &DynamicImage, new_width: u32, new_height: u32) -> DynamicImage {
-  source_image.resize(new_width, new_height, FilterType::Lanczos3)
+/// Resize an image preserving the exact aspect ratio of the source image.
+///
+/// If `exact_fit` is true, the image will be resized to fit the largest dimension,
+/// then cropped to fit the precise dimensions specified.
+pub fn resize_preserving_aspect(
+  source_image: &DynamicImage,
+  new_width: u32,
+  new_height: u32,
+  exact_fit: bool,
+) -> DynamicImage {
+  if exact_fit {
+    source_image.resize_to_fill(new_width, new_height, FilterType::Lanczos3)
+  } else {
+    source_image.resize(new_width, new_height, FilterType::Lanczos3)
+  }
 }
 
 #[cfg(test)]
@@ -38,9 +51,7 @@ mod tests {
   #[test]
   fn downsize_wide_image_preserving_aspect() {
     let image = open_wide_image().unwrap();
-    assert!(image.width() > image.height());
-
-    let resized = resize_preserving_aspect(&image, 500, 500);
+    let resized = resize_preserving_aspect(&image, 500, 500, false);
     assert!(resized.width() > resized.height());
     assert_eq!(resized.width(), 500);
     assert_eq!(resized.height(), 375);
@@ -49,9 +60,7 @@ mod tests {
   #[test]
   fn downsize_tall_image_preserving_aspect() {
     let image = open_tall_image().unwrap();
-    assert!(image.width() < image.height());
-
-    let resized = resize_preserving_aspect(&image, 500, 500);
+    let resized = resize_preserving_aspect(&image, 500, 500, false);
     assert!(resized.width() < resized.height());
     assert_eq!(resized.width(), 377);
     assert_eq!(resized.height(), 500);
@@ -60,9 +69,7 @@ mod tests {
   #[test]
   fn enlarge_wide_image_preserving_aspect() {
     let image = open_wide_image().unwrap();
-    assert!(image.width() > image.height());
-
-    let resized = resize_preserving_aspect(&image, 1200, 1200);
+    let resized = resize_preserving_aspect(&image, 1200, 1200, false);
     assert!(resized.width() > resized.height());
     assert_eq!(resized.width(), 1200);
     assert_eq!(resized.height(), 900);
@@ -71,11 +78,57 @@ mod tests {
   #[test]
   fn enlarge_tall_image_preserving_aspect() {
     let image = open_tall_image().unwrap();
-    assert!(image.width() < image.height());
-
-    let resized = resize_preserving_aspect(&image, 1200, 1200);
+    let resized = resize_preserving_aspect(&image, 1200, 1200, false);
     assert!(resized.width() < resized.height());
     assert_eq!(resized.width(), 904);
+    assert_eq!(resized.height(), 1200);
+  }
+
+  #[test]
+  fn resize_wide_image_preserving_aspect_exact() {
+    // Downscale
+    let image = open_wide_image().unwrap();
+    let resized = resize_preserving_aspect(&image, 500, 500, true);
+    assert_eq!(resized.width(), 500);
+    assert_eq!(resized.height(), 500);
+
+    // Upscale
+    let resized = resize_preserving_aspect(&image, 1200, 1200, true);
+    assert_eq!(resized.width(), 1200);
+    assert_eq!(resized.height(), 1200);
+
+    // Really wide
+    let resized = resize_preserving_aspect(&image, 1200, 100, true);
+    assert_eq!(resized.width(), 1200);
+    assert_eq!(resized.height(), 100);
+
+    // Really tall
+    let resized = resize_preserving_aspect(&image, 100, 1200, true);
+    assert_eq!(resized.width(), 100);
+    assert_eq!(resized.height(), 1200);
+  }
+
+  #[test]
+  fn resize_tall_image_preserving_aspect_exact() {
+    // Downscale
+    let image = open_tall_image().unwrap();
+    let resized = resize_preserving_aspect(&image, 500, 500, true);
+    assert_eq!(resized.width(), 500);
+    assert_eq!(resized.height(), 500);
+
+    // Upscale
+    let resized = resize_preserving_aspect(&image, 1200, 1200, true);
+    assert_eq!(resized.width(), 1200);
+    assert_eq!(resized.height(), 1200);
+
+    // Really wide
+    let resized = resize_preserving_aspect(&image, 1200, 100, true);
+    assert_eq!(resized.width(), 1200);
+    assert_eq!(resized.height(), 100);
+
+    // Really tall
+    let resized = resize_preserving_aspect(&image, 100, 1200, true);
+    assert_eq!(resized.width(), 100);
     assert_eq!(resized.height(), 1200);
   }
 }

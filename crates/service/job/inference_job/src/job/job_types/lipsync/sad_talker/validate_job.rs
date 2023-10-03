@@ -15,6 +15,9 @@ pub struct JobArgs<'a> {
   pub preprocess: Option<String>,
   // NB: Enhancer controls quality
   pub enhancer: Option<String>,
+
+  pub width: Option<u32>,
+  pub height: Option<u32>,
 }
 
 pub fn validate_job(job: &AvailableInferenceJob) -> Result<JobArgs, ProcessSingleJobError> {
@@ -70,7 +73,7 @@ pub fn validate_job(job: &AvailableInferenceJob) -> Result<JobArgs, ProcessSingl
   let make_still = inference_args.maybe_make_still.unwrap_or(false);
 
   let preprocess = match inference_args.maybe_preprocess {
-    None => None,
+    None => Some("full".to_string()),
     Some(Preprocess::F) => Some("full".to_string()),
     Some(Preprocess::EF) => Some("extfull".to_string()),
     Some(Preprocess::C) => Some("crop".to_string()),
@@ -83,6 +86,9 @@ pub fn validate_job(job: &AvailableInferenceJob) -> Result<JobArgs, ProcessSingl
     Some(FaceEnhancer::R) => Some("RestoreFormer".to_string()),
   };
 
+  let mut width = inference_args.maybe_resize_width;
+  let mut height = inference_args.maybe_resize_height;
+
   Ok(JobArgs {
     audio_source,
     image_source,
@@ -90,5 +96,7 @@ pub fn validate_job(job: &AvailableInferenceJob) -> Result<JobArgs, ProcessSingl
     make_still,
     preprocess,
     enhancer,
+    width,
+    height,
   })
 }
