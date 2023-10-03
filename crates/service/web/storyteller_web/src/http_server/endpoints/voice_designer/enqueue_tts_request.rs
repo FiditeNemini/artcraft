@@ -89,7 +89,7 @@ pub async fn enqueue_tts_request(
 
     let is_debug_request = true;
     let mut maybe_user_token : Option<UserToken> = None;
-    let mut priority_level ;
+    let priority_level = 0;
     let disable_rate_limiter = false; // NB: Careful!
 
   // do something with user session check if the user should even be able to access the end point
@@ -130,12 +130,8 @@ let mut inference_args = TTSArgs {
 };
 
 // create the inference args here
-
 // enqueue a zero shot tts request here...
-
 // create the job record here! explore the table insert the inference args in here as json! keep it short
-
-
 let query_result = insert_generic_inference_job(InsertGenericInferenceArgs {
   uuid_idempotency_token: &request.uuid_idempotency_token,
   inference_category: InferenceCategory::TextToSpeech,
@@ -154,7 +150,7 @@ let query_result = insert_generic_inference_job(InsertGenericInferenceArgs {
   priority_level,
   requires_keepalive: true, //
   is_debug_request,
-  maybe_routing_tag: "".to_string(), // TODO fix later
+  maybe_routing_tag: Some("Tag"), // TODO fix later what is this tag for?
   mysql_pool: &server_state.mysql_pool,
 }).await;
 
@@ -166,7 +162,20 @@ let job_token = match query_result {
   }
 };
 
+let response: EnqueueTTSRequestSuccessResponse = EnqueueTTSRequestSuccessResponse {
+  success: true,
+  inference_job_token: job_token,
+};
+
+
+let body = serde_json::to_string(&response)
+.map_err(|_e| EnqueueTTSRequestError::ServerError)?;
+
+
 // Error handling 101 rust result type returned like so.
-  Ok(HttpResponse::Ok().json("TTS request enqueued successfully"))
+  Ok(HttpResponse::Ok()
+    .content_type("application/json")
+    .body(body))
+
   //Err(EnqueueTTSRequestError::ServerError)
 }
