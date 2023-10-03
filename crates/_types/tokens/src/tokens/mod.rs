@@ -6,6 +6,7 @@ pub mod model_categories;
 pub mod tts_models;
 pub mod voice_conversion_results;
 pub mod w2l_templates;
+pub mod dataset;
 
 // ===== For Sqlite =====
 pub mod news_stories;

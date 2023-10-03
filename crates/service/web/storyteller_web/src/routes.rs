@@ -120,7 +120,7 @@ use crate::http_server::endpoints::w2l::list_user_w2l_templates::list_user_w2l_t
 use crate::http_server::endpoints::w2l::list_w2l_templates::list_w2l_templates_handler;
 use crate::http_server::endpoints::w2l::set_w2l_template_mod_approval::set_w2l_template_mod_approval_handler;
 
-use crate::http_server::endpoints::voice_designer::create_dataset::create_dataset;
+use crate::http_server::endpoints::voice_designer::create_dataset::create_dataset_handler;
 use crate::http_server::endpoints::voice_designer::update_dataset::update_dataset;
 use crate::http_server::endpoints::voice_designer::delete_dataset::delete_dataset;
 use crate::http_server::endpoints::voice_designer::list_datasets_by_user::list_datasets_by_user;
@@ -174,7 +174,7 @@ pub fn add_routes<T, B> (app: App<T>) -> App<T>
   app = add_subscription_routes(app); /* /v1/subscriptions/... */
 
   // TODO find a long term feature flag solution, since this code is likely deployed into production we don't want the route found.
-  let enable_voice_designer_route = false;
+  let enable_voice_designer_route = true;
   if (enable_voice_designer_route) { 
     app = add_voice_designer_routes(app); /* /v1/voice_designer */
   }
@@ -1140,7 +1140,7 @@ fn add_voice_designer_routes<T,B> (app:App<T>)-> App<T>
           web::scope("/v1/voice_designer")
               .service(
                   web::scope("/datasets")
-                      .route("/create", web::post().to(create_dataset))
+                      .route("/create", web::post().to(create_dataset_handler))
                       .route("/{dataset_token}/update", web::post().to(update_dataset))
                       .route("/{dataset_token}/delete", web::delete().to(delete_dataset))
                       .route("/user/{user_token}/list", web::get().to(list_datasets_by_user))
