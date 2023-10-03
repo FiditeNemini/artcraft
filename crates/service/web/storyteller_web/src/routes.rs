@@ -1160,7 +1160,7 @@ fn add_voice_designer_routes<T,B> (app:App<T>)-> App<T>
               )
               .service(
                   web::scope("/inference")
-                      .route("/enqueue_tts", web::post().to(enqueue_tts_request))
+                      .route("/enqueue_tts", web::post().to(enqueue_infer_tts_handler))
                       .route("/enqueue_vc", web::post().to(enqueue_vc_request))
               )
               .service(

@@ -23,6 +23,7 @@ pub struct EnqueueTTSRequest {
 pub struct EnqueueTTSRequestSuccessResponse {
   pub success: bool,
   pub inference_job_token: InferenceJobToken,
+  pub embedding_token: str
 }
 
 #[derive(Debug)]
@@ -61,20 +62,40 @@ impl std::fmt::Display for EnqueueTTSRequestError {
   }
 }
 
-
+// TODO Delete later.
+// Not gonna go this route, going to leverage enqueue_infer_tts_handler.rs instead.
 pub async fn enqueue_tts_request(http_request: HttpRequest,
   request: web::Json<EnqueueTTSRequest>,
   server_state: web::Data<Arc<ServerState>>) -> Result<HttpResponse,EnqueueTTSRequestError> 
   {
   // Implementation for enqueuing a TTS request
+
+  // do something with user session check if the user should even be able to access the end point
+
+
   
-  let mut mysql_connection = server_state.mysql_pool
-  .acquire()
-  .await
-  .map_err(|err| {
-    warn!("MySql pool error: {:?}", err);
-    EnqueueTTSRequestError::ServerError
-  })?;
+  // let mut mysql_connection = server_state.mysql_pool
+  // .acquire()
+  // .await
+  // .map_err(|err| {
+  //   warn!("MySql pool error: {:?}", err);
+  //   EnqueueTTSRequestError::ServerError
+  // })?;
+
+// check for session later 
+
+// grab any data from other sources from GCB
+
+// rate limiter
+
+
+// remap the json into data for lookup in the DB and for other processes, from the request
+
+// create the inference args here
+
+// enqueue a zero shot tts request here...
+
+// create the job record here! explore the table
 
   HttpResponse::Ok().json("TTS request enqueued successfully");
 }
