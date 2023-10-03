@@ -8,6 +8,7 @@ import {
   faUser,
   faSignOutAlt,
   faFaceViewfinder,
+  faCloudUpload,
 } from "@fortawesome/pro-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Button from "components/common/Button/Button";
@@ -21,6 +22,7 @@ import {
 import { WebUrl } from "common/WebUrl";
 import { Logout } from "@storyteller/components/src/api/session/Logout";
 import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
+import { useLocalize } from "hooks";
 
 const DEFAULT_QUEUE_REFRESH_INTERVAL_MILLIS = 15000;
 
@@ -32,6 +34,7 @@ interface SideNavProps {
 }
 
 export default function SideNav(props: SideNavProps) {
+  const { t } = useLocalize("SideNav");
   let history = useHistory();
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
 
@@ -151,7 +154,7 @@ export default function SideNav(props: SideNavProps) {
   let userOrLoginButton = (
     <>
       <Button
-        label="Login"
+        label={t("loginButton")}
         small
         secondary
         onClick={() => {
@@ -165,7 +168,7 @@ export default function SideNav(props: SideNavProps) {
   let signupOrLogOutButton = (
     <>
       <Button
-        label="Sign Up"
+        label={t("signUpButton")}
         small
         onClick={() => {
           history.push("/signup");
@@ -189,7 +192,7 @@ export default function SideNav(props: SideNavProps) {
       <>
         <Button
           icon={faUser}
-          label="Profile"
+          label={t("profileButton")}
           small
           secondary
           onClick={() => {
@@ -204,7 +207,7 @@ export default function SideNav(props: SideNavProps) {
       <>
         <Button
           icon={faSignOutAlt}
-          label="Log Out"
+          label={t("logOutButton")}
           small
           danger
           onClick={async () => {
@@ -237,7 +240,7 @@ export default function SideNav(props: SideNavProps) {
         </div>
         <hr className="my-4" />
 
-        <li className="sidebar-heading">Speech Generation</li>
+        <li className="sidebar-heading">{t("speechTitle")}</li>
         <li>
           <NavLink
             to="/tts"
@@ -248,7 +251,7 @@ export default function SideNav(props: SideNavProps) {
               icon={faMessageDots}
               className="sidebar-heading-icon"
             />
-            Text to Speech
+            {t("speechTts")}
           </NavLink>
         </li>
         <li>
@@ -261,11 +264,11 @@ export default function SideNav(props: SideNavProps) {
               icon={faWaveformLines}
               className="sidebar-heading-icon"
             />
-            Voice to Voice
+            {t("speechVc")}
           </NavLink>
         </li>
         <hr className="mb-4 mt-3" />
-        <li className="sidebar-heading">Video Generation</li>
+        <li className="sidebar-heading">{t("videoTitle")}</li>
         <li>
           <NavLink
             to="/face-animation"
@@ -276,19 +279,32 @@ export default function SideNav(props: SideNavProps) {
               icon={faFaceViewfinder}
               className="sidebar-heading-icon"
             />
-            Face Animator
+            {t("videoFaceAnimator")}
           </NavLink>
         </li>
 
         <hr className="mb-4 mt-3" />
-        <li className="sidebar-heading">Community</li>
+        <li className="sidebar-heading">{t("communityTitle")}</li>
+        <li>
+          <NavLink
+            to="/contribute"
+            activeClassName="active-link"
+            onClick={handleNavLinkClick}
+          >
+            <FontAwesomeIcon
+              icon={faCloudUpload}
+              className="sidebar-heading-icon"
+            />
+            {t("communityUploadModels")}
+          </NavLink>
+        </li>
         <li>
           <a href="https://discord.gg/fakeyou" target="_blank" rel="noreferrer">
             <FontAwesomeIcon
               icon={faDiscord}
               className="sidebar-heading-icon"
             />
-            Discord
+            {t("communityDiscord")}
           </a>
           <NavLink
             to="/leaderboard"
@@ -296,7 +312,7 @@ export default function SideNav(props: SideNavProps) {
             onClick={handleNavLinkClick}
           >
             <FontAwesomeIcon icon={faTrophy} className="sidebar-heading-icon" />
-            Leaderboard
+            {t("communityLeaderboard")}
           </NavLink>
           <NavLink
             to="/guide"
@@ -307,7 +323,7 @@ export default function SideNav(props: SideNavProps) {
               icon={faBookOpen}
               className="sidebar-heading-icon"
             />
-            Guide
+            {t("communityGuide")}
           </NavLink>
         </li>
         <hr className="mb-3 mt-3" />
@@ -318,32 +334,32 @@ export default function SideNav(props: SideNavProps) {
             onClick={handleNavLinkClick}
           >
             <FontAwesomeIcon icon={faStar} className="sidebar-heading-icon" />
-            Pricing
+            {t("infoPricing")}
           </NavLink>
         </li>
         <hr className="mb-4 mt-3" />
-        <li className="sidebar-heading">Service Queues</li>
-        <li className="ps-4 fs-7">
+        <li className="sidebar-heading">{t("queueTitle")}</li>
+        <li className="ps-4 fs-7 mb-5">
           <div>
-            TTS Queued:{" "}
+            {t("queueTts")}:{" "}
             <span className="text-red">
               {queueStats.legacy_tts.pending_job_count}
             </span>
           </div>
           <div>
-            RVC Queued:{" "}
+            {t("queueRvc")}:{" "}
             <span className="text-red">
               {queueStats.inference.by_queue.pending_rvc_jobs}
             </span>
           </div>
           <div>
-            SVC Queued:{" "}
+            {t("queueSvc")}:{" "}
             <span className="text-red">
               {queueStats.inference.by_queue.pending_svc_jobs}
             </span>
           </div>
           <div>
-            Animations Queued:{" "}
+            {t("queueFaceAnimator")}:{" "}
             <span className="text-red">
               {queueStats.inference.by_queue.pending_face_animation_jobs}
             </span>
