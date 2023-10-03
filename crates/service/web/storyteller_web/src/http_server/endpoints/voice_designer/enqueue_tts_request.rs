@@ -12,19 +12,33 @@ use enums::by_table::generic_inference_jobs::inference_model_type::InferenceMode
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use tokens::jobs::inference::InferenceJobToken;
 use crate::server_state::ServerState;
+
+
+
+// TODO MOVE into own file.
+use std::fmt::Debug;
+use serde::Deserialize;
+use serde::Serialize;
+use crate::prefixes::EntityType;
+/// The primary key for embeddings for voice cloning inference jobs.
+#[derive(Clone, PartialEq, Eq, sqlx::Type, Debug, Serialize, Deserialize)]
+#[sqlx(transparent)]
+pub struct EmbeddingToken(String);
+
+
 #[derive(Deserialize)]
 pub struct EnqueueTTSRequest {
   uuid_idempotency_token: String,
-  text: String
+  text: String,
+  embedding_token: EmbeddingToken
 }
-
 
 #[derive(Serialize)]
 pub struct EnqueueTTSRequestSuccessResponse {
   pub success: bool,
-  pub inference_job_token: InferenceJobToken,
-  pub embedding_token: str
+  pub inference_job_token: InferenceJobToken
 }
+
 
 #[derive(Debug)]
 pub enum EnqueueTTSRequestError {
@@ -62,34 +76,47 @@ impl std::fmt::Display for EnqueueTTSRequestError {
   }
 }
 
-// TODO Delete later.
-// Not gonna go this route, going to leverage enqueue_infer_tts_handler.rs instead.
-pub async fn enqueue_tts_request(http_request: HttpRequest,
+
+// Implementation for enqueuing a TTS request
+// Reference enqueue_infer_tts_handler.rs for checks: rate limiting / user sessions
+// insert generic inference job.rs
+// Need to convert it to generic inference job.
+pub async fn enqueue_tts_request(
+  http_request: HttpRequest,
   request: web::Json<EnqueueTTSRequest>,
-  server_state: web::Data<Arc<ServerState>>) -> Result<HttpResponse,EnqueueTTSRequestError> 
-  {
-  // Implementation for enqueuing a TTS request
+  server_state: web::Data<Arc<ServerState>>) -> Result<HttpResponse,EnqueueTTSRequestError> {
 
   // do something with user session check if the user should even be able to access the end point
 
-
-  
-  // let mut mysql_connection = server_state.mysql_pool
-  // .acquire()
-  // .await
-  // .map_err(|err| {
-  //   warn!("MySql pool error: {:?}", err);
-  //   EnqueueTTSRequestError::ServerError
-  // })?;
-
-// check for session later 
-
-// grab any data from other sources from GCB
-
-// rate limiter
+  // GET MY SQL
+  let mut mysql_connection = server_state.mysql_pool
+  .acquire()
+  .await
+  .map_err(|err| {
+    warn!("MySql pool error: {:?}", err);
+    EnqueueTTSRequestError::ServerError
+  })?;
 
 
-// remap the json into data for lookup in the DB and for other processes, from the request
+// TODO: check for session 
+
+// TODO: Give investors priority
+
+// TODO: Add Rate Limiter
+
+// TODO: Look up model info?
+
+// TODO(bt): CHECK DATABASE FOR TOKENS? I am guessing we need to ensure those tokens exist because the files may not uploaded or are availible?
+// get input from the container spec and create a object that similar to llipsync_payload.rs
+
+// PACKAGE JSON into RUST Struct, any smaller components
+// remap from the request
+// pass tokens from the request and create a payload that will have the information.
+// check malformed json
+
+// Get up IP address
+
+// package as larger component args
 
 // create the inference args here
 
@@ -97,5 +124,7 @@ pub async fn enqueue_tts_request(http_request: HttpRequest,
 
 // create the job record here! explore the table
 
-  HttpResponse::Ok().json("TTS request enqueued successfully");
+// Error handling 101 rust result type returned like so.
+  //Ok(HttpResponse::Ok().json("TTS request enqueued successfully"))
+  Err(EnqueueTTSRequestError::ServerError)
 }

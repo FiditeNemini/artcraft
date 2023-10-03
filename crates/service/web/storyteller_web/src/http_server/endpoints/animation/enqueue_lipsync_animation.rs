@@ -234,7 +234,7 @@ pub async fn enqueue_lipsync_animation_handler(
 
   // TODO(bt): CHECK DATABASE FOR TOKENS!
 
-  let audio_source = {
+  let audio_source: LipsyncAnimationAudioSource = {
     if let Some(ref token) = request.audio_source.maybe_media_file_token {
       LipsyncAnimationAudioSource::media_file_token(token.as_str())
     } else if let Some(ref token) = request.audio_source.maybe_media_upload_token {
@@ -248,7 +248,7 @@ pub async fn enqueue_lipsync_animation_handler(
     }
   };
 
-  let image_source = {
+  let image_source: LipsyncAnimationImageSource = {
     if let Some(ref token) = request.image_source.maybe_media_file_token {
       LipsyncAnimationImageSource::media_file_token(token.as_str())
     } else if let Some(ref token) = request.image_source.maybe_media_upload_token {
@@ -262,7 +262,7 @@ pub async fn enqueue_lipsync_animation_handler(
 
   let maybe_user_preferred_visibility : Option<Visibility> = maybe_user_session
       .as_ref()
-      .map(|user_session| user_session.preferences.preferred_tts_result_visibility); // TODO: New setting for web-vc
+      .map(|user_session: &users_component::utils::user_session_extended::UserSessionExtended| user_session.preferences.preferred_tts_result_visibility); // TODO: New setting for web-vc
 
   let set_visibility = request.creator_set_visibility
       .or(maybe_user_preferred_visibility)
@@ -341,7 +341,7 @@ pub async fn enqueue_lipsync_animation_handler(
         EnqueueLipsyncAnimationError::ServerError
       })?;
 
-  let response = EnqueueLipsyncAnimationSuccessResponse {
+  let response: EnqueueLipsyncAnimationSuccessResponse = EnqueueLipsyncAnimationSuccessResponse {
     success: true,
     inference_job_token: job_token,
   };

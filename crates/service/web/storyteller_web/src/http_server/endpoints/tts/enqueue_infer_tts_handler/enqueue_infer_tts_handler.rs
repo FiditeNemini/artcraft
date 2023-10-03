@@ -73,7 +73,6 @@ const MAX_TTS_LENGTH : usize = 10_000;
 pub struct InferTtsRequest {
   uuid_idempotency_token: String,
   tts_model_token: String,
-  embedding_token: Option<String>, // for any voice cloning based system that uses embeddings or prompts
   inference_text: String,
   creator_set_visibility: Option<Visibility>,
   is_storyteller_demo: Option<bool>,

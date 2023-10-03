@@ -75,6 +75,7 @@ use crate::http_server::endpoints::tts::delete_tts_model::delete_tts_model_handl
 use crate::http_server::endpoints::tts::delete_tts_result::delete_tts_inference_result_handler;
 use crate::http_server::endpoints::tts::edit_tts_model::edit_tts_model_handler;
 use crate::http_server::endpoints::tts::edit_tts_result::edit_tts_inference_result_handler;
+use crate::http_server::endpoints::tts::enqueue_infer_tts_handler;
 use crate::http_server::endpoints::tts::enqueue_infer_tts_handler::enqueue_infer_tts_handler::enqueue_infer_tts_handler;
 use crate::http_server::endpoints::tts::enqueue_upload_tts_model::upload_tts_model_handler;
 use crate::http_server::endpoints::tts::get_pending_tts_inference_job_count::get_pending_tts_inference_job_count_handler;
@@ -1160,7 +1161,7 @@ fn add_voice_designer_routes<T,B> (app:App<T>)-> App<T>
               )
               .service(
                   web::scope("/inference")
-                      .route("/enqueue_tts", web::post().to(enqueue_infer_tts_handler))
+                      .route("/enqueue_tts", web::post().to(enqueue_tts_request))
                       .route("/enqueue_vc", web::post().to(enqueue_vc_request))
               )
               .service(
