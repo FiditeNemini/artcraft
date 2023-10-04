@@ -18,6 +18,7 @@ use crate::server_state::ServerState;
 #[derive(Deserialize)]
 pub struct CreateDatasetRequest {
   pub title: String,
+
   pub creator_set_visibility: Option<Visibility>,
 
   pub idempotency_token: Option<String>,
@@ -26,7 +27,7 @@ pub struct CreateDatasetRequest {
 #[derive(Serialize)]
 pub struct CreateDatasetResponse {
   pub success: bool,
-  pub token: Option<String>,
+  pub token: Option<ZsDatasetToken>,
 }
 
 // =============== Error Response ===============
@@ -111,7 +112,7 @@ pub async fn create_dataset_handler(http_request: HttpRequest, request: web::Jso
 
     let response = CreateDatasetResponse {
         success: true,
-        token: Some(dataset_token.to_string()),
+        token: Some(dataset_token),
     };
 
 
