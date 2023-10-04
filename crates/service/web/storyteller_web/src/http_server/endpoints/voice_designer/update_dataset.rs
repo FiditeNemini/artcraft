@@ -96,24 +96,31 @@ pub async fn update_dataset_handler(
     }
   };
 
-
   let dataset_token = path.dataset_token.clone();
   let dataset_lookup_result = get_dataset_by_token(
     &ZsDatasetToken::new(dataset_token.clone()),
     &server_state.mysql_pool,
   ).await;
 
-    let dataset = match dataset_lookup_result {
-        Ok(Some(dataset)) => dataset,
-        Ok(None) => {
-          warn!("Dataset not found: {:?}", dataset_token);
-          return Err(UpdateDatasetError::NotFound);
-        },
-        Err(err) => {
+  let dataset = match dataset_lookup_result {
+      Ok(Some(dataset)) => dataset,
+      Ok(None) => {
+        warn!("Dataset not found: {:?}", dataset_token);
+        return Err(UpdateDatasetError::NotFound);
+      },
+      Err(err) => {
         warn!("Error looking up dataset: {:?}", err);
         return Err(UpdateDatasetError::ServerError);
-        }
-    };
+      }
+  };
+
+  let is_creator = dataset.maybe_creator_user_token == Some(user_session.user_token);
+  let is_mod = user_session.can_ban_users;
+
+  if !is_creator && !is_mod {
+    warn!("user is not allowed to edit this dataset: {}", user_session.user_token);
+    return Err(UpdateDatasetError::NotAuthorized);
+  }
 
   let mut title = None;
   let mut ietf_language_tag = None;
@@ -156,10 +163,8 @@ pub async fn update_dataset_handler(
         .map_err(|_| UpdateDatasetError::BadInput("bad record visibility".to_string()))?;
   }
 
-  let is_mod = user_session.can_ban_users;
 
   let ip_address = get_request_ip(&http_request);
-
   let mut maybe_mod_user_token = None;
 
   if is_mod {
@@ -167,7 +172,7 @@ pub async fn update_dataset_handler(
   }
   let query_result = update_dataset(
     UpdateDatasetArgs {
-      dataset_token: &ZsDatasetToken::new(path.dataset_token.clone()),
+      dataset_token: &ZsDatasetToken::new(dataset_token.clone()),
       dataset_title: title.as_deref(),
       maybe_creator_user_token: Some(user_session.user_token.clone().as_ref()),
       creator_ip_address: ip_address.as_ref(),
