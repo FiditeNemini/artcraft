@@ -1,0 +1,30 @@
+@import "scss/colours.scss";
+
+.fy-segment-buttons {
+	display: grid;
+	grid-auto-flow: column;
+	grid-auto-columns: 1fr;
+	gap: 2px;
+
+	li {
+		background-color: $secondary;
+		border-radius: .125rem;
+		cursor: pointer;
+		display: inline-flex;
+		flex: 1;
+		white-space: nowrap;
+		justify-content: center;
+		align-items: center;
+		height: 2rem;
+		padding: 0 .75rem;
+		transition: .25s background-color ease-in-out;
+
+		&:hover { background-color: lighten($secondary, 5%) !important; }
+		&:first-of-type { border-radius: .5rem .125rem .125rem .5rem; }
+		&:last-of-type { border-radius: .125rem .5rem .5rem .125rem; }
+		&.fy-selected-segment { 
+			background-color: $primary;
+			&:hover { background-color: lighten($primary, 5%) !important; }
+		}
+	}
+}

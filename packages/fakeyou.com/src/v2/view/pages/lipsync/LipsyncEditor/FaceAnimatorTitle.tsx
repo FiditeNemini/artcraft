@@ -40,6 +40,7 @@ export default function FaceAnimatorTitle({ ...rest }) {
   const {
     audioProps,
     audioReady,
+    clearInputs,
     imageProps,
     imageReady,
     indexSet,
@@ -58,6 +59,7 @@ export default function FaceAnimatorTitle({ ...rest }) {
     if (page === 2) {
       imageProps.clear();
       audioProps.clear();
+      clearInputs();
       indexSet(0);
     } else if (!incomplete && !working) submit();
   };
