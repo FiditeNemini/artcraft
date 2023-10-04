@@ -19,9 +19,10 @@ export interface EnqueueFaceAnimationRequest {
   audio_source: AudioSource,
   image_source: ImageSource,
 
-  crop?: string,
+  dimensions?: string,
+
   make_still?: boolean,
-  high_quality?: boolean,
+  disable_face_enhancement?: boolean,
   remove_watermark?: boolean,
 }
 
