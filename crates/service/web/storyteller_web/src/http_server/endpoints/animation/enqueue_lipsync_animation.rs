@@ -45,20 +45,20 @@ pub struct EnqueueLipsyncAnimationRequest {
 
   creator_set_visibility: Option<Visibility>,
 
-  ///// SadTalker: cropping
-  //crop: Option<CropMode>,
+  /// Width/height of the video to generate (presets)
+  dimensions: Option<FrameSize>,
 
   /// SadTalker: parameter to make the animation more still.
   make_still: Option<bool>,
 
-  /// SadTalker: parameter to enhance the face using gfpgan.
-  high_quality: Option<bool>,
+  /// SadTalker: we use gfpgan face enhancement by default; this disables it.
+  disable_face_enhancement: Option<bool>,
 
-  /// Remove the watermark
+  /// Remove the watermark (premium only)
   remove_watermark: Option<bool>,
 
-  /// Size of the video to generate
-  dimensions: Option<FrameSize>,
+  ///// SadTalker: cropping
+  //crop: Option<CropMode>,
 }
 
 //#[derive(Deserialize, Copy, Clone)]
@@ -165,8 +165,6 @@ pub async fn enqueue_lipsync_animation_handler(
   server_state: web::Data<Arc<ServerState>>) -> Result<HttpResponse, EnqueueLipsyncAnimationError>
 {
   let mut maybe_user_token : Option<UserToken> = None;
-  let priority_level ;
-  let disable_rate_limiter = false; // NB: Careful!
 
   let mut mysql_connection = server_state.mysql_pool
       .acquire()
@@ -197,7 +195,7 @@ pub async fn enqueue_lipsync_animation_handler(
     maybe_user_session.as_ref());
 
   // TODO: Separate priority for animation.
-  priority_level = plan.web_vc_base_priority_level();
+  let priority_level = plan.web_vc_base_priority_level();
 
   // ==================== DEBUG MODE + ROUTING TAG ==================== //
 
@@ -211,20 +209,18 @@ pub async fn enqueue_lipsync_animation_handler(
 
   // ==================== RATE LIMIT ==================== //
 
-  if !disable_rate_limiter {
-    let rate_limiter = match maybe_user_session {
-      None => &server_state.redis_rate_limiters.logged_out,
-      Some(ref user) => {
-        if user.role.is_banned {
-          return Err(EnqueueLipsyncAnimationError::NotAuthorized);
-        }
-        &server_state.redis_rate_limiters.logged_in
-      },
-    };
+  let rate_limiter = match maybe_user_session {
+    None => &server_state.redis_rate_limiters.logged_out,
+    Some(ref user) => {
+      if user.role.is_banned {
+        return Err(EnqueueLipsyncAnimationError::NotAuthorized);
+      }
+      &server_state.redis_rate_limiters.logged_in
+    },
+  };
 
-    if let Err(_err) = rate_limiter.rate_limit_request(&http_request) {
-      return Err(EnqueueLipsyncAnimationError::RateLimited);
-    }
+  if let Err(_err) = rate_limiter.rate_limit_request(&http_request) {
+    return Err(EnqueueLipsyncAnimationError::RateLimited);
   }
 
   // ==================== LOOK UP MODEL INFO ==================== //
@@ -277,7 +273,9 @@ pub async fn enqueue_lipsync_animation_handler(
     maybe_resize_height: None,
   };
 
-  if request.high_quality.unwrap_or(false) {
+  let enable_face_enhancement = !request.disable_face_enhancement.unwrap_or(false);
+
+  if enable_face_enhancement {
     inference_args.maybe_face_enhancer = Some(FaceEnhancer::G); // "--enhancer gfpgan"
   }
 
