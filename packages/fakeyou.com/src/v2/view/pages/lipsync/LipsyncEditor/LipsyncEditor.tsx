@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { animated, useTransition } from "@react-spring/web";
 import { v4 as uuidv4 } from "uuid";
 import { useFile, useLocalize } from "hooks";
-import { AudioInput, Checkbox, ImageInput, NumberSlider, SegmentButtons, Spinner } from "components/common";
+import { AudioInput, Checkbox, ImageInput, SegmentButtons, Spinner } from "components/common";
 import { springs } from "resources";
 import {
   UploadAudio,
@@ -176,19 +176,19 @@ export default function LipsyncEditor({
   const [index, indexSet] = useState<number>(0); // index  = slideshow slide position
 
 
-  const [animationStyle,animationStyleSet] = useState(0);
+  //const [animationStyle,animationStyleSet] = useState(0);
   const [frameDimensions,frameDimensionsSet] = useState("twitter_square");
   const [removeWatermark,removeWatermarkSet] = useState(false);
   const [disableFaceEnhancement,disableFaceEnhancementSet] = useState(false);
   const [still,stillSet] = useState(false);
 
-  const animationChange = ({ target }: any) => animationStyleSet(target.value);
+  //const animationChange = ({ target }: any) => animationStyleSet(target.value);
   const frameDimensionsChange = ({ target }: any) => frameDimensionsSet(target.value);
   const removeWatermarkChange = ({ target }: any) => removeWatermarkSet(target.checked);
   const disableFaceEnhancementChange = ({ target }: any) => disableFaceEnhancementSet(target.checked);
   const stillChange = ({ target }: any) => stillSet(target.checked);
   const clearInputs = () => { 
-    animationStyleSet(0); 
+    //animationStyleSet(0); 
     stillSet(false); 
     frameDimensionsSet("twitter_square"); 
     removeWatermarkSet(false); 
