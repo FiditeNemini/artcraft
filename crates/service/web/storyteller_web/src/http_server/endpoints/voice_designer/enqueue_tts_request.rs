@@ -9,7 +9,7 @@ use std::sync::Arc;
 use actix_web::{HttpRequest, HttpResponse, web};
 use actix_web::error::ResponseError;
 use actix_web::http::StatusCode;
-use log::{info, warn};
+use log::{warn};
 use http_server_common::request::get_request_ip::get_request_ip;
 
 use tokens::users::user::UserToken;
@@ -87,21 +87,22 @@ pub async fn enqueue_tts_request(
   request: web::Json<EnqueueTTSRequest>,
   server_state: web::Data<Arc<ServerState>>) -> Result<HttpResponse,EnqueueTTSRequestError> {
 
+    println!("Recieved payload");
     let is_debug_request = true;
-    let mut maybe_user_token : Option<UserToken> = None;
+    let maybe_user_token : Option<UserToken> =  Some(UserToken::new_from_str(&"place holder"));
     let priority_level = 0;
-    let disable_rate_limiter = false; // NB: Careful!
+    //let disable_rate_limiter = false; // NB: Careful!
 
   // do something with user session check if the user should even be able to access the end point
 
   // GET MY SQL
-  let mut mysql_connection = server_state.mysql_pool
-  .acquire()
-  .await
-  .map_err(|err| {
-    warn!("MySql pool error: {:?}", err);
-    EnqueueTTSRequestError::ServerError
-  })?;
+  // let mut mysql_connection = server_state.mysql_pool
+  // .acquire()
+  // .await
+  // .map_err(|err| {
+  //   warn!("MySql pool error: {:?}", err);
+  //   EnqueueTTSRequestError::ServerError
+  // })?;
 
 
 // TODO: check for session 
@@ -123,10 +124,10 @@ pub async fn enqueue_tts_request(
 // Get up IP address
 let ip_address = get_request_ip(&http_request);
 
-// package as larger component args
-let mut inference_args = TTSArgs {
-  text: "Hello!".to_string(),
-  maybe_voice_token: Some("Voice Token.".to_string())
+// package as larger component args should always have an embedding token ..
+let inference_args = TTSArgs {
+  text: request.text,
+  maybe_voice_token: request.embedding_token
 };
 
 // create the inference args here
@@ -167,10 +168,8 @@ let response: EnqueueTTSRequestSuccessResponse = EnqueueTTSRequestSuccessRespons
   inference_job_token: job_token,
 };
 
-
 let body = serde_json::to_string(&response)
 .map_err(|_e| EnqueueTTSRequestError::ServerError)?;
-
 
 // Error handling 101 rust result type returned like so.
   Ok(HttpResponse::Ok()

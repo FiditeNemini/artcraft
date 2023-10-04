@@ -332,6 +332,8 @@ pub async fn enqueue_lipsync_animation_handler(
     }
   };
 
+  // If you are using this file as a reference for another generic endpoint feature.
+  // this feature will be sunset so don't worry about this
   server_state.firehose_publisher.enqueue_lipsync_animation(
     maybe_user_token.as_ref(),
     &job_token)

@@ -57,7 +57,7 @@ use crate::job::job_types::tts::vits::vits_inference_command::VitsInferenceComma
 use crate::job::job_types::vc::rvc_v2::pretrained_hubert_model::PretrainedHubertModel;
 use crate::job::job_types::vc::rvc_v2::rvc_v2_inference_command::RvcV2InferenceCommand;
 use crate::job::job_types::vc::so_vits_svc::so_vits_svc_inference_command::SoVitsSvcInferenceCommand;
-use crate::job_dependencies::{FileSystemDetails, JobCaches, JobDependencies, JobTypeDetails, JobWorkerDetails, PretrainedModels, RvcV2Details, SadTalkerDetails, SoVitsSvcDetails, Tacotron2VocodesDetails, VitsDetails};
+use crate::job_dependencies::{FileSystemDetails, JobCaches, JobDependencies, JobTypeDetails, JobWorkerDetails, PretrainedModels, RvcV2Details, SadTalkerDetails, SoVitsSvcDetails, Tacotron2VocodesDetails, VitsDetails, VallEXDetails};
 use crate::util::common_commands::ffmpeg_logo_watermark_command::FfmpegLogoWatermarkCommand;
 use crate::util::scoped_execution::ScopedExecution;
 use crate::util::scoped_temp_dir_creator::ScopedTempDirCreator;
@@ -306,6 +306,10 @@ async fn main() -> AnyhowResult<()> {
         waveglow_vocoder_model_filename,
         hifigan_vocoder_model_filename,
         hifigan_superres_vocoder_model_filename,
+      },
+      vallEX: VallEXDetails { 
+        inference_command: "", 
+        create_embedding_command: "" 
       },
       vits: VitsDetails {
         inference_command: vits_inference_command()?,

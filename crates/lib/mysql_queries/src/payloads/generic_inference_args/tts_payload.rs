@@ -5,7 +5,7 @@ pub struct TTSArgs {
   pub text: String, 
   #[serde(rename = "e")] 
   #[serde(skip_serializing_if = "Option::is_none")]
-  pub maybe_voice_token: Option<String> //  varchar 32
+  pub voice_token: String //  varchar 32
 }
 
 #[cfg(test)]

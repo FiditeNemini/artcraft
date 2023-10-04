@@ -161,6 +161,7 @@ pub struct JobTypeDetails {
   pub rvc_v2: RvcV2Details,
   pub so_vits_svc: SoVitsSvcDetails,
   pub sad_talker: SadTalkerDetails,
+  pub vallEX:  VallEXDetails
   //pub tacotron2_modern: ...,
   //pub softvc: ...,
 }
@@ -195,4 +196,11 @@ pub struct SadTalkerDetails {
   pub downloaders: SadTalkerDownloaders,
   pub inference_command: SadTalkerInferenceCommand,
   pub ffmpeg_watermark_command: FfmpegLogoWatermarkCommand,
+}
+
+// TODO: we will probably want a command type of some kind that implements 
+// some kind of interface that we can just pass strings to.
+pub struct VallEXDetails {
+  pub inference_command: VallEXInferenceCommand,
+  pub create_embedding_command: VallEXCreateEmbeddingCommand
 }
