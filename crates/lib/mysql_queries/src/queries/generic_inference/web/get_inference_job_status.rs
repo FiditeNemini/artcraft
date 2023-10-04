@@ -45,6 +45,8 @@ pub struct ResultDetails {
 
   /// The bucket storage hash (for vc and media_files) or full path (for tts)
   pub public_bucket_location_or_hash: String,
+  pub maybe_media_file_public_bucket_prefix: Option<String>,
+  pub maybe_media_file_public_bucket_extension: Option<String>,
 
   /// Whether the location is a full path (for tts) or a hash (for vc) that
   /// needs to be reconstructed into a path.
@@ -84,6 +86,8 @@ SELECT
     tts_results.public_bucket_wav_audio_path as maybe_tts_public_bucket_path,
     voice_conversion_results.public_bucket_hash as maybe_voice_conversion_public_bucket_hash,
     media_files.public_bucket_directory_hash as maybe_media_file_public_bucket_directory_hash,
+    media_files.maybe_public_bucket_prefix as maybe_media_file_public_bucket_prefix,
+    media_files.maybe_public_bucket_extension as maybe_media_file_public_bucket_extension,
 
     jobs.assigned_worker as maybe_assigned_worker,
     jobs.assigned_cluster as maybe_assigned_cluster,
@@ -149,6 +153,8 @@ WHERE jobs.token = ?
                   entity_type: entity_type.to_string(),
                   entity_token: entity_token.to_string(),
                   public_bucket_location_or_hash: public_bucket_hash.to_string(),
+                  maybe_media_file_public_bucket_prefix: record.maybe_media_file_public_bucket_prefix.clone(),
+                  maybe_media_file_public_bucket_extension: record.maybe_media_file_public_bucket_extension.clone(),
                   public_bucket_location_is_hash: bucket_path_is_hash,
                   maybe_successfully_completed_at: record.maybe_successfully_completed_at.clone(),
                 }
@@ -197,6 +203,8 @@ struct RawGenericInferenceJobStatus {
   pub maybe_voice_conversion_public_bucket_hash: Option<String>, // NB: This is the bucket hash.
   pub maybe_tts_public_bucket_path: Option<String>, // NB: This isn't the bucket path, but the whole hash.
   pub maybe_media_file_public_bucket_directory_hash: Option<String>, // NB: This is the bucket directory hash
+  pub maybe_media_file_public_bucket_prefix: Option<String>,
+  pub maybe_media_file_public_bucket_extension: Option<String>,
 
   pub maybe_assigned_worker: Option<String>,
   pub maybe_assigned_cluster: Option<String>,

@@ -88,7 +88,23 @@ CREATE TABLE media_files (
 
   -- The hash for the bucket directory that contains the original upload
   -- as well as any transcodings, downsamplings, etc.
+  -- The bucket filename for the primary file (not including the directory path) is given by:
+  -- `[{maybe_public_bucket_prefix}]{public_bucket_directory_hash}[{maybe_public_bucket_extension}]`
   public_bucket_directory_hash  VARCHAR(32) NOT NULL,
+
+  -- An optional prefix on the bucket filename.
+  -- If present, this will be prepended to the beginning of the bucket filename to access the file.
+  -- The bucket filename for the primary file (not including the directory path) is given by:
+  -- `[{maybe_public_bucket_prefix}]{public_bucket_directory_hash}[{maybe_public_bucket_extension}]`
+  maybe_public_bucket_prefix VARCHAR(16) DEFAULT NULL,
+
+  -- An optional appended extension on the bucket filename.
+  -- If present, this will be appended to the end of the bucket filename to access the file.
+  -- To allow for flexibility, this extension typically will contain a leading period if
+  -- the file needs it (eg ".mp4" rather than "mp4")!
+  -- The bucket filename for the primary file (not including the directory path) is given by:
+  -- `[{maybe_public_bucket_prefix}]{public_bucket_directory_hash}[{maybe_public_bucket_extension}]`
+  maybe_public_bucket_extension VARCHAR(16) DEFAULT NULL,
 
   -- NB: Removed, since this can be derived.
   -- The directory this media is uploaded to will be exclusive for this file.

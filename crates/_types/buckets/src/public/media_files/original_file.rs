@@ -14,25 +14,43 @@ const ORIGINAL_FILE_BASENAME : &str = "file.bin";
 #[derive(Clone)]
 pub struct MediaFileBucketPath {
   directory: MediaFileBucketDirectory,
+
+  filename: String,
   full_object_path: String,
+
+  optional_prefix: Option<String>,
+  /// NB: Extension contains the leading period, eg. ".mp4"
+  optional_extension: Option<String>,
 }
 
 impl PublicPath for MediaFileBucketPath {}
 
 impl MediaFileBucketPath {
 
-  pub fn generate_new() -> Self {
+  pub fn generate_new(optional_prefix: Option<&str>, optional_extension: Option<&str>) -> Self {
     let entropy = crockford_entropy_lower(32);
-    Self::from_object_hash(&entropy)
+    Self::from_object_hash(&entropy, optional_prefix, optional_extension)
   }
 
-  pub fn from_object_hash(hash: &str) -> Self {
+  pub fn from_object_hash(hash: &str, optional_prefix: Option<&str>, optional_extension: Option<&str>) -> Self {
     // TODO: Path construction could be cleaner.
     let directory = MediaFileBucketDirectory::from_object_hash(hash);
-    let full_object_path = format!("{}/{}", directory.get_directory_path_str(), ORIGINAL_FILE_BASENAME);
+
+    let filename = match (optional_prefix, optional_extension) {
+      (None, None) => ORIGINAL_FILE_BASENAME.to_string(),
+      (None, Some(ext)) => format!("{}{}", hash, ext),
+      (Some(pre), None) => format!("{}{}", pre, hash),
+      (Some(pre), Some(ext)) => format!("{}{}{}", pre, hash, ext),
+    };
+
+    let full_object_path = format!("{}/{}", directory.get_directory_path_str(), filename);
+
     Self {
       directory,
+      filename,
       full_object_path,
+      optional_prefix: optional_prefix.map(|p| p.to_string()),
+      optional_extension: optional_extension.map(|e| e.to_string()),
     }
   }
 
@@ -52,8 +70,8 @@ impl MediaFileBucketPath {
     &self.directory.get_object_hash()
   }
 
-  pub fn get_basename() -> &'static str {
-    ORIGINAL_FILE_BASENAME
+  pub fn get_basename(&self) -> &str {
+    &self.filename
   }
 }
 
@@ -63,42 +81,65 @@ mod tests {
 
   use crate::public::media_files::original_file::MediaFileBucketPath;
 
-  #[test]
-  pub fn generate_new_entropy() {
-    let file = MediaFileBucketPath::generate_new();
-    assert_eq!(file.get_object_hash().len(), 32);
-    assert_eq!(file.get_directory().get_object_hash().len(), 32);
+  mod with_prefix_and_extension {
+    use super::*;
+
+    #[test]
+    pub fn generate_new_entropy() {
+      let file = MediaFileBucketPath::generate_new(Some("pre_"), Some(".mp4"));
+      assert_eq!(file.get_object_hash().len(), 32);
+      assert_eq!(file.get_object_hash().len(), 32);
+      assert_eq!(file.get_directory().get_object_hash().len(), 32);
+    }
+
+    #[test]
+    pub fn get_full_object_path_str() {
+      let file = MediaFileBucketPath::from_object_hash("abcdefghijk", Some("pre_"), Some(".mp4"));
+      assert_eq!(file.get_full_object_path_str(), "/media/a/b/c/d/e/abcdefghijk/pre_abcdefghijk.mp4");
+      assert_eq!(file.get_basename(), "pre_abcdefghijk.mp4");
+    }
   }
 
-  #[test]
-  pub fn get_full_object_path_str() {
-    let file = MediaFileBucketPath::from_object_hash("abcdefghijk");
-    assert_eq!(file.get_full_object_path_str(), "/media/a/b/c/d/e/abcdefghijk/file.bin");
-  }
+  mod without_prefix_and_extension {
+    use super::*;
 
-  #[test]
-  pub fn to_full_object_pathbuf() {
-    let file = MediaFileBucketPath::from_object_hash("abcdefghijk");
-    assert_eq!(file.to_full_object_pathbuf(), PathBuf::from("/media/a/b/c/d/e/abcdefghijk/file.bin"));
-  }
+    #[test]
+    pub fn generate_new_entropy() {
+      let file = MediaFileBucketPath::generate_new(None, None);
+      assert_eq!(file.get_object_hash().len(), 32);
+      assert_eq!(file.get_directory().get_object_hash().len(), 32);
+    }
 
-  #[test]
-  pub fn get_full_object_path_str_short_name() {
-    let file = MediaFileBucketPath::from_object_hash("foo");
-    assert_eq!(file.get_full_object_path_str(), "/media/f/o/foo/file.bin");
-  }
+    #[test]
+    pub fn get_full_object_path_str() {
+      let file = MediaFileBucketPath::from_object_hash("abcdefghijk", None, None);
+      assert_eq!(file.get_full_object_path_str(), "/media/a/b/c/d/e/abcdefghijk/file.bin");
+    }
 
-  #[test]
-  pub fn get_full_object_path_str_starts_with_directory() {
-    let file = MediaFileBucketPath::from_object_hash("abcdefghijk");
-    let full_path = file.get_full_object_path_str();
-    assert!(full_path.starts_with(file.get_directory().get_directory_path_str()))
-  }
+    #[test]
+    pub fn to_full_object_pathbuf() {
+      let file = MediaFileBucketPath::from_object_hash("abcdefghijk", None, None);
+      assert_eq!(file.to_full_object_pathbuf(), PathBuf::from("/media/a/b/c/d/e/abcdefghijk/file.bin"));
+    }
 
-  #[test]
-  pub fn get_object_hash() {
-    let hash = "abcdefghijk";
-    let file = MediaFileBucketPath::from_object_hash(hash);
-    assert_eq!(file.get_object_hash(), hash);
+    #[test]
+    pub fn get_full_object_path_str_short_name() {
+      let file = MediaFileBucketPath::from_object_hash("foo", None, None);
+      assert_eq!(file.get_full_object_path_str(), "/media/f/o/foo/file.bin");
+    }
+
+    #[test]
+    pub fn get_full_object_path_str_starts_with_directory() {
+      let file = MediaFileBucketPath::from_object_hash("abcdefghijk", None, None);
+      let full_path = file.get_full_object_path_str();
+      assert!(full_path.starts_with(file.get_directory().get_directory_path_str()))
+    }
+
+    #[test]
+    pub fn get_object_hash() {
+      let hash = "abcdefghijk";
+      let file = MediaFileBucketPath::from_object_hash(hash, None, None);
+      assert_eq!(file.get_object_hash(), hash);
+    }
   }
 }
