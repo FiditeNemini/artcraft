@@ -2,7 +2,11 @@ import React, { useState } from "react";
 import { animated, useTransition } from "@react-spring/web";
 import { v4 as uuidv4 } from "uuid";
 import { useFile, useLocalize } from "hooks";
+<<<<<<< HEAD
 import { AudioInput, Checkbox, ImageInput, NumberSlider, SegmentButtons, Spinner } from "components/common";
+=======
+import { AudioInput, Checkbox, ImageInput, SegmentButtons, Spinner } from "components/common";
+>>>>>>> master
 import { springs } from "resources";
 import {
   UploadAudio,
@@ -37,9 +41,11 @@ interface LipSyncProps {
   cropChange: any;
   cropping: any;
   imageProps: any;
+  frameDimensions: any;
+  frameDimensionsChange: any;
+  disableFaceEnhancement: any;
+  disableFaceEnhancementChange: any;
   index: number;
-  highQuality: any;
-  highQualityChange: any;
   still: any;
   stillChange: any;
   style: any;
@@ -70,8 +76,10 @@ const InputPage = ({
   cropping,
   cropChange,
   imageProps,
-  highQuality,
-  highQualityChange,
+  frameDimensions,
+  frameDimensionsChange,
+  disableFaceEnhancement,
+  disableFaceEnhancementChange,
   still,
   stillChange,
   toggle,
@@ -90,23 +98,24 @@ const InputPage = ({
           onRest: () => toggle.image(imageProps.file ? true : false),
         }}
       />
-      <label {...{ class: "sub-title", }}>Watermark</label>
-      <Checkbox {...{ checked: removeWatermark, label: "Remove (premium only)", onChange: removeWatermarkChange }}/>
-      
-      <label {...{ class: "sub-title", }}>Quality</label>
-      <Checkbox {...{ checked: highQuality, label: "High Quality", onChange: highQualityChange}}/>
 
-      <label {...{ class: "sub-title", }}>Cropping</label>
+      <label {...{ class: "sub-title", }}>Video Dimensions</label>
       <SegmentButtons {...{
-        onChange: cropChange,
-        options: [{ label: "Full", value: "full" },{ label: "Crop", value: "crop" },{ label: "Close crop", value: "close_crop" }],
-        value: cropping
+        onChange: frameDimensionsChange,
+        options: [{ label: "Landscape (Wide)", value: "twitter_landscape" },{ label: "Portrait (Tall)", value: "twitter_portrait" },{ label: "Square", value: "twitter_square" }],
+        value: frameDimensions
       }}/>
 
-      <label {...{ class: "sub-title", }}>Make Animation More Still</label>
-      <Checkbox {...{ checked: still, label: "Still", onChange: stillChange}}/>
-      <label {...{ class: "sub-title", }}>Animation style</label>
-      <NumberSlider {...{ min: 0, max: 32, onChange: animationChange, value: animationStyle }}/>
+      <label {...{ class: "sub-title", }}>Animation</label>
+      <Checkbox {...{ checked: still, label: "Reduce Movement (not recommended)", onChange: stillChange}}/>
+      <Checkbox {...{ checked: disableFaceEnhancement, label: "Disable Face Enhancer (not recommended)", onChange: disableFaceEnhancementChange}}/>
+
+      <label {...{ class: "sub-title", }}>Watermark</label>
+      <Checkbox {...{ checked: removeWatermark, label: "Remove Watermark (premium only)", onChange: removeWatermarkChange }}/>
+      
+      {/*<label {...{ class: "sub-title", }}>Animation style</label>
+      <NumberSlider {...{ min: 0, max: 32, onChange: animationChange, value: animationStyle }}/>*/}
+
     </div>
     <div {...{ className: "media-input-column col-lg-6" }}>
       <h5>{t("headings.audio")}</h5>
@@ -179,19 +188,24 @@ export default function LipsyncEditor({
   const imageProps = useFile({}); // contains upload inout state and controls, see docs
   const [index, indexSet] = useState<number>(0); // index  = slideshow slide position
 
-
-  const [animationStyle,animationStyleSet] = useState(0);
-  const [cropping,croppingSet] = useState("full");
+  //const [animationStyle,animationStyleSet] = useState(0);
+  const [frameDimensions,frameDimensionsSet] = useState("twitter_square");
   const [removeWatermark,removeWatermarkSet] = useState(false);
-  const [highQuality,highQualitySet] = useState(true);
+  const [disableFaceEnhancement,disableFaceEnhancementSet] = useState(false);
   const [still,stillSet] = useState(false);
 
-  const animationChange = ({ target }: any) => animationStyleSet(target.value);
-  const cropChange = ({ target }: any) => croppingSet(target.value);
+  //const animationChange = ({ target }: any) => animationStyleSet(target.value);
+  const frameDimensionsChange = ({ target }: any) => frameDimensionsSet(target.value);
   const removeWatermarkChange = ({ target }: any) => removeWatermarkSet(target.checked);
-  const highQualityChange = ({ target }: any) => highQualitySet(target.checked);
+  const disableFaceEnhancementChange = ({ target }: any) => disableFaceEnhancementSet(target.checked);
   const stillChange = ({ target }: any) => stillSet(target.checked);
-  const clearInputs = () => { animationStyleSet(0); croppingSet("crop"); removeWatermarkSet(false);  }
+  const clearInputs = () => { 
+    //animationStyleSet(0); 
+    stillSet(false); 
+    frameDimensionsSet("twitter_square"); 
+    removeWatermarkSet(false); 
+    disableFaceEnhancementSet(false);
+  }
 
   const makeRequest = (mode: number) => ({
     uuid_idempotency_token: uuidv4(),
@@ -232,10 +246,10 @@ export default function LipsyncEditor({
             image_source: {
               maybe_media_upload_token: responses.image.upload_token,
             },
-            crop: cropping,
             make_still: still,
-            high_quality: highQuality,
+            disable_face_enhancement: disableFaceEnhancement,
             remove_watermark: removeWatermark,
+            dimensions: frameDimensions,
           });
         }
       })
@@ -282,14 +296,12 @@ export default function LipsyncEditor({
             <Page
               {...{
                 audioProps,
-                animationStyle,
-                animationChange,
-                cropChange,
-                cropping,
-                enqueueInferenceJob,
                 imageProps,
-                highQuality,
-                highQualityChange,
+                frameDimensions,
+                frameDimensionsChange,
+                disableFaceEnhancement,
+                disableFaceEnhancementChange,
+                enqueueInferenceJob,
                 still,
                 stillChange,
                 sessionSubscriptionsWrapper,

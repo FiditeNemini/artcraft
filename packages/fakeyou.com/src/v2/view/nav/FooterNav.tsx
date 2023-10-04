@@ -218,10 +218,6 @@ function FooterNav(props: Props) {
               </li>
 
               <li>
-                <Link to="/video">{t("productVideo")}</Link>
-              </li>
-
-              <li>
                 <Link to="/contribute">{t("productUploadModels")}</Link>
               </li>
             </div>
