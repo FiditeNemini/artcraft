@@ -29,6 +29,9 @@ use crate::util::common_commands::ffmpeg_logo_watermark_command;
 /// The maximum that either width or height can be
 const MAX_DIMENSION : u32 = 1500;
 
+const BUCKET_FILE_PREFIX: &str = "fakeyou_";
+const BUCKET_FILE_EXTENSION: &str = ".mp4";
+
 pub struct SadTalkerProcessJobArgs<'a> {
   pub job_dependencies: &'a JobDependencies,
   pub job: &'a AvailableInferenceJob,
@@ -288,7 +291,9 @@ pub async fn process_job(args: SadTalkerProcessJobArgs<'_>) -> Result<JobSuccess
   job_progress_reporter.log_status("uploading result")
       .map_err(|e| ProcessSingleJobError::Other(e))?;
 
-  let result_bucket_location = MediaFileBucketPath::generate_new();
+  let result_bucket_location = MediaFileBucketPath::generate_new(
+    Some(BUCKET_FILE_PREFIX),
+    Some(BUCKET_FILE_EXTENSION));
 
   let result_bucket_object_pathbuf = result_bucket_location.to_full_object_pathbuf();
 
@@ -323,7 +328,8 @@ pub async fn process_job(args: SadTalkerProcessJobArgs<'_>) -> Result<JobSuccess
     file_size_bytes,
     sha256_checksum: &file_checksum,
     public_bucket_directory_hash: result_bucket_location.get_object_hash(),
-    maybe_public_bucket_extension: None, // TODO(bt,2023-10-02): Add extension '.mp4'
+    maybe_public_bucket_prefix: Some(BUCKET_FILE_PREFIX),
+    maybe_public_bucket_extension: Some(BUCKET_FILE_EXTENSION),
     is_on_prem: args.job_dependencies.container.is_on_prem,
     worker_hostname: &args.job_dependencies.container.hostname,
     worker_cluster: &args.job_dependencies.container.cluster_name,

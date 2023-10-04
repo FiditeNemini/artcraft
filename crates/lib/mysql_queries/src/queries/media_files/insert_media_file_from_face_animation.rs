@@ -24,6 +24,7 @@ pub struct InsertArgs<'a> {
   //pub duration_millis: u64,
 
   pub public_bucket_directory_hash: &'a str,
+  pub maybe_public_bucket_prefix: Option<&'a str>,
   pub maybe_public_bucket_extension: Option<&'a str>,
 
   pub is_on_prem: bool,
@@ -86,6 +87,7 @@ SET
   checksum_sha2 = ?,
 
   public_bucket_directory_hash = ?,
+  maybe_public_bucket_prefix = ?,
   maybe_public_bucket_extension = ?,
 
   maybe_creator_user_token = ?,
@@ -113,6 +115,7 @@ SET
       args.sha256_checksum,
 
       args.public_bucket_directory_hash,
+      args.maybe_public_bucket_prefix,
       args.maybe_public_bucket_extension,
 
       args.job.maybe_creator_user_token,
