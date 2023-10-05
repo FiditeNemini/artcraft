@@ -24,6 +24,10 @@ pub enum IdCategory {
   /// Zs dataset which lives in the zs_voice_datasets table
   #[serde(rename = "zs_dataset")]
   ZsDataset,
+
+  /// Zs voice which lives in the zs_voices table
+  #[serde(rename = "zs_voice")]
+  ZsVoice,
 }
 
 // TODO(bt, 2022-12-21): This desperately needs MySQL integration tests!
@@ -37,6 +41,7 @@ impl IdCategory {
       Self::MediaFile => "media_file",
       Self::LipsyncAnimation => "lipsync_animation",
       Self::ZsDataset => "zs_dataset",
+      Self::ZsVoice => "zs_voice",
     }
   }
 
@@ -45,6 +50,7 @@ impl IdCategory {
       "media_file" => Ok(Self::MediaFile),
       "lipsync_animation" => Ok(Self::LipsyncAnimation),
       "zs_dataset" => Ok(Self::ZsDataset),
+      "zs_voice" => Ok(Self::ZsVoice),
       _ => Err(format!("invalid value: {:?}", value)),
     }
   }
@@ -56,6 +62,7 @@ impl IdCategory {
       Self::MediaFile,
       Self::LipsyncAnimation,
       Self::ZsDataset,
+      Self::ZsVoice,
     ])
   }
 }
@@ -76,6 +83,7 @@ mod tests {
     assert_eq!(IdCategory::MediaFile.to_str(), "media_file");
     assert_eq!(IdCategory::LipsyncAnimation.to_str(), "lipsync_animation");
     assert_eq!(IdCategory::ZsDataset.to_str(), "zs_dataset");
+    assert_eq!(IdCategory::ZsVoice.to_str(), "zs_voice");
   }
 
   #[test]
@@ -83,6 +91,7 @@ mod tests {
     assert_eq!(IdCategory::from_str("media_file").unwrap(), IdCategory::MediaFile);
     assert_eq!(IdCategory::from_str("lipsync_animation").unwrap(), IdCategory::LipsyncAnimation);
     assert_eq!(IdCategory::from_str("zs_dataset").unwrap(), IdCategory::ZsDataset);
+    assert_eq!(IdCategory::from_str("zs_voice").unwrap(), IdCategory::ZsVoice);
   }
 
   #[test]
@@ -93,6 +102,7 @@ mod tests {
     assert_eq!(variants.pop_first(), Some(IdCategory::MediaFile));
     assert_eq!(variants.pop_first(), Some(IdCategory::LipsyncAnimation));
     assert_eq!(variants.pop_first(), Some(IdCategory::ZsDataset));
+    assert_eq!(variants.pop_first(), Some(IdCategory::ZsVoice));
     assert_eq!(variants.pop_first(), None);
 
     // Generated check

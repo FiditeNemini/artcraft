@@ -28,6 +28,7 @@ pub(crate) enum EntityType {
   VoiceConversionResult,
   W2lTemplate,
   ZsDataset,
+  ZsVoice,
 }
 
 impl EntityType {
@@ -48,7 +49,8 @@ impl EntityType {
       Self::VoiceConversionModel => "vcm_",
       Self::VoiceConversionResult => "vcr_",
       Self::W2lTemplate => "WT:", // NB: Old-style prefix, do not use for future tokens.
-      Self::ZsDataset => "zs_",
+      Self::ZsDataset => "zsd_",
+      Self::ZsVoice => "zsv_",
     }
   }
 }

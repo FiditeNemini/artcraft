@@ -7,7 +7,7 @@ use actix_web::http::StatusCode;
 use log::{info, warn};
 
 
-pub async fn create_voice() -> HttpResponse {
+pub async fn create_voice_handler() -> HttpResponse {
   // Implementation for creating a voice
   HttpResponse::Ok().json("Voice created successfully")
 }

@@ -14,7 +14,7 @@ use http_server_common::response::serialize_as_json_error::serialize_as_json_err
 use mysql_queries::queries::voice_designer::create_dataset::{create_dataset, CreateDatasetArgs};
 use mysql_queries::queries::voice_designer::get_dataset::get_dataset_by_token;
 use mysql_queries::queries::voice_designer::update_dataset::{update_dataset, UpdateDatasetArgs};
-use tokens::tokens::dataset::ZsDatasetToken;
+use tokens::tokens::zs_dataset::ZsDatasetToken;
 
 use crate::server_state::ServerState;
 

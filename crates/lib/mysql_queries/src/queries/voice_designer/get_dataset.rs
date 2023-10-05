@@ -8,7 +8,7 @@ use enums::by_table::media_uploads::media_upload_type::MediaUploadType;
 use enums::common::visibility::Visibility;
 use errors::AnyhowResult;
 use tokens::files::media_upload::MediaUploadToken;
-use tokens::tokens::dataset::ZsDatasetToken;
+use tokens::tokens::zs_dataset::ZsDatasetToken;
 
 
 pub struct ZsDataset {
@@ -84,7 +84,7 @@ async fn select_include_deleted(
       RawDataset,
         r#"
         SELECT
-        zd.token as `token: tokens::tokens::dataset::ZsDatasetToken`,
+        zd.token as `token: tokens::tokens::zs_dataset::ZsDatasetToken`,
         zd.title,
         zd.ietf_language_tag,
         zd.ietf_primary_language_subtag,
@@ -107,7 +107,7 @@ async fn select_without_deleted(
       RawDataset,
         r#"
         SELECT
-        zd.token as `token: tokens::tokens::dataset::ZsDatasetToken`,
+        zd.token as `token: tokens::tokens::zs_dataset::ZsDatasetToken`,
         zd.title,
         zd.ietf_language_tag,
         zd.ietf_primary_language_subtag,
