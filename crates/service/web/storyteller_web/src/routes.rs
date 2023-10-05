@@ -122,7 +122,7 @@ use crate::http_server::endpoints::w2l::set_w2l_template_mod_approval::set_w2l_t
 
 use crate::http_server::endpoints::voice_designer::create_dataset::create_dataset_handler;
 use crate::http_server::endpoints::voice_designer::update_dataset::update_dataset_handler;
-use crate::http_server::endpoints::voice_designer::delete_dataset::delete_dataset;
+use crate::http_server::endpoints::voice_designer::delete_dataset::delete_dataset_handler;
 use crate::http_server::endpoints::voice_designer::list_datasets_by_user::list_datasets_by_user;
 
 use crate::http_server::endpoints::voice_designer::create_voice::create_voice;
@@ -1145,7 +1145,7 @@ fn add_voice_designer_routes<T,B> (app:App<T>)-> App<T>
                           .route(web::post().to(update_dataset_handler))
                           .route(web::head().to(|| HttpResponse::Ok()))
                       )
-                      .route("/{dataset_token}/delete", web::delete().to(delete_dataset))
+                      .route("/{dataset_token}/delete", web::delete().to(delete_dataset_handler))
                       .route("/user/{user_token}/list", web::get().to(list_datasets_by_user))
               )
               .service(

@@ -9,6 +9,7 @@ use log::{error, log, warn};
 use enums::common::visibility::Visibility;
 
 use http_server_common::request::get_request_ip::get_request_ip;
+use http_server_common::response::response_success_helpers::simple_json_success;
 use http_server_common::response::serialize_as_json_error::serialize_as_json_error;
 use mysql_queries::queries::voice_designer::create_dataset::{create_dataset, CreateDatasetArgs};
 use mysql_queries::queries::voice_designer::get_dataset::get_dataset_by_token;
@@ -97,8 +98,11 @@ pub async fn update_dataset_handler(
   };
 
   let dataset_token = path.dataset_token.clone();
+  let is_mod = user_session.can_ban_users;
+
   let dataset_lookup_result = get_dataset_by_token(
     &ZsDatasetToken::new(dataset_token.clone()),
+    is_mod,
     &server_state.mysql_pool,
   ).await;
 
@@ -114,8 +118,10 @@ pub async fn update_dataset_handler(
       }
   };
 
-  let is_creator = dataset.maybe_creator_user_token == Some(user_session.user_token);
-  let is_mod = user_session.can_ban_users;
+  // let is_creator = dataset.maybe_creator_user_token == Some(user_session.user_token);
+  let is_creator = dataset.maybe_creator_user_token.as_deref()
+      .map(|creator_user_token| creator_user_token == &user_session.user_token)
+      .unwrap_or(false);
 
   if !is_creator && !is_mod {
     warn!("user is not allowed to edit this dataset: {}", user_session.user_token);
@@ -192,14 +198,5 @@ pub async fn update_dataset_handler(
     }
   };
 
-  let response = UpdateDatasetResponse {
-    success: true,
-  };
-
-  let body = serde_json::to_string(&response)
-      .map_err(|e| UpdateDatasetError::ServerError)?;
-
-  Ok(HttpResponse::Ok()
-      .content_type("application/json")
-      .body(body))
+  Ok(simple_json_success())
 }
