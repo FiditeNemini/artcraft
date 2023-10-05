@@ -1,0 +1,23 @@
+{
+  "communityDiscord": "Discord",
+  "communityGuide": "Führung",
+  "communityLeaderboard": "Bestenliste",
+  "communityTitle": "Gemeinschaft",
+  "communityUploadModels": "Modelle hochladen",
+  "infoPricing": "Preisgestaltung",
+  "logOutButton": "Ausloggen",
+  "loginButton": "Anmeldung",
+  "profileButton": "Profil",
+  "queueFaceAnimator": "Animationen in der Warteschlange",
+  "queueRvc": "RVC in der Warteschlange",
+  "queueSvc": "SVC in der Warteschlange",
+  "queueTitle": "Service-Warteschlangen",
+  "queueTts": "TTS in der Warteschlange",
+  "signUpButton": "Melden Sie sich an",
+  "speechTitle": "Spracherzeugung",
+  "speechTts": "Text zu Sprache",
+  "speechVc": "Stimme zu Stimme",
+  "videoFaceAnimator": "Gesichtsanimator",
+  "videoTitle": "Videogenerierung",
+  "videoW2l": "Video-Lippensynchronisation"
+}

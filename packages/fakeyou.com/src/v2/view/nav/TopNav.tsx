@@ -159,7 +159,7 @@ function TopNav(props: Props) {
   }
 
   return (
-    <div>
+    <div className="d-none d-lg-block">
       <nav
         className="navbar navbar-expand-lg navbar-dark pt-3"
         aria-label="Offcanvas navbar large"

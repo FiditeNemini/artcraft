@@ -8,7 +8,7 @@ import {
 } from "@storyteller/components/src/api/locale/DetectLocale";
 import { Language } from "@storyteller/components/src/i18n/Language";
 import { BrowserRouter, Route, Switch } from "react-router-dom";
-import { PageContainer } from "./v2/view/PageContainer";
+import PageContainer from "./v2/view/PageContainer";
 import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
 import { PosthogClient } from "@storyteller/components/src/analytics/PosthogClient";
 import { SessionSubscriptionsWrapper } from "@storyteller/components/src/session/SessionSubscriptionsWrapper";
@@ -45,15 +45,21 @@ import {
   AVAILABLE_LANGUAGE_MAP,
   ENGLISH_LANGUAGE,
 } from "./_i18n/AvailableLanguageMap";
-import { FrontendInferenceJobType, InferenceJob } from "@storyteller/components/src/jobs/InferenceJob";
-import { GetModelInferenceJobStatus, GetModelInferenceJobStatusIsOk } from "@storyteller/components/src/api/model_inference/GetModelInferenceJobStatus";
+import {
+  FrontendInferenceJobType,
+  InferenceJob,
+} from "@storyteller/components/src/jobs/InferenceJob";
+import {
+  GetModelInferenceJobStatus,
+  GetModelInferenceJobStatusIsOk,
+} from "@storyteller/components/src/api/model_inference/GetModelInferenceJobStatus";
 import { VoiceConversionModelUploadJob } from "@storyteller/components/src/jobs/VoiceConversionModelUploadJob";
 import { VoiceConversionModelListItem } from "@storyteller/components/src/api/voice_conversion/ListVoiceConversionModels";
-import HttpBackend from 'i18next-http-backend'
+import HttpBackend from "i18next-http-backend";
 
 // NB: We're transitioning over to this instance of i18n-next that loads translations over HTTP from Json Files.
 // The old i18n-next instance (see below) bakes in translations into the compiled javascript blob.
-// This new instance uses the Locize paid service to manage translation strings on their website. It's automated, 
+// This new instance uses the Locize paid service to manage translation strings on their website. It's automated,
 // can easily sync to version control, and makes translation easy to maintain across a wide number of languages.
 export const i18n2 = i18n.createInstance();
 
@@ -79,16 +85,14 @@ i18n
     },
   });
 
-i18n2
-  .use(HttpBackend)
-  .init({
-    fallbackLng: "en",
-    debug: false,
-    backend: {
-      // This is the path localizations are loaded from.
-      loadPath: '/locales/{{lng}}/{{ns}}.json',
-    }
-  });
+i18n2.use(HttpBackend).init({
+  fallbackLng: "en",
+  debug: false,
+  backend: {
+    // This is the path localizations are loaded from.
+    loadPath: "/locales/{{lng}}/{{ns}}.json",
+  },
+});
 
 enum MigrationMode {
   NEW_VOCODES,
@@ -123,8 +127,8 @@ interface Props {
   maybeSelectedTtsModel?: TtsModelListItem;
   setMaybeSelectedTtsModel: (maybeSelectedTtsModel: TtsModelListItem) => void;
 
-  selectedTtsLanguageScope: string,
-  setSelectedTtsLanguageScope: (selectedTtsLanguageScope: string) => void,
+  selectedTtsLanguageScope: string;
+  setSelectedTtsLanguageScope: (selectedTtsLanguageScope: string) => void;
 }
 
 interface State {
@@ -310,7 +314,8 @@ class App extends React.Component<Props, State> {
       let preferredLanguage = ENGLISH_LANGUAGE;
 
       for (let languageCode of locale.language_codes) {
-        let maybeLanguage = AVAILABLE_LANGUAGE_MAP[languageCode as AvailableLanguageKey];
+        let maybeLanguage =
+          AVAILABLE_LANGUAGE_MAP[languageCode as AvailableLanguageKey];
 
         if (maybeLanguage !== undefined) {
           preferredLanguage = maybeLanguage;
@@ -373,12 +378,14 @@ class App extends React.Component<Props, State> {
   };
 
   setAllVoiceConversionModels = (models: VoiceConversionModelListItem[]) => {
-    this.setState({ voiceConversionModels: models })
-  }
+    this.setState({ voiceConversionModels: models });
+  };
 
-  setMaybeSelectedVoiceConversionModel =(model?: VoiceConversionModelListItem) => {
-    this.setState({ maybeSelectedVoiceConversionModel: model })
-  }
+  setMaybeSelectedVoiceConversionModel = (
+    model?: VoiceConversionModelListItem
+  ) => {
+    this.setState({ maybeSelectedVoiceConversionModel: model });
+  };
 
   checkInferenceJob = async (jobToken: string) => {
     const lookupResult = await GetModelInferenceJobStatus(jobToken);
@@ -394,17 +401,21 @@ class App extends React.Component<Props, State> {
           !jobStateCanChange(existingJob.jobState)
         ) {
           updatedJobs.push(existingJob);
-          inferenceJobsByCategory.get(existingJob.frontendJobType)?.push(existingJob);
+          inferenceJobsByCategory
+            .get(existingJob.frontendJobType)
+            ?.push(existingJob);
           return;
         }
 
         let updatedJob = InferenceJob.fromResponse(
-          lookupResult.state!, 
+          lookupResult.state!,
           existingJob.frontendJobType
         );
 
         updatedJobs.push(updatedJob);
-        inferenceJobsByCategory.get(updatedJob.frontendJobType)?.push(updatedJob);
+        inferenceJobsByCategory
+          .get(updatedJob.frontendJobType)
+          ?.push(updatedJob);
       });
 
       this.setState({
@@ -414,7 +425,10 @@ class App extends React.Component<Props, State> {
     }
   };
 
-  enqueueInferenceJob = (jobToken: string, frontendJobType: FrontendInferenceJobType) => {
+  enqueueInferenceJob = (
+    jobToken: string,
+    frontendJobType: FrontendInferenceJobType
+  ) => {
     const newJob = new InferenceJob(jobToken, frontendJobType);
     let inferenceJobs = this.state.inferenceJobs.concat([newJob]);
 
@@ -689,7 +703,9 @@ class App extends React.Component<Props, State> {
           return;
         }
 
-        let updatedJob = VoiceConversionModelUploadJob.fromResponse(lookupResult.state!);
+        let updatedJob = VoiceConversionModelUploadJob.fromResponse(
+          lookupResult.state!
+        );
         updatedJobs.push(updatedJob);
       });
 
@@ -809,8 +825,12 @@ class App extends React.Component<Props, State> {
                     w2lTemplateUploadJobs={this.state.w2lTemplateUploadJobs}
                     enqueueVocoderUploadJob={this.enqueueVocoderUploadJob}
                     vocoderUploadJobs={this.state.vocoderUploadJobs}
-                    enqueueVoiceConversionModelUploadJob={this.enqueueVoiceConversionModelUploadJob}
-                    voiceConversionModelUploadJobs={this.state.voiceConversionModelUploadJobs}
+                    enqueueVoiceConversionModelUploadJob={
+                      this.enqueueVoiceConversionModelUploadJob
+                    }
+                    voiceConversionModelUploadJobs={
+                      this.state.voiceConversionModelUploadJobs
+                    }
                     textBuffer={this.state.textBuffer}
                     setTextBuffer={this.setTextBuffer}
                     clearTextBuffer={this.clearTextBuffer}
@@ -839,13 +859,20 @@ class App extends React.Component<Props, State> {
                     setMaybeSelectedTtsModel={
                       this.props.setMaybeSelectedTtsModel
                     }
-                    selectedTtsLanguageScope={this.props.selectedTtsLanguageScope}
-                    setSelectedTtsLanguageScope={this.props.setSelectedTtsLanguageScope}
-
+                    selectedTtsLanguageScope={
+                      this.props.selectedTtsLanguageScope
+                    }
+                    setSelectedTtsLanguageScope={
+                      this.props.setSelectedTtsLanguageScope
+                    }
                     voiceConversionModels={this.state.voiceConversionModels}
                     setVoiceConversionModels={this.setAllVoiceConversionModels}
-                    maybeSelectedVoiceConversionModel={this.state.maybeSelectedVoiceConversionModel}
-                    setMaybeSelectedVoiceConversionModel={this.setMaybeSelectedVoiceConversionModel}
+                    maybeSelectedVoiceConversionModel={
+                      this.state.maybeSelectedVoiceConversionModel
+                    }
+                    setMaybeSelectedVoiceConversionModel={
+                      this.setMaybeSelectedVoiceConversionModel
+                    }
                   />
                 </Route>
               </Switch>
