@@ -1,5 +1,14 @@
 @import "scss/colours.scss";
 
+.fy-checkbox-frame {
+  margin-bottom: .5rem;
+  white-space: nowrap;
+
+  label {
+    margin-left: .5rem;
+  }
+}
+
 .fy-checkbox {
   background-color: $primary;
   border-radius: .5rem;

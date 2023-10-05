@@ -21,7 +21,7 @@ export default function Checkbox({ checked, className = "", label = "", name = "
   });
   const onClick = ({ target }: any) => onChange({ target: { checked: !checked, name, type: 'checkbox' } });
   const id = "checkbox-" + useId();
-  return <div {...{ ...makeClass("form-check",className),  }}>
+  return <div {...{ ...makeClass("fy-checkbox-frame",className),  }}>
     <a.svg {...{ className: "fy-checkbox", onClick, style, ...hoverEvents }}>
       <Check {...{ checked }}/>
     </a.svg>

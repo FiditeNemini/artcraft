@@ -30,8 +30,12 @@ import {
 } from "@storyteller/components/src/jobs/InferenceJob";
 
 interface LipSyncProps {
+  // animationChange: any;
+  // animationStyle: any;
   audioProps: any;
   children?: any;
+  // cropChange: any;
+  // cropping: any;
   imageProps: any;
   frameDimensions: any;
   frameDimensionsChange: any;
@@ -62,7 +66,11 @@ interface EditorProps {
 const softSpring = { config: { mass: 1, tension: 80, friction: 10 } };
 
 const InputPage = ({
+  // animationChange,
+  // animationStyle,
   audioProps,
+  // cropping,
+  // cropChange,
   imageProps,
   frameDimensions,
   frameDimensionsChange,
@@ -87,22 +95,6 @@ const InputPage = ({
         }}
       />
 
-      <label {...{ class: "sub-title", }}>Video Dimensions</label>
-      <SegmentButtons {...{
-        onChange: frameDimensionsChange,
-        options: [{ label: "Landscape (Wide)", value: "twitter_landscape" },{ label: "Portrait (Tall)", value: "twitter_portrait" },{ label: "Square", value: "twitter_square" }],
-        value: frameDimensions
-      }}/>
-
-      <label {...{ class: "sub-title", }}>Animation</label>
-      <Checkbox {...{ checked: still, label: "Reduce Movement (not recommended)", onChange: stillChange}}/>
-      <Checkbox {...{ checked: disableFaceEnhancement, label: "Disable Face Enhancer (not recommended)", onChange: disableFaceEnhancementChange}}/>
-
-      <label {...{ class: "sub-title", }}>Watermark</label>
-      <Checkbox {...{ checked: removeWatermark, label: "Remove Watermark (premium only)", onChange: removeWatermarkChange }}/>
-      
-      {/*<label {...{ class: "sub-title", }}>Animation style</label>
-      <NumberSlider {...{ min: 0, max: 32, onChange: animationChange, value: animationStyle }}/>*/}
     </div>
     <div {...{ className: "media-input-column col-lg-6" }}>
       <h5>{t("headings.audio")}</h5>
@@ -116,6 +108,26 @@ const InputPage = ({
         }}
       />
     </div>
+    <div {...{ className: "animation-configure-panel panel" }}>
+      <fieldset {...{ className: "input-block" }}>
+        <legend>Video Dimensions</legend>
+        <SegmentButtons {...{
+          onChange: frameDimensionsChange,
+          options: [{ label: "Landscape (Wide)", value: "twitter_landscape" },{ label: "Portrait (Tall)", value: "twitter_portrait" },{ label: "Square", value: "twitter_square" }],
+          value: frameDimensions
+        }}/>
+      </fieldset>
+      <fieldset {...{ className: "input-block" }}>
+        <legend>Watermark</legend>
+        <Checkbox {...{ checked: removeWatermark, label: "Remove Watermark (premium only)", onChange: removeWatermarkChange }}/>
+      </fieldset>
+      <fieldset {...{ className: "input-block" }}>
+        <legend>Animation</legend>
+        <Checkbox {...{ checked: still, label: "Reduce Movement (not recommended)", onChange: stillChange}}/>
+        <Checkbox {...{ checked: disableFaceEnhancement, label: "Disable Face Enhancer (not recommended)", onChange: disableFaceEnhancementChange}}/>
+      </fieldset>
+    </div>
+
   </animated.div>;
 };
 
@@ -174,7 +186,6 @@ export default function LipsyncEditor({
   const audioProps = useFile({}); // contains upload inout state and controls, see docs
   const imageProps = useFile({}); // contains upload inout state and controls, see docs
   const [index, indexSet] = useState<number>(0); // index  = slideshow slide position
-
 
   //const [animationStyle,animationStyleSet] = useState(0);
   const [frameDimensions,frameDimensionsSet] = useState("twitter_square");
