@@ -1,9 +1,6 @@
-import React, { useState } from 'react';
-import { animated, useSpring } from "@react-spring/web";
-import { useVideo } from "hooks";
-import { AudioInput, Checkbox, ImageInput, SegmentButtons } from "components/common";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faPlay } from "@fortawesome/free-solid-svg-icons";
+import React from "react";
+import { animated } from "@react-spring/web";
+import { AudioInput, BasicVideo, Checkbox, ImageInput, SegmentButtons } from "components/common";
 import { FaceAnimatorSlide } from "./FaceAnimatorTypes";
 
 export default function FaceAnimatorInput({  
@@ -20,14 +17,6 @@ export default function FaceAnimatorInput({
   t,
   removeWatermark,
   removeWatermarkChange, }: FaceAnimatorSlide) {
-  const [tint,tintSet] = useState(true);
-  const [{ playCtrl },vidProps] = useVideo({ onEnded: () => tintSet(true) });
-  const tintSpring = useSpring({
-    onRest: () => { if (!tint) { playCtrl!(tintSet) }},
-    opacity: tint ? 1 : 0
-  });
-  const overlayClick = () => tintSet(!tint);
-
   return <animated.div {...{ className: "lipsync-editor row", style }}>
     <div {...{ className: "media-input-column col-lg-6" }}>
       <h5>{t("headings.image")}</h5>
@@ -49,15 +38,7 @@ export default function FaceAnimatorInput({
           hideActions: true,
         }}
       />
-      <div {...{ className: "video-frame" }}>
-        <video {...{ playsInline: true, ...vidProps }}>
-          <source src="/videos/face-animator-instruction-en.mp4" type="video/mp4" />
-        </video>
-        <animated.div {...{ className: "video-overlay", onClick: overlayClick, style: tintSpring }}>
-          <h6>Face Animator Sample</h6>
-          <FontAwesomeIcon icon={faPlay} />
-        </animated.div>
-      </div>
+      <BasicVideo {...{ src: "/videos/face-animator-instruction-en.mp4" }}/>
     </div>
     <div {...{ className: "animation-configure-panel panel" }}>
       <fieldset {...{ className: "input-block" }}>
