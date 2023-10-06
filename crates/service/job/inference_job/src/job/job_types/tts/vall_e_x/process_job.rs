@@ -48,7 +48,7 @@ pub struct VALLEXProcessJobArgs<'a> {
     // Need to download the models
     info!("Download models (if not present)...");
     let mut i : usize = 0;
-    for downloader in deps.job_type_details.sad_talker.downloaders.all_downloaders() {
+    for downloader in deps.job_type_details.vall_e_x.downloaders.all_downloaders() {
 
         // Temporary debugging
         info!("Downloader {}", i);
@@ -65,9 +65,21 @@ pub struct VALLEXProcessJobArgs<'a> {
         }
     }
 
-    // Download embeddings 
+    // Download embeddings files
         
-    //
+    // rinr inference 
 
+      // ==================== TEMP DIR ==================== //
+      // create a temp dir 
+
+      // run inference
+
+      // upload audio to bucket
+
+      // deletetemp dir files
+
+      // save result ? 
+
+      
 
   }
