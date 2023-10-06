@@ -18,9 +18,12 @@ pub async fn seed_zero_shot_tts(mysql_pool: &Pool<MySql>) -> AnyhowResult<()> {
   };
 
   let records = [
-    ("Goku", "todo", &user_token),
-    ("David Attenborough", "todo", &user_token),
-    ("Ash Ketchum", "todo", &user_token),
+    ("Alice", "qtqaprnd5shtybve4fqpvcfp50yjw238fbgj92z1521c50xqdxy1akkhkw7tesj0", &user_token),
+    ("Biden", "n945w0xsq15xrh16hc147a5mc1a91gwh886e14qqzte1gr9z9q3yawjfvanp4fmg", &user_token),
+    ("Goku", "cnnv05yjst2m737dpmxazgfpksjf4y7cxxern2ph7gddgnkh2bw1ephg5mhjbz14", &user_token),
+    ("Hilary", "7wav68ba2yy86491jk36cgk36tkmzesr452dgfs28wchkrr03bd0h3e6c1bbz9eg", &user_token),
+    ("Obama", "z3gy4v56sgtfrxfrpvaj7v74sqc67rcqs89jb884b00zfdm9vmkf1w2fsnta0gwp", &user_token),
+    ("Trump", "qcy7pv3rph0ntkqnpz5cfg9ksyh7kkz53v1wbr2ckvt8znvhxqn7ca5mz7wzm3q5", &user_token),
   ];
 
   for (voice_name, bucket_hash, user_token) in records {
