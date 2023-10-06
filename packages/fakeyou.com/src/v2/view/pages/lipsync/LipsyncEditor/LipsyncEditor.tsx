@@ -102,7 +102,7 @@ const InputPage = ({
         }}
       />
     </div>
-    <div {...{ className: "media-input-column col-lg-6" }}>
+    <div {...{ className: "media-input-column audio-input-column col-lg-6" }}>
       <h5>{t("headings.audio")}</h5>
       <AudioInput
         {...{
