@@ -79,7 +79,7 @@ pub async fn process_single_tts_job(
                 job_dependencies,
                 job,
             }).await?;
-            Ok(job_success_result);
+            Ok::<JobSuccessResult,ProcessSingleJobError>(job_success_result);
         }
         // do nothing try regular tts else other zero shot models
     }
