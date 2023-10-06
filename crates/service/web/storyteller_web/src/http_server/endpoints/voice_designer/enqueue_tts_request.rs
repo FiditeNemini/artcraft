@@ -89,12 +89,12 @@ pub async fn enqueue_tts_request(
 
     println!("Recieved payload");
     let is_debug_request = true;
-    let maybe_user_token : Option<UserToken> =  Some(UserToken::new_from_str(&"place holder"));
+    let maybe_user_token : Option<UserToken> =  Some(UserToken::new_from_str(&"place holder")); // TODO fix this
     let priority_level = 0;
     //let disable_rate_limiter = false; // NB: Careful!
 
   // do something with user session check if the user should even be able to access the end point
-
+    // CAN address this soon just getting everything out of the way to just enqueue the job.
   // GET MY SQL
   // let mut mysql_connection = server_state.mysql_pool
   // .acquire()
@@ -104,6 +104,8 @@ pub async fn enqueue_tts_request(
   //   EnqueueTTSRequestError::ServerError
   // })?;
 
+  // return errors on payload not being correct
+  //Err(EnqueueTTSRequestError::ServerError) # missing voice token
 
 // TODO: check for session 
 
@@ -127,7 +129,7 @@ let ip_address = get_request_ip(&http_request);
 // package as larger component args should always have an embedding token ..
 let inference_args = TTSArgs {
   text: request.text,
-  maybe_voice_token: request.embedding_token
+  voice_token: request.embedding_token
 };
 
 // create the inference args here
@@ -149,7 +151,7 @@ let query_result = insert_generic_inference_job(InsertGenericInferenceArgs {
   creator_ip_address: &ip_address,
   creator_set_visibility: enums::common::visibility::Visibility::Public,
   priority_level,
-  requires_keepalive: true, //
+  requires_keepalive: true, // do we need this? I think so 
   is_debug_request,
   maybe_routing_tag: Some("Tag"), // TODO fix later what is this tag for?
   mysql_pool: &server_state.mysql_pool,
@@ -176,5 +178,5 @@ let body = serde_json::to_string(&response)
     .content_type("application/json")
     .body(body))
 
-  //Err(EnqueueTTSRequestError::ServerError)
+
 }

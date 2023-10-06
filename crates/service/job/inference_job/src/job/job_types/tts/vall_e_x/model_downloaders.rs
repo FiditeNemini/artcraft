@@ -40,7 +40,7 @@ crate::impl_model_downloader!(
     "VOCOS_ENCODEC_TENSOR_BUCKET_PATH",
     "dependencies/zero_shot_tts/vall-e-x_1.0/encodec_pytorch_model.bin",
     "VOCOS_ENCODEC_TENSOR_FILESYSTEM_PATH",
-    "dependencies/zero_shot_tts/vall-e-x_1.0/encodec_pytorch_model.bin"
+    "/tmp/downloads/zero_shot_tts/vall-e-x_1.0/encodec_pytorch_model.bin"
   );
 
 impl VallEXDownloaders {
