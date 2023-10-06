@@ -9,7 +9,6 @@ use tokens::users::user::UserToken;
 use crate::queries::generic_synthetic_ids::transactional_increment_generic_synthetic_id::transactional_increment_generic_synthetic_id;
 
 pub struct CreateDatasetArgs<'a> {
-    pub dataset_token: &'a ZsDatasetToken,
     pub dataset_title: &'a str,
     pub maybe_creator_user_token: Option<&'a str>,
     pub creator_ip_address: &'a str,
@@ -18,7 +17,8 @@ pub struct CreateDatasetArgs<'a> {
     pub mysql_pool: &'a MySqlPool
 }
 
-pub async fn create_dataset(args: CreateDatasetArgs<'_>) -> AnyhowResult<()>{
+pub async fn create_dataset(args: CreateDatasetArgs<'_>) -> AnyhowResult<ZsDatasetToken> {
+    let dataset_token = ZsDatasetToken::generate();
 
     // (KS/noob questions): confirm if dataset version is different from synthetic id
     // * confirm if language tags can only be "updated" or should be configurable on create
@@ -53,7 +53,7 @@ pub async fn create_dataset(args: CreateDatasetArgs<'_>) -> AnyhowResult<()>{
             maybe_mod_user_token = ?,
             maybe_creator_synthetic_id = ?
         "#,
-        args.dataset_token.as_str(),
+        dataset_token.as_str(),
         args.dataset_title,
         args.maybe_creator_user_token,
         args.creator_ip_address,
@@ -63,10 +63,9 @@ pub async fn create_dataset(args: CreateDatasetArgs<'_>) -> AnyhowResult<()>{
     ).execute(args.mysql_pool).await;
     // TODO(Kasisnu): This should probably rollback
     transaction.commit().await?;
+
     match query_result {
-        Ok(_) => Ok(()),
+        Ok(_) => Ok(dataset_token),
         Err(err) => Err(anyhow!("zs dataset creation error: {:?}", err)),
     }
-
 }
-

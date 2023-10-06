@@ -1799,6 +1799,22 @@ dependencies = [
 ]
 
 [[package]]
+name = "dev-database-seed"
+version = "0.0.1"
+dependencies = [
+ "config",
+ "easyenv",
+ "enums",
+ "errors",
+ "hashing",
+ "log",
+ "mysql_queries",
+ "sqlx",
+ "tokens",
+ "tokio 1.25.0",
+]
+
+[[package]]
 name = "diesel"
 version = "1.4.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2538,8 +2554,10 @@ dependencies = [
 name = "hashing"
 version = "0.0.1"
 dependencies = [
+ "bcrypt",
  "data-encoding",
  "errors",
+ "md-5",
  "ring 0.17.0-alpha.11",
 ]
 
