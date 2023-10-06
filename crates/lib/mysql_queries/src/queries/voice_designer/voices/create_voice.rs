@@ -1,17 +1,19 @@
 use anyhow::anyhow;
 use sqlx::MySqlPool;
-use enums::common::visibility::Visibility;
-use enums::by_table::generic_synthetic_ids::id_category::IdCategory;
 
+use enums::by_table::generic_synthetic_ids::id_category::IdCategory;
+use enums::common::visibility::Visibility;
 use errors::AnyhowResult;
 use tokens::tokens::zs_dataset::ZsDatasetToken;
 use tokens::tokens::zs_voice::ZsVoiceToken;
 use tokens::users::user::UserToken;
+
 use crate::queries::generic_synthetic_ids::transactional_increment_generic_synthetic_id::transactional_increment_generic_synthetic_id;
 
 pub struct CreateVoiceArgs<'a> {
   pub dataset_token: &'a ZsDatasetToken,
 
+  // TODO(bt,2023-10-06): These should be *Rust Enums* to limit their possible range of values.
   pub model_category: &'a str,
   pub model_type: &'a str,
   pub model_version: u64,
@@ -45,11 +47,6 @@ pub async fn create_voice(args: CreateVoiceArgs<'_>) -> AnyhowResult<ZsVoiceToke
 
     maybe_creator_synthetic_id = Some(next_zs_dataset_synthetic_id);
   }
-  // TODO(bt,2023-10-06): These should be parameters, and moreover they should be *enums*
-  //  to limit their possible values.
-  const MODEL_CATEGORY : &str = "vc";
-  const MODEL_TYPE : &str = "vall-e-x";
-  const ENCODING_TYPE : &str = "encodec";
 
   let query_result = sqlx::query!(
     r#"
@@ -69,9 +66,9 @@ pub async fn create_voice(args: CreateVoiceArgs<'_>) -> AnyhowResult<ZsVoiceToke
     "#,
     voice_token.as_str(),
     args.dataset_token,
-    MODEL_CATEGORY,
-    MODEL_TYPE,
-    ENCODING_TYPE,
+    args.model_category,
+    args.model_type,
+    args.model_encoding_type,
     args.voice_title,
     args.bucket_hash,
     args.maybe_creator_user_token,
