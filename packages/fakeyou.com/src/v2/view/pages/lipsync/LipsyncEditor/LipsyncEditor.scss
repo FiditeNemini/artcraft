@@ -2,6 +2,7 @@
 @import "scss/colours.scss";
 
 $under992: max-width 992px;
+$over992: min-width 992px;
 
 .lipsync-editor {
   padding-top: 2rem;
@@ -25,52 +26,6 @@ $under992: max-width 992px;
     }
   }
 
-  .video-frame {
-    overflow: hidden;
-    width: 100%;
-    margin: 0;
-    flex: 1;
-    position: relative;
-
-    video, .video-overlay {
-      border-radius: .5rem;
-      width: 100%;
-      height: 100%;
-    }
-
-    video { position: absolute; object-fit: cover; }
-
-    .video-overlay {
-      background: linear-gradient(rgba($primary,0.5) 0%, rgba($secondary,0.75) 75%);
-      cursor: pointer;
-      padding: 2rem;
-      position: absolute;
-      top: 0px;
-
-      h6 {
-        color: #fff;
-        filter: drop-shadow(0 3px 3px rgba($primary-dark,.25));
-        font-size: 2rem;
-        text-align: center;
-      }
-
-      svg {
-        filter: drop-shadow(0 3px 7px rgba($primary-dark,.45));
-        position: absolute;
-        width: 3rem;
-        height: 3rem;
-        inset: 50%;
-        transform: translate(-50%, -50%);
-      }
-
-      .video-play-button {
-        background-color: green;
-        width: 4rem;
-        height: 4rem;
-        stroke: white;
-      }
-    }
-  }
   .animation-configure-panel {
     margin: 1.5rem 0 -.5rem;
     padding: 1rem;
@@ -176,3 +131,22 @@ $under992: max-width 992px;
     font-size: 0.75rem;
   }
 }
+
+  .face-animator-mobile-sample {
+    padding: 1rem;
+
+    @include breakpoint($over992) {
+      display: none;
+    }
+  }
+
+  .face-animator-wide-sample {
+    flex: 1;
+    height: auto;
+
+    @include breakpoint($under992) {
+      display: none;
+    }
+
+    video { position: absolute ;}
+  }

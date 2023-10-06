@@ -38,7 +38,7 @@ export default function FaceAnimatorInput({
           hideActions: true,
         }}
       />
-      <BasicVideo {...{ src: "/videos/face-animator-instruction-en.mp4" }}/>
+      <BasicVideo {...{ className: "face-animator-wide-sample", src: "/videos/face-animator-instruction-en.mp4" }}/>
     </div>
     <div {...{ className: "animation-configure-panel panel" }}>
       <fieldset {...{ className: "input-block" }}>

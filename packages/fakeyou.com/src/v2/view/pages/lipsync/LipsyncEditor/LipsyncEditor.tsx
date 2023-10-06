@@ -23,6 +23,7 @@ import FaceAnimatorInput from './FaceAnimatorInput';
 import FaceAnimatorWorking from './FaceAnimatorWorking';
 import FaceAnimatorSuccess from "./FaceAnimatorSuccess";
 import { FaceAnimatorCore } from "./FaceAnimatorTypes";
+import { BasicVideo } from "components/common";
 import "./LipsyncEditor.scss";
 import { FrontendInferenceJobType } from "@storyteller/components/src/jobs/InferenceJob";
 
@@ -170,6 +171,9 @@ export default function LipsyncEditor({
             <></>
           );
         })}
+      </div>
+      <div {...{ className: "face-animator-mobile-sample" }}>
+        <BasicVideo {...{ src: "/videos/face-animator-instruction-en.mp4" }}/>
       </div>
     </div>
   );
