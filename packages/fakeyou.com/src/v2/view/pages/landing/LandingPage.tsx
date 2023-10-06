@@ -13,12 +13,8 @@ import { faDiscord, faTwitter } from "@fortawesome/free-brands-svg-icons";
 import { WebUrl } from "../../../../common/WebUrl";
 import { faFileArrowUp, faSparkles } from "@fortawesome/pro-solid-svg-icons";
 import { PosthogClient } from "@storyteller/components/src/analytics/PosthogClient";
+import { FooterNav } from "v2/view/nav/FooterNav";
 import Alert from "components/common/Alert/Alert";
-// import {
-//   faFileArrowUp,
-//   faMicrophone,
-//   faRightLeft,
-// } from "@fortawesome/pro-solid-svg-icons";
 // import { Analytics } from "../../../../../common/Analytics";
 
 interface Props {
@@ -535,6 +531,8 @@ function LandingPage(props: Props) {
           />
         </div>
       </div>
+
+      <FooterNav sessionWrapper={props.sessionWrapper} />
     </div>
   );
 }

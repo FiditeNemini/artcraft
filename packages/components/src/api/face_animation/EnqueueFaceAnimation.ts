@@ -18,6 +18,12 @@ export interface EnqueueFaceAnimationRequest {
 
   audio_source: AudioSource,
   image_source: ImageSource,
+
+  dimensions?: string,
+
+  make_still?: boolean,
+  disable_face_enhancement?: boolean,
+  remove_watermark?: boolean,
 }
 
 // export interface EnqueueFaceAnimationSuccessResponse {

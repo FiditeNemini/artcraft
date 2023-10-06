@@ -7,7 +7,6 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faPlus,
   faUsers,
-  faVideo,
   faTrophy,
   faUser,
   faSignOutAlt,
@@ -160,7 +159,7 @@ function TopNav(props: Props) {
   }
 
   return (
-    <div>
+    <div className="d-none d-lg-block">
       <nav
         className="navbar navbar-expand-lg navbar-dark pt-3"
         aria-label="Offcanvas navbar large"
@@ -252,12 +251,6 @@ function TopNav(props: Props) {
                           className="me-2"
                         />
                         {t("productFaceAnimator")}
-                      </Link>
-                    </li>
-                    <li data-bs-toggle="offcanvas">
-                      <Link className="dropdown-item" to="/video">
-                        <FontAwesomeIcon icon={faVideo} className="me-2" />
-                        {t("productVideo")}
                       </Link>
                     </li>
                     <hr className="my-2" />

@@ -3,9 +3,10 @@
 
 
 .image-upload-frame {
-	@include breakpoint(min-width 992px) {
-		aspect-ratio: 1/1;
-	}
+	// aspect-ratio: 4/3;
+	// @include breakpoint(min-width 992px) {
+	// 	aspect-ratio: 1/1;
+	// }
 }
 
 .fy-image-uploader {

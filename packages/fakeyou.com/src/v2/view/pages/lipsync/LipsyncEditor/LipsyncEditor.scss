@@ -58,6 +58,21 @@ $under992: max-width 992px;
       }
     }
   }
+  .animation-configure-panel {
+    margin: 1rem 0 -.5rem;
+    padding: 1rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: .5rem 2rem;
+
+    .input-block {
+      legend {
+        font-size: .875rem;
+      };
+      flex-grow: 1;
+      vertical-align: top;
+    }
+  }
 }
 
 .progress-header {

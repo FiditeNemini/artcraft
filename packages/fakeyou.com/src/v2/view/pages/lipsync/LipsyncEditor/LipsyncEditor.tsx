@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { animated, useSpring, useTransition } from "@react-spring/web";
 import { v4 as uuidv4 } from "uuid";
 import { useFile, useLocalize, useVideo } from "hooks";
-import { AudioInput, ImageInput, Spinner } from "components/common";
+import { AudioInput, Checkbox, ImageInput, SegmentButtons, Spinner } from "components/common";
 import { springs } from "resources";
 import {
   UploadAudio,
@@ -29,16 +29,28 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlay } from "@fortawesome/free-solid-svg-icons";
 
 interface LipSyncProps {
+  // animationChange: any;
+  // animationStyle: any;
   audioProps: any;
   children?: any;
+  // cropChange: any;
+  // cropping: any;
   imageProps: any;
+  frameDimensions: any;
+  frameDimensionsChange: any;
+  disableFaceEnhancement: any;
+  disableFaceEnhancementChange: any;
   index: number;
-  toggle: any;
+  still: any;
+  stillChange: any;
   style: any;
+  toggle: any;
   enqueueInferenceJob: any;
   sessionSubscriptionsWrapper: any;
   t: any;
   inferenceJobsByCategory: any;
+  removeWatermark: any;
+  removeWatermarkChange: any;
 }
 interface EditorProps {
   sessionSubscriptionsWrapper: SessionSubscriptionsWrapper;
@@ -53,11 +65,23 @@ interface EditorProps {
 const softSpring = { config: { mass: 1, tension: 80, friction: 10 } };
 
 const InputPage = ({
+  // animationChange,
+  // animationStyle,
   audioProps,
+  // cropping,
+  // cropChange,
   imageProps,
+  frameDimensions,
+  frameDimensionsChange,
+  disableFaceEnhancement,
+  disableFaceEnhancementChange,
+  still,
+  stillChange,
   toggle,
   style,
   t,
+  removeWatermark,
+  removeWatermarkChange,
 }: LipSyncProps) => {
   const [tint,tintSet] = useState(true);
   const [{ playCtrl },vidProps] = useVideo({ onEnded: () => tintSet(true) });
@@ -98,6 +122,25 @@ const InputPage = ({
           <FontAwesomeIcon icon={faPlay} />
         </animated.div>
       </div>
+    </div>
+    <div {...{ className: "animation-configure-panel panel" }}>
+      <fieldset {...{ className: "input-block" }}>
+        <legend>Video Dimensions</legend>
+        <SegmentButtons {...{
+          onChange: frameDimensionsChange,
+          options: [{ label: "Landscape (Wide)", value: "twitter_landscape" },{ label: "Portrait (Tall)", value: "twitter_portrait" },{ label: "Square", value: "twitter_square" }],
+          value: frameDimensions
+        }}/>
+      </fieldset>
+      <fieldset {...{ className: "input-block" }}>
+        <legend>Watermark</legend>
+        <Checkbox {...{ checked: removeWatermark, label: "Remove Watermark (premium only)", onChange: removeWatermarkChange }}/>
+      </fieldset>
+      <fieldset {...{ className: "input-block" }}>
+        <legend>Animation</legend>
+        <Checkbox {...{ checked: still, label: "Reduce Movement (not recommended)", onChange: stillChange}}/>
+        <Checkbox {...{ checked: disableFaceEnhancement, label: "Disable Face Enhancer (not recommended)", onChange: disableFaceEnhancementChange}}/>
+      </fieldset>
     </div>
   </animated.div>;
 };
@@ -158,6 +201,25 @@ export default function LipsyncEditor({
   const imageProps = useFile({}); // contains upload inout state and controls, see docs
   const [index, indexSet] = useState<number>(0); // index  = slideshow slide position
 
+  //const [animationStyle,animationStyleSet] = useState(0);
+  const [frameDimensions,frameDimensionsSet] = useState("twitter_square");
+  const [removeWatermark,removeWatermarkSet] = useState(false);
+  const [disableFaceEnhancement,disableFaceEnhancementSet] = useState(false);
+  const [still,stillSet] = useState(false);
+
+  //const animationChange = ({ target }: any) => animationStyleSet(target.value);
+  const frameDimensionsChange = ({ target }: any) => frameDimensionsSet(target.value);
+  const removeWatermarkChange = ({ target }: any) => removeWatermarkSet(target.checked);
+  const disableFaceEnhancementChange = ({ target }: any) => disableFaceEnhancementSet(target.checked);
+  const stillChange = ({ target }: any) => stillSet(target.checked);
+  const clearInputs = () => { 
+    //animationStyleSet(0); 
+    stillSet(false); 
+    frameDimensionsSet("twitter_square"); 
+    removeWatermarkSet(false); 
+    disableFaceEnhancementSet(false);
+  }
+
   const makeRequest = (mode: number) => ({
     uuid_idempotency_token: uuidv4(),
     file: mode ? imageProps.file : audioProps.file,
@@ -186,6 +248,10 @@ export default function LipsyncEditor({
         if ("upload_token" in responses.image) {
           indexSet(3); // set face animator API working page
           return EnqueueFaceAnimation({
+            // backend_animation_key: animationStyle,
+            // backend_cropping_key: cropping === "cropped",
+            // backend_orientation_key: orientation === "landscape",
+            // backend_watermark_key: watermark,
             uuid_idempotency_token: uuidv4(),
             audio_source: {
               maybe_media_upload_token: responses.audio.upload_token,
@@ -193,6 +259,10 @@ export default function LipsyncEditor({
             image_source: {
               maybe_media_upload_token: responses.image.upload_token,
             },
+            make_still: still,
+            disable_face_enhancement: disableFaceEnhancement,
+            remove_watermark: removeWatermark,
+            dimensions: frameDimensions,
           });
         }
       })
@@ -213,6 +283,7 @@ export default function LipsyncEditor({
   const headerProps = {
     audioProps,
     audioReady,
+    clearInputs,
     imageProps,
     imageReady,
     indexSet,
@@ -239,13 +310,21 @@ export default function LipsyncEditor({
               {...{
                 audioProps,
                 imageProps,
+                frameDimensions,
+                frameDimensionsChange,
+                disableFaceEnhancement,
+                disableFaceEnhancementChange,
                 enqueueInferenceJob,
+                still,
+                stillChange,
                 sessionSubscriptionsWrapper,
                 inferenceJobsByCategory,
                 index,
                 t,
                 toggle: { audio: readyMedia(1), image: readyMedia(0) },
                 style,
+                removeWatermark,
+                removeWatermarkChange,
               }}
             />
           ) : (

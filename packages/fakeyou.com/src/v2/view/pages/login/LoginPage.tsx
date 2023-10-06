@@ -88,8 +88,8 @@ function LoginPage(props: Props) {
   }
 
   return (
-    <div>
-      <div className="container-panel pb-5 pt-lg-5 my-lg-5 login-panel">
+    <div className="pt-lg-5">
+      <div className="container-panel pb-5 pt-lg-5 login-panel">
         <div className="panel p-3 p-lg-4 load-hidden mt-5 mt-lg-0 px-md-4">
           <h1 className="panel-title fw-bold">Login</h1>
           <div className="py-6">
