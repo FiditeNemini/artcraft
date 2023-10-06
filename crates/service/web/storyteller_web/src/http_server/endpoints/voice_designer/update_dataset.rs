@@ -11,9 +11,9 @@ use enums::common::visibility::Visibility;
 use http_server_common::request::get_request_ip::get_request_ip;
 use http_server_common::response::response_success_helpers::simple_json_success;
 use http_server_common::response::serialize_as_json_error::serialize_as_json_error;
-use mysql_queries::queries::voice_designer::create_dataset::{create_dataset, CreateDatasetArgs};
-use mysql_queries::queries::voice_designer::get_dataset::get_dataset_by_token;
-use mysql_queries::queries::voice_designer::update_dataset::{update_dataset, UpdateDatasetArgs};
+use mysql_queries::queries::voice_designer::datasets::create_dataset::{create_dataset, CreateDatasetArgs};
+use mysql_queries::queries::voice_designer::datasets::get_dataset::get_dataset_by_token;
+use mysql_queries::queries::voice_designer::datasets::update_dataset::{update_dataset, UpdateDatasetArgs};
 use tokens::tokens::zs_dataset::ZsDatasetToken;
 
 use crate::server_state::ServerState;

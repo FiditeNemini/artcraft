@@ -10,7 +10,7 @@ use enums::common::visibility::Visibility;
 
 use http_server_common::request::get_request_ip::get_request_ip;
 use http_server_common::response::serialize_as_json_error::serialize_as_json_error;
-use mysql_queries::queries::voice_designer::create_dataset::{create_dataset, CreateDatasetArgs};
+use mysql_queries::queries::voice_designer::datasets::create_dataset::{create_dataset, CreateDatasetArgs};
 use tokens::tokens::zs_dataset::ZsDatasetToken;
 
 use crate::server_state::ServerState;
