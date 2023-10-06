@@ -17,6 +17,8 @@ pub struct BucketPathUnifier {
   pub w2l_inference_output_root: PathBuf,
   pub w2l_model_root: PathBuf,
   pub w2l_end_bump_root: PathBuf,
+  // Zero shot
+  pub zs_tts_speaker_embedding_root: PathBuf,
   // VC
   pub rvc_v2_model_root: PathBuf,
   pub softvc_model_root: PathBuf,
@@ -39,6 +41,8 @@ impl BucketPathUnifier {
       w2l_inference_output_root: PathBuf::from("/w2l_inference_output"),
       w2l_model_root: PathBuf::from("/w2l_pretrained_models"),
       w2l_end_bump_root: PathBuf::from("/w2l_end_bumps"),
+      // Zero shot
+      zs_tts_speaker_embedding_root: PathBuf::from("/user/zero_shot_embeddings/tts"),
       // VC
       rvc_v2_model_root: PathBuf::from("/user_uploaded_rvc_v2_models"),
       softvc_model_root: PathBuf::from("/user_uploaded_softvc_models"),
@@ -197,6 +201,19 @@ impl BucketPathUnifier {
       .join(video_filename)
   }
 
+  // ==================== ZERO SHOT SPEAKER EMBEDDINGS ==================== //
+
+  // NB: Entropic hash is not based on file hash and will be reused for future encodings.
+  pub fn zero_shot_tts_speaker_encoding(&self, entropic_hash: &str, version: u32) -> PathBuf {
+    let hashed_path = Self::hashed_directory_path(entropic_hash);
+    let speaker_encoding_filename = format!("{}_{}.zs", &entropic_hash, version);
+
+    self.zs_tts_speaker_embedding_root
+        .join(hashed_path)
+        .join(speaker_encoding_filename)
+  }
+
+
   // ==================== VOICE CONVERSION MODELS ==================== //
 
   // NB: Entropic hash is not based on file hash and is shared between .pth and .index files.
@@ -279,6 +296,7 @@ mod tests {
       w2l_model_root: PathBuf::from("/test_path_w2l_pretrained_models"),
       w2l_end_bump_root: PathBuf::from("/test_path_w2l_end_bumps"),
       // VOICE CONVERSION
+      zs_tts_speaker_embedding_root: PathBuf::from("/test/zs_tts_speaker_embedding_root"),
       rvc_v2_model_root: PathBuf::from("/test_path_rvc_v2_models"),
       softvc_model_root: PathBuf::from("/test_path_softvc_models"),
       so_vits_svc_model_root: PathBuf::from("/test_path_so_vits_svc_models"),
@@ -382,6 +400,27 @@ mod tests {
     assert_eq!(paths.w2l_inference_video_output_path("TYPE:ABCDEF").to_str().unwrap(),
                "/test_path_w2l_output/a/b/c/vocodes_video_TYPEABCDEF.mp4");
   }
+
+  #[test]
+  fn test_zero_shot_tts_speaker_encoding_paths() {
+    let paths = get_instance();
+    let entropic_hash = "entropic";
+    let version = 0;
+    assert_eq!(paths.zero_shot_tts_speaker_encoding(entropic_hash, version).to_str().unwrap(),
+               "/test/zs_tts_speaker_embedding_root/e/n/t/entropic_0.zs");
+
+    let version = 23;
+    assert_eq!(paths.zero_shot_tts_speaker_encoding(entropic_hash, version).to_str().unwrap(),
+               "/test/zs_tts_speaker_embedding_root/e/n/t/entropic_23.zs");
+  }
+
+  //#[test]
+  //fn test_temp() {
+  //  // TODO/TEMP: Generating paths to use in dev
+  //  let unifier = BucketPathUnifier::default_paths();
+  //  let path = unifier.zero_shot_tts_speaker_encoding("qcy7pv3rph0ntkqnpz5cfg9ksyh7kkz53v1wbr2ckvt8znvhxqn7ca5mz7wzm3q5", 0);
+  //  assert_eq!(path.to_str().unwrap(), "");
+  //}
 
   #[test]
   fn test_rvc_model_and_index_paths() {
