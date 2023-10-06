@@ -1,10 +1,10 @@
 use crate::util::model_downloader::ModelDownloader;
 
 pub struct VallEXDownloaders {
-    pub vall_e_x: String,
-    pub whisper_lg: String,
-    pub whisper_md: String,
-    pub vocos_encodec_24khz: String
+    pub vall_e_x: VallEXModelMapping,
+    pub whisper_lg: WhisperLargeModelMapping,
+    pub whisper_md: WhisperMediumModelMapping,
+    pub vocos_encodec_24khz: VocosEncodecModelMapping
 }
 
 crate::impl_model_downloader!(

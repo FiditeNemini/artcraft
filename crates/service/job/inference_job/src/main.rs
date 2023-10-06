@@ -316,8 +316,8 @@ async fn main() -> AnyhowResult<()> {
       },
       vall_e_x: VallEXDetails { 
         downloaders: VallEXDownloaders::build_all_from_env(),
-        inference_command: VallEXInferenceCommand, 
-        create_embedding_command: VallEXCreateEmbeddingCommand, 
+        inference_command: VallEXInferenceCommand::from_env()?, 
+        create_embedding_command: VallEXCreateEmbeddingCommand::from_env()?, 
       },
       vits: VitsDetails {
         inference_command: vits_inference_command()?,

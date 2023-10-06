@@ -22,6 +22,7 @@ use newrelic_telemetry::Client as NewRelicClient;
 use crate::job::job_types::lipsync::sad_talker::model_downloaders::SadTalkerDownloaders;
 use crate::job::job_types::lipsync::sad_talker::sad_talker_inference_command::SadTalkerInferenceCommand;
 use crate::job::job_types::tts::tacotron2_v2_early_fakeyou::tacotron2_inference_command::Tacotron2InferenceCommand;
+use crate::job::job_types::tts::vall_e_x::model_downloaders::VallEXDownloaders;
 use crate::job::job_types::tts::vits::vits_inference_command::VitsInferenceCommand;
 
 use crate::job::job_types::tts::vall_e_x::vall_e_x_inference_command::VallEXInferenceCommand;
@@ -205,6 +206,7 @@ pub struct SadTalkerDetails {
 // TODO: we will probably want a command type of some kind that implements 
 // some kind of interface that we can just pass strings to.
 pub struct VallEXDetails {
+  pub downloaders: VallEXDownloaders,
   pub inference_command: VallEXInferenceCommand,
   pub create_embedding_command: VallEXCreateEmbeddingCommand
 }

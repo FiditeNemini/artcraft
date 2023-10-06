@@ -26,12 +26,14 @@ use crate::job::job_types::tts::vall_e_x::validate_job::validate_job;
 
 use crate::job_dependencies::JobDependencies;
 
+
+// This will download everything get into the root host OS then ... will invoke inference using the pathes from the files invoked
 pub struct VALLEXProcessJobArgs<'a> {
     pub job_dependencies: &'a JobDependencies,
     pub job: &'a AvailableInferenceJob,
   }
 
-  pub async fn process_job(args: SadTalkerProcessJobArgs<'_>) -> Result<JobSuccessResult, ProcessSingleJobError> {
+  pub async fn process_job(args: VALLEXProcessJobArgs<'_>) -> Result<JobSuccessResult, ProcessSingleJobError> {
 
     // get job args and dependencies and execute them with the inputs
     let job = args.job;
@@ -84,4 +86,13 @@ pub struct VALLEXProcessJobArgs<'a> {
 
       
 
+  }
+
+
+  #[cfg(test)]
+  mod test {
+    #[test]
+    fn values() {
+      print!("{}","Hello!");
+    }
   }
