@@ -11,20 +11,11 @@ import { JobState } from "@storyteller/components/src/jobs/JobStates";
 import { Analytics } from "common/Analytics";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faDownload } from "@fortawesome/free-solid-svg-icons";
-
-interface Props {
-  audioProps: any;
-  imageProps: any;
-  style: any;
-  enqueueInferenceJob: any;
-  sessionSubscriptionsWrapper: any;
-  inferenceJobsByCategory: any;
-  t: any;
-}
+import { FaceAnimatorSlide } from "./FaceAnimatorTypes";
 
 const DEFAULT_QUEUE_REFRESH_INTERVAL_MILLIS = 15000;
 
-export default function FaceAnimatorSuccess({ audioProps, imageProps, style, enqueueInferenceJob, sessionSubscriptionsWrapper, inferenceJobsByCategory, t }: Props) {
+export default function FaceAnimatorSuccess({ audioProps, imageProps, style, enqueueInferenceJob, sessionSubscriptionsWrapper, inferenceJobsByCategory, t }: FaceAnimatorSlide) {
   const [pending, pendingSet] = useState<GetPendingTtsJobCountSuccessResponse>({
     success: true,
     pending_job_count: 0,

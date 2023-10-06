@@ -1,8 +1,7 @@
 import React, { useState } from "react";
-import { animated, useTransition } from "@react-spring/web";
+import { useTransition } from "@react-spring/web";
 import { v4 as uuidv4 } from "uuid";
 import { useFile, useLocalize } from "hooks";
-import { AudioInput, Checkbox, ImageInput, SegmentButtons, Spinner } from "components/common";
 import { springs } from "resources";
 import {
   UploadAudio,
@@ -19,162 +18,21 @@ import {
   // EnqueueFaceAnimationIsSuccess,
   // EnqueueFaceAnimationRequest,
 } from "@storyteller/components/src/api/face_animation/EnqueueFaceAnimation";
-// import { FrontendInferenceJobType } from "@storyteller/components/src/jobs/InferenceJob";
 import FaceAnimatorTitle from "./FaceAnimatorTitle";
+import FaceAnimatorInput from './FaceAnimatorInput';
+import FaceAnimatorWorking from './FaceAnimatorWorking';
 import FaceAnimatorSuccess from "./FaceAnimatorSuccess";
+import { FaceAnimatorCore } from "./FaceAnimatorTypes";
+import { BasicVideo } from "components/common";
 import "./LipsyncEditor.scss";
-import { SessionSubscriptionsWrapper } from "@storyteller/components/src/session/SessionSubscriptionsWrapper";
-import {
-  FrontendInferenceJobType,
-  InferenceJob,
-} from "@storyteller/components/src/jobs/InferenceJob";
-
-interface LipSyncProps {
-  // animationChange: any;
-  // animationStyle: any;
-  audioProps: any;
-  children?: any;
-  // cropChange: any;
-  // cropping: any;
-  imageProps: any;
-  frameDimensions: any;
-  frameDimensionsChange: any;
-  disableFaceEnhancement: any;
-  disableFaceEnhancementChange: any;
-  index: number;
-  still: any;
-  stillChange: any;
-  style: any;
-  toggle: any;
-  enqueueInferenceJob: any;
-  sessionSubscriptionsWrapper: any;
-  t: any;
-  inferenceJobsByCategory: any;
-  removeWatermark: any;
-  removeWatermarkChange: any;
-}
-interface EditorProps {
-  sessionSubscriptionsWrapper: SessionSubscriptionsWrapper;
-  enqueueInferenceJob: (
-    jobToken: string,
-    frontendInferenceJobType: FrontendInferenceJobType
-  ) => void;
-  inferenceJobs: Array<InferenceJob>;
-  inferenceJobsByCategory: Map<FrontendInferenceJobType, Array<InferenceJob>>;
-}
-
-const softSpring = { config: { mass: 1, tension: 80, friction: 10 } };
-
-const InputPage = ({
-  // animationChange,
-  // animationStyle,
-  audioProps,
-  // cropping,
-  // cropChange,
-  imageProps,
-  frameDimensions,
-  frameDimensionsChange,
-  disableFaceEnhancement,
-  disableFaceEnhancementChange,
-  still,
-  stillChange,
-  toggle,
-  style,
-  t,
-  removeWatermark,
-  removeWatermarkChange,
-}: LipSyncProps) => {
-
-  return  <animated.div {...{ className: "lipsync-editor row", style }}>
-    <div {...{ className: "media-input-column col-lg-6" }}>
-      <h5>{t("headings.image")}</h5>
-      <ImageInput
-        {...{
-          ...imageProps,
-          onRest: () => toggle.image(imageProps.file ? true : false),
-        }}
-      />
-
-    </div>
-    <div {...{ className: "media-input-column col-lg-6" }}>
-      <h5>{t("headings.audio")}</h5>
-      <AudioInput
-        {...{
-          ...audioProps,
-          onRest: (p: any, c: any, item: any, l: any) => {
-            toggle.audio(!!audioProps.file);
-          },
-          hideActions: true,
-        }}
-      />
-    </div>
-    <div {...{ className: "animation-configure-panel panel" }}>
-      <fieldset {...{ className: "input-block" }}>
-        <legend>Video Dimensions</legend>
-        <SegmentButtons {...{
-          onChange: frameDimensionsChange,
-          options: [{ label: "Landscape (Wide)", value: "twitter_landscape" },{ label: "Portrait (Tall)", value: "twitter_portrait" },{ label: "Square", value: "twitter_square" }],
-          value: frameDimensions
-        }}/>
-      </fieldset>
-      <fieldset {...{ className: "input-block" }}>
-        <legend>Watermark</legend>
-        <Checkbox {...{ checked: removeWatermark, label: "Remove Watermark (premium only)", onChange: removeWatermarkChange }}/>
-      </fieldset>
-      <fieldset {...{ className: "input-block" }}>
-        <legend>Animation</legend>
-        <Checkbox {...{ checked: still, label: "Reduce Movement (not recommended)", onChange: stillChange}}/>
-        <Checkbox {...{ checked: disableFaceEnhancement, label: "Disable Face Enhancer (not recommended)", onChange: disableFaceEnhancementChange}}/>
-      </fieldset>
-    </div>
-
-  </animated.div>;
-};
-
-const Working = ({ audioProps, imageProps, index, style, t }: LipSyncProps) => {
-  const workStatus = [
-    "",
-    t("status.uploadingAudio"),
-    t("status.uploadingImage"),
-    t("status.requestingAnimation"),
-    "",
-  ];
-  const transitions = useTransition(index, {
-    ...springs.soft,
-    from: { opacity: 0, position: "absolute" },
-    enter: { opacity: 1, position: "relative" },
-    leave: { opacity: 0, position: "absolute" },
-  });
-  return (
-    <animated.div {...{ className: "lipsync-working", style }}>
-      <div {...{ className: "lipsync-working-notice" }}>
-        <h2 {...{ className: "working-title" }}>
-          {" "}
-          {transitions(({ opacity, position }, i) => {
-            return (
-              <animated.span
-                {...{
-                  className: "working-title-text",
-                  style: { opacity, position: position as any },
-                }}
-              >
-                {workStatus[index]} ...
-              </animated.span>
-            );
-          })}
-        </h2>
-        <Spinner />
-      </div>
-    </animated.div>
-  );
-};
+import { FrontendInferenceJobType } from "@storyteller/components/src/jobs/InferenceJob";
 
 export default function LipsyncEditor({
   enqueueInferenceJob,
   sessionSubscriptionsWrapper,
   inferenceJobsByCategory,
   ...rest
-}: EditorProps) {
+}: FaceAnimatorCore) {
   const { t } = useLocalize("FaceAnimator");
 
   // the ready states are set by functions which run after the upload input animation is completed, which then illuminates the respective checkmark in a staggered way to draw attention to the workflow, and reduces concurrent animations
@@ -234,10 +92,6 @@ export default function LipsyncEditor({
         if ("upload_token" in responses.image) {
           indexSet(3); // set face animator API working page
           return EnqueueFaceAnimation({
-            // backend_animation_key: animationStyle,
-            // backend_cropping_key: cropping === "cropped",
-            // backend_orientation_key: orientation === "landscape",
-            // backend_watermark_key: watermark,
             uuid_idempotency_token: uuidv4(),
             audio_source: {
               maybe_media_upload_token: responses.audio.upload_token,
@@ -279,7 +133,7 @@ export default function LipsyncEditor({
   };
 
   const transitions = useTransition(index, {
-    ...softSpring,
+    ...springs.soft,
     from: { opacity: 0, position: "absolute" },
     enter: { opacity: 1, position: "relative" },
     leave: { opacity: 0, position: "absolute" },
@@ -290,7 +144,7 @@ export default function LipsyncEditor({
       <div {...{ className: "panel lipsync-panel p-3 py-4 p-md-4" }}>
         <FaceAnimatorTitle {...headerProps} />
         {transitions((style, i) => {
-          const Page = [InputPage, Working, FaceAnimatorSuccess][page];
+          const Page = [FaceAnimatorInput, FaceAnimatorWorking, FaceAnimatorSuccess][page];
           return Page ? (
             <Page
               {...{
@@ -317,6 +171,9 @@ export default function LipsyncEditor({
             <></>
           );
         })}
+      </div>
+      <div {...{ className: "face-animator-mobile-sample" }}>
+        <BasicVideo {...{ src: "/videos/face-animator-instruction-en.mp4" }}/>
       </div>
     </div>
   );

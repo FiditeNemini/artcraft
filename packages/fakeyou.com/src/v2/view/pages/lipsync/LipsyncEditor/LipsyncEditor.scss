@@ -1,5 +1,8 @@
 @import "scss/_breakpoint.scss";
+@import "scss/colours.scss";
+
 $under992: max-width 992px;
+$over992: min-width 992px;
 
 .lipsync-editor {
   padding-top: 2rem;
@@ -13,13 +16,18 @@ $under992: max-width 992px;
     }
   }
 
-  .sub-title {
-    display: block;
-    margin-top: 1rem;
+  .audio-input-column {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+
+    .fy-audio-uploder {
+      flex: 1 0 auto;
+    }
   }
 
   .animation-configure-panel {
-    margin: 1rem 0 -.5rem;
+    margin: 1.5rem 0 -.5rem;
     padding: 1rem;
     display: flex;
     flex-wrap: wrap;
@@ -123,3 +131,22 @@ $under992: max-width 992px;
     font-size: 0.75rem;
   }
 }
+
+  .face-animator-mobile-sample {
+    padding: 1rem;
+
+    @include breakpoint($over992) {
+      display: none;
+    }
+  }
+
+  .face-animator-wide-sample {
+    flex: 1;
+    height: auto;
+
+    @include breakpoint($under992) {
+      display: none;
+    }
+
+    video { position: absolute ;}
+  }
