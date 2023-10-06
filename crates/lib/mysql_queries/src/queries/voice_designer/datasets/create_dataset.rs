@@ -13,7 +13,6 @@ pub struct CreateDatasetArgs<'a> {
     pub maybe_creator_user_token: Option<&'a str>,
     pub creator_ip_address: &'a str,
     pub creator_set_visibility: &'a Visibility,
-    pub maybe_mod_user_token: Option<&'a str>,
     pub mysql_pool: &'a MySqlPool
 }
 
@@ -50,7 +49,6 @@ pub async fn create_dataset(args: CreateDatasetArgs<'_>) -> AnyhowResult<ZsDatas
             maybe_creator_user_token = ?,
             creator_ip_address = ?,
             creator_set_visibility = ?,
-            maybe_mod_user_token = ?,
             maybe_creator_synthetic_id = ?
         "#,
         dataset_token.as_str(),
@@ -58,7 +56,6 @@ pub async fn create_dataset(args: CreateDatasetArgs<'_>) -> AnyhowResult<ZsDatas
         args.maybe_creator_user_token,
         args.creator_ip_address,
         args.creator_set_visibility.to_str(),
-        args.maybe_mod_user_token,
         maybe_creator_synthetic_id
     ).execute(args.mysql_pool).await;
     // TODO(Kasisnu): This should probably rollback

@@ -21,7 +21,6 @@ pub struct UpdateVoiceArgs<'a> {
 }
 
 pub async fn update_voice(args: UpdateVoiceArgs<'_>) -> AnyhowResult<()>{
-
     // TODO: enforce checks for idempotency token
     let mut maybe_creator_synthetic_id : Option<u64> = None;
 
@@ -73,4 +72,3 @@ pub async fn update_voice(args: UpdateVoiceArgs<'_>) -> AnyhowResult<()>{
     }
 
 }
-

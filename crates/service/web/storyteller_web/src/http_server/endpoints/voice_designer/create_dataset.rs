@@ -76,8 +76,6 @@ pub async fn create_dataset_handler(http_request: HttpRequest, request: web::Jso
     },
   };
 
-  let is_mod = user_session.can_ban_users;
-
   let idempotency_token = request.idempotency_token.clone().ok_or(CreateDatasetError::BadInput("no idempotency token provided".to_string()))?;
 
   let title = request.title.clone();
@@ -86,18 +84,11 @@ pub async fn create_dataset_handler(http_request: HttpRequest, request: web::Jso
 
   let creator_set_visibility = request.creator_set_visibility.unwrap_or(Visibility::Public);
 
-  let mut maybe_mod_user_token = None;
-
-  if is_mod {
-    maybe_mod_user_token = Some(user_session.user_token.clone());
-  }
-
   let query_result = create_dataset(CreateDatasetArgs {
       dataset_title: &title,
       maybe_creator_user_token: Some(user_session.user_token.clone().as_ref()),
       creator_ip_address: &creator_ip_address,
       creator_set_visibility: &creator_set_visibility,
-      maybe_mod_user_token: maybe_mod_user_token.as_deref(),
       mysql_pool: &server_state.mysql_pool
   }).await;
 
