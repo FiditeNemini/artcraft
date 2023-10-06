@@ -5,9 +5,13 @@ use std::sync::Arc;
 use actix_web::{HttpRequest, HttpResponse, web};
 use actix_web::error::ResponseError;
 use actix_web::http::StatusCode;
+use actix_web::web::Path;
 use chrono::{DateTime, Utc};
 
 use log::{info, warn};
+use mysql_queries::queries::voice_designer::datasets::list_datasets::{list_datasets_by_token, list_datasets_with_connection};
+
+use crate::server_state::ServerState;
 
 #[derive(Serialize, Clone)]
 pub struct ZsDatasetRecordForResponse {
@@ -27,6 +31,11 @@ pub struct ZsDatasetRecordForResponse {
 pub struct ListDatasetsByUserSuccessResponse {
   pub success: bool,
   pub datasets: Vec<ZsDatasetRecordForResponse>,
+}
+
+#[derive(Deserialize)]
+pub struct ListDatasetsByUserPathInfo {
+  user_token: String,
 }
 
 #[derive(Debug)]
@@ -50,16 +59,72 @@ impl ResponseError for ListDatasetsByUserError {
   }
 }
 
-pub async fn list_datasets_by_user_handler(user_token: web::Path<String>) -> HttpResponse {
+pub async fn list_datasets_by_user_handler(
+  http_request: HttpRequest,
+  path: Path<ListDatasetsByUserPathInfo>,
+  server_state: web::Data<Arc<ServerState>>
+) -> Result<HttpResponse, ListDatasetsByUserError> {
 
   //TOOD(kasisnu):
-  // [ ] confirm if we need a feature flag to disable this endpoint
-  // [ ] check if this needs to be cached in Redis/anywhere - what's the diff between ephemeral/durable
   // [ ] double check if the fields in the struct are everything needed for the FE
-  // [ ] Mocks have a few datapoints I think I didn't track anywhere - stars/likes/plays/favorites
 
 
+  let maybe_user_session = server_state
+      .session_checker
+      .maybe_get_user_session(&http_request, &server_state.mysql_pool)
+      .await
+      .map_err(|e| {
+        warn!("Session checker error: {:?}", e);
+        ListDatasetsByUserError::ServerError
+      })?;
 
-  // Implementation for listing datasets for a user
-  HttpResponse::Ok().json(format!("List of datasets for user {}", user_token))
+  let user_session = match maybe_user_session {
+    Some(session) => session,
+    None => {
+      warn!("not logged in");
+      return Err(ListDatasetsByUserError::NotAuthorized);
+    }
+  };
+
+  let user_token = path.user_token.clone();
+  let is_mod = user_session.can_ban_users;
+
+  // TODO(kasisnu): fix this so this matches "private" scoping - did that mean visibility cause the user token is in the path
+  let query_results = list_datasets_by_token(&server_state.mysql_pool, Some(&user_token), is_mod).await.map_err(|e| {
+    warn!("Error querying for datasets: {:?}", e);
+    ListDatasetsByUserError::ServerError
+  });
+  let datasets = match query_results {
+    Ok(datasets) => datasets,
+    Err(e) => {
+      warn!("Error querying for datasets: {:?}", e);
+      return Err(ListDatasetsByUserError::ServerError);
+    }
+  };
+
+  let datasets = datasets.into_iter().map(|dataset| {
+    ZsDatasetRecordForResponse {
+      dataset_token: dataset.dataset_token,
+      title: dataset.title,
+      creator_set_visibility: dataset.creator_set_visibility.to_string() ,
+      ietf_language_tag: dataset.ietf_language_tag,
+      ietf_primary_language_subtag: dataset.ietf_primary_language_subtag,
+      maybe_creator_user_token: dataset.maybe_creator_user_token,
+
+      created_at: dataset.created_at,
+      updated_at: dataset.updated_at,
+    }
+  }).collect();
+
+  let response = ListDatasetsByUserSuccessResponse {
+      success: true,
+      datasets,
+  };
+
+  let body = serde_json::to_string(&response)
+      .map_err(|e| ListDatasetsByUserError::ServerError)?;
+
+  Ok(HttpResponse::Ok()
+      .content_type("application/json")
+      .body(body))
 }
