@@ -26,7 +26,6 @@ use std::fmt::Debug;
 use serde::Deserialize;
 use serde::Serialize;
 
-
 #[derive(Deserialize)]
 pub struct EnqueueTTSRequest {
   uuid_idempotency_token: String,

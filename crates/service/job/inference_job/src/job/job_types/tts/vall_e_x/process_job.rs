@@ -21,7 +21,8 @@ use crate::job::job_loop::process_single_job_error::ProcessSingleJobError;
 
 //use crate::job::job_types::lipsync::sad_talker::download_audio_file::download_audio_file;
 //use crate::job::job_types::lipsync::sad_talker::sad_talker_inference_command::InferenceArgs;
-//use crate::job::job_types::lipsync::sad_talker::validate_job::validate_job;
+
+use crate::job::job_types::tts::vall_e_x::validate_job::validate_job;
 
 use crate::job_dependencies::JobDependencies;
 
@@ -41,13 +42,14 @@ pub struct VALLEXProcessJobArgs<'a> {
     .new_generic_inference(job.inference_job_token.as_str())
     .map_err(|e| ProcessSingleJobError::Other(anyhow!(e)))?;
 
-    // validate the inputs on the job
-    let job_args = validate_job(job)?;
+    // validate the inputs on the job shouldn't this happen at json
+    //let job_args = validate_job(job)?;
 
 
     // Need to download the models
     info!("Download models (if not present)...");
     let mut i : usize = 0;
+
     for downloader in deps.job_type_details.vall_e_x.downloaders.all_downloaders() {
 
         // Temporary debugging
