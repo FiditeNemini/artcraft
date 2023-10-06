@@ -10,7 +10,10 @@ use crate::job::job_loop::process_single_job_error::ProcessSingleJobError;
 use crate::job::job_types::tts::{tacotron2_v2_early_fakeyou, vits};
 use crate::job::job_types::tts::tacotron2_v2_early_fakeyou::process_job::ProcessJobArgs;
 use crate::job::job_types::tts::vits::process_job::VitsProcessJobArgs;
+use crate::job::job_types::tts::vall_e_x::process_job::VALLEXProcessJobArgs;
 use crate::job_dependencies::JobDependencies;
+
+use super::vall_e_x;
 
 pub async fn process_single_tts_job(job_dependencies: &JobDependencies, job: &AvailableInferenceJob) -> Result<JobSuccessResult, ProcessSingleJobError> {
 
@@ -60,7 +63,16 @@ pub async fn process_single_tts_job(job_dependencies: &JobDependencies, job: &Av
 
 // Look for the Zeroshot job type
 
-
+ let job_success_result = match job.maybe_model_type {
+    Some(InferenceModelType::VallEX) => {
+      vall_e_x::process_job::process_job(VALLEXProcessJobArgs {
+        job_dependencies,
+        job,
+      }).await?
+    }
+    Some(model_type) => return Err(ProcessSingleJobError::Other(anyhow!("wrong model type: {:?}", model_type))),
+    None => return Err(ProcessSingleJobError::Other(anyhow!("no model type in record"))),
+  };
 
 // let these run anyways ? 
 

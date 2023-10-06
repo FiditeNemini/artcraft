@@ -25,7 +25,7 @@ use crate::job::job_loop::process_single_job_error::ProcessSingleJobError;
 
 use crate::job_dependencies::JobDependencies;
 
-pub struct VALL_E_XProcessJobArgs<'a> {
+pub struct VALLEXProcessJobArgs<'a> {
     pub job_dependencies: &'a JobDependencies,
     pub job: &'a AvailableInferenceJob,
   }
