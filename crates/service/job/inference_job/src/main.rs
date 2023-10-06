@@ -55,7 +55,10 @@ use crate::job::job_types::lipsync::sad_talker::sad_talker_inference_command::Sa
 use crate::job::job_types::tts::tacotron2_v2_early_fakeyou::tacotron2_inference_command::Tacotron2InferenceCommand;
 
 use crate::job::job_types::tts::vits::vits_inference_command::VitsInferenceCommand;
+
 use crate::job::job_types::tts::vall_e_x::vall_e_x_inference_command::VallEXInferenceCommand;
+use crate::job::job_types::tts::vall_e_x::vall_e_x_inference_command::VallEXCreateEmbeddingCommand;
+use crate::job::job_types::tts::vall_e_x::model_downloaders::VallEXDownloaders;
 
 use crate::job::job_types::vc::rvc_v2::pretrained_hubert_model::PretrainedHubertModel;
 use crate::job::job_types::vc::rvc_v2::rvc_v2_inference_command::RvcV2InferenceCommand;
@@ -311,10 +314,10 @@ async fn main() -> AnyhowResult<()> {
         hifigan_vocoder_model_filename,
         hifigan_superres_vocoder_model_filename,
       },
-      vallEX: VallEXDetails { 
+      vall_e_x: VallEXDetails { 
         downloaders: VallEXDownloaders::build_all_from_env(),
-        inference_command: "", 
-        create_embedding_command: "" 
+        inference_command: VallEXInferenceCommand, 
+        create_embedding_command: VallEXCreateEmbeddingCommand, 
       },
       vits: VitsDetails {
         inference_command: vits_inference_command()?,

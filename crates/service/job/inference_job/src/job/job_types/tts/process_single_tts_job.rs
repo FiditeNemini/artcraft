@@ -57,12 +57,19 @@ pub async fn process_single_tts_job(job_dependencies: &JobDependencies, job: &Av
 //
 //  info!("Lock acquired for job: {}", job.inference_job_token);
 
+
+// Look for the Zeroshot job type
+
+
+
+// let these run anyways ? 
+
   let tts_model = match maybe_tts_model {
     None => return Err(ProcessSingleJobError::Other(anyhow!("tts model not found: {:?}", tts_model_token))),
     Some(model) => model,
   };
 
-  let job_success_result = match tts_model.tts_model_type {
+  let job_success_result: JobSuccessResult = match tts_model.tts_model_type {
     TtsModelType::Tacotron2 => {
       tacotron2_v2_early_fakeyou::process_job::process_job(ProcessJobArgs {
         job_dependencies,

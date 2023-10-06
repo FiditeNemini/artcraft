@@ -1,1 +1,91 @@
 use crate::util::model_downloader::ModelDownloader;
+
+pub struct VallEXDownloaders {
+    pub vall_e_x: String,
+    pub whisper_lg: String,
+    pub whisper_md: String,
+    pub vocos_encodec_24khz: String
+}
+
+crate::impl_model_downloader!(
+    VallEXModelMapping,
+    "Vall-e-x Model Mapping",
+    "VALL_E_X_MAPPING_BUCKET_PATH",
+    "/dependencies/zero_shot_tts/vall-e-x_1.0",
+    "VALL_E_X_MAPPING_FILESYSTEM_PATH",
+    "/tmp/downloads/zero_shot_tts/vall-e-x_1.0" 
+  );
+  
+  crate::impl_model_downloader!(
+    WhisperLargeModelMapping,
+    "whisper Large Model Mapping",
+    "WHISPER_LARGE_MAPPING_BUCKET_PATH",
+    "dependencies/zero_shot_tts/vall-e-x_1.0/whisper-large",
+    "WHISPER_LARGE_MAPPING_FILESYSTEM_PATH",
+    "/tmp/downloads/zero_shot_tts/vall-e-x_1.0/whisper-large"
+  );
+  
+  crate::impl_model_downloader!(
+    WhisperMediumModelMapping,
+    "whisper Medium Model Mapping",
+    "WHISPER_MEDIUM_TENSOR_BUCKET_PATH",
+    "dependencies/zero_shot_tts/vall-e-x_1.0/whisper-medium",
+    "WHISPER_MEDIUM_TENSOR_FILESYSTEM_PATH",
+    "/tmp/downloads/zero_shot_tts/vall-e-x_1.0/whisper-medium"
+  );
+  
+  crate::impl_model_downloader!(
+    VocosEncodecModelMapping,
+    "Vocos Encodec Model Mapping",
+    "VOCOS_ENCODEC_TENSOR_BUCKET_PATH",
+    "dependencies/zero_shot_tts/vall-e-x_1.0/encodec_pytorch_model.bin",
+    "VOCOS_ENCODEC_TENSOR_FILESYSTEM_PATH",
+    "dependencies/zero_shot_tts/vall-e-x_1.0/encodec_pytorch_model.bin"
+  );
+
+impl VallEXDownloaders {
+    pub fn build_all_from_env() -> Self {
+      Self {
+        vall_e_x: VallEXModelMapping::from_env(),
+        whisper_lg: WhisperLargeModelMapping::from_env(),
+        whisper_md: WhisperMediumModelMapping::from_env(),
+        vocos_encodec_24khz: VocosEncodecModelMapping::from_env()
+      }
+    }
+  
+    pub fn all_downloaders(&self) -> Vec<&dyn ModelDownloader> {
+      vec![
+        &self.vall_e_x,
+        &self.whisper_lg,
+        &self.whisper_md,
+        &self.vocos_encodec_24khz,
+      ]
+    }
+  }
+  
+
+
+  mod test {
+    // use std::path::Path;
+  
+    // use crate::job::job_types::lipsync::sad_talker::model_downloaders::{SadTalkerModelFirstMapping, SadTalkerModelSecondMapping};
+    // use crate::util::model_downloader::ModelDownloader;
+  
+    // #[test]
+    // fn test_downloader_model_first_mapping() {
+    //   let model = SadTalkerModelFirstMapping::default();
+    //   assert_eq!(model.get_model_name(), "sad talker model first mapping");
+    //   assert_eq!(model.get_cloud_bucket_path(), "/animation_sadtalker/model/mapping_00109-model.pth.tar");
+    //   assert_eq!(model.get_filesystem_path(), Path::new("/tmp/downloads/sadtalker/mapping_00109-model.pth.tar"));
+    // }
+  
+    // #[test]
+    // fn test_downloader_model_second_mapping() {
+    //   let model = SadTalkerModelSecondMapping::default();
+    //   assert_eq!(model.get_model_name(), "sad talker model second mapping");
+    //   assert_eq!(model.get_cloud_bucket_path(), "/animation_sadtalker/model/mapping_00229-model.pth.tar");
+    //   assert_eq!(model.get_filesystem_path(), Path::new("/tmp/downloads/sadtalker/mapping_00229-model.pth.tar"));
+    // }
+
+  }
+  

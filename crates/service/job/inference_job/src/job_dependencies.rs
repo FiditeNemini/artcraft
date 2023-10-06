@@ -24,8 +24,8 @@ use crate::job::job_types::lipsync::sad_talker::sad_talker_inference_command::Sa
 use crate::job::job_types::tts::tacotron2_v2_early_fakeyou::tacotron2_inference_command::Tacotron2InferenceCommand;
 use crate::job::job_types::tts::vits::vits_inference_command::VitsInferenceCommand;
 
-use crate::job::job_types::tts::vallEX::vall_e_x_inference_command::VallEXInferenceCommand;
-use crate::job::job_types::tts::vallEX::vall_e_x_inference_command::VallEXCreateEmbeddingCommand;
+use crate::job::job_types::tts::vall_e_x::vall_e_x_inference_command::VallEXInferenceCommand;
+use crate::job::job_types::tts::vall_e_x::vall_e_x_inference_command::VallEXCreateEmbeddingCommand;
 
 use crate::job::job_types::vc::rvc_v2::pretrained_hubert_model::PretrainedHubertModel;
 use crate::job::job_types::vc::rvc_v2::rvc_v2_inference_command::RvcV2InferenceCommand;
@@ -165,7 +165,7 @@ pub struct JobTypeDetails {
   pub rvc_v2: RvcV2Details,
   pub so_vits_svc: SoVitsSvcDetails,
   pub sad_talker: SadTalkerDetails,
-  pub vallEX:  VallEXDetails
+  pub vall_e_x:  VallEXDetails
   //pub tacotron2_modern: ...,
   //pub softvc: ...,
 }

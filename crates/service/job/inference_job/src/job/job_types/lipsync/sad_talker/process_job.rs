@@ -77,7 +77,7 @@ pub async fn process_job(args: SadTalkerProcessJobArgs<'_>) -> Result<JobSuccess
       .new_tempdir(&work_temp_dir)
       .map_err(|e| ProcessSingleJobError::from_io_error(e))?;
 
-
+ 
   // ==================== QUERY AND DOWNLOAD FILES ==================== //
 
   let audio_path = download_audio_file(
@@ -132,9 +132,7 @@ pub async fn process_job(args: SadTalkerProcessJobArgs<'_>) -> Result<JobSuccess
   // ==================== RUN INFERENCE SCRIPT ==================== //
 
   let workdir = work_temp_dir.path().to_path_buf();
-
   let stderr_output_file = work_temp_dir.path().join("stderr.txt");
-
   let inference_start_time = Instant::now();
 
   let command_exit_status = args.job_dependencies
