@@ -128,8 +128,8 @@ let ip_address = get_request_ip(&http_request);
 
 // package as larger component args should always have an embedding token ..
 let inference_args = TTSArgs {
-  text: request.text,
-  voice_token: request.embedding_token
+  text: request.text.clone(),
+  voice_token: request.embedding_token.clone()
 };
 
 // create the inference args here
