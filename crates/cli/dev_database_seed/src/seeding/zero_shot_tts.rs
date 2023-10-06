@@ -1,32 +1,40 @@
-use log::{info, warn};
+use log::info;
 use sqlx::{MySql, Pool};
 
 use errors::{anyhow, AnyhowResult};
 use hashing::bcrypt::bcrypt_password_hash::bcrypt_password_hash;
 use hashing::md5::email_to_gravatar_hash::email_to_gravatar_hash;
 use mysql_queries::queries::users::user::create_account::{create_account, CreateAccountArgs};
+use mysql_queries::queries::users::user::get_user_token_by_username::get_user_token_by_username;
+use mysql_queries::queries::voice_designer::datasets::create_dataset::{create_dataset, CreateDatasetArgs};
+
+use crate::seeding::users::HANASHI_USERNAME;
 
 pub async fn seed_zero_shot_tts(mysql_pool: &Pool<MySql>) -> AnyhowResult<()> {
   info!("Seeding zero shot TTS...");
 
-  let users = [
-    ("admin", "admin@storyteller.ai", "password"),
-    ("hanashi", "admin@storyteller.ai", "password"),
-    ("test", "admin@storyteller.ai", "password"),
-  ];
+  let user_token = match get_user_token_by_username(HANASHI_USERNAME, mysql_pool).await? {
+    None => { return Err(anyhow!("could not find user hanashi")) }
+    Some(token) => token,
+  };
 
-  for (username, email, password) in users {
-    let result = seed_user(username, email, password, &mysql_pool).await;
-    match result {
-      Ok(_) => info!("Seeded {}", username),
-      Err(err) => warn!("Could not seed user {} : {:?}", username, err),
-    }
-  }
+  info!("Creating dataset...");
+
+  let dataset_token = create_dataset(CreateDatasetArgs {
+    dataset_title: "Goku Dataset",
+    maybe_creator_user_token: Some(user_token.as_str()),
+    creator_ip_address: "127.0.0.1",
+    creator_set_visibility: &Default::default(),
+    maybe_mod_user_token: None,
+    mysql_pool,
+  }).await?;
+
+
 
   Ok(())
 }
 
-async fn seed_user(
+async fn seed_dataset(
   username: &str,
   email_address: &str,
   password: &str,

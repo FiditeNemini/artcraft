@@ -91,9 +91,8 @@ pub async fn create_dataset_handler(http_request: HttpRequest, request: web::Jso
   if is_mod {
     maybe_mod_user_token = Some(user_session.user_token.clone());
   }
-  let dataset_token = ZsDatasetToken::generate();
+
   let query_result = create_dataset(CreateDatasetArgs {
-      dataset_token: &dataset_token,
       dataset_title: &title,
       maybe_creator_user_token: Some(user_session.user_token.clone().as_ref()),
       creator_ip_address: &creator_ip_address,
@@ -102,24 +101,24 @@ pub async fn create_dataset_handler(http_request: HttpRequest, request: web::Jso
       mysql_pool: &server_state.mysql_pool
   }).await;
 
-    match query_result {
-        Ok(_) => {},
-        Err(e) => {
-        error!("Error creating dataset: {:?}", e);
-        return Err(CreateDatasetError::ServerError);
-        }
+  let dataset_token = match query_result {
+    Ok(token) => token,
+    Err(e) => {
+      error!("Error creating dataset: {:?}", e);
+      return Err(CreateDatasetError::ServerError);
     }
+  };
 
-    let response = CreateDatasetResponse {
-        success: true,
-        token: Some(dataset_token),
-    };
+  let response = CreateDatasetResponse {
+    success: true,
+    token: Some(dataset_token),
+  };
 
 
-    let body = serde_json::to_string(&response)
-        .map_err(|e| CreateDatasetError::ServerError)?;
+  let body = serde_json::to_string(&response)
+      .map_err(|e| CreateDatasetError::ServerError)?;
 
-    Ok(HttpResponse::Ok()
-        .content_type("application/json")
-        .body(body))
+  Ok(HttpResponse::Ok()
+      .content_type("application/json")
+      .body(body))
 }

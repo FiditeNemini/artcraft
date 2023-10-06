@@ -6,17 +6,20 @@ use hashing::bcrypt::bcrypt_password_hash::bcrypt_password_hash;
 use hashing::md5::email_to_gravatar_hash::email_to_gravatar_hash;
 use mysql_queries::queries::users::user::create_account::{create_account, CreateAccountArgs};
 
+pub const ADMIN_USERNAME : &str = "admin";
+pub const HANASHI_USERNAME : &str = "hanashi";
+
 pub async fn seed_user_accounts(mysql_pool: &Pool<MySql>) -> AnyhowResult<()> {
   info!("Seeding user accounts...");
 
   let users = [
-    ("admin", "admin@storyteller.ai", "password"),
-    ("hanashi", "admin@storyteller.ai", "password"),
-    ("test", "admin@storyteller.ai", "password"),
+    (ADMIN_USERNAME, format!("{}@storyteller.ai", ADMIN_USERNAME), "password"),
+    (HANASHI_USERNAME, format!("{}@storyteller.ai", HANASHI_USERNAME), "password"),
+    ("test", "test@storyteller.ai".to_string(), "password"),
   ];
 
   for (username, email, password) in users {
-    let result = seed_user(username, email, password, &mysql_pool).await;
+    let result = seed_user(username, &email, password, &mysql_pool).await;
     match result {
       Ok(_) => info!("Seeded {}", username),
       Err(err) => warn!("Could not seed user {} : {:?}", username, err),
