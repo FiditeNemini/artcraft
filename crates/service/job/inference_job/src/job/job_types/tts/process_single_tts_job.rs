@@ -20,6 +20,7 @@ pub async fn process_single_tts_job(
     job_dependencies: &JobDependencies,
     job: &AvailableInferenceJob
 ) -> Result<JobSuccessResult, ProcessSingleJobError> {
+
     let tts_model_token = match job.maybe_model_token.as_deref() {
         None => {
             return Err(ProcessSingleJobError::Other(anyhow!("no model token on job")));
@@ -28,7 +29,6 @@ pub async fn process_single_tts_job(
     };
 
     // TODO: Move common checks for slurs, etc. here.
-
     let raw_inference_text = job.maybe_raw_inference_text
         .as_deref()
         .ok_or(ProcessSingleJobError::Other(anyhow!("no inference text")))?;
@@ -40,7 +40,6 @@ pub async fn process_single_tts_job(
     ).await.map_err(|err| ProcessSingleJobError::Other(anyhow!("database error: {:?}", err)))?;
 
     // TODO: Attempt to grab job lock
-
     //  // ==================== ATTEMPT TO GRAB JOB LOCK ==================== //
     //
     //  info!("Attempting to grab lock for job: {}", job.inference_job_token);
@@ -114,4 +113,5 @@ pub async fn process_single_tts_job(
         }
     };
     Ok(job_success_result)
+
 }
