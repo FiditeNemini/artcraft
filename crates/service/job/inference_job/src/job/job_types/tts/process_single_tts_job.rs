@@ -1,5 +1,6 @@
 use anyhow::anyhow;
 
+use enums::by_table::generic_inference_jobs::inference_model_type::InferenceModelType;
 use enums::by_table::tts_models::tts_model_type::TtsModelType;
 use mysql_queries::queries::generic_inference::job::list_available_generic_inference_jobs::AvailableInferenceJob;
 use mysql_queries::queries::tts::tts_models::get_tts_model_for_inference_improved::get_tts_model_for_inference_improved;
@@ -60,46 +61,51 @@ pub async fn process_single_tts_job(job_dependencies: &JobDependencies, job: &Av
 //
 //  info!("Lock acquired for job: {}", job.inference_job_token);
 
+  // Look for the Zeroshot job type
+  // let job_success_result = match job.maybe_model_type {
+  //   Some(InferenceModelType::VallEX) => {
+      
+  //   }
+  //   Some(model_type) => return Err(ProcessSingleJobError::Other(anyhow!("wrong model type: {:?}", model_type))),
+  //   None => return Err(ProcessSingleJobError::Other(anyhow!("no model type in record"))),
+  // };
 
-// Look for the Zeroshot job type
+    if let Some(model_type) = job.maybe_model_type {
+      if model_type ==  InferenceModelType::VallEX {
+          let job_success_result = vall_e_x::process_job::process_job(VALLEXProcessJobArgs {
+            job_dependencies,
+            job,
+          }).await?;
+          Ok(job_success_result)
+      };
+      // do nothing...
+    };
 
- let job_success_result = match job.maybe_model_type {
-    Some(InferenceModelType::VallEX) => {
-      vall_e_x::process_job::process_job(VALLEXProcessJobArgs {
-        job_dependencies,
-        job,
-      }).await?
-    }
-    Some(model_type) => return Err(ProcessSingleJobError::Other(anyhow!("wrong model type: {:?}", model_type))),
-    None => return Err(ProcessSingleJobError::Other(anyhow!("no model type in record"))),
-  };
+    // lets run the regular tts
+    let tts_model = match maybe_tts_model {
+      None => return Err(ProcessSingleJobError::Other(anyhow!("tts model not found: {:?}", tts_model_token))),
+      Some(model) => model,
+    };
 
-// let these run anyways ? 
-
-  let tts_model = match maybe_tts_model {
-    None => return Err(ProcessSingleJobError::Other(anyhow!("tts model not found: {:?}", tts_model_token))),
-    Some(model) => model,
-  };
-
-  let job_success_result: JobSuccessResult = match tts_model.tts_model_type {
-    TtsModelType::Tacotron2 => {
-      tacotron2_v2_early_fakeyou::process_job::process_job(ProcessJobArgs {
-        job_dependencies,
-        job,
-        tts_model: &tts_model,
-        raw_inference_text,
-      }).await?
-    }
-    TtsModelType::Vits => {
-      vits::process_job::process_job(VitsProcessJobArgs {
-        job_dependencies,
-        job,
-        tts_model: &tts_model,
-        raw_inference_text,
-      }).await?
-    }
-  };
-
-  Ok(job_success_result)
+    let job_success_result: JobSuccessResult = match tts_model.tts_model_type {
+      TtsModelType::Tacotron2 => {
+        tacotron2_v2_early_fakeyou::process_job::process_job(ProcessJobArgs {
+          job_dependencies,
+          job,
+          tts_model: &tts_model,
+          raw_inference_text,
+        }).await?
+      }
+      TtsModelType::Vits => {
+        vits::process_job::process_job(VitsProcessJobArgs {
+          job_dependencies,
+          job,
+          tts_model: &tts_model,
+          raw_inference_text,
+        }).await?
+      }
+    };
+    Ok(job_success_result)
+  } 
 }
 
