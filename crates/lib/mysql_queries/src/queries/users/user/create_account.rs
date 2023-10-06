@@ -23,6 +23,7 @@ pub struct CreateAccountSuccessResult {
   pub user_id: u64,
 }
 
+#[derive(Debug, Copy, Clone)]
 pub enum CreateAccountError {
   EmailIsTaken,
   UsernameIsTaken,

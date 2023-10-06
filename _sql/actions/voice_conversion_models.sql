@@ -302,7 +302,10 @@ where token IN (
     'vcm_p7m9jw1krrkr',
     'vcm_x7v3m9mcvten',
     'vcm_6r057m7594bv',
-    'vcm_wkm9e42d3spm'
+    'vcm_wkm9e42d3spm',
+    'vcm_cvz78weydh57',
+    'vcm_7g5q89m75n1p',
+    'vcm_fg3175bxy7kj'
 );
 
 

@@ -129,6 +129,8 @@ mod tests {
         maybe_preprocess: None,
         maybe_make_still: None,
         maybe_remove_watermark: None,
+        maybe_resize_width: None,
+        maybe_resize_height: None,
       })),
     };
 

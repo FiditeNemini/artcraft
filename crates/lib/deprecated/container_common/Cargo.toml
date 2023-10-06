@@ -19,7 +19,7 @@ hashing = { path = "../../files/hashing" }
 
 # External
 anyhow = "1.0.40"
-once_cell = "1.9.0"
+once_cell = "1.18.0"
 rand = "0.8.3"
 uuid = { version = "0.8.2", features = ["v4"] }
 log = "0.4.14"

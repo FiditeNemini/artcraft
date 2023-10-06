@@ -1,0 +1,39 @@
+[package]
+name = "dev-database-seed"
+edition = "2018"
+version = "0.0.1"
+authors = [
+    "Brandon Thomas <bt@brand.io>",
+    "Brandon Thomas <echelon@gmail.com>",
+]
+publish = false
+
+[[bin]]
+name = "dev-database-seed"
+path = "src/main.rs"
+
+[dependencies]
+# Internal
+config = { path = "../../lib/deprecated/config" }
+easyenv = { path = "../../lib/easyenv" }
+enums = { path = "../../_types/enums" }
+errors = { path = "../../lib/errors" }
+hashing = { path = "../../lib/files/hashing" }
+mysql_queries = { path = "../../lib/mysql_queries" }
+tokens = { path = "../../_types/tokens" }
+
+# External
+log = "0.4.14"
+
+# Runtime
+# NB: We switched to Tokio from `async-std` for broader ecosystem support.
+tokio = { version = "1.6.0", features = ["macros"] }
+
+# MySql Database
+# "offline" supports typesafe builds without a live database
+# "rustls" doesn't appear to work with IP addresses, per:
+# https://github.com/launchbadge/sqlx/issues/1095#issuecomment-798050828
+sqlx = { version = "0.6.2", features = [ "mysql", "runtime-actix-native-tls", "offline", "chrono" ] }
+
+[dev-dependencies]
+# None yet

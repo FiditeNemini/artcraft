@@ -146,6 +146,7 @@ pub static PRODUCTION_PREMIUM_PLANS: Lazy<HashSet<Plan>> = Lazy::new(|| {
         .web_vc_base_priority_level(30)
         .web_vc_requires_frontend_keepalive(false)
         .lipsync_requires_frontend_keepalive(false)
+        .can_remove_visual_watermarks(true)
         .build());
 
     plans.insert(PlanBuilder::new("fakeyou_elite")
@@ -159,6 +160,7 @@ pub static PRODUCTION_PREMIUM_PLANS: Lazy<HashSet<Plan>> = Lazy::new(|| {
         .web_vc_base_priority_level(40)
         .web_vc_requires_frontend_keepalive(false)
         .lipsync_requires_frontend_keepalive(false)
+        .can_remove_visual_watermarks(true)
         .build());
 
     // ========== Spanish plans ==========

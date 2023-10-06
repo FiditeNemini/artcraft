@@ -20,10 +20,17 @@ use crate::job::job_loop::job_success_result::{JobSuccessResult, ResultEntity};
 use crate::job::job_loop::process_single_job_error::ProcessSingleJobError;
 use crate::job::job_types::lipsync::sad_talker::download_audio_file::download_audio_file;
 use crate::job::job_types::lipsync::sad_talker::download_image_file::download_image_file;
+use crate::job::job_types::lipsync::sad_talker::resize_image::resize_image;
 use crate::job::job_types::lipsync::sad_talker::sad_talker_inference_command::InferenceArgs;
 use crate::job::job_types::lipsync::sad_talker::validate_job::validate_job;
 use crate::job_dependencies::JobDependencies;
 use crate::util::common_commands::ffmpeg_logo_watermark_command;
+
+/// The maximum that either width or height can be
+const MAX_DIMENSION : u32 = 1500;
+
+const BUCKET_FILE_PREFIX: &str = "fakeyou_";
+const BUCKET_FILE_EXTENSION: &str = ".mp4";
 
 pub struct SadTalkerProcessJobArgs<'a> {
   pub job_dependencies: &'a JobDependencies,
@@ -102,11 +109,50 @@ pub async fn process_job(args: SadTalkerProcessJobArgs<'_>) -> Result<JobSuccess
     &deps.mysql_pool
   ).await?;
 
-  info!("Image file: {:?}", image_path.filesystem_path);
+  info!("Downloaded image file: {:?}", image_path.filesystem_path);
 
   // ==================== TRANSCODE MEDIA (IF NECESSARY) ==================== //
 
-  // TODO
+  let mut usable_image_path = image_path.filesystem_path.clone();
+
+  if let Some((width, height)) = job_args.width.zip(job_args.height) {
+    info!("Requested image resize to {}x{} ...", width, height);
+
+    let mut width = width.min(MAX_DIMENSION);
+    let mut height = height.min(MAX_DIMENSION);
+
+    if job_args.enhancer.is_some() {
+      // The enhancer will double the size of the image, so we'll downsize the image by half
+      // if it's enabled.
+      width = width / 2;
+      height = height / 2;
+      info!("Enhancer will be doubling image size, so cutting frame size to {}x{}.", width, height)
+    }
+
+    info!("Resizing image to {}x{} ...", width, height);
+
+    let result = resize_image(
+      &image_path.filesystem_path,
+      &work_temp_dir,
+      width,
+      height
+    );
+
+    match result {
+      Err(err) => {
+        error!("Image resize failure: {:?}", err);
+        safe_delete_temp_file(&audio_path.filesystem_path);
+        safe_delete_temp_file(&image_path.filesystem_path);
+        safe_delete_temp_directory(&work_temp_dir);
+        return Err(ProcessSingleJobError::Other(anyhow!("image resize failure: {:?}", err)));
+      }
+      Ok(resized_image_path) => {
+        usable_image_path = resized_image_path;
+      }
+    }
+  }
+
+  info!("Used image file: {:?}", usable_image_path);
 
   // ==================== SETUP FOR INFERENCE ==================== //
 
@@ -122,7 +168,7 @@ pub async fn process_job(args: SadTalkerProcessJobArgs<'_>) -> Result<JobSuccess
 
   info!("Expected output video filename: {:?}", &output_video_fs_path);
 
-  // TODO: Limit output length for premium.
+  // TODO: Limit output length for non-premium (???)
 
   let maybe_args = job.maybe_inference_args
       .as_ref()
@@ -141,7 +187,7 @@ pub async fn process_job(args: SadTalkerProcessJobArgs<'_>) -> Result<JobSuccess
       .inference_command
       .execute_inference(InferenceArgs {
         input_audio: &audio_path.filesystem_path,
-        input_image: &image_path.filesystem_path,
+        input_image: &usable_image_path,
         work_dir: &workdir,
         output_file: &output_video_fs_path,
         stderr_output_file: &stderr_output_file,
@@ -168,6 +214,7 @@ pub async fn process_job(args: SadTalkerProcessJobArgs<'_>) -> Result<JobSuccess
 
     safe_delete_temp_file(&audio_path.filesystem_path);
     safe_delete_temp_file(&image_path.filesystem_path);
+    safe_delete_temp_file(&usable_image_path);
     safe_delete_temp_file(&output_video_fs_path);
     safe_delete_temp_file(&stderr_output_file);
     safe_delete_temp_directory(&work_temp_dir);
@@ -181,7 +228,7 @@ pub async fn process_job(args: SadTalkerProcessJobArgs<'_>) -> Result<JobSuccess
 
   check_file_exists(&output_video_fs_path).map_err(|e| ProcessSingleJobError::Other(e))?;
 
-  // ==================== WATERMARK ==================== //
+  // ==================== OPTIONAL WATERMARK ==================== //
 
   let mut finished_file = output_video_fs_path.clone();
 
@@ -205,13 +252,13 @@ pub async fn process_job(args: SadTalkerProcessJobArgs<'_>) -> Result<JobSuccess
       error!("Watermark failed: {:?}", command_exit_status);
       safe_delete_temp_file(&audio_path.filesystem_path);
       safe_delete_temp_file(&image_path.filesystem_path);
+      safe_delete_temp_file(&usable_image_path);
       safe_delete_temp_file(&output_video_fs_path);
       safe_delete_temp_file(&output_video_fs_path_watermark);
       safe_delete_temp_directory(&work_temp_dir);
       return Err(ProcessSingleJobError::Other(anyhow!("CommandExitStatus: {:?}", command_exit_status)));
     }
   }
-
 
   // ==================== CHECK ALL FILES EXIST AND GET METADATA ==================== //
 
@@ -242,7 +289,9 @@ pub async fn process_job(args: SadTalkerProcessJobArgs<'_>) -> Result<JobSuccess
   job_progress_reporter.log_status("uploading result")
       .map_err(|e| ProcessSingleJobError::Other(e))?;
 
-  let result_bucket_location = MediaFileBucketPath::generate_new();
+  let result_bucket_location = MediaFileBucketPath::generate_new(
+    Some(BUCKET_FILE_PREFIX),
+    Some(BUCKET_FILE_EXTENSION));
 
   let result_bucket_object_pathbuf = result_bucket_location.to_full_object_pathbuf();
 
@@ -261,6 +310,7 @@ pub async fn process_job(args: SadTalkerProcessJobArgs<'_>) -> Result<JobSuccess
 
   safe_delete_temp_file(&output_video_fs_path);
   safe_delete_temp_file(&output_video_fs_path_watermark);
+  safe_delete_temp_file(&usable_image_path);
 
   // NB: We should be using a tempdir, but to make absolutely certain we don't overflow the disk...
   safe_delete_temp_directory(&work_temp_dir);
@@ -276,6 +326,8 @@ pub async fn process_job(args: SadTalkerProcessJobArgs<'_>) -> Result<JobSuccess
     file_size_bytes,
     sha256_checksum: &file_checksum,
     public_bucket_directory_hash: result_bucket_location.get_object_hash(),
+    maybe_public_bucket_prefix: Some(BUCKET_FILE_PREFIX),
+    maybe_public_bucket_extension: Some(BUCKET_FILE_EXTENSION),
     is_on_prem: args.job_dependencies.container.is_on_prem,
     worker_hostname: &args.job_dependencies.container.hostname,
     worker_cluster: &args.job_dependencies.container.cluster_name,

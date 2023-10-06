@@ -20,4 +20,4 @@ easyenv = { path = "../../../lib/easyenv" }
 
 # External
 anyhow = "1.0.40"
-url = "2.2.2"
+url = "2.4.1"

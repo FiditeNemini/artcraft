@@ -207,7 +207,10 @@ pub async fn get_inference_job_status_handler(
     maybe_result: record.maybe_result_details.map(|result_details| {
       let public_bucket_media_path = match inference_category {
         InferenceCategory::LipsyncAnimation => {
-          MediaFileBucketPath::from_object_hash(&result_details.public_bucket_location_or_hash)
+          MediaFileBucketPath::from_object_hash(
+            &result_details.public_bucket_location_or_hash,
+            result_details.maybe_media_file_public_bucket_prefix.as_deref(),
+          result_details.maybe_media_file_public_bucket_extension.as_deref())
               .get_full_object_path_str()
               .to_string()
         }
