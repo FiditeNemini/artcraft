@@ -110,7 +110,6 @@ pub async fn delete_dataset_handler(
         }
     };
 
-    //TODO(kasisnu): Confirm who can delete/undelete and cleanup this logic
     let is_creator = dataset.maybe_creator_user_token.as_deref()
         .map(|creator_user_token| creator_user_token == &user_session.user_token)
         .unwrap_or(false);
@@ -145,12 +144,11 @@ pub async fn delete_dataset_handler(
     } else {
         match delete_role {
             DeleteRole::ErrorDoNotDelete => {
-                warn!("user is not allowed to undelete inference results: {}", user_session.user_token);
+                warn!("user is not allowed to undelete voices: {}", user_session.user_token);
                 return Err(DeleteDatasetError::NotAuthorized);
             }
             DeleteRole::AsUser => {
                 // NB: Technically only mods can see their own datasets
-                //TODO(kasisnu): Is this a case that can apply to datasets?
                 undelete_dataset_as_user(
                     &path.dataset_token,
                     &server_state.mysql_pool
@@ -177,4 +175,3 @@ pub async fn delete_dataset_handler(
     Ok(simple_json_success())
 
   }
-  

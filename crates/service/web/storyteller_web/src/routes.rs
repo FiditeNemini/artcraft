@@ -126,8 +126,8 @@ use crate::http_server::endpoints::voice_designer::delete_dataset::delete_datase
 use crate::http_server::endpoints::voice_designer::list_datasets_by_user::list_datasets_by_user_handler;
 
 use crate::http_server::endpoints::voice_designer::create_voice::create_voice_handler;
-use crate::http_server::endpoints::voice_designer::update_voice::update_voice;
-use crate::http_server::endpoints::voice_designer::delete_voice::delete_voice;
+use crate::http_server::endpoints::voice_designer::update_voice::update_voice_handler;
+use crate::http_server::endpoints::voice_designer::delete_voice::delete_voice_handler;
 use crate::http_server::endpoints::voice_designer::list_available_voices::list_available_voices;
 
 use crate::http_server::endpoints::voice_designer::upload_sample::upload_sample;
@@ -1151,8 +1151,8 @@ fn add_voice_designer_routes<T,B> (app:App<T>)-> App<T>
               .service(
                   web::scope("/voice")
                       .route("/create", web::post().to(create_voice_handler))
-                      .route("/{voice_token}/update", web::post().to(update_voice))
-                      .route("/{voice_token}/delete", web::delete().to(delete_voice))
+                      .route("/{voice_token}/update", web::post().to(update_voice_handler))
+                      .route("/{voice_token}/delete", web::delete().to(delete_voice_handler))
                       .route("/user/{user_token}/list", web::get().to(list_voices_by_user))
               )
               .service(
