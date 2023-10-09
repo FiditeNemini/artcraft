@@ -1,4 +1,5 @@
 import React, { useMemo } from "react";
+import { usePrefixedDocumentTitle } from "../../../../common/UsePrefixedDocumentTitle";
 import { Link } from "react-router-dom";
 import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
 import { SessionSubscriptionsWrapper } from "@storyteller/components/src/session/SessionSubscriptionsWrapper";
@@ -23,6 +24,8 @@ interface Props {
 }
 
 function LandingPage(props: Props) {
+  usePrefixedDocumentTitle("FakeYou Celebrity Voice Generator");
+
   PosthogClient.recordPageview();
 
   const { t } = useLocalize("LandingPage");

@@ -138,6 +138,8 @@ interface Props {
 }
 
 function TtsModelListPage(props: Props) {
+  usePrefixedDocumentTitle("FakeYou. Deep Fake Text to Speech.");
+
   PosthogClient.recordPageview();
 
   const { t } = useLocalize("TtsModelListPage");
@@ -393,8 +395,6 @@ function TtsModelListPage(props: Props) {
       </div>
     );
   }
-
-  usePrefixedDocumentTitle(undefined); // NB: Sets to default title
 
   const vocodesNotice = props.isShowingVocodesNotice ? (
     <VocodesNotice clearVocodesNotice={props.clearVocodesNotice} />

@@ -59,7 +59,8 @@ interface Props {
 }
 
 function VcModelListPage(props: Props) {
-  usePrefixedDocumentTitle("Voice Conversion");
+  usePrefixedDocumentTitle("AI Voice Conversion");
+  
   const { t } = useLocalize("VcModelListPage");
   PosthogClient.recordPageview();
 
