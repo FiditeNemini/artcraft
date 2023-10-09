@@ -33,7 +33,7 @@ cidr-utils = "0.5.10"
 num-traits = "0.2.15" # for cidr-utils
 
 # Futures
-futures-util = "0.3.9"
+futures-util = "0.3.28"
 
 # Serialization
 serde = "1.0.125"

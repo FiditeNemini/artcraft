@@ -94,7 +94,7 @@ tokio = { version = "1.6.0", features = ["macros"] }
 
 # Futures
 futures = { version = "0.3.17", features = ["thread-pool"] } # feature for ThreadPool
-futures-util = "0.3.9"
+futures-util = "0.3.28"
 futures_old_for_limiter = { package = "futures", version = "0.1.29" } # Older version of futures for `limiter` crate
 futures-core = "0.3.26" # NB: For middleware/futures upgrade
 pin-project-lite = "0.2.9" # NB: For middleware/futures upgrade
