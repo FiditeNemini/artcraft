@@ -138,7 +138,7 @@ interface Props {
 }
 
 function TtsModelListPage(props: Props) {
-  usePrefixedDocumentTitle("AI Text to Speech");
+  usePrefixedDocumentTitle("FakeYou. Deep Fake Text to Speech.");
 
   PosthogClient.recordPageview();
 
