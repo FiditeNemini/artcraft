@@ -28,15 +28,17 @@ pub async fn list_voices_by_user_token(
     mysql_pool: &MySqlPool,
     user_token: &str,
     can_see_deleted: bool,
+    is_owner: bool,
 ) -> AnyhowResult<Vec<VoiceRecordForList>> {
     let mut connection = mysql_pool.acquire().await?;
-    list_voices_with_connection(&mut connection, user_token, can_see_deleted).await
+    list_voices_with_connection(&mut connection, user_token, can_see_deleted, is_owner).await
 }
 
 pub async fn list_voices_with_connection(
     mysql_connection: &mut PoolConnection<MySql>,
     user_token: &str,
     can_see_deleted: bool,
+    is_owner: bool,
 ) -> AnyhowResult<Vec<VoiceRecordForList>> {
 
     let maybe_voices = list_dataset_by_creator(mysql_connection, user_token, can_see_deleted)
@@ -70,6 +72,9 @@ pub async fn list_voices_with_connection(
                 created_at: voice.created_at,
                 updated_at: voice.updated_at,
             }
+        })
+        .filter(|dataset| {
+            is_owner || dataset.creator_set_visibility == Visibility::Public || can_see_deleted
         })
         .collect::<Vec<VoiceRecordForList>>())
 }
