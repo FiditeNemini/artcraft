@@ -10,8 +10,8 @@ use enums::by_table::audit_logs::audit_log_entity_action::AuditLogEntityAction::
 
 use http_server_common::request::get_request_ip::get_request_ip;
 use http_server_common::response::serialize_as_json_error::serialize_as_json_error;
-use mysql_queries::queries::voice_designer::delete_voice::{delete_voice_as_mod, delete_voice_as_user, undelete_voice_as_mod, undelete_voice_as_user};
-use mysql_queries::queries::voice_designer::get_voice::get_voice_by_token;
+use mysql_queries::queries::voice_designer::voices::delete_voice::{delete_voice_as_mod, delete_voice_as_user, undelete_voice_as_mod, undelete_voice_as_user};
+use mysql_queries::queries::voice_designer::voices::get_voice::get_voice_by_token;
 use tokens::tokens::zs_voice::ZsVoiceToken;
 use crate::http_server::web_utils::response_success_helpers::simple_json_success;
 

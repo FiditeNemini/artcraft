@@ -24,34 +24,29 @@ pub struct DatasetRecordForList {
     pub updated_at: DateTime<Utc>,
 }
 
-pub async fn list_datasets_by_token(
+pub async fn list_datasets_by_user_token(
     mysql_pool: &MySqlPool,
-    maybe_creator_token: Option<&str>,
+    user_token: &str,
     can_see_deleted: bool,
+    is_owner: bool,
 ) -> AnyhowResult<Vec<DatasetRecordForList>> {
     let mut connection = mysql_pool.acquire().await?;
-    list_datasets_with_connection(&mut connection, maybe_creator_token, can_see_deleted).await
+    list_datasets_with_connection(&mut connection, user_token, can_see_deleted, is_owner).await
 }
 
 pub async fn list_datasets_with_connection(
     mysql_connection: &mut PoolConnection<MySql>,
-    maybe_creator_token: Option<&str>,
+    user_token: &str,
     can_see_deleted: bool,
+    is_owner: bool,
 ) -> AnyhowResult<Vec<DatasetRecordForList>> {
 
-    let maybe_models = match maybe_creator_token {
-        Some(username) => {
-            list_datset_by_creator(mysql_connection, username, can_see_deleted)
-                .await
-        },
-        None => {
-            // TODO(kasisnu): anonymous users can list?
-            return Ok(Vec::new());
-        },
-    };
+    let datasets =
+            list_datasets_by_creator_token(mysql_connection, user_token, can_see_deleted)
+                .await;
 
-    let models : Vec<InternalRawDatasetRecordForList> = match maybe_models {
-        Ok(models) => models,
+    let datasets : Vec<InternalRawDatasetRecordForList> = match datasets {
+        Ok(datasets) => datasets,
         Err(err) => {
             match err {
                 RowNotFound => {
@@ -65,7 +60,7 @@ pub async fn list_datasets_with_connection(
         }
     };
 
-    Ok(models.into_iter()
+    Ok(datasets.into_iter()
         .map(|dataset| {
             DatasetRecordForList{
                 dataset_token: dataset.token.to_string(),
@@ -79,18 +74,21 @@ pub async fn list_datasets_with_connection(
                 updated_at: dataset.updated_at,
             }
         })
+        .filter(|dataset| {
+            is_owner || dataset.creator_set_visibility == Visibility::Public || can_see_deleted
+        })
         .collect::<Vec<DatasetRecordForList>>())
 }
 
 
-async fn list_datset_by_creator(
+async fn list_datasets_by_creator_token(
     mysql_connection: &mut PoolConnection<MySql>,
     creator_token: &str,
     can_see_deleted: bool,
 ) -> AnyhowResult<Vec<InternalRawDatasetRecordForList>> {
     // TODO: There has to be a better way.
     //  Sqlx doesn't like anything except string literals.
-    let maybe_models = if !can_see_deleted {
+    let maybe_datasets = if !can_see_deleted {
         info!("listing datasets for user;");
         sqlx::query_as!(
       InternalRawDatasetRecordForList,
@@ -137,7 +135,7 @@ async fn list_datset_by_creator(
             .await?
     };
 
-    Ok(maybe_models)
+    Ok(maybe_datasets)
 }
 
 struct InternalRawDatasetRecordForList {

@@ -11,9 +11,9 @@ use enums::common::visibility::Visibility;
 use http_server_common::request::get_request_ip::get_request_ip;
 use http_server_common::response::response_success_helpers::simple_json_success;
 use http_server_common::response::serialize_as_json_error::serialize_as_json_error;
-use mysql_queries::queries::voice_designer::get_voice::get_voice_by_token;
-use mysql_queries::queries::voice_designer::update_voice::{update_voice, UpdateVoiceArgs};
 use mysql_queries::queries::voice_designer::voices::create_voice::{create_voice, CreateVoiceArgs};
+use mysql_queries::queries::voice_designer::voices::get_voice::get_voice_by_token;
+use mysql_queries::queries::voice_designer::voices::update_voice::{update_voice, UpdateVoiceArgs};
 use tokens::tokens::zs_voice::ZsVoiceToken;
 
 use crate::server_state::ServerState;

@@ -9,7 +9,7 @@ use actix_web::web::Path;
 use chrono::{DateTime, Utc};
 
 use log::{info, warn};
-use mysql_queries::queries::voice_designer::datasets::list_datasets::{list_datasets_by_token, list_datasets_with_connection};
+use mysql_queries::queries::voice_designer::datasets::list_datasets::{ list_datasets_by_user_token, list_datasets_with_connection};
 
 use crate::server_state::ServerState;
 
@@ -65,10 +65,6 @@ pub async fn list_datasets_by_user_handler(
   server_state: web::Data<Arc<ServerState>>
 ) -> Result<HttpResponse, ListDatasetsByUserError> {
 
-  //TOOD(kasisnu):
-  // [ ] double check if the fields in the struct are everything needed for the FE
-
-
   let maybe_user_session = server_state
       .session_checker
       .maybe_get_user_session(&http_request, &server_state.mysql_pool)
@@ -87,10 +83,15 @@ pub async fn list_datasets_by_user_handler(
   };
 
   let user_token = path.user_token.clone();
+  let creator_user_token = user_session.user_token.clone();
   let is_mod = user_session.can_ban_users;
 
-  // TODO(kasisnu): fix this so this matches "private" scoping - did that mean visibility cause the user token is in the path
-  let query_results = list_datasets_by_token(&server_state.mysql_pool, Some(&user_token), is_mod).await.map_err(|e| {
+  let query_results = list_datasets_by_user_token(
+    &server_state.mysql_pool,
+    &user_token,
+    is_mod,
+    creator_user_token == user_token,
+  ).await.map_err(|e| {
     warn!("Error querying for datasets: {:?}", e);
     ListDatasetsByUserError::ServerError
   });
