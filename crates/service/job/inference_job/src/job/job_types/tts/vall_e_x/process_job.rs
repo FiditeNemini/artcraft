@@ -24,7 +24,7 @@ pub async fn process_job(args: VALLEXProcessJobArgs<'_>) -> Result<JobSuccessRes
     .new_generic_inference(job.inference_job_token.as_str())
     .map_err(|e| ProcessSingleJobError::Other(anyhow!(e)))?;
 
-  // validate the inputs on the job shouldn't this happen at json
+  // validate the inputs 
   //let job_args = validate_job(job)?;
 
   // Need to download the models
@@ -43,12 +43,10 @@ pub async fn process_job(args: VALLEXProcessJobArgs<'_>) -> Result<JobSuccessRes
   }
 
   // Download embeddings files
-        
-  // rinr inference
 
-  // ==================== TEMP DIR ==================== //
-  // create a temp dir
+  // Create a temp dir to download things to
 
+  
   // run inference
 
   // upload audio to bucket

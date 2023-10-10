@@ -30,7 +30,7 @@ use serde::Serialize;
 pub struct EnqueueTTSRequest {
   uuid_idempotency_token: String,
   text: String,
-  embedding_token: String
+  voice_token: String
 }
 
 #[derive(Serialize)]
@@ -87,7 +87,7 @@ pub async fn enqueue_tts_request(
   server_state: web::Data<Arc<ServerState>>) -> Result<HttpResponse,EnqueueTTSRequestError> {
 
     println!("Recieved payload");
-    let is_debug_request = true;
+    let is_debug_request = false;
     let maybe_user_token : Option<UserToken> =  Some(UserToken::new_from_str(&"place holder")); // TODO fix this
     let priority_level = 0;
     //let disable_rate_limiter = false; // NB: Careful!
@@ -128,7 +128,7 @@ let ip_address = get_request_ip(&http_request);
 // package as larger component args should always have an embedding token ..
 let inference_args = TTSArgs {
   text: request.text.clone(),
-  voice_token: request.embedding_token.clone()
+  voice_token: request.voice_token.clone()
 };
 
 // create the inference args here
@@ -152,7 +152,7 @@ let query_result = insert_generic_inference_job(InsertGenericInferenceArgs {
   priority_level,
   requires_keepalive: true, // do we need this? I think so 
   is_debug_request,
-  maybe_routing_tag: Some("Tag"), // TODO fix later what is this tag for?
+  maybe_routing_tag: None, // TODO needs documents for routing work to workers in production ...
   mysql_pool: &server_state.mysql_pool,
 }).await;
 

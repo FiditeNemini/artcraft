@@ -338,7 +338,6 @@ impl VallEXCreateEmbeddingCommand  {
       let maybe_execution_timeout =
           easyenv::get_env_duration_seconds_optional("TIMEOUT_SECONDS");
         
-
       // Probably for local
       let maybe_docker_options = easyenv::get_env_string_optional(
         "VALL_E_X_INFERENCE_MAYBE_DOCKER_IMAGE")
@@ -367,3 +366,4 @@ impl VallEXCreateEmbeddingCommand  {
     }
 
 }
+
