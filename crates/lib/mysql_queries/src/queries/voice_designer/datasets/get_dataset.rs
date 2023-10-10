@@ -1,13 +1,10 @@
 use anyhow::anyhow;
-use chrono::{DateTime, Utc};
 use log::error;
 use sqlx::{MySql, MySqlPool};
 use sqlx::pool::PoolConnection;
 
-use enums::by_table::media_uploads::media_upload_type::MediaUploadType;
 use enums::common::visibility::Visibility;
 use errors::AnyhowResult;
-use tokens::files::media_upload::MediaUploadToken;
 use tokens::tokens::zs_dataset::ZsDatasetToken;
 
 
@@ -17,6 +14,7 @@ pub struct ZsDataset {
     pub ietf_language_tag: String,
     pub ietf_primary_language_subtag: String,
     pub maybe_creator_user_token: Option<String>,
+    pub creator_set_visibility: Visibility,
 }
 
 pub async fn get_dataset_by_token(
@@ -73,6 +71,7 @@ pub async fn get_dataset_by_token_with_connection(
         ietf_language_tag: record.ietf_language_tag,
         ietf_primary_language_subtag: record.ietf_primary_language_subtag,
         maybe_creator_user_token: record.maybe_creator_user_token,
+        creator_set_visibility: record.creator_set_visibility,
     }))
 }
 
