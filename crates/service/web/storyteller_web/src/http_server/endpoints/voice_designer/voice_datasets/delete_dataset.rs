@@ -12,7 +12,7 @@ use http_server_common::request::get_request_ip::get_request_ip;
 use http_server_common::response::serialize_as_json_error::serialize_as_json_error;
 use mysql_queries::queries::voice_designer::datasets::delete_dataset::{delete_dataset_as_mod, delete_dataset_as_user, undelete_dataset_as_mod, undelete_dataset_as_user};
 use mysql_queries::queries::voice_designer::datasets::get_dataset::get_dataset_by_token;
-use tokens::tokens::zs_dataset::ZsDatasetToken;
+use tokens::tokens::zs_voice_datasets::ZsVoiceDatasetToken;
 use crate::http_server::web_utils::response_success_helpers::simple_json_success;
 
 
@@ -93,7 +93,7 @@ pub async fn delete_dataset_handler(
     let is_mod = user_session.can_ban_users;
 
     let dataset_lookup_result = get_dataset_by_token(
-        &ZsDatasetToken::new(dataset_token.clone()),
+        &ZsVoiceDatasetToken::new(dataset_token.clone()),
         is_mod,
         &server_state.mysql_pool,
     ).await;

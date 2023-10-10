@@ -11,7 +11,7 @@ use enums::common::visibility::Visibility;
 use http_server_common::request::get_request_ip::get_request_ip;
 use http_server_common::response::serialize_as_json_error::serialize_as_json_error;
 use mysql_queries::queries::voice_designer::datasets::create_dataset::{create_dataset, CreateDatasetArgs};
-use tokens::tokens::zs_dataset::ZsDatasetToken;
+use tokens::tokens::zs_voice_datasets::ZsVoiceDatasetToken;
 
 use crate::server_state::ServerState;
 
@@ -27,7 +27,7 @@ pub struct CreateDatasetRequest {
 #[derive(Serialize)]
 pub struct CreateDatasetResponse {
   pub success: bool,
-  pub token: Option<ZsDatasetToken>,
+  pub token: Option<ZsVoiceDatasetToken>,
 }
 
 // =============== Error Response ===============

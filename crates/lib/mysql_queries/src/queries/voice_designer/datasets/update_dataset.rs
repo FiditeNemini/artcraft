@@ -4,12 +4,12 @@ use enums::common::visibility::Visibility;
 use enums::by_table::generic_synthetic_ids::id_category::IdCategory;
 
 use errors::AnyhowResult;
-use tokens::tokens::zs_dataset::ZsDatasetToken;
+use tokens::tokens::zs_voice_datasets::ZsVoiceDatasetToken;
 use tokens::tokens::users::UserToken;
 use crate::queries::generic_synthetic_ids::transactional_increment_generic_synthetic_id::transactional_increment_generic_synthetic_id;
 
 pub struct UpdateDatasetArgs<'a> {
-    pub dataset_token: &'a ZsDatasetToken,
+    pub dataset_token: &'a ZsVoiceDatasetToken,
     pub dataset_title: Option<&'a str>,
     pub maybe_creator_user_token: Option<&'a str>,
     pub creator_ip_address: &'a str,

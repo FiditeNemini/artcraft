@@ -5,11 +5,11 @@ use sqlx::pool::PoolConnection;
 
 use enums::common::visibility::Visibility;
 use errors::AnyhowResult;
-use tokens::tokens::zs_dataset::ZsDatasetToken;
+use tokens::tokens::zs_voice_datasets::ZsVoiceDatasetToken;
 
 
 pub struct ZsDataset {
-    pub token: ZsDatasetToken,
+    pub token: ZsVoiceDatasetToken,
     pub title: String,
     pub ietf_language_tag: String,
     pub ietf_primary_language_subtag: String,
@@ -18,7 +18,7 @@ pub struct ZsDataset {
 }
 
 pub async fn get_dataset_by_token(
-  dataset_token: &ZsDatasetToken,
+  dataset_token: &ZsVoiceDatasetToken,
   can_see_deleted: bool,
   mysql_pool: &MySqlPool,
 ) -> AnyhowResult<Option<ZsDataset>> {
@@ -31,7 +31,7 @@ pub async fn get_dataset_by_token(
 }
 
 pub async fn get_dataset_by_token_with_connection(
-  dataset_token: &ZsDatasetToken,
+  dataset_token: &ZsVoiceDatasetToken,
   can_see_deleted: bool,
   mysql_connection: &mut PoolConnection<MySql>,
 ) -> AnyhowResult<Option<ZsDataset>> {
@@ -76,14 +76,14 @@ pub async fn get_dataset_by_token_with_connection(
 }
 
 async fn select_include_deleted(
-  dataset_token: &ZsDatasetToken,
+  dataset_token: &ZsVoiceDatasetToken,
   mysql_connection: &mut PoolConnection<MySql>,
 ) -> Result<RawDataset, sqlx::Error> {
   sqlx::query_as!(
       RawDataset,
         r#"
         SELECT
-        zd.token as `token: tokens::tokens::zs_dataset::ZsDatasetToken`,
+        zd.token as `token: tokens::tokens::zs_voice_datasets::ZsVoiceDatasetToken`,
         zd.title,
         zd.ietf_language_tag,
         zd.ietf_primary_language_subtag,
@@ -99,14 +99,14 @@ async fn select_include_deleted(
 }
 
 async fn select_without_deleted(
-  dataset_token: &ZsDatasetToken,
+  dataset_token: &ZsVoiceDatasetToken,
   mysql_connection: &mut PoolConnection<MySql>,
 ) -> Result<RawDataset, sqlx::Error> {
   sqlx::query_as!(
       RawDataset,
         r#"
         SELECT
-        zd.token as `token: tokens::tokens::zs_dataset::ZsDatasetToken`,
+        zd.token as `token: tokens::tokens::zs_voice_datasets::ZsVoiceDatasetToken`,
         zd.title,
         zd.ietf_language_tag,
         zd.ietf_primary_language_subtag,
@@ -124,7 +124,7 @@ async fn select_without_deleted(
 }
 #[derive(Serialize)]
 pub struct RawDataset {
-    token: ZsDatasetToken,
+    token: ZsVoiceDatasetToken,
     title: String,
     ietf_language_tag: String,
     ietf_primary_language_subtag: String,

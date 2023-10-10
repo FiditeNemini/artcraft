@@ -4,7 +4,7 @@ use enums::common::visibility::Visibility;
 use enums::by_table::generic_synthetic_ids::id_category::IdCategory;
 
 use errors::AnyhowResult;
-use tokens::tokens::zs_dataset::ZsDatasetToken;
+use tokens::tokens::zs_voice_datasets::ZsVoiceDatasetToken;
 use tokens::tokens::users::UserToken;
 use crate::queries::generic_synthetic_ids::transactional_increment_generic_synthetic_id::transactional_increment_generic_synthetic_id;
 
@@ -16,8 +16,8 @@ pub struct CreateDatasetArgs<'a> {
     pub mysql_pool: &'a MySqlPool
 }
 
-pub async fn create_dataset(args: CreateDatasetArgs<'_>) -> AnyhowResult<ZsDatasetToken> {
-    let dataset_token = ZsDatasetToken::generate();
+pub async fn create_dataset(args: CreateDatasetArgs<'_>) -> AnyhowResult<ZsVoiceDatasetToken> {
+    let dataset_token = ZsVoiceDatasetToken::generate();
 
     // (KS/noob questions): confirm if dataset version is different from synthetic id
     // * confirm if language tags can only be "updated" or should be configurable on create

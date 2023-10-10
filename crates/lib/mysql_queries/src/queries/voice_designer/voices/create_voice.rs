@@ -4,14 +4,14 @@ use sqlx::MySqlPool;
 use enums::by_table::generic_synthetic_ids::id_category::IdCategory;
 use enums::common::visibility::Visibility;
 use errors::AnyhowResult;
-use tokens::tokens::zs_dataset::ZsDatasetToken;
-use tokens::tokens::zs_voice::ZsVoiceToken;
+use tokens::tokens::zs_voice_datasets::ZsVoiceDatasetToken;
+use tokens::tokens::zs_voices::ZsVoiceToken;
 use tokens::tokens::users::UserToken;
 
 use crate::queries::generic_synthetic_ids::transactional_increment_generic_synthetic_id::transactional_increment_generic_synthetic_id;
 
 pub struct CreateVoiceArgs<'a> {
-  pub dataset_token: &'a ZsDatasetToken,
+  pub dataset_token: &'a ZsVoiceDatasetToken,
 
   // TODO(bt,2023-10-06): These should be *Rust Enums* to limit their possible range of values.
   pub model_category: &'a str,
