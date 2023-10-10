@@ -13,6 +13,16 @@ use crate::list_pods::list_pods;
 pub mod list_pods;
 pub mod delete_pods;
 
+/// kube-pod-cleanup
+///
+/// Rationale: In production, dead/evicted pods stick around for eternity.
+/// Within a matter of days, thousands of dead pods can clutter the output of `kubectl`,
+/// making it operationally difficult to maintain the cluster.
+///
+/// This tool quickly dispenses of garbage pods. (Though we may still want to keep them
+/// for debugging actual issues.)
+///
+
 pub fn main() -> AnyhowResult<()> {
   easyenv::init_all_with_default_logging(Some(DEFAULT_RUST_LOG));
 
@@ -52,7 +62,7 @@ pub fn main() -> AnyhowResult<()> {
 
   info!("Clearing pods: {:?}", &pod_names_to_clear);
 
-  delete_pods(pod_names_to_clear)?;
+  delete_pods(pod_names_to_clear, 30)?;
 
   info!("Done!");
   Ok(())
