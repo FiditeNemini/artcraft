@@ -11,23 +11,35 @@ use rand::RngCore;
 
 use errors::AnyhowResult;
 
-// TODO: A protobuf would be more compact!
-/// This gets encrypted and sent to the frontend as an opaque handle.
-#[derive(Serialize, Deserialize)]
-pub struct SortId {
-  // NB: Entropy is causing React to panic on re-renders
-  //pub entropy: u32,
-  pub column_id: u64,
-}
-
-/// This exists so that we don't leak our database IDs.
-/// If competitors see our IDs, they'll know how big our database is.
-/// We encrypt our IDs so we don't leak "business secret information".
+/// This tool exists so that we don't leak our database IDs!
+///
+/// If competitors (or VCs) see our IDs, they'll know how big our database
+/// is (since IDs are auto_increment), and they can use that information to
+/// estimate our success, unit economics, etc.
+///
+/// We can still use our IDs in the frontend APIs for sorting and pagination
+/// if we encrypt them before delivering them to the client. This prevents
+/// us from leaking "business secret information".
+///
+/// To some degree this may be mild paranoia, but I've always seen this
+/// practice taken in industry (unicorn+ companies) and in the startup world.
+///
 #[derive(Clone)]
 pub struct SortKeyCrypto {
   crypt: MagicCrypt256,
   alphabet: Alphabet,
   base64_config: GeneralPurposeConfig,
+}
+
+// TODO: A protobuf would be more compact than JSON!
+/// This gets encrypted and sent to the frontend as an opaque handle.
+#[derive(Serialize, Deserialize)]
+pub struct SortId {
+  // NB(bt): Entropy is causing React to panic on re-renders and endlessly
+  // call the endpoint. We may need to make these stable. It's also possible
+  // additional entropy is simply a waste.
+  //pub entropy: u32,
+  pub column_id: u64,
 }
 
 impl SortKeyCrypto {
@@ -96,6 +108,19 @@ mod tests {
 //
 //    assert_eq!(encrypted_tokens.len(), 1000);
 //  }
+
+  #[test]
+  fn decode_encrypted() {
+    let encrypted = "n4CjiUNwL6zEM61mJxvLCxD3wiZa8d6_O70ICRVzNUg";
+    let sorter = SortKeyCrypto::new("secret");
+    let decrypted = sorter.decrypt_id(&encrypted).unwrap();
+    assert_eq!(decrypted, 1234);
+
+    let encrypted = "NL5wfw85lJsVtQ4QEPmoe-TWNDNnZU7TZgSqMBXCGAA";
+    let sorter = SortKeyCrypto::new("different secret");
+    let decrypted = sorter.decrypt_id(&encrypted).unwrap();
+    assert_eq!(decrypted, 54321);
+  }
 
   #[test]
   fn encrypt_roundtrip() {
