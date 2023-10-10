@@ -14,6 +14,7 @@ use filesys::create_dir_all_if_missing::create_dir_all_if_missing;
 use filesys::file_size::file_size;
 use media::decode_basic_audio_info::decode_basic_audio_file_info;
 use mimetypes::mimetype_for_file::get_mimetype_for_file;
+use mysql_queries::payloads::generic_inference_args::generic_inference_args::PolymorphicInferenceArgs;
 use mysql_queries::queries::generic_inference::job::list_available_generic_inference_jobs::AvailableInferenceJob;
 use mysql_queries::queries::media_uploads::get_media_upload_for_inference::MediaUploadRecordForInference;
 use mysql_queries::queries::voice_conversion::inference::get_voice_conversion_model_for_inference::VoiceConversionModelForInference;
@@ -86,6 +87,27 @@ pub async fn process_job(args: RvcV2ProcessJobArgs<'_>) -> Result<JobSuccessResu
 
     fs_path
   };
+
+  info!("Download models (if not present)...");
+
+  let mut i : usize = 0;
+
+  for downloader in args.job_dependencies.job_type_details.rvc_v2.downloaders.all_downloaders() {
+
+    // Temporary debugging
+    info!("Downloader {}", i);
+    i = i + 1;
+
+    let result = downloader.download_if_not_on_filesystem(
+      &args.job_dependencies.private_bucket_client,
+      &args.job_dependencies.fs.scoped_temp_dir_creator_for_downloads,
+    ).await;
+
+    if let Err(e) = result {
+      error!("could not download: {:?}", e);
+      return Err(ProcessSingleJobError::from_anyhow_error(e))
+    }
+  }
 
   // ==================== CONFIRM OR DOWNLOAD RVC (v2) MODEL INDICES ==================== //
 
@@ -193,6 +215,22 @@ pub async fn process_job(args: RvcV2ProcessJobArgs<'_>) -> Result<JobSuccessResu
       .map(|args| args.args.as_ref())
       .flatten();
 
+  let maybe_override_f0_method = maybe_args
+      .map(|args| match args {
+        PolymorphicInferenceArgs::Tts { .. } => None,
+        PolymorphicInferenceArgs::La(_) => None,
+        PolymorphicInferenceArgs::Vc { override_f0_method, .. } => *override_f0_method,
+      })
+      .flatten();
+
+  let maybe_f0_up_key = maybe_args
+      .map(|args| match args {
+        PolymorphicInferenceArgs::Tts { .. } => None,
+        PolymorphicInferenceArgs::La(_) => None,
+        PolymorphicInferenceArgs::Vc { transpose, .. } => *transpose,
+      })
+      .flatten();
+
   // ==================== RUN INFERENCE SCRIPT ==================== //
 
   let inference_start_time = Instant::now();
@@ -205,8 +243,11 @@ pub async fn process_job(args: RvcV2ProcessJobArgs<'_>) -> Result<JobSuccessResu
         model_path: &rvc_v2_model_fs_path,
         maybe_model_index_path: maybe_rvc_v2_model_index_fs_path,
         hubert_path: &args.job_dependencies.pretrained_models.rvc_v2_hubert.filesystem_path,
+        rmvpe_path: &args.job_dependencies.job_type_details.rvc_v2.downloaders.rmvpe.filesystem_path,
         input_path: &input_wav_path,
         output_path: &output_audio_fs_path,
+        maybe_override_f0_method,
+        maybe_f0_up_key,
       });
 
   let inference_duration = Instant::now().duration_since(inference_start_time);

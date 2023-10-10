@@ -147,7 +147,6 @@ pub async fn process_job(args: SoVitsSvcProcessJobArgs<'_>) -> Result<JobSuccess
       .map(|args| args.args.as_ref())
       .flatten();
 
-
   // If not specified by the user, turn off auto prediction. It sounds awful.
   let auto_predict_f0 = maybe_args
       .map(|args| match args {
@@ -166,15 +165,6 @@ pub async fn process_job(args: SoVitsSvcProcessJobArgs<'_>) -> Result<JobSuccess
       })
       .flatten();
 
-  let maybe_override_f0_method = maybe_args
-      .map(|args| match args {
-        PolymorphicInferenceArgs::Tts { .. } => None,
-        PolymorphicInferenceArgs::La(_) => None,
-        PolymorphicInferenceArgs::Vc { override_f0_method, .. } =>
-          *override_f0_method,
-      })
-      .flatten();
-
   // ==================== RUN INFERENCE SCRIPT ==================== //
 
   let inference_start_time = Instant::now();
@@ -190,7 +180,6 @@ pub async fn process_job(args: SoVitsSvcProcessJobArgs<'_>) -> Result<JobSuccess
         maybe_config_path: None,
         device: Device::Cuda,
         auto_predict_f0,
-        maybe_override_f0_method,
         maybe_transpose,
       });
 

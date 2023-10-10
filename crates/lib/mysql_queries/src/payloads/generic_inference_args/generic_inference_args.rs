@@ -38,6 +38,8 @@ pub enum InferenceCategoryAbbreviated {
 
 #[derive(Serialize, Deserialize, Clone, Copy, Debug)]
 pub enum FundamentalFrequencyMethodForJob {
+  #[serde(rename = "r")] // NB: DO NOT CHANGE. It could break live jobs. Renamed to be fewer bytes.
+  Rmvpe,
   #[serde(rename = "c")] // NB: DO NOT CHANGE. It could break live jobs. Renamed to be fewer bytes.
   Crepe,
   #[serde(rename = "d")] // NB: DO NOT CHANGE. It could break live jobs. Renamed to be fewer bytes.
@@ -66,7 +68,7 @@ pub enum PolymorphicInferenceArgs {
     #[serde(skip_serializing_if = "Option::is_none")]
     auto_predict_f0: Option<bool>,
 
-    /// Argument for so-vits-svc (-fm / --f0-method)
+    /// Argument for RVC (-fm / --f0_method)
     /// Crepe, dio, harvest, etc.
     /// If unspecified, the model defaults to crepe
     #[serde(rename = "fm")] // NB: DO NOT CHANGE. It could break live jobs. Renamed to be fewer bytes.
@@ -74,6 +76,7 @@ pub enum PolymorphicInferenceArgs {
     override_f0_method: Option<FundamentalFrequencyMethodForJob>,
 
     /// Argument for so-vits-svc (-t / --transpose)
+    /// Argument for RVC (--f0_up_key)
     /// Pitch control.
     /// If unspecified, the model uses "0".
     #[serde(rename = "t")] // NB: DO NOT CHANGE. It could break live jobs. Renamed to be fewer bytes.
@@ -250,6 +253,27 @@ mod tests {
     // NB: Assert the serialized form. If this changes and the test breaks, be careful about migrating.
     assert_eq!(json,
                r#"{"cat":"vc","args":{"Vc":{"a":true}}}"#.to_string());
+
+    // NB: Make sure we don't overflow the DB field capacity (TEXT column).
+    assert!(json.len() < 1000);
+  }
+
+  #[test]
+  fn rmvpe() {
+    let args = GenericInferenceArgs {
+      inference_category: Some(InferenceCategoryAbbreviated::VoiceConversion),
+      args: Some(PolymorphicInferenceArgs::Vc {
+        auto_predict_f0: None,
+        override_f0_method: Some(FundamentalFrequencyMethodForJob::Rmvpe),
+        transpose: None,
+      }),
+    };
+
+    let json = serde_json::ser::to_string(&args).unwrap();
+
+    // NB: Assert the serialized form. If this changes and the test breaks, be careful about migrating.
+    assert_eq!(json,
+               r#"{"cat":"vc","args":{"Vc":{"fm":"r"}}}"#.to_string());
 
     // NB: Make sure we don't overflow the DB field capacity (TEXT column).
     assert!(json.len() < 1000);

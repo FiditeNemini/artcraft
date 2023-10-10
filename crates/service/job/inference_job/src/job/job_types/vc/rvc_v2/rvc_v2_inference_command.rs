@@ -11,6 +11,7 @@ use subprocess::{Popen, PopenConfig};
 
 use container_common::anyhow_result::AnyhowResult;
 use filesys::path_to_string::path_to_string;
+use mysql_queries::payloads::generic_inference_args::generic_inference_args::FundamentalFrequencyMethodForJob;
 use subprocess_common::docker_options::{DockerFilesystemMount, DockerGpu, DockerOptions};
 
 use crate::job::job_loop::command_exit_status::CommandExitStatus;
@@ -70,11 +71,20 @@ pub struct InferenceArgs<P: AsRef<Path>, Q: AsRef<Path>> {
   /// --hubert_model_path: path to the hubert model on the filesystem
   pub hubert_path: P,
 
+  /// --rmvpe_model_path: path to the RMVPE model on the filesystem
+  pub rmvpe_path: P,
+
   /// --input_audio_filename: input wav path
   pub input_path: P,
 
   /// --output_audio_filename: output path of wav file.
   pub output_path: P,
+
+  /// --f0-method: f0 prediction method
+  pub maybe_override_f0_method: Option<FundamentalFrequencyMethodForJob>,
+
+  /// --f0_up_key: pitch adjustment
+  pub maybe_f0_up_key: Option<i32>,
 }
 
 impl RvcV2InferenceCommand {
@@ -199,11 +209,33 @@ impl RvcV2InferenceCommand {
     command.push_str(" --hubert_model_path ");
     command.push_str(&path_to_string(args.hubert_path));
 
+    command.push_str(" --rmvpe_model_path ");
+    command.push_str(&path_to_string(args.rmvpe_path));
+
     command.push_str(" --input_audio_filename ");
     command.push_str(&path_to_string(args.input_path));
 
     command.push_str(" --output_audio_filename ");
     command.push_str(&path_to_string(args.output_path));
+
+    if let Some(f0_method) = args.maybe_override_f0_method {
+      let method = match f0_method {
+        FundamentalFrequencyMethodForJob::Crepe => "crepe",
+        FundamentalFrequencyMethodForJob::Dio => "dio",
+        FundamentalFrequencyMethodForJob::Harvest => "harvest",
+        FundamentalFrequencyMethodForJob::Rmvpe => "rmvpe",
+      };
+      command.push_str(" --f0_method ");
+      command.push_str(&method);
+      command.push_str(" ");
+    }
+
+    if let Some(key) = args.maybe_f0_up_key {
+      let value = key.to_string();
+      command.push_str(" --f0_up_key ");
+      command.push_str(&value);
+      command.push_str(" ");
+    }
 
     // ===== End Python Args =====
 

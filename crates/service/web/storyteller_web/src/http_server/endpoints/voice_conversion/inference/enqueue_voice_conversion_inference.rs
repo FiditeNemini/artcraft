@@ -72,6 +72,9 @@ pub struct EnqueueVoiceConversionInferenceRequest {
 
 #[derive(Deserialize, Clone, Copy)]
 pub enum FundamentalFrequencyMethod {
+  /// RMVPE is the best algorithm as of 2023-10-10.
+  #[serde(rename = "rmvpe")]
+  Rmvpe,
   #[serde(rename = "crepe")]
   Crepe,
   #[serde(rename = "dio")]
@@ -276,6 +279,7 @@ pub async fn enqueue_voice_conversion_inference_handler(
         FundamentalFrequencyMethod::Crepe => FundamentalFrequencyMethodForJob::Crepe,
         FundamentalFrequencyMethod::Dio => FundamentalFrequencyMethodForJob::Dio,
         FundamentalFrequencyMethod::Harvest => FundamentalFrequencyMethodForJob::Harvest,
+        FundamentalFrequencyMethod::Rmvpe => FundamentalFrequencyMethodForJob::Rmvpe,
       }),
       transpose: request.transpose,
     });

@@ -27,6 +27,7 @@ use crate::job::job_types::tts::vits::vits_inference_command::VitsInferenceComma
 
 use crate::job::job_types::tts::vall_e_x::vall_e_x_inference_command::VallEXInferenceCommand;
 use crate::job::job_types::tts::vall_e_x::vall_e_x_inference_command::VallEXCreateEmbeddingCommand;
+use crate::job::job_types::vc::rvc_v2::model_downloaders::RvcV2Downloaders;
 
 use crate::job::job_types::vc::rvc_v2::pretrained_hubert_model::PretrainedHubertModel;
 use crate::job::job_types::vc::rvc_v2::rvc_v2_inference_command::RvcV2InferenceCommand;
@@ -191,6 +192,7 @@ pub struct VitsDetails {
 
 pub struct RvcV2Details {
   pub inference_command: RvcV2InferenceCommand,
+  pub downloaders: RvcV2Downloaders,
 }
 
 pub struct SoVitsSvcDetails {
