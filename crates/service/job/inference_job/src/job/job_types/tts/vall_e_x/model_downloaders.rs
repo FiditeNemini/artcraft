@@ -20,7 +20,7 @@ crate::impl_model_downloader!(
     WhisperLargeModelMapping,
     "whisper Large Model Mapping",
     "WHISPER_LARGE_MAPPING_BUCKET_PATH",
-    "dependencies/zero_shot_tts/vall-e-x_1.0/whisper-large",
+    "/dependencies/zero_shot_tts/vall-e-x_1.0/whisper-large",
     "WHISPER_LARGE_MAPPING_FILESYSTEM_PATH",
     "/tmp/downloads/zero_shot_tts/vall-e-x_1.0/whisper-large"
   );
@@ -29,7 +29,7 @@ crate::impl_model_downloader!(
     WhisperMediumModelMapping,
     "whisper Medium Model Mapping",
     "WHISPER_MEDIUM_TENSOR_BUCKET_PATH",
-    "dependencies/zero_shot_tts/vall-e-x_1.0/whisper-medium",
+    "/dependencies/zero_shot_tts/vall-e-x_1.0/whisper-medium",
     "WHISPER_MEDIUM_TENSOR_FILESYSTEM_PATH",
     "/tmp/downloads/zero_shot_tts/vall-e-x_1.0/whisper-medium"
   );
@@ -38,7 +38,7 @@ crate::impl_model_downloader!(
     VocosEncodecModelMapping,
     "Vocos Encodec Model Mapping",
     "VOCOS_ENCODEC_TENSOR_BUCKET_PATH",
-    "dependencies/zero_shot_tts/vall-e-x_1.0/encodec_pytorch_model.bin",
+    "/dependencies/zero_shot_tts/vall-e-x_1.0/encodec_pytorch_model.bin",
     "VOCOS_ENCODEC_TENSOR_FILESYSTEM_PATH",
     "/tmp/downloads/zero_shot_tts/vall-e-x_1.0/encodec_pytorch_model.bin"
   );
