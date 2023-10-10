@@ -21,7 +21,8 @@ pub struct ZsVoiceRecordForResponse {
   creator_set_visibility: String,
   ietf_language_tag: String,
   ietf_primary_language_subtag: String,
-  maybe_creator_user_token: Option<String>,
+  creator_user_token: String,
+  creator_username: String,
 
   created_at: DateTime<Utc>,
   updated_at: DateTime<Utc>,
@@ -36,7 +37,7 @@ pub struct ListVoicesByUserSuccessResponse {
 
 #[derive(Deserialize)]
 pub struct ListVoicesByUserPathInfo {
-  user_token: String,
+  username: String,
 }
 
 #[derive(Debug)]
@@ -83,15 +84,14 @@ pub async fn list_voices_by_user(
     }
   };
 
-  let user_token = path.user_token.clone();
+  let username = path.username.as_ref();
   let creator_user_token = user_session.user_token.clone();
   let is_mod = user_session.can_ban_users;
 
   let query_results = list_voices_by_user_token(
     &server_state.mysql_pool,
-    &user_token,
+    &username,
     is_mod,
-    creator_user_token == user_token,
   ).await.map_err(|e| {
     warn!("Error querying for voices: {:?}", e);
     ListVoicesByUserError::ServerError
@@ -111,7 +111,8 @@ pub async fn list_voices_by_user(
       creator_set_visibility: voice.creator_set_visibility.to_string() ,
       ietf_language_tag: voice.ietf_language_tag,
       ietf_primary_language_subtag: voice.ietf_primary_language_subtag,
-      maybe_creator_user_token: voice.maybe_creator_user_token,
+      creator_user_token: voice.creator_user_token,
+      creator_username: voice.creator_username,
 
       created_at: voice.created_at,
       updated_at: voice.updated_at,

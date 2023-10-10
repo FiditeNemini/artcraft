@@ -18,7 +18,8 @@ pub struct VoiceRecordForList {
     pub creator_set_visibility: Visibility,
     pub ietf_language_tag: String,
     pub ietf_primary_language_subtag: String,
-    pub maybe_creator_user_token: Option<String>,
+    pub creator_user_token: String,
+    pub creator_username: String,
 
     pub created_at: DateTime<Utc>,
     pub updated_at: DateTime<Utc>,
@@ -26,22 +27,20 @@ pub struct VoiceRecordForList {
 
 pub async fn list_voices_by_user_token(
     mysql_pool: &MySqlPool,
-    user_token: &str,
+    creator_username: &str,
     can_see_deleted: bool,
-    is_owner: bool,
 ) -> AnyhowResult<Vec<VoiceRecordForList>> {
     let mut connection = mysql_pool.acquire().await?;
-    list_voices_with_connection(&mut connection, user_token, can_see_deleted, is_owner).await
+    list_voices_with_connection(&mut connection, creator_username, can_see_deleted).await
 }
 
 pub async fn list_voices_with_connection(
     mysql_connection: &mut PoolConnection<MySql>,
-    user_token: &str,
+    creator_username: &str,
     can_see_deleted: bool,
-    is_owner: bool,
 ) -> AnyhowResult<Vec<VoiceRecordForList>> {
 
-    let maybe_voices = list_dataset_by_creator(mysql_connection, user_token, can_see_deleted)
+    let maybe_voices = list_voices_by_creator_username(mysql_connection, creator_username, can_see_deleted)
                 .await;
 
     let voices : Vec<InternalRawVoiceRecordForList> = match maybe_voices {
@@ -67,22 +66,23 @@ pub async fn list_voices_with_connection(
                 creator_set_visibility: voice.creator_set_visibility,
                 ietf_language_tag: voice.ietf_language_tag,
                 ietf_primary_language_subtag: voice.ietf_primary_language_subtag,
-                maybe_creator_user_token: voice.maybe_creator_user_token,
+                creator_user_token: voice.creator_user_token,
+                creator_username: voice.creator_username,
 
                 created_at: voice.created_at,
                 updated_at: voice.updated_at,
             }
         })
-        .filter(|dataset| {
-            is_owner || dataset.creator_set_visibility == Visibility::Public || can_see_deleted
+        .filter(|voice| {
+           creator_username == voice.creator_username || voice.creator_set_visibility == Visibility::Public || can_see_deleted
         })
         .collect::<Vec<VoiceRecordForList>>())
 }
 
 
-async fn list_dataset_by_creator(
+async fn list_voices_by_creator_username(
     mysql_connection: &mut PoolConnection<MySql>,
-    creator_token: &str,
+    creator_username: &str,
     can_see_deleted: bool,
 ) -> AnyhowResult<Vec<InternalRawVoiceRecordForList>> {
     // TODO: There has to be a better way.
@@ -97,17 +97,20 @@ async fn list_dataset_by_creator(
             zv.title,
             zv.ietf_language_tag,
             zv.ietf_primary_language_subtag,
-            zv.maybe_creator_user_token,
+            users.token as creator_user_token,
+            users.username as creator_username,
             zv.creator_set_visibility as `creator_set_visibility: enums::common::visibility::Visibility`,
             zv.created_at,
             zv.updated_at
         FROM zs_voices as zv
+        JOIN users
+            ON users.token = zv.maybe_creator_user_token
         WHERE
-            zv.maybe_creator_user_token = ?
+            users.username = ?
             AND zv.user_deleted_at IS NULL
             AND zv.mod_deleted_at IS NULL
         "#,
-      creator_token)
+      creator_username)
             .fetch_all(mysql_connection)
             .await?
     } else {
@@ -121,15 +124,18 @@ async fn list_dataset_by_creator(
             zv.title,
             zv.ietf_language_tag,
             zv.ietf_primary_language_subtag,
-            zv.maybe_creator_user_token,
+            users.token as creator_user_token,
+            users.username as creator_username,
             zv.creator_set_visibility as `creator_set_visibility: enums::common::visibility::Visibility`,
             zv.created_at,
             zv.updated_at
         FROM zs_voices as zv
+        JOIN users
+            ON users.token = zv.maybe_creator_user_token
         WHERE
-            zv.maybe_creator_user_token = ?
+            users.username = ?
         "#,
-      creator_token)
+      creator_username)
             .fetch_all(mysql_connection)
             .await?
     };
@@ -142,7 +148,8 @@ struct InternalRawVoiceRecordForList {
     title: String,
     ietf_language_tag: String,
     ietf_primary_language_subtag: String,
-    maybe_creator_user_token: Option<String>,
+    creator_user_token: String,
+    creator_username: String,
     creator_set_visibility: Visibility,
     created_at: DateTime<Utc>,
     updated_at: DateTime<Utc>,

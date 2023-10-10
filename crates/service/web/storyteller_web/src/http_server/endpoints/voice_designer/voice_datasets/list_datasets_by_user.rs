@@ -20,7 +20,8 @@ pub struct ZsDatasetRecordForResponse {
   creator_set_visibility: String,
   ietf_language_tag: String,
   ietf_primary_language_subtag: String,
-  maybe_creator_user_token: Option<String>,
+  creator_user_token: String,
+  creator_username: String,
 
   created_at: DateTime<Utc>,
   updated_at: DateTime<Utc>,
@@ -35,7 +36,7 @@ pub struct ListDatasetsByUserSuccessResponse {
 
 #[derive(Deserialize)]
 pub struct ListDatasetsByUserPathInfo {
-  user_token: String,
+  username: String,
 }
 
 #[derive(Debug)]
@@ -82,15 +83,14 @@ pub async fn list_datasets_by_user_handler(
     }
   };
 
-  let user_token = path.user_token.clone();
+  let username = path.username.as_ref();
   let creator_user_token = user_session.user_token.clone();
   let is_mod = user_session.can_ban_users;
 
   let query_results = list_datasets_by_user_token(
     &server_state.mysql_pool,
-    &user_token,
+    &username,
     is_mod,
-    creator_user_token == user_token,
   ).await.map_err(|e| {
     warn!("Error querying for datasets: {:?}", e);
     ListDatasetsByUserError::ServerError
@@ -110,7 +110,8 @@ pub async fn list_datasets_by_user_handler(
       creator_set_visibility: dataset.creator_set_visibility.to_string() ,
       ietf_language_tag: dataset.ietf_language_tag,
       ietf_primary_language_subtag: dataset.ietf_primary_language_subtag,
-      maybe_creator_user_token: dataset.maybe_creator_user_token,
+      creator_user_token: dataset.creator_user_token,
+      creator_username: dataset.creator_username,
 
       created_at: dataset.created_at,
       updated_at: dataset.updated_at,

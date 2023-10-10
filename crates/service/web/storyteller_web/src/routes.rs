@@ -169,7 +169,7 @@ pub fn add_routes<T, B> (app: App<T>) -> App<T>
   app = add_subscription_routes(app); /* /v1/subscriptions/... */
 
   // TODO find a long term feature flag solution, since this code is likely deployed into production we don't want the route found.
-  let enable_voice_designer_route = true;
+  let enable_voice_designer_route = false;
   if (enable_voice_designer_route) { 
     app = add_voice_designer_routes(app); /* /v1/voice_designer */
   }
@@ -1140,14 +1140,14 @@ fn add_voice_designer_routes<T,B> (app:App<T>)-> App<T>
                           .route(web::head().to(|| HttpResponse::Ok()))
                       )
                       .route("/{dataset_token}/delete", web::delete().to(delete_dataset_handler))
-                      .route("/user/{user_token}/list", web::get().to(list_datasets_by_user_handler))
+                      .route("/user/{username}/list", web::get().to(list_datasets_by_user_handler))
               )
               .service(
                   web::scope("/voice")
                       .route("/create", web::post().to(create_voice_handler))
                       .route("/{voice_token}/update", web::post().to(update_voice_handler))
                       .route("/{voice_token}/delete", web::delete().to(delete_voice_handler))
-                      .route("/user/{user_token}/list", web::get().to(list_voices_by_user))
+                      .route("/user/{username}/list", web::get().to(list_voices_by_user))
               )
               .service(
                   web::scope("/sample")
