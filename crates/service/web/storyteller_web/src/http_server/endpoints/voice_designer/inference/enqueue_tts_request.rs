@@ -127,7 +127,6 @@ let ip_address = get_request_ip(&http_request);
 
 // package as larger component args should always have an embedding token ..
 let inference_args = TTSArgs {
-  text: request.text.clone(),
   voice_token: request.voice_token.clone()
 };
 
@@ -139,9 +138,9 @@ let query_result = insert_generic_inference_job(InsertGenericInferenceArgs {
   inference_category: InferenceCategory::TextToSpeech,
   maybe_model_type: Some(InferenceModelType::VallEX), // NB: Model is static during inference
   maybe_model_token: None, // NB: Model is static during inference
-  maybe_input_source_token: None, // TODO: Introduce a second foreign key ?
-  maybe_input_source_token_type: None, // TODO: Introduce a second foreign key ?
-  maybe_raw_inference_text: None, // No text
+  maybe_input_source_token: None, 
+  maybe_input_source_token_type: None, 
+  maybe_raw_inference_text: Some(&request.text),
   maybe_inference_args: Some(GenericInferenceArgs {
     inference_category: Some(InferenceCategoryAbbreviated::TextToSpeech),
     args: Some(PolymorphicInferenceArgs::Tts(inference_args)),
