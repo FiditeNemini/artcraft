@@ -1,7 +1,9 @@
 use std::io::Cursor;
 
-use base64::{CharacterSet, Config};
 use base64;
+use base64::alphabet::{Alphabet, URL_SAFE};
+use base64::engine::{Config, DecodePaddingMode, GeneralPurpose, GeneralPurposeConfig};
+use base64::Engine;
 use magic_crypt::{MagicCrypt256, MagicCryptTrait};
 use magic_crypt::generic_array::typenum::U256;
 use magic_crypt::new_magic_crypt;
@@ -24,15 +26,19 @@ pub struct SortId {
 #[derive(Clone)]
 pub struct SortKeyCrypto {
   crypt: MagicCrypt256,
-  base64_config: Config,
+  alphabet: Alphabet,
+  base64_config: GeneralPurposeConfig,
 }
 
 impl SortKeyCrypto {
   pub fn new(secret: &str) -> Self {
-    let base64_config = Config::new(CharacterSet::UrlSafe, false)
-        .decode_allow_trailing_bits(true);
+    let base64_config = GeneralPurposeConfig::new()
+        .with_encode_padding(false)
+        .with_decode_allow_trailing_bits(true)
+        .with_decode_padding_mode(DecodePaddingMode::Indifferent);
     Self {
       crypt: new_magic_crypt!(secret, 256),
+      alphabet: URL_SAFE.clone(),
       base64_config,
     }
   }
@@ -50,8 +56,10 @@ impl SortKeyCrypto {
     let mut reader = Cursor::new(payload);
     let mut writer = Vec::new();
 
+    let engine = GeneralPurpose::new(&self.alphabet, self.base64_config);
+
     self.crypt.encrypt_reader_to_writer2::<U256>(&mut reader, &mut writer)?;
-    let encoded = base64::encode_config(&writer, self.base64_config.clone());
+    let encoded = engine.encode(&writer);
 
     Ok(encoded)
   }
@@ -59,7 +67,9 @@ impl SortKeyCrypto {
   pub fn decrypt_id(&self, base_64_payload: &str) -> AnyhowResult<u64> {
     //let payload = self.crypt.decrypt_base64_to_string(base_64_payload)?;
 
-    let decoded_bytes= base64::decode_config(base_64_payload, self.base64_config)?;
+    let engine = GeneralPurpose::new(&self.alphabet, self.base64_config);
+
+    let decoded_bytes = engine.decode(base_64_payload)?;
     let decrypted_bytes = self.crypt.decrypt_bytes_to_bytes(&decoded_bytes)?;
 
     let payload = String::from_utf8(decrypted_bytes)?;
