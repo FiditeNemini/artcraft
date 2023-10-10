@@ -1153,7 +1153,7 @@ fn add_voice_designer_routes<T,B> (app:App<T>)-> App<T>
                   web::scope("/sample")
                       .route("/upload", web::post().to(upload_sample_handler))
                       .route("/{sample_token}/delete", web::delete().to(delete_sample_handler))
-                      .route("/data_set/{data_set_token}/list", web::get().to(list_samples_by_dataset_handler))
+                      .route("/dataset/{dataset_token}/list", web::get().to(list_samples_by_dataset_handler))
               )
               .service(
                   web::scope("/inference")
