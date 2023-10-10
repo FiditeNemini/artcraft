@@ -1,22 +1,39 @@
 use std::process::Command;
-use std::vec::IntoIter;
 
-use itertools::{Chunk, Itertools};
+use itertools::Itertools;
 use log::info;
+use rand::prelude::IteratorRandom;
+use rand::thread_rng;
 
 use errors::AnyhowResult;
 
-pub fn delete_pods(pod_names: Vec<String>, batch_size: usize) -> AnyhowResult<()> {
-  for pod_batch in pod_names.into_iter().chunks(batch_size).into_iter() {
-    delete_pod_batch(pod_batch)?;
+pub fn delete_pods(mut pod_names: Vec<String>, batch_size: usize) -> AnyhowResult<()> {
+  // Randomly delete from the pods so several processes can be spun up at once (prior to
+  // implementing multithreading here.)
+  let mut batch : Vec<String>;
+
+  while !pod_names.is_empty() {
+    batch = Vec::with_capacity(batch_size);
+
+    while !pod_names.is_empty() && batch.len() < batch_size {
+      if let Some((index, element)) = pod_names.iter()
+          .enumerate()
+          .choose(&mut thread_rng()) {
+        batch.push(element.to_string());
+        pod_names.remove(index);
+      }
+    }
+
+    delete_pod_batch(&batch)?;
   }
+
   Ok(())
 }
 
-fn delete_pod_batch(pod_names: Chunk<IntoIter<String>>) -> AnyhowResult<()> {
+fn delete_pod_batch(pod_names: &Vec<String>) -> AnyhowResult<()> {
   let mut args = Vec::from(["delete".to_string(), "pods".to_string()]);
 
-  args.extend(pod_names);
+  args.extend_from_slice(pod_names);
 
   info!("Deleting batch of {} pods", (args.len() - 2));
 

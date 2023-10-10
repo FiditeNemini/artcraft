@@ -22,6 +22,13 @@ pub mod delete_pods;
 /// This tool quickly dispenses of garbage pods. (Though we may still want to keep them
 /// for debugging actual issues.)
 ///
+/// To install as a system binary, do the following:
+///
+///  cargo install --path ./crates/cli/kube_pod_cleanup --bin kube-pod-cleanup
+///
+/// (Cargo install seems to currently require the --path argument in a workspace,
+/// as tracked by this issue: https://stackoverflow.com/a/76271890 )
+///
 
 pub fn main() -> AnyhowResult<()> {
   easyenv::init_all_with_default_logging(Some(DEFAULT_RUST_LOG));
@@ -62,6 +69,8 @@ pub fn main() -> AnyhowResult<()> {
 
   info!("Clearing pods: {:?}", &pod_names_to_clear);
 
+  // TODO(bt,2023-10-10): Delete pods isn't the cleanest code; we can improve this in the future
+  // TODO(1): Add multi-threading, make the threads clear different batches.
   delete_pods(pod_names_to_clear, 30)?;
 
   info!("Done!");
