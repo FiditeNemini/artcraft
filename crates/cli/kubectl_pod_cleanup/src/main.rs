@@ -24,7 +24,7 @@ pub mod delete_pods;
 ///
 /// To install as a system binary, do the following:
 ///
-///  cargo install --path ./crates/cli/kube_pod_cleanup --bin kube-pod-cleanup
+///  cargo install --path ./crates/cli/kubectl_pod_cleanup --bin kubectl-pod-cleanup
 ///
 /// (Cargo install seems to currently require the --path argument in a workspace,
 /// as tracked by this issue: https://stackoverflow.com/a/76271890 )

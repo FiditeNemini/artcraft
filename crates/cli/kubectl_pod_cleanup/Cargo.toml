@@ -1,5 +1,5 @@
 [package]
-name = "kube-pod-cleanup"
+name = "kubectl-pod-cleanup"
 edition = "2018"
 version = "0.0.1"
 authors = [
@@ -9,7 +9,7 @@ authors = [
 publish = false
 
 [[bin]]
-name = "kube-pod-cleanup"
+name = "kubectl-pod-cleanup"
 path = "src/main.rs"
 
 [dependencies]
