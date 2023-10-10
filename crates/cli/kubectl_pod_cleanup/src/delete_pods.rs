@@ -1,6 +1,5 @@
 use std::process::Command;
 
-use itertools::Itertools;
 use log::info;
 use rand::prelude::IteratorRandom;
 use rand::thread_rng;

@@ -39,9 +39,10 @@ pub fn main() -> AnyhowResult<()> {
     "Running",
   ];
 
-  const POD_STATUSES_TO_ALWAYS_CLEAR : [&str; 11] = [
+  const POD_STATUSES_TO_ALWAYS_CLEAR : [&str; 18] = [
     "Completed",
     "ContainerStatusUnknown", // TODO: Maybe don't include?
+    "CrashLoopBackOff",
     "ErrImagePull",
     "Error",
     "Evicted",
@@ -50,11 +51,20 @@ pub fn main() -> AnyhowResult<()> {
     "Init:Error",
     "Init:ImagePullBackOff",
     "Init:OOMKilled",
+    "NodeAffinity",
+    "NodeShutdown",
     "OOMKilled",
+    "OutOfnvidia.com/gpu",
+    "Terminated",
+    "Terminating",
+    "UnexpectedAdmissionError",
   ];
 
-  const POD_STATUSES_TO_SOMETIMES_CLEAR : [&str; 2] = [
+  const POD_STATUSES_TO_SOMETIMES_CLEAR : [&str; 5] = [
     "Init:1/2",
+    "Init:1/3",
+    "Init:2/3",
+    "Pending",
     "PodInitializing",
     //"ContainerStatusUnknown",
     //"Init:ContainerStatusUnknown",

@@ -18,46 +18,9 @@ pub struct PodInfo {
   pub age: String,
 }
 
-//#[derive(Clone, Debug)]
-//pub enum PodStatus {
-//  Running,
-//
-//  Completed,
-//  ContainerStatusUnknown,
-//  CrashLoopBackOff,
-//  Error,
-//  Evicted,
-//  /// eg. Init:ContainerStatusUnknown
-//  InitContainerStatusUnknown,
-//  /// eg. Init:ErrImagePull
-//  InitErrImagePull,
-//  InitError,
-//  InitImagePullBackoff,
-//  /// eg. Init:2/3
-//  InitPartial,
-//  NodeAffinity,
-//  NodeShutdown,
-//  OOMKilled,
-//  /// eg. OutOfnvidia.com/gpu
-//  OutOfGpu,
-//  Pending,
-//  PodInitializing,
-//  Terminated,
-//  Terminating,
-//  UnexpectedAdmissionError,
-//
-//  OtherStatus(String),
-//}
-
 pub fn list_pods() -> AnyhowResult<Vec<PodInfo>> {
   info!("kube-pod-cleanup");
 
-  // Returns, eg.
-  //     NAME                               READY   STATUS                   RESTARTS        AGE
-  //     analytics-job-b8cbf88bd-c5ghc      1/1     Running                  0               90d
-  //     storyteller-obs-7d6df4b678-xprsq   1/1     Running                  0               90d
-  //     storyteller-web-8566f9bdc5-247d4   0/1     Error                    0               6d11h
-  //     storyteller-web-8566f9bdc5-25lw6   0/1     Evicted                  0               2d15h
   let output = Command::new("kubectl")
       .args(["get", "pods"])
       .output()?;
@@ -79,12 +42,11 @@ fn parse_pod_status_output(stdout: &str) -> AnyhowResult<Vec<PodInfo>> {
       .map(|line| line.trim().to_string())
       .collect::<Vec<String>>();
 
-  // NB: We skip the first line as that's the header.
   Ok(lines.iter()
       .filter_map(|line| {
         LIST_POD_REGEX.captures(line)
       })
-      .skip(1)
+      .skip(1) // NB: We skip the first line as that's the header.
       .map(|captures| {
         let name = captures.index(1);
         let ready = captures.index(2);
