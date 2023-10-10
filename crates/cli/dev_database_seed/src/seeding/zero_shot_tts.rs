@@ -51,7 +51,6 @@ async fn create_voice_records(
     maybe_creator_user_token: Some(creator_user_token.as_str()),
     creator_ip_address: "127.0.0.1",
     creator_set_visibility: &Default::default(),
-    maybe_mod_user_token: None,
     mysql_pool,
   }).await?;
 
