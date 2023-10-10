@@ -19,7 +19,7 @@ container_common = { path = "../../../lib/deprecated/container_common" }
 
 # External
 anyhow = "1.0.40"
-base64 = "0.13.0"
+base64 = "0.21.0"
 chrono = { version = "0.4.19", features = ["serde"] }
 dotenv = "0.15.0"
 log = "0.4.14"

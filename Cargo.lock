@@ -142,7 +142,7 @@ dependencies = [
  "actix-service 1.0.6",
  "actix-threadpool",
  "actix-utils 2.0.0",
- "base64 0.13.0",
+ "base64 0.13.1",
  "bitflags 1.3.2",
  "bytes 0.5.6",
  "cookie 0.14.4",
@@ -854,7 +854,7 @@ dependencies = [
  "actix-http 2.2.0",
  "actix-rt 1.1.1",
  "actix-service 1.0.6",
- "base64 0.13.0",
+ "base64 0.13.1",
  "bytes 0.5.6",
  "cfg-if 1.0.0",
  "derive_more",
@@ -907,9 +907,9 @@ checksum = "3441f0f7b02788e948e47f457ca01f1d7e6d92c693bc132c22b087d3141c03ff"
 
 [[package]]
 name = "base64"
-version = "0.13.0"
+version = "0.13.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "904dfeac50f3cdaba28fc6f57fdcddb75f49ed61346676a78c4ffe55877802fd"
+checksum = "9e1b586273c5702936fe7b7d6896644d8be71e6314cfe09d3167c95f712589e8"
 
 [[package]]
 name = "base64"
@@ -945,7 +945,7 @@ dependencies = [
  "anyhow",
  "async-stripe",
  "async-trait",
- "base64 0.13.0",
+ "base64 0.21.0",
  "chrono",
  "container_common",
  "dotenv",
@@ -1321,7 +1321,7 @@ dependencies = [
  "actix-http 3.3.0",
  "actix-web 4.0.1",
  "anyhow",
- "base64 0.13.0",
+ "base64 0.21.0",
  "chrono",
  "container_common",
  "dotenv",
@@ -2699,7 +2699,7 @@ checksum = "6e9b187a72d63adbfba487f48095306ac823049cb504ee195541e91c7775f5ad"
 dependencies = [
  "anyhow",
  "async-channel",
- "base64 0.13.0",
+ "base64 0.13.1",
  "futures-lite",
  "http",
  "infer 0.2.3",
@@ -2721,7 +2721,7 @@ dependencies = [
  "actix-rt 2.9.0",
  "actix-web 4.0.1",
  "anyhow",
- "base64 0.13.0",
+ "base64 0.21.0",
  "chrono",
  "container_common",
  "dotenv",
@@ -3126,7 +3126,7 @@ version = "0.13.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "86e46349d67dc03bdbdb28da0337a355a53ca1d5156452722c36fe21d0e6389b"
 dependencies = [
- "base64 0.13.0",
+ "base64 0.13.1",
  "crypto-mac",
  "digest 0.9.0",
  "hmac 0.10.1",
@@ -3319,7 +3319,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d3c94f1281833c690f81e6a00c545063b4f034509d3af6d29b58d48e39aa64c9"
 dependencies = [
  "aes-soft",
- "base64 0.13.0",
+ "base64 0.13.1",
  "block-modes",
  "crc-any",
  "des",
@@ -3562,7 +3562,7 @@ name = "mysql_queries"
 version = "0.0.1"
 dependencies = [
  "anyhow",
- "base64 0.13.0",
+ "base64 0.21.0",
  "buckets",
  "chrono",
  "config",
@@ -4763,7 +4763,7 @@ dependencies = [
  "async-trait",
  "aws-creds",
  "aws-region",
- "base64 0.13.0",
+ "base64 0.13.1",
  "cfg-if 1.0.0",
  "hex",
  "hmac 0.12.1",
@@ -4820,7 +4820,7 @@ version = "0.19.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "35edb675feee39aec9c99fa5ff985081995a06d594114ae14cbe797ad7b7a6d7"
 dependencies = [
- "base64 0.13.0",
+ "base64 0.13.1",
  "log",
  "ring 0.16.20",
  "sct",
@@ -5488,7 +5488,7 @@ dependencies = [
  "anyhow",
  "async-stripe",
  "async-trait",
- "base64 0.13.0",
+ "base64 0.21.0",
  "bcrypt",
  "billing_component",
  "bootstrap",
@@ -6536,7 +6536,7 @@ version = "0.14.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "a0b2d8558abd2e276b0a8df5c05a2ec762609344191e5fd23e292c910e9165b5"
 dependencies = [
- "base64 0.13.0",
+ "base64 0.13.1",
  "byteorder",
  "bytes 1.3.0",
  "http",
@@ -6566,7 +6566,7 @@ dependencies = [
  "actix-web 4.0.1",
  "actix-web-actors",
  "anyhow",
- "base64 0.13.0",
+ "base64 0.21.0",
  "bcrypt",
  "chrono",
  "config",
@@ -6666,7 +6666,7 @@ checksum = "f454ca1e9b8dc97a7255ff50e13a8a1d6ffab8ce6b9445cfc331d6420d40a953"
 dependencies = [
  "aliri_braid",
  "async-trait",
- "base64 0.13.0",
+ "base64 0.13.1",
  "displaydoc",
  "http",
  "once_cell",
@@ -6826,7 +6826,7 @@ version = "0.0.1"
 dependencies = [
  "actix-web 4.0.1",
  "anyhow",
- "base64 0.13.0",
+ "base64 0.21.0",
  "bcrypt",
  "chrono",
  "container_common",
@@ -7144,7 +7144,7 @@ dependencies = [
  "actix-web 4.0.1",
  "actix-web-actors",
  "anyhow",
- "base64 0.13.0",
+ "base64 0.21.0",
  "bcrypt",
  "chrono",
  "config",
