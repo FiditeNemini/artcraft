@@ -18,6 +18,8 @@ pub async fn seed_zero_shot_tts(mysql_pool: &Pool<MySql>) -> AnyhowResult<()> {
   };
 
   let records = [
+    // NB: The bucket hashes here are already uploaded to the development Google Cloud Storage
+    // bucket and should be usable if you have the development secrets on your machine.
     ("Alice", "qtqaprnd5shtybve4fqpvcfp50yjw238fbgj92z1521c50xqdxy1akkhkw7tesj0", &user_token),
     ("Biden", "n945w0xsq15xrh16hc147a5mc1a91gwh886e14qqzte1gr9z9q3yawjfvanp4fmg", &user_token),
     ("Goku", "cnnv05yjst2m737dpmxazgfpksjf4y7cxxern2ph7gddgnkh2bw1ephg5mhjbz14", &user_token),

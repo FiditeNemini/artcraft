@@ -18,6 +18,8 @@ pub async fn seed_voice_conversion(mysql_pool: &Pool<MySql>) -> AnyhowResult<()>
   };
 
   let rvc_models = [
+    // NB: The bucket hashes here are already uploaded to the development Google Cloud Storage
+    // bucket and should be usable if you have the development secrets on your machine.
     ("Eric Cartman", "4t9d3y4ve807q69t806pw352dx82h83dzf52bfrp9s9z63gqsxgyezxf8fzdn9yn", true),
     ("Stewie", "bvfe3zwvqnrv64rrtvva1f3r2p2k5tpznfejbh90r353brzqfkveytzyt4cy73hs", true),
     ("Yoda", "cqbcbjsbdy77s4g525nrs791s035b13wew7rp6pep49sx0xr8pqr5af5sseqtkq7", false),
