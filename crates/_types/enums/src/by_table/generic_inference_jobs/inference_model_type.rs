@@ -19,20 +19,18 @@ use strum::EnumIter;
 pub enum InferenceModelType {
   #[serde(rename = "rvc_v2")]
   RvcV2,
-
   // NB: sad_talker does use user-supplied models, so there is no "model token"
   #[serde(rename = "sad_talker")]
   SadTalker,
-
   #[serde(rename = "so_vits_svc")]
   SoVitsSvc,
-
   // TODO: Does this need to be "legacy_tacotron2" ?
   #[serde(rename = "tacotron2")]
   Tacotron2,
-
   #[serde(rename = "vits")]
   Vits,
+  #[serde(rename = "vall_e_x")]
+  VallEX,
 }
 
 // TODO(bt, 2022-12-21): This desperately needs MySQL integration tests!
@@ -48,6 +46,7 @@ impl InferenceModelType {
       Self::SoVitsSvc => "so_vits_svc",
       Self::Tacotron2 => "tacotron2",
       Self::Vits => "vits",
+      Self::VallEX => "vall_e_x"
     }
   }
 
@@ -58,6 +57,7 @@ impl InferenceModelType {
       "so_vits_svc" => Ok(Self::SoVitsSvc),
       "tacotron2" => Ok(Self::Tacotron2),
       "vits" => Ok(Self::Vits),
+      "vall_e_x" => Ok(Self::VallEX),
       _ => Err(format!("invalid value: {:?}", value)),
     }
   }
@@ -71,6 +71,7 @@ impl InferenceModelType {
       InferenceModelType::SoVitsSvc,
       InferenceModelType::Tacotron2,
       InferenceModelType::Vits,
+      InferenceModelType::VallEX
     ])
   }
 }
@@ -87,6 +88,7 @@ mod tests {
     assert_serialization(InferenceModelType::SoVitsSvc, "so_vits_svc");
     assert_serialization(InferenceModelType::Tacotron2, "tacotron2");
     assert_serialization(InferenceModelType::Vits, "vits");
+    assert_serialization(InferenceModelType::VallEX, "vall_e_x");
   }
 
   #[test]
@@ -96,6 +98,7 @@ mod tests {
     assert_eq!(InferenceModelType::SoVitsSvc.to_str(), "so_vits_svc");
     assert_eq!(InferenceModelType::Tacotron2.to_str(), "tacotron2");
     assert_eq!(InferenceModelType::Vits.to_str(), "vits");
+    assert_eq!(InferenceModelType::VallEX.to_str(), "vall_e_x");
   }
 
   #[test]
@@ -105,18 +108,20 @@ mod tests {
     assert_eq!(InferenceModelType::from_str("so_vits_svc").unwrap(), InferenceModelType::SoVitsSvc);
     assert_eq!(InferenceModelType::from_str("tacotron2").unwrap(), InferenceModelType::Tacotron2);
     assert_eq!(InferenceModelType::from_str("vits").unwrap(), InferenceModelType::Vits);
+    assert_eq!(InferenceModelType::from_str("vall_e_x").unwrap(), InferenceModelType::VallEX);
   }
 
   #[test]
   fn all_variants() {
     // Static check
     let mut variants = InferenceModelType::all_variants();
-    assert_eq!(variants.len(), 5);
+    assert_eq!(variants.len(), 6);
     assert_eq!(variants.pop_first(), Some(InferenceModelType::RvcV2));
     assert_eq!(variants.pop_first(), Some(InferenceModelType::SadTalker));
     assert_eq!(variants.pop_first(), Some(InferenceModelType::SoVitsSvc));
     assert_eq!(variants.pop_first(), Some(InferenceModelType::Tacotron2));
     assert_eq!(variants.pop_first(), Some(InferenceModelType::Vits));
+    assert_eq!(variants.pop_first(), Some(InferenceModelType::VallEX));
     assert_eq!(variants.pop_first(), None);
 
     // Generated check

@@ -22,7 +22,12 @@ use newrelic_telemetry::Client as NewRelicClient;
 use crate::job::job_types::lipsync::sad_talker::model_downloaders::SadTalkerDownloaders;
 use crate::job::job_types::lipsync::sad_talker::sad_talker_inference_command::SadTalkerInferenceCommand;
 use crate::job::job_types::tts::tacotron2_v2_early_fakeyou::tacotron2_inference_command::Tacotron2InferenceCommand;
+use crate::job::job_types::tts::vall_e_x::model_downloaders::VallEXDownloaders;
 use crate::job::job_types::tts::vits::vits_inference_command::VitsInferenceCommand;
+
+use crate::job::job_types::tts::vall_e_x::vall_e_x_inference_command::VallEXInferenceCommand;
+use crate::job::job_types::tts::vall_e_x::vall_e_x_inference_command::VallEXCreateEmbeddingCommand;
+
 use crate::job::job_types::vc::rvc_v2::pretrained_hubert_model::PretrainedHubertModel;
 use crate::job::job_types::vc::rvc_v2::rvc_v2_inference_command::RvcV2InferenceCommand;
 use crate::job::job_types::vc::so_vits_svc::so_vits_svc_inference_command::SoVitsSvcInferenceCommand;
@@ -161,6 +166,7 @@ pub struct JobTypeDetails {
   pub rvc_v2: RvcV2Details,
   pub so_vits_svc: SoVitsSvcDetails,
   pub sad_talker: SadTalkerDetails,
+  pub vall_e_x:  VallEXDetails
   //pub tacotron2_modern: ...,
   //pub softvc: ...,
 }
@@ -195,4 +201,12 @@ pub struct SadTalkerDetails {
   pub downloaders: SadTalkerDownloaders,
   pub inference_command: SadTalkerInferenceCommand,
   pub ffmpeg_watermark_command: FfmpegLogoWatermarkCommand,
+}
+
+// TODO: we will probably want a command type of some kind that implements 
+// some kind of interface that we can just pass strings to.
+pub struct VallEXDetails {
+  pub downloaders: VallEXDownloaders,
+  pub inference_command: VallEXInferenceCommand,
+  pub create_embedding_command: VallEXCreateEmbeddingCommand
 }

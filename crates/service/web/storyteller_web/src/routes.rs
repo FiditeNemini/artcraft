@@ -75,6 +75,7 @@ use crate::http_server::endpoints::tts::delete_tts_model::delete_tts_model_handl
 use crate::http_server::endpoints::tts::delete_tts_result::delete_tts_inference_result_handler;
 use crate::http_server::endpoints::tts::edit_tts_model::edit_tts_model_handler;
 use crate::http_server::endpoints::tts::edit_tts_result::edit_tts_inference_result_handler;
+use crate::http_server::endpoints::tts::enqueue_infer_tts_handler;
 use crate::http_server::endpoints::tts::enqueue_infer_tts_handler::enqueue_infer_tts_handler::enqueue_infer_tts_handler;
 use crate::http_server::endpoints::tts::enqueue_upload_tts_model::upload_tts_model_handler;
 use crate::http_server::endpoints::tts::get_pending_tts_inference_job_count::get_pending_tts_inference_job_count_handler;
@@ -174,7 +175,7 @@ pub fn add_routes<T, B> (app: App<T>) -> App<T>
   app = add_subscription_routes(app); /* /v1/subscriptions/... */
 
   // TODO find a long term feature flag solution, since this code is likely deployed into production we don't want the route found.
-  let enable_voice_designer_route = false;
+  let enable_voice_designer_route = true;
   if (enable_voice_designer_route) { 
     app = add_voice_designer_routes(app); /* /v1/voice_designer */
   }

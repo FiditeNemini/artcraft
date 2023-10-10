@@ -2,6 +2,7 @@ use enums::by_table::generic_inference_jobs::inference_category::InferenceCatego
 use errors::AnyhowResult;
 
 use crate::payloads::generic_inference_args::lipsync_payload::LipsyncArgs;
+use crate::payloads::generic_inference_args::tts_payload::TTSArgs;
 
 /// Used to encode extra state for the `generic_inference_jobs` table.
 /// This should act somewhat like a serialized protobuf stored inside a record.
@@ -52,10 +53,10 @@ pub enum PolymorphicInferenceArgs {
   La (LipsyncArgs),
 
   /// Text to speech. (Short name to save space when serializing.)
-  Tts {
+  Tts(TTSArgs)
     // No arguments yet.
     // It might be best to just not include this when not used.
-  },
+    ,
   /// Voice conversion. (Short name to save space when serializing.)
   Vc {
     /// Argument for so-vits-svc
@@ -142,12 +143,13 @@ mod tests {
     assert!(json.len() < 1000);
   }
 
+
+  // TODO FIX THIS TEST! MICHAEL
   #[test]
   fn typical_tts_args_serialize() {
     let args = GenericInferenceArgs {
       inference_category: Some(InferenceCategoryAbbreviated::VoiceConversion),
-      args: Some(PolymorphicInferenceArgs::Tts {
-      }),
+      args: Some(PolymorphicInferenceArgs::Tts()),
     };
 
     let json = serde_json::ser::to_string(&args).unwrap();
