@@ -9,7 +9,7 @@ use actix_web::http::StatusCode;
 use log::{info, warn};
 
 
-pub async fn delete_sample() -> HttpResponse {
-    // Implementation for deleting a sample
-    HttpResponse::Ok().json("Sample deleted successfully")
-  }
+pub async fn upload_sample_handler() -> HttpResponse {
+  // Implementation for uploading a sample
+  HttpResponse::Ok().json("Sample uploaded successfully")
+}

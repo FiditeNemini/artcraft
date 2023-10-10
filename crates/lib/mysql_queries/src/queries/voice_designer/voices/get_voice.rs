@@ -5,7 +5,7 @@ use sqlx::pool::PoolConnection;
 
 use enums::common::visibility::Visibility;
 use errors::AnyhowResult;
-use tokens::tokens::zs_voice::ZsVoiceToken;
+use tokens::tokens::zs_voices::ZsVoiceToken;
 
 pub struct ZsVoice {
     pub token: ZsVoiceToken,
@@ -80,7 +80,7 @@ async fn select_include_deleted(
       RawVoice,
         r#"
         SELECT
-        zv.token as `token: tokens::tokens::zs_voice::ZsVoiceToken`,
+        zv.token as `token: tokens::tokens::zs_voices::ZsVoiceToken`,
         zv.title,
         zv.ietf_language_tag,
         zv.ietf_primary_language_subtag,
@@ -103,7 +103,7 @@ async fn select_without_deleted(
       RawVoice,
         r#"
         SELECT
-        zv.token as `token: tokens::tokens::zs_voice::ZsVoiceToken`,
+        zv.token as `token: tokens::tokens::zs_voices::ZsVoiceToken`,
         zv.title,
         zv.ietf_language_tag,
         zv.ietf_primary_language_subtag,

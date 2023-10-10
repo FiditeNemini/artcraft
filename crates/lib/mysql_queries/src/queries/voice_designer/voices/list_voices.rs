@@ -6,7 +6,7 @@ use sqlx::pool::PoolConnection;
 
 use enums::common::visibility::Visibility;
 use errors::AnyhowResult;
-use tokens::tokens::zs_voice::ZsVoiceToken;
+use tokens::tokens::zs_voices::ZsVoiceToken;
 
 
 // FIXME: This is the old style of query scoping and shouldn't be copied.
@@ -93,7 +93,7 @@ async fn list_dataset_by_creator(
       InternalRawVoiceRecordForList,
         r#"
         SELECT
-            zv.token as `token: tokens::tokens::zs_voice::ZsVoiceToken`,
+            zv.token as `token: tokens::tokens::zs_voices::ZsVoiceToken`,
             zv.title,
             zv.ietf_language_tag,
             zv.ietf_primary_language_subtag,
@@ -117,7 +117,7 @@ async fn list_dataset_by_creator(
             ,
         r#"
         SELECT
-            zv.token as `token: tokens::tokens::zs_voice::ZsVoiceToken`,
+            zv.token as `token: tokens::tokens::zs_voices::ZsVoiceToken`,
             zv.title,
             zv.ietf_language_tag,
             zv.ietf_primary_language_subtag,

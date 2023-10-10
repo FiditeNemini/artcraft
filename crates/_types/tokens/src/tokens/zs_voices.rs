@@ -5,6 +5,7 @@ use serde::Serialize;
 
 use crate::prefixes::EntityType;
 
+/// The primary key for the  "zs_voices" table.
 #[derive(Clone, PartialEq, Eq, PartialOrd, Ord, Hash, sqlx::Type, Debug, Serialize, Deserialize)]
 #[sqlx(transparent)]
 pub struct ZsVoiceToken(pub String);

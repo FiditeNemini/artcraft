@@ -11,15 +11,15 @@ use enums::common::visibility::Visibility;
 use http_server_common::request::get_request_ip::get_request_ip;
 use http_server_common::response::response_success_helpers::simple_json_success;
 use http_server_common::response::serialize_as_json_error::serialize_as_json_error;
-use mysql_queries::queries::voice_designer::voices::create_voice::{create_voice, CreateVoiceArgs};
-use mysql_queries::queries::voice_designer::voices::get_voice::get_voice_by_token;
-use mysql_queries::queries::voice_designer::voices::update_voice::{update_voice, UpdateVoiceArgs};
-use tokens::tokens::zs_voice::ZsVoiceToken;
+use mysql_queries::queries::voice_designer::datasets::create_dataset::{create_dataset, CreateDatasetArgs};
+use mysql_queries::queries::voice_designer::datasets::get_dataset::get_dataset_by_token;
+use mysql_queries::queries::voice_designer::datasets::update_dataset::{update_dataset, UpdateDatasetArgs};
+use tokens::tokens::zs_voice_datasets::ZsVoiceDatasetToken;
 
 use crate::server_state::ServerState;
 
 #[derive(Deserialize)]
-pub struct UpdateVoiceRequest {
+pub struct UpdateDatasetRequest {
   // ========== Author + Moderator options ==========
 
   pub title: Option<String>,
@@ -30,33 +30,33 @@ pub struct UpdateVoiceRequest {
 }
 
 #[derive(Serialize)]
-pub struct UpdateVoiceResponse {
+pub struct UpdateDatasetResponse {
   pub success: bool,
 }
 
 /// For the URL PathInfo
 #[derive(Deserialize)]
-pub struct UpdateVoicePathInfo {
-  voice_token: String,
+pub struct UpdateDatasetPathInfo {
+  dataset_token: String,
 }
 
 // =============== Error Response ===============
 
 #[derive(Debug, Serialize)]
-pub enum UpdateVoiceError {
+pub enum UpdateDatasetError {
   BadInput(String),
   NotFound,
   NotAuthorized,
   ServerError,
 }
 
-impl ResponseError for UpdateVoiceError {
+impl ResponseError for UpdateDatasetError {
   fn status_code(&self) -> StatusCode {
     match *self {
-      UpdateVoiceError::BadInput(_) => StatusCode::BAD_REQUEST,
-      UpdateVoiceError::NotFound => StatusCode::NOT_FOUND,
-      UpdateVoiceError::NotAuthorized => StatusCode::UNAUTHORIZED,
-      UpdateVoiceError::ServerError => StatusCode::INTERNAL_SERVER_ERROR,
+      UpdateDatasetError::BadInput(_) => StatusCode::BAD_REQUEST,
+      UpdateDatasetError::NotFound => StatusCode::NOT_FOUND,
+      UpdateDatasetError::NotAuthorized => StatusCode::UNAUTHORIZED,
+      UpdateDatasetError::ServerError => StatusCode::INTERNAL_SERVER_ERROR,
     }
   }
 
@@ -66,7 +66,7 @@ impl ResponseError for UpdateVoiceError {
 }
 
 // NB: Not using derive_more::Display since Clion doesn't understand it.
-impl fmt::Display for UpdateVoiceError {
+impl fmt::Display for UpdateDatasetError {
   fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
     write!(f, "{:?}", self)
   }
@@ -74,11 +74,11 @@ impl fmt::Display for UpdateVoiceError {
 
 // =============== Handler ===============
 
-pub async fn update_voice_handler(
+pub async fn update_dataset_handler(
   http_request: HttpRequest,
-  path: Path<UpdateVoicePathInfo>,
-  request: web::Json<UpdateVoiceRequest>,
-  server_state: web::Data<Arc<ServerState>>) -> Result<HttpResponse, UpdateVoiceError>
+  path: Path<UpdateDatasetPathInfo>,
+  request: web::Json<UpdateDatasetRequest>,
+  server_state: web::Data<Arc<ServerState>>) -> Result<HttpResponse, UpdateDatasetError>
 {
   let maybe_user_session = server_state
       .session_checker
@@ -86,46 +86,46 @@ pub async fn update_voice_handler(
       .await
       .map_err(|e| {
         warn!("Session checker error: {:?}", e);
-        UpdateVoiceError::ServerError
+        UpdateDatasetError::ServerError
       })?;
 
   let user_session = match maybe_user_session {
     Some(session) => session,
     None => {
       warn!("not logged in");
-      return Err(UpdateVoiceError::NotAuthorized);
+      return Err(UpdateDatasetError::NotAuthorized);
     }
   };
 
-  let voice_token = path.voice_token.clone();
+  let dataset_token = path.dataset_token.clone();
   let is_mod = user_session.can_ban_users;
 
-  let voice_lookup_result = get_voice_by_token(
-    &ZsVoiceToken::new(voice_token.clone()),
+  let dataset_lookup_result = get_dataset_by_token(
+    &ZsVoiceDatasetToken::new(dataset_token.clone()),
     is_mod,
     &server_state.mysql_pool,
   ).await;
 
-  let voice = match voice_lookup_result {
-    Ok(Some(voice)) => voice,
-    Ok(None) => {
-      warn!("Voice not found: {:?}", voice_token);
-      return Err(UpdateVoiceError::NotFound);
-    },
-    Err(err) => {
-      warn!("Error looking up voice: {:?}", err);
-      return Err(UpdateVoiceError::ServerError);
-    }
+  let dataset = match dataset_lookup_result {
+      Ok(Some(dataset)) => dataset,
+      Ok(None) => {
+        warn!("Dataset not found: {:?}", dataset_token);
+        return Err(UpdateDatasetError::NotFound);
+      },
+      Err(err) => {
+        warn!("Error looking up dataset: {:?}", err);
+        return Err(UpdateDatasetError::ServerError);
+      }
   };
 
-  // let is_creator = voice.maybe_creator_user_token == Some(user_session.user_token);
-  let is_creator = voice.maybe_creator_user_token.as_deref()
+  // let is_creator = dataset.maybe_creator_user_token == Some(user_session.user_token);
+  let is_creator = dataset.maybe_creator_user_token.as_deref()
       .map(|creator_user_token| creator_user_token == &user_session.user_token)
       .unwrap_or(false);
 
   if !is_creator && !is_mod {
-    warn!("user is not allowed to edit this voice: {}", user_session.user_token);
-    return Err(UpdateVoiceError::NotAuthorized);
+    warn!("user is not allowed to edit this dataset: {}", user_session.user_token);
+    return Err(UpdateDatasetError::NotAuthorized);
   }
 
   let mut title = None;
@@ -135,7 +135,7 @@ pub async fn update_voice_handler(
 
   if let Some(payload) = request.title.as_deref() {
     if user_input_common::check_for_slurs::contains_slurs(payload) {
-      return Err(UpdateVoiceError::BadInput("title contains slurs".to_string()));
+      return Err(UpdateDatasetError::BadInput("title contains slurs".to_string()));
     }
 
     title = Some(payload.trim().to_string());
@@ -153,7 +153,7 @@ pub async fn update_voice_handler(
         .transpose()
         .map_err(|e| {
           error!("Error parsing language tag '{}': {:?}", tag, e);
-          UpdateVoiceError::BadInput("bad locale string".to_string())
+          UpdateDatasetError::BadInput("bad locale string".to_string())
         })?;
 
     if let Some(full_tag) = maybe_full_canonical_tag {
@@ -166,7 +166,7 @@ pub async fn update_voice_handler(
 
   if let Some(visibility) = request.creator_set_visibility.as_deref() {
     creator_set_visibility = Visibility::from_str(visibility)
-        .map_err(|_| UpdateVoiceError::BadInput("bad record visibility".to_string()))?;
+        .map_err(|_| UpdateDatasetError::BadInput("bad record visibility".to_string()))?;
   }
 
 
@@ -176,10 +176,10 @@ pub async fn update_voice_handler(
   if is_mod {
     maybe_mod_user_token = Some(user_session.user_token.clone());
   }
-  let query_result = update_voice(
-    UpdateVoiceArgs {
-      voice_token: &ZsVoiceToken::new(voice_token.clone()),
-      voice_title: title.as_deref(),
+  let query_result = update_dataset(
+    UpdateDatasetArgs {
+      dataset_token: &ZsVoiceDatasetToken::new(dataset_token.clone()),
+      dataset_title: title.as_deref(),
       maybe_creator_user_token: Some(user_session.user_token.clone().as_ref()),
       creator_ip_address: ip_address.as_ref(),
       creator_set_visibility: &creator_set_visibility,
@@ -193,8 +193,8 @@ pub async fn update_voice_handler(
   match query_result {
     Ok(_) => {},
     Err(err) => {
-      warn!("Update Voice DB error: {:?}", err);
-      return Err(UpdateVoiceError::ServerError);
+      warn!("Update Dataset DB error: {:?}", err);
+      return Err(UpdateDatasetError::ServerError);
     }
   };
 

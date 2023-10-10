@@ -75,7 +75,6 @@ use crate::http_server::endpoints::tts::delete_tts_model::delete_tts_model_handl
 use crate::http_server::endpoints::tts::delete_tts_result::delete_tts_inference_result_handler;
 use crate::http_server::endpoints::tts::edit_tts_model::edit_tts_model_handler;
 use crate::http_server::endpoints::tts::edit_tts_result::edit_tts_inference_result_handler;
-use crate::http_server::endpoints::tts::enqueue_infer_tts_handler;
 use crate::http_server::endpoints::tts::enqueue_infer_tts_handler::enqueue_infer_tts_handler::enqueue_infer_tts_handler;
 use crate::http_server::endpoints::tts::enqueue_upload_tts_model::upload_tts_model_handler;
 use crate::http_server::endpoints::tts::get_pending_tts_inference_job_count::get_pending_tts_inference_job_count_handler;
@@ -105,6 +104,23 @@ use crate::http_server::endpoints::voice_clone_requests::check_if_voice_clone_re
 use crate::http_server::endpoints::voice_clone_requests::create_voice_clone_request::create_voice_clone_request_handler;
 use crate::http_server::endpoints::voice_conversion::inference::enqueue_voice_conversion_inference::enqueue_voice_conversion_inference_handler;
 use crate::http_server::endpoints::voice_conversion::models::list_voice_conversion_models::list_voice_conversion_models_handler;
+use crate::http_server::endpoints::voice_designer::inference::enqueue_tts_request::enqueue_tts_request;
+use crate::http_server::endpoints::voice_designer::inference::enqueue_vc_request::enqueue_vc_request;
+use crate::http_server::endpoints::voice_designer::list_favorite_models::list_favorite_models;
+use crate::http_server::endpoints::voice_designer::list_user_models::list_user_models;
+use crate::http_server::endpoints::voice_designer::voice_dataset_samples::delete_sample::delete_sample_handler;
+use crate::http_server::endpoints::voice_designer::voice_dataset_samples::list_samples_by_dataset::list_samples_by_dataset_handler;
+use crate::http_server::endpoints::voice_designer::voice_dataset_samples::upload_sample::upload_sample_handler;
+use crate::http_server::endpoints::voice_designer::voice_datasets::create_dataset::create_dataset_handler;
+use crate::http_server::endpoints::voice_designer::voice_datasets::delete_dataset::delete_dataset_handler;
+use crate::http_server::endpoints::voice_designer::voice_datasets::list_datasets_by_user::list_datasets_by_user_handler;
+use crate::http_server::endpoints::voice_designer::voice_datasets::update_dataset::update_dataset_handler;
+use crate::http_server::endpoints::voice_designer::voices::create_voice::create_voice_handler;
+use crate::http_server::endpoints::voice_designer::voices::delete_voice::delete_voice_handler;
+use crate::http_server::endpoints::voice_designer::voices::list_available_voices::list_available_voices;
+use crate::http_server::endpoints::voice_designer::voices::list_voices_by_user::list_voices_by_user;
+use crate::http_server::endpoints::voice_designer::voices::search_voices::search_voices;
+use crate::http_server::endpoints::voice_designer::voices::update_voice::update_voice_handler;
 use crate::http_server::endpoints::w2l::delete_w2l_result::delete_w2l_inference_result_handler;
 use crate::http_server::endpoints::w2l::delete_w2l_template::delete_w2l_template_handler;
 use crate::http_server::endpoints::w2l::edit_w2l_result::edit_w2l_inference_result_handler;
@@ -120,28 +136,6 @@ use crate::http_server::endpoints::w2l::list_user_w2l_inference_results::list_us
 use crate::http_server::endpoints::w2l::list_user_w2l_templates::list_user_w2l_templates_handler;
 use crate::http_server::endpoints::w2l::list_w2l_templates::list_w2l_templates_handler;
 use crate::http_server::endpoints::w2l::set_w2l_template_mod_approval::set_w2l_template_mod_approval_handler;
-
-use crate::http_server::endpoints::voice_designer::create_dataset::create_dataset_handler;
-use crate::http_server::endpoints::voice_designer::update_dataset::update_dataset_handler;
-use crate::http_server::endpoints::voice_designer::delete_dataset::delete_dataset_handler;
-use crate::http_server::endpoints::voice_designer::list_datasets_by_user::list_datasets_by_user_handler;
-
-use crate::http_server::endpoints::voice_designer::create_voice::create_voice_handler;
-use crate::http_server::endpoints::voice_designer::update_voice::update_voice_handler;
-use crate::http_server::endpoints::voice_designer::delete_voice::delete_voice_handler;
-use crate::http_server::endpoints::voice_designer::list_available_voices::list_available_voices;
-
-use crate::http_server::endpoints::voice_designer::upload_sample::upload_sample;
-use crate::http_server::endpoints::voice_designer::delete_sample::delete_sample;
-use crate::http_server::endpoints::voice_designer::list_samples_by_dataset::list_samples_by_dataset;
-
-use crate::http_server::endpoints::voice_designer::enqueue_tts_request::enqueue_tts_request;
-use crate::http_server::endpoints::voice_designer::enqueue_vc_request::enqueue_vc_request;
-
-use crate::http_server::endpoints::voice_designer::list_user_models::list_user_models;
-use crate::http_server::endpoints::voice_designer::list_voices_by_user::list_voices_by_user;
-use crate::http_server::endpoints::voice_designer::list_favorite_models::list_favorite_models;
-use crate::http_server::endpoints::voice_designer::search_voices::search_voices;
 
 pub fn add_routes<T, B> (app: App<T>) -> App<T>
   where
@@ -1125,7 +1119,6 @@ fn add_subscription_routes<T, B> (app: App<T>) -> App<T>
     )
 }
 
-// Rename to what you think makes
 fn add_voice_designer_routes<T,B> (app:App<T>)-> App<T>
   where 
     B: MessageBody,
@@ -1158,9 +1151,9 @@ fn add_voice_designer_routes<T,B> (app:App<T>)-> App<T>
               )
               .service(
                   web::scope("/sample")
-                      .route("/upload", web::post().to(upload_sample))
-                      .route("/delete", web::delete().to(delete_sample))
-                      .route("/data_set/{data_set_token}/list", web::get().to(list_samples_by_dataset))
+                      .route("/upload", web::post().to(upload_sample_handler))
+                      .route("/{sample_token}/delete", web::delete().to(delete_sample_handler))
+                      .route("/data_set/{data_set_token}/list", web::get().to(list_samples_by_dataset_handler))
               )
               .service(
                   web::scope("/inference")

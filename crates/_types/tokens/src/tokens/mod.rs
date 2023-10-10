@@ -11,5 +11,6 @@ pub mod users;
 pub mod voice_conversion_models;
 pub mod voice_conversion_results;
 pub mod w2l_templates;
-pub mod zs_dataset;
-pub mod zs_voice;
+pub mod zs_voice_dataset_samples;
+pub mod zs_voice_datasets;
+pub mod zs_voices;
