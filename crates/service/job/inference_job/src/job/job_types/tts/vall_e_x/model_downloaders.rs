@@ -11,9 +11,9 @@ crate::impl_model_downloader!(
     VallEXModelMapping,
     "Vall-e-x Model Mapping",
     "VALL_E_X_MAPPING_BUCKET_PATH",
-    "/dependencies/zero_shot_tts/vall-e-x_1.0",
+    "/dependencies/zero_shot_tts/vall-e-x_1.0/vallex-checkpoint.pt",
     "VALL_E_X_MAPPING_FILESYSTEM_PATH",
-    "/tmp/downloads/zero_shot_tts/vall-e-x_1.0" 
+    "/tmp/downloads/zero_shot_tts/vall-e-x_1.0/vallex-checkpoint.pt" 
   );
   
   crate::impl_model_downloader!(
