@@ -1,0 +1,29 @@
+[package]
+name = "kube-pod-cleanup"
+edition = "2018"
+version = "0.0.1"
+authors = [
+    "Brandon Thomas <bt@brand.io>",
+    "Brandon Thomas <echelon@gmail.com>",
+]
+publish = false
+
+[[bin]]
+name = "kube-pod-cleanup"
+path = "src/main.rs"
+
+[dependencies]
+# Internal
+config = { path = "../../lib/deprecated/config" }
+easyenv = { path = "../../lib/easyenv" }
+enums = { path = "../../_types/enums" }
+errors = { path = "../../lib/errors" }
+hashing = { path = "../../lib/files/hashing" }
+
+# External
+log = "0.4.20"
+once_cell = "1.18.0"
+regex = "1.10.0"
+
+[dev-dependencies]
+# None yet
