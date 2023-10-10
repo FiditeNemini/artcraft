@@ -8,7 +8,7 @@ use enums::by_table::generic_inference_jobs::inference_category::InferenceCatego
 use enums::by_table::generic_inference_jobs::inference_model_type::InferenceModelType;
 use enums::common::visibility::Visibility;
 use errors::AnyhowResult;
-use tokens::jobs::inference::InferenceJobToken;
+use tokens::tokens::generic_inference_jobs::InferenceJobToken;
 
 use crate::column_types::job_status::JobStatus;
 use crate::helpers::boolean_converters::i8_to_bool;

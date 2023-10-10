@@ -10,7 +10,7 @@ use tokens::tokens::audit_logs::AuditLogToken;
 use tokens::tokens::comments::CommentToken;
 use tokens::tokens::tts_models::TtsModelToken;
 use tokens::tokens::w2l_templates::W2lTemplateToken;
-use tokens::users::user::UserToken;
+use tokens::tokens::users::UserToken;
 
 pub enum AuditLogEntityToken {
   Comment(CommentToken),

@@ -12,7 +12,7 @@ use r2d2_redis::redis::Commands;
 use http_server_common::response::serialize_as_json_error::serialize_as_json_error;
 use mysql_queries::queries::generic_download::web::get_generic_download_job_status::get_generic_download_job_status;
 use redis_common::redis_keys::RedisKeys;
-use tokens::jobs::download::DownloadJobToken;
+use tokens::tokens::generic_download_jobs::DownloadJobToken;
 
 use crate::server_state::ServerState;
 

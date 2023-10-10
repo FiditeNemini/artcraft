@@ -4,7 +4,7 @@ use sqlx::MySqlPool;
 use enums::by_table::generic_download_jobs::generic_download_type::GenericDownloadType;
 use enums::common::visibility::Visibility;
 use errors::AnyhowResult;
-use tokens::jobs::download::DownloadJobToken;
+use tokens::tokens::generic_download_jobs::DownloadJobToken;
 
 pub struct InsertGenericDownloadJobArgs<'a> {
   pub uuid_idempotency_token: &'a str,

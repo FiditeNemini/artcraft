@@ -6,7 +6,7 @@ use sqlx::pool::PoolConnection;
 
 use enums::common::visibility::Visibility;
 use errors::AnyhowResult;
-use tokens::users::user::UserToken;
+use tokens::tokens::users::UserToken;
 
 use crate::helpers::boolean_converters::i8_to_bool;
 
@@ -99,7 +99,7 @@ pub async fn get_user_profile_by_username_from_connection<'a>(
       RawUserProfileRecord,
         r#"
 SELECT
-    users.token as `user_token: tokens::users::user::UserToken`,
+    users.token as `user_token: tokens::tokens::users::UserToken`,
     username,
     display_name,
     email_gravatar_hash,

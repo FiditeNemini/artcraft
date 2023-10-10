@@ -5,7 +5,7 @@ use sqlx::{Executor, MySql};
 use enums::by_table::comments::comment_entity_type::CommentEntityType;
 use errors::AnyhowResult;
 use tokens::tokens::comments::CommentToken;
-use tokens::users::user::UserToken;
+use tokens::tokens::users::UserToken;
 
 pub struct Comment {
   pub token: CommentToken,
@@ -53,7 +53,7 @@ SELECT
     c.entity_type as `entity_type: enums::by_table::comments::comment_entity_type::CommentEntityType`,
     c.entity_token,
 
-    c.user_token as `user_token: tokens::users::user::UserToken`,
+    c.user_token as `user_token: tokens::tokens::users::UserToken`,
     u.username,
     u.display_name as user_display_name,
     u.email_gravatar_hash as user_gravatar_hash,

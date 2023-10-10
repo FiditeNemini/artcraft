@@ -15,7 +15,7 @@ use media::decode_basic_audio_info::decode_basic_audio_bytes_info;
 use mimetypes::mimetype_for_bytes::get_mimetype_for_bytes;
 use mysql_queries::queries::media_uploads::get_media_upload_by_uuid::get_media_upload_by_uuid_with_connection;
 use mysql_queries::queries::media_uploads::insert_media_upload::{Args, insert_media_upload};
-use tokens::files::media_upload::MediaUploadToken;
+use tokens::tokens::media_uploads::MediaUploadToken;
 
 use crate::http_server::endpoints::media_uploads::common::drain_multipart_request::{drain_multipart_request, MediaSource};
 use crate::http_server::endpoints::media_uploads::common::upload_error::UploadError;

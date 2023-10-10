@@ -5,7 +5,7 @@ use actix_multipart::Multipart;
 use actix_web::{HttpRequest, HttpResponse, web};
 use once_cell::sync::Lazy;
 
-use tokens::files::media_upload::MediaUploadToken;
+use tokens::tokens::media_uploads::MediaUploadToken;
 
 use crate::http_server::endpoints::media_uploads::common::handle_upload::handle_upload;
 use crate::http_server::endpoints::media_uploads::common::upload_error::UploadError;

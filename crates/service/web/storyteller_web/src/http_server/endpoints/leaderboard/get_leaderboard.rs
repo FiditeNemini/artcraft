@@ -15,7 +15,7 @@ use sqlx::MySqlPool;
 use errors::AnyhowResult;
 use mysql_queries::queries::tts::stats::calculate_tts_model_leaderboard::calculate_tts_model_leaderboard;
 use mysql_queries::queries::w2l::stats::calculate_w2l_template_leaderboard::calculate_w2l_template_leaderboard;
-use tokens::users::user::UserToken;
+use tokens::tokens::users::UserToken;
 
 use crate::http_server::common_responses::user_details_lite::{DefaultAvatarInfo, UserDetailsLight};
 use crate::http_server::web_utils::serialize_as_json_error::serialize_as_json_error;

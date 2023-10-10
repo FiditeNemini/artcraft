@@ -7,8 +7,8 @@ use enums::by_table::media_uploads::media_upload_source::MediaUploadSource;
 use enums::by_table::media_uploads::media_upload_type::MediaUploadType;
 use enums::common::visibility::Visibility;
 use errors::AnyhowResult;
-use tokens::files::media_upload::MediaUploadToken;
-use tokens::users::user::UserToken;
+use tokens::tokens::media_uploads::MediaUploadToken;
+use tokens::tokens::users::UserToken;
 
 use crate::payloads::media_upload_modification_details::MediaUploadModificationDetails;
 

@@ -1,4 +1,4 @@
-use tokens::users::user::UserToken;
+use tokens::tokens::users::UserToken;
 
 use crate::user_avatars::default_avatar_color_from_username::default_avatar_color_from_username;
 use crate::user_avatars::default_avatar_from_username::default_avatar_from_username;

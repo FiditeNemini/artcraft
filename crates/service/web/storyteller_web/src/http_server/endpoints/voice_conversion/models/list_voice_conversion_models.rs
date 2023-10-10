@@ -20,8 +20,8 @@ use enums::common::visibility::Visibility;
 use errors::AnyhowResult;
 use mysql_queries::queries::users::user_sessions::get_user_session_by_token::SessionUserRecord;
 use mysql_queries::queries::voice_conversion::models::list_voice_conversion_models::list_voice_conversion_models_with_connection;
-use tokens::users::user::UserToken;
-use tokens::voice_conversion::model::VoiceConversionModelToken;
+use tokens::tokens::users::UserToken;
+use tokens::tokens::voice_conversion_models::VoiceConversionModelToken;
 
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::server_state::ServerState;

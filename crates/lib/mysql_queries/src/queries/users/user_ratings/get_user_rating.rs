@@ -6,7 +6,7 @@ use sqlx::pool::PoolConnection;
 
 use enums::by_table::user_ratings::rating_value::UserRatingValue;
 use errors::AnyhowResult;
-use tokens::users::user::UserToken;
+use tokens::tokens::users::UserToken;
 
 use crate::composite_keys::by_table::user_ratings::user_rating_entity::UserRatingEntity;
 

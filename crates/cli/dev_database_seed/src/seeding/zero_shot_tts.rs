@@ -5,7 +5,7 @@ use errors::{anyhow, AnyhowResult};
 use mysql_queries::queries::users::user::get_user_token_by_username::get_user_token_by_username;
 use mysql_queries::queries::voice_designer::datasets::create_dataset::{create_dataset, CreateDatasetArgs};
 use mysql_queries::queries::voice_designer::voices::create_voice::{create_voice, CreateVoiceArgs};
-use tokens::users::user::UserToken;
+use tokens::tokens::users::UserToken;
 
 use crate::seeding::users::HANASHI_USERNAME;
 

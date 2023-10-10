@@ -2,7 +2,7 @@ use anyhow::anyhow;
 use sqlx::MySqlPool;
 
 use errors::AnyhowResult;
-use tokens::users::user::UserToken;
+use tokens::tokens::users::UserToken;
 
 pub async fn get_user_token_by_username(username: &str, pool: &MySqlPool) -> AnyhowResult<Option<UserToken>> {
   let username = username.to_lowercase();
@@ -12,7 +12,7 @@ pub async fn get_user_token_by_username(username: &str, pool: &MySqlPool) -> Any
     UsernameRecord,
         r#"
 SELECT
-  token as `token: tokens::users::user::UserToken`
+  token as `token: tokens::tokens::users::UserToken`
 FROM users
   WHERE username = ?
 LIMIT 1

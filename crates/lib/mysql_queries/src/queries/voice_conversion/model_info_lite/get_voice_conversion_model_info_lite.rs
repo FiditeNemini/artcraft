@@ -5,7 +5,7 @@ use sqlx::pool::PoolConnection;
 
 use enums::by_table::voice_conversion_models::voice_conversion_model_type::VoiceConversionModelType;
 use errors::AnyhowResult;
-use tokens::voice_conversion::model::VoiceConversionModelToken;
+use tokens::tokens::voice_conversion_models::VoiceConversionModelToken;
 
 use crate::queries::voice_conversion::model_info_lite::model_info_lite::VoiceConversionModelInfoLite;
 
@@ -26,7 +26,7 @@ pub async fn get_voice_conversion_model_info_lite_with_connection(
       RawVoiceConversionModelInfoLite,
         r#"
 SELECT
-    vc.token as `token: tokens::voice_conversion::model::VoiceConversionModelToken`,
+    vc.token as `token: tokens::tokens::voice_conversion_models::VoiceConversionModelToken`,
     vc.model_type as `model_type: enums::by_table::voice_conversion_models::voice_conversion_model_type::VoiceConversionModelType`
 FROM voice_conversion_models as vc
 WHERE vc.token = ?

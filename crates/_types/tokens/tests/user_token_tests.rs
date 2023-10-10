@@ -3,7 +3,7 @@
 use serde::Deserialize;
 use serde::Serialize;
 
-use tokens::users::user::UserToken;
+use tokens::tokens::users::UserToken;
 
 #[derive(Serialize, Deserialize, PartialEq, Debug)]
 struct CompositeType {
@@ -12,7 +12,7 @@ struct CompositeType {
 }
 
 mod interface {
-  use tokens::users::user::UserToken;
+  use tokens::tokens::users::UserToken;
 
   #[test]
   fn generate() {
@@ -47,7 +47,7 @@ mod interface {
 }
 
 mod traits {
-  use tokens::users::user::UserToken;
+  use tokens::tokens::users::UserToken;
 
   #[test]
   fn display() {
@@ -63,7 +63,7 @@ mod traits {
 }
 
 mod serialization {
-  use tokens::users::user::UserToken;
+  use tokens::tokens::users::UserToken;
 
   use crate::CompositeType;
 
@@ -87,7 +87,7 @@ mod serialization {
 }
 
 mod deserialization {
-  use tokens::users::user::UserToken;
+  use tokens::tokens::users::UserToken;
 
   use crate::CompositeType;
 
@@ -118,7 +118,7 @@ mod deserialization {
 
 // These traits should be tested by the macro, but we duplicate them in case that breaks
 mod crockford_traits {
-  use tokens::users::user::UserToken;
+  use tokens::tokens::users::UserToken;
 
   const ENTROPIC_CHARACTERS_MINIMUM : usize = 8;
 

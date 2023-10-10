@@ -11,7 +11,7 @@ use sqlx::MySqlPool;
 use enums::common::visibility::Visibility;
 use errors::AnyhowResult;
 use tokens::tokens::voice_conversion_results::VoiceConversionResultToken;
-use tokens::users::user::UserToken;
+use tokens::tokens::users::UserToken;
 
 use crate::helpers::boolean_converters::nullable_i8_to_bool;
 
@@ -114,7 +114,7 @@ async fn select_including_deleted(
 SELECT
     voice_conversion_results.token as `voice_conversion_result_token: tokens::tokens::voice_conversion_results::VoiceConversionResultToken`,
 
-    users.token as `maybe_creator_user_token: tokens::users::user::UserToken`,
+    users.token as `maybe_creator_user_token: tokens::tokens::users::UserToken`,
     users.is_banned as maybe_creator_is_banned,
 
     voice_conversion_results.public_bucket_hash,
@@ -151,7 +151,7 @@ async fn select_without_deleted(
 SELECT
     voice_conversion_results.token as `voice_conversion_result_token: tokens::tokens::voice_conversion_results::VoiceConversionResultToken`,
 
-    users.token as `maybe_creator_user_token: tokens::users::user::UserToken`,
+    users.token as `maybe_creator_user_token: tokens::tokens::users::UserToken`,
     users.is_banned as maybe_creator_is_banned,
 
     voice_conversion_results.public_bucket_hash,

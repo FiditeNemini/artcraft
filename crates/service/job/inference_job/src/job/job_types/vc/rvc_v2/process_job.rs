@@ -18,8 +18,8 @@ use mysql_queries::queries::generic_inference::job::list_available_generic_infer
 use mysql_queries::queries::media_uploads::get_media_upload_for_inference::MediaUploadRecordForInference;
 use mysql_queries::queries::voice_conversion::inference::get_voice_conversion_model_for_inference::VoiceConversionModelForInference;
 use mysql_queries::queries::voice_conversion::results::insert_voice_conversion_result::{insert_voice_conversion_result, InsertArgs};
-use tokens::files::media_upload::MediaUploadToken;
-use tokens::users::user::UserToken;
+use tokens::tokens::media_uploads::MediaUploadToken;
+use tokens::tokens::users::UserToken;
 
 use crate::job::job_loop::job_success_result::{JobSuccessResult, ResultEntity};
 use crate::job::job_loop::process_single_job_error::ProcessSingleJobError;

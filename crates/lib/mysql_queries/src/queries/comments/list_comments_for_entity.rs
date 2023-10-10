@@ -5,7 +5,7 @@ use sqlx::MySqlPool;
 
 use errors::AnyhowResult;
 use tokens::tokens::comments::CommentToken;
-use tokens::users::user::UserToken;
+use tokens::tokens::users::UserToken;
 
 use crate::queries::comments::comment_entity_token::CommentEntityToken;
 
@@ -47,7 +47,7 @@ pub async fn list_comments_for_entity(
         r#"
 SELECT
     c.token as `token: tokens::tokens::comments::CommentToken`,
-    c.user_token as `user_token: tokens::users::user::UserToken`,
+    c.user_token as `user_token: tokens::tokens::users::UserToken`,
     u.username,
     u.display_name as user_display_name,
     u.email_gravatar_hash as user_gravatar_hash,

@@ -11,8 +11,8 @@ use log::{log, warn};
 use enums::by_table::media_uploads::media_upload_type::MediaUploadType;
 use enums::common::visibility::Visibility;
 use mysql_queries::queries::media_uploads::reverse_list_user_media_uploads_of_type::reverse_list_user_media_uploads_of_type_with_connection;
-use tokens::files::media_upload::MediaUploadToken;
-use tokens::users::user::UserToken;
+use tokens::tokens::media_uploads::MediaUploadToken;
+use tokens::tokens::users::UserToken;
 use users_component::utils::user_session_extended::UserSessionExtended;
 
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;

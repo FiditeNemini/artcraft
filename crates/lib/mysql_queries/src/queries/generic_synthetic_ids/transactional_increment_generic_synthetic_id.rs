@@ -4,7 +4,7 @@ use sqlx::{MySql, Transaction};
 
 use enums::by_table::generic_synthetic_ids::id_category::IdCategory;
 use errors::AnyhowResult;
-use tokens::users::user::UserToken;
+use tokens::tokens::users::UserToken;
 
 pub async fn transactional_increment_generic_synthetic_id(
   user_token: &UserToken,

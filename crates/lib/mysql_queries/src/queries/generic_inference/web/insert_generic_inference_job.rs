@@ -6,8 +6,8 @@ use enums::by_table::generic_inference_jobs::inference_input_source_token_type::
 use enums::by_table::generic_inference_jobs::inference_model_type::InferenceModelType;
 use enums::common::visibility::Visibility;
 use errors::AnyhowResult;
-use tokens::jobs::inference::InferenceJobToken;
-use tokens::users::user::UserToken;
+use tokens::tokens::generic_inference_jobs::InferenceJobToken;
+use tokens::tokens::users::UserToken;
 
 use crate::payloads::generic_inference_args::generic_inference_args::GenericInferenceArgs;
 

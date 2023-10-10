@@ -3359,7 +3359,7 @@
           }
         },
         {
-          "name": "creator_user_token: tokens::users::user::UserToken",
+          "name": "creator_user_token: tokens::tokens::users::UserToken",
           "ordinal": 2,
           "type_info": {
             "char_set": 224,
@@ -3510,7 +3510,7 @@
         "Right": 1
       }
     },
-    "query": "\nSELECT\n    vc.token as `token: tokens::voice_conversion::model::VoiceConversionModelToken`,\n    vc.model_type as `model_type: enums::by_table::voice_conversion_models::voice_conversion_model_type::VoiceConversionModelType`,\n    vc.creator_user_token as `creator_user_token: tokens::users::user::UserToken`,\n    users.username as creator_username,\n    users.display_name as creator_display_name,\n    users.email_gravatar_hash as creator_gravatar_hash,\n    vc.title,\n    vc.ietf_language_tag,\n    vc.ietf_primary_language_subtag,\n    vc.is_front_page_featured,\n    vc.creator_set_visibility as `creator_set_visibility: enums::common::visibility::Visibility`,\n    vc.created_at,\n    vc.updated_at\nFROM voice_conversion_models as vc\nJOIN users\n    ON users.token = vc.creator_user_token\nWHERE\n    users.username = ?\n    AND vc.user_deleted_at IS NULL\n    AND vc.mod_deleted_at IS NULL\n        "
+    "query": "\nSELECT\n    vc.token as `token: tokens::voice_conversion::model::VoiceConversionModelToken`,\n    vc.model_type as `model_type: enums::by_table::voice_conversion_models::voice_conversion_model_type::VoiceConversionModelType`,\n    vc.creator_user_token as `creator_user_token: tokens::tokens::users::UserToken`,\n    users.username as creator_username,\n    users.display_name as creator_display_name,\n    users.email_gravatar_hash as creator_gravatar_hash,\n    vc.title,\n    vc.ietf_language_tag,\n    vc.ietf_primary_language_subtag,\n    vc.is_front_page_featured,\n    vc.creator_set_visibility as `creator_set_visibility: enums::common::visibility::Visibility`,\n    vc.created_at,\n    vc.updated_at\nFROM voice_conversion_models as vc\nJOIN users\n    ON users.token = vc.creator_user_token\nWHERE\n    users.username = ?\n    AND vc.user_deleted_at IS NULL\n    AND vc.mod_deleted_at IS NULL\n        "
   },
   "25e7858d370ac1359deb42ef5292e85ccd1fe7debf3a1ba73303e5882523a4d0": {
     "describe": {
@@ -4325,7 +4325,7 @@
           }
         },
         {
-          "name": "maybe_creator_user_token: tokens::users::user::UserToken",
+          "name": "maybe_creator_user_token: tokens::tokens::users::UserToken",
           "ordinal": 1,
           "type_info": {
             "char_set": 224,
@@ -4436,7 +4436,7 @@
         "Right": 1
       }
     },
-    "query": "\nSELECT\n    voice_conversion_results.token as `voice_conversion_result_token: tokens::tokens::voice_conversion_results::VoiceConversionResultToken`,\n\n    users.token as `maybe_creator_user_token: tokens::users::user::UserToken`,\n    users.is_banned as maybe_creator_is_banned,\n\n    voice_conversion_results.public_bucket_hash,\n\n    voice_conversion_results.creator_set_visibility,\n\n    voice_conversion_results.file_size_bytes,\n    voice_conversion_results.duration_millis,\n\n    voice_conversion_results.user_deleted_at,\n    voice_conversion_results.mod_deleted_at\n\nFROM voice_conversion_results\nLEFT OUTER JOIN voice_conversion_models\n  ON voice_conversion_results.model_token = voice_conversion_models.token\nLEFT OUTER JOIN users\n  ON voice_conversion_results.maybe_creator_user_token = users.token\nWHERE\n    voice_conversion_results.token = ?\n        "
+    "query": "\nSELECT\n    voice_conversion_results.token as `voice_conversion_result_token: tokens::tokens::voice_conversion_results::VoiceConversionResultToken`,\n\n    users.token as `maybe_creator_user_token: tokens::tokens::users::UserToken`,\n    users.is_banned as maybe_creator_is_banned,\n\n    voice_conversion_results.public_bucket_hash,\n\n    voice_conversion_results.creator_set_visibility,\n\n    voice_conversion_results.file_size_bytes,\n    voice_conversion_results.duration_millis,\n\n    voice_conversion_results.user_deleted_at,\n    voice_conversion_results.mod_deleted_at\n\nFROM voice_conversion_results\nLEFT OUTER JOIN voice_conversion_models\n  ON voice_conversion_results.model_token = voice_conversion_models.token\nLEFT OUTER JOIN users\n  ON voice_conversion_results.maybe_creator_user_token = users.token\nWHERE\n    voice_conversion_results.token = ?\n        "
   },
   "3e0387ef5d2569da801274c3ca80524e2b59b7eea577c1c96a28c186fb4fa0ea": {
     "describe": {
@@ -6540,7 +6540,7 @@
     "describe": {
       "columns": [
         {
-          "name": "token: tokens::users::user::UserToken",
+          "name": "token: tokens::tokens::users::UserToken",
           "ordinal": 0,
           "type_info": {
             "char_set": 224,
@@ -6611,7 +6611,7 @@
         "Right": 1
       }
     },
-    "query": "\nSELECT\n  token as `token: tokens::users::user::UserToken`,\n  username,\n  email_address,\n  password_hash,\n  is_banned\nFROM users\nWHERE email_address = ?\nLIMIT 1\n        "
+    "query": "\nSELECT\n  token as `token: tokens::tokens::users::UserToken`,\n  username,\n  email_address,\n  password_hash,\n  is_banned\nFROM users\nWHERE email_address = ?\nLIMIT 1\n        "
   },
   "497aa22c0f3085dd2905ab6a66643a247ecbb25a5a125e8bf67a49c87a20b70f": {
     "describe": {
@@ -7500,7 +7500,7 @@
           }
         },
         {
-          "name": "maybe_creator_user_token: tokens::users::user::UserToken",
+          "name": "maybe_creator_user_token: tokens::tokens::users::UserToken",
           "ordinal": 3,
           "type_info": {
             "char_set": 224,
@@ -7560,7 +7560,7 @@
           }
         },
         {
-          "name": "maybe_model_creator_user_token: tokens::users::user::UserToken",
+          "name": "maybe_model_creator_user_token: tokens::tokens::users::UserToken",
           "ordinal": 8,
           "type_info": {
             "char_set": 224,
@@ -7782,7 +7782,7 @@
         "Right": 1
       }
     },
-    "query": "\nSELECT\n    voice_conversion_results.token as `voice_conversion_result_token: tokens::tokens::voice_conversion_results::VoiceConversionResultToken`,\n\n    voice_conversion_results.model_token as `voice_conversion_model_token: tokens::voice_conversion::model::VoiceConversionModelToken`,\n    voice_conversion_models.title as voice_conversion_model_title,\n\n    users.token as `maybe_creator_user_token: tokens::users::user::UserToken`,\n    users.username as maybe_creator_username,\n    users.display_name as maybe_creator_display_name,\n    users.email_gravatar_hash as maybe_creator_gravatar_hash,\n    users.is_banned as maybe_creator_is_banned,\n\n    model_users.token as `maybe_model_creator_user_token: tokens::users::user::UserToken`,\n    model_users.username as maybe_model_creator_username,\n    model_users.display_name as maybe_model_creator_display_name,\n    model_users.email_gravatar_hash as maybe_model_creator_gravatar_hash,\n    model_users.is_banned as maybe_model_creator_is_banned,\n\n    voice_conversion_results.public_bucket_hash,\n\n    voice_conversion_results.creator_set_visibility,\n\n    voice_conversion_results.generated_by_worker,\n    voice_conversion_results.is_debug_request,\n\n    voice_conversion_results.file_size_bytes,\n    voice_conversion_results.duration_millis,\n    voice_conversion_results.created_at,\n    voice_conversion_results.updated_at,\n\n    voice_conversion_results.creator_ip_address,\n    voice_conversion_results.user_deleted_at,\n    voice_conversion_results.mod_deleted_at\n\nFROM voice_conversion_results\nLEFT OUTER JOIN voice_conversion_models\n  ON voice_conversion_results.model_token = voice_conversion_models.token\nLEFT OUTER JOIN users\n  ON voice_conversion_results.maybe_creator_user_token = users.token\nLEFT OUTER JOIN users as model_users\n  ON voice_conversion_models.creator_user_token = model_users.token\nWHERE\n    voice_conversion_results.token = ?\n    AND voice_conversion_results.user_deleted_at IS NULL\n    AND voice_conversion_results.mod_deleted_at IS NULL\n        "
+    "query": "\nSELECT\n    voice_conversion_results.token as `voice_conversion_result_token: tokens::tokens::voice_conversion_results::VoiceConversionResultToken`,\n\n    voice_conversion_results.model_token as `voice_conversion_model_token: tokens::voice_conversion::model::VoiceConversionModelToken`,\n    voice_conversion_models.title as voice_conversion_model_title,\n\n    users.token as `maybe_creator_user_token: tokens::tokens::users::UserToken`,\n    users.username as maybe_creator_username,\n    users.display_name as maybe_creator_display_name,\n    users.email_gravatar_hash as maybe_creator_gravatar_hash,\n    users.is_banned as maybe_creator_is_banned,\n\n    model_users.token as `maybe_model_creator_user_token: tokens::tokens::users::UserToken`,\n    model_users.username as maybe_model_creator_username,\n    model_users.display_name as maybe_model_creator_display_name,\n    model_users.email_gravatar_hash as maybe_model_creator_gravatar_hash,\n    model_users.is_banned as maybe_model_creator_is_banned,\n\n    voice_conversion_results.public_bucket_hash,\n\n    voice_conversion_results.creator_set_visibility,\n\n    voice_conversion_results.generated_by_worker,\n    voice_conversion_results.is_debug_request,\n\n    voice_conversion_results.file_size_bytes,\n    voice_conversion_results.duration_millis,\n    voice_conversion_results.created_at,\n    voice_conversion_results.updated_at,\n\n    voice_conversion_results.creator_ip_address,\n    voice_conversion_results.user_deleted_at,\n    voice_conversion_results.mod_deleted_at\n\nFROM voice_conversion_results\nLEFT OUTER JOIN voice_conversion_models\n  ON voice_conversion_results.model_token = voice_conversion_models.token\nLEFT OUTER JOIN users\n  ON voice_conversion_results.maybe_creator_user_token = users.token\nLEFT OUTER JOIN users as model_users\n  ON voice_conversion_models.creator_user_token = model_users.token\nWHERE\n    voice_conversion_results.token = ?\n    AND voice_conversion_results.user_deleted_at IS NULL\n    AND voice_conversion_results.mod_deleted_at IS NULL\n        "
   },
   "551749bc153f9c8683a3a1ca5bb50744322aac046db34327501cf991485c4dee": {
     "describe": {
@@ -8030,7 +8030,7 @@
     "describe": {
       "columns": [
         {
-          "name": "user_token: tokens::users::user::UserToken",
+          "name": "user_token: tokens::tokens::users::UserToken",
           "ordinal": 0,
           "type_info": {
             "char_set": 224,
@@ -8309,7 +8309,7 @@
         "Right": 1
       }
     },
-    "query": "\nSELECT\n    users.token as `user_token: tokens::users::user::UserToken`,\n    username,\n    display_name,\n    email_gravatar_hash,\n    profile_markdown,\n    profile_rendered_html,\n    user_role_slug,\n    disable_gravatar,\n    preferred_tts_result_visibility as `preferred_tts_result_visibility: enums::common::visibility::Visibility`,\n    preferred_w2l_result_visibility as `preferred_w2l_result_visibility: enums::common::visibility::Visibility`,\n    discord_username,\n    twitch_username,\n    twitter_username,\n    patreon_username,\n    github_username,\n    cashapp_username,\n    website_url,\n    is_banned,\n    maybe_mod_comments,\n    maybe_mod_user_token,\n    created_at\nFROM users\nWHERE\n    users.username = ?\n    AND users.user_deleted_at IS NULL\n    AND users.mod_deleted_at IS NULL\n        "
+    "query": "\nSELECT\n    users.token as `user_token: tokens::tokens::users::UserToken`,\n    username,\n    display_name,\n    email_gravatar_hash,\n    profile_markdown,\n    profile_rendered_html,\n    user_role_slug,\n    disable_gravatar,\n    preferred_tts_result_visibility as `preferred_tts_result_visibility: enums::common::visibility::Visibility`,\n    preferred_w2l_result_visibility as `preferred_w2l_result_visibility: enums::common::visibility::Visibility`,\n    discord_username,\n    twitch_username,\n    twitter_username,\n    patreon_username,\n    github_username,\n    cashapp_username,\n    website_url,\n    is_banned,\n    maybe_mod_comments,\n    maybe_mod_user_token,\n    created_at\nFROM users\nWHERE\n    users.username = ?\n    AND users.user_deleted_at IS NULL\n    AND users.mod_deleted_at IS NULL\n        "
   },
   "593f27e96257dd615bd389f5ecc65d2e5e6334fcad8eca384ad5c49849d5ed18": {
     "describe": {
@@ -8437,7 +8437,7 @@
           }
         },
         {
-          "name": "maybe_creator_user_token: tokens::users::user::UserToken",
+          "name": "maybe_creator_user_token: tokens::tokens::users::UserToken",
           "ordinal": 3,
           "type_info": {
             "char_set": 224,
@@ -8497,7 +8497,7 @@
           }
         },
         {
-          "name": "maybe_model_creator_user_token: tokens::users::user::UserToken",
+          "name": "maybe_model_creator_user_token: tokens::tokens::users::UserToken",
           "ordinal": 8,
           "type_info": {
             "char_set": 224,
@@ -8719,7 +8719,7 @@
         "Right": 1
       }
     },
-    "query": "\nSELECT\n    voice_conversion_results.token as `voice_conversion_result_token: tokens::tokens::voice_conversion_results::VoiceConversionResultToken`,\n\n    voice_conversion_results.model_token as `voice_conversion_model_token: tokens::voice_conversion::model::VoiceConversionModelToken`,\n    voice_conversion_models.title as voice_conversion_model_title,\n\n    users.token as `maybe_creator_user_token: tokens::users::user::UserToken`,\n    users.username as maybe_creator_username,\n    users.display_name as maybe_creator_display_name,\n    users.email_gravatar_hash as maybe_creator_gravatar_hash,\n    users.is_banned as maybe_creator_is_banned,\n\n    model_users.token as `maybe_model_creator_user_token: tokens::users::user::UserToken`,\n    model_users.username as maybe_model_creator_username,\n    model_users.display_name as maybe_model_creator_display_name,\n    model_users.email_gravatar_hash as maybe_model_creator_gravatar_hash,\n    model_users.is_banned as maybe_model_creator_is_banned,\n\n    voice_conversion_results.public_bucket_hash,\n\n    voice_conversion_results.creator_set_visibility,\n\n    voice_conversion_results.generated_by_worker,\n    voice_conversion_results.is_debug_request,\n\n    voice_conversion_results.file_size_bytes,\n    voice_conversion_results.duration_millis,\n    voice_conversion_results.created_at,\n    voice_conversion_results.updated_at,\n\n    voice_conversion_results.creator_ip_address,\n    voice_conversion_results.user_deleted_at,\n    voice_conversion_results.mod_deleted_at\n\nFROM voice_conversion_results\nLEFT OUTER JOIN voice_conversion_models\n  ON voice_conversion_results.model_token = voice_conversion_models.token\nLEFT OUTER JOIN users\n  ON voice_conversion_results.maybe_creator_user_token = users.token\nLEFT OUTER JOIN users as model_users\n  ON voice_conversion_models.creator_user_token = model_users.token\nWHERE\n    voice_conversion_results.token = ?\n        "
+    "query": "\nSELECT\n    voice_conversion_results.token as `voice_conversion_result_token: tokens::tokens::voice_conversion_results::VoiceConversionResultToken`,\n\n    voice_conversion_results.model_token as `voice_conversion_model_token: tokens::voice_conversion::model::VoiceConversionModelToken`,\n    voice_conversion_models.title as voice_conversion_model_title,\n\n    users.token as `maybe_creator_user_token: tokens::tokens::users::UserToken`,\n    users.username as maybe_creator_username,\n    users.display_name as maybe_creator_display_name,\n    users.email_gravatar_hash as maybe_creator_gravatar_hash,\n    users.is_banned as maybe_creator_is_banned,\n\n    model_users.token as `maybe_model_creator_user_token: tokens::tokens::users::UserToken`,\n    model_users.username as maybe_model_creator_username,\n    model_users.display_name as maybe_model_creator_display_name,\n    model_users.email_gravatar_hash as maybe_model_creator_gravatar_hash,\n    model_users.is_banned as maybe_model_creator_is_banned,\n\n    voice_conversion_results.public_bucket_hash,\n\n    voice_conversion_results.creator_set_visibility,\n\n    voice_conversion_results.generated_by_worker,\n    voice_conversion_results.is_debug_request,\n\n    voice_conversion_results.file_size_bytes,\n    voice_conversion_results.duration_millis,\n    voice_conversion_results.created_at,\n    voice_conversion_results.updated_at,\n\n    voice_conversion_results.creator_ip_address,\n    voice_conversion_results.user_deleted_at,\n    voice_conversion_results.mod_deleted_at\n\nFROM voice_conversion_results\nLEFT OUTER JOIN voice_conversion_models\n  ON voice_conversion_results.model_token = voice_conversion_models.token\nLEFT OUTER JOIN users\n  ON voice_conversion_results.maybe_creator_user_token = users.token\nLEFT OUTER JOIN users as model_users\n  ON voice_conversion_models.creator_user_token = model_users.token\nWHERE\n    voice_conversion_results.token = ?\n        "
   },
   "5e4a00c339ce4d7fac19aff728449156b1e02b9e1d9fd534ac37d4ac79f44820": {
     "describe": {
@@ -9113,7 +9113,7 @@
           }
         },
         {
-          "name": "user_token: tokens::users::user::UserToken",
+          "name": "user_token: tokens::tokens::users::UserToken",
           "ordinal": 1,
           "type_info": {
             "char_set": 224,
@@ -9302,7 +9302,7 @@
         "Right": 2
       }
     },
-    "query": "\nSELECT\n    c.token as `token: tokens::tokens::comments::CommentToken`,\n    c.user_token as `user_token: tokens::users::user::UserToken`,\n    u.username,\n    u.display_name as user_display_name,\n    u.email_gravatar_hash as user_gravatar_hash,\n\n    c.comment_markdown,\n    c.comment_rendered_html,\n\n    c.creator_ip_address,\n    c.editor_ip_address,\n\n    c.created_at,\n    c.updated_at,\n    c.edited_at,\n    c.user_deleted_at,\n    c.mod_deleted_at,\n    c.object_owner_deleted_at\n\nFROM\n    comments AS c\nJOIN users AS u\n    ON c.user_token = u.token\nWHERE\n    c.entity_type = ?\n    AND c.entity_token = ?\n    AND c.user_deleted_at IS NULL\n    AND c.mod_deleted_at IS NULL\n    AND c.object_owner_deleted_at IS NULL\nORDER BY c.id DESC\nLIMIT 50\n        "
+    "query": "\nSELECT\n    c.token as `token: tokens::tokens::comments::CommentToken`,\n    c.user_token as `user_token: tokens::tokens::users::UserToken`,\n    u.username,\n    u.display_name as user_display_name,\n    u.email_gravatar_hash as user_gravatar_hash,\n\n    c.comment_markdown,\n    c.comment_rendered_html,\n\n    c.creator_ip_address,\n    c.editor_ip_address,\n\n    c.created_at,\n    c.updated_at,\n    c.edited_at,\n    c.user_deleted_at,\n    c.mod_deleted_at,\n    c.object_owner_deleted_at\n\nFROM\n    comments AS c\nJOIN users AS u\n    ON c.user_token = u.token\nWHERE\n    c.entity_type = ?\n    AND c.entity_token = ?\n    AND c.user_deleted_at IS NULL\n    AND c.mod_deleted_at IS NULL\n    AND c.object_owner_deleted_at IS NULL\nORDER BY c.id DESC\nLIMIT 50\n        "
   },
   "70c4b729165c1f29c71cbd4c6b1866a82c950997af4adb6fe2fe7e30a6c17590": {
     "describe": {
@@ -9332,7 +9332,7 @@
           }
         },
         {
-          "name": "creator_user_token: tokens::users::user::UserToken",
+          "name": "creator_user_token: tokens::tokens::users::UserToken",
           "ordinal": 2,
           "type_info": {
             "char_set": 224,
@@ -9483,7 +9483,7 @@
         "Right": 0
       }
     },
-    "query": "\nSELECT\n    vc.token as `token: tokens::voice_conversion::model::VoiceConversionModelToken`,\n    vc.model_type as `model_type: enums::by_table::voice_conversion_models::voice_conversion_model_type::VoiceConversionModelType`,\n    vc.creator_user_token as `creator_user_token: tokens::users::user::UserToken`,\n    users.username as creator_username,\n    users.display_name as creator_display_name,\n    users.email_gravatar_hash as creator_gravatar_hash,\n    vc.title,\n    vc.ietf_language_tag,\n    vc.ietf_primary_language_subtag,\n    vc.is_front_page_featured,\n    vc.creator_set_visibility as `creator_set_visibility: enums::common::visibility::Visibility`,\n    vc.created_at,\n    vc.updated_at\nFROM voice_conversion_models as vc\nJOIN users\n    ON users.token = vc.creator_user_token\nWHERE\n    vc.user_deleted_at IS NULL\n    AND vc.mod_deleted_at IS NULL\n        "
+    "query": "\nSELECT\n    vc.token as `token: tokens::voice_conversion::model::VoiceConversionModelToken`,\n    vc.model_type as `model_type: enums::by_table::voice_conversion_models::voice_conversion_model_type::VoiceConversionModelType`,\n    vc.creator_user_token as `creator_user_token: tokens::tokens::users::UserToken`,\n    users.username as creator_username,\n    users.display_name as creator_display_name,\n    users.email_gravatar_hash as creator_gravatar_hash,\n    vc.title,\n    vc.ietf_language_tag,\n    vc.ietf_primary_language_subtag,\n    vc.is_front_page_featured,\n    vc.creator_set_visibility as `creator_set_visibility: enums::common::visibility::Visibility`,\n    vc.created_at,\n    vc.updated_at\nFROM voice_conversion_models as vc\nJOIN users\n    ON users.token = vc.creator_user_token\nWHERE\n    vc.user_deleted_at IS NULL\n    AND vc.mod_deleted_at IS NULL\n        "
   },
   "718174fa75df95d510a330bcdfb898653ae3e405e4609c9a4011cc5389c2e9ba": {
     "describe": {
@@ -9638,7 +9638,7 @@
           }
         },
         {
-          "name": "user_token: tokens::users::user::UserToken",
+          "name": "user_token: tokens::tokens::users::UserToken",
           "ordinal": 3,
           "type_info": {
             "char_set": 224,
@@ -9829,7 +9829,7 @@
         "Right": 1
       }
     },
-    "query": "\nSELECT\n    c.token as `token: tokens::tokens::comments::CommentToken`,\n\n    c.entity_type as `entity_type: enums::by_table::comments::comment_entity_type::CommentEntityType`,\n    c.entity_token,\n\n    c.user_token as `user_token: tokens::users::user::UserToken`,\n    u.username,\n    u.display_name as user_display_name,\n    u.email_gravatar_hash as user_gravatar_hash,\n\n    c.comment_markdown,\n    c.comment_rendered_html,\n\n    c.creator_ip_address,\n    c.editor_ip_address,\n\n    c.created_at,\n    c.updated_at,\n    c.edited_at,\n    c.user_deleted_at,\n    c.mod_deleted_at,\n    c.object_owner_deleted_at\n\nFROM\n    comments AS c\nJOIN users AS u\n    ON c.user_token = u.token\nWHERE\n    c.token = ?\n        "
+    "query": "\nSELECT\n    c.token as `token: tokens::tokens::comments::CommentToken`,\n\n    c.entity_type as `entity_type: enums::by_table::comments::comment_entity_type::CommentEntityType`,\n    c.entity_token,\n\n    c.user_token as `user_token: tokens::tokens::users::UserToken`,\n    u.username,\n    u.display_name as user_display_name,\n    u.email_gravatar_hash as user_gravatar_hash,\n\n    c.comment_markdown,\n    c.comment_rendered_html,\n\n    c.creator_ip_address,\n    c.editor_ip_address,\n\n    c.created_at,\n    c.updated_at,\n    c.edited_at,\n    c.user_deleted_at,\n    c.mod_deleted_at,\n    c.object_owner_deleted_at\n\nFROM\n    comments AS c\nJOIN users AS u\n    ON c.user_token = u.token\nWHERE\n    c.token = ?\n        "
   },
   "7622292c05fe1b5832136762042780a12a02048166bb1b4492dfd627c48c8968": {
     "describe": {
@@ -11032,7 +11032,7 @@
           }
         },
         {
-          "name": "creator_user_token: tokens::users::user::UserToken",
+          "name": "creator_user_token: tokens::tokens::users::UserToken",
           "ordinal": 10,
           "type_info": {
             "char_set": 224,
@@ -11165,7 +11165,7 @@
         "Right": 1
       }
     },
-    "query": "\nSELECT\n    tts.token as `model_token: tokens::tokens::tts_models::TtsModelToken`,\n    tts.tts_model_type as `tts_model_type: enums::by_table::tts_models::tts_model_type::TtsModelType`,\n    tts.text_pipeline_type,\n\n    tts.use_default_mel_multiply_factor,\n    tts.maybe_custom_mel_multiply_factor,\n\n    tts.maybe_default_pretrained_vocoder,\n\n    tts.maybe_custom_vocoder_token,\n    vocoder.vocoder_type as `maybe_custom_vocoder_type: enums::common::vocoder_type::VocoderType`,\n    vocoder.title as maybe_custom_vocoder_title,\n    vocoder.private_bucket_hash as maybe_custom_vocoder_private_bucket_hash,\n\n    tts.creator_user_token as `creator_user_token: tokens::users::user::UserToken`,\n    users.username as creator_username,\n    users.display_name as creator_display_name,\n    tts.title,\n    tts.private_bucket_hash,\n    tts.created_at,\n    tts.updated_at,\n    tts.user_deleted_at,\n    tts.mod_deleted_at\n\nFROM tts_models as tts\n\nJOIN users\n    ON users.token = tts.creator_user_token\n\nLEFT OUTER JOIN vocoder_models AS vocoder\n    ON vocoder.token = tts.maybe_custom_vocoder_token\n\nWHERE tts.token = ?\n        "
+    "query": "\nSELECT\n    tts.token as `model_token: tokens::tokens::tts_models::TtsModelToken`,\n    tts.tts_model_type as `tts_model_type: enums::by_table::tts_models::tts_model_type::TtsModelType`,\n    tts.text_pipeline_type,\n\n    tts.use_default_mel_multiply_factor,\n    tts.maybe_custom_mel_multiply_factor,\n\n    tts.maybe_default_pretrained_vocoder,\n\n    tts.maybe_custom_vocoder_token,\n    vocoder.vocoder_type as `maybe_custom_vocoder_type: enums::common::vocoder_type::VocoderType`,\n    vocoder.title as maybe_custom_vocoder_title,\n    vocoder.private_bucket_hash as maybe_custom_vocoder_private_bucket_hash,\n\n    tts.creator_user_token as `creator_user_token: tokens::tokens::users::UserToken`,\n    users.username as creator_username,\n    users.display_name as creator_display_name,\n    tts.title,\n    tts.private_bucket_hash,\n    tts.created_at,\n    tts.updated_at,\n    tts.user_deleted_at,\n    tts.mod_deleted_at\n\nFROM tts_models as tts\n\nJOIN users\n    ON users.token = tts.creator_user_token\n\nLEFT OUTER JOIN vocoder_models AS vocoder\n    ON vocoder.token = tts.maybe_custom_vocoder_token\n\nWHERE tts.token = ?\n        "
   },
   "865ce236444a36d597939660b14eb4b0cee05c70fdb73f31c2fb8cddddfef42c": {
     "describe": {
@@ -14048,7 +14048,7 @@
     "describe": {
       "columns": [
         {
-          "name": "token: tokens::users::user::UserToken",
+          "name": "token: tokens::tokens::users::UserToken",
           "ordinal": 0,
           "type_info": {
             "char_set": 224,
@@ -14119,7 +14119,7 @@
         "Right": 1
       }
     },
-    "query": "\nSELECT\n  token as `token: tokens::users::user::UserToken`,\n  username,\n  email_address,\n  password_hash,\n  is_banned\nFROM users\nWHERE username = ?\nLIMIT 1\n        "
+    "query": "\nSELECT\n  token as `token: tokens::tokens::users::UserToken`,\n  username,\n  email_address,\n  password_hash,\n  is_banned\nFROM users\nWHERE username = ?\nLIMIT 1\n        "
   },
   "bc9c6b57b2578b8163956d11a5f6a9a77ddab6098d2c4207e1a70502db30c9d1": {
     "describe": {
@@ -16447,7 +16447,7 @@
           }
         },
         {
-          "name": "maybe_creator_user_token: tokens::users::user::UserToken",
+          "name": "maybe_creator_user_token: tokens::tokens::users::UserToken",
           "ordinal": 1,
           "type_info": {
             "char_set": 224,
@@ -16558,7 +16558,7 @@
         "Right": 1
       }
     },
-    "query": "\nSELECT\n    voice_conversion_results.token as `voice_conversion_result_token: tokens::tokens::voice_conversion_results::VoiceConversionResultToken`,\n\n    users.token as `maybe_creator_user_token: tokens::users::user::UserToken`,\n    users.is_banned as maybe_creator_is_banned,\n\n    voice_conversion_results.public_bucket_hash,\n\n    voice_conversion_results.creator_set_visibility,\n\n    voice_conversion_results.file_size_bytes,\n    voice_conversion_results.duration_millis,\n\n    voice_conversion_results.user_deleted_at,\n    voice_conversion_results.mod_deleted_at\n\nFROM voice_conversion_results\nLEFT OUTER JOIN voice_conversion_models\n  ON voice_conversion_results.model_token = voice_conversion_models.token\nLEFT OUTER JOIN users\n  ON voice_conversion_results.maybe_creator_user_token = users.token\nWHERE\n    voice_conversion_results.token = ?\n    AND voice_conversion_results.user_deleted_at IS NULL\n    AND voice_conversion_results.mod_deleted_at IS NULL\n        "
+    "query": "\nSELECT\n    voice_conversion_results.token as `voice_conversion_result_token: tokens::tokens::voice_conversion_results::VoiceConversionResultToken`,\n\n    users.token as `maybe_creator_user_token: tokens::tokens::users::UserToken`,\n    users.is_banned as maybe_creator_is_banned,\n\n    voice_conversion_results.public_bucket_hash,\n\n    voice_conversion_results.creator_set_visibility,\n\n    voice_conversion_results.file_size_bytes,\n    voice_conversion_results.duration_millis,\n\n    voice_conversion_results.user_deleted_at,\n    voice_conversion_results.mod_deleted_at\n\nFROM voice_conversion_results\nLEFT OUTER JOIN voice_conversion_models\n  ON voice_conversion_results.model_token = voice_conversion_models.token\nLEFT OUTER JOIN users\n  ON voice_conversion_results.maybe_creator_user_token = users.token\nWHERE\n    voice_conversion_results.token = ?\n    AND voice_conversion_results.user_deleted_at IS NULL\n    AND voice_conversion_results.mod_deleted_at IS NULL\n        "
   },
   "ed8d32dd94719ad6479dd638cdc7a8cfbf725785f51678533988ddba94aac112": {
     "describe": {

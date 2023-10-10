@@ -23,7 +23,7 @@ use http_server_common::util::timer::MultiBenchmarkingTimer;
 use mysql_queries::queries::users::user_badges::list_user_badges::list_user_badges;
 use mysql_queries::queries::users::user_badges::list_user_badges::UserBadgeForList;
 use mysql_queries::queries::users::user_profiles::get_user_profile_by_username::{get_user_profile_by_username_from_connection, UserProfileResult};
-use tokens::users::user::UserToken;
+use tokens::tokens::users::UserToken;
 
 use crate::utils::default_avatar_color_from_username::default_avatar_color_from_username;
 use crate::utils::default_avatar_from_username::default_avatar_from_username;

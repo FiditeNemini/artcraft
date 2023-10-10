@@ -11,7 +11,7 @@ use sqlx::MySqlPool;
 use enums::by_table::tts_models::tts_model_type::TtsModelType;
 use enums::common::vocoder_type::VocoderType;
 use tokens::tokens::tts_models::TtsModelToken;
-use tokens::users::user::UserToken;
+use tokens::tokens::users::UserToken;
 
 use crate::helpers::boolean_converters::i8_to_bool;
 
@@ -107,7 +107,7 @@ SELECT
     vocoder.title as maybe_custom_vocoder_title,
     vocoder.private_bucket_hash as maybe_custom_vocoder_private_bucket_hash,
 
-    tts.creator_user_token as `creator_user_token: tokens::users::user::UserToken`,
+    tts.creator_user_token as `creator_user_token: tokens::tokens::users::UserToken`,
     users.username as creator_username,
     users.display_name as creator_display_name,
     tts.title,

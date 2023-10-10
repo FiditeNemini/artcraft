@@ -11,8 +11,8 @@ use sqlx::MySqlPool;
 use enums::common::visibility::Visibility;
 use errors::AnyhowResult;
 use tokens::tokens::voice_conversion_results::VoiceConversionResultToken;
-use tokens::users::user::UserToken;
-use tokens::voice_conversion::model::VoiceConversionModelToken;
+use tokens::tokens::users::UserToken;
+use tokens::tokens::voice_conversion_models::VoiceConversionModelToken;
 
 use crate::helpers::boolean_converters::{i8_to_bool, nullable_i8_to_bool};
 
@@ -188,16 +188,16 @@ async fn select_including_deleted(
 SELECT
     voice_conversion_results.token as `voice_conversion_result_token: tokens::tokens::voice_conversion_results::VoiceConversionResultToken`,
 
-    voice_conversion_results.model_token as `voice_conversion_model_token: tokens::voice_conversion::model::VoiceConversionModelToken`,
+    voice_conversion_results.model_token as `voice_conversion_model_token: tokens::tokens::voice_conversion_models::VoiceConversionModelToken`,
     voice_conversion_models.title as voice_conversion_model_title,
 
-    users.token as `maybe_creator_user_token: tokens::users::user::UserToken`,
+    users.token as `maybe_creator_user_token: tokens::tokens::users::UserToken`,
     users.username as maybe_creator_username,
     users.display_name as maybe_creator_display_name,
     users.email_gravatar_hash as maybe_creator_gravatar_hash,
     users.is_banned as maybe_creator_is_banned,
 
-    model_users.token as `maybe_model_creator_user_token: tokens::users::user::UserToken`,
+    model_users.token as `maybe_model_creator_user_token: tokens::tokens::users::UserToken`,
     model_users.username as maybe_model_creator_username,
     model_users.display_name as maybe_model_creator_display_name,
     model_users.email_gravatar_hash as maybe_model_creator_gravatar_hash,
@@ -245,16 +245,16 @@ async fn select_without_deleted(
 SELECT
     voice_conversion_results.token as `voice_conversion_result_token: tokens::tokens::voice_conversion_results::VoiceConversionResultToken`,
 
-    voice_conversion_results.model_token as `voice_conversion_model_token: tokens::voice_conversion::model::VoiceConversionModelToken`,
+    voice_conversion_results.model_token as `voice_conversion_model_token: tokens::tokens::voice_conversion_models::VoiceConversionModelToken`,
     voice_conversion_models.title as voice_conversion_model_title,
 
-    users.token as `maybe_creator_user_token: tokens::users::user::UserToken`,
+    users.token as `maybe_creator_user_token: tokens::tokens::users::UserToken`,
     users.username as maybe_creator_username,
     users.display_name as maybe_creator_display_name,
     users.email_gravatar_hash as maybe_creator_gravatar_hash,
     users.is_banned as maybe_creator_is_banned,
 
-    model_users.token as `maybe_model_creator_user_token: tokens::users::user::UserToken`,
+    model_users.token as `maybe_model_creator_user_token: tokens::tokens::users::UserToken`,
     model_users.username as maybe_model_creator_username,
     model_users.display_name as maybe_model_creator_display_name,
     model_users.email_gravatar_hash as maybe_model_creator_gravatar_hash,

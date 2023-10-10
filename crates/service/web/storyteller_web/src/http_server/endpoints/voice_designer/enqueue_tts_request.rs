@@ -12,12 +12,12 @@ use actix_web::http::StatusCode;
 use log::{warn};
 use http_server_common::request::get_request_ip::get_request_ip;
 
-use tokens::users::user::UserToken;
+use tokens::tokens::users::UserToken;
 use enums::by_table::generic_inference_jobs::inference_model_type::InferenceModelType;
 use mysql_queries::payloads::generic_inference_args::tts_payload::TTSArgs;
 
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
-use tokens::jobs::inference::InferenceJobToken;
+use tokens::tokens::generic_inference_jobs::InferenceJobToken;
 use crate::server_state::ServerState;
 use mysql_queries::queries::generic_inference::web::insert_generic_inference_job::{insert_generic_inference_job, InsertGenericInferenceArgs};
 

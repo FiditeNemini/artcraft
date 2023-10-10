@@ -5,7 +5,7 @@ use sqlx::MySqlPool;
 
 use enums::by_table::generic_inference_jobs::inference_category::InferenceCategory;
 use errors::AnyhowResult;
-use tokens::jobs::inference::InferenceJobToken;
+use tokens::tokens::generic_inference_jobs::InferenceJobToken;
 
 use crate::helpers::boolean_converters::i8_to_bool;
 
@@ -67,7 +67,7 @@ pub async fn get_inference_job_status(job_token: &InferenceJobToken, mysql_pool:
       RawGenericInferenceJobStatus,
         r#"
 SELECT
-    jobs.token as `job_token: tokens::jobs::inference::InferenceJobToken`,
+    jobs.token as `job_token: tokens::tokens::generic_inference_jobs::InferenceJobToken`,
 
     jobs.status,
     jobs.attempt_count,

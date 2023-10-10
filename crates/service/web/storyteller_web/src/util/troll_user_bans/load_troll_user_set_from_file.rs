@@ -24,7 +24,7 @@ pub fn load_user_token_set_from_file<P: AsRef<Path>>(path: P) -> AnyhowResult<Tr
 mod tests {
   use std::path::PathBuf;
 
-  use tokens::users::user::UserToken;
+  use tokens::tokens::users::UserToken;
 
   use crate::util::troll_user_bans::load_troll_user_set_from_file::load_user_token_set_from_file;
 
