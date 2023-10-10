@@ -7,8 +7,8 @@ use sqlx::pool::PoolConnection;
 use enums::by_table::media_uploads::media_upload_type::MediaUploadType;
 use enums::common::visibility::Visibility;
 use errors::AnyhowResult;
-use tokens::files::media_upload::MediaUploadToken;
-use tokens::users::user::UserToken;
+use tokens::tokens::media_uploads::MediaUploadToken;
+use tokens::tokens::users::UserToken;
 
 pub struct MediaUploadRecord {
   pub token: MediaUploadToken,
@@ -47,7 +47,7 @@ pub async fn reverse_list_user_media_uploads_of_type_with_connection(
       RawMediaUploadRecord,
         r#"
 SELECT
-    mu.token as `token: tokens::files::media_upload::MediaUploadToken`,
+    mu.token as `token: tokens::tokens::media_uploads::MediaUploadToken`,
     mu.media_type as `media_type: enums::by_table::media_uploads::media_upload_type::MediaUploadType`,
     mu.maybe_original_filename,
     mu.original_file_size_bytes,

@@ -5,7 +5,7 @@ use sqlx::{Executor, MySql};
 
 use errors::AnyhowResult;
 use tokens::tokens::comments::CommentToken;
-use tokens::users::user::UserToken;
+use tokens::tokens::users::UserToken;
 
 use crate::queries::comments::comment_entity_token::CommentEntityToken;
 

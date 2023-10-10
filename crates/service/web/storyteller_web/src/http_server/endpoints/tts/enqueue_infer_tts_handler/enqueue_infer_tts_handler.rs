@@ -27,7 +27,7 @@ use mysql_queries::queries::tts::tts_inference_jobs::insert_tts_inference_job::T
 use mysql_queries::queries::tts::tts_models::get_tts_model::TtsModelRecord;
 use mysql_queries::tokens::Tokens;
 use redis_common::redis_keys::RedisKeys;
-use tokens::users::user::UserToken;
+use tokens::tokens::users::UserToken;
 use tts_common::priority::{FAKEYOU_DEFAULT_VALID_API_TOKEN_PRIORITY_LEVEL, FAKEYOU_INVESTOR_PRIORITY_LEVEL};
 use user_input_common::check_for_slurs::contains_slurs;
 use users_component::utils::user_session_extended::UserSessionExtended;

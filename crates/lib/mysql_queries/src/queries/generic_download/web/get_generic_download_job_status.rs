@@ -4,7 +4,7 @@ use log::warn;
 use sqlx::MySqlPool;
 
 use errors::AnyhowResult;
-use tokens::jobs::download::DownloadJobToken;
+use tokens::tokens::generic_download_jobs::DownloadJobToken;
 
 pub struct GenericDownloadJobStatus {
   pub job_token: DownloadJobToken,
@@ -27,7 +27,7 @@ pub async fn get_generic_download_job_status(job_token: &DownloadJobToken, mysql
       GenericDownloadJobStatus,
         r#"
 SELECT
-    jobs.token as `job_token: tokens::jobs::download::DownloadJobToken`,
+    jobs.token as `job_token: tokens::tokens::generic_download_jobs::DownloadJobToken`,
 
     jobs.status,
     jobs.attempt_count,

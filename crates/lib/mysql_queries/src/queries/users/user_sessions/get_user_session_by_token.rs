@@ -9,7 +9,7 @@ use sqlx::pool::PoolConnection;
 
 use enums::common::visibility::Visibility;
 use errors::AnyhowResult;
-use tokens::users::user::UserToken;
+use tokens::tokens::users::UserToken;
 
 use crate::helpers::boolean_converters::{i8_to_bool, nullable_i8_to_bool_default_false, nullable_i8_to_optional_bool};
 

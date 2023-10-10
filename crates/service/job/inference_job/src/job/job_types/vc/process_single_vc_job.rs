@@ -7,7 +7,7 @@ use enums::by_table::voice_conversion_models::voice_conversion_model_type::Voice
 use mysql_queries::queries::generic_inference::job::list_available_generic_inference_jobs::AvailableInferenceJob;
 use mysql_queries::queries::media_uploads::get_media_upload_for_inference::get_media_upload_for_inference;
 use mysql_queries::queries::voice_conversion::inference::get_voice_conversion_model_for_inference::get_voice_conversion_model_for_inference;
-use tokens::files::media_upload::MediaUploadToken;
+use tokens::tokens::media_uploads::MediaUploadToken;
 
 use crate::job::job_loop::job_success_result::JobSuccessResult;
 use crate::job::job_loop::process_single_job_error::ProcessSingleJobError;

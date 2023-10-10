@@ -17,7 +17,7 @@ use enums::by_table::comments::comment_entity_type::CommentEntityType;
 use mysql_queries::queries::comments::comment_entity_token::CommentEntityToken;
 use mysql_queries::queries::comments::list_comments_for_entity::list_comments_for_entity;
 use tokens::tokens::comments::CommentToken;
-use tokens::users::user::UserToken;
+use tokens::tokens::users::UserToken;
 
 use crate::http_server::common_responses::user_details_lite::{DefaultAvatarInfo, UserDetailsLight};
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;

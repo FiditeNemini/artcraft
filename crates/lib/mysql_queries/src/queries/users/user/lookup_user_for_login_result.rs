@@ -1,4 +1,4 @@
-use tokens::users::user::UserToken;
+use tokens::tokens::users::UserToken;
 
 /// Shared result type for user lookups for login (via email or username)
 #[derive(Debug)]

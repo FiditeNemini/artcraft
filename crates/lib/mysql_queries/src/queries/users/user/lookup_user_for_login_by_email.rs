@@ -10,7 +10,7 @@ pub async fn lookup_user_for_login_by_email(email: &str, pool: &MySqlPool) -> An
     UserRecordForLogin,
         r#"
 SELECT
-  token as `token: tokens::users::user::UserToken`,
+  token as `token: tokens::tokens::users::UserToken`,
   username,
   email_address,
   password_hash,

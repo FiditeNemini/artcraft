@@ -1,6 +1,6 @@
 use std::collections::HashSet;
 
-use tokens::users::user::UserToken;
+use tokens::tokens::users::UserToken;
 
 #[derive(Clone)]
 pub struct TrollUserSet {

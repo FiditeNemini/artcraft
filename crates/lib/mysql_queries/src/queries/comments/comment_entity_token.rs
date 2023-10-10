@@ -1,7 +1,7 @@
 use enums::by_table::comments::comment_entity_type::CommentEntityType;
 use tokens::tokens::tts_models::TtsModelToken;
 use tokens::tokens::w2l_templates::W2lTemplateToken;
-use tokens::users::user::UserToken;
+use tokens::tokens::users::UserToken;
 
 pub enum CommentEntityToken {
   User(UserToken),

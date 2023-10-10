@@ -1,8 +1,20 @@
 //! tokens
 //!
-//! The purpose of this library is to have a strongly-typed primary/foreign key system.
-//! Every Database or Redis key will have a type here.
-//! Well known keys will have short identifiers (eg. "user" is prefixed with "U:")
+//! The purpose of this library is to provide a strongly-typed primary/foreign key system with
+//! well-known identifier prefixes to aid in manual database debugging.
+//!
+//! 1) All table foreign keys have a strongly-typed (non-stringly typed) wrapper type,
+//!    eg. `MediaFileToken` for the `token` field in the `media_files` table or `UserToken` for
+//!    the `token` field in the `users` table.
+//!
+//! 2) All such keys should have a well-defined constant prefix. Though tokens should be 100%
+//!    opaque to the user and the code, having well-defined prefixes can greatly aid when
+//!    debugging systems. Every table's primary key should have a unique prefix that identifies
+//!    that key, eg. `comment_` for the `comments` table or `m_` for the `media_files` table.
+//!
+//! This library does not directly introduce MySQL dependencies, so these strongly-typed token
+//! types can be used in other crates, eg. for defining HTTP APIs and returning strongly-typed
+//! tokens to the user.
 //!
 
 // Never allow these
@@ -39,8 +51,4 @@ mod macros;
 
 pub (crate) mod prefixes;
 
-pub mod files;
-pub mod jobs;
 pub mod tokens;
-pub mod users;
-pub mod voice_conversion;

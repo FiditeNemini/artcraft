@@ -14,7 +14,7 @@ use buckets::public::voice_conversion_results::original_file::VoiceConversionRes
 use enums::by_table::generic_inference_jobs::inference_category::InferenceCategory;
 use mysql_queries::queries::generic_inference::web::get_inference_job_status::get_inference_job_status;
 use redis_common::redis_keys::RedisKeys;
-use tokens::jobs::inference::InferenceJobToken;
+use tokens::tokens::generic_inference_jobs::InferenceJobToken;
 
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::server_state::ServerState;

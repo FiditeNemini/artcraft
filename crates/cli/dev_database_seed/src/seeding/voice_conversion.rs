@@ -5,7 +5,7 @@ use enums::by_table::voice_conversion_models::voice_conversion_model_type::Voice
 use errors::{anyhow, AnyhowResult};
 use mysql_queries::queries::users::user::get_user_token_by_username::get_user_token_by_username;
 use mysql_queries::queries::voice_conversion::models::insert_voice_conversion_model_from_download_job::{insert_voice_conversion_model_from_download_job, InsertVoiceConversionModelArgs};
-use tokens::users::user::UserToken;
+use tokens::tokens::users::UserToken;
 
 use crate::seeding::users::HANASHI_USERNAME;
 

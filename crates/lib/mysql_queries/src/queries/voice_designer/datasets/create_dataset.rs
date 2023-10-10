@@ -5,7 +5,7 @@ use enums::by_table::generic_synthetic_ids::id_category::IdCategory;
 
 use errors::AnyhowResult;
 use tokens::tokens::zs_dataset::ZsDatasetToken;
-use tokens::users::user::UserToken;
+use tokens::tokens::users::UserToken;
 use crate::queries::generic_synthetic_ids::transactional_increment_generic_synthetic_id::transactional_increment_generic_synthetic_id;
 
 pub struct CreateDatasetArgs<'a> {

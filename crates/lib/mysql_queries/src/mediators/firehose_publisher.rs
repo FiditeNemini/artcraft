@@ -5,10 +5,10 @@ use sqlx::error::Error::Database;
 use sqlx::mysql::MySqlQueryResult;
 
 use errors::AnyhowResult;
-use tokens::files::media_upload::MediaUploadToken;
-use tokens::jobs::inference::InferenceJobToken;
+use tokens::tokens::media_uploads::MediaUploadToken;
+use tokens::tokens::generic_inference_jobs::InferenceJobToken;
 use tokens::tokens::comments::CommentToken;
-use tokens::users::user::UserToken;
+use tokens::tokens::users::UserToken;
 
 use crate::tokens::Tokens;
 

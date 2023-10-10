@@ -7,8 +7,8 @@ use sqlx::pool::PoolConnection;
 use enums::by_table::voice_conversion_models::voice_conversion_model_type::VoiceConversionModelType;
 use enums::common::visibility::Visibility;
 use errors::AnyhowResult;
-use tokens::users::user::UserToken;
-use tokens::voice_conversion::model::VoiceConversionModelToken;
+use tokens::tokens::users::UserToken;
+use tokens::tokens::voice_conversion_models::VoiceConversionModelToken;
 
 use crate::helpers::boolean_converters::i8_to_bool;
 
@@ -109,9 +109,9 @@ async fn list_voice_conversion_models_for_all_creators(
       RawVoiceConversionModelRecord,
         r#"
 SELECT
-    vc.token as `token: tokens::voice_conversion::model::VoiceConversionModelToken`,
+    vc.token as `token: tokens::tokens::voice_conversion_models::VoiceConversionModelToken`,
     vc.model_type as `model_type: enums::by_table::voice_conversion_models::voice_conversion_model_type::VoiceConversionModelType`,
-    vc.creator_user_token as `creator_user_token: tokens::users::user::UserToken`,
+    vc.creator_user_token as `creator_user_token: tokens::tokens::users::UserToken`,
     users.username as creator_username,
     users.display_name as creator_display_name,
     users.email_gravatar_hash as creator_gravatar_hash,
@@ -141,9 +141,9 @@ async fn list_voice_conversion_models_creator_scoped(
       RawVoiceConversionModelRecord,
         r#"
 SELECT
-    vc.token as `token: tokens::voice_conversion::model::VoiceConversionModelToken`,
+    vc.token as `token: tokens::tokens::voice_conversion_models::VoiceConversionModelToken`,
     vc.model_type as `model_type: enums::by_table::voice_conversion_models::voice_conversion_model_type::VoiceConversionModelType`,
-    vc.creator_user_token as `creator_user_token: tokens::users::user::UserToken`,
+    vc.creator_user_token as `creator_user_token: tokens::tokens::users::UserToken`,
     users.username as creator_username,
     users.display_name as creator_display_name,
     users.email_gravatar_hash as creator_gravatar_hash,
