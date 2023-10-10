@@ -5,8 +5,6 @@ use log::info;
 use errors::AnyhowResult;
 
 pub fn delete_pods(pod_names: Vec<String>) -> AnyhowResult<()> {
-  //let pod_names = pod_names.join(" ");
-
   let mut args = Vec::from(["delete".to_string(), "pods".to_string()]);
 
   args.extend(pod_names);
