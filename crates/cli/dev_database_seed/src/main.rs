@@ -1,4 +1,4 @@
-use log::{info, log};
+use log::info;
 use sqlx::mysql::MySqlPoolOptions;
 
 use config::shared_constants::{DEFAULT_MYSQL_CONNECTION_STRING, DEFAULT_RUST_LOG};

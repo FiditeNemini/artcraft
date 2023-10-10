@@ -116,6 +116,7 @@ impl InferenceCategoryAbbreviated {
 mod tests {
   use crate::payloads::generic_inference_args::generic_inference_args::{FundamentalFrequencyMethodForJob, GenericInferenceArgs, InferenceCategoryAbbreviated, PolymorphicInferenceArgs};
   use crate::payloads::generic_inference_args::lipsync_payload::{LipsyncAnimationAudioSource, LipsyncAnimationImageSource, LipsyncArgs};
+  use crate::payloads::generic_inference_args::tts_payload::TTSArgs;
 
   #[test]
   fn typical_lipsync_animation_args_serialize() {
@@ -148,14 +149,17 @@ mod tests {
   #[test]
   fn typical_tts_args_serialize() {
     let args = GenericInferenceArgs {
-      inference_category: Some(InferenceCategoryAbbreviated::VoiceConversion),
-      args: Some(PolymorphicInferenceArgs::Tts()),
+      inference_category: Some(InferenceCategoryAbbreviated::TextToSpeech),
+      args: Some(PolymorphicInferenceArgs::Tts(TTSArgs {
+        text: "hello world".to_string(),
+        voice_token: "token".to_string(),
+      })),
     };
 
     let json = serde_json::ser::to_string(&args).unwrap();
 
     // NB: Assert the serialized form. If this changes and the test breaks, be careful about migrating.
-    assert_eq!(json, r#"{"cat":"vc","args":{"Tts":{}}}"#.to_string());
+    assert_eq!(json, r#"{"cat":"tts","args":{"Tts":{"t":"hello world","e":"token"}}}"#.to_string());
 
     // NB: Make sure we don't overflow the DB field capacity (TEXT column).
     assert!(json.len() < 1000);

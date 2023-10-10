@@ -98,7 +98,7 @@ mod tests {
   fn all_variants() {
     // Static check
     let mut variants = IdCategory::all_variants();
-    assert_eq!(variants.len(), 3);
+    assert_eq!(variants.len(), 4);
     assert_eq!(variants.pop_first(), Some(IdCategory::MediaFile));
     assert_eq!(variants.pop_first(), Some(IdCategory::LipsyncAnimation));
     assert_eq!(variants.pop_first(), Some(IdCategory::ZsDataset));

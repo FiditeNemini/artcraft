@@ -4,7 +4,6 @@ use enums::by_table::generic_inference_jobs::inference_model_type::InferenceMode
 use enums::by_table::tts_models::tts_model_type::TtsModelType;
 use mysql_queries::queries::generic_inference::job::list_available_generic_inference_jobs::AvailableInferenceJob;
 use mysql_queries::queries::tts::tts_models::get_tts_model_for_inference_improved::get_tts_model_for_inference_improved;
-use tokens::tokens::tts_models::TtsModelToken;
 
 use crate::job::job_loop::job_success_result::JobSuccessResult;
 use crate::job::job_loop::process_single_job_error::ProcessSingleJobError;
