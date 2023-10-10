@@ -31,6 +31,9 @@ function PitchEstimateMethodComponent(props: PitchShiftProps) {
     let pitchMethod = undefined;
 
     switch (pitchMethodName) {
+      case "rmvpe":
+        pitchMethod = EnqueueVoiceConversionFrequencyMethod.Rmvpe;
+        break;
       case "crepe":
         pitchMethod = EnqueueVoiceConversionFrequencyMethod.Crepe;
         break;
@@ -51,9 +54,11 @@ function PitchEstimateMethodComponent(props: PitchShiftProps) {
   }
 
   const options : DropdownOption[] = [
-    { label: "DIO", value: EnqueueVoiceConversionFrequencyMethod.Dio },
-    { label: "CREPE", value: EnqueueVoiceConversionFrequencyMethod.Crepe }, 
+    { label: "RMVPE (typically best overall)", value: EnqueueVoiceConversionFrequencyMethod.Rmvpe },
+    { label: "CREPE (good for noisy samples)", value: EnqueueVoiceConversionFrequencyMethod.Crepe }, 
     { label: "Harvest", value: EnqueueVoiceConversionFrequencyMethod.Harvest },
+    // NB: We no longer recommend DIO.
+    //{ label: "DIO", value: EnqueueVoiceConversionFrequencyMethod.Dio },
   ];
 
   const selectedOption = options.find((option) => option.value === props.pitchMethod) || options[0];

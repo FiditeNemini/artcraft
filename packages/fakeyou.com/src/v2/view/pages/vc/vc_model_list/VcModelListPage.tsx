@@ -78,8 +78,8 @@ function VcModelListPage(props: Props) {
   const [autoConvertF0, setAutoConvertF0] = useState(false);
 
   const [maybeF0MethodOverride, setMaybeF0MethodOverride] = useState<
-    EnqueueVoiceConversionFrequencyMethod | undefined
-  >(undefined);
+    EnqueueVoiceConversionFrequencyMethod
+  >(EnqueueVoiceConversionFrequencyMethod.Rmvpe);
 
   const [semitones, setSemitones] = useState(0);
 
