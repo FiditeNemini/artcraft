@@ -39,20 +39,35 @@ pub fn main() -> AnyhowResult<()> {
     "Running",
   ];
 
-  const POD_STATUSES_TO_ALWAYS_CLEAR : [&str; 2] = [
+  const POD_STATUSES_TO_ALWAYS_CLEAR : [&str; 11] = [
+    "Completed",
+    "ContainerStatusUnknown", // TODO: Maybe don't include?
+    "ErrImagePull",
     "Error",
     "Evicted",
+    "Init:ContainerStatusUnknown", // TODO: Maybe don't include?
+    "Init:ErrImagePull",
+    "Init:Error",
+    "Init:ImagePullBackOff",
+    "Init:OOMKilled",
+    "OOMKilled",
   ];
 
-  const POD_STATUSES_TO_SOMETIMES_CLEAR : [&str; 1] = [
-    "ContainerStatusUnknown",
+  const POD_STATUSES_TO_SOMETIMES_CLEAR : [&str; 2] = [
+    "Init:1/2",
+    "PodInitializing",
+    //"ContainerStatusUnknown",
+    //"Init:ContainerStatusUnknown",
   ];
 
   let all_pods = list_pods()?;
 
   let pods_to_clear = all_pods.iter()
       .filter(|pod| !POD_STATUSES_TO_KEEP.contains(&pod.status.as_str()))
-      .filter(|pod| POD_STATUSES_TO_ALWAYS_CLEAR.contains(&pod.status.as_str()))
+      .filter(|pod| {
+        POD_STATUSES_TO_ALWAYS_CLEAR.contains(&pod.status.as_str()) ||
+        POD_STATUSES_TO_SOMETIMES_CLEAR.contains(&pod.status.as_str())
+      })
       .collect::<Vec<_>>();
 
   info!("Clearing {} / {} pods...", pods_to_clear.len(), all_pods.len());
