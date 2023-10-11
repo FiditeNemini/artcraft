@@ -87,7 +87,7 @@ pub fn main() -> AnyhowResult<()> {
 
   info!("Clearing {} / {} pods...", pods_to_clear.len(), all_pods.len());
 
-  let wait_duration = Duration::from_secs(10);
+  let wait_duration = Duration::from_secs(3);
 
   info!("Clearing in {} seconds... (Last chance to cancel!)", wait_duration.as_secs());
 
