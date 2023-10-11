@@ -29,7 +29,7 @@ pub async fn seed_zero_shot_tts(mysql_pool: &Pool<MySql>) -> AnyhowResult<()> {
   ];
 
   for (voice_name, bucket_hash, user_token) in records {
-    create_voice_records(voice_name, user_token, mysql_pool).await?;
+    create_voice_records(voice_name, bucket_hash, user_token, mysql_pool).await?;
   }
 
   Ok(())
@@ -37,6 +37,7 @@ pub async fn seed_zero_shot_tts(mysql_pool: &Pool<MySql>) -> AnyhowResult<()> {
 
 async fn create_voice_records(
   voice_name: &str,
+  bucket_hash: &str,
   creator_user_token: &UserToken,
   mysql_pool: &Pool<MySql>,
 ) -> AnyhowResult<()> {
@@ -63,7 +64,7 @@ async fn create_voice_records(
     model_version: 0,
     model_encoding_type: "encodec",
     voice_title: &voice_name,
-    bucket_hash: "asdf", // TODO
+    bucket_hash: &bucket_hash,
     maybe_creator_user_token: Some(&creator_user_token),
     creator_ip_address: "127.0.0.1",
     creator_set_visibility: &Default::default(),
