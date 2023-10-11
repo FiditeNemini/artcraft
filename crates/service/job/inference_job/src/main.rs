@@ -255,22 +255,6 @@ async fn main() -> AnyhowResult<()> {
     job_stats: job_stats.clone(),
   };
 
-  //// TODO/REMOVE - testing download of the dev weights
-  //let records = [
-  //  ("Alice", "qtqaprnd5shtybve4fqpvcfp50yjw238fbgj92z1521c50xqdxy1akkhkw7tesj0"),
-  //  ("Biden", "n945w0xsq15xrh16hc147a5mc1a91gwh886e14qqzte1gr9z9q3yawjfvanp4fmg"),
-  //  ("Goku", "cnnv05yjst2m737dpmxazgfpksjf4y7cxxern2ph7gddgnkh2bw1ephg5mhjbz14"),
-  //  ("Hilary", "7wav68ba2yy86491jk36cgk36tkmzesr452dgfs28wchkrr03bd0h3e6c1bbz9eg"),
-  //  ("Obama", "z3gy4v56sgtfrxfrpvaj7v74sqc67rcqs89jb884b00zfdm9vmkf1w2fsnta0gwp"),
-  //  ("Trump", "qcy7pv3rph0ntkqnpz5cfg9ksyh7kkz53v1wbr2ckvt8znvhxqn7ca5mz7wzm3q5"),
-  //];
-  //let paths = BucketPathUnifier::default_paths();
-  //for (name, hash) in records {
-  //  let object_path = paths.zero_shot_tts_speaker_encoding(hash, 0);
-  //  let filesystem_path = format!("{}_weights.npz", name);
-  //  private_bucket_client.download_file_to_disk(object_path, filesystem_path).await?;
-  //}
-
   let job_dependencies = JobDependencies {
     scoped_execution: ScopedExecution::new_from_env()?,
     fs: FileSystemDetails {

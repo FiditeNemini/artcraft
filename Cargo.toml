@@ -12,6 +12,7 @@ members = [
   "crates/cli/database_backup",
   "crates/cli/database_cleanup",
   "crates/cli/dev_database_seed",
+  "crates/cli/kubectl_pod_cleanup",
   "crates/cli/scrape_test",
 
   # Shared libraries
