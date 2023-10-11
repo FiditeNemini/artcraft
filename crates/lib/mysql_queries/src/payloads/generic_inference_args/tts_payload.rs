@@ -1,7 +1,7 @@
 #[derive(Clone, Debug, Serialize, Deserialize)]
 
 pub struct TTSArgs {
-  #[serde(rename = "e")] 
+  #[serde(rename = "vt")] 
   pub voice_token: String //  varchar 32
 }
 

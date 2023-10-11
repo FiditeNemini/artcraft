@@ -42,7 +42,10 @@ pub async fn process_job(args: VALLEXProcessJobArgs<'_>) -> Result<JobSuccessRes
     }
   }
 
-  // Download embeddings files
+  // Download embeddings file using embedding token
+  println!("");
+
+
 
   // Create a temp dir to download things to
 
@@ -54,6 +57,9 @@ pub async fn process_job(args: VALLEXProcessJobArgs<'_>) -> Result<JobSuccessRes
   // deletetemp dir files
 
   // save result ?
+
+
+   // ==================== UPLOAD AUDIO TO BUCKET ==================== //
 
   Err(ProcessSingleJobError::InvalidJob(anyhow!("this job flow is not yet implemented")))
 }
