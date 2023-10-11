@@ -6,15 +6,19 @@ import { LoginPage } from "./pages/login/LoginPage";
 import { ModerationFc } from "./pages/moderation/moderation_main/ModerationFc";
 import { ModerationIpBanListFc } from "./pages/moderation/moderation_ip_ban_list/ModerationIpBanListFc";
 import { ModerationViewIpBanFc } from "./pages/moderation/moderation_view_ip_ban/ModerationViewIpBanFc";
+import { Media } from "./pages/media";
 import { LipsyncEditor } from "./pages/lipsync";
-import { FooterNav } from "./nav/FooterNav";
-import { TopNav } from "./nav/TopNav";
 import { ProfileEditFc } from "./pages/profile/profile_edit/ProfileEditFc";
 import { ProfilePage } from "./pages/profile/profile_view/ProfilePage";
 import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
 import { SessionSubscriptionsWrapper } from "@storyteller/components/src/session/SessionSubscriptionsWrapper";
 import { SignupPage } from "./pages/signup/SignupPage";
-import { Switch, Route } from "react-router-dom";
+import {
+  Switch,
+  Route,
+  withRouter,
+  RouteComponentProps,
+} from "react-router-dom";
 import { TermsPage } from "./pages/about/terms_page/TermsPage";
 import { TtsInferenceJob, W2lInferenceJob } from "../../App";
 import { TtsModelDeletePage } from "./pages/tts/tts_model_delete/TtsModelDeletePage";
@@ -54,7 +58,6 @@ import { ModerationTtsCategoryEditPage } from "./pages/moderation/categories/Mod
 import { ModerationCategoryDeletePage } from "./pages/moderation/categories/ModerationCategoryDeletePage";
 import { TtsCategoryType } from "../../AppWrapper";
 import { PatronPage } from "./pages/patrons/PatronPage";
-import ScrollToTop from "./_common/ScrollToTop";
 import { Language } from "@storyteller/components/src/i18n/Language";
 import { VoiceCloneRequestPage } from "./pages/clone_voice_requests/VoiceCloneRequestPage";
 import { VocodesPage } from "./pages/vocodes/VocodesPage";
@@ -83,6 +86,13 @@ import { VoiceDesignerPage } from "./pages/voice_designer/VoiceDesignerPage";
 import { TestingPage } from "./pages/testing/TestingPage";
 import { FaceAnimationPage } from "./pages/face-animation/FaceAnimationPage";
 import { GenerateSpeechPage } from "./pages/generate_speech/GenerateSpeechPage";
+import VcModelViewPage from "./pages/vc/vc_model_view/VcModelViewPage";
+import VcModelEditPage from "./pages/vc/vc_model_edit/VcModelEditPage";
+import VcModelDeletePage from "./pages/vc/vc_model_delete/VcModelDeletePage";
+import SideNav from "components/layout/SideNav/SideNav";
+import MobileMenu from "components/layout/MobileMenu/MobileMenu";
+import { TopNav } from "./nav/TopNav";
+import { TestingPage } from "./pages/testing/TestingPage";
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -178,8 +188,11 @@ interface Props {
 
 interface State {}
 
-class PageContainer extends React.Component<Props, State> {
-  constructor(props: Props) {
+class PageContainer extends React.Component<
+  Props & RouteComponentProps,
+  State
+> {
+  constructor(props: Props & RouteComponentProps) {
     super(props);
 
     this.state = {};
@@ -188,9 +201,23 @@ class PageContainer extends React.Component<Props, State> {
   logout = () => {};
 
   public render() {
+    const { location } = this.props;
+
+    const shouldRenderNavs = location.pathname === "/";
+
     return (
-      <div id="main" className="mainwrap">
-        <div id="viewable">
+      <div id="wrapper" className="no-padding">
+        <div id="overlay"></div>
+        <SideNav
+          sessionWrapper={this.props.sessionWrapper}
+          logoutHandler={this.logout}
+          querySessionCallback={this.props.querySessionAction}
+          querySessionSubscriptionsCallback={
+            this.props.querySessionSubscriptionsAction
+          }
+        />
+
+        {shouldRenderNavs && (
           <TopNav
             logoutHandler={this.logout}
             sessionWrapper={this.props.sessionWrapper}
@@ -199,9 +226,10 @@ class PageContainer extends React.Component<Props, State> {
               this.props.querySessionSubscriptionsAction
             }
           />
+        )}
 
-          <ScrollToTop />
-
+        <div id="page-content-wrapper">
+          <MobileMenu sessionWrapper={this.props.sessionWrapper} />
           <Switch>
             <Route path="/firehose">
               <FirehoseEventListPage
@@ -434,8 +462,8 @@ class PageContainer extends React.Component<Props, State> {
               <CreateCategoryPage sessionWrapper={this.props.sessionWrapper} />
             </Route>
 
-            <Route path="/dev-lipsync">
-              <LipsyncEditor />
+            <Route path="/media/:token">
+              <Media/>
             </Route>
 
             <Route path="/moderation/user/list">
@@ -510,6 +538,27 @@ class PageContainer extends React.Component<Props, State> {
               />
             </Route>
 
+            <Route path="/voice-conversion/:token/delete">
+              <VcModelDeletePage sessionWrapper={this.props.sessionWrapper} />
+            </Route>
+
+            <Route path="/voice-conversion/:token/edit">
+              <VcModelEditPage sessionWrapper={this.props.sessionWrapper} />
+            </Route>
+
+            <Route path="/voice-conversion/:token">
+              <VcModelViewPage
+                sessionWrapper={this.props.sessionWrapper}
+                sessionSubscriptionsWrapper={
+                  this.props.sessionSubscriptionsWrapper
+                }
+                inferenceJobsByCategory={this.props.inferenceJobsByCategory}
+                setMaybeSelectedInferenceJob={
+                  this.props.maybeSelectedVoiceConversionModel
+                }
+              />
+            </Route>
+
             <Route path="/voice-conversion">
               <VcModelListPage
                 sessionWrapper={this.props.sessionWrapper}
@@ -546,14 +595,12 @@ class PageContainer extends React.Component<Props, State> {
             </Route>
 
             <Route path="/face-animation">
-              <FaceAnimationPage
-                sessionSubscriptionsWrapper={
-                  this.props.sessionSubscriptionsWrapper
-                }
-                enqueueInferenceJob={this.props.enqueueInferenceJob}
-                inferenceJobs={this.props.inferenceJobs}
-                inferenceJobsByCategory={this.props.inferenceJobsByCategory}
-              />
+              <LipsyncEditor {...{ 
+                enqueueInferenceJob: this.props.enqueueInferenceJob,
+                sessionSubscriptionsWrapper:  this.props.sessionSubscriptionsWrapper,
+                inferenceJobs: this.props.inferenceJobs,
+                inferenceJobsByCategory: this.props.inferenceJobsByCategory
+              }} />
             </Route>
 
             <Route path="/commissions">
@@ -698,12 +745,10 @@ class PageContainer extends React.Component<Props, State> {
               />
             </Route>
           </Switch>
-
-          <FooterNav sessionWrapper={this.props.sessionWrapper} />
         </div>
       </div>
     );
   }
 }
 
-export { PageContainer };
+export default withRouter(PageContainer);

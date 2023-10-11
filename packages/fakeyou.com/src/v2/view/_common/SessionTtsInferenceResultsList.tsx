@@ -93,9 +93,9 @@ function SessionTtsInferenceResultList(props: Props) {
           break;
         case JobState.ATTEMPT_FAILED:
           cssStyle = "alert alert-danger mb-0";
-          stateDescription = `${
-            (t("resultsProgressFail"), { 0: job.attemptCount || "0" })
-          }}`;
+          stateDescription = `${t("resultsProgressFail", {
+            0: job.attemptCount || "0",
+          })}}`;
           break;
         case JobState.COMPLETE_FAILURE:
         case JobState.DEAD:
@@ -199,9 +199,9 @@ function SessionTtsInferenceResultList(props: Props) {
           break;
         case JobState.ATTEMPT_FAILED:
           cssStyle = "alert alert-danger mb-0";
-          stateDescription = `${
-            (t("resultsProgressFail"), { 0: job.attemptCount || "0" })
-          }}`;
+          stateDescription = `${t("resultsProgressFail", {
+            0: job.attemptCount || "0",
+          })}}`;
           break;
         case JobState.COMPLETE_FAILURE:
         case JobState.DEAD:

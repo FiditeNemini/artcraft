@@ -1,4 +1,5 @@
 import React, { useMemo } from "react";
+import { usePrefixedDocumentTitle } from "../../../../common/UsePrefixedDocumentTitle";
 import { Link } from "react-router-dom";
 import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
 import { SessionSubscriptionsWrapper } from "@storyteller/components/src/session/SessionSubscriptionsWrapper";
@@ -13,12 +14,8 @@ import { faDiscord, faTwitter } from "@fortawesome/free-brands-svg-icons";
 import { WebUrl } from "../../../../common/WebUrl";
 import { faFileArrowUp, faSparkles } from "@fortawesome/pro-solid-svg-icons";
 import { PosthogClient } from "@storyteller/components/src/analytics/PosthogClient";
+import { FooterNav } from "v2/view/nav/FooterNav";
 import Alert from "components/common/Alert/Alert";
-// import {
-//   faFileArrowUp,
-//   faMicrophone,
-//   faRightLeft,
-// } from "@fortawesome/pro-solid-svg-icons";
 // import { Analytics } from "../../../../../common/Analytics";
 
 interface Props {
@@ -27,6 +24,8 @@ interface Props {
 }
 
 function LandingPage(props: Props) {
+  usePrefixedDocumentTitle("FakeYou Celebrity Voice Generator");
+
   PosthogClient.recordPageview();
 
   const { t } = useLocalize("LandingPage");
@@ -303,15 +302,19 @@ function LandingPage(props: Props) {
             >
               <div className="d-flex px-4 pt-4 align-items-start w-100">
                 <div className="flex-grow-1">
-                  <h4 className="fw-bold text-white mb-1 d-flex align-items-center text-nowrap">
-                    <span className="badge-new mt-0 me-2">
+                  <div className="mb-1">
+                    <span className="badge-new d-inline-flex align-items-center mb-2 me-2">
                       <FontAwesomeIcon icon={faSparkles} className="me-1" />
-                      NEW
+                      {t("productNewTag")}
                     </span>
-                    Face Animation
-                  </h4>
+
+                    <h4 className="fw-bold text-white d-inline-flex align-items-center mb-0">
+                      <span>{t("productFaceAnimatorTitle")}</span>
+                    </h4>
+                  </div>
+
                   <h6 className="fw-normal opacity-75 text-white">
-                    Create videos from audio
+                    {t("productFaceAnimatorText")}
                   </h6>
                 </div>
                 <Link to="/face-animation" className="btn btn-square mt-1">
@@ -531,6 +534,8 @@ function LandingPage(props: Props) {
           />
         </div>
       </div>
+
+      <FooterNav sessionWrapper={props.sessionWrapper} />
     </div>
   );
 }

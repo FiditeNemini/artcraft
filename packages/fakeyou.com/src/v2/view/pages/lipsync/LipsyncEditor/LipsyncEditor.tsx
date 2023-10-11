@@ -1,76 +1,180 @@
-import React from "react";
-import { useFile } from "hooks";
-import { AudioInput, ImageInput } from "components/common";
-import { PageHeader } from "components/layout";
-import './LipsyncEditor.scss';
+import React, { useState } from "react";
+import { useTransition } from "@react-spring/web";
+import { v4 as uuidv4 } from "uuid";
+import { useFile, useLocalize } from "hooks";
+import { springs } from "resources";
+import {
+  UploadAudio,
+  // UploadAudioIsOk,
+  // UploadAudioRequest,
+} from "@storyteller/components/src/api/upload/UploadAudio";
+import {
+  UploadImage,
+  // UploadImageIsOk,
+  // UploadImageRequest,
+} from "@storyteller/components/src/api/upload/UploadImage";
+import {
+  EnqueueFaceAnimation,
+  // EnqueueFaceAnimationIsSuccess,
+  // EnqueueFaceAnimationRequest,
+} from "@storyteller/components/src/api/face_animation/EnqueueFaceAnimation";
+import FaceAnimatorTitle from "./FaceAnimatorTitle";
+import FaceAnimatorInput from './FaceAnimatorInput';
+import FaceAnimatorWorking from './FaceAnimatorWorking';
+import FaceAnimatorSuccess from "./FaceAnimatorSuccess";
+import { FaceAnimatorCore } from "./FaceAnimatorTypes";
+import { BasicVideo } from "components/common";
+import "./LipsyncEditor.scss";
+import { FrontendInferenceJobType } from "@storyteller/components/src/jobs/InferenceJob";
 
-// interface Props {
-//   audioFile?: any;
-//   imageFile?: any;
-// }
+export default function LipsyncEditor({
+  enqueueInferenceJob,
+  sessionSubscriptionsWrapper,
+  inferenceJobsByCategory,
+  ...rest
+}: FaceAnimatorCore) {
+  const { t } = useLocalize("FaceAnimator");
 
-const ProgressCheck = ({ disabled = false }: {disabled?: boolean}) => <svg>
-  { !disabled && <polyline {...{
-    fill: 'none',
-    points: '7 16 12 20 20 10',
-    strokeLinecap: 'round',
-    strokeLinejoin: 'round',
-    strokeWidth: '4',
-  }}/> }
-</svg>;
+  // the ready states are set by functions which run after the upload input animation is completed, which then illuminates the respective checkmark in a staggered way to draw attention to the workflow, and reduces concurrent animations
 
-const Title = ({ ...rest }) => {
-  const { audioFile, imageFile } = rest;
+  const [imageReady, imageReadySet] = useState<boolean>(false);
+  const [audioReady, audioReadySet] = useState<boolean>(false);
+  const readyMedia = (m: number) => (t: boolean) =>
+    [imageReadySet, audioReadySet][m](t);
+  const audioProps = useFile({}); // contains upload inout state and controls, see docs
+  const imageProps = useFile({}); // contains upload inout state and controls, see docs
+  const [index, indexSet] = useState<number>(0); // index  = slideshow slide position
 
-  return <div {...{ className: 'progress-header' }}>
-    <h1 {...{ className: "fw-bold text-center text-md-start progress-heading" }}>
-      Generate a lipsync
-    </h1>
-    <ul {...{ className: 'async-progress-tracker' }}>
-      <li>
-        <ProgressCheck {...{ disabled: imageFile }}/>
-        Image
-      </li>
-      <li>
-        <ProgressCheck {...{ disabled: audioFile }}/>
-        Audio
-      </li>
-    </ul>
-    <button className="btn btn-primary">
-    Generate
-    </button>
-  </div>
-};
+  //const [animationStyle,animationStyleSet] = useState(0);
+  const [frameDimensions,frameDimensionsSet] = useState("twitter_square");
+  const [removeWatermark,removeWatermarkSet] = useState(false);
+  const [disableFaceEnhancement,disableFaceEnhancementSet] = useState(false);
+  const [still,stillSet] = useState(false);
 
-export default function LipsyncEditor({ ...rest }) {
-  const audioProps = useFile({ debug: 'audio useFile' });
-  const imageProps = useFile({});
+  //const animationChange = ({ target }: any) => animationStyleSet(target.value);
+  const frameDimensionsChange = ({ target }: any) => frameDimensionsSet(target.value);
+  const removeWatermarkChange = ({ target }: any) => removeWatermarkSet(target.checked);
+  const disableFaceEnhancementChange = ({ target }: any) => disableFaceEnhancementSet(target.checked);
+  const stillChange = ({ target }: any) => stillSet(target.checked);
+  const clearInputs = () => { 
+    //animationStyleSet(0); 
+    stillSet(false); 
+    frameDimensionsSet("twitter_square"); 
+    removeWatermarkSet(false); 
+    disableFaceEnhancementSet(false);
+  }
 
-  const subText = "Select an image with a clear face, or one of our existing templates, then choose either text to speech or uploaded audio(eg. music). Then you can generate a beautifully lipsynced video.";
+  const makeRequest = (mode: number) => ({
+    uuid_idempotency_token: uuidv4(),
+    file: mode ? imageProps.file : audioProps.file,
+    source: "file",
+    type: mode ? "image" : "audio",
+  });
+
+  const upImageAndMerge = async (audio: any) => ({
+    audio,
+    image: await UploadImage(makeRequest(1)),
+  });
+
+  const submit = async () => {
+    if (!audioProps.file) return false;
+
+    indexSet(1); // set audio working page
+
+    UploadAudio(makeRequest(0)) // start audio (0) upload
+      .then((res) => {
+        if ("upload_token" in res) {
+          indexSet(2); // set image working page
+        }
+        return upImageAndMerge(res); // start image (1) upload, replace with Upload(imageRequest)
+      })
+      .then((responses) => {
+        if ("upload_token" in responses.image) {
+          indexSet(3); // set face animator API working page
+          return EnqueueFaceAnimation({
+            uuid_idempotency_token: uuidv4(),
+            audio_source: {
+              maybe_media_upload_token: responses.audio.upload_token,
+            },
+            image_source: {
+              maybe_media_upload_token: responses.image.upload_token,
+            },
+            make_still: still,
+            disable_face_enhancement: disableFaceEnhancement,
+            remove_watermark: removeWatermark,
+            dimensions: frameDimensions,
+          });
+        }
+      })
+      .then((res) => {
+        if (res && res.inference_job_token) {
+          enqueueInferenceJob(
+            res.inference_job_token,
+            FrontendInferenceJobType.FaceAnimation
+          );
+          indexSet(4); // set face animator API success page
+        }
+      })
+      .catch((e) => {
+        return { success: false };
+      });
+  };
+  const page = index === 0 ? 0 : index === 4 ? 2 : 1;
   const headerProps = {
-    childProps: { audioFile: !audioProps.file, imageFile: !imageProps.file },
-    titleComponent: Title,
-    subText,
-    showButtons: false
+    audioProps,
+    audioReady,
+    clearInputs,
+    imageProps,
+    imageReady,
+    indexSet,
+    page,
+    submit,
+    t,
   };
 
-	return <div>
-    <PageHeader { ...headerProps }/>
-      <div {...{ className: "container" }}>
-        <div {...{ className: "lipsync-editor panel" }}>
-          <div {...{ className: "grid-heading" }}>
-            <h5>Image</h5>
-          </div>
-          <div {...{ className: "grid-heading" }}>
-            <h5>Audio</h5>
-          </div>
-          <div {...{ className: "grid-square lipsync-audio" }}>
-            <ImageInput {...imageProps}/>
-          </div>
-          <div {...{ className: "grid-square" }}>
-            <AudioInput {...{ ...audioProps, hideActions: true } }/>
-          </div>
-        </div>
+  const transitions = useTransition(index, {
+    ...springs.soft,
+    from: { opacity: 0, position: "absolute" },
+    enter: { opacity: 1, position: "relative" },
+    leave: { opacity: 0, position: "absolute" },
+  });
+
+  return (
+    <div {...{ className: "container-panel pt-4" }}>
+      <div {...{ className: "panel lipsync-panel p-3 py-4 p-md-4" }}>
+        <FaceAnimatorTitle {...headerProps} />
+        {transitions((style, i) => {
+          const Page = [FaceAnimatorInput, FaceAnimatorWorking, FaceAnimatorSuccess][page];
+          return Page ? (
+            <Page
+              {...{
+                audioProps,
+                imageProps,
+                frameDimensions,
+                frameDimensionsChange,
+                disableFaceEnhancement,
+                disableFaceEnhancementChange,
+                enqueueInferenceJob,
+                still,
+                stillChange,
+                sessionSubscriptionsWrapper,
+                inferenceJobsByCategory,
+                index,
+                t,
+                toggle: { audio: readyMedia(1), image: readyMedia(0) },
+                style,
+                removeWatermark,
+                removeWatermarkChange,
+              }}
+            />
+          ) : (
+            <></>
+          );
+        })}
       </div>
-	</div>;
-};
+      <div {...{ className: "face-animator-mobile-sample" }}>
+        <BasicVideo {...{ src: "/videos/face-animator-instruction-en.mp4" }}/>
+      </div>
+    </div>
+  );
+}

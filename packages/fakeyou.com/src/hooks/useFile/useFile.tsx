@@ -6,28 +6,27 @@ interface Props {
   debug?: any;
   onChange?: (file: any) => void;
   onClear?: (x?: any) => void;
-  onSubmit?: (file: any) => Promise<boolean>;
+  onSubmit?: (file: any) => Promise<boolean | undefined> | Promise<void>;
 }
 
 export default function useFile({ debug, onChange = n, onClear = n, onSubmit = n }: Props) {
   const [file, fileSet] = useState<any>(undefined);
   const [blob, blobSet] = useState<string>();
-  const [working, workingSet] = useState(false);
-  const [success, successSet] = useState<boolean>(false);
+  const [status, statusSet] = useState<number>(0);
   const inputRef = useRef<HTMLInputElement>(null);
 
   const submit = async () => {
     if (file === undefined) { return false; }
+    statusSet(1);
     const onUploadResult = await onSubmit(file);
-    workingSet(true);
-    if (onUploadResult) { successSet(true); }
-    else successSet(false);
+    if (onUploadResult) { statusSet(2); }
+    else { statusSet(3); }
   };
   const fileChange = (inputFile?: any) => {
     onChange(file);
     fileSet(inputFile || null);
     blobSet(inputFile ? URL.createObjectURL(inputFile) : "");
-    successSet(false);
+    statusSet(0);
   };
   const inputChange = ({ target = {} }: { target: any }) => {
     fileChange(target.value);
@@ -36,6 +35,7 @@ export default function useFile({ debug, onChange = n, onClear = n, onSubmit = n
     if (inputRef?.current?.value) inputRef.current.value = '';
     fileChange();
     onClear();
+    statusSet(0);
   };
 
   return { 
@@ -46,8 +46,9 @@ export default function useFile({ debug, onChange = n, onClear = n, onSubmit = n
       onChange: inputChange,
       inputRef
     },
+    status,
     submit,
-    success,
-    working,
+    success: status === 2,
+    working: status === 1,
   };
 };

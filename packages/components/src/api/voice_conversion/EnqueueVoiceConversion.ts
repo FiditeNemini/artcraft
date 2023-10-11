@@ -1,6 +1,7 @@
 import { ApiConfig } from "@storyteller/components";
 
 export enum EnqueueVoiceConversionFrequencyMethod {
+  Rmvpe = "rmvpe",
   Crepe = "crepe",
   Dio = "dio",
   Harvest = "harvest",

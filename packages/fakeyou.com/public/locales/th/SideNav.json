@@ -1,0 +1,23 @@
+{
+  "communityDiscord": "Discord",
+  "communityGuide": "แนะนำ",
+  "communityLeaderboard": "ลีดเดอร์บอร์ด",
+  "communityTitle": "ชุมชน",
+  "communityUploadModels": "อัพโหลดโมเดล",
+  "infoPricing": "ราคา",
+  "logOutButton": "ออกจากระบบ",
+  "loginButton": "เข้าสู่ระบบ",
+  "profileButton": "ประวัติโดยย่อ",
+  "queueFaceAnimator": "ภาพเคลื่อนไหวอยู่ในคิว",
+  "queueRvc": "RVC อยู่ในคิว",
+  "queueSvc": "SVC อยู่ในคิว",
+  "queueTitle": "คิวบริการ",
+  "queueTts": "TTS อยู่ในคิว",
+  "signUpButton": "ลงชื่อ",
+  "speechTitle": "การสร้างคำพูด",
+  "speechTts": "ข้อความเป็นคำพูด",
+  "speechVc": "เสียงเป็นเสียง",
+  "videoFaceAnimator": "แอนิเมชั่นใบหน้า",
+  "videoTitle": "การสร้างวิดีโอ",
+  "videoW2l": "ลิปซิงค์วิดีโอ"
+}

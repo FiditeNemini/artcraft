@@ -420,7 +420,7 @@ styles with important tags:
     .form-control-feedback {
       position: absolute;
       z-index: 2;
-      width: 2.375rem;
+      width: 2.75rem;
       // height: 2.375rem;
       // line-height: 2.69rem;
       text-align: center;
@@ -642,6 +642,13 @@ styles with important tags:
       background-color: #fff3cd;
       color: #664d03;
     }
+
+    &.badge-tag {
+      font-size: 13px;
+      padding: 6px 12px;
+      background-color: $input-dark;
+      color: $white;
+    }
   }
 
   .badge-model {
@@ -673,10 +680,10 @@ styles with important tags:
     font-weight: 600;
     font-size: 12px;
     padding: 2px 6px;
+    margin-top: -1px !important;
     border: none;
     border-radius: 0.3rem;
     opacity: 0.85;
-    max-height: 18px;
     background-color: #fff3d0;
     color: #833c00;
   }
@@ -748,7 +755,7 @@ styles with important tags:
     padding-left: 2.25rem;
     padding-right: 0.5rem;
     background-color: $input-dark;
-    border-radius: 50px;
+    border-radius: 0.5rem;
     border-color: $input-dark !important;
     box-shadow: none;
     cursor: pointer;
@@ -858,18 +865,18 @@ styles with important tags:
     font-weight: 500;
     font-size: 17px;
     background-color: lighten($secondary, 4%);
-    border-radius: 50px;
+    border-radius: 0.5rem;
     border: none;
     padding: 6px 20px;
     color: rgba($white, 0.5);
     transition: 0.1s all;
 
     &.left {
-      border-radius: 50px 0px 0px 50px;
+      border-radius: 0.5rem 0px 0px 0.5rem;
     }
 
     &.right {
-      border-radius: 0px 50px 50px 5px;
+      border-radius: 0px 0.5rem 0.5rem 0px;
     }
 
     &.rated {
@@ -879,6 +886,25 @@ styles with important tags:
 
     &:hover {
       background-color: lighten($secondary, 10%);
+    }
+  }
+
+  .btn-action {
+    font-weight: 500;
+    font-size: 14px;
+    background-color: lighten($secondary, 4%);
+    border-radius: 0.5rem;
+    border: none;
+    padding: 8.25px 20px;
+    color: $white;
+    transition: 0.1s all;
+
+    &:hover {
+      background-color: lighten($secondary, 10%);
+    }
+
+    &:active {
+      background-color: lighten($secondary, 15%);
     }
   }
 
@@ -1519,7 +1545,7 @@ textarea {
     }
 
     .session-vc-section {
-      height: 565px;
+      height: 660px;
     }
 
     .session-tts-section::-webkit-scrollbar {
