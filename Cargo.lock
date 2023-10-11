@@ -3155,7 +3155,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "kube-pod-cleanup"
+name = "kubectl-pod-cleanup"
 version = "0.0.1"
 dependencies = [
  "config",

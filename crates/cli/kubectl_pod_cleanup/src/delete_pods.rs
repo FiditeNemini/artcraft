@@ -29,7 +29,7 @@ pub fn delete_pods(mut pod_names: Vec<String>, batch_size: usize) -> AnyhowResul
   Ok(())
 }
 
-fn delete_pod_batch(pod_names: &Vec<String>) -> AnyhowResult<()> {
+pub fn delete_pod_batch(pod_names: &Vec<String>) -> AnyhowResult<()> {
   let mut args = Vec::from(["delete".to_string(), "pods".to_string()]);
 
   args.extend_from_slice(pod_names);
