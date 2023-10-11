@@ -84,7 +84,6 @@ import { CommunityCommissionsPage } from "./pages/contest/CommunityCommissionsPa
 import { ProductUsageInfoPage } from "./pages/product_usage_info/ProductUsageInfoPage";
 import { VoiceDesignerPage } from "./pages/voice_designer/VoiceDesignerPage";
 import { TestingPage } from "./pages/testing/TestingPage";
-import { FaceAnimationPage } from "./pages/face-animation/FaceAnimationPage";
 import { GenerateSpeechPage } from "./pages/generate_speech/GenerateSpeechPage";
 import VcModelViewPage from "./pages/vc/vc_model_view/VcModelViewPage";
 import VcModelEditPage from "./pages/vc/vc_model_edit/VcModelEditPage";
@@ -92,7 +91,6 @@ import VcModelDeletePage from "./pages/vc/vc_model_delete/VcModelDeletePage";
 import SideNav from "components/layout/SideNav/SideNav";
 import MobileMenu from "components/layout/MobileMenu/MobileMenu";
 import { TopNav } from "./nav/TopNav";
-import { TestingPage } from "./pages/testing/TestingPage";
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -463,7 +461,7 @@ class PageContainer extends React.Component<
             </Route>
 
             <Route path="/media/:token">
-              <Media/>
+              <Media />
             </Route>
 
             <Route path="/moderation/user/list">
@@ -595,12 +593,15 @@ class PageContainer extends React.Component<
             </Route>
 
             <Route path="/face-animation">
-              <LipsyncEditor {...{ 
-                enqueueInferenceJob: this.props.enqueueInferenceJob,
-                sessionSubscriptionsWrapper:  this.props.sessionSubscriptionsWrapper,
-                inferenceJobs: this.props.inferenceJobs,
-                inferenceJobsByCategory: this.props.inferenceJobsByCategory
-              }} />
+              <LipsyncEditor
+                {...{
+                  enqueueInferenceJob: this.props.enqueueInferenceJob,
+                  sessionSubscriptionsWrapper:
+                    this.props.sessionSubscriptionsWrapper,
+                  inferenceJobs: this.props.inferenceJobs,
+                  inferenceJobsByCategory: this.props.inferenceJobsByCategory,
+                }}
+              />
             </Route>
 
             <Route path="/commissions">
