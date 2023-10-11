@@ -1,6 +1,7 @@
 use anyhow::anyhow;
 use cloud_storage::bucket_client::BucketClient;
-use log::{ error, info };
+use log::{ error, info, warn };
+use mysql_queries::queries::voice_designer::voices::get_voice::get_voice_by_token;
 use std::path::PathBuf;
 use std::time::Instant;
 use mysql_queries::queries::generic_inference::job::list_available_generic_inference_jobs::AvailableInferenceJob;
@@ -11,15 +12,16 @@ use crate::job_dependencies::JobDependencies;
 use crate::job::job_types::tts::vall_e_x::vall_e_x_inference_command::InferenceArgs;
 use cloud_storage::bucket_path_unifier::BucketPathUnifier;
 
-
 pub struct VoiceFile {
     pub filesystem_path: PathBuf,
 }
 
-pub async fn download_voice_embedding_from_hash(object_path: str,
-                                                bucket_hash: str,
-                                                name: str,
-                                                private_bucket_client:BucketClient) -> Result<VoiceFile,ProcessSingleJobError> {
+pub async fn download_voice_embedding_from_hash(
+    object_path: str,
+    bucket_hash: str,
+    name: str,
+    private_bucket_client: BucketClient
+) -> Result<VoiceFile, ProcessSingleJobError> {
     let paths = BucketPathUnifier::default_paths();
     let object_path = paths(bucket_hash, 0);
     let filesystem_path = format!("{}_weights.npz", name);
@@ -43,11 +45,30 @@ pub async fn process_job(
 ) -> Result<JobSuccessResult, ProcessSingleJobError> {
     let job = args.job;
     let deps = args.job_dependencies;
+    let mysql_pool = deps.mysql_pool;
 
     // get job args
     let text = match job.maybe_raw_inference_text {
         Some(value) => value,
         None => { Err(ProcessSingleJobError::InvalidJob(anyhow!("Missing Text for Inference"))) }
+    };
+
+    // get voice token
+    
+
+    // Get voice bucket hash - from voice token
+    let voice_lookup_result = get_voice_by_token(voice_token, false, &mysql_pool).await;
+
+    let voice = match voice_lookup_result {
+        Ok(Some(voice)) => voice,
+        Ok(None) => {
+            warn!("Voice not found: {:?}", voice_token);
+            return Err(ProcessSingleJobError::Other(anyhow!("")));
+        }
+        Err(err) => {
+            warn!("Error looking up voice: {:?}", err);
+            return Err(ProcessSingleJobError::Other(anyhow!("")));
+        }
     };
 
     // get some globals
@@ -74,11 +95,19 @@ pub async fn process_job(
     }
 
     // Download embeddings file using embedding token
-    println!("");
-
     // Create a temp dir to download things to
 
-    // run inference
+    // Run Inference
+    let command_exit_status =
+        args.job_dependencies.job_type_details.vall_e_x.inference_command.execute_inference(
+            InferenceArgs {
+                input_embedding: String::from(""), // name of the embedding.npz in the tmp dir
+                input_text: String::from(""), // name of the text
+                /// --result_file: path to final file output
+                output_file_name: String::from(""), // output file name in the output folder
+                stderr_output_file: String::from(""),
+            }
+        );
 
     // upload audio to bucket
 
@@ -107,17 +136,6 @@ pub async fn process_job(
     let workdir = work_temp_dir.path().to_path_buf();
     let stderr_output_file = work_temp_dir.path().join("stderr.txt");
     let inference_start_time = Instant::now();
-
-    let command_exit_status =
-        args.job_dependencies.job_type_details.vall_e_x.inference_command.execute_inference(
-            InferenceArgs {
-                input_embedding: String::from(""), // name of the embedding.npz in the tmp dir
-                input_text: String::from(""), // name of the text
-                /// --result_file: path to final file output
-                output_file_name: String::from(""), // output file name in the output folder
-                stderr_output_file: String::from(""),
-            }
-        );
 
     // upload audio to public bucket ( for voice )
     // return ok

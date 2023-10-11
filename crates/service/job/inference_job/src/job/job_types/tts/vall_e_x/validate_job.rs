@@ -1,15 +1,11 @@
 use anyhow::anyhow;
-
 use mysql_queries::payloads::generic_inference_args::generic_inference_args::{InferenceCategoryAbbreviated, PolymorphicInferenceArgs};
 use mysql_queries::queries::generic_inference::job::list_available_generic_inference_jobs::AvailableInferenceJob;
-use mysql_queries::payloads::generic_inference_args::tts_payload::{TTSArgs};
-
 use crate::job::job_loop::process_single_job_error::ProcessSingleJobError;
-use crate::job::job_types::lipsync::sad_talker::validate_job::JobArgs;
 
-pub struct JobArgs<'a> {
-  text: String,
-  voice_token: String 
+
+pub struct JobArgs {
+  voice_token: &String 
 }
 
 pub fn validate_job(job: &AvailableInferenceJob) -> Result<JobArgs, ProcessSingleJobError> {
@@ -46,12 +42,8 @@ pub fn validate_job(job: &AvailableInferenceJob) -> Result<JobArgs, ProcessSingl
     }
   };
 
-  
   Ok(JobArgs {
-    text:,
-    voice_token: , 
-  })
-
-
+    voice_token: ttsArgs.voice_token.as_str()
+  });
 
 }

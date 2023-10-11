@@ -12,7 +12,8 @@ pub struct ZsVoice {
     pub title: String,
     pub ietf_language_tag: String,
     pub ietf_primary_language_subtag: String,
-    pub maybe_creator_user_token: Option<String>,
+    pub bucket_hash: String,
+    pub maybe_creator_user_token: Option<String>
 }
 
 pub async fn get_voice_by_token(
@@ -68,7 +69,8 @@ pub async fn get_voice_by_token_with_connection(
         title: record.title,
         ietf_language_tag: record.ietf_language_tag,
         ietf_primary_language_subtag: record.ietf_primary_language_subtag,
-        maybe_creator_user_token: record.maybe_creator_user_token,
+        bucket_hash: record.bucket_hash,
+        maybe_creator_user_token: record.maybe_creator_user_token
     }))
 }
 
@@ -85,6 +87,7 @@ async fn select_include_deleted(
         zv.ietf_language_tag,
         zv.ietf_primary_language_subtag,
         zv.maybe_creator_user_token,
+        zv.bucket_hash,
         zv.creator_set_visibility as `creator_set_visibility: enums::common::visibility::Visibility`
         FROM zs_voices as zv
         WHERE
@@ -108,6 +111,7 @@ async fn select_without_deleted(
         zv.ietf_language_tag,
         zv.ietf_primary_language_subtag,
         zv.maybe_creator_user_token,
+        zv.bucket_hash,
         zv.creator_set_visibility as `creator_set_visibility: enums::common::visibility::Visibility`
         FROM zs_voices as zv
         WHERE
@@ -126,5 +130,6 @@ pub struct RawVoice {
     ietf_language_tag: String,
     ietf_primary_language_subtag: String,
     maybe_creator_user_token: Option<String>,
+    bucket_hash: String,
     creator_set_visibility: Visibility,
 }
