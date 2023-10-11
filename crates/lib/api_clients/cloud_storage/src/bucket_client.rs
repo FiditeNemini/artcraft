@@ -201,7 +201,7 @@ impl BucketClient {
 
     let mut output_file = tokio::fs::File::create(filesystem_path).await?;
 
-    let status_code = self.bucket.get_object_stream(&object_path_str, &mut output_file).await?;
+    let status_code = self.bucket.get_object_to_writer(&object_path_str, &mut output_file).await?;
 
     match status_code {
       404 => bail!("File not found in bucket: {}", &object_path_str),

@@ -30,12 +30,14 @@ pub fn list_pods() -> AnyhowResult<Vec<PodInfo>> {
   parse_pod_status_output(&stdout)
 }
 
+const LIST_POD_REGEX : Lazy<Regex> = Lazy::new(|| {
+  Regex::new(r"(\S+)\s+(\S+)\s+(\S+)\s+((\d+\s\(\S+ ago\))|(\S+))\s+(\S+).*")
+      .expect("regex should parse")
+});
+
 fn parse_pod_status_output(stdout: &str) -> AnyhowResult<Vec<PodInfo>> {
   // Parse `kubectl get pods` lines
-  const LIST_POD_REGEX : Lazy<Regex> = Lazy::new(|| {
-    Regex::new(r"(\S+)\s+(\S+)\s+(\S+)\s+((\d+\s\(\S+ ago\))|(\S+))\s+(\S+).*")
-        .expect("regex should parse")
-  });
+  let regex = LIST_POD_REGEX; // NB: To pass lint on const interior mutability (???)
 
   let lines = stdout.split("\n")
       .into_iter()
@@ -44,7 +46,7 @@ fn parse_pod_status_output(stdout: &str) -> AnyhowResult<Vec<PodInfo>> {
 
   Ok(lines.iter()
       .filter_map(|line| {
-        LIST_POD_REGEX.captures(line)
+        regex.captures(line)
       })
       .skip(1) // NB: We skip the first line as that's the header.
       .map(|captures| {

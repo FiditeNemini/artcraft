@@ -28,7 +28,7 @@ impl PodStore {
   pub fn grab_batch(&self, batch_size: usize) -> AnyhowResult<HashSet<String>> {
     match self.pod_names.read() {
       Err(err) => {
-        return Err(anyhow!("lock error: {:?}", err));
+        Err(anyhow!("lock error: {:?}", err))
       }
       Ok(read) => {
         let mut batch : HashSet<String> = HashSet::with_capacity(batch_size);
@@ -48,7 +48,7 @@ impl PodStore {
   pub fn expunge_pods(&self, pod_names: &Vec<String>) -> AnyhowResult<()> {
     match self.pod_names.write() {
       Err(err) => {
-        return Err(anyhow!("lock error: {:?}", err));
+        Err(anyhow!("lock error: {:?}", err))
       }
       Ok(mut write) => {
         for pod_name in pod_names {
