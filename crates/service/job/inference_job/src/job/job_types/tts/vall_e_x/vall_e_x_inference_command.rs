@@ -43,7 +43,7 @@ static IGNORED_ENVIRONMENT_VARS : Lazy<HashSet<String>> = Lazy::new(|| {
 // so we have all the files downloaded for the inputs.
 pub struct InferenceArgs<P: AsRef<Path>> {
     /// --driven_audio: path to the input audio
-    pub input_embedding: P, // name of the embedding.npz in the prompts folder?
+    pub input_embedding: P, // name of the embedding.npz in the tmp dir
     pub input_text: P, // name of the text
     /// --result_file: path to final file output
     pub output_file_name: P, // output file name in the output folder
@@ -135,7 +135,7 @@ impl VallEXInferenceCommand {
     
         // Override for --checkpoint_dir at inference time
         let alternate_checkpoint_dir = easyenv::get_env_pathbuf_optional(
-          "SAD_TALKER_ALTERNATE_CHECKPOINT_PATH");
+          "VALL_E_X_ALTERNATE_CHECKPOINT_PATH");
     
         Ok(Self {
           root_code_directory,
@@ -353,7 +353,7 @@ impl VallEXCreateEmbeddingCommand  {
   
       // Override for --checkpoint_dir at inference time
       let alternate_checkpoint_dir = easyenv::get_env_pathbuf_optional(
-        "SAD_TALKER_ALTERNATE_CHECKPOINT_PATH");
+        "VALL_E_X_CHECKPOINT_PATH");
   
       Ok(Self {
         root_code_directory,
