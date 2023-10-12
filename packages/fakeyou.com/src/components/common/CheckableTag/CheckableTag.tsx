@@ -3,13 +3,17 @@ import "./CheckableTag.scss";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faXmark } from "@fortawesome/pro-solid-svg-icons";
 
-interface Props {
+interface CheckableTagProps {
   tag: string;
   isSelected: boolean;
   onToggle: (tag: string) => void;
 }
 
-export default function CheckableTag({ tag, isSelected, onToggle }: Props) {
+export default function CheckableTag({
+  tag,
+  isSelected,
+  onToggle,
+}: CheckableTagProps) {
   return (
     <div
       className={`d-flex align-items-center checkable-tag ${

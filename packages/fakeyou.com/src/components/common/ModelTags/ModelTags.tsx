@@ -1,13 +1,17 @@
 import React from "react";
 import CheckableTag from "../CheckableTag";
 
-interface Props {
+interface ModelTagsProps {
   tags: string[];
   selectedTags: string[];
   onSelectTag: (tag: string) => void;
 }
 
-export default function ModelTags({ tags, selectedTags, onSelectTag }: Props) {
+export default function ModelTags({
+  tags,
+  selectedTags,
+  onSelectTag,
+}: ModelTagsProps) {
   return (
     <div className="d-flex gap-2 flex-wrap">
       {tags.map((tag) => (

@@ -2,12 +2,12 @@ import React from "react";
 import Input from "../Input";
 import { faSearch } from "@fortawesome/pro-solid-svg-icons";
 
-interface Props {
+interface ModelSearchProps {
   value: string;
   onChange: (value: string) => void;
 }
 
-export default function ModelSearch({ value, onChange }: Props) {
+export default function ModelSearch({ value, onChange }: ModelSearchProps) {
   return (
     <Input
       icon={faSearch}

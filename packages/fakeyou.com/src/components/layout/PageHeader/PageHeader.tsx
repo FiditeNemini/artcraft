@@ -41,13 +41,15 @@ export default function PageHeader({
                 {icon}
                 {title}
               </h2>
-              {showButton && (
-                <Button
-                  variant={buttonVariant}
-                  label={buttonLabel}
-                  to={buttonTo}
-                />
-              )}
+              <div className="d-none d-md-block">
+                {showButton && (
+                  <Button
+                    variant={buttonVariant}
+                    label={buttonLabel}
+                    to={buttonTo}
+                  />
+                )}
+              </div>
             </div>
             <p>{subText}</p>
           </div>
