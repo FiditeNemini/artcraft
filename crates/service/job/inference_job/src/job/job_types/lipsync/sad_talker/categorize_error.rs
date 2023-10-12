@@ -2,6 +2,7 @@ use crate::job::job_loop::process_single_job_error::ProcessSingleJobError;
 
 pub fn categorize_error(stderr_contents: &str) -> Option<ProcessSingleJobError> {
   if stderr_contents.contains("Face not detected in source image") ||
+      stderr_contents.contains("can not detect the landmark from source image") ||
       stderr_contents.contains("face3d/extract_kp_videos_safe.py") ||
       stderr_contents.contains("cv2.error") {
     return Some(ProcessSingleJobError::FaceDetectionFailure);
@@ -23,6 +24,13 @@ mod tests {
       None => bail!("error is absent"),
       Some(_) => bail!("error is wrong type"),
     }
+  }
+
+  #[test]
+  fn stack_trace_0() {
+    // TODO: I don't have the full stack trace for these anymore
+    let trace = "Face not detected in source image";
+    assert_face_tracking_error(categorize_error(trace)).unwrap();
   }
 
   #[test]
@@ -92,6 +100,27 @@ seamlessClone::   0%|          | 0/322 [00:00<?, ?it/s]
       File "/common/sadtalker-code/model_code/src/face3d/util/my_awing_arch.py", line 363, in get_landmarks
         img = cv2.resize(img, (256, 256))
     cv2.error: OpenCV(4.8.0) /io/opencv/modules/imgproc/src/resize.cpp:4062: error: (-215:Assertion failed) !ssize.empty() in function 'resize'
+    "#;
+
+    assert_face_tracking_error(categorize_error(trace)).unwrap();
+  }
+
+  #[test]
+  fn stack_trace_4() {
+    // Failure image example:
+    // https://storage.googleapis.com/vocodes-public/media_upload/s/h/h/a/6/shha6jn69d2km0wxys5yzk0ce85jwvw1/original_upload.bin
+    // No idea what the issue is here
+    let trace = r#"
+        Traceback (most recent call last):
+      File "/common/sadtalker-code/model_code/inference.py", line 175, in <module>
+        main(args)
+      File "/common/sadtalker-code/model_code/inference.py", line 71, in main
+        first_coeff_path, crop_pic_path, crop_info =  preprocess_model.generate(pic_path, first_frame_dir, args.preprocess,\
+      File "/common/sadtalker-code/model_code/src/utils/preprocess.py", line 103, in generate
+        x_full_frames, crop, quad = self.propress.crop(x_full_frames, still=True if 'ext' in crop_or_resize.lower() else False, xsize=512)
+      File "/common/sadtalker-code/model_code/src/utils/croper.py", line 131, in crop
+        raise 'can not detect the landmark from source image'
+    TypeError: exceptions must derive from BaseException
     "#;
 
     assert_face_tracking_error(categorize_error(trace)).unwrap();
