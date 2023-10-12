@@ -123,11 +123,19 @@ CREATE TABLE generic_inference_jobs (
   -- ========== DEVELOPMENT AND DEBUGGING METADATA ==========
 
   -- If true, the request gets a "debug" flag, which may do different
-  -- things depending on the type of work.
+  -- things depending on the type of work. This doesn't really have any
+  -- specific meaning -- it can be used to flag for anything -- but should
+  -- typically be used for one-off debugging and not a part of the normal
+  -- product surface area. Contrast this with `maybe_routing_tag`, which
+  -- forces the job onto a specific physical server: this might be a flag
+  -- deployed to handle debugging across the entire fleet.
   is_debug_request BOOLEAN NOT NULL DEFAULT FALSE,
 
   -- If set, the request gets processed by a special "tagged" worker
   -- that matches this tag. The ordinary workers will ignore this work.
+  -- The tag is typically added via a special HTTP header when the work
+  -- is enqueued. In practice, this means we can canary deploy or cordon
+  -- off special workers to handle certain jobs.
   maybe_routing_tag VARCHAR(32) DEFAULT NULL,
 
   -- ========== JOB SYSTEM DETAILS ==========
@@ -156,10 +164,17 @@ CREATE TABLE generic_inference_jobs (
   attempt_count SMALLINT UNSIGNED NOT NULL DEFAULT 0,
 
   -- If there is a failure, tell the user why.
+  -- This isn't localized or very friendly to present to the user.
   failure_reason VARCHAR(512) DEFAULT NULL,
 
   -- Optional internal-only debugging information in the case of failure.
   internal_debugging_failure_reason VARCHAR(512) DEFAULT NULL,
+
+  -- An enum-like key to present the frontend with a failure class in an
+  -- i18n-friendly way. The javascript/frontend can use these as indices
+  -- into descriptive, broadly-localized error messages.
+  --   * 'face_not_detected' for images or videos that do not have a detectable face (SadTalker, Wav2Lip, etc.)
+  frontend_failure_category VARCHAR(32) DEFAULT NULL,
 
   -- On success, we populate how long the job execution took in milliseconds.
   -- We have this because 1) the job system timestamps are second-resolution,
