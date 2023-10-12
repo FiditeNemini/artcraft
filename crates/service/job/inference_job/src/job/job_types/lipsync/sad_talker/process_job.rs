@@ -1,5 +1,6 @@
 use std::fs::read_to_string;
-use std::time::Instant;
+use std::thread;
+use std::time::{Duration, Instant};
 
 use anyhow::anyhow;
 use log::{error, info, warn};
@@ -209,6 +210,8 @@ pub async fn process_job(args: SadTalkerProcessJobArgs<'_>) -> Result<JobSuccess
       if contents.contains("can not detect the landmark from source image") {
         warn!("Face not detected in source image");
         error = ProcessSingleJobError::FaceDetectionFailure;
+      } else {
+        warn!("Captured stderr output: {}", contents);
       }
     }
 

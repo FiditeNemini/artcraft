@@ -173,7 +173,14 @@ CREATE TABLE generic_inference_jobs (
   -- An enum-like key to present the frontend with a failure class in an
   -- i18n-friendly way. The javascript/frontend can use these as indices
   -- into descriptive, broadly-localized error messages.
-  --   * 'face_not_detected' for images or videos that do not have a detectable face (SadTalker, Wav2Lip, etc.)
+  --
+  --   * 'face_not_detected' for images or videos that do not have a detectable
+  --                         face (SadTalker, Wav2Lip, etc.)
+  --
+  --   * 'retryable_worker_error' for generic worker errors (full filesystem,
+  --                              etc.) that can be retried. (We don't need to
+  --                              tell the user why the job failed.)
+  --
   frontend_failure_category VARCHAR(32) DEFAULT NULL,
 
   -- On success, we populate how long the job execution took in milliseconds.

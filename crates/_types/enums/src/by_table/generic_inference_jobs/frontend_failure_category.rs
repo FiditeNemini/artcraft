@@ -26,6 +26,9 @@ pub enum FrontendFailureCategory {
   /// For SadTalker (and possibly Wav2Lip)
   #[serde(rename = "face_not_detected")]
   FaceNotDetected,
+
+  #[serde(rename = "retryable_worker_error")]
+  RetryableWorkerError,
 }
 
 // TODO(bt, 2022-12-21): This desperately needs MySQL integration tests!
@@ -37,12 +40,14 @@ impl FrontendFailureCategory {
   pub fn to_str(&self) -> &'static str {
     match self {
       Self::FaceNotDetected => "face_not_detected",
+      Self::RetryableWorkerError => "retryable_worker_error",
     }
   }
 
   pub fn from_str(value: &str) -> Result<Self, String> {
     match value {
       "face_not_detected" => Ok(Self::FaceNotDetected),
+      "retryable_worker_error" => Ok(Self::RetryableWorkerError),
       _ => Err(format!("invalid value: {:?}", value)),
     }
   }
@@ -52,6 +57,7 @@ impl FrontendFailureCategory {
     // NB: BTreeSet::from() isn't const, but not worth using LazyStatic, etc.
     BTreeSet::from([
       Self::FaceNotDetected,
+      Self::RetryableWorkerError,
     ])
   }
 }
@@ -67,23 +73,27 @@ mod tests {
     #[test]
     fn test_serialization() {
       assert_serialization(FrontendFailureCategory::FaceNotDetected, "face_not_detected");
+      assert_serialization(FrontendFailureCategory::RetryableWorkerError, "retryable_worker_error");
     }
 
     #[test]
     fn to_str() {
       assert_eq!(FrontendFailureCategory::FaceNotDetected.to_str(), "face_not_detected");
+      assert_eq!(FrontendFailureCategory::RetryableWorkerError.to_str(), "retryable_worker_error");
     }
 
     #[test]
     fn from_str() {
       assert_eq!(FrontendFailureCategory::from_str("face_not_detected").unwrap(), FrontendFailureCategory::FaceNotDetected);
+      assert_eq!(FrontendFailureCategory::from_str("retryable_worker_error").unwrap(), FrontendFailureCategory::RetryableWorkerError);
     }
 
     #[test]
     fn all_variants() {
       let mut variants = FrontendFailureCategory::all_variants();
-      assert_eq!(variants.len(), 1);
+      assert_eq!(variants.len(), 2);
       assert_eq!(variants.pop_first(), Some(FrontendFailureCategory::FaceNotDetected));
+      assert_eq!(variants.pop_first(), Some(FrontendFailureCategory::RetryableWorkerError));
       assert_eq!(variants.pop_first(), None);
     }
   }
