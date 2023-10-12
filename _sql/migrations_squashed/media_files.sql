@@ -29,8 +29,15 @@ CREATE TABLE media_files (
   -- Product area where the media file originated.
   -- This is not the *model* that created the thing, this is the *product*.
   -- (The underlying models can change over time.)
+  --
+  -- This value indicates what product originally created the media file. (Not the ML model or
+  -- user upload process.) This will let us scope media files to the product that generated them
+  -- and filter them out of unrelated products if necessary (eg. a user probably doesn't want
+  -- "Voice Designer" dataset samples in a video generation flow.)
+  --
+  -- Possible values:
   --   * 'face_animator' for uploads and outputs
-  --   * 'unknown' for legacy records without an associated product
+  --   * 'unknown' for legacy records without an associated product (TODO: This should be temporary)
   origin_product_category VARCHAR(16) NOT NULL DEFAULT "unknown",
 
   -- For inference that can be tied back to a model, the type of model.
