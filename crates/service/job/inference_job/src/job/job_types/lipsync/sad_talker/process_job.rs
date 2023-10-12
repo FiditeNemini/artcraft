@@ -1,6 +1,5 @@
 use std::fs::read_to_string;
-use std::thread;
-use std::time::{Duration, Instant};
+use std::time::Instant;
 
 use anyhow::anyhow;
 use log::{error, info, warn};
