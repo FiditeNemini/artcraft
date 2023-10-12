@@ -146,9 +146,14 @@ export default function TtsModelSearchPage(props: TtsModelSearchPageProps) {
         extension={searchTts}
       />
       <Panel padding={true}>
-        <div className="d-flex gap-2 mb-3">
-          <Select options={sortOptions} defaultValue={sortOptions[0]} />
+        <div className="d-flex gap-2 mb-4">
           <Select
+            small={true}
+            options={sortOptions}
+            defaultValue={sortOptions[0]}
+          />
+          <Select
+            small={true}
             icon={faClock}
             options={sortTimeOptions}
             defaultValue={sortTimeOptions[0]}

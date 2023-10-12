@@ -11,9 +11,16 @@ interface SelectProps extends ReactSelectProps {
   icon?: IconDefinition;
   label?: string;
   rounded?: boolean;
+  small?: boolean;
 }
 
-export default function Select({ label, icon, rounded, ...rest }: SelectProps) {
+export default function Select({
+  label,
+  icon,
+  rounded,
+  small,
+  ...rest
+}: SelectProps) {
   const SelectFieldClass = {
     control: (state: any) =>
       state.isFocused
@@ -36,7 +43,11 @@ export default function Select({ label, icon, rounded, ...rest }: SelectProps) {
     <div>
       {label && <label className="sub-title">{label}</label>}
 
-      <div className={`form-group ${icon ? "input-icon" : ""}`}>
+      <div
+        className={`form-group ${icon ? "input-icon" : ""} ${
+          small && "select-small"
+        }`}
+      >
         {icon && (
           <FontAwesomeIcon icon={icon} className="form-control-feedback" />
         )}
