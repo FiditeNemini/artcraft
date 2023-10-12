@@ -1,9 +1,9 @@
 {
 	"info": {
-		"_postman_id": "febcb082-e71c-46c4-a172-adf736e01298",
+		"_postman_id": "5b9aab26-f591-4264-b75b-3075dbeaf6df",
 		"name": "Base Service Collection",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-		"_exporter_id": "30159615"
+		"_exporter_id": "10633600"
 	},
 	"item": [
 		{
@@ -76,6 +76,77 @@
 							"variable": [
 								{
 									"key": "comment_token"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Favorites",
+			"item": [
+				{
+					"name": "List Favorites",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/v1/favorites/list/user/U:0XTEZ7HX29B9C",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"v1",
+								"favorites",
+								"list",
+								"user",
+								"U:0XTEZ7HX29B9C"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Favorite",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/v1/comments/new",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"v1",
+								"comments",
+								"new"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Favorite",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/v1/favorites/delete/:favorite_token",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"v1",
+								"favorites",
+								"delete",
+								":favorite_token"
+							],
+							"variable": [
+								{
+									"key": "favorite_token",
+									"value": ""
 								}
 							]
 						}

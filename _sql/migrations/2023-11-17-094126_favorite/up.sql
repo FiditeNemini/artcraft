@@ -25,10 +25,6 @@ CREATE TABLE favorites
     -- The token of the entity the favorite applies to
     entity_token            VARCHAR(32) NOT NULL,
 
-    -- For abuse tracking.
-    -- Wide enough for IPv4/6
-    creator_ip_address      VARCHAR(40) NOT NULL,
-
     -- ========== VECTOR CLOCK ==========
 
     -- Incremented with every update.
