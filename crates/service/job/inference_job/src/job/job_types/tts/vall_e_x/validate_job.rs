@@ -3,9 +3,8 @@ use mysql_queries::payloads::generic_inference_args::generic_inference_args::{In
 use mysql_queries::queries::generic_inference::job::list_available_generic_inference_jobs::AvailableInferenceJob;
 use crate::job::job_loop::process_single_job_error::ProcessSingleJobError;
 
-
 pub struct JobArgs {
-  voice_token: &String 
+  pub voice_token: String 
 }
 
 pub fn validate_job(job: &AvailableInferenceJob) -> Result<JobArgs, ProcessSingleJobError> {
@@ -43,7 +42,7 @@ pub fn validate_job(job: &AvailableInferenceJob) -> Result<JobArgs, ProcessSingl
   };
 
   Ok(JobArgs {
-    voice_token: ttsArgs.voice_token.as_str()
-  });
+    voice_token: ttsArgs.voice_token
+  })
 
 }

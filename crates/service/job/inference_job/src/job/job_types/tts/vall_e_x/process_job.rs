@@ -8,6 +8,9 @@ use mysql_queries::queries::generic_inference::job::list_available_generic_infer
 
 use crate::job::job_loop::job_success_result::JobSuccessResult;
 use crate::job::job_loop::process_single_job_error::ProcessSingleJobError;
+use crate::job::job_types::tts::vall_e_x::validate_job::validate_job;
+use crate::job::job_types::tts::vall_e_x::validate_job::JobArgs;
+
 use crate::job_dependencies::JobDependencies;
 use crate::job::job_types::tts::vall_e_x::vall_e_x_inference_command::InferenceArgs;
 use cloud_storage::bucket_path_unifier::BucketPathUnifier;
@@ -46,18 +49,32 @@ pub async fn process_job(
     let job = args.job;
     let deps = args.job_dependencies;
     let mysql_pool = deps.mysql_pool;
+    
+    // get some globals
+    let job_progress_reporter = deps.job_progress_reporter
+        .new_generic_inference(job.inference_job_token.as_str())
+        .map_err(|e| ProcessSingleJobError::Other(anyhow!(e)))?;
+
+
 
     // get job args
     let text = match job.maybe_raw_inference_text {
-        Some(value) => value,
-        None => { Err(ProcessSingleJobError::InvalidJob(anyhow!("Missing Text for Inference"))) }
+        Some(value) => { value },
+        None => { return Err(ProcessSingleJobError::InvalidJob(anyhow!("Missing Text for Inference"))) }
     };
 
-    // get voice token
-    
+    // get args token
+    let jobArgs = validate_job(&job);
 
+    let args = match jobArgs {
+        Ok(args) => { args },
+        Err(error) => { error }
+    };
+    
+    let voice_token = tokens::tokens::zs_voices::ZsVoiceToken(args.voice_token.clone());
+    
     // Get voice bucket hash - from voice token
-    let voice_lookup_result = get_voice_by_token(voice_token, false, &mysql_pool).await;
+    let voice_lookup_result = get_voice_by_token(&voice_token, false, &mysql_pool).await;
 
     let voice = match voice_lookup_result {
         Ok(Some(voice)) => voice,
@@ -71,13 +88,6 @@ pub async fn process_job(
         }
     };
 
-    // get some globals
-    let job_progress_reporter = deps.job_progress_reporter
-        .new_generic_inference(job.inference_job_token.as_str())
-        .map_err(|e| ProcessSingleJobError::Other(anyhow!(e)))?;
-
-    // validate the inputs
-    // let job_args = validate_job(job)?;
 
     // Need to download the models
     info!("Download models (if not present)...");
