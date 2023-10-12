@@ -3,6 +3,7 @@ use chrono::{DateTime, Utc};
 use log::warn;
 use sqlx::MySqlPool;
 
+use enums::by_table::generic_inference_jobs::frontend_failure_category::FrontendFailureCategory;
 use enums::by_table::generic_inference_jobs::inference_category::InferenceCategory;
 use errors::AnyhowResult;
 use tokens::tokens::generic_inference_jobs::InferenceJobToken;
@@ -20,6 +21,8 @@ pub struct GenericInferenceJobStatus {
 
   pub maybe_first_started_at: Option<DateTime<Utc>>,
 
+  pub maybe_frontend_failure_category: Option<FrontendFailureCategory>,
+
   pub request_details: RequestDetails,
   pub maybe_result_details: Option<ResultDetails>,
 
@@ -29,6 +32,8 @@ pub struct GenericInferenceJobStatus {
   pub updated_at: DateTime<Utc>,
 }
 
+/// Details about the user's original inference request
+/// (We may want to present it in the "pending" UI.)
 pub struct RequestDetails {
   pub inference_category: InferenceCategory,
   pub maybe_model_type: Option<String>, // TODO: Strongly type
@@ -39,6 +44,7 @@ pub struct RequestDetails {
   pub maybe_raw_inference_text: Option<String>,
 }
 
+/// Details about the generated result
 pub struct ResultDetails {
   pub entity_type: String,
   pub entity_token: String,
@@ -62,6 +68,7 @@ pub async fn get_inference_job_status(job_token: &InferenceJobToken, mysql_pool:
 {
   // NB(bt): jobs.uuid_idempotency_token is the current way to reconstruct the hash of the
   // TTS result since we don't store a bucket hash on the table. This is an ugly hack :(
+  // TODO(bt,2023-10-12): ^^^ Is this comment still accurate? I don't see that field referenced below.
 
   let maybe_status = sqlx::query_as!(
       RawGenericInferenceJobStatus,
@@ -76,6 +83,8 @@ SELECT
     jobs.maybe_model_type,
     jobs.maybe_model_token,
     jobs.maybe_raw_inference_text,
+
+    jobs.frontend_failure_category as `maybe_frontend_failure_category: enums::by_table::generic_inference_jobs::frontend_failure_category::FrontendFailureCategory`,
 
     jobs.on_success_result_entity_type as maybe_result_entity_type,
     jobs.on_success_result_entity_token as maybe_result_entity_token,
@@ -169,6 +178,7 @@ WHERE jobs.token = ?
     maybe_assigned_worker: record.maybe_assigned_worker,
     maybe_assigned_cluster: record.maybe_assigned_cluster,
     maybe_first_started_at: record.maybe_first_started_at,
+    maybe_frontend_failure_category: record.maybe_frontend_failure_category,
     request_details: RequestDetails {
       inference_category: record.inference_category,
       maybe_model_type: record.maybe_model_type,
@@ -208,6 +218,8 @@ struct RawGenericInferenceJobStatus {
 
   pub maybe_assigned_worker: Option<String>,
   pub maybe_assigned_cluster: Option<String>,
+
+  pub maybe_frontend_failure_category: Option<FrontendFailureCategory>,
 
   pub is_keepalive_required: i8,
 

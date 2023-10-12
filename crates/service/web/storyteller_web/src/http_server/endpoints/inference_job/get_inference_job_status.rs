@@ -11,6 +11,7 @@ use r2d2_redis::redis::Commands;
 
 use buckets::public::media_files::original_file::MediaFileBucketPath;
 use buckets::public::voice_conversion_results::original_file::VoiceConversionResultOriginalFilePath;
+use enums::by_table::generic_inference_jobs::frontend_failure_category::FrontendFailureCategory;
 use enums::by_table::generic_inference_jobs::inference_category::InferenceCategory;
 use mysql_queries::queries::generic_inference::web::get_inference_job_status::get_inference_job_status;
 use redis_common::redis_keys::RedisKeys;
@@ -80,6 +81,10 @@ pub struct StatusDetailsResponse {
   /// Whether the frontend needs to maintain a keepalive check.
   /// This is typically only for non-premium users.
   pub requires_keepalive: bool,
+
+  /// An enum the frontend can use to display localized/I18N error
+  /// messages. These pertain to both transient and permanent failures.
+  pub maybe_failure_category: Option<FrontendFailureCategory>
 }
 
 #[derive(Serialize)]
@@ -203,8 +208,10 @@ pub async fn get_inference_job_status_handler(
       maybe_first_started_at: record.maybe_first_started_at,
       attempt_count: record.attempt_count as u8,
       requires_keepalive: record.is_keepalive_required,
+      maybe_failure_category: record.maybe_frontend_failure_category,
     },
     maybe_result: record.maybe_result_details.map(|result_details| {
+      // NB: Be careful here, because this varies based on the type of inference result.
       let public_bucket_media_path = match inference_category {
         InferenceCategory::LipsyncAnimation => {
           MediaFileBucketPath::from_object_hash(

@@ -164,8 +164,8 @@ async fn handle_error(job_dependencies: &&JobDependencies, job: &AvailableInfere
         JobFailureClass::PermanentFailure,
         ContainerHealth::Ignore,
         "keepalive elapsed".to_string(),
-        Some("keepalive elapsed"),
         None,
+        Some(FrontendFailureCategory::KeepAliveElapsed),
       ),
     ProcessSingleJobError::InvalidJob(ref err) =>
       (
@@ -180,15 +180,15 @@ async fn handle_error(job_dependencies: &&JobDependencies, job: &AvailableInfere
         JobFailureClass::PermanentFailure,
         ContainerHealth::Ignore,
         "not yet implemented".to_string(),
-        Some("not yet implemented"),
         None,
+        Some(FrontendFailureCategory::NotYetImplemented),
       ),
     ProcessSingleJobError::FaceDetectionFailure =>
       (
         JobFailureClass::PermanentFailure,
         ContainerHealth::Ignore,
         "face not detected".to_string(),
-        Some("face not detected"),
+        None,
         Some(FrontendFailureCategory::FaceNotDetected),
       ),
 
@@ -198,7 +198,7 @@ async fn handle_error(job_dependencies: &&JobDependencies, job: &AvailableInfere
         JobFailureClass::TransientFailure,
         ContainerHealth::IncrementContainerFailCount,
         "worker filesystem full".to_string(),
-        Some("worker filesystem full"),
+        None, // User doesn't need to know the filesystem is full
         Some(FrontendFailureCategory::RetryableWorkerError),
       ),
     ProcessSingleJobError::Other(ref err) =>
@@ -206,7 +206,7 @@ async fn handle_error(job_dependencies: &&JobDependencies, job: &AvailableInfere
         JobFailureClass::TransientFailure,
         ContainerHealth::IncrementContainerFailCount,
         format!("OtherErr: {:?}", err),
-        None,
+        None, // Obviously don't tell the user about errors even we're not sure about
         Some(FrontendFailureCategory::RetryableWorkerError),
       ),
   };

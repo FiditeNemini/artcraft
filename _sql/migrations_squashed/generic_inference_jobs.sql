@@ -177,6 +177,13 @@ CREATE TABLE generic_inference_jobs (
   --   * 'face_not_detected' for images or videos that do not have a detectable
   --                         face (SadTalker, Wav2Lip, etc.)
   --
+  --   * 'keep_alive_elapsed' when users walk away from their inference job and
+  --                          the workload class expects for them to remain
+  --
+  --   * 'not_yet_implemented' error for developers during feature development
+  --                           and prototyping. Should ideally never happen in
+  --                           production
+  --
   --   * 'retryable_worker_error' for generic worker errors (full filesystem,
   --                              etc.) that can be retried. (We don't need to
   --                              tell the user why the job failed.)

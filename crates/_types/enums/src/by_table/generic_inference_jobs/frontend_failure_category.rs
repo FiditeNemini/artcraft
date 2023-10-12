@@ -27,6 +27,18 @@ pub enum FrontendFailureCategory {
   #[serde(rename = "face_not_detected")]
   FaceNotDetected,
 
+  /// The user stepped away from their device and expected the workload to finish.
+  /// Some workloads require that the user keep their browser open.
+  #[serde(rename = "keep_alive_elapsed")]
+  KeepAliveElapsed,
+
+  /// This is mostly for developers -- a feature isn't complete somewhere in the code.
+  /// Big oops if errors of this class make it to production.
+  #[serde(rename = "not_yet_implemented")]
+  NotYetImplemented,
+
+  /// Tell the user that some kind of transient error happened. They don't need to know
+  /// exactly what happened. We'll retry their workload in any case.
   #[serde(rename = "retryable_worker_error")]
   RetryableWorkerError,
 }
@@ -40,6 +52,8 @@ impl FrontendFailureCategory {
   pub fn to_str(&self) -> &'static str {
     match self {
       Self::FaceNotDetected => "face_not_detected",
+      Self::KeepAliveElapsed => "keep_alive_elapsed",
+      Self::NotYetImplemented => "not_yet_implemented",
       Self::RetryableWorkerError => "retryable_worker_error",
     }
   }
@@ -47,6 +61,8 @@ impl FrontendFailureCategory {
   pub fn from_str(value: &str) -> Result<Self, String> {
     match value {
       "face_not_detected" => Ok(Self::FaceNotDetected),
+      "keep_alive_elapsed" => Ok(Self::KeepAliveElapsed),
+      "not_yet_implemented" => Ok(Self::NotYetImplemented),
       "retryable_worker_error" => Ok(Self::RetryableWorkerError),
       _ => Err(format!("invalid value: {:?}", value)),
     }
@@ -57,6 +73,8 @@ impl FrontendFailureCategory {
     // NB: BTreeSet::from() isn't const, but not worth using LazyStatic, etc.
     BTreeSet::from([
       Self::FaceNotDetected,
+      Self::KeepAliveElapsed,
+      Self::NotYetImplemented,
       Self::RetryableWorkerError,
     ])
   }
@@ -73,26 +91,34 @@ mod tests {
     #[test]
     fn test_serialization() {
       assert_serialization(FrontendFailureCategory::FaceNotDetected, "face_not_detected");
+      assert_serialization(FrontendFailureCategory::KeepAliveElapsed, "keep_alive_elapsed");
+      assert_serialization(FrontendFailureCategory::NotYetImplemented, "not_yet_implemented");
       assert_serialization(FrontendFailureCategory::RetryableWorkerError, "retryable_worker_error");
     }
 
     #[test]
     fn to_str() {
       assert_eq!(FrontendFailureCategory::FaceNotDetected.to_str(), "face_not_detected");
+      assert_eq!(FrontendFailureCategory::KeepAliveElapsed.to_str(), "keep_alive_elapsed");
+      assert_eq!(FrontendFailureCategory::NotYetImplemented.to_str(), "not_yet_implemented");
       assert_eq!(FrontendFailureCategory::RetryableWorkerError.to_str(), "retryable_worker_error");
     }
 
     #[test]
     fn from_str() {
       assert_eq!(FrontendFailureCategory::from_str("face_not_detected").unwrap(), FrontendFailureCategory::FaceNotDetected);
+      assert_eq!(FrontendFailureCategory::from_str("keep_alive_elapsed").unwrap(), FrontendFailureCategory::KeepAliveElapsed);
+      assert_eq!(FrontendFailureCategory::from_str("not_yet_implemented").unwrap(), FrontendFailureCategory::NotYetImplemented);
       assert_eq!(FrontendFailureCategory::from_str("retryable_worker_error").unwrap(), FrontendFailureCategory::RetryableWorkerError);
     }
 
     #[test]
     fn all_variants() {
       let mut variants = FrontendFailureCategory::all_variants();
-      assert_eq!(variants.len(), 2);
+      assert_eq!(variants.len(), 4);
       assert_eq!(variants.pop_first(), Some(FrontendFailureCategory::FaceNotDetected));
+      assert_eq!(variants.pop_first(), Some(FrontendFailureCategory::KeepAliveElapsed));
+      assert_eq!(variants.pop_first(), Some(FrontendFailureCategory::NotYetImplemented));
       assert_eq!(variants.pop_first(), Some(FrontendFailureCategory::RetryableWorkerError));
       assert_eq!(variants.pop_first(), None);
     }
