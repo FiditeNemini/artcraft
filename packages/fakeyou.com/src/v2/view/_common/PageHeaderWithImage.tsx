@@ -11,7 +11,7 @@ interface Props {
 
 function PageHeaderWithImage(props: Props) {
   return (
-    <div className="container-panel hero-section pt-3 pb-4 pt-lg-4">
+    <div className="container-panel pt-3 pb-4 pt-lg-4">
       <div className="panel">
         <div className="row gx-3 flex-md-row-reverse">
           <div className="col-12 col-md-5 hero-img-container d-none d-md-block">
