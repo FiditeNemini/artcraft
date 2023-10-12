@@ -29,6 +29,9 @@ use crate::http_server::endpoints::comments::list_comments_handler::list_comment
 use crate::http_server::endpoints::download_job::enqueue_generic_download::enqueue_generic_download_handler;
 use crate::http_server::endpoints::download_job::get_generic_upload_job_status::get_generic_download_job_status_handler;
 use crate::http_server::endpoints::events::list_events::list_events_handler;
+use crate::http_server::endpoints::favorites::create_favorite_handler::create_favorite_handler;
+use crate::http_server::endpoints::favorites::delete_favorite_handler::delete_favorite_handler;
+use crate::http_server::endpoints::favorites::list_favorites_handler::list_favorites_handler;
 use crate::http_server::endpoints::flags::design_refresh_flag::disable_design_refresh_flag_handler::disable_design_refresh_flag_handler;
 use crate::http_server::endpoints::flags::design_refresh_flag::enable_design_refresh_flag_handler::enable_design_refresh_flag_handler;
 use crate::http_server::endpoints::inference_job::get_inference_job_status::get_inference_job_status_handler;
@@ -184,6 +187,14 @@ pub fn add_routes<T, B> (app: App<T>, server_environment: ServerEnvironment) -> 
       .add_get("/v1/comments/list/{entity_type}/{entity_token}", list_comments_handler)
       .add_post("/v1/comments/new", create_comment_handler)
       .add_post("/v1/comments/delete/{comment_token}", delete_comment_handler)
+      .into_app();
+
+  // ==================== Favorites ====================
+
+  let mut app = RouteBuilder::from_app(app)
+      .add_get("/v1/favorites/list/{entity_type}/{entity_token}", list_favorites_handler)
+      .add_post("/v1/favorites/new", create_favorite_handler)
+      .add_post("/v1/favorites/delete/{favorite_token}", delete_favorite_handler)
       .into_app();
 
   // ==================== Animations ====================
