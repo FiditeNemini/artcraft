@@ -195,7 +195,7 @@ pub async fn get_inference_job_status_handler(
     job_token: record.job_token,
     request: RequestDetailsResponse {
       inference_category: record.request_details.inference_category,
-      maybe_model_type: record.request_details.maybe_model_type,
+      maybe_model_type: filter_model_name(record.request_details.maybe_model_type),
       maybe_model_token: record.request_details.maybe_model_token,
       maybe_model_title: record.request_details.maybe_model_title,
       maybe_raw_inference_text: record.request_details.maybe_raw_inference_text,
@@ -203,7 +203,7 @@ pub async fn get_inference_job_status_handler(
     status: StatusDetailsResponse {
       status: record.status,
       maybe_extra_status_description,
-      maybe_assigned_worker: record.maybe_assigned_worker,
+      maybe_assigned_worker: filter_model_name(record.maybe_assigned_worker),
       maybe_assigned_cluster: record.maybe_assigned_cluster,
       maybe_first_started_at: record.maybe_first_started_at,
       attempt_count: record.attempt_count as u8,
@@ -257,4 +257,26 @@ pub async fn get_inference_job_status_handler(
   Ok(HttpResponse::Ok()
       .content_type("application/json")
       .body(body))
+}
+
+fn filter_model_name(name: Option<String>) -> Option<String> {
+  // We're not revealing some of the models we use
+  name.map(|name| {
+    name.replace("sadtalker", "faceanimator")
+        .replace("sad-talker", "face-animator")
+        .replace("sad_talker", "face_animator")
+  })
+}
+
+#[cfg(test)]
+mod tests {
+  use crate::http_server::endpoints::inference_job::get_inference_job_status::filter_model_name;
+
+  #[test]
+  fn test_filter_model_name() {
+    assert_eq!(filter_model_name(None), None);
+    assert_eq!(filter_model_name(Some("foobarbaz".to_string())), Some("foobarbaz".to_string()));
+    assert_eq!(filter_model_name(Some("inference-job-sadtalker-5df55cfbb7-ngxzh".to_string())), Some("inference-job-faceanimator-5df55cfbb7-ngxzh".to_string()));
+    assert_eq!(filter_model_name(Some("sad_talker".to_string())), Some("face_animator".to_string()));
+  }
 }
