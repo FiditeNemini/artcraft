@@ -18,6 +18,7 @@ use tokens::tokens::users::UserToken;
 
 use crate::job::job_loop::job_success_result::{JobSuccessResult, ResultEntity};
 use crate::job::job_loop::process_single_job_error::ProcessSingleJobError;
+use crate::job::job_types::lipsync::sad_talker::categorize_error::categorize_error;
 use crate::job::job_types::lipsync::sad_talker::download_audio_file::download_audio_file;
 use crate::job::job_types::lipsync::sad_talker::download_image_file::download_image_file;
 use crate::job::job_types::lipsync::sad_talker::resize_image::resize_image;
@@ -206,9 +207,14 @@ pub async fn process_job(args: SadTalkerProcessJobArgs<'_>) -> Result<JobSuccess
     let mut error = ProcessSingleJobError::Other(anyhow!("CommandExitStatus: {:?}", command_exit_status));
 
     if let Ok(contents) = read_to_string(&stderr_output_file) {
-      if contents.contains("can not detect the landmark from source image") {
-        warn!("Face not detected in source image");
-        error = ProcessSingleJobError::FaceDetectionFailure;
+      match categorize_error(&contents)  {
+        Some(ProcessSingleJobError::FaceDetectionFailure) => {
+          warn!("Face not detected in source image");
+          error = ProcessSingleJobError::FaceDetectionFailure;
+        }
+        _ => {
+          warn!("Captured stderr output: {}", contents);
+        }
       }
     }
 

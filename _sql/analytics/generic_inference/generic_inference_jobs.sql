@@ -23,6 +23,20 @@ and success_execution_millis IS NOT NULL
 order by id desc
 limit 50;
 
+-- See who is uploading SadTalker jobs
+select
+    maybe_creator_user_token,
+    users.username as maybe_creator_username,
+    creator_ip_address,
+    count(*) as attempts
+from generic_inference_jobs
+left outer join users
+on users.token = generic_inference_jobs.maybe_creator_user_token
+where maybe_model_type = 'sad_talker'
+and status IN ('pending', 'started', 'complete_failure', 'attempt_failed')
+group by maybe_creator_user_token, maybe_creator_username, creator_ip_address
+order by attempts desc;
+
 
 -- Detailed report on most recent jobs, ordered by worst performing.
 -- TODO: Determine if the problem is in downloading models. Make sure the job timer doesn't include
@@ -57,7 +71,8 @@ from (
                  m.token = jobs.maybe_input_source_token
          where
              jobs.status != 'pending'
-        AND jobs.created_at > NOW() - INTERVAL 20 MINUTE
+         AND jobs.created_at > NOW() - INTERVAL 2000 MINUTE
+         AND jobs.maybe_model_type IN ('sad_talker')
          order by id desc
              limit 200
      ) as t

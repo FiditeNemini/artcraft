@@ -19,11 +19,26 @@ CREATE TABLE media_files (
 
   -- ========== FOREIGN KEY TO ORIGIN ==========
 
-  -- Where the file came from:
+  -- Broad category for where the file came from:
   --   * 'inference' for inference output
-  --   * 'processed' for processed file
+  --   * 'processed' for processed file (eg. mp3 encoding, stem splitting, etc.)
   --   * 'upload' for direct user upload
   origin_category VARCHAR(16) NOT NULL,
+
+  -- TODO: Remove default value once records backfilled and queries updated.
+  -- Product area where the media file originated.
+  -- This is not the *model* that created the thing, this is the *product*.
+  -- (The underlying models can change over time.)
+  --
+  -- This value indicates what product originally created the media file. (Not the ML model or
+  -- user upload process.) This will let us scope media files to the product that generated them
+  -- and filter them out of unrelated products if necessary (eg. a user probably doesn't want
+  -- "Voice Designer" dataset samples in a video generation flow.)
+  --
+  -- Possible values:
+  --   * 'face_animator' for uploads and outputs
+  --   * 'unknown' for legacy records without an associated product (TODO: This should be temporary)
+  origin_product_category VARCHAR(16) NOT NULL DEFAULT "unknown",
 
   -- For inference that can be tied back to a model, the type of model.
   --   * 'sad_talker', which doesn't have a value for maybe_origin_model_token (!!!)

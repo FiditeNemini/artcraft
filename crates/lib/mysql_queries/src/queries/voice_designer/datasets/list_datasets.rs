@@ -16,9 +16,10 @@ pub struct DatasetRecordForList {
     pub dataset_token: String,
     pub title: String,
     pub creator_set_visibility: Visibility,
+    pub creator_user_token: String,
+    pub creator_username: String,
     pub ietf_language_tag: String,
     pub ietf_primary_language_subtag: String,
-    pub maybe_creator_user_token: Option<String>,
 
     pub created_at: DateTime<Utc>,
     pub updated_at: DateTime<Utc>,
@@ -26,23 +27,21 @@ pub struct DatasetRecordForList {
 
 pub async fn list_datasets_by_user_token(
     mysql_pool: &MySqlPool,
-    user_token: &str,
+    username: &str,
     can_see_deleted: bool,
-    is_owner: bool,
 ) -> AnyhowResult<Vec<DatasetRecordForList>> {
     let mut connection = mysql_pool.acquire().await?;
-    list_datasets_with_connection(&mut connection, user_token, can_see_deleted, is_owner).await
+    list_datasets_with_connection(&mut connection, username, can_see_deleted).await
 }
 
 pub async fn list_datasets_with_connection(
     mysql_connection: &mut PoolConnection<MySql>,
-    user_token: &str,
+    creator_username: &str,
     can_see_deleted: bool,
-    is_owner: bool,
 ) -> AnyhowResult<Vec<DatasetRecordForList>> {
 
     let datasets =
-            list_datasets_by_creator_token(mysql_connection, user_token, can_see_deleted)
+            list_datasets_by_creator_username(mysql_connection, creator_username, can_see_deleted)
                 .await;
 
     let datasets : Vec<InternalRawDatasetRecordForList> = match datasets {
@@ -68,22 +67,23 @@ pub async fn list_datasets_with_connection(
                 creator_set_visibility: dataset.creator_set_visibility,
                 ietf_language_tag: dataset.ietf_language_tag,
                 ietf_primary_language_subtag: dataset.ietf_primary_language_subtag,
-                maybe_creator_user_token: dataset.maybe_creator_user_token,
+                creator_user_token: dataset.creator_user_token,
+                creator_username: dataset.creator_username,
 
                 created_at: dataset.created_at,
                 updated_at: dataset.updated_at,
             }
         })
         .filter(|dataset| {
-            is_owner || dataset.creator_set_visibility == Visibility::Public || can_see_deleted
+            dataset.creator_username == creator_username || dataset.creator_set_visibility == Visibility::Public || can_see_deleted
         })
         .collect::<Vec<DatasetRecordForList>>())
 }
 
 
-async fn list_datasets_by_creator_token(
+async fn list_datasets_by_creator_username(
     mysql_connection: &mut PoolConnection<MySql>,
-    creator_token: &str,
+    creator_username: &str,
     can_see_deleted: bool,
 ) -> AnyhowResult<Vec<InternalRawDatasetRecordForList>> {
     // TODO: There has to be a better way.
@@ -98,17 +98,20 @@ async fn list_datasets_by_creator_token(
             zd.title,
             zd.ietf_language_tag,
             zd.ietf_primary_language_subtag,
-            zd.maybe_creator_user_token,
+            users.token as creator_user_token,
+            users.username as creator_username,
             zd.creator_set_visibility as `creator_set_visibility: enums::common::visibility::Visibility`,
             zd.created_at,
             zd.updated_at
         FROM zs_voice_datasets as zd
+        JOIN users
+            ON users.token = zd.maybe_creator_user_token
         WHERE
-            zd.maybe_creator_user_token = ?
+            users.username = ?
             AND zd.user_deleted_at IS NULL
             AND zd.mod_deleted_at IS NULL
         "#,
-      creator_token)
+      creator_username)
             .fetch_all(mysql_connection)
             .await?
     } else {
@@ -122,15 +125,18 @@ async fn list_datasets_by_creator_token(
             zd.title,
             zd.ietf_language_tag,
             zd.ietf_primary_language_subtag,
-            zd.maybe_creator_user_token,
+            users.token as creator_user_token,
+            users.username as creator_username,
             zd.creator_set_visibility as `creator_set_visibility: enums::common::visibility::Visibility`,
             zd.created_at,
             zd.updated_at
         FROM zs_voice_datasets as zd
+        JOIN users
+            ON users.token = zd.maybe_creator_user_token
         WHERE
-            zd.maybe_creator_user_token = ?
+            users.username = ?
         "#,
-      creator_token)
+      creator_username)
             .fetch_all(mysql_connection)
             .await?
     };
@@ -143,7 +149,8 @@ struct InternalRawDatasetRecordForList {
     title: String,
     ietf_language_tag: String,
     ietf_primary_language_subtag: String,
-    maybe_creator_user_token: Option<String>,
+    creator_user_token: String,
+    creator_username: String,
     creator_set_visibility: Visibility,
     created_at: DateTime<Utc>,
     updated_at: DateTime<Utc>,

@@ -11,3 +11,8 @@ select count(*) from generic_inference_jobs where status = 'pending';
 update generic_inference_jobs
 set status = 'dead'
 where status IN ('pending', 'started', 'attempt_failed');
+
+update generic_inference_jobs
+set status = 'dead'
+where status IN ('pending', 'started', 'attempt_failed')
+and maybe_model_type IN ('sad_talker', 'so_vits_svc');

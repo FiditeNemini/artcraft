@@ -1,3 +1,4 @@
+pub mod categorize_error;
 pub mod download_audio_file;
 pub mod download_image_file;
 pub mod model_downloaders;

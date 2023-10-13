@@ -1,4 +1,3 @@
-use std::ops::Index;
 use std::thread;
 use std::time::Duration;
 
@@ -7,11 +6,13 @@ use log::info;
 use config::shared_constants::DEFAULT_RUST_LOG;
 use errors::AnyhowResult;
 
-use crate::delete_pods::delete_pods;
+use crate::delete_pods_threaded::delete_pods_threaded;
 use crate::list_pods::list_pods;
 
-pub mod list_pods;
 pub mod delete_pods;
+pub mod delete_pods_threaded;
+pub mod list_pods;
+pub mod pod_store;
 
 /// kube-pod-cleanup
 ///
@@ -35,7 +36,8 @@ pub fn main() -> AnyhowResult<()> {
 
   info!("kube-pod-cleanup");
 
-  const POD_STATUSES_TO_KEEP : [&str; 1] = [
+  const POD_STATUSES_TO_KEEP : [&str; 2] = [
+    "ContainerCreating",
     "Running",
   ];
 
@@ -67,6 +69,7 @@ pub fn main() -> AnyhowResult<()> {
     "Pending",
     "PodInitializing",
     //"ContainerStatusUnknown",
+    //"Init:0/2",
     //"Init:ContainerStatusUnknown",
   ];
 
@@ -82,7 +85,7 @@ pub fn main() -> AnyhowResult<()> {
 
   info!("Clearing {} / {} pods...", pods_to_clear.len(), all_pods.len());
 
-  let wait_duration = Duration::from_secs(10);
+  let wait_duration = Duration::from_secs(3);
 
   info!("Clearing in {} seconds... (Last chance to cancel!)", wait_duration.as_secs());
 
@@ -96,7 +99,9 @@ pub fn main() -> AnyhowResult<()> {
 
   // TODO(bt,2023-10-10): Delete pods isn't the cleanest code; we can improve this in the future
   // TODO(1): Add multi-threading, make the threads clear different batches.
-  delete_pods(pod_names_to_clear, 30)?;
+  //delete_pods(pod_names_to_clear, 30)?;
+
+  delete_pods_threaded(pod_names_to_clear, 6, 30)?;
 
   info!("Done!");
   Ok(())

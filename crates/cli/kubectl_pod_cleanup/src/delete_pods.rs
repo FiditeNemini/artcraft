@@ -1,6 +1,6 @@
 use std::process::Command;
 
-use log::info;
+use log::{debug, info};
 use rand::prelude::IteratorRandom;
 use rand::thread_rng;
 
@@ -29,7 +29,7 @@ pub fn delete_pods(mut pod_names: Vec<String>, batch_size: usize) -> AnyhowResul
   Ok(())
 }
 
-fn delete_pod_batch(pod_names: &Vec<String>) -> AnyhowResult<()> {
+pub fn delete_pod_batch(pod_names: &Vec<String>) -> AnyhowResult<()> {
   let mut args = Vec::from(["delete".to_string(), "pods".to_string()]);
 
   args.extend_from_slice(pod_names);
@@ -42,7 +42,7 @@ fn delete_pod_batch(pod_names: &Vec<String>) -> AnyhowResult<()> {
 
   let stdout = String::from_utf8(output.stdout)?;
 
-  info!("Output: {}", stdout);
+  debug!("Output: {}", stdout);
 
   Ok(())
 }

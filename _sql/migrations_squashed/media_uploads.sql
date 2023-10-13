@@ -98,7 +98,7 @@ CREATE TABLE media_uploads (
     'public',
     'hidden',
     'private'
-    ) NOT NULL DEFAULT 'public',
+  ) NOT NULL DEFAULT 'public',
 
   -- The synthetic id associated with this result.
   -- These ids are incremented on a per-user basis to help users

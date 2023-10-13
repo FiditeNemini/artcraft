@@ -2,6 +2,7 @@ use std::time::Duration;
 
 use log::{error, info, warn};
 
+use enums::by_table::generic_inference_jobs::frontend_failure_category::FrontendFailureCategory;
 use errors::AnyhowResult;
 use filesys::file_exists::file_exists;
 use jobs_common::noop_logger::NoOpLogger;
@@ -123,66 +124,133 @@ async fn process_job_batch(job_dependencies: &JobDependencies, jobs: Vec<Availab
           warn!("Success stats: {:?}", stats);
         }
       },
-      Err(e) => {
-        warn!("Failure to process job: {:?}", e);
-
-        let (permanent_failure, increment_fail_count, internal_failure_reason, maybe_public_failure_reason) =
-            match e {
-              // Permanent failures
-              ProcessSingleJobError::KeepAliveElapsed =>
-                (true, false, "keepalive elapsed".to_string(), Some("keepalive elapsed")),
-              ProcessSingleJobError::InvalidJob(ref err) =>
-                (true, false, format!("InvalidJob: {:?}", err), Some("invalid job")),
-              ProcessSingleJobError::NotYetImplemented =>
-                (true, false, "not yet implemented".to_string(), Some("not yet implemented")),
-              ProcessSingleJobError::FaceDetectionFailure =>
-                (true, false, "face not detected".to_string(), Some("face not detected")),
-
-              // Non-permanent failures
-              ProcessSingleJobError::FilesystemFull =>
-                (false, true, "worker filesystem full".to_string(), Some("worker filesystem full")),
-              ProcessSingleJobError::Other(ref err) =>
-                (false, true, format!("OtherErr: {:?}", err), None),
-            };
-
-        if increment_fail_count {
-          // NB: We only increment the fail count for events that may indicate the job server is stuck.
-          let stats = job_dependencies.job_stats.increment_failure_count().ok();
-          warn!("Failure stats: {:?}", stats);
-        }
-
-        if permanent_failure {
-          let _r = mark_generic_inference_job_completely_failed(
-            &job_dependencies.mysql_pool,
-            &job,
-            maybe_public_failure_reason,
-            Some(&internal_failure_reason),
-          ).await;
-        } else {
-          let _r = mark_generic_inference_job_failure(
-            &job_dependencies.mysql_pool,
-            &job,
-            maybe_public_failure_reason,
-            &internal_failure_reason,
-            job_dependencies.job_max_attempts
-          ).await;
-        }
-
-        match e {
-          // Post failure handling
-          ProcessSingleJobError::FilesystemFull => {
-            warn!("Clearing full filesystem...");
-            clear_full_filesystem(&job_dependencies.fs.semi_persistent_cache)?;
-          }
-          // No-op
-          ProcessSingleJobError::Other(_) => {}
-          ProcessSingleJobError::InvalidJob(_) => {}
-          ProcessSingleJobError::KeepAliveElapsed => {}
-          ProcessSingleJobError::NotYetImplemented => {}
-          ProcessSingleJobError::FaceDetectionFailure => {}
-        }
+      Err(err) => {
+        warn!("Failure to process job: {:?}", err);
+        let _r = handle_error(&job_dependencies, &job, err).await?;
       }
     }
+  }
+
+  Ok(())
+}
+
+#[derive(Eq,PartialEq)]
+enum JobFailureClass {
+  // Jobs that can be retried
+  TransientFailure,
+  // Jobs that cannot be retried and must be marked dead
+  PermanentFailure,
+}
+
+#[derive(Eq,PartialEq)]
+enum ContainerHealth {
+  // No impact to container health
+  Ignore,
+  // Increment the container health failure counter
+  IncrementContainerFailCount,
+}
+
+async fn handle_error(job_dependencies: &&JobDependencies, job: &AvailableInferenceJob, error: ProcessSingleJobError) -> AnyhowResult<()> {
+  let (
+    job_failure_class,
+    container_health_report,
+    internal_failure_reason,
+    maybe_public_failure_reason, // TODO(bt,2023-10-11): Remove this column in favor of "frontend_failure_category".
+    maybe_frontend_failure_category
+  ) = match error {
+    // Permanent failures
+    ProcessSingleJobError::KeepAliveElapsed =>
+      (
+        JobFailureClass::PermanentFailure,
+        ContainerHealth::Ignore,
+        "keepalive elapsed".to_string(),
+        None,
+        Some(FrontendFailureCategory::KeepAliveElapsed),
+      ),
+    ProcessSingleJobError::InvalidJob(ref err) =>
+      (
+        JobFailureClass::PermanentFailure,
+        ContainerHealth::Ignore,
+        format!("InvalidJob: {:?}", err),
+        Some("invalid job"),
+        None,
+      ),
+    ProcessSingleJobError::NotYetImplemented =>
+      (
+        JobFailureClass::PermanentFailure,
+        ContainerHealth::Ignore,
+        "not yet implemented".to_string(),
+        None,
+        Some(FrontendFailureCategory::NotYetImplemented),
+      ),
+    ProcessSingleJobError::FaceDetectionFailure =>
+      (
+        JobFailureClass::PermanentFailure,
+        ContainerHealth::Ignore,
+        "face not detected".to_string(),
+        None,
+        Some(FrontendFailureCategory::FaceNotDetected),
+      ),
+
+    // Non-permanent failures
+    ProcessSingleJobError::FilesystemFull =>
+      (
+        JobFailureClass::TransientFailure,
+        ContainerHealth::IncrementContainerFailCount,
+        "worker filesystem full".to_string(),
+        None, // User doesn't need to know the filesystem is full
+        Some(FrontendFailureCategory::RetryableWorkerError),
+      ),
+    ProcessSingleJobError::Other(ref err) =>
+      (
+        JobFailureClass::TransientFailure,
+        ContainerHealth::IncrementContainerFailCount,
+        format!("OtherErr: {:?}", err),
+        None, // Obviously don't tell the user about errors even we're not sure about
+        Some(FrontendFailureCategory::RetryableWorkerError),
+      ),
+  };
+
+  if container_health_report == ContainerHealth::IncrementContainerFailCount {
+    // NB: We only increment the fail count for events that may indicate the job server is stuck.
+    let stats = job_dependencies.job_stats.increment_failure_count().ok();
+    warn!("Failure stats: {:?}", stats);
+  }
+
+  match job_failure_class {
+    JobFailureClass::PermanentFailure => {
+      let _r = mark_generic_inference_job_completely_failed(
+        &job_dependencies.mysql_pool,
+        &job,
+        maybe_public_failure_reason,
+        Some(&internal_failure_reason),
+        maybe_frontend_failure_category,
+      ).await;
+    }
+    JobFailureClass::TransientFailure => {
+      let _r = mark_generic_inference_job_failure(
+        &job_dependencies.mysql_pool,
+        &job,
+        maybe_public_failure_reason,
+        &internal_failure_reason,
+        maybe_frontend_failure_category,
+        job_dependencies.job_max_attempts
+      ).await;
+    }
+  }
+
+  match error {
+    // Post failure handling
+    ProcessSingleJobError::FilesystemFull => {
+      warn!("Clearing full filesystem...");
+      clear_full_filesystem(&job_dependencies.fs.semi_persistent_cache)?;
+    }
+    // No-op
+    ProcessSingleJobError::Other(_) => {}
+    ProcessSingleJobError::InvalidJob(_) => {}
+    ProcessSingleJobError::KeepAliveElapsed => {}
+    ProcessSingleJobError::NotYetImplemented => {}
+    ProcessSingleJobError::FaceDetectionFailure => {}
   }
 
   Ok(())

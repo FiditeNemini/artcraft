@@ -11,6 +11,7 @@ use r2d2_redis::redis::Commands;
 
 use buckets::public::media_files::original_file::MediaFileBucketPath;
 use buckets::public::voice_conversion_results::original_file::VoiceConversionResultOriginalFilePath;
+use enums::by_table::generic_inference_jobs::frontend_failure_category::FrontendFailureCategory;
 use enums::by_table::generic_inference_jobs::inference_category::InferenceCategory;
 use mysql_queries::queries::generic_inference::web::get_inference_job_status::get_inference_job_status;
 use redis_common::redis_keys::RedisKeys;
@@ -80,6 +81,10 @@ pub struct StatusDetailsResponse {
   /// Whether the frontend needs to maintain a keepalive check.
   /// This is typically only for non-premium users.
   pub requires_keepalive: bool,
+
+  /// An enum the frontend can use to display localized/I18N error
+  /// messages. These pertain to both transient and permanent failures.
+  pub maybe_failure_category: Option<FrontendFailureCategory>
 }
 
 #[derive(Serialize)]
@@ -190,7 +195,7 @@ pub async fn get_inference_job_status_handler(
     job_token: record.job_token,
     request: RequestDetailsResponse {
       inference_category: record.request_details.inference_category,
-      maybe_model_type: record.request_details.maybe_model_type,
+      maybe_model_type: filter_model_name(record.request_details.maybe_model_type),
       maybe_model_token: record.request_details.maybe_model_token,
       maybe_model_title: record.request_details.maybe_model_title,
       maybe_raw_inference_text: record.request_details.maybe_raw_inference_text,
@@ -198,13 +203,15 @@ pub async fn get_inference_job_status_handler(
     status: StatusDetailsResponse {
       status: record.status,
       maybe_extra_status_description,
-      maybe_assigned_worker: record.maybe_assigned_worker,
+      maybe_assigned_worker: filter_model_name(record.maybe_assigned_worker),
       maybe_assigned_cluster: record.maybe_assigned_cluster,
       maybe_first_started_at: record.maybe_first_started_at,
       attempt_count: record.attempt_count as u8,
       requires_keepalive: record.is_keepalive_required,
+      maybe_failure_category: record.maybe_frontend_failure_category,
     },
     maybe_result: record.maybe_result_details.map(|result_details| {
+      // NB: Be careful here, because this varies based on the type of inference result.
       let public_bucket_media_path = match inference_category {
         InferenceCategory::LipsyncAnimation => {
           MediaFileBucketPath::from_object_hash(
@@ -250,4 +257,26 @@ pub async fn get_inference_job_status_handler(
   Ok(HttpResponse::Ok()
       .content_type("application/json")
       .body(body))
+}
+
+fn filter_model_name(name: Option<String>) -> Option<String> {
+  // We're not revealing some of the models we use
+  name.map(|name| {
+    name.replace("sadtalker", "faceanimator")
+        .replace("sad-talker", "face-animator")
+        .replace("sad_talker", "face_animator")
+  })
+}
+
+#[cfg(test)]
+mod tests {
+  use crate::http_server::endpoints::inference_job::get_inference_job_status::filter_model_name;
+
+  #[test]
+  fn test_filter_model_name() {
+    assert_eq!(filter_model_name(None), None);
+    assert_eq!(filter_model_name(Some("foobarbaz".to_string())), Some("foobarbaz".to_string()));
+    assert_eq!(filter_model_name(Some("inference-job-sadtalker-5df55cfbb7-ngxzh".to_string())), Some("inference-job-faceanimator-5df55cfbb7-ngxzh".to_string()));
+    assert_eq!(filter_model_name(Some("sad_talker".to_string())), Some("face_animator".to_string()));
+  }
 }

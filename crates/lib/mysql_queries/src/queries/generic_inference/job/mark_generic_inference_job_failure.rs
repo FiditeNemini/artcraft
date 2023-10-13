@@ -2,6 +2,7 @@ use anyhow::anyhow;
 use sqlx;
 use sqlx::MySqlPool;
 
+use enums::by_table::generic_inference_jobs::frontend_failure_category::FrontendFailureCategory;
 use errors::AnyhowResult;
 
 use crate::queries::generic_inference::job::list_available_generic_inference_jobs::AvailableInferenceJob;
@@ -12,6 +13,7 @@ pub async fn mark_generic_inference_job_failure(
   job: &AvailableInferenceJob,
   maybe_public_failure_reason: Option<&str>,
   internal_debugging_failure_reason: &str,
+  maybe_frontend_failure_category: Option<FrontendFailureCategory>,
   max_attempts: u16
 ) -> AnyhowResult<()> {
 
@@ -40,12 +42,14 @@ SET
   status = ?,
   failure_reason = ?,
   internal_debugging_failure_reason = ?,
+  frontend_failure_category = ?,
   retry_at = NOW() + interval 2 minute
 WHERE id = ?
         "#,
         next_status,
         maybe_public_failure_reason.as_deref(),
         &internal_debugging_failure_reason,
+        maybe_frontend_failure_category,
         job.id.0,
     )
       .execute(pool)
