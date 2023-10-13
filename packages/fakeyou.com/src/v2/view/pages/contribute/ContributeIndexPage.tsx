@@ -8,8 +8,6 @@ import { Trans } from "react-i18next";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faVolumeHigh,
-  faVideo,
-  faImage,
   faTags,
   faHandsHelping,
 } from "@fortawesome/free-solid-svg-icons";
