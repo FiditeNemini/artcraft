@@ -90,6 +90,7 @@ import MobileMenu from "components/layout/MobileMenu/MobileMenu";
 import { TopNav } from "./nav/TopNav";
 import { TestingPage } from "./pages/testing/TestingPage";
 import TtsModelSearchPage from "./pages/tts/tts_model_search/TtsModelSearchPage";
+import MediaPage from "./pages/media_page/MediaPage";
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -316,6 +317,10 @@ class PageContainer extends React.Component<
                 querySessionCallback={() => {}}
                 sessionWrapper={this.props.sessionWrapper}
               />
+            </Route>
+
+            <Route path="/media/:token">
+              <MediaPage />
             </Route>
 
             <Route path="/dev-tts">
