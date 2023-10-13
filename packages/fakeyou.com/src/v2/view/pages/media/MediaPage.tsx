@@ -3,13 +3,14 @@ import { useParams } from "react-router-dom";
 import AudioComponent from "./AudioComponent";
 import VideoComponent from "./VideoComponent";
 import ImageComponent from "./ImageComponent";
+import MediaData from "./MediaDataTypes";
 
 const MediaPage = () => {
-  const { token } = useParams();
-  const [mediaData, setMediaData] = useState<{} | null>(null);
+  const { token } = useParams<{ token: string }>();
+  const [mediaData, setMediaData] = useState<MediaData | null>(null);
 
   // Dummy media data (replace with actual API data)
-  const dummyMediaData = {
+  let dummyMediaData = {
     token: "m_v032bt6ecm0rwhebbhgdmk5rexf7cij",
     media_type: "video", // Change to somthing like "video" or "image" to test different types
     public_bucket_path:
@@ -32,8 +33,8 @@ const MediaPage = () => {
   // Simulate API call
   useEffect(() => {
     setTimeout(() => {
-      setMediaData(dummyMediaData); // Replace with actual API data
-    }, 1000); // Simulated delay of 1 second
+      setMediaData(dummyMediaData);
+    }, 1000);
   }, [token]);
 
   const renderMediaComponent = () => {
@@ -41,13 +42,13 @@ const MediaPage = () => {
       return <div>Loading...</div>;
     }
 
-    switch (dummyMediaData.media_type) {
+    switch (mediaData.media_type) {
       case "audio":
-        return <AudioComponent mediaData={dummyMediaData} />;
+        return <AudioComponent mediaData={mediaData} />;
       case "video":
-        return <VideoComponent mediaData={dummyMediaData} />;
+        return <VideoComponent mediaData={mediaData} />;
       case "image":
-        return <ImageComponent mediaData={dummyMediaData} />;
+        return <ImageComponent mediaData={mediaData} />;
       default:
         return <div>Unsupported media type</div>;
     }
@@ -55,7 +56,7 @@ const MediaPage = () => {
 
   return (
     <div>
-      <h1>{dummyMediaData.token}</h1>
+      <h1>{mediaData?.token}</h1>
       {renderMediaComponent()}
     </div>
   );
