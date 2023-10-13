@@ -34,6 +34,7 @@ use crate::http_server::endpoints::inference_job::get_pending_inference_job_coun
 use crate::http_server::endpoints::investor_demo::disable_demo_mode_handler::disable_demo_mode_handler;
 use crate::http_server::endpoints::investor_demo::enable_demo_mode_handler::enable_demo_mode_handler;
 use crate::http_server::endpoints::leaderboard::get_leaderboard::leaderboard_handler;
+use crate::http_server::endpoints::media_files::get_media_file::get_media_file_handler;
 use crate::http_server::endpoints::media_uploads::list_user_media_uploads_of_type::list_user_media_uploads_of_type_handler;
 use crate::http_server::endpoints::media_uploads::upload_audio::upload_audio_handler;
 use crate::http_server::endpoints::media_uploads::upload_image::upload_image_handler;
@@ -163,6 +164,7 @@ pub fn add_routes<T, B> (app: App<T>) -> App<T>
   app = add_investor_demo_routes(app); /* /demo_mode */ // TODO: DEFINITELY TEMPORARY
   app = add_flag_routes(app); /* /flag */
   app = add_desktop_app_routes(app); /* /v1/vc/... */
+  app = add_media_file_routes(app); /* /v1/media_files/... */
   app = add_media_upload_routes(app); /* /v1/media_upload/... */
   app = add_trending_routes(app); /* /v1/trending/... */
   app = add_user_rating_routes(app); /* /v1/user_rating/... */
@@ -954,6 +956,27 @@ fn add_desktop_app_routes<T, B> (app: App<T>) -> App<T>
             .route(web::head().to(|| HttpResponse::Ok()))
         )
     )
+}
+
+// ==================== MEDIA FILE ROUTES ====================
+
+fn add_media_file_routes<T, B> (app: App<T>) -> App<T>
+  where
+      B: MessageBody,
+      T: ServiceFactory<
+        ServiceRequest,
+        Config = (),
+        Response = ServiceResponse<B>,
+        Error = Error,
+        InitError = (),
+      >,
+{
+  app.service(web::scope("/v1/media_files")
+      .service(web::resource("/file/{token}")
+          .route(web::get().to(get_media_file_handler))
+          .route(web::head().to(|| HttpResponse::Ok()))
+      )
+  )
 }
 
 // ==================== MEDIA UPLOAD ROUTES ====================

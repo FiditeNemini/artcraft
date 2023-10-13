@@ -37,7 +37,6 @@ and status IN ('pending', 'started', 'complete_failure', 'attempt_failed')
 group by maybe_creator_user_token, maybe_creator_username, creator_ip_address
 order by attempts desc;
 
-
 -- Detailed report on most recent jobs, ordered by worst performing.
 -- TODO: Determine if the problem is in downloading models. Make sure the job timer doesn't include
 --   sections where models / files get downloaded.
@@ -71,8 +70,8 @@ from (
                  m.token = jobs.maybe_input_source_token
          where
              jobs.status != 'pending'
-         AND jobs.created_at > NOW() - INTERVAL 2000 MINUTE
-         AND jobs.maybe_model_type IN ('sad_talker')
+         AND jobs.created_at > NOW() - INTERVAL 20 MINUTE
+         AND jobs.maybe_model_type IN ('so_vits_svc')
          order by id desc
              limit 200
      ) as t
