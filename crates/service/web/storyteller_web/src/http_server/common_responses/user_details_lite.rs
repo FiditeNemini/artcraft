@@ -28,6 +28,45 @@ pub struct UserDetailsLight {
   // In the future, we'll also support user-uploaded avatars that we store on our servers.
 }
 
+impl UserDetailsLight {
+
+  pub fn from_optional_db_fields(
+    maybe_user_token: Option<&UserToken>,
+    maybe_username: Option<&str>,
+    maybe_display_name: Option<&str>,
+    maybe_gravatar_hash: Option<&str>,
+  ) -> Option<Self> {
+    Self::from_optional_db_fields_owned(
+      maybe_user_token.map(|u| u.clone()),
+      maybe_username.map(|s|s.to_string()),
+      maybe_display_name.map(|s|s.to_string()),
+      maybe_gravatar_hash.map(|s|s.to_string()),
+    )
+  }
+
+  pub fn from_optional_db_fields_owned(
+    maybe_user_token: Option<UserToken>,
+    maybe_username: Option<String>,
+    maybe_display_name: Option<String>,
+    maybe_gravatar_hash: Option<String>,
+  ) -> Option<Self> {
+    match (maybe_user_token, maybe_username, maybe_display_name, maybe_gravatar_hash) {
+      (Some(user_token), Some(username), Some(display_name), Some(gravatar_hash)) => {
+        Some(Self {
+          default_avatar: DefaultAvatarInfo::from_username(&username),
+          user_token,
+          username,
+          display_name,
+          gravatar_hash,
+        })
+      }
+      _ => {
+        None
+      }
+    }
+  }
+}
+
 #[derive(Clone, Serialize)]
 pub struct DefaultAvatarInfo {
   pub image_index: u8,
@@ -43,5 +82,36 @@ impl DefaultAvatarInfo {
       image_index: default_avatar_from_username(username),
       color_index: default_avatar_color_from_username(username),
     }
+  }
+}
+
+#[cfg(test)]
+mod tests {
+  use tokens::tokens::users::UserToken;
+
+  use crate::http_server::common_responses::user_details_lite::UserDetailsLight;
+
+  #[test]
+  fn test_from_optional_db_fields() {
+    let user_token = UserToken::new_from_str("token");
+    let username = "username";
+    let display_name = "display_name";
+    let gravatar_hash= "adsf";
+
+    let user_details = UserDetailsLight::from_optional_db_fields(
+      Some(&user_token),
+      Some(username),
+      Some(display_name),
+      Some(gravatar_hash)
+    );
+
+    let user_details = user_details.expect("Should not be optional.");
+
+    assert_eq!(user_details.user_token, user_token);
+    assert_eq!(user_details.username, username);
+    assert_eq!(user_details.display_name, display_name);
+    assert_eq!(user_details.gravatar_hash, gravatar_hash);
+    assert_eq!(user_details.default_avatar.color_index, 5);
+    assert_eq!(user_details.default_avatar.image_index, 16);
   }
 }
