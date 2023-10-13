@@ -89,6 +89,7 @@ import SideNav from "components/layout/SideNav/SideNav";
 import MobileMenu from "components/layout/MobileMenu/MobileMenu";
 import { TopNav } from "./nav/TopNav";
 import { TestingPage } from "./pages/testing/TestingPage";
+import TtsModelSearchPage from "./pages/tts/tts_model_search/TtsModelSearchPage";
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -317,6 +318,10 @@ class PageContainer extends React.Component<
               />
             </Route>
 
+            <Route path="/dev-tts">
+              <TtsModelSearchPage sessionWrapper={this.props.sessionWrapper} />
+            </Route>
+
             <Route path="/tts/result/:token/edit">
               <TtsResultEditPage sessionWrapper={this.props.sessionWrapper} />
             </Route>
@@ -459,7 +464,7 @@ class PageContainer extends React.Component<
             </Route>
 
             <Route path="/media/:token">
-              <Media/>
+              <Media />
             </Route>
 
             <Route path="/moderation/user/list">
@@ -580,7 +585,7 @@ class PageContainer extends React.Component<
             </Route>
 
             <Route path="/testing">
-              <TestingPage 
+              <TestingPage
                 sessionSubscriptionsWrapper={
                   this.props.sessionSubscriptionsWrapper
                 }
@@ -591,12 +596,15 @@ class PageContainer extends React.Component<
             </Route>
 
             <Route path="/face-animation">
-              <LipsyncEditor {...{ 
-                enqueueInferenceJob: this.props.enqueueInferenceJob,
-                sessionSubscriptionsWrapper:  this.props.sessionSubscriptionsWrapper,
-                inferenceJobs: this.props.inferenceJobs,
-                inferenceJobsByCategory: this.props.inferenceJobsByCategory
-              }} />
+              <LipsyncEditor
+                {...{
+                  enqueueInferenceJob: this.props.enqueueInferenceJob,
+                  sessionSubscriptionsWrapper:
+                    this.props.sessionSubscriptionsWrapper,
+                  inferenceJobs: this.props.inferenceJobs,
+                  inferenceJobsByCategory: this.props.inferenceJobsByCategory,
+                }}
+              />
             </Route>
 
             <Route path="/commissions">

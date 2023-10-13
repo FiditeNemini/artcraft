@@ -156,7 +156,7 @@ export default function SideNav(props: SideNavProps) {
       <Button
         label={t("loginButton")}
         small
-        secondary
+        variant="secondary"
         onClick={() => {
           history.push("/login");
           handleNavLinkClick();
@@ -194,7 +194,7 @@ export default function SideNav(props: SideNavProps) {
           icon={faUser}
           label={t("profileButton")}
           small
-          secondary
+          variant="secondary"
           onClick={() => {
             history.push(url);
             handleNavLinkClick();
@@ -209,7 +209,7 @@ export default function SideNav(props: SideNavProps) {
           icon={faSignOutAlt}
           label={t("logOutButton")}
           small
-          danger
+          variant="danger"
           onClick={async () => {
             await logoutHandler();
             handleNavLinkClick();
