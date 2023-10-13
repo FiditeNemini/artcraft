@@ -156,7 +156,7 @@ function LandingPage(props: Props) {
           icon={faSparkles}
           message="Have you tried our new Face Animator? Turn photos of faces into animated lip-synced videos with just a picture and some audio!"
           alertVariant="new"
-          link="/face-animation"
+          link="/face-animator"
           linkText="Try it now"
         />
 
@@ -300,7 +300,7 @@ function LandingPage(props: Props) {
           </div>
           <div className="col-12 col-md-4">
             <Link
-              to="/face-animation"
+              to="/face-animator"
               className="panel panel-select d-flex flex-column align-items-center"
             >
               <div className="d-flex px-4 pt-4 align-items-start w-100">
@@ -320,7 +320,7 @@ function LandingPage(props: Props) {
                     {t("productFaceAnimatorText")}
                   </h6>
                 </div>
-                <Link to="/face-animation" className="btn btn-square mt-1">
+                <Link to="/face-animator" className="btn btn-square mt-1">
                   <FontAwesomeIcon icon={faArrowRight} />
                 </Link>
               </div>

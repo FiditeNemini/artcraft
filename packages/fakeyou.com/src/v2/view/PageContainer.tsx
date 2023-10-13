@@ -595,7 +595,7 @@ class PageContainer extends React.Component<
               />
             </Route>
 
-            <Route path="/face-animation">
+            <Route path="/face-animator">
               <LipsyncEditor
                 {...{
                   enqueueInferenceJob: this.props.enqueueInferenceJob,

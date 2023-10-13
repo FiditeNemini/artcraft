@@ -271,7 +271,7 @@ export default function SideNav(props: SideNavProps) {
         <li className="sidebar-heading">{t("videoTitle")}</li>
         <li>
           <NavLink
-            to="/face-animation"
+            to="/face-animator"
             activeClassName="active-link"
             onClick={handleNavLinkClick}
           >

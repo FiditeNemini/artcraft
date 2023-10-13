@@ -19,13 +19,14 @@ import {
   // EnqueueFaceAnimationRequest,
 } from "@storyteller/components/src/api/face_animation/EnqueueFaceAnimation";
 import FaceAnimatorTitle from "./FaceAnimatorTitle";
-import FaceAnimatorInput from './FaceAnimatorInput';
-import FaceAnimatorWorking from './FaceAnimatorWorking';
+import FaceAnimatorInput from "./FaceAnimatorInput";
+import FaceAnimatorWorking from "./FaceAnimatorWorking";
 import FaceAnimatorSuccess from "./FaceAnimatorSuccess";
 import { FaceAnimatorCore } from "./FaceAnimatorTypes";
 import { BasicVideo } from "components/common";
 import "./LipsyncEditor.scss";
 import { FrontendInferenceJobType } from "@storyteller/components/src/jobs/InferenceJob";
+import { usePrefixedDocumentTitle } from "common/UsePrefixedDocumentTitle";
 
 export default function LipsyncEditor({
   enqueueInferenceJob,
@@ -34,6 +35,7 @@ export default function LipsyncEditor({
   ...rest
 }: FaceAnimatorCore) {
   const { t } = useLocalize("FaceAnimator");
+  usePrefixedDocumentTitle("AI Face Animator");
 
   // the ready states are set by functions which run after the upload input animation is completed, which then illuminates the respective checkmark in a staggered way to draw attention to the workflow, and reduces concurrent animations
 
@@ -46,23 +48,26 @@ export default function LipsyncEditor({
   const [index, indexSet] = useState<number>(0); // index  = slideshow slide position
 
   //const [animationStyle,animationStyleSet] = useState(0);
-  const [frameDimensions,frameDimensionsSet] = useState("twitter_square");
-  const [removeWatermark,removeWatermarkSet] = useState(false);
-  const [disableFaceEnhancement,disableFaceEnhancementSet] = useState(false);
-  const [still,stillSet] = useState(false);
+  const [frameDimensions, frameDimensionsSet] = useState("twitter_square");
+  const [removeWatermark, removeWatermarkSet] = useState(false);
+  const [disableFaceEnhancement, disableFaceEnhancementSet] = useState(false);
+  const [still, stillSet] = useState(false);
 
   //const animationChange = ({ target }: any) => animationStyleSet(target.value);
-  const frameDimensionsChange = ({ target }: any) => frameDimensionsSet(target.value);
-  const removeWatermarkChange = ({ target }: any) => removeWatermarkSet(target.checked);
-  const disableFaceEnhancementChange = ({ target }: any) => disableFaceEnhancementSet(target.checked);
+  const frameDimensionsChange = ({ target }: any) =>
+    frameDimensionsSet(target.value);
+  const removeWatermarkChange = ({ target }: any) =>
+    removeWatermarkSet(target.checked);
+  const disableFaceEnhancementChange = ({ target }: any) =>
+    disableFaceEnhancementSet(target.checked);
   const stillChange = ({ target }: any) => stillSet(target.checked);
-  const clearInputs = () => { 
-    //animationStyleSet(0); 
-    stillSet(false); 
-    frameDimensionsSet("twitter_square"); 
-    removeWatermarkSet(false); 
+  const clearInputs = () => {
+    //animationStyleSet(0);
+    stillSet(false);
+    frameDimensionsSet("twitter_square");
+    removeWatermarkSet(false);
     disableFaceEnhancementSet(false);
-  }
+  };
 
   const makeRequest = (mode: number) => ({
     uuid_idempotency_token: uuidv4(),
@@ -144,7 +149,11 @@ export default function LipsyncEditor({
       <div {...{ className: "panel lipsync-panel p-3 py-4 p-md-4" }}>
         <FaceAnimatorTitle {...headerProps} />
         {transitions((style, i) => {
-          const Page = [FaceAnimatorInput, FaceAnimatorWorking, FaceAnimatorSuccess][page];
+          const Page = [
+            FaceAnimatorInput,
+            FaceAnimatorWorking,
+            FaceAnimatorSuccess,
+          ][page];
           return Page ? (
             <Page
               {...{
@@ -173,7 +182,7 @@ export default function LipsyncEditor({
         })}
       </div>
       <div {...{ className: "face-animator-mobile-sample" }}>
-        <BasicVideo {...{ src: "/videos/face-animator-instruction-en.mp4" }}/>
+        <BasicVideo {...{ src: "/videos/face-animator-instruction-en.mp4" }} />
       </div>
     </div>
   );
