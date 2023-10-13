@@ -4,7 +4,7 @@ import AudioComponent from "./AudioComponent";
 import VideoComponent from "./VideoComponent";
 import ImageComponent from "./ImageComponent";
 
-const MediaFilePage = () => {
+const MediaPage = () => {
   const { token } = useParams();
   const [mediaData, setMediaData] = useState<{} | null>(null);
 
@@ -61,4 +61,4 @@ const MediaFilePage = () => {
   );
 };
 
-export default MediaFilePage;
+export default MediaPage;

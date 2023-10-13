@@ -6,7 +6,6 @@ import { LoginPage } from "./pages/login/LoginPage";
 import { ModerationFc } from "./pages/moderation/moderation_main/ModerationFc";
 import { ModerationIpBanListFc } from "./pages/moderation/moderation_ip_ban_list/ModerationIpBanListFc";
 import { ModerationViewIpBanFc } from "./pages/moderation/moderation_view_ip_ban/ModerationViewIpBanFc";
-import { Media } from "./pages/media";
 import { LipsyncEditor } from "./pages/lipsync";
 import { ProfileEditFc } from "./pages/profile/profile_edit/ProfileEditFc";
 import { ProfilePage } from "./pages/profile/profile_view/ProfilePage";
@@ -90,7 +89,7 @@ import MobileMenu from "components/layout/MobileMenu/MobileMenu";
 import { TopNav } from "./nav/TopNav";
 import { TestingPage } from "./pages/testing/TestingPage";
 import TtsModelSearchPage from "./pages/tts/tts_model_search/TtsModelSearchPage";
-import MediaPage from "./pages/media_page/MediaPage";
+import MediaPage from "./pages/media/MediaPage";
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -469,7 +468,7 @@ class PageContainer extends React.Component<
             </Route>
 
             <Route path="/media/:token">
-              <Media />
+              <MediaPage />
             </Route>
 
             <Route path="/moderation/user/list">
