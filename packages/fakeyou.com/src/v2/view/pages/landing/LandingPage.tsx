@@ -328,28 +328,8 @@ function LandingPage(props: Props) {
               <img
                 className="img-fluid"
                 src="/images/landing/select-w2l.webp"
-                alt="Video Lip Sync"
+                alt="Face Animator"
               />
-            </Link>
-          </div>
-          <div className="col-12 col-md-4">
-            <Link
-              to="/video"
-              className="panel panel-select d-flex flex-column align-items-center h-auto pb-4"
-            >
-              <div className="d-flex px-4 pt-4 align-items-center w-100">
-                <div className="flex-grow-1">
-                  <h3 className="fw-bold text-white mb-1">
-                    {t("productVideoTitle")}
-                  </h3>
-                  <h6 className="fw-normal opacity-75 text-white mb-0">
-                    {t("productVideoText")}
-                  </h6>
-                </div>
-                <Link to="/video" className="btn btn-square mt-1">
-                  <FontAwesomeIcon icon={faArrowRight} />
-                </Link>
-              </div>
             </Link>
           </div>
           <img
