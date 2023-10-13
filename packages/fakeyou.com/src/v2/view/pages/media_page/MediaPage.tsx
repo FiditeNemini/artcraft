@@ -6,16 +6,14 @@ import ImageComponent from "./ImageComponent";
 
 const MediaFilePage = () => {
   const { token } = useParams();
-  const [mediaData, setMediaData] = useState<{
-    /* media data properties */
-  } | null>(null);
+  const [mediaData, setMediaData] = useState<{} | null>(null);
 
   // Dummy media data (replace with actual API data)
   const dummyMediaData = {
-    token: "m_v032bt6ecm0rwhebbhgdmk5rexf7cij", // Initialize with an empty string or your default token value
-    media_type: "video", // Change to "video" or "image" to test different types
+    token: "m_v032bt6ecm0rwhebbhgdmk5rexf7cij",
+    media_type: "video", // Change to somthing like "video" or "image" to test different types
     public_bucket_path:
-      "/media/8/p/c/h/h/8pchhrgc0ayawn09s9gmtfec2mcft0xk/fakeyou_8pchhrgc0ayawn09s9gmtfec2mcft0xk.wav", // Replace with actual URLs
+      "/media/8/p/c/h/h/8pchhrgc0ayawn09s9gmtfec2mcft0xk/fakeyou_8pchhrgc0ayawn09s9gmtfec2mcft0xk.mp4", // Replace with actual URLs
     maybe_creator_user: {
       user_token: "u_00XGM6M2TE4J9",
       username: "hanashi",
