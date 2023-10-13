@@ -42,7 +42,7 @@ pub fn validate_job(job: &AvailableInferenceJob) -> Result<JobArgs, ProcessSingl
   };
 
   Ok(JobArgs {
-    voice_token: ttsArgs.voice_token
+    voice_token: ttsArgs.voice_token.clone()
   })
 
 }
