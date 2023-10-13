@@ -22,7 +22,8 @@ CREATE TABLE media_files (
   -- Broad category for where the file came from:
   --   * 'inference' for inference output
   --   * 'processed' for processed file (eg. mp3 encoding, stem splitting, etc.)
-  --   * 'upload' for direct user upload
+  --   * 'upload' for direct user upload (from the filesystem)
+  --   * 'device_api' for direct user uploads recorded using Browser/Device APIs.
   origin_category VARCHAR(16) NOT NULL,
 
   -- TODO: Remove default value once records backfilled and queries updated.
