@@ -10,7 +10,7 @@
 /coming-soon*   /index.html   200
 /commissions*   /index.html   200
 /contribute*   /index.html   200
-/face-animation*   /index.html   200
+/face-animator*   /index.html   200
 /firehose*   /index.html   200
 /guide*   /index.html   200
 /jobs*   /index.html   200
@@ -40,6 +40,10 @@
 /video*   /index.html   200
 /voice-conversion*   /index.html   200
 /w2l*   /index.html   200
+
+# Old paths
+/face-animation* /face-animator 302
+
 # This is for YCombinator.
 # This is the *OLD* video for Summer 2022. We'll re-edit.
 # PLEASE DO NOT ACECSS THIS URL OR WATCH. IT WILL CHANGE THE

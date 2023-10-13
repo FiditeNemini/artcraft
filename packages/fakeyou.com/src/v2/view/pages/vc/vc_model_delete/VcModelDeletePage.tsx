@@ -5,7 +5,7 @@ import Panel from "components/common/Panel/Panel";
 import { faSave, faTrash } from "@fortawesome/pro-solid-svg-icons";
 import PageHeaderModelView from "components/layout/PageHeaderModelView/PageHeaderModelView";
 import Button from "components/common/Button/Button";
-import PageContainer from "components/common/PageContainer/PageContainer";
+import PageContainer from "components/common/Container";
 
 interface VcModelDeletePageProps {
   sessionWrapper: SessionWrapper;
