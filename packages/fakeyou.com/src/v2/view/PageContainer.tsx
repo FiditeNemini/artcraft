@@ -319,7 +319,7 @@ class PageContainer extends React.Component<
             </Route>
 
             <Route path="/media/:token">
-              <MediaPage />
+              <MediaPage sessionWrapper={this.props.sessionWrapper} />
             </Route>
 
             <Route path="/dev-tts">
@@ -465,10 +465,6 @@ class PageContainer extends React.Component<
 
             <Route path="/category/create">
               <CreateCategoryPage sessionWrapper={this.props.sessionWrapper} />
-            </Route>
-
-            <Route path="/media/:token">
-              <MediaPage />
             </Route>
 
             <Route path="/moderation/user/list">
