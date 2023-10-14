@@ -14,6 +14,7 @@ import { faCircleExclamation } from "@fortawesome/pro-solid-svg-icons";
 import Accordion from "components/common/Accordion";
 import DataTable from "components/common/DataTable";
 import { Gravatar } from "@storyteller/components/src/elements/Gravatar";
+import useTimeAgo from "hooks/useTimeAgo";
 
 interface MediaPageProps {
   sessionWrapper: SessionWrapper;
@@ -35,9 +36,11 @@ let dummyMediaData = {
       color_index: 3,
     },
   },
+  model_used: "Ash Ketchum",
+  model_link: "/tts/TM:6g1mfb9b6fb8",
   creator_set_visibility: "public",
-  created_at: "2023-10-12T07:49:53Z",
-  updated_at: "2023-10-12T07:49:53Z",
+  created_at: "2023-05-12T07:49:53Z",
+  updated_at: "2023-05-12T07:49:53Z",
 };
 
 export default function MediaPage({ sessionWrapper }: MediaPageProps) {
@@ -45,6 +48,8 @@ export default function MediaPage({ sessionWrapper }: MediaPageProps) {
   const [mediaData, setMediaData] = useState<MediaData | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<boolean>(false);
+
+  const timeCreated = useTimeAgo(mediaData?.created_at || "");
 
   // Simulate API call
   useEffect(() => {
@@ -88,12 +93,12 @@ export default function MediaPage({ sessionWrapper }: MediaPageProps) {
         />
         <Panel padding={true}>
           <div className="row">
-            <div className="col-12 col-md-8">
+            <div className="col-12 col-xl-8">
               <h1 className="mb-0">
                 <Skeleton />
               </h1>
             </div>
-            <div className="col-12 col-md-4">
+            <div className="col-12 col-xl-4">
               <h1 className="mb-0">
                 <Skeleton />
               </h1>
@@ -123,7 +128,10 @@ export default function MediaPage({ sessionWrapper }: MediaPageProps) {
     { property: "Type", value: mediaData.media_type },
     { property: "Created at", value: mediaData.created_at },
     { property: "Visibility", value: mediaData.creator_set_visibility },
-    { property: "Model Used", value: "Model Name" },
+    {
+      property: "Model",
+      value: mediaData.model_used,
+    },
   ];
 
   return (
@@ -134,13 +142,13 @@ export default function MediaPage({ sessionWrapper }: MediaPageProps) {
       />
       <Panel padding={true}>
         <div className="row g-4">
-          <div className="col-12 col-lg-8">
+          <div className="col-12 col-xl-8">
             {renderMediaComponent(mediaData)}
           </div>
-          <div className="col-12 col-lg-4">
-            <div className="d-flex">
+          <div className="col-12 col-xl-4">
+            <div className="d-flex mb-3 gap-2">
               <Gravatar
-                size={50}
+                size={48}
                 username={mediaData.maybe_creator_user.display_name}
                 avatarIndex={
                   mediaData.maybe_creator_user.default_avatar.image_index
@@ -151,10 +159,12 @@ export default function MediaPage({ sessionWrapper }: MediaPageProps) {
               />
               <div className="d-flex flex-column">
                 <Link
+                  className="fw-medium"
                   to={`/profile/${mediaData.maybe_creator_user.display_name}`}
                 >
                   {mediaData.maybe_creator_user.display_name}
                 </Link>
+                {timeCreated}
               </div>
             </div>
             <Accordion>

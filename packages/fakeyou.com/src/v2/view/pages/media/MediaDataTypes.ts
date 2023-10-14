@@ -12,6 +12,8 @@ export default interface MediaData {
       color_index: number;
     };
   };
+  model_used: string;
+  model_link: string;
   creator_set_visibility: string;
   created_at: string;
   updated_at: string;

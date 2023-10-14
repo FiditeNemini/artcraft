@@ -1,4 +1,10 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, {
+  useState,
+  useRef,
+  useEffect,
+  createContext,
+  useContext,
+} from "react";
 import "./Accordion.scss";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faChevronDown } from "@fortawesome/pro-solid-svg-icons";
@@ -14,50 +20,62 @@ interface AccordionItemProps {
   children: React.ReactNode;
 }
 
+interface AccordionContextType {
+  openItems: string[];
+  toggleItem: (title: string) => void;
+}
+
+const AccordionContext = createContext<AccordionContextType | undefined>(
+  undefined
+);
+
 function AccordionItem({
   title,
   defaultOpen = false,
   children,
 }: AccordionItemProps) {
-  const [isOpen, setIsOpen] = useState(defaultOpen);
+  const { openItems, toggleItem } = useContext(
+    AccordionContext
+  ) as AccordionContextType;
+  const isOpen = openItems.includes(title);
+
   const [contentHeight, setContentHeight] = useState<number | undefined>(
-    defaultOpen ? undefined : 0
+    isOpen ? undefined : 0
   );
   const contentRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (isOpen && contentRef.current) {
-      setContentHeight(contentRef.current.scrollHeight);
-    } else {
-      setContentHeight(0);
+    if (contentRef.current) {
+      setContentHeight(isOpen ? contentRef.current.scrollHeight : 0);
     }
   }, [isOpen]);
 
   const heightProps = useSpring({
-    height: `${contentHeight}px`,
-    from: {
-      height: defaultOpen ? "auto" : "0px",
-      config: { tension: 300, friction: 25 },
-    },
+    height: isOpen ? `${contentHeight}px` : "0px",
+    config: { tension: 300, friction: 25, clamp: true },
   });
 
   const contentOpacityProps = useSpring({
     opacity: isOpen ? 1 : 0,
-    config: { tension: 300, friction: 25 },
+    config: { tension: 300, friction: 25, clamp: true },
   });
+
+  const handleClick = () => {
+    toggleItem(title);
+  };
 
   return (
     <div className="fy-accordion-item">
       <div
         className={`fy-accordion-header p-3 ${isOpen ? "open" : ""}`}
-        onClick={() => setIsOpen(!isOpen)}
+        onClick={handleClick}
       >
         {title}
         <span className={`caret-icon ${isOpen ? "caret-rotated" : ""}`}>
           <FontAwesomeIcon icon={faChevronDown} />
         </span>
       </div>
-      <animated.div style={heightProps}>
+      <animated.div style={{ ...heightProps, overflow: "hidden" }}>
         <animated.div
           ref={contentRef}
           style={contentOpacityProps}
@@ -71,7 +89,29 @@ function AccordionItem({
 }
 
 function Accordion({ children }: AccordionProps) {
-  return <div className="d-flex flex-column gap-3">{children}</div>;
+  const [openItems, setOpenItems] = useState<string[]>([]);
+
+  const toggleItem = (title: string) => {
+    if (openItems.includes(title)) {
+      setOpenItems(openItems.filter((item) => item !== title));
+    } else {
+      setOpenItems([...openItems, title]);
+    }
+  };
+
+  // Initialize openItems based on defaultOpen props of AccordionItem children
+  useEffect(() => {
+    const defaultOpenItems = React.Children.toArray(children)
+      .filter((child: any) => child.props.defaultOpen)
+      .map((child: any) => child.props.title);
+    setOpenItems(defaultOpenItems);
+  }, [children]);
+
+  return (
+    <AccordionContext.Provider value={{ openItems, toggleItem }}>
+      <div className="d-flex flex-column gap-3">{children}</div>
+    </AccordionContext.Provider>
+  );
 }
 
 Accordion.Item = AccordionItem;

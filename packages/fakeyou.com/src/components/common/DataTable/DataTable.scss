@@ -1,11 +1,13 @@
 @import "scss/colours.scss";
 
 table {
+  font-size: 14px;
   margin-bottom: 0 !important;
 }
 
 td {
   padding: 8px 16px !important;
+  min-width: 124px !important;
 }
 
 .no-outer-border {
