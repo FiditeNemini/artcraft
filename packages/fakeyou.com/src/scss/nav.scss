@@ -21,11 +21,28 @@
   width: 0;
   height: 100%;
   margin-left: -260px;
-  overflow: auto;
+  overflow-x: hidden;
   -webkit-transition: all 0.2s ease;
   -moz-transition: all 0.2s ease;
   -o-transition: all 0.2s ease;
   transition: all 0.2s ease;
+
+  &::-webkit-scrollbar {
+    width: 0;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background-color: rgba($secondary, 1);
+    border-radius: 0.5rem;
+  }
+
+  &::-webkit-scrollbar-track {
+    background-color: rgba($panel, 1) !important;
+  }
+
+  &:hover::-webkit-scrollbar {
+    width: 10px;
+  }
 }
 
 #wrapper.toggled #sidebar-wrapper {
