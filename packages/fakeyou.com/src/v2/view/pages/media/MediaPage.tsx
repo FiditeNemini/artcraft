@@ -1,10 +1,19 @@
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import AudioComponent from "./AudioComponent";
 import VideoComponent from "./VideoComponent";
 import ImageComponent from "./ImageComponent";
 import MediaData from "./MediaDataTypes";
 import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
+import Container from "components/common/Container";
+import Panel from "components/common/Panel";
+import PageHeader from "components/layout/PageHeader";
+import Skeleton from "components/common/Skeleton";
+import Button from "components/common/Button";
+import { faCircleExclamation } from "@fortawesome/pro-solid-svg-icons";
+import Accordion from "components/common/Accordion";
+import DataTable from "components/common/DataTable";
+import { Gravatar } from "@storyteller/components/src/elements/Gravatar";
 
 interface MediaPageProps {
   sessionWrapper: SessionWrapper;
@@ -19,7 +28,7 @@ let dummyMediaData = {
   maybe_creator_user: {
     user_token: "u_00XGM6M2TE4J9",
     username: "hanashi",
-    display_name: "hanashi",
+    display_name: "Hanashi",
     gravatar_hash: "c45b453fcb1d27b348504ae7f5d6a6c",
     default_avatar: {
       image_index: 1,
@@ -57,7 +66,12 @@ export default function MediaPage({ sessionWrapper }: MediaPageProps) {
       case "audio":
         return <AudioComponent mediaData={data} />;
       case "video":
-        return <VideoComponent mediaData={data} />;
+        return (
+          <div className="ratio ratio-16x9">
+            <VideoComponent mediaData={data} />
+          </div>
+        );
+
       case "image":
         return <ImageComponent mediaData={data} />;
       default:
@@ -65,13 +79,92 @@ export default function MediaPage({ sessionWrapper }: MediaPageProps) {
     }
   }
 
-  if (isLoading) return <div>Loading...</div>;
-  if (error || !mediaData) return <div>Media not found</div>;
+  if (isLoading)
+    return (
+      <Container type="panel">
+        <PageHeader
+          title={<Skeleton type="medium" />}
+          subText={<Skeleton type="short" />}
+        />
+        <Panel padding={true}>
+          <div className="row">
+            <div className="col-12 col-md-8">
+              <h1 className="mb-0">
+                <Skeleton />
+              </h1>
+            </div>
+            <div className="col-12 col-md-4">
+              <h1 className="mb-0">
+                <Skeleton />
+              </h1>
+            </div>
+          </div>
+        </Panel>
+      </Container>
+    );
+
+  if (error || !mediaData)
+    return (
+      <Container type="panel">
+        <PageHeader
+          titleIcon={faCircleExclamation}
+          title="Media not found"
+          subText="This media does not exist or is private."
+          extension={
+            <div className="d-flex">
+              <Button label="Back to homepage" to="/" className="d-flex" />
+            </div>
+          }
+        />
+      </Container>
+    );
+
+  const mediaDetails = [
+    { property: "Type", value: mediaData.media_type },
+    { property: "Created at", value: mediaData.created_at },
+    { property: "Visibility", value: mediaData.creator_set_visibility },
+    { property: "Model Used", value: "Model Name" },
+  ];
 
   return (
-    <div>
-      <h1>{mediaData?.token}</h1>
-      {renderMediaComponent(mediaData)}
-    </div>
+    <Container type="panel">
+      <PageHeader
+        title="Model name"
+        subText={mediaData.maybe_creator_user.display_name}
+      />
+      <Panel padding={true}>
+        <div className="row g-4">
+          <div className="col-12 col-lg-8">
+            {renderMediaComponent(mediaData)}
+          </div>
+          <div className="col-12 col-lg-4">
+            <div className="d-flex">
+              <Gravatar
+                size={50}
+                username={mediaData.maybe_creator_user.display_name}
+                avatarIndex={
+                  mediaData.maybe_creator_user.default_avatar.image_index
+                }
+                backgroundIndex={
+                  mediaData.maybe_creator_user.default_avatar.color_index
+                }
+              />
+              <div className="d-flex flex-column">
+                <Link
+                  to={`/profile/${mediaData.maybe_creator_user.display_name}`}
+                >
+                  {mediaData.maybe_creator_user.display_name}
+                </Link>
+              </div>
+            </div>
+            <Accordion>
+              <Accordion.Item title="Details" defaultOpen={true}>
+                <DataTable data={mediaDetails} />
+              </Accordion.Item>
+            </Accordion>
+          </div>
+        </div>
+      </Panel>
+    </Container>
   );
 }

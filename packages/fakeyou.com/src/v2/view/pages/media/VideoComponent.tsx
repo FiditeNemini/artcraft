@@ -4,15 +4,11 @@ interface VideoComponentProps {
   mediaData: MediaData;
 }
 
-const VideoComponent: React.FC<VideoComponentProps> = ({ mediaData }) => {
+export default function VideoComponent({ mediaData }: VideoComponentProps) {
   return (
-    <div>
-      <video controls width="640" height="360">
-        <source src={mediaData.public_bucket_path} />
-        Your browser does not support the video element.
-      </video>
-    </div>
+    <video className="rounded" controls width="100%" height="auto">
+      <source src={mediaData.public_bucket_path} />
+      Your browser does not support the video element.
+    </video>
   );
-};
-
-export default VideoComponent;
+}

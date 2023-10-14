@@ -6,7 +6,7 @@ import Button from "components/common/Button";
 
 interface PageHeaderProps {
   titleIcon?: IconDefinition;
-  title: string;
+  title: string | React.ReactNode;
   subText: string | React.ReactNode;
   full?: boolean;
   showButton?: boolean;
