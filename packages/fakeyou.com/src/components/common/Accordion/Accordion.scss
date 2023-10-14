@@ -13,6 +13,7 @@
   cursor: pointer;
   background-color: $secondary;
   transition: all 0.2s ease;
+  font-weight: 500;
 
   &.open {
     background-color: lighten($secondary, 5%);
