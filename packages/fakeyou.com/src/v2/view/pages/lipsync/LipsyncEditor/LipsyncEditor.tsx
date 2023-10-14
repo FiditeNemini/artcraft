@@ -22,6 +22,7 @@ import FaceAnimatorTitle from "./FaceAnimatorTitle";
 import FaceAnimatorInput from "./FaceAnimatorInput";
 import FaceAnimatorWorking from "./FaceAnimatorWorking";
 import FaceAnimatorSuccess from "./FaceAnimatorSuccess";
+import FaceAnimatorJobs from "./FaceAnimatorJobs";
 import { FaceAnimatorCore } from "./FaceAnimatorTypes";
 import { BasicVideo } from "components/common";
 import "./LipsyncEditor.scss";
@@ -146,7 +147,7 @@ export default function LipsyncEditor({
 
   return (
     <div {...{ className: "container-panel pt-4" }}>
-      <div {...{ className: "panel lipsync-panel p-3 py-4 p-md-4" }}>
+      <div {...{ className: "panel face-animator-main" }}>
         <FaceAnimatorTitle {...headerProps} />
         {transitions((style, i) => {
           const Page = [
@@ -181,6 +182,7 @@ export default function LipsyncEditor({
           );
         })}
       </div>
+      <FaceAnimatorJobs {...{ inferenceJobsByCategory, t }}/>
       <div {...{ className: "face-animator-mobile-sample" }}>
         <BasicVideo {...{ src: "/videos/face-animator-instruction-en.mp4" }} />
       </div>

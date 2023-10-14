@@ -86,7 +86,7 @@ export default function FaceAnimatorTitle({ ...rest }) {
           index: page,
         }}
       />
-      <p {...{ className: "progress-description" }}>{t("headings.subtitle")}</p>
+      <p {...{ className: "progress-description fa-light-txt" }}>{t("headings.subtitle")}</p>
     </div>
   );
 }
