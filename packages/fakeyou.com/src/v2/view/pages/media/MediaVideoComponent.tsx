@@ -1,10 +1,13 @@
 import React from "react";
 import MediaData from "./MediaDataTypes";
-interface VideoComponentProps {
+
+interface MediaVideoComponentProps {
   mediaData: MediaData;
 }
 
-export default function VideoComponent({ mediaData }: VideoComponentProps) {
+export default function MediaVideoComponent({
+  mediaData,
+}: MediaVideoComponentProps) {
   return (
     <video className="rounded" controls width="100%" height="auto">
       <source src={mediaData.public_bucket_path} />

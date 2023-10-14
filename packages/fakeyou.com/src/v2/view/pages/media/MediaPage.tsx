@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
-import AudioComponent from "./AudioComponent";
-import VideoComponent from "./VideoComponent";
-import ImageComponent from "./ImageComponent";
+import MediaAudioComponent from "./MediaAudioComponent";
+import MediaVideoComponent from "./MediaVideoComponent";
+import MediaImageComponent from "./MediaImageComponent";
 import MediaData from "./MediaDataTypes";
 import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
 import Container from "components/common/Container";
@@ -10,11 +10,16 @@ import Panel from "components/common/Panel";
 import PageHeader from "components/layout/PageHeader";
 import Skeleton from "components/common/Skeleton";
 import Button from "components/common/Button";
-import { faCircleExclamation } from "@fortawesome/pro-solid-svg-icons";
+import {
+  faCircleExclamation,
+  faArrowDownToLine,
+} from "@fortawesome/pro-solid-svg-icons";
 import Accordion from "components/common/Accordion";
 import DataTable from "components/common/DataTable";
 import { Gravatar } from "@storyteller/components/src/elements/Gravatar";
 import useTimeAgo from "hooks/useTimeAgo";
+// import { RatingButtons } from "v2/view/_common/ratings/RatingButtons";
+// import { RatingStats } from "v2/view/_common/ratings/RatingStats";
 
 interface MediaPageProps {
   sessionWrapper: SessionWrapper;
@@ -69,16 +74,16 @@ export default function MediaPage({ sessionWrapper }: MediaPageProps) {
   function renderMediaComponent(data: MediaData) {
     switch (data.media_type) {
       case "audio":
-        return <AudioComponent mediaData={data} />;
+        return <MediaAudioComponent mediaData={data} />;
       case "video":
         return (
           <div className="ratio ratio-16x9">
-            <VideoComponent mediaData={data} />
+            <MediaVideoComponent mediaData={data} />
           </div>
         );
 
       case "image":
-        return <ImageComponent mediaData={data} />;
+        return <MediaImageComponent mediaData={data} />;
       default:
         return <div>Unsupported media type</div>;
     }
@@ -124,29 +129,94 @@ export default function MediaPage({ sessionWrapper }: MediaPageProps) {
       </Container>
     );
 
-  const mediaDetails = [
+  const audioDetails = [
     { property: "Type", value: mediaData.media_type },
     { property: "Created at", value: mediaData.created_at },
     { property: "Visibility", value: mediaData.creator_set_visibility },
     {
       property: "Model",
       value: mediaData.model_used,
+      link: mediaData.model_link,
+    },
+    {
+      property: "Vocoder",
+      value: "Test",
+    },
+    {
+      property: "Language",
+      value: mediaData.model_used,
+    },
+    {
+      property: "Model",
+      value: mediaData.model_used,
     },
   ];
 
+  const videoDetails = [
+    { property: "Type", value: mediaData.media_type },
+    { property: "Created at", value: mediaData.created_at },
+    { property: "Visibility", value: mediaData.creator_set_visibility },
+  ];
+
+  let pageTitle = "Result";
+  let pageSubText = "This is the result of your media.";
+  let mediaDetails = undefined;
+
+  switch (mediaData.media_type) {
+    case "audio":
+      pageTitle = "Audio Result";
+      pageSubText = mediaData.token;
+      mediaDetails = (
+        <Accordion.Item title="Audio Details" defaultOpen={true}>
+          <DataTable data={audioDetails} />
+        </Accordion.Item>
+      );
+      break;
+    case "video":
+      pageTitle = "Video Result";
+      pageSubText = mediaData.token;
+      mediaDetails = (
+        <Accordion.Item title="Video Details" defaultOpen={true}>
+          <DataTable data={videoDetails} />
+        </Accordion.Item>
+      );
+      break;
+    case "image":
+      pageTitle = "Image Model";
+      pageSubText = "Image Model SubText";
+      break;
+    default:
+  }
+
+  // const resultRatings = (
+  //   <div className="d-flex flex-column flex-lg-row flex-column-reverse gap-3">
+  //     <div className="d-flex gap-3">
+  //       <RatingButtons entity_type="v2v_model" entity_token="test" />
+  //     </div>
+  //     <RatingStats positive_votes={100} negative_votes={0} total_votes={100} />
+  //   </div>
+  // );
+
   return (
     <Container type="panel">
-      <PageHeader
-        title="Model name"
-        subText={mediaData.maybe_creator_user.display_name}
-      />
+      <PageHeader title={pageTitle} subText={pageSubText} />
       <Panel padding={true}>
         <div className="row g-4">
           <div className="col-12 col-xl-8">
-            {renderMediaComponent(mediaData)}
+            <div className="media-wrapper">
+              {renderMediaComponent(mediaData)}
+            </div>
           </div>
           <div className="col-12 col-xl-4">
-            <div className="d-flex mb-3 gap-2">
+            <div className="d-flex mb-4">
+              <Button
+                icon={faArrowDownToLine}
+                label="Download Result"
+                onClick={() => {}}
+              />
+            </div>
+            <Accordion>{mediaDetails}</Accordion>
+            <div className="d-flex mt-4 gap-2">
               <Gravatar
                 size={48}
                 username={mediaData.maybe_creator_user.display_name}
@@ -167,11 +237,6 @@ export default function MediaPage({ sessionWrapper }: MediaPageProps) {
                 {timeCreated}
               </div>
             </div>
-            <Accordion>
-              <Accordion.Item title="Details" defaultOpen={true}>
-                <DataTable data={mediaDetails} />
-              </Accordion.Item>
-            </Accordion>
           </div>
         </div>
       </Panel>

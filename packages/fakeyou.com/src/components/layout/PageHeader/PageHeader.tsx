@@ -14,6 +14,8 @@ interface PageHeaderProps {
   buttonLabel?: string;
   buttonVariant?: "primary" | "secondary" | "danger";
   buttonTo?: string;
+  buttonIcon?: IconDefinition;
+  buttonOnClick?: () => void;
 }
 
 export default function PageHeader({
@@ -26,6 +28,8 @@ export default function PageHeader({
   buttonLabel,
   buttonVariant = "primary",
   buttonTo,
+  buttonIcon,
+  buttonOnClick,
 }: PageHeaderProps) {
   const icon = (
     <>{titleIcon && <FontAwesomeIcon icon={titleIcon} className="me-3" />}</>
@@ -44,9 +48,11 @@ export default function PageHeader({
               <div className="d-none d-md-block">
                 {showButton && (
                   <Button
+                    icon={buttonIcon}
                     variant={buttonVariant}
                     label={buttonLabel}
                     to={buttonTo}
+                    onClick={buttonOnClick}
                   />
                 )}
               </div>
