@@ -4,13 +4,11 @@ use futures::TryStreamExt;
 use log::warn;
 
 use errors::AnyhowResult;
-use tokens::tokens::zs_voice_datasets::ZsVoiceDatasetToken;
 
 use crate::http_server::web_utils::read_multipart_field_bytes::{checked_read_multipart_bytes, read_multipart_field_as_text};
 
-pub struct UploadSampleRequest {
+pub struct UploadMediaRequest {
   pub uuid_idempotency_token: Option<String>,
-  pub dataset_token: Option<String>,
   pub file_name: Option<String>,
   pub file_bytes: Option<BytesMut>,
   pub media_source: MediaSource,
@@ -26,9 +24,8 @@ pub enum MediaSource {
 }
 
 /// Pull common parts out of multipart media HTTP requests, typically for handling file uploads.
-pub async fn drain_multipart_request(mut multipart_payload: Multipart) -> AnyhowResult<UploadSampleRequest> {
+pub async fn drain_multipart_request(mut multipart_payload: Multipart) -> AnyhowResult<UploadMediaRequest> {
   let mut uuid_idempotency_token = None;
-  let mut dataset_token = None;
   let mut file_bytes = None;
   let mut file_name = None;
   let mut media_source = None;
@@ -49,13 +46,6 @@ pub async fn drain_multipart_request(mut multipart_payload: Multipart) -> Anyhow
         uuid_idempotency_token = read_multipart_field_as_text(&mut field).await
             .map_err(|e| {
               warn!("Error reading idempotency token: {:}", e);
-              e
-            })?;
-      },
-      Some("dataset_token") => {
-        dataset_token = read_multipart_field_as_text(&mut field).await
-            .map_err(|e| {
-              warn!("Error reading dataset token: {:}", e);
               e
             })?;
       },
@@ -90,9 +80,8 @@ pub async fn drain_multipart_request(mut multipart_payload: Multipart) -> Anyhow
     },
   };
 
-  Ok(UploadSampleRequest {
+  Ok(UploadMediaRequest {
     uuid_idempotency_token,
-    dataset_token,
     file_name,
     file_bytes,
     media_source,
