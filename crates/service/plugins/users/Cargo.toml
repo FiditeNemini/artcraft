@@ -28,7 +28,7 @@ tokens = { path = "../../../_types/tokens" }
 user_input_common = { path = "../../../lib/user_input_common" }
 
 # External
-anyhow = "1.0.40"
+anyhow = "1.0.75"
 base64 = "0.21.0"
 chrono = { version = "0.4.19", features = ["serde"] }
 dotenv = "0.15.0"

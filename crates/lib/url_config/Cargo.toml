@@ -20,4 +20,4 @@ reusable_types = { path = "../../_types/reusable_types" }
 
 # External
 actix-web = "4.0.0-beta.10"
-anyhow = "1.0.40"
+anyhow = "1.0.75"

@@ -39,7 +39,7 @@ tts_common = { path = "../../../lib/tts_common" }
 newrelic-telemetry = { path = "../../../vendor/newrelic-telemetry-sdk-rust" }
 
 # External
-anyhow = "1.0.40"
+anyhow = "1.0.75"
 chrono = { version = "0.4.19", features = ["serde"] }
 clap = "2.34.0" # TODO: This is really out of date, but has conflicts when updated
 dotenv = "0.15.0"

@@ -25,7 +25,7 @@ redis_common = { path = "../../../lib/redis_common" }
 twitch_common = { path = "../../../lib/api_clients/twitch_common" }
 
 # External
-anyhow = "1.0.40"
+anyhow = "1.0.75"
 base64 = "0.21.0"
 chrono = { version = "0.4.19", features = ["serde"] }
 derive_more = "0.99.14"

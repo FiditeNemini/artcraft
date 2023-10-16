@@ -19,7 +19,7 @@ buckets = { path = "../../../_types/buckets" }
 container_common = { path = "../../deprecated/container_common" }
 
 # External
-anyhow = "1.0.40"
+anyhow = "1.0.75"
 log = "0.4.14"
 
 # The "never-encode-slash" feature seems to have been removed:
