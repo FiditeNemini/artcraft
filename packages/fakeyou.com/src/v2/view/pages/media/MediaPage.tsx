@@ -207,16 +207,8 @@ export default function MediaPage({ sessionWrapper }: MediaPageProps) {
               {renderMediaComponent(mediaData)}
             </div>
           </div>
-          <div className="col-12 col-xl-4">
-            <div className="d-flex mb-4">
-              <Button
-                icon={faArrowDownToLine}
-                label="Download Result"
-                onClick={() => {}}
-              />
-            </div>
-            <Accordion>{mediaDetails}</Accordion>
-            <div className="d-flex mt-4 gap-2">
+          <div className="col-12 col-xl-4 d-flex flex-column gap-4">
+            <div className="d-flex gap-2">
               <Gravatar
                 size={48}
                 username={mediaData.maybe_creator_user.display_name}
@@ -236,6 +228,16 @@ export default function MediaPage({ sessionWrapper }: MediaPageProps) {
                 </Link>
                 {timeCreated}
               </div>
+            </div>
+
+            <Accordion>{mediaDetails}</Accordion>
+
+            <div className="d-flex">
+              <Button
+                icon={faArrowDownToLine}
+                label="Download Result"
+                onClick={() => {}}
+              />
             </div>
           </div>
         </div>
