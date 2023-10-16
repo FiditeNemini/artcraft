@@ -10,11 +10,13 @@ import Panel from "components/common/Panel";
 import PageHeader from "components/layout/PageHeader";
 import Skeleton from "components/common/Skeleton";
 import Button from "components/common/Button";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faCircleExclamation,
   faArrowDownToLine,
   faCirclePlay,
   faShare,
+  faSquareQuote,
 } from "@fortawesome/pro-solid-svg-icons";
 import Accordion from "components/common/Accordion";
 import DataTable from "components/common/DataTable";
@@ -45,6 +47,8 @@ let dummyMediaData = {
     },
   },
   model_used: "Ash Ketchum",
+  audio_text:
+    "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.",
   model_link: "/tts/TM:6g1mfb9b6fb8",
   creator_set_visibility: "public",
   created_at: "2023-05-12T07:49:53Z",
@@ -77,7 +81,18 @@ export default function MediaPage({ sessionWrapper }: MediaPageProps) {
   function renderMediaComponent(data: MediaData) {
     switch (data.media_type) {
       case "audio":
-        return <MediaAudioComponent mediaData={data} />;
+        return (
+          <div className="d-flex flex-column gap-4">
+            <MediaAudioComponent mediaData={data} />
+            <div>
+              <h5 className="fw-semibold">
+                <FontAwesomeIcon icon={faSquareQuote} className="me-2" />
+                Audio Text
+              </h5>
+              <p className="pb-3">{mediaData?.audio_text}</p>
+            </div>
+          </div>
+        );
       case "video":
         return (
           <div className="ratio ratio-16x9">
@@ -99,7 +114,7 @@ export default function MediaPage({ sessionWrapper }: MediaPageProps) {
           title={<Skeleton type="medium" />}
           subText={<Skeleton type="short" />}
         />
-        <Panel padding={true}>
+        <Panel padding={true} mb={true}>
           <div className="row">
             <div className="col-12 col-xl-8">
               <h1 className="mb-0">
@@ -112,6 +127,11 @@ export default function MediaPage({ sessionWrapper }: MediaPageProps) {
               </h1>
             </div>
           </div>
+        </Panel>
+        <Panel padding={true}>
+          <h1 className="mb-0">
+            <Skeleton />
+          </h1>
         </Panel>
       </Container>
     );
@@ -147,7 +167,7 @@ export default function MediaPage({ sessionWrapper }: MediaPageProps) {
     },
     {
       property: "Language",
-      value: mediaData.model_used,
+      value: "English",
     },
     {
       property: "Model",
@@ -262,8 +282,8 @@ export default function MediaPage({ sessionWrapper }: MediaPageProps) {
           </div>
         </div>
       </Panel>
-      <Panel padding={true} mt={true}>
-        <h4 className="mb-3">Comments</h4>
+      <Panel padding={true} mt={true} mb={true}>
+        <h4 className="fw-semibold mb-3">Comments</h4>
         <CommentComponent
           entityType="user"
           entityToken={mediaData.token}
