@@ -1,6 +1,12 @@
+export enum MediaType {
+  Audio = "audio",
+  Video = "video",
+  Image = "image",
+}
+
 export default interface MediaData {
   token: string;
-  media_type: string;
+  media_type: MediaType;
   public_bucket_path: string;
   maybe_creator_user: {
     user_token: string;
@@ -16,6 +22,6 @@ export default interface MediaData {
   model_used: string;
   model_link: string;
   creator_set_visibility: string;
-  created_at: string;
-  updated_at: string;
+  created_at: Date;
+  updated_at: Date;
 }

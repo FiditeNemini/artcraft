@@ -3,7 +3,7 @@ import { Link, useParams } from "react-router-dom";
 import MediaAudioComponent from "./MediaAudioComponent";
 import MediaVideoComponent from "./MediaVideoComponent";
 import MediaImageComponent from "./MediaImageComponent";
-import MediaData from "./MediaDataTypes";
+import MediaData, { MediaType } from "./MediaDataTypes";
 import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
 import Container from "components/common/Container";
 import Panel from "components/common/Panel";
@@ -33,7 +33,7 @@ interface MediaPageProps {
 // Dummy media data (replace with actual API data)
 let dummyMediaData = {
   token: "m_v032bt6ecm0rwhebbhgdmk5rexf7cij",
-  media_type: "video", // Change to somthing like "video" or "image" to test different types
+  media_type: MediaType.Video, // Change to somthing like "video" or "image" to test different types
   public_bucket_path:
     "/media/8/p/c/h/h/8pchhrgc0ayawn09s9gmtfec2mcft0xk/fakeyou_8pchhrgc0ayawn09s9gmtfec2mcft0xk.mp4", // Replace with actual URLs
   maybe_creator_user: {
@@ -51,8 +51,8 @@ let dummyMediaData = {
     "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.",
   model_link: "/tts/TM:6g1mfb9b6fb8",
   creator_set_visibility: "public",
-  created_at: "2023-05-12T07:49:53Z",
-  updated_at: "2023-05-12T07:49:53Z",
+  created_at: new Date("2023-05-12T07:49:53Z"),
+  updated_at: new Date("2023-05-12T07:49:53Z"),
 };
 
 export default function MediaPage({ sessionWrapper }: MediaPageProps) {
@@ -61,7 +61,7 @@ export default function MediaPage({ sessionWrapper }: MediaPageProps) {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<boolean>(false);
 
-  const timeCreated = useTimeAgo(mediaData?.created_at || "");
+  const timeCreated = useTimeAgo(mediaData?.created_at.toISOString() || "");
 
   // Simulate API call
   useEffect(() => {
@@ -80,7 +80,7 @@ export default function MediaPage({ sessionWrapper }: MediaPageProps) {
 
   function renderMediaComponent(data: MediaData) {
     switch (data.media_type) {
-      case "audio":
+      case MediaType.Audio:
         return (
           <div className="d-flex flex-column gap-4">
             <MediaAudioComponent mediaData={data} />
@@ -89,18 +89,20 @@ export default function MediaPage({ sessionWrapper }: MediaPageProps) {
                 <FontAwesomeIcon icon={faSquareQuote} className="me-2" />
                 Audio Text
               </h5>
-              <p className="pb-3">{mediaData?.audio_text}</p>
+              <p className="pb-3">
+                {mediaData?.audio_text && mediaData.audio_text}
+              </p>
             </div>
           </div>
         );
-      case "video":
+      case MediaType.Video:
         return (
           <div className="ratio ratio-16x9">
             <MediaVideoComponent mediaData={data} />
           </div>
         );
 
-      case "image":
+      case MediaType.Image:
         return <MediaImageComponent mediaData={data} />;
       default:
         return <div>Unsupported media type</div>;
@@ -154,8 +156,11 @@ export default function MediaPage({ sessionWrapper }: MediaPageProps) {
 
   const audioDetails = [
     { property: "Type", value: mediaData.media_type },
-    { property: "Created at", value: mediaData.created_at },
-    { property: "Visibility", value: mediaData.creator_set_visibility },
+    { property: "Created at", value: mediaData.created_at.toString() },
+    {
+      property: "Visibility",
+      value: mediaData.creator_set_visibility.toString(),
+    },
     {
       property: "Model",
       value: mediaData.model_used,
@@ -177,8 +182,11 @@ export default function MediaPage({ sessionWrapper }: MediaPageProps) {
 
   const videoDetails = [
     { property: "Type", value: mediaData.media_type },
-    { property: "Created at", value: mediaData.created_at },
-    { property: "Visibility", value: mediaData.creator_set_visibility },
+    { property: "Created at", value: mediaData.created_at.toString() },
+    {
+      property: "Visibility",
+      value: mediaData.creator_set_visibility.toString(),
+    },
   ];
 
   let pageTitle = "Result";
@@ -186,7 +194,7 @@ export default function MediaPage({ sessionWrapper }: MediaPageProps) {
   let mediaDetails = undefined;
 
   switch (mediaData.media_type) {
-    case "audio":
+    case MediaType.Audio:
       pageTitle = "Audio Result";
       pageSubText = mediaData.token;
       mediaDetails = (
@@ -195,7 +203,7 @@ export default function MediaPage({ sessionWrapper }: MediaPageProps) {
         </Accordion.Item>
       );
       break;
-    case "video":
+    case MediaType.Video:
       pageTitle = "Video Result";
       pageSubText = mediaData.token;
       mediaDetails = (
@@ -204,7 +212,7 @@ export default function MediaPage({ sessionWrapper }: MediaPageProps) {
         </Accordion.Item>
       );
       break;
-    case "image":
+    case MediaType.Image:
       pageTitle = "Image Model";
       pageSubText = "Image Model SubText";
       break;
