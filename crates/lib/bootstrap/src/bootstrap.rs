@@ -120,7 +120,7 @@ fn load_env_config_files<P: AsRef<Path>>(server_environment: ServerEnvironment, 
   for env_config_file in env_config_file_names.into_iter() {
     info!("Loading environment variable config file: {}", &env_config_file);
 
-    let was_read = envvar::maybe_read_from_filename_and_paths(
+    let was_read = easyenv::maybe_read_env_config_from_filename_and_paths(
       &env_config_file,
       args.config_search_directories)?;
 

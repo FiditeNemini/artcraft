@@ -1,9 +1,11 @@
-use crate::EnvError;
-use log::warn;
-use std::env::VarError;
 use std::env;
+use std::env::VarError;
 use std::path::{Path, PathBuf};
 use std::str::FromStr;
+
+use log::warn;
+
+use crate::error::EnvError;
 
 /// Get an environment variable as a `PathBuf`.
 /// If not provided or cannot parse, return an error.
