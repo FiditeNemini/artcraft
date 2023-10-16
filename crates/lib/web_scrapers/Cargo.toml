@@ -35,7 +35,7 @@ reqwest = { version = "0.11", features = ["json"] } # HTTP Client
 
 # Scraping
 rss = "2.0.2"
-scraper = "0.14.0"
+scraper = "0.17.1"
 
 [dev-dependencies]
 # None yet
