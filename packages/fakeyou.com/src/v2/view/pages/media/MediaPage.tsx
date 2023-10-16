@@ -230,8 +230,6 @@ export default function MediaPage({ sessionWrapper }: MediaPageProps) {
               </div>
             </div>
 
-            <Accordion>{mediaDetails}</Accordion>
-
             <div className="d-flex">
               <Button
                 icon={faArrowDownToLine}
@@ -239,6 +237,8 @@ export default function MediaPage({ sessionWrapper }: MediaPageProps) {
                 onClick={() => {}}
               />
             </div>
+
+            <Accordion>{mediaDetails}</Accordion>
           </div>
         </div>
       </Panel>
