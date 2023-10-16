@@ -1,4 +1,5 @@
 import "./AppNew.scss";
+import "scss/custom-bootstrap.scss";
 
 import React from "react";
 import { ApiConfig } from "@storyteller/components";
@@ -184,12 +185,15 @@ function newVocodes() {
   return discord || twitter || alphaCookie;
 }
 
-function initInferenceJobsByCategoryMap() : Map<FrontendInferenceJobType, InferenceJob[]> {
-    let inferenceJobsByCategory = new Map();
-    inferenceJobsByCategory.set(FrontendInferenceJobType.FaceAnimation, []);
-    inferenceJobsByCategory.set(FrontendInferenceJobType.TextToSpeech, []);
-    inferenceJobsByCategory.set(FrontendInferenceJobType.VoiceConversion, []);
-    return inferenceJobsByCategory;
+function initInferenceJobsByCategoryMap(): Map<
+  FrontendInferenceJobType,
+  InferenceJob[]
+> {
+  let inferenceJobsByCategory = new Map();
+  inferenceJobsByCategory.set(FrontendInferenceJobType.FaceAnimation, []);
+  inferenceJobsByCategory.set(FrontendInferenceJobType.TextToSpeech, []);
+  inferenceJobsByCategory.set(FrontendInferenceJobType.VoiceConversion, []);
+  return inferenceJobsByCategory;
 }
 
 function isMacOs() {

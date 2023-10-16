@@ -111,31 +111,61 @@ export default function MediaPage({ sessionWrapper }: MediaPageProps) {
 
   if (isLoading)
     return (
-      <Container type="panel">
-        <PageHeader
-          title={<Skeleton type="medium" />}
-          subText={<Skeleton type="short" />}
-        />
-        <Panel padding={true} mb={true}>
-          <div className="row">
+      <>
+        <Container type="padded">
+          <div className="pt-4 pb-4">
+            <h2 className="fw-bold mb-1 pt-0 pt-lg-1">
+              <Skeleton type="medium" />
+            </h2>
+            <p className="mb-0">
+              <Skeleton type="short" />
+            </p>
+          </div>
+        </Container>
+
+        <Container type="padded">
+          <div className="row g-4">
             <div className="col-12 col-xl-8">
+              <div className="panel p-3 py-4 p-md-4">
+                <h1 className="mb-0">
+                  <Skeleton />
+                </h1>
+              </div>
+
+              <div className="panel p-3 py-4 p-md-4 mt-4 d-none d-xl-block">
+                <h4 className="fw-semibold mb-3">
+                  <Skeleton />
+                </h4>
+                <h1>
+                  <Skeleton />
+                </h1>
+              </div>
+            </div>
+            <div className="col-12 col-xl-4 d-flex flex-column gap-2">
               <h1 className="mb-0">
                 <Skeleton />
               </h1>
-            </div>
-            <div className="col-12 col-xl-4">
+              <h1 className="mb-0">
+                <Skeleton />
+              </h1>
               <h1 className="mb-0">
                 <Skeleton />
               </h1>
             </div>
           </div>
-        </Panel>
-        <Panel padding={true}>
-          <h1 className="mb-0">
-            <Skeleton />
-          </h1>
-        </Panel>
-      </Container>
+        </Container>
+
+        <div className="d-xl-none mt-4">
+          <Panel padding>
+            <h4 className="fw-semibold mb-3">
+              <Skeleton />
+            </h4>
+            <h1 className="mb-0">
+              <Skeleton />
+            </h1>
+          </Panel>
+        </div>
+      </>
     );
 
   if (error || !mediaData)
@@ -259,13 +289,28 @@ export default function MediaPage({ sessionWrapper }: MediaPageProps) {
   // );
 
   return (
-    <Container type="panel">
-      <PageHeader title={pageTitle} subText={pageSubText} />
-      <Panel padding={true}>
+    <>
+      <Container>
+        <div className="container py-5">
+          <h2 className="fw-bold mb-1">{pageTitle}</h2>
+          <p className="mb-0">{pageSubText}</p>
+        </div>
+      </Container>
+
+      <Container type="padded">
         <div className="row g-4">
           <div className="col-12 col-xl-8">
-            <div className="media-wrapper">
+            <div className="panel media-wrapper rounded">
               {renderMediaComponent(mediaData)}
+            </div>
+
+            <div className="panel p-3 py-4 p-md-4 mt-4 d-none d-xl-block">
+              <h4 className="fw-semibold mb-3">Comments</h4>
+              <CommentComponent
+                entityType="user"
+                entityToken={mediaData.token}
+                sessionWrapper={sessionWrapper}
+              />
             </div>
           </div>
           <div className="col-12 col-xl-4 d-flex flex-column gap-4">
@@ -322,15 +367,18 @@ export default function MediaPage({ sessionWrapper }: MediaPageProps) {
             </Accordion>
           </div>
         </div>
-      </Panel>
-      <Panel padding={true} mt={true} mb={true}>
-        <h4 className="fw-semibold mb-3">Comments</h4>
-        <CommentComponent
-          entityType="user"
-          entityToken={mediaData.token}
-          sessionWrapper={sessionWrapper}
-        />
-      </Panel>
-    </Container>
+      </Container>
+
+      <div className="d-xl-none mt-4">
+        <Panel padding>
+          <h4 className="fw-semibold mb-3">Comments</h4>
+          <CommentComponent
+            entityType="user"
+            entityToken={mediaData.token}
+            sessionWrapper={sessionWrapper}
+          />
+        </Panel>
+      </div>
+    </>
   );
 }

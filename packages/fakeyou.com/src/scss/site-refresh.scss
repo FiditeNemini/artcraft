@@ -168,11 +168,6 @@ styles with important tags:
     padding-bottom: 0.4rem !important;
   }
 
-  .py-4 {
-    padding-top: 2rem !important;
-    padding-bottom: 2rem !important;
-  }
-
   .lead {
     color: rgba($white, 0.8);
     font-size: 17px;
@@ -286,6 +281,10 @@ styles with important tags:
   .btn-explore {
     min-width: 172px;
     border-radius: 50px;
+  }
+
+  .bg-panel {
+    background-color: lighten($panel, 1%);
   }
 
   .panel {
@@ -1481,10 +1480,6 @@ textarea {
       }
     }
 
-    .p-lg-4 {
-      padding: 2rem !important;
-    }
-
     .lead {
       font-size: 18px;
     }
@@ -1550,10 +1545,6 @@ textarea {
       min-height: 391px;
       height: 100%;
       border-radius: 0.5rem;
-    }
-
-    .p-md-4 {
-      padding: 2rem !important;
     }
   }
 }
