@@ -211,6 +211,36 @@ export default function MediaPage({ sessionWrapper }: MediaPageProps) {
     default:
   }
 
+  let modMediaDetails = undefined;
+
+  const modDetails = [
+    { property: "Model creator is banned", value: "good standing" },
+    {
+      property: "Result creator is banned (if user)",
+      value: "good standing",
+    },
+    {
+      property: "Result creator IP address",
+      value: "0.0.0.0",
+    },
+    {
+      property: "Mod deleted at (UTC)",
+      value: "not deleted",
+    },
+    {
+      property: "Result creator deleted at (UTC)",
+      value: "not deleted",
+    },
+  ];
+
+  if (sessionWrapper.canBanUsers()) {
+    modMediaDetails = (
+      <Accordion.Item title="Moderator Details" defaultOpen={false}>
+        <DataTable data={modDetails} />
+      </Accordion.Item>
+    );
+  }
+
   // const resultRatings = (
   //   <div className="d-flex flex-column flex-lg-row flex-column-reverse gap-3">
   //     <div className="d-flex gap-3">
@@ -278,7 +308,10 @@ export default function MediaPage({ sessionWrapper }: MediaPageProps) {
               </div>
             </div>
 
-            <Accordion>{mediaDetails}</Accordion>
+            <Accordion>
+              {mediaDetails}
+              {modMediaDetails}
+            </Accordion>
           </div>
         </div>
       </Panel>
