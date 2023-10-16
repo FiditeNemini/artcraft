@@ -13,11 +13,14 @@ import Button from "components/common/Button";
 import {
   faCircleExclamation,
   faArrowDownToLine,
+  faCirclePlay,
+  faShare,
 } from "@fortawesome/pro-solid-svg-icons";
 import Accordion from "components/common/Accordion";
 import DataTable from "components/common/DataTable";
 import { Gravatar } from "@storyteller/components/src/elements/Gravatar";
 import useTimeAgo from "hooks/useTimeAgo";
+import { CommentComponent } from "v2/view/_common/comments/CommentComponent";
 // import { RatingButtons } from "v2/view/_common/ratings/RatingButtons";
 // import { RatingStats } from "v2/view/_common/ratings/RatingStats";
 
@@ -28,7 +31,7 @@ interface MediaPageProps {
 // Dummy media data (replace with actual API data)
 let dummyMediaData = {
   token: "m_v032bt6ecm0rwhebbhgdmk5rexf7cij",
-  media_type: "video", // Change to somthing like "video" or "image" to test different types
+  media_type: "audio", // Change to somthing like "video" or "image" to test different types
   public_bucket_path:
     "/media/8/p/c/h/h/8pchhrgc0ayawn09s9gmtfec2mcft0xk/fakeyou_8pchhrgc0ayawn09s9gmtfec2mcft0xk.mp4", // Replace with actual URLs
   maybe_creator_user: {
@@ -230,17 +233,42 @@ export default function MediaPage({ sessionWrapper }: MediaPageProps) {
               </div>
             </div>
 
-            <div className="d-flex">
+            <div className="d-flex gap-2 flex-wrap">
               <Button
                 icon={faArrowDownToLine}
-                label="Download Result"
+                label="Download"
                 onClick={() => {}}
+                className="flex-grow-1"
               />
+              <div className="d-flex gap-2">
+                <Button
+                  square={true}
+                  variant="secondary"
+                  icon={faCirclePlay}
+                  onClick={() => {}}
+                  tooltip="Create"
+                />
+                <Button
+                  square={true}
+                  variant="secondary"
+                  icon={faShare}
+                  onClick={() => {}}
+                  tooltip="Share"
+                />
+              </div>
             </div>
 
             <Accordion>{mediaDetails}</Accordion>
           </div>
         </div>
+      </Panel>
+      <Panel padding={true} mt={true}>
+        <h4 className="mb-3">Comments</h4>
+        <CommentComponent
+          entityType="user"
+          entityToken={mediaData.token}
+          sessionWrapper={sessionWrapper}
+        />
       </Panel>
     </Container>
   );

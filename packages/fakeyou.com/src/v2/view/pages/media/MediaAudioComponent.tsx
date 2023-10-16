@@ -1,6 +1,6 @@
 import MediaData from "./MediaDataTypes";
 import React from "react";
-import AudioPlayer from "./MediaAudioPlayer";
+import MediaAudioPlayer from "./MediaAudioPlayer";
 
 interface MediaAudioComponentProps {
   mediaData: MediaData;
@@ -11,7 +11,7 @@ export default function MediaAudioComponent({
 }: MediaAudioComponentProps) {
   return (
     <div className="w-100">
-      <AudioPlayer mediaData={mediaData} />
+      <MediaAudioPlayer mediaData={mediaData} />
     </div>
   );
 }
