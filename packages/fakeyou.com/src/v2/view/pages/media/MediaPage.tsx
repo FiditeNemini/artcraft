@@ -33,7 +33,7 @@ interface MediaPageProps {
 // Dummy media data (replace with actual API data)
 let dummyMediaData = {
   token: "m_v032bt6ecm0rwhebbhgdmk5rexf7cij",
-  media_type: MediaType.Video, // Change to somthing like "video" or "image" to test different types
+  media_type: MediaType.Audio, // Change to somthing like "video" or "image" to test different types
   public_bucket_path:
     "/media/8/p/c/h/h/8pchhrgc0ayawn09s9gmtfec2mcft0xk/fakeyou_8pchhrgc0ayawn09s9gmtfec2mcft0xk.mp4", // Replace with actual URLs
   maybe_creator_user: {
@@ -82,7 +82,7 @@ export default function MediaPage({ sessionWrapper }: MediaPageProps) {
     switch (data.media_type) {
       case MediaType.Audio:
         return (
-          <div className="d-flex flex-column gap-4">
+          <div className="panel p-3 p-lg-4 d-flex flex-column gap-4 rounded">
             <MediaAudioComponent mediaData={data} />
             <div>
               <h5 className="fw-semibold">
@@ -97,7 +97,7 @@ export default function MediaPage({ sessionWrapper }: MediaPageProps) {
         );
       case MediaType.Video:
         return (
-          <div className="ratio ratio-16x9">
+          <div className="panel ratio ratio-16x9">
             <MediaVideoComponent mediaData={data} />
           </div>
         );
@@ -298,9 +298,9 @@ export default function MediaPage({ sessionWrapper }: MediaPageProps) {
       </Container>
 
       <Container type="padded">
-        <div className="row g-4">
+        <div className="row g-4 mb-4">
           <div className="col-12 col-xl-8">
-            <div className="panel media-wrapper rounded">
+            <div className="media-wrapper">
               {renderMediaComponent(mediaData)}
             </div>
 
@@ -370,14 +370,16 @@ export default function MediaPage({ sessionWrapper }: MediaPageProps) {
       </Container>
 
       <div className="d-xl-none mt-4">
-        <Panel padding>
-          <h4 className="fw-semibold mb-3">Comments</h4>
-          <CommentComponent
-            entityType="user"
-            entityToken={mediaData.token}
-            sessionWrapper={sessionWrapper}
-          />
-        </Panel>
+        <Container type="padded">
+          <Panel>
+            <h4 className="fw-semibold mb-3">Comments</h4>
+            <CommentComponent
+              entityType="user"
+              entityToken={mediaData.token}
+              sessionWrapper={sessionWrapper}
+            />
+          </Panel>
+        </Container>
       </div>
     </>
   );

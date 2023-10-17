@@ -37,7 +37,7 @@ export default function PageHeader({
 
   return (
     <div className="pt-3 pb-4 pt-lg-4">
-      <Panel padding full={full}>
+      <Panel padding>
         <div className="d-flex flex-column gap-4">
           <div>
             <div className="d-flex">
