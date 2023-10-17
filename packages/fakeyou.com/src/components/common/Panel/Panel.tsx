@@ -10,7 +10,7 @@ interface PanelProps {
 export default function Panel({ children, padding, mb, mt }: PanelProps) {
   return (
     <div
-      className={`panel rounded ${padding ? "p-3 py-4 p-md-4" : ""}
+      className={`panel ${padding ? "p-3 py-4 p-md-4" : ""}
         ${mb ? "mb-4" : ""} ${mt ? "mt-4" : ""}`}
     >
       {children}
