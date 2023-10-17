@@ -299,6 +299,15 @@ styles with important tags:
       0 10px 8px rgb(0 0 0 / 3%), 0 4px 4px rgb(0 0 0 / 2%),
       0 2px 2px rgb(0 0 0 / 1%) !important;
 
+    &.panel-clear {
+      padding-left: 1rem;
+      padding-right: 1rem;
+      background-color: transparent;
+      border: none;
+      border-color: transparent !important;
+      box-shadow: none !important;
+    }
+
     .panel-inner {
       background-color: lighten($panel, 4%);
     }
@@ -1531,6 +1540,11 @@ textarea {
 
     .panel {
       border-radius: 0.5rem;
+
+      &.panel-clear {
+        padding-left: 0rem;
+        padding-right: 0rem;
+      }
     }
 
     ul.patrons-list {

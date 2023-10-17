@@ -97,8 +97,10 @@ export default function MediaPage({ sessionWrapper }: MediaPageProps) {
         );
       case MediaType.Video:
         return (
-          <div className="panel ratio ratio-16x9">
-            <MediaVideoComponent mediaData={data} />
+          <div className="panel panel-clear">
+            <div className="ratio ratio-16x9">
+              <MediaVideoComponent mediaData={data} />
+            </div>
           </div>
         );
 
@@ -297,74 +299,78 @@ export default function MediaPage({ sessionWrapper }: MediaPageProps) {
         </div>
       </Container>
 
-      <Container type="padded">
-        <div className="row g-4 mb-4">
-          <div className="col-12 col-xl-8">
-            <div className="media-wrapper">
-              {renderMediaComponent(mediaData)}
-            </div>
-
-            <div className="panel p-3 py-4 p-md-4 mt-4 d-none d-xl-block">
-              <h4 className="fw-semibold mb-3">Comments</h4>
-              <CommentComponent
-                entityType="user"
-                entityToken={mediaData.token}
-                sessionWrapper={sessionWrapper}
-              />
-            </div>
-          </div>
-          <div className="col-12 col-xl-4 d-flex flex-column gap-4">
-            <div className="d-flex gap-2">
-              <Gravatar
-                size={48}
-                username={mediaData.maybe_creator_user.display_name}
-                avatarIndex={
-                  mediaData.maybe_creator_user.default_avatar.image_index
-                }
-                backgroundIndex={
-                  mediaData.maybe_creator_user.default_avatar.color_index
-                }
-              />
-              <div className="d-flex flex-column">
-                <Link
-                  className="fw-medium"
-                  to={`/profile/${mediaData.maybe_creator_user.display_name}`}
-                >
-                  {mediaData.maybe_creator_user.display_name}
-                </Link>
-                {timeCreated}
+      <Container type="panel">
+        <div className="container-panel">
+          <div className="row g-4 mb-4">
+            <div className="col-12 col-xl-8">
+              <div className="media-wrapper">
+                {renderMediaComponent(mediaData)}
               </div>
-            </div>
 
-            <div className="d-flex gap-2 flex-wrap">
-              <Button
-                icon={faArrowDownToLine}
-                label="Download"
-                onClick={() => {}}
-                className="flex-grow-1"
-              />
-              <div className="d-flex gap-2">
-                <Button
-                  square={true}
-                  variant="secondary"
-                  icon={faCirclePlay}
-                  onClick={() => {}}
-                  tooltip="Create"
-                />
-                <Button
-                  square={true}
-                  variant="secondary"
-                  icon={faShare}
-                  onClick={() => {}}
-                  tooltip="Share"
+              <div className="panel p-3 py-4 p-md-4 mt-4 d-none d-xl-block">
+                <h4 className="fw-semibold mb-3">Comments</h4>
+                <CommentComponent
+                  entityType="user"
+                  entityToken={mediaData.token}
+                  sessionWrapper={sessionWrapper}
                 />
               </div>
             </div>
+            <div className="col-12 col-xl-4">
+              <div className="panel panel-clear d-flex flex-column gap-4">
+                <div className="d-flex gap-2">
+                  <Gravatar
+                    size={48}
+                    username={mediaData.maybe_creator_user.display_name}
+                    avatarIndex={
+                      mediaData.maybe_creator_user.default_avatar.image_index
+                    }
+                    backgroundIndex={
+                      mediaData.maybe_creator_user.default_avatar.color_index
+                    }
+                  />
+                  <div className="d-flex flex-column">
+                    <Link
+                      className="fw-medium"
+                      to={`/profile/${mediaData.maybe_creator_user.display_name}`}
+                    >
+                      {mediaData.maybe_creator_user.display_name}
+                    </Link>
+                    {timeCreated}
+                  </div>
+                </div>
 
-            <Accordion>
-              {mediaDetails}
-              {modMediaDetails}
-            </Accordion>
+                <div className="d-flex gap-2 flex-wrap">
+                  <Button
+                    icon={faArrowDownToLine}
+                    label="Download"
+                    onClick={() => {}}
+                    className="flex-grow-1"
+                  />
+                  <div className="d-flex gap-2">
+                    <Button
+                      square={true}
+                      variant="secondary"
+                      icon={faCirclePlay}
+                      onClick={() => {}}
+                      tooltip="Create"
+                    />
+                    <Button
+                      square={true}
+                      variant="secondary"
+                      icon={faShare}
+                      onClick={() => {}}
+                      tooltip="Share"
+                    />
+                  </div>
+                </div>
+
+                <Accordion>
+                  {mediaDetails}
+                  {modMediaDetails}
+                </Accordion>
+              </div>
+            </div>
           </div>
         </div>
       </Container>
