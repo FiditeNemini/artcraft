@@ -1043,7 +1043,6 @@ version = "0.0.1"
 dependencies = [
  "dotenv",
  "easyenv",
- "envvar",
  "errors",
  "hostname",
  "log",
@@ -1948,7 +1947,6 @@ dependencies = [
  "dotenv",
  "easyenv",
  "enums",
- "envvar",
  "errors",
  "filesys",
  "google_drive_common",
@@ -2024,7 +2022,7 @@ dependencies = [
 
 [[package]]
 name = "easyenv"
-version = "0.0.9"
+version = "0.1.0"
 dependencies = [
  "dotenv",
  "env_logger 0.10.0",
@@ -2104,16 +2102,6 @@ dependencies = [
  "log",
  "regex",
  "termcolor",
-]
-
-[[package]]
-name = "envvar"
-version = "0.0.1"
-dependencies = [
- "dotenv",
- "easyenv",
- "errors",
- "log",
 ]
 
 [[package]]
@@ -2958,7 +2946,6 @@ dependencies = [
  "dotenv",
  "easyenv",
  "enums",
- "envvar",
  "errors",
  "filesys",
  "hashing",
@@ -5123,7 +5110,6 @@ version = "0.0.1"
 dependencies = [
  "dotenv",
  "easyenv",
- "envvar",
  "errors",
  "log",
 ]
@@ -5535,7 +5521,6 @@ dependencies = [
  "dotenv",
  "easyenv",
  "enums",
- "envvar",
  "errors",
  "futures 0.1.31",
  "futures 0.3.26",

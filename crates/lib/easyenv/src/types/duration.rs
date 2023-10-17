@@ -1,7 +1,9 @@
-use crate::EnvError;
-use log::warn;
 use std::env;
 use std::time::Duration;
+
+use log::warn;
+
+use crate::error::EnvError;
 
 /// Get an environment variable as a `Duration` in seconds.
 /// If not provided or cannot parse, return an error.

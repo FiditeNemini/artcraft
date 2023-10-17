@@ -1,7 +1,9 @@
 use std::env;
 use std::env::VarError;
+
 use log::warn;
-use crate::EnvError;
+
+use crate::error::EnvError;
 
 /// Get an environment variable as a bool.
 /// If not present or there is an error in parsing, return `None`.
