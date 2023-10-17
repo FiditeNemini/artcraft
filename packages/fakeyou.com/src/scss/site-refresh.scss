@@ -293,6 +293,8 @@ styles with important tags:
     background-color: $panel;
     border-color: #ffffff12 !important;
     border: 1px solid;
+    border-left: none;
+    border-right: none;
     border-radius: 0px;
     box-shadow: 0 0 0 1px rgba(0 0 0 / 16%), 0 70px 65px rgb(0 0 0 / 8%),
       0 30px 30px rgb(0 0 0 / 7%), 0 15px 15px rgb(0 0 0 / 5%),
@@ -1540,7 +1542,7 @@ textarea {
 
     .panel {
       border-radius: 0.5rem;
-      border: 0px !important;
+      border: 1px solid;
 
       &.panel-clear {
         padding-left: 0rem;
