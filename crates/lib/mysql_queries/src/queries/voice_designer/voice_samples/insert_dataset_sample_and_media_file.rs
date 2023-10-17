@@ -1,22 +1,16 @@
 use anyhow::anyhow;
-use log::warn;
 use sqlx::MySqlPool;
-use buckets::public::media_files::original_file::MediaFileBucketPath;
 
-use buckets::public::media_uploads::original_file::MediaUploadOriginalFilePath;
+use buckets::public::media_files::original_file::MediaFileBucketPath;
 use enums::by_table::media_files::media_file_origin_category::MediaFileOriginCategory;
 use enums::by_table::media_files::media_file_origin_product_category::MediaFileOriginProductCategory;
-use enums::by_table::media_uploads::media_upload_source::MediaUploadSource;
 use enums::by_table::media_uploads::media_upload_type::MediaUploadType;
 use enums::common::visibility::Visibility;
 use errors::AnyhowResult;
 use tokens::tokens::media_files::MediaFileToken;
-use tokens::tokens::media_uploads::MediaUploadToken;
 use tokens::tokens::users::UserToken;
 use tokens::tokens::zs_voice_dataset_samples::ZsVoiceDatasetSampleToken;
 use tokens::tokens::zs_voice_datasets::ZsVoiceDatasetToken;
-
-use crate::payloads::media_upload_modification_details::MediaUploadModificationDetails;
 
 /// Used to give user-facing order to logged in user inference requests
 pub struct SyntheticIdRecord {

@@ -329,7 +329,7 @@ pub async fn upload_sample_handler(
     uuid_idempotency_token: &uuid_idempotency_token,
     media_type: media_upload_type,
     origin_category: media_file_origin,
-    dataset_token: dataset_token,
+    dataset_token,
     //maybe_original_filename: upload_media_request.file_name.as_deref(),
     //original_file_size_bytes: file_size_bytes as u64,
     //maybe_original_duration_millis: maybe_duration_millis,
