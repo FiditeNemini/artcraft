@@ -369,9 +369,9 @@ export default function MediaPage({ sessionWrapper }: MediaPageProps) {
         </div>
       </Container>
 
-      <div className="d-xl-none mt-4">
+      <div className="d-xl-none my-4">
         <Container type="padded">
-          <Panel>
+          <Panel padding={true}>
             <h4 className="fw-semibold mb-3">Comments</h4>
             <CommentComponent
               entityType="user"
