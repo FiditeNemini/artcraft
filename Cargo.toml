@@ -43,6 +43,7 @@ members = [
   "crates/lib/redis_common",
   "crates/lib/server_environment",
   "crates/lib/sqlx_mysql_helpers",
+  "crates/lib/storyteller_root",
   "crates/lib/subprocess_common",
   "crates/lib/testing",
   "crates/lib/tts_common",

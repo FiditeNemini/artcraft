@@ -55,5 +55,4 @@ pub use types::string::get_env_string_required;
 mod error;
 mod init;
 mod logging;
-mod types;
-
+pub (crate) mod types;
