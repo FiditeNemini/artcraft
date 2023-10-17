@@ -33,7 +33,7 @@ interface MediaPageProps {
 // Dummy media data (replace with actual API data)
 let dummyMediaData = {
   token: "m_v032bt6ecm0rwhebbhgdmk5rexf7cij",
-  media_type: MediaType.Audio, // Change to somthing like "video" or "image" to test different types
+  media_type: MediaType.Video, // Change to somthing like "video" or "image" to test different types
   public_bucket_path:
     "/media/8/p/c/h/h/8pchhrgc0ayawn09s9gmtfec2mcft0xk/fakeyou_8pchhrgc0ayawn09s9gmtfec2mcft0xk.mp4", // Replace with actual URLs
   maybe_creator_user: {
