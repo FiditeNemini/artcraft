@@ -23,8 +23,6 @@ import DataTable from "components/common/DataTable";
 import { Gravatar } from "@storyteller/components/src/elements/Gravatar";
 import useTimeAgo from "hooks/useTimeAgo";
 import { CommentComponent } from "v2/view/_common/comments/CommentComponent";
-// import { RatingButtons } from "v2/view/_common/ratings/RatingButtons";
-// import { RatingStats } from "v2/view/_common/ratings/RatingStats";
 
 interface MediaPageProps {
   sessionWrapper: SessionWrapper;
@@ -32,7 +30,7 @@ interface MediaPageProps {
 
 // Dummy media data (replace with actual API data)
 let dummyMediaData = {
-  token: "m_v032bt6ecm0rwhebbhgdmk5rexf7cij",
+  token: "m_v032bt6ecm0rwhebbhgdmk5rexf7cij", //-----access view at /media/m_v032bt6ecm0rwhebbhgdmk5rexf7cij to view this media
   media_type: MediaType.Video, // Change to somthing like "video" or "image" to test different types
   public_bucket_path:
     "/media/8/p/c/h/h/8pchhrgc0ayawn09s9gmtfec2mcft0xk/fakeyou_8pchhrgc0ayawn09s9gmtfec2mcft0xk.mp4", // Replace with actual URLs
@@ -89,9 +87,7 @@ export default function MediaPage({ sessionWrapper }: MediaPageProps) {
                 <FontAwesomeIcon icon={faSquareQuote} className="me-2" />
                 Audio Text
               </h5>
-              <p className="pb-3">
-                {mediaData?.audio_text && mediaData.audio_text}
-              </p>
+              <p>{mediaData?.audio_text && mediaData.audio_text}</p>
             </div>
           </div>
         );
@@ -117,10 +113,10 @@ export default function MediaPage({ sessionWrapper }: MediaPageProps) {
         <Container type="padded">
           <div className="pt-4 pb-4">
             <h2 className="fw-bold mb-1 pt-0 pt-lg-1">
-              <Skeleton type="medium" />
+              <Skeleton type="short" />
             </h2>
             <p className="mb-0">
-              <Skeleton type="short" />
+              <Skeleton type="medium" />
             </p>
           </div>
         </Container>
@@ -281,95 +277,82 @@ export default function MediaPage({ sessionWrapper }: MediaPageProps) {
     );
   }
 
-  // const resultRatings = (
-  //   <div className="d-flex flex-column flex-lg-row flex-column-reverse gap-3">
-  //     <div className="d-flex gap-3">
-  //       <RatingButtons entity_type="v2v_model" entity_token="test" />
-  //     </div>
-  //     <RatingStats positive_votes={100} negative_votes={0} total_votes={100} />
-  //   </div>
-  // );
-
   return (
     <>
-      <Container>
-        <div className="container py-5">
-          <h2 className="fw-bold mb-1">{pageTitle}</h2>
-          <p className="mb-0">{pageSubText}</p>
-        </div>
+      <Container type="padded" className="py-5">
+        <h2 className="fw-bold mb-1">{pageTitle}</h2>
+        <p className="mb-0">{pageSubText}</p>
       </Container>
 
       <Container type="panel">
-        <div className="container-panel">
-          <div className="row g-4 mb-4">
-            <div className="col-12 col-xl-8">
-              <div className="media-wrapper">
-                {renderMediaComponent(mediaData)}
-              </div>
-
-              <div className="panel p-3 py-4 p-md-4 mt-4 d-none d-xl-block">
-                <h4 className="fw-semibold mb-3">Comments</h4>
-                <CommentComponent
-                  entityType="user"
-                  entityToken={mediaData.token}
-                  sessionWrapper={sessionWrapper}
-                />
-              </div>
+        <div className="row g-4 mb-4">
+          <div className="col-12 col-xl-8">
+            <div className="media-wrapper">
+              {renderMediaComponent(mediaData)}
             </div>
-            <div className="col-12 col-xl-4">
-              <div className="panel panel-clear d-flex flex-column gap-4">
-                <div className="d-flex gap-2">
-                  <Gravatar
-                    size={48}
-                    username={mediaData.maybe_creator_user.display_name}
-                    avatarIndex={
-                      mediaData.maybe_creator_user.default_avatar.image_index
-                    }
-                    backgroundIndex={
-                      mediaData.maybe_creator_user.default_avatar.color_index
-                    }
-                  />
-                  <div className="d-flex flex-column">
-                    <Link
-                      className="fw-medium"
-                      to={`/profile/${mediaData.maybe_creator_user.display_name}`}
-                    >
-                      {mediaData.maybe_creator_user.display_name}
-                    </Link>
-                    {timeCreated}
-                  </div>
-                </div>
 
-                <div className="d-flex gap-2 flex-wrap">
-                  <Button
-                    icon={faArrowDownToLine}
-                    label="Download"
-                    onClick={() => {}}
-                    className="flex-grow-1"
-                  />
-                  <div className="d-flex gap-2">
-                    <Button
-                      square={true}
-                      variant="secondary"
-                      icon={faCirclePlay}
-                      onClick={() => {}}
-                      tooltip="Create"
-                    />
-                    <Button
-                      square={true}
-                      variant="secondary"
-                      icon={faShare}
-                      onClick={() => {}}
-                      tooltip="Share"
-                    />
-                  </div>
+            <div className="panel p-3 py-4 p-md-4 mt-4 d-none d-xl-block">
+              <h4 className="fw-semibold mb-3">Comments</h4>
+              <CommentComponent
+                entityType="user"
+                entityToken={mediaData.token}
+                sessionWrapper={sessionWrapper}
+              />
+            </div>
+          </div>
+          <div className="col-12 col-xl-4">
+            <div className="panel panel-clear d-flex flex-column gap-4">
+              <div className="d-flex gap-2">
+                <Gravatar
+                  size={48}
+                  username={mediaData.maybe_creator_user.display_name}
+                  avatarIndex={
+                    mediaData.maybe_creator_user.default_avatar.image_index
+                  }
+                  backgroundIndex={
+                    mediaData.maybe_creator_user.default_avatar.color_index
+                  }
+                />
+                <div className="d-flex flex-column">
+                  <Link
+                    className="fw-medium"
+                    to={`/profile/${mediaData.maybe_creator_user.display_name}`}
+                  >
+                    {mediaData.maybe_creator_user.display_name}
+                  </Link>
+                  {timeCreated}
                 </div>
-
-                <Accordion>
-                  {mediaDetails}
-                  {modMediaDetails}
-                </Accordion>
               </div>
+
+              <div className="d-flex gap-2 flex-wrap">
+                <Button
+                  icon={faArrowDownToLine}
+                  label="Download"
+                  onClick={() => {}}
+                  className="flex-grow-1"
+                />
+                <div className="d-flex gap-2">
+                  <Button
+                    square={true}
+                    variant="secondary"
+                    icon={faCirclePlay}
+                    onClick={() => {}}
+                    tooltip="Create"
+                  />
+                  <Button
+                    square={true}
+                    variant="secondary"
+                    icon={faShare}
+                    onClick={() => {}}
+                    tooltip="Share"
+                  />
+                </div>
+              </div>
+
+              <Accordion>
+                {mediaDetails}
+                {modMediaDetails}
+              </Accordion>
             </div>
           </div>
         </div>
