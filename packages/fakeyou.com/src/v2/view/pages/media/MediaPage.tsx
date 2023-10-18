@@ -132,7 +132,7 @@ export default function MediaPage({ sessionWrapper }: MediaPageProps) {
 
               <div className="panel p-3 py-4 p-md-4 mt-4 d-none d-xl-block">
                 <h4 className="fw-semibold mb-3">
-                  <Skeleton />
+                  <Skeleton type="short" />
                 </h4>
                 <h1>
                   <Skeleton />
@@ -141,7 +141,7 @@ export default function MediaPage({ sessionWrapper }: MediaPageProps) {
             </div>
             <div className="col-12 col-xl-4 d-flex flex-column gap-2">
               <h1 className="mb-0">
-                <Skeleton />
+                <Skeleton type="medium" />
               </h1>
               <h1 className="mb-0">
                 <Skeleton />
@@ -156,7 +156,7 @@ export default function MediaPage({ sessionWrapper }: MediaPageProps) {
         <div className="d-xl-none mt-4">
           <Panel padding>
             <h4 className="fw-semibold mb-3">
-              <Skeleton />
+              <Skeleton type="short" />
             </h4>
             <h1 className="mb-0">
               <Skeleton />
