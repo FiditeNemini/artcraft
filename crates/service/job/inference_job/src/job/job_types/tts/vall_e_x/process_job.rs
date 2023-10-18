@@ -145,7 +145,7 @@ pub async fn process_job(
                 // TODO: zero shot tts folder to tmp
                 //input_embedding_path: "/tmp/downloads/zero_shot_tts", // name of the embedding.npz in the tmp dir
                 input_embedding_path: &workdir,
-                input_embedding_name:  format!("{}_weights.npz", &voice.title),
+                input_embedding_name:  file_name,
                 input_text: String::from(text), // text
                 output_file_name: String::from("output.wav"), // output file name in the output folder
                 stderr_output_file: String::from("zero_shot.txt"),
@@ -153,12 +153,34 @@ pub async fn process_job(
         );
     
     // upload audio to bucket
+    info!("Uploading media ...");
 
+    args.job_dependencies.public_bucket_client.upload_filename_with_content_type(
+      &result_bucket_object_pathbuf,
+      &finished_file,
+      &mimetype) // TODO: We should check the mimetype to make sure bad payloads can't get uploaded
+        .await
+        .map_err(|e| ProcessSingleJobError::Other(e))?;
     // ==================== UPLOAD AUDIO TO BUCKET ==================== //
-
+            
     // upload audio to public bucket ( for voice )
     // return ok
-    Err(ProcessSingleJobError::InvalidJob(anyhow!("this job flow is not yet implemented")))
+
+    job_progress_reporter.log_status("done")
+      .map_err(|e| ProcessSingleJobError::Other(e))?;
+
+    info!("Job {:?} complete success! Downloaded, ran inference, and uploaded. Saved model record: {}, Result Token: {}",
+            job.id, id, &media_file_token);
+
+    Ok(JobSuccessResult {
+        maybe_result_entity: Some(ResultEntity {
+        entity_type: InferenceResultType::MediaFile,
+        entity_token: media_file_token.to_string(),
+        }),
+        inference_duration,
+    })
+
+    //Err(ProcessSingleJobError::InvalidJob(anyhow!("this job flow is not yet implemented")))
 }
 mod tests {
     #[test]
