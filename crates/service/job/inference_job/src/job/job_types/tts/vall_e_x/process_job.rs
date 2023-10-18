@@ -1,18 +1,22 @@
 use anyhow::anyhow;
 use buckets::public::media_files::original_file::MediaFileBucketPath;
 use cloud_storage::bucket_client::BucketClient;
-use container_common::filesystem;
+use hashing::sha256::sha256_hash_file::sha256_hash_file;
+use filesys::file_size::file_size;
+use enums::by_table::generic_inference_jobs::inference_result_type::InferenceResultType;
+
 use log::{ error, info, warn };
+use mysql_queries::queries::media_files::insert_media_file_from_zero_shot_tts::InsertArgs;
+use mysql_queries::queries::media_files::insert_media_file_from_zero_shot_tts::insert_media_file_from_face_zero_shot;
 use mysql_queries::queries::voice_designer::voices::get_voice::get_voice_by_token;
 use std::path::PathBuf;
-use std::path::Path;
 use std::time::Instant;
 use mysql_queries::queries::generic_inference::job::list_available_generic_inference_jobs::AvailableInferenceJob;
 
 use crate::job::job_loop::job_success_result::JobSuccessResult;
+use crate::job::job_loop::job_success_result::ResultEntity;
 use crate::job::job_loop::process_single_job_error::ProcessSingleJobError;
 use crate::job::job_types::tts::vall_e_x::validate_job::validate_job;
-use crate::job::job_types::tts::vall_e_x::validate_job::JobArgs;
 
 use crate::job_dependencies::JobDependencies;
 use crate::job::job_types::tts::vall_e_x::vall_e_x_inference_command::InferenceArgs;
@@ -143,6 +147,7 @@ pub async fn process_job(
     let inference_start_time = Instant::now();
 
     let output_file_name = String::from("output.wav");
+
     // Run Inference
     let command_exit_status =
         args.job_dependencies.job_type_details.vall_e_x.inference_command.execute_inference(
@@ -154,6 +159,7 @@ pub async fn process_job(
                 stderr_output_file: String::from("zero_shot.txt"),
             }
         );
+    let inference_duration = Instant::now().duration_since(inference_start_time);
 
     // upload audio to bucket
     info!("Uploading media ...");
@@ -177,14 +183,23 @@ pub async fn process_job(
         .map_err(|e| ProcessSingleJobError::Other(e))?;
 
     // ==================== UPLOAD AUDIO TO BUCKET ==================== 
+    info!("Calculating sha256...");
+  
+    let file_checksum = sha256_hash_file(&finished_file)
+        .map_err(|err| {
+          ProcessSingleJobError::Other(anyhow!("Error hashing file: {:?}", err))
+        })?;
+ 
+    let file_size_bytes = file_size(&finished_file)
+        .map_err(|err| ProcessSingleJobError::Other(err))?;
 
     job_progress_reporter.log_status("done").map_err(|e| ProcessSingleJobError::Other(e))?;
-
+        
     // insert into db the record
     let (media_file_token, id) = insert_media_file_from_face_zero_shot(InsertArgs {
         pool: &args.job_dependencies.mysql_pool,
         job: &job,
-        maybe_mime_type: Some(&mimetype),
+        maybe_mime_type: Some(&MIME_TYPE),
         file_size_bytes,
         sha256_checksum: &file_checksum,
         public_bucket_directory_hash: result_bucket_location.get_object_hash(),
@@ -197,14 +212,14 @@ pub async fn process_job(
 
     info!("Job {:?} complete success! Downloaded, ran inference, and uploaded. Saved model record: {}, Result Token: {}",
             job.id, id, &media_file_token);
-
+    
     Ok(JobSuccessResult {
         maybe_result_entity: Some(ResultEntity {
         entity_type: InferenceResultType::MediaFile,
         entity_token: media_file_token.to_string(),
         }),
         inference_duration,
-    });
+    })
 
 }
 mod tests {
