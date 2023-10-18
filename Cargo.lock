@@ -2038,6 +2038,7 @@ dependencies = [
  "dotenv",
  "env_logger 0.10.0",
  "log",
+ "storyteller_root",
 ]
 
 [[package]]

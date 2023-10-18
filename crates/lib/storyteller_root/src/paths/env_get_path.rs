@@ -35,6 +35,7 @@ impl Error for EnvError {
   }
 }
 
+// NB: Pulled from `easyenv` crate.
 pub (crate) fn env_get_path(env_name: &str) -> Result<Option<PathBuf>, EnvError> {
   match std::env::var(env_name).as_ref() {
     Err(err) => match err {

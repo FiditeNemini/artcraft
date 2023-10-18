@@ -1,9 +1,10 @@
 use std::env;
 use std::env::VarError;
 use std::path::{Path, PathBuf};
-use std::str::FromStr;
 
 use log::warn;
+
+use storyteller_root::get_substituted_path;
 
 use crate::error::EnvError;
 
@@ -64,12 +65,10 @@ pub (crate) fn get_env_pathbuf_internal(env_name: &str) -> Result<Option<PathBuf
       VarError::NotUnicode(_) => Err(EnvError::NotUnicode),
     }
     Ok(val) => {
-      match PathBuf::from_str(val) {
-        Ok(path) => Ok(Some(path)),
-        Err(_err) => Err(EnvError::ParseError {
-          reason: "error parsing PathBuf from value".to_string()
-        }),
-      }
+      // TODO(bt,2023-10-17): The error handling and type juggling under the hood is pretty gnarly
+      //  and needs to be revisited to make the failure modes safer.
+      let path = get_substituted_path(val);
+      Ok(Some(path))
     }
   }
 }
