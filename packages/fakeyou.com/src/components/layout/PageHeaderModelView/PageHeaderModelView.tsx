@@ -35,7 +35,7 @@ export default function PageHeaderModelView({
   return (
     <div className="pt-3 pb-4 pt-lg-4">
       {view === "regular" && (
-        <Panel padding full={full}>
+        <Panel padding>
           <div className="row gy-3">
             <div className="col-12 col-lg-8">
               <h2 className="fw-bold">

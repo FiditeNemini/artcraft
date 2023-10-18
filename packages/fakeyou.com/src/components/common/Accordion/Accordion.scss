@@ -1,0 +1,45 @@
+@import "scss/colours.scss";
+
+.fy-accordion-item {
+  border: 1px solid rgba($white, 0.12);
+  border-radius: 0.5rem;
+  overflow: hidden;
+}
+
+.fy-accordion-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  background-color: $secondary;
+  transition: all 0.2s ease;
+  font-weight: 500;
+
+  &.open {
+    background-color: lighten($secondary, 5%);
+  }
+}
+
+.fy-accordion-content {
+  overflow: hidden;
+  background-color: lighten($panel, 4%);
+
+  &.open {
+    opacity: 1;
+    max-height: 100%;
+    visibility: visible;
+  }
+}
+
+.fy-accordion-content table {
+  width: 100%;
+}
+
+.caret-icon {
+  transition: transform 0.2s ease;
+  transform-origin: center;
+}
+
+.caret-rotated {
+  transform: rotate(180deg);
+}

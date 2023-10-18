@@ -3,15 +3,20 @@ import { Link } from "react-router-dom";
 import "./Button.scss";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { IconDefinition } from "@fortawesome/fontawesome-svg-core";
+import Tippy from "@tippyjs/react";
+import "tippy.js/dist/tippy.css";
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
-  label?: string;
+  label?: string | null;
   icon?: IconDefinition;
   small?: boolean;
   variant?: "primary" | "secondary" | "danger";
-  to?: string; // for internal links
-  href?: string; // for external links
+  to?: string;
+  href?: string;
   target?: "_blank" | "_self";
+  square?: boolean;
+  tooltip?: string;
+  full?: boolean;
 }
 
 export default function Button({
@@ -22,56 +27,52 @@ export default function Button({
   to,
   href,
   target = "_self",
+  square,
+  tooltip,
+  full = false,
   ...rest
 }: ButtonProps) {
-  let buttonClass = `button`;
+  let IconComponent = icon ? (
+    <FontAwesomeIcon icon={icon} className={!square && label ? "me-2" : ""} />
+  ) : null;
+  let LabelComponent = !square ? label : null;
 
-  if (small) {
-    buttonClass += ` button-small`;
-  }
+  const externalClass = rest.className || "";
 
-  switch (variant) {
-    case "primary":
-      buttonClass += " button-primary";
-      break;
-    case "secondary":
-      buttonClass += " button-secondary";
-      break;
-    case "danger":
-      buttonClass += " button-destructive";
-      break;
-    default:
-      buttonClass += " button-primary";
-      break;
-  }
+  const commonProps = {
+    className: `${externalClass} button ${small ? "button-small" : ""} ${
+      square ? (small ? "button-square-small" : "button-square") : ""
+    } button-${variant} ${full ? "w-100" : ""}`,
+  };
 
-  if (to) {
-    return (
-      <Link to={to} className={buttonClass}>
-        {icon && <FontAwesomeIcon icon={icon} className="me-2" />}
-        {label}
-      </Link>
-    );
-  }
-  if (href) {
-    return (
-      <a
-        href={href}
-        target={target}
-        rel="noopener noreferrer"
-        className={buttonClass}
-      >
-        {icon && <FontAwesomeIcon icon={icon} className="me-2" />}
-        {label}
-      </a>
-    );
-  }
+  delete rest.className;
 
-  // If neither 'to' nor 'href' are provided (regular button)
-  return (
-    <button className={buttonClass} type="button" {...rest}>
-      {icon && <FontAwesomeIcon icon={icon} className="me-2" />}
-      {label}
+  const ButtonContent = (
+    <>
+      {IconComponent}
+      {LabelComponent}
+    </>
+  );
+
+  const WrappedButton = to ? (
+    <Link to={to} {...commonProps}>
+      {ButtonContent}
+    </Link>
+  ) : href ? (
+    <a href={href} target={target} rel="noopener noreferrer" {...commonProps}>
+      {ButtonContent}
+    </a>
+  ) : (
+    <button type="button" {...commonProps} {...rest}>
+      {ButtonContent}
     </button>
+  );
+
+  return tooltip ? (
+    <Tippy theme="fakeyou" content={tooltip}>
+      {WrappedButton}
+    </Tippy>
+  ) : (
+    WrappedButton
   );
 }

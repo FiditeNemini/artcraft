@@ -148,7 +148,7 @@ styles with important tags:
   }
 
   .container {
-    max-width: 1080px !important;
+    max-width: 1200px !important;
   }
 
   .container,
@@ -166,11 +166,6 @@ styles with important tags:
   .py-6 {
     padding-top: 1.6rem !important;
     padding-bottom: 0.4rem !important;
-  }
-
-  .py-4 {
-    padding-top: 2rem !important;
-    padding-bottom: 2rem !important;
   }
 
   .lead {
@@ -288,17 +283,32 @@ styles with important tags:
     border-radius: 50px;
   }
 
+  .bg-panel {
+    background-color: lighten($panel, 1%);
+  }
+
   .panel {
     position: relative;
     width: 100%;
     background-color: $panel;
     border-color: #ffffff12 !important;
     border: 1px solid;
+    border-left: none;
+    border-right: none;
     border-radius: 0px;
     box-shadow: 0 0 0 1px rgba(0 0 0 / 16%), 0 70px 65px rgb(0 0 0 / 8%),
       0 30px 30px rgb(0 0 0 / 7%), 0 15px 15px rgb(0 0 0 / 5%),
       0 10px 8px rgb(0 0 0 / 3%), 0 4px 4px rgb(0 0 0 / 2%),
       0 2px 2px rgb(0 0 0 / 1%) !important;
+
+    &.panel-clear {
+      padding-left: 1rem;
+      padding-right: 1rem;
+      background-color: transparent;
+      border: none;
+      border-color: transparent !important;
+      box-shadow: none !important;
+    }
 
     .panel-inner {
       background-color: lighten($panel, 4%);
@@ -926,15 +936,28 @@ styles with important tags:
     color: $white;
   }
 
-  .tippy-box[data-theme~="fakeyou"] > .tippy-svg-arrow {
-    fill: lighten($secondary, 5%);
-  }
-
   .tippy-box[data-theme~="range-slider"] {
     margin-top: -5px;
     background-color: lighten($panel, 10%);
     color: $white;
     font-size: 13px !important;
+  }
+
+  .tippy-box[data-theme~="fakeyou"][data-placement^="top"]
+    > .tippy-arrow::before {
+    border-top-color: lighten($secondary, 5%);
+  }
+  .tippy-box[data-theme~="fakeyou"][data-placement^="bottom"]
+    > .tippy-arrow::before {
+    border-bottom-color: lighten($secondary, 5%);
+  }
+  .tippy-box[data-theme~="fakeyou"][data-placement^="left"]
+    > .tippy-arrow::before {
+    border-left-color: lighten($secondary, 5%);
+  }
+  .tippy-box[data-theme~="fakeyou"][data-placement^="right"]
+    > .tippy-arrow::before {
+    border-right-color: lighten($secondary, 5%);
   }
 
   .sliding-content {
@@ -1468,10 +1491,6 @@ textarea {
       }
     }
 
-    .p-lg-4 {
-      padding: 2rem !important;
-    }
-
     .lead {
       font-size: 18px;
     }
@@ -1517,12 +1536,18 @@ textarea {
       padding-left: var(--bs-gutter-x, 1rem);
       margin-right: auto;
       margin-left: auto;
-      max-width: 1080px;
+      max-width: 1200px;
       border-radius: 0.5rem;
     }
 
     .panel {
       border-radius: 0.5rem;
+      border: 1px solid;
+
+      &.panel-clear {
+        padding-left: 0rem;
+        padding-right: 0rem;
+      }
     }
 
     ul.patrons-list {
@@ -1537,10 +1562,6 @@ textarea {
       min-height: 391px;
       height: 100%;
       border-radius: 0.5rem;
-    }
-
-    .p-md-4 {
-      padding: 2rem !important;
     }
   }
 }

@@ -434,46 +434,6 @@ function TtsResultViewPage(props: Props) {
       <div className="container py-5">
         <div className="d-flex flex-column">
           <h1 className=" fw-bold mb-2">{headingTitle}</h1>
-          {/* Rate Result Buttons */}
-          {/* Commented out because not ready yet. */}
-          {/*<div className="d-flex gap-3">
-            <div className="d-flex">
-              <Tippy
-                content="I like this audio"
-                hideOnClick
-                placement="bottom"
-                theme="fakeyou"
-                arrow={false}
-              >
-                <button className="btn-rate left rated">
-                  <FontAwesomeIcon icon={faThumbsUp} />
-                </button>
-              </Tippy>
-
-              <div className="vr"></div>
-
-              <Tippy
-                content="I dislike this audio"
-                hideOnClick
-                placement="bottom"
-                theme="fakeyou"
-                arrow={false}
-              >
-                <button className="btn-rate right">
-                  <FontAwesomeIcon icon={faThumbsDown} />
-                </button>
-              </Tippy>
-            </div>
-            <div className="d-flex align-items-center">
-              <FontAwesomeIcon
-                icon={faHeart}
-                className="me-2 rating-icon heart"
-              />
-              <p>
-                <span className="fw-medium">1,518 likes</span>
-              </p>
-            </div>
-          </div>*/}
 
           <p className="mb-3 result-text pt-2">
             <TextExpander
@@ -494,14 +454,6 @@ function TtsResultViewPage(props: Props) {
         </div>
       </div>
 
-      {/* Without wavesurfer, 
-      <audio
-        controls
-        src={audioLink}>
-            Your browser does not support the
-            <code>audio</code> element.
-      </audio>*/}
-
       <div className="container-panel pt-3 pb-5">{socialSharing}</div>
 
       <div className="container-panel pt-3 pb-5">
@@ -517,12 +469,6 @@ function TtsResultViewPage(props: Props) {
           <div className="py-6">
             <table className="table tts-result-table">
               <tbody>
-                {/* <tr>
-                  <th scope="row">Original text</th>
-                  <td className="overflow-fix">
-                    {ttsInferenceResult.raw_inference_text}
-                  </td>
-                </tr> */}
                 <tr>
                   <th scope="row">Audio creator</th>
                   <td>{creatorDetails}</td>

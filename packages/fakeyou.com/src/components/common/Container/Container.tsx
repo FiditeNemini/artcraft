@@ -3,11 +3,13 @@ import React from "react";
 interface ContainerProps {
   children: React.ReactNode;
   type?: "full" | "padded" | "panel";
+  className?: string;
 }
 
 export default function PageContainer({
   children,
-  type = "panel",
+  type = "full",
+  className = "",
 }: ContainerProps) {
   let containerClass = "";
 
@@ -19,12 +21,15 @@ export default function PageContainer({
       containerClass = "container";
       break;
     case "panel":
-      containerClass = "";
+      containerClass = "container-panel";
       break;
     default:
       containerClass = "container-fluid";
       break;
   }
 
-  return <div className={containerClass}>{children}</div>;
+  // Merge the classNames
+  const mergedClassNames = `${containerClass} ${className}`;
+
+  return <div className={mergedClassNames}>{children}</div>;
 }

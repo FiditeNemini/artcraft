@@ -410,6 +410,12 @@ class ApiConfig {
     return `${this.getApiOrigin()}/voice_clone_requests/check`;
   }
 
+  // =============== Media Files ===============
+
+  getMediaFile(mediaFileToken: string): string {
+    return `${this.getApiOrigin()}/v1/media_files/file/${mediaFileToken}`;
+  }
+
   // =============== File Uploads ===============
 
   uploadAudio(): string {

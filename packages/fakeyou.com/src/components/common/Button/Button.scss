@@ -11,6 +11,16 @@
   align-items: center;
   justify-content: center;
   color: $white !important;
+
+  &-square {
+    width: 46.5px;
+    height: 46.5px;
+  }
+
+  &-square-small {
+    width: 37.5px;
+    height: 37.5px;
+  }
 }
 
 .button-primary,
@@ -45,9 +55,9 @@
   border-color: lighten($secondary, 5%);
 }
 
-.button-destructive,
-.button-destructive:focus,
-.button-destructive:active {
+.button-danger,
+.button-danger:focus,
+.button-danger:active {
   background-color: $danger;
   color: $white !important;
   border: 2.5px solid;
@@ -55,7 +65,7 @@
   transition: 0.2s;
 }
 
-.button-destructive:hover {
+.button-danger:hover {
   background-color: lighten($danger, 5%);
   color: $white !important;
   border: 2.5px solid;
