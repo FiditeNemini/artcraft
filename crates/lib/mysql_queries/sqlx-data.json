@@ -13338,6 +13338,16 @@
     },
     "query": "\nUPDATE tts_models\nSET\n    maybe_default_pretrained_vocoder = ?,\n    maybe_custom_vocoder_token = ?,\n    text_pipeline_type = ?,\n    title = ?,\n    description_markdown = ?,\n    description_rendered_html = ?,\n    ietf_language_tag = ?,\n    ietf_primary_language_subtag = ?,\n    creator_set_visibility = ?,\n    maybe_mod_user_token = ?,\n    version = version + 1\nWHERE token = ?\nLIMIT 1\n        "
   },
+  "b4308b1aae016b0f2559c88c90008c35b20fcf14cf8a37585af26958be62a398": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Right": 7
+      }
+    },
+    "query": "\n  INSERT INTO zs_voice_dataset_samples SET\n\n  token = ?,\n\n  uuid_idempotency_token = ?,\n\n  dataset_token = ?,\n  media_file_token = ?,\n\n  maybe_creator_user_token = ?,\n  maybe_creator_anonymous_visitor_token = ?,\n  creator_ip_address = ?\n        "
+  },
   "b483867c3f767a01cc80e4c0e0f1950c65154e06c13fc2fcc6e3ec96e8e2c956": {
     "describe": {
       "columns": [],
@@ -14939,6 +14949,44 @@
     },
     "query": "\nUPDATE tts_inference_jobs\nSET status='complete_failure'\nWHERE\n  status IN ('pending')\n  AND priority_level = 0;\n        "
   },
+  "cc27f21042c3d8ed5a2ef37e3e1d59f1aded7ba78acb938663cd439baf1c58ef": {
+    "describe": {
+      "columns": [
+        {
+          "name": "token: tokens::tokens::zs_voice_dataset_samples::ZsVoiceDatasetSampleToken",
+          "ordinal": 0,
+          "type_info": {
+            "char_set": 224,
+            "flags": {
+              "bits": 4229
+            },
+            "max_size": 128,
+            "type": "VarString"
+          }
+        },
+        {
+          "name": "media_file_token: tokens::tokens::media_files::MediaFileToken",
+          "ordinal": 1,
+          "type_info": {
+            "char_set": 224,
+            "flags": {
+              "bits": 4233
+            },
+            "max_size": 128,
+            "type": "VarString"
+          }
+        }
+      ],
+      "nullable": [
+        false,
+        false
+      ],
+      "parameters": {
+        "Right": 1
+      }
+    },
+    "query": "\nSELECT\n    token as `token: tokens::tokens::zs_voice_dataset_samples::ZsVoiceDatasetSampleToken`,\n    media_file_token as `media_file_token: tokens::tokens::media_files::MediaFileToken`\nFROM zs_voice_dataset_samples\nWHERE\n    uuid_idempotency_token = ?\n    AND user_deleted_at IS NULL\n    AND mod_deleted_at IS NULL\n        "
+  },
   "cc4372cdd1a65999cbaf008f200683eedc93ab83e17256e47e011667ba8384d8": {
     "describe": {
       "columns": [],
@@ -15870,6 +15918,16 @@
       }
     },
     "query": "\nUPDATE api_tokens\nSET\n  deleted_at = CURRENT_TIMESTAMP,\n  ip_address_last_update = ?\nWHERE\n  user_token = ?\nAND api_token NOT IN (?, ?, ?, ?, ?)\n        "
+  },
+  "d66d409272c3aae14e81cf52b1c54e017889752eed9c7fc79e9a91317d95e4d7": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Right": 10
+      }
+    },
+    "query": "\nINSERT INTO media_files\nSET\n  token = ?,\n\n  origin_category = ?,\n  origin_product_category = ?,\n\n  media_type = ?,\n\n  checksum_sha2 = ?,\n\n  public_bucket_directory_hash = ?,\n\n  maybe_creator_user_token = ?,\n  maybe_creator_anonymous_visitor_token = ?,\n  creator_ip_address = ?,\n  creator_set_visibility = ?\n\n        "
   },
   "d71ef2cfed337f9e3f9e1c2255bdec6347763910fd589482f0b0e56b794d7bb7": {
     "describe": {
