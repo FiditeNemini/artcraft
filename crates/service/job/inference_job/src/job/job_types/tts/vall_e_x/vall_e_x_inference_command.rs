@@ -43,7 +43,7 @@ static IGNORED_ENVIRONMENT_VARS : Lazy<HashSet<String>> = Lazy::new(|| {
 // so we have all the files downloaded for the inputs.
 pub struct InferenceArgs<P: AsRef<Path>> {
     /// --driven_audio: path to the input audio
-    pub input_embedding: P, // name of the embedding.npz in the tmp dir
+    pub input_embedding_path: P, // name of the embedding.npz in the work dir
     pub input_text: P, // name of the text
     /// --result_file: path to final file output
     pub output_file_name: P, // output file name in the output folder
@@ -97,7 +97,6 @@ impl VallEXInferenceCommand {
         let maybe_inference_command = easyenv::get_env_string_optional(
           "VALL_E_X_INFERENCE_COMMAND");
     
-
           // EVENTUALLY should remove the check
         // Optional, eg. `./infer.py`. Typically we'll use the command form instead.
         let maybe_inference_executable = easyenv::get_env_pathbuf_optional(
@@ -187,14 +186,29 @@ impl VallEXInferenceCommand {
     
         // ===== Begin Python Args =====
     
-        command.push_str(" -text ");
+        command.push_str(" --text ");
         command.push_str(&path_to_string(args.input_text));
     
-        command.push_str(" -use_prompt_name ");
-        command.push_str(&path_to_string(args.input_embedding));
+        command.push_str(" --prompt-name ");
+        command.push_str(&path_to_string(args.input_embedding_path));
     
-        command.push_str(" -output_file_name ");
+        command.push_str(" --audio-name ");
         command.push_str(&path_to_string(args.output_file_name));
+
+        command.push_str(" mode ");
+        command.push_str(&path_to_string("0"));
+        // TODO improve and use a better model for premium users
+        command.push_str(" --whisper-model ");
+        command.push_str(&path_to_string(Path::new("medium")));
+
+        command.push_str(" whisper-path ");
+        command.push_str(&path_to_string(Path::new("/tmp/downloads/zero_shot_tts/vall-e-x_1.0/medium.pt")));
+
+        command.push_str(" --vocos-folder-path ");
+        command.push_str(&path_to_string(Path::new("/tmp/downloads/zero_shot_tts/vall-e-x_1.0/vocos-encodec/")));
+
+        command.push_str(" --vallex-path ");
+        command.push_str(&path_to_string(Path::new("/tmp/downloads/zero_shot_tts/vall-e-x_1.0/vallex-checkpoint.pt")));
 
         // ===== End Python Args =====
     
