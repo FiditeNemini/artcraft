@@ -155,6 +155,12 @@ pub async fn process_job(
     // upload audio to bucket
     info!("Uploading media ...");
 
+    let result_bucket_location = MediaFileBucketPath::generate_new(
+        Some(BUCKET_FILE_PREFIX),
+        Some(BUCKET_FILE_EXTENSION));
+      let result_bucket_object_pathbuf = result_bucket_location.to_full_object_pathbuf();
+
+
     args.job_dependencies.public_bucket_client.upload_filename_with_content_type(
       &result_bucket_object_pathbuf,
       &finished_file,
