@@ -44,10 +44,11 @@ static IGNORED_ENVIRONMENT_VARS : Lazy<HashSet<String>> = Lazy::new(|| {
 pub struct InferenceArgs<P: AsRef<Path>> {
     /// --driven_audio: path to the input audio
     pub input_embedding_path: P, // name of the embedding.npz in the work dir
+    pub input_embedding_name: String,
     pub input_text: String, // name of the text
     /// --result_file: path to final file output
-    pub output_file_name: P, // output file name in the output folder
-    pub stderr_output_file: P
+    pub output_file_name: String, // output file name in the output folder
+    pub stderr_output_file: String
   }
 
 #[derive(Clone)]
@@ -190,10 +191,16 @@ impl VallEXInferenceCommand {
         command.push_str(&format!("\"{}\"",&args.input_text));
     
         command.push_str(" --prompt-name ");
-        command.push_str(&path_to_string(args.input_embedding_path));
+        command.push_str(&path_to_string(args.input_embedding_name));
+
+        command.push_str(" --prompt-path ");
+        command.push_str(&path_to_string(&args.input_embedding_path));
     
         command.push_str(" --audio-name ");
         command.push_str(&path_to_string(args.output_file_name));
+
+        command.push_str(" --audio-path ");
+        command.push_str(&path_to_string(&args.input_embedding_path));
 
         command.push_str(" --mode ");
         command.push_str(&path_to_string("0"));
@@ -243,7 +250,7 @@ impl VallEXInferenceCommand {
     
         let mut config = PopenConfig::default();
     
-        info!("stderr will be written to file: {:?}", args.stderr_output_file.as_ref());
+        info!("stderr will be written to file: {:?}", args.stderr_output_file);
     
         let stderr_file = File::create(&args.stderr_output_file)?;
         config.stderr = Redirection::File(stderr_file);

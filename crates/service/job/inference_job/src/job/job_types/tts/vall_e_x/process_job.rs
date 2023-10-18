@@ -1,8 +1,10 @@
 use anyhow::anyhow;
 use cloud_storage::bucket_client::BucketClient;
+use container_common::filesystem;
 use log::{ error, info, warn };
 use mysql_queries::queries::voice_designer::voices::get_voice::get_voice_by_token;
 use std::path::PathBuf;
+use std::path::Path;
 use std::time::Instant;
 use mysql_queries::queries::generic_inference::job::list_available_generic_inference_jobs::AvailableInferenceJob;
 
@@ -14,6 +16,7 @@ use crate::job::job_types::tts::vall_e_x::validate_job::JobArgs;
 use crate::job_dependencies::JobDependencies;
 use crate::job::job_types::tts::vall_e_x::vall_e_x_inference_command::InferenceArgs;
 use cloud_storage::bucket_path_unifier::BucketPathUnifier;
+
 pub struct VoiceFile {
     pub filesystem_path: PathBuf,
 }
@@ -22,16 +25,23 @@ pub async fn download_voice_embedding_from_hash(
     bucket_hash: &str,
     name: &str,
     private_bucket_client: &BucketClient,
-    path: &str
+    path: &PathBuf
 ) -> Result<VoiceFile, ProcessSingleJobError> {
     let unifer = BucketPathUnifier::default_paths();
     let object_path = unifer.zero_shot_tts_speaker_encoding(bucket_hash, 0);
-    let filesystem_path = format!("{}/{}_weights.npz", path, name);
 
-    let result = private_bucket_client.download_file_to_disk(object_path, &filesystem_path).await;
+    // todo replace with path ...
+    //let path: String = String::from("/tmp/downloads/zero_shot_tts/");
+    // let filesystem_path = format!("{}{}_weights.npz",path, name);
+    let mut path = path.clone();
+
+    let file_name = format!("{}",name);
+    path.push(&file_name);
+    
+    let result = private_bucket_client.download_file_to_disk(object_path, &path).await;
 
     let voice_file = VoiceFile {
-        filesystem_path: PathBuf::from(&filesystem_path),
+        filesystem_path: PathBuf::from(&path.clone()),
     };
 
     Ok(voice_file)
@@ -99,52 +109,52 @@ pub async fn process_job(
     }
 
     // run inference
-    let work_temp_dir = format!("temp_zeroshot_inference_{}", job.id.0);
-    let work_temp_dir_string = work_temp_dir.clone();
+    let work_temp_dir = format!("/tmp/temp_zeroshot_inference_{}", job.id.0);
+
     // NB: TempDir exists until it goes out of scope, at which point it should delete from filesystem.
     let work_temp_dir = args.job_dependencies.fs.scoped_temp_dir_creator_for_work
         .new_tempdir(&work_temp_dir)
         .map_err(|e| ProcessSingleJobError::from_io_error(e))?;
+     
+    let workdir = work_temp_dir.path().to_path_buf();
 
+    let file_name = format!("{}_weights.npz", &voice.title);
+
+    // USE THIS LATER SINCE it requires specific typing ...
     let voiceFile = download_voice_embedding_from_hash(
         &voice.bucket_hash,
-        &voice.title,
+        &file_name,
         &deps.private_bucket_client,
-        &work_temp_dir_string
+        &workdir
     ).await?;
-    // // Download embeddings file using embedding token
-    // // Create a temp dir to download things to
+
+    println!("voicefile path! {}",voiceFile.filesystem_path.to_string_lossy());
+
+    // Download embeddings file using embedding token
+    // Create a temp dir to download things to
     job_progress_reporter
         .log_status("running inference")
         .map_err(|e| ProcessSingleJobError::Other(e))?;
+
+    let inference_start_time = Instant::now();
 
     // Run Inference
     let command_exit_status =
         args.job_dependencies.job_type_details.vall_e_x.inference_command.execute_inference(
             InferenceArgs {
-                input_embedding_path: format!("{}_weights.npz", &voice.title), // name of the embedding.npz in the tmp dir
+                // TODO: zero shot tts folder to tmp
+                //input_embedding_path: "/tmp/downloads/zero_shot_tts", // name of the embedding.npz in the tmp dir
+                input_embedding_path: &workdir,
+                input_embedding_name:  format!("{}_weights.npz", &voice.title),
                 input_text: String::from(text), // text
                 output_file_name: String::from("output.wav"), // output file name in the output folder
-                stderr_output_file: String::from("test.txt"),
+                stderr_output_file: String::from("zero_shot.txt"),
             }
         );
-        
-    // // upload audio to bucket
-    // // deletetemp dir files
+    
+    // upload audio to bucket
 
-    // // ==================== UPLOAD AUDIO TO BUCKET ==================== //
-
-    // // delete temp dir files
-
-    // // ==================== UPLOAD AUDIO TO BUCKET ==================== //
-    // let maybe_args = job.maybe_inference_args
-    //     .as_ref()
-    //     .map(|args| args.args.as_ref())
-    //     .flatten();
-
-    // let workdir = work_temp_dir.path().to_path_buf();
-    // let stderr_output_file = work_temp_dir.path().join("stderr.txt");
-    // let inference_start_time = Instant::now();
+    // ==================== UPLOAD AUDIO TO BUCKET ==================== //
 
     // upload audio to public bucket ( for voice )
     // return ok
