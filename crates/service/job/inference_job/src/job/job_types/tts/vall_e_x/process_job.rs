@@ -1,4 +1,5 @@
 use anyhow::anyhow;
+use buckets::public::media_files::original_file::MediaFileBucketPath;
 use cloud_storage::bucket_client::BucketClient;
 use container_common::filesystem;
 use log::{ error, info, warn };
@@ -17,6 +18,9 @@ use crate::job_dependencies::JobDependencies;
 use crate::job::job_types::tts::vall_e_x::vall_e_x_inference_command::InferenceArgs;
 use cloud_storage::bucket_path_unifier::BucketPathUnifier;
 
+const BUCKET_FILE_PREFIX: &str = "fakeyou_";
+const BUCKET_FILE_EXTENSION: &str = ".wav";
+const MIME_TYPE: &str = "audio/wav";
 pub struct VoiceFile {
     pub filesystem_path: PathBuf,
 }
@@ -35,9 +39,9 @@ pub async fn download_voice_embedding_from_hash(
     // let filesystem_path = format!("{}{}_weights.npz",path, name);
     let mut path = path.clone();
 
-    let file_name = format!("{}",name);
+    let file_name = format!("{}", name);
     path.push(&file_name);
-    
+
     let result = private_bucket_client.download_file_to_disk(object_path, &path).await;
 
     let voice_file = VoiceFile {
@@ -115,7 +119,7 @@ pub async fn process_job(
     let work_temp_dir = args.job_dependencies.fs.scoped_temp_dir_creator_for_work
         .new_tempdir(&work_temp_dir)
         .map_err(|e| ProcessSingleJobError::from_io_error(e))?;
-     
+
     let workdir = work_temp_dir.path().to_path_buf();
 
     let file_name = format!("{}_weights.npz", &voice.title);
@@ -128,7 +132,7 @@ pub async fn process_job(
         &workdir
     ).await?;
 
-    println!("voicefile path! {}",voiceFile.filesystem_path.to_string_lossy());
+    println!("voicefile path! {}", voiceFile.filesystem_path.to_string_lossy());
 
     // Download embeddings file using embedding token
     // Create a temp dir to download things to
@@ -138,42 +142,58 @@ pub async fn process_job(
 
     let inference_start_time = Instant::now();
 
+    let output_file_name = String::from("output.wav");
     // Run Inference
     let command_exit_status =
         args.job_dependencies.job_type_details.vall_e_x.inference_command.execute_inference(
             InferenceArgs {
-                // TODO: zero shot tts folder to tmp
-                //input_embedding_path: "/tmp/downloads/zero_shot_tts", // name of the embedding.npz in the tmp dir
                 input_embedding_path: &workdir,
-                input_embedding_name:  file_name,
+                input_embedding_name: file_name,
                 input_text: String::from(text), // text
-                output_file_name: String::from("output.wav"), // output file name in the output folder
+                output_file_name: output_file_name.clone(), // output file name in the output folder
                 stderr_output_file: String::from("zero_shot.txt"),
             }
         );
-    
+
     // upload audio to bucket
     info!("Uploading media ...");
 
     let result_bucket_location = MediaFileBucketPath::generate_new(
         Some(BUCKET_FILE_PREFIX),
-        Some(BUCKET_FILE_EXTENSION));
-      let result_bucket_object_pathbuf = result_bucket_location.to_full_object_pathbuf();
+        Some(BUCKET_FILE_EXTENSION)
+    );
 
+    let result_bucket_object_pathbuf = result_bucket_location.to_full_object_pathbuf();
 
-    args.job_dependencies.public_bucket_client.upload_filename_with_content_type(
-      &result_bucket_object_pathbuf,
-      &finished_file,
-      &mimetype) // TODO: We should check the mimetype to make sure bad payloads can't get uploaded
-        .await
+    let mut finished_file = work_temp_dir.path().to_path_buf();
+    finished_file.push(&output_file_name);
+
+    args.job_dependencies.public_bucket_client
+        .upload_filename_with_content_type(
+            &result_bucket_object_pathbuf,
+            &finished_file,
+            &MIME_TYPE
+        ).await // TODO: We should check the mimetype to make sure bad payloads can't get uploaded
         .map_err(|e| ProcessSingleJobError::Other(e))?;
-    // ==================== UPLOAD AUDIO TO BUCKET ==================== //
-            
-    // upload audio to public bucket ( for voice )
-    // return ok
 
-    job_progress_reporter.log_status("done")
-      .map_err(|e| ProcessSingleJobError::Other(e))?;
+    // ==================== UPLOAD AUDIO TO BUCKET ==================== 
+
+    job_progress_reporter.log_status("done").map_err(|e| ProcessSingleJobError::Other(e))?;
+
+    // insert into db the record
+    let (media_file_token, id) = insert_media_file_from_face_zero_shot(InsertArgs {
+        pool: &args.job_dependencies.mysql_pool,
+        job: &job,
+        maybe_mime_type: Some(&mimetype),
+        file_size_bytes,
+        sha256_checksum: &file_checksum,
+        public_bucket_directory_hash: result_bucket_location.get_object_hash(),
+        maybe_public_bucket_prefix: Some(BUCKET_FILE_PREFIX),
+        maybe_public_bucket_extension: Some(BUCKET_FILE_EXTENSION),
+        is_on_prem: args.job_dependencies.container.is_on_prem,
+        worker_hostname: &args.job_dependencies.container.hostname,
+        worker_cluster: &args.job_dependencies.container.cluster_name,
+    }).await.map_err(|e| ProcessSingleJobError::Other(e))?;
 
     info!("Job {:?} complete success! Downloaded, ran inference, and uploaded. Saved model record: {}, Result Token: {}",
             job.id, id, &media_file_token);
@@ -184,9 +204,8 @@ pub async fn process_job(
         entity_token: media_file_token.to_string(),
         }),
         inference_duration,
-    })
+    });
 
-    //Err(ProcessSingleJobError::InvalidJob(anyhow!("this job flow is not yet implemented")))
 }
 mod tests {
     #[test]

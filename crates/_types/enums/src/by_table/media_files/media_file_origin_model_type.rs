@@ -14,6 +14,7 @@ use strum::EnumIter;
 pub enum MediaFileOriginModelType {
   /// SadTalker -- v1, we may add another enum value for future versions
   SadTalker,
+  VallEX,
 }
 
 // TODO(bt, 2022-12-21): This desperately needs MySQL integration tests!
@@ -25,12 +26,14 @@ impl MediaFileOriginModelType {
   pub fn to_str(&self) -> &'static str {
     match self {
       Self::SadTalker => "sad_talker",
+      Self::VallEX => "vall_e_x"
     }
   }
 
   pub fn from_str(value: &str) -> Result<Self, String> {
     match value {
       "sad_talker" => Ok(Self::SadTalker),
+      "vall_e_x" => Ok(Self::VallEX),
       _ => Err(format!("invalid value: {:?}", value)),
     }
   }
@@ -44,16 +47,19 @@ mod tests {
   #[test]
   fn test_serialization() {
     assert_serialization(MediaFileOriginModelType::SadTalker, "sad_talker");
+    assert_serialization(MediaFileOriginModelType::VallEX, "sad_talker");
   }
 
   #[test]
   fn test_to_str() {
     assert_eq!(MediaFileOriginModelType::SadTalker.to_str(), "sad_talker");
+    assert_eq!(MediaFileOriginModelType::VallEX.to_str(), "vall_e_x");
   }
 
   #[test]
   fn test_from_str() {
     assert_eq!(MediaFileOriginModelType::from_str("sad_talker").unwrap(), MediaFileOriginModelType::SadTalker);
+    assert_eq!(MediaFileOriginModelType::from_str("vall_e_x").unwrap(), MediaFileOriginModelType::VallEX);
     assert!(MediaFileOriginModelType::from_str("foo").is_err());
   }
 }

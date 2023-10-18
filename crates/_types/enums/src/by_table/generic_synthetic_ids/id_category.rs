@@ -21,6 +21,10 @@ pub enum IdCategory {
   #[serde(rename = "lipsync_animation")]
   LipsyncAnimation,
 
+  /// Results from the zero shot tts
+  #[serde(rename = "zs_audio_tts")]
+  ZeroShotTTS,
+
   /// Zs dataset which lives in the zs_voice_datasets table
   #[serde(rename = "zs_dataset")]
   ZsDataset,
@@ -42,6 +46,7 @@ impl IdCategory {
       Self::LipsyncAnimation => "lipsync_animation",
       Self::ZsDataset => "zs_dataset",
       Self::ZsVoice => "zs_voice",
+      Self::ZeroShotTTS => "zs_audio_tts"
     }
   }
 
@@ -51,6 +56,7 @@ impl IdCategory {
       "lipsync_animation" => Ok(Self::LipsyncAnimation),
       "zs_dataset" => Ok(Self::ZsDataset),
       "zs_voice" => Ok(Self::ZsVoice),
+      "zs_audio_tts" => Ok(Self::ZeroShotTTS),
       _ => Err(format!("invalid value: {:?}", value)),
     }
   }
@@ -63,6 +69,7 @@ impl IdCategory {
       Self::LipsyncAnimation,
       Self::ZsDataset,
       Self::ZsVoice,
+      Self::ZeroShotTTS
     ])
   }
 }
@@ -76,6 +83,7 @@ mod tests {
   fn test_serialization() {
     assert_serialization(IdCategory::MediaFile, "media_file");
     assert_serialization(IdCategory::LipsyncAnimation, "lipsync_animation");
+    assert_serialization(IdCategory::ZeroShotTTS, "zs_audio_tts");
   }
 
   #[test]
@@ -84,6 +92,7 @@ mod tests {
     assert_eq!(IdCategory::LipsyncAnimation.to_str(), "lipsync_animation");
     assert_eq!(IdCategory::ZsDataset.to_str(), "zs_dataset");
     assert_eq!(IdCategory::ZsVoice.to_str(), "zs_voice");
+    assert_eq!(IdCategory::ZeroShotTTS.to_str(),"zs_audio_tts");
   }
 
   #[test]
@@ -92,6 +101,7 @@ mod tests {
     assert_eq!(IdCategory::from_str("lipsync_animation").unwrap(), IdCategory::LipsyncAnimation);
     assert_eq!(IdCategory::from_str("zs_dataset").unwrap(), IdCategory::ZsDataset);
     assert_eq!(IdCategory::from_str("zs_voice").unwrap(), IdCategory::ZsVoice);
+    assert_eq!(IdCategory::from_str("zs_audio_tts").unwrap(), IdCategory::ZeroShotTTS);
   }
 
   #[test]
@@ -103,6 +113,7 @@ mod tests {
     assert_eq!(variants.pop_first(), Some(IdCategory::LipsyncAnimation));
     assert_eq!(variants.pop_first(), Some(IdCategory::ZsDataset));
     assert_eq!(variants.pop_first(), Some(IdCategory::ZsVoice));
+    assert_eq!(variants.pop_first(), Some(IdCategory::ZeroShotTTS));
     assert_eq!(variants.pop_first(), None);
 
     // Generated check
