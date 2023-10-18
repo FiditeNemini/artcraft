@@ -1,9 +1,12 @@
-use crate::EnvError;
-use log::warn;
-use std::env::VarError;
 use std::env;
+use std::env::VarError;
 use std::path::{Path, PathBuf};
-use std::str::FromStr;
+
+use log::warn;
+
+use storyteller_root::get_substituted_path;
+
+use crate::error::EnvError;
 
 /// Get an environment variable as a `PathBuf`.
 /// If not provided or cannot parse, return an error.
@@ -54,7 +57,7 @@ pub fn get_env_pathbuf_or_default<P: AsRef<Path>>(env_name: &str, default_value:
     })
 }
 
-fn get_env_pathbuf_internal(env_name: &str) -> Result<Option<PathBuf>, EnvError> {
+pub (crate) fn get_env_pathbuf_internal(env_name: &str) -> Result<Option<PathBuf>, EnvError> {
   match env::var(env_name).as_ref() {
     Err(err) => match err {
       // TODO: EnvError enum variant for equals sign in env var name
@@ -62,12 +65,10 @@ fn get_env_pathbuf_internal(env_name: &str) -> Result<Option<PathBuf>, EnvError>
       VarError::NotUnicode(_) => Err(EnvError::NotUnicode),
     }
     Ok(val) => {
-      match PathBuf::from_str(val) {
-        Ok(path) => Ok(Some(path)),
-        Err(_err) => Err(EnvError::ParseError {
-          reason: "error parsing PathBuf from value".to_string()
-        }),
-      }
+      // TODO(bt,2023-10-17): The error handling and type juggling under the hood is pretty gnarly
+      //  and needs to be revisited to make the failure modes safer.
+      let path = get_substituted_path(val);
+      Ok(Some(path))
     }
   }
 }

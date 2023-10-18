@@ -16,7 +16,6 @@ path = "src/lib.rs"
 [dependencies]
 # Internal
 easyenv = { path = "../easyenv" }
-envvar = { path = "../envvar" }
 errors = { path = "../errors" }
 
 # External

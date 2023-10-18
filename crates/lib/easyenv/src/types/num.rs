@@ -1,8 +1,10 @@
 use std::env;
 use std::fmt::{Debug, Display};
 use std::str::FromStr;
+
 use log::{error, warn};
-use crate::EnvError;
+
+use crate::error::EnvError;
 
 /// Get an environment variable as a number, or fall back to the provided default if not set.
 /// If the env var is present but can't be parsed, an error is returned instead.

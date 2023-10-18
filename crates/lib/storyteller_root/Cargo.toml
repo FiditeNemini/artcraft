@@ -1,5 +1,5 @@
 [package]
-name = "envvar"
+name = "storyteller_root"
 edition = "2018"
 version = "0.0.1"
 authors = [
@@ -9,19 +9,18 @@ authors = [
 publish = false
 
 [lib]
-# NB: Public "envvar" crate is real, but doesn't seem useful.
-# NB: We shouldn't use "env" because that overlaps std::env.
-name = "envvar"
+name = "storyteller_root"
 path = "src/lib.rs"
 
 [dependencies]
 # Internal
-easyenv = { path = "../easyenv" }
 errors = { path = "../errors" }
 
 # External
 dotenv = "0.15.0"
+env_logger = "0.10.0"
 log = "0.4.14"
 
 [dev-dependencies]
-# None yet
+serial_test = "2.0.0"
+tempdir = "0.3.7"

@@ -1,6 +1,8 @@
-use crate::EnvError;
-use log::warn;
 use std::env;
+
+use log::warn;
+
+use crate::error::EnvError;
 
 /// Get an environment variable as an optional `String`.
 pub fn get_env_string_optional(env_name: &str) -> Option<String> {

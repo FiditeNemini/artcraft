@@ -1043,7 +1043,6 @@ version = "0.0.1"
 dependencies = [
  "dotenv",
  "easyenv",
- "envvar",
  "errors",
  "hostname",
  "log",
@@ -1678,6 +1677,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "dashmap"
+version = "5.2.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "4c8858831f7781322e539ea39e72449c46b059638250c14344fec8d0aa6e539c"
+dependencies = [
+ "cfg-if 1.0.0",
+ "num_cpus",
+ "parking_lot 0.12.1",
+]
+
+[[package]]
 name = "data-encoding"
 version = "2.3.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1948,7 +1958,6 @@ dependencies = [
  "dotenv",
  "easyenv",
  "enums",
- "envvar",
  "errors",
  "filesys",
  "google_drive_common",
@@ -2024,11 +2033,12 @@ dependencies = [
 
 [[package]]
 name = "easyenv"
-version = "0.0.9"
+version = "0.1.0"
 dependencies = [
  "dotenv",
  "env_logger 0.10.0",
  "log",
+ "storyteller_root",
 ]
 
 [[package]]
@@ -2104,16 +2114,6 @@ dependencies = [
  "log",
  "regex",
  "termcolor",
-]
-
-[[package]]
-name = "envvar"
-version = "0.0.1"
-dependencies = [
- "dotenv",
- "easyenv",
- "errors",
- "log",
 ]
 
 [[package]]
@@ -2958,7 +2958,6 @@ dependencies = [
  "dotenv",
  "easyenv",
  "enums",
- "envvar",
  "errors",
  "filesys",
  "hashing",
@@ -3822,11 +3821,11 @@ dependencies = [
 
 [[package]]
 name = "num_cpus"
-version = "1.13.0"
+version = "1.16.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "05499f3756671c15885fee9034446956fff3f243d6077b91e5767df161f766b3"
+checksum = "4161fcb6d602d4d2081af7c3a45852d875a03dd337a6bfdd6e06407b61342a43"
 dependencies = [
- "hermit-abi 0.1.18",
+ "hermit-abi 0.3.1",
  "libc",
 ]
 
@@ -5118,12 +5117,36 @@ dependencies = [
 ]
 
 [[package]]
+name = "serial_test"
+version = "2.0.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "0e56dd856803e253c8f298af3f4d7eb0ae5e23a737252cd90bb4f3b435033b2d"
+dependencies = [
+ "dashmap",
+ "futures 0.3.26",
+ "lazy_static",
+ "log",
+ "parking_lot 0.12.1",
+ "serial_test_derive",
+]
+
+[[package]]
+name = "serial_test_derive"
+version = "2.0.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "91d129178576168c589c9ec973feedf7d3126c01ac2bf08795109aa35b69fb8f"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn 2.0.26",
+]
+
+[[package]]
 name = "server_environment"
 version = "0.0.1"
 dependencies = [
  "dotenv",
  "easyenv",
- "envvar",
  "errors",
  "log",
 ]
@@ -5535,7 +5558,6 @@ dependencies = [
  "dotenv",
  "easyenv",
  "enums",
- "envvar",
  "errors",
  "futures 0.1.31",
  "futures 0.3.26",
@@ -5599,6 +5621,18 @@ dependencies = [
  "user_input_common",
  "users_component",
  "uuid 0.8.2",
+]
+
+[[package]]
+name = "storyteller_root"
+version = "0.0.1"
+dependencies = [
+ "dotenv",
+ "env_logger 0.10.0",
+ "errors",
+ "log",
+ "serial_test",
+ "tempdir",
 ]
 
 [[package]]
