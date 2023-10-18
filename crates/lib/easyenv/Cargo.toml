@@ -13,6 +13,10 @@ name = "easyenv"
 path = "src/lib.rs"
 
 [dependencies]
+# Internal
+storyteller_root = { path = "../storyteller_root" }
+
+# External
 dotenv = "0.15.0"
 env_logger = "0.10.0"
 log = "0.4.14"

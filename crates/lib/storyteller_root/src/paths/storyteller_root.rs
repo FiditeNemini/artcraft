@@ -16,9 +16,9 @@ pub (crate) const TEST_HOME : &str = "ENV_TEST_HOME_DO_NOT_LEAK_";
 /// Use several heuristics to find "storyteller root", where all of our monorepos are located.
 pub fn get_storyteller_root() -> PathBuf {
   // 1) Try "STORYTELLER_ROOT" env var override. Do not check for path existence.
-  let root = if cfg!(test) { TEST_STORYTELLER_ROOT } else { STORYTELLER_ROOT };
+  let env_var_name = if cfg!(test) { TEST_STORYTELLER_ROOT } else { STORYTELLER_ROOT };
 
-  if let Ok(Some(path)) = env_get_path(root) {
+  if let Ok(Some(path)) = env_get_path(env_var_name) {
     return path;
   }
 
@@ -27,9 +27,9 @@ pub fn get_storyteller_root() -> PathBuf {
   //  https://crates.io/crates/directories
 
   // 2) Try to construct paths relative to the "HOME" directory. Prefer existing directories.
-  let home = if cfg!(test) { TEST_HOME } else { HOME };
+  let env_var_name = if cfg!(test) { TEST_HOME } else { HOME };
 
-  if let Ok(Some(home_path)) = env_get_path(home) {
+  if let Ok(Some(home_path)) = env_get_path(env_var_name) {
     if let Some(path) = try_subdirectories(home_path) {
       return path;
     }
