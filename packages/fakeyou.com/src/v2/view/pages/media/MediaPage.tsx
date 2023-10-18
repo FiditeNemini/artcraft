@@ -1,10 +1,10 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import MediaAudioComponent from "./MediaAudioComponent";
 import MediaVideoComponent from "./MediaVideoComponent";
 import MediaImageComponent from "./MediaImageComponent";
-import MediaData, { MediaType } from "./MediaDataTypes";
 import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
+import { GetMediaFile, MediaFile } from "@storyteller/components/src/api/media_files/GetMediaFile";
 import Container from "components/common/Container";
 import Panel from "components/common/Panel";
 import PageHeader from "components/layout/PageHeader";
@@ -23,85 +23,61 @@ import DataTable from "components/common/DataTable";
 import { Gravatar } from "@storyteller/components/src/elements/Gravatar";
 import useTimeAgo from "hooks/useTimeAgo";
 import { CommentComponent } from "v2/view/_common/comments/CommentComponent";
+import { MediaFileType } from "@storyteller/components/src/api/_common/enums/MediaFileType";
 
 interface MediaPageProps {
   sessionWrapper: SessionWrapper;
 }
 
-// Dummy media data (replace with actual API data)
-let dummyMediaData = {
-  token: "m_v032bt6ecm0rwhebbhgdmk5rexf7cij", //-----access view at /media/m_v032bt6ecm0rwhebbhgdmk5rexf7cij to view this media
-  media_type: MediaType.Video, // Change to somthing like "video" or "image" to test different types
-  public_bucket_path:
-    "/media/8/p/c/h/h/8pchhrgc0ayawn09s9gmtfec2mcft0xk/fakeyou_8pchhrgc0ayawn09s9gmtfec2mcft0xk.mp4", // Replace with actual URLs
-  maybe_creator_user: {
-    user_token: "u_00XGM6M2TE4J9",
-    username: "hanashi",
-    display_name: "Hanashi",
-    gravatar_hash: "c45b453fcb1d27b348504ae7f5d6a6c",
-    default_avatar: {
-      image_index: 1,
-      color_index: 3,
-    },
-  },
-  model_used: "Ash Ketchum",
-  audio_text:
-    "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.",
-  model_link: "/tts/TM:6g1mfb9b6fb8",
-  creator_set_visibility: "public",
-  created_at: new Date("2023-05-12T07:49:53Z"),
-  updated_at: new Date("2023-05-12T07:49:53Z"),
-};
-
 export default function MediaPage({ sessionWrapper }: MediaPageProps) {
   const { token } = useParams<{ token: string }>();
-  const [mediaData, setMediaData] = useState<MediaData | null>(null);
+  const [mediaFile, setMediaFile] = useState<MediaFile | undefined | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<boolean>(false);
 
-  const timeCreated = useTimeAgo(mediaData?.created_at.toISOString() || "");
+  const timeCreated = useTimeAgo(mediaFile?.created_at.toISOString() || "");
 
-  // Simulate API call
+  const getMediaFile = useCallback(async (mediaFileToken: string) => {
+    let result = await GetMediaFile(mediaFileToken);
+    if (result.media_file) {
+      setMediaFile(result.media_file);
+      setIsLoading(false);
+    } else {
+      setError(true);
+      setIsLoading(false);
+    }
+  }, []);
+
   useEffect(() => {
-    setTimeout(() => {
-      //Check if token is valid
-      if (token !== dummyMediaData.token) {
-        //if invalid token, set error to true
-        setError(true);
-        setIsLoading(false);
-      } else {
-        setMediaData(dummyMediaData);
-        setIsLoading(false);
-      }
-    }, 1000);
-  }, [token]);
+    getMediaFile(token);
+  }, [token, getMediaFile]);
 
-  function renderMediaComponent(data: MediaData) {
-    switch (data.media_type) {
-      case MediaType.Audio:
+  function renderMediaComponent(mediaFile: MediaFile) {
+    switch (mediaFile.media_type) {
+      case MediaFileType.Audio:
         return (
           <div className="panel p-3 p-lg-4 d-flex flex-column gap-4 rounded">
-            <MediaAudioComponent mediaData={data} />
+            <MediaAudioComponent mediaFile={mediaFile} />
             <div>
               <h5 className="fw-semibold">
                 <FontAwesomeIcon icon={faSquareQuote} className="me-2" />
                 Audio Text
               </h5>
-              <p>{mediaData?.audio_text && mediaData.audio_text}</p>
+              {/*<p>{mediaFile?.audio_text && mediaFile.audio_text}</p>*/}
             </div>
           </div>
         );
-      case MediaType.Video:
+      case MediaFileType.Video:
         return (
           <div className="panel panel-clear">
             <div className="ratio ratio-16x9">
-              <MediaVideoComponent mediaData={data} />
+              <MediaVideoComponent mediaFile={mediaFile} />
             </div>
           </div>
         );
 
-      case MediaType.Image:
-        return <MediaImageComponent mediaData={data} />;
+      case MediaFileType.Image:
+        return <MediaImageComponent mediaFile={mediaFile} />;
       default:
         return <div>Unsupported media type</div>;
     }
@@ -166,7 +142,7 @@ export default function MediaPage({ sessionWrapper }: MediaPageProps) {
       </>
     );
 
-  if (error || !mediaData)
+  if (error || !mediaFile)
     return (
       <Container type="panel">
         <PageHeader
@@ -183,16 +159,16 @@ export default function MediaPage({ sessionWrapper }: MediaPageProps) {
     );
 
   const audioDetails = [
-    { property: "Type", value: mediaData.media_type },
-    { property: "Created at", value: mediaData.created_at.toString() },
+    { property: "Type", value: mediaFile.media_type },
+    { property: "Created at", value: mediaFile.created_at.toString() },
     {
       property: "Visibility",
-      value: mediaData.creator_set_visibility.toString(),
+      value: mediaFile.creator_set_visibility.toString(),
     },
-    {
+    /*{
       property: "Model",
-      value: mediaData.model_used,
-      link: mediaData.model_link,
+      value: mediaFile.model_used,
+      link: mediaFile.model_link,
     },
     {
       property: "Vocoder",
@@ -204,16 +180,16 @@ export default function MediaPage({ sessionWrapper }: MediaPageProps) {
     },
     {
       property: "Model",
-      value: mediaData.model_used,
-    },
+      value: mediaFile.model_used,
+    },*/
   ];
 
   const videoDetails = [
-    { property: "Type", value: mediaData.media_type },
-    { property: "Created at", value: mediaData.created_at.toString() },
+    { property: "Type", value: mediaFile.media_type },
+    { property: "Created at", value: mediaFile.created_at.toString() },
     {
       property: "Visibility",
-      value: mediaData.creator_set_visibility.toString(),
+      value: mediaFile.creator_set_visibility.toString(),
     },
   ];
 
@@ -221,26 +197,26 @@ export default function MediaPage({ sessionWrapper }: MediaPageProps) {
   let pageSubText = "This is the result of your media.";
   let mediaDetails = undefined;
 
-  switch (mediaData.media_type) {
-    case MediaType.Audio:
+  switch (mediaFile.media_type) {
+    case MediaFileType.Audio:
       pageTitle = "Audio Result";
-      pageSubText = mediaData.token;
+      pageSubText = mediaFile.token;
       mediaDetails = (
         <Accordion.Item title="Audio Details" defaultOpen={true}>
           <DataTable data={audioDetails} />
         </Accordion.Item>
       );
       break;
-    case MediaType.Video:
+    case MediaFileType.Video:
       pageTitle = "Video Result";
-      pageSubText = mediaData.token;
+      pageSubText = mediaFile.token;
       mediaDetails = (
         <Accordion.Item title="Video Details" defaultOpen={true}>
           <DataTable data={videoDetails} />
         </Accordion.Item>
       );
       break;
-    case MediaType.Image:
+    case MediaFileType.Image:
       pageTitle = "Image Model";
       pageSubText = "Image Model SubText";
       break;
@@ -288,14 +264,14 @@ export default function MediaPage({ sessionWrapper }: MediaPageProps) {
         <div className="row g-4 mb-4">
           <div className="col-12 col-xl-8">
             <div className="media-wrapper">
-              {renderMediaComponent(mediaData)}
+              {renderMediaComponent(mediaFile)}
             </div>
 
             <div className="panel p-3 py-4 p-md-4 mt-4 d-none d-xl-block">
               <h4 className="fw-semibold mb-3">Comments</h4>
               <CommentComponent
                 entityType="user"
-                entityToken={mediaData.token}
+                entityToken={mediaFile.token}
                 sessionWrapper={sessionWrapper}
               />
             </div>
@@ -305,20 +281,20 @@ export default function MediaPage({ sessionWrapper }: MediaPageProps) {
               <div className="d-flex gap-2">
                 <Gravatar
                   size={48}
-                  username={mediaData.maybe_creator_user.display_name}
+                  username={mediaFile.maybe_creator_user?.display_name}
                   avatarIndex={
-                    mediaData.maybe_creator_user.default_avatar.image_index
+                    mediaFile.maybe_creator_user?.default_avatar.image_index
                   }
                   backgroundIndex={
-                    mediaData.maybe_creator_user.default_avatar.color_index
+                    mediaFile.maybe_creator_user?.default_avatar.color_index
                   }
                 />
                 <div className="d-flex flex-column">
                   <Link
                     className="fw-medium"
-                    to={`/profile/${mediaData.maybe_creator_user.display_name}`}
+                    to={`/profile/${mediaFile.maybe_creator_user?.display_name}`}
                   >
-                    {mediaData.maybe_creator_user.display_name}
+                    {mediaFile.maybe_creator_user?.display_name}
                   </Link>
                   {timeCreated}
                 </div>
@@ -364,7 +340,7 @@ export default function MediaPage({ sessionWrapper }: MediaPageProps) {
             <h4 className="fw-semibold mb-3">Comments</h4>
             <CommentComponent
               entityType="user"
-              entityToken={mediaData.token}
+              entityToken={mediaFile.token}
               sessionWrapper={sessionWrapper}
             />
           </Panel>

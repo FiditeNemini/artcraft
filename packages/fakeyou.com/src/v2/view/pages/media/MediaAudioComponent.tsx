@@ -1,17 +1,17 @@
-import MediaData from "./MediaDataTypes";
 import React from "react";
 import MediaAudioPlayer from "./MediaAudioPlayer";
+import { MediaFile } from "@storyteller/components/src/api/media_files/GetMediaFile";
 
 interface MediaAudioComponentProps {
-  mediaData: MediaData;
+  mediaFile: MediaFile;
 }
 
 export default function MediaAudioComponent({
-  mediaData,
+  mediaFile,
 }: MediaAudioComponentProps) {
   return (
     <div className="w-100">
-      <MediaAudioPlayer mediaData={mediaData} />
+      <MediaAudioPlayer mediaFile={mediaFile} />
     </div>
   );
 }

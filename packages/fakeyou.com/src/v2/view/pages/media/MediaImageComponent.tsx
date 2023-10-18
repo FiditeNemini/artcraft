@@ -1,17 +1,17 @@
+import { MediaFile } from "@storyteller/components/src/api/media_files/GetMediaFile";
 import React from "react";
-import MediaData from "./MediaDataTypes";
 
 interface MediaImageComponentProps {
-  mediaData: MediaData;
+  mediaFile: MediaFile;
 }
 
 export default function MediaImageComponent({
-  mediaData,
+  mediaFile,
 }: MediaImageComponentProps) {
   return (
     <div>
       <img
-        src={mediaData.public_bucket_path}
+        src={mediaFile.public_bucket_path}
         alt="test"
         width="400"
         height="300"

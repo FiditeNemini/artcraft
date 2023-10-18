@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { BucketConfig } from "@storyteller/components/src/api/BucketConfig";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlay, faPause } from "@fortawesome/pro-solid-svg-icons";
-import MediaData from "./MediaDataTypes";
+import { MediaFile } from "@storyteller/components/src/api/media_files/GetMediaFile";
 
 enum PlaybackSpeed {
   HALF,
@@ -13,10 +13,10 @@ enum PlaybackSpeed {
 }
 
 interface MediaAudioPlayerProps {
-  mediaData: MediaData;
+  mediaFile: MediaFile;
 }
 
-export default function MediaAudioPlayer({ mediaData }: MediaAudioPlayerProps) {
+export default function MediaAudioPlayer({ mediaFile }: MediaAudioPlayerProps) {
   let [isPlaying, setIsPlaying] = useState(false);
   let [isRepeating, setIsRepeating] = useState(false);
   let [playbackSpeed, setPlaybackSpeed] = useState(PlaybackSpeed.NORMAL);
@@ -40,12 +40,12 @@ export default function MediaAudioPlayer({ mediaData }: MediaAudioPlayerProps) {
 
   useEffect(() => {
     const audioLink = new BucketConfig().getGcsUrl(
-      mediaData.public_bucket_path
+      mediaFile.public_bucket_path
     );
     if (waveSurfer) {
       waveSurfer.load(audioLink);
     }
-  }, [waveSurfer, mediaData]);
+  }, [waveSurfer, mediaFile]);
 
   useEffect(() => {
     if (waveSurfer) {

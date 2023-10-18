@@ -4440,6 +4440,7 @@ __metadata:
     "@types/uuid": ^8.3.0
     "@types/wavesurfer.js": ^5.2.0
     axios: ^0.21.0
+    bootstrap: 5.1.3
     bulma: ^0.9.0
     craco: ^0.0.3
     date-fns: 2.22.1
@@ -4569,7 +4570,6 @@ __metadata:
   resolution: "@storyteller/root@workspace:."
   dependencies:
     "@react-spring/types": ^9.7.3
-    bootstrap: 5.1.3
     craco: ^0.0.3
     lerna: ^4.0.0
     yarn: ^1.22.19
