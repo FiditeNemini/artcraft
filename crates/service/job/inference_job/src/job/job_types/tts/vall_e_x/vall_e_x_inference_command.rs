@@ -195,13 +195,13 @@ impl VallEXInferenceCommand {
         command.push_str(" --audio-name ");
         command.push_str(&path_to_string(args.output_file_name));
 
-        command.push_str(" mode ");
+        command.push_str(" --mode ");
         command.push_str(&path_to_string("0"));
         // TODO improve and use a better model for premium users
         command.push_str(" --whisper-model ");
         command.push_str(&path_to_string(Path::new("medium")));
 
-        command.push_str(" whisper-path ");
+        command.push_str(" --whisper-folder-path ");
         command.push_str(&path_to_string(Path::new("/tmp/downloads/zero_shot_tts/vall-e-x_1.0/medium.pt")));
 
         command.push_str(" --vocos-folder-path ");
