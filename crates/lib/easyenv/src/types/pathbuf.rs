@@ -56,7 +56,7 @@ pub fn get_env_pathbuf_or_default<P: AsRef<Path>>(env_name: &str, default_value:
     })
 }
 
-fn get_env_pathbuf_internal(env_name: &str) -> Result<Option<PathBuf>, EnvError> {
+pub (crate) fn get_env_pathbuf_internal(env_name: &str) -> Result<Option<PathBuf>, EnvError> {
   match env::var(env_name).as_ref() {
     Err(err) => match err {
       // TODO: EnvError enum variant for equals sign in env var name

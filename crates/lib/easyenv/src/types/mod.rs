@@ -1,5 +1,5 @@
-pub mod boolean;
-pub mod duration;
-pub mod pathbuf;
-pub mod string;
-pub mod num;
+pub (crate) mod boolean;
+pub (crate) mod duration;
+pub (crate) mod pathbuf;
+pub (crate) mod string;
+pub (crate) mod num;

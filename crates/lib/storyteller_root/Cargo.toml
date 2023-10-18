@@ -1,0 +1,26 @@
+[package]
+name = "storyteller_root"
+edition = "2018"
+version = "0.0.1"
+authors = [
+    "Brandon Thomas <bt@brand.io>",
+    "Brandon Thomas <echelon@gmail.com>",
+]
+publish = false
+
+[lib]
+name = "storyteller_root"
+path = "src/lib.rs"
+
+[dependencies]
+# Internal
+errors = { path = "../errors" }
+
+# External
+dotenv = "0.15.0"
+env_logger = "0.10.0"
+log = "0.4.14"
+
+[dev-dependencies]
+serial_test = "2.0.0"
+tempdir = "0.3.7"
