@@ -44,7 +44,7 @@ static IGNORED_ENVIRONMENT_VARS : Lazy<HashSet<String>> = Lazy::new(|| {
 pub struct InferenceArgs<P: AsRef<Path>> {
     /// --driven_audio: path to the input audio
     pub input_embedding_path: P, // name of the embedding.npz in the work dir
-    pub input_text: P, // name of the text
+    pub input_text: String, // name of the text
     /// --result_file: path to final file output
     pub output_file_name: P, // output file name in the output folder
     pub stderr_output_file: P
@@ -187,7 +187,7 @@ impl VallEXInferenceCommand {
         // ===== Begin Python Args =====
     
         command.push_str(" --text ");
-        command.push_str(&path_to_string(args.input_text));
+        command.push_str(&format!("\"{}\"",&args.input_text));
     
         command.push_str(" --prompt-name ");
         command.push_str(&path_to_string(args.input_embedding_path));
@@ -202,13 +202,16 @@ impl VallEXInferenceCommand {
         command.push_str(&path_to_string(Path::new("medium")));
 
         command.push_str(" --whisper-folder-path ");
-        command.push_str(&path_to_string(Path::new("/tmp/downloads/zero_shot_tts/vall-e-x_1.0/medium.pt")));
+        command.push_str(&path_to_string(Path::new("/tmp/downloads/zero_shot_tts/vall-e-x_1.0/whisper/")));
 
         command.push_str(" --vocos-folder-path ");
         command.push_str(&path_to_string(Path::new("/tmp/downloads/zero_shot_tts/vall-e-x_1.0/vocos-encodec/")));
 
         command.push_str(" --vallex-path ");
         command.push_str(&path_to_string(Path::new("/tmp/downloads/zero_shot_tts/vall-e-x_1.0/vallex-checkpoint.pt")));
+
+        command.push_str(" --tmp-work-dir ");
+        command.push_str(&path_to_string(Path::new("/tmp/downloads/zero_shot_tts/")));
 
         // ===== End Python Args =====
     
