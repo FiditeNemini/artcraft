@@ -2,6 +2,20 @@
 -- noinspection SqlNoDataSourceInspectionForFile
 -- noinspection SqlResolveForFile
 
+-- Per-user password resets.
+-- Password resets are valid until any of the following are true:
+--
+--   1) database NOW() > password_rests.expires_at
+--   2) password_rests.is_redeemed == TRUE
+--   3) users.password_version > password_resets.current_password_version
+--
+-- When creating a new password reset, send the user an email with the `secret_key` in the URL.
+-- The user will have to supply their username and/or email address, plus the secret key to
+-- redeem the password reset.
+--
+-- Also when creating the password hash, be sure to set `expires_at` to be "NOW() + 3 hours", or
+-- some other small, reasonable time frame.
+--
 CREATE TABLE password_resets (
   -- Not used for anything except replication.
   id BIGINT(20) NOT NULL AUTO_INCREMENT,
@@ -22,7 +36,7 @@ CREATE TABLE password_resets (
   -- reset is no longer valid.
   current_password_version INT NOT NULL DEFAULT 0,
 
-  -- Username is a lookup key; display_name allows the user to add custom case.
+  -- Whether the password reset has been consumed.
   is_redeemed BOOLEAN NOT NULL DEFAULT false,
 
   -- For abuse tracking.
@@ -44,6 +58,9 @@ CREATE TABLE password_resets (
   -- INDICES --
   PRIMARY KEY (id),
   UNIQUE KEY (token),
+
+  UNIQUE KEY (user_token, secret_key),
+
   KEY fk_user_token (user_token),
   KEY index_secret_key (secret_key),
   KEY index_expires_at (expires_at)
