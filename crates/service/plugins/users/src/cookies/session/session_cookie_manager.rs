@@ -13,7 +13,7 @@ use log::warn;
 use cookies::jwt_signer::JwtSigner;
 use errors::AnyhowResult;
 
-use crate::cookies::session_cookie_payload::SessionCookiePayload;
+use crate::cookies::session::session_cookie_payload::SessionCookiePayload;
 
 /**
  * Cookie version history
@@ -136,7 +136,7 @@ impl SessionCookieManager {
 
 #[cfg(test)]
 mod tests {
-  use crate::cookies::session_cookie_manager::SessionCookieManager;
+  use crate::cookies::session::session_cookie_manager::SessionCookieManager;
 
   #[test]
   fn test_cookie_payload() {

@@ -19,7 +19,7 @@ use mysql_queries::queries::users::user::lookup_user_for_login_by_email::lookup_
 use mysql_queries::queries::users::user::lookup_user_for_login_by_username::lookup_user_for_login_by_username;
 use mysql_queries::queries::users::user_sessions::create_user_session::create_user_session;
 
-use crate::cookies::session_cookie_manager::SessionCookieManager;
+use crate::cookies::session::session_cookie_manager::SessionCookieManager;
 
 #[derive(Deserialize)]
 pub struct LoginRequest {
