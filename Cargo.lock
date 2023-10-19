@@ -1439,7 +1439,7 @@ dependencies = [
  "errors",
  "hmac 0.10.1",
  "jwt",
- "sha2 0.9.5",
+ "sha2 0.10.5",
 ]
 
 [[package]]
@@ -3158,7 +3158,7 @@ dependencies = [
  "hmac 0.10.1",
  "serde",
  "serde_json",
- "sha2 0.9.5",
+ "sha2 0.9.9",
 ]
 
 [[package]]
@@ -3362,7 +3362,7 @@ dependencies = [
  "des",
  "digest 0.9.0",
  "md-5",
- "sha2 0.9.5",
+ "sha2 0.9.9",
  "tiger",
 ]
 
@@ -5162,13 +5162,13 @@ dependencies = [
 
 [[package]]
 name = "sha2"
-version = "0.9.5"
+version = "0.9.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b362ae5752fd2137731f9fa25fd4d9058af34666ca1966fb969119cc35719f12"
+checksum = "4d58a1e1bf39749807d89cf2d98ac2dfa0ff1cb3faa38fbb64dd88ac8013d800"
 dependencies = [
  "block-buffer 0.9.0",
  "cfg-if 1.0.0",
- "cpufeatures 0.1.1",
+ "cpufeatures 0.2.5",
  "digest 0.9.0",
  "opaque-debug",
 ]
@@ -5573,7 +5573,7 @@ dependencies = [
  "serde",
  "serde_derive",
  "serde_json",
- "sha2 0.9.5",
+ "sha2 0.10.5",
  "speculoos",
  "sqlx",
  "subprocess",
@@ -6634,7 +6634,7 @@ dependencies = [
  "serde",
  "serde_derive",
  "serde_json",
- "sha2 0.9.5",
+ "sha2 0.10.5",
  "sqlx",
  "time 0.2.26",
  "tokio 1.25.0",
@@ -6869,7 +6869,7 @@ dependencies = [
  "serde",
  "serde_derive",
  "serde_json",
- "sha2 0.9.5",
+ "sha2 0.10.5",
  "sqlx",
  "sqlx_mysql_helpers",
  "time 0.2.26",
@@ -7204,7 +7204,7 @@ dependencies = [
  "serde",
  "serde_derive",
  "serde_json",
- "sha2 0.9.5",
+ "sha2 0.10.5",
  "sqlx",
  "time 0.2.26",
  "tokio 1.25.0",
