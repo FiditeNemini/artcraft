@@ -96,7 +96,7 @@ class ApiConfig {
   }
 
   createAccount(): string {
-    return `${this.getApiOrigin()}/v1/create_account`;
+    return `${this.getApiOrigin()}/create_account`;
   }
 
   login(): string {
