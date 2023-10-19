@@ -4,6 +4,7 @@ use errors::AnyhowResult;
 use crate::payloads::generic_inference_args::lipsync_payload::LipsyncArgs;
 use crate::payloads::generic_inference_args::tts_payload::TTSArgs;
 
+
 /// Used to encode extra state for the `generic_inference_jobs` table.
 /// This should act somewhat like a serialized protobuf stored inside a record.
 #[derive(Clone, Debug, Serialize, Deserialize)]
@@ -55,10 +56,10 @@ pub enum PolymorphicInferenceArgs {
   La (LipsyncArgs),
 
   /// Text to speech. (Short name to save space when serializing.)
-  Tts(TTSArgs)
+  Tts(TTSArgs),
     // No arguments yet.
     // It might be best to just not include this when not used.
-    ,
+    
   /// Voice conversion. (Short name to save space when serializing.)
   Vc {
     /// Argument for so-vits-svc

@@ -40,9 +40,14 @@ pub fn validate_job(job: &AvailableInferenceJob) -> Result<JobArgs, ProcessSingl
       return Err(ProcessSingleJobError::from_anyhow_error(anyhow!("wrong inner args for job!")));
     }
   };
+  
+  if let Some(voice_token) = &ttsArgs.voice_token {
+    Ok(JobArgs {
+      voice_token: voice_token.clone()
+    })
+  } else {
+    return Err(ProcessSingleJobError::from_anyhow_error(anyhow!("Missing Voice Token!")))
+  }
 
-  Ok(JobArgs {
-    voice_token: ttsArgs.voice_token.clone()
-  })
 
 }

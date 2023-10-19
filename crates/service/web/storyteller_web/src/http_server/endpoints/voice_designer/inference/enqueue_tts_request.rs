@@ -39,7 +39,6 @@ pub struct EnqueueTTSRequestSuccessResponse {
   pub inference_job_token: InferenceJobToken
 }
 
-
 #[derive(Debug)]
 pub enum EnqueueTTSRequestError {
   BadInput(String),
@@ -127,7 +126,8 @@ let ip_address = get_request_ip(&http_request);
 
 // package as larger component args should always have an embedding token ..
 let inference_args = TTSArgs {
-  voice_token: request.voice_token.clone()
+  voice_token: Some(request.voice_token.clone()),
+  dataset_token: None 
 };
 
 // create the inference args here
