@@ -4,14 +4,24 @@ use log::warn;
 use sqlx::{MySql, MySqlPool};
 use sqlx::pool::PoolConnection;
 
+use enums::by_table::media_files::media_file_type::MediaFileType;
 use errors::AnyhowResult;
+use tokens::tokens::media_files::MediaFileToken;
 use tokens::tokens::users::UserToken;
 use tokens::tokens::zs_voice_dataset_samples::ZsVoiceDatasetSampleToken;
 use tokens::tokens::zs_voice_datasets::ZsVoiceDatasetToken;
 
 pub struct DatasetSampleRecordForList {
-    pub token: ZsVoiceDatasetSampleToken,
-    pub dataset_token: ZsVoiceDatasetToken,
+    pub sample_token: ZsVoiceDatasetSampleToken,
+
+    pub media_file_token: MediaFileToken,
+    pub media_type: MediaFileType,
+
+    // Bucket path, prefix, and extension are all that are required to construct a path to
+    // download media from cloud buckets.
+    pub public_bucket_directory_hash: String,
+    pub maybe_public_bucket_prefix: Option<String>,
+    pub maybe_public_bucket_extension: Option<String>,
 
     pub maybe_creator_user_token: Option<UserToken>,
 
@@ -21,7 +31,7 @@ pub struct DatasetSampleRecordForList {
 }
 
 
-pub async fn list_samples(
+pub async fn list_dataset_samples_for_dataset_token(
     dataset_token: &ZsVoiceDatasetToken,
     can_see_deleted: bool,
     mysql_pool: &MySqlPool,
@@ -65,8 +75,12 @@ pub async fn list_samples_by_dataset_token_with_connection(
     Ok(records.into_iter()
         .map(|record| {
             DatasetSampleRecordForList {
-                token: record.token,
-                dataset_token: record.dataset_token,
+                sample_token: record.token,
+                media_file_token: record.media_file_token,
+                media_type: record.media_type,
+                public_bucket_directory_hash: record.public_bucket_directory_hash,
+                maybe_public_bucket_prefix: record.maybe_public_bucket_prefix,
+                maybe_public_bucket_extension: record.maybe_public_bucket_extension,
                 maybe_creator_user_token: record.maybe_creator_user_token,
                 created_at: record.created_at,
                 updated_at: record.updated_at,
@@ -87,11 +101,17 @@ async fn list_samples_by_dataset_token(
             r#"
                 SELECT
                     zds.token as `token: tokens::tokens::zs_voice_dataset_samples::ZsVoiceDatasetSampleToken`,
-                    zds.dataset_token as `dataset_token: tokens::tokens::zs_voice_datasets::ZsVoiceDatasetToken`,
+                    zds.media_file_token as `media_file_token: tokens::tokens::media_files::MediaFileToken`,
+                    m.media_type as `media_type: enums::by_table::media_files::media_file_type::MediaFileType`,
+                    m.public_bucket_directory_hash,
+                    m.maybe_public_bucket_prefix,
+                    m.maybe_public_bucket_extension,
                     zds.maybe_creator_user_token as `maybe_creator_user_token: tokens::tokens::users::UserToken`,
                     zds.created_at,
                     zds.updated_at
                 FROM zs_voice_dataset_samples as zds
+                JOIN media_files as m
+                    ON zds.media_file_token = m.token
                 WHERE zds.dataset_token = ?
                     AND zds.user_deleted_at IS NULL
                     AND zds.mod_deleted_at IS NULL
@@ -104,11 +124,17 @@ async fn list_samples_by_dataset_token(
             r#"
                 SELECT
                     zds.token as `token: tokens::tokens::zs_voice_dataset_samples::ZsVoiceDatasetSampleToken`,
-                    zds.dataset_token as `dataset_token: tokens::tokens::zs_voice_datasets::ZsVoiceDatasetToken`,
+                    zds.media_file_token as `media_file_token: tokens::tokens::media_files::MediaFileToken`,
+                    m.media_type as `media_type: enums::by_table::media_files::media_file_type::MediaFileType`,
+                    m.public_bucket_directory_hash,
+                    m.maybe_public_bucket_prefix,
+                    m.maybe_public_bucket_extension,
                     zds.maybe_creator_user_token as `maybe_creator_user_token: tokens::tokens::users::UserToken`,
                     zds.created_at,
                     zds.updated_at
                 FROM zs_voice_dataset_samples as zds
+                JOIN media_files as m
+                    ON zds.media_file_token = m.token
                 WHERE zds.dataset_token = ?
             "#,
             dataset_token
@@ -121,7 +147,13 @@ async fn list_samples_by_dataset_token(
 
 struct InternalRawDatasetSampleRecordForList {
     token: ZsVoiceDatasetSampleToken,
-    dataset_token: ZsVoiceDatasetToken,
+
+    media_file_token: MediaFileToken,
+    media_type: MediaFileType,
+
+    public_bucket_directory_hash: String,
+    maybe_public_bucket_prefix: Option<String>,
+    maybe_public_bucket_extension: Option<String>,
 
     maybe_creator_user_token: Option<UserToken>,
 
