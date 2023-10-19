@@ -37,6 +37,7 @@ use crate::http_server::endpoints::inference_job::terminate_inference_job_handle
 use crate::http_server::endpoints::investor_demo::disable_demo_mode_handler::disable_demo_mode_handler;
 use crate::http_server::endpoints::investor_demo::enable_demo_mode_handler::enable_demo_mode_handler;
 use crate::http_server::endpoints::leaderboard::get_leaderboard::leaderboard_handler;
+use crate::http_server::endpoints::media_files::delete_media_file::delete_media_file_handler;
 use crate::http_server::endpoints::media_files::get_media_file::get_media_file_handler;
 use crate::http_server::endpoints::media_uploads::list_user_media_uploads_of_type::list_user_media_uploads_of_type_handler;
 use crate::http_server::endpoints::media_uploads::upload_audio::upload_audio_handler;
@@ -982,6 +983,7 @@ fn add_media_file_routes<T, B> (app: App<T>) -> App<T>
   app.service(web::scope("/v1/media_files")
       .service(web::resource("/file/{token}")
           .route(web::get().to(get_media_file_handler))
+          .route(web::delete().to(delete_media_file_handler))
           .route(web::head().to(|| HttpResponse::Ok()))
       )
   )
