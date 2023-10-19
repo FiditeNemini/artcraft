@@ -111,7 +111,7 @@ toml = "0.5.8"
 pulldown-cmark = "0.8.0"
 
 # Temporary (just to ask for oauth credentials during dev)
-rpassword = "5.0.1"
+rpassword = "7.2.0"
 
 [build-dependencies]
 # NB: Only using diesel for migrations support
