@@ -21,7 +21,7 @@ use mysql_queries::queries::users::user_sessions::create_user_session::create_us
 use mysql_queries::tokens::Tokens;
 use user_input_common::check_for_slurs::contains_slurs;
 
-use crate::cookies::session_cookie_manager::SessionCookieManager;
+use crate::cookies::session::session_cookie_manager::SessionCookieManager;
 use crate::utils::email_to_gravatar::email_to_gravatar;
 use crate::validations::is_reserved_username::is_reserved_username;
 use crate::validations::validate_passwords::validate_passwords;

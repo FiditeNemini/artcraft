@@ -13,6 +13,7 @@ const VISITOR_COOKIE_NAME : &str = "visitor";
 /// Handle "anonymous visitor tracking" cookies.
 /// This enables us to associate results with an anonymous user for a better experience,
 /// as well as do some form of return visitor tracking.
+#[derive(Clone)]
 pub struct AvtCookieManager {
   cookie_domain: String,
   jwt_signer: JwtSigner,

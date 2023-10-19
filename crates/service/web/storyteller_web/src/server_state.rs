@@ -15,7 +15,8 @@ use mysql_queries::queries::w2l::w2l_templates::list_w2l_templates::W2lTemplateR
 use redis_caching::redis_ttl_cache::RedisTtlCache;
 use reusable_types::server_environment::ServerEnvironment;
 use url_config::third_party_url_redirector::ThirdPartyUrlRedirector;
-use users_component::cookies::session_cookie_manager::SessionCookieManager;
+use users_component::cookies::anonymous_visitor_tracking::avt_cookie_manager::AvtCookieManager;
+use users_component::cookies::session::session_cookie_manager::SessionCookieManager;
 use users_component::utils::session_checker::SessionChecker;
 
 use crate::http_server::endpoints::categories::tts::list_fully_computed_assigned_tts_categories::list_fully_computed_assigned_tts_categories::ModelTokensByCategoryToken;
@@ -58,7 +59,8 @@ pub struct ServerState {
 
   pub redis_rate_limiters: RedisRateLimiters,
 
-  pub cookie_manager: SessionCookieManager,
+  pub session_cookie_manager: SessionCookieManager,
+  pub avt_cookie_manager: AvtCookieManager,
 
   pub session_checker: SessionChecker,
 
