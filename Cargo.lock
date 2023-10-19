@@ -1421,6 +1421,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "cookies"
+version = "0.0.1"
+dependencies = [
+ "errors",
+ "hmac 0.10.1",
+ "jwt",
+ "sha2 0.9.5",
+]
+
+[[package]]
 name = "copyless"
 version = "0.1.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -5551,6 +5561,7 @@ dependencies = [
  "cloud_storage",
  "config",
  "container_common",
+ "cookies",
  "data-encoding",
  "datetimes",
  "derive_more",

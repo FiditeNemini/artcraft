@@ -90,6 +90,7 @@ pub const RESERVED_SUBSTRINGS : &str = include_str!("../../../../../includes/bin
 
 pub mod billing;
 pub mod configs;
+pub mod cookies;
 pub mod http_server;
 pub mod memory_cache;
 pub mod model;

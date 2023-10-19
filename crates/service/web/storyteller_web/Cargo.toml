@@ -22,6 +22,7 @@ buckets = { path = "../../../_types/buckets" }
 cloud_storage = { path = "../../../lib/api_clients/cloud_storage" }
 config = { path = "../../../lib/deprecated/config" }
 container_common = { path = "../../../lib/deprecated/container_common" }
+cookies = { path = "../../../lib/cookies" }
 datetimes = { path = "../../../lib/datetimes" }
 easyenv = { path = "../../../lib/easyenv" }
 enums = { path = "../../../_types/enums" }
