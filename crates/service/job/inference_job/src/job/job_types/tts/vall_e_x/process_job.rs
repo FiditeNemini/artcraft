@@ -8,6 +8,9 @@ use enums::by_table::generic_inference_jobs::inference_result_type::InferenceRes
 use log::{ error, info, warn };
 use mysql_queries::queries::media_files::insert_media_file_from_zero_shot_tts::InsertArgs;
 use mysql_queries::queries::media_files::insert_media_file_from_zero_shot_tts::insert_media_file_from_face_zero_shot;
+use mysql_queries::queries::voice_designer::datasets::get_dataset::get_dataset_by_token;
+use mysql_queries::queries::voice_designer::voice_samples::get_dataset_sample;
+use mysql_queries::queries::voice_designer::voice_samples::get_dataset_sample::get_dataset_sample_by_token;
 use mysql_queries::queries::voice_designer::voices::get_voice::get_voice_by_token;
 use std::path::PathBuf;
 use std::time::Instant;
@@ -68,6 +71,17 @@ pub async fn process_create_voice(
     args: VALLEXProcessJobArgs<'_>,
     dataset_token: String
 ) -> Result<JobSuccessResult, ProcessSingleJobError> {
+
+    let deps = args.job_dependencies;
+    let job = args.job;
+    let mysql_pool = &deps.mysql_pool;
+    // get some globals
+    let mut job_progress_reporter = deps.job_progress_reporter
+        .new_generic_inference(job.inference_job_token.as_str())
+        .map_err(|e| ProcessSingleJobError::Other(anyhow!(e)))?;
+
+        let voice_dataset_token = tokens::tokens::zs_voice_datasets::ZsVoiceDatasetToken(dataset_token);
+
     Err(ProcessSingleJobError::Other(anyhow!("Error")))
 }
 
@@ -239,7 +253,6 @@ pub async fn process_job(
 ) -> Result<JobSuccessResult, ProcessSingleJobError> {
     let job = args.job;
     let deps = args.job_dependencies;
-    let mysql_pool = &deps.mysql_pool;
 
     // get args token
     let jobArgs = validate_job(&job)?; // bubbles error up
