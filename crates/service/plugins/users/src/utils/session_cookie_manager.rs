@@ -70,12 +70,12 @@ impl SessionCookieManager {
       && !self.cookie_domain.to_lowercase().contains("localhost");
 
     Ok(Cookie::build(SESSION_COOKIE_NAME, jwt_string)
-      //.domain(&self.cookie_domain)
       .secure(make_secure) // HTTPS-only
+      .permanent()
+      //.domain(&self.cookie_domain)
       //.path("/")
       //.http_only(true) // Not exposed to Javascript
       //.expires(OffsetDateTime::now_utc() + time::Duration::days(365))
-      .permanent()
       //.same_site(SameSite::Lax)
       .finish())
   }

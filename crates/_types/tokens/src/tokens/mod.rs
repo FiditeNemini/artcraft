@@ -1,3 +1,4 @@
+pub mod anonymous_visitor_tracking;
 pub mod audit_logs;
 pub mod comments;
 pub mod generic_download_jobs;

@@ -24,6 +24,7 @@ members = [
   "crates/lib/caching/memory_caching",
   "crates/lib/caching/redis_caching",
   "crates/lib/concurrency",
+  "crates/lib/cookies",
   "crates/lib/crockford",
   "crates/lib/datetimes",
   "crates/lib/deprecated/config", # TODO(bt, 2023-02-13): Deprecate or repurpose
