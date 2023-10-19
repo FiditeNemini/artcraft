@@ -2,9 +2,14 @@ import React from "react";
 import WaveSurfer from "wavesurfer.js";
 import { useEffect, useState } from "react";
 import { BucketConfig } from "@storyteller/components/src/api/BucketConfig";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faPlay, faPause } from "@fortawesome/pro-solid-svg-icons";
+import {
+  faPlay,
+  faPause,
+  faRepeat,
+  faArrowRight,
+} from "@fortawesome/pro-solid-svg-icons";
 import { MediaFile } from "@storyteller/components/src/api/media_files/GetMediaFile";
+import Button from "components/common/Button";
 
 enum PlaybackSpeed {
   HALF,
@@ -26,13 +31,12 @@ export default function MediaAudioPlayer({ mediaFile }: MediaAudioPlayerProps) {
     const wavesurferInstance = WaveSurfer.create({
       container: "#waveform", // Previousy I used 'this.ref.current' and React.createRef()
       height: 200,
-
       responsive: true,
       waveColor: "#cbcbcb",
       progressColor: "#fc8481",
       cursorColor: "#fc6b68",
       cursorWidth: 2,
-      normalize: false,
+      normalize: true,
     });
 
     setWaveSurfer(wavesurferInstance);
@@ -93,20 +97,12 @@ export default function MediaAudioPlayer({ mediaFile }: MediaAudioPlayerProps) {
     setPlaybackSpeed(nextSpeed);
   };
 
-  let playButtonText = (
-    <>
-      <FontAwesomeIcon icon={faPlay} />
-    </>
-  );
+  let playButtonIcon = faPlay;
   if (isPlaying) {
-    playButtonText = (
-      <>
-        <FontAwesomeIcon icon={faPause} />
-      </>
-    );
+    playButtonIcon = faPause;
   }
 
-  let repeatButtonText = isRepeating ? "Repeat" : "NoRepeat";
+  let repeatButtonIcon = isRepeating ? faRepeat : faArrowRight;
 
   let speedButtonText = "1x";
   switch (playbackSpeed) {
@@ -117,33 +113,34 @@ export default function MediaAudioPlayer({ mediaFile }: MediaAudioPlayerProps) {
       speedButtonText = "2x";
       break;
     case PlaybackSpeed.HALF:
-      speedButtonText = "1/2x";
+      speedButtonText = "0.5x";
       break;
   }
 
   return (
     <div>
       <div id="waveform"></div>
-      <div className="d-flex gap-4 flex-column justify-content-center align-items-center mt-4">
-        <div className="d-flex gap-2">
-          <button className="btn btn-primary" onClick={() => togglePlayPause()}>
-            {playButtonText}
-          </button>
+      <div className="d-flex justify-content-center gap-2 mt-3">
+        <Button
+          square={true}
+          icon={playButtonIcon}
+          onClick={() => togglePlayPause()}
+        />
 
-          <button
-            className="btn btn-secondary"
-            onClick={() => toggleIsRepeating()}
-          >
-            {repeatButtonText}
-          </button>
+        <Button
+          tooltip="Toggle Repeat"
+          variant="secondary"
+          square={true}
+          icon={repeatButtonIcon}
+          onClick={() => toggleIsRepeating()}
+        />
 
-          <button
-            className="btn btn-secondary"
-            onClick={() => togglePlaybackSpeed()}
-          >
-            {speedButtonText}
-          </button>
-        </div>
+        <Button
+          tooltip="Speed"
+          label={speedButtonText}
+          variant="secondary"
+          onClick={() => togglePlaybackSpeed()}
+        />
       </div>
     </div>
   );

@@ -310,6 +310,15 @@ styles with important tags:
       box-shadow: none !important;
     }
 
+    .video-bg {
+      background-color: $black;
+    }
+
+    .panel-border {
+      border-color: #ffffff12 !important;
+      border: 1px solid;
+    }
+
     .panel-inner {
       background-color: lighten($panel, 4%);
     }
@@ -510,7 +519,7 @@ styles with important tags:
     box-shadow: none;
   }
 
-  .panel-border {
+  .pricing-border {
     box-sizing: border-box;
     box-shadow: inset 0px 0px 0px 3px $primary;
   }
