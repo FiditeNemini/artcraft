@@ -6837,6 +6837,7 @@ dependencies = [
  "bcrypt",
  "chrono",
  "container_common",
+ "cookies",
  "dotenv",
  "enums",
  "errors",

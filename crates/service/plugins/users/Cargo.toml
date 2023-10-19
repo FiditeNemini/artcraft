@@ -16,6 +16,7 @@ path = "src/lib.rs"
 
 # Internal
 container_common = { path = "../../../lib/deprecated/container_common" }
+cookies = { path = "../../../lib/cookies" }
 enums = { path = "../../../_types/enums" }
 errors = { path = "../../../lib/errors" }
 http_server_common = { path = "../../../lib/deprecated/http_server_common" }

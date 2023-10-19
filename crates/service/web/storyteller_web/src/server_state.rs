@@ -15,8 +15,8 @@ use mysql_queries::queries::w2l::w2l_templates::list_w2l_templates::W2lTemplateR
 use redis_caching::redis_ttl_cache::RedisTtlCache;
 use reusable_types::server_environment::ServerEnvironment;
 use url_config::third_party_url_redirector::ThirdPartyUrlRedirector;
+use users_component::cookies::session_cookie_manager::SessionCookieManager;
 use users_component::utils::session_checker::SessionChecker;
-use users_component::utils::session_cookie_manager::SessionCookieManager;
 
 use crate::http_server::endpoints::categories::tts::list_fully_computed_assigned_tts_categories::list_fully_computed_assigned_tts_categories::ModelTokensByCategoryToken;
 use crate::http_server::endpoints::leaderboard::get_leaderboard::LeaderboardInfo;
