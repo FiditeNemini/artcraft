@@ -13,6 +13,7 @@ use std::path::PathBuf;
 use std::time::Instant;
 use mysql_queries::queries::generic_inference::job::list_available_generic_inference_jobs::AvailableInferenceJob;
 
+use crate::job;
 use crate::job::job_loop::job_success_result::JobSuccessResult;
 use crate::job::job_loop::job_success_result::ResultEntity;
 use crate::job::job_loop::process_single_job_error::ProcessSingleJobError;
@@ -21,6 +22,8 @@ use crate::job::job_types::tts::vall_e_x::validate_job::validate_job;
 use crate::job_dependencies::JobDependencies;
 use crate::job::job_types::tts::vall_e_x::vall_e_x_inference_command::InferenceArgs;
 use cloud_storage::bucket_path_unifier::BucketPathUnifier;
+
+use super::validate_job::JobType;
 
 const BUCKET_FILE_PREFIX: &str = "fakeyou_";
 const BUCKET_FILE_EXTENSION: &str = ".wav";
@@ -61,14 +64,20 @@ pub struct VALLEXProcessJobArgs<'a> {
     pub job: &'a AvailableInferenceJob,
 }
 
-// query using the token then grab the bucket hash
-pub async fn process_job(
-    args: VALLEXProcessJobArgs<'_>
+pub async fn process_create_voice(
+    args: VALLEXProcessJobArgs<'_>,
+    dataset_token: String
 ) -> Result<JobSuccessResult, ProcessSingleJobError> {
-    let job = args.job;
-    let deps = args.job_dependencies;
-    let mysql_pool = &deps.mysql_pool;
+    Err(ProcessSingleJobError::Other(anyhow!("Error")))
+}
 
+pub async fn process_inference_voice(
+    args: VALLEXProcessJobArgs<'_>,
+    voice_token: String
+) -> Result<JobSuccessResult, ProcessSingleJobError> {
+    let deps = args.job_dependencies;
+    let job = args.job;
+    let mysql_pool = &deps.mysql_pool;
     // get some globals
     let mut job_progress_reporter = deps.job_progress_reporter
         .new_generic_inference(job.inference_job_token.as_str())
@@ -82,9 +91,7 @@ pub async fn process_job(
         }
     };
 
-    // get args token
-    let jobArgs = validate_job(&job)?; // bubbles error up
-    let voice_token = tokens::tokens::zs_voices::ZsVoiceToken(jobArgs.voice_token);
+    let voice_token = tokens::tokens::zs_voices::ZsVoiceToken(voice_token);
 
     // Get voice bucket hash - from voice token
     let voice_lookup_result = get_voice_by_token(&voice_token, false, &mysql_pool).await;
@@ -179,22 +186,23 @@ pub async fn process_job(
             &result_bucket_object_pathbuf,
             &finished_file,
             &MIME_TYPE
-        ).await // TODO: We should check the mimetype to make sure bad payloads can't get uploaded
+        )
+        .await // TODO: We should check the mimetype to make sure bad payloads can't get uploaded
         .map_err(|e| ProcessSingleJobError::Other(e))?;
 
-    // ==================== UPLOAD AUDIO TO BUCKET ==================== 
+    // ==================== UPLOAD AUDIO TO BUCKET ====================
     info!("Calculating sha256...");
-  
-    let file_checksum = sha256_hash_file(&finished_file)
-        .map_err(|err| {
-          ProcessSingleJobError::Other(anyhow!("Error hashing file: {:?}", err))
-        })?;
- 
-    let file_size_bytes = file_size(&finished_file)
-        .map_err(|err| ProcessSingleJobError::Other(err))?;
+
+    let file_checksum = sha256_hash_file(&finished_file).map_err(|err| {
+        ProcessSingleJobError::Other(anyhow!("Error hashing file: {:?}", err))
+    })?;
+
+    let file_size_bytes = file_size(&finished_file).map_err(|err|
+        ProcessSingleJobError::Other(err)
+    )?;
 
     job_progress_reporter.log_status("done").map_err(|e| ProcessSingleJobError::Other(e))?;
-        
+
     // insert into db the record
     let (media_file_token, id) = insert_media_file_from_face_zero_shot(InsertArgs {
         pool: &args.job_dependencies.mysql_pool,
@@ -210,17 +218,48 @@ pub async fn process_job(
         worker_cluster: &args.job_dependencies.container.cluster_name,
     }).await.map_err(|e| ProcessSingleJobError::Other(e))?;
 
-    info!("Job {:?} complete success! Downloaded, ran inference, and uploaded. Saved model record: {}, Result Token: {}",
-            job.id, id, &media_file_token);
-    
+    info!(
+        "Job {:?} complete success! Downloaded, ran inference, and uploaded. Saved model record: {}, Result Token: {}",
+        job.id,
+        id,
+        &media_file_token
+    );
+
     Ok(JobSuccessResult {
         maybe_result_entity: Some(ResultEntity {
-        entity_type: InferenceResultType::MediaFile,
-        entity_token: media_file_token.to_string(),
+            entity_type: InferenceResultType::MediaFile,
+            entity_token: media_file_token.to_string(),
         }),
         inference_duration,
     })
+}
+// query using the token then grab the bucket hash
+pub async fn process_job(
+    args: VALLEXProcessJobArgs<'_>
+) -> Result<JobSuccessResult, ProcessSingleJobError> {
+    let job = args.job;
+    let deps = args.job_dependencies;
+    let mysql_pool = &deps.mysql_pool;
 
+    // get args token
+    let jobArgs = validate_job(&job)?; // bubbles error up
+
+    match jobArgs.job_type {
+        JobType::Create => {
+            if let Some(voice_dataset_token) = jobArgs.voice_dataset_token {
+                process_create_voice(args, voice_dataset_token).await
+            } else {
+                Err(ProcessSingleJobError::Other(anyhow!("Missing Dataset Token?")))
+            }
+        }
+        JobType::Inference => {
+            if let Some(voice_token) = jobArgs.voice_token {
+                process_inference_voice(args, voice_token).await
+            } else {
+                Err(ProcessSingleJobError::Other(anyhow!("Missing Voice Token?")))
+            }
+        }
+    }
 }
 mod tests {
     #[test]

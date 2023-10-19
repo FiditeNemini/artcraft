@@ -56,12 +56,19 @@ async fn dispatch_zero_shot_model(
     job: &AvailableInferenceJob,
     raw_inference_text: &str,
 ) -> Result<JobSuccessResult, ProcessSingleJobError> {
+
+
+
+
   match job.maybe_model_type {
     Some(InferenceModelType::VallEX) => {
+      
       vall_e_x::process_job::process_job(VALLEXProcessJobArgs {
         job_dependencies,
         job,
       }).await
+
+
     }
     _ => {
       Err(ProcessSingleJobError::Other(anyhow!("not a zero-shot model")))
