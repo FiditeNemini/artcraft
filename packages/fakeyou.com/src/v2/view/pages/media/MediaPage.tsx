@@ -4,7 +4,10 @@ import MediaAudioComponent from "./MediaAudioComponent";
 import MediaVideoComponent from "./MediaVideoComponent";
 import MediaImageComponent from "./MediaImageComponent";
 import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
-import { GetMediaFile, MediaFile } from "@storyteller/components/src/api/media_files/GetMediaFile";
+import {
+  GetMediaFile,
+  MediaFile,
+} from "@storyteller/components/src/api/media_files/GetMediaFile";
 import Container from "components/common/Container";
 import Panel from "components/common/Panel";
 import PageHeader from "components/layout/PageHeader";
@@ -14,8 +17,8 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faCircleExclamation,
   faArrowDownToLine,
-  faCirclePlay,
-  faShare,
+  // faCirclePlay,
+  // faShare,
   faSquareQuote,
 } from "@fortawesome/pro-solid-svg-icons";
 import Accordion from "components/common/Accordion";
@@ -31,7 +34,9 @@ interface MediaPageProps {
 
 export default function MediaPage({ sessionWrapper }: MediaPageProps) {
   const { token } = useParams<{ token: string }>();
-  const [mediaFile, setMediaFile] = useState<MediaFile | undefined | null>(null);
+  const [mediaFile, setMediaFile] = useState<MediaFile | undefined | null>(
+    null
+  );
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<boolean>(false);
 
@@ -86,18 +91,7 @@ export default function MediaPage({ sessionWrapper }: MediaPageProps) {
   if (isLoading)
     return (
       <>
-        <Container type="padded">
-          <div className="pt-4 pb-4">
-            <h2 className="fw-bold mb-1 pt-0 pt-lg-1">
-              <Skeleton type="short" />
-            </h2>
-            <p className="mb-0">
-              <Skeleton type="medium" />
-            </p>
-          </div>
-        </Container>
-
-        <Container type="padded">
+        <Container type="padded" className="pt-4 pt-lg-5">
           <div className="row g-4">
             <div className="col-12 col-xl-8">
               <div className="panel p-3 py-4 p-md-4">
@@ -193,14 +187,10 @@ export default function MediaPage({ sessionWrapper }: MediaPageProps) {
     },
   ];
 
-  let pageTitle = "Result";
-  let pageSubText = "This is the result of your media.";
   let mediaDetails = undefined;
 
   switch (mediaFile.media_type) {
     case MediaFileType.Audio:
-      pageTitle = "Audio Result";
-      pageSubText = mediaFile.token;
       mediaDetails = (
         <Accordion.Item title="Audio Details" defaultOpen={true}>
           <DataTable data={audioDetails} />
@@ -208,8 +198,6 @@ export default function MediaPage({ sessionWrapper }: MediaPageProps) {
       );
       break;
     case MediaFileType.Video:
-      pageTitle = "Video Result";
-      pageSubText = mediaFile.token;
       mediaDetails = (
         <Accordion.Item title="Video Details" defaultOpen={true}>
           <DataTable data={videoDetails} />
@@ -217,8 +205,6 @@ export default function MediaPage({ sessionWrapper }: MediaPageProps) {
       );
       break;
     case MediaFileType.Image:
-      pageTitle = "Image Model";
-      pageSubText = "Image Model SubText";
       break;
     default:
   }
@@ -254,14 +240,9 @@ export default function MediaPage({ sessionWrapper }: MediaPageProps) {
   }
 
   return (
-    <>
-      <Container type="padded" className="py-5">
-        <h2 className="fw-bold mb-1">{pageTitle}</h2>
-        <p className="mb-0">{pageSubText}</p>
-      </Container>
-
-      <Container type="panel">
-        <div className="row g-4 mb-4">
+    <div>
+      <Container type="panel" className="pt-4 pt-lg-5">
+        <div className="row g-4">
           <div className="col-12 col-xl-8">
             <div className="media-wrapper">
               {renderMediaComponent(mediaFile)}
@@ -307,7 +288,7 @@ export default function MediaPage({ sessionWrapper }: MediaPageProps) {
                   onClick={() => {}}
                   className="flex-grow-1"
                 />
-                <div className="d-flex gap-2">
+                {/* <div className="d-flex gap-2">
                   <Button
                     square={true}
                     variant="secondary"
@@ -322,7 +303,7 @@ export default function MediaPage({ sessionWrapper }: MediaPageProps) {
                     onClick={() => {}}
                     tooltip="Share"
                   />
-                </div>
+                </div> */}
               </div>
 
               <Accordion>
@@ -346,6 +327,6 @@ export default function MediaPage({ sessionWrapper }: MediaPageProps) {
           </Panel>
         </Container>
       </div>
-    </>
+    </div>
   );
 }
