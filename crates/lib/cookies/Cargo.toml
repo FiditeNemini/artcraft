@@ -20,7 +20,7 @@ errors = { path = "../errors" }
 # External
 hmac = "0.10.0" # jwt signing
 jwt = "0.13.0"
-sha2 = "0.10.5" # hmac signing
+sha2 = "0.9.5" # hmac signing
 
 [dev-dependencies]
 # None yet
