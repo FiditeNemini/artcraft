@@ -96,19 +96,19 @@ class ApiConfig {
   }
 
   createAccount(): string {
-    return `${this.getApiOrigin()}/create_account`;
+    return `${this.getApiOrigin()}/v1/create_account`;
   }
 
   login(): string {
-    return `${this.getApiOrigin()}/login`;
+    return `${this.getApiOrigin()}/v1/login`;
   }
 
   logout(): string {
-    return `${this.getApiOrigin()}/logout`;
+    return `${this.getApiOrigin()}/v1/logout`;
   }
 
   sessionDetails(): string {
-    return `${this.getApiOrigin()}/session`;
+    return `${this.getApiOrigin()}/v1/session`;
   }
 
   getQueueStats(): string {
