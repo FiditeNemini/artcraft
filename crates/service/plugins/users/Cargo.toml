@@ -47,7 +47,7 @@ jwt = "0.13.0"
 bcrypt = "0.8" # password hashes
 hmac = "0.10.0" # cookies
 md-5 = "0.9.1" # gravatar
-sha2 = "0.9.5" # file hashes, inference text hashes, etc.
+sha2 = "0.10.5" # file hashes, inference text hashes, etc.
 
 # Serialization
 serde = "1.0.125"
