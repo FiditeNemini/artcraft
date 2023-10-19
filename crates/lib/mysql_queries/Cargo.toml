@@ -25,7 +25,7 @@ sqlx_mysql_helpers = { path = "../sqlx_mysql_helpers" }
 tokens = { path = "../../_types/tokens" }
 
 # External
-anyhow = "1.0.40"
+anyhow = "1.0.75"
 base64 = "0.21.0"
 chrono = { version = "0.4.19", features = ["serde"] }
 dotenv = "0.15.0"

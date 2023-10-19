@@ -52,7 +52,7 @@ users_component = { path = "../../plugins/users" }
 newrelic-telemetry = { path = "../../../vendor/newrelic-telemetry-sdk-rust" }
 
 # External
-anyhow = "1.0.40"
+anyhow = "1.0.75"
 base64 = "0.21.0"
 chrono = { version = "0.4.19", features = ["serde"] }
 derive_more = "0.99.14"

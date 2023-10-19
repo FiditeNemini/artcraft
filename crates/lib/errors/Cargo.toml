@@ -17,7 +17,7 @@ path = "src/lib.rs"
 # NB: This is one of the most central crates in the monorepo and everything depends on it.
 # Consider the dependencies here wisely.
 # Ideally we have almost nothing as a dependency of this crate.
-anyhow = "1.0.40"
+anyhow = "1.0.75"
 
 [dev-dependencies]
 # None yet
