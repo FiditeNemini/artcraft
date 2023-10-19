@@ -60,8 +60,8 @@ impl SessionCookieManager {
     Ok(Cookie::build(SESSION_COOKIE_NAME, jwt_string)
       .secure(make_secure) // HTTPS-only
       .permanent()
+      .path("/") // NB: Otherwise it'll be set to `/v1`
       //.domain(&self.cookie_domain)
-      //.path("/")
       //.http_only(true) // Not exposed to Javascript
       //.expires(OffsetDateTime::now_utc() + time::Duration::days(365))
       //.same_site(SameSite::Lax)
@@ -70,6 +70,7 @@ impl SessionCookieManager {
 
   pub fn delete_cookie(&self) -> Cookie {
     let mut cookie = Cookie::build(SESSION_COOKIE_NAME, "DELETED")
+      .path("/") // NB: Otherwise it'll be set to `/v1`
       .expires(actix_web::cookie::time::OffsetDateTime::UNIX_EPOCH)
       .finish();
     cookie.make_removal();

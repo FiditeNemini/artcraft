@@ -49,6 +49,7 @@ impl AvtCookieManager {
   pub fn make_delete_cookie(&self) -> Cookie {
     let mut cookie = Cookie::build(VISITOR_COOKIE_NAME, "DELETED")
         .expires(actix_web::cookie::time::OffsetDateTime::UNIX_EPOCH)
+        .path("/") // NB: Otherwise it'll be set to `/v1`
         .finish();
     cookie.make_removal();
     cookie
