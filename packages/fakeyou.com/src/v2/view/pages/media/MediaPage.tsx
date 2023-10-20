@@ -61,24 +61,39 @@ export default function MediaPage({ sessionWrapper }: MediaPageProps) {
     switch (mediaFile.media_type) {
       case MediaFileType.Audio:
         return (
-          <div className="panel p-3 p-lg-4 d-flex flex-column gap-4 rounded">
+          <div className="panel p-3 p-lg-4 d-flex flex-column">
+            {/* Voice model name that is used to generate the audio */}
+            <h3 className="fw-bold mb-4">[Voice Model Name]</h3>
+
             <MediaAudioComponent mediaFile={mediaFile} />
-            <div>
-              <h5 className="fw-semibold">
-                <FontAwesomeIcon icon={faSquareQuote} className="me-2" />
-                Audio Text
-              </h5>
-              {/*<p>{mediaFile?.audio_text && mediaFile.audio_text}</p>*/}
-            </div>
+
+            {/* Show TTS text input if it is a TTS result */}
+            {mediaFile.public_bucket_path.includes("tts_inference_output") && (
+              <div className="mt-4">
+                <h5 className="fw-semibold">
+                  <FontAwesomeIcon icon={faSquareQuote} className="me-2" />
+                  Audio Text
+                </h5>
+                <p>
+                  Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed
+                  do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+                  Pellentesque elit ullamcorper dignissim cras tincidunt
+                  lobortis. Integer malesuada nunc vel risus commodo viverra
+                  maecenas accumsan lacus.
+                </p>
+              </div>
+            )}
           </div>
         );
       case MediaFileType.Video:
         return (
-          <div className="panel panel-clear">
-            <div className="ratio ratio-16x9">
-              <MediaVideoComponent mediaFile={mediaFile} />
+          <>
+            <div className="panel panel-clear">
+              <div className="ratio ratio-16x9 video-bg panel-border rounded">
+                <MediaVideoComponent mediaFile={mediaFile} />
+              </div>
             </div>
-          </div>
+          </>
         );
 
       case MediaFileType.Image:
@@ -187,24 +202,26 @@ export default function MediaPage({ sessionWrapper }: MediaPageProps) {
     },
   ];
 
+  const imageDetails = [
+    { property: "Type", value: mediaFile.media_type },
+    { property: "Created at", value: mediaFile.created_at.toString() },
+    {
+      property: "Visibility",
+      value: mediaFile.creator_set_visibility.toString(),
+    },
+  ];
+
   let mediaDetails = undefined;
 
   switch (mediaFile.media_type) {
     case MediaFileType.Audio:
-      mediaDetails = (
-        <Accordion.Item title="Audio Details" defaultOpen={true}>
-          <DataTable data={audioDetails} />
-        </Accordion.Item>
-      );
+      mediaDetails = <DataTable data={audioDetails} />;
       break;
     case MediaFileType.Video:
-      mediaDetails = (
-        <Accordion.Item title="Video Details" defaultOpen={true}>
-          <DataTable data={videoDetails} />
-        </Accordion.Item>
-      );
+      mediaDetails = <DataTable data={videoDetails} />;
       break;
     case MediaFileType.Image:
+      mediaDetails = <DataTable data={imageDetails} />;
       break;
     default:
   }
@@ -307,7 +324,10 @@ export default function MediaPage({ sessionWrapper }: MediaPageProps) {
               </div>
 
               <Accordion>
-                {mediaDetails}
+                <Accordion.Item title="Video Details" defaultOpen={true}>
+                  {mediaDetails}
+                </Accordion.Item>
+
                 {modMediaDetails}
               </Accordion>
             </div>
