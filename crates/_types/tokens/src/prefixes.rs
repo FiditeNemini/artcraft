@@ -13,6 +13,8 @@ use strum::EnumIter;
 #[derive(Debug, Copy, Clone, Eq, PartialEq)]
 #[cfg_attr(test, derive(EnumIter, EnumCount))]
 pub(crate) enum EntityType {
+  /// AVTs are not stored as primary keys in any table, but an index in many tables.
+  AnonymousVisitorTracking,
   AuditLog,
   Comment,
   DownloadJob,
@@ -36,6 +38,7 @@ impl EntityType {
 
   pub fn prefix(self) -> &'static str {
     match self {
+      Self::AnonymousVisitorTracking => "avt_",
       Self::AuditLog => "audit_",
       Self::Comment => "comment_",
       Self::DownloadJob => "jdown_", // NB: Was "JGUP:"

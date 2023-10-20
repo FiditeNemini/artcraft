@@ -30,6 +30,11 @@ pub fn add_suggested_api_v1_account_creation_and_session_routes<T, B> (app: App<
             .route(web::head().to(|| HttpResponse::Ok()))
       )
       .service(
+        web::resource("/v1/create_account")
+            .route(web::post().to(create_account_handler))
+            .route(web::head().to(|| HttpResponse::Ok()))
+      )
+      .service(
         web::resource("/login")
             .route(web::post().to(login_handler))
             .route(web::head().to(|| HttpResponse::Ok()))

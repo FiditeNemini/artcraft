@@ -20,7 +20,7 @@ container_common = { path = "../../lib/deprecated/container_common" }
 easyenv = { path = "../../lib/easyenv" }
 
 # External
-anyhow = "1.0.40"
+anyhow = "1.0.75"
 chrono = { version = "0.4.19", features = ["serde"] }
 # TODO/NB: Commenting out clap4 as it prevents windows builds
 # clap4 = { package = "clap", version = "4.0" } # TODO/NB: We're using an older version of clap elsewhere, hence the naming.

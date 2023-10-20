@@ -15,7 +15,7 @@ use mysql_queries::queries::users::user_subscriptions::list_active_user_subscrip
 use redis_caching::redis_ttl_cache::{RedisTtlCache, RedisTtlCacheConnection};
 use redis_common::redis_cache_keys::RedisCacheKeys;
 
-use crate::utils::session_cookie_manager::SessionCookieManager;
+use crate::cookies::session::session_cookie_manager::SessionCookieManager;
 use crate::utils::user_session_extended::{UserSessionExtended, UserSessionPreferences, UserSessionPremiumPlanInfo, UserSessionRoleAndPermissions, UserSessionSubscriptionPlan, UserSessionUserDetails};
 
 #[derive(Clone)]

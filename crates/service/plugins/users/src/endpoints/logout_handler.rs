@@ -14,7 +14,7 @@ use sqlx::MySqlPool;
 use http_server_common::response::response_error_helpers::to_simple_json_error;
 use mysql_queries::queries::users::user_sessions::delete_user_session::delete_user_session;
 
-use crate::utils::session_cookie_manager::SessionCookieManager;
+use crate::cookies::session::session_cookie_manager::SessionCookieManager;
 
 #[derive(Serialize)]
 pub struct LogoutSuccessResponse {

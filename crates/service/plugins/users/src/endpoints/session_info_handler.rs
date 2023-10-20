@@ -13,6 +13,7 @@ use sqlx::MySqlPool;
 
 use http_server_common::response::response_error_helpers::to_simple_json_error;
 
+use crate::cookies::anonymous_visitor_tracking::avt_cookie_manager::AvtCookieManager;
 use crate::utils::session_checker::SessionChecker;
 
 #[derive(Serialize, Copy, Clone)]
@@ -109,6 +110,7 @@ pub async fn session_info_handler(
   http_request: HttpRequest,
   mysql_pool: web::Data<MySqlPool>,
   session_checker: web::Data<SessionChecker>,
+  avt_manager: web::Data<AvtCookieManager>,
 ) -> Result<HttpResponse, SessionInfoError>
 {
   let mut mysql_connection = mysql_pool.acquire()
@@ -174,6 +176,18 @@ pub async fn session_info_handler(
     }
   }
 
+  let maybe_avt_cookie = match avt_manager.decode_cookie_payload_from_request(&http_request) {
+    Ok(Some(_avt_cookie)) => None,
+    _ => {
+      let cookie = avt_manager.make_new_cookie()
+          .map_err(|e| {
+            warn!("avt cookie creation error: {:?}", e);
+            SessionInfoError::ServerError
+          })?;
+      Some(cookie)
+    }
+  };
+
   let response = SessionInfoSuccessResponse {
     success: true,
     logged_in,
@@ -183,7 +197,13 @@ pub async fn session_info_handler(
   let body = serde_json::to_string(&response)
     .map_err(|_e| SessionInfoError::ServerError)?;
 
-  Ok(HttpResponse::Ok()
+  let mut response_builder = HttpResponse::Ok();
+
+  if let Some(cookie) = maybe_avt_cookie {
+    response_builder.cookie(cookie);
+  }
+
+  Ok(response_builder
     .content_type("application/json")
     .body(body))
 }

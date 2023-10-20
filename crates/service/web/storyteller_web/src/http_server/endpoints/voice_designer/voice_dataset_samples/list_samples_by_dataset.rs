@@ -4,17 +4,29 @@ use actix_web::{HttpRequest, HttpResponse, web};
 use actix_web::error::ResponseError;
 use actix_web::http::StatusCode;
 use chrono::{DateTime, Utc};
+use log::warn;
 
-use log::{info, warn};
-use mysql_queries::queries::voice_designer::voice_samples::list_dataset_samples::list_samples;
+use enums::by_table::media_files::media_file_type::MediaFileType;
+use mysql_queries::queries::voice_designer::voice_samples::list_dataset_samples_for_dataset_token::list_dataset_samples_for_dataset_token;
+use tokens::tokens::media_files::MediaFileToken;
+use tokens::tokens::users::UserToken;
+use tokens::tokens::zs_voice_dataset_samples::ZsVoiceDatasetSampleToken;
 use tokens::tokens::zs_voice_datasets::ZsVoiceDatasetToken;
+
 use crate::server_state::ServerState;
 
 #[derive(Serialize, Clone)]
 pub struct ZsSampleRecordForResponse {
-  sample_token: String,
-  dataset_token: String,
-  maybe_creator_user_token: Option<String>,
+  sample_token: ZsVoiceDatasetSampleToken,
+
+  media_file_token: MediaFileToken,
+  media_type: MediaFileType,
+
+  public_bucket_directory_hash: String,
+  maybe_public_bucket_prefix: Option<String>,
+  maybe_public_bucket_extension: Option<String>,
+
+  maybe_creator_user_token: Option<UserToken>,
 
   created_at: DateTime<Utc>,
   updated_at: DateTime<Utc>,
@@ -76,7 +88,7 @@ pub async fn list_samples_by_dataset_handler(
   let dataset_token = ZsVoiceDatasetToken(path.dataset_token.clone());
   let is_mod = user_session.can_ban_users;
 
-  let query_results = list_samples(
+  let query_results = list_dataset_samples_for_dataset_token(
     &dataset_token,
     is_mod,
     &server_state.mysql_pool
@@ -96,12 +108,13 @@ pub async fn list_samples_by_dataset_handler(
   let samples = samples
     .into_iter()
     .map(|sample| ZsSampleRecordForResponse {
-      sample_token: sample.token.to_string(),
-      dataset_token: sample.dataset_token.to_string(),
-      maybe_creator_user_token: match sample.maybe_creator_user_token {
-        Some(user_token) => Some(user_token.to_string()),
-        None => None,
-      },
+      sample_token: sample.sample_token,
+      media_file_token: sample.media_file_token,
+      media_type: sample.media_type,
+      public_bucket_directory_hash: sample.public_bucket_directory_hash,
+      maybe_public_bucket_prefix: sample.maybe_public_bucket_prefix,
+      maybe_public_bucket_extension: sample.maybe_public_bucket_extension,
+      maybe_creator_user_token: sample.maybe_creator_user_token,
       created_at: sample.created_at,
       updated_at: sample.updated_at,
     })

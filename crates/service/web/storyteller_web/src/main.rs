@@ -64,8 +64,9 @@ use redis_caching::redis_ttl_cache::RedisTtlCache;
 use reusable_types::server_environment::ServerEnvironment;
 use twitch_common::twitch_secrets::TwitchSecrets;
 use url_config::third_party_url_redirector::ThirdPartyUrlRedirector;
+use users_component::cookies::anonymous_visitor_tracking::avt_cookie_manager::AvtCookieManager;
+use users_component::cookies::session::session_cookie_manager::SessionCookieManager;
 use users_component::utils::session_checker::SessionChecker;
-use users_component::utils::session_cookie_manager::SessionCookieManager;
 
 use crate::billing::internal_product_to_stripe_lookup_impl::InternalProductToStripeLookupImpl;
 use crate::billing::internal_session_cache_purge_impl::InternalSessionCachePurgeImpl;
@@ -90,6 +91,7 @@ pub const RESERVED_SUBSTRINGS : &str = include_str!("../../../../../includes/bin
 
 pub mod billing;
 pub mod configs;
+pub mod cookies;
 pub mod http_server;
 pub mod memory_cache;
 pub mod model;
@@ -239,9 +241,11 @@ async fn main() -> AnyhowResult<()> {
   let website_homepage_redirect =
       easyenv::get_env_string_or_default("WEBSITE_HOMEPAGE_REDIRECT", "https://vo.codes/");
 
-  let cookie_manager = SessionCookieManager::new(&cookie_domain, &hmac_secret);
+  let session_cookie_manager = SessionCookieManager::new(&cookie_domain, &hmac_secret);
+  let avt_cookie_manager = AvtCookieManager::new(&cookie_domain, &hmac_secret)?;
+
   let session_checker = SessionChecker::new_with_cache(
-    &cookie_manager,
+    &session_cookie_manager,
     redis_ttl_cache.clone(),
   );
 
@@ -456,7 +460,8 @@ async fn main() -> AnyhowResult<()> {
     },
     firehose_publisher,
     badge_granter,
-    cookie_manager,
+    avt_cookie_manager,
+    session_cookie_manager,
     session_checker,
     private_bucket_client,
     public_bucket_client,
@@ -633,7 +638,8 @@ pub async fn serve(server_state: ServerState) -> AnyhowResult<()>
       .app_data(web::Data::new(server_state_arc.redis_pool.clone()))
       .app_data(web::Data::new(server_state_arc.redis_ttl_cache.clone()))
       .app_data(web::Data::new(server_state_arc.session_checker.clone()))
-      .app_data(web::Data::new(server_state_arc.cookie_manager.clone()))
+      .app_data(web::Data::new(server_state_arc.avt_cookie_manager.clone()))
+      .app_data(web::Data::new(server_state_arc.session_cookie_manager.clone()))
       .app_data(web::Data::new(server_state_arc.stripe.clone().config.clone()))
       .app_data(web::Data::new(server_state_arc.stripe.clone().client.clone()))
       .app_data(web::Data::new(server_state_arc.third_party_url_redirector.clone()))

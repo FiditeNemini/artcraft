@@ -8,14 +8,12 @@ use std::collections::BTreeMap;
 use actix_web::cookie::Cookie;
 use actix_web::HttpRequest;
 use anyhow::anyhow;
-use hmac::Hmac;
-use hmac::NewMac;
-use jwt::SignWithKey;
-use jwt::VerifyWithKey;
 use log::warn;
-use sha2::Sha256;
 
+use cookies::jwt_signer::JwtSigner;
 use errors::AnyhowResult;
+
+use crate::cookies::session::session_cookie_payload::SessionCookiePayload;
 
 /**
  * Cookie version history
@@ -34,15 +32,7 @@ const SESSION_COOKIE_NAME : &str = "session";
 pub struct SessionCookieManager {
   cookie_domain: String,
   hmac_secret: String,
-}
-
-#[derive(Clone)]
-pub struct SessionCookiePayload {
-  /// The database primary key for the session instance.
-  pub session_token: String,
-  /// The primary key identifier of the user.
-  /// Version 1 cookies do not have a user token, hence it is optional.
-  pub maybe_user_token: Option<String>,
+  jwt_signer: JwtSigner,
 }
 
 impl SessionCookieManager {
@@ -50,13 +40,11 @@ impl SessionCookieManager {
     Self {
       cookie_domain: cookie_domain.to_string(),
       hmac_secret: hmac_secret.to_string(),
+      jwt_signer: JwtSigner::new(hmac_secret).unwrap(),//TODO FIXME
     }
   }
 
   pub fn create_cookie(&self, session_token: &str, user_token: &str) -> AnyhowResult<Cookie> {
-    let key: Hmac<Sha256> = Hmac::new_varkey(self.hmac_secret.as_bytes())
-      .map_err(|e| anyhow!("invalid hmac: {:?}", e))?;
-
     let cookie_version = COOKIE_VERSION.to_string();
 
     let mut claims = BTreeMap::new();
@@ -64,24 +52,25 @@ impl SessionCookieManager {
     claims.insert("user_token", user_token);
     claims.insert("cookie_version", &cookie_version);
 
-    let jwt_string = claims.sign_with_key(&key)?;
+    let jwt_string = self.jwt_signer.claims_to_jwt(&claims)?;
 
     let make_secure = !self.cookie_domain.to_lowercase().contains("jungle.horse")
       && !self.cookie_domain.to_lowercase().contains("localhost");
 
     Ok(Cookie::build(SESSION_COOKIE_NAME, jwt_string)
-      //.domain(&self.cookie_domain)
       .secure(make_secure) // HTTPS-only
-      //.path("/")
+      .permanent()
+      .path("/") // NB: Otherwise it'll be set to `/v1`
+      //.domain(&self.cookie_domain)
       //.http_only(true) // Not exposed to Javascript
       //.expires(OffsetDateTime::now_utc() + time::Duration::days(365))
-      .permanent()
       //.same_site(SameSite::Lax)
       .finish())
   }
 
   pub fn delete_cookie(&self) -> Cookie {
     let mut cookie = Cookie::build(SESSION_COOKIE_NAME, "DELETED")
+      .path("/") // NB: Otherwise it'll be set to `/v1`
       .expires(actix_web::cookie::time::OffsetDateTime::UNIX_EPOCH)
       .finish();
     cookie.make_removal();
@@ -91,12 +80,9 @@ impl SessionCookieManager {
   pub fn decode_session_cookie_payload(&self, session_cookie: &Cookie)
     -> AnyhowResult<SessionCookiePayload>
   {
-    let key: Hmac<Sha256> = Hmac::new_varkey(self.hmac_secret.as_bytes())
-        .map_err(|e| anyhow!("invalid hmac: {:?}", e))?;
-
     let cookie_contents = session_cookie.value().to_string();
 
-    let claims: BTreeMap<String, String> = cookie_contents.verify_with_key(&key)?;
+    let claims = self.jwt_signer.jwt_to_claims(&cookie_contents)?;
 
     let session_token = claims["session_token"].clone();
     let maybe_user_token = claims.get("user_token")
@@ -149,3 +135,30 @@ impl SessionCookieManager {
   }
 }
 
+#[cfg(test)]
+mod tests {
+  use crate::cookies::session::session_cookie_manager::SessionCookieManager;
+
+  #[test]
+  fn test_cookie_payload() {
+    // NB: Let's make extra sure this always works when migrating cookies, else we'll accidentally log out logged-in users.
+    // (These are version 2 cookies.)
+    let manager = SessionCookieManager::new("fakeyou.com", "secret");
+    let cookie = manager.create_cookie("ex_session_token", "ex_user_token").unwrap();
+
+    assert_eq!(cookie.value(), "eyJhbGciOiJIUzI1NiJ9.eyJjb29raWVfdmVyc2lvbiI6IjIiLCJzZXNzaW9uX3Rva2VuIjoiZXhfc2Vzc2lvbl90b2tlbiIsInVzZXJfdG9rZW4iOiJleF91c2VyX3Rva2VuIn0.94ly2gHhlPVtnANsNy6cJozFVmId4imwW5v-mei7jD8");
+  }
+
+  #[test]
+  fn test_cookie_round_trip() {
+    // NB: Let's make extra sure this always works when migrating cookies, else we'll accidentally log out logged-in users.
+    // (These are version 2 cookies.)
+    let manager = SessionCookieManager::new("fakeyou.com", "secret");
+    let cookie = manager.create_cookie("ex_session_token", "ex_user_token").unwrap();
+
+    let decoded = manager.decode_session_cookie_payload(&cookie).unwrap();
+
+    assert_eq!(decoded.session_token, "ex_session_token".to_string());
+    assert_eq!(decoded.maybe_user_token, Some("ex_user_token".to_string()));
+  }
+}
