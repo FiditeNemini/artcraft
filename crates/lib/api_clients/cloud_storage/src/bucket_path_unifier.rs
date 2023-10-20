@@ -213,7 +213,6 @@ impl BucketPathUnifier {
         .join(speaker_encoding_filename)
   }
 
-
   // ==================== VOICE CONVERSION MODELS ==================== //
 
   // NB: Entropic hash is not based on file hash and is shared between .pth and .index files.
