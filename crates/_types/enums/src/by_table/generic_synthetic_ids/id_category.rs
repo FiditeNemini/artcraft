@@ -21,6 +21,11 @@ pub enum IdCategory {
   #[serde(rename = "lipsync_animation")]
   LipsyncAnimation,
 
+  /// Results from voice conversion (which may live in the media_files table)
+  /// Applies for RVC and SVC
+  #[serde(rename = "voice_conversion")]
+  VoiceConversion,
+
   /// Zs dataset which lives in the zs_voice_datasets table
   #[serde(rename = "zs_dataset")]
   ZsDataset,
@@ -40,6 +45,7 @@ impl IdCategory {
     match self {
       Self::MediaFile => "media_file",
       Self::LipsyncAnimation => "lipsync_animation",
+      Self::VoiceConversion => "voice_conversion",
       Self::ZsDataset => "zs_dataset",
       Self::ZsVoice => "zs_voice",
     }
@@ -49,6 +55,7 @@ impl IdCategory {
     match value {
       "media_file" => Ok(Self::MediaFile),
       "lipsync_animation" => Ok(Self::LipsyncAnimation),
+      "voice_conversion" => Ok(Self::VoiceConversion),
       "zs_dataset" => Ok(Self::ZsDataset),
       "zs_voice" => Ok(Self::ZsVoice),
       _ => Err(format!("invalid value: {:?}", value)),
@@ -61,6 +68,7 @@ impl IdCategory {
     BTreeSet::from([
       Self::MediaFile,
       Self::LipsyncAnimation,
+      Self::VoiceConversion,
       Self::ZsDataset,
       Self::ZsVoice,
     ])
@@ -72,41 +80,70 @@ mod tests {
   use crate::by_table::generic_synthetic_ids::id_category::IdCategory;
   use crate::test_helpers::assert_serialization;
 
-  #[test]
-  fn test_serialization() {
-    assert_serialization(IdCategory::MediaFile, "media_file");
-    assert_serialization(IdCategory::LipsyncAnimation, "lipsync_animation");
+  mod explicit_checks {
+    use super::*;
+
+    #[test]
+    fn test_serialization() {
+      assert_serialization(IdCategory::MediaFile, "media_file");
+      assert_serialization(IdCategory::LipsyncAnimation, "lipsync_animation");
+      assert_serialization(IdCategory::VoiceConversion, "voice_conversion");
+      assert_serialization(IdCategory::ZsDataset, "zs_dataset");
+      assert_serialization(IdCategory::ZsVoice, "zs_voice");
+    }
+
+    #[test]
+    fn to_str() {
+      assert_eq!(IdCategory::MediaFile.to_str(), "media_file");
+      assert_eq!(IdCategory::LipsyncAnimation.to_str(), "lipsync_animation");
+      assert_eq!(IdCategory::VoiceConversion.to_str(), "voice_conversion");
+      assert_eq!(IdCategory::ZsDataset.to_str(), "zs_dataset");
+      assert_eq!(IdCategory::ZsVoice.to_str(), "zs_voice");
+    }
+
+    #[test]
+    fn from_str() {
+      assert_eq!(IdCategory::from_str("media_file").unwrap(), IdCategory::MediaFile);
+      assert_eq!(IdCategory::from_str("lipsync_animation").unwrap(), IdCategory::LipsyncAnimation);
+      assert_eq!(IdCategory::from_str("voice_conversion").unwrap(), IdCategory::VoiceConversion);
+      assert_eq!(IdCategory::from_str("zs_dataset").unwrap(), IdCategory::ZsDataset);
+      assert_eq!(IdCategory::from_str("zs_voice").unwrap(), IdCategory::ZsVoice);
+    }
+
+    #[test]
+    fn all_variants() {
+      // Static check
+      let mut variants = IdCategory::all_variants();
+      assert_eq!(variants.len(), 5);
+      assert_eq!(variants.pop_first(), Some(IdCategory::MediaFile));
+      assert_eq!(variants.pop_first(), Some(IdCategory::LipsyncAnimation));
+      assert_eq!(variants.pop_first(), Some(IdCategory::VoiceConversion));
+      assert_eq!(variants.pop_first(), Some(IdCategory::ZsDataset));
+      assert_eq!(variants.pop_first(), Some(IdCategory::ZsVoice));
+      assert_eq!(variants.pop_first(), None);
+
+      // Generated check
+      use strum::IntoEnumIterator;
+      assert_eq!(IdCategory::all_variants().len(), IdCategory::iter().len());
+    }
   }
 
-  #[test]
-  fn to_str() {
-    assert_eq!(IdCategory::MediaFile.to_str(), "media_file");
-    assert_eq!(IdCategory::LipsyncAnimation.to_str(), "lipsync_animation");
-    assert_eq!(IdCategory::ZsDataset.to_str(), "zs_dataset");
-    assert_eq!(IdCategory::ZsVoice.to_str(), "zs_voice");
-  }
+  mod mechanical_checks {
+    use super::*;
 
-  #[test]
-  fn from_str() {
-    assert_eq!(IdCategory::from_str("media_file").unwrap(), IdCategory::MediaFile);
-    assert_eq!(IdCategory::from_str("lipsync_animation").unwrap(), IdCategory::LipsyncAnimation);
-    assert_eq!(IdCategory::from_str("zs_dataset").unwrap(), IdCategory::ZsDataset);
-    assert_eq!(IdCategory::from_str("zs_voice").unwrap(), IdCategory::ZsVoice);
-  }
+    #[test]
+    fn variant_length() {
+      use strum::IntoEnumIterator;
+      assert_eq!(IdCategory::all_variants().len(), IdCategory::iter().len());
+    }
 
-  #[test]
-  fn all_variants() {
-    // Static check
-    let mut variants = IdCategory::all_variants();
-    assert_eq!(variants.len(), 4);
-    assert_eq!(variants.pop_first(), Some(IdCategory::MediaFile));
-    assert_eq!(variants.pop_first(), Some(IdCategory::LipsyncAnimation));
-    assert_eq!(variants.pop_first(), Some(IdCategory::ZsDataset));
-    assert_eq!(variants.pop_first(), Some(IdCategory::ZsVoice));
-    assert_eq!(variants.pop_first(), None);
-
-    // Generated check
-    use strum::IntoEnumIterator;
-    assert_eq!(IdCategory::all_variants().len(), IdCategory::iter().len());
+    #[test]
+    fn round_trip() {
+      for variant in IdCategory::all_variants() {
+        assert_eq!(variant, IdCategory::from_str(variant.to_str()).unwrap());
+        assert_eq!(variant, IdCategory::from_str(&format!("{}", variant)).unwrap());
+        assert_eq!(variant, IdCategory::from_str(&format!("{:?}", variant)).unwrap());
+      }
+    }
   }
 }

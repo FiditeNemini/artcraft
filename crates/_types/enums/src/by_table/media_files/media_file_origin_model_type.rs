@@ -1,3 +1,5 @@
+use std::collections::BTreeSet;
+
 use serde::Deserialize;
 use serde::Serialize;
 #[cfg(test)]
@@ -9,11 +11,19 @@ use strum::EnumIter;
 ///
 /// DO NOT CHANGE VALUES WITHOUT A MIGRATION STRATEGY.
 #[cfg_attr(test, derive(EnumIter, EnumCount))]
-#[derive(Clone, Copy, Eq, PartialEq, Deserialize, Serialize)]
+#[derive(Clone, Copy, Eq, PartialEq, Hash, Ord, PartialOrd, Deserialize, Serialize)]
 #[serde(rename_all = "snake_case")]
 pub enum MediaFileOriginModelType {
+  /// RVC (v2) voice conversion models
+  #[serde(rename = "rvc_v2")]
+  RvcV2,
+
   /// SadTalker -- v1, we may add another enum value for future versions
   SadTalker,
+
+  /// so-vits-svc voice conversion models
+  #[serde(rename = "so_vits_svc")]
+  SoVitsSvc,
 }
 
 // TODO(bt, 2022-12-21): This desperately needs MySQL integration tests!
@@ -24,15 +34,29 @@ impl_mysql_enum_coders!(MediaFileOriginModelType);
 impl MediaFileOriginModelType {
   pub fn to_str(&self) -> &'static str {
     match self {
+      Self::RvcV2  => "rvc_v2",
       Self::SadTalker => "sad_talker",
+      Self::SoVitsSvc => "so_vits_svc",
     }
   }
 
   pub fn from_str(value: &str) -> Result<Self, String> {
     match value {
+      "rvc_v2" => Ok(Self::RvcV2),
       "sad_talker" => Ok(Self::SadTalker),
+      "so_vits_svc" => Ok(Self::SoVitsSvc),
       _ => Err(format!("invalid value: {:?}", value)),
     }
+  }
+
+  pub fn all_variants() -> BTreeSet<Self> {
+    // NB: BTreeSet is sorted
+    // NB: BTreeSet::from() isn't const, but not worth using LazyStatic, etc.
+    BTreeSet::from([
+      Self::RvcV2,
+      Self::SadTalker,
+      Self::SoVitsSvc,
+    ])
   }
 }
 
@@ -41,19 +65,59 @@ mod tests {
   use crate::by_table::media_files::media_file_origin_model_type::MediaFileOriginModelType;
   use crate::test_helpers::assert_serialization;
 
-  #[test]
-  fn test_serialization() {
-    assert_serialization(MediaFileOriginModelType::SadTalker, "sad_talker");
+  mod explicit_checks {
+    use super::*;
+
+    #[test]
+    fn test_serialization() {
+      assert_serialization(MediaFileOriginModelType::RvcV2, "rvc_v2");
+      assert_serialization(MediaFileOriginModelType::SadTalker, "sad_talker");
+      assert_serialization(MediaFileOriginModelType::SoVitsSvc, "so_vits_svc");
+    }
+
+    #[test]
+    fn test_to_str() {
+      assert_eq!(MediaFileOriginModelType::RvcV2.to_str(), "rvc_v2");
+      assert_eq!(MediaFileOriginModelType::SadTalker.to_str(), "sad_talker");
+      assert_eq!(MediaFileOriginModelType::SoVitsSvc.to_str(), "so_vits_svc");
+    }
+
+    #[test]
+    fn test_from_str() {
+      assert_eq!(MediaFileOriginModelType::from_str("rvc_v2").unwrap(), MediaFileOriginModelType::RvcV2);
+      assert_eq!(MediaFileOriginModelType::from_str("sad_talker").unwrap(), MediaFileOriginModelType::SadTalker);
+      assert_eq!(MediaFileOriginModelType::from_str("so_vits_svc").unwrap(), MediaFileOriginModelType::SoVitsSvc);
+      assert!(MediaFileOriginModelType::from_str("foo").is_err());
+    }
+
+    #[test]
+    fn all_variants() {
+      let mut variants = MediaFileOriginModelType::all_variants();
+      assert_eq!(variants.len(), 3);
+      assert_eq!(variants.pop_first(), Some(MediaFileOriginModelType::RvcV2));
+      assert_eq!(variants.pop_first(), Some(MediaFileOriginModelType::SadTalker));
+      assert_eq!(variants.pop_first(), Some(MediaFileOriginModelType::SoVitsSvc));
+      assert_eq!(variants.pop_first(), None);
+    }
   }
 
-  #[test]
-  fn test_to_str() {
-    assert_eq!(MediaFileOriginModelType::SadTalker.to_str(), "sad_talker");
-  }
 
-  #[test]
-  fn test_from_str() {
-    assert_eq!(MediaFileOriginModelType::from_str("sad_talker").unwrap(), MediaFileOriginModelType::SadTalker);
-    assert!(MediaFileOriginModelType::from_str("foo").is_err());
+  mod mechanical_checks {
+    use super::*;
+
+    #[test]
+    fn variant_length() {
+      use strum::IntoEnumIterator;
+      assert_eq!(MediaFileOriginModelType::all_variants().len(), MediaFileOriginModelType::iter().len());
+    }
+
+    #[test]
+    fn round_trip() {
+      for variant in MediaFileOriginModelType::all_variants() {
+        assert_eq!(variant, MediaFileOriginModelType::from_str(variant.to_str()).unwrap());
+        assert_eq!(variant, MediaFileOriginModelType::from_str(&format!("{}", variant)).unwrap());
+        assert_eq!(variant, MediaFileOriginModelType::from_str(&format!("{:?}", variant)).unwrap());
+      }
+    }
   }
 }
