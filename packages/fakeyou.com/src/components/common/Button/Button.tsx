@@ -17,6 +17,7 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   square?: boolean;
   tooltip?: string;
   full?: boolean;
+  iconFlip?: boolean;
 }
 
 export default function Button({
@@ -30,11 +31,14 @@ export default function Button({
   square,
   tooltip,
   full = false,
+  iconFlip = false,
   ...rest
 }: ButtonProps) {
+  let iconMarginClass = !square && label ? (iconFlip ? "ms-2" : "me-2") : "";
   let IconComponent = icon ? (
-    <FontAwesomeIcon icon={icon} className={!square && label ? "me-2" : ""} />
+    <FontAwesomeIcon icon={icon} className={iconMarginClass} />
   ) : null;
+
   let LabelComponent = !square ? label : null;
 
   const externalClass = rest.className || "";
@@ -47,7 +51,12 @@ export default function Button({
 
   delete rest.className;
 
-  const ButtonContent = (
+  const ButtonContent = iconFlip ? (
+    <>
+      {LabelComponent}
+      {IconComponent}
+    </>
+  ) : (
     <>
       {IconComponent}
       {LabelComponent}
