@@ -64,7 +64,7 @@ export default function MediaPage({ sessionWrapper }: MediaPageProps) {
         return (
           <div className="panel p-3 p-lg-4 d-flex flex-column">
             {/* Voice model name that is used to generate the audio */}
-            <h3 className="fw-bold mb-4">[Voice Model Name]</h3>
+            {/*<h3 className="fw-bold mb-4">[Voice Model Name]</h3> */}
 
             <MediaAudioComponent mediaFile={mediaFile} />
 
@@ -302,29 +302,20 @@ export default function MediaPage({ sessionWrapper }: MediaPageProps) {
               </div>
 
               <div className="d-flex gap-2 flex-wrap">
-                <Button
-                  icon={faArrowDownToLine}
-                  label="Download"
-                  className="flex-grow-1"
+
+                <a
                   href={audioLink}
-                  download={true}
-                />
-                {/* <div className="d-flex gap-2">
-                  <Button
-                    square={true}
-                    variant="secondary"
-                    icon={faCirclePlay}
-                    onClick={() => {}}
-                    tooltip="Create"
-                  />
-                  <Button
-                    square={true}
-                    variant="secondary"
-                    icon={faShare}
-                    onClick={() => {}}
-                    tooltip="Share"
-                  />
-                </div> */}
+                  download={audioLink}
+                  onClick={() => {
+                    //Analytics.ttsClickResultLink();
+                  }}
+                  className=" btn btn-primary w-100 mt-4"
+                  
+                >
+                  <FontAwesomeIcon icon={faArrowDownToLine} className="me-2" />
+                  Download
+                </a>
+
               </div>
 
               <Accordion>
