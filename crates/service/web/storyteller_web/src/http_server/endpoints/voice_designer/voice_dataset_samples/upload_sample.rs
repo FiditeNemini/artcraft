@@ -19,7 +19,7 @@ use media::decode_basic_audio_info::decode_basic_audio_bytes_info;
 use mimetypes::mimetype_for_bytes::get_mimetype_for_bytes;
 use mysql_queries::queries::media_uploads::insert_media_upload::insert_media_upload;
 use mysql_queries::queries::voice_designer::voice_samples::get_dataset_sample_by_uuid::get_dataset_sample_by_uuid_with_connection;
-use mysql_queries::queries::voice_designer::voice_samples::insert_dataset_sample_and_media_file::{Args, insert_dataset_sample_and_media_file};
+use mysql_queries::queries::voice_designer::voice_samples::insert_dataset_sample_and_media_file::{InsertDatasetSampleAndMediaFileArgs, insert_dataset_sample_and_media_file};
 use tokens::tokens::media_files::MediaFileToken;
 use tokens::tokens::zs_voice_dataset_samples::ZsVoiceDatasetSampleToken;
 use tokens::tokens::zs_voice_datasets::ZsVoiceDatasetToken;
@@ -325,11 +325,11 @@ pub async fn upload_sample_handler(
         UploadSampleError::ServerError
       })?;
 
-  let (dataset_sample_token, media_file_token, _record_id) = insert_dataset_sample_and_media_file(Args {
+  let (dataset_sample_token, media_file_token, _record_id) = insert_dataset_sample_and_media_file(InsertDatasetSampleAndMediaFileArgs {
     uuid_idempotency_token: &uuid_idempotency_token,
     media_type: media_upload_type,
     origin_category: media_file_origin,
-    dataset_token,
+    dataset_token: &dataset_token,
     //maybe_original_filename: upload_media_request.file_name.as_deref(),
     //original_file_size_bytes: file_size_bytes as u64,
     //maybe_original_duration_millis: maybe_duration_millis,

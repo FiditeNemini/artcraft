@@ -88,7 +88,7 @@ pub async fn create_dataset_handler(http_request: HttpRequest, request: web::Jso
       dataset_title: &title,
       maybe_creator_user_token: Some(user_session.user_token.clone().as_ref()),
       creator_ip_address: &creator_ip_address,
-      creator_set_visibility: &creator_set_visibility,
+      creator_set_visibility,
       mysql_pool: &server_state.mysql_pool
   }).await;
 
