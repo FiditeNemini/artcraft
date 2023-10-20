@@ -10,6 +10,7 @@ use tokens::tokens::generic_inference_jobs::InferenceJobToken;
 
 use crate::helpers::boolean_converters::i8_to_bool;
 
+#[derive(Debug)]
 pub struct GenericInferenceJobStatus {
   pub job_token: InferenceJobToken,
 
@@ -34,6 +35,7 @@ pub struct GenericInferenceJobStatus {
 
 /// Details about the user's original inference request
 /// (We may want to present it in the "pending" UI.)
+#[derive(Debug)]
 pub struct RequestDetails {
   pub inference_category: InferenceCategory,
   pub maybe_model_type: Option<String>, // TODO: Strongly type
@@ -45,6 +47,7 @@ pub struct RequestDetails {
 }
 
 /// Details about the generated result
+#[derive(Debug)]
 pub struct ResultDetails {
   pub entity_type: String,
   pub entity_token: String,
@@ -94,6 +97,7 @@ SELECT
 
     tts_results.public_bucket_wav_audio_path as maybe_tts_public_bucket_path,
     voice_conversion_results.public_bucket_hash as maybe_voice_conversion_public_bucket_hash,
+
     media_files.public_bucket_directory_hash as maybe_media_file_public_bucket_directory_hash,
     media_files.maybe_public_bucket_prefix as maybe_media_file_public_bucket_prefix,
     media_files.maybe_public_bucket_extension as maybe_media_file_public_bucket_extension,
@@ -144,11 +148,21 @@ WHERE jobs.token = ?
 
   // NB: A bit of a hack. We store TTS results with a full path.
   // Going forward, all other record types will store a hash.
-  let (bucket_path_is_hash, maybe_public_bucket_hash) = match record.inference_category {
+  let (mut bucket_path_is_hash, mut maybe_public_bucket_hash) = match record.inference_category {
     InferenceCategory::LipsyncAnimation => (true, record.maybe_media_file_public_bucket_directory_hash.as_deref()),
     InferenceCategory::TextToSpeech => (false, record.maybe_tts_public_bucket_path.as_deref()),
     InferenceCategory::VoiceConversion => (true, record.maybe_voice_conversion_public_bucket_hash.as_deref()),
   };
+
+  // NB: We've moved voice conversion out of their own table and into media_files
+  // This check should allow for graceful migration to the new end-state.
+  match record.maybe_result_entity_type.as_deref() {
+    Some("media_file") => {
+      bucket_path_is_hash = true;
+      maybe_public_bucket_hash = record.maybe_media_file_public_bucket_directory_hash.as_deref();
+    }
+    _ => {}
+  }
 
   let maybe_result_details = record
       .maybe_result_entity_type

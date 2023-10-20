@@ -233,9 +233,23 @@ pub async fn get_inference_job_status_handler(
           result_details.public_bucket_location_or_hash
         }
         InferenceCategory::VoiceConversion => {
-          VoiceConversionResultOriginalFilePath::from_object_hash(&result_details.public_bucket_location_or_hash)
-              .get_full_object_path_str()
-              .to_string()
+          match result_details.entity_type.as_str() {
+            "media_file" => {
+              // NB: We're migrating voice conversion to media_files.
+              MediaFileBucketPath::from_object_hash(
+                &result_details.public_bucket_location_or_hash,
+                result_details.maybe_media_file_public_bucket_prefix.as_deref(),
+                result_details.maybe_media_file_public_bucket_extension.as_deref())
+                  .get_full_object_path_str()
+                  .to_string()
+            }
+            _ => {
+              // NB: This is the old voice conversion result pathing.
+              VoiceConversionResultOriginalFilePath::from_object_hash(&result_details.public_bucket_location_or_hash)
+                  .get_full_object_path_str()
+                  .to_string()
+            }
+          }
         }
       };
 
