@@ -3,10 +3,9 @@ use std::time::Instant;
 
 use anyhow::anyhow;
 use log::{error, info, warn};
-use buckets::public::media_files::original_file::MediaFileBucketPath;
 
+use buckets::public::media_files::original_file::MediaFileBucketPath;
 use buckets::public::media_uploads::original_file::MediaUploadOriginalFilePath;
-use buckets::public::voice_conversion_results::original_file::VoiceConversionResultOriginalFilePath;
 use container_common::filesystem::check_file_exists::check_file_exists;
 use container_common::filesystem::safe_delete_temp_directory::safe_delete_temp_directory;
 use container_common::filesystem::safe_delete_temp_file::safe_delete_temp_file;
@@ -362,7 +361,7 @@ pub async fn process_job(args: RvcV2ProcessJobArgs<'_>) -> Result<JobSuccessResu
   let (inference_result_token, id) = insert_media_file_from_voice_conversion(InsertMediaFileArgs {
     pool: &args.job_dependencies.mysql_pool,
     job: &job,
-    voice_conversion_type: VoiceConversionModelType::SoVitsSvc,
+    voice_conversion_type: VoiceConversionModelType::RvcV2,
     maybe_mime_type: maybe_mimetype.as_deref(),
     file_size_bytes: file_metadata.file_size_bytes,
     duration_millis: file_metadata.duration_millis.unwrap_or(0),
@@ -401,7 +400,7 @@ pub async fn process_job(args: RvcV2ProcessJobArgs<'_>) -> Result<JobSuccessResu
 
   Ok(JobSuccessResult {
     maybe_result_entity: Some(ResultEntity {
-      entity_type: InferenceResultType::VoiceConversion,
+      entity_type: InferenceResultType::MediaFile,
       entity_token: inference_result_token.to_string(),
     }),
     inference_duration,
