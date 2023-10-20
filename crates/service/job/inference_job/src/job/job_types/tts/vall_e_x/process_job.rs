@@ -124,8 +124,8 @@ pub async fn process_create_voice(
     
         let workdir = work_temp_dir.path().to_path_buf();
 
-        let dataset = list_dataset_samples_for_dataset_token(&voice_dataset_token, false, &mysql_pool).await;
-        // unwrap this..... TODO 
+        let dataset = list_dataset_samples_for_dataset_token(&voice_dataset_token, false, &mysql_pool).await?;
+        
         let downloaded_dataset:Vec<PathBuf> = Vec::new();
 
         for (index,record) in dataset.iter().enumerate() {
