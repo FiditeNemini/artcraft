@@ -77,6 +77,7 @@ export default function FaceAnimatorJobs({ t }: { t: any }) {
           job.maybeResultToken ?  <Button {...{
               href: `media/${job.maybeResultToken}`,
               icon: faChevronRight,
+              iconFlip: true,
               label: t("inputs.viewResult"),
               onClick:() => Analytics.voiceConversionClickDownload()
             }} />: null
