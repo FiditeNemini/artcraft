@@ -302,20 +302,30 @@ export default function MediaPage({ sessionWrapper }: MediaPageProps) {
               </div>
 
               <div className="d-flex gap-2 flex-wrap">
-
-                <a
+                <Button
+                  icon={faArrowDownToLine}
+                  label="Download"
+                  className="flex-grow-1"
                   href={audioLink}
                   download={audioLink}
-                  onClick={() => {
-                    //Analytics.ttsClickResultLink();
-                  }}
-                  className=" btn btn-primary w-100 mt-4"
-                  
-                >
-                  <FontAwesomeIcon icon={faArrowDownToLine} className="me-2" />
-                  Download
-                </a>
-
+                />
+                {/* Share and Create Buttons */}
+                {/* <div className="d-flex gap-2">
+                  <Button
+                    square={true}
+                    variant="secondary"
+                    icon={faCirclePlay}
+                    onClick={() => {}}
+                    tooltip="Create"
+                  />
+                  <Button
+                    square={true}
+                    variant="secondary"
+                    icon={faShare}
+                    onClick={() => {}}
+                    tooltip="Share"
+                  />
+                </div> */}
               </div>
 
               <Accordion>
