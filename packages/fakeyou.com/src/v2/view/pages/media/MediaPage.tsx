@@ -27,6 +27,7 @@ import { Gravatar } from "@storyteller/components/src/elements/Gravatar";
 import useTimeAgo from "hooks/useTimeAgo";
 import { CommentComponent } from "v2/view/_common/comments/CommentComponent";
 import { MediaFileType } from "@storyteller/components/src/api/_common/enums/MediaFileType";
+import { BucketConfig } from "@storyteller/components/src/api/BucketConfig";
 
 interface MediaPageProps {
   sessionWrapper: SessionWrapper;
@@ -102,6 +103,8 @@ export default function MediaPage({ sessionWrapper }: MediaPageProps) {
         return <div>Unsupported media type</div>;
     }
   }
+
+  let audioLink = new BucketConfig().getGcsUrl(mediaFile?.public_bucket_path);
 
   if (isLoading)
     return (
@@ -302,8 +305,9 @@ export default function MediaPage({ sessionWrapper }: MediaPageProps) {
                 <Button
                   icon={faArrowDownToLine}
                   label="Download"
-                  onClick={() => {}}
                   className="flex-grow-1"
+                  href={audioLink}
+                  download={true}
                 />
                 {/* <div className="d-flex gap-2">
                   <Button
