@@ -18,6 +18,7 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   tooltip?: string;
   full?: boolean;
   iconFlip?: boolean;
+  download?: boolean | string;
 }
 
 export default function Button({
@@ -32,6 +33,7 @@ export default function Button({
   tooltip,
   full = false,
   iconFlip = false,
+  download,
   ...rest
 }: ButtonProps) {
   let iconMarginClass = !square && label ? (iconFlip ? "ms-2" : "me-2") : "";
@@ -68,7 +70,15 @@ export default function Button({
       {ButtonContent}
     </Link>
   ) : href ? (
-    <a href={href} target={target} rel="noopener noreferrer" {...commonProps}>
+    <a
+      href={href}
+      target={target}
+      rel="noopener noreferrer"
+      download={
+        download ? (typeof download === "string" ? download : true) : undefined
+      }
+      {...commonProps}
+    >
       {ButtonContent}
     </a>
   ) : (
