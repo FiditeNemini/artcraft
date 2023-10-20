@@ -6,7 +6,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faClock,
   faHeadphonesSimple,
-  faDownload,
+  faLink,
 } from "@fortawesome/free-solid-svg-icons";
 
 import { SessionSubscriptionsWrapper } from "@storyteller/components/src/session/SessionSubscriptionsWrapper";
@@ -120,11 +120,9 @@ function SessionVoiceConversionResultsList(props: Props) {
       let audioLink = new BucketConfig().getGcsUrl(
         job.maybeResultPublicBucketMediaPath
       );
-      //let ttsPermalink = `/tts/result/${job.maybeResultToken}`;
+      let audioPermalink = `/media/${job.maybeResultToken}`;
 
       let wavesurfers = <SessionTtsAudioPlayer filename={audioLink} />;
-
-      let audioDownloadFilename = `fakeyou-${job.jobToken}.wav`;
 
       results.push(
         <div key={job.jobToken}>
@@ -154,28 +152,16 @@ function SessionVoiceConversionResultsList(props: Props) {
               {wavesurfers}
 
               <div className="mt-2">
-                {/*<Link
-                  to={ttsPermalink}
+                <Link
+                  to={audioPermalink}
                   onClick={() => {
-                    Analytics.ttsClickResultLink();
+                    //Analytics.ttsClickResultLink();
                   }}
                   className="fw-semibold"
                 >
                   <FontAwesomeIcon icon={faLink} className="me-2" />
-                  {t("common.SessionTtsInferenceResults.result.shareDownload")}
-                </Link>*/}
-
-                <a
-                  className=" btn btn-primary w-100 mt-4"
-                  href={audioLink}
-                  onClick={() => {
-                    Analytics.voiceConversionClickDownload();
-                  }}
-                  download={audioDownloadFilename}
-                >
-                  <FontAwesomeIcon icon={faDownload} className="me-2" />
                   {t("resultsAudioDownload")}
-                </a>
+                </Link>
               </div>
             </div>
           </div>
