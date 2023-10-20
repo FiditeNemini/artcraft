@@ -17,11 +17,11 @@ pub struct SyntheticIdRecord {
   pub next_id: i64,
 }
 
-pub struct Args <'a> {
+pub struct InsertDatasetSampleAndMediaFileArgs<'a> {
   pub uuid_idempotency_token: &'a str,
 
   // Dataset to which this sample belongs
-  pub dataset_token: ZsVoiceDatasetToken,
+  pub dataset_token: &'a ZsVoiceDatasetToken,
 
   pub media_type: MediaUploadType,
 
@@ -51,7 +51,7 @@ pub struct Args <'a> {
 
 const ORIGIN_PRODUCT : MediaFileOriginProductCategory = MediaFileOriginProductCategory::Unknown; // TODO: Zero shot voice enum
 
-pub async fn insert_dataset_sample_and_media_file(args: Args<'_>) -> AnyhowResult<(ZsVoiceDatasetSampleToken, MediaFileToken, u64)> {
+pub async fn insert_dataset_sample_and_media_file(args: InsertDatasetSampleAndMediaFileArgs<'_>) -> AnyhowResult<(ZsVoiceDatasetSampleToken, MediaFileToken, u64)> {
 
   let mut maybe_creator_synthetic_id : Option<u64> = None;
 

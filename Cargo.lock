@@ -1829,14 +1829,20 @@ dependencies = [
 name = "dev-database-seed"
 version = "0.0.1"
 dependencies = [
+ "buckets",
+ "cloud_storage",
  "config",
  "easyenv",
  "enums",
  "errors",
+ "filesys",
  "hashing",
+ "idempotency",
  "log",
+ "mimetypes",
  "mysql_queries",
  "sqlx",
+ "storyteller_root",
  "tokens",
  "tokio 1.25.0",
 ]
