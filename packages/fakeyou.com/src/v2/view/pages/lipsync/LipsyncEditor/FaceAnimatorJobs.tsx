@@ -7,10 +7,10 @@ import {
 } from "@storyteller/components/src/api/tts/GetPendingTtsJobCount";
 // import { springs } from "resources";
 import { useInferenceJobs } from "hooks";
-import { BucketConfig } from "@storyteller/components/src/api/BucketConfig";
+import { Button } from 'components/common';
 import { Analytics } from "common/Analytics";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faDownload, faHourglass1, faRemove, faTrophy, faWarning } from "@fortawesome/free-solid-svg-icons";
+import { faChevronRight, faHourglass1, faRemove, faTrophy, faWarning } from "@fortawesome/free-solid-svg-icons";
 
 const DEFAULT_QUEUE_REFRESH_INTERVAL_MILLIS = 15000;
 
@@ -22,7 +22,6 @@ export default function FaceAnimatorJobs({ t }: { t: any }) {
     cache_time: new Date(0), // NB: Epoch is used for vector clock's initial state
     refresh_interval_millis: DEFAULT_QUEUE_REFRESH_INTERVAL_MILLIS,
   });
-  const mediaLink = (path: string) => new BucketConfig().getGcsUrl(path);
   const statusIcons = [faHourglass1,faHourglass1,faWarning,faRemove,faTrophy];
   const statusTxt = (which: number, config = {}) => ["animationPending","animationInProgress","animationFailed","animationDead","animationSuccess"].map((str,i) => t(`status.${str}`,config))[which];
 
@@ -63,7 +62,7 @@ export default function FaceAnimatorJobs({ t }: { t: any }) {
   }, [pending]);
 
     return inferenceJobs.length ? <div {...{ className: "face-animator-jobs panel" }}>
-      <h5>Your jobs</h5>
+      <h5>{ t("headings.yourJobs") }</h5>
       { inferenceJobs.map((job, key) => {
       return <div {...{ className: "panel face-animator-job", key }}>
         <FontAwesomeIcon {...{ className: `job-status-icon job-status-${job.statusIndex}`, icon: statusIcons[job.statusIndex] }}/>
@@ -75,15 +74,13 @@ export default function FaceAnimatorJobs({ t }: { t: any }) {
           <span {...{ className: "job-id" }}>id: { job.jobToken }</span>
         </div>
         {
-          job.maybeResultToken ?  <a {...{
-              className: "btn btn-primary",
-              download: `fakeyou-${job.jobToken}.mp4`,
-              href: mediaLink(job.maybeResultPublicBucketMediaPath || ""),
+          job.maybeResultToken ?  <Button {...{
+              href: `media/${job.maybeResultToken}`,
+              icon: faChevronRight,
+              iconFlip: true,
+              label: t("inputs.viewResult"),
               onClick:() => Analytics.voiceConversionClickDownload()
-            }}>
-              <FontAwesomeIcon icon={faDownload} className="me-2" />
-              { t("inputs.downloadFile") }
-            </a> : null
+            }} />: null
           }
       </div>
      }).reverse()}
