@@ -126,34 +126,39 @@ pub async fn process_create_voice(
 
         let result = list_dataset_samples_for_dataset_token(&voice_dataset_token, false, &mysql_pool).await;
 
-        let records: Vec<DatasetSampleRecordForList>;
+        let dataset: Vec<DatasetSampleRecordForList>;
 
         match result {
-            Some(val) => {
-                records = val;
+            Ok(val) => {
+                dataset = val;
             },
             Err(e) => {
                 return Err(ProcessSingleJobError::from_anyhow_error(e));
             }
         }
         
-        let downloaded_dataset:Vec<PathBuf> = Vec::new();
+        let mut downloaded_dataset:Vec<PathBuf> = Vec::new();
+
         for (index,record) in dataset.iter().enumerate() {
-            
+
+            let prefix: Option<&str> = record.maybe_public_bucket_prefix.as_ref().map(|s| s.as_str());
+            let extension: Option<&str> = record.maybe_public_bucket_extension.as_ref().map(|s| s.as_str());
+
             let audio_media_file = MediaFileBucketPath::from_object_hash(
                 &record.public_bucket_directory_hash,
-                record.maybe_public_bucket_prefix,
-                record.maybe_public_bucket_extension);
+                prefix,
+                extension,
+                );
 
             let file_name_wav = format!("{}.wav", index);
-            let file_path = PathBuf::new();
-            file_path.push(workdir);
-            file_path.push(file_path);
+            let mut file_path = PathBuf::new();
+            file_path.push(workdir.clone());
+            file_path.push(file_path.clone());
                 
              // TODO we might want to catch the error and not include the pathes into download dataset
-            deps.public_bucket_client.download_file_to_disk(audio_media_file.to_full_object_pathbuf(), file_path);
+            let _ = deps.public_bucket_client.download_file_to_disk(audio_media_file.to_full_object_pathbuf(), &file_path).await;
 
-            downloaded_dataset.push(file_path);
+            downloaded_dataset.push(file_path.clone());
         }
 
         // Need to download the models
@@ -177,7 +182,7 @@ pub async fn process_create_voice(
 
     let inference_start_time = Instant::now();
 
-    // TODO fix
+    // TODO: fix
     let output_file_name = String::from("s.npz");
 
     // Run Inference
