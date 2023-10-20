@@ -21,6 +21,7 @@
 pub mod create_dir_all_if_missing;
 pub mod directory_exists;
 pub mod file_exists;
+pub mod file_read_bytes;
 pub mod file_size;
 pub mod filename_concat;
 pub mod path_to_string;

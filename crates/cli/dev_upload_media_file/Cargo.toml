@@ -1,0 +1,44 @@
+[package]
+name = "dev-upload-media-file"
+edition = "2018"
+version = "0.0.1"
+authors = [
+    "Brandon Thomas <bt@brand.io>",
+    "Brandon Thomas <echelon@gmail.com>",
+]
+publish = false
+
+[[bin]]
+name = "dev-upload-media-file"
+path = "src/main.rs"
+
+[dependencies]
+# Internal
+buckets = { path = "../../_types/buckets" }
+cloud_storage = { path = "../../lib/api_clients/cloud_storage" }
+config = { path = "../../lib/deprecated/config" }
+easyenv = { path = "../../lib/easyenv" }
+enums = { path = "../../_types/enums" }
+errors = { path = "../../lib/errors" }
+filesys = { path = "../../lib/files/filesys" }
+hashing = { path = "../../lib/files/hashing" }
+mimetypes = { path = "../../lib/files/mimetypes" }
+mysql_queries = { path = "../../lib/mysql_queries" }
+tokens = { path = "../../_types/tokens" }
+
+# External
+clap = "2.34.0" # TODO: This is really out of date, but has conflicts when updated
+log = "0.4.14"
+
+# Runtime
+# NB: We switched to Tokio from `async-std` for broader ecosystem support.
+tokio = { version = "1.6.0", features = ["macros"] }
+
+# MySql Database
+# "offline" supports typesafe builds without a live database
+# "rustls" doesn't appear to work with IP addresses, per:
+# https://github.com/launchbadge/sqlx/issues/1095#issuecomment-798050828
+sqlx = { version = "0.6.2", features = [ "mysql", "runtime-actix-native-tls", "offline", "chrono" ] }
+
+[dev-dependencies]
+# None yet
