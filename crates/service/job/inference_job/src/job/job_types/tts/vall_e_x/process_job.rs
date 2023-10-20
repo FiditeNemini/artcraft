@@ -124,10 +124,20 @@ pub async fn process_create_voice(
     
         let workdir = work_temp_dir.path().to_path_buf();
 
-        let dataset = list_dataset_samples_for_dataset_token(&voice_dataset_token, false, &mysql_pool).await?;
+        let result = list_dataset_samples_for_dataset_token(&voice_dataset_token, false, &mysql_pool).await;
+
+        let records: Vec<DatasetSampleRecordForList>;
+
+        match result {
+            Some(val) => {
+                records = val;
+            },
+            Err(e) => {
+                return Err(ProcessSingleJobError::from_anyhow_error(e));
+            }
+        }
         
         let downloaded_dataset:Vec<PathBuf> = Vec::new();
-
         for (index,record) in dataset.iter().enumerate() {
             
             let audio_media_file = MediaFileBucketPath::from_object_hash(
@@ -161,20 +171,20 @@ pub async fn process_create_voice(
             }
         }
 
-
     job_progress_reporter
     .log_status("running inference")
     .map_err(|e| ProcessSingleJobError::Other(e))?;
 
     let inference_start_time = Instant::now();
 
-    let output_file_name = String::from("output.wav");
+    // TODO fix
+    let output_file_name = String::from("s.npz");
 
     // Run Inference
     let command_exit_status = args.job_dependencies.job_type_details.vall_e_x.create_embedding_command.execute_inference(
             CreateVoiceArgs {
                 output_embedding_path: &workdir,
-                output_embedding_name: file_name,
+                output_embedding_name: output_file_name,
                 audio_files: String::from(""), // " "
                 stderr_output_file: String::from("zero_shot_create_voice.txt"),
             }
@@ -353,7 +363,6 @@ pub async fn process_job(
     args: VALLEXProcessJobArgs<'_>
 ) -> Result<JobSuccessResult, ProcessSingleJobError> {
     let job = args.job;
-    let deps = args.job_dependencies;
 
     // get args token
     let jobArgs = validate_job(&job)?; // bubbles error up
