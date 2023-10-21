@@ -7,7 +7,7 @@ use actix_web::http::StatusCode;
 use actix_web::web::Path;
 use chrono::{DateTime, Utc};
 use log::{error, log};
-use r2d2_redis::redis::Commands;
+use r2d2_redis::redis::{Commands, RedisResult};
 
 use buckets::public::media_files::original_file::MediaFileBucketPath;
 use buckets::public::voice_conversion_results::original_file::VoiceConversionResultOriginalFilePath;
@@ -163,15 +163,22 @@ pub async fn get_inference_job_status_handler(
 
   // TODO(bt,2023-05-21): Make async.
   let extra_status_key = RedisKeys::generic_inference_extra_status_info(path.token.as_str());
-  let maybe_extra_status_description : Option<String> = match redis.get(&extra_status_key) {
-    Ok(Some(status)) => {
-      Some(status)
-    },
-    Ok(None) => None,
+  let maybe_extra_status_value : RedisResult<Option<String>> = redis.get(&extra_status_key);
+
+  let maybe_extra_status_description = match maybe_extra_status_value {
     Err(e) => {
       error!("redis error: {:?}", e);
       None // Fail open
     },
+    Ok(maybe_value) => match maybe_value.as_deref() {
+      Some("1") => {
+        // TODO(bt,2023-10-20): Redis is reporting "1" and it's been surfacing this as a weird
+        //  message to the frontend for months. This needs proper fixing.
+        None
+      },
+      Some(value) => Some(value.to_string()),
+      None => None,
+    }
   };
 
   if record.is_keepalive_required {
@@ -226,9 +233,23 @@ pub async fn get_inference_job_status_handler(
           result_details.public_bucket_location_or_hash
         }
         InferenceCategory::VoiceConversion => {
-          VoiceConversionResultOriginalFilePath::from_object_hash(&result_details.public_bucket_location_or_hash)
-              .get_full_object_path_str()
-              .to_string()
+          match result_details.entity_type.as_str() {
+            "media_file" => {
+              // NB: We're migrating voice conversion to media_files.
+              MediaFileBucketPath::from_object_hash(
+                &result_details.public_bucket_location_or_hash,
+                result_details.maybe_media_file_public_bucket_prefix.as_deref(),
+                result_details.maybe_media_file_public_bucket_extension.as_deref())
+                  .get_full_object_path_str()
+                  .to_string()
+            }
+            _ => {
+              // NB: This is the old voice conversion result pathing.
+              VoiceConversionResultOriginalFilePath::from_object_hash(&result_details.public_bucket_location_or_hash)
+                  .get_full_object_path_str()
+                  .to_string()
+            }
+          }
         }
       };
 

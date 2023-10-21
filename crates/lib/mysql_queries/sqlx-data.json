@@ -891,6 +891,16 @@
     },
     "query": "\nSELECT\n  id,\n  status\nFROM w2l_inference_jobs\nWHERE id = ?\nFOR UPDATE\n        "
   },
+  "030e26fa7977555cdd04864d9b95c07196ab520cd8c63d30689b6021fa4b4ec1": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Right": 13
+      }
+    },
+    "query": "\nINSERT INTO media_files\nSET\n  token = ?,\n\n  origin_category = ?,\n  origin_product_category = ?,\n\n  media_type = ?,\n  maybe_mime_type = ?,\n  file_size_bytes = ?,\n  checksum_sha2 = ?,\n\n  public_bucket_directory_hash = ?,\n  maybe_public_bucket_prefix = ?,\n  maybe_public_bucket_extension = ?,\n\n  maybe_creator_user_token = ?,\n  creator_ip_address = ?,\n\n  creator_set_visibility = ?\n        "
+  },
   "044b4a53b537fdc154f049488e222ac001b04cf0f47df6ac79f2b0d8f79b5aff": {
     "describe": {
       "columns": [],
@@ -2389,6 +2399,135 @@
     },
     "query": "\nUPDATE zs_voices\nSET\n  mod_deleted_at = NULL,\n  maybe_mod_user_token = ?\nWHERE\n  token = ?\nLIMIT 1\n        "
   },
+  "0cad9a0df1167ae1dfb7847b5ab8a09a7b1e1f7bf0d7a06beddab1098cb285f6": {
+    "describe": {
+      "columns": [
+        {
+          "name": "token: tokens::tokens::zs_voice_dataset_samples::ZsVoiceDatasetSampleToken",
+          "ordinal": 0,
+          "type_info": {
+            "char_set": 224,
+            "flags": {
+              "bits": 4229
+            },
+            "max_size": 128,
+            "type": "VarString"
+          }
+        },
+        {
+          "name": "media_file_token: tokens::tokens::media_files::MediaFileToken",
+          "ordinal": 1,
+          "type_info": {
+            "char_set": 224,
+            "flags": {
+              "bits": 4233
+            },
+            "max_size": 128,
+            "type": "VarString"
+          }
+        },
+        {
+          "name": "media_type: enums::by_table::media_files::media_file_type::MediaFileType",
+          "ordinal": 2,
+          "type_info": {
+            "char_set": 224,
+            "flags": {
+              "bits": 4233
+            },
+            "max_size": 64,
+            "type": "VarString"
+          }
+        },
+        {
+          "name": "public_bucket_directory_hash",
+          "ordinal": 3,
+          "type_info": {
+            "char_set": 224,
+            "flags": {
+              "bits": 4225
+            },
+            "max_size": 128,
+            "type": "VarString"
+          }
+        },
+        {
+          "name": "maybe_public_bucket_prefix",
+          "ordinal": 4,
+          "type_info": {
+            "char_set": 224,
+            "flags": {
+              "bits": 128
+            },
+            "max_size": 64,
+            "type": "VarString"
+          }
+        },
+        {
+          "name": "maybe_public_bucket_extension",
+          "ordinal": 5,
+          "type_info": {
+            "char_set": 224,
+            "flags": {
+              "bits": 128
+            },
+            "max_size": 64,
+            "type": "VarString"
+          }
+        },
+        {
+          "name": "maybe_creator_user_token: tokens::tokens::users::UserToken",
+          "ordinal": 6,
+          "type_info": {
+            "char_set": 224,
+            "flags": {
+              "bits": 136
+            },
+            "max_size": 128,
+            "type": "VarString"
+          }
+        },
+        {
+          "name": "created_at",
+          "ordinal": 7,
+          "type_info": {
+            "char_set": 63,
+            "flags": {
+              "bits": 1153
+            },
+            "max_size": 19,
+            "type": "Timestamp"
+          }
+        },
+        {
+          "name": "updated_at",
+          "ordinal": 8,
+          "type_info": {
+            "char_set": 63,
+            "flags": {
+              "bits": 9345
+            },
+            "max_size": 19,
+            "type": "Timestamp"
+          }
+        }
+      ],
+      "nullable": [
+        false,
+        false,
+        false,
+        false,
+        true,
+        true,
+        true,
+        false,
+        false
+      ],
+      "parameters": {
+        "Right": 1
+      }
+    },
+    "query": "\n                SELECT\n                    zds.token as `token: tokens::tokens::zs_voice_dataset_samples::ZsVoiceDatasetSampleToken`,\n                    zds.media_file_token as `media_file_token: tokens::tokens::media_files::MediaFileToken`,\n                    m.media_type as `media_type: enums::by_table::media_files::media_file_type::MediaFileType`,\n                    m.public_bucket_directory_hash,\n                    m.maybe_public_bucket_prefix,\n                    m.maybe_public_bucket_extension,\n                    zds.maybe_creator_user_token as `maybe_creator_user_token: tokens::tokens::users::UserToken`,\n                    zds.created_at,\n                    zds.updated_at\n                FROM zs_voice_dataset_samples as zds\n                JOIN media_files as m\n                    ON zds.media_file_token = m.token\n                WHERE zds.dataset_token = ?\n                    AND zds.user_deleted_at IS NULL\n                    AND zds.mod_deleted_at IS NULL\n            "
+  },
   "0caed749627ff22ae1cea52621a375156259a731e8070459593082b80d463491": {
     "describe": {
       "columns": [
@@ -2586,6 +2725,330 @@
       }
     },
     "query": "\nSELECT\n    assignments.model_token AS tts_model_token,\n    assignments.category_token\nFROM\n    tts_category_assignments AS assignments\nJOIN\n    tts_models AS tts\n    ON assignments.model_token = tts.token\nWHERE\n    tts.is_locked_from_use IS FALSE\n    AND tts.user_deleted_at IS NULL\n    AND tts.mod_deleted_at IS NULL\n    AND assignments.deleted_at IS NULL\n\n        "
+  },
+  "12fd7e61b2596c4591d4c65c0a655401481f55e733b2c5e876ee376f5fe7d329": {
+    "describe": {
+      "columns": [
+        {
+          "name": "job_token: tokens::tokens::generic_inference_jobs::InferenceJobToken",
+          "ordinal": 0,
+          "type_info": {
+            "char_set": 224,
+            "flags": {
+              "bits": 4229
+            },
+            "max_size": 128,
+            "type": "VarString"
+          }
+        },
+        {
+          "name": "status",
+          "ordinal": 1,
+          "type_info": {
+            "char_set": 224,
+            "flags": {
+              "bits": 393
+            },
+            "max_size": 64,
+            "type": "String"
+          }
+        },
+        {
+          "name": "attempt_count",
+          "ordinal": 2,
+          "type_info": {
+            "char_set": 63,
+            "flags": {
+              "bits": 33
+            },
+            "max_size": 5,
+            "type": "Short"
+          }
+        },
+        {
+          "name": "inference_category: enums::by_table::generic_inference_jobs::inference_category::InferenceCategory",
+          "ordinal": 3,
+          "type_info": {
+            "char_set": 224,
+            "flags": {
+              "bits": 4233
+            },
+            "max_size": 128,
+            "type": "VarString"
+          }
+        },
+        {
+          "name": "maybe_model_type",
+          "ordinal": 4,
+          "type_info": {
+            "char_set": 224,
+            "flags": {
+              "bits": 136
+            },
+            "max_size": 128,
+            "type": "VarString"
+          }
+        },
+        {
+          "name": "maybe_model_token",
+          "ordinal": 5,
+          "type_info": {
+            "char_set": 224,
+            "flags": {
+              "bits": 136
+            },
+            "max_size": 128,
+            "type": "VarString"
+          }
+        },
+        {
+          "name": "maybe_raw_inference_text",
+          "ordinal": 6,
+          "type_info": {
+            "char_set": 224,
+            "flags": {
+              "bits": 144
+            },
+            "max_size": 262140,
+            "type": "Blob"
+          }
+        },
+        {
+          "name": "maybe_frontend_failure_category: enums::by_table::generic_inference_jobs::frontend_failure_category::FrontendFailureCategory",
+          "ordinal": 7,
+          "type_info": {
+            "char_set": 224,
+            "flags": {
+              "bits": 128
+            },
+            "max_size": 128,
+            "type": "VarString"
+          }
+        },
+        {
+          "name": "maybe_result_entity_type",
+          "ordinal": 8,
+          "type_info": {
+            "char_set": 224,
+            "flags": {
+              "bits": 128
+            },
+            "max_size": 128,
+            "type": "VarString"
+          }
+        },
+        {
+          "name": "maybe_result_entity_token",
+          "ordinal": 9,
+          "type_info": {
+            "char_set": 224,
+            "flags": {
+              "bits": 136
+            },
+            "max_size": 128,
+            "type": "VarString"
+          }
+        },
+        {
+          "name": "maybe_tts_model_title",
+          "ordinal": 10,
+          "type_info": {
+            "char_set": 224,
+            "flags": {
+              "bits": 4224
+            },
+            "max_size": 1020,
+            "type": "VarString"
+          }
+        },
+        {
+          "name": "maybe_voice_conversion_model_title",
+          "ordinal": 11,
+          "type_info": {
+            "char_set": 224,
+            "flags": {
+              "bits": 4224
+            },
+            "max_size": 1020,
+            "type": "VarString"
+          }
+        },
+        {
+          "name": "maybe_tts_public_bucket_path",
+          "ordinal": 12,
+          "type_info": {
+            "char_set": 224,
+            "flags": {
+              "bits": 4224
+            },
+            "max_size": 1020,
+            "type": "VarString"
+          }
+        },
+        {
+          "name": "maybe_voice_conversion_public_bucket_hash",
+          "ordinal": 13,
+          "type_info": {
+            "char_set": 224,
+            "flags": {
+              "bits": 4224
+            },
+            "max_size": 256,
+            "type": "VarString"
+          }
+        },
+        {
+          "name": "maybe_media_file_public_bucket_directory_hash",
+          "ordinal": 14,
+          "type_info": {
+            "char_set": 224,
+            "flags": {
+              "bits": 4224
+            },
+            "max_size": 128,
+            "type": "VarString"
+          }
+        },
+        {
+          "name": "maybe_media_file_public_bucket_prefix",
+          "ordinal": 15,
+          "type_info": {
+            "char_set": 224,
+            "flags": {
+              "bits": 128
+            },
+            "max_size": 64,
+            "type": "VarString"
+          }
+        },
+        {
+          "name": "maybe_media_file_public_bucket_extension",
+          "ordinal": 16,
+          "type_info": {
+            "char_set": 224,
+            "flags": {
+              "bits": 128
+            },
+            "max_size": 64,
+            "type": "VarString"
+          }
+        },
+        {
+          "name": "maybe_assigned_worker",
+          "ordinal": 17,
+          "type_info": {
+            "char_set": 224,
+            "flags": {
+              "bits": 128
+            },
+            "max_size": 512,
+            "type": "VarString"
+          }
+        },
+        {
+          "name": "maybe_assigned_cluster",
+          "ordinal": 18,
+          "type_info": {
+            "char_set": 224,
+            "flags": {
+              "bits": 128
+            },
+            "max_size": 512,
+            "type": "VarString"
+          }
+        },
+        {
+          "name": "is_keepalive_required",
+          "ordinal": 19,
+          "type_info": {
+            "char_set": 63,
+            "flags": {
+              "bits": 1
+            },
+            "max_size": 1,
+            "type": "Tiny"
+          }
+        },
+        {
+          "name": "created_at",
+          "ordinal": 20,
+          "type_info": {
+            "char_set": 63,
+            "flags": {
+              "bits": 1153
+            },
+            "max_size": 19,
+            "type": "Timestamp"
+          }
+        },
+        {
+          "name": "updated_at",
+          "ordinal": 21,
+          "type_info": {
+            "char_set": 63,
+            "flags": {
+              "bits": 9345
+            },
+            "max_size": 19,
+            "type": "Timestamp"
+          }
+        },
+        {
+          "name": "maybe_first_started_at",
+          "ordinal": 22,
+          "type_info": {
+            "char_set": 63,
+            "flags": {
+              "bits": 128
+            },
+            "max_size": 19,
+            "type": "Timestamp"
+          }
+        },
+        {
+          "name": "maybe_successfully_completed_at",
+          "ordinal": 23,
+          "type_info": {
+            "char_set": 63,
+            "flags": {
+              "bits": 128
+            },
+            "max_size": 19,
+            "type": "Timestamp"
+          }
+        }
+      ],
+      "nullable": [
+        false,
+        false,
+        false,
+        false,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        false,
+        false,
+        false,
+        true,
+        true
+      ],
+      "parameters": {
+        "Right": 1
+      }
+    },
+    "query": "\nSELECT\n    jobs.token as `job_token: tokens::tokens::generic_inference_jobs::InferenceJobToken`,\n\n    jobs.status,\n    jobs.attempt_count,\n\n    jobs.inference_category as `inference_category: enums::by_table::generic_inference_jobs::inference_category::InferenceCategory`,\n    jobs.maybe_model_type,\n    jobs.maybe_model_token,\n    jobs.maybe_raw_inference_text,\n\n    jobs.frontend_failure_category as `maybe_frontend_failure_category: enums::by_table::generic_inference_jobs::frontend_failure_category::FrontendFailureCategory`,\n\n    jobs.on_success_result_entity_type as maybe_result_entity_type,\n    jobs.on_success_result_entity_token as maybe_result_entity_token,\n\n    tts_models.title as maybe_tts_model_title,\n    voice_conversion_models.title as maybe_voice_conversion_model_title,\n\n    tts_results.public_bucket_wav_audio_path as maybe_tts_public_bucket_path,\n    voice_conversion_results.public_bucket_hash as maybe_voice_conversion_public_bucket_hash,\n\n    media_files.public_bucket_directory_hash as maybe_media_file_public_bucket_directory_hash,\n    media_files.maybe_public_bucket_prefix as maybe_media_file_public_bucket_prefix,\n    media_files.maybe_public_bucket_extension as maybe_media_file_public_bucket_extension,\n\n    jobs.assigned_worker as maybe_assigned_worker,\n    jobs.assigned_cluster as maybe_assigned_cluster,\n\n    jobs.is_keepalive_required,\n\n    jobs.created_at,\n    jobs.updated_at,\n\n    jobs.first_started_at as maybe_first_started_at,\n    jobs.successfully_completed_at as maybe_successfully_completed_at\n\nFROM generic_inference_jobs as jobs\n\nLEFT OUTER JOIN tts_models ON jobs.maybe_model_token = tts_models.token\nLEFT OUTER JOIN voice_conversion_models ON jobs.maybe_model_token = voice_conversion_models.token\n\nLEFT OUTER JOIN tts_results ON jobs.on_success_result_entity_token = tts_results.token\nLEFT OUTER JOIN voice_conversion_results ON jobs.on_success_result_entity_token = voice_conversion_results.token\nLEFT OUTER JOIN media_files ON jobs.on_success_result_entity_token = media_files.token\n\nWHERE jobs.token = ?\n        "
   },
   "1309910f97940b25bc163af0f62edd182848e5d4059dd5acf8c2387cda0d90cf": {
     "describe": {
@@ -3393,83 +3856,6 @@
     },
     "query": "\nUPDATE user_sessions\nSET deleted_at = CURRENT_TIMESTAMP()\nWHERE\n    token = ?\n    AND deleted_at IS NULL\n        "
   },
-  "1cf83a1087b97cbe5183765ad04da4baba294201af9621065300b235c6c98806": {
-    "describe": {
-      "columns": [
-        {
-          "name": "token: tokens::tokens::zs_voice_dataset_samples::ZsVoiceDatasetSampleToken",
-          "ordinal": 0,
-          "type_info": {
-            "char_set": 224,
-            "flags": {
-              "bits": 4229
-            },
-            "max_size": 128,
-            "type": "VarString"
-          }
-        },
-        {
-          "name": "dataset_token: tokens::tokens::zs_voice_datasets::ZsVoiceDatasetToken",
-          "ordinal": 1,
-          "type_info": {
-            "char_set": 224,
-            "flags": {
-              "bits": 4233
-            },
-            "max_size": 128,
-            "type": "VarString"
-          }
-        },
-        {
-          "name": "maybe_creator_user_token: tokens::tokens::users::UserToken",
-          "ordinal": 2,
-          "type_info": {
-            "char_set": 224,
-            "flags": {
-              "bits": 136
-            },
-            "max_size": 128,
-            "type": "VarString"
-          }
-        },
-        {
-          "name": "created_at",
-          "ordinal": 3,
-          "type_info": {
-            "char_set": 63,
-            "flags": {
-              "bits": 1153
-            },
-            "max_size": 19,
-            "type": "Timestamp"
-          }
-        },
-        {
-          "name": "updated_at",
-          "ordinal": 4,
-          "type_info": {
-            "char_set": 63,
-            "flags": {
-              "bits": 9345
-            },
-            "max_size": 19,
-            "type": "Timestamp"
-          }
-        }
-      ],
-      "nullable": [
-        false,
-        false,
-        true,
-        false,
-        false
-      ],
-      "parameters": {
-        "Right": 1
-      }
-    },
-    "query": "\n                SELECT\n                    zds.token as `token: tokens::tokens::zs_voice_dataset_samples::ZsVoiceDatasetSampleToken`,\n                    zds.dataset_token as `dataset_token: tokens::tokens::zs_voice_datasets::ZsVoiceDatasetToken`,\n                    zds.maybe_creator_user_token as `maybe_creator_user_token: tokens::tokens::users::UserToken`,\n                    zds.created_at,\n                    zds.updated_at\n                FROM zs_voice_dataset_samples as zds\n                WHERE zds.dataset_token = ?\n            "
-  },
   "1e85e546684feffc151a26b0495b9ab8aa4ee5f1627464a9872e9c357ba1dc7a": {
     "describe": {
       "columns": [],
@@ -3945,83 +4331,6 @@
       }
     },
     "query": "\nUPDATE comments\nSET\n  comment_markdown = ?,\n  comment_rendered_html = ?,\n  editor_ip_address = ?,\n  edited_at = NOW(),\n  version = version + 1\nWHERE\n  token = ?\n        "
-  },
-  "2a3c71e399fb0ef378227630f45bc073eb438a4093a780d1e775e796d1a82a39": {
-    "describe": {
-      "columns": [
-        {
-          "name": "token: tokens::tokens::zs_voice_dataset_samples::ZsVoiceDatasetSampleToken",
-          "ordinal": 0,
-          "type_info": {
-            "char_set": 224,
-            "flags": {
-              "bits": 4229
-            },
-            "max_size": 128,
-            "type": "VarString"
-          }
-        },
-        {
-          "name": "dataset_token: tokens::tokens::zs_voice_datasets::ZsVoiceDatasetToken",
-          "ordinal": 1,
-          "type_info": {
-            "char_set": 224,
-            "flags": {
-              "bits": 4233
-            },
-            "max_size": 128,
-            "type": "VarString"
-          }
-        },
-        {
-          "name": "maybe_creator_user_token: tokens::tokens::users::UserToken",
-          "ordinal": 2,
-          "type_info": {
-            "char_set": 224,
-            "flags": {
-              "bits": 136
-            },
-            "max_size": 128,
-            "type": "VarString"
-          }
-        },
-        {
-          "name": "created_at",
-          "ordinal": 3,
-          "type_info": {
-            "char_set": 63,
-            "flags": {
-              "bits": 1153
-            },
-            "max_size": 19,
-            "type": "Timestamp"
-          }
-        },
-        {
-          "name": "updated_at",
-          "ordinal": 4,
-          "type_info": {
-            "char_set": 63,
-            "flags": {
-              "bits": 9345
-            },
-            "max_size": 19,
-            "type": "Timestamp"
-          }
-        }
-      ],
-      "nullable": [
-        false,
-        false,
-        true,
-        false,
-        false
-      ],
-      "parameters": {
-        "Right": 1
-      }
-    },
-    "query": "\n                SELECT\n                    zds.token as `token: tokens::tokens::zs_voice_dataset_samples::ZsVoiceDatasetSampleToken`,\n                    zds.dataset_token as `dataset_token: tokens::tokens::zs_voice_datasets::ZsVoiceDatasetToken`,\n                    zds.maybe_creator_user_token as `maybe_creator_user_token: tokens::tokens::users::UserToken`,\n                    zds.created_at,\n                    zds.updated_at\n                FROM zs_voice_dataset_samples as zds\n                WHERE zds.dataset_token = ?\n                    AND zds.user_deleted_at IS NULL\n                    AND zds.mod_deleted_at IS NULL\n            "
   },
   "2b04dd7db52ef3a97a6f420a22a4dbee7416ae58697438df69e87ffd47bbf350": {
     "describe": {
@@ -11944,6 +12253,135 @@
     },
     "query": "\nUPDATE generic_inference_jobs\nSET\n  status = 'started',\n  assigned_worker = ?,\n  assigned_cluster = ?,\n  attempt_count = attempt_count + 1,\n  retry_at = NOW() + interval 2 minute\nWHERE id = ?\n        "
   },
+  "99434f1e829c772003ee5649297072763fd5a1ba9862ca888cc989cac0d5b57d": {
+    "describe": {
+      "columns": [
+        {
+          "name": "token: tokens::tokens::zs_voice_dataset_samples::ZsVoiceDatasetSampleToken",
+          "ordinal": 0,
+          "type_info": {
+            "char_set": 224,
+            "flags": {
+              "bits": 4229
+            },
+            "max_size": 128,
+            "type": "VarString"
+          }
+        },
+        {
+          "name": "media_file_token: tokens::tokens::media_files::MediaFileToken",
+          "ordinal": 1,
+          "type_info": {
+            "char_set": 224,
+            "flags": {
+              "bits": 4233
+            },
+            "max_size": 128,
+            "type": "VarString"
+          }
+        },
+        {
+          "name": "media_type: enums::by_table::media_files::media_file_type::MediaFileType",
+          "ordinal": 2,
+          "type_info": {
+            "char_set": 224,
+            "flags": {
+              "bits": 4233
+            },
+            "max_size": 64,
+            "type": "VarString"
+          }
+        },
+        {
+          "name": "public_bucket_directory_hash",
+          "ordinal": 3,
+          "type_info": {
+            "char_set": 224,
+            "flags": {
+              "bits": 4225
+            },
+            "max_size": 128,
+            "type": "VarString"
+          }
+        },
+        {
+          "name": "maybe_public_bucket_prefix",
+          "ordinal": 4,
+          "type_info": {
+            "char_set": 224,
+            "flags": {
+              "bits": 128
+            },
+            "max_size": 64,
+            "type": "VarString"
+          }
+        },
+        {
+          "name": "maybe_public_bucket_extension",
+          "ordinal": 5,
+          "type_info": {
+            "char_set": 224,
+            "flags": {
+              "bits": 128
+            },
+            "max_size": 64,
+            "type": "VarString"
+          }
+        },
+        {
+          "name": "maybe_creator_user_token: tokens::tokens::users::UserToken",
+          "ordinal": 6,
+          "type_info": {
+            "char_set": 224,
+            "flags": {
+              "bits": 136
+            },
+            "max_size": 128,
+            "type": "VarString"
+          }
+        },
+        {
+          "name": "created_at",
+          "ordinal": 7,
+          "type_info": {
+            "char_set": 63,
+            "flags": {
+              "bits": 1153
+            },
+            "max_size": 19,
+            "type": "Timestamp"
+          }
+        },
+        {
+          "name": "updated_at",
+          "ordinal": 8,
+          "type_info": {
+            "char_set": 63,
+            "flags": {
+              "bits": 9345
+            },
+            "max_size": 19,
+            "type": "Timestamp"
+          }
+        }
+      ],
+      "nullable": [
+        false,
+        false,
+        false,
+        false,
+        true,
+        true,
+        true,
+        false,
+        false
+      ],
+      "parameters": {
+        "Right": 1
+      }
+    },
+    "query": "\n                SELECT\n                    zds.token as `token: tokens::tokens::zs_voice_dataset_samples::ZsVoiceDatasetSampleToken`,\n                    zds.media_file_token as `media_file_token: tokens::tokens::media_files::MediaFileToken`,\n                    m.media_type as `media_type: enums::by_table::media_files::media_file_type::MediaFileType`,\n                    m.public_bucket_directory_hash,\n                    m.maybe_public_bucket_prefix,\n                    m.maybe_public_bucket_extension,\n                    zds.maybe_creator_user_token as `maybe_creator_user_token: tokens::tokens::users::UserToken`,\n                    zds.created_at,\n                    zds.updated_at\n                FROM zs_voice_dataset_samples as zds\n                JOIN media_files as m\n                    ON zds.media_file_token = m.token\n                WHERE zds.dataset_token = ?\n            "
+  },
   "9a879f76345ef5682b995f99026fac8b2f4c64c8ec4bb078187d1e53effcfbaf": {
     "describe": {
       "columns": [],
@@ -14177,330 +14615,6 @@
     },
     "query": "\nUPDATE zs_voice_datasets\nSET\n  user_deleted_at = NULL\nWHERE\n  token = ?\nLIMIT 1\n        "
   },
-  "c2a3ba1db511506563ae81a081ba3d3f93833a9474e43818e71bf42434b6f3e1": {
-    "describe": {
-      "columns": [
-        {
-          "name": "job_token: tokens::tokens::generic_inference_jobs::InferenceJobToken",
-          "ordinal": 0,
-          "type_info": {
-            "char_set": 224,
-            "flags": {
-              "bits": 4229
-            },
-            "max_size": 128,
-            "type": "VarString"
-          }
-        },
-        {
-          "name": "status",
-          "ordinal": 1,
-          "type_info": {
-            "char_set": 224,
-            "flags": {
-              "bits": 393
-            },
-            "max_size": 64,
-            "type": "String"
-          }
-        },
-        {
-          "name": "attempt_count",
-          "ordinal": 2,
-          "type_info": {
-            "char_set": 63,
-            "flags": {
-              "bits": 33
-            },
-            "max_size": 5,
-            "type": "Short"
-          }
-        },
-        {
-          "name": "inference_category: enums::by_table::generic_inference_jobs::inference_category::InferenceCategory",
-          "ordinal": 3,
-          "type_info": {
-            "char_set": 224,
-            "flags": {
-              "bits": 4233
-            },
-            "max_size": 128,
-            "type": "VarString"
-          }
-        },
-        {
-          "name": "maybe_model_type",
-          "ordinal": 4,
-          "type_info": {
-            "char_set": 224,
-            "flags": {
-              "bits": 136
-            },
-            "max_size": 128,
-            "type": "VarString"
-          }
-        },
-        {
-          "name": "maybe_model_token",
-          "ordinal": 5,
-          "type_info": {
-            "char_set": 224,
-            "flags": {
-              "bits": 136
-            },
-            "max_size": 128,
-            "type": "VarString"
-          }
-        },
-        {
-          "name": "maybe_raw_inference_text",
-          "ordinal": 6,
-          "type_info": {
-            "char_set": 224,
-            "flags": {
-              "bits": 144
-            },
-            "max_size": 262140,
-            "type": "Blob"
-          }
-        },
-        {
-          "name": "maybe_frontend_failure_category: enums::by_table::generic_inference_jobs::frontend_failure_category::FrontendFailureCategory",
-          "ordinal": 7,
-          "type_info": {
-            "char_set": 224,
-            "flags": {
-              "bits": 128
-            },
-            "max_size": 128,
-            "type": "VarString"
-          }
-        },
-        {
-          "name": "maybe_result_entity_type",
-          "ordinal": 8,
-          "type_info": {
-            "char_set": 224,
-            "flags": {
-              "bits": 128
-            },
-            "max_size": 128,
-            "type": "VarString"
-          }
-        },
-        {
-          "name": "maybe_result_entity_token",
-          "ordinal": 9,
-          "type_info": {
-            "char_set": 224,
-            "flags": {
-              "bits": 136
-            },
-            "max_size": 128,
-            "type": "VarString"
-          }
-        },
-        {
-          "name": "maybe_tts_model_title",
-          "ordinal": 10,
-          "type_info": {
-            "char_set": 224,
-            "flags": {
-              "bits": 4224
-            },
-            "max_size": 1020,
-            "type": "VarString"
-          }
-        },
-        {
-          "name": "maybe_voice_conversion_model_title",
-          "ordinal": 11,
-          "type_info": {
-            "char_set": 224,
-            "flags": {
-              "bits": 4224
-            },
-            "max_size": 1020,
-            "type": "VarString"
-          }
-        },
-        {
-          "name": "maybe_tts_public_bucket_path",
-          "ordinal": 12,
-          "type_info": {
-            "char_set": 224,
-            "flags": {
-              "bits": 4224
-            },
-            "max_size": 1020,
-            "type": "VarString"
-          }
-        },
-        {
-          "name": "maybe_voice_conversion_public_bucket_hash",
-          "ordinal": 13,
-          "type_info": {
-            "char_set": 224,
-            "flags": {
-              "bits": 4224
-            },
-            "max_size": 256,
-            "type": "VarString"
-          }
-        },
-        {
-          "name": "maybe_media_file_public_bucket_directory_hash",
-          "ordinal": 14,
-          "type_info": {
-            "char_set": 224,
-            "flags": {
-              "bits": 4224
-            },
-            "max_size": 128,
-            "type": "VarString"
-          }
-        },
-        {
-          "name": "maybe_media_file_public_bucket_prefix",
-          "ordinal": 15,
-          "type_info": {
-            "char_set": 224,
-            "flags": {
-              "bits": 128
-            },
-            "max_size": 64,
-            "type": "VarString"
-          }
-        },
-        {
-          "name": "maybe_media_file_public_bucket_extension",
-          "ordinal": 16,
-          "type_info": {
-            "char_set": 224,
-            "flags": {
-              "bits": 128
-            },
-            "max_size": 64,
-            "type": "VarString"
-          }
-        },
-        {
-          "name": "maybe_assigned_worker",
-          "ordinal": 17,
-          "type_info": {
-            "char_set": 224,
-            "flags": {
-              "bits": 128
-            },
-            "max_size": 512,
-            "type": "VarString"
-          }
-        },
-        {
-          "name": "maybe_assigned_cluster",
-          "ordinal": 18,
-          "type_info": {
-            "char_set": 224,
-            "flags": {
-              "bits": 128
-            },
-            "max_size": 512,
-            "type": "VarString"
-          }
-        },
-        {
-          "name": "is_keepalive_required",
-          "ordinal": 19,
-          "type_info": {
-            "char_set": 63,
-            "flags": {
-              "bits": 1
-            },
-            "max_size": 1,
-            "type": "Tiny"
-          }
-        },
-        {
-          "name": "created_at",
-          "ordinal": 20,
-          "type_info": {
-            "char_set": 63,
-            "flags": {
-              "bits": 1153
-            },
-            "max_size": 19,
-            "type": "Timestamp"
-          }
-        },
-        {
-          "name": "updated_at",
-          "ordinal": 21,
-          "type_info": {
-            "char_set": 63,
-            "flags": {
-              "bits": 9345
-            },
-            "max_size": 19,
-            "type": "Timestamp"
-          }
-        },
-        {
-          "name": "maybe_first_started_at",
-          "ordinal": 22,
-          "type_info": {
-            "char_set": 63,
-            "flags": {
-              "bits": 128
-            },
-            "max_size": 19,
-            "type": "Timestamp"
-          }
-        },
-        {
-          "name": "maybe_successfully_completed_at",
-          "ordinal": 23,
-          "type_info": {
-            "char_set": 63,
-            "flags": {
-              "bits": 128
-            },
-            "max_size": 19,
-            "type": "Timestamp"
-          }
-        }
-      ],
-      "nullable": [
-        false,
-        false,
-        false,
-        false,
-        true,
-        true,
-        true,
-        true,
-        true,
-        true,
-        true,
-        true,
-        true,
-        true,
-        true,
-        true,
-        true,
-        true,
-        true,
-        false,
-        false,
-        false,
-        true,
-        true
-      ],
-      "parameters": {
-        "Right": 1
-      }
-    },
-    "query": "\nSELECT\n    jobs.token as `job_token: tokens::tokens::generic_inference_jobs::InferenceJobToken`,\n\n    jobs.status,\n    jobs.attempt_count,\n\n    jobs.inference_category as `inference_category: enums::by_table::generic_inference_jobs::inference_category::InferenceCategory`,\n    jobs.maybe_model_type,\n    jobs.maybe_model_token,\n    jobs.maybe_raw_inference_text,\n\n    jobs.frontend_failure_category as `maybe_frontend_failure_category: enums::by_table::generic_inference_jobs::frontend_failure_category::FrontendFailureCategory`,\n\n    jobs.on_success_result_entity_type as maybe_result_entity_type,\n    jobs.on_success_result_entity_token as maybe_result_entity_token,\n\n    tts_models.title as maybe_tts_model_title,\n    voice_conversion_models.title as maybe_voice_conversion_model_title,\n\n    tts_results.public_bucket_wav_audio_path as maybe_tts_public_bucket_path,\n    voice_conversion_results.public_bucket_hash as maybe_voice_conversion_public_bucket_hash,\n    media_files.public_bucket_directory_hash as maybe_media_file_public_bucket_directory_hash,\n    media_files.maybe_public_bucket_prefix as maybe_media_file_public_bucket_prefix,\n    media_files.maybe_public_bucket_extension as maybe_media_file_public_bucket_extension,\n\n    jobs.assigned_worker as maybe_assigned_worker,\n    jobs.assigned_cluster as maybe_assigned_cluster,\n\n    jobs.is_keepalive_required,\n\n    jobs.created_at,\n    jobs.updated_at,\n\n    jobs.first_started_at as maybe_first_started_at,\n    jobs.successfully_completed_at as maybe_successfully_completed_at\n\nFROM generic_inference_jobs as jobs\n\nLEFT OUTER JOIN tts_models ON jobs.maybe_model_token = tts_models.token\nLEFT OUTER JOIN voice_conversion_models ON jobs.maybe_model_token = voice_conversion_models.token\n\nLEFT OUTER JOIN tts_results ON jobs.on_success_result_entity_token = tts_results.token\nLEFT OUTER JOIN voice_conversion_results ON jobs.on_success_result_entity_token = voice_conversion_results.token\nLEFT OUTER JOIN media_files ON jobs.on_success_result_entity_token = media_files.token\n\nWHERE jobs.token = ?\n        "
-  },
   "c2daf40fd0ca9d892ac19be067b23d35439e67d42d5b1d14c24b706da6f0d836": {
     "describe": {
       "columns": [],
@@ -14928,6 +15042,16 @@
       }
     },
     "query": "\nSELECT\n    tts_results.token as tts_result_token,\n\n    tts_results.raw_inference_text,\n\n    tts_results.model_token as tts_model_token,\n    tts_models.title as tts_model_title,\n\n    tts_results.maybe_pretrained_vocoder_used,\n\n    users.token as maybe_creator_user_token,\n    users.username as maybe_creator_username,\n    users.display_name as maybe_creator_display_name,\n    users.email_gravatar_hash as maybe_creator_gravatar_hash,\n    users.is_banned as maybe_creator_is_banned,\n\n    model_users.token as maybe_model_creator_user_token,\n    model_users.username as maybe_model_creator_username,\n    model_users.display_name as maybe_model_creator_display_name,\n    model_users.email_gravatar_hash as maybe_model_creator_gravatar_hash,\n    model_users.is_banned as maybe_model_creator_is_banned,\n\n    tts_results.public_bucket_wav_audio_path,\n    tts_results.public_bucket_spectrogram_path,\n\n    tts_results.creator_set_visibility,\n\n    tts_results.generated_by_worker,\n    tts_results.is_debug_request,\n\n    tts_results.file_size_bytes,\n    tts_results.duration_millis,\n    tts_results.created_at,\n    tts_results.updated_at,\n\n    tts_results.creator_ip_address,\n    tts_results.user_deleted_at,\n    tts_results.mod_deleted_at\n\nFROM tts_results\nLEFT OUTER JOIN tts_models\n  ON tts_results.model_token = tts_models.token\nLEFT OUTER JOIN users\n  ON tts_results.maybe_creator_user_token = users.token\nLEFT OUTER JOIN users as model_users\n  ON tts_models.creator_user_token = model_users.token\nWHERE\n    tts_results.token = ?\n        "
+  },
+  "c8547ea25817cd60c1ed15be51b8e5aa6c437b5156eacf81e95f1b029190f005": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Right": 20
+      }
+    },
+    "query": "\nINSERT INTO media_files\nSET\n  token = ?,\n\n  origin_category = ?,\n  origin_product_category = ?,\n\n  maybe_origin_model_type = ?,\n  maybe_origin_model_token = ?,\n\n  media_type = ?,\n  maybe_mime_type = ?,\n  file_size_bytes = ?,\n\n  checksum_sha2 = ?,\n\n  public_bucket_directory_hash = ?,\n  maybe_public_bucket_prefix = ?,\n  maybe_public_bucket_extension = ?,\n\n  maybe_creator_user_token = ?,\n  creator_ip_address = ?,\n\n  creator_set_visibility = ?,\n\n  maybe_creator_file_synthetic_id = ?,\n  maybe_creator_category_synthetic_id = ?,\n\n  is_generated_on_prem = ?,\n  generated_by_worker = ?,\n  generated_by_cluster = ?\n\n        "
   },
   "c9f9cf47f52c4eb41188f0119a9035bb590545a7129e9a6baabe1fde9082d990": {
     "describe": {

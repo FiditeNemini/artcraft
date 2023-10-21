@@ -12,6 +12,7 @@ pub const HANASHI_USERNAME : &str = "hanashi";
 pub async fn seed_user_accounts(mysql_pool: &Pool<MySql>) -> AnyhowResult<()> {
   info!("Seeding user accounts...");
 
+  // NB: This is idempotent and will only install the accounts once.
   let users = [
     (ADMIN_USERNAME, "password"),
     (HANASHI_USERNAME, "password"),

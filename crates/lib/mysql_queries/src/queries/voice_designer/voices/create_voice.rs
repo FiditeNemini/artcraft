@@ -34,7 +34,7 @@ pub struct CreateVoiceArgs<'a> {
   pub maybe_creator_user_token: Option<&'a UserToken>,
 
   pub creator_ip_address: &'a str,
-  pub creator_set_visibility: &'a Visibility,
+  pub creator_set_visibility: Visibility,
   pub mysql_pool: &'a MySqlPool
 }
 

@@ -207,14 +207,14 @@ pub async fn process_job(args: SadTalkerProcessJobArgs<'_>) -> Result<JobSuccess
     let mut error = ProcessSingleJobError::Other(anyhow!("CommandExitStatus: {:?}", command_exit_status));
 
     if let Ok(contents) = read_to_string(&stderr_output_file) {
+      warn!("Captured stderr output: {}", contents);
+
       match categorize_error(&contents)  {
         Some(ProcessSingleJobError::FaceDetectionFailure) => {
           warn!("Face not detected in source image");
           error = ProcessSingleJobError::FaceDetectionFailure;
         }
-        _ => {
-          warn!("Captured stderr output: {}", contents);
-        }
+        _ => {}
       }
     }
 

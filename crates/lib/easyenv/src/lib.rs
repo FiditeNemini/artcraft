@@ -32,6 +32,7 @@
 // It's easy to just keep them exported here to maintain compatibility.
 pub use error::EnvError;
 pub use error::InitError;
+pub use init::from_filename;
 pub use init::init_all_with_default_logging;
 pub use init::maybe_read_env_config_from_filename_and_paths;
 pub use init::read_env_config_from_filename_and_paths;

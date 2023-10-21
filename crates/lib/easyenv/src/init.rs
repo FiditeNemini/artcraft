@@ -11,6 +11,16 @@ pub fn init_all_with_default_logging(default_if_absent: Option<&str>) {
   init_env_logger(default_if_absent)
 }
 
+/// Read env configs from a filename.
+pub fn from_filename<P: AsRef<Path>>(filename: P) -> Result<(), InitError> {
+  let _path = dotenv::from_filename(&filename)
+      .map_err(|err| {
+        error!("Could not read env config from path {:?} : {:?}", filename.as_ref(), err);
+        InitError::DotEnvError
+      })?;
+  Ok(())
+}
+
 /// Try loading in an environment file across many search paths (first found wins).
 /// Returns an error if no file could be read or if in attempting to read a file there was an error.
 pub fn read_env_config_from_filename_and_paths<P: AsRef<Path>, Q: AsRef<Path>>(filename: P, paths: &[Q]) -> Result<(), InitError> {

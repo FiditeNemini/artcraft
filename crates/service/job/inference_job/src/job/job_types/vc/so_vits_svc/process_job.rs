@@ -2,6 +2,7 @@ use std::time::Instant;
 
 use anyhow::anyhow;
 use log::{error, info, warn};
+use buckets::public::media_files::original_file::MediaFileBucketPath;
 
 use buckets::public::media_uploads::original_file::MediaUploadOriginalFilePath;
 use buckets::public::voice_conversion_results::original_file::VoiceConversionResultOriginalFilePath;
@@ -11,13 +12,14 @@ use container_common::filesystem::safe_delete_temp_file::safe_delete_temp_file;
 use enums::by_table::generic_inference_jobs::inference_result_type::InferenceResultType;
 use filesys::create_dir_all_if_missing::create_dir_all_if_missing;
 use filesys::file_size::file_size;
+use hashing::sha256::sha256_hash_file::sha256_hash_file;
 use media::decode_basic_audio_info::decode_basic_audio_file_info;
 use mimetypes::mimetype_for_file::get_mimetype_for_file;
 use mysql_queries::payloads::generic_inference_args::generic_inference_args::PolymorphicInferenceArgs;
 use mysql_queries::queries::generic_inference::job::list_available_generic_inference_jobs::AvailableInferenceJob;
+use mysql_queries::queries::media_files::insert_media_file_from_voice_conversion::{insert_media_file_from_voice_conversion, InsertMediaFileArgs, VoiceConversionModelType};
 use mysql_queries::queries::media_uploads::get_media_upload_for_inference::MediaUploadRecordForInference;
 use mysql_queries::queries::voice_conversion::inference::get_voice_conversion_model_for_inference::VoiceConversionModelForInference;
-use mysql_queries::queries::voice_conversion::results::insert_voice_conversion_result::{insert_voice_conversion_result, InsertArgs};
 use tokens::tokens::media_uploads::MediaUploadToken;
 use tokens::tokens::users::UserToken;
 
@@ -26,6 +28,9 @@ use crate::job::job_loop::process_single_job_error::ProcessSingleJobError;
 use crate::job::job_types::vc::so_vits_svc::so_vits_svc_inference_command::{Device, InferenceArgs};
 use crate::job_dependencies::JobDependencies;
 use crate::util::maybe_download_file_from_bucket::maybe_download_file_from_bucket;
+
+const BUCKET_FILE_PREFIX : &str = "fakeyou_svc_";
+const BUCKET_FILE_EXTENSION : &str = ".wav";
 
 pub struct SoVitsSvcProcessJobArgs<'a> {
   pub job_dependencies: &'a JobDependencies,
@@ -131,14 +136,10 @@ pub async fn process_job(args: SoVitsSvcProcessJobArgs<'_>) -> Result<JobSuccess
   let input_wav_path = original_media_upload_fs_path;
 
   let output_audio_fs_path = work_temp_dir.path().join("output.wav");
-  //let output_metadata_fs_path = temp_dir.path().join("metadata.json");
-  //let output_spectrogram_fs_path = temp_dir.path().join("spectrogram.json");
 
   info!("Running VC inference...");
 
   info!("Expected output audio filename: {:?}", &output_audio_fs_path);
-  //info!("Expected output metadata filename: {:?}", &output_metadata_fs_path);
-  //info!("Expected output spectrogram filename: {:?}", &output_spectrogram_fs_path);
 
   // TODO: Limit output length for premium.
 
@@ -200,8 +201,6 @@ pub async fn process_job(args: SoVitsSvcProcessJobArgs<'_>) -> Result<JobSuccess
   info!("Checking that output files exist...");
 
   check_file_exists(&output_audio_fs_path).map_err(|e| ProcessSingleJobError::Other(e))?;
-  //check_file_exists(&output_metadata_fs_path).map_err(|e| ProcessSingleJobError::Other(e))?;
-  //check_file_exists(&output_spectrogram_fs_path).map_err(|e| ProcessSingleJobError::Other(e))?;
 
   info!("Interrogating result file properties...");
 
@@ -219,28 +218,41 @@ pub async fn process_job(args: SoVitsSvcProcessJobArgs<'_>) -> Result<JobSuccess
     warn!("Required a full decode of the output data to get duration! That's inefficient!");
   }
 
+  info!("Calculating sha256...");
+
+  let file_checksum = sha256_hash_file(&output_audio_fs_path)
+      .map_err(|err| {
+        ProcessSingleJobError::Other(anyhow!("Error hashing file: {:?}", err))
+      })?;
+
   // TODO: Make a new python image that generates spectrograms from any audio file.
 
   let file_metadata = FileMetadata {
     duration_millis: audio_info.duration_millis,
-    mimetype: maybe_mimetype,
+    mimetype: maybe_mimetype.clone(),
     file_size_bytes,
   };
-
-  //safe_delete_temp_file(&output_metadata_fs_path);
 
   // ==================== UPLOAD AUDIO TO BUCKET ==================== //
 
   job_progress_reporter.log_status("uploading result")
       .map_err(|e| ProcessSingleJobError::Other(e))?;
 
-  let result_bucket_location = VoiceConversionResultOriginalFilePath::generate_new();
+//  let result_bucket_location = VoiceConversionResultOriginalFilePath::generate_new();
+//
+//  let result_bucket_object_pathbuf = result_bucket_location.to_full_object_pathbuf();
+//
+//  info!("Audio destination bucket path: {:?}", &result_bucket_object_pathbuf);
+
+  let result_bucket_location = MediaFileBucketPath::generate_new(
+    Some(BUCKET_FILE_PREFIX),
+    Some(BUCKET_FILE_EXTENSION));
 
   let result_bucket_object_pathbuf = result_bucket_location.to_full_object_pathbuf();
 
   info!("Audio destination bucket path: {:?}", &result_bucket_object_pathbuf);
 
-  info!("Uploading audio...");
+  info!("Uploading audio media file...");
 
   args.job_dependencies.public_bucket_client.upload_filename_with_content_type(
     &result_bucket_object_pathbuf,
@@ -251,24 +263,6 @@ pub async fn process_job(args: SoVitsSvcProcessJobArgs<'_>) -> Result<JobSuccess
 
   safe_delete_temp_file(&output_audio_fs_path);
 
-//  // ==================== UPLOAD SPECTROGRAM TO BUCKETS ==================== //
-//
-//  let spectrogram_result_object_path = args.job_dependencies.bucket_path_unifier.tts_inference_spectrogram_output_path(
-//    &job.uuid_idempotency_token); // TODO: Don't use this!
-//
-//  info!("Spectrogram destination bucket path: {:?}", &spectrogram_result_object_path);
-//
-//  info!("Uploading spectrogram...");
-//
-//  args.job_dependencies.public_bucket_client.upload_filename_with_content_type(
-//    &spectrogram_result_object_path,
-//    &output_spectrogram_fs_path,
-//    "application/json")
-//      .await
-//      .map_err(|e| ProcessSingleJobError::Other(e))?;
-//
-//  safe_delete_temp_file(&output_spectrogram_fs_path);
-
   // ==================== DELETE DOWNLOADED FILE ==================== //
 
   // NB: We should be using a tempdir, but to make absolutely certain we don't overflow the disk...
@@ -278,16 +272,34 @@ pub async fn process_job(args: SoVitsSvcProcessJobArgs<'_>) -> Result<JobSuccess
 
   info!("Saving vc inference record...");
 
-  let (inference_result_token, id) = insert_voice_conversion_result(InsertArgs {
+//  let (inference_result_token, id) = insert_voice_conversion_result(InsertArgs {
+//    pool: &args.job_dependencies.mysql_pool,
+//    job: &job,
+//    public_bucket_hash: result_bucket_location.get_object_hash(),
+//    file_size_bytes: file_metadata.file_size_bytes,
+//    duration_millis: file_metadata.duration_millis.unwrap_or(0),
+//    is_on_prem: args.job_dependencies.container.is_on_prem,
+//    worker_hostname: &args.job_dependencies.container.hostname,
+//    worker_cluster: &args.job_dependencies.container.cluster_name,
+//    is_debug_worker: args.job_dependencies.worker_details.is_debug_worker
+//  })
+//      .await
+//      .map_err(|e| ProcessSingleJobError::Other(e))?;
+
+  let (inference_result_token, id) = insert_media_file_from_voice_conversion(InsertMediaFileArgs {
     pool: &args.job_dependencies.mysql_pool,
     job: &job,
-    public_bucket_hash: result_bucket_location.get_object_hash(),
+    voice_conversion_type: VoiceConversionModelType::SoVitsSvc,
+    maybe_mime_type: maybe_mimetype.as_deref(),
     file_size_bytes: file_metadata.file_size_bytes,
     duration_millis: file_metadata.duration_millis.unwrap_or(0),
+    sha256_checksum: &file_checksum,
+    public_bucket_directory_hash: result_bucket_location.get_object_hash(),
+    maybe_public_bucket_prefix: Some(BUCKET_FILE_PREFIX),
+    maybe_public_bucket_extension: Some(BUCKET_FILE_EXTENSION),
     is_on_prem: args.job_dependencies.container.is_on_prem,
     worker_hostname: &args.job_dependencies.container.hostname,
     worker_cluster: &args.job_dependencies.container.cluster_name,
-    is_debug_worker: args.job_dependencies.worker_details.is_debug_worker
   })
       .await
       .map_err(|e| ProcessSingleJobError::Other(e))?;
@@ -316,7 +328,7 @@ pub async fn process_job(args: SoVitsSvcProcessJobArgs<'_>) -> Result<JobSuccess
 
   Ok(JobSuccessResult {
     maybe_result_entity: Some(ResultEntity {
-      entity_type: InferenceResultType::VoiceConversion,
+      entity_type: InferenceResultType::MediaFile,
       entity_token: inference_result_token.to_string(),
     }),
     inference_duration,
