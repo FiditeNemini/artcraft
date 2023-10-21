@@ -10,6 +10,14 @@ use tokens::tokens::users::UserToken;
 
 use crate::queries::generic_synthetic_ids::transactional_increment_generic_synthetic_id::transactional_increment_generic_synthetic_id;
 
+
+
+// Model category? Zero shot?
+// Model type? end to end TTS / VC  vs cascading TTS / VC
+// Model version? 1?
+// Encoding Type? npz ? 
+//
+
 pub struct CreateVoiceArgs<'a> {
   pub dataset_token: &'a ZsVoiceDatasetToken,
 

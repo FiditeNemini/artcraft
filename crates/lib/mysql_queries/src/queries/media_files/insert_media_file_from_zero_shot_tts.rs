@@ -33,7 +33,7 @@ pub struct InsertArgs<'a> {
   pub worker_cluster: &'a str,
 
 }
-pub async fn insert_media_file_from_face_zero_shot(
+pub async fn insert_media_file_from_zero_shot(
     args: InsertArgs<'_>
   ) -> AnyhowResult<(MediaFileToken, u64)>
   {
