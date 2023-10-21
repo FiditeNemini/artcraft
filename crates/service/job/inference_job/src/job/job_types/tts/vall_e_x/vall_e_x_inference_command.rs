@@ -410,7 +410,7 @@ impl VallEXCreateEmbeddingCommand {
         })
     }
 
-    pub fn execute_inference<P: AsRef<Path>>(&self, args: CreateVoiceArgs<P>) -> CommandExitStatus {
+    pub fn execute_inference<P: AsRef<Path>>(&self, args: CreateVoiceInferenceArgs<P>) -> CommandExitStatus {
         match self.do_execute_inference(args) {
             Ok(exit_status) => exit_status,
             Err(error) =>
@@ -420,7 +420,7 @@ impl VallEXCreateEmbeddingCommand {
 
     fn do_execute_inference<P: AsRef<Path>>(
         &self,
-        args: CreateVoiceArgs<P>
+        args: CreateVoiceInferenceArgs<P>
     ) -> AnyhowResult<CommandExitStatus> {
         let mut command = String::new();
         command.push_str(&format!("cd {}", path_to_string(&self.root_code_directory)));

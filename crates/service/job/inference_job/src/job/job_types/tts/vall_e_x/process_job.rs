@@ -8,7 +8,7 @@ use enums::by_table::generic_inference_jobs::inference_result_type::InferenceRes
 use log::{ error, info, warn };
 use mysql_queries::queries::media_files::get_media_file::MediaFile;
 use mysql_queries::queries::media_files::insert_media_file_from_zero_shot_tts::InsertArgs;
-use mysql_queries::queries::media_files::insert_media_file_from_zero_shot_tts::insert_media_file_from_face_zero_shot;
+use mysql_queries::queries::media_files::insert_media_file_from_zero_shot_tts::insert_media_file_from_zero_shot;
 use mysql_queries::queries::voice_designer::datasets::get_dataset::ZsDataset;
 use mysql_queries::queries::voice_designer::datasets::get_dataset::get_dataset_by_token;
 use mysql_queries::queries::voice_designer::datasets::list_datasets::DatasetRecordForList;
@@ -28,17 +28,19 @@ use mysql_queries::queries::generic_inference::job::list_available_generic_infer
 
 use crate::job;
 use crate::job::job_loop::job_success_result::JobSuccessResult;
+
 use crate::job::job_loop::job_success_result::ResultEntity;
 use crate::job::job_loop::process_single_job_error::ProcessSingleJobError;
-use crate::job::job_types::tts::vall_e_x::validate_job::validate_job;
 
+use crate::job::job_types::tts::vall_e_x::validate_job::validate_job;
 use crate::job::job_types::tts::vall_e_x::vall_e_x_inference_command::CreateVoiceInferenceArgs;
 
 use crate::job_dependencies::JobDependencies;
 use crate::job::job_types::tts::vall_e_x::vall_e_x_inference_command::InferenceArgs;
-use cloud_storage::bucket_path_unifier::BucketPathUnifier;
 
+use cloud_storage::bucket_path_unifier::BucketPathUnifier;
 use super::validate_job::JobType;
+
 
 const BUCKET_FILE_PREFIX: &str = "fakeyou_";
 const BUCKET_FILE_EXTENSION: &str = ".npz";
@@ -47,9 +49,11 @@ const MIME_TYPE: &str = "application/x-binary";
 pub struct VoiceFile {
     pub filesystem_path: PathBuf,
 }
-const BUCKET_FILE_PREFIX: &str = "fakeyou_";
-const BUCKET_FILE_EXTENSION: &str = ".wav";
-const MIME_TYPE: &str = "audio/wav";
+
+const BUCKET_FILE_PREFIX_CREATE: &str = "fakeyou_";
+const BUCKET_FILE_EXTENSION_CREATE: &str = ".wav";
+const MIME_TYPE_CREATE: &str = "audio/wav";
+
 pub struct AudioFile {
     pub filesystem_path: PathBuf,
 }
@@ -134,7 +138,15 @@ pub async fn process_create_voice(
 
     match voice_dataset {
         Ok(val) => {
-            single_dataset = val;
+            match val {
+                Some(val) => {
+                    single_dataset = val;
+                },
+                None => {
+                    return Err(ProcessSingleJobError::InvalidJob(anyhow!("Missing Text for Inference")));
+                }
+            }
+           
         }
         Err(e) => {
             return Err(ProcessSingleJobError::from_anyhow_error(e));
@@ -181,7 +193,7 @@ pub async fn process_create_voice(
             audio_media_file.to_full_object_pathbuf(),
             &file_path
         ).await;
-        println!("FilePath to clone voice: {}", file_path);
+        println!("FilePath to clone voice: {}", file_path.to_string_lossy());
         downloaded_dataset.push(file_path.clone());
     }
 
@@ -206,18 +218,19 @@ pub async fn process_create_voice(
 
     let inference_start_time = Instant::now();
 
-    let audio_files = join_paths(path);
+    let audio_files = join_paths(downloaded_dataset);
 
     // TODO: fix with proper name
     let name: String = single_dataset.title;
-    let output_file_name = String::from("s.npz");
+
+    let output_file_name = String::from("temp.npz");
 
     // Run Inference
     let command_exit_status =
         args.job_dependencies.job_type_details.vall_e_x.create_embedding_command.execute_inference(
             job::job_types::tts::vall_e_x::vall_e_x_inference_command::CreateVoiceInferenceArgs {
                 output_embedding_path: &workdir,
-                output_embedding_name: output_file_name,
+                output_embedding_name: output_file_name.clone(),
                 audio_files: audio_files,
                 stderr_output_file: String::from("zero_shot_create_voice.txt"),
             }
@@ -229,8 +242,8 @@ pub async fn process_create_voice(
     info!("Uploading media ...");
 
     let result_bucket_location = MediaFileBucketPath::generate_new(
-        Some(BUCKET_FILE_PREFIX),
-        Some(BUCKET_FILE_EXTENSION)
+        Some(BUCKET_FILE_PREFIX_CREATE),
+        Some(BUCKET_FILE_EXTENSION_CREATE)
     );
 
     let result_bucket_object_pathbuf = result_bucket_location.to_full_object_pathbuf();
@@ -242,7 +255,7 @@ pub async fn process_create_voice(
         .upload_filename_with_content_type(
             &result_bucket_object_pathbuf,
             &finished_file,
-            &MIME_TYPE
+            &MIME_TYPE_CREATE
         )
         .await // TODO: We should check the mimetype to make sure bad payloads can't get uploaded
         .map_err(|e| ProcessSingleJobError::Other(e))?;
@@ -250,12 +263,13 @@ pub async fn process_create_voice(
 
     // TODO fix
     let creator_ip_address = String::from("127.0.0.1");
-    let creator_user_token = String::from("creator_user_token");
+    let creator_user_token = UserToken::new(String::from("user token"));
 
     let bucket_hash = String::from("bucket hash");
+    let voice_name = String::from("voice name");
     // insert record
     let voice_token = create_voice(CreateVoiceArgs {
-        dataset_token: &dataset_token,
+        dataset_token: &voice_dataset_token,
         model_category: "vc",
         model_type: "vall-e-x",
         model_version: 0,
@@ -268,13 +282,14 @@ pub async fn process_create_voice(
         mysql_pool,
     }).await;
 
-    Ok(JobSuccessResult {
-        maybe_result_entity: Some(ResultEntity {
-            entity_type: InferenceResultType::MediaFile,
-            entity_token: media_file_token.to_string(),
-        }),
-        inference_duration,
-    })
+    // Ok(JobSuccessResult {
+    //     maybe_result_entity: Some(ResultEntity {
+    //         entity_type: InferenceResultType::MediaFile,
+    //         entity_token: media_file_token.to_string(),
+    //     }),
+    //     inference_duration,
+    // })
+    Err(ProcessSingleJobError::Other(anyhow!("Missing Dataset Token?")))
 }
 
 pub async fn process_inference_voice(
@@ -485,7 +500,6 @@ mod tests {
         let value = join_paths(paths);
         let expected =
             "\"/home/tensor/code/TTSDockerContainer/Vall-E-mount/input/20.wav\" \"/home/tensor/code/TTSDockerContainer/Vall-E-mount/input/21.wav\"";
-        println!(expected);
         assert_eq!(value, expected);
     }
 }
