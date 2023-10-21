@@ -21,21 +21,21 @@ pub async fn process_single_tts_job(
 ) -> Result<JobSuccessResult, ProcessSingleJobError> {
 
   // TODO: Move common checks for slurs, etc. here.
-  let raw_inference_text = job.maybe_raw_inference_text
-      .as_deref()
-      .ok_or(ProcessSingleJobError::Other(anyhow!("no inference text")))?;
 
   match job.maybe_model_type {
     Some(InferenceModelType::VallEX) => {
       // Zero-shot TTS does not need a fine-tuned model token.
       dispatch_zero_shot_model(
         job_dependencies,
-        job,
-        &raw_inference_text
+        job
       ).await
     },
     Some(InferenceModelType::Tacotron2 | InferenceModelType::Vits) => {
       // All other TTS types require a fine-tuned TTS database record.
+      let raw_inference_text = job.maybe_raw_inference_text
+      .as_deref()
+      .ok_or(ProcessSingleJobError::Other(anyhow!("no inference text")))?;
+  
       dispatch_fine_tuned_weights_model(
         job_dependencies,
         job,
@@ -54,21 +54,14 @@ pub async fn process_single_tts_job(
 async fn dispatch_zero_shot_model(
     job_dependencies: &JobDependencies,
     job: &AvailableInferenceJob,
-    raw_inference_text: &str,
 ) -> Result<JobSuccessResult, ProcessSingleJobError> {
-
-
-
 
   match job.maybe_model_type {
     Some(InferenceModelType::VallEX) => {
-      
       vall_e_x::process_job::process_job(VALLEXProcessJobArgs {
         job_dependencies,
         job,
       }).await
-
-
     }
     _ => {
       Err(ProcessSingleJobError::Other(anyhow!("not a zero-shot model")))

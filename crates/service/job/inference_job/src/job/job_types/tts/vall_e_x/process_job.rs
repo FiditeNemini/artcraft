@@ -121,7 +121,7 @@ pub async fn process_create_voice(
     let mut job_progress_reporter = deps.job_progress_reporter
         .new_generic_inference(job.inference_job_token.as_str())
         .map_err(|e| ProcessSingleJobError::Other(anyhow!(e)))?;
-
+    println!("token! {}",dataset_token);
     let voice_dataset_token = tokens::tokens::zs_voice_datasets::ZsVoiceDatasetToken(dataset_token);
 
     // download data set files into a temp directory
@@ -143,7 +143,7 @@ pub async fn process_create_voice(
                     single_dataset = val;
                 },
                 None => {
-                    return Err(ProcessSingleJobError::InvalidJob(anyhow!("Missing Text for Inference")));
+                    return Err(ProcessSingleJobError::InvalidJob(anyhow!("Missing Dataset")));
                 }
             }
            
