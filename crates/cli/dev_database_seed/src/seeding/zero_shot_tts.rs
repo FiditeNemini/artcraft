@@ -1,3 +1,5 @@
+use std::path::PathBuf;
+
 use log::info;
 use sqlx::{MySql, Pool};
 
@@ -77,7 +79,7 @@ async fn create_voice_records(
 
   info!("Uploading media to bucket path: {}", public_upload_path.get_full_object_path_str());
 
-  let mut file_path = get_storyteller_rust_root();
+  let mut file_path = PathBuf::from("/home/tensor/code/storyteller/storyteller-rust/");
   file_path.push(format!("assets/seed/{}", wav_file));
 
   info!("Reading seed file: {:?}", file_path);

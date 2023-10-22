@@ -1,6 +1,7 @@
 use anyhow::anyhow;
 use buckets::public::media_files::original_file::MediaFileBucketPath;
 use cloud_storage::bucket_client::BucketClient;
+use enums::common::visibility::Visibility;
 use hashing::sha256::sha256_hash_file::sha256_hash_file;
 use filesys::file_size::file_size;
 use enums::by_table::generic_inference_jobs::inference_result_type::InferenceResultType;
@@ -40,7 +41,6 @@ use crate::job::job_types::tts::vall_e_x::vall_e_x_inference_command::InferenceA
 
 use cloud_storage::bucket_path_unifier::BucketPathUnifier;
 use super::validate_job::JobType;
-
 
 const BUCKET_FILE_PREFIX: &str = "fakeyou_";
 const BUCKET_FILE_EXTENSION: &str = ".npz";
@@ -121,7 +121,7 @@ pub async fn process_create_voice(
     let mut job_progress_reporter = deps.job_progress_reporter
         .new_generic_inference(job.inference_job_token.as_str())
         .map_err(|e| ProcessSingleJobError::Other(anyhow!(e)))?;
-    println!("token! {}",dataset_token);
+    info!("token! {}", dataset_token);
     let voice_dataset_token = tokens::tokens::zs_voice_datasets::ZsVoiceDatasetToken(dataset_token);
 
     // download data set files into a temp directory
@@ -141,17 +141,18 @@ pub async fn process_create_voice(
             match val {
                 Some(val) => {
                     single_dataset = val;
-                },
+                }
                 None => {
                     return Err(ProcessSingleJobError::InvalidJob(anyhow!("Missing Dataset")));
                 }
             }
-           
         }
         Err(e) => {
             return Err(ProcessSingleJobError::from_anyhow_error(e));
         }
     }
+
+    info!("Title:{} Token:{}", &single_dataset.title, &single_dataset.token);
 
     let result = list_dataset_samples_for_dataset_token(
         &voice_dataset_token,
@@ -169,13 +170,25 @@ pub async fn process_create_voice(
         }
     }
 
+    info!("dataset length {}", dataset.len());
+
     let mut downloaded_dataset: Vec<PathBuf> = Vec::new();
 
     for (index, record) in dataset.iter().enumerate() {
-        let prefix: Option<&str> = record.maybe_public_bucket_prefix.as_ref().map(|s| s.as_str());
+        //https://storage.googleapis.com/dev-vocodes-public/media/5/3/3/w/8/533w8zs0fy11nv7gkcna7p7vt03h8nda/dev_zs_533w8zs0fy11nv7gkcna7p7vt03h8nda.bin <-- where the file actually is
+        let temp_prefix = String::from("dev_zs_"); // hard code this for now and ask brandon whats up hahah ... probably forgot to seed ;_;
+        let prefix: Option<&str> = Some(&temp_prefix); // record.maybe_public_bucket_prefix.as_ref().map(|s| s.as_str());
         let extension: Option<&str> = record.maybe_public_bucket_extension
             .as_ref()
             .map(|s| s.as_str());
+        
+
+        info!(
+            "Record=> hash:{} prefix:{:?} extension:{:?}",
+            record.public_bucket_directory_hash,
+            prefix,
+            extension
+        );
 
         let audio_media_file = MediaFileBucketPath::from_object_hash(
             &record.public_bucket_directory_hash,
@@ -183,19 +196,27 @@ pub async fn process_create_voice(
             extension
         );
 
+        info!(
+            "Download using audio_media_file_path:{}",
+            audio_media_file.to_full_object_pathbuf().to_string_lossy()
+        );
+
         let file_name_wav = format!("{}.wav", index);
         let mut file_path = PathBuf::new();
         file_path.push(workdir.clone());
         file_path.push(file_path.clone());
+        file_path.push(file_name_wav);
 
         // TODO we might want to catch the error and not include the pathes into download dataset
         let _ = deps.public_bucket_client.download_file_to_disk(
             audio_media_file.to_full_object_pathbuf(),
             &file_path
         ).await;
-        println!("FilePath to clone voice: {}", file_path.to_string_lossy());
+        info!("FilePath to clone voice: {}", file_path.to_string_lossy());
         downloaded_dataset.push(file_path.clone());
     }
+
+    info!("Dataset Length {}", downloaded_dataset.len());
 
     // Need to download the models
     info!("Download models (if not present)...");
@@ -260,7 +281,6 @@ pub async fn process_create_voice(
         .await // TODO: We should check the mimetype to make sure bad payloads can't get uploaded
         .map_err(|e| ProcessSingleJobError::Other(e))?;
 
-
     // TODO fix
     let creator_ip_address = String::from("127.0.0.1");
     let creator_user_token = UserToken::new(String::from("user token"));
@@ -278,7 +298,7 @@ pub async fn process_create_voice(
         bucket_hash: &bucket_hash,
         maybe_creator_user_token: Some(&creator_user_token),
         creator_ip_address: &creator_ip_address,
-        creator_set_visibility: &Default::default(),
+        creator_set_visibility: Visibility::Public,
         mysql_pool,
     }).await;
 
