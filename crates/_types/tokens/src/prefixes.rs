@@ -30,6 +30,8 @@ pub(crate) enum TokenPrefix {
   MediaFile,
   MediaUpload,
   NewsStory, // NB: aichatbot / sqlite
+  PasswordReset,
+  TtsModel,
   TtsRenderTask, // NB: aichatbot / sqlite
   User,
   UserSession,
@@ -92,6 +94,8 @@ impl PrefixGenerator for TokenPrefix {
       Self::MediaFile => "m_",
       Self::MediaUpload => "mu_",
       Self::NewsStory => "news_story_",
+      Self::PasswordReset => "pw_reset_",
+      Self::TtsModel => "TM:", // NB: Old-style prefix, do not use for future tokens.
       Self::TtsRenderTask => "tts_task_",
       Self::User => "user_", // NB: Previously "U:"
       Self::UserSession => "session_",
