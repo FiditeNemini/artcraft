@@ -156,7 +156,7 @@ serde_json = "1.0.64"
 toml = "0.5.8"
 
 # Text processing
-pulldown-cmark = "0.8.0"
+pulldown-cmark = "0.9.3"
 
 # Async traits
 # NB: note: `async` trait functions are not currently supported
