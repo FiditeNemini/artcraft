@@ -152,7 +152,6 @@ pub async fn process_create_voice(
         .map_err(|e| ProcessSingleJobError::from_io_error(e))?;
 
     let workdir = work_temp_dir.path().to_path_buf();
-    // let workdir = PathBuf::from(work_temp_dir);
 
     // STEP 2. Get dataset for the title for the voice
     let voice_dataset = get_dataset_by_token(&voice_dataset_token, false, &mysql_pool).await;
@@ -204,7 +203,6 @@ pub async fn process_create_voice(
         let extension: Option<&str> = Some(&temp_extension);//record.maybe_public_bucket_extension
             // .as_ref()
             // .map(|s| s.as_str());
-
         // naming
         //[2023-10-23T01:26:46Z INFO  inference_job::job::job_types::tts::vall_e_x::process_job] Upload Bucket Path: /media/9/j/6/g/c/9j6gcd3ngb70ybpsq1rv4tw3gk97ds3t/fakeyou_9j6gcd3ngb70ybpsq1rv4tw3gk97ds3t.npz
         //[2023-10-23T01:26:46Z INFO  inference_job::job::job_types::tts::vall_e_x::process_job] Upload File Path: /tmp/temp_zeroshot_create_voice_11.1BLk16qTwhuo/temp.npz
@@ -284,7 +282,7 @@ pub async fn process_create_voice(
     // STEP 4. Download dataset each audio file
     info!("Uploading Media ...");
 
-    let media_file_token = MediaFileToken::generate();
+  
 
     let result_bucket_location: MediaFileBucketPath = MediaFileBucketPath::generate_new(
         Some(BUCKET_FILE_PREFIX_CREATE),
@@ -332,6 +330,8 @@ pub async fn process_create_voice(
         creator_set_visibility: Visibility::Public,
         mysql_pool,
     }).await;
+    
+    let media_file_token = MediaFileToken::generate();
 
     match voice_token {
         Ok(_value) => {

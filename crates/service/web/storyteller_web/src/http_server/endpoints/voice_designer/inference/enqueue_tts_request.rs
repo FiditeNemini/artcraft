@@ -3,6 +3,7 @@
 #![forbid(unused_variables)]
 
 use enums::by_table::generic_inference_jobs::inference_category::InferenceCategory;
+use http_server_common::request::{get_request_api_token, get_request_header_optional};
 use mysql_queries::payloads::generic_inference_args::generic_inference_args::{GenericInferenceArgs, InferenceCategoryAbbreviated, PolymorphicInferenceArgs};
 
 use std::sync::Arc;
@@ -16,6 +17,7 @@ use tokens::tokens::users::UserToken;
 use enums::by_table::generic_inference_jobs::inference_model_type::InferenceModelType;
 use mysql_queries::payloads::generic_inference_args::tts_payload::TTSArgs;
 
+use crate::configs::plans::get_correct_plan_for_session;
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use tokens::tokens::generic_inference_jobs::InferenceJobToken;
 use crate::server_state::ServerState;
@@ -25,6 +27,15 @@ use mysql_queries::queries::generic_inference::web::insert_generic_inference_job
 use std::fmt::Debug;
 use serde::Deserialize;
 use serde::Serialize;
+
+
+/// Debug requests can get routed to special "debug-only" workers, which can
+/// be used to trial new code, run debugging, etc.
+const DEBUG_HEADER_NAME : &str = "enable-debug-mode";
+
+/// The routing tag header can send workloads to particular k8s hosts.
+/// This is useful for catching the live logs or intercepting the job.
+const ROUTING_TAG_HEADER_NAME : &str = "routing-tag";
 
 #[derive(Deserialize)]
 pub struct EnqueueTTSRequest {
@@ -75,7 +86,6 @@ impl std::fmt::Display for EnqueueTTSRequestError {
   }
 }
 
-
 // Implementation for enqueuing a TTS request
 // Reference enqueue_infer_tts_handler.rs for checks: rate limiting / user sessions
 // insert generic inference job.rs
@@ -91,35 +101,64 @@ pub async fn enqueue_tts_request(
     let priority_level = 0;
     //let disable_rate_limiter = false; // NB: Careful!
 
-  // do something with user session check if the user should even be able to access the end point
-    // CAN address this soon just getting everything out of the way to just enqueue the job.
-  // GET MY SQL
-  // let mut mysql_connection = server_state.mysql_pool
-  // .acquire()
-  // .await
-  // .map_err(|err| {
-  //   warn!("MySql pool error: {:?}", err);
-  //   EnqueueTTSRequestError::ServerError
-  // })?;
+  let mut maybe_user_token : Option<UserToken> = None;
 
-  // return errors on payload not being correct
-  //Err(EnqueueTTSRequestError::ServerError) # missing voice token
+  let mut mysql_connection = server_state.mysql_pool
+      .acquire()
+      .await
+      .map_err(|err| {
+        warn!("MySql pool error: {:?}", err);
+        EnqueueTTSRequestError::ServerError
+      })?;
 
-// TODO: check for session 
+  // ==================== USER SESSION ==================== //
 
-// TODO: Give investors priority
+  let maybe_user_session = server_state
+      .session_checker
+      .maybe_get_user_session_extended_from_connection(&http_request, &mut mysql_connection)
+      .await
+      .map_err(|e| {
+        warn!("Session checker error: {:?}", e);
+        EnqueueTTSRequestError::ServerError
+      })?;
 
-// TODO: Add Rate Limiter
+  if let Some(user_session) = maybe_user_session.as_ref() {
+    maybe_user_token = Some(UserToken::new_from_str(&user_session.user_token));
+  }
 
-// TODO: Look up model info?
+  // Plan should handle "first anonymous use" and "investor" cases.
+  let plan = get_correct_plan_for_session(
+    server_state.server_environment,
+    maybe_user_session.as_ref());
 
-// TODO(bt): CHECK DATABASE FOR TOKENS? I am guessing we need to ensure those tokens exist because the files may not uploaded or are availible?
-// get input from the container spec and create a object that similar to llipsync_payload.rs
+  // Separate priority for animation.
+  let priority_level = plan.web_vc_base_priority_level();
 
-// PACKAGE JSON into RUST Struct, any smaller components
-// remap from the request
-// pass tokens from the request and create a payload that will have the information.
-// check malformed json
+  // ==================== DEBUG MODE + ROUTING TAG ==================== //
+    
+  let is_debug_request =
+      get_request_header_optional(&http_request, DEBUG_HEADER_NAME)
+          .is_some();
+
+  let maybe_routing_tag =
+      get_request_header_optional(&http_request, ROUTING_TAG_HEADER_NAME)
+          .map(|routing_tag| routing_tag.trim().to_string());
+
+  // ==================== RATE LIMIT ==================== //
+
+  let rate_limiter = match maybe_user_session {
+    None => &server_state.redis_rate_limiters.logged_out,
+    Some(ref user) => {
+      if user.role.is_banned {
+        return Err(EnqueueTTSRequestError::NotAuthorized);
+      }
+      &server_state.redis_rate_limiters.logged_in
+    },
+  };
+
+  if let Err(_err) = rate_limiter.rate_limit_request(&http_request) {
+    return Err(EnqueueTTSRequestError::RateLimited);
+  }
 
 // Get up IP address
 let ip_address = get_request_ip(&http_request);
@@ -132,7 +171,8 @@ let inference_args = TTSArgs {
 
 // create the inference args here
 // enqueue a zero shot tts request here...
-// create the job record here! explore the table insert the inference args in here as json! keep it short
+
+// create the job record here! 
 let query_result = insert_generic_inference_job(InsertGenericInferenceArgs {
   uuid_idempotency_token: &request.uuid_idempotency_token,
   inference_category: InferenceCategory::TextToSpeech,
@@ -150,8 +190,8 @@ let query_result = insert_generic_inference_job(InsertGenericInferenceArgs {
   creator_set_visibility: enums::common::visibility::Visibility::Public,
   priority_level,
   requires_keepalive: true, // do we need this? I think so 
-  is_debug_request,
-  maybe_routing_tag: None, // TODO needs documents for routing work to workers in production ...
+  is_debug_request:&is_debug_request,
+  maybe_routing_tag: &maybe_routing_tag, 
   mysql_pool: &server_state.mysql_pool,
 }).await;
 
