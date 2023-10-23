@@ -40,7 +40,7 @@ futures_old_for_limiter = { package = "futures", version = "0.1.29" } # Older ve
 # Web
 actix-cors = "0.6.0-beta.3"
 actix-files= "0.6.0-beta.8"
-actix-http = "3.0.0-beta.11"
+actix-http = "3.4.0"
 actix-multipart = "0.4.0-beta.7"
 actix-rt = "2.9.0"
 actix-service = "2.0.1"
