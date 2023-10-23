@@ -46,7 +46,7 @@ use super::validate_job::JobType;
 
 // Clearify what this is for ?
 const BUCKET_FILE_PREFIX: &str = "fakeyou_";
-const BUCKET_FILE_EXTENSION: &str = ".npz";
+const BUCKET_FILE_EXTENSION: &str = ".wav";
 const MIME_TYPE: &str = "audio/wav";
 
 pub struct VoiceFile {
@@ -54,7 +54,7 @@ pub struct VoiceFile {
 }
 
 const BUCKET_FILE_PREFIX_CREATE: &str = "fakeyou_";
-const BUCKET_FILE_EXTENSION_CREATE: &str = ".wav";
+const BUCKET_FILE_EXTENSION_CREATE: &str = ".npz";
 const MIME_TYPE_CREATE: &str = "application/x-binary";
 
 pub struct AudioFile {
@@ -273,8 +273,12 @@ pub async fn process_create_voice(
     );
     let result_bucket_object_pathbuf = result_bucket_location.to_full_object_pathbuf();
 
+    // Get Finished File
     let mut finished_file = work_temp_dir.path().to_path_buf();
     finished_file.push(&output_file_name);
+
+    info!("Upload Bucket Path: {}",result_bucket_object_pathbuf.to_path_buf().to_string_lossy());
+    info!("Upload File Path: {}",finished_file.to_path_buf().to_string_lossy());
 
     args.job_dependencies.private_bucket_client
         .upload_filename_with_content_type(
@@ -305,7 +309,6 @@ pub async fn process_create_voice(
         creator_set_visibility: Visibility::Public,
         mysql_pool,
     }).await;
-
 
     match voice_token {
         Ok(_value) => {
@@ -416,20 +419,25 @@ pub async fn process_inference_voice(
                 stderr_output_file: String::from("zero_shot_inference.txt"),
             }
         );
+
     let inference_duration = Instant::now().duration_since(inference_start_time);
 
     // upload audio to bucket
     info!("Uploading media ...");
 
     let result_bucket_location = MediaFileBucketPath::generate_new(
-        Some(BUCKET_FILE_PREFIX),
-        Some(BUCKET_FILE_EXTENSION)
+        Some(BUCKET_FILE_PREFIX_CREATE),
+        Some(BUCKET_FILE_EXTENSION_CREATE)
     );
 
     let result_bucket_object_pathbuf = result_bucket_location.to_full_object_pathbuf();
 
+    // Finished file path
     let mut finished_file = work_temp_dir.path().to_path_buf();
     finished_file.push(&output_file_name);
+
+    info!("Upload Bucket Path: {}",result_bucket_object_pathbuf.to_path_buf().to_string_lossy());
+    info!("Upload File Path: {}",finished_file.to_path_buf().to_string_lossy());
 
     args.job_dependencies.public_bucket_client
         .upload_filename_with_content_type(
