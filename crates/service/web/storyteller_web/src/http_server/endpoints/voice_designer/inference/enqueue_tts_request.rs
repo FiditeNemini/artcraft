@@ -95,7 +95,7 @@ pub async fn enqueue_tts_request(
   request: web::Json<EnqueueTTSRequest>,
   server_state: web::Data<Arc<ServerState>>) -> Result<HttpResponse,EnqueueTTSRequestError> {
 
-    println!("Recieved payload");
+    println!("Enqueue TTS Recieved payload");
     //let disable_rate_limiter = false; // NB: Careful!
 
   let mut maybe_user_token : Option<UserToken> = None;
