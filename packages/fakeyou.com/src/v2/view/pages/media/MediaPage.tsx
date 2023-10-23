@@ -329,7 +329,7 @@ export default function MediaPage({ sessionWrapper }: MediaPageProps) {
               </div>
 
               <Accordion>
-                <Accordion.Item title="Video Details" defaultOpen={true}>
+                <Accordion.Item title="Media Details" defaultOpen={true}>
                   {mediaDetails}
                 </Accordion.Item>
 
