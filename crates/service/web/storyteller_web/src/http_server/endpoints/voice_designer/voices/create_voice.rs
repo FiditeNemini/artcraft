@@ -3,8 +3,9 @@
 // #![forbid(unused_variables)]
 
 use std::sync::Arc;
+use http_server_common::request::get_request_header_optional::get_request_header_optional;
 use log::warn;
-use actix_web::{ HttpRequest, HttpResponse, web};
+use actix_web::{ HttpRequest, HttpResponse, web };
 use actix_web::error::ResponseError;
 use actix_web::http::StatusCode;
 
@@ -21,6 +22,7 @@ use tokens::tokens::users::UserToken;
 use enums::by_table::generic_inference_jobs::inference_model_type::InferenceModelType;
 use mysql_queries::payloads::generic_inference_args::tts_payload::TTSArgs;
 
+use crate::configs::plans::get_correct_plan_for_session::get_correct_plan_for_session;
 use crate::http_server::endpoints::voice_designer::inference::enqueue_tts_request::EnqueueTTSRequest;
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use tokens::tokens::generic_inference_jobs::InferenceJobToken;
@@ -82,17 +84,78 @@ impl std::fmt::Display for EnqueueCreateVoiceRequestError {
     }
 }
 
+/// Debug requests can get routed to special "debug-only" workers, which can
+/// be used to trial new code, run debugging, etc.
+const DEBUG_HEADER_NAME: &str = "enable-debug-mode";
+
+/// The routing tag header can send workloads to particular k8s hosts.
+/// This is useful for catching the live logs or intercepting the job.
+const ROUTING_TAG_HEADER_NAME: &str = "routing-tag";
+
 // pub async fn get_dataset_by_token
 pub async fn create_voice_handler(
     http_request: HttpRequest,
     request: web::Json<EnqueueCreateVoiceRequest>,
     server_state: web::Data<Arc<ServerState>>
 ) -> Result<HttpResponse, EnqueueCreateVoiceRequestError> {
-    // voice data set token ... zsd_wb08asm0m4a4cz42wwqked6tfg6e
+    // voice data set token ... zsd_wb08asm0m4a4cz42wwqked6tfg6e e.g
 
     // need this for the job
     // -> create_voice_records
     // Implementation for creating a voice
+
+    let mut maybe_user_token: Option<UserToken> = None;
+
+    let mut mysql_connection = server_state.mysql_pool.acquire().await.map_err(|err| {
+        warn!("MySql pool error: {:?}", err);
+        EnqueueCreateVoiceRequestError::ServerError
+    })?;
+
+    // ==================== USER SESSION ==================== //
+
+    let maybe_user_session = server_state.session_checker
+        .maybe_get_user_session_extended_from_connection(&http_request, &mut mysql_connection).await
+        .map_err(|e| {
+            warn!("Session checker error: {:?}", e);
+            EnqueueCreateVoiceRequestError::ServerError
+        })?;
+
+    if let Some(user_session) = maybe_user_session.as_ref() {
+        maybe_user_token = Some(UserToken::new_from_str(&user_session.user_token));
+    }
+
+    // TODO: Plan should handle "first anonymous use" and "investor" cases.
+    let plan = get_correct_plan_for_session(
+        server_state.server_environment,
+        maybe_user_session.as_ref()
+    );
+
+    // TODO: Separate priority for animation.
+    let priority_level = plan.web_vc_base_priority_level();
+
+    // ==================== DEBUG MODE + ROUTING TAG ==================== //
+
+    let is_debug_request = get_request_header_optional(&http_request, DEBUG_HEADER_NAME).is_some();
+
+    let maybe_routing_tag = get_request_header_optional(&http_request, ROUTING_TAG_HEADER_NAME).map(
+        |routing_tag| routing_tag.trim().to_string()
+    );
+
+    // ==================== RATE LIMIT ==================== //
+
+    let rate_limiter = match maybe_user_session {
+        None => &server_state.redis_rate_limiters.logged_out,
+        Some(ref user) => {
+            if user.role.is_banned {
+                return Err(EnqueueCreateVoiceRequestError::NotAuthorized);
+            }
+            &server_state.redis_rate_limiters.logged_in
+        }
+    };
+
+    if let Err(_err) = rate_limiter.rate_limit_request(&http_request) {
+        return Err(EnqueueCreateVoiceRequestError::RateLimited);
+    }
 
     println!("Recieved payload for voice creation.");
 
@@ -127,10 +190,10 @@ pub async fn create_voice_handler(
         maybe_creator_user_token: maybe_user_token.as_ref(),
         creator_ip_address: &ip_address,
         creator_set_visibility: enums::common::visibility::Visibility::Public,
-        priority_level,
+        priority_level: priority_level,
         requires_keepalive: true,
         is_debug_request: is_debug_request,
-        maybe_routing_tag: None,
+        maybe_routing_tag: maybe_routing_tag.as_deref(),
         mysql_pool: &server_state.mysql_pool,
     }).await;
 
@@ -153,5 +216,4 @@ pub async fn create_voice_handler(
         .map_err(|_e| EnqueueCreateVoiceRequestError::ServerError)?;
     // Error handling 101 rust result type returned like so.
     Ok(HttpResponse::Ok().content_type("application/json").body(body))
-
 }

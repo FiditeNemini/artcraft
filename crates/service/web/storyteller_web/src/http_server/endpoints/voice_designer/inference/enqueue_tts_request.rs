@@ -3,7 +3,7 @@
 #![forbid(unused_variables)]
 
 use enums::by_table::generic_inference_jobs::inference_category::InferenceCategory;
-use http_server_common::request::{get_request_api_token, get_request_header_optional};
+use http_server_common::request::get_request_header_optional::get_request_header_optional;
 use mysql_queries::payloads::generic_inference_args::generic_inference_args::{GenericInferenceArgs, InferenceCategoryAbbreviated, PolymorphicInferenceArgs};
 
 use std::sync::Arc;
@@ -17,7 +17,7 @@ use tokens::tokens::users::UserToken;
 use enums::by_table::generic_inference_jobs::inference_model_type::InferenceModelType;
 use mysql_queries::payloads::generic_inference_args::tts_payload::TTSArgs;
 
-use crate::configs::plans::get_correct_plan_for_session;
+use crate::configs::plans::get_correct_plan_for_session::get_correct_plan_for_session;
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use tokens::tokens::generic_inference_jobs::InferenceJobToken;
 use crate::server_state::ServerState;
@@ -96,9 +96,6 @@ pub async fn enqueue_tts_request(
   server_state: web::Data<Arc<ServerState>>) -> Result<HttpResponse,EnqueueTTSRequestError> {
 
     println!("Recieved payload");
-    let is_debug_request = false;
-    let maybe_user_token : Option<UserToken> =  Some(UserToken::new_from_str(&"place holder")); // TODO fix this
-    let priority_level = 0;
     //let disable_rate_limiter = false; // NB: Careful!
 
   let mut maybe_user_token : Option<UserToken> = None;
@@ -126,6 +123,7 @@ pub async fn enqueue_tts_request(
     maybe_user_token = Some(UserToken::new_from_str(&user_session.user_token));
   }
 
+  
   // Plan should handle "first anonymous use" and "investor" cases.
   let plan = get_correct_plan_for_session(
     server_state.server_environment,
@@ -190,8 +188,8 @@ let query_result = insert_generic_inference_job(InsertGenericInferenceArgs {
   creator_set_visibility: enums::common::visibility::Visibility::Public,
   priority_level,
   requires_keepalive: true, // do we need this? I think so 
-  is_debug_request:&is_debug_request,
-  maybe_routing_tag: &maybe_routing_tag, 
+  is_debug_request:is_debug_request,
+  maybe_routing_tag: maybe_routing_tag.as_deref(), 
   mysql_pool: &server_state.mysql_pool,
 }).await;
 
