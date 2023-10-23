@@ -125,6 +125,7 @@ pub async fn process_create_voice(
     let mut job_progress_reporter = deps.job_progress_reporter
         .new_generic_inference(job.inference_job_token.as_str())
         .map_err(|e| ProcessSingleJobError::Other(anyhow!(e)))?;
+
     info!("token! {}", dataset_token);
     let voice_dataset_token = tokens::tokens::zs_voice_datasets::ZsVoiceDatasetToken(dataset_token);
 
@@ -140,6 +141,7 @@ pub async fn process_create_voice(
         .map_err(|e| ProcessSingleJobError::from_io_error(e))?;
 
     let workdir = work_temp_dir.path().to_path_buf();
+    //let workdir = PathBuf::from(work_temp_dir);
 
     // STEP 2. Get dataset for the title for the voice
     let voice_dataset = get_dataset_by_token(&voice_dataset_token, false, &mysql_pool).await;
@@ -182,13 +184,18 @@ pub async fn process_create_voice(
 
     let mut downloaded_dataset: Vec<PathBuf> = Vec::new();
 
+    let temp_extension = String::from(".bin");
     for (index, record) in dataset.iter().enumerate() {
         //https://storage.googleapis.com/dev-vocodes-public/media/5/3/3/w/8/533w8zs0fy11nv7gkcna7p7vt03h8nda/dev_zs_533w8zs0fy11nv7gkcna7p7vt03h8nda.bin <-- where the file actually is
-        let temp_prefix = String::from("dev_zs_"); // hard code this for now and ask brandon whats up hahah ... probably forgot to seed ;_;
+        let temp_prefix = String::from("dev_zs_"); // hard code this for now and ask brandon whats up ... probably forgot to seed ;_;?
         let prefix: Option<&str> = Some(&temp_prefix); // record.maybe_public_bucket_prefix.as_ref().map(|s| s.as_str());
-        let extension: Option<&str> = record.maybe_public_bucket_extension
-            .as_ref()
-            .map(|s| s.as_str());
+        let extension: Option<&str> = Some(&temp_extension);//record.maybe_public_bucket_extension
+            // .as_ref()
+            // .map(|s| s.as_str());
+
+        // naming
+        //[2023-10-23T01:26:46Z INFO  inference_job::job::job_types::tts::vall_e_x::process_job] Upload Bucket Path: /media/9/j/6/g/c/9j6gcd3ngb70ybpsq1rv4tw3gk97ds3t/fakeyou_9j6gcd3ngb70ybpsq1rv4tw3gk97ds3t.npz
+        //[2023-10-23T01:26:46Z INFO  inference_job::job::job_types::tts::vall_e_x::process_job] Upload File Path: /tmp/temp_zeroshot_create_voice_11.1BLk16qTwhuo/temp.npz
 
         info!(
             "Record=> hash:{} prefix:{:?} extension:{:?}",
@@ -248,8 +255,7 @@ pub async fn process_create_voice(
     let audio_files = join_paths(downloaded_dataset);
 
     // Name of the output file
-    let output_file_name = String::from("temp.npz");
-
+    let output_file_name = String::from("temp"); // don't use the extension... for the inference
     // Run Inference
     let command_exit_status =
         args.job_dependencies.job_type_details.vall_e_x.create_embedding_command.execute_inference(
@@ -260,6 +266,7 @@ pub async fn process_create_voice(
                 stderr_output_file: String::from("zero_shot_create_voice.txt"),
             }
         );
+
     let inference_duration = Instant::now().duration_since(inference_start_time);
 
     // STEP 4. Download dataset each audio file
@@ -271,11 +278,15 @@ pub async fn process_create_voice(
         Some(BUCKET_FILE_PREFIX_CREATE),
         Some(BUCKET_FILE_EXTENSION_CREATE)
     );
+    
     let result_bucket_object_pathbuf = result_bucket_location.to_full_object_pathbuf();
 
     // Get Finished File
     let mut finished_file = work_temp_dir.path().to_path_buf();
-    finished_file.push(&output_file_name);
+    //let mut finished_file = workdir;
+
+    let output_bucket_file_name = String::from("temp.npz"); // use extension for bucket up.oad
+    finished_file.push(&output_bucket_file_name);
 
     info!("Upload Bucket Path: {}",result_bucket_object_pathbuf.to_path_buf().to_string_lossy());
     info!("Upload File Path: {}",finished_file.to_path_buf().to_string_lossy());
@@ -290,7 +301,7 @@ pub async fn process_create_voice(
         .map_err(|e| ProcessSingleJobError::Other(e))?;
 
     // CLEARIFY!
-    // 1.Not clear what this should be ?
+    // 1.Not clear what this should be ? this is to large rn.
     let bucket_hash = result_bucket_location.get_full_object_path_str().clone();
     // 2.As well as this ?
     let voice_name = single_dataset.title;
@@ -310,12 +321,13 @@ pub async fn process_create_voice(
         mysql_pool,
     }).await;
 
+
     match voice_token {
         Ok(_value) => {
             Ok(JobSuccessResult {
                 maybe_result_entity: Some(ResultEntity {
                     entity_type: InferenceResultType::MediaFile,
-                    entity_token: media_file_token.to_string(),
+                    entity_token: media_file_token.to_string(), // TO LONG?
                 }),
                 inference_duration,
             })
