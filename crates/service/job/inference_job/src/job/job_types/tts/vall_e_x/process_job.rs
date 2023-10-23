@@ -6,6 +6,7 @@ use hashing::sha256::sha256_hash_file::sha256_hash_file;
 use filesys::file_size::file_size;
 use enums::by_table::generic_inference_jobs::inference_result_type::InferenceResultType;
 
+
 use log::{ error, info, warn };
 use mysql_queries::queries::media_files::get_media_file::MediaFile;
 use mysql_queries::queries::media_files::insert_media_file_from_zero_shot_tts::InsertArgs;
@@ -121,6 +122,7 @@ pub async fn process_create_voice(
     let job = args.job;
     let mysql_pool = &deps.mysql_pool;
 
+    
     // get some globals
     let mut job_progress_reporter = deps.job_progress_reporter
         .new_generic_inference(job.inference_job_token.as_str())
@@ -129,9 +131,18 @@ pub async fn process_create_voice(
     info!("token! {}", dataset_token);
     let voice_dataset_token = tokens::tokens::zs_voice_datasets::ZsVoiceDatasetToken(dataset_token);
 
-    // TODO fix user info
-    let creator_ip_address = String::from("127.0.0.1");
-    let creator_user_token = UserToken::new(String::from("user token"));
+    let creator_ip_address = &job.creator_ip_address;
+    
+    let creator_user_token:UserToken;
+
+    match &job.maybe_creator_user_token {
+        Some(token) => {
+            creator_user_token = UserToken::new_from_str(token);
+        },
+        None => {
+            return Err(ProcessSingleJobError::InvalidJob(anyhow!("Missing Creator User Token")));
+        }
+    }
 
     // STEP 1. SETUP A TEMP DIRECTORY
     let work_temp_dir = format!("/tmp/temp_zeroshot_create_voice_{}", job.id.0);
@@ -141,7 +152,7 @@ pub async fn process_create_voice(
         .map_err(|e| ProcessSingleJobError::from_io_error(e))?;
 
     let workdir = work_temp_dir.path().to_path_buf();
-    //let workdir = PathBuf::from(work_temp_dir);
+    // let workdir = PathBuf::from(work_temp_dir);
 
     // STEP 2. Get dataset for the title for the voice
     let voice_dataset = get_dataset_by_token(&voice_dataset_token, false, &mysql_pool).await;
@@ -187,6 +198,7 @@ pub async fn process_create_voice(
     let temp_extension = String::from(".bin");
     for (index, record) in dataset.iter().enumerate() {
         //https://storage.googleapis.com/dev-vocodes-public/media/5/3/3/w/8/533w8zs0fy11nv7gkcna7p7vt03h8nda/dev_zs_533w8zs0fy11nv7gkcna7p7vt03h8nda.bin <-- where the file actually is
+
         let temp_prefix = String::from("dev_zs_"); // hard code this for now and ask brandon whats up ... probably forgot to seed ;_;?
         let prefix: Option<&str> = Some(&temp_prefix); // record.maybe_public_bucket_prefix.as_ref().map(|s| s.as_str());
         let extension: Option<&str> = Some(&temp_extension);//record.maybe_public_bucket_extension
@@ -255,7 +267,7 @@ pub async fn process_create_voice(
     let audio_files = join_paths(downloaded_dataset);
 
     // Name of the output file
-    let output_file_name = String::from("temp"); // don't use the extension... for the inference
+    let output_file_name = String::from("temp"); // don't use the extension... for the inference since the container will add the extension.
     // Run Inference
     let command_exit_status =
         args.job_dependencies.job_type_details.vall_e_x.create_embedding_command.execute_inference(
@@ -285,7 +297,7 @@ pub async fn process_create_voice(
     let mut finished_file = work_temp_dir.path().to_path_buf();
     //let mut finished_file = workdir;
 
-    let output_bucket_file_name = String::from("temp.npz"); // use extension for bucket up.oad
+    let output_bucket_file_name = String::from("temp.npz"); // use extension for bucket upload.
     finished_file.push(&output_bucket_file_name);
 
     info!("Upload Bucket Path: {}",result_bucket_object_pathbuf.to_path_buf().to_string_lossy());
@@ -300,10 +312,10 @@ pub async fn process_create_voice(
         .await // TODO: We should check the mimetype to make sure bad payloads can't get uploaded
         .map_err(|e| ProcessSingleJobError::Other(e))?;
 
-    // CLEARIFY!
-    // 1.Not clear what this should be ? this is to large rn.
-    let bucket_hash = result_bucket_location.get_full_object_path_str().clone();
-    // 2.As well as this ?
+    // CLEARIFY! these items
+    // 1.Should this be object hash?
+    let bucket_hash = result_bucket_location.get_object_hash().clone();
+    // 2.As well as this what should the voice name be?
     let voice_name = single_dataset.title;
 
     // insert record
@@ -321,13 +333,12 @@ pub async fn process_create_voice(
         mysql_pool,
     }).await;
 
-
     match voice_token {
         Ok(_value) => {
             Ok(JobSuccessResult {
                 maybe_result_entity: Some(ResultEntity {
                     entity_type: InferenceResultType::MediaFile,
-                    entity_token: media_file_token.to_string(), // TO LONG?
+                    entity_token: media_file_token.to_string(),
                 }),
                 inference_duration,
             })
@@ -457,7 +468,7 @@ pub async fn process_inference_voice(
             &finished_file,
             &MIME_TYPE
         )
-        .await // TODO: We should check the mimetype to make sure bad payloads can't get uploaded
+        .await 
         .map_err(|e| ProcessSingleJobError::Other(e))?;
 
     // ==================== UPLOAD AUDIO TO BUCKET ====================
