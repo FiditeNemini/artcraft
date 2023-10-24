@@ -24,6 +24,7 @@ pub enum MediaFileOriginModelType {
   /// so-vits-svc voice conversion models
   #[serde(rename = "so_vits_svc")]
   SoVitsSvc,
+  #[serde(rename = "vall_e_x")]
   VallEX,
 }
 
@@ -59,6 +60,7 @@ impl MediaFileOriginModelType {
       Self::RvcV2,
       Self::SadTalker,
       Self::SoVitsSvc,
+      Self::VallEX
     ])
   }
 }
@@ -96,10 +98,11 @@ mod tests {
     #[test]
     fn all_variants() {
       let mut variants = MediaFileOriginModelType::all_variants();
-      assert_eq!(variants.len(), 3);
+      assert_eq!(variants.len(), 4);
       assert_eq!(variants.pop_first(), Some(MediaFileOriginModelType::RvcV2));
       assert_eq!(variants.pop_first(), Some(MediaFileOriginModelType::SadTalker));
       assert_eq!(variants.pop_first(), Some(MediaFileOriginModelType::SoVitsSvc));
+      assert_eq!(variants.pop_first(), Some(MediaFileOriginModelType::VallEX));
       assert_eq!(variants.pop_first(), None);
     }
   }
