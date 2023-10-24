@@ -94,6 +94,9 @@ mod tests {
   fn test_serialization() {
     assert_serialization(IdCategory::MediaFile, "media_file");
     assert_serialization(IdCategory::LipsyncAnimation, "lipsync_animation");
+    assert_serialization(IdCategory::VoiceConversion, "voice_conversion");
+    assert_serialization(IdCategory::ZsDataset, "zs_dataset");
+    assert_serialization(IdCategory::ZsVoice, "zs_voice");
   }
 
     #[test]
