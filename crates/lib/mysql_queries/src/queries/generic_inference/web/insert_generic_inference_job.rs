@@ -6,6 +6,7 @@ use enums::by_table::generic_inference_jobs::inference_input_source_token_type::
 use enums::by_table::generic_inference_jobs::inference_model_type::InferenceModelType;
 use enums::common::visibility::Visibility;
 use errors::AnyhowResult;
+use tokens::tokens::anonymous_visitor_tracking::AnonymousVisitorTrackingToken;
 use tokens::tokens::generic_inference_jobs::InferenceJobToken;
 use tokens::tokens::users::UserToken;
 
@@ -26,6 +27,7 @@ pub struct InsertGenericInferenceArgs<'a> {
   pub maybe_inference_args: Option<GenericInferenceArgs>,
 
   pub maybe_creator_user_token: Option<&'a UserToken>,
+  pub maybe_avt_token: Option<&'a AnonymousVisitorTrackingToken>,
   pub creator_ip_address: &'a str,
   pub creator_set_visibility: Visibility,
 
@@ -71,7 +73,9 @@ SET
   maybe_inference_args = ?,
 
   maybe_creator_user_token = ?,
+  maybe_creator_anonymous_visitor_token = ?,
   creator_ip_address = ?,
+
   creator_set_visibility = ?,
 
   priority_level = ?,
@@ -98,7 +102,9 @@ SET
         serialized_args_payload,
 
         args.maybe_creator_user_token.map(|t| t.to_string()),
+        args.maybe_avt_token.map(|t| t.to_string()),
         args.creator_ip_address,
+
         args.creator_set_visibility.to_str(),
 
         args.priority_level,

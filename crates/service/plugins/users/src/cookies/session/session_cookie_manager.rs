@@ -31,17 +31,15 @@ const SESSION_COOKIE_NAME : &str = "session";
 #[derive(Clone)]
 pub struct SessionCookieManager {
   cookie_domain: String,
-  hmac_secret: String,
   jwt_signer: JwtSigner,
 }
 
 impl SessionCookieManager {
-  pub fn new(cookie_domain: &str, hmac_secret: &str) -> Self {
-    Self {
+  pub fn new(cookie_domain: &str, hmac_secret: &str) -> AnyhowResult<Self> {
+    Ok(Self {
       cookie_domain: cookie_domain.to_string(),
-      hmac_secret: hmac_secret.to_string(),
-      jwt_signer: JwtSigner::new(hmac_secret).unwrap(),//TODO FIXME
-    }
+      jwt_signer: JwtSigner::new(hmac_secret)?
+    })
   }
 
   pub fn create_cookie(&self, session_token: &str, user_token: &str) -> AnyhowResult<Cookie> {
@@ -143,7 +141,7 @@ mod tests {
   fn test_cookie_payload() {
     // NB: Let's make extra sure this always works when migrating cookies, else we'll accidentally log out logged-in users.
     // (These are version 2 cookies.)
-    let manager = SessionCookieManager::new("fakeyou.com", "secret");
+    let manager = SessionCookieManager::new("fakeyou.com", "secret").unwrap();
     let cookie = manager.create_cookie("ex_session_token", "ex_user_token").unwrap();
 
     assert_eq!(cookie.value(), "eyJhbGciOiJIUzI1NiJ9.eyJjb29raWVfdmVyc2lvbiI6IjIiLCJzZXNzaW9uX3Rva2VuIjoiZXhfc2Vzc2lvbl90b2tlbiIsInVzZXJfdG9rZW4iOiJleF91c2VyX3Rva2VuIn0.94ly2gHhlPVtnANsNy6cJozFVmId4imwW5v-mei7jD8");
@@ -153,7 +151,7 @@ mod tests {
   fn test_cookie_round_trip() {
     // NB: Let's make extra sure this always works when migrating cookies, else we'll accidentally log out logged-in users.
     // (These are version 2 cookies.)
-    let manager = SessionCookieManager::new("fakeyou.com", "secret");
+    let manager = SessionCookieManager::new("fakeyou.com", "secret").unwrap();
     let cookie = manager.create_cookie("ex_session_token", "ex_user_token").unwrap();
 
     let decoded = manager.decode_session_cookie_payload(&cookie).unwrap();

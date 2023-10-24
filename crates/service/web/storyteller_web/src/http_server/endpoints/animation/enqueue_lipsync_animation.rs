@@ -18,11 +18,11 @@ use http_server_common::request::get_request_ip::get_request_ip;
 use mysql_queries::payloads::generic_inference_args::generic_inference_args::{GenericInferenceArgs, InferenceCategoryAbbreviated, PolymorphicInferenceArgs};
 use mysql_queries::payloads::generic_inference_args::lipsync_payload::{FaceEnhancer, LipsyncAnimationAudioSource, LipsyncAnimationImageSource, LipsyncArgs};
 use mysql_queries::queries::generic_inference::web::insert_generic_inference_job::{insert_generic_inference_job, InsertGenericInferenceArgs};
-use tokens::tokens::media_uploads::MediaUploadToken;
 use tokens::tokens::generic_inference_jobs::InferenceJobToken;
 use tokens::tokens::media_files::MediaFileToken;
-use tokens::tokens::voice_conversion_results::VoiceConversionResultToken;
+use tokens::tokens::media_uploads::MediaUploadToken;
 use tokens::tokens::users::UserToken;
+use tokens::tokens::voice_conversion_results::VoiceConversionResultToken;
 
 use crate::configs::plans::get_correct_plan_for_session::get_correct_plan_for_session;
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
@@ -174,6 +174,8 @@ pub async fn enqueue_lipsync_animation_handler(
         EnqueueLipsyncAnimationError::ServerError
       })?;
 
+  let maybe_avt_token = server_state.avt_cookie_manager.get_avt_token_from_request(&http_request);
+
   // ==================== USER SESSION ==================== //
 
   let maybe_user_session = server_state
@@ -312,6 +314,7 @@ pub async fn enqueue_lipsync_animation_handler(
       args: Some(PolymorphicInferenceArgs::La(inference_args)),
     }),
     maybe_creator_user_token: maybe_user_token.as_ref(),
+    maybe_avt_token: maybe_avt_token.as_ref(),
     creator_ip_address: &ip_address,
     creator_set_visibility: set_visibility,
     priority_level,

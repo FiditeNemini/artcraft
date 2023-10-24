@@ -241,7 +241,7 @@ async fn main() -> AnyhowResult<()> {
   let website_homepage_redirect =
       easyenv::get_env_string_or_default("WEBSITE_HOMEPAGE_REDIRECT", "https://vo.codes/");
 
-  let session_cookie_manager = SessionCookieManager::new(&cookie_domain, &hmac_secret);
+  let session_cookie_manager = SessionCookieManager::new(&cookie_domain, &hmac_secret)?;
   let avt_cookie_manager = AvtCookieManager::new(&cookie_domain, &hmac_secret)?;
 
   let session_checker = SessionChecker::new_with_cache(
