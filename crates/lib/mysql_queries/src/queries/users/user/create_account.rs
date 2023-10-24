@@ -7,7 +7,7 @@ use log::warn;
 use sqlx::error::Error::Database;
 use sqlx::MySqlPool;
 
-use crate::tokens::Tokens;
+use tokens::tokens::users::UserToken;
 
 pub struct CreateAccountArgs<'a> {
   pub username: &'a str,
@@ -19,7 +19,7 @@ pub struct CreateAccountArgs<'a> {
 }
 
 pub struct CreateAccountSuccessResult {
-  pub user_token: String,
+  pub user_token: UserToken,
   pub user_id: u64,
 }
 
@@ -40,11 +40,7 @@ pub async fn create_account(
   const INITIAL_PROFILE_RENDERED_HTML : &str = "";
   const INITIAL_USER_ROLE: &str = "user";
 
-  let user_token = Tokens::new_user()
-      .map_err(|_e| {
-        warn!("problem creating user token");
-        CreateAccountError::OtherError
-      })?;
+  let user_token = UserToken::generate();
 
   let query_result = sqlx::query!(
         r#"
