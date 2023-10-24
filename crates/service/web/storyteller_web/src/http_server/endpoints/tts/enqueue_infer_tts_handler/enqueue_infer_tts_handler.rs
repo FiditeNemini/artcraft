@@ -383,6 +383,8 @@ pub async fn enqueue_infer_tts_handler(
         .as_deref()
         .map(|token| UserToken::new_from_str(token));
 
+    let maybe_avt_token = server_state.avt_cookie_manager.get_avt_token_from_request(&http_request);
+
     let query_result = insert_generic_inference_job(InsertGenericInferenceArgs {
       uuid_idempotency_token: &request.uuid_idempotency_token,
       inference_category: InferenceCategory::TextToSpeech,
@@ -396,6 +398,7 @@ pub async fn enqueue_infer_tts_handler(
         args: None, // NB: We don't need to encode any args yet.
       }),
       maybe_creator_user_token: maybe_creator_user_token_typed.as_ref(),
+      maybe_avt_token: maybe_avt_token.as_ref(),
       creator_ip_address: &ip_address,
       creator_set_visibility: set_visibility,
       priority_level,

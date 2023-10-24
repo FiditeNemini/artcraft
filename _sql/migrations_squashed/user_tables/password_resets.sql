@@ -42,7 +42,7 @@ CREATE TABLE password_resets (
   -- For abuse tracking.
   -- Wide enough for IPv4/6
   ip_address_creation VARCHAR(40) NOT NULL,
-  ip_address_redemption VARCHAR(40) NOT NULL,
+  ip_address_redemption VARCHAR(40) DEFAULT NULL,
 
   -- Incremented with every update.
   version INT NOT NULL DEFAULT 0,
@@ -58,6 +58,9 @@ CREATE TABLE password_resets (
   -- INDICES --
   PRIMARY KEY (id),
   UNIQUE KEY (token),
+
+  UNIQUE KEY (user_token, secret_key),
+
   KEY fk_user_token (user_token),
   KEY index_secret_key (secret_key),
   KEY index_expires_at (expires_at)

@@ -31,6 +31,7 @@ use crate::http_server::endpoints::flags::design_refresh_flag::disable_design_re
 use crate::http_server::endpoints::flags::design_refresh_flag::enable_design_refresh_flag_handler::enable_design_refresh_flag_handler;
 use crate::http_server::endpoints::inference_job::get_inference_job_status::get_inference_job_status_handler;
 use crate::http_server::endpoints::inference_job::get_pending_inference_job_count::get_pending_inference_job_count_handler;
+use crate::http_server::endpoints::inference_job::terminate_inference_job_handler::terminate_inference_job_handler;
 use crate::http_server::endpoints::investor_demo::disable_demo_mode_handler::disable_demo_mode_handler;
 use crate::http_server::endpoints::investor_demo::enable_demo_mode_handler::enable_demo_mode_handler;
 use crate::http_server::endpoints::leaderboard::get_leaderboard::leaderboard_handler;
@@ -193,6 +194,7 @@ pub fn add_routes<T, B> (app: App<T>) -> App<T>
 
   let mut app = RouteBuilder::from_app(app)
       .add_get("/v1/model_inference/job_status/{token}", get_inference_job_status_handler)
+      .add_delete("/v1/model_inference/job/{token}", terminate_inference_job_handler, true)
       .add_get("/v1/model_inference/queue_length", get_pending_inference_job_count_handler)
       .into_app();
 

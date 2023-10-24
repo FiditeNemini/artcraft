@@ -145,9 +145,11 @@ CREATE TABLE generic_inference_jobs (
   --  * Pending = job is ready to go
   --  * Started = job is running
   --  * Complete_Success = job is done (success)
-  --  * Complete_Failure = job is done (failure)
+  --  * Complete_Failure = job is done (permanent failure, eg. a Face Animator job without a face)
   --  * Attempt_Failed = job failed but may retry.
-  --  * Dead = job failed permanently.
+  --  * Dead = job failed permanently (ie. exhausted retries)
+  --  * Cancelled_By_User = the user canceled their own job
+  --  * Cancelled_By_System = the system terminated the job (ie. load shedding, user account deletion, etc.)
   --
   -- Pending -> Started -> Complete_Success
   --                    |-> Complete_Failure
@@ -158,7 +160,10 @@ CREATE TABLE generic_inference_jobs (
     'complete_success',
     'complete_failure',
     'attempt_failed',
-    'dead') NOT NULL DEFAULT 'pending',
+    'dead',
+    'cancelled_by_user',
+    'cancelled_by_system'
+  ) NOT NULL DEFAULT 'pending',
 
   -- We can track this against a "max_attempt_count"
   attempt_count SMALLINT UNSIGNED NOT NULL DEFAULT 0,

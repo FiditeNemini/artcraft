@@ -3,23 +3,28 @@
 #![forbid(unused_variables)]
 
 use enums::by_table::generic_inference_jobs::inference_category::InferenceCategory;
-use http_server_common::request::get_request_header_optional::get_request_header_optional;
 use mysql_queries::payloads::generic_inference_args::generic_inference_args::{GenericInferenceArgs, InferenceCategoryAbbreviated, PolymorphicInferenceArgs};
 
 use std::sync::Arc;
+
 use actix_web::{HttpRequest, HttpResponse, web};
 use actix_web::error::ResponseError;
 use actix_web::http::StatusCode;
-use log::{warn};
-use http_server_common::request::get_request_ip::get_request_ip;
+use log::warn;
+use serde::Deserialize;
+use serde::Serialize;
 
-use tokens::tokens::users::UserToken;
+use enums::by_table::generic_inference_jobs::inference_category::InferenceCategory;
 use enums::by_table::generic_inference_jobs::inference_model_type::InferenceModelType;
+use http_server_common::request::get_request_ip::get_request_ip;
+use mysql_queries::payloads::generic_inference_args::generic_inference_args::{GenericInferenceArgs, InferenceCategoryAbbreviated, PolymorphicInferenceArgs};
 use mysql_queries::payloads::generic_inference_args::tts_payload::TTSArgs;
+use mysql_queries::queries::generic_inference::web::insert_generic_inference_job::{insert_generic_inference_job, InsertGenericInferenceArgs};
+use tokens::tokens::generic_inference_jobs::InferenceJobToken;
+use tokens::tokens::users::UserToken;
 
 use crate::configs::plans::get_correct_plan_for_session::get_correct_plan_for_session;
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
-use tokens::tokens::generic_inference_jobs::InferenceJobToken;
 use crate::server_state::ServerState;
 use mysql_queries::queries::generic_inference::web::insert_generic_inference_job::{insert_generic_inference_job, InsertGenericInferenceArgs};
 
@@ -27,15 +32,6 @@ use mysql_queries::queries::generic_inference::web::insert_generic_inference_job
 use std::fmt::Debug;
 use serde::Deserialize;
 use serde::Serialize;
-
-
-/// Debug requests can get routed to special "debug-only" workers, which can
-/// be used to trial new code, run debugging, etc.
-const DEBUG_HEADER_NAME : &str = "enable-debug-mode";
-
-/// The routing tag header can send workloads to particular k8s hosts.
-/// This is useful for catching the live logs or intercepting the job.
-const ROUTING_TAG_HEADER_NAME : &str = "routing-tag";
 
 #[derive(Deserialize)]
 pub struct EnqueueTTSRequest {
@@ -95,7 +91,10 @@ pub async fn enqueue_tts_request(
   request: web::Json<EnqueueTTSRequest>,
   server_state: web::Data<Arc<ServerState>>) -> Result<HttpResponse,EnqueueTTSRequestError> {
 
-    println!("Enqueue TTS Recieved payload");
+    println!("Recieved payload");
+    let is_debug_request = true;
+    let maybe_user_token : Option<UserToken> =  Some(UserToken::new_from_str(&"place holder")); // TODO fix this
+    let priority_level = 0;
     //let disable_rate_limiter = false; // NB: Careful!
 
   let mut maybe_user_token : Option<UserToken> = None;
@@ -184,6 +183,7 @@ let query_result = insert_generic_inference_job(InsertGenericInferenceArgs {
     args: Some(PolymorphicInferenceArgs::Tts(inference_args)),
   }),
   maybe_creator_user_token: maybe_user_token.as_ref(),
+  maybe_avt_token: maybe_avt_token.as_ref(),
   creator_ip_address: &ip_address,
   creator_set_visibility: enums::common::visibility::Visibility::Public,
   priority_level,

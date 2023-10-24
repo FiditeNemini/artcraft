@@ -25,8 +25,8 @@ use mysql_queries::payloads::generic_inference_args::generic_inference_args::{Fu
 use mysql_queries::queries::generic_inference::web::insert_generic_inference_job::{insert_generic_inference_job, InsertGenericInferenceArgs};
 use mysql_queries::queries::voice_conversion::model_info_lite::get_voice_conversion_model_info_lite::get_voice_conversion_model_info_lite_with_connection;
 use redis_common::redis_keys::RedisKeys;
-use tokens::tokens::media_uploads::MediaUploadToken;
 use tokens::tokens::generic_inference_jobs::InferenceJobToken;
+use tokens::tokens::media_uploads::MediaUploadToken;
 use tokens::tokens::users::UserToken;
 use tokens::tokens::voice_conversion_models::VoiceConversionModelToken;
 use tts_common::priority::FAKEYOU_INVESTOR_PRIORITY_LEVEL;
@@ -142,6 +142,10 @@ pub async fn enqueue_voice_conversion_inference_handler(
         warn!("MySql pool error: {:?}", err);
         EnqueueVoiceConversionInferenceError::ServerError
       })?;
+
+  // ==================== AVT TOKEN ==================== //
+
+  let maybe_avt_token = server_state.avt_cookie_manager.get_avt_token_from_request(&http_request);
 
   // ==================== USER SESSION ==================== //
 
@@ -298,6 +302,7 @@ pub async fn enqueue_voice_conversion_inference_handler(
       args: maybe_args,
     }),
     maybe_creator_user_token: maybe_user_token.as_ref(),
+    maybe_avt_token: maybe_avt_token.as_ref(),
     creator_ip_address: &ip_address,
     creator_set_visibility: set_visibility,
     priority_level,

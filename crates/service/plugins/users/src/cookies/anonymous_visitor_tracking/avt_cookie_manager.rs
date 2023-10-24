@@ -5,6 +5,7 @@ use log::warn;
 
 use cookies::jwt_signer::JwtSigner;
 use errors::AnyhowResult;
+use tokens::tokens::anonymous_visitor_tracking::AnonymousVisitorTrackingToken;
 
 use crate::cookies::anonymous_visitor_tracking::avt_cookie_payload::AvtCookiePayload;
 
@@ -75,5 +76,12 @@ impl AvtCookieManager {
       },
       Ok(payload) => Ok(Some(payload)),
     }
+  }
+
+  pub fn get_avt_token_from_request(&self, request: &HttpRequest) -> Option<AnonymousVisitorTrackingToken> {
+    self.decode_cookie_payload_from_request(request)
+        .ok()
+        .flatten()
+        .map(|payload| payload.avt_token)
   }
 }

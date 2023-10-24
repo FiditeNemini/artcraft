@@ -1,12 +1,16 @@
 use anyhow::anyhow;
 use chrono::{DateTime, Utc};
 use log::warn;
-use sqlx::MySqlPool;
+use sqlx::{MySql, MySqlPool};
+use sqlx::pool::PoolConnection;
 
 use enums::by_table::generic_inference_jobs::frontend_failure_category::FrontendFailureCategory;
 use enums::by_table::generic_inference_jobs::inference_category::InferenceCategory;
+use enums::common::job_status_plus::JobStatusPlus;
 use errors::AnyhowResult;
+use tokens::tokens::anonymous_visitor_tracking::AnonymousVisitorTrackingToken;
 use tokens::tokens::generic_inference_jobs::InferenceJobToken;
+use tokens::tokens::users::UserToken;
 
 use crate::helpers::boolean_converters::i8_to_bool;
 
@@ -14,7 +18,7 @@ use crate::helpers::boolean_converters::i8_to_bool;
 pub struct GenericInferenceJobStatus {
   pub job_token: InferenceJobToken,
 
-  pub status: String,
+  pub status: JobStatusPlus,
   pub attempt_count: u16,
 
   pub maybe_assigned_worker: Option<String>,
@@ -26,6 +30,7 @@ pub struct GenericInferenceJobStatus {
 
   pub request_details: RequestDetails,
   pub maybe_result_details: Option<ResultDetails>,
+  pub user_details: UserDetails,
 
   pub is_keepalive_required: bool,
 
@@ -64,9 +69,28 @@ pub struct ResultDetails {
   pub maybe_successfully_completed_at: Option<DateTime<Utc>>,
 }
 
+/// NB: DO NOT EXPOSE TO FRONTEND.
+/// This is used to gate access to job termination
+#[derive(Debug)]
+pub struct UserDetails {
+  pub maybe_creator_user_token: Option<UserToken>,
+  pub maybe_creator_anonymous_visitor_token: Option<AnonymousVisitorTrackingToken>,
+  pub creator_ip_address: String,
+}
+
 /// Look up job status.
 /// Returns Ok(None) when the record cannot be found.
 pub async fn get_inference_job_status(job_token: &InferenceJobToken, mysql_pool: &MySqlPool)
+  -> AnyhowResult<Option<GenericInferenceJobStatus>>
+{
+  let mut connection = mysql_pool.acquire().await?;
+  get_inference_job_status_from_connection(job_token, &mut connection).await
+}
+
+
+/// Look up job status.
+/// Returns Ok(None) when the record cannot be found.
+pub async fn get_inference_job_status_from_connection(job_token: &InferenceJobToken, mysql_connection: &mut PoolConnection<MySql>)
   -> AnyhowResult<Option<GenericInferenceJobStatus>>
 {
   // NB(bt): jobs.uuid_idempotency_token is the current way to reconstruct the hash of the
@@ -79,8 +103,12 @@ pub async fn get_inference_job_status(job_token: &InferenceJobToken, mysql_pool:
 SELECT
     jobs.token as `job_token: tokens::tokens::generic_inference_jobs::InferenceJobToken`,
 
-    jobs.status,
+    jobs.status as `status: enums::common::job_status_plus::JobStatusPlus`,
     jobs.attempt_count,
+
+    jobs.maybe_creator_user_token as `maybe_creator_user_token: tokens::tokens::users::UserToken`,
+    jobs.maybe_creator_anonymous_visitor_token as `maybe_creator_anonymous_visitor_token: tokens::tokens::anonymous_visitor_tracking::AnonymousVisitorTrackingToken`,
+    jobs.creator_ip_address,
 
     jobs.inference_category as `inference_category: enums::by_table::generic_inference_jobs::inference_category::InferenceCategory`,
     jobs.maybe_model_type,
@@ -126,7 +154,7 @@ WHERE jobs.token = ?
         "#,
       job_token
     )
-      .fetch_one(mysql_pool)
+      .fetch_one(mysql_connection)
       .await;
 
   let record = match maybe_status {
@@ -201,6 +229,11 @@ WHERE jobs.token = ?
       maybe_raw_inference_text: record.maybe_raw_inference_text,
     },
     maybe_result_details,
+    user_details: UserDetails {
+      maybe_creator_user_token: record.maybe_creator_user_token,
+      maybe_creator_anonymous_visitor_token: record.maybe_creator_anonymous_visitor_token,
+      creator_ip_address: record.creator_ip_address,
+    },
     is_keepalive_required: i8_to_bool(record.is_keepalive_required),
     created_at: record.created_at,
     updated_at: record.updated_at,
@@ -210,8 +243,12 @@ WHERE jobs.token = ?
 struct RawGenericInferenceJobStatus {
   pub job_token: InferenceJobToken,
 
-  pub status: String,
+  pub status: JobStatusPlus,
   pub attempt_count: u16,
+
+  pub maybe_creator_user_token: Option<UserToken>,
+  pub maybe_creator_anonymous_visitor_token: Option<AnonymousVisitorTrackingToken>,
+  pub creator_ip_address: String,
 
   pub inference_category: InferenceCategory,
   pub maybe_model_type: Option<String>,
