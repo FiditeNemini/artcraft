@@ -26,7 +26,7 @@ pub(crate) enum EntityType {
   TtsModel,
   TtsRenderTask, // NB: aichatbot / sqlite
   User,
-  UserDeprecatedDoNotUse,
+  UserDeprecatedDoNotUse, // NB: Users prior to 2023-10-24 used this prefix.
   VoiceConversionModel,
   VoiceConversionResult,
   W2lTemplate,
