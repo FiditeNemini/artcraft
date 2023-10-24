@@ -14,8 +14,8 @@ SELECT
   username,
   email_address,
   password_hash,
-  is_banned,
-  password_version
+  password_version,
+  is_banned
 FROM users
 WHERE email_address = ?
 LIMIT 1

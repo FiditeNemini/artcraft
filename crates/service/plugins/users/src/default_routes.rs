@@ -7,7 +7,7 @@ use actix_web::error::Error;
 use crate::endpoints::create_account_handler::create_account_handler;
 use crate::endpoints::login_handler::login_handler;
 use crate::endpoints::logout_handler::logout_handler;
-use crate::endpoints::password_reset_handler::password_reset_request_handler;
+use crate::endpoints::password_reset_requisition_handler::password_reset_requisition_handler;
 use crate::endpoints::session_info_handler::session_info_handler;
 
 // NB: This does not include the user edit endpoints since FakeYou's API mounts them alongside other things.
@@ -67,7 +67,7 @@ pub fn add_suggested_api_v1_account_creation_and_session_routes<T, B> (app: App<
       )
       .service(
         web::resource("/v1/request-reset")
-          .route(web::post().to(password_reset_request_handler))
+          .route(web::post().to(password_reset_requisition_handler))
           .route(web::head().to(|| HttpResponse::Ok()))
       )
 }

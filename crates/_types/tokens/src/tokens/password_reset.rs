@@ -3,7 +3,7 @@ use std::fmt::Debug;
 use serde::Deserialize;
 use serde::Serialize;
 
-use crate::prefixes::EntityType;
+use crate::prefixes::TokenPrefix;
 
 /// The primary key for `password_reset`s
 #[derive(Clone, PartialEq, Eq, sqlx::Type, Debug, Serialize, Deserialize)]
@@ -11,4 +11,4 @@ use crate::prefixes::EntityType;
 pub struct PasswordResetToken(pub String);
 
 impl_string_token!(PasswordResetToken);
-impl_crockford_generator!(PasswordResetToken, 32usize, EntityType::PasswordReset, CrockfordUpper);
+impl_crockford_generator!(PasswordResetToken, 32usize, TokenPrefix::PasswordReset, CrockfordUpper);
