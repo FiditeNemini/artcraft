@@ -79,7 +79,7 @@ async fn create_voice_records(
 
   info!("Uploading media to bucket path: {}", public_upload_path.get_full_object_path_str());
 
-  let mut file_path = PathBuf::from("/home/tensor/code/storyteller/storyteller-rust/");
+  let mut file_path = get_storyteller_rust_root();
   file_path.push(format!("assets/seed/{}", wav_file));
 
   info!("Reading seed file: {:?}", file_path);
