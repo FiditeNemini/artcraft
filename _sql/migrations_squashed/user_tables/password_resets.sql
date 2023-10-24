@@ -42,7 +42,7 @@ CREATE TABLE password_resets (
   -- For abuse tracking.
   -- Wide enough for IPv4/6
   ip_address_creation VARCHAR(40) NOT NULL,
-  ip_address_redemption VARCHAR(40) NOT NULL,
+  ip_address_redemption VARCHAR(40) DEFAULT NULL,
 
   -- Incremented with every update.
   version INT NOT NULL DEFAULT 0,
