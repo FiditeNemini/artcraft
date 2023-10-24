@@ -108,6 +108,7 @@ SET
   maybe_public_bucket_extension = ?,
 
   maybe_creator_user_token = ?,
+  maybe_creator_anonymous_visitor_token = ?,
   creator_ip_address = ?,
 
   creator_set_visibility = ?,
@@ -139,6 +140,7 @@ SET
       args.maybe_public_bucket_extension,
 
       args.job.maybe_creator_user_token,
+      args.job.maybe_creator_anonymous_visitor_token,
       args.job.creator_ip_address,
 
       args.job.creator_set_visibility.to_str(),

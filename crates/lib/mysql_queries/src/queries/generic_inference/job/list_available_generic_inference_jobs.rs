@@ -38,6 +38,7 @@ pub struct AvailableInferenceJob {
 
   // User information to propagate downstream
   pub maybe_creator_user_token: Option<String>,
+  pub maybe_creator_anonymous_visitor_token: Option<String>,
   pub creator_ip_address: String,
   pub creator_set_visibility: Visibility,
 
@@ -111,6 +112,7 @@ pub async fn list_available_generic_inference_jobs(
           uuid_idempotency_token: record.uuid_idempotency_token,
           creator_ip_address: record.creator_ip_address,
           maybe_creator_user_token: record.maybe_creator_user_token,
+          maybe_creator_anonymous_visitor_token: record.maybe_creator_anonymous_visitor_token,
           creator_set_visibility: Visibility::from_str(&record.creator_set_visibility)
               .map_err(|e| anyhow!("error: {:?}", e))?, // TODO/FIXME: This is a gross fix.
           inference_category: InferenceCategory::from_str(&record.inference_category)
@@ -181,6 +183,7 @@ SELECT
   maybe_raw_inference_text,
 
   maybe_creator_user_token,
+  maybe_creator_anonymous_visitor_token,
   creator_ip_address,
   creator_set_visibility,
 
@@ -274,6 +277,7 @@ SELECT
   maybe_raw_inference_text,
 
   maybe_creator_user_token,
+  maybe_creator_anonymous_visitor_token,
   creator_ip_address,
   creator_set_visibility,
 
@@ -364,6 +368,7 @@ struct AvailableInferenceJobRawInternal {
 
   // User information to propagate downstream
   pub maybe_creator_user_token: Option<String>,
+  pub maybe_creator_anonymous_visitor_token: Option<String>,
   pub creator_ip_address: String,
   //pub creator_set_visibility: Visibility,
   pub creator_set_visibility: String,
