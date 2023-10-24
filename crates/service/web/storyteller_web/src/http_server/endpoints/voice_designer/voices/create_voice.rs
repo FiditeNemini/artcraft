@@ -167,6 +167,7 @@ pub async fn create_voice_handler(
         voice_token: None,
         dataset_token: Some(request.voice_dataset_token.clone()),
     };
+    let maybe_avt_token = server_state.avt_cookie_manager.get_avt_token_from_request(&http_request);
 
     // create the inference args here
     // enqueue a zero shot tts request here...
@@ -188,6 +189,7 @@ pub async fn create_voice_handler(
         creator_set_visibility: enums::common::visibility::Visibility::Public,
         priority_level: priority_level,
         requires_keepalive: true,
+        maybe_avt_token: maybe_avt_token.as_ref(),
         is_debug_request: is_debug_request,
         maybe_routing_tag: maybe_routing_tag.as_deref(),
         mysql_pool: &server_state.mysql_pool,

@@ -28,14 +28,9 @@ const DEBUG_HEADER_NAME: &str = "enable-debug-mode";
 /// This is useful for catching the live logs or intercepting the job.
 const ROUTING_TAG_HEADER_NAME: &str = "routing-tag";
 
-use enums::by_table::generic_inference_jobs::inference_category::InferenceCategory;
 use enums::by_table::generic_inference_jobs::inference_model_type::InferenceModelType;
 use http_server_common::request::get_request_ip::get_request_ip;
-use mysql_queries::payloads::generic_inference_args::generic_inference_args::{
-    GenericInferenceArgs,
-    InferenceCategoryAbbreviated,
-    PolymorphicInferenceArgs,
-};
+
 use mysql_queries::payloads::generic_inference_args::tts_payload::TTSArgs;
 use mysql_queries::queries::generic_inference::web::insert_generic_inference_job::{
     insert_generic_inference_job,
@@ -47,15 +42,10 @@ use tokens::tokens::users::UserToken;
 use crate::configs::plans::get_correct_plan_for_session::get_correct_plan_for_session;
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::server_state::ServerState;
-use mysql_queries::queries::generic_inference::web::insert_generic_inference_job::{
-    insert_generic_inference_job,
-    InsertGenericInferenceArgs,
-};
+
 
 // TODO MOVE into own file.
 use std::fmt::Debug;
-use serde::Deserialize;
-use serde::Serialize;
 
 #[derive(Deserialize)]
 pub struct EnqueueTTSRequest {
@@ -181,6 +171,7 @@ pub async fn enqueue_tts_request(
 
     // create the inference args here
     // enqueue a zero shot tts request here...
+    let maybe_avt_token = server_state.avt_cookie_manager.get_avt_token_from_request(&http_request);
 
     // create the job record here!
     let query_result = insert_generic_inference_job(InsertGenericInferenceArgs {
