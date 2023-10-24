@@ -58,6 +58,9 @@ CREATE TABLE password_resets (
   -- INDICES --
   PRIMARY KEY (id),
   UNIQUE KEY (token),
+
+  UNIQUE KEY (user_token, secret_key),
+
   KEY fk_user_token (user_token),
   KEY index_secret_key (secret_key),
   KEY index_expires_at (expires_at)
