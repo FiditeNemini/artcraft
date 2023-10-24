@@ -54,8 +54,9 @@ pub struct VoiceFile {
     pub filesystem_path: PathBuf,
 }
 
+
 const BUCKET_FILE_PREFIX_CREATE: &str = "fakeyou_";
-const BUCKET_FILE_EXTENSION_CREATE: &str = ".npz";
+const BUCKET_FILE_EXTENSION_CREATE: &str = ".bin";
 const MIME_TYPE_CREATE: &str = "application/x-binary";
 
 pub struct AudioFile {
@@ -195,10 +196,17 @@ pub async fn process_create_voice(
     let mut downloaded_dataset: Vec<PathBuf> = Vec::new();
 
     let temp_extension = String::from(".bin");
+    let temp_prefix:String;
+
+    if deps.container.is_on_prem == false {
+        temp_prefix = String::from("dev_zs_"); // this is for seed in local dev to download the samples
+    } else {
+        temp_prefix = String::from(BUCKET_FILE_PREFIX_CREATE);
+    }
+
     for (index, record) in dataset.iter().enumerate() {
         //https://storage.googleapis.com/dev-vocodes-public/media/5/3/3/w/8/533w8zs0fy11nv7gkcna7p7vt03h8nda/dev_zs_533w8zs0fy11nv7gkcna7p7vt03h8nda.bin <-- where the file actually is
-
-        let temp_prefix = String::from("dev_zs_"); // hard code this for now and ask brandon whats up ... probably forgot to seed ;_;?
+    
         let prefix: Option<&str> = Some(&temp_prefix); // record.maybe_public_bucket_prefix.as_ref().map(|s| s.as_str());
         let extension: Option<&str> = Some(&temp_extension);//record.maybe_public_bucket_extension
             // .as_ref()
@@ -281,8 +289,6 @@ pub async fn process_create_voice(
 
     // STEP 4. Download dataset each audio file
     info!("Uploading Media ...");
-
-  
 
     let result_bucket_location: MediaFileBucketPath = MediaFileBucketPath::generate_new(
         Some(BUCKET_FILE_PREFIX_CREATE),

@@ -1,6 +1,14 @@
 FakeYou Development Setup (bare metal)
 ======================================
 
+Set your Environment .env File with the following paths, copy this in
+The root path and the folders associated with the path.
+This will change the base paths for development.
+STORYTELLER_ROOT = "/home/tensor/code/storyteller" # change this
+STORYTELLER_FRONTEND = "storyteller-frontend" 
+STORYTELLER_ML = "storyteller-ml"
+STORYTELLER_RUST = "storyteller-rust"
+
 This document describes how to run the FakeYou infrastructure on your development 
 machine's bare metal (no containers).
 
