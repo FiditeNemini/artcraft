@@ -6,11 +6,11 @@ use sqlx::MySqlPool;
 
 use enums::by_table::generic_inference_jobs::inference_category::InferenceCategory;
 use enums::by_table::generic_inference_jobs::inference_model_type::InferenceModelType;
+use enums::common::job_status_plus::JobStatusPlus;
 use enums::common::visibility::Visibility;
 use errors::AnyhowResult;
 use tokens::tokens::generic_inference_jobs::InferenceJobToken;
 
-use crate::column_types::job_status::JobStatus;
 use crate::helpers::boolean_converters::i8_to_bool;
 use crate::payloads::generic_inference_args::generic_inference_args::GenericInferenceArgs;
 use crate::queries::generic_inference::job::_keys::GenericInferenceJobId;
@@ -42,7 +42,7 @@ pub struct AvailableInferenceJob {
   pub creator_set_visibility: Visibility,
 
   // Job information
-  pub status: JobStatus,
+  pub status: JobStatusPlus,
   pub attempt_count: u16,
 
   pub priority_level: u16,
@@ -128,7 +128,8 @@ pub async fn list_available_generic_inference_jobs(
               .map(|args| GenericInferenceArgs::from_json(args))
               .transpose()?,
           maybe_raw_inference_text: record.maybe_raw_inference_text,
-          status: JobStatus::from_str(&record.status)?,
+          status: JobStatusPlus::from_str(&record.status)
+              .map_err(|err| anyhow!("JobStatus failure to parse: {:?}", err))?,
           attempt_count: record.attempt_count,
           priority_level: record.priority_level,
           is_keepalive_required: i8_to_bool(record.is_keepalive_required),

@@ -6,10 +6,10 @@
 use chrono::{DateTime, Utc};
 use sqlx::MySqlPool;
 
+use enums::common::job_status::JobStatus;
 use enums::common::visibility::Visibility;
 use errors::AnyhowResult;
 
-use crate::column_types::job_status::JobStatus;
 use crate::helpers::boolean_converters::i8_to_bool;
 use crate::queries::tts::tts_inference_jobs::_keys::TtsInferenceJobId;
 
@@ -83,7 +83,7 @@ SELECT
   is_for_twitch,
   is_debug_request,
 
-  status as `status: crate::column_types::job_status::JobStatus`,
+  status as `status: enums::common::job_status::JobStatus`,
   priority_level,
   attempt_count,
   failure_reason,
@@ -132,7 +132,7 @@ SELECT
   is_for_twitch,
   is_debug_request,
 
-  status as `status: crate::column_types::job_status::JobStatus`,
+  status as `status: enums::common::job_status::JobStatus`,
   priority_level,
   attempt_count,
   failure_reason,
@@ -224,7 +224,7 @@ SELECT
   is_for_twitch,
   is_debug_request,
 
-  status as `status: crate::column_types::job_status::JobStatus`,
+  status as `status: enums::common::job_status::JobStatus`,
   priority_level,
   attempt_count,
   failure_reason,

@@ -62,6 +62,8 @@ FOR UPDATE
     "complete_success" => false, // Job already complete
     "complete_failure" => false, // Job already complete (permanently dead; no need to retry)
     "dead" => false, // Job already complete (permanently dead; retries exhausted)
+    "cancelled_by_user" => false, // Job already complete (permanently dead; killed by user)
+    "cancelled_by_system" => false, // Job already complete (permanently dead; killed by system)
     _ => false, // Future-proof
   };
 
