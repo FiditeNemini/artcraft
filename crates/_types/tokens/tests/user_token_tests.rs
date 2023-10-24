@@ -18,31 +18,31 @@ mod interface {
   fn generate() {
     let token = UserToken::generate();
     assert!(!token.to_string().is_empty());
-    assert!(token.to_string().starts_with("U:"));
+    assert!(token.to_string().starts_with("user_"));
   }
 
   #[test]
   fn new() {
-    let token = UserToken::new("U:foo".to_string());
-    assert_eq!(token, UserToken("U:foo".to_string()));
+    let token = UserToken::new("user_foo".to_string());
+    assert_eq!(token, UserToken("user_foo".to_string()));
   }
 
   #[test]
   fn new_from_str() {
-    let token = UserToken::new_from_str("U:foo");
-    assert_eq!(token, UserToken("U:foo".to_string()));
+    let token = UserToken::new_from_str("user_foo");
+    assert_eq!(token, UserToken("user_foo".to_string()));
   }
 
   #[test]
   fn as_str() {
-    let token = UserToken("U:foo".to_string());
-    assert_eq!(token.as_str(), "U:foo");
+    let token = UserToken("user_foo".to_string());
+    assert_eq!(token.as_str(), "user_foo");
   }
 
   #[test]
   fn to_string() {
-    let token = UserToken("U:foo".to_string());
-    assert_eq!(token.to_string(), "U:foo".to_string());
+    let token = UserToken("user_foo".to_string());
+    assert_eq!(token.to_string(), "user_foo".to_string());
   }
 }
 
@@ -51,14 +51,14 @@ mod traits {
 
   #[test]
   fn display() {
-    let token = UserToken("U:foo".to_string());
-    assert_eq!(format!("{}", token), "U:foo".to_string());
+    let token = UserToken("user_foo".to_string());
+    assert_eq!(format!("{}", token), "user_foo".to_string());
   }
 
   #[test]
   fn debug() {
-    let token = UserToken("U:foo".to_string());
-    assert_eq!(format!("{:?}", token), "UserToken(\"U:foo\")".to_string());
+    let token = UserToken("user_foo".to_string());
+    assert_eq!(format!("{:?}", token), "UserToken(\"user_foo\")".to_string());
   }
 }
 
@@ -69,19 +69,19 @@ mod serialization {
 
   #[test]
   fn serialize() {
-    let expected = "\"U:foo\"".to_string(); // NB: Quoted
+    let expected = "\"user_foo\"".to_string(); // NB: Quoted
 
-    let token = UserToken("U:foo".to_string());
+    let token = UserToken("user_foo".to_string());
     assert_eq!(expected, toml::to_string(&token).unwrap());
 
     // Just to show this serializes the same as a string
-    assert_eq!(expected, toml::to_string("U:foo").unwrap());
+    assert_eq!(expected, toml::to_string("user_foo").unwrap());
   }
 
   #[test]
   fn nested_serialize() {
-    let value = CompositeType { user_token: UserToken("U:foo".to_string()), string: "bar".to_string() };
-    let expected = r#"{"user_token":"U:foo","string":"bar"}"#.to_string();
+    let value = CompositeType { user_token: UserToken("user_foo".to_string()), string: "bar".to_string() };
+    let expected = r#"{"user_token":"user_foo","string":"bar"}"#.to_string();
     assert_eq!(expected, serde_json::to_string(&value).unwrap());
   }
 }
@@ -93,8 +93,8 @@ mod deserialization {
 
   #[test]
   fn deserialize() {
-    let payload = "\"U:foo\""; // NB: Quoted
-    let expected = "U:foo".to_string();
+    let payload = "\"user_foo\""; // NB: Quoted
+    let expected = "user_foo".to_string();
 
     let value: UserToken = serde_json::from_str(payload).unwrap();
     assert_eq!(value, UserToken(expected.clone()));
@@ -106,9 +106,9 @@ mod deserialization {
 
   #[test]
   fn nested_deserialize() {
-    let payload = r#"{"user_token":"U:foo","string":"bar"}"#.to_string();
+    let payload = r#"{"user_token":"user_foo","string":"bar"}"#.to_string();
     let expected = CompositeType {
-      user_token: UserToken("U:foo".to_string()),
+      user_token: UserToken("user_foo".to_string()),
       string: "bar".to_string(),
     };
 
@@ -129,7 +129,7 @@ mod crockford_traits {
 
   #[test]
   fn token_length() {
-    assert_eq!(UserToken::generate().as_str().len(), 15);
+    assert_eq!(UserToken::generate().as_str().len(), 18);
   }
 
   #[test]
@@ -148,7 +148,7 @@ mod crockford_traits {
     let random_part = token_string.replace(prefix, "");
 
     assert!(random_part.len() > ENTROPIC_CHARACTERS_MINIMUM);
-    assert!(random_part.chars().all(|c| c.is_numeric() || c.is_uppercase()));
+    assert!(random_part.chars().all(|c| c.is_numeric() || c.is_lowercase()));
   }
 
   #[test]
@@ -169,7 +169,7 @@ mod crockford_traits {
 
   #[test]
   fn entropy_suffix() {
-    let token = UserToken::new_from_str("U:foo");
+    let token = UserToken::new_from_str("user_foo");
     assert_eq!(token.entropy_suffix(), "foo");
 
     let token = UserToken::new_from_str("bar");

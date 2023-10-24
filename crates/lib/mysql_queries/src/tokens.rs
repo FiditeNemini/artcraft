@@ -36,10 +36,6 @@ impl Tokens {
 
   // ========== Tokens not typically visible to users ==========
 
-  pub fn new_user() -> AnyhowResult<String> {
-    random_prefix_crockford_token("U:", 15, true)
-  }
-
   pub fn new_session() -> AnyhowResult<String> {
     random_prefix_crockford_token("SESSION:", 32, false)
   }

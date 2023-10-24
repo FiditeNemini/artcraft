@@ -11,4 +11,5 @@ use crate::prefixes::EntityType;
 pub struct UserToken(pub String);
 
 impl_string_token!(UserToken);
-impl_crockford_generator!(UserToken, 15usize, EntityType::User, CrockfordUpper);
+// NB: Older user tokens were under this regime: 15 characters, "U:" prefix, Crockford Upper.
+impl_crockford_generator!(UserToken, 18usize, EntityType::User, CrockfordLower);
