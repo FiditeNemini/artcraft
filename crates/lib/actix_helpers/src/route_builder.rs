@@ -75,4 +75,26 @@ impl <T, B> RouteBuilder<T, B>
     );
     self
   }
+
+  /// Add an HTTP DELETE route.
+  pub fn add_delete<F, Args>(mut self, path: &str, handler: F, add_head_route: bool) -> Self
+    where
+        F: Handler<Args>,
+        Args: FromRequest + 'static,
+        F::Output: Responder + 'static,
+  {
+    if add_head_route {
+      self.app = self.app.service(
+        web::resource(path)
+            .route(web::delete().to(handler))
+            .route(web::head().to(|| HttpResponse::Ok())) // NB: For XHR/CORS HEAD requests.
+      );
+    } else {
+      self.app = self.app.service(
+        web::resource(path)
+            .route(web::delete().to(handler))
+      );
+    }
+    self
+  }
 }
