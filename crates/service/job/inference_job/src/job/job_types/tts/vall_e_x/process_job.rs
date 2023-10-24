@@ -449,8 +449,8 @@ pub async fn process_inference_voice(
     info!("Uploading media ...");
 
     let result_bucket_location = MediaFileBucketPath::generate_new(
-        Some(BUCKET_FILE_PREFIX_CREATE),
-        Some(BUCKET_FILE_EXTENSION_CREATE)
+        Some(BUCKET_FILE_PREFIX),
+        Some(BUCKET_FILE_EXTENSION)
     );
 
     let result_bucket_object_pathbuf = result_bucket_location.to_full_object_pathbuf();
