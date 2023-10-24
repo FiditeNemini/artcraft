@@ -20,7 +20,7 @@ pub async fn main() -> AnyhowResult<()> {
   info!("Database seed CLI script.");
 
   // NB: Read secrets (eg. ACCESS_KEY)
-  easyenv::from_filename("/home/tensor/code/storyteller/storyteller-rust/crates/cli/dev_database_seed/src/env-secrets")?;
+  easyenv::from_filename("env-secrets")?;
 
   let db_connection_string =
       easyenv::get_env_string_or_default(
