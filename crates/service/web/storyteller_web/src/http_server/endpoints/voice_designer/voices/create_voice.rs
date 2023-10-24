@@ -159,10 +159,6 @@ pub async fn create_voice_handler(
 
     println!("Recieved payload for voice creation.");
 
-    let is_debug_request = false;
-    let maybe_user_token: Option<UserToken> = Some(UserToken::new_from_str(&"place holder")); // TODO fix this
-    let priority_level = 0;
-
     // Get up IP address
     let ip_address = get_request_ip(&http_request);
 
