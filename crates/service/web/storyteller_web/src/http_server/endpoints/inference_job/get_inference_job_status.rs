@@ -6,13 +6,14 @@ use actix_web::error::ResponseError;
 use actix_web::http::StatusCode;
 use actix_web::web::Path;
 use chrono::{DateTime, Utc};
-use log::{error, log};
+use log::error;
 use r2d2_redis::redis::{Commands, RedisResult};
 
 use buckets::public::media_files::original_file::MediaFileBucketPath;
 use buckets::public::voice_conversion_results::original_file::VoiceConversionResultOriginalFilePath;
 use enums::by_table::generic_inference_jobs::frontend_failure_category::FrontendFailureCategory;
 use enums::by_table::generic_inference_jobs::inference_category::InferenceCategory;
+use enums::common::job_status_plus::JobStatusPlus;
 use mysql_queries::queries::generic_inference::web::get_inference_job_status::get_inference_job_status;
 use redis_common::redis_keys::RedisKeys;
 use tokens::tokens::generic_inference_jobs::InferenceJobToken;
@@ -65,7 +66,7 @@ pub struct RequestDetailsResponse {
 #[derive(Serialize)]
 pub struct StatusDetailsResponse {
   /// Primary status from the database (a state machine).
-  pub status: String,
+  pub status: JobStatusPlus,
 
   /// Extra, temporary status from Redis.
   /// This can denote inference progress, and the Python code can write to it.

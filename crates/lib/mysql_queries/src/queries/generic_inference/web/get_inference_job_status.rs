@@ -5,6 +5,7 @@ use sqlx::MySqlPool;
 
 use enums::by_table::generic_inference_jobs::frontend_failure_category::FrontendFailureCategory;
 use enums::by_table::generic_inference_jobs::inference_category::InferenceCategory;
+use enums::common::job_status_plus::JobStatusPlus;
 use errors::AnyhowResult;
 use tokens::tokens::generic_inference_jobs::InferenceJobToken;
 
@@ -14,7 +15,7 @@ use crate::helpers::boolean_converters::i8_to_bool;
 pub struct GenericInferenceJobStatus {
   pub job_token: InferenceJobToken,
 
-  pub status: String,
+  pub status: JobStatusPlus,
   pub attempt_count: u16,
 
   pub maybe_assigned_worker: Option<String>,
@@ -79,7 +80,7 @@ pub async fn get_inference_job_status(job_token: &InferenceJobToken, mysql_pool:
 SELECT
     jobs.token as `job_token: tokens::tokens::generic_inference_jobs::InferenceJobToken`,
 
-    jobs.status,
+    jobs.status as `status: enums::common::job_status_plus::JobStatusPlus`,
     jobs.attempt_count,
 
     jobs.inference_category as `inference_category: enums::by_table::generic_inference_jobs::inference_category::InferenceCategory`,
@@ -210,7 +211,7 @@ WHERE jobs.token = ?
 struct RawGenericInferenceJobStatus {
   pub job_token: InferenceJobToken,
 
-  pub status: String,
+  pub status: JobStatusPlus,
   pub attempt_count: u16,
 
   pub inference_category: InferenceCategory,
