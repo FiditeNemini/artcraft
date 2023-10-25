@@ -30,6 +30,7 @@ export interface RequestDetails {
 export interface StatusDetails {
   status: string,
   maybe_extra_status_description?: string,
+  maybe_failure_category?: string,
   attempt_count: number,
 }
 

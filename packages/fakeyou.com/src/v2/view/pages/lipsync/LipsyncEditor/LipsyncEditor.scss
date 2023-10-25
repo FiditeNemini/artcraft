@@ -171,6 +171,7 @@ $over992: min-width 992px;
   .face-animator-job {
     display: flex;
     flex-wrap: wrap;
+    align-items: stretch;
     margin-top: 1rem;
     padding: 1rem;
 
@@ -194,12 +195,18 @@ $over992: min-width 992px;
     .job-status-4 { background-color: $success } // success = green
 
     .job-details {
-      // display: flex;
+      display: flex;
       align-items: center;
-      height: 100%;
-      // width: 100%;
+      flex-wrap: wrap;
+      // height: 100%;
+      width: min-content;
+
+      h4, span { white-space: nowrap; }
       
-      h6 { line-height: 1em }
+      h4 {
+        line-height: 1em;
+        margin-bottom: 0;
+      }
 
     }
 

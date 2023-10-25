@@ -25,12 +25,12 @@ export default function FaceAnimatorJobs({ t }: { t: any }) {
   const statusIcons = [faHourglass1,faHourglass1,faWarning,faRemove,faTrophy];
   const statusTxt = (which: number, config = {}) => ["animationPending","animationInProgress","animationFailed","animationDead","animationSuccess"].map((str,i) => t(`status.${str}`,config))[which];
 
-  // const processFail = (fail = "") => {
-  //   switch (fail) {
-  //     case "face_not_detected": return "Face not detected, try another picture";
-  //     default: return "Uknown failure";
-  //   }
-  // };
+  const processFail = (fail = "") => {
+    switch (fail) {
+      case "face_not_detected": return "Face not detected, try another picture";
+      default: return "Uknown failure";
+    }
+  };
 
   // const transitions = useTransition(inferenceJobs, { // not today
   //   ...springs.soft,
@@ -67,11 +67,12 @@ export default function FaceAnimatorJobs({ t }: { t: any }) {
       return <div {...{ className: "panel face-animator-job", key }}>
         <FontAwesomeIcon {...{ className: `job-status-icon job-status-${job.statusIndex}`, icon: statusIcons[job.statusIndex] }}/>
         <div {...{ className: "job-details" }}>
-          <h6>
+          <h4>
             { statusTxt(job.statusIndex,{ attemptCount: job.attemptCount || "" }) }
-            {/*{ job.maybeFailureCategory ? `: ${ processFail(job.maybeFailureCategory) }` : "" }*/}
-          </h6>
-          <span {...{ className: "job-id" }}>id: { job.jobToken }</span>
+          </h4>
+          <span>
+            { job.maybeFailureCategory ? `${ processFail(job.maybeFailureCategory) }` : "" }
+          </span>
         </div>
         {
           job.maybeResultToken ?  <Button {...{
