@@ -82,7 +82,6 @@ import { VoiceConversionModelListItem } from "@storyteller/components/src/api/vo
 import { CommunityCommissionsPage } from "./pages/contest/CommunityCommissionsPage";
 import { ProductUsageInfoPage } from "./pages/product_usage_info/ProductUsageInfoPage";
 import { VoiceDesignerPage } from "./pages/voice_designer/VoiceDesignerPage";
-import { TestingPage } from "./pages/testing/TestingPage";
 import { GenerateSpeechPage } from "./pages/generate_speech/GenerateSpeechPage";
 import VcModelViewPage from "./pages/vc/vc_model_view/VcModelViewPage";
 import VcModelEditPage from "./pages/vc/vc_model_edit/VcModelEditPage";
@@ -90,7 +89,6 @@ import VcModelDeletePage from "./pages/vc/vc_model_delete/VcModelDeletePage";
 import SideNav from "components/layout/SideNav/SideNav";
 import MobileMenu from "components/layout/MobileMenu/MobileMenu";
 import { TopNav } from "./nav/TopNav";
-import { TestingPage } from "./pages/testing/TestingPage";
 import TtsModelSearchPage from "./pages/tts/tts_model_search/TtsModelSearchPage";
 import MediaPage from "./pages/media/MediaPage";
 
@@ -469,7 +467,7 @@ class PageContainer extends React.Component<
             <Route path="/category/create">
               <CreateCategoryPage sessionWrapper={this.props.sessionWrapper} />
             </Route>
-            
+
             <Route path="/moderation/user/list">
               <ModerationUserListFc
                 sessionWrapper={this.props.sessionWrapper}
@@ -585,17 +583,6 @@ class PageContainer extends React.Component<
 
             <Route path="/about">
               <AboutPage />
-            </Route>
-
-            <Route path="/testing">
-              <TestingPage
-                sessionSubscriptionsWrapper={
-                  this.props.sessionSubscriptionsWrapper
-                }
-                enqueueInferenceJob={this.props.enqueueInferenceJob}
-                inferenceJobs={this.props.inferenceJobs}
-                inferenceJobsByCategory={this.props.inferenceJobsByCategory}
-              />
             </Route>
 
             <Route path="/face-animator">

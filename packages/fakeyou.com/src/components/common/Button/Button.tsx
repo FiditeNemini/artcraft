@@ -10,7 +10,7 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   label?: string | null;
   icon?: IconDefinition;
   small?: boolean;
-  variant?: "primary" | "secondary" | "danger";
+  variant?: "primary" | "secondary" | "danger" | "link";
   to?: string;
   href?: string;
   target?: "_blank" | "_self";

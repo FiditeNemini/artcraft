@@ -85,3 +85,17 @@
 .button-small:hover {
   border: none;
 }
+
+.button-link {
+  border: none;
+  border-radius: 0;
+  background-color: transparent;
+  padding: 0;
+  color: $primary !important;
+  font-size: 16px !important;
+  transition: all 0.2s;
+
+  &:hover {
+    color: lighten($primary, 6%) !important;
+  }
+}

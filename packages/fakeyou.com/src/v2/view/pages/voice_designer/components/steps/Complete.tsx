@@ -6,11 +6,9 @@ function Complete() {
     <div className="d-flex flex-column gap-3 align-items-center">
       <div className="d-flex gap-3">
         <Button label="Use Voice" />
-        <Button label="Create another voice" secondary={true} />
+        <Button label="Create another voice" variant="secondary" />
       </div>
-      <a onClick={() => {}} className="text-link fw-medium">
-        View my voices
-      </a>
+      <Button label="My Voices" variant="link" />
     </div>
   );
 }
