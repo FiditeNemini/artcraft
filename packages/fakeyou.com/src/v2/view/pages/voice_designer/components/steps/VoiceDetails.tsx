@@ -1,7 +1,7 @@
 import {
   faEye,
-  faMicrophoneLines,
-  faTags,
+  // faMicrophoneLines,
+  // faTags,
 } from "@fortawesome/pro-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import useVoiceDetailsStore from "hooks/useVoiceDetailsStore/";
@@ -24,23 +24,12 @@ export const SearchFieldClass = {
 };
 
 function VoiceDetails() {
-  const {
-    name,
-    vocalType,
-    tags,
-    description,
-    visibility,
-    setName,
-    setVocalType,
-    setTags,
-    setDescription,
-    setVisibility,
-  } = useVoiceDetailsStore();
+  const { name, visibility, setName, setVisibility } = useVoiceDetailsStore();
 
   return (
     <div className="d-flex flex-column gap-4">
       <div className="row gy-4">
-        <div className="col-12 col-md-8">
+        <div>
           <label className="sub-title">Name</label>
           <input
             className="form-control"
@@ -50,22 +39,9 @@ function VoiceDetails() {
             onChange={(e) => setName(e.target.value)}
           />
         </div>
-        <div className="col-12 col-md-4">
-          <label className="sub-title">Vocal Type</label>
-          <div className="input-icon-search">
-            <span className="form-control-feedback">
-              <FontAwesomeIcon icon={faMicrophoneLines} />
-            </span>
-            <Select
-              classNames={SearchFieldClass}
-              value={vocalType}
-              onChange={(e) => setVocalType(e.target.value)}
-            />
-          </div>
-        </div>
       </div>
 
-      <div>
+      {/* <div>
         <label className="sub-title">Tags</label>
         <div className="input-icon-search">
           <span className="form-control-feedback">
@@ -77,9 +53,9 @@ function VoiceDetails() {
             onChange={(e) => setTags(e.target.value)}
           />
         </div>
-      </div>
+      </div> */}
 
-      <div>
+      {/* <div>
         <label className="sub-title">Description</label>
         <textarea
           className="form-control"
@@ -87,7 +63,7 @@ function VoiceDetails() {
           value={description}
           onChange={(e) => setDescription(e.target.value)}
         />
-      </div>
+      </div> */}
 
       <div>
         <label className="sub-title">Visibility</label>

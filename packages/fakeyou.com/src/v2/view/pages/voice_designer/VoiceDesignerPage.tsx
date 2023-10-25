@@ -17,14 +17,14 @@ function VoiceDesignerPage() {
   usePrefixedDocumentTitle("Voice Designer");
 
   const [currentStep, setCurrentStep] = useState(0);
-  const steps = ["Upload Samples", "Voice Details", "Processing", "Complete"];
+  const steps = ["Voice Details", "Upload Samples", "Processing", "Complete"];
 
   const displayStep = (step: any) => {
     switch (step) {
       case 0:
-        return <UploadSamples />;
-      case 1:
         return <VoiceDetails />;
+      case 1:
+        return <UploadSamples />;
       case 2:
         return <Processing />;
       case 3:
@@ -41,7 +41,7 @@ function VoiceDesignerPage() {
 
   const handleNext = async () => {
     if (currentStep === 1) {
-      // When moving from Voice Details to Processing
+      // When moving from Upload Samples to Processing
       setCurrentStep(2); // Move to processing step immediately
 
       // Simulating a 3-second delay to mimic API call
