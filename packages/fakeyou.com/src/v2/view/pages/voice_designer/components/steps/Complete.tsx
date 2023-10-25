@@ -5,7 +5,7 @@ import { faArrowRight, faCheck } from "@fortawesome/pro-solid-svg-icons";
 
 function Complete() {
   return (
-    <div className="d-flex flex-column align-items-center">
+    <div className="d-flex flex-column align-items-center py-5">
       <div className="d-flex flex-column align-items-center">
         <div className="d-flex bg-success rounded-circle p-3 mb-3">
           <FontAwesomeIcon icon={faCheck} className="display-6 text-white" />
@@ -23,7 +23,7 @@ function Complete() {
         iconFlip={true}
         label="View all my voices"
         variant="link"
-        className="mt-4"
+        className="mt-3"
       />
     </div>
   );
