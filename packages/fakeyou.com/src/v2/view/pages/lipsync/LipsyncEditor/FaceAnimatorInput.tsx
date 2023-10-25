@@ -18,7 +18,7 @@ export default function FaceAnimatorInput({
   removeWatermark,
   removeWatermarkChange, }: FaceAnimatorSlide) {
   return <animated.div {...{ className: "lipsync-editor row", style }}>
-    <div {...{ className: "media-input-column col-lg-6" }}>
+    <div {...{ className: "media-input-column col-lg-6 ga-image-input" }}>
       <h5>{t("headings.image")}</h5>
       <ImageInput
         {...{
@@ -27,7 +27,7 @@ export default function FaceAnimatorInput({
         }}
       />
     </div>
-    <div {...{ className: "media-input-column audio-input-column col-lg-6" }}>
+    <div {...{ className: "media-input-column audio-input-column col-lg-6 ga-audio-input" }}>
       <h5>{t("headings.audio")}</h5>
       <AudioInput
         {...{
