@@ -6,11 +6,11 @@ use sqlx;
 use sqlx::MySqlPool;
 
 use errors::AnyhowResult;
+use tokens::tokens::tts_results::TtsResultToken;
 
 use crate::column_types::vocoder_type::VocoderType;
 use crate::queries::generic_inference::job::list_available_generic_inference_jobs::AvailableInferenceJob;
 use crate::queries::tts::tts_inference_jobs::list_available_tts_inference_jobs::AvailableTtsInferenceJob;
-use crate::tokens::Tokens;
 
 /// Used to give user-facing order to logged in user inference requests
 pub struct SyntheticIdRecord {
@@ -37,7 +37,7 @@ pub async fn insert_tts_result<P: AsRef<Path>>(
   is_debug_worker: bool,
 ) -> AnyhowResult<(u64, String)>
 {
-  let inference_result_token = Tokens::new_tts_result()?;
+  let inference_result_token = TtsResultToken::generate().to_string();
 
   let bucket_audio_result_path = &bucket_audio_results_path
       .as_ref()

@@ -14,6 +14,8 @@ use strum::EnumIter;
 #[cfg_attr(test, derive(EnumIter, EnumCount))]
 pub(crate) enum EntityType {
   AnonymousVisitorTracking, // AVTs are not stored as primary keys in any table, but an index in many tables.
+  ApiTokenExternal,
+  ApiTokenInternal,
   AuditLog,
   Comment,
   DownloadJob,
@@ -24,13 +26,16 @@ pub(crate) enum EntityType {
   NewsStory, // NB: aichatbot / sqlite
   TtsModel,
   TtsRenderTask, // NB: aichatbot / sqlite
+  TtsResult,
   TwitchEventRule,
   TwitchOauthGrouping,
   TwitchOauthInternal,
   User,
   UserSession,
+  VocoderModel,
   VoiceConversionModel,
   VoiceConversionResult,
+  W2lResult,
   W2lTemplate,
   ZsVoice,
   ZsVoiceDataset,
@@ -44,6 +49,8 @@ impl EntityType {
   pub fn prefix(self) -> &'static str {
     match self {
       Self::AnonymousVisitorTracking => "avt_",
+      Self::ApiTokenExternal => "API:", // NB: Old-style prefix, do not use for future tokens.
+      Self::ApiTokenInternal => "INT_API:", // NB: Old-style prefix, do not use for future tokens.
       Self::AuditLog => "audit_",
       Self::Comment => "comment_",
       Self::DownloadJob => "jdown_", // NB: Was "JGUP:"
@@ -54,13 +61,16 @@ impl EntityType {
       Self::NewsStory => "news_story_",
       Self::TtsModel => "TM:", // NB: Old-style prefix, do not use for future tokens.
       Self::TtsRenderTask => "tts_task_",
+      Self::TtsResult => "TR:", // NB: Old-style prefix, do not use for future tokens.
       Self::TwitchEventRule => "TER:", // NB: Old-style prefix, do not use for future tokens.
       Self::TwitchOauthGrouping => "OG:", // NB: Old-style prefix, do not use for future tokens.
       Self::TwitchOauthInternal => "TOI:", // NB: Old-style prefix, do not use for future tokens.
       Self::User => "user_",
       Self::UserSession => "session_",
+      Self::VocoderModel => "VM:", // NB: Old-style prefix, do not use for future tokens.
       Self::VoiceConversionModel => "vcm_",
       Self::VoiceConversionResult => "vcr_",
+      Self::W2lResult => "WR:", // NB: Old-style prefix, do not use for future tokens.
       Self::W2lTemplate => "WT:", // NB: Old-style prefix, do not use for future tokens.
       Self::ZsVoice => "zsv_",
       Self::ZsVoiceDataset => "zsd_",

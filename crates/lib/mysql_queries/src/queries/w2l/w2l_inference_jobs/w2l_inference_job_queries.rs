@@ -11,8 +11,7 @@ use sqlx::MySqlPool;
 
 use enums::common::visibility::Visibility;
 use errors::AnyhowResult;
-
-use crate::tokens::Tokens;
+use tokens::tokens::w2l_results::W2lResultToken;
 
 // TODO(2022-08-04): These were moved into the 'mysql_queries' crate, but they need
 //  to be split up into several modules for better maintainability. cf the already moved
@@ -264,7 +263,7 @@ pub async fn insert_w2l_result<P: AsRef<Path>>(
   duration_millis: u64
 ) -> AnyhowResult<(u64, String)>
 {
-  let inference_result_token = Tokens::new_w2l_result()?;
+  let inference_result_token = W2lResultToken::generate().to_string();
 
   let bucket_video_result_path = &bucket_video_results_path
     .as_ref()

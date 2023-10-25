@@ -7,8 +7,7 @@ use chrono::Utc;
 use sqlx::MySqlPool;
 
 use errors::AnyhowResult;
-
-use crate::tokens::Tokens;
+use tokens::tokens::w2l_templates::W2lTemplateToken;
 
 // TODO(2022-08-04): These were moved into the 'mysql_queries' crate, but they need
 //  to be split up into several modules for better maintainability. cf the already moved
@@ -243,7 +242,7 @@ pub async fn insert_w2l_template(
   duration_millis: u64
 ) -> AnyhowResult<(u64, String)> {
 
-  let model_token = Tokens::new_w2l_template()?;
+  let model_token = W2lTemplateToken::generate().to_string();
 
   let query_result = sqlx::query!(
         r#"

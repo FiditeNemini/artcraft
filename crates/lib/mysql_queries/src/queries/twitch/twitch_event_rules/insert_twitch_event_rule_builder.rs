@@ -22,7 +22,7 @@ impl InsertTwitchEventRuleBuilder {
   /// Returns the newly generated token.
   pub async fn insert(&self, mysql_pool: &MySqlPool) -> AnyhowResult<String> {
 
-    let token = TwitchEventRuleToken::generate();
+    let token = TwitchEventRuleToken::generate().to_string();
 
     let query = sqlx::query!(
         r#"

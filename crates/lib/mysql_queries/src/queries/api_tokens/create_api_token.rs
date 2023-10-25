@@ -3,9 +3,10 @@ use sqlx;
 use sqlx::MySqlPool;
 
 use errors::AnyhowResult;
+use tokens::tokens::api_tokens_external::ApiTokenExternal;
+use tokens::tokens::api_tokens_internal::ApiTokenInternal;
 
 use crate::queries::api_tokens::list_available_api_tokens_for_user::list_available_api_tokens_for_user;
-use crate::tokens::Tokens;
 
 /// Create a new API token for the user.
 /// If the user has more than five tokens, delete the least recent.
@@ -18,8 +19,8 @@ pub async fn create_api_token_for_user(
 
   // TODO: Database transaction.
 
-  let internal_token = Tokens::new_api_token_internal_token()?;
-  let api_token = Tokens::new_api_token()?;
+  let internal_token = ApiTokenInternal::generate().to_string();
+  let api_token = ApiTokenExternal::generate().to_string();
 
   let query = sqlx::query!(
         r#"

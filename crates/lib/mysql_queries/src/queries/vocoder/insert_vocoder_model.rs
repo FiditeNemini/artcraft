@@ -11,8 +11,7 @@ use sqlx::MySqlPool;
 use enums::common::visibility::Visibility;
 use enums::common::vocoder_type::VocoderType;
 use errors::AnyhowResult;
-
-use crate::tokens::Tokens;
+use tokens::tokens::vocoder_model_token::VocoderModelToken;
 
 pub struct Args<'a, P: AsRef<Path>> {
   pub vocoder_type: VocoderType,
@@ -37,7 +36,7 @@ pub async fn insert_vocoder_model<P: AsRef<Path>>(
   args: Args<'_, P>,
 ) -> AnyhowResult<(u64, String)> {
 
-  let model_token = Tokens::new_vocoder_model()?;
+  let model_token = VocoderModelToken::generate().to_string();
 
   let private_bucket_object_name = &args.private_bucket_object_name
       .as_ref()

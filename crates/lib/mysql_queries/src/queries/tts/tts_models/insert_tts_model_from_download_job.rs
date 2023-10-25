@@ -6,8 +6,7 @@ use sqlx::MySqlPool;
 use enums::by_table::tts_models::tts_model_type::TtsModelType;
 use enums::common::visibility::Visibility;
 use errors::AnyhowResult;
-
-use crate::tokens::Tokens;
+use tokens::tokens::tts_models::TtsModelToken;
 
 pub struct InsertTtsModelFromDownloadJobArgs<'a, P: AsRef<Path>> {
   pub tts_model_type: TtsModelType,
@@ -33,7 +32,7 @@ pub async fn insert_tts_model_from_download_job<P: AsRef<Path>>(
   args: InsertTtsModelFromDownloadJobArgs<'_, P>,
 ) -> AnyhowResult<(u64, String)> {
 
-  let model_token = Tokens::new_tts_model()?;
+  let model_token = TtsModelToken::generate().to_string();
 
   let private_bucket_object_name = &args.private_bucket_object_name
       .as_ref()

@@ -5,8 +5,7 @@ use chrono::Utc;
 use sqlx::MySqlPool;
 
 use errors::AnyhowResult;
-
-use crate::tokens::Tokens;
+use tokens::tokens::tts_models::TtsModelToken;
 
 /// table: tts_model_upload_jobs
 #[derive(Debug)]
@@ -204,7 +203,7 @@ pub async fn insert_tts_model<P: AsRef<Path>>(
   file_size_bytes: u64
 ) -> AnyhowResult<(u64, String)> {
 
-  let model_token = Tokens::new_tts_model()?;
+  let model_token = TtsModelToken::generate().to_string();
 
   let private_bucket_object_name = &private_bucket_object_name
       .as_ref()

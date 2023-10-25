@@ -8,7 +8,7 @@ use tokens::tokens::user_sessions::UserSessionToken;
 pub async fn create_user_session(user_token: &str, ip_address: &str, mysql_pool: &MySqlPool)
     -> AnyhowResult<String>
 {
-  let session_token = UserSessionToken::generate();
+  let session_token = UserSessionToken::generate().to_string();
 
   let query_result = sqlx::query!(
         r#"
@@ -20,7 +20,7 @@ INSERT INTO user_sessions (
 )
 VALUES ( ?, ?, ?, NOW() + interval 1 year )
         "#,
-        session_token.to_string(),
+        session_token,
         user_token.to_string(),
         ip_address.to_string(),
     )
