@@ -4,8 +4,7 @@ use sqlx::error::Error::Database;
 use sqlx::MySqlPool;
 
 use errors::AnyhowResult;
-
-use crate::tokens::Tokens;
+use tokens::tokens::tts_model_upload_jobs::TtsModelUploadJobToken;
 
 pub struct InsertTtsModelUploadJobArgs<'a> {
   pub uuid: &'a str,
@@ -22,7 +21,7 @@ pub struct InsertTtsModelUploadJobArgs<'a> {
 // NB: Returns job token
 pub async fn insert_tts_model_upload_job(args: InsertTtsModelUploadJobArgs<'_>) -> AnyhowResult<String> {
   // This token is returned to the client.
-  let job_token = Tokens::new_tts_model_upload_job()?;
+  let job_token = TtsModelUploadJobToken::generate().to_string();
 
   let query_result = sqlx::query!(
         r#"

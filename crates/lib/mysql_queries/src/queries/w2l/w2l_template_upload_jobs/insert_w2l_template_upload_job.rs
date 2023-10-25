@@ -2,8 +2,7 @@ use anyhow::anyhow;
 use sqlx::MySqlPool;
 
 use errors::AnyhowResult;
-
-use crate::tokens::Tokens;
+use tokens::tokens::w2l_template_upload_jobs::W2lTemplateUploadJobToken;
 
 pub struct InsertW2lTemplateUploadJobArgs<'a> {
   pub uuid: &'a str,
@@ -19,10 +18,7 @@ pub struct InsertW2lTemplateUploadJobArgs<'a> {
 // NB: Returns the new token
 pub async fn insert_w2l_template_upload_job(args: InsertW2lTemplateUploadJobArgs<'_>) -> AnyhowResult<String> {
   // This token is returned to the client.
-  let job_token = Tokens::new_w2l_template_upload_job()
-      .map_err(|_e| {
-        anyhow!("error creating token")
-      })?;
+  let job_token = W2lTemplateUploadJobToken::generate().to_string();
 
   let query_result = sqlx::query!(
         r#"
@@ -38,7 +34,7 @@ SET
   download_url = ?,
   status = "pending"
         "#,
-        job_token.to_string(),
+        &job_token,
         args.uuid.to_string(),
         args.creator_user_token.to_string(),
         args.creator_ip_address.to_string(),

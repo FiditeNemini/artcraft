@@ -2,8 +2,7 @@ use anyhow::anyhow;
 use sqlx::MySqlPool;
 
 use errors::AnyhowResult;
-
-use crate::tokens::Tokens;
+use tokens::tokens::voice_clone_requests::VoiceCloneRequestToken;
 
 pub struct InsertVoiceCloneRequestBuilder {
   pub uuid_idempotency_token: String,
@@ -47,7 +46,7 @@ impl InsertVoiceCloneRequestBuilder {
   /// Returns the newly generated token.
   pub async fn insert(&self, mysql_pool: &MySqlPool) -> AnyhowResult<String> {
 
-    let token = Tokens::new_voice_clone_request_token()?;
+    let token = VoiceCloneRequestToken::generate().to_string();
 
     let query = sqlx::query!(
         r#"

@@ -1,16 +1,15 @@
 use anyhow::anyhow;
 use log::warn;
-use sqlx::MySqlPool;
 use sqlx::error::Error::Database;
 use sqlx::mysql::MySqlQueryResult;
+use sqlx::MySqlPool;
 
 use errors::AnyhowResult;
-use tokens::tokens::media_uploads::MediaUploadToken;
-use tokens::tokens::generic_inference_jobs::InferenceJobToken;
 use tokens::tokens::comments::CommentToken;
+use tokens::tokens::firehose_entries::FirehoseEntryToken;
+use tokens::tokens::generic_inference_jobs::InferenceJobToken;
+use tokens::tokens::media_uploads::MediaUploadToken;
 use tokens::tokens::users::UserToken;
-
-use crate::tokens::Tokens;
 
 // TODO(bt, 2022-12-19): Convert this to a database 'enum'. Also, create an 'enums' package similar to 'tokens'.
 #[derive(Debug, Clone, Copy)]
@@ -308,7 +307,7 @@ impl FirehosePublisher {
     entity_token: Option<&str>,
     created_entity_token: Option<&str>
   ) -> AnyhowResult<u64> {
-    let token = Tokens::new_firehose_event()?;
+    let token = FirehoseEntryToken::generate().to_string();
 
     let query_result = sqlx::query!(
         r#"
@@ -320,7 +319,7 @@ SET
   maybe_target_entity_token = ?,
   maybe_created_entity_token = ?
         "#,
-      token,
+      &token,
       event_type.to_db_value(),
       user_token,
       entity_token,

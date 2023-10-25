@@ -11,7 +11,6 @@ use twitch_oauth2::{CsrfToken, TwitchToken};
 use http_server_common::request::get_request_ip::get_request_ip;
 use http_server_common::response::response_error_helpers::to_simple_json_error;
 use mysql_queries::queries::twitch::twitch_oauth::insert::TwitchOauthTokenInsertBuilder;
-use mysql_queries::tokens::Tokens;
 use tokens::tokens::twitch_oauth_tokens_grouping::TwitchOauthGroupingToken;
 use twitch_common::oauth_token_builder::get_oauth_token_builder;
 

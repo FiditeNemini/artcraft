@@ -8,8 +8,8 @@ use sqlx::MySql;
 
 use container_common::anyhow_result::AnyhowResult;
 use mysql_queries::queries::tts::tts_inference_jobs::insert_tts_inference_job::TtsInferenceJobInsertBuilder;
-use mysql_queries::tokens::Tokens;
 use redis_common::redis_keys::RedisKeys;
+use tokens::tokens::tts_inference_jobs::TtsInferenceJobToken;
 use tts_common::priority::TWITCH_TTS_PRIORITY_LEVEL;
 use twitch_common::cheers::remove_cheers;
 use twitch_common::twitch_user_id::TwitchUserId;
@@ -42,7 +42,7 @@ impl TtsWriter {
 
   pub async fn write_tts_with_model(&self, message_text: &str, model_token: &str) -> AnyhowResult<()> {
     let sanitized_text = remove_cheers(message_text);
-    let job_token = Tokens::new_tts_inference_job()?;
+    let job_token = TtsInferenceJobToken::generate().to_string();
 
     info!("Writing TTS: model={}, text={}", model_token, sanitized_text);
 

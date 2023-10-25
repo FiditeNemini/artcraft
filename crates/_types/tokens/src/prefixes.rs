@@ -24,12 +24,15 @@ pub(crate) enum EntityType {
   AuditLog,
   Comment,
   DownloadJob,
+  FirehoseEntry,
   InferenceJob,
   MediaFile,
   MediaUpload,
   ModelCategory,
   NewsStory, // NB: aichatbot / sqlite
+  TtsInferenceJob,
   TtsModel,
+  TtsModelUploadJob,
   TtsRenderTask, // NB: aichatbot / sqlite
   TtsResult,
   TwitchEventRule,
@@ -39,10 +42,13 @@ pub(crate) enum EntityType {
   UserSession,
   UserSubscription,
   VocoderModel,
+  VoiceCloneRequest,
   VoiceConversionModel,
   VoiceConversionResult,
+  W2lInferenceJob,
   W2lResult,
   W2lTemplate,
+  W2lTemplateUploadJob,
   ZsVoice,
   ZsVoiceDataset,
   ZsVoiceDatasetSample,
@@ -60,12 +66,15 @@ impl EntityType {
       Self::AuditLog => "audit_",
       Self::Comment => "comment_",
       Self::DownloadJob => "jdown_", // NB: Was "JGUP:"
+      Self::FirehoseEntry => "EV:", // NB: Old-style prefix, do not use for future tokens.
       Self::InferenceJob => "jinf_",
       Self::MediaFile => "m_",
       Self::MediaUpload => "mu_",
       Self::ModelCategory => "CAT:", // NB: Old-style prefix, do not use for future tokens.
       Self::NewsStory => "news_story_",
+      Self::TtsInferenceJob => "JTINF:", // NB: Old-style prefix, do not use for future tokens.
       Self::TtsModel => "TM:", // NB: Old-style prefix, do not use for future tokens.
+      Self::TtsModelUploadJob => "JTUP:", // NB: Old-style prefix, do not use for future tokens.
       Self::TtsRenderTask => "tts_task_",
       Self::TtsResult => "TR:", // NB: Old-style prefix, do not use for future tokens.
       Self::TwitchEventRule => "TER:", // NB: Old-style prefix, do not use for future tokens.
@@ -75,10 +84,13 @@ impl EntityType {
       Self::UserSession => "session_",
       Self::UserSubscription => "SUB:", // NB: Old-style prefix, do not use for future tokens.
       Self::VocoderModel => "VM:", // NB: Old-style prefix, do not use for future tokens.
+      Self::VoiceCloneRequest => "VCR:", // NB: Old-style prefix, do not use for future tokens.
       Self::VoiceConversionModel => "vcm_",
       Self::VoiceConversionResult => "vcr_",
+      Self::W2lInferenceJob => "JWINF:", // NB: Old-style prefix, do not use for future tokens.
       Self::W2lResult => "WR:", // NB: Old-style prefix, do not use for future tokens.
       Self::W2lTemplate => "WT:", // NB: Old-style prefix, do not use for future tokens.
+      Self::W2lTemplateUploadJob => "JWUP:",  // NB: Old-style prefix, do not use for future tokens.
       Self::ZsVoice => "zsv_",
       Self::ZsVoiceDataset => "zsd_",
       Self::ZsVoiceDatasetSample => "zss_",
@@ -119,8 +131,11 @@ mod tests {
 
     assert!(entities.len() > 0);
 
-    // NB: We're accounting for collision in SESSION: and session_
-    let expected_count = EntityType::COUNT - 1;
+    // NB: We're accounting for collision in a few new/legacy token prefixes:
+    //  - `SESSION:` vs `session_` (the same table)
+    //  - `VCR:` vs `vcr_` (two actually separate tables!)
+    // Don't let this happen anymore!
+    let expected_count = EntityType::COUNT - 2;
     assert_eq!(entities.len(), expected_count);
   }
 

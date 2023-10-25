@@ -3,8 +3,7 @@ use sqlx::MySqlPool;
 
 use enums::common::visibility::Visibility;
 use errors::AnyhowResult;
-
-use crate::tokens::Tokens;
+use tokens::tokens::w2l_inference_jobs::W2lInferenceJobToken;
 
 pub struct InsertW2lInferenceJobExtendedArgs<'a> {
   pub uuid_idempotency_token: &'a str,
@@ -23,10 +22,7 @@ pub struct InsertW2lInferenceJobExtendedArgs<'a> {
 /// Returns the new job's token on success
 pub async fn insert_w2l_inference_job_extended(args: InsertW2lInferenceJobExtendedArgs<'_>) -> AnyhowResult<String> {
   // This token is returned to the client.
-  let job_token = Tokens::new_w2l_inference_job()
-      .map_err(|err| {
-        anyhow!("token creation error: {:?}", err)
-      })?;
+  let job_token = W2lInferenceJobToken::generate().to_string();
 
   let query_result = sqlx::query!(
         r#"
@@ -48,7 +44,7 @@ SET
   creator_set_visibility = ?,
   status = "pending"
         "#,
-        job_token.to_string(),
+        &job_token,
         args.uuid_idempotency_token.to_string(),
         args.maybe_template_token.clone(),
         args.audio_upload_bucket_hash.clone(),

@@ -25,8 +25,8 @@ use mysql_queries::payloads::generic_inference_args::generic_inference_args::{Ge
 use mysql_queries::queries::generic_inference::web::insert_generic_inference_job::{insert_generic_inference_job, InsertGenericInferenceArgs};
 use mysql_queries::queries::tts::tts_inference_jobs::insert_tts_inference_job::TtsInferenceJobInsertBuilder;
 use mysql_queries::queries::tts::tts_models::get_tts_model::TtsModelRecord;
-use mysql_queries::tokens::Tokens;
 use redis_common::redis_keys::RedisKeys;
+use tokens::tokens::tts_inference_jobs::TtsInferenceJobToken;
 use tokens::tokens::users::UserToken;
 use tts_common::priority::{FAKEYOU_DEFAULT_VALID_API_TOKEN_PRIORITY_LEVEL, FAKEYOU_INVESTOR_PRIORITY_LEVEL};
 use user_input_common::check_for_slurs::contains_slurs;
@@ -424,11 +424,7 @@ pub async fn enqueue_infer_tts_handler(
     info!("Creating tts inference job record (legacy job system)...");
 
     // This token is returned to the client.
-    job_token = Tokens::new_tts_inference_job()
-        .map_err(|_e| {
-          warn!("Error creating token");
-          InferTtsError::ServerError
-        })?;
+    job_token = TtsInferenceJobToken::generate().to_string();
 
     let query_result = TtsInferenceJobInsertBuilder::new_for_fakeyou_request()
         .set_job_token(&job_token)

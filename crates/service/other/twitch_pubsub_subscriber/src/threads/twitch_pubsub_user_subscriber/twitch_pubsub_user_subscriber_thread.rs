@@ -23,7 +23,6 @@ use mysql_queries::queries::tts::tts_inference_jobs::insert_tts_inference_job::T
 use mysql_queries::queries::twitch::twitch_event_rules::list_twitch_event_rules_for_user::list_twitch_event_rules_for_user;
 use mysql_queries::queries::twitch::twitch_oauth::find::{TwitchOauthTokenFinder, TwitchOauthTokenRecord};
 use mysql_queries::queries::twitch::twitch_oauth::insert::TwitchOauthTokenInsertBuilder;
-use mysql_queries::tokens::Tokens;
 use redis_common::payloads::lease_payload::LeasePayload;
 use redis_common::redis_keys::RedisKeys;
 use redis_common::shared_constants::LEASE_CHECK_PERIOD;
@@ -31,6 +30,7 @@ use redis_common::shared_constants::LEASE_RENEW_PERIOD;
 use redis_common::shared_constants::LEASE_TIMEOUT_SECONDS;
 use redis_common::shared_constants::OBS_ACTIVE_CHECK_PERIOD;
 use redis_common::shared_constants::STREAMER_TTS_JOB_QUEUE_TTL_SECONDS;
+use tokens::tokens::tts_inference_jobs::TtsInferenceJobToken;
 use twitch_common::cheers::remove_cheers;
 use twitch_common::twitch_user_id::TwitchUserId;
 
@@ -566,7 +566,7 @@ impl TwitchPubsubUserSubscriberThreadStageTwo {
 
   async fn write_tts_inference_event(&mut self, tts_text: &str) -> AnyhowResult<()> {
     let sanitized_text = remove_cheers(tts_text);
-    let job_token = Tokens::new_tts_inference_job()?;
+    let job_token = TtsInferenceJobToken::generate().to_string();
     //let model_token = "TM:7wbtjphx8h8v"; // "Mario *" voice (prod)
     let model_token = "TM:40m3aqtt41y0"; // "Wakko" voice (dev)
 
