@@ -6,6 +6,11 @@ use strum::EnumCount;
 #[cfg(test)]
 use strum::EnumIter;
 
+// TODO(bt,2023-10-25): Group these into three enums -
+//  TokenPrefix, DeprecatedTokenPrefix, (private) RetiredTokenPrefix
+//  Then make the same uniqueness assertions.
+//  Assert the new token prefixes only end with underscore.
+
 /// Each entity type in our system gets a unique prefix.
 /// Older entities have prefixes ending in ':', but newer entities use the Stripe-style "_"
 /// separator, which makes it easy to select and copy entire tokens with just mouse clicks across
