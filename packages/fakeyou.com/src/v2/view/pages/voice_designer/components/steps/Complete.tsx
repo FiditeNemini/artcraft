@@ -7,7 +7,7 @@ function Complete() {
   return (
     <div className="d-flex flex-column align-items-center">
       <div className="d-flex flex-column align-items-center">
-        <div className="bg-success rounded-circle p-3 mb-3">
+        <div className="d-flex bg-success rounded-circle p-3 mb-3">
           <FontAwesomeIcon icon={faCheck} className="display-6 text-white" />
         </div>
 
