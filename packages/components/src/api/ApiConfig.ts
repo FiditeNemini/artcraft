@@ -100,15 +100,15 @@ class ApiConfig {
   }
 
   login(): string {
-    return `${this.getApiOrigin()}/login`;
+    return `${this.getApiOrigin()}/v1/login`;
   }
 
   logout(): string {
-    return `${this.getApiOrigin()}/logout`;
+    return `${this.getApiOrigin()}/v1/logout`;
   }
 
   sessionDetails(): string {
-    return `${this.getApiOrigin()}/session`;
+    return `${this.getApiOrigin()}/v1/session`;
   }
 
   getQueueStats(): string {
@@ -408,6 +408,12 @@ class ApiConfig {
 
   checkVoiceCloneRequest(): string {
     return `${this.getApiOrigin()}/voice_clone_requests/check`;
+  }
+
+  // =============== Media Files ===============
+
+  getMediaFile(mediaFileToken: string): string {
+    return `${this.getApiOrigin()}/v1/media_files/file/${mediaFileToken}`;
   }
 
   // =============== File Uploads ===============

@@ -245,7 +245,7 @@ function TopNav(props: Props) {
                       </Link>
                     </li>
                     <li data-bs-toggle="offcanvas">
-                      <Link className="dropdown-item" to="/face-animation">
+                      <Link className="dropdown-item" to="/face-animator">
                         <FontAwesomeIcon
                           icon={faFaceViewfinder}
                           className="me-2"

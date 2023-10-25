@@ -1,33 +1,67 @@
 import React from "react";
+import Panel from "../../common/Panel";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { IconDefinition } from "@fortawesome/fontawesome-svg-core";
+import Button from "components/common/Button";
 
-interface Props {
-  childProps?: any;
-  titleIcon?: JSX.Element;
-  titleComponent?: React.ComponentType;
-  title?: string;
-  subText: string;
-  showButtons: boolean;
-  actionButtons?: JSX.Element;
+interface PageHeaderProps {
+  titleIcon?: IconDefinition;
+  title: string | React.ReactNode;
+  subText: string | React.ReactNode;
+  full?: boolean;
+  showButton?: boolean;
+  extension?: React.ReactNode;
+  buttonLabel?: string;
+  buttonVariant?: "primary" | "secondary" | "danger";
+  buttonTo?: string;
+  buttonIcon?: IconDefinition;
+  buttonOnClick?: () => void;
 }
 
+export default function PageHeader({
+  titleIcon,
+  title,
+  subText,
+  full,
+  showButton,
+  extension,
+  buttonLabel,
+  buttonVariant = "primary",
+  buttonTo,
+  buttonIcon,
+  buttonOnClick,
+}: PageHeaderProps) {
+  const icon = (
+    <>{titleIcon && <FontAwesomeIcon icon={titleIcon} className="me-3" />}</>
+  );
 
-export default function PageHeader({ actionButtons, childProps, showButtons, subText, titleComponent: Title, title, titleIcon }: Props) {
-  return <div className="container-panel hero-section py-4">
-    <div className="panel">
-      <div className="p-3 py-4 p-md-4">
-        { Title ? <Title {...childProps }/> : <h1 className="fw-bold text-center text-md-start">
-            { titleIcon }
-            { title }
-          </h1> }
-        <p className="text-center text-md-start pt-1">{ subText }</p>
-        { showButtons && (
-          <div className="d-flex flex-column flex-md-row gap-3 justify-content-center justify-content-md-start mt-4">
-            { actionButtons }
+  return (
+    <div className="pt-3 pb-4 pt-lg-4">
+      <Panel padding>
+        <div className="d-flex flex-column gap-4">
+          <div>
+            <div className="d-flex">
+              <h2 className="fw-bold flex-grow-1">
+                {icon}
+                {title}
+              </h2>
+              <div className="d-none d-md-block">
+                {showButton && (
+                  <Button
+                    icon={buttonIcon}
+                    variant={buttonVariant}
+                    label={buttonLabel}
+                    to={buttonTo}
+                    onClick={buttonOnClick}
+                  />
+                )}
+              </div>
+            </div>
+            <p>{subText}</p>
           </div>
-        )}
-      </div>
+          {extension && <div>{extension}</div>}
+        </div>
+      </Panel>
     </div>
-  </div>;
-};
-
-// export default PageHeader;
+  );
+}

@@ -35,8 +35,8 @@ export default function ShareButton(props: ShareButtonProps) {
           <Button
             label="Share Link"
             icon={faLink}
-            secondary
-            small
+            variant="secondary"
+            small={true}
             onClick={copyToClipboard}
           />
         </div>

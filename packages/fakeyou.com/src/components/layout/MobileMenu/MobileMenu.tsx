@@ -43,7 +43,7 @@ export default function MobileMenu(props: MobileMenuProps) {
           icon={faUser}
           label="Profile"
           small
-          secondary
+          variant="secondary"
           onClick={() => history.push(url)}
         />
       </>
@@ -58,7 +58,7 @@ export default function MobileMenu(props: MobileMenuProps) {
             <Button
               label="Menu"
               icon={faBars}
-              secondary
+              variant="secondary"
               small
               onClick={handleMenuButtonClick}
             />

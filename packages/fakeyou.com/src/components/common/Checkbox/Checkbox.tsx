@@ -25,6 +25,6 @@ export default function Checkbox({ checked, className = "", label = "", name = "
     <a.svg {...{ className: "fy-checkbox", onClick, style, ...hoverEvents }}>
       <Check {...{ checked }}/>
     </a.svg>
-    { label && <label {...{ className: "form-check-label", for: id, onClick }}>{ label }</label> } 
+    { label && <label {...{ className: "form-check-label", htmlFor: id, onClick }}>{ label }</label> } 
   </div>
 };

@@ -13,6 +13,7 @@ interface PageHeaderModelViewProps {
   extras?: React.ReactNode;
   view?: "regular" | "edit" | "delete";
   modelType?: "TTS" | "V2V";
+  full?: boolean;
 }
 
 export default function PageHeaderModelView({
@@ -25,13 +26,14 @@ export default function PageHeaderModelView({
   extras,
   view = "regular",
   modelType = "TTS",
+  full,
 }: PageHeaderModelViewProps) {
   const icon = (
     <>{titleIcon && <FontAwesomeIcon icon={titleIcon} className="me-3" />}</>
   );
 
   return (
-    <div className="pt-2 pt-lg-4 pb-4">
+    <div className="pt-3 pb-4 pt-lg-4">
       {view === "regular" && (
         <Panel padding>
           <div className="row gy-3">

@@ -137,8 +137,11 @@ function LandingPage(props: Props) {
   const randomHeroImage = useMemo(() => {
     const images = [
       // Main Images:
-      "mascot/kitsune_pose2.webp",
+      // "mascot/kitsune_pose2.webp",
       // "mascot/may4th.webp",
+      "mascot/halloween_1.webp",
+      "mascot/halloween_2.webp",
+      "mascot/halloween_3.webp",
     ];
 
     return images[Math.floor(Math.random() * images.length)];
@@ -153,7 +156,7 @@ function LandingPage(props: Props) {
           icon={faSparkles}
           message="Have you tried our new Face Animator? Turn photos of faces into animated lip-synced videos with just a picture and some audio!"
           alertVariant="new"
-          link="/face-animation"
+          link="/face-animator"
           linkText="Try it now"
         />
 
@@ -297,7 +300,7 @@ function LandingPage(props: Props) {
           </div>
           <div className="col-12 col-md-4">
             <Link
-              to="/face-animation"
+              to="/face-animator"
               className="panel panel-select d-flex flex-column align-items-center"
             >
               <div className="d-flex px-4 pt-4 align-items-start w-100">
@@ -317,7 +320,7 @@ function LandingPage(props: Props) {
                     {t("productFaceAnimatorText")}
                   </h6>
                 </div>
-                <Link to="/face-animation" className="btn btn-square mt-1">
+                <Link to="/face-animator" className="btn btn-square mt-1">
                   <FontAwesomeIcon icon={faArrowRight} />
                 </Link>
               </div>
@@ -325,28 +328,8 @@ function LandingPage(props: Props) {
               <img
                 className="img-fluid"
                 src="/images/landing/select-w2l.webp"
-                alt="Video Lip Sync"
+                alt="Face Animator"
               />
-            </Link>
-          </div>
-          <div className="col-12 col-md-4">
-            <Link
-              to="/video"
-              className="panel panel-select d-flex flex-column align-items-center h-auto pb-4"
-            >
-              <div className="d-flex px-4 pt-4 align-items-center w-100">
-                <div className="flex-grow-1">
-                  <h3 className="fw-bold text-white mb-1">
-                    {t("productVideoTitle")}
-                  </h3>
-                  <h6 className="fw-normal opacity-75 text-white mb-0">
-                    {t("productVideoText")}
-                  </h6>
-                </div>
-                <Link to="/video" className="btn btn-square mt-1">
-                  <FontAwesomeIcon icon={faArrowRight} />
-                </Link>
-              </div>
             </Link>
           </div>
           <img

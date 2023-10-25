@@ -143,7 +143,7 @@ function PricingPage(props: Props) {
 
   // Highlight the mid-tier plan if nothing is subscribed
   if (!userHasPaidPremium) {
-    proBorderCss = "rounded panel p-4 h-100  panel-border";
+    proBorderCss = "rounded panel p-4 h-100  pricing-border";
   }
 
   return (

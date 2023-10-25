@@ -8,8 +8,6 @@ import { Trans } from "react-i18next";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faVolumeHigh,
-  faVideo,
-  faImage,
   faTags,
   faHandsHelping,
 } from "@fortawesome/free-solid-svg-icons";
@@ -118,18 +116,6 @@ function ContributeIndexPage(props: Props) {
                   Upload Vocoder
                 </Link>
               </div>
-              <div className="col-12 col-md-6">
-                <Link to="/upload/w2l_video" className="btn btn-primary w-100">
-                  <FontAwesomeIcon icon={faVideo} className="me-3" />
-                  {t("pages.contributeIndex.buttonUploadW2lVideo")}
-                </Link>
-              </div>
-              <div className="col-12 col-md-6">
-                <Link to="/upload/w2l_photo" className="btn btn-primary w-100">
-                  <FontAwesomeIcon icon={faImage} className="me-3" />
-                  {t("pages.contributeIndex.buttonUploadW2lPhoto")}
-                </Link>
-              </div>
             </div>
           </div>
         </div>
@@ -156,7 +142,7 @@ function ContributeIndexPage(props: Props) {
           </div>
         </div>
       </div>
-      <div className="container-panel pt-3">
+      <div className="container-panel pt-3 pb-5">
         <div className="panel p-3 py-4 p-md-4 text-center text-lg-start">
           <h2 className="fw-bold">
             <FontAwesomeIcon icon={faHandsHelping} className="me-3" />

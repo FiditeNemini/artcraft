@@ -1,4 +1,5 @@
 import "./AppNew.scss";
+import "scss/custom-bootstrap.scss";
 
 import React from "react";
 import { ApiConfig } from "@storyteller/components";
@@ -56,6 +57,8 @@ import {
 import { VoiceConversionModelUploadJob } from "@storyteller/components/src/jobs/VoiceConversionModelUploadJob";
 import { VoiceConversionModelListItem } from "@storyteller/components/src/api/voice_conversion/ListVoiceConversionModels";
 import HttpBackend from "i18next-http-backend";
+
+import { InferenceJobs } from "components/providers";
 
 // NB: We're transitioning over to this instance of i18n-next that loads translations over HTTP from Json Files.
 // The old i18n-next instance (see below) bakes in translations into the compiled javascript blob.
@@ -182,12 +185,15 @@ function newVocodes() {
   return discord || twitter || alphaCookie;
 }
 
-function initInferenceJobsByCategoryMap() : Map<FrontendInferenceJobType, InferenceJob[]> {
-    let inferenceJobsByCategory = new Map();
-    inferenceJobsByCategory.set(FrontendInferenceJobType.FaceAnimation, []);
-    inferenceJobsByCategory.set(FrontendInferenceJobType.TextToSpeech, []);
-    inferenceJobsByCategory.set(FrontendInferenceJobType.VoiceConversion, []);
-    return inferenceJobsByCategory;
+function initInferenceJobsByCategoryMap(): Map<
+  FrontendInferenceJobType,
+  InferenceJob[]
+> {
+  let inferenceJobsByCategory = new Map();
+  inferenceJobsByCategory.set(FrontendInferenceJobType.FaceAnimation, []);
+  inferenceJobsByCategory.set(FrontendInferenceJobType.TextToSpeech, []);
+  inferenceJobsByCategory.set(FrontendInferenceJobType.VoiceConversion, []);
+  return inferenceJobsByCategory;
 }
 
 function isMacOs() {
@@ -779,6 +785,7 @@ class App extends React.Component<Props, State> {
             */}
 
             <div className="migrationComponentWrapper">
+            <InferenceJobs {...{ byCategory: this.state.inferenceJobsByCategory }}>
               <Switch>
                 <Route path="/">
                   <PageContainer
@@ -876,6 +883,7 @@ class App extends React.Component<Props, State> {
                   />
                 </Route>
               </Switch>
+            </InferenceJobs>
             </div>
           </div>
         </div>

@@ -1,5 +1,6 @@
 import AudioInput from "./AudioInput";
 import BasicVideo from "./BasicVideo";
+import Button from "./Button";
 import Check from "./Check";
 import Checkbox from "./Checkbox";
 import FileActions from "./FileActions";
@@ -16,6 +17,7 @@ import Spinner from "./Spinner";
 export {
   AudioInput,
   BasicVideo,
+  Button,
   Check,
   Checkbox,
   FileActions,
