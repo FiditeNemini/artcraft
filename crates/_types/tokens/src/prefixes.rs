@@ -6,10 +6,19 @@ use strum::EnumCount;
 #[cfg(test)]
 use strum::EnumIter;
 
-/// Each entity type in our system gets a unique prefix.
-/// Older entities have prefixes ending in ':', but newer entities use the Stripe-style "_"
-/// separator, which makes it easy to select and copy entire tokens with just mouse clicks across
-/// all major operating systems.
+/// Each primary key or token type in our system gets a unique prefix so that they're easy to
+/// identify by observation. (Random entropic tokens or UUIDs are ambiguous and easier to fumble
+/// when manually debugging.)
+///
+/// This set is the newest set of token prefixes in our system, which all end with underscore "_".
+/// This is the Stripe-style prefixing which makes it easy to "double click" the token string to
+/// select and copy the entire value -- this should work on all operating systems, too!
+///
+/// These are incredibly ergonomic tokens for manually querying and debugging against.
+///
+/// Older entities in our system (see `LegacyTokenPrefix`) have prefixes ending in ':', but these
+/// do not have the nice "double click" property. Plus, they kind of look ugly. Don't make any more
+/// of those.
 #[derive(Debug, Copy, Clone, Eq, PartialEq)]
 #[cfg_attr(test, derive(EnumIter, EnumCount))]
 pub(crate) enum TokenPrefix {
@@ -34,6 +43,7 @@ pub(crate) enum TokenPrefix {
 /// These are old-style prefixes that end in colon (:).
 /// Don't do this anymore, since tokens built like this are difficult to "double click to select".
 /// The modern, Stripe-style token prefixes (which use underscores) are much better.
+/// These tokens are also uglier (though that may be subjective).
 #[derive(Debug, Copy, Clone, Eq, PartialEq)]
 #[cfg_attr(test, derive(EnumIter, EnumCount))]
 pub(crate) enum LegacyTokenPrefix {
@@ -58,10 +68,11 @@ pub(crate) enum LegacyTokenPrefix {
 }
 
 /// Do not use these token prefixes ever again. They're retired.
-/// These tokens may still exist in the database.
+/// Tokens with these prefixes may still exist in the database.
 #[derive(Debug, Copy, Clone, Eq, PartialEq)]
 #[cfg_attr(test, derive(EnumIter, EnumCount))]
 enum RetiredTokenPrefix {
+  _DownloadJobDeprecatedNotNotUse,
   _UserDeprecatedDoNotUse, // NB: Users prior to 2023-10-24. Kept to prevent collision.
   _UserSessionDeprecatedDoNotUse, // NB: Sessions prior to 2023-10-24. Kept to prevent collision.
 }
@@ -76,13 +87,13 @@ impl PrefixGenerator for TokenPrefix {
       Self::AnonymousVisitorTracking => "avt_",
       Self::AuditLog => "audit_",
       Self::Comment => "comment_",
-      Self::DownloadJob => "jdown_", // NB: Was "JGUP:"
+      Self::DownloadJob => "jdown_", // NB: Previously "JGUP:"
       Self::InferenceJob => "jinf_",
       Self::MediaFile => "m_",
       Self::MediaUpload => "mu_",
       Self::NewsStory => "news_story_",
       Self::TtsRenderTask => "tts_task_",
-      Self::User => "user_",
+      Self::User => "user_", // NB: Previously "U:"
       Self::UserSession => "session_",
       Self::VoiceConversionModel => "vcm_",
       Self::VoiceConversionResult => "vcr_",
@@ -122,6 +133,7 @@ impl PrefixGenerator for LegacyTokenPrefix {
 impl PrefixGenerator for RetiredTokenPrefix {
   fn prefix(self) -> &'static str {
     match self {
+      Self::_DownloadJobDeprecatedNotNotUse => "JGUP:", // NB: Download jobs changed roughly around 2022-12-16
       Self::_UserDeprecatedDoNotUse => "U:", // NB: Users prior to 2023-10-24 used this prefix.
       Self::_UserSessionDeprecatedDoNotUse => "SESSION:", // NB: Users prior to 2023-10-24 used this prefix.
     }
