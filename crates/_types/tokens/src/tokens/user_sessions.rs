@@ -3,7 +3,7 @@ use std::fmt::Debug;
 use serde::Deserialize;
 use serde::Serialize;
 
-use crate::prefixes::EntityType;
+use crate::prefixes::TokenPrefix;
 
 /// Primary key for the `user_sessions` table.
 #[derive(Clone, PartialEq, Eq, PartialOrd, Ord, Hash, sqlx::Type, Debug, Serialize, Deserialize)]
@@ -11,4 +11,4 @@ use crate::prefixes::EntityType;
 pub struct UserSessionToken(pub String);
 
 impl_string_token!(UserSessionToken);
-impl_crockford_generator!(UserSessionToken, 32usize, EntityType::UserSession, CrockfordLower);
+impl_crockford_generator!(UserSessionToken, 32usize, TokenPrefix::UserSession, CrockfordLower);

@@ -3,7 +3,7 @@ use std::fmt::Debug;
 use serde::Deserialize;
 use serde::Serialize;
 
-use crate::prefixes::EntityType;
+use crate::prefixes::TokenPrefix;
 
 /// The primary key for Audit Logs.
 #[derive(Clone, PartialEq, Eq, PartialOrd, Ord, Hash, sqlx::Type, Debug, Serialize, Deserialize)]
@@ -11,4 +11,4 @@ use crate::prefixes::EntityType;
 pub struct AuditLogToken(pub String);
 
 impl_string_token!(AuditLogToken);
-impl_crockford_generator!(AuditLogToken, 32usize, EntityType::AuditLog, CrockfordLower);
+impl_crockford_generator!(AuditLogToken, 32usize, TokenPrefix::AuditLog, CrockfordLower);

@@ -3,7 +3,7 @@ use std::fmt::Debug;
 use serde::Deserialize;
 use serde::Serialize;
 
-use crate::prefixes::EntityType;
+use crate::prefixes::TokenPrefix;
 
 /// A rare instance that is *not* a primary key.
 /// These are generated as cookies to track users for a better logged out experience and for analytics.
@@ -13,4 +13,4 @@ use crate::prefixes::EntityType;
 pub struct AnonymousVisitorTrackingToken(pub String);
 
 impl_string_token!(AnonymousVisitorTrackingToken);
-impl_crockford_generator!(AnonymousVisitorTrackingToken, 32usize, EntityType::AnonymousVisitorTracking, CrockfordLower);
+impl_crockford_generator!(AnonymousVisitorTrackingToken, 32usize, TokenPrefix::AnonymousVisitorTracking, CrockfordLower);

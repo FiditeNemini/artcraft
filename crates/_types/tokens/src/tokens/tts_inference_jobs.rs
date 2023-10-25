@@ -3,7 +3,7 @@ use std::fmt::Debug;
 use serde::Deserialize;
 use serde::Serialize;
 
-use crate::prefixes::EntityType;
+use crate::prefixes::LegacyTokenPrefix;
 
 /// Primary key for the `tts_inference_jobs` table.
 #[derive(Clone, PartialEq, Eq, PartialOrd, Ord, Hash, sqlx::Type, Debug, Serialize, Deserialize)]
@@ -11,4 +11,4 @@ use crate::prefixes::EntityType;
 pub struct TtsInferenceJobToken(pub String);
 
 impl_string_token!(TtsInferenceJobToken);
-impl_crockford_generator!(TtsInferenceJobToken, 32usize, EntityType::TtsInferenceJob, CrockfordLower);
+impl_crockford_generator!(TtsInferenceJobToken, 32usize, LegacyTokenPrefix::TtsInferenceJob, CrockfordLower);

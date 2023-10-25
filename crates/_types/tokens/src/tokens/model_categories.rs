@@ -3,7 +3,7 @@ use std::fmt::Debug;
 use serde::Deserialize;
 use serde::Serialize;
 
-use crate::prefixes::EntityType;
+use crate::prefixes::LegacyTokenPrefix;
 
 /// The primary key for model categories.
 #[derive(Clone, PartialEq, Eq, PartialOrd, Ord, Hash, sqlx::Type, Debug, Serialize, Deserialize)]
@@ -11,4 +11,4 @@ use crate::prefixes::EntityType;
 pub struct ModelCategoryToken(pub String);
 
 impl_string_token!(ModelCategoryToken);
-impl_crockford_generator!(ModelCategoryToken, 15usize, EntityType::ModelCategory, CrockfordLower);
+impl_crockford_generator!(ModelCategoryToken, 15usize, LegacyTokenPrefix::ModelCategory, CrockfordLower);

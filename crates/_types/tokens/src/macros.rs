@@ -58,6 +58,8 @@ macro_rules! impl_crockford_generator {
 
       #[inline]
       pub fn entropy_suffix(&self) -> &str {
+        use crate::prefixes::PrefixGenerator;
+
         &self.0
           .strip_prefix($variant.prefix())
           .unwrap_or(&self.0)
@@ -71,6 +73,8 @@ macro_rules! impl_crockford_generator {
 
       #[inline]
       pub fn token_prefix() -> &'static str {
+        use crate::prefixes::PrefixGenerator;
+
         $variant.prefix()
       }
 

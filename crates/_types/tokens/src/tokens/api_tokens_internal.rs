@@ -3,7 +3,7 @@ use std::fmt::Debug;
 use serde::Deserialize;
 use serde::Serialize;
 
-use crate::prefixes::EntityType;
+use crate::prefixes::LegacyTokenPrefix;
 
 /// Internal token for the `api_tokens` table.
 #[derive(Clone, PartialEq, Eq, PartialOrd, Ord, Hash, sqlx::Type, Debug, Serialize, Deserialize)]
@@ -11,4 +11,4 @@ use crate::prefixes::EntityType;
 pub struct ApiTokenInternal(pub String);
 
 impl_string_token!(ApiTokenInternal);
-impl_crockford_generator!(ApiTokenInternal, 32usize, EntityType::ApiTokenInternal, CrockfordLower);
+impl_crockford_generator!(ApiTokenInternal, 32usize, LegacyTokenPrefix::ApiTokenInternal, CrockfordLower);

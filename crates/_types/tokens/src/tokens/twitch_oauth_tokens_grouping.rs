@@ -3,7 +3,7 @@ use std::fmt::Debug;
 use serde::Deserialize;
 use serde::Serialize;
 
-use crate::prefixes::EntityType;
+use crate::prefixes::LegacyTokenPrefix;
 
 /// "grouping token" for the `twitch_oauth_tokens` table (this is deprecated)
 #[derive(Clone, PartialEq, Eq, PartialOrd, Ord, Hash, sqlx::Type, Debug, Serialize, Deserialize)]
@@ -11,4 +11,4 @@ use crate::prefixes::EntityType;
 pub struct TwitchOauthGroupingToken(pub String);
 
 impl_string_token!(TwitchOauthGroupingToken);
-impl_crockford_generator!(TwitchOauthGroupingToken, 32usize, EntityType::TwitchOauthGrouping, CrockfordLower);
+impl_crockford_generator!(TwitchOauthGroupingToken, 32usize, LegacyTokenPrefix::TwitchOauthGrouping, CrockfordLower);

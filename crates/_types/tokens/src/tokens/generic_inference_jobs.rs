@@ -3,7 +3,7 @@ use std::fmt::Debug;
 use serde::Deserialize;
 use serde::Serialize;
 
-use crate::prefixes::EntityType;
+use crate::prefixes::TokenPrefix;
 
 /// The primary key for "generic" inference jobs.
 #[derive(Clone, PartialEq, Eq, sqlx::Type, Debug, Serialize, Deserialize)]
@@ -11,4 +11,4 @@ use crate::prefixes::EntityType;
 pub struct InferenceJobToken(String);
 
 impl_string_token!(InferenceJobToken);
-impl_crockford_generator!(InferenceJobToken, 32usize, EntityType::InferenceJob, CrockfordLower);
+impl_crockford_generator!(InferenceJobToken, 32usize, TokenPrefix::InferenceJob, CrockfordLower);
