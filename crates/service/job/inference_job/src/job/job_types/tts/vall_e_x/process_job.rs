@@ -405,6 +405,17 @@ pub async fn process_inference_voice(
         }
     }
 
+    // Might not need this for inference.
+    // let creator_user_token:UserToken;
+    // match &job.maybe_creator_user_token {
+    //     Some(token) => {
+    //         creator_user_token = UserToken::new_from_str(token);
+    //     },
+    //     None => {
+    //         return Err(ProcessSingleJobError::InvalidJob(anyhow!("Missing Creator User Token")));
+    //     }
+    // }
+
     // run inference
     let work_temp_dir = format!("/tmp/temp_zeroshot_inference_{}", job.id.0);
 
