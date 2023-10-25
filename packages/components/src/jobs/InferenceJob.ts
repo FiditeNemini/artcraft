@@ -31,6 +31,7 @@ export class InferenceJob {
   maybeResultType: string | undefined | null;
   maybeResultToken: string | undefined | null;
   maybeResultPublicBucketMediaPath: string | undefined | null;
+  maybeFailureCategory: string | undefined | null;
 
   constructor(
     // PK
@@ -50,6 +51,7 @@ export class InferenceJob {
     maybeResultEntityType: string | undefined | null = null,
     maybeResultEntityToken: string | undefined | null = null,
     maybeResultPublicBucketMediaPath: string | undefined | null = null,
+    maybeFailureCategory: string | undefined | null = null
   ) {
     this.jobToken = jobToken;
     this.frontendJobType = frontendJobType;
@@ -77,6 +79,10 @@ export class InferenceJob {
     }
 
     this.maybeResultPublicBucketMediaPath = maybeResultPublicBucketMediaPath;
+
+    if (!!maybeFailureCategory) {
+      this.maybeFailureCategory = maybeFailureCategory;
+    }
   }
 
   static fromResponse(response: ModelInferenceJobStatus, frontendJobType: FrontendInferenceJobType) : InferenceJob {
@@ -93,6 +99,7 @@ export class InferenceJob {
       response.maybe_result?.entity_type,
       response.maybe_result?.entity_token,
       response.maybe_result?.maybe_public_bucket_media_path,
+      response.status.maybe_failure_category
     );
   }
 }
