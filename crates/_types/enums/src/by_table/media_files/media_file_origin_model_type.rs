@@ -24,6 +24,8 @@ pub enum MediaFileOriginModelType {
   /// so-vits-svc voice conversion models
   #[serde(rename = "so_vits_svc")]
   SoVitsSvc,
+  #[serde(rename = "vall_e_x")]
+  VallEX,
 }
 
 // TODO(bt, 2022-12-21): This desperately needs MySQL integration tests!
@@ -37,6 +39,7 @@ impl MediaFileOriginModelType {
       Self::RvcV2  => "rvc_v2",
       Self::SadTalker => "sad_talker",
       Self::SoVitsSvc => "so_vits_svc",
+      Self::VallEX => "vall_e_x"
     }
   }
 
@@ -45,6 +48,7 @@ impl MediaFileOriginModelType {
       "rvc_v2" => Ok(Self::RvcV2),
       "sad_talker" => Ok(Self::SadTalker),
       "so_vits_svc" => Ok(Self::SoVitsSvc),
+      "vall_e_x" => Ok(Self::VallEX),
       _ => Err(format!("invalid value: {:?}", value)),
     }
   }
@@ -56,6 +60,7 @@ impl MediaFileOriginModelType {
       Self::RvcV2,
       Self::SadTalker,
       Self::SoVitsSvc,
+      Self::VallEX
     ])
   }
 }
@@ -68,35 +73,36 @@ mod tests {
   mod explicit_checks {
     use super::*;
 
-    #[test]
-    fn test_serialization() {
-      assert_serialization(MediaFileOriginModelType::RvcV2, "rvc_v2");
-      assert_serialization(MediaFileOriginModelType::SadTalker, "sad_talker");
-      assert_serialization(MediaFileOriginModelType::SoVitsSvc, "so_vits_svc");
-    }
+  #[test]
+  fn test_serialization() {
+    assert_serialization(MediaFileOriginModelType::SadTalker, "sad_talker");
+  }
 
     #[test]
     fn test_to_str() {
       assert_eq!(MediaFileOriginModelType::RvcV2.to_str(), "rvc_v2");
       assert_eq!(MediaFileOriginModelType::SadTalker.to_str(), "sad_talker");
       assert_eq!(MediaFileOriginModelType::SoVitsSvc.to_str(), "so_vits_svc");
-    }
+      assert_eq!(MediaFileOriginModelType::VallEX.to_str(), "vall_e_x");
+  }
 
     #[test]
     fn test_from_str() {
       assert_eq!(MediaFileOriginModelType::from_str("rvc_v2").unwrap(), MediaFileOriginModelType::RvcV2);
       assert_eq!(MediaFileOriginModelType::from_str("sad_talker").unwrap(), MediaFileOriginModelType::SadTalker);
       assert_eq!(MediaFileOriginModelType::from_str("so_vits_svc").unwrap(), MediaFileOriginModelType::SoVitsSvc);
-      assert!(MediaFileOriginModelType::from_str("foo").is_err());
+      assert_eq!(MediaFileOriginModelType::from_str("vall_e_x").unwrap(), MediaFileOriginModelType::VallEX);
+    assert!(MediaFileOriginModelType::from_str("foo").is_err());
     }
 
     #[test]
     fn all_variants() {
       let mut variants = MediaFileOriginModelType::all_variants();
-      assert_eq!(variants.len(), 3);
+      assert_eq!(variants.len(), 4);
       assert_eq!(variants.pop_first(), Some(MediaFileOriginModelType::RvcV2));
       assert_eq!(variants.pop_first(), Some(MediaFileOriginModelType::SadTalker));
       assert_eq!(variants.pop_first(), Some(MediaFileOriginModelType::SoVitsSvc));
+      assert_eq!(variants.pop_first(), Some(MediaFileOriginModelType::VallEX));
       assert_eq!(variants.pop_first(), None);
     }
   }

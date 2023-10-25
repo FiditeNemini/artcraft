@@ -192,6 +192,7 @@ impl BucketClient {
     object_path: P,
     filesystem_path: Q,
   ) -> anyhow::Result<()> {
+    // TODO I think we might want to return an error here? but there has to a reason why we are just returning ok?
     let object_path_str = object_path.as_ref()
       .to_str()
       .map(|s| s.to_string())
