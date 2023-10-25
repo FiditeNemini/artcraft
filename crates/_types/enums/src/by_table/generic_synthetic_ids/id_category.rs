@@ -19,24 +19,24 @@ pub enum IdCategory {
 
   /// Results from lipsync animations (which may live in the media_files table)
   #[serde(rename = "lipsync_animation")]
-  LipsyncAnimation,
+  LipsyncAnimationResult,
 
   /// Results from voice conversion (which may live in the media_files table)
   /// Applies for RVC and SVC
   #[serde(rename = "voice_conversion")]
-  VoiceConversion,
+  VoiceConversionResult,
 
-  /// Results from the zero shot tts
+  /// Results from the zero shot tts (which may live in the media_files table)
   #[serde(rename = "zs_audio_tts")]
-  ZeroShotTTS,
+  ZeroShotTtsResult,
 
   /// Zs dataset which lives in the zs_voice_datasets table
   #[serde(rename = "zs_dataset")]
-  ZsDataset,
+  ZeroShotVoiceDataset,
 
   /// Zs voice which lives in the zs_voices table
   #[serde(rename = "zs_voice")]
-  ZsVoice,
+  ZeroShotVoiceEmbedding,
 }
 
 // TODO(bt, 2022-12-21): This desperately needs MySQL integration tests!
@@ -48,22 +48,22 @@ impl IdCategory {
   pub fn to_str(&self) -> &'static str {
     match self {
       Self::MediaFile => "media_file",
-      Self::LipsyncAnimation => "lipsync_animation",
-      Self::VoiceConversion => "voice_conversion",
-      Self::ZsDataset => "zs_dataset",
-      Self::ZsVoice => "zs_voice",
-      Self::ZeroShotTTS => "zs_audio_tts"
+      Self::LipsyncAnimationResult => "lipsync_animation",
+      Self::VoiceConversionResult => "voice_conversion",
+      Self::ZeroShotVoiceDataset => "zs_dataset",
+      Self::ZeroShotVoiceEmbedding => "zs_voice",
+      Self::ZeroShotTtsResult => "zs_audio_tts"
     }
   }
 
   pub fn from_str(value: &str) -> Result<Self, String> {
     match value {
       "media_file" => Ok(Self::MediaFile),
-      "lipsync_animation" => Ok(Self::LipsyncAnimation),
-      "voice_conversion" => Ok(Self::VoiceConversion),
-      "zs_dataset" => Ok(Self::ZsDataset),
-      "zs_voice" => Ok(Self::ZsVoice),
-      "zs_audio_tts" => Ok(Self::ZeroShotTTS),
+      "lipsync_animation" => Ok(Self::LipsyncAnimationResult),
+      "voice_conversion" => Ok(Self::VoiceConversionResult),
+      "zs_dataset" => Ok(Self::ZeroShotVoiceDataset),
+      "zs_voice" => Ok(Self::ZeroShotVoiceEmbedding),
+      "zs_audio_tts" => Ok(Self::ZeroShotTtsResult),
       _ => Err(format!("invalid value: {:?}", value)),
     }
   }
@@ -73,11 +73,11 @@ impl IdCategory {
     // NB: BTreeSet::from() isn't const, but not worth using LazyStatic, etc.
     BTreeSet::from([
       Self::MediaFile,
-      Self::LipsyncAnimation,
-      Self::VoiceConversion,
-      Self::ZeroShotTTS,
-      Self::ZsDataset,
-      Self::ZsVoice,
+      Self::LipsyncAnimationResult,
+      Self::VoiceConversionResult,
+      Self::ZeroShotTtsResult,
+      Self::ZeroShotVoiceDataset,
+      Self::ZeroShotVoiceEmbedding,
     ])
   }
 }
@@ -93,30 +93,30 @@ mod tests {
   #[test]
   fn test_serialization() {
     assert_serialization(IdCategory::MediaFile, "media_file");
-    assert_serialization(IdCategory::LipsyncAnimation, "lipsync_animation");
-    assert_serialization(IdCategory::VoiceConversion, "voice_conversion");
-    assert_serialization(IdCategory::ZsDataset, "zs_dataset");
-    assert_serialization(IdCategory::ZsVoice, "zs_voice");
+    assert_serialization(IdCategory::LipsyncAnimationResult, "lipsync_animation");
+    assert_serialization(IdCategory::VoiceConversionResult, "voice_conversion");
+    assert_serialization(IdCategory::ZeroShotVoiceDataset, "zs_dataset");
+    assert_serialization(IdCategory::ZeroShotVoiceEmbedding, "zs_voice");
   }
 
     #[test]
     fn to_str() {
       assert_eq!(IdCategory::MediaFile.to_str(), "media_file");
-      assert_eq!(IdCategory::LipsyncAnimation.to_str(), "lipsync_animation");
-      assert_eq!(IdCategory::VoiceConversion.to_str(), "voice_conversion");
-      assert_eq!(IdCategory::ZsDataset.to_str(), "zs_dataset");
-      assert_eq!(IdCategory::ZsVoice.to_str(), "zs_voice");
-      assert_eq!(IdCategory::ZeroShotTTS.to_str(),"zs_audio_tts");
+      assert_eq!(IdCategory::LipsyncAnimationResult.to_str(), "lipsync_animation");
+      assert_eq!(IdCategory::VoiceConversionResult.to_str(), "voice_conversion");
+      assert_eq!(IdCategory::ZeroShotVoiceDataset.to_str(), "zs_dataset");
+      assert_eq!(IdCategory::ZeroShotVoiceEmbedding.to_str(), "zs_voice");
+      assert_eq!(IdCategory::ZeroShotTtsResult.to_str(), "zs_audio_tts");
     }
 
     #[test]
     fn from_str() {
       assert_eq!(IdCategory::from_str("media_file").unwrap(), IdCategory::MediaFile);
-      assert_eq!(IdCategory::from_str("lipsync_animation").unwrap(), IdCategory::LipsyncAnimation);
-      assert_eq!(IdCategory::from_str("voice_conversion").unwrap(), IdCategory::VoiceConversion);
-      assert_eq!(IdCategory::from_str("zs_dataset").unwrap(), IdCategory::ZsDataset);
-      assert_eq!(IdCategory::from_str("zs_voice").unwrap(), IdCategory::ZsVoice);
-      assert_eq!(IdCategory::from_str("zs_audio_tts").unwrap(), IdCategory::ZeroShotTTS);
+      assert_eq!(IdCategory::from_str("lipsync_animation").unwrap(), IdCategory::LipsyncAnimationResult);
+      assert_eq!(IdCategory::from_str("voice_conversion").unwrap(), IdCategory::VoiceConversionResult);
+      assert_eq!(IdCategory::from_str("zs_dataset").unwrap(), IdCategory::ZeroShotVoiceDataset);
+      assert_eq!(IdCategory::from_str("zs_voice").unwrap(), IdCategory::ZeroShotVoiceEmbedding);
+      assert_eq!(IdCategory::from_str("zs_audio_tts").unwrap(), IdCategory::ZeroShotTtsResult);
     }
 
     #[test]
@@ -125,11 +125,11 @@ mod tests {
       let mut variants = IdCategory::all_variants();
       assert_eq!(variants.len(), 6);
       assert_eq!(variants.pop_first(), Some(IdCategory::MediaFile));
-      assert_eq!(variants.pop_first(), Some(IdCategory::LipsyncAnimation));
-      assert_eq!(variants.pop_first(), Some(IdCategory::VoiceConversion));
-      assert_eq!(variants.pop_first(), Some(IdCategory::ZeroShotTTS));
-      assert_eq!(variants.pop_first(), Some(IdCategory::ZsDataset));
-      assert_eq!(variants.pop_first(), Some(IdCategory::ZsVoice));
+      assert_eq!(variants.pop_first(), Some(IdCategory::LipsyncAnimationResult));
+      assert_eq!(variants.pop_first(), Some(IdCategory::VoiceConversionResult));
+      assert_eq!(variants.pop_first(), Some(IdCategory::ZeroShotTtsResult));
+      assert_eq!(variants.pop_first(), Some(IdCategory::ZeroShotVoiceDataset));
+      assert_eq!(variants.pop_first(), Some(IdCategory::ZeroShotVoiceEmbedding));
       assert_eq!(variants.pop_first(), None);
 
       // Generated check

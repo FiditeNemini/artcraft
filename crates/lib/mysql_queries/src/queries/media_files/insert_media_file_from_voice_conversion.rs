@@ -68,7 +68,7 @@ pub async fn insert_media_file_from_voice_conversion(
 
     let next_voice_conversion_id = transactional_increment_generic_synthetic_id(
       &user_token,
-      IdCategory::VoiceConversion,
+      IdCategory::VoiceConversionResult,
       &mut transaction
     ).await?;
 

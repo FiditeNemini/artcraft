@@ -55,7 +55,7 @@ pub async fn insert_media_file_from_face_animation(
 
     let next_lipsync_id = transactional_increment_generic_synthetic_id(
       &user_token,
-      IdCategory::LipsyncAnimation,
+      IdCategory::LipsyncAnimationResult,
       &mut transaction
     ).await?;
 

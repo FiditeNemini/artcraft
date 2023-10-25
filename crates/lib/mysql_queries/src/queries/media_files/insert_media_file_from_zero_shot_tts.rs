@@ -57,7 +57,7 @@ pub async fn insert_media_file_from_zero_shot(
   
       let next_lipsync_id = transactional_increment_generic_synthetic_id(
         &user_token,
-        IdCategory::ZeroShotTTS,
+        IdCategory::ZeroShotTtsResult,
         &mut transaction
       ).await?;
   

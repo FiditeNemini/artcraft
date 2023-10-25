@@ -30,7 +30,7 @@ pub async fn update_voice(args: UpdateVoiceArgs<'_>) -> AnyhowResult<()>{
 
         let next_zs_voice_synthetic_id = transactional_increment_generic_synthetic_id(
             &user_token,
-            IdCategory::ZsVoice,
+            IdCategory::ZeroShotVoiceEmbedding,
             &mut transaction
         ).await?;
 

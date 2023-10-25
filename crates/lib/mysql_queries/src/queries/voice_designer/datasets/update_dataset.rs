@@ -31,7 +31,7 @@ pub async fn update_dataset(args: UpdateDatasetArgs<'_>) -> AnyhowResult<()>{
 
         let next_zs_dataset_synthetic_id = transactional_increment_generic_synthetic_id(
             &user_token,
-            IdCategory::ZsDataset,
+            IdCategory::ZeroShotVoiceDataset,
             &mut transaction
         ).await?;
 

@@ -41,7 +41,7 @@ pub async fn create_voice(args: CreateVoiceArgs<'_>) -> AnyhowResult<ZsVoiceToke
   if let Some(creator_user_token) = args.maybe_creator_user_token.as_deref() {
     let next_zs_dataset_synthetic_id = transactional_increment_generic_synthetic_id(
       creator_user_token,
-      IdCategory::ZsDataset,
+      IdCategory::ZeroShotVoiceDataset,
       &mut transaction
     ).await?;
 
