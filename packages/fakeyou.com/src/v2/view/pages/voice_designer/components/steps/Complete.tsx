@@ -11,7 +11,7 @@ function Complete() {
           <FontAwesomeIcon icon={faCheck} className="display-6 text-white" />
         </div>
 
-        <h1 className="fw-bold mb-1">Voice successfully created!</h1>
+        <h2 className="fw-bold mb-1">Voice successfully created!</h2>
         <h5 className="fw-normal opacity-75">"Test Voice Name"</h5>
       </div>
 

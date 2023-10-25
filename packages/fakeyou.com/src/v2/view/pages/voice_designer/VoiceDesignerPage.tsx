@@ -63,7 +63,7 @@ function VoiceDesignerPage() {
 
       <Panel>
         {/* Stepper */}
-        <div className="p-3 px-lg-4 bg-stepper">
+        <div className="p-3 px-lg-4 bg-stepper overflow-hidden">
           <Stepper steps={steps} currentStep={currentStep} />
         </div>
 
