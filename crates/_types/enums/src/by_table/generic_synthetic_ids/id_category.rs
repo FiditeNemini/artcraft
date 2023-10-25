@@ -75,9 +75,9 @@ impl IdCategory {
       Self::MediaFile,
       Self::LipsyncAnimation,
       Self::VoiceConversion,
+      Self::ZeroShotTTS,
       Self::ZsDataset,
       Self::ZsVoice,
-      Self::ZeroShotTTS
     ])
   }
 }
@@ -106,7 +106,7 @@ mod tests {
       assert_eq!(IdCategory::VoiceConversion.to_str(), "voice_conversion");
       assert_eq!(IdCategory::ZsDataset.to_str(), "zs_dataset");
       assert_eq!(IdCategory::ZsVoice.to_str(), "zs_voice");
-    assert_eq!(IdCategory::ZeroShotTTS.to_str(),"zs_audio_tts");
+      assert_eq!(IdCategory::ZeroShotTTS.to_str(),"zs_audio_tts");
     }
 
     #[test]
@@ -116,20 +116,20 @@ mod tests {
       assert_eq!(IdCategory::from_str("voice_conversion").unwrap(), IdCategory::VoiceConversion);
       assert_eq!(IdCategory::from_str("zs_dataset").unwrap(), IdCategory::ZsDataset);
       assert_eq!(IdCategory::from_str("zs_voice").unwrap(), IdCategory::ZsVoice);
-    assert_eq!(IdCategory::from_str("zs_audio_tts").unwrap(), IdCategory::ZeroShotTTS);
+      assert_eq!(IdCategory::from_str("zs_audio_tts").unwrap(), IdCategory::ZeroShotTTS);
     }
 
     #[test]
     fn all_variants() {
       // Static check
       let mut variants = IdCategory::all_variants();
-      assert_eq!(variants.len(), 5);
+      assert_eq!(variants.len(), 6);
       assert_eq!(variants.pop_first(), Some(IdCategory::MediaFile));
       assert_eq!(variants.pop_first(), Some(IdCategory::LipsyncAnimation));
       assert_eq!(variants.pop_first(), Some(IdCategory::VoiceConversion));
+      assert_eq!(variants.pop_first(), Some(IdCategory::ZeroShotTTS));
       assert_eq!(variants.pop_first(), Some(IdCategory::ZsDataset));
       assert_eq!(variants.pop_first(), Some(IdCategory::ZsVoice));
-    assert_eq!(variants.pop_first(), Some(IdCategory::ZeroShotTTS));
       assert_eq!(variants.pop_first(), None);
 
       // Generated check

@@ -2,35 +2,26 @@
 #![forbid(unused_mut)]
 #![forbid(unused_variables)]
 
-use enums::by_table::generic_inference_jobs::inference_category::InferenceCategory;
-use mysql_queries::payloads::generic_inference_args::generic_inference_args::{
-    GenericInferenceArgs,
-    InferenceCategoryAbbreviated,
-    PolymorphicInferenceArgs,
-};
-
+// TODO MOVE into own file.
+use std::fmt::Debug;
 use std::sync::Arc;
 
-use actix_web::{ HttpRequest, HttpResponse, web };
+use actix_web::{HttpRequest, HttpResponse, web};
 use actix_web::error::ResponseError;
 use actix_web::http::StatusCode;
 use log::warn;
 use serde::Deserialize;
 use serde::Serialize;
 
-use http_server_common::request::get_request_header_optional::get_request_header_optional;
-
-/// Debug requests can get routed to special "debug-only" workers, which can
-/// be used to trial new code, run debugging, etc.
-const DEBUG_HEADER_NAME: &str = "enable-debug-mode";
-
-/// The routing tag header can send workloads to particular k8s hosts.
-/// This is useful for catching the live logs or intercepting the job.
-const ROUTING_TAG_HEADER_NAME: &str = "routing-tag";
-
+use enums::by_table::generic_inference_jobs::inference_category::InferenceCategory;
 use enums::by_table::generic_inference_jobs::inference_model_type::InferenceModelType;
+use http_server_common::request::get_request_header_optional::get_request_header_optional;
 use http_server_common::request::get_request_ip::get_request_ip;
-
+use mysql_queries::payloads::generic_inference_args::generic_inference_args::{
+    GenericInferenceArgs,
+    InferenceCategoryAbbreviated,
+    PolymorphicInferenceArgs,
+};
 use mysql_queries::payloads::generic_inference_args::tts_payload::TTSArgs;
 use mysql_queries::queries::generic_inference::web::insert_generic_inference_job::{
     insert_generic_inference_job,
@@ -43,9 +34,13 @@ use crate::configs::plans::get_correct_plan_for_session::get_correct_plan_for_se
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::server_state::ServerState;
 
+/// Debug requests can get routed to special "debug-only" workers, which can
+/// be used to trial new code, run debugging, etc.
+const DEBUG_HEADER_NAME: &str = "enable-debug-mode";
 
-// TODO MOVE into own file.
-use std::fmt::Debug;
+/// The routing tag header can send workloads to particular k8s hosts.
+/// This is useful for catching the live logs or intercepting the job.
+const ROUTING_TAG_HEADER_NAME: &str = "routing-tag";
 
 #[derive(Deserialize)]
 pub struct EnqueueTTSRequest {
@@ -192,7 +187,7 @@ pub async fn enqueue_tts_request(
         creator_set_visibility: enums::common::visibility::Visibility::Public,
         priority_level,
         requires_keepalive: true, // do we need this? I think so
-        is_debug_request: is_debug_request,
+        is_debug_request,
         maybe_routing_tag: maybe_routing_tag.as_deref(),
         mysql_pool: &server_state.mysql_pool,
     }).await;

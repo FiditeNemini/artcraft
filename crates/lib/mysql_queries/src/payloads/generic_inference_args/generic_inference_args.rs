@@ -153,14 +153,15 @@ mod tests {
     let args = GenericInferenceArgs {
       inference_category: Some(InferenceCategoryAbbreviated::TextToSpeech),
       args: Some(PolymorphicInferenceArgs::Tts(TTSArgs {
-        voice_token: "token".to_string(),
+        voice_token: Some("token".to_string()),
+        dataset_token: None,
       })),
     };
 
     let json = serde_json::ser::to_string(&args).unwrap();
 
     // NB: Assert the serialized form. If this changes and the test breaks, be careful about migrating.
-    assert_eq!(json, r#"{"cat":"tts","args":{"Tts":{"e":"token"}}}"#.to_string());
+    assert_eq!(json, r#"{"cat":"tts","args":{"Tts":{"vt":"token"}}}"#.to_string());
 
     // NB: Make sure we don't overflow the DB field capacity (TEXT column).
     assert!(json.len() < 1000);

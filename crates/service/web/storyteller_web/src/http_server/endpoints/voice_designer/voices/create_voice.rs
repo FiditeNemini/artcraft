@@ -2,39 +2,36 @@
 // #![forbid(unused_mut)]
 // #![forbid(unused_variables)]
 
+use std::fmt::Debug;
 use std::sync::Arc;
-use http_server_common::request::get_request_header_optional::get_request_header_optional;
-use log::warn;
-use actix_web::{ HttpRequest, HttpResponse, web };
+
+use actix_web::{HttpRequest, HttpResponse, web};
 use actix_web::error::ResponseError;
 use actix_web::http::StatusCode;
+use log::warn;
+use serde::Deserialize;
+use serde::Serialize;
 
 use enums::by_table::generic_inference_jobs::inference_category::InferenceCategory;
+use enums::by_table::generic_inference_jobs::inference_model_type::InferenceModelType;
+use http_server_common::request::get_request_header_optional::get_request_header_optional;
+use http_server_common::request::get_request_ip::get_request_ip;
 use mysql_queries::payloads::generic_inference_args::generic_inference_args::{
     GenericInferenceArgs,
     InferenceCategoryAbbreviated,
     PolymorphicInferenceArgs,
 };
-use http_server_common::request::get_request_ip::get_request_ip;
-
-use mysql_queries::queries::generic_inference::web::insert_generic_inference_job;
-use tokens::tokens::users::UserToken;
-use enums::by_table::generic_inference_jobs::inference_model_type::InferenceModelType;
 use mysql_queries::payloads::generic_inference_args::tts_payload::TTSArgs;
-
-use crate::configs::plans::get_correct_plan_for_session::get_correct_plan_for_session;
-use crate::http_server::endpoints::voice_designer::inference::enqueue_tts_request::EnqueueTTSRequest;
-use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
-use tokens::tokens::generic_inference_jobs::InferenceJobToken;
-use crate::server_state::ServerState;
 use mysql_queries::queries::generic_inference::web::insert_generic_inference_job::{
     insert_generic_inference_job,
     InsertGenericInferenceArgs,
 };
+use tokens::tokens::generic_inference_jobs::InferenceJobToken;
+use tokens::tokens::users::UserToken;
 
-use std::fmt::Debug;
-use serde::Deserialize;
-use serde::Serialize;
+use crate::configs::plans::get_correct_plan_for_session::get_correct_plan_for_session;
+use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
+use crate::server_state::ServerState;
 
 #[derive(Deserialize)]
 pub struct EnqueueCreateVoiceRequest {
@@ -157,7 +154,7 @@ pub async fn create_voice_handler(
         return Err(EnqueueCreateVoiceRequestError::RateLimited);
     }
 
-    println!("Recieved payload for voice creation.");
+    println!("Received payload for voice creation.");
 
     // Get up IP address
     let ip_address = get_request_ip(&http_request);
@@ -187,10 +184,10 @@ pub async fn create_voice_handler(
         maybe_creator_user_token: maybe_user_token.as_ref(),
         creator_ip_address: &ip_address,
         creator_set_visibility: enums::common::visibility::Visibility::Public,
-        priority_level: priority_level,
+        priority_level,
         requires_keepalive: true,
         maybe_avt_token: maybe_avt_token.as_ref(),
-        is_debug_request: is_debug_request,
+        is_debug_request,
         maybe_routing_tag: maybe_routing_tag.as_deref(),
         mysql_pool: &server_state.mysql_pool,
     }).await;

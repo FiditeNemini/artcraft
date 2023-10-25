@@ -1,9 +1,11 @@
 use anyhow::anyhow;
+
 use mysql_queries::payloads::generic_inference_args::generic_inference_args::{
     InferenceCategoryAbbreviated,
     PolymorphicInferenceArgs,
 };
 use mysql_queries::queries::generic_inference::job::list_available_generic_inference_jobs::AvailableInferenceJob;
+
 use crate::job::job_loop::process_single_job_error::ProcessSingleJobError;
 
 pub enum JobType {
@@ -78,5 +80,5 @@ pub fn validate_job(job: &AvailableInferenceJob) -> Result<JobArgs, ProcessSingl
         });
     }
 
-    return Err(ProcessSingleJobError::from_anyhow_error(anyhow!("Missing Voice Token!")));
+    Err(ProcessSingleJobError::from_anyhow_error(anyhow!("Missing Voice Token!")))
 }

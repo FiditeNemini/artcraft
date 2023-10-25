@@ -1,48 +1,37 @@
+use std::path::PathBuf;
+use std::time::Instant;
+
 use anyhow::anyhow;
+use log::{error, info, warn};
+
 use buckets::public::media_files::original_file::MediaFileBucketPath;
 use cloud_storage::bucket_client::BucketClient;
-use enums::common::visibility::Visibility;
-use hashing::sha256::sha256_hash_file::sha256_hash_file;
-use filesys::file_size::file_size;
+use cloud_storage::bucket_path_unifier::BucketPathUnifier;
 use enums::by_table::generic_inference_jobs::inference_result_type::InferenceResultType;
-
-
-use log::{ error, info, warn };
-use mysql_queries::queries::media_files::get_media_file::MediaFile;
-use mysql_queries::queries::media_files::insert_media_file_from_zero_shot_tts::InsertArgs;
+use enums::common::visibility::Visibility;
+use filesys::file_size::file_size;
+use hashing::sha256::sha256_hash_file::sha256_hash_file;
+use mysql_queries::queries::generic_inference::job::list_available_generic_inference_jobs::AvailableInferenceJob;
 use mysql_queries::queries::media_files::insert_media_file_from_zero_shot_tts::insert_media_file_from_zero_shot;
-use mysql_queries::queries::voice_designer::datasets::get_dataset::ZsDataset;
+use mysql_queries::queries::media_files::insert_media_file_from_zero_shot_tts::InsertArgs;
 use mysql_queries::queries::voice_designer::datasets::get_dataset::get_dataset_by_token;
-use mysql_queries::queries::voice_designer::datasets::list_datasets::DatasetRecordForList;
+use mysql_queries::queries::voice_designer::datasets::get_dataset::ZsDataset;
 use mysql_queries::queries::voice_designer::voice_samples::list_dataset_samples_for_dataset_token::DatasetSampleRecordForList;
-
-use mysql_queries::queries::voice_designer::voice_samples::get_dataset_sample;
-use mysql_queries::queries::voice_designer::voice_samples::get_dataset_sample::get_dataset_sample_by_token;
 use mysql_queries::queries::voice_designer::voice_samples::list_dataset_samples_for_dataset_token::list_dataset_samples_for_dataset_token;
-use mysql_queries::queries::voice_designer::voices::create_voice;
 use mysql_queries::queries::voice_designer::voices::create_voice::create_voice;
 use mysql_queries::queries::voice_designer::voices::create_voice::CreateVoiceArgs;
 use mysql_queries::queries::voice_designer::voices::get_voice::get_voice_by_token;
-use serde::de::value;
 use tokens::tokens::media_files::MediaFileToken;
 use tokens::tokens::users::UserToken;
-use std::path::PathBuf;
-use std::time::Instant;
-use mysql_queries::queries::generic_inference::job::list_available_generic_inference_jobs::AvailableInferenceJob;
 
 use crate::job;
 use crate::job::job_loop::job_success_result::JobSuccessResult;
-
 use crate::job::job_loop::job_success_result::ResultEntity;
 use crate::job::job_loop::process_single_job_error::ProcessSingleJobError;
-
 use crate::job::job_types::tts::vall_e_x::validate_job::validate_job;
-use crate::job::job_types::tts::vall_e_x::vall_e_x_inference_command::CreateVoiceInferenceArgs;
-
-use crate::job_dependencies::JobDependencies;
 use crate::job::job_types::tts::vall_e_x::vall_e_x_inference_command::InferenceArgs;
+use crate::job_dependencies::JobDependencies;
 
-use cloud_storage::bucket_path_unifier::BucketPathUnifier;
 use super::validate_job::JobType;
 
 // Clearify what this is for ?
@@ -280,7 +269,7 @@ pub async fn process_create_voice(
             job::job_types::tts::vall_e_x::vall_e_x_inference_command::CreateVoiceInferenceArgs {
                 output_embedding_path: &workdir,
                 output_embedding_name: output_file_name.clone(),
-                audio_files: audio_files,
+                audio_files,
                 stderr_output_file: String::from("zero_shot_create_voice.txt"),
             }
         );
@@ -304,8 +293,8 @@ pub async fn process_create_voice(
     let output_bucket_file_name = String::from("temp.npz"); // use extension for bucket upload.
     finished_file.push(&output_bucket_file_name);
 
-    info!("Upload Bucket Path: {}",result_bucket_object_pathbuf.to_path_buf().to_string_lossy());
-    info!("Upload File Path: {}",finished_file.to_path_buf().to_string_lossy());
+    info!("Upload Bucket Path: {:?}", result_bucket_object_pathbuf);
+    info!("Upload File Path: {:?}", finished_file);
 
     args.job_dependencies.private_bucket_client
         .upload_filename_with_content_type(
@@ -330,7 +319,7 @@ pub async fn process_create_voice(
         model_version: 0,
         model_encoding_type: "encodec",
         voice_title: &voice_name,
-        bucket_hash: bucket_hash,
+        bucket_hash,
         maybe_creator_user_token: Some(&creator_user_token),
         creator_ip_address: &creator_ip_address,
         creator_set_visibility: Visibility::Public,
@@ -476,8 +465,8 @@ pub async fn process_inference_voice(
     let mut finished_file = work_temp_dir.path().to_path_buf();
     finished_file.push(&output_file_name);
 
-    info!("Upload Bucket Path: {}",result_bucket_object_pathbuf.to_path_buf().to_string_lossy());
-    info!("Upload File Path: {}",finished_file.to_path_buf().to_string_lossy());
+    info!("Upload Bucket Path: {:?}", result_bucket_object_pathbuf);
+    info!("Upload File Path: {:?}", finished_file);
 
     args.job_dependencies.public_bucket_client
         .upload_filename_with_content_type(
@@ -565,8 +554,13 @@ fn join_paths(paths: Vec<PathBuf>) -> String {
         .collect::<Vec<String>>()
         .join(" ")
 }
+
+#[cfg(test)]
 mod tests {
-    use super::*;
+    use std::path::PathBuf;
+
+    use crate::job::job_types::tts::vall_e_x::process_job::join_paths;
+
     #[test]
     fn test_path_build() {
         let paths = vec![

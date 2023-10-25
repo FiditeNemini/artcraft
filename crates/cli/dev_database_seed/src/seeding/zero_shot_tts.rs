@@ -1,5 +1,3 @@
-use std::path::PathBuf;
-
 use log::info;
 use sqlx::{MySql, Pool};
 
