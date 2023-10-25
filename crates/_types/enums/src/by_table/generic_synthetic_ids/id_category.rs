@@ -27,7 +27,7 @@ pub enum IdCategory {
   VoiceConversionResult,
 
   /// Results from the zero shot tts (which may live in the media_files table)
-  #[serde(rename = "zs_audio_tts")]
+  #[serde(rename = "zs_tts_result")]
   ZeroShotTtsResult,
 
   /// Zs dataset which lives in the zs_voice_datasets table
@@ -52,7 +52,7 @@ impl IdCategory {
       Self::VoiceConversionResult => "voice_conversion",
       Self::ZeroShotVoiceDataset => "zs_dataset",
       Self::ZeroShotVoiceEmbedding => "zs_voice",
-      Self::ZeroShotTtsResult => "zs_audio_tts"
+      Self::ZeroShotTtsResult => "zs_tts_result",
     }
   }
 
@@ -63,7 +63,7 @@ impl IdCategory {
       "voice_conversion" => Ok(Self::VoiceConversionResult),
       "zs_dataset" => Ok(Self::ZeroShotVoiceDataset),
       "zs_voice" => Ok(Self::ZeroShotVoiceEmbedding),
-      "zs_audio_tts" => Ok(Self::ZeroShotTtsResult),
+      "zs_tts_result" => Ok(Self::ZeroShotTtsResult),
       _ => Err(format!("invalid value: {:?}", value)),
     }
   }
@@ -97,6 +97,7 @@ mod tests {
     assert_serialization(IdCategory::VoiceConversionResult, "voice_conversion");
     assert_serialization(IdCategory::ZeroShotVoiceDataset, "zs_dataset");
     assert_serialization(IdCategory::ZeroShotVoiceEmbedding, "zs_voice");
+    assert_serialization(IdCategory::ZeroShotTtsResult, "zs_tts_result");
   }
 
     #[test]
@@ -106,7 +107,7 @@ mod tests {
       assert_eq!(IdCategory::VoiceConversionResult.to_str(), "voice_conversion");
       assert_eq!(IdCategory::ZeroShotVoiceDataset.to_str(), "zs_dataset");
       assert_eq!(IdCategory::ZeroShotVoiceEmbedding.to_str(), "zs_voice");
-      assert_eq!(IdCategory::ZeroShotTtsResult.to_str(), "zs_audio_tts");
+      assert_eq!(IdCategory::ZeroShotTtsResult.to_str(), "zs_tts_result");
     }
 
     #[test]
@@ -116,7 +117,7 @@ mod tests {
       assert_eq!(IdCategory::from_str("voice_conversion").unwrap(), IdCategory::VoiceConversionResult);
       assert_eq!(IdCategory::from_str("zs_dataset").unwrap(), IdCategory::ZeroShotVoiceDataset);
       assert_eq!(IdCategory::from_str("zs_voice").unwrap(), IdCategory::ZeroShotVoiceEmbedding);
-      assert_eq!(IdCategory::from_str("zs_audio_tts").unwrap(), IdCategory::ZeroShotTtsResult);
+      assert_eq!(IdCategory::from_str("zs_tts_result").unwrap(), IdCategory::ZeroShotTtsResult);
     }
 
     #[test]
