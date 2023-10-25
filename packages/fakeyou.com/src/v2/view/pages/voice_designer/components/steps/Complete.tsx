@@ -5,13 +5,14 @@ import { faArrowRight, faCheck } from "@fortawesome/pro-solid-svg-icons";
 
 function Complete() {
   return (
-    <div className="d-flex flex-column align-items-center py-5">
-      <div className="d-flex flex-column align-items-center">
+    <div className="d-flex flex-column align-items-center py-2 py-lg-5">
+      <div className="d-flex flex-column align-items-center text-center">
         <div className="d-flex bg-success rounded-circle p-3 mb-3">
           <FontAwesomeIcon icon={faCheck} className="display-6 text-white" />
         </div>
 
-        <h1 className="fw-bold">Voice successfully created!</h1>
+        <h1 className="fw-bold mb-1">Voice successfully created!</h1>
+        <h5 className="fw-normal opacity-75">"Test Voice Name"</h5>
       </div>
 
       <div className="d-flex gap-3 mt-4">

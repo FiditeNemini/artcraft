@@ -6,8 +6,6 @@ import { PageHeaderWithImage } from "v2/view/_common/PageHeaderWithImage";
 import { Panel } from "v2/view/_common/Panel";
 import { Stepper } from "./components/Stepper";
 import { StepperControls } from "./components/StepperControls";
-import { motion } from "framer-motion";
-import { container } from "data/animation";
 import { UploadSamples } from "./components/steps/UploadSamples";
 import { VoiceDetails } from "./components/steps/VoiceDetails";
 import { Complete } from "./components/steps/Complete";
@@ -54,7 +52,7 @@ function VoiceDesignerPage() {
   };
 
   return (
-    <motion.div initial="hidden" animate="visible" variants={container}>
+    <div className="mb-4">
       <PageHeaderWithImage
         headerImage="/mascot/kitsune_pose2.webp"
         titleIcon={<FontAwesomeIcon icon={faWaveform} className="me-3" />}
@@ -80,7 +78,7 @@ function VoiceDesignerPage() {
           onNext={handleNext}
         />
       </Panel>
-    </motion.div>
+    </div>
   );
 }
 
