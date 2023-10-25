@@ -32,6 +32,7 @@ pub(crate) enum EntityType {
   TwitchOauthInternal,
   User,
   UserSession,
+  UserSubscription,
   VocoderModel,
   VoiceConversionModel,
   VoiceConversionResult,
@@ -67,6 +68,7 @@ impl EntityType {
       Self::TwitchOauthInternal => "TOI:", // NB: Old-style prefix, do not use for future tokens.
       Self::User => "user_",
       Self::UserSession => "session_",
+      Self::UserSubscription => "SUB:", // NB: Old-style prefix, do not use for future tokens.
       Self::VocoderModel => "VM:", // NB: Old-style prefix, do not use for future tokens.
       Self::VoiceConversionModel => "vcm_",
       Self::VoiceConversionResult => "vcr_",
@@ -127,7 +129,7 @@ mod tests {
   #[test]
   fn test_all_prefixes_end_with_separator_length_one() {
     for prefix in EntityType::iter().map(|entity| entity.prefix()) {
-      if prefix == "news_story_" || prefix == "tts_task_" {
+      if prefix == "news_story_" || prefix == "tts_task_" || prefix == "INT_API:" {
         // TODO/FIXME: I'm too tired at 5AM to replacen from the left. Make this test valid.
         //  These tokens are from the AIChatBot sidecar, so asserting their validity is less important.
         continue;

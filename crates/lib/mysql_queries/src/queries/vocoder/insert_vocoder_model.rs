@@ -11,7 +11,7 @@ use sqlx::MySqlPool;
 use enums::common::visibility::Visibility;
 use enums::common::vocoder_type::VocoderType;
 use errors::AnyhowResult;
-use tokens::tokens::vocoder_model_token::VocoderModelToken;
+use tokens::tokens::vocoder_models::VocoderModelToken;
 
 pub struct Args<'a, P: AsRef<Path>> {
   pub vocoder_type: VocoderType,

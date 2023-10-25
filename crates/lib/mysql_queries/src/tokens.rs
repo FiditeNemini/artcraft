@@ -37,10 +37,4 @@ impl Tokens {
   pub fn new_category() -> AnyhowResult<String> {
     random_prefix_crockford_token("CAT:", 15, false)
   }
-
-  // ========== [Billing] Tokens not typically visible to users ==========
-
-  pub fn new_subscription_token() -> AnyhowResult<String> {
-    random_prefix_crockford_token("SUB:", 32, false)
-  }
 }
