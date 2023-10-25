@@ -2,8 +2,7 @@ use anyhow::anyhow;
 use sqlx::MySqlPool;
 
 use errors::AnyhowResult;
-
-use crate::tokens::Tokens;
+use tokens::tokens::twitch_oauth_tokens_internal::TwitchOauthInternalToken;
 
 pub struct TwitchOauthTokenInsertBuilder {
   // ===== Required Fields =====
@@ -134,7 +133,7 @@ impl TwitchOauthTokenInsertBuilder {
 
   pub async fn insert(&mut self, mysql_pool: &MySqlPool) -> AnyhowResult<()> {
     // An internal token that we may use in the future.
-    let internal_token = Tokens::new_twitch_oauth_internal_token()?;
+    let internal_token = TwitchOauthInternalToken::generate();
 
     // NB: We have to duplicate these since the string literals must not
     // include concatenation. Boo.
@@ -162,7 +161,7 @@ SET
   ip_address_creation = ?,
   expires_at = DATE_ADD(NOW(), INTERVAL ? SECOND)
         "#,
-        internal_token.clone(),
+        internal_token.to_string(),
         self.oauth_grouping_token.clone(),
         self.maybe_user_token.clone(),
         self.twitch_user_id.clone(),

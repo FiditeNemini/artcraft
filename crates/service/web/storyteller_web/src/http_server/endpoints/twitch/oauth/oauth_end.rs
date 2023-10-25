@@ -12,6 +12,7 @@ use http_server_common::request::get_request_ip::get_request_ip;
 use http_server_common::response::response_error_helpers::to_simple_json_error;
 use mysql_queries::queries::twitch::twitch_oauth::insert::TwitchOauthTokenInsertBuilder;
 use mysql_queries::tokens::Tokens;
+use tokens::tokens::twitch_oauth_tokens_grouping::TwitchOauthGroupingToken;
 use twitch_common::oauth_token_builder::get_oauth_token_builder;
 
 use crate::server_state::ServerState;
@@ -153,11 +154,7 @@ pub async fn oauth_end_enroll_from_redirect(
 
   let expires_seconds = expires_in.as_secs() as u32; // NB: Silent overflow
 
-  let oauth_grouping_token = Tokens::new_twitch_oauth_grouping_token()
-      .map_err(|e| {
-        error!("token creation error: {:?}", e);
-        OauthEndEnrollFromRedirectError::ServerError
-      })?;
+  let oauth_grouping_token = TwitchOauthGroupingToken::generate().to_string();
 
   let mut insert_builder =
       TwitchOauthTokenInsertBuilder::new(&user_id, &twitch_username, &auth_token, &oauth_grouping_token)

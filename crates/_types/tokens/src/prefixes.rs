@@ -13,8 +13,7 @@ use strum::EnumIter;
 #[derive(Debug, Copy, Clone, Eq, PartialEq)]
 #[cfg_attr(test, derive(EnumIter, EnumCount))]
 pub(crate) enum EntityType {
-  /// AVTs are not stored as primary keys in any table, but an index in many tables.
-  AnonymousVisitorTracking,
+  AnonymousVisitorTracking, // AVTs are not stored as primary keys in any table, but an index in many tables.
   AuditLog,
   Comment,
   DownloadJob,
@@ -25,14 +24,19 @@ pub(crate) enum EntityType {
   NewsStory, // NB: aichatbot / sqlite
   TtsModel,
   TtsRenderTask, // NB: aichatbot / sqlite
+  TwitchEventRule,
+  TwitchOauthGrouping,
+  TwitchOauthInternal,
   User,
-  UserDeprecatedDoNotUse, // NB: Users prior to 2023-10-24 used this prefix.
+  UserSession,
   VoiceConversionModel,
   VoiceConversionResult,
   W2lTemplate,
   ZsVoice,
   ZsVoiceDataset,
   ZsVoiceDatasetSample,
+  _UserDeprecatedDoNotUse, // NB: Users prior to 2023-10-24. Kept to prevent collision.
+  _UserSessionDeprecatedDoNotUse, // NB: Sessions prior to 2023-10-24. Kept to prevent collision.
 }
 
 impl EntityType {
@@ -50,14 +54,19 @@ impl EntityType {
       Self::NewsStory => "news_story_",
       Self::TtsModel => "TM:", // NB: Old-style prefix, do not use for future tokens.
       Self::TtsRenderTask => "tts_task_",
+      Self::TwitchEventRule => "TER:", // NB: Old-style prefix, do not use for future tokens.
+      Self::TwitchOauthGrouping => "OG:", // NB: Old-style prefix, do not use for future tokens.
+      Self::TwitchOauthInternal => "TOI:", // NB: Old-style prefix, do not use for future tokens.
       Self::User => "user_",
-      Self::UserDeprecatedDoNotUse => "U:", // NB: Users prior to 2023-10-24 used this prefix.
+      Self::UserSession => "session_",
       Self::VoiceConversionModel => "vcm_",
       Self::VoiceConversionResult => "vcr_",
       Self::W2lTemplate => "WT:", // NB: Old-style prefix, do not use for future tokens.
       Self::ZsVoice => "zsv_",
       Self::ZsVoiceDataset => "zsd_",
       Self::ZsVoiceDatasetSample => "zss_",
+      Self::_UserDeprecatedDoNotUse => "U:", // NB: Users prior to 2023-10-24 used this prefix.
+      Self::_UserSessionDeprecatedDoNotUse => "SESSION:", // NB: Users prior to 2023-10-24 used this prefix.
     }
   }
 }
@@ -92,7 +101,10 @@ mod tests {
         .collect::<HashSet<String>>();
 
     assert!(entities.len() > 0);
-    assert_eq!(entities.len(), EntityType::COUNT);
+
+    // NB: We're accounting for collision in SESSION: and session_
+    let expected_count = EntityType::COUNT - 1;
+    assert_eq!(entities.len(), expected_count);
   }
 
   #[test]

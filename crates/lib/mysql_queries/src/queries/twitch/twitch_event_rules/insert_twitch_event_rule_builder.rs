@@ -2,9 +2,9 @@ use anyhow::anyhow;
 use sqlx::MySqlPool;
 
 use errors::AnyhowResult;
+use tokens::tokens::twitch_event_rule::TwitchEventRuleToken;
 
 use crate::column_types::twitch_event_category::TwitchEventCategory;
-use crate::tokens::Tokens;
 
 pub struct InsertTwitchEventRuleBuilder {
   pub uuid_idempotency_token: String,
@@ -22,7 +22,7 @@ impl InsertTwitchEventRuleBuilder {
   /// Returns the newly generated token.
   pub async fn insert(&self, mysql_pool: &MySqlPool) -> AnyhowResult<String> {
 
-    let token = Tokens::new_twitch_event_rule()?;
+    let token = TwitchEventRuleToken::generate();
 
     let query = sqlx::query!(
         r#"

@@ -3,13 +3,12 @@ use log::info;
 use sqlx::MySqlPool;
 
 use errors::AnyhowResult;
-
-use crate::tokens::Tokens;
+use tokens::tokens::user_sessions::UserSessionToken;
 
 pub async fn create_user_session(user_token: &str, ip_address: &str, mysql_pool: &MySqlPool)
     -> AnyhowResult<String>
 {
-  let session_token = Tokens::new_session()?;
+  let session_token = UserSessionToken::generate();
 
   let query_result = sqlx::query!(
         r#"
