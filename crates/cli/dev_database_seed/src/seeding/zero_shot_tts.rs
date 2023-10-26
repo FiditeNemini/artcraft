@@ -5,6 +5,9 @@ use buckets::public::media_files::original_file::MediaFileBucketPath;
 use cloud_storage::bucket_client::BucketClient;
 use enums::by_table::media_files::media_file_origin_category::MediaFileOriginCategory;
 use enums::by_table::media_uploads::media_upload_type::MediaUploadType;
+use enums::by_table::zs_voices::encoding_type::ZsVoiceEncodingType;
+use enums::by_table::zs_voices::model_category::ZsVoiceModelCategory;
+use enums::by_table::zs_voices::model_type::ZsVoiceModelType;
 use enums::common::visibility::Visibility;
 use errors::{anyhow, AnyhowResult};
 use filesys::file_read_bytes::file_read_bytes;
@@ -115,10 +118,10 @@ async fn create_voice_records(
 
   let voice_token = create_voice(CreateVoiceArgs {
     dataset_token: &dataset_token,
-    model_category: "vc",
-    model_type: "vall-e-x",
+    model_category: ZsVoiceModelCategory::Tts,
+    model_type: ZsVoiceModelType::VallEX,
     model_version: 0,
-    model_encoding_type: "encodec",
+    model_encoding_type: ZsVoiceEncodingType::Encodec,
     voice_title: &voice_name,
     bucket_hash: &bucket_hash,
     maybe_creator_user_token: Some(&creator_user_token),

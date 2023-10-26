@@ -5,13 +5,11 @@ use actix_web::{HttpRequest, HttpResponse, web};
 use actix_web::error::ResponseError;
 use actix_web::http::StatusCode;
 use actix_web::web::Path;
-use log::{error, log, warn};
-use enums::common::visibility::Visibility;
+use log::{error, warn};
 
-use http_server_common::request::get_request_ip::get_request_ip;
+use enums::common::visibility::Visibility;
 use http_server_common::response::response_success_helpers::simple_json_success;
 use http_server_common::response::serialize_as_json_error::serialize_as_json_error;
-use mysql_queries::queries::voice_designer::voices::create_voice::{create_voice, CreateVoiceArgs};
 use mysql_queries::queries::voice_designer::voices::get_voice::get_voice_by_token;
 use mysql_queries::queries::voice_designer::voices::update_voice::{update_voice, UpdateVoiceArgs};
 use tokens::tokens::zs_voices::ZsVoiceToken;
@@ -119,8 +117,8 @@ pub async fn update_voice_handler(
   };
 
   // let is_creator = voice.maybe_creator_user_token == Some(user_session.user_token);
-  let is_creator = voice.maybe_creator_user_token.as_deref()
-      .map(|creator_user_token| creator_user_token == &user_session.user_token)
+  let is_creator = voice.maybe_creator_user_token.as_ref()
+      .map(|creator_user_token| creator_user_token == &user_session.user_token_typed)
       .unwrap_or(false);
 
   if !is_creator && !is_mod {
@@ -170,18 +168,16 @@ pub async fn update_voice_handler(
   }
 
 
-  let ip_address = get_request_ip(&http_request);
   let mut maybe_mod_user_token = None;
 
   if is_mod {
     maybe_mod_user_token = Some(user_session.user_token.clone());
   }
+
   let query_result = update_voice(
     UpdateVoiceArgs {
       voice_token: &ZsVoiceToken::new(voice_token.clone()),
       voice_title: title.as_deref(),
-      maybe_creator_user_token: Some(user_session.user_token.clone().as_ref()),
-      creator_ip_address: ip_address.as_ref(),
       creator_set_visibility: &creator_set_visibility,
       maybe_mod_user_token: maybe_mod_user_token.as_deref(),
       ietf_language_tag: ietf_language_tag.as_deref(),

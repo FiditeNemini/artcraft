@@ -6,19 +6,19 @@ use sqlx::pool::PoolConnection;
 
 use enums::common::visibility::Visibility;
 use errors::AnyhowResult;
+use tokens::tokens::users::UserToken;
 use tokens::tokens::zs_voices::ZsVoiceToken;
-
 
 // FIXME: This is the old style of query scoping and shouldn't be copied.
 
 #[derive(Serialize)]
 pub struct VoiceRecordForList {
-    pub voice_token: String,
+    pub voice_token: ZsVoiceToken,
     pub title: String,
     pub creator_set_visibility: Visibility,
     pub ietf_language_tag: String,
     pub ietf_primary_language_subtag: String,
-    pub creator_user_token: String,
+    pub creator_user_token: UserToken,
     pub creator_username: String,
 
     pub created_at: DateTime<Utc>,
@@ -61,7 +61,7 @@ pub async fn list_voices_with_connection(
     Ok(voices.into_iter()
         .map(|voice| {
             VoiceRecordForList{
-                voice_token: voice.token.to_string(),
+                voice_token: voice.token,
                 title: voice.title,
                 creator_set_visibility: voice.creator_set_visibility,
                 ietf_language_tag: voice.ietf_language_tag,
@@ -97,7 +97,7 @@ async fn list_voices_by_creator_username(
             zv.title,
             zv.ietf_language_tag,
             zv.ietf_primary_language_subtag,
-            users.token as creator_user_token,
+            users.token as `creator_user_token: tokens::tokens::users::UserToken`,
             users.username as creator_username,
             zv.creator_set_visibility as `creator_set_visibility: enums::common::visibility::Visibility`,
             zv.created_at,
@@ -124,7 +124,7 @@ async fn list_voices_by_creator_username(
             zv.title,
             zv.ietf_language_tag,
             zv.ietf_primary_language_subtag,
-            users.token as creator_user_token,
+            users.token as `creator_user_token: tokens::tokens::users::UserToken`,
             users.username as creator_username,
             zv.creator_set_visibility as `creator_set_visibility: enums::common::visibility::Visibility`,
             zv.created_at,
@@ -148,7 +148,7 @@ struct InternalRawVoiceRecordForList {
     title: String,
     ietf_language_tag: String,
     ietf_primary_language_subtag: String,
-    creator_user_token: String,
+    creator_user_token: UserToken,
     creator_username: String,
     creator_set_visibility: Visibility,
     created_at: DateTime<Utc>,

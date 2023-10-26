@@ -58,8 +58,8 @@ CREATE TABLE zs_voices (
   -- to deal with.
   --
   -- Example values:
-  --   * 'spectrogram'
   --   * 'encodec'
+  --   * 'spectrogram' (for example; not yet used)
   --   * (Since this isn't an enum, the list of values can be expanded.)
   encoding_type VARCHAR(16) NOT NULL,
 

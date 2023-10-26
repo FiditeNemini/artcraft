@@ -5,6 +5,7 @@ use sqlx::pool::PoolConnection;
 
 use enums::common::visibility::Visibility;
 use errors::AnyhowResult;
+use tokens::tokens::users::UserToken;
 use tokens::tokens::zs_voices::ZsVoiceToken;
 
 pub struct ZsVoice {
@@ -13,7 +14,7 @@ pub struct ZsVoice {
     pub ietf_language_tag: String,
     pub ietf_primary_language_subtag: String,
     pub bucket_hash: String,
-    pub maybe_creator_user_token: Option<String>
+    pub maybe_creator_user_token: Option<UserToken>
 }
 
 pub async fn get_voice_by_token(
@@ -86,7 +87,7 @@ async fn select_include_deleted(
         zv.title,
         zv.ietf_language_tag,
         zv.ietf_primary_language_subtag,
-        zv.maybe_creator_user_token,
+        zv.maybe_creator_user_token as `maybe_creator_user_token: tokens::tokens::users::UserToken`,
         zv.bucket_hash,
         zv.creator_set_visibility as `creator_set_visibility: enums::common::visibility::Visibility`
         FROM zs_voices as zv
@@ -110,7 +111,7 @@ async fn select_without_deleted(
         zv.title,
         zv.ietf_language_tag,
         zv.ietf_primary_language_subtag,
-        zv.maybe_creator_user_token,
+        zv.maybe_creator_user_token as `maybe_creator_user_token: tokens::tokens::users::UserToken`,
         zv.bucket_hash,
         zv.creator_set_visibility as `creator_set_visibility: enums::common::visibility::Visibility`
         FROM zs_voices as zv
@@ -129,7 +130,7 @@ pub struct RawVoice {
     title: String,
     ietf_language_tag: String,
     ietf_primary_language_subtag: String,
-    maybe_creator_user_token: Option<String>,
+    maybe_creator_user_token: Option<UserToken>,
     bucket_hash: String,
     creator_set_visibility: Visibility,
 }

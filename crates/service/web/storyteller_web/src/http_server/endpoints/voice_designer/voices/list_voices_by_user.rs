@@ -1,6 +1,4 @@
-
 use std::fmt;
-use std::fmt::{Formatter};
 use std::sync::Arc;
 
 use actix_web::{HttpRequest, HttpResponse, web};
@@ -8,20 +6,22 @@ use actix_web::error::ResponseError;
 use actix_web::http::StatusCode;
 use actix_web::web::Path;
 use chrono::{DateTime, Utc};
+use log::warn;
 
-use log::{info, warn};
 use mysql_queries::queries::voice_designer::voices::list_voices::list_voices_by_user_token;
+use tokens::tokens::users::UserToken;
+use tokens::tokens::zs_voices::ZsVoiceToken;
 
 use crate::server_state::ServerState;
 
 #[derive(Serialize, Clone)]
 pub struct ZsVoiceRecordForResponse {
-  voice_token: String,
+  voice_token: ZsVoiceToken,
   title: String,
   creator_set_visibility: String,
   ietf_language_tag: String,
   ietf_primary_language_subtag: String,
-  creator_user_token: String,
+  creator_user_token: UserToken,
   creator_username: String,
 
   created_at: DateTime<Utc>,
