@@ -25,6 +25,7 @@ container_common = { path = "../../../lib/deprecated/container_common" }
 cookies = { path = "../../../lib/cookies" }
 datetimes = { path = "../../../lib/datetimes" }
 easyenv = { path = "../../../lib/easyenv" }
+elasticsearch_schema = { path = "../../../lib/elasticsearch_schema" }
 enums = { path = "../../../_types/enums" }
 errors = { path = "../../../lib/errors" }
 google_drive_common = { path = "../../../lib/api_clients/google_drive_common" }
@@ -108,6 +109,9 @@ sqlx = { version = "0.6.2", features = [ "mysql", "runtime-actix-native-tls", "o
 # Redis Database
 limitation = "0.1.1" # Redis rate limiter
 r2d2_redis = "0.14.0"
+
+# Elasticsearch
+elasticsearch = "8.5.0-alpha.1"
 
 # In-memory caching
 lru_time_cache = "0.11.11"

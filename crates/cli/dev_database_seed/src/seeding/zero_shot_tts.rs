@@ -24,7 +24,7 @@ use tokens::tokens::zs_voices::ZsVoiceToken;
 
 use crate::seeding::users::HANASHI_USERNAME;
 
-pub async fn seed_zero_shot_tts(mysql_pool: &Pool<MySql>, bucket_client: &BucketClient) -> AnyhowResult<()> {
+pub async fn seed_zero_shot_tts(mysql_pool: &Pool<MySql>, maybe_bucket_client: Option<&BucketClient>) -> AnyhowResult<()> {
   info!("Seeding zero shot TTS...");
 
   let user_token = match get_user_token_by_username(HANASHI_USERNAME, mysql_pool).await? {
@@ -44,7 +44,7 @@ pub async fn seed_zero_shot_tts(mysql_pool: &Pool<MySql>, bucket_client: &Bucket
   ];
 
   for (voice_name, bucket_hash, wav_file, user_token) in records {
-    create_voice_records(voice_name, bucket_hash, wav_file, user_token, mysql_pool, bucket_client).await?;
+    create_voice_records(voice_name, bucket_hash, wav_file, user_token, mysql_pool, maybe_bucket_client).await?;
   }
 
   Ok(())
@@ -56,7 +56,7 @@ async fn create_voice_records(
   wav_file: &str,
   creator_user_token: &UserToken,
   mysql_pool: &Pool<MySql>,
-  bucket_client: &BucketClient,
+  maybe_bucket_client: Option<&BucketClient>,
 ) -> AnyhowResult<(ZsVoiceToken, ZsVoiceDatasetToken)> {
   info!("Creating voice records for voice {} ...", voice_name);
 
@@ -72,28 +72,13 @@ async fn create_voice_records(
     mysql_pool,
   }).await?;
 
-  info!("Uploading wav file {} ...", wav_file);
+  let public_upload_path;
 
-  let public_upload_path = MediaFileBucketPath::generate_new(
-    Some("dev_zs_"),
-    Some(".bin"));
-
-  info!("Uploading media to bucket path: {}", public_upload_path.get_full_object_path_str());
-
-  let mut file_path = get_storyteller_rust_root();
-  file_path.push(format!("assets/seed/{}", wav_file));
-
-  info!("Reading seed file: {:?}", file_path);
-
-  let bytes = file_read_bytes(file_path)?;
-  let mimetype = get_mimetype_for_bytes(&bytes).unwrap_or("audio/wav");
-
-  let _r = bucket_client.upload_file_with_content_type(
-    public_upload_path.get_full_object_path_str(),
-    bytes.as_ref(),
-    mimetype)
-      .await?;
-
+  if let Some(bucket_client) = maybe_bucket_client {
+    public_upload_path = seed_file_to_bucket(wav_file, bucket_client).await?;
+  } else {
+    public_upload_path = MediaFileBucketPath::from_object_hash("fake", None, None);
+  }
 
   info!("Creating dataset sample record...");
 
@@ -131,4 +116,30 @@ async fn create_voice_records(
   }).await?;
 
   Ok((voice_token, dataset_token))
+}
+
+async fn seed_file_to_bucket(wav_file: &str, bucket_client: &BucketClient) -> AnyhowResult<MediaFileBucketPath> {
+  info!("Uploading wav file {} ...", wav_file);
+
+  let public_upload_path = MediaFileBucketPath::generate_new(
+    Some("dev_zs_"),
+    Some(".bin"));
+
+  info!("Uploading media to bucket path: {}", public_upload_path.get_full_object_path_str());
+
+  let mut file_path = get_storyteller_rust_root();
+  file_path.push(format!("assets/seed/{}", wav_file));
+
+  info!("Reading seed file: {:?}", file_path);
+
+  let bytes = file_read_bytes(file_path)?;
+  let mimetype = get_mimetype_for_bytes(&bytes).unwrap_or("audio/wav");
+
+  let _r = bucket_client.upload_file_with_content_type(
+    public_upload_path.get_full_object_path_str(),
+    bytes.as_ref(),
+    mimetype)
+      .await?;
+
+  Ok(public_upload_path)
 }

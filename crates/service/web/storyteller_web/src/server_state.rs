@@ -1,3 +1,4 @@
+use elasticsearch::Elasticsearch;
 use r2d2_redis::{r2d2, RedisConnectionManager};
 use sqlx::MySqlPool;
 
@@ -53,6 +54,8 @@ pub struct ServerState {
   pub health_check_status: HealthCheckStatus,
 
   pub mysql_pool: MySqlPool,
+
+  pub elasticsearch: Elasticsearch,
 
   pub redis_pool: r2d2::Pool<RedisConnectionManager>,
   pub redis_ttl_cache: RedisTtlCache,

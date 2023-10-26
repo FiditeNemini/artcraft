@@ -13,6 +13,7 @@ members = [
   "crates/cli/database_cleanup",
   "crates/cli/dev_database_seed",
   "crates/cli/dev_upload_media_file",
+  "crates/cli/elasticsearch-cli",
   "crates/cli/kubectl_pod_cleanup",
   "crates/cli/scrape_test",
 
@@ -32,6 +33,7 @@ members = [
   "crates/lib/deprecated/container_common", # TODO(bt, 2023-02-13): Pull apart and rehome pieces
   "crates/lib/deprecated/http_server_common", # TODO(bt, 2023-03-20): Move useful pieces to actix_helpers
   "crates/lib/easyenv", # NB: Vendored version of https://github.com/echelon/easyenv.rs that we'll improve.
+  "crates/lib/elasticsearch_schema",
   "crates/lib/errors",
   "crates/lib/files/archives",
   "crates/lib/files/filesys",

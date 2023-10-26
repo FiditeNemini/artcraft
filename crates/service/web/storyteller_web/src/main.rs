@@ -24,6 +24,8 @@ use actix_cors::Cors;
 use actix_web::{App, HttpResponse, HttpServer, middleware, web};
 use actix_web::middleware::{DefaultHeaders, Logger};
 use anyhow::anyhow;
+use elasticsearch::Elasticsearch;
+use elasticsearch::http::transport::Transport;
 use futures::Future;
 use limitation::Limiter;
 use log::{error, info};
@@ -229,6 +231,10 @@ async fn main() -> AnyhowResult<()> {
 
     RedisRateLimiter::new(limiter, "model_upload", limiter_enabled)
   };
+
+  info!("Connecting to elasticsearch...");
+
+  let elasticsearch = get_elasticsearch_client()?;
 
   info!("Reading env vars and setting up utils...");
 
@@ -450,6 +456,7 @@ async fn main() -> AnyhowResult<()> {
     third_party_url_redirector,
     health_check_status,
     mysql_pool: pool,
+    elasticsearch,
     redis_pool,
     redis_ttl_cache,
     redis_rate_limiters: RedisRateLimiters {
@@ -670,4 +677,10 @@ pub async fn serve(server_state: ServerState) -> AnyhowResult<()>
   .await?;
 
   Ok(())
+}
+
+fn get_elasticsearch_client() -> AnyhowResult<Elasticsearch> {
+  let transport = Transport::single_node(&easyenv::get_env_string_required("ELASTICSEARCH_URL")?)?;
+  let client = Elasticsearch::new(transport);
+  Ok(client)
 }

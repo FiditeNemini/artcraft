@@ -143,13 +143,76 @@ file (located at `/etc/hosts`) to include the following configuration lines:
 127.0.0.1    devproxy.storyteller.ai
 ```
 
-### (9a) Install Redis
+### (9) Install Redis
 
 ```
 sudo apt install redis
 ```
 
-### (9b) Run one or more applications:
+### (10) Install Elasticsearch
+
+Mac: (TODO - haven't installed yet)
+
+Ubuntu 22.04:
+
+Install:
+
+```bash
+curl -fsSL https://artifacts.elastic.co/GPG-KEY-elasticsearch | sudo gpg --dearmor -o /usr/share/keyrings/elastic.gpg
+
+echo "deb [signed-by=/usr/share/keyrings/elastic.gpg] https://artifacts.elastic.co/packages/7.x/apt stable main" | sudo tee -a /etc/apt/sources.list.d/elastic-7.x.list
+
+sudo apt update
+sudo apt install elasticsearch
+```
+
+Configure:
+
+```text
+# Edit /etc/elasticsearch/elasticsearch.yml
+# Set the following:
+network.host: localhost
+```
+
+Run:
+
+```bash
+sudo systemctl start elasticsearch
+sudo systemctl enable elasticsearch
+```
+
+Verify:
+
+```bash
+curl -X GET 'http://localhost:9200'
+```
+
+Install Kibana (prototyping UI):
+
+```bash
+# Install
+sudo apt-get install kibana
+
+# Run
+sudo /bin/systemctl daemon-reload
+sudo /bin/systemctl enable kibana.service
+sudo systemctl start kibana.service
+
+# Access the Kibana Status Page:
+# http://localhost:5601/status
+
+# Access the query console UI:
+# Click Sidebar > Management > Dev Tools > Console
+# http://localhost:5601/
+```
+
+Extra reading: 
+
+- [Guide 1](https://www.digitalocean.com/community/tutorials/how-to-install-and-configure-elasticsearch-on-ubuntu-22-04)
+- [Guide 2](https://www.elastic.co/guide/en/elasticsearch/reference/current/deb.html)
+- [Kibana](https://www.elastic.co/guide/en/kibana/current/deb.html)
+
+### (11) Run one or more applications:
 DO NOT CHECK THESE TWO FILES INTO THE REPO
 Ask Brandon for the .env-secrets and .storteller-web.development-secrets.env and place it in the root of the folder.
 
