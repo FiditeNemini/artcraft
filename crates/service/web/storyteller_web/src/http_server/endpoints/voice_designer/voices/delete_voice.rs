@@ -110,8 +110,8 @@ pub async fn delete_voice_handler(
     }
   };
 
-  let is_creator = voice.maybe_creator_user_token.as_deref()
-      .map(|creator_user_token| creator_user_token == &user_session.user_token)
+  let is_creator = voice.maybe_creator_user_token.as_ref()
+      .map(|creator_user_token| creator_user_token == &user_session.user_token_typed)
       .unwrap_or(false);
 
   if !is_creator && !is_mod {

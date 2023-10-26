@@ -2,22 +2,24 @@ use anyhow::anyhow;
 use sqlx::MySqlPool;
 
 use enums::by_table::generic_synthetic_ids::id_category::IdCategory;
+use enums::by_table::zs_voices::encoding_type::ZsVoiceEncodingType;
+use enums::by_table::zs_voices::model_category::ZsVoiceModelCategory;
+use enums::by_table::zs_voices::model_type::ZsVoiceModelType;
 use enums::common::visibility::Visibility;
 use errors::AnyhowResult;
+use tokens::tokens::users::UserToken;
 use tokens::tokens::zs_voice_datasets::ZsVoiceDatasetToken;
 use tokens::tokens::zs_voices::ZsVoiceToken;
-use tokens::tokens::users::UserToken;
 
 use crate::queries::generic_synthetic_ids::transactional_increment_generic_synthetic_id::transactional_increment_generic_synthetic_id;
 
 pub struct CreateVoiceArgs<'a> {
   pub dataset_token: &'a ZsVoiceDatasetToken,
 
-  // TODO(bt,2023-10-06): These should be *Rust Enums* to limit their possible range of values.
-  pub model_category: &'a str,
-  pub model_type: &'a str,
+  pub model_category: ZsVoiceModelCategory,
+  pub model_type: ZsVoiceModelType,
   pub model_version: u64,
-  pub model_encoding_type: &'a str,
+  pub model_encoding_type: ZsVoiceEncodingType,
 
   pub voice_title: &'a str,
   // TODO(Kasisnu): Is this a create/update field?
@@ -41,7 +43,7 @@ pub async fn create_voice(args: CreateVoiceArgs<'_>) -> AnyhowResult<ZsVoiceToke
   if let Some(creator_user_token) = args.maybe_creator_user_token.as_deref() {
     let next_zs_dataset_synthetic_id = transactional_increment_generic_synthetic_id(
       creator_user_token,
-      IdCategory::ZeroShotVoiceDataset,
+      IdCategory::ZeroShotVoiceEmbedding,
       &mut transaction
     ).await?;
 
@@ -66,9 +68,9 @@ pub async fn create_voice(args: CreateVoiceArgs<'_>) -> AnyhowResult<ZsVoiceToke
     "#,
     voice_token.as_str(),
     args.dataset_token,
-    args.model_category,
-    args.model_type,
-    args.model_encoding_type,
+    args.model_category.to_str(),
+    args.model_type.to_str(),
+    args.model_encoding_type.to_str(),
     args.voice_title,
     args.bucket_hash,
     args.maybe_creator_user_token,

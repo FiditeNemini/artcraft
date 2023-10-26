@@ -8,6 +8,9 @@ use buckets::public::media_files::original_file::MediaFileBucketPath;
 use cloud_storage::bucket_client::BucketClient;
 use cloud_storage::bucket_path_unifier::BucketPathUnifier;
 use enums::by_table::generic_inference_jobs::inference_result_type::InferenceResultType;
+use enums::by_table::zs_voices::encoding_type::ZsVoiceEncodingType;
+use enums::by_table::zs_voices::model_category::ZsVoiceModelCategory;
+use enums::by_table::zs_voices::model_type::ZsVoiceModelType;
 use enums::common::visibility::Visibility;
 use filesys::file_size::file_size;
 use hashing::sha256::sha256_hash_file::sha256_hash_file;
@@ -314,10 +317,10 @@ pub async fn process_create_voice(
     // insert record
     let voice_token = create_voice(CreateVoiceArgs {
         dataset_token: &voice_dataset_token,
-        model_category: "vc",
-        model_type: "vall-e-x",
+        model_category: ZsVoiceModelCategory::Tts,
+        model_type: ZsVoiceModelType::VallEX,
         model_version: 0,
-        model_encoding_type: "encodec",
+        model_encoding_type: ZsVoiceEncodingType::Encodec,
         voice_title: &voice_name,
         bucket_hash,
         maybe_creator_user_token: Some(&creator_user_token),
