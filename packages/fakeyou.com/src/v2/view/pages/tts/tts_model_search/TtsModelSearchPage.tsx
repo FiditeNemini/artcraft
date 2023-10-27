@@ -1,87 +1,18 @@
-import React from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
 import Container from "components/common/Container";
 import PageHeader from "components/layout/PageHeader";
 import { faClock, faMessageDots } from "@fortawesome/pro-solid-svg-icons";
 import ModelSearch from "components/common/ModelSearch";
 import Panel from "components/common/Panel";
-import useSearch from "hooks/useSearch/useSearch";
 import ModelSearchResults from "components/common/ModelSearchResults";
 import ModelTags from "components/common/ModelTags";
 import Select from "components/common/Select";
+import { SearchTtsModels, TtsModel } from "@storyteller/components/src/api/tts/SearchTtsModels";
 
 interface TtsModelSearchPageProps {
   sessionWrapper: SessionWrapper;
 }
-
-const dummyData = [
-  {
-    id: 1,
-    name: "Spongebob",
-    tags: ["English", "High-pitched", "Character"],
-    type: "Tacotron2",
-    creator: "echelon",
-    likes: 14000,
-    uses: 1000000,
-    comments: 250,
-    time: new Date("2023-09-20T12:00:00Z").toISOString(),
-  },
-  {
-    id: 2,
-    name: "Mariano Closs",
-    tags: ["Spanish", "Low-pitched"],
-    type: "Tacotron2",
-    creator: "echelon",
-    likes: 308290,
-    uses: 30000000,
-    comments: 1200,
-    time: new Date("2023-10-12T12:00:00Z").toISOString(),
-  },
-  {
-    id: 3,
-    name: "Cristiano  Ronaldo",
-    tags: ["Portuguese", "Low-pitched"],
-    type: "Tacotron2",
-    creator: "echelon",
-    likes: 17500,
-    uses: 40000000,
-    comments: 250,
-    time: new Date("2023-09-20T12:00:00Z").toISOString(),
-  },
-  {
-    id: 4,
-    name: "Messi",
-    tags: ["Portuguese", "Low-pitched"],
-    type: "Tacotron2",
-    creator: "echelon",
-    likes: 17500,
-    uses: 40000000,
-    comments: 250,
-    time: new Date("2023-09-20T12:00:00Z").toISOString(),
-  },
-  {
-    id: 5,
-    name: "Morty",
-    tags: ["English", "High-pitched", "Character"],
-    type: "Tacotron2",
-    creator: "echelon",
-    likes: 14000,
-    uses: 1000000,
-    comments: 250,
-    time: new Date("2023-09-20T12:00:00Z").toISOString(),
-  },
-  {
-    id: 6,
-    name: "Bad Bunny",
-    tags: ["Spanish", "Low-pitched"],
-    type: "Tacotron2",
-    creator: "echelon",
-    likes: 308290,
-    uses: 30000000,
-    comments: 1200,
-    time: new Date("2023-10-12T12:00:00Z").toISOString(),
-  },
-];
 
 const allTags = [
   "English",
@@ -93,26 +24,43 @@ const allTags = [
 ];
 
 export default function TtsModelSearchPage(props: TtsModelSearchPageProps) {
-  const {
-    searchTerm,
-    setSearchTerm,
-    selectedTags,
-    setSelectedTags,
-    filteredData,
-  } = useSearch(dummyData);
+  const [searchTerm, setSearchTerm] = useState<string>("");
+  const [foundTtsModels, setFoundTtsModels] = useState<TtsModel[]>([]);
 
-  const handleSelectTag = (tag: string) => {
-    setSelectedTags((prev) => {
-      if (prev.includes(tag)) {
-        return prev.filter((t) => t !== tag);
-      }
-      return [...prev, tag];
-    });
-  };
+  let selectedTags : any = [];
+  let handleSelectTag = () => {};
+
+  const maybeSearch = useCallback(async (
+    value: string
+  ) => {
+    setSearchTerm(value);
+  }, []);
+
+
+  const doSearch = useCallback(async (
+    value: string
+  ) => {
+    let request = {
+      search_term: value,
+    }
+
+    let response = await SearchTtsModels(request);
+
+    if (response.success) {
+      let models = [...response.models];
+      setFoundTtsModels(models);
+    } else {
+      setFoundTtsModels([]);
+    }
+  }, [setFoundTtsModels]);
+
+  useEffect(() => {
+    doSearch(searchTerm);
+  }, [doSearch, searchTerm])
 
   const searchTts = (
     <div className="d-flex flex-column gap-3">
-      <ModelSearch value={searchTerm} onChange={setSearchTerm} />
+      <ModelSearch value={searchTerm} onChange={maybeSearch} />
       <ModelTags
         tags={allTags}
         selectedTags={selectedTags}
@@ -160,7 +108,8 @@ export default function TtsModelSearchPage(props: TtsModelSearchPageProps) {
           />
         </div>
 
-        <ModelSearchResults data={filteredData} />
+        {/*<ModelSearchResults data={filteredData} />*/}
+        <ModelSearchResults data={foundTtsModels} />
       </Panel>
     </Container>
   );
