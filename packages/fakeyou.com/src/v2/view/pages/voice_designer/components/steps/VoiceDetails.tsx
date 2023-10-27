@@ -1,5 +1,6 @@
 import {
   faEye,
+  faLanguage,
   // faMicrophoneLines,
   // faTags,
 } from "@fortawesome/pro-solid-svg-icons";
@@ -41,19 +42,20 @@ function VoiceDetails() {
         </div>
       </div>
 
-      {/* <div>
-        <label className="sub-title">Tags</label>
+      <div>
+        <label className="sub-title">Language</label>
         <div className="input-icon-search">
           <span className="form-control-feedback">
-            <FontAwesomeIcon icon={faTags} />
+            <FontAwesomeIcon icon={faLanguage} />
           </span>
           <Select
             classNames={SearchFieldClass}
-            value={tags}
-            onChange={(e) => setTags(e.target.value)}
+            value="English"
+            defaultValue="English"
+            placeholder="English"
           />
         </div>
-      </div> */}
+      </div>
 
       {/* <div>
         <label className="sub-title">Description</label>

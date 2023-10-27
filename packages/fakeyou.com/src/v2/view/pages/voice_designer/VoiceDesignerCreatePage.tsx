@@ -1,17 +1,17 @@
 import React, { useState } from "react";
 import { faWaveform } from "@fortawesome/pro-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { usePrefixedDocumentTitle } from "common/UsePrefixedDocumentTitle";
-import { PageHeaderWithImage } from "v2/view/_common/PageHeaderWithImage";
-import { Panel } from "v2/view/_common/Panel";
+import Panel from "components/common/Panel";
 import { Stepper } from "./components/Stepper";
 import { StepperControls } from "./components/StepperControls";
 import { UploadSamples } from "./components/steps/UploadSamples";
 import { VoiceDetails } from "./components/steps/VoiceDetails";
 import { Complete } from "./components/steps/Complete";
 import { Processing } from "./components/steps/Processing";
+import PageHeader from "components/layout/PageHeader";
+import Container from "components/common/Container";
 
-function VoiceDesignerPage() {
+function VoiceDesignerCreatePage() {
   usePrefixedDocumentTitle("Voice Designer");
 
   const [currentStep, setCurrentStep] = useState(0);
@@ -52,13 +52,11 @@ function VoiceDesignerPage() {
   };
 
   return (
-    <div className="mb-4">
-      <PageHeaderWithImage
-        headerImage="/mascot/kitsune_pose2.webp"
-        titleIcon={<FontAwesomeIcon icon={faWaveform} className="me-3" />}
-        title={<>Voice Designer</>}
-        subText={<>Upload audio samples and instantly clone your voice!</>}
-        showButtons={false}
+    <Container type="panel">
+      <PageHeader
+        title="Creating New Voice"
+        titleIcon={faWaveform}
+        subText="Add voice details and upload audio samples to clone your voice!"
       />
 
       <Panel>
@@ -78,8 +76,8 @@ function VoiceDesignerPage() {
           onNext={handleNext}
         />
       </Panel>
-    </div>
+    </Container>
   );
 }
 
-export { VoiceDesignerPage };
+export { VoiceDesignerCreatePage };

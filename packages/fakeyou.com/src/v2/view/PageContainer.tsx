@@ -81,7 +81,7 @@ import { UploadVoiceConversionModel } from "./pages/upload/UploadVoiceConversion
 import { VoiceConversionModelListItem } from "@storyteller/components/src/api/voice_conversion/ListVoiceConversionModels";
 import { CommunityCommissionsPage } from "./pages/contest/CommunityCommissionsPage";
 import { ProductUsageInfoPage } from "./pages/product_usage_info/ProductUsageInfoPage";
-import { VoiceDesignerPage } from "./pages/voice_designer/VoiceDesignerPage";
+import { VoiceDesignerCreatePage } from "./pages/voice_designer/VoiceDesignerCreatePage";
 import { GenerateSpeechPage } from "./pages/generate_speech/GenerateSpeechPage";
 import VcModelViewPage from "./pages/vc/vc_model_view/VcModelViewPage";
 import VcModelEditPage from "./pages/vc/vc_model_edit/VcModelEditPage";
@@ -91,6 +91,7 @@ import MobileMenu from "components/layout/MobileMenu/MobileMenu";
 import { TopNav } from "./nav/TopNav";
 import TtsModelSearchPage from "./pages/tts/tts_model_search/TtsModelSearchPage";
 import MediaPage from "./pages/media/MediaPage";
+import { VoiceDesignerMainPage } from "./pages/voice_designer/VoiceDesignerMainPage";
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -617,8 +618,12 @@ class PageContainer extends React.Component<
               <VocodesPage />
             </Route>
 
-            <Route path="/voice-designer">
-              <VoiceDesignerPage />
+            <Route path="/voice-designer/create">
+              <VoiceDesignerCreatePage />
+            </Route>
+
+            <Route path="/voice-designer/">
+              <VoiceDesignerMainPage />
             </Route>
 
             <Route path="/generate-speech">
