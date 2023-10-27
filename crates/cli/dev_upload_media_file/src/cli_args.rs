@@ -7,7 +7,7 @@ pub struct CliArgs {
 }
 
 pub fn parse_cli_args() -> AnyhowResult<CliArgs> {
-  let matches = App::new("scrape_test")
+  let matches = App::new("dev_upload_media")
       .arg(Arg::with_name("file")
           .short("f")
           .long("file")
@@ -15,18 +15,11 @@ pub fn parse_cli_args() -> AnyhowResult<CliArgs> {
           .help("File to upload")
           .takes_value(true)
           .required(true))
-      //.arg(Arg::with_name("print_html")
-      //  .long("html")
-      //  .help("Print the HTML scraped")
-      //  .takes_value(false)
-      //  .required(false))
       .get_matches();
 
   let file_path = matches.value_of("file")
       .map(|val| val.trim().to_string())
-      .ok_or(anyhow!("no url supplied"))?;
-
-  //let print_html = matches.is_present("print_html");
+      .ok_or(anyhow!("no file path supplied"))?;
 
   Ok(CliArgs {
     file_path: PathBuf::from(file_path),

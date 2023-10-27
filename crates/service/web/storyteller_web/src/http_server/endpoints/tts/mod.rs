@@ -13,3 +13,4 @@ pub mod get_tts_upload_model_job_status;
 pub mod list_tts_models;
 pub mod list_user_tts_inference_results;
 pub mod list_user_tts_models;
+pub mod search_tts_models_handler;

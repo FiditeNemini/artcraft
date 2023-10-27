@@ -2,18 +2,20 @@
 *secret*sh
 .env
 .env-aichatbot-secrets
+.env-elasticsearch-secrets
 .env-secrets
+_develop/tools/.secrets
+_develop/tools/db_secrets.toml
+crates/service/web/storyteller_web/config/storyteller-web.development-secrets.env
 db.secrets
 db_secrets.toml
+env-secrets
 production_database_secret_connect.sh
 production_database_secret_query.sh
 production_database_voice_clone_report_download.sh
 secrets.toml
 secrets.yaml
-_develop/tools/.secrets
-_develop/tools/db_secrets.toml
 twitch_secrets.toml
-crates/service/web/storyteller_web/config/storyteller-web.development-secrets.env
 
 # New env secrets (per-app)
 *-secrets.env
@@ -28,7 +30,7 @@ crates/lib/sqlite_queries/target/
 *.swp
 *~
 
-# IntelliJ/CLion noise
+# IntelliJ/CLion/RustRover noise
 .idea/
 
 # Python noise

@@ -88,6 +88,7 @@ use crate::http_server::endpoints::tts::get_tts_upload_model_job_status::get_tts
 use crate::http_server::endpoints::tts::list_tts_models::list_tts_models_handler;
 use crate::http_server::endpoints::tts::list_user_tts_inference_results::list_user_tts_inference_results_handler;
 use crate::http_server::endpoints::tts::list_user_tts_models::list_user_tts_models_handler;
+use crate::http_server::endpoints::tts::search_tts_models_handler::search_tts_models_handler;
 use crate::http_server::endpoints::twitch::event_rules::create_event_rule::create_twitch_event_rule_handler;
 use crate::http_server::endpoints::twitch::event_rules::delete_event_rule::delete_twitch_event_rule_handler;
 use crate::http_server::endpoints::twitch::event_rules::edit_event_rule::edit_twitch_event_rule_handler;
@@ -415,6 +416,11 @@ fn add_tts_routes<T, B> (app: App<T>) -> App<T>
       .service(
         web::resource("/list")
             .route(web::get().to(list_tts_models_handler))
+            .route(web::head().to(|| HttpResponse::Ok()))
+      )
+      .service(
+        web::resource("/search")
+            .route(web::post().to(search_tts_models_handler))
             .route(web::head().to(|| HttpResponse::Ok()))
       )
       .service(
