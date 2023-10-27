@@ -119,6 +119,10 @@ class ApiConfig {
     return `${this.getApiOrigin()}/tts/list`;
   }
 
+  searchTts(): string {
+    return `${this.getApiOrigin()}/tts/search`;
+  }
+
   getPendingTtsJobCount(): string {
     return `${this.getApiOrigin()}/tts/queue_length`;
   }

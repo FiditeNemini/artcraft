@@ -8,9 +8,10 @@ import {
   faComment,
   faHeart,
 } from "@fortawesome/pro-solid-svg-icons";
+import { TtsModel } from "@storyteller/components/src/api/tts/SearchTtsModels";
 
-interface ModelSearchResultsProps {
-  data: any[];
+interface Props {
+  data: TtsModel[];
 }
 
 function shortenNumber(num: number): string {
@@ -20,46 +21,55 @@ function shortenNumber(num: number): string {
   return num.toString();
 }
 
-export default function ModelSearchResults({ data }: ModelSearchResultsProps) {
+export default function ModelSearchResults(props: Props) {
+  // TODO: Expose fields on backend
+  let likes = 1500;
+  let uses = 25000;
+  let comments = 25;
+  let model_type  = "Tacotron2";
+
   return (
     <div className="row g-3">
-      {data.map((item) => {
+      {props.data.map((item) => {
+        console.log('iter', item.model_token);
+        let modelPageLink = `/tts/${item.model_token}`;
+
         return (
-          <div className="col-12 col-lg-6" key={item.id}>
+          <div className="col-12 col-lg-6" key={item.model_token}>
             <div className="model-search-results p-3">
-              <h5 className="fw-semibold mb-0">{item.name}</h5>
+              <h5 className="fw-semibold mb-0">{item.title}</h5>
               <p className="creator-name">
                 by{" "}
-                <Link className="fw-medium" to={`/profile/${item.creator}`}>
-                  {item.creator}
+                <Link className="fw-medium" to={`/profile/${item.creator_username}`}>
+                  {item.creator_display_name}
                 </Link>
               </p>
               <div className="d-flex align-items-end">
                 <div className="flex-grow-1">
                   <span
                     className={`type-tag ${
-                      item.type === "Tacotron2" ? "tt2" : "tt2"
+                      model_type === "Tacotron2" ? "tt2" : "tt2" // TODO
                     }`}
                   >
-                    {item.type}
+                    TT2
                   </span>
                   <div className="d-flex gap-3 model-details fw-medium mt-3">
                     <div>
                       <FontAwesomeIcon icon={faHeart} className="me-2" />
-                      {item.likes && shortenNumber(item.likes)}
+                      {likes && shortenNumber(likes)}
                     </div>
                     <div>
                       <FontAwesomeIcon icon={faChartSimple} className="me-2" />
-                      {item.uses && shortenNumber(item.uses)}
+                      {uses && shortenNumber(uses)}
                     </div>
                     <div>
                       <FontAwesomeIcon icon={faComment} className="me-2" />
-                      {item.comments && shortenNumber(item.comments)}
+                      {comments && shortenNumber(comments)}
                     </div>
                   </div>
                 </div>
                 <div>
-                  <Button label="Use Voice" small={true} to="/" />
+                  <Button label="Use Voice" small={true} to={modelPageLink} />
                 </div>
               </div>
             </div>

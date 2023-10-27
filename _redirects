@@ -42,6 +42,10 @@
 /voice-conversion*   /index.html   200
 /w2l*   /index.html   200
 
+# Test paths
+/dev-tts*   /index.html   200
+/tts-dev*   /index.html   200
+
 # Old paths
 /face-animation* /face-animator 302
 
