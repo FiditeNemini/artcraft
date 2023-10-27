@@ -1,6 +1,6 @@
-use std::path::PathBuf;
 use clap::{App, Arg};
-use errors::{anyhow, AnyhowResult};
+
+use errors::AnyhowResult;
 
 pub struct CliArgs {
   pub seed_cloud_bucket: bool,
