@@ -31,7 +31,6 @@ export default function ModelSearchResults(props: Props) {
   return (
     <div className="row g-3">
       {props.data.map((item) => {
-        console.log('iter', item.model_token);
         let modelPageLink = `/tts/${item.model_token}`;
 
         return (
