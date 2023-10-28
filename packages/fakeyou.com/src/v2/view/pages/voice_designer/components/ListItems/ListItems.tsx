@@ -76,16 +76,20 @@ export default function ListItems({ data, type }: ListItemsProps) {
                   label="Edit"
                   small={true}
                   variant="secondary"
-                  to={item.edit}
+                  to={`/tts/${item.modelToken}/edit`}
                 />
                 <Button
                   label="Delete"
                   small={true}
                   variant="danger"
-                  to={item.delete}
+                  to={`/tts/${item.modelToken}/delete`}
                 />
                 {type === "voices" && (
-                  <Button label="Use Voice" small={true} to={item.use} />
+                  <Button
+                    label="Use Voice"
+                    small={true}
+                    to={`/tts/${item.modelToken}`}
+                  />
                 )}
               </div>
             </div>

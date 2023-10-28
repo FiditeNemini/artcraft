@@ -13,15 +13,11 @@ function VoiceDesignerMainPage() {
   const voicesList = [
     {
       name: "Donald Trump (45th US President)",
-      edit: "/tts",
-      delete: "/",
-      use: "/",
+      modelToken: "TM:z7x37sbvb8vc",
     },
     {
       name: "Spongebob Squarepants (Season 1)",
-      edit: "/",
-      delete: "/",
-      use: "/",
+      modelToken: "TM:z7x37sbvb8vc",
     },
   ];
   const datasetList = [
