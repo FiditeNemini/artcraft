@@ -54,14 +54,14 @@ function VoiceDesignerCreatePage() {
   return (
     <Container type="panel">
       <PageHeader
-        title="Creating New Voice"
+        title="Create New Voice"
         titleIcon={faWaveform}
         subText="Add voice details and upload audio samples to clone your voice!"
       />
 
       <Panel>
         {/* Stepper */}
-        <div className="p-3 px-lg-4 bg-stepper overflow-hidden">
+        <div className="p-3 px-lg-4 bg-stepper">
           <Stepper steps={steps} currentStep={currentStep} />
         </div>
 

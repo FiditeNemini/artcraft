@@ -6,31 +6,43 @@ import PageHeader from "components/layout/PageHeader";
 import Container from "components/common/Container";
 import { Route, NavLink, Switch, Redirect } from "react-router-dom";
 import ListItems from "./components/ListItems/ListItems";
-import { Button } from "components/common";
 
 function VoiceDesignerMainPage() {
   usePrefixedDocumentTitle("Voice Designer");
 
-  const dummyData: any[] = [];
+  const voicesList = [
+    {
+      name: "Donald Trump (45th US President)",
+      edit: "/tts",
+      delete: "/",
+      use: "/",
+    },
+    {
+      name: "Spongebob Squarepants (Season 1)",
+      edit: "/",
+      delete: "/",
+      use: "/",
+    },
+  ];
+  const datasetList = [
+    { name: "Donald Trump (45th US President)", edit: "/", delete: "/" },
+  ];
+  const emptyList = [] as any[];
 
-  const MyVoices: React.FC = () => {
-    return <ListItems data={dummyData} />;
-  };
+  function MyVoices() {
+    return <ListItems type="voices" data={voicesList} />;
+  }
 
-  const Datasets: React.FC = () => {
-    return (
-      <div>
-        <h4 className="fw-bold">Datasets</h4>
-      </div>
-    );
-  };
+  function MyDatasets() {
+    return <ListItems type="datasets" data={datasetList} />;
+  }
 
   return (
     <Container type="panel">
       <PageHeader
         title="Voice Designer"
         titleIcon={faWaveform}
-        subText="Turn text into your favorite character's voice."
+        subText="Create your own AI voice by providing audio files of the voice you want to clone."
         showButton={true}
         buttonLabel="Create New voice"
         buttonVariant="primary"
@@ -44,7 +56,7 @@ function VoiceDesignerMainPage() {
             <div className="d-flex flex-grow-1">
               <li className="nav-item">
                 <NavLink
-                  to="/voice-designer/my-voices"
+                  to="/voice-designer/voices"
                   className="nav-link fs-6 px-3 px-lg-4"
                   activeClassName="active"
                 >
@@ -66,13 +78,13 @@ function VoiceDesignerMainPage() {
 
         <div className="p-3 p-lg-4">
           <Switch>
+            <Route path="/voice-designer/voices" exact component={MyVoices} />
             <Route
-              path="/voice-designer/my-voices"
+              path="/voice-designer/datasets"
               exact
-              component={MyVoices}
+              component={MyDatasets}
             />
-            <Route path="/voice-designer/datasets" exact component={Datasets} />
-            <Redirect to="/voice-designer/my-voices" />
+            <Redirect to="/voice-designer/voices" />
           </Switch>
         </div>
       </Panel>

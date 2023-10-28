@@ -1,17 +1,17 @@
 @import "scss/colours.scss";
 
 .list-items {
-  background-color: lighten($panel, 5%);
+  background-color: lighten($panel, 4%);
   border-radius: 0.5rem;
-  border: 1px solid lighten($panel, 10%);
+  border: 1px solid lighten($panel, 8%);
 
-  .type-tag {
+  .dataset-badge {
     font-weight: 600;
     border-radius: 0.35rem;
     font-size: 13px;
-    padding: 4px 8px;
-    background-color: $secondary;
-    color: $white;
+    padding: 2px 6px;
+    background-color: #f7daed;
+    color: #961574;
     transition: 0.2s;
     -moz-user-select: none;
     -khtml-user-select: none;
@@ -19,16 +19,7 @@
     -ms-user-select: none;
     user-select: none;
     height: 100%;
-
-    &.public {
-      color: #494ea9;
-      background-color: #c6c7e1;
-    }
-
-    &.private {
-      color: #494ea9;
-      background-color: #c6c7e1;
-    }
+    margin-bottom: 10px;
   }
 
   .model-details {

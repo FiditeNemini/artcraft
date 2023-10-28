@@ -178,7 +178,6 @@ export default function MediaPage({ sessionWrapper }: MediaPageProps) {
       value: mediaFile.creator_set_visibility.toString(),
     },
     /*{
-      property: "Model",
       value: mediaFile.model_used,
       link: mediaFile.model_link,
     },
