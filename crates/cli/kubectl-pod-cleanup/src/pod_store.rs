@@ -25,6 +25,19 @@ impl PodStore {
     }
   }
 
+  pub fn replace_pods(&self, pod_names: Vec<String>) -> AnyhowResult<()> {
+    match self.pod_names.write() {
+      Err(err) => {
+        Err(anyhow!("lock error: {:?}", err))
+      }
+      Ok(mut write) => {
+        write.clear();
+        write.extend(pod_names);
+        Ok(())
+      }
+    }
+  }
+
   pub fn grab_batch(&self, batch_size: usize) -> AnyhowResult<HashSet<String>> {
     match self.pod_names.read() {
       Err(err) => {
