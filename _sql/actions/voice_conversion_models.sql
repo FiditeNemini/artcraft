@@ -318,7 +318,8 @@ where token IN (
     'vcm_hrxhg4d13n6j',
     'vcm_58spen1nr492',
     'vcm_6qzhqded58bq',
-    'vcm_wyfd0ft3b1dk'
+    'vcm_wyfd0ft3b1dk',
+    'vcm_rhhz8sgrxg4w'
 );
 
 
