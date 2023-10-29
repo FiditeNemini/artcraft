@@ -319,7 +319,11 @@ where token IN (
     'vcm_58spen1nr492',
     'vcm_6qzhqded58bq',
     'vcm_wyfd0ft3b1dk',
-    'vcm_rhhz8sgrxg4w'
+    'vcm_rhhz8sgrxg4w',
+    'vcm_9amtxj95fwpe',
+    'vcm_5thjhwepk2rs',
+    'vcm_p4xp9e34ypka',
+    'vcm_ch8xjth7wm5a'
 );
 
 
