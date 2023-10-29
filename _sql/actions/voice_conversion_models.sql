@@ -305,7 +305,20 @@ where token IN (
     'vcm_wkm9e42d3spm',
     'vcm_cvz78weydh57',
     'vcm_7g5q89m75n1p',
-    'vcm_fg3175bxy7kj'
+    'vcm_fg3175bxy7kj',
+    'vcm_a7cejk4ng5nh',
+    'vcm_dywsh786nmp7',
+    'vcm_8q3xkanjt79v',
+    'vcm_vkgardaf2she',
+    'vcm_900cj3s8f073',
+    'vcm_ah1ffqbrzzrj',
+    'vcm_81x4c144phe8',
+    'vcm_89ghs14h2gpr',
+    'vcm_30jfz8hqdq05',
+    'vcm_hrxhg4d13n6j',
+    'vcm_58spen1nr492',
+    'vcm_6qzhqded58bq',
+    'vcm_wyfd0ft3b1dk'
 );
 
 

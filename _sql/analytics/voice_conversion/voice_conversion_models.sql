@@ -24,9 +24,9 @@ select
     vc.id,
     vc.token,
     vc.model_type,
-    vc.title,
+    SUBSTRING(vc.title, 1, 50) as title,
     u.username,
-    vc.original_download_url,
+    SUBSTRING(vc.original_download_url, 1, 50) as url,
     vc.created_at,
     vc.updated_at
 from voice_conversion_models as vc
