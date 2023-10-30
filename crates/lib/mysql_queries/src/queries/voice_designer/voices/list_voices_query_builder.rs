@@ -8,11 +8,13 @@ use sqlx::MySqlPool;
 use config::shared_constants::DEFAULT_MYSQL_QUERY_RESULT_PAGE_SIZE;
 use enums::common::visibility::Visibility;
 use errors::AnyhowResult;
+use tokens::tokens::users::UserToken;
+use tokens::tokens::zs_voices::ZsVoiceToken;
 
 
 #[derive(Serialize)]
 pub struct ZsVoiceListPage {
-    pub voices: Vec<ZsVoiceRecordForList>,
+    pub voices: Vec<ZsVoice>,
     pub sort_ascending: bool,
 
     pub first_id: Option<i64>,
@@ -21,14 +23,19 @@ pub struct ZsVoiceListPage {
 }
 
 #[derive(Serialize)]
-pub struct ZsVoiceRecordForList {
-    pub voice_token: String,
+pub struct ZsVoice {
+    pub voice_token: ZsVoiceToken,
     pub title: String,
-    pub creator_set_visibility: Visibility,
+
     pub ietf_language_tag: String,
     pub ietf_primary_language_subtag: String,
-    pub creator_user_token: String,
+
+    pub creator_user_token: UserToken,
     pub creator_username: String,
+    pub creator_display_name: String,
+    pub creator_email_gravatar_hash: String,
+
+    pub creator_set_visibility: Visibility,
 
     pub created_at: DateTime<Utc>,
     pub updated_at: DateTime<Utc>,
@@ -99,7 +106,7 @@ impl ListVoicesQueryBuilder {
         self
     }
 
-    pub async fn perform_internal_query(
+    async fn perform_internal_query(
         &self,
         mysql_pool: &MySqlPool
     ) -> AnyhowResult<Vec<RawInternalVoiceRecordForList>> {
@@ -144,19 +151,21 @@ impl ListVoicesQueryBuilder {
 
         let voices = internal_voices.into_iter().map(
             |v| {
-                ZsVoiceRecordForList {
-                    voice_token: v.token.to_string(),
+                ZsVoice {
+                    voice_token: v.token,
                     title: v.title,
                     creator_set_visibility: Visibility::from_str(&v.creator_set_visibility).unwrap_or(Visibility::Public),
                     ietf_language_tag: v.ietf_language_tag,
                     ietf_primary_language_subtag: v.ietf_primary_language_subtag,
                     creator_user_token: v.creator_user_token,
                     creator_username: v.creator_username,
+                    creator_display_name: v.creator_display_name,
+                    creator_email_gravatar_hash: v.creator_email_gravatar_hash,
                     created_at: v.created_at,
                     updated_at: v.updated_at,
                 }
             })
-            .collect::<Vec<ZsVoiceRecordForList>>();
+            .collect::<Vec<ZsVoice>>();
 
         Ok(ZsVoiceListPage {
             voices,
@@ -170,12 +179,16 @@ impl ListVoicesQueryBuilder {
         let mut query = r#"
         SELECT
             zs_voices.id as voice_id,
-            zs_voices.token,
+            zs_voices.token as `token: tokens::tokens::zs_voices::ZsVoiceToken`,
             zs_voices.title,
             zs_voices.ietf_language_tag,
             zs_voices.ietf_primary_language_subtag,
-            users.token as creator_user_token,
+
+            users.token as `creator_user_token: tokens::tokens::users::UserToken`,
             users.username as creator_username,
+            users.display_name as creator_display_name,
+            users.email_gravatar_hash as creator_email_gravatar_hash,
+
             zs_voices.creator_set_visibility,
             zs_voices.created_at,
             zs_voices.updated_at
@@ -272,22 +285,24 @@ impl ListVoicesQueryBuilder {
 }
 
 #[derive(sqlx::FromRow)]
-pub struct RawInternalVoiceRecordForList {
-    pub voice_id: i64,
-    pub token: String,
-    pub title: String,
-    pub ietf_language_tag: String,
-    pub ietf_primary_language_subtag: String,
-    pub creator_user_token: String,
-    pub creator_username: String,
-    pub creator_set_visibility: String,
-    pub created_at: DateTime<Utc>,
-    pub updated_at: DateTime<Utc>,
+struct RawInternalVoiceRecordForList {
+    voice_id: i64,
+    token: ZsVoiceToken,
+    title: String,
+    ietf_language_tag: String,
+    ietf_primary_language_subtag: String,
+    creator_user_token: UserToken,
+    creator_username: String,
+    creator_display_name: String,
+    creator_email_gravatar_hash: String,
+    creator_set_visibility: String,
+    created_at: DateTime<Utc>,
+    updated_at: DateTime<Utc>,
 }
 
 #[cfg(test)]
 mod tests {
-    use crate::queries::voice_designer::inventory::list_voices_query_builder::ListVoicesQueryBuilder;
+    use crate::queries::voice_designer::voices::list_voices_query_builder::ListVoicesQueryBuilder;
 
     #[test]
     fn predicates_without_scoping() {

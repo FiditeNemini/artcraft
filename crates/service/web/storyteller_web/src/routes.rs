@@ -119,7 +119,7 @@ use crate::http_server::endpoints::voice_designer::voice_datasets::list_datasets
 use crate::http_server::endpoints::voice_designer::voice_datasets::update_dataset::update_dataset_handler;
 use crate::http_server::endpoints::voice_designer::voices::create_voice::create_voice_handler;
 use crate::http_server::endpoints::voice_designer::voices::delete_voice::delete_voice_handler;
-use crate::http_server::endpoints::voice_designer::voices::list_available_voices::list_available_voices;
+use crate::http_server::endpoints::voice_designer::voices::list_available_voices::list_available_voices_handler;
 use crate::http_server::endpoints::voice_designer::voices::list_voices_by_session::list_voices_by_session_handler;
 use crate::http_server::endpoints::voice_designer::voices::list_voices_by_user::list_voices_by_user_handler;
 use crate::http_server::endpoints::voice_designer::voices::search_voices::search_voices;
@@ -1176,7 +1176,7 @@ fn add_voice_designer_routes<T,B> (app:App<T>)-> App<T>
               )
               .service(
                   web::scope("/voice")
-                      .route("/list", web::get().to(list_available_voices))
+                      .route("/list", web::get().to(list_available_voices_handler))
                       .route("/search", web::post().to(search_voices))
                       .route("/create", web::post().to(create_voice_handler))
                       .route("/{voice_token}/update", web::post().to(update_voice_handler))

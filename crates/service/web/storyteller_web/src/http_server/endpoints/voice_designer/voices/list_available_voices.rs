@@ -1,15 +1,17 @@
-
-
 use std::sync::Arc;
 
 use actix_web::{HttpRequest, HttpResponse, web};
 use actix_web::error::ResponseError;
 use actix_web::http::StatusCode;
-
+use chrono::{DateTime, Utc};
 use log::{info, warn};
-use mysql_queries::queries::voice_designer::inventory::list_voices_query_builder::{ListVoicesQueryBuilder, ZsVoiceRecordForList};
-use crate::server_state::ServerState;
 
+use enums::common::visibility::Visibility;
+use mysql_queries::queries::voice_designer::voices::list_voices_query_builder::ListVoicesQueryBuilder;
+use tokens::tokens::zs_voices::ZsVoiceToken;
+
+use crate::http_server::common_responses::user_details_lite::UserDetailsLight;
+use crate::server_state::ServerState;
 
 #[derive(Deserialize)]
 pub struct ListZsVoicesQuery {
@@ -22,9 +24,24 @@ pub struct ListZsVoicesQuery {
 #[derive(Serialize)]
 pub struct ListZsVoicesSuccessResponse {
   pub success: bool,
-  pub voices: Vec<ZsVoiceRecordForList>,
+  pub voices: Vec<ZsVoiceForList>,
   pub cursor_next: Option<String>,
   pub cursor_previous: Option<String>
+}
+
+#[derive(Serialize)]
+pub struct ZsVoiceForList {
+  pub voice_token: ZsVoiceToken,
+  pub title: String,
+
+  pub ietf_language_tag: String,
+  pub ietf_primary_language_subtag: String,
+
+  pub creator: UserDetailsLight,
+  pub creator_set_visibility: Visibility,
+
+  pub created_at: DateTime<Utc>,
+  pub updated_at: DateTime<Utc>,
 }
 
 #[derive(Debug)]
@@ -48,7 +65,7 @@ impl ResponseError for ListZsVoicesError {
   }
 }
 
-pub async fn list_available_voices(
+pub async fn list_available_voices_handler(
     http_request: HttpRequest,
     query: web::Query<ListZsVoicesQuery>,
     server_state: web::Data<Arc<ServerState>>
@@ -139,7 +156,23 @@ pub async fn list_available_voices(
 
     let response = ListZsVoicesSuccessResponse {
         success: true,
-        voices: voices_page.voices,
+        voices: voices_page.voices.into_iter()
+            .map(|voice| ZsVoiceForList {
+              voice_token: voice.voice_token,
+              title: voice.title,
+              ietf_language_tag: voice.ietf_language_tag,
+              ietf_primary_language_subtag: voice.ietf_primary_language_subtag,
+              creator: UserDetailsLight::from_db_fields(
+                &voice.creator_user_token,
+                &voice.creator_username,
+                &voice.creator_display_name,
+                &voice.creator_email_gravatar_hash,
+              ),
+              creator_set_visibility: voice.creator_set_visibility,
+              created_at: voice.created_at,
+              updated_at: voice.updated_at,
+            })
+            .collect::<Vec<_>>(),
         cursor_next,
         cursor_previous,
     };
