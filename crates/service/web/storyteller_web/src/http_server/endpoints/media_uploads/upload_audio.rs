@@ -21,6 +21,7 @@ static ALLOWED_MIME_TYPES : Lazy<HashSet<&'static str>> = Lazy::new(|| {
   HashSet::from([
     "audio/aac",
     "audio/m4a",
+    "audio/mp4", // iPhone seems to upload these
     "audio/mpeg",
     "audio/ogg",
     "audio/opus",
