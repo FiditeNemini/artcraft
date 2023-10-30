@@ -51,7 +51,7 @@ export default function PageHeader({
       <div className="py-3 py-lg-4">
         <Panel clear={true}>
           {showBackButton && (
-            <div className="d-flex mb-3">
+            <div className="d-flex mb-2 mb-lg-3">
               <BackButton label={backbuttonLabel} to={backbuttonTo} />
             </div>
           )}
