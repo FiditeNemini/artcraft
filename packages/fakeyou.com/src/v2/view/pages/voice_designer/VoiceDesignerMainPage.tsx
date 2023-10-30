@@ -21,7 +21,10 @@ function VoiceDesignerMainPage() {
     },
   ];
   const datasetList = [
-    { name: "Donald Trump (45th US President)", edit: "/", delete: "/" },
+    {
+      name: "Donald Trump (45th US President)",
+      modelToken: "dummyToken",
+    },
   ];
   const emptyList = [] as any[];
 
@@ -44,6 +47,8 @@ function VoiceDesignerMainPage() {
         buttonVariant="primary"
         buttonIcon={faPlus}
         buttonTo="/voice-designer/create"
+        withImage={true}
+        imageUrl="https://app.kits.ai/_next/static/media/vocals-gated-graphic.eb866911.svg"
       />
 
       <Panel>

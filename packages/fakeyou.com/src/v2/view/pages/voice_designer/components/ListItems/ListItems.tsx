@@ -28,7 +28,9 @@ export default function ListItems({ data, type }: ListItemsProps) {
         )}
         {type === "datasets" && (
           <>
-            <h5 className="fw-semibold mb-3">No existing datasets yet.</h5>
+            <h5 className="fw-semibold mb-3">
+              Datasets will appear after creating voices.
+            </h5>
             <Button
               icon={faPlus}
               label="Create New Voice"
@@ -43,15 +45,6 @@ export default function ListItems({ data, type }: ListItemsProps) {
 
   return (
     <div className="d-flex flex-column gap-3">
-      <div className="d-flex flex-column flex-lg-row py-2 d-md-none">
-        <div>
-          <Button
-            icon={faPlus}
-            label="Create New Voice"
-            to="/voice-designer/create"
-          />
-        </div>
-      </div>
       {data.map((item) => {
         return (
           <div className="d-flex flex-column flex-lg-row gap-3 list-items p-3 align-items-lg-center">
@@ -76,19 +69,19 @@ export default function ListItems({ data, type }: ListItemsProps) {
                   label="Edit"
                   small={true}
                   variant="secondary"
-                  to={`/tts/${item.modelToken}/edit`}
+                  to={`/voice-designer/dataset/${item.modelToken}/edit`}
                 />
                 <Button
                   label="Delete"
                   small={true}
                   variant="danger"
-                  to={`/tts/${item.modelToken}/delete`}
+                  to={`/voice-designer/dataset/${item.modelToken}/delete`}
                 />
                 {type === "voices" && (
                   <Button
                     label="Use Voice"
                     small={true}
-                    to={`/tts/${item.modelToken}`}
+                    to={`/voice-designer/dataset/${item.modelToken}`}
                   />
                 )}
               </div>

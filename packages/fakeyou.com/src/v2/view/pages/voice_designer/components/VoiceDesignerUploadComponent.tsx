@@ -147,7 +147,7 @@ function VoiceDesignerUploadComponent(props: Props) {
           <div className="d-flex flex-column opacity-75 h-100 justify-content-center">
             <FontAwesomeIcon icon={faWaveform} className="fs-3 mb-3" />
             <h5>No voice samples yet</h5>
-            <p>Selected samples will appear here.</p>
+            <p>Uploaded samples will appear here.</p>
           </div>
         </div>
       )}

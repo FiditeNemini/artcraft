@@ -81,7 +81,7 @@ import { UploadVoiceConversionModel } from "./pages/upload/UploadVoiceConversion
 import { VoiceConversionModelListItem } from "@storyteller/components/src/api/voice_conversion/ListVoiceConversionModels";
 import { CommunityCommissionsPage } from "./pages/contest/CommunityCommissionsPage";
 import { ProductUsageInfoPage } from "./pages/product_usage_info/ProductUsageInfoPage";
-import { VoiceDesignerCreatePage } from "./pages/voice_designer/VoiceDesignerCreatePage";
+import { VoiceDesignerFormPage } from "./pages/voice_designer/VoiceDesignerFormPage";
 import { GenerateSpeechPage } from "./pages/generate_speech/GenerateSpeechPage";
 import VcModelViewPage from "./pages/vc/vc_model_view/VcModelViewPage";
 import VcModelEditPage from "./pages/vc/vc_model_edit/VcModelEditPage";
@@ -618,11 +618,28 @@ class PageContainer extends React.Component<
               <VocodesPage />
             </Route>
 
-            <Route path="/voice-designer/create">
-              <VoiceDesignerCreatePage />
-            </Route>
+            {/* Route for initial voice creation */}
+            <Route
+              exact
+              path="/voice-designer/create"
+              component={VoiceDesignerFormPage}
+            />
 
-            <Route path="/voice-designer/">
+            {/* Route for editing the dataset details */}
+            <Route
+              exact
+              path="/voice-designer/dataset/:dataset_token/edit"
+              component={VoiceDesignerFormPage}
+            />
+
+            {/* Route for handling dataset token for uploading samples */}
+            <Route
+              exact
+              path="/voice-designer/dataset/:dataset_token/upload"
+              component={VoiceDesignerFormPage}
+            />
+
+            <Route path="/voice-designer">
               <VoiceDesignerMainPage />
             </Route>
 
