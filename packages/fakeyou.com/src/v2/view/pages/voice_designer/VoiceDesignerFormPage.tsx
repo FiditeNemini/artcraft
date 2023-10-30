@@ -84,7 +84,9 @@ function VoiceDesignerFormPage() {
         panel={false}
         showBackButton={true}
         backbuttonLabel="Back to Voice Designer"
-        backbuttonTo="/voice-designer"
+        backbuttonTo={
+          isEditMode ? "/voice-designer/datasets" : "/voice-designer/voices"
+        }
       />
 
       <Panel>
