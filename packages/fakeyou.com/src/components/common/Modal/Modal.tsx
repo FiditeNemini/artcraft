@@ -1,4 +1,7 @@
 import React, { useRef, useEffect } from "react";
+import Button from "../Button";
+import { faTrash, faTrashAlt } from "@fortawesome/pro-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 interface ModalProps {
   show: boolean;
@@ -44,7 +47,10 @@ const Modal: React.FC<ModalProps> = ({ show, handleClose, title, content }) => {
         <div className="modal-dialog modal-dialog-centered">
           <div className="modal-content">
             <div className="modal-header">
-              <h5 className="modal-title">{title}</h5>
+              <h5 className="modal-title">
+                <FontAwesomeIcon icon={faTrashAlt} className="me-3" />
+                {title}
+              </h5>
               <button
                 type="button"
                 className="btn-close"
@@ -54,14 +60,12 @@ const Modal: React.FC<ModalProps> = ({ show, handleClose, title, content }) => {
             </div>
             <div className="modal-body">{content}</div>
             <div className="modal-footer">
-              <button
-                type="button"
-                className="btn btn-secondary"
-                data-dismiss="modal"
+              <Button
+                variant="secondary"
+                label="Cancel"
                 onClick={handleClose}
-              >
-                Close
-              </button>
+              />
+              <Button variant="danger" label="Delete" onClick={handleClose} />
             </div>
           </div>
         </div>

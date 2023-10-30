@@ -115,8 +115,14 @@ function VoiceDesignerMainPage() {
       <Modal
         show={isModalOpen}
         handleClose={closeModal}
-        title="My Modal"
-        content={<p>This is a Bootstrap modal.</p>}
+        title="Delete Voice"
+        content={
+          <p>
+            Are you sure you want to delete "[Voice Name]"?
+            <br />
+            This cannot be undone.
+          </p>
+        }
       />
     </>
   );
