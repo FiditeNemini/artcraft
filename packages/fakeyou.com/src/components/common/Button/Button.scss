@@ -21,6 +21,13 @@
     width: 37.5px;
     height: 37.5px;
   }
+
+  &:disabled,
+  &.disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    pointer-events: none;
+  }
 }
 
 .button-primary,
@@ -32,6 +39,7 @@
   transition: 0.2s;
   color: $white !important;
 }
+
 .button-primary:hover {
   background-color: lighten($primary, 5%);
   border-color: lighten($primary, 5%);
@@ -84,4 +92,27 @@
 
 .button-small:hover {
   border: none;
+}
+
+.button-link {
+  border: none;
+  border-radius: 0;
+  background-color: transparent;
+  padding: 0;
+  color: $primary !important;
+  font-size: 16px !important;
+  transition: all 0.2s;
+
+  &:hover {
+    color: lighten($primary, 6%) !important;
+  }
+}
+
+/* Disabled styles */
+.btn-primary:disabled,
+.btn-secondary:disabled,
+.btn-danger:disabled,
+.btn-small:disabled,
+.btn-link:disabled {
+  @extend .disabled;
 }

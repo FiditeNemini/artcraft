@@ -81,15 +81,18 @@ import { UploadVoiceConversionModel } from "./pages/upload/UploadVoiceConversion
 import { VoiceConversionModelListItem } from "@storyteller/components/src/api/voice_conversion/ListVoiceConversionModels";
 import { CommunityCommissionsPage } from "./pages/contest/CommunityCommissionsPage";
 import { ProductUsageInfoPage } from "./pages/product_usage_info/ProductUsageInfoPage";
+import { VoiceDesignerFormPage } from "./pages/voice_designer/VoiceDesignerFormPage";
+import { GenerateSpeechPage } from "./pages/generate_speech/GenerateSpeechPage";
 import VcModelViewPage from "./pages/vc/vc_model_view/VcModelViewPage";
 import VcModelEditPage from "./pages/vc/vc_model_edit/VcModelEditPage";
 import VcModelDeletePage from "./pages/vc/vc_model_delete/VcModelDeletePage";
 import SideNav from "components/layout/SideNav/SideNav";
 import MobileMenu from "components/layout/MobileMenu/MobileMenu";
 import { TopNav } from "./nav/TopNav";
-import { TestingPage } from "./pages/testing/TestingPage";
 import TtsModelSearchPage from "./pages/tts/tts_model_search/TtsModelSearchPage";
 import MediaPage from "./pages/media/MediaPage";
+import { VoiceDesignerMainPage } from "./pages/voice_designer/VoiceDesignerMainPage";
+import { VoiceDesignerVoiceEditPage } from "./pages/voice_designer/VoiceDesignerVoiceEditPage";
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -584,17 +587,6 @@ class PageContainer extends React.Component<
               <AboutPage />
             </Route>
 
-            <Route path="/testing">
-              <TestingPage
-                sessionSubscriptionsWrapper={
-                  this.props.sessionSubscriptionsWrapper
-                }
-                enqueueInferenceJob={this.props.enqueueInferenceJob}
-                inferenceJobs={this.props.inferenceJobs}
-                inferenceJobsByCategory={this.props.inferenceJobsByCategory}
-              />
-            </Route>
-
             <Route path="/face-animator">
               <LipsyncEditor
                 {...{
@@ -625,6 +617,39 @@ class PageContainer extends React.Component<
 
             <Route path="/old">
               <VocodesPage />
+            </Route>
+
+            {/* Route for initial voice creation */}
+            <Route
+              exact
+              path="/voice-designer/create"
+              component={VoiceDesignerFormPage}
+            />
+
+            {/* Route for editing the dataset details */}
+            <Route
+              exact
+              path="/voice-designer/dataset/:dataset_token/edit"
+              component={VoiceDesignerFormPage}
+            />
+
+            {/* Route for handling dataset token for uploading samples */}
+            <Route
+              exact
+              path="/voice-designer/dataset/:dataset_token/upload"
+              component={VoiceDesignerFormPage}
+            />
+
+            <Route path="/voice-designer/voice/:voice_token/edit">
+              <VoiceDesignerVoiceEditPage />
+            </Route>
+
+            <Route path="/voice-designer">
+              <VoiceDesignerMainPage />
+            </Route>
+
+            <Route path="/generate-speech">
+              <GenerateSpeechPage />
             </Route>
 
             <Route path="/character/donald-trump">

@@ -10,7 +10,7 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   label?: string | null;
   icon?: IconDefinition;
   small?: boolean;
-  variant?: "primary" | "secondary" | "danger";
+  variant?: "primary" | "secondary" | "danger" | "link";
   to?: string;
   href?: string;
   target?: "_blank" | "_self";
@@ -19,6 +19,7 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   full?: boolean;
   iconFlip?: boolean;
   download?: boolean | string;
+  disabled?: boolean;
 }
 
 export default function Button({
@@ -34,6 +35,7 @@ export default function Button({
   full = false,
   iconFlip = false,
   download,
+  disabled,
   ...rest
 }: ButtonProps) {
   let iconMarginClass = !square && label ? (iconFlip ? "ms-2" : "me-2") : "";
@@ -49,6 +51,7 @@ export default function Button({
     className: `${externalClass} button ${small ? "button-small" : ""} ${
       square ? (small ? "button-square-small" : "button-square") : ""
     } button-${variant} ${full ? "w-100" : ""}`,
+    disabled: disabled,
   };
 
   delete rest.className;

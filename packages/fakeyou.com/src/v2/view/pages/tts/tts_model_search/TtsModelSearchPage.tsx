@@ -87,11 +87,12 @@ export default function TtsModelSearchPage(props: TtsModelSearchPageProps) {
         title="Text to Speech"
         titleIcon={faMessageDots}
         subText="Turn text into your favorite character's voice."
-        showButton={true}
-        buttonLabel="Create a voice"
-        buttonVariant="secondary"
-        buttonTo="/voice-designer"
+        // showButton={true}
+        // buttonLabel="Create a voice"
+        // buttonVariant="secondary"
+        // buttonTo="/voice-designer"
         extension={searchTts}
+        panel={false}
       />
       <Panel padding={true}>
         <div className="d-flex gap-2 mb-4">
