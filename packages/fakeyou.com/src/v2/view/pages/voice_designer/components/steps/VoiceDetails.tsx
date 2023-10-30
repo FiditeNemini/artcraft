@@ -5,9 +5,11 @@ import {
   // faTags,
 } from "@fortawesome/pro-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { Button } from "components/common";
+import Input from "components/common/Input";
 import useVoiceDetailsStore from "hooks/useVoiceDetailsStore/";
 import React from "react";
-import Select from "react-select";
+import Select from "components/common/Select";
 
 export const SearchFieldClass = {
   control: (state: any) =>
@@ -24,61 +26,71 @@ export const SearchFieldClass = {
     state.isFocused ? "select-separator" : "select-separator",
 };
 
-function VoiceDetails() {
+interface VoiceDetailsProps {
+  view?: "voice" | "dataset";
+}
+
+function VoiceDetails({ view }: VoiceDetailsProps) {
   const { name, visibility, setName, setVisibility } = useVoiceDetailsStore();
 
-  return (
-    <div className="d-flex flex-column gap-4">
-      <div className="row gy-4">
-        <div>
-          <label className="sub-title">Name</label>
-          <input
-            className="form-control"
-            type="text"
-            placeholder="Voice name"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-          />
+  if (view === "voice") {
+    return (
+      <div className="d-flex flex-column gap-4">
+        <div className="row gy-4">
+          <Input label="Name" placeholder="Voice name" />
         </div>
-      </div>
 
-      <div>
-        <label className="sub-title">Language</label>
-        <div className="input-icon-search">
-          <span className="form-control-feedback">
-            <FontAwesomeIcon icon={faLanguage} />
-          </span>
+        <div>
           <Select
             classNames={SearchFieldClass}
             value="English"
             defaultValue="English"
             placeholder="English"
+            icon={faLanguage}
+            label="Language"
           />
         </div>
-      </div>
 
-      {/* <div>
-        <label className="sub-title">Description</label>
-        <textarea
-          className="form-control"
-          placeholder="Describe the voice - eg. Squeaky male cartoon character voice"
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
-        />
-      </div> */}
-
-      <div>
-        <label className="sub-title">Visibility</label>
-        <div className="input-icon-search">
-          <span className="form-control-feedback">
-            <FontAwesomeIcon icon={faEye} />
-          </span>
+        <div>
           <Select
             classNames={SearchFieldClass}
             value={visibility}
             onChange={(e) => setVisibility(e.target.value)}
+            icon={faEye}
+            label="Visibility"
           />
         </div>
+
+        <Button label="Save" />
+      </div>
+    );
+  }
+
+  return (
+    <div className="d-flex flex-column gap-4">
+      <div className="row gy-4">
+        <Input label="Name" placeholder="Voice name" />
+      </div>
+
+      <div>
+        <Select
+          classNames={SearchFieldClass}
+          value="English"
+          defaultValue="English"
+          placeholder="English"
+          icon={faLanguage}
+          label="Language"
+        />
+      </div>
+
+      <div>
+        <Select
+          classNames={SearchFieldClass}
+          value={visibility}
+          onChange={(e) => setVisibility(e.target.value)}
+          icon={faEye}
+          label="Visibility"
+        />
       </div>
     </div>
   );

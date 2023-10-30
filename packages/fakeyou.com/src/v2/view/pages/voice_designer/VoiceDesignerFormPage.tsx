@@ -10,7 +10,6 @@ import { VoiceDetails } from "./components/steps/VoiceDetails";
 import PageHeader from "components/layout/PageHeader";
 import Container from "components/common/Container";
 import { useHistory } from "react-router-dom";
-import BackButton from "components/common/BackButton";
 
 interface RouteParams {
   dataset_token?: string;

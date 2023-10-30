@@ -6,14 +6,14 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 interface ListItemsProps {
   data: any[];
-  type: "voices" | "datasets";
+  type: "voice" | "dataset";
 }
 
 export default function ListItems({ data, type }: ListItemsProps) {
   if (data.length === 0) {
     return (
       <div className="d-flex flex-column list-items p-5 align-items-center">
-        {type === "voices" && (
+        {type === "voice" && (
           <>
             <h5 className="fw-semibold mb-3">
               You haven't created any voices.
@@ -26,7 +26,7 @@ export default function ListItems({ data, type }: ListItemsProps) {
             />
           </>
         )}
-        {type === "datasets" && (
+        {type === "dataset" && (
           <>
             <h5 className="fw-semibold mb-3">
               Datasets will appear after creating voices.
@@ -49,11 +49,11 @@ export default function ListItems({ data, type }: ListItemsProps) {
         return (
           <div className="d-flex flex-column flex-lg-row gap-3 list-items p-3 align-items-lg-center">
             <div className="d-inline-flex flex-wrap align-items-center flex-grow-1 gap-2">
-              {type === "datasets" && (
+              {type === "dataset" && (
                 <span className="dataset-badge mb-0">Dataset</span>
               )}
               <h5 className="fw-semibold mb-0">
-                {type === "voices" && (
+                {type === "voice" && (
                   <FontAwesomeIcon
                     icon={faMicrophone}
                     className="me-2 me-lg-3"
@@ -83,15 +83,23 @@ export default function ListItems({ data, type }: ListItemsProps) {
                       label="Edit"
                       small={true}
                       variant="secondary"
-                      to={`/voice-designer/dataset/${item.modelToken}/edit`}
+                      to={
+                        type === "dataset"
+                          ? `/voice-designer/dataset/${item.modelToken}/edit`
+                          : `/voice-designer/voice/${item.modelToken}/edit`
+                      }
                     />
                     <Button
                       label="Delete"
                       small={true}
                       variant="danger"
-                      to={`/voice-designer/dataset/${item.modelToken}/delete`}
+                      to={
+                        type === "dataset"
+                          ? `/voice-designer/dataset/${item.modelToken}/delete`
+                          : `/voice-designer/voice/${item.modelToken}/delete`
+                      }
                     />
-                    {type === "voices" && (
+                    {type === "voice" && (
                       <Button
                         label="Use Voice"
                         small={true}

@@ -1400,6 +1400,7 @@ styles with important tags:
 
   .bg-stepper {
     background-color: lighten($panel, 4%);
+    border-radius: 0.5rem 0.5rem 0rem 0rem;
   }
 
   .stepper-container {

@@ -19,7 +19,7 @@ export default function Panel({
 }: PanelProps) {
   return (
     <div
-      className={`panel ${clear ? "panel-clear" : "overflow-hidden"} ${
+      className={`panel ${clear && "panel-clear"} ${
         padding ? "p-3 py-4 p-md-4" : ""
       }
         ${mb ? "mb-4" : ""} ${mt ? "mt-4" : ""} ${className || ""}`}

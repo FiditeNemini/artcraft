@@ -12,6 +12,7 @@ interface SelectProps extends ReactSelectProps {
   label?: string;
   rounded?: boolean;
   small?: boolean;
+  onChange?: (value: any) => void;
 }
 
 export default function Select({

@@ -92,6 +92,7 @@ import { TopNav } from "./nav/TopNav";
 import TtsModelSearchPage from "./pages/tts/tts_model_search/TtsModelSearchPage";
 import MediaPage from "./pages/media/MediaPage";
 import { VoiceDesignerMainPage } from "./pages/voice_designer/VoiceDesignerMainPage";
+import { VoiceDesignerVoiceEditPage } from "./pages/voice_designer/VoiceDesignerVoiceEditPage";
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -638,6 +639,10 @@ class PageContainer extends React.Component<
               path="/voice-designer/dataset/:dataset_token/upload"
               component={VoiceDesignerFormPage}
             />
+
+            <Route path="/voice-designer/voice/:voice_token/edit">
+              <VoiceDesignerVoiceEditPage />
+            </Route>
 
             <Route path="/voice-designer">
               <VoiceDesignerMainPage />

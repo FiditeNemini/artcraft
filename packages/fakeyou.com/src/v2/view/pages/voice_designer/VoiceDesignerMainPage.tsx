@@ -30,11 +30,11 @@ function VoiceDesignerMainPage() {
   const emptyList = [] as any[];
 
   function MyVoices() {
-    return <ListItems type="voices" data={voicesList} />;
+    return <ListItems type="voice" data={voicesList} />;
   }
 
   function MyDatasets() {
-    return <ListItems type="datasets" data={datasetList} />;
+    return <ListItems type="dataset" data={datasetList} />;
   }
 
   return (
