@@ -110,7 +110,7 @@ export default function ListItems({
                       <Button
                         label="Use Voice"
                         small={true}
-                        to={`/voice-designer/dataset/${item.modelToken}`}
+                        to={`/voice-designer/voice/${item.modelToken}`}
                       />
                     )}
                   </div>
