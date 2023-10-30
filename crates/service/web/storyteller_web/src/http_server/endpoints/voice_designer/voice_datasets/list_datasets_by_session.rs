@@ -4,7 +4,6 @@ use std::sync::Arc;
 use actix_web::{HttpRequest, HttpResponse, web};
 use actix_web::error::ResponseError;
 use actix_web::http::StatusCode;
-use actix_web::web::Path;
 use chrono::{DateTime, Utc};
 use log::warn;
 
@@ -38,11 +37,6 @@ pub struct ListDatasetsByUserSuccessResponse {
   pub datasets: Vec<ZsDatasetRecord>,
 }
 
-#[derive(Deserialize)]
-pub struct ListDatasetsByUserPathInfo {
-  username: String,
-}
-
 #[derive(Debug)]
 pub enum ListDatasetsByUserError {
   NotAuthorized,
@@ -64,36 +58,30 @@ impl ResponseError for ListDatasetsByUserError {
   }
 }
 
-pub async fn list_datasets_by_user_handler(
+pub async fn list_datasets_by_session_handler(
   http_request: HttpRequest,
-  path: Path<ListDatasetsByUserPathInfo>,
   server_state: web::Data<Arc<ServerState>>
 ) -> Result<HttpResponse, ListDatasetsByUserError> {
 
-  let maybe_user_session = server_state
+  let user_session = server_state
       .session_checker
       .maybe_get_user_session(&http_request, &server_state.mysql_pool)
       .await
       .map_err(|e| {
         warn!("Session checker error: {:?}", e);
         ListDatasetsByUserError::ServerError
+      })?
+      .ok_or_else(|| {
+        warn!("not logged in");
+        ListDatasetsByUserError::NotAuthorized
       })?;
 
-  let user_session = match maybe_user_session {
-    Some(session) => session,
-    None => {
-      warn!("not logged in");
-      return Err(ListDatasetsByUserError::NotAuthorized);
-    }
-  };
 
-  let username = path.username.as_ref();
-  let creator_user_token = user_session.user_token.clone();
   let is_mod = user_session.can_ban_users;
 
   let query_results = list_datasets_by_username(
     &server_state.mysql_pool,
-    &username,
+    &user_session.username,
     is_mod,
   ).await.map_err(|e| {
     warn!("Error querying for datasets: {:?}", e);

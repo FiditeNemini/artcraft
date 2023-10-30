@@ -8,21 +8,24 @@ use actix_web::web::Path;
 use chrono::{DateTime, Utc};
 use log::warn;
 
+use enums::common::visibility::Visibility;
 use mysql_queries::queries::voice_designer::voices::list_voices_by_username::list_zs_voices_by_username;
-use tokens::tokens::users::UserToken;
 use tokens::tokens::zs_voices::ZsVoiceToken;
 
+use crate::http_server::common_responses::user_details_lite::UserDetailsLight;
 use crate::server_state::ServerState;
 
 #[derive(Serialize, Clone)]
 pub struct Voice {
   voice_token: ZsVoiceToken,
   title: String,
-  creator_set_visibility: String,
+
   ietf_language_tag: String,
   ietf_primary_language_subtag: String,
-  creator_user_token: UserToken,
-  creator_username: String,
+
+  creator: UserDetailsLight,
+
+  creator_set_visibility: Visibility,
 
   created_at: DateTime<Utc>,
   updated_at: DateTime<Utc>,
@@ -61,7 +64,7 @@ impl ResponseError for ListVoicesByUserError {
   }
 }
 
-pub async fn list_voices_by_user(
+pub async fn list_voices_by_user_handler(
   http_request: HttpRequest,
   path: Path<ListVoicesByUserPathInfo>,
   server_state: web::Data<Arc<ServerState>>
@@ -108,12 +111,15 @@ pub async fn list_voices_by_user(
     Voice {
       voice_token: voice.voice_token,
       title: voice.title,
-      creator_set_visibility: voice.creator_set_visibility.to_string() ,
       ietf_language_tag: voice.ietf_language_tag,
       ietf_primary_language_subtag: voice.ietf_primary_language_subtag,
-      creator_user_token: voice.creator_user_token,
-      creator_username: voice.creator_username,
-
+      creator: UserDetailsLight::from_db_fields(
+        &voice.creator_user_token,
+        &voice.creator_username,
+        &voice.creator_display_name,
+        &voice.creator_email_gravatar_hash,
+      ),
+      creator_set_visibility: voice.creator_set_visibility,
       created_at: voice.created_at,
       updated_at: voice.updated_at,
     }
