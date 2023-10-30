@@ -12,33 +12,37 @@ use tokens::tokens::zs_voices::ZsVoiceToken;
 // FIXME: This is the old style of query scoping and shouldn't be copied.
 
 #[derive(Serialize)]
-pub struct VoiceRecordForList {
+pub struct VoiceRecord {
     pub voice_token: ZsVoiceToken,
     pub title: String,
-    pub creator_set_visibility: Visibility,
     pub ietf_language_tag: String,
     pub ietf_primary_language_subtag: String,
+
     pub creator_user_token: UserToken,
     pub creator_username: String,
+    pub creator_display_name: String,
+    pub creator_email_gravatar_hash: String,
+
+    pub creator_set_visibility: Visibility,
 
     pub created_at: DateTime<Utc>,
     pub updated_at: DateTime<Utc>,
 }
 
-pub async fn list_voices_by_user_token(
+pub async fn list_zs_voices_by_username(
     mysql_pool: &MySqlPool,
     creator_username: &str,
     can_see_deleted: bool,
-) -> AnyhowResult<Vec<VoiceRecordForList>> {
+) -> AnyhowResult<Vec<VoiceRecord>> {
     let mut connection = mysql_pool.acquire().await?;
-    list_voices_with_connection(&mut connection, creator_username, can_see_deleted).await
+    list_zs_voices_by_username_with_connection(&mut connection, creator_username, can_see_deleted).await
 }
 
-pub async fn list_voices_with_connection(
+pub async fn list_zs_voices_by_username_with_connection(
     mysql_connection: &mut PoolConnection<MySql>,
     creator_username: &str,
     can_see_deleted: bool,
-) -> AnyhowResult<Vec<VoiceRecordForList>> {
+) -> AnyhowResult<Vec<VoiceRecord>> {
 
     let maybe_voices = list_voices_by_creator_username(mysql_connection, creator_username, can_see_deleted)
                 .await;
@@ -60,7 +64,7 @@ pub async fn list_voices_with_connection(
 
     Ok(voices.into_iter()
         .map(|voice| {
-            VoiceRecordForList{
+            VoiceRecord {
                 voice_token: voice.token,
                 title: voice.title,
                 creator_set_visibility: voice.creator_set_visibility,
@@ -68,7 +72,8 @@ pub async fn list_voices_with_connection(
                 ietf_primary_language_subtag: voice.ietf_primary_language_subtag,
                 creator_user_token: voice.creator_user_token,
                 creator_username: voice.creator_username,
-
+                creator_display_name: voice.creator_display_name,
+                creator_email_gravatar_hash: voice.creator_email_gravatar_hash,
                 created_at: voice.created_at,
                 updated_at: voice.updated_at,
             }
@@ -76,7 +81,7 @@ pub async fn list_voices_with_connection(
         .filter(|voice| {
            creator_username == voice.creator_username || voice.creator_set_visibility == Visibility::Public || can_see_deleted
         })
-        .collect::<Vec<VoiceRecordForList>>())
+        .collect::<Vec<VoiceRecord>>())
 }
 
 
@@ -99,6 +104,8 @@ async fn list_voices_by_creator_username(
             zv.ietf_primary_language_subtag,
             users.token as `creator_user_token: tokens::tokens::users::UserToken`,
             users.username as creator_username,
+            users.display_name as creator_display_name,
+            users.email_gravatar_hash as creator_email_gravatar_hash,
             zv.creator_set_visibility as `creator_set_visibility: enums::common::visibility::Visibility`,
             zv.created_at,
             zv.updated_at
@@ -126,6 +133,8 @@ async fn list_voices_by_creator_username(
             zv.ietf_primary_language_subtag,
             users.token as `creator_user_token: tokens::tokens::users::UserToken`,
             users.username as creator_username,
+            users.display_name as creator_display_name,
+            users.email_gravatar_hash as creator_email_gravatar_hash,
             zv.creator_set_visibility as `creator_set_visibility: enums::common::visibility::Visibility`,
             zv.created_at,
             zv.updated_at
@@ -150,6 +159,8 @@ struct InternalRawVoiceRecordForList {
     ietf_primary_language_subtag: String,
     creator_user_token: UserToken,
     creator_username: String,
+    creator_display_name: String,
+    creator_email_gravatar_hash: String,
     creator_set_visibility: Visibility,
     created_at: DateTime<Utc>,
     updated_at: DateTime<Utc>,

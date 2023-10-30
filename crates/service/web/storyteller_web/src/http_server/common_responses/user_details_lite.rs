@@ -30,6 +30,21 @@ pub struct UserDetailsLight {
 
 impl UserDetailsLight {
 
+  pub fn from_db_fields(
+    user_token: &UserToken,
+    username: &str,
+    display_name: &str,
+    gravatar_hash: &str,
+  ) -> Self {
+    Self {
+      default_avatar: DefaultAvatarInfo::from_username(&username),
+      user_token: user_token.clone(),
+      username: username.to_string(),
+      display_name: display_name.to_string(),
+      gravatar_hash: gravatar_hash.to_string(),
+    }
+  }
+
   pub fn from_optional_db_fields(
     maybe_user_token: Option<&UserToken>,
     maybe_username: Option<&str>,

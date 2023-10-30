@@ -109,19 +109,19 @@ use crate::http_server::endpoints::voice_conversion::inference::enqueue_voice_co
 use crate::http_server::endpoints::voice_conversion::models::list_voice_conversion_models::list_voice_conversion_models_handler;
 use crate::http_server::endpoints::voice_designer::inference::enqueue_tts_request::enqueue_tts_request;
 use crate::http_server::endpoints::voice_designer::inference::enqueue_vc_request::enqueue_vc_request;
-use crate::http_server::endpoints::voice_designer::list_favorite_models::list_favorite_models;
-use crate::http_server::endpoints::voice_designer::list_user_models::list_user_models;
 use crate::http_server::endpoints::voice_designer::voice_dataset_samples::delete_sample::delete_sample_handler;
 use crate::http_server::endpoints::voice_designer::voice_dataset_samples::list_samples_by_dataset::list_samples_by_dataset_handler;
 use crate::http_server::endpoints::voice_designer::voice_dataset_samples::upload_sample::upload_sample_handler;
 use crate::http_server::endpoints::voice_designer::voice_datasets::create_dataset::create_dataset_handler;
 use crate::http_server::endpoints::voice_designer::voice_datasets::delete_dataset::delete_dataset_handler;
+use crate::http_server::endpoints::voice_designer::voice_datasets::list_datasets_by_session::list_datasets_by_session_handler;
 use crate::http_server::endpoints::voice_designer::voice_datasets::list_datasets_by_user::list_datasets_by_user_handler;
 use crate::http_server::endpoints::voice_designer::voice_datasets::update_dataset::update_dataset_handler;
 use crate::http_server::endpoints::voice_designer::voices::create_voice::create_voice_handler;
 use crate::http_server::endpoints::voice_designer::voices::delete_voice::delete_voice_handler;
-use crate::http_server::endpoints::voice_designer::voices::list_available_voices::list_available_voices;
-use crate::http_server::endpoints::voice_designer::voices::list_voices_by_user::list_voices_by_user;
+use crate::http_server::endpoints::voice_designer::voices::list_available_voices::list_available_voices_handler;
+use crate::http_server::endpoints::voice_designer::voices::list_voices_by_session::list_voices_by_session_handler;
+use crate::http_server::endpoints::voice_designer::voices::list_voices_by_user::list_voices_by_user_handler;
 use crate::http_server::endpoints::voice_designer::voices::search_voices::search_voices;
 use crate::http_server::endpoints::voice_designer::voices::update_voice::update_voice_handler;
 use crate::http_server::endpoints::w2l::delete_w2l_result::delete_w2l_inference_result_handler;
@@ -1164,7 +1164,7 @@ fn add_voice_designer_routes<T,B> (app:App<T>)-> App<T>
         app.service(
           web::scope("/v1/voice_designer")
               .service(
-                  web::scope("/datasets")
+                  web::scope("/dataset")
                       .route("/create", web::post().to(create_dataset_handler))
                       .service(web::resource("/{dataset_token}/update")
                           .route(web::post().to(update_dataset_handler))
@@ -1172,13 +1172,17 @@ fn add_voice_designer_routes<T,B> (app:App<T>)-> App<T>
                       )
                       .route("/{dataset_token}/delete", web::delete().to(delete_dataset_handler))
                       .route("/user/{username}/list", web::get().to(list_datasets_by_user_handler))
+                      .route("/session/list", web::get().to(list_datasets_by_session_handler))
               )
               .service(
                   web::scope("/voice")
+                      .route("/list", web::get().to(list_available_voices_handler))
+                      .route("/search", web::post().to(search_voices))
                       .route("/create", web::post().to(create_voice_handler))
                       .route("/{voice_token}/update", web::post().to(update_voice_handler))
                       .route("/{voice_token}/delete", web::delete().to(delete_voice_handler))
-                      .route("/user/{username}/list", web::get().to(list_voices_by_user))
+                      .route("/user/{username}/list", web::get().to(list_voices_by_user_handler))
+                      .route("/session/list", web::get().to(list_voices_by_session_handler))
               )
               .service(
                   web::scope("/sample")
@@ -1191,13 +1195,6 @@ fn add_voice_designer_routes<T,B> (app:App<T>)-> App<T>
                       .route("/enqueue_tts", web::post().to(enqueue_tts_request))
                       .route("/enqueue_vc", web::post().to(enqueue_vc_request))
               )
-              .service(
-                  web::scope("/inventory")
-                      .route("/list", web::get().to(list_available_voices))
-                      .route("/user_list", web::get().to(list_user_models))
-                      .route("/favorites_list", web::get().to(list_favorite_models))
-                      .route("/search", web::get().to(search_voices))
-              )
-      )      
+      )
 }
 

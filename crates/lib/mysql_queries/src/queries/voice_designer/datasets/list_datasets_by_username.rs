@@ -6,18 +6,22 @@ use sqlx::pool::PoolConnection;
 
 use enums::common::visibility::Visibility;
 use errors::AnyhowResult;
+use tokens::tokens::users::UserToken;
 use tokens::tokens::zs_voice_datasets::ZsVoiceDatasetToken;
-
 
 // FIXME: This is the old style of query scoping and shouldn't be copied.
 
 #[derive(Serialize)]
-pub struct DatasetRecordForList {
-    pub dataset_token: String,
+pub struct DatasetRecord {
+    pub dataset_token: ZsVoiceDatasetToken,
     pub title: String,
-    pub creator_set_visibility: Visibility,
-    pub creator_user_token: String,
+
+    pub creator_user_token: UserToken,
     pub creator_username: String,
+    pub creator_display_name: String,
+    pub creator_email_gravatar_hash: String,
+    pub creator_set_visibility: Visibility,
+
     pub ietf_language_tag: String,
     pub ietf_primary_language_subtag: String,
 
@@ -25,20 +29,20 @@ pub struct DatasetRecordForList {
     pub updated_at: DateTime<Utc>,
 }
 
-pub async fn list_datasets_by_user_token(
+pub async fn list_datasets_by_username(
     mysql_pool: &MySqlPool,
     username: &str,
     can_see_deleted: bool,
-) -> AnyhowResult<Vec<DatasetRecordForList>> {
+) -> AnyhowResult<Vec<DatasetRecord>> {
     let mut connection = mysql_pool.acquire().await?;
-    list_datasets_with_connection(&mut connection, username, can_see_deleted).await
+    list_datasets_by_username_with_connection(&mut connection, username, can_see_deleted).await
 }
 
-pub async fn list_datasets_with_connection(
+pub async fn list_datasets_by_username_with_connection(
     mysql_connection: &mut PoolConnection<MySql>,
     creator_username: &str,
     can_see_deleted: bool,
-) -> AnyhowResult<Vec<DatasetRecordForList>> {
+) -> AnyhowResult<Vec<DatasetRecord>> {
 
     let datasets =
             list_datasets_by_creator_username(mysql_connection, creator_username, can_see_deleted)
@@ -61,15 +65,16 @@ pub async fn list_datasets_with_connection(
 
     Ok(datasets.into_iter()
         .map(|dataset| {
-            DatasetRecordForList{
-                dataset_token: dataset.token.to_string(),
+            DatasetRecord {
+                dataset_token: dataset.token,
                 title: dataset.title,
-                creator_set_visibility: dataset.creator_set_visibility,
                 ietf_language_tag: dataset.ietf_language_tag,
                 ietf_primary_language_subtag: dataset.ietf_primary_language_subtag,
                 creator_user_token: dataset.creator_user_token,
                 creator_username: dataset.creator_username,
-
+                creator_display_name: dataset.creator_display_name,
+                creator_email_gravatar_hash: dataset.creator_email_gravatar_hash,
+                creator_set_visibility: dataset.creator_set_visibility,
                 created_at: dataset.created_at,
                 updated_at: dataset.updated_at,
             }
@@ -77,7 +82,7 @@ pub async fn list_datasets_with_connection(
         .filter(|dataset| {
             dataset.creator_username == creator_username || dataset.creator_set_visibility == Visibility::Public || can_see_deleted
         })
-        .collect::<Vec<DatasetRecordForList>>())
+        .collect::<Vec<DatasetRecord>>())
 }
 
 
@@ -98,8 +103,10 @@ async fn list_datasets_by_creator_username(
             zd.title,
             zd.ietf_language_tag,
             zd.ietf_primary_language_subtag,
-            users.token as creator_user_token,
+            users.token as `creator_user_token: tokens::tokens::users::UserToken`,
             users.username as creator_username,
+            users.display_name as creator_display_name,
+            users.email_gravatar_hash as creator_email_gravatar_hash,
             zd.creator_set_visibility as `creator_set_visibility: enums::common::visibility::Visibility`,
             zd.created_at,
             zd.updated_at
@@ -125,8 +132,10 @@ async fn list_datasets_by_creator_username(
             zd.title,
             zd.ietf_language_tag,
             zd.ietf_primary_language_subtag,
-            users.token as creator_user_token,
+            users.token as `creator_user_token: tokens::tokens::users::UserToken`,
             users.username as creator_username,
+            users.display_name as creator_display_name,
+            users.email_gravatar_hash as creator_email_gravatar_hash,
             zd.creator_set_visibility as `creator_set_visibility: enums::common::visibility::Visibility`,
             zd.created_at,
             zd.updated_at
@@ -149,8 +158,10 @@ struct InternalRawDatasetRecordForList {
     title: String,
     ietf_language_tag: String,
     ietf_primary_language_subtag: String,
-    creator_user_token: String,
+    creator_user_token: UserToken,
     creator_username: String,
+    creator_display_name: String,
+    creator_email_gravatar_hash: String,
     creator_set_visibility: Visibility,
     created_at: DateTime<Utc>,
     updated_at: DateTime<Utc>,
