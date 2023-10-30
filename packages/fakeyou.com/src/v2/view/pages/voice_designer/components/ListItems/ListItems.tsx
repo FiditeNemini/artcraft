@@ -7,9 +7,16 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 interface ListItemsProps {
   data: any[];
   type: "voice" | "dataset";
+  handleDeleteVoice?: () => void;
+  handleDeleteDataset?: () => void;
 }
 
-export default function ListItems({ data, type }: ListItemsProps) {
+export default function ListItems({
+  data,
+  type,
+  handleDeleteDataset,
+  handleDeleteVoice,
+}: ListItemsProps) {
   if (data.length === 0) {
     return (
       <div className="d-flex flex-column list-items p-5 align-items-center">
@@ -93,10 +100,10 @@ export default function ListItems({ data, type }: ListItemsProps) {
                       label="Delete"
                       small={true}
                       variant="danger"
-                      to={
+                      onClick={
                         type === "dataset"
-                          ? `/voice-designer/dataset/${item.modelToken}/delete`
-                          : `/voice-designer/voice/${item.modelToken}/delete`
+                          ? handleDeleteDataset
+                          : handleDeleteVoice
                       }
                     />
                     {type === "voice" && (

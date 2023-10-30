@@ -26,45 +26,8 @@ export const SearchFieldClass = {
     state.isFocused ? "select-separator" : "select-separator",
 };
 
-interface VoiceDetailsProps {
-  view?: "voice" | "dataset";
-}
-
-function VoiceDetails({ view }: VoiceDetailsProps) {
+function VoiceDetails() {
   const { name, visibility, setName, setVisibility } = useVoiceDetailsStore();
-
-  if (view === "voice") {
-    return (
-      <div className="d-flex flex-column gap-4">
-        <div className="row gy-4">
-          <Input label="Name" placeholder="Voice name" />
-        </div>
-
-        <div>
-          <Select
-            classNames={SearchFieldClass}
-            value="English"
-            defaultValue="English"
-            placeholder="English"
-            icon={faLanguage}
-            label="Language"
-          />
-        </div>
-
-        <div>
-          <Select
-            classNames={SearchFieldClass}
-            value={visibility}
-            onChange={(e) => setVisibility(e.target.value)}
-            icon={faEye}
-            label="Visibility"
-          />
-        </div>
-
-        <Button label="Save" />
-      </div>
-    );
-  }
 
   return (
     <div className="d-flex flex-column gap-4">
