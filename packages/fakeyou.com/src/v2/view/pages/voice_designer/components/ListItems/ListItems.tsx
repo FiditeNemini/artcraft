@@ -64,27 +64,43 @@ export default function ListItems({ data, type }: ListItemsProps) {
             </div>
 
             <div className="d-flex">
-              <div className="d-flex gap-2">
-                <Button
-                  label="Edit"
-                  small={true}
-                  variant="secondary"
-                  to={`/voice-designer/dataset/${item.modelToken}/edit`}
-                />
-                <Button
-                  label="Delete"
-                  small={true}
-                  variant="danger"
-                  to={`/voice-designer/dataset/${item.modelToken}/delete`}
-                />
-                {type === "voices" && (
-                  <Button
-                    label="Use Voice"
-                    small={true}
-                    to={`/voice-designer/dataset/${item.modelToken}`}
-                  />
-                )}
-              </div>
+              {item.isCreating ? (
+                <div className="d-flex align-items-center gap-2 py-1">
+                  <p className="fw-medium opacity-75">
+                    Voice is being created...
+                  </p>
+                  <div
+                    className="spinner-border spinner-border-sm text-light"
+                    role="status"
+                  >
+                    <span className="visually-hidden">Loading...</span>
+                  </div>
+                </div>
+              ) : (
+                <>
+                  <div className="d-flex gap-2">
+                    <Button
+                      label="Edit"
+                      small={true}
+                      variant="secondary"
+                      to={`/voice-designer/dataset/${item.modelToken}/edit`}
+                    />
+                    <Button
+                      label="Delete"
+                      small={true}
+                      variant="danger"
+                      to={`/voice-designer/dataset/${item.modelToken}/delete`}
+                    />
+                    {type === "voices" && (
+                      <Button
+                        label="Use Voice"
+                        small={true}
+                        to={`/voice-designer/dataset/${item.modelToken}`}
+                      />
+                    )}
+                  </div>
+                </>
+              )}
             </div>
           </div>
         );

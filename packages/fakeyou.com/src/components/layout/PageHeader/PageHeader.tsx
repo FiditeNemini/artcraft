@@ -3,6 +3,7 @@ import Panel from "../../common/Panel";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { IconDefinition } from "@fortawesome/fontawesome-svg-core";
 import Button from "components/common/Button";
+import BackButton from "components/common/BackButton";
 
 interface PageHeaderProps {
   titleIcon?: IconDefinition;
@@ -16,8 +17,11 @@ interface PageHeaderProps {
   buttonTo?: string;
   buttonIcon?: IconDefinition;
   buttonOnClick?: () => void;
-  withImage?: boolean;
+  panel?: boolean;
   imageUrl?: string;
+  showBackButton?: boolean;
+  backbuttonTo?: string;
+  backbuttonLabel?: string;
 }
 
 export default function PageHeader({
@@ -32,19 +36,27 @@ export default function PageHeader({
   buttonTo,
   buttonIcon,
   buttonOnClick,
-  withImage,
+  panel = false,
   imageUrl,
+  showBackButton,
+  backbuttonTo,
+  backbuttonLabel,
 }: PageHeaderProps) {
   const icon = (
     <>{titleIcon && <FontAwesomeIcon icon={titleIcon} className="me-3" />}</>
   );
 
-  if (withImage) {
+  if (!panel) {
     return (
-      <div className="pt-3 pb-4 pt-lg-4">
+      <div className="py-3 py-lg-4">
         <Panel clear={true}>
+          {showBackButton && (
+            <div className="d-flex mb-3">
+              <BackButton label={backbuttonLabel} to={backbuttonTo} />
+            </div>
+          )}
           <div className="row">
-            <div className="d-flex flex-column col-lg-7 justify-content-center gap-4">
+            <div className="d-flex flex-column col-lg-7 justify-content-center gap-4 py-3">
               <div>
                 <h1 className="fw-bold">
                   {/* {icon} */}
@@ -66,7 +78,12 @@ export default function PageHeader({
             </div>
             <div className="d-none d-lg-block col-lg-5">
               {imageUrl && (
-                <img src={imageUrl} alt="Header" className="img-fluid my-3" />
+                <img
+                  src={imageUrl}
+                  alt="Header"
+                  className="img-fluid my-3"
+                  height="235"
+                />
               )}
             </div>
           </div>

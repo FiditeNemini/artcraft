@@ -10,6 +10,7 @@ import { VoiceDetails } from "./components/steps/VoiceDetails";
 import PageHeader from "components/layout/PageHeader";
 import Container from "components/common/Container";
 import { useHistory } from "react-router-dom";
+import BackButton from "components/common/BackButton";
 
 interface RouteParams {
   dataset_token?: string;
@@ -81,6 +82,10 @@ function VoiceDesignerFormPage() {
             ? "Edit your dataset by uploading more samples to create a new voice"
             : "Add voice details and upload audio samples to clone your voice!"
         }
+        panel={false}
+        showBackButton={true}
+        backbuttonLabel="Back to Voice Designer"
+        backbuttonTo="/voice-designer"
       />
 
       <Panel>
