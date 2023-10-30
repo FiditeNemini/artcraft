@@ -12,7 +12,7 @@ use tokens::tokens::zs_voices::ZsVoiceToken;
 // FIXME: This is the old style of query scoping and shouldn't be copied.
 
 #[derive(Serialize)]
-pub struct VoiceRecordForList {
+pub struct VoiceRecord {
     pub voice_token: ZsVoiceToken,
     pub title: String,
     pub creator_set_visibility: Visibility,
@@ -25,20 +25,20 @@ pub struct VoiceRecordForList {
     pub updated_at: DateTime<Utc>,
 }
 
-pub async fn list_voices_by_user_token(
+pub async fn list_zs_voices_by_username(
     mysql_pool: &MySqlPool,
     creator_username: &str,
     can_see_deleted: bool,
-) -> AnyhowResult<Vec<VoiceRecordForList>> {
+) -> AnyhowResult<Vec<VoiceRecord>> {
     let mut connection = mysql_pool.acquire().await?;
-    list_voices_with_connection(&mut connection, creator_username, can_see_deleted).await
+    list_zs_voices_by_username_with_connection(&mut connection, creator_username, can_see_deleted).await
 }
 
-pub async fn list_voices_with_connection(
+pub async fn list_zs_voices_by_username_with_connection(
     mysql_connection: &mut PoolConnection<MySql>,
     creator_username: &str,
     can_see_deleted: bool,
-) -> AnyhowResult<Vec<VoiceRecordForList>> {
+) -> AnyhowResult<Vec<VoiceRecord>> {
 
     let maybe_voices = list_voices_by_creator_username(mysql_connection, creator_username, can_see_deleted)
                 .await;
@@ -60,7 +60,7 @@ pub async fn list_voices_with_connection(
 
     Ok(voices.into_iter()
         .map(|voice| {
-            VoiceRecordForList{
+            VoiceRecord {
                 voice_token: voice.token,
                 title: voice.title,
                 creator_set_visibility: voice.creator_set_visibility,
@@ -76,7 +76,7 @@ pub async fn list_voices_with_connection(
         .filter(|voice| {
            creator_username == voice.creator_username || voice.creator_set_visibility == Visibility::Public || can_see_deleted
         })
-        .collect::<Vec<VoiceRecordForList>>())
+        .collect::<Vec<VoiceRecord>>())
 }
 
 

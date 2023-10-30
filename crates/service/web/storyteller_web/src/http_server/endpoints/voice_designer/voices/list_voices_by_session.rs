@@ -4,7 +4,6 @@ use std::sync::Arc;
 use actix_web::{HttpRequest, HttpResponse, web};
 use actix_web::error::ResponseError;
 use actix_web::http::StatusCode;
-use actix_web::web::Path;
 use chrono::{DateTime, Utc};
 use log::warn;
 
@@ -35,11 +34,6 @@ pub struct ListVoicesByUserSuccessResponse {
   pub voices: Vec<Voice>,
 }
 
-#[derive(Deserialize)]
-pub struct ListVoicesByUserPathInfo {
-  username: String,
-}
-
 #[derive(Debug)]
 pub enum ListVoicesByUserError {
   NotAuthorized,
@@ -61,36 +55,30 @@ impl ResponseError for ListVoicesByUserError {
   }
 }
 
-pub async fn list_voices_by_user(
+pub async fn list_voices_by_session(
   http_request: HttpRequest,
-  path: Path<ListVoicesByUserPathInfo>,
   server_state: web::Data<Arc<ServerState>>
 ) -> Result<HttpResponse, ListVoicesByUserError> {
 
-  let maybe_user_session = server_state
+  let user_session = server_state
       .session_checker
       .maybe_get_user_session(&http_request, &server_state.mysql_pool)
       .await
       .map_err(|e| {
         warn!("Session checker error: {:?}", e);
         ListVoicesByUserError::ServerError
+      })?
+      .ok_or_else(|| {
+        warn!("not logged in");
+        return ListVoicesByUserError::NotAuthorized;
       })?;
 
-  let user_session = match maybe_user_session {
-    Some(session) => session,
-    None => {
-      warn!("not logged in");
-      return Err(ListVoicesByUserError::NotAuthorized);
-    }
-  };
-
-  let username = path.username.as_ref();
   let creator_user_token = user_session.user_token.clone();
   let is_mod = user_session.can_ban_users;
 
   let query_results = list_zs_voices_by_username(
     &server_state.mysql_pool,
-    &username,
+    &user_session.username,
     is_mod,
   ).await.map_err(|e| {
     warn!("Error querying for voices: {:?}", e);
@@ -131,5 +119,3 @@ pub async fn list_voices_by_user(
       .content_type("application/json")
       .body(body))
 }
-
-
