@@ -11,14 +11,24 @@ import Modal from "components/common/Modal";
 function VoiceDesignerMainPage() {
   usePrefixedDocumentTitle("Voice Designer");
 
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isDeleteVoiceModalOpen, setIsDeleteVoiceModalOpen] = useState(false);
+  const [isDeleteDatasetModalOpen, setIsDeleteDatasetModalOpen] =
+    useState(false);
 
-  const openModal = () => {
-    setIsModalOpen(true);
+  const openDeleteVoiceModal = () => {
+    setIsDeleteVoiceModalOpen(true);
   };
 
-  const closeModal = () => {
-    setIsModalOpen(false);
+  const closeDeleteVoiceModal = () => {
+    setIsDeleteVoiceModalOpen(false);
+  };
+
+  const openDeleteDatasetModal = () => {
+    setIsDeleteDatasetModalOpen(true);
+  };
+
+  const closeDeleteDatasetModal = () => {
+    setIsDeleteDatasetModalOpen(false);
   };
 
   const voicesList = [
@@ -38,11 +48,15 @@ function VoiceDesignerMainPage() {
       modelToken: "dummyToken",
     },
   ];
-  const emptyList = [] as any[];
+  // const emptyList = [] as any[];
 
   function MyVoices() {
     return (
-      <ListItems type="voice" data={voicesList} handleDeleteVoice={openModal} />
+      <ListItems
+        type="voice"
+        data={voicesList}
+        handleDeleteVoice={openDeleteVoiceModal}
+      />
     );
   }
 
@@ -51,7 +65,7 @@ function VoiceDesignerMainPage() {
       <ListItems
         type="dataset"
         data={datasetList}
-        handleDeleteDataset={openModal}
+        handleDeleteDataset={openDeleteDatasetModal}
       />
     );
   }
@@ -112,13 +126,27 @@ function VoiceDesignerMainPage() {
         </Panel>
       </Container>
 
+      {/* Delete Voice Modal */}
       <Modal
-        show={isModalOpen}
-        handleClose={closeModal}
+        show={isDeleteVoiceModalOpen}
+        handleClose={closeDeleteVoiceModal}
         title="Delete Voice"
         content={
           <p>
             Are you sure you want to delete "[Voice Name]"?
+            <br />
+            This cannot be undone.
+          </p>
+        }
+      />
+      {/* Delete Dataset Modal */}
+      <Modal
+        show={isDeleteDatasetModalOpen}
+        handleClose={closeDeleteDatasetModal}
+        title="Delete Dataset"
+        content={
+          <p>
+            Are you sure you want to delete "[Dataset Name]"?
             <br />
             This cannot be undone.
           </p>

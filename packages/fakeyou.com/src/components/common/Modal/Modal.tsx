@@ -1,7 +1,8 @@
-import React, { useRef, useEffect } from "react";
+import React, { useRef, useEffect, useState } from "react";
 import Button from "../Button";
-import { faTrash, faTrashAlt } from "@fortawesome/pro-solid-svg-icons";
+import { faTrashAlt } from "@fortawesome/pro-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { useSpring, a } from "@react-spring/web";
 
 interface ModalProps {
   show: boolean;
@@ -13,6 +14,14 @@ interface ModalProps {
 const Modal: React.FC<ModalProps> = ({ show, handleClose, title, content }) => {
   const modalRef = useRef<HTMLDivElement>(null);
 
+  const fadeIn = useSpring({
+    opacity: show ? 1 : 0,
+    config: { duration: 80, easing: (t) => t },
+    onRest: () => {
+      if (!show) handleClose();
+    },
+  });
+
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
@@ -23,11 +32,9 @@ const Modal: React.FC<ModalProps> = ({ show, handleClose, title, content }) => {
       }
     };
 
-    // Attach the event listener to the document
     document.addEventListener("mousedown", handleClickOutside);
 
     return () => {
-      // Clean up the event listener
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, [handleClose]);
@@ -37,7 +44,7 @@ const Modal: React.FC<ModalProps> = ({ show, handleClose, title, content }) => {
   }
 
   return (
-    <div className="modal-backdrop">
+    <a.div style={fadeIn} className="modal-backdrop">
       <div
         ref={modalRef}
         className="modal"
@@ -70,7 +77,7 @@ const Modal: React.FC<ModalProps> = ({ show, handleClose, title, content }) => {
           </div>
         </div>
       </div>
-    </div>
+    </a.div>
   );
 };
 
