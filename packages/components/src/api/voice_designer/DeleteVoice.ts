@@ -1,4 +1,4 @@
-import { GrabEndpoint } from "../GrabEndpoint"
+import MakeRequest from "../MakeRequest";
 
 interface DreateVoiceRequest {
   set_delete: boolean,
@@ -9,9 +9,9 @@ interface DreateVoiceResponse {
   success: boolean
 }
 
-const DeleteVoice = GrabEndpoint<string, DreateVoiceRequest, DreateVoiceResponse>({
+const DeleteVoice = MakeRequest<string, DreateVoiceRequest, DreateVoiceResponse>({
   method: "POST", 
-  routingFunction: (voiceToken:  string) => `${ voiceToken }/delete`,
+  routingFunction: (voiceToken:  string) => `/${ voiceToken }/delete`,
 });
 
 

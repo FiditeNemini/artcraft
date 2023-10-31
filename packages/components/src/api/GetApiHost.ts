@@ -1,26 +1,30 @@
-const GetApiHost = () => {
-  switch (document.location.host.split(":")[0]) { // strip ports
+// interface ApiDetails { hostname: string, useSsl: boolean, }
+
+const domainWithoutPort = document.location.host.split(":")[0];
+
+const hostConfig = (host: string, useSsl = true) => ({ host, useSsl });
+
+export default function GetApiHost() {
+  switch (domainWithoutPort) {
     case "fakeyou.com":
     case "staging.fakeyou.com":
-      return ["api.fakeyou.com"];
+      return hostConfig("api.fakeyou.com");
     case "storyteller.ai":
     case "staging.storyteller.ai":
-      return ["api.storyteller.ai"];
+      return hostConfig("api.storyteller.ai");
     case "storyteller.stream": // Storyteller.stream is deprecated and will be decommissioned in the future.
-      return ["api.storyteller.stream"];
+      return hostConfig("api.storyteller.stream");
     case "devproxy.fakeyou.com":
-      return ["api.fakeyou.com"];
+      return hostConfig("api.fakeyou.com");
     case "devproxy.storyteller.ai":
-      return ["api.storyteller.ai"];
+      return hostConfig("api.storyteller.ai");
     case "dev.fakeyou.com":
-      return ["api.dev.fakeyou.com"]; // NB: for dev machines with nginx proxies
+      return hostConfig("api.dev.fakeyou.com"); // NB: for dev machines with nginx proxies
     case "dev.fakeyou.com":
-      return ["api.dev.fakeyou.com:12345",true]; // true = disableSSL
+      return hostConfig("api.dev.fakeyou.com:12345",false); // true = disableSSL
     default:
       return document.location.host.includes("localhost") ? 
-        ["localhost:12345",document.location.protocol !== "https:"] :
-        ["api.fakeyou.com"]; // default
+        hostConfig("localhost:12345",document.location.protocol === "https:") :
+        hostConfig("api.fakeyou.com"); // default
   }
 };
-
-export default GetApiHost;

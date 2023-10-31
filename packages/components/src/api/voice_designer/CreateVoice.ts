@@ -1,4 +1,4 @@
-import { GrabEndpoint } from "../GrabEndpoint"
+import MakeRequest from "../MakeRequest";
 
 interface CreateVoiceRequest {
   uuid_idempotency_token: string,
@@ -10,9 +10,9 @@ interface CreateVoiceResponse {
   inference_job_token: string,
 }
 
-const CreateVoice = GrabEndpoint<string, CreateVoiceRequest, CreateVoiceResponse>({
+const CreateVoice = MakeRequest<string, CreateVoiceRequest, CreateVoiceResponse>({
     method: "POST", 
-    routingFunction: () => "voice_designer/create",
+    routingFunction: () => "/voice_designer/create",
 });
 
 

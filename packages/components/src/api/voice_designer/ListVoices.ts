@@ -1,4 +1,4 @@
-import { GrabEndpoint } from "../GrabEndpoint"
+import MakeRequest from "../MakeRequest";
 
 interface ListVoiceRequest {}
 
@@ -14,9 +14,9 @@ interface ListVoiceResponse {
     updated_at: Date,
 }
 
-const List = GrabEndpoint<string, ListVoiceRequest, ListVoiceResponse>({
+const List = MakeRequest<string, ListVoiceRequest, ListVoiceResponse>({
     method: "GET", 
-    routingFunction: (userToken:  string) => `user/${ userToken }/list`,
+    routingFunction: (userToken:  string) => `/user/${ userToken }/list`,
 });
 
 

@@ -1,4 +1,4 @@
-import { GrabEndpoint } from "../GrabEndpoint"
+import MakeRequest from "../MakeRequest";
 
 interface UpdateVoiceRequest {
   title: string,
@@ -10,9 +10,9 @@ interface UpdateVoiceResponse {
     success: boolean,
 }
 
-const UpdateVoice = GrabEndpoint<string, UpdateVoiceRequest, UpdateVoiceResponse>({
+const UpdateVoice = MakeRequest<string, UpdateVoiceRequest, UpdateVoiceResponse>({
     method: "PATCH", 
-    routingFunction: (voiceToken:  string) => `${ voiceToken }/update`,
+    routingFunction: (voiceToken:  string) => `/${ voiceToken }/update`,
 });
 
 

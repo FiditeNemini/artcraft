@@ -1,6 +1,6 @@
 import GetApiHost from "./GetApiHost";
 
-const [ apiHost, disableSSL = false ] = GetApiHost();
+const { host = "", useSsl = true } = GetApiHost();
 
 type UrlRoutingFunction<UrlRouteArgs> = (urlRouteArgs: UrlRouteArgs) => string;
 
@@ -13,29 +13,31 @@ interface RouteSetup<UrlRouteArgs> {
     routingFunction: UrlRoutingFunction<UrlRouteArgs>;
 }
 
-const GrabPath = (endpoint = "") => `${ disableSSL ? "http" : "https" }://${ apiHost }/${ endpoint }`;
+const formatUrl = (endpoint = "") => `${ useSsl ? "https" : "http" }://${ host + endpoint }`;
 
-const GrabEndpoint = <UrlRouteArgs, Request, Response>(routeSetup: RouteSetup<UrlRouteArgs>) :  (urlRouteArgs: UrlRouteArgs, request: Request) => Promise<Response> => {
+const MakeRequest = <UrlRouteArgs, Request, Response>(routeSetup: RouteSetup<UrlRouteArgs>) :  (urlRouteArgs: UrlRouteArgs, request: Request) => Promise<Response> => {
     return async function(urlRouteArgs: UrlRouteArgs, request: Request) : Promise<Response> {
         const endpoint = routeSetup.routingFunction(urlRouteArgs);
         const method = routeSetup.method;
+        const isGet = method === "GET";
 
-        return fetch(GrabPath(endpoint), {
+        return fetch(formatUrl(endpoint), {
             method,
             headers: {
                 "Accept": "application/json",
+                ...isGet ? {} : { "Content-Type": "application/json" }
             },
             credentials: 'include',
-            ...method === "GET" ? {} : { body: JSON.stringify(request) },
+            ...isGet ? {} : { body: JSON.stringify(request) },
         })
         .then(res => res.json())
         .then(res => {
-            if (res && 'success' in res) {
+            if (res && "success" in res) {
                 return res;
-            } else throw new Error;
+            } else Promise.reject();
         })
         .catch(e => ({ success : false }));
     }
 };
 
-export { GrabEndpoint, GrabPath };
+export default MakeRequest;
