@@ -65,6 +65,7 @@ import { InferenceJobs } from "components/providers";
 // This new instance uses the Locize paid service to manage translation strings on their website. It's automated,
 // can easily sync to version control, and makes translation easy to maintain across a wide number of languages.
 export const i18n2 = i18n.createInstance();
+declare const window: Window & { dataLayer: Record<string, unknown>[]; };
 
 // OLD i18n-next instance
 // This instance of i18n-next should not be used for new translations going forward.
@@ -296,6 +297,9 @@ class App extends React.Component<Props, State> {
       // Track only logged-in users (for now)
       PosthogClient.enablePosthog();
       PosthogClient.setUsername(username);
+        window.dataLayer.push({
+          'user_id': username,
+        });
     }
     this.setState({
       sessionWrapper: sessionWrapper,

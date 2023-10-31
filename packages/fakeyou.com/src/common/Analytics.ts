@@ -2,11 +2,11 @@ import { PosthogClient } from "@storyteller/components/src/analytics/PosthogClie
 
 /**
  * Send Analytics to Google Analytics.
- * 
+ *
  * Keeping track of events in a singular space lets us easily update them and keep track of what we're analyzing at a high level.
- * 
+ *
  * Currently we use Universal Analytics (UA), but support for that ends July 2023. We need to update to Google Analytics 4 (GA4).
- * 
+ *
  * Here is some reading material:
  *  - [Events usage in UA - really good resource on how to bucket events](https://support.google.com/analytics/answer/1033068)
  *  - [GTag events for multiple Google products: UA, GA4, etc.](https://developers.google.com/tag-platform/devguides/events)
@@ -14,7 +14,7 @@ import { PosthogClient } from "@storyteller/components/src/analytics/PosthogClie
  */
 
 class Analytics {
-  // NB: DO NOT CHANGE! 
+  // NB: DO NOT CHANGE!
   // These should be stable values for analytics.
   private static readonly ACCOUNT = "account";
   private static readonly PREMIUM = "premium";
@@ -234,43 +234,13 @@ class Analytics {
   }
 
   static voiceConversionClickDownload() {
-    Analytics.sendCategorizedEvent(this.VOICE_CONVERSION, 'click_download');
-  }
-
-  // ========== UI ==========
-
-  static uiTurnOnAnimations() {
-    Analytics.sendCategorizedEvent(this.UI, 'turn_on_animations');
-  }
-
-  static uiTurnOffAnimations() {
-    Analytics.sendCategorizedEvent(this.UI, 'turn_off_animations');
+    Analytics.sendCategorizedEvent(this.VOICE_CONVERSION, "click_download");
   }
 
   // ========== TOPBAR ==========
 
   static topbarClickPricing() {
-    Analytics.sendCategorizedEvent(this.TOPBAR, 'click_pricing');
-  }
-
-  static topbarClickVoiceClone() {
-    Analytics.sendCategorizedEvent(this.TOPBAR, 'click_voice_clone');
-  }
-
-  static topbarClickAbout() {
-    Analytics.sendCategorizedEvent(this.TOPBAR, 'click_about');
-  }
-
-  static topbarClickTerms() {
-    Analytics.sendCategorizedEvent(this.TOPBAR, 'click_terms');
-  }
-
-  static topbarClickChannels() {
-    Analytics.sendCategorizedEvent(this.TOPBAR, 'click_channels');
-  }
-
-  static topbarClickNews() {
-    Analytics.sendCategorizedEvent(this.TOPBAR, 'click_news');
+    Analytics.sendCategorizedEvent(this.TOPBAR, "click_pricing");
   }
 
   // ========== (impl) ==========

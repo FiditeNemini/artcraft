@@ -634,6 +634,7 @@ function TtsModelViewPage(props: Props) {
             <TwitterShareButton
               title={shareTitle}
               url={shareLink}
+              className="ga-share-twitter"
               onClick={() => {
                 Analytics.ttsModelPageClickShareTwitter();
               }}
@@ -643,6 +644,7 @@ function TtsModelViewPage(props: Props) {
             <FacebookShareButton
               quote={shareTitle}
               url={shareLink}
+              className="ga-share-facebook"
               onClick={() => {
                 Analytics.ttsModelPageClickShareFacebook();
               }}
@@ -652,6 +654,7 @@ function TtsModelViewPage(props: Props) {
             <RedditShareButton
               title={shareTitle}
               url={shareLink}
+              className="ga-share-reddit"
               onClick={() => {
                 Analytics.ttsModelPageClickShareReddit();
               }}
@@ -661,6 +664,7 @@ function TtsModelViewPage(props: Props) {
             <WhatsappShareButton
               title={shareTitle}
               url={shareLink}
+              className="ga-share-whatsapp"
               onClick={() => {
                 Analytics.ttsModelPageClickShareWhatsapp();
               }}
@@ -680,7 +684,7 @@ function TtsModelViewPage(props: Props) {
               onClick={handleCopyLink}
               id="copyBtn"
               type="button"
-              className="btn btn-primary"
+              className="btn btn-primary ga-share-clipboard"
             >
               Copy
             </button>
