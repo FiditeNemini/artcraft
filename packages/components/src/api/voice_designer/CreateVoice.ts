@@ -1,13 +1,13 @@
 import { GrabEndpoint } from "../GrabEndpoint"
 
 interface CreateVoiceRequest {
-    // args
-    example_token: String;
+  uuid_idempotency_token: string,
+  voice_dataset_token: string,
 }
 
 interface CreateVoiceResponse {
-    // args
-    name: string,
+  success: boolean,
+  inference_job_token: string,
 }
 
 const CreateVoice = GrabEndpoint<string, CreateVoiceRequest, CreateVoiceResponse>({

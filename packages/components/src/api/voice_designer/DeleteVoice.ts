@@ -1,18 +1,17 @@
 import { GrabEndpoint } from "../GrabEndpoint"
 
-interface CreateVoiceRequest {
-    // args
-    example_token: String;
+interface DreateVoiceRequest {
+  set_delete: boolean,
+  as_mod: boolean
+},
+
+interface DreateVoiceResponse {
+  success: boolean
 }
 
-interface CreateVoiceResponse {
-    // args
-    name: string,
-}
-
-const DeleteVoice = GrabEndpoint<string, CreateVoiceRequest, CreateVoiceResponse>({
-    method: "POST", 
-    routingFunction: (voiceToken:  string) => `${ voiceToken }/delete`,
+const DeleteVoice = GrabEndpoint<string, DreateVoiceRequest, DreateVoiceResponse>({
+  method: "POST", 
+  routingFunction: (voiceToken:  string) => `${ voiceToken }/delete`,
 });
 
 

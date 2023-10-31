@@ -1,16 +1,20 @@
 import { GrabEndpoint } from "../GrabEndpoint"
 
-interface CreateVoiceRequest {
-    // args
-    example_token: String;
+interface ListVoiceRequest {}
+
+interface ListVoiceResponse {
+    voice_token: string,
+    title: string,
+    creator_set_visibility: string,
+    ietf_language_tag: string,
+    ietf_primary_language_subtag: string,
+    creator_user_token: string,
+    creator_username: string,
+    created_at: Date,
+    updated_at: Date,
 }
 
-interface CreateVoiceResponse {
-    // args
-    name: string,
-}
-
-const List = GrabEndpoint<string, CreateVoiceRequest, CreateVoiceResponse>({
+const List = GrabEndpoint<string, ListVoiceRequest, ListVoiceResponse>({
     method: "GET", 
     routingFunction: (userToken:  string) => `user/${ userToken }/list`,
 });

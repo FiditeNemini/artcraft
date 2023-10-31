@@ -1,16 +1,16 @@
 import { GrabEndpoint } from "../GrabEndpoint"
 
-interface CreateVoiceRequest {
-    // args
-    example_token: String;
+interface UpdateVoiceRequest {
+  title: string,
+  creator_set_visibility: string,
+  ietf_language_tag: string,
 }
 
-interface CreateVoiceResponse {
-    // args
-    name: string,
+interface UpdateVoiceResponse {
+    success: boolean,
 }
 
-const UpdateVoice = GrabEndpoint<string, CreateVoiceRequest, CreateVoiceResponse>({
+const UpdateVoice = GrabEndpoint<string, UpdateVoiceRequest, UpdateVoiceResponse>({
     method: "PATCH", 
     routingFunction: (voiceToken:  string) => `${ voiceToken }/update`,
 });
