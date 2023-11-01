@@ -9,6 +9,7 @@ platforms:
 
 - Mac OS (Apple M2 silicon)
 - Ubuntu 22.04
+- Windows Subsystem for Linux (Ubuntu 22.04 distro) aka "WSL"
 
 The applications (binary targets) you might be interested in running include, but 
 are not limited to:
@@ -25,13 +26,19 @@ Setup Instructions
 Install Rust [using this guide](https://www.rust-lang.org/learn/get-started). If it asks, 
 you'll want "stable" Rust, not "nightly" Rust. If it doesn't ask, it defaults to "stable".
 
+For Windows Subsystem for Linux, you'll want the WSL version, not the `.exe` file!
+
 ### (2) Install the necessary libraries
 
-Mac: (Lost the list, but it should match Linux. Install Homebrew.)
+Mac: (Lost the library list, but it should match Linux. Install Homebrew.)
 
-Ubuntu 22.04:
+Ubuntu 22.04 and WSL:
 
 ```bash
+# If you haven't run apt before, you'll need to fetch the package list:
+sudo apt update
+
+# Install the dependencies
 sudo apt install jq \
   libmysqlclient-dev \
   libsqlite3-dev \
@@ -54,12 +61,25 @@ If `mysql -uroot` fails, reboot the machine:
 sudo reboot now
 ```
 
-Ubuntu 22.04:
+Ubuntu 22.04 and WSL:
 
 ```bash
 sudo apt install mysql-server
 ```
 
+You may need to start MySQL (typically WSL),
+
+```bash
+sudo service mysql start
+```
+
+You may also have to change some socket file permissions (again, typically WSL):
+
+```bash
+sudo chmod g+rx /var/run/mysqld
+sudo usermod -aG mysql $USER
+newgrp mysql
+```
 
 ### (4) Install a `storyteller` user and table in MySQL
 
@@ -119,13 +139,21 @@ typesafe SQL.
 
 ### (8) Install hosts file:
 
-(This should be the same on Linux and Mac, but might differ for Windows.)
+(This is the same for Linux, Mac, and WSL.)
 
 If you're developing against the frontend, it'll target development domains (eg. `dev.fakeyou.com`) instead 
 of `127.0.0.1` or `localhost`. You can make your machine route domains to localhost by editing your hosts 
 file (located at `/etc/hosts`) to include the following configuration lines:
 
 ```
+# 1) Edit hosts file with your editor of choice
+#
+#  - sudo vi /etc/hosts
+#  - sudo nano /etc/hosts
+#
+# 2) Then paste:
+#
+
 127.0.0.1    dev.fakeyou.com
 127.0.0.1    api.dev.fakeyou.com
 127.0.0.1    devproxy.fakeyou.com
@@ -137,13 +165,25 @@ file (located at `/etc/hosts`) to include the following configuration lines:
 
 ### (9) Install Redis
 
+Mac: (TODO)
+
+Ubuntu 22.04 and WSL: 
+
 ```
 sudo apt install redis
 ```
 
-### (10) Install Elasticsearch
+The server might need to be started on WSL,
+
+```
+sudo service redis-server start
+```
+
+### (10) Install Elasticsearch (optional)
 
 Mac: (TODO - haven't installed yet)
+
+WSL: (TODO - haven't installed yet)
 
 Ubuntu 22.04:
 
@@ -216,36 +256,35 @@ Note that this compiles and runs the "development" binary. It's faster and easie
 optimized "production" build. To build a fully optimized production release,
 run `cargo build --release --bin storyteller-web` . Note that this will take much longer.
 
-You may notice that this might not work on your machine. If not, we'll need to set up a few environment variables and
-secrets.
+You may notice that this might not work right off the bat. You may need to specify some environment variables 
+and supply some development secrets.
 
-Ask Brandon for the `.env-secrets` and place it in the root of the folder.
+Secrets: 
 
-Place `storteller-web.development-secrets.env` in `crates/service/web/storyteller-web/config`.
+- Global secrets (ask Brandon for these): 
+  - Put `.env-secrets` in the root `storyteller-rust` directory.
+  
+- Per app secrets (ask Brandon for these):
+  - Put `storteller-web.development-secrets.env` in `crates/service/web/storyteller-web/config`
+  - Put `inference-job.development-secrets.env` in `crates/service/job/inference_job/config`
+  - Put `donwload-job.development-secrets.env` in `crates/service/job/download_job/config`
 
-**DO NOT CHECK THESE TWO FILES INTO THE REPO!**
+**DO NOT CHECK THESE SECRET FILES INTO THE REPO!**
+
+Environment config: 
 
 You may need to set local development paths for your environment. You can set these in `.env-secrets` too,
-and they won't be committed:
+so that they won't be updated for other engineers.
 
 ```
+# this should be the directory containing all of the "storyteller" projects:
 STORYTELLER_ROOT = "/home/tensor/code/storyteller" # change this
-STORYTELLER_FRONTEND = "storyteller-frontend"
+
+# The following are entirely optional, but if you want to fine tune where each project lives, you may do so:
+STORYTELLER_FRONTEND = "/somewhere/else/storyteller-frontend"
 STORYTELLER_ML = "storyteller-ml"
-STORYTELLER_RUST = "storyteller-rust"
+STORYTELLER_RUST = "/Users/bt/Development/storyteller-rust"
 ```
-
-File with the following paths, copy this in
-The root path and the folders associated with the path.
-This will change the base paths for development.
-
-DO NOT CHECK THESE TWO FILES INTO THE REPO
-
-Ask Brandon for the .download-job.development-secrets.env and place it in
-crates/service/job/download_job/config
-
-Ask Brandon for the .inference-job.development-secrets.env and place it in
-crates/service/job/inference_job/config
 
 To download some ML models, run:
 
