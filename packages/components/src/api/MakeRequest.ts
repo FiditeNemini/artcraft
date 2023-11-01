@@ -19,6 +19,7 @@ const MakeRequest = <UrlRouteArgs, Request, Response>(routeSetup: RouteSetup<Url
     return async function(urlRouteArgs: UrlRouteArgs, request: Request) : Promise<Response> {
         const endpoint = routeSetup.routingFunction(urlRouteArgs);
         const method = routeSetup.method;
+        const noBodyMethods = ["GET","HEAD", "DELETE", "OPTIONS"].indexOf(method) > -1;
         const isGet = method === "GET";
 
         return fetch(formatUrl(endpoint), {
@@ -28,7 +29,7 @@ const MakeRequest = <UrlRouteArgs, Request, Response>(routeSetup: RouteSetup<Url
                 ...isGet ? {} : { "Content-Type": "application/json" }
             },
             credentials: 'include',
-            ...isGet ? {} : { body: JSON.stringify(request) },
+            ...noBodyMethod ? {} : { body: JSON.stringify(request) },
         })
         .then(res => res.json())
         .then(res => {

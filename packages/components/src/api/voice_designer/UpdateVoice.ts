@@ -11,7 +11,7 @@ interface UpdateVoiceResponse {
 }
 
 const UpdateVoice = MakeRequest<string, UpdateVoiceRequest, UpdateVoiceResponse>({
-    method: "PATCH", 
+    method: "POST", 
     routingFunction: (voiceToken:  string) => `/${ voiceToken }/update`,
 });
 
