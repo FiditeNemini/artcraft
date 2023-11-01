@@ -11,7 +11,8 @@
     "build-fakeyou": "lerna exec --scope @storyteller/fakeyou.com -- yarn build",
     "start-fakeyou": "PORT=7000 BROWSER=none lerna exec --scope @storyteller/fakeyou.com -- yarn start",
     "start-fakeyou-80": "PORT=80 BROWSER=none lerna exec --scope @storyteller/fakeyou.com -- yarn start",
-    "start-fakeyou-w": "set PORT=7000 && lerna exec --scope @storyteller/fakeyou.com -- yarn start-w",
+    "start-fakeyou-w": "lerna exec --scope @storyteller/fakeyou.com -- yarn start-w",
+    "start-fakeyou-ws": "lerna exec --scope @storyteller/fakeyou.com -- yarn start-ws",
     "build-storyteller": "lerna exec --scope @storyteller/storyteller.io -- yarn build",
     "start-storyteller": "PORT=7008 BROWSER=none lerna exec --scope @storyteller/storyteller.io -- yarn start",
     "start-storyteller-w": "set PORT=7008 && lerna exec --scope @storyteller/storyteller.io -- yarn start-w",
@@ -30,6 +31,7 @@
   },
   "devDependencies": {
     "craco": "^0.0.3",
+    "cross-env": "^7.0.3",
     "lerna": "^4.0.0"
   },
   "dependencies": {
