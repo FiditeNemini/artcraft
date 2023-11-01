@@ -15,21 +15,30 @@ interface RouteSetup<UrlRouteArgs> {
 
 const formatUrl = (endpoint = "") => `${ useSsl ? "https" : "http" }://${ host + endpoint }`;
 
+const METHOD_OMITS_BODY : { [key: string] : boolean } = {
+    "DELETE": true,
+    "GET": true,
+    "OPTIONS": true,
+    "PATCH": false,
+    "POST": false,
+    "PUT": false,
+}
+
 const MakeRequest = <UrlRouteArgs, Request, Response>(routeSetup: RouteSetup<UrlRouteArgs>) :  (urlRouteArgs: UrlRouteArgs, request: Request) => Promise<Response> => {
     return async function(urlRouteArgs: UrlRouteArgs, request: Request) : Promise<Response> {
         const endpoint = routeSetup.routingFunction(urlRouteArgs);
         const method = routeSetup.method;
-        const noBodyMethods = ["GET","HEAD", "DELETE", "OPTIONS"].indexOf(method) > -1;
-        const isGet = method === "GET";
+
+        const methodOmitsBody = METHOD_OMITS_BODY[method] || false;
 
         return fetch(formatUrl(endpoint), {
             method,
             headers: {
                 "Accept": "application/json",
-                ...isGet ? {} : { "Content-Type": "application/json" }
+                ...methodOmitsBody? {} : { "Content-Type": "application/json" }
             },
             credentials: 'include',
-            ...noBodyMethod ? {} : { body: JSON.stringify(request) },
+            ...methodOmitsBody ? {} : { body: JSON.stringify(request) },
         })
         .then(res => res.json())
         .then(res => {
