@@ -1,14 +1,6 @@
 FakeYou Development Setup (bare metal)
 ======================================
 
-Set your Environment .env File with the following paths, copy this in
-The root path and the folders associated with the path.
-This will change the base paths for development.
-STORYTELLER_ROOT = "/home/tensor/code/storyteller" # change this
-STORYTELLER_FRONTEND = "storyteller-frontend" 
-STORYTELLER_ML = "storyteller-ml"
-STORYTELLER_RUST = "storyteller-rust"
-
 This document describes how to run the FakeYou infrastructure on your development 
 machine's bare metal (no containers).
 
@@ -213,17 +205,39 @@ Extra reading:
 - [Kibana](https://www.elastic.co/guide/en/kibana/current/deb.html)
 
 ### (11) Run one or more applications:
-DO NOT CHECK THESE TWO FILES INTO THE REPO
-Ask Brandon for the .env-secrets and .storteller-web.development-secrets.env and place it in the root of the folder.
 
 To start the HTTP API server,
 
 ```bash
 cargo run --bin storyteller-web
 ```
+
 Note that this compiles and runs the "development" binary. It's faster and easier to debug than the
 optimized "production" build. To build a fully optimized production release,
 run `cargo build --release --bin storyteller-web` . Note that this will take much longer.
+
+You may notice that this might not work on your machine. If not, we'll need to set up a few environment variables and
+secrets.
+
+Ask Brandon for the `.env-secrets` and place it in the root of the folder.
+
+Place `storteller-web.development-secrets.env` in `crates/service/web/storyteller-web/config`.
+
+**DO NOT CHECK THESE TWO FILES INTO THE REPO!**
+
+You may need to set local development paths for your environment. You can set these in `.env-secrets` too,
+and they won't be committed:
+
+```
+STORYTELLER_ROOT = "/home/tensor/code/storyteller" # change this
+STORYTELLER_FRONTEND = "storyteller-frontend"
+STORYTELLER_ML = "storyteller-ml"
+STORYTELLER_RUST = "storyteller-rust"
+```
+
+File with the following paths, copy this in
+The root path and the folders associated with the path.
+This will change the base paths for development.
 
 DO NOT CHECK THESE TWO FILES INTO THE REPO
 
