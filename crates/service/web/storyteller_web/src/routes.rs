@@ -3,9 +3,11 @@ use actix_service::ServiceFactory;
 use actix_web::{App, HttpResponse, web};
 use actix_web::dev::{ServiceRequest, ServiceResponse};
 use actix_web::error::Error;
+use log::warn;
 
 use actix_helpers::route_builder::RouteBuilder;
 use billing_component::default_routes::add_suggested_stripe_billing_routes;
+use reusable_types::server_environment::ServerEnvironment;
 use users_component::default_routes::add_suggested_api_v1_account_creation_and_session_routes;
 use users_component::endpoints::edit_profile_handler::edit_profile_handler;
 use users_component::endpoints::get_profile_handler::get_profile_handler;
@@ -140,7 +142,7 @@ use crate::http_server::endpoints::w2l::list_user_w2l_templates::list_user_w2l_t
 use crate::http_server::endpoints::w2l::list_w2l_templates::list_w2l_templates_handler;
 use crate::http_server::endpoints::w2l::set_w2l_template_mod_approval::set_w2l_template_mod_approval_handler;
 
-pub fn add_routes<T, B> (app: App<T>) -> App<T>
+pub fn add_routes<T, B> (app: App<T>, server_environment: ServerEnvironment) -> App<T>
   where
       B: MessageBody,
       T: ServiceFactory<
@@ -173,8 +175,8 @@ pub fn add_routes<T, B> (app: App<T>) -> App<T>
   app = add_subscription_routes(app); /* /v1/subscriptions/... */
 
   // TODO find a long term feature flag solution, since this code is likely deployed into production we don't want the route found.
-  let enable_voice_designer_route = true;
-  if enable_voice_designer_route {
+  if !server_environment.is_deployed_in_production() {
+    warn!("Adding voice designer routes (development only)");
     app = add_voice_designer_routes(app); /* /v1/voice_designer */
   }
   // ==================== Comments ====================
