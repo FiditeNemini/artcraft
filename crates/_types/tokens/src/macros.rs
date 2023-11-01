@@ -29,6 +29,10 @@ macro_rules! impl_string_token {
   }
 }
 
+// TODO(bt, 2023-11-01): Don't generate slurs or dangerous terms in the token generator
+//  see: https://news.ycombinator.com/item?id=35337210
+//  see: https://www.reddit.com/r/ProgrammerHumor/comments/3ov56n/randomly_generating_ids_can_be_dangerous/
+//  see: https://stackoverflow.com/a/36294356
 macro_rules! impl_crockford_generator {
   ($t:ident, $total_string_length:literal, $variant:path, $character_case:ident) => {
     impl $t {
