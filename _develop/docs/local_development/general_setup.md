@@ -30,9 +30,14 @@ For Windows Subsystem for Linux, you'll want the WSL version, not the `.exe` fil
 
 ### (2) Install the necessary libraries
 
-Mac: (Lost the library list, but it should match Linux. Install Homebrew.)
+#### Mac
 
-Ubuntu 22.04 and WSL:
+On an up-to-date M1/M2 Mac, there should be no libraries you need to install! Any exceptions 
+to this assumption should be documented here.
+
+#### Ubuntu 22.04 and WSL:
+
+If you're on Ubuntu or WSL, you'll need to install some libraries to build the Rust code: 
 
 ```bash
 # If you haven't run apt before, you'll need to fetch the package list:
@@ -49,48 +54,66 @@ sudo apt install jq \
 
 ### (3) Install MySQL server
 
-Mac:
+#### Mac
 
 ```bash
+# Install MySQL
 brew install mysql
+
+# Try to connect
+mysql -uroot
 ```
 
-If `mysql -uroot` fails, reboot the machine:
+In the event of failure to connect, try the following steps:
 
 ```bash
-sudo reboot now
+# If connection fails, start service
+brew services start mysql
+
+# Try to connect again 
+# If this fails, reboot the machine, eg. using `sudo reboot now`
+mysql -uroot
 ```
 
-Ubuntu 22.04 and WSL:
+#### Ubuntu 22.04 and WSL
 
 ```bash
+# Install MySQL
 sudo apt install mysql-server
-```
 
-You may need to start MySQL (typically WSL),
+# Try to connect 
+# The default password is typically "root".
+sudo mysql -u root -p
+````
+
+In the event of failure to connect, try the following steps:
 
 ```bash
+# If it failed, you may need to start MySQL (typically only on WSL, not on native Ubuntu)
 sudo service mysql start
-```
 
-You may also have to change some socket file permissions (again, typically WSL):
-
-```bash
+# You may also have to change some socket file permissions (again, typically only on WSL)
 sudo chmod g+rx /var/run/mysqld
 sudo usermod -aG mysql $USER
 newgrp mysql
+
+# Try to connect again
+# The default password is typically "root".
+# If this fails, try rebooting. If it still fails, read some of the suggestions at the bottom 
+# of this README.
+sudo mysql -u root -p
 ```
 
 ### (4) Install a `storyteller` user and table in MySQL
 
-Connect to mysql:
+First, connect to MySQL:
 
 ```bash
 # If the following command asks for a password, the password is typically "root"
 sudo mysql -u root -p
 ```
 
-Once in MySQL, run the following:
+Once in MySQL, run the following to set up the database and user accounts:
 
 ```mysql
 use mysql;
@@ -103,39 +126,53 @@ Then verify access with `./dev_mysql_connect.sh`
 
 ### (5) Install Diesel CLI (for MySQL migrations):
 
+In order to run MySQL database migrations, you'll need to install the migration tool we use:
+
 ```bash
 cargo install diesel_cli \
   --no-default-features \
   --features mysql,sqlite
 ```
 
-As of this writing, Mac [has some issues with Diesel CLI](https://github.com/diesel-rs/diesel/issues/2605)
-and requires a few extra dependencies to be installed:
+In older Macs, there [have been some issues with Diesel CLI](https://github.com/diesel-rs/diesel/issues/2605)
+that require a few extra dependencies to be installed:
 
 ```bash
+# If you're on Mac and the above command didn't work, run the following and then retry:
 brew install libpq
 ```
 
 ### (6) Run the pending database migrations:
 
+You're ready to run the migrations:
+
 ```bash
 diesel migration run
 ```
 
-You might get a scary message about `"Encountered unknown type for Mysql: enum"` -- you can ignore this 
-error (see below).
+You might get a scary message about `"Encountered unknown type for Mysql: enum"` -- you can safely ignore this 
+error if you see it in isolation. It doesn't impact the migrations whatsoever. (See notes at the bottom of 
+the README for details.)
 
 ### (7) (optional) Install the SQLx CLI (if doing database development)
+
+(You can probably skip this step unless you're a backend engineer.) 
+
+If (and only if) you're doing Rust service development that changes the MySQL queries, then you should install 
+SQLx utilities. This tool is used to cache the column types and query plans for CI, as SQLx statically verifies 
+raw MySQL queries against the schema and Rust types.
+
+We'll be using diesel to manage the migrations, but sqlx within the app to actually perform queries.
+Diesel is an immature ORM, which isn't a good tech bet, so we use sqlx as at-compile-time
+typesafe SQL. 
+
+(TODO: Reevaluate this assessment for 2023-2024 and beyond. Maybe we do want Diesel now.)
 
 ```bash
 # NB(bt,2023-10-04): "--no-default-features" not working
 # cargo install sqlx-cli --no-default-features --features rustls,mysql,sqlite
 cargo install sqlx-cli --features rustls,mysql,sqlite
 ```
-
-We'll be using diesel to manage the migrations, but sqlx within the app to actually perform queries.
-Diesel is an immature ORM, which isn't a good tech bet, so we use sqlx as at-compile-time
-typesafe SQL.
 
 ### (8) Install hosts file:
 
@@ -165,21 +202,29 @@ file (located at `/etc/hosts`) to include the following configuration lines:
 
 ### (9) Install Redis
 
-Mac: (TODO)
+#### Mac:
 
-Ubuntu 22.04 and WSL: 
+```bash
+# Install Redis
+brew install redis
+
+# Start the service:
+brew services start redis
+```
+
+#### Ubuntu 22.04 and WSL
 
 ```
+# Install Redis
 sudo apt install redis
-```
 
-The server might need to be started on WSL,
-
-```
+# Start the service (typically only needed on WSL):
 sudo service redis-server start
 ```
 
 ### (10) Install Elasticsearch (optional)
+
+(You can most likely skip this step.)
 
 Mac: (TODO - haven't installed yet)
 
@@ -238,7 +283,7 @@ sudo systemctl start kibana.service
 # http://localhost:5601/
 ```
 
-Extra reading: 
+Extra reading on setting up Elasticsearch: 
 
 - [Guide 1](https://www.digitalocean.com/community/tutorials/how-to-install-and-configure-elasticsearch-on-ubuntu-22-04)
 - [Guide 2](https://www.elastic.co/guide/en/elasticsearch/reference/current/deb.html)
