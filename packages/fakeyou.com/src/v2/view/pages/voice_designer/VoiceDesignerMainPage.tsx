@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { faPlus, faWaveform } from "@fortawesome/pro-solid-svg-icons";
 import { usePrefixedDocumentTitle } from "common/UsePrefixedDocumentTitle";
 import Panel from "components/common/Panel";
@@ -8,8 +8,29 @@ import { Route, NavLink, Switch, Redirect } from "react-router-dom";
 import ListItems from "./components/ListItems/ListItems";
 import Modal from "components/common/Modal";
 
-function VoiceDesignerMainPage() {
+import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
+import { ListDatasetsByUser, Dataset } from "@storyteller/components/src/api/voice_designer/voice_datasets/ListDatasetsByUser";
+
+interface Props {
+  sessionWrapper: SessionWrapper;
+}
+
+function VoiceDesignerMainPage({ sessionWrapper }: Props) {
+  const { user } = sessionWrapper.sessionStateResponse || {};
+  const [datasets,datasetsSet] = useState<Dataset[]>([]);
+
+
   usePrefixedDocumentTitle("Voice Designer");
+
+  useEffect(() => {
+
+   if (!datasets.length && user) {
+      ListDatasetsByUser("hanashi",{}).then(res => {
+        if (res.datasets) datasetsSet(res.datasets);
+      });
+   }
+
+  },[user,datasets]);
 
   const [isDeleteVoiceModalOpen, setIsDeleteVoiceModalOpen] = useState(false);
   const [isDeleteDatasetModalOpen, setIsDeleteDatasetModalOpen] =
@@ -42,13 +63,12 @@ function VoiceDesignerMainPage() {
       modelToken: "TM:z7x37sbvb8vc",
     },
   ];
-  const datasetList = [
-    {
-      name: "Donald Trump (45th US President)",
-      modelToken: "dummyToken",
-    },
-  ];
-  // const emptyList = [] as any[];
+  // const datasetList = [
+  //   {
+  //     name: "Donald Trump (45th US President)",
+  //     modelToken: "dummyToken",
+  //   },
+  // ];
 
   function MyVoices() {
     return (
@@ -64,7 +84,8 @@ function VoiceDesignerMainPage() {
     return (
       <ListItems
         type="dataset"
-        data={datasetList}
+        data={datasets}
+        //data={datasetList}
         handleDeleteDataset={openDeleteDatasetModal}
       />
     );

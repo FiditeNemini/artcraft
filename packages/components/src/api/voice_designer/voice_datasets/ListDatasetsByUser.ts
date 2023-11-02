@@ -3,7 +3,7 @@ import { UserDetailsLight } from "../../_common/UserDetailsLight";
 
 export interface ListDatasetsByUserRequest {}
 
-export interface ListDatasetsByUserResponse {
+export interface Dataset {
     dataset_token: string,
     title: string,
     
@@ -15,6 +15,11 @@ export interface ListDatasetsByUserResponse {
 
     created_at: Date,
     updated_at: Date,
+}
+
+export interface ListDatasetsByUserResponse {
+    success: boolean,
+    datasets: Dataset[],
 }
 
 export const ListDatasetsByUser = MakeRequest<string, ListDatasetsByUserRequest, ListDatasetsByUserResponse>({
