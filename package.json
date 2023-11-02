@@ -34,6 +34,7 @@
   },
   "dependencies": {
     "@react-spring/types": "^9.7.3",
+    "universal-cookie": "^6.1.1",
     "yarn": "^1.22.19"
   },
   "packageManager": "yarn@3.3.1"
