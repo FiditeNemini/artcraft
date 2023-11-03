@@ -4,14 +4,18 @@ import { faTrashAlt } from "@fortawesome/pro-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useSpring, a } from "@react-spring/web";
 
+
+
 interface ModalProps {
   show: boolean;
   handleClose: () => void;
+  onCancel?: (e: React.MouseEvent<HTMLElement>) => any;
+  onConfirm?: (e: React.MouseEvent<HTMLElement>) => any;
   title: string;
   content: React.ReactNode;
 }
 
-const Modal: React.FC<ModalProps> = ({ show, handleClose, title, content }) => {
+const Modal: React.FC<ModalProps> = ({ show, handleClose, onCancel: cancelEvent, onConfirm: confirmEvent, title, content }) => {
   const modalRef = useRef<HTMLDivElement>(null);
 
   const fadeIn = useSpring({
@@ -21,6 +25,16 @@ const Modal: React.FC<ModalProps> = ({ show, handleClose, title, content }) => {
       if (!show) handleClose();
     },
   });
+
+  const onCancel = (e: React.MouseEvent<HTMLElement>) => {
+    if (cancelEvent) cancelEvent(e);
+    handleClose();
+  };
+
+  const onConfirm = (e: React.MouseEvent<HTMLElement>) => {
+    if (confirmEvent) confirmEvent(e);
+    handleClose();
+  };
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -70,9 +84,9 @@ const Modal: React.FC<ModalProps> = ({ show, handleClose, title, content }) => {
               <Button
                 variant="secondary"
                 label="Cancel"
-                onClick={handleClose}
+                onClick={onCancel}
               />
-              <Button variant="danger" label="Delete" onClick={handleClose} />
+              <Button variant="danger" label="Delete" onClick={onConfirm} />
             </div>
           </div>
         </div>
