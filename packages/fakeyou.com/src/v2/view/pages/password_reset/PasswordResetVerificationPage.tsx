@@ -62,6 +62,3 @@ function PasswordResetVerificationPage(props: Props) {
 }
 
 export { PasswordResetVerificationPage };
-function setIsLoading(arg0: boolean) {
-  throw new Error("Function not implemented.");
-}
