@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import { WebUrl } from "../../../../common/WebUrl";
 import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
 import { Link, useHistory } from "react-router-dom";
 import {
@@ -13,6 +12,9 @@ import { faUser, faKey } from "@fortawesome/free-solid-svg-icons";
 import { Analytics } from "../../../../common/Analytics";
 import { usePrefixedDocumentTitle } from "../../../../common/UsePrefixedDocumentTitle";
 import { PosthogClient } from "@storyteller/components/src/analytics/PosthogClient";
+import Container from "components/common/Container";
+import Panel from "components/common/Panel";
+import PageHeader from "components/layout/PageHeader";
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -88,62 +90,59 @@ function LoginPage(props: Props) {
   }
 
   return (
-    <div className="pt-lg-5">
-      <div className="container-panel pb-5 pt-lg-5 login-panel">
-        <div className="panel p-3 p-lg-4 load-hidden mt-5 mt-lg-0 px-md-4">
-          <h1 className="panel-title fw-bold">Login</h1>
-          <div className="py-6">
-            {errorWarning}
+    <Container type="panel" className="login-panel">
+      <PageHeader
+        title="Login"
+        subText="Log into your account."
+        panel={false}
+      />
+      <Panel padding={true}>
+        {errorWarning}
 
-            <form onSubmit={handleFormSubmit}>
-              <div className="d-flex flex-column gap-4">
-                <div>
-                  <label className="sub-title">Username or Email</label>
-                  <div className="form-group input-icon">
-                    <span className="form-control-feedback">
-                      <FontAwesomeIcon icon={faUser} />
-                    </span>
-                    <input
-                      className="form-control"
-                      type="text"
-                      placeholder="Username or Email"
-                      value={usernameOrEmail}
-                      onChange={handleUsernameOrEmailChange}
-                    />
-                  </div>
-                  {/*<p className="help"></p>*/}
-                </div>
-
-                <div>
-                  <label className="sub-title">Password</label>
-                  <div className="form-group input-icon">
-                    <span className="form-control-feedback">
-                      <FontAwesomeIcon icon={faKey} />
-                    </span>
-                    <input
-                      className="form-control"
-                      type="password"
-                      placeholder="Password"
-                      value={password}
-                      onChange={handlePasswordChange}
-                    />
-                  </div>
-                  {/*<p className="help"></p>*/}
-                </div>
-
-                <button className="btn btn-primary w-100 mt-2">Login</button>
-                <p>
-                  Don’t have an account? &nbsp;
-                  <Link to={WebUrl.signupPage()} className="text-link">
-                    Create an account now.
-                  </Link>
-                </p>
+        <form onSubmit={handleFormSubmit}>
+          <div className="d-flex flex-column gap-4">
+            <div>
+              <label className="sub-title">Username or Email</label>
+              <div className="form-group input-icon">
+                <span className="form-control-feedback">
+                  <FontAwesomeIcon icon={faUser} />
+                </span>
+                <input
+                  className="form-control"
+                  type="text"
+                  placeholder="Username or Email"
+                  value={usernameOrEmail}
+                  onChange={handleUsernameOrEmailChange}
+                />
               </div>
-            </form>
+              {/*<p className="help"></p>*/}
+            </div>
+
+            <div>
+              <label className="sub-title">Password</label>
+              <div className="form-group input-icon">
+                <span className="form-control-feedback">
+                  <FontAwesomeIcon icon={faKey} />
+                </span>
+                <input
+                  className="form-control"
+                  type="password"
+                  placeholder="Password"
+                  value={password}
+                  onChange={handlePasswordChange}
+                />
+              </div>
+              <p className="d-flex flex-column flex-lg-row gap-2">
+                <Link to="/password-reset" className="text-link form-text">
+                  Forgot your password?
+                </Link>
+              </p>
+            </div>
           </div>
-        </div>
-      </div>
-    </div>
+          <button className="btn btn-primary w-100 mt-4">Login</button>
+        </form>
+      </Panel>
+    </Container>
   );
 }
 
