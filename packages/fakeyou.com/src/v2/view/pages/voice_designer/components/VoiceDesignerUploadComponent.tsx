@@ -8,11 +8,11 @@ import React, { useState } from "react";
 import { FileUploader } from "react-drag-drop-files";
 import { InputVcAudioPlayer } from "v2/view/_common/InputVcAudioPlayer";
 import { v4 as uuidv4 } from "uuid";
-import {
-  UploadAudio,
-  UploadAudioIsOk,
-  UploadAudioRequest,
-} from "@storyteller/components/src/api/upload/UploadAudio";
+// import {
+//   UploadAudio,
+//   UploadAudioIsOk,
+//   UploadAudioRequest,
+// } from "@storyteller/components/src/api/upload/UploadAudio";
 import useUploadedFiles from "hooks/useUploadedFiles";
 
 const FILE_TYPES = ["MP3", "WAV", "FLAC", "OGG"];
@@ -34,6 +34,7 @@ function VoiceDesignerUploadComponent(props: Props) {
   const setAudioLinks = useUploadedFiles((state: any) => state.setAudioLinks);
 
   // Auto generated
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [idempotencyToken, setIdempotencyToken] = useState(uuidv4());
 
   const handleChange = (file: any) => {
@@ -68,6 +69,7 @@ function VoiceDesignerUploadComponent(props: Props) {
       ? `${Math.floor(file.size / 1024)} KB`
       : null;
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const uploadBtnClass = isUploadDisabled
     ? "btn btn-uploaded w-100 disabled"
     : "btn btn-primary w-100";
@@ -154,7 +156,7 @@ function VoiceDesignerUploadComponent(props: Props) {
     </div>
   );
 }
-
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const LoadingIcon: React.FC = () => {
   return (
     <>
