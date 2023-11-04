@@ -1,15 +1,15 @@
 import MakeRequest from "../../MakeRequest";
 
-export interface DreateVoiceRequest {
+export interface DeleteVoiceRequest {
   set_delete: boolean;
   as_mod: boolean;
 }
 
-export interface DreateVoiceResponse {
+export interface DeleteVoiceResponse {
   success: boolean
 }
 
-export const DeleteVoice = MakeRequest<string, DreateVoiceRequest, DreateVoiceResponse>({
+export const DeleteDataset = MakeRequest<string, DeleteVoiceRequest, DeleteVoiceResponse>({
   method: "DELETE", 
   routingFunction: (voiceToken:  string) => `/v1/voice_designer/dataset/${ voiceToken }/delete`,
 });

@@ -1,36 +1,26 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
+import { useHistory } from "react-router-dom";
 import { faPlus, faWaveform } from "@fortawesome/pro-solid-svg-icons";
-import { usePrefixedDocumentTitle } from "common/UsePrefixedDocumentTitle";
+// import { usePrefixedDocumentTitle } from "common/UsePrefixedDocumentTitle";
 import Panel from "components/common/Panel";
 import PageHeader from "components/layout/PageHeader";
 import Container from "components/common/Container";
 import { Route, NavLink, Switch, Redirect } from "react-router-dom";
-import ListItems from "./components/ListItems/ListItems";
+import ListItems from "./components/NewList";
 import Modal from "components/common/Modal";
-
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
-import { ListDatasetsByUser, Dataset } from "@storyteller/components/src/api/voice_designer/voice_datasets/ListDatasetsByUser";
+import { faMicrophone } from "@fortawesome/pro-solid-svg-icons";
+
+import useVoiceRequests from "./useVoiceRequests";
 
 interface Props {
   sessionWrapper: SessionWrapper;
 }
 
 function VoiceDesignerMainPage({ sessionWrapper }: Props) {
-  const { user } = sessionWrapper.sessionStateResponse || {};
-  const [datasets,datasetsSet] = useState<Dataset[]>([]);
 
-
-  usePrefixedDocumentTitle("Voice Designer");
-
-  useEffect(() => {
-
-   if (!datasets.length && user) {
-      ListDatasetsByUser("hanashi",{}).then(res => {
-        if (res.datasets) datasetsSet(res.datasets);
-      });
-   }
-
-  },[user,datasets]);
+  const { datasets, deleteDataSet } = useVoiceRequests({ sessionWrapper });
 
   const [isDeleteVoiceModalOpen, setIsDeleteVoiceModalOpen] = useState(false);
   const [isDeleteDatasetModalOpen, setIsDeleteDatasetModalOpen] =
@@ -52,23 +42,51 @@ function VoiceDesignerMainPage({ sessionWrapper }: Props) {
     setIsDeleteDatasetModalOpen(false);
   };
 
-  const voicesList = [
+  const DataBadge = () => <span className="dataset-badge mb-0">Dataset</span>;
+  const VoiceBadge = () => <FontAwesomeIcon icon={faMicrophone} className="me-2 me-lg-3" />;
+
+  const history = useHistory();
+
+  const navToEdit = (token: string) => { history.push(`/voice-designer/voice/${token}/edit`) }
+
+  const rowClick = (todo: any) => ({ target }: { target: any }) => {
+    let datasetToken = datasets[target.name.split(",")[0].split(":")[1]].dataset_token;
+    todo(datasetToken);
+  };
+
+  const actionDataSets = datasets.map((dataset,i) => {
+    return {
+      ...dataset,
+      badge: DataBadge,
+      buttons: [{
+        label: "Edit",
+        small: true,
+        variant: "secondary",
+        onClick: rowClick(navToEdit)
+      },{
+        label: "Delete",
+        small: true,
+        variant: "danger",
+        onClick: rowClick(deleteDataSet)
+      }],
+      name: dataset.title
+    };
+  });
+
+
+    const voicesList = [
     {
+      badge: VoiceBadge,
       name: "Donald Trump (45th US President)",
       modelToken: "TM:z7x37sbvb8vc",
       isCreating: true,
     },
     {
+      badge: VoiceBadge,
       name: "Spongebob Squarepants (Season 1)",
       modelToken: "TM:z7x37sbvb8vc",
     },
   ];
-  // const datasetList = [
-  //   {
-  //     name: "Donald Trump (45th US President)",
-  //     modelToken: "dummyToken",
-  //   },
-  // ];
 
   function MyVoices() {
     return (
@@ -84,7 +102,7 @@ function VoiceDesignerMainPage({ sessionWrapper }: Props) {
     return (
       <ListItems
         type="dataset"
-        data={datasets}
+        data={actionDataSets}
         //data={datasetList}
         handleDeleteDataset={openDeleteDatasetModal}
       />
