@@ -20,6 +20,7 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   iconFlip?: boolean;
   download?: boolean | string;
   disabled?: boolean;
+  isLoading?: boolean;
 }
 
 export default function Button({
@@ -36,6 +37,7 @@ export default function Button({
   iconFlip = false,
   download,
   disabled,
+  isLoading = false,
   ...rest
 }: ButtonProps) {
   let iconMarginClass = !square && label ? (iconFlip ? "ms-2" : "me-2") : "";
@@ -45,13 +47,22 @@ export default function Button({
 
   let LabelComponent = !square ? label : null;
 
+  const SpinnerComponent = isLoading ? (
+    <div
+      className="spinner-border spinner-border-sm text-white ms-2"
+      role="status"
+    >
+      <span className="visually-hidden">Loading...</span>
+    </div>
+  ) : null;
+
   const externalClass = rest.className || "";
 
   const commonProps = {
     className: `${externalClass} button ${small ? "button-small" : ""} ${
       square ? (small ? "button-square-small" : "button-square") : ""
     } button-${variant} ${full ? "w-100" : ""}`,
-    disabled: disabled,
+    disabled: disabled || isLoading,
   };
 
   delete rest.className;
@@ -60,11 +71,13 @@ export default function Button({
     <>
       {LabelComponent}
       {IconComponent}
+      {SpinnerComponent}
     </>
   ) : (
     <>
       {IconComponent}
       {LabelComponent}
+      {SpinnerComponent}
     </>
   );
 

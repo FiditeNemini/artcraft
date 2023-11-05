@@ -93,6 +93,9 @@ import TtsModelSearchPage from "./pages/tts/tts_model_search/TtsModelSearchPage"
 import MediaPage from "./pages/media/MediaPage";
 import { VoiceDesignerMainPage } from "./pages/voice_designer/VoiceDesignerMainPage";
 import { VoiceDesignerVoiceEditPage } from "./pages/voice_designer/VoiceDesignerVoiceEditPage";
+import { PasswordResetEmailPage } from "./pages/password_reset/PasswordResetEmailPage";
+import { PasswordResetVerificationPage } from "./pages/password_reset/PasswordResetVerificationPage";
+import { PasswordResetChangePage } from "./pages/password_reset/PasswordResetChangePage";
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -266,6 +269,24 @@ class PageContainer extends React.Component<
                 querySessionSubscriptionsAction={
                   this.props.querySessionSubscriptionsAction
                 }
+              />
+            </Route>
+
+            <Route path="/password-reset/new">
+              <PasswordResetChangePage
+                sessionWrapper={this.props.sessionWrapper}
+              />
+            </Route>
+
+            <Route path="/password-reset/verify">
+              <PasswordResetVerificationPage
+                sessionWrapper={this.props.sessionWrapper}
+              />
+            </Route>
+
+            <Route path="/password-reset">
+              <PasswordResetEmailPage
+                sessionWrapper={this.props.sessionWrapper}
               />
             </Route>
 
@@ -645,9 +666,11 @@ class PageContainer extends React.Component<
             </Route>
 
             <Route path="/voice-designer">
-              <VoiceDesignerMainPage {...{
-                sessionWrapper: this.props.sessionWrapper
-              }}/>
+              <VoiceDesignerMainPage
+                {...{
+                  sessionWrapper: this.props.sessionWrapper,
+                }}
+              />
             </Route>
 
             <Route path="/generate-speech">
