@@ -185,10 +185,10 @@ function SignupPage(props: Props) {
     Analytics.accountSignupAttempt();
 
     if (
-      !usernameValid ||
-      !emailValid ||
-      !passwordValid ||
-      !passwordConfirmationValid
+      (usernameValid !== FieldTriState.TRUE) ||
+      (emailValid !== FieldTriState.TRUE) ||
+      (passwordValid !== FieldTriState.TRUE) ||
+      (passwordConfirmationValid !== FieldTriState.TRUE)
     ) {
       return false;
     }
