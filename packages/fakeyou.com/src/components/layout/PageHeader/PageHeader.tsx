@@ -63,7 +63,11 @@ export default function PageHeader({
             </div>
           )}
           <div className="row">
-            <div className="d-flex flex-column col-lg-7 justify-content-center gap-4 py-3">
+            <div
+              className={`d-flex flex-column ${
+                imageUrl ? "col-lg-7" : "col-12"
+              } justify-content-center gap-4 py-2`}
+            >
               <div>
                 <h1 className="fw-bold">
                   {/* {icon} */}
@@ -83,7 +87,11 @@ export default function PageHeader({
                 </div>
               )}
             </div>
-            <div className="d-none d-lg-block col-lg-5">
+            <div
+              className={`d-none col-lg-5 ${
+                imageUrl ? "d-lg-block" : "d-lg-none"
+              }`}
+            >
               {imageUrl && (
                 <img
                   src={imageUrl}

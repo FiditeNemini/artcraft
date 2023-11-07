@@ -4,8 +4,8 @@ import {
   // faMicrophoneLines,
   // faTags,
 } from "@fortawesome/pro-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { Button } from "components/common";
+// import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+// import { Button } from "components/common";
 import Input from "components/common/Input";
 import useVoiceDetailsStore from "hooks/useVoiceDetailsStore/";
 import React from "react";
@@ -27,7 +27,7 @@ export const SearchFieldClass = {
 };
 
 function VoiceDetails() {
-  const { name, visibility, setName, setVisibility } = useVoiceDetailsStore();
+  const { visibility, setVisibility } = useVoiceDetailsStore();
 
   return (
     <div className="d-flex flex-column gap-4">

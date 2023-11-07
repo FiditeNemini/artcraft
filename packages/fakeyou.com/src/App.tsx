@@ -3,6 +3,7 @@ import "scss/custom-bootstrap.scss";
 
 import React from "react";
 import { ApiConfig } from "@storyteller/components";
+import Cookies from 'universal-cookie';
 import {
   DetectLocale,
   DetectLocaleIsOk,
@@ -256,6 +257,7 @@ class App extends React.Component<Props, State> {
       voiceConversionModels: [],
       maybeSelectedVoiceConversionModel: undefined,
     };
+
   }
 
   componentWillMount() {
@@ -293,13 +295,18 @@ class App extends React.Component<Props, State> {
   querySession = async () => {
     const sessionWrapper = await SessionWrapper.lookupSession();
     const username = sessionWrapper.getDisplayName();
+    const cookies = new Cookies();
+
     if (username !== undefined) {
       // Track only logged-in users (for now)
       PosthogClient.enablePosthog();
       PosthogClient.setUsername(username);
-        window.dataLayer.push({
-          'user_id': username,
-        });
+      cookies.set('logged_in_username', username, { path: '/', expires: new Date(Date.now()+3 * 86400000) });
+      window.dataLayer.push({
+        'user_id': username,
+      });
+    } else {
+      cookies.remove('logged_in_username', { path: '/' });
     }
     this.setState({
       sessionWrapper: sessionWrapper,
@@ -307,8 +314,18 @@ class App extends React.Component<Props, State> {
   };
 
   querySessionSubscriptions = async () => {
+    const cookies = new Cookies();
+
     const sessionSubscriptionsWrapper =
-      await SessionSubscriptionsWrapper.lookupActiveSubscriptions();
+    await SessionSubscriptionsWrapper.lookupActiveSubscriptions();
+
+    const plan = sessionSubscriptionsWrapper.getActiveProductSlug();
+    if (plan !== undefined) {
+    cookies.set('logged_in_user_plan', plan, { path: '/', expires: new Date(Date.now()+3 * 86400000) });
+    } else {
+      cookies.remove('logged_in_user_plan', { path: '/' });
+    }
+
     this.setState({
       sessionSubscriptionsWrapper: sessionSubscriptionsWrapper,
     });
