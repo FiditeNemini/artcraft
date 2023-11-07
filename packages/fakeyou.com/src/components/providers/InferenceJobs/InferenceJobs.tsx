@@ -6,9 +6,10 @@ import { InferenceJobsContext } from 'context';
 interface Props {
   children?: any;
   byCategory?: any;
+  sessionWrapper?: any;
 }
 
-export default function InferenceJobs({ children, byCategory }: Props) {
+export default function InferenceJobs({ children, byCategory, sessionWrapper }: Props) {
 	const processStatus = (job: InferenceJob) => {
     switch (job.jobState) {
       case JobState.PENDING:
@@ -21,7 +22,7 @@ export default function InferenceJobs({ children, byCategory }: Props) {
       default: return -1;
     }
   };
-	return <InferenceJobsContext.Provider {...{ value: { byCategory, processStatus } }}>
+	return <InferenceJobsContext.Provider {...{ value: { byCategory, processStatus, sessionWrapper } }}>
 		{ children }
 	</InferenceJobsContext.Provider>
 };

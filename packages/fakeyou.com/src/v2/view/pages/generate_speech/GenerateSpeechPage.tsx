@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { faMicrophone, faVolume } from "@fortawesome/pro-solid-svg-icons";
+import { faVolume } from "@fortawesome/pro-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { usePrefixedDocumentTitle } from "common/UsePrefixedDocumentTitle";
 import { PageHeaderWithImage } from "v2/view/_common/PageHeaderWithImage";

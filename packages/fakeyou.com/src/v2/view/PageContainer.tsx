@@ -82,6 +82,7 @@ import { VoiceConversionModelListItem } from "@storyteller/components/src/api/vo
 import { CommunityCommissionsPage } from "./pages/contest/CommunityCommissionsPage";
 import { ProductUsageInfoPage } from "./pages/product_usage_info/ProductUsageInfoPage";
 import { VoiceDesignerFormPage } from "./pages/voice_designer/VoiceDesignerFormPage";
+import DatasetEditor from "./pages/voice_designer/DatasetEditor";
 import { GenerateSpeechPage } from "./pages/generate_speech/GenerateSpeechPage";
 import VcModelViewPage from "./pages/vc/vc_model_view/VcModelViewPage";
 import VcModelEditPage from "./pages/vc/vc_model_edit/VcModelEditPage";
@@ -94,6 +95,9 @@ import MediaPage from "./pages/media/MediaPage";
 import { VoiceDesignerMainPage } from "./pages/voice_designer/VoiceDesignerMainPage";
 import { VoiceDesignerVoiceEditPage } from "./pages/voice_designer/VoiceDesignerVoiceEditPage";
 import VoiceDesignerUseVoicePage from "./pages/voice_designer/VoiceDesignerUseVoicePage";
+import { PasswordResetEmailPage } from "./pages/password_reset/PasswordResetEmailPage";
+import { PasswordResetVerificationPage } from "./pages/password_reset/PasswordResetVerificationPage";
+import { PasswordResetChangePage } from "./pages/password_reset/PasswordResetChangePage";
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -267,6 +271,24 @@ class PageContainer extends React.Component<
                 querySessionSubscriptionsAction={
                   this.props.querySessionSubscriptionsAction
                 }
+              />
+            </Route>
+
+            <Route path="/password-reset/new">
+              <PasswordResetChangePage
+                sessionWrapper={this.props.sessionWrapper}
+              />
+            </Route>
+
+            <Route path="/password-reset/verify">
+              <PasswordResetVerificationPage
+                sessionWrapper={this.props.sessionWrapper}
+              />
+            </Route>
+
+            <Route path="/password-reset">
+              <PasswordResetEmailPage
+                sessionWrapper={this.props.sessionWrapper}
               />
             </Route>
 
@@ -631,7 +653,10 @@ class PageContainer extends React.Component<
             <Route
               exact
               path="/voice-designer/dataset/:dataset_token/edit"
-              component={VoiceDesignerFormPage}
+              {...{
+                sessionWrapper: this.props.sessionWrapper
+              }}
+              component={DatasetEditor}
             />
 
             {/* Route for handling dataset token for uploading samples */}
@@ -655,7 +680,7 @@ class PageContainer extends React.Component<
             </Route>
 
             <Route path="/voice-designer">
-              <VoiceDesignerMainPage />
+              <VoiceDesignerMainPage/>
             </Route>
 
             <Route path="/generate-speech">

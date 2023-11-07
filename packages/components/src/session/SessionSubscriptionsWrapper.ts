@@ -1,4 +1,9 @@
-import { ActiveSubscription, ListActiveSubscriptions, ListActiveSubscriptionsIsSuccess, ListActiveSubscriptionsSuccessResponse } from "../api/premium/ListActiveSubscriptions";
+import {
+  ActiveSubscription,
+  ListActiveSubscriptions,
+  ListActiveSubscriptionsIsSuccess,
+  ListActiveSubscriptionsSuccessResponse,
+} from "../api/premium/ListActiveSubscriptions";
 import { FakeYouFrontendEnvironment } from "../env/FakeYouFrontendEnvironment";
 
 const FAKEYOU_NAMESPACE = "fakeyou";
@@ -72,8 +77,25 @@ export class SessionSubscriptionsWrapper {
     return maybePlan !== undefined;
   }
 
-  private findActiveSubscription(namespace: string, product_slug: string) : ActiveSubscription | undefined {
-    const subs = this.listActiveSubscriptionResponse?.active_subscriptions || [];
-    return subs.find((sub) => sub.namespace === namespace && sub.product_slug === product_slug);
+  public getActiveProductSlug(): string | undefined {
+    if (this.hasActiveEliteSubscription()) {
+      return "fakeyou_elite";
+    } else if (this.hasActiveProSubscription()) {
+      return "fakeyou_pro";
+    } else if (this.hasActivePlusSubscription()) {
+      return "fakeyou_plus";
+    }
+    return undefined;
+  }
+
+  private findActiveSubscription(
+    namespace: string,
+    product_slug: string
+  ): ActiveSubscription | undefined {
+    const subs =
+      this.listActiveSubscriptionResponse?.active_subscriptions || [];
+    return subs.find(
+      (sub) => sub.namespace === namespace && sub.product_slug === product_slug
+    );
   }
 }
