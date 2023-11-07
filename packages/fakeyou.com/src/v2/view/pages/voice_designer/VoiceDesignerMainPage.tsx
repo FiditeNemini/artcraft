@@ -9,18 +9,17 @@ import { Route, NavLink, Switch, Redirect } from "react-router-dom";
 import ListItems from "./components/NewList";
 import Modal from "components/common/Modal";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
+// import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
 import { faMicrophone } from "@fortawesome/pro-solid-svg-icons";
-
 import useVoiceRequests from "./useVoiceRequests";
 
-interface Props {
-  sessionWrapper: SessionWrapper;
-}
+// interface Props {
+//   sessionWrapper: SessionWrapper;
+// }
 
-function VoiceDesignerMainPage({ sessionWrapper }: Props) {
+function VoiceDesignerMainPage() {
 
-  const { datasets, deleteDataSet } = useVoiceRequests({ sessionWrapper });
+  const { datasets, deleteDataSet } = useVoiceRequests();
 
   const [isDeleteVoiceModalOpen, setIsDeleteVoiceModalOpen] = useState(false);
   const [isDeleteDatasetModalOpen, setIsDeleteDatasetModalOpen] =
@@ -47,7 +46,7 @@ function VoiceDesignerMainPage({ sessionWrapper }: Props) {
 
   const history = useHistory();
 
-  const navToEdit = (token: string) => { history.push(`/voice-designer/voice/${token}/edit`) }
+  const navToEdit = (token: string) => { history.push(`/voice-designer/dataset/${token}/edit`) }
 
   const rowClick = (todo: any) => ({ target }: { target: any }) => {
     let datasetToken = datasets[target.name.split(",")[0].split(":")[1]].dataset_token;
