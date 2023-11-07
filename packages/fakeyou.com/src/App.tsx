@@ -329,8 +329,6 @@ class App extends React.Component<Props, State> {
     } else {
       cookies.remove('logged_in_user_plan', { path: '/' });
     }
-    console.log(sessionSubscriptionsWrapper);
-    console.log(deepEqual(sessionSubscriptionsWrapper, this.state.sessionSubscriptionsWrapper))
 
     if (!deepEqual(sessionSubscriptionsWrapper, this.state.sessionSubscriptionsWrapper)) {
       this.setState({
