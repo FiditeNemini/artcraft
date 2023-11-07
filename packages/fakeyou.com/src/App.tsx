@@ -36,6 +36,7 @@ import { TtsCategoryType } from "./AppWrapper";
 import { FAKEYOU_MERGED_TRANSLATIONS } from "./_i18n/FakeYouTranslations";
 import i18n from "i18next";
 import { initReactI18next } from "react-i18next";
+import deepEqual from "deep-equal";
 import { VocoderUploadJob } from "@storyteller/components/src/jobs/VocoderUploadJobs";
 import {
   GetRemoteDownloadJobStatus,
@@ -308,9 +309,12 @@ class App extends React.Component<Props, State> {
     } else {
       cookies.remove('logged_in_username', { path: '/' });
     }
-    this.setState({
-      sessionWrapper: sessionWrapper,
-    });
+    
+    if (!deepEqual(sessionWrapper, this.state.sessionWrapper)) {
+      this.setState({
+        sessionWrapper: sessionWrapper,
+      });
+    }
   };
 
   querySessionSubscriptions = async () => {
@@ -326,9 +330,11 @@ class App extends React.Component<Props, State> {
       cookies.remove('logged_in_user_plan', { path: '/' });
     }
 
-    this.setState({
-      sessionSubscriptionsWrapper: sessionSubscriptionsWrapper,
-    });
+    if (!deepEqual(sessionSubscriptionsWrapper, this.state.sessionSubscriptionsWrapper)) {
+      this.setState({
+        sessionSubscriptionsWrapper: sessionSubscriptionsWrapper,
+      });
+    }
   };
 
   queryLanguage = async () => {
