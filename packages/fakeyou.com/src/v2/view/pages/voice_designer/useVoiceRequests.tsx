@@ -1,15 +1,12 @@
 import { useEffect, useState } from 'react';
-import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
+// import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
 import { ListDatasetsByUser, Dataset } from "@storyteller/components/src/api/voice_designer/voice_datasets/ListDatasetsByUser";
 import { DeleteDataset } from "@storyteller/components/src/api/voice_designer/voice_datasets/DeleteDataset";
+import { useSession } from "hooks";
 
-interface Props {
-  sessionWrapper: SessionWrapper;
-}
-
-export default function useVoiceRequests({ sessionWrapper }: Props) {
-	const { user } = sessionWrapper.sessionStateResponse || {};
+export default function useVoiceRequests() {
   const [datasets, datasetsSet] = useState<Dataset[]>([]);
+  const { user } = useSession();
 
   const deleteDataSet = (voiceToken:  string) => DeleteDataset(voiceToken,{
   	set_delete: true,
@@ -17,6 +14,8 @@ export default function useVoiceRequests({ sessionWrapper }: Props) {
   }).then(res => {
   	console.log("🏧",res);
   });
+
+  const datasetByToken = (datasetToken?: string) => datasets.filter(({ dataset_token },i) => datasetToken === dataset_token)[0];
 
 	useEffect(() => {
 
@@ -28,5 +27,5 @@ export default function useVoiceRequests({ sessionWrapper }: Props) {
 
 	},[user, datasets]);
 
-  return { datasets, deleteDataSet };
+  return { datasetByToken, datasets, deleteDataSet };
 };

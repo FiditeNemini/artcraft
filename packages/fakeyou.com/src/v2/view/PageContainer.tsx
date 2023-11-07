@@ -82,6 +82,7 @@ import { VoiceConversionModelListItem } from "@storyteller/components/src/api/vo
 import { CommunityCommissionsPage } from "./pages/contest/CommunityCommissionsPage";
 import { ProductUsageInfoPage } from "./pages/product_usage_info/ProductUsageInfoPage";
 import { VoiceDesignerFormPage } from "./pages/voice_designer/VoiceDesignerFormPage";
+import DatasetEditor from "./pages/voice_designer/DatasetEditor";
 import { GenerateSpeechPage } from "./pages/generate_speech/GenerateSpeechPage";
 import VcModelViewPage from "./pages/vc/vc_model_view/VcModelViewPage";
 import VcModelEditPage from "./pages/vc/vc_model_edit/VcModelEditPage";
@@ -651,7 +652,10 @@ class PageContainer extends React.Component<
             <Route
               exact
               path="/voice-designer/dataset/:dataset_token/edit"
-              component={VoiceDesignerFormPage}
+              {...{
+                sessionWrapper: this.props.sessionWrapper
+              }}
+              component={DatasetEditor}
             />
 
             {/* Route for handling dataset token for uploading samples */}
@@ -666,11 +670,7 @@ class PageContainer extends React.Component<
             </Route>
 
             <Route path="/voice-designer">
-              <VoiceDesignerMainPage
-                {...{
-                  sessionWrapper: this.props.sessionWrapper,
-                }}
-              />
+              <VoiceDesignerMainPage/>
             </Route>
 
             <Route path="/generate-speech">

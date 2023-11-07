@@ -1,3 +1,4 @@
 import InferenceJobs from "./InferenceJobs";
+import Session from "./Session";
 
-export { InferenceJobs };
+export { InferenceJobs, Session };

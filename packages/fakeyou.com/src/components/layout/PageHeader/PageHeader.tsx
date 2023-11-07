@@ -5,7 +5,13 @@ import { IconDefinition } from "@fortawesome/fontawesome-svg-core";
 import Button from "components/common/Button";
 import BackButton from "components/common/BackButton";
 
+interface BackConfig {
+  label: string;
+  to: string;
+};
+
 interface PageHeaderProps {
+  back?: BackConfig;
   titleIcon?: IconDefinition;
   title: string | React.ReactNode;
   subText: string | React.ReactNode;
@@ -25,6 +31,7 @@ interface PageHeaderProps {
 }
 
 export default function PageHeader({
+  back,
   titleIcon,
   title,
   subText,
@@ -50,9 +57,9 @@ export default function PageHeader({
     return (
       <div className="py-3 py-lg-4">
         <Panel clear={true}>
-          {showBackButton && (
+          {( back || showBackButton) && (
             <div className="d-flex mb-2 mb-lg-3">
-              <BackButton label={backbuttonLabel} to={backbuttonTo} />
+              <BackButton label={back ? back.label : backbuttonLabel} to={ back ? back.to : backbuttonTo } />
             </div>
           )}
           <div className="row">
