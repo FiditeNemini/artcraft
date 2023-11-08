@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
-import { Link, useHistory } from "react-router-dom";
+import { useHistory } from "react-router-dom";
 import {
   CreateSession,
   CreateSessionIsError,
@@ -132,11 +132,11 @@ function LoginPage(props: Props) {
                   onChange={handlePasswordChange}
                 />
               </div>
-              <p className="d-flex flex-column flex-lg-row gap-2">
+              {/* <p className="d-flex flex-column flex-lg-row gap-2">
                 <Link to="/password-reset" className="text-link form-text">
                   Forgot your password?
                 </Link>
-              </p>
+              </p> */}
             </div>
           </div>
           <button className="btn btn-primary w-100 mt-4">Login</button>
