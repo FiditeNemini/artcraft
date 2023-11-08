@@ -117,7 +117,7 @@ fn invoice_paid_extractor(invoice: &Invoice) -> AnyhowResult<Option<InvoicePaidD
     }
     InvoiceLineItemType::Subscription => {
       let maybe_subscription_id = line_item.subscription
-          .as_deref().map(|s| s.to_string());
+          .as_ref().map(|s| expand_subscription_id(s));
 
       let maybe_product_id = line_item.price
           .as_ref()

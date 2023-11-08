@@ -30,7 +30,7 @@ pub async fn search_tts_models(
   let mut hits = response_json.get_mut("hits")
       .map(|hits| hits.take());
 
-  let mut hits = hits.map(|mut hits| {
+  let hits = hits.map(|mut hits| {
     hits.get_mut("hits")
         .map(|hits| hits.take())
   }).flatten();

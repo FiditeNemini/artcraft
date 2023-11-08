@@ -11,6 +11,7 @@ pub fn subscription_status_to_reusable_type(subscription_status: SubscriptionSta
     SubscriptionStatus::PastDue => StripeSubscriptionStatus::PastDue,
     SubscriptionStatus::Trialing => StripeSubscriptionStatus::Trialing,
     SubscriptionStatus::Unpaid => StripeSubscriptionStatus::Unpaid,
+    SubscriptionStatus::Paused => StripeSubscriptionStatus::Paused,
   }
 }
 
@@ -31,5 +32,6 @@ pub mod tests {
     assert_eq!(subscription_status_to_reusable_type(SubscriptionStatus::PastDue), StripeSubscriptionStatus::PastDue);
     assert_eq!(subscription_status_to_reusable_type(SubscriptionStatus::Trialing), StripeSubscriptionStatus::Trialing);
     assert_eq!(subscription_status_to_reusable_type(SubscriptionStatus::Unpaid), StripeSubscriptionStatus::Unpaid);
+    assert_eq!(subscription_status_to_reusable_type(SubscriptionStatus::Paused), StripeSubscriptionStatus::Paused);
   }
 }

@@ -75,7 +75,8 @@ pub async fn stripe_create_checkout_session_shared(
   };
 
   let checkout_session = {
-    let mut params = CreateCheckoutSession::new(&cancel_url, &success_url);
+    let mut params = CreateCheckoutSession::new(&success_url);
+    params.cancel_url = Some(&cancel_url);
 
     // `client_reference_id`
     // Stripe Docs:
@@ -127,7 +128,7 @@ pub async fn stripe_create_checkout_session_shared(
       // This cannot be used for non-subscription, one-off payments.
       // https://support.stripe.com/questions/using-metadata-with-checkout-sessions
       params.subscription_data = Some(CreateCheckoutSessionSubscriptionData {
-        metadata,
+       metadata: Some(metadata),
         ..Default::default()
       });
 
@@ -139,7 +140,7 @@ pub async fn stripe_create_checkout_session_shared(
       // This cannot be used for subscriptions.
       // https://support.stripe.com/questions/using-metadata-with-checkout-sessions
       params.payment_intent_data = Some(CreateCheckoutSessionPaymentIntentData {
-        metadata: metadata.clone(),
+        metadata: Some(metadata.clone()),
         ..Default::default()
       });
     }

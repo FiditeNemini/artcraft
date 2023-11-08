@@ -70,7 +70,7 @@ pub async fn stripe_webhook_handler(
 
   let stripe_event_created_at = NaiveDateTime::from_timestamp(webhook_payload.created, 0);
 
-  let stripe_event_type = serde_json::to_string(&webhook_payload.event_type)
+  let stripe_event_type = serde_json::to_string(&webhook_payload.type_)
       .map(|s| s.replace("\"", ""))
       .map_err(|err| {
         error!("Could not deserialize webhook type: {:?}", err);
@@ -82,7 +82,7 @@ pub async fn stripe_webhook_handler(
 
   info!("Stripe webhook event type: {} ({:?}); is production: {}, created at: {}, pending events to be handled: {}",
     &stripe_event_type,
-    &webhook_payload.event_type,
+    &webhook_payload.type_,
     stripe_is_production,
     &stripe_event_created_at,
     webhook_payload.pending_webhooks);
@@ -117,7 +117,7 @@ pub async fn stripe_webhook_handler(
   // NB:
   // - "Webhook endpoints might occasionally receive the same event more than once."
   // - "Stripe does not guarantee delivery of events in the order in which they are generated."
-  match webhook_payload.event_type {
+  match webhook_payload.type_ {
 
     // =============== CHECKOUT SESSIONS ===============
 
@@ -309,7 +309,7 @@ pub async fn stripe_webhook_handler(
   if unhandled_event_type {
     warn!("Unhandled Stripe webhook event type: {} ({:?})",
       &stripe_event_type,
-      &webhook_payload.event_type);
+      &webhook_payload.type_);
   }
 
   let query = InsertStripeWebhookEventLog {
