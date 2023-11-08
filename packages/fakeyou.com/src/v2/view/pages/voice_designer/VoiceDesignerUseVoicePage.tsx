@@ -41,7 +41,12 @@ export default function VoiceDesignerUseVoicePage(
   const [textBuffer, setTextBuffer] = useState("");
 
   const title = "Solid Snake";
-  const subText = "Voice Designer TTS model by Vegito1089";
+  const subText = (
+    <div>
+      Voice Designer TTS model by{" "}
+      <Link to="/profile/Vegito1089">Vegito1089</Link>
+    </div>
+  );
   // const tags = ["Speaking", "English", "Character", "Singing", "Spanish"];
 
   let modelCreatorLink = <Link to="">Creator Name</Link>;
