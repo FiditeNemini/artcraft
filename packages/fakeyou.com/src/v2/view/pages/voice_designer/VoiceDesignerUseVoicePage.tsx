@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import {
   faBarsStaggered,
+  faDeleteLeft,
   faEdit,
   faEye,
   faMemo,
@@ -17,12 +18,13 @@ import PageHeader from "components/layout/PageHeader";
 import { CommentComponent } from "v2/view/_common/comments/CommentComponent";
 import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
 import Container from "components/common/Container/Container";
-import { useSession } from "hooks";
+// import { useSession } from "hooks";
 import TextArea from "components/common/TextArea";
 import { Button } from "components/common";
 import { SessionTtsInferenceResultList } from "v2/view/_common/SessionTtsInferenceResultsList";
 import { InferenceJob } from "@storyteller/components/src/jobs/InferenceJob";
 import { TtsInferenceJob } from "@storyteller/components/src/jobs/TtsInferenceJobs";
+import { faVolumeUp } from "@fortawesome/free-solid-svg-icons";
 
 interface VoiceDesignerUseVoicePageProps {
   sessionWrapper: SessionWrapper;
@@ -34,22 +36,13 @@ interface VoiceDesignerUseVoicePageProps {
 export default function VoiceDesignerUseVoicePage(
   props: VoiceDesignerUseVoicePageProps
 ) {
-  const { user } = useSession();
+  // const { user } = useSession();
   // let { token } = useParams() as { token: string };
   const [textBuffer, setTextBuffer] = useState("");
 
   const title = "Solid Snake";
-  const subText = (
-    <div className="d-flex align-items-center gap-2">
-      <div>
-        <span className="badge-model badge-model-rvc fs-6">RVCv2</span>
-      </div>
-      <p>
-        TTS model by <Link to="/">Vegito1089</Link>
-      </p>
-    </div>
-  );
-  const tags = ["Speaking", "English", "Character", "Singing", "Spanish"];
+  const subText = "Voice Designer TTS model by Vegito1089";
+  // const tags = ["Speaking", "English", "Character", "Singing", "Spanish"];
 
   let modelCreatorLink = <Link to="">Creator Name</Link>;
   let modelTitle = title;
@@ -90,7 +83,7 @@ export default function VoiceDesignerUseVoicePage(
     { label: "Front page featured?", value: frontPageFeatured },
   ];
 
-  const shareUrl = window.location.href;
+  // const shareUrl = window.location.href;
 
   const handleFormSubmit = async (ev: React.FormEvent<HTMLFormElement>) => {
     ev.preventDefault();
@@ -120,8 +113,13 @@ export default function VoiceDesignerUseVoicePage(
                 rows={8}
               />
               <div className="d-flex gap-3">
-                <Button label="Speak" full={true} />
-                <Button label="Clear" full={true} variant="danger" />
+                <Button icon={faVolumeUp} label="Speak" full={true} />
+                <Button
+                  icon={faDeleteLeft}
+                  label="Clear"
+                  full={true}
+                  variant="danger"
+                />
               </div>
             </div>
             <div className="col-12 col-lg-6 d-flex flex-column gap-3">
