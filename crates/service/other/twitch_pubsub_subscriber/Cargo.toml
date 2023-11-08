@@ -48,7 +48,7 @@ tokio = { version = "1.10.0", features = ["rt-multi-thread", "macros", "time"] }
 
 # Futures
 futures = { version = "0.3.17", features = ["thread-pool"] } # feature for ThreadPool
-futures-util = "0.3.28"
+futures-util = "0.3.29"
 futures_old_for_limiter = { package = "futures", version = "0.1.29" } # Older version of futures for `limiter` crate
 
 # Threading
