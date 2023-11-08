@@ -8,7 +8,7 @@ import BackButton from "components/common/BackButton";
 interface BackConfig {
   label: string;
   to: string;
-};
+}
 
 interface PageHeaderProps {
   back?: BackConfig;
@@ -57,9 +57,12 @@ export default function PageHeader({
     return (
       <div className="py-3 py-lg-4">
         <Panel clear={true}>
-          {( back || showBackButton) && (
+          {(back || showBackButton) && (
             <div className="d-flex mb-2 mb-lg-3">
-              <BackButton label={back ? back.label : backbuttonLabel} to={ back ? back.to : backbuttonTo } />
+              <BackButton
+                label={back ? back.label : backbuttonLabel}
+                to={back ? back.to : backbuttonTo}
+              />
             </div>
           )}
           <div className="row">
@@ -73,7 +76,9 @@ export default function PageHeader({
                   {/* {icon} */}
                   {title}
                 </h1>
-                <p className="opacity-75">{subText}</p>
+                <p className={typeof subText === "string" ? "opacity-75" : ""}>
+                  {subText}
+                </p>
               </div>
               {showButton && (
                 <div className="d-md-flex">

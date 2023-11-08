@@ -94,6 +94,7 @@ import TtsModelSearchPage from "./pages/tts/tts_model_search/TtsModelSearchPage"
 import MediaPage from "./pages/media/MediaPage";
 import { VoiceDesignerMainPage } from "./pages/voice_designer/VoiceDesignerMainPage";
 import { VoiceDesignerVoiceEditPage } from "./pages/voice_designer/VoiceDesignerVoiceEditPage";
+import VoiceDesignerUseVoicePage from "./pages/voice_designer/VoiceDesignerUseVoicePage";
 import { PasswordResetEmailPage } from "./pages/password_reset/PasswordResetEmailPage";
 import { PasswordResetVerificationPage } from "./pages/password_reset/PasswordResetVerificationPage";
 import { PasswordResetChangePage } from "./pages/password_reset/PasswordResetChangePage";
@@ -653,7 +654,7 @@ class PageContainer extends React.Component<
               exact
               path="/voice-designer/dataset/:dataset_token/edit"
               {...{
-                sessionWrapper: this.props.sessionWrapper
+                sessionWrapper: this.props.sessionWrapper,
               }}
               component={DatasetEditor}
             />
@@ -669,8 +670,19 @@ class PageContainer extends React.Component<
               <VoiceDesignerVoiceEditPage />
             </Route>
 
+            <Route path="/voice-designer/voice/:voice_token">
+              <VoiceDesignerUseVoicePage
+                sessionWrapper={this.props.sessionWrapper}
+                sessionSubscriptionsWrapper={
+                  this.props.sessionSubscriptionsWrapper
+                }
+                inferenceJobs={this.props.inferenceJobs}
+                ttsInferenceJobs={this.props.ttsInferenceJobs}
+              />
+            </Route>
+
             <Route path="/voice-designer">
-              <VoiceDesignerMainPage/>
+              <VoiceDesignerMainPage />
             </Route>
 
             <Route path="/generate-speech">
