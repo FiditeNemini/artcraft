@@ -654,7 +654,7 @@ class PageContainer extends React.Component<
               exact
               path="/voice-designer/dataset/:dataset_token/edit"
               {...{
-                sessionWrapper: this.props.sessionWrapper
+                sessionWrapper: this.props.sessionWrapper,
               }}
               component={DatasetEditor}
             />
@@ -676,11 +676,13 @@ class PageContainer extends React.Component<
                 sessionSubscriptionsWrapper={
                   this.props.sessionSubscriptionsWrapper
                 }
+                inferenceJobs={this.props.inferenceJobs}
+                ttsInferenceJobs={this.props.ttsInferenceJobs}
               />
             </Route>
 
             <Route path="/voice-designer">
-              <VoiceDesignerMainPage/>
+              <VoiceDesignerMainPage />
             </Route>
 
             <Route path="/generate-speech">

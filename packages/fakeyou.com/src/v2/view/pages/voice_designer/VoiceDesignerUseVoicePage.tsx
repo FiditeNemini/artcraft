@@ -1,11 +1,13 @@
-import React from "react";
+import React, { useState } from "react";
 import {
+  faBarsStaggered,
   faEdit,
   faEye,
   faMemo,
   faMemoCircleInfo,
   faMessages,
   faTrash,
+  faWaveformLines,
 } from "@fortawesome/pro-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Panel from "components/common/Panel/Panel";
@@ -14,20 +16,27 @@ import { SessionSubscriptionsWrapper } from "@storyteller/components/src/session
 import PageHeader from "components/layout/PageHeader";
 import { CommentComponent } from "v2/view/_common/comments/CommentComponent";
 import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
-import { RatingButtons } from "v2/view/_common/ratings/RatingButtons";
-import { RatingStats } from "v2/view/_common/ratings/RatingStats";
-import ShareButton from "components/common/ShareButton/ShareButton";
 import Container from "components/common/Container/Container";
+import { useSession } from "hooks";
+import TextArea from "components/common/TextArea";
+import { Button } from "components/common";
+import { SessionTtsInferenceResultList } from "v2/view/_common/SessionTtsInferenceResultsList";
+import { InferenceJob } from "@storyteller/components/src/jobs/InferenceJob";
+import { TtsInferenceJob } from "@storyteller/components/src/jobs/TtsInferenceJobs";
 
 interface VoiceDesignerUseVoicePageProps {
   sessionWrapper: SessionWrapper;
   sessionSubscriptionsWrapper: SessionSubscriptionsWrapper;
+  inferenceJobs: Array<InferenceJob>;
+  ttsInferenceJobs: Array<TtsInferenceJob>;
 }
 
 export default function VoiceDesignerUseVoicePage(
   props: VoiceDesignerUseVoicePageProps
 ) {
+  const { user } = useSession();
   // let { token } = useParams() as { token: string };
+  const [textBuffer, setTextBuffer] = useState("");
 
   const title = "Solid Snake";
   const subText = (
@@ -36,7 +45,7 @@ export default function VoiceDesignerUseVoicePage(
         <span className="badge-model badge-model-rvc fs-6">RVCv2</span>
       </div>
       <p>
-        V2V model by <Link to="/">Vegito1089</Link>
+        TTS model by <Link to="/">Vegito1089</Link>
       </p>
     </div>
   );
@@ -82,13 +91,57 @@ export default function VoiceDesignerUseVoicePage(
   ];
 
   const shareUrl = window.location.href;
-  const shareButton = <ShareButton url={shareUrl} />;
+
+  const handleFormSubmit = async (ev: React.FormEvent<HTMLFormElement>) => {
+    ev.preventDefault();
+  };
+
+  const handleChangeText = (ev: React.FormEvent<HTMLTextAreaElement>) => {
+    const textValue = (ev.target as HTMLTextAreaElement).value;
+    setTextBuffer(textValue);
+  };
 
   return (
     <Container type="panel">
       <PageHeader title={title} subText={subText} />
 
-      {/* TTS Voice Generation */}
+      <Panel padding={true} mb={true}>
+        <form onSubmit={handleFormSubmit}>
+          <div className="row g-4">
+            <div className="col-12 col-lg-6 d-flex flex-column gap-3">
+              <h4>
+                <FontAwesomeIcon icon={faWaveformLines} className="me-3" />
+                Use Voice
+              </h4>
+              <TextArea
+                placeholder="Enter text you want your character to say here..."
+                value={textBuffer}
+                onChange={handleChangeText}
+                rows={8}
+              />
+              <div className="d-flex gap-3">
+                <Button label="Speak" full={true} />
+                <Button label="Clear" full={true} variant="danger" />
+              </div>
+            </div>
+            <div className="col-12 col-lg-6 d-flex flex-column gap-3">
+              <h4>
+                <FontAwesomeIcon icon={faBarsStaggered} className="me-3" />
+                Session TTS Results
+              </h4>
+              <div className="d-flex flex-column gap-3 session-tts-section">
+                <SessionTtsInferenceResultList
+                  inferenceJobs={props.inferenceJobs}
+                  ttsInferenceJobs={props.ttsInferenceJobs}
+                  sessionSubscriptionsWrapper={
+                    props.sessionSubscriptionsWrapper
+                  }
+                />
+              </div>
+            </div>
+          </div>
+        </form>
+      </Panel>
 
       {modelDescription && (
         <Panel padding mb>
