@@ -24,10 +24,9 @@ select
     vc.id,
     vc.token,
     vc.model_type,
-    SUBSTRING(vc.title, 1, 50) as title,
+    SUBSTRING(vc.title, 1, 35) as title,
     u.username,
-    SUBSTRING(vc.original_download_url, 1, 50) as url,
-    vc.created_at,
+    SUBSTRING(vc.original_download_url, 1, 35) as url,
     vc.updated_at
 from voice_conversion_models as vc
 left join users AS u on

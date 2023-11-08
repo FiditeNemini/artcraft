@@ -323,7 +323,25 @@ where token IN (
     'vcm_9amtxj95fwpe',
     'vcm_5thjhwepk2rs',
     'vcm_p4xp9e34ypka',
-    'vcm_ch8xjth7wm5a'
+    'vcm_1bknrg4gqm18',
+    'vcm_4rxa4qp1ek7y',
+    'vcm_71pgq78k1y3b',
+    'vcm_7h3p6vn9ts4n',
+    'vcm_7w2akqddh758',
+    'vcm_9ytxkwqk00se',
+    'vcm_avyzqxctreb8',
+    'vcm_bxz11j5g503k',
+    'vcm_byxtz4gs6m25',
+    'vcm_ch8xjth7wm5a',
+    'vcm_dg57xngqxdp0',
+    'vcm_eb6htakr2y44',
+    'vcm_k5hkg05p5f19',
+    'vcm_kmhs1a6n97ez',
+    'vcm_krvgbm1wc2xv',
+    'vcm_m3sjae12xw66',
+    'vcm_vn1qqvy0t9bn',
+    'vcm_w6hz0tbmmmd3',
+    'vcm_zmxv2k1q9jd8'
 );
 
 
