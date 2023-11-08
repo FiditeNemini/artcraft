@@ -72,7 +72,7 @@ pub async fn list_voices_by_session_handler(
       })?
       .ok_or_else(|| {
         warn!("not logged in");
-        return ListVoicesByUserError::NotAuthorized;
+        ListVoicesByUserError::NotAuthorized
       })?;
 
   let creator_user_token = user_session.user_token.clone();

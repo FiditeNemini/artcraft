@@ -7,7 +7,6 @@ use config::shared_constants::DEFAULT_RUST_LOG;
 use errors::AnyhowResult;
 
 use crate::delete_pods_threaded::delete_pods_threaded;
-use crate::list_pods::list_pods;
 
 pub mod delete_pods;
 pub mod delete_pods_threaded;

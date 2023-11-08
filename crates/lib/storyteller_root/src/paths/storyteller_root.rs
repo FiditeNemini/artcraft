@@ -127,7 +127,22 @@ mod tests {
     // test variable so we never infect other tests.
     std::env::set_var(TEST_HOME, fake_home.to_str().expect("should be string"));
 
-    assert_eq!(get_storyteller_root(), fake_storyteller);
+    let actual = get_storyteller_root();
+    let mut expected = fake_storyteller.clone();
+
+    if actual.starts_with("/private") && !expected.starts_with("/private") {
+      // NB: For Mac, TempDir creates in /var/... which is an alias of /private/var/...
+      // We'll make sure to canonicalize both paths.
+      let mut corrected = PathBuf::from("/private");
+
+      expected.iter()
+          .filter(|component| !component.to_string_lossy().eq("/"))
+          .for_each(|component| corrected.push(component));
+
+      expected = corrected;
+    }
+
+    assert_eq!(actual, expected);
 
     std::env::remove_var(TEST_HOME);
 
