@@ -20,6 +20,7 @@ pub enum StripeSubscriptionStatus {
   PastDue,
   Trialing,
   Unpaid,
+  Paused,
 }
 
 impl StripeSubscriptionStatus {
@@ -32,6 +33,7 @@ impl StripeSubscriptionStatus {
       StripeSubscriptionStatus::PastDue => "past_due",
       StripeSubscriptionStatus::Trialing => "trialing",
       StripeSubscriptionStatus::Unpaid => "unpaid",
+      StripeSubscriptionStatus::Paused => "paused"
     }
   }
 
@@ -45,6 +47,7 @@ impl StripeSubscriptionStatus {
       "past_due" => Ok(Self::PastDue),
       "trialing" => Ok(Self::Trialing),
       "unpaid" => Ok(Self::Unpaid),
+      "paused" => Ok(Self::Paused),
       _ => Err(format!("invalid value: {:?}", value)),
     }
   }
@@ -91,6 +94,7 @@ mod tests {
     assert_serialization(StripeSubscriptionStatus::PastDue, "past_due");
     assert_serialization(StripeSubscriptionStatus::Trialing, "trialing");
     assert_serialization(StripeSubscriptionStatus::Unpaid, "unpaid");
+    assert_serialization(StripeSubscriptionStatus::Paused, "paused");
   }
 
   #[test]
@@ -102,6 +106,7 @@ mod tests {
     assert_eq!(StripeSubscriptionStatus::PastDue.as_str(), "past_due");
     assert_eq!(StripeSubscriptionStatus::Trialing.as_str(), "trialing");
     assert_eq!(StripeSubscriptionStatus::Unpaid.as_str(), "unpaid");
+    assert_eq!(StripeSubscriptionStatus::Paused.as_str(), "paused");
   }
 
   #[test]
@@ -113,6 +118,7 @@ mod tests {
     assert_eq!(StripeSubscriptionStatus::from_str("past_due").unwrap(), StripeSubscriptionStatus::PastDue);
     assert_eq!(StripeSubscriptionStatus::from_str("trialing").unwrap(), StripeSubscriptionStatus::Trialing);
     assert_eq!(StripeSubscriptionStatus::from_str("unpaid").unwrap(), StripeSubscriptionStatus::Unpaid);
+    assert_eq!(StripeSubscriptionStatus::from_str("paused").unwrap(), StripeSubscriptionStatus::Paused);
     assert!(StripeSubscriptionStatus::from_str("foo").is_err());
   }
 }

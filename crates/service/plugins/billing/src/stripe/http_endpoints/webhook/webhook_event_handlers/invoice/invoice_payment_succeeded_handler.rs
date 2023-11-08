@@ -18,8 +18,9 @@ pub fn invoice_payment_succeeded_handler(invoice: &Invoice) -> Result<StripeWebh
       .map(|c| expand_customer_id(c));
 
   // NB: Our internal user token.
-  let maybe_user_token = invoice.metadata.get(METADATA_USER_TOKEN)
-      .map(|t| t.to_string());
+  let maybe_user_token = invoice.metadata
+      .as_ref()
+      .and_then(|m| m.get(METADATA_USER_TOKEN).map(|t| t.to_string()));
 
   Ok(StripeWebhookSummary {
     maybe_user_token,

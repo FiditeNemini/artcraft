@@ -20,8 +20,8 @@ pub fn checkout_session_completed_handler(checkout_session: CheckoutSession) -> 
       .map(|c| expand_customer_id(c));
 
   // NB: Our internal user token.
-  let maybe_user_token = checkout_session.metadata.get(METADATA_USER_TOKEN)
-      .map(|t| t.to_string());
+  let maybe_user_token = checkout_session.metadata
+      .and_then(|m| m.get(METADATA_USER_TOKEN).map(|t| t.to_string()));
 
   Ok(StripeWebhookSummary {
     maybe_user_token,
