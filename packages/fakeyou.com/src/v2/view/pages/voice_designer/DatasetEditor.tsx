@@ -6,6 +6,8 @@ import { faPencil, faWaveform } from "@fortawesome/pro-solid-svg-icons";
 import { TempInput, Panel, SegmentButtons, TempSelect } from "components/common";
 import useVoiceRequests from "./useVoiceRequests";
 
+import { v4 as uuidv4 } from "uuid";
+
 import "./VoiceDesigner.scss";
 
 interface Props {
@@ -38,6 +40,7 @@ export default function DatasetEditor({ value }: Props) {
     { value: "es", label: "Spanish" },
     { value: "fr", label: "French" },
   ];
+
   const visibilityOptions = [{ label: "Public", value: "public" },{  label: "Hidden", value: "hidden" }];
   const buttonLabel = "Save dataset";
   const buttonOnClick = () => {
@@ -48,7 +51,11 @@ export default function DatasetEditor({ value }: Props) {
         ietf_language_tag: language
       });
     } else {
-      datasets.create();
+      datasets.create({
+          title,
+          creator_set_visibility: language,
+          idempotency_token: uuidv4(),
+      });
     }
   };
   const headerProps = { back, buttonOnClick, buttonLabel, panel: false, showButton: true, subText, title: pageTitle, titleIcon };

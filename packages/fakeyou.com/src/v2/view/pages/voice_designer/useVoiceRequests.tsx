@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 // import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
 import { ListDatasetsByUser, Dataset } from "@storyteller/components/src/api/voice_designer/voice_datasets/ListDatasetsByUser";
 import { DeleteDataset } from "@storyteller/components/src/api/voice_designer/voice_datasets/DeleteDataset";
-// import { CreateVoice, UpdateDatasetRequest } from "@storyteller/components/src/api/voice_designer/voice_datasets/CreateVoice";
+import { CreateDataset, CreateDatasetRequest, CreateDatasetResponse } from "@storyteller/components/src/api/voice_designer/voice_datasets/CreateDataset";
 import { UpdateDataset, UpdateDatasetRequest } from "@storyteller/components/src/api/voice_designer/voice_datasets/UpdateDataset";
 import { useSession } from "hooks";
 
@@ -14,23 +14,23 @@ export default function useVoiceRequests() {
   	set_delete: true,
   	as_mod: false
   }).then(res => {
-  	console.log("🏧",res);
+  	// console.log("🏧",res);
   });
 
   const datasetByToken = (datasetToken?: string) => datasets.filter(({ dataset_token },i) => datasetToken === dataset_token)[0];
 
   const editDataSet = (datasetToken: string, request: UpdateDatasetRequest) => {
-  	console.log("🍄", datasetToken);
+  	// console.log("🍄", datasetToken);
   	UpdateDataset(datasetToken,request).then(res => {
-  		console.log("😎",res);
+  		// console.log("😎",res);
   	});
   };
 
-  const createDataSet = () => {
-  	console.log("🌎",);
-  	// CreateVoice(datasetToken,request).then(res => {
-  	// 	console.log("☘️",res);
-  	// });
+  const createDataSet = (request: CreateDatasetRequest) => {
+  	// console.log("🌎",);
+  	CreateDataset("",request).then((res: CreateDatasetResponse) => {
+  		// console.log("☘️",res);
+  	});
   };
 
 	useEffect(() => {

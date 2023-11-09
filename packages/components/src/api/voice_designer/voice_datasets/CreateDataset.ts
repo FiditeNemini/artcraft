@@ -1,16 +1,17 @@
 import MakeRequest from "../../MakeRequest";
 
-export interface CreateVoiceRequest {
-  uuid_idempotency_token: string,
-  voice_dataset_token: string,
+export interface CreateDatasetRequest {
+  title: string,
+  creator_set_visibility: string,
+  idempotency_token: string,
 }
 
-export interface CreateVoiceResponse {
+export interface CreateDatasetResponse {
   success: boolean,
-  inference_job_token: string,
+  token: string,
 }
 
-export const CreateVoice = MakeRequest<string, CreateVoiceRequest, CreateVoiceResponse>({
+export const CreateDataset = MakeRequest<string, CreateDatasetRequest, CreateDatasetResponse>({
     method: "POST", 
     routingFunction: () => "/v1/voice_designer/dataset/create",
 });
