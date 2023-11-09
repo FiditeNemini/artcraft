@@ -93,7 +93,7 @@ tokio-tungstenite = { version = "0.15.0", features = ["rustls", "rustls-tls"] }
 
 # NB: Hyper is just for HTTP client use in jobs. I'd use Actix client, but I need tokio runtime
 # NB: Furthermore, the Tokio runtime is old, so I have to use an older Hyper.
-hyper = { version = "0.13.10" }
+hyper = { version = "0.14.24" }
 
 # Crypto
 bcrypt = "0.8" # password hashes
