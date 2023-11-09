@@ -125,7 +125,7 @@ infer = "0.5.0"
 # https://github.com/durch/rust-s3/pull/254
 rust-s3 = { version = "0.33.0" }
 
-subprocess = "0.2.6"
+subprocess = "0.2.9"
 tempdir = "0.3.7"
 
 actix-cors = "0.6.0-beta.3"
