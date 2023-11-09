@@ -2,31 +2,29 @@ import React, { useEffect, useState } from 'react';
 import { useParams } from "react-router-dom";
 import Container from "components/common/Container";
 import PageHeader from "components/layout/PageHeader";
-// import { Stepper } from "./components/Stepper";
-// import { StepperControls } from "./components/StepperControls";
 import { faPencil, faWaveform } from "@fortawesome/pro-solid-svg-icons";
-import { Input, Panel, Select } from "components/common";
+import { TempInput, Panel, SegmentButtons, TempSelect } from "components/common";
 import useVoiceRequests from "./useVoiceRequests";
 
+import { v4 as uuidv4 } from "uuid";
 
-import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
+import "./VoiceDesigner.scss";
 
 interface Props {
   value?: any;
-  sessionWrapper: SessionWrapper;
 }
 
 interface RouteParams {
   dataset_token?: string;
 }
 
-export default function DatasetEditor({ sessionWrapper, value }: Props) {
-  const { datasets, datasetByToken } = useVoiceRequests();
+export default function DatasetEditor({ value }: Props) {
+  const { datasets } = useVoiceRequests();
   const [title, titleSet] = useState("");
-  const [language,languageSet] = useState({ value: "en", label: "English"});
+  const [language,languageSet] = useState("en");
   const [visibility,visibilitySet] = useState("");
   const [ready,readySet] = useState(false);
-  // const [currentStep, currentStepSet] = useState(0);
+  const inputCtrl = (todo: any) => ({ target }: { target: any}) => todo(target.value);
   const { dataset_token: token } = useParams<RouteParams>();
   const pageTitle = token ? `Edit` : "Create Dataset";
   const subText = token ?
@@ -35,49 +33,52 @@ export default function DatasetEditor({ sessionWrapper, value }: Props) {
   const titleIcon = token ? faPencil : faWaveform;
   const back = {
     label: "Back to Voice Designer",
-    to: token ? "/voice-designer/datasets" : "/voice-designer/voices"
+    to: `/voice-designer/${ token ? "datasets" : "voices" }`
   };
-  // const steps = ["A","B"];
-
-  useEffect(() => {
-    if (token && datasets && datasets.length && !ready) {
-      const { creator_set_visibility, ietf_language_tag, title: resTitle } = datasetByToken(token);
-      console.log("☔️",ietf_language_tag);
-      readySet(true);
-      titleSet(resTitle);
-      languageSet({ value: ietf_language_tag, label: "asss" });
-      visibilitySet(creator_set_visibility);
-    }
-  },[datasetByToken,datasets,ready,token]);
-
-  const inputCtrl = (todo: any) => ({ target }: { target: any}) => todo(target.value);
-
-  const selectChange = ({ value }: any) => { // react-select doesn't format events like events, doesn't pass name prop, ew
-    console.log("🍕",value);
-    // languageSet(value);
-  }
-
   const options = [
     { value: "en", label: "English" },
     { value: "es", label: "Spanish" },
     { value: "fr", label: "French" },
   ];
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [abc,abcSet] = useState("123");
 
-  console.log("🚜", visibility, language, title);
-  return <Container type="panel">
-  	<PageHeader {...{ back, subText, title: pageTitle, titleIcon }} panel={false} />
-      <Panel>
-        <div className="p-3 py-4 p-md-4">
-          <Input {...{ label: "Title", onChange: inputCtrl(titleSet), value: title }}/>
-          <Select {...{  label: "Language", name: "language", onChange: selectChange, options, value: language }}/>
-          <select {...{ name: 'abc', value: abc, onChange: (e:any) => console.log("🌸",e.target.value) }}>
-            <option value="123">123</option>
-            <option value="456">456</option>
-            <option value="789">789</option>
-          </select>
-        </div>
-      </Panel>
+  const visibilityOptions = [{ label: "Public", value: "public" },{  label: "Hidden", value: "hidden" }];
+  const buttonLabel = "Save dataset";
+  const buttonOnClick = () => {
+    if (token) {
+      datasets.edit(token,{
+        title,
+        creator_set_visibility: visibility,
+        ietf_language_tag: language
+      });
+    } else {
+      datasets.create({
+          title,
+          creator_set_visibility: language,
+          idempotency_token: uuidv4(),
+      });
+    }
+  };
+  const headerProps = { back, buttonOnClick, buttonLabel, panel: false, showButton: true, subText, title: pageTitle, titleIcon };
+
+  useEffect(() => {
+    if (token && datasets.list && datasets.list.length && !ready) {
+      const { creator_set_visibility, ietf_language_tag, title: resTitle } = datasets.byToken(token);
+      readySet(true);
+      titleSet(resTitle);
+      languageSet(ietf_language_tag);
+      visibilitySet(creator_set_visibility);
+    }
+  },[datasets,ready,token]);
+
+  return <Container {...{ className: "voice-designer-page", type: "panel", }}>
+  	<PageHeader {...headerProps}/>
+    <Panel>
+      <div className="p-3 py-4 p-md-4">
+        <TempInput {...{ label: "Title", onChange: inputCtrl(titleSet), value: title }}/>
+        <TempSelect {...{  label: "Language", name: "language", onChange: inputCtrl(languageSet), options, value: language }}/>
+        <label {...{ className: "sub-title" }} htmlFor="">Visibility</label>
+        <SegmentButtons {...{ value: visibility, options: visibilityOptions, onChange: inputCtrl(visibilitySet) }}/>
+      </div>
+    </Panel>
   </Container>;
 };
