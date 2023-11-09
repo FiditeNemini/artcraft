@@ -645,16 +645,13 @@ class PageContainer extends React.Component<
             <Route
               exact
               path="/voice-designer/create"
-              component={VoiceDesignerFormPage}
+              component={DatasetEditor}
             />
 
             {/* Route for editing the dataset details */}
             <Route
               exact
               path="/voice-designer/dataset/:dataset_token/edit"
-              {...{
-                sessionWrapper: this.props.sessionWrapper
-              }}
               component={DatasetEditor}
             />
 

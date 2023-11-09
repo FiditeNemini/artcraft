@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react';
 // import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
 import { ListDatasetsByUser, Dataset } from "@storyteller/components/src/api/voice_designer/voice_datasets/ListDatasetsByUser";
 import { DeleteDataset } from "@storyteller/components/src/api/voice_designer/voice_datasets/DeleteDataset";
+// import { CreateVoice, UpdateDatasetRequest } from "@storyteller/components/src/api/voice_designer/voice_datasets/CreateVoice";
+import { UpdateDataset, UpdateDatasetRequest } from "@storyteller/components/src/api/voice_designer/voice_datasets/UpdateDataset";
 import { useSession } from "hooks";
 
 export default function useVoiceRequests() {
@@ -17,6 +19,20 @@ export default function useVoiceRequests() {
 
   const datasetByToken = (datasetToken?: string) => datasets.filter(({ dataset_token },i) => datasetToken === dataset_token)[0];
 
+  const editDataSet = (datasetToken: string, request: UpdateDatasetRequest) => {
+  	console.log("🍄", datasetToken);
+  	UpdateDataset(datasetToken,request).then(res => {
+  		console.log("😎",res);
+  	});
+  };
+
+  const createDataSet = () => {
+  	console.log("🌎",);
+  	// CreateVoice(datasetToken,request).then(res => {
+  	// 	console.log("☘️",res);
+  	// });
+  };
+
 	useEffect(() => {
 
 		if (!datasets.length && user && user.username) {
@@ -27,5 +43,15 @@ export default function useVoiceRequests() {
 
 	},[user, datasets]);
 
-  return { datasetByToken, datasets, deleteDataSet };
+  return { 
+  	datasets: {
+  		create: createDataSet,
+  		delete: deleteDataSet,
+  		edit: editDataSet,
+  		list: datasets,
+  		byToken: datasetByToken
+  	},
+  	inference: {},
+  	voice: {},
+  };
 };

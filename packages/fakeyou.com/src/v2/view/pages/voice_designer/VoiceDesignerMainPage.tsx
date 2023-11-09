@@ -19,7 +19,7 @@ import useVoiceRequests from "./useVoiceRequests";
 
 function VoiceDesignerMainPage() {
 
-  const { datasets, deleteDataSet } = useVoiceRequests();
+  const { datasets } = useVoiceRequests();
 
   const [isDeleteVoiceModalOpen, setIsDeleteVoiceModalOpen] = useState(false);
   const [isDeleteDatasetModalOpen, setIsDeleteDatasetModalOpen] =
@@ -49,11 +49,11 @@ function VoiceDesignerMainPage() {
   const navToEdit = (token: string) => { history.push(`/voice-designer/dataset/${token}/edit`) }
 
   const rowClick = (todo: any) => ({ target }: { target: any }) => {
-    let datasetToken = datasets[target.name.split(",")[0].split(":")[1]].dataset_token;
+    let datasetToken = datasets.list[target.name.split(",")[0].split(":")[1]].dataset_token;
     todo(datasetToken);
   };
 
-  const actionDataSets = datasets.map((dataset,i) => {
+  const actionDataSets = datasets.list.map((dataset,i) => {
     return {
       ...dataset,
       badge: DataBadge,
@@ -66,7 +66,7 @@ function VoiceDesignerMainPage() {
         label: "Delete",
         small: true,
         variant: "danger",
-        onClick: rowClick(deleteDataSet)
+        onClick: rowClick(datasets.delete)
       }],
       name: dataset.title
     };
