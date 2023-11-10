@@ -1,0 +1,31 @@
+[package]
+name = "lru-delete-models"
+edition = "2018"
+version = "0.0.1"
+authors = [
+    "Brandon Thomas <bt@brand.io>",
+    "Brandon Thomas <echelon@gmail.com>",
+]
+publish = false
+
+[[bin]]
+name = "lru-delete-models"
+path = "src/main.rs"
+
+[dependencies]
+# Internal
+easyenv = { path = "../../lib/easyenv" }
+errors = { path = "../../lib/errors" }
+filesys = { path = "../../lib/files/filesys" }
+logging = { path = "../../lib/logging" }
+storyteller_root = { path = "../../lib/storyteller_root" }
+
+# External
+clap = { version = "4.4.7", features = ["derive"] }
+walkdir = "2.4.0"
+
+# Runtime
+tokio = { version = "1.34.0", features = ["macros"] }
+
+[dev-dependencies]
+# None yet

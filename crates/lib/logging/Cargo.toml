@@ -1,0 +1,22 @@
+[package]
+name = "logging"
+edition = "2018"
+version = "0.0.1"
+authors = [
+    "Brandon Thomas <bt@brand.io>",
+    "Brandon Thomas <echelon@gmail.com>",
+]
+publish = false
+
+[lib]
+# NB: Public "logging" crate is five years old and uninteresting. Stealing this name for internal use.
+name = "logging"
+path = "src/lib.rs"
+
+[dependencies]
+dotenv = "0.15.0"
+env_logger = "0.10.0"
+log = "0.4.20"
+
+[dev-dependencies]
+# None yet
