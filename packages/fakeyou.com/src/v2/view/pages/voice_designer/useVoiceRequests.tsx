@@ -1,5 +1,12 @@
 import { useEffect, useState } from 'react';
-// import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
+
+// voice imports
+
+import { ListVoicesByUser, Voice } from "@storyteller/components/src/api/voice_designer/voices/ListVoicesByUser";
+import { DeleteVoice } from "@storyteller/components/src/api/voice_designer/voices/DeleteVoice";
+
+// dataset imports
+
 import { ListDatasetsByUser, Dataset } from "@storyteller/components/src/api/voice_designer/voice_datasets/ListDatasetsByUser";
 import { DeleteDataset } from "@storyteller/components/src/api/voice_designer/voice_datasets/DeleteDataset";
 import { CreateDataset, CreateDatasetRequest, CreateDatasetResponse } from "@storyteller/components/src/api/voice_designer/voice_datasets/CreateDataset";
@@ -8,9 +15,30 @@ import { useSession } from "hooks";
 
 export default function useVoiceRequests() {
   const [datasets, datasetsSet] = useState<Dataset[]>([]);
+  const [voices, voicesSet] = useState<Voice[]>([]);
   const { user } = useSession();
 
-  const deleteDataSet = (voiceToken:  string) => DeleteDataset(voiceToken,{
+  // voices
+
+  const deleteVoice = (voiceToken:  string) => DeleteVoice(voiceToken,{
+    set_delete: true,
+    as_mod: false
+  }).then(res => {
+    // console.log("🏧",res);
+  });
+
+
+  // datasets
+
+  const createDataset = (request: CreateDatasetRequest) => {
+  	// console.log("🌎",);
+  	CreateDataset("",request).then((res: CreateDatasetResponse) => {
+  		// console.log("☘️",res);
+  	});
+  };
+
+
+  const deleteDataset = (voiceToken:  string) => DeleteDataset(voiceToken,{
   	set_delete: true,
   	as_mod: false
   }).then(res => {
@@ -26,32 +54,34 @@ export default function useVoiceRequests() {
   	});
   };
 
-  const createDataSet = (request: CreateDatasetRequest) => {
-  	// console.log("🌎",);
-  	CreateDataset("",request).then((res: CreateDatasetResponse) => {
-  		// console.log("☘️",res);
-  	});
-  };
-
 	useEffect(() => {
+    if (user && user.username) { 
+      if (!datasets.length) {
+        ListDatasetsByUser(user.username,{}).then(res => {
+          if (res.datasets) datasetsSet(res.datasets);
+        });
+      }
+      if (!voices.length) {
+        ListVoicesByUser(user.username,{}).then(res => {
+          if (res.voices) voicesSet(res.voices);
+        });
+      }
+    }
 
-		if (!datasets.length && user && user.username) {
-		  ListDatasetsByUser(user.username,{}).then(res => {
-		    if (res.datasets) datasetsSet(res.datasets);
-		  });
-		}
-
-	},[user, datasets]);
+	},[user, datasets, voices]);
 
   return { 
   	datasets: {
-  		create: createDataSet,
-  		delete: deleteDataSet,
+  		create: createDataset,
+  		delete: deleteDataset,
   		edit: editDataSet,
   		list: datasets,
   		byToken: datasetByToken
   	},
   	inference: {},
-  	voice: {},
+  	voices: {
+      delete: deleteVoice,
+      list: voices
+    },
   };
 };

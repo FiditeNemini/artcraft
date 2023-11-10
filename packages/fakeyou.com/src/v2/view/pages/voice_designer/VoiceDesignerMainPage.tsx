@@ -19,7 +19,9 @@ import useVoiceRequests from "./useVoiceRequests";
 
 function VoiceDesignerMainPage() {
 
-  const { datasets } = useVoiceRequests();
+  const { datasets, voices } = useVoiceRequests();
+
+  console.log("😎",voices);
 
   const [isDeleteVoiceModalOpen, setIsDeleteVoiceModalOpen] = useState(false);
   const [isDeleteDatasetModalOpen, setIsDeleteDatasetModalOpen] =
@@ -46,11 +48,11 @@ function VoiceDesignerMainPage() {
 
   const history = useHistory();
 
-  const navToEdit = (token: string) => { history.push(`/voice-designer/dataset/${token}/edit`) }
+  const navToEdit = (token: string, type: string) => { history.push(`/voice-designer/${ type }/${ token }/edit`) }
 
-  const rowClick = (todo: any) => ({ target }: { target: any }) => {
+  const rowClick = (todo: any, type?: string) => ({ target }: { target: any }) => {
     let datasetToken = datasets.list[target.name.split(",")[0].split(":")[1]].dataset_token;
-    todo(datasetToken);
+    todo(datasetToken, type);
   };
 
   const actionDataSets = datasets.list.map((dataset,i) => {
@@ -61,7 +63,7 @@ function VoiceDesignerMainPage() {
         label: "Edit",
         small: true,
         variant: "secondary",
-        onClick: rowClick(navToEdit)
+        onClick: rowClick(navToEdit,"dataset")
       },{
         label: "Delete",
         small: true,
@@ -72,26 +74,30 @@ function VoiceDesignerMainPage() {
     };
   });
 
-
-    const voicesList = [
-    {
+  const actionVoices = voices.list.map((voice,i) => {
+    return {
+      ...voice,
       badge: VoiceBadge,
-      name: "Donald Trump (45th US President)",
-      modelToken: "TM:z7x37sbvb8vc",
-      isCreating: true,
-    },
-    {
-      badge: VoiceBadge,
-      name: "Spongebob Squarepants (Season 1)",
-      modelToken: "TM:z7x37sbvb8vc",
-    },
-  ];
+      buttons: [{
+        label: "Edit",
+        small: true,
+        variant: "secondary",
+        onClick: rowClick(navToEdit,"voice")
+      },{
+        label: "Delete",
+        small: true,
+        variant: "danger",
+        onClick: rowClick(voices.delete)
+      }],
+      name: voice.title
+    }
+  });
 
   function MyVoices() {
     return (
       <ListItems
         type="voice"
-        data={voicesList}
+        data={actionVoices}
         handleDeleteVoice={openDeleteVoiceModal}
       />
     );

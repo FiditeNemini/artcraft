@@ -3,7 +3,7 @@ import { UserDetailsLight } from "../../_common/UserDetailsLight";
 
 export interface ListVoicesByUserRequest {}
 
-export interface ListVoicesByUserResponse {
+export interface Voice {
     voice_token: string,
     title: string,
 
@@ -15,6 +15,11 @@ export interface ListVoicesByUserResponse {
 
     created_at: Date,
     updated_at: Date,
+}
+
+export interface ListVoicesByUserResponse {
+    success: boolean,
+    voices: Voice[],
 }
 
 export const ListVoicesByUser = MakeRequest<string, ListVoicesByUserRequest, ListVoicesByUserResponse>({
