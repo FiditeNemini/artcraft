@@ -200,6 +200,8 @@ pub async fn handle_upload(
     };
 
     let do_audio_decode = match mimetype {
+      // TODO: Revisit when Safari can send us this metadata consistently
+      "audio/mp4" | "video/mp4" => false,
       "audio/opus" => {
         // TODO/FIXME(bt, 2023-05-19): Symphonia is currently broken for Firefox's opus.
         //  We're on an off-master branch that may resolve the problem in the future, but for now
