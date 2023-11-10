@@ -71,8 +71,9 @@ pub enum InvoicePaidDetails {
 pub fn invoice_paid_handler(invoice: &Invoice) -> Result<StripeWebhookSummary, StripeWebhookError> {
   let maybe_invoice_details = invoice_paid_extractor(invoice)
       .map_err(|err| {
-        error!("Error processing invoice: {:?}", err);
-        StripeWebhookError::ServerError
+        let reason = format!("Error extracting invoice details from 'invoice.paid' payload: {:?}", err);
+        error!("{}", reason);
+        StripeWebhookError::ServerError(reason)
       })?;
 
   // TODO
