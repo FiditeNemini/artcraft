@@ -23,8 +23,9 @@ pub async fn customer_subscription_updated_handler(
 
   let summary = subscription_summary_extractor(subscription)
       .map_err(|err| {
-        error!("Error extracting subscription from 'customer.subscription.updated' payload: {:?}", err);
-        StripeWebhookError::ServerError // NB: This was probably *our* fault.
+        let reason = format!("Error extracting subscription from 'customer.subscription.updated' payload: {:?}", err);
+        error!("{}", reason);
+        StripeWebhookError::ServerError(reason) // NB: This was probably *our* fault.
       })?;
 
   let mut should_process_update = true;
@@ -35,8 +36,9 @@ pub async fn customer_subscription_updated_handler(
   let maybe_internal_subscription_product =
       internal_subscription_product_lookup.lookup_internal_product_from_stripe_product_id(&summary.stripe_product_id)
           .map_err(|err| {
-            error!("Error mapping to internal product: {:?}", err);
-            StripeWebhookError::ServerError // NB: This was probably *our* fault.
+            let reason = format!("Error mapping to internal product: {:?}", err);
+            error!("{}", reason);
+            StripeWebhookError::ServerError(reason) // NB: This was probably *our* fault.
           })?;
 
   let mut subscription_namespace = UNKNOWN_SUBSCRIPTION_NAMESPACE;
@@ -51,8 +53,9 @@ pub async fn customer_subscription_updated_handler(
   let maybe_existing_subscription = get_user_subscription_by_stripe_subscription_id(&summary.stripe_subscription_id, &mysql_pool)
       .await
       .map_err(|err| {
-        error!("Mysql error: {:?}", err);
-        StripeWebhookError::ServerError
+        let reason = format!("Mysql error: {:?}", err);
+        error!("{}", reason);
+        StripeWebhookError::ServerError(reason)
       })?;
 
   if let Some(existing_subscription) = maybe_existing_subscription {
@@ -92,8 +95,9 @@ pub async fn customer_subscription_updated_handler(
       let _r = upsert.upsert(mysql_pool)
           .await
           .map_err(|err| {
-            error!("Mysql error: {:?}", err);
-            StripeWebhookError::ServerError
+            let reason = format!("Mysql error: {:?}", err);
+            error!("{}", reason);
+            StripeWebhookError::ServerError(reason)
           })?;
 
       info!("Updating user record with stripe customer ID");
@@ -106,8 +110,9 @@ pub async fn customer_subscription_updated_handler(
         Some(&summary.stripe_customer_id))
           .await
           .map_err(|err| {
-            error!("Mysql error: {:?}", err);
-            StripeWebhookError::ServerError
+            let reason = format!("Mysql error: {:?}", err);
+            error!("{}", reason);
+            StripeWebhookError::ServerError(reason)
           })?;
 
       action_was_taken = true;
