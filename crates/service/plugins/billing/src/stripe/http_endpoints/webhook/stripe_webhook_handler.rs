@@ -43,8 +43,9 @@ pub async fn stripe_webhook_handler(
 {
   verify_stripe_webhook_ip_address(&http_request)
       .map_err(|e| {
-        error!("Improper client IP address. Error: {:?}", e);
-        StripeWebhookError::BadRequest
+        let reason = format!("Improper client IP address. Error: {:?}", e);
+        error!("{}", &reason);
+        StripeWebhookError::BadRequest(reason)
       })?;
 
   let secret_signing_key = &stripe_config.secrets.secret_webhook_signing_key;
@@ -55,14 +56,16 @@ pub async fn stripe_webhook_handler(
   // NB: Treat the request payload as unstructured and defer to Stripe libraries.
   let webhook_payload = String::from_utf8(request_body_bytes.to_vec())
       .map_err(|err| {
-        error!("Could not decode request body to stripe webhook!");
-        StripeWebhookError::BadRequest
+        let reason = format!("Could not decode request body to UTF-8: {:?}", err);
+        error!("{}", &reason);
+        StripeWebhookError::BadRequest(reason)
       })?;
 
   let webhook_payload = Webhook::construct_event(&webhook_payload, &stripe_signature, secret_signing_key)
       .map_err(|e| {
-        error!("Could not decode stripe webhook: {:?}", e);
-        StripeWebhookError::BadRequest
+        let reason = format!("Could not construct Stripe webhook event: {:?}", e);
+        error!("{}", &reason);
+        StripeWebhookError::BadRequest(reason)
       })?;
 
   // Events can be re-sent, so we need to make handling them idempotent.
@@ -73,8 +76,9 @@ pub async fn stripe_webhook_handler(
   let stripe_event_type = serde_json::to_string(&webhook_payload.type_)
       .map(|s| s.replace("\"", ""))
       .map_err(|err| {
-        error!("Could not deserialize webhook type: {:?}", err);
-        StripeWebhookError::BadRequest
+        let reason = format!("Could not serialize webhook type: {:?}", err);
+        error!("{}", &reason);
+        StripeWebhookError::BadRequest(reason)
       })?;
 
   // NB: Whether this was test data or live data
@@ -90,8 +94,9 @@ pub async fn stripe_webhook_handler(
   let maybe_previously_played_event = get_stripe_webhook_event_log_by_id(&stripe_event_id, &mysql_pool)
       .await
       .map_err(|err| {
-        error!("Could not query previous event by ID ({}): {:?}", &stripe_event_id, err);
-        StripeWebhookError::ServerError
+        let reason = format!("Could not query previous event by ID ({}): {:?}", &stripe_event_id, err);
+        error!("{}", &reason);
+        StripeWebhookError::ServerError(reason)
       })?;
 
   if let Some(event) = maybe_previously_played_event {
@@ -327,8 +332,9 @@ pub async fn stripe_webhook_handler(
   query.insert(&mysql_pool)
       .await
       .map_err(|err| {
-        error!("Failure to record event: {:?}", err);
-        StripeWebhookError::ServerError
+        let reason = format!("Could not insert Stripe webhook event log: {:?}", err);
+        error!("{}", &reason);
+        StripeWebhookError::ServerError(reason)
       })?;
 
   report_success()
@@ -341,7 +347,7 @@ fn report_success() -> Result<HttpResponse, StripeWebhookError> {
   };
 
   let body = serde_json::to_string(&response)
-      .map_err(|_e| StripeWebhookError::ServerError)?;
+      .map_err(|_e| StripeWebhookError::ServerError(_e.to_string()))?;
 
   Ok(HttpResponse::Ok()
       .content_type("application/json")

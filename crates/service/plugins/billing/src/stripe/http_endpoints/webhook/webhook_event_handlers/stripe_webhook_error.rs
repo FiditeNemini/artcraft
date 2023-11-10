@@ -9,15 +9,15 @@ use http_server_common::response::serialize_as_json_error::serialize_as_json_err
 
 #[derive(Debug, Serialize)]
 pub enum StripeWebhookError {
-  BadRequest,
-  ServerError,
+  BadRequest(String),
+  ServerError(String),
 }
 
 impl ResponseError for StripeWebhookError {
   fn status_code(&self) -> StatusCode {
-    match *self {
-      StripeWebhookError::BadRequest => StatusCode::BAD_REQUEST,
-      StripeWebhookError::ServerError => StatusCode::INTERNAL_SERVER_ERROR,
+    match self {
+      StripeWebhookError::BadRequest(String) => StatusCode::BAD_REQUEST,
+      StripeWebhookError::ServerError(String) => StatusCode::INTERNAL_SERVER_ERROR,
     }
   }
 
