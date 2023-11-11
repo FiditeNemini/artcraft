@@ -53,7 +53,7 @@ export default function DatasetEditor({ value }: Props) {
     } else {
       datasets.create({
           title,
-          creator_set_visibility: language,
+          creator_set_visibility: visibility,
           idempotency_token: uuidv4(),
       });
     }

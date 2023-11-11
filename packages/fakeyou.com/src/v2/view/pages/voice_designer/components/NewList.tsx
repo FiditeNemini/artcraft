@@ -7,9 +7,6 @@ import "./ListItems/ListItems.scss";
 
 interface ListItemsProps {
   data: any[];
-  type: "voice" | "dataset";
-  handleDeleteVoice?: () => void;
-  handleDeleteDataset?: () => void;
 }
 
 interface ListItem {
@@ -55,7 +52,7 @@ const ItemRow = ({ badge: Badge, buttons, index, isCreating, name, ...rest }: Li
   </div>;
 };
 
-export default function NewList({ data,  handleDeleteDataset, type,  handleDeleteVoice, }: ListItemsProps) {
+export default function NewList({ data }: ListItemsProps) {
 
   const DataPlaceholder = () => <div className="d-flex flex-column list-items p-5 align-items-center">
     <h5 className="fw-semibold mb-3">

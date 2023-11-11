@@ -1,27 +1,10 @@
-import React, { ButtonHTMLAttributes } from "react";
+import React from "react";
 import { Link } from "react-router-dom";
 import "./Button.scss";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { IconDefinition } from "@fortawesome/fontawesome-svg-core";
+import ButtonProps from "./ButtonProps";
 import Tippy from "@tippyjs/react";
 import "tippy.js/dist/tippy.css";
-
-interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
-  label?: string | null;
-  icon?: IconDefinition;
-  small?: boolean;
-  variant?: "primary" | "secondary" | "danger" | "link";
-  to?: string;
-  href?: string;
-  target?: "_blank" | "_self";
-  square?: boolean;
-  tooltip?: string;
-  full?: boolean;
-  iconFlip?: boolean;
-  download?: boolean | string;
-  disabled?: boolean;
-  isLoading?: boolean;
-}
 
 export default function Button({
   label,

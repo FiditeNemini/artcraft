@@ -3,6 +3,7 @@ import Panel from "../../common/Panel";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { IconDefinition } from "@fortawesome/fontawesome-svg-core";
 import Button from "components/common/Button";
+import ButtonProps from "components/common/Button/ButtonProps";
 import BackButton from "components/common/BackButton";
 
 interface BackConfig {
@@ -19,6 +20,7 @@ interface PageHeaderProps {
   showButton?: boolean;
   extension?: React.ReactNode;
   buttonLabel?: string;
+  button?: ButtonProps;
   buttonVariant?: "primary" | "secondary" | "danger";
   buttonTo?: string;
   buttonIcon?: IconDefinition;
@@ -38,6 +40,7 @@ export default function PageHeader({
   full,
   showButton,
   extension,
+  button,
   buttonLabel,
   buttonVariant = "primary",
   buttonTo,
@@ -49,9 +52,21 @@ export default function PageHeader({
   backbuttonTo,
   backbuttonLabel,
 }: PageHeaderProps) {
+
   const icon = (
     <>{titleIcon && <FontAwesomeIcon icon={titleIcon} className="me-3" />}</>
   );
+
+  const buttonProps = {
+    ...button ? button : {},
+    ...buttonIcon && { icon: buttonIcon },
+    ...buttonLabel && { label: buttonLabel },
+    ...buttonOnClick && { onClick: buttonOnClick },
+    ...buttonTo && { to: buttonTo },
+    ...buttonVariant && { variant: buttonVariant }
+  };
+
+  const HeaderBtn = () => button || showButton ? <Button { ...buttonProps }/> : null;
 
   if (!panel) {
     return (
@@ -80,15 +95,9 @@ export default function PageHeader({
                   {subText}
                 </p>
               </div>
-              {showButton && (
+              { ( button || showButton ) && (
                 <div className="d-md-flex">
-                  <Button
-                    icon={buttonIcon}
-                    variant={buttonVariant}
-                    label={buttonLabel}
-                    to={buttonTo}
-                    onClick={buttonOnClick}
-                  />
+                  <HeaderBtn />
                 </div>
               )}
             </div>
@@ -125,15 +134,7 @@ export default function PageHeader({
                 {title}
               </h1>
               <div className="d-none d-md-block">
-                {showButton && (
-                  <Button
-                    icon={buttonIcon}
-                    variant={buttonVariant}
-                    label={buttonLabel}
-                    to={buttonTo}
-                    onClick={buttonOnClick}
-                  />
-                )}
+                <HeaderBtn />
               </div>
             </div>
             <p>{subText}</p>

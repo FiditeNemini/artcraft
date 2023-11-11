@@ -16,6 +16,7 @@ import { useSession } from "hooks";
 export default function useVoiceRequests() {
   const [datasets, datasetsSet] = useState<Dataset[]>([]);
   const [voices, voicesSet] = useState<Voice[]>([]);
+  const [fetched,fetchedSet] = useState(false);
   const { user } = useSession();
 
   // voices
@@ -55,7 +56,8 @@ export default function useVoiceRequests() {
   };
 
 	useEffect(() => {
-    if (user && user.username) { 
+    if (!fetched && user && user.username) {
+      fetchedSet(true);
       if (!datasets.length) {
         ListDatasetsByUser(user.username,{}).then(res => {
           if (res.datasets) datasetsSet(res.datasets);
@@ -68,7 +70,7 @@ export default function useVoiceRequests() {
       }
     }
 
-	},[user, datasets, voices]);
+	},[fetched,user, datasets, voices]);
 
   return { 
   	datasets: {
