@@ -1,12 +1,3 @@
-/* 
-    ~ B R A I N S T O R M ~
-
-    - redeem reset request
-        - needs a way to identify the user because only the tuple is unique (user + key)
-            username or email address
-        - provide new password
- */
-
 use std::fmt::Display;
 
 use actix_web::{HttpRequest, HttpResponse, ResponseError, web};
@@ -22,9 +13,9 @@ use email_sender::letter_exports::Message;
 use email_sender::smtp_email_sender::SmtpEmailSender;
 use http_server_common::request::get_request_ip::get_request_ip;
 use http_server_common::response::serialize_as_json_error::serialize_as_json_error;
-use mysql_queries::queries::users::user::create_password_reset_request::create_password_reset;
 use mysql_queries::queries::users::user::lookup_user_for_login_by_email::lookup_user_for_login_by_email;
 use mysql_queries::queries::users::user::lookup_user_for_login_by_username::lookup_user_for_login_by_username;
+use mysql_queries::queries::users::user_password_resets::create_password_reset_request::create_password_reset;
 
 #[derive(Deserialize)]
 pub struct PasswordResetRequestedRequest {
@@ -95,7 +86,7 @@ pub async fn password_reset_request_handler(
     } else {
         lookup_user_for_login_by_username(&username_or_email, &mysql_pool).await
     }.map_err(|e| {
-        warn!("Password reset user lookup: {:?}", e);
+        warn!("Password reset user lookup error: {:?}", e);
         //TODO: This could be anything, not necessarily a lookup.  The name is misleading 🤷🏻
         PasswordResetRequestedRequestError::NoSuchUser
     })?;

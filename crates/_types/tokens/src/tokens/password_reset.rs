@@ -11,4 +11,4 @@ use crate::prefixes::TokenPrefix;
 pub struct PasswordResetToken(pub String);
 
 impl_string_token!(PasswordResetToken);
-impl_crockford_generator!(PasswordResetToken, 32usize, TokenPrefix::PasswordReset, CrockfordUpper);
+impl_crockford_generator!(PasswordResetToken, 32usize, TokenPrefix::PasswordReset, CrockfordMixed);

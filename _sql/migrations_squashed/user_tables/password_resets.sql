@@ -16,6 +16,7 @@
 -- Also when creating the password hash, be sure to set `expires_at` to be "NOW() + 3 hours", or
 -- some other small, reasonable time frame.
 --
+-- TODO: Rename to 'user_password_resets'
 CREATE TABLE password_resets (
   -- Not used for anything except replication.
   id BIGINT(20) NOT NULL AUTO_INCREMENT,
@@ -27,10 +28,12 @@ CREATE TABLE password_resets (
   -- Foreign key to user
   user_token VARCHAR(32) NOT NULL,
 
+  -- TODO: Change to `public_reset_token`
   -- Secret "key" for the password reset
   -- This will be shared via URL or user text input.
   secret_key VARCHAR(32) NOT NULL,
 
+  -- TODO: Make unsigned. Also unsigned on users.
   -- Copied from the user record at the time of password reset issuance.
   -- If the user's password version is greater than this value, then this
   -- reset is no longer valid.
@@ -59,6 +62,7 @@ CREATE TABLE password_resets (
   PRIMARY KEY (id),
   UNIQUE KEY (token),
 
+  -- TODO: Change to UNIQUE on `public_reset_token`
   UNIQUE KEY (user_token, secret_key),
 
   KEY fk_user_token (user_token),
