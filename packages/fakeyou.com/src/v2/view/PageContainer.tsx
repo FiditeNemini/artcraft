@@ -646,6 +646,13 @@ class PageContainer extends React.Component<
             <Route
               exact
               path="/voice-designer/create"
+              component={VoiceDesignerVoiceEditPage}
+            />
+
+            {/* Route for initial voice creation */}
+            <Route
+              exact
+              path="/voice-designer/dataset/create"
               component={DatasetEditor}
             />
 
