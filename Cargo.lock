@@ -2375,14 +2375,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "email"
-version = "0.1.0"
-dependencies = [
- "errors",
- "lettre",
-]
-
-[[package]]
 name = "email-encoding"
 version = "0.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2397,6 +2389,14 @@ name = "email_address"
 version = "0.2.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "e2153bd83ebc09db15bcbdc3e2194d901804952e3dc96967e1cd3b0c5c32d112"
+
+[[package]]
+name = "email_sender"
+version = "0.1.0"
+dependencies = [
+ "errors",
+ "lettre",
+]
 
 [[package]]
 name = "encoding_rs"
@@ -5972,6 +5972,7 @@ dependencies = [
  "easyenv",
  "elasticsearch",
  "elasticsearch_schema",
+ "email_sender",
  "enums",
  "errors",
  "futures 0.1.31",
@@ -7315,7 +7316,7 @@ dependencies = [
  "cookies",
  "crockford",
  "dotenv",
- "email",
+ "email_sender",
  "enums",
  "errors",
  "hmac 0.10.1",

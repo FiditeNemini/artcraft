@@ -85,7 +85,7 @@ impl ResponseError for PasswordResetRequisitionErrorResponse {
 /// - create password reset request
 ///     - sends email?
 ///     - inserts record and stuff
-pub async fn password_reset_requisition_handler(
+pub async fn password_reset_redeem_handler(
     http_request: HttpRequest,
     request: web::Json<PasswordResetRequisitionRequest>,
     mysql_pool: web::Data<MySqlPool>,
@@ -111,8 +111,6 @@ pub async fn password_reset_requisition_handler(
             log::error!("Password reset error {:?}", err);
             err
         })?;
-
-    email::send_password_reset(&user.email_address, secret_key).await?;
 
     let response = PasswordResetRequisitionResponse {
         success: true,

@@ -6,6 +6,7 @@ use actix_helpers::middleware::banned_cidr_filter::banned_cidr_set::BannedCidrSe
 use actix_helpers::middleware::banned_ip_filter::ip_ban_list::ip_ban_list::IpBanList;
 use billing_component::stripe::stripe_config::StripeConfig;
 use cloud_storage::bucket_client::BucketClient;
+use email_sender::smtp_email_sender::SmtpEmailSender;
 use memory_caching::single_item_ttl_cache::SingleItemTtlCache;
 use mysql_queries::mediators::badge_granter::BadgeGranter;
 use mysql_queries::mediators::firehose_publisher::FirehosePublisher;
@@ -77,6 +78,8 @@ pub struct ServerState {
   pub audio_uploads_bucket_root: String,
 
   pub sort_key_crypto: SortKeyCrypto,
+
+  pub email_sender: SmtpEmailSender,
 
   pub ip_ban_list: IpBanList,
 

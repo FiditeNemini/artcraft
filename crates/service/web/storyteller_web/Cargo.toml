@@ -26,6 +26,7 @@ cookies = { path = "../../../lib/cookies" }
 datetimes = { path = "../../../lib/datetimes" }
 easyenv = { path = "../../../lib/easyenv" }
 elasticsearch_schema = { path = "../../../lib/elasticsearch_schema" }
+email_sender= { path = "../../../lib/email_sender" }
 enums = { path = "../../../_types/enums" }
 errors = { path = "../../../lib/errors" }
 google_drive_common = { path = "../../../lib/api_clients/google_drive_common" }
