@@ -41,7 +41,7 @@ CREATE TABLE users (
   password_hash BINARY(60) NOT NULL,
 
   -- Incremented with every update to the password.
-  password_version INT NOT NULL DEFAULT 0,
+  password_version INT UNSIGNED NOT NULL DEFAULT 0,
 
   -- ========== ABUSE TRACKING ==========
 
@@ -145,7 +145,7 @@ CREATE TABLE users (
   -- ========== VECTOR CLOCK ==========
 
   -- Incremented with every update.
-  version INT NOT NULL DEFAULT 0,
+  version INT UNSIGNED NOT NULL DEFAULT 0,
 
   -- ========== TIMESTAMPS ==========
 

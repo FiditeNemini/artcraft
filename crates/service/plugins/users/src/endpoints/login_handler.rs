@@ -18,6 +18,7 @@ use mysql_queries::helpers::boolean_converters::i8_to_bool;
 use mysql_queries::queries::users::user::lookup_user_for_login_by_email::lookup_user_for_login_by_email;
 use mysql_queries::queries::users::user::lookup_user_for_login_by_username::lookup_user_for_login_by_username;
 use mysql_queries::queries::users::user_sessions::create_user_session::create_user_session;
+use password::bcrypt_confirm_password::bcrypt_confirm_password;
 
 use crate::cookies::session::session_cookie_manager::SessionCookieManager;
 
@@ -123,7 +124,7 @@ pub async fn login_handler(
     }
   };
 
-  match bcrypt::verify(&request.password, &actual_hash) {
+  match bcrypt_confirm_password(request.password.clone(), &actual_hash) {
     Err(e) => {
       warn!("Login hash comparison error: {:?}", e);
       return Err(LoginErrorResponse::server_error());
@@ -135,7 +136,7 @@ pub async fn login_handler(
       }
       // Good to go...!
     },
-  };
+  }
 
   let ip_address = get_request_ip(&http_request);
 

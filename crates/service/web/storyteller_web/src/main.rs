@@ -57,6 +57,7 @@ use config::common_env::CommonEnv;
 use config::shared_constants::DEFAULT_MYSQL_CONNECTION_STRING;
 use config::shared_constants::DEFAULT_RUST_LOG;
 use container_common::files::read_toml_file_to_struct::read_toml_file_to_struct;
+use email_sender::smtp_email_sender::SmtpEmailSender;
 use errors::AnyhowResult;
 use http_server_common::cors::{build_cors_config, build_production_cors_config};
 use memory_caching::single_item_ttl_cache::SingleItemTtlCache;
@@ -434,6 +435,12 @@ async fn main() -> AnyhowResult<()> {
       .trim()
       .to_string();
 
+  // TODO(bt,2023-11-11): Password and account details should be a secret, but gotta go fast.
+  let email_sender = SmtpEmailSender::new(
+    "smtp.gmail.com",
+    "noreply@storyteller.ai".to_string(),
+    "FakeYouHanashi1".to_string())?;
+
   let server_state = ServerState {
     env_config: EnvConfig {
       num_workers,
@@ -475,6 +482,7 @@ async fn main() -> AnyhowResult<()> {
     audio_uploads_bucket_root,
     sort_key_crypto,
     static_api_token_set,
+    email_sender,
     caches: InMemoryCaches {
       durable: DurableInMemoryCaches {
         model_token_info: model_token_info_cache,
@@ -651,6 +659,7 @@ pub async fn serve(server_state: ServerState) -> AnyhowResult<()>
       .app_data(web::Data::new(server_state_arc.stripe.clone().config.clone()))
       .app_data(web::Data::new(server_state_arc.stripe.clone().client.clone()))
       .app_data(web::Data::new(server_state_arc.third_party_url_redirector.clone()))
+      .app_data(web::Data::new(server_state_arc.email_sender.clone()))
       .app_data(web::Data::new(server_environment))
       .app_data(web::Data::from(product_lookup)) // NB: Data::from(Arc<T>) for dynamic dispatch
       .app_data(web::Data::from(stripe_lookup)) // NB: Data::from(Arc<T>) for dynamic dispatch

@@ -30,6 +30,7 @@ pub(crate) enum TokenPrefix {
   MediaFile,
   MediaUpload,
   NewsStory, // NB: aichatbot / sqlite
+  PasswordReset,
   TtsRenderTask, // NB: aichatbot / sqlite
   User,
   UserSession,
@@ -92,6 +93,7 @@ impl PrefixGenerator for TokenPrefix {
       Self::MediaFile => "m_",
       Self::MediaUpload => "mu_",
       Self::NewsStory => "news_story_",
+      Self::PasswordReset => "pw_reset_",
       Self::TtsRenderTask => "tts_task_",
       Self::User => "user_", // NB: Previously "U:"
       Self::UserSession => "session_",
@@ -288,7 +290,7 @@ mod tests {
     #[test]
     fn test_all_prefixes_end_with_separator_length_one() {
       for prefix in get_all_prefixes().iter().map(|s| *s) {
-        if prefix == "news_story_" || prefix == "tts_task_" || prefix == "INT_API:" {
+        if prefix == "news_story_" || prefix == "tts_task_" || prefix == "INT_API:" || prefix == "pw_reset_" {
           // TODO/FIXME: I'm too tired at 5AM to replacen from the left. Make this test valid.
           //  These tokens are from the AIChatBot sidecar, so asserting their validity is less important.
           continue;

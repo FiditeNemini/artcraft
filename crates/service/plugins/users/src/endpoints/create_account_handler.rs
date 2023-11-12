@@ -18,6 +18,7 @@ use http_server_common::response::serialize_as_json_error::serialize_as_json_err
 use mysql_queries::mediators::firehose_publisher::FirehosePublisher;
 use mysql_queries::queries::users::user::create_account::{create_account, CreateAccountArgs, CreateAccountError};
 use mysql_queries::queries::users::user_sessions::create_user_session::create_user_session;
+use password::bcrypt_hash_password::bcrypt_hash_password;
 use user_input_common::check_for_slurs::contains_slurs;
 
 use crate::cookies::session::session_cookie_manager::SessionCookieManager;
@@ -132,7 +133,7 @@ pub async fn create_account_handler(
     });
   }
 
-  let password_hash = match bcrypt::hash(&request.password, bcrypt::DEFAULT_COST) {
+  let password_hash = match bcrypt_hash_password(request.password.clone()) {
     Ok(hash) => hash,
     Err(err) => {
       warn!("Bcrypt error: {:?}", err);

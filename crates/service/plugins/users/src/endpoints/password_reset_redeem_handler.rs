@@ -1,0 +1,150 @@
+use std::fmt::Display;
+
+use actix_web::{HttpRequest, HttpResponse, ResponseError, web};
+use actix_web::http::StatusCode;
+use log::{error, warn};
+use serde::Deserialize;
+use sqlx::MySqlPool;
+use strum_macros::Display;
+
+use http_server_common::request::get_request_ip::get_request_ip;
+use http_server_common::response::serialize_as_json_error::serialize_as_json_error;
+use mysql_queries::queries::users::user_password_resets::change_password_from_password_reset::{change_password_from_password_reset, ChangePasswordFromPasswordResetArgs};
+use mysql_queries::queries::users::user_password_resets::lookup_password_reset_request::lookup_password_reset_request;
+use password::bcrypt_hash_password::bcrypt_hash_password;
+
+#[derive(Deserialize)]
+pub struct PasswordResetRedemptionRequest {
+    username_or_email: String,
+    reset_token: String,
+    new_password: String,
+    new_password_validation: String,
+}
+
+#[derive(Serialize)]
+pub struct PasswordResetRedemptionResponse {
+    success: bool,
+}
+
+#[derive(Serialize, Debug, Display)]
+pub enum PasswordResetRedemptionError {
+    /// Account does not exist or reset token is wrong.
+    InvalidRedemption,
+    PasswordsDoNotMatch,
+    Internal,
+}
+
+#[derive(Serialize, Debug)]
+pub struct PasswordResetRedemptionErrorResponse {
+    kind: PasswordResetRedemptionError,
+}
+impl Display for PasswordResetRedemptionErrorResponse {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{:?}", self)
+    }
+}
+
+impl From<PasswordResetRedemptionError> for PasswordResetRedemptionErrorResponse {
+    fn from(value: PasswordResetRedemptionError) -> Self {
+        Self { kind: value }
+    }
+}
+impl From<errors::AnyhowError> for PasswordResetRedemptionErrorResponse {
+    fn from(value: errors::AnyhowError) -> Self {
+        log::error!("Internal error: {value}");
+        Self { kind: PasswordResetRedemptionError::Internal }
+    }
+}
+
+impl ResponseError for PasswordResetRedemptionErrorResponse {
+    //TODO: Yknow, clean this up and stuff
+    fn status_code(&self) -> StatusCode {
+        StatusCode::INTERNAL_SERVER_ERROR
+    }
+  
+    fn error_response(&self) -> HttpResponse {
+        serialize_as_json_error(self)
+    }
+  }
+
+pub async fn password_reset_redeem_handler(
+    http_request: HttpRequest,
+    request: web::Json<PasswordResetRedemptionRequest>,
+    mysql_pool: web::Data<MySqlPool>,
+) -> Result<HttpResponse, PasswordResetRedemptionErrorResponse> {
+
+    let new_password = request.new_password.trim();
+
+    if new_password != request.new_password_validation.trim() {
+        return Err(PasswordResetRedemptionErrorResponse {
+            kind: PasswordResetRedemptionError::PasswordsDoNotMatch,
+        });
+    }
+
+    //TODO: Handle banned users, they shouldn't be able to do this
+
+    let result = lookup_password_reset_request(&request.reset_token, &mysql_pool).await
+        .map_err(|err| {
+            log::error!("Password reset error {:?}", err);
+            err
+        });
+
+    let transaction_and_state = match result {
+        Ok(Some(reset_state)) => reset_state,
+        Ok(None) => {
+            warn!("No such reset request.");
+            return Err(PasswordResetRedemptionErrorResponse {
+                kind: PasswordResetRedemptionError::InvalidRedemption,
+            });
+        }
+        Err(err) => {
+            error!("lookup error: {err}");
+            return Err(PasswordResetRedemptionErrorResponse {
+                kind: PasswordResetRedemptionError::InvalidRedemption,
+            });
+        }
+    };
+
+    println!("Reset state: {}", transaction_and_state.reset_state.user_token);
+
+    let ip_address = get_request_ip(&http_request);
+
+    let password_hash = match bcrypt_hash_password(new_password.to_string()) {
+        Ok(hash) => hash,
+        Err(err) => {
+            error!("password hash error: {err}");
+            return Err(PasswordResetRedemptionErrorResponse {
+                kind: PasswordResetRedemptionError::Internal,
+            });
+        }
+    };
+
+    let result = change_password_from_password_reset(ChangePasswordFromPasswordResetArgs {
+        password_reset_token: &transaction_and_state.reset_state.password_reset_token,
+        user_token: &transaction_and_state.reset_state.user_token,
+        new_password_hash: &password_hash,
+        ip_address: &ip_address,
+        mysql_transaction: transaction_and_state.transaction,
+    }).await;
+
+    if let Err(err) = result {
+        error!("password reset error: {err}");
+        return Err(PasswordResetRedemptionErrorResponse {
+            kind: PasswordResetRedemptionError::Internal,
+        });
+    }
+
+    let response = PasswordResetRedemptionResponse {
+        success: true,
+    };
+
+    let body = serde_json::to_string(&response)
+        .map_err(|e| {
+            error!("error returning response: {:?}",  e);
+            PasswordResetRedemptionError::Internal
+        })?;
+
+    Ok(HttpResponse::Ok()
+        .content_type("application/json")
+        .body(body))
+}

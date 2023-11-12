@@ -9,6 +9,7 @@ pub mod generic_inference_jobs;
 pub mod media_files;
 pub mod media_uploads;
 pub mod model_categories;
+pub mod password_reset;
 pub mod sqlite;
 pub mod tts_inference_jobs;
 pub mod tts_model_upload_jobs;
