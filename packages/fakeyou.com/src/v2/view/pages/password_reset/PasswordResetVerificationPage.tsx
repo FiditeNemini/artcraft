@@ -23,6 +23,7 @@ const ERR_CODE_NOT_SET = "password reset code is not set";
 const ERR_CODE_TOO_SHORT = "password reset code is too short";
 const ERR_PASSWORD_TOO_SHORT = "new password is too short";
 const ERR_PASSWORD_DOES_NOT_MATCH = "new password does not match";
+const ERR_BACKEND = "There was an issue resetting your password. Perhaps your code expired?";
 
 function PasswordResetVerificationPage(props: Props) {
   let history = useHistory();
@@ -40,6 +41,8 @@ function PasswordResetVerificationPage(props: Props) {
   const [newPasswordConfirmation, setNewPasswordConfirmation] = useState("");
   const [newPasswordConfirmationIsValid, setNewPasswordConfirmationIsValid] = useState(false);
   const [newPasswordConfirmationInvalidReason, setNewPasswordConfirmationInvalidReason] = useState<string|undefined>(ERR_PASSWORD_TOO_SHORT);
+
+  const [backendError, setBackendError] = useState<string|undefined>(undefined);
 
   if (props.sessionWrapper.isLoggedIn()) {
     history.push("/");
@@ -116,9 +119,12 @@ function PasswordResetVerificationPage(props: Props) {
     // TODO(bt,2023-11-12): Handle server-side errors
 
     if (RedeemResetPasswordIsSuccess(response)) {
+      setBackendError(undefined);
       props.querySessionAction();
       props.querySessionSubscriptionsAction();
       history.push("/");
+    } else {
+      setBackendError(ERR_BACKEND);
     }
 
     return false;
@@ -129,6 +135,7 @@ function PasswordResetVerificationPage(props: Props) {
   let resetTokenHelpClasses = resetTokenLooksValid ? "" : "form-control is-danger";
   let newPasswordHelpClasses = newPasswordIsValid ? "" : "form-control is-danger";
   let newPasswordConfirmationHelpClasses = newPasswordConfirmationIsValid ? "" : "form-control is-danger";
+  let backendErrorClasses = !!!backendError ? "" : "form-control is-danger";
 
   return (
     <Container type="panel" className="login-panel">
@@ -178,6 +185,10 @@ function PasswordResetVerificationPage(props: Props) {
 
             <p className={newPasswordConfirmationHelpClasses}>
               {newPasswordConfirmationInvalidReason}
+            </p>
+
+            <p className={backendErrorClasses}>
+              {backendError}
             </p>
 
             <Button
