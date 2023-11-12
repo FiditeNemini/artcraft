@@ -11,7 +11,10 @@ use http_server_common::request::get_request_ip::get_request_ip;
 use http_server_common::response::serialize_as_json_error::serialize_as_json_error;
 use mysql_queries::queries::users::user_password_resets::change_password_from_password_reset::{change_password_from_password_reset, ChangePasswordFromPasswordResetArgs};
 use mysql_queries::queries::users::user_password_resets::lookup_password_reset_request::lookup_password_reset_request;
+use mysql_queries::queries::users::user_sessions::create_user_session::create_user_session;
 use password::bcrypt_hash_password::bcrypt_hash_password;
+
+use crate::cookies::session::session_cookie_manager::SessionCookieManager;
 
 #[derive(Deserialize)]
 pub struct PasswordResetRedemptionRequest {
@@ -70,6 +73,7 @@ impl ResponseError for PasswordResetRedemptionErrorResponse {
 pub async fn password_reset_redeem_handler(
     http_request: HttpRequest,
     request: web::Json<PasswordResetRedemptionRequest>,
+    session_cookie_manager: web::Data<SessionCookieManager>,
     mysql_pool: web::Data<MySqlPool>,
 ) -> Result<HttpResponse, PasswordResetRedemptionErrorResponse> {
 
@@ -135,6 +139,31 @@ pub async fn password_reset_redeem_handler(
         });
     }
 
+    let create_session_result =
+        create_user_session(&transaction_and_state.reset_state.user_token.0, &ip_address, &mysql_pool).await;
+
+    let session_token = match create_session_result {
+        Ok(token) => token,
+        Err(err) => {
+            error!("error creating session: {err}");
+            return Err(PasswordResetRedemptionErrorResponse {
+                kind: PasswordResetRedemptionError::Internal,
+                success: false,
+            });
+        }
+    };
+
+    let session_cookie = match session_cookie_manager.create_cookie(&session_token, &transaction_and_state.reset_state.user_token.0) {
+        Ok(cookie) => cookie,
+        Err(err) => {
+            error!("error creating session cookie: {err}");
+            return Err(PasswordResetRedemptionErrorResponse {
+                kind: PasswordResetRedemptionError::Internal,
+                success: false,
+            });
+        },
+    };
+
     let response = PasswordResetRedemptionResponse {
         success: true,
     };
@@ -146,6 +175,7 @@ pub async fn password_reset_redeem_handler(
         })?;
 
     Ok(HttpResponse::Ok()
+        .cookie(session_cookie)
         .content_type("application/json")
         .body(body))
 }
