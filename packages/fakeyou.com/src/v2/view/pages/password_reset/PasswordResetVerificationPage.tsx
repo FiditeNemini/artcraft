@@ -14,7 +14,15 @@ import {
 
 interface Props {
   sessionWrapper: SessionWrapper;
+  querySessionAction: () => void;
+  querySessionSubscriptionsAction: () => void;
 }
+
+// TODO(bt,2023-11-12): Localize error messages
+const ERR_CODE_NOT_SET = "password reset code is not set";
+const ERR_CODE_TOO_SHORT = "password reset code is too short";
+const ERR_PASSWORD_TOO_SHORT = "new password is too short";
+const ERR_PASSWORD_DOES_NOT_MATCH = "new password does not match";
 
 function PasswordResetVerificationPage(props: Props) {
   let history = useHistory();
@@ -27,11 +35,11 @@ function PasswordResetVerificationPage(props: Props) {
 
   const [newPassword, setNewPassword] = useState("");
   const [newPasswordIsValid, setNewPasswordIsValid] = useState(false);
-  const [newPasswordInvalidReason, setNewPasswordInvalidReason] = useState<string|undefined>("new password is too short");
+  const [newPasswordInvalidReason, setNewPasswordInvalidReason] = useState<string|undefined>(ERR_PASSWORD_TOO_SHORT);
 
   const [newPasswordConfirmation, setNewPasswordConfirmation] = useState("");
   const [newPasswordConfirmationIsValid, setNewPasswordConfirmationIsValid] = useState(false);
-  const [newPasswordConfirmationInvalidReason, setNewPasswordConfirmationInvalidReason] = useState<string|undefined>("new password is too short");
+  const [newPasswordConfirmationInvalidReason, setNewPasswordConfirmationInvalidReason] = useState<string|undefined>(ERR_PASSWORD_TOO_SHORT);
 
   if (props.sessionWrapper.isLoggedIn()) {
     history.push("/");
@@ -53,7 +61,7 @@ function PasswordResetVerificationPage(props: Props) {
 
     if (value.length < 5) {
       isValid = false;
-      invalidReason = "new password is too short";
+      invalidReason = ERR_PASSWORD_TOO_SHORT;
     }
 
     setNewPassword(value);
@@ -62,7 +70,7 @@ function PasswordResetVerificationPage(props: Props) {
 
     if (value !== newPasswordConfirmation) {
       setNewPasswordConfirmationIsValid(false);
-      setNewPasswordConfirmationInvalidReason("new password does not match")
+      setNewPasswordConfirmationInvalidReason(ERR_PASSWORD_DOES_NOT_MATCH)
     } else if (newPasswordConfirmation.length > 4) {
       setNewPasswordConfirmationIsValid(true);
       setNewPasswordConfirmationInvalidReason(undefined)
@@ -77,11 +85,11 @@ function PasswordResetVerificationPage(props: Props) {
 
     if (value !== newPassword) {
       isValid = false;
-      invalidReason = "new password does not match";
+      invalidReason = ERR_PASSWORD_DOES_NOT_MATCH;
     }
     else if (value.length < 5) {
       isValid = false;
-      invalidReason = "new password is too short";
+      invalidReason = ERR_PASSWORD_TOO_SHORT;
     }
 
     setNewPasswordConfirmation(value);
@@ -108,6 +116,8 @@ function PasswordResetVerificationPage(props: Props) {
     // TODO(bt,2023-11-12): Handle server-side errors
 
     if (RedeemResetPasswordIsSuccess(response)) {
+      props.querySessionAction();
+      props.querySessionSubscriptionsAction();
       history.push("/");
     }
 
@@ -135,7 +145,7 @@ function PasswordResetVerificationPage(props: Props) {
             <Input
               label="Verification Code"
               icon={faLock}
-              placeholder="Enter 6-digit code"
+              placeholder="Enter verification code"
               value={resetToken}
               onChange={handleChangeResetToken}
             />
@@ -191,10 +201,10 @@ function getCodeFromUrl() : string | null {
 // Handle error state at initialization
 function getResetCodeErrors(code: string | null) : string | undefined {
   if (!code) {
-    return "no code set";
+    return ERR_CODE_NOT_SET;
   }
   if (code.length < 10) {
-    return "code is too short";
+    return ERR_CODE_TOO_SHORT;
   };
 }
 
