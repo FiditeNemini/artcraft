@@ -8,6 +8,9 @@ import Input from "components/common/Input";
 import { Button } from "components/common";
 import Panel from "components/common/Panel";
 import { faLock } from "@fortawesome/pro-solid-svg-icons";
+import {
+  RedeemResetPassword, RedeemResetPasswordIsSuccess,
+} from "@storyteller/components/src/api/user/RedeemResetPassword";
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -86,8 +89,29 @@ function PasswordResetVerificationPage(props: Props) {
     setNewPasswordConfirmationInvalidReason(invalidReason)
   }
 
+  const handleSubmit = async (
+    ev: React.FormEvent<HTMLButtonElement>
+  ) : Promise<boolean> => {
+    ev.preventDefault();
 
-  const handleVerifyCode = async () => {
+    const password = newPassword.trim();
+    const passwordConfirmation = newPasswordConfirmation.trim();
+
+    const request = {
+      reset_token: resetToken,
+      new_password: password,
+      new_password_validation: passwordConfirmation,
+    };
+
+    const response = await RedeemResetPassword(request);
+
+    // TODO(bt,2023-11-12): Handle server-side errors
+
+    if (RedeemResetPasswordIsSuccess(response)) {
+      history.push("/");
+    }
+
+    return false;
   };
 
   const canSubmit = resetTokenLooksValid && newPasswordIsValid && newPasswordConfirmationIsValid;
@@ -148,7 +172,7 @@ function PasswordResetVerificationPage(props: Props) {
 
             <Button
               label="Change Password"
-              onClick={handleVerifyCode}
+              onClick={handleSubmit}
               disabled={!canSubmit}
             />
           </div>
@@ -158,18 +182,13 @@ function PasswordResetVerificationPage(props: Props) {
   );
 }
 
+// Pre-load the code from a URL query string, eg https://fakeyou.com/password-reset/validate?code=codeGoesHere
 function getCodeFromUrl() : string | null {
   const urlParams = new URLSearchParams(window.location.search);
   return urlParams.get('token');
 }
 
-function checkResetCodeLooksValid(code: string | null) : boolean {
-  if (!code) {
-    return false;
-  }
-  return code.length > 10;
-}
-
+// Handle error state at initialization
 function getResetCodeErrors(code: string | null) : string | undefined {
   if (!code) {
     return "no code set";

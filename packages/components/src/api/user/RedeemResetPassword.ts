@@ -1,32 +1,32 @@
 import { ApiConfig } from "@storyteller/components";
 
-export interface RequestResetPasswordRequest {
+export interface RedeemResetPasswordRedeem {
   reset_token: string,
   new_password: string,
   new_password_validation: string,
 }
 
-export interface RequestResetPasswordSuccessResponse {
+export interface RedeemResetPasswordSuccessResponse {
   success: boolean,
 }
 
-export interface RequestResetPasswordErrorResponse {
+export interface RedeemResetPasswordErrorResponse {
   success: boolean,
   error_type: string,
   error_fields: { [key: string]: string; },
 }
 
-type RequestResetPasswordResponse = RequestResetPasswordSuccessResponse | RequestResetPasswordErrorResponse;
+type RedeemResetPasswordResponse = RedeemResetPasswordSuccessResponse | RedeemResetPasswordErrorResponse;
 
-export function RequestResetPasswordIsSuccess(response: RequestResetPasswordResponse): response is RequestResetPasswordSuccessResponse {
+export function RedeemResetPasswordIsSuccess(response: RedeemResetPasswordResponse): response is RedeemResetPasswordSuccessResponse {
   return response?.success === true;
 }
 
-export function RequestResetPasswordIsError(response: RequestResetPasswordResponse): response is RequestResetPasswordErrorResponse {
+export function RedeemResetPasswordIsError(response: RedeemResetPasswordResponse): response is RedeemResetPasswordErrorResponse {
   return response?.success === false;
 }
 
-export async function RequestResetPassword(request: RequestResetPasswordRequest) : Promise<RequestResetPasswordResponse> 
+export async function RedeemResetPassword(Redeem: RedeemResetPasswordRedeem) : Promise<RedeemResetPasswordResponse> 
 {
   const endpoint = new ApiConfig().passwordResetRedeem();
   
@@ -37,7 +37,7 @@ export async function RequestResetPassword(request: RequestResetPasswordRequest)
       'Content-Type': 'application/json',
     },
     credentials: 'include',
-    body: JSON.stringify(request),
+    body: JSON.stringify(Redeem),
   })
   .then(res => res.json())
   .then(res => {
