@@ -35,6 +35,7 @@ pub enum PasswordResetRequestedRequestError {
 
 #[derive(Serialize, Debug)]
 pub struct PasswordResetRequestedErrorResponse {
+    success: bool,
     kind: PasswordResetRequestedRequestError,
 }
 impl Display for PasswordResetRequestedErrorResponse {
@@ -45,13 +46,13 @@ impl Display for PasswordResetRequestedErrorResponse {
 
 impl From<PasswordResetRequestedRequestError> for PasswordResetRequestedErrorResponse {
     fn from(value: PasswordResetRequestedRequestError) -> Self {
-        Self { kind: value }
+        Self { kind: value, success: false }
     }
 }
 impl From<errors::AnyhowError> for PasswordResetRequestedErrorResponse {
     fn from(value: errors::AnyhowError) -> Self {
         log::error!("Internal error: {value}");
-        Self { kind: PasswordResetRequestedRequestError::Internal }
+        Self { kind: PasswordResetRequestedRequestError::Internal, success: false }
     }
 }
 

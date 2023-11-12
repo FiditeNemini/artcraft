@@ -15,7 +15,6 @@ use password::bcrypt_hash_password::bcrypt_hash_password;
 
 #[derive(Deserialize)]
 pub struct PasswordResetRedemptionRequest {
-    username_or_email: String,
     reset_token: String,
     new_password: String,
     new_password_validation: String,
@@ -36,6 +35,7 @@ pub enum PasswordResetRedemptionError {
 
 #[derive(Serialize, Debug)]
 pub struct PasswordResetRedemptionErrorResponse {
+    success: bool,
     kind: PasswordResetRedemptionError,
 }
 impl Display for PasswordResetRedemptionErrorResponse {
@@ -46,13 +46,13 @@ impl Display for PasswordResetRedemptionErrorResponse {
 
 impl From<PasswordResetRedemptionError> for PasswordResetRedemptionErrorResponse {
     fn from(value: PasswordResetRedemptionError) -> Self {
-        Self { kind: value }
+        Self { kind: value, success: false }
     }
 }
 impl From<errors::AnyhowError> for PasswordResetRedemptionErrorResponse {
     fn from(value: errors::AnyhowError) -> Self {
         log::error!("Internal error: {value}");
-        Self { kind: PasswordResetRedemptionError::Internal }
+        Self { kind: PasswordResetRedemptionError::Internal, success: false }
     }
 }
 
@@ -78,10 +78,9 @@ pub async fn password_reset_redeem_handler(
     if new_password != request.new_password_validation.trim() {
         return Err(PasswordResetRedemptionErrorResponse {
             kind: PasswordResetRedemptionError::PasswordsDoNotMatch,
+            success: false,
         });
     }
-
-    //TODO: Handle banned users, they shouldn't be able to do this
 
     let result = lookup_password_reset_request(&request.reset_token, &mysql_pool).await
         .map_err(|err| {
@@ -95,17 +94,17 @@ pub async fn password_reset_redeem_handler(
             warn!("No such reset request.");
             return Err(PasswordResetRedemptionErrorResponse {
                 kind: PasswordResetRedemptionError::InvalidRedemption,
+                success: false,
             });
         }
         Err(err) => {
             error!("lookup error: {err}");
             return Err(PasswordResetRedemptionErrorResponse {
                 kind: PasswordResetRedemptionError::InvalidRedemption,
+                success: false,
             });
         }
     };
-
-    println!("Reset state: {}", transaction_and_state.reset_state.user_token);
 
     let ip_address = get_request_ip(&http_request);
 
@@ -115,6 +114,7 @@ pub async fn password_reset_redeem_handler(
             error!("password hash error: {err}");
             return Err(PasswordResetRedemptionErrorResponse {
                 kind: PasswordResetRedemptionError::Internal,
+                success: false,
             });
         }
     };
@@ -131,6 +131,7 @@ pub async fn password_reset_redeem_handler(
         error!("password reset error: {err}");
         return Err(PasswordResetRedemptionErrorResponse {
             kind: PasswordResetRedemptionError::Internal,
+            success: false,
         });
     }
 
