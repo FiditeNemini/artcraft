@@ -9,9 +9,9 @@ use strum_macros::Display;
 
 use http_server_common::request::get_request_ip::get_request_ip;
 use http_server_common::response::serialize_as_json_error::serialize_as_json_error;
-use mysql_queries::queries::users::user::lookup_user_for_login_by_email::lookup_user_for_login_by_email;
-use mysql_queries::queries::users::user::lookup_user_for_login_by_username::lookup_user_for_login_by_username;
+use mysql_queries::queries::users::user_password_resets::change_password_from_password_reset::{change_password_from_password_reset, ChangePasswordFromPasswordResetArgs};
 use mysql_queries::queries::users::user_password_resets::lookup_password_reset_request::lookup_password_reset_request;
+use password::bcrypt_hash_password::bcrypt_hash_password;
 
 #[derive(Deserialize)]
 pub struct PasswordResetRedemptionRequest {
@@ -72,18 +72,14 @@ pub async fn password_reset_redeem_handler(
     request: web::Json<PasswordResetRedemptionRequest>,
     mysql_pool: web::Data<MySqlPool>,
 ) -> Result<HttpResponse, PasswordResetRedemptionErrorResponse> {
-    let username_or_email = request.username_or_email.trim();
 
-    //let user = if username_or_email.contains("@") {
-    //    lookup_user_for_login_by_email(&username_or_email, &mysql_pool).await
-    //} else {
-    //    lookup_user_for_login_by_username(&username_or_email, &mysql_pool).await
-    //}.map_err(|e| {
-    //    warn!("Password reset redemption user lookup error: {:?}", e);
-    //    PasswordResetRedemptionError::InvalidRedemption
-    //})?;
+    let new_password = request.new_password.trim();
 
-    let ip_address = get_request_ip(&http_request);
+    if new_password != request.new_password_validation.trim() {
+        return Err(PasswordResetRedemptionErrorResponse {
+            kind: PasswordResetRedemptionError::PasswordsDoNotMatch,
+        });
+    }
 
     //TODO: Handle banned users, they shouldn't be able to do this
 
@@ -93,7 +89,7 @@ pub async fn password_reset_redeem_handler(
             err
         });
 
-    let reset_state = match result {
+    let transaction_and_state = match result {
         Ok(Some(reset_state)) => reset_state,
         Ok(None) => {
             warn!("No such reset request.");
@@ -109,8 +105,34 @@ pub async fn password_reset_redeem_handler(
         }
     };
 
+    println!("Reset state: {}", transaction_and_state.reset_state.user_token);
 
-    println!("Reset state: {}", reset_state.user_token);
+    let ip_address = get_request_ip(&http_request);
+
+    let password_hash = match bcrypt_hash_password(new_password.to_string()) {
+        Ok(hash) => hash,
+        Err(err) => {
+            error!("password hash error: {err}");
+            return Err(PasswordResetRedemptionErrorResponse {
+                kind: PasswordResetRedemptionError::Internal,
+            });
+        }
+    };
+
+    let result = change_password_from_password_reset(ChangePasswordFromPasswordResetArgs {
+        password_reset_token: &transaction_and_state.reset_state.password_reset_token,
+        user_token: &transaction_and_state.reset_state.user_token,
+        new_password_hash: &password_hash,
+        ip_address: &ip_address,
+        mysql_transaction: transaction_and_state.transaction,
+    }).await;
+
+    if let Err(err) = result {
+        error!("password reset error: {err}");
+        return Err(PasswordResetRedemptionErrorResponse {
+            kind: PasswordResetRedemptionError::Internal,
+        });
+    }
 
     let response = PasswordResetRedemptionResponse {
         success: true,

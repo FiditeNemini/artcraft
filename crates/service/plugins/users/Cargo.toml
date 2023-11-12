@@ -23,6 +23,7 @@ enums = { path = "../../../_types/enums" }
 errors = { path = "../../../lib/errors" }
 http_server_common = { path = "../../../lib/deprecated/http_server_common" }
 mysql_queries = { path = "../../../lib/mysql_queries" }
+password = { path = "../../../lib/password" }
 redis_caching = { path = "../../../lib/caching/redis_caching" }
 redis_common = { path = "../../../lib/redis_common" }
 reusable_types = { path = "../../../_types/reusable_types" }
@@ -47,7 +48,6 @@ actix-web = "4.0.0-beta.10"
 jwt = "0.13.0"
 
 # Crypto
-bcrypt = "0.8" # password hashes
 hmac = "0.10.0" # cookies
 md-5 = "0.9.1" # gravatar
 sha2 = "0.9.5" # file hashes, inference text hashes, etc.

@@ -4359,6 +4359,14 @@ dependencies = [
 ]
 
 [[package]]
+name = "password"
+version = "0.0.1"
+dependencies = [
+ "bcrypt",
+ "errors",
+]
+
+[[package]]
 name = "password-hash"
 version = "0.4.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -7309,7 +7317,6 @@ dependencies = [
  "actix-web 4.0.1",
  "anyhow",
  "base64 0.21.0",
- "bcrypt",
  "byteorder",
  "chrono",
  "container_common",
@@ -7327,6 +7334,7 @@ dependencies = [
  "md-5",
  "mysql_queries",
  "once_cell",
+ "password",
  "r2d2_redis",
  "rand 0.8.5",
  "redis_caching",
