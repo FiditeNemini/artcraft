@@ -23,6 +23,7 @@
 /news*   /index.html   200
 /obs_configs*   /index.html   200
 /old*   /index.html   200
+/password-reset*   /index.html   200
 /patrons*   /index.html   200
 /pending*   /index.html   200
 /portal_success*   /index.html   200

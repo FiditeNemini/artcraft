@@ -103,6 +103,14 @@ class ApiConfig {
     return `${this.getApiOrigin()}/v1/login`;
   }
 
+  passwordResetRequest(): string {
+    return `${this.getApiOrigin()}/v1/password_reset/request`;
+  }
+
+  passwordResetRedeem(): string {
+    return `${this.getApiOrigin()}/v1/password_reset/redeem`;
+  }
+
   logout(): string {
     return `${this.getApiOrigin()}/v1/logout`;
   }
