@@ -15,44 +15,141 @@ interface Props {
 
 function PasswordResetVerificationPage(props: Props) {
   let history = useHistory();
-  const [isLoading, setIsLoading] = useState(false);
+
+  usePrefixedDocumentTitle("Password Reset Verification");
+
+  const [resetToken, setResetToken] = useState(getCodeFromUrl() || "");
+  const [resetTokenLooksValid, setResetTokenLooksValid] = useState(!!!getResetCodeErrors(getCodeFromUrl()));
+  const [resetTokenInvalidReason, setResetTokenInvalidReason] = useState(getResetCodeErrors(getCodeFromUrl()));
+
+  const [newPassword, setNewPassword] = useState("");
+  const [newPasswordIsValid, setNewPasswordIsValid] = useState(false);
+  const [newPasswordInvalidReason, setNewPasswordInvalidReason] = useState<string|undefined>("new password is too short");
+
+  const [newPasswordConfirmation, setNewPasswordConfirmation] = useState("");
+  const [newPasswordConfirmationIsValid, setNewPasswordConfirmationIsValid] = useState(false);
+  const [newPasswordConfirmationInvalidReason, setNewPasswordConfirmationInvalidReason] = useState<string|undefined>("new password is too short");
 
   if (props.sessionWrapper.isLoggedIn()) {
     history.push("/");
   }
 
-  usePrefixedDocumentTitle("Code Verification");
+  const handleChangeResetToken = (ev: React.FormEvent<HTMLInputElement>) => {
+    const token = (ev.target as HTMLInputElement).value;
+    const errors = getResetCodeErrors(token);
+    setResetToken(token);
+    setResetTokenLooksValid(!!!errors);
+    setResetTokenInvalidReason(errors);
+  }
+
+  const handleChangePassword = (ev: React.FormEvent<HTMLInputElement>) => {
+    const value = (ev.target as HTMLInputElement).value;
+
+    let isValid = true;
+    let invalidReason = undefined;
+
+    if (value.length < 5) {
+      isValid = false;
+      invalidReason = "new password is too short";
+    }
+
+    setNewPassword(value);
+    setNewPasswordIsValid(isValid);
+    setNewPasswordInvalidReason(invalidReason)
+
+    if (value !== newPasswordConfirmation) {
+      setNewPasswordConfirmationIsValid(false);
+      setNewPasswordConfirmationInvalidReason("new password does not match")
+    } else if (newPasswordConfirmation.length > 4) {
+      setNewPasswordConfirmationIsValid(true);
+      setNewPasswordConfirmationInvalidReason(undefined)
+    }
+  }
+
+  const handleChangePasswordConfirmation = (ev: React.FormEvent<HTMLInputElement>) => {
+    const value = (ev.target as HTMLInputElement).value;
+
+    let isValid = true;
+    let invalidReason = undefined;
+
+    if (value !== newPassword) {
+      isValid = false;
+      invalidReason = "new password does not match";
+    }
+    else if (value.length < 5) {
+      isValid = false;
+      invalidReason = "new password is too short";
+    }
+
+    setNewPasswordConfirmation(value);
+    setNewPasswordConfirmationIsValid(isValid);
+    setNewPasswordConfirmationInvalidReason(invalidReason)
+  }
+
 
   const handleVerifyCode = async () => {
-    // Simulate a delay using a timer (dummy timer)
-    setIsLoading(true);
-
-    setTimeout(() => {
-      setIsLoading(false);
-    }, 2000);
   };
+
+  const canSubmit = resetTokenLooksValid && newPasswordIsValid && newPasswordConfirmationIsValid;
+
+  let resetTokenHelpClasses = resetTokenLooksValid ? "" : "form-control is-danger";
+  let newPasswordHelpClasses = newPasswordIsValid ? "" : "form-control is-danger";
+  let newPasswordConfirmationHelpClasses = newPasswordConfirmationIsValid ? "" : "form-control is-danger";
 
   return (
     <Container type="panel" className="login-panel">
       <PageHeader
-        title="Code Verification"
-        subText="Enter the 6-digit code sent to your email address."
+        title="Password Reset Verification"
+        subText="Enter the code sent to your email address."
         panel={false}
       />
 
       <Panel padding={true}>
         <form>
           <div className="d-flex flex-column gap-4">
+
             <Input
               label="Verification Code"
               icon={faLock}
               placeholder="Enter 6-digit code"
+              value={resetToken}
+              onChange={handleChangeResetToken}
             />
 
+            <p className={resetTokenHelpClasses}>
+              {resetTokenInvalidReason}
+            </p>
+
+            <Input
+              type="password"
+              label="New Password"
+              icon={faLock}
+              placeholder="Enter new password"
+              value={newPassword}
+              onChange={handleChangePassword}
+            />
+
+            <p className={newPasswordHelpClasses}>
+              {newPasswordInvalidReason}
+            </p>
+
+            <Input
+              type="password"
+              label="Verify New Password"
+              icon={faLock}
+              placeholder="Enter new password again"
+              value={newPasswordConfirmation}
+              onChange={handleChangePasswordConfirmation}
+            />
+
+            <p className={newPasswordConfirmationHelpClasses}>
+              {newPasswordConfirmationInvalidReason}
+            </p>
+
             <Button
-              label="Verify Code"
+              label="Change Password"
               onClick={handleVerifyCode}
-              isLoading={isLoading}
+              disabled={!canSubmit}
             />
           </div>
         </form>
@@ -60,5 +157,27 @@ function PasswordResetVerificationPage(props: Props) {
     </Container>
   );
 }
+
+function getCodeFromUrl() : string | null {
+  const urlParams = new URLSearchParams(window.location.search);
+  return urlParams.get('token');
+}
+
+function checkResetCodeLooksValid(code: string | null) : boolean {
+  if (!code) {
+    return false;
+  }
+  return code.length > 10;
+}
+
+function getResetCodeErrors(code: string | null) : string | undefined {
+  if (!code) {
+    return "no code set";
+  }
+  if (code.length < 10) {
+    return "code is too short";
+  };
+}
+
 
 export { PasswordResetVerificationPage };
