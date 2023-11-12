@@ -20,7 +20,6 @@ container_common = { path = "../../../lib/deprecated/container_common" }
 easyenv = { path = "../../../lib/easyenv" }
 enums = { path = "../../../_types/enums" }
 errors = { path = "../../../lib/errors" }
-jobs_common = { path = "../../../lib/jobs_common" }
 mysql_queries = { path = "../../../lib/mysql_queries" }
 reusable_types = { path = "../../../_types/reusable_types" }
 tokens = { path = "../../../_types/tokens" }
@@ -28,7 +27,6 @@ tokens = { path = "../../../_types/tokens" }
 # External
 anyhow = "1.0.75"
 chrono = { version = "0.4.19", features = ["serde"] }
-clap = "2.34.0" # TODO: This is really out of date, but has conflicts when updated
 dotenv = "0.15.0"
 hostname = "0.3.1"
 log = "0.4.14"
@@ -48,3 +46,4 @@ tokio = { version = "1.6.0", features = ["macros"] }
 serde = "1.0.125"
 serde_derive = "1.0.125"
 serde_json = "1.0.64"
+my-workspace-hack = { version = "0.1", path = "../../../../my-workspace-hack" }

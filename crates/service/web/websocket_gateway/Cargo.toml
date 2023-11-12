@@ -30,11 +30,8 @@ base64 = "0.21.0"
 chrono = { version = "0.4.19", features = ["serde"] }
 derive_more = "0.99.17"
 dotenv = "0.15.0"
-futures-timer = "3.0.2"
-hex = "0.4.3"
 hostname = "0.3.1"
 lazy_static = "1.4.0"
-lfu = "0.2.5"
 log = "0.4.14"
 rand = "0.8.3"
 regex = "1.5.4"
@@ -49,9 +46,6 @@ tokio = { version = "1.10.0", features = ["rt-multi-thread", "macros", "time"] }
 futures = { version = "0.3.17", features = ["thread-pool"] } # feature for ThreadPool
 futures-util = "0.3.29"
 futures_old_for_limiter = { package = "futures", version = "0.1.29" } # Older version of futures for `limiter` crate
-
-# Threading
-crossbeam = "0.8.1"
 
 # MySql Database
 # "offline" supports typesafe builds without a live database
@@ -73,9 +67,6 @@ twitch_oauth2 = "0.6.0-rc.2"
 reqwest = { version = "0.11.4" }
 native-tls = "0.2.8"
 
-# In-memory caching
-lru_time_cache = "0.11.11"
-
 # Web
 actix = "0.12.0"
 actix-cors = "0.5.4"
@@ -86,18 +77,12 @@ actix-service = "2.0.1"
 actix-utils = "3.0.0"
 actix-web = "4.0.0-beta.10"
 actix-web-actors = "4.0.0-beta.7"
-jwt = "0.13.0"
-
-# Websockets
-tokio-tungstenite = { version = "0.15.0", features = ["rustls", "rustls-tls"] }
 
 # NB: Hyper is just for HTTP client use in jobs. I'd use Actix client, but I need tokio runtime
 # NB: Furthermore, the Tokio runtime is old, so I have to use an older Hyper.
 hyper = { version = "0.14.24" }
 
 # Crypto
-bcrypt = "0.8" # password hashes
-hmac = "0.10.0" # cookies
 magic-crypt = "3.1.8" # encrypting sort IDs for the frontend so we don't leak info
 md-5 = "0.9.1" # gravatar
 sha2 = "0.9.5" # file hashes, inference text hashes, etc.
@@ -108,11 +93,8 @@ serde_derive = "1.0.125"
 serde_json = "1.0.64"
 toml = "0.5.8"
 
-# Text processing
-pulldown-cmark = "0.9.3"
-
 # Temporary (just to ask for oauth credentials during dev)
-rpassword = "7.2.0"
+my-workspace-hack = { version = "0.1", path = "../../../../my-workspace-hack" }
 
 [build-dependencies]
 # NB: Only using diesel for migrations support

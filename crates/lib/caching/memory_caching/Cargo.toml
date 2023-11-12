@@ -15,14 +15,11 @@ path = "src/lib.rs"
 [dependencies]
 
 # Internal
-config = { path = "../../deprecated/config" }
-container_common = { path = "../../deprecated/container_common" }
 errors = { path = "../../errors" }
 
 # External
 anyhow = "1.0.75"
-chrono = { version = "0.4.19", features = ["serde"] }
-log = "0.4.14"
 
 # In-memory caching
 lru_time_cache = "0.11.11"
+my-workspace-hack = { version = "0.1", path = "../../../../my-workspace-hack" }

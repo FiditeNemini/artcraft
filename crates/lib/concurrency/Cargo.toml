@@ -14,7 +14,7 @@ path = "src/lib.rs"
 
 [dependencies]
 # Internal
-errors = { path = "../../lib/errors" }
+my-workspace-hack = { version = "0.1", path = "../../../my-workspace-hack" }
 
 # External
 # (None yet)
