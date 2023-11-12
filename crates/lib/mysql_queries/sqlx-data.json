@@ -7471,6 +7471,96 @@
     },
     "query": "\nSELECT\n  internal_token,\n  api_token,\n  maybe_short_description,\n  created_at,\n  updated_at\nFROM api_tokens\nWHERE\n  user_token = ?\n  AND deleted_at IS NULL\nORDER BY created_at DESC\nLIMIT 5\n        "
   },
+  "4f4a76d50f8fe6078dfc78c17a362face2984063bf5e1c5a43534f4ba3cab510": {
+    "describe": {
+      "columns": [
+        {
+          "name": "token: tokens::tokens::users::UserToken",
+          "ordinal": 0,
+          "type_info": {
+            "char_set": 224,
+            "flags": {
+              "bits": 4229
+            },
+            "max_size": 128,
+            "type": "VarString"
+          }
+        },
+        {
+          "name": "username",
+          "ordinal": 1,
+          "type_info": {
+            "char_set": 224,
+            "flags": {
+              "bits": 4229
+            },
+            "max_size": 80,
+            "type": "VarString"
+          }
+        },
+        {
+          "name": "email_address",
+          "ordinal": 2,
+          "type_info": {
+            "char_set": 224,
+            "flags": {
+              "bits": 4229
+            },
+            "max_size": 1020,
+            "type": "VarString"
+          }
+        },
+        {
+          "name": "password_hash",
+          "ordinal": 3,
+          "type_info": {
+            "char_set": 63,
+            "flags": {
+              "bits": 4225
+            },
+            "max_size": 60,
+            "type": "String"
+          }
+        },
+        {
+          "name": "password_version",
+          "ordinal": 4,
+          "type_info": {
+            "char_set": 63,
+            "flags": {
+              "bits": 33
+            },
+            "max_size": 10,
+            "type": "Long"
+          }
+        },
+        {
+          "name": "is_banned",
+          "ordinal": 5,
+          "type_info": {
+            "char_set": 63,
+            "flags": {
+              "bits": 1
+            },
+            "max_size": 1,
+            "type": "Tiny"
+          }
+        }
+      ],
+      "nullable": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        false
+      ],
+      "parameters": {
+        "Right": 1
+      }
+    },
+    "query": "\nSELECT\n  token as `token: tokens::tokens::users::UserToken`,\n  username,\n  email_address,\n  password_hash,\n  password_version,\n  is_banned\nFROM users\nWHERE email_address = ?\nLIMIT 1\n        "
+  },
   "4f61f621682ba255814f8a55455ea2b7fba9b6c85affaf87abfe2f81e11322f0": {
     "describe": {
       "columns": [
@@ -8961,6 +9051,16 @@
       }
     },
     "query": "\n        SELECT\n        zds.token as `token: tokens::tokens::zs_voice_dataset_samples::ZsVoiceDatasetSampleToken`,\n        zds.dataset_token as `dataset_token: tokens::tokens::zs_voice_datasets::ZsVoiceDatasetToken`,\n        zds.maybe_creator_user_token as `maybe_creator_user_token: tokens::tokens::users::UserToken`\n        FROM zs_voice_dataset_samples as zds\n        WHERE\n          zds.token = ?\n        "
+  },
+  "65f9b84dba27b93887bc0688fb83ca6e03f5e5ed780019130986afbe88301fb5": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Right": 3
+      }
+    },
+    "query": "\nUPDATE users\nSET\n  password_hash = ?,\n  ip_address_last_update = ?,\n  password_version = password_version + 1,\n  version = version + 1\nWHERE\n  token = ?\nLIMIT 1\n        "
   },
   "6607741dfa3dc7c5c7f9be61eee8637529d55ea788f202391b7659e63f5a354c": {
     "describe": {
@@ -11179,6 +11279,16 @@
     },
     "query": "\nUPDATE tts_inference_jobs\nSET status='complete_failure'\nWHERE\n  status IN ('pending', 'attempt_failed');\n        "
   },
+  "8c611add62bbe8bc79618804923ee966dfc6d0e430a197dc0ab962636f6479d0": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Right": 2
+      }
+    },
+    "query": "\nUPDATE user_password_resets\nSET\n  is_redeemed = true,\n  ip_address_redemption = ?,\n  version = version + 1\nWHERE\n  token = ?\nLIMIT 1\n        "
+  },
   "8c6a56bfa985324a0dd138c9ac9570d72195ee721d5e2d6c50c4266d1590ed20": {
     "describe": {
       "columns": [],
@@ -11710,83 +11820,6 @@
       }
     },
     "query": "\nUPDATE tts_results\nSET\n  user_deleted_at = CURRENT_TIMESTAMP\nWHERE\n  token = ?\nLIMIT 1\n        "
-  },
-  "982c0890c66df857c4a2600f3428ad060ca8c212af9a892905ae0cd33f21a21d": {
-    "describe": {
-      "columns": [
-        {
-          "name": "token: tokens::tokens::users::UserToken",
-          "ordinal": 0,
-          "type_info": {
-            "char_set": 224,
-            "flags": {
-              "bits": 4229
-            },
-            "max_size": 128,
-            "type": "VarString"
-          }
-        },
-        {
-          "name": "username",
-          "ordinal": 1,
-          "type_info": {
-            "char_set": 224,
-            "flags": {
-              "bits": 4229
-            },
-            "max_size": 80,
-            "type": "VarString"
-          }
-        },
-        {
-          "name": "email_address",
-          "ordinal": 2,
-          "type_info": {
-            "char_set": 224,
-            "flags": {
-              "bits": 4229
-            },
-            "max_size": 1020,
-            "type": "VarString"
-          }
-        },
-        {
-          "name": "password_hash",
-          "ordinal": 3,
-          "type_info": {
-            "char_set": 63,
-            "flags": {
-              "bits": 4225
-            },
-            "max_size": 60,
-            "type": "String"
-          }
-        },
-        {
-          "name": "is_banned",
-          "ordinal": 4,
-          "type_info": {
-            "char_set": 63,
-            "flags": {
-              "bits": 1
-            },
-            "max_size": 1,
-            "type": "Tiny"
-          }
-        }
-      ],
-      "nullable": [
-        false,
-        false,
-        false,
-        false,
-        false
-      ],
-      "parameters": {
-        "Right": 1
-      }
-    },
-    "query": "\nSELECT\n  token as `token: tokens::tokens::users::UserToken`,\n  username,\n  email_address,\n  password_hash,\n  is_banned\nFROM users\nWHERE email_address = ?\nLIMIT 1\n        "
   },
   "98752fdd6d26c88db17ccfe4cc17fef21f36b102c27b3950500e0c659982ed7b": {
     "describe": {
@@ -13086,6 +13119,16 @@
       }
     },
     "query": "\nUPDATE generic_inference_jobs\nSET\n  status = \"complete_success\",\n  on_success_result_entity_type = ?,\n  on_success_result_entity_token = ?,\n  failure_reason = NULL,\n  internal_debugging_failure_reason = NULL,\n  success_execution_millis = ?,\n  success_inference_execution_millis = ?,\n  retry_at = NULL,\n  successfully_completed_at = NOW()\nWHERE id = ?\n        "
+  },
+  "a93f40bcbe2a0d362234e51d9bec6c8a0c704c5de7856c5545176caac6281c4b": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Right": 5
+      }
+    },
+    "query": "\nINSERT INTO user_password_resets\n(token, user_token, public_reset_token, current_password_version, ip_address_creation, expires_at)\nVALUES (?, ?, ?, ?, ?, NOW() + INTERVAL 3 hour);\n        "
   },
   "a993e289a631846abd26185d6a78ba37e10ce98782d00fd4aecb4a4a5502ad38": {
     "describe": {
@@ -14518,6 +14561,44 @@
       }
     },
     "query": "\nSELECT\n    w2l.token as template_token,\n    w2l.template_type,\n    w2l.creator_user_token,\n    users.username as creator_username,\n    users.display_name as creator_display_name,\n    w2l.title,\n    w2l.frame_width,\n    w2l.frame_height,\n    w2l.duration_millis,\n    w2l.private_bucket_hash,\n    w2l.maybe_public_bucket_preview_image_object_name,\n    w2l.maybe_public_bucket_preview_video_object_name,\n    w2l.created_at,\n    w2l.updated_at\nFROM w2l_templates as w2l\nJOIN users\nON users.token = w2l.creator_user_token\nWHERE w2l.token = ?\nAND w2l.user_deleted_at IS NULL\nAND w2l.mod_deleted_at IS NULL\n        "
+  },
+  "bc9d5ba0be77c97a7429e2c84ada00fa749fe9a252304db0e1e88fbaae97fa41": {
+    "describe": {
+      "columns": [
+        {
+          "name": "password_reset_token: tokens::tokens::password_reset::PasswordResetToken",
+          "ordinal": 0,
+          "type_info": {
+            "char_set": 224,
+            "flags": {
+              "bits": 4229
+            },
+            "max_size": 128,
+            "type": "VarString"
+          }
+        },
+        {
+          "name": "user_token: tokens::tokens::users::UserToken",
+          "ordinal": 1,
+          "type_info": {
+            "char_set": 224,
+            "flags": {
+              "bits": 4233
+            },
+            "max_size": 128,
+            "type": "VarString"
+          }
+        }
+      ],
+      "nullable": [
+        false,
+        false
+      ],
+      "parameters": {
+        "Right": 1
+      }
+    },
+    "query": "\nSELECT\n  pw.token as `password_reset_token: tokens::tokens::password_reset::PasswordResetToken`,\n  pw.user_token as `user_token: tokens::tokens::users::UserToken`\nFROM user_password_resets AS pw\nJOIN users AS u\n  ON pw.user_token = u.token\nWHERE public_reset_token = ?\n  AND pw.expires_at > NOW()\n  AND pw.current_password_version = u.password_version\n  AND NOT pw.is_redeemed\n  AND NOT u.is_banned\nLIMIT 1\nFOR UPDATE\n        "
   },
   "bee13160674414391587f56e8fb0aa3629e3dfcead0afa5759bff1e161f1bb6e": {
     "describe": {
@@ -17379,83 +17460,6 @@
     },
     "query": "\n        UPDATE zs_voice_datasets\n        SET\n            title = ?,\n            maybe_creator_user_token = ?,\n            creator_ip_address = ?,\n            creator_set_visibility = ?,\n            maybe_mod_user_token = ?,\n            maybe_creator_synthetic_id = ?,\n            ietf_language_tag = ?,\n            ietf_primary_language_subtag = ?,\n\n\n            version = version + 1\n        WHERE token = ?\n        LIMIT 1\n        "
   },
-  "e030f8104479f9d07ce1adbbe4843cd8069e09debc1d3608a956b8ca8c2ed918": {
-    "describe": {
-      "columns": [
-        {
-          "name": "token: tokens::tokens::users::UserToken",
-          "ordinal": 0,
-          "type_info": {
-            "char_set": 224,
-            "flags": {
-              "bits": 4229
-            },
-            "max_size": 128,
-            "type": "VarString"
-          }
-        },
-        {
-          "name": "username",
-          "ordinal": 1,
-          "type_info": {
-            "char_set": 224,
-            "flags": {
-              "bits": 4229
-            },
-            "max_size": 80,
-            "type": "VarString"
-          }
-        },
-        {
-          "name": "email_address",
-          "ordinal": 2,
-          "type_info": {
-            "char_set": 224,
-            "flags": {
-              "bits": 4229
-            },
-            "max_size": 1020,
-            "type": "VarString"
-          }
-        },
-        {
-          "name": "password_hash",
-          "ordinal": 3,
-          "type_info": {
-            "char_set": 63,
-            "flags": {
-              "bits": 4225
-            },
-            "max_size": 60,
-            "type": "String"
-          }
-        },
-        {
-          "name": "is_banned",
-          "ordinal": 4,
-          "type_info": {
-            "char_set": 63,
-            "flags": {
-              "bits": 1
-            },
-            "max_size": 1,
-            "type": "Tiny"
-          }
-        }
-      ],
-      "nullable": [
-        false,
-        false,
-        false,
-        false,
-        false
-      ],
-      "parameters": {
-        "Right": 1
-      }
-    },
-    "query": "\nSELECT\n  token as `token: tokens::tokens::users::UserToken`,\n  username,\n  email_address,\n  password_hash,\n  is_banned\nFROM users\nWHERE username = ?\nLIMIT 1\n        "
-  },
   "e0ad2a7fe4ae795e4f097f604d5cfcf9605298b58cde5ca23bdf9c8ec7383b00": {
     "describe": {
       "columns": [],
@@ -19559,6 +19563,96 @@
       }
     },
     "query": "\nINSERT INTO tts_results\nSET\n  token = ?,\n\n  model_token = ?,\n  maybe_pretrained_vocoder_used = ?,\n  raw_inference_text = ?,\n  raw_inference_text_hash_sha2 = ?,\n  normalized_inference_text = ?,\n\n  maybe_creator_user_token = ?,\n  maybe_creator_synthetic_id = ?,\n\n  creator_ip_address = ?,\n  creator_set_visibility = ?,\n\n  public_bucket_wav_audio_path = ?,\n  public_bucket_spectrogram_path = ?,\n\n  file_size_bytes = ?,\n  duration_millis = ?,\n\n  is_generated_on_prem = ?,\n  generated_by_worker = ?,\n\n  is_debug_request = ?\n        "
+  },
+  "fc85f6e8ff6d250fcd969afd96a0d273f6a0e8d4a19e138c604567244c731a1c": {
+    "describe": {
+      "columns": [
+        {
+          "name": "token: tokens::tokens::users::UserToken",
+          "ordinal": 0,
+          "type_info": {
+            "char_set": 224,
+            "flags": {
+              "bits": 4229
+            },
+            "max_size": 128,
+            "type": "VarString"
+          }
+        },
+        {
+          "name": "username",
+          "ordinal": 1,
+          "type_info": {
+            "char_set": 224,
+            "flags": {
+              "bits": 4229
+            },
+            "max_size": 80,
+            "type": "VarString"
+          }
+        },
+        {
+          "name": "email_address",
+          "ordinal": 2,
+          "type_info": {
+            "char_set": 224,
+            "flags": {
+              "bits": 4229
+            },
+            "max_size": 1020,
+            "type": "VarString"
+          }
+        },
+        {
+          "name": "password_hash",
+          "ordinal": 3,
+          "type_info": {
+            "char_set": 63,
+            "flags": {
+              "bits": 4225
+            },
+            "max_size": 60,
+            "type": "String"
+          }
+        },
+        {
+          "name": "password_version",
+          "ordinal": 4,
+          "type_info": {
+            "char_set": 63,
+            "flags": {
+              "bits": 33
+            },
+            "max_size": 10,
+            "type": "Long"
+          }
+        },
+        {
+          "name": "is_banned",
+          "ordinal": 5,
+          "type_info": {
+            "char_set": 63,
+            "flags": {
+              "bits": 1
+            },
+            "max_size": 1,
+            "type": "Tiny"
+          }
+        }
+      ],
+      "nullable": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        false
+      ],
+      "parameters": {
+        "Right": 1
+      }
+    },
+    "query": "\nSELECT\n  token as `token: tokens::tokens::users::UserToken`,\n  username,\n  email_address,\n  password_hash,\n  password_version,\n  is_banned\nFROM users\nWHERE username = ?\nLIMIT 1\n        "
   },
   "fd31f7abe386147c07f862d668c9e56eb3d809c4f0a61b7debf9b2e3785a4c83": {
     "describe": {
