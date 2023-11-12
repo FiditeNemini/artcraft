@@ -97,7 +97,6 @@ import { VoiceDesignerVoiceEditPage } from "./pages/voice_designer/VoiceDesigner
 import VoiceDesignerUseVoicePage from "./pages/voice_designer/VoiceDesignerUseVoicePage";
 import { PasswordResetEmailPage } from "./pages/password_reset/PasswordResetEmailPage";
 import { PasswordResetVerificationPage } from "./pages/password_reset/PasswordResetVerificationPage";
-import { PasswordResetChangePage } from "./pages/password_reset/PasswordResetChangePage";
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -274,15 +273,13 @@ class PageContainer extends React.Component<
               />
             </Route>
 
-            <Route path="/password-reset/new">
-              <PasswordResetChangePage
-                sessionWrapper={this.props.sessionWrapper}
-              />
-            </Route>
-
             <Route path="/password-reset/verify">
               <PasswordResetVerificationPage
                 sessionWrapper={this.props.sessionWrapper}
+                querySessionAction={this.props.querySessionAction}
+                querySessionSubscriptionsAction={
+                  this.props.querySessionSubscriptionsAction
+                }
               />
             </Route>
 
