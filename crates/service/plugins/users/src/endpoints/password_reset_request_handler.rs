@@ -11,6 +11,7 @@ use crockford::crockford_entropy_lower;
 use email_sender::letter_exports;
 use email_sender::letter_exports::Message;
 use email_sender::smtp_email_sender::SmtpEmailSender;
+use errors::AnyhowResult;
 use http_server_common::request::get_request_ip::get_request_ip;
 use http_server_common::response::serialize_as_json_error::serialize_as_json_error;
 use mysql_queries::queries::users::user::lookup_user_for_login_by_email::lookup_user_for_login_by_email;
@@ -84,15 +85,24 @@ pub async fn password_reset_request_handler(
 
     let username_or_email = request.username_or_email.trim();
 
-    let user = if username_or_email.contains("@") {
+    // TODO(bt,2023-11-12): I need to prevent user lookup attacks.
+    let maybe_user = if username_or_email.contains("@") {
         lookup_user_for_login_by_email(&username_or_email, &mysql_pool).await
     } else {
         lookup_user_for_login_by_username(&username_or_email, &mysql_pool).await
     }.map_err(|e| {
         warn!("Password reset user lookup error: {:?}", e);
-        //TODO: This could be anything, not necessarily a lookup.  The name is misleading 🤷🏻
         PasswordResetRequestedRequestError::NoSuchUser
     })?;
+
+    let user = match maybe_user {
+        Some(user) => user,
+        None => {
+            // NB: Don't let the user know if the account exists. This is to prevent
+            // user lookup attacks.
+            return success_response();
+        }
+    };
 
     let secret_key = crockford_entropy_lower(32);
 
@@ -155,6 +165,11 @@ pub async fn password_reset_request_handler(
         PasswordResetRequestedRequestError::Internal
     })?;
 
+    success_response()
+}
+
+
+fn success_response() -> Result<HttpResponse, PasswordResetRequestedErrorResponse> {
     let response = PasswordResetRequestedResponse {
         success: true,
     };

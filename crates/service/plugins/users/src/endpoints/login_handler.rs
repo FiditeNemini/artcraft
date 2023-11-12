@@ -92,6 +92,7 @@ pub async fn login_handler(
 {
   let check_username_or_email = request.username_or_email.to_lowercase();
 
+  // TODO(bt,2023-11-12): I need to prevent user lookup attacks.
   let maybe_user = if check_username_or_email.contains("@") {
     lookup_user_for_login_by_email(&check_username_or_email, &mysql_pool).await
   } else {
@@ -99,12 +100,13 @@ pub async fn login_handler(
   };
 
   let user = match maybe_user {
-    Ok(user) => user,
-    Err(e) =>  {
-      // TODO: This isn't necessarily user error. I need to fix the above code to not lose error
-      //  semantics. I also need to prevent user lookup attacks.
-      warn!("Login lookup error: {:?}", e);
+    Ok(Some(user)) => user,
+    Ok(None) => {
       return Err(LoginErrorResponse::invalid_credentials());
+    }
+    Err(err) =>  {
+      warn!("Login lookup error: {:?}", err);
+      return Err(LoginErrorResponse::server_error());
     }
   };
 
