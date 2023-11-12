@@ -16,6 +16,7 @@ use http_server_common::response::serialize_as_json_error::serialize_as_json_err
 use mysql_queries::queries::users::user::lookup_user_for_login_by_email::lookup_user_for_login_by_email;
 use mysql_queries::queries::users::user::lookup_user_for_login_by_username::lookup_user_for_login_by_username;
 use mysql_queries::queries::users::user_password_resets::create_password_reset_request::create_password_reset;
+use server_environment::ServerEnvironment;
 
 #[derive(Deserialize)]
 pub struct PasswordResetRequestedRequest {
@@ -77,6 +78,7 @@ pub async fn password_reset_request_handler(
     http_request: HttpRequest,
     request: web::Json<PasswordResetRequestedRequest>,
     mysql_pool: web::Data<MySqlPool>,
+    server_environment: web::Data<ServerEnvironment>,
     sender: web::Data<SmtpEmailSender>,
 ) -> Result<HttpResponse, PasswordResetRequestedErrorResponse> {
 
@@ -118,12 +120,31 @@ pub async fn password_reset_request_handler(
             PasswordResetRequestedRequestError::Internal
         })?;
 
+    // TODO(bt,2023-11-12): Environmentally configure, allow overrides.
+    let link = match **server_environment {
+        ServerEnvironment::Development => format!("http://dev.fakeyou.com:7000/password-reset/verify?token={secret_key}"),
+        ServerEnvironment::Production => format!("https://fakeyou.com/password-reset/verify?token={secret_key}"),
+    };
+
+    let message = format!(r#"
+      <a href="{link}">Click here to reset your password!</a>
+      <br />
+      <br />
+      If you can't click the link, here's the secret reset code: {secret_key}
+      <br />
+      <br />
+      Thank You,
+      <br />
+      <br />
+      Storyteller.ai (FakeYou) Team
+    "#);
+
     let email = Message::builder()
         .from(from_address)
         .to(to_address)
         .subject("FakeYou Password Reset")
-        .header(letter_exports::ContentType::TEXT_PLAIN)
-        .body(format!("Here's the secret key: {secret_key}"))
+        .header(letter_exports::ContentType::TEXT_HTML)
+        .body(message)
         .map_err(|err| {
             log::error!("Error constructing email: {err}");
             PasswordResetRequestedRequestError::Internal

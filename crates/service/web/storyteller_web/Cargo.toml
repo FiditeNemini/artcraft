@@ -40,6 +40,7 @@ mysql_queries = { path = "../../../lib/mysql_queries" }
 redis_caching = { path = "../../../lib/caching/redis_caching" }
 redis_common = { path = "../../../lib/redis_common" }
 reusable_types = { path = "../../../_types/reusable_types" }
+server_environment = { path = "../../../lib/server_environment" }
 tokens = { path = "../../../_types/tokens" }
 tts_common = { path = "../../../lib/tts_common" }
 twitch_common = { path = "../../../lib/api_clients/twitch_common" }

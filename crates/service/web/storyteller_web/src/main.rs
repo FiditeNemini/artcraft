@@ -619,7 +619,13 @@ pub async fn serve(server_state: ServerState) -> AnyhowResult<()>
   let bind_address = server_state.env_config.bind_address.clone();
   let num_workers = server_state.env_config.num_workers.clone();
   let hostname = server_state.hostname.clone();
-  let server_environment = server_state.server_environment.clone();
+
+  // TODO(bt,2023-11-12): Remove the old type.
+  let old_server_environment = server_state.server_environment.clone();
+  let new_server_environment = match old_server_environment {
+    ServerEnvironment::Development => server_environment::ServerEnvironment::Development,
+    ServerEnvironment::Production => server_environment::ServerEnvironment::Production,
+  };
 
   let server_state_arc = web::Data::new(Arc::new(server_state));
 
@@ -660,13 +666,14 @@ pub async fn serve(server_state: ServerState) -> AnyhowResult<()>
       .app_data(web::Data::new(server_state_arc.stripe.clone().client.clone()))
       .app_data(web::Data::new(server_state_arc.third_party_url_redirector.clone()))
       .app_data(web::Data::new(server_state_arc.email_sender.clone()))
-      .app_data(web::Data::new(server_environment))
+      .app_data(web::Data::new(old_server_environment))
+      .app_data(web::Data::new(new_server_environment))
       .app_data(web::Data::from(product_lookup)) // NB: Data::from(Arc<T>) for dynamic dispatch
       .app_data(web::Data::from(stripe_lookup)) // NB: Data::from(Arc<T>) for dynamic dispatch
       .app_data(web::Data::from(user_lookup)) // NB: Data::from(Arc<T>) for dynamic dispatch
       .app_data(web::Data::from(session_cache_purge)) // NB: Data::from(Arc<T>) for dynamic dispatch
       .app_data(server_state_arc.clone())
-      .wrap(build_cors_config(server_environment))
+      .wrap(build_cors_config(old_server_environment))
       .wrap(DefaultHeaders::new()
         .header("X-Backend-Hostname", &hostname)
         .header("X-Build-Sha", server_state_arc.server_info.build_sha.clone()))
@@ -679,7 +686,7 @@ pub async fn serve(server_state: ServerState) -> AnyhowResult<()>
         .exclude("/readiness"))
       .wrap(middleware::Compress::default());
 
-    add_routes(app, server_environment)
+    add_routes(app, old_server_environment)
   })
   .bind(bind_address)?
   .workers(num_workers)
