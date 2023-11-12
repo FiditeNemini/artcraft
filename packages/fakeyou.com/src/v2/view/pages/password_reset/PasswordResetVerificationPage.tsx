@@ -195,7 +195,9 @@ function PasswordResetVerificationPage(props: Props) {
 // Pre-load the code from a URL query string, eg https://fakeyou.com/password-reset/validate?code=codeGoesHere
 function getCodeFromUrl() : string | null {
   const urlParams = new URLSearchParams(window.location.search);
-  return urlParams.get('token');
+  const tokenUnsafe = urlParams.get('token');
+  const tokenSafe = tokenUnsafe === null ? null : tokenUnsafe.replace(/[^A-Za-z0-9]/g, '');
+  return tokenSafe;
 }
 
 // Handle error state at initialization
