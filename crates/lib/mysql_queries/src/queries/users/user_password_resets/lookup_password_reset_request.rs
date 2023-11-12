@@ -26,10 +26,10 @@ pub async fn lookup_password_reset_request<'a>(password_reset_token: &str, pool:
 SELECT
   pw.token as `password_reset_token: tokens::tokens::password_reset::PasswordResetToken`,
   pw.user_token as `user_token: tokens::tokens::users::UserToken`
-FROM password_resets AS pw
+FROM user_password_resets AS pw
 JOIN users AS u
   ON pw.user_token = u.token
-WHERE secret_key = ?
+WHERE public_reset_token = ?
   AND pw.expires_at > NOW()
   AND pw.current_password_version = u.password_version
   AND NOT pw.is_redeemed

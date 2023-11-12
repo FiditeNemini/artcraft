@@ -43,7 +43,7 @@ LIMIT 1
 
   let query = sqlx::query!(
         r#"
-UPDATE password_resets
+UPDATE user_password_resets
 SET
   is_redeemed = true,
   ip_address_redemption = ?,

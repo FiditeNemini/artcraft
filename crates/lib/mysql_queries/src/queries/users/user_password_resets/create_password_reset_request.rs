@@ -11,8 +11,8 @@ pub async fn create_password_reset(pool: &MySqlPool, user: &UserRecordForLogin, 
 
     sqlx::query!(
         r#"
-INSERT INTO password_resets
-(token, user_token, secret_key, current_password_version, ip_address_creation, expires_at)
+INSERT INTO user_password_resets
+(token, user_token, public_reset_token, current_password_version, ip_address_creation, expires_at)
 VALUES (?, ?, ?, ?, ?, NOW() + INTERVAL 3 hour);
         "#,
 
