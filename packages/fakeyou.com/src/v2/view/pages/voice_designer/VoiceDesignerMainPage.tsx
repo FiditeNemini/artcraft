@@ -1,43 +1,35 @@
 import React, { useState } from "react";
-import { useHistory } from "react-router-dom";
+import { useHistory, useLocation } from "react-router-dom";
 import { faPlus, faWaveform } from "@fortawesome/pro-solid-svg-icons";
 // import { usePrefixedDocumentTitle } from "common/UsePrefixedDocumentTitle";
 import Panel from "components/common/Panel";
 import PageHeader from "components/layout/PageHeader";
 import Container from "components/common/Container";
-import { Route, NavLink, Switch, Redirect } from "react-router-dom";
+import { NavLink } from "react-router-dom";
 import ListItems from "./components/NewList";
 import Modal from "components/common/Modal";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-// import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
 import { faMicrophone } from "@fortawesome/pro-solid-svg-icons";
 import useVoiceRequests from "./useVoiceRequests";
 
-// interface Props {
-//   sessionWrapper: SessionWrapper;
-// }
-
 function VoiceDesignerMainPage() {
-
+  const { pathname } = useLocation();
   const { datasets, voices } = useVoiceRequests();
-
-  console.log("😎",voices);
-
   const [isDeleteVoiceModalOpen, setIsDeleteVoiceModalOpen] = useState(false);
-  const [isDeleteDatasetModalOpen, setIsDeleteDatasetModalOpen] =
-    useState(false);
+  const [isDeleteDatasetModalOpen, setIsDeleteDatasetModalOpen] = useState(false);
+  const view = ["/voice-designer/datasets","/voice-designer/voices"].indexOf(pathname);
 
-  const openDeleteVoiceModal = () => {
-    setIsDeleteVoiceModalOpen(true);
-  };
+  // const openDeleteVoiceModal = () => {
+  //   setIsDeleteVoiceModalOpen(true);
+  // };
 
   const closeDeleteVoiceModal = () => {
     setIsDeleteVoiceModalOpen(false);
   };
 
-  const openDeleteDatasetModal = () => {
-    setIsDeleteDatasetModalOpen(true);
-  };
+  // const openDeleteDatasetModal = () => {
+  //   setIsDeleteDatasetModalOpen(true);
+  // };
 
   const closeDeleteDatasetModal = () => {
     setIsDeleteDatasetModalOpen(false);
@@ -93,39 +85,20 @@ function VoiceDesignerMainPage() {
     }
   });
 
-  function MyVoices() {
-    return (
-      <ListItems
-        type="voice"
-        data={actionVoices}
-        handleDeleteVoice={openDeleteVoiceModal}
-      />
-    );
-  }
-
-  function MyDatasets() {
-    return (
-      <ListItems
-        type="dataset"
-        data={actionDataSets}
-        //data={datasetList}
-        handleDeleteDataset={openDeleteDatasetModal}
-      />
-    );
-  }
+  const button = {
+    label: `Create new voice`,
+    icon: faPlus,
+    to: "/voice-designer/create" 
+  };
 
   return (
     <>
       <Container type="panel">
         <PageHeader
+         button={button}
           title="Voice Designer"
           titleIcon={faWaveform}
           subText="Create your own AI voice by providing audio files of the voice you want to clone."
-          showButton={true}
-          buttonLabel="Create New voice"
-          buttonVariant="primary"
-          buttonIcon={faPlus}
-          buttonTo="/voice-designer/create"
           panel={false}
           imageUrl="/images/header/voice-designer.png"
         />
@@ -157,15 +130,7 @@ function VoiceDesignerMainPage() {
           </nav>
 
           <div className="p-3 p-lg-4">
-            <Switch>
-              <Route path="/voice-designer/voices" exact component={MyVoices} />
-              <Route
-                path="/voice-designer/datasets"
-                exact
-                component={MyDatasets}
-              />
-              <Redirect to="/voice-designer/voices" />
-            </Switch>
+            <ListItems {...{ data: view ? actionVoices : actionDataSets }}/>
           </div>
         </Panel>
       </Container>

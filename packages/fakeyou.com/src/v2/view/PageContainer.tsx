@@ -81,7 +81,6 @@ import { UploadVoiceConversionModel } from "./pages/upload/UploadVoiceConversion
 import { VoiceConversionModelListItem } from "@storyteller/components/src/api/voice_conversion/ListVoiceConversionModels";
 import { CommunityCommissionsPage } from "./pages/contest/CommunityCommissionsPage";
 import { ProductUsageInfoPage } from "./pages/product_usage_info/ProductUsageInfoPage";
-import { VoiceDesignerFormPage } from "./pages/voice_designer/VoiceDesignerFormPage";
 import DatasetEditor from "./pages/voice_designer/DatasetEditor";
 import { GenerateSpeechPage } from "./pages/generate_speech/GenerateSpeechPage";
 import VcModelViewPage from "./pages/vc/vc_model_view/VcModelViewPage";
@@ -92,6 +91,7 @@ import MobileMenu from "components/layout/MobileMenu/MobileMenu";
 import { TopNav } from "./nav/TopNav";
 import TtsModelSearchPage from "./pages/tts/tts_model_search/TtsModelSearchPage";
 import MediaPage from "./pages/media/MediaPage";
+import { VoiceDesignerFormPage } from "./pages/voice_designer/VoiceDesignerFormPage";
 import { VoiceDesignerMainPage } from "./pages/voice_designer/VoiceDesignerMainPage";
 import { VoiceDesignerVoiceEditPage } from "./pages/voice_designer/VoiceDesignerVoiceEditPage";
 import VoiceDesignerUseVoicePage from "./pages/voice_designer/VoiceDesignerUseVoicePage";
@@ -643,6 +643,13 @@ class PageContainer extends React.Component<
             <Route
               exact
               path="/voice-designer/create"
+              component={VoiceDesignerFormPage}
+            />
+
+            {/* Route for initial voice creation */}
+            <Route
+              exact
+              path="/voice-designer/dataset/create"
               component={DatasetEditor}
             />
 

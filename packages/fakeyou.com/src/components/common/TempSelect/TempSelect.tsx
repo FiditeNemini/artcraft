@@ -4,12 +4,12 @@ import { IconDefinition } from "@fortawesome/fontawesome-svg-core";
 import "../Select/Select.scss";
 import ReactSelect, { Props as ReactSelectProps } from "react-select";
 
-interface Option {
+export interface Option {
   value: string,
   label: string
 }
 
-interface SelectProps extends ReactSelectProps {
+export interface SelectProps extends ReactSelectProps {
   icon?: IconDefinition;
   label?: string;
   rounded?: boolean;

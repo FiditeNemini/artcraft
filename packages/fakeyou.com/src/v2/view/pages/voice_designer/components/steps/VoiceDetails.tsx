@@ -1,15 +1,9 @@
-import {
-  faEye,
-  faLanguage,
-  // faMicrophoneLines,
-  // faTags,
-} from "@fortawesome/pro-solid-svg-icons";
+import React from "react";
 // import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 // import { Button } from "components/common";
 import Input from "components/common/Input";
-import useVoiceDetailsStore from "hooks/useVoiceDetailsStore/";
-import React from "react";
-import Select from "components/common/Select";
+// import useVoiceDetailsStore from "hooks/useVoiceDetailsStore/";
+import Select from "components/common/TempSelect";
 
 export const SearchFieldClass = {
   control: (state: any) =>
@@ -26,35 +20,15 @@ export const SearchFieldClass = {
     state.isFocused ? "select-separator" : "select-separator",
 };
 
-function VoiceDetails() {
-  const { visibility, setVisibility } = useVoiceDetailsStore();
+function VoiceDetails({ datasetInputs }: { datasetInputs: any }) {
+  const classNames = SearchFieldClass;
 
   return (
     <div className="d-flex flex-column gap-4">
-      <div className="row gy-4">
-        <Input label="Name" placeholder="Voice name" />
-      </div>
-
-      <div>
-        <Select
-          classNames={SearchFieldClass}
-          value="English"
-          defaultValue="English"
-          placeholder="English"
-          icon={faLanguage}
-          label="Language"
-        />
-      </div>
-
-      <div>
-        <Select
-          classNames={SearchFieldClass}
-          value={visibility}
-          onChange={(e) => setVisibility(e.target.value)}
-          icon={faEye}
-          label="Visibility"
-        />
-      </div>
+      { datasetInputs.map(({ type = "", options = [], ...props }, key: number) => {
+        if (type === "text") return <Input {...{ ...props, key }} />;
+        else return <Select {...{ ...props, classNames, key, options } }/>;
+      }) }
     </div>
   );
 }

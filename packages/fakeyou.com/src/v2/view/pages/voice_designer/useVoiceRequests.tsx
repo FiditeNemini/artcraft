@@ -9,13 +9,16 @@ import { DeleteVoice } from "@storyteller/components/src/api/voice_designer/voic
 
 import { ListDatasetsByUser, Dataset } from "@storyteller/components/src/api/voice_designer/voice_datasets/ListDatasetsByUser";
 import { DeleteDataset } from "@storyteller/components/src/api/voice_designer/voice_datasets/DeleteDataset";
-import { CreateDataset, CreateDatasetRequest, CreateDatasetResponse } from "@storyteller/components/src/api/voice_designer/voice_datasets/CreateDataset";
+import { CreateDataset } from "@storyteller/components/src/api/voice_designer/voice_datasets/CreateDataset";
 import { UpdateDataset, UpdateDatasetRequest } from "@storyteller/components/src/api/voice_designer/voice_datasets/UpdateDataset";
 import { useSession } from "hooks";
 
 export default function useVoiceRequests() {
+
+  // this state will be provided as params, triggering the appropriate api call if present
   const [datasets, datasetsSet] = useState<Dataset[]>([]);
   const [voices, voicesSet] = useState<Voice[]>([]);
+  const [fetched,fetchedSet] = useState(false);
   const { user } = useSession();
 
   // voices
@@ -26,17 +29,6 @@ export default function useVoiceRequests() {
   }).then(res => {
     // console.log("🏧",res);
   });
-
-
-  // datasets
-
-  const createDataset = (request: CreateDatasetRequest) => {
-  	// console.log("🌎",);
-  	CreateDataset("",request).then((res: CreateDatasetResponse) => {
-  		// console.log("☘️",res);
-  	});
-  };
-
 
   const deleteDataset = (voiceToken:  string) => DeleteDataset(voiceToken,{
   	set_delete: true,
@@ -55,7 +47,8 @@ export default function useVoiceRequests() {
   };
 
 	useEffect(() => {
-    if (user && user.username) { 
+    if (!fetched && user && user.username) {
+      fetchedSet(true);
       if (!datasets.length) {
         ListDatasetsByUser(user.username,{}).then(res => {
           if (res.datasets) datasetsSet(res.datasets);
@@ -68,11 +61,11 @@ export default function useVoiceRequests() {
       }
     }
 
-	},[user, datasets, voices]);
+	},[fetched,user, datasets, voices]);
 
   return { 
   	datasets: {
-  		create: createDataset,
+  		create: CreateDataset,
   		delete: deleteDataset,
   		edit: editDataSet,
   		list: datasets,
@@ -83,5 +76,8 @@ export default function useVoiceRequests() {
       delete: deleteVoice,
       list: voices
     },
+    inputCtrl: (todo: any) => ({ target }: { target: any}) => {
+      console.log("🌿",target);
+      todo(target.value)}
   };
 };
