@@ -86,9 +86,9 @@ function VoiceDesignerMainPage() {
   });
 
   const button = {
-    label: `Create new ${ view ? "voice" : "dataset" }`,
+    label: `Create new voice`,
     icon: faPlus,
-    to: view ? "/voice-designer/create" : "/voice-designer/dataset/create"
+    to: "/voice-designer/create" 
   };
 
   return (

@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useParams } from "react-router-dom";
-import { faPencil, faWaveform } from "@fortawesome/pro-solid-svg-icons";
+import { faEye, faLanguage, faPencil, faWaveform } from "@fortawesome/pro-solid-svg-icons";
 import { usePrefixedDocumentTitle } from "common/UsePrefixedDocumentTitle";
 import Panel from "components/common/Panel";
 import { Stepper } from "./components/Stepper";
@@ -11,12 +11,36 @@ import PageHeader from "components/layout/PageHeader";
 import Container from "components/common/Container";
 import { useHistory } from "react-router-dom";
 
+import { v4 as uuidv4 } from "uuid";
+
+
+import useVoiceRequests from "./useVoiceRequests";
+
 interface RouteParams {
   dataset_token?: string;
 }
 
 function VoiceDesignerFormPage() {
   const history = useHistory();
+  const { datasets, inputCtrl } = useVoiceRequests();
+  const [language,languageSet] = useState("en");
+  const [visibility,visibilitySet] = useState("");
+  const [title, titleSet] = useState("");
+
+  const languages = [
+    { value: "en", label: "English" },
+    { value: "es", label: "Spanish" },
+    { value: "fr", label: "French" },
+  ];
+
+  const visibilityOptions = [{ label: "Public", value: "public" },{  label: "Hidden", value: "hidden" }];
+
+  const datasetInputs = [
+    { type: "text", label: "Title", placeholder: "Voice name", value: title, onChange: inputCtrl(titleSet) },
+    { type: "select", icon: faLanguage, label: "Language", value: language, onChange: inputCtrl(languageSet), options: languages },
+    { type: "select", icon: faEye, label: "Visibility", value: visibility, onChange: inputCtrl(visibilitySet), options: visibilityOptions }
+  ];
+
   const { dataset_token } = useParams<RouteParams>();
   const [isNewCreation] = useState(!dataset_token);
   const isEditMode = Boolean(dataset_token) && !isNewCreation;
@@ -33,7 +57,7 @@ function VoiceDesignerFormPage() {
   const displayStep = (step: any) => {
     switch (step) {
       case 0:
-        return <VoiceDetails />;
+        return <VoiceDetails {...{ datasetInputs }} />;
       case 1:
         return <UploadSamples />;
       default:
@@ -55,8 +79,18 @@ function VoiceDesignerFormPage() {
     if (currentStep === 0) {
       if (isNewCreation) {
         // It's a new creation and on the first step
-        const dummyDatasetToken = "dummyToken123";
-        history.push(`/voice-designer/dataset/${dummyDatasetToken}/upload`);
+
+        datasets.create("",{
+          title,
+          creator_set_visibility: visibility,
+          idempotency_token: uuidv4(),
+        }).then((res: any) => {
+
+          if (res && res.success && res.token) {
+            history.push(`/voice-designer/dataset/${ res.token }/upload`);
+          } 
+        });
+
       } else if (dataset_token) {
         // It's edit mode and on the first step
         history.push(`/voice-designer/dataset/${dataset_token}/upload`);

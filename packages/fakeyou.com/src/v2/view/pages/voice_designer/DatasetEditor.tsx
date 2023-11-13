@@ -6,7 +6,7 @@ import { faPencil, faWaveform } from "@fortawesome/pro-solid-svg-icons";
 import { TempInput, Panel, SegmentButtons, TempSelect } from "components/common";
 import useVoiceRequests from "./useVoiceRequests";
 
-import { v4 as uuidv4 } from "uuid";
+// import { v4 as uuidv4 } from "uuid";
 
 import "./VoiceDesigner.scss";
 
@@ -19,12 +19,12 @@ interface RouteParams {
 }
 
 export default function DatasetEditor({ value }: Props) {
-  const { datasets } = useVoiceRequests();
+  const { datasets, inputCtrl } = useVoiceRequests();
   const [title, titleSet] = useState("");
   const [language,languageSet] = useState("en");
   const [visibility,visibilitySet] = useState("");
   const [ready,readySet] = useState(false);
-  const inputCtrl = (todo: any) => ({ target }: { target: any}) => todo(target.value);
+  // const inputCtrl = (todo: any) => ({ target }: { target: any}) => todo(target.value);
   const { dataset_token: token } = useParams<RouteParams>();
   const pageTitle = token ? `Edit` : "Create Dataset";
   const subText = token ?
@@ -50,13 +50,14 @@ export default function DatasetEditor({ value }: Props) {
         creator_set_visibility: visibility,
         ietf_language_tag: language
       });
-    } else {
-      datasets.create({
-          title,
-          creator_set_visibility: visibility,
-          idempotency_token: uuidv4(),
-      });
-    }
+    } 
+    // else {
+    //   datasets.create({
+    //       title,
+    //       creator_set_visibility: visibility,
+    //       idempotency_token: uuidv4(),
+    //   });
+    // }
   };
   const headerProps = { back, buttonOnClick, buttonLabel, panel: false, showButton: true, subText, title: pageTitle, titleIcon };
 
