@@ -9,6 +9,7 @@ on:
       # NB: Default-branch doesn't work, despite Github's documentation.
       #- $default-branch
       - master
+      - speedup-experiments
 env:
   IMAGE_NAME: storyteller-rust
 
