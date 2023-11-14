@@ -21,7 +21,7 @@ errors = { path = "../../errors" }
 
 # External
 image = "0.24.1"
-log = "0.4.14"
+my-workspace-hack = { version = "0.1", path = "../../../../my-workspace-hack" }
 
 [dev-dependencies]
 testing = { path = "../../testing" }

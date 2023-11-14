@@ -28,7 +28,6 @@ redis_caching = { path = "../../../lib/caching/redis_caching" }
 redis_common = { path = "../../../lib/redis_common" }
 reusable_types = { path = "../../../_types/reusable_types" }
 server_environment = { path = "../../../lib/server_environment" }
-sqlx_mysql_helpers = { path = "../../../lib/sqlx_mysql_helpers" }
 tokens = { path = "../../../_types/tokens" }
 user_input_common = { path = "../../../lib/user_input_common" }
 
@@ -69,5 +68,5 @@ sqlx = { version = "0.6.2", features = [ "mysql", "runtime-actix-native-tls", "o
 # Redis Database
 r2d2_redis = "0.14.0"
 byteorder = "1.5.0"
-strum = "0.25.0"
 strum_macros = "0.25.3"
+my-workspace-hack = { version = "0.1", path = "../../../../my-workspace-hack" }

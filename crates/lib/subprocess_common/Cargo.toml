@@ -14,11 +14,8 @@ path = "src/lib.rs"
 
 [dependencies]
 
-# Internal
-container_common = { path = "../deprecated/container_common" }
-
 # External
-anyhow = "1.0.75"
+my-workspace-hack = { version = "0.1", path = "../../../my-workspace-hack" }
 
 # Serialization
 #serde = "1.0.125"

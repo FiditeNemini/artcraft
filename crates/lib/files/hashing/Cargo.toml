@@ -22,6 +22,7 @@ bcrypt = "0.8" # password hashes
 data-encoding = "2.3.2"
 md-5 = "0.9.1" # DO NOT USE FOR SERIOUS CRYPTO (we use this for gravatar)
 ring = "0.17.0-alpha.10"
+my-workspace-hack = { version = "0.1", path = "../../../../my-workspace-hack" }
 
 [dev-dependencies]
 # None yet

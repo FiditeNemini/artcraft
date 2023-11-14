@@ -15,16 +15,11 @@ path = "src/main.rs"
 [dependencies]
 # Internal
 buckets = { path = "../../_types/buckets" }
-cloud_storage = { path = "../../lib/api_clients/cloud_storage" }
 config = { path = "../../lib/deprecated/config" }
 easyenv = { path = "../../lib/easyenv" }
 elasticsearch_schema = { path = "../../lib/elasticsearch_schema" }
 enums = { path = "../../_types/enums" }
 errors = { path = "../../lib/errors" }
-filesys = { path = "../../lib/files/filesys" }
-hashing = { path = "../../lib/files/hashing" }
-idempotency = { path = "../../lib/idempotency" }
-mimetypes = { path = "../../lib/files/mimetypes" }
 mysql_queries = { path = "../../lib/mysql_queries" }
 storyteller_root = { path = "../../lib/storyteller_root" }
 tokens = { path = "../../_types/tokens" }
@@ -50,6 +45,7 @@ elasticsearch = "8.5.0-alpha.1"
 serde = "1.0.125"
 serde_derive = "1.0.125"
 serde_json = "1.0.64"
+my-workspace-hack = { version = "0.1", path = "../../../my-workspace-hack" }
 
 [dev-dependencies]
 # None yet

@@ -20,6 +20,7 @@ errors = { path = "../../errors" }
 
 # External
 zip = "0.6.6"
+my-workspace-hack = { version = "0.1", path = "../../../../my-workspace-hack" }
 
 [dev-dependencies]
 # None yet
