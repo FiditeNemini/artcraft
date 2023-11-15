@@ -25,26 +25,26 @@ export class FakeYouFrontendEnvironment {
     }
   }
 
-  public static getInstance() : FakeYouFrontendEnvironment {
+  public static getInstance(): FakeYouFrontendEnvironment {
     if (FakeYouFrontendEnvironment.instance === undefined) {
-        FakeYouFrontendEnvironment.instance = new FakeYouFrontendEnvironment();
+      FakeYouFrontendEnvironment.instance = new FakeYouFrontendEnvironment();
     }
     return FakeYouFrontendEnvironment.instance;
   }
 
-  public useProductionStripePlans() : boolean {
+  public useProductionStripePlans(): boolean {
     return this.isProduction() || this.isStaging();
   }
 
-  public isProduction() : boolean {
+  public isProduction(): boolean {
     return this.environment === Environment.Production;
   }
 
-  public isStaging() : boolean {
+  public isStaging(): boolean {
     return this.environment === Environment.Staging;
   }
 
-  public isDevelopment() : boolean {
+  public isDevelopment(): boolean {
     return this.environment === Environment.Development;
   }
 }
