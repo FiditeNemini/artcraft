@@ -5,24 +5,25 @@ const { host = "", useSsl = true } = GetApiHost();
 type UrlRoutingFunction<UrlRouteArgs> = (urlRouteArgs: UrlRouteArgs) => string;
 
 interface RequestHeaders {
-    [name: string]: string,
+  [name: string]: string;
 }
 
 interface RouteSetup<UrlRouteArgs> {
-    method: string;
-    routingFunction: UrlRoutingFunction<UrlRouteArgs>;
+  method: string;
+  routingFunction: UrlRoutingFunction<UrlRouteArgs>;
 }
 
-const formatUrl = (endpoint = "") => `${ useSsl ? "https" : "http" }://${ host + endpoint }`;
+const formatUrl = (endpoint = "") =>
+  `${useSsl ? "https" : "http"}://${host + endpoint}`;
 
-const METHOD_OMITS_BODY : { [key: string] : boolean } = {
-    "DELETE": true,
-    "GET": true,
-    "OPTIONS": true,
-    "PATCH": false,
-    "POST": false,
-    "PUT": false,
-}
+const METHOD_OMITS_BODY: { [key: string]: boolean } = {
+  DELETE: false,
+  GET: true,
+  OPTIONS: true,
+  PATCH: false,
+  POST: false,
+  PUT: false,
+};
 
 const MakeRequest = <UrlRouteArgs, Request, Response>(routeSetup: RouteSetup<UrlRouteArgs>) :  (urlRouteArgs: UrlRouteArgs, request: Request) => Promise<Response> => {
     return async function(urlRouteArgs: UrlRouteArgs, request: Request) : Promise<Response> {
