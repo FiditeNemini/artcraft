@@ -1,6 +1,6 @@
 import GetApiHost from "./GetApiHost";
 
-const { host = "", useSsl = true } = GetApiHost();
+const { formatUrl } = GetApiHost();
 
 type UrlRoutingFunction<UrlRouteArgs> = (urlRouteArgs: UrlRouteArgs) => string;
 
@@ -10,10 +10,9 @@ interface RequestHeaders {
 
 interface RouteSetup<UrlRouteArgs> {
     method: string;
+    multipart?: boolean;
     routingFunction: UrlRoutingFunction<UrlRouteArgs>;
 }
-
-const formatUrl = (endpoint = "") => `${ useSsl ? "https" : "http" }://${ host + endpoint }`;
 
 const METHOD_OMITS_BODY : { [key: string] : boolean } = {
     "DELETE": true,

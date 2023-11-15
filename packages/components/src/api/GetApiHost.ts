@@ -2,7 +2,11 @@
 
 const domainWithoutPort = document.location.host.split(":")[0];
 
-const hostConfig = (host: string, useSsl = true) => ({ host, useSsl });
+const hostConfig = (host: string, useSsl = true) => ({
+  formatUrl: (endpoint = "") => `${ useSsl ? "https" : "http" }://${ host + endpoint }`,
+  host,
+  useSsl,
+});
 
 export default function GetApiHost() {
   switch (domainWithoutPort) {
