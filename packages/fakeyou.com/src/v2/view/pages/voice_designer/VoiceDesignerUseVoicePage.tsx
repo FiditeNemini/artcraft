@@ -1,10 +1,9 @@
 import React, { useCallback, useEffect, useState } from "react";
 import {
   faBarsStaggered,
+  faCircleExclamation,
   faDeleteLeft,
   faEdit,
-  faEye,
-  faMemo,
   faMemoCircleInfo,
   faMessages,
   faTrash,
@@ -26,6 +25,7 @@ import { TtsInferenceJob } from "@storyteller/components/src/jobs/TtsInferenceJo
 import { faVolumeUp } from "@fortawesome/free-solid-svg-icons";
 import { useParams } from "react-router-dom";
 import { GetVoice } from "@storyteller/components/src/api/voice_designer/voices/GetVoice";
+import Skeleton from "components/common/Skeleton";
 
 interface VoiceDesignerUseVoicePageProps {
   sessionWrapper: SessionWrapper;
@@ -39,22 +39,34 @@ export default function VoiceDesignerUseVoicePage(
 ) {
   const { voice_token } = useParams<{ voice_token: string }>();
   const [textBuffer, setTextBuffer] = useState("");
-  const [titleTest, setTitleTest] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<boolean>(false);
+  const [voiceData, setVoiceData] = useState({
+    title: "",
+    creatorUsername: "",
+    createdAt: "",
+    updatedAt: "",
+    visibility: "",
+    voiceToken: "",
+    languageTag: "",
+  });
 
-  //Test Get voice details
-  const getVoiceDetails = useCallback(async (voice_token: string) => {
+  const getVoiceDetails = useCallback(async (voice_token) => {
     try {
-      console.log("Fetching details for token:", voice_token);
       let result = await GetVoice(voice_token, {});
-      console.log("API Response:", result);
 
-      if (result.title) {
-        setTitleTest(result.title);
+      if (result) {
+        setVoiceData({
+          title: result.title,
+          creatorUsername: result.creator.username,
+          createdAt: result.created_at.toString(),
+          updatedAt: result.updated_at.toString(),
+          visibility: result.creator_set_visibility,
+          voiceToken: result.voice_token,
+          languageTag: result.ietf_language_tag,
+        });
         setIsLoading(false);
       } else {
-        setTitleTest("not found");
         setError(true);
         setIsLoading(false);
       }
@@ -69,59 +81,31 @@ export default function VoiceDesignerUseVoicePage(
     getVoiceDetails(voice_token);
   }, [voice_token, getVoiceDetails]);
 
-  const title = titleTest;
-  const subText = (
-    <div>
-      Voice Designer TTS model by{" "}
-      <Link to="/profile/Vegito1089">Vegito1089</Link>
-    </div>
+  const modelCreatorLink = (
+    <Link to={`/profile/${voiceData.creatorUsername}`}>
+      {voiceData.creatorUsername}
+    </Link>
   );
-  // const tags = ["Speaking", "English", "Character", "Singing", "Spanish"];
 
-  let modelCreatorLink = <Link to="">Creator Name</Link>;
-  let modelTitle = title;
-  let modelDescription = "This is a description of the model";
-  let modelUseCount = 10000;
-  let modelLanguage = "English";
-  let modelType = "RVCv2";
-  let modelUploadDate = "2021-09-10T06:15:04Z";
-  let modelVisibility = (
-    <div>
-      <FontAwesomeIcon icon={faEye} className="me-2" />
-      Public
-    </div>
-  );
-  let modelCreatorBanned = "good standing";
-  let modelCreationIp = "0.0.0.0.0";
-  let modelUpdateIp = "0.0.0.0.0";
-  let frontPageFeatured = "no";
-  let moderatorDeletedAt = "not deleted";
-  let userDeletedAt = "not deleted";
-
-  // if (voices.data) {
-  //   modelCreatorLink = <Link to="">{voices.data.creator.username}</Link>;
-  //   modelTitle = voices.data.title;
-  //   modelDescription = "This is a dynamic description of the model";
-  // }
+  const subText = <div>TTS model by {modelCreatorLink}</div>;
 
   const voiceDetails = [
     { label: "Creator", value: modelCreatorLink },
-    { label: "Title", value: modelTitle },
-    { label: "Use count", value: modelUseCount },
-    { label: "Spoken language", value: modelLanguage },
-    { label: "Model type", value: modelType },
-    { label: "Upload date (UTC)", value: modelUploadDate },
-    { label: "Visibility", value: modelVisibility },
+    { label: "Title", value: voiceData.title },
+    { label: "Spoken language", value: voiceData.languageTag },
+    { label: "Created at (UTC)", value: voiceData.createdAt },
+    { label: "Updated at (UTC)", value: voiceData.updatedAt },
+    { label: "Visibility", value: voiceData.visibility },
   ];
 
-  const voiceDetailsModerator = [
-    { label: "Creator is banned?", value: modelCreatorBanned },
-    { label: "Creation IP address", value: modelCreationIp },
-    { label: "Update IP address", value: modelUpdateIp },
-    { label: "Mod deleted at (UTC)", value: moderatorDeletedAt },
-    { label: "User deleted at (UTC)", value: userDeletedAt },
-    { label: "Front page featured?", value: frontPageFeatured },
-  ];
+  // const voiceDetailsModerator = [
+  //   { label: "Creator is banned?", value: modelCreatorBanned },
+  //   { label: "Creation IP address", value: modelCreationIp },
+  //   { label: "Update IP address", value: modelUpdateIp },
+  //   { label: "Mod deleted at (UTC)", value: moderatorDeletedAt },
+  //   { label: "User deleted at (UTC)", value: userDeletedAt },
+  //   { label: "Front page featured?", value: frontPageFeatured },
+  // ];
 
   const handleFormSubmit = async (ev: React.FormEvent<HTMLFormElement>) => {
     ev.preventDefault();
@@ -132,13 +116,45 @@ export default function VoiceDesignerUseVoicePage(
     setTextBuffer(textValue);
   };
 
-  if (!voice_token) {
-    return <div>Voice token not found.</div>;
+  if (isLoading) {
+    return (
+      <Container type="panel">
+        <div className="py-5">
+          <h1>
+            <Skeleton />
+          </h1>
+          <p>
+            <Skeleton />
+          </p>
+        </div>
+        <Panel padding={true}>
+          <Skeleton />
+        </Panel>
+      </Container>
+    );
+  }
+
+  if (error) {
+    return (
+      <Container type="panel">
+        <PageHeader
+          panel={true}
+          titleIcon={faCircleExclamation}
+          title="Voice model not found"
+          subText="This voice does not exist or is private."
+          extension={
+            <div className="d-flex">
+              <Button label="Back to homepage" to="/" className="d-flex" />
+            </div>
+          }
+        />
+      </Container>
+    );
   }
 
   return (
     <Container type="panel">
-      <PageHeader title={title} subText={subText} />
+      <PageHeader title={voiceData.title} subText={subText} />
 
       <Panel padding={true} mb={true}>
         <form onSubmit={handleFormSubmit}>
@@ -183,7 +199,7 @@ export default function VoiceDesignerUseVoicePage(
         </form>
       </Panel>
 
-      {modelDescription && (
+      {/* {modelDescription && (
         <Panel padding mb>
           <h4 className="mb-4">
             <FontAwesomeIcon icon={faMemo} className="me-3" />
@@ -191,7 +207,7 @@ export default function VoiceDesignerUseVoicePage(
           </h4>
           <p>{modelDescription}</p>
         </Panel>
-      )}
+      )} */}
 
       <Panel padding mb>
         <h4 className="mb-4">
@@ -208,7 +224,7 @@ export default function VoiceDesignerUseVoicePage(
                 <td>{item.value}</td>
               </tr>
             ))}
-            {props.sessionWrapper.canBanUsers() &&
+            {/* {props.sessionWrapper.canBanUsers() &&
               voiceDetailsModerator.map((item, index) => (
                 <tr key={index}>
                   <th scope="row" className="fw-semibold">
@@ -216,7 +232,7 @@ export default function VoiceDesignerUseVoicePage(
                   </th>
                   <td>{item.value}</td>
                 </tr>
-              ))}
+              ))} */}
           </tbody>
         </table>
 
@@ -241,7 +257,7 @@ export default function VoiceDesignerUseVoicePage(
         </h4>
         <CommentComponent
           entityType="user"
-          entityToken="test"
+          entityToken={voice_token}
           sessionWrapper={props.sessionWrapper}
         />
       </Panel>
