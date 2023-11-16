@@ -2,9 +2,9 @@ import { useEffect, useState } from "react";
 
 // voice imports
 
-import { CreateVoice, CreateVoiceRequest } from "@storyteller/components/src/api/voice_designer/voices/CreateVoice";
+import { CreateVoice, CreateVoiceRequest, CreateVoiceResponse } from "@storyteller/components/src/api/voice_designer/voices/CreateVoice";
 import { ListVoicesByUser, Voice } from "@storyteller/components/src/api/voice_designer/voices/ListVoicesByUser";
-import { DeleteVoice } from "@storyteller/components/src/api/voice_designer/voices/DeleteVoice";
+import { DeleteVoice, DeleteVoiceRequest, DeleteVoiceResponse } from "@storyteller/components/src/api/voice_designer/voices/DeleteVoice";
 
 // dataset imports
 
@@ -12,9 +12,9 @@ import {
   ListDatasetsByUser,
   Dataset,
 } from "@storyteller/components/src/api/voice_designer/voice_datasets/ListDatasetsByUser";
-import { DeleteDataset } from "@storyteller/components/src/api/voice_designer/voice_datasets/DeleteDataset";
+import { DeleteDataset, DeleteDatasetResponse } from "@storyteller/components/src/api/voice_designer/voice_datasets/DeleteDataset";
 import { CreateDataset, CreateDatasetRequest, CreateDatasetResponse } from "@storyteller/components/src/api/voice_designer/voice_datasets/CreateDataset";
-import { UpdateDataset, UpdateDatasetRequest } from "@storyteller/components/src/api/voice_designer/voice_datasets/UpdateDataset";
+import { UpdateDataset, UpdateDatasetRequest, UpdateDatasetResponse } from "@storyteller/components/src/api/voice_designer/voice_datasets/UpdateDataset";
 import { EnqueueTts } from "@storyteller/components/src/api/voice_designer/inference/EnqueueTts";
 import { useSession } from "hooks";
 
@@ -30,30 +30,34 @@ export default function useVoiceRequests() {
     timestampSet(Date.now());
   }
 
-  const createDataset = (urlRouteArgs: string, request: CreateDatasetRequest) =>
+  const createDataset = (urlRouteArgs: string, request: CreateDatasetRequest): Promise<CreateDatasetResponse> =>
     CreateDataset(urlRouteArgs, request).then(res => {
       refreshData();
-    });
-  
-
-  const createVoice = (urlRouteArgs: string, request: CreateVoiceRequest) => CreateVoice(urlRouteArgs, request).then(res => {
-      refreshData();
+      return res;
     });
 
-  const deleteVoice = (voiceToken:  string) => DeleteVoice(voiceToken,{
+
+  const createVoice = (urlRouteArgs: string, request: CreateVoiceRequest): Promise<CreateVoiceResponse> => CreateVoice(urlRouteArgs, request).then(res => {
+    refreshData();
+    return res;
+  });
+
+  const deleteVoice = (voiceToken: string): Promise<DeleteVoiceResponse> => DeleteVoice(voiceToken, {
     set_delete: true,
     as_mod: false
   }).then(res => {
     refreshData();
+    return res;
     // console.log("🏧",res);
   });
 
-  const deleteDataset = (voiceToken:  string) => DeleteDataset(voiceToken,{
-  	set_delete: true,
-  	as_mod: false
+  const deleteDataset = (voiceToken: string): Promise<DeleteDatasetResponse> => DeleteDataset(voiceToken, {
+    set_delete: true,
+    as_mod: false
   }).then(res => {
     refreshData();
-  	// console.log("🏧",res);
+    return res;
+    // console.log("🏧",res);
   });
 
   const datasetByToken = (datasetToken?: string) =>
@@ -61,38 +65,38 @@ export default function useVoiceRequests() {
       ({ dataset_token }, i) => datasetToken === dataset_token
     )[0];
 
-  const editDataSet = (datasetToken: string, request: UpdateDatasetRequest) => {
-  	// console.log("🍄", datasetToken);
-  	UpdateDataset(datasetToken,request).then(res => {
+  const editDataSet = (datasetToken: string, request: UpdateDatasetRequest): Promise<UpdateDatasetResponse> => {
+    // console.log("🍄", datasetToken);
+    return UpdateDataset(datasetToken, request).then(res => {
       refreshData();
-  		// console.log("😎",res);
-  	});
+      return res;
+    });
   };
 
-	useEffect(() => {
+  useEffect(() => {
     if (user && user.username) {
-        ListDatasetsByUser(user.username,{}).then(res => {
-          if (res.datasets) datasetsSet(res.datasets);
-        });
-        ListVoicesByUser(user.username,{}).then(res => {
-          if (res.voices) voicesSet(res.voices);
-        });
+      ListDatasetsByUser(user.username, {}).then(res => {
+        if (res.datasets) datasetsSet(res.datasets);
+      });
+      ListVoicesByUser(user.username, {}).then(res => {
+        if (res.voices) voicesSet(res.voices);
+      });
     }
-	},[user,timestamp]);
+  }, [user, timestamp]);
 
   return {
-  	datasets: {
-  		create: createDataset,
-  		delete: deleteDataset,
-  		edit: editDataSet,
-  		list: datasets,
-  		byToken: datasetByToken,
+    datasets: {
+      create: createDataset,
+      delete: deleteDataset,
+      edit: editDataSet,
+      list: datasets,
+      byToken: datasetByToken,
       refresh: refreshData
-  	},
-  	inference: {
+    },
+    inference: {
       enqueue: EnqueueTts,
     },
-  	voices: {
+    voices: {
       create: createVoice,
       delete: deleteVoice,
       list: voices,
@@ -100,9 +104,9 @@ export default function useVoiceRequests() {
     },
     inputCtrl:
       (todo: any) =>
-      ({ target }: { target: any }) => {
-        console.log("🌿", target);
-        todo(target.value);
-      },
+        ({ target }: { target: any }) => {
+          console.log("🌿", target);
+          todo(target.value);
+        },
   };
 }
