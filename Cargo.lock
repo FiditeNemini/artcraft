@@ -2339,6 +2339,56 @@ dependencies = [
 ]
 
 [[package]]
+name = "email-sender-job"
+version = "0.0.1"
+dependencies = [
+ "actix-web 4.0.1",
+ "actix_helpers",
+ "anyhow",
+ "async-trait",
+ "bootstrap",
+ "buckets",
+ "chrono",
+ "clap 2.34.0",
+ "cloud_storage",
+ "concurrency",
+ "config",
+ "container_common",
+ "dotenv",
+ "easyenv",
+ "email_sender",
+ "enums",
+ "errors",
+ "filesys",
+ "hashing",
+ "hostname",
+ "hyper",
+ "images",
+ "jobs_common",
+ "lfu",
+ "log",
+ "media",
+ "memory_caching",
+ "mimetypes",
+ "mysql_queries",
+ "once_cell",
+ "r2d2_redis",
+ "redis_common",
+ "serde",
+ "serde_derive",
+ "serde_json",
+ "server_environment",
+ "sqlx",
+ "subprocess",
+ "subprocess_common",
+ "tempdir",
+ "testing",
+ "tokens",
+ "tokio 1.34.0",
+ "tts_common",
+]
+
+[[package]]
 name = "email_address"
 version = "0.2.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2381,9 +2431,11 @@ dependencies = [
  "my-workspace-hack",
  "serde",
  "serde_derive",
+ "serde_json",
  "sqlx",
  "sqlx-core",
  "strum",
+ "toml",
 ]
 
 [[package]]

@@ -1,6 +1,7 @@
 // ===== MySql =====
 pub mod audit_logs;
 pub mod comments;
+pub mod email_sender_jobs;
 pub mod generic_download_jobs;
 pub mod generic_inference_jobs;
 pub mod generic_synthetic_ids;

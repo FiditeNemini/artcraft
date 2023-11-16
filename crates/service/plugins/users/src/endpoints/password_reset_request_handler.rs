@@ -7,13 +7,15 @@ use serde::Deserialize;
 use sqlx::MySqlPool;
 use strum_macros::Display;
 
+use container_common::token::random_uuid::generate_random_uuid;
 use crockford::crockford_entropy_lower;
-use email_sender::letter_exports;
-use email_sender::letter_exports::Message;
 use email_sender::smtp_email_sender::SmtpEmailSender;
-use errors::AnyhowResult;
+use enums::by_table::email_sender_jobs::email_category::EmailCategory;
 use http_server_common::request::get_request_ip::get_request_ip;
 use http_server_common::response::serialize_as_json_error::serialize_as_json_error;
+use mysql_queries::payloads::email_sender_jobs::email_sender_job_args::{EmailSenderJobArgs, PolymorphicEmailSenderJobArgs};
+use mysql_queries::payloads::email_sender_jobs::subtypes::email_job_password_reset_args::EmailJobPasswordResetArgs;
+use mysql_queries::queries::email_sender_jobs::insert_email_sender_job::{insert_email_sender_job, InsertEmailSenderJobArgs};
 use mysql_queries::queries::users::user::lookup_user_for_login_by_email::lookup_user_for_login_by_email;
 use mysql_queries::queries::users::user::lookup_user_for_login_by_username::lookup_user_for_login_by_username;
 use mysql_queries::queries::users::user_password_resets::create_password_reset_request::create_password_reset;
@@ -79,8 +81,8 @@ pub async fn password_reset_request_handler(
     http_request: HttpRequest,
     request: web::Json<PasswordResetRequestedRequest>,
     mysql_pool: web::Data<MySqlPool>,
-    server_environment: web::Data<ServerEnvironment>,
-    sender: web::Data<SmtpEmailSender>,
+    _server_environment: web::Data<ServerEnvironment>,
+    _sender: web::Data<SmtpEmailSender>,
 ) -> Result<HttpResponse, PasswordResetRequestedErrorResponse> {
 
     let username_or_email = request.username_or_email.trim();
@@ -106,68 +108,53 @@ pub async fn password_reset_request_handler(
 
     let secret_key = crockford_entropy_lower(32);
 
-    //TODO: Handle banned users, they shouldn't be able to do this
+    // TODO(bt,2023-11-15): Handle banned users, they shouldn't be able to do this
+
+    // TODO(bt,2023-11-15): AVT cookie
+    //let maybe_avt_token = server_state.avt_cookie_manager.get_avt_token_from_request(&http_request);
 
     let ip_address = get_request_ip(&http_request);
 
-    create_password_reset(&mysql_pool, &user, ip_address, secret_key.clone()).await
+    create_password_reset(&mysql_pool, &user, &ip_address, secret_key.clone()).await
         .map_err(|err| {
             log::error!("Error creating password reset: {err}");
             PasswordResetRequestedRequestError::Internal
         })?;
 
-    let from_address = "Support <support@storyteller.ai>"
-        .parse()
+    let uuid_idempotency_token = generate_random_uuid();
+
+    // TODO(bt,2023-11-15): i18n
+    let ietf_language_tag = "en";
+    let ietf_primary_language_subtag = "en";
+
+    insert_email_sender_job(InsertEmailSenderJobArgs {
+        uuid_idempotency_token: &uuid_idempotency_token,
+        destination_email_address: &user.email_address,
+        maybe_destination_user_token: Some(&user.token),
+        email_category: EmailCategory::PasswordReset,
+        maybe_email_args: Some(EmailSenderJobArgs {
+            args: Some(PolymorphicEmailSenderJobArgs::Pr(EmailJobPasswordResetArgs {
+                password_reset_secret_key: Some(secret_key),
+            })),
+        }),
+        ietf_language_tag,
+        ietf_primary_language_subtag,
+        maybe_creator_user_token: None,
+        maybe_avt_token: None,
+        creator_ip_address: &ip_address,
+        priority_level: 1,
+        is_debug_request: false,
+        maybe_routing_tag: None,
+        mysql_pool: &mysql_pool,
+    })
+        .await
         .map_err(|err| {
-            log::error!("Error parsing from address: {err}");
+            log::error!("Error inserting email job: {err}");
             PasswordResetRequestedRequestError::Internal
         })?;
-
-    let to_address = user.email_address
-        .parse()
-        .map_err(|err| {
-            log::error!("Error parsing to address: {err}");
-            PasswordResetRequestedRequestError::Internal
-        })?;
-
-    // TODO(bt,2023-11-12): Environmentally configure, allow overrides.
-    let link = match **server_environment {
-        ServerEnvironment::Development => format!("http://dev.fakeyou.com:7000/password-reset/verify?token={secret_key}"),
-        ServerEnvironment::Production => format!("https://fakeyou.com/password-reset/verify?token={secret_key}"),
-    };
-
-    let message = format!(r#"
-      <a href="{link}">Click here to reset your password!</a>
-      <br />
-      <br />
-      If you can't click the link, here's the secret reset code: {secret_key}
-      <br />
-      <br />
-      Thank You,
-      <br />
-      <br />
-      Storyteller.ai (FakeYou) Team
-    "#);
-
-    let email = Message::builder()
-        .from(from_address)
-        .to(to_address)
-        .subject("FakeYou Password Reset")
-        .header(letter_exports::ContentType::TEXT_HTML)
-        .body(message)
-        .map_err(|err| {
-            log::error!("Error constructing email: {err}");
-            PasswordResetRequestedRequestError::Internal
-        })?;
-
-    sender.send_message(&email).map_err(|err| {
-        log::error!("Error sending email: {err}");
-        PasswordResetRequestedRequestError::Internal
-    })?;
 
     success_response()
 }
-
 
 fn success_response() -> Result<HttpResponse, PasswordResetRequestedErrorResponse> {
     let response = PasswordResetRequestedResponse {

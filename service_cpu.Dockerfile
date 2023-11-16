@@ -123,7 +123,13 @@ RUN SQLX_OFFLINE=true \
   LD_LIBRARY_PATH=/usr/lib:${LD_LIBRARY_PATH} \
   $HOME/.cargo/bin/cargo build \
   --release \
-  --bin tts-download-job
+  --bin tts-download-job \
+
+RUN SQLX_OFFLINE=true \
+  LD_LIBRARY_PATH=/usr/lib:${LD_LIBRARY_PATH} \
+  $HOME/.cargo/bin/cargo build \
+  --release \
+  --bin email-sender-job
 
 RUN SQLX_OFFLINE=true \
   LD_LIBRARY_PATH=/usr/lib:${LD_LIBRARY_PATH} \
@@ -185,6 +191,7 @@ RUN echo -n ${GIT_SHA} > GIT_SHA
 COPY --from=builder /tmp/target/release/storyteller-web /
 COPY --from=builder /tmp/target/release/dummy-service /
 COPY --from=builder /tmp/target/release/analytics-job /
+COPY --from=builder /tmp/target/release/email-sender-job  /
 
 # Legacy apps:
 COPY --from=builder /tmp/target/release/tts-download-job /
