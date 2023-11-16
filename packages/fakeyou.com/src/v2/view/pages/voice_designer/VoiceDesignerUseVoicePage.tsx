@@ -119,14 +119,15 @@ export default function VoiceDesignerUseVoicePage(
   if (isLoading) {
     return (
       <Container type="panel">
-        <div className="py-5">
+        <Panel padding={true} clear={true}>
           <h1>
             <Skeleton />
           </h1>
           <p>
             <Skeleton />
           </p>
-        </div>
+        </Panel>
+
         <Panel padding={true}>
           <Skeleton />
         </Panel>
