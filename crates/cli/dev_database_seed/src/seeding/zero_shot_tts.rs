@@ -36,6 +36,8 @@ pub async fn seed_zero_shot_tts(mysql_pool: &Pool<MySql>, maybe_bucket_client: O
     // NB: The bucket hashes here are already uploaded to the development Google Cloud Storage
     // bucket and should be usable if you have the development secrets on your machine.
     ("Alice", "qtqaprnd5shtybve4fqpvcfp50yjw238", "alice.wav", &user_token),
+    ("Random Audio", "qtqaprnd5shtybve4fqpvcfp50yjw231", "vocodes2.wav", &user_token),
+    ("Trump Broken", "qtqaprnd5shtybve4fqpvcfp50yjw239", "trump_problem.wav", &user_token),
     ("Biden", "n945w0xsq15xrh16hc147a5mc1a91gwh", "biden.wav", &user_token),
     ("Goku", "cnnv05yjst2m737dpmxazgfpksjf4y7c", "goku.wav", &user_token),
     ("Hilary", "7wav68ba2yy86491jk36cgk36tkmzesr", "hilary.wav", &user_token),

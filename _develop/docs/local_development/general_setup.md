@@ -354,6 +354,11 @@ cargo run --bin tts-inference-job
 Again, note that the configurations pointing to the ML monorepo must be set up for each application.
 Additionally, some development secrets may be needed (ask the team to share).
 
+Seeding the Database with Some Values
+-------------------------------------
+For voice designer you might want some pre-seeded audio that will hit the google cloud bucket, it will require env-secrets ask Brandon.
+cargo run --bin dev-database-seed -- --bucket
+
 Solutions to Common Setup Problems 
 -----------------------------------
 
