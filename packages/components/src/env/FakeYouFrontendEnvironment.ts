@@ -10,19 +10,16 @@ export class FakeYouFrontendEnvironment {
   environment: Environment;
 
   private constructor() {
-    switch (document.location.host) {
+    const domainWithoutPort = document.location.host.split(":")[0];
+
+    switch (domainWithoutPort) {
       case "fakeyou.com":
         this.environment = Environment.Production;
         break;
       case "staging.fakeyou.com":
         this.environment = Environment.Staging;
         break;
-      case "localhost:7000":
-        this.environment = Environment.Development;
-        break;
-      case "localhost:7001":
-        this.environment = Environment.Development;
-        break;
+      case "localhost":
       case "dev.fakeyou.com":
         this.environment = Environment.Development;
         break;
