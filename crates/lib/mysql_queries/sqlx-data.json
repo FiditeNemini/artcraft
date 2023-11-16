@@ -2260,6 +2260,135 @@
     },
     "query": "\nSELECT count(*) as count\nFROM tts_models\nWHERE\n  creator_user_token = ?\nLIMIT 1\n        "
   },
+  "0a4bbab84f3c487961681a065c5d0f429974dc2b15571a1772a2cbacb9e8bf7c": {
+    "describe": {
+      "columns": [
+        {
+          "name": "token: tokens::tokens::zs_voices::ZsVoiceToken",
+          "ordinal": 0,
+          "type_info": {
+            "char_set": 224,
+            "flags": {
+              "bits": 4229
+            },
+            "max_size": 128,
+            "type": "VarString"
+          }
+        },
+        {
+          "name": "title",
+          "ordinal": 1,
+          "type_info": {
+            "char_set": 224,
+            "flags": {
+              "bits": 4225
+            },
+            "max_size": 1020,
+            "type": "VarString"
+          }
+        },
+        {
+          "name": "ietf_language_tag",
+          "ordinal": 2,
+          "type_info": {
+            "char_set": 224,
+            "flags": {
+              "bits": 129
+            },
+            "max_size": 256,
+            "type": "VarString"
+          }
+        },
+        {
+          "name": "ietf_primary_language_subtag",
+          "ordinal": 3,
+          "type_info": {
+            "char_set": 224,
+            "flags": {
+              "bits": 137
+            },
+            "max_size": 48,
+            "type": "VarString"
+          }
+        },
+        {
+          "name": "maybe_creator_user_token: tokens::tokens::users::UserToken",
+          "ordinal": 4,
+          "type_info": {
+            "char_set": 224,
+            "flags": {
+              "bits": 136
+            },
+            "max_size": 128,
+            "type": "VarString"
+          }
+        },
+        {
+          "name": "bucket_hash",
+          "ordinal": 5,
+          "type_info": {
+            "char_set": 224,
+            "flags": {
+              "bits": 4225
+            },
+            "max_size": 128,
+            "type": "VarString"
+          }
+        },
+        {
+          "name": "creator_set_visibility: enums::common::visibility::Visibility",
+          "ordinal": 6,
+          "type_info": {
+            "char_set": 224,
+            "flags": {
+              "bits": 385
+            },
+            "max_size": 28,
+            "type": "String"
+          }
+        },
+        {
+          "name": "created_at",
+          "ordinal": 7,
+          "type_info": {
+            "char_set": 63,
+            "flags": {
+              "bits": 1153
+            },
+            "max_size": 19,
+            "type": "Timestamp"
+          }
+        },
+        {
+          "name": "updated_at",
+          "ordinal": 8,
+          "type_info": {
+            "char_set": 63,
+            "flags": {
+              "bits": 9345
+            },
+            "max_size": 19,
+            "type": "Timestamp"
+          }
+        }
+      ],
+      "nullable": [
+        false,
+        false,
+        false,
+        false,
+        true,
+        false,
+        false,
+        false,
+        false
+      ],
+      "parameters": {
+        "Right": 1
+      }
+    },
+    "query": "\n        SELECT\n        zv.token as `token: tokens::tokens::zs_voices::ZsVoiceToken`,\n        zv.title,\n        zv.ietf_language_tag,\n        zv.ietf_primary_language_subtag,\n        zv.maybe_creator_user_token as `maybe_creator_user_token: tokens::tokens::users::UserToken`,\n        zv.bucket_hash,\n        zv.creator_set_visibility as `creator_set_visibility: enums::common::visibility::Visibility`,\n        zv.created_at,\n        zv.updated_at\n        FROM zs_voices as zv\n        WHERE\n            zv.token = ?\n            AND zv.user_deleted_at IS NULL\n            AND zv.mod_deleted_at IS NULL\n            "
+  },
   "0a913be3a4bee4f1c3ed9e830c8b32da6d35c5f5917d76a7d923b622469b6e51": {
     "describe": {
       "columns": [],
@@ -2534,6 +2663,16 @@
     },
     "query": "\nSELECT\n    badges.slug,\n    badges.title,\n    badges.description,\n    badges.image_url,\n    user_badges.created_at as user_created_at\n\nFROM badges\nJOIN user_badges\nON\n    badges.slug = user_badges.badge_slug\nWHERE\n    user_badges.user_token = ?\n        "
   },
+  "112a5ce6412c7ab9995bab3906f3ddd4b74068346a3e188f669c146e4ff1ac12": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Right": 14
+      }
+    },
+    "query": "\nINSERT INTO email_sender_jobs\nSET\n  token = ?,\n  uuid_idempotency_token = ?,\n\n  destination_email_address = ?,\n  maybe_destination_user_token = ?,\n\n  email_category = ?,\n  maybe_email_args = ?,\n\n  ietf_language_tag = ?,\n  ietf_primary_language_subtag = ?,\n\n  maybe_creator_user_token = ?,\n  maybe_creator_anonymous_visitor_token = ?,\n  maybe_creator_ip_address = ?,\n\n  priority_level = ?,\n\n  is_debug_request = ?,\n  maybe_routing_tag = ?,\n\n  status = \"pending\"\n        "
+  },
   "1236640a30d0d5177e13c31b61b791874f7c70026003a58ba6e07e7af46c30c1": {
     "describe": {
       "columns": [
@@ -2764,96 +2903,6 @@
       }
     },
     "query": "\nUPDATE w2l_templates\nSET\n    is_public_listing_approved = ?,\n    is_locked_from_user_modification = ?,\n    is_locked_from_use = ?,\n    maybe_mod_comments = ?,\n    maybe_mod_user_token = ?,\n    version = version + 1\nWHERE token = ?\nLIMIT 1\n        "
-  },
-  "18363ea229294f6cb8cd52c267483c66fb56074d4a713157144f5a50ff9919ba": {
-    "describe": {
-      "columns": [
-        {
-          "name": "token: tokens::tokens::zs_voice_datasets::ZsVoiceDatasetToken",
-          "ordinal": 0,
-          "type_info": {
-            "char_set": 224,
-            "flags": {
-              "bits": 4229
-            },
-            "max_size": 128,
-            "type": "VarString"
-          }
-        },
-        {
-          "name": "title",
-          "ordinal": 1,
-          "type_info": {
-            "char_set": 224,
-            "flags": {
-              "bits": 4225
-            },
-            "max_size": 1020,
-            "type": "VarString"
-          }
-        },
-        {
-          "name": "ietf_language_tag",
-          "ordinal": 2,
-          "type_info": {
-            "char_set": 224,
-            "flags": {
-              "bits": 129
-            },
-            "max_size": 256,
-            "type": "VarString"
-          }
-        },
-        {
-          "name": "ietf_primary_language_subtag",
-          "ordinal": 3,
-          "type_info": {
-            "char_set": 224,
-            "flags": {
-              "bits": 137
-            },
-            "max_size": 48,
-            "type": "VarString"
-          }
-        },
-        {
-          "name": "maybe_creator_user_token",
-          "ordinal": 4,
-          "type_info": {
-            "char_set": 224,
-            "flags": {
-              "bits": 136
-            },
-            "max_size": 128,
-            "type": "VarString"
-          }
-        },
-        {
-          "name": "creator_set_visibility: enums::common::visibility::Visibility",
-          "ordinal": 5,
-          "type_info": {
-            "char_set": 224,
-            "flags": {
-              "bits": 385
-            },
-            "max_size": 28,
-            "type": "String"
-          }
-        }
-      ],
-      "nullable": [
-        false,
-        false,
-        false,
-        false,
-        true,
-        false
-      ],
-      "parameters": {
-        "Right": 1
-      }
-    },
-    "query": "\n        SELECT\n        zd.token as `token: tokens::tokens::zs_voice_datasets::ZsVoiceDatasetToken`,\n        zd.title,\n        zd.ietf_language_tag,\n        zd.ietf_primary_language_subtag,\n        zd.maybe_creator_user_token,\n        zd.creator_set_visibility as `creator_set_visibility: enums::common::visibility::Visibility`\n        FROM zs_voice_datasets as zd\n        WHERE\n            zd.token = ?\n            AND zd.user_deleted_at IS NULL\n            AND zd.mod_deleted_at IS NULL\n            "
   },
   "1bc8e8382345979e6cc618ce0360410258da1d376528b96ebf3b8d3d0f650147": {
     "describe": {
@@ -3381,109 +3430,6 @@
     },
     "query": "\nINSERT INTO trending_model_analytics\nSET\n  model_type = ?,\n  model_token = ?,\n  window_name = ?,\n  numeric_value = ?,\n  version = 1\n\nON DUPLICATE KEY UPDATE\n  numeric_value = ?,\n  version = version + 1\n        "
   },
-  "2459f85fc95a656cdcc8390a82486ff487b7e24c1d18eff7a8d14d2b9ccbb3c2": {
-    "describe": {
-      "columns": [
-        {
-          "name": "token: tokens::tokens::zs_voices::ZsVoiceToken",
-          "ordinal": 0,
-          "type_info": {
-            "char_set": 224,
-            "flags": {
-              "bits": 4229
-            },
-            "max_size": 128,
-            "type": "VarString"
-          }
-        },
-        {
-          "name": "title",
-          "ordinal": 1,
-          "type_info": {
-            "char_set": 224,
-            "flags": {
-              "bits": 4225
-            },
-            "max_size": 1020,
-            "type": "VarString"
-          }
-        },
-        {
-          "name": "ietf_language_tag",
-          "ordinal": 2,
-          "type_info": {
-            "char_set": 224,
-            "flags": {
-              "bits": 129
-            },
-            "max_size": 256,
-            "type": "VarString"
-          }
-        },
-        {
-          "name": "ietf_primary_language_subtag",
-          "ordinal": 3,
-          "type_info": {
-            "char_set": 224,
-            "flags": {
-              "bits": 137
-            },
-            "max_size": 48,
-            "type": "VarString"
-          }
-        },
-        {
-          "name": "maybe_creator_user_token: tokens::tokens::users::UserToken",
-          "ordinal": 4,
-          "type_info": {
-            "char_set": 224,
-            "flags": {
-              "bits": 136
-            },
-            "max_size": 128,
-            "type": "VarString"
-          }
-        },
-        {
-          "name": "bucket_hash",
-          "ordinal": 5,
-          "type_info": {
-            "char_set": 224,
-            "flags": {
-              "bits": 4225
-            },
-            "max_size": 128,
-            "type": "VarString"
-          }
-        },
-        {
-          "name": "creator_set_visibility: enums::common::visibility::Visibility",
-          "ordinal": 6,
-          "type_info": {
-            "char_set": 224,
-            "flags": {
-              "bits": 385
-            },
-            "max_size": 28,
-            "type": "String"
-          }
-        }
-      ],
-      "nullable": [
-        false,
-        false,
-        false,
-        false,
-        true,
-        false,
-        false
-      ],
-      "parameters": {
-        "Right": 1
-      }
-    },
-    "query": "\n        SELECT\n        zv.token as `token: tokens::tokens::zs_voices::ZsVoiceToken`,\n        zv.title,\n        zv.ietf_language_tag,\n        zv.ietf_primary_language_subtag,\n        zv.maybe_creator_user_token as `maybe_creator_user_token: tokens::tokens::users::UserToken`,\n        zv.bucket_hash,\n        zv.creator_set_visibility as `creator_set_visibility: enums::common::visibility::Visibility`\n        FROM zs_voices as zv\n        WHERE\n            zv.token = ?\n            "
-  },
   "25e7858d370ac1359deb42ef5292e85ccd1fe7debf3a1ba73303e5882523a4d0": {
     "describe": {
       "columns": [],
@@ -3661,109 +3607,6 @@
       }
     },
     "query": "\nUPDATE generic_download_jobs\nSET\n  status = ?,\n  failure_reason = ?,\n  retry_at = NOW() + interval 2 minute\nWHERE id = ?\n        "
-  },
-  "2f747f2008687271dfd7e31a48e0f6ee3799a916fec07c4c9b1a6a21bf6b97c6": {
-    "describe": {
-      "columns": [
-        {
-          "name": "token: tokens::tokens::zs_voices::ZsVoiceToken",
-          "ordinal": 0,
-          "type_info": {
-            "char_set": 224,
-            "flags": {
-              "bits": 4229
-            },
-            "max_size": 128,
-            "type": "VarString"
-          }
-        },
-        {
-          "name": "title",
-          "ordinal": 1,
-          "type_info": {
-            "char_set": 224,
-            "flags": {
-              "bits": 4225
-            },
-            "max_size": 1020,
-            "type": "VarString"
-          }
-        },
-        {
-          "name": "ietf_language_tag",
-          "ordinal": 2,
-          "type_info": {
-            "char_set": 224,
-            "flags": {
-              "bits": 129
-            },
-            "max_size": 256,
-            "type": "VarString"
-          }
-        },
-        {
-          "name": "ietf_primary_language_subtag",
-          "ordinal": 3,
-          "type_info": {
-            "char_set": 224,
-            "flags": {
-              "bits": 137
-            },
-            "max_size": 48,
-            "type": "VarString"
-          }
-        },
-        {
-          "name": "maybe_creator_user_token: tokens::tokens::users::UserToken",
-          "ordinal": 4,
-          "type_info": {
-            "char_set": 224,
-            "flags": {
-              "bits": 136
-            },
-            "max_size": 128,
-            "type": "VarString"
-          }
-        },
-        {
-          "name": "bucket_hash",
-          "ordinal": 5,
-          "type_info": {
-            "char_set": 224,
-            "flags": {
-              "bits": 4225
-            },
-            "max_size": 128,
-            "type": "VarString"
-          }
-        },
-        {
-          "name": "creator_set_visibility: enums::common::visibility::Visibility",
-          "ordinal": 6,
-          "type_info": {
-            "char_set": 224,
-            "flags": {
-              "bits": 385
-            },
-            "max_size": 28,
-            "type": "String"
-          }
-        }
-      ],
-      "nullable": [
-        false,
-        false,
-        false,
-        false,
-        true,
-        false,
-        false
-      ],
-      "parameters": {
-        "Right": 1
-      }
-    },
-    "query": "\n        SELECT\n        zv.token as `token: tokens::tokens::zs_voices::ZsVoiceToken`,\n        zv.title,\n        zv.ietf_language_tag,\n        zv.ietf_primary_language_subtag,\n        zv.maybe_creator_user_token as `maybe_creator_user_token: tokens::tokens::users::UserToken`,\n        zv.bucket_hash,\n        zv.creator_set_visibility as `creator_set_visibility: enums::common::visibility::Visibility`\n        FROM zs_voices as zv\n        WHERE\n            zv.token = ?\n            AND zv.user_deleted_at IS NULL\n            AND zv.mod_deleted_at IS NULL\n            "
   },
   "30168a545d7c8895126e44e6950546974ae4129208df18d55165eb6445311114": {
     "describe": {
@@ -4610,6 +4453,16 @@
     },
     "query": "\nUPDATE users\nSET\n    profile_markdown = ?,\n    profile_rendered_html = ?,\n    discord_username = ?,\n    twitter_username = ?,\n    twitch_username = ?,\n    github_username = ?,\n    cashapp_username = ?,\n    website_url = ?,\n    version = version + 1\n\nWHERE users.token = ?\nLIMIT 1\n        "
   },
+  "3ae0f9336e1f651533cb6e07e8fb64bb1036721cfe77556273ee23d1d15d88ab": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Right": 3
+      }
+    },
+    "query": "\nUPDATE email_sender_jobs\nSET\n  status = 'started',\n  assigned_worker = ?,\n  assigned_cluster = ?,\n  attempt_count = attempt_count + 1,\n  retry_at = NOW() + interval 2 minute,\n  first_started_at = NOW()\nWHERE id = ?\n        "
+  },
   "3c72b6c08fd2c9c43e8eb09db912a1bc875d45e738550dc5d29db6ca63c57d8f": {
     "describe": {
       "columns": [],
@@ -4619,6 +4472,135 @@
       }
     },
     "query": "\nUPDATE zs_voice_dataset_samples\nSET\n  mod_deleted_at = CURRENT_TIMESTAMP,\n  maybe_mod_user_token = ?\nWHERE\n  token = ?\nLIMIT 1\n        "
+  },
+  "3fc8f9b8237034c5e93e2f5ebbe1616c7c73d39eb62d205926af9fb61e3d51f4": {
+    "describe": {
+      "columns": [
+        {
+          "name": "token: tokens::tokens::zs_voices::ZsVoiceToken",
+          "ordinal": 0,
+          "type_info": {
+            "char_set": 224,
+            "flags": {
+              "bits": 4229
+            },
+            "max_size": 128,
+            "type": "VarString"
+          }
+        },
+        {
+          "name": "title",
+          "ordinal": 1,
+          "type_info": {
+            "char_set": 224,
+            "flags": {
+              "bits": 4225
+            },
+            "max_size": 1020,
+            "type": "VarString"
+          }
+        },
+        {
+          "name": "ietf_language_tag",
+          "ordinal": 2,
+          "type_info": {
+            "char_set": 224,
+            "flags": {
+              "bits": 129
+            },
+            "max_size": 256,
+            "type": "VarString"
+          }
+        },
+        {
+          "name": "ietf_primary_language_subtag",
+          "ordinal": 3,
+          "type_info": {
+            "char_set": 224,
+            "flags": {
+              "bits": 137
+            },
+            "max_size": 48,
+            "type": "VarString"
+          }
+        },
+        {
+          "name": "maybe_creator_user_token: tokens::tokens::users::UserToken",
+          "ordinal": 4,
+          "type_info": {
+            "char_set": 224,
+            "flags": {
+              "bits": 136
+            },
+            "max_size": 128,
+            "type": "VarString"
+          }
+        },
+        {
+          "name": "bucket_hash",
+          "ordinal": 5,
+          "type_info": {
+            "char_set": 224,
+            "flags": {
+              "bits": 4225
+            },
+            "max_size": 128,
+            "type": "VarString"
+          }
+        },
+        {
+          "name": "creator_set_visibility: enums::common::visibility::Visibility",
+          "ordinal": 6,
+          "type_info": {
+            "char_set": 224,
+            "flags": {
+              "bits": 385
+            },
+            "max_size": 28,
+            "type": "String"
+          }
+        },
+        {
+          "name": "created_at",
+          "ordinal": 7,
+          "type_info": {
+            "char_set": 63,
+            "flags": {
+              "bits": 1153
+            },
+            "max_size": 19,
+            "type": "Timestamp"
+          }
+        },
+        {
+          "name": "updated_at",
+          "ordinal": 8,
+          "type_info": {
+            "char_set": 63,
+            "flags": {
+              "bits": 9345
+            },
+            "max_size": 19,
+            "type": "Timestamp"
+          }
+        }
+      ],
+      "nullable": [
+        false,
+        false,
+        false,
+        false,
+        true,
+        false,
+        false,
+        false,
+        false
+      ],
+      "parameters": {
+        "Right": 1
+      }
+    },
+    "query": "\n        SELECT\n        zv.token as `token: tokens::tokens::zs_voices::ZsVoiceToken`,\n        zv.title,\n        zv.ietf_language_tag,\n        zv.ietf_primary_language_subtag,\n        zv.maybe_creator_user_token as `maybe_creator_user_token: tokens::tokens::users::UserToken`,\n        zv.bucket_hash,\n        zv.creator_set_visibility as `creator_set_visibility: enums::common::visibility::Visibility`,\n        zv.created_at,\n        zv.updated_at\n        FROM zs_voices as zv\n        WHERE\n            zv.token = ?\n            "
   },
   "40a3301e9a3201e74d49b6b339f67291e2ae22d315188401708609ac2d28a68c": {
     "describe": {
@@ -5868,96 +5850,6 @@
       }
     },
     "query": "\nSELECT\n    vocoder.token as vocoder_token,\n    vocoder.vocoder_type as `vocoder_type: enums::common::vocoder_type::VocoderType`,\n\n    vocoder.creator_user_token,\n    users.username as creator_username,\n    users.display_name as creator_display_name,\n    users.email_gravatar_hash as creator_gravatar_hash,\n    users.is_banned as creator_is_banned,\n\n    vocoder.title,\n    vocoder.description_markdown,\n    vocoder.description_rendered_html,\n    vocoder.is_staff_recommended,\n\n    vocoder.is_mod_disabled_from_public_use,\n    vocoder.is_mod_disabled_from_author_use,\n    vocoder.is_mod_author_editing_locked,\n\n    vocoder.creator_set_visibility as `creator_set_visibility: enums::common::visibility::Visibility`,\n\n    vocoder.created_at,\n    vocoder.updated_at,\n\n    vocoder.creator_ip_address_creation,\n    vocoder.creator_ip_address_last_update,\n    vocoder.mod_deleted_at,\n    vocoder.user_deleted_at\n\nFROM vocoder_models as vocoder\nJOIN users\n    ON users.token = vocoder.creator_user_token\nWHERE\n    vocoder.token = ?\n        "
-  },
-  "45f976a4e256efda598e314a801e528078507708d38c3b8bf8c1b2cebf20d8ab": {
-    "describe": {
-      "columns": [
-        {
-          "name": "token: tokens::tokens::zs_voice_datasets::ZsVoiceDatasetToken",
-          "ordinal": 0,
-          "type_info": {
-            "char_set": 224,
-            "flags": {
-              "bits": 4229
-            },
-            "max_size": 128,
-            "type": "VarString"
-          }
-        },
-        {
-          "name": "title",
-          "ordinal": 1,
-          "type_info": {
-            "char_set": 224,
-            "flags": {
-              "bits": 4225
-            },
-            "max_size": 1020,
-            "type": "VarString"
-          }
-        },
-        {
-          "name": "ietf_language_tag",
-          "ordinal": 2,
-          "type_info": {
-            "char_set": 224,
-            "flags": {
-              "bits": 129
-            },
-            "max_size": 256,
-            "type": "VarString"
-          }
-        },
-        {
-          "name": "ietf_primary_language_subtag",
-          "ordinal": 3,
-          "type_info": {
-            "char_set": 224,
-            "flags": {
-              "bits": 137
-            },
-            "max_size": 48,
-            "type": "VarString"
-          }
-        },
-        {
-          "name": "maybe_creator_user_token",
-          "ordinal": 4,
-          "type_info": {
-            "char_set": 224,
-            "flags": {
-              "bits": 136
-            },
-            "max_size": 128,
-            "type": "VarString"
-          }
-        },
-        {
-          "name": "creator_set_visibility: enums::common::visibility::Visibility",
-          "ordinal": 5,
-          "type_info": {
-            "char_set": 224,
-            "flags": {
-              "bits": 385
-            },
-            "max_size": 28,
-            "type": "String"
-          }
-        }
-      ],
-      "nullable": [
-        false,
-        false,
-        false,
-        false,
-        true,
-        false
-      ],
-      "parameters": {
-        "Right": 1
-      }
-    },
-    "query": "\n        SELECT\n        zd.token as `token: tokens::tokens::zs_voice_datasets::ZsVoiceDatasetToken`,\n        zd.title,\n        zd.ietf_language_tag,\n        zd.ietf_primary_language_subtag,\n        zd.maybe_creator_user_token,\n        zd.creator_set_visibility as `creator_set_visibility: enums::common::visibility::Visibility`\n        FROM zs_voice_datasets as zd\n        WHERE\n            zd.token = ?\n            "
   },
   "46662ffe56827f98f43968681bfaab2eaa6a73f017a92c3289777f49c115f839": {
     "describe": {
@@ -10437,6 +10329,16 @@
     },
     "query": "\nSELECT\n    vc.token as `token: tokens::tokens::voice_conversion_models::VoiceConversionModelToken`,\n    vc.model_type as `model_type: enums::by_table::voice_conversion_models::voice_conversion_model_type::VoiceConversionModelType`\nFROM voice_conversion_models as vc\nWHERE vc.token = ?\n        "
   },
+  "814445e0daf4a025867f2ee939ad42542162c7b433715956e12fa5fee539e8dd": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Right": 1
+      }
+    },
+    "query": "\nUPDATE email_sender_jobs\nSET\n  status = \"complete_success\",\n  internal_debugging_failure_reason = NULL,\n  retry_at = NULL,\n  successfully_completed_at = NOW()\nWHERE id = ?\n        "
+  },
   "816c6cfb3e7395b7cd02eaf9ac38e91c46fef67a222578942c3e44dd7938a9e1": {
     "describe": {
       "columns": [],
@@ -13140,6 +13042,122 @@
     },
     "query": "\nINSERT INTO user_ratings\nSET\n  user_token = ?,\n  entity_type = ?,\n  entity_token = ?,\n  rating_value = ?,\n  vote_ip_address = ?,\n  version = 1\n\nON DUPLICATE KEY UPDATE\n  rating_value = ?,\n  vote_ip_address = ?,\n  version = version + 1\n        "
   },
+  "aa0de341dc212d4c020d2e3a655aa116d4e213004ee14fdebdd89e88f88f64ed": {
+    "describe": {
+      "columns": [
+        {
+          "name": "token: tokens::tokens::zs_voice_datasets::ZsVoiceDatasetToken",
+          "ordinal": 0,
+          "type_info": {
+            "char_set": 224,
+            "flags": {
+              "bits": 4229
+            },
+            "max_size": 128,
+            "type": "VarString"
+          }
+        },
+        {
+          "name": "title",
+          "ordinal": 1,
+          "type_info": {
+            "char_set": 224,
+            "flags": {
+              "bits": 4225
+            },
+            "max_size": 1020,
+            "type": "VarString"
+          }
+        },
+        {
+          "name": "ietf_language_tag",
+          "ordinal": 2,
+          "type_info": {
+            "char_set": 224,
+            "flags": {
+              "bits": 129
+            },
+            "max_size": 256,
+            "type": "VarString"
+          }
+        },
+        {
+          "name": "ietf_primary_language_subtag",
+          "ordinal": 3,
+          "type_info": {
+            "char_set": 224,
+            "flags": {
+              "bits": 137
+            },
+            "max_size": 48,
+            "type": "VarString"
+          }
+        },
+        {
+          "name": "maybe_creator_user_token",
+          "ordinal": 4,
+          "type_info": {
+            "char_set": 224,
+            "flags": {
+              "bits": 136
+            },
+            "max_size": 128,
+            "type": "VarString"
+          }
+        },
+        {
+          "name": "creator_set_visibility: enums::common::visibility::Visibility",
+          "ordinal": 5,
+          "type_info": {
+            "char_set": 224,
+            "flags": {
+              "bits": 385
+            },
+            "max_size": 28,
+            "type": "String"
+          }
+        },
+        {
+          "name": "created_at",
+          "ordinal": 6,
+          "type_info": {
+            "char_set": 63,
+            "flags": {
+              "bits": 1153
+            },
+            "max_size": 19,
+            "type": "Timestamp"
+          }
+        },
+        {
+          "name": "updated_at",
+          "ordinal": 7,
+          "type_info": {
+            "char_set": 63,
+            "flags": {
+              "bits": 9345
+            },
+            "max_size": 19,
+            "type": "Timestamp"
+          }
+        }
+      ],
+      "nullable": [
+        false,
+        false,
+        false,
+        false,
+        true,
+        false,
+        false,
+        false
+      ],
+      "parameters": {
+        "Right": 1
+      }
+    },
+    "query": "\n        SELECT\n        zd.token as `token: tokens::tokens::zs_voice_datasets::ZsVoiceDatasetToken`,\n        zd.title,\n        zd.ietf_language_tag,\n        zd.ietf_primary_language_subtag,\n        zd.maybe_creator_user_token,\n        zd.creator_set_visibility as `creator_set_visibility: enums::common::visibility::Visibility`,\n        zd.created_at,\n        zd.updated_at\n        FROM zs_voice_datasets as zd\n        WHERE\n            zd.token = ?\n            "
+  },
   "ab6f25eb0f6340d49aa705835ed428434d8b6ab14b0740f6a5ebe7841b9ece20": {
     "describe": {
       "columns": [],
@@ -14600,6 +14618,16 @@
     },
     "query": "\nSELECT\n  pw.token as `password_reset_token: tokens::tokens::password_reset::PasswordResetToken`,\n  pw.user_token as `user_token: tokens::tokens::users::UserToken`\nFROM user_password_resets AS pw\nJOIN users AS u\n  ON pw.user_token = u.token\nWHERE public_reset_token = ?\n  AND pw.expires_at > NOW()\n  AND pw.current_password_version = u.password_version\n  AND NOT pw.is_redeemed\n  AND NOT u.is_banned\nLIMIT 1\nFOR UPDATE\n        "
   },
+  "be751e104519d6efa3c63031d43edfd84cb9105913d749f96c012841dfa2f6af": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Right": 3
+      }
+    },
+    "query": "\nUPDATE email_sender_jobs\nSET\n  status = 'started',\n  assigned_worker = ?,\n  assigned_cluster = ?,\n  attempt_count = attempt_count + 1,\n  retry_at = NOW() + interval 2 minute\nWHERE id = ?\n        "
+  },
   "bee13160674414391587f56e8fb0aa3629e3dfcead0afa5759bff1e161f1bb6e": {
     "describe": {
       "columns": [],
@@ -15754,6 +15782,16 @@
     },
     "query": "\nSELECT\n    voice_conversion_results.token as `voice_conversion_result_token: tokens::tokens::voice_conversion_results::VoiceConversionResultToken`,\n\n    voice_conversion_results.model_token as `voice_conversion_model_token: tokens::tokens::voice_conversion_models::VoiceConversionModelToken`,\n    voice_conversion_models.title as voice_conversion_model_title,\n\n    users.token as `maybe_creator_user_token: tokens::tokens::users::UserToken`,\n    users.username as maybe_creator_username,\n    users.display_name as maybe_creator_display_name,\n    users.email_gravatar_hash as maybe_creator_gravatar_hash,\n    users.is_banned as maybe_creator_is_banned,\n\n    model_users.token as `maybe_model_creator_user_token: tokens::tokens::users::UserToken`,\n    model_users.username as maybe_model_creator_username,\n    model_users.display_name as maybe_model_creator_display_name,\n    model_users.email_gravatar_hash as maybe_model_creator_gravatar_hash,\n    model_users.is_banned as maybe_model_creator_is_banned,\n\n    voice_conversion_results.public_bucket_hash,\n\n    voice_conversion_results.creator_set_visibility,\n\n    voice_conversion_results.generated_by_worker,\n    voice_conversion_results.is_debug_request,\n\n    voice_conversion_results.file_size_bytes,\n    voice_conversion_results.duration_millis,\n    voice_conversion_results.created_at,\n    voice_conversion_results.updated_at,\n\n    voice_conversion_results.creator_ip_address,\n    voice_conversion_results.user_deleted_at,\n    voice_conversion_results.mod_deleted_at\n\nFROM voice_conversion_results\nLEFT OUTER JOIN voice_conversion_models\n  ON voice_conversion_results.model_token = voice_conversion_models.token\nLEFT OUTER JOIN users\n  ON voice_conversion_results.maybe_creator_user_token = users.token\nLEFT OUTER JOIN users as model_users\n  ON voice_conversion_models.creator_user_token = model_users.token\nWHERE\n    voice_conversion_results.token = ?\n    AND voice_conversion_results.user_deleted_at IS NULL\n    AND voice_conversion_results.mod_deleted_at IS NULL\n        "
   },
+  "ce84e4a2aa0d08fae21073ae2516673d5e1cda7f06b4bad40440bb776e3c6c8d": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Right": 3
+      }
+    },
+    "query": "\nUPDATE email_sender_jobs\nSET\n  status = ?,\n  internal_debugging_failure_reason = ?,\n  retry_at = NOW() + interval 2 minute\nWHERE id = ?\n        "
+  },
   "ce8560e2ff8c879647c7b9f154a8987765272c53f95b9e6a8b8ee5c4ad7b1f17": {
     "describe": {
       "columns": [
@@ -16341,6 +16379,16 @@
       }
     },
     "query": "\nUPDATE api_tokens\nSET\n  deleted_at = CURRENT_TIMESTAMP,\n  ip_address_last_update = ?\nWHERE\n  user_token = ?\nAND api_token NOT IN (?, ?, ?, ?, ?)\n        "
+  },
+  "d5f53a89b5eff21dd5be25ff779d0719626b8248ae800cc14f4a84323e2db88b": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Right": 2
+      }
+    },
+    "query": "\nUPDATE email_sender_jobs\nSET\n  status = \"complete_failure\",\n  internal_debugging_failure_reason = ?,\n  retry_at = NULL\nWHERE id = ?\n        "
   },
   "d621645f30cf671e3e9d83bc702878f73b1c4a2516985872a126600740aabf7a": {
     "describe": {
@@ -17838,6 +17886,57 @@
       }
     },
     "query": "\nUPDATE tts_inference_jobs\nSET\n  status = ?,\n  on_success_result_token = ?,\n  last_assigned_worker = ?,\n  failure_reason = NULL,\n  retry_at = NULL\nWHERE id = ?\n        "
+  },
+  "e3e77a7126c5b9aa6b7776980bd65a5835704ec8d2a009653cab002a6ef2a311": {
+    "describe": {
+      "columns": [
+        {
+          "name": "id",
+          "ordinal": 0,
+          "type_info": {
+            "char_set": 63,
+            "flags": {
+              "bits": 515
+            },
+            "max_size": 20,
+            "type": "LongLong"
+          }
+        },
+        {
+          "name": "status",
+          "ordinal": 1,
+          "type_info": {
+            "char_set": 224,
+            "flags": {
+              "bits": 393
+            },
+            "max_size": 76,
+            "type": "String"
+          }
+        },
+        {
+          "name": "attempt_count",
+          "ordinal": 2,
+          "type_info": {
+            "char_set": 63,
+            "flags": {
+              "bits": 33
+            },
+            "max_size": 5,
+            "type": "Short"
+          }
+        }
+      ],
+      "nullable": [
+        false,
+        false,
+        false
+      ],
+      "parameters": {
+        "Right": 1
+      }
+    },
+    "query": "\nSELECT\n  id,\n  status,\n  attempt_count\nFROM email_sender_jobs\nWHERE id = ?\nFOR UPDATE\n        "
   },
   "e404b9dcdec3e8fed927cc88658a05b8a96936cdf3a881cedb9b11c24bf53278": {
     "describe": {
@@ -19663,6 +19762,122 @@
       }
     },
     "query": "\nINSERT INTO model_categories\nSET\n    token = ?,\n    uuid_idempotency_token = ?,\n    model_type = ?,\n    name = ?,\n\n    creator_user_token = ?,\n    creator_ip_address_creation = ?,\n    creator_ip_address_last_update = ?,\n\n    is_mod_approved = ?,\n    maybe_mod_user_token = ?,\n    can_directly_have_models = ?,\n    can_have_subcategories = ?,\n    can_only_mods_apply = ?\n        "
+  },
+  "ffa85bac1e92386a908dfa656b6672ccc2b8ba417afcc489e4670a2287992b02": {
+    "describe": {
+      "columns": [
+        {
+          "name": "token: tokens::tokens::zs_voice_datasets::ZsVoiceDatasetToken",
+          "ordinal": 0,
+          "type_info": {
+            "char_set": 224,
+            "flags": {
+              "bits": 4229
+            },
+            "max_size": 128,
+            "type": "VarString"
+          }
+        },
+        {
+          "name": "title",
+          "ordinal": 1,
+          "type_info": {
+            "char_set": 224,
+            "flags": {
+              "bits": 4225
+            },
+            "max_size": 1020,
+            "type": "VarString"
+          }
+        },
+        {
+          "name": "ietf_language_tag",
+          "ordinal": 2,
+          "type_info": {
+            "char_set": 224,
+            "flags": {
+              "bits": 129
+            },
+            "max_size": 256,
+            "type": "VarString"
+          }
+        },
+        {
+          "name": "ietf_primary_language_subtag",
+          "ordinal": 3,
+          "type_info": {
+            "char_set": 224,
+            "flags": {
+              "bits": 137
+            },
+            "max_size": 48,
+            "type": "VarString"
+          }
+        },
+        {
+          "name": "maybe_creator_user_token",
+          "ordinal": 4,
+          "type_info": {
+            "char_set": 224,
+            "flags": {
+              "bits": 136
+            },
+            "max_size": 128,
+            "type": "VarString"
+          }
+        },
+        {
+          "name": "creator_set_visibility: enums::common::visibility::Visibility",
+          "ordinal": 5,
+          "type_info": {
+            "char_set": 224,
+            "flags": {
+              "bits": 385
+            },
+            "max_size": 28,
+            "type": "String"
+          }
+        },
+        {
+          "name": "created_at",
+          "ordinal": 6,
+          "type_info": {
+            "char_set": 63,
+            "flags": {
+              "bits": 1153
+            },
+            "max_size": 19,
+            "type": "Timestamp"
+          }
+        },
+        {
+          "name": "updated_at",
+          "ordinal": 7,
+          "type_info": {
+            "char_set": 63,
+            "flags": {
+              "bits": 9345
+            },
+            "max_size": 19,
+            "type": "Timestamp"
+          }
+        }
+      ],
+      "nullable": [
+        false,
+        false,
+        false,
+        false,
+        true,
+        false,
+        false,
+        false
+      ],
+      "parameters": {
+        "Right": 1
+      }
+    },
+    "query": "\n        SELECT\n        zd.token as `token: tokens::tokens::zs_voice_datasets::ZsVoiceDatasetToken`,\n        zd.title,\n        zd.ietf_language_tag,\n        zd.ietf_primary_language_subtag,\n        zd.maybe_creator_user_token,\n        zd.creator_set_visibility as `creator_set_visibility: enums::common::visibility::Visibility`,\n        zd.created_at,\n        zd.updated_at\n        FROM zs_voice_datasets as zd\n        WHERE\n            zd.token = ?\n            AND zd.user_deleted_at IS NULL\n            AND zd.mod_deleted_at IS NULL\n            "
   },
   "ffa85f7c65101a43653c724479ee080e0a74577d2ae37863b039f3a452493d1e": {
     "describe": {
