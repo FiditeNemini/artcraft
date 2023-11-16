@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 
 // voice imports
 
+import { CreateVoice } from "@storyteller/components/src/api/voice_designer/voices/CreateVoice";
 import { ListVoicesByUser, Voice } from "@storyteller/components/src/api/voice_designer/voices/ListVoicesByUser";
 import { DeleteVoice } from "@storyteller/components/src/api/voice_designer/voices/DeleteVoice";
 
@@ -73,6 +74,7 @@ export default function useVoiceRequests() {
   	},
   	inference: {},
   	voices: {
+      create: CreateVoice,
       delete: deleteVoice,
       list: voices
     },

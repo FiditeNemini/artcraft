@@ -40,32 +40,20 @@ function VoiceDesignerUploadComponent({ changeConvertIdempotencyToken, datasetTo
 
   // Auto generated
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [idempotencyToken, setIdempotencyToken] = useState(uuidv4());
+  // const [idempotencyToken, setIdempotencyToken] = useState(uuidv4());
 
   const handleChange = (file: any) => {
     if (files.length < 20) {
       setFiles([...files, file]);
-      setIdempotencyToken(uuidv4());
       const audioUrl = URL.createObjectURL(file);
       setAudioLinks([...audioLinks, audioUrl ?? ""]);
 
-
-      // const formData = new FormData();
-
-      // formData.append('uuid_idempotency_token', uuidv4());
-      // formData.append('file', files);
-
-      // console.log("🆘", file);
-
-      // UploadSample("",{
-      //   dataset_token: datasetToken || "",
-      //   file: file,
-      //   uuid_idempotency_token: idempotencyToken,
-      // }).then(res => {
-      //   console.log("😎",res);
-      // });
-
-
+      UploadSample("",{
+        dataset_token: datasetToken || "",
+        file: file,
+        uuid_idempotency_token: uuidv4(),
+      })
+      .then(res => {});
 
       setFormIsCleared(false);
       setCanConvert(false);
