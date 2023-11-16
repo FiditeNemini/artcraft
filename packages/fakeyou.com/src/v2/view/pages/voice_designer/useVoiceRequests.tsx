@@ -21,6 +21,7 @@ import {
   UpdateDataset,
   UpdateDatasetRequest,
 } from "@storyteller/components/src/api/voice_designer/voice_datasets/UpdateDataset";
+import { EnqueueTts } from "@storyteller/components/src/api/voice_designer/inference/EnqueueTts";
 import { useSession } from "hooks";
 
 export default function useVoiceRequests() {
@@ -84,7 +85,9 @@ export default function useVoiceRequests() {
       list: datasets,
       byToken: datasetByToken,
     },
-    inference: {},
+    inference: {
+      enqueue: EnqueueTts,
+    },
     voices: {
       create: CreateVoice,
       delete: deleteVoice,

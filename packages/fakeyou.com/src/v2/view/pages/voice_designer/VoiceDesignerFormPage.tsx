@@ -1,6 +1,11 @@
 import React, { useState } from "react";
 import { useParams } from "react-router-dom";
-import { faEye, faLanguage, faPencil, faWaveform } from "@fortawesome/pro-solid-svg-icons";
+import {
+  faEye,
+  faLanguage,
+  faPencil,
+  faWaveform,
+} from "@fortawesome/pro-solid-svg-icons";
 import { usePrefixedDocumentTitle } from "common/UsePrefixedDocumentTitle";
 import Panel from "components/common/Panel";
 import { Stepper } from "./components/Stepper";
@@ -24,8 +29,8 @@ interface RouteParams {
 function VoiceDesignerFormPage() {
   const history = useHistory();
   const { datasets, inputCtrl, voices } = useVoiceRequests();
-  const [language,languageSet] = useState("en");
-  const [visibility,visibilitySet] = useState("");
+  const [language, languageSet] = useState("en");
+  const [visibility, visibilitySet] = useState("");
   const [title, titleSet] = useState("");
 
   const audioProps = useFile({}); // contains upload inout state and controls, see docs
@@ -36,12 +41,35 @@ function VoiceDesignerFormPage() {
     { value: "fr", label: "French" },
   ];
 
-  const visibilityOptions = [{ label: "Public", value: "public" },{  label: "Hidden", value: "hidden" }];
+  const visibilityOptions = [
+    { label: "Public", value: "public" },
+    { label: "Hidden", value: "hidden" },
+  ];
 
   const datasetInputs = [
-    { type: "text", label: "Title", placeholder: "Voice name", value: title, onChange: inputCtrl(titleSet) },
-    { type: "select", icon: faLanguage, label: "Language", value: language, onChange: inputCtrl(languageSet), options: languages },
-    { type: "select", icon: faEye, label: "Visibility", value: visibility, onChange: inputCtrl(visibilitySet), options: visibilityOptions }
+    {
+      type: "text",
+      label: "Title",
+      placeholder: "Voice name",
+      value: title,
+      onChange: inputCtrl(titleSet),
+    },
+    {
+      type: "select",
+      icon: faLanguage,
+      label: "Language",
+      value: language,
+      onChange: inputCtrl(languageSet),
+      options: languages,
+    },
+    {
+      type: "select",
+      icon: faEye,
+      label: "Visibility",
+      value: visibility,
+      onChange: inputCtrl(visibilitySet),
+      options: visibilityOptions,
+    },
   ];
 
   const { dataset_token } = useParams<RouteParams>();
@@ -62,7 +90,9 @@ function VoiceDesignerFormPage() {
       case 0:
         return <VoiceDetails {...{ datasetInputs }} />;
       case 1:
-        return <UploadSamples {...{ audioProps, datasetToken: dataset_token }}/>;
+        return (
+          <UploadSamples {...{ audioProps, datasetToken: dataset_token }} />
+        );
       default:
         return null;
     }
@@ -83,17 +113,17 @@ function VoiceDesignerFormPage() {
       if (isNewCreation) {
         // It's a new creation and on the first step
 
-        datasets.create("",{
-          title,
-          creator_set_visibility: visibility,
-          idempotency_token: uuidv4(),
-        }).then((res: any) => {
-
-          if (res && res.success && res.token) {
-            history.push(`/voice-designer/dataset/${ res.token }/upload`);
-          } 
-        });
-
+        datasets
+          .create("", {
+            title,
+            creator_set_visibility: visibility,
+            idempotency_token: uuidv4(),
+          })
+          .then((res: any) => {
+            if (res && res.success && res.token) {
+              history.push(`/voice-designer/dataset/${res.token}/upload`);
+            }
+          });
       } else if (dataset_token) {
         // It's edit mode and on the first step
         history.push(`/voice-designer/dataset/${dataset_token}/upload`);
@@ -105,14 +135,16 @@ function VoiceDesignerFormPage() {
   };
 
   const handleCreateVoice = () => {
-    voices.create("",{
-      uuid_idempotency_token: uuidv4(),
-      voice_dataset_token: dataset_token || "",
-    }).then((res: any) => {
-      if (res && res.success) {
-        history.push("/voice-designer");
-      } 
-    });
+    voices
+      .create("", {
+        uuid_idempotency_token: uuidv4(),
+        voice_dataset_token: dataset_token || "",
+      })
+      .then((res: any) => {
+        if (res && res.success) {
+          history.push("/voice-designer");
+        }
+      });
   };
 
   return (
