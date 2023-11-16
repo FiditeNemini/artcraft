@@ -94,11 +94,11 @@ async fn main() -> AnyhowResult<()> {
   let server_environment = ServerEnvironment::from_str(&easyenv::get_env_string_required("SERVER_ENVIRONMENT")?)
       .ok_or(anyhow!("invalid server environment"))?;
 
-  // TODO(bt,2023-11-11): Password and account details should be a secret, but gotta go fast.
   let email_sender = SmtpEmailSender::new(
-    "smtp.gmail.com",
-    "noreply@storyteller.ai".to_string(),
-    "FakeYouHanashi1".to_string())?;
+    &easyenv::get_env_string_required("SMTP_RELAY")?,
+    easyenv::get_env_string_required("SMTP_USERNAME")?,
+    easyenv::get_env_string_required("SMTP_PASSWORD")?,
+  )?;
 
   let is_debug_worker = easyenv::get_env_bool_or_default("IS_DEBUG_WORKER", false);
 
