@@ -20,18 +20,28 @@ import Container from "components/common/Container/Container";
 import TextArea from "components/common/TextArea";
 import { Button } from "components/common";
 import { SessionTtsInferenceResultList } from "v2/view/_common/SessionTtsInferenceResultsList";
-import { InferenceJob } from "@storyteller/components/src/jobs/InferenceJob";
+import {
+  FrontendInferenceJobType,
+  InferenceJob,
+} from "@storyteller/components/src/jobs/InferenceJob";
 import { TtsInferenceJob } from "@storyteller/components/src/jobs/TtsInferenceJobs";
 import { faVolumeUp } from "@fortawesome/free-solid-svg-icons";
 import { useParams } from "react-router-dom";
 import { GetVoice } from "@storyteller/components/src/api/voice_designer/voices/GetVoice";
 import Skeleton from "components/common/Skeleton";
+import useVoiceRequests from "./useVoiceRequests";
+import { v4 as uuidv4 } from "uuid";
 
 interface VoiceDesignerUseVoicePageProps {
   sessionWrapper: SessionWrapper;
   sessionSubscriptionsWrapper: SessionSubscriptionsWrapper;
   inferenceJobs: Array<InferenceJob>;
   ttsInferenceJobs: Array<TtsInferenceJob>;
+  enqueueInferenceJob: (
+    jobToken: string,
+    frontendInferenceJobType: FrontendInferenceJobType
+  ) => void;
+  inferenceJobsByCategory: Map<FrontendInferenceJobType, Array<InferenceJob>>;
 }
 
 export default function VoiceDesignerUseVoicePage(
@@ -50,6 +60,8 @@ export default function VoiceDesignerUseVoicePage(
     voiceToken: "",
     languageTag: "",
   });
+  const { inference } = useVoiceRequests();
+  const [isEnqueuing, setIsEnqueuing] = useState(false);
 
   const getVoiceDetails = useCallback(async (voice_token) => {
     try {
@@ -107,8 +119,28 @@ export default function VoiceDesignerUseVoicePage(
   //   { label: "Front page featured?", value: frontPageFeatured },
   // ];
 
-  const handleFormSubmit = async (ev: React.FormEvent<HTMLFormElement>) => {
-    ev.preventDefault();
+  const handleEnqueueTts = () => {
+    setIsEnqueuing(true);
+    inference
+      .enqueue("", {
+        uuid_idempotency_token: uuidv4(),
+        text: textBuffer,
+        voice_token: voice_token,
+      })
+      .then((res: any) => {
+        if (res && res.success) {
+          props.enqueueInferenceJob(
+            res.inference_job_token,
+            FrontendInferenceJobType.VoiceDesignerTts
+          );
+        }
+      })
+      .catch((error) => {
+        console.error("Error enqueuing TTS:", error);
+      })
+      .finally(() => {
+        setIsEnqueuing(false);
+      });
   };
 
   const handleChangeText = (ev: React.FormEvent<HTMLTextAreaElement>) => {
@@ -158,7 +190,7 @@ export default function VoiceDesignerUseVoicePage(
       <PageHeader title={voiceData.title} subText={subText} />
 
       <Panel padding={true} mb={true}>
-        <form onSubmit={handleFormSubmit}>
+        <form>
           <div className="row g-4">
             <div className="col-12 col-lg-6 d-flex flex-column gap-3">
               <h4>
@@ -172,7 +204,13 @@ export default function VoiceDesignerUseVoicePage(
                 rows={8}
               />
               <div className="d-flex gap-3">
-                <Button icon={faVolumeUp} label="Speak" full={true} />
+                <Button
+                  icon={faVolumeUp}
+                  label="Speak"
+                  full={true}
+                  onClick={handleEnqueueTts}
+                  isLoading={isEnqueuing}
+                />
                 <Button
                   icon={faDeleteLeft}
                   label="Clear"
@@ -188,7 +226,11 @@ export default function VoiceDesignerUseVoicePage(
               </h4>
               <div className="d-flex flex-column gap-3 session-tts-section">
                 <SessionTtsInferenceResultList
-                  inferenceJobs={props.inferenceJobs}
+                  inferenceJobs={
+                    props.inferenceJobsByCategory.get(
+                      FrontendInferenceJobType.VoiceDesignerTts
+                    )!
+                  }
                   ttsInferenceJobs={props.ttsInferenceJobs}
                   sessionSubscriptionsWrapper={
                     props.sessionSubscriptionsWrapper
