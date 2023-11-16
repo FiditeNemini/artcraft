@@ -13,6 +13,7 @@ import { useHistory } from "react-router-dom";
 
 import { v4 as uuidv4 } from "uuid";
 
+import { useFile } from "hooks";
 
 import useVoiceRequests from "./useVoiceRequests";
 
@@ -22,10 +23,12 @@ interface RouteParams {
 
 function VoiceDesignerFormPage() {
   const history = useHistory();
-  const { datasets, inputCtrl } = useVoiceRequests();
+  const { datasets, inputCtrl, voices } = useVoiceRequests();
   const [language,languageSet] = useState("en");
   const [visibility,visibilitySet] = useState("");
   const [title, titleSet] = useState("");
+
+  const audioProps = useFile({}); // contains upload inout state and controls, see docs
 
   const languages = [
     { value: "en", label: "English" },
@@ -59,7 +62,7 @@ function VoiceDesignerFormPage() {
       case 0:
         return <VoiceDetails {...{ datasetInputs }} />;
       case 1:
-        return <UploadSamples />;
+        return <UploadSamples {...{ audioProps, datasetToken: dataset_token }}/>;
       default:
         return null;
     }
@@ -102,7 +105,14 @@ function VoiceDesignerFormPage() {
   };
 
   const handleCreateVoice = () => {
-    history.push("/voice-designer");
+    voices.create("",{
+      uuid_idempotency_token: uuidv4(),
+      voice_dataset_token: dataset_token || "",
+    }).then((res: any) => {
+      if (res && res.success) {
+        history.push("/voice-designer");
+      } 
+    });
   };
 
   return (

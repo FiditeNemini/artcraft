@@ -15,9 +15,14 @@ import { v4 as uuidv4 } from "uuid";
 // } from "@storyteller/components/src/api/upload/UploadAudio";
 import useUploadedFiles from "hooks/useUploadedFiles";
 
+import { UploadSample } from "@storyteller/components/src/api/voice_designer/voice_dataset_samples/UploadSample";
+
+// import { DeleteSample } from "@storyteller/components/src/api/voice_designer/voice_dataset_samples/DeleteSample";
+
 const FILE_TYPES = ["MP3", "WAV", "FLAC", "OGG"];
 
 interface Props {
+  datasetToken?: string,
   setMediaUploadToken: (token?: string) => void;
   formIsCleared: boolean;
   setFormIsCleared: (cleared: boolean) => void;
@@ -25,7 +30,7 @@ interface Props {
   changeConvertIdempotencyToken: () => void;
 }
 
-function VoiceDesignerUploadComponent(props: Props) {
+function VoiceDesignerUploadComponent({ changeConvertIdempotencyToken, datasetToken, setCanConvert, setFormIsCleared }: Props) {
   const [isUploadDisabled, setIsUploadDisabled] = useState<boolean>(false);
 
   const files = useUploadedFiles((state: any) => state.files);
@@ -35,17 +40,24 @@ function VoiceDesignerUploadComponent(props: Props) {
 
   // Auto generated
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [idempotencyToken, setIdempotencyToken] = useState(uuidv4());
+  // const [idempotencyToken, setIdempotencyToken] = useState(uuidv4());
 
   const handleChange = (file: any) => {
     if (files.length < 20) {
       setFiles([...files, file]);
-      setIdempotencyToken(uuidv4());
       const audioUrl = URL.createObjectURL(file);
       setAudioLinks([...audioLinks, audioUrl ?? ""]);
-      props.setFormIsCleared(false);
-      props.setCanConvert(false);
-      props.changeConvertIdempotencyToken();
+
+      UploadSample("",{
+        dataset_token: datasetToken || "",
+        file: file,
+        uuid_idempotency_token: uuidv4(),
+      })
+      .then(res => {});
+
+      setFormIsCleared(false);
+      setCanConvert(false);
+      changeConvertIdempotencyToken();
       setIsUploadDisabled(false);
     }
   };
