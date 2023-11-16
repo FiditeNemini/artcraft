@@ -27,7 +27,7 @@ tokens = { path = "../../_types/tokens" }
 # External
 log = "0.4.14"
 clap = "2.34.0" # TODO: This is really out of date, but has conflicts when updated
-strum = { version = "0.24", features = ["derive"] }
+strum = { version = "0.25", features = ["derive"] }
 
 # Runtime
 # NB: We switched to Tokio from `async-std` for broader ecosystem support.
