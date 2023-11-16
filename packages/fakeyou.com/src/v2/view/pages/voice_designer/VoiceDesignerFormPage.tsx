@@ -113,17 +113,16 @@ function VoiceDesignerFormPage() {
       if (isNewCreation) {
         // It's a new creation and on the first step
 
-        datasets
-          .create("", {
-            title,
-            creator_set_visibility: visibility,
-            idempotency_token: uuidv4(),
-          })
-          .then((res: any) => {
-            if (res && res.success && res.token) {
-              history.push(`/voice-designer/dataset/${res.token}/upload`);
-            }
-          });
+        datasets.create("",{
+          title,
+          creator_set_visibility: visibility,
+          idempotency_token: uuidv4(),
+        }).then((res: any) => {
+          if (res && res.success && res.token) {
+            history.push(`/voice-designer/dataset/${ res.token }/upload`);
+          } 
+        });
+
       } else if (dataset_token) {
         // It's edit mode and on the first step
         history.push(`/voice-designer/dataset/${dataset_token}/upload`);

@@ -8,16 +8,22 @@ export class FakeYouFrontendEnvironment {
   static instance?: FakeYouFrontendEnvironment;
 
   environment: Environment;
-  
+
   private constructor() {
     switch (document.location.host) {
-      case 'fakeyou.com':
+      case "fakeyou.com":
         this.environment = Environment.Production;
         break;
-      case 'staging.fakeyou.com':
+      case "staging.fakeyou.com":
         this.environment = Environment.Staging;
         break;
-      case 'dev.fakeyou.com':
+      case "localhost:7000":
+        this.environment = Environment.Development;
+        break;
+      case "localhost:7001":
+        this.environment = Environment.Development;
+        break;
+      case "dev.fakeyou.com":
         this.environment = Environment.Development;
         break;
       default:
