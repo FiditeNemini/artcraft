@@ -8,16 +8,17 @@ import Container from "components/common/Container";
 import { NavLink } from "react-router-dom";
 import ListItems from "./components/NewList";
 import Modal from "components/common/Modal";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faMicrophone } from "@fortawesome/pro-solid-svg-icons";
 import useVoiceRequests from "./useVoiceRequests";
 
 function VoiceDesignerMainPage() {
   const { pathname } = useLocation();
   const { datasets, voices } = useVoiceRequests();
   const [isDeleteVoiceModalOpen, setIsDeleteVoiceModalOpen] = useState(false);
-  const [isDeleteDatasetModalOpen, setIsDeleteDatasetModalOpen] = useState(false);
-  const view = ["/voice-designer/datasets","/voice-designer/voices"].indexOf(pathname);
+  const [isDeleteDatasetModalOpen, setIsDeleteDatasetModalOpen] =
+    useState(false);
+  const view = ["/voice-designer/datasets", "/voice-designer/voices"].indexOf(
+    pathname
+  );
 
   // const openDeleteVoiceModal = () => {
   //   setIsDeleteVoiceModalOpen(true);
@@ -35,67 +36,75 @@ function VoiceDesignerMainPage() {
     setIsDeleteDatasetModalOpen(false);
   };
 
-  const DataBadge = () => <span className="dataset-badge mb-0">Dataset</span>;
-  const VoiceBadge = () => <FontAwesomeIcon icon={faMicrophone} className="me-2 me-lg-3" />;
-
   const history = useHistory();
 
-  const navToEdit = (token: string, type: string) => { history.push(`/voice-designer/${ type }/${ token }/edit`) }
-
-  const rowClick = (todo: any, type?: string) => ({ target }: { target: any }) => {
-    let datasetToken = datasets.list[target.name.split(",")[0].split(":")[1]].dataset_token;
-    todo(datasetToken, type);
+  const navToEdit = (token: string, type: string) => {
+    history.push(`/voice-designer/${type}/${token}/edit`);
   };
 
-  const actionDataSets = datasets.list.map((dataset,i) => {
+  const rowClick =
+    (todo: any, type?: string) =>
+    ({ target }: { target: any }) => {
+      let datasetToken =
+        datasets.list[target.name.split(",")[0].split(":")[1]].dataset_token;
+      todo(datasetToken, type);
+    };
+
+  const actionDataSets = datasets.list.map((dataset, i) => {
     return {
       ...dataset,
-      badge: DataBadge,
-      buttons: [{
-        label: "Edit",
-        small: true,
-        variant: "secondary",
-        onClick: rowClick(navToEdit,"dataset")
-      },{
-        label: "Delete",
-        small: true,
-        variant: "danger",
-        onClick: rowClick(datasets.delete)
-      }],
-      name: dataset.title
+      badge: "dataset",
+      buttons: [
+        {
+          label: "Edit",
+          small: true,
+          variant: "secondary",
+          onClick: rowClick(navToEdit, "dataset"),
+        },
+        {
+          label: "Delete",
+          small: true,
+          variant: "danger",
+          onClick: rowClick(datasets.delete),
+        },
+      ],
+      name: dataset.title,
     };
   });
 
-  const actionVoices = voices.list.map((voice,i) => {
+  const actionVoices = voices.list.map((voice, i) => {
     return {
       ...voice,
-      badge: VoiceBadge,
-      buttons: [{
-        label: "Edit",
-        small: true,
-        variant: "secondary",
-        onClick: rowClick(navToEdit,"voice")
-      },{
-        label: "Delete",
-        small: true,
-        variant: "danger",
-        onClick: rowClick(voices.delete)
-      }],
-      name: voice.title
-    }
+      badge: "voice",
+      buttons: [
+        {
+          label: "Edit",
+          small: true,
+          variant: "secondary",
+          onClick: rowClick(navToEdit, "voice"),
+        },
+        {
+          label: "Delete",
+          small: true,
+          variant: "danger",
+          onClick: rowClick(voices.delete),
+        },
+      ],
+      name: voice.title,
+    };
   });
 
   const button = {
     label: `Create new voice`,
     icon: faPlus,
-    to: "/voice-designer/create" 
+    to: "/voice-designer/create",
   };
 
   return (
     <>
       <Container type="panel">
         <PageHeader
-         button={button}
+          button={button}
           title="Voice Designer"
           titleIcon={faWaveform}
           subText="Create your own AI voice by providing audio files of the voice you want to clone."
@@ -103,7 +112,7 @@ function VoiceDesignerMainPage() {
           imageUrl="/images/header/voice-designer.png"
         />
 
-        <Panel>
+        <Panel mb={true}>
           <nav>
             <ul className="nav nav-tabs">
               <div className="d-flex flex-grow-1">
@@ -130,7 +139,7 @@ function VoiceDesignerMainPage() {
           </nav>
 
           <div className="p-3 p-lg-4">
-            <ListItems {...{ data: view ? actionVoices : actionDataSets }}/>
+            <ListItems {...{ data: view ? actionVoices : actionDataSets }} />
           </div>
         </Panel>
       </Container>

@@ -148,6 +148,10 @@ export default function VoiceDesignerUseVoicePage(
     setTextBuffer(textValue);
   };
 
+  const handleClearText = () => {
+    setTextBuffer("");
+  };
+
   if (isLoading) {
     return (
       <Container type="panel">
@@ -216,6 +220,7 @@ export default function VoiceDesignerUseVoicePage(
                   label="Clear"
                   full={true}
                   variant="danger"
+                  onClick={handleClearText}
                 />
               </div>
             </div>
