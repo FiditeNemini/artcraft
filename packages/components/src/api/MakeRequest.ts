@@ -44,7 +44,10 @@ const MakeRequest = <UrlRouteArgs, Request, Response>(routeSetup: RouteSetup<Url
         })
         .then(res => res.json())
         .then(res => {
-            if (res && "success" in res) {
+            if (res && res.voice_token) {
+                return res;
+            }
+            else if (res && "success" in res) {
                 return res;
             } else Promise.reject();
         })
