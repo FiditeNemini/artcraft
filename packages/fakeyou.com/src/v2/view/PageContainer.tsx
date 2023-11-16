@@ -646,18 +646,11 @@ class PageContainer extends React.Component<
               component={VoiceDesignerFormPage}
             />
 
-            {/* Route for initial voice creation */}
-            <Route
-              exact
-              path="/voice-designer/dataset/create"
-              component={DatasetEditor}
-            />
-
             {/* Route for editing the dataset details */}
             <Route
               exact
               path="/voice-designer/dataset/:dataset_token/edit"
-              component={DatasetEditor}
+              component={VoiceDesignerFormPage}
             />
 
             {/* Route for handling dataset token for uploading samples */}

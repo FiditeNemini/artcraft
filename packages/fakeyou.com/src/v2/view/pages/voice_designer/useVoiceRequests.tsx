@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 
 // voice imports
 
+import { GetVoice } from "@storyteller/components/src/api/voice_designer/voices/GetVoice";
 import { CreateVoice } from "@storyteller/components/src/api/voice_designer/voices/CreateVoice";
 import { ListVoicesByUser, Voice } from "@storyteller/components/src/api/voice_designer/voices/ListVoicesByUser";
 import { DeleteVoice } from "@storyteller/components/src/api/voice_designer/voices/DeleteVoice";
@@ -60,6 +61,10 @@ export default function useVoiceRequests() {
           if (res.voices) voicesSet(res.voices);
         });
       }
+      // GetVoice("zsv_a7a10qp2qh8jwyramsyrzk127dx1",{})
+      // .then((res) => {
+      //   console.log("🔥",res);
+      // });
     }
 
 	},[fetched,user, datasets, voices]);
