@@ -6,6 +6,8 @@ export enum FrontendInferenceJobType {
   FaceAnimation,
   TextToSpeech,
   VoiceConversion,
+  VoiceDesignerCreateVoice,
+  VoiceDesignerTts,
 }
 
 // NB: Many of these fields are optional despite the response payload containing them
@@ -35,11 +37,11 @@ export class InferenceJob {
 
   constructor(
     // PK
-    jobToken: string, 
+    jobToken: string,
     // Frontend state
     frontendJobType: FrontendInferenceJobType,
     // Status
-    status: string = 'unknown',
+    status: string = "unknown",
     maybeExtraStatusDescription: string | null = null,
     attemptCount: number = 0,
     // Request
@@ -85,7 +87,10 @@ export class InferenceJob {
     }
   }
 
-  static fromResponse(response: ModelInferenceJobStatus, frontendJobType: FrontendInferenceJobType) : InferenceJob {
+  static fromResponse(
+    response: ModelInferenceJobStatus,
+    frontendJobType: FrontendInferenceJobType
+  ): InferenceJob {
     return new InferenceJob(
       response.job_token,
       frontendJobType,
