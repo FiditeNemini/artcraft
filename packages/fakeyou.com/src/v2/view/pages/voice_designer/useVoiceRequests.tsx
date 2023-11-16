@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 
 // voice imports
 
-// import { GetVoice } from "@storyteller/components/src/api/voice_designer/voices/GetVoice";
+import { GetVoice } from "@storyteller/components/src/api/voice_designer/voices/GetVoice";
 import { CreateVoice, CreateVoiceRequest, CreateVoiceResponse } from "@storyteller/components/src/api/voice_designer/voices/CreateVoice";
 import { ListVoicesByUser, Voice } from "@storyteller/components/src/api/voice_designer/voices/ListVoicesByUser";
 import { 
@@ -12,6 +12,7 @@ import {
 
 // dataset imports
 
+import { GetDataset } from "@storyteller/components/src/api/voice_designer/voice_datasets/GetDataset";
 import {
   ListDatasetsByUser,
   Dataset,
@@ -97,11 +98,12 @@ export default function useVoiceRequests() {
 
   return {
     datasets: {
+      byToken: datasetByToken,
       create: createDataset,
       delete: deleteDataset,
       edit: editDataSet,
+      get: GetDataset,
       list: datasets,
-      byToken: datasetByToken,
       refresh: refreshData
     },
     inference: {
@@ -110,6 +112,7 @@ export default function useVoiceRequests() {
     voices: {
       create: createVoice,
       delete: deleteVoice,
+      get: GetVoice,
       list: voices,
       refresh: refreshData
     },

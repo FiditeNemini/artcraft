@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import {
   faEye,
@@ -32,6 +32,7 @@ function VoiceDesignerFormPage() {
   const [language, languageSet] = useState("en");
   const [visibility, visibilitySet] = useState("");
   const [title, titleSet] = useState("");
+  const [fetched,fetchedSet] = useState(false);
 
   const audioProps = useFile({}); // contains upload inout state and controls, see docs
 
@@ -125,7 +126,15 @@ function VoiceDesignerFormPage() {
 
       } else if (dataset_token) {
         // It's edit mode and on the first step
-        history.push(`/voice-designer/dataset/${dataset_token}/upload`);
+        datasets.edit(dataset_token,{
+          title,
+          creator_set_visibility: visibility,
+          ietf_language_tag: language
+        }).then((res: any) => {
+          if (res && res.success && res.token) {
+            history.push(`/voice-designer/dataset/${dataset_token}/upload`);
+          } 
+        });
       }
       setCurrentStep(currentStep + 1);
     } else if (currentStep < steps.length - 1) {
@@ -145,6 +154,18 @@ function VoiceDesignerFormPage() {
         }
       });
   };
+
+  useEffect(() => {
+    if (!fetched && dataset_token) {
+      fetchedSet(true);
+      datasets.get(dataset_token,{})
+      .then((res) => {
+        languageSet(res.ietf_language_tag);
+        titleSet(res.title);
+        visibilitySet(res.creator_set_visibility);
+      });
+    }
+  },[dataset_token,datasets,fetched]);
 
   return (
     <Container type="panel">
