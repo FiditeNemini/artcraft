@@ -4,7 +4,6 @@
 use errors::AnyhowResult;
 
 use crate::payloads::email_sender_jobs::subtypes::email_job_password_reset_args::EmailJobPasswordResetArgs;
-use crate::payloads::email_sender_jobs::subtypes::email_job_welcome_args::EmailJobWelcomeArgs;
 
 /// Used to encode extra state for the `email_sender_jobs` table.
 /// This should act somewhat like a serialized protobuf stored inside a record.
@@ -20,8 +19,9 @@ pub struct EmailSenderJobArgs {
 // NB: Keep the enum variant names short as these get serialized to json in the db
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub enum PolymorphicEmailSenderJobArgs {
+  // TODO: Args?
   /// Welcome email
-  W(EmailJobWelcomeArgs),
+  W,
 
   /// Forgot password / password reset args
   Pr(EmailJobPasswordResetArgs),

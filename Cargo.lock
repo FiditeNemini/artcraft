@@ -5114,6 +5114,7 @@ dependencies = [
  "serde",
  "serde_derive",
  "sqlx",
+ "toml",
 ]
 
 [[package]]
@@ -6603,9 +6604,11 @@ dependencies = [
  "rand 0.8.5",
  "serde",
  "serde_derive",
+ "serde_json",
  "sqlx",
  "sqlx-core",
  "strum",
+ "toml",
 ]
 
 [[package]]
