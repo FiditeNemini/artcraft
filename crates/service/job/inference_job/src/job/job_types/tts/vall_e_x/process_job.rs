@@ -71,7 +71,12 @@ pub async fn download_voice_embedding_from_hash(
     let file_name = format!("{}", name);
     path.push(&file_name);
 
-    let result = private_bucket_client.download_file_to_disk(object_path, &path).await;
+    private_bucket_client.download_file_to_disk(object_path, &path)
+        .await
+        .map_err(|err| {
+            error!("Could not download embedding file: {err}");
+            ProcessSingleJobError::from_anyhow_error(anyhow!("Could not download embedding file: {err}"))
+        })?;
 
     let voice_file = VoiceFile {
         filesystem_path: PathBuf::from(&path.clone()),
@@ -94,7 +99,12 @@ pub async fn download_audio_from_hash(
     let file_name = format!("{}", name);
     path.push(&file_name);
 
-    let result = private_bucket_client.download_file_to_disk(object_path, &path).await;
+    private_bucket_client.download_file_to_disk(object_path, &path)
+        .await
+        .map_err(|err| {
+            error!("Could not download audio file: {err}");
+            ProcessSingleJobError::from_anyhow_error(anyhow!("Could not download audio file: {err}"))
+        })?;
 
     let audio_file = AudioFile {
         filesystem_path: PathBuf::from(&path.clone()),
@@ -173,23 +183,18 @@ pub async fn process_create_voice(
         false,
         &mysql_pool
     ).await;
-    let dataset: Vec<DatasetSampleRecordForList>;
 
-    match result {
-        Ok(val) => {
-            dataset = val;
-        }
-        Err(e) => {
-            return Err(ProcessSingleJobError::from_anyhow_error(e));
-        }
-    }
+    let dataset: Vec<DatasetSampleRecordForList> = match result {
+        Ok(val) => val,
+        Err(e) => return Err(ProcessSingleJobError::from_anyhow_error(e)),
+    };
 
     info!("Dataset length info: {}", dataset.len());
 
     let temp_extension = String::from(".bin");
     let temp_prefix:String;
 
-    if deps.container.is_on_prem == false {
+    if !deps.container.is_on_prem {
         temp_prefix = String::from("sample_"); // this is for seed in local dev to download the samples
     } else {
         temp_prefix = String::from(BUCKET_FILE_PREFIX_CREATE);
@@ -292,7 +297,6 @@ pub async fn process_create_voice(
         );
 
     let inference_duration = Instant::now().duration_since(inference_start_time);
-
 
     if !command_exit_status.is_success() {
         error!("Create Embedding Failed: {:?}", command_exit_status);
@@ -487,6 +491,8 @@ pub async fn process_inference_voice(
 
     let output_file_name = String::from("output.wav");
 
+    let stderr_output_file = work_temp_dir.path().join("zero_shot_inference.txt");
+
     // Run Inference
     let command_exit_status =
         args.job_dependencies.job_type_details.vall_e_x.inference_command.execute_inference(
@@ -495,11 +501,42 @@ pub async fn process_inference_voice(
                 input_embedding_name: file_name,
                 input_text: String::from(text), // text
                 output_file_name: output_file_name.clone(), // output file name in the output folder
-                stderr_output_file: String::from("zero_shot_inference.txt"),
+                stderr_output_file: &stderr_output_file,
             }
         );
 
     let inference_duration = Instant::now().duration_since(inference_start_time);
+
+    if !command_exit_status.is_success() {
+        error!("Zero shot TTS failed: {:?}", command_exit_status);
+
+        let error = ProcessSingleJobError::Other(anyhow!("CommandExitStatus: {:?}", command_exit_status));
+
+        if let Ok(contents) = read_to_string(&stderr_output_file) {
+            warn!("Captured stderr output: {}", contents);
+
+            // Re-categorize error?
+            //match categorize_error(&contents)  {
+            //    Some(ProcessSingleJobError::FaceDetectionFailure) => {
+            //        warn!("Face not detected in source image");
+            //        error = ProcessSingleJobError::FaceDetectionFailure;
+            //    }
+            //    _ => {}
+            //}
+        }
+
+        //thread::sleep(Duration::from_secs(300));
+
+        // Clean up temp files
+        //safe_delete_temp_file(&audio_path.filesystem_path);
+        //safe_delete_temp_file(&image_path.filesystem_path);
+        //safe_delete_temp_file(&usable_image_path);
+        //safe_delete_temp_file(&output_video_fs_path);
+        //safe_delete_temp_file(&stderr_output_file);
+        //safe_delete_temp_directory(&work_temp_dir);
+
+        return Err(error);
+    }
 
     // upload audio to bucket
     info!("Uploading media ...");
