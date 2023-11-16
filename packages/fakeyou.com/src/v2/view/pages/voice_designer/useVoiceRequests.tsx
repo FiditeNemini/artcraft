@@ -2,11 +2,13 @@ import { useEffect, useState } from "react";
 
 // voice imports
 
-import { GetVoice } from "@storyteller/components/src/api/voice_designer/voices/GetVoice";
-import { CreateVoice } from "@storyteller/components/src/api/voice_designer/voices/CreateVoice";
+// import { GetVoice } from "@storyteller/components/src/api/voice_designer/voices/GetVoice";
 import { CreateVoice, CreateVoiceRequest, CreateVoiceResponse } from "@storyteller/components/src/api/voice_designer/voices/CreateVoice";
 import { ListVoicesByUser, Voice } from "@storyteller/components/src/api/voice_designer/voices/ListVoicesByUser";
-import { DeleteVoice, DeleteVoiceRequest, DeleteVoiceResponse } from "@storyteller/components/src/api/voice_designer/voices/DeleteVoice";
+import { 
+  DeleteVoice, 
+  // DeleteVoiceRequest, use me somewhere pls
+  DeleteVoiceResponse } from "@storyteller/components/src/api/voice_designer/voices/DeleteVoice";
 
 // dataset imports
 
@@ -24,13 +26,14 @@ export default function useVoiceRequests() {
   // this state will be provided as params, triggering the appropriate api call if present
   const [datasets, datasetsSet] = useState<Dataset[]>([]);
   const [voices, voicesSet] = useState<Voice[]>([]);
-  const [fetched, fetchedSet] = useState(false);
-  const { user } = useSession();
-  const [timestamp, timestampSet] = useState(Date.now());
 
-  const refreshData = () => {
-    timestampSet(Date.now());
-  }
+  // this state stays here, fetched states are not success, merely an attempt was made. Each list fetch sets to true. Set to false to retry
+  const [fetchedDatasets, fetchedDatasetsSet] = useState(false);
+  const [fetchedVoices,fetchedVoicesSet] = useState(false);
+  const { user } = useSession();
+  // const [timestamp, timestampSet] = useState(Date.now());
+
+  const refreshData = () => { fetchedDatasetsSet(false); fetchedVoicesSet(false); }; // later we can do refresh per list
 
   const createDataset = (urlRouteArgs: string, request: CreateDatasetRequest): Promise<CreateDatasetResponse> =>
     CreateDataset(urlRouteArgs, request).then(res => {
@@ -76,24 +79,21 @@ export default function useVoiceRequests() {
   };
 
 	useEffect(() => {
-    if (!fetched && user && user.username) {
-      fetchedSet(true);
-      if (!datasets.length) {
+    if (user && user.username) {
+      if (!fetchedDatasets) {
+        fetchedDatasetsSet(true);
         ListDatasetsByUser(user.username,{}).then(res => {
           if (res.datasets) datasetsSet(res.datasets);
         });
       }
-      if (!voices.length) {
+      if (!fetchedVoices) {
+        fetchedVoicesSet(true);
         ListVoicesByUser(user.username,{}).then(res => {
           if (res.voices) voicesSet(res.voices);
         });
       }
-      // GetVoice("zsv_a7a10qp2qh8jwyramsyrzk127dx1",{})
-      // .then((res) => {
-      //   console.log("🔥",res);
-      // });
     }
-  }, [user, timestamp]);
+  }, [user, fetchedDatasets, fetchedVoices]);
 
   return {
     datasets: {
