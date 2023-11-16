@@ -19,6 +19,8 @@ use crate::server_state::ServerState;
 
 #[derive(Serialize, Clone)]
 pub struct GetDatasetResponse {
+    success: bool,
+
     dataset_token: ZsVoiceDatasetToken,
     title: String,
 
@@ -115,7 +117,8 @@ pub async fn get_dataset_handler(
         return Err(GetDatasetError::NotAuthorized);
     }
 
-    let response = GetDatasetResponse{
+    let response = GetDatasetResponse {
+        success: true,
         dataset_token: dataset.token,
         title: dataset.title,
         ietf_language_tag: dataset.ietf_language_tag,

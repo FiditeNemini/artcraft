@@ -18,6 +18,8 @@ use crate::server_state::ServerState;
 
 #[derive(Serialize, Clone)]
 pub struct GetVoiceResponse {
+    success: bool,
+
     voice_token: ZsVoiceToken,
     title: String,
 
@@ -114,7 +116,8 @@ pub async fn get_voice_handler(
         return Err(GetVoiceError::NotAuthorized);
     }
 
-    let response = GetVoiceResponse{
+    let response = GetVoiceResponse {
+        success: true,
         voice_token: voice.token,
         title: voice.title,
         ietf_language_tag: voice.ietf_language_tag,
