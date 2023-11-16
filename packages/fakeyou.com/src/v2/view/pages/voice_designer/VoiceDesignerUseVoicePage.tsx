@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import {
   faBarsStaggered,
   faDeleteLeft,
@@ -18,13 +18,14 @@ import PageHeader from "components/layout/PageHeader";
 import { CommentComponent } from "v2/view/_common/comments/CommentComponent";
 import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
 import Container from "components/common/Container/Container";
-// import { useSession } from "hooks";
 import TextArea from "components/common/TextArea";
 import { Button } from "components/common";
 import { SessionTtsInferenceResultList } from "v2/view/_common/SessionTtsInferenceResultsList";
 import { InferenceJob } from "@storyteller/components/src/jobs/InferenceJob";
 import { TtsInferenceJob } from "@storyteller/components/src/jobs/TtsInferenceJobs";
 import { faVolumeUp } from "@fortawesome/free-solid-svg-icons";
+import { useParams } from "react-router-dom";
+import { GetVoice } from "@storyteller/components/src/api/voice_designer/voices/GetVoice";
 
 interface VoiceDesignerUseVoicePageProps {
   sessionWrapper: SessionWrapper;
@@ -36,11 +37,39 @@ interface VoiceDesignerUseVoicePageProps {
 export default function VoiceDesignerUseVoicePage(
   props: VoiceDesignerUseVoicePageProps
 ) {
-  // const { user } = useSession();
-  // let { token } = useParams() as { token: string };
+  const { voice_token } = useParams<{ voice_token: string }>();
   const [textBuffer, setTextBuffer] = useState("");
+  const [titleTest, setTitleTest] = useState("");
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<boolean>(false);
 
-  const title = "Solid Snake";
+  //Test Get voice details
+  const getVoiceDetails = useCallback(async (voice_token: string) => {
+    try {
+      console.log("Fetching details for token:", voice_token);
+      let result = await GetVoice(voice_token, {});
+      console.log("API Response:", result);
+
+      if (result.title) {
+        setTitleTest(result.title);
+        setIsLoading(false);
+      } else {
+        setTitleTest("not found");
+        setError(true);
+        setIsLoading(false);
+      }
+    } catch (error) {
+      console.error("Error fetching voice details:", error);
+      setError(true);
+      setIsLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    getVoiceDetails(voice_token);
+  }, [voice_token, getVoiceDetails]);
+
+  const title = titleTest;
   const subText = (
     <div>
       Voice Designer TTS model by{" "}
@@ -69,6 +98,12 @@ export default function VoiceDesignerUseVoicePage(
   let moderatorDeletedAt = "not deleted";
   let userDeletedAt = "not deleted";
 
+  // if (voices.data) {
+  //   modelCreatorLink = <Link to="">{voices.data.creator.username}</Link>;
+  //   modelTitle = voices.data.title;
+  //   modelDescription = "This is a dynamic description of the model";
+  // }
+
   const voiceDetails = [
     { label: "Creator", value: modelCreatorLink },
     { label: "Title", value: modelTitle },
@@ -88,8 +123,6 @@ export default function VoiceDesignerUseVoicePage(
     { label: "Front page featured?", value: frontPageFeatured },
   ];
 
-  // const shareUrl = window.location.href;
-
   const handleFormSubmit = async (ev: React.FormEvent<HTMLFormElement>) => {
     ev.preventDefault();
   };
@@ -98,6 +131,10 @@ export default function VoiceDesignerUseVoicePage(
     const textValue = (ev.target as HTMLTextAreaElement).value;
     setTextBuffer(textValue);
   };
+
+  if (!voice_token) {
+    return <div>Voice token not found.</div>;
+  }
 
   return (
     <Container type="panel">
