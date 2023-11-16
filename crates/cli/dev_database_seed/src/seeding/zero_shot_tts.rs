@@ -122,7 +122,7 @@ async fn seed_file_to_bucket(wav_file: &str, bucket_client: &BucketClient) -> An
   info!("Uploading wav file {} ...", wav_file);
 
   let public_upload_path = MediaFileBucketPath::generate_new(
-    Some("dev_zs_"),
+    Some("sample_"),
     Some(".bin"));
 
   info!("Uploading media to bucket path: {}", public_upload_path.get_full_object_path_str());

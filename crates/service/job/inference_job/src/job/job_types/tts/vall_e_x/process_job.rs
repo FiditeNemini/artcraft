@@ -1,5 +1,7 @@
+use std::fs::read_to_string;
 use std::path::PathBuf;
-use std::time::Instant;
+use std::thread;
+use std::time::{Duration, Instant};
 
 use anyhow::anyhow;
 use log::{error, info, warn};
@@ -115,7 +117,6 @@ pub async fn process_create_voice(
     let job = args.job;
     let mysql_pool = &deps.mysql_pool;
 
-    
     // get some globals
     let mut job_progress_reporter = deps.job_progress_reporter
         .new_generic_inference(job.inference_job_token.as_str())
@@ -185,22 +186,22 @@ pub async fn process_create_voice(
 
     info!("Dataset length info: {}", dataset.len());
 
-    let mut downloaded_dataset: Vec<PathBuf> = Vec::new();
-
     let temp_extension = String::from(".bin");
     let temp_prefix:String;
 
     if deps.container.is_on_prem == false {
-        temp_prefix = String::from("dev_zs_"); // this is for seed in local dev to download the samples
+        temp_prefix = String::from("sample_"); // this is for seed in local dev to download the samples
     } else {
         temp_prefix = String::from(BUCKET_FILE_PREFIX_CREATE);
     }
+
+    let mut downloaded_dataset: Vec<PathBuf> = Vec::new();
 
     for (index, record) in dataset.iter().enumerate() {
         //https://storage.googleapis.com/dev-vocodes-public/media/5/3/3/w/8/533w8zs0fy11nv7gkcna7p7vt03h8nda/dev_zs_533w8zs0fy11nv7gkcna7p7vt03h8nda.bin <-- where the file actually is
     
         let prefix: Option<&str> = Some(&temp_prefix); // record.maybe_public_bucket_prefix.as_ref().map(|s| s.as_str());
-        let extension: Option<&str> = Some(&temp_extension);//record.maybe_public_bucket_extension
+        let extension: Option<&str> = Some(&temp_extension); //record.maybe_public_bucket_extension
             // .as_ref()
             // .map(|s| s.as_str());
         // naming
@@ -221,7 +222,7 @@ pub async fn process_create_voice(
         );
 
         info!(
-            "Download using audio_media_file_path:{}",
+            "Download using audio_media_file_path: {}",
             audio_media_file.to_full_object_pathbuf().to_string_lossy()
         );
 
@@ -231,11 +232,19 @@ pub async fn process_create_voice(
         file_path.push(file_path.clone());
         file_path.push(file_name_wav);
 
+        info!("Downloading to path: {:?}", file_path);
+
         // TODO: we might want to catch the error and not include the pathes into download dataset?
-        let _ = deps.public_bucket_client.download_file_to_disk(
+        let result = deps.public_bucket_client.download_file_to_disk(
             audio_media_file.to_full_object_pathbuf(),
             &file_path
         ).await;
+
+        if let Err(err) = result {
+            error!("could not download sample: {:?}", err);
+            return Err(ProcessSingleJobError::from_anyhow_error(err));
+        }
+
         info!("FilePath to clone voice: {}", file_path.to_string_lossy());
         downloaded_dataset.push(file_path.clone());
     }
@@ -261,11 +270,16 @@ pub async fn process_create_voice(
 
     let inference_start_time = Instant::now();
 
-    // Command line arg for a list of pathes to insert the container
+    // Command line arg for a list of paths to insert the container
     let audio_files = join_paths(downloaded_dataset);
+
+    info!("Files to process: {:?}", audio_files);
 
     // Name of the output file
     let output_file_name = String::from("temp"); // don't use the extension... for the inference since the container will add the extension.
+
+    let stderr_output_file = work_temp_dir.path().join("zero_shot_create_voice_err.txt");
+
     // Run Inference
     let command_exit_status =
         args.job_dependencies.job_type_details.vall_e_x.create_embedding_command.execute_inference(
@@ -273,11 +287,44 @@ pub async fn process_create_voice(
                 output_embedding_path: &workdir,
                 output_embedding_name: output_file_name.clone(),
                 audio_files,
-                stderr_output_file: String::from("zero_shot_create_voice.txt"),
+                stderr_output_file: &stderr_output_file,
             }
         );
 
     let inference_duration = Instant::now().duration_since(inference_start_time);
+
+
+    if !command_exit_status.is_success() {
+        error!("Create Embedding Failed: {:?}", command_exit_status);
+
+        let error = ProcessSingleJobError::Other(anyhow!("CommandExitStatus: {:?}", command_exit_status));
+
+        if let Ok(contents) = read_to_string(&stderr_output_file) {
+            warn!("Captured stderr output: {}", contents);
+
+            // Re-categorize error?
+            //match categorize_error(&contents)  {
+            //    Some(ProcessSingleJobError::FaceDetectionFailure) => {
+            //        warn!("Face not detected in source image");
+            //        error = ProcessSingleJobError::FaceDetectionFailure;
+            //    }
+            //    _ => {}
+            //}
+        }
+
+        //thread::sleep(Duration::from_secs(300));
+
+        // Clean up temp files
+        //safe_delete_temp_file(&audio_path.filesystem_path);
+        //safe_delete_temp_file(&image_path.filesystem_path);
+        //safe_delete_temp_file(&usable_image_path);
+        //safe_delete_temp_file(&output_video_fs_path);
+        //safe_delete_temp_file(&stderr_output_file);
+        //safe_delete_temp_directory(&work_temp_dir);
+
+        return Err(error);
+    }
+
 
     // STEP 4. Download dataset each audio file
     info!("Uploading Media ...");
