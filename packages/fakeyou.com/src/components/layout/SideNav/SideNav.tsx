@@ -22,6 +22,7 @@ import {
 import { WebUrl } from "common/WebUrl";
 import { Logout } from "@storyteller/components/src/api/session/Logout";
 import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
+import { FakeYouFrontendEnvironment } from "@storyteller/components/src/env/FakeYouFrontendEnvironment";
 import { useLocalize } from "hooks";
 
 const DEFAULT_QUEUE_REFRESH_INTERVAL_MILLIS = 15000;
@@ -37,7 +38,9 @@ export default function SideNav(props: SideNavProps) {
   const { t } = useLocalize("SideNav");
   let history = useHistory();
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
+  const fakeYouFrontendEnv =  FakeYouFrontendEnvironment.getInstance();
 
+  const isDevelopmentEnv = fakeYouFrontendEnv.isDevelopment()
   const handleNavLinkClick = () => {
     const wrapper = document.getElementById("wrapper");
 
@@ -267,6 +270,21 @@ export default function SideNav(props: SideNavProps) {
             {t("speechVc")}
           </NavLink>
         </li>
+        {isDevelopmentEnv && (
+        <li>
+          <NavLink
+            to="/voice-designer"
+            activeClassName="active-link"
+            onClick={handleNavLinkClick}
+          >
+            <FontAwesomeIcon
+              icon={faWaveformLines}
+              className="sidebar-heading-icon"
+            />
+            {"Voice Designer"}
+          </NavLink>
+        </li>
+        )}
         <hr className="mb-4 mt-3" />
         <li className="sidebar-heading">{t("videoTitle")}</li>
         <li>
