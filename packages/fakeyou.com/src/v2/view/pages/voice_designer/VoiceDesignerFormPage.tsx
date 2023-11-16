@@ -15,7 +15,6 @@ import { v4 as uuidv4 } from "uuid";
 
 import { useFile } from "hooks";
 
-
 import useVoiceRequests from "./useVoiceRequests";
 
 interface RouteParams {
@@ -24,7 +23,7 @@ interface RouteParams {
 
 function VoiceDesignerFormPage() {
   const history = useHistory();
-  const { datasets, inputCtrl } = useVoiceRequests();
+  const { datasets, inputCtrl, voices } = useVoiceRequests();
   const [language,languageSet] = useState("en");
   const [visibility,visibilitySet] = useState("");
   const [title, titleSet] = useState("");
@@ -106,7 +105,14 @@ function VoiceDesignerFormPage() {
   };
 
   const handleCreateVoice = () => {
-    history.push("/voice-designer");
+    voices.create("",{
+      uuid_idempotency_token: uuidv4(),
+      voice_dataset_token: dataset_token || "",
+    }).then((res: any) => {
+      if (res && res.success) {
+        history.push("/voice-designer");
+      } 
+    });
   };
 
   return (
