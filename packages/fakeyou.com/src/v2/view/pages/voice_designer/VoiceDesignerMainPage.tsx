@@ -42,6 +42,10 @@ function VoiceDesignerMainPage() {
     history.push(`/voice-designer/${type}/${token}/edit`);
   };
 
+  const navToUseVoice = (token: string, type: string) => {
+    history.push(`/voice-designer/voice/${token}`);
+  };
+
   const rowClick =
     (todo: any, type?: string) =>
     ({ target }: { target: any }) => {
@@ -88,6 +92,12 @@ function VoiceDesignerMainPage() {
           small: true,
           variant: "danger",
           onClick: rowClick(voices.delete),
+        },
+        {
+          label: "Use Voice",
+          small: true,
+          variant: "primary",
+          onClick: rowClick(navToUseVoice),
         },
       ],
       name: voice.title,
