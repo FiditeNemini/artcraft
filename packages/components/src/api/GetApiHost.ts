@@ -23,8 +23,6 @@ export default function GetApiHost() {
     case "devproxy.storyteller.ai":
       return hostConfig("api.storyteller.ai");
     case "dev.fakeyou.com":
-      return hostConfig("api.dev.fakeyou.com"); // NB: for dev machines with nginx proxies
-    case "dev.fakeyou.com":
       return hostConfig("api.dev.fakeyou.com:12345",false); // false disables SSL
     default:
       return document.location.host.includes("localhost") ? 
