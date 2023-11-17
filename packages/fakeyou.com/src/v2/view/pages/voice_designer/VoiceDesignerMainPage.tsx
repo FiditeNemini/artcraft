@@ -15,28 +15,43 @@ import useVoiceRequests from "./useVoiceRequests";
 function VoiceDesignerMainPage({ inferenceJobs }: { inferenceJobs: any }) {
   const { pathname } = useLocation();
   const { t } = useLocalize("FaceAnimator");
-  const { datasets, voices } = useVoiceRequests({ requestDatasets: true, requestVoices: true });
-  const [isDeleteVoiceModalOpen, setIsDeleteVoiceModalOpen] = useState(false);
-  const [isDeleteDatasetModalOpen, setIsDeleteDatasetModalOpen] =
-    useState(false);
+  const { datasets, voices } = useVoiceRequests({
+    requestDatasets: true,
+    requestVoices: true,
+  });
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const view = ["/voice-designer/datasets", "/voice-designer/voices"].indexOf(
     pathname
   );
+  const [deleteItem, setDeleteItem] = useState("");
+  const [deleteType, setDeleteType] = useState("");
+  const [deleteText, setDeleteText] = useState({
+    title: "",
+    text: "",
+  });
 
-  // const openDeleteVoiceModal = () => {
-  //   setIsDeleteVoiceModalOpen(true);
-  // };
-
-  const closeDeleteVoiceModal = () => {
-    setIsDeleteVoiceModalOpen(false);
+  const openDeleteModal = (token: string, type: string) => {
+    setDeleteItem(token);
+    setDeleteType(type);
+    setDeleteText({
+      title: `Delete ${type}`,
+      text: `Are you sure you want to delete this ${type}?`,
+    });
+    setIsDeleteModalOpen(true);
   };
 
-  // const openDeleteDatasetModal = () => {
-  //   setIsDeleteDatasetModalOpen(true);
-  // };
+  const handleDelete = () => {
+    if (deleteType === "voice") {
+      voices.delete(deleteItem);
+    } else if (deleteType === "dataset") datasets.delete(deleteItem);
+    setDeleteItem("");
+    setDeleteType("");
+  };
 
-  const closeDeleteDatasetModal = () => {
-    setIsDeleteDatasetModalOpen(false);
+  const closeDeleteModal = () => {
+    setIsDeleteModalOpen(false);
+    setDeleteItem("");
+    setDeleteType("");
   };
 
   const history = useHistory();
@@ -52,15 +67,16 @@ function VoiceDesignerMainPage({ inferenceJobs }: { inferenceJobs: any }) {
   const voiceClick =
     (todo: any, type: string) =>
     ({ target }: { target: any }) => {
-      let voiceToken = voices.list[target.name.split(",")[0].split(":")[1]].voice_token;
+      let voiceToken =
+        voices.list[target.name.split(",")[0].split(":")[1]].voice_token;
       todo(voiceToken, type);
     };
-
 
   const datasetClick =
     (todo: any, type: string) =>
     ({ target }: { target: any }) => {
-      let datasetToken = datasets.list[target.name.split(",")[0].split(":")[1]].dataset_token;
+      let datasetToken =
+        datasets.list[target.name.split(",")[0].split(":")[1]].dataset_token;
       todo(datasetToken, type);
     };
 
@@ -79,7 +95,7 @@ function VoiceDesignerMainPage({ inferenceJobs }: { inferenceJobs: any }) {
           label: "Delete",
           small: true,
           variant: "danger",
-          onClick: datasetClick(datasets.delete, "dataset"),
+          onClick: datasetClick(openDeleteModal, "dataset"),
         },
       ],
       name: dataset.title,
@@ -101,7 +117,7 @@ function VoiceDesignerMainPage({ inferenceJobs }: { inferenceJobs: any }) {
           label: "Delete",
           small: true,
           variant: "danger",
-          onClick: voiceClick(voices.delete, "voice"),
+          onClick: voiceClick(openDeleteModal, "voice"),
         },
         {
           label: "Use Voice",
@@ -131,7 +147,8 @@ function VoiceDesignerMainPage({ inferenceJobs }: { inferenceJobs: any }) {
           panel={false}
           imageUrl="/images/header/voice-designer.png"
         />
-        <InferenceJobsList {...{ t, inferenceJobs }}/>
+
+        <InferenceJobsList {...{ t, inferenceJobs }} />
         <Panel mb={true}>
           <nav>
             <ul className="nav nav-tabs">
@@ -164,31 +181,13 @@ function VoiceDesignerMainPage({ inferenceJobs }: { inferenceJobs: any }) {
         </Panel>
       </Container>
 
-      {/* Delete Voice Modal */}
+      {/* Delete Modal */}
       <Modal
-        show={isDeleteVoiceModalOpen}
-        handleClose={closeDeleteVoiceModal}
-        title="Delete Voice"
-        content={
-          <p>
-            Are you sure you want to delete "[Voice Name]"?
-            <br />
-            This cannot be undone.
-          </p>
-        }
-      />
-      {/* Delete Dataset Modal */}
-      <Modal
-        show={isDeleteDatasetModalOpen}
-        handleClose={closeDeleteDatasetModal}
-        title="Delete Dataset"
-        content={
-          <p>
-            Are you sure you want to delete "[Dataset Name]"?
-            <br />
-            This cannot be undone.
-          </p>
-        }
+        show={isDeleteModalOpen}
+        handleClose={closeDeleteModal}
+        title={deleteText.title}
+        content={<p>{deleteText.text}</p>}
+        onConfirm={handleDelete}
       />
     </>
   );
