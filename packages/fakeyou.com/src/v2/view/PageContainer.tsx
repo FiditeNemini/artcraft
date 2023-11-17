@@ -677,7 +677,7 @@ class PageContainer extends React.Component<
             </Route>
 
             <Route path="/voice-designer">
-              <VoiceDesignerMainPage />
+              <VoiceDesignerMainPage {...{ inferenceJobs: this.props.inferenceJobs }} />
             </Route>
 
             <Route path="/generate-speech">
