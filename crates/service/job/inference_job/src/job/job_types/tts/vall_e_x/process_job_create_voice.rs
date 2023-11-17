@@ -1,12 +1,13 @@
 use std::fs::read_to_string;
 use std::path::PathBuf;
-use std::thread;
-use std::time::{Duration, Instant};
+use std::time::Instant;
 
 use anyhow::anyhow;
 use log::{error, info, warn};
 
 use buckets::public::media_files::original_file::MediaFileBucketPath;
+use buckets::public::zs_voices::directory::{ModelCategory, ModelType};
+use buckets::public::zs_voices::file::ZeroShotVoiceEmbeddingBucketPath;
 use cloud_storage::bucket_client::BucketClient;
 use cloud_storage::bucket_path_unifier::BucketPathUnifier;
 use enums::by_table::generic_inference_jobs::inference_result_type::InferenceResultType;
@@ -20,7 +21,6 @@ use mysql_queries::queries::voice_designer::voice_samples::list_dataset_samples_
 use mysql_queries::queries::voice_designer::voice_samples::list_dataset_samples_for_dataset_token::list_dataset_samples_for_dataset_token;
 use mysql_queries::queries::voice_designer::voices::create_voice::create_voice;
 use mysql_queries::queries::voice_designer::voices::create_voice::CreateVoiceArgs;
-use tokens::tokens::media_files::MediaFileToken;
 use tokens::tokens::users::UserToken;
 
 use crate::job;
@@ -32,6 +32,9 @@ use crate::job::job_types::tts::vall_e_x::process_job::VALLEXProcessJobArgs;
 const BUCKET_FILE_PREFIX_CREATE: &str = "fakeyou_";
 const BUCKET_FILE_EXTENSION_CREATE: &str = ".bin";
 const MIME_TYPE_CREATE: &str = "application/x-binary";
+
+/// We'll increment this if we change the underlying Vall-E code in an incompatible way.
+const CURRENT_VALLE_MODEL_VERSION: u64 = 0;
 
 pub async fn process_create_voice(
   args: VALLEXProcessJobArgs<'_>,
@@ -244,19 +247,22 @@ pub async fn process_create_voice(
     return Err(error);
   }
 
-  info!("Success; waiting...");
-  thread::sleep(Duration::from_secs(300));
+  info!("Inference success!");
+
+  //info!("Success; waiting...");
+  //thread::sleep(Duration::from_secs(300));
 
 
   // STEP 4. Download dataset each audio file
   info!("Uploading Media ...");
 
-  let result_bucket_location: MediaFileBucketPath = MediaFileBucketPath::generate_new(
-    Some(BUCKET_FILE_PREFIX_CREATE),
-    Some(BUCKET_FILE_EXTENSION_CREATE)
+  let embedding_bucket_location = ZeroShotVoiceEmbeddingBucketPath::generate_new(
+    ModelCategory::Tts,
+    ModelType::VallEx,
+    CURRENT_VALLE_MODEL_VERSION
   );
 
-  let result_bucket_object_pathbuf = result_bucket_location.to_full_object_pathbuf();
+  let embedding_bucket_object_pathbuf = embedding_bucket_location.to_full_object_pathbuf();
 
   // Get Finished File
   let mut finished_file = work_temp_dir.path().to_path_buf();
@@ -264,12 +270,12 @@ pub async fn process_create_voice(
   let output_bucket_file_name = String::from("temp.npz"); // use extension for bucket upload.
   finished_file.push(&output_bucket_file_name);
 
-  info!("Upload Bucket Path: {:?}", result_bucket_object_pathbuf);
   info!("Upload File Path: {:?}", finished_file);
+  info!("Upload Bucket Path: {:?}", embedding_bucket_object_pathbuf);
 
   args.job_dependencies.private_bucket_client
       .upload_filename_with_content_type(
-        &result_bucket_object_pathbuf,
+        &embedding_bucket_object_pathbuf,
         &finished_file,
         &MIME_TYPE_CREATE
       )
@@ -278,7 +284,6 @@ pub async fn process_create_voice(
 
   // CLEARIFY! these items
   // 1.Should this be object hash?
-  let bucket_hash = result_bucket_location.get_object_hash().clone();
   // 2.As well as this what should the voice name be?
   let voice_name = single_dataset.title;
 
@@ -287,30 +292,24 @@ pub async fn process_create_voice(
     dataset_token: &voice_dataset_token,
     model_category: ZsVoiceModelCategory::Tts,
     model_type: ZsVoiceModelType::VallEX,
-    model_version: 0,
+    model_version: CURRENT_VALLE_MODEL_VERSION,
     model_encoding_type: ZsVoiceEncodingType::Encodec,
     voice_title: &voice_name,
-    bucket_hash,
+    bucket_hash: embedding_bucket_location.get_object_hash().clone(),
     maybe_creator_user_token: Some(&creator_user_token),
     creator_ip_address: &creator_ip_address,
     creator_set_visibility: Visibility::Public,
     mysql_pool,
-  }).await;
+  }).await
+      .map_err(|e| ProcessSingleJobError::Other(e))?;
 
-  let media_file_token = MediaFileToken::generate();
-
-  match voice_token {
-    Ok(_value) => {
-      Ok(JobSuccessResult {
-        maybe_result_entity: Some(ResultEntity {
-          entity_type: InferenceResultType::MediaFile,
-          entity_token: media_file_token.to_string(),
-        }),
-        inference_duration,
-      })
-    }
-    Err(e) => { Err(ProcessSingleJobError::Other(e)) }
-  }
+  Ok(JobSuccessResult {
+    maybe_result_entity: Some(ResultEntity {
+      entity_type: InferenceResultType::ZeroShotVoiceEmbedding,
+      entity_token: voice_token.to_string(),
+    }),
+    inference_duration,
+  })
 }
 
 pub struct AudioFile {

@@ -3,23 +3,10 @@ use std::path::PathBuf;
 use crockford::crockford_entropy_lower;
 
 use crate::private::private_path::PrivatePath;
-use crate::public::zs_voices::directory::{ModelCategory, ZeroShotVoiceEmbeddingBucketDirectory};
+use crate::public::zs_voices::directory::{ModelCategory, ModelType, ZeroShotVoiceEmbeddingBucketDirectory};
 
 // TODO: Generate these from a macro.
 
-
-#[derive(Debug, Clone, Copy, Eq, PartialEq)]
-pub enum ModelType {
-  VallEx,
-}
-
-impl ModelType {
-  pub fn to_str(&self) -> &'static str {
-    match self {
-      ModelType::VallEx => "vallex",
-    }
-  }
-}
 
 /// The original user upload file.
 /// It may have derivative files (down samples, crops, etc.) that live alongside it.
@@ -32,21 +19,21 @@ pub struct ZeroShotVoiceEmbeddingBucketPath {
 
   model_category: ModelCategory,
   model_type: ModelType,
-  model_version: u32,
+  model_version: u64,
 }
 
 impl PrivatePath for ZeroShotVoiceEmbeddingBucketPath {}
 
 impl ZeroShotVoiceEmbeddingBucketPath {
 
-  pub fn generate_new(model_category: ModelCategory, model_type: ModelType, model_version: u32) -> Self {
+  pub fn generate_new(model_category: ModelCategory, model_type: ModelType, model_version: u64) -> Self {
     let entropy = crockford_entropy_lower(32);
     Self::from_object_hash(&entropy, model_category, model_type, model_version)
   }
 
-  pub fn from_object_hash(hash: &str, model_category: ModelCategory, model_type: ModelType, model_version: u32) -> Self {
+  pub fn from_object_hash(hash: &str, model_category: ModelCategory, model_type: ModelType, model_version: u64) -> Self {
     // TODO: Path construction could be cleaner.
-    let directory = ZeroShotVoiceEmbeddingBucketDirectory::from_object_hash(model_category, hash);
+    let directory = ZeroShotVoiceEmbeddingBucketDirectory::from_object_hash(model_category, model_type, hash);
 
     let filename = format!("{}_{}_{}", model_type.to_str(), hash, model_version);
 
@@ -104,7 +91,7 @@ mod tests {
     #[test]
     pub fn get_full_object_path_str() {
       let file = ZeroShotVoiceEmbeddingBucketPath::from_object_hash("abcdefghijk", ModelCategory::Tts, ModelType::VallEx, 0);
-      assert_eq!(file.get_full_object_path_str(), "/user/zero_shot_embeddings/tts/a/b/c/d/e/abcdefghijk/vallex_abcdefghijk_0");
+      assert_eq!(file.get_full_object_path_str(), "/user/zs_embeddings/tts/vallex/a/b/c/d/e/abcdefghijk/vallex_abcdefghijk_0");
       assert_eq!(file.get_basename(), "vallex_abcdefghijk_0");
     }
   }
@@ -112,6 +99,7 @@ mod tests {
   mod without_prefix_and_extension {
     use crate::public::zs_voices::directory::ModelCategory;
     use crate::public::zs_voices::file::{ModelType, ZeroShotVoiceEmbeddingBucketPath};
+
     use super::*;
 
     #[test]
@@ -124,16 +112,16 @@ mod tests {
     #[test]
     pub fn from_object_hash_tts_vallex_version() {
       let file = ZeroShotVoiceEmbeddingBucketPath::from_object_hash("abcdefghijk", ModelCategory::Tts, ModelType::VallEx, 123);
-      assert_eq!(file.get_full_object_path_str(), "/user/zero_shot_embeddings/tts/a/b/c/d/e/abcdefghijk/vallex_abcdefghijk_123");
-      assert_eq!(file.to_full_object_pathbuf(), PathBuf::from("/user/zero_shot_embeddings/tts/a/b/c/d/e/abcdefghijk/vallex_abcdefghijk_123"));
+      assert_eq!(file.get_full_object_path_str(), "/user/zs_embeddings/tts/vallex/a/b/c/d/e/abcdefghijk/vallex_abcdefghijk_123");
+      assert_eq!(file.to_full_object_pathbuf(), PathBuf::from("/user/zs_embeddings/tts/vallex/a/b/c/d/e/abcdefghijk/vallex_abcdefghijk_123"));
       assert_eq!(file.get_basename(), "vallex_abcdefghijk_123");
     }
 
     #[test]
     pub fn from_object_hash_vc_vallex_version() {
       let file = ZeroShotVoiceEmbeddingBucketPath::from_object_hash("abcdefghijk", ModelCategory::Vc, ModelType::VallEx, 0);
-      assert_eq!(file.get_full_object_path_str(), "/user/zero_shot_embeddings/vc/a/b/c/d/e/abcdefghijk/vallex_abcdefghijk_0");
-      assert_eq!(file.to_full_object_pathbuf(), PathBuf::from("/user/zero_shot_embeddings/vc/a/b/c/d/e/abcdefghijk/vallex_abcdefghijk_0"));
+      assert_eq!(file.get_full_object_path_str(), "/user/zs_embeddings/vc/vallex/a/b/c/d/e/abcdefghijk/vallex_abcdefghijk_0");
+      assert_eq!(file.to_full_object_pathbuf(), PathBuf::from("/user/zs_embeddings/vc/vallex/a/b/c/d/e/abcdefghijk/vallex_abcdefghijk_0"));
       assert_eq!(file.get_basename(), "vallex_abcdefghijk_0");
     }
 

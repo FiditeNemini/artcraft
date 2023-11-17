@@ -26,6 +26,9 @@ pub enum InferenceResultType {
 
   #[serde(rename = "voice_conversion")]
   VoiceConversion,
+
+  #[serde(rename = "zs_voice_embedding")]
+  ZeroShotVoiceEmbedding,
 }
 
 // TODO(bt, 2022-12-21): This desperately needs MySQL integration tests!
@@ -39,6 +42,7 @@ impl InferenceResultType {
       Self::MediaFile => "media_file",
       Self::TextToSpeech => "text_to_speech",
       Self::VoiceConversion => "voice_conversion",
+      Self::ZeroShotVoiceEmbedding => "zs_voice_embedding",
     }
   }
 
@@ -47,6 +51,7 @@ impl InferenceResultType {
       "media_file" => Ok(Self::MediaFile),
       "text_to_speech" => Ok(Self::TextToSpeech),
       "voice_conversion" => Ok(Self::VoiceConversion),
+      "zs_voice_embedding" => Ok(Self::ZeroShotVoiceEmbedding),
       _ => Err(format!("invalid value: {:?}", value)),
     }
   }
@@ -58,6 +63,7 @@ impl InferenceResultType {
       InferenceResultType::MediaFile,
       InferenceResultType::TextToSpeech,
       InferenceResultType::VoiceConversion,
+      InferenceResultType::ZeroShotVoiceEmbedding,
     ])
   }
 }
@@ -72,6 +78,7 @@ mod tests {
     assert_serialization(InferenceResultType::MediaFile, "media_file");
     assert_serialization(InferenceResultType::TextToSpeech, "text_to_speech");
     assert_serialization(InferenceResultType::VoiceConversion, "voice_conversion");
+    assert_serialization(InferenceResultType::ZeroShotVoiceEmbedding, "zs_voice_embedding");
   }
 
   #[test]
@@ -79,6 +86,7 @@ mod tests {
     assert_eq!(InferenceResultType::MediaFile.to_str(), "media_file");
     assert_eq!(InferenceResultType::TextToSpeech.to_str(), "text_to_speech");
     assert_eq!(InferenceResultType::VoiceConversion.to_str(), "voice_conversion");
+    assert_eq!(InferenceResultType::ZeroShotVoiceEmbedding.to_str(), "zs_voice_embedding");
   }
 
   #[test]
@@ -86,16 +94,18 @@ mod tests {
     assert_eq!(InferenceResultType::from_str("media_file").unwrap(), InferenceResultType::MediaFile);
     assert_eq!(InferenceResultType::from_str("text_to_speech").unwrap(), InferenceResultType::TextToSpeech);
     assert_eq!(InferenceResultType::from_str("voice_conversion").unwrap(), InferenceResultType::VoiceConversion);
+    assert_eq!(InferenceResultType::from_str("zs_voice_embedding").unwrap(), InferenceResultType::ZeroShotVoiceEmbedding);
   }
 
   #[test]
   fn all_variants() {
     // Static check
     let mut variants = InferenceResultType::all_variants();
-    assert_eq!(variants.len(), 3);
+    assert_eq!(variants.len(), 4);
     assert_eq!(variants.pop_first(), Some(InferenceResultType::MediaFile));
     assert_eq!(variants.pop_first(), Some(InferenceResultType::TextToSpeech));
     assert_eq!(variants.pop_first(), Some(InferenceResultType::VoiceConversion));
+    assert_eq!(variants.pop_first(), Some(InferenceResultType::ZeroShotVoiceEmbedding));
     assert_eq!(variants.pop_first(), None);
 
     // Generated check
