@@ -12,6 +12,7 @@ import {
   faSignOutAlt,
   faBook,
   faStar,
+  faWandMagicSparkles
 } from "@fortawesome/free-solid-svg-icons";
 import { faDiscord } from "@fortawesome/free-brands-svg-icons";
 import { Logout } from "@storyteller/components/src/api/session/Logout";
@@ -242,6 +243,15 @@ function TopNav(props: Props) {
                           className="me-2"
                         />
                         {t("productVc")}
+                      </Link>
+                    </li>
+                    <li data-bs-toggle="offcanvas">
+                      <Link className="dropdown-item" to="/voice-designer">
+                        <FontAwesomeIcon
+                          icon={faWandMagicSparkles}
+                          className="me-2"
+                        />
+                        Voice Designer
                       </Link>
                     </li>
                     <li data-bs-toggle="offcanvas">

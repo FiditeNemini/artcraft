@@ -10,6 +10,7 @@ import {
   faDiscord,
   faTwitter,
   faTiktok,
+
 } from "@fortawesome/free-brands-svg-icons";
 import { ThirdPartyLinks } from "@storyteller/components/src/constants/ThirdPartyLinks";
 import {
@@ -211,6 +212,10 @@ function FooterNav(props: Props) {
 
               <li>
                 <Link to="/voice-conversion">{t("productVc")}</Link>
+              </li>
+
+              <li>
+                <Link to="/voice-designer">Voice Designer</Link>
               </li>
 
               <li>
