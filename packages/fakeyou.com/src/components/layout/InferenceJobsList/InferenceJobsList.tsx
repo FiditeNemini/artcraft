@@ -21,7 +21,7 @@ const DEFAULT_QUEUE_REFRESH_INTERVAL_MILLIS = 15000;
 export default function InferenceJobsList({ t, inferenceJobs }: { t: any, inferenceJobs?: any }) {
   // const { inferenceJobs = [] } = useInferenceJobs({ type: 0 });
   // const oldJobs = thejobs || inferenceJobs;
-  // console.log("😎",inferenceJobs);
+  console.log("😎",inferenceJobs);
   const [pending, pendingSet] = useState<GetPendingTtsJobCountSuccessResponse>({
     success: true,
     pending_job_count: 0,
