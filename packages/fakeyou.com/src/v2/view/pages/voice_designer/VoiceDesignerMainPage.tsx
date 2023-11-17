@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from "react";
-import { useHistory, useLocation } from "react-router-dom";
+import React, { useState } from "react";
+import { Redirect, useHistory, useLocation } from "react-router-dom";
 import { faPlus, faWaveform } from "@fortawesome/pro-solid-svg-icons";
 import InferenceJobsList from "components/layout/InferenceJobsList";
 import { useLocalize } from "hooks";
@@ -40,6 +40,12 @@ function VoiceDesignerMainPage({
     text: "",
   });
 
+  const history = useHistory();
+
+  if (pathname === "/voice-designer" || pathname === "/voice-designer/") {
+    return <Redirect to="/voice-designer/voices" />;
+  }
+
   const openDeleteModal = (token: string, type: string) => {
     setDeleteItem(token);
     setDeleteType(type);
@@ -61,8 +67,6 @@ function VoiceDesignerMainPage({
   const closeDeleteModal = () => {
     setIsDeleteModalOpen(false);
   };
-
-  const history = useHistory();
 
   const navToEdit = (token: string, type: string) => {
     history.push(`/voice-designer/${type}/${token}/edit`);
