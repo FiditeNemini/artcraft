@@ -13,14 +13,13 @@ use log::warn;
 
 use enums::by_table::favorites::favorite_entity_type::FavoriteEntityType;
 use mysql_queries::queries::favorites::favorite_entity_token::FavoriteEntityToken;
-use mysql_queries::queries::favorites::insert_favorite::{insert_favorite, InsertFavoriteArgs};
+use mysql_queries::queries::favorites::create_favorite::{create_favorite, CreateFavoriteArgs};
 use tokens::tokens::favorites::FavoriteToken;
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::server_state::ServerState;
 
 #[derive(Deserialize)]
 pub struct CreateFavoriteRequest {
-  uuid_idempotency_token: String,
   entity_token: String,
   entity_type: FavoriteEntityType,
 }
@@ -99,9 +98,8 @@ pub async fn create_favorite_handler(
   let entity_token = FavoriteEntityToken::from_entity_type_and_token(
     request.entity_type, &request.entity_token);
 
-  let query_result = insert_favorite(InsertFavoriteArgs {
+  let query_result = create_favorite(CreateFavoriteArgs {
     entity_token: &entity_token,
-    uuid_idempotency_token: &request.uuid_idempotency_token,
     user_token: &user_session.user_token_typed,
     mysql_executor: &mut mysql_connection,
     phantom: Default::default(),

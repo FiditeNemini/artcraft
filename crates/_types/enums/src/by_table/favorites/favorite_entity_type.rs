@@ -32,6 +32,14 @@ pub enum FavoriteEntityType {
     /// MediaFile
     #[serde(rename = "media_file")]
     MediaFile,
+
+    /// VoiceConversionModel
+    #[serde(rename = "voice_conversion_model")]
+    VoiceConversionModel,
+
+    /// ZsVoice
+    #[serde(rename = "zs_voice")]
+    ZsVoice,
 }
 
 // TODO(bt, 2023-01-17): This desperately needs MySQL integration tests!
@@ -48,6 +56,8 @@ impl FavoriteEntityType {
             Self::W2lTemplate => "w2l_template",
             Self::W2lResult => "w2l_result",
             Self::MediaFile => "media_file",
+            Self::VoiceConversionModel => "voice_conversion_model",
+            Self::ZsVoice => "zs_voice",
         }
     }
 
@@ -59,6 +69,8 @@ impl FavoriteEntityType {
             "w2l_template" => Ok(Self::W2lTemplate),
             "w2l_result" => Ok(Self::W2lResult),
             "media_file" => Ok(Self::MediaFile),
+            "voice_conversion_model" => Ok(Self::VoiceConversionModel),
+            "zs_voice" => Ok(Self::ZsVoice),
             _ => Err(format!("invalid value: {:?}", value)),
         }
     }
@@ -80,6 +92,8 @@ mod tests {
             assert_serialization(FavoriteEntityType::W2lTemplate, "w2l_template");
             assert_serialization(FavoriteEntityType::W2lResult, "w2l_result");
             assert_serialization(FavoriteEntityType::MediaFile, "media_file");
+            assert_serialization(FavoriteEntityType::VoiceConversionModel, "voice_conversion_model");
+            assert_serialization(FavoriteEntityType::ZsVoice, "zs_voice");
         }
     }
 
@@ -94,6 +108,8 @@ mod tests {
             assert_eq!(FavoriteEntityType::W2lTemplate.to_str(), "w2l_template");
             assert_eq!(FavoriteEntityType::W2lResult.to_str(), "w2l_result");
             assert_eq!(FavoriteEntityType::MediaFile.to_str(), "media_file");
+            assert_eq!(FavoriteEntityType::VoiceConversionModel.to_str(), "voice_conversion_model");
+            assert_eq!(FavoriteEntityType::ZsVoice.to_str(), "zs_voice");
         }
 
         #[test]
@@ -104,6 +120,8 @@ mod tests {
             assert_eq!(FavoriteEntityType::from_str("w2l_template").unwrap(), FavoriteEntityType::W2lTemplate);
             assert_eq!(FavoriteEntityType::from_str("w2l_result").unwrap(), FavoriteEntityType::W2lResult);
             assert_eq!(FavoriteEntityType::from_str("media_file").unwrap(), FavoriteEntityType::MediaFile);
+            assert_eq!(FavoriteEntityType::from_str("voice_conversion_model").unwrap(), FavoriteEntityType::VoiceConversionModel);
+            assert_eq!(FavoriteEntityType::from_str("zs_voice").unwrap(), FavoriteEntityType::ZsVoice);
             assert!(FavoriteEntityType::from_str("foo").is_err());
         }
     }

@@ -9,12 +9,10 @@ use tokens::tokens::users::UserToken;
 
 use crate::queries::favorites::favorite_entity_token::FavoriteEntityToken;
 
-pub struct InsertFavoriteArgs<'e, 'c, E>
+pub struct CreateFavoriteArgs<'e, 'c, E>
   where E: 'e + Executor<'c, Database = MySql>
 {
   pub entity_token: &'e FavoriteEntityToken,
-
-  pub uuid_idempotency_token: &'e str,
 
   pub user_token: &'e UserToken,
 
@@ -25,10 +23,10 @@ pub struct InsertFavoriteArgs<'e, 'c, E>
   pub phantom: PhantomData<&'c E>,
 }
 
-pub async fn insert_favorite<'e, 'c : 'e, E>(
-  args: InsertFavoriteArgs<'e, 'c, E>,
+pub async fn create_favorite<'e, 'c : 'e, E>(
+    args: CreateFavoriteArgs<'e, 'c, E>,
 )
-  -> AnyhowResult<FavoriteToken>
+    -> AnyhowResult<FavoriteToken>
   where E: 'e + Executor<'c, Database = MySql>
 {
 
@@ -40,13 +38,15 @@ pub async fn insert_favorite<'e, 'c : 'e, E>(
 INSERT INTO favorites
 SET
   token = ?,
-  uuid_idempotency_token = ?,
   user_token = ?,
   entity_type = ?,
   entity_token = ?
+
+ON DUPLICATE KEY UPDATE
+  user_deleted_at = NULL,
+  version = version + 1
         "#,
       &favorite_token,
-      args.uuid_idempotency_token,
       args.user_token,
       entity_type,
       entity_token,

@@ -12,10 +12,6 @@ CREATE TABLE favorites
     -- Effective "primary key" (PUBLIC)
     token                   VARCHAR(32) NOT NULL,
 
-    -- Idempotency token from client
-    -- This is so the frontend client doesn't submit duplicate items.
-    uuid_idempotency_token  VARCHAR(36) NOT NULL,
-
     -- User making the favorite
     user_token              VARCHAR(32) NOT NULL,
 
@@ -43,7 +39,6 @@ CREATE TABLE favorites
     -- INDICES --
     PRIMARY KEY (id),
     UNIQUE KEY (token),
-    UNIQUE KEY (uuid_idempotency_token),
     KEY index_entity_type_entity_token (entity_type, entity_token),
     KEY index_user_token (user_token),
     KEY index_created_at (created_at),
