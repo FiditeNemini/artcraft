@@ -122,20 +122,14 @@ pub async fn process_create_voice(
   for (index, record) in dataset.iter().enumerate() {
     //https://storage.googleapis.com/dev-vocodes-public/media/5/3/3/w/8/533w8zs0fy11nv7gkcna7p7vt03h8nda/dev_zs_533w8zs0fy11nv7gkcna7p7vt03h8nda.bin <-- where the file actually is
 
-    let prefix: Option<&str> = Some(&temp_prefix); // record.maybe_public_bucket_prefix.as_ref().map(|s| s.as_str());
-    let extension: Option<&str> = Some(&temp_extension); //record.maybe_public_bucket_extension
-    // .as_ref()
-    // .map(|s| s.as_str());
-    // naming
-    //[2023-10-23T01:26:46Z INFO  inference_job::job::job_types::tts::vall_e_x::process_job] Upload Bucket Path: /media/9/j/6/g/c/9j6gcd3ngb70ybpsq1rv4tw3gk97ds3t/fakeyou_9j6gcd3ngb70ybpsq1rv4tw3gk97ds3t.npz
-    //[2023-10-23T01:26:46Z INFO  inference_job::job::job_types::tts::vall_e_x::process_job] Upload File Path: /tmp/temp_zeroshot_create_voice_11.1BLk16qTwhuo/temp.npz
+    let prefix: Option<&str> = record.maybe_public_bucket_prefix.as_ref().map(|s| s.as_str());
+    let extension: Option<&str> = record.maybe_public_bucket_extension.as_ref().map(|s| s.as_str());
 
-    info!(
-            "Record=> hash:{} prefix:{:?} extension:{:?}",
-            record.public_bucket_directory_hash,
-            prefix,
-            extension
-        );
+    info!("Record=> hash:{} prefix:{:?} extension:{:?}",
+      record.public_bucket_directory_hash,
+      prefix,
+      extension
+    );
 
     let audio_media_file = MediaFileBucketPath::from_object_hash(
       &record.public_bucket_directory_hash,
@@ -143,12 +137,10 @@ pub async fn process_create_voice(
       extension
     );
 
-    info!(
-            "Download using audio_media_file_path: {}",
-            audio_media_file.to_full_object_pathbuf().to_string_lossy()
-        );
+    info!("Download using audio_media_file_path: {:?}", audio_media_file.to_full_object_pathbuf());
 
     let file_name_wav = format!("{}.wav", index);
+
     let mut file_path = PathBuf::new();
     file_path.push(workdir.clone());
     file_path.push(file_path.clone());

@@ -17,6 +17,7 @@ use http_server_common::request::get_request_ip::get_request_ip;
 use http_server_common::response::serialize_as_json_error::serialize_as_json_error;
 use media::decode_basic_audio_info::decode_basic_audio_bytes_info;
 use mimetypes::mimetype_for_bytes::get_mimetype_for_bytes;
+use mimetypes::mimetype_to_extension::mimetype_to_extension;
 use mysql_queries::queries::media_uploads::insert_media_upload::insert_media_upload;
 use mysql_queries::queries::voice_designer::voice_samples::get_dataset_sample_by_uuid::get_dataset_sample_by_uuid_with_connection;
 use mysql_queries::queries::voice_designer::voice_samples::insert_dataset_sample_and_media_file::{InsertDatasetSampleAndMediaFileArgs, insert_dataset_sample_and_media_file};
@@ -173,6 +174,10 @@ pub async fn upload_sample_handler(
 
   let ip_address = get_request_ip(&http_request);
 
+  let maybe_avt_token = server_state
+      .avt_cookie_manager
+      .get_avt_token_from_request(&http_request);
+
   let maybe_user_token = maybe_user_session
       .map(|session| session.get_strongly_typed_user_token());
 
@@ -311,7 +316,15 @@ pub async fn upload_sample_handler(
     },
   };
 
-  let public_upload_path = MediaFileBucketPath::generate_new(Some("sample_"), Some(".bin"));
+  let file_prefix = "sample_";
+
+  let file_extension = mimetype_to_extension(mime_type).unwrap_or("bin");
+  let file_extension = format!(".{file_extension}");
+
+  let public_upload_path = MediaFileBucketPath::generate_new(
+    Some(&file_prefix),
+    Some(&file_extension)
+  );
 
   info!("Uploading media to bucket path: {}", public_upload_path.get_full_object_path_str());
 
@@ -330,19 +343,18 @@ pub async fn upload_sample_handler(
     media_type: media_upload_type,
     origin_category: media_file_origin,
     dataset_token: &dataset_token,
-    //maybe_original_filename: upload_media_request.file_name.as_deref(),
-    //original_file_size_bytes: file_size_bytes as u64,
     //maybe_original_duration_millis: maybe_duration_millis,
-    //maybe_original_mime_type: maybe_mimetype,
+    maybe_mime_type: maybe_mimetype,
+    file_size_bytes: file_size_bytes as u64,
+    maybe_original_filename: upload_sample_request.file_name.as_deref(),
     //maybe_original_audio_encoding: maybe_codec_name.as_deref(),
-    //maybe_original_video_encoding: None,
-    //maybe_original_frame_width: None, // TODO
-    //maybe_original_frame_height: None, // TODO
     checksum_sha2: &hash,
     media_file_path: &public_upload_path,
+    maybe_public_bucket_prefix: Some(&file_prefix),
+    maybe_public_bucket_extension: Some(&file_extension),
     //maybe_extra_file_modification_info: None,
     maybe_creator_user_token: maybe_user_token.as_ref(),
-    maybe_creator_anonymous_visitor_token: None,
+    maybe_creator_anonymous_visitor_token: maybe_avt_token.as_ref(),
     creator_ip_address: &ip_address,
     creator_set_visibility,
     mysql_pool: &server_state.mysql_pool,
