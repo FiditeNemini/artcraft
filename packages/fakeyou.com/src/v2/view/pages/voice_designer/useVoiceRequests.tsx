@@ -9,6 +9,7 @@ import {
   DeleteVoice, 
   // DeleteVoiceRequest, use me somewhere pls
   DeleteVoiceResponse } from "@storyteller/components/src/api/voice_designer/voices/DeleteVoice";
+  import { UpdateVoice } from "@storyteller/components/src/api/voice_designer/voices/UpdateVoice";
 
 // dataset imports
 
@@ -38,13 +39,13 @@ export default function useVoiceRequests() {
 
   const createDataset = (urlRouteArgs: string, request: CreateDatasetRequest): Promise<CreateDatasetResponse> =>
     CreateDataset(urlRouteArgs, request).then(res => {
-      refreshData();
+      // refreshData(); // not needed because creating a dataset navigates to the upload page with no lists
       return res;
     });
 
 
   const createVoice = (urlRouteArgs: string, request: CreateVoiceRequest): Promise<CreateVoiceResponse> => CreateVoice(urlRouteArgs, request).then(res => {
-    refreshData();
+    // refreshData(); // not needed because creating a voice navigates to a new page with a new instance of useVoiceRequest 
     return res;
   });
 
@@ -79,6 +80,17 @@ export default function useVoiceRequests() {
     });
   };
 
+  const languages = [
+    { value: "en", label: "English" },
+    { value: "es", label: "Spanish" },
+    { value: "fr", label: "French" },
+  ];
+
+  const visibilityOptions = [
+    { label: "Public", value: "public" },
+    { label: "Hidden", value: "hidden" },
+  ];
+
 	useEffect(() => {
     if (user && user.username) {
       if (!fetchedDatasets) {
@@ -109,12 +121,15 @@ export default function useVoiceRequests() {
     inference: {
       enqueue: EnqueueTts,
     },
+    languages,
+    visibilityOptions,
     voices: {
       create: createVoice,
       delete: deleteVoice,
       get: GetVoice,
       list: voices,
-      refresh: refreshData
+      refresh: refreshData,
+      update: UpdateVoice,
     },
     inputCtrl:
       (todo: any) =>

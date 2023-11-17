@@ -1,4 +1,5 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
 import {
   faEye,
   faLanguage,
@@ -8,18 +9,48 @@ import { usePrefixedDocumentTitle } from "common/UsePrefixedDocumentTitle";
 import Panel from "components/common/Panel";
 import PageHeader from "components/layout/PageHeader";
 import Container from "components/common/Container";
-import Input from "components/common/Input";
-import Select from "components/common/Select";
-import { Button } from "components/common";
+import TempInput from "components/common/TempInput";
+import { Button, TempSelect } from "components/common";
+import useVoiceRequests from "./useVoiceRequests";
+import { useHistory } from "react-router-dom";
 
 function VoiceDesignerVoiceEditPage() {
+  const [language, languageSet] = useState("en");
+  const [visibility, visibilitySet] = useState("");
+  const [title, titleSet] = useState("");
+
+  const [fetched,fetchedSet] = useState(false);
+
+  const history = useHistory();
+  const { voice_token } = useParams();
+
+  const { inputCtrl, languages, visibilityOptions, voices } = useVoiceRequests();
+
   usePrefixedDocumentTitle("Edit Voice");
 
-  const dummyData = {
-    name: "Name",
-    visibility: "public",
-    language: "English",
-  };
+  const onClick = () => voices.update(voice_token,{
+    title,
+    creator_set_visibility: visibility,
+    ietf_language_tag: language,
+  })
+  .then((res: any) => {
+    if (res && res.success) {
+      history.push("/voice-designer");
+    }
+  });
+
+  useEffect(() => {
+    if (!fetched && voice_token) {
+      fetchedSet(true);
+      voices.get(voice_token,{})
+      .then((res) => {
+        languageSet(res.ietf_language_tag);
+        titleSet(res.title);
+        visibilitySet(res.creator_set_visibility);
+      });
+    }
+
+  },[fetched, voice_token, voices]);
 
   return (
     <Container type="panel">
@@ -36,26 +67,40 @@ function VoiceDesignerVoiceEditPage() {
       <Panel padding={true}>
         <div className="d-flex flex-column gap-4">
           <div className="row gy-4">
-            <Input label="Name" placeholder="Voice name" />
+            <TempInput {...{
+              label: "Title",
+              placeholder: "Voice name",
+              onChange: inputCtrl(titleSet),
+              value: title
+            }}/>
           </div>
 
           <div>
-            <Select
-              value={dummyData.language}
-              icon={faLanguage}
-              label="Language"
+            <TempSelect {...{
+              icon: faLanguage,
+              label: "Language",
+              // placeholder: "Voice name",
+              onChange: inputCtrl(languageSet),
+              options: languages,
+              value: language
+            }}
             />
           </div>
 
           <div>
-            <Select
-              value={dummyData.visibility}
-              icon={faEye}
-              label="Visibility"
+            <TempSelect
+              {...{
+                icon: faEye,
+                label: "Visibility",
+                // placeholder: "Voice name",
+                onChange: inputCtrl(visibilitySet),
+                options: visibilityOptions,
+                value: visibility
+              }}
             />
           </div>
 
-          <Button label="Save" />
+          <Button {...{ label: "Save", onClick }}/>
         </div>
       </Panel>
     </Container>
