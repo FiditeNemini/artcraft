@@ -21,6 +21,7 @@ pub async fn change_password_from_password_reset<'a, 'b>(
         r#"
 UPDATE users
 SET
+  email_confirmed = true,
   password_hash = ?,
   ip_address_last_update = ?,
   password_version = password_version + 1,
