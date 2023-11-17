@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useHistory, useLocation } from "react-router-dom";
+import { Redirect, useHistory, useLocation } from "react-router-dom";
 import { faPlus, faWaveform } from "@fortawesome/pro-solid-svg-icons";
 import InferenceJobsList from "components/layout/InferenceJobsList";
 import { useLocalize } from "hooks";
@@ -17,7 +17,11 @@ import {
   // InferenceJob,
 } from "@storyteller/components/src/jobs/InferenceJob";
 
-function VoiceDesignerMainPage({ inferenceJobsByCategory }: { inferenceJobsByCategory: any }) {
+function VoiceDesignerMainPage({
+  inferenceJobsByCategory,
+}: {
+  inferenceJobsByCategory: any;
+}) {
   const { pathname } = useLocation();
   const { t } = useLocalize("FaceAnimator");
   const { datasets, voices } = useVoiceRequests({
@@ -34,6 +38,12 @@ function VoiceDesignerMainPage({ inferenceJobsByCategory }: { inferenceJobsByCat
     title: "",
     text: "",
   });
+
+  const history = useHistory();
+
+  if (pathname === "/voice-designer" || pathname === "/voice-designer/") {
+    return <Redirect to="/voice-designer/voices" />;
+  }
 
   const openDeleteModal = (token: string, type: string) => {
     setDeleteItem(token);
@@ -58,8 +68,6 @@ function VoiceDesignerMainPage({ inferenceJobsByCategory }: { inferenceJobsByCat
     setDeleteItem("");
     setDeleteType("");
   };
-
-  const history = useHistory();
 
   const navToEdit = (token: string, type: string) => {
     history.push(`/voice-designer/${type}/${token}/edit`);
@@ -135,13 +143,14 @@ function VoiceDesignerMainPage({ inferenceJobsByCategory }: { inferenceJobsByCat
     };
   });
 
-  const statusTxt = (status: number, config: any) => [
-    "Voice pending...",
-    "Voice in progress",
-    "Voice failed",
-    "Voice dead",
-    "Voice created successfully"
-  ][status];
+  const statusTxt = (status: number, config: any) =>
+    [
+      "Voice pending...",
+      "Voice in progress",
+      "Voice failed",
+      "Voice dead",
+      "Voice created successfully",
+    ][status];
 
   const button = {
     label: `Create new voice`,
@@ -160,11 +169,15 @@ function VoiceDesignerMainPage({ inferenceJobsByCategory }: { inferenceJobsByCat
           panel={false}
           imageUrl="/images/header/voice-designer.png"
         />
-        <InferenceJobsList {...{
-          t,
-          inferenceJobs: inferenceJobsByCategory.get(FrontendInferenceJobType.VoiceDesignerCreateVoice), 
-          statusTxt
-        }}/>
+        <InferenceJobsList
+          {...{
+            t,
+            inferenceJobs: inferenceJobsByCategory.get(
+              FrontendInferenceJobType.VoiceDesignerCreateVoice
+            ),
+            statusTxt,
+          }}
+        />
         <Panel mb={true}>
           <nav>
             <ul className="nav nav-tabs">
