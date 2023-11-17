@@ -207,7 +207,7 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive TZ=Etc/UTC apt-get install 
 # NB(bt,2023-11-17): We need python3.8 for vall-e-x (for now)
 # We should make the effort to get it running on python3.10
 RUN apt-get install software-properties-common -y \
-    && add-apt-repository ppa:deadsnakes/ppa \
+    && add-apt-repository ppa:deadsnakes/ppa -y \
     && apt-get update \
     && apt-get install -y python3.8 python3.8-venv python3.8-dev python3.8-full python3.8-distutils
 
