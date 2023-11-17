@@ -18,8 +18,6 @@ pub struct InsertFavoriteArgs<'e, 'c, E>
 
   pub user_token: &'e UserToken,
 
-  pub creator_ip_address: &'e str,
-
   pub mysql_executor: E,
 
   // TODO: Not sure if this works to tell the compiler we need the lifetime annotation.
@@ -45,15 +43,13 @@ SET
   uuid_idempotency_token = ?,
   user_token = ?,
   entity_type = ?,
-  entity_token = ?,
-  creator_ip_address = ?
+  entity_token = ?
         "#,
       &favorite_token,
       args.uuid_idempotency_token,
       args.user_token,
       entity_type,
       entity_token,
-      args.creator_ip_address,
     )
       .execute(args.mysql_executor)
       .await;

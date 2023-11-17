@@ -12,7 +12,6 @@ use actix_web::http::StatusCode;
 use log::warn;
 
 use enums::by_table::favorites::favorite_entity_type::FavoriteEntityType;
-use http_server_common::request::get_request_ip::get_request_ip;
 use mysql_queries::queries::favorites::favorite_entity_token::FavoriteEntityToken;
 use mysql_queries::queries::favorites::insert_favorite::{insert_favorite, InsertFavoriteArgs};
 use tokens::tokens::favorites::FavoriteToken;
@@ -97,8 +96,6 @@ pub async fn create_favorite_handler(
     }
   };
 
-  let ip_address = get_request_ip(&http_request);
-
   let entity_token = FavoriteEntityToken::from_entity_type_and_token(
     request.entity_type, &request.entity_token);
 
@@ -106,7 +103,6 @@ pub async fn create_favorite_handler(
     entity_token: &entity_token,
     uuid_idempotency_token: &request.uuid_idempotency_token,
     user_token: &user_session.user_token_typed,
-    creator_ip_address: &ip_address,
     mysql_executor: &mut mysql_connection,
     phantom: Default::default(),
   }).await;

@@ -28,6 +28,10 @@ pub enum FavoriteEntityType {
     /// W2L result
     #[serde(rename = "w2l_result")]
     W2lResult,
+
+    /// MediaFile
+    #[serde(rename = "media_file")]
+    MediaFile,
 }
 
 // TODO(bt, 2023-01-17): This desperately needs MySQL integration tests!
@@ -43,6 +47,7 @@ impl FavoriteEntityType {
             Self::TtsResult => "tts_result",
             Self::W2lTemplate => "w2l_template",
             Self::W2lResult => "w2l_result",
+            Self::MediaFile => "media_file",
         }
     }
 
@@ -53,6 +58,7 @@ impl FavoriteEntityType {
             "tts_result" => Ok(Self::TtsResult),
             "w2l_template" => Ok(Self::W2lTemplate),
             "w2l_result" => Ok(Self::W2lResult),
+            "media_file" => Ok(Self::MediaFile),
             _ => Err(format!("invalid value: {:?}", value)),
         }
     }
@@ -73,6 +79,7 @@ mod tests {
             assert_serialization(FavoriteEntityType::TtsResult, "tts_result");
             assert_serialization(FavoriteEntityType::W2lTemplate, "w2l_template");
             assert_serialization(FavoriteEntityType::W2lResult, "w2l_result");
+            assert_serialization(FavoriteEntityType::MediaFile, "media_file");
         }
     }
 
@@ -86,6 +93,7 @@ mod tests {
             assert_eq!(FavoriteEntityType::TtsResult.to_str(), "tts_result");
             assert_eq!(FavoriteEntityType::W2lTemplate.to_str(), "w2l_template");
             assert_eq!(FavoriteEntityType::W2lResult.to_str(), "w2l_result");
+            assert_eq!(FavoriteEntityType::MediaFile.to_str(), "media_file");
         }
 
         #[test]
@@ -95,6 +103,7 @@ mod tests {
             assert_eq!(FavoriteEntityType::from_str("tts_result").unwrap(), FavoriteEntityType::TtsResult);
             assert_eq!(FavoriteEntityType::from_str("w2l_template").unwrap(), FavoriteEntityType::W2lTemplate);
             assert_eq!(FavoriteEntityType::from_str("w2l_result").unwrap(), FavoriteEntityType::W2lResult);
+            assert_eq!(FavoriteEntityType::from_str("media_file").unwrap(), FavoriteEntityType::MediaFile);
             assert!(FavoriteEntityType::from_str("foo").is_err());
         }
     }

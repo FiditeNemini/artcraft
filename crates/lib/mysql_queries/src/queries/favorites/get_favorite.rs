@@ -25,7 +25,6 @@ pub struct Favorite {
 }
 
 pub struct FavoriteForListModFields {
-  pub creator_ip_address: String,
   pub maybe_user_deleted_at: Option<DateTime<Utc>>,
   pub maybe_mod_deleted_at: Option<DateTime<Utc>>,
 }
@@ -52,7 +51,6 @@ SELECT
     u.display_name as user_display_name,
     u.email_gravatar_hash as user_gravatar_hash,
 
-    f.creator_ip_address,
     f.created_at,
     f.updated_at,
     f.user_deleted_at,
@@ -80,7 +78,6 @@ WHERE
       user_display_name: favorite.user_display_name,
       user_gravatar_hash: favorite.user_gravatar_hash,
       mod_fields: FavoriteForListModFields {
-        creator_ip_address: favorite.creator_ip_address,
         maybe_user_deleted_at: favorite.user_deleted_at,
         maybe_mod_deleted_at: favorite.mod_deleted_at,
       },
@@ -105,7 +102,6 @@ pub struct RawFavorite {
   pub user_display_name: String,
   pub user_gravatar_hash: String,
 
-  pub creator_ip_address: String,
 
   pub created_at: DateTime<Utc>,
   pub updated_at: DateTime<Utc>,
