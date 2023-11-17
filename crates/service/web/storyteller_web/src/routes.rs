@@ -175,12 +175,8 @@ pub fn add_routes<T, B> (app: App<T>, server_environment: ServerEnvironment) -> 
   app = add_trending_routes(app); /* /v1/trending/... */
   app = add_user_rating_routes(app); /* /v1/user_rating/... */
   app = add_subscription_routes(app); /* /v1/subscriptions/... */
+  app = add_voice_designer_routes(app); /* /v1/voice_designer */
 
-  // TODO find a long term feature flag solution, since this code is likely deployed into production we don't want the route found.
-  if !server_environment.is_deployed_in_production() {
-    warn!("Adding voice designer routes (development only)");
-    app = add_voice_designer_routes(app); /* /v1/voice_designer */
-  }
   // ==================== Comments ====================
 
   let mut app = RouteBuilder::from_app(app)
