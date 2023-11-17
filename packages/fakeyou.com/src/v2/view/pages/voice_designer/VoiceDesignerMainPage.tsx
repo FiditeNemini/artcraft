@@ -24,7 +24,7 @@ function VoiceDesignerMainPage({
 }) {
   const { pathname } = useLocation();
   const { t } = useLocalize("FaceAnimator");
-  const { datasets, voices } = useVoiceRequests({
+  const { datasets, voices, isFetching } = useVoiceRequests({
     requestDatasets: true,
     requestVoices: true,
   });
@@ -205,7 +205,10 @@ function VoiceDesignerMainPage({
           </nav>
 
           <div className="p-3 p-lg-4">
-            <ListItems {...{ data: view ? actionVoices : actionDataSets }} />
+            <ListItems
+              {...{ data: view ? actionVoices : actionDataSets }}
+              isLoading={isFetching}
+            />
           </div>
         </Panel>
       </Container>

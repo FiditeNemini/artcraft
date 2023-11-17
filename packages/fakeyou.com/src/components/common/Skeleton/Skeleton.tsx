@@ -7,7 +7,7 @@ interface SkeletonProps {
 }
 
 export default function Skeleton({ type = "full", rounded }: SkeletonProps) {
-  const skeletonClass = `skeleton ${type} ${rounded && "rounded"}`;
+  const skeletonClass = `skeleton ${type} ${rounded ? "rounded" : ""}`;
 
   return <div className={skeletonClass}></div>;
 }
