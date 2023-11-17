@@ -46,11 +46,18 @@ function VoiceDesignerMainPage() {
     history.push(`/voice-designer/voice/${token}`);
   };
 
-  const rowClick =
-    (todo: any, type?: string) =>
+  const voiceClick =
+    (todo: any, type: string) =>
     ({ target }: { target: any }) => {
-      let datasetToken =
-        datasets.list[target.name.split(",")[0].split(":")[1]].dataset_token;
+      let voiceToken = voices.list[target.name.split(",")[0].split(":")[1]].voice_token;
+      todo(voiceToken, type);
+    };
+
+
+  const datasetClick =
+    (todo: any, type: string) =>
+    ({ target }: { target: any }) => {
+      let datasetToken = datasets.list[target.name.split(",")[0].split(":")[1]].dataset_token;
       todo(datasetToken, type);
     };
 
@@ -63,13 +70,13 @@ function VoiceDesignerMainPage() {
           label: "Edit",
           small: true,
           variant: "secondary",
-          onClick: rowClick(navToEdit, "dataset"),
+          onClick: datasetClick(navToEdit, "dataset"),
         },
         {
           label: "Delete",
           small: true,
           variant: "danger",
-          onClick: rowClick(datasets.delete),
+          onClick: datasetClick(datasets.delete, "dataset"),
         },
       ],
       name: dataset.title,
@@ -85,19 +92,19 @@ function VoiceDesignerMainPage() {
           label: "Edit",
           small: true,
           variant: "secondary",
-          onClick: rowClick(navToEdit, "voice"),
+          onClick: voiceClick(navToEdit, "voice"),
         },
         {
           label: "Delete",
           small: true,
           variant: "danger",
-          onClick: rowClick(voices.delete),
+          onClick: voiceClick(voices.delete, "voice"),
         },
         {
           label: "Use Voice",
           small: true,
           variant: "primary",
-          onClick: rowClick(navToUseVoice),
+          onClick: voiceClick(navToUseVoice, "voice"),
         },
       ],
       name: voice.title,

@@ -119,6 +119,8 @@ function VoiceDesignerFormPage() {
           creator_set_visibility: visibility,
           idempotency_token: uuidv4(),
         }).then((res: any) => {
+          
+          console.log("😎",res);
           if (res && res.success && res.token) {
             history.push(`/voice-designer/dataset/${ res.token }/upload`);
           } 
