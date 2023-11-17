@@ -19,7 +19,7 @@ import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapp
 import Container from "components/common/Container/Container";
 import TextArea from "components/common/TextArea";
 import { Button } from "components/common";
-import { SessionTtsInferenceResultList } from "v2/view/_common/SessionTtsInferenceResultsList";
+import { SessionVoiceDesignerInferenceResultsList } from "v2/view/_common/SessionVoiceDesignerInferenceResultsList";
 import {
   FrontendInferenceJobType,
   InferenceJob,
@@ -230,7 +230,7 @@ export default function VoiceDesignerUseVoicePage(
                 Session TTS Results
               </h4>
               <div className="d-flex flex-column gap-3 session-tts-section">
-                <SessionTtsInferenceResultList
+                <SessionVoiceDesignerInferenceResultsList
                   inferenceJobs={
                     props.inferenceJobsByCategory.get(
                       FrontendInferenceJobType.VoiceDesignerTts
