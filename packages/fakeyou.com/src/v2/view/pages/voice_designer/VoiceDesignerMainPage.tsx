@@ -17,10 +17,14 @@ import {
   // InferenceJob,
 } from "@storyteller/components/src/jobs/InferenceJob";
 
-function VoiceDesignerMainPage({ inferenceJobsByCategory }: { inferenceJobsByCategory: any }) {
+function VoiceDesignerMainPage({
+  inferenceJobsByCategory,
+}: {
+  inferenceJobsByCategory: any;
+}) {
   const { pathname } = useLocation();
   const { t } = useLocalize("FaceAnimator");
-  const { datasets, voices } = useVoiceRequests({
+  const { datasets, voices, isFetching } = useVoiceRequests({
     requestDatasets: true,
     requestVoices: true,
   });
@@ -135,13 +139,14 @@ function VoiceDesignerMainPage({ inferenceJobsByCategory }: { inferenceJobsByCat
     };
   });
 
-  const statusTxt = (status: number, config: any) => [
-    "Voice pending...",
-    "Voice in progress",
-    "Voice failed",
-    "Voice dead",
-    "Voice created successfully"
-  ][status];
+  const statusTxt = (status: number, config: any) =>
+    [
+      "Voice pending...",
+      "Voice in progress",
+      "Voice failed",
+      "Voice dead",
+      "Voice created successfully",
+    ][status];
 
   const button = {
     label: `Create new voice`,
@@ -160,11 +165,15 @@ function VoiceDesignerMainPage({ inferenceJobsByCategory }: { inferenceJobsByCat
           panel={false}
           imageUrl="/images/header/voice-designer.png"
         />
-        <InferenceJobsList {...{
-          t,
-          inferenceJobs: inferenceJobsByCategory.get(FrontendInferenceJobType.VoiceDesignerCreateVoice), 
-          statusTxt
-        }}/>
+        <InferenceJobsList
+          {...{
+            t,
+            inferenceJobs: inferenceJobsByCategory.get(
+              FrontendInferenceJobType.VoiceDesignerCreateVoice
+            ),
+            statusTxt,
+          }}
+        />
         <Panel mb={true}>
           <nav>
             <ul className="nav nav-tabs">
@@ -192,7 +201,10 @@ function VoiceDesignerMainPage({ inferenceJobsByCategory }: { inferenceJobsByCat
           </nav>
 
           <div className="p-3 p-lg-4">
-            <ListItems {...{ data: view ? actionVoices : actionDataSets }} />
+            <ListItems
+              {...{ data: view ? actionVoices : actionDataSets }}
+              isLoading={isFetching}
+            />
           </div>
         </Panel>
       </Container>

@@ -4,9 +4,11 @@ import { faMicrophone, faPlus } from "@fortawesome/pro-solid-svg-icons";
 
 import "./ListItems/ListItems.scss";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import Skeleton from "components/common/Skeleton";
 
 interface ListItemsProps {
   data: any[];
+  isLoading: boolean;
 }
 
 interface ListItem {
@@ -79,7 +81,7 @@ const ItemRow = ({
   );
 };
 
-export default function NewList({ data }: ListItemsProps) {
+export default function NewList({ data, isLoading }: ListItemsProps) {
   const DataPlaceholder = () => (
     <div className="d-flex flex-column list-items p-5 align-items-center">
       <h5 className="fw-semibold mb-3">You haven't created any voices.</h5>
@@ -91,6 +93,25 @@ export default function NewList({ data }: ListItemsProps) {
       />
     </div>
   );
+
+  if (isLoading) {
+    const loaderView = (
+      <div className="list-items p-3">
+        <h3 className="mb-0">
+          <Skeleton type="medium" rounded />
+        </h3>
+      </div>
+    );
+
+    return (
+      <div className="d-flex flex-column gap-3">
+        {[...Array(2)].map((_, i) => (
+          <React.Fragment key={i}>{loaderView}</React.Fragment>
+        ))}
+      </div>
+    );
+  }
+
   return data.length ? (
     <div className="d-flex flex-column gap-3">
       {data.map((item, key) => (
