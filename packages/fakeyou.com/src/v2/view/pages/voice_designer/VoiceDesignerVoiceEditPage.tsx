@@ -24,7 +24,7 @@ function VoiceDesignerVoiceEditPage() {
   const history = useHistory();
   const { voice_token } = useParams();
 
-  const { inputCtrl, languages, visibilityOptions, voices } = useVoiceRequests();
+  const { inputCtrl, languages, visibilityOptions, voices } = useVoiceRequests({});
 
   usePrefixedDocumentTitle("Edit Voice");
 
