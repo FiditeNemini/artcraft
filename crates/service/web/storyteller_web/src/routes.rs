@@ -113,7 +113,7 @@ use crate::http_server::endpoints::voice_designer::inference::enqueue_tts_reques
 use crate::http_server::endpoints::voice_designer::inference::enqueue_vc_request::enqueue_vc_request;
 use crate::http_server::endpoints::voice_designer::voice_dataset_samples::delete_sample::delete_sample_handler;
 use crate::http_server::endpoints::voice_designer::voice_dataset_samples::list_samples_by_dataset::list_samples_by_dataset_handler;
-use crate::http_server::endpoints::voice_designer::voice_dataset_samples::upload_sample::upload_sample_handler;
+use crate::http_server::endpoints::voice_designer::voice_dataset_samples::upload_zs_sample::upload_zs_sample_handler;
 use crate::http_server::endpoints::voice_designer::voice_datasets::create_dataset::create_dataset_handler;
 use crate::http_server::endpoints::voice_designer::voice_datasets::delete_dataset::delete_dataset_handler;
 use crate::http_server::endpoints::voice_designer::voice_datasets::get_dataset::get_dataset_handler;
@@ -1192,7 +1192,7 @@ fn add_voice_designer_routes<T,B> (app:App<T>)-> App<T>
               )
               .service(
                   web::scope("/sample")
-                      .route("/upload", web::post().to(upload_sample_handler))
+                      .route("/upload", web::post().to(upload_zs_sample_handler))
                       .route("/{sample_token}/delete", web::delete().to(delete_sample_handler))
                       .route("/dataset/{dataset_token}/list", web::get().to(list_samples_by_dataset_handler))
               )

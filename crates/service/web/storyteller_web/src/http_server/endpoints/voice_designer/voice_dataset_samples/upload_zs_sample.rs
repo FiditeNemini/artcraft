@@ -86,7 +86,7 @@ static ALLOWED_AUDIO_MIME_TYPES : Lazy<HashSet<&'static str>> = Lazy::new(|| {
     "video/webm",
   ])
 });
-pub async fn upload_sample_handler(
+pub async fn upload_zs_sample_handler(
   http_request: HttpRequest,
   server_state: web::Data<Arc<ServerState>>,
   mut multipart_payload: Multipart,
