@@ -642,22 +642,31 @@ class PageContainer extends React.Component<
             <Route
               exact
               path="/voice-designer/create"
-              component={VoiceDesignerFormPage}
-            />
+            >
+              <VoiceDesignerFormPage {...{
+                enqueueInferenceJob: this.props.enqueueInferenceJob
+              }}/>
+            </Route>
 
             {/* Route for editing the dataset details */}
             <Route
               exact
               path="/voice-designer/dataset/:dataset_token/edit"
-              component={VoiceDesignerFormPage}
-            />
+            >
+              <VoiceDesignerFormPage {...{
+                enqueueInferenceJob: this.props.enqueueInferenceJob
+              }}/>
+            </Route>
 
             {/* Route for handling dataset token for uploading samples */}
             <Route
               exact
               path="/voice-designer/dataset/:dataset_token/upload"
-              component={VoiceDesignerFormPage}
-            />
+             >
+              <VoiceDesignerFormPage {...{
+                enqueueInferenceJob: this.props.enqueueInferenceJob
+              }}/>
+            </Route>
 
             <Route path="/voice-designer/voice/:voice_token/edit">
               <VoiceDesignerVoiceEditPage />
@@ -677,7 +686,10 @@ class PageContainer extends React.Component<
             </Route>
 
             <Route path="/voice-designer">
-              <VoiceDesignerMainPage />
+              <VoiceDesignerMainPage {...{
+                enqueueInferenceJob: this.props.enqueueInferenceJob,
+                inferenceJobs: this.props.inferenceJobs
+              }} />
             </Route>
 
             <Route path="/generate-speech">

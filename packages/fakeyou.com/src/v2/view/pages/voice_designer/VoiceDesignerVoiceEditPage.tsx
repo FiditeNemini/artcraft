@@ -16,7 +16,7 @@ import { useHistory } from "react-router-dom";
 
 function VoiceDesignerVoiceEditPage() {
   const [language, languageSet] = useState("en");
-  const [visibility, visibilitySet] = useState("");
+  const [visibility, visibilitySet] = useState("hidden");
   const [title, titleSet] = useState("");
 
   const [fetched,fetchedSet] = useState(false);
@@ -88,6 +88,7 @@ function VoiceDesignerVoiceEditPage() {
           </div>
 
           <div>
+          aaaaa
             <TempSelect
               {...{
                 icon: faEye,

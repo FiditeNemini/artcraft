@@ -32,6 +32,7 @@ import { usePrefixedDocumentTitle } from "common/UsePrefixedDocumentTitle";
 export default function LipsyncEditor({
   enqueueInferenceJob,
   sessionSubscriptionsWrapper,
+  inferenceJobs,
   inferenceJobsByCategory,
   ...rest
 }: FaceAnimatorCore) {
@@ -182,7 +183,7 @@ export default function LipsyncEditor({
           );
         })}
       </div>
-      <InferenceJobsList {...{ t }}/>
+      <InferenceJobsList {...{ t, inferenceJobs }}/>
       <div {...{ className: "face-animator-mobile-sample" }}>
         <BasicVideo {...{ src: "/videos/face-animator-instruction-en.mp4" }} />
       </div>

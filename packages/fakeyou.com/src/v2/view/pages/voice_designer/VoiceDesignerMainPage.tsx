@@ -12,7 +12,7 @@ import ListItems from "./components/NewList";
 import Modal from "components/common/Modal";
 import useVoiceRequests from "./useVoiceRequests";
 
-function VoiceDesignerMainPage() {
+function VoiceDesignerMainPage({ inferenceJobs }: { inferenceJobs: any }) {
   const { pathname } = useLocation();
   const { t } = useLocalize("FaceAnimator");
   const { datasets, voices } = useVoiceRequests({
@@ -147,7 +147,8 @@ function VoiceDesignerMainPage() {
           panel={false}
           imageUrl="/images/header/voice-designer.png"
         />
-        <InferenceJobsList {...{ t }} />
+
+        <InferenceJobsList {...{ t, inferenceJobs }}/>
         <Panel mb={true}>
           <nav>
             <ul className="nav nav-tabs">

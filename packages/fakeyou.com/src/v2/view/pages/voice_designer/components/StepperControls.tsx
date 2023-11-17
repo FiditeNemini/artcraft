@@ -4,6 +4,7 @@ interface StepperControlsProps {
   onBack: () => void;
   onNext: () => void;
   onCreate: () => void;
+  createDisabled: boolean;
   steps: string[];
   currentStep: number;
 }
@@ -14,6 +15,7 @@ const StepperControls: React.FC<StepperControlsProps> = ({
   steps,
   currentStep,
   onCreate,
+  createDisabled
 }) => {
   return (
     <div className="p-3 pb-4 px-lg-4 pt-0 d-flex gap-3">
@@ -30,7 +32,7 @@ const StepperControls: React.FC<StepperControlsProps> = ({
       )}
 
       {currentStep === 1 && (
-        <button className="btn btn-primary w-100" onClick={onCreate}>
+        <button disabled={ createDisabled } className="btn btn-primary w-100" onClick={onCreate}>
           Create Voice
         </button>
       )}

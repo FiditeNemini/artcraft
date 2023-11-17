@@ -21,19 +21,22 @@ import { v4 as uuidv4 } from "uuid";
 import { useFile } from "hooks";
 
 import useVoiceRequests from "./useVoiceRequests";
+import useUploadedFiles from "hooks/useUploadedFiles";
+
+import { FrontendInferenceJobType } from "@storyteller/components/src/jobs/InferenceJob";
 
 interface RouteParams {
   dataset_token?: string;
 }
 
-function VoiceDesignerFormPage() {
+function VoiceDesignerFormPage({ enqueueInferenceJob }: { enqueueInferenceJob: any }) {
   const history = useHistory();
   const { datasets, inputCtrl, languages, visibilityOptions, voices } = useVoiceRequests({});
   const [language, languageSet] = useState("en");
-  const [visibility, visibilitySet] = useState("");
+  const [visibility, visibilitySet] = useState("hidden");
   const [title, titleSet] = useState("");
   const [fetched,fetchedSet] = useState(false);
-
+  const deleteEverything = useUploadedFiles((state: any) => state.deleteEverything);
   const audioProps = useFile({}); // contains upload inout state and controls, see docs
 
   const datasetInputs = [
@@ -70,6 +73,7 @@ function VoiceDesignerFormPage() {
 
   const initialStep = history.location.pathname.includes("/upload") ? 1 : 0;
   const [currentStep, setCurrentStep] = useState(initialStep);
+  const [audioSamplesReady, setAudioSamplesReady] = useState(false);
 
   const steps = isEditMode
     ? ["Edit Details", "Edit Samples"]
@@ -81,7 +85,7 @@ function VoiceDesignerFormPage() {
         return <VoiceDetails {...{ datasetInputs }} />;
       case 1:
         return (
-          <UploadSamples {...{ audioProps, datasetToken: dataset_token }} />
+          <UploadSamples key={!isNewCreation && dataset_token || uuidv4()} {...{ audioProps, datasetToken: dataset_token, setAudioSamplesReady }} />
         );
       default:
         return null;
@@ -108,9 +112,8 @@ function VoiceDesignerFormPage() {
           creator_set_visibility: visibility,
           idempotency_token: uuidv4(),
         }).then((res: any) => {
-
-          console.log("😎",res);
           if (res && res.success && res.token) {
+            deleteEverything();
             history.push(`/voice-designer/dataset/${ res.token }/upload`);
           } 
         });
@@ -140,7 +143,13 @@ function VoiceDesignerFormPage() {
         voice_dataset_token: dataset_token || "",
       })
       .then((res: any) => {
+        deleteEverything();
         if (res && res.success) {
+          enqueueInferenceJob(
+            res.inference_job_token,
+            FrontendInferenceJobType.VoiceDesignerTts
+          );
+
           history.push("/voice-designer");
         }
       });
@@ -189,6 +198,7 @@ function VoiceDesignerFormPage() {
           onBack={handleBack}
           onNext={handleNext}
           onCreate={handleCreateVoice}
+          createDisabled={!audioSamplesReady}
         />
       </Panel>
     </Container>
