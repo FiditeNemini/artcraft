@@ -21,6 +21,7 @@ import { v4 as uuidv4 } from "uuid";
 import { useFile } from "hooks";
 
 import useVoiceRequests from "./useVoiceRequests";
+import useUploadedFiles from "hooks/useUploadedFiles";
 
 import { FrontendInferenceJobType } from "@storyteller/components/src/jobs/InferenceJob";
 
@@ -35,7 +36,7 @@ function VoiceDesignerFormPage({ enqueueInferenceJob }: { enqueueInferenceJob: a
   const [visibility, visibilitySet] = useState("hidden");
   const [title, titleSet] = useState("");
   const [fetched,fetchedSet] = useState(false);
-
+  const deleteEverything = useUploadedFiles((state: any) => state.deleteEverything);
   const audioProps = useFile({}); // contains upload inout state and controls, see docs
 
   const datasetInputs = [
@@ -72,6 +73,7 @@ function VoiceDesignerFormPage({ enqueueInferenceJob }: { enqueueInferenceJob: a
 
   const initialStep = history.location.pathname.includes("/upload") ? 1 : 0;
   const [currentStep, setCurrentStep] = useState(initialStep);
+  const [audioSamplesReady, setAudioSamplesReady] = useState(false);
 
   const steps = isEditMode
     ? ["Edit Details", "Edit Samples"]
@@ -83,7 +85,7 @@ function VoiceDesignerFormPage({ enqueueInferenceJob }: { enqueueInferenceJob: a
         return <VoiceDetails {...{ datasetInputs }} />;
       case 1:
         return (
-          <UploadSamples {...{ audioProps, datasetToken: dataset_token }} />
+          <UploadSamples key={!isNewCreation && dataset_token || uuidv4()} {...{ audioProps, datasetToken: dataset_token, setAudioSamplesReady }} />
         );
       default:
         return null;
@@ -111,6 +113,7 @@ function VoiceDesignerFormPage({ enqueueInferenceJob }: { enqueueInferenceJob: a
           idempotency_token: uuidv4(),
         }).then((res: any) => {
           if (res && res.success && res.token) {
+            deleteEverything();
             history.push(`/voice-designer/dataset/${ res.token }/upload`);
           } 
         });
@@ -140,6 +143,7 @@ function VoiceDesignerFormPage({ enqueueInferenceJob }: { enqueueInferenceJob: a
         voice_dataset_token: dataset_token || "",
       })
       .then((res: any) => {
+        deleteEverything();
         if (res && res.success) {
           enqueueInferenceJob(
             res.inference_job_token,
@@ -194,6 +198,7 @@ function VoiceDesignerFormPage({ enqueueInferenceJob }: { enqueueInferenceJob: a
           onBack={handleBack}
           onNext={handleNext}
           onCreate={handleCreateVoice}
+          createDisabled={!audioSamplesReady}
         />
       </Panel>
     </Container>

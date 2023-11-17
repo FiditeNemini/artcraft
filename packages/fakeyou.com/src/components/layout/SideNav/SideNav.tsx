@@ -9,6 +9,7 @@ import {
   faSignOutAlt,
   faFaceViewfinder,
   faCloudUpload,
+  faWandMagicSparkles,
 } from "@fortawesome/pro-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Button from "components/common/Button/Button";
@@ -39,7 +40,7 @@ export default function SideNav(props: SideNavProps) {
   let history = useHistory();
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
   const fakeYouFrontendEnv =  FakeYouFrontendEnvironment.getInstance();
-
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const isDevelopmentEnv = fakeYouFrontendEnv.isDevelopment()
   const handleNavLinkClick = () => {
     const wrapper = document.getElementById("wrapper");
@@ -270,7 +271,6 @@ export default function SideNav(props: SideNavProps) {
             {t("speechVc")}
           </NavLink>
         </li>
-        {isDevelopmentEnv && (
         <li>
           <NavLink
             to="/voice-designer"
@@ -278,13 +278,12 @@ export default function SideNav(props: SideNavProps) {
             onClick={handleNavLinkClick}
           >
             <FontAwesomeIcon
-              icon={faWaveformLines}
+              icon={faWandMagicSparkles}
               className="sidebar-heading-icon"
             />
             {"Voice Designer"}
           </NavLink>
         </li>
-        )}
         <hr className="mb-4 mt-3" />
         <li className="sidebar-heading">{t("videoTitle")}</li>
         <li>

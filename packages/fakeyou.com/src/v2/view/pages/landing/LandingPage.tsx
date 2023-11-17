@@ -300,6 +300,40 @@ function LandingPage(props: Props) {
           </div>
           <div className="col-12 col-md-4">
             <Link
+              to="/voice-designer"
+              className="panel panel-select d-flex flex-column align-items-center"
+            >
+              <div className="d-flex px-4 pt-4 align-items-start w-100">
+                <div className="flex-grow-1">
+                  <div className="mb-1">
+                    <span className="badge-new d-inline-flex align-items-center mb-2 me-2">
+                      <FontAwesomeIcon icon={faSparkles} className="me-1" />
+                      {t("productNewTag")}
+                    </span>
+
+                    <h4 className="fw-bold text-white d-inline-flex align-items-center mb-0">
+                      <span>Voice Designer</span>
+                    </h4>
+                  </div>
+
+                  <h6 className="fw-normal opacity-75 text-white">
+                    Make yourself sound like anyone
+                  </h6>
+                </div>
+                <Link to="/voice-designer" className="btn btn-square mt-1">
+                  <FontAwesomeIcon icon={faArrowRight} />
+                </Link>
+              </div>
+
+              <img
+                className="img-fluid"
+                src="/images/landing/hanashi-after.webp"
+                alt="Voice Designer"
+              />
+            </Link>
+          </div>
+          <div className="col-12 col-md-4">
+            <Link
               to="/face-animator"
               className="panel panel-select d-flex flex-column align-items-center"
             >
