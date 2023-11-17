@@ -17,7 +17,6 @@ export interface FaceAnimatorSlide {
   enqueueInferenceJob: any;
   sessionSubscriptionsWrapper: any;
   t: any;
-  inferenceJobsByCategory: any;
   removeWatermark: any;
   removeWatermarkChange: any;
 }
