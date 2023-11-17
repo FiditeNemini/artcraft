@@ -1,9 +1,8 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useHistory, useLocation } from "react-router-dom";
 import { faPlus, faWaveform } from "@fortawesome/pro-solid-svg-icons";
 import InferenceJobsList from "components/layout/InferenceJobsList";
 import { useLocalize } from "hooks";
-// import { usePrefixedDocumentTitle } from "common/UsePrefixedDocumentTitle";
 import Panel from "components/common/Panel";
 import PageHeader from "components/layout/PageHeader";
 import Container from "components/common/Container";
@@ -11,6 +10,7 @@ import { NavLink } from "react-router-dom";
 import ListItems from "./components/NewList";
 import Modal from "components/common/Modal";
 import useVoiceRequests from "./useVoiceRequests";
+import { usePrefixedDocumentTitle } from "common/UsePrefixedDocumentTitle";
 
 import {
   FrontendInferenceJobType,
@@ -22,6 +22,7 @@ function VoiceDesignerMainPage({
 }: {
   inferenceJobsByCategory: any;
 }) {
+  usePrefixedDocumentTitle("AI Voice Designer");
   const { pathname } = useLocation();
   const { t } = useLocalize("FaceAnimator");
   const { datasets, voices, isFetching } = useVoiceRequests({
@@ -52,15 +53,13 @@ function VoiceDesignerMainPage({
   const handleDelete = () => {
     if (deleteType === "voice") {
       voices.delete(deleteItem);
+      voices.refresh();
     } else if (deleteType === "dataset") datasets.delete(deleteItem);
-    setDeleteItem("");
-    setDeleteType("");
+    datasets.refresh();
   };
 
   const closeDeleteModal = () => {
     setIsDeleteModalOpen(false);
-    setDeleteItem("");
-    setDeleteType("");
   };
 
   const history = useHistory();
