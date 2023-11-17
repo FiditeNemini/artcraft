@@ -5,8 +5,12 @@ import {
   GetPendingTtsJobCountIsOk,
   GetPendingTtsJobCountSuccessResponse,
 } from "@storyteller/components/src/api/tts/GetPendingTtsJobCount";
+
+import { JobState } from "@storyteller/components/src/jobs/JobStates";
+
+import { InferenceJob } from "@storyteller/components/src/jobs/InferenceJob";
 // import { springs } from "resources";
-import { useInferenceJobs } from "hooks";
+// import { useInferenceJobs } from "hooks";
 import { Button } from 'components/common';
 import { Analytics } from "common/Analytics";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -14,8 +18,10 @@ import { faChevronRight, faHourglass1, faRemove, faTrophy, faWarning } from "@fo
 
 const DEFAULT_QUEUE_REFRESH_INTERVAL_MILLIS = 15000;
 
-export default function InferenceJobsList({ t }: { t: any }) {
-  const { inferenceJobs = [] } = useInferenceJobs({ type: 0 });
+export default function InferenceJobsList({ t, inferenceJobs }: { t: any, inferenceJobs?: any }) {
+  // const { inferenceJobs = [] } = useInferenceJobs({ type: 0 });
+  // const oldJobs = thejobs || inferenceJobs;
+  // console.log("😎",inferenceJobs);
   const [pending, pendingSet] = useState<GetPendingTtsJobCountSuccessResponse>({
     success: true,
     pending_job_count: 0,
@@ -31,6 +37,24 @@ export default function InferenceJobsList({ t }: { t: any }) {
       default: return "Uknown failure";
     }
   };
+
+  const processStatus = (job: InferenceJob) => {
+    switch (job.jobState) {
+      case JobState.PENDING:
+      case JobState.UNKNOWN: return 0;
+      case JobState.STARTED: return 1
+      case JobState.ATTEMPT_FAILED: return 2;
+      case JobState.COMPLETE_FAILURE:
+      case JobState.DEAD: return 3;
+      case JobState.COMPLETE_SUCCESS: return 4;
+      default: return -1;
+    }
+  };
+
+  const jobs = inferenceJobs.map((job: InferenceJob, i: number) => ({
+    ...job!,
+    statusIndex: processStatus(job!)
+  }));
 
   // const transitions = useTransition(inferenceJobs, { // not today
   //   ...springs.soft,
@@ -61,9 +85,10 @@ export default function InferenceJobsList({ t }: { t: any }) {
     return () => clearInterval(interval);
   }, [pending]);
 
-    return inferenceJobs.length ? <div {...{ className: "face-animator-jobs panel" }}>
+    return jobs.length ? <div {...{ className: "face-animator-jobs panel" }}>
       <h5>{ t("headings.yourJobs") }</h5>
-      { inferenceJobs.map((job, key) => {
+      { jobs.map((job: any, key: number) => {
+        console.log("🌸",job);
       return <div {...{ className: "panel face-animator-job", key }}>
         <FontAwesomeIcon {...{ className: `job-status-icon job-status-${job.statusIndex}`, icon: statusIcons[job.statusIndex] }}/>
         <div {...{ className: "job-details" }}>

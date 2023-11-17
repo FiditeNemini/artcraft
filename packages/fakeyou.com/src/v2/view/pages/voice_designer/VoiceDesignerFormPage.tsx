@@ -30,7 +30,7 @@ function VoiceDesignerFormPage() {
   const history = useHistory();
   const { datasets, inputCtrl, languages, visibilityOptions, voices } = useVoiceRequests({});
   const [language, languageSet] = useState("en");
-  const [visibility, visibilitySet] = useState("");
+  const [visibility, visibilitySet] = useState("hidden");
   const [title, titleSet] = useState("");
   const [fetched,fetchedSet] = useState(false);
 
@@ -108,8 +108,6 @@ function VoiceDesignerFormPage() {
           creator_set_visibility: visibility,
           idempotency_token: uuidv4(),
         }).then((res: any) => {
-
-          console.log("😎",res);
           if (res && res.success && res.token) {
             history.push(`/voice-designer/dataset/${ res.token }/upload`);
           } 
