@@ -10,6 +10,7 @@ const useUploadedFiles = create<UploadedFilesState>((set) => ({
   setFiles: (files: any[]) => set({ files }),
   audioLinks: [],
   setAudioLinks: (audioLinks: string[]) => set({ audioLinks }),
+  deleteEverything:() => set({ files: [], audioLinks: [] }),
 }));
 
 export default useUploadedFiles;
