@@ -1,6 +1,7 @@
 use std::fs::read_to_string;
 use std::path::PathBuf;
-use std::time::Instant;
+use std::thread;
+use std::time::{Duration, Instant};
 
 use anyhow::anyhow;
 use log::{error, info, warn};
@@ -186,24 +187,25 @@ pub async fn process_create_voice(
       .log_status("running inference")
       .map_err(|e| ProcessSingleJobError::Other(e))?;
 
-  let inference_start_time = Instant::now();
-
   // Command line arg for a list of paths to insert the container
   let audio_files = join_paths(downloaded_dataset);
 
   info!("Files to process: {:?}", audio_files);
 
   // Name of the output file
-  let output_file_name = String::from("temp"); // don't use the extension... for the inference since the container will add the extension.
+  // NB: don't use the extension... for the inference since the container will add the extension.
+  let output_file_name = PathBuf::from("temp");
 
   let stderr_output_file = work_temp_dir.path().join("zero_shot_create_voice_err.txt");
+
+  let inference_start_time = Instant::now();
 
   // Run Inference
   let command_exit_status =
       args.job_dependencies.job_type_details.vall_e_x.create_embedding_command.execute_inference(
         job::job_types::tts::vall_e_x::vall_e_x_inference_command::CreateVoiceInferenceArgs {
           output_embedding_path: &workdir,
-          output_embedding_name: output_file_name.clone(),
+          output_embedding_name: &output_file_name,
           audio_files,
           stderr_output_file: &stderr_output_file,
         }
@@ -242,6 +244,9 @@ pub async fn process_create_voice(
     return Err(error);
   }
 
+  info!("Success; waiting...");
+  thread::sleep(Duration::from_secs(300));
+
 
   // STEP 4. Download dataset each audio file
   info!("Uploading Media ...");
@@ -255,7 +260,6 @@ pub async fn process_create_voice(
 
   // Get Finished File
   let mut finished_file = work_temp_dir.path().to_path_buf();
-  //let mut finished_file = workdir;
 
   let output_bucket_file_name = String::from("temp.npz"); // use extension for bucket upload.
   finished_file.push(&output_bucket_file_name);
