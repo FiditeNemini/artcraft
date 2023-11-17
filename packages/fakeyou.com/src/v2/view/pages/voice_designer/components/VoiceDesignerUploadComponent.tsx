@@ -27,16 +27,18 @@ interface Props {
   formIsCleared: boolean;
   setFormIsCleared: (cleared: boolean) => void;
   setCanConvert: (canConvert: boolean) => void;
+  setAudioSamplesReady: (ready: boolean) => void;
   changeConvertIdempotencyToken: () => void;
 }
 
-function VoiceDesignerUploadComponent({ changeConvertIdempotencyToken, datasetToken, setCanConvert, setFormIsCleared }: Props) {
+function VoiceDesignerUploadComponent({ changeConvertIdempotencyToken, datasetToken, setCanConvert, setFormIsCleared, setAudioSamplesReady }: Props) {
   const [isUploadDisabled, setIsUploadDisabled] = useState<boolean>(false);
 
   const files = useUploadedFiles((state: any) => state.files);
   const setFiles = useUploadedFiles((state: any) => state.setFiles);
   const audioLinks = useUploadedFiles((state: any) => state.audioLinks);
   const setAudioLinks = useUploadedFiles((state: any) => state.setAudioLinks);
+
 
   // Auto generated
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -53,7 +55,9 @@ function VoiceDesignerUploadComponent({ changeConvertIdempotencyToken, datasetTo
         file: file,
         uuid_idempotency_token: uuidv4(),
       })
-      .then(res => {});
+      .then(res => {
+        setAudioSamplesReady(true);
+      });
 
       setFormIsCleared(false);
       setCanConvert(false);
@@ -100,6 +104,7 @@ function VoiceDesignerUploadComponent({ changeConvertIdempotencyToken, datasetTo
     <div className="d-flex flex-column gap-3">
       {/* Usage refer to https://github.com/KarimMokhtar/react-drag-drop-files */}
       <FileUploader
+        key={datasetToken || uuidv4()}
         handleChange={handleChange}
         name="file"
         types={FILE_TYPES}

@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import VoiceDesignerUploadComponent from "../VoiceDesignerUploadComponent";
 import { v4 as uuidv4 } from "uuid";
 
-function UploadSamples({ audioProps, datasetToken }: { audioProps: any, datasetToken?: string }) {
+function UploadSamples({ audioProps, datasetToken, setAudioSamplesReady }: { audioProps: any, datasetToken?: string, setAudioSamplesReady:any  }) {
   /* eslint-disable @typescript-eslint/no-unused-vars */
   const [convertLoading, setConvertLoading] = useState(false);
   const [canConvert, setCanConvert] = useState(false);
@@ -25,7 +25,7 @@ function UploadSamples({ audioProps, datasetToken }: { audioProps: any, datasetT
       <div>
         <label className="sub-title">Upload Audio</label>
         <div className="d-flex flex-column gap-3 upload-component">
-          <VoiceDesignerUploadComponent {...{ changeConvertIdempotencyToken, datasetToken, formIsCleared, setCanConvert, setFormIsCleared, setMediaUploadToken }}/>
+          <VoiceDesignerUploadComponent {...{ changeConvertIdempotencyToken, datasetToken, formIsCleared, setCanConvert, setFormIsCleared, setMediaUploadToken, setAudioSamplesReady }}/>
         </div>
       </div>
     </div>
