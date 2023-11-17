@@ -15,6 +15,7 @@ pub struct ZsVoice {
     pub ietf_language_tag: String,
     pub ietf_primary_language_subtag: String,
     pub bucket_hash: String,
+    pub model_version: u64,
     pub maybe_creator_user_token: Option<UserToken>,
     pub creator_set_visibility: Visibility,
     pub created_at: DateTime<Utc>,
@@ -75,6 +76,7 @@ pub async fn get_voice_by_token_with_connection(
         ietf_language_tag: record.ietf_language_tag,
         ietf_primary_language_subtag: record.ietf_primary_language_subtag,
         bucket_hash: record.bucket_hash,
+        model_version: record.model_version as u64, // FIXME: Lazily widening.
         maybe_creator_user_token: record.maybe_creator_user_token,
         creator_set_visibility: record.creator_set_visibility,
         created_at: record.created_at,
@@ -96,6 +98,7 @@ async fn select_include_deleted(
         zv.ietf_primary_language_subtag,
         zv.maybe_creator_user_token as `maybe_creator_user_token: tokens::tokens::users::UserToken`,
         zv.bucket_hash,
+        zv.model_version,
         zv.creator_set_visibility as `creator_set_visibility: enums::common::visibility::Visibility`,
         zv.created_at,
         zv.updated_at
@@ -122,6 +125,7 @@ async fn select_without_deleted(
         zv.ietf_primary_language_subtag,
         zv.maybe_creator_user_token as `maybe_creator_user_token: tokens::tokens::users::UserToken`,
         zv.bucket_hash,
+        zv.model_version,
         zv.creator_set_visibility as `creator_set_visibility: enums::common::visibility::Visibility`,
         zv.created_at,
         zv.updated_at
@@ -143,6 +147,7 @@ pub struct RawVoice {
     ietf_primary_language_subtag: String,
     maybe_creator_user_token: Option<UserToken>,
     bucket_hash: String,
+    model_version: u32,
     creator_set_visibility: Visibility,
     created_at: DateTime<Utc>,
     updated_at: DateTime<Utc>,

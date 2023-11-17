@@ -230,8 +230,23 @@ pub async fn get_inference_job_status_handler(
               .to_string()
         }
         InferenceCategory::TextToSpeech => {
-          // NB: TTS results receive the legacy treatment where their table only reports the full bucket path
-          result_details.public_bucket_location_or_hash
+          match result_details.entity_type.as_str() {
+            "media_file" => {
+              // NB: We're migrating TTS to media_files.
+              // Zero shot TTS uses media files.
+              // Legacy TT2 uses old pathing.
+              MediaFileBucketPath::from_object_hash(
+                &result_details.public_bucket_location_or_hash,
+                result_details.maybe_media_file_public_bucket_prefix.as_deref(),
+                result_details.maybe_media_file_public_bucket_extension.as_deref())
+                  .get_full_object_path_str()
+                  .to_string()
+            }
+            _ => {
+              // NB: TTS results receive the legacy treatment where their table only reports the full bucket path
+              result_details.public_bucket_location_or_hash
+            }
+          }
         }
         InferenceCategory::VoiceConversion => {
           match result_details.entity_type.as_str() {
@@ -287,6 +302,7 @@ fn filter_model_name(name: Option<String>) -> Option<String> {
     name.replace("sadtalker", "faceanimator")
         .replace("sad-talker", "face-animator")
         .replace("sad_talker", "face_animator")
+        .replace("vall_e_x", "voice_designer")
   })
 }
 
