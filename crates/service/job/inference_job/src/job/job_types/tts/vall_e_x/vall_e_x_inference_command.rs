@@ -48,7 +48,7 @@ pub struct InferenceArgs<P: AsRef<Path>> {
 
 pub struct CreateVoiceInferenceArgs<P: AsRef<Path>> {
   pub output_embedding_path: P,
-  pub output_embedding_name: String,
+  pub output_embedding_name: P,
   pub audio_files: String,
   pub stderr_output_file: P,
 }

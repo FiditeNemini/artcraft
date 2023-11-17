@@ -17,8 +17,6 @@ pub struct VALLEXProcessJobArgs<'a> {
     pub job: &'a AvailableInferenceJob,
 }
 
-
-
 // query using the token then grab the bucket hash
 pub async fn process_job(
     args: VALLEXProcessJobArgs<'_>
@@ -45,4 +43,3 @@ pub async fn process_job(
         }
     }
 }
-
