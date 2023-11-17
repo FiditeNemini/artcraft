@@ -44,15 +44,15 @@ function VoiceDesignerMainPage({ inferenceJobs }: { inferenceJobs: any }) {
     if (deleteType === "voice") {
       voices.delete(deleteItem);
     } else if (deleteType === "dataset") datasets.delete(deleteItem);
+    setDeleteItem("");
+    setDeleteType("");
   };
 
   const closeDeleteModal = () => {
     setIsDeleteModalOpen(false);
+    setDeleteItem("");
+    setDeleteType("");
   };
-
-  // const openDeleteDatasetModal = () => {
-  //   setIsDeleteDatasetModalOpen(true);
-  // };
 
   const history = useHistory();
 
@@ -148,7 +148,7 @@ function VoiceDesignerMainPage({ inferenceJobs }: { inferenceJobs: any }) {
           imageUrl="/images/header/voice-designer.png"
         />
 
-        <InferenceJobsList {...{ t, inferenceJobs }}/>
+        <InferenceJobsList {...{ t, inferenceJobs }} />
         <Panel mb={true}>
           <nav>
             <ul className="nav nav-tabs">
