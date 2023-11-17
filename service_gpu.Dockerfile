@@ -202,8 +202,15 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive TZ=Etc/UTC apt-get install 
     ripgrep \
     tmux \
     vim \
-    --no-install-recommends \
-    && apt-get clean autoclean && apt-get autoremove -y && rm -rf /var/lib/{apt,dpkg,cache,log}/
+    --no-install-recommends
+
+# NB(bt,2023-11-17): We need python3.8 for vall-e-x (for now)
+# We should make the effort to get it running on python3.10
+RUN add-apt-repository ppa:deadsnakes/ppa \
+    && apt-get update \
+    && apt-get install -y python3.8 python3.8-venv python3.8-dev python3.8-full python3.8-distutils
+
+RUN  apt-get clean autoclean && apt-get autoremove -y && rm -rf /var/lib/{apt,dpkg,cache,log}/
 
 # NB(bt,2023-05-28): Python logging may be slowing down in k8s
 # See: https://github.com/kubernetes-client/python/issues/1867
