@@ -22,11 +22,13 @@ import { useFile } from "hooks";
 
 import useVoiceRequests from "./useVoiceRequests";
 
+import { FrontendInferenceJobType } from "@storyteller/components/src/jobs/InferenceJob";
+
 interface RouteParams {
   dataset_token?: string;
 }
 
-function VoiceDesignerFormPage() {
+function VoiceDesignerFormPage({ enqueueInferenceJob }: { enqueueInferenceJob: any }) {
   const history = useHistory();
   const { datasets, inputCtrl, languages, visibilityOptions, voices } = useVoiceRequests({});
   const [language, languageSet] = useState("en");
@@ -139,6 +141,11 @@ function VoiceDesignerFormPage() {
       })
       .then((res: any) => {
         if (res && res.success) {
+          enqueueInferenceJob(
+            res.inference_job_token,
+            FrontendInferenceJobType.VoiceDesignerTts
+          );
+
           history.push("/voice-designer");
         }
       });
