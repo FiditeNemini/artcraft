@@ -688,7 +688,8 @@ class PageContainer extends React.Component<
             <Route path="/voice-designer">
               <VoiceDesignerMainPage {...{
                 enqueueInferenceJob: this.props.enqueueInferenceJob,
-                inferenceJobs: this.props.inferenceJobs
+                inferenceJobs: this.props.inferenceJobs,
+                inferenceJobsByCategory: this.props.inferenceJobsByCategory
               }} />
             </Route>
 

@@ -28,6 +28,7 @@ import { BasicVideo } from "components/common";
 import "./LipsyncEditor.scss";
 import { FrontendInferenceJobType } from "@storyteller/components/src/jobs/InferenceJob";
 import { usePrefixedDocumentTitle } from "common/UsePrefixedDocumentTitle";
+import { Analytics } from "common/Analytics";
 
 export default function LipsyncEditor({
   enqueueInferenceJob,
@@ -146,6 +147,8 @@ export default function LipsyncEditor({
     leave: { opacity: 0, position: "absolute" },
   });
 
+  const statusTxt = (which: number, config = {}) => ["animationPending","animationInProgress","animationFailed","animationDead","animationSuccess"].map((str,i) => t(`status.${str}`,config))[which];
+
   return (
     <div {...{ className: "container-panel pt-4" }}>
       <div {...{ className: "panel face-animator-main" }}>
@@ -169,7 +172,6 @@ export default function LipsyncEditor({
                 still,
                 stillChange,
                 sessionSubscriptionsWrapper,
-                inferenceJobsByCategory,
                 index,
                 t,
                 toggle: { audio: readyMedia(1), image: readyMedia(0) },
@@ -183,7 +185,12 @@ export default function LipsyncEditor({
           );
         })}
       </div>
-      <InferenceJobsList {...{ t, inferenceJobs }}/>
+      <InferenceJobsList {...{
+        t,
+        onSelect: () => Analytics.voiceConversionClickDownload(),
+        inferenceJobs: inferenceJobsByCategory.get(FrontendInferenceJobType.FaceAnimation),
+        statusTxt
+      }}/>
       <div {...{ className: "face-animator-mobile-sample" }}>
         <BasicVideo {...{ src: "/videos/face-animator-instruction-en.mp4" }} />
       </div>

@@ -162,6 +162,7 @@ $over992: min-width 992px;
 }
 
 .face-animator-jobs {
+  margin-bottom: 1rem;
   @include FApanel;
   h5 {
     @include FAltTxt;

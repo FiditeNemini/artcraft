@@ -12,16 +12,23 @@ import { InferenceJob } from "@storyteller/components/src/jobs/InferenceJob";
 // import { springs } from "resources";
 // import { useInferenceJobs } from "hooks";
 import { Button } from 'components/common';
-import { Analytics } from "common/Analytics";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faChevronRight, faHourglass1, faRemove, faTrophy, faWarning } from "@fortawesome/free-solid-svg-icons";
 
 const DEFAULT_QUEUE_REFRESH_INTERVAL_MILLIS = 15000;
 
-export default function InferenceJobsList({ t, inferenceJobs }: { t: any, inferenceJobs?: any }) {
+interface JobsListProps{
+  filter?: (job:any) => any,
+  onSelect?: (e:any) => any,
+  statusTxt: any,
+  t: any,
+  inferenceJobs?: any
+}
+
+export default function InferenceJobsList({ filter, onSelect, statusTxt, t, inferenceJobs }: JobsListProps) {
   // const { inferenceJobs = [] } = useInferenceJobs({ type: 0 });
   // const oldJobs = thejobs || inferenceJobs;
-  console.log("😎",inferenceJobs);
+ console.log("🥬",inferenceJobs);
   const [pending, pendingSet] = useState<GetPendingTtsJobCountSuccessResponse>({
     success: true,
     pending_job_count: 0,
@@ -29,7 +36,7 @@ export default function InferenceJobsList({ t, inferenceJobs }: { t: any, infere
     refresh_interval_millis: DEFAULT_QUEUE_REFRESH_INTERVAL_MILLIS,
   });
   const statusIcons = [faHourglass1,faHourglass1,faWarning,faRemove,faTrophy];
-  const statusTxt = (which: number, config = {}) => ["animationPending","animationInProgress","animationFailed","animationDead","animationSuccess"].map((str,i) => t(`status.${str}`,config))[which];
+  // const statusTxt = (which: number, config = {}) => ["animationPending","animationInProgress","animationFailed","animationDead","animationSuccess"].map((str,i) => t(`status.${str}`,config))[which];
 
   const processFail = (fail = "") => {
     switch (fail) {
@@ -87,8 +94,10 @@ export default function InferenceJobsList({ t, inferenceJobs }: { t: any, infere
 
     return jobs.length ? <div {...{ className: "face-animator-jobs panel" }}>
       <h5>{ t("headings.yourJobs") }</h5>
-      { jobs.map((job: any, key: number) => {
-        console.log("🌸",job);
+      { jobs
+        // .filter(filter)
+        .map((job: any, key: number) => {
+        console.log("🍇",job);
       return <div {...{ className: "panel face-animator-job", key }}>
         <FontAwesomeIcon {...{ className: `job-status-icon job-status-${job.statusIndex}`, icon: statusIcons[job.statusIndex] }}/>
         <div {...{ className: "job-details" }}>
@@ -105,7 +114,7 @@ export default function InferenceJobsList({ t, inferenceJobs }: { t: any, infere
               icon: faChevronRight,
               iconFlip: true,
               label: t("inputs.viewResult"),
-              onClick:() => Analytics.voiceConversionClickDownload()
+              onClick: onSelect
             }} />: null
           }
       </div>

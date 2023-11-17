@@ -143,7 +143,7 @@ function VoiceDesignerFormPage({ enqueueInferenceJob }: { enqueueInferenceJob: a
         if (res && res.success) {
           enqueueInferenceJob(
             res.inference_job_token,
-            FrontendInferenceJobType.VoiceDesignerTts
+            FrontendInferenceJobType.VoiceDesignerCreateVoice
           );
 
           history.push("/voice-designer");

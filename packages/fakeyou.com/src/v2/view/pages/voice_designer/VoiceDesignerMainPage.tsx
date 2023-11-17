@@ -12,7 +12,12 @@ import ListItems from "./components/NewList";
 import Modal from "components/common/Modal";
 import useVoiceRequests from "./useVoiceRequests";
 
-function VoiceDesignerMainPage({ inferenceJobs }: { inferenceJobs: any }) {
+import {
+  FrontendInferenceJobType,
+  // InferenceJob,
+} from "@storyteller/components/src/jobs/InferenceJob";
+
+function VoiceDesignerMainPage({ inferenceJobsByCategory }: { inferenceJobsByCategory: any }) {
   const { pathname } = useLocation();
   const { t } = useLocalize("FaceAnimator");
   const { datasets, voices } = useVoiceRequests({ requestDatasets: true, requestVoices: true });
@@ -114,6 +119,14 @@ function VoiceDesignerMainPage({ inferenceJobs }: { inferenceJobs: any }) {
     };
   });
 
+  const statusTxt = (status: number, config: any) => [
+    "Voice pending...",
+    "Voice in progress",
+    "Voice failed",
+    "Voice dead",
+    "Voice created successfully"
+  ][status];
+
   const button = {
     label: `Create new voice`,
     icon: faPlus,
@@ -131,7 +144,11 @@ function VoiceDesignerMainPage({ inferenceJobs }: { inferenceJobs: any }) {
           panel={false}
           imageUrl="/images/header/voice-designer.png"
         />
-        <InferenceJobsList {...{ t, inferenceJobs }}/>
+        <InferenceJobsList {...{
+          t,
+          inferenceJobs: inferenceJobsByCategory.get(FrontendInferenceJobType.VoiceDesignerCreateVoice), 
+          statusTxt
+        }}/>
         <Panel mb={true}>
           <nav>
             <ul className="nav nav-tabs">
