@@ -30,10 +30,10 @@ pub struct InsertDatasetSampleAndMediaFileArgs<'a> {
 
   // TODO:
   pub maybe_original_filename: Option<&'a str>,
-  //pub maybe_original_duration_millis: Option<u64>,
   pub maybe_mime_type: Option<&'a str>,
   pub file_size_bytes: u64,
-  //pub maybe_original_audio_encoding: Option<&'a str>,
+  pub maybe_original_duration_millis: Option<u64>,
+  pub maybe_original_audio_encoding: Option<&'a str>,
 
   pub checksum_sha2: &'a str,
 
@@ -136,6 +136,9 @@ SET
   maybe_mime_type = ?,
   file_size_bytes = ?,
 
+  maybe_duration_millis = ?,
+  maybe_audio_encoding = ?,
+
   checksum_sha2 = ?,
 
   public_bucket_directory_hash = ?,
@@ -156,13 +159,12 @@ SET
         args.media_type,
 
         args.maybe_original_filename,
-        //args.maybe_original_duration_millis.unwrap_or(0),
         args.maybe_mime_type,
         args.file_size_bytes,
-        //args.maybe_original_audio_encoding,
-        //args.maybe_original_video_encoding,
-        //args.maybe_original_frame_width,
-        //args.maybe_original_frame_height,
+
+        args.maybe_original_duration_millis.unwrap_or(0),
+        args.maybe_original_audio_encoding,
+
         args.checksum_sha2,
 
         args.media_file_path.get_object_hash(),
