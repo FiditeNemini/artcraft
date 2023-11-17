@@ -60,7 +60,7 @@ export default function VoiceDesignerUseVoicePage(
     voiceToken: "",
     languageTag: "",
   });
-  const { inference } = useVoiceRequests();
+  const { inference } = useVoiceRequests({});
   const [isEnqueuing, setIsEnqueuing] = useState(false);
 
   const getVoiceDetails = useCallback(async (voice_token) => {

@@ -19,7 +19,7 @@ interface RouteParams {
 }
 
 export default function DatasetEditor({ value }: Props) {
-  const { datasets, inputCtrl } = useVoiceRequests();
+  const { datasets, inputCtrl } = useVoiceRequests({});
   const [title, titleSet] = useState("");
   const [language,languageSet] = useState("en");
   const [visibility,visibilitySet] = useState("");

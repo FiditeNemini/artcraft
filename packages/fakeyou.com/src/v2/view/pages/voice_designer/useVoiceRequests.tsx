@@ -24,18 +24,18 @@ import { UpdateDataset, UpdateDatasetRequest, UpdateDatasetResponse } from "@sto
 import { EnqueueTts } from "@storyteller/components/src/api/voice_designer/inference/EnqueueTts";
 import { useSession } from "hooks";
 
-export default function useVoiceRequests() {
+export default function useVoiceRequests({ requestDatasets = false, requestVoices = false }){ 
   // this state will be provided as params, triggering the appropriate api call if present
   const [datasets, datasetsSet] = useState<Dataset[]>([]);
   const [voices, voicesSet] = useState<Voice[]>([]);
 
   // this state stays here, fetched states are not success, merely an attempt was made. Each list fetch sets to true. Set to false to retry
-  const [fetchedDatasets, fetchedDatasetsSet] = useState(false);
-  const [fetchedVoices,fetchedVoicesSet] = useState(false);
+  const [fetchDatasets, fetchDatasetsSet] = useState(requestDatasets);
+  const [fetchVoices,fetchVoicesSet] = useState(requestVoices);
   const { user } = useSession();
   // const [timestamp, timestampSet] = useState(Date.now());
 
-  const refreshData = () => { fetchedDatasetsSet(false); fetchedVoicesSet(false); }; // later we can do refresh per list
+  const refreshData = () => { fetchDatasetsSet(true); fetchVoicesSet(true); }; // later we can do refresh per list
 
   const createDataset = (urlRouteArgs: string, request: CreateDatasetRequest): Promise<CreateDatasetResponse> =>
     CreateDataset(urlRouteArgs, request).then(res => {
@@ -80,6 +80,8 @@ export default function useVoiceRequests() {
     });
   };
 
+  const listDatasets = () => { fetchDatasetsSet(true); return datasets; }
+
   const languages = [
     { value: "en", label: "English" },
     { value: "es", label: "Spanish" },
@@ -93,20 +95,20 @@ export default function useVoiceRequests() {
 
 	useEffect(() => {
     if (user && user.username) {
-      if (!fetchedDatasets) {
-        fetchedDatasetsSet(true);
+      if (fetchDatasets) {
+        fetchDatasetsSet(false);
         ListDatasetsByUser(user.username,{}).then(res => {
           if (res.datasets) datasetsSet(res.datasets);
         });
       }
-      if (!fetchedVoices) {
-        fetchedVoicesSet(true);
+      if (fetchVoices) {
+        fetchVoicesSet(false);
         ListVoicesByUser(user.username,{}).then(res => {
           if (res.voices) voicesSet(res.voices);
         });
       }
     }
-  }, [user, fetchedDatasets, fetchedVoices]);
+  }, [user, fetchDatasets, fetchVoices]);
 
   return {
     datasets: {
@@ -116,6 +118,7 @@ export default function useVoiceRequests() {
       edit: editDataSet,
       get: GetDataset,
       list: datasets,
+      listDatasets,
       refresh: refreshData
     },
     inference: {

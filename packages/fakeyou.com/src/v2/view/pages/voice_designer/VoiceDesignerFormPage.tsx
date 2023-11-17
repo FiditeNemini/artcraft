@@ -28,7 +28,7 @@ interface RouteParams {
 
 function VoiceDesignerFormPage() {
   const history = useHistory();
-  const { datasets, inputCtrl, languages, visibilityOptions, voices } = useVoiceRequests();
+  const { datasets, inputCtrl, languages, visibilityOptions, voices } = useVoiceRequests({});
   const [language, languageSet] = useState("en");
   const [visibility, visibilitySet] = useState("");
   const [title, titleSet] = useState("");

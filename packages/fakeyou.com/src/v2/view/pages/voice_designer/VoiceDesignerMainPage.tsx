@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import { useHistory, useLocation } from "react-router-dom";
 import { faPlus, faWaveform } from "@fortawesome/pro-solid-svg-icons";
+import InferenceJobsList from "components/layout/InferenceJobsList";
+import { useLocalize } from "hooks";
 // import { usePrefixedDocumentTitle } from "common/UsePrefixedDocumentTitle";
 import Panel from "components/common/Panel";
 import PageHeader from "components/layout/PageHeader";
@@ -12,7 +14,8 @@ import useVoiceRequests from "./useVoiceRequests";
 
 function VoiceDesignerMainPage() {
   const { pathname } = useLocation();
-  const { datasets, voices } = useVoiceRequests();
+  const { t } = useLocalize("FaceAnimator");
+  const { datasets, voices } = useVoiceRequests({ requestDatasets: true, requestVoices: true });
   const [isDeleteVoiceModalOpen, setIsDeleteVoiceModalOpen] = useState(false);
   const [isDeleteDatasetModalOpen, setIsDeleteDatasetModalOpen] =
     useState(false);
@@ -128,7 +131,7 @@ function VoiceDesignerMainPage() {
           panel={false}
           imageUrl="/images/header/voice-designer.png"
         />
-
+        <InferenceJobsList {...{ t }}/>
         <Panel mb={true}>
           <nav>
             <ul className="nav nav-tabs">
