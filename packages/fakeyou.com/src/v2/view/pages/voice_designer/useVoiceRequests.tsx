@@ -51,17 +51,18 @@ export default function useVoiceRequests({
   const [datasets, datasetsSet] = useState<Dataset[]>([]);
   const [voices, voicesSet] = useState<Voice[]>([]);
 
-  // this state stays here, fetched states are not success, merely an attempt was made. Each list fetch sets to true. Set to false to retry
-  const [fetchDatasets, fetchDatasetsSet] = useState(requestDatasets);
-  const [fetchVoices, fetchVoicesSet] = useState(requestVoices);
-  const [isFetchingVoices, setIsFetchingVoices] = useState(requestVoices);
-  const [isFetchingDatasets, setIsFetchingDatasets] = useState(requestDatasets);
+  // 0 =  paused, 1 = requested, 2 = started, 3 = success, we could even do 4 for errors
+  const [datasetStatus, datasetStatusSet] = useState(requestDatasets ? 1 : 0);
+  const [voicesStatus, voicesStatusSet] = useState(requestVoices ? 1 : 0);
+
+  const isBusy = (status: number) => status === 1 || status === 2;
+
   const { user } = useSession();
   // const [timestamp, timestampSet] = useState(Date.now());
 
   const refreshData = () => {
-    fetchDatasetsSet(true);
-    fetchVoicesSet(true);
+    datasetStatusSet(1);
+    voicesStatusSet(1);
   }; // later we can do refresh per list
 
   const createDataset = (
@@ -89,7 +90,6 @@ export default function useVoiceRequests({
     }).then((res) => {
       refreshData();
       return res;
-      // console.log("🏧",res);
     });
 
   const deleteDataset = (voiceToken: string): Promise<DeleteDatasetResponse> =>
@@ -99,7 +99,6 @@ export default function useVoiceRequests({
     }).then((res) => {
       refreshData();
       return res;
-      // console.log("🏧",res);
     });
 
   const datasetByToken = (datasetToken?: string) =>
@@ -111,7 +110,6 @@ export default function useVoiceRequests({
     datasetToken: string,
     request: UpdateDatasetRequest
   ): Promise<UpdateDatasetResponse> => {
-    // console.log("🍄", datasetToken);
     return UpdateDataset(datasetToken, request).then((res) => {
       refreshData();
       return res;
@@ -119,7 +117,7 @@ export default function useVoiceRequests({
   };
 
   const listDatasets = () => {
-    fetchDatasetsSet(true);
+    datasetStatusSet(1);
     return datasets;
   };
 
@@ -136,27 +134,25 @@ export default function useVoiceRequests({
 
   useEffect(() => {
     if (user && user.username) {
-      if (fetchDatasets) {
-        setIsFetchingDatasets(true);
-        fetchDatasetsSet(false);
+      if (datasetStatus === 1) {
+        datasetStatusSet(2);
         ListDatasetsByUser(user.username, {}).then((res) => {
+          datasetStatusSet(3);
           if (res.datasets) datasetsSet(res.datasets);
-          setIsFetchingDatasets(false);
         });
       }
-      if (fetchVoices) {
-        setIsFetchingVoices(true);
-        fetchVoicesSet(false);
+      if (voicesStatus === 1) {
+        voicesStatusSet(2);
         ListVoicesByUser(user.username, {}).then((res) => {
+          voicesStatusSet(3);
           if (res.voices) voicesSet(res.voices);
-          setIsFetchingVoices(false);
         });
       }
     }
-  }, [user, fetchDatasets, fetchVoices]);
+  }, [user, datasetStatus, voicesStatus]);
 
   return {
-    isFetching: isFetchingVoices || isFetchingDatasets,
+    isFetching: isBusy(datasetStatus) || isBusy(voicesStatus),
     datasets: {
       byToken: datasetByToken,
       create: createDataset,
@@ -182,9 +178,6 @@ export default function useVoiceRequests({
     },
     inputCtrl:
       (todo: any) =>
-      ({ target }: { target: any }) => {
-        console.log("🌿", target);
-        todo(target.value);
-      },
+      ({ target }: { target: any }) => { todo(target.value); },
   };
 }
