@@ -14,7 +14,7 @@ pub mod user_ratings;
 pub mod voice_conversion_models;
 pub mod voice_conversion_results;
 pub mod zs_voices;
-
+pub mod model_weights;
 // ===== Sqlite =====
 pub mod tts_render_tasks;
 pub mod web_rendition_targets;
