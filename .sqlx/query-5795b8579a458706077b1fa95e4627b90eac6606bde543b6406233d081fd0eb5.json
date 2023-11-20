@@ -1,0 +1,80 @@
+{
+  "db_name": "MySQL",
+  "query": "\nSELECT\n  token as `token: tokens::tokens::users::UserToken`,\n  username,\n  email_address,\n  password_hash as `password_hash: crate::queries::users::user::lookup_user_for_login_result::VecBytes`,\n  password_version,\n  is_banned\nFROM users\nWHERE username = ?\nLIMIT 1\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "token: tokens::tokens::users::UserToken",
+        "type_info": {
+          "type": "VarString",
+          "flags": "NOT_NULL | UNIQUE_KEY | BINARY | NO_DEFAULT_VALUE",
+          "char_set": 224,
+          "max_size": 128
+        }
+      },
+      {
+        "ordinal": 1,
+        "name": "username",
+        "type_info": {
+          "type": "VarString",
+          "flags": "NOT_NULL | UNIQUE_KEY | BINARY | NO_DEFAULT_VALUE",
+          "char_set": 224,
+          "max_size": 80
+        }
+      },
+      {
+        "ordinal": 2,
+        "name": "email_address",
+        "type_info": {
+          "type": "VarString",
+          "flags": "NOT_NULL | UNIQUE_KEY | BINARY | NO_DEFAULT_VALUE",
+          "char_set": 224,
+          "max_size": 1020
+        }
+      },
+      {
+        "ordinal": 3,
+        "name": "password_hash: crate::queries::users::user::lookup_user_for_login_result::VecBytes",
+        "type_info": {
+          "type": "String",
+          "flags": "NOT_NULL | BINARY | NO_DEFAULT_VALUE",
+          "char_set": 63,
+          "max_size": 60
+        }
+      },
+      {
+        "ordinal": 4,
+        "name": "password_version",
+        "type_info": {
+          "type": "Long",
+          "flags": "NOT_NULL | UNSIGNED",
+          "char_set": 63,
+          "max_size": 10
+        }
+      },
+      {
+        "ordinal": 5,
+        "name": "is_banned",
+        "type_info": {
+          "type": "Tiny",
+          "flags": "NOT_NULL",
+          "char_set": 63,
+          "max_size": 1
+        }
+      }
+    ],
+    "parameters": {
+      "Right": 1
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "5795b8579a458706077b1fa95e4627b90eac6606bde543b6406233d081fd0eb5"
+}
