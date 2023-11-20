@@ -9,6 +9,7 @@ use config::shared_constants::{DEFAULT_MYSQL_CONNECTION_STRING, DEFAULT_RUST_LOG
 use errors::AnyhowResult;
 use crate::cli_args::parse_cli_args;
 
+use crate::seeding::model_weights::seed_weights;
 use crate::seeding::users::seed_user_accounts;
 use crate::seeding::voice_conversion::seed_voice_conversion;
 use crate::seeding::zero_shot_tts::seed_zero_shot_tts;
@@ -52,7 +53,8 @@ pub async fn main() -> AnyhowResult<()> {
   seed_user_accounts(&pool).await?;
   seed_zero_shot_tts(&pool, maybe_public_bucket_client.as_ref()).await?;
   seed_voice_conversion(&pool).await?;
-
+  seed_weights(&pool).await?;
+  
   info!("Done!");
   Ok(())
 }

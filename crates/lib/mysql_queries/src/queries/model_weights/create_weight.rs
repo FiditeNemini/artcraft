@@ -1,12 +1,9 @@
 use container_common::anyhow_result::AnyhowResult;
 use sqlx::MySqlPool;
-use enums::by_table::{
-    generic_synthetic_ids::id_category::IdCategory,
-    model_weights::{ weights_types::WeightsType, weights_category::WeightsCategory },
-};
+use enums::by_table::model_weights::{ weights_types::WeightsType, weights_category::WeightsCategory };
+use log::warn;
 use enums::common::visibility::Visibility;
-use tokens::tokens::{ users::UserToken, model_weights::{ ModelWeightToken, self } };
-
+use tokens::tokens::{ users::UserToken, model_weights::ModelWeightToken };
 pub struct CreateModelWeightsArgs<'a> {
     pub token: &'a ModelWeightToken,
     pub weights_type: WeightsType,
@@ -36,19 +33,7 @@ pub struct CreateModelWeightsArgs<'a> {
 
 pub async fn create_weight(args: CreateModelWeightsArgs<'_>) -> AnyhowResult<ModelWeightToken> {
     let model_weights_token = ModelWeightToken::generate();
-
-    let mut transaction = args.mysql_pool.begin().await?;
-
-    if let Some(create_user_token) = args.creator_user_token.as_deref() {
-        let next_model_weights_synthetic_id = transactional_increment_generic_synthetic_id(
-            create_user_token,
-            IdCategory::ModelWeights,
-            &mut transaction
-        ).await?;
-
-        maybe_creator_synthetic_id = Some(next_model_weights_synthetic_id);
-    }
-
+    let transaction = args.mysql_pool.begin().await?;
     let query_result = sqlx::query!(
         r#"
         INSERT INTO model_weights
@@ -84,7 +69,7 @@ pub async fn create_weight(args: CreateModelWeightsArgs<'_>) -> AnyhowResult<Mod
         args.maybe_thumbnail_token,
         args.description_markdown,
         args.description_rendered_html,
-        args.creator_user_token,
+        args.creator_user_token.as_deref(),
         args.creator_ip_address,
         args.creator_set_visibility.to_str(),
         args.maybe_last_update_user_token,
@@ -104,49 +89,12 @@ pub async fn create_weight(args: CreateModelWeightsArgs<'_>) -> AnyhowResult<Mod
 
     match query_result {
         Ok(_) => {
-            Ok(model_weights_token);
+            Ok(model_weights_token)
         }
         Err(err) => {
             transaction.rollback().await?;
             warn!("Transaction failure: {:?}", err);
+            Err(err.into())
         }
     }
 }
-
-// CREATE TABLE model_weights (
-//     id BIGINT(20) NOT NULL AUTO_INCREMENT,
-//     token VARCHAR(32) NOT NULL,
-//     weights_type VARCHAR(32) NOT NULL,
-//     weights_category VARCHAR(32) NOT NULL,
-//     title VARCHAR(255) NOT NULL,
-//     maybe_thumbnail_token VARCHAR(32) DEFAULT NULL,
-//     description_markdown TEXT NOT NULL,
-//     description_rendered_html TEXT NOT NULL,
-//     creator_user_token VARCHAR(32) NOT NULL,
-//     creator_ip_address VARCHAR(40) NOT NULL,
-//     creator_set_visibility ENUM(
-//       'public',
-//       'hidden',
-//       'private'
-//     ) NOT NULL DEFAULT 'public',
-//     maybe_last_update_user_token VARCHAR(32) DEFAULT NULL,
-//     original_download_url VARCHAR(512) DEFAULT NULL,
-//     original_filename VARCHAR(255) DEFAULT NULL,
-//     file_size_bytes INT(10) NOT NULL DEFAULT 0,
-//     file_checksum_sha2 CHAR(64) NOT NULL,
-//     private_bucket_hash  VARCHAR(32) NOT NULL,
-//     maybe_private_bucket_prefix VARCHAR(16) DEFAULT NULL,
-//     maybe_private_bucket_extension VARCHAR(16) DEFAULT NULL,
-//     cached_user_ratings_total_count INT(10) UNSIGNED NOT NULL DEFAULT 0,
-//     cached_user_ratings_positive_count INT(10) UNSIGNED NOT NULL DEFAULT 0,
-//     cached_user_ratings_negative_count INT(10) UNSIGNED NOT NULL DEFAULT 0,
-//     maybe_cached_user_ratings_ratio FLOAT,
-//     cached_user_ratings_last_updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-//     version INT NOT NULL DEFAULT 0,
-//     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-//     updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-//     user_deleted_at TIMESTAMP NULL,
-//     mod_deleted_at TIMESTAMP NULL,
-//     PRIMARY KEY (id),
-//     UNIQUE KEY (token)
-//   ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;
