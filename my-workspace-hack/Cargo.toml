@@ -68,7 +68,8 @@ sha2 = { version = "0.10.5" }
 simd-adler32 = { version = "0.3.7" }
 socket2-9fbad63c4bcf4a8f = { package = "socket2", version = "0.4.7", default-features = false, features = ["all"] }
 socket2-d8f496e17d97b5cb = { package = "socket2", version = "0.5.5", default-features = false, features = ["all"] }
-sqlx = { version = "0.7.2", features = ["chrono", "mysql", "runtime-tokio-native-tls", "sqlite"] }
+sqlx = { version = "0.7.2", features = ["chrono", "mysql", "runtime-tokio-native-tls", "sqlite", "tls-rustls"] }
+sqlx-core = { version = "0.7.2", features = ["_rt-tokio", "_tls-native-tls", "_tls-rustls", "any", "chrono", "json", "migrate", "offline"] }
 sqlx-mysql = { version = "0.7.2", default-features = false, features = ["any", "chrono", "json", "migrate", "offline"] }
 sqlx-sqlite = { version = "0.7.2", default-features = false, features = ["any", "chrono", "json", "migrate", "offline"] }
 time = { version = "0.3.14", features = ["macros", "serde-well-known"] }
@@ -128,8 +129,9 @@ serde = { version = "1.0.179", features = ["alloc", "derive", "rc"] }
 serde_json = { version = "1.0.108", features = ["raw_value"] }
 sha1 = { version = "0.10.4" }
 sha2 = { version = "0.10.5" }
-sqlx-macros = { version = "0.7.2", features = ["_rt-tokio", "_tls-native-tls", "chrono", "json", "migrate", "mysql", "sqlite"] }
-sqlx-macros-core = { version = "0.7.2", features = ["_rt-tokio", "_tls-native-tls", "chrono", "json", "migrate", "mysql", "sqlite"] }
+sqlx-core = { version = "0.7.2", features = ["_rt-tokio", "_tls-native-tls", "_tls-rustls", "any", "chrono", "json", "migrate", "offline"] }
+sqlx-macros = { version = "0.7.2", features = ["_rt-tokio", "_tls-native-tls", "_tls-rustls", "chrono", "json", "migrate", "mysql", "sqlite"] }
+sqlx-macros-core = { version = "0.7.2", features = ["_rt-tokio", "_tls-native-tls", "_tls-rustls", "chrono", "json", "migrate", "mysql", "sqlite"] }
 sqlx-mysql = { version = "0.7.2", default-features = false, features = ["any", "chrono", "json", "migrate", "offline"] }
 sqlx-sqlite = { version = "0.7.2", default-features = false, features = ["any", "chrono", "json", "migrate", "offline"] }
 syn-dff4ba8e3ae991db = { package = "syn", version = "1.0.107", features = ["extra-traits", "fold", "full", "visit", "visit-mut"] }
