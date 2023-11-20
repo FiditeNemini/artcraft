@@ -99,19 +99,19 @@ RUN du -hsc * | sort -hr
 RUN RUSTFLAGS="-C target-feature=+crt-static" SQLX_OFFLINE=true \
   LD_LIBRARY_PATH=/usr/lib:${LD_LIBRARY_PATH} \
   $HOME/.cargo/bin/cargo build \
-  --release --target=x86_64-unknown-linux-musl \
+  --release --target=x86_64-unknown-linux-gnu \
   --bin dummy-service
 
 RUN RUSTFLAGS="-C target-feature=+crt-static" SQLX_OFFLINE=true \
   LD_LIBRARY_PATH=/usr/lib:${LD_LIBRARY_PATH} \
   $HOME/.cargo/bin/cargo build \
-  --release --target=x86_64-unknown-linux-musl \
+  --release --target=x86_64-unknown-linux-gnu \
   --bin download-job
 
 RUN RUSTFLAGS="-C target-feature=+crt-static" SQLX_OFFLINE=true \
   LD_LIBRARY_PATH=/usr/lib:${LD_LIBRARY_PATH} \
   $HOME/.cargo/bin/cargo build \
-  --release --target=x86_64-unknown-linux-musl \
+  --release --target=x86_64-unknown-linux-gnu \
   --bin inference-job
 
 # Print a report on disk space
