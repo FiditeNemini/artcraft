@@ -17,6 +17,9 @@ import { WebUrl } from "../../../../common/WebUrl";
 import { BeginStripeCheckoutFlow } from "../../../../common/BeginStripeCheckoutFlow";
 import { usePrefixedDocumentTitle } from "../../../../common/UsePrefixedDocumentTitle";
 import { PosthogClient } from "@storyteller/components/src/analytics/PosthogClient";
+import Container from "components/common/Container";
+import PageHeader from "components/layout/PageHeader";
+import Panel from "components/common/Panel";
 
 enum FieldTriState {
   EMPTY_FALSE,
@@ -185,10 +188,10 @@ function SignupPage(props: Props) {
     Analytics.accountSignupAttempt();
 
     if (
-      (usernameValid !== FieldTriState.TRUE) ||
-      (emailValid !== FieldTriState.TRUE) ||
-      (passwordValid !== FieldTriState.TRUE) ||
-      (passwordConfirmationValid !== FieldTriState.TRUE)
+      usernameValid !== FieldTriState.TRUE ||
+      emailValid !== FieldTriState.TRUE ||
+      passwordValid !== FieldTriState.TRUE ||
+      passwordConfirmationValid !== FieldTriState.TRUE
     ) {
       return false;
     }
@@ -346,118 +349,115 @@ function SignupPage(props: Props) {
   }
 
   return (
-    <div className="pt-lg-5">
-      <div className="container-panel pb-5 pt-lg-5 login-panel">
-        <div className="panel p-3 p-lg-4 load-hidden mt-5 mt-lg-0 px-md-4">
-          <h1 className="panel-title fw-bold ">
-            {t("account.SignUpPage.signUpTitle")}
-          </h1>
-          <div className="py-6">
-            <form onSubmit={handleFormSubmit}>
-              <div className="d-flex flex-column gap-4">
-                <div>
-                  <label className="sub-title">
-                    {t("account.SignUpPage.inputs.username")}
-                  </label>
-                  <div className="form-group input-icon">
-                    <span className="form-control-feedback">
-                      <FontAwesomeIcon icon={faUser} />
-                    </span>
-                    <input
-                      className={usernameInputClass}
-                      type="text"
-                      placeholder={t(
-                        "account.SignUpPage.inputs.usernamePlaceholder"
-                      )}
-                      value={username}
-                      onChange={handleUsernameChange}
-                    />
-                  </div>
-                  <p className={usernameHelpClass}>{usernameInvalidReason}</p>
-                </div>
-                <div>
-                  <label className="sub-title">
-                    {t("account.SignUpPage.inputs.email")}
-                  </label>
-                  <div className="form-group input-icon">
-                    <span className="form-control-feedback">
-                      <FontAwesomeIcon icon={faEnvelope} />
-                    </span>
-                    <input
-                      className={emailInputClass}
-                      type="email"
-                      placeholder={t(
-                        "account.SignUpPage.inputs.emailPlaceholder"
-                      )}
-                      value={email}
-                      onChange={handleEmailChange}
-                    />
-                  </div>
-                  <p className={emailHelpClass}>{emailInvalidReason}</p>
-                </div>
-                <div>
-                  <label className="sub-title">
-                    {t("account.SignUpPage.inputs.password")}
-                  </label>
-                  <div className="form-group input-icon">
-                    <span className="form-control-feedback">
-                      <FontAwesomeIcon icon={faKey} />
-                    </span>
-                    <input
-                      className={passwordInputClass}
-                      type="password"
-                      placeholder={t(
-                        "account.SignUpPage.inputs.passwordPlaceholder"
-                      )}
-                      value={password}
-                      onChange={handlePasswordChange}
-                    />
-                  </div>
-                  <p className={passwordHelpClass}>{passwordInvalidReason}</p>
-                </div>
-                <div>
-                  <label className="sub-title">
-                    {t("account.SignUpPage.inputs.passwordConfirm")}
-                  </label>
-                  <div className="form-group input-icon">
-                    <span className="form-control-feedback">
-                      <FontAwesomeIcon icon={faKey} />
-                    </span>
-                    <input
-                      className={passwordConfirmationInputClass}
-                      type="password"
-                      placeholder={t(
-                        "account.SignUpPage.inputs.passwordConfirmPlaceholder"
-                      )}
-                      value={passwordConfirmation}
-                      onChange={handlePasswordConfirmationChange}
-                    />
-                  </div>
-                  <p className={passwordConfirmationHelpClass}>
-                    {passwordConfirmationInvalidReason}
-                  </p>
-                </div>
-                {/*<div className="alert alert-warning mb-0">
+    <Container type="panel" className="login-panel">
+      <PageHeader
+        title="Sign Up"
+        subText="Create a new account."
+        panel={false}
+      />
+
+      <Panel padding={true}>
+        <form onSubmit={handleFormSubmit}>
+          <div className="d-flex flex-column gap-4">
+            <div>
+              <label className="sub-title">
+                {t("account.SignUpPage.inputs.username")}
+              </label>
+              <div className="form-group input-icon">
+                <span className="form-control-feedback">
+                  <FontAwesomeIcon icon={faUser} />
+                </span>
+                <input
+                  className={usernameInputClass}
+                  type="text"
+                  placeholder={t(
+                    "account.SignUpPage.inputs.usernamePlaceholder"
+                  )}
+                  value={username}
+                  onChange={handleUsernameChange}
+                />
+              </div>
+              <p className={usernameHelpClass}>{usernameInvalidReason}</p>
+            </div>
+            <div>
+              <label className="sub-title">
+                {t("account.SignUpPage.inputs.email")}
+              </label>
+              <div className="form-group input-icon">
+                <span className="form-control-feedback">
+                  <FontAwesomeIcon icon={faEnvelope} />
+                </span>
+                <input
+                  className={emailInputClass}
+                  type="email"
+                  placeholder={t("account.SignUpPage.inputs.emailPlaceholder")}
+                  value={email}
+                  onChange={handleEmailChange}
+                />
+              </div>
+              <p className={emailHelpClass}>{emailInvalidReason}</p>
+            </div>
+            <div>
+              <label className="sub-title">
+                {t("account.SignUpPage.inputs.password")}
+              </label>
+              <div className="form-group input-icon">
+                <span className="form-control-feedback">
+                  <FontAwesomeIcon icon={faKey} />
+                </span>
+                <input
+                  className={passwordInputClass}
+                  type="password"
+                  placeholder={t(
+                    "account.SignUpPage.inputs.passwordPlaceholder"
+                  )}
+                  value={password}
+                  onChange={handlePasswordChange}
+                />
+              </div>
+              <p className={passwordHelpClass}>{passwordInvalidReason}</p>
+            </div>
+            <div>
+              <label className="sub-title">
+                {t("account.SignUpPage.inputs.passwordConfirm")}
+              </label>
+              <div className="form-group input-icon">
+                <span className="form-control-feedback">
+                  <FontAwesomeIcon icon={faKey} />
+                </span>
+                <input
+                  className={passwordConfirmationInputClass}
+                  type="password"
+                  placeholder={t(
+                    "account.SignUpPage.inputs.passwordConfirmPlaceholder"
+                  )}
+                  value={passwordConfirmation}
+                  onChange={handlePasswordConfirmationChange}
+                />
+              </div>
+              <p className={passwordConfirmationHelpClass}>
+                {passwordConfirmationInvalidReason}
+              </p>
+            </div>
+            {/*<div className="alert alert-warning mb-0">
                   <strong>Remember your password!</strong> We don't have
                   password reset currently, and it'll be a few more weeks before
                   it's added (there are more important features to work on). If
                   you lose your password, please let us know in Discord.
                 </div>*/}
-                <button className="btn btn-primary btn-lg w-100 mt-2">
-                  {t("account.SignUpPage.signUpButton")}
-                </button>
-                <p>
-                  <Trans i18nKey="account.SignUpPage.signInInstead">
-                    Already have an account?{" "}
-                    <Link to="/login">Log in instead.</Link>
-                  </Trans>
-                </p>
-              </div>
-            </form>
+            <button className="btn btn-primary btn-lg w-100 mt-2">
+              {t("account.SignUpPage.signUpButton")}
+            </button>
+            <p>
+              <Trans i18nKey="account.SignUpPage.signInInstead">
+                Already have an account?{" "}
+                <Link to="/login">Log in instead.</Link>
+              </Trans>
+            </p>
           </div>
-        </div>
-      </div>
-    </div>
+        </form>
+      </Panel>
+    </Container>
   );
 }
 
