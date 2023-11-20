@@ -14,7 +14,7 @@ SELECT
   token as `token: tokens::tokens::users::UserToken`,
   username,
   email_address,
-  password_hash,
+  password_hash as `password_hash: crate::queries::users::user::lookup_user_for_login_result::VecBytes`,
   password_version,
   is_banned
 FROM users

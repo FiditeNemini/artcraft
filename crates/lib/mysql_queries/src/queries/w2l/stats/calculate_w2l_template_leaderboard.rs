@@ -53,7 +53,7 @@ ORDER BY uploaded_count desc
 LIMIT 25;
         "#,
     )
-      .fetch_all(mysql_pool)
+      .fetch_all(&mut **mysql_pool)
       .await;
 
   let results : Vec<W2lLeaderboardRecordForListRaw> = match maybe_results {

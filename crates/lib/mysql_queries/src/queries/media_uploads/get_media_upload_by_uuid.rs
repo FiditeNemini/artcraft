@@ -61,7 +61,7 @@ WHERE
         "#,
     uuid_idempotency_token,
   )
-      .fetch_one(mysql_connection)
+      .fetch_one(&mut **mysql_connection)
       .await;
 
   match maybe_result {

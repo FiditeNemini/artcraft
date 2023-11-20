@@ -152,7 +152,7 @@ SET
       args.worker_hostname,
       args.worker_cluster
     )
-        .execute(&mut transaction)
+        .execute(&mut *transaction)
         .await;
 
     let record_id = match query_result {

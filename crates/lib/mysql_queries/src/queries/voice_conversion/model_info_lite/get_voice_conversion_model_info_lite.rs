@@ -33,7 +33,7 @@ WHERE vc.token = ?
         "#,
     token
   )
-          .fetch_one(mysql_connection)
+          .fetch_one(&mut **mysql_connection)
           .await;
 
   let model : RawVoiceConversionModelInfoLite = match maybe_model {

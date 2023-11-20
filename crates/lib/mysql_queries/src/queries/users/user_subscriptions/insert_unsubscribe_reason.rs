@@ -48,7 +48,7 @@ SET
       self.ip_address,
       );
 
-    let query_result = query.execute(mysql_connection)
+    let query_result = query.execute(&mut **mysql_connection)
         .await;
 
     let _record_id = match query_result {

@@ -44,7 +44,7 @@ WHERE
         "#,
       user_token,
     )
-        .fetch_all(mysql_connection)
+        .fetch_all(&mut **mysql_connection)
         .await?;
 
     let records = records.into_iter()

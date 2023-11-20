@@ -26,7 +26,7 @@ SELECT
     vc.model_type as `model_type: enums::by_table::voice_conversion_models::voice_conversion_model_type::VoiceConversionModelType`
 FROM voice_conversion_models as vc
         "#)
-          .fetch_all(mysql_connection)
+          .fetch_all(&mut **mysql_connection)
           .await?;
 
   Ok(models.into_iter()

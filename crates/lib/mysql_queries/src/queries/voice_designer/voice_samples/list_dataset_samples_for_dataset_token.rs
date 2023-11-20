@@ -119,7 +119,7 @@ async fn list_samples_by_dataset_token(
                     AND zds.mod_deleted_at IS NULL
             "#,
             dataset_token
-        ).fetch_all(mysql_connection).await?
+        ).fetch_all(&mut **mysql_connection).await?
     } else {
         sqlx::query_as!(
             InternalRawDatasetSampleRecordForList,
@@ -140,7 +140,7 @@ async fn list_samples_by_dataset_token(
                 WHERE zds.dataset_token = ?
             "#,
             dataset_token
-        ).fetch_all(mysql_connection).await?
+        ).fetch_all(&mut **mysql_connection).await?
     };
 
     Ok(maybe_samples)

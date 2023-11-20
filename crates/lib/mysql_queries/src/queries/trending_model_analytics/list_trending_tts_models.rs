@@ -65,7 +65,7 @@ pub async fn list_trending_tts_models(
   let query = query_parts.join(" UNION ");
   let mut query = sqlx::query_as::<_, RawTrendingModel>(&query);
 
-  let results = query.fetch_all(mysql_connection).await?;
+  let results = query.fetch_all(&mut **mysql_connection).await?;
 
   let results = results.into_iter()
       .map(|model| TrendingModel {

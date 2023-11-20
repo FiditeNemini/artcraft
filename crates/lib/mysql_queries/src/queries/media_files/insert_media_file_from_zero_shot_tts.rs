@@ -136,7 +136,7 @@ pub async fn insert_media_file_from_zero_shot(
           args.worker_hostname,
           args.worker_cluster
         )
-            .execute(&mut transaction)
+            .execute(&mut *transaction)
             .await;
     
         let record_id = match query_result {

@@ -14,170 +14,152 @@ publish = false
 
 ### BEGIN HAKARI SECTION
 [dependencies]
-actix-rt = { version = "2" }
-ahash = { version = "0.7" }
-base64ct = { version = "1", default-features = false, features = ["alloc"] }
-bitflags = { version = "1" }
-block-buffer = { version = "0.9", default-features = false, features = ["block-padding"] }
-bytemuck = { version = "1", default-features = false, features = ["extern_crate_alloc"] }
-byteorder = { version = "1" }
-chrono = { version = "0.4", features = ["alloc", "serde"] }
-combine = { version = "4", default-features = false, features = ["std", "tokio"] }
-crossbeam-utils = { version = "0.8" }
-digest = { version = "0.10", features = ["mac", "std"] }
-either = { version = "1", features = ["serde"] }
-flate2 = { version = "1" }
-flume = { version = "0.10" }
-futures = { version = "0.3", features = ["thread-pool"] }
-futures-channel = { version = "0.3", features = ["sink"] }
-futures-core = { version = "0.3" }
-futures-executor = { version = "0.3", features = ["thread-pool"] }
-futures-io = { version = "0.3" }
-futures-sink = { version = "0.3" }
-futures-task = { version = "0.3", default-features = false, features = ["std"] }
-futures-util = { version = "0.3", features = ["channel", "io", "sink"] }
-generic-array = { version = "0.14", default-features = false, features = ["more_lengths"] }
-getrandom-6f8ce4dd05d13bba = { package = "getrandom", version = "0.2", default-features = false, features = ["js", "rdrand", "std"] }
-getrandom-c65f7effa3be6d31 = { package = "getrandom", version = "0.1", default-features = false, features = ["std"] }
-hashbrown = { version = "0.12", features = ["raw"] }
-hmac = { version = "0.12", default-features = false, features = ["reset"] }
-hyper = { version = "0.14", features = ["client", "http1", "http2", "server", "tcp"] }
-indexmap = { version = "1", default-features = false, features = ["std"] }
-lazy_static = { version = "1", default-features = false, features = ["spin_no_std"] }
-log = { version = "0.4", default-features = false, features = ["std"] }
-memchr = { version = "2", features = ["use_std"] }
-miniz_oxide = { version = "0.7", features = ["simd"] }
-native-tls = { version = "0.2", default-features = false, features = ["vendored"] }
-num-bigint = { version = "0.4" }
-num-integer = { version = "0.1", features = ["i128"] }
-num-iter = { version = "0.1" }
-num-traits = { version = "0.2", features = ["i128", "libm"] }
-parking_lot = { version = "0.12", features = ["send_guard"] }
-rand = { version = "0.8", features = ["small_rng"] }
-rand_core = { version = "0.6", default-features = false, features = ["std"] }
-regex = { version = "1" }
-regex-automata = { version = "0.4", default-features = false, features = ["dfa-onepass", "hybrid", "meta", "nfa-backtrack", "perf-inline", "perf-literal", "unicode"] }
-regex-syntax = { version = "0.8" }
-reqwest = { version = "0.11", features = ["gzip", "json", "native-tls", "stream"] }
-serde = { version = "1", features = ["alloc", "derive", "rc"] }
-serde_json = { version = "1", features = ["raw_value"] }
-sha1 = { version = "0.10" }
-sha2 = { version = "0.10" }
-simd-adler32 = { version = "0.3" }
-socket2 = { version = "0.4", default-features = false, features = ["all"] }
-sqlx = { version = "0.6", features = ["chrono", "mysql", "offline", "runtime-actix-native-tls", "sqlite"] }
-sqlx-core = { version = "0.6", features = ["any", "chrono", "mysql", "offline", "runtime-tokio-native-tls", "sqlite"] }
-standback = { version = "0.2", default-features = false, features = ["std"] }
-time = { version = "0.3", features = ["macros", "serde-well-known"] }
-tokio-6f8ce4dd05d13bba = { package = "tokio", version = "0.2", features = ["blocking", "io-util", "rt-util", "signal", "stream", "sync", "tcp", "time", "udp", "uds"] }
-tokio-dff4ba8e3ae991db = { package = "tokio", version = "1", features = ["fs", "io-util", "macros", "net", "parking_lot", "rt-multi-thread", "signal", "sync", "time"] }
-tokio-stream = { version = "0.1", features = ["fs"] }
-tokio-util-3b31131e45eafb45 = { package = "tokio-util", version = "0.6", features = ["codec", "io"] }
-tokio-util-ca01ad9e24f5d932 = { package = "tokio-util", version = "0.7", features = ["codec", "io"] }
-tracing = { version = "0.1", default-features = false, features = ["log", "std"] }
-tracing-core = { version = "0.1", default-features = false, features = ["std"] }
-twitch_oauth2 = { version = "0.6", features = ["reqwest_client"] }
-unicode-bidi = { version = "0.3" }
-unicode-normalization = { version = "0.1" }
-url = { version = "2", features = ["serde"] }
-void = { version = "1" }
+actix-rt = { version = "2.9.0" }
+ahash-c38e5c1d305a1b54 = { package = "ahash", version = "0.8.3" }
+ahash-ca01ad9e24f5d932 = { package = "ahash", version = "0.7.6" }
+base64 = { version = "0.21.0" }
+base64ct = { version = "1.5.3", default-features = false, features = ["alloc"] }
+bitflags = { version = "2.4.0", default-features = false, features = ["serde"] }
+block-buffer = { version = "0.9.0", default-features = false, features = ["block-padding"] }
+bytemuck = { version = "1.12.3", default-features = false, features = ["extern_crate_alloc"] }
+byteorder = { version = "1.5.0" }
+chrono = { version = "0.4.22", features = ["alloc", "serde"] }
+combine = { version = "4.6.3", default-features = false, features = ["std", "tokio"] }
+crossbeam-utils = { version = "0.8.16" }
+digest = { version = "0.10.7", features = ["mac", "oid", "std"] }
+either = { version = "1.6.1", features = ["serde"] }
+flate2 = { version = "1.0.26" }
+futures = { version = "0.3.26", features = ["thread-pool"] }
+futures-channel = { version = "0.3.29", features = ["sink"] }
+futures-core = { version = "0.3.29" }
+futures-executor = { version = "0.3.26", features = ["thread-pool"] }
+futures-io = { version = "0.3.29" }
+futures-sink = { version = "0.3.29" }
+futures-util = { version = "0.3.29", features = ["channel", "io", "sink"] }
+generic-array = { version = "0.14.4", default-features = false, features = ["more_lengths"] }
+getrandom-6f8ce4dd05d13bba = { package = "getrandom", version = "0.2.8", default-features = false, features = ["js", "rdrand", "std"] }
+getrandom-c65f7effa3be6d31 = { package = "getrandom", version = "0.1.16", default-features = false, features = ["std"] }
+hashbrown-582f2526e08bb6a0 = { package = "hashbrown", version = "0.14.2", features = ["raw"] }
+hashbrown-5ef9efb8ec2df382 = { package = "hashbrown", version = "0.12.3", features = ["raw"] }
+hmac = { version = "0.12.1", default-features = false, features = ["reset"] }
+hyper = { version = "0.14.24", features = ["client", "http1", "http2", "runtime", "server"] }
+lazy_static = { version = "1.4.0", default-features = false, features = ["spin_no_std"] }
+libc = { version = "0.2.150", features = ["align", "extra_traits"] }
+log = { version = "0.4.20", default-features = false, features = ["std"] }
+memchr = { version = "2.6.4", features = ["use_std"] }
+miniz_oxide = { version = "0.7.1", features = ["simd"] }
+mio = { version = "0.8.9", features = ["net", "os-ext"] }
+native-tls = { version = "0.2.10", default-features = false, features = ["vendored"] }
+num-integer = { version = "0.1.44", features = ["i128"] }
+num-iter = { version = "0.1.42" }
+num-traits = { version = "0.2.15", features = ["i128", "libm"] }
+once_cell = { version = "1.18.0", features = ["unstable"] }
+parking_lot = { version = "0.12.1", features = ["send_guard"] }
+rand = { version = "0.8.5", features = ["small_rng"] }
+rand_core = { version = "0.6.4", default-features = false, features = ["std"] }
+regex = { version = "1.10.0" }
+regex-automata = { version = "0.4.1", default-features = false, features = ["dfa-onepass", "hybrid", "meta", "nfa-backtrack", "perf-inline", "perf-literal", "unicode"] }
+regex-syntax = { version = "0.8.0" }
+reqwest = { version = "0.11.14", features = ["gzip", "json", "native-tls", "stream"] }
+serde = { version = "1.0.179", features = ["alloc", "derive", "rc"] }
+serde_json = { version = "1.0.108", features = ["raw_value"] }
+sha1 = { version = "0.10.4" }
+sha2 = { version = "0.10.5" }
+simd-adler32 = { version = "0.3.7" }
+socket2-9fbad63c4bcf4a8f = { package = "socket2", version = "0.4.7", default-features = false, features = ["all"] }
+socket2-d8f496e17d97b5cb = { package = "socket2", version = "0.5.5", default-features = false, features = ["all"] }
+sqlx = { version = "0.7.2", features = ["chrono", "mysql", "runtime-tokio-native-tls", "sqlite"] }
+sqlx-mysql = { version = "0.7.2", default-features = false, features = ["any", "chrono", "json", "migrate", "offline"] }
+sqlx-sqlite = { version = "0.7.2", default-features = false, features = ["any", "chrono", "json", "migrate", "offline"] }
+time = { version = "0.3.14", features = ["macros", "serde-well-known"] }
+tokio = { version = "1.34.0", features = ["fs", "io-util", "macros", "net", "parking_lot", "rt-multi-thread", "signal", "sync", "time"] }
+tokio-stream = { version = "0.1.11", features = ["fs"] }
+tokio-util-3b31131e45eafb45 = { package = "tokio-util", version = "0.6.9", features = ["codec", "io"] }
+tokio-util-ca01ad9e24f5d932 = { package = "tokio-util", version = "0.7.4", features = ["codec", "io"] }
+tracing = { version = "0.1.37", features = ["log"] }
+twitch_oauth2 = { version = "0.6.0", features = ["reqwest_client"] }
+unicode-bidi = { version = "0.3.13" }
+unicode-normalization = { version = "0.1.22" }
+url = { version = "2.4.1", features = ["serde"] }
+void = { version = "1.0.2" }
 
 [build-dependencies]
-ahash = { version = "0.7" }
-base64ct = { version = "1", default-features = false, features = ["alloc"] }
-bitflags = { version = "1" }
-byteorder = { version = "1" }
-cc = { version = "1", default-features = false, features = ["parallel"] }
-chrono = { version = "0.4", features = ["alloc", "serde"] }
-crossbeam-utils = { version = "0.8" }
-derive_more = { version = "0.99" }
-digest = { version = "0.10", features = ["mac", "std"] }
-either = { version = "1", features = ["serde"] }
-flume = { version = "0.10" }
-futures-channel = { version = "0.3", features = ["sink"] }
-futures-core = { version = "0.3" }
-futures-executor = { version = "0.3", features = ["thread-pool"] }
-futures-io = { version = "0.3" }
-futures-sink = { version = "0.3" }
-futures-task = { version = "0.3", default-features = false, features = ["std"] }
-futures-util = { version = "0.3", features = ["channel", "io", "sink"] }
-generic-array = { version = "0.14", default-features = false, features = ["more_lengths"] }
-getrandom-6f8ce4dd05d13bba = { package = "getrandom", version = "0.2", default-features = false, features = ["js", "rdrand", "std"] }
-hashbrown = { version = "0.12", features = ["raw"] }
-indexmap = { version = "1", default-features = false, features = ["std"] }
-lazy_static = { version = "1", default-features = false, features = ["spin_no_std"] }
-log = { version = "0.4", default-features = false, features = ["std"] }
-memchr = { version = "2", features = ["use_std"] }
-native-tls = { version = "0.2", default-features = false, features = ["vendored"] }
-num-bigint = { version = "0.4" }
-num-integer = { version = "0.1", features = ["i128"] }
-num-iter = { version = "0.1" }
-num-traits = { version = "0.2", features = ["i128", "libm"] }
-parking_lot = { version = "0.12", features = ["send_guard"] }
-rand = { version = "0.8", features = ["small_rng"] }
-rand_core = { version = "0.6", default-features = false, features = ["std"] }
-regex = { version = "1" }
-regex-automata = { version = "0.4", default-features = false, features = ["dfa-onepass", "hybrid", "meta", "nfa-backtrack", "perf-inline", "perf-literal", "unicode"] }
-regex-syntax = { version = "0.8" }
-serde = { version = "1", features = ["alloc", "derive", "rc"] }
-serde_json = { version = "1", features = ["raw_value"] }
-sha1 = { version = "0.10" }
-sha2 = { version = "0.10" }
-sqlx-core = { version = "0.6", features = ["any", "chrono", "mysql", "offline", "runtime-tokio-native-tls", "sqlite"] }
-sqlx-macros = { version = "0.6", default-features = false, features = ["chrono", "migrate", "mysql", "offline", "runtime-tokio-native-tls", "sqlite"] }
-standback = { version = "0.2", default-features = false, features = ["std"] }
-syn-dff4ba8e3ae991db = { package = "syn", version = "1", features = ["extra-traits", "fold", "full", "visit-mut"] }
-syn-f595c2ba2a3f28df = { package = "syn", version = "2", features = ["extra-traits", "fold", "full"] }
-tokio-dff4ba8e3ae991db = { package = "tokio", version = "1", features = ["fs", "io-util", "macros", "net", "parking_lot", "rt-multi-thread", "signal", "sync", "time"] }
-tokio-stream = { version = "0.1", features = ["fs"] }
-tracing = { version = "0.1", default-features = false, features = ["log", "std"] }
-tracing-core = { version = "0.1", default-features = false, features = ["std"] }
-unicode-bidi = { version = "0.3" }
-unicode-normalization = { version = "0.1" }
-url = { version = "2", features = ["serde"] }
-
-[target.x86_64-unknown-linux-musl.dependencies]
-hyper = { version = "0.14", default-features = false, features = ["runtime"] }
-libc = { version = "0.2", features = ["align", "extra_traits"] }
-once_cell = { version = "1", features = ["unstable"] }
-openssl = { version = "0.10", features = ["vendored"] }
-openssl-sys = { version = "0.9", default-features = false, features = ["vendored"] }
-
-[target.x86_64-unknown-linux-musl.build-dependencies]
-libc = { version = "0.2", features = ["align", "extra_traits"] }
-once_cell = { version = "1", features = ["unstable"] }
-openssl = { version = "0.10", features = ["vendored"] }
-openssl-sys = { version = "0.9", default-features = false, features = ["vendored"] }
-
-[target.aarch64-apple-darwin.dependencies]
-hyper = { version = "0.14", default-features = false, features = ["runtime"] }
-libc = { version = "0.2", features = ["align", "extra_traits"] }
-once_cell = { version = "1", features = ["unstable"] }
-
-[target.aarch64-apple-darwin.build-dependencies]
-libc = { version = "0.2", features = ["align", "extra_traits"] }
-once_cell = { version = "1", features = ["unstable"] }
+ahash-c38e5c1d305a1b54 = { package = "ahash", version = "0.8.3" }
+ahash-ca01ad9e24f5d932 = { package = "ahash", version = "0.7.6" }
+base64 = { version = "0.21.0" }
+base64ct = { version = "1.5.3", default-features = false, features = ["alloc"] }
+bitflags = { version = "2.4.0", default-features = false, features = ["serde"] }
+byteorder = { version = "1.5.0" }
+cc = { version = "1.0.79", default-features = false, features = ["parallel"] }
+chrono = { version = "0.4.22", features = ["alloc", "serde"] }
+crossbeam-utils = { version = "0.8.16" }
+derive_more = { version = "0.99.17" }
+digest = { version = "0.10.7", features = ["mac", "oid", "std"] }
+either = { version = "1.6.1", features = ["serde"] }
+futures-channel = { version = "0.3.29", features = ["sink"] }
+futures-core = { version = "0.3.29" }
+futures-executor = { version = "0.3.26", features = ["thread-pool"] }
+futures-io = { version = "0.3.29" }
+futures-sink = { version = "0.3.29" }
+futures-util = { version = "0.3.29", features = ["channel", "io", "sink"] }
+generic-array = { version = "0.14.4", default-features = false, features = ["more_lengths"] }
+getrandom-6f8ce4dd05d13bba = { package = "getrandom", version = "0.2.8", default-features = false, features = ["js", "rdrand", "std"] }
+hashbrown-582f2526e08bb6a0 = { package = "hashbrown", version = "0.14.2", features = ["raw"] }
+hashbrown-5ef9efb8ec2df382 = { package = "hashbrown", version = "0.12.3", features = ["raw"] }
+heck = { version = "0.4.1", features = ["unicode"] }
+hmac = { version = "0.12.1", default-features = false, features = ["reset"] }
+lazy_static = { version = "1.4.0", default-features = false, features = ["spin_no_std"] }
+libc = { version = "0.2.150", features = ["align", "extra_traits"] }
+log = { version = "0.4.20", default-features = false, features = ["std"] }
+memchr = { version = "2.6.4", features = ["use_std"] }
+mio = { version = "0.8.9", features = ["net", "os-ext"] }
+native-tls = { version = "0.2.10", default-features = false, features = ["vendored"] }
+num-integer = { version = "0.1.44", features = ["i128"] }
+num-iter = { version = "0.1.42" }
+num-traits = { version = "0.2.15", features = ["i128", "libm"] }
+once_cell = { version = "1.18.0", features = ["unstable"] }
+parking_lot = { version = "0.12.1", features = ["send_guard"] }
+rand = { version = "0.8.5", features = ["small_rng"] }
+rand_core = { version = "0.6.4", default-features = false, features = ["std"] }
+regex = { version = "1.10.0" }
+regex-automata = { version = "0.4.1", default-features = false, features = ["dfa-onepass", "hybrid", "meta", "nfa-backtrack", "perf-inline", "perf-literal", "unicode"] }
+regex-syntax = { version = "0.8.0" }
+serde = { version = "1.0.179", features = ["alloc", "derive", "rc"] }
+serde_json = { version = "1.0.108", features = ["raw_value"] }
+sha1 = { version = "0.10.4" }
+sha2 = { version = "0.10.5" }
+sqlx-macros = { version = "0.7.2", features = ["_rt-tokio", "_tls-native-tls", "chrono", "json", "migrate", "mysql", "sqlite"] }
+sqlx-macros-core = { version = "0.7.2", features = ["_rt-tokio", "_tls-native-tls", "chrono", "json", "migrate", "mysql", "sqlite"] }
+sqlx-mysql = { version = "0.7.2", default-features = false, features = ["any", "chrono", "json", "migrate", "offline"] }
+sqlx-sqlite = { version = "0.7.2", default-features = false, features = ["any", "chrono", "json", "migrate", "offline"] }
+syn-dff4ba8e3ae991db = { package = "syn", version = "1.0.107", features = ["extra-traits", "fold", "full", "visit", "visit-mut"] }
+syn-f595c2ba2a3f28df = { package = "syn", version = "2.0.26", features = ["extra-traits", "fold", "full", "visit-mut"] }
+tokio = { version = "1.34.0", features = ["fs", "io-util", "macros", "net", "parking_lot", "rt-multi-thread", "signal", "sync", "time"] }
+tokio-stream = { version = "0.1.11", features = ["fs"] }
+tracing = { version = "0.1.37", features = ["log"] }
+unicode-bidi = { version = "0.3.13" }
+unicode-normalization = { version = "0.1.22" }
+url = { version = "2.4.1", features = ["serde"] }
 
 [target.x86_64-unknown-linux-gnu.dependencies]
-hyper = { version = "0.14", default-features = false, features = ["runtime"] }
-libc = { version = "0.2", features = ["align", "extra_traits"] }
-once_cell = { version = "1", features = ["unstable"] }
-openssl = { version = "0.10", features = ["vendored"] }
-openssl-sys = { version = "0.9", default-features = false, features = ["vendored"] }
+openssl = { version = "0.10.57", features = ["vendored"] }
+openssl-sys = { version = "0.9.93", default-features = false, features = ["vendored"] }
 
 [target.x86_64-unknown-linux-gnu.build-dependencies]
-libc = { version = "0.2", features = ["align", "extra_traits"] }
-once_cell = { version = "1", features = ["unstable"] }
-openssl = { version = "0.10", features = ["vendored"] }
-openssl-sys = { version = "0.9", default-features = false, features = ["vendored"] }
-
-[target.x86_64-apple-darwin.dependencies]
-hyper = { version = "0.14", default-features = false, features = ["runtime"] }
-libc = { version = "0.2", features = ["align", "extra_traits"] }
-once_cell = { version = "1", features = ["unstable"] }
+openssl = { version = "0.10.57", features = ["vendored"] }
+openssl-sys = { version = "0.9.93", default-features = false, features = ["vendored"] }
+socket2-d8f496e17d97b5cb = { package = "socket2", version = "0.5.5", default-features = false, features = ["all"] }
 
 [target.x86_64-apple-darwin.build-dependencies]
-libc = { version = "0.2", features = ["align", "extra_traits"] }
-once_cell = { version = "1", features = ["unstable"] }
+socket2-d8f496e17d97b5cb = { package = "socket2", version = "0.5.5", default-features = false, features = ["all"] }
+
+[target.x86_64-pc-windows-msvc.dependencies]
+winapi = { version = "0.3.9", default-features = false, features = ["consoleapi", "errhandlingapi", "fibersapi", "fileapi", "handleapi", "impl-debug", "impl-default", "knownfolders", "lmcons", "memoryapi", "minschannel", "minwinbase", "minwindef", "namedpipeapi", "ntdef", "ntsecapi", "ntstatus", "objbase", "processenv", "processthreadsapi", "profileapi", "schannel", "securitybaseapi", "shlobj", "sspi", "std", "synchapi", "sysinfoapi", "timezoneapi", "winbase", "wincon", "wincrypt", "winerror", "winnt", "winreg", "winsock2", "ws2def", "ws2ipdef", "ws2tcpip", "wtypesbase"] }
+windows-sys = { version = "0.48.0", features = ["Win32_Foundation", "Win32_NetworkManagement_IpHelper", "Win32_Networking_WinSock", "Win32_Security", "Win32_Storage_FileSystem", "Win32_System_Console", "Win32_System_Diagnostics_Debug", "Win32_System_IO", "Win32_System_Pipes", "Win32_System_SystemServices", "Win32_System_Threading", "Win32_System_WindowsProgramming"] }
+
+[target.x86_64-pc-windows-msvc.build-dependencies]
+socket2-d8f496e17d97b5cb = { package = "socket2", version = "0.5.5", default-features = false, features = ["all"] }
+winapi = { version = "0.3.9", default-features = false, features = ["consoleapi", "errhandlingapi", "fibersapi", "fileapi", "handleapi", "impl-debug", "impl-default", "knownfolders", "lmcons", "memoryapi", "minschannel", "minwinbase", "minwindef", "namedpipeapi", "ntdef", "ntsecapi", "ntstatus", "objbase", "processenv", "processthreadsapi", "profileapi", "schannel", "securitybaseapi", "shlobj", "sspi", "std", "synchapi", "sysinfoapi", "timezoneapi", "winbase", "wincon", "wincrypt", "winerror", "winnt", "winreg", "winsock2", "ws2def", "ws2ipdef", "ws2tcpip", "wtypesbase"] }
+windows-sys = { version = "0.48.0", features = ["Win32_Foundation", "Win32_NetworkManagement_IpHelper", "Win32_Networking_WinSock", "Win32_Security", "Win32_Storage_FileSystem", "Win32_System_Console", "Win32_System_Diagnostics_Debug", "Win32_System_IO", "Win32_System_Pipes", "Win32_System_SystemServices", "Win32_System_Threading", "Win32_System_WindowsProgramming"] }
 
 ### END HAKARI SECTION

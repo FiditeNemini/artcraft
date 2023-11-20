@@ -53,7 +53,7 @@ const ORIGIN_PRODUCT : MediaFileOriginProductCategory = MediaFileOriginProductCa
 
 pub async fn insert_dataset_sample_and_media_file(args: InsertDatasetSampleAndMediaFileArgs<'_>) -> AnyhowResult<(ZsVoiceDatasetSampleToken, MediaFileToken, u64)> {
 
-  let mut maybe_creator_synthetic_id : Option<u64> = None;
+  let maybe_creator_synthetic_id : Option<u64> = None;
 
   let mut transaction = args.mysql_pool.begin().await?;
 
@@ -180,7 +180,7 @@ SET
         args.creator_set_visibility.to_str()
     );
 
-  let query_result = query.execute(&mut transaction)
+  let query_result = query.execute(&mut *transaction)
       .await;
 
   if let Err(err) = query_result {
@@ -214,7 +214,7 @@ SET
         args.creator_ip_address,
     );
 
-  let query_result = query.execute(&mut transaction)
+  let query_result = query.execute(&mut *transaction)
       .await;
 
   let result_tuple  = match query_result {

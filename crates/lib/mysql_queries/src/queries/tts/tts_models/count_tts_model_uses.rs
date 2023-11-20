@@ -33,7 +33,7 @@ pub async fn count_tts_model_uses(
     last_n_minutes,
     tts_model_token
   )
-      .fetch_one(mysql_connection)
+      .fetch_one(&mut **mysql_connection)
       .await?;
 
   Ok(TtsModelUseCountInfo {

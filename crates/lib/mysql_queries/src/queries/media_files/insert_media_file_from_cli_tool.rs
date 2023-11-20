@@ -86,7 +86,7 @@ SET
 
       args.creator_set_visibility.to_str(),
     )
-        .execute(&mut transaction)
+        .execute(&mut *transaction)
         .await;
 
     let record_id = match query_result {

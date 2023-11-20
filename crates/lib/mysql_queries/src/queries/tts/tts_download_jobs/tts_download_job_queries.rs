@@ -81,7 +81,7 @@ FOR UPDATE
         "#,
         job.id,
     )
-      .fetch_one(&mut transaction)
+      .fetch_one(&mut *transaction)
       .await;
 
   let record : TtsUploadLockRecord = match maybe_record {
@@ -124,7 +124,7 @@ WHERE id = ?
         "#,
         job.id,
     )
-      .execute(&mut transaction)
+      .execute(&mut *transaction)
       .await?;
 
   transaction.commit().await?;

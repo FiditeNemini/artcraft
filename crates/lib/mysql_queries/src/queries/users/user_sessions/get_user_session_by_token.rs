@@ -81,7 +81,7 @@ pub async fn get_user_session_by_token_pooled_connection(
   mysql_connection: &mut PoolConnection<MySql>,
   session_token: &str,
 ) -> AnyhowResult<Option<SessionUserRecord>> {
-  get_user_session_by_token(mysql_connection, session_token).await
+  get_user_session_by_token(&mut **mysql_connection, session_token).await
 }
 
 

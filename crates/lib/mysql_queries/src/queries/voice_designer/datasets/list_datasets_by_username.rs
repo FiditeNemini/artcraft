@@ -119,7 +119,7 @@ async fn list_datasets_by_creator_username(
             AND zd.mod_deleted_at IS NULL
         "#,
       creator_username)
-            .fetch_all(mysql_connection)
+            .fetch_all(&mut **mysql_connection)
             .await?
     } else {
         info!("listing datasets for user");
@@ -146,7 +146,7 @@ async fn list_datasets_by_creator_username(
             users.username = ?
         "#,
       creator_username)
-            .fetch_all(mysql_connection)
+            .fetch_all(&mut **mysql_connection)
             .await?
     };
 

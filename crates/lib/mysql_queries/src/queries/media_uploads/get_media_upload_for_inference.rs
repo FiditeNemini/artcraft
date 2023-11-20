@@ -69,7 +69,7 @@ WHERE
         "#,
     media_upload_token.as_str(),
   )
-      .fetch_one(mysql_connection)
+      .fetch_one(&mut **mysql_connection)
       .await;
 
   match maybe_result {

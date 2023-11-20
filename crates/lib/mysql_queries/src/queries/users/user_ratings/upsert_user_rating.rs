@@ -45,6 +45,6 @@ ON DUPLICATE KEY UPDATE
       args.ip_address
     );
 
-  let _r = query.execute(args.mysql_connection).await?;
+  let _r = query.execute(&mut **args.mysql_connection).await?;
   Ok(())
 }

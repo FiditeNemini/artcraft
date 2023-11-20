@@ -67,7 +67,7 @@ impl SessionChecker {
     mysql_connection: &mut PoolConnection<MySql>,
   ) -> AnyhowResult<Option<SessionRecord>>
   {
-    self.do_session_light_lookup_and_cookie_decode(request, mysql_connection).await
+    self.do_session_light_lookup_and_cookie_decode(request, &mut **mysql_connection).await
   }
 
 
@@ -127,7 +127,7 @@ impl SessionChecker {
     mysql_connection: &mut PoolConnection<MySql>,
   ) -> AnyhowResult<Option<SessionUserRecord>>
   {
-    self.do_user_session_lookup_and_cookie_decode(request, mysql_connection).await
+    self.do_user_session_lookup_and_cookie_decode(request, &mut **mysql_connection).await
   }
 
 

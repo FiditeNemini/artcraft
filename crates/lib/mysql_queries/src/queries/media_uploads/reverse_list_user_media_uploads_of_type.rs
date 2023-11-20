@@ -68,7 +68,7 @@ LIMIT 25
     creator_user_token,
     media_upload_type.to_str(),
   )
-          .fetch_all(mysql_connection)
+          .fetch_all(&mut **mysql_connection)
           .await;
 
   match maybe_results {
