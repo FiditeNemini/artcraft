@@ -26,7 +26,7 @@ actix-web = "4.0.0-beta.10"
 
 # IPv4 and v6 CIDRs (crate has few dependencies)
 cidr-utils = "0.5.11"
-num-traits = "0.2.15" # for cidr-utils
+num-traits = "0.2.17" # for cidr-utils
 
 # Futures
 futures-util = "0.3.29"
