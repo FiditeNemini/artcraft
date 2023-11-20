@@ -96,19 +96,19 @@ RUN pwd
 RUN du -hsc * | sort -hr
 
 # Build all the binaries that run on GPU, including "dummy-service".
-RUN SQLX_OFFLINE=true \
+RUN RUSTFLAGS="-C target-feature=+crt-static" SQLX_OFFLINE=true \
   LD_LIBRARY_PATH=/usr/lib:${LD_LIBRARY_PATH} \
   $HOME/.cargo/bin/cargo build \
   --release \
   --bin dummy-service
 
-RUN SQLX_OFFLINE=true \
+RUN RUSTFLAGS="-C target-feature=+crt-static" SQLX_OFFLINE=true \
   LD_LIBRARY_PATH=/usr/lib:${LD_LIBRARY_PATH} \
   $HOME/.cargo/bin/cargo build \
   --release \
   --bin download-job
 
-RUN SQLX_OFFLINE=true \
+RUN RUSTFLAGS="-C target-feature=+crt-static" SQLX_OFFLINE=true \
   LD_LIBRARY_PATH=/usr/lib:${LD_LIBRARY_PATH} \
   $HOME/.cargo/bin/cargo build \
   --release \
