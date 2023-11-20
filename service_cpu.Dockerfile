@@ -130,7 +130,7 @@ RUN SQLX_OFFLINE=true \
   LD_LIBRARY_PATH=/usr/lib:${LD_LIBRARY_PATH} \
   $HOME/.cargo/bin/cargo build \
   --release \
-  --bin tts-inference-job \
+  --bin tts-inference-job
 
 # Print a report on disk space
 RUN echo "Disk usage at current directory (after all builds):"
