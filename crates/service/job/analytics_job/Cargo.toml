@@ -26,7 +26,7 @@ tokens = { path = "../../../_types/tokens" }
 
 # External
 anyhow = "1.0.75"
-chrono = { version = "0.4.19", features = ["serde"] }
+chrono = { version = "=0.4.22", features = ["serde"] }
 dotenv = "0.15.0"
 hostname = "0.3.1"
 log = "0.4.14"
@@ -36,7 +36,7 @@ rand = "0.8.3"
 # "offline" supports typesafe builds without a live database
 # "rustls" doesn't appear to work with IP addresses, per:
 # https://github.com/launchbadge/sqlx/issues/1095#issuecomment-798050828
-sqlx = { version = "0.6.2", features = [ "mysql", "runtime-actix-native-tls", "offline", "chrono" ] }
+sqlx = { version = "0.7.2", features = [ "mysql", "runtime-tokio", "tls-native-tls", "chrono" ] }
 
 # Runtime
 # NB: We switched to Tokio from `async-std` for broader ecosystem support.

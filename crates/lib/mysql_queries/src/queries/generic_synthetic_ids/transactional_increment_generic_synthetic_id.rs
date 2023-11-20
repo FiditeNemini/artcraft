@@ -31,7 +31,7 @@ ON DUPLICATE KEY UPDATE
       user_token,
       id_category_str
     )
-        .execute(&mut *transaction) // TODO/FIXME WTF THIS IS SO GROSS
+        .execute(&mut **transaction) // TODO/FIXME WTF THIS IS SO GROSS
         .await;
 
     match query_result {
@@ -59,7 +59,7 @@ LIMIT 1
       user_token,
       id_category_str,
     )
-      .fetch_one(&mut *transaction)
+      .fetch_one(&mut **transaction)
       .await;
 
   let record : SyntheticIdRecord = match query_result {

@@ -33,7 +33,7 @@ SELECT
     token as `token: tokens::tokens::tts_models::TtsModelToken`
 FROM tts_models
         "#)
-        .fetch_all(mysql_connection)
+        .fetch_all(&mut **mysql_connection)
         .await?;
 
   let tokens = tokens.into_iter()

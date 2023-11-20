@@ -18,14 +18,14 @@ path = "src/lib.rs"
 # (none)
 
 # External
-chrono = { version = "0.4.19", features = ["serde"] }
+chrono = { version = "=0.4.22", features = ["serde"] }
 
 # Serialization
 serde = "1.0.125"
 serde_derive = "1.0.125"
 
 # MySql Database
-sqlx = { version = "0.6.2", features = [ "mysql", "runtime-actix-native-tls", "offline", "chrono" ] }
+sqlx = { version = "0.7.2", features = [ "mysql", "runtime-tokio", "tls-native-tls", "chrono" ] }
 my-workspace-hack = { version = "0.1", path = "../../../my-workspace-hack" }
 
 [dev-dependencies]

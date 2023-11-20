@@ -90,7 +90,7 @@ WHERE
     LIMIT {}
   "#, num_records));
 
-  let mut job_records = sqlx::query_as::<_, AvailableDownloadJobRawInternal>(&query)
+  let job_records = sqlx::query_as::<_, AvailableDownloadJobRawInternal>(&query)
       .fetch_all(pool)
       .await?;
 

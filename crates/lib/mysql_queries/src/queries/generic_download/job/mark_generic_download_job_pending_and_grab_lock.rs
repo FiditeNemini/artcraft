@@ -38,7 +38,7 @@ FOR UPDATE
         "#,
         job_id.0,
     )
-      .fetch_one(&mut transaction)
+      .fetch_one(&mut *transaction)
       .await;
 
   let record : GenericDownloadJobLockRecord = match maybe_record {
@@ -87,7 +87,7 @@ WHERE id = ?
         &container_environment.cluster_name,
         job_id.0,
     )
-        .execute(&mut transaction)
+        .execute(&mut *transaction)
         .await?;
   } else {
     let _acquire_lock = sqlx::query!(
@@ -105,7 +105,7 @@ WHERE id = ?
         &container_environment.cluster_name,
         job_id.0,
     )
-        .execute(&mut transaction)
+        .execute(&mut *transaction)
         .await?;
   }
 

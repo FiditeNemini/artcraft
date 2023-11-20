@@ -84,7 +84,7 @@ async fn select_include_deleted(
         "#,
         dataset_sample_token.as_str()
   )
-      .fetch_one(mysql_connection).await
+      .fetch_one(&mut **mysql_connection).await
 }
 
 async fn select_without_deleted(
@@ -106,7 +106,7 @@ async fn select_without_deleted(
         "#,
         dataset_sample_token.as_str()
   )
-      .fetch_one(mysql_connection).await
+      .fetch_one(&mut **mysql_connection).await
 }
 #[derive(Serialize)]
 pub struct RawDataset {

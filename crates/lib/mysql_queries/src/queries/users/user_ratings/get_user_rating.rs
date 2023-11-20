@@ -47,7 +47,7 @@ LIMIT 1
       entity_type,
       entity_token,
     )
-      .fetch_one(args.mysql_connection)
+      .fetch_one(&mut **args.mysql_connection)
       .await;
 
   match maybe_result {

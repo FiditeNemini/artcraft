@@ -120,7 +120,7 @@ pub async fn create_comment_handler(
     comment_markdown: &markdown,
     comment_rendered_html: &html,
     creator_ip_address: &ip_address,
-    mysql_executor: &mut mysql_connection,
+    mysql_executor: &mut *mysql_connection,
     phantom: Default::default(),
   }).await;
 

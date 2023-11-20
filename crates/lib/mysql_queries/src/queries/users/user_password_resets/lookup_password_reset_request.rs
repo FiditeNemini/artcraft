@@ -39,7 +39,7 @@ FOR UPDATE
         "#,
         password_reset_token,
     )
-      .fetch_one(&mut transaction)
+      .fetch_one(&mut *transaction)
       .await;
 
   match result {

@@ -35,7 +35,7 @@ LIMIT 1
         args.user_token,
     );
 
-  let query_result = query.execute(&mut args.mysql_transaction).await;
+  let query_result = query.execute(&mut *args.mysql_transaction).await;
 
   if let Err(err) = query_result {
     let _r = args.mysql_transaction.rollback().await.ok();
@@ -57,7 +57,7 @@ LIMIT 1
         args.password_reset_token,
     );
 
-  let query_result = query.execute(&mut args.mysql_transaction).await;
+  let query_result = query.execute(&mut *args.mysql_transaction).await;
 
   if let Err(err) = query_result {
     let _r = args.mysql_transaction.rollback().await.ok();

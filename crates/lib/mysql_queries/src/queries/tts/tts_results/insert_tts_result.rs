@@ -99,7 +99,7 @@ ON DUPLICATE KEY UPDATE
       creator_user_token,
       creator_user_token
     )
-        .execute(&mut transaction)
+        .execute(&mut *transaction)
         .await;
 
     match query_result {
@@ -123,7 +123,7 @@ LIMIT 1
         "#,
       creator_user_token,
     )
-        .fetch_one(&mut transaction)
+        .fetch_one(&mut *transaction)
         .await;
 
     let record : SyntheticIdRecord = match query_result {
@@ -191,7 +191,7 @@ SET
       worker_hostname,
       is_debug_worker,
     )
-        .execute(&mut transaction)
+        .execute(&mut *transaction)
         .await;
 
     let record_id = match query_result {

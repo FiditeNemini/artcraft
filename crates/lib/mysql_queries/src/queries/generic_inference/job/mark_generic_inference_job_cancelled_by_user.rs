@@ -23,7 +23,7 @@ AND status NOT IN ('complete_success', 'complete_failure', 'dead', 'cancelled_by
         "#,
         job_token,
     )
-      .execute(mysql_connection)
+      .execute(&mut **mysql_connection)
       .await;
 
   match query_result {
