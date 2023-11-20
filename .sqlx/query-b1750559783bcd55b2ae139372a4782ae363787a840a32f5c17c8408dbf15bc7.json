@@ -1,0 +1,12 @@
+{
+  "db_name": "MySQL",
+  "query": "\nINSERT INTO generic_inference_jobs\nSET\n  token = ?,\n  uuid_idempotency_token = ?,\n\n  inference_category = ?,\n  maybe_model_type = ?,\n  maybe_model_token = ?,\n\n  maybe_input_source_token = ?,\n  maybe_input_source_token_type = ?,\n\n  maybe_raw_inference_text = ?,\n\n  maybe_inference_args = ?,\n\n  maybe_creator_user_token = ?,\n  maybe_creator_anonymous_visitor_token = ?,\n  creator_ip_address = ?,\n\n  creator_set_visibility = ?,\n\n  priority_level = ?,\n  is_keepalive_required = ?,\n\n  is_debug_request = ?,\n  maybe_routing_tag = ?,\n\n  status = \"pending\"\n        ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 17
+    },
+    "nullable": []
+  },
+  "hash": "b1750559783bcd55b2ae139372a4782ae363787a840a32f5c17c8408dbf15bc7"
+}

@@ -70,6 +70,7 @@ FROM rust-base AS builder
 # NB: Now we build and test our code.
 COPY Cargo.lock .
 COPY Cargo.toml .
+COPY .sqlx/ .sqlx
 COPY crates/ ./crates
 COPY my-workspace-hack/ ./my-workspace-hack
 COPY includes/ ./includes
