@@ -24,7 +24,7 @@ rand = "0.8.3"
 # "offline" supports typesafe builds without a live database
 # "rustls" doesn't appear to work with IP addresses, per:
 # https://github.com/launchbadge/sqlx/issues/1095#issuecomment-798050828
-sqlx = { version = "0.7.2", features = [ "mysql", "runtime-tokio", "tls-native-tls", "chrono" ] }
+sqlx = { version = "0.7.2", features = [ "mysql", "runtime-tokio", "tls-rustls", "chrono" ] }
 sqlx-core = { version = "0.7.2" }
 my-workspace-hack = { version = "0.1", path = "../../../my-workspace-hack" }
 

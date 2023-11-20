@@ -2,10 +2,6 @@
 # =============== (1) set up core rust build image ===============
 # ================================================================
 
-# Custom base image
-# Make sure to add this repository so it has read acces to the base image:
-# https://github.com/orgs/storytold/packages/container/docker-base-images-rust-ssl/settings/actions_access
-# FROM ghcr.io/storytold/docker-base-images-rust-ssl:d94ce4350c3b as rust-build
 FROM ubuntu:jammy as rust-base
 
 # NB: This can be "stable" or another version.
@@ -16,7 +12,6 @@ WORKDIR /tmp
 # NB: cmake is required for freetype-sys-0.13.1, which in turn has only been added for egui.
 # NB: fontconfig is required by servo-fontconfig-sys, which is in the dependency chain for egui.
 # NB: libfontconfig-dev is required by servo-fontconfig-sys, which is in the dependency chain for egui.
-# NB: pkg-config and libssl are for container TLS; we may switch to rustls in the future.
 RUN apt-get update \
     && DEBIAN_FRONTEND=noninteractive TZ=Etc/UTC apt-get install -y \
         build-essential \
@@ -24,7 +19,6 @@ RUN apt-get update \
         curl \
         fontconfig \
         libfontconfig1-dev \
-        libssl-dev \
         pkg-config
 
 # NB: Fix for fontconfig (servo-fontconfig-sys): https://github.com/alacritty/alacritty/issues/4423#issuecomment-727277235
@@ -153,13 +147,6 @@ COPY --from=builder /tmp/target/release/dummy-service /
 COPY --from=builder /tmp/target/release/download-job /
 COPY --from=builder /tmp/target/release/inference-job /
 
-# SSL certs are required for crypto
-COPY --from=builder /etc/ssl /etc/ssl
-
-# Required dynamically linked libraries
-COPY --from=builder /usr/lib/x86_64-linux-gnu/libssl.*             /lib/x86_64-linux-gnu/
-COPY --from=builder /usr/lib/x86_64-linux-gnu/libcrypto.*          /lib/x86_64-linux-gnu/
-
 # Container includes
 COPY includes/ /includes
 
@@ -216,6 +203,6 @@ RUN  apt-get clean autoclean && apt-get autoremove -y && rm -rf /var/lib/{apt,dp
 # NB(bt,2023-05-28): Python logging may be slowing down in k8s
 # See: https://github.com/kubernetes-client/python/issues/1867
 COPY includes/container_includes/python_overrides/logger/__init__.py /usr/lib/python3.10/logging/__init__.py
-COPY includes/container_includes/python_overrides/logger/__init__.py /usr/lib/python3.8/logging/__init__.py
+# COPY includes/container_includes/python_overrides/logger/__init__.py /usr/lib/python3.8/logging/__init__.py
 
 EXPOSE 8080

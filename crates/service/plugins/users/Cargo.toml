@@ -62,7 +62,7 @@ toml = "0.5.8"
 # "offline" supports typesafe builds without a live database
 # "rustls" doesn't appear to work with IP addresses, per:
 # https://github.com/launchbadge/sqlx/issues/1095#issuecomment-798050828
-sqlx = { version = "0.7.2", features = [ "mysql", "runtime-tokio", "tls-native-tls", "chrono" ] }
+sqlx = { version = "0.7.2", features = [ "mysql", "runtime-tokio", "tls-rustls", "chrono" ] }
 
 # TODO: Shouldn't really be a dependency, but need to add caching for the DDoS attack.
 # Redis Database
