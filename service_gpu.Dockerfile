@@ -151,9 +151,9 @@ ARG GIT_SHA
 RUN echo -n ${GIT_SHA} > GIT_SHA
 
 # Copy all the binaries.
-COPY --from=builder /tmp/target/release/dummy-service /
-COPY --from=builder /tmp/target/release/download-job /
-COPY --from=builder /tmp/target/release/inference-job /
+COPY --from=builder /tmp/target/x86_64-unknown-linux-gnu/release/dummy-service /
+COPY --from=builder /tmp/target/x86_64-unknown-linux-gnu/release/download-job /
+COPY --from=builder /tmp/target/x86_64-unknown-linux-gnu/release/inference-job /
 
 # Container includes
 COPY includes/ /includes
