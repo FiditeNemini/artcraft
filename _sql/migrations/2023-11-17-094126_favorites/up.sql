@@ -24,26 +24,22 @@ CREATE TABLE favorites
     -- ========== VECTOR CLOCK ==========
 
     -- Incremented with every update.
-    version                 INT         NOT NULL DEFAULT 0,
+    version                 INT  NOT NULL DEFAULT 0,
 
     -- ========== TIMESTAMPS ==========
 
-    created_at              TIMESTAMP   NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at              TIMESTAMP   NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-
-    -- If this is removed by a mod.
-    -- It completely disappears from the system.
-    user_deleted_at         TIMESTAMP   NULL,
-    mod_deleted_at          TIMESTAMP   NULL,
+    created_at         TIMESTAMP   NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at         TIMESTAMP   NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    deleted_at         TIMESTAMP   NULL,
 
     -- INDICES --
     PRIMARY KEY (id),
     UNIQUE KEY (token),
     KEY index_entity_type_entity_token (entity_type, entity_token),
+    KEY index_user_token_entity_token (user_token, entity_type),
     KEY index_user_token (user_token),
     KEY index_created_at (created_at),
-    KEY index_user_deleted_at (user_deleted_at),
-    KEY index_mod_deleted_at (mod_deleted_at)
+    KEY index_user_deleted_at (deleted_at)
 
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4

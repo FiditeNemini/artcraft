@@ -101,7 +101,7 @@ pub async fn create_favorite_handler(
   let query_result = create_favorite(CreateFavoriteArgs {
     entity_token: &entity_token,
     user_token: &user_session.user_token_typed,
-    mysql_executor: &mut mysql_connection,
+    mysql_executor: &mut *mysql_connection,
     phantom: Default::default(),
   }).await;
 
@@ -112,14 +112,6 @@ pub async fn create_favorite_handler(
       return Err(CreateFavoriteError::ServerError);
     }
   };
-
-  // server_state.firehose_publisher.publish_favorite_created(
-  //   &user_session.user_token_typed, &favorite_token)
-  //     .await
-  //     .map_err(|e| {
-  //       warn!("error publishing event: {:?}", e);
-  //       CreateFavoriteError::ServerError
-  //     })?;
 
   let response = CreateFavoriteSuccessResponse {
     success: true,

@@ -10,10 +10,9 @@ use actix_web::{HttpRequest, HttpResponse, web};
 use actix_web::error::ResponseError;
 use actix_web::http::StatusCode;
 use actix_web::web::Path;
-use log::{error, warn};
+use log::warn;
 
-use mysql_queries::queries::favorites::delete_favorite::{delete_favorite, DeleteFavoriteAs};
-use mysql_queries::queries::favorites::get_favorite::get_favorite;
+use mysql_queries::queries::favorites::delete_favorite::delete_favorite;
 use tokens::tokens::favorites::FavoriteToken;
 
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
@@ -72,7 +71,7 @@ impl fmt::Display for DeleteFavoriteError {
 pub async fn delete_favorite_handler(
   http_request: HttpRequest,
   path: Path<DeleteFavoritePathInfo>,
-  request: web::Json<DeleteFavoriteRequest>,
+  _request: web::Json<DeleteFavoriteRequest>,
   server_state: web::Data<Arc<ServerState>>
 ) -> Result<HttpResponse, DeleteFavoriteError> {
   let mut mysql_connection = server_state.mysql_pool
@@ -99,45 +98,10 @@ pub async fn delete_favorite_handler(
     }
   };
 
-  let mut maybe_delete_as = None;
-
-  if request.as_mod.unwrap_or(false) && user_session.can_ban_users {
-    // 1) Delete as moderator
-    maybe_delete_as = Some(DeleteFavoriteAs::Moderator);
-  } else {
-    let favorite = get_favorite(&path.favorite_token, &mut mysql_connection)
-        .await
-        .map_err(|err| {
-          error!("error with query: {:?}", err);
-          DeleteFavoriteError::ServerError
-        })?
-        .ok_or(DeleteFavoriteError::NotFound)?;
-
-    // 2) Delete as author
-    if favorite.user_token == user_session.user_token_typed {
-      maybe_delete_as = Some(DeleteFavoriteAs::Author);
-    }
-
-    // 3) Delete as object owner
-    if maybe_delete_as.is_none() {
-      // TODO: Search for owner of the entity.
-    }
-
-    // 4) Last ditch - try to see if they're a moderator again.
-    if maybe_delete_as.is_none() && user_session.can_ban_users {
-      maybe_delete_as = Some(DeleteFavoriteAs::Moderator);
-    }
-  }
-
-  let delete_as = match maybe_delete_as {
-    Some(delete_as) => delete_as,
-    None => return Err(DeleteFavoriteError::NotAuthorized),
-  };
-
   let query_result = delete_favorite(
     &path.favorite_token,
-    delete_as,
-    &mut mysql_connection
+    &user_session.user_token_typed,
+    &mut *mysql_connection
   ).await;
 
   match query_result {

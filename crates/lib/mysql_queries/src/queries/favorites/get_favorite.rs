@@ -18,15 +18,9 @@ pub struct Favorite {
   pub user_display_name: String,
   pub user_gravatar_hash: String,
 
-  pub mod_fields: FavoriteForListModFields,
-
   pub created_at: DateTime<Utc>,
   pub updated_at: DateTime<Utc>,
-}
-
-pub struct FavoriteForListModFields {
-  pub maybe_user_deleted_at: Option<DateTime<Utc>>,
-  pub maybe_mod_deleted_at: Option<DateTime<Utc>>,
+  pub maybe_deleted_at: Option<DateTime<Utc>>,
 }
 
 pub async fn get_favorite<'e, 'c, E>(
@@ -53,8 +47,7 @@ SELECT
 
     f.created_at,
     f.updated_at,
-    f.user_deleted_at,
-    f.mod_deleted_at
+    f.deleted_at
 
 FROM
     favorites AS f
@@ -77,12 +70,9 @@ WHERE
       username: favorite.username,
       user_display_name: favorite.user_display_name,
       user_gravatar_hash: favorite.user_gravatar_hash,
-      mod_fields: FavoriteForListModFields {
-        maybe_user_deleted_at: favorite.user_deleted_at,
-        maybe_mod_deleted_at: favorite.mod_deleted_at,
-      },
       created_at: favorite.created_at,
       updated_at: favorite.updated_at,
+      maybe_deleted_at: favorite.deleted_at,
     })),
     Err(err) => match err {
       sqlx::Error::RowNotFound => Ok(None),
@@ -102,9 +92,7 @@ pub struct RawFavorite {
   pub user_display_name: String,
   pub user_gravatar_hash: String,
 
-
   pub created_at: DateTime<Utc>,
   pub updated_at: DateTime<Utc>,
-  pub user_deleted_at: Option<DateTime<Utc>>,
-  pub mod_deleted_at: Option<DateTime<Utc>>,
+  pub deleted_at: Option<DateTime<Utc>>,
 }

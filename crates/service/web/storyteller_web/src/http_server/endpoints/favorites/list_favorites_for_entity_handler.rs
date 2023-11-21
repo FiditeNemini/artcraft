@@ -17,13 +17,10 @@ use enums::by_table::favorites::favorite_entity_type::FavoriteEntityType;
 use mysql_queries::queries::favorites::favorite_entity_token::FavoriteEntityToken;
 use mysql_queries::queries::favorites::list_favorites_for_entity::list_favorites_for_entity;
 use tokens::tokens::favorites::FavoriteToken;
-use tokens::tokens::users::UserToken;
 
 use crate::http_server::common_responses::user_details_lite::{DefaultAvatarInfo, UserDetailsLight};
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::server_state::ServerState;
-use crate::user_avatars::default_avatar_color_from_username::default_avatar_color_from_username;
-use crate::user_avatars::default_avatar_from_username::default_avatar_from_username;
 
 /// For the URL PathInfo
 #[derive(Deserialize)]
@@ -44,38 +41,9 @@ pub struct Favorite {
 
   pub user: UserDetailsLight,
 
-  //pub mod_fields: FavoriteForListModFields,
-
   pub created_at: DateTime<Utc>,
   pub updated_at: DateTime<Utc>,
-
-  #[deprecated(note="switch to UserDetailsLight")]
-  pub user_token: UserToken,
-
-  #[deprecated(note="switch to UserDetailsLight")]
-  pub username: String,
-
-  #[deprecated(note="switch to UserDetailsLight")]
-  pub user_display_name: String,
-
-  #[deprecated(note="switch to UserDetailsLight")]
-  pub user_gravatar_hash: String,
-
-  #[deprecated(note="switch to UserDetailsLight")]
-  pub default_avatar_index: u8,
-
-  #[deprecated(note="switch to UserDetailsLight")]
-  pub default_avatar_color_index: u8,
 }
-
-// TODO
-//pub struct FavoriteForListModFields {
-//  pub creator_ip_address: String,
-//  pub editor_ip_address: String,
-//  pub maybe_user_deleted_at: Option<DateTime<Utc>>,
-//  pub maybe_mod_deleted_at: Option<DateTime<Utc>>,
-//  pub maybe_object_owner_deleted_at: Option<DateTime<Utc>>,
-//}
 
 #[derive(Debug)]
 pub enum ListFavoritesError {
@@ -105,7 +73,7 @@ impl fmt::Display for ListFavoritesError {
   }
 }
 
-pub async fn list_favorites_handler(
+pub async fn list_favorites_for_entity_handler(
   _http_request: HttpRequest,
   path: Path<ListFavoritesPathInfo>,
   server_state: web::Data<Arc<ServerState>>
@@ -139,12 +107,6 @@ pub async fn list_favorites_handler(
             gravatar_hash: favorite.user_gravatar_hash.clone(),
             default_avatar: DefaultAvatarInfo::from_username(&favorite.username),
           },
-          user_token: favorite.user_token,
-          username: favorite.username.to_string(), // NB: Cloned because of ref use for avatar below
-          user_display_name: favorite.user_display_name,
-          user_gravatar_hash: favorite.user_gravatar_hash,
-          default_avatar_index: default_avatar_from_username(&favorite.username),
-          default_avatar_color_index: default_avatar_color_from_username(&favorite.username),
           created_at: favorite.created_at,
           updated_at: favorite.updated_at,
         })

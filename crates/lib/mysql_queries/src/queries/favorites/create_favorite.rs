@@ -43,7 +43,7 @@ SET
   entity_token = ?
 
 ON DUPLICATE KEY UPDATE
-  user_deleted_at = NULL,
+  deleted_at = NULL,
   version = version + 1
         "#,
       &favorite_token,
