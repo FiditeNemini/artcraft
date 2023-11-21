@@ -1,3 +1,8 @@
+#![forbid(unreachable_patterns)]
+#![forbid(unused_imports)]
+#![forbid(unused_mut)]
+#![forbid(unused_variables)]
+
 use std::path::PathBuf;
 
 use r2d2_redis::r2d2;
@@ -23,15 +28,11 @@ use crate::job::job_types::lipsync::sad_talker::model_downloaders::SadTalkerDown
 use crate::job::job_types::lipsync::sad_talker::sad_talker_inference_command::SadTalkerInferenceCommand;
 use crate::job::job_types::tts::tacotron2_v2_early_fakeyou::tacotron2_inference_command::Tacotron2InferenceCommand;
 use crate::job::job_types::tts::vall_e_x::model_downloaders::VallEXDownloaders;
-use crate::job::job_types::tts::vits::vits_inference_command::VitsInferenceCommand;
-
-use crate::job::job_types::tts::vall_e_x::vall_e_x_inference_command::VallEXInferenceCommand;
 use crate::job::job_types::tts::vall_e_x::vall_e_x_inference_command::VallEXCreateEmbeddingCommand;
-use crate::job::job_types::vc::rvc_v2::model_downloaders::RvcV2Downloaders;
-
-use crate::job::job_types::vc::rvc_v2::pretrained_hubert_model::PretrainedHubertModel;
-use crate::job::job_types::vc::rvc_v2::rvc_v2_inference_command::RvcV2InferenceCommand;
+use crate::job::job_types::tts::vall_e_x::vall_e_x_inference_command::VallEXInferenceCommand;
+use crate::job::job_types::tts::vits::vits_inference_command::VitsInferenceCommand;
 use crate::job::job_types::vc::so_vits_svc::so_vits_svc_inference_command::SoVitsSvcInferenceCommand;
+use crate::job_specific_dependencies::JobSpecificDependencies;
 use crate::util::common_commands::ffmpeg_logo_watermark_command::FfmpegLogoWatermarkCommand;
 use crate::util::scoped_execution::ScopedExecution;
 use crate::util::scoped_temp_dir_creator::ScopedTempDirCreator;
@@ -40,6 +41,11 @@ pub struct JobDependencies {
   /// The job should only run on these types of models.
   /// This is provided at job start.
   pub scoped_execution: ScopedExecution,
+
+  /// Specific dependencies for the various job types.
+  /// They're only loaded if that type of job is configured to run.
+  /// (See "scoped execution")
+  pub job_specific_dependencies: JobSpecificDependencies,
 
   /// Filesystem info and utils
   pub fs: FileSystemDetails,
@@ -105,8 +111,6 @@ pub struct JobDependencies {
   // Details for each job type (grouped by the job type)
   pub job_type_details: JobTypeDetails,
 
-  pub pretrained_models: PretrainedModels,
-
   pub container: ContainerEnvironment,
   pub container_db: ContainerEnvironmentArg, // Same info, but for database.
 
@@ -156,15 +160,10 @@ pub struct JobCaches {
   pub model_cache_counter: TtlKeyCounter,
 }
 
-pub struct PretrainedModels {
-  pub rvc_v2_hubert: PretrainedHubertModel,
-}
-
 /// Per-job type details
 pub struct JobTypeDetails {
   pub tacotron2_old_vocodes: Tacotron2VocodesDetails,
   pub vits: VitsDetails,
-  pub rvc_v2: RvcV2Details,
   pub so_vits_svc: SoVitsSvcDetails,
   pub sad_talker: SadTalkerDetails,
   pub vall_e_x:  VallEXDetails
@@ -188,11 +187,6 @@ pub struct Tacotron2VocodesDetails {
 
 pub struct VitsDetails {
   pub inference_command: VitsInferenceCommand,
-}
-
-pub struct RvcV2Details {
-  pub inference_command: RvcV2InferenceCommand,
-  pub downloaders: RvcV2Downloaders,
 }
 
 pub struct SoVitsSvcDetails {

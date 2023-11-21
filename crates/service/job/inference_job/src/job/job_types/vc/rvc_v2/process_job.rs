@@ -49,11 +49,18 @@ pub async fn process_job(args: RvcV2ProcessJobArgs<'_>) -> Result<JobSuccessResu
       .new_generic_inference(job.inference_job_token.as_str())
       .map_err(|e| ProcessSingleJobError::Other(anyhow!(e)))?;
 
+  let model_dependencies = args
+      .job_dependencies
+      .job_specific_dependencies
+      .maybe_rvc_v2_dependencies
+      .as_ref()
+      .ok_or_else(|| ProcessSingleJobError::JobSystemMisconfiguration(Some("missing RVC dependencies".to_string())))?;
+
   // ==================== DOWNLOAD HUBERT ==================== //
 
   info!("Download RVC hubert model (if not present)...");
 
-  args.job_dependencies.pretrained_models.rvc_v2_hubert.download_if_not_on_filesystem(
+  model_dependencies.pretrained_hubert_model.download_if_not_on_filesystem(
     &args.job_dependencies.private_bucket_client,
     &args.job_dependencies.fs.scoped_temp_dir_creator_for_downloads)
       .await
@@ -96,7 +103,7 @@ pub async fn process_job(args: RvcV2ProcessJobArgs<'_>) -> Result<JobSuccessResu
 
   let mut i : usize = 0;
 
-  for downloader in args.job_dependencies.job_type_details.rvc_v2.downloaders.all_downloaders() {
+  for downloader in model_dependencies.downloaders.all_downloaders() {
 
     // Temporary debugging
     info!("Downloader {}", i);
@@ -239,15 +246,13 @@ pub async fn process_job(args: RvcV2ProcessJobArgs<'_>) -> Result<JobSuccessResu
 
   let inference_start_time = Instant::now();
 
-  let command_exit_status = args.job_dependencies
-      .job_type_details
-      .rvc_v2
+  let command_exit_status = model_dependencies
       .inference_command
       .execute_inference(InferenceArgs {
         model_path: &rvc_v2_model_fs_path,
         maybe_model_index_path: maybe_rvc_v2_model_index_fs_path,
-        hubert_path: &args.job_dependencies.pretrained_models.rvc_v2_hubert.filesystem_path,
-        rmvpe_path: &args.job_dependencies.job_type_details.rvc_v2.downloaders.rmvpe.filesystem_path,
+        hubert_path: &model_dependencies.pretrained_hubert_model.filesystem_path,
+        rmvpe_path: &model_dependencies.downloaders.rmvpe.filesystem_path,
         input_path: &input_wav_path,
         output_path: &output_audio_fs_path,
         maybe_override_f0_method,

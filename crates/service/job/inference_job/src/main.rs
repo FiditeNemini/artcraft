@@ -53,19 +53,13 @@ use crate::job::job_loop::main_loop::main_loop;
 use crate::job::job_types::lipsync::sad_talker::model_downloaders::SadTalkerDownloaders;
 use crate::job::job_types::lipsync::sad_talker::sad_talker_inference_command::SadTalkerInferenceCommand;
 use crate::job::job_types::tts::tacotron2_v2_early_fakeyou::tacotron2_inference_command::Tacotron2InferenceCommand;
-
-use crate::job::job_types::tts::vits::vits_inference_command::VitsInferenceCommand;
-
-use crate::job::job_types::tts::vall_e_x::vall_e_x_inference_command::VallEXInferenceCommand;
-use crate::job::job_types::tts::vall_e_x::vall_e_x_inference_command::VallEXCreateEmbeddingCommand;
 use crate::job::job_types::tts::vall_e_x::model_downloaders::VallEXDownloaders;
-use crate::job::job_types::vc::rvc_v2::model_downloaders::RvcV2Downloaders;
-
-use crate::job::job_types::vc::rvc_v2::pretrained_hubert_model::PretrainedHubertModel;
-use crate::job::job_types::vc::rvc_v2::rvc_v2_inference_command::RvcV2InferenceCommand;
+use crate::job::job_types::tts::vall_e_x::vall_e_x_inference_command::VallEXCreateEmbeddingCommand;
+use crate::job::job_types::tts::vall_e_x::vall_e_x_inference_command::VallEXInferenceCommand;
+use crate::job::job_types::tts::vits::vits_inference_command::VitsInferenceCommand;
 use crate::job::job_types::vc::so_vits_svc::so_vits_svc_inference_command::SoVitsSvcInferenceCommand;
-
-use crate::job_dependencies::{FileSystemDetails, JobCaches, JobDependencies, JobTypeDetails, JobWorkerDetails, PretrainedModels, RvcV2Details, SadTalkerDetails, SoVitsSvcDetails, Tacotron2VocodesDetails, VitsDetails, VallEXDetails};
+use crate::job_dependencies::{FileSystemDetails, JobCaches, JobDependencies, JobTypeDetails, JobWorkerDetails, SadTalkerDetails, SoVitsSvcDetails, Tacotron2VocodesDetails, VallEXDetails, VitsDetails};
+use crate::job_specific_dependencies::JobSpecificDependencies;
 use crate::util::common_commands::ffmpeg_logo_watermark_command::FfmpegLogoWatermarkCommand;
 use crate::util::scoped_execution::ScopedExecution;
 use crate::util::scoped_temp_dir_creator::ScopedTempDirCreator;
@@ -73,6 +67,7 @@ use crate::util::scoped_temp_dir_creator::ScopedTempDirCreator;
 pub mod http_server;
 pub mod job;
 pub mod job_dependencies;
+pub mod job_specific_dependencies;
 pub mod util;
 
 // Buckets (shared config)
@@ -255,8 +250,13 @@ async fn main() -> AnyhowResult<()> {
     job_stats: job_stats.clone(),
   };
 
+  let scoped_execution = ScopedExecution::new_from_env()?;
+
+  let job_specific_dependencies = JobSpecificDependencies::setup_for_jobs(&scoped_execution)?;
+
   let job_dependencies = JobDependencies {
-    scoped_execution: ScopedExecution::new_from_env()?,
+    scoped_execution,
+    job_specific_dependencies,
     fs: FileSystemDetails {
       temp_directory_downloads: temp_directory_downloads.clone(),
       temp_directory_work: temp_directory_work.clone(),
@@ -326,18 +326,11 @@ async fn main() -> AnyhowResult<()> {
       so_vits_svc: SoVitsSvcDetails {
         inference_command: SoVitsSvcInferenceCommand::from_env()?,
       },
-      rvc_v2: RvcV2Details {
-        inference_command: RvcV2InferenceCommand::from_env()?,
-        downloaders: RvcV2Downloaders::build_all_from_env(),
-      },
       sad_talker: SadTalkerDetails {
         downloaders: SadTalkerDownloaders::build_all_from_env(),
         inference_command: SadTalkerInferenceCommand::from_env()?,
         ffmpeg_watermark_command: FfmpegLogoWatermarkCommand::from_env()?,
       },
-    },
-    pretrained_models: PretrainedModels {
-      rvc_v2_hubert: PretrainedHubertModel::from_env(),
     },
     container: container_environment.clone(),
     container_db: ContainerEnvironmentArg {
