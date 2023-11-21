@@ -5,17 +5,14 @@ use actix_web::{HttpRequest, HttpResponse, web};
 use actix_web::error::ResponseError;
 use actix_web::http::StatusCode;
 use actix_web::web::Path;
-use log::{error, log, warn};
-use enums::by_table::audit_logs::audit_log_entity_action::AuditLogEntityAction::Delete;
+use log::warn;
 
-use http_server_common::request::get_request_ip::get_request_ip;
 use http_server_common::response::serialize_as_json_error::serialize_as_json_error;
 use mysql_queries::queries::media_files::delete_media_file::{delete_media_file_as_mod, delete_media_file_as_user, undelete_media_file_as_mod, undelete_media_file_as_user};
 use mysql_queries::queries::media_files::get_media_file::get_media_file;
 use tokens::tokens::media_files::MediaFileToken;
+
 use crate::http_server::web_utils::response_success_helpers::simple_json_success;
-
-
 use crate::server_state::ServerState;
 use crate::util::delete_role_disambiguation::{delete_role_disambiguation, DeleteRole};
 
@@ -29,7 +26,7 @@ pub struct DeleteMediaFileRequest {
 /// For the URL PathInfo
 #[derive(Deserialize)]
 pub struct DeleteMediaFilePathInfo {
-    token: String,
+    token: MediaFileToken,
 }
 
 // =============== Error Response ===============
@@ -89,11 +86,10 @@ pub async fn delete_media_file_handler(
         }
     };
 
-    let media_file_token = MediaFileToken::new(path.token.clone());
     let is_mod = user_session.can_ban_users;
 
     let media_file_lookup_result = get_media_file(
-        &media_file_token,
+        &path.token,
         is_mod,
         &server_state.mysql_pool,
     ).await;
@@ -101,7 +97,7 @@ pub async fn delete_media_file_handler(
     let media_file = match media_file_lookup_result {
         Ok(Some(media_file)) => media_file,
         Ok(None) => {
-            warn!("MediaFile not found: {:?}", media_file_token);
+            warn!("MediaFile not found: {:?}", path.token);
             return Err(DeleteMediaFileError::NotFound);
         },
         Err(err) => {
@@ -110,7 +106,6 @@ pub async fn delete_media_file_handler(
         }
     };
 
-    //TODO(KS): Confirm this check is sound
     let is_creator = media_file.maybe_creator_user_token
         .is_some_and(|t| t.as_str() == &user_session.user_token);
 
@@ -129,13 +124,13 @@ pub async fn delete_media_file_handler(
             }
             DeleteRole::AsUser => {
                 delete_media_file_as_user(
-                    &media_file_token,
+                    &path.token,
                     &server_state.mysql_pool
                 ).await
             }
             DeleteRole::AsMod => {
                 delete_media_file_as_mod(
-                    &media_file_token,
+                    &path.token,
                     &user_session.user_token,
                     &server_state.mysql_pool
                 ).await
@@ -150,13 +145,13 @@ pub async fn delete_media_file_handler(
             DeleteRole::AsUser => {
                 // NB: Technically only mods can see their own media_files
                 undelete_media_file_as_user(
-                    &media_file_token,
+                    &path.token,
                     &server_state.mysql_pool
                 ).await
             }
             DeleteRole::AsMod => {
                 undelete_media_file_as_mod(
-                    &media_file_token,
+                    &path.token,
                     &user_session.user_token,
                     &server_state.mysql_pool
                 ).await
@@ -173,5 +168,4 @@ pub async fn delete_media_file_handler(
     };
 
     Ok(simple_json_success())
-
 }
