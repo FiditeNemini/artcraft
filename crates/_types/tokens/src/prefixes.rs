@@ -27,6 +27,7 @@ pub(crate) enum TokenPrefix {
   Comment,
   DownloadJob,
   EmailSenderJob,
+  Favorite,
   InferenceJob,
   MediaFile,
   MediaUpload,
@@ -93,6 +94,7 @@ impl PrefixGenerator for TokenPrefix {
       Self::DownloadJob => "jdown_", // NB: Previously "JGUP:"
       Self::EmailSenderJob => "email_job_",
       Self::InferenceJob => "jinf_",
+      Self::Favorite => "fav_",
       Self::MediaFile => "m_",
       Self::MediaUpload => "mu_",
       Self::ModelWeight => "weight_",
