@@ -29,4 +29,4 @@ my-workspace-hack = { version = "0.1", path = "../../../../my-workspace-hack" }
 [dev-dependencies]
 
 # For testing
-tempfile = "3.3.0"
+tempfile = "3.8.1"
