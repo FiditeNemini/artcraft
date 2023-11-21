@@ -1,0 +1,12 @@
+{
+  "db_name": "MySQL",
+  "query": "\n        UPDATE media_files\n        SET\n            maybe_creator_user_token = ?,\n            creator_ip_address = ?,\n            creator_set_visibility = ?,\n            maybe_mod_user_token = ?\n\n        WHERE token = ?\n        LIMIT 1\n        ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 5
+    },
+    "nullable": []
+  },
+  "hash": "a982f37b9c2d0785dfaced73e82a799a071566a0b6255ab6365e12cd1c4ff9b3"
+}
