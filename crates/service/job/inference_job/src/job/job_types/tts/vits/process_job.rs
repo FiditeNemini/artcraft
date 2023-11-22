@@ -46,6 +46,13 @@ pub async fn process_job(args: VitsProcessJobArgs<'_>) -> Result<JobSuccessResul
       .new_generic_inference(job.inference_job_token.as_str())
       .map_err(|e| ProcessSingleJobError::Other(anyhow!(e)))?;
 
+  let model_dependencies = args
+      .job_dependencies
+      .job_specific_dependencies
+      .maybe_vits_dependencies
+      .as_ref()
+      .ok_or_else(|| ProcessSingleJobError::JobSystemMisconfiguration(Some("missing VITS dependencies".to_string())))?;
+
   // ==================== CONFIRM OR DOWNLOAD VITS DEPENDENCIES ==================== //
 
   // TODO: Currently VITS downloads models from HuggingFace. This is likely a risk in that they can move.
@@ -123,7 +130,7 @@ pub async fn process_job(args: VitsProcessJobArgs<'_>) -> Result<JobSuccessResul
 
   let inference_start_time = Instant::now();
 
-  let _r = args.job_dependencies.job_type_details.vits.inference_command.execute_inference(VitsInferenceArgs {
+  let _r = model_dependencies.inference_command.execute_inference(VitsInferenceArgs {
     model_checkpoint_path: &vits_traced_synthesizer_fs_path,
     config_path: &config_path,
     device: Device::Cuda,

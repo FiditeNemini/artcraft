@@ -24,7 +24,6 @@ use mysql_queries::queries::tts::tts_models::get_tts_model_for_inference_improve
 use mysql_queries::queries::voice_conversion::inference::get_voice_conversion_model_for_inference::VoiceConversionModelForInference;
 use newrelic_telemetry::Client as NewRelicClient;
 
-use crate::job::job_types::tts::vits::vits_inference_command::VitsInferenceCommand;
 use crate::job_specific_dependencies::JobSpecificDependencies;
 use crate::util::scoped_execution::ScopedExecution;
 use crate::util::scoped_temp_dir_creator::ScopedTempDirCreator;
@@ -100,9 +99,6 @@ pub struct JobDependencies {
   // This finds jobs of equal or greater priority.
   pub maybe_minimum_priority: Option<u8>,
 
-  // Details for each job type (grouped by the job type)
-  pub job_type_details: JobTypeDetails,
-
   pub container: ContainerEnvironment,
   pub container_db: ContainerEnvironmentArg, // Same info, but for database.
 
@@ -150,13 +146,4 @@ pub struct JobCaches {
   /// Skip processing models if they're not on the filesystem.
   /// If the counter elapses a delta, proceed with calculation.
   pub model_cache_counter: TtlKeyCounter,
-}
-
-/// Per-job type details
-pub struct JobTypeDetails {
-  pub vits: VitsDetails,
-}
-
-pub struct VitsDetails {
-  pub inference_command: VitsInferenceCommand,
 }

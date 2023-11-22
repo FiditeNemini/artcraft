@@ -45,13 +45,11 @@ use memory_caching::ttl_key_counter::TtlKeyCounter;
 use mysql_queries::common_inputs::container_environment_arg::ContainerEnvironmentArg;
 use mysql_queries::mediators::firehose_publisher::FirehosePublisher;
 use newrelic_telemetry::ClientBuilder;
-use subprocess_common::docker_options::{DockerEnvVar, DockerFilesystemMount, DockerGpu, DockerOptions};
 
 use crate::http_server::run_http_server::CreateServerArgs;
 use crate::http_server::run_http_server::launch_http_server;
 use crate::job::job_loop::main_loop::main_loop;
-use crate::job::job_types::tts::vits::vits_inference_command::VitsInferenceCommand;
-use crate::job_dependencies::{FileSystemDetails, JobCaches, JobDependencies, JobTypeDetails, JobWorkerDetails, VitsDetails};
+use crate::job_dependencies::{FileSystemDetails, JobCaches, JobDependencies, JobWorkerDetails};
 use crate::job_specific_dependencies::JobSpecificDependencies;
 use crate::util::scoped_execution::ScopedExecution;
 use crate::util::scoped_temp_dir_creator::ScopedTempDirCreator;
@@ -291,11 +289,6 @@ async fn main() -> AnyhowResult<()> {
     sidecar_max_synthesizer_models,
     low_priority_starvation_prevention_every_nth,
     maybe_minimum_priority,
-    job_type_details: JobTypeDetails {
-      vits: VitsDetails {
-        inference_command: vits_inference_command()?,
-      },
-    },
     container: container_environment.clone(),
     container_db: ContainerEnvironmentArg {
       hostname: container_environment.hostname,
@@ -320,59 +313,3 @@ async fn main() -> AnyhowResult<()> {
   Ok(())
 }
 
-fn vits_inference_command() -> AnyhowResult<VitsInferenceCommand> {
-  let root_directory = easyenv::get_env_string_required(
-    "VITS_INFERENCE_ROOT_DIRECTORY")?;
-
-  let inference_script = easyenv::get_env_string_or_default(
-    "VITS_INFERENCE_SCRIPT",
-    "infer_ts_job.py");
-
-  let maybe_venv_command = easyenv::get_env_string_optional(
-    "VITS_INFERENCE_MAYBE_VENV_COMMAND");
-
-  let maybe_python_interpreter = easyenv::get_env_string_optional(
-    "VITS_INFERENCE_MAYBE_PYTHON_INTERPRETER");
-
-  let maybe_huggingface_dataset_cache = easyenv::get_env_string_optional(
-    "HF_DATASETS_CACHE");
-
-  let maybe_nltk_data_cache = easyenv::get_env_string_optional(
-    "NLTK_DATA");
-
-  let mut docker_env_vars = Vec::new();
-
-  if let Some(cache_dir) = maybe_huggingface_dataset_cache.as_deref() {
-    docker_env_vars.push(DockerEnvVar::new("HF_DATASETS_CACHE", cache_dir));
-    docker_env_vars.push(DockerEnvVar::new("HF_HOME", cache_dir));
-  }
-
-  if let Some(cache_dir) = maybe_nltk_data_cache.as_deref() {
-    docker_env_vars.push(DockerEnvVar::new("NLTK_DATA", cache_dir));
-    docker_env_vars.push(DockerEnvVar::new("NLTK_DATA_PATH", cache_dir));
-  }
-
-  let maybe_docker_env_vars =
-      if docker_env_vars.is_empty() { None } else { Some(docker_env_vars) };
-
-  let maybe_docker_options = easyenv::get_env_string_optional(
-    "VITS_INFERENCE_MAYBE_DOCKER_IMAGE_SHA")
-      .map(|image_name| {
-        DockerOptions {
-          image_name,
-          maybe_bind_mount: Some(DockerFilesystemMount::tmp_to_tmp()),
-          maybe_environment_variables: maybe_docker_env_vars,
-          maybe_gpu: Some(DockerGpu::All),
-        }
-      });
-
-  Ok(VitsInferenceCommand::new(
-    root_directory,
-    inference_script,
-    maybe_python_interpreter.as_deref(),
-    maybe_venv_command.as_deref(),
-    maybe_huggingface_dataset_cache.as_deref(),
-    maybe_nltk_data_cache.as_deref(),
-    maybe_docker_options,
-  ))
-}
