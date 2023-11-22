@@ -644,7 +644,10 @@ class PageContainer extends React.Component<
               path="/voice-designer/create"
             >
               <VoiceDesignerFormPage {...{
-                enqueueInferenceJob: this.props.enqueueInferenceJob
+                enqueueInferenceJob: this.props.enqueueInferenceJob,
+                sessionWrapper: this.props.sessionWrapper,
+                sessionSubscriptionsWrapper:
+                  this.props.sessionSubscriptionsWrapper
               }}/>
             </Route>
 
@@ -654,7 +657,10 @@ class PageContainer extends React.Component<
               path="/voice-designer/dataset/:dataset_token/edit"
             >
               <VoiceDesignerFormPage {...{
-                enqueueInferenceJob: this.props.enqueueInferenceJob
+                enqueueInferenceJob: this.props.enqueueInferenceJob,
+                sessionWrapper: this.props.sessionWrapper,
+                sessionSubscriptionsWrapper:
+                  this.props.sessionSubscriptionsWrapper
               }}/>
             </Route>
 
@@ -664,7 +670,10 @@ class PageContainer extends React.Component<
               path="/voice-designer/dataset/:dataset_token/upload"
              >
               <VoiceDesignerFormPage {...{
-                enqueueInferenceJob: this.props.enqueueInferenceJob
+                enqueueInferenceJob: this.props.enqueueInferenceJob,
+                sessionWrapper: this.props.sessionWrapper,
+                sessionSubscriptionsWrapper:
+                  this.props.sessionSubscriptionsWrapper
               }}/>
             </Route>
 
@@ -687,6 +696,9 @@ class PageContainer extends React.Component<
 
             <Route path="/voice-designer">
               <VoiceDesignerMainPage {...{
+                sessionWrapper:this.props.sessionWrapper,
+                sessionSubscriptionsWrapper:
+                  this.props.sessionSubscriptionsWrapper,
                 enqueueInferenceJob: this.props.enqueueInferenceJob,
                 inferenceJobs: this.props.inferenceJobs,
                 inferenceJobsByCategory: this.props.inferenceJobsByCategory

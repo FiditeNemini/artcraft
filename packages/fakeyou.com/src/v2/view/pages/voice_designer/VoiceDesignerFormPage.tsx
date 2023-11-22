@@ -24,12 +24,13 @@ import useVoiceRequests from "./useVoiceRequests";
 import useUploadedFiles from "hooks/useUploadedFiles";
 
 import { FrontendInferenceJobType } from "@storyteller/components/src/jobs/InferenceJob";
+import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
 
 interface RouteParams {
   dataset_token?: string;
 }
 
-function VoiceDesignerFormPage({ enqueueInferenceJob }: { enqueueInferenceJob: any }) {
+function VoiceDesignerFormPage({ enqueueInferenceJob, sessionWrapper }: { enqueueInferenceJob: any, sessionWrapper: SessionWrapper }) {
   const history = useHistory();
   const { datasets, inputCtrl, languages, visibilityOptions, voices } = useVoiceRequests({});
   const [language, languageSet] = useState("en");
@@ -167,6 +168,10 @@ function VoiceDesignerFormPage({ enqueueInferenceJob }: { enqueueInferenceJob: a
       });
     }
   },[dataset_token,datasets,fetched]);
+
+  if (!sessionWrapper.isLoggedIn()) {
+    history.push("/voice-designer");
+  }
 
   return (
     <Container type="panel">

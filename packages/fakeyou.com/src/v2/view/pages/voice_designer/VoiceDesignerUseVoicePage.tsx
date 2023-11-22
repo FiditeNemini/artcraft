@@ -31,6 +31,7 @@ import { GetVoice } from "@storyteller/components/src/api/voice_designer/voices/
 import Skeleton from "components/common/Skeleton";
 import useVoiceRequests from "./useVoiceRequests";
 import { v4 as uuidv4 } from "uuid";
+import { useHistory } from "react-router-dom";
 
 interface VoiceDesignerUseVoicePageProps {
   sessionWrapper: SessionWrapper;
@@ -62,6 +63,7 @@ export default function VoiceDesignerUseVoicePage(
   });
   const { inference } = useVoiceRequests({});
   const [isEnqueuing, setIsEnqueuing] = useState(false);
+  const history = useHistory();
 
   const getVoiceDetails = useCallback(async (voice_token) => {
     try {
@@ -187,6 +189,10 @@ export default function VoiceDesignerUseVoicePage(
         />
       </Container>
     );
+  }
+
+  if (!props.sessionWrapper.isLoggedIn()) {
+    history.push("/voice-designer");
   }
 
   return (

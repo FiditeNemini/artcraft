@@ -1,6 +1,12 @@
 import React, { useState } from "react";
 import { Redirect, useHistory, useLocation } from "react-router-dom";
-import { faPlus, faWaveform } from "@fortawesome/pro-solid-svg-icons";
+import {
+  faPenToSquare,
+  faPlus,
+  faRightToBracket,
+  faStar,
+  faWaveform,
+} from "@fortawesome/pro-solid-svg-icons";
 import InferenceJobsList from "components/layout/InferenceJobsList";
 import { useLocalize } from "hooks";
 import Panel from "components/common/Panel";
@@ -16,12 +22,17 @@ import {
   FrontendInferenceJobType,
   // InferenceJob,
 } from "@storyteller/components/src/jobs/InferenceJob";
+import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
+import { SessionSubscriptionsWrapper } from "@storyteller/components/src/session/SessionSubscriptionsWrapper";
+import { Button } from "components/common";
 
-function VoiceDesignerMainPage({
-  inferenceJobsByCategory,
-}: {
+interface Props {
+  sessionWrapper: SessionWrapper;
+  sessionSubscriptionsWrapper: SessionSubscriptionsWrapper;
   inferenceJobsByCategory: any;
-}) {
+}
+
+function VoiceDesignerMainPage(props: Props) {
   usePrefixedDocumentTitle("AI Voice Designer");
   const { pathname } = useLocation();
   const { t } = useLocalize("FaceAnimator");
@@ -151,27 +162,90 @@ function VoiceDesignerMainPage({
       "Voice created successfully",
     ][status];
 
-  const button = {
+  const createVoiceButton = {
     label: `Create new voice`,
     icon: faPlus,
     to: "/voice-designer/create",
   };
 
-  return (
-    <>
-      <Container type="panel">
-        <PageHeader
-          button={button}
-          title="Voice Designer"
-          titleIcon={faWaveform}
-          subText="Create your own AI voice by providing audio files of the voice you want to clone."
-          panel={false}
-          imageUrl="/images/header/voice-designer.png"
-        />
+  const signUpButton = {
+    label: `Sign Up`,
+    icon: faPenToSquare,
+    to: "/signup",
+  };
+
+  const pricingButton = {
+    label: `View Pricing`,
+    icon: faStar,
+    to: "/pricing",
+  };
+
+  const isLoggedIn = props.sessionWrapper.isLoggedIn();
+  let pageHeader = <></>;
+  if (!isLoggedIn) {
+    pageHeader = (
+      <PageHeader
+        button={signUpButton}
+        secondaryButton={pricingButton}
+        title="Voice Designer"
+        titleIcon={faWaveform}
+        subText="Create your own AI voice by providing audio files of the voice you want to clone."
+        panel={false}
+        imageUrl="/images/header/voice-designer.png"
+      />
+    );
+  } else {
+    pageHeader = (
+      <PageHeader
+        button={createVoiceButton}
+        title="Voice Designer"
+        titleIcon={faWaveform}
+        subText="Create your own AI voice by providing audio files of the voice you want to clone."
+        panel={false}
+        imageUrl="/images/header/voice-designer.png"
+      />
+    );
+  }
+
+  let body = <></>;
+
+  if (!isLoggedIn) {
+    body = (
+      <Panel padding={true}>
+        <div className="d-flex flex-column align-items-center py-3 my-3 py-md-4 my-md-4 gap-4">
+          <div className="text-center">
+            <h4 className="fw-bold">Please log in to access voice creation.</h4>
+
+            <p className="text-center opacity-75">
+              If you don't have an account yet, sign up now to unlock this
+              feature!
+            </p>
+          </div>
+
+          <div className="d-flex gap-3 align-items-center">
+            <Button
+              label="Sign Up"
+              variant="primary"
+              icon={faPenToSquare}
+              to="/signup"
+            />
+            <Button
+              label="Login"
+              variant="secondary"
+              icon={faRightToBracket}
+              to="/login"
+            />
+          </div>
+        </div>
+      </Panel>
+    );
+  } else {
+    body = (
+      <>
         <InferenceJobsList
           {...{
             t,
-            inferenceJobs: inferenceJobsByCategory.get(
+            inferenceJobs: props.inferenceJobsByCategory.get(
               FrontendInferenceJobType.VoiceDesignerCreateVoice
             ),
             statusTxt,
@@ -210,6 +284,16 @@ function VoiceDesignerMainPage({
             />
           </div>
         </Panel>
+      </>
+    );
+  }
+
+  return (
+    <>
+      <Container type="panel">
+        {pageHeader}
+
+        {body}
       </Container>
 
       {/* Delete Modal */}
