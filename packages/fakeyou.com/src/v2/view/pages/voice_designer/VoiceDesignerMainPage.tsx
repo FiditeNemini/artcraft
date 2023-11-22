@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Redirect, useHistory, useLocation } from "react-router-dom";
 import { faPlus, faWaveform } from "@fortawesome/pro-solid-svg-icons";
 import InferenceJobsList from "components/layout/InferenceJobsList";
-import { useLocalize } from "hooks";
+import { useLocalize, useSession } from "hooks";
 import Panel from "components/common/Panel";
 import PageHeader from "components/layout/PageHeader";
 import Container from "components/common/Container";
@@ -16,12 +16,17 @@ import {
   FrontendInferenceJobType,
   // InferenceJob,
 } from "@storyteller/components/src/jobs/InferenceJob";
+import { VdPageHero } from "./components/VdPageHero";
+import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
+import { SessionSubscriptionsWrapper } from "@storyteller/components/src/session/SessionSubscriptionsWrapper";
 
-function VoiceDesignerMainPage({
-  inferenceJobsByCategory,
-}: {
+interface Props {
+  sessionWrapper: SessionWrapper;
+  sessionSubscriptionsWrapper: SessionSubscriptionsWrapper;
   inferenceJobsByCategory: any;
-}) {
+}
+
+function VoiceDesignerMainPage(props: Props) {
   usePrefixedDocumentTitle("AI Voice Designer");
   const { pathname } = useLocation();
   const { t } = useLocalize("FaceAnimator");
@@ -39,6 +44,7 @@ function VoiceDesignerMainPage({
     title: "",
     text: "",
   });
+
 
   const history = useHistory();
 
@@ -157,59 +163,109 @@ function VoiceDesignerMainPage({
     to: "/voice-designer/create",
   };
 
+  const isLoggedIn = props.sessionWrapper.isLoggedIn();
+  let pageHeader = <></>;
+  if (!isLoggedIn) {
+    pageHeader = (
+    <VdPageHero
+      sessionWrapper={props.sessionWrapper}
+    />)
+  } else {
+    pageHeader = (
+    <PageHeader
+      button={button}
+      title="Voice Designer"
+      titleIcon={faWaveform}
+      subText="Create your own AI voice by providing audio files of the voice you want to clone."
+      panel={false}
+      imageUrl="/images/header/voice-designer.png"
+    />)
+  }
+
+  let body = <></>;
+
+  if (!isLoggedIn) {
+    body = (
+      <div className="container section mb-3 d-flex flex-column align-items-center">
+        <div className="d-flex justify-content-center align-items-center gap-4">
+          <img className="rotateimg180" src="assets/title-shape.png" alt="" />
+          <img src="assets/title-shape.png" alt="" />
+        </div>
+        {/* <h1 className=" fw-bold mb-4 mt-3">
+          <span className="word">Join Our Community</span>
+        </h1> */}
+        <p className="lead text-center mb-5">
+          This feature requires a subscription
+          <br />
+          Log in or Sign Up!
+          <br />
+          Also join us on Discord so that we know what you're thinking.
+        </p>
+        <div className="d-flex flex-column flex-lg-row gap-3 mb-5">
+          <button className="btn btn-secondary">
+            <i className="fa-brands fa-twitter me-2"></i>Follow on Twitter
+          </button>
+          <button className="btn btn-primary">
+            <i className="fa-brands fa-discord me-2"></i>Join our Discord
+          </button>
+        </div>
+      </div>
+    )
+  } else {
+    body = (
+      <>
+      <InferenceJobsList
+      {...{
+        t,
+        inferenceJobs: props.inferenceJobsByCategory.get(
+          FrontendInferenceJobType.VoiceDesignerCreateVoice
+        ),
+        statusTxt,
+      }}
+    />
+    <Panel mb={true}>
+      <nav>
+        <ul className="nav nav-tabs">
+          <div className="d-flex flex-grow-1">
+            <li className="nav-item">
+              <NavLink
+                to="/voice-designer/voices"
+                className="nav-link fs-6 px-3 px-lg-4"
+                activeClassName="active"
+              >
+                My Voices
+              </NavLink>
+            </li>
+            <li className="nav-item">
+              <NavLink
+                to="/voice-designer/datasets"
+                className="nav-link fs-6"
+                activeClassName="active"
+              >
+                My Datasets
+              </NavLink>
+            </li>
+          </div>
+        </ul>
+      </nav>
+
+      <div className="p-3 p-lg-4">
+        <ListItems
+          {...{ data: view ? actionVoices : actionDataSets }}
+          isLoading={isFetching}
+        />
+      </div>
+    </Panel>
+    </>
+    )
+  }
+
   return (
     <>
       <Container type="panel">
-        <PageHeader
-          button={button}
-          title="Voice Designer"
-          titleIcon={faWaveform}
-          subText="Create your own AI voice by providing audio files of the voice you want to clone."
-          panel={false}
-          imageUrl="/images/header/voice-designer.png"
-        />
-        <InferenceJobsList
-          {...{
-            t,
-            inferenceJobs: inferenceJobsByCategory.get(
-              FrontendInferenceJobType.VoiceDesignerCreateVoice
-            ),
-            statusTxt,
-          }}
-        />
-        <Panel mb={true}>
-          <nav>
-            <ul className="nav nav-tabs">
-              <div className="d-flex flex-grow-1">
-                <li className="nav-item">
-                  <NavLink
-                    to="/voice-designer/voices"
-                    className="nav-link fs-6 px-3 px-lg-4"
-                    activeClassName="active"
-                  >
-                    My Voices
-                  </NavLink>
-                </li>
-                <li className="nav-item">
-                  <NavLink
-                    to="/voice-designer/datasets"
-                    className="nav-link fs-6"
-                    activeClassName="active"
-                  >
-                    My Datasets
-                  </NavLink>
-                </li>
-              </div>
-            </ul>
-          </nav>
+        {pageHeader}
 
-          <div className="p-3 p-lg-4">
-            <ListItems
-              {...{ data: view ? actionVoices : actionDataSets }}
-              isLoading={isFetching}
-            />
-          </div>
-        </Panel>
+        {body}
       </Container>
 
       {/* Delete Modal */}

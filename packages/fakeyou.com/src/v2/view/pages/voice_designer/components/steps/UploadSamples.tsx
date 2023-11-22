@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import VoiceDesignerUploadComponent from "../VoiceDesignerUploadComponent";
 import { v4 as uuidv4 } from "uuid";
+import { SessionContext } from 'context';
 
 function UploadSamples({ audioProps, datasetToken, setAudioSamplesReady }: { audioProps: any, datasetToken?: string, setAudioSamplesReady:any  }) {
   /* eslint-disable @typescript-eslint/no-unused-vars */
