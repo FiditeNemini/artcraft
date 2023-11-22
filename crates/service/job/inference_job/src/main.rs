@@ -50,11 +50,8 @@ use subprocess_common::docker_options::{DockerEnvVar, DockerFilesystemMount, Doc
 use crate::http_server::run_http_server::CreateServerArgs;
 use crate::http_server::run_http_server::launch_http_server;
 use crate::job::job_loop::main_loop::main_loop;
-use crate::job::job_types::tts::vall_e_x::model_downloaders::VallEXDownloaders;
-use crate::job::job_types::tts::vall_e_x::vall_e_x_inference_command::VallEXCreateEmbeddingCommand;
-use crate::job::job_types::tts::vall_e_x::vall_e_x_inference_command::VallEXInferenceCommand;
 use crate::job::job_types::tts::vits::vits_inference_command::VitsInferenceCommand;
-use crate::job_dependencies::{FileSystemDetails, JobCaches, JobDependencies, JobTypeDetails, JobWorkerDetails, VallEXDetails, VitsDetails};
+use crate::job_dependencies::{FileSystemDetails, JobCaches, JobDependencies, JobTypeDetails, JobWorkerDetails, VitsDetails};
 use crate::job_specific_dependencies::JobSpecificDependencies;
 use crate::util::scoped_execution::ScopedExecution;
 use crate::util::scoped_temp_dir_creator::ScopedTempDirCreator;
@@ -295,11 +292,6 @@ async fn main() -> AnyhowResult<()> {
     low_priority_starvation_prevention_every_nth,
     maybe_minimum_priority,
     job_type_details: JobTypeDetails {
-      vall_e_x: VallEXDetails {
-        downloaders: VallEXDownloaders::build_all_from_env(),
-        inference_command: VallEXInferenceCommand::from_env()?, 
-        create_embedding_command: VallEXCreateEmbeddingCommand::from_env()?, 
-      },
       vits: VitsDetails {
         inference_command: vits_inference_command()?,
       },

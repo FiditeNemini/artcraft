@@ -36,6 +36,13 @@ pub async fn process_inference_voice(
   let deps = args.job_dependencies;
   let job = args.job;
   let mysql_pool = &deps.mysql_pool;
+
+  let model_dependencies = deps
+      .job_specific_dependencies
+      .maybe_vall_e_x_dependencies
+      .as_ref()
+      .ok_or_else(|| ProcessSingleJobError::JobSystemMisconfiguration(Some("missing VALL-E-X dependencies".to_string())))?;
+
   // get some globals
   let mut job_progress_reporter = deps.job_progress_reporter
       .new_generic_inference(job.inference_job_token.as_str())
@@ -69,7 +76,7 @@ pub async fn process_inference_voice(
   // Need to download the models
   info!("Download models (if not present)...");
 
-  for downloader in deps.job_type_details.vall_e_x.downloaders.all_downloaders() {
+  for downloader in model_dependencies.downloaders.all_downloaders() {
     let result = downloader.download_if_not_on_filesystem(
       &args.job_dependencies.private_bucket_client,
       &args.job_dependencies.fs.scoped_temp_dir_creator_for_downloads
@@ -128,7 +135,7 @@ pub async fn process_inference_voice(
 
   // Run Inference
   let command_exit_status =
-      args.job_dependencies.job_type_details.vall_e_x.inference_command.execute_inference(
+      model_dependencies.inference_command.execute_inference(
         InferenceArgs {
           input_embedding_path: &workdir,
           input_embedding_name: filename,

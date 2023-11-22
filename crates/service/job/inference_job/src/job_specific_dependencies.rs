@@ -5,6 +5,7 @@ use errors::AnyhowResult;
 
 use crate::job::job_types::lipsync::sad_talker::sad_talker_dependencies::SadTalkerDependencies;
 use crate::job::job_types::tts::tacotron2_v2_early_fakeyou::tacotron2_dependencies::Tacotron2Dependencies;
+use crate::job::job_types::tts::vall_e_x::vall_e_x_dependencies::VallExDependencies;
 use crate::job::job_types::vc::rvc_v2::rvc_v2_dependencies::RvcV2Dependencies;
 use crate::job::job_types::vc::so_vits_svc::svc_dependencies::SvcDependencies;
 use crate::util::scoped_execution::ScopedExecution;
@@ -14,6 +15,7 @@ pub struct JobSpecificDependencies {
   pub maybe_sad_talker_dependencies: Option<SadTalkerDependencies>,
   pub maybe_svc_dependencies: Option<SvcDependencies>,
   pub maybe_tacotron2_dependencies: Option<Tacotron2Dependencies>,
+  pub maybe_vall_e_x_dependencies: Option<VallExDependencies>,
 }
 
 impl JobSpecificDependencies {
@@ -23,6 +25,7 @@ impl JobSpecificDependencies {
     let mut maybe_sad_talker_dependencies = None;
     let mut maybe_svc_dependencies = None;
     let mut maybe_tacotron2_dependencies = None;
+    let mut maybe_vall_e_x_dependencies = None;
 
     if scoped_execution.can_run_job(InferenceModelType::RvcV2) {
       info!("Setting RVCv2 dependencies...");
@@ -44,11 +47,17 @@ impl JobSpecificDependencies {
       maybe_tacotron2_dependencies = Some(Tacotron2Dependencies::setup()?);
     }
 
+    if scoped_execution.can_run_job(InferenceModelType::VallEX) {
+      info!("Setting VALL-E-X dependencies...");
+      maybe_vall_e_x_dependencies = Some(VallExDependencies::setup()?);
+    }
+
     Ok(JobSpecificDependencies {
       maybe_rvc_v2_dependencies,
       maybe_sad_talker_dependencies,
       maybe_svc_dependencies,
       maybe_tacotron2_dependencies,
+      maybe_vall_e_x_dependencies,
     })
   }
 }

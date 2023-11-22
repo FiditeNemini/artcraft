@@ -24,9 +24,6 @@ use mysql_queries::queries::tts::tts_models::get_tts_model_for_inference_improve
 use mysql_queries::queries::voice_conversion::inference::get_voice_conversion_model_for_inference::VoiceConversionModelForInference;
 use newrelic_telemetry::Client as NewRelicClient;
 
-use crate::job::job_types::tts::vall_e_x::model_downloaders::VallEXDownloaders;
-use crate::job::job_types::tts::vall_e_x::vall_e_x_inference_command::VallEXCreateEmbeddingCommand;
-use crate::job::job_types::tts::vall_e_x::vall_e_x_inference_command::VallEXInferenceCommand;
 use crate::job::job_types::tts::vits::vits_inference_command::VitsInferenceCommand;
 use crate::job_specific_dependencies::JobSpecificDependencies;
 use crate::util::scoped_execution::ScopedExecution;
@@ -158,17 +155,8 @@ pub struct JobCaches {
 /// Per-job type details
 pub struct JobTypeDetails {
   pub vits: VitsDetails,
-  pub vall_e_x:  VallEXDetails
 }
 
 pub struct VitsDetails {
   pub inference_command: VitsInferenceCommand,
-}
-
-// TODO: we will probably want a command type of some kind that implements
-// some kind of interface that we can just pass strings to.
-pub struct VallEXDetails {
-  pub downloaders: VallEXDownloaders,
-  pub inference_command: VallEXInferenceCommand,
-  pub create_embedding_command: VallEXCreateEmbeddingCommand
 }
