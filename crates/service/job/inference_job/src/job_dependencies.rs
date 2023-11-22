@@ -24,7 +24,6 @@ use mysql_queries::queries::tts::tts_models::get_tts_model_for_inference_improve
 use mysql_queries::queries::voice_conversion::inference::get_voice_conversion_model_for_inference::VoiceConversionModelForInference;
 use newrelic_telemetry::Client as NewRelicClient;
 
-use crate::job::job_types::tts::tacotron2_v2_early_fakeyou::tacotron2_inference_command::Tacotron2InferenceCommand;
 use crate::job::job_types::tts::vall_e_x::model_downloaders::VallEXDownloaders;
 use crate::job::job_types::tts::vall_e_x::vall_e_x_inference_command::VallEXCreateEmbeddingCommand;
 use crate::job::job_types::tts::vall_e_x::vall_e_x_inference_command::VallEXInferenceCommand;
@@ -158,25 +157,8 @@ pub struct JobCaches {
 
 /// Per-job type details
 pub struct JobTypeDetails {
-  pub tacotron2_old_vocodes: Tacotron2VocodesDetails,
   pub vits: VitsDetails,
   pub vall_e_x:  VallEXDetails
-  //pub tacotron2_modern: ...,
-  //pub softvc: ...,
-}
-
-/// "Old" TT2 (vocodes-era)
-pub struct Tacotron2VocodesDetails {
-  pub inference_command: Tacotron2InferenceCommand,
-
-  /// Common pretrained waveglow vocoder filename
-  pub waveglow_vocoder_model_filename: String,
-
-  /// Common pretrained hifigan vocoder filename
-  pub hifigan_vocoder_model_filename: String,
-
-  /// Common pretrained hifigan super resolution vocoder filename
-  pub hifigan_superres_vocoder_model_filename: String,
 }
 
 pub struct VitsDetails {

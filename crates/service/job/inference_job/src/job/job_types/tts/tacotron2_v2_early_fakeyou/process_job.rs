@@ -32,7 +32,6 @@ use crate::util::maybe_download_file_from_bucket::maybe_download_file_from_bucke
 /// This allows the request to bypass the model cache and query the latest TTS model.
 const TEST_REQUEST_TEXT: &str = "This is a test request.";
 
-
 pub struct ProcessJobArgs<'a> {
   pub job_dependencies: &'a JobDependencies,
   pub job: &'a AvailableInferenceJob,
@@ -50,10 +49,18 @@ pub async fn process_job(args: ProcessJobArgs<'_>) -> Result<JobSuccessResult, P
       .new_generic_inference(job.inference_job_token.as_str())
       .map_err(|e| ProcessSingleJobError::Other(anyhow!(e)))?;
 
+  let model_dependencies = args
+      .job_dependencies
+      .job_specific_dependencies
+      .maybe_tacotron2_dependencies
+      .as_ref()
+      .ok_or_else(|| ProcessSingleJobError::JobSystemMisconfiguration(Some("missing Tacotron2 dependencies".to_string())))?;
+
   // ==================== CONFIRM OR DOWNLOAD WAVEGLOW VOCODER MODEL ==================== //
 
   let waveglow_vocoder_model_fs_path = {
-    let waveglow_vocoder_model_filename = args.job_dependencies.job_type_details.tacotron2_old_vocodes.waveglow_vocoder_model_filename.clone();
+    // TODO(bt,2023-11-21): Port this to the common downloader code.
+    let waveglow_vocoder_model_filename = model_dependencies.waveglow_vocoder_model_filename.clone();
     let waveglow_vocoder_model_fs_path = args.job_dependencies.fs.semi_persistent_cache.tts_pretrained_vocoder_model_path(&waveglow_vocoder_model_filename);
     let waveglow_vocoder_model_object_path = args.job_dependencies.bucket_path_unifier.tts_pretrained_vocoders_path(&waveglow_vocoder_model_filename);
 
@@ -74,7 +81,8 @@ pub async fn process_job(args: ProcessJobArgs<'_>) -> Result<JobSuccessResult, P
   // ==================== CONFIRM OR DOWNLOAD HIFIGAN (NORMAL) VOCODER MODEL ==================== //
 
   let pretrained_hifigan_vocoder_model_fs_path = {
-    let hifigan_vocoder_model_filename = args.job_dependencies.job_type_details.tacotron2_old_vocodes.hifigan_vocoder_model_filename.clone();
+    // TODO(bt,2023-11-21): Port this to the common downloader code.
+    let hifigan_vocoder_model_filename = model_dependencies.hifigan_vocoder_model_filename.clone();
     let hifigan_vocoder_model_fs_path = args.job_dependencies.fs.semi_persistent_cache.tts_pretrained_vocoder_model_path(&hifigan_vocoder_model_filename);
     let hifigan_vocoder_model_object_path = args.job_dependencies.bucket_path_unifier.tts_pretrained_vocoders_path(&hifigan_vocoder_model_filename);
 
@@ -95,7 +103,8 @@ pub async fn process_job(args: ProcessJobArgs<'_>) -> Result<JobSuccessResult, P
   // ==================== CONFIRM OR DOWNLOAD HIFIGAN (SUPERRES) VOCODER MODEL ==================== //
 
   let hifigan_superres_vocoder_model_fs_path = {
-    let hifigan_superres_vocoder_model_filename = args.job_dependencies.job_type_details.tacotron2_old_vocodes.hifigan_superres_vocoder_model_filename.clone();
+    // TODO(bt,2023-11-21): Port this to the common downloader code.
+    let hifigan_superres_vocoder_model_filename = model_dependencies.hifigan_superres_vocoder_model_filename.clone();
     let hifigan_superres_vocoder_model_fs_path = args.job_dependencies.fs.semi_persistent_cache.tts_pretrained_vocoder_model_path(&hifigan_superres_vocoder_model_filename);
     let hifigan_superres_vocoder_model_object_path = args.job_dependencies.bucket_path_unifier.tts_pretrained_vocoders_path(&hifigan_superres_vocoder_model_filename);
 
@@ -113,7 +122,7 @@ pub async fn process_job(args: ProcessJobArgs<'_>) -> Result<JobSuccessResult, P
     hifigan_superres_vocoder_model_fs_path
   };
 
-//  // ==================== CONFIRM OR DOWNLOAD OPTIONAL CUSTOM VOCODER MODEL ==================== //
+  // ==================== CONFIRM OR DOWNLOAD OPTIONAL CUSTOM VOCODER MODEL ==================== //
 
   let custom_vocoder_fs_path = match &tts_model.maybe_custom_vocoder {
     None => None,
@@ -249,7 +258,7 @@ pub async fn process_job(args: ProcessJobArgs<'_>) -> Result<JobSuccessResult, P
 
   let inference_start_time = Instant::now();
 
-  let _r = args.job_dependencies.job_type_details.tacotron2_old_vocodes.inference_command.execute_inference(InferenceArgs {
+  let _r = model_dependencies.inference_command.execute_inference(InferenceArgs {
     synthesizer_checkpoint_path: &tts_synthesizer_fs_path,
     text_pipeline_type: text_pipeline_type_or_guess.to_str(),
     vocoder: vocoder_option,
