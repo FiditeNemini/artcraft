@@ -21,6 +21,12 @@ interface PageHeaderProps {
   extension?: React.ReactNode;
   buttonLabel?: string;
   button?: ButtonProps;
+  secondaryButtonLabel?: string;
+  secondaryButton?: ButtonProps;
+  secondaryButtonVariant?: "primary" | "secondary" | "danger";
+  secondaryButtonTo?: string;
+  secondaryButtonIcon?: IconDefinition;
+  secondaryButtonOnClick?: () => void;
   buttonVariant?: "primary" | "secondary" | "danger";
   buttonTo?: string;
   buttonIcon?: IconDefinition;
@@ -51,22 +57,40 @@ export default function PageHeader({
   showBackButton,
   backbuttonTo,
   backbuttonLabel,
+  secondaryButton,
+  secondaryButtonLabel,
+  secondaryButtonVariant = "secondary",
+  secondaryButtonTo,
+  secondaryButtonIcon,
+  secondaryButtonOnClick,
 }: PageHeaderProps) {
-
   const icon = (
     <>{titleIcon && <FontAwesomeIcon icon={titleIcon} className="me-3" />}</>
   );
 
   const buttonProps = {
-    ...button ? button : {},
-    ...buttonIcon && { icon: buttonIcon },
-    ...buttonLabel && { label: buttonLabel },
-    ...buttonOnClick && { onClick: buttonOnClick },
-    ...buttonTo && { to: buttonTo },
-    ...buttonVariant && { variant: buttonVariant }
+    ...(button ? button : {}),
+    ...(buttonIcon && { icon: buttonIcon }),
+    ...(buttonLabel && { label: buttonLabel }),
+    ...(buttonOnClick && { onClick: buttonOnClick }),
+    ...(buttonTo && { to: buttonTo }),
+    ...(buttonVariant && { variant: buttonVariant }),
   };
 
-  const HeaderBtn = () => button || showButton ? <Button { ...buttonProps }/> : null;
+  const secondaryButtonProps = {
+    ...(secondaryButton ? secondaryButton : {}),
+    ...(secondaryButtonIcon && { icon: secondaryButtonIcon }),
+    ...(secondaryButtonLabel && { label: secondaryButtonLabel }),
+    ...(secondaryButtonOnClick && { onClick: secondaryButtonOnClick }),
+    ...(secondaryButtonTo && { to: secondaryButtonTo }),
+    ...(secondaryButtonVariant && { variant: secondaryButtonVariant }),
+  };
+
+  const HeaderBtn = () =>
+    button || showButton ? <Button {...buttonProps} /> : null;
+
+  const HeaderBtnTwo = () =>
+    secondaryButton ? <Button {...secondaryButtonProps} /> : null;
 
   if (!panel) {
     return (
@@ -95,9 +119,10 @@ export default function PageHeader({
                   {subText}
                 </p>
               </div>
-              { ( button || showButton ) && (
-                <div className="d-md-flex">
+              {(button || showButton) && (
+                <div className="d-flex gap-3">
                   <HeaderBtn />
+                  <HeaderBtnTwo />
                 </div>
               )}
             </div>
