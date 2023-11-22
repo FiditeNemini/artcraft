@@ -1,5 +1,3 @@
-use log::info;
-
 use enums::by_table::generic_inference_jobs::inference_model_type::InferenceModelType;
 use errors::AnyhowResult;
 
@@ -31,32 +29,32 @@ impl JobSpecificDependencies {
     let mut maybe_vits_dependencies = None;
 
     if scoped_execution.can_run_job(InferenceModelType::RvcV2) {
-      info!("Setting RVCv2 dependencies...");
+      print_with_space("Setting RVCv2 dependencies...");
       maybe_rvc_v2_dependencies = Some(RvcV2Dependencies::setup()?);
     }
 
     if scoped_execution.can_run_job(InferenceModelType::SadTalker) {
-      info!("Setting SadTalker dependencies...");
+      print_with_space("Setting SadTalker dependencies...");
       maybe_sad_talker_dependencies = Some(SadTalkerDependencies::setup()?);
     }
 
     if scoped_execution.can_run_job(InferenceModelType::SoVitsSvc) {
-      info!("Setting SVC dependencies...");
+      print_with_space("Setting SVC dependencies...");
       maybe_svc_dependencies = Some(SvcDependencies::setup()?);
     }
 
     if scoped_execution.can_run_job(InferenceModelType::Tacotron2) {
-      info!("Setting Tacotron2 dependencies...");
+      print_with_space("Setting Tacotron2 dependencies...");
       maybe_tacotron2_dependencies = Some(Tacotron2Dependencies::setup()?);
     }
 
     if scoped_execution.can_run_job(InferenceModelType::VallEX) {
-      info!("Setting VALL-E-X dependencies...");
+      print_with_space("Setting VALL-E-X dependencies...");
       maybe_vall_e_x_dependencies = Some(VallExDependencies::setup()?);
     }
 
     if scoped_execution.can_run_job(InferenceModelType::Vits) {
-      info!("Setting Vits dependencies...");
+      print_with_space("Setting Vits dependencies...");
       maybe_vits_dependencies = Some(VitsDependencies::setup()?);
     }
 
@@ -69,4 +67,8 @@ impl JobSpecificDependencies {
       maybe_vits_dependencies,
     })
   }
+}
+
+fn print_with_space(line: &str) {
+  println!("\n  ---------- \n  {line} \n  ---------- \n");
 }
