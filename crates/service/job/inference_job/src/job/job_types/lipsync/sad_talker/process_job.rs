@@ -47,6 +47,13 @@ pub async fn process_job(args: SadTalkerProcessJobArgs<'_>) -> Result<JobSuccess
       .new_generic_inference(job.inference_job_token.as_str())
       .map_err(|e| ProcessSingleJobError::Other(anyhow!(e)))?;
 
+  let model_dependencies = args
+      .job_dependencies
+      .job_specific_dependencies
+      .maybe_sad_talker_dependencies
+      .as_ref()
+      .ok_or_else(|| ProcessSingleJobError::JobSystemMisconfiguration(Some("missing SadTalker dependencies".to_string())))?;
+
   // ==================== UNPACK + VALIDATE INFERENCE ARGS ==================== //
 
   let job_args = validate_job(job)?;
@@ -57,7 +64,7 @@ pub async fn process_job(args: SadTalkerProcessJobArgs<'_>) -> Result<JobSuccess
 
   let mut i : usize = 0;
 
-  for downloader in deps.job_type_details.sad_talker.downloaders.all_downloaders() {
+  for downloader in model_dependencies.downloaders.all_downloaders() {
 
     // Temporary debugging
     info!("Downloader {}", i);
@@ -182,9 +189,7 @@ pub async fn process_job(args: SadTalkerProcessJobArgs<'_>) -> Result<JobSuccess
   let stderr_output_file = work_temp_dir.path().join("stderr.txt");
   let inference_start_time = Instant::now();
 
-  let command_exit_status = args.job_dependencies
-      .job_type_details
-      .sad_talker
+  let command_exit_status = model_dependencies
       .inference_command
       .execute_inference(InferenceArgs {
         input_audio: &audio_path.filesystem_path,
@@ -243,9 +248,7 @@ pub async fn process_job(args: SadTalkerProcessJobArgs<'_>) -> Result<JobSuccess
 
     finished_file = output_video_fs_path_watermark.clone();
 
-    let command_exit_status = args.job_dependencies
-        .job_type_details
-        .sad_talker
+    let command_exit_status = model_dependencies
         .ffmpeg_watermark_command
         .execute_inference(ffmpeg_logo_watermark_command::InferenceArgs {
           video_path: &output_video_fs_path,

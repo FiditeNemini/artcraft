@@ -4,5 +4,6 @@ pub mod download_image_file;
 pub mod model_downloaders;
 pub mod process_job;
 pub mod resize_image;
+pub mod sad_talker_dependencies;
 pub mod sad_talker_inference_command;
 pub mod validate_job;

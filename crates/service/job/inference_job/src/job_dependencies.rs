@@ -24,15 +24,12 @@ use mysql_queries::queries::tts::tts_models::get_tts_model_for_inference_improve
 use mysql_queries::queries::voice_conversion::inference::get_voice_conversion_model_for_inference::VoiceConversionModelForInference;
 use newrelic_telemetry::Client as NewRelicClient;
 
-use crate::job::job_types::lipsync::sad_talker::model_downloaders::SadTalkerDownloaders;
-use crate::job::job_types::lipsync::sad_talker::sad_talker_inference_command::SadTalkerInferenceCommand;
 use crate::job::job_types::tts::tacotron2_v2_early_fakeyou::tacotron2_inference_command::Tacotron2InferenceCommand;
 use crate::job::job_types::tts::vall_e_x::model_downloaders::VallEXDownloaders;
 use crate::job::job_types::tts::vall_e_x::vall_e_x_inference_command::VallEXCreateEmbeddingCommand;
 use crate::job::job_types::tts::vall_e_x::vall_e_x_inference_command::VallEXInferenceCommand;
 use crate::job::job_types::tts::vits::vits_inference_command::VitsInferenceCommand;
 use crate::job_specific_dependencies::JobSpecificDependencies;
-use crate::util::common_commands::ffmpeg_logo_watermark_command::FfmpegLogoWatermarkCommand;
 use crate::util::scoped_execution::ScopedExecution;
 use crate::util::scoped_temp_dir_creator::ScopedTempDirCreator;
 
@@ -163,7 +160,6 @@ pub struct JobCaches {
 pub struct JobTypeDetails {
   pub tacotron2_old_vocodes: Tacotron2VocodesDetails,
   pub vits: VitsDetails,
-  pub sad_talker: SadTalkerDetails,
   pub vall_e_x:  VallEXDetails
   //pub tacotron2_modern: ...,
   //pub softvc: ...,
@@ -187,13 +183,7 @@ pub struct VitsDetails {
   pub inference_command: VitsInferenceCommand,
 }
 
-pub struct SadTalkerDetails {
-  pub downloaders: SadTalkerDownloaders,
-  pub inference_command: SadTalkerInferenceCommand,
-  pub ffmpeg_watermark_command: FfmpegLogoWatermarkCommand,
-}
-
-// TODO: we will probably want a command type of some kind that implements 
+// TODO: we will probably want a command type of some kind that implements
 // some kind of interface that we can just pass strings to.
 pub struct VallEXDetails {
   pub downloaders: VallEXDownloaders,
