@@ -323,9 +323,6 @@ async fn main() -> AnyhowResult<()> {
       vits: VitsDetails {
         inference_command: vits_inference_command()?,
       },
-      so_vits_svc: SoVitsSvcDetails {
-        inference_command: SoVitsSvcInferenceCommand::from_env()?,
-      },
       sad_talker: SadTalkerDetails {
         downloaders: SadTalkerDownloaders::build_all_from_env(),
         inference_command: SadTalkerInferenceCommand::from_env()?,

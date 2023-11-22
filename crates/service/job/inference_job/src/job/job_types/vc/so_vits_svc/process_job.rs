@@ -48,9 +48,17 @@ pub async fn process_job(args: SoVitsSvcProcessJobArgs<'_>) -> Result<JobSuccess
       .new_generic_inference(job.inference_job_token.as_str())
       .map_err(|e| ProcessSingleJobError::Other(anyhow!(e)))?;
 
+  let model_dependencies = args
+      .job_dependencies
+      .job_specific_dependencies
+      .maybe_svc_dependencies
+      .as_ref()
+      .ok_or_else(|| ProcessSingleJobError::JobSystemMisconfiguration(Some("missing SVC dependencies".to_string())))?;
+
   // ==================== CONFIRM OR DOWNLOAD SO-VITS-SVC DEPENDENCIES ==================== //
 
-  // TODO: Currently SO-VITS-SVC downloads models from HuggingFace. This is likely a risk in that they can move.
+  // TODO(bt,2023-04-22): Currently SO-VITS-SVC downloads models from HuggingFace.
+  //  This is likely a risk in that they can move.
   //  We'll need to address this and save these in our own cloud storage.
 
   // ==================== CONFIRM OR DOWNLOAD SO-VITS-SVC SYNTHESIZER MODEL ==================== //
@@ -169,9 +177,7 @@ pub async fn process_job(args: SoVitsSvcProcessJobArgs<'_>) -> Result<JobSuccess
 
   let inference_start_time = Instant::now();
 
-  let command_exit_status = args.job_dependencies
-      .job_type_details
-      .so_vits_svc
+  let command_exit_status = model_dependencies
       .inference_command
       .execute_inference(InferenceArgs {
         model_path: &so_vits_svc_fs_path,

@@ -31,7 +31,6 @@ use crate::job::job_types::tts::vall_e_x::model_downloaders::VallEXDownloaders;
 use crate::job::job_types::tts::vall_e_x::vall_e_x_inference_command::VallEXCreateEmbeddingCommand;
 use crate::job::job_types::tts::vall_e_x::vall_e_x_inference_command::VallEXInferenceCommand;
 use crate::job::job_types::tts::vits::vits_inference_command::VitsInferenceCommand;
-use crate::job::job_types::vc::so_vits_svc::so_vits_svc_inference_command::SoVitsSvcInferenceCommand;
 use crate::job_specific_dependencies::JobSpecificDependencies;
 use crate::util::common_commands::ffmpeg_logo_watermark_command::FfmpegLogoWatermarkCommand;
 use crate::util::scoped_execution::ScopedExecution;
@@ -164,7 +163,6 @@ pub struct JobCaches {
 pub struct JobTypeDetails {
   pub tacotron2_old_vocodes: Tacotron2VocodesDetails,
   pub vits: VitsDetails,
-  pub so_vits_svc: SoVitsSvcDetails,
   pub sad_talker: SadTalkerDetails,
   pub vall_e_x:  VallEXDetails
   //pub tacotron2_modern: ...,
@@ -187,10 +185,6 @@ pub struct Tacotron2VocodesDetails {
 
 pub struct VitsDetails {
   pub inference_command: VitsInferenceCommand,
-}
-
-pub struct SoVitsSvcDetails {
-  pub inference_command: SoVitsSvcInferenceCommand,
 }
 
 pub struct SadTalkerDetails {
