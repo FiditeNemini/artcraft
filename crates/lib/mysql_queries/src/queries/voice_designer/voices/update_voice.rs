@@ -3,10 +3,10 @@ use sqlx::MySqlPool;
 
 use enums::common::visibility::Visibility;
 use errors::AnyhowResult;
-use tokens::tokens::zs_voices::ZsVoiceToken;
+use tokens::tokens::model_weights::ModelWeightToken;
 
 pub struct UpdateVoiceArgs<'a> {
-    pub voice_token: &'a ZsVoiceToken,
+    pub voice_token: &'a ModelWeightToken,
     pub voice_title: Option<&'a str>,
     pub creator_set_visibility: &'a Visibility,
     pub maybe_mod_user_token: Option<&'a str>,
