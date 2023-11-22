@@ -43,12 +43,14 @@ pub async fn process_job(args: SadTalkerProcessJobArgs<'_>) -> Result<JobSuccess
   let deps = args.job_dependencies;
 
   let mut job_progress_reporter = args.job_dependencies
+      .clients
       .job_progress_reporter
       .new_generic_inference(job.inference_job_token.as_str())
       .map_err(|e| ProcessSingleJobError::Other(anyhow!(e)))?;
 
   let model_dependencies = args
       .job_dependencies
+      .job
       .job_specific_dependencies
       .maybe_sad_talker_dependencies
       .as_ref()
@@ -71,7 +73,7 @@ pub async fn process_job(args: SadTalkerProcessJobArgs<'_>) -> Result<JobSuccess
     i = i + 1;
 
     let result = downloader.download_if_not_on_filesystem(
-      &args.job_dependencies.private_bucket_client,
+      &args.job_dependencies.buckets.private_bucket_client,
       &args.job_dependencies.fs.scoped_temp_dir_creator_for_downloads,
     ).await;
 
@@ -97,24 +99,24 @@ pub async fn process_job(args: SadTalkerProcessJobArgs<'_>) -> Result<JobSuccess
 
   let audio_path = download_audio_file(
     &job_args.audio_source,
-    &args.job_dependencies.public_bucket_client,
+    &args.job_dependencies.buckets.public_bucket_client,
     &mut job_progress_reporter,
     job,
     &args.job_dependencies.fs.scoped_temp_dir_creator_for_work,
     &work_temp_dir,
-    &deps.mysql_pool
+    &deps.db.mysql_pool
   ).await?;
 
   info!("Audio file: {:?}", audio_path.filesystem_path);
 
   let image_path = download_image_file(
     &job_args.image_source,
-    &args.job_dependencies.public_bucket_client,
+    &args.job_dependencies.buckets.public_bucket_client,
     &mut job_progress_reporter,
     job,
     &args.job_dependencies.fs.scoped_temp_dir_creator_for_work,
     &work_temp_dir,
-    &deps.mysql_pool
+    &deps.db.mysql_pool
   ).await?;
 
   info!("Downloaded image file: {:?}", image_path.filesystem_path);
@@ -308,7 +310,7 @@ pub async fn process_job(args: SadTalkerProcessJobArgs<'_>) -> Result<JobSuccess
 
   info!("Uploading media ...");
 
-  args.job_dependencies.public_bucket_client.upload_filename_with_content_type(
+  args.job_dependencies.buckets.public_bucket_client.upload_filename_with_content_type(
     &result_bucket_object_pathbuf,
     &finished_file,
     &mimetype) // TODO: We should check the mimetype to make sure bad payloads can't get uploaded
@@ -329,7 +331,7 @@ pub async fn process_job(args: SadTalkerProcessJobArgs<'_>) -> Result<JobSuccess
   info!("Saving SadTalker result (media_files table record) ...");
 
   let (media_file_token, id) = insert_media_file_from_face_animation(InsertArgs {
-    pool: &args.job_dependencies.mysql_pool,
+    pool: &args.job_dependencies.db.mysql_pool,
     job: &job,
     maybe_mime_type: Some(&mimetype),
     file_size_bytes,
@@ -337,9 +339,9 @@ pub async fn process_job(args: SadTalkerProcessJobArgs<'_>) -> Result<JobSuccess
     public_bucket_directory_hash: result_bucket_location.get_object_hash(),
     maybe_public_bucket_prefix: Some(BUCKET_FILE_PREFIX),
     maybe_public_bucket_extension: Some(BUCKET_FILE_EXTENSION),
-    is_on_prem: args.job_dependencies.container.is_on_prem,
-    worker_hostname: &args.job_dependencies.container.hostname,
-    worker_cluster: &args.job_dependencies.container.cluster_name,
+    is_on_prem: args.job_dependencies.job.info.container.is_on_prem,
+    worker_hostname: &args.job_dependencies.job.info.container.hostname,
+    worker_cluster: &args.job_dependencies.job.info.container.cluster_name,
   })
       .await
       .map_err(|e| ProcessSingleJobError::Other(e))?;
@@ -350,7 +352,7 @@ pub async fn process_job(args: SadTalkerProcessJobArgs<'_>) -> Result<JobSuccess
   let maybe_user_token = job.maybe_creator_user_token.as_deref()
       .map(|token| UserToken::new_from_str(token));
 
-  args.job_dependencies.firehose_publisher.lipsync_animation_finished(
+  args.job_dependencies.clients.firehose_publisher.lipsync_animation_finished(
     maybe_user_token.as_ref(),
     &job.inference_job_token,
     media_file_token.as_str())

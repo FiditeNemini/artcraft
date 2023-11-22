@@ -45,12 +45,14 @@ pub async fn process_job(args: RvcV2ProcessJobArgs<'_>) -> Result<JobSuccessResu
   let vc_model = args.vc_model;
 
   let mut job_progress_reporter = args.job_dependencies
+      .clients
       .job_progress_reporter
       .new_generic_inference(job.inference_job_token.as_str())
       .map_err(|e| ProcessSingleJobError::Other(anyhow!(e)))?;
 
   let model_dependencies = args
       .job_dependencies
+      .job
       .job_specific_dependencies
       .maybe_rvc_v2_dependencies
       .as_ref()
@@ -61,7 +63,7 @@ pub async fn process_job(args: RvcV2ProcessJobArgs<'_>) -> Result<JobSuccessResu
   info!("Download RVC hubert model (if not present)...");
 
   model_dependencies.pretrained_hubert_model.download_if_not_on_filesystem(
-    &args.job_dependencies.private_bucket_client,
+    &args.job_dependencies.buckets.private_bucket_client,
     &args.job_dependencies.fs.scoped_temp_dir_creator_for_downloads)
       .await
       .map_err(|e| {
@@ -83,13 +85,13 @@ pub async fn process_job(args: RvcV2ProcessJobArgs<'_>) -> Result<JobSuccessResu
           ProcessSingleJobError::from_io_error(e)
         })?;
 
-    let model_object_path = args.job_dependencies.bucket_path_unifier.rvc_v2_model_path(&vc_model.private_bucket_hash);
+    let model_object_path = args.job_dependencies.buckets.bucket_path_unifier.rvc_v2_model_path(&vc_model.private_bucket_hash);
 
     maybe_download_file_from_bucket(
       "rvc (v2) model",
       &fs_path,
       &model_object_path,
-      &args.job_dependencies.private_bucket_client,
+      &args.job_dependencies.buckets.private_bucket_client,
       &mut job_progress_reporter,
       "downloading rvc (v2) model",
       job.id.0,
@@ -110,7 +112,7 @@ pub async fn process_job(args: RvcV2ProcessJobArgs<'_>) -> Result<JobSuccessResu
     i = i + 1;
 
     let result = downloader.download_if_not_on_filesystem(
-      &args.job_dependencies.private_bucket_client,
+      &args.job_dependencies.buckets.private_bucket_client,
       &args.job_dependencies.fs.scoped_temp_dir_creator_for_downloads,
     ).await;
 
@@ -138,13 +140,13 @@ pub async fn process_job(args: RvcV2ProcessJobArgs<'_>) -> Result<JobSuccessResu
             ProcessSingleJobError::from_io_error(e)
           })?;
 
-      let model_index_object_path = args.job_dependencies.bucket_path_unifier.rvc_v2_model_index_path(&vc_model.private_bucket_hash);
+      let model_index_object_path = args.job_dependencies.buckets.bucket_path_unifier.rvc_v2_model_index_path(&vc_model.private_bucket_hash);
 
       maybe_download_file_from_bucket(
         "rvc (v2) model index",
         &fs_path,
         &model_index_object_path,
-        &args.job_dependencies.private_bucket_client,
+        &args.job_dependencies.buckets.private_bucket_client,
         &mut job_progress_reporter,
         "downloading rvc (v2) model index",
         job.id.0,
@@ -187,7 +189,7 @@ pub async fn process_job(args: RvcV2ProcessJobArgs<'_>) -> Result<JobSuccessResu
       "media upload (original file)",
       &original_media_upload_fs_path,
       &bucket_object_path,
-      &args.job_dependencies.public_bucket_client,
+      &args.job_dependencies.buckets.public_bucket_client,
       &mut job_progress_reporter,
       "downloading",
       job.id.0,
@@ -331,7 +333,7 @@ pub async fn process_job(args: RvcV2ProcessJobArgs<'_>) -> Result<JobSuccessResu
 
   info!("Uploading audio...");
 
-  args.job_dependencies.public_bucket_client.upload_filename_with_content_type(
+  args.job_dependencies.buckets.public_bucket_client.upload_filename_with_content_type(
     &result_bucket_object_pathbuf,
     &output_audio_fs_path,
     "audio/wav")
@@ -364,7 +366,7 @@ pub async fn process_job(args: RvcV2ProcessJobArgs<'_>) -> Result<JobSuccessResu
 //      .map_err(|e| ProcessSingleJobError::Other(e))?;
 
   let (inference_result_token, id) = insert_media_file_from_voice_conversion(InsertMediaFileArgs {
-    pool: &args.job_dependencies.mysql_pool,
+    pool: &args.job_dependencies.db.mysql_pool,
     job: &job,
     voice_conversion_type: VoiceConversionModelType::RvcV2,
     maybe_mime_type: maybe_mimetype.as_deref(),
@@ -374,9 +376,9 @@ pub async fn process_job(args: RvcV2ProcessJobArgs<'_>) -> Result<JobSuccessResu
     public_bucket_directory_hash: result_bucket_location.get_object_hash(),
     maybe_public_bucket_prefix: Some(BUCKET_FILE_PREFIX),
     maybe_public_bucket_extension: Some(BUCKET_FILE_EXTENSION),
-    is_on_prem: args.job_dependencies.container.is_on_prem,
-    worker_hostname: &args.job_dependencies.container.hostname,
-    worker_cluster: &args.job_dependencies.container.cluster_name,
+    is_on_prem: args.job_dependencies.job.info.container.is_on_prem,
+    worker_hostname: &args.job_dependencies.job.info.container.hostname,
+    worker_cluster: &args.job_dependencies.job.info.container.cluster_name,
   })
       .await
       .map_err(|e| ProcessSingleJobError::Other(e))?;
@@ -387,7 +389,7 @@ pub async fn process_job(args: RvcV2ProcessJobArgs<'_>) -> Result<JobSuccessResu
   let maybe_user_token = job.maybe_creator_user_token.as_deref()
       .map(|token| UserToken::new_from_str(token));
 
-  args.job_dependencies.firehose_publisher.vc_inference_finished(
+  args.job_dependencies.clients.firehose_publisher.vc_inference_finished(
     maybe_user_token.as_ref(),
     &job.inference_job_token,
     inference_result_token.as_str())

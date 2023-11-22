@@ -35,16 +35,19 @@ pub async fn process_inference_voice(
 ) -> Result<JobSuccessResult, ProcessSingleJobError> {
   let deps = args.job_dependencies;
   let job = args.job;
-  let mysql_pool = &deps.mysql_pool;
+  let mysql_pool = &deps.db.mysql_pool;
 
   let model_dependencies = deps
+      .job
       .job_specific_dependencies
       .maybe_vall_e_x_dependencies
       .as_ref()
       .ok_or_else(|| ProcessSingleJobError::JobSystemMisconfiguration(Some("missing VALL-E-X dependencies".to_string())))?;
 
   // get some globals
-  let mut job_progress_reporter = deps.job_progress_reporter
+  let mut job_progress_reporter = deps
+      .clients
+      .job_progress_reporter
       .new_generic_inference(job.inference_job_token.as_str())
       .map_err(|e| ProcessSingleJobError::Other(anyhow!(e)))?;
 
@@ -78,7 +81,7 @@ pub async fn process_inference_voice(
 
   for downloader in model_dependencies.downloaders.all_downloaders() {
     let result = downloader.download_if_not_on_filesystem(
-      &args.job_dependencies.private_bucket_client,
+      &args.job_dependencies.buckets.private_bucket_client,
       &args.job_dependencies.fs.scoped_temp_dir_creator_for_downloads
     ).await;
 
@@ -115,7 +118,7 @@ pub async fn process_inference_voice(
 
   let voice_file = download_voice_embedding(
     &voice,
-    &deps.private_bucket_client,
+    &deps.buckets.private_bucket_client,
     &downloaded_weights_path
   ).await?;
 
@@ -195,7 +198,7 @@ pub async fn process_inference_voice(
   info!("Upload Bucket Path: {:?}", result_bucket_object_pathbuf);
   info!("Upload File Path: {:?}", finished_file);
 
-  args.job_dependencies.public_bucket_client
+  args.job_dependencies.buckets.public_bucket_client
       .upload_filename_with_content_type(
         &result_bucket_object_pathbuf,
         &finished_file,
@@ -219,7 +222,7 @@ pub async fn process_inference_voice(
 
   // insert into db the record
   let (media_file_token, id) = insert_media_file_from_zero_shot(InsertArgs {
-    pool: &args.job_dependencies.mysql_pool,
+    pool: &args.job_dependencies.db.mysql_pool,
     job: &job,
     maybe_mime_type: Some(&MIME_TYPE),
     file_size_bytes,
@@ -227,9 +230,9 @@ pub async fn process_inference_voice(
     public_bucket_directory_hash: result_bucket_location.get_object_hash(),
     maybe_public_bucket_prefix: Some(BUCKET_FILE_PREFIX),
     maybe_public_bucket_extension: Some(BUCKET_FILE_EXTENSION),
-    is_on_prem: args.job_dependencies.container.is_on_prem,
-    worker_hostname: &args.job_dependencies.container.hostname,
-    worker_cluster: &args.job_dependencies.container.cluster_name,
+    is_on_prem: args.job_dependencies.job.info.container.is_on_prem,
+    worker_hostname: &args.job_dependencies.job.info.container.hostname,
+    worker_cluster: &args.job_dependencies.job.info.container.cluster_name,
   }).await.map_err(|e| ProcessSingleJobError::Other(e))?;
 
   info!(

@@ -81,7 +81,7 @@ async fn dispatch_fine_tuned_weights_model(
 
   // TODO(bt,2023-10-09): Interrogate TTS model cache before querying database.
   let maybe_tts_model = get_tts_model_for_inference_improved(
-    &job_dependencies.mysql_pool,
+    &job_dependencies.db.mysql_pool,
     tts_model_token,
   ).await.map_err(|err| ProcessSingleJobError::Other(anyhow!("database error: {:?}", err)))?;
 

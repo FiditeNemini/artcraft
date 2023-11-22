@@ -49,7 +49,7 @@ use newrelic_telemetry::ClientBuilder;
 use crate::http_server::run_http_server::CreateServerArgs;
 use crate::http_server::run_http_server::launch_http_server;
 use crate::job::job_loop::main_loop::main_loop;
-use crate::job_dependencies::{FileSystemDetails, JobCaches, JobDependencies, JobWorkerDetails};
+use crate::job_dependencies::{BucketDependencies, ClientDependencies, DatabaseDependencies, FileSystemDetails, JobCaches, JobDependencies, JobInstanceInfo, JobSystemControls, JobSystemDependencies};
 use crate::job_specific_dependencies::JobSpecificDependencies;
 use crate::util::scoped_execution::ScopedExecution;
 use crate::util::scoped_temp_dir_creator::ScopedTempDirCreator;
@@ -236,8 +236,11 @@ async fn main() -> AnyhowResult<()> {
   let job_specific_dependencies = JobSpecificDependencies::setup_for_jobs(&scoped_execution)?;
 
   let job_dependencies = JobDependencies {
-    scoped_execution,
-    job_specific_dependencies,
+    db: DatabaseDependencies {
+      mysql_pool,
+      maybe_redis_pool: None, // TODO(bt, 2023-01-11): See note in JobDependencies
+      maybe_keepalive_redis_pool,
+    },
     fs: FileSystemDetails {
       temp_directory_downloads: temp_directory_downloads.clone(),
       temp_directory_work: temp_directory_work.clone(),
@@ -246,55 +249,61 @@ async fn main() -> AnyhowResult<()> {
       scoped_temp_dir_creator_for_work: ScopedTempDirCreator::for_directory(&temp_directory_work),
       semi_persistent_cache,
     },
-    mysql_pool,
-    maybe_redis_pool: None, // TODO(bt, 2023-01-11): See note in JobDependencies
-    maybe_keepalive_redis_pool,
-    job_progress_reporter,
-    public_bucket_client,
-    private_bucket_client,
-    job_stats,
-    newrelic_client,
-    newrelic_disabled,
-    worker_details: JobWorkerDetails {
-      is_debug_worker,
+    buckets: BucketDependencies {
+      public_bucket_client,
+      private_bucket_client,
+      bucket_path_unifier: BucketPathUnifier::default_paths(),
     },
-    caches: JobCaches {
-      tts_model_record_cache: MultiItemTtlCache::create_with_duration(
-        easyenv::get_env_duration_seconds_or_default(
-          "TTS_MODEL_RECORD_CACHE_SECONDS",
-          Duration::from_secs(60*5)
-        ),
-      ),
-      vc_model_record_cache: MultiItemTtlCache::create_with_duration(
-        easyenv::get_env_duration_seconds_or_default(
-        "VC_MODEL_RECORD_CACHE_SECONDS",
-        Duration::from_secs(60)
-        ),
-      ),
-      model_cache_counter: TtlKeyCounter::create_with_duration(
-        easyenv::get_env_duration_seconds_or_default(
-          "TTL_KEY_COUNTER_CACHE_SECONDS",
-          Duration::from_secs(60 * 5)
-        ),
-      ),
+    clients: ClientDependencies {
+      job_progress_reporter,
+      firehose_publisher,
+      newrelic_client,
+      newrelic_disabled,
     },
-    cold_filesystem_cache_starvation_threshold:
-      easyenv::get_env_num("COLD_FILESYSTEM_CACHE_STARVATION_THRESHOLD", 3)?,
-    bucket_path_unifier: BucketPathUnifier::default_paths(),
-    firehose_publisher,
-    job_batch_wait_millis: common_env.job_batch_wait_millis,
-    job_max_attempts: common_env.job_max_attempts as u16,
-    job_batch_size: common_env.job_batch_size,
-    no_op_logger_millis: common_env.no_op_logger_millis,
-    sidecar_max_synthesizer_models,
-    low_priority_starvation_prevention_every_nth,
-    maybe_minimum_priority,
-    container: container_environment.clone(),
-    container_db: ContainerEnvironmentArg {
-      hostname: container_environment.hostname,
-      cluster_name: container_environment.cluster_name,
+    job: JobSystemDependencies {
+      system: JobSystemControls {
+        scoped_execution,
+        cold_filesystem_cache_starvation_threshold: easyenv::get_env_num("COLD_FILESYSTEM_CACHE_STARVATION_THRESHOLD", 3)?,
+        job_batch_wait_millis: common_env.job_batch_wait_millis,
+        job_max_attempts: common_env.job_max_attempts as u16,
+        job_batch_size: common_env.job_batch_size,
+        no_op_logger_millis: common_env.no_op_logger_millis,
+        sidecar_max_synthesizer_models,
+        low_priority_starvation_prevention_every_nth,
+        maybe_minimum_priority,
+        is_debug_worker,
+        application_shutdown: application_shutdown.clone(),
+      },
+      info: JobInstanceInfo {
+        job_stats,
+        caches: JobCaches {
+          tts_model_record_cache: MultiItemTtlCache::create_with_duration(
+            easyenv::get_env_duration_seconds_or_default(
+              "TTS_MODEL_RECORD_CACHE_SECONDS",
+              Duration::from_secs(60*5)
+            ),
+          ),
+          vc_model_record_cache: MultiItemTtlCache::create_with_duration(
+            easyenv::get_env_duration_seconds_or_default(
+              "VC_MODEL_RECORD_CACHE_SECONDS",
+              Duration::from_secs(60)
+            ),
+          ),
+          model_cache_counter: TtlKeyCounter::create_with_duration(
+            easyenv::get_env_duration_seconds_or_default(
+              "TTL_KEY_COUNTER_CACHE_SECONDS",
+              Duration::from_secs(60 * 5)
+            ),
+          ),
+        },
+        container: container_environment.clone(),
+        container_db: ContainerEnvironmentArg {
+          hostname: container_environment.hostname,
+          cluster_name: container_environment.cluster_name,
+        },
+      },
+      job_specific_dependencies,
     },
-    application_shutdown: application_shutdown.clone(),
   };
 
   std::thread::spawn(move || {

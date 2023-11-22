@@ -89,20 +89,20 @@ pub async fn determine_dependency_status(job_dependencies: &JobDependencies, job
 pub async fn get_model_record_from_cacheable_query(job_dependencies: &JobDependencies, job: &AvailableInferenceJob) -> AnyhowResult<MaybeInferenceModel> {
   let model = match (job.inference_category, job.maybe_model_token.as_deref()) {
     (InferenceCategory::TextToSpeech, Some(token)) => {
-      let maybe_model = job_dependencies.caches.tts_model_record_cache.copy_without_bump_if_unexpired(token.to_string())?;
+      let maybe_model = job_dependencies.job.info.caches.tts_model_record_cache.copy_without_bump_if_unexpired(token.to_string())?;
 
       match maybe_model {
         Some(model) => MaybeInferenceModel::TtsModel(model),
         None => {
           let maybe_tts_model = get_tts_model_for_inference_improved(
-            &job_dependencies.mysql_pool, token)
+            &job_dependencies.db.mysql_pool, token)
               .await
               .map_err(|err| anyhow!("database error: {:?}", err))?;
 
           match maybe_tts_model {
             Some(model) => {
               let token = token.to_string();
-              let _r = job_dependencies.caches.tts_model_record_cache.store_copy(&token, &model)?;
+              let _r = job_dependencies.job.info.caches.tts_model_record_cache.store_copy(&token, &model)?;
               MaybeInferenceModel::TtsModel(model)
             },
 
@@ -112,20 +112,20 @@ pub async fn get_model_record_from_cacheable_query(job_dependencies: &JobDepende
       }
     }
     (InferenceCategory::VoiceConversion, Some(token)) => {
-      let maybe_model = job_dependencies.caches.vc_model_record_cache.copy_without_bump_if_unexpired(token.to_string())?;
+      let maybe_model = job_dependencies.job.info.caches.vc_model_record_cache.copy_without_bump_if_unexpired(token.to_string())?;
 
       match maybe_model {
         Some(model) => MaybeInferenceModel::VcModel(model),
         None => {
           let maybe_vc_model = get_voice_conversion_model_for_inference(
-            &job_dependencies.mysql_pool, token)
+            &job_dependencies.db.mysql_pool, token)
               .await
               .map_err(|err| anyhow!("database error: {:?}", err))?;
 
           match maybe_vc_model {
             Some(model) => {
               let token = token.to_string();
-              let _r = job_dependencies.caches.vc_model_record_cache.store_copy(&token, &model)?;
+              let _r = job_dependencies.job.info.caches.vc_model_record_cache.store_copy(&token, &model)?;
               MaybeInferenceModel::VcModel(model)
             },
 

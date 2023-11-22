@@ -24,13 +24,13 @@ const INCREASE_TIMEOUT_MILLIS : u64 = 1000;
 const PAUSE_FILE_EXISTS_WAIT_MILLIS : u64 = 1000 * 30;
 
 pub async fn main_loop(job_dependencies: JobDependencies) {
-  let mut noop_logger = NoOpLogger::new(job_dependencies.no_op_logger_millis as i64);
+  let mut noop_logger = NoOpLogger::new(job_dependencies.job.system.no_op_logger_millis as i64);
 
   let mut error_timeout_millis = START_TIMEOUT_MILLIS;
   let mut sort_by_priority = true;
   let mut sort_by_priority_count = 0;
 
-  while !job_dependencies.application_shutdown.get() {
+  while !job_dependencies.job.system.application_shutdown.get() {
     if let Some(pause_file) = job_dependencies.fs.maybe_pause_file.as_deref() {
       while file_exists(pause_file) {
         warn!("Pause file exists. Pausing until deleted: {:?}", pause_file);
@@ -39,20 +39,20 @@ pub async fn main_loop(job_dependencies: JobDependencies) {
     }
 
     // Don't completely starve low-priority jobs
-    if sort_by_priority_count >= job_dependencies.low_priority_starvation_prevention_every_nth {
+    if sort_by_priority_count >= job_dependencies.job.system.low_priority_starvation_prevention_every_nth {
       sort_by_priority_count = 0;
       sort_by_priority = false;
     }
 
-    let maybe_scoped_model_types = job_dependencies.scoped_execution.get_scoped_model_types();
+    let maybe_scoped_model_types = job_dependencies.job.system.scoped_execution.get_scoped_model_types();
 
     let maybe_available_jobs = list_available_generic_inference_jobs(ListAvailableGenericInferenceJobArgs {
-      num_records: job_dependencies.job_batch_size,
+      num_records: job_dependencies.job.system.job_batch_size,
       is_debug_worker: false, // TODO
       sort_by_priority,
       maybe_scope_by_model_type: maybe_scoped_model_types,
       maybe_scope_by_job_category: None,
-      mysql_pool: &job_dependencies.mysql_pool,
+      mysql_pool: &job_dependencies.db.mysql_pool,
     }).await;
 
     sort_by_priority = true;
@@ -75,7 +75,7 @@ pub async fn main_loop(job_dependencies: JobDependencies) {
 
       noop_logger.log_message_after_awhile(&message);
 
-      std::thread::sleep(Duration::from_millis(job_dependencies.job_batch_wait_millis));
+      std::thread::sleep(Duration::from_millis(job_dependencies.job.system.job_batch_wait_millis));
       error_timeout_millis = START_TIMEOUT_MILLIS; // reset
       continue;
     }
@@ -96,7 +96,7 @@ pub async fn main_loop(job_dependencies: JobDependencies) {
 
     error_timeout_millis = START_TIMEOUT_MILLIS; // reset
 
-    std::thread::sleep(Duration::from_millis(job_dependencies.job_batch_wait_millis));
+    std::thread::sleep(Duration::from_millis(job_dependencies.job.system.job_batch_wait_millis));
   }
 
   warn!("Job runner main loop is shut down.");
@@ -120,7 +120,7 @@ async fn process_job_batch(job_dependencies: &JobDependencies, jobs: Vec<Availab
         };
 
         if increment_success_count {
-          let stats = job_dependencies.job_stats.increment_success_count().ok();
+          let stats = job_dependencies.job.info.job_stats.increment_success_count().ok();
           warn!("Success stats: {:?}", stats);
         }
       },
@@ -222,14 +222,14 @@ async fn handle_error(job_dependencies: &&JobDependencies, job: &AvailableInfere
 
   if container_health_report == ContainerHealth::IncrementContainerFailCount {
     // NB: We only increment the fail count for events that may indicate the job server is stuck.
-    let stats = job_dependencies.job_stats.increment_failure_count().ok();
+    let stats = job_dependencies.job.info.job_stats.increment_failure_count().ok();
     warn!("Failure stats: {:?}", stats);
   }
 
   match job_failure_class {
     JobFailureClass::PermanentFailure => {
       let _r = mark_generic_inference_job_completely_failed(
-        &job_dependencies.mysql_pool,
+        &job_dependencies.db.mysql_pool,
         &job,
         maybe_public_failure_reason,
         Some(&internal_failure_reason),
@@ -238,12 +238,12 @@ async fn handle_error(job_dependencies: &&JobDependencies, job: &AvailableInfere
     }
     JobFailureClass::TransientFailure => {
       let _r = mark_generic_inference_job_failure(
-        &job_dependencies.mysql_pool,
+        &job_dependencies.db.mysql_pool,
         &job,
         maybe_public_failure_reason,
         &internal_failure_reason,
         maybe_frontend_failure_category,
-        job_dependencies.job_max_attempts
+        job_dependencies.job.system.job_max_attempts
       ).await;
     }
   }
