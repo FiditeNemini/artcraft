@@ -1,3 +1,8 @@
+#![forbid(unreachable_patterns)]
+#![forbid(unused_imports)]
+#![forbid(unused_mut)]
+#![forbid(unused_variables)]
+
 use std::path::PathBuf;
 
 use r2d2_redis::r2d2;
@@ -19,61 +24,41 @@ use mysql_queries::queries::tts::tts_models::get_tts_model_for_inference_improve
 use mysql_queries::queries::voice_conversion::inference::get_voice_conversion_model_for_inference::VoiceConversionModelForInference;
 use newrelic_telemetry::Client as NewRelicClient;
 
-use crate::job::job_types::lipsync::sad_talker::model_downloaders::SadTalkerDownloaders;
-use crate::job::job_types::lipsync::sad_talker::sad_talker_inference_command::SadTalkerInferenceCommand;
-use crate::job::job_types::tts::tacotron2_v2_early_fakeyou::tacotron2_inference_command::Tacotron2InferenceCommand;
-use crate::job::job_types::tts::vall_e_x::model_downloaders::VallEXDownloaders;
-use crate::job::job_types::tts::vits::vits_inference_command::VitsInferenceCommand;
-
-use crate::job::job_types::tts::vall_e_x::vall_e_x_inference_command::VallEXInferenceCommand;
-use crate::job::job_types::tts::vall_e_x::vall_e_x_inference_command::VallEXCreateEmbeddingCommand;
-use crate::job::job_types::vc::rvc_v2::model_downloaders::RvcV2Downloaders;
-
-use crate::job::job_types::vc::rvc_v2::pretrained_hubert_model::PretrainedHubertModel;
-use crate::job::job_types::vc::rvc_v2::rvc_v2_inference_command::RvcV2InferenceCommand;
-use crate::job::job_types::vc::so_vits_svc::so_vits_svc_inference_command::SoVitsSvcInferenceCommand;
-use crate::util::common_commands::ffmpeg_logo_watermark_command::FfmpegLogoWatermarkCommand;
+use crate::job_specific_dependencies::JobSpecificDependencies;
 use crate::util::scoped_execution::ScopedExecution;
 use crate::util::scoped_temp_dir_creator::ScopedTempDirCreator;
 
 pub struct JobDependencies {
+  /// Database dependencies.
+  pub db: DatabaseDependencies,
+
+  /// Filesystem info and utils.
+  pub fs: FileSystemDetails,
+
+  /// Various cloud bucket tools.
+  pub buckets: BucketDependencies,
+
+  /// Various clients; HTTP, 3rd party, etc.
+  pub clients: ClientDependencies,
+
+  /// Job controls, stats, etc.
+  pub job: JobSystemDependencies,
+}
+
+pub struct JobSystemDependencies {
+  pub system: JobSystemControls,
+  pub info: JobInstanceInfo,
+
+  /// Specific dependencies for the various job types.
+  /// They're only loaded if that type of job is configured to run.
+  /// (See "scoped execution")
+  pub job_specific_dependencies: JobSpecificDependencies,
+}
+
+pub struct JobSystemControls {
   /// The job should only run on these types of models.
   /// This is provided at job start.
   pub scoped_execution: ScopedExecution,
-
-  /// Filesystem info and utils
-  pub fs: FileSystemDetails,
-
-  pub mysql_pool: MySqlPool,
-
-  // TODO(2023-01-11): We don't always connect to a Redis
-  //  Typically this is for job status reporting, but we might also report on when users leave the
-  //  site to proactively kill their inference jobs and save on worker quota.
-  //  On local dev we probably don't care about Redis at all, and on on-prem workers, we cannot
-  //  connect to production Redis easily (requires lots of setup - ghosttunnel or something + IP rules)
-  pub maybe_redis_pool: Option<r2d2::Pool<RedisConnectionManager>>,
-
-  pub maybe_keepalive_redis_pool: Option<r2d2::Pool<RedisConnectionManager>>,
-
-  pub job_progress_reporter: Box<dyn JobProgressReporterBuilder>,
-
-  pub private_bucket_client: BucketClient,
-  pub public_bucket_client: BucketClient,
-
-  pub firehose_publisher: FirehosePublisher,
-
-  pub bucket_path_unifier: BucketPathUnifier,
-
-  pub job_stats: JobStats,
-
-  pub newrelic_client: NewRelicClient,
-
-  pub newrelic_disabled: bool,
-
-  pub worker_details: JobWorkerDetails,
-
-  // In-process cache of database lookup records, etc.
-  pub caches: JobCaches,
 
   // How many times to skip jobs (on cold filesystem cache) before proceeding with execution.
   pub cold_filesystem_cache_starvation_threshold: u64,
@@ -102,17 +87,54 @@ pub struct JobDependencies {
   // This finds jobs of equal or greater priority.
   pub maybe_minimum_priority: Option<u8>,
 
-  // Details for each job type (grouped by the job type)
-  pub job_type_details: JobTypeDetails,
+  // The application can be shut down from another thread.
+  // Checking this will determine if the application needs to exit (true = exit).
+  pub application_shutdown: RelaxedAtomicBool,
 
-  pub pretrained_models: PretrainedModels,
+  // Debug workers only process special debug requests. They're silent otherwise.
+  // Non-debug workers ignore debug requests. This is so we can deploy special code
+  // to debug nodes (typically just one, perhaps even ephemerally).
+  pub is_debug_worker: bool,
+}
+
+pub struct JobInstanceInfo {
+  pub job_stats: JobStats,
+
+  // In-process cache of database lookup records, etc.
+  pub caches: JobCaches,
 
   pub container: ContainerEnvironment,
   pub container_db: ContainerEnvironmentArg, // Same info, but for database.
 
-  // The application can be shut down from another thread.
-  // Checking this will determine if the application needs to exit (true = exit).
-  pub application_shutdown: RelaxedAtomicBool,
+}
+
+pub struct DatabaseDependencies {
+  pub mysql_pool: MySqlPool,
+
+  // TODO(2023-01-11): We don't always connect to a Redis
+  //  Typically this is for job status reporting, but we might also report on when users leave the
+  //  site to proactively kill their inference jobs and save on worker quota.
+  //  On local dev we probably don't care about Redis at all, and on on-prem workers, we cannot
+  //  connect to production Redis easily (requires lots of setup - ghosttunnel or something + IP rules)
+  pub maybe_redis_pool: Option<r2d2::Pool<RedisConnectionManager>>,
+
+  pub maybe_keepalive_redis_pool: Option<r2d2::Pool<RedisConnectionManager>>,
+}
+
+pub struct BucketDependencies {
+  pub private_bucket_client: BucketClient,
+  pub public_bucket_client: BucketClient,
+  pub bucket_path_unifier: BucketPathUnifier,
+}
+
+pub struct ClientDependencies {
+  pub job_progress_reporter: Box<dyn JobProgressReporterBuilder>,
+
+  pub firehose_publisher: FirehosePublisher,
+
+  pub newrelic_client: NewRelicClient,
+
+  pub newrelic_disabled: bool,
 }
 
 pub struct FileSystemDetails {
@@ -140,13 +162,7 @@ pub struct FileSystemDetails {
   pub semi_persistent_cache: SemiPersistentCacheDir,
 }
 
-pub struct JobWorkerDetails {
-  // Debug workers only process special debug requests. They're silent otherwise.
-  // Non-debug workers ignore debug requests. This is so we can deploy special code
-  // to debug nodes (typically just one, perhaps even ephemerally).
-  pub is_debug_worker: bool,
-}
-
+// TODO: Move into the appropriate job-specific dependencies object.
 pub struct JobCaches {
   pub tts_model_record_cache: MultiItemTtlCache<String, TtsModelForInferenceRecord>,
   pub vc_model_record_cache: MultiItemTtlCache<String, VoiceConversionModelForInference>,
@@ -154,61 +170,4 @@ pub struct JobCaches {
   /// Skip processing models if they're not on the filesystem.
   /// If the counter elapses a delta, proceed with calculation.
   pub model_cache_counter: TtlKeyCounter,
-}
-
-pub struct PretrainedModels {
-  pub rvc_v2_hubert: PretrainedHubertModel,
-}
-
-/// Per-job type details
-pub struct JobTypeDetails {
-  pub tacotron2_old_vocodes: Tacotron2VocodesDetails,
-  pub vits: VitsDetails,
-  pub rvc_v2: RvcV2Details,
-  pub so_vits_svc: SoVitsSvcDetails,
-  pub sad_talker: SadTalkerDetails,
-  pub vall_e_x:  VallEXDetails
-  //pub tacotron2_modern: ...,
-  //pub softvc: ...,
-}
-
-/// "Old" TT2 (vocodes-era)
-pub struct Tacotron2VocodesDetails {
-  pub inference_command: Tacotron2InferenceCommand,
-
-  /// Common pretrained waveglow vocoder filename
-  pub waveglow_vocoder_model_filename: String,
-
-  /// Common pretrained hifigan vocoder filename
-  pub hifigan_vocoder_model_filename: String,
-
-  /// Common pretrained hifigan super resolution vocoder filename
-  pub hifigan_superres_vocoder_model_filename: String,
-}
-
-pub struct VitsDetails {
-  pub inference_command: VitsInferenceCommand,
-}
-
-pub struct RvcV2Details {
-  pub inference_command: RvcV2InferenceCommand,
-  pub downloaders: RvcV2Downloaders,
-}
-
-pub struct SoVitsSvcDetails {
-  pub inference_command: SoVitsSvcInferenceCommand,
-}
-
-pub struct SadTalkerDetails {
-  pub downloaders: SadTalkerDownloaders,
-  pub inference_command: SadTalkerInferenceCommand,
-  pub ffmpeg_watermark_command: FfmpegLogoWatermarkCommand,
-}
-
-// TODO: we will probably want a command type of some kind that implements 
-// some kind of interface that we can just pass strings to.
-pub struct VallEXDetails {
-  pub downloaders: VallEXDownloaders,
-  pub inference_command: VallEXInferenceCommand,
-  pub create_embedding_command: VallEXCreateEmbeddingCommand
 }

@@ -42,10 +42,17 @@ pub async fn process_create_voice(
 ) -> Result<JobSuccessResult, ProcessSingleJobError> {
   let deps = args.job_dependencies;
   let job = args.job;
-  let mysql_pool = &deps.mysql_pool;
+  let mysql_pool = &deps.db.mysql_pool;
+
+  let model_dependencies = deps
+      .job
+      .job_specific_dependencies
+      .maybe_vall_e_x_dependencies
+      .as_ref()
+      .ok_or_else(|| ProcessSingleJobError::JobSystemMisconfiguration(Some("missing VALL-E-X dependencies".to_string())))?;
 
   // get some globals
-  let mut job_progress_reporter = deps.job_progress_reporter
+  let mut job_progress_reporter = deps.clients.job_progress_reporter
       .new_generic_inference(job.inference_job_token.as_str())
       .map_err(|e| ProcessSingleJobError::Other(anyhow!(e)))?;
 
@@ -111,7 +118,7 @@ pub async fn process_create_voice(
   let temp_extension = String::from(".bin");
   let temp_prefix:String;
 
-  if !deps.container.is_on_prem {
+  if !deps.job.info.container.is_on_prem {
     temp_prefix = String::from("sample_"); // this is for seed in local dev to download the samples
   } else {
     temp_prefix = String::from(BUCKET_FILE_PREFIX_CREATE);
@@ -149,7 +156,7 @@ pub async fn process_create_voice(
     info!("Downloading to path: {:?}", file_path);
 
     // TODO: we might want to catch the error and not include the pathes into download dataset?
-    let result = deps.public_bucket_client.download_file_to_disk(
+    let result = deps.buckets.public_bucket_client.download_file_to_disk(
       audio_media_file.to_full_object_pathbuf(),
       &file_path
     ).await;
@@ -167,9 +174,9 @@ pub async fn process_create_voice(
 
   // STEP 4 Download the models
   info!("Download models (if not present)...");
-  for downloader in deps.job_type_details.vall_e_x.downloaders.all_downloaders() {
+  for downloader in model_dependencies.downloaders.all_downloaders() {
     let result = downloader.download_if_not_on_filesystem(
-      &args.job_dependencies.private_bucket_client,
+      &args.job_dependencies.buckets.private_bucket_client,
       &args.job_dependencies.fs.scoped_temp_dir_creator_for_downloads
     ).await;
     if let Err(e) = result {
@@ -197,7 +204,7 @@ pub async fn process_create_voice(
 
   // Run Inference
   let command_exit_status =
-      args.job_dependencies.job_type_details.vall_e_x.create_embedding_command.execute_inference(
+      model_dependencies.create_embedding_command.execute_inference(
         job::job_types::tts::vall_e_x::vall_e_x_inference_command::CreateVoiceInferenceArgs {
           output_embedding_path: &workdir,
           output_embedding_name: &output_file_name,
@@ -265,7 +272,7 @@ pub async fn process_create_voice(
   info!("Upload File Path: {:?}", finished_file);
   info!("Upload Bucket Path: {:?}", embedding_bucket_object_pathbuf);
 
-  args.job_dependencies.private_bucket_client
+  args.job_dependencies.buckets.private_bucket_client
       .upload_filename_with_content_type(
         &embedding_bucket_object_pathbuf,
         &finished_file,

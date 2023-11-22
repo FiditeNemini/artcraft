@@ -3453,7 +3453,7 @@ checksum = "adcf93614601c8129ddf72e2d5633df827ba6551541c6d8c59520a371475be1f"
 dependencies = [
  "hermit-abi 0.3.1",
  "io-lifetimes",
- "rustix 0.37.13",
+ "rustix 0.37.27",
  "windows-sys 0.48.0",
 ]
 
