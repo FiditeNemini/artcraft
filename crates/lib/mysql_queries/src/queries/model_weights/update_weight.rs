@@ -14,7 +14,7 @@ pub struct UpdateWeightArgs<'a> {
     pub mysql_pool: &'a MySqlPool,
 }
 
-pub async fn update_voice(args: UpdateWeightArgs<'_>) -> AnyhowResult<()> {
+pub async fn update_weights(args: UpdateWeightArgs<'_>) -> AnyhowResult<()> {
     let mut transaction = args.mysql_pool.begin().await?;
 
     let query_result = sqlx
@@ -44,7 +44,7 @@ pub async fn update_voice(args: UpdateWeightArgs<'_>) -> AnyhowResult<()> {
         Ok(_) => Ok(()),
         Err(err) => { 
             transaction.rollback().await?;
-            Err(anyhow!("zs voice update error: {:?}", err)) 
+            Err(anyhow!("weights update error: {:?}", err)) 
         }
     }
 }
