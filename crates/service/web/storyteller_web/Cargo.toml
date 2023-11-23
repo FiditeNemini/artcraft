@@ -94,7 +94,7 @@ tokio = { version = "1.6.0", features = ["macros"] }
 futures = { version = "0.3.17", features = ["thread-pool"] } # feature for ThreadPool
 futures-util = "0.3.29"
 futures_old_for_limiter = { package = "futures", version = "0.1.29" } # Older version of futures for `limiter` crate
-futures-core = "0.3.26" # NB: For middleware/futures upgrade
+futures-core = "0.3.29" # NB: For middleware/futures upgrade
 pin-project-lite = "0.2.9" # NB: For middleware/futures upgrade
 
 # MySql Database
@@ -122,13 +122,13 @@ infer = "0.5.0"
 # https://github.com/durch/rust-s3/pull/254
 rust-s3 = { version = "0.33.0" }
 
-actix-cors = "0.6.0-beta.3"
+actix-cors = "0.6.4"
 actix-http = "3.4.0"
-actix-multipart = "0.4.0-beta.7"
+actix-multipart = "0.6.1"
 actix-rt = "2.9.0"
-actix-service = "2.0.1"
-actix-utils = "3.0.0"
-actix-web = "4.0.0-beta.10"
+actix-service = "2.0.2"
+actix-utils = "3.0.1"
+actix-web = "4.4.0"
 jwt = "0.13.0"
 
 # NB: Hyper is just for HTTP client use in jobs. I'd use Actix client, but I need tokio runtime
