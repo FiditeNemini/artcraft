@@ -1,7 +1,7 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
 import React, { useCallback, useEffect, useState } from "react";
 import { Gravatar } from "@storyteller/components/src/elements/Gravatar";
-import { Link, NavLink, Redirect, useLocation } from "react-router-dom";
+import { Link, Redirect, useLocation } from "react-router-dom";
 import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
 import { SessionSubscriptionsWrapper } from "@storyteller/components/src/session/SessionSubscriptionsWrapper";
 import { useParams } from "react-router-dom";
@@ -153,7 +153,7 @@ function NewProfilePage(this: any, props: Props) {
 
     // Mods shouldn't edit preferences.
     const buttonLabel = props.sessionWrapper.userTokenMatches(
-      userData.user_token
+      userData.user_token,
     )
       ? "Edit Profile & Preferences"
       : "Edit Profile";
@@ -207,7 +207,7 @@ function NewProfilePage(this: any, props: Props) {
     >
       <FontAwesomeIcon icon={faCalendarAlt} className="me-2" />
       <p className="fw-normal">Joined {joinDate}</p>
-    </div>
+    </div>,
   );
 
   if (userData.website_url !== undefined && userData.website_url !== null) {
@@ -299,7 +299,7 @@ function NewProfilePage(this: any, props: Props) {
         >
           <FontAwesomeIcon icon={faDiscord} />
         </a>
-      </Tippy>
+      </Tippy>,
     );
   }
 
