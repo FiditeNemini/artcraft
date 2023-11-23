@@ -1,9 +1,14 @@
 use anyhow::anyhow;
 use sqlx::MySqlPool;
 
+use log::info;
+use sqlx::mysql::MySqlPoolOptions;
+
 use enums::common::visibility::Visibility;
 use errors::AnyhowResult;
 use tokens::tokens::model_weights::ModelWeightToken;
+
+use config::shared_constants::{DEFAULT_MYSQL_CONNECTION_STRING, DEFAULT_RUST_LOG};
 
 pub struct UpdateWeightArgs<'a> {
     pub weight_token: &ModelWeightToken,
@@ -46,5 +51,41 @@ pub async fn update_weights(args: UpdateWeightArgs<'_>) -> AnyhowResult<()> {
             transaction.rollback().await?;
             Err(anyhow!("weights update error: {:?}", err)) 
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use sqlx::MySqlPoolOptions;
+    use easyenv;
+    use tokio;
+
+    #[tokio::test]
+    async fn test_update_weights() -> AnyhowResult<()> {
+        let db_connection_string = easyenv::get_env_string_or_default(
+            "MYSQL_URL",
+            DEFAULT_MYSQL_CONNECTION_STRING
+        );
+
+        let pool = MySqlPoolOptions::new()
+            .max_connections(easyenv::get_env_num("MYSQL_MAX_CONNECTIONS", 3)?)
+            .connect(&db_connection_string)
+            .await?;
+
+        let args = UpdateWeightArgs {
+            weight_token: &ModelWeightToken::new("test_token"),
+            title: Some("Test Title"),
+            description_markdown: "Test Description Markdown",
+            description_rendered_html: "Test Description HTML",
+            creator_set_visibility: &Visibility::Public,
+            mysql_pool: &pool,
+        };
+
+        let result = update_weights(args).await;
+
+        assert!(result.is_ok());
+
+        Ok(())
     }
 }

@@ -6,7 +6,7 @@ use strum::EnumCount;
 use strum::EnumIter;
 
 #[cfg_attr(test, derive(EnumIter, EnumCount))]
-#[derive(Clone, Copy, Eq, PartialEq, Hash, Ord, PartialOrd, Deserialize, Serialize,Debug)]
+#[derive(Clone, Copy, Eq, PartialEq, Hash, Ord, PartialOrd, sqlx::Type, Deserialize, Serialize,Debug)]
 pub enum WeightsType {
     #[serde(rename = "hifigan_tt2")]
     HifiganTacotron2,

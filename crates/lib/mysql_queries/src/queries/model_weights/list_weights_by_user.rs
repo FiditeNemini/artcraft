@@ -8,36 +8,47 @@ use enums::common::visibility::Visibility;
 use errors::AnyhowResult;
 use tokens::tokens::model_weights::ModelWeightToken;
 
-// FIXME: This is the old style of query scoping and shouldn't be copied.
+use enums::by_table::model_weights::{
+    weights_types::WeightsType,
+    weights_category::WeightsCategory,
+};
 
 #[derive(Serialize)]
 pub struct WeightsRecord {
-    pub weights_token: ZsVoiceDatasetToken,
+    pub weights_token: ModelWeightToken,
     pub title: String,
 
     pub creator_user_token: UserToken,
-    pub creator_username: String,
-    pub creator_display_name: String,
-    pub creator_email_gravatar_hash: String,
-    pub creator_set_visibility: Visibility,
+    pub creator_username: String, 
+    pub creator_ip_address: String, 
 
-    pub ietf_language_tag: String,
-    pub ietf_primary_language_subtag: String,
+    pub weights_type: WeightsType,
+    pub weights_category: WeightsCategory,
+    
+    pub description_markdown: String,
+    pub description_rendered_html: String,
+
+    pub cached_user_ratings_negative_count: i32,
+    pub cached_user_ratings_positive_count: i32,
+    pub cached_user_ratings_total_count: i32,
+
+    pub maybe_cached_user_ratings_ratio: Option<f32>,
+    pub cached_user_ratings_total_count: i32,
 
     pub created_at: DateTime<Utc>,
     pub updated_at: DateTime<Utc>,
 }
 
-pub async fn list_datasets_by_username(
+pub async fn list_weights_by_username(
     mysql_pool: &MySqlPool,
     username: &str,
     can_see_deleted: bool,
 ) -> AnyhowResult<Vec<WeightsRecord>> {
     let mut connection = mysql_pool.acquire().await?;
-    list_datasets_by_username_with_connection(&mut connection, username, can_see_deleted).await
+    list_weights_by_username_with_connection(&mut connection, username, can_see_deleted).await
 }
 
-pub async fn list_datasets_by_username_with_connection(
+pub async fn list_weights_by_username_with_connection(
     mysql_connection: &mut PoolConnection<MySql>,
     creator_username: &str,
     can_see_deleted: bool,
@@ -47,7 +58,7 @@ pub async fn list_datasets_by_username_with_connection(
             list_datasets_by_creator_username(mysql_connection, creator_username, can_see_deleted)
                 .await;
 
-    let datasets : Vec<InternalRawWeightsRecordForList> = match datasets {
+    let datasets : Vec<WeightsRecord> = match datasets {
         Ok(datasets) => datasets,
         Err(err) => {
             match err {
@@ -55,8 +66,8 @@ pub async fn list_datasets_by_username_with_connection(
                     return Ok(Vec::new());
                 },
                 _ => {
-                    warn!("dataset list query error: {:?}", err);
-                    return Err(anyhow!("dataset list query error"));
+                    warn!("weights dataset list query error: {:?}", err);
+                    return Err(anyhow!("weights dataset list query error"));
                 }
             }
         }
@@ -65,21 +76,26 @@ pub async fn list_datasets_by_username_with_connection(
     Ok(datasets.into_iter()
         .map(|dataset| {
             WeightsRecord {
-                dataset_token: dataset.token,
+                weights_token: ModelWeightToken(dataset.token),
                 title: dataset.title,
-                ietf_language_tag: dataset.ietf_language_tag,
-                ietf_primary_language_subtag: dataset.ietf_primary_language_subtag,
                 creator_user_token: dataset.creator_user_token,
                 creator_username: dataset.creator_username,
-                creator_display_name: dataset.creator_display_name,
-                creator_email_gravatar_hash: dataset.creator_email_gravatar_hash,
-                creator_set_visibility: dataset.creator_set_visibility,
+                creator_ip_address: dataset.creator_ip_address,
+                weights_type: dataset.weights_type,
+                weights_category: dataset.weights_category,
+                description_markdown: dataset.description_markdown,
+                description_rendered_html: dataset.description_rendered_html,
+                cached_user_ratings_negative_count: dataset.cached_user_ratings_negative_count,
+                cached_user_ratings_positive_count: dataset.cached_user_ratings_positive_count,
+                cached_user_ratings_total_count: dataset.cached_user_ratings_total_count,
+                maybe_cached_user_ratings_ratio: dataset.maybe_cached_user_ratings_ratio,
+                cached_user_ratings_total_count: dataset.cached_user_ratings_total_count,
                 created_at: dataset.created_at,
                 updated_at: dataset.updated_at,
             }
         })
         .filter(|dataset| {
-            dataset.creator_username == creator_username || dataset.creator_set_visibility == Visibility::Public || can_see_deleted
+            dataset.weights_token == creator_username || dataset.creator_set_visibility == Visibility::Public || can_see_deleted
         })
         .collect::<Vec<WeightsRecord>>())
 }
@@ -89,13 +105,13 @@ async fn list_datasets_by_creator_username(
     mysql_connection: &mut PoolConnection<MySql>,
     creator_username: &str,
     can_see_deleted: bool,
-) -> AnyhowResult<Vec<InternalRawWeightsRecordForList>> {
+) -> AnyhowResult<Vec<WeightsRecord>> {
     // TODO: There has to be a better way.
     //  Sqlx doesn't like anything except string literals.
     let maybe_datasets = if !can_see_deleted {
         info!("listing datasets for user;");
         sqlx::query_as!(
-      InternalRawWeightsRecordForList,
+            WeightsRecord,
         r#"
         SELECT
             zd.token as `token: tokens::tokens::zs_voice_datasets::ZsVoiceDatasetToken`,
@@ -123,7 +139,7 @@ async fn list_datasets_by_creator_username(
     } else {
         info!("listing datasets for user");
         sqlx::query_as!(
-      InternalRawWeightsRecordForList
+            WeightsRecord
             ,
         r#"
         SELECT
@@ -150,4 +166,14 @@ async fn list_datasets_by_creator_username(
     };
 
     Ok(maybe_datasets)
+}
+
+#[cfg(test)]
+mod tests {
+
+  #[test]
+  fn test() {
+    assert_eq!("one", "two"); // This fails
+  }
+
 }

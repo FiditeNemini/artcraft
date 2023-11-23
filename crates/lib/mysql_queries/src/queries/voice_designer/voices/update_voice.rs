@@ -3,10 +3,10 @@ use sqlx::MySqlPool;
 
 use enums::common::visibility::Visibility;
 use errors::AnyhowResult;
-use tokens::tokens::model_weights::ModelWeightToken;
+use tokens::tokens::zs_voices::ZsVoiceToken;
 
 pub struct UpdateVoiceArgs<'a> {
-    pub voice_token: &'a ModelWeightToken,
+    pub voice_token: &'a ZsVoiceToken,
     pub voice_title: Option<&'a str>,
     pub creator_set_visibility: &'a Visibility,
     pub maybe_mod_user_token: Option<&'a str>,
@@ -18,7 +18,8 @@ pub struct UpdateVoiceArgs<'a> {
 pub async fn update_voice(args: UpdateVoiceArgs<'_>) -> AnyhowResult<()>{
     let mut transaction = args.mysql_pool.begin().await?;
 
-    let query_result = sqlx::query!(
+    let query_result = sqlx
+    ::query!(
         r#"
         UPDATE zs_voices
         SET
@@ -39,11 +40,13 @@ pub async fn update_voice(args: UpdateVoiceArgs<'_>) -> AnyhowResult<()>{
         args.voice_token.as_str(),
     ).execute(args.mysql_pool).await;
 
-    // TODO(Kasisnu): This should probably rollback
     transaction.commit().await?;
 
     match query_result {
         Ok(_) => Ok(()),
-        Err(err) => Err(anyhow!("zs voice update error: {:?}", err)),
+        Err(err) => 
+        {
+            Err(anyhow!("zs voice update error: {:?}", err))
+        },
     }
 }
