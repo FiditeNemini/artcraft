@@ -12,6 +12,10 @@ use enums::common::visibility::Visibility;
 use tokens::tokens::{ users::UserToken, model_weights::ModelWeightToken };
 use chrono::{ DateTime, Utc };
 
+// Notes ensure that Enums have sqlx::Type 
+//  'weights_type: enums::by_table::model_weights::weights_types::WeightsType' use this to map
+// Retrieved Model Weight can be constrained to the fields that are needed
+
 pub struct RetrivedModelWeight {
     pub token: ModelWeightToken,
     pub title: String,
@@ -202,6 +206,7 @@ async fn select_without_deleted(
         .fetch_one(mysql_connection).await
 }
 
+// RawWeight is the struct that is returned from the database in raw form.
 #[derive(Serialize)]
 pub struct RawWeight {
     pub token: ModelWeightToken,
