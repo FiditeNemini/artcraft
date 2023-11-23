@@ -79,15 +79,13 @@ function VoiceDesignerFormPage({ enqueueInferenceJob }: { enqueueInferenceJob: a
     ? ["Edit Details", "Edit Samples"]
     : ["Voice Details", "Upload Samples"];
 
-  const key = !isNewCreation && (dataset_token || uuidv4());
+  // const key = !isNewCreation && (dataset_token || uuidv4());
   const displayStep = (step: any) => {
     switch (step) {
       case 0:
         return <VoiceDetails {...{ datasetInputs }} />;
       case 1:
-        return (
-          <UploadSamples key={key as any} {...{ audioProps, datasetToken: dataset_token, setAudioSamplesReady }} />
-        );
+        return <UploadSamples {...{ audioProps, datasetToken: dataset_token, setAudioSamplesReady }}/>;
       default:
         return null;
     }

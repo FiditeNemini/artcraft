@@ -9,8 +9,11 @@ import Container from "components/common/Container";
 import { NavLink } from "react-router-dom";
 import ListItems from "./components/NewList";
 import Modal from "components/common/Modal";
+import { Button } from "components/common";
 import useVoiceRequests from "./useVoiceRequests";
 import { usePrefixedDocumentTitle } from "common/UsePrefixedDocumentTitle";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faMicrophone } from "@fortawesome/pro-solid-svg-icons";
 
 import {
   FrontendInferenceJobType,
@@ -25,14 +28,9 @@ function VoiceDesignerMainPage({
   usePrefixedDocumentTitle("AI Voice Designer");
   const { pathname } = useLocation();
   const { t } = useLocalize("FaceAnimator");
-  const { datasets, voices, isFetching } = useVoiceRequests({
-    requestDatasets: true,
-    requestVoices: true,
-  });
+  const { datasets, voices, isLoading } = useVoiceRequests({ requestDatasets: true,requestVoices: true });
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-  const view = ["/voice-designer/datasets", "/voice-designer/voices"].indexOf(
-    pathname
-  );
+  const view = ["/voice-designer/datasets", "/voice-designer/voices"].indexOf(pathname);
   const [deleteItem, setDeleteItem] = useState("");
   const [deleteType, setDeleteType] = useState("");
   const [deleteText, setDeleteText] = useState({
@@ -76,26 +74,24 @@ function VoiceDesignerMainPage({
     history.push(`/voice-designer/voice/${token}`);
   };
 
-  const voiceClick =
-    (todo: any, type: string) =>
-    ({ target }: { target: any }) => {
-      let voiceToken =
-        voices.list[target.name.split(",")[0].split(":")[1]].voice_token;
-      todo(voiceToken, type);
-    };
+  const DataBadge = () => <span className="dataset-badge mb-0">Dataset</span>;
+  const VoiceBadge = () => <FontAwesomeIcon icon={faMicrophone} className="me-2 me-lg-3" />;
 
-  const datasetClick =
-    (todo: any, type: string) =>
-    ({ target }: { target: any }) => {
-      let datasetToken =
-        datasets.list[target.name.split(",")[0].split(":")[1]].dataset_token;
-      todo(datasetToken, type);
-    };
+  // these need to be abstracted to use over again -V
+  const voiceClick = (todo: any, type: string) =>  ({ target }: { target: any }) => {
+    let voiceToken = voices.list[target.name.split(",")[0].split(":")[1]].voice_token;
+    todo(voiceToken, type);
+  };
+
+  const datasetClick = (todo: any, type: string) => ({ target }: { target: any }) => {
+    let datasetToken = datasets.list[target.name.split(",")[0].split(":")[1]].dataset_token;
+    todo(datasetToken, type);
+  };
 
   const actionDataSets = datasets.list.map((dataset, i) => {
     return {
       ...dataset,
-      badge: "dataset",
+      badge: DataBadge,
       buttons: [
         {
           label: "Edit",
@@ -117,7 +113,7 @@ function VoiceDesignerMainPage({
   const actionVoices = voices.list.map((voice, i) => {
     return {
       ...voice,
-      badge: "voice",
+      badge: VoiceBadge,
       buttons: [
         {
           label: "Edit",
@@ -156,6 +152,18 @@ function VoiceDesignerMainPage({
     icon: faPlus,
     to: "/voice-designer/create",
   };
+
+  const dataPlaceholder = () => <div className="d-flex flex-column list-items p-5 align-items-center">
+    <h5 className="fw-semibold mb-3">
+      You haven't created any voices.
+    </h5>
+    <Button
+      icon={faPlus} // 1
+      label="Create New Voice" // 2
+      small={true}
+      to="/voice-designer/create" // 3
+    />
+  </div>;
 
   return (
     <>
@@ -204,10 +212,7 @@ function VoiceDesignerMainPage({
           </nav>
 
           <div className="p-3 p-lg-4">
-            <ListItems
-              {...{ data: view ? actionVoices : actionDataSets }}
-              isLoading={isFetching}
-            />
+            <ListItems {...{ data: view ? actionVoices : actionDataSets, dataPlaceholder, isLoading }}/>
           </div>
         </Panel>
       </Container>

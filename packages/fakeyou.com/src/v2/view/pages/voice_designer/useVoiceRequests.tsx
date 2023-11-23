@@ -152,7 +152,6 @@ export default function useVoiceRequests({
   }, [user, datasetStatus, voicesStatus]);
 
   return {
-    isFetching: isBusy(datasetStatus) || isBusy(voicesStatus),
     datasets: {
       byToken: datasetByToken,
       create: createDataset,
@@ -166,6 +165,7 @@ export default function useVoiceRequests({
     inference: {
       enqueue: EnqueueTts,
     },
+    isLoading: isBusy(datasetStatus) || isBusy(voicesStatus),
     languages,
     visibilityOptions,
     voices: {

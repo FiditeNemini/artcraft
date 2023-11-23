@@ -88,7 +88,6 @@ function VoiceDesignerVoiceEditPage() {
           </div>
 
           <div>
-          aaaaa
             <TempSelect
               {...{
                 icon: faEye,
