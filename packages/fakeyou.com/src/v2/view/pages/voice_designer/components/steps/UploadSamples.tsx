@@ -77,17 +77,20 @@ function UploadSamples({ audioProps, datasetToken, uploadStatus, uploadStatusSet
 
   },[audioProps, datasetToken, listFetched, uploadStatus, uploadStatusSet]);
 
-  return (
-    <div className="d-flex flex-column gap-4">
-      <div>
-        <label className="sub-title">Upload Audio</label>
-        <div className="d-flex flex-column gap-3 upload-component">
-          <AudioInput {...{ ...audioProps }}/>
-          { samples.length ? <ListItems {...{ data: actionSamples, isLoading: false }}/> : null }
-        </div>
-      </div>
+  return <div className="d-flex flex-column gap-4">
+    <label className="sub-title">Upload Audio</label>
+    <div className="d-flex flex-column gap-3 upload-component">
+      <AudioInput {...{ ...audioProps }}/>
+      { samples.length ? <ListItems {...{ data: actionSamples, isLoading: false }}/> : 
+        <div className="panel panel-inner text-center p-5 rounded-5 h-100">
+          <div className="d-flex flex-column opacity-75 h-100 justify-content-center">
+            <FontAwesomeIcon icon={faWaveform} className="fs-3 mb-3" />
+            <h5>No voice samples yet</h5>
+            <p>Uploaded samples will appear here.</p>
+          </div>
+        </div> }
     </div>
-  );
+  </div>;
 }
 
 export { UploadSamples };
