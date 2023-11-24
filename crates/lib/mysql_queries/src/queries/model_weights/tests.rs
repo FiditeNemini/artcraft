@@ -21,6 +21,7 @@ mod tests {
     use crate::queries::model_weights::create_weight::create_weight;
     use crate::queries::model_weights::get_weight::get_weight_by_token;
 
+    use crate::queries::model_weights::delete_weights::{delete_weights_as_user, self};
 
     async fn setup() -> sqlx::Pool<sqlx::MySql> {
         println!("Dropped database model_weights");
@@ -130,6 +131,59 @@ mod tests {
     #[tokio::test]
     async fn test_delete_weights() -> AnyhowResult<()> {
 
+                let mut rng = rand::thread_rng();
+        let random_number: u32 = rng.gen();
+        let model_weight_token1 = ModelWeightToken(random_number.to_string());
+
+        let pool = setup().await;
+        // create a random token for the model weight 
+
+        let creator_token1 = UserToken("creatorToken!1".to_string());
+
+        let args = CreateModelWeightsArgs {
+            token: &model_weight_token1, // replace with actual ModelWeightToken
+            weights_type: WeightsType::RvcV2, // replace with actual WeightsType
+            weights_category: WeightsCategory::VoiceConversion, // replace with actual WeightsCategory
+            title: "Title 1".to_string(),
+            maybe_thumbnail_token: Some("Thumbnail 1".to_string()),
+            description_markdown: "Description 1".to_string(),
+            description_rendered_html: "<p>Description 1</p>".to_string(),
+            creator_user_token: Some(&creator_token1), // replace with actual UserToken
+            creator_ip_address: "192.168.1.1",
+            creator_set_visibility: Visibility::Public,
+            maybe_last_update_user_token: Some("Last Update User Token 1".to_string()),
+            original_download_url: Some("http://example.com/download1".to_string()),
+            original_filename: Some("filename1.txt".to_string()),
+            file_size_bytes: 1024,
+            file_checksum_sha2: "checksum1".to_string(),
+            private_bucket_hash: "bucket_hash1".to_string(),
+            maybe_private_bucket_prefix: Some("_fake".to_string()),
+            maybe_private_bucket_extension: Some("rvc".to_string()),
+            cached_user_ratings_total_count: 10,
+            cached_user_ratings_positive_count: 9,
+            cached_user_ratings_negative_count: 1,
+            maybe_cached_user_ratings_ratio: Some(0.9),
+            version: 1,
+            mysql_pool: &pool, // replace with actual MySqlPool
+        };
+
+        create_weight(args).await?;
+        delete_weights_as_user(&model_weight_token1,  &pool).await?;
+        let result = get_weight_by_token(&model_weight_token1, true, &pool).await?;
+        let result = result.unwrap();
+
+
+        match result.user_deleted_at {
+            Some(date) => {
+                // `date` is the unwrapped value
+                // You can use `date` here
+                assert!(true, "user_deleted_at is Some");
+            },
+            None => {
+                // Handle the case where `user_deleted_at` is None
+                assert!(false,"user_deleted_at is None");
+            },
+        }
         
         Ok(())
     }

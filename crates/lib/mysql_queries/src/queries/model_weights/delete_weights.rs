@@ -1,8 +1,11 @@
+
 use sqlx::MySqlPool;
 use errors::AnyhowResult;
+use tokens::tokens::model_weights::ModelWeightToken;
+
 
 pub async fn delete_weights_as_user(
-    weight_token: &str,
+    weight_token: &ModelWeightToken,
     mysql_pool: &MySqlPool
 ) -> AnyhowResult<()> {
     let _r = sqlx
@@ -15,13 +18,13 @@ WHERE
   token = ?
 LIMIT 1
         "#,
-            weight_token
+            weight_token.to_string()
         )
         .execute(mysql_pool).await?;
     Ok(())
 }
 
-pub async fn delete_voice_as_mod(weight_token: &str, mysql_pool: &MySqlPool) -> AnyhowResult<()> {
+pub async fn delete_voice_as_mod(weight_token: &ModelWeightToken, mysql_pool: &MySqlPool) -> AnyhowResult<()> {
     let _r = sqlx
         ::query!(
             r#"
@@ -32,14 +35,14 @@ WHERE
   token = ?
 LIMIT 1
         "#,
-            weight_token
+            weight_token.to_string()
         )
         .execute(mysql_pool).await?;
     Ok(())
 }
 
 pub async fn undelete_weights_as_user(
-    weight_token: &str,
+    weight_token:  &ModelWeightToken,
     mysql_pool: &MySqlPool
 ) -> AnyhowResult<()> {
     let _r = sqlx
@@ -52,14 +55,14 @@ WHERE
   token = ?
 LIMIT 1
         "#,
-            weight_token
+            weight_token.to_string()
         )
         .execute(mysql_pool).await?;
     Ok(())
 }
 
 pub async fn undelete_weights_as_mod(
-    weight_token: &str,
+    weight_token:  &ModelWeightToken,
     mysql_pool: &MySqlPool
 ) -> AnyhowResult<()> {
     let _r = sqlx
@@ -72,7 +75,7 @@ WHERE
   token = ?
 LIMIT 1
         "#,
-            weight_token
+            weight_token.to_string()
         )
         .execute(mysql_pool).await?;
     Ok(())
