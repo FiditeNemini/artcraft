@@ -10,7 +10,7 @@ const mockData = [
   },
   {
     id: 2,
-    weight_name: "House",
+    weight_name: "Monster House",
     media_type: "image",
     public_bucket_path: "/images/dummy-image.jpg",
     favorites: 200,
@@ -28,9 +28,9 @@ const mockData = [
   },
   {
     id: 4,
-    weight_name: "Messi",
-    media_type: "audio",
-    public_bucket_path: "/path/to/audio.mp3",
+    weight_name: "Desert",
+    media_type: "video",
+    public_bucket_path: "/images/dummy-video.jpg",
     favorites: 150,
     liked: true,
     created_at: "2023-08-10T09:00:00.000Z",
@@ -82,7 +82,7 @@ const mockData = [
   },
   {
     id: 10,
-    weight_name: "Image Test",
+    weight_name: "Watery Landscape",
     media_type: "image",
     public_bucket_path: "/images/dummy-image-4.jpg",
     favorites: 150,

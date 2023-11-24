@@ -4,6 +4,7 @@ import MasonryGrid from "components/common/MasonryGrid/MasonryGrid";
 import mockData from "./mockData";
 import AudioCard from "components/common/Card/AudioCard";
 import ImageCard from "components/common/Card/ImageCard";
+import VideoCard from "components/common/Card/VideoCard";
 // import InfiniteScroll from "react-infinite-scroll-component";
 import Panel from "components/common/Panel";
 import { Select } from "components/common/Inputs/Inputs";
@@ -49,7 +50,7 @@ export default function MediaTab() {
               card = <ImageCard key={index} data={data} to="/" />;
               break;
             case "video":
-              card = <>test</>;
+              card = <VideoCard key={index} data={data} to="/" />;
               break;
             default:
               card = <div key={index}>Unsupported media type</div>;
