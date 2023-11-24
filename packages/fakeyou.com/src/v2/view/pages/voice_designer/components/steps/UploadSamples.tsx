@@ -18,6 +18,7 @@ interface Props {
 
 function UploadSamples({ audioProps, datasetToken, uploadStatus, uploadStatusSet }: Props) {
   const [samples,samplesSet] = useState<any[]>([]);
+  const [uploads,uploadsSet] = useState<any[]>([]);
   const [listFetched,listFetchedSet] = useState(false);
 
   const SampleBadge = () => <FontAwesomeIcon icon={faWaveform} className="me-2 me-lg-3" />;
@@ -31,34 +32,46 @@ function UploadSamples({ audioProps, datasetToken, uploadStatus, uploadStatusSet
       });
   };
 
-  const actionSamples = samples.map((sample: any, i: number) => {
-    let date = new Date(sample.created_at);
-    return {
-      ...sample,
-      badge: SampleBadge,
-      buttons: [
-        {
-          label: "Delete",
-          small: true,
-          variant: "secondary",
-          onClick: sampleClick()
-        },
-      ],
-      name: `Sample from ${ date ? moment(date).format("MMMM Do YYYY, h:mm a") : "" }`,
-    };
-  });
+  const actionSamples = [
+    ...uploads,
+    ...samples.map((sample: any, i: number) => {
+        let date = new Date(sample.created_at);
+        return {
+          ...sample,
+          badge: SampleBadge,
+          buttons: [
+            {
+              label: "Delete",
+              small: true,
+              variant: "secondary",
+              onClick: sampleClick()
+            },
+          ],
+          name: `Sample from ${ date ? moment(date).format("MMMM Do YYYY, h:mm a") : "" }`,
+        };
+      })
+  ];
 
   useEffect(() => {
     if (audioProps.file && datasetToken && !uploadStatus) {
+      let uuid_idempotency_token = uuidv4();
+      audioProps.clear();
+      uploadsSet([
+        {
+          name: "Uploading",
+          uuid_idempotency_token
+        },
+        ...uploads
+      ]);
       uploadStatusSet(1);
       UploadSample("",{
         dataset_token: datasetToken || "",
         file: audioProps.file,
-        uuid_idempotency_token: uuidv4(),
+        uuid_idempotency_token,
       })
       .then((res) => {
         if (res.success) {
-          audioProps.clear();
+          uploadsSet(uploads.filter((item,i) => item.uuid_idempotency_token === uuid_idempotency_token));
           uploadStatusSet(2);
           listFetchedSet(false);
         }
@@ -75,13 +88,13 @@ function UploadSamples({ audioProps, datasetToken, uploadStatus, uploadStatusSet
       });
     }
 
-  },[audioProps, datasetToken, listFetched, uploadStatus, uploadStatusSet]);
+  },[audioProps, datasetToken, listFetched, uploads, uploadStatus, uploadStatusSet]);
 
   return <div className="d-flex flex-column gap-4">
     <label className="sub-title">Upload Audio</label>
     <div className="d-flex flex-column gap-3 upload-component">
       <AudioInput {...{ ...audioProps }}/>
-      { samples.length ? <ListItems {...{ data: actionSamples, isLoading: false }}/> : 
+      { actionSamples.length ? <ListItems {...{ data: actionSamples, isLoading: false }}/> : 
         <div className="panel panel-inner text-center p-5 rounded-5 h-100">
           <div className="d-flex flex-column opacity-75 h-100 justify-content-center">
             <FontAwesomeIcon icon={faWaveform} className="fs-3 mb-3" />

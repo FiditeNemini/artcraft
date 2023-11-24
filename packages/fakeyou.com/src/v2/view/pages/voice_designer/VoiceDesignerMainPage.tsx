@@ -54,7 +54,6 @@ function VoiceDesignerMainPage(props: Props) {
   if (pathname === "/voice-designer" || pathname === "/voice-designer/") {
     return <Redirect to="/voice-designer/voices" />;
   }
-
   const openDeleteModal = (token: string, type: string) => {
     setDeleteItem(token);
     setDeleteType(type);

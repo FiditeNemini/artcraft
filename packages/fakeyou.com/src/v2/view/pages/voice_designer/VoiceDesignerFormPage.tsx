@@ -15,6 +15,7 @@ import { useFile } from "hooks";
 import useVoiceRequests from "./useVoiceRequests";
 import { FrontendInferenceJobType } from "@storyteller/components/src/jobs/InferenceJob";
 import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
+import { useSession } from "hooks";
 
 interface RouteParams {
   dataset_token?: string;
@@ -29,6 +30,7 @@ function VoiceDesignerFormPage({ enqueueInferenceJob, sessionWrapper }: { enqueu
   const [fetched,fetchedSet] = useState(false);
   const [uploadStatus,uploadStatusSet] = useState(0); // will replace with enum
   const audioProps = useFile({});
+  const { user, sessionFetched } = useSession();
 
   const datasetInputs = [
     {
@@ -149,7 +151,7 @@ function VoiceDesignerFormPage({ enqueueInferenceJob, sessionWrapper }: { enqueu
     }
   },[dataset_token,datasets,fetched]);
 
-  if (!sessionWrapper.isLoggedIn()) {
+  if (sessionFetched && !user) {
     history.push("/voice-designer");
   }
 
@@ -170,8 +172,7 @@ function VoiceDesignerFormPage({ enqueueInferenceJob, sessionWrapper }: { enqueu
           existingVoice ? "/voice-designer/datasets" : "/voice-designer/voices"
         }
       />
-
-      <Panel>
+    { sessionFetched && user && <Panel>
         <div className="p-3 px-lg-4 bg-stepper">
           <Stepper steps={steps} currentStep={currentStep} />
         </div>
@@ -187,6 +188,7 @@ function VoiceDesignerFormPage({ enqueueInferenceJob, sessionWrapper }: { enqueu
           createDisabled={uploadStatus === 1} // will replace with enum
         />
       </Panel>
+    }
     </Container>
   );
 }
