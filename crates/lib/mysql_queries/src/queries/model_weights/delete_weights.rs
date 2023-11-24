@@ -1,6 +1,7 @@
 use sqlx::MySqlPool;
-
 use errors::AnyhowResult;
+
+
 
 pub async fn delete_weights_as_user(
     weight_token: &str,

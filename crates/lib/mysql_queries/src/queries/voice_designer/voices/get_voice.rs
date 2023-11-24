@@ -96,7 +96,7 @@ async fn select_include_deleted(
         zv.ietf_primary_language_subtag,
         zv.maybe_creator_user_token as `maybe_creator_user_token: tokens::tokens::users::UserToken`,
         zv.bucket_hash,
-        zv.creator_set_visibility as `creator_set_visibility: enums::common::visibility::Visibility`,
+        zv.creator_set_visibility as `creator_set_visibility: enums::common::visibility::Visibility`, 
         zv.created_at,
         zv.updated_at
         FROM zs_voices as zv

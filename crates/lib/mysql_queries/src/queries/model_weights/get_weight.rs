@@ -57,14 +57,14 @@ pub async fn get_weight_by_token(
 }
 
 pub async fn get_weights_by_token_with_connection(
-    voice_token: &ModelWeightToken,
+    weight_token: &ModelWeightToken,
     can_see_deleted: bool,
     mysql_connection: &mut PoolConnection<MySql>
 ) -> AnyhowResult<Option<RetrivedModelWeight>> {
     let maybe_result = if can_see_deleted {
-        select_include_deleted(voice_token, mysql_connection).await
+        select_include_deleted(weight_token, mysql_connection).await
     } else {
-        select_without_deleted(voice_token, mysql_connection).await
+        select_without_deleted(weight_token, mysql_connection).await
     };
 
     let record: RawWeight = match maybe_result {
@@ -123,8 +123,8 @@ async fn select_include_deleted(
         SELECT
         wt.token as `token: tokens::tokens::model_weights::ModelWeightToken`,
         wt.title,
-        wt.weights_type as 'weights_type: enums::by_table::model_weights::weights_types::WeightsType',
-        wt.weights_category as 'weights_category: enums::by_table::model_weights::weights_category::WeightsCategory',
+        wt.weights_type as `weights_type: enums::by_table::model_weights::weights_types::WeightsType`,
+        wt.weights_category as `weights_category: enums::by_table::model_weights::weights_category::WeightsCategory`,
         wt.maybe_thumbnail_token,
         wt.description_markdown,
         wt.description_rendered_html,
@@ -169,8 +169,8 @@ async fn select_without_deleted(
         SELECT
         wt.token as `token: tokens::tokens::model_weights::ModelWeightToken`,
         wt.title,
-        wt.weights_type as 'weights_type: enums::by_table::model_weights::weights_types::WeightsType',
-        wt.weights_category as 'weights_category: enums::by_table::model_weights::weights_category::WeightsCategory',
+        wt.weights_type as `weights_type: enums::by_table::model_weights::weights_types::WeightsType`,
+        wt.weights_category as `weights_category: enums::by_table::model_weights::weights_category::WeightsCategory`,
         wt.maybe_thumbnail_token,
         wt.description_markdown,
         wt.description_rendered_html,

@@ -45,5 +45,6 @@ toml = "0.5.8"
 # https://github.com/launchbadge/sqlx/issues/1095#issuecomment-798050828
 sqlx = { version = "0.6.2", features = [ "mysql", "runtime-actix-native-tls", "offline", "chrono" ] }
 tokio = { version = "1.6.0", features = ["full"] }
+rand = "0.8"
 my-workspace-hack = { version = "0.1", path = "../../../my-workspace-hack" }
 
