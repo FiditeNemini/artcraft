@@ -137,11 +137,15 @@ function LandingPage(props: Props) {
   const randomHeroImage = useMemo(() => {
     const images = [
       // Main Images:
-      "mascot/kitsune_pose2.webp",
+      // "mascot/kitsune_pose2.webp",
       // "mascot/may4th.webp",
       // "mascot/halloween_1.webp",
       // "mascot/halloween_2.webp",
       // "mascot/halloween_3.webp",
+      "mascot/xmas_1.webp",
+      "mascot/xmas_2.webp",
+      "mascot/xmas_3.webp",
+      "mascot/xmas_4.webp",
     ];
 
     return images[Math.floor(Math.random() * images.length)];
@@ -317,7 +321,7 @@ function LandingPage(props: Props) {
                   </div>
 
                   <h6 className="fw-normal opacity-75 text-white">
-                    Make yourself sound like anyone
+                    Create your own AI voice
                   </h6>
                 </div>
                 <Link to="/voice-designer" className="btn btn-square mt-1">
@@ -327,7 +331,7 @@ function LandingPage(props: Props) {
 
               <img
                 className="img-fluid"
-                src="/images/landing/hanashi-after.webp"
+                src="/images/landing/select-vd.webp"
                 alt="Voice Designer"
               />
             </Link>

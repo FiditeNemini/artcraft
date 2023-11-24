@@ -19,38 +19,40 @@ function VoiceDesignerVoiceEditPage() {
   const [visibility, visibilitySet] = useState("hidden");
   const [title, titleSet] = useState("");
 
-  const [fetched,fetchedSet] = useState(false);
+  const [fetched, fetchedSet] = useState(false);
 
   const history = useHistory();
   const { voice_token } = useParams();
 
-  const { inputCtrl, languages, visibilityOptions, voices } = useVoiceRequests({});
+  const { inputCtrl, languages, visibilityOptions, voices } = useVoiceRequests(
+    {}
+  );
 
   usePrefixedDocumentTitle("Edit Voice");
 
-  const onClick = () => voices.update(voice_token,{
-    title,
-    creator_set_visibility: visibility,
-    ietf_language_tag: language,
-  })
-  .then((res: any) => {
-    if (res && res.success) {
-      history.push("/voice-designer");
-    }
-  });
+  const onClick = () =>
+    voices
+      .update(voice_token, {
+        title,
+        creator_set_visibility: visibility,
+        ietf_language_tag: language,
+      })
+      .then((res: any) => {
+        if (res && res.success) {
+          history.push("/voice-designer");
+        }
+      });
 
   useEffect(() => {
     if (!fetched && voice_token) {
       fetchedSet(true);
-      voices.get(voice_token,{})
-      .then((res) => {
+      voices.get(voice_token, {}).then((res) => {
         languageSet(res.ietf_language_tag);
         titleSet(res.title);
         visibilitySet(res.creator_set_visibility);
       });
     }
-
-  },[fetched, voice_token, voices]);
+  }, [fetched, voice_token, voices]);
 
   return (
     <Container type="panel">
@@ -67,23 +69,26 @@ function VoiceDesignerVoiceEditPage() {
       <Panel padding={true}>
         <div className="d-flex flex-column gap-4">
           <div className="row gy-4">
-            <TempInput {...{
-              label: "Title",
-              placeholder: "Voice name",
-              onChange: inputCtrl(titleSet),
-              value: title
-            }}/>
+            <TempInput
+              {...{
+                label: "Title",
+                placeholder: "Voice name",
+                onChange: inputCtrl(titleSet),
+                value: title,
+              }}
+            />
           </div>
 
           <div>
-            <TempSelect {...{
-              icon: faLanguage,
-              label: "Language",
-              // placeholder: "Voice name",
-              onChange: inputCtrl(languageSet),
-              options: languages,
-              value: language
-            }}
+            <TempSelect
+              {...{
+                icon: faLanguage,
+                label: "Language",
+                // placeholder: "Voice name",
+                onChange: inputCtrl(languageSet),
+                options: languages,
+                value: language,
+              }}
             />
           </div>
 
@@ -95,12 +100,12 @@ function VoiceDesignerVoiceEditPage() {
                 // placeholder: "Voice name",
                 onChange: inputCtrl(visibilitySet),
                 options: visibilityOptions,
-                value: visibility
+                value: visibility,
               }}
             />
           </div>
 
-          <Button {...{ label: "Save", onClick }}/>
+          <Button {...{ label: "Save", onClick }} />
         </div>
       </Panel>
     </Container>
