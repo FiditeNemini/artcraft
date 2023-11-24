@@ -5,4 +5,53 @@
   border: 1px solid $panel-inner-border;
   border-radius: 0.5rem;
   overflow: hidden;
+  transition: 0.2s;
+  position: relative;
+
+  .card-img {
+    width: 100%;
+    transition: 0.2s;
+    object-fit: cover;
+    object-position: center;
+  }
+
+  .card-image-overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+  }
+
+  .card-image-gradient {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 40%;
+    background: linear-gradient(180deg, transparent, black);
+  }
+
+  .card-image-overlay-text {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 1rem;
+    color: $white;
+    font-weight: 500;
+    font-size: 1.2rem;
+    text-shadow: 0 0 10px black;
+  }
+
+  &.card-clickable {
+    &:hover {
+      background-color: lighten($panel-inner, 3%);
+      cursor: pointer;
+    }
+
+    &:hover > .card-img {
+      transform: scale(1.04);
+    }
+  }
 }
