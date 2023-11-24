@@ -1,6 +1,7 @@
 import React from "react";
 import { useHistory } from "react-router-dom";
 import Card from "../Card";
+import useTimeAgo from "hooks/useTimeAgo";
 
 interface ImageCardProps {
   data: any;
@@ -14,9 +15,7 @@ export default function ImageCard({ data, to }: ImageCardProps) {
     history.push(to);
   };
 
-  // const handleInnerClick = (event: any) => {
-  //   event.stopPropagation();
-  // };
+  const timeAgo = useTimeAgo(data.created_at);
 
   return (
     <Card padding={false} onClick={handleCardClick}>
@@ -26,8 +25,13 @@ export default function ImageCard({ data, to }: ImageCardProps) {
         className="card-img"
       />
       <div className="card-image-overlay">
-        <div className="card-image-gradient"></div>
-        <div className="card-image-overlay-text">{data.weight_name}</div>
+        <div className="card-image-gradient" />
+        <div className="card-image-overlay-text">
+          <div>
+            <h6 className="fw-semibold text-white mb-1">{data.weight_name}</h6>
+            <p className="fs-7 opacity-75">{timeAgo}</p>
+          </div>
+        </div>
       </div>
     </Card>
   );

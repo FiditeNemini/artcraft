@@ -2,6 +2,7 @@ import React from "react";
 import { useHistory } from "react-router-dom";
 import Card from "../Card";
 import AudioPlayer from "components/common/AudioPlayer";
+import useTimeAgo from "hooks/useTimeAgo";
 
 interface AudioCardProps {
   data: any;
@@ -19,9 +20,15 @@ export default function AudioCard({ data, to }: AudioCardProps) {
     event.stopPropagation();
   };
 
+  const timeAgo = useTimeAgo(data.created_at);
+
   return (
     <Card padding={true} onClick={handleCardClick}>
-      <h6 className="fw-semibold text-white mb-3">{data.weight_name}</h6>
+      <div className="mb-3">
+        <h6 className="fw-semibold text-white mb-1">{data.weight_name}</h6>
+        <p className="fs-7 opacity-75">{timeAgo}</p>
+      </div>
+
       <div onClick={handleInnerClick}>
         <AudioPlayer src={data.public_bucket_path} />
       </div>

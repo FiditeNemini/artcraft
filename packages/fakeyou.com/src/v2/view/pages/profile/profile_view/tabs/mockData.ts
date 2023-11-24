@@ -6,6 +6,7 @@ const mockData = [
     public_bucket_path: "/path/to/audio.mp3",
     favorites: 150,
     liked: true,
+    created_at: "2023-08-10T09:00:00.000Z",
   },
   {
     id: 2,
@@ -14,6 +15,7 @@ const mockData = [
     public_bucket_path: "/images/dummy-image.jpg",
     favorites: 200,
     liked: false,
+    created_at: "2023-08-10T09:00:00.000Z",
   },
   {
     id: 3,
@@ -22,6 +24,7 @@ const mockData = [
     public_bucket_path: "/path/to/audio.mp3",
     favorites: 200,
     liked: false,
+    created_at: "2023-08-10T09:00:00.000Z",
   },
   {
     id: 4,
@@ -30,14 +33,16 @@ const mockData = [
     public_bucket_path: "/path/to/audio.mp3",
     favorites: 150,
     liked: true,
+    created_at: "2023-08-10T09:00:00.000Z",
   },
   {
     id: 5,
-    weight_name: "Ash Ketchum",
+    weight_name: "3D Cat",
     media_type: "image",
     public_bucket_path: "/images/dummy-image-2.jpg",
     favorites: 200,
     liked: false,
+    created_at: "2023-08-10T09:00:00.000Z",
   },
   {
     id: 6,
@@ -46,6 +51,7 @@ const mockData = [
     public_bucket_path: "/path/to/image.jpg",
     favorites: 200,
     liked: false,
+    created_at: "2023-08-10T09:00:00.000Z",
   },
   {
     id: 7,
@@ -54,14 +60,16 @@ const mockData = [
     public_bucket_path: "/path/to/audio.mp3",
     favorites: 150,
     liked: true,
+    created_at: "2023-08-10T09:00:00.000Z",
   },
   {
     id: 8,
-    weight_name: "Image Test",
+    weight_name: "Astronaut in Space",
     media_type: "image",
     public_bucket_path: "/images/dummy-image-3.jpg",
     favorites: 150,
     liked: true,
+    created_at: "2023-08-10T09:00:00.000Z",
   },
   {
     id: 9,
@@ -70,6 +78,7 @@ const mockData = [
     public_bucket_path: "/path/to/audio.mp3",
     favorites: 150,
     liked: true,
+    created_at: "2023-08-10T09:00:00.000Z",
   },
   {
     id: 10,
@@ -78,6 +87,7 @@ const mockData = [
     public_bucket_path: "/images/dummy-image-4.jpg",
     favorites: 150,
     liked: true,
+    created_at: "2023-08-10T09:00:00.000Z",
   },
 ];
 
