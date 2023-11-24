@@ -4,10 +4,10 @@ use sqlx::{ MySqlPool, MySql };
 use sqlx::pool::PoolConnection;
 use anyhow::anyhow;
 use log::{ error };
-use enums::by_table::model_weights::{
-    weights_types::WeightsType,
-    weights_category::WeightsCategory,
-};
+
+use enums::by_table::model_weights::weights_types::WeightsType;
+use enums::by_table::model_weights::weights_category::WeightsCategory;
+
 use enums::common::visibility::Visibility;
 use tokens::tokens::{ users::UserToken, model_weights::ModelWeightToken };
 use chrono::{ DateTime, Utc };

@@ -56,7 +56,6 @@ mod tests {
 
     #[tokio::test]
     async fn test_create_weights() -> AnyhowResult<()> {
-        let db_connection_string = DEFAULT_MYSQL_CONNECTION_STRING;
 
         let mut rng = rand::thread_rng();
         let random_number: u32 = rng.gen();
@@ -127,5 +126,13 @@ mod tests {
 
         Ok(())
     }
+
+    #[tokio::test]
+    async fn test_delete_weights() -> AnyhowResult<()> {
+
+        
+        Ok(())
+    }
+
 
 }

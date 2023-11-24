@@ -5,6 +5,7 @@ use strum::EnumCount;
 #[cfg(test)]
 use strum::EnumIter;
 
+
 #[cfg_attr(test, derive(EnumIter, EnumCount))]
 #[derive(Clone, Copy, Eq, PartialEq, Hash, Ord, PartialOrd, sqlx::Type, Deserialize, Serialize,Debug)]
 pub enum WeightsType {
