@@ -1,5 +1,7 @@
 #[cfg(test)]
 mod tests {
+    use std::result;
+
     use sqlx::MySqlPool;
     use rand::Rng;
 
@@ -21,7 +23,7 @@ mod tests {
     use crate::queries::model_weights::create_weight::create_weight;
     use crate::queries::model_weights::get_weight::get_weight_by_token;
 
-    use crate::queries::model_weights::delete_weights::{ delete_weights_as_user, delete_weights_as_mod };
+    use crate::queries::model_weights::delete_weights::{ delete_weights_as_user, delete_weights_as_mod, undelete_weights_as_mod , undelete_weights_as_user};
 
     async fn setup() -> sqlx::Pool<sqlx::MySql> {
         println!("Dropped database model_weights");
@@ -129,7 +131,7 @@ mod tests {
     }
 
     #[tokio::test]
-    async fn test_delete_weights_user() -> AnyhowResult<()> {
+    async fn test_delete_and_undelete_weights_user() -> AnyhowResult<()> {
         let mut rng = rand::thread_rng();
         let random_number: u32 = rng.gen();
         let model_weight_token1 = ModelWeightToken(random_number.to_string());
@@ -183,11 +185,27 @@ mod tests {
             }
         }
 
+        undelete_weights_as_user(&model_weight_token1, &pool).await?;
+        let result = get_weight_by_token(&model_weight_token1, true, &pool).await?;
+        let result = result.unwrap();
+
+        match result.user_deleted_at {
+            Some(date) => {
+                // `date` is the unwrapped value
+                // You can use `date` here
+                assert!(false, "user_deleted_at is Some");
+            }
+            None => {
+                // Handle the case where `user_deleted_at` is None
+                assert!(true, "user_deleted_at is None");
+            }
+        }
+
         Ok(())
     }
 
     #[tokio::test]
-    async fn test_delete_weights_mod() -> AnyhowResult<()> {
+    async fn test_delete_and_undelete_weights_mod() -> AnyhowResult<()> {
         let mut rng = rand::thread_rng();
         let random_number: u32 = rng.gen();
         let model_weight_token1 = ModelWeightToken(random_number.to_string());
@@ -241,6 +259,26 @@ mod tests {
             }
         }
 
+
+        undelete_weights_as_mod(&model_weight_token1, &pool).await?;
+        let result = get_weight_by_token(&model_weight_token1, true, &pool).await?;
+        let result = result.unwrap();
+
+        match result.mod_deleted_at {
+            Some(date) => {
+                // `date` is the unwrapped value
+                // You can use `date` here
+                assert!(false, "mod_deleted is Some");
+            }
+            None => {
+                // Handle the case where `mod_deleted` is None
+                assert!(true, "mod_deleted is None");
+            }
+        }
+
         Ok(())
     }
+
+
+
 }
