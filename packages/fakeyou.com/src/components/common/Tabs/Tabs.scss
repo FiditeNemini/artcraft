@@ -12,14 +12,24 @@
     white-space: nowrap;
     transition: 0.2s;
 
+    &:focus {
+      border-bottom: 4px solid transparent;
+    }
+
     &:hover {
       color: rgba($white, 0.75);
+      border-bottom: 4px solid rgba($white, 0.75);
+    }
+
+    &:focus:hover {
+      color: rgba($white, 0.75);
+      border-bottom: 4px solid rgba($white, 0.75);
     }
 
     &.active {
-      color: $white;
+      color: $white !important;
       background-color: transparent;
-      border-bottom: 4px solid $primary;
+      border-bottom: 4px solid $primary !important;
     }
   }
 }

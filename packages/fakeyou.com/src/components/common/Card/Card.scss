@@ -1,0 +1,8 @@
+@import "scss/colours.scss";
+
+.card {
+  background-color: $panel-inner;
+  border: 1px solid $panel-inner-border;
+  border-radius: 0.5rem;
+  overflow: hidden;
+}

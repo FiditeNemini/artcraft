@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { NavLink } from "react-router-dom";
+import { NavLink, useLocation } from "react-router-dom";
 import { useSpring, a } from "@react-spring/web";
 import "./Tabs.scss";
 
@@ -37,7 +37,10 @@ function TabContent({ children }: TabContentProps) {
 }
 
 function Tabs({ tabs }: TabsProps) {
-  const [activeTab, setActiveTab] = useState(tabs[0].to);
+  const location = useLocation();
+  const currentPath = location.pathname;
+  const initialTab = tabs.find((tab) => tab.to === currentPath) || tabs[0];
+  const [activeTab, setActiveTab] = useState(initialTab.to);
 
   const [fade, setFade] = useSpring(() => ({
     opacity: 1,
@@ -48,6 +51,10 @@ function Tabs({ tabs }: TabsProps) {
   useEffect(() => {
     setFade({ opacity: 1 });
   }, [activeTab, setFade]);
+
+  useEffect(() => {
+    setActiveTab(currentPath);
+  }, [currentPath]);
 
   const handleTabClick = (tabTo: string) => {
     setFade({ opacity: 0 });

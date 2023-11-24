@@ -2,7 +2,6 @@
 $primary: #e66462;
 $secondary: #39394c;
 $bg: #1a1a27;
-$panel: #242433;
 $input: #39394c;
 $input-placeholder: #aeaeb3;
 $danger: #8f4951;
@@ -12,8 +11,9 @@ $success: #40ad48;
 $warning: darken(#f7941c, 5%);
 $accent: #80cfd3;
 $workflow: $primary;
-
-// Light mode colours
+$panel: #242433;
+$panel-inner: lighten($panel, 4%);
+$panel-inner-border: lighten($panel, 8%);
 
 $primary-lm: #000;
 

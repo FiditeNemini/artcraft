@@ -40,6 +40,7 @@ import { PosthogClient } from "@storyteller/components/src/analytics/PosthogClie
 import { Panel } from "components/common";
 import Container from "components/common/Container";
 import Tabs from "components/common/Tabs";
+import MediaTab from "./tabs/MediaTab";
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -349,7 +350,7 @@ function NewProfilePage(this: any, props: Props) {
     {
       to: `/profile/${username}/media`,
       label: "Media",
-      content: <div>Media</div>,
+      content: <MediaTab />,
     },
     {
       to: `/profile/${username}/weights`,
@@ -365,45 +366,47 @@ function NewProfilePage(this: any, props: Props) {
 
   return (
     <Container type="panel">
-      <div className="d-flex flex-column flex-lg-row py-4">
-        <div className="mb-3 me-lg-4 mb-lg-0">
-          <div className="border-3 d-none d-lg-block">
-            <Gravatar
-              size={150}
-              username={userData.display_name}
-              email_hash={userEmailHash}
-              avatarIndex={userData.default_avatar_index}
-              backgroundIndex={userData.default_avatar_color_index}
-            />
-          </div>
-          <div className="border-3 text-center d-lg-none">
-            <Gravatar
-              size={100}
-              username={userData.display_name}
-              email_hash={userEmailHash}
-              avatarIndex={userData.default_avatar_index}
-              backgroundIndex={userData.default_avatar_color_index}
-            />
-          </div>
-        </div>
-        <div className="d-flex flex-column w-100">
-          <div className="d-flex">
-            <h1 className="fw-bold mb-0 flex-grow-1 text-center text-lg-start">
-              {userData.display_name}
-            </h1>
-            <div className="gap-3 d-none d-lg-flex">
-              {banUserButton}
-              {upgradeButton}
-              {editProfileButton}
+      <Panel clear={true}>
+        <div className="d-flex flex-column flex-lg-row py-4">
+          <div className="mb-3 me-lg-4 mb-lg-0">
+            <div className="border-3 d-none d-lg-block">
+              <Gravatar
+                size={150}
+                username={userData.display_name}
+                email_hash={userEmailHash}
+                avatarIndex={userData.default_avatar_index}
+                backgroundIndex={userData.default_avatar_color_index}
+              />
+            </div>
+            <div className="border-3 text-center d-lg-none">
+              <Gravatar
+                size={100}
+                username={userData.display_name}
+                email_hash={userEmailHash}
+                avatarIndex={userData.default_avatar_index}
+                backgroundIndex={userData.default_avatar_color_index}
+              />
             </div>
           </div>
-          <div className="opacity-75 mt-1">{profileJoinDate}</div>
-          <div>{profileDesc}</div>
-          <div className="d-flex mt-3 gap-4 gap-lg-3 profile-social-icons justify-content-center justify-content-lg-start">
-            {profileRows}
+          <div className="d-flex flex-column w-100">
+            <div className="d-flex">
+              <h1 className="fw-bold mb-0 flex-grow-1 text-center text-lg-start">
+                {userData.display_name}
+              </h1>
+              <div className="gap-3 d-none d-lg-flex">
+                {banUserButton}
+                {upgradeButton}
+                {editProfileButton}
+              </div>
+            </div>
+            <div className="opacity-75 mt-1">{profileJoinDate}</div>
+            <div>{profileDesc}</div>
+            <div className="d-flex mt-3 gap-4 gap-lg-3 profile-social-icons justify-content-center justify-content-lg-start">
+              {profileRows}
+            </div>
           </div>
         </div>
-      </div>
+      </Panel>
 
       {profileButtonsMobile}
 
