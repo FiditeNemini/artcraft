@@ -28,7 +28,9 @@ function VoiceDesignerFormPage({ enqueueInferenceJob, sessionWrapper }: { enqueu
   const [visibility, visibilitySet] = useState("hidden");
   const [title, titleSet] = useState("");
   const [fetched,fetchedSet] = useState(false);
-  const [uploadStatus,uploadStatusSet] = useState(0); // will replace with enum
+  const [deleting,deletingSet] = useState([]); // samples currently being uploaded
+  const [inProgress,inProgressSet] = useState([]); // samples currently being uploaded
+  const [samples,samplesSet] = useState([]); // fetched/uploaded samples
   const audioProps = useFile({});
   const { user, sessionFetched } = useSession();
 
@@ -66,13 +68,14 @@ function VoiceDesignerFormPage({ enqueueInferenceJob, sessionWrapper }: { enqueu
   const initialStep = history.location.pathname.includes("/upload") ? 1 : 0;
   const [currentStep, setCurrentStep] = useState(initialStep);
   const steps = existingVoice ? ["Edit Details", "Edit Samples"] : ["Voice Details", "Upload Samples"];
+  const uploadProps = { audioProps, datasetToken: dataset_token, deleting, deletingSet, inProgress, inProgressSet, samples, samplesSet };
 
   const displayStep = (step: any) => {
     switch (step) {
       case 0:
         return <VoiceDetails {...{ datasetInputs }} />;
       case 1:
-        return <UploadSamples {...{ audioProps, datasetToken: dataset_token, uploadStatus, uploadStatusSet }}/>;
+        return <UploadSamples {...uploadProps }/>;
       default:
         return null;
     }
@@ -185,7 +188,7 @@ function VoiceDesignerFormPage({ enqueueInferenceJob, sessionWrapper }: { enqueu
           onBack={handleBack}
           onNext={handleNext}
           onCreate={handleCreateVoice}
-          createDisabled={uploadStatus === 1} // will replace with enum
+          createDisabled={ !!deleting.length || !!inProgress.length || !samples.length } // deleting, uploading, or no samples = disabled
         />
       </Panel>
     }

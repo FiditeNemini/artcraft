@@ -12,28 +12,31 @@ import { faWaveform } from "@fortawesome/pro-solid-svg-icons";
 interface Props {
    audioProps: any,
    datasetToken?: string,
-   uploadStatus: number,
-   uploadStatusSet: any 
+   deleting: any,
+   deletingSet: any,
+   inProgress: any,
+   inProgressSet: any
+   samples: any,
+   samplesSet: any
 }
 
-function UploadSamples({ audioProps, datasetToken, uploadStatus, uploadStatusSet }: Props) {
-  const [samples,samplesSet] = useState<any[]>([]);
-  const [uploads,uploadsSet] = useState<any[]>([]);
+function UploadSamples({ audioProps, datasetToken, deleting, deletingSet, inProgress, inProgressSet, samples, samplesSet }: Props) {
   const [listFetched,listFetchedSet] = useState(false);
 
   const SampleBadge = () => <FontAwesomeIcon icon={faWaveform} className="me-2 me-lg-3" />;
 
   const sampleClick =  () => ({ target }: { target: any }) => {
       let sampleToken = samples[target.name.split(",")[0].split(":")[1]].sample_token;
+      deletingSet([ ...deleting, sampleToken ]); // add to deleting list
       DeleteSample(sampleToken,{ as_mod: false, set_delete: true })
       .then((res) => {
         listFetchedSet(false);
-        // set unBusy here
+        deletingSet(deleting.filter((item: any) => item === sampleToken)); // remove from deleting list
       });
   };
 
-  const actionSamples = [
-    ...uploads,
+  const actionSamples = [ // these spread operators combine the inProgress and sample arrays
+    ...inProgress,
     ...samples.map((sample: any, i: number) => {
         let date = new Date(sample.created_at);
         return {
@@ -53,17 +56,17 @@ function UploadSamples({ audioProps, datasetToken, uploadStatus, uploadStatusSet
   ];
 
   useEffect(() => {
-    if (audioProps.file && datasetToken && !uploadStatus) {
+    if (audioProps.file && datasetToken) {
       let uuid_idempotency_token = uuidv4();
       audioProps.clear();
-      uploadsSet([
+      inProgressSet([ // add sample to in progress list
         {
+        //  badge: Component // this can be a loading indicator
           name: "Uploading",
           uuid_idempotency_token
         },
-        ...uploads
+        ...inProgress
       ]);
-      uploadStatusSet(1);
       UploadSample("",{
         dataset_token: datasetToken || "",
         file: audioProps.file,
@@ -71,9 +74,10 @@ function UploadSamples({ audioProps, datasetToken, uploadStatus, uploadStatusSet
       })
       .then((res) => {
         if (res.success) {
-          uploadsSet(uploads.filter((item,i) => item.uuid_idempotency_token === uuid_idempotency_token));
-          uploadStatusSet(2);
-          listFetchedSet(false);
+          inProgressSet(inProgress.filter((item: any) => // removes sample from in progress list
+            item.uuid_idempotency_token === uuid_idempotency_token)
+          );
+          listFetchedSet(false); // refetches sample list
         }
       });
     }
@@ -88,7 +92,7 @@ function UploadSamples({ audioProps, datasetToken, uploadStatus, uploadStatusSet
       });
     }
 
-  },[audioProps, datasetToken, listFetched, uploads, uploadStatus, uploadStatusSet]);
+  },[audioProps, datasetToken, listFetched, inProgress, inProgressSet, samplesSet]);
 
   return <div className="d-flex flex-column gap-4">
     <label className="sub-title">Upload Audio</label>
