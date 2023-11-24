@@ -24,7 +24,7 @@ LIMIT 1
     Ok(())
 }
 
-pub async fn delete_voice_as_mod(weight_token: &ModelWeightToken, mysql_pool: &MySqlPool) -> AnyhowResult<()> {
+pub async fn delete_weights_as_mod(weight_token: &ModelWeightToken, mysql_pool: &MySqlPool) -> AnyhowResult<()> {
     let _r = sqlx
         ::query!(
             r#"

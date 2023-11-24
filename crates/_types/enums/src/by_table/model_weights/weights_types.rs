@@ -7,7 +7,7 @@ use strum::EnumIter;
 
 
 #[cfg_attr(test, derive(EnumIter, EnumCount))]
-#[derive(Clone, Copy, Eq, PartialEq, Hash, Ord, PartialOrd, sqlx::Type, Deserialize, Serialize,Debug)]
+#[derive(Clone, Copy, Eq, PartialEq, Hash, Ord, PartialOrd, Deserialize, Serialize)]
 pub enum WeightsType {
     #[serde(rename = "hifigan_tt2")]
     HifiganTacotron2,
@@ -24,6 +24,7 @@ pub enum WeightsType {
     #[serde(rename = "loRA")]
     LoRA,
 }
+
 
 impl WeightsType {
     pub fn to_str(&self) -> &'static str {
@@ -63,6 +64,10 @@ impl WeightsType {
         ])
     }
 }
+
+impl_enum_display_and_debug_using_to_str!(WeightsType);
+impl_mysql_enum_coders!(WeightsType);
+
 
 #[cfg(test)]
 mod tests {

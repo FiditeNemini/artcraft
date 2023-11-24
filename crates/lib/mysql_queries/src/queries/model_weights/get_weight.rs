@@ -5,7 +5,7 @@ use sqlx::pool::PoolConnection;
 use anyhow::anyhow;
 use log::{ error };
 
-use enums::by_table::model_weights::weights_types::{WeightsType, self};
+use enums::by_table::model_weights::weights_types::WeightsType;
 use enums::by_table::model_weights::weights_category::WeightsCategory;
 
 use enums::common::visibility::Visibility;
@@ -79,34 +79,13 @@ pub async fn get_weights_by_token_with_connection(
     };
 
     // unwrap the result
-    
-    let weights_category = WeightsCategory::from_str(record.weights_category.as_ref());
-    let weights_category = match weights_category {
-        Ok(weights_category) => weights_category,
-        Err(err) => {
-            error!("Error fetching weights by token: {:?}", err);
-            return Err(anyhow!("Error fetching weights by token: {:?}", err));
-        }
-    };
-    
-
-
-    let weights_types = WeightsType::from_str(record.weights_type.as_ref());
-
-    let weights_types = match weights_types {
-        Ok(weights_types) => weights_types,
-        Err(err) => {
-            error!("Error fetching weights by token: {:?}", err);
-            return Err(anyhow!("Error fetching weights by token: {:?}", err));
-        }
-    };
 
     Ok(
         Some(RetrivedModelWeight {
             token: record.token,
             title: record.title,
-            weights_type: weights_types,
-            weights_category: weights_category,
+            weights_type: record.weights_type,
+            weights_category: record.weights_category,
             maybe_thumbnail_token: record.maybe_thumbnail_token,
             description_markdown: record.description_markdown,
             description_rendered_html: record.description_rendered_html,
@@ -146,8 +125,8 @@ async fn select_include_deleted(
         SELECT
         wt.token as `token: tokens::tokens::model_weights::ModelWeightToken`,
         wt.title,
-        wt.weights_type,
-        wt.weights_category,
+        wt.weights_type as `weights_type: enums::by_table::model_weights::weights_types::WeightsType`,
+        wt.weights_category as `weights_category: enums::by_table::model_weights::weights_category::WeightsCategory`,
         wt.maybe_thumbnail_token,
         wt.description_markdown,
         wt.description_rendered_html,
@@ -194,8 +173,8 @@ async fn select_without_deleted(
         SELECT
         wt.token as `token: tokens::tokens::model_weights::ModelWeightToken`,
         wt.title,
-        wt.weights_type,
-        wt.weights_category,
+        wt.weights_type as `weights_type: enums::by_table::model_weights::weights_types::WeightsType`,
+        wt.weights_category as `weights_category: enums::by_table::model_weights::weights_category::WeightsCategory`,
         wt.maybe_thumbnail_token,
         wt.description_markdown,
         wt.description_rendered_html,
@@ -236,8 +215,8 @@ async fn select_without_deleted(
 pub struct RawWeight {
     pub token: ModelWeightToken,
     pub title: String,
-    pub weights_type: String,
-    pub weights_category: String,
+    pub weights_type: WeightsType,
+    pub weights_category: WeightsCategory,
     pub maybe_thumbnail_token: Option<String>,
     pub description_markdown: String,
     pub description_rendered_html: String,

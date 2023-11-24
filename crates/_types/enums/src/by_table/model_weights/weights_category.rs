@@ -6,7 +6,7 @@ use strum::EnumCount;
 use strum::EnumIter;
 
 #[cfg_attr(test, derive(EnumIter, EnumCount))]
-#[derive(Clone, Copy, Eq, PartialEq, Hash, Ord, PartialOrd,sqlx::Type, Deserialize, Serialize,Debug)]
+#[derive(Clone, Copy, Eq, PartialEq, Hash, Ord, PartialOrd, Deserialize, Serialize)]
 pub enum WeightsCategory {
     #[serde(rename = "image_generation")]
     ImageGeneration,
@@ -47,6 +47,8 @@ impl WeightsCategory {
         ])
     }
 }
+impl_enum_display_and_debug_using_to_str!(WeightsCategory);
+impl_mysql_enum_coders!(WeightsCategory);
 
 
 #[cfg(test)]
