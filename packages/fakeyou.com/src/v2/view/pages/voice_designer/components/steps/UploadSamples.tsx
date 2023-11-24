@@ -1,27 +1,22 @@
 import React, { useEffect, useState } from "react";
-// import VoiceDesignerUploadComponent from "../VoiceDesignerUploadComponent";
 import { AudioInput } from "components/common";
-
 import moment from 'moment';
-
 import ListItems from "../NewList";
 import { v4 as uuidv4 } from "uuid";
-// import { SessionContext } from 'context';
-
 import { ListSamplesForDataset } from "@storyteller/components/src/api/voice_designer/voice_dataset_samples/ListSamplesForDataset";
 import { UploadSample } from "@storyteller/components/src/api/voice_designer/voice_dataset_samples/UploadSample";
 import { DeleteSample } from "@storyteller/components/src/api/voice_designer/voice_dataset_samples/DeleteSample";
-
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faWaveform } from "@fortawesome/pro-solid-svg-icons";
 
+interface Props {
+   audioProps: any,
+   datasetToken?: string,
+   uploadStatus: number,
+   uploadStatusSet: any 
+}
 
-function UploadSamples({ audioProps, datasetToken, setAudioSamplesReady }: { audioProps: any, datasetToken?: string, setAudioSamplesReady:any  }) {
-  // const [convertLoading, setConvertLoading] = useState(false);
-  // const [canConvert, setCanConvert] = useState(false);
-  // const [mediaUploadToken, setMediaUploadToken] = useState<string | undefined>();
-  // const [formIsCleared, setFormIsCleared] = useState(false);
-  const [uploaded,uploadedSet] = useState(false);
+function UploadSamples({ audioProps, datasetToken, uploadStatus, uploadStatusSet }: Props) {
   const [samples,samplesSet] = useState<any[]>([]);
   const [listFetched,listFetchedSet] = useState(false);
 
@@ -54,8 +49,8 @@ function UploadSamples({ audioProps, datasetToken, setAudioSamplesReady }: { aud
   });
 
   useEffect(() => {
-    if (audioProps.file && datasetToken && !uploaded) {
-      uploadedSet(true);
+    if (audioProps.file && datasetToken && !uploadStatus) {
+      uploadStatusSet(1);
       UploadSample("",{
         dataset_token: datasetToken || "",
         file: audioProps.file,
@@ -64,12 +59,11 @@ function UploadSamples({ audioProps, datasetToken, setAudioSamplesReady }: { aud
       .then((res) => {
         if (res.success) {
           audioProps.clear();
-          uploadedSet(false);
+          uploadStatusSet(2);
           listFetchedSet(false);
         }
       });
     }
-
 
     if (datasetToken && !listFetched) {
       listFetchedSet(true);
@@ -81,7 +75,7 @@ function UploadSamples({ audioProps, datasetToken, setAudioSamplesReady }: { aud
       });
     }
 
-  },[audioProps, datasetToken, listFetched, uploaded]);
+  },[audioProps, datasetToken, listFetched, uploadStatus, uploadStatusSet]);
 
   return (
     <div className="d-flex flex-column gap-4">

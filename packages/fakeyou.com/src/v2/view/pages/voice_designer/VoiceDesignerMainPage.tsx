@@ -4,7 +4,7 @@ import {
   faPenToSquare,
   faPlus,
   faRightToBracket,
-  // faStar,
+  faStar,
   faWaveform,
 } from "@fortawesome/pro-solid-svg-icons";
 import InferenceJobsList from "components/layout/InferenceJobsList";
@@ -170,11 +170,11 @@ function VoiceDesignerMainPage(props: Props) {
     to: "/signup",
   };
 
-  // const pricingButton = {
-  //   label: `View Pricing`,
-  //   icon: faStar,
-  //   to: "/pricing",
-  // };
+  const pricingButton = {
+    label: `View Pricing`,
+    icon: faStar,
+    to: "/pricing",
+  };
 
   const dataPlaceholder = () => <div className="d-flex flex-column list-items p-5 align-items-center">
     <h5 className="fw-semibold mb-3">
@@ -263,7 +263,7 @@ function VoiceDesignerMainPage(props: Props) {
       <Container type="panel">
         <PageHeader {...{
           button: user ? createVoiceButton : signUpButton,
-          ...!user ? { secondaryButton: signUpButton  } : {},
+          ...!user ? { secondaryButton: pricingButton  } : {},
           title: "Voice Designer",
           titleIcon: faWaveform,
           subText: "Create your own AI voice by providing audio files of the voice you want to clone.",

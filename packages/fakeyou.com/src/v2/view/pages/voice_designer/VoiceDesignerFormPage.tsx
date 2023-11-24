@@ -1,11 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import {
-  faEye,
-  faLanguage,
-  faPencil,
-  faWaveform,
-} from "@fortawesome/pro-solid-svg-icons";
+import { faEye, faLanguage, faPencil, faWaveform } from "@fortawesome/pro-solid-svg-icons";
 import { usePrefixedDocumentTitle } from "common/UsePrefixedDocumentTitle";
 import Panel from "components/common/Panel";
 import { Stepper } from "./components/Stepper";
@@ -15,14 +10,9 @@ import { VoiceDetails } from "./components/steps/VoiceDetails";
 import PageHeader from "components/layout/PageHeader";
 import Container from "components/common/Container";
 import { useHistory } from "react-router-dom";
-
 import { v4 as uuidv4 } from "uuid";
-
 import { useFile } from "hooks";
-
 import useVoiceRequests from "./useVoiceRequests";
-import useUploadedFiles from "hooks/useUploadedFiles";
-
 import { FrontendInferenceJobType } from "@storyteller/components/src/jobs/InferenceJob";
 import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
 
@@ -37,8 +27,8 @@ function VoiceDesignerFormPage({ enqueueInferenceJob, sessionWrapper }: { enqueu
   const [visibility, visibilitySet] = useState("hidden");
   const [title, titleSet] = useState("");
   const [fetched,fetchedSet] = useState(false);
-  const deleteEverything = useUploadedFiles((state: any) => state.deleteEverything);
-  const audioProps = useFile({}); // contains upload inout state and controls, see docs
+  const [uploadStatus,uploadStatusSet] = useState(0); // will replace with enum
+  const audioProps = useFile({});
 
   const datasetInputs = [
     {
@@ -67,26 +57,20 @@ function VoiceDesignerFormPage({ enqueueInferenceJob, sessionWrapper }: { enqueu
   ];
 
   const { dataset_token } = useParams<RouteParams>();
-  const [isNewCreation] = useState(!dataset_token);
-  const isEditMode = Boolean(dataset_token) && !isNewCreation;
+  const existingVoice = !!dataset_token;
 
-  usePrefixedDocumentTitle(isEditMode ? "Edit Dataset" : "Create New Voice");
+  usePrefixedDocumentTitle(existingVoice ? "Edit Dataset" : "Create New Voice");
 
   const initialStep = history.location.pathname.includes("/upload") ? 1 : 0;
   const [currentStep, setCurrentStep] = useState(initialStep);
-  const [audioSamplesReady, setAudioSamplesReady] = useState(false);
+  const steps = existingVoice ? ["Edit Details", "Edit Samples"] : ["Voice Details", "Upload Samples"];
 
-  const steps = isEditMode
-    ? ["Edit Details", "Edit Samples"]
-    : ["Voice Details", "Upload Samples"];
-
-  // const key = !isNewCreation && (dataset_token || uuidv4());
   const displayStep = (step: any) => {
     switch (step) {
       case 0:
         return <VoiceDetails {...{ datasetInputs }} />;
       case 1:
-        return <UploadSamples {...{ audioProps, datasetToken: dataset_token, setAudioSamplesReady }}/>;
+        return <UploadSamples {...{ audioProps, datasetToken: dataset_token, uploadStatus, uploadStatusSet }}/>;
       default:
         return null;
     }
@@ -104,7 +88,7 @@ function VoiceDesignerFormPage({ enqueueInferenceJob, sessionWrapper }: { enqueu
 
   const handleNext = () => {
     if (currentStep === 0) {
-      if (isNewCreation) {
+      if (!existingVoice) {
         // It's a new creation and on the first step
 
         datasets.create("",{
@@ -113,7 +97,6 @@ function VoiceDesignerFormPage({ enqueueInferenceJob, sessionWrapper }: { enqueu
           idempotency_token: uuidv4(),
         }).then((res: any) => {
           if (res && res.success && res.token) {
-            deleteEverything();
             history.push(`/voice-designer/dataset/${ res.token }/upload`);
           } 
         });
@@ -143,7 +126,6 @@ function VoiceDesignerFormPage({ enqueueInferenceJob, sessionWrapper }: { enqueu
         voice_dataset_token: dataset_token || "",
       })
       .then((res: any) => {
-        deleteEverything();
         if (res && res.success) {
           enqueueInferenceJob(
             res.inference_job_token,
@@ -174,10 +156,10 @@ function VoiceDesignerFormPage({ enqueueInferenceJob, sessionWrapper }: { enqueu
   return (
     <Container type="panel">
       <PageHeader
-        title={isEditMode ? "Edit Dataset" : "Create New Voice"}
-        titleIcon={isEditMode ? faPencil : faWaveform}
+        title={existingVoice ? "Edit Dataset" : "Create New Voice"}
+        titleIcon={existingVoice ? faPencil : faWaveform}
         subText={
-          isEditMode
+          existingVoice
             ? "Edit your dataset by uploading more samples to create a new voice"
             : "Add voice details and upload audio samples to clone your voice!"
         }
@@ -185,7 +167,7 @@ function VoiceDesignerFormPage({ enqueueInferenceJob, sessionWrapper }: { enqueu
         showBackButton={true}
         backbuttonLabel="Back to Voice Designer"
         backbuttonTo={
-          isEditMode ? "/voice-designer/datasets" : "/voice-designer/voices"
+          existingVoice ? "/voice-designer/datasets" : "/voice-designer/voices"
         }
       />
 
@@ -202,7 +184,7 @@ function VoiceDesignerFormPage({ enqueueInferenceJob, sessionWrapper }: { enqueu
           onBack={handleBack}
           onNext={handleNext}
           onCreate={handleCreateVoice}
-          createDisabled={!audioSamplesReady}
+          createDisabled={uploadStatus === 1} // will replace with enum
         />
       </Panel>
     </Container>
