@@ -12,38 +12,45 @@ use enums::by_table::model_weights::{
     weights_types::WeightsType,
     weights_category::WeightsCategory,
 };
+use tokens::tokens::users::UserToken;
 
 #[derive(Serialize)]
-pub struct WeightsRecord {
-    pub weights_token: ModelWeightToken,
+pub struct WeightsJoinUserRecord {
+    pub token: ModelWeightToken,
     pub title: String,
-
-    pub creator_user_token: UserToken,
-    pub creator_username: String, 
-    pub creator_ip_address: String, 
-
     pub weights_type: WeightsType,
     pub weights_category: WeightsCategory,
-    
+    pub maybe_thumbnail_token: Option<String>,
     pub description_markdown: String,
     pub description_rendered_html: String,
-
-    pub cached_user_ratings_negative_count: i32,
-    pub cached_user_ratings_positive_count: i32,
-    pub cached_user_ratings_total_count: i32,
-
+    pub creator_user_token: UserToken,
+    pub creator_ip_address: String,
+    pub creator_set_visibility: Visibility,
+    pub maybe_last_update_user_token: Option<UserToken>,
+    pub original_download_url: Option<String>,
+    pub original_filename: Option<String>,
+    pub file_size_bytes: i32,
+    pub file_checksum_sha2: String,
+    pub private_bucket_hash: String,
+    pub maybe_private_bucket_prefix: Option<String>,
+    pub maybe_private_bucket_extension: Option<String>,
+    pub cached_user_ratings_negative_count: u32,
+    pub cached_user_ratings_positive_count: u32,
+    pub cached_user_ratings_total_count: u32,
     pub maybe_cached_user_ratings_ratio: Option<f32>,
-    pub cached_user_ratings_total_count: i32,
-
+    pub cached_user_ratings_last_updated_at: DateTime<Utc>,
+    pub version: i32,
     pub created_at: DateTime<Utc>,
     pub updated_at: DateTime<Utc>,
+    pub user_deleted_at: Option<DateTime<Utc>>,
+    pub mod_deleted_at: Option<DateTime<Utc>>
 }
 
 pub async fn list_weights_by_username(
     mysql_pool: &MySqlPool,
     username: &str,
     can_see_deleted: bool,
-) -> AnyhowResult<Vec<WeightsRecord>> {
+) -> AnyhowResult<Vec<WeightsJoinUserRecord>> {
     let mut connection = mysql_pool.acquire().await?;
     list_weights_by_username_with_connection(&mut connection, username, can_see_deleted).await
 }
@@ -52,13 +59,13 @@ pub async fn list_weights_by_username_with_connection(
     mysql_connection: &mut PoolConnection<MySql>,
     creator_username: &str,
     can_see_deleted: bool,
-) -> AnyhowResult<Vec<WeightsRecord>> {
+) -> AnyhowResult<Vec<WeightsJoinUserRecord>> {
 
     let datasets =
             list_datasets_by_creator_username(mysql_connection, creator_username, can_see_deleted)
                 .await;
 
-    let datasets : Vec<WeightsRecord> = match datasets {
+    let datasets : Vec<WeightsJoinUserRecord> = match datasets {
         Ok(datasets) => datasets,
         Err(err) => {
             match err {
@@ -74,24 +81,24 @@ pub async fn list_weights_by_username_with_connection(
     };
 
     Ok(datasets.into_iter()
-        .map(|dataset| {
-            WeightsRecord {
-                weights_token: ModelWeightToken(dataset.token),
-                title: dataset.title,
-                creator_user_token: dataset.creator_user_token,
-                creator_username: dataset.creator_username,
-                creator_ip_address: dataset.creator_ip_address,
-                weights_type: dataset.weights_type,
-                weights_category: dataset.weights_category,
-                description_markdown: dataset.description_markdown,
-                description_rendered_html: dataset.description_rendered_html,
-                cached_user_ratings_negative_count: dataset.cached_user_ratings_negative_count,
-                cached_user_ratings_positive_count: dataset.cached_user_ratings_positive_count,
-                cached_user_ratings_total_count: dataset.cached_user_ratings_total_count,
-                maybe_cached_user_ratings_ratio: dataset.maybe_cached_user_ratings_ratio,
-                cached_user_ratings_total_count: dataset.cached_user_ratings_total_count,
-                created_at: dataset.created_at,
-                updated_at: dataset.updated_at,
+        .map(|dataset: WeightsJoinUserRecord| {
+            WeightsJoinUserRecord {
+                // weights_token: ModelWeightToken(dataset.token),
+                // title: dataset.title,
+                // creator_user_token: dataset.creator_user_token,
+                // creator_username: dataset.creator_username,
+                // creator_ip_address: dataset.creator_ip_address,
+                // weights_type: dataset.weights_type,
+                // weights_category: dataset.weights_category,
+                // description_markdown: dataset.description_markdown,
+                // description_rendered_html: dataset.description_rendered_html,
+                // cached_user_ratings_negative_count: dataset.cached_user_ratings_negative_count,
+                // cached_user_ratings_positive_count: dataset.cached_user_ratings_positive_count,
+                // cached_user_ratings_total_count: dataset.cached_user_ratings_total_count,
+                // maybe_cached_user_ratings_ratio: dataset.maybe_cached_user_ratings_ratio,
+                // cached_user_ratings_total_count: dataset.cached_user_ratings_total_count,
+                // created_at: dataset.created_at,
+                // updated_at: dataset.updated_at,
             }
         })
         .filter(|dataset| {
@@ -101,7 +108,7 @@ pub async fn list_weights_by_username_with_connection(
 }
 
 
-async fn list_datasets_by_creator_username(
+async fn list_weights_by_creator_username(
     mysql_connection: &mut PoolConnection<MySql>,
     creator_username: &str,
     can_see_deleted: bool,
@@ -166,6 +173,39 @@ async fn list_datasets_by_creator_username(
     };
 
     Ok(maybe_datasets)
+}
+
+
+#[derive(Serialize)]
+pub struct RawWeightJoinUser {
+    pub token: ModelWeightToken,
+    pub title: String,
+    pub weights_type: WeightsType,
+    pub weights_category: WeightsCategory,
+    pub maybe_thumbnail_token: Option<String>,
+    pub description_markdown: String,
+    pub description_rendered_html: String,
+    pub creator_user_token: UserToken,
+    pub creator_ip_address: String,
+    pub creator_set_visibility: Visibility,
+    pub maybe_last_update_user_token: Option<UserToken>,
+    pub original_download_url: Option<String>,
+    pub original_filename: Option<String>,
+    pub file_size_bytes: i32,
+    pub file_checksum_sha2: String,
+    pub private_bucket_hash: String,
+    pub maybe_private_bucket_prefix: Option<String>,
+    pub maybe_private_bucket_extension: Option<String>,
+    pub cached_user_ratings_negative_count: u32,
+    pub cached_user_ratings_positive_count: u32,
+    pub cached_user_ratings_total_count: u32,
+    pub maybe_cached_user_ratings_ratio: Option<f32>,
+    pub cached_user_ratings_last_updated_at: DateTime<Utc>,
+    pub version: i32,
+    pub created_at: DateTime<Utc>,
+    pub updated_at: DateTime<Utc>,
+    pub user_deleted_at: Option<DateTime<Utc>>,
+    pub mod_deleted_at: Option<DateTime<Utc>>,
 }
 
 #[cfg(test)]
