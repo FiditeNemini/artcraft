@@ -4029,6 +4029,7 @@ dependencies = [
  "serde_json",
  "sqlx",
  "tokens",
+ "tokio 1.34.0",
  "toml",
 ]
 

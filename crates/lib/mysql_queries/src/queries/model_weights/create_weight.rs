@@ -1,6 +1,9 @@
 use container_common::anyhow_result::AnyhowResult;
 use sqlx::MySqlPool;
-use enums::by_table::model_weights::{ weights_types::WeightsType, weights_category::WeightsCategory };
+use enums::by_table::model_weights::{
+    weights_types::WeightsType,
+    weights_category::WeightsCategory,
+};
 use log::warn;
 use enums::common::visibility::Visibility;
 use tokens::tokens::{ users::UserToken, model_weights::ModelWeightToken };
@@ -34,8 +37,9 @@ pub struct CreateModelWeightsArgs<'a> {
 pub async fn create_weight(args: CreateModelWeightsArgs<'_>) -> AnyhowResult<ModelWeightToken> {
     let model_weights_token = ModelWeightToken::generate();
     let transaction = args.mysql_pool.begin().await?;
-    let query_result = sqlx::query!(
-        r#"
+    let query_result = sqlx
+        ::query!(
+            r#"
         INSERT INTO model_weights
         SET
           token = ?,
@@ -62,35 +66,34 @@ pub async fn create_weight(args: CreateModelWeightsArgs<'_>) -> AnyhowResult<Mod
           maybe_cached_user_ratings_ratio = ?,
           version = ?
         "#,
-        args.token.as_str(),
-        args.weights_type.to_str(),
-        args.weights_category.to_str(),
-        args.title,
-        args.maybe_thumbnail_token,
-        args.description_markdown,
-        args.description_rendered_html,
-        args.creator_user_token.as_deref(),
-        args.creator_ip_address,
-        args.creator_set_visibility.to_str(),
-        args.maybe_last_update_user_token,
-        args.original_download_url,
-        args.original_filename,
-        args.file_size_bytes,
-        args.file_checksum_sha2,
-        args.private_bucket_hash,
-        args.maybe_private_bucket_prefix,
-        args.maybe_private_bucket_extension,
-        args.cached_user_ratings_total_count,
-        args.cached_user_ratings_positive_count,
-        args.cached_user_ratings_negative_count,
-        args.maybe_cached_user_ratings_ratio,
-        args.version
-    ).execute(args.mysql_pool).await;
+            args.token.as_str(),
+            args.weights_type.to_str(),
+            args.weights_category.to_str(),
+            args.title,
+            args.maybe_thumbnail_token,
+            args.description_markdown,
+            args.description_rendered_html,
+            args.creator_user_token.as_deref(),
+            args.creator_ip_address,
+            args.creator_set_visibility.to_str(),
+            args.maybe_last_update_user_token,
+            args.original_download_url,
+            args.original_filename,
+            args.file_size_bytes,
+            args.file_checksum_sha2,
+            args.private_bucket_hash,
+            args.maybe_private_bucket_prefix,
+            args.maybe_private_bucket_extension,
+            args.cached_user_ratings_total_count,
+            args.cached_user_ratings_positive_count,
+            args.cached_user_ratings_negative_count,
+            args.maybe_cached_user_ratings_ratio,
+            args.version
+        )
+        .execute(args.mysql_pool).await;
 
     match query_result {
-        Ok(_) => {
-            Ok(model_weights_token)
-        }
+        Ok(_) => { Ok(model_weights_token) }
         Err(err) => {
             transaction.rollback().await?;
             warn!("Transaction failure: {:?}", err);

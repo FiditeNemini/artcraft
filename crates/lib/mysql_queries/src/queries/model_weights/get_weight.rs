@@ -3,7 +3,7 @@ use container_common::anyhow_result::AnyhowResult;
 use sqlx::{ MySqlPool, MySql };
 use sqlx::pool::PoolConnection;
 use anyhow::anyhow;
-use log::{ info, warn, error };
+use log::{ error };
 use enums::by_table::model_weights::{
     weights_types::WeightsType,
     weights_category::WeightsCategory,

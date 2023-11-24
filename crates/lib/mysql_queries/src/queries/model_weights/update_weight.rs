@@ -56,39 +56,24 @@ pub async fn update_weights(args: UpdateWeightArgs<'_>) -> AnyhowResult<()> {
     }
 }
 
-// #[cfg(test)]
-// mod tests {
-//     use super::*;
-//     use sqlx::MySqlPoolOptions;
-//     use easyenv;
-//     use tokio;
+#[cfg(test)]
+mod tests {
 
-//     #[tokio::test]
-//     async fn test_update_weights() -> AnyhowResult<()> {
-//         let db_connection_string = easyenv::get_env_string_or_default(
-//             "MYSQL_URL",
-//             DEFAULT_MYSQL_CONNECTION_STRING
-//         );
+    use tokio;
+    // Template 
+    use sqlx::mysql::MySqlPoolOptions;
 
-//         let pool = MySqlPoolOptions::new()
-//             .max_connections(easyenv::get_env_num("MYSQL_MAX_CONNECTIONS", 3)?)
-//             .connect(&db_connection_string)
-//             .await?;
+    use config::shared_constants::{DEFAULT_MYSQL_CONNECTION_STRING};
+    use errors::AnyhowResult;
+    #[tokio::test]
+    async fn test_update_weights() -> AnyhowResult<()> {
+        let db_connection_string = DEFAULT_MYSQL_CONNECTION_STRING;
 
-//         let args = UpdateWeightArgs {
-//             weight_token: &ModelWeightToken::new("test_token"),
-//             title: Some("Test Title"),
-            
-//             description_markdown: "Test Description Markdown",
-//             description_rendered_html: "Test Description HTML",
-//             creator_set_visibility: &Visibility::Public,
-//             mysql_pool: &pool,
-//         };
+        let pool = MySqlPoolOptions::new()
+            .max_connections(3)
+            .connect(&db_connection_string)
+            .await?;
 
-//         let result = update_weights(args).await;
-
-//         assert!(result.is_ok());
-
-//         Ok(())
-//     }
-// }
+        Ok(())
+    }
+}
