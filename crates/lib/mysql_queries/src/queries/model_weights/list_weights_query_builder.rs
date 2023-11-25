@@ -9,7 +9,13 @@ use config::shared_constants::DEFAULT_MYSQL_QUERY_RESULT_PAGE_SIZE;
 use enums::common::visibility::Visibility;
 use errors::AnyhowResult;
 use tokens::tokens::users::UserToken;
-use tokens::tokens::weights::WeightToken;
+
+use enums::by_table::model_weights::{
+    weights_types::WeightsType,
+    weights_category::WeightsCategory,
+};
+
+use crate::queries::model_weights::list_weights_by_user::RawWeightJoinUser;
 
 
 #[derive(Serialize)]
@@ -34,16 +40,15 @@ pub struct ListWeightsQueryBuilder {
     cursor_is_reversed: bool,
 }
 
-impl  ListWeightsQueryBuilder {
+impl ListWeightsQueryBuilder {
     pub fn new() -> Self {
         Self {
             scope_creator_username: None,
-            include_user_hidden: false,
             include_mod_deleted_results: false,
             include_user_deleted_results: false,
             sort_ascending: false,
-            weights_type:WeightsType::All,
-            weights_category:WeightsCategory::All,
+            weights_type:WeightsType,
+            weights_category:WeightsCategory,
             offset: None,
             limit: DEFAULT_MYSQL_QUERY_RESULT_PAGE_SIZE,
             cursor_is_reversed: false,
@@ -55,10 +60,6 @@ impl  ListWeightsQueryBuilder {
         self
     }
 
-    pub fn include_user_hidden(mut self, include_user_hidden: bool) -> Self {
-        self.include_user_hidden = include_user_hidden;
-        self
-    }
 
     pub fn include_mod_deleted_results(mut self, include_mod_deleted_results: bool) -> Self {
         self.include_mod_deleted_results = include_mod_deleted_results;
@@ -134,18 +135,18 @@ impl  ListWeightsQueryBuilder {
         &self,
         mysql_pool: &MySqlPool
     ) -> AnyhowResult<WeightsPage> {
-        let internal_voices = self.perform_internal_query(mysql_pool).await?;
+        let weights = self.perform_internal_query(mysql_pool).await?;
 
-        let first_id = internal_voices.first()
-            .map(|raw_result| raw_result.voice_id);
+        let first_id = weights.first()
+            .map(|raw_result| raw_result.weight_id);
 
-        let last_id = internal_voices.last()
-            .map(|raw_result| raw_result.voice_id);
+        let last_id = weights.last()
+            .map(|raw_result| raw_result.weight_id);
 
-        let voices = internal_voices.into_iter().map(
+        let weights = weights.into_iter().map(
             |v| {
                 RawWeightJoinUser {
-                    voice_token: v.token,
+                    weights_token: v.token,
                     title: v.title,
                     creator_set_visibility: Visibility::from_str(&v.creator_set_visibility).unwrap_or(Visibility::Public),
                     ietf_language_tag: v.ietf_language_tag,
@@ -161,7 +162,7 @@ impl  ListWeightsQueryBuilder {
             .collect::<Vec<RawWeightJoinUser>>();
 
         Ok(WeightsPage {
-            voices,
+            weights,
             sort_ascending: self.sort_ascending,
             first_id,
             last_id,
@@ -279,7 +280,7 @@ impl  ListWeightsQueryBuilder {
 
 #[derive(sqlx::FromRow)]
 struct RawWeightJoinUser {
-    voice_id: i64,
+    weight_id: i64,
     token: RawWeightJoinUserToken,
     title: String,
     ietf_language_tag: String,
