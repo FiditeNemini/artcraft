@@ -10,9 +10,11 @@ use errors::AnyhowResult;
 use crate::cli_args::parse_cli_args;
 
 use crate::seeding::model_weights::seed_weights;
+use crate::seeding::model_weights::seed_weights_for_user_token;
 use crate::seeding::users::seed_user_accounts;
 use crate::seeding::voice_conversion::seed_voice_conversion;
 use crate::seeding::zero_shot_tts::seed_zero_shot_tts;
+
 
 pub mod cli_args;
 pub mod seeding;

@@ -279,6 +279,8 @@ mod tests {
         Ok(())
     }
 
+    #[tokio::test]
+    async fn list_all_weights_by_user() -> AnyhowResult<()> {
 
-
+    }
 }
