@@ -1,34 +1,10 @@
+use std::os::linux::raw;
+
 use anyhow::anyhow;
 use chrono::{ DateTime, Utc };
 use log::{ info, warn };
 use sqlx::{ MySql, MySqlPool, query };
 use sqlx::pool::PoolConnection;
-
-//     let result = sqlx
-    //         ::query_as!(
-    //             RawWeightJoinUser,
-    //             r#"
-    //             SELECT
-    //     mw.token as `token: tokens::tokens::model_weights::ModelWeightsToken`,
-    //     mw.title,
-    //     users.token as `creator_user_token: tokens::tokens::users::UserToken`,
-    //     users.username as creator_username,
-    //     users.display_name as creator_display_name,
-    //     users.email_gravatar_hash as creator_email_gravatar_hash,
-    //     mw.creator_set_visibility as `creator_set_visibility: enums::common::visibility::Visibility`,
-    //     mw.created_at,
-    //     mw.updated_at
-    // FROM model_weights as mw
-    // JOIN users
-    //     ON users.token = mw.creator_user_token
-    // WHERE
-    //     users.username = ?
-    //     AND mw.user_deleted_at IS NULL
-    //     AND mw.mod_deleted_at IS NULL
-    //     "#,
-    //         creator_username
-    //         )
-    //         .fetch_all(mysql_connection).await?
 
 use enums::common::visibility::Visibility;
 use errors::AnyhowResult;
@@ -86,6 +62,118 @@ pub async fn list_weights_by_username(
 ) -> AnyhowResult<Vec<WeightsJoinUserRecord>> {
     let mut connection = mysql_pool.acquire().await?;
     list_weights_by_username_with_connection(&mut connection, username, can_see_deleted).await
+}
+
+
+pub async fn get_raw_weights_by_username(
+    mysql_pool: &MySqlPool,
+    username: &str,
+    can_see_deleted: bool
+) -> AnyhowResult<Vec<RawWeightJoinUser>> {
+
+    let mut connection = mysql_pool.acquire().await?;
+    
+    if can_see_deleted {
+        let raw_weights: Vec<RawWeightJoinUser> = sqlx::query_as!(
+            RawWeightJoinUser,
+            r#"
+            SELECT              
+                mw.token as `token: tokens::tokens::model_weights::ModelWeightToken`,
+                mw.title,
+                mw.weights_type as `weights_type: enums::by_table::model_weights::weights_types::WeightsType`,
+                mw.weights_category as `weights_category: enums::by_table::model_weights::weights_category::WeightsCategory`,
+                mw.maybe_thumbnail_token,
+                mw.description_markdown,
+                mw.description_rendered_html,
+                users.token as `creator_user_token: tokens::tokens::users::UserToken`,
+                users.username as username,
+                users.display_name as display_name,
+                users.email_gravatar_hash as email_gravatar_hash,
+                mw.creator_ip_address,
+                mw.creator_set_visibility as `creator_set_visibility: enums::common::visibility::Visibility`,
+                mw.maybe_last_update_user_token as `maybe_last_update_user_token: tokens::tokens::users::UserToken`,
+                mw.original_download_url,
+                mw.original_filename,
+                mw.file_size_bytes,
+                mw.file_checksum_sha2,
+                mw.private_bucket_hash,
+                mw.maybe_private_bucket_prefix,
+                mw.maybe_private_bucket_extension,
+                mw.cached_user_ratings_negative_count,
+                mw.cached_user_ratings_positive_count,
+                mw.cached_user_ratings_total_count,
+                mw.maybe_cached_user_ratings_ratio,
+                mw.cached_user_ratings_last_updated_at,
+                mw.version,
+                mw.created_at,
+                mw.updated_at,
+                mw.user_deleted_at,
+                mw.mod_deleted_at
+            FROM model_weights as mw
+            JOIN users
+                ON users.token = mw.creator_user_token
+            WHERE
+                users.username = ?
+            "#,
+            username).fetch_all(&mut connection)
+        .await?;
+        return Ok(raw_weights);
+    } else {
+        let raw_weights: Vec<RawWeightJoinUser> = sqlx::query_as!(
+            RawWeightJoinUser,
+            r#"
+            SELECT
+                mw.token as `token: tokens::tokens::model_weights::ModelWeightToken`,
+                mw.title,
+                mw.weights_type as `weights_type: enums::by_table::model_weights::weights_types::WeightsType`,
+                mw.weights_category as `weights_category: enums::by_table::model_weights::weights_category::WeightsCategory`,
+                mw.maybe_thumbnail_token,
+                mw.description_markdown,
+                mw.description_rendered_html,
+                users.token as `creator_user_token: tokens::tokens::users::UserToken`,
+                users.username as username,
+                users.display_name as display_name,
+                users.email_gravatar_hash as email_gravatar_hash,
+                mw.creator_ip_address,
+                mw.creator_set_visibility as `creator_set_visibility: enums::common::visibility::Visibility`,
+                mw.maybe_last_update_user_token as `maybe_last_update_user_token: tokens::tokens::users::UserToken`,
+                mw.original_download_url,
+                mw.original_filename,
+                mw.file_size_bytes,
+                mw.file_checksum_sha2,
+                mw.private_bucket_hash,
+                mw.maybe_private_bucket_prefix,
+                mw.maybe_private_bucket_extension,
+                mw.cached_user_ratings_negative_count,
+                mw.cached_user_ratings_positive_count,
+                mw.cached_user_ratings_total_count,
+                mw.maybe_cached_user_ratings_ratio,
+                mw.cached_user_ratings_last_updated_at,
+                mw.version,
+                mw.created_at,
+                mw.updated_at,
+                mw.user_deleted_at,
+                mw.mod_deleted_at
+            FROM model_weights as mw
+            JOIN users
+                ON users.token = mw.creator_user_token
+            WHERE
+                users.username = ?
+                AND mw.user_deleted_at IS NULL
+                AND mw.mod_deleted_at IS NULL
+            "#,
+            username).fetch_all(&mut connection).await?;
+
+        Ok(raw_weights)
+    }
+}
+
+pub async fn map_to_weights() {
+
+}
+
+pub async fn filter_weights() {
+
 }
 
 pub async fn list_weights_by_username_with_connection(
@@ -174,47 +262,6 @@ async fn list_datasets_by_creator_username(
     let model_weights: Vec<WeightsJoinUserRecord> = Vec::new();
     Ok(model_weights)
 }
-
-
-
-// CREATE TABLE model_weights (
-//     id BIGINT(20) NOT NULL AUTO_INCREMENT,
-//     token VARCHAR(32) NOT NULL,
-//     weights_type VARCHAR(32) NOT NULL,
-//     weights_category VARCHAR(32) NOT NULL,
-//     title VARCHAR(255) NOT NULL,
-//     maybe_thumbnail_token VARCHAR(32) DEFAULT NULL,
-//     description_markdown TEXT NOT NULL,
-//     description_rendered_html TEXT NOT NULL,
-//     creator_user_token VARCHAR(32) NOT NULL,
-//     creator_ip_address VARCHAR(40) NOT NULL,
-//     creator_set_visibility ENUM(
-//       'public',
-//       'hidden',
-//       'private'
-//     ) NOT NULL DEFAULT 'public',
-//     maybe_last_update_user_token VARCHAR(32) DEFAULT NULL,
-//     original_download_url VARCHAR(512) DEFAULT NULL,
-//     original_filename VARCHAR(255) DEFAULT NULL,
-//     file_size_bytes INT(10) NOT NULL DEFAULT 0,
-//     file_checksum_sha2 CHAR(64) NOT NULL,
-//     private_bucket_hash  VARCHAR(32) NOT NULL,
-//     maybe_private_bucket_prefix VARCHAR(16) DEFAULT NULL,
-//     maybe_private_bucket_extension VARCHAR(16) DEFAULT NULL,
-//     cached_user_ratings_total_count INT(10) UNSIGNED NOT NULL DEFAULT 0,
-//     cached_user_ratings_positive_count INT(10) UNSIGNED NOT NULL DEFAULT 0,
-//     cached_user_ratings_negative_count INT(10) UNSIGNED NOT NULL DEFAULT 0,
-//     maybe_cached_user_ratings_ratio FLOAT,
-//     cached_user_ratings_last_updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-//     version INT NOT NULL DEFAULT 0,
-//     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-//     updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-//     user_deleted_at TIMESTAMP NULL,
-//     mod_deleted_at TIMESTAMP NULL,
-//     PRIMARY KEY (id),
-//     UNIQUE KEY (token)
-//   ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;
-
 
 
   #[derive(Serialize)]
