@@ -4432,6 +4432,7 @@ __metadata:
     "@types/google.analytics": ^0.0.42
     "@types/gtag.js": ^0.0.12
     "@types/howler": ^2.1.2
+    "@types/imagesloaded": ^4.1.6
     "@types/jest": ^24.9.1
     "@types/js-cookie": ^3.0.1
     "@types/masonry-layout": ^4.2.7
@@ -4453,6 +4454,7 @@ __metadata:
     i18next: ^21.6.11
     i18next-browser-languagedetector: ^7.1.0
     i18next-http-backend: ^2.2.1
+    imagesloaded: ^5.0.0
     js-cookie: ^3.0.1
     masonry-layout: ^4.2.2
     posthog-js: ^1.73.1
@@ -4577,10 +4579,8 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@storyteller/root@workspace:."
   dependencies:
-    "@types/imagesloaded": ^4.1.6
     craco: ^0.0.3
     cross-env: ^7.0.3
-    imagesloaded: ^5.0.0
     lerna: ^4.0.0
     yarn: ^1.22.19
   languageName: unknown

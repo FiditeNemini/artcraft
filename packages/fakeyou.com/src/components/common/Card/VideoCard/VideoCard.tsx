@@ -29,7 +29,7 @@ export default function VideoCard({ data, to }: VideoCardProps) {
       />
       <div className="card-img-overlay">
         <div className="card-img-gradient" />
-        <Badge label="Hi" color="teal" />
+        <Badge label="Video" color="purple" />
         <FontAwesomeIcon icon={faPlayCircle} className="card-video-play" />
         <div className="card-img-overlay-text">
           <div>

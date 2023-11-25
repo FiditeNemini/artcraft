@@ -3,6 +3,7 @@ import { useHistory } from "react-router-dom";
 import Card from "../Card";
 import AudioPlayer from "components/common/AudioPlayer";
 import useTimeAgo from "hooks/useTimeAgo";
+import Badge from "components/common/Badge";
 
 interface AudioCardProps {
   data: any;
@@ -25,7 +26,8 @@ export default function AudioCard({ data, to }: AudioCardProps) {
   return (
     <Card padding={true} onClick={handleCardClick}>
       <div className="mb-3">
-        <h6 className="fw-semibold text-white mb-1">{data.weight_name}</h6>
+        <Badge label="Audio" color="teal" />
+        <h6 className="fw-semibold text-white mb-1 mt-3">{data.weight_name}</h6>
         <p className="fs-7 opacity-75">{timeAgo}</p>
       </div>
 

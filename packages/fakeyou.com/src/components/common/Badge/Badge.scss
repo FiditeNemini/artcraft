@@ -4,7 +4,7 @@
   font-weight: 600;
   border-radius: 0.35rem;
   font-size: 13px;
-  padding: 2px 6px;
+  padding: 4px 8px;
   transition: 0.2s;
   -moz-user-select: none;
   -khtml-user-select: none;
@@ -13,6 +13,10 @@
   user-select: none;
   height: 100%;
   margin-bottom: 10px;
+
+  &.shadow {
+    box-shadow: 0 0 12px rgba($bg, 0.2);
+  }
 }
 
 $colors: (
@@ -34,6 +38,6 @@ $colors: (
 @each $color, $value in $colors {
   .badge-#{$color} {
     background-color: $value;
-    color: contrast($value);
+    color: contrast($value) !important;
   }
 }

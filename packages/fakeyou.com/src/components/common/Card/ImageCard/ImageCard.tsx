@@ -2,6 +2,7 @@ import React from "react";
 import { useHistory } from "react-router-dom";
 import Card from "../Card";
 import useTimeAgo from "hooks/useTimeAgo";
+import Badge from "components/common/Badge";
 
 interface ImageCardProps {
   data: any;
@@ -26,6 +27,7 @@ export default function ImageCard({ data, to }: ImageCardProps) {
       />
       <div className="card-img-overlay">
         <div className="card-img-gradient" />
+        <Badge label="Image" color="ultramarine" />
         <div className="card-img-overlay-text">
           <div>
             <h6 className="fw-semibold text-white mb-1">{data.weight_name}</h6>
