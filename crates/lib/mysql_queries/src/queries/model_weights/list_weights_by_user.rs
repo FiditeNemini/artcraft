@@ -68,10 +68,11 @@ pub struct WeightsJoinUserRecord {
 }
 
 pub async fn list_weights_by_creator_username(
-    mysql_pool:  &mut PoolConnection<MySql>,
+    mysql_pool: &MySqlPool,
     creator_username: &str,
     can_see_deleted: bool
 ) -> AnyhowResult<Vec<WeightsJoinUserRecord>> {
+    
     let mut connection = mysql_pool.acquire().await?;
 
     let raw_weights: Vec<RawWeightJoinUser> = get_raw_weights_by_creator_username(&mut connection, creator_username, can_see_deleted).await?;
@@ -84,8 +85,8 @@ pub async fn list_weights_by_creator_username(
     Ok(filtered_weights)
 }
 
-pub async fn get_raw_weights_by_creator_username(
-    connection:  &mut MySqlConnection,
+async fn get_raw_weights_by_creator_username(
+    connection: &mut MySqlConnection,
     creator_username: &str,
     can_see_deleted: bool
 ) -> AnyhowResult<Vec<RawWeightJoinUser>> {
@@ -187,7 +188,7 @@ pub async fn get_raw_weights_by_creator_username(
     }
 }
 
-pub async fn map_to_weights(dataset:Vec<RawWeightJoinUser>) -> Vec<WeightsJoinUserRecord> {
+async fn map_to_weights(dataset:Vec<RawWeightJoinUser>) -> Vec<WeightsJoinUserRecord> {
     let weights: Vec<WeightsJoinUserRecord> = dataset
         .into_iter()
         .map(|dataset: RawWeightJoinUser| {

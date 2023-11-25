@@ -2,7 +2,7 @@
 mod tests {
     use std::result;
 
-    use sqlx::MySqlPool;
+    use sqlx::{MySqlPool, Acquire};
     use rand::Rng;
 
     use tokio;
@@ -24,6 +24,7 @@ mod tests {
     use crate::queries::model_weights::get_weight::get_weight_by_token;
 
     use crate::queries::model_weights::delete_weights::{ delete_weights_as_user, delete_weights_as_mod, undelete_weights_as_mod , undelete_weights_as_user};
+    use crate::queries::model_weights::list_weights_by_user::list_weights_by_creator_username;
 
     async fn setup() -> sqlx::Pool<sqlx::MySql> {
         println!("Dropped database model_weights");
@@ -281,6 +282,18 @@ mod tests {
 
     #[tokio::test]
     async fn list_all_weights_by_user() -> AnyhowResult<()> {
+        let pool = setup().await;
+        
+        let creator_username = "hanashi".to_string();
+        let can_see_deleted = true;
 
+        let weights_by_username = list_weights_by_creator_username(&pool, &creator_username, can_see_deleted).await?;
+        assert_eq!(weights_by_username.len(), 5);
+
+        Ok(())
+    }
+
+    async fn list_weights_query_build() -> AnyhowResult<()> {
+        Ok(())
     }
 }
