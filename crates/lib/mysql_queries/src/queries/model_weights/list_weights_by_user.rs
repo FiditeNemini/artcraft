@@ -4,7 +4,7 @@ use anyhow::anyhow;
 use chrono::{ DateTime, Utc };
 use enums::by_table::model_weights::weights_types;
 use log::{ info, warn };
-use sqlx::{ MySql, MySqlPool, query };
+use sqlx::{ MySql, MySqlPool, query, Acquire, MySqlConnection };
 use sqlx::pool::PoolConnection;
 
 use enums::common::visibility::Visibility;
@@ -67,23 +67,26 @@ pub struct WeightsJoinUserRecord {
     pub creator_email_gravatar_hash: String,
 }
 
-pub async fn list_weights_by_username(
-    mysql_pool: &MySqlPool,
-    username: &str,
+pub async fn list_weights_by_creator_username(
+    mysql_pool:  &mut PoolConnection<MySql>,
+    creator_username: &str,
     can_see_deleted: bool
 ) -> AnyhowResult<Vec<WeightsJoinUserRecord>> {
     let mut connection = mysql_pool.acquire().await?;
-    list_weights_by_username_with_connection(&mut connection, username, can_see_deleted).await
+
+    let raw_weights: Vec<RawWeightJoinUser> = get_raw_weights_by_creator_username(&mut connection, creator_username, can_see_deleted).await?;
+    let weights_records: Vec<WeightsJoinUserRecord> = map_to_weights(raw_weights).await;
+
+    Ok(weights_records)
 }
 
-
-pub async fn get_raw_weights_by_username(
-    mysql_pool: &MySqlPool,
-    username: &str,
+pub async fn get_raw_weights_by_creator_username(
+    connection:  &mut MySqlConnection,
+    creator_username: &str,
     can_see_deleted: bool
 ) -> AnyhowResult<Vec<RawWeightJoinUser>> {
 
-    let mut connection = mysql_pool.acquire().await?;
+    let connection = connection.acquire().await?;
     
     if can_see_deleted {
         let raw_weights: Vec<RawWeightJoinUser> = sqlx::query_as!(
@@ -127,7 +130,7 @@ pub async fn get_raw_weights_by_username(
             WHERE
                 users.username = ?
             "#,
-            username).fetch_all(&mut connection)
+            creator_username).fetch_all(connection)
         .await?;
         return Ok(raw_weights);
     } else {
@@ -174,7 +177,7 @@ pub async fn get_raw_weights_by_username(
                 AND mw.user_deleted_at IS NULL
                 AND mw.mod_deleted_at IS NULL
             "#,
-            username).fetch_all(&mut connection).await?;
+            creator_username).fetch_all(connection).await?;
 
         Ok(raw_weights)
     }
@@ -228,94 +231,6 @@ pub async fn map_to_weights(dataset:Vec<RawWeightJoinUser>) -> Vec<WeightsJoinUs
 }
 
 
-pub async fn list_weights_by_username_with_connection(
-    mysql_connection: &mut PoolConnection<MySql>,
-    creator_username: &str,
-    can_see_deleted: bool
-) -> AnyhowResult<Vec<WeightsJoinUserRecord>> {
-    // query
-    // let datasets = list_datasets_by_creator_username(
-    //     mysql_connection,
-    //     creator_username,
-    //     can_see_deleted
-    // ).await;
-
-    // // map
-    // let datasets: Vec<WeightsJoinUserRecord> = match datasets {
-    //     Ok(datasets) => datasets,
-    //     Err(err) => {
-    //         match err {
-    //             RowNotFound => {
-    //                 return Ok(Vec::new());
-    //             }
-    //             _ => {
-    //                 warn!("weights dataset list query error: {:?}", err);
-    //                 return Err(anyhow!("weights dataset list query error"));
-    //             }
-    //         }
-    //     }
-    // };
-
-    // Ok(
-    //     datasets
-    //         .into_iter()
-    //         .map(|dataset: WeightsJoinUserRecord| {
-    //             WeightsJoinUserRecord {
-    //                 token: dataset.token,
-    //                 title: dataset.title,
-    //                 weights_type: dataset.weights_type,
-    //                 weights_category: dataset.weights_category,
-    //                 maybe_thumbnail_token: dataset.maybe_thumbnail_token,
-    //                 description_markdown: dataset.description_markdown,
-    //                 description_rendered_html: dataset.description_rendered_html,
-
-    //                 creator_user_token: dataset.creator_user_token,
-    //                 creator_ip_address: dataset.creator_ip_address,
-    //                 creator_set_visibility: dataset.creator_set_visibility,
-
-    //                 maybe_last_update_user_token: dataset.maybe_last_update_user_token,
-    //                 original_download_url: dataset.original_download_url,
-    //                 original_filename: dataset.original_filename,
-    //                 file_size_bytes: dataset.file_size_bytes,
-    //                 file_checksum_sha2: dataset.file_checksum_sha2,
-    //                 private_bucket_hash: dataset.private_bucket_hash,
-    //                 maybe_private_bucket_prefix: dataset.maybe_private_bucket_prefix,
-    //                 maybe_private_bucket_extension: dataset.maybe_private_bucket_extension,
-
-    //                 cached_user_ratings_negative_count: dataset.cached_user_ratings_negative_count,
-    //                 cached_user_ratings_positive_count: dataset.cached_user_ratings_positive_count,
-    //                 cached_user_ratings_total_count: dataset.cached_user_ratings_total_count,
-
-    //                 maybe_cached_user_ratings_ratio: dataset.maybe_cached_user_ratings_ratio,
-    //                 cached_user_ratings_last_updated_at: dataset.cached_user_ratings_last_updated_at,
-    //                 version: dataset.version,
-    //                 created_at: dataset.created_at,
-    //                 updated_at: dataset.updated_at,
-    //                 user_deleted_at: dataset.user_deleted_at,
-    //                 mod_deleted_at: dataset.mod_deleted_at,
-    //             }
-    //         })
-    //         .filter(|dataset| {
-    //             dataset.creator_user_token == creator_username ||
-    //                 dataset.creator_set_visibility == Visibility::Public ||
-    //                 can_see_deleted
-    //         })
-    //         .collect::<Vec<WeightsJoinUserRecord>>())
-    let weights_records = Vec::<WeightsJoinUserRecord>::new();
-    Ok(weights_records)
-    
-}
-
-async fn list_datasets_by_creator_username(
-    mysql_connection: &mut PoolConnection<MySql>,
-    creator_username: &str,
-    can_see_deleted: bool
-) -> AnyhowResult<Vec<WeightsJoinUserRecord>> {
-    let model_weights: Vec<WeightsJoinUserRecord> = Vec::new();
-    Ok(model_weights)
-}
-
-
   #[derive(Serialize)]
   pub struct RawWeightJoinUser {
     pub token: ModelWeightToken,
@@ -365,44 +280,3 @@ async fn list_datasets_by_creator_username(
     pub creator_display_name: String,
     pub creator_email_gravatar_hash: String,
 }
-
-
-// SELECT
-//     mw.token as `token: tokens::tokens::model_weights::ModelWeightsToken`,
-//     mw.title,
-//     mw.weights_type,
-//     mw.weights_category,
-//     mw.maybe_thumbnail_token,
-//     mw.description_markdown,
-//     mw.description_rendered_html,
-//     users.token as `creator_user_token: tokens::tokens::users::UserToken`,
-//     users.username as creator_username,
-//     users.display_name as creator_display_name,
-//     users.email_gravatar_hash as creator_email_gravatar_hash,
-//     mw.creator_ip_address,
-//     mw.creator_set_visibility as `creator_set_visibility: enums::common::visibility::Visibility`,
-//     mw.maybe_last_update_user_token,
-//     mw.original_download_url,
-//     mw.original_filename,
-//     mw.file_size_bytes,
-//     mw.file_checksum_sha2,
-//     mw.private_bucket_hash,
-//     mw.maybe_private_bucket_prefix,
-//     mw.maybe_private_bucket_extension,
-//     mw.cached_user_ratings_negative_count,
-//     mw.cached_user_ratings_positive_count,
-//     mw.cached_user_ratings_total_count,
-//     mw.maybe_cached_user_ratings_ratio,
-//     mw.cached_user_ratings_last_updated_at,
-//     mw.version,
-//     mw.created_at,
-//     mw.updated_at,
-//     mw.user_deleted_at,
-//     mw.mod_deleted_at
-// FROM model_weights as mw
-// JOIN users
-//     ON users.token = mw.creator_user_token
-// WHERE
-//     users.username = ?
-//     AND mw.user_deleted_at IS NULL
-//     AND mw.mod_deleted_at IS NULL
