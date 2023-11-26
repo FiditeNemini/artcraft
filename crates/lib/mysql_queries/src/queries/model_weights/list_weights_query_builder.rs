@@ -9,18 +9,16 @@ use config::shared_constants::DEFAULT_MYSQL_QUERY_RESULT_PAGE_SIZE;
 use enums::common::visibility::Visibility;
 use errors::AnyhowResult;
 use tokens::tokens::users::UserToken;
+use tokens::tokens::model_weights::ModelWeightToken;
 
 use enums::by_table::model_weights::{
     weights_types::WeightsType,
     weights_category::WeightsCategory,
 };
 
-use crate::queries::model_weights::list_weights_by_user::RawWeightJoinUser;
-
-
 #[derive(Serialize)]
 pub struct WeightsPage {
-    pub weights: Vec<RawWeightJoinUser>,
+    pub weights: Vec<WeightJoinUser>,
     pub sort_ascending: bool,
 
     pub first_id: Option<i64>,
@@ -28,10 +26,65 @@ pub struct WeightsPage {
     pub last_id: Option<i64>,
 }
 
+
+// TODO: figure out what you want to expose ? since we don't have specs really
+#[derive(Serialize)]
+pub struct WeightJoinUser {
+    pub weight_id: i64,
+    pub token: ModelWeightToken,
+
+    pub weights_type: WeightsType,
+    pub weights_category: WeightsCategory,
+    
+    pub title: String,
+    
+    pub maybe_thumbnail_token: Option<String>,
+    
+    pub description_markdown: String,
+    pub description_rendered_html: String,
+    
+    pub creator_user_token: UserToken,
+    pub creator_ip_address: String,
+    pub creator_set_visibility: Visibility,
+    
+    pub maybe_last_update_user_token: Option<UserToken>,
+    
+    pub original_download_url: Option<String>,
+    pub original_filename: Option<String>,
+    
+    pub file_size_bytes: i32,
+    pub file_checksum_sha2: String,
+    
+    pub private_bucket_hash: String,
+    
+    pub maybe_private_bucket_prefix: Option<String>,
+    pub maybe_private_bucket_extension: Option<String>,
+    
+    pub cached_user_ratings_total_count: u32,
+    pub cached_user_ratings_positive_count: u32,
+    pub cached_user_ratings_negative_count: u32,
+    pub maybe_cached_user_ratings_ratio: Option<f32>,
+    pub cached_user_ratings_last_updated_at: DateTime<Utc>,
+    
+    pub version: i32,
+    
+    pub created_at: DateTime<Utc>,
+    pub updated_at: DateTime<Utc>,
+    
+    pub user_deleted_at: Option<DateTime<Utc>>,
+    pub mod_deleted_at: Option<DateTime<Utc>>,
+    
+    pub creator_username: String,
+    pub creator_display_name: String,
+    pub creator_email_gravatar_hash: String,
+}
+
+
 pub struct ListWeightsQueryBuilder {
     scope_creator_username: Option<String>,
     include_mod_deleted_results: bool,
     include_user_deleted_results: bool,
+    include_hidden_results: bool,
     sort_ascending: bool,
     weights_type:WeightsType,
     weights_category:WeightsCategory,
@@ -40,15 +93,18 @@ pub struct ListWeightsQueryBuilder {
     cursor_is_reversed: bool,
 }
 
+
 impl ListWeightsQueryBuilder {
-    pub fn new() -> Self {
+    
+    pub fn new(weights_type:WeightsType,weights_category:WeightsCategory) -> Self {
         Self {
             scope_creator_username: None,
             include_mod_deleted_results: false,
             include_user_deleted_results: false,
+            include_hidden_results: false,
             sort_ascending: false,
-            weights_type:WeightsType,
-            weights_category:WeightsCategory,
+            weights_type:weights_type,
+            weights_category:weights_category,
             offset: None,
             limit: DEFAULT_MYSQL_QUERY_RESULT_PAGE_SIZE,
             cursor_is_reversed: false,
@@ -60,6 +116,10 @@ impl ListWeightsQueryBuilder {
         self
     }
 
+    pub fn include_hidden_results(mut self, include_hidden_results: bool) -> Self {
+        self.include_hidden_results = include_hidden_results;
+        self
+    }
 
     pub fn include_mod_deleted_results(mut self, include_mod_deleted_results: bool) -> Self {
         self.include_mod_deleted_results = include_mod_deleted_results;
@@ -135,6 +195,7 @@ impl ListWeightsQueryBuilder {
         &self,
         mysql_pool: &MySqlPool
     ) -> AnyhowResult<WeightsPage> {
+
         let weights = self.perform_internal_query(mysql_pool).await?;
 
         let first_id = weights.first()
@@ -144,22 +205,44 @@ impl ListWeightsQueryBuilder {
             .map(|raw_result| raw_result.weight_id);
 
         let weights = weights.into_iter().map(
-            |v| {
-                RawWeightJoinUser {
-                    weights_token: v.token,
-                    title: v.title,
-                    creator_set_visibility: Visibility::from_str(&v.creator_set_visibility).unwrap_or(Visibility::Public),
-                    ietf_language_tag: v.ietf_language_tag,
-                    ietf_primary_language_subtag: v.ietf_primary_language_subtag,
-                    creator_user_token: v.creator_user_token,
-                    creator_username: v.creator_username,
-                    creator_display_name: v.creator_display_name,
-                    creator_email_gravatar_hash: v.creator_email_gravatar_hash,
-                    created_at: v.created_at,
-                    updated_at: v.updated_at,
+            |record| {
+                // map the raw result into a WeightJoinUser
+                WeightJoinUser {
+                    weight_id:record.weight_id,
+                    token:record.token,
+                    weights_type:record.weights_type,
+                    weights_category:record.weights_category,
+                    title:record.title,
+                    maybe_thumbnail_token:record.maybe_thumbnail_token,
+                    description_markdown:record.description_markdown,
+                    description_rendered_html:record.description_rendered_html,
+                    creator_user_token:record.creator_user_token,
+                    creator_ip_address:record.creator_ip_address,
+                    creator_set_visibility:record.creator_set_visibility,
+                    maybe_last_update_user_token:record.maybe_last_update_user_token,
+                    original_download_url:record.original_download_url,
+                    original_filename:record.original_filename,
+                    file_size_bytes:record.file_size_bytes,
+                    file_checksum_sha2:record.file_checksum_sha2,
+                    private_bucket_hash:record.private_bucket_hash,
+                    maybe_private_bucket_prefix:record.maybe_private_bucket_prefix,
+                    maybe_private_bucket_extension:record.maybe_private_bucket_extension,
+                    cached_user_ratings_total_count:record.cached_user_ratings_total_count,
+                    cached_user_ratings_positive_count:record.cached_user_ratings_positive_count,
+                    cached_user_ratings_negative_count:record.cached_user_ratings_negative_count,
+                    maybe_cached_user_ratings_ratio:record.maybe_cached_user_ratings_ratio,
+                    cached_user_ratings_last_updated_at:record.cached_user_ratings_last_updated_at,
+                    version:record.version,
+                    created_at:record.created_at,
+                    updated_at:record.updated_at,
+                    user_deleted_at:record.user_deleted_at,
+                    mod_deleted_at:record.mod_deleted_at,
+                    creator_username:record.creator_username,
+                    creator_display_name:record.creator_display_name,
+                    creator_email_gravatar_hash:record.creator_email_gravatar_hash,
                 }
             })
-            .collect::<Vec<RawWeightJoinUser>>();
+            .collect::<Vec<WeightJoinUser>>();
 
         Ok(WeightsPage {
             weights,
@@ -172,23 +255,41 @@ impl ListWeightsQueryBuilder {
     pub fn build_query_string(&self) -> String {
         let mut query = r#"
         SELECT
-            model_weights.id as voice_id,
-            model_weights.token as `token: tokens::tokens::model_weights::RawWeightJoinUserToken`,
+            model_weights.id AS weight_id,
+            model_weights.token,
+            model_weights.weights_type,
+            model_weights.weights_category,
             model_weights.title,
-            model_weights.ietf_language_tag,
-            model_weights.ietf_primary_language_subtag,
-
-            users.token as `creator_user_token: tokens::tokens::users::UserToken`,
-            users.username as creator_username,
-            users.display_name as creator_display_name,
-            users.email_gravatar_hash as creator_email_gravatar_hash,
-
+            model_weights.maybe_thumbnail_token,
+            model_weights.description_markdown,
+            model_weights.description_rendered_html,
+            model_weights.creator_user_token,
+            model_weights.creator_ip_address,
             model_weights.creator_set_visibility,
+            model_weights.maybe_last_update_user_token,
+            model_weights.original_download_url,
+            model_weights.original_filename,
+            model_weights.file_size_bytes,
+            model_weights.file_checksum_sha2,
+            model_weights.private_bucket_hash,
+            model_weights.maybe_private_bucket_prefix,
+            model_weights.maybe_private_bucket_extension,
+            model_weights.cached_user_ratings_total_count,
+            model_weights.cached_user_ratings_positive_count,
+            model_weights.cached_user_ratings_negative_count,
+            model_weights.maybe_cached_user_ratings_ratio,
+            model_weights.cached_user_ratings_last_updated_at,
+            model_weights.version,
             model_weights.created_at,
-            model_weights.updated_at
-        FROM model_weights
+            model_weights.updated_at,
+            model_weights.user_deleted_at,
+            model_weights.mod_deleted_at,
+            users.username AS creator_username,
+            users.display_name AS creator_display_name,
+            users.email_gravatar_hash AS creator_email_gravatar_hash
+        FROM model_weights 
         JOIN users
-            ON users.token = model_weights.maybe_creator_user_token
+            ON users.token = mw.maybe_creator_user_token
         "#.to_string();
 
         query.push_str(&self.build_predicates());
@@ -239,15 +340,6 @@ impl ListWeightsQueryBuilder {
             }
         }
 
-        if !self.include_user_hidden {
-            if !first_predicate_added {
-                query.push_str(" WHERE model_weights.creator_set_visibility = 'public'");
-                first_predicate_added = true;
-            } else {
-                query.push_str(" AND model_weights.creator_set_visibility = 'public'");
-            }
-        }
-
         if !self.include_mod_deleted_results {
             if !first_predicate_added {
                 query.push_str(" WHERE model_weights.mod_deleted_at IS NULL");
@@ -278,29 +370,70 @@ impl ListWeightsQueryBuilder {
     }
 }
 
+
+#[derive(Serialize)]
 #[derive(sqlx::FromRow)]
 struct RawWeightJoinUser {
-    weight_id: i64,
-    token: RawWeightJoinUserToken,
-    title: String,
-    ietf_language_tag: String,
-    ietf_primary_language_subtag: String,
-    creator_user_token: UserToken,
-    creator_username: String,
-    creator_display_name: String,
-    creator_email_gravatar_hash: String,
-    creator_set_visibility: String,
-    created_at: DateTime<Utc>,
-    updated_at: DateTime<Utc>,
+    pub weight_id: i64,
+    pub token: ModelWeightToken,
+
+    pub weights_type: WeightsType,
+    pub weights_category: WeightsCategory,
+    
+    pub title: String,
+    
+    pub maybe_thumbnail_token: Option<String>,
+    
+    pub description_markdown: String,
+    pub description_rendered_html: String,
+    
+    pub creator_user_token: UserToken,
+    pub creator_ip_address: String,
+    pub creator_set_visibility: Visibility,
+    
+    pub maybe_last_update_user_token: Option<UserToken>,
+    
+    pub original_download_url: Option<String>,
+    pub original_filename: Option<String>,
+    
+    pub file_size_bytes: i32,
+    pub file_checksum_sha2: String,
+    
+    pub private_bucket_hash: String,
+    
+    pub maybe_private_bucket_prefix: Option<String>,
+    pub maybe_private_bucket_extension: Option<String>,
+    
+    pub cached_user_ratings_total_count: u32,
+    pub cached_user_ratings_positive_count: u32,
+    pub cached_user_ratings_negative_count: u32,
+    pub maybe_cached_user_ratings_ratio: Option<f32>,
+    pub cached_user_ratings_last_updated_at: DateTime<Utc>,
+    
+    pub version: i32,
+    
+    pub created_at: DateTime<Utc>,
+    pub updated_at: DateTime<Utc>,
+    
+    pub user_deleted_at: Option<DateTime<Utc>>,
+    pub mod_deleted_at: Option<DateTime<Utc>>,
+    
+    pub creator_username: String,
+    pub creator_display_name: String,
+    pub creator_email_gravatar_hash: String,
 }
 
 #[cfg(test)]
 mod tests {
-    use crate::queries::voice_designer::voices::list_voices_query_builder::ListWeightsQueryBuilder;
-
+    use crate::queries::model_weights::list_weights_query_builder::ListWeightsQueryBuilder;
+    use enums::by_table::model_weights::{
+        weights_types::WeightsType,
+        weights_category::WeightsCategory,
+    };
+    
     #[test]
     fn predicates_without_scoping() {
-        let query_builder = ListWeightsQueryBuilder::new();
+        let query_builder = ListWeightsQueryBuilder::new(WeightsType::HifiganTacotron2,WeightsCategory::Vocoder);
 
         assert_eq!(&query_builder.build_predicates(),
                    " WHERE model_weights.creator_set_visibility = 'public' \
@@ -312,12 +445,12 @@ mod tests {
 
     #[test]
     fn predicates_scoped_to_user() {
-        let query_builder = ListWeightsQueryBuilder::new()
+        let query_builder = ListWeightsQueryBuilder::new(WeightsType::HifiganTacotron2,WeightsCategory::Vocoder)
             .scope_creator_username(Some("echelon"));
 
         assert_eq!(&query_builder.build_predicates(),
                    " WHERE users.username = ? \
-      AND model_weights.creator_set_visibility = 'public' \
+      AND model_weights.creator_set_visibility = 'public' 
       AND model_weights.mod_deleted_at IS NULL \
       AND model_weights.user_deleted_at IS NULL \
       ORDER BY model_weights.id DESC \
@@ -326,8 +459,8 @@ mod tests {
 
     #[test]
     fn predicates_including_user_hidden() {
-        let query_builder = ListWeightsQueryBuilder::new()
-            .include_user_hidden(true);
+        let query_builder = ListWeightsQueryBuilder::new(WeightsType::HifiganTacotron2,WeightsCategory::Vocoder)
+            .include_hidden_results(true);
 
         assert_eq!(&query_builder.build_predicates(),
                    " WHERE model_weights.mod_deleted_at IS NULL \
@@ -338,7 +471,7 @@ mod tests {
 
     #[test]
     fn predicates_including_mod_deleted() {
-        let query_builder = ListWeightsQueryBuilder::new()
+        let query_builder = ListWeightsQueryBuilder::new(WeightsType::HifiganTacotron2,WeightsCategory::Vocoder)
             .include_mod_deleted_results(true);
 
         assert_eq!(&query_builder.build_predicates(),
@@ -350,7 +483,7 @@ mod tests {
 
     #[test]
     fn predicates_including_user_deleted() {
-        let query_builder = ListWeightsQueryBuilder::new()
+        let query_builder = ListWeightsQueryBuilder::new(WeightsType::HifiganTacotron2,WeightsCategory::Vocoder)
             .include_user_deleted_results(true);
 
         assert_eq!(&query_builder.build_predicates(),
@@ -362,7 +495,7 @@ mod tests {
 
     #[test]
     fn predicates_including_mod_deleted_and_user_deleted() {
-        let query_builder = ListWeightsQueryBuilder::new()
+        let query_builder = ListWeightsQueryBuilder::new(WeightsType::HifiganTacotron2,WeightsCategory::Vocoder)
             .include_mod_deleted_results(true)
             .include_user_deleted_results(true);
 
