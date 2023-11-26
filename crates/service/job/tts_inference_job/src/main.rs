@@ -59,13 +59,11 @@ use crate::job_steps::job_args::{JobArgs, JobCaches, JobHttpClients};
 use crate::job_steps::job_args::JobWorkerDetails;
 use crate::job_steps::process_single_job::process_single_job;
 use crate::job_steps::process_single_job_error::ProcessSingleJobError;
-use crate::script_execution::tacotron_inference_command::TacotronInferenceCommand;
 use crate::util::scoped_temp_dir_creator::ScopedTempDirCreator;
 
 pub mod caching;
 pub mod http_clients;
 pub mod job_steps;
-pub mod script_execution;
 pub mod util;
 
 // Buckets (shared config)
@@ -153,14 +151,6 @@ async fn main() -> AnyhowResult<()> {
     None,
     Some(bucket_timeout),
   )?;
-
-  let py_code_directory = easyenv::get_env_string_required(ENV_CODE_DIRECTORY)?;
-  let py_script_name = easyenv::get_env_string_required(ENV_INFERENCE_SCRIPT_NAME)?;
-
-  let tts_inference_command = TacotronInferenceCommand::new(
-    &py_code_directory,
-    &py_script_name,
-  );
 
   let mut sidecar_hostname =
       easyenv::get_env_string_required(ENV_TTS_INFERENCE_SIDECAR_HOSTNAME)?;
@@ -306,7 +296,6 @@ async fn main() -> AnyhowResult<()> {
     job_progress_reporter,
     public_bucket_client,
     private_bucket_client,
-    tts_inference_command,
     http_clients: JobHttpClients {
       tts_inference_sidecar_client,
       tts_sidecar_health_check_client,

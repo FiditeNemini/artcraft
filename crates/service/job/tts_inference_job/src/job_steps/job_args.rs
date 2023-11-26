@@ -16,7 +16,6 @@ use crate::caching::cache_miss_strategizer_multi::SyncMultiCacheMissStrategizer;
 use crate::caching::virtual_lfu_cache::SyncVirtualLfuCache;
 use crate::http_clients::tts_inference_sidecar_client::TtsInferenceSidecarClient;
 use crate::http_clients::tts_sidecar_health_check_client::TtsSidecarHealthCheckClient;
-use crate::script_execution::tacotron_inference_command::TacotronInferenceCommand;
 use crate::util::scoped_temp_dir_creator::ScopedTempDirCreator;
 
 pub struct JobArgs {
@@ -38,8 +37,6 @@ pub struct JobArgs {
   pub http_clients: JobHttpClients,
 
   pub job_stats: JobStats,
-
-  pub tts_inference_command: TacotronInferenceCommand,
 
   pub newrelic_client: NewRelicClient,
 
