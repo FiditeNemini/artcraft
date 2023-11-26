@@ -146,6 +146,8 @@ interface State {
 
   // Rollout of vocodes 2.0
   enableAlpha: boolean;
+
+  sessionFetched: boolean;
   sessionWrapper: SessionWrapper;
   sessionSubscriptionsWrapper: SessionSubscriptionsWrapper;
 
@@ -237,6 +239,7 @@ class App extends React.Component<Props, State> {
       enableAlpha: enableAlpha,
       migrationMode: migrationMode,
 
+      sessionFetched: false,
       sessionWrapper: SessionWrapper.emptySession(),
       sessionSubscriptionsWrapper:
         SessionSubscriptionsWrapper.emptySubscriptions(),
@@ -328,6 +331,7 @@ class App extends React.Component<Props, State> {
   };
 
   querySessionSubscriptions = async () => {
+    this.setState({ sessionFetched: true });
     const cookies = new Cookies();
 
     const sessionSubscriptionsWrapper =
@@ -836,7 +840,10 @@ class App extends React.Component<Props, State> {
                 }}
               >
                 <SessionProvider
-                  {...{ sessionWrapper: this.state.sessionWrapper }}
+                  {...{ 
+                    sessionWrapper: this.state.sessionWrapper,
+                    sessionFetched: this.state.sessionFetched
+                  }}
                 >
                   <Switch>
                     <Route path="/">

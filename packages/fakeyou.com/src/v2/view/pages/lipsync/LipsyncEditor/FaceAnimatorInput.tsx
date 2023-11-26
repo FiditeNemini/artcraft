@@ -1,6 +1,6 @@
 import React from "react";
 import { animated } from "@react-spring/web";
-import { AudioInput, BasicVideo, Checkbox, ImageInput, SegmentButtons } from "components/common";
+import { AudioBlobPreview, AudioInput, BasicVideo, Checkbox, ImageInput, SegmentButtons } from "components/common";
 import { FaceAnimatorSlide } from "./FaceAnimatorTypes";
 
 export default function FaceAnimatorInput({  
@@ -35,9 +35,17 @@ export default function FaceAnimatorInput({
           onRest: (p: any, c: any, item: any, l: any) => {
             toggle.audio(!!audioProps.file);
           },
-          hideActions: true,
+          // hideActions: true,
         }}
-      />
+      >
+        <AudioBlobPreview {...{
+          ...audioProps,
+          onRest: (p: any, c: any, item: any, l: any) => {
+            toggle.audio(!!audioProps.file);
+          },
+          hideActions: true,
+        }}/>
+      </AudioInput>
       <BasicVideo {...{ className: "face-animator-wide-sample", src: "/videos/face-animator-instruction-en.mp4" }}/>
     </div>
     <div {...{ className: "animation-configure-panel panel" }}>
