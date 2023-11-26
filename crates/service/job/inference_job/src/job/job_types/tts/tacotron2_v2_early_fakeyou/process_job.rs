@@ -23,6 +23,7 @@ use tts_common::text_pipelines::text_pipeline_type::TextPipelineType;
 
 use crate::job::job_loop::job_success_result::{JobSuccessResult, ResultEntity};
 use crate::job::job_loop::process_single_job_error::ProcessSingleJobError;
+use crate::job::job_types::tts::tacotron2_v2_early_fakeyou::download_static_dependencies::download_static_dependencies;
 use crate::job::job_types::tts::tacotron2_v2_early_fakeyou::seconds_to_decoder_steps::seconds_to_decoder_steps;
 use crate::job::job_types::tts::tacotron2_v2_early_fakeyou::tacotron2_inference_command::{InferenceArgs, MelMultiplyFactor, VocoderForInferenceOption};
 use crate::job_dependencies::JobDependencies;
@@ -58,71 +59,19 @@ pub async fn process_job(args: ProcessJobArgs<'_>) -> Result<JobSuccessResult, P
       .as_ref()
       .ok_or_else(|| ProcessSingleJobError::JobSystemMisconfiguration(Some("missing Tacotron2 dependencies".to_string())))?;
 
-  // ==================== CONFIRM OR DOWNLOAD WAVEGLOW VOCODER MODEL ==================== //
+  // TODO(bt,2023-11-26): Need to stop the job before the sidecar spins up
+  //if needs_health_check_at_start {
+  //  maybe_block_on_sidecar_health_check(&inferencer.http_clients.tts_sidecar_health_check_client).await;
+  //}
 
-  let waveglow_vocoder_model_fs_path = {
-    // TODO(bt,2023-11-21): Port this to the common downloader code.
-    let waveglow_vocoder_model_filename = model_dependencies.waveglow_vocoder_model_filename.clone();
-    let waveglow_vocoder_model_fs_path = args.job_dependencies.fs.semi_persistent_cache.tts_pretrained_vocoder_model_path(&waveglow_vocoder_model_filename);
-    let waveglow_vocoder_model_object_path = args.job_dependencies.buckets.bucket_path_unifier.tts_pretrained_vocoders_path(&waveglow_vocoder_model_filename);
+  // ==================== CONFIRM OR DOWNLOAD STATIC DEPENDENCIES ==================== //
 
-    maybe_download_file_from_bucket(
-      "waveglow vocoder model",
-      &waveglow_vocoder_model_fs_path,
-      &waveglow_vocoder_model_object_path,
-      &args.job_dependencies.buckets.private_bucket_client,
-      &mut job_progress_reporter,
-      "downloading vocoder (1 of 3)",
-      job.id.0,
-      &args.job_dependencies.fs.scoped_temp_dir_creator_for_downloads,
-    ).await?;
-
-    waveglow_vocoder_model_fs_path
-  };
-
-  // ==================== CONFIRM OR DOWNLOAD HIFIGAN (NORMAL) VOCODER MODEL ==================== //
-
-  let pretrained_hifigan_vocoder_model_fs_path = {
-    // TODO(bt,2023-11-21): Port this to the common downloader code.
-    let hifigan_vocoder_model_filename = model_dependencies.hifigan_vocoder_model_filename.clone();
-    let hifigan_vocoder_model_fs_path = args.job_dependencies.fs.semi_persistent_cache.tts_pretrained_vocoder_model_path(&hifigan_vocoder_model_filename);
-    let hifigan_vocoder_model_object_path = args.job_dependencies.buckets.bucket_path_unifier.tts_pretrained_vocoders_path(&hifigan_vocoder_model_filename);
-
-    maybe_download_file_from_bucket(
-      "hifigan vocoder model",
-      &hifigan_vocoder_model_fs_path,
-      &hifigan_vocoder_model_object_path,
-      &args.job_dependencies.buckets.private_bucket_client,
-      &mut job_progress_reporter,
-      "downloading vocoder (2 of 3)",
-      job.id.0,
-      &args.job_dependencies.fs.scoped_temp_dir_creator_for_downloads,
-    ).await?;
-
-    hifigan_vocoder_model_fs_path
-  };
-
-  // ==================== CONFIRM OR DOWNLOAD HIFIGAN (SUPERRES) VOCODER MODEL ==================== //
-
-  let hifigan_superres_vocoder_model_fs_path = {
-    // TODO(bt,2023-11-21): Port this to the common downloader code.
-    let hifigan_superres_vocoder_model_filename = model_dependencies.hifigan_superres_vocoder_model_filename.clone();
-    let hifigan_superres_vocoder_model_fs_path = args.job_dependencies.fs.semi_persistent_cache.tts_pretrained_vocoder_model_path(&hifigan_superres_vocoder_model_filename);
-    let hifigan_superres_vocoder_model_object_path = args.job_dependencies.buckets.bucket_path_unifier.tts_pretrained_vocoders_path(&hifigan_superres_vocoder_model_filename);
-
-    maybe_download_file_from_bucket(
-      "hifigan superres vocoder model",
-      &hifigan_superres_vocoder_model_fs_path,
-      &hifigan_superres_vocoder_model_object_path,
-      &args.job_dependencies.buckets.private_bucket_client,
-      &mut job_progress_reporter,
-      "downloading vocoder (3 of 3)",
-      job.id.0,
-      &args.job_dependencies.fs.scoped_temp_dir_creator_for_downloads,
-    ).await?;
-
-    hifigan_superres_vocoder_model_fs_path
-  };
+  let static_deps = download_static_dependencies(
+    &args.job_dependencies,
+    &job,
+    &model_dependencies,
+    &mut job_progress_reporter,
+  ).await?;
 
   // ==================== CONFIRM OR DOWNLOAD OPTIONAL CUSTOM VOCODER MODEL ==================== //
 
@@ -214,13 +163,13 @@ pub async fn process_job(args: ProcessJobArgs<'_>) -> Result<JobSuccessResult, P
     // We most likely will *not* use WaveGlow.
     VocoderType::WaveGlow => {
       VocoderForInferenceOption::Waveglow {
-        waveglow_vocoder_checkpoint_path: &waveglow_vocoder_model_fs_path
+        waveglow_vocoder_checkpoint_path: &static_deps.waveglow_vocoder_model_fs_path
       }
     }
     VocoderType::HifiGanSuperResolution => {
       VocoderForInferenceOption::HifiganSuperres {
-        hifigan_vocoder_checkpoint_path: &pretrained_hifigan_vocoder_model_fs_path,
-        hifigan_superres_vocoder_checkpoint_path: &hifigan_superres_vocoder_model_fs_path,
+        hifigan_vocoder_checkpoint_path: &static_deps.pretrained_hifigan_vocoder_model_fs_path,
+        hifigan_superres_vocoder_checkpoint_path: &static_deps.hifigan_superres_vocoder_model_fs_path,
       }
     }
   };
@@ -229,7 +178,7 @@ pub async fn process_job(args: ProcessJobArgs<'_>) -> Result<JobSuccessResult, P
       info!("using custom user-trained HiFi-GAN vocoder: {:?}", custom_vocoder_fs_path);
       vocoder_option = VocoderForInferenceOption::HifiganSuperres {
         hifigan_vocoder_checkpoint_path: custom_vocoder_path,
-        hifigan_superres_vocoder_checkpoint_path: &hifigan_superres_vocoder_model_fs_path,
+        hifigan_superres_vocoder_checkpoint_path: &static_deps.hifigan_superres_vocoder_model_fs_path,
       };
   };
 
