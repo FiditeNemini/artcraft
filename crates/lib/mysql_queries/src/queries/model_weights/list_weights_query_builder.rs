@@ -84,7 +84,7 @@ pub struct ListWeightsQueryBuilder {
     scope_creator_username: Option<String>,
     include_mod_deleted_results: bool,
     include_user_deleted_results: bool,
-    include_hidden_results: bool,
+    include_user_hidden: bool,
     sort_ascending: bool,
     weights_type:WeightsType,
     weights_category:WeightsCategory,
@@ -99,9 +99,9 @@ impl ListWeightsQueryBuilder {
     pub fn new(weights_type:WeightsType,weights_category:WeightsCategory) -> Self {
         Self {
             scope_creator_username: None,
+            include_user_hidden: false,
             include_mod_deleted_results: false,
             include_user_deleted_results: false,
-            include_hidden_results: false,
             sort_ascending: false,
             weights_type:weights_type,
             weights_category:weights_category,
@@ -115,9 +115,9 @@ impl ListWeightsQueryBuilder {
         self.scope_creator_username = scope_creator_username.map(|u| u.to_string());
         self
     }
-
-    pub fn include_hidden_results(mut self, include_hidden_results: bool) -> Self {
-        self.include_hidden_results = include_hidden_results;
+    
+    pub fn include_user_hidden(mut self, include_user_hidden: bool) -> Self {
+        self.include_user_hidden = include_user_hidden;
         self
     }
 
@@ -218,7 +218,7 @@ impl ListWeightsQueryBuilder {
                     description_rendered_html:record.description_rendered_html,
                     creator_user_token:record.creator_user_token,
                     creator_ip_address:record.creator_ip_address,
-                    creator_set_visibility:record.creator_set_visibility,
+                    creator_set_visibility: record.creator_set_visibility,
                     maybe_last_update_user_token:record.maybe_last_update_user_token,
                     original_download_url:record.original_download_url,
                     original_filename:record.original_filename,
@@ -340,6 +340,15 @@ impl ListWeightsQueryBuilder {
             }
         }
 
+        if !self.include_user_hidden {
+            if !first_predicate_added {
+                query.push_str(" WHERE model_weights.creator_set_visibility = 'public'");
+                first_predicate_added = true;
+            } else {
+                query.push_str(" AND model_weights.creator_set_visibility = 'public'");
+            }
+        }
+
         if !self.include_mod_deleted_results {
             if !first_predicate_added {
                 query.push_str(" WHERE model_weights.mod_deleted_at IS NULL");
@@ -434,7 +443,8 @@ mod tests {
     #[test]
     fn predicates_without_scoping() {
         let query_builder = ListWeightsQueryBuilder::new(WeightsType::HifiganTacotron2,WeightsCategory::Vocoder);
-
+      
+        println!("Query HERE! {}", &query_builder.build_predicates());
         assert_eq!(&query_builder.build_predicates(),
                    " WHERE model_weights.creator_set_visibility = 'public' \
       AND model_weights.mod_deleted_at IS NULL \
@@ -447,10 +457,10 @@ mod tests {
     fn predicates_scoped_to_user() {
         let query_builder = ListWeightsQueryBuilder::new(WeightsType::HifiganTacotron2,WeightsCategory::Vocoder)
             .scope_creator_username(Some("echelon"));
-
+        println!("Query HERE! {}", &query_builder.build_predicates());
         assert_eq!(&query_builder.build_predicates(),
                    " WHERE users.username = ? \
-      AND model_weights.creator_set_visibility = 'public' 
+      AND model_weights.creator_set_visibility = 'public' \
       AND model_weights.mod_deleted_at IS NULL \
       AND model_weights.user_deleted_at IS NULL \
       ORDER BY model_weights.id DESC \
@@ -460,7 +470,7 @@ mod tests {
     #[test]
     fn predicates_including_user_hidden() {
         let query_builder = ListWeightsQueryBuilder::new(WeightsType::HifiganTacotron2,WeightsCategory::Vocoder)
-            .include_hidden_results(true);
+            .include_user_hidden(true);
 
         assert_eq!(&query_builder.build_predicates(),
                    " WHERE model_weights.mod_deleted_at IS NULL \

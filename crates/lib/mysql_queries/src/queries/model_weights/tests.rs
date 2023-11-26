@@ -21,7 +21,7 @@ mod tests {
 
     use crate::queries::model_weights::create_weight::CreateModelWeightsArgs;
     use crate::queries::model_weights::create_weight::create_weight;
-
+    use crate::queries::model_weights::get_weight::get_weight_by_token;
 
     use crate::queries::model_weights::delete_weights::{ delete_weights_as_user, delete_weights_as_mod, undelete_weights_as_mod , undelete_weights_as_user};
     use crate::queries::model_weights::list_weights_by_user::list_weights_by_creator_username;
