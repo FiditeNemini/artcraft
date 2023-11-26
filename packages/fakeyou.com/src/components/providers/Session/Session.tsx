@@ -8,7 +8,6 @@ interface Props {
 }
 
 export default function Session({ children, sessionFetched, sessionWrapper }: Props) { 
-  console.log("😎",sessionFetched);
   return <SessionContext.Provider {...{ value: { sessionFetched, sessionWrapper } }}>
     { children }
   </SessionContext.Provider>
