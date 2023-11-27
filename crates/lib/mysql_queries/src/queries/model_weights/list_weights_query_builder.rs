@@ -86,8 +86,8 @@ pub struct ListWeightsQueryBuilder {
     include_user_deleted_results: bool,
     include_user_hidden: bool,
     sort_ascending: bool,
-    weights_type:WeightsType,
-    weights_category:WeightsCategory,
+    weights_type:Option<WeightsType>,
+    weights_category:Option<WeightsCategory>,
     offset: Option<u64>,
     limit: u16,
     cursor_is_reversed: bool,
@@ -96,15 +96,15 @@ pub struct ListWeightsQueryBuilder {
 
 impl ListWeightsQueryBuilder {
     
-    pub fn new(weights_type:WeightsType,weights_category:WeightsCategory) -> Self {
+    pub fn new() -> Self {
         Self {
             scope_creator_username: None,
             include_user_hidden: false,
             include_mod_deleted_results: false,
             include_user_deleted_results: false,
             sort_ascending: false,
-            weights_type:weights_type,
-            weights_category:weights_category,
+            weights_type: None,
+            weights_category: None,
             offset: None,
             limit: DEFAULT_MYSQL_QUERY_RESULT_PAGE_SIZE,
             cursor_is_reversed: false,
@@ -137,12 +137,12 @@ impl ListWeightsQueryBuilder {
     }
 
     pub fn weights_type(mut self,weights_type:WeightsType) -> Self {
-        self.weights_type = weights_type;
+        self.weights_type = Some(weights_type);
         self
     }
 
     pub fn weights_category(mut self,weights_category:WeightsCategory) -> Self {
-        self.weights_category = weights_category;
+        self.weights_category = Some(weights_category);
         self
     }
 
@@ -340,6 +340,24 @@ impl ListWeightsQueryBuilder {
             }
         }
 
+        if let Some(_weights_type) = self.weights_type {
+            if !first_predicate_added {
+                query.push_str(" WHERE model_weights.weights_type = ?");
+                first_predicate_added = true;
+            } else {
+                query.push_str(" AND model_weights.weights_type = ?");
+            }
+        }
+
+        if let Some(_weights_category) = self.weights_category {
+            if !first_predicate_added {
+                query.push_str(" WHERE model_weights.weights_category = ?");
+                first_predicate_added = true;
+            } else {
+                query.push_str(" AND model_weights.weights_category = ?");
+            }
+        }
+
         if !self.include_user_hidden {
             if !first_predicate_added {
                 query.push_str(" WHERE model_weights.creator_set_visibility = 'public'");
@@ -442,7 +460,7 @@ mod tests {
     
     #[test]
     fn predicates_without_scoping() {
-        let query_builder = ListWeightsQueryBuilder::new(WeightsType::HifiganTacotron2,WeightsCategory::Vocoder);
+        let query_builder = ListWeightsQueryBuilder::new();
       
         println!("Query HERE! {}", &query_builder.build_predicates());
         assert_eq!(&query_builder.build_predicates(),
@@ -455,7 +473,7 @@ mod tests {
 
     #[test]
     fn predicates_scoped_to_user() {
-        let query_builder = ListWeightsQueryBuilder::new(WeightsType::HifiganTacotron2,WeightsCategory::Vocoder)
+        let query_builder = ListWeightsQueryBuilder::new()
             .scope_creator_username(Some("echelon"));
         println!("Query HERE! {}", &query_builder.build_predicates());
         assert_eq!(&query_builder.build_predicates(),
@@ -468,8 +486,36 @@ mod tests {
     }
 
     #[test]
+    fn predicates_scoped_to_weights_type() {
+        let query_builder = ListWeightsQueryBuilder::new()
+            .weights_type(WeightsType::RvcV2);
+        println!("Query HERE! {}", &query_builder.build_predicates());
+        assert_eq!(&query_builder.build_predicates(),
+                   " WHERE model_weights.weights_type = ? \
+      AND model_weights.creator_set_visibility = 'public' \
+      AND model_weights.mod_deleted_at IS NULL \
+      AND model_weights.user_deleted_at IS NULL \
+      ORDER BY model_weights.id DESC \
+      LIMIT ?");
+    }
+
+    #[test]
+    fn predicates_scoped_to_weights_category() {
+        let query_builder = ListWeightsQueryBuilder::new()
+            .weights_category(WeightsCategory::VoiceConversion);
+        println!("Query HERE! {}", &query_builder.build_predicates());
+        assert_eq!(&query_builder.build_predicates(),
+                   " WHERE model_weights.weights_category = ? \
+      AND model_weights.creator_set_visibility = 'public' \
+      AND model_weights.mod_deleted_at IS NULL \
+      AND model_weights.user_deleted_at IS NULL \
+      ORDER BY model_weights.id DESC \
+      LIMIT ?");
+    }
+
+    #[test]
     fn predicates_including_user_hidden() {
-        let query_builder = ListWeightsQueryBuilder::new(WeightsType::HifiganTacotron2,WeightsCategory::Vocoder)
+        let query_builder = ListWeightsQueryBuilder::new()
             .include_user_hidden(true);
 
         assert_eq!(&query_builder.build_predicates(),
@@ -481,7 +527,7 @@ mod tests {
 
     #[test]
     fn predicates_including_mod_deleted() {
-        let query_builder = ListWeightsQueryBuilder::new(WeightsType::HifiganTacotron2,WeightsCategory::Vocoder)
+        let query_builder = ListWeightsQueryBuilder::new()
             .include_mod_deleted_results(true);
 
         assert_eq!(&query_builder.build_predicates(),
@@ -493,7 +539,7 @@ mod tests {
 
     #[test]
     fn predicates_including_user_deleted() {
-        let query_builder = ListWeightsQueryBuilder::new(WeightsType::HifiganTacotron2,WeightsCategory::Vocoder)
+        let query_builder = ListWeightsQueryBuilder::new()
             .include_user_deleted_results(true);
 
         assert_eq!(&query_builder.build_predicates(),
@@ -505,7 +551,7 @@ mod tests {
 
     #[test]
     fn predicates_including_mod_deleted_and_user_deleted() {
-        let query_builder = ListWeightsQueryBuilder::new(WeightsType::HifiganTacotron2,WeightsCategory::Vocoder)
+        let query_builder = ListWeightsQueryBuilder::new()
             .include_mod_deleted_results(true)
             .include_user_deleted_results(true);
 

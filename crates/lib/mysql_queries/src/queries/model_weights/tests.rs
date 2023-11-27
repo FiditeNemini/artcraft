@@ -26,6 +26,11 @@ mod tests {
     use crate::queries::model_weights::delete_weights::{ delete_weights_as_user, delete_weights_as_mod, undelete_weights_as_mod , undelete_weights_as_user};
     use crate::queries::model_weights::list_weights_by_user::list_weights_by_creator_username;
 
+
+
+    use crate::queries::model_weights::list_weights_query_builder::ListWeightsQueryBuilder;
+    use crate::queries::users::user::get_user_token_by_username::get_user_token_by_username;
+
     async fn setup() -> sqlx::Pool<sqlx::MySql> {
         println!("Dropped database model_weights");
 
@@ -293,7 +298,88 @@ mod tests {
         Ok(())
     }
 
-    async fn list_weights_query_build() -> AnyhowResult<()> {
+    #[tokio::test]
+    async fn list_weights_query_build_test() -> AnyhowResult<()> {
+        let pool = setup().await;
+        
+        let creator_username = "hanashi".to_string();
+
+        let creator_token = get_user_token_by_username(&creator_username, &pool).await?.unwrap_or_else(
+            || panic!("Could not find user with username {}", creator_username)
+        );
+
+        for i in 0..6 {
+            let weights_type = if i % 5 == 0 {
+                WeightsType::Tacotron2
+            } else if i % 5 == 1 {
+                WeightsType::LoRA
+            } else if i % 5 == 2 {
+                WeightsType::RvcV2
+            } else if i % 5 == 3 {
+                WeightsType::StableDiffusionXL
+            } else if i ^ 5 == 4 {
+                WeightsType::SoVitsSvc
+            } else {
+                WeightsType::StableDiffusion15
+            };
+
+            let weights_category = if i % 5 == 0 {
+                WeightsCategory::TextToSpeech
+            } else if i % 5 == 1 {
+                WeightsCategory::ImageGeneration
+            } else if i % 5 == 2 {
+                WeightsCategory::VoiceConversion
+            } else if i % 5 == 3 {
+                WeightsCategory::ImageGeneration
+            } else if i ^ 5 == 4 {
+                WeightsCategory::VoiceConversion
+            } else {
+                WeightsCategory::ImageGeneration
+            };
+
+            let model_weight_token = ModelWeightToken(i.to_string());
+                 
+            let args = CreateModelWeightsArgs {
+                token: &model_weight_token, // replace with actual ModelWeightToken
+                weights_type:weights_type, // replace with actual WeightsType
+                weights_category: weights_category, // replace with actual WeightsCategory
+                title: format!("Title {}", i),
+                maybe_thumbnail_token: Some(format!("Thumbnail {}", i)),
+                description_markdown: format!("Description {}", i),
+                description_rendered_html: format!("<p>Description {}</p>", i),
+                creator_user_token: Some(&creator_token), // replace with actual UserToken
+                creator_ip_address: "192.168.1.1",
+                creator_set_visibility: Visibility::Public,
+                maybe_last_update_user_token: Some(format!("Last Update User Token {}", i)),
+                original_download_url: Some(format!("http://example.com/download{}", i)),
+                original_filename: Some(format!("filename {}.txt", i)),
+                file_size_bytes: 1024,
+                file_checksum_sha2: format!("checksum{}", i),
+                private_bucket_hash: format!("bucket_hash{}", i),
+                maybe_private_bucket_prefix: Some("_fake".to_string()),
+                maybe_private_bucket_extension: Some("rvc".to_string()),
+                cached_user_ratings_total_count: 10,
+                cached_user_ratings_positive_count: 9,
+                cached_user_ratings_negative_count: 1,
+                maybe_cached_user_ratings_ratio: Some(0.9),
+                version: 1,
+                mysql_pool: &pool, // replace with actual MySqlPool
+            };
+
+            create_weight(args).await?;
+        }
+
+        // try a query with all the filters
+        let qb = ListWeightsQueryBuilder::new()
+            .weights_type(WeightsType::Tacotron2)
+            .weights_category(WeightsCategory::TextToSpeech)
+            .scope_creator_username(Some("hanashi"))
+            .include_user_deleted_results(false);
+        
+        let result = qb.perform_query_for_page(&pool).await?;
+
+        assert_eq!(result.weights.len(), 1);
+
         Ok(())
     }
 }
