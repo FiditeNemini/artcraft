@@ -1,11 +1,12 @@
 use anyhow::anyhow;
 use log::warn;
-use sqlx::MySqlPool;
 use sqlx::error::Error::Database;
 use sqlx::mysql::MySqlQueryResult;
+use sqlx::MySqlPool;
 
 use errors::AnyhowResult;
 use reusable_types::achievements::user_badge::UserBadge;
+use tokens::tokens::users::UserToken;
 
 use crate::mediators::firehose_publisher::FirehosePublisher;
 
@@ -34,8 +35,8 @@ impl BadgeGranter {
   }
 
   /// This needs to be called *after* successful upload.
-  pub async fn maybe_grant_tts_model_uploads_badge(&self, user_token: &str) -> AnyhowResult<()> {
-    let count = self.count_tts_models_uploaded(user_token).await?;
+  pub async fn maybe_grant_tts_model_uploads_badge(&self, user_token: &UserToken) -> AnyhowResult<()> {
+    let count = self.count_tts_models_uploaded(user_token.as_str()).await?;
 
     let mut maybe_badge = None;
 
@@ -68,16 +69,16 @@ impl BadgeGranter {
       None => return Ok(()),
     };
 
-    if self.has_badge(user_token, badge).await? {
+    if self.has_badge(user_token.as_str(), badge).await? {
       return Ok(())
     }
 
     let _record_id = self.insert(
       badge,
-      user_token,
+      user_token.as_str(),
     ).await?;
 
-    self.firehose_publisher.publish_user_badge_granted(user_token, badge.to_db_value())
+    self.firehose_publisher.publish_user_badge_granted(user_token.as_str(), badge.to_db_value())
         .await?;
 
     Ok(())

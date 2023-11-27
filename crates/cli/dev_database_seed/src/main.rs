@@ -1,18 +1,16 @@
-use std::time::Duration;
 use elasticsearch::Elasticsearch;
-
 use log::info;
 use sqlx::mysql::MySqlPoolOptions;
 
-use cloud_storage::bucket_client::BucketClient;
 use config::shared_constants::{DEFAULT_MYSQL_CONNECTION_STRING, DEFAULT_RUST_LOG};
 use errors::AnyhowResult;
+
+use crate::bucket_clients::get_bucket_clients;
 use crate::cli_args::parse_cli_args;
-
+use crate::seeding::tts_tacotron2::seed_tts_tacotron2;
 use crate::seeding::users::seed_user_accounts;
-use crate::seeding::voice_conversion::seed_voice_conversion;
-use crate::seeding::zero_shot_tts::seed_zero_shot_tts;
 
+pub mod bucket_clients;
 pub mod cli_args;
 pub mod seeding;
 
@@ -37,10 +35,10 @@ pub async fn main() -> AnyhowResult<()> {
 
   let args = parse_cli_args()?;
 
-  let mut maybe_public_bucket_client = None;
+  let mut maybe_bucket_clients = None;
 
   if args.seed_cloud_bucket {
-    maybe_public_bucket_client = Some(get_bucket_client()?);
+    maybe_bucket_clients = Some(get_bucket_clients()?);
   }
 
   let mut maybe_elasticsearch = None;
@@ -50,34 +48,12 @@ pub async fn main() -> AnyhowResult<()> {
   }
 
   seed_user_accounts(&pool).await?;
-  seed_zero_shot_tts(&pool, maybe_public_bucket_client.as_ref()).await?;
-  seed_voice_conversion(&pool).await?;
+  //seed_zero_shot_tts(&pool, maybe_bucket_clients.as_ref()).await?;
+  //seed_voice_conversion(&pool).await?;
+  seed_tts_tacotron2(&pool, maybe_bucket_clients.as_ref()).await?;
 
   info!("Done!");
   Ok(())
-}
-
-fn get_bucket_client() -> AnyhowResult<BucketClient> {
-  let access_key = easyenv::get_env_string_required("ACCESS_KEY")?;
-  let secret_key = easyenv::get_env_string_required("SECRET_KEY")?;
-  let region_name = easyenv::get_env_string_required("REGION_NAME")?;
-  let public_bucket_name = easyenv::get_env_string_required("PUBLIC_BUCKET_NAME")?;
-
-  let bucket_timeout = easyenv::get_env_duration_seconds_or_default(
-    "BUCKET_TIMEOUT_SECONDS", Duration::from_secs(60 * 5));
-
-  info!("Configuring GCS bucket...");
-
-  let public_bucket_client = BucketClient::create(
-    &access_key,
-    &secret_key,
-    &region_name,
-    &public_bucket_name,
-    None,
-    Some(bucket_timeout),
-  )?;
-
-  Ok(public_bucket_client)
 }
 
 fn get_elasticsearch_client() -> AnyhowResult<Elasticsearch> {

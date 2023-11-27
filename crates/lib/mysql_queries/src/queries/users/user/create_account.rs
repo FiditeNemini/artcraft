@@ -16,6 +16,11 @@ pub struct CreateAccountArgs<'a> {
   pub email_gravatar_hash: &'a str,
   pub password_hash: &'a str,
   pub ip_address: &'a str,
+
+  /// In production code, send this as `None`.
+  /// Only provide an external user token for db integration tests and db seeding tools.
+  /// This allows for knowing the user token a priori.
+  pub maybe_user_token: Option<&'a UserToken>,
 }
 
 pub struct CreateAccountSuccessResult {
@@ -40,7 +45,10 @@ pub async fn create_account(
   const INITIAL_PROFILE_RENDERED_HTML : &str = "";
   const INITIAL_USER_ROLE: &str = "user";
 
-  let user_token = UserToken::generate();
+  let user_token = match args.maybe_user_token {
+    None => UserToken::generate(),
+    Some(user_token) => user_token.clone(),
+  };
 
   let query_result = sqlx::query!(
         r#"

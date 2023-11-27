@@ -7,6 +7,7 @@ use enums::by_table::tts_models::tts_model_type::TtsModelType;
 use enums::common::visibility::Visibility;
 use errors::AnyhowResult;
 use tokens::tokens::tts_models::TtsModelToken;
+use tokens::tokens::users::UserToken;
 
 pub struct InsertTtsModelFromDownloadJobArgs<'a, P: AsRef<Path>> {
   pub tts_model_type: TtsModelType,
@@ -17,7 +18,7 @@ pub struct InsertTtsModelFromDownloadJobArgs<'a, P: AsRef<Path>> {
   pub original_filename: &'a str,
   pub file_size_bytes: u64,
 
-  pub creator_user_token: &'a str,
+  pub creator_user_token: &'a UserToken,
   pub creator_ip_address: &'a str,
   pub creator_set_visibility: Visibility,
 

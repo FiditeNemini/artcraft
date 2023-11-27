@@ -31,6 +31,7 @@
 mod paths;
 mod substituted_path;
 
+pub use paths::seed_tool_data_root::get_seed_tool_data_root;
 pub use paths::storyteller_frontend_root::get_storyteller_frontend_root;
 pub use paths::storyteller_ml_root::get_storyteller_ml_root;
 pub use paths::storyteller_root::get_storyteller_root;

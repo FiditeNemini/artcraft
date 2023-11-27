@@ -76,12 +76,15 @@ pub async fn process_tacotron_model<'a, 'b>(
 
   info!("File hash: {}", private_bucket_hash);
 
+  // FIXME(bt,2023-11-27): 'bucket_path_unifier' is super deprecated. Do not use it anymore or for anything except TT2!
   let model_bucket_path = job_state.bucket_path_unifier.tts_synthesizer_path(&private_bucket_hash);
 
   info!("Destination bucket path: {:?}", &model_bucket_path);
 
   redis_logger.log_status("uploading tacotron TTS model")?;
 
+  // TODO(bt,2023-11-27): This method of uploading model files is super deprecated.
+  //  Try to standardize on something resembling media_files going forward.
   if let Err(e) = job_state.bucket_client.upload_filename(&model_bucket_path, &file_path).await {
     safe_delete_temp_file(&output_metadata_fs_path);
     safe_delete_temp_file(&file_path);
