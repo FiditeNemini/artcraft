@@ -178,8 +178,19 @@ impl ListWeightsQueryBuilder {
             query = query.bind(username);
         }
 
+        if let Some(weights_type) = self.weights_type {
+            query = query.bind(weights_type);
+        }
+
+        if let Some(weights_category) = self.weights_category {
+            query = query.bind(weights_category);
+        }
+
         query = query.bind(self.limit);
 
+
+        // debug!("query: {:?}", query);
+        // panic!("query: {:?}", query)
         let mut results = query.fetch_all(mysql_pool)
             .await?;
 
@@ -210,16 +221,18 @@ impl ListWeightsQueryBuilder {
                 WeightJoinUser {
                     weight_id:record.weight_id,
                     token:record.token,
-                    weights_type:record.weights_type,
-                    weights_category:record.weights_category,
+                    weights_type:
+                    WeightsType::from_str(record.weights_type.as_str()).unwrap(),
+                    weights_category:WeightsCategory::from_str(record.weights_category.as_str()).unwrap(),
                     title:record.title,
                     maybe_thumbnail_token:record.maybe_thumbnail_token,
                     description_markdown:record.description_markdown,
                     description_rendered_html:record.description_rendered_html,
-                    creator_user_token:record.creator_user_token,
+                    creator_user_token: UserToken::new_from_str( &record.creator_user_token),
                     creator_ip_address:record.creator_ip_address,
-                    creator_set_visibility: record.creator_set_visibility,
-                    maybe_last_update_user_token:record.maybe_last_update_user_token,
+                    creator_set_visibility: Visibility::from_str(&record.creator_set_visibility).unwrap(),
+                    maybe_last_update_user_token:
+                    record.maybe_last_update_user_token.map(|token| UserToken::new_from_str(&token)),
                     original_download_url:record.original_download_url,
                     original_filename:record.original_filename,
                     file_size_bytes:record.file_size_bytes,
@@ -404,8 +417,8 @@ struct RawWeightJoinUser {
     pub weight_id: i64,
     pub token: ModelWeightToken,
 
-    pub weights_type: WeightsType,
-    pub weights_category: WeightsCategory,
+    pub weights_type: String,
+    pub weights_category: String,
     
     pub title: String,
     
@@ -414,11 +427,11 @@ struct RawWeightJoinUser {
     pub description_markdown: String,
     pub description_rendered_html: String,
     
-    pub creator_user_token: UserToken,
+    pub creator_user_token: String,
     pub creator_ip_address: String,
-    pub creator_set_visibility: Visibility,
-    
-    pub maybe_last_update_user_token: Option<UserToken>,
+    pub creator_set_visibility: String,
+
+    pub maybe_last_update_user_token: Option<String>,
     
     pub original_download_url: Option<String>,
     pub original_filename: Option<String>,
