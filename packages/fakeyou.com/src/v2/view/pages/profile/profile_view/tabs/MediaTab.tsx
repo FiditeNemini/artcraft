@@ -6,7 +6,10 @@ import ImageCard from "components/common/Card/ImageCard";
 import VideoCard from "components/common/Card/VideoCard";
 import Panel from "components/common/Panel";
 import { Select } from "components/common/Inputs/Inputs";
-import { faFilter } from "@fortawesome/pro-solid-svg-icons";
+import {
+  faArrowDownWideShort,
+  faFilter,
+} from "@fortawesome/pro-solid-svg-icons";
 import AudioPlayerProvider from "components/common/AudioPlayer/AudioPlayerContext";
 import SkeletonCard from "components/common/Card/SkeletonCard";
 import InfiniteScroll from "react-infinite-scroll-component";
@@ -37,20 +40,32 @@ export default function MediaTab() {
     }, 1500);
   };
 
-  const options = [
+  const filterOptions = [
     { value: "all", label: "All Media" },
     { value: "images", label: "Images" },
     { value: "audio", label: "Audio" },
     { value: "video", label: "Video" },
   ];
 
+  const sortOptions = [
+    { value: "newest", label: "Newest" },
+    { value: "oldest", label: "Oldest" },
+    { value: "mostliked", label: "Most Liked" },
+  ];
+
   return (
     <Panel clear={true} padding={true}>
-      <div className="d-flex mb-3">
+      <div className="d-flex gap-2 mb-3">
+        <Select
+          icon={faArrowDownWideShort}
+          options={sortOptions}
+          defaultValue={sortOptions[0]}
+          isSearchable={false}
+        />
         <Select
           icon={faFilter}
-          options={options}
-          defaultValue={options[0]}
+          options={filterOptions}
+          defaultValue={filterOptions[0]}
           isSearchable={false}
         />
       </div>
