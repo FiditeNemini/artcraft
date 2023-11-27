@@ -9,17 +9,10 @@ import VideoCard from "components/common/Card/VideoCard";
 import Panel from "components/common/Panel";
 import { Select } from "components/common/Inputs/Inputs";
 import { faFilter } from "@fortawesome/pro-solid-svg-icons";
+import AudioPlayerProvider from "components/common/AudioPlayer/AudioPlayerContext";
 
 export default function MediaTab() {
   const [data, setData] = useState(mockData);
-  // const [hasMore, setHasMore] = useState(true);
-
-  // const fetchData = () => {
-  //   setTimeout(() => {
-  //     setData((prevData) => [...prevData, ...mockData]);
-  //     setHasMore(false);
-  //   }, 1500);
-  // };
 
   const options = [
     { value: "all", label: "All Media" },
@@ -38,33 +31,34 @@ export default function MediaTab() {
           isSearchable={false}
         />
       </div>
-
-      <MasonryGrid>
-        {data.map((data, index) => {
-          let card;
-          switch (data.media_type) {
-            case "audio":
-              card = <AudioCard key={index} data={data} to="/" />;
-              break;
-            case "image":
-              card = <ImageCard key={index} data={data} to="/" />;
-              break;
-            case "video":
-              card = <VideoCard key={index} data={data} to="/" />;
-              break;
-            default:
-              card = <div key={index}>Unsupported media type</div>;
-          }
-          return (
-            <div
-              key={index}
-              className="col-12 col-sm-6 col-xl-4 col-xxl-3 grid-item"
-            >
-              {card}
-            </div>
-          );
-        })}
-      </MasonryGrid>
+      <AudioPlayerProvider>
+        <MasonryGrid>
+          {data.map((data, index) => {
+            let card;
+            switch (data.media_type) {
+              case "audio":
+                card = <AudioCard key={index} data={data} />;
+                break;
+              case "image":
+                card = <ImageCard key={index} data={data} />;
+                break;
+              case "video":
+                card = <VideoCard key={index} data={data} />;
+                break;
+              default:
+                card = <div key={index}>Unsupported media type</div>;
+            }
+            return (
+              <div
+                key={index}
+                className="col-12 col-sm-6 col-xl-4 col-xxl-3 grid-item"
+              >
+                {card}
+              </div>
+            );
+          })}
+        </MasonryGrid>
+      </AudioPlayerProvider>
     </Panel>
   );
 }

@@ -34,7 +34,11 @@ import Tippy from "@tippyjs/react";
 import "tippy.js/dist/tippy.css";
 
 import { usePrefixedDocumentTitle } from "../../../../../common/UsePrefixedDocumentTitle";
-import { faCalendarAlt } from "@fortawesome/pro-solid-svg-icons";
+import {
+  faCalendarAlt,
+  faLayerGroup,
+  faPhotoFilmMusic,
+} from "@fortawesome/pro-solid-svg-icons";
 // import { CommentComponent } from "../../../_common/comments/CommentComponent";
 import { PosthogClient } from "@storyteller/components/src/analytics/PosthogClient";
 import { Panel } from "components/common";
@@ -154,7 +158,7 @@ function NewProfilePage(this: any, props: Props) {
 
     // Mods shouldn't edit preferences.
     const buttonLabel = props.sessionWrapper.userTokenMatches(
-      userData.user_token,
+      userData.user_token
     )
       ? "Edit Profile & Preferences"
       : "Edit Profile";
@@ -208,7 +212,7 @@ function NewProfilePage(this: any, props: Props) {
     >
       <FontAwesomeIcon icon={faCalendarAlt} className="me-2" />
       <p className="fw-normal">Joined {joinDate}</p>
-    </div>,
+    </div>
   );
 
   if (userData.website_url !== undefined && userData.website_url !== null) {
@@ -300,7 +304,7 @@ function NewProfilePage(this: any, props: Props) {
         >
           <FontAwesomeIcon icon={faDiscord} />
         </a>
-      </Tippy>,
+      </Tippy>
     );
   }
 
@@ -351,16 +355,19 @@ function NewProfilePage(this: any, props: Props) {
       to: `/profile/${username}/media`,
       label: "Media",
       content: <MediaTab />,
+      icon: faPhotoFilmMusic,
     },
     {
       to: `/profile/${username}/weights`,
       label: "Weights",
       content: <div>Weights</div>,
+      icon: faLayerGroup,
     },
     {
       to: `/profile/${username}/favorites`,
       label: "Favorites",
       content: <div>Favorites</div>,
+      icon: faStar,
     },
   ];
 

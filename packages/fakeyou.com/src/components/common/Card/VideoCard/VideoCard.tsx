@@ -5,20 +5,28 @@ import useTimeAgo from "hooks/useTimeAgo";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlayCircle } from "@fortawesome/pro-solid-svg-icons";
 import Badge from "components/common/Badge";
+import LikeButton from "components/common/LikeButton";
 
 interface VideoCardProps {
   data: any;
-  to: string;
 }
 
-export default function VideoCard({ data, to }: VideoCardProps) {
+export default function VideoCard({ data }: VideoCardProps) {
   const history = useHistory();
 
   const handleCardClick = () => {
-    history.push(to);
+    history.push(`/media/${data.token}`);
+  };
+
+  const handleInnerClick = (event: any) => {
+    event.stopPropagation();
   };
 
   const timeAgo = useTimeAgo(data.created_at);
+
+  const handleLike = async (data: any) => {
+    console.log(`The item is now ${data.isLiked ? "liked" : "not liked"}.`);
+  };
 
   return (
     <Card padding={false} onClick={handleCardClick}>
@@ -29,7 +37,19 @@ export default function VideoCard({ data, to }: VideoCardProps) {
       />
       <div className="card-img-overlay">
         <div className="card-img-gradient" />
-        <Badge label="Video" color="purple" />
+
+        <div className="d-flex align-items-center">
+          <div className="flex-grow-1">
+            <Badge label="Video" color="purple" overlay={true} />
+          </div>
+          <div onClick={handleInnerClick}>
+            <LikeButton
+              onToggle={handleLike}
+              likeCount={data.likes}
+              overlay={true}
+            />
+          </div>
+        </div>
         <FontAwesomeIcon icon={faPlayCircle} className="card-video-play" />
         <div className="card-img-overlay-text">
           <div>

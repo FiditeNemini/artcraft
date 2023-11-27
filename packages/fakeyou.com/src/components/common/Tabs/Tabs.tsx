@@ -2,11 +2,14 @@ import React, { useEffect, useState } from "react";
 import { NavLink, useLocation } from "react-router-dom";
 import { useSpring, a } from "@react-spring/web";
 import "./Tabs.scss";
+import { IconDefinition } from "@fortawesome/fontawesome-svg-core";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 interface TabProps {
   to: string;
   label: string;
   content?: React.ReactNode;
+  icon?: IconDefinition;
 }
 
 interface TabsProps {
@@ -17,7 +20,7 @@ interface TabContentProps {
   children: React.ReactNode;
 }
 
-function Tab({ to, label, onClick }: TabProps & { onClick: () => void }) {
+function Tab({ to, label, icon, onClick }: TabProps & { onClick: () => void }) {
   return (
     <li className="nav-item">
       <NavLink
@@ -26,6 +29,7 @@ function Tab({ to, label, onClick }: TabProps & { onClick: () => void }) {
         activeClassName="active"
         onClick={onClick}
       >
+        {icon && <FontAwesomeIcon icon={icon} className="me-2" />}
         {label}
       </NavLink>
     </li>
@@ -70,6 +74,7 @@ function Tabs({ tabs }: TabsProps) {
             to={tab.to}
             label={tab.label}
             onClick={() => handleTabClick(tab.to)}
+            icon={tab.icon}
           />
         ))}
       </ul>

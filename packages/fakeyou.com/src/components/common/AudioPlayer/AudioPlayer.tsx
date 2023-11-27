@@ -3,15 +3,21 @@ import WaveSurfer from "wavesurfer.js";
 import { BucketConfig } from "@storyteller/components/src/api/BucketConfig";
 import { faPlay, faPause } from "@fortawesome/pro-solid-svg-icons";
 import Button from "components/common/Button";
+import "./AudioPlayer.scss";
+import { useAudioPlayerContext } from "./AudioPlayerContext";
+import useOnScreen from "hooks/useOnScreen";
 
 interface AudioPlayerProps {
   src: string;
+  id: string;
 }
 
-export default function AudioPlayer({ src }: AudioPlayerProps) {
+export default function AudioPlayer({ src, id }: AudioPlayerProps) {
+  const { currentPlayingId, setCurrentPlayingId } = useAudioPlayerContext();
   const [isPlaying, setIsPlaying] = useState(false);
   const waveformRef = useRef<HTMLDivElement | null>(null);
   const waveSurferRef = useRef<WaveSurfer | null>(null);
+  const isPlayerOnScreen = useOnScreen(waveformRef); //This stops the audio from playing when the player is not on screen
 
   useEffect(() => {
     const audioLink = new BucketConfig().getGcsUrl(src);
@@ -38,6 +44,7 @@ export default function AudioPlayer({ src }: AudioPlayerProps) {
 
       waveSurferRef.current.on("play", () => {
         setIsPlaying(true);
+        setCurrentPlayingId(id);
       });
 
       waveSurferRef.current.on("finish", () => {
@@ -51,10 +58,26 @@ export default function AudioPlayer({ src }: AudioPlayerProps) {
         waveSurferRef.current.destroy();
       }
     };
-  }, [src]);
+  }, [src, setCurrentPlayingId, id]);
+
+  useEffect(() => {
+    if (currentPlayingId !== id && isPlaying) {
+      setIsPlaying(false);
+      waveSurferRef.current?.pause();
+    }
+  }, [currentPlayingId, id, isPlaying]);
+
+  useEffect(() => {
+    if (!isPlayerOnScreen && isPlaying) {
+      waveSurferRef.current?.pause();
+    }
+  }, [isPlayerOnScreen, isPlaying]);
 
   const togglePlayPause = () => {
     if (waveSurferRef.current) {
+      if (!isPlaying) {
+        setCurrentPlayingId(id);
+      }
       waveSurferRef.current.playPause();
     }
   };
