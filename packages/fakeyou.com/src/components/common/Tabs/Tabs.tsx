@@ -61,6 +61,9 @@ function Tabs({ tabs }: TabsProps) {
   }, [currentPath]);
 
   const handleTabClick = (tabTo: string) => {
+    if (activeTab === tabTo) {
+      return;
+    }
     setFade({ opacity: 0 });
     setTimeout(() => setActiveTab(tabTo), 50);
   };
