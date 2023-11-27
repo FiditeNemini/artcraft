@@ -47,17 +47,9 @@ mod tests {
 
     pub async fn delete_all_weights_for_table(mysql_pool: &MySqlPool) -> AnyhowResult<()> {
         // write a query that deletes all weights
-        let _r = sqlx
-            ::query(
-                r#"
-    UPDATE model_weights
-    SET
-      user_deleted_at = CURRENT_TIMESTAMP
-    WHERE
-      user_deleted_at IS NULL
-            "#
-            )
-            .execute(mysql_pool).await?;
+        let _r = sqlx::query("DELETE FROM model_weights")
+        .execute(mysql_pool)
+        .await?;
         Ok(())
     }
 
@@ -337,7 +329,10 @@ mod tests {
                 WeightsCategory::ImageGeneration
             };
 
-            let model_weight_token = ModelWeightToken(i.to_string());
+            let mut rng = rand::thread_rng();
+            let number: u32 = rng.gen();
+
+            let model_weight_token = ModelWeightToken(number.to_string());
                  
             let args = CreateModelWeightsArgs {
                 token: &model_weight_token, // replace with actual ModelWeightToken
@@ -375,7 +370,8 @@ mod tests {
             .weights_category(WeightsCategory::TextToSpeech)
             .scope_creator_username(Some("hanashi"))
             .include_user_deleted_results(false);
-        
+
+
         let result = qb.perform_query_for_page(&pool).await?;
 
         assert_eq!(result.weights.len(), 1);

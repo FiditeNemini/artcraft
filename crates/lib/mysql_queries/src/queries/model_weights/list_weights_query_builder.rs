@@ -289,7 +289,7 @@ impl ListWeightsQueryBuilder {
             users.email_gravatar_hash AS creator_email_gravatar_hash
         FROM model_weights 
         JOIN users
-            ON users.token = mw.maybe_creator_user_token
+            ON users.token = model_weights.creator_user_token
         "#.to_string();
 
         query.push_str(&self.build_predicates());
@@ -475,7 +475,6 @@ mod tests {
     fn predicates_scoped_to_user() {
         let query_builder = ListWeightsQueryBuilder::new()
             .scope_creator_username(Some("echelon"));
-        println!("Query HERE! {}", &query_builder.build_predicates());
         assert_eq!(&query_builder.build_predicates(),
                    " WHERE users.username = ? \
       AND model_weights.creator_set_visibility = 'public' \
@@ -489,7 +488,6 @@ mod tests {
     fn predicates_scoped_to_weights_type() {
         let query_builder = ListWeightsQueryBuilder::new()
             .weights_type(WeightsType::RvcV2);
-        println!("Query HERE! {}", &query_builder.build_predicates());
         assert_eq!(&query_builder.build_predicates(),
                    " WHERE model_weights.weights_type = ? \
       AND model_weights.creator_set_visibility = 'public' \
