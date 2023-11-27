@@ -33,7 +33,7 @@ export default function VideoCard({ data }: VideoCardProps) {
       <img
         src={data.public_bucket_path}
         alt={data.weight_name}
-        className="card-img"
+        className="card-video"
       />
       <div className="card-img-overlay">
         <div className="card-img-gradient" />

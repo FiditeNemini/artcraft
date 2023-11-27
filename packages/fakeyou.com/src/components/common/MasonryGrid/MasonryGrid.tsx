@@ -1,16 +1,27 @@
 import Masonry from "masonry-layout"; //Refer to: https://github.com/desandro/masonry
 import imagesLoaded from "imagesloaded"; //Refer to: https://github.com/desandro/imagesloaded
-import React, { useEffect, useRef } from "react";
+import React, { useEffect } from "react";
 
 interface MasonryGridProps {
   children: React.ReactNode;
+  onLayoutComplete?: () => void;
+  gridRef: React.RefObject<HTMLDivElement>;
 }
 
-export default function MasonryGrid({ children }: MasonryGridProps) {
-  const gridRef = useRef<HTMLDivElement>(null);
-
+export default function MasonryGrid({
+  children,
+  onLayoutComplete,
+  gridRef,
+}: MasonryGridProps) {
   useEffect(() => {
     let masonryInstance: Masonry | null = null;
+
+    const updateLayout = () => {
+      //Needs this type guard to check that it is not undefined.
+      if (masonryInstance && typeof masonryInstance.layout === "function") {
+        masonryInstance.layout();
+      }
+    };
 
     if (gridRef.current) {
       masonryInstance = new Masonry(gridRef.current, {
@@ -20,10 +31,8 @@ export default function MasonryGrid({ children }: MasonryGridProps) {
 
       //Needs this or images will overflow masonry card. It checks if image is loaded then after it is loaded, it resizes the card.
       imagesLoaded(gridRef.current, function () {
-        //Needs this type guard to check that it is not undefined.
-        if (masonryInstance && typeof masonryInstance.layout === "function") {
-          masonryInstance.layout();
-        }
+        updateLayout();
+        onLayoutComplete?.();
       });
     }
 
@@ -33,7 +42,7 @@ export default function MasonryGrid({ children }: MasonryGridProps) {
         masonryInstance.destroy();
       }
     };
-  }, []);
+  }, [gridRef, onLayoutComplete]);
 
   return (
     <div
