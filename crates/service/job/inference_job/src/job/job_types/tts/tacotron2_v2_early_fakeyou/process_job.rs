@@ -25,7 +25,8 @@ use crate::job::job_loop::job_success_result::{JobSuccessResult, ResultEntity};
 use crate::job::job_loop::process_single_job_error::ProcessSingleJobError;
 use crate::job::job_types::tts::tacotron2_v2_early_fakeyou::download_static_dependencies::download_static_dependencies;
 use crate::job::job_types::tts::tacotron2_v2_early_fakeyou::seconds_to_decoder_steps::seconds_to_decoder_steps;
-use crate::job::job_types::tts::tacotron2_v2_early_fakeyou::tacotron2_inference_command::{InferenceArgs, MelMultiplyFactor, VocoderForInferenceOption};
+use crate::job::job_types::tts::tacotron2_v2_early_fakeyou::tacotron2_inference_command::{InferenceArgs, MelMultiplyFactor};
+use crate::job::job_types::tts::tacotron2_v2_early_fakeyou::vocoder_option::VocoderForInferenceOption;
 use crate::job_dependencies::JobDependencies;
 use crate::util::maybe_download_file_from_bucket::maybe_download_file_from_bucket;
 
@@ -198,7 +199,6 @@ pub async fn process_job(args: ProcessJobArgs<'_>) -> Result<JobSuccessResult, P
 
   // ==================== RUN INFERENCE SCRIPT ==================== //
 
-
   let mut maybe_mel_multiply_factor = None;
 
   if let Some(factor) = tts_model.maybe_custom_mel_multiply_factor {
@@ -207,19 +207,38 @@ pub async fn process_job(args: ProcessJobArgs<'_>) -> Result<JobSuccessResult, P
     maybe_mel_multiply_factor = Some(MelMultiplyFactor::DefaultMultiplyFactor);
   }
 
+  // TODO(bt,2023-11-27): Handle LRU cache on python side
+  let maybe_unload_model_path = None;
+
   let inference_start_time = Instant::now();
 
-  let _r = model_dependencies.inference_command.execute_inference(InferenceArgs {
-    synthesizer_checkpoint_path: &tts_synthesizer_fs_path,
-    text_pipeline_type: text_pipeline_type_or_guess.to_str(),
-    vocoder: vocoder_option,
-    maybe_mel_multiply_factor,
-    max_decoder_steps,
-    input_text_filename: &text_input_fs_path,
-    output_audio_filename: &output_audio_fs_path,
-    output_spectrogram_filename: &output_spectrogram_fs_path,
-    output_metadata_filename: &output_metadata_fs_path,
-  });
+  if model_dependencies.sidecar.use_sidecar_instead_of_shell {
+    let _r = model_dependencies.sidecar.inference_client.request_inference(
+      &cleaned_inference_text,
+      max_decoder_steps,
+      &tts_synthesizer_fs_path,
+      &text_pipeline_type_or_guess.to_str(),
+      vocoder_option,
+      &output_audio_fs_path,
+      &output_spectrogram_fs_path,
+      &output_metadata_fs_path,
+      maybe_unload_model_path,
+      tts_model.use_default_mel_multiply_factor,
+      tts_model.maybe_custom_mel_multiply_factor,
+    ).await.map_err(|e| ProcessSingleJobError::Other(e))?;
+  } else {
+    let _r = model_dependencies.inference_command.execute_inference(InferenceArgs {
+      synthesizer_checkpoint_path: &tts_synthesizer_fs_path,
+      text_pipeline_type: text_pipeline_type_or_guess.to_str(),
+      vocoder: vocoder_option,
+      maybe_mel_multiply_factor,
+      max_decoder_steps,
+      input_text_filename: &text_input_fs_path,
+      output_audio_filename: &output_audio_fs_path,
+      output_spectrogram_filename: &output_spectrogram_fs_path,
+      output_metadata_filename: &output_metadata_fs_path,
+    });
+  }
 
   let inference_duration = Instant::now().duration_since(inference_start_time);
 

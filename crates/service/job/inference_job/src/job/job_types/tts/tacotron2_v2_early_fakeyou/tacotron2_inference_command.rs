@@ -3,10 +3,11 @@ use std::path::{Path, PathBuf};
 use log::info;
 use subprocess::{Popen, PopenConfig};
 
+use errors::AnyhowResult;
 use filesys::path_to_string::path_to_string;
 use subprocess_common::docker_options::{DockerFilesystemMount, DockerGpu, DockerOptions};
 
-use crate::AnyhowResult;
+use crate::job::job_types::tts::tacotron2_v2_early_fakeyou::vocoder_option::VocoderForInferenceOption;
 
 /// This command is used to run tacotron2 (v1 "early fakeyou") inference
 #[derive(Clone)]
@@ -25,17 +26,6 @@ pub struct Tacotron2InferenceCommand {
 
   /// If this is run under Docker (eg. in development), these are the options.
   maybe_docker_options: Option<DockerOptions>,
-}
-
-#[derive(Clone)]
-pub enum VocoderForInferenceOption<P: AsRef<Path>> {
-  Waveglow {
-    waveglow_vocoder_checkpoint_path: P,
-  },
-  HifiganSuperres {
-    hifigan_vocoder_checkpoint_path: P,
-    hifigan_superres_vocoder_checkpoint_path: P,
-  }
 }
 
 pub enum MelMultiplyFactor {

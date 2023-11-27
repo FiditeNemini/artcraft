@@ -6,7 +6,10 @@ use hyper::client::Client;
 use log::info;
 
 use container_common::anyhow_result::AnyhowResult;
+use filesys::path_to_string::path_to_string;
 use mysql_queries::column_types::vocoder_type::VocoderType;
+
+use crate::job::job_types::tts::tacotron2_v2_early_fakeyou::vocoder_option::VocoderForInferenceOption;
 
 /// This is used to talk to the TT2 Python HTTP sidecar (rather than shelling out over bash).
 /// This keeps models loaded in memory and results in faster inference time.
@@ -67,11 +70,8 @@ impl Tacotron2InferenceSidecarClient {
     raw_text: &str,
     max_decoder_steps: u32,
     synthesizer_checkpoint_path: P,
-    vocoder_type: VocoderType,
     text_pipeline_type: &str,
-    hifigan_vocoder_checkpoint_path: P,
-    hifigan_superres_vocoder_checkpoint_path: P,
-    waveglow_vocoder_checkpoint_path: P,
+    vocoder_option: VocoderForInferenceOption<P>,
     output_audio_filename: P,
     output_spectrogram_filename: P,
     output_metadata_filename: P,
@@ -80,23 +80,30 @@ impl Tacotron2InferenceSidecarClient {
     maybe_custom_mel_multiply_factor: Option<f64>,
   ) -> AnyhowResult<()> {
 
-    let waveglow_vocoder_checkpoint_path = waveglow_vocoder_checkpoint_path
-        .as_ref()
-        .to_str()
-        .map(|s| s.to_string())
-        .ok_or(anyhow!("bad waveglow vocoder path"))?;
+    // TODO(bt,2023-11-26): Clean this mutability / multi-configuration up
+    let vocoder_type;
 
-    let hifigan_vocoder_checkpoint_path = hifigan_vocoder_checkpoint_path
-        .as_ref()
-        .to_str()
-        .map(|s| s.to_string())
-        .ok_or(anyhow!("bad hifigan vocoder path"))?;
+    let waveglow_vocoder_checkpoint_path;
+    let hifigan_vocoder_checkpoint_path;
+    let hifigan_superres_vocoder_checkpoint_path;
 
-    let hifigan_superres_vocoder_checkpoint_path = hifigan_superres_vocoder_checkpoint_path
-        .as_ref()
-        .to_str()
-        .map(|s| s.to_string())
-        .ok_or(anyhow!("bad hifigan super resolution vocoder path"))?;
+    match vocoder_option {
+      VocoderForInferenceOption::Waveglow { waveglow_vocoder_checkpoint_path : path } => {
+        vocoder_type = VocoderType::WaveGlow;
+        waveglow_vocoder_checkpoint_path = path_to_string(path.as_ref());
+        hifigan_vocoder_checkpoint_path = "BOGUS_NOT_USED".to_string();
+        hifigan_superres_vocoder_checkpoint_path = "BOGUS_NOT_USED".to_string();
+      }
+      VocoderForInferenceOption::HifiganSuperres {
+        hifigan_vocoder_checkpoint_path: path,
+        hifigan_superres_vocoder_checkpoint_path : super_res_path,
+      } => {
+        vocoder_type = VocoderType::HifiGanSuperResolution;
+        waveglow_vocoder_checkpoint_path = "BOGUS_NOT_USED".to_string();
+        hifigan_vocoder_checkpoint_path = path_to_string(path.as_ref());
+        hifigan_superres_vocoder_checkpoint_path = path_to_string(super_res_path.as_ref());
+      }
+    }
 
     let synthesizer_checkpoint_path = synthesizer_checkpoint_path
         .as_ref()

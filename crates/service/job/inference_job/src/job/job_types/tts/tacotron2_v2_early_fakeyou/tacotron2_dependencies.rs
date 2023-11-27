@@ -21,6 +21,7 @@ pub struct Tacotron2Dependencies {
 }
 
 pub struct SidecarDeps {
+  pub use_sidecar_instead_of_shell: bool,
   pub inference_client: Tacotron2InferenceSidecarClient,
   pub health_check_client: Tacotron2SidecarHealthCheckClient,
 }
@@ -56,6 +57,7 @@ impl Tacotron2Dependencies {
       hifigan_vocoder_model_filename,
       hifigan_superres_vocoder_model_filename,
       sidecar: SidecarDeps {
+        use_sidecar_instead_of_shell: true, // TODO: ENV VAR
         inference_client,
         health_check_client,
       }
