@@ -113,8 +113,8 @@ pub async fn delete_tts_inference_result_handler(
 
   // NB: Second set of permission checks
   let is_author = tts_inference_result.maybe_creator_user_token
-      .as_deref()
-      .map(|creator_token| creator_token == &user_session.user_token)
+      .as_ref()
+      .map(|creator_token| creator_token == &user_session.user_token_typed)
       .unwrap_or(false);
 
   let is_mod = user_session.can_delete_other_users_tts_results;
