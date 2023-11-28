@@ -118,8 +118,8 @@ pub async fn edit_tts_inference_result_handler(
 
   // NB: Second set of permission checks
   let mut is_author = false;
-  if let Some(creator_user_token) = inference_result.maybe_creator_user_token.as_deref() {
-    is_author = creator_user_token == &user_session.user_token;
+  if let Some(creator_user_token) = inference_result.maybe_creator_user_token.as_ref() {
+    is_author = creator_user_token == &user_session.user_token_typed;
   }
 
   if !is_author && !is_moderator {

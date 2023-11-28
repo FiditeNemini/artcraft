@@ -1,4 +1,5 @@
 use anyhow::anyhow;
+use log::warn;
 
 use enums::by_table::generic_inference_jobs::inference_model_type::InferenceModelType;
 use enums::by_table::tts_models::tts_model_type::TtsModelType;
@@ -33,8 +34,8 @@ pub async fn process_single_tts_job(
     Some(InferenceModelType::Tacotron2 | InferenceModelType::Vits) => {
       // All other TTS types require a fine-tuned TTS database record.
       let raw_inference_text = job.maybe_raw_inference_text
-      .as_deref()
-      .ok_or(ProcessSingleJobError::Other(anyhow!("no inference text")))?;
+        .as_deref()
+        .ok_or(ProcessSingleJobError::Other(anyhow!("no inference text")))?;
   
       dispatch_fine_tuned_weights_model(
         job_dependencies,
@@ -93,21 +94,38 @@ async fn dispatch_fine_tuned_weights_model(
   };
 
   match tts_model.tts_model_type {
-    TtsModelType::Tacotron2 => {
-      tacotron2_v2_early_fakeyou::process_job::process_job(ProcessJobArgs {
-          job_dependencies,
-          job,
-          tts_model: &tts_model,
-          raw_inference_text,
-      }).await
-    }
     TtsModelType::Vits => {
       vits::process_job::process_job(VitsProcessJobArgs {
+        job_dependencies,
+        job,
+        tts_model: &tts_model,
+        raw_inference_text,
+      }).await
+    }
+    TtsModelType::Tacotron2 => {
+      let result = tacotron2_v2_early_fakeyou::process_job::process_job(ProcessJobArgs {
           job_dependencies,
           job,
           tts_model: &tts_model,
           raw_inference_text,
-      }).await
+      }).await;
+
+      if let Err(err) = result.as_ref() {
+        warn!("Error with TT2 inference. Requiring health check next iteration: {:?}", err);
+        job_dependencies
+            .job
+            .job_specific_dependencies
+            .maybe_tacotron2_dependencies
+            .as_ref()
+            .map(|deps| {
+              deps.sidecar.health_check_state.mark_maybe_needs_health_check(true)
+                  .map_err(|err| {
+                    warn!("Error with health check status lock: {:?}", err);
+                  })
+            });
+      }
+
+      result
     }
   }
 }

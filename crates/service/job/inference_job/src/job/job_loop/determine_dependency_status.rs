@@ -1,5 +1,6 @@
+use std::path::PathBuf;
 use anyhow::anyhow;
-use log::warn;
+use log::{info, warn};
 
 use enums::by_table::generic_inference_jobs::inference_category::InferenceCategory;
 use enums::by_table::tts_models::tts_model_type::TtsModelType;
@@ -31,12 +32,36 @@ pub enum MaybeInferenceModel {
 }
 
 pub async fn determine_dependency_status(job_dependencies: &JobDependencies, job: &AvailableInferenceJob) -> AnyhowResult<DependencyStatus> {
-
   let maybe_model = get_model_record_from_cacheable_query(job_dependencies, job).await?;
+  let maybe_token_and_path = get_model_token_and_path(job_dependencies, &maybe_model);
 
+  let models_already_on_filesystem = match maybe_token_and_path.maybe_filesystem_path {
+    None => true,
+    Some(path) => {
+      info!("Checking if dynamic model dependency already on filesystem: {:?}", path);
+      let exists = file_exists(&path);
+      info!("Checking if dynamic model dependency already on filesystem: {:?} (exists = {})", path, exists);
+      exists
+    },
+  };
+
+  Ok(DependencyStatus {
+    maybe_inference_model: maybe_model,
+    maybe_model_token: maybe_token_and_path.maybe_model_token,
+    models_already_on_filesystem,
+  })
+}
+
+
+struct MaybeTokenAndPath {
+  maybe_model_token: Option<String>,
+  maybe_filesystem_path: Option<PathBuf>,
+}
+
+fn get_model_token_and_path(job_dependencies: &JobDependencies, maybe_model: &MaybeInferenceModel) -> MaybeTokenAndPath {
   let mut maybe_model_token = None;
 
-  // TODO: Also check other paths (vocoders, etc.)
+  // TODO(bt,2023-05-01): Also check other paths (user-supplied vocoders, etc.)
   let maybe_filesystem_path = match maybe_model {
     MaybeInferenceModel::TtsModel(ref model) => {
       match model.tts_model_type {
@@ -74,19 +99,13 @@ pub async fn determine_dependency_status(job_dependencies: &JobDependencies, job
     }
   };
 
-  let models_already_on_filesystem = match maybe_filesystem_path {
-    None => true,
-    Some(path) => file_exists(path),
-  };
-
-  Ok(DependencyStatus {
-    maybe_inference_model: maybe_model,
+  MaybeTokenAndPath {
     maybe_model_token,
-    models_already_on_filesystem,
-  })
+    maybe_filesystem_path,
+  }
 }
 
-pub async fn get_model_record_from_cacheable_query(job_dependencies: &JobDependencies, job: &AvailableInferenceJob) -> AnyhowResult<MaybeInferenceModel> {
+async fn get_model_record_from_cacheable_query(job_dependencies: &JobDependencies, job: &AvailableInferenceJob) -> AnyhowResult<MaybeInferenceModel> {
   let model = match (job.inference_category, job.maybe_model_token.as_deref()) {
     (InferenceCategory::TextToSpeech, Some(token)) => {
       let maybe_model = job_dependencies.job.info.caches.tts_model_record_cache.copy_without_bump_if_unexpired(token.to_string())?;

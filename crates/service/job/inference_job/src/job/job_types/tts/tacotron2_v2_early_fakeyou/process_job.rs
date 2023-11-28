@@ -23,8 +23,11 @@ use tts_common::text_pipelines::text_pipeline_type::TextPipelineType;
 
 use crate::job::job_loop::job_success_result::{JobSuccessResult, ResultEntity};
 use crate::job::job_loop::process_single_job_error::ProcessSingleJobError;
+use crate::job::job_types::tts::tacotron2_v2_early_fakeyou::download_static_dependencies::download_static_dependencies;
+use crate::job::job_types::tts::tacotron2_v2_early_fakeyou::health_check_trap::maybe_block_on_sidecar_health_check;
 use crate::job::job_types::tts::tacotron2_v2_early_fakeyou::seconds_to_decoder_steps::seconds_to_decoder_steps;
-use crate::job::job_types::tts::tacotron2_v2_early_fakeyou::tacotron2_inference_command::{InferenceArgs, MelMultiplyFactor, VocoderForInferenceOption};
+use crate::job::job_types::tts::tacotron2_v2_early_fakeyou::tacotron2_inference_command::{InferenceArgs, MelMultiplyFactor};
+use crate::job::job_types::tts::tacotron2_v2_early_fakeyou::vocoder_option::VocoderForInferenceOption;
 use crate::job_dependencies::JobDependencies;
 use crate::util::maybe_download_file_from_bucket::maybe_download_file_from_bucket;
 
@@ -58,71 +61,29 @@ pub async fn process_job(args: ProcessJobArgs<'_>) -> Result<JobSuccessResult, P
       .as_ref()
       .ok_or_else(|| ProcessSingleJobError::JobSystemMisconfiguration(Some("missing Tacotron2 dependencies".to_string())))?;
 
-  // ==================== CONFIRM OR DOWNLOAD WAVEGLOW VOCODER MODEL ==================== //
+  // ==================== OPTIONAL SIDECAR HEALTH CHECK ==================== //
 
-  let waveglow_vocoder_model_fs_path = {
-    // TODO(bt,2023-11-21): Port this to the common downloader code.
-    let waveglow_vocoder_model_filename = model_dependencies.waveglow_vocoder_model_filename.clone();
-    let waveglow_vocoder_model_fs_path = args.job_dependencies.fs.semi_persistent_cache.tts_pretrained_vocoder_model_path(&waveglow_vocoder_model_filename);
-    let waveglow_vocoder_model_object_path = args.job_dependencies.buckets.bucket_path_unifier.tts_pretrained_vocoders_path(&waveglow_vocoder_model_filename);
+  // TODO(bt,2023-11-28): Ideally we'd perform health checks before grabbing a lock on the job.
+  let maybe_needs_health_check =
+      model_dependencies.sidecar.use_sidecar_instead_of_shell &&
+          model_dependencies.sidecar.health_check_state.needs_health_check()
+              .map_err(|e| ProcessSingleJobError::Other(anyhow!(e)))?;
 
-    maybe_download_file_from_bucket(
-      "waveglow vocoder model",
-      &waveglow_vocoder_model_fs_path,
-      &waveglow_vocoder_model_object_path,
-      &args.job_dependencies.buckets.private_bucket_client,
-      &mut job_progress_reporter,
-      "downloading vocoder (1 of 3)",
-      job.id.0,
-      &args.job_dependencies.fs.scoped_temp_dir_creator_for_downloads,
-    ).await?;
+  if maybe_needs_health_check {
+    maybe_block_on_sidecar_health_check(&model_dependencies.sidecar.health_check_client).await;
 
-    waveglow_vocoder_model_fs_path
-  };
+    model_dependencies.sidecar.health_check_state.mark_maybe_needs_health_check(false)
+        .map_err(|e| ProcessSingleJobError::Other(anyhow!(e)))?;
+  }
 
-  // ==================== CONFIRM OR DOWNLOAD HIFIGAN (NORMAL) VOCODER MODEL ==================== //
+  // ==================== CONFIRM OR DOWNLOAD STATIC DEPENDENCIES ==================== //
 
-  let pretrained_hifigan_vocoder_model_fs_path = {
-    // TODO(bt,2023-11-21): Port this to the common downloader code.
-    let hifigan_vocoder_model_filename = model_dependencies.hifigan_vocoder_model_filename.clone();
-    let hifigan_vocoder_model_fs_path = args.job_dependencies.fs.semi_persistent_cache.tts_pretrained_vocoder_model_path(&hifigan_vocoder_model_filename);
-    let hifigan_vocoder_model_object_path = args.job_dependencies.buckets.bucket_path_unifier.tts_pretrained_vocoders_path(&hifigan_vocoder_model_filename);
-
-    maybe_download_file_from_bucket(
-      "hifigan vocoder model",
-      &hifigan_vocoder_model_fs_path,
-      &hifigan_vocoder_model_object_path,
-      &args.job_dependencies.buckets.private_bucket_client,
-      &mut job_progress_reporter,
-      "downloading vocoder (2 of 3)",
-      job.id.0,
-      &args.job_dependencies.fs.scoped_temp_dir_creator_for_downloads,
-    ).await?;
-
-    hifigan_vocoder_model_fs_path
-  };
-
-  // ==================== CONFIRM OR DOWNLOAD HIFIGAN (SUPERRES) VOCODER MODEL ==================== //
-
-  let hifigan_superres_vocoder_model_fs_path = {
-    // TODO(bt,2023-11-21): Port this to the common downloader code.
-    let hifigan_superres_vocoder_model_filename = model_dependencies.hifigan_superres_vocoder_model_filename.clone();
-    let hifigan_superres_vocoder_model_fs_path = args.job_dependencies.fs.semi_persistent_cache.tts_pretrained_vocoder_model_path(&hifigan_superres_vocoder_model_filename);
-    let hifigan_superres_vocoder_model_object_path = args.job_dependencies.buckets.bucket_path_unifier.tts_pretrained_vocoders_path(&hifigan_superres_vocoder_model_filename);
-
-    maybe_download_file_from_bucket(
-      "hifigan superres vocoder model",
-      &hifigan_superres_vocoder_model_fs_path,
-      &hifigan_superres_vocoder_model_object_path,
-      &args.job_dependencies.buckets.private_bucket_client,
-      &mut job_progress_reporter,
-      "downloading vocoder (3 of 3)",
-      job.id.0,
-      &args.job_dependencies.fs.scoped_temp_dir_creator_for_downloads,
-    ).await?;
-
-    hifigan_superres_vocoder_model_fs_path
-  };
+  let static_deps = download_static_dependencies(
+    &args.job_dependencies,
+    &job,
+    &model_dependencies,
+    &mut job_progress_reporter,
+  ).await?;
 
   // ==================== CONFIRM OR DOWNLOAD OPTIONAL CUSTOM VOCODER MODEL ==================== //
 
@@ -214,13 +175,13 @@ pub async fn process_job(args: ProcessJobArgs<'_>) -> Result<JobSuccessResult, P
     // We most likely will *not* use WaveGlow.
     VocoderType::WaveGlow => {
       VocoderForInferenceOption::Waveglow {
-        waveglow_vocoder_checkpoint_path: &waveglow_vocoder_model_fs_path
+        waveglow_vocoder_checkpoint_path: &static_deps.waveglow_vocoder_model_fs_path
       }
     }
     VocoderType::HifiGanSuperResolution => {
       VocoderForInferenceOption::HifiganSuperres {
-        hifigan_vocoder_checkpoint_path: &pretrained_hifigan_vocoder_model_fs_path,
-        hifigan_superres_vocoder_checkpoint_path: &hifigan_superres_vocoder_model_fs_path,
+        hifigan_vocoder_checkpoint_path: &static_deps.pretrained_hifigan_vocoder_model_fs_path,
+        hifigan_superres_vocoder_checkpoint_path: &static_deps.hifigan_superres_vocoder_model_fs_path,
       }
     }
   };
@@ -229,7 +190,7 @@ pub async fn process_job(args: ProcessJobArgs<'_>) -> Result<JobSuccessResult, P
       info!("using custom user-trained HiFi-GAN vocoder: {:?}", custom_vocoder_fs_path);
       vocoder_option = VocoderForInferenceOption::HifiganSuperres {
         hifigan_vocoder_checkpoint_path: custom_vocoder_path,
-        hifigan_superres_vocoder_checkpoint_path: &hifigan_superres_vocoder_model_fs_path,
+        hifigan_superres_vocoder_checkpoint_path: &static_deps.hifigan_superres_vocoder_model_fs_path,
       };
   };
 
@@ -249,7 +210,6 @@ pub async fn process_job(args: ProcessJobArgs<'_>) -> Result<JobSuccessResult, P
 
   // ==================== RUN INFERENCE SCRIPT ==================== //
 
-
   let mut maybe_mel_multiply_factor = None;
 
   if let Some(factor) = tts_model.maybe_custom_mel_multiply_factor {
@@ -258,19 +218,38 @@ pub async fn process_job(args: ProcessJobArgs<'_>) -> Result<JobSuccessResult, P
     maybe_mel_multiply_factor = Some(MelMultiplyFactor::DefaultMultiplyFactor);
   }
 
+  // TODO(bt,2023-11-27): Handle LRU cache on python side
+  let maybe_unload_model_path = None;
+
   let inference_start_time = Instant::now();
 
-  let _r = model_dependencies.inference_command.execute_inference(InferenceArgs {
-    synthesizer_checkpoint_path: &tts_synthesizer_fs_path,
-    text_pipeline_type: text_pipeline_type_or_guess.to_str(),
-    vocoder: vocoder_option,
-    maybe_mel_multiply_factor,
-    max_decoder_steps,
-    input_text_filename: &text_input_fs_path,
-    output_audio_filename: &output_audio_fs_path,
-    output_spectrogram_filename: &output_spectrogram_fs_path,
-    output_metadata_filename: &output_metadata_fs_path,
-  });
+  if model_dependencies.sidecar.use_sidecar_instead_of_shell {
+    let _r = model_dependencies.sidecar.inference_client.request_inference(
+      &cleaned_inference_text,
+      max_decoder_steps,
+      &tts_synthesizer_fs_path,
+      &text_pipeline_type_or_guess.to_str(),
+      vocoder_option,
+      &output_audio_fs_path,
+      &output_spectrogram_fs_path,
+      &output_metadata_fs_path,
+      maybe_unload_model_path,
+      tts_model.use_default_mel_multiply_factor,
+      tts_model.maybe_custom_mel_multiply_factor,
+    ).await.map_err(|e| ProcessSingleJobError::Other(e))?;
+  } else {
+    let _r = model_dependencies.inference_command.execute_inference(InferenceArgs {
+      synthesizer_checkpoint_path: &tts_synthesizer_fs_path,
+      text_pipeline_type: text_pipeline_type_or_guess.to_str(),
+      vocoder: vocoder_option,
+      maybe_mel_multiply_factor,
+      max_decoder_steps,
+      input_text_filename: &text_input_fs_path,
+      output_audio_filename: &output_audio_fs_path,
+      output_spectrogram_filename: &output_spectrogram_fs_path,
+      output_metadata_filename: &output_metadata_fs_path,
+    });
+  }
 
   let inference_duration = Instant::now().duration_since(inference_start_time);
 
