@@ -5,14 +5,21 @@ use sqlx::mysql::MySqlPoolOptions;
 use config::shared_constants::{DEFAULT_MYSQL_CONNECTION_STRING, DEFAULT_RUST_LOG};
 use errors::AnyhowResult;
 
+
+use crate::seeding::model_weights::seed_weights;
+use crate::seeding::model_weights::seed_weights_for_user_token;
+
 use crate::bucket_clients::get_bucket_clients;
 use crate::cli_args::parse_cli_args;
 use crate::seeding::tts_tacotron2::seed_tts_tacotron2;
+
 use crate::seeding::users::seed_user_accounts;
 use crate::seeding::voice_conversion::seed_voice_conversion;
 use crate::seeding::zero_shot_tts::seed_zero_shot_tts;
 
+
 pub mod bucket_clients;
+
 pub mod cli_args;
 pub mod seeding;
 
@@ -52,6 +59,10 @@ pub async fn main() -> AnyhowResult<()> {
   seed_user_accounts(&pool).await?;
   seed_zero_shot_tts(&pool, maybe_bucket_clients.as_ref()).await?;
   seed_voice_conversion(&pool).await?;
+
+  seed_weights(&pool).await?;
+  
+
   seed_tts_tacotron2(&pool, maybe_bucket_clients.as_ref()).await?;
 
   info!("Done!");

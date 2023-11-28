@@ -23,3 +23,6 @@ pub mod voice_clone_requests;
 pub mod voice_conversion;
 pub mod voice_designer;
 pub mod w2l;
+pub mod model_weights;
+
+

@@ -37,6 +37,9 @@ pub enum IdCategory {
   /// Zs voice which lives in the zs_voices table
   #[serde(rename = "zs_voice")]
   ZeroShotVoiceEmbedding,
+
+  #[serde(rename = "model_weights")]
+  ModelWeights,
 }
 
 // TODO(bt, 2022-12-21): This desperately needs MySQL integration tests!
@@ -53,6 +56,7 @@ impl IdCategory {
       Self::ZeroShotVoiceDataset => "zs_dataset",
       Self::ZeroShotVoiceEmbedding => "zs_voice",
       Self::ZeroShotTtsResult => "zs_tts_result",
+      Self::ModelWeights => "model_weights",
     }
   }
 
@@ -64,6 +68,7 @@ impl IdCategory {
       "zs_dataset" => Ok(Self::ZeroShotVoiceDataset),
       "zs_voice" => Ok(Self::ZeroShotVoiceEmbedding),
       "zs_tts_result" => Ok(Self::ZeroShotTtsResult),
+      "model_weights" => Ok(Self::ModelWeights),
       _ => Err(format!("invalid value: {:?}", value)),
     }
   }
@@ -78,6 +83,7 @@ impl IdCategory {
       Self::ZeroShotTtsResult,
       Self::ZeroShotVoiceDataset,
       Self::ZeroShotVoiceEmbedding,
+      Self::ModelWeights,
     ])
   }
 }
@@ -98,6 +104,7 @@ mod tests {
     assert_serialization(IdCategory::ZeroShotVoiceDataset, "zs_dataset");
     assert_serialization(IdCategory::ZeroShotVoiceEmbedding, "zs_voice");
     assert_serialization(IdCategory::ZeroShotTtsResult, "zs_tts_result");
+    assert_serialization(IdCategory::ModelWeights, "model_weights")
   }
 
     #[test]
@@ -108,6 +115,7 @@ mod tests {
       assert_eq!(IdCategory::ZeroShotVoiceDataset.to_str(), "zs_dataset");
       assert_eq!(IdCategory::ZeroShotVoiceEmbedding.to_str(), "zs_voice");
       assert_eq!(IdCategory::ZeroShotTtsResult.to_str(), "zs_tts_result");
+      assert_eq!(IdCategory::ModelWeights.to_str(), "model_weights");
     }
 
     #[test]
@@ -118,6 +126,7 @@ mod tests {
       assert_eq!(IdCategory::from_str("zs_dataset").unwrap(), IdCategory::ZeroShotVoiceDataset);
       assert_eq!(IdCategory::from_str("zs_voice").unwrap(), IdCategory::ZeroShotVoiceEmbedding);
       assert_eq!(IdCategory::from_str("zs_tts_result").unwrap(), IdCategory::ZeroShotTtsResult);
+      assert_eq!(IdCategory::from_str("model_weights").unwrap(), IdCategory::ModelWeights);
     }
 
     #[test]
@@ -131,6 +140,7 @@ mod tests {
       assert_eq!(variants.pop_first(), Some(IdCategory::ZeroShotTtsResult));
       assert_eq!(variants.pop_first(), Some(IdCategory::ZeroShotVoiceDataset));
       assert_eq!(variants.pop_first(), Some(IdCategory::ZeroShotVoiceEmbedding));
+      assert_eq!(variants.pop_first(), Some(IdCategory::ModelWeights));
       assert_eq!(variants.pop_first(), None);
 
       // Generated check

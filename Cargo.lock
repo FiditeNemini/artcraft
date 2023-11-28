@@ -3783,13 +3783,16 @@ dependencies = [
  "log",
  "my-workspace-hack",
  "once_cell",
+ "rand 0.8.5",
  "regex",
  "reusable_types",
  "serde",
  "serde_derive",
  "serde_json",
+ "serial_test",
  "sqlx",
  "tokens",
+ "tokio 1.34.0",
  "toml",
 ]
 
