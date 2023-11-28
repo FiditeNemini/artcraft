@@ -3,7 +3,7 @@
 .favorite-button {
   display: flex;
   align-items: center;
-  background-color: lighten($secondary, 3%);
+  background-color: rgba(lighten($secondary, 5%), 0.9);
   color: inherit;
   border: none;
   padding: 0;
@@ -15,8 +15,16 @@
   padding: 3px 8px;
   border-radius: 0.5rem;
 
+  &.shadow {
+    box-shadow: 0 0 12px rgba($bg, 0.4) !important;
+
+    &:hover {
+      box-shadow: 0 0 12px rgba($bg, 0.4) !important;
+    }
+  }
+
   &:hover {
-    background: lighten($secondary, 10%);
+    background: rgba(lighten($secondary, 10%), 0.9);
   }
 
   &:hover .favorite-number {
@@ -24,15 +32,18 @@
   }
 
   &:hover .icon-default {
-    color: $primary;
+    color: map-get($badge-colors, "yellow");
     opacity: 1;
   }
 
   &.toggled {
-    background-color: rgba($primary, 0.25);
+    background-color: darken(rgba(map-get($badge-colors, "yellow"), 0.9), 32%);
 
     &:hover {
-      background-color: darken(rgba($primary, 0.25), 5%);
+      background-color: darken(
+        rgba(map-get($badge-colors, "yellow"), 0.9),
+        25%
+      );
     }
   }
 }
@@ -44,12 +55,12 @@
 }
 
 .favorite-button .icon-toggled {
-  color: $primary;
+  color: map-get($badge-colors, "yellow");
   animation: pulse 0.3s ease;
 }
 
 .favorite-button .icon-toggled:hover {
-  color: $primary;
+  color: map-get($badge-colors, "yellow");
 }
 
 .favorite-number {

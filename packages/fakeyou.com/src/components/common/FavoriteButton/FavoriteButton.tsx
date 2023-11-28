@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faHeart } from "@fortawesome/pro-solid-svg-icons";
-import { faHeart as faHeartOutline } from "@fortawesome/pro-regular-svg-icons";
+import { faBookmark } from "@fortawesome/pro-solid-svg-icons";
+import { faBookmark as faBookmarkOutline } from "@fortawesome/pro-regular-svg-icons";
 import Tippy from "@tippyjs/react";
 import "tippy.js/dist/tippy.css";
 import "./FavoriteButton.scss";
@@ -9,13 +9,15 @@ import "./FavoriteButton.scss";
 interface FavoriteButtonProps {
   initialToggled?: boolean;
   onToggle: (toggled: boolean) => Promise<void>;
-  FavoriteCount?: number;
+  favoriteCount?: number;
+  overlay?: boolean;
 }
 
 export default function FavoriteButton({
   initialToggled = false,
   onToggle,
-  FavoriteCount,
+  favoriteCount,
+  overlay,
 }: FavoriteButtonProps) {
   const [isToggled, setIsToggled] = useState(initialToggled);
   const [isLoading, setIsLoading] = useState(false);
@@ -33,6 +35,7 @@ export default function FavoriteButton({
   };
 
   const buttonClass = isToggled ? "favorite-button toggled" : "favorite-button";
+  const buttonShadow = overlay ? "shadow" : "";
   const iconClass = isToggled ? "icon-toggled" : "icon-default";
   const toolTip = isToggled ? "Unfavorite" : "Favorite";
 
@@ -49,13 +52,13 @@ export default function FavoriteButton({
         <button
           onClick={handleClick}
           disabled={isLoading}
-          className={buttonClass}
+          className={`${buttonClass} ${buttonShadow}`}
         >
           <FontAwesomeIcon
-            icon={isToggled ? faHeart : faHeartOutline}
+            icon={isToggled ? faBookmark : faBookmarkOutline}
             className={`${iconClass} me-2`}
           />
-          {FavoriteCount && <p className="favorite-number">{FavoriteCount}</p>}
+          {favoriteCount && <p className="favorite-number">{favoriteCount}</p>}
         </button>
       </Tippy>
     </div>

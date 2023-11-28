@@ -48,6 +48,7 @@ export default function LikeButton({
         trigger="mouseenter"
         delay={[500, 0]}
         offset={[0, 12]}
+        placement="bottom"
       >
         <button
           onClick={handleClick}

@@ -35,6 +35,7 @@ import "tippy.js/dist/tippy.css";
 
 import { usePrefixedDocumentTitle } from "../../../../../common/UsePrefixedDocumentTitle";
 import {
+  faBookmark,
   faCalendarAlt,
   faLayerGroup,
   faPhotoFilmMusic,
@@ -45,6 +46,7 @@ import { Panel } from "components/common";
 import Container from "components/common/Container";
 import Tabs from "components/common/Tabs";
 import MediaTab from "./tabs/MediaTab";
+import WeightsTab from "./tabs/WeightsTab";
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -360,14 +362,14 @@ function NewProfilePage(this: any, props: Props) {
     {
       to: `/profile/${username}/weights`,
       label: "Weights",
-      content: <div>Weights</div>,
+      content: <WeightsTab />,
       icon: faLayerGroup,
     },
     {
-      to: `/profile/${username}/favorites`,
-      label: "Favorites",
-      content: <div>Favorites</div>,
-      icon: faStar,
+      to: `/profile/${username}/bookmarks`,
+      label: "Bookmarks",
+      content: <div>Bookmarks</div>,
+      icon: faBookmark,
     },
   ];
 

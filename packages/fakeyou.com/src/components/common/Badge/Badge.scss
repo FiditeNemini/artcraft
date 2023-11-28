@@ -19,23 +19,7 @@
   }
 }
 
-$colors: (
-  "gray": #5b7282,
-  "red": #d91f11,
-  "orange": #e86427,
-  "yellow": #f5c518,
-  "lime": #3c7d0e,
-  "green": #077d55,
-  "teal": #167b7d,
-  "turquoise": #067a91,
-  "aqua": #0073ba,
-  "blue": #186ade,
-  "ultramarine": #535fe8,
-  "purple": #8f49de,
-  "pink": #cc1d92,
-);
-
-@each $color, $value in $colors {
+@each $color, $value in $badge-colors {
   .badge-#{$color} {
     background-color: $value;
     color: contrast($value) !important;

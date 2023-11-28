@@ -1,4 +1,4 @@
-let mockData = [
+let mockMediaData = [
   {
     token: "token1",
     weight_name: "Queen Elizabeth",
@@ -381,4 +381,4 @@ let mockData = [
   },
 ];
 
-export default mockData;
+export default mockMediaData;
