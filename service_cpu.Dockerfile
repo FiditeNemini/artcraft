@@ -177,9 +177,11 @@ COPY --from=builder /tmp/target/release/email-sender-job  /
 COPY --from=builder /tmp/target/release/tts-download-job /
 COPY --from=builder /tmp/target/release/tts-inference-job /
 
+# NB(bt,2023-11-28): These still seem essential even after switching to rustls
 # SSL certs are required for crypto
 COPY --from=builder /etc/ssl /etc/ssl
 
+# NB(bt,2023-11-28): These still seem essential even after switching to rustls
 # Required dynamically linked libraries
 COPY --from=builder /usr/lib/x86_64-linux-gnu/libssl.*             /lib/x86_64-linux-gnu/
 COPY --from=builder /usr/lib/x86_64-linux-gnu/libcrypto.*          /lib/x86_64-linux-gnu/
