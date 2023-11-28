@@ -96,6 +96,7 @@ import { VoiceDesignerVoiceEditPage } from "./pages/voice_designer/VoiceDesigner
 import VoiceDesignerUseVoicePage from "./pages/voice_designer/VoiceDesignerUseVoicePage";
 import { PasswordResetEmailPage } from "./pages/password_reset/PasswordResetEmailPage";
 import { PasswordResetVerificationPage } from "./pages/password_reset/PasswordResetVerificationPage";
+import DevUpload from "./pages/dev-upload/DevUpload";
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -638,43 +639,44 @@ class PageContainer extends React.Component<
               <VocodesPage />
             </Route>
 
+            <Route path="/dev-upload">
+              <DevUpload />
+            </Route>
+
             {/* Route for initial voice creation */}
-            <Route
-              exact
-              path="/voice-designer/create"
-            >
-              <VoiceDesignerFormPage {...{
-                enqueueInferenceJob: this.props.enqueueInferenceJob,
-                sessionWrapper: this.props.sessionWrapper,
-                sessionSubscriptionsWrapper:
-                  this.props.sessionSubscriptionsWrapper
-              }}/>
+            <Route exact path="/voice-designer/create">
+              <VoiceDesignerFormPage
+                {...{
+                  enqueueInferenceJob: this.props.enqueueInferenceJob,
+                  sessionWrapper: this.props.sessionWrapper,
+                  sessionSubscriptionsWrapper:
+                    this.props.sessionSubscriptionsWrapper,
+                }}
+              />
             </Route>
 
             {/* Route for editing the dataset details */}
-            <Route
-              exact
-              path="/voice-designer/dataset/:dataset_token/edit"
-            >
-              <VoiceDesignerFormPage {...{
-                enqueueInferenceJob: this.props.enqueueInferenceJob,
-                sessionWrapper: this.props.sessionWrapper,
-                sessionSubscriptionsWrapper:
-                  this.props.sessionSubscriptionsWrapper
-              }}/>
+            <Route exact path="/voice-designer/dataset/:dataset_token/edit">
+              <VoiceDesignerFormPage
+                {...{
+                  enqueueInferenceJob: this.props.enqueueInferenceJob,
+                  sessionWrapper: this.props.sessionWrapper,
+                  sessionSubscriptionsWrapper:
+                    this.props.sessionSubscriptionsWrapper,
+                }}
+              />
             </Route>
 
             {/* Route for handling dataset token for uploading samples */}
-            <Route
-              exact
-              path="/voice-designer/dataset/:dataset_token/upload"
-             >
-              <VoiceDesignerFormPage {...{
-                enqueueInferenceJob: this.props.enqueueInferenceJob,
-                sessionWrapper: this.props.sessionWrapper,
-                sessionSubscriptionsWrapper:
-                  this.props.sessionSubscriptionsWrapper
-              }}/>
+            <Route exact path="/voice-designer/dataset/:dataset_token/upload">
+              <VoiceDesignerFormPage
+                {...{
+                  enqueueInferenceJob: this.props.enqueueInferenceJob,
+                  sessionWrapper: this.props.sessionWrapper,
+                  sessionSubscriptionsWrapper:
+                    this.props.sessionSubscriptionsWrapper,
+                }}
+              />
             </Route>
 
             <Route path="/voice-designer/voice/:voice_token/edit">
@@ -695,14 +697,16 @@ class PageContainer extends React.Component<
             </Route>
 
             <Route path="/voice-designer">
-              <VoiceDesignerMainPage {...{
-                sessionWrapper:this.props.sessionWrapper,
-                sessionSubscriptionsWrapper:
-                  this.props.sessionSubscriptionsWrapper,
-                enqueueInferenceJob: this.props.enqueueInferenceJob,
-                inferenceJobs: this.props.inferenceJobs,
-                inferenceJobsByCategory: this.props.inferenceJobsByCategory
-              }} />
+              <VoiceDesignerMainPage
+                {...{
+                  sessionWrapper: this.props.sessionWrapper,
+                  sessionSubscriptionsWrapper:
+                    this.props.sessionSubscriptionsWrapper,
+                  enqueueInferenceJob: this.props.enqueueInferenceJob,
+                  inferenceJobs: this.props.inferenceJobs,
+                  inferenceJobsByCategory: this.props.inferenceJobsByCategory,
+                }}
+              />
             </Route>
 
             <Route path="/generate-speech">
