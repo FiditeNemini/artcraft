@@ -5,7 +5,6 @@ use std::time::Instant;
 
 use anyhow::anyhow;
 use log::{error, info};
-use tempdir::TempDir;
 
 use container_common::filesystem::check_file_exists::check_file_exists;
 use container_common::filesystem::safe_delete_temp_directory::safe_delete_temp_directory;
@@ -85,6 +84,17 @@ pub async fn process_job(args: ProcessJobArgs<'_>) -> Result<JobSuccessResult, P
     &mut job_progress_reporter,
   ).await?;
 
+  // ==================== TEMP DIR ==================== //
+
+  let work_temp_dir = format!("temp_tt2_inference_{}", job.id.0);
+
+  // NB: TempDir exists until it goes out of scope, at which point it should delete from filesystem.
+  let work_temp_dir = args.job_dependencies
+      .fs
+      .scoped_temp_dir_creator_for_work
+      .new_tempdir(&work_temp_dir)
+      .map_err(|e| ProcessSingleJobError::from_io_error(e))?;
+
   // ==================== CONFIRM OR DOWNLOAD OPTIONAL CUSTOM VOCODER MODEL ==================== //
 
   let custom_vocoder_fs_path = match &tts_model.maybe_custom_vocoder {
@@ -138,11 +148,7 @@ pub async fn process_job(args: ProcessJobArgs<'_>) -> Result<JobSuccessResult, P
 
   let temp_dir = format!("temp_tts_inference_{}", job.id.0);
 
-  // NB: TempDir exists until it goes out of scope, at which point it should delete from filesystem.
-  let temp_dir = TempDir::new(&temp_dir)
-      .map_err(|e| ProcessSingleJobError::from_io_error(e))?;
-
-  let text_input_fs_path = temp_dir.path().join("inference_input.txt");
+  let text_input_fs_path = work_temp_dir.path().join("inference_input.txt");
 
   std::fs::write(&text_input_fs_path, &cleaned_inference_text)
       .map_err(|e| ProcessSingleJobError::from_io_error(e))?;
@@ -152,9 +158,9 @@ pub async fn process_job(args: ProcessJobArgs<'_>) -> Result<JobSuccessResult, P
   job_progress_reporter.log_status("running inference")
       .map_err(|e| ProcessSingleJobError::Other(e))?;
 
-  let output_audio_fs_path = temp_dir.path().join("output.wav");
-  let output_metadata_fs_path = temp_dir.path().join("metadata.json");
-  let output_spectrogram_fs_path = temp_dir.path().join("spectrogram.json");
+  let output_audio_fs_path = work_temp_dir.path().join("output.wav");
+  let output_metadata_fs_path = work_temp_dir.path().join("metadata.json");
+  let output_spectrogram_fs_path = work_temp_dir.path().join("spectrogram.json");
 
   info!("Running TTS inference...");
 
