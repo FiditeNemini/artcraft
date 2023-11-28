@@ -2,6 +2,8 @@
 mod tests {
     use std::result;
 
+    use anyhow::Ok;
+    use enums::by_table::model_weights::{weights_types, weights_category};
     use sqlx::{MySqlPool, Acquire};
     use rand::Rng;
 
@@ -290,6 +292,154 @@ mod tests {
         Ok(())
     }
 
+
+    async fn seed_weights_with_category_and_type(weights_type:WeightsType,weights_category:WeightsCategory,number_of_items:u32,creator_username:&str) -> AnyhowResult<()> {
+
+        let pool = setup().await;
+        let creator_token = get_user_token_by_username(&creator_username, &pool).await?.unwrap_or_else(
+            || panic!("Could not find user with username {}", creator_username)
+        );
+
+        for i in 0..number_of_items {
+
+            let mut rng = rand::thread_rng();
+            let number: u32 = rng.gen();
+
+            let model_weight_token = ModelWeightToken(number.to_string());
+                 
+            let args = CreateModelWeightsArgs {
+                token: &model_weight_token, // replace with actual ModelWeightToken
+                weights_type:weights_type, // replace with actual WeightsType
+                weights_category: weights_category, // replace with actual WeightsCategory
+                title: format!("Title {}", i),
+                maybe_thumbnail_token: Some(format!("Thumbnail {}", i)),
+                description_markdown: format!("Description {}", i),
+                description_rendered_html: format!("<p>Description {}</p>", i),
+                creator_user_token: Some(&creator_token), // replace with actual UserToken
+                creator_ip_address: "192.168.1.1",
+                creator_set_visibility: Visibility::Public,
+                maybe_last_update_user_token: Some(format!("Last Update User Token {}", i)),
+                original_download_url: Some(format!("http://example.com/download{}", i)),
+                original_filename: Some(format!("filename {}.txt", i)),
+                file_size_bytes: 1024,
+                file_checksum_sha2: format!("checksum{}", i),
+                private_bucket_hash: format!("bucket_hash{}", i),
+                maybe_private_bucket_prefix: Some("_fake".to_string()),
+                maybe_private_bucket_extension: Some("rvc".to_string()),
+                cached_user_ratings_total_count: 10,
+                cached_user_ratings_positive_count: 9,
+                cached_user_ratings_negative_count: 1,
+                maybe_cached_user_ratings_ratio: Some(0.9),
+                version: 1,
+                mysql_pool: &pool, // replace with actual MySqlPool
+            };
+
+            create_weight(args).await?;
+        }
+
+        Ok(())
+
+    }
+
+    // Tests paging for the list weights query builder
+    #[tokio::test]
+    async fn list_weights_query_build_test_paging() -> AnyhowResult<()> {
+        let pool = setup().await;
+        let creator_username = "hanashi".to_string();
+
+        seed_weights_with_category_and_type(WeightsType::LoRA,WeightsCategory::ImageGeneration,20,&creator_username).await?;
+        
+        let qb = ListWeightsQueryBuilder::new()
+        .offset(Some(0))
+        .weights_type(WeightsType::LoRA)
+        .weights_category(WeightsCategory::ImageGeneration)
+        .limit(10)
+        .scope_creator_username(Some("hanashi"))
+        .include_user_deleted_results(false);
+       
+        let result = qb.perform_query_for_page(&pool).await?;
+    
+        // let result = qb.perform_query_for_page(&pool).await?;
+        assert_eq!(result.weights.len(), 10);
+
+        let qb = ListWeightsQueryBuilder::new()
+        .weights_type(WeightsType::LoRA)
+        .weights_category(WeightsCategory::ImageGeneration)
+        .scope_creator_username(Some("hanashi"))
+        .include_user_deleted_results(false)
+        .offset(Some(10))
+        .limit(10);
+
+        let result = qb.perform_query_for_page(&pool).await?;
+
+        assert_eq!(result.weights.len(), 10);
+
+
+        
+        let qb = ListWeightsQueryBuilder::new()
+        .weights_type(WeightsType::LoRA)
+        .weights_category(WeightsCategory::ImageGeneration)
+        .scope_creator_username(Some("hanashi"))
+        .include_user_deleted_results(false)
+        .offset(Some(10))
+        .limit(10);
+
+        let result = qb.perform_query_for_page(&pool).await?;
+
+        assert_eq!(result.weights.len(), 10);
+
+        Ok(())
+    }
+
+    #[tokio::test]
+    // asc and desc tests
+    async fn list_weights_query_build_test_asc_desc() -> AnyhowResult<()> {
+        let pool = setup().await;
+        let creator_username = "hanashi".to_string();
+
+        seed_weights_with_category_and_type(WeightsType::LoRA,WeightsCategory::ImageGeneration,10,&creator_username).await?;
+        
+        let qb = ListWeightsQueryBuilder::new()
+        .offset(Some(0))
+        .weights_type(WeightsType::LoRA)
+        .weights_category(WeightsCategory::ImageGeneration)
+        .limit(10)
+        .scope_creator_username(Some("hanashi"))
+        .include_user_deleted_results(false)
+        .sort_ascending(true);
+        let result = qb.perform_query_for_page(&pool).await?;
+        
+        // write code that will loop through the result and check if the ids are in ascending order
+        let mut previous_id = 0;
+        for weight in result.weights.iter() {
+            let current_id = weight.weight_id;
+            assert!(current_id > previous_id);
+            previous_id = current_id;
+        }
+
+        let qb = ListWeightsQueryBuilder::new()
+        .offset(Some(0))
+        .weights_type(WeightsType::LoRA)
+        .weights_category(WeightsCategory::ImageGeneration)
+        .limit(10)
+        .scope_creator_username(Some("hanashi"))
+        .include_user_deleted_results(false)
+        .sort_ascending(false);
+        let result = qb.perform_query_for_page(&pool).await?;
+
+        // write code that will loop through the result and check if the ids are in descending order
+
+        let mut previous_id
+        = 10000;
+        for weight in result.weights.iter() {
+            let current_id = weight.weight_id;
+            assert!(current_id < previous_id);
+            previous_id = current_id;
+        }
+
+        Ok(())
+    }
+
     #[tokio::test]
     async fn list_weights_query_build_test() -> AnyhowResult<()> {
         let pool = setup().await;
@@ -374,8 +524,20 @@ mod tests {
 
         let result = qb.perform_query_for_page(&pool).await?;
 
+        assert_eq!(result.weights.len(), 2);
+
+        let qb = ListWeightsQueryBuilder::new()
+        .weights_type(WeightsType::LoRA)
+        .weights_category(WeightsCategory::ImageGeneration)
+        .scope_creator_username(Some("hanashi"))
+        .include_user_deleted_results(false);
+
+        let result = qb.perform_query_for_page(&pool).await?;
         assert_eq!(result.weights.len(), 1);
+        assert_eq!(result.weights[0].weights_category, WeightsCategory::ImageGeneration);
+        assert_eq!(result.weights[0].weights_type, WeightsType::LoRA);
 
         Ok(())
     }
 }
+

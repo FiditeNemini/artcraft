@@ -2,7 +2,8 @@
 #![forbid(unused_mut)]
 #![forbid(unused_variables)]
 
-use chrono::{DateTime, Utc};
+use chrono::{ DateTime, Utc };
+
 use sqlx::MySqlPool;
 
 use config::shared_constants::DEFAULT_MYSQL_QUERY_RESULT_PAGE_SIZE;
@@ -26,7 +27,6 @@ pub struct WeightsPage {
     pub last_id: Option<i64>,
 }
 
-
 // TODO: figure out what you want to expose ? since we don't have specs really
 #[derive(Serialize)]
 pub struct WeightJoinUser {
@@ -35,50 +35,49 @@ pub struct WeightJoinUser {
 
     pub weights_type: WeightsType,
     pub weights_category: WeightsCategory,
-    
+
     pub title: String,
-    
+
     pub maybe_thumbnail_token: Option<String>,
-    
+
     pub description_markdown: String,
     pub description_rendered_html: String,
-    
+
     pub creator_user_token: UserToken,
     pub creator_ip_address: String,
     pub creator_set_visibility: Visibility,
-    
+
     pub maybe_last_update_user_token: Option<UserToken>,
-    
+
     pub original_download_url: Option<String>,
     pub original_filename: Option<String>,
-    
+
     pub file_size_bytes: i32,
     pub file_checksum_sha2: String,
-    
+
     pub private_bucket_hash: String,
-    
+
     pub maybe_private_bucket_prefix: Option<String>,
     pub maybe_private_bucket_extension: Option<String>,
-    
+
     pub cached_user_ratings_total_count: u32,
     pub cached_user_ratings_positive_count: u32,
     pub cached_user_ratings_negative_count: u32,
     pub maybe_cached_user_ratings_ratio: Option<f32>,
     pub cached_user_ratings_last_updated_at: DateTime<Utc>,
-    
+
     pub version: i32,
-    
+
     pub created_at: DateTime<Utc>,
     pub updated_at: DateTime<Utc>,
-    
+
     pub user_deleted_at: Option<DateTime<Utc>>,
     pub mod_deleted_at: Option<DateTime<Utc>>,
-    
+
     pub creator_username: String,
     pub creator_display_name: String,
     pub creator_email_gravatar_hash: String,
 }
-
 
 pub struct ListWeightsQueryBuilder {
     scope_creator_username: Option<String>,
@@ -86,16 +85,14 @@ pub struct ListWeightsQueryBuilder {
     include_user_deleted_results: bool,
     include_user_hidden: bool,
     sort_ascending: bool,
-    weights_type:Option<WeightsType>,
-    weights_category:Option<WeightsCategory>,
+    weights_type: Option<WeightsType>,
+    weights_category: Option<WeightsCategory>,
     offset: Option<u64>,
     limit: u16,
     cursor_is_reversed: bool,
 }
 
-
 impl ListWeightsQueryBuilder {
-    
     pub fn new() -> Self {
         Self {
             scope_creator_username: None,
@@ -115,7 +112,7 @@ impl ListWeightsQueryBuilder {
         self.scope_creator_username = scope_creator_username.map(|u| u.to_string());
         self
     }
-    
+
     pub fn include_user_hidden(mut self, include_user_hidden: bool) -> Self {
         self.include_user_hidden = include_user_hidden;
         self
@@ -136,12 +133,12 @@ impl ListWeightsQueryBuilder {
         self
     }
 
-    pub fn weights_type(mut self,weights_type:WeightsType) -> Self {
+    pub fn weights_type(mut self, weights_type: WeightsType) -> Self {
         self.weights_type = Some(weights_type);
         self
     }
 
-    pub fn weights_category(mut self,weights_category:WeightsCategory) -> Self {
+    pub fn weights_category(mut self, weights_category: WeightsCategory) -> Self {
         self.weights_category = Some(weights_category);
         self
     }
@@ -166,13 +163,12 @@ impl ListWeightsQueryBuilder {
         mysql_pool: &MySqlPool
     ) -> AnyhowResult<Vec<RawWeightJoinUser>> {
         let query = self.build_query_string();
+        println!("HERE! query: {}", query);
+        //panic!("query: {:?}", query);
+
         let mut query = sqlx::query_as::<_, RawWeightJoinUser>(&query);
 
         // NB: The following bindings must match the order of the query builder !!
-
-        if let Some(offset) = self.offset {
-            query = query.bind(offset);
-        }
 
         if let Some(username) = self.scope_creator_username.as_deref() {
             query = query.bind(username);
@@ -188,71 +184,72 @@ impl ListWeightsQueryBuilder {
 
         query = query.bind(self.limit);
 
+        if let Some(offset) = self.offset {
+            query = query.bind(offset);
+        }
 
-        // debug!("query: {:?}", query);
-        // panic!("query: {:?}", query)
-        let mut results = query.fetch_all(mysql_pool)
-            .await?;
+        let mut results = query.fetch_all(mysql_pool).await?;
 
         if self.cursor_is_reversed {
-            results.reverse()
+            results.reverse();
         }
 
         Ok(results)
     }
 
-
     pub async fn perform_query_for_page(
         &self,
         mysql_pool: &MySqlPool
     ) -> AnyhowResult<WeightsPage> {
-
         let weights = self.perform_internal_query(mysql_pool).await?;
 
-        let first_id = weights.first()
-            .map(|raw_result| raw_result.weight_id);
+        let first_id = weights.first().map(|raw_result| raw_result.weight_id);
 
-        let last_id = weights.last()
-            .map(|raw_result| raw_result.weight_id);
+        let last_id = weights.last().map(|raw_result| raw_result.weight_id);
 
-        let weights = weights.into_iter().map(
-            |record| {
+        let weights = weights
+            .into_iter()
+            .map(|record| {
                 // map the raw result into a WeightJoinUser
                 WeightJoinUser {
-                    weight_id:record.weight_id,
-                    token:record.token,
-                    weights_type:
-                    WeightsType::from_str(record.weights_type.as_str()).unwrap(),
-                    weights_category:WeightsCategory::from_str(record.weights_category.as_str()).unwrap(),
-                    title:record.title,
-                    maybe_thumbnail_token:record.maybe_thumbnail_token,
-                    description_markdown:record.description_markdown,
-                    description_rendered_html:record.description_rendered_html,
-                    creator_user_token: UserToken::new_from_str( &record.creator_user_token),
-                    creator_ip_address:record.creator_ip_address,
-                    creator_set_visibility: Visibility::from_str(&record.creator_set_visibility).unwrap(),
-                    maybe_last_update_user_token:
-                    record.maybe_last_update_user_token.map(|token| UserToken::new_from_str(&token)),
-                    original_download_url:record.original_download_url,
-                    original_filename:record.original_filename,
-                    file_size_bytes:record.file_size_bytes,
-                    file_checksum_sha2:record.file_checksum_sha2,
-                    private_bucket_hash:record.private_bucket_hash,
-                    maybe_private_bucket_prefix:record.maybe_private_bucket_prefix,
-                    maybe_private_bucket_extension:record.maybe_private_bucket_extension,
-                    cached_user_ratings_total_count:record.cached_user_ratings_total_count,
-                    cached_user_ratings_positive_count:record.cached_user_ratings_positive_count,
-                    cached_user_ratings_negative_count:record.cached_user_ratings_negative_count,
-                    maybe_cached_user_ratings_ratio:record.maybe_cached_user_ratings_ratio,
-                    cached_user_ratings_last_updated_at:record.cached_user_ratings_last_updated_at,
-                    version:record.version,
-                    created_at:record.created_at,
-                    updated_at:record.updated_at,
-                    user_deleted_at:record.user_deleted_at,
-                    mod_deleted_at:record.mod_deleted_at,
-                    creator_username:record.creator_username,
-                    creator_display_name:record.creator_display_name,
-                    creator_email_gravatar_hash:record.creator_email_gravatar_hash,
+                    weight_id: record.weight_id,
+                    token: record.token,
+                    weights_type: WeightsType::from_str(record.weights_type.as_str()).unwrap(),
+                    weights_category: WeightsCategory::from_str(
+                        record.weights_category.as_str()
+                    ).unwrap(),
+                    title: record.title,
+                    maybe_thumbnail_token: record.maybe_thumbnail_token,
+                    description_markdown: record.description_markdown,
+                    description_rendered_html: record.description_rendered_html,
+                    creator_user_token: UserToken::new_from_str(&record.creator_user_token),
+                    creator_ip_address: record.creator_ip_address,
+                    creator_set_visibility: Visibility::from_str(
+                        &record.creator_set_visibility
+                    ).unwrap(),
+                    maybe_last_update_user_token: record.maybe_last_update_user_token.map(|token|
+                        UserToken::new_from_str(&token)
+                    ),
+                    original_download_url: record.original_download_url,
+                    original_filename: record.original_filename,
+                    file_size_bytes: record.file_size_bytes,
+                    file_checksum_sha2: record.file_checksum_sha2,
+                    private_bucket_hash: record.private_bucket_hash,
+                    maybe_private_bucket_prefix: record.maybe_private_bucket_prefix,
+                    maybe_private_bucket_extension: record.maybe_private_bucket_extension,
+                    cached_user_ratings_total_count: record.cached_user_ratings_total_count,
+                    cached_user_ratings_positive_count: record.cached_user_ratings_positive_count,
+                    cached_user_ratings_negative_count: record.cached_user_ratings_negative_count,
+                    maybe_cached_user_ratings_ratio: record.maybe_cached_user_ratings_ratio,
+                    cached_user_ratings_last_updated_at: record.cached_user_ratings_last_updated_at,
+                    version: record.version,
+                    created_at: record.created_at,
+                    updated_at: record.updated_at,
+                    user_deleted_at: record.user_deleted_at,
+                    mod_deleted_at: record.mod_deleted_at,
+                    creator_username: record.creator_username,
+                    creator_display_name: record.creator_display_name,
+                    creator_email_gravatar_hash: record.creator_email_gravatar_hash,
                 }
             })
             .collect::<Vec<WeightJoinUser>>();
@@ -266,7 +263,8 @@ impl ListWeightsQueryBuilder {
     }
 
     pub fn build_query_string(&self) -> String {
-        let mut query = r#"
+        let mut query =
+            r#"
         SELECT
             model_weights.id AS weight_id,
             model_weights.token,
@@ -328,18 +326,18 @@ impl ListWeightsQueryBuilder {
             if sort_ascending {
                 if self.cursor_is_reversed {
                     // NB: We're searching backwards.
-                    query.push_str(" model_weights.id < ?");
+                    query.push_str(" model_weights.id");
                     sort_ascending = !sort_ascending;
                 } else {
-                    query.push_str(" model_weights.id > ?");
+                    query.push_str(" model_weights.id");
                 }
             } else {
                 if self.cursor_is_reversed {
                     // NB: We're searching backwards.
-                    query.push_str(" model_weights.id > ?");
+                    query.push_str(" model_weights.id");
                     sort_ascending = !sort_ascending;
                 } else {
-                    query.push_str(" model_weights.id < ?");
+                    query.push_str(" model_weights.id");
                 }
             }
         }
@@ -404,12 +402,17 @@ impl ListWeightsQueryBuilder {
             query.push_str(" ORDER BY model_weights.id DESC");
         }
 
-        query.push_str(" LIMIT ?");
+        if self.limit > 0 {
+            query.push_str(" LIMIT ?");
+        }
+
+        if let Some(_) = self.offset {
+            query.push_str(" OFFSET ?");
+        }
 
         query
     }
 }
-
 
 #[derive(Serialize)]
 #[derive(sqlx::FromRow)]
@@ -419,45 +422,45 @@ struct RawWeightJoinUser {
 
     pub weights_type: String,
     pub weights_category: String,
-    
+
     pub title: String,
-    
+
     pub maybe_thumbnail_token: Option<String>,
-    
+
     pub description_markdown: String,
     pub description_rendered_html: String,
-    
+
     pub creator_user_token: String,
     pub creator_ip_address: String,
     pub creator_set_visibility: String,
 
     pub maybe_last_update_user_token: Option<String>,
-    
+
     pub original_download_url: Option<String>,
     pub original_filename: Option<String>,
-    
+
     pub file_size_bytes: i32,
     pub file_checksum_sha2: String,
-    
+
     pub private_bucket_hash: String,
-    
+
     pub maybe_private_bucket_prefix: Option<String>,
     pub maybe_private_bucket_extension: Option<String>,
-    
+
     pub cached_user_ratings_total_count: u32,
     pub cached_user_ratings_positive_count: u32,
     pub cached_user_ratings_negative_count: u32,
     pub maybe_cached_user_ratings_ratio: Option<f32>,
     pub cached_user_ratings_last_updated_at: DateTime<Utc>,
-    
+
     pub version: i32,
-    
+
     pub created_at: DateTime<Utc>,
     pub updated_at: DateTime<Utc>,
-    
+
     pub user_deleted_at: Option<DateTime<Utc>>,
     pub mod_deleted_at: Option<DateTime<Utc>>,
-    
+
     pub creator_username: String,
     pub creator_display_name: String,
     pub creator_email_gravatar_hash: String,
@@ -470,94 +473,104 @@ mod tests {
         weights_types::WeightsType,
         weights_category::WeightsCategory,
     };
-    
+
     #[test]
     fn predicates_without_scoping() {
         let query_builder = ListWeightsQueryBuilder::new();
-      
+
         println!("Query HERE! {}", &query_builder.build_predicates());
-        assert_eq!(&query_builder.build_predicates(),
-                   " WHERE model_weights.creator_set_visibility = 'public' \
+        assert_eq!(
+            &query_builder.build_predicates(),
+            " WHERE model_weights.creator_set_visibility = 'public' \
       AND model_weights.mod_deleted_at IS NULL \
       AND model_weights.user_deleted_at IS NULL \
       ORDER BY model_weights.id DESC \
-      LIMIT ?");
+      LIMIT ?"
+        );
     }
 
     #[test]
     fn predicates_scoped_to_user() {
-        let query_builder = ListWeightsQueryBuilder::new()
-            .scope_creator_username(Some("echelon"));
-        assert_eq!(&query_builder.build_predicates(),
-                   " WHERE users.username = ? \
+        let query_builder = ListWeightsQueryBuilder::new().scope_creator_username(Some("echelon"));
+        assert_eq!(
+            &query_builder.build_predicates(),
+            " WHERE users.username = ? \
       AND model_weights.creator_set_visibility = 'public' \
       AND model_weights.mod_deleted_at IS NULL \
       AND model_weights.user_deleted_at IS NULL \
       ORDER BY model_weights.id DESC \
-      LIMIT ?");
+      LIMIT ?"
+        );
     }
 
     #[test]
     fn predicates_scoped_to_weights_type() {
-        let query_builder = ListWeightsQueryBuilder::new()
-            .weights_type(WeightsType::RvcV2);
-        assert_eq!(&query_builder.build_predicates(),
-                   " WHERE model_weights.weights_type = ? \
+        let query_builder = ListWeightsQueryBuilder::new().weights_type(WeightsType::RvcV2);
+        assert_eq!(
+            &query_builder.build_predicates(),
+            " WHERE model_weights.weights_type = ? \
       AND model_weights.creator_set_visibility = 'public' \
       AND model_weights.mod_deleted_at IS NULL \
       AND model_weights.user_deleted_at IS NULL \
       ORDER BY model_weights.id DESC \
-      LIMIT ?");
+      LIMIT ?"
+        );
     }
 
     #[test]
     fn predicates_scoped_to_weights_category() {
-        let query_builder = ListWeightsQueryBuilder::new()
-            .weights_category(WeightsCategory::VoiceConversion);
+        let query_builder = ListWeightsQueryBuilder::new().weights_category(
+            WeightsCategory::VoiceConversion
+        );
         println!("Query HERE! {}", &query_builder.build_predicates());
-        assert_eq!(&query_builder.build_predicates(),
-                   " WHERE model_weights.weights_category = ? \
+        assert_eq!(
+            &query_builder.build_predicates(),
+            " WHERE model_weights.weights_category = ? \
       AND model_weights.creator_set_visibility = 'public' \
       AND model_weights.mod_deleted_at IS NULL \
       AND model_weights.user_deleted_at IS NULL \
       ORDER BY model_weights.id DESC \
-      LIMIT ?");
+      LIMIT ?"
+        );
     }
 
     #[test]
     fn predicates_including_user_hidden() {
-        let query_builder = ListWeightsQueryBuilder::new()
-            .include_user_hidden(true);
+        let query_builder = ListWeightsQueryBuilder::new().include_user_hidden(true);
 
-        assert_eq!(&query_builder.build_predicates(),
-                   " WHERE model_weights.mod_deleted_at IS NULL \
+        assert_eq!(
+            &query_builder.build_predicates(),
+            " WHERE model_weights.mod_deleted_at IS NULL \
       AND model_weights.user_deleted_at IS NULL \
       ORDER BY model_weights.id DESC \
-      LIMIT ?");
+      LIMIT ?"
+        );
     }
 
     #[test]
     fn predicates_including_mod_deleted() {
-        let query_builder = ListWeightsQueryBuilder::new()
-            .include_mod_deleted_results(true);
+        let query_builder = ListWeightsQueryBuilder::new().include_mod_deleted_results(true);
 
-        assert_eq!(&query_builder.build_predicates(),
-                   " WHERE model_weights.creator_set_visibility = 'public' \
+        assert_eq!(
+            &query_builder.build_predicates(),
+            " WHERE model_weights.creator_set_visibility = 'public' \
       AND model_weights.user_deleted_at IS NULL \
       ORDER BY model_weights.id DESC \
-      LIMIT ?");
+      LIMIT ?"
+        );
     }
 
     #[test]
     fn predicates_including_user_deleted() {
-        let query_builder = ListWeightsQueryBuilder::new()
-            .include_user_deleted_results(true);
+        let query_builder = ListWeightsQueryBuilder::new().include_user_deleted_results(true);
 
-        assert_eq!(&query_builder.build_predicates(),
-                   " WHERE model_weights.creator_set_visibility = 'public' \
+        assert_eq!(
+            &query_builder.build_predicates(),
+            " WHERE model_weights.creator_set_visibility = 'public' \
       AND model_weights.mod_deleted_at IS NULL \
       ORDER BY model_weights.id DESC \
-      LIMIT ?");
+      LIMIT ?"
+        );
     }
 
     #[test]
@@ -566,9 +579,11 @@ mod tests {
             .include_mod_deleted_results(true)
             .include_user_deleted_results(true);
 
-        assert_eq!(&query_builder.build_predicates(),
-                   " WHERE model_weights.creator_set_visibility = 'public' \
+        assert_eq!(
+            &query_builder.build_predicates(),
+            " WHERE model_weights.creator_set_visibility = 'public' \
       ORDER BY model_weights.id DESC \
-      LIMIT ?");
+      LIMIT ?"
+        );
     }
 }
