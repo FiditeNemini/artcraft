@@ -24,6 +24,7 @@ use tts_common::text_pipelines::text_pipeline_type::TextPipelineType;
 use crate::job::job_loop::job_success_result::{JobSuccessResult, ResultEntity};
 use crate::job::job_loop::process_single_job_error::ProcessSingleJobError;
 use crate::job::job_types::tts::tacotron2_v2_early_fakeyou::download_static_dependencies::download_static_dependencies;
+use crate::job::job_types::tts::tacotron2_v2_early_fakeyou::health_check_trap::maybe_block_on_sidecar_health_check;
 use crate::job::job_types::tts::tacotron2_v2_early_fakeyou::seconds_to_decoder_steps::seconds_to_decoder_steps;
 use crate::job::job_types::tts::tacotron2_v2_early_fakeyou::tacotron2_inference_command::{InferenceArgs, MelMultiplyFactor};
 use crate::job::job_types::tts::tacotron2_v2_early_fakeyou::vocoder_option::VocoderForInferenceOption;
@@ -60,10 +61,20 @@ pub async fn process_job(args: ProcessJobArgs<'_>) -> Result<JobSuccessResult, P
       .as_ref()
       .ok_or_else(|| ProcessSingleJobError::JobSystemMisconfiguration(Some("missing Tacotron2 dependencies".to_string())))?;
 
-  // TODO(bt,2023-11-26): Need to stop the job before the sidecar spins up
-  //if needs_health_check_at_start {
-  //  maybe_block_on_sidecar_health_check(&inferencer.http_clients.tts_sidecar_health_check_client).await;
-  //}
+  // ==================== OPTIONAL SIDECAR HEALTH CHECK ==================== //
+
+  // TODO(bt,2023-11-28): Ideally we'd perform health checks before grabbing a lock on the job.
+  let maybe_needs_health_check =
+      model_dependencies.sidecar.use_sidecar_instead_of_shell &&
+          model_dependencies.sidecar.health_check_state.needs_health_check()
+              .map_err(|e| ProcessSingleJobError::Other(anyhow!(e)))?;
+
+  if maybe_needs_health_check {
+    maybe_block_on_sidecar_health_check(&model_dependencies.sidecar.health_check_client).await;
+
+    model_dependencies.sidecar.health_check_state.mark_maybe_needs_health_check(false)
+        .map_err(|e| ProcessSingleJobError::Other(anyhow!(e)))?;
+  }
 
   // ==================== CONFIRM OR DOWNLOAD STATIC DEPENDENCIES ==================== //
 

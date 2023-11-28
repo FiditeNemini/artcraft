@@ -1,4 +1,6 @@
 pub mod download_static_dependencies;
+pub mod health_check_state;
+pub mod health_check_trap;
 pub mod process_job;
 pub mod read_metadata_file;
 pub mod seconds_to_decoder_steps;

@@ -1,4 +1,5 @@
 use errors::AnyhowResult;
+use crate::job::job_types::tts::tacotron2_v2_early_fakeyou::health_check_state::HealthCheckState;
 
 use crate::job::job_types::tts::tacotron2_v2_early_fakeyou::tacotron2_inference_command::Tacotron2InferenceCommand;
 use crate::job::job_types::tts::tacotron2_v2_early_fakeyou::tacotron2_inference_sidecar_client::Tacotron2InferenceSidecarClient;
@@ -24,6 +25,7 @@ pub struct SidecarDeps {
   pub use_sidecar_instead_of_shell: bool,
   pub inference_client: Tacotron2InferenceSidecarClient,
   pub health_check_client: Tacotron2SidecarHealthCheckClient,
+  pub health_check_state: HealthCheckState,
 }
 
 impl Tacotron2Dependencies {
@@ -60,6 +62,7 @@ impl Tacotron2Dependencies {
         use_sidecar_instead_of_shell: true, // TODO: ENV VAR
         inference_client,
         health_check_client,
+        health_check_state: HealthCheckState::new(),
       }
     })
   }
