@@ -8,6 +8,7 @@ use enums::common::job_status::JobStatus;
 use enums::common::visibility::Visibility;
 use errors::AnyhowResult;
 use tokens::tokens::generic_download_jobs::DownloadJobToken;
+use tokens::tokens::users::UserToken;
 
 use crate::queries::generic_download::job::_keys::GenericDownloadJobId;
 
@@ -17,7 +18,7 @@ pub struct AvailableDownloadJob {
   pub id: GenericDownloadJobId,
   pub download_job_token: DownloadJobToken,
 
-  pub creator_user_token: String,
+  pub creator_user_token: UserToken,
   pub creator_ip_address: String,
   pub creator_set_visibility: Visibility,
 
@@ -51,7 +52,7 @@ SELECT
   id,
   token,
 
-  creator_user_token,
+  creator_user_token as `creator_user_token: tokens::tokens::users::UserToken`,
   creator_ip_address,
   creator_set_visibility,
 
@@ -143,7 +144,7 @@ struct AvailableDownloadJobRawInternal {
   pub id: i64,
   pub token: String,
 
-  pub creator_user_token: String,
+  pub creator_user_token: UserToken,
   pub creator_ip_address: String,
   pub creator_set_visibility: String,
 

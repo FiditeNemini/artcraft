@@ -160,6 +160,7 @@ pub async fn create_account_handler(
       email_gravatar_hash: &email_gravatar_hash,
       password_hash: &password_hash,
       ip_address: &ip_address,
+      maybe_user_token: None, // NB: This parameter is for internal testing only
     }
   ).await;
 
