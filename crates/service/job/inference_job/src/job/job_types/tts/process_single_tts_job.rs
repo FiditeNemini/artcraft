@@ -34,8 +34,8 @@ pub async fn process_single_tts_job(
     Some(InferenceModelType::Tacotron2 | InferenceModelType::Vits) => {
       // All other TTS types require a fine-tuned TTS database record.
       let raw_inference_text = job.maybe_raw_inference_text
-      .as_deref()
-      .ok_or(ProcessSingleJobError::Other(anyhow!("no inference text")))?;
+        .as_deref()
+        .ok_or(ProcessSingleJobError::Other(anyhow!("no inference text")))?;
   
       dispatch_fine_tuned_weights_model(
         job_dependencies,
