@@ -1,13 +1,11 @@
 use anyhow::anyhow;
 use log::warn;
 use sqlx::MySqlPool;
+
 use enums::by_table::favorites::favorite_entity_type::FavoriteEntityType;
-
 use errors::AnyhowResult;
-use tokens::tokens::users::UserToken;
 
-use crate::queries::favorites::favorite_entity_token::FavoriteEntityToken;
-use crate::queries::favorites::list_user_favorites_result::{UserFavorite, RawUserFavoriteRecord};
+use crate::queries::favorites::list_user_favorites_result::{RawUserFavoriteRecord, UserFavorite};
 
 pub async fn list_user_favorites(
   username: &str,

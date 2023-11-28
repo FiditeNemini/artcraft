@@ -1,5 +1,7 @@
-use std::sync::{Arc, LockResult, RwLock};
+use std::sync::{Arc, RwLock};
+
 use anyhow::anyhow;
+
 use errors::AnyhowResult;
 
 #[derive(Clone)]
@@ -34,7 +36,7 @@ impl HealthCheckState {
 
   pub fn mark_maybe_needs_health_check(&self, maybe_needs_health_check: bool) -> AnyhowResult<()> {
     match self.inner.write() {
-      Err(err) => return Err(anyhow!("lock error: {err}")),
+      Err(err) => Err(anyhow!("lock error: {err}")),
       Ok(mut lock) => {
         lock.maybe_needs_health_check = maybe_needs_health_check;
         if !maybe_needs_health_check {
@@ -47,7 +49,7 @@ impl HealthCheckState {
 
   pub fn needs_health_check(&self) -> AnyhowResult<bool> {
     match self.inner.read() {
-      Err(err) => return Err(anyhow!("lock error: {err}")),
+      Err(err) => Err(anyhow!("lock error: {err}")),
       Ok(lock) => {
         let needs_health_check = !lock.checked_health_at_least_once || lock.maybe_needs_health_check;
         Ok(needs_health_check)
