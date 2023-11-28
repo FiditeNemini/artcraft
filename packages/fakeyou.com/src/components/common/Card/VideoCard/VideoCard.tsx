@@ -9,9 +9,10 @@ import LikeButton from "components/common/LikeButton";
 
 interface VideoCardProps {
   data: any;
+  type: "media" | "weights";
 }
 
-export default function VideoCard({ data }: VideoCardProps) {
+export default function VideoCard({ data, type }: VideoCardProps) {
   const history = useHistory();
 
   const handleCardClick = () => {
@@ -30,34 +31,75 @@ export default function VideoCard({ data }: VideoCardProps) {
 
   return (
     <Card padding={false} onClick={handleCardClick}>
-      <img
-        src={data.public_bucket_path}
-        alt={data.weight_name}
-        className="card-video"
-      />
-      <div className="card-img-overlay">
-        <div className="card-img-gradient" />
+      {type === "media" && (
+        <>
+          <img
+            src={data.public_bucket_path}
+            alt={data.weight_name}
+            className="card-video"
+          />
+          <div className="card-img-overlay">
+            <div className="card-img-gradient" />
 
-        <div className="d-flex align-items-center">
-          <div className="flex-grow-1">
-            <Badge label="Video" color="purple" overlay={true} />
-          </div>
-        </div>
-        <FontAwesomeIcon icon={faPlayCircle} className="card-video-play" />
-        <div className="card-img-overlay-text">
-          <div>
-            <h6 className="fw-semibold text-white mb-1">{data.weight_name}</h6>
-            <p className="fs-7 opacity-75">{timeAgo}</p>
-            <div className="mt-2" onClick={handleInnerClick}>
-              <LikeButton
-                onToggle={handleLike}
-                likeCount={data.likes}
-                overlay={true}
-              />
+            <div className="d-flex align-items-center">
+              <div className="flex-grow-1">
+                <Badge label="Video" color="purple" overlay={true} />
+              </div>
+            </div>
+            <FontAwesomeIcon icon={faPlayCircle} className="card-video-play" />
+            <div className="card-img-overlay-text">
+              <div>
+                <h6 className="fw-semibold text-white mb-1">
+                  {data.weight_name}
+                </h6>
+                <p className="fs-7 opacity-75">{timeAgo}</p>
+                <div className="mt-2" onClick={handleInnerClick}>
+                  <LikeButton
+                    onToggle={handleLike}
+                    likeCount={data.likes}
+                    overlay={true}
+                  />
+                </div>
+              </div>
             </div>
           </div>
-        </div>
-      </div>
+        </>
+      )}
+
+      {type === "weights" && (
+        <>
+          <img
+            src={data.public_bucket_path}
+            alt={data.weight_name}
+            className="card-video"
+          />
+          <div className="card-img-overlay">
+            <div className="card-img-gradient" />
+
+            <div className="d-flex align-items-center">
+              <div className="flex-grow-1">
+                <Badge label="Video" color="purple" overlay={true} />
+              </div>
+            </div>
+            <FontAwesomeIcon icon={faPlayCircle} className="card-video-play" />
+            <div className="card-img-overlay-text">
+              <div>
+                <h6 className="fw-semibold text-white mb-1">
+                  {data.weight_name}
+                </h6>
+                <p className="fs-7 opacity-75">{timeAgo}</p>
+                <div className="mt-2" onClick={handleInnerClick}>
+                  <LikeButton
+                    onToggle={handleLike}
+                    likeCount={data.likes}
+                    overlay={true}
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+        </>
+      )}
     </Card>
   );
 }

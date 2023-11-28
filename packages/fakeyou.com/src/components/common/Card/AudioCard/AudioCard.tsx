@@ -10,7 +10,7 @@ import Button from "components/common/Button";
 
 interface AudioCardProps {
   data: any;
-  type: "media" | "weights" | "favorites";
+  type: "media" | "weights";
 }
 
 export default function AudioCard({ data, type }: AudioCardProps) {
@@ -26,6 +26,12 @@ export default function AudioCard({ data, type }: AudioCardProps) {
 
   const handleInnerClick = (event: any) => {
     event.stopPropagation();
+  };
+
+  const handleUseModel = () => {
+    if (type === "weights") {
+      history.push(`/weights/${data.token}`);
+    }
   };
 
   const timeAgo = useTimeAgo(data.created_at);
@@ -84,7 +90,7 @@ export default function AudioCard({ data, type }: AudioCardProps) {
                 <p className="fs-7 opacity-75">{timeAgo}</p>
               </div>
               <div onClick={handleInnerClick}>
-                <Button label="Use" small={true} />
+                <Button label="Use" small={true} onClick={handleUseModel} />
               </div>
             </div>
           </div>

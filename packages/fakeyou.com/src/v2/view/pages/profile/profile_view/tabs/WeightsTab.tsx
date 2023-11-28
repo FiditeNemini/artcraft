@@ -12,7 +12,7 @@ import {
 } from "@fortawesome/pro-solid-svg-icons";
 import SkeletonCard from "components/common/Card/SkeletonCard";
 
-export default function MediaTab() {
+export default function WeightsTab() {
   const [data, setData] = useState(mockWeightsData);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -68,7 +68,7 @@ export default function MediaTab() {
                 card = <ImageCard key={index} data={data} type="weights" />;
                 break;
               case "video":
-                card = <VideoCard key={index} data={data} />;
+                card = <VideoCard key={index} data={data} type="weights" />;
                 break;
               default:
                 card = <div key={index}>Unsupported media type</div>;

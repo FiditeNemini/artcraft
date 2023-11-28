@@ -9,7 +9,7 @@ import FavoriteButton from "components/common/FavoriteButton";
 
 interface ImageCardProps {
   data: any;
-  type: "media" | "weights" | "favorites";
+  type: "media" | "weights";
 }
 
 export default function ImageCard({ data, type }: ImageCardProps) {
