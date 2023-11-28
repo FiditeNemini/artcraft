@@ -163,7 +163,7 @@ impl ListWeightsQueryBuilder {
         mysql_pool: &MySqlPool
     ) -> AnyhowResult<Vec<RawWeightJoinUser>> {
         let query = self.build_query_string();
-        println!("HERE! query: {}", query);
+        //println!("HERE! query: {}", query);
         //panic!("query: {:?}", query);
 
         let mut query = sqlx::query_as::<_, RawWeightJoinUser>(&query);

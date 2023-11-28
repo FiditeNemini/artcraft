@@ -8,8 +8,7 @@ mod tests {
     use rand::Rng;
 
     use tokio;
-    use log::{ error };
-
+    use serial_test::serial;
     use container_common::anyhow_result::AnyhowResult;
     use sqlx::mysql::MySqlPoolOptions;
     use config::shared_constants::{ DEFAULT_MYSQL_CONNECTION_STRING };
@@ -28,20 +27,17 @@ mod tests {
     use crate::queries::model_weights::delete_weights::{ delete_weights_as_user, delete_weights_as_mod, undelete_weights_as_mod , undelete_weights_as_user};
     use crate::queries::model_weights::list_weights_by_user::list_weights_by_creator_username;
 
-
-
     use crate::queries::model_weights::list_weights_query_builder::ListWeightsQueryBuilder;
     use crate::queries::users::user::get_user_token_by_username::get_user_token_by_username;
 
     async fn setup() -> sqlx::Pool<sqlx::MySql> {
-        println!("Dropped database model_weights");
+        println!("Dropping database model_weights");
 
         let db_connection_string = DEFAULT_MYSQL_CONNECTION_STRING;
         let pool = MySqlPoolOptions::new()
             .max_connections(3)
             .connect(&db_connection_string).await
             .unwrap();
-
         // delete everything that exists in the database
         delete_all_weights_for_table(&pool).await.unwrap();
         pool
@@ -56,13 +52,15 @@ mod tests {
     }
 
     #[tokio::test]
+    #[serial]
     async fn test_create_weights() -> AnyhowResult<()> {
+
+        let pool = setup().await;
+        // create a random token for the model weight
         let mut rng = rand::thread_rng();
         let random_number: u32 = rng.gen();
         let model_weight_token1 = ModelWeightToken(random_number.to_string());
 
-        let pool = setup().await;
-        // create a random token for the model weight
 
         let creator_token1 = UserToken("creatorToken!1".to_string());
 
@@ -131,13 +129,14 @@ mod tests {
     }
 
     #[tokio::test]
+    #[serial]
     async fn test_delete_and_undelete_weights_user() -> AnyhowResult<()> {
-        let mut rng = rand::thread_rng();
-        let random_number: u32 = rng.gen();
-        let model_weight_token1 = ModelWeightToken(random_number.to_string());
 
         let pool = setup().await;
         // create a random token for the model weight
+        let mut rng = rand::thread_rng();
+        let random_number: u32 = rng.gen();
+        let model_weight_token1 = ModelWeightToken(random_number.to_string());
 
         let creator_token1 = UserToken("creatorToken!1".to_string());
 
@@ -169,7 +168,9 @@ mod tests {
         };
 
         create_weight(args).await?;
+
         delete_weights_as_user(&model_weight_token1, &pool).await?;
+        
         let result = get_weight_by_token(&model_weight_token1, true, &pool).await?;
         let result = result.unwrap();
 
@@ -205,6 +206,7 @@ mod tests {
     }
 
     #[tokio::test]
+    #[serial]
     async fn test_delete_and_undelete_weights_mod() -> AnyhowResult<()> {
         let mut rng = rand::thread_rng();
         let random_number: u32 = rng.gen();
@@ -280,18 +282,20 @@ mod tests {
     }
 
     #[tokio::test]
+    #[serial]
     async fn list_all_weights_by_user() -> AnyhowResult<()> {
         let pool = setup().await;
         
         let creator_username = "hanashi".to_string();
         let can_see_deleted = true;
 
+        seed_weights_with_category_and_type(WeightsType::LoRA,WeightsCategory::ImageGeneration,5,&creator_username).await?;
+
         let weights_by_username = list_weights_by_creator_username(&pool, &creator_username, can_see_deleted).await?;
         assert_eq!(weights_by_username.len(), 5);
 
         Ok(())
     }
-
 
     async fn seed_weights_with_category_and_type(weights_type:WeightsType,weights_category:WeightsCategory,number_of_items:u32,creator_username:&str) -> AnyhowResult<()> {
 
@@ -343,6 +347,7 @@ mod tests {
 
     // Tests paging for the list weights query builder
     #[tokio::test]
+    #[serial]
     async fn list_weights_query_build_test_paging() -> AnyhowResult<()> {
         let pool = setup().await;
         let creator_username = "hanashi".to_string();
@@ -374,8 +379,6 @@ mod tests {
 
         assert_eq!(result.weights.len(), 10);
 
-
-        
         let qb = ListWeightsQueryBuilder::new()
         .weights_type(WeightsType::LoRA)
         .weights_category(WeightsCategory::ImageGeneration)
@@ -391,7 +394,59 @@ mod tests {
         Ok(())
     }
 
+
     #[tokio::test]
+    #[serial]
+    async fn list_weights_query_build_test_asc_desc_cursor_reverse() -> AnyhowResult<()> {
+        let pool = setup().await;
+        let creator_username = "hanashi".to_string();
+
+        seed_weights_with_category_and_type(WeightsType::LoRA,WeightsCategory::ImageGeneration,10,&creator_username).await?;
+        
+        let qb = ListWeightsQueryBuilder::new()
+        .offset(Some(0))
+        .weights_type(WeightsType::LoRA)
+        .weights_category(WeightsCategory::ImageGeneration)
+        .limit(10)
+        .scope_creator_username(Some("hanashi"))
+        .include_user_deleted_results(false)
+        .sort_ascending(true)
+        .cursor_is_reversed(false);
+
+        let result = qb.perform_query_for_page(&pool).await?;
+        
+        // write code that will loop through the result and check if the ids are in ascending order
+        let mut previous_id = 0;
+        for weight in result.weights.iter() {
+            let current_id = weight.weight_id;
+            assert!(current_id > previous_id);
+            previous_id = current_id;
+        }
+
+        let qb = ListWeightsQueryBuilder::new()
+        .offset(Some(0))
+        .weights_type(WeightsType::LoRA)
+        .weights_category(WeightsCategory::ImageGeneration)
+        .limit(10)
+        .scope_creator_username(Some("hanashi"))
+        .include_user_deleted_results(false)
+        .sort_ascending(false)
+        .cursor_is_reversed(true);
+        let result = qb.perform_query_for_page(&pool).await?;
+
+        // write code that will loop through the result and check if the ids are in descending order
+        let mut previous_id
+        = 10000;
+        for weight in result.weights.iter() {
+            let current_id = weight.weight_id;
+            assert!(current_id < previous_id);
+            previous_id = current_id;
+        }
+
+        Ok(())
+    }
+    #[tokio::test]
+    #[serial]
     // asc and desc tests
     async fn list_weights_query_build_test_asc_desc() -> AnyhowResult<()> {
         let pool = setup().await;
@@ -441,6 +496,7 @@ mod tests {
     }
 
     #[tokio::test]
+    #[serial]
     async fn list_weights_query_build_test() -> AnyhowResult<()> {
         let pool = setup().await;
         

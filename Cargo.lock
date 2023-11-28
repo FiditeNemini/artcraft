@@ -4028,6 +4028,7 @@ dependencies = [
  "serde",
  "serde_derive",
  "serde_json",
+ "serial_test",
  "sqlx",
  "tokens",
  "tokio 1.34.0",
