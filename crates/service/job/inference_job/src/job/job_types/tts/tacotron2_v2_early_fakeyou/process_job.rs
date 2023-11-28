@@ -160,8 +160,6 @@ async fn process_job_with_cleanup(
 
   info!("Creating tempdir for inference results.");
 
-  let temp_dir = format!("temp_tts_inference_{}", job.id.0);
-
   let text_input_fs_path = work_temp_dir.path().join("inference_input.txt");
 
   std::fs::write(&text_input_fs_path, &cleaned_inference_text)
@@ -330,7 +328,7 @@ async fn process_job_with_cleanup(
   // ==================== DELETE DOWNLOADED FILE ==================== //
 
   // NB: We should be using a tempdir, but to make absolutely certain we don't overflow the disk...
-  safe_delete_temp_directory(&temp_dir);
+  safe_delete_temp_directory(&work_temp_dir.path());
 
   // ==================== SAVE RECORDS ==================== //
 
