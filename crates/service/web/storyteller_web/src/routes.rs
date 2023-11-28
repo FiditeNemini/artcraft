@@ -182,6 +182,9 @@ pub fn add_routes<T, B> (app: App<T>, server_environment: ServerEnvironment) -> 
   app = add_subscription_routes(app); /* /v1/subscriptions/... */
   app = add_voice_designer_routes(app); /* /v1/voice_designer */
 
+  if server_environment == ServerEnvironment::Development {
+     app = add_weights_routes(app); /* /v1/stubs/... */
+  }
   // ==================== Comments ====================
 
   let mut app = RouteBuilder::from_app(app)
@@ -1216,3 +1219,34 @@ fn add_voice_designer_routes<T,B> (app:App<T>)-> App<T>
       )
 }
 
+
+// ==================== Weights ROUTES ====================
+fn add_weights_routes<T, B>(app: App<T>) -> App<T>
+    where
+        B: MessageBody,
+        T: ServiceFactory<
+            ServiceRequest,
+            Config = (),
+            Response = ServiceResponse<B>,
+            Error = Error,
+            InitError = ()
+        >
+{
+    app.service(
+        web
+            ::scope("/v1/weights")
+            .route("/upload", web::post().to(upload_weights_handler))
+            .service(
+                web
+                    ::resource("/weight/{weight_token}")
+                    .route(web::get().to(get_weight_details_handler))
+                    .route(web::post().to(update_weight_metadata_handler))
+                    .route(web::delete().to(delete_weight_handler))
+            )
+            .route("/by_user/{username}", web::get().to(get_weights_by_user_handler))
+            .route(
+                "/by_user_and_type/{username}/{type}",
+                web::get().to(get_weights_by_user_and_type_handler)
+            )
+    )
+}
