@@ -154,7 +154,7 @@ WHERE jobs.token = ?
         "#,
       job_token
     )
-      .fetch_one(mysql_connection)
+      .fetch_one(&mut **mysql_connection)
       .await;
 
   let record = match maybe_status {

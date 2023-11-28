@@ -3,6 +3,7 @@ pub mod audit_logs;
 pub mod billing;
 pub mod comments;
 pub mod email_sender_jobs;
+pub mod favorites;
 pub mod generic_download;
 pub mod generic_inference;
 pub mod generic_synthetic_ids;
@@ -23,3 +24,5 @@ pub mod voice_conversion;
 pub mod voice_designer;
 pub mod w2l;
 pub mod model_weights;
+
+

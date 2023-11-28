@@ -16,7 +16,7 @@ pub struct UpdateVoiceArgs<'a> {
 }
 
 pub async fn update_voice(args: UpdateVoiceArgs<'_>) -> AnyhowResult<()>{
-    let mut transaction = args.mysql_pool.begin().await?;
+    let transaction = args.mysql_pool.begin().await?;
 
     let query_result = sqlx
     ::query!(

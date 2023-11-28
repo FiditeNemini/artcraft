@@ -20,3 +20,4 @@
 
 pub mod mimetype_for_bytes;
 pub mod mimetype_for_file;
+pub mod mimetype_to_extension;

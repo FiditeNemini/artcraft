@@ -29,7 +29,7 @@ pub async fn process_single_job(
   // This is typically for debugging or development.
   if let Some(routing_tag) = job.maybe_routing_tag.as_deref() {
     let routing_tag = routing_tag.to_lowercase();
-    let hostname = job_dependencies.container.hostname.to_ascii_lowercase();
+    let hostname = job_dependencies.job.info.container.hostname.to_ascii_lowercase();
 
     if hostname.starts_with(&routing_tag) {
       info!("Job has routing tag ({}) for execution on this host ({})", routing_tag, hostname);
@@ -53,14 +53,16 @@ pub async fn process_single_job(
       None => {} // No model token, proceed
       Some(model_token) => {
         let count = job_dependencies
+            .job
+            .info
             .caches
             .model_cache_counter
             .increment_count(&model_token)
             .map_err(|err| ProcessSingleJobError::Other(anyhow!("cache counter increment error: {:?}", err)))?;
 
-        if count < job_dependencies.cold_filesystem_cache_starvation_threshold {
+        if count < job_dependencies.job.system.cold_filesystem_cache_starvation_threshold {
           warn!("model file is not present in the filesystem cache: {:?}, skipping iteration # {} (will continue after {})",
-            model_token, count, job_dependencies.cold_filesystem_cache_starvation_threshold);
+            model_token, count, job_dependencies.job.system.cold_filesystem_cache_starvation_threshold);
           return Ok(ProcessSingleJobSuccessCase::JobTemporarilySkippedFilesAbsent);
         }
       }
@@ -70,9 +72,9 @@ pub async fn process_single_job(
   // ==================== ATTEMPT TO GRAB JOB LOCK ==================== //
 
   let lock_acquired = mark_generic_inference_job_pending_and_grab_lock(
-    &job_dependencies.mysql_pool,
+    &job_dependencies.db.mysql_pool,
     job.id,
-    &job_dependencies.container_db,
+    &job_dependencies.job.info.container_db,
   ).await
       .map_err(|err| ProcessSingleJobError::Other(anyhow!("database error: {:?}", err)))?;
 
@@ -110,6 +112,7 @@ async fn do_process_single_job(
 
   // TODO(bt, 2023-07-23): Redis pool management probably belongs at near the outermost loop.
   let mut maybe_keepalive_redis = job_dependencies
+      .db
       .maybe_keepalive_redis_pool
       .as_ref()
       .map(|redis| redis.get())
@@ -201,7 +204,7 @@ async fn do_process_single_job(
   info!("Marking job complete...");
 
   mark_generic_inference_job_successfully_done(
-    &job_dependencies.mysql_pool,
+    &job_dependencies.db.mysql_pool,
     job,
     maybe_entity_type,
     maybe_entity_token,

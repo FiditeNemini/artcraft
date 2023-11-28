@@ -19,3 +19,4 @@ pub mod model_weights;
 pub mod tts_render_tasks;
 pub mod web_rendition_targets;
 pub mod web_scraping_targets;
+pub mod favorites;

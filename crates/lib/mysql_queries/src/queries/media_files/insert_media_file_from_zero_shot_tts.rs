@@ -94,6 +94,7 @@ pub async fn insert_media_file_from_zero_shot(
       maybe_public_bucket_extension = ?,
     
       maybe_creator_user_token = ?,
+      maybe_creator_anonymous_visitor_token = ?,
       creator_ip_address = ?,
     
       creator_set_visibility = ?,
@@ -123,6 +124,7 @@ pub async fn insert_media_file_from_zero_shot(
           args.maybe_public_bucket_extension,
     
           args.job.maybe_creator_user_token,
+          args.job.maybe_creator_anonymous_visitor_token,
           args.job.creator_ip_address,
     
           args.job.creator_set_visibility.to_str(),
@@ -134,7 +136,7 @@ pub async fn insert_media_file_from_zero_shot(
           args.worker_hostname,
           args.worker_cluster
         )
-            .execute(&mut transaction)
+            .execute(&mut *transaction)
             .await;
     
         let record_id = match query_result {

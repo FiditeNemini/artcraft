@@ -17,20 +17,21 @@ SQLITE_DATABASE_PATH=./runtime_data/database.db
 build_shared_mysql_database_library() {
   # NB: For now, this is our monolithic DB that serves all of our microservices (gross)
   # It's a single package so that queries can be shared (again, gross)
-  pushd crates/lib/mysql_queries
-  SQLX_OFFLINE=true cargo sqlx prepare
-  popd
+  #pushd crates/lib/mysql_queries
+  #SQLX_OFFLINE=true cargo sqlx prepare
+  #popd
+  cargo sqlx prepare --workspace
 }
 
-build_shared_sqlite_database_library() {
-  # NB(1): These are *SQLite* queries for the desktop AiChatBot app.
-  # NB(2): Make sure to run migrations first.
-  # NB(3): SqLite has trouble with relative paths, so we copy the file to /
-  cp $SQLITE_DATABASE_PATH /tmp
-  pushd crates/lib/sqlite_queries
-  DATABASE_URL=sqlite:///tmp/database.db cargo sqlx prepare --merged
-  popd
-}
+#build_shared_sqlite_database_library() {
+#  # NB(1): These are *SQLite* queries for the desktop AiChatBot app.
+#  # NB(2): Make sure to run migrations first.
+#  # NB(3): SqLite has trouble with relative paths, so we copy the file to /
+#  cp $SQLITE_DATABASE_PATH /tmp
+#  pushd crates/lib/sqlite_queries
+#  DATABASE_URL=sqlite:///tmp/database.db cargo sqlx prepare --merged
+#  popd
+#}
 
 echo 'mysql prepare'
 build_shared_mysql_database_library

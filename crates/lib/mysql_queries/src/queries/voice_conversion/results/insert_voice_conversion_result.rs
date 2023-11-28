@@ -50,7 +50,7 @@ ON DUPLICATE KEY UPDATE
       creator_user_token,
       creator_user_token
     )
-        .execute(&mut transaction)
+        .execute(&mut *transaction)
         .await;
 
     match query_result {
@@ -74,7 +74,7 @@ LIMIT 1
         "#,
       creator_user_token,
     )
-        .fetch_one(&mut transaction)
+        .fetch_one(&mut *transaction)
         .await;
 
     let record : SyntheticIdRecord = match query_result {
@@ -89,10 +89,6 @@ LIMIT 1
     let next_id = record.next_id as u64;
     maybe_creator_synthetic_id = Some(next_id);
   }
-
-  let vc_model_token = args.job.maybe_model_token.as_deref();
-  let creator_ip_address = args.job.creator_ip_address.as_str();
-  let creator_set_visibility = args.job.creator_set_visibility.clone();
 
   let record_id = {
     let query_result = sqlx::query!(
@@ -146,7 +142,7 @@ SET
       args.worker_cluster,
       args.is_debug_worker,
     )
-        .execute(&mut transaction)
+        .execute(&mut *transaction)
         .await;
 
     let record_id = match query_result {

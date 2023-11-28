@@ -2,10 +2,6 @@
 # =============== (1) set up core rust build image ===============
 # ================================================================
 
-# Custom base image
-# Make sure to add this repository so it has read acces to the base image:
-# https://github.com/orgs/storytold/packages/container/docker-base-images-rust-ssl/settings/actions_access
-# FROM ghcr.io/storytold/docker-base-images-rust-ssl:d94ce4350c3b as rust-build
 FROM ubuntu:jammy as rust-base
 
 # NB: This can be "stable" or another version.
@@ -16,7 +12,6 @@ WORKDIR /tmp
 # NB: cmake is required for freetype-sys-0.13.1, which in turn has only been added for egui.
 # NB: fontconfig is required by servo-fontconfig-sys, which is in the dependency chain for egui.
 # NB: libfontconfig-dev is required by servo-fontconfig-sys, which is in the dependency chain for egui.
-# NB: pkg-config and libssl are for container TLS; we may switch to rustls in the future.
 RUN apt-get update \
     && DEBIAN_FRONTEND=noninteractive TZ=Etc/UTC apt-get install -y \
         build-essential \
@@ -24,7 +19,6 @@ RUN apt-get update \
         curl \
         fontconfig \
         libfontconfig1-dev \
-        libssl-dev \
         pkg-config
 
 # NB: Fix for fontconfig (servo-fontconfig-sys): https://github.com/alacritty/alacritty/issues/4423#issuecomment-727277235
@@ -76,6 +70,7 @@ FROM rust-base AS builder
 # NB: Now we build and test our code.
 COPY Cargo.lock .
 COPY Cargo.toml .
+COPY .sqlx/ .sqlx
 COPY crates/ ./crates
 COPY my-workspace-hack ./my-workspace-hack
 COPY includes/ ./includes
@@ -101,22 +96,22 @@ RUN pwd
 RUN du -hsc * | sort -hr
 
 # Build all the binaries that run on GPU, including "dummy-service".
-RUN SQLX_OFFLINE=true \
+RUN RUSTFLAGS="-C target-feature=+crt-static" SQLX_OFFLINE=true \
   LD_LIBRARY_PATH=/usr/lib:${LD_LIBRARY_PATH} \
   $HOME/.cargo/bin/cargo build \
-  --release \
+  --release --target=x86_64-unknown-linux-gnu \
   --bin dummy-service
 
-RUN SQLX_OFFLINE=true \
+RUN RUSTFLAGS="-C target-feature=+crt-static" SQLX_OFFLINE=true \
   LD_LIBRARY_PATH=/usr/lib:${LD_LIBRARY_PATH} \
   $HOME/.cargo/bin/cargo build \
-  --release \
+  --release --target=x86_64-unknown-linux-gnu \
   --bin download-job
 
-RUN SQLX_OFFLINE=true \
+RUN RUSTFLAGS="-C target-feature=+crt-static" SQLX_OFFLINE=true \
   LD_LIBRARY_PATH=/usr/lib:${LD_LIBRARY_PATH} \
   $HOME/.cargo/bin/cargo build \
-  --release \
+  --release --target=x86_64-unknown-linux-gnu \
   --bin inference-job
 
 # Print a report on disk space
@@ -144,21 +139,21 @@ LABEL org.opencontainers.image.url='https://github.com/storytold/storyteller-web
 
 WORKDIR /
 
+# Install rsync to copy files to other containers
+RUN apt-get update \
+    && DEBIAN_FRONTEND=noninteractive TZ=Etc/UTC apt-get install -y \
+        rsync \
+        --no-install-recommends \
+    && apt-get clean autoclean && apt-get autoremove -y && rm -rf /var/lib/{apt,dpkg,cache,log}/
+
 # Give the container its version so it can report over HTTP.
 ARG GIT_SHA
 RUN echo -n ${GIT_SHA} > GIT_SHA
 
 # Copy all the binaries.
-COPY --from=builder /tmp/target/release/dummy-service /
-COPY --from=builder /tmp/target/release/download-job /
-COPY --from=builder /tmp/target/release/inference-job /
-
-# SSL certs are required for crypto
-COPY --from=builder /etc/ssl /etc/ssl
-
-# Required dynamically linked libraries
-COPY --from=builder /usr/lib/x86_64-linux-gnu/libssl.*             /lib/x86_64-linux-gnu/
-COPY --from=builder /usr/lib/x86_64-linux-gnu/libcrypto.*          /lib/x86_64-linux-gnu/
+COPY --from=builder /tmp/target/x86_64-unknown-linux-gnu/release/dummy-service /
+COPY --from=builder /tmp/target/x86_64-unknown-linux-gnu/release/download-job /
+COPY --from=builder /tmp/target/x86_64-unknown-linux-gnu/release/inference-job /
 
 # Container includes
 COPY includes/ /includes
@@ -178,35 +173,44 @@ COPY crates/service/job/download_job/config/download-job.production.env .
 COPY crates/service/job/inference_job/config/inference-job.common.env .
 COPY crates/service/job/inference_job/config/inference-job.production.env .
 
-# Need python to make use of other containers' venv
-# TODO(bt,2023-04-26): This is only necessary for download-job and inference-job
-# NB(bt,2023-05-04): Installing lsof, htop, ripgrep, as debugging tools
-# - net-tools: netstat, for debugging process network connections
-# - psmisc: fuser, for determining which things users have opennetstat, for debugging process network connections
-# - libnvidia-container: these are installed to attempt to fix https://github.com/NVIDIA/nvidia-docker/issues/1618#issuecomment-1120104007
-RUN apt-get update && DEBIAN_FRONTEND=noninteractive TZ=Etc/UTC apt-get install -y \
-    ffmpeg \
-    htop \
-    less \
-    libnvidia-container-dev \
-    libnvidia-container-tools \
-    libnvidia-container1 \
-    libsndfile1 \
-    lsof \
-    net-tools \
-    nvidia-driver-530 \
-    psmisc \
-    python3-pip \
-    python3.10 \
-    python3.10-venv \
-    ripgrep \
-    tmux \
-    vim \
-    --no-install-recommends \
-    && apt-get clean autoclean && apt-get autoremove -y && rm -rf /var/lib/{apt,dpkg,cache,log}/
+# # Need python to make use of other containers' venv
+# # TODO(bt,2023-04-26): This is only necessary for download-job and inference-job
+# # NB(bt,2023-05-04): Installing lsof, htop, ripgrep, as debugging tools
+# # - net-tools: netstat, for debugging process network connections
+# # - psmisc: fuser, for determining which things users have opennetstat, for debugging process network connections
+# # - libnvidia-container: these are installed to attempt to fix https://github.com/NVIDIA/nvidia-docker/issues/1618#issuecomment-1120104007
+# RUN apt-get update && DEBIAN_FRONTEND=noninteractive TZ=Etc/UTC apt-get install -y \
+#     ffmpeg \
+#     htop \
+#     less \
+#     libnvidia-container-dev \
+#     libnvidia-container-tools \
+#     libnvidia-container1 \
+#     libsndfile1 \
+#     lsof \
+#     net-tools \
+#     nvidia-driver-530 \
+#     psmisc \
+#     python3-pip \
+#     python3.10 \
+#     python3.10-venv \
+#     ripgrep \
+#     tmux \
+#     vim \
+#     --no-install-recommends
+#
+# # NB(bt,2023-11-17): We need python3.8 for vall-e-x (for now)
+# # We should make the effort to get it running on python3.10
+# RUN DEBIAN_FRONTEND=noninteractive TZ=Etc/UTC apt-get install software-properties-common -y \
+#     && DEBIAN_FRONTEND=noninteractive TZ=Etc/UTC add-apt-repository ppa:deadsnakes/ppa -y \
+#     && DEBIAN_FRONTEND=noninteractive TZ=Etc/UTC apt-get update \
+#     && DEBIAN_FRONTEND=noninteractive TZ=Etc/UTC apt-get install -y python3.8 python3.8-venv python3.8-dev python3.8-full python3.8-distutils
+
+RUN  apt-get clean autoclean && apt-get autoremove -y && rm -rf /var/lib/{apt,dpkg,cache,log}/
 
 # NB(bt,2023-05-28): Python logging may be slowing down in k8s
 # See: https://github.com/kubernetes-client/python/issues/1867
 COPY includes/container_includes/python_overrides/logger/__init__.py /usr/lib/python3.10/logging/__init__.py
+# COPY includes/container_includes/python_overrides/logger/__init__.py /usr/lib/python3.8/logging/__init__.py
 
 EXPOSE 8080

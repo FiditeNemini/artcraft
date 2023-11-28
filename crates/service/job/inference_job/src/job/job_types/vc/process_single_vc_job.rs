@@ -28,7 +28,7 @@ pub async fn process_single_vc_job(job_dependencies: &JobDependencies, job: &Ava
 
   // TODO: Interrogate cache (which also depends on other flags)
   let maybe_vc_model = get_voice_conversion_model_for_inference(
-    &job_dependencies.mysql_pool, model_token)
+    &job_dependencies.db.mysql_pool, model_token)
       .await
       .map_err(|err| {
         ProcessSingleJobError::Other(anyhow!("database error: {:?}", err))
@@ -65,7 +65,7 @@ pub async fn process_single_vc_job(job_dependencies: &JobDependencies, job: &Ava
   };
 
   let maybe_media_upload_result =
-      get_media_upload_for_inference(&media_upload_token, &job_dependencies.mysql_pool).await;
+      get_media_upload_for_inference(&media_upload_token, &job_dependencies.db.mysql_pool).await;
 
   let media_upload = match maybe_media_upload_result {
     Ok(Some(media_upload)) => media_upload,

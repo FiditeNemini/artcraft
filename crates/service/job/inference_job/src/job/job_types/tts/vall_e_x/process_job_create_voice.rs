@@ -6,6 +6,8 @@ use anyhow::anyhow;
 use log::{error, info, warn};
 
 use buckets::public::media_files::original_file::MediaFileBucketPath;
+use buckets::public::zs_voices::directory::{ModelCategory, ModelType};
+use buckets::public::zs_voices::file::ZeroShotVoiceEmbeddingBucketPath;
 use cloud_storage::bucket_client::BucketClient;
 use cloud_storage::bucket_path_unifier::BucketPathUnifier;
 use enums::by_table::generic_inference_jobs::inference_result_type::InferenceResultType;
@@ -19,7 +21,6 @@ use mysql_queries::queries::voice_designer::voice_samples::list_dataset_samples_
 use mysql_queries::queries::voice_designer::voice_samples::list_dataset_samples_for_dataset_token::list_dataset_samples_for_dataset_token;
 use mysql_queries::queries::voice_designer::voices::create_voice::create_voice;
 use mysql_queries::queries::voice_designer::voices::create_voice::CreateVoiceArgs;
-use tokens::tokens::media_files::MediaFileToken;
 use tokens::tokens::users::UserToken;
 
 use crate::job;
@@ -32,16 +33,26 @@ const BUCKET_FILE_PREFIX_CREATE: &str = "fakeyou_";
 const BUCKET_FILE_EXTENSION_CREATE: &str = ".bin";
 const MIME_TYPE_CREATE: &str = "application/x-binary";
 
+/// We'll increment this if we change the underlying Vall-E code in an incompatible way.
+const CURRENT_VALLE_MODEL_VERSION: u64 = 0;
+
 pub async fn process_create_voice(
   args: VALLEXProcessJobArgs<'_>,
   dataset_token: String
 ) -> Result<JobSuccessResult, ProcessSingleJobError> {
   let deps = args.job_dependencies;
   let job = args.job;
-  let mysql_pool = &deps.mysql_pool;
+  let mysql_pool = &deps.db.mysql_pool;
+
+  let model_dependencies = deps
+      .job
+      .job_specific_dependencies
+      .maybe_vall_e_x_dependencies
+      .as_ref()
+      .ok_or_else(|| ProcessSingleJobError::JobSystemMisconfiguration(Some("missing VALL-E-X dependencies".to_string())))?;
 
   // get some globals
-  let mut job_progress_reporter = deps.job_progress_reporter
+  let mut job_progress_reporter = deps.clients.job_progress_reporter
       .new_generic_inference(job.inference_job_token.as_str())
       .map_err(|e| ProcessSingleJobError::Other(anyhow!(e)))?;
 
@@ -107,7 +118,7 @@ pub async fn process_create_voice(
   let temp_extension = String::from(".bin");
   let temp_prefix:String;
 
-  if !deps.container.is_on_prem {
+  if !deps.job.info.container.is_on_prem {
     temp_prefix = String::from("sample_"); // this is for seed in local dev to download the samples
   } else {
     temp_prefix = String::from(BUCKET_FILE_PREFIX_CREATE);
@@ -118,20 +129,14 @@ pub async fn process_create_voice(
   for (index, record) in dataset.iter().enumerate() {
     //https://storage.googleapis.com/dev-vocodes-public/media/5/3/3/w/8/533w8zs0fy11nv7gkcna7p7vt03h8nda/dev_zs_533w8zs0fy11nv7gkcna7p7vt03h8nda.bin <-- where the file actually is
 
-    let prefix: Option<&str> = Some(&temp_prefix); // record.maybe_public_bucket_prefix.as_ref().map(|s| s.as_str());
-    let extension: Option<&str> = Some(&temp_extension); //record.maybe_public_bucket_extension
-    // .as_ref()
-    // .map(|s| s.as_str());
-    // naming
-    //[2023-10-23T01:26:46Z INFO  inference_job::job::job_types::tts::vall_e_x::process_job] Upload Bucket Path: /media/9/j/6/g/c/9j6gcd3ngb70ybpsq1rv4tw3gk97ds3t/fakeyou_9j6gcd3ngb70ybpsq1rv4tw3gk97ds3t.npz
-    //[2023-10-23T01:26:46Z INFO  inference_job::job::job_types::tts::vall_e_x::process_job] Upload File Path: /tmp/temp_zeroshot_create_voice_11.1BLk16qTwhuo/temp.npz
+    let prefix: Option<&str> = record.maybe_public_bucket_prefix.as_ref().map(|s| s.as_str());
+    let extension: Option<&str> = record.maybe_public_bucket_extension.as_ref().map(|s| s.as_str());
 
-    info!(
-            "Record=> hash:{} prefix:{:?} extension:{:?}",
-            record.public_bucket_directory_hash,
-            prefix,
-            extension
-        );
+    info!("Record=> hash:{} prefix:{:?} extension:{:?}",
+      record.public_bucket_directory_hash,
+      prefix,
+      extension
+    );
 
     let audio_media_file = MediaFileBucketPath::from_object_hash(
       &record.public_bucket_directory_hash,
@@ -139,12 +144,10 @@ pub async fn process_create_voice(
       extension
     );
 
-    info!(
-            "Download using audio_media_file_path: {}",
-            audio_media_file.to_full_object_pathbuf().to_string_lossy()
-        );
+    info!("Download using audio_media_file_path: {:?}", audio_media_file.to_full_object_pathbuf());
 
     let file_name_wav = format!("{}.wav", index);
+
     let mut file_path = PathBuf::new();
     file_path.push(workdir.clone());
     file_path.push(file_path.clone());
@@ -153,7 +156,7 @@ pub async fn process_create_voice(
     info!("Downloading to path: {:?}", file_path);
 
     // TODO: we might want to catch the error and not include the pathes into download dataset?
-    let result = deps.public_bucket_client.download_file_to_disk(
+    let result = deps.buckets.public_bucket_client.download_file_to_disk(
       audio_media_file.to_full_object_pathbuf(),
       &file_path
     ).await;
@@ -171,9 +174,9 @@ pub async fn process_create_voice(
 
   // STEP 4 Download the models
   info!("Download models (if not present)...");
-  for downloader in deps.job_type_details.vall_e_x.downloaders.all_downloaders() {
+  for downloader in model_dependencies.downloaders.all_downloaders() {
     let result = downloader.download_if_not_on_filesystem(
-      &args.job_dependencies.private_bucket_client,
+      &args.job_dependencies.buckets.private_bucket_client,
       &args.job_dependencies.fs.scoped_temp_dir_creator_for_downloads
     ).await;
     if let Err(e) = result {
@@ -186,24 +189,25 @@ pub async fn process_create_voice(
       .log_status("running inference")
       .map_err(|e| ProcessSingleJobError::Other(e))?;
 
-  let inference_start_time = Instant::now();
-
   // Command line arg for a list of paths to insert the container
   let audio_files = join_paths(downloaded_dataset);
 
   info!("Files to process: {:?}", audio_files);
 
   // Name of the output file
-  let output_file_name = String::from("temp"); // don't use the extension... for the inference since the container will add the extension.
+  // NB: don't use the extension... for the inference since the container will add the extension.
+  let output_file_name = PathBuf::from("temp");
 
   let stderr_output_file = work_temp_dir.path().join("zero_shot_create_voice_err.txt");
 
+  let inference_start_time = Instant::now();
+
   // Run Inference
   let command_exit_status =
-      args.job_dependencies.job_type_details.vall_e_x.create_embedding_command.execute_inference(
+      model_dependencies.create_embedding_command.execute_inference(
         job::job_types::tts::vall_e_x::vall_e_x_inference_command::CreateVoiceInferenceArgs {
           output_embedding_path: &workdir,
-          output_embedding_name: output_file_name.clone(),
+          output_embedding_name: &output_file_name,
           audio_files,
           stderr_output_file: &stderr_output_file,
         }
@@ -242,30 +246,35 @@ pub async fn process_create_voice(
     return Err(error);
   }
 
+  info!("Inference success!");
+
+  //info!("Success; waiting...");
+  //thread::sleep(Duration::from_secs(300));
+
 
   // STEP 4. Download dataset each audio file
   info!("Uploading Media ...");
 
-  let result_bucket_location: MediaFileBucketPath = MediaFileBucketPath::generate_new(
-    Some(BUCKET_FILE_PREFIX_CREATE),
-    Some(BUCKET_FILE_EXTENSION_CREATE)
+  let embedding_bucket_location = ZeroShotVoiceEmbeddingBucketPath::generate_new(
+    ModelCategory::Tts,
+    ModelType::VallEx,
+    CURRENT_VALLE_MODEL_VERSION
   );
 
-  let result_bucket_object_pathbuf = result_bucket_location.to_full_object_pathbuf();
+  let embedding_bucket_object_pathbuf = embedding_bucket_location.to_full_object_pathbuf();
 
   // Get Finished File
   let mut finished_file = work_temp_dir.path().to_path_buf();
-  //let mut finished_file = workdir;
 
   let output_bucket_file_name = String::from("temp.npz"); // use extension for bucket upload.
   finished_file.push(&output_bucket_file_name);
 
-  info!("Upload Bucket Path: {:?}", result_bucket_object_pathbuf);
   info!("Upload File Path: {:?}", finished_file);
+  info!("Upload Bucket Path: {:?}", embedding_bucket_object_pathbuf);
 
-  args.job_dependencies.private_bucket_client
+  args.job_dependencies.buckets.private_bucket_client
       .upload_filename_with_content_type(
-        &result_bucket_object_pathbuf,
+        &embedding_bucket_object_pathbuf,
         &finished_file,
         &MIME_TYPE_CREATE
       )
@@ -274,7 +283,6 @@ pub async fn process_create_voice(
 
   // CLEARIFY! these items
   // 1.Should this be object hash?
-  let bucket_hash = result_bucket_location.get_object_hash().clone();
   // 2.As well as this what should the voice name be?
   let voice_name = single_dataset.title;
 
@@ -283,30 +291,24 @@ pub async fn process_create_voice(
     dataset_token: &voice_dataset_token,
     model_category: ZsVoiceModelCategory::Tts,
     model_type: ZsVoiceModelType::VallEX,
-    model_version: 0,
+    model_version: CURRENT_VALLE_MODEL_VERSION,
     model_encoding_type: ZsVoiceEncodingType::Encodec,
     voice_title: &voice_name,
-    bucket_hash,
+    bucket_hash: embedding_bucket_location.get_object_hash().clone(),
     maybe_creator_user_token: Some(&creator_user_token),
     creator_ip_address: &creator_ip_address,
     creator_set_visibility: Visibility::Public,
     mysql_pool,
-  }).await;
+  }).await
+      .map_err(|e| ProcessSingleJobError::Other(e))?;
 
-  let media_file_token = MediaFileToken::generate();
-
-  match voice_token {
-    Ok(_value) => {
-      Ok(JobSuccessResult {
-        maybe_result_entity: Some(ResultEntity {
-          entity_type: InferenceResultType::MediaFile,
-          entity_token: media_file_token.to_string(),
-        }),
-        inference_duration,
-      })
-    }
-    Err(e) => { Err(ProcessSingleJobError::Other(e)) }
-  }
+  Ok(JobSuccessResult {
+    maybe_result_entity: Some(ResultEntity {
+      entity_type: InferenceResultType::ZeroShotVoiceEmbedding,
+      entity_token: voice_token.to_string(),
+    }),
+    inference_duration,
+  })
 }
 
 pub struct AudioFile {

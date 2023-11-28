@@ -6,6 +6,7 @@ use sqlx::MySqlPool;
 use enums::by_table::voice_conversion_models::voice_conversion_model_type::VoiceConversionModelType;
 use enums::common::visibility::Visibility;
 use errors::AnyhowResult;
+use tokens::tokens::users::UserToken;
 use tokens::tokens::voice_conversion_models::VoiceConversionModelToken;
 
 pub struct InsertVoiceConversionModelArgs<'a, P: AsRef<Path>> {
@@ -17,7 +18,7 @@ pub struct InsertVoiceConversionModelArgs<'a, P: AsRef<Path>> {
   pub original_filename: &'a str,
   pub file_size_bytes: u64,
 
-  pub creator_user_token: &'a str,
+  pub creator_user_token: &'a UserToken,
   pub creator_ip_address: &'a str,
   pub creator_set_visibility: Visibility,
 

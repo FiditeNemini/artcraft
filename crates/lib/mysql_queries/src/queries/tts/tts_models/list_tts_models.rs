@@ -153,7 +153,7 @@ WHERE
     AND tts.user_deleted_at IS NULL
     AND tts.mod_deleted_at IS NULL
         "#)
-      .fetch_all(mysql_connection)
+      .fetch_all(&mut **mysql_connection)
       .await?
   } else {
     info!("listing tts models for everyone; all");
@@ -187,7 +187,7 @@ WHERE
     tts.user_deleted_at IS NULL
     AND tts.mod_deleted_at IS NULL
         "#)
-      .fetch_all(mysql_connection)
+      .fetch_all(&mut **mysql_connection)
       .await?
   };
 
@@ -237,7 +237,7 @@ WHERE
     AND tts.mod_deleted_at IS NULL
         "#,
       scope_creator_username)
-      .fetch_all(mysql_connection)
+      .fetch_all(&mut **mysql_connection)
       .await?
   } else {
     info!("listing tts models for user; all");
@@ -274,7 +274,7 @@ WHERE
     AND tts.mod_deleted_at IS NULL
         "#,
       scope_creator_username)
-      .fetch_all(mysql_connection)
+      .fetch_all(&mut **mysql_connection)
       .await?
   };
 

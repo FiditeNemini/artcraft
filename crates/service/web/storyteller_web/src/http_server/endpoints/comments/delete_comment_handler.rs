@@ -105,7 +105,7 @@ pub async fn delete_comment_handler(
     // 1) Delete as moderator
     maybe_delete_as = Some(DeleteCommentAs::Moderator);
   } else {
-    let comment = get_comment(&path.comment_token, &mut mysql_connection)
+    let comment = get_comment(&path.comment_token, &mut *mysql_connection)
         .await
         .map_err(|err| {
           error!("error with query: {:?}", err);
@@ -137,7 +137,7 @@ pub async fn delete_comment_handler(
   let query_result = delete_comment(
     &path.comment_token,
     delete_as,
-    &mut mysql_connection
+    &mut *mysql_connection
   ).await;
 
   match query_result {

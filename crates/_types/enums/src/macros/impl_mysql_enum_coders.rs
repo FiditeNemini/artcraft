@@ -12,20 +12,20 @@
 macro_rules! impl_mysql_enum_coders {
   ($t:ident) => {
 
-    impl sqlx::Type<sqlx_core::mysql::MySql> for $t {
-      fn type_info() -> sqlx_core::mysql::MySqlTypeInfo {
+    impl sqlx::Type<sqlx::MySql> for $t {
+      fn type_info() -> sqlx_mysql::MySqlTypeInfo {
         // // 0.4.x series:
         // String::type_info()
 
         // NB: https://docs.rs/sqlx-core/0.6.2/src/sqlx_core/mysql/types/uuid.rs.html#38-66 serves as an example
-        <str as sqlx::Type<sqlx_core::mysql::MySql>>::type_info()
+        <str as sqlx::Type<sqlx::MySql>>::type_info()
       }
     }
 
-    impl<'q> sqlx::Encode<'q, sqlx_core::mysql::MySql> for $t {
+    impl<'q> sqlx::Encode<'q, sqlx::MySql> for $t {
       fn encode_by_ref(
         &self,
-        buf: &mut <sqlx_core::mysql::MySql as sqlx_core::database::HasArguments<'q>>::ArgumentBuffer
+        buf: &mut <sqlx::MySql as sqlx_core::database::HasArguments<'q>>::ArgumentBuffer
       ) -> sqlx_core::encode::IsNull {
         // // 0.4.x series:
         // // NB: In the absence of `#[derive(sqlx::Type)]` and `#sqlx(rename_all="lowercase")]`,
@@ -35,13 +35,13 @@ macro_rules! impl_mysql_enum_coders {
         // NB: https://docs.rs/sqlx-core/0.6.2/src/sqlx_core/mysql/types/uuid.rs.html#38-66 and
         //  https://docs.rs/sqlx-core/0.6.2/src/sqlx_core/mysql/types/str.rs.html#75-78 serves as examples
         let value = self.to_str();
-        <&str as sqlx::Encode<sqlx_core::mysql::MySql>>::encode(&*value, buf)
+        <&str as sqlx::Encode<sqlx::MySql>>::encode(&*value, buf)
       }
     }
 
-    impl<'r> sqlx::Decode<'r, sqlx_core::mysql::MySql> for $t {
+    impl<'r> sqlx::Decode<'r, sqlx::MySql> for $t {
       fn decode(
-        value: sqlx_core::mysql::MySqlValueRef<'r>,
+        value: sqlx_mysql::MySqlValueRef<'r>,
       ) -> Result<Self, sqlx_core::error::BoxDynError> {
         // // 0.4.x series:
         // let string = String::decode(value)?;
@@ -50,7 +50,7 @@ macro_rules! impl_mysql_enum_coders {
 
         // NB: https://docs.rs/sqlx-core/0.6.2/src/sqlx_core/mysql/types/uuid.rs.html#38-66 serves as an example
         // delegate to the &str type to decode from MySQL
-        let text = <&str as sqlx::Decode<sqlx_core::mysql::MySql>>::decode(value)?;
+        let text = <&str as sqlx::Decode<sqlx::MySql>>::decode(value)?;
         let value = $t::from_str(&text)?;
         Ok(value)
       }

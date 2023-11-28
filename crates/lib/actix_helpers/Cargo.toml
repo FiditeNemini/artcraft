@@ -20,13 +20,13 @@ errors = { path = "../../lib/errors" }
 # Actix
 actix-http = "3.4.0"
 actix-rt = "2.9.0"
-actix-service = "2.0.1"
-actix-utils = "3.0.0"
-actix-web = "4.0.0-beta.10"
+actix-service = "2.0.2"
+actix-utils = "3.0.1"
+actix-web = "4.4.0"
 
 # IPv4 and v6 CIDRs (crate has few dependencies)
 cidr-utils = "0.5.11"
-num-traits = "0.2.15" # for cidr-utils
+num-traits = "0.2.17" # for cidr-utils
 
 # Futures
 futures-util = "0.3.29"

@@ -10,6 +10,7 @@ use sqlx::MySqlPool;
 
 use enums::common::visibility::Visibility;
 use errors::AnyhowResult;
+use tokens::tokens::users::UserToken;
 
 use crate::column_types::vocoder_type::VocoderType;
 use crate::helpers::boolean_converters::{i8_to_bool, nullable_i8_to_bool};
@@ -24,7 +25,7 @@ pub struct TtsResultRecordForResponse {
 
   pub maybe_pretrained_vocoder_used: Option<VocoderType>,
 
-  pub maybe_creator_user_token: Option<String>,
+  pub maybe_creator_user_token: Option<UserToken>,
   pub maybe_creator_username: Option<String>,
   pub maybe_creator_display_name: Option<String>,
   pub maybe_creator_gravatar_hash: Option<String>,
@@ -79,7 +80,7 @@ pub struct TtsResultRecordRaw {
   pub maybe_pretrained_vocoder_used: Option<String>,
 
   pub maybe_creator_is_banned: Option<i8>,
-  pub maybe_creator_user_token: Option<String>,
+  pub maybe_creator_user_token: Option<UserToken>,
   pub maybe_creator_username: Option<String>,
   pub maybe_creator_display_name: Option<String>,
   pub maybe_creator_gravatar_hash: Option<String>,
@@ -217,7 +218,7 @@ SELECT
 
     tts_results.maybe_pretrained_vocoder_used,
 
-    users.token as maybe_creator_user_token,
+    users.token as `maybe_creator_user_token: tokens::tokens::users::UserToken`,
     users.username as maybe_creator_username,
     users.display_name as maybe_creator_display_name,
     users.email_gravatar_hash as maybe_creator_gravatar_hash,
@@ -279,7 +280,7 @@ SELECT
 
     tts_results.maybe_pretrained_vocoder_used,
 
-    users.token as maybe_creator_user_token,
+    users.token as `maybe_creator_user_token: tokens::tokens::users::UserToken`,
     users.username as maybe_creator_username,
     users.display_name as maybe_creator_display_name,
     users.email_gravatar_hash as maybe_creator_gravatar_hash,

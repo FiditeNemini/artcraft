@@ -128,7 +128,7 @@ WHERE
         "#,
         username,
     )
-      .fetch_one(connection)
+      .fetch_one(&mut **connection)
       .await;
 
   let profile_record : RawUserProfileRecord = match maybe_profile_record {

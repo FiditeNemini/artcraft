@@ -47,6 +47,6 @@ LIMIT 1
       token
     );
 
-  let _r = query.execute(mysql_connection).await?;
+  let _r = query.execute(&mut** mysql_connection).await?;
   Ok(())
 }

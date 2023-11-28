@@ -34,7 +34,7 @@ FOR UPDATE
         "#,
         job_id.0,
     )
-      .fetch_one(&mut transaction)
+      .fetch_one(&mut *transaction)
       .await;
 
   let record : TtsInferenceLockRecord = match maybe_record {
@@ -77,7 +77,7 @@ WHERE id = ?
         "#,
         job_id.0,
     )
-      .execute(&mut transaction)
+      .execute(&mut *transaction)
       .await?;
 
   transaction.commit().await?;

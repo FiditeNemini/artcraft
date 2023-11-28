@@ -44,13 +44,23 @@ pub async fn process_job(args: SoVitsSvcProcessJobArgs<'_>) -> Result<JobSuccess
   let vc_model = args.vc_model;
 
   let mut job_progress_reporter = args.job_dependencies
+      .clients
       .job_progress_reporter
       .new_generic_inference(job.inference_job_token.as_str())
       .map_err(|e| ProcessSingleJobError::Other(anyhow!(e)))?;
 
+  let model_dependencies = args
+      .job_dependencies
+      .job
+      .job_specific_dependencies
+      .maybe_svc_dependencies
+      .as_ref()
+      .ok_or_else(|| ProcessSingleJobError::JobSystemMisconfiguration(Some("missing SVC dependencies".to_string())))?;
+
   // ==================== CONFIRM OR DOWNLOAD SO-VITS-SVC DEPENDENCIES ==================== //
 
-  // TODO: Currently SO-VITS-SVC downloads models from HuggingFace. This is likely a risk in that they can move.
+  // TODO(bt,2023-04-22): Currently SO-VITS-SVC downloads models from HuggingFace.
+  //  This is likely a risk in that they can move.
   //  We'll need to address this and save these in our own cloud storage.
 
   // ==================== CONFIRM OR DOWNLOAD SO-VITS-SVC SYNTHESIZER MODEL ==================== //
@@ -64,13 +74,13 @@ pub async fn process_job(args: SoVitsSvcProcessJobArgs<'_>) -> Result<JobSuccess
           ProcessSingleJobError::from_io_error(e)
         })?;
 
-    let so_vits_svc_model_object_path  = args.job_dependencies.bucket_path_unifier.so_vits_svc_model_path(&vc_model.private_bucket_hash);
+    let so_vits_svc_model_object_path  = args.job_dependencies.buckets.bucket_path_unifier.so_vits_svc_model_path(&vc_model.private_bucket_hash);
 
     maybe_download_file_from_bucket(
       "so-vits-svc model",
       &so_vits_svc_fs_path,
       &so_vits_svc_model_object_path,
-      &args.job_dependencies.private_bucket_client,
+      &args.job_dependencies.buckets.private_bucket_client,
       &mut job_progress_reporter,
       "downloading so-vits-svc model",
       job.id.0,
@@ -112,7 +122,7 @@ pub async fn process_job(args: SoVitsSvcProcessJobArgs<'_>) -> Result<JobSuccess
       "media upload (original file)",
       &original_media_upload_fs_path,
       &bucket_object_path,
-      &args.job_dependencies.public_bucket_client,
+      &args.job_dependencies.buckets.public_bucket_client,
       &mut job_progress_reporter,
       "downloading",
       job.id.0,
@@ -169,9 +179,7 @@ pub async fn process_job(args: SoVitsSvcProcessJobArgs<'_>) -> Result<JobSuccess
 
   let inference_start_time = Instant::now();
 
-  let command_exit_status = args.job_dependencies
-      .job_type_details
-      .so_vits_svc
+  let command_exit_status = model_dependencies
       .inference_command
       .execute_inference(InferenceArgs {
         model_path: &so_vits_svc_fs_path,
@@ -253,7 +261,7 @@ pub async fn process_job(args: SoVitsSvcProcessJobArgs<'_>) -> Result<JobSuccess
 
   info!("Uploading audio media file...");
 
-  args.job_dependencies.public_bucket_client.upload_filename_with_content_type(
+  args.job_dependencies.buckets.public_bucket_client.upload_filename_with_content_type(
     &result_bucket_object_pathbuf,
     &output_audio_fs_path,
     "audio/wav")
@@ -286,7 +294,7 @@ pub async fn process_job(args: SoVitsSvcProcessJobArgs<'_>) -> Result<JobSuccess
 //      .map_err(|e| ProcessSingleJobError::Other(e))?;
 
   let (inference_result_token, id) = insert_media_file_from_voice_conversion(InsertMediaFileArgs {
-    pool: &args.job_dependencies.mysql_pool,
+    pool: &args.job_dependencies.db.mysql_pool,
     job: &job,
     voice_conversion_type: VoiceConversionModelType::SoVitsSvc,
     maybe_mime_type: maybe_mimetype.as_deref(),
@@ -296,9 +304,9 @@ pub async fn process_job(args: SoVitsSvcProcessJobArgs<'_>) -> Result<JobSuccess
     public_bucket_directory_hash: result_bucket_location.get_object_hash(),
     maybe_public_bucket_prefix: Some(BUCKET_FILE_PREFIX),
     maybe_public_bucket_extension: Some(BUCKET_FILE_EXTENSION),
-    is_on_prem: args.job_dependencies.container.is_on_prem,
-    worker_hostname: &args.job_dependencies.container.hostname,
-    worker_cluster: &args.job_dependencies.container.cluster_name,
+    is_on_prem: args.job_dependencies.job.info.container.is_on_prem,
+    worker_hostname: &args.job_dependencies.job.info.container.hostname,
+    worker_cluster: &args.job_dependencies.job.info.container.cluster_name,
   })
       .await
       .map_err(|e| ProcessSingleJobError::Other(e))?;
@@ -309,7 +317,7 @@ pub async fn process_job(args: SoVitsSvcProcessJobArgs<'_>) -> Result<JobSuccess
   let maybe_user_token = job.maybe_creator_user_token.as_deref()
       .map(|token| UserToken::new_from_str(token));
 
-  args.job_dependencies.firehose_publisher.vc_inference_finished(
+  args.job_dependencies.clients.firehose_publisher.vc_inference_finished(
     maybe_user_token.as_ref(),
     &job.inference_job_token,
     inference_result_token.as_str())

@@ -21,11 +21,12 @@ impl Default for CacheableQueueStats {
 
 #[derive(Serialize, Deserialize, Clone, Default)]
 pub struct Queues {
-  pub legacy_tts: u64, // Tacotron2
-  pub total_generic: u64, // Everything except Tacotron2 summed together
+  pub legacy_tts: u64, // Tacotron2 (as tts_inference_jobs)
+  pub total_generic: u64, // Everything except tts_inference_jobs' Tacotron2 summed together
   pub rvc_v2: u64,
   pub sad_talker: u64,
   pub so_vits_svc: u64,
+  pub tacotron2: u64, // Tacotron2 (as generic_inference_jobs; NB: included in `total_generic`)
 }
 
 pub fn database_result_to_cacheable(database_records: Vec<QueueStatsRow>) -> CacheableQueueStats {
@@ -43,6 +44,7 @@ pub fn database_result_to_cacheable(database_records: Vec<QueueStatsRow>) -> Cac
   let rvc_v2 = unwrap(queue_lengths.get("rvc_v2"));
   let sad_talker = unwrap(queue_lengths.get("sad_talker"));
   let so_vits_svc = unwrap(queue_lengths.get("so_vits_svc"));
+  let tacotron2 = unwrap(queue_lengths.get("tacotron2"));
 
   let total_generic = rvc_v2 + so_vits_svc;
 
@@ -54,6 +56,7 @@ pub fn database_result_to_cacheable(database_records: Vec<QueueStatsRow>) -> Cac
       rvc_v2,
       sad_talker,
       so_vits_svc,
+      tacotron2,
     },
   }
 }

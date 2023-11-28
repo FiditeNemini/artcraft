@@ -1,5 +1,3 @@
 pub mod process_single_vc_job;
 pub mod rvc_v2;
 pub mod so_vits_svc;
-pub mod softvc;
-pub mod vall_e_x_temp;

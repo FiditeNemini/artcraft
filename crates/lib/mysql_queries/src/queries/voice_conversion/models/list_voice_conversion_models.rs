@@ -129,7 +129,7 @@ WHERE
     vc.user_deleted_at IS NULL
     AND vc.mod_deleted_at IS NULL
         "#)
-      .fetch_all(mysql_connection)
+      .fetch_all(&mut **mysql_connection)
       .await?)
 }
 
@@ -163,7 +163,7 @@ WHERE
     AND vc.mod_deleted_at IS NULL
         "#,
       scope_creator_username)
-      .fetch_all(mysql_connection)
+      .fetch_all(&mut **mysql_connection)
       .await?)
 }
 

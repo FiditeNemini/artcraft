@@ -146,7 +146,7 @@ pub async fn enqueue_infer_w2l_with_uploads(
     let mut field_name = "".to_string();
     let mut filename = "".to_string();
 
-    if let Some(content_disposition) = field.content_disposition() {
+    if let content_disposition = field.content_disposition() {
       field_name = content_disposition.get_name()
         .map(|s| s.to_string())
         .unwrap_or("".to_string());

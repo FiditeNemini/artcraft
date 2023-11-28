@@ -118,7 +118,7 @@ async fn list_voices_by_creator_username(
             AND zv.mod_deleted_at IS NULL
         "#,
       creator_username)
-            .fetch_all(mysql_connection)
+            .fetch_all(&mut **mysql_connection)
             .await?
     } else {
         info!("listing voices for user");
@@ -145,7 +145,7 @@ async fn list_voices_by_creator_username(
             users.username = ?
         "#,
       creator_username)
-            .fetch_all(mysql_connection)
+            .fetch_all(&mut **mysql_connection)
             .await?
     };
 

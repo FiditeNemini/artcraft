@@ -28,6 +28,7 @@ pub struct BucketPathUnifier {
 
 impl BucketPathUnifier {
 
+  #[deprecated(note = "see the 'buckets' crate for a better approach")]
   pub fn default_paths() -> Self {
     Self {
       // TTS
@@ -55,6 +56,7 @@ impl BucketPathUnifier {
 
   // NB: Callers use "hash_file_sha2" as the file hash.
   // NB: This is used for TT2 *and* VITS
+  #[deprecated(note = "see the 'buckets' crate for a better approach")]
   pub fn tts_synthesizer_path(&self, tts_synthesizer_file_hash: &str) -> PathBuf {
     let hashed_path = Self::hashed_directory_path(tts_synthesizer_file_hash);
     let model_filename = format!("{}.pt", &tts_synthesizer_file_hash);
@@ -66,6 +68,7 @@ impl BucketPathUnifier {
 
   // NB: Callers use "hash_file_sha2" as the file hash.
   // NB: This is used for VITS traced models, the original model is uploaded with `tts_synthesizer_path()`
+  #[deprecated(note = "see the 'buckets' crate for a better approach")]
   pub fn tts_traced_synthesizer_path(&self, tts_synthesizer_file_hash: &str) -> PathBuf {
     let hashed_path = Self::hashed_directory_path(tts_synthesizer_file_hash);
     let model_filename = format!("{}_traced.pt", &tts_synthesizer_file_hash);
@@ -76,6 +79,7 @@ impl BucketPathUnifier {
   }
 
   // TODO(bt, 2023-04-03): I don't think we ever wound up using this?
+  #[deprecated(note = "see the 'buckets' crate for a better approach")]
   pub fn tts_zipped_synthesizer_path(&self, tts_synthesizer_file_hash: &str) -> PathBuf {
     let hashed_path = Self::hashed_directory_path(tts_synthesizer_file_hash);
     let model_filename = format!("{}.zip", &tts_synthesizer_file_hash);
@@ -90,6 +94,7 @@ impl BucketPathUnifier {
   /// TTS pretrained vocoder models.
   /// For now this will be limited, but once they're user-uploadable, we'll add more.
   /// NB: These are vocoders that we uploaded without the FakeYou upload system!!
+  #[deprecated(note = "see the 'buckets' crate for a better approach")]
   pub fn tts_pretrained_vocoders_path(&self, tts_vocoder_model_name: &str) -> PathBuf {
     self.tts_pretrained_vocoder_model_root.join(tts_vocoder_model_name)
   }
@@ -97,6 +102,7 @@ impl BucketPathUnifier {
   // NB: Callers use "hash_file_sha2" as the file hash.
   /// User-uploaded vocoders.
   /// These can be HifiGan and HifiGanSoftVc
+  #[deprecated(note = "see the 'buckets' crate for a better approach")]
   pub fn vocoder_path(&self, vocoder_file_hash: &str) -> PathBuf {
     let hashed_path = Self::hashed_directory_path(vocoder_file_hash);
     let model_filename = format!("{}.pt", &vocoder_file_hash);
@@ -110,6 +116,7 @@ impl BucketPathUnifier {
 
   // NB: Callers use job uuid_idempotency_token, which seems *bad*
   /// This should include the string "vocodes" for downloaders.
+  #[deprecated(note = "see the 'buckets' crate for a better approach")]
   pub fn tts_inference_wav_audio_output_path(&self, tts_inference_output_uuid: &str) -> PathBuf {
     let hashed_path = Self::hashed_directory_path(tts_inference_output_uuid);
     let audio_filename = format!("vocodes_{}.wav", &tts_inference_output_uuid);
@@ -119,6 +126,7 @@ impl BucketPathUnifier {
         .join(audio_filename)
   }
 
+  #[deprecated(note = "see the 'buckets' crate for a better approach")]
   pub fn tts_inference_spectrogram_output_path(&self, tts_inference_output_uuid: &str) -> PathBuf {
     let hashed_path = Self::hashed_directory_path(tts_inference_output_uuid);
     let json_filename = format!("{}.json", &tts_inference_output_uuid);
@@ -131,11 +139,13 @@ impl BucketPathUnifier {
   // ==================== W2L STATIC RESOURCES ==================== //
 
   // W2L pretrained models. There are only two.
+  #[deprecated(note = "see the 'buckets' crate for a better approach")]
   pub fn w2l_pretrained_models_path(&self, w2l_model_name: &str) -> PathBuf {
     self.w2l_model_root.join(w2l_model_name)
   }
 
   // W2L "end bumps" are videos added at the end.
+  #[deprecated(note = "see the 'buckets' crate for a better approach")]
   pub fn end_bump_video_for_w2l_path(&self, end_bump_filename: &str) -> PathBuf {
     self.w2l_end_bump_root.join(end_bump_filename)
   }
@@ -144,6 +154,7 @@ impl BucketPathUnifier {
 
   // The video or images uploaded as templates
   // eg. /user_uploaded_w2l_templates/1/5/1/151a[...60]...
+  #[deprecated(note = "see the 'buckets' crate for a better approach")]
   pub fn media_templates_for_w2l_path(&self, template_file_hash: &str) -> PathBuf {
     let hashed_path = Self::hashed_directory_path(template_file_hash);
     self.user_uploaded_w2l_templates_root
@@ -153,6 +164,7 @@ impl BucketPathUnifier {
 
   // These share the same directory as the uploaded w2l template media.
   // eg. /user_uploaded_w2l_templates/1/5/1/151a[...60]_detected_faces.pickle
+  #[deprecated(note = "see the 'buckets' crate for a better approach")]
   pub fn precomputed_faces_for_w2l_path(&self, template_file_hash: &str) -> PathBuf {
     let faces_filename = format!("{}_detected_faces.pickle", &template_file_hash);
     let hashed_path = Self::hashed_directory_path(template_file_hash);
@@ -164,6 +176,7 @@ impl BucketPathUnifier {
 
   // User-uploaded audio.
   // eg. /user_uploaded_w2l_audio/0/0/b/00bcc7a4-bdf5-43a5-9603-a15ca780d866
+  #[deprecated(note = "see the 'buckets' crate for a better approach")]
   pub fn user_audio_for_w2l_inference_path(&self, audio_uuid: &str) -> PathBuf {
     let hashed_path = Self::hashed_directory_path(audio_uuid);
     self.user_uploaded_audio_for_w2l_root
@@ -175,6 +188,7 @@ impl BucketPathUnifier {
 
   // NB: caller uses inference job token, which seems ideal
   // W2L inference output videos
+  #[deprecated(note = "see the 'buckets' crate for a better approach")]
   pub fn w2l_inference_video_output_path(&self, w2l_inference_job_token: &str) -> PathBuf {
     // NB: We don't want colons from the token in the filename.
     if w2l_inference_job_token.contains(":") {
@@ -204,6 +218,7 @@ impl BucketPathUnifier {
   // ==================== ZERO SHOT SPEAKER EMBEDDINGS ==================== //
 
   // NB: Entropic hash is not based on file hash and will be reused for future encodings.
+  #[deprecated(note = "see the 'buckets' crate for a better approach")]
   pub fn zero_shot_tts_speaker_encoding(&self, entropic_hash: &str, version: u32) -> PathBuf {
     let hashed_path = Self::hashed_directory_path(entropic_hash);
     let speaker_encoding_filename = format!("{}_{}.zs", &entropic_hash, version);
@@ -216,6 +231,7 @@ impl BucketPathUnifier {
   // ==================== VOICE CONVERSION MODELS ==================== //
 
   // NB: Entropic hash is not based on file hash and is shared between .pth and .index files.
+  #[deprecated(note = "see the 'buckets' crate for a better approach")]
   pub fn rvc_v2_model_index_path(&self, entropic_hash: &str) -> PathBuf {
     let hashed_path = Self::hashed_directory_path(entropic_hash);
     let model_index_filename = format!("{}.index", &entropic_hash);
@@ -226,6 +242,7 @@ impl BucketPathUnifier {
   }
 
   // NB: Entropic hash is not based on file hash and is shared between .pth and .index files.
+  #[deprecated(note = "see the 'buckets' crate for a better approach")]
   pub fn rvc_v2_model_path(&self, entropic_hash: &str) -> PathBuf {
     let hashed_path = Self::hashed_directory_path(entropic_hash);
     let model_filename = format!("{}.pt", &entropic_hash);
@@ -236,6 +253,7 @@ impl BucketPathUnifier {
   }
 
   // NB: Callers use "hash_file_sha2" as the file hash.
+  #[deprecated(note = "see the 'buckets' crate for a better approach")]
   pub fn softvc_model_path(&self, softvc_model_file_hash: &str) -> PathBuf {
     let hashed_path = Self::hashed_directory_path(softvc_model_file_hash);
     let model_filename = format!("{}.pt", &softvc_model_file_hash);
@@ -246,6 +264,7 @@ impl BucketPathUnifier {
   }
 
   // NB: Callers use "hash_file_sha2" as the file hash.
+  #[deprecated(note = "see the 'buckets' crate for a better approach")]
   pub fn so_vits_svc_model_path(&self, so_vits_svc_model_file_hash: &str) -> PathBuf {
     let hashed_path = Self::hashed_directory_path(so_vits_svc_model_file_hash);
     let model_filename = format!("{}.pt", &so_vits_svc_model_file_hash);
@@ -258,6 +277,7 @@ impl BucketPathUnifier {
   // ==================== VOICE CONVERSION INFERENCE OUTPUT ==================== //
 
   // NB: Callers use job uuid_idempotency_token, which seems *bad*
+  #[deprecated(note = "see the 'buckets' crate for a better approach")]
   pub fn voice_conversion_inference_wav_audio_output_path(&self, vc_inference_output_uuid: &str) -> PathBuf {
     let hashed_path = Self::hashed_directory_path(vc_inference_output_uuid);
     let audio_filename = format!("fakeyou_{}.wav", &vc_inference_output_uuid);
@@ -270,6 +290,7 @@ impl BucketPathUnifier {
 
   // ==================== UTILITY ==================== //
 
+  #[deprecated(note = "see the 'buckets' crate for a better approach")]
   pub fn hashed_directory_path(file_hash: &str) -> String {
     hashed_directory_path_short_string(file_hash)
   }

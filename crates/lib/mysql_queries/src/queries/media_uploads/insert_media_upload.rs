@@ -64,7 +64,7 @@ ON DUPLICATE KEY UPDATE
       creator_user_token,
       creator_user_token
     )
-        .execute(&mut transaction)
+        .execute(&mut *transaction)
         .await;
 
     match query_result {
@@ -88,7 +88,7 @@ LIMIT 1
         "#,
       creator_user_token,
     )
-        .fetch_one(&mut transaction)
+        .fetch_one(&mut *transaction)
         .await;
 
     let record : SyntheticIdRecord = match query_result {
@@ -169,7 +169,7 @@ SET
         args.creator_set_visibility.to_str(),
     );
 
-  let query_result = query.execute(&mut transaction)
+  let query_result = query.execute(&mut *transaction)
       .await;
 
   let result_tuple  = match query_result {

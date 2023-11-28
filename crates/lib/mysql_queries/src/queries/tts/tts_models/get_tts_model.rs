@@ -261,7 +261,7 @@ WHERE tts.token = ?
         "#,
       tts_model_token
     )
-    .fetch_one(mysql_connection)
+    .fetch_one(&mut **mysql_connection)
     .await // TODO: This will return error if it doesn't exist
 }
 
@@ -340,7 +340,7 @@ WHERE
         "#,
       tts_model_token
     )
-    .fetch_one(mysql_connection)
+    .fetch_one(&mut **mysql_connection)
     .await // TODO: This will return error if it doesn't exist
 }
 

@@ -125,10 +125,10 @@ impl FirehosePublisher {
     Ok(())
   }
 
-  pub async fn publish_tts_model_upload_finished(&self, user_token: &str, model_token: &str) -> AnyhowResult<()> {
+  pub async fn publish_tts_model_upload_finished(&self, user_token: &UserToken, model_token: &str) -> AnyhowResult<()> {
     let _record_id = self.insert(
       FirehoseEvent::TtsModelUploadCompleted,
-      Some(user_token),
+      Some(user_token.as_str()),
       Some(model_token),
       Some(model_token)
     ).await?;
@@ -258,10 +258,10 @@ impl FirehosePublisher {
   }
 
   // NB: Entity token is optional.
-  pub async fn publish_generic_download_finished(&self, user_token: &str, entity_token: Option<&str>) -> AnyhowResult<()> {
+  pub async fn publish_generic_download_finished(&self, user_token: &UserToken, entity_token: Option<&str>) -> AnyhowResult<()> {
     let _record_id = self.insert(
       FirehoseEvent::GenericDownloadCompleted,
-      Some(user_token),
+      Some(user_token.as_str()),
       entity_token,
       entity_token,
     ).await?;

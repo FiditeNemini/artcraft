@@ -17,6 +17,7 @@ use enums::common::job_status_plus::JobStatusPlus;
 use mysql_queries::queries::generic_inference::web::get_inference_job_status::get_inference_job_status;
 use redis_common::redis_keys::RedisKeys;
 use tokens::tokens::generic_inference_jobs::InferenceJobToken;
+use crate::http_server::responses::filter_model_name::maybe_filter_model_name;
 
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::server_state::ServerState;
@@ -203,7 +204,7 @@ pub async fn get_inference_job_status_handler(
     job_token: record.job_token,
     request: RequestDetailsResponse {
       inference_category: record.request_details.inference_category,
-      maybe_model_type: filter_model_name(record.request_details.maybe_model_type),
+      maybe_model_type: maybe_filter_model_name(record.request_details.maybe_model_type.as_deref()),
       maybe_model_token: record.request_details.maybe_model_token,
       maybe_model_title: record.request_details.maybe_model_title,
       maybe_raw_inference_text: record.request_details.maybe_raw_inference_text,
@@ -211,7 +212,7 @@ pub async fn get_inference_job_status_handler(
     status: StatusDetailsResponse {
       status: record.status,
       maybe_extra_status_description,
-      maybe_assigned_worker: filter_model_name(record.maybe_assigned_worker),
+      maybe_assigned_worker: maybe_filter_model_name(record.maybe_assigned_worker.as_deref()),
       maybe_assigned_cluster: record.maybe_assigned_cluster,
       maybe_first_started_at: record.maybe_first_started_at,
       attempt_count: record.attempt_count as u8,
@@ -230,8 +231,23 @@ pub async fn get_inference_job_status_handler(
               .to_string()
         }
         InferenceCategory::TextToSpeech => {
-          // NB: TTS results receive the legacy treatment where their table only reports the full bucket path
-          result_details.public_bucket_location_or_hash
+          match result_details.entity_type.as_str() {
+            "media_file" => {
+              // NB: We're migrating TTS to media_files.
+              // Zero shot TTS uses media files.
+              // Legacy TT2 uses old pathing.
+              MediaFileBucketPath::from_object_hash(
+                &result_details.public_bucket_location_or_hash,
+                result_details.maybe_media_file_public_bucket_prefix.as_deref(),
+                result_details.maybe_media_file_public_bucket_extension.as_deref())
+                  .get_full_object_path_str()
+                  .to_string()
+            }
+            _ => {
+              // NB: TTS results receive the legacy treatment where their table only reports the full bucket path
+              result_details.public_bucket_location_or_hash
+            }
+          }
         }
         InferenceCategory::VoiceConversion => {
           match result_details.entity_type.as_str() {
@@ -279,26 +295,4 @@ pub async fn get_inference_job_status_handler(
   Ok(HttpResponse::Ok()
       .content_type("application/json")
       .body(body))
-}
-
-fn filter_model_name(name: Option<String>) -> Option<String> {
-  // We're not revealing some of the models we use
-  name.map(|name| {
-    name.replace("sadtalker", "faceanimator")
-        .replace("sad-talker", "face-animator")
-        .replace("sad_talker", "face_animator")
-  })
-}
-
-#[cfg(test)]
-mod tests {
-  use crate::http_server::endpoints::inference_job::get_inference_job_status::filter_model_name;
-
-  #[test]
-  fn test_filter_model_name() {
-    assert_eq!(filter_model_name(None), None);
-    assert_eq!(filter_model_name(Some("foobarbaz".to_string())), Some("foobarbaz".to_string()));
-    assert_eq!(filter_model_name(Some("inference-job-sadtalker-5df55cfbb7-ngxzh".to_string())), Some("inference-job-faceanimator-5df55cfbb7-ngxzh".to_string()));
-    assert_eq!(filter_model_name(Some("sad_talker".to_string())), Some("face_animator".to_string()));
-  }
 }

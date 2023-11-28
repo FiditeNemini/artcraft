@@ -45,34 +45,19 @@ use memory_caching::ttl_key_counter::TtlKeyCounter;
 use mysql_queries::common_inputs::container_environment_arg::ContainerEnvironmentArg;
 use mysql_queries::mediators::firehose_publisher::FirehosePublisher;
 use newrelic_telemetry::ClientBuilder;
-use subprocess_common::docker_options::{DockerEnvVar, DockerFilesystemMount, DockerGpu, DockerOptions};
 
 use crate::http_server::run_http_server::CreateServerArgs;
 use crate::http_server::run_http_server::launch_http_server;
 use crate::job::job_loop::main_loop::main_loop;
-use crate::job::job_types::lipsync::sad_talker::model_downloaders::SadTalkerDownloaders;
-use crate::job::job_types::lipsync::sad_talker::sad_talker_inference_command::SadTalkerInferenceCommand;
-use crate::job::job_types::tts::tacotron2_v2_early_fakeyou::tacotron2_inference_command::Tacotron2InferenceCommand;
-
-use crate::job::job_types::tts::vits::vits_inference_command::VitsInferenceCommand;
-
-use crate::job::job_types::tts::vall_e_x::vall_e_x_inference_command::VallEXInferenceCommand;
-use crate::job::job_types::tts::vall_e_x::vall_e_x_inference_command::VallEXCreateEmbeddingCommand;
-use crate::job::job_types::tts::vall_e_x::model_downloaders::VallEXDownloaders;
-use crate::job::job_types::vc::rvc_v2::model_downloaders::RvcV2Downloaders;
-
-use crate::job::job_types::vc::rvc_v2::pretrained_hubert_model::PretrainedHubertModel;
-use crate::job::job_types::vc::rvc_v2::rvc_v2_inference_command::RvcV2InferenceCommand;
-use crate::job::job_types::vc::so_vits_svc::so_vits_svc_inference_command::SoVitsSvcInferenceCommand;
-
-use crate::job_dependencies::{FileSystemDetails, JobCaches, JobDependencies, JobTypeDetails, JobWorkerDetails, PretrainedModels, RvcV2Details, SadTalkerDetails, SoVitsSvcDetails, Tacotron2VocodesDetails, VitsDetails, VallEXDetails};
-use crate::util::common_commands::ffmpeg_logo_watermark_command::FfmpegLogoWatermarkCommand;
+use crate::job_dependencies::{BucketDependencies, ClientDependencies, DatabaseDependencies, FileSystemDetails, JobCaches, JobDependencies, JobInstanceInfo, JobSystemControls, JobSystemDependencies};
+use crate::job_specific_dependencies::JobSpecificDependencies;
 use crate::util::scoped_execution::ScopedExecution;
 use crate::util::scoped_temp_dir_creator::ScopedTempDirCreator;
 
 pub mod http_server;
 pub mod job;
 pub mod job_dependencies;
+pub mod job_specific_dependencies;
 pub mod util;
 
 // Buckets (shared config)
@@ -178,15 +163,6 @@ async fn main() -> AnyhowResult<()> {
 
   let common_env = CommonEnv::read_from_env()?;
 
-  let waveglow_vocoder_model_filename = easyenv::get_env_string_or_default(
-    "TTS_WAVEGLOW_VOCODER_MODEL_FILENAME", "waveglow.pth");
-
-  let hifigan_vocoder_model_filename = easyenv::get_env_string_or_default(
-    "TTS_HIFIGAN_VOCODER_MODEL_FILENAME", "hifigan.pth");
-
-  let hifigan_superres_vocoder_model_filename = easyenv::get_env_string_or_default(
-    "TTS_HIFIGAN_SUPERRES_VOCODER_MODEL_FILENAME", "hifigan_superres.pth");
-
   let sidecar_max_synthesizer_models = easyenv::get_env_num(
     "SIDECAR_MAX_SYNTHESIZER_MODELS", 3)?;
 
@@ -255,8 +231,16 @@ async fn main() -> AnyhowResult<()> {
     job_stats: job_stats.clone(),
   };
 
+  let scoped_execution = ScopedExecution::new_from_env()?;
+
+  let job_specific_dependencies = JobSpecificDependencies::setup_for_jobs(&scoped_execution)?;
+
   let job_dependencies = JobDependencies {
-    scoped_execution: ScopedExecution::new_from_env()?,
+    db: DatabaseDependencies {
+      mysql_pool,
+      maybe_redis_pool: None, // TODO(bt, 2023-01-11): See note in JobDependencies
+      maybe_keepalive_redis_pool,
+    },
     fs: FileSystemDetails {
       temp_directory_downloads: temp_directory_downloads.clone(),
       temp_directory_work: temp_directory_work.clone(),
@@ -265,86 +249,61 @@ async fn main() -> AnyhowResult<()> {
       scoped_temp_dir_creator_for_work: ScopedTempDirCreator::for_directory(&temp_directory_work),
       semi_persistent_cache,
     },
-    mysql_pool,
-    maybe_redis_pool: None, // TODO(bt, 2023-01-11): See note in JobDependencies
-    maybe_keepalive_redis_pool,
-    job_progress_reporter,
-    public_bucket_client,
-    private_bucket_client,
-    job_stats,
-    newrelic_client,
-    newrelic_disabled,
-    worker_details: JobWorkerDetails {
-      is_debug_worker,
+    buckets: BucketDependencies {
+      public_bucket_client,
+      private_bucket_client,
+      bucket_path_unifier: BucketPathUnifier::default_paths(),
     },
-    caches: JobCaches {
-      tts_model_record_cache: MultiItemTtlCache::create_with_duration(
-        easyenv::get_env_duration_seconds_or_default(
-          "TTS_MODEL_RECORD_CACHE_SECONDS",
-          Duration::from_secs(60*5)
-        ),
-      ),
-      vc_model_record_cache: MultiItemTtlCache::create_with_duration(
-        easyenv::get_env_duration_seconds_or_default(
-        "VC_MODEL_RECORD_CACHE_SECONDS",
-        Duration::from_secs(60)
-        ),
-      ),
-      model_cache_counter: TtlKeyCounter::create_with_duration(
-        easyenv::get_env_duration_seconds_or_default(
-          "TTL_KEY_COUNTER_CACHE_SECONDS",
-          Duration::from_secs(60 * 5)
-        ),
-      ),
+    clients: ClientDependencies {
+      job_progress_reporter,
+      firehose_publisher,
+      newrelic_client,
+      newrelic_disabled,
     },
-    cold_filesystem_cache_starvation_threshold:
-      easyenv::get_env_num("COLD_FILESYSTEM_CACHE_STARVATION_THRESHOLD", 3)?,
-    bucket_path_unifier: BucketPathUnifier::default_paths(),
-    firehose_publisher,
-    job_batch_wait_millis: common_env.job_batch_wait_millis,
-    job_max_attempts: common_env.job_max_attempts as u16,
-    job_batch_size: common_env.job_batch_size,
-    no_op_logger_millis: common_env.no_op_logger_millis,
-    sidecar_max_synthesizer_models,
-    low_priority_starvation_prevention_every_nth,
-    maybe_minimum_priority,
-    job_type_details: JobTypeDetails {
-      tacotron2_old_vocodes: Tacotron2VocodesDetails {
-        inference_command: Tacotron2InferenceCommand::from_env()?,
-        waveglow_vocoder_model_filename,
-        hifigan_vocoder_model_filename,
-        hifigan_superres_vocoder_model_filename,
+    job: JobSystemDependencies {
+      system: JobSystemControls {
+        scoped_execution,
+        cold_filesystem_cache_starvation_threshold: easyenv::get_env_num("COLD_FILESYSTEM_CACHE_STARVATION_THRESHOLD", 3)?,
+        job_batch_wait_millis: common_env.job_batch_wait_millis,
+        job_max_attempts: common_env.job_max_attempts as u16,
+        job_batch_size: common_env.job_batch_size,
+        no_op_logger_millis: common_env.no_op_logger_millis,
+        sidecar_max_synthesizer_models,
+        low_priority_starvation_prevention_every_nth,
+        maybe_minimum_priority,
+        is_debug_worker,
+        application_shutdown: application_shutdown.clone(),
       },
-      vall_e_x: VallEXDetails { 
-        downloaders: VallEXDownloaders::build_all_from_env(),
-        inference_command: VallEXInferenceCommand::from_env()?, 
-        create_embedding_command: VallEXCreateEmbeddingCommand::from_env()?, 
+      info: JobInstanceInfo {
+        job_stats,
+        caches: JobCaches {
+          tts_model_record_cache: MultiItemTtlCache::create_with_duration(
+            easyenv::get_env_duration_seconds_or_default(
+              "TTS_MODEL_RECORD_CACHE_SECONDS",
+              Duration::from_secs(60*5)
+            ),
+          ),
+          vc_model_record_cache: MultiItemTtlCache::create_with_duration(
+            easyenv::get_env_duration_seconds_or_default(
+              "VC_MODEL_RECORD_CACHE_SECONDS",
+              Duration::from_secs(60)
+            ),
+          ),
+          model_cache_counter: TtlKeyCounter::create_with_duration(
+            easyenv::get_env_duration_seconds_or_default(
+              "TTL_KEY_COUNTER_CACHE_SECONDS",
+              Duration::from_secs(60 * 5)
+            ),
+          ),
+        },
+        container: container_environment.clone(),
+        container_db: ContainerEnvironmentArg {
+          hostname: container_environment.hostname,
+          cluster_name: container_environment.cluster_name,
+        },
       },
-      vits: VitsDetails {
-        inference_command: vits_inference_command()?,
-      },
-      so_vits_svc: SoVitsSvcDetails {
-        inference_command: SoVitsSvcInferenceCommand::from_env()?,
-      },
-      rvc_v2: RvcV2Details {
-        inference_command: RvcV2InferenceCommand::from_env()?,
-        downloaders: RvcV2Downloaders::build_all_from_env(),
-      },
-      sad_talker: SadTalkerDetails {
-        downloaders: SadTalkerDownloaders::build_all_from_env(),
-        inference_command: SadTalkerInferenceCommand::from_env()?,
-        ffmpeg_watermark_command: FfmpegLogoWatermarkCommand::from_env()?,
-      },
+      job_specific_dependencies,
     },
-    pretrained_models: PretrainedModels {
-      rvc_v2_hubert: PretrainedHubertModel::from_env(),
-    },
-    container: container_environment.clone(),
-    container_db: ContainerEnvironmentArg {
-      hostname: container_environment.hostname,
-      cluster_name: container_environment.cluster_name,
-    },
-    application_shutdown: application_shutdown.clone(),
   };
 
   std::thread::spawn(move || {
@@ -363,59 +322,3 @@ async fn main() -> AnyhowResult<()> {
   Ok(())
 }
 
-fn vits_inference_command() -> AnyhowResult<VitsInferenceCommand> {
-  let root_directory = easyenv::get_env_string_required(
-    "VITS_INFERENCE_ROOT_DIRECTORY")?;
-
-  let inference_script = easyenv::get_env_string_or_default(
-    "VITS_INFERENCE_SCRIPT",
-    "infer_ts_job.py");
-
-  let maybe_venv_command = easyenv::get_env_string_optional(
-    "VITS_INFERENCE_MAYBE_VENV_COMMAND");
-
-  let maybe_python_interpreter = easyenv::get_env_string_optional(
-    "VITS_INFERENCE_MAYBE_PYTHON_INTERPRETER");
-
-  let maybe_huggingface_dataset_cache = easyenv::get_env_string_optional(
-    "HF_DATASETS_CACHE");
-
-  let maybe_nltk_data_cache = easyenv::get_env_string_optional(
-    "NLTK_DATA");
-
-  let mut docker_env_vars = Vec::new();
-
-  if let Some(cache_dir) = maybe_huggingface_dataset_cache.as_deref() {
-    docker_env_vars.push(DockerEnvVar::new("HF_DATASETS_CACHE", cache_dir));
-    docker_env_vars.push(DockerEnvVar::new("HF_HOME", cache_dir));
-  }
-
-  if let Some(cache_dir) = maybe_nltk_data_cache.as_deref() {
-    docker_env_vars.push(DockerEnvVar::new("NLTK_DATA", cache_dir));
-    docker_env_vars.push(DockerEnvVar::new("NLTK_DATA_PATH", cache_dir));
-  }
-
-  let maybe_docker_env_vars =
-      if docker_env_vars.is_empty() { None } else { Some(docker_env_vars) };
-
-  let maybe_docker_options = easyenv::get_env_string_optional(
-    "VITS_INFERENCE_MAYBE_DOCKER_IMAGE_SHA")
-      .map(|image_name| {
-        DockerOptions {
-          image_name,
-          maybe_bind_mount: Some(DockerFilesystemMount::tmp_to_tmp()),
-          maybe_environment_variables: maybe_docker_env_vars,
-          maybe_gpu: Some(DockerGpu::All),
-        }
-      });
-
-  Ok(VitsInferenceCommand::new(
-    root_directory,
-    inference_script,
-    maybe_python_interpreter.as_deref(),
-    maybe_venv_command.as_deref(),
-    maybe_huggingface_dataset_cache.as_deref(),
-    maybe_nltk_data_cache.as_deref(),
-    maybe_docker_options,
-  ))
-}

@@ -3,7 +3,6 @@ use actix_service::ServiceFactory;
 use actix_web::{App, HttpResponse, web};
 use actix_web::dev::{ServiceRequest, ServiceResponse};
 use actix_web::error::Error;
-use log::warn;
 
 use actix_helpers::route_builder::RouteBuilder;
 use billing_component::default_routes::add_suggested_stripe_billing_routes;
@@ -29,6 +28,11 @@ use crate::http_server::endpoints::comments::list_comments_handler::list_comment
 use crate::http_server::endpoints::download_job::enqueue_generic_download::enqueue_generic_download_handler;
 use crate::http_server::endpoints::download_job::get_generic_upload_job_status::get_generic_download_job_status_handler;
 use crate::http_server::endpoints::events::list_events::list_events_handler;
+use crate::http_server::endpoints::favorites::create_favorite_handler::create_favorite_handler;
+use crate::http_server::endpoints::favorites::delete_favorite_handler::delete_favorite_handler;
+use crate::http_server::endpoints::favorites::list_favorites_for_entity_handler::list_favorites_for_entity_handler;
+use crate::http_server::endpoints::favorites::list_favorites_for_session_handler::list_favorites_for_session_handler;
+use crate::http_server::endpoints::favorites::list_favorites_for_user_handler::list_favorites_for_user_handler;
 use crate::http_server::endpoints::flags::design_refresh_flag::disable_design_refresh_flag_handler::disable_design_refresh_flag_handler;
 use crate::http_server::endpoints::flags::design_refresh_flag::enable_design_refresh_flag_handler::enable_design_refresh_flag_handler;
 use crate::http_server::endpoints::inference_job::get_inference_job_status::get_inference_job_status_handler;
@@ -37,6 +41,7 @@ use crate::http_server::endpoints::inference_job::terminate_inference_job_handle
 use crate::http_server::endpoints::investor_demo::disable_demo_mode_handler::disable_demo_mode_handler;
 use crate::http_server::endpoints::investor_demo::enable_demo_mode_handler::enable_demo_mode_handler;
 use crate::http_server::endpoints::leaderboard::get_leaderboard::leaderboard_handler;
+use crate::http_server::endpoints::media_files::delete_media_file::delete_media_file_handler;
 use crate::http_server::endpoints::media_files::get_media_file::get_media_file_handler;
 use crate::http_server::endpoints::media_uploads::list_user_media_uploads_of_type::list_user_media_uploads_of_type_handler;
 use crate::http_server::endpoints::media_uploads::upload_audio::upload_audio_handler;
@@ -113,7 +118,7 @@ use crate::http_server::endpoints::voice_designer::inference::enqueue_tts_reques
 use crate::http_server::endpoints::voice_designer::inference::enqueue_vc_request::enqueue_vc_request;
 use crate::http_server::endpoints::voice_designer::voice_dataset_samples::delete_sample::delete_sample_handler;
 use crate::http_server::endpoints::voice_designer::voice_dataset_samples::list_samples_by_dataset::list_samples_by_dataset_handler;
-use crate::http_server::endpoints::voice_designer::voice_dataset_samples::upload_sample::upload_sample_handler;
+use crate::http_server::endpoints::voice_designer::voice_dataset_samples::upload_zs_sample::upload_zs_sample_handler;
 use crate::http_server::endpoints::voice_designer::voice_datasets::create_dataset::create_dataset_handler;
 use crate::http_server::endpoints::voice_designer::voice_datasets::delete_dataset::delete_dataset_handler;
 use crate::http_server::endpoints::voice_designer::voice_datasets::get_dataset::get_dataset_handler;
@@ -175,18 +180,24 @@ pub fn add_routes<T, B> (app: App<T>, server_environment: ServerEnvironment) -> 
   app = add_trending_routes(app); /* /v1/trending/... */
   app = add_user_rating_routes(app); /* /v1/user_rating/... */
   app = add_subscription_routes(app); /* /v1/subscriptions/... */
+  app = add_voice_designer_routes(app); /* /v1/voice_designer */
 
-  // TODO find a long term feature flag solution, since this code is likely deployed into production we don't want the route found.
-  if !server_environment.is_deployed_in_production() {
-    warn!("Adding voice designer routes (development only)");
-    app = add_voice_designer_routes(app); /* /v1/voice_designer */
-  }
   // ==================== Comments ====================
 
   let mut app = RouteBuilder::from_app(app)
       .add_get("/v1/comments/list/{entity_type}/{entity_token}", list_comments_handler)
       .add_post("/v1/comments/new", create_comment_handler)
       .add_post("/v1/comments/delete/{comment_token}", delete_comment_handler)
+      .into_app();
+
+  // ==================== Favorites ====================
+
+  let mut app = RouteBuilder::from_app(app)
+      .add_post("/v1/favorites/create", create_favorite_handler)
+      .add_post("/v1/favorites/delete/{favorite_token}", delete_favorite_handler)
+      .add_get("/v1/favorites/list/session", list_favorites_for_session_handler)
+      .add_get("/v1/favorites/list/user/{username}", list_favorites_for_user_handler)
+      .add_get("/v1/favorites/list/entity/{entity_type}/{entity_token}", list_favorites_for_entity_handler)
       .into_app();
 
   // ==================== Animations ====================
@@ -986,6 +997,7 @@ fn add_media_file_routes<T, B> (app: App<T>) -> App<T>
   app.service(web::scope("/v1/media_files")
       .service(web::resource("/file/{token}")
           .route(web::get().to(get_media_file_handler))
+          .route(web::delete().to(delete_media_file_handler))
           .route(web::head().to(|| HttpResponse::Ok()))
       )
   )
@@ -1192,7 +1204,7 @@ fn add_voice_designer_routes<T,B> (app:App<T>)-> App<T>
               )
               .service(
                   web::scope("/sample")
-                      .route("/upload", web::post().to(upload_sample_handler))
+                      .route("/upload", web::post().to(upload_zs_sample_handler))
                       .route("/{sample_token}/delete", web::delete().to(delete_sample_handler))
                       .route("/dataset/{dataset_token}/list", web::get().to(list_samples_by_dataset_handler))
               )

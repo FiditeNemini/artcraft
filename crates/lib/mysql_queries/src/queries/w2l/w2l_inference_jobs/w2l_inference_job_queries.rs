@@ -134,7 +134,7 @@ FOR UPDATE
         "#,
         job.id,
     )
-      .fetch_one(&mut transaction)
+      .fetch_one(&mut *transaction)
       .await;
 
   let record : W2lInferenceLockRecord = match maybe_record {
@@ -177,7 +177,7 @@ WHERE id = ?
         "#,
         job.id,
     )
-      .execute(&mut transaction)
+      .execute(&mut *transaction)
       .await?;
 
   transaction.commit().await?;
@@ -201,7 +201,7 @@ pub async fn mark_w2l_inference_job_failure(
     next_status = "dead";
   }
 
-  let query_result = sqlx::query!(
+  let _query_result = sqlx::query!(
         r#"
 UPDATE w2l_inference_jobs
 SET
@@ -228,7 +228,7 @@ pub async fn mark_w2l_inference_job_done(
 ) -> AnyhowResult<()> {
   let status = if success { "complete_success" } else { "complete_failure" };
 
-  let query_result = sqlx::query!(
+  let _query_result = sqlx::query!(
         r#"
 UPDATE w2l_inference_jobs
 SET
@@ -289,7 +289,7 @@ ON DUPLICATE KEY UPDATE
       creator_user_token,
       creator_user_token
     )
-        .execute(&mut transaction)
+        .execute(&mut *transaction)
         .await;
 
     match query_result {
@@ -313,7 +313,7 @@ LIMIT 1
         "#,
       creator_user_token,
     )
-        .fetch_one(&mut transaction)
+        .fetch_one(&mut *transaction)
         .await;
 
     let record : SyntheticIdRecord = match query_result {
@@ -366,7 +366,7 @@ SET
       frame_height,
       duration_millis
     )
-        .execute(&mut transaction)
+        .execute(&mut *transaction)
         .await;
 
     let record_id = match query_result {

@@ -184,7 +184,7 @@ impl ListCategoriesQueryBuilder {
       query = query.bind(model_type);
     }
 
-    let mut results = query.fetch_all(mysql_connection)
+    let mut results = query.fetch_all(&mut **mysql_connection)
         .await?;
 
     Ok(results)

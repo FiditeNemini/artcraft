@@ -7,6 +7,7 @@ use enums::by_table::tts_models::tts_model_type::TtsModelType;
 use enums::common::visibility::Visibility;
 use errors::AnyhowResult;
 use tokens::tokens::tts_models::TtsModelToken;
+use tokens::tokens::users::UserToken;
 
 pub struct InsertTtsModelFromDownloadJobArgs<'a, P: AsRef<Path>> {
   pub tts_model_type: TtsModelType,
@@ -17,12 +18,17 @@ pub struct InsertTtsModelFromDownloadJobArgs<'a, P: AsRef<Path>> {
   pub original_filename: &'a str,
   pub file_size_bytes: u64,
 
-  pub creator_user_token: &'a str,
+  pub creator_user_token: &'a UserToken,
   pub creator_ip_address: &'a str,
   pub creator_set_visibility: Visibility,
 
   pub private_bucket_hash: &'a str,
   pub private_bucket_object_name: P,
+
+  /// In production code, send this as `None`.
+  /// Only provide an external model token for db integration tests and db seeding tools.
+  /// This allows for knowing the model token a priori.
+  pub maybe_model_token: Option<&'a TtsModelToken>,
 
   pub mysql_pool: &'a MySqlPool,
 }
@@ -30,9 +36,12 @@ pub struct InsertTtsModelFromDownloadJobArgs<'a, P: AsRef<Path>> {
 
 pub async fn insert_tts_model_from_download_job<P: AsRef<Path>>(
   args: InsertTtsModelFromDownloadJobArgs<'_, P>,
-) -> AnyhowResult<(u64, String)> {
+) -> AnyhowResult<(u64, TtsModelToken)> {
 
-  let model_token = TtsModelToken::generate().to_string();
+  let model_token = match args.maybe_model_token {
+    None => TtsModelToken::generate(),
+    Some(model_token) => model_token.clone(),
+  };
 
   let private_bucket_object_name = &args.private_bucket_object_name
       .as_ref()

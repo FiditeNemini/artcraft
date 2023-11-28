@@ -47,7 +47,7 @@ WHERE
         "#,
         user_token
       )
-      .fetch_all(mysql_connector)
+      .fetch_all(&mut **mysql_connector)
       .await;
 
   let user_badges : Vec<RawDbUserBadgeForList> = match maybe_user_badges {

@@ -6,6 +6,8 @@ use anyhow::anyhow;
 use log::{error, info, warn};
 
 use buckets::public::media_files::original_file::MediaFileBucketPath;
+use buckets::public::zs_voices::directory::{ModelCategory, ModelType};
+use buckets::public::zs_voices::file::ZeroShotVoiceEmbeddingBucketPath;
 use cloud_storage::bucket_client::BucketClient;
 use cloud_storage::bucket_path_unifier::BucketPathUnifier;
 use enums::by_table::generic_inference_jobs::inference_result_type::InferenceResultType;
@@ -13,7 +15,7 @@ use filesys::file_size::file_size;
 use hashing::sha256::sha256_hash_file::sha256_hash_file;
 use mysql_queries::queries::media_files::insert_media_file_from_zero_shot_tts::insert_media_file_from_zero_shot;
 use mysql_queries::queries::media_files::insert_media_file_from_zero_shot_tts::InsertArgs;
-use mysql_queries::queries::voice_designer::voices::get_voice::get_voice_by_token;
+use mysql_queries::queries::voice_designer::voices::get_voice::{get_voice_by_token, ZsVoice};
 
 use crate::job::job_loop::job_success_result::JobSuccessResult;
 use crate::job::job_loop::job_success_result::ResultEntity;
@@ -33,9 +35,19 @@ pub async fn process_inference_voice(
 ) -> Result<JobSuccessResult, ProcessSingleJobError> {
   let deps = args.job_dependencies;
   let job = args.job;
-  let mysql_pool = &deps.mysql_pool;
+  let mysql_pool = &deps.db.mysql_pool;
+
+  let model_dependencies = deps
+      .job
+      .job_specific_dependencies
+      .maybe_vall_e_x_dependencies
+      .as_ref()
+      .ok_or_else(|| ProcessSingleJobError::JobSystemMisconfiguration(Some("missing VALL-E-X dependencies".to_string())))?;
+
   // get some globals
-  let mut job_progress_reporter = deps.job_progress_reporter
+  let mut job_progress_reporter = deps
+      .clients
+      .job_progress_reporter
       .new_generic_inference(job.inference_job_token.as_str())
       .map_err(|e| ProcessSingleJobError::Other(anyhow!(e)))?;
 
@@ -67,9 +79,9 @@ pub async fn process_inference_voice(
   // Need to download the models
   info!("Download models (if not present)...");
 
-  for downloader in deps.job_type_details.vall_e_x.downloaders.all_downloaders() {
+  for downloader in model_dependencies.downloaders.all_downloaders() {
     let result = downloader.download_if_not_on_filesystem(
-      &args.job_dependencies.private_bucket_client,
+      &args.job_dependencies.buckets.private_bucket_client,
       &args.job_dependencies.fs.scoped_temp_dir_creator_for_downloads
     ).await;
 
@@ -99,18 +111,18 @@ pub async fn process_inference_voice(
       .map_err(|e| ProcessSingleJobError::from_io_error(e))?;
 
   let workdir = work_temp_dir.path().to_path_buf();
+  let filename = "weights.npz".to_string();
 
-  let file_name = format!("{}_weights.npz", &voice.title);
+  let mut downloaded_weights_path = work_temp_dir.path().to_path_buf();
+  downloaded_weights_path.push(&filename);
 
-  // USE THIS LATER SINCE it requires specific typing ...
-  let voiceFile = download_voice_embedding_from_hash(
-    &voice.bucket_hash,
-    &file_name,
-    &deps.private_bucket_client,
-    &workdir
+  let voice_file = download_voice_embedding(
+    &voice,
+    &deps.buckets.private_bucket_client,
+    &downloaded_weights_path
   ).await?;
 
-  println!("voicefile path! {}", voiceFile.filesystem_path.to_string_lossy());
+  println!("voice file path! {}", voice_file.filesystem_path.to_string_lossy());
 
   // Download embeddings file using embedding token
   // Create a temp dir to download things to
@@ -126,10 +138,10 @@ pub async fn process_inference_voice(
 
   // Run Inference
   let command_exit_status =
-      args.job_dependencies.job_type_details.vall_e_x.inference_command.execute_inference(
+      model_dependencies.inference_command.execute_inference(
         InferenceArgs {
           input_embedding_path: &workdir,
-          input_embedding_name: file_name,
+          input_embedding_name: filename,
           input_text: String::from(text), // text
           output_file_name: output_file_name.clone(), // output file name in the output folder
           stderr_output_file: &stderr_output_file,
@@ -186,7 +198,7 @@ pub async fn process_inference_voice(
   info!("Upload Bucket Path: {:?}", result_bucket_object_pathbuf);
   info!("Upload File Path: {:?}", finished_file);
 
-  args.job_dependencies.public_bucket_client
+  args.job_dependencies.buckets.public_bucket_client
       .upload_filename_with_content_type(
         &result_bucket_object_pathbuf,
         &finished_file,
@@ -210,7 +222,7 @@ pub async fn process_inference_voice(
 
   // insert into db the record
   let (media_file_token, id) = insert_media_file_from_zero_shot(InsertArgs {
-    pool: &args.job_dependencies.mysql_pool,
+    pool: &args.job_dependencies.db.mysql_pool,
     job: &job,
     maybe_mime_type: Some(&MIME_TYPE),
     file_size_bytes,
@@ -218,9 +230,9 @@ pub async fn process_inference_voice(
     public_bucket_directory_hash: result_bucket_location.get_object_hash(),
     maybe_public_bucket_prefix: Some(BUCKET_FILE_PREFIX),
     maybe_public_bucket_extension: Some(BUCKET_FILE_EXTENSION),
-    is_on_prem: args.job_dependencies.container.is_on_prem,
-    worker_hostname: &args.job_dependencies.container.hostname,
-    worker_cluster: &args.job_dependencies.container.cluster_name,
+    is_on_prem: args.job_dependencies.job.info.container.is_on_prem,
+    worker_hostname: &args.job_dependencies.job.info.container.hostname,
+    worker_cluster: &args.job_dependencies.job.info.container.cluster_name,
   }).await.map_err(|e| ProcessSingleJobError::Other(e))?;
 
   info!(
@@ -266,6 +278,39 @@ pub async fn download_voice_embedding_from_hash(
 
   let voice_file = VoiceFile {
     filesystem_path: PathBuf::from(&path.clone()),
+  };
+
+  Ok(voice_file)
+}
+
+pub async fn download_voice_embedding(
+  voice: &ZsVoice,
+  private_bucket_client: &BucketClient,
+  download_path: &PathBuf,
+) -> Result<VoiceFile, ProcessSingleJobError> {
+
+  let embedding_bucket_location = ZeroShotVoiceEmbeddingBucketPath::from_object_hash(
+    &voice.bucket_hash,
+    ModelCategory::Tts,
+    ModelType::VallEx,
+    voice.model_version
+  );
+
+  info!("Downloading embedding from: {:?}", &embedding_bucket_location.to_full_object_pathbuf());
+  info!("Downloading to filesystem location: {:?}", download_path);
+
+  let result = private_bucket_client.download_file_to_disk(
+    embedding_bucket_location.to_full_object_pathbuf(),
+    &download_path
+  ).await;
+
+  if let Err(err) = result {
+    error!("could not download embedding file: {:?}", err);
+    return Err(ProcessSingleJobError::from_anyhow_error(err));
+  }
+
+  let voice_file = VoiceFile {
+    filesystem_path: PathBuf::from(&download_path.clone()),
   };
 
   Ok(voice_file)
