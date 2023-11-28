@@ -48,7 +48,7 @@ async fn create_rvc_model(
     original_download_url: "https://example.com",
     original_filename: "unknown.zip",
     file_size_bytes: 1234,
-    creator_user_token: creator_user_token.as_str(),
+    creator_user_token,
     creator_ip_address: "127.0.0.1",
     creator_set_visibility: Default::default(),
     has_index_file,

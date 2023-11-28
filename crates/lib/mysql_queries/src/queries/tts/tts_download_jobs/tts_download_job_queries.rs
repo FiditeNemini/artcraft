@@ -6,6 +6,7 @@ use sqlx::MySqlPool;
 
 use errors::AnyhowResult;
 use tokens::tokens::tts_models::TtsModelToken;
+use tokens::tokens::users::UserToken;
 
 /// table: tts_model_upload_jobs
 #[derive(Debug)]
@@ -14,7 +15,7 @@ pub struct TtsUploadJobRecord {
   pub token: String,
   pub uuid_idempotency_token: String,
   pub on_success_result_token: Option<String>,
-  pub creator_user_token: String,
+  pub creator_user_token: UserToken,
   pub creator_ip_address: String,
   pub creator_set_visibility: String, // TODO
   pub title: String,
@@ -34,7 +35,23 @@ pub async fn query_tts_upload_job_records(pool: &MySqlPool, num_records: u32)
   let job_records = sqlx::query_as!(
       TtsUploadJobRecord,
         r#"
-SELECT *
+SELECT
+  id,
+  token,
+  uuid_idempotency_token,
+  on_success_result_token,
+  creator_user_token as `creator_user_token: tokens::tokens::users::UserToken`,
+  creator_ip_address,
+  creator_set_visibility,
+  title,
+  tts_model_type,
+  download_url,
+  status,
+  attempt_count,
+  failure_reason,
+  created_at,
+  updated_at,
+  retry_at
 FROM tts_model_upload_jobs
 WHERE
   (
@@ -229,7 +246,7 @@ SET
         "#,
       &model_token,
       job.title.to_string(),
-      job.creator_user_token.clone(),
+      job.creator_user_token.as_str(),
       job.creator_ip_address.clone(),
       job.creator_ip_address.clone(),
       job.download_url.clone(),

@@ -85,7 +85,7 @@ impl BadgeGranter {
   }
 
   /// This needs to be called *after* successful upload.
-  pub async fn maybe_grant_voice_conversion_model_uploads_badge(&self, user_token: &str) -> AnyhowResult<()> {
+  pub async fn maybe_grant_voice_conversion_model_uploads_badge(&self, user_token: &UserToken) -> AnyhowResult<()> {
     let count = self.count_voice_conversion_models_uploaded(user_token).await?;
 
     let mut maybe_badge = None;
@@ -119,16 +119,16 @@ impl BadgeGranter {
       None => return Ok(()),
     };
 
-    if self.has_badge(user_token, badge).await? {
+    if self.has_badge(user_token.as_str(), badge).await? {
       return Ok(())
     }
 
     let _record_id = self.insert(
       badge,
-      user_token,
+      user_token.as_str(),
     ).await?;
 
-    self.firehose_publisher.publish_user_badge_granted(user_token, badge.to_db_value())
+    self.firehose_publisher.publish_user_badge_granted(user_token.as_str(), badge.to_db_value())
         .await?;
 
     Ok(())
@@ -184,8 +184,8 @@ impl BadgeGranter {
   }
 
   /// This needs to be called *after* successful upload.
-  pub async fn maybe_grant_vocoder_model_uploads_badge(&self, user_token: &str) -> AnyhowResult<()> {
-    let count = self.count_vocoder_models_uploaded(user_token).await?;
+  pub async fn maybe_grant_vocoder_model_uploads_badge(&self, user_token: &UserToken) -> AnyhowResult<()> {
+    let count = self.count_vocoder_models_uploaded(user_token.as_str()).await?;
 
     let mut maybe_badge = None;
 
@@ -218,24 +218,24 @@ impl BadgeGranter {
       None => return Ok(()),
     };
 
-    if self.has_badge(user_token, badge).await? {
+    if self.has_badge(user_token.as_str(), badge).await? {
       return Ok(())
     }
 
     let _record_id = self.insert(
       badge,
-      user_token,
+      user_token.as_str(),
     ).await?;
 
-    self.firehose_publisher.publish_user_badge_granted(user_token, badge.to_db_value())
+    self.firehose_publisher.publish_user_badge_granted(user_token.as_str(), badge.to_db_value())
         .await?;
 
     Ok(())
   }
 
   /// This needs to be called *after* successful upload.
-  pub async fn maybe_grant_softvc_vocoder_model_uploads_badge(&self, user_token: &str) -> AnyhowResult<()> {
-    let count = self.count_softvc_vocoder_models_uploaded(user_token).await?;
+  pub async fn maybe_grant_softvc_vocoder_model_uploads_badge(&self, user_token: &UserToken) -> AnyhowResult<()> {
+    let count = self.count_softvc_vocoder_models_uploaded(user_token.as_str()).await?;
 
     let mut maybe_badge = None;
 
@@ -268,16 +268,16 @@ impl BadgeGranter {
       None => return Ok(()),
     };
 
-    if self.has_badge(user_token, badge).await? {
+    if self.has_badge(user_token.as_str(), badge).await? {
       return Ok(())
     }
 
     let _record_id = self.insert(
       badge,
-      user_token,
+      user_token.as_str(),
     ).await?;
 
-    self.firehose_publisher.publish_user_badge_granted(user_token, badge.to_db_value())
+    self.firehose_publisher.publish_user_badge_granted(user_token.as_str(), badge.to_db_value())
         .await?;
 
     Ok(())
@@ -345,7 +345,7 @@ LIMIT 1
 
   async fn count_voice_conversion_models_uploaded(
     &self,
-    user_token: &str,
+    user_token: &UserToken,
   ) -> AnyhowResult<u64> {
     // NB: This could get expensive!
     let maybe_result = sqlx::query_as!(

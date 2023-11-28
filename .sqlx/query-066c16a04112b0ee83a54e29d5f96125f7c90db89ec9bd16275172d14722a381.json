@@ -1,6 +1,6 @@
 {
   "db_name": "MySQL",
-  "query": "\nSELECT *\nFROM tts_model_upload_jobs\nWHERE\n  (\n    status IN (\"pending\", \"attempt_failed\")\n  )\n  AND\n  (\n    retry_at IS NULL\n    OR\n    retry_at < CURRENT_TIMESTAMP\n  )\n  LIMIT ?\n        ",
+  "query": "\nSELECT\n  id,\n  token,\n  uuid_idempotency_token,\n  on_success_result_token,\n  creator_user_token as `creator_user_token: tokens::tokens::users::UserToken`,\n  creator_ip_address,\n  creator_set_visibility,\n  title,\n  tts_model_type,\n  download_url,\n  status,\n  attempt_count,\n  failure_reason,\n  created_at,\n  updated_at,\n  retry_at\nFROM tts_model_upload_jobs\nWHERE\n  (\n    status IN (\"pending\", \"attempt_failed\")\n  )\n  AND\n  (\n    retry_at IS NULL\n    OR\n    retry_at < CURRENT_TIMESTAMP\n  )\n  LIMIT ?\n        ",
   "describe": {
     "columns": [
       {
@@ -45,37 +45,7 @@
       },
       {
         "ordinal": 4,
-        "name": "title",
-        "type_info": {
-          "type": "VarString",
-          "flags": "NOT_NULL | BINARY | NO_DEFAULT_VALUE",
-          "char_set": 224,
-          "max_size": 1020
-        }
-      },
-      {
-        "ordinal": 5,
-        "name": "tts_model_type",
-        "type_info": {
-          "type": "String",
-          "flags": "NOT_NULL | BINARY | ENUM",
-          "char_set": 224,
-          "max_size": 60
-        }
-      },
-      {
-        "ordinal": 6,
-        "name": "download_url",
-        "type_info": {
-          "type": "VarString",
-          "flags": "BINARY",
-          "char_set": 224,
-          "max_size": 2048
-        }
-      },
-      {
-        "ordinal": 7,
-        "name": "creator_user_token",
+        "name": "creator_user_token: tokens::tokens::users::UserToken",
         "type_info": {
           "type": "VarString",
           "flags": "NOT_NULL | MULTIPLE_KEY | BINARY | NO_DEFAULT_VALUE",
@@ -84,7 +54,7 @@
         }
       },
       {
-        "ordinal": 8,
+        "ordinal": 5,
         "name": "creator_ip_address",
         "type_info": {
           "type": "VarString",
@@ -94,13 +64,43 @@
         }
       },
       {
-        "ordinal": 9,
+        "ordinal": 6,
         "name": "creator_set_visibility",
         "type_info": {
           "type": "String",
           "flags": "NOT_NULL | BINARY | ENUM",
           "char_set": 224,
           "max_size": 28
+        }
+      },
+      {
+        "ordinal": 7,
+        "name": "title",
+        "type_info": {
+          "type": "VarString",
+          "flags": "NOT_NULL | BINARY | NO_DEFAULT_VALUE",
+          "char_set": 224,
+          "max_size": 1020
+        }
+      },
+      {
+        "ordinal": 8,
+        "name": "tts_model_type",
+        "type_info": {
+          "type": "String",
+          "flags": "NOT_NULL | BINARY | ENUM",
+          "char_set": 224,
+          "max_size": 60
+        }
+      },
+      {
+        "ordinal": 9,
+        "name": "download_url",
+        "type_info": {
+          "type": "VarString",
+          "flags": "BINARY",
+          "char_set": 224,
+          "max_size": 2048
         }
       },
       {
@@ -174,10 +174,10 @@
       true,
       false,
       false,
+      false,
+      false,
+      false,
       true,
-      false,
-      false,
-      false,
       false,
       false,
       true,
@@ -186,5 +186,5 @@
       true
     ]
   },
-  "hash": "7ab54466ca3021d90e0feb234acba56bf53d415dde69bc1c35120ed0c8dd1858"
+  "hash": "066c16a04112b0ee83a54e29d5f96125f7c90db89ec9bd16275172d14722a381"
 }

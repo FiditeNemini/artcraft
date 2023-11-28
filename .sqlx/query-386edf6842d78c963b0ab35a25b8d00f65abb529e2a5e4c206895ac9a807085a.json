@@ -1,6 +1,6 @@
 {
   "db_name": "MySQL",
-  "query": "\nSELECT\n    tts_results.token as tts_result_token,\n\n    tts_results.raw_inference_text,\n\n    tts_results.model_token as tts_model_token,\n    tts_models.title as tts_model_title,\n\n    tts_results.maybe_pretrained_vocoder_used,\n\n    users.token as maybe_creator_user_token,\n    users.username as maybe_creator_username,\n    users.display_name as maybe_creator_display_name,\n    users.email_gravatar_hash as maybe_creator_gravatar_hash,\n    users.is_banned as maybe_creator_is_banned,\n\n    model_users.token as maybe_model_creator_user_token,\n    model_users.username as maybe_model_creator_username,\n    model_users.display_name as maybe_model_creator_display_name,\n    model_users.email_gravatar_hash as maybe_model_creator_gravatar_hash,\n    model_users.is_banned as maybe_model_creator_is_banned,\n\n    tts_results.public_bucket_wav_audio_path,\n    tts_results.public_bucket_spectrogram_path,\n\n    tts_results.creator_set_visibility,\n\n    tts_results.generated_by_worker,\n    tts_results.is_debug_request,\n\n    tts_results.file_size_bytes,\n    tts_results.duration_millis,\n    tts_results.created_at,\n    tts_results.updated_at,\n\n    tts_results.creator_ip_address,\n    tts_results.user_deleted_at,\n    tts_results.mod_deleted_at\n\nFROM tts_results\nLEFT OUTER JOIN tts_models\n  ON tts_results.model_token = tts_models.token\nLEFT OUTER JOIN users\n  ON tts_results.maybe_creator_user_token = users.token\nLEFT OUTER JOIN users as model_users\n  ON tts_models.creator_user_token = model_users.token\nWHERE\n    tts_results.token = ?\n    AND tts_results.user_deleted_at IS NULL\n    AND tts_results.mod_deleted_at IS NULL\n        ",
+  "query": "\nSELECT\n    tts_results.token as tts_result_token,\n\n    tts_results.raw_inference_text,\n\n    tts_results.model_token as tts_model_token,\n    tts_models.title as tts_model_title,\n\n    tts_results.maybe_pretrained_vocoder_used,\n\n    users.token as `maybe_creator_user_token: tokens::tokens::users::UserToken`,\n    users.username as maybe_creator_username,\n    users.display_name as maybe_creator_display_name,\n    users.email_gravatar_hash as maybe_creator_gravatar_hash,\n    users.is_banned as maybe_creator_is_banned,\n\n    model_users.token as maybe_model_creator_user_token,\n    model_users.username as maybe_model_creator_username,\n    model_users.display_name as maybe_model_creator_display_name,\n    model_users.email_gravatar_hash as maybe_model_creator_gravatar_hash,\n    model_users.is_banned as maybe_model_creator_is_banned,\n\n    tts_results.public_bucket_wav_audio_path,\n    tts_results.public_bucket_spectrogram_path,\n\n    tts_results.creator_set_visibility,\n\n    tts_results.generated_by_worker,\n    tts_results.is_debug_request,\n\n    tts_results.file_size_bytes,\n    tts_results.duration_millis,\n    tts_results.created_at,\n    tts_results.updated_at,\n\n    tts_results.creator_ip_address,\n    tts_results.user_deleted_at,\n    tts_results.mod_deleted_at\n\nFROM tts_results\nLEFT OUTER JOIN tts_models\n  ON tts_results.model_token = tts_models.token\nLEFT OUTER JOIN users\n  ON tts_results.maybe_creator_user_token = users.token\nLEFT OUTER JOIN users as model_users\n  ON tts_models.creator_user_token = model_users.token\nWHERE\n    tts_results.token = ?\n    AND tts_results.user_deleted_at IS NULL\n    AND tts_results.mod_deleted_at IS NULL\n        ",
   "describe": {
     "columns": [
       {
@@ -55,7 +55,7 @@
       },
       {
         "ordinal": 5,
-        "name": "maybe_creator_user_token",
+        "name": "maybe_creator_user_token: tokens::tokens::users::UserToken",
         "type_info": {
           "type": "VarString",
           "flags": "UNIQUE_KEY | BINARY | NO_DEFAULT_VALUE",
@@ -307,5 +307,5 @@
       true
     ]
   },
-  "hash": "a3818a8688e1adab95f9f1263fbbd7effd5b77348b4e19cdba02672602b91d98"
+  "hash": "386edf6842d78c963b0ab35a25b8d00f65abb529e2a5e4c206895ac9a807085a"
 }
