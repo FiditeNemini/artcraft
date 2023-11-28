@@ -5,5 +5,6 @@
   "ratingGood": "Voice Sounds Good",
   "ratingGreat": "Voice Sounds Great",
   "ratingLabel": "Rating:",
+  "ratingNone": "Voice Not Rated",
   "ratingOk": "Voice Sounds Okay"
 }

@@ -30,7 +30,7 @@ function RatingStats(props: Props) {
           icon={faStarExclamation}
           className="me-2 rating-icon"
         />
-        <p>{t("common.RatingStats.voice.notRated")}</p>
+        <p>{t("ratingNone")}</p>
       </div>
     );
   }
