@@ -14,6 +14,7 @@ use mysql_queries::queries::generic_inference::web::get_inference_job_status::ge
 use mysql_queries::queries::tts::tts_inference_jobs::get_tts_inference_job_status::get_tts_inference_job_status;
 use redis_common::redis_keys::RedisKeys;
 use tokens::tokens::generic_inference_jobs::InferenceJobToken;
+use crate::http_server::responses::filter_model_name::filter_model_name;
 
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::server_state::ServerState;
@@ -225,6 +226,10 @@ async fn modern_lookup(job_token: &str, server_state: &ServerState)
     }
   };
 
+  // NB: Model type is probably TT2, but let's filter it in case a hidden model type ever sneaks in
+  let model_type = record.request_details.maybe_model_type.as_deref().unwrap_or_else(|| "tacotron2");
+  let model_type = filter_model_name(model_type);
+
   Ok(TtsInferenceJobStatusForResponse {
     job_token: record.job_token.to_string(),
     status: record.status.to_string(),
@@ -251,7 +256,7 @@ async fn modern_lookup(job_token: &str, server_state: &ServerState)
       }
     }),
     model_token: record.request_details.maybe_model_token.unwrap_or_else(|| "NO_MODEL_TOKEN".to_string()),
-    tts_model_type: record.request_details.maybe_model_type.unwrap_or_else(|| "tacotron2".to_string()), // NB: It's probably TT2
+    tts_model_type: model_type,
     title: record.request_details.maybe_model_title.unwrap_or_else(|| "no model title".to_string()),
     raw_inference_text: record.request_details.maybe_raw_inference_text.unwrap_or_else(|| "no inference text".to_string()),
     created_at: record.created_at,
