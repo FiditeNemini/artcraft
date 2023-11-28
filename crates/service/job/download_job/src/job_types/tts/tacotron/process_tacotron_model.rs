@@ -114,6 +114,7 @@ pub async fn process_tacotron_model<'a, 'b>(
     creator_set_visibility: Visibility::Public, // TODO: All models default to public at start
     private_bucket_hash: &private_bucket_hash,
     private_bucket_object_name: &model_bucket_path,
+    maybe_model_token: None, // NB: This parameter is for internal testing only
     mysql_pool: &job_state.mysql_pool,
   }).await?;
 
@@ -125,7 +126,7 @@ pub async fn process_tacotron_model<'a, 'b>(
       })?;
 
   Ok(JobResults {
-    entity_token: Some(model_token),
+    entity_token: Some(model_token.to_string()),
     entity_type: Some(TtsModelType::Tacotron2.to_string()), // NB: This may be different from `GenericDownloadType` in the future!
   })
 }

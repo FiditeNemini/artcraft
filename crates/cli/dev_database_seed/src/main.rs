@@ -9,6 +9,8 @@ use crate::bucket_clients::get_bucket_clients;
 use crate::cli_args::parse_cli_args;
 use crate::seeding::tts_tacotron2::seed_tts_tacotron2;
 use crate::seeding::users::seed_user_accounts;
+use crate::seeding::voice_conversion::seed_voice_conversion;
+use crate::seeding::zero_shot_tts::seed_zero_shot_tts;
 
 pub mod bucket_clients;
 pub mod cli_args;
@@ -48,8 +50,8 @@ pub async fn main() -> AnyhowResult<()> {
   }
 
   seed_user_accounts(&pool).await?;
-  //seed_zero_shot_tts(&pool, maybe_bucket_clients.as_ref()).await?;
-  //seed_voice_conversion(&pool).await?;
+  seed_zero_shot_tts(&pool, maybe_bucket_clients.as_ref()).await?;
+  seed_voice_conversion(&pool).await?;
   seed_tts_tacotron2(&pool, maybe_bucket_clients.as_ref()).await?;
 
   info!("Done!");

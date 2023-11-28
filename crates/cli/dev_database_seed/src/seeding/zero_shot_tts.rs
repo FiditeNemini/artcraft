@@ -22,9 +22,10 @@ use tokens::tokens::users::UserToken;
 use tokens::tokens::zs_voice_datasets::ZsVoiceDatasetToken;
 use tokens::tokens::zs_voices::ZsVoiceToken;
 
+use crate::bucket_clients::BucketClients;
 use crate::seeding::users::HANASHI_USERNAME;
 
-pub async fn seed_zero_shot_tts(mysql_pool: &Pool<MySql>, maybe_bucket_client: Option<&BucketClient>) -> AnyhowResult<()> {
+pub async fn seed_zero_shot_tts(mysql_pool: &Pool<MySql>, maybe_bucket_clients: Option<&BucketClients>) -> AnyhowResult<()> {
   info!("Seeding zero shot TTS...");
 
   let user_token = match get_user_token_by_username(HANASHI_USERNAME, mysql_pool).await? {
@@ -46,7 +47,7 @@ pub async fn seed_zero_shot_tts(mysql_pool: &Pool<MySql>, maybe_bucket_client: O
   ];
 
   for (voice_name, bucket_hash, wav_file, user_token) in records {
-    create_voice_records(voice_name, bucket_hash, wav_file, user_token, mysql_pool, maybe_bucket_client).await?;
+    create_voice_records(voice_name, bucket_hash, wav_file, user_token, mysql_pool, maybe_bucket_clients).await?;
   }
 
   Ok(())
@@ -58,7 +59,7 @@ async fn create_voice_records(
   wav_file: &str,
   creator_user_token: &UserToken,
   mysql_pool: &Pool<MySql>,
-  maybe_bucket_client: Option<&BucketClient>,
+  maybe_bucket_clients: Option<&BucketClients>,
 ) -> AnyhowResult<(ZsVoiceToken, ZsVoiceDatasetToken)> {
   info!("Creating voice records for voice {} ...", voice_name);
 
@@ -76,8 +77,8 @@ async fn create_voice_records(
 
   let public_upload_path;
 
-  if let Some(bucket_client) = maybe_bucket_client {
-    public_upload_path = seed_file_to_bucket(wav_file, bucket_client).await?;
+  if let Some(bucket_clients) = maybe_bucket_clients {
+    public_upload_path = seed_file_to_bucket(wav_file, &bucket_clients.public).await?;
   } else {
     public_upload_path = MediaFileBucketPath::from_object_hash("fake", None, None);
   }
