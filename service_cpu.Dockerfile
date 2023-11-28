@@ -158,6 +158,8 @@ WORKDIR /
 RUN apt-get update \
     && DEBIAN_FRONTEND=noninteractive TZ=Etc/UTC apt-get install -y \
         rsync \
+        curl \
+        libssl-dev \
         --no-install-recommends \
     && apt-get clean autoclean && apt-get autoremove -y && rm -rf /var/lib/{apt,dpkg,cache,log}/
 

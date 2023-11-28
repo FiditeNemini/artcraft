@@ -45,6 +45,8 @@ pub struct ProcessJobArgs<'a> {
 pub async fn process_job(args: ProcessJobArgs<'_>) -> Result<JobSuccessResult, ProcessSingleJobError> {
   let work_temp_dir = format!("temp_tt2_inference_{}", args.job.id.0);
 
+  // for FILE in tmp*; do echo $FILE && rm -r $FILE ; done
+  // for file in `ls -tr | grep tmp`; do echo $file && rm -r $file ; done
   // NB: TempDir exists until it goes out of scope, at which point it should delete from filesystem.
   let work_temp_dir = args.job_dependencies
       .fs
