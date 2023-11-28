@@ -8,4 +8,5 @@ pub mod tacotron2_dependencies;
 pub mod tacotron2_inference_command;
 pub mod tacotron2_inference_sidecar_client;
 pub mod tacotron2_sidecar_health_check_client;
+pub mod virtual_lfu_cache;
 pub mod vocoder_option;

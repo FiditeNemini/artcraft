@@ -3045,6 +3045,7 @@ dependencies = [
  "hyper",
  "images",
  "jobs_common",
+ "lfu",
  "log",
  "media",
  "memory_caching",

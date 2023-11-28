@@ -238,8 +238,15 @@ async fn process_job_with_cleanup(
     maybe_mel_multiply_factor = Some(MelMultiplyFactor::DefaultMultiplyFactor);
   }
 
-  // TODO(bt,2023-11-27): Handle LRU cache on python side
-  let maybe_unload_model_path = None;
+  let maybe_unload_model_path = model_dependencies
+      .sidecar
+      .virtual_lfu_cache
+      .insert_returning_replaced(tts_synthesizer_fs_path.to_str().unwrap_or(""))
+      .map_err(|e| ProcessSingleJobError::Other(e))?;
+
+  if let Some(model_path) = maybe_unload_model_path.as_deref() {
+    info!("Remove model from sidecar LFU cache: {:?}", model_path);
+  }
 
   let inference_start_time = Instant::now();
 
