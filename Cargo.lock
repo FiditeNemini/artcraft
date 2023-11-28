@@ -3792,7 +3792,7 @@ dependencies = [
  "serial_test",
  "sqlx",
  "tokens",
- "tokio 1.34.0",
+ "tokio",
  "toml",
 ]
 
