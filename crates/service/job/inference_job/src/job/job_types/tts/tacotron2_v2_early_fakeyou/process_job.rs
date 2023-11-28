@@ -5,6 +5,7 @@ use std::time::Instant;
 
 use anyhow::anyhow;
 use log::{error, info};
+use tempdir::TempDir;
 
 use container_common::filesystem::check_file_exists::check_file_exists;
 use container_common::filesystem::safe_delete_temp_directory::safe_delete_temp_directory;
@@ -42,6 +43,28 @@ pub struct ProcessJobArgs<'a> {
 }
 
 pub async fn process_job(args: ProcessJobArgs<'_>) -> Result<JobSuccessResult, ProcessSingleJobError> {
+  let work_temp_dir = format!("temp_tt2_inference_{}", args.job.id.0);
+
+  // NB: TempDir exists until it goes out of scope, at which point it should delete from filesystem.
+  let work_temp_dir = args.job_dependencies
+      .fs
+      .scoped_temp_dir_creator_for_work
+      .new_tempdir(&work_temp_dir)
+      .map_err(|e| ProcessSingleJobError::from_io_error(e))?;
+
+  let result = process_job_with_cleanup(args, &work_temp_dir).await;
+
+  info!("Deleting temp directory: {:?}", work_temp_dir.path());
+  safe_delete_temp_directory(&work_temp_dir);
+
+  result
+}
+
+async fn process_job_with_cleanup(
+  args: ProcessJobArgs<'_>,
+  work_temp_dir: &TempDir,
+) -> Result<JobSuccessResult, ProcessSingleJobError> {
+
   let job = args.job;
   let tts_model = args.tts_model;
   let raw_inference_text = args.raw_inference_text;
@@ -83,17 +106,6 @@ pub async fn process_job(args: ProcessJobArgs<'_>) -> Result<JobSuccessResult, P
     &model_dependencies,
     &mut job_progress_reporter,
   ).await?;
-
-  // ==================== TEMP DIR ==================== //
-
-  let work_temp_dir = format!("temp_tt2_inference_{}", job.id.0);
-
-  // NB: TempDir exists until it goes out of scope, at which point it should delete from filesystem.
-  let work_temp_dir = args.job_dependencies
-      .fs
-      .scoped_temp_dir_creator_for_work
-      .new_tempdir(&work_temp_dir)
-      .map_err(|e| ProcessSingleJobError::from_io_error(e))?;
 
   // ==================== CONFIRM OR DOWNLOAD OPTIONAL CUSTOM VOCODER MODEL ==================== //
 
