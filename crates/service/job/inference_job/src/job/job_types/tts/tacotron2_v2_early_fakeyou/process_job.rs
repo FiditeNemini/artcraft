@@ -54,6 +54,8 @@ pub async fn process_job(args: ProcessJobArgs<'_>) -> Result<JobSuccessResult, P
 
   let result = process_job_with_cleanup(args, &work_temp_dir).await;
 
+  // NB: The first time TT2 on inference-job was deployed, the filesystem filled up with
+  // temporary directories. This is just being abundantly safe.
   info!("Deleting temp directory: {:?}", work_temp_dir.path());
   safe_delete_temp_directory(&work_temp_dir);
 
