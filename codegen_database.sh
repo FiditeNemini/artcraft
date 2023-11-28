@@ -7,7 +7,7 @@ set -euxo pipefail
 
 # NB: Database used by desktop app for AiChatBot sidecar.
 # Make sure it has been migrated (use aichatbot-sidecar app directory as root).
-SQLITE_DATABASE_PATH=./runtime_data/database.db
+# SQLITE_DATABASE_PATH=./runtime_data/database.db
 
 # NB: OpenSSL is broken on Ubuntu 22.04 (this is documented elsewhere)
 # See https://askubuntu.com/a/1403961
