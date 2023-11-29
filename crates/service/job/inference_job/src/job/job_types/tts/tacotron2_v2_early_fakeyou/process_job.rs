@@ -127,7 +127,7 @@ async fn process_job_with_cleanup(
         &mut job_progress_reporter,
         "downloading user vocoder",
         job.id.0,
-        &args.job_dependencies.fs.scoped_temp_dir_creator_for_downloads,
+        &args.job_dependencies.fs.scoped_temp_dir_creator_for_short_lived_downloads,
       ).await?;
 
       Some(custom_vocoder_fs_path)
@@ -148,7 +148,7 @@ async fn process_job_with_cleanup(
       &mut job_progress_reporter,
       "downloading synthesizer",
       job.id.0,
-      &args.job_dependencies.fs.scoped_temp_dir_creator_for_downloads,
+      &args.job_dependencies.fs.scoped_temp_dir_creator_for_short_lived_downloads,
     ).await?;
 
     tts_synthesizer_fs_path

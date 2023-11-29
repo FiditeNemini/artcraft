@@ -138,26 +138,28 @@ pub struct ClientDependencies {
 }
 
 pub struct FileSystemDetails {
-  /// Temporary directory for storing downloads
-  /// (In prod, typically model files from GCS / NFS PVC mount)
-  pub temp_directory_downloads: PathBuf,
-
-  /// Temporary directory for storing work
-  /// (In prod, typically python inference outputs / emptyDir mount)
-  pub temp_directory_work: PathBuf,
-
   /// If the pause file is set and exists on the filesystem,
   /// the job will pause until the file stops existing.
   /// Good for live debugging of production k8s clusters without
   /// redeploying.
   pub maybe_pause_file: Option<PathBuf>,
 
-  // TODO: Rename
+  /// Directory to store long-term downloads (models)
+  /// (In prod, typically model files from GCS / NFS PVC mount)
+  pub directory_long_lived_downloads: PathBuf,
+
+  /// Temporary directory for storing downloads
   /// Creates temp directories for scratch files
-  pub scoped_temp_dir_creator_for_downloads: ScopedTempDirCreator,
+  pub scoped_temp_dir_creator_for_short_lived_downloads: ScopedTempDirCreator,
+
+  /// Temporary directory for storing downloads
+  /// (In prod, typically model files from GCS / NFS PVC mount)
+  pub scoped_temp_dir_creator_for_long_lived_downloads: ScopedTempDirCreator,
+
+  /// Temporary directory for storing work
+  /// (In prod, typically python inference outputs / emptyDir mount)
   pub scoped_temp_dir_creator_for_work: ScopedTempDirCreator,
 
-  // TODO: Rename
   /// Organizes downloaded files
   pub semi_persistent_cache: SemiPersistentCacheDir,
 }

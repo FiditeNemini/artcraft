@@ -160,17 +160,18 @@ async fn do_process_single_job(
     }
   }
 
-  // ==================== SETUP TEMP DIRS ==================== //
-
-  let temp_dir = format!("temp_{}", job.id.0);
-  let temp_dir = job_dependencies.fs.scoped_temp_dir_creator_for_downloads.new_tempdir(&temp_dir)
-      .map_err(|err| ProcessSingleJobError::Other(anyhow!("filesystem error: {:?}", err)))?;
-
-  let _p = temp_dir.path(); // TODO: Just so the build doesn't complain about unused. Remove.
+// NB(bt,2023-11-29): This looks dead, but hopefully isn't leaned on for downstream side effects.
+// I'll leave this commented out while dealing with the outage, but this can probably be removed
+// in a short while after we redeploy and verify all the jobs.
+//  // ==================== SETUP TEMP DIRS ==================== //
+//
+//  let temp_dir = format!("temp_{}", job.id.0);
+//  let temp_dir = job_dependencies.fs.scoped_temp_dir_creator_for_short_lived_downloads.new_tempdir(&temp_dir)
+//      .map_err(|err| ProcessSingleJobError::Other(anyhow!("filesystem error: {:?}", err)))?;
+//
+//  let _p = temp_dir.path(); // TODO: Just so the build doesn't complain about unused. Remove.
 
   // ==================== HANDLE DIFFERENT INFERENCE TYPES ==================== //
-
-  let mut maybe_result_entity : Option<ResultEntity>;
 
   let job_success_result = match job.inference_category {
     InferenceCategory::LipsyncAnimation => {

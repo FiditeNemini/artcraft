@@ -64,7 +64,7 @@ pub async fn process_job(args: RvcV2ProcessJobArgs<'_>) -> Result<JobSuccessResu
 
   model_dependencies.pretrained_hubert_model.download_if_not_on_filesystem(
     &args.job_dependencies.buckets.private_bucket_client,
-    &args.job_dependencies.fs.scoped_temp_dir_creator_for_downloads)
+    &args.job_dependencies.fs.scoped_temp_dir_creator_for_short_lived_downloads)
       .await
       .map_err(|e| {
         error!("could not download hubert: {:?}", e);
@@ -95,7 +95,7 @@ pub async fn process_job(args: RvcV2ProcessJobArgs<'_>) -> Result<JobSuccessResu
       &mut job_progress_reporter,
       "downloading rvc (v2) model",
       job.id.0,
-      &args.job_dependencies.fs.scoped_temp_dir_creator_for_downloads,
+      &args.job_dependencies.fs.scoped_temp_dir_creator_for_short_lived_downloads,
     ).await?;
 
     fs_path
@@ -113,7 +113,7 @@ pub async fn process_job(args: RvcV2ProcessJobArgs<'_>) -> Result<JobSuccessResu
 
     let result = downloader.download_if_not_on_filesystem(
       &args.job_dependencies.buckets.private_bucket_client,
-      &args.job_dependencies.fs.scoped_temp_dir_creator_for_downloads,
+      &args.job_dependencies.fs.scoped_temp_dir_creator_for_short_lived_downloads,
     ).await;
 
     if let Err(e) = result {
@@ -150,7 +150,7 @@ pub async fn process_job(args: RvcV2ProcessJobArgs<'_>) -> Result<JobSuccessResu
         &mut job_progress_reporter,
         "downloading rvc (v2) model index",
         job.id.0,
-        &args.job_dependencies.fs.scoped_temp_dir_creator_for_downloads,
+        &args.job_dependencies.fs.scoped_temp_dir_creator_for_short_lived_downloads,
       ).await?;
 
       Some(fs_path)
