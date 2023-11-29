@@ -125,7 +125,7 @@ async fn process_job_batch(job_dependencies: &JobDependencies, jobs: Vec<Availab
         }
       },
       Err(err) => {
-        warn!("Failure to process job: {} - {:?}",job.token, err);
+        warn!("Failure to process job: {:?} - {:?}",job.inference_job_token, err);
         let _r = handle_error(&job_dependencies, &job, err).await?;
       }
     }
@@ -268,6 +268,7 @@ async fn handle_error(job_dependencies: &&JobDependencies, job: &AvailableInfere
     ProcessSingleJobError::NotYetImplemented => {}
     ProcessSingleJobError::FaceDetectionFailure => {}
     ProcessSingleJobError::JobSystemMisconfiguration(_) => {}
+    ProcessSingleJobError::ModelDeleted => {}
   }
 
   Ok(())
