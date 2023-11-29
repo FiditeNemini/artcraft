@@ -74,7 +74,7 @@ pub async fn process_job(args: SadTalkerProcessJobArgs<'_>) -> Result<JobSuccess
 
     let result = downloader.download_if_not_on_filesystem(
       &args.job_dependencies.buckets.private_bucket_client,
-      &args.job_dependencies.fs.scoped_temp_dir_creator_for_downloads,
+      &args.job_dependencies.fs.scoped_temp_dir_creator_for_short_lived_downloads,
     ).await;
 
     if let Err(e) = result {
