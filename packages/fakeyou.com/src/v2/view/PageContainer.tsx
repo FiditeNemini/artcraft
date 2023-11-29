@@ -96,6 +96,7 @@ import VoiceDesignerUseVoicePage from "./pages/voice_designer/VoiceDesignerUseVo
 import { PasswordResetEmailPage } from "./pages/password_reset/PasswordResetEmailPage";
 import { PasswordResetVerificationPage } from "./pages/password_reset/PasswordResetVerificationPage";
 import { NewProfilePage } from "./pages/profile/profile_view/NewProfilePage";
+import { ProfilePage } from "./pages/profile/profile_view/ProfilePage";
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -297,6 +298,16 @@ class PageContainer extends React.Component<
             </Route>
 
             <Route path="/profile/:username">
+              <ProfilePage
+                sessionWrapper={this.props.sessionWrapper}
+                sessionSubscriptionsWrapper={
+                  this.props.sessionSubscriptionsWrapper
+                }
+              />
+            </Route>
+
+            {/* New Profile Page */}
+            <Route path="/dev-profile/:username">
               <NewProfilePage
                 sessionWrapper={this.props.sessionWrapper}
                 sessionSubscriptionsWrapper={
