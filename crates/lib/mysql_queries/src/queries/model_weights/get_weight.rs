@@ -157,7 +157,7 @@ async fn select_include_deleted(
             "#,
             weight_token.as_str()
         )
-        .fetch_one(mysql_connection).await
+        .fetch_one(&mut **mysql_connection).await
 }
 
 async fn select_without_deleted(
@@ -207,7 +207,7 @@ async fn select_without_deleted(
         "#,
             weight_token.as_str()
         )
-        .fetch_one(mysql_connection).await
+        .fetch_one(&mut **mysql_connection).await
 }
 
 // RawWeight is the struct that is returned from the database in raw form.

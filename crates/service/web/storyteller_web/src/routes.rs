@@ -149,6 +149,10 @@ use crate::http_server::endpoints::w2l::list_user_w2l_templates::list_user_w2l_t
 use crate::http_server::endpoints::w2l::list_w2l_templates::list_w2l_templates_handler;
 use crate::http_server::endpoints::w2l::set_w2l_template_mod_approval::set_w2l_template_mod_approval_handler;
 
+use crate::http_server::endpoints::weights::get_weight::get_weight_handler;
+use crate::http_server::endpoints::weights::delete_weight::delete_weight_handler;
+use crate::http_server::endpoints::weights::update_weight::update_weight_handler;
+
 pub fn add_routes<T, B> (app: App<T>, server_environment: ServerEnvironment) -> App<T>
   where
       B: MessageBody,
@@ -1235,18 +1239,18 @@ fn add_weights_routes<T, B>(app: App<T>) -> App<T>
     app.service(
         web
             ::scope("/v1/weights")
-            .route("/upload", web::post().to(upload_weights_handler))
+           // .route("/upload", web::post().to(upload_weights_handler))
             .service(
                 web
                     ::resource("/weight/{weight_token}")
-                    .route(web::get().to(get_weight_details_handler))
-                    .route(web::post().to(update_weight_metadata_handler))
+                    .route(web::get().to(get_weight_handler))
+                    .route(web::post().to(update_weight_handler))
                     .route(web::delete().to(delete_weight_handler))
             )
-            .route("/by_user/{username}", web::get().to(get_weights_by_user_handler))
-            .route(
-                "/by_user_and_type/{username}/{type}",
-                web::get().to(get_weights_by_user_and_type_handler)
-            )
+            // .route("/by_user/{username}", web::get().to(get_weights_by_user_handler))
+            // .route(
+            //     "/by_user_and_type/{username}/{type}",
+            //     web::get().to(get_weights_by_user_and_type_handler)
+            // )
     )
 }
