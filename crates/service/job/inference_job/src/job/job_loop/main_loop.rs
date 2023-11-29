@@ -125,7 +125,7 @@ async fn process_job_batch(job_dependencies: &JobDependencies, jobs: Vec<Availab
         }
       },
       Err(err) => {
-        warn!("Failure to process job: {:?}", err);
+        warn!("Failure to process job: {} - {:?}",job.token, err);
         let _r = handle_error(&job_dependencies, &job, err).await?;
       }
     }
@@ -191,7 +191,14 @@ async fn handle_error(job_dependencies: &&JobDependencies, job: &AvailableInfere
         None,
         Some(FrontendFailureCategory::FaceNotDetected),
       ),
-
+    ProcessSingleJobError::ModelDeleted =>
+      (
+        JobFailureClass::PermanentFailure,
+        ContainerHealth::Ignore,
+        "model deleted".to_string(),
+        None,
+        None,
+      ),
     // Non-permanent failures
     ProcessSingleJobError::FilesystemFull =>
       (

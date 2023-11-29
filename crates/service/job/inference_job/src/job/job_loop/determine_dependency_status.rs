@@ -8,8 +8,9 @@ use enums::by_table::voice_conversion_models::voice_conversion_model_type::Voice
 use errors::AnyhowResult;
 use filesys::file_exists::file_exists;
 use mysql_queries::queries::generic_inference::job::list_available_generic_inference_jobs::AvailableInferenceJob;
-use mysql_queries::queries::tts::tts_models::get_tts_model_for_inference_improved::{get_tts_model_for_inference_improved, TtsModelForInferenceRecord};
+use mysql_queries::queries::tts::tts_models::get_tts_model_for_inference_improved::{get_tts_model_for_inference_improved, TtsModelForInferenceError, TtsModelForInferenceRecord};
 use mysql_queries::queries::voice_conversion::inference::get_voice_conversion_model_for_inference::{get_voice_conversion_model_for_inference, VoiceConversionModelForInference};
+use crate::job::job_loop::process_single_job_error::ProcessSingleJobError;
 
 use crate::job_dependencies::JobDependencies;
 
@@ -31,7 +32,7 @@ pub enum MaybeInferenceModel {
   VcModel(VoiceConversionModelForInference)
 }
 
-pub async fn determine_dependency_status(job_dependencies: &JobDependencies, job: &AvailableInferenceJob) -> AnyhowResult<DependencyStatus> {
+pub async fn determine_dependency_status(job_dependencies: &JobDependencies, job: &AvailableInferenceJob) -> Result<DependencyStatus, ProcessSingleJobError> {
   let maybe_model = get_model_record_from_cacheable_query(job_dependencies, job).await?;
   let maybe_token_and_path = get_model_token_and_path(job_dependencies, &maybe_model);
 
@@ -105,7 +106,7 @@ fn get_model_token_and_path(job_dependencies: &JobDependencies, maybe_model: &Ma
   }
 }
 
-async fn get_model_record_from_cacheable_query(job_dependencies: &JobDependencies, job: &AvailableInferenceJob) -> AnyhowResult<MaybeInferenceModel> {
+async fn get_model_record_from_cacheable_query(job_dependencies: &JobDependencies, job: &AvailableInferenceJob) -> Result<MaybeInferenceModel, ProcessSingleJobError> {
   let model = match (job.inference_category, job.maybe_model_token.as_deref()) {
     (InferenceCategory::TextToSpeech, Some(token)) => {
       let maybe_model = job_dependencies.job.info.caches.tts_model_record_cache.copy_without_bump_if_unexpired(token.to_string())?;
@@ -116,8 +117,11 @@ async fn get_model_record_from_cacheable_query(job_dependencies: &JobDependencie
           let maybe_tts_model = get_tts_model_for_inference_improved(
             &job_dependencies.db.mysql_pool, token)
               .await
-              .map_err(|err| anyhow!("database error: {:?}", err))?;
-
+              .map_err(|err|
+                  match err {
+                    TtsModelForInferenceError::ModelDeleted => ProcessSingleJobError::ModelDeleted,
+                    _ => ProcessSingleJobError::Other(anyhow!("database error: {:?}", err))
+                  })?;
           match maybe_tts_model {
             Some(model) => {
               let token = token.to_string();

@@ -45,8 +45,7 @@ pub async fn process_single_job(
   // TODO(bt,2023-07-23): Re-review the following. It looks sus.
   // TODO(bt,2023-07-23): Re-review the following. It looks sus.
   let dependency_status = determine_dependency_status(job_dependencies, job)
-      .await
-      .map_err(|err| ProcessSingleJobError::Other(anyhow!("database or cache error: {:?}", err)))?;
+      .await?;
 
   if !force_execution && !dependency_status.models_already_on_filesystem {
     match dependency_status.maybe_model_token {
