@@ -56,9 +56,10 @@ function FooterNav(props: Props) {
       total_pending_job_count: 0,
       pending_job_count: 0,
       by_queue: {
-        pending_svc_jobs: 0,
-        pending_rvc_jobs: 0,
         pending_face_animation_jobs: 0,
+        pending_rvc_jobs: 0,
+        pending_svc_jobs: 0,
+        pending_tacotron2_jobs: 0,
       },
     },
     legacy_tts: {
@@ -122,6 +123,11 @@ function FooterNav(props: Props) {
     );
   }
 
+  // NB(bt,2023-11-28): These are representative of tacotron2 jobs handled by two queueing systems:
+  // The legacy queue (tts-inference-job) and the modern queue (inference-job). We'll add both totals
+  // while we migrate off of the legacy system, then eventually kill the legacy statistic.
+  const ttsQueuedCount = queueStats.legacy_tts.pending_job_count + queueStats.inference.by_queue.pending_tacotron2_jobs;
+
   return (
     <div>
       <footer id="footer">
@@ -130,7 +136,7 @@ function FooterNav(props: Props) {
             <div>
               TTS Queued:{" "}
               <span className="text-red">
-                {queueStats.legacy_tts.pending_job_count}
+                {ttsQueuedCount}
               </span>
             </div>
             <span className="opacity-25">•</span>
