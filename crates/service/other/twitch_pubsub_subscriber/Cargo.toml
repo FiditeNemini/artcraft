@@ -34,7 +34,7 @@ lazy_static = "1.4.0"
 log = "0.4.14"
 rand = "0.8.3"
 regex = "1.5.4"
-time = "0.2.26"
+time = "0.3.30"
 uuid = { version = "0.8.2", features = ["v4"] }
 
 # Runtime
