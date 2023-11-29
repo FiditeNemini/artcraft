@@ -1,9 +1,10 @@
 use std::path::Path;
 
-use log::{info, warn};
+use log::{error, info, warn};
 
 use cloud_storage::bucket_client::BucketClient;
 use container_common::filesystem::safe_delete_temp_directory::safe_delete_temp_directory;
+use filesys::rename_across_devices::rename_across_devices;
 use jobs_common::job_progress_reporter::job_progress_reporter::JobProgressReporter;
 
 use crate::job::job_loop::process_single_job_error::ProcessSingleJobError;
@@ -56,10 +57,11 @@ pub async fn maybe_download_file_from_bucket(
   info!("Renaming {} temp file from {:?} to {:?}!",
     name_or_description_of_file, &temp_path, &final_filesystem_file_path);
 
-  std::fs::rename(&temp_path, &final_filesystem_file_path)
-      .map_err(|e| {
+  rename_across_devices(&temp_path, &final_filesystem_file_path)
+      .map_err(|err| {
+        error!("could not rename on disk: {:?}", err);
         safe_delete_temp_directory(&temp_dir);
-        ProcessSingleJobError::from_io_error(e)
+        ProcessSingleJobError::from_io_error(err)
       })?;
 
   info!("Finished downloading {} file to {:?}", name_or_description_of_file, &final_filesystem_file_path);

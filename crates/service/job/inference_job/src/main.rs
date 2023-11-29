@@ -218,8 +218,6 @@ async fn main() -> AnyhowResult<()> {
     },
     fs: FileSystemDetails {
       maybe_pause_file: easyenv::get_env_pathbuf_optional("PAUSE_FILE"),
-      directory_long_lived_downloads: easyenv::get_env_pathbuf_or_default(
-        "DIR_LONG_LIVED_DOWNLOADS", PathBuf::from("/tmp/downloads_long_lived")),
       scoped_temp_dir_creator_for_short_lived_downloads: ScopedTempDirCreator::for_directory(
         easyenv::get_env_pathbuf_or_default(
           "SCOPED_TEMP_DIR_SHORT_LIVED_DOWNLOADS", PathBuf::from("/tmp/downloads_short_lived"))),
@@ -314,13 +312,11 @@ fn set_up_directories(job_dependencies: &JobDependencies) -> AnyhowResult<()> {
   if !job_dependencies.job.info.container.server_environment.is_deployed_in_production() {
     warn!("Creating directories for non-production / development only!");
 
-    create_dir_all_if_missing(&fs.directory_long_lived_downloads)?;
     create_dir_all_if_missing(&fs.scoped_temp_dir_creator_for_long_lived_downloads.get_base_dir())?;
     create_dir_all_if_missing(&fs.scoped_temp_dir_creator_for_short_lived_downloads.get_base_dir())?;
     create_dir_all_if_missing(&fs.scoped_temp_dir_creator_for_work.get_base_dir())?;
   }
 
-  check_directory_exists(&fs.directory_long_lived_downloads)?;
   check_directory_exists(fs.scoped_temp_dir_creator_for_long_lived_downloads.get_base_dir())?;
   check_directory_exists(fs.scoped_temp_dir_creator_for_short_lived_downloads.get_base_dir())?;
   check_directory_exists(fs.scoped_temp_dir_creator_for_work.get_base_dir())?;

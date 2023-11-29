@@ -144,10 +144,6 @@ pub struct FileSystemDetails {
   /// redeploying.
   pub maybe_pause_file: Option<PathBuf>,
 
-  /// Directory to store long-term downloads (models)
-  /// (In prod, typically model files from GCS / NFS PVC mount)
-  pub directory_long_lived_downloads: PathBuf,
-
   /// Temporary directory for storing downloads
   /// Creates temp directories for scratch files
   pub scoped_temp_dir_creator_for_short_lived_downloads: ScopedTempDirCreator,
@@ -161,6 +157,8 @@ pub struct FileSystemDetails {
   pub scoped_temp_dir_creator_for_work: ScopedTempDirCreator,
 
   /// Organizes downloaded files
+  /// Directory to store long-term downloads (models)
+  /// (In prod, typically model files from GCS / NFS PVC mount)
   pub semi_persistent_cache: SemiPersistentCacheDir,
 }
 
