@@ -25,6 +25,9 @@ pub enum ProcessSingleJobError {
   /// It might be important, we just haven't special cased it yet.
   Other(anyhow::Error),
 
+  /// Job underlying resources are missing - model deleted
+  ModelDeleted,
+
   /// The job system is misconfigured.
   /// Retry the job, but mark as a job runner system failure (health check failure).
   JobSystemMisconfiguration(Option<String>),
