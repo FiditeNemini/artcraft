@@ -222,7 +222,7 @@ async fn main() -> AnyhowResult<()> {
         "DIR_LONG_LIVED_DOWNLOADS", PathBuf::from("/tmp/downloads_long_lived")),
       scoped_temp_dir_creator_for_short_lived_downloads: ScopedTempDirCreator::for_directory(
         easyenv::get_env_pathbuf_or_default(
-          "SCOPED_TEMP_DIR_SHORT_LIVED_DOWNLOADS", PathBuf::from("/tmp/downloads_long_lived"))),
+          "SCOPED_TEMP_DIR_SHORT_LIVED_DOWNLOADS", PathBuf::from("/tmp/downloads_short_lived"))),
       scoped_temp_dir_creator_for_long_lived_downloads: ScopedTempDirCreator::for_directory(
         easyenv::get_env_pathbuf_or_default(
           "SCOPED_TEMP_DIR_LONG_LIVED_DOWNLOADS", PathBuf::from("/tmp/downloads_long_lived"))),
