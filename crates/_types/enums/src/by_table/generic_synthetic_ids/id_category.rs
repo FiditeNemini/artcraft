@@ -133,7 +133,7 @@ mod tests {
     fn all_variants() {
       // Static check
       let mut variants = IdCategory::all_variants();
-      assert_eq!(variants.len(), 6);
+      assert_eq!(variants.len(), 7);
       assert_eq!(variants.pop_first(), Some(IdCategory::MediaFile));
       assert_eq!(variants.pop_first(), Some(IdCategory::LipsyncAnimationResult));
       assert_eq!(variants.pop_first(), Some(IdCategory::VoiceConversionResult));

@@ -1,14 +1,9 @@
 use anyhow::anyhow;
 use sqlx::MySqlPool;
 
-use log::info;
-use sqlx::mysql::MySqlPoolOptions;
-
 use enums::common::visibility::Visibility;
 use errors::AnyhowResult;
 use tokens::tokens::model_weights::ModelWeightToken;
-
-use config::shared_constants::{DEFAULT_MYSQL_CONNECTION_STRING, DEFAULT_RUST_LOG};
 
 pub struct UpdateWeightArgs<'a> {
     pub weight_token: &'a ModelWeightToken,
@@ -58,13 +53,13 @@ pub async fn update_weights(args: UpdateWeightArgs<'_>) -> AnyhowResult<()> {
 
 #[cfg(test)]
 mod tests {
-
-    use tokio;
-    // Template 
+    // Template
     use sqlx::mysql::MySqlPoolOptions;
+    use tokio;
 
-    use config::shared_constants::{DEFAULT_MYSQL_CONNECTION_STRING};
+    use config::shared_constants::DEFAULT_MYSQL_CONNECTION_STRING;
     use errors::AnyhowResult;
+
     #[tokio::test]
     async fn test_update_weights() -> AnyhowResult<()> {
         let db_connection_string = DEFAULT_MYSQL_CONNECTION_STRING;
