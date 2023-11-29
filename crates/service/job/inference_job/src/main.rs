@@ -119,20 +119,10 @@ async fn main() -> AnyhowResult<()> {
   )?;
 
   // Where we download models and resources to (typically a shared NFS volume in prod).
-  let temp_directory_downloads = easyenv::get_env_pathbuf_or_default(
-    "TEMP_DIR_DOWNLOADS",
-    PathBuf::from("/tmp/downloads")
-  );
 
-  // //// Where we store scratch files for workloads (temporary processing).
-  // let temp_directory_work = easyenv::get_env_pathbuf_or_default(
-  //   "TEMP_DIR_WORK",
-  //   PathBuf::from("/tmp/work")
-  // );
-
-
-  let semi_persistent_cache =
-      SemiPersistentCacheDir::configured_root(&temp_directory_downloads);
+  let semi_persistent_cache = SemiPersistentCacheDir::configured_root(
+    easyenv::get_env_pathbuf_or_default("SEMI_PERSISTENT_DIR_ROOT",
+                                        PathBuf::from("/tmp/persistent")));
 
   let db_connection_string =
       easyenv::get_env_string_or_default(

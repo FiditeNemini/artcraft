@@ -13,7 +13,7 @@ use crate::util::scoped_temp_dir_creator::ScopedTempDirCreator;
 
 pub async fn maybe_download_file_from_bucket(
   name_or_description_of_file: &str,
-  file_path: &Path,
+  final_filesystem_file_path: &Path,
   bucket_object_path: &Path,
   bucket_client: &BucketClient,
   job_progress_reporter: &mut Box<dyn JobProgressReporter>,
@@ -22,12 +22,12 @@ pub async fn maybe_download_file_from_bucket(
   scoped_tempdir_creator: &ScopedTempDirCreator,
 ) -> Result<(), ProcessSingleJobError> {
 
-  if file_path.exists() {
+  if final_filesystem_file_path.exists() {
     // TODO(bt, 2022-07-15): Check signature of file
     return Ok(())
   }
 
-  warn!("{} does not exist at path: {:?}", name_or_description_of_file, &file_path);
+  warn!("{} does not exist at path: {:?}", name_or_description_of_file, &final_filesystem_file_path);
 
   job_progress_reporter.log_status(job_progress_update_description)
       .map_err(|e| ProcessSingleJobError::Other(e))?;
@@ -54,15 +54,15 @@ pub async fn maybe_download_file_from_bucket(
   info!("Downloaded {} from bucket!", name_or_description_of_file);
 
   info!("Renaming {} temp file from {:?} to {:?}!",
-    name_or_description_of_file, &temp_path, &file_path);
+    name_or_description_of_file, &temp_path, &final_filesystem_file_path);
 
-  std::fs::rename(&temp_path, &file_path)
+  std::fs::rename(&temp_path, &final_filesystem_file_path)
       .map_err(|e| {
         safe_delete_temp_directory(&temp_dir);
         ProcessSingleJobError::from_io_error(e)
       })?;
 
-  info!("Finished downloading {} file to {:?}", name_or_description_of_file, &file_path);
+  info!("Finished downloading {} file to {:?}", name_or_description_of_file, &final_filesystem_file_path);
 
   safe_delete_temp_directory(&temp_dir);
 

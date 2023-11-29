@@ -39,7 +39,7 @@ pub async fn download_static_dependencies<'a>(
       &mut job_progress_reporter,
       "downloading vocoder (1 of 3)",
       job.id.0,
-      &job_dependencies.fs.scoped_temp_dir_creator_for_short_lived_downloads,
+      &job_dependencies.fs.scoped_temp_dir_creator_for_long_lived_downloads,
     ).await?;
 
     waveglow_vocoder_model_fs_path
@@ -61,7 +61,7 @@ pub async fn download_static_dependencies<'a>(
       &mut job_progress_reporter,
       "downloading vocoder (2 of 3)",
       job.id.0,
-      &job_dependencies.fs.scoped_temp_dir_creator_for_short_lived_downloads,
+      &job_dependencies.fs.scoped_temp_dir_creator_for_long_lived_downloads,
     ).await?;
 
     hifigan_vocoder_model_fs_path
@@ -83,7 +83,7 @@ pub async fn download_static_dependencies<'a>(
       &mut job_progress_reporter,
       "downloading vocoder (3 of 3)",
       job.id.0,
-      &job_dependencies.fs.scoped_temp_dir_creator_for_short_lived_downloads,
+      &job_dependencies.fs.scoped_temp_dir_creator_for_long_lived_downloads,
     ).await?;
 
     hifigan_superres_vocoder_model_fs_path
