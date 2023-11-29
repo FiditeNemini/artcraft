@@ -20,7 +20,7 @@ errors = { path = "../errors" }
 # External
 hmac = "0.10.0" # jwt signing
 jwt = "0.13.0"
-sha2 = "0.10.8" # hmac signing
+sha2 = "0.9.5" # hmac signing
 my-workspace-hack = { version = "0.1", path = "../../../my-workspace-hack" }
 
 [dev-dependencies]

@@ -75,7 +75,7 @@ hyper = { version = "0.14.24" }
 # Crypto
 magic-crypt = "3.1.13" # encrypting sort IDs for the frontend so we don't leak info
 md-5 = "0.9.1" # gravatar
-sha2 = "0.10.8" # file hashes, inference text hashes, etc.
+sha2 = "0.9.5" # file hashes, inference text hashes, etc.
 
 # Serialization
 serde = "1.0.125"
