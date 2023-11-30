@@ -1,5 +1,7 @@
 use anyhow::anyhow;
 
+use filesys::is_filesystem_full_error::is_filesystem_full_error;
+
 /// Error from processing a single job
 #[derive(Debug)]
 pub enum ProcessSingleJobError {
@@ -35,6 +37,22 @@ pub enum ProcessSingleJobError {
   /// We hit a feature or a path for this job that has not yet been implemented.
   /// Permanently fail the job.
   NotYetImplemented
+}
+
+impl From<std::io::Error> for ProcessSingleJobError {
+  fn from(error: std::io::Error) -> Self {
+    if is_filesystem_full_error(&error) {
+      ProcessSingleJobError::FilesystemFull
+    } else {
+      ProcessSingleJobError::Other(anyhow!(error))
+    }
+  }
+}
+
+impl From<anyhow::Error> for ProcessSingleJobError {
+  fn from(error: anyhow::Error) -> Self {
+    ProcessSingleJobError::Other(error)
+  }
 }
 
 impl ProcessSingleJobError {

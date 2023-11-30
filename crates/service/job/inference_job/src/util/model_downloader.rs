@@ -9,7 +9,8 @@ use container_common::filesystem::safe_delete_temp_directory::safe_delete_temp_d
 use errors::AnyhowResult;
 use filesys::create_dir_all_if_missing::create_dir_all_if_missing;
 use filesys::file_exists::file_exists;
-use filesys::rename_across_devices::rename_across_devices;
+use filesys::rename_across_devices::{rename_across_devices, RenameError};
+use crate::job::job_loop::process_single_job_error::ProcessSingleJobError;
 
 use crate::util::scoped_temp_dir_creator::ScopedTempDirCreator;
 
@@ -31,7 +32,7 @@ pub trait ModelDownloader {
     &self,
     bucket_client: &BucketClient,
     scoped_tempdir_creator: &ScopedTempDirCreator,
-  ) -> AnyhowResult<()> {
+  ) -> Result<(), ProcessSingleJobError> {
     let filesystem_path = self.get_filesystem_path();
 
     if file_exists(filesystem_path) {
@@ -71,10 +72,13 @@ pub trait ModelDownloader {
     info!("Renaming {} file from {:?} to {:?}!", model_name, &temp_path, filesystem_path);
 
     rename_across_devices(&temp_path, filesystem_path)
-        .map_err(|e| {
-          error!("could not rename on disk: {:?}", e);
+        .map_err(|err| {
+          error!("could not rename on disk: {:?}", err);
           safe_delete_temp_directory(&temp_dir);
-          anyhow!("couldn't rename disk files: {:?}", e)
+          match err {
+            RenameError::StorageFull => ProcessSingleJobError::FilesystemFull,
+            RenameError::IoError(err) => ProcessSingleJobError::from_io_error(err),
+          }
         })?;
 
     info!("Finished downloading {} file to {:?}", model_name, filesystem_path);

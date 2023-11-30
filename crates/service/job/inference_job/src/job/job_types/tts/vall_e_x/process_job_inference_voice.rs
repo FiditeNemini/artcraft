@@ -85,9 +85,9 @@ pub async fn process_inference_voice(
       &args.job_dependencies.fs.scoped_temp_dir_creator_for_short_lived_downloads
     ).await;
 
-    if let Err(e) = result {
-      error!("could not download: {:?}", e);
-      return Err(ProcessSingleJobError::from_anyhow_error(e));
+    if let Err(err) = result {
+      error!("could not download: {:?}", err);
+      return Err(err);
     }
   }
 

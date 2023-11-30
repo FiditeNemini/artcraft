@@ -4,6 +4,8 @@ use std::path::Path;
 
 use log::error;
 
+use crate::is_filesystem_full_error::is_filesystem_full_error;
+
 #[derive(Debug)]
 pub enum RenameError {
   StorageFull,
@@ -42,18 +44,16 @@ pub fn rename_across_devices<P: AsRef<Path>, Q: AsRef<Path>>(from: P, to: Q) -> 
   // Nearly a third of `ErrorKind` is nightly rust, so we're going to have to match on
   // unix error codes until the rest of the ErrorKind enum variants are stable.
   // The error codes are maintained in sys/unix/mod.rs - decode_error_kind(i32)
-
   const E_CROSSES_DEVICES : i32 = 18; // pub const EXDEV: ::c_int = 18;
-  const E_FILESYSTEM_QUOTA_EXCEEDED : i32 = 122; // pub const EDQUOT: ::c_int = 122;
-  const E_STORAGE_FULL : i32 = 28; // pub const ENOSPC: ::c_int = 28;
+
+  if is_filesystem_full_error(&err) {
+    error!("Filesystem is full during rename.");
+    return Err(RenameError::StorageFull);
+  }
 
   match err.raw_os_error() {
     Some(E_CROSSES_DEVICES) => {
       // NB: Fall through.
-    }
-    Some(E_STORAGE_FULL) | Some(E_FILESYSTEM_QUOTA_EXCEEDED) => {
-      error!("Filesystem is full during rename.");
-      return Err(RenameError::StorageFull);
     }
     _ => {
       // Something else happened. Return original error.

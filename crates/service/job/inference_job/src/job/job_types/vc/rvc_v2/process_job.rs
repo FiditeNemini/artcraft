@@ -66,9 +66,9 @@ pub async fn process_job(args: RvcV2ProcessJobArgs<'_>) -> Result<JobSuccessResu
     &args.job_dependencies.buckets.private_bucket_client,
     &args.job_dependencies.fs.scoped_temp_dir_creator_for_short_lived_downloads)
       .await
-      .map_err(|e| {
-        error!("could not download hubert: {:?}", e);
-        ProcessSingleJobError::from_anyhow_error(e)
+      .map_err(|err| {
+        error!("could not download hubert: {:?}", err);
+        err
       })?;
 
   // ==================== CONFIRM OR DOWNLOAD RVC (v2) MODEL ==================== //
@@ -117,9 +117,9 @@ pub async fn process_job(args: RvcV2ProcessJobArgs<'_>) -> Result<JobSuccessResu
       &args.job_dependencies.fs.scoped_temp_dir_creator_for_short_lived_downloads,
     ).await;
 
-    if let Err(e) = result {
-      error!("could not download: {:?}", e);
-      return Err(ProcessSingleJobError::from_anyhow_error(e))
+    if let Err(err) = result {
+      error!("could not download: {:?}", err);
+      return Err(err);
     }
   }
 

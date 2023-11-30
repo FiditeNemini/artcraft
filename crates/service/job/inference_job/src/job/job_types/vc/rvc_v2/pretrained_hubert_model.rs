@@ -9,6 +9,7 @@ use errors::AnyhowResult;
 use filesys::create_dir_all_if_missing::create_dir_all_if_missing;
 use filesys::file_exists::file_exists;
 use filesys::rename_across_devices::rename_across_devices;
+use crate::job::job_loop::process_single_job_error::ProcessSingleJobError;
 
 use crate::util::scoped_temp_dir_creator::ScopedTempDirCreator;
 
@@ -43,7 +44,7 @@ impl PretrainedHubertModel {
     &self,
     bucket_client: &BucketClient,
     scoped_tempdir_creator: &ScopedTempDirCreator,
-  ) -> AnyhowResult<()> {
+  ) -> Result<(), ProcessSingleJobError> {
     if file_exists(&self.filesystem_path) {
       return Ok(());
     }
