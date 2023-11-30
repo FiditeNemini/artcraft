@@ -128,7 +128,7 @@ async fn process_job_with_cleanup(
         job_progress_update_description: "downloading user vocoder",
         job_id: job.id.0,
         scoped_tempdir_creator: &args.job_dependencies.fs.scoped_temp_dir_creator_for_short_lived_downloads,
-        maybe_existing_file_minimum_size_required: None,
+        maybe_existing_file_minimum_size_required: Some(1000),
       }).await?;
 
       Some(custom_vocoder_fs_path)
@@ -150,7 +150,7 @@ async fn process_job_with_cleanup(
       job_progress_update_description: "downloading synthesizer",
       job_id: job.id.0,
       scoped_tempdir_creator: &args.job_dependencies.fs.scoped_temp_dir_creator_for_short_lived_downloads,
-      maybe_existing_file_minimum_size_required: None,
+      maybe_existing_file_minimum_size_required: Some(1000),
     }).await?;
 
     tts_synthesizer_fs_path
