@@ -7,7 +7,7 @@ use log::{info, warn};
 use once_cell::sync::Lazy;
 use subprocess::{Popen, PopenConfig};
 
-use container_common::anyhow_result::AnyhowResult;
+use errors::AnyhowResult;
 use filesys::path_to_string::path_to_string;
 
 use crate::job::job_loop::command_exit_status::CommandExitStatus;

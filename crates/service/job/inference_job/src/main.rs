@@ -32,7 +32,7 @@ use concurrency::relaxed_atomic_bool::RelaxedAtomicBool;
 use config::common_env::CommonEnv;
 use config::shared_constants::DEFAULT_MYSQL_CONNECTION_STRING;
 use config::shared_constants::DEFAULT_RUST_LOG;
-use container_common::anyhow_result::AnyhowResult;
+use errors::AnyhowResult;
 use filesys::check_directory_exists::check_directory_exists;
 use filesys::create_dir_all_if_missing::create_dir_all_if_missing;
 use jobs_common::job_progress_reporter::job_progress_reporter::JobProgressReporterBuilder;

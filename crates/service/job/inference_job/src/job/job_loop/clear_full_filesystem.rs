@@ -1,6 +1,6 @@
 use log::warn;
 
-use container_common::collections::multiple_random_from_vec::multiple_random_from_vec;
+use collections::multiple_random_from_vec::multiple_random_from_vec;
 use errors::AnyhowResult;
 use jobs_common::semi_persistent_cache_dir::SemiPersistentCacheDir;
 

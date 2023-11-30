@@ -1170,6 +1170,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "collections"
+version = "0.0.1"
+dependencies = [
+ "errors",
+ "my-workspace-hack",
+ "rand 0.8.5",
+]
+
+[[package]]
 name = "color_quant"
 version = "1.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3015,9 +3024,9 @@ dependencies = [
  "buckets",
  "chrono",
  "cloud_storage",
+ "collections",
  "concurrency",
  "config",
- "container_common",
  "dotenv",
  "easyenv",
  "enums",
@@ -6686,6 +6695,7 @@ dependencies = [
  "chrono",
  "clap 2.34.0",
  "cloud_storage",
+ "collections",
  "config",
  "container_common",
  "dotenv",
@@ -6758,6 +6768,7 @@ dependencies = [
  "anyhow",
  "base64 0.21.5",
  "chrono",
+ "collections",
  "config",
  "container_common",
  "diesel",
