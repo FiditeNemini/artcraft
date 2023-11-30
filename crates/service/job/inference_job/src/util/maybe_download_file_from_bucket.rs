@@ -1,3 +1,4 @@
+use std::io::ErrorKind;
 use std::path::Path;
 
 use log::{error, info, warn};
@@ -127,10 +128,23 @@ fn reattempt_copy_if_failed(args: &MaybeDownloadArgs, temp_dir: &TempDir, temp_p
 
   error!("Copied size was 0! Removing destination file and retrying...");
 
-  std::fs::remove_file(&args.final_filesystem_file_path)
-      .map_err(|err| ProcessSingleJobError::from_io_error(err))?;
+  if let Err(err) = std::fs::remove_file(&args.final_filesystem_file_path) {
+    match err.kind() {
+      ErrorKind::NotFound => {
+        // NB: We seem to be seeing this in production.
+        // Perhaps another pod deleted it in a race condition?
+        // Fall through case.
+        warn!("File couldn't be removed: it's already gone.")
+      },
+      _ => {
+        return Err(ProcessSingleJobError::from_io_error(err));
+      }
+    }
+  } else {
+    warn!("File removed.");
+  }
 
-  warn!("Removed. Retrying copy...");
+  warn!("Retrying copy...");
 
   rename_across_devices(&temp_path, &args.final_filesystem_file_path)
       .map_err(|err| {
