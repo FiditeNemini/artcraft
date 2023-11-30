@@ -24,6 +24,8 @@ pub struct InsertGenericInferenceArgs<'a> {
 
   pub maybe_raw_inference_text: Option<&'a str>,
 
+  pub maybe_max_duration_seconds: Option<i32>,
+
   pub maybe_inference_args: Option<GenericInferenceArgs>,
 
   pub maybe_creator_user_token: Option<&'a UserToken>,
@@ -54,6 +56,11 @@ pub async fn insert_generic_inference_job(args: InsertGenericInferenceArgs<'_>) 
         routing_tag
       });
 
+  // This only applies to certain types of inference.
+  // "0" is the default value, typically 12 seconds for TTS.
+  // "-1" means "unlimited"
+  let max_duration_seconds = args.maybe_max_duration_seconds.unwrap_or(0);
+
   let query = sqlx::query!(
         r#"
 INSERT INTO generic_inference_jobs
@@ -80,6 +87,7 @@ SET
 
   priority_level = ?,
   is_keepalive_required = ?,
+  max_duration_seconds = ?,
 
   is_debug_request = ?,
   maybe_routing_tag = ?,
@@ -109,6 +117,7 @@ SET
 
         args.priority_level,
         args.requires_keepalive,
+        max_duration_seconds,
 
         args.is_debug_request,
         maybe_routing_tag,

@@ -309,6 +309,7 @@ pub async fn enqueue_lipsync_animation_handler(
     maybe_input_source_token: None, // TODO: Introduce a second foreign key ?
     maybe_input_source_token_type: None, // TODO: Introduce a second foreign key ?
     maybe_raw_inference_text: None, // No text
+    maybe_max_duration_seconds: None,
     maybe_inference_args: Some(GenericInferenceArgs {
       inference_category: Some(InferenceCategoryAbbreviated::LipsyncAnimation),
       args: Some(PolymorphicInferenceArgs::La(inference_args)),

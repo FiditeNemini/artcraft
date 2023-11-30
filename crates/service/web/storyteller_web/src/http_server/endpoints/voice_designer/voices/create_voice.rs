@@ -164,6 +164,7 @@ pub async fn create_voice_handler(
         voice_token: None,
         dataset_token: Some(request.voice_dataset_token.clone()),
     };
+
     let maybe_avt_token = server_state.avt_cookie_manager.get_avt_token_from_request(&http_request);
 
     // create the inference args here
@@ -177,6 +178,7 @@ pub async fn create_voice_handler(
         maybe_input_source_token: None,
         maybe_input_source_token_type: None,
         maybe_raw_inference_text: None,
+        maybe_max_duration_seconds: None,
         maybe_inference_args: Some(GenericInferenceArgs {
             inference_category: Some(InferenceCategoryAbbreviated::TextToSpeech),
             args: Some(PolymorphicInferenceArgs::Tts(inference_args)),
