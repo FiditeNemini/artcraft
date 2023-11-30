@@ -5,10 +5,10 @@ use async_trait::async_trait;
 use log::{error, info};
 
 use cloud_storage::bucket_client::BucketClient;
-use container_common::filesystem::safe_delete_temp_directory::safe_delete_temp_directory;
 use filesys::create_dir_all_if_missing::create_dir_all_if_missing;
 use filesys::file_exists::file_exists;
 use filesys::rename_across_devices::{rename_across_devices, RenameError};
+use filesys::safe_delete_temp_directory::safe_delete_temp_directory;
 
 use crate::job::job_loop::process_single_job_error::ProcessSingleJobError;
 use crate::util::scoped_temp_dir_creator::ScopedTempDirCreator;

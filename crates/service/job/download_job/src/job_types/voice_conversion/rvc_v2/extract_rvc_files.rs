@@ -3,8 +3,8 @@ use std::path::{Path, PathBuf};
 use log::{info, warn};
 use tempdir::TempDir;
 
-use container_common::filesystem::safe_delete_temp_file::safe_delete_temp_file;
 use errors::AnyhowResult;
+use filesys::safe_delete_temp_file::safe_delete_temp_file;
 use mimetypes::mimetype_for_file::get_mimetype_for_file;
 
 #[derive(Debug)]

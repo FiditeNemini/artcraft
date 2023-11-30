@@ -7,11 +7,11 @@ use anyhow::anyhow;
 use log::{error, info};
 use tempdir::TempDir;
 
-use container_common::filesystem::safe_delete_temp_directory::safe_delete_temp_directory;
-use container_common::filesystem::safe_delete_temp_file::safe_delete_temp_file;
 use enums::by_table::generic_inference_jobs::inference_result_type::InferenceResultType;
 use errors::AnyhowResult;
 use filesys::check_file_exists::check_file_exists;
+use filesys::safe_delete_temp_directory::safe_delete_temp_directory;
+use filesys::safe_delete_temp_file::safe_delete_temp_file;
 use hashing::sha256::sha256_hash_string::sha256_hash_string;
 use mysql_queries::column_types::vocoder_type::VocoderType;
 use mysql_queries::queries::generic_inference::job::list_available_generic_inference_jobs::AvailableInferenceJob;
