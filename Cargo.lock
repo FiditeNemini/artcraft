@@ -2278,6 +2278,7 @@ name = "filesys"
 version = "0.0.1"
 dependencies = [
  "errors",
+ "log",
  "my-workspace-hack",
 ]
 
