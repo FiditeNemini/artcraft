@@ -12,7 +12,7 @@ pub fn multiple_random_from_vec<T>(vec: &Vec<T>, amount: usize) -> Vec<&T> {
 
 #[cfg(test)]
 mod tests {
-  use collections::multiple_random_from_vec::multiple_random_from_vec;
+  use crate::multiple_random_from_vec::multiple_random_from_vec;
 
   #[test]
   fn pulls_item_from_vec() {

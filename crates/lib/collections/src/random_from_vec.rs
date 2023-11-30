@@ -7,7 +7,7 @@ pub fn random_from_vec<T>(vec: &Vec<T>) -> Option<&T> {
 
 #[cfg(test)]
 mod tests {
-  use collections::random_from_vec::random_from_vec;
+  use crate::random_from_vec::random_from_vec;
 
   #[test]
   fn pulls_item_from_vec() {
