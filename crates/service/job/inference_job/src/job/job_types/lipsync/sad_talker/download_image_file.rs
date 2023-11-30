@@ -74,6 +74,7 @@ pub async fn download_image_file(
     "downloading",
     job.id.0,
     &temp_dir_creator,
+    None,
   ).await?;
 
   Ok(ImageFile {

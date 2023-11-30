@@ -79,6 +79,7 @@ pub async fn process_job(args: VitsProcessJobArgs<'_>) -> Result<JobSuccessResul
       "downloading synthesizer",
       job.id.0,
       &args.job_dependencies.fs.scoped_temp_dir_creator_for_short_lived_downloads,
+      None,
     ).await?;
 
     vits_traced_synthesizer_fs_path

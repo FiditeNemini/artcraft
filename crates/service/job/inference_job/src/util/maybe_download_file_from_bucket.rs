@@ -4,6 +4,7 @@ use log::{error, info, warn};
 
 use cloud_storage::bucket_client::BucketClient;
 use container_common::filesystem::safe_delete_temp_directory::safe_delete_temp_directory;
+use filesys::file_size::file_size;
 use filesys::rename_across_devices::rename_across_devices;
 use jobs_common::job_progress_reporter::job_progress_reporter::JobProgressReporter;
 
@@ -21,14 +22,41 @@ pub async fn maybe_download_file_from_bucket(
   job_progress_update_description: &str,
   job_id: i64,
   scoped_tempdir_creator: &ScopedTempDirCreator,
+  maybe_existing_file_minimum_size_required: Option<u64>,
 ) -> Result<(), ProcessSingleJobError> {
 
   if final_filesystem_file_path.exists() {
-    // TODO(bt, 2022-07-15): Check signature of file
-    return Ok(())
-  }
+    // TODO(bt, 2022-07-15): Check signature of file as best proof of file validity
+    let mut existing_file_is_valid = true;
 
-  warn!("{} does not exist at path: {:?}", name_or_description_of_file, &final_filesystem_file_path);
+    if let Some(existing_file_minimum_size_required) = maybe_existing_file_minimum_size_required {
+      // NB: Sometimes the downloader incompletely downloads files. Typically this is a zero file
+      // size, but the Rust system may report a non-zero (but small) number of bytes. This should
+      // later be investigated and the heuristic simplified. The intent here is merely to make sure
+      // we don't consider these okay:
+      //
+      //   -rw-r--r-- 1 root root 55824433 Nov 30 00:12 VM:012rkwsv91zb
+      //   -rw-r--r-- 1 root root 55823149 Nov 30 00:13 VM:79etbx4fdksv
+      //   -rw-r--r-- 1 root root        0 Nov 30 00:52 VM:1dzepsnwzbkc
+      //   -rw-r--r-- 1 root root        0 Nov 30 00:29 VM:7c2df5a36qjb
+      //
+      let size = file_size(final_filesystem_file_path)
+          .map_err(|err| ProcessSingleJobError::from_anyhow_error(err))?;
+
+      info!("{name_or_description_of_file} exists at path {:?} ; file size = {size}",
+        &final_filesystem_file_path);
+
+      if size < existing_file_minimum_size_required {
+        existing_file_is_valid = false;
+      }
+    }
+
+    if existing_file_is_valid {
+      return Ok(())
+    }
+  } else {
+    warn!("{} does not exist at path: {:?}", name_or_description_of_file, &final_filesystem_file_path);
+  }
 
   job_progress_reporter.log_status(job_progress_update_description)
       .map_err(|e| ProcessSingleJobError::Other(e))?;

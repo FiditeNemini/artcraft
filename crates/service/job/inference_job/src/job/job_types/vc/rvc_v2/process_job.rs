@@ -96,6 +96,7 @@ pub async fn process_job(args: RvcV2ProcessJobArgs<'_>) -> Result<JobSuccessResu
       "downloading rvc (v2) model",
       job.id.0,
       &args.job_dependencies.fs.scoped_temp_dir_creator_for_short_lived_downloads,
+      None,
     ).await?;
 
     fs_path
@@ -151,6 +152,7 @@ pub async fn process_job(args: RvcV2ProcessJobArgs<'_>) -> Result<JobSuccessResu
         "downloading rvc (v2) model index",
         job.id.0,
         &args.job_dependencies.fs.scoped_temp_dir_creator_for_short_lived_downloads,
+        None,
       ).await?;
 
       Some(fs_path)
@@ -194,6 +196,7 @@ pub async fn process_job(args: RvcV2ProcessJobArgs<'_>) -> Result<JobSuccessResu
       "downloading",
       job.id.0,
       &args.job_dependencies.fs.scoped_temp_dir_creator_for_work,
+      None,
     ).await?;
 
     original_media_upload_fs_path

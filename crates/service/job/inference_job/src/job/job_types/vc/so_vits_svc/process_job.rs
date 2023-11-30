@@ -85,6 +85,7 @@ pub async fn process_job(args: SoVitsSvcProcessJobArgs<'_>) -> Result<JobSuccess
       "downloading so-vits-svc model",
       job.id.0,
       &args.job_dependencies.fs.scoped_temp_dir_creator_for_short_lived_downloads,
+      None,
     ).await?;
 
     so_vits_svc_fs_path
@@ -127,6 +128,7 @@ pub async fn process_job(args: SoVitsSvcProcessJobArgs<'_>) -> Result<JobSuccess
       "downloading",
       job.id.0,
       &args.job_dependencies.fs.scoped_temp_dir_creator_for_work,
+      None,
     ).await?;
 
     original_media_upload_fs_path

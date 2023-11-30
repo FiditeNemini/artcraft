@@ -128,6 +128,7 @@ async fn process_job_with_cleanup(
         "downloading user vocoder",
         job.id.0,
         &args.job_dependencies.fs.scoped_temp_dir_creator_for_short_lived_downloads,
+        None,
       ).await?;
 
       Some(custom_vocoder_fs_path)
@@ -149,6 +150,7 @@ async fn process_job_with_cleanup(
       "downloading synthesizer",
       job.id.0,
       &args.job_dependencies.fs.scoped_temp_dir_creator_for_short_lived_downloads,
+      None,
     ).await?;
 
     tts_synthesizer_fs_path

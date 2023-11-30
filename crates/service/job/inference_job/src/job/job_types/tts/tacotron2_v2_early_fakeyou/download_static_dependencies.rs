@@ -22,7 +22,6 @@ pub async fn download_static_dependencies<'a>(
   mut job_progress_reporter: &mut Box<dyn JobProgressReporter>,
 ) -> Result<StaticDependencies, ProcessSingleJobError> {
 
-
   // ==================== CONFIRM OR DOWNLOAD WAVEGLOW VOCODER MODEL ==================== //
 
   let waveglow_vocoder_model_fs_path = {
@@ -40,6 +39,7 @@ pub async fn download_static_dependencies<'a>(
       "downloading vocoder (1 of 3)",
       job.id.0,
       &job_dependencies.fs.scoped_temp_dir_creator_for_long_lived_downloads,
+      Some(1000),
     ).await?;
 
     waveglow_vocoder_model_fs_path
@@ -62,6 +62,7 @@ pub async fn download_static_dependencies<'a>(
       "downloading vocoder (2 of 3)",
       job.id.0,
       &job_dependencies.fs.scoped_temp_dir_creator_for_long_lived_downloads,
+      Some(1000),
     ).await?;
 
     hifigan_vocoder_model_fs_path
@@ -84,6 +85,7 @@ pub async fn download_static_dependencies<'a>(
       "downloading vocoder (3 of 3)",
       job.id.0,
       &job_dependencies.fs.scoped_temp_dir_creator_for_long_lived_downloads,
+      Some(1000),
     ).await?;
 
     hifigan_superres_vocoder_model_fs_path
