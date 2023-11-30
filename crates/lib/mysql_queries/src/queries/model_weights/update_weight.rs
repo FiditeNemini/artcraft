@@ -12,11 +12,18 @@ pub struct UpdateWeightArgs<'a> {
     pub description_markdown: Option<&'a str>,
     pub description_rendered_html: Option<&'a str>,
     pub creator_set_visibility: Option<&'a Visibility>,
+    pub weight_type: Option<String>,
+    pub weight_category: Option<String>,
     pub mysql_pool: &'a MySqlPool,
 }
 
 pub async fn update_weights(args: UpdateWeightArgs<'_>) -> AnyhowResult<()> {
     let mut transaction = args.mysql_pool.begin().await?;
+
+    let visbility: &str = match args.creator_set_visibility {
+        Some(visibility) => visibility.to_str(),
+        None => "",
+    };
 
     let query_result = sqlx::query!(
         r#"
@@ -29,13 +36,12 @@ pub async fn update_weights(args: UpdateWeightArgs<'_>) -> AnyhowResult<()> {
         creator_set_visibility = COALESCE(?, creator_set_visibility),
         version = version + 1
     WHERE token = ?
-    LIMIT 1
     "#,
-        args.title.as_deref().unwrap_or(Some("")),
-        args.description_markdown.as_deref().unwrap_or(Some("")),
-        args.maybe_thumbnail_token.as_deref().unwrap_or(Some("")),
-        args.description_rendered_html.as_deref().unwrap_or(Some("")),
-        args.creator_set_visibility.as_deref().unwrap_or(Some("")),
+        args.title.as_deref().unwrap_or(""),
+        args.description_markdown.as_deref().unwrap_or(""),
+        args.maybe_thumbnail_token.as_deref().unwrap_or(""),
+        args.description_rendered_html.as_deref().unwrap_or(""),
+        visbility,
         args.weight_token.as_str()
     )
     .execute(args.mysql_pool).await;
@@ -45,7 +51,6 @@ pub async fn update_weights(args: UpdateWeightArgs<'_>) -> AnyhowResult<()> {
     match query_result {
         Ok(_) => Ok(()),
         Err(err) => { 
-            transaction.rollback().await?;
             Err(anyhow!("weights update error: {:?}", err)) 
         }
     }
