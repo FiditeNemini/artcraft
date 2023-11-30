@@ -95,20 +95,39 @@ pub async fn maybe_download_file_from_bucket(
   info!("File size of {} temp download file {:?} is {original_size}",
     args.name_or_description_of_file, &temp_path);
 
-  info!("Renaming {} temp file from {:?} to {:?}!",
+  //info!("Renaming {} temp file from {:?} to {:?}!",
+  //  args.name_or_description_of_file, &temp_path, &args.final_filesystem_file_path);
+
+  //rename_across_devices(&temp_path, &args.final_filesystem_file_path)
+  //    .map_err(|err| {
+  //      error!("could not rename on disk: {:?}", err);
+  //      safe_delete_temp_directory(&temp_dir);
+  //      ProcessSingleJobError::from_io_error(err)
+  //    })?;
+
+  info!("Copying {} temp file from {:?} to {:?}!",
     args.name_or_description_of_file, &temp_path, &args.final_filesystem_file_path);
 
-  rename_across_devices(&temp_path, &args.final_filesystem_file_path)
-      .map_err(|err| {
-        error!("could not rename on disk: {:?}", err);
-        safe_delete_temp_directory(&temp_dir);
-        ProcessSingleJobError::from_io_error(err)
-      })?;
+  // NB: We're now seeing a bug where the resultant copied file is 0 bytes
+  match copy_with_logging(&temp_path, &args.final_filesystem_file_path) {
+    Err(err) => {
+      error!("Error Copying {} temp file from {:?} to {:?}! {err}",
+        args.name_or_description_of_file, &temp_path, &args.final_filesystem_file_path);
+
+      return Err(ProcessSingleJobError::from_anyhow_error(err));
+    }
+    Ok(false) => {
+      error!("Error copying {} temp file from {:?} to {:?}! File size in bytes did not match.",
+        args.name_or_description_of_file, &temp_path, &args.final_filesystem_file_path);
+
+      reattempt_copy_if_failed(&args, &temp_dir, &temp_path, original_size)?;
+    }
+    Ok(true) => {
+      // Success case
+    }
+  }
 
   info!("Finished downloading {} file to {:?}", args.name_or_description_of_file, &args.final_filesystem_file_path);
-
-  // NB: We're now seeing a bug where the resultant copied file is 0 bytes
-  reattempt_copy_if_failed(&args, &temp_dir, &temp_path, original_size)?;
 
   safe_delete_temp_directory(&temp_dir);
 
@@ -160,4 +179,23 @@ fn reattempt_copy_if_failed(args: &MaybeDownloadArgs, temp_dir: &TempDir, temp_p
     args.name_or_description_of_file, &args.final_filesystem_file_path);
 
   Ok(())
+}
+
+
+pub fn copy_with_logging<P: AsRef<Path>, Q: AsRef<Path>>(from: P, to: Q) -> AnyhowResult<bool> {
+  let original_size = file_size(&from)?;
+
+  let num_bytes_copied = std::fs::copy(&from, &to)?;
+
+  let destination_size = file_size(&to)?;
+
+  info!(r#"Copied {:?} to {:?}
+   - Copied bytes: {num_bytes_copied}
+   - Orig. bytes:  {original_size}
+   - Dest. bytes:  {destination_size}
+  "#, from.as_ref(), to.as_ref());
+
+  let file_sizes_match = original_size == destination_size;
+
+  Ok(file_sizes_match)
 }

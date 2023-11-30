@@ -24,6 +24,10 @@ pub fn rename_across_devices<P: AsRef<Path>, Q: AsRef<Path>>(from: P, to: Q) -> 
     }
   }
 
+  // FIXME(bt,2023-11-29): There appears to be a new bug where the std::fs::copy succeeds in
+  //  copying zero bytes (perhaps the file was truncated to zero bytes before in std::fs::rename?),
+  //  and we delete the source file (below). This only appears to happen in GCP currently, and this
+  //  code has worked for months prior to this.
   let _num_bytes = std::fs::copy(&from, &to)?;
 
   std::fs::remove_file(&from)?;
