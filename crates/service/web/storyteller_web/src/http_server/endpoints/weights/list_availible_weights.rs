@@ -8,7 +8,12 @@ use log::{ info, warn };
 
 use enums::common::visibility::Visibility;
 use mysql_queries::queries::model_weights::list_weights_query_builder::ListWeightsQueryBuilder;
-use mysql_queries::queries::model_weights::update_weight::{ update_weights, UpdateWeightArgs };
+
+use enums::by_table::model_weights::{
+    weights_types::WeightsType,
+    weights_category::WeightsCategory,
+};
+use tokens::tokens::users::UserToken;
 use tokens::tokens::model_weights::ModelWeightToken;
 
 use crate::http_server::common_responses::user_details_lite::UserDetailsLight;
@@ -33,7 +38,6 @@ pub struct ListAvailibleWeightsSuccessResponse {
 #[derive(Serialize)]
 pub struct ModelWeightForList {
     pub weight_token: ModelWeightToken,
-    pub title: String,
 
     
     pub weights_type: WeightsType,
@@ -47,10 +51,7 @@ pub struct ModelWeightForList {
     pub description_rendered_html: String,
 
     pub creator_user_token: UserToken,
-    pub creator_ip_address: String,
     pub creator_set_visibility: Visibility,
-
-    pub maybe_last_update_user_token: Option<UserToken>,
 
     pub file_size_bytes: i32,
     pub file_checksum_sha2: String,
@@ -59,7 +60,6 @@ pub struct ModelWeightForList {
     pub cached_user_ratings_positive_count: u32,
     pub cached_user_ratings_negative_count: u32,
     pub maybe_cached_user_ratings_ratio: Option<f32>,
-    pub cached_user_ratings_last_updated_at: DateTime<Utc>,
 
     pub version: i32,
 
@@ -184,53 +184,36 @@ pub async fn list_availible_weights_handler(
       success: true,
       weights: weights_page.weights.into_iter()
           .map(|weights| ModelWeightForList {
-                  weight_token: weights.token,
-                  title: weights.title,
-                  
-                 weights_type: WeightsType,
-                 weights_category: WeightsCategory,
+                 weight_token: weights.token,
+                 title: weights.title,
+                 weights_type: weights.weights_type,
+                 weights_category: weights.weights_category,
 
-                 title: String,
+                 maybe_thumbnail_token:weights.maybe_thumbnail_token,
+                 description_markdown: weights.description_markdown,
+                 description_rendered_html: weights.description_rendered_html,
 
-                 maybe_thumbnail_token: Option<String>,
+                 creator_user_token: weights.creator_user_token,
+                 creator_set_visibility: weights.creator_set_visibility,
 
-                 description_markdown: String,
-                 description_rendered_html: String,
+                 file_size_bytes:weights.file_size_bytes,
+                 file_checksum_sha2: weights.file_checksum_sha2,
 
-                 creator_user_token: UserToken,
-                 creator_ip_address: String,
-                 creator_set_visibility: Visibility,
+                
 
-                 maybe_last_update_user_token: Option<UserToken>,
+                 cached_user_ratings_total_count: weights.cached_user_ratings_total_count,
+                 cached_user_ratings_positive_count: weights.cached_user_ratings_positive_count,
+                 cached_user_ratings_negative_count: weights.cached_user_ratings_negative_count,
+                 maybe_cached_user_ratings_ratio: weights.maybe_cached_user_ratings_ratio,
 
-                 original_download_url: Option<String>,
-                 original_filename: Option<String>,
+                 version: weights.version,
 
-                 file_size_bytes: i32,
-                 file_checksum_sha2: String,
+                 created_at: weights.created_at,
+                 updated_at: weights.updated_at,
 
-                 private_bucket_hash: String,
-
-                 maybe_private_bucket_prefix: Option<String>,
-                 maybe_private_bucket_extension: Option<String>,
-
-                 cached_user_ratings_total_count: u32,
-                 cached_user_ratings_positive_count: u32,
-                 cached_user_ratings_negative_count: u32,
-                 maybe_cached_user_ratings_ratio: Option<f32>,
-                 cached_user_ratings_last_updated_at: DateTime<Utc>,
-
-                 version: i32,
-
-                 created_at: DateTime<Utc>,
-                 updated_at: DateTime<Utc>,
-
-                 user_deleted_at: Option<DateTime<Utc>>,
-                 mod_deleted_at: Option<DateTime<Utc>>,
-
-                 creator_username: String,
-                 creator_display_name: String,
-                 creator_email_gravatar_hash: String,
+                 creator_username: weights.creator_username,
+                 creator_display_name: weights.creator_display_name,
+                 creator_email_gravatar_hash: weights.creator_email_gravatar_hash
               }).collect::<Vec<_>>(),
       cursor_next,
       cursor_previous,
