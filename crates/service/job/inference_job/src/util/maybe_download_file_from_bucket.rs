@@ -86,6 +86,12 @@ pub async fn maybe_download_file_from_bucket(
 
   info!("Downloaded {} from bucket!", args.name_or_description_of_file);
 
+  let size = file_size(&temp_path)
+      .map_err(|err| ProcessSingleJobError::from_anyhow_error(err))?;
+
+  info!("File size of {} temp download file {:?} is {size}",
+    args.name_or_description_of_file, &temp_path);
+
   info!("Renaming {} temp file from {:?} to {:?}!",
     args.name_or_description_of_file, &temp_path, &args.final_filesystem_file_path);
 
