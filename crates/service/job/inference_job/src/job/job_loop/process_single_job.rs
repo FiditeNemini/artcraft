@@ -91,7 +91,7 @@ async fn process_single_job_wrap_with_logs(
 
   println!("\n  ----------------------------------------- JOB START -----------------------------------------  \n");
 
-  info!("Beginning work on job ({}): {:?}", job.id.0, job.inference_job_token);
+  info!("Lock acquired. Beginning work on job ({}): {:?}", job.id.0, job.inference_job_token);
   info!("Job category: {:?}", job.inference_category);
   info!("Job model type: {:?}", job.maybe_model_type);
   info!("Job model token: {:?}", job.maybe_model_token);
