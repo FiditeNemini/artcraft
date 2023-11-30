@@ -1,8 +1,6 @@
 use std::path::Path;
 
-use anyhow::bail;
-
-use crate::anyhow_result::AnyhowResult;
+use errors::{AnyhowResult, bail};
 
 pub fn check_directory_exists<P: AsRef<Path>>(path: P) -> AnyhowResult<()> {
   let check_path = path.as_ref();

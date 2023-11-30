@@ -1,8 +1,8 @@
 use std::io;
 use std::path::{Path, PathBuf};
 
-use container_common::filesystem::check_directory_exists::check_directory_exists;
 use errors::AnyhowResult;
+use filesys::check_directory_exists::check_directory_exists;
 use filesys::create_dir_all_if_missing::create_dir_all_if_missing;
 
 /// Utilities for directories serving as file caches
