@@ -60,6 +60,10 @@ pub struct JobSystemControls {
   /// This is provided at job start.
   pub scoped_execution: ScopedExecution,
 
+  // Allow for models not to exist on the filesystem. All jobs will execute when first tried
+  // regardless of whether their models were previously downloaded.
+  pub always_allow_cold_filesystem_cache: bool,
+
   // How many times to skip jobs (on cold filesystem cache) before proceeding with execution.
   pub cold_filesystem_cache_starvation_threshold: u64,
 

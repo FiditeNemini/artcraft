@@ -243,6 +243,7 @@ async fn main() -> AnyhowResult<()> {
     job: JobSystemDependencies {
       system: JobSystemControls {
         scoped_execution,
+        always_allow_cold_filesystem_cache: easyenv::get_env_bool_or_default("ALWAYS_ALLOW_COLD_FILESYSTEM_CACHE", false),
         cold_filesystem_cache_starvation_threshold: easyenv::get_env_num("COLD_FILESYSTEM_CACHE_STARVATION_THRESHOLD", 3)?,
         job_batch_wait_millis: common_env.job_batch_wait_millis,
         job_max_attempts: common_env.job_max_attempts as u16,

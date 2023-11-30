@@ -41,13 +41,13 @@ pub async fn process_single_job(
   }
 
   // TODO(bt,2023-07-23): Re-review the following. It looks sus.
-  // TODO(bt,2023-07-23): Re-review the following. It looks sus.
-  // TODO(bt,2023-07-23): Re-review the following. It looks sus.
-  // TODO(bt,2023-07-23): Re-review the following. It looks sus.
   let dependency_status = determine_dependency_status(job_dependencies, job)
       .await?;
 
-  if !force_execution && !dependency_status.models_already_on_filesystem {
+  if !force_execution
+      && !job_dependencies.job.system.always_allow_cold_filesystem_cache
+      && !dependency_status.models_already_on_filesystem
+  {
     match dependency_status.maybe_model_token {
       None => {} // No model token, proceed
       Some(model_token) => {
