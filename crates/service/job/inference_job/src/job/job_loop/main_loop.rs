@@ -109,8 +109,6 @@ async fn process_job_batch(job_dependencies: &JobDependencies, jobs: Vec<Availab
   for job in jobs.into_iter() {
     let result = process_single_job(job_dependencies, &job).await;
 
-    println!("\n  ----------------------------------------- RESULTS SUMMARY -----------------------------------------  \n");
-
     match result {
       Ok(success_case) => {
         info!("Job loop iteration \"success\": {:?}", success_case);
@@ -128,12 +126,14 @@ async fn process_job_batch(job_dependencies: &JobDependencies, jobs: Vec<Availab
         }
       },
       Err(err) => {
+        println!("\n  ----------------------------------------- FAILURE SUMMARY -----------------------------------------  \n");
+
         warn!("Failure to process job: {:?} - {:?}",job.inference_job_token, err);
         let _r = handle_error(&job_dependencies, &job, err).await?;
+
+        println!("\n  ----------------------------------------- FAILURE SUMMARY END -----------------------------------------  \n");
       }
     }
-
-    println!("\n  ----------------------------------------- RESULTS SUMMARY END -----------------------------------------  \n");
   }
 
   Ok(())
