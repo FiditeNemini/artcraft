@@ -6,6 +6,7 @@ use tempdir::TempDir;
 
 use cloud_storage::bucket_client::BucketClient;
 use container_common::filesystem::safe_delete_temp_directory::safe_delete_temp_directory;
+use container_common::filesystem::safe_delete_temp_file::safe_delete_temp_file;
 use errors::AnyhowResult;
 use filesys::file_size::file_size;
 use filesys::rename_across_devices::rename_across_devices;
@@ -114,6 +115,9 @@ pub async fn maybe_download_file_from_bucket(
       error!("Error Copying {} temp file from {:?} to {:?}! {err}",
         args.name_or_description_of_file, &temp_path, &args.final_filesystem_file_path);
 
+      safe_delete_temp_file(&temp_path);
+      safe_delete_temp_directory(&temp_dir);
+
       return Err(ProcessSingleJobError::from_anyhow_error(err));
     }
     Ok(false) => {
@@ -129,6 +133,7 @@ pub async fn maybe_download_file_from_bucket(
 
   info!("Finished downloading {} file to {:?}", args.name_or_description_of_file, &args.final_filesystem_file_path);
 
+  safe_delete_temp_file(&temp_path);
   safe_delete_temp_directory(&temp_dir);
 
   Ok(())
@@ -156,6 +161,8 @@ fn reattempt_copy_if_failed(args: &MaybeDownloadArgs, temp_dir: &TempDir, temp_p
         warn!("File couldn't be removed: it's already gone.")
       },
       _ => {
+        safe_delete_temp_file(&temp_path);
+        safe_delete_temp_directory(&temp_dir);
         return Err(ProcessSingleJobError::from_io_error(err));
       }
     }
@@ -168,6 +175,7 @@ fn reattempt_copy_if_failed(args: &MaybeDownloadArgs, temp_dir: &TempDir, temp_p
   rename_across_devices(&temp_path, &args.final_filesystem_file_path)
       .map_err(|err| {
         error!("could not rename on disk: {:?}", err);
+        safe_delete_temp_file(&temp_path);
         safe_delete_temp_directory(&temp_dir);
         ProcessSingleJobError::from_io_error(err)
       })?;
