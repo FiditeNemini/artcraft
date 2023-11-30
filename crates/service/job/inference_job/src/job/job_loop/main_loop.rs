@@ -106,12 +106,13 @@ pub async fn main_loop(job_dependencies: JobDependencies) {
 //  This probably returns a struct or enum with some measure of how many GB need to be downloaded.
 
 async fn process_job_batch(job_dependencies: &JobDependencies, jobs: Vec<AvailableInferenceJob>) -> AnyhowResult<()> {
-  for job in jobs.into_iter() {
+  let job_count = jobs.len();
+  for (i, job) in jobs.into_iter().enumerate() {
     let result = process_single_job(job_dependencies, &job).await;
 
     match result {
       Ok(success_case) => {
-        info!("Job loop iteration \"success\": {:?}", success_case);
+        info!("Job loop iteration ({i} of {job_count} batch) \"success\": {:?}", success_case);
 
         let increment_success_count = match success_case {
           ProcessSingleJobSuccessCase::JobCompleted => true,
@@ -126,12 +127,11 @@ async fn process_job_batch(job_dependencies: &JobDependencies, jobs: Vec<Availab
         }
       },
       Err(err) => {
-        println!("\n  ----------------------------------------- FAILURE SUMMARY -----------------------------------------  \n");
-
-        warn!("Failure to process job: {:?} - {:?}",job.inference_job_token, err);
+        error!(
+          r#"Failure to process job ({i} of {job_count} batch): {:?} -
+            {:?}
+          "#,job.inference_job_token, err);
         let _r = handle_error(&job_dependencies, &job, err).await?;
-
-        println!("\n  ----------------------------------------- FAILURE SUMMARY END -----------------------------------------  \n");
       }
     }
   }
