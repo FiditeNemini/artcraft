@@ -86,10 +86,10 @@ pub async fn maybe_download_file_from_bucket(
 
   info!("Downloaded {} from bucket!", args.name_or_description_of_file);
 
-  let size = file_size(&temp_path)
+  let original_size = file_size(&temp_path)
       .map_err(|err| ProcessSingleJobError::from_anyhow_error(err))?;
 
-  info!("File size of {} temp download file {:?} is {size}",
+  info!("File size of {} temp download file {:?} is {original_size}",
     args.name_or_description_of_file, &temp_path);
 
   info!("Renaming {} temp file from {:?} to {:?}!",
@@ -103,6 +103,33 @@ pub async fn maybe_download_file_from_bucket(
       })?;
 
   info!("Finished downloading {} file to {:?}", args.name_or_description_of_file, &args.final_filesystem_file_path);
+
+  // NB: We're now seeing a bug where the resultant copied file is 0 bytes
+  let copied_size = file_size(&args.final_filesystem_file_path)
+      .map_err(|err| ProcessSingleJobError::from_anyhow_error(err))?;
+
+  info!("Final copied size of {} file {:?} is {copied_size} (original size was {original_size})",
+    args.name_or_description_of_file, &args.final_filesystem_file_path);
+
+  if copied_size == 0 {
+    error!("Copied size was 0! Removing and retrying...");
+
+    std::fs::remove_file(&args.final_filesystem_file_path)
+        .map_err(|err| ProcessSingleJobError::from_io_error(err))?;
+
+    rename_across_devices(&temp_path, &args.final_filesystem_file_path)
+        .map_err(|err| {
+          error!("could not rename on disk: {:?}", err);
+          safe_delete_temp_directory(&temp_dir);
+          ProcessSingleJobError::from_io_error(err)
+        })?;
+
+    let copied_size = file_size(&args.final_filesystem_file_path)
+        .map_err(|err| ProcessSingleJobError::from_anyhow_error(err))?;
+
+    info!("Last copy attempt. Final copied size of {} file {:?} is {copied_size}.",
+      args.name_or_description_of_file, &args.final_filesystem_file_path);
+  }
 
   safe_delete_temp_directory(&temp_dir);
 
