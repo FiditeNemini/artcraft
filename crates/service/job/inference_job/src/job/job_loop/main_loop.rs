@@ -1,4 +1,4 @@
-use std::time::Duration;
+use std::time::{Duration, Instant};
 
 use log::{error, info, warn};
 
@@ -23,6 +23,9 @@ const INCREASE_TIMEOUT_MILLIS : u64 = 1000;
 /// Pause file millis
 const PAUSE_FILE_EXISTS_WAIT_MILLIS : u64 = 1000 * 30;
 
+/// Warn on slow batch queries
+const SLOW_BATCH_QUERY_NOTICE_DURATION : Duration = Duration::from_millis(3500);
+
 pub async fn main_loop(job_dependencies: JobDependencies) {
   let mut noop_logger = NoOpLogger::new(job_dependencies.job.system.no_op_logger_millis as i64);
 
@@ -46,6 +49,8 @@ pub async fn main_loop(job_dependencies: JobDependencies) {
 
     let maybe_scoped_model_types = job_dependencies.job.system.scoped_execution.get_scoped_model_types();
 
+    let batch_query_start_time = Instant::now();
+
     let maybe_available_jobs = list_available_generic_inference_jobs(ListAvailableGenericInferenceJobArgs {
       num_records: job_dependencies.job.system.job_batch_size,
       is_debug_worker: false, // TODO
@@ -54,6 +59,12 @@ pub async fn main_loop(job_dependencies: JobDependencies) {
       maybe_scope_by_job_category: None,
       mysql_pool: &job_dependencies.db.mysql_pool,
     }).await;
+
+    let batch_query_duration = Instant::now().duration_since(batch_query_start_time);
+
+    if batch_query_duration > SLOW_BATCH_QUERY_NOTICE_DURATION {
+      warn!("Batch query took duration: {:?}", &batch_query_duration);
+    }
 
     sort_by_priority = true;
     sort_by_priority_count += 1;
