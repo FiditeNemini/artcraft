@@ -27,7 +27,7 @@ use crate::job::job_loop::job_success_result::{JobSuccessResult, ResultEntity};
 use crate::job::job_loop::process_single_job_error::ProcessSingleJobError;
 use crate::job::job_types::vc::rvc_v2::rvc_v2_inference_command::InferenceArgs;
 use crate::job_dependencies::JobDependencies;
-use crate::util::maybe_download_file_from_bucket::maybe_download_file_from_bucket;
+use crate::util::maybe_download_file_from_bucket::{maybe_download_file_from_bucket, MaybeDownloadArgs};
 
 const BUCKET_FILE_PREFIX : &str = "fakeyou_rvc_";
 const BUCKET_FILE_EXTENSION : &str = ".wav";
@@ -87,17 +87,17 @@ pub async fn process_job(args: RvcV2ProcessJobArgs<'_>) -> Result<JobSuccessResu
 
     let model_object_path = args.job_dependencies.buckets.bucket_path_unifier.rvc_v2_model_path(&vc_model.private_bucket_hash);
 
-    maybe_download_file_from_bucket(
-      "rvc (v2) model",
-      &fs_path,
-      &model_object_path,
-      &args.job_dependencies.buckets.private_bucket_client,
-      &mut job_progress_reporter,
-      "downloading rvc (v2) model",
-      job.id.0,
-      &args.job_dependencies.fs.scoped_temp_dir_creator_for_short_lived_downloads,
-      None,
-    ).await?;
+    maybe_download_file_from_bucket(MaybeDownloadArgs {
+      name_or_description_of_file: "rvc (v2) model",
+      final_filesystem_file_path: &fs_path,
+      bucket_object_path: &model_object_path,
+      bucket_client: &args.job_dependencies.buckets.private_bucket_client,
+      job_progress_reporter: &mut job_progress_reporter,
+      job_progress_update_description: "downloading rvc (v2) model",
+      job_id: job.id.0,
+      scoped_tempdir_creator: &args.job_dependencies.fs.scoped_temp_dir_creator_for_short_lived_downloads,
+      maybe_existing_file_minimum_size_required: None,
+    }).await?;
 
     fs_path
   };
@@ -143,17 +143,17 @@ pub async fn process_job(args: RvcV2ProcessJobArgs<'_>) -> Result<JobSuccessResu
 
       let model_index_object_path = args.job_dependencies.buckets.bucket_path_unifier.rvc_v2_model_index_path(&vc_model.private_bucket_hash);
 
-      maybe_download_file_from_bucket(
-        "rvc (v2) model index",
-        &fs_path,
-        &model_index_object_path,
-        &args.job_dependencies.buckets.private_bucket_client,
-        &mut job_progress_reporter,
-        "downloading rvc (v2) model index",
-        job.id.0,
-        &args.job_dependencies.fs.scoped_temp_dir_creator_for_short_lived_downloads,
-        None,
-      ).await?;
+      maybe_download_file_from_bucket(MaybeDownloadArgs {
+        name_or_description_of_file: "rvc (v2) model index",
+        final_filesystem_file_path: &fs_path,
+        bucket_object_path: &model_index_object_path,
+        bucket_client: &args.job_dependencies.buckets.private_bucket_client,
+        job_progress_reporter: &mut job_progress_reporter,
+        job_progress_update_description: "downloading rvc (v2) model index",
+        job_id: job.id.0,
+        scoped_tempdir_creator: &args.job_dependencies.fs.scoped_temp_dir_creator_for_short_lived_downloads,
+        maybe_existing_file_minimum_size_required: None,
+      }).await?;
 
       Some(fs_path)
     };
@@ -187,17 +187,17 @@ pub async fn process_job(args: RvcV2ProcessJobArgs<'_>) -> Result<JobSuccessResu
 
     info!("Downloading media from bucket path: {:?}", &bucket_object_path);
 
-    maybe_download_file_from_bucket(
-      "media upload (original file)",
-      &original_media_upload_fs_path,
-      &bucket_object_path,
-      &args.job_dependencies.buckets.public_bucket_client,
-      &mut job_progress_reporter,
-      "downloading",
-      job.id.0,
-      &args.job_dependencies.fs.scoped_temp_dir_creator_for_work,
-      None,
-    ).await?;
+    maybe_download_file_from_bucket(MaybeDownloadArgs {
+      name_or_description_of_file:  "media upload (original file)",
+      final_filesystem_file_path: &original_media_upload_fs_path,
+      bucket_object_path: &bucket_object_path,
+      bucket_client: &args.job_dependencies.buckets.public_bucket_client,
+      job_progress_reporter: &mut job_progress_reporter,
+      job_progress_update_description: "downloading",
+      job_id: job.id.0,
+      scoped_tempdir_creator: &args.job_dependencies.fs.scoped_temp_dir_creator_for_work,
+      maybe_existing_file_minimum_size_required: None,
+    }).await?;
 
     original_media_upload_fs_path
   };

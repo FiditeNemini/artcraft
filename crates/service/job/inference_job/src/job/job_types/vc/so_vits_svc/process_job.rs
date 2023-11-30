@@ -26,7 +26,7 @@ use crate::job::job_loop::job_success_result::{JobSuccessResult, ResultEntity};
 use crate::job::job_loop::process_single_job_error::ProcessSingleJobError;
 use crate::job::job_types::vc::so_vits_svc::so_vits_svc_inference_command::{Device, InferenceArgs};
 use crate::job_dependencies::JobDependencies;
-use crate::util::maybe_download_file_from_bucket::maybe_download_file_from_bucket;
+use crate::util::maybe_download_file_from_bucket::{maybe_download_file_from_bucket, MaybeDownloadArgs};
 
 const BUCKET_FILE_PREFIX : &str = "fakeyou_svc_";
 const BUCKET_FILE_EXTENSION : &str = ".wav";
@@ -76,17 +76,17 @@ pub async fn process_job(args: SoVitsSvcProcessJobArgs<'_>) -> Result<JobSuccess
 
     let so_vits_svc_model_object_path  = args.job_dependencies.buckets.bucket_path_unifier.so_vits_svc_model_path(&vc_model.private_bucket_hash);
 
-    maybe_download_file_from_bucket(
-      "so-vits-svc model",
-      &so_vits_svc_fs_path,
-      &so_vits_svc_model_object_path,
-      &args.job_dependencies.buckets.private_bucket_client,
-      &mut job_progress_reporter,
-      "downloading so-vits-svc model",
-      job.id.0,
-      &args.job_dependencies.fs.scoped_temp_dir_creator_for_short_lived_downloads,
-      None,
-    ).await?;
+    maybe_download_file_from_bucket(MaybeDownloadArgs {
+      name_or_description_of_file: "so-vits-svc model",
+      final_filesystem_file_path: &so_vits_svc_fs_path,
+      bucket_object_path: &so_vits_svc_model_object_path,
+      bucket_client: &args.job_dependencies.buckets.private_bucket_client,
+      job_progress_reporter: &mut job_progress_reporter,
+      job_progress_update_description: "downloading so-vits-svc model",
+      job_id: job.id.0,
+      scoped_tempdir_creator: &args.job_dependencies.fs.scoped_temp_dir_creator_for_short_lived_downloads,
+      maybe_existing_file_minimum_size_required: None,
+    }).await?;
 
     so_vits_svc_fs_path
   };
@@ -119,17 +119,17 @@ pub async fn process_job(args: SoVitsSvcProcessJobArgs<'_>) -> Result<JobSuccess
 
     info!("Downloading media to bucket path: {:?}", &bucket_object_path);
 
-    maybe_download_file_from_bucket(
-      "media upload (original file)",
-      &original_media_upload_fs_path,
-      &bucket_object_path,
-      &args.job_dependencies.buckets.public_bucket_client,
-      &mut job_progress_reporter,
-      "downloading",
-      job.id.0,
-      &args.job_dependencies.fs.scoped_temp_dir_creator_for_work,
-      None,
-    ).await?;
+    maybe_download_file_from_bucket(MaybeDownloadArgs {
+      name_or_description_of_file: "media upload (original file)",
+      final_filesystem_file_path: &original_media_upload_fs_path,
+      bucket_object_path: &bucket_object_path,
+      bucket_client: &args.job_dependencies.buckets.public_bucket_client,
+      job_progress_reporter: &mut job_progress_reporter,
+      job_progress_update_description: "downloading",
+      job_id: job.id.0,
+      scoped_tempdir_creator: &args.job_dependencies.fs.scoped_temp_dir_creator_for_work,
+      maybe_existing_file_minimum_size_required: None,
+    }).await?;
 
     original_media_upload_fs_path
   };

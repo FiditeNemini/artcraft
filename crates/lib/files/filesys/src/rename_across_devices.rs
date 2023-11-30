@@ -3,6 +3,7 @@ use std::path::Path;
 /// Rename a file.
 /// Ordinary rename will fail in Linux if it is across physical devices.
 /// This function will perform a copy followed by delete in that case.
+/// In both cases, this function will overwrite the destination if it already exists.
 pub fn rename_across_devices<P: AsRef<Path>, Q: AsRef<Path>>(from: P, to: Q) -> std::io::Result<()> {
   let result = std::fs::rename(&from, &to);
 

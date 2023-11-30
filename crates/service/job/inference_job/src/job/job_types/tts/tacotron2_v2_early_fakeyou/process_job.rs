@@ -29,7 +29,7 @@ use crate::job::job_types::tts::tacotron2_v2_early_fakeyou::seconds_to_decoder_s
 use crate::job::job_types::tts::tacotron2_v2_early_fakeyou::tacotron2_inference_command::{InferenceArgs, MelMultiplyFactor};
 use crate::job::job_types::tts::tacotron2_v2_early_fakeyou::vocoder_option::VocoderForInferenceOption;
 use crate::job_dependencies::JobDependencies;
-use crate::util::maybe_download_file_from_bucket::maybe_download_file_from_bucket;
+use crate::util::maybe_download_file_from_bucket::{maybe_download_file_from_bucket, MaybeDownloadArgs};
 
 /// Text starting with this will be treated as a test request.
 /// This allows the request to bypass the model cache and query the latest TTS model.
@@ -119,17 +119,17 @@ async fn process_job_with_cleanup(
       let custom_vocoder_fs_path = args.job_dependencies.fs.semi_persistent_cache.custom_vocoder_model_path(&vocoder.vocoder_token);
       let custom_vocoder_object_path  = args.job_dependencies.buckets.bucket_path_unifier.vocoder_path(&vocoder.vocoder_private_bucket_hash);
 
-      maybe_download_file_from_bucket(
-        "custom vocoder",
-        &custom_vocoder_fs_path,
-        &custom_vocoder_object_path,
-        &args.job_dependencies.buckets.private_bucket_client,
-        &mut job_progress_reporter,
-        "downloading user vocoder",
-        job.id.0,
-        &args.job_dependencies.fs.scoped_temp_dir_creator_for_short_lived_downloads,
-        None,
-      ).await?;
+      maybe_download_file_from_bucket(MaybeDownloadArgs {
+        name_or_description_of_file: "custom vocoder",
+        final_filesystem_file_path: &custom_vocoder_fs_path,
+        bucket_object_path: &custom_vocoder_object_path,
+        bucket_client: &args.job_dependencies.buckets.private_bucket_client,
+        job_progress_reporter: &mut job_progress_reporter,
+        job_progress_update_description: "downloading user vocoder",
+        job_id: job.id.0,
+        scoped_tempdir_creator: &args.job_dependencies.fs.scoped_temp_dir_creator_for_short_lived_downloads,
+        maybe_existing_file_minimum_size_required: None,
+      }).await?;
 
       Some(custom_vocoder_fs_path)
     }
@@ -141,17 +141,17 @@ async fn process_job_with_cleanup(
     let tts_synthesizer_fs_path = args.job_dependencies.fs.semi_persistent_cache.tts_synthesizer_model_path(tts_model.model_token.as_str());
     let tts_synthesizer_object_path  = args.job_dependencies.buckets.bucket_path_unifier.tts_synthesizer_path(&tts_model.private_bucket_hash);
 
-    maybe_download_file_from_bucket(
-      "synthesizer",
-      &tts_synthesizer_fs_path,
-      &tts_synthesizer_object_path,
-      &args.job_dependencies.buckets.private_bucket_client,
-      &mut job_progress_reporter,
-      "downloading synthesizer",
-      job.id.0,
-      &args.job_dependencies.fs.scoped_temp_dir_creator_for_short_lived_downloads,
-      None,
-    ).await?;
+    maybe_download_file_from_bucket(MaybeDownloadArgs {
+      name_or_description_of_file: "synthesizer",
+      final_filesystem_file_path: & tts_synthesizer_fs_path,
+      bucket_object_path: &tts_synthesizer_object_path,
+      bucket_client: &args.job_dependencies.buckets.private_bucket_client,
+      job_progress_reporter: &mut job_progress_reporter,
+      job_progress_update_description: "downloading synthesizer",
+      job_id: job.id.0,
+      scoped_tempdir_creator: &args.job_dependencies.fs.scoped_temp_dir_creator_for_short_lived_downloads,
+      maybe_existing_file_minimum_size_required: None,
+    }).await?;
 
     tts_synthesizer_fs_path
   };
