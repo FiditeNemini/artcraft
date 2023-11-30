@@ -147,6 +147,9 @@ fn reattempt_copy_if_failed(args: &MaybeDownloadArgs, temp_dir: &TempDir, temp_p
     args.name_or_description_of_file, &args.final_filesystem_file_path);
 
   if copied_size != 0 {
+    safe_delete_temp_file(&temp_path);
+    safe_delete_temp_directory(&temp_dir);
+
     return Ok(());
   }
 
