@@ -130,6 +130,8 @@ fn reattempt_copy_if_failed(args: &MaybeDownloadArgs, temp_dir: &TempDir, temp_p
   std::fs::remove_file(&args.final_filesystem_file_path)
       .map_err(|err| ProcessSingleJobError::from_io_error(err))?;
 
+  warn!("Removed. Retrying copy...");
+
   rename_across_devices(&temp_path, &args.final_filesystem_file_path)
       .map_err(|err| {
         error!("could not rename on disk: {:?}", err);
@@ -140,7 +142,7 @@ fn reattempt_copy_if_failed(args: &MaybeDownloadArgs, temp_dir: &TempDir, temp_p
   let copied_size = file_size(&args.final_filesystem_file_path)
       .map_err(|err| ProcessSingleJobError::from_anyhow_error(err))?;
 
-  info!("Last copy attempt. Final copied size of {} file {:?} is {copied_size}.",
+  warn!("Last copy attempt. Final copied size of {} file {:?} is {copied_size}.",
     args.name_or_description_of_file, &args.final_filesystem_file_path);
 
   Ok(())
