@@ -18,7 +18,7 @@ serde = "1.0.125"
 serde_derive = "1.0.125"
 
 # Random
-rand = "0.8.3"
+rand = "0.8.5"
 
 # MySql Database
 # "offline" supports typesafe builds without a live database

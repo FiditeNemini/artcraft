@@ -15,7 +15,7 @@ name = "crockford"
 path = "src/lib.rs"
 
 [dependencies]
-rand = "0.8.3"
+rand = "0.8.5"
 my-workspace-hack = { version = "0.1", path = "../../../my-workspace-hack" }
 
 [dev-dependencies]
