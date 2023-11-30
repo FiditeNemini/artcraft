@@ -27,6 +27,10 @@ pub enum ProcessSingleJobError {
   /// It might be important, we just haven't special cased it yet.
   Other(anyhow::Error),
 
+  /// This is a non-special-cased IO Error
+  /// It might be important, we just haven't special cased it yet.
+  IoError(std::io::Error),
+
   /// Job underlying resources are missing - model deleted
   ModelDeleted,
 
@@ -41,39 +45,35 @@ pub enum ProcessSingleJobError {
 
 impl From<std::io::Error> for ProcessSingleJobError {
   fn from(error: std::io::Error) -> Self {
-    if is_filesystem_full_error(&error) {
-      ProcessSingleJobError::FilesystemFull
-    } else {
-      ProcessSingleJobError::Other(anyhow!(error))
-    }
+    ProcessSingleJobError::from_io_error(error)
   }
 }
 
 impl From<anyhow::Error> for ProcessSingleJobError {
   fn from(error: anyhow::Error) -> Self {
-    ProcessSingleJobError::Other(error)
+    ProcessSingleJobError::from_anyhow_error(error)
   }
 }
 
 impl ProcessSingleJobError {
   pub fn from_io_error(error: std::io::Error) -> Self {
-    match error.raw_os_error() {
-      // NB: We can't use err.kind() -> ErrorKind::StorageFull, because it's marked unstable:
-      // `io_error_more` is unstable [E0658]
-      Some(28) => ProcessSingleJobError::FilesystemFull,
-      _ => ProcessSingleJobError::Other(anyhow!(error)),
+    if is_filesystem_full_error(&error) {
+      ProcessSingleJobError::FilesystemFull
+    } else {
+      ProcessSingleJobError::IoError(error)
     }
   }
 
   pub fn from_anyhow_error(error: anyhow::Error) -> Self {
-    match error.downcast_ref::<std::io::Error>() {
-      Some(e) => match e.raw_os_error() {
-        // NB: We can't use err.kind() -> ErrorKind::StorageFull, because it's marked unstable:
-        // `io_error_more` is unstable [E0658]
-        Some(28) => ProcessSingleJobError::FilesystemFull,
-        _ => ProcessSingleJobError::Other(anyhow!(error)),
+    match error.downcast::<std::io::Error>() {
+      Ok(io_error) => {
+        if is_filesystem_full_error(&io_error) {
+          ProcessSingleJobError::FilesystemFull
+        } else {
+          ProcessSingleJobError::IoError(io_error)
+        }
       },
-      None => ProcessSingleJobError::Other(error),
+      Err(anyhow_error) => ProcessSingleJobError::Other(anyhow_error),
     }
   }
 }

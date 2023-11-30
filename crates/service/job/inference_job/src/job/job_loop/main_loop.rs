@@ -216,7 +216,14 @@ async fn handle_error(job_dependencies: &&JobDependencies, job: &AvailableInfere
         None, // Obviously don't tell the user about errors even we're not sure about
         Some(FrontendFailureCategory::RetryableWorkerError),
       ),
-
+    ProcessSingleJobError::IoError(ref err) =>
+      (
+        JobFailureClass::TransientFailure,
+        ContainerHealth::IncrementContainerFailCount,
+        format!("IoError: {:?}", err),
+        None, // Obviously don't tell the user about errors even we're not sure about
+        Some(FrontendFailureCategory::RetryableWorkerError),
+      ),
     ProcessSingleJobError::JobSystemMisconfiguration(ref maybe_reason) =>
       (
         JobFailureClass::TransientFailure,
@@ -269,6 +276,7 @@ async fn handle_error(job_dependencies: &&JobDependencies, job: &AvailableInfere
     ProcessSingleJobError::FaceDetectionFailure => {}
     ProcessSingleJobError::JobSystemMisconfiguration(_) => {}
     ProcessSingleJobError::ModelDeleted => {}
+    ProcessSingleJobError::IoError(_) => {}
   }
 
   Ok(())
