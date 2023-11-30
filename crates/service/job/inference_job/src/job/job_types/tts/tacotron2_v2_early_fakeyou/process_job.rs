@@ -58,7 +58,7 @@ pub async fn process_job(args: ProcessJobArgs<'_>) -> Result<JobSuccessResult, P
 
   // NB: The first time TT2 on inference-job was deployed, the filesystem filled up with
   // temporary directories. This is just being abundantly safe.
-  info!("Deleting temp directory: {:?}", work_temp_dir.path());
+  info!("(After job cleanup) Deleting temp directory: {:?}", work_temp_dir.path());
   safe_delete_temp_directory(&work_temp_dir);
 
   result
@@ -251,6 +251,7 @@ async fn process_job_with_cleanup(
   let inference_start_time = Instant::now();
 
   if model_dependencies.sidecar.use_sidecar_instead_of_shell {
+    info!("Calling inference sidecar...");
     let _r = model_dependencies.sidecar.inference_client.request_inference(
       &cleaned_inference_text,
       max_decoder_steps,
@@ -265,6 +266,7 @@ async fn process_job_with_cleanup(
       tts_model.maybe_custom_mel_multiply_factor,
     ).await.map_err(|e| ProcessSingleJobError::Other(e))?;
   } else {
+    info!("Shelling out for inference...");
     let _r = model_dependencies.inference_command.execute_inference(InferenceArgs {
       synthesizer_checkpoint_path: &tts_synthesizer_fs_path,
       text_pipeline_type: text_pipeline_type_or_guess.to_str(),
@@ -290,8 +292,14 @@ async fn process_job_with_cleanup(
   check_file_exists(&output_spectrogram_fs_path).map_err(|e| ProcessSingleJobError::Other(e))?;
   check_file_exists(&output_metadata_fs_path).map_err(|e| ProcessSingleJobError::Other(e))?;
 
+  info!("All required files exist!");
+
+  info!("Reading metadata file...");
+
   let file_metadata = read_metadata_file(&output_metadata_fs_path)
       .map_err(|e| ProcessSingleJobError::Other(e))?;
+
+  info!("Deleting metadata file...");
 
   safe_delete_temp_file(&output_metadata_fs_path);
 
