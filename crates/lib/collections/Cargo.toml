@@ -20,7 +20,7 @@ my-workspace-hack = { version = "0.1", path = "../../../my-workspace-hack" }
 
 # External
 # KEEP THIS TO A MINIMUM OR NIL.
-rand = "0.8.3"
+rand = "0.8.5"
 
 [dev-dependencies]
 # None yet
