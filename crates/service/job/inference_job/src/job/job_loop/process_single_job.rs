@@ -11,7 +11,6 @@ use mysql_queries::queries::generic_inference::job::mark_generic_inference_job_s
 use redis_common::redis_keys::RedisKeys;
 
 use crate::job::job_loop::determine_dependency_status::determine_dependency_status;
-use crate::job::job_loop::job_success_result::ResultEntity;
 use crate::job::job_loop::process_single_job_error::ProcessSingleJobError;
 use crate::job::job_loop::process_single_job_success_case::ProcessSingleJobSuccessCase;
 use crate::job::job_types::lipsync::process_single_lipsync_job::process_single_lipsync_job;

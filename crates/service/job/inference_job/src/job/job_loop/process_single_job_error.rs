@@ -1,5 +1,3 @@
-use anyhow::anyhow;
-
 use filesys::is_filesystem_full_error::is_filesystem_full_error;
 
 /// Error from processing a single job

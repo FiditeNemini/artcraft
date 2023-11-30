@@ -18,6 +18,7 @@
 #![allow(dead_code)]
 #![allow(non_snake_case)]
 
+pub mod check_file_exists;
 pub mod create_dir_all_if_missing;
 pub mod directory_exists;
 pub mod file_exists;
