@@ -20,6 +20,9 @@ pub enum MediaUploadType {
 
   /// Video files: mp4, etc.
   Video,
+
+  // Binary files: safetensors ... weights, etc.
+  Binary,
 }
 
 // TODO(bt, 2022-12-21): This desperately needs MySQL integration tests!
@@ -33,6 +36,7 @@ impl MediaUploadType {
       Self::Audio => "audio",
       Self::Image => "image",
       Self::Video => "video",
+      Self::Binary => "binary",
     }
   }
 
@@ -41,6 +45,7 @@ impl MediaUploadType {
       "audio" => Ok(Self::Audio),
       "image" => Ok(Self::Image),
       "video" => Ok(Self::Video),
+      "binary" => Ok(Self::Binary),
       _ => Err(format!("invalid value: {:?}", value)),
     }
   }
@@ -56,6 +61,7 @@ mod tests {
     assert_serialization(MediaUploadType::Audio, "audio");
     assert_serialization(MediaUploadType::Image, "image");
     assert_serialization(MediaUploadType::Video, "video");
+    assert_serialization(MediaUploadType::Binary, "binary");
   }
 
   #[test]
@@ -63,6 +69,7 @@ mod tests {
     assert_eq!(MediaUploadType::Audio.to_str(), "audio");
     assert_eq!(MediaUploadType::Image.to_str(), "image");
     assert_eq!(MediaUploadType::Video.to_str(), "video");
+    assert_eq!(MediaUploadType::Binary.to_str(), "binary");
   }
 
   #[test]
@@ -70,6 +77,7 @@ mod tests {
     assert_eq!(MediaUploadType::from_str("audio").unwrap(), MediaUploadType::Audio);
     assert_eq!(MediaUploadType::from_str("image").unwrap(), MediaUploadType::Image);
     assert_eq!(MediaUploadType::from_str("video").unwrap(), MediaUploadType::Video);
+    assert_eq!(MediaUploadType::from_str("binary").unwrap(), MediaUploadType::Binary);
     assert!(MediaUploadType::from_str("foo").is_err());
   }
 }

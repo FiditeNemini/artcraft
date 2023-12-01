@@ -3,17 +3,19 @@ use std::sync::Arc;
 
 use actix_multipart::Multipart;
 use actix_web::{HttpRequest, HttpResponse, web};
+use enums::by_table::model_weights::weights_category::WeightsCategory;
+use enums::by_table::model_weights::weights_types::WeightsType;
 use mysql_queries::queries::model_weights::create_weight::{self, create_weight};
 use once_cell::sync::Lazy;
 
-use tokens::tokens::media_uploads::MediaUploadToken;
+use tokens::tokens::model_weights::ModelWeightToken;
 
 use crate::http_server::endpoints::media_uploads::common::upload_error::UploadError;
 use crate::server_state::ServerState;
 
 use log::{error, info, warn};
 
-use buckets::public::media_uploads::original_file::MediaUploadOriginalFilePath;
+use buckets::public::weight_uploads::original_file::WeightUploadOriginalFilePath;
 use enums::by_table::media_uploads::media_upload_source::MediaUploadSource;
 use enums::by_table::media_uploads::media_upload_type::MediaUploadType;
 use enums::common::visibility::Visibility;
@@ -23,17 +25,14 @@ use media::decode_basic_audio_info::decode_basic_audio_bytes_info;
 use mimetypes::mimetype_for_bytes::get_mimetype_for_bytes;
 use mysql_queries::queries::media_uploads::get_media_upload_by_uuid::get_media_upload_by_uuid_with_connection;
 use mysql_queries::queries::media_uploads::insert_media_upload::{Args, insert_media_upload};
-use tokens::tokens::media_uploads::MediaUploadToken;
 
 use crate::http_server::endpoints::media_uploads::common::drain_multipart_request::{drain_multipart_request, MediaSource};
-use crate::http_server::endpoints::media_uploads::common::upload_error::UploadError;
-use crate::server_state::ServerState;
 use crate::validations::validate_idempotency_token_format::validate_idempotency_token_format;
 
 #[derive(Serialize)]
 pub struct UploadWeightsSuccessResponse {
   pub success: bool,
-  pub upload_token: MediaUploadToken,
+  pub upload_token: ModelWeightToken,
 }
 
 static ALLOWED_MIME_TYPES : Lazy<HashSet<&'static str>> = Lazy::new(|| {
@@ -53,8 +52,10 @@ pub async fn upload_weights_handler(
     &server_state,
     multipart_payload,
     &ALLOWED_MIME_TYPES).await?;
+  
+  // send a body with the required payload along side the multipart upload 
 
-  let weight_upload_token = response.to_media_token();
+  let weight_upload_token = response.to_model_token();
 
   let response: UploadWeightsSuccessResponse = UploadWeightsSuccessResponse {
     success: true,
@@ -69,18 +70,17 @@ pub async fn upload_weights_handler(
       .body(body));
 }
 
-
 pub enum SuccessCase {
   WeightAlreadyUploaded {
-    existing_upload_token: WeightUploadToken,
+    existing_upload_token: ModelWeightToken,
   },
   WeightSuccessfullyUploaded {
-    upload_token: WeightUploadToken,
+    upload_token: ModelWeightToken,
   }
 }
 
 impl SuccessCase {
-  pub fn to_media_token(self) -> WeightUploadToken {
+  pub fn to_model_token(self) -> ModelWeightToken {
     match self {
       SuccessCase::WeightAlreadyUploaded { existing_upload_token } => existing_upload_token,
       SuccessCase::WeightSuccessfullyUploaded { upload_token } => upload_token,
@@ -190,6 +190,7 @@ pub async fn handle_weight_upload(
       .as_ref()
       .map(|bytes| get_mimetype_for_bytes(bytes.as_ref()))
       .flatten();
+    
 
   let bytes = match upload_weights_request.file_bytes {
     None => return Err(UploadError::BadInput("missing file contents".to_string())),
@@ -219,38 +220,14 @@ pub async fn handle_weight_upload(
           .collect::<String>();
       return Err(UploadError::BadInput(format!("unpermitted mime type: {}", &filtered_mimetype)));
     }
-
-    // NB: .aiff (audio/aiff) isn't supported by Symphonia:
-    //  It contains uncompressed PCM-encoded audio similar to wav.
-    //  See: https://github.com/pdeljanov/Symphonia/issues/75
-    // NB: The following formats are not supported by Symphonia and
-    //  do not have any open issues filed. They may simply be too old:
-    //  - .wma (audio/x-ms-wma)
-    //  - .avi (video/x-msvideo)
     media_upload_type = match mimetype {
-      // Audio
-      "audio/aac" /* .aac */ => Some(MediaUploadType::Audio),
+      "binary/octet-stream" /* .bin */ => Some(MediaUploadType::Binary),
       _ => None,
     };
-
-    
-  let media_upload_type = match media_upload_type {
-    Some(m) => m,
-    None => {
-      warn!("Invalid mimetype: {:?}", maybe_mimetype);
-      return Err(UploadError::BadInput(format!("unknown mimetype: {:?}", maybe_mimetype)))
-    },
-  };
-
-  // probably don't need this 
-  let media_upload_source = match upload_weights_request.media_source {
-    MediaSource::Unknown => MediaUploadSource::Unknown,
-    MediaSource::UserFile => MediaUploadSource::File,
-    MediaSource::UserDeviceApi => MediaUploadSource::DeviceApi,
-  };
+  }
 
   // This is fine for now we just don't expose the path!
-  let public_upload_path = MediaUploadOriginalFilePath::generate_new();
+  let public_upload_path = WeightUploadOriginalFilePath::generate_new();
 
   info!("Uploading media to bucket path: {}", public_upload_path.get_full_object_path_str());
 
@@ -266,18 +243,18 @@ pub async fn handle_weight_upload(
       })?;
 
   let token = create_weight(CreateModelWeightsArgs {
-    token: &MediaUploadToken::generate(),
-    weights_type: media_upload_type,
-    weights_category: media_upload_category,
+    token: &ModelWeightToken::generate(),
+    weights_type: WeightsType::LoRA, // to do parse multi part for this
+    weights_category: WeightsCategory::ImageGeneration,
     title: upload_weights_request.file_name.as_deref(),
-    maybe_thumbnail_token: None,
-    description_markdown: None,
-    description_rendered_html: None,
-    creator_user_token: maybe_user_token.as_deref(),
+    maybe_thumbnail_token: &ThumbnailToken::generate(),
+    description_markdown: "",
+    description_rendered_html: "",
+    creator_user_token: maybe_user_token.as_str(),
     creator_ip_address: &ip_address,
     creator_set_visibility,
-    maybe_last_update_user_token: None,
-    original_download_url: None,
+    maybe_last_update_user_token: "",
+    original_download_url: "",
     original_filename: upload_weights_request.file_name.as_deref(),
     file_size_bytes: file_size_bytes as i32,
     file_checksum_sha2: hash,
@@ -290,44 +267,13 @@ pub async fn handle_weight_upload(
     maybe_cached_user_ratings_ratio: None,
     version: 0,
     mysql_pool: &server_state.mysql_pool,
-  })
-      .await
-      .map_err(|err| {
-        warn!("New generic download creation DB error: {:?}", err);
-        UploadError::ServerError
-      })?;
-  }).await?;
-
-
-
-  let (token, record_id) = insert_media_upload(Args{
-    uuid_idempotency_token: &uuid_idempotency_token,
-    media_type: media_upload_type,
-    media_source: media_upload_source,
-    maybe_original_filename: upload_weights_request.file_name.as_deref(),
-    original_file_size_bytes: file_size_bytes as u64,
-    maybe_original_duration_millis: maybe_duration_millis,
-    maybe_original_mime_type: maybe_mimetype,
-    maybe_original_audio_encoding: maybe_codec_name.as_deref(),
-    maybe_original_video_encoding: None,
-    maybe_original_frame_width: None, // TODO
-    maybe_original_frame_height: None, // TODO
-    checksum_sha2: &hash,
-    public_upload_path: &public_upload_path,
-    maybe_extra_file_modification_info: None,
-    maybe_creator_user_token: maybe_user_token.as_ref(),
-    maybe_creator_anonymous_visitor_token: None,
-    creator_ip_address: &ip_address,
-    creator_set_visibility,
-    mysql_pool: &server_state.mysql_pool,
-  })
-      .await
-      .map_err(|err| {
-        warn!("New generic download creation DB error: {:?}", err);
+  }).await
+      .map_err(|e| {
+        error!("Error creating weights upload: {:?}", e);
         UploadError::ServerError
       })?;
 
-  info!("new media upload id: {} token: {:?}", record_id, &token);
+  info!("new weights upload id: {} token: {:?}", record_id, &token);
 
   Ok(SuccessCase::WeightSuccessfullyUploaded {
     upload_token: token,
