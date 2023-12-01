@@ -3,14 +3,14 @@
     "audio": "Audio",
     "image": "Image",
     "subtitle": "Select and image with a clear face, and an audio sample, and generate a lipsynced video.",
-    "title": "Face Animator",
-    "yourJobs": "Your jobs"
+    "title": "Face Animator"
   },
   "inputs": {
     "downloadFile": "Download File",
     "generate": "Generate",
     "makeAnother": "Make another",
-    "viewResult": "View result"
+    "viewResult": "View result",
+    "yourJobs": "Your jobs"
   },
   "status": {
     "animationComplete": "Animation complete!",

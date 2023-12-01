@@ -8,7 +8,9 @@
   "inputs": {
     "downloadFile": "डाउनलोड फ़ाइल",
     "generate": "उत्पन्न",
-    "makeAnother": "एक और बनाने"
+    "makeAnother": "एक और बनाने",
+    "viewResult": "परिणाम देख",
+    "yourJobs": "आपकी नौकरियाँ"
   },
   "status": {
     "animationComplete": "एनिमेशन पूर्ण!",

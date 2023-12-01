@@ -8,7 +8,9 @@
   "inputs": {
     "downloadFile": "Tải tập tin",
     "generate": "Phát ra",
-    "makeAnother": "Làm một cái khác"
+    "makeAnother": "Làm một cái khác",
+    "viewResult": "Xem kết quả",
+    "yourJobs": "Công việc của bạn"
   },
   "status": {
     "animationComplete": "Hoạt hình hoàn tất!",

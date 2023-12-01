@@ -8,7 +8,9 @@
   "inputs": {
     "downloadFile": "ডাউনলোড ফাইল",
     "generate": "তৈরি করুন",
-    "makeAnother": "আরেকটা তৈরি কর"
+    "makeAnother": "আরেকটা তৈরি কর",
+    "viewResult": "ফলাফল দেখুন",
+    "yourJobs": "আপনার কাজ"
   },
   "status": {
     "animationComplete": "অ্যানিমেশন সম্পূর্ণ!",

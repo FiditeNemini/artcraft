@@ -39,6 +39,7 @@
   },
   "dependencies": {
     "@react-spring/types": "^9.7.3",
+    "moment": "^2.29.4",
     "universal-cookie": "^6.1.1",
     "yarn": "^1.22.19"
   },

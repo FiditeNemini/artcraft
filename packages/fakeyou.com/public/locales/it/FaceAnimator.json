@@ -8,7 +8,9 @@
   "inputs": {
     "downloadFile": "Download file",
     "generate": "creare",
-    "makeAnother": "Fanne un'altro"
+    "makeAnother": "Fanne un'altro",
+    "viewResult": "Visualizza risultato",
+    "yourJobs": "I tuoi lavori"
   },
   "status": {
     "animationComplete": "Animazione completata!",

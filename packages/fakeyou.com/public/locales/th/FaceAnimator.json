@@ -8,7 +8,9 @@
   "inputs": {
     "downloadFile": "ดาวน์โหลดไฟล์",
     "generate": "สร้าง",
-    "makeAnother": "ทำอีก"
+    "makeAnother": "ทำอีก",
+    "viewResult": "ดูผลลัพธ์",
+    "yourJobs": "งานของคุณ"
   },
   "status": {
     "animationComplete": "แอนิเมชั่นเสร็จสมบูรณ์!",
