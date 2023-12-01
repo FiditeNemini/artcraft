@@ -1,3 +1,4 @@
+use std::fs::read_to_string;
 use std::path::PathBuf;
 use std::time::Instant;
 
@@ -220,6 +221,8 @@ pub async fn process_job(args: RvcV2ProcessJobArgs<'_>) -> Result<JobSuccessResu
   //let output_metadata_fs_path = temp_dir.path().join("metadata.json");
   //let output_spectrogram_fs_path = temp_dir.path().join("spectrogram.json");
 
+  let stderr_output_file = work_temp_dir.path().join("stderr.txt");
+
   info!("Running RVC (v2) VC inference...");
 
   info!("Expected output audio filename: {:?}", &output_audio_fs_path);
@@ -260,6 +263,7 @@ pub async fn process_job(args: RvcV2ProcessJobArgs<'_>) -> Result<JobSuccessResu
         rmvpe_path: &model_dependencies.downloaders.rmvpe.filesystem_path,
         input_path: &input_wav_path,
         output_path: &output_audio_fs_path,
+        stderr_output_file: &stderr_output_file,
         maybe_override_f0_method,
         maybe_f0_up_key,
       });
@@ -270,10 +274,26 @@ pub async fn process_job(args: RvcV2ProcessJobArgs<'_>) -> Result<JobSuccessResu
 
   if !command_exit_status.is_success() {
     error!("Inference failed: {:?}", command_exit_status);
+
+    let error = ProcessSingleJobError::Other(anyhow!("CommandExitStatus: {:?}", command_exit_status));
+
+    if let Ok(contents) = read_to_string(&stderr_output_file) {
+      warn!("Captured stderr output: {}", contents);
+
+      //match categorize_error(&contents)  {
+      //  Some(ProcessSingleJobError::FaceDetectionFailure) => {
+      //    warn!("Face not detected in source image");
+      //    error = ProcessSingleJobError::FaceDetectionFailure;
+      //  }
+      //  _ => {}
+      //}
+    }
+
     safe_delete_temp_file(&input_wav_path);
     safe_delete_temp_file(&output_audio_fs_path);
     safe_delete_temp_directory(&work_temp_dir);
-    return Err(ProcessSingleJobError::Other(anyhow!("CommandExitStatus: {:?}", command_exit_status)));
+
+    return Err(error);
   }
 
   // ==================== CHECK ALL FILES EXIST AND GET METADATA ==================== //

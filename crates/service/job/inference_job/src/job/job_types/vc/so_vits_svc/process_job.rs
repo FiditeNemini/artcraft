@@ -1,3 +1,4 @@
+use std::fs::read_to_string;
 use std::time::Instant;
 
 use anyhow::anyhow;
@@ -148,6 +149,8 @@ pub async fn process_job(args: SoVitsSvcProcessJobArgs<'_>) -> Result<JobSuccess
 
   let output_audio_fs_path = work_temp_dir.path().join("output.wav");
 
+  let stderr_output_file = work_temp_dir.path().join("stderr.txt");
+
   info!("Running VC inference...");
 
   info!("Expected output audio filename: {:?}", &output_audio_fs_path);
@@ -187,6 +190,7 @@ pub async fn process_job(args: SoVitsSvcProcessJobArgs<'_>) -> Result<JobSuccess
         model_path: &so_vits_svc_fs_path,
         input_path: &input_wav_path,
         output_path: &output_audio_fs_path,
+        stderr_output_file: &stderr_output_file,
         maybe_config_path: None,
         device: Device::Cuda,
         auto_predict_f0,
@@ -199,10 +203,26 @@ pub async fn process_job(args: SoVitsSvcProcessJobArgs<'_>) -> Result<JobSuccess
 
   if !command_exit_status.is_success() {
     error!("Inference failed: {:?}", command_exit_status);
+
+    let error = ProcessSingleJobError::Other(anyhow!("CommandExitStatus: {:?}", command_exit_status));
+
+    if let Ok(contents) = read_to_string(&stderr_output_file) {
+      warn!("Captured stderr output: {}", contents);
+
+      //match categorize_error(&contents)  {
+      //  Some(ProcessSingleJobError::FaceDetectionFailure) => {
+      //    warn!("Face not detected in source image");
+      //    error = ProcessSingleJobError::FaceDetectionFailure;
+      //  }
+      //  _ => {}
+      //}
+    }
+
     safe_delete_temp_file(&input_wav_path);
     safe_delete_temp_file(&output_audio_fs_path);
     safe_delete_temp_directory(&work_temp_dir);
-    return Err(ProcessSingleJobError::Other(anyhow!("CommandExitStatus: {:?}", command_exit_status)));
+
+    return Err(error);
   }
 
   // ==================== CHECK ALL FILES EXIST AND GET METADATA ==================== //
