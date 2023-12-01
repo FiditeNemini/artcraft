@@ -178,8 +178,9 @@ COPY --from=builder /tmp/target/release/tts-download-job /
 COPY --from=builder /tmp/target/release/tts-inference-job /
 
 # NB(bt,2023-11-28): These still seem essential even after switching to rustls
+# NB(bt,2023-11-30): I commented out the /etc/ssl copy and it broke certs, so this is *essential*
 # SSL certs are required for crypto
-# COPY --from=builder /etc/ssl /etc/ssl # TODO TEST COMMENT
+COPY --from=builder /etc/ssl /etc/ssl
 
 # NB(bt,2023-11-28): These still seem essential even after switching to rustls
 # Required dynamically linked libraries
