@@ -118,6 +118,7 @@ export default function SideNav(props: SideNavProps) {
         pending_rvc_jobs: 0,
         pending_svc_jobs: 0,
         pending_tacotron2_jobs: 0,
+        pending_voice_designer: 0,
       },
     },
     legacy_tts: {
@@ -385,6 +386,12 @@ export default function SideNav(props: SideNavProps) {
             {t("queueFaceAnimator")}:{" "}
             <span className="text-red">
               {queueStats.inference.by_queue.pending_face_animation_jobs}
+            </span>
+          </div>
+          <div>
+            Voice Designer:{" "}
+            <span className="text-red">
+              {queueStats.inference.by_queue.pending_voice_designer}
             </span>
           </div>
         </li>

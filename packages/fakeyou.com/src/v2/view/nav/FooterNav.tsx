@@ -60,6 +60,7 @@ function FooterNav(props: Props) {
         pending_rvc_jobs: 0,
         pending_svc_jobs: 0,
         pending_tacotron2_jobs: 0,
+        pending_voice_designer: 0,
       },
     },
     legacy_tts: {
@@ -157,6 +158,12 @@ function FooterNav(props: Props) {
               Animations Queued:{" "}
               <span className="text-red">
                 {queueStats.inference.by_queue.pending_face_animation_jobs}
+              </span>
+            </div>
+            <div>
+              Voice Designer Queued:{" "}
+              <span className="text-red">
+                {queueStats.inference.by_queue.pending_voice_designer}
               </span>
             </div>
           </div>
