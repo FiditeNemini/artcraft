@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
 import { useTransition } from "@react-spring/web";
 import { v4 as uuidv4 } from "uuid";
 import { useFile, useLocalize } from "hooks";
@@ -29,14 +30,10 @@ import "./LipsyncEditor.scss";
 import { FrontendInferenceJobType } from "@storyteller/components/src/jobs/InferenceJob";
 import { usePrefixedDocumentTitle } from "common/UsePrefixedDocumentTitle";
 import { Analytics } from "common/Analytics";
+import { GetMedia } from "@storyteller/components/src/api/media_files/GetMedia";
 
-export default function LipsyncEditor({
-  enqueueInferenceJob,
-  sessionSubscriptionsWrapper,
-  inferenceJobs,
-  inferenceJobsByCategory,
-  ...rest
-}: FaceAnimatorCore) {
+export default function LipsyncEditor({ enqueueInferenceJob,  sessionSubscriptionsWrapper,  inferenceJobs,  inferenceJobsByCategory, ...rest }: FaceAnimatorCore) {
+  const { mediaToken } = useParams<{ mediaToken: string }>();
   const { t } = useLocalize("FaceAnimator");
   usePrefixedDocumentTitle("AI Face Animator");
 
@@ -44,8 +41,7 @@ export default function LipsyncEditor({
 
   const [imageReady, imageReadySet] = useState<boolean>(false);
   const [audioReady, audioReadySet] = useState<boolean>(false);
-  const readyMedia = (m: number) => (t: boolean) =>
-    [imageReadySet, audioReadySet][m](t);
+  const readyMedia = (m: number) => (t: boolean) => [imageReadySet, audioReadySet][m](t);
   const audioProps = useFile({}); // contains upload inout state and controls, see docs
   const imageProps = useFile({}); // contains upload inout state and controls, see docs
   const [index, indexSet] = useState<number>(0); // index  = slideshow slide position
@@ -56,13 +52,14 @@ export default function LipsyncEditor({
   const [disableFaceEnhancement, disableFaceEnhancementSet] = useState(false);
   const [still, stillSet] = useState(false);
 
+  const [audioFetched,audioFetchedSet] = useState(false); // this is here for now because I am relocating all the state to a hook anyway
+  const [presetAudio,presetAudioSet] = useState<any|undefined>(); // this is here for now because I am relocating all the state to a hook anyway
+  const [preferUpload,preferUploadSet] = useState(false); 
+
   //const animationChange = ({ target }: any) => animationStyleSet(target.value);
-  const frameDimensionsChange = ({ target }: any) =>
-    frameDimensionsSet(target.value);
-  const removeWatermarkChange = ({ target }: any) =>
-    removeWatermarkSet(target.checked);
-  const disableFaceEnhancementChange = ({ target }: any) =>
-    disableFaceEnhancementSet(target.checked);
+  const frameDimensionsChange = ({ target }: any) => frameDimensionsSet(target.value);
+  const removeWatermarkChange = ({ target }: any) => removeWatermarkSet(target.checked);
+  const disableFaceEnhancementChange = ({ target }: any) => disableFaceEnhancementSet(target.checked);
   const stillChange = ({ target }: any) => stillSet(target.checked);
   const clearInputs = () => {
     //animationStyleSet(0);
@@ -79,66 +76,63 @@ export default function LipsyncEditor({
     type: mode ? "image" : "audio",
   });
 
-  const upImageAndMerge = async (audio: any) => ({
-    audio,
-    image: await UploadImage(makeRequest(1)),
+  const upImageAndMerge = async (audio: any) => ({  audio, image: await UploadImage(makeRequest(1)) });
+  // const fakey = new Promise<any>((audio: any) => ({  upload_token: mediaToken }));
+
+  // const initialPromise = presetAudio && !preferUpload ? fakey : UploadAudio;
+
+
+  const MergeAndEnque = (res: any) => upImageAndMerge(res)
+    .then((responses) => {
+    if ("upload_token" in responses.image) {
+      indexSet(3); // set face animator API working page
+      return EnqueueFaceAnimation({
+        uuid_idempotency_token: uuidv4(),
+        audio_source: {
+          maybe_media_upload_token: responses.audio.upload_token,
+        },
+        image_source: {
+          maybe_media_upload_token: responses.image.upload_token,
+        },
+        make_still: still,
+        disable_face_enhancement: disableFaceEnhancement,
+        remove_watermark: removeWatermark,
+        dimensions: frameDimensions,
+      });
+    }
+  })
+  .then((res) => {
+    if (res && res.inference_job_token) {
+      enqueueInferenceJob(
+        res.inference_job_token,
+        FrontendInferenceJobType.FaceAnimation
+      );
+      indexSet(4); // set face animator API success page
+    }
+  })
+  .catch((e) => {
+    return { success: false };
   });
 
   const submit = async () => {
-    if (!audioProps.file) return false;
+    if (!presetAudio && !audioProps.file) return false;
 
     indexSet(1); // set audio working page
 
-    UploadAudio(makeRequest(0)) // start audio (0) upload
+    if (presetAudio && !preferUpload) {
+      MergeAndEnque({ upload_token: mediaToken });
+    } else {
+      UploadAudio(makeRequest(0)) // start audio (0) upload
       .then((res) => {
         if ("upload_token" in res) {
           indexSet(2); // set image working page
         }
-        return upImageAndMerge(res); // start image (1) upload, replace with Upload(imageRequest)
-      })
-      .then((responses) => {
-        if ("upload_token" in responses.image) {
-          indexSet(3); // set face animator API working page
-          return EnqueueFaceAnimation({
-            uuid_idempotency_token: uuidv4(),
-            audio_source: {
-              maybe_media_upload_token: responses.audio.upload_token,
-            },
-            image_source: {
-              maybe_media_upload_token: responses.image.upload_token,
-            },
-            make_still: still,
-            disable_face_enhancement: disableFaceEnhancement,
-            remove_watermark: removeWatermark,
-            dimensions: frameDimensions,
-          });
-        }
-      })
-      .then((res) => {
-        if (res && res.inference_job_token) {
-          enqueueInferenceJob(
-            res.inference_job_token,
-            FrontendInferenceJobType.FaceAnimation
-          );
-          indexSet(4); // set face animator API success page
-        }
-      })
-      .catch((e) => {
-        return { success: false };
+        return MergeAndEnque(res); // start image (1) upload, replace with Upload(imageRequest)
       });
+    }
   };
   const page = index === 0 ? 0 : index === 4 ? 2 : 1;
-  const headerProps = {
-    audioProps,
-    audioReady,
-    clearInputs,
-    imageProps,
-    imageReady,
-    indexSet,
-    page,
-    submit,
-    t,
-  };
+  const headerProps = { audioProps, audioReady, clearInputs, imageProps, imageReady, indexSet, page, presetAudio, preferUpload, submit, t };
 
   const transitions = useTransition(index, {
     ...springs.soft,
@@ -149,51 +143,52 @@ export default function LipsyncEditor({
 
   const statusTxt = (which: number, config = {}) => ["animationPending","animationInProgress","animationFailed","animationDead","animationSuccess"].map((str,i) => t(`status.${str}`,config))[which];
 
-  return (
-    <div {...{ className: "container-panel pt-4" }}>
-      <div {...{ className: "panel face-animator-main" }}>
-        <FaceAnimatorTitle {...headerProps} />
-        {transitions((style, i) => {
-          const Page = [
-            FaceAnimatorInput,
-            FaceAnimatorWorking,
-            FaceAnimatorSuccess,
-          ][page];
-          return Page ? (
-            <Page
-              {...{
-                audioProps,
-                imageProps,
-                frameDimensions,
-                frameDimensionsChange,
-                disableFaceEnhancement,
-                disableFaceEnhancementChange,
-                enqueueInferenceJob,
-                still,
-                stillChange,
-                sessionSubscriptionsWrapper,
-                index,
-                t,
-                toggle: { audio: readyMedia(1), image: readyMedia(0) },
-                style,
-                removeWatermark,
-                removeWatermarkChange,
-              }}
-            />
-          ) : (
-            <></>
-          );
-        })}
-      </div>
-      <InferenceJobsList {...{
-        t,
-        onSelect: () => Analytics.voiceConversionClickDownload(),
-        inferenceJobs: inferenceJobsByCategory.get(FrontendInferenceJobType.FaceAnimation),
-        statusTxt
-      }}/>
-      <div {...{ className: "face-animator-mobile-sample" }}>
-        <BasicVideo {...{ src: "/videos/face-animator-instruction-en.mp4" }} />
-      </div>
+  useEffect(() => {
+    if (mediaToken && !audioFetched) {
+      audioFetchedSet(true);
+      GetMedia(mediaToken,{})
+      .then((res) => { presetAudioSet(res.media_file); });
+    }
+  },[audioFetched,mediaToken]);
+
+  return <div {...{ className: "container-panel pt-4" }}>
+    <div {...{ className: "panel face-animator-main" }}>
+      <FaceAnimatorTitle {...headerProps} />
+      {transitions((style, i) => {
+        const Page = [FaceAnimatorInput,  FaceAnimatorWorking,  FaceAnimatorSuccess ][page];
+        return Page ? <Page
+            {...{
+              audioProps,
+              imageProps,
+              frameDimensions,
+              frameDimensionsChange,
+              disableFaceEnhancement,
+              disableFaceEnhancementChange,
+              enqueueInferenceJob,
+              preferUpload,
+              preferUploadSet,
+              presetAudio,
+              still,
+              stillChange,
+              sessionSubscriptionsWrapper,
+              index,
+              t,
+              toggle: { audio: readyMedia(1), image: readyMedia(0) },
+              style,
+              removeWatermark,
+              removeWatermarkChange,
+            }}
+          /> : null
+      })}
     </div>
-  );
+    <InferenceJobsList {...{
+      t,
+      onSelect: () => Analytics.voiceConversionClickDownload(),
+      inferenceJobs: inferenceJobsByCategory.get(FrontendInferenceJobType.FaceAnimation),
+      statusTxt
+    }}/>
+    <div {...{ className: "face-animator-mobile-sample" }}>
+      <BasicVideo {...{ src: "/videos/face-animator-instruction-en.mp4" }} />
+    </div>
+  </div>;
 }

@@ -1,3 +1,4 @@
+import AudioPlayer from "./AudioPlayer";
 import AudioBlobPreview from "./AudioBlobPreview";
 import AudioInput from "./AudioInput";
 import BasicVideo from "./BasicVideo";
@@ -21,6 +22,7 @@ import TempInput from "./TempInput";
 import TempSelect from "./TempSelect";
 
 export {
+  AudioPlayer,
   AudioBlobPreview,
   AudioInput,
   BasicVideo,

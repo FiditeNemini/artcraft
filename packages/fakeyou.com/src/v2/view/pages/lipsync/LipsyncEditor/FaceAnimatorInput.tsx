@@ -1,15 +1,18 @@
 import React from "react";
 import { animated } from "@react-spring/web";
-import { AudioBlobPreview, AudioInput, BasicVideo, Checkbox, ImageInput, SegmentButtons } from "components/common";
+import { AudioPlayer, AudioBlobPreview, AudioInput, BasicVideo, Checkbox, ImageInput, SegmentButtons } from "components/common";
 import { FaceAnimatorSlide } from "./FaceAnimatorTypes";
 
-export default function FaceAnimatorInput({  
+export default function FaceAnimatorInput({
   audioProps,
   imageProps,
   frameDimensions,
   frameDimensionsChange,
   disableFaceEnhancement,
   disableFaceEnhancementChange,
+  preferUpload,
+  preferUploadSet,
+  presetAudio,
   still,
   stillChange,
   toggle,
@@ -29,23 +32,26 @@ export default function FaceAnimatorInput({
     </div>
     <div {...{ className: "media-input-column audio-input-column col-lg-6 ga-audio-input" }}>
       <h5>{t("headings.audio")}</h5>
-      <AudioInput
-        {...{
+      { presetAudio && !preferUpload ? 
+        <AudioPlayer {...{
+          actions: [{
+            label: "Upload file instead",
+            variant: "secondary",
+            onClick: () => { preferUploadSet(true) }
+          }],
+          mediaFile: presetAudio
+        }} /> :
+        <AudioInput {...{
           ...audioProps,
-          onRest: (p: any, c: any, item: any, l: any) => {
-            toggle.audio(!!audioProps.file);
-          },
+          onRest: (p: any, c: any, item: any, l: any) => toggle.audio(!!audioProps.file)
           // hideActions: true,
-        }}
-      >
+        }} >
         <AudioBlobPreview {...{
           ...audioProps,
-          onRest: (p: any, c: any, item: any, l: any) => {
-            toggle.audio(!!audioProps.file);
-          },
+          onRest: (p: any, c: any, item: any, l: any) => toggle.audio(!!audioProps.file),
           hideActions: true,
         }}/>
-      </AudioInput>
+      </AudioInput> }
       <BasicVideo {...{ className: "face-animator-wide-sample", src: "/videos/face-animator-instruction-en.mp4" }}/>
     </div>
     <div {...{ className: "animation-configure-panel panel" }}>
