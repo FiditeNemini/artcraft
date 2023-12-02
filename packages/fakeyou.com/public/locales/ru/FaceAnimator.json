@@ -8,7 +8,9 @@
   "inputs": {
     "downloadFile": "Загрузить файл",
     "generate": "Генерировать",
-    "makeAnother": "Сделайте еще один"
+    "makeAnother": "Сделайте еще один",
+    "viewResult": "Посмотреть результат",
+    "yourJobs": "Ваши вакансии"
   },
   "status": {
     "animationComplete": "Анимация завершена!",

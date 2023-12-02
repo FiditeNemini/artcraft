@@ -28,7 +28,7 @@ interface JobsListProps{
 export default function InferenceJobsList({ filter, onSelect, statusTxt, t, inferenceJobs }: JobsListProps) {
   // const { inferenceJobs = [] } = useInferenceJobs({ type: 0 });
   // const oldJobs = thejobs || inferenceJobs;
- console.log("🥬",inferenceJobs);
+
   const [pending, pendingSet] = useState<GetPendingTtsJobCountSuccessResponse>({
     success: true,
     pending_job_count: 0,
@@ -97,7 +97,6 @@ export default function InferenceJobsList({ filter, onSelect, statusTxt, t, infe
       { jobs
         // .filter(filter)
         .map((job: any, key: number) => {
-        console.log("🍇",job);
       return <div {...{ className: "panel face-animator-job", key }}>
         <FontAwesomeIcon {...{ className: `job-status-icon job-status-${job.statusIndex}`, icon: statusIcons[job.statusIndex] }}/>
         <div {...{ className: "job-details" }}>

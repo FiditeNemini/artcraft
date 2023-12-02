@@ -15,9 +15,11 @@ export interface InferenceInfo {
 }
 
 export interface ByQueueStats {
-  pending_svc_jobs: number,
-  pending_rvc_jobs: number,
   pending_face_animation_jobs: number,
+  pending_rvc_jobs: number,
+  pending_svc_jobs: number,
+  pending_tacotron2_jobs: number,
+  pending_voice_designer: number,
 }
 
 export interface LegacyTtsInfo {

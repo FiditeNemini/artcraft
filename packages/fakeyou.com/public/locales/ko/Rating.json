@@ -5,5 +5,6 @@
   "ratingGood": "목소리가 좋다",
   "ratingGreat": "목소리가 좋아요",
   "ratingLabel": "평가:",
+  "ratingNone": "음성 등급 없음",
   "ratingOk": "목소리는 괜찮아요"
 }

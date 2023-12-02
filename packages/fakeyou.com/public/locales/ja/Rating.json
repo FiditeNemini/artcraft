@@ -5,5 +5,6 @@
   "ratingGood": "声が良い",
   "ratingGreat": "声が素晴らしい",
   "ratingLabel": "評価:",
+  "ratingNone": "音声が評価されていません",
   "ratingOk": "声は大丈夫です"
 }

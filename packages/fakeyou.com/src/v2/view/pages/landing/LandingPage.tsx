@@ -145,7 +145,7 @@ function LandingPage(props: Props) {
       "mascot/xmas_1.webp",
       "mascot/xmas_2.webp",
       "mascot/xmas_3.webp",
-      "mascot/xmas_4.webp",
+      // "mascot/xmas_4.webp",
     ];
 
     return images[Math.floor(Math.random() * images.length)];
