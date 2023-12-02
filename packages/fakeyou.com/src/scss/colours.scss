@@ -2,6 +2,7 @@
 $primary: #e66462;
 $secondary: #39394c;
 $bg: #1a1a27;
+$panel: #242433;
 $input: #39394c;
 $input-placeholder: #aeaeb3;
 $danger: #8f4951;
@@ -11,9 +12,8 @@ $success: #40ad48;
 $warning: darken(#f7941c, 5%);
 $accent: #80cfd3;
 $workflow: $primary;
-$panel: #242433;
-$panel-inner: lighten($panel, 4%);
-$panel-inner-border: lighten($panel, 8%);
+
+// Light mode colours
 
 $primary-lm: #000;
 
@@ -59,19 +59,3 @@ $danger-dark: darken($danger, 10%);
 
 $accent-light: desaturate(lighten($accent, 20%), 15%);
 $accent-dark: saturate(darken($accent, 15%), 10%);
-
-$badge-colors: (
-  "gray": #5b7282,
-  "red": #d91f11,
-  "orange": #e86427,
-  "yellow": #f5c518,
-  "lime": #3c7d0e,
-  "green": #077d55,
-  "teal": #167b7d,
-  "turquoise": #067a91,
-  "aqua": #0073ba,
-  "blue": #186ade,
-  "ultramarine": #535fe8,
-  "purple": #8f49de,
-  "pink": #cc1d92,
-);
