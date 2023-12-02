@@ -46,7 +46,7 @@ function VoiceDesignerVoiceEditPage() {
   useEffect(() => {
     if (!fetched && voice_token) {
       fetchedSet(true);
-      voices.get(voice_token, {}).then((res) => {
+      voices.get(voice_token, {}).then(res => {
         languageSet(res.ietf_language_tag);
         titleSet(res.title);
         visibilitySet(res.creator_set_visibility);
@@ -66,8 +66,8 @@ function VoiceDesignerVoiceEditPage() {
         backbuttonTo="/voice-designer"
       />
 
-      <Panel padding={true}>
-        <div className="d-flex flex-column gap-4">
+      <Panel>
+        <div className="d-flex flex-column gap-4 p-3 py-4 p-md-4">
           <div className="row gy-4">
             <TempInput
               {...{
@@ -104,8 +104,19 @@ function VoiceDesignerVoiceEditPage() {
               }}
             />
           </div>
-
-          <Button {...{ label: "Save", onClick }} />
+        </div>
+        <hr className="mt-0 mb-4" />
+        <div className="p-3 pb-4 px-lg-4 pt-0">
+          <div className="d-flex gap-3 justify-content-end">
+            <Button
+              {...{
+                label: "Cancel",
+                to: "/voice-designer",
+                variant: "secondary",
+              }}
+            />
+            <Button {...{ label: "Save Changes", onClick }} />
+          </div>
         </div>
       </Panel>
     </Container>
