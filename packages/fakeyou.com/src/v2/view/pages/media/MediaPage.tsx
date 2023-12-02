@@ -57,8 +57,6 @@ export default function MediaPage({ sessionWrapper }: MediaPageProps) {
     getMediaFile(token);
   }, [token, getMediaFile]);
 
-  console.log("😎",mediaFile);
-
   function renderMediaComponent(mediaFile: MediaFile) {
     switch (mediaFile.media_type) {
       case MediaFileType.Audio:

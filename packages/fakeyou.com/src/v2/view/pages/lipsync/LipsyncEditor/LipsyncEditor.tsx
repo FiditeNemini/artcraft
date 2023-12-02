@@ -54,7 +54,7 @@ export default function LipsyncEditor({ enqueueInferenceJob,  sessionSubscriptio
 
   const [audioFetched,audioFetchedSet] = useState(false); // this is here for now because I am relocating all the state to a hook anyway
   const [presetAudio,presetAudioSet] = useState<any|undefined>(); // this is here for now because I am relocating all the state to a hook anyway
-  const [preferUpload,preferUploadSet] = useState(false); 
+  const [preferPresetAudio,preferPresetAudioSet] = useState(!!mediaToken); 
 
   //const animationChange = ({ target }: any) => animationStyleSet(target.value);
   const frameDimensionsChange = ({ target }: any) => frameDimensionsSet(target.value);
@@ -77,10 +77,6 @@ export default function LipsyncEditor({ enqueueInferenceJob,  sessionSubscriptio
   });
 
   const upImageAndMerge = async (audio: any) => ({  audio, image: await UploadImage(makeRequest(1)) });
-  // const fakey = new Promise<any>((audio: any) => ({  upload_token: mediaToken }));
-
-  // const initialPromise = presetAudio && !preferUpload ? fakey : UploadAudio;
-
 
   const MergeAndEnque = (res: any) => upImageAndMerge(res)
     .then((responses) => {
@@ -111,28 +107,28 @@ export default function LipsyncEditor({ enqueueInferenceJob,  sessionSubscriptio
     }
   })
   .catch((e) => {
-    return { success: false };
+    return { success: false }; // we can do more user facing error handling
   });
 
   const submit = async () => {
-    if (!presetAudio && !audioProps.file) return false;
+    if (!presetAudio && !audioProps.file) return false
 
     indexSet(1); // set audio working page
 
-    if (presetAudio && !preferUpload) {
-      MergeAndEnque({ upload_token: mediaToken });
+    if (presetAudio && preferPresetAudio) {
+      MergeAndEnque({ upload_token: mediaToken }); // if there is a media token then we enque this like a "fake" audio/media response
     } else {
-      UploadAudio(makeRequest(0)) // start audio (0) upload
+      UploadAudio(makeRequest(0)) // if there an audio file it uploads here
       .then((res) => {
         if ("upload_token" in res) {
           indexSet(2); // set image working page
         }
-        return MergeAndEnque(res); // start image (1) upload, replace with Upload(imageRequest)
+        return MergeAndEnque(res); // start image upload, then combine both responses into an enqueue request
       });
     }
   };
   const page = index === 0 ? 0 : index === 4 ? 2 : 1;
-  const headerProps = { audioProps, audioReady, clearInputs, imageProps, imageReady, indexSet, page, presetAudio, preferUpload, submit, t };
+  const headerProps = { audioProps, audioReady, clearInputs, imageProps, imageReady, indexSet, page, presetAudio, preferPresetAudio, submit, t };
 
   const transitions = useTransition(index, {
     ...springs.soft,
@@ -165,8 +161,8 @@ export default function LipsyncEditor({ enqueueInferenceJob,  sessionSubscriptio
               disableFaceEnhancement,
               disableFaceEnhancementChange,
               enqueueInferenceJob,
-              preferUpload,
-              preferUploadSet,
+              preferPresetAudio,
+              preferPresetAudioSet,
               presetAudio,
               still,
               stillChange,

@@ -26,10 +26,11 @@ $over992: min-width 992px;
   .media-input-column {
     display: inline-block;
   }
+  @include breakpoint($over992) {
+    .fy-audio-player {  margin-bottom: 1rem; }
+  }
   @include breakpoint($under992) {
-    .media-input-column:first-of-type {
-      margin-bottom: 1rem;
-    }
+    .media-input-column:first-of-type { margin-bottom: 1rem; }
   }
 
   .audio-input-column {

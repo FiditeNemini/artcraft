@@ -21,6 +21,5 @@ export interface GetMediaResponse {
 
 export const GetMedia = MakeRequest<string, GetMediaRequest, GetMediaResponse>({
   method: "GET",
-  routingFunction: (mediaFileToken: string) =>
-    `/v1/media_files/file/${mediaFileToken}`,
+  routingFunction: (mediaFileToken: string) => `/v1/media_files/file/${mediaFileToken}`,
 });

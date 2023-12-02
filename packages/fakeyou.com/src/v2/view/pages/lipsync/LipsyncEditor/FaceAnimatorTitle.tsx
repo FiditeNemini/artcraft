@@ -32,9 +32,9 @@ const ProgressLi = ({ children, disabled = false }: { children?: any; disabled?:
 
 export default function FaceAnimatorTitle({ ...rest }) {
   const { audioProps,  audioReady, clearInputs, imageProps, imageReady, indexSet, page, presetAudio, 
-    // preferUpload,
+    preferPresetAudio,
     submit, t } = rest;
-  const noAudio = !presetAudio && (!audioReady || !audioProps.file);
+  const noAudio = (preferPresetAudio && !presetAudio) || (!preferPresetAudio && (!audioReady || !audioProps.file));
   const noImg = !imageReady || !imageProps.file;
   const incomplete = noAudio || noImg;
 

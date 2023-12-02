@@ -10,8 +10,8 @@ export default function FaceAnimatorInput({
   frameDimensionsChange,
   disableFaceEnhancement,
   disableFaceEnhancementChange,
-  preferUpload,
-  preferUploadSet,
+  preferPresetAudio,
+  preferPresetAudioSet,
   presetAudio,
   still,
   stillChange,
@@ -32,12 +32,12 @@ export default function FaceAnimatorInput({
     </div>
     <div {...{ className: "media-input-column audio-input-column col-lg-6 ga-audio-input" }}>
       <h5>{t("headings.audio")}</h5>
-      { presetAudio && !preferUpload ? 
+      { presetAudio && preferPresetAudio ? 
         <AudioPlayer {...{
           actions: [{
             label: "Upload file instead",
             variant: "secondary",
-            onClick: () => { preferUploadSet(true) }
+            onClick: () => { preferPresetAudioSet(false) }
           }],
           mediaFile: presetAudio
         }} /> :
