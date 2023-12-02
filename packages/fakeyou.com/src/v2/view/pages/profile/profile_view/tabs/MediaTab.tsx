@@ -14,9 +14,8 @@ import AudioPlayerProvider from "components/common/AudioPlayer/AudioPlayerContex
 import SkeletonCard from "components/common/Card/SkeletonCard";
 
 export default function MediaTab() {
-  const [data, setData] = useState(mockMediaData);
-  const [hasMore, setHasMore] = useState(true);
-  const [isLoading, setIsLoading] = useState(false);
+  const [data] = useState(mockMediaData);
+  const [isLoading] = useState(false);
 
   const gridContainerRef = useRef<HTMLDivElement | null>(null);
 
