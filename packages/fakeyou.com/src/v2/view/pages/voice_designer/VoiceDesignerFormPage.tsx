@@ -7,7 +7,7 @@ import {
   faWaveform,
 } from "@fortawesome/pro-solid-svg-icons";
 import { usePrefixedDocumentTitle } from "common/UsePrefixedDocumentTitle";
-import Panel from "components/common/Panel";
+import { Panel } from "components/common";
 import { Stepper } from "./components/Stepper";
 import { StepperControls } from "./components/StepperControls";
 import { UploadSamples } from "./components/steps/UploadSamples";
