@@ -9,9 +9,8 @@ import SkeletonCard from "components/common/Card/SkeletonCard";
 import mockWeightsData from "./mockWeightsData";
 
 export default function BookmarksTab() {
-  const [data, setData] = useState(mockWeightsData);
-  const [hasMore, setHasMore] = useState(true);
-  const [isLoading, setIsLoading] = useState(false);
+  const [data] = useState(mockWeightsData);
+  const [isLoading] = useState(false);
 
   const gridContainerRef = useRef<HTMLDivElement | null>(null);
 

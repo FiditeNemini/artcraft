@@ -13,8 +13,8 @@ import {
 import SkeletonCard from "components/common/Card/SkeletonCard";
 
 export default function WeightsTab() {
-  const [data, setData] = useState(mockWeightsData);
-  const [isLoading, setIsLoading] = useState(false);
+  const [data] = useState(mockWeightsData);
+  const [isLoading] = useState(false);
 
   const gridContainerRef = useRef<HTMLDivElement | null>(null);
 
