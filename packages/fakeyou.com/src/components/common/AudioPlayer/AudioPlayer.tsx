@@ -82,7 +82,7 @@ export default function AudioPlayer({ actions = [], mediaFile }: Props) {
   return <div {...{ className: "fy-audio-player" }}>
       <div {...{ ref }}></div>
       <div className="d-flex justify-content-center gap-2 mt-3">
-        { baseActions.map((action,i) => action.options ? <TempSelect { ...action }/> : <Button { ...action }/>) }
+        { baseActions.map((action,key) => action.options ? <TempSelect { ...{ ...action, key } }/> : <Button { ...{ ...action, key } }/>) }
       </div>
     </div>;
 };

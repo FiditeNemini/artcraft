@@ -1,8 +1,8 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { useParams } from "react-router-dom";
 import { useTransition } from "@react-spring/web";
 import { v4 as uuidv4 } from "uuid";
-import { useFile, useLocalize } from "hooks";
+import { useFile, useLocalize, useMedia } from "hooks";
 import { springs } from "resources";
 import {
   UploadAudio,
@@ -30,10 +30,11 @@ import "./LipsyncEditor.scss";
 import { FrontendInferenceJobType } from "@storyteller/components/src/jobs/InferenceJob";
 import { usePrefixedDocumentTitle } from "common/UsePrefixedDocumentTitle";
 import { Analytics } from "common/Analytics";
-import { GetMedia } from "@storyteller/components/src/api/media_files/GetMedia";
+// import { GetMedia } from "@storyteller/components/src/api/media_files/GetMedia";
 
 export default function LipsyncEditor({ enqueueInferenceJob,  sessionSubscriptionsWrapper,  inferenceJobs,  inferenceJobsByCategory, ...rest }: FaceAnimatorCore) {
   const { mediaToken } = useParams<{ mediaToken: string }>();
+  const [presetAudio] = useMedia({ mediaToken });
   const { t } = useLocalize("FaceAnimator");
   usePrefixedDocumentTitle("AI Face Animator");
 
@@ -52,8 +53,6 @@ export default function LipsyncEditor({ enqueueInferenceJob,  sessionSubscriptio
   const [disableFaceEnhancement, disableFaceEnhancementSet] = useState(false);
   const [still, stillSet] = useState(false);
 
-  const [audioFetched,audioFetchedSet] = useState(false); // this is here for now because I am relocating all the state to a hook anyway
-  const [presetAudio,presetAudioSet] = useState<any|undefined>(); // this is here for now because I am relocating all the state to a hook anyway
   const [preferPresetAudio,preferPresetAudioSet] = useState(!!mediaToken); 
 
   //const animationChange = ({ target }: any) => animationStyleSet(target.value);
@@ -138,14 +137,6 @@ export default function LipsyncEditor({ enqueueInferenceJob,  sessionSubscriptio
   });
 
   const statusTxt = (which: number, config = {}) => ["animationPending","animationInProgress","animationFailed","animationDead","animationSuccess"].map((str,i) => t(`status.${str}`,config))[which];
-
-  useEffect(() => {
-    if (mediaToken && !audioFetched) {
-      audioFetchedSet(true);
-      GetMedia(mediaToken,{})
-      .then((res) => { presetAudioSet(res.media_file); });
-    }
-  },[audioFetched,mediaToken]);
 
   return <div {...{ className: "container-panel pt-4" }}>
     <div {...{ className: "panel face-animator-main" }}>
