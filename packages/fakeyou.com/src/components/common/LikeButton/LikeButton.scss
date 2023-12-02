@@ -1,0 +1,80 @@
+@import "scss/colours.scss";
+
+.like-button {
+  display: flex;
+  align-items: center;
+  background-color: rgba(lighten($secondary, 5%), 0.9);
+  color: inherit;
+  border: none;
+  padding: 0;
+  font: inherit;
+  cursor: pointer;
+  outline: inherit;
+  font-size: 16px;
+  transition: 0.2s;
+  padding: 3px 8px;
+  border-radius: 0.5rem;
+
+  &.shadow {
+    box-shadow: 0 0 12px rgba($bg, 0.4) !important;
+
+    &:hover {
+      box-shadow: 0 0 12px rgba($bg, 0.4) !important;
+    }
+  }
+
+  &:hover {
+    background: rgba(lighten($secondary, 10%), 0.9);
+  }
+
+  &:hover .like-number {
+    opacity: 1;
+  }
+
+  &:hover .icon-default {
+    color: $primary;
+    opacity: 1;
+  }
+
+  &.toggled {
+    background-color: rgba(#593a48, 0.9);
+
+    &:hover {
+      background-color: darken(rgba(#593a48, 0.9), 2%);
+    }
+  }
+}
+
+.like-button .icon-default {
+  color: $white;
+  opacity: 0.7;
+  transition: 0.2s;
+}
+
+.like-button .icon-toggled {
+  color: $primary;
+  animation: pulse 0.3s ease;
+}
+
+.like-button .icon-toggled:hover {
+  color: $primary;
+}
+
+.like-number {
+  font-size: 14px;
+  font-weight: 400 !important;
+  opacity: 0.8;
+  transition: 0.2s;
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.3);
+  }
+  100% {
+    transform: scale(1);
+  }
+}

@@ -148,7 +148,7 @@ styles with important tags:
   }
 
   .container {
-    max-width: 1200px !important;
+    max-width: 1280px !important;
   }
 
   .container,
@@ -296,19 +296,14 @@ styles with important tags:
     border-left: none;
     border-right: none;
     border-radius: 0px;
-    box-shadow: 0 0 0 1px rgba(0 0 0 / 16%), 0 70px 65px rgb(0 0 0 / 8%),
-      0 30px 30px rgb(0 0 0 / 7%), 0 15px 15px rgb(0 0 0 / 5%),
-      0 10px 8px rgb(0 0 0 / 3%), 0 4px 4px rgb(0 0 0 / 2%),
+    box-shadow:
+      0 0 0 1px rgba(0 0 0 / 16%),
+      0 70px 65px rgb(0 0 0 / 8%),
+      0 30px 30px rgb(0 0 0 / 7%),
+      0 15px 15px rgb(0 0 0 / 5%),
+      0 10px 8px rgb(0 0 0 / 3%),
+      0 4px 4px rgb(0 0 0 / 2%),
       0 2px 2px rgb(0 0 0 / 1%) !important;
-
-    &.panel-clear {
-      padding-left: 1rem;
-      padding-right: 1rem;
-      background-color: transparent;
-      border: none;
-      border-color: transparent !important;
-      box-shadow: none !important;
-    }
 
     .video-bg {
       background-color: $black;
@@ -354,6 +349,15 @@ styles with important tags:
         }
       }
     }
+  }
+
+  .panel-clear {
+    padding-left: 1rem;
+    padding-right: 1rem;
+    background-color: transparent;
+    border: none;
+    border-color: transparent !important;
+    box-shadow: none !important;
   }
 
   .menu {
@@ -1020,9 +1024,13 @@ styles with important tags:
     background-color: $panel !important;
     min-height: 220px;
     height: 100%;
-    box-shadow: 0 0 0 1px rgba(0 0 0 / 30%), 0 70px 65px rgb(0 0 0 / 10%),
-      0 30px 30px rgb(0 0 0 / 8%), 0 15px 15px rgb(0 0 0 / 6%),
-      0 10px 8px rgb(0 0 0 / 4%), 0 4px 4px rgb(0 0 0 / 2%),
+    box-shadow:
+      0 0 0 1px rgba(0 0 0 / 30%),
+      0 70px 65px rgb(0 0 0 / 10%),
+      0 30px 30px rgb(0 0 0 / 8%),
+      0 15px 15px rgb(0 0 0 / 6%),
+      0 10px 8px rgb(0 0 0 / 4%),
+      0 4px 4px rgb(0 0 0 / 2%),
       0 2px 2px rgb(0 0 0 / 1%) !important;
   }
 
@@ -1031,9 +1039,13 @@ styles with important tags:
     border-radius: 0.5rem;
     background-color: $panel !important;
     min-height: 650px;
-    box-shadow: 0 0 0 1px rgba(0 0 0 / 30%), 0 70px 65px rgb(0 0 0 / 10%),
-      0 30px 30px rgb(0 0 0 / 8%), 0 15px 15px rgb(0 0 0 / 6%),
-      0 10px 8px rgb(0 0 0 / 4%), 0 4px 4px rgb(0 0 0 / 2%),
+    box-shadow:
+      0 0 0 1px rgba(0 0 0 / 30%),
+      0 70px 65px rgb(0 0 0 / 10%),
+      0 30px 30px rgb(0 0 0 / 8%),
+      0 15px 15px rgb(0 0 0 / 6%),
+      0 10px 8px rgb(0 0 0 / 4%),
+      0 4px 4px rgb(0 0 0 / 2%),
       0 2px 2px rgb(0 0 0 / 1%) !important;
   }
 
@@ -1633,18 +1645,18 @@ textarea {
       padding-left: var(--bs-gutter-x, 1.75rem);
       margin-right: auto;
       margin-left: auto;
-      max-width: 1200px;
+      max-width: 1280px;
       border-radius: 0.5rem;
     }
 
     .panel {
       border-radius: 0.5rem;
       border: 1px solid;
+    }
 
-      &.panel-clear {
-        padding-left: 0rem;
-        padding-right: 0rem;
-      }
+    .panel-clear {
+      padding-left: 0rem;
+      padding-right: 0rem;
     }
 
     ul.patrons-list {
