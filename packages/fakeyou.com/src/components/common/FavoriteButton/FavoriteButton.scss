@@ -1,0 +1,83 @@
+@import "scss/colours.scss";
+
+.favorite-button {
+  display: flex;
+  align-items: center;
+  background-color: rgba(lighten($secondary, 5%), 0.9);
+  color: inherit;
+  border: none;
+  padding: 0;
+  font: inherit;
+  cursor: pointer;
+  outline: inherit;
+  font-size: 16px;
+  transition: 0.2s;
+  padding: 3px 8px;
+  border-radius: 0.5rem;
+
+  &.shadow {
+    box-shadow: 0 0 12px rgba($bg, 0.4) !important;
+
+    &:hover {
+      box-shadow: 0 0 12px rgba($bg, 0.4) !important;
+    }
+  }
+
+  &:hover {
+    background: rgba(lighten($secondary, 10%), 0.9);
+  }
+
+  &:hover .favorite-number {
+    opacity: 1;
+  }
+
+  &:hover .icon-default {
+    color: map-get($badge-colors, "yellow");
+    opacity: 1;
+  }
+
+  &.toggled {
+    background-color: darken(rgba(map-get($badge-colors, "yellow"), 0.9), 32%);
+
+    &:hover {
+      background-color: darken(
+        rgba(map-get($badge-colors, "yellow"), 0.9),
+        25%
+      );
+    }
+  }
+}
+
+.favorite-button .icon-default {
+  color: $white;
+  opacity: 0.7;
+  transition: 0.2s;
+}
+
+.favorite-button .icon-toggled {
+  color: map-get($badge-colors, "yellow");
+  animation: pulse 0.3s ease;
+}
+
+.favorite-button .icon-toggled:hover {
+  color: map-get($badge-colors, "yellow");
+}
+
+.favorite-number {
+  font-size: 14px;
+  font-weight: 400 !important;
+  opacity: 0.8;
+  transition: 0.2s;
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.3);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
