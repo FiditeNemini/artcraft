@@ -24,10 +24,14 @@ use tokens::tokens::users::UserToken;
 
 
 #[derive(Deserialize)]
+pub struct DeleteWeightPathInfo {
+  weight_token: String, 
+}
+
+#[derive(Deserialize)]
 pub struct DeleteWeightRequest {
   set_delete: bool,
-  as_mod: bool,
-  weight_token: String, 
+  as_mod: bool
 }
 
 // =============== Error Response ===============
@@ -64,7 +68,8 @@ impl fmt::Display for DeleteWeightError {
 
 pub async fn delete_weight_handler(
     http_request: HttpRequest,
-    path: Path<DeleteWeightRequest>,
+    path: Path<DeleteWeightPathInfo>,
+    request: web::Json<DeleteWeightRequest>,
     server_state: web::Data<Arc<ServerState>>
   ) -> Result<HttpResponse, DeleteWeightError>{
     let maybe_user_session = server_state
@@ -112,9 +117,9 @@ pub async fn delete_weight_handler(
       return Err(DeleteWeightError::NotAuthorized);
     }
   
-    let delete_role = delete_role_disambiguation(is_mod, is_creator, Some(path.as_mod));
-  
-    let query_result = if path.set_delete {
+    let delete_role = delete_role_disambiguation(is_mod, is_creator, Some(request.as_mod));
+
+    let query_result = if request.set_delete {
       match delete_role {
         DeleteRole::ErrorDoNotDelete => {
           warn!("user is not allowed to delete weights: {}", user_session.user_token);

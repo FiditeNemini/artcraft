@@ -19,7 +19,6 @@ use crate::server_state::ServerState;
 /// TODO will eventually be polymorphic
 #[derive(Deserialize)]
 pub struct UpdateWeightRequest {
-    pub weight_token: String,
     pub title: Option<String>,
     pub thumbnail_token: Option<String>,
     pub description_markdown: Option<String>,
@@ -127,25 +126,9 @@ pub async fn update_weight_handler(
         return Err(UpdateWeightError::NotAuthorized);
     }
 
-    let mut weight_type = None;
-    let mut weight_category = None;
-
-    if let Some(wt) = request.weight_type.as_deref() {
-        weight_type = Some(wt.to_string());
-    }
-
-    if let Some(wc) = request.weight_category.as_deref() {
-        weight_category = Some(wc.to_string());
-    }
-
-    let mut maybe_mod_user_token = None;
-
-    if is_mod {
-        maybe_mod_user_token = Some(user_session.user_token.clone());
-    }
 
     let query_result = update_weights(UpdateWeightArgs {
-        weight_token: &ModelWeightToken::new(weight_token.clone()),
+        weight_token: &ModelWeightToken::new(path.weight_token.clone()),
         mysql_pool: &server_state.mysql_pool,
         title: request.title.as_deref(),
         maybe_thumbnail_token: request.thumbnail_token.as_deref(),

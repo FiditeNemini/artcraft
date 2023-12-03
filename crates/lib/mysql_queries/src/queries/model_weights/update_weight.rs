@@ -18,12 +18,8 @@ pub struct UpdateWeightArgs<'a> {
 }
 
 pub async fn update_weights(args: UpdateWeightArgs<'_>) -> AnyhowResult<()> {
-    let mut transaction = args.mysql_pool.begin().await?;
+    let transaction = args.mysql_pool.begin().await?;
 
-    let visbility: &str = match args.creator_set_visibility {
-        Some(visibility) => visibility.to_str(),
-        None => "",
-    };
 
     let query_result = sqlx::query!(
         r#"
@@ -37,11 +33,11 @@ pub async fn update_weights(args: UpdateWeightArgs<'_>) -> AnyhowResult<()> {
         version = version + 1
     WHERE token = ?
     "#,
-        args.title.as_deref().unwrap_or(""),
-        args.description_markdown.as_deref().unwrap_or(""),
-        args.maybe_thumbnail_token.as_deref().unwrap_or(""),
-        args.description_rendered_html.as_deref().unwrap_or(""),
-        visbility,
+        args.title.as_deref(),
+        args.description_markdown.as_deref(),
+        args.maybe_thumbnail_token.as_deref(),
+        args.description_rendered_html.as_deref(),
+        args.creator_set_visibility.as_deref(),
         args.weight_token.as_str()
     )
     .execute(args.mysql_pool).await;

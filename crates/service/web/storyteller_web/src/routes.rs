@@ -152,6 +152,9 @@ use crate::http_server::endpoints::w2l::set_w2l_template_mod_approval::set_w2l_t
 use crate::http_server::endpoints::weights::get_weight::get_weight_handler;
 use crate::http_server::endpoints::weights::delete_weight::delete_weight_handler;
 use crate::http_server::endpoints::weights::update_weight::update_weight_handler;
+use crate::http_server::endpoints::weights::list_availible_weights::list_availible_weights_handler;
+use crate::http_server::endpoints::weights::list_weights_by_user::list_weights_by_user_handler;
+
 
 pub fn add_routes<T, B> (app: App<T>, server_environment: ServerEnvironment) -> App<T>
   where
@@ -1223,7 +1226,6 @@ fn add_voice_designer_routes<T,B> (app:App<T>)-> App<T>
       )
 }
 
-
 // ==================== Weights ROUTES ====================
 fn add_weights_routes<T, B>(app: App<T>) -> App<T>
     where
@@ -1239,7 +1241,7 @@ fn add_weights_routes<T, B>(app: App<T>) -> App<T>
     app.service(
         web
             ::scope("/v1/weights")
-            // .route("/upload", web::post().to(upload_weights_handler))
+            //.route("/upload", web::post().to(upload_weights_handler))
             .service(
                 web
                     ::resource("/weight/{weight_token}")
