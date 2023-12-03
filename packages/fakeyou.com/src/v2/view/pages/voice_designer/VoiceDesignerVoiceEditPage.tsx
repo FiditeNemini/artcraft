@@ -68,7 +68,7 @@ function VoiceDesignerVoiceEditPage() {
 
       <Panel>
         <div className="d-flex flex-column gap-4 p-3 py-4 p-md-4">
-          <div className="row gy-4">
+          <div>
             <TempInput
               {...{
                 label: "Title",
