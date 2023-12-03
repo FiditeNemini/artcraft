@@ -37,6 +37,7 @@ use crate::http_server::endpoints::flags::design_refresh_flag::disable_design_re
 use crate::http_server::endpoints::flags::design_refresh_flag::enable_design_refresh_flag_handler::enable_design_refresh_flag_handler;
 use crate::http_server::endpoints::inference_job::get_inference_job_status::get_inference_job_status_handler;
 use crate::http_server::endpoints::inference_job::get_pending_inference_job_count::get_pending_inference_job_count_handler;
+use crate::http_server::endpoints::inference_job::kill_inference_jobs::kill_generic_inference_jobs_handler;
 use crate::http_server::endpoints::inference_job::terminate_inference_job_handler::terminate_inference_job_handler;
 use crate::http_server::endpoints::investor_demo::disable_demo_mode_handler::disable_demo_mode_handler;
 use crate::http_server::endpoints::investor_demo::enable_demo_mode_handler::enable_demo_mode_handler;
@@ -353,6 +354,11 @@ fn add_moderator_routes<T, B> (app: App<T>) -> App<T>
             .service(
               web::resource("/w2l_inference_queue_stats")
                   .route(web::get().to(get_w2l_inference_queue_count_handler))
+                  .route(web::head().to(|| HttpResponse::Ok()))
+            )
+            .service(
+              web::resource("/kill_generic")
+                  .route(web::post().to(kill_generic_inference_jobs_handler))
                   .route(web::head().to(|| HttpResponse::Ok()))
             )
       )
