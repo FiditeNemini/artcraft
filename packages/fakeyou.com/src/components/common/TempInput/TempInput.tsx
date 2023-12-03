@@ -15,7 +15,7 @@ export default function TempInput({
   ...rest
 }: InputProps) {
   return (
-    <div>
+    <>
       {label && <label className="sub-title">{label}</label>}
       <div className={`form-group ${icon ? "input-icon" : ""}`}>
         {icon && (
@@ -23,6 +23,6 @@ export default function TempInput({
         )}
         <input className="form-control" {...rest} />
       </div>
-    </div>
+    </>
   );
 }
