@@ -97,6 +97,7 @@ import { PasswordResetEmailPage } from "./pages/password_reset/PasswordResetEmai
 import { PasswordResetVerificationPage } from "./pages/password_reset/PasswordResetVerificationPage";
 import { NewProfilePage } from "./pages/profile/profile_view/NewProfilePage";
 import { ProfilePage } from "./pages/profile/profile_view/ProfilePage";
+import { ModerationJobControlPage } from "./pages/moderation/job_control/ModerationJobControlPage";
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -526,6 +527,12 @@ class PageContainer extends React.Component<
 
             <Route path="/moderation/job_stats">
               <ModerationJobStatsFc
+                sessionWrapper={this.props.sessionWrapper}
+              />
+            </Route>
+
+            <Route path="/moderation/job_control">
+              <ModerationJobControlPage
                 sessionWrapper={this.props.sessionWrapper}
               />
             </Route>
