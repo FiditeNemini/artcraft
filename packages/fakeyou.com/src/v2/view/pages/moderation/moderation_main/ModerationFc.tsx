@@ -38,12 +38,21 @@ function ModerationFc(props: Props) {
                 <FontAwesomeIcon icon={faBan} className="me-2" />
                 IP Bans
               </Link>
+
+              <Link
+                to="/moderation/job_control"
+                className="btn btn-primary w-100"
+              >
+                <FontAwesomeIcon icon={faListCheck} className="me-2" />
+                Job Control (New)
+              </Link>
+
               <Link
                 to="/moderation/job_stats"
                 className="btn btn-primary w-100"
               >
                 <FontAwesomeIcon icon={faListCheck} className="me-2" />
-                Job Stats
+                Job Stats (Old TTS + W2L)
               </Link>
             </div>
           </div>
