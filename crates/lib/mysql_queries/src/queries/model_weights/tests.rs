@@ -360,8 +360,8 @@ mod tests {
         
         let qb = ListWeightsQueryBuilder::new()
         .offset(Some(0))
-        .weights_type(WeightsType::LoRA)
-        .weights_category(WeightsCategory::ImageGeneration)
+        .weights_type(Some(WeightsType::LoRA))
+        .weights_category(Some(WeightsCategory::ImageGeneration))
         .limit(10)
         .scope_creator_username(Some("hanashi"))
         .include_user_deleted_results(false);
@@ -372,8 +372,8 @@ mod tests {
         assert_eq!(result.weights.len(), 10);
 
         let qb = ListWeightsQueryBuilder::new()
-        .weights_type(WeightsType::LoRA)
-        .weights_category(WeightsCategory::ImageGeneration)
+        .weights_type(Some(WeightsType::LoRA))
+        .weights_category(Some(WeightsCategory::ImageGeneration))
         .scope_creator_username(Some("hanashi"))
         .include_user_deleted_results(false)
         .offset(Some(10))
@@ -384,8 +384,8 @@ mod tests {
         assert_eq!(result.weights.len(), 10);
 
         let qb = ListWeightsQueryBuilder::new()
-        .weights_type(WeightsType::LoRA)
-        .weights_category(WeightsCategory::ImageGeneration)
+        .weights_type(Some(WeightsType::LoRA))
+        .weights_category(Some(WeightsCategory::ImageGeneration))
         .scope_creator_username(Some("hanashi"))
         .include_user_deleted_results(false)
         .offset(Some(10))
@@ -409,8 +409,8 @@ mod tests {
         
         let qb = ListWeightsQueryBuilder::new()
         .offset(Some(0))
-        .weights_type(WeightsType::LoRA)
-        .weights_category(WeightsCategory::ImageGeneration)
+        .weights_type(Some(WeightsType::LoRA))
+        .weights_category(Some(WeightsCategory::ImageGeneration))
         .limit(10)
         .scope_creator_username(Some("hanashi"))
         .include_user_deleted_results(false)
@@ -429,8 +429,8 @@ mod tests {
 
         let qb = ListWeightsQueryBuilder::new()
         .offset(Some(0))
-        .weights_type(WeightsType::LoRA)
-        .weights_category(WeightsCategory::ImageGeneration)
+        .weights_type(Some(WeightsType::LoRA))
+        .weights_category(Some(WeightsCategory::ImageGeneration))
         .limit(10)
         .scope_creator_username(Some("hanashi"))
         .include_user_deleted_results(false)
@@ -460,8 +460,8 @@ mod tests {
         
         let qb = ListWeightsQueryBuilder::new()
         .offset(Some(0))
-        .weights_type(WeightsType::LoRA)
-        .weights_category(WeightsCategory::ImageGeneration)
+        .weights_type(Some(WeightsType::LoRA))
+        .weights_category(Some(WeightsCategory::ImageGeneration))
         .limit(10)
         .scope_creator_username(Some("hanashi"))
         .include_user_deleted_results(false)
@@ -478,8 +478,8 @@ mod tests {
 
         let qb = ListWeightsQueryBuilder::new()
         .offset(Some(0))
-        .weights_type(WeightsType::LoRA)
-        .weights_category(WeightsCategory::ImageGeneration)
+        .weights_type(Some(WeightsType::LoRA))
+        .weights_category(Some(WeightsCategory::ImageGeneration))
         .limit(10)
         .scope_creator_username(Some("hanashi"))
         .include_user_deleted_results(false)
@@ -576,8 +576,8 @@ mod tests {
 
         // try a query with all the filters
         let qb = ListWeightsQueryBuilder::new()
-            .weights_type(WeightsType::Tacotron2)
-            .weights_category(WeightsCategory::TextToSpeech)
+            .weights_type(Some(WeightsType::Tacotron2))
+            .weights_category(Some(WeightsCategory::TextToSpeech))
             .scope_creator_username(Some("hanashi"))
             .include_user_deleted_results(false);
 
@@ -587,8 +587,8 @@ mod tests {
         assert_eq!(result.weights.len(), 2);
 
         let qb = ListWeightsQueryBuilder::new()
-        .weights_type(WeightsType::LoRA)
-        .weights_category(WeightsCategory::ImageGeneration)
+        .weights_type(Some(WeightsType::LoRA))
+        .weights_category(Some(WeightsCategory::ImageGeneration))
         .scope_creator_username(Some("hanashi"))
         .include_user_deleted_results(false);
 
