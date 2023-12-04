@@ -133,13 +133,13 @@ impl ListWeightsQueryBuilder {
         self
     }
 
-    pub fn weights_type(mut self, weights_type: WeightsType) -> Self {
-        self.weights_type = Some(weights_type);
+    pub fn weights_type(mut self, weights_type: Option<WeightsType>) -> Self {
+        self.weights_type = weights_type;
         self
     }
 
-    pub fn weights_category(mut self, weights_category: WeightsCategory) -> Self {
-        self.weights_category = Some(weights_category);
+    pub fn weights_category(mut self, weights_category: Option<WeightsCategory>) -> Self {
+        self.weights_category = weights_category;
         self
     }
 
