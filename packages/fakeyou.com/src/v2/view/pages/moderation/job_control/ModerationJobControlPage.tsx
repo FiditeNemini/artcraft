@@ -39,7 +39,7 @@ function ModerationJobControlPage(props: Props) {
         break;
       case 'rvc_v2':
       case 'so_vits_svc':
-      case 'tt2':
+      case 'tacotron2':
         requestTarget = { 'model_type': target };
         break;
     }
@@ -110,7 +110,7 @@ function ModerationJobControlPage(props: Props) {
                 <option value="voice_conversion">Category: Voice Conversion (RVC, SVC, etc.)</option>
                 <option value="rvc_v2">Model type: RVCv2</option>
                 <option value="so_vits_svc">Model type: SVC</option>
-                <option value="tt2">Model type: TT2</option>
+                <option value="tacotron2">Model type: TT2</option>
               </select>
             </div>
             <br />
