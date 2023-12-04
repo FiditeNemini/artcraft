@@ -177,11 +177,11 @@ pub async fn process_create_voice(
   for downloader in model_dependencies.downloaders.all_downloaders() {
     let result = downloader.download_if_not_on_filesystem(
       &args.job_dependencies.buckets.private_bucket_client,
-      &args.job_dependencies.fs.scoped_temp_dir_creator_for_downloads
+      &args.job_dependencies.fs.scoped_temp_dir_creator_for_short_lived_downloads
     ).await;
-    if let Err(e) = result {
-      error!("could not download: {:?}", e);
-      return Err(ProcessSingleJobError::from_anyhow_error(e));
+    if let Err(err) = result {
+      error!("could not download: {:?}", err);
+      return Err(err);
     }
   }
 

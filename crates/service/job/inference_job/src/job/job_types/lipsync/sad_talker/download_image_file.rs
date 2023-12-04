@@ -14,7 +14,7 @@ use mysql_queries::queries::media_uploads::get_media_upload_for_inference::get_m
 use tokens::tokens::media_uploads::MediaUploadToken;
 
 use crate::job::job_loop::process_single_job_error::ProcessSingleJobError;
-use crate::util::maybe_download_file_from_bucket::maybe_download_file_from_bucket;
+use crate::util::maybe_download_file_from_bucket::{maybe_download_file_from_bucket, MaybeDownloadArgs};
 use crate::util::scoped_temp_dir_creator::ScopedTempDirCreator;
 
 pub struct ImageFile {
@@ -65,16 +65,17 @@ pub async fn download_image_file(
 
   let downloaded_filesystem_path = work_temp_dir.path().join("image.bin");
 
-  maybe_download_file_from_bucket(
-    "image file",
-    &downloaded_filesystem_path,
-    &bucket_object_path,
-    public_bucket_client,
+  maybe_download_file_from_bucket(MaybeDownloadArgs {
+    name_or_description_of_file: "image file",
+    final_filesystem_file_path: &downloaded_filesystem_path,
+    bucket_object_path: &bucket_object_path,
+    bucket_client: public_bucket_client,
     job_progress_reporter,
-    "downloading",
-    job.id.0,
-    &temp_dir_creator,
-  ).await?;
+    job_progress_update_description: "downloading",
+    job_id: job.id.0,
+    scoped_tempdir_creator: &temp_dir_creator,
+    maybe_existing_file_minimum_size_required: None,
+  }).await?;
 
   Ok(ImageFile {
     filesystem_path: downloaded_filesystem_path,

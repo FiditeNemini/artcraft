@@ -375,6 +375,8 @@ pub async fn enqueue_infer_tts_handler(
     TtsModelType::Vits => InferenceModelType::Vits,
   };
 
+  let max_duration_seconds = plan.tts_max_duration_seconds();
+
   if use_new_job_system {
     // This branch uses the `generic-inference-job` service and tables.
     info!("Creating tts inference job record (new generic job system)...");
@@ -393,6 +395,7 @@ pub async fn enqueue_infer_tts_handler(
       maybe_input_source_token: None, // NB: TTS doesn't have input media
       maybe_input_source_token_type: None, // NB: TTS doesn't have input media
       maybe_raw_inference_text: Some(inference_text.as_str()),
+      maybe_max_duration_seconds: Some(max_duration_seconds),
       maybe_inference_args: Some(GenericInferenceArgs {
         inference_category: Some(InferenceCategoryAbbreviated::TextToSpeech),
         args: None, // NB: We don't need to encode any args yet.
@@ -435,7 +438,7 @@ pub async fn enqueue_infer_tts_handler(
         .set_creator_ip_address(&ip_address)
         .set_creator_set_visibility(set_visibility.to_str())
         .set_priority_level(priority_level)
-        .set_max_duration_seconds(plan.tts_max_duration_seconds())
+        .set_max_duration_seconds(max_duration_seconds)
         .set_is_from_api(is_from_api)
         .set_is_debug_request(is_debug_request)
         .insert(&server_state.mysql_pool)

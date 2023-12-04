@@ -5,11 +5,11 @@ use anyhow::anyhow;
 use log::{error, info, warn};
 
 use buckets::public::media_files::original_file::MediaFileBucketPath;
-use container_common::filesystem::check_file_exists::check_file_exists;
-use container_common::filesystem::safe_delete_temp_directory::safe_delete_temp_directory;
-use container_common::filesystem::safe_delete_temp_file::safe_delete_temp_file;
 use enums::by_table::generic_inference_jobs::inference_result_type::InferenceResultType;
+use filesys::check_file_exists::check_file_exists;
 use filesys::file_size::file_size;
+use filesys::safe_delete_temp_directory::safe_delete_temp_directory;
+use filesys::safe_delete_temp_file::safe_delete_temp_file;
 use hashing::sha256::sha256_hash_file::sha256_hash_file;
 use mimetypes::mimetype_for_file::get_mimetype_for_file;
 use mysql_queries::queries::generic_inference::job::list_available_generic_inference_jobs::AvailableInferenceJob;
@@ -74,12 +74,12 @@ pub async fn process_job(args: SadTalkerProcessJobArgs<'_>) -> Result<JobSuccess
 
     let result = downloader.download_if_not_on_filesystem(
       &args.job_dependencies.buckets.private_bucket_client,
-      &args.job_dependencies.fs.scoped_temp_dir_creator_for_downloads,
+      &args.job_dependencies.fs.scoped_temp_dir_creator_for_short_lived_downloads,
     ).await;
 
-    if let Err(e) = result {
-      error!("could not download: {:?}", e);
-      return Err(ProcessSingleJobError::from_anyhow_error(e))
+    if let Err(err) = result {
+      error!("could not download: {:?}", err);
+      return Err(err);
     }
   }
 

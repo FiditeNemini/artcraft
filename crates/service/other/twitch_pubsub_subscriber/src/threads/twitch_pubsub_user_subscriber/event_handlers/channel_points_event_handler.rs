@@ -6,8 +6,8 @@ use log::info;
 use sqlx::MySql;
 use twitch_api2::pubsub::channel_points::{ChannelPointsChannelV1, ChannelPointsChannelV1Reply, Redemption};
 
+use collections::random_from_vec::random_from_vec;
 use container_common::anyhow_result::AnyhowResult;
-use container_common::collections::random_from_vec::random_from_vec;
 use mysql_queries::column_types::twitch_event_category::TwitchEventCategory;
 use mysql_queries::complex_models::event_match_predicate::EventMatchPredicate;
 use mysql_queries::complex_models::event_responses::EventResponse;

@@ -7,6 +7,7 @@ use errors::{anyhow, AnyhowResult};
 pub fn file_size<P: AsRef<Path>>(filename: P) -> AnyhowResult<u64> {
   let metadata = std::fs::metadata(filename.as_ref())?;
 
+  // TODO(bt,2023-11-29): Return io::Result and errors here.
   if !metadata.is_file() {
     Err(anyhow!("path {:?} is not a file", filename.as_ref()))
   } else if metadata.is_symlink() {

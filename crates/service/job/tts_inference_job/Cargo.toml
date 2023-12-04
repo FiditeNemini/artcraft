@@ -16,9 +16,11 @@ path = "src/main.rs"
 
 # Internal
 cloud_storage = { path = "../../../lib/api_clients/cloud_storage" }
+collections = { path = "../../../lib/collections" }
 config = { path = "../../../lib/deprecated/config" }
 container_common = { path = "../../../lib/deprecated/container_common" }
 easyenv = { path = "../../../lib/easyenv" }
+filesys = { path = "../../../lib/files/filesys" }
 hashing = { path = "../../../lib/files/hashing" }
 jobs_common = { path = "../../../lib/jobs_common" }
 memory_caching = { path = "../../../lib/caching/memory_caching" }

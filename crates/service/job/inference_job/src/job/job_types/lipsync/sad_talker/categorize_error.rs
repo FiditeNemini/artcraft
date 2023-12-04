@@ -13,7 +13,9 @@ pub fn categorize_error(stderr_contents: &str) -> Option<ProcessSingleJobError> 
 #[cfg(test)]
 mod tests {
   use anyhow::bail;
-  use container_common::anyhow_result::AnyhowResult;
+
+  use errors::AnyhowResult;
+
   use crate::job::job_loop::process_single_job_error::ProcessSingleJobError;
   use crate::job::job_types::lipsync::sad_talker::categorize_error::categorize_error;
 

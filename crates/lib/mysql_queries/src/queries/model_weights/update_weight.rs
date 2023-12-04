@@ -55,4 +55,22 @@ pub async fn update_weights(args: UpdateWeightArgs<'_>) -> AnyhowResult<()> {
 #[cfg(test)]
 mod tests {
 
+    // Template
+    use sqlx::mysql::MySqlPoolOptions;
+    use tokio;
+
+    use config::shared_constants::DEFAULT_MYSQL_CONNECTION_STRING;
+    use errors::AnyhowResult;
+
+    #[tokio::test]
+    async fn test_update_weights() -> AnyhowResult<()> {
+        let db_connection_string = DEFAULT_MYSQL_CONNECTION_STRING;
+
+        let pool = MySqlPoolOptions::new()
+            .max_connections(3)
+            .connect(&db_connection_string)
+            .await?;
+
+        Ok(())
+    }
 }

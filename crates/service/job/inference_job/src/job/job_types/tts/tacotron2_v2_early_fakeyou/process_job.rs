@@ -7,11 +7,11 @@ use anyhow::anyhow;
 use log::{error, info};
 use tempdir::TempDir;
 
-use container_common::filesystem::check_file_exists::check_file_exists;
-use container_common::filesystem::safe_delete_temp_directory::safe_delete_temp_directory;
-use container_common::filesystem::safe_delete_temp_file::safe_delete_temp_file;
 use enums::by_table::generic_inference_jobs::inference_result_type::InferenceResultType;
 use errors::AnyhowResult;
+use filesys::check_file_exists::check_file_exists;
+use filesys::safe_delete_temp_directory::safe_delete_temp_directory;
+use filesys::safe_delete_temp_file::safe_delete_temp_file;
 use hashing::sha256::sha256_hash_string::sha256_hash_string;
 use mysql_queries::column_types::vocoder_type::VocoderType;
 use mysql_queries::queries::generic_inference::job::list_available_generic_inference_jobs::AvailableInferenceJob;
@@ -29,7 +29,7 @@ use crate::job::job_types::tts::tacotron2_v2_early_fakeyou::seconds_to_decoder_s
 use crate::job::job_types::tts::tacotron2_v2_early_fakeyou::tacotron2_inference_command::{InferenceArgs, MelMultiplyFactor};
 use crate::job::job_types::tts::tacotron2_v2_early_fakeyou::vocoder_option::VocoderForInferenceOption;
 use crate::job_dependencies::JobDependencies;
-use crate::util::maybe_download_file_from_bucket::maybe_download_file_from_bucket;
+use crate::util::maybe_download_file_from_bucket::{maybe_download_file_from_bucket, MaybeDownloadArgs};
 
 /// Text starting with this will be treated as a test request.
 /// This allows the request to bypass the model cache and query the latest TTS model.
@@ -58,7 +58,7 @@ pub async fn process_job(args: ProcessJobArgs<'_>) -> Result<JobSuccessResult, P
 
   // NB: The first time TT2 on inference-job was deployed, the filesystem filled up with
   // temporary directories. This is just being abundantly safe.
-  info!("Deleting temp directory: {:?}", work_temp_dir.path());
+  info!("(After job cleanup) Deleting temp directory: {:?}", work_temp_dir.path());
   safe_delete_temp_directory(&work_temp_dir);
 
   result
@@ -119,16 +119,17 @@ async fn process_job_with_cleanup(
       let custom_vocoder_fs_path = args.job_dependencies.fs.semi_persistent_cache.custom_vocoder_model_path(&vocoder.vocoder_token);
       let custom_vocoder_object_path  = args.job_dependencies.buckets.bucket_path_unifier.vocoder_path(&vocoder.vocoder_private_bucket_hash);
 
-      maybe_download_file_from_bucket(
-        "custom vocoder",
-        &custom_vocoder_fs_path,
-        &custom_vocoder_object_path,
-        &args.job_dependencies.buckets.private_bucket_client,
-        &mut job_progress_reporter,
-        "downloading user vocoder",
-        job.id.0,
-        &args.job_dependencies.fs.scoped_temp_dir_creator_for_downloads,
-      ).await?;
+      maybe_download_file_from_bucket(MaybeDownloadArgs {
+        name_or_description_of_file: "custom vocoder",
+        final_filesystem_file_path: &custom_vocoder_fs_path,
+        bucket_object_path: &custom_vocoder_object_path,
+        bucket_client: &args.job_dependencies.buckets.private_bucket_client,
+        job_progress_reporter: &mut job_progress_reporter,
+        job_progress_update_description: "downloading user vocoder",
+        job_id: job.id.0,
+        scoped_tempdir_creator: &args.job_dependencies.fs.scoped_temp_dir_creator_for_short_lived_downloads,
+        maybe_existing_file_minimum_size_required: Some(1000),
+      }).await?;
 
       Some(custom_vocoder_fs_path)
     }
@@ -140,16 +141,17 @@ async fn process_job_with_cleanup(
     let tts_synthesizer_fs_path = args.job_dependencies.fs.semi_persistent_cache.tts_synthesizer_model_path(tts_model.model_token.as_str());
     let tts_synthesizer_object_path  = args.job_dependencies.buckets.bucket_path_unifier.tts_synthesizer_path(&tts_model.private_bucket_hash);
 
-    maybe_download_file_from_bucket(
-      "synthesizer",
-      &tts_synthesizer_fs_path,
-      &tts_synthesizer_object_path,
-      &args.job_dependencies.buckets.private_bucket_client,
-      &mut job_progress_reporter,
-      "downloading synthesizer",
-      job.id.0,
-      &args.job_dependencies.fs.scoped_temp_dir_creator_for_downloads,
-    ).await?;
+    maybe_download_file_from_bucket(MaybeDownloadArgs {
+      name_or_description_of_file: "synthesizer",
+      final_filesystem_file_path: & tts_synthesizer_fs_path,
+      bucket_object_path: &tts_synthesizer_object_path,
+      bucket_client: &args.job_dependencies.buckets.private_bucket_client,
+      job_progress_reporter: &mut job_progress_reporter,
+      job_progress_update_description: "downloading synthesizer",
+      job_id: job.id.0,
+      scoped_tempdir_creator: &args.job_dependencies.fs.scoped_temp_dir_creator_for_short_lived_downloads,
+      maybe_existing_file_minimum_size_required: Some(1000),
+    }).await?;
 
     tts_synthesizer_fs_path
   };
@@ -238,12 +240,20 @@ async fn process_job_with_cleanup(
     maybe_mel_multiply_factor = Some(MelMultiplyFactor::DefaultMultiplyFactor);
   }
 
-  // TODO(bt,2023-11-27): Handle LRU cache on python side
-  let maybe_unload_model_path = None;
+  let maybe_unload_model_path = model_dependencies
+      .sidecar
+      .virtual_lfu_cache
+      .insert_returning_replaced(tts_synthesizer_fs_path.to_str().unwrap_or(""))
+      .map_err(|e| ProcessSingleJobError::Other(e))?;
+
+  if let Some(model_path) = maybe_unload_model_path.as_deref() {
+    info!("Remove model from sidecar LFU cache: {:?}", model_path);
+  }
 
   let inference_start_time = Instant::now();
 
   if model_dependencies.sidecar.use_sidecar_instead_of_shell {
+    info!("Calling inference sidecar...");
     let _r = model_dependencies.sidecar.inference_client.request_inference(
       &cleaned_inference_text,
       max_decoder_steps,
@@ -258,6 +268,7 @@ async fn process_job_with_cleanup(
       tts_model.maybe_custom_mel_multiply_factor,
     ).await.map_err(|e| ProcessSingleJobError::Other(e))?;
   } else {
+    info!("Shelling out for inference...");
     let _r = model_dependencies.inference_command.execute_inference(InferenceArgs {
       synthesizer_checkpoint_path: &tts_synthesizer_fs_path,
       text_pipeline_type: text_pipeline_type_or_guess.to_str(),
@@ -283,8 +294,14 @@ async fn process_job_with_cleanup(
   check_file_exists(&output_spectrogram_fs_path).map_err(|e| ProcessSingleJobError::Other(e))?;
   check_file_exists(&output_metadata_fs_path).map_err(|e| ProcessSingleJobError::Other(e))?;
 
+  info!("All required files exist!");
+
+  info!("Reading metadata file...");
+
   let file_metadata = read_metadata_file(&output_metadata_fs_path)
       .map_err(|e| ProcessSingleJobError::Other(e))?;
+
+  info!("Deleting metadata file...");
 
   safe_delete_temp_file(&output_metadata_fs_path);
 

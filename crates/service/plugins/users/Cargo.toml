@@ -39,9 +39,9 @@ dotenv = "0.15.0"
 lazy_static = "1.4.0" # Regex caching (TODO: Use OnceCell instead)
 log = "0.4.14"
 once_cell = "1.18.0"
-rand = "0.8.3"
+rand = "0.8.5"
 regex = "1.5.4"
-time = "0.2.26"
+time = "0.3.30"
 
 # Web
 actix-web = "4.4.0"

@@ -1,19 +1,13 @@
+use chrono::{DateTime, Utc};
+use sqlx::{Acquire, MySqlConnection, MySqlPool};
 
-use anyhow::anyhow;
-use chrono::{ DateTime, Utc };
-use enums::by_table::model_weights::weights_types;
-use log::{ info, warn };
-use sqlx::{ MySql, MySqlPool, query, Acquire, MySqlConnection };
-use sqlx::pool::PoolConnection;
-
+use enums::by_table::model_weights::{
+  weights_category::WeightsCategory,
+  weights_types::WeightsType,
+};
 use enums::common::visibility::Visibility;
 use errors::AnyhowResult;
 use tokens::tokens::model_weights::ModelWeightToken;
-
-use enums::by_table::model_weights::{
-    weights_types::WeightsType,
-    weights_category::WeightsCategory,
-};
 use tokens::tokens::users::UserToken;
 
 #[derive(Serialize)]
@@ -132,7 +126,7 @@ async fn get_raw_weights_by_creator_username(
             "#,
             creator_username).fetch_all(connection)
         .await?;
-        return Ok(raw_weights);
+        Ok(raw_weights)
     } else {
         let raw_weights: Vec<RawWeightJoinUser> = sqlx::query_as!(
             RawWeightJoinUser,

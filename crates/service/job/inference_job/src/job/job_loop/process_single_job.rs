@@ -11,7 +11,6 @@ use mysql_queries::queries::generic_inference::job::mark_generic_inference_job_s
 use redis_common::redis_keys::RedisKeys;
 
 use crate::job::job_loop::determine_dependency_status::determine_dependency_status;
-use crate::job::job_loop::job_success_result::ResultEntity;
 use crate::job::job_loop::process_single_job_error::ProcessSingleJobError;
 use crate::job::job_loop::process_single_job_success_case::ProcessSingleJobSuccessCase;
 use crate::job::job_types::lipsync::process_single_lipsync_job::process_single_lipsync_job;
@@ -41,14 +40,13 @@ pub async fn process_single_job(
   }
 
   // TODO(bt,2023-07-23): Re-review the following. It looks sus.
-  // TODO(bt,2023-07-23): Re-review the following. It looks sus.
-  // TODO(bt,2023-07-23): Re-review the following. It looks sus.
-  // TODO(bt,2023-07-23): Re-review the following. It looks sus.
   let dependency_status = determine_dependency_status(job_dependencies, job)
-      .await
-      .map_err(|err| ProcessSingleJobError::Other(anyhow!("database or cache error: {:?}", err)))?;
+      .await?;
 
-  if !force_execution && !dependency_status.models_already_on_filesystem {
+  if !force_execution
+      && !job_dependencies.job.system.always_allow_cold_filesystem_cache
+      && !dependency_status.models_already_on_filesystem
+  {
     match dependency_status.maybe_model_token {
       None => {} // No model token, proceed
       Some(model_token) => {
@@ -93,7 +91,7 @@ async fn process_single_job_wrap_with_logs(
 
   println!("\n  ----------------------------------------- JOB START -----------------------------------------  \n");
 
-  info!("Beginning work on job ({}): {:?}", job.id.0, job.inference_job_token);
+  info!("Lock acquired. Beginning work on job ({}): {:?}", job.id.0, job.inference_job_token);
   info!("Job category: {:?}", job.inference_category);
   info!("Job model type: {:?}", job.maybe_model_type);
   info!("Job model token: {:?}", job.maybe_model_token);
@@ -161,17 +159,18 @@ async fn do_process_single_job(
     }
   }
 
-  // ==================== SETUP TEMP DIRS ==================== //
-
-  let temp_dir = format!("temp_{}", job.id.0);
-  let temp_dir = job_dependencies.fs.scoped_temp_dir_creator_for_downloads.new_tempdir(&temp_dir)
-      .map_err(|err| ProcessSingleJobError::Other(anyhow!("filesystem error: {:?}", err)))?;
-
-  let _p = temp_dir.path(); // TODO: Just so the build doesn't complain about unused. Remove.
+// NB(bt,2023-11-29): This looks dead, but hopefully isn't leaned on for downstream side effects.
+// I'll leave this commented out while dealing with the outage, but this can probably be removed
+// in a short while after we redeploy and verify all the jobs.
+//  // ==================== SETUP TEMP DIRS ==================== //
+//
+//  let temp_dir = format!("temp_{}", job.id.0);
+//  let temp_dir = job_dependencies.fs.scoped_temp_dir_creator_for_short_lived_downloads.new_tempdir(&temp_dir)
+//      .map_err(|err| ProcessSingleJobError::Other(anyhow!("filesystem error: {:?}", err)))?;
+//
+//  let _p = temp_dir.path(); // TODO: Just so the build doesn't complain about unused. Remove.
 
   // ==================== HANDLE DIFFERENT INFERENCE TYPES ==================== //
-
-  let mut maybe_result_entity : Option<ResultEntity>;
 
   let job_success_result = match job.inference_category {
     InferenceCategory::LipsyncAnimation => {

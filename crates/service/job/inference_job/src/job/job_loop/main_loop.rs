@@ -1,4 +1,4 @@
-use std::time::Duration;
+use std::time::{Duration, Instant};
 
 use log::{error, info, warn};
 
@@ -23,6 +23,9 @@ const INCREASE_TIMEOUT_MILLIS : u64 = 1000;
 /// Pause file millis
 const PAUSE_FILE_EXISTS_WAIT_MILLIS : u64 = 1000 * 30;
 
+/// Warn on slow batch queries
+const SLOW_BATCH_QUERY_NOTICE_DURATION : Duration = Duration::from_millis(3500);
+
 pub async fn main_loop(job_dependencies: JobDependencies) {
   let mut noop_logger = NoOpLogger::new(job_dependencies.job.system.no_op_logger_millis as i64);
 
@@ -46,6 +49,8 @@ pub async fn main_loop(job_dependencies: JobDependencies) {
 
     let maybe_scoped_model_types = job_dependencies.job.system.scoped_execution.get_scoped_model_types();
 
+    let batch_query_start_time = Instant::now();
+
     let maybe_available_jobs = list_available_generic_inference_jobs(ListAvailableGenericInferenceJobArgs {
       num_records: job_dependencies.job.system.job_batch_size,
       is_debug_worker: false, // TODO
@@ -54,6 +59,12 @@ pub async fn main_loop(job_dependencies: JobDependencies) {
       maybe_scope_by_job_category: None,
       mysql_pool: &job_dependencies.db.mysql_pool,
     }).await;
+
+    let batch_query_duration = Instant::now().duration_since(batch_query_start_time);
+
+    if batch_query_duration > SLOW_BATCH_QUERY_NOTICE_DURATION {
+      warn!("Batch query took duration: {:?}", &batch_query_duration);
+    }
 
     sort_by_priority = true;
     sort_by_priority_count += 1;
@@ -106,11 +117,13 @@ pub async fn main_loop(job_dependencies: JobDependencies) {
 //  This probably returns a struct or enum with some measure of how many GB need to be downloaded.
 
 async fn process_job_batch(job_dependencies: &JobDependencies, jobs: Vec<AvailableInferenceJob>) -> AnyhowResult<()> {
-  for job in jobs.into_iter() {
+  let job_count = jobs.len();
+  for (i, job) in jobs.into_iter().enumerate() {
     let result = process_single_job(job_dependencies, &job).await;
+
     match result {
       Ok(success_case) => {
-        info!("Job loop iteration \"success\": {:?}", success_case);
+        info!("Job loop iteration ({i} of {job_count} batch) \"success\": {:?}", success_case);
 
         let increment_success_count = match success_case {
           ProcessSingleJobSuccessCase::JobCompleted => true,
@@ -125,7 +138,10 @@ async fn process_job_batch(job_dependencies: &JobDependencies, jobs: Vec<Availab
         }
       },
       Err(err) => {
-        warn!("Failure to process job: {:?}", err);
+        error!(
+          r#"Failure to process job ({i} of {job_count} batch): {:?} -
+            {:?}
+          "#,job.inference_job_token, err);
         let _r = handle_error(&job_dependencies, &job, err).await?;
       }
     }
@@ -191,7 +207,14 @@ async fn handle_error(job_dependencies: &&JobDependencies, job: &AvailableInfere
         None,
         Some(FrontendFailureCategory::FaceNotDetected),
       ),
-
+    ProcessSingleJobError::ModelDeleted =>
+      (
+        JobFailureClass::PermanentFailure,
+        ContainerHealth::Ignore,
+        "model deleted".to_string(),
+        None,
+        None,
+      ),
     // Non-permanent failures
     ProcessSingleJobError::FilesystemFull =>
       (
@@ -209,7 +232,14 @@ async fn handle_error(job_dependencies: &&JobDependencies, job: &AvailableInfere
         None, // Obviously don't tell the user about errors even we're not sure about
         Some(FrontendFailureCategory::RetryableWorkerError),
       ),
-
+    ProcessSingleJobError::IoError(ref err) =>
+      (
+        JobFailureClass::TransientFailure,
+        ContainerHealth::IncrementContainerFailCount,
+        format!("IoError: {:?}", err),
+        None, // Obviously don't tell the user about errors even we're not sure about
+        Some(FrontendFailureCategory::RetryableWorkerError),
+      ),
     ProcessSingleJobError::JobSystemMisconfiguration(ref maybe_reason) =>
       (
         JobFailureClass::TransientFailure,
@@ -261,6 +291,8 @@ async fn handle_error(job_dependencies: &&JobDependencies, job: &AvailableInfere
     ProcessSingleJobError::NotYetImplemented => {}
     ProcessSingleJobError::FaceDetectionFailure => {}
     ProcessSingleJobError::JobSystemMisconfiguration(_) => {}
+    ProcessSingleJobError::ModelDeleted => {}
+    ProcessSingleJobError::IoError(_) => {}
   }
 
   Ok(())

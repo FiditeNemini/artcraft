@@ -32,8 +32,8 @@ use concurrency::relaxed_atomic_bool::RelaxedAtomicBool;
 use config::common_env::CommonEnv;
 use config::shared_constants::DEFAULT_MYSQL_CONNECTION_STRING;
 use config::shared_constants::DEFAULT_RUST_LOG;
-use container_common::anyhow_result::AnyhowResult;
-use container_common::filesystem::check_directory_exists::check_directory_exists;
+use errors::AnyhowResult;
+use filesys::check_directory_exists::check_directory_exists;
 use filesys::create_dir_all_if_missing::create_dir_all_if_missing;
 use jobs_common::job_progress_reporter::job_progress_reporter::JobProgressReporterBuilder;
 use jobs_common::job_progress_reporter::noop_job_progress_reporter::NoOpJobProgressReporterBuilder;
@@ -119,35 +119,10 @@ async fn main() -> AnyhowResult<()> {
   )?;
 
   // Where we download models and resources to (typically a shared NFS volume in prod).
-  let temp_directory_downloads = easyenv::get_env_pathbuf_or_default(
-    "TEMP_DIR_DOWNLOADS",
-    PathBuf::from("/tmp/downloads")
-  );
 
-  // Where we store scratch files for workloads (temporary processing).
-  let temp_directory_work = easyenv::get_env_pathbuf_or_default(
-    "TEMP_DIR_WORK",
-    PathBuf::from("/tmp/work")
-  );
-
-  if !container_environment.server_environment.is_deployed_in_production() {
-    warn!("Creating temporary directories for non-production / development only!");
-    create_dir_all_if_missing(&temp_directory_downloads)?;
-    create_dir_all_if_missing(&temp_directory_work)?;
-  }
-
-  check_directory_exists(&temp_directory_downloads)?;
-  check_directory_exists(&temp_directory_work)?;
-
-  let semi_persistent_cache =
-      SemiPersistentCacheDir::configured_root(&temp_directory_downloads);
-
-  // TODO(bt,2023.05.22): create_all_paths() for some subset of jobs.
-  info!("Creating pod semi-persistent cache dirs...");
-  semi_persistent_cache.create_custom_vocoder_model_path()?;
-  semi_persistent_cache.create_tts_pretrained_vocoder_model_path()?;
-  semi_persistent_cache.create_tts_synthesizer_model_path()?;
-  semi_persistent_cache.create_voice_conversion_model_path()?;
+  let semi_persistent_cache = SemiPersistentCacheDir::configured_root(
+    easyenv::get_env_pathbuf_or_default("SEMI_PERSISTENT_DIR_ROOT",
+                                        PathBuf::from("/tmp/persistent")));
 
   let db_connection_string =
       easyenv::get_env_string_or_default(
@@ -242,11 +217,16 @@ async fn main() -> AnyhowResult<()> {
       maybe_keepalive_redis_pool,
     },
     fs: FileSystemDetails {
-      temp_directory_downloads: temp_directory_downloads.clone(),
-      temp_directory_work: temp_directory_work.clone(),
       maybe_pause_file: easyenv::get_env_pathbuf_optional("PAUSE_FILE"),
-      scoped_temp_dir_creator_for_downloads: ScopedTempDirCreator::for_directory(&temp_directory_downloads),
-      scoped_temp_dir_creator_for_work: ScopedTempDirCreator::for_directory(&temp_directory_work),
+      scoped_temp_dir_creator_for_short_lived_downloads: ScopedTempDirCreator::for_directory(
+        easyenv::get_env_pathbuf_or_default(
+          "SCOPED_TEMP_DIR_SHORT_LIVED_DOWNLOADS", PathBuf::from("/tmp/downloads_short_lived"))),
+      scoped_temp_dir_creator_for_long_lived_downloads: ScopedTempDirCreator::for_directory(
+        easyenv::get_env_pathbuf_or_default(
+          "SCOPED_TEMP_DIR_LONG_LIVED_DOWNLOADS", PathBuf::from("/tmp/downloads_long_lived"))),
+      scoped_temp_dir_creator_for_work: ScopedTempDirCreator::for_directory(
+        easyenv::get_env_pathbuf_or_default(
+          "SCOPED_TEMP_DIR_WORK", PathBuf::from("/tmp/downloads_long_lived"))),
       semi_persistent_cache,
     },
     buckets: BucketDependencies {
@@ -263,6 +243,7 @@ async fn main() -> AnyhowResult<()> {
     job: JobSystemDependencies {
       system: JobSystemControls {
         scoped_execution,
+        always_allow_cold_filesystem_cache: easyenv::get_env_bool_or_default("ALWAYS_ALLOW_COLD_FILESYSTEM_CACHE", false),
         cold_filesystem_cache_starvation_threshold: easyenv::get_env_num("COLD_FILESYSTEM_CACHE_STARVATION_THRESHOLD", 3)?,
         job_batch_wait_millis: common_env.job_batch_wait_millis,
         job_max_attempts: common_env.job_max_attempts as u16,
@@ -306,6 +287,8 @@ async fn main() -> AnyhowResult<()> {
     },
   };
 
+  set_up_directories(&job_dependencies)?;
+
   std::thread::spawn(move || {
     let actix_runtime = actix_web::rt::System::new();
     let http_server_handle = launch_http_server(create_server_args);
@@ -322,3 +305,30 @@ async fn main() -> AnyhowResult<()> {
   Ok(())
 }
 
+fn set_up_directories(job_dependencies: &JobDependencies) -> AnyhowResult<()> {
+  info!("Setting up and checking file system paths for temporary work, ephemeral and persistent downloads, etc...");
+
+  let fs = &job_dependencies.fs;
+
+  if !job_dependencies.job.info.container.server_environment.is_deployed_in_production() {
+    warn!("Creating directories for non-production / development only!");
+
+    create_dir_all_if_missing(&fs.scoped_temp_dir_creator_for_long_lived_downloads.get_base_dir())?;
+    create_dir_all_if_missing(&fs.scoped_temp_dir_creator_for_short_lived_downloads.get_base_dir())?;
+    create_dir_all_if_missing(&fs.scoped_temp_dir_creator_for_work.get_base_dir())?;
+  }
+
+  check_directory_exists(fs.scoped_temp_dir_creator_for_long_lived_downloads.get_base_dir())?;
+  check_directory_exists(fs.scoped_temp_dir_creator_for_short_lived_downloads.get_base_dir())?;
+  check_directory_exists(fs.scoped_temp_dir_creator_for_work.get_base_dir())?;
+
+  // TODO(bt,2023.05.22): create_all_paths() for some subset of jobs.
+  info!("Creating semi-persistent cache dirs...");
+
+  fs.semi_persistent_cache.create_custom_vocoder_model_path()?;
+  fs.semi_persistent_cache.create_tts_pretrained_vocoder_model_path()?;
+  fs.semi_persistent_cache.create_tts_synthesizer_model_path()?;
+  fs.semi_persistent_cache.create_voice_conversion_model_path()?;
+
+  Ok(())
+}

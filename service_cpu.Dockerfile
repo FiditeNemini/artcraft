@@ -12,6 +12,7 @@ WORKDIR /tmp
 # NB: cmake is required for freetype-sys-0.13.1, which in turn has only been added for egui.
 # NB: fontconfig is required by servo-fontconfig-sys, which is in the dependency chain for egui.
 # NB: libfontconfig-dev is required by servo-fontconfig-sys, which is in the dependency chain for egui.
+# NB: pkg-config and libssl are for container TLS; we may switch to rustls in the future.
 RUN apt-get update \
     && DEBIAN_FRONTEND=noninteractive TZ=Etc/UTC apt-get install -y \
         build-essential \
@@ -19,6 +20,7 @@ RUN apt-get update \
         curl \
         fontconfig \
         libfontconfig1-dev \
+        libssl-dev \
         pkg-config
 
 # NB: Fix for fontconfig (servo-fontconfig-sys): https://github.com/alacritty/alacritty/issues/4423#issuecomment-727277235
@@ -158,8 +160,6 @@ WORKDIR /
 RUN apt-get update \
     && DEBIAN_FRONTEND=noninteractive TZ=Etc/UTC apt-get install -y \
         rsync \
-        curl \
-        libssl-dev \
         --no-install-recommends \
     && apt-get clean autoclean && apt-get autoremove -y && rm -rf /var/lib/{apt,dpkg,cache,log}/
 
@@ -176,6 +176,16 @@ COPY --from=builder /tmp/target/release/email-sender-job  /
 # Legacy apps:
 COPY --from=builder /tmp/target/release/tts-download-job /
 COPY --from=builder /tmp/target/release/tts-inference-job /
+
+# NB(bt,2023-11-28): These still seem essential even after switching to rustls
+# NB(bt,2023-11-30): I commented out the /etc/ssl copy and it broke certs, so this is *essential*
+# SSL certs are required for crypto
+COPY --from=builder /etc/ssl /etc/ssl
+
+# NB(bt,2023-11-28): These still seem essential even after switching to rustls
+# Required dynamically linked libraries
+COPY --from=builder /usr/lib/x86_64-linux-gnu/libssl.*             /lib/x86_64-linux-gnu/
+COPY --from=builder /usr/lib/x86_64-linux-gnu/libcrypto.*          /lib/x86_64-linux-gnu/
 
 # Container includes
 COPY includes/ /includes

@@ -1,15 +1,16 @@
 use std::collections::HashSet;
 use std::env;
 use std::ffi::OsString;
+use std::fs::File;
 use std::path::{Path, PathBuf};
 use std::time::Duration;
 
 use anyhow::anyhow;
 use log::info;
 use once_cell::sync::Lazy;
-use subprocess::{Popen, PopenConfig};
+use subprocess::{Popen, PopenConfig, Redirection};
 
-use container_common::anyhow_result::AnyhowResult;
+use errors::AnyhowResult;
 use filesys::path_to_string::path_to_string;
 use mysql_queries::payloads::generic_inference_args::generic_inference_args::FundamentalFrequencyMethodForJob;
 use subprocess_common::docker_options::{DockerFilesystemMount, DockerGpu, DockerOptions};
@@ -79,6 +80,8 @@ pub struct InferenceArgs<P: AsRef<Path>, Q: AsRef<Path>> {
 
   /// --output_audio_filename: output path of wav file.
   pub output_path: P,
+
+  pub stderr_output_file: P,
 
   /// --f0-method: f0 prediction method
   pub maybe_override_f0_method: Option<FundamentalFrequencyMethodForJob>,
@@ -266,6 +269,11 @@ impl RvcV2InferenceCommand {
     }
 
     let mut config = PopenConfig::default();
+
+    info!("stderr will be written to file: {:?}", args.stderr_output_file.as_ref());
+
+    let stderr_file = File::create(&args.stderr_output_file)?;
+    config.stderr = Redirection::File(stderr_file);
 
     if !env_vars.is_empty() {
       config.env = Some(env_vars);

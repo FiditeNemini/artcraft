@@ -7,11 +7,11 @@ use anyhow::anyhow;
 use log::{error, info};
 use tempdir::TempDir;
 
-use container_common::filesystem::check_file_exists::check_file_exists;
-use container_common::filesystem::safe_delete_temp_directory::safe_delete_temp_directory;
-use container_common::filesystem::safe_delete_temp_file::safe_delete_temp_file;
 use enums::by_table::generic_inference_jobs::inference_result_type::InferenceResultType;
 use errors::AnyhowResult;
+use filesys::check_file_exists::check_file_exists;
+use filesys::safe_delete_temp_directory::safe_delete_temp_directory;
+use filesys::safe_delete_temp_file::safe_delete_temp_file;
 use hashing::sha256::sha256_hash_string::sha256_hash_string;
 use mysql_queries::column_types::vocoder_type::VocoderType;
 use mysql_queries::queries::generic_inference::job::list_available_generic_inference_jobs::AvailableInferenceJob;
@@ -22,7 +22,7 @@ use crate::job::job_loop::job_success_result::{JobSuccessResult, ResultEntity};
 use crate::job::job_loop::process_single_job_error::ProcessSingleJobError;
 use crate::job::job_types::tts::vits::vits_inference_command::{Device, VitsInferenceArgs};
 use crate::job_dependencies::JobDependencies;
-use crate::util::maybe_download_file_from_bucket::maybe_download_file_from_bucket;
+use crate::util::maybe_download_file_from_bucket::{maybe_download_file_from_bucket, MaybeDownloadArgs};
 
 /// Text starting with this will be treated as a test request.
 /// This allows the request to bypass the model cache and query the latest TTS model.
@@ -70,16 +70,17 @@ pub async fn process_job(args: VitsProcessJobArgs<'_>) -> Result<JobSuccessResul
     // In the future we may need to "repair" broken models.
     let vits_traced_synthesizer_object_path  = args.job_dependencies.buckets.bucket_path_unifier.tts_traced_synthesizer_path(&tts_model.private_bucket_hash);
 
-    maybe_download_file_from_bucket(
-      "vits traced tts model",
-      &vits_traced_synthesizer_fs_path,
-      &vits_traced_synthesizer_object_path,
-      &args.job_dependencies.buckets.private_bucket_client,
-      &mut job_progress_reporter,
-      "downloading synthesizer",
-      job.id.0,
-      &args.job_dependencies.fs.scoped_temp_dir_creator_for_downloads,
-    ).await?;
+    maybe_download_file_from_bucket(MaybeDownloadArgs {
+      name_or_description_of_file: "vits traced tts model",
+      final_filesystem_file_path: &vits_traced_synthesizer_fs_path,
+      bucket_object_path: &vits_traced_synthesizer_object_path,
+      bucket_client: &args.job_dependencies.buckets.private_bucket_client,
+      job_progress_reporter: &mut job_progress_reporter,
+      job_progress_update_description: "downloading synthesizer",
+      job_id: job.id.0,
+      scoped_tempdir_creator: &args.job_dependencies.fs.scoped_temp_dir_creator_for_short_lived_downloads,
+      maybe_existing_file_minimum_size_required: None,
+    }).await?;
 
     vits_traced_synthesizer_fs_path
   };

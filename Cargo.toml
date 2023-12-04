@@ -27,6 +27,7 @@ members = [
   "crates/lib/bootstrap",
   "crates/lib/caching/memory_caching",
   "crates/lib/caching/redis_caching",
+  "crates/lib/collections",
   "crates/lib/concurrency",
   "crates/lib/cookies",
   "crates/lib/crockford",

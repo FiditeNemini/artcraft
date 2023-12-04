@@ -1,9 +1,10 @@
 use errors::AnyhowResult;
-use crate::job::job_types::tts::tacotron2_v2_early_fakeyou::health_check_state::HealthCheckState;
 
+use crate::job::job_types::tts::tacotron2_v2_early_fakeyou::health_check_state::HealthCheckState;
 use crate::job::job_types::tts::tacotron2_v2_early_fakeyou::tacotron2_inference_command::Tacotron2InferenceCommand;
 use crate::job::job_types::tts::tacotron2_v2_early_fakeyou::tacotron2_inference_sidecar_client::Tacotron2InferenceSidecarClient;
 use crate::job::job_types::tts::tacotron2_v2_early_fakeyou::tacotron2_sidecar_health_check_client::Tacotron2SidecarHealthCheckClient;
+use crate::job::job_types::tts::tacotron2_v2_early_fakeyou::virtual_lfu_cache::SyncVirtualLfuCache;
 
 pub struct Tacotron2Dependencies {
   pub inference_command: Tacotron2InferenceCommand,
@@ -26,6 +27,7 @@ pub struct SidecarDeps {
   pub inference_client: Tacotron2InferenceSidecarClient,
   pub health_check_client: Tacotron2SidecarHealthCheckClient,
   pub health_check_state: HealthCheckState,
+  pub virtual_lfu_cache: SyncVirtualLfuCache,
 }
 
 impl Tacotron2Dependencies {
@@ -53,6 +55,11 @@ impl Tacotron2Dependencies {
     let health_check_client=
         Tacotron2SidecarHealthCheckClient::new(&sidecar_hostname)?;
 
+    let sidecar_max_synthesizer_models = easyenv::get_env_num(
+      "TTS_SIDECAR_MAX_SYNTHESIZER_MODELS", 3)?;
+
+    let virtual_lfu_cache = SyncVirtualLfuCache::new(sidecar_max_synthesizer_models)?;
+
     Ok(Self {
       inference_command: Tacotron2InferenceCommand::from_env()?,
       waveglow_vocoder_model_filename,
@@ -63,6 +70,7 @@ impl Tacotron2Dependencies {
         inference_client,
         health_check_client,
         health_check_state: HealthCheckState::new(),
+        virtual_lfu_cache,
       }
     })
   }

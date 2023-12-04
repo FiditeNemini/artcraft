@@ -4,7 +4,7 @@ use hyper::client::Client;
 use hyper::Uri;
 use log::info;
 
-use container_common::anyhow_result::AnyhowResult;
+use errors::AnyhowResult;
 
 // TODO(bt): As more microservices adopt a common health check protocol,
 //  it may make sense to make this a common library.
