@@ -126,7 +126,6 @@ pub async fn update_weight_handler(
         return Err(UpdateWeightError::NotAuthorized);
     }
 
-
     let query_result = update_weights(UpdateWeightArgs {
         weight_token: &ModelWeightToken::new(path.weight_token.clone()),
         mysql_pool: &server_state.mysql_pool,
