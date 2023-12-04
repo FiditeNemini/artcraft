@@ -4,7 +4,6 @@ import mockMediaData from "./mockMediaData";
 import AudioCard from "components/common/Card/AudioCard";
 import ImageCard from "components/common/Card/ImageCard";
 import VideoCard from "components/common/Card/VideoCard";
-import Panel from "components/common/Panel";
 import { Select } from "components/common/Inputs/Inputs";
 import {
   faArrowDownWideShort,
@@ -33,7 +32,7 @@ export default function MediaTab() {
   ];
 
   return (
-    <Panel clear={true} padding={true}>
+    <>
       <div className="d-flex gap-2 mb-3">
         <Select
           icon={faArrowDownWideShort}
@@ -84,6 +83,6 @@ export default function MediaTab() {
           </MasonryGrid>
         )}
       </AudioPlayerProvider>
-    </Panel>
+    </>
   );
 }
