@@ -81,7 +81,7 @@ WHERE status IN(
   separated.push_unseparated(") ");
 
   if let Some(priority) = maybe_priority_or_lower {
-    query_builder.push(format!(" AND priority <= {priority} "));
+    query_builder.push(format!(" AND priority_level <= {priority} "));
   }
 
   match target {
@@ -136,7 +136,7 @@ mod tests {
     let statuses = HashSet::from([KillableStatus::Failed]);
     let builder = query_builder(statuses, KillableTarget::AllJobs, Some(10));
     let query = cleanup_query(&builder.into_sql());
-    assert_eq!(query, "UPDATE generic_inference_jobs SET status='cancelled_by_system' WHERE status IN( ?) AND priority <= 10".to_string());
+    assert_eq!(query, "UPDATE generic_inference_jobs SET status='cancelled_by_system' WHERE status IN( ?) AND priority_level <= 10".to_string());
   }
 
   #[test]
