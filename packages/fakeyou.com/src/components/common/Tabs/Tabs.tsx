@@ -10,6 +10,7 @@ interface TabProps {
   label: string;
   content?: React.ReactNode;
   icon?: IconDefinition;
+  padding?: boolean;
 }
 
 interface TabsProps {
@@ -18,6 +19,7 @@ interface TabsProps {
 
 interface TabContentProps {
   children: React.ReactNode;
+  padding?: boolean;
 }
 
 function Tab({ to, label, icon, onClick }: TabProps & { onClick: () => void }) {
@@ -36,14 +38,15 @@ function Tab({ to, label, icon, onClick }: TabProps & { onClick: () => void }) {
   );
 }
 
-function TabContent({ children }: TabContentProps) {
-  return <div className="tab-content">{children}</div>;
+function TabContent({ children, padding }: TabContentProps) {
+  const paddingClasses = padding ? "p-3 py-4 p-md-4" : "";
+  return <div className={`tab-content ${paddingClasses}`}>{children}</div>;
 }
 
 function Tabs({ tabs }: TabsProps) {
   const location = useLocation();
   const currentPath = location.pathname;
-  const initialTab = tabs.find((tab) => tab.to === currentPath) || tabs[0];
+  const initialTab = tabs.find(tab => tab.to === currentPath) || tabs[0];
   const [activeTab, setActiveTab] = useState(initialTab.to);
 
   const [fade, setFade] = useSpring(() => ({
@@ -68,10 +71,12 @@ function Tabs({ tabs }: TabsProps) {
     setTimeout(() => setActiveTab(tabTo), 50);
   };
 
+  const activeTabProps = tabs.find(tab => tab.to === activeTab);
+
   return (
     <nav>
       <ul className="nav nav-tabs">
-        {tabs.map((tab) => (
+        {tabs.map(tab => (
           <Tab
             key={tab.to}
             to={tab.to}
@@ -81,8 +86,8 @@ function Tabs({ tabs }: TabsProps) {
           />
         ))}
       </ul>
-      <TabContent>
-        {tabs.map((tab) => (
+      <TabContent padding={activeTabProps?.padding}>
+        {tabs.map(tab => (
           <a.div
             key={tab.to}
             style={fade}

@@ -62,7 +62,7 @@ function NewProfilePage(this: any, props: Props) {
   const [userData, setUserData] = useState<User | undefined>(undefined);
   const [notFoundState, setNotFoundState] = useState<boolean>(false);
 
-  const getUser = useCallback(async (username) => {
+  const getUser = useCallback(async username => {
     const response = await GetUserByUsername(username);
     if (GetUserByUsernameIsOk(response)) {
       setUserData(response);
@@ -359,18 +359,21 @@ function NewProfilePage(this: any, props: Props) {
       label: "Media",
       content: <MediaTab />,
       icon: faPhotoFilmMusic,
+      padding: true,
     },
     {
       to: `/dev-profile/${username}/weights`,
       label: "Weights",
       content: <WeightsTab />,
       icon: faLayerGroup,
+      padding: true,
     },
     {
       to: `/dev-profile/${username}/bookmarks`,
       label: "Bookmarks",
       content: <BookmarksTab />,
       icon: faBookmark,
+      padding: true,
     },
   ];
 
