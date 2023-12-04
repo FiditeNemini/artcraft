@@ -142,22 +142,22 @@ url = { version = "2.4.1", features = ["serde"] }
 [target.x86_64-unknown-linux-gnu.dependencies]
 openssl = { version = "0.10.59", features = ["vendored"] }
 openssl-sys = { version = "0.9.95", default-features = false, features = ["vendored"] }
-rustix = { version = "0.38.25", features = ["fs", "termios"] }
+rustix = { version = "0.38.26", features = ["fs", "termios"] }
 spin = { version = "0.9.8" }
 
 [target.x86_64-unknown-linux-gnu.build-dependencies]
 openssl = { version = "0.10.59", features = ["vendored"] }
 openssl-sys = { version = "0.9.95", default-features = false, features = ["vendored"] }
-rustix = { version = "0.38.25", features = ["fs", "termios"] }
+rustix = { version = "0.38.26", features = ["fs", "termios"] }
 socket2 = { version = "0.5.5", default-features = false, features = ["all"] }
 spin = { version = "0.9.8" }
 
 [target.x86_64-apple-darwin.dependencies]
-rustix = { version = "0.38.25", features = ["fs", "termios"] }
+rustix = { version = "0.38.26", features = ["fs", "termios"] }
 spin = { version = "0.9.8" }
 
 [target.x86_64-apple-darwin.build-dependencies]
-rustix = { version = "0.38.25", features = ["fs", "termios"] }
+rustix = { version = "0.38.26", features = ["fs", "termios"] }
 socket2 = { version = "0.5.5", default-features = false, features = ["all"] }
 spin = { version = "0.9.8" }
 
