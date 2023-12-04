@@ -9,7 +9,7 @@ use chrono::{DateTime, Utc};
 use log::warn;
 
 use enums::common::visibility::Visibility;
-use mysql_queries::queries::model_weights::list_weights_by_user::list_weights_by_creator_username;
+use mysql_queries::queries::model_weights::list_weights_by_user::{list_weights_by_creator_username, WeightsJoinUserRecord};
 use tokens::tokens::model_weights::ModelWeightToken;
 
 use crate::http_server::common_responses::user_details_lite::UserDetailsLight;
@@ -19,10 +19,22 @@ use crate::server_state::ServerState;
 pub struct Weight {
   weight_token: ModelWeightToken,
   title: String,
-
+  
   creator: UserDetailsLight,
-
   creator_set_visibility: Visibility,
+
+  maybe_thumbnail_token: Option<String>,
+    
+  description_markdown: String,
+  description_rendered_html: String,
+  
+  file_size_bytes: i32,
+  file_checksum_sha2: String,
+  cached_user_ratings_total_count: u32,
+  cached_user_ratings_positive_count: u32,
+  cached_user_ratings_negative_count: u32,
+  maybe_cached_user_ratings_ratio: Option<f32>,
+  cached_user_ratings_last_updated_at: DateTime<Utc>,
 
   created_at: DateTime<Utc>,
   updated_at: DateTime<Utc>,
@@ -96,17 +108,16 @@ pub async fn list_weights_by_user_handler(
     warn!("Error querying for weights: {:?}", e);
     ListWeightsByUserError::ServerError
   });
+
   let weights = match query_results {
     Ok(weights) => weights,
     Err(e) => {
       warn!("Error querying for weights: {:?}", e);
-
-
       return Err(ListWeightsByUserError::ServerError);
     }
   };
-  
-  let weights = weights.into_iter().map(|weight| {
+
+  let weights:Vec<Weight> = weights.into_iter().map(|weight| {
     Weight {
       weight_token: weight.token,
       title: weight.title,
@@ -116,16 +127,41 @@ pub async fn list_weights_by_user_handler(
         &weight.creator_display_name,
         &weight.creator_email_gravatar_hash,
       ),
+      maybe_thumbnail_token: weight.maybe_thumbnail_token,
+      description_markdown: weight.description_markdown,
+      description_rendered_html: weight.description_rendered_html,
+      file_size_bytes: weight.file_size_bytes,
+      file_checksum_sha2: weight.file_checksum_sha2,
+      cached_user_ratings_total_count: weight.cached_user_ratings_total_count,
+      cached_user_ratings_positive_count: weight.cached_user_ratings_positive_count,
+      cached_user_ratings_negative_count: weight.cached_user_ratings_negative_count,
+      maybe_cached_user_ratings_ratio: weight.maybe_cached_user_ratings_ratio,
+      cached_user_ratings_last_updated_at: weight.cached_user_ratings_last_updated_at,
       creator_set_visibility: weight.creator_set_visibility,
       created_at: weight.created_at,
       updated_at: weight.updated_at,
     }
   }).collect();
-  
-  let response = ListWeightsByUserSuccessResponse {
+
+  let final_weights:Vec<Weight>;
+
+  // if it's not the user ... then only show public weights else show private and public
+  if (creator_user_token != user_session.user_token) {
+    final_weights = weights.into_iter().filter(|weight| {
+      weight.creator_set_visibility == Visibility::Public
+    }).collect();
+ 
+  }  
+  else {
+    final_weights = weights;
+  }
+
+
+  let response: ListWeightsByUserSuccessResponse = ListWeightsByUserSuccessResponse {
     success: true,
-    weights,
+    weights: final_weights,
   };
+
   
   let body = serde_json::to_string(&response)
       .map_err(|e| ListWeightsByUserError::ServerError)?;

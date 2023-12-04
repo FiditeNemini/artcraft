@@ -77,11 +77,7 @@ pub async fn list_weights_by_creator_username(
     let raw_weights: Vec<RawWeightJoinUser> = get_raw_weights_by_creator_username(&mut connection, creator_username, can_see_deleted).await?;
     let weights_records: Vec<WeightsJoinUserRecord> = map_to_weights(raw_weights).await;
 
-    let filtered_weights: Vec<WeightsJoinUserRecord> = weights_records.into_iter().filter(|weight| {
-        weight.creator_username == creator_username && weight.creator_set_visibility == Visibility::Public && can_see_deleted
-    }).collect();
-
-    Ok(filtered_weights)
+    Ok(weights_records)
 }
 
 async fn get_raw_weights_by_creator_username(

@@ -292,6 +292,10 @@ mod tests {
         seed_weights_with_category_and_type(WeightsType::LoRA,WeightsCategory::ImageGeneration,5,&creator_username).await?;
 
         let weights_by_username = list_weights_by_creator_username(&pool, &creator_username, can_see_deleted).await?;
+        for weight in weights_by_username.iter() {
+            // print weight
+            println!("weight: {:?}", weight.creator_username);
+        }
         assert_eq!(weights_by_username.len(), 5);
 
         Ok(())
