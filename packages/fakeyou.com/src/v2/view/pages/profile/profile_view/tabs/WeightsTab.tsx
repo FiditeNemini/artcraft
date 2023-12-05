@@ -4,46 +4,113 @@ import mockWeightsData from "./mockWeightsData";
 import AudioCard from "components/common/Card/AudioCard";
 import ImageCard from "components/common/Card/ImageCard";
 import VideoCard from "components/common/Card/VideoCard";
-import { Select } from "components/common/Inputs/Inputs";
+import Select from "components/common/Select";
 import {
   faArrowDownWideShort,
   faFilter,
 } from "@fortawesome/pro-solid-svg-icons";
 import SkeletonCard from "components/common/Card/SkeletonCard";
+import Pagination from "components/common/Pagination";
 
 export default function WeightsTab() {
+  const gridContainerRef = useRef<HTMLDivElement | null>(null);
   const [data] = useState(mockWeightsData);
   const [isLoading] = useState(false);
+  const [selectedFilter, setSelectedFilter] = useState("all");
+  const [currentPage, setCurrentPage] = useState(0);
+  const itemsPerPage = 10;
 
-  const gridContainerRef = useRef<HTMLDivElement | null>(null);
+  const handlePageClick = (selectedItem: { selected: number }) => {
+    setCurrentPage(selectedItem.selected);
+  };
+
+  const currentItems = data.slice(
+    currentPage * itemsPerPage,
+    (currentPage + 1) * itemsPerPage
+  );
 
   const filterOptions = [
     { value: "all", label: "All Weights" },
     { value: "tts", label: "Text to Speech" },
     { value: "vc", label: "Voice to Voice" },
-    { value: "vd", label: "Voice Designer" },
+    { value: "sd", label: "Image Generation" },
   ];
 
   const sortOptions = [
     { value: "newest", label: "Newest" },
     { value: "oldest", label: "Oldest" },
-    { value: "mostliked", label: "Most Favorited" },
+    { value: "mostliked", label: "Most Bookmarked" },
   ];
+
+  const modelTtsOptions = [
+    { value: "all", label: "All Types" },
+    { value: "tt2", label: "Tacotron 2" },
+  ];
+
+  const modelVcOptions = [
+    { value: "all", label: "All Types" },
+    { value: "rvc", label: "RVCv2" },
+    { value: "svc", label: "SoVitsSvc" },
+  ];
+
+  const modelSdOptions = [
+    { value: "all", label: "All Types" },
+    { value: "lora", label: "LoRA" },
+    { value: "SD15", label: "SD 1.5" },
+    { value: "SDXL", label: "SD XL" },
+  ];
+
+  const handleFilterChange = (option: any) => {
+    const selectedOption = option as { value: string; label: string };
+    setSelectedFilter(selectedOption.value);
+  };
 
   return (
     <>
-      <div className="d-flex gap-2 mb-3">
-        <Select
-          icon={faArrowDownWideShort}
-          options={sortOptions}
-          defaultValue={sortOptions[0]}
-          isSearchable={false}
-        />
-        <Select
-          icon={faFilter}
-          options={filterOptions}
-          defaultValue={filterOptions[0]}
-          isSearchable={false}
+      <div className="d-flex flex-wrap gap-3 mb-3">
+        <div className="d-flex gap-2 flex-grow-1">
+          <Select
+            icon={faArrowDownWideShort}
+            options={sortOptions}
+            defaultValue={sortOptions[0]}
+            isSearchable={false}
+          />
+
+          <Select
+            icon={faFilter}
+            options={filterOptions}
+            defaultValue={filterOptions[0]}
+            isSearchable={false}
+            onChange={handleFilterChange}
+          />
+
+          {selectedFilter === "tts" && (
+            <Select
+              options={modelTtsOptions}
+              defaultValue={modelTtsOptions[0]}
+              isSearchable={false}
+            />
+          )}
+          {selectedFilter === "sd" && (
+            <Select
+              options={modelSdOptions}
+              defaultValue={modelSdOptions[0]}
+              isSearchable={false}
+            />
+          )}
+          {selectedFilter === "vc" && (
+            <Select
+              options={modelVcOptions}
+              defaultValue={modelVcOptions[0]}
+              isSearchable={false}
+            />
+          )}
+        </div>
+        <Pagination
+          itemsPerPage={itemsPerPage}
+          totalItems={data.length}
+          onPageChange={handlePageClick}
+          currentPage={currentPage}
         />
       </div>
       {isLoading ? (
@@ -57,7 +124,7 @@ export default function WeightsTab() {
           gridRef={gridContainerRef}
           onLayoutComplete={() => console.log("Layout complete!")}
         >
-          {data.map((data, index) => {
+          {currentItems.map((data, index) => {
             let card;
             switch (data.media_type) {
               case "audio":
@@ -80,6 +147,15 @@ export default function WeightsTab() {
           })}
         </MasonryGrid>
       )}
+
+      <div className="d-flex justify-content-end mt-4">
+        <Pagination
+          itemsPerPage={itemsPerPage}
+          totalItems={data.length}
+          onPageChange={handlePageClick}
+          currentPage={currentPage}
+        />
+      </div>
     </>
   );
 }

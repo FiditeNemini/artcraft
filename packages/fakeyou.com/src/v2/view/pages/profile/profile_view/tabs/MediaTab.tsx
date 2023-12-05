@@ -4,19 +4,30 @@ import mockMediaData from "./mockMediaData";
 import AudioCard from "components/common/Card/AudioCard";
 import ImageCard from "components/common/Card/ImageCard";
 import VideoCard from "components/common/Card/VideoCard";
-import { Select } from "components/common/Inputs/Inputs";
+import Select from "components/common/Select";
 import {
   faArrowDownWideShort,
   faFilter,
 } from "@fortawesome/pro-solid-svg-icons";
 import AudioPlayerProvider from "components/common/AudioPlayer/AudioPlayerContext";
 import SkeletonCard from "components/common/Card/SkeletonCard";
+import Pagination from "components/common/Pagination";
 
 export default function MediaTab() {
+  const gridContainerRef = useRef<HTMLDivElement | null>(null);
   const [data] = useState(mockMediaData);
   const [isLoading] = useState(false);
+  const [currentPage, setCurrentPage] = useState(0);
+  const itemsPerPage = 10;
 
-  const gridContainerRef = useRef<HTMLDivElement | null>(null);
+  const handlePageClick = (selectedItem: { selected: number }) => {
+    setCurrentPage(selectedItem.selected);
+  };
+
+  const currentItems = data.slice(
+    currentPage * itemsPerPage,
+    (currentPage + 1) * itemsPerPage
+  );
 
   const filterOptions = [
     { value: "all", label: "All Media" },
@@ -33,18 +44,26 @@ export default function MediaTab() {
 
   return (
     <>
-      <div className="d-flex gap-2 mb-3">
-        <Select
-          icon={faArrowDownWideShort}
-          options={sortOptions}
-          defaultValue={sortOptions[0]}
-          isSearchable={false}
-        />
-        <Select
-          icon={faFilter}
-          options={filterOptions}
-          defaultValue={filterOptions[0]}
-          isSearchable={false}
+      <div className="d-flex flex-wrap gap-3 mb-3">
+        <div className="d-flex gap-2 flex-grow-1">
+          <Select
+            icon={faArrowDownWideShort}
+            options={sortOptions}
+            defaultValue={sortOptions[0]}
+            isSearchable={false}
+          />
+          <Select
+            icon={faFilter}
+            options={filterOptions}
+            defaultValue={filterOptions[0]}
+            isSearchable={false}
+          />
+        </div>
+        <Pagination
+          itemsPerPage={itemsPerPage}
+          totalItems={data.length}
+          onPageChange={handlePageClick}
+          currentPage={currentPage}
         />
       </div>
       <AudioPlayerProvider>
@@ -59,7 +78,7 @@ export default function MediaTab() {
             gridRef={gridContainerRef}
             onLayoutComplete={() => console.log("Layout complete!")}
           >
-            {data.map((data, index) => {
+            {currentItems.map((data, index) => {
               let card;
               switch (data.media_type) {
                 case "audio":
@@ -83,6 +102,15 @@ export default function MediaTab() {
           </MasonryGrid>
         )}
       </AudioPlayerProvider>
+
+      <div className="d-flex justify-content-end mt-4">
+        <Pagination
+          itemsPerPage={itemsPerPage}
+          totalItems={data.length}
+          onPageChange={handlePageClick}
+          currentPage={currentPage}
+        />
+      </div>
     </>
   );
 }

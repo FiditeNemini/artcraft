@@ -4582,6 +4582,7 @@ __metadata:
   resolution: "@storyteller/root@workspace:."
   dependencies:
     "@react-spring/types": ^9.7.3
+    "@types/react-paginate": ^7.1.4
     craco: ^0.0.3
     cross-env: ^7.0.3
     husky: ^8.0.3
@@ -4589,6 +4590,7 @@ __metadata:
     moment: ^2.29.4
     prettier: ^3.1.0
     pretty-quick: ^3.1.3
+    react-paginate: ^8.2.0
     universal-cookie: ^6.1.1
     yarn: ^1.22.19
   languageName: unknown
@@ -5505,6 +5507,15 @@ __metadata:
   dependencies:
     "@types/react": ^16
   checksum: 68a4ee88f7a56cdbfbca24b1936b9aa5dad8b40ffbf1f047ddf990454aec6e0c9da2a01c9ae87045e95236602061646c90d02f01281533e14f1970687873030f
+  languageName: node
+  linkType: hard
+
+"@types/react-paginate@npm:^7.1.4":
+  version: 7.1.4
+  resolution: "@types/react-paginate@npm:7.1.4"
+  dependencies:
+    "@types/react": "*"
+  checksum: 3dbada2ab364307382adce1283220c83b743bfb056508dac6c513cfc1ce6b703e98129717abb052739106ae02eaab847b8b7037e7ca6b666eba86c9879e70d74
   languageName: node
   linkType: hard
 
@@ -17411,7 +17422,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"prop-types@npm:^15.5.10, prop-types@npm:^15.6.0, prop-types@npm:^15.6.2, prop-types@npm:^15.7.2, prop-types@npm:^15.8.1":
+"prop-types@npm:^15, prop-types@npm:^15.5.10, prop-types@npm:^15.6.0, prop-types@npm:^15.6.2, prop-types@npm:^15.7.2, prop-types@npm:^15.8.1":
   version: 15.8.1
   resolution: "prop-types@npm:15.8.1"
   dependencies:
@@ -17843,6 +17854,17 @@ __metadata:
     locomotive-scroll: ^4.1.4
     react: ^18.0.2
   checksum: 06a1bf798f58244c0110512394ab80ae10a7b7227efbf3dfab81d56eeec1dc914a03410b5083b62a81dd4843fa4142dc6410ab7bfa239cd10a7b318a36820d08
+  languageName: node
+  linkType: hard
+
+"react-paginate@npm:^8.2.0":
+  version: 8.2.0
+  resolution: "react-paginate@npm:8.2.0"
+  dependencies:
+    prop-types: ^15
+  peerDependencies:
+    react: ^16 || ^17 || ^18
+  checksum: a0969b4ef27be466ef3e052e2c7c61fca60af24e0d10c76770ebd9953ad6131206a276dfc335e61cf35aa494ff3aacc2610682e3192d7f2ee9541928edb46721
   languageName: node
   linkType: hard
 

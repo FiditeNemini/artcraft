@@ -379,6 +379,24 @@ let mockMediaData = [
     isLiked: true,
     created_at: "2023-08-10T09:00:00.000Z",
   },
+  {
+    token: "token21",
+    weight_name: "Watery Landscape",
+    media_type: "image",
+    public_bucket_path: "/images/dummy-image-4.jpg",
+    likes: 150,
+    isLiked: true,
+    created_at: "2023-08-10T09:00:00.000Z",
+  },
+  {
+    token: "token22",
+    weight_name: "Watery Landscape",
+    media_type: "image",
+    public_bucket_path: "/images/dummy-image-4.jpg",
+    likes: 150,
+    isLiked: true,
+    created_at: "2023-08-10T09:00:00.000Z",
+  },
 ];
 
 export default mockMediaData;
