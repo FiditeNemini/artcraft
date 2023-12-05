@@ -15,6 +15,7 @@ use enums::common::visibility::Visibility;
 use mysql_queries::queries::media_files::list_media_files_for_user::{list_media_files_for_user, ListMediaFileForUserArgs, ViewAs};
 use tokens::tokens::media_files::MediaFileToken;
 
+use crate::http_server::common_responses::pagination_cursors::PaginationCursors;
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::server_state::ServerState;
 
@@ -36,8 +37,7 @@ pub struct QueryParams {
 pub struct SuccessResponse {
   pub success: bool,
   pub results: Vec<MediaFileListItem>,
-  pub cursor_next: Option<String>,
-  pub cursor_previous: Option<String>,
+  pub pagination: PaginationCursors,
 }
 
 #[derive(Serialize)]
@@ -202,8 +202,11 @@ pub async fn list_media_files_for_user_handler(
   let response = SuccessResponse {
     success: true,
     results,
-    cursor_next,
-    cursor_previous,
+    pagination: PaginationCursors {
+      maybe_next: cursor_next,
+      maybe_previous: cursor_previous,
+      cursor_is_reversed,
+    }
   };
 
   let body = serde_json::to_string(&response)
