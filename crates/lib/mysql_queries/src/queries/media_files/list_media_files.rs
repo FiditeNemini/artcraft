@@ -10,6 +10,7 @@ use enums::common::visibility::Visibility;
 use enums::traits::mysql_from_row::MySqlFromRow;
 use errors::AnyhowResult;
 use tokens::tokens::media_files::MediaFileToken;
+use tokens::tokens::users::UserToken;
 
 pub struct MediaFileListPage {
   pub records: Vec<MediaFileListItem>,
@@ -36,6 +37,11 @@ pub struct MediaFileListItem {
   pub maybe_public_bucket_prefix: Option<String>,
   pub maybe_public_bucket_extension: Option<String>,
 
+  pub maybe_creator_user_token: Option<UserToken>,
+  pub maybe_creator_username: Option<String>,
+  pub maybe_creator_display_name: Option<String>,
+  pub maybe_creator_gravatar_hash: Option<String>,
+
   pub creator_set_visibility: Visibility,
 
   pub created_at: DateTime<Utc>,
@@ -44,13 +50,11 @@ pub struct MediaFileListItem {
 
 #[derive(Clone, Copy)]
 pub enum ViewAs {
-  Author,
   Moderator,
-  AnotherUser,
+  NonModerator,
 }
 
-pub struct ListMediaFileForUserArgs<'a> {
-  pub username: &'a str,
+pub struct ListMediaFilesArgs<'a> {
   pub limit: usize,
   pub maybe_filter_media_type: Option<MediaFileType>,
   pub maybe_offset: Option<usize>,
@@ -59,11 +63,10 @@ pub struct ListMediaFileForUserArgs<'a> {
   pub mysql_pool: &'a MySqlPool,
 }
 
-pub async fn list_media_files_for_user(args: ListMediaFileForUserArgs<'_>) -> AnyhowResult<MediaFileListPage> {
+pub async fn list_media_files(args: ListMediaFilesArgs<'_>) -> AnyhowResult<MediaFileListPage> {
 
   let mut query = query_builder(
     args.maybe_filter_media_type,
-    args.username,
     args.limit,
     args.maybe_offset,
     args.cursor_is_reversed,
@@ -92,6 +95,10 @@ pub async fn list_media_files_for_user(args: ListMediaFileForUserArgs<'_>) -> An
           public_bucket_directory_hash: record.public_bucket_directory_hash,
           maybe_public_bucket_prefix: record.maybe_public_bucket_prefix,
           maybe_public_bucket_extension: record.maybe_public_bucket_extension,
+          maybe_creator_user_token: record.maybe_creator_user_token,
+          maybe_creator_username: record.maybe_creator_username,
+          maybe_creator_display_name: record.maybe_creator_display_name,
+          maybe_creator_gravatar_hash: record.maybe_creator_gravatar_hash,
           creator_set_visibility: record.creator_set_visibility,
           created_at: record.created_at,
           updated_at: record.updated_at,
@@ -109,7 +116,6 @@ pub async fn list_media_files_for_user(args: ListMediaFileForUserArgs<'_>) -> An
 
 fn query_builder<'a>(
   maybe_filter_media_type: Option<MediaFileType>,
-  username: &'a str,
   limit: usize,
   maybe_offset: Option<usize>,
   cursor_is_reversed: bool,
@@ -135,6 +141,11 @@ SELECT
   m.maybe_public_bucket_prefix,
   m.maybe_public_bucket_extension,
 
+  m.maybe_creator_user_token,
+  u.username as maybe_creator_username,
+  u.display_name as maybe_creator_display_name,
+  u.email_gravatar_hash as maybe_creator_gravatar_hash,
+
   m.creator_set_visibility,
   m.created_at,
   m.updated_at
@@ -144,12 +155,9 @@ LEFT OUTER JOIN users AS u
     ON m.maybe_creator_user_token = u.token
 
 WHERE m.user_deleted_at IS NULL
-  AND m.mod_deleted_at IS NULL
+AND m.mod_deleted_at IS NULL
     "#
   );
-
-  query_builder.push(" AND u.username = ");
-  query_builder.push_bind(username);
 
   if let Some(media_type) = maybe_filter_media_type {
     // FIXME: Binding shouldn't require to_str().
@@ -160,9 +168,8 @@ WHERE m.user_deleted_at IS NULL
   }
 
   match view_as {
-    ViewAs::Author => {}
     ViewAs::Moderator => {}
-    ViewAs::AnotherUser => {
+    ViewAs::NonModerator=> {
       // FIXME: Binding shouldn't require to_str().
       //  Otherwise, it's calling the Display trait on the raw type which is resulting in an
       //  incorrect binding and runtime error.
@@ -204,6 +211,11 @@ struct MediaFileListItemInternal {
   maybe_public_bucket_prefix: Option<String>,
   maybe_public_bucket_extension: Option<String>,
 
+  maybe_creator_user_token: Option<UserToken>,
+  maybe_creator_username: Option<String>,
+  maybe_creator_display_name: Option<String>,
+  maybe_creator_gravatar_hash: Option<String>,
+
   creator_set_visibility: Visibility,
 
   created_at: DateTime<Utc>,
@@ -224,6 +236,9 @@ struct MediaFileListItemInternal {
 // full "as" clause).
 impl FromRow<'_, MySqlRow> for MediaFileListItemInternal {
   fn from_row(row: &MySqlRow) -> Result<Self, sqlx::Error> {
+    let maybe_creator_user_token : Option<String> = row.try_get("maybe_creator_user_token")?;
+    let maybe_creator_user_token = maybe_creator_user_token.map(|user_token| UserToken::new(user_token));
+
     Ok(Self {
       id: row.try_get("id")?,
       token: MediaFileToken::new(row.try_get("token")?),
@@ -235,6 +250,10 @@ impl FromRow<'_, MySqlRow> for MediaFileListItemInternal {
       public_bucket_directory_hash: row.try_get("public_bucket_directory_hash")?,
       maybe_public_bucket_prefix: row.try_get("maybe_public_bucket_prefix")?,
       maybe_public_bucket_extension: row.try_get("maybe_public_bucket_extension")?,
+      maybe_creator_user_token,
+      maybe_creator_username: row.try_get("maybe_creator_username")?,
+      maybe_creator_display_name: row.try_get("maybe_creator_display_name")?,
+      maybe_creator_gravatar_hash: row.try_get("maybe_creator_gravatar_hash")?,
       creator_set_visibility: Visibility::try_from_mysql_row(row, "creator_set_visibility")?,
       created_at: row.try_get("created_at")?,
       updated_at: row.try_get("updated_at")?,
