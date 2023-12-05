@@ -89,7 +89,6 @@ import MobileMenu from "components/layout/MobileMenu/MobileMenu";
 import { TopNav } from "./nav/TopNav";
 import TtsModelSearchPage from "./pages/tts/tts_model_search/TtsModelSearchPage";
 import MediaPage from "./pages/media/MediaPage";
-import MediaDebug from "./pages/media/MediaDebug";
 import { VoiceDesignerFormPage } from "./pages/voice_designer/VoiceDesignerFormPage";
 import { VoiceDesignerMainPage } from "./pages/voice_designer/VoiceDesignerMainPage";
 import { VoiceDesignerVoiceEditPage } from "./pages/voice_designer/VoiceDesignerVoiceEditPage";
@@ -355,11 +354,6 @@ class PageContainer extends React.Component<
 
             <Route path="/media/:token">
               <MediaPage sessionWrapper={this.props.sessionWrapper} />
-            </Route>
-
-
-            <Route path="/media-debug">
-              <MediaDebug />
             </Route>
 
             <Route path="/dev-tts">
