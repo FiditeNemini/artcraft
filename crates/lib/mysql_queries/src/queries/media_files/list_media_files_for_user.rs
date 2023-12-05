@@ -1,11 +1,13 @@
 use chrono::{DateTime, Utc};
-use sqlx::{MySql, MySqlPool, QueryBuilder};
+use sqlx::{FromRow, MySql, MySqlPool, QueryBuilder, Row};
+use sqlx::mysql::MySqlRow;
 
 use enums::by_table::media_files::media_file_origin_category::MediaFileOriginCategory;
 use enums::by_table::media_files::media_file_origin_model_type::MediaFileOriginModelType;
 use enums::by_table::media_files::media_file_origin_product_category::MediaFileOriginProductCategory;
 use enums::by_table::media_files::media_file_type::MediaFileType;
 use enums::common::visibility::Visibility;
+use enums::traits::mysql_from_row::MySqlFromRow;
 use errors::AnyhowResult;
 use tokens::tokens::media_files::MediaFileToken;
 
@@ -119,21 +121,21 @@ fn query_builder<'a>(
     r#"
 SELECT
   m.id,
-  m.token as `token: tokens::tokens::media_files::MediaFileToken`,
+  m.token,
 
-  m.origin_category as `origin_category: enums::by_table::media_files::media_file_origin_category::MediaFileOriginCategory`,
-  m.origin_product_category as `origin_product_category: enums::by_table::media_files::media_file_origin_product_category::MediaFileOriginProductCategory`,
+  m.origin_category,
+  m.origin_product_category,
 
   m.maybe_origin_model_type,
   m.maybe_origin_model_token,
 
-  m.media_type as `media_type: enums::by_table::media_files::media_file_type::MediaFileType`,
+  m.media_type,
 
   m.public_bucket_directory_hash,
   m.maybe_public_bucket_prefix,
   m.maybe_public_bucket_extension,
 
-  m.creator_set_visibility as `creator_set_visibility: enums::common::visibility::Visibility`,
+  m.creator_set_visibility,
   m.created_at,
   m.updated_at
 
@@ -141,24 +143,30 @@ FROM media_files AS m
 LEFT OUTER JOIN users AS u
     ON m.maybe_creator_user_token = u.token
 
-WHERE u.username = ?
-AND m.user_deleted_at IS NULL
-AND m.mod_deleted_at IS NULL
+WHERE m.user_deleted_at IS NULL
+  AND m.mod_deleted_at IS NULL
     "#
   );
 
+  query_builder.push(" AND u.username = ");
   query_builder.push_bind(username);
 
   if let Some(media_type) = maybe_filter_media_type {
-    query_builder.push(" AND m.media_file_type = ? ");
-    query_builder.push_bind(media_type);
+    // FIXME: Binding shouldn't require to_str().
+    //  Otherwise, it's calling the Display trait on the raw type which is resulting in an
+    //  incorrect binding and runtime error.
+    query_builder.push(" AND m.media_file_type = ");
   }
 
   match view_as {
     ViewAs::Author => {}
     ViewAs::Moderator => {}
     ViewAs::AnotherUser => {
-      query_builder.push(" AND m.creator_set_visibility = 'public' ");
+      // FIXME: Binding shouldn't require to_str().
+      //  Otherwise, it's calling the Display trait on the raw type which is resulting in an
+      //  incorrect binding and runtime error.
+      query_builder.push(" AND m.creator_set_visibility = ");
+      query_builder.push_bind(Visibility::Public.to_str());
     }
   }
 
@@ -181,7 +189,6 @@ AND m.mod_deleted_at IS NULL
   query_builder
 }
 
-#[derive(sqlx::FromRow)]
 struct MediaFileListItemInternal {
   id: i64,
   token: MediaFileToken,
@@ -200,4 +207,36 @@ struct MediaFileListItemInternal {
 
   created_at: DateTime<Utc>,
   updated_at: DateTime<Utc>,
+}
+
+// NB(bt,2023-12-05): There's an issue with type hinting in the `as` clauses with QueryBuilder (or
+// raw query strings) and sqlx::FromRow, regardless of whether it is derived of manually
+// implemented. Perhaps this will improve in the future, but for now manually constructed queries
+// cannot have type hints, eg. the following:
+//
+//    m.token as `token: tokens::tokens::media_files::MediaFileToken`,
+//    m.origin_category as `origin_category: enums::by_table::media_files::media_file_origin_category::MediaFileOriginCategory`,
+//    m.creator_set_visibility as `creator_set_visibility: enums::common::visibility::Visibility`,
+//
+// This results in the automatic mapping not being able to be found by name (for macro derive), and
+// in the manual case `row.try_get()` etc. won't have the correct column name (since the name is the
+// full "as" clause).
+impl FromRow<'_, MySqlRow> for MediaFileListItemInternal {
+  fn from_row(row: &MySqlRow) -> Result<Self, sqlx::Error> {
+    Ok(Self {
+      id: row.try_get("id")?,
+      token: MediaFileToken::new(row.try_get("token")?),
+      origin_category: MediaFileOriginCategory::try_from_mysql_row(row, "origin_category")?,
+      origin_product_category: MediaFileOriginProductCategory::try_from_mysql_row(row, "origin_product_category")?,
+      maybe_origin_model_type: MediaFileOriginModelType::try_from_mysql_row_nullable(row, "maybe_origin_model_type")?,
+      maybe_origin_model_token: row.try_get("maybe_origin_model_token")?,
+      media_type: MediaFileType::try_from_mysql_row(row, "media_type")?,
+      public_bucket_directory_hash: row.try_get("public_bucket_directory_hash")?,
+      maybe_public_bucket_prefix: row.try_get("maybe_public_bucket_prefix")?,
+      maybe_public_bucket_extension: row.try_get("maybe_public_bucket_extension")?,
+      creator_set_visibility: Visibility::try_from_mysql_row(row, "creator_set_visibility")?,
+      created_at: row.try_get("created_at")?,
+      updated_at: row.try_get("updated_at")?,
+    })
+  }
 }

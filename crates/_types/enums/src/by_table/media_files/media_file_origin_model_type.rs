@@ -24,6 +24,7 @@ pub enum MediaFileOriginModelType {
   /// so-vits-svc voice conversion models
   #[serde(rename = "so_vits_svc")]
   SoVitsSvc,
+
   #[serde(rename = "vall_e_x")]
   VallEX,
 }
@@ -31,6 +32,7 @@ pub enum MediaFileOriginModelType {
 // TODO(bt, 2022-12-21): This desperately needs MySQL integration tests!
 impl_enum_display_and_debug_using_to_str!(MediaFileOriginModelType);
 impl_mysql_enum_coders!(MediaFileOriginModelType);
+impl_mysql_from_row!(MediaFileOriginModelType);
 
 /// NB: Legacy API for older code.
 impl MediaFileOriginModelType {
