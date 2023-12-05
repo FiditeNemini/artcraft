@@ -11,7 +11,7 @@ interface Props {
   mediaFile?: MediaFile;
 }
 
-export default function AudioPlayer({ actions = [], mediaFile }: Props) {
+export default function TempAudioPlayer({ actions = [], mediaFile }: Props) {
   const ref = useRef(null);
   const [finished,finishedSet] = useState(false);
   const [initialized,initializedSet] = useState(false);
