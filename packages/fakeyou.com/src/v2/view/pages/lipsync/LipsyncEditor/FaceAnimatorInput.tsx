@@ -1,22 +1,9 @@
 import React from "react";
 import { animated } from "@react-spring/web";
-import { AudioBlobPreview, AudioInput, BasicVideo, Checkbox, ImageInput, SegmentButtons } from "components/common";
+import { TempAudioPlayer, AudioBlobPreview, AudioInput, BasicVideo, Checkbox, ImageInput, SegmentButtons } from "components/common";
 import { FaceAnimatorSlide } from "./FaceAnimatorTypes";
 
-export default function FaceAnimatorInput({  
-  audioProps,
-  imageProps,
-  frameDimensions,
-  frameDimensionsChange,
-  disableFaceEnhancement,
-  disableFaceEnhancementChange,
-  still,
-  stillChange,
-  toggle,
-  style,
-  t,
-  removeWatermark,
-  removeWatermarkChange, }: FaceAnimatorSlide) {
+export default function FaceAnimatorInput({ audioProps, imageProps, frameDimensions, frameDimensionsChange, disableFaceEnhancement, disableFaceEnhancementChange, preferPresetAudio,  preferPresetAudioSet,  presetAudio,  still, stillChange, toggle, style, t, removeWatermark, removeWatermarkChange, }: FaceAnimatorSlide) {
   return <animated.div {...{ className: "lipsync-editor row", style }}>
     <div {...{ className: "media-input-column col-lg-6 ga-image-input" }}>
       <h5>{t("headings.image")}</h5>
@@ -29,23 +16,26 @@ export default function FaceAnimatorInput({
     </div>
     <div {...{ className: "media-input-column audio-input-column col-lg-6 ga-audio-input" }}>
       <h5>{t("headings.audio")}</h5>
-      <AudioInput
-        {...{
+      { presetAudio && preferPresetAudio ? 
+        <TempAudioPlayer {...{
+          actions: [{
+            label: "Upload file instead",
+            variant: "secondary",
+            onClick: () => { preferPresetAudioSet(false) }
+          }],
+          mediaFile: presetAudio
+        }} /> :
+        <AudioInput {...{
           ...audioProps,
-          onRest: (p: any, c: any, item: any, l: any) => {
-            toggle.audio(!!audioProps.file);
-          },
+          onRest: (p: any, c: any, item: any, l: any) => toggle.audio(!!audioProps.file)
           // hideActions: true,
-        }}
-      >
+        }} >
         <AudioBlobPreview {...{
           ...audioProps,
-          onRest: (p: any, c: any, item: any, l: any) => {
-            toggle.audio(!!audioProps.file);
-          },
+          onRest: (p: any, c: any, item: any, l: any) => toggle.audio(!!audioProps.file),
           hideActions: true,
         }}/>
-      </AudioInput>
+      </AudioInput> }
       <BasicVideo {...{ className: "face-animator-wide-sample", src: "/videos/face-animator-instruction-en.mp4" }}/>
     </div>
     <div {...{ className: "animation-configure-panel panel" }}>

@@ -4,13 +4,7 @@ import { Spinner } from "components/common";
 import { springs } from "resources";
 import DynamicButton from "./DynamicButton";
 
-const ProgressLi = ({
-  children,
-  disabled = false,
-}: {
-  children?: any;
-  disabled?: boolean;
-}) => {
+const ProgressLi = ({ children, disabled = false }: { children?: any; disabled?: boolean; }) => {
   const style = useSpring({
     ...springs.soft,
     opacity: disabled ? 0.25 : 1,
@@ -37,20 +31,13 @@ const ProgressLi = ({
 };
 
 export default function FaceAnimatorTitle({ ...rest }) {
-  const {
-    audioProps,
-    audioReady,
-    clearInputs,
-    imageProps,
-    imageReady,
-    indexSet,
-    page,
-    submit,
-    t,
-  } = rest;
-  const noAudio = !audioReady || !audioProps.file;
+  const { audioProps,  audioReady, clearInputs, imageProps, imageReady, indexSet, page, presetAudio, 
+    preferPresetAudio,
+    submit, t } = rest;
+  const noAudio = (preferPresetAudio && !presetAudio) || (!preferPresetAudio && (!audioReady || !audioProps.file));
   const noImg = !imageReady || !imageProps.file;
   const incomplete = noAudio || noImg;
+
   const working = imageProps.working && audioProps.working;
 
   const slides = [t("inputs.generate"), <Spinner />, t("inputs.makeAnother")];

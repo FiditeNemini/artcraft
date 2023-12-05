@@ -5,7 +5,7 @@ import "../Select/Select.scss";
 import ReactSelect, { Props as ReactSelectProps } from "react-select";
 
 export interface Option {
-  value: string;
+  value: string | number;
   label: string;
 }
 

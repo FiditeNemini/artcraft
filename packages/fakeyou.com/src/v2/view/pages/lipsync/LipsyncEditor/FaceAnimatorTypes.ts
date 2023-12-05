@@ -10,6 +10,9 @@ export interface FaceAnimatorSlide {
   disableFaceEnhancement: any;
   disableFaceEnhancementChange: any;
   index: number;
+  preferPresetAudio?: any,
+  preferPresetAudioSet?: any,
+  presetAudio?: any;
   still: any;
   stillChange: any;
   style: any;

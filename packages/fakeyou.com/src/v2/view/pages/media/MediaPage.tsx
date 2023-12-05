@@ -16,6 +16,7 @@ import Button from "components/common/Button";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faCircleExclamation,
+  faFaceViewfinder,
   faArrowDownToLine,
   // faCirclePlay,
   // faShare,
@@ -35,9 +36,7 @@ interface MediaPageProps {
 
 export default function MediaPage({ sessionWrapper }: MediaPageProps) {
   const { token } = useParams<{ token: string }>();
-  const [mediaFile, setMediaFile] = useState<MediaFile | undefined | null>(
-    null
-  );
+  const [mediaFile, setMediaFile] = useState<MediaFile | undefined | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<boolean>(false);
 
@@ -309,24 +308,33 @@ export default function MediaPage({ sessionWrapper }: MediaPageProps) {
                   download={audioLink}
                 />
                 {/* Share and Create Buttons */}
-                {/* <div className="d-flex gap-2">
+                 {/* 
+                <div className="d-flex gap-2">
                   <Button
                     square={true}
                     variant="secondary"
-                    icon={faCirclePlay}
+                    // icon={faCirclePlay}
                     onClick={() => {}}
                     tooltip="Create"
                   />
+                 }
                   <Button
                     square={true}
                     variant="secondary"
-                    icon={faShare}
+                    // icon={faShare}
                     onClick={() => {}}
                     tooltip="Share"
-                  />
+                  /> 
                 </div> */}
               </div>
-
+              {  mediaFile.media_type === MediaFileType.Audio ? 
+                <Button {...{ 
+                  icon: faFaceViewfinder,
+                  label: "Use audio in Face Animator",
+                  to: `/face-animator/${ mediaFile.token }`,
+                  variant: "secondary"
+                }}/> : null
+              }
               <Accordion>
                 <Accordion.Item title="Media Details" defaultOpen={true}>
                   {mediaDetails}

@@ -624,12 +624,11 @@ class PageContainer extends React.Component<
               <AboutPage />
             </Route>
 
-            <Route path="/face-animator">
+            <Route path="/face-animator/:mediaToken?">
               <LipsyncEditor
                 {...{
                   enqueueInferenceJob: this.props.enqueueInferenceJob,
-                  sessionSubscriptionsWrapper:
-                    this.props.sessionSubscriptionsWrapper,
+                  sessionSubscriptionsWrapper: this.props.sessionSubscriptionsWrapper,
                   inferenceJobs: this.props.inferenceJobs,
                   inferenceJobsByCategory: this.props.inferenceJobsByCategory,
                 }}

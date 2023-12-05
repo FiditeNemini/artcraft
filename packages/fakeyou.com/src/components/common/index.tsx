@@ -17,6 +17,7 @@ import SegmentButtons from "./SegmentButtons";
 import Select from "./Select";
 import Slider from "./Slider";
 import Spinner from "./Spinner";
+import TempAudioPlayer from "./TempAudioPlayer";
 import TempInput from "./TempInput";
 import TempSelect from "./TempSelect";
 
@@ -40,6 +41,7 @@ export {
   Select,
   Slider,
   Spinner,
+  TempAudioPlayer,
   TempInput,
   TempSelect
 };
