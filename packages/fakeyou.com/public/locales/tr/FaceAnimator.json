@@ -8,7 +8,9 @@
   "inputs": {
     "downloadFile": "Dosyayı indir",
     "generate": "Oluştur",
-    "makeAnother": "Başka bir tane yap"
+    "makeAnother": "Başka bir tane yap",
+    "viewResult": "Sonucu göster",
+    "yourJobs": "İşleriniz"
   },
   "status": {
     "animationComplete": "Animasyon tamamlandı!",

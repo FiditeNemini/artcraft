@@ -5,5 +5,6 @@
   "ratingGood": "Ses Kulağa İyi Geliyor",
   "ratingGreat": "Sesi harika geliyor",
   "ratingLabel": "Değerlendirme:",
+  "ratingNone": "Ses Derecelendirilmedi",
   "ratingOk": "Ses Kulağa Sorunsuz Geliyor"
 }
