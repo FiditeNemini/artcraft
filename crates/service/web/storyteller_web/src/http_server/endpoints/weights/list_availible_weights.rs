@@ -22,22 +22,23 @@ use crate::server_state::ServerState;
 #[derive(Deserialize)]
 pub struct ListAvailibleWeightsQuery {
     pub sort_ascending: Option<bool>,
-    pub limit: Option<u16>,
-    pub cursor: Option<String>,
-    pub cursor_is_reversed: Option<bool>,
+    pub page_size: u16,
+    pub page_index : u16,
 }
 
 #[derive(Serialize)]
 pub struct ListAvailibleWeightsSuccessResponse {
     pub success: bool,
     pub weights: Vec<ModelWeightForList>,
+    pub page_size: u16,
+    pub page_index : u16,
     pub cursor_next: Option<String>,
     pub cursor_previous: Option<String>,
 }
 
 #[derive(Deserialize)]
 pub struct ListWeightsByPathInfo {
-    pub username: String,
+    pub username: Option<String>,
     pub weights_type: Option<String>,
     pub weights_category: Option<String>,
 }
@@ -75,6 +76,11 @@ pub struct ModelWeightForList {
     pub creator_username: String,
     pub creator_display_name: String,
     pub creator_email_gravatar_hash: String,
+
+    // additional fields to be added when tables are around
+    pub likes: u32,
+    pub bookmarks: bool,
+
 }
 
 #[derive(Debug)]
@@ -123,7 +129,7 @@ pub async fn list_availible_weights_handler(
         }
     };
 
-    let limit = query.limit.unwrap_or(25);
+    let limit = query.page_size.unwrap_or(10);
 
     let sort_ascending = query.sort_ascending.unwrap_or(false);
     let cursor_is_reversed = query.cursor_is_reversed.unwrap_or(false);
@@ -236,7 +242,6 @@ pub async fn list_availible_weights_handler(
                 file_size_bytes:weights.file_size_bytes,
                 file_checksum_sha2: weights.file_checksum_sha2,
 
-                
 
                 cached_user_ratings_total_count: weights.cached_user_ratings_total_count,
                 cached_user_ratings_positive_count: weights.cached_user_ratings_positive_count,

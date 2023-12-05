@@ -1260,6 +1260,5 @@ fn add_weights_routes<T, B>(app: App<T>) -> App<T>
                 "/by_user_category_and_type/{username}/{weights_category}/{weights_type}",
                 web::get().to(list_availible_weights_handler)
             )
-            .route("/list/{username}/{weights_category}/{weights_type}",list_weights_handler)
     )
 }
