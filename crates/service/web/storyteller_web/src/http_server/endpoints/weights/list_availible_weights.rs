@@ -5,7 +5,7 @@ use actix_web::error::ResponseError;
 use actix_web::http::StatusCode;
 use chrono::{ DateTime, Utc };
 use log::{ info, warn };
-
+use rand::Rng;
 use enums::common::visibility::Visibility;
 use mysql_queries::queries::model_weights::list_weights_query_builder::ListWeightsQueryBuilder;
 
@@ -129,21 +129,9 @@ pub async fn list_availible_weights_handler(
         }
     };
 
-    let limit = query.page_size.unwrap_or(10);
+    let limit = query.page_size;
 
     let sort_ascending = query.sort_ascending.unwrap_or(false);
-    let cursor_is_reversed = query.cursor_is_reversed.unwrap_or(false);
-
-    let cursor = if let Some(cursor) = query.cursor.as_deref() {
-        let cursor = server_state.sort_key_crypto.decrypt_id(cursor)
-          .map_err(|e| {
-            warn!("crypto error: {:?}", e);
-            ListWeightError::ServerError
-        })?;
-        Some(cursor)
-    } else {
-        None
-    };
 
     let include_user_hidden = is_mod;
 
@@ -185,11 +173,9 @@ pub async fn list_availible_weights_handler(
         .include_user_deleted_results(is_mod)
         .include_mod_deleted_results(is_mod)
         .limit(limit)
-        .cursor_is_reversed(cursor_is_reversed)
-        .offset(cursor);
+        .offset(Some((query.page_index as u64) * (query.page_size as u64)));
 
     let query_results = query_builder.perform_query_for_page(&server_state.mysql_pool).await;
-
 
     let weights_page = match query_results {
         Ok(results) => results,
@@ -221,6 +207,9 @@ pub async fn list_availible_weights_handler(
         None
     };
 
+    let mut rng = rand::thread_rng();
+    let random_float = rng.gen_range(0.0..1.0);
+    let random_bool = random_float >= 0.5;
 
     // generate parse a response
     let response = ListAvailibleWeightsSuccessResponse {
@@ -242,7 +231,6 @@ pub async fn list_availible_weights_handler(
                 file_size_bytes:weights.file_size_bytes,
                 file_checksum_sha2: weights.file_checksum_sha2,
 
-
                 cached_user_ratings_total_count: weights.cached_user_ratings_total_count,
                 cached_user_ratings_positive_count: weights.cached_user_ratings_positive_count,
                 cached_user_ratings_negative_count: weights.cached_user_ratings_negative_count,
@@ -255,10 +243,15 @@ pub async fn list_availible_weights_handler(
 
                 creator_username: weights.creator_username,
                 creator_display_name: weights.creator_display_name,
-                creator_email_gravatar_hash: weights.creator_email_gravatar_hash
+                creator_email_gravatar_hash: weights.creator_email_gravatar_hash,
+
+                bookmarks: random_bool,
+                likes: rng.gen_range(0..1000),
             }).collect::<Vec<_>>(),
         cursor_next,
         cursor_previous,
+        page_index: query.page_index,
+        page_size: query.page_size
     };
 
     let body = serde_json::to_string(&response)
