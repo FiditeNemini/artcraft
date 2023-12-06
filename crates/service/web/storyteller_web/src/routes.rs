@@ -44,6 +44,8 @@ use crate::http_server::endpoints::investor_demo::enable_demo_mode_handler::enab
 use crate::http_server::endpoints::leaderboard::get_leaderboard::leaderboard_handler;
 use crate::http_server::endpoints::media_files::delete_media_file::delete_media_file_handler;
 use crate::http_server::endpoints::media_files::get_media_file::get_media_file_handler;
+use crate::http_server::endpoints::media_files::list_media_files::list_media_files_handler;
+use crate::http_server::endpoints::media_files::list_media_files_for_user::list_media_files_for_user_handler;
 use crate::http_server::endpoints::media_uploads::list_user_media_uploads_of_type::list_user_media_uploads_of_type_handler;
 use crate::http_server::endpoints::media_uploads::upload_audio::upload_audio_handler;
 use crate::http_server::endpoints::media_uploads::upload_image::upload_image_handler;
@@ -168,7 +170,6 @@ pub fn add_routes<T, B> (app: App<T>, server_environment: ServerEnvironment) -> 
         InitError = (),
       >,
 {
-  
   let mut app = add_moderator_routes(app); /* /moderation */
   app = add_tts_routes(app); /* /tts */
   app = add_w2l_routes(app); /* /w2l */
@@ -1014,6 +1015,14 @@ fn add_media_file_routes<T, B> (app: App<T>) -> App<T>
       .service(web::resource("/file/{token}")
           .route(web::get().to(get_media_file_handler))
           .route(web::delete().to(delete_media_file_handler))
+          .route(web::head().to(|| HttpResponse::Ok()))
+      )
+      .service(web::resource("/list")
+          .route(web::get().to(list_media_files_handler))
+          .route(web::head().to(|| HttpResponse::Ok()))
+      )
+      .service(web::resource("/list/user/{username}")
+          .route(web::get().to(list_media_files_for_user_handler))
           .route(web::head().to(|| HttpResponse::Ok()))
       )
   )

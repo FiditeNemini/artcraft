@@ -17,10 +17,6 @@ path = "src/lib.rs"
 serde = "1.0.125"
 serde_derive = "1.0.125"
 
-# MySql Database
-# "offline" supports typesafe builds without a live database
-# "rustls" doesn't appear to work with IP addresses, per:
-# https://github.com/launchbadge/sqlx/issues/1095#issuecomment-798050828
 sqlx = { version = "0.7.2", features = [ "mysql", "sqlite", "runtime-tokio-native-tls", "chrono" ] }
 sqlx-core = { version = "0.7.2" }
 sqlx-mysql= { version = "0.7.2" }

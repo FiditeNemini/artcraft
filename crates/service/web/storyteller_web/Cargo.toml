@@ -13,6 +13,10 @@ publish = false
 name = "storyteller-web"
 path = "src/main.rs"
 
+[[bin]]
+name = "docs"
+path = "src/api_doc_server.rs"
+
 [dependencies]
 
 # Internal
@@ -54,7 +58,7 @@ users_component = { path = "../../plugins/users" }
 # External
 anyhow = "1.0.75"
 base64 = "0.21.0"
-chrono = { version = "=0.4.22", features = ["serde"] }
+chrono = { version = "=0.4.31", features = ["serde"] }
 derive_more = "0.99.17"
 dotenv = "0.15.0"
 hex = "0.4.3"
@@ -97,10 +101,6 @@ futures_old_for_limiter = { package = "futures", version = "0.1.29" } # Older ve
 futures-core = "0.3.29" # NB: For middleware/futures upgrade
 pin-project-lite = "0.2.9" # NB: For middleware/futures upgrade
 
-# MySql Database
-# "offline" supports typesafe builds without a live database
-# "rustls" doesn't appear to work with IP addresses, per:
-# https://github.com/launchbadge/sqlx/issues/1095#issuecomment-798050828
 sqlx = { version = "0.7.2", features = [ "mysql", "runtime-tokio", "tls-rustls", "chrono" ] }
 
 # Redis Database
@@ -160,6 +160,8 @@ pulldown-cmark = "0.9.3"
 # include support for async fn in traits.
 async-trait = "0.1.58"
 my-workspace-hack = { version = "0.1", path = "../../../../my-workspace-hack" }
+utoipa = { version = "4", features = ["actix_extras"] }
+utoipa-swagger-ui = { version = "5", features = ["actix-web"] }
 
 [build-dependencies]
 # NB: Only using diesel for migrations support

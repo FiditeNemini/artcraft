@@ -22,7 +22,7 @@ bitflags = { version = "2.4.1", default-features = false, features = ["serde", "
 block-buffer = { version = "0.9.0", default-features = false, features = ["block-padding"] }
 bytemuck = { version = "1.14.0", default-features = false, features = ["extern_crate_alloc"] }
 byteorder = { version = "1.5.0" }
-chrono = { version = "0.4.22", features = ["alloc", "serde"] }
+chrono = { version = "0.4.31", features = ["alloc", "serde"] }
 combine = { version = "4.6.6", default-features = false, features = ["std", "tokio"] }
 crossbeam-utils = { version = "0.8.16" }
 deranged = { version = "0.3.9", default-features = false, features = ["powerfmt", "serde", "std"] }
@@ -88,7 +88,7 @@ base64ct = { version = "1.6.0", default-features = false, features = ["alloc"] }
 bitflags = { version = "2.4.1", default-features = false, features = ["serde", "std"] }
 byteorder = { version = "1.5.0" }
 cc = { version = "1.0.83", default-features = false, features = ["parallel"] }
-chrono = { version = "0.4.22", features = ["alloc", "serde"] }
+chrono = { version = "0.4.31", features = ["alloc", "serde"] }
 crossbeam-utils = { version = "0.8.16" }
 derive_more = { version = "0.99.17" }
 digest = { version = "0.10.7", features = ["mac", "oid", "std"] }
@@ -142,22 +142,22 @@ url = { version = "2.4.1", features = ["serde"] }
 [target.x86_64-unknown-linux-gnu.dependencies]
 openssl = { version = "0.10.59", features = ["vendored"] }
 openssl-sys = { version = "0.9.95", default-features = false, features = ["vendored"] }
-rustix = { version = "0.38.25", features = ["fs", "termios"] }
+rustix = { version = "0.38.26", features = ["fs", "termios"] }
 spin = { version = "0.9.8" }
 
 [target.x86_64-unknown-linux-gnu.build-dependencies]
 openssl = { version = "0.10.59", features = ["vendored"] }
 openssl-sys = { version = "0.9.95", default-features = false, features = ["vendored"] }
-rustix = { version = "0.38.25", features = ["fs", "termios"] }
+rustix = { version = "0.38.26", features = ["fs", "termios"] }
 socket2 = { version = "0.5.5", default-features = false, features = ["all"] }
 spin = { version = "0.9.8" }
 
 [target.x86_64-apple-darwin.dependencies]
-rustix = { version = "0.38.25", features = ["fs", "termios"] }
+rustix = { version = "0.38.26", features = ["fs", "termios"] }
 spin = { version = "0.9.8" }
 
 [target.x86_64-apple-darwin.build-dependencies]
-rustix = { version = "0.38.25", features = ["fs", "termios"] }
+rustix = { version = "0.38.26", features = ["fs", "termios"] }
 socket2 = { version = "0.5.5", default-features = false, features = ["all"] }
 spin = { version = "0.9.8" }
 

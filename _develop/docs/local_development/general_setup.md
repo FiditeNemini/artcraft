@@ -380,3 +380,16 @@ of this error message. You can essentially ignore it.
 ### [Fix] Can't connect to local MySQL after install on Ubuntu
 
 - If MySql in local dev can't be connected to, [reset the accounts](https://linuxconfig.org/how-to-reset-root-mysql-mariadb-password-on-ubuntu-20-04-focal-fossa-linux).
+
+### API Server
+```
+cargo run --bin docs
+```
+This setups an api server with swagger docs to show you responses and requests with each associated endpoint
+It is run at http://127.0.0.1:8989/
+To obtain the json for the postman collection go to this url http://127.0.0.1:8989/api-docs/openapi.json
+We use this: `https://github.com/juhaku/utoipa`
+The documentation example is in: 
+`crates/service/web/storyteller_web/src/http_server/endpoints/voice_designer/inference/enqueue_tts_request.rs`
+Write into the api doc to: 
+`crates/service/web/storyteller_web/src/api_doc.rs`
