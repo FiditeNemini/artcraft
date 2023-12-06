@@ -13,20 +13,23 @@ use enums::by_table::model_weights::{
     weights_types::WeightsType,
     weights_category::WeightsCategory,
 };
+
 use tokens::tokens::users::UserToken;
 use tokens::tokens::model_weights::ModelWeightToken;
 
 use crate::http_server::common_responses::user_details_lite::UserDetailsLight;
 use crate::server_state::ServerState;
 
-#[derive(Deserialize)]
+use utoipia::Schema;
+
+#[derive(Deserialize,Schema)]
 pub struct ListAvailibleWeightsQuery {
     pub sort_ascending: Option<bool>,
     pub page_size: u16,
     pub page_index : u16,
 }
 
-#[derive(Serialize)]
+#[derive(Serialize,Schema)]
 pub struct ListAvailibleWeightsSuccessResponse {
     pub success: bool,
     pub weights: Vec<ModelWeightForList>,
@@ -36,14 +39,14 @@ pub struct ListAvailibleWeightsSuccessResponse {
     pub cursor_previous: Option<String>,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize,Schema)]
 pub struct ListWeightsByPathInfo {
     pub username: Option<String>,
     pub weights_type: Option<String>,
     pub weights_category: Option<String>,
 }
 
-#[derive(Serialize)]
+#[derive(Serialize,Schema)]
 pub struct ModelWeightForList {
     pub weight_token: ModelWeightToken,
 
@@ -83,7 +86,7 @@ pub struct ModelWeightForList {
 
 }
 
-#[derive(Debug)]
+#[derive(Debug,Schema)]
 pub enum ListWeightError {
     NotAuthorized,
     ServerError,
@@ -104,6 +107,19 @@ impl ResponseError for ListWeightError {
     }
 }
 
+#[utoipa::path(
+    get,
+    path = "/by_user_category_and_type/{username}/{weights_category}/{weights_type}",
+    responses(
+        (status = 200, description = "List Weights", body = ListAvailibleWeightsSuccessResponse),
+        (status = 401, description = "Not authorized", body = ListWeightError),
+        (status = 500, description = "Server error", body = ListWeightError),
+    ),
+    params(
+        ("request" = ListAvailibleWeightsQuery, description = "Payload for Request")
+        ("path" = ListWeightsByPathInfo, description = "Path for Request")
+    )
+)]
 pub async fn list_availible_weights_handler(
     http_request: HttpRequest,
     path: web::Path<ListWeightsByPathInfo>,
@@ -245,6 +261,7 @@ pub async fn list_availible_weights_handler(
                 creator_display_name: weights.creator_display_name,
                 creator_email_gravatar_hash: weights.creator_email_gravatar_hash,
 
+                // TODO FIX THIS when we align.
                 bookmarks: random_bool,
                 likes: rng.gen_range(0..1000),
             }).collect::<Vec<_>>(),
@@ -256,7 +273,6 @@ pub async fn list_availible_weights_handler(
 
     let body = serde_json::to_string(&response)
       .map_err(|e| ListWeightError::ServerError)?;
-
 
     Ok(HttpResponse::Ok().content_type("application/json").body(body))
 }

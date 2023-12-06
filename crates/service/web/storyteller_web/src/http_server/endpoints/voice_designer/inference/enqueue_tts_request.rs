@@ -43,23 +43,20 @@ const DEBUG_HEADER_NAME: &str = "enable-debug-mode";
 const ROUTING_TAG_HEADER_NAME: &str = "routing-tag";
 
 
-#[derive(Deserialize)]
-#[derive(ToSchema)]
+#[derive(Deserialize,ToSchema)]
 pub struct EnqueueTTSRequest {
     uuid_idempotency_token: String,
     text: String,
     voice_token: String,
 }
 
-#[derive(Serialize)]
-#[derive(ToSchema)]
+#[derive(Serialize,ToSchema)]
 pub struct EnqueueTTSRequestSuccessResponse {
     pub success: bool,
     pub inference_job_token: InferenceJobToken,
 }
 
-#[derive(Debug)]
-#[derive(ToSchema)]
+#[derive(Debug,ToSchema)]
 pub enum EnqueueTTSRequestError {
     BadInput(String),
     NotAuthorized,

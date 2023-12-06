@@ -1053,7 +1053,7 @@ dependencies = [
  "num-traits",
  "serde",
  "wasm-bindgen",
- "windows-targets",
+ "windows-targets 0.48.5",
 ]
 
 [[package]]
@@ -2178,6 +2178,7 @@ dependencies = [
  "sqlx-mysql",
  "strum",
  "toml",
+ "utoipa",
 ]
 
 [[package]]
