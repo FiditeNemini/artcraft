@@ -50,7 +50,7 @@ futures_old_for_limiter = { package = "futures", version = "0.1.29" } # Older ve
 sqlx = { version = "0.7.2", features = [ "mysql", "runtime-tokio", "tls-rustls", "chrono" ] }
 
 # Redis Database
-limitation = "0.1.1" # Redis rate limiter
+limitation = { path = "../../../vendor/limitation" }
 r2d2_redis = "0.14.0"
 redis_async = { package = "redis", version = "0.21.5", features = ["tokio-comp"] }
 
