@@ -21,6 +21,10 @@ pub enum MediaFileOriginProductCategory {
   #[serde(rename = "face_animator")]
   FaceAnimator,
 
+  /// Text to speech (Tacotron2, not voice designer / VallE-X)
+  #[serde(rename = "tts")]
+  TextToSpeech,
+
   // TODO: This should be a temporary category until we migrate the DB to remove this default value
   /// Unknown which product is attached to the file (generated the file, the file was
   /// uploaded on behalf of, etc.)
@@ -46,6 +50,7 @@ impl MediaFileOriginProductCategory {
   pub fn to_str(&self) -> &'static str {
     match self {
       Self::FaceAnimator => "face_animator",
+      Self::TextToSpeech => "tts",
       Self::Unknown => "unknown",
       Self::VoiceConversion => "voice_conversion",
       Self::ZeroShotVoice => "zs_voice",
@@ -55,6 +60,7 @@ impl MediaFileOriginProductCategory {
   pub fn from_str(value: &str) -> Result<Self, String> {
     match value {
       "face_animator" => Ok(Self::FaceAnimator),
+      "tts" => Ok(Self::TextToSpeech),
       "unknown" => Ok(Self::Unknown),
       "voice_conversion" => Ok(Self::VoiceConversion),
       "zs_voice" => Ok(Self::ZeroShotVoice),
@@ -67,6 +73,7 @@ impl MediaFileOriginProductCategory {
     // NB: BTreeSet::from() isn't const, but not worth using LazyStatic, etc.
     BTreeSet::from([
       Self::FaceAnimator,
+      Self::TextToSpeech,
       Self::Unknown,
       Self::VoiceConversion,
       Self::ZeroShotVoice,
@@ -85,6 +92,7 @@ mod tests {
     #[test]
     fn test_serialization() {
       assert_serialization(MediaFileOriginProductCategory::FaceAnimator, "face_animator");
+      assert_serialization(MediaFileOriginProductCategory::TextToSpeech, "tts");
       assert_serialization(MediaFileOriginProductCategory::Unknown, "unknown");
       assert_serialization(MediaFileOriginProductCategory::VoiceConversion, "voice_conversion");
       assert_serialization(MediaFileOriginProductCategory::ZeroShotVoice, "zs_voice");
@@ -93,6 +101,7 @@ mod tests {
     #[test]
     fn to_str() {
       assert_eq!(MediaFileOriginProductCategory::FaceAnimator.to_str(), "face_animator");
+      assert_eq!(MediaFileOriginProductCategory::TextToSpeech.to_str(), "tts");
       assert_eq!(MediaFileOriginProductCategory::Unknown.to_str(), "unknown");
       assert_eq!(MediaFileOriginProductCategory::VoiceConversion.to_str(), "voice_conversion");
       assert_eq!(MediaFileOriginProductCategory::ZeroShotVoice.to_str(), "zs_voice");
@@ -101,6 +110,7 @@ mod tests {
     #[test]
     fn from_str() {
       assert_eq!(MediaFileOriginProductCategory::from_str("face_animator").unwrap(), MediaFileOriginProductCategory::FaceAnimator);
+      assert_eq!(MediaFileOriginProductCategory::from_str("tts").unwrap(), MediaFileOriginProductCategory::TextToSpeech);
       assert_eq!(MediaFileOriginProductCategory::from_str("unknown").unwrap(), MediaFileOriginProductCategory::Unknown);
       assert_eq!(MediaFileOriginProductCategory::from_str("voice_conversion").unwrap(), MediaFileOriginProductCategory::VoiceConversion);
       assert_eq!(MediaFileOriginProductCategory::from_str("zs_voice").unwrap(), MediaFileOriginProductCategory::ZeroShotVoice);
@@ -109,8 +119,9 @@ mod tests {
     #[test]
     fn all_variants() {
       let mut variants = MediaFileOriginProductCategory::all_variants();
-      assert_eq!(variants.len(), 4);
+      assert_eq!(variants.len(), 5);
       assert_eq!(variants.pop_first(), Some(MediaFileOriginProductCategory::FaceAnimator));
+      assert_eq!(variants.pop_first(), Some(MediaFileOriginProductCategory::TextToSpeech));
       assert_eq!(variants.pop_first(), Some(MediaFileOriginProductCategory::Unknown));
       assert_eq!(variants.pop_first(), Some(MediaFileOriginProductCategory::VoiceConversion));
       assert_eq!(variants.pop_first(), Some(MediaFileOriginProductCategory::ZeroShotVoice));

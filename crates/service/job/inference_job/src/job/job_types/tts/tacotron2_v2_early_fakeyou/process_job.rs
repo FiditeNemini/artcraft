@@ -27,6 +27,7 @@ use crate::job::job_types::tts::tacotron2_v2_early_fakeyou::download_static_depe
 use crate::job::job_types::tts::tacotron2_v2_early_fakeyou::health_check_trap::maybe_block_on_sidecar_health_check;
 use crate::job::job_types::tts::tacotron2_v2_early_fakeyou::seconds_to_decoder_steps::seconds_to_decoder_steps;
 use crate::job::job_types::tts::tacotron2_v2_early_fakeyou::tacotron2_inference_command::{InferenceArgs, MelMultiplyFactor};
+use crate::job::job_types::tts::tacotron2_v2_early_fakeyou::upload_results::{upload_results, UploadResultArgs};
 use crate::job::job_types::tts::tacotron2_v2_early_fakeyou::vocoder_option::VocoderForInferenceOption;
 use crate::job_dependencies::JobDependencies;
 use crate::util::maybe_download_file_from_bucket::{maybe_download_file_from_bucket, MaybeDownloadArgs};
@@ -305,78 +306,27 @@ async fn process_job_with_cleanup(
 
   safe_delete_temp_file(&output_metadata_fs_path);
 
-  // ==================== UPLOAD AUDIO TO BUCKET ==================== //
+  // ==================== UPLOAD FILES AND SAVE RECORD ==================== //
 
-  job_progress_reporter.log_status("uploading result")
-      .map_err(|e| ProcessSingleJobError::Other(e))?;
-
-  let audio_result_object_path = args.job_dependencies.buckets.bucket_path_unifier.tts_inference_wav_audio_output_path(
-    &job.uuid_idempotency_token); // TODO: Don't use this!
-
-  info!("Audio destination bucket path: {:?}", &audio_result_object_path);
-
-  info!("Uploading audio...");
-
-  args.job_dependencies.buckets.public_bucket_client.upload_filename_with_content_type(
-    &audio_result_object_path,
-    &output_audio_fs_path,
-    "audio/wav")
-      .await
-      .map_err(|e| ProcessSingleJobError::Other(e))?;
-
-  safe_delete_temp_file(&output_audio_fs_path);
-
-  // ==================== UPLOAD SPECTROGRAM TO BUCKETS ==================== //
-
-  let spectrogram_result_object_path = args.job_dependencies.buckets.bucket_path_unifier.tts_inference_spectrogram_output_path(
-    &job.uuid_idempotency_token); // TODO: Don't use this!
-
-  info!("Spectrogram destination bucket path: {:?}", &spectrogram_result_object_path);
-
-  info!("Uploading spectrogram...");
-
-  args.job_dependencies.buckets.public_bucket_client.upload_filename_with_content_type(
-    &spectrogram_result_object_path,
-    &output_spectrogram_fs_path,
-    "application/json")
-      .await
-      .map_err(|e| ProcessSingleJobError::Other(e))?;
-
-  safe_delete_temp_file(&output_spectrogram_fs_path);
-
-  // ==================== DELETE DOWNLOADED FILE ==================== //
-
-  // NB: We should be using a tempdir, but to make absolutely certain we don't overflow the disk...
-  safe_delete_temp_directory(&work_temp_dir.path());
-
-  // ==================== SAVE RECORDS ==================== //
-
-  let text_hash = sha256_hash_string(&cleaned_inference_text)
-      .map_err(|e| ProcessSingleJobError::Other(e))?;
-
-  info!("Saving tts inference record...");
-
-  let (id, inference_result_token) = insert_tts_result(
-    &args.job_dependencies.db.mysql_pool,
-    JobType::GenericInferenceJob(&job),
-    &text_hash,
-    Some(pretrained_vocoder),
-    &audio_result_object_path,
-    &spectrogram_result_object_path,
-    file_metadata.file_size_bytes,
-    file_metadata.duration_millis.unwrap_or(0),
-    args.job_dependencies.job.info.container.is_on_prem,
-    &args.job_dependencies.job.info.container.hostname,
-    args.job_dependencies.job.system.is_debug_worker)
-      .await
-      .map_err(|e| ProcessSingleJobError::Other(e))?;
+  let inference_result = upload_results(UploadResultArgs {
+    job_dependencies: args.job_dependencies,
+    job_progress_reporter: &mut job_progress_reporter,
+    job,
+    cleaned_inference_text: &cleaned_inference_text,
+    work_temp_dir,
+    pretrained_vocoder,
+    file_metadata: &file_metadata,
+    output_audio_fs_path: &output_audio_fs_path,
+    output_spectrogram_fs_path: &output_spectrogram_fs_path,
+    upload_as_media_file: model_dependencies.upload_as_media_file,
+  }).await?;
 
   info!("TTS Done. Original text was: {:?}", &job.maybe_raw_inference_text);
 
   args.job_dependencies.clients.firehose_publisher.tts_inference_finished(
     job.maybe_creator_user_token.as_deref(),
     tts_model.model_token.as_str(),
-    &inference_result_token)
+    &inference_result.entity_token)
       .await
       .map_err(|e| {
         error!("error publishing event: {:?}", e);
@@ -386,20 +336,20 @@ async fn process_job_with_cleanup(
   job_progress_reporter.log_status("done")
       .map_err(|e| ProcessSingleJobError::Other(e))?;
 
-  info!("Job {:?} complete success! Downloaded, ran inference, and uploaded. Saved model record: {}, Result Token: {}",
-        job.id, id, &inference_result_token);
+  info!("Job {:?} complete success! Downloaded, ran inference, and uploaded. Result Token: {}",
+        job.id, &inference_result.entity_token);
 
   Ok(JobSuccessResult {
     maybe_result_entity: Some(ResultEntity {
-      entity_type: InferenceResultType::TextToSpeech,
-      entity_token: inference_result_token
+      entity_type: inference_result.entity_type,
+      entity_token: inference_result.entity_token,
     }),
     inference_duration,
   })
 }
 
 #[derive(Deserialize, Default)]
-struct FileMetadata {
+pub struct FileMetadata {
   pub duration_millis: Option<u64>,
   pub mimetype: Option<String>,
   pub file_size_bytes: u64,

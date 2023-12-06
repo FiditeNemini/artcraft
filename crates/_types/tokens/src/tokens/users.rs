@@ -6,7 +6,7 @@ use serde::Serialize;
 use crate::prefixes::TokenPrefix;
 
 /// The primary key for users.
-#[derive(Clone, PartialEq, Eq, sqlx::Type, Debug, Serialize, Deserialize)]
+#[derive(Clone, PartialEq, Eq, sqlx::Type, Debug, Serialize, Deserialize, Default)]
 #[sqlx(transparent)]
 pub struct UserToken(pub String);
 

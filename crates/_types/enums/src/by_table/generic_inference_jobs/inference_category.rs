@@ -13,10 +13,11 @@ use strum::EnumIter;
 ///
 /// DO NOT CHANGE VALUES WITHOUT A MIGRATION STRATEGY.
 #[cfg_attr(test, derive(EnumIter, EnumCount))]
-#[derive(Clone, Copy, Eq, PartialEq, Hash, Ord, PartialOrd, Deserialize, Serialize)]
+#[derive(Clone, Copy, Eq, PartialEq, Hash, Ord, PartialOrd, Deserialize, Serialize, Default)]
 pub enum InferenceCategory {
   /// Eg. SadTalker and possibly Wav2Lip
   #[serde(rename = "lipsync_animation")]
+  #[default]
   LipsyncAnimation,
 
   #[serde(rename = "text_to_speech")]
