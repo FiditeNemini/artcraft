@@ -25,7 +25,7 @@ tokens = { path = "../../_types/tokens" }
 
 # External
 anyhow = "1.0.75"
-chrono = { version = "=0.4.22", features = ["serde"] }
+chrono = { version = "=0.4.31", features = ["serde"] }
 dotenv = "0.15.0"
 log = "0.4.14"
 
