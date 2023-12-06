@@ -6459,7 +6459,6 @@ dependencies = [
  "strum",
  "toml",
  "utoipa",
- "utoipa-swagger-ui",
 ]
 
 [[package]]
