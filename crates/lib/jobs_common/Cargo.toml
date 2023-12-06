@@ -24,7 +24,7 @@ redis_common = { path = "../redis_common" }
 
 # External
 anyhow = "1.0.75"
-chrono = { version = "=0.4.22", features = ["serde"] }
+chrono = { version = "=0.4.31", features = ["serde"] }
 log = "0.4.14"
 r2d2_redis = "0.14.0"
 my-workspace-hack = { version = "0.1", path = "../../../my-workspace-hack" }
