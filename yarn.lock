@@ -4441,6 +4441,7 @@ __metadata:
     "@types/react": ^16.9.36
     "@types/react-autocomplete": ^1.8.6
     "@types/react-dom": ^16.9.8
+    "@types/react-paginate": ^7.1.4
     "@types/react-router-dom": ^5.1.7
     "@types/uuid": ^8.3.0
     "@types/wavesurfer.js": ^5.2.0
@@ -4469,6 +4470,7 @@ __metadata:
     react-drag-drop-files: ^2.3.9
     react-i18next: ^11.15.4
     react-infinite-scroll-component: ^6.1.0
+    react-paginate: ^8.2.0
     react-range: ^1.8.14
     react-reveal: ^1.2.2
     react-router-dom: ^5.2.0
@@ -4582,7 +4584,6 @@ __metadata:
   resolution: "@storyteller/root@workspace:."
   dependencies:
     "@react-spring/types": ^9.7.3
-    "@types/react-paginate": ^7.1.4
     craco: ^0.0.3
     cross-env: ^7.0.3
     husky: ^8.0.3
@@ -4590,7 +4591,6 @@ __metadata:
     moment: ^2.29.4
     prettier: ^3.1.0
     pretty-quick: ^3.1.3
-    react-paginate: ^8.2.0
     universal-cookie: ^6.1.1
     yarn: ^1.22.19
   languageName: unknown

@@ -26,13 +26,12 @@ import FaceAnimatorSuccess from "./FaceAnimatorSuccess";
 import InferenceJobsList from "components/layout/InferenceJobsList";
 import { FaceAnimatorCore } from "./FaceAnimatorTypes";
 import { BasicVideo } from "components/common";
-import "./LipsyncEditor.scss";
 import { FrontendInferenceJobType } from "@storyteller/components/src/jobs/InferenceJob";
 import { usePrefixedDocumentTitle } from "common/UsePrefixedDocumentTitle";
 import { Analytics } from "common/Analytics";
-// import { GetMedia } from "@storyteller/components/src/api/media_files/GetMedia";
+import "./FaceAnimator.scss";
 
-export default function LipsyncEditor({ enqueueInferenceJob,  sessionSubscriptionsWrapper,  inferenceJobs,  inferenceJobsByCategory, ...rest }: FaceAnimatorCore) {
+export default function FaceAnimator({ enqueueInferenceJob,  sessionSubscriptionsWrapper,  inferenceJobs,  inferenceJobsByCategory, ...rest }: FaceAnimatorCore) {
   const { mediaToken } = useParams<{ mediaToken: string }>();
   const [presetAudio] = useMedia({ mediaToken });
   const { t } = useLocalize("FaceAnimator");
