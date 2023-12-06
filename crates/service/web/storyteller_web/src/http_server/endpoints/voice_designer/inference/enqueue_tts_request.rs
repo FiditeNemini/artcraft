@@ -1,8 +1,8 @@
 #![forbid(unused_imports)]
 #![forbid(unused_mut)]
 #![forbid(unused_variables)]
+use utoipa::ToSchema;
 
-// TODO MOVE into own file.
 use std::fmt::Debug;
 use std::sync::Arc;
 
@@ -42,7 +42,9 @@ const DEBUG_HEADER_NAME: &str = "enable-debug-mode";
 /// This is useful for catching the live logs or intercepting the job.
 const ROUTING_TAG_HEADER_NAME: &str = "routing-tag";
 
+
 #[derive(Deserialize)]
+#[derive(ToSchema)]
 pub struct EnqueueTTSRequest {
     uuid_idempotency_token: String,
     text: String,
@@ -50,12 +52,14 @@ pub struct EnqueueTTSRequest {
 }
 
 #[derive(Serialize)]
+#[derive(ToSchema)]
 pub struct EnqueueTTSRequestSuccessResponse {
     pub success: bool,
     pub inference_job_token: InferenceJobToken,
 }
 
 #[derive(Debug)]
+#[derive(ToSchema)]
 pub enum EnqueueTTSRequestError {
     BadInput(String),
     NotAuthorized,
@@ -95,13 +99,26 @@ impl std::fmt::Display for EnqueueTTSRequestError {
 // Reference enqueue_infer_tts_handler.rs for checks: rate limiting / user sessions
 // insert generic inference job.rs
 // Need to convert it to generic inference job.
+#[utoipa::path(
+    post,
+    path = "/inference/enqueue_tts/",
+    responses(
+        (status = 200, description = "Enqueue TTS generically", body = EnqueueTTSRequestSuccessResponse),
+        (status = 400, description = "Bad input", body = EnqueueTTSRequestError),
+        (status = 401, description = "Not authorized", body = EnqueueTTSRequestError),
+        (status = 429, description = "Rate limited", body = EnqueueTTSRequestError),
+        (status = 500, description = "Server error", body = EnqueueTTSRequestError)
+    ),
+    params(
+        ("request" = EnqueueTTSRequest, description = "Payload for TTS Request")
+    )
+)]
 pub async fn enqueue_tts_request(
     http_request: HttpRequest,
     request: web::Json<EnqueueTTSRequest>,
     server_state: web::Data<Arc<ServerState>>
 ) -> Result<HttpResponse, EnqueueTTSRequestError> {
-    println!("Received payload");
-
+    
     let mut maybe_user_token: Option<UserToken> = None;
 
     let mut mysql_connection = server_state.mysql_pool.acquire().await.map_err(|err| {

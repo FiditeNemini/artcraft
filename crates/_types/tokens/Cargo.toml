@@ -28,6 +28,9 @@ sqlx = { version = "0.7.2", features = [ "mysql", "runtime-tokio", "tls-rustls",
 sqlx-core = { version = "0.7.2" }
 my-workspace-hack = { version = "0.1", path = "../../../my-workspace-hack" }
 
+utoipa = { version = "4", features = ["actix_extras"] }
+utoipa-swagger-ui = { version = "5", features = ["actix-web"] }
+
 [dev-dependencies]
 
 # Enum utilities
