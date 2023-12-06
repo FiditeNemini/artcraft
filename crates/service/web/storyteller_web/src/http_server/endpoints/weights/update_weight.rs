@@ -15,9 +15,9 @@ use mysql_queries::queries::model_weights::update_weight::{ update_weights, Upda
 use tokens::tokens::model_weights::ModelWeightToken;
 
 use crate::server_state::ServerState;
-
+use utopia::ToSchema;
 /// TODO will eventually be polymorphic
-#[derive(Deserialize)]
+#[derive(Deserialize, ToSchema)]
 pub struct UpdateWeightRequest {
     pub title: Option<String>,
     pub thumbnail_token: Option<String>,
@@ -28,7 +28,7 @@ pub struct UpdateWeightRequest {
     pub visibility: Option<Visibility>,
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, ToSchema)]
 pub struct UpdateWeightResponse {
     pub success: bool,
 }
@@ -41,7 +41,7 @@ pub struct UpdateWeightPathInfo {
 
 // =============== Error Response ===============
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, ToSchema)]
 pub enum UpdateWeightError {
     BadInput(String),
     NotFound,
@@ -72,7 +72,20 @@ impl fmt::Display for UpdateWeightError {
 }
 
 // =============== Handler ===============
-
+#[utoipa::path(
+    post,
+    path = "/weight/{weight_token}",
+    responses(
+        (status = 200, description = "Success Update", body = SimpleGenericJsonSuccess),
+        (status = 400, description = "Bad input", body = UpdateWeightError),
+        (status = 401, description = "Not authorized", body = UpdateWeightError),
+        (status = 500, description = "Server error", body = UpdateWeightError),
+    ),
+    params(
+        ("request" = UpdateWeightRequest, description = "Payload for Request"),
+        ("path" = UpdateWeightPathInfo, description = "Path for Request")
+    )
+  )]
 pub async fn update_weight_handler(
     http_request: HttpRequest,
     path: Path<UpdateWeightPathInfo>,

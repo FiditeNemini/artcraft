@@ -18,7 +18,8 @@ use mysql_queries::queries::model_weights::get_weight::get_weight_by_token;
 use enums::by_table::model_weights::weights_types::WeightsType;
 use enums::by_table::model_weights::weights_category::WeightsCategory;
 
-#[derive(Serialize, Clone)]
+use utoipa::ToSchema
+#[derive(Serialize, Clone,ToSchema)]
 pub struct GetWeightResponse {
     success: bool,
     weight_token: ModelWeightToken,
@@ -44,12 +45,12 @@ pub struct GetWeightResponse {
     created_at: DateTime<Utc>,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize,ToSchema)]
 pub struct GetWeightPathInfo {
     weight_token: String,
 }
 
-#[derive(Debug)]
+#[derive(Debug,ToSchema)]
 pub enum GetWeightError {
     NotAuthorized,
     NotFound,

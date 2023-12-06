@@ -20,15 +20,18 @@ use utoipa::OpenApi;
 #[derive(OpenApi)]
 #[openapi(paths(crate::http_server::endpoints::voice_designer::inference::enqueue_tts_request::enqueue_tts_request,
     crate::http_server::endpoints::weights::list_availible_weights::list_availible_weights_handler,
-    crate::http_server::endpoints::weights::delete_weight::delete_weight_handler
+    crate::http_server::endpoints::weights::delete_weight::delete_weight_handler,
+    crate::http_server::endpoints::weights::update_weight::update_weight_handler,
+    crate::http_server::endpoints::weights::get_weight::get_weight_handler,
+    crate::http_server::endpoints::weights::create_weight::create_weight_handler,
     ),components(schemas(
-                        SimpleGenericJsonSuccess,
-                        EnqueueTTSRequest,EnqueueTTSRequestSuccessResponse,EnqueueTTSRequestError,InferenceJobToken,
+    SimpleGenericJsonSuccess,
+    EnqueueTTSRequest,EnqueueTTSRequestSuccessResponse,EnqueueTTSRequestError,InferenceJobToken,
                         
-                        ModelWeightToken,UserToken,Visibility,
-                        ListWeightError,ListWeightsByPathInfo,ModelWeightForList,ListWeightError,WeightsCategory,WeightsType,
-                        ListAvailibleWeightsQuery,ListAvailibleWeightsSuccessResponse,ListWeightsByPathInfo,ModelWeightForList,
-                        DeleteWeightPathInfo,DeleteWeightRequest,DeleteWeightError,DeleteWeightRequest,DeleteWeightError
-                    )))]
+    ModelWeightToken,UserToken,Visibility,
+    ListWeightError,ListWeightsByPathInfo,ModelWeightForList,ListWeightError,WeightsCategory,WeightsType,
+    ListAvailibleWeightsQuery,ListAvailibleWeightsSuccessResponse,ListWeightsByPathInfo,ModelWeightForList,
+    DeleteWeightPathInfo,DeleteWeightRequest,DeleteWeightError,DeleteWeightRequest,DeleteWeightError
+    )))]
 pub struct ApiDoc;
 
