@@ -1,10 +1,11 @@
 
 use crate::http_server::endpoints::voice_designer::inference::enqueue_tts_request::*;
 
-
 use crate::http_server::endpoints::weights::list_availible_weights::*;
-use crate::http_server::web_utils::response_success_helpers::simple_json_success::SimpleGenericJsonSuccess;
+use crate::http_server::web_utils::response_success_helpers::*;
 use crate::http_server::endpoints::weights::delete_weight::*;
+use crate::http_server::endpoints::weights::get_weight::*;
+use crate::http_server::endpoints::weights::update_weight::*;
 use enums::by_table::model_weights::{
     weights_types::WeightsType,
     weights_category::WeightsCategory,
@@ -23,15 +24,20 @@ use utoipa::OpenApi;
     crate::http_server::endpoints::weights::delete_weight::delete_weight_handler,
     crate::http_server::endpoints::weights::update_weight::update_weight_handler,
     crate::http_server::endpoints::weights::get_weight::get_weight_handler,
-    crate::http_server::endpoints::weights::create_weight::create_weight_handler,
     ),components(schemas(
+    // Tokens
+    UserToken,Visibility,
+    // 
     SimpleGenericJsonSuccess,
+    // Inference
     EnqueueTTSRequest,EnqueueTTSRequestSuccessResponse,EnqueueTTSRequestError,InferenceJobToken,
-                        
-    ModelWeightToken,UserToken,Visibility,
-    ListWeightError,ListWeightsByPathInfo,ModelWeightForList,ListWeightError,WeightsCategory,WeightsType,
+    //Model Weights                   
+    ModelWeightToken,WeightsCategory,WeightsType,
+    GetWeightPathInfo,GetWeightResponse,GetWeightError,
+    UpdateWeightRequest,UpdateWeightRequest,UpdateWeightPathInfo,UpdateWeightRequest,UpdateWeightError,
+    DeleteWeightPathInfo,DeleteWeightRequest,DeleteWeightError,DeleteWeightRequest,DeleteWeightError,
+    ListWeightError,ListWeightsByPathInfo,ModelWeightForList,ListWeightError,
     ListAvailibleWeightsQuery,ListAvailibleWeightsSuccessResponse,ListWeightsByPathInfo,ModelWeightForList,
-    DeleteWeightPathInfo,DeleteWeightRequest,DeleteWeightError,DeleteWeightRequest,DeleteWeightError
     )))]
 pub struct ApiDoc;
 

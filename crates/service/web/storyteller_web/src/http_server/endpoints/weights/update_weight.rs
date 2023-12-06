@@ -15,7 +15,7 @@ use mysql_queries::queries::model_weights::update_weight::{ update_weights, Upda
 use tokens::tokens::model_weights::ModelWeightToken;
 
 use crate::server_state::ServerState;
-use utopia::ToSchema;
+use utoipa::ToSchema;
 /// TODO will eventually be polymorphic
 #[derive(Deserialize, ToSchema)]
 pub struct UpdateWeightRequest {
@@ -34,7 +34,7 @@ pub struct UpdateWeightResponse {
 }
 
 /// For the URL PathInfo
-#[derive(Deserialize)]
+#[derive(Deserialize,ToSchema)]
 pub struct UpdateWeightPathInfo {
     weight_token: String,
 }

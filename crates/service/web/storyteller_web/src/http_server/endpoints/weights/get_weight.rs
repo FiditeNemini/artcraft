@@ -18,8 +18,9 @@ use mysql_queries::queries::model_weights::get_weight::get_weight_by_token;
 use enums::by_table::model_weights::weights_types::WeightsType;
 use enums::by_table::model_weights::weights_category::WeightsCategory;
 
-use utoipa::ToSchema
-#[derive(Serialize, Clone,ToSchema)]
+use utoipa::ToSchema;
+
+#[derive(Serialize, Clone, ToSchema)]
 pub struct GetWeightResponse {
     success: bool,
     weight_token: ModelWeightToken,
@@ -72,7 +73,20 @@ impl ResponseError for GetWeightError {
         }
     }
 }
-
+#[utoipa::path(
+    get,
+    path = "/weight/{weight_token}",
+    responses(
+        (status = 200, description = "Success Update", body = GetWeightResponse),
+        (status = 400, description = "Bad input", body = GetWeightError),
+        (status = 401, description = "Not authorized", body = GetWeightError),
+        (status = 500, description = "Server error", body = GetWeightError),
+    ),
+    params(
+        ("request" = UpdateWeightRequest, description = "Payload for Request"),
+        ("path" = GetWeightPathInfo, description = "Path for Request")
+    )
+  )]
 pub async fn get_weight_handler(
     http_request: HttpRequest,
     path: Path<GetWeightPathInfo>,

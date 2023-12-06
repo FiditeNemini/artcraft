@@ -160,7 +160,7 @@ pulldown-cmark = "0.9.3"
 # include support for async fn in traits.
 async-trait = "0.1.58"
 my-workspace-hack = { version = "0.1", path = "../../../../my-workspace-hack" }
-utoipa = { version = "4", features = ["actix_extras"] }
+utoipa = { version = "4", features = ["chrono","actix_extras"] }
 utoipa-swagger-ui = { version = "5", features = ["actix-web"] }
 
 [build-dependencies]

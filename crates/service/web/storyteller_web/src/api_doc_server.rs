@@ -56,6 +56,7 @@ use std::{
 
 pub mod api_doc;
 use api_doc::ApiDoc;
+
 use futures::future::LocalBoxFuture;
 use utoipa::OpenApi;
 #[actix_web::main]
