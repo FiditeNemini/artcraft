@@ -21,7 +21,7 @@ errors = { path = "../../../lib/errors" }
 reusable_types = { path = "../../../_types/reusable_types" }
 
 # External
-chrono = { version = "=0.4.22", features = ["serde"] }
+chrono = { version = "0.4.22", features = ["serde"] }
 dotenv = "0.15.0"
 hostname = "0.3.1"
 #once_cell = "1.9.0"

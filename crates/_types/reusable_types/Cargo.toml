@@ -18,7 +18,7 @@ path = "src/lib.rs"
 # (none)
 
 # External
-chrono = { version = "=0.4.22", features = ["serde"] }
+chrono = { version = "0.4.22", features = ["serde"] }
 
 # Serialization
 serde = "1.0.125"
