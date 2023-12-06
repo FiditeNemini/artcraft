@@ -11,11 +11,12 @@ import { Button } from 'components/common';
 import { Analytics } from "common/Analytics";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faChevronRight, faHourglass1, faRemove, faTrophy, faWarning } from "@fortawesome/free-solid-svg-icons";
+import { FrontendInferenceJobType } from "@storyteller/components/src/jobs/InferenceJob";
 
 const DEFAULT_QUEUE_REFRESH_INTERVAL_MILLIS = 15000;
 
 export default function FaceAnimatorJobs({ t }: { t: any }) {
-  const { inferenceJobs = [] } = useInferenceJobs({ type: 0 });
+  const { inferenceJobs = [] } = useInferenceJobs(FrontendInferenceJobType.FaceAnimation);
   const [pending, pendingSet] = useState<GetPendingTtsJobCountSuccessResponse>({
     success: true,
     pending_job_count: 0,

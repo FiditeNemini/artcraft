@@ -170,7 +170,7 @@ export default function FaceAnimator({ enqueueInferenceJob,  sessionSubscription
     <InferenceJobsList {...{
       t,
       onSelect: () => Analytics.voiceConversionClickDownload(),
-      inferenceJobs: inferenceJobsByCategory.get(FrontendInferenceJobType.FaceAnimation),
+      jobType: FrontendInferenceJobType.FaceAnimation,
       statusTxt
     }}/>
     <div {...{ className: "face-animator-mobile-sample" }}>
