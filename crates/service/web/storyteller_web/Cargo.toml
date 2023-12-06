@@ -58,7 +58,7 @@ users_component = { path = "../../plugins/users" }
 # External
 anyhow = "1.0.75"
 base64 = "0.21.0"
-chrono = { version = "=0.4.31", features = ["serde"] }
+chrono = { version = "=0.4.22", features = ["serde"] }
 derive_more = "0.99.17"
 dotenv = "0.15.0"
 hex = "0.4.3"
@@ -104,7 +104,7 @@ pin-project-lite = "0.2.9" # NB: For middleware/futures upgrade
 sqlx = { version = "0.7.2", features = [ "mysql", "runtime-tokio", "tls-rustls", "chrono" ] }
 
 # Redis Database
-limitation = "0.1.1" # Redis rate limiter
+limitation = { path = "../../../vendor/limitation" }
 r2d2_redis = "0.14.0"
 
 # Elasticsearch

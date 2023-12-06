@@ -86,6 +86,7 @@ members = [
   "crates/service/plugins/users",
 
   # Vendored code
+  "crates/vendor/limitation",
   "crates/vendor/newrelic-telemetry-sdk-rust",
 
   # Vendored code

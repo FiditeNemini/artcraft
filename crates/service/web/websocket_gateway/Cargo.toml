@@ -27,7 +27,7 @@ twitch_common = { path = "../../../lib/api_clients/twitch_common" }
 # External
 anyhow = "1.0.75"
 base64 = "0.21.0"
-chrono = { version = "=0.4.31", features = ["serde"] }
+chrono = { version = "=0.4.22", features = ["serde"] }
 derive_more = "0.99.17"
 dotenv = "0.15.0"
 hostname = "0.3.1"
@@ -50,7 +50,7 @@ futures_old_for_limiter = { package = "futures", version = "0.1.29" } # Older ve
 sqlx = { version = "0.7.2", features = [ "mysql", "runtime-tokio", "tls-rustls", "chrono" ] }
 
 # Redis Database
-limitation = "0.1.1" # Redis rate limiter
+limitation = { path = "../../../vendor/limitation" }
 r2d2_redis = "0.14.0"
 redis_async = { package = "redis", version = "0.21.5", features = ["tokio-comp"] }
 
