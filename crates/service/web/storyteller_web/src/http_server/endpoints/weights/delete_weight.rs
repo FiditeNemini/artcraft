@@ -10,7 +10,12 @@ use enums::by_table::audit_logs::audit_log_entity_action::AuditLogEntityAction::
 
 use http_server_common::request::get_request_ip::get_request_ip;
 use http_server_common::response::serialize_as_json_error::serialize_as_json_error;
-use mysql_queries::queries::model_weights::delete_weights::{delete_weights_as_user,delete_weights_as_mod,undelete_weights_as_user,undelete_weights_as_mod};
+use mysql_queries::queries::model_weights::delete_weights::{
+  delete_weights_as_user,
+  delete_weights_as_mod,
+  undelete_weights_as_user,
+  undelete_weights_as_mod
+};
 use mysql_queries::queries::model_weights::get_weight::get_weight_by_token;
 
 use tokens::tokens::model_weights::ModelWeightToken;
@@ -22,21 +27,23 @@ use crate::util::delete_role_disambiguation::{delete_role_disambiguation, Delete
 use enums::common::visibility::Visibility;
 use tokens::tokens::users::UserToken;
 
+use utoipa::ToSchema;
 
-#[derive(Deserialize)]
+#[derive(Deserialize,ToSchema)]
 pub struct DeleteWeightPathInfo {
   weight_token: String, 
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize,ToSchema)]
 pub struct DeleteWeightRequest {
   set_delete: bool,
   as_mod: bool
 }
 
+
 // =============== Error Response ===============
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize,ToSchema)]
 pub enum DeleteWeightError {
   BadInput(String),
   NotFound,
@@ -66,6 +73,21 @@ impl fmt::Display for DeleteWeightError {
   }
 }
 
+
+#[utoipa::path(
+  get,
+  path = "/weight/{weight_token}",
+  responses(
+      (status = 200, description = "Success Delete", body = SimpleGenericJsonSuccess),
+      (status = 400, description = "Bad input", body = DeleteWeightError),
+      (status = 401, description = "Not authorized", body = DeleteWeightError),
+      (status = 500, description = "Server error", body = DeleteWeightError),
+  ),
+  params(
+      ("request" = DeleteWeightRequest, description = "Payload for Request"),
+      ("path" = DeleteWeightPathInfo, description = "Path for Request")
+  )
+)]
 pub async fn delete_weight_handler(
     http_request: HttpRequest,
     path: Path<DeleteWeightPathInfo>,
