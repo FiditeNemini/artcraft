@@ -5,8 +5,8 @@ use strum::EnumCount;
 #[cfg(test)]
 use strum::EnumIter;
 
-use utoipia::ToSchema;
 
+use utoipa::ToSchema;
 #[cfg_attr(test, derive(EnumIter, EnumCount))]
 #[derive(Clone, Copy, Eq, PartialEq, Hash, Ord, PartialOrd, Deserialize, Serialize, ToSchema)]
 pub enum WeightsCategory {

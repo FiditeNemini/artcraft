@@ -20,16 +20,16 @@ use tokens::tokens::model_weights::ModelWeightToken;
 use crate::http_server::common_responses::user_details_lite::UserDetailsLight;
 use crate::server_state::ServerState;
 
-use utoipia::Schema;
+use utoipa::ToSchema;
 
-#[derive(Deserialize,Schema)]
+#[derive(Deserialize,ToSchema)]
 pub struct ListAvailibleWeightsQuery {
     pub sort_ascending: Option<bool>,
     pub page_size: u16,
     pub page_index : u16,
 }
 
-#[derive(Serialize,Schema)]
+#[derive(Serialize,ToSchema)]
 pub struct ListAvailibleWeightsSuccessResponse {
     pub success: bool,
     pub weights: Vec<ModelWeightForList>,
@@ -39,14 +39,14 @@ pub struct ListAvailibleWeightsSuccessResponse {
     pub cursor_previous: Option<String>,
 }
 
-#[derive(Deserialize,Schema)]
+#[derive(Deserialize,ToSchema)]
 pub struct ListWeightsByPathInfo {
     pub username: Option<String>,
     pub weights_type: Option<String>,
     pub weights_category: Option<String>,
 }
 
-#[derive(Serialize,Schema)]
+#[derive(Serialize,ToSchema)]
 pub struct ModelWeightForList {
     pub weight_token: ModelWeightToken,
 
@@ -86,7 +86,7 @@ pub struct ModelWeightForList {
 
 }
 
-#[derive(Debug,Schema)]
+#[derive(Debug,ToSchema)]
 pub enum ListWeightError {
     NotAuthorized,
     ServerError,
@@ -116,7 +116,7 @@ impl ResponseError for ListWeightError {
         (status = 500, description = "Server error", body = ListWeightError),
     ),
     params(
-        ("request" = ListAvailibleWeightsQuery, description = "Payload for Request")
+        ("request" = ListAvailibleWeightsQuery, description = "Payload for Request"),
         ("path" = ListWeightsByPathInfo, description = "Path for Request")
     )
 )]
