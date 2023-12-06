@@ -6,7 +6,7 @@ import { LoginPage } from "./pages/login/LoginPage";
 import { ModerationFc } from "./pages/moderation/moderation_main/ModerationFc";
 import { ModerationIpBanListFc } from "./pages/moderation/moderation_ip_ban_list/ModerationIpBanListFc";
 import { ModerationViewIpBanFc } from "./pages/moderation/moderation_view_ip_ban/ModerationViewIpBanFc";
-import { LipsyncEditor } from "./pages/lipsync";
+import FaceAnimator from "./pages/face_animator";
 import { ProfileEditFc } from "./pages/profile/profile_edit/ProfileEditFc";
 import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
 import { SessionSubscriptionsWrapper } from "@storyteller/components/src/session/SessionSubscriptionsWrapper";
@@ -625,7 +625,7 @@ class PageContainer extends React.Component<
             </Route>
 
             <Route path="/face-animator/:mediaToken?">
-              <LipsyncEditor
+              <FaceAnimator
                 {...{
                   enqueueInferenceJob: this.props.enqueueInferenceJob,
                   sessionSubscriptionsWrapper: this.props.sessionSubscriptionsWrapper,
