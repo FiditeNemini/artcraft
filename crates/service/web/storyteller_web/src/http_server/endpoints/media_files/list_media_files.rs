@@ -12,22 +12,18 @@ use enums::by_table::media_files::media_file_origin_model_type::MediaFileOriginM
 use enums::by_table::media_files::media_file_origin_product_category::MediaFileOriginProductCategory;
 use enums::by_table::media_files::media_file_type::MediaFileType;
 use enums::common::visibility::Visibility;
-use mysql_queries::queries::media_files::list_media_files_for_user::{list_media_files_for_user, ListMediaFileForUserArgs, ViewAs};
+use mysql_queries::queries::media_files::list_media_files::{list_media_files, ListMediaFilesArgs, ViewAs};
 use tokens::tokens::media_files::MediaFileToken;
 
 use crate::http_server::common_responses::pagination_cursors::PaginationCursors;
+use crate::http_server::common_responses::user_details_lite::UserDetailsLight;
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::server_state::ServerState;
 
 #[derive(Deserialize)]
-pub struct PathInfo {
-  username: String,
-}
-
-#[derive(Deserialize)]
 pub struct QueryParams {
   pub sort_ascending: Option<bool>,
-  pub limit: Option<usize>,
+  pub per_page: Option<usize>,
   pub cursor: Option<String>,
   pub cursor_is_reversed: Option<bool>,
   pub filter_media_type: Option<MediaFileType>,
@@ -53,6 +49,8 @@ pub struct MediaFileListItem {
   pub public_bucket_directory_hash: String,
   pub maybe_public_bucket_prefix: Option<String>,
   pub maybe_public_bucket_extension: Option<String>,
+
+  pub maybe_creator: Option<UserDetailsLight>,
 
   pub creator_set_visibility: Visibility,
 
@@ -87,9 +85,8 @@ impl std::fmt::Display for ErrorResponse {
   }
 }
 
-pub async fn list_media_files_for_user_handler(
+pub async fn list_media_files_handler(
   http_request: HttpRequest,
-  path: Path<PathInfo>,
   query: Query<QueryParams>,
   server_state: web::Data<Arc<ServerState>>
 ) -> Result<HttpResponse, ErrorResponse>
@@ -103,19 +100,17 @@ pub async fn list_media_files_for_user_handler(
         ErrorResponse::ServerError
       })?;
 
-  let mut is_author = false;
   let mut is_mod = false;
 
   match maybe_user_session {
     None => {},
     Some(session) => {
-      is_author = session.username == path.username;
       is_mod = session.can_ban_users;
     },
   };
 
   // TODO(bt,2023-12-04): Enforce real maximums and defaults
-  let limit = query.limit.unwrap_or(25);
+  let limit = query.per_page.unwrap_or(25);
 
   let sort_ascending = query.sort_ascending.unwrap_or(false);
   let cursor_is_reversed = query.cursor_is_reversed.unwrap_or(false);
@@ -131,16 +126,13 @@ pub async fn list_media_files_for_user_handler(
     None
   };
 
-  let view_as = if is_author {
-    ViewAs::Author
-  } else if is_mod {
+  let view_as = if is_mod {
     ViewAs::Moderator
   } else {
-    ViewAs::AnotherUser
+    ViewAs::NonModerator
   };
 
-  let query_results = list_media_files_for_user(ListMediaFileForUserArgs {
-    username: &path.username,
+  let query_results = list_media_files(ListMediaFilesArgs {
     limit,
     maybe_filter_media_type: query.filter_media_type,
     maybe_offset: cursor,
@@ -191,6 +183,12 @@ pub async fn list_media_files_for_user_handler(
         public_bucket_directory_hash: record.public_bucket_directory_hash,
         maybe_public_bucket_prefix: record.maybe_public_bucket_prefix,
         maybe_public_bucket_extension: record.maybe_public_bucket_extension,
+        maybe_creator: UserDetailsLight::from_optional_db_fields_owned(
+          record.maybe_creator_user_token,
+          record.maybe_creator_username,
+          record.maybe_creator_display_name,
+          record.maybe_creator_gravatar_hash,
+        ),
         creator_set_visibility: record.creator_set_visibility,
         created_at: record.created_at,
         updated_at: record.updated_at,
