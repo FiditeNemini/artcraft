@@ -47,10 +47,6 @@ futures = { version = "0.3.17", features = ["thread-pool"] } # feature for Threa
 futures-util = "0.3.29"
 futures_old_for_limiter = { package = "futures", version = "0.1.29" } # Older version of futures for `limiter` crate
 
-# MySql Database
-# "offline" supports typesafe builds without a live database
-# "rustls" doesn't appear to work with IP addresses, per:
-# https://github.com/launchbadge/sqlx/issues/1095#issuecomment-798050828
 sqlx = { version = "0.7.2", features = [ "mysql", "runtime-tokio", "tls-rustls", "chrono" ] }
 
 # Redis Database

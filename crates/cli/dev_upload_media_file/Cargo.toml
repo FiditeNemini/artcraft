@@ -33,10 +33,6 @@ log = "0.4.14"
 # NB: We switched to Tokio from `async-std` for broader ecosystem support.
 tokio = { version = "1.6.0", features = ["macros"] }
 
-# MySql Database
-# "offline" supports typesafe builds without a live database
-# "rustls" doesn't appear to work with IP addresses, per:
-# https://github.com/launchbadge/sqlx/issues/1095#issuecomment-798050828
 sqlx = { version = "0.7.2", features = [ "mysql", "runtime-tokio", "tls-rustls", "chrono" ] }
 my-workspace-hack = { version = "0.1", path = "../../../my-workspace-hack" }
 
