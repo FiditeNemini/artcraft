@@ -31,4 +31,4 @@ twitch_oauth2 = "0.6.0-rc.2"
 # Serialization
 serde = "1.0.125"
 serde_derive = "1.0.125"
-my-workspace-hack = { version = "0.1", path = "../../../../my-workspace-hack" }
+my-workspace-hack = { version = "0.1", path = "../../../my-workspace-hack" }

@@ -35,7 +35,7 @@ reqwest = { version = "0.11", features = ["json"] } # HTTP Client
 # Scraping
 rss = "2.0.2"
 scraper = "0.17.1"
-my-workspace-hack = { version = "0.1", path = "../../../my-workspace-hack" }
+my-workspace-hack = { version = "0.1", path = "../../my-workspace-hack" }
 
 [dev-dependencies]
 # None yet

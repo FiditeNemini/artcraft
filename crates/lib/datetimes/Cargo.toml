@@ -15,7 +15,7 @@ path = "src/lib.rs"
 [dependencies]
 chrono = { version = "0.4.22", features = ["serde"] }
 once_cell = "1.18.0"
-my-workspace-hack = { version = "0.1", path = "../../../my-workspace-hack" }
+my-workspace-hack = { version = "0.1", path = "../../my-workspace-hack" }
 
 [dev-dependencies]
 # (none)

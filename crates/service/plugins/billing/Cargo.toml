@@ -51,7 +51,7 @@ async-stripe = { version = "0.25.2", default-features = false, features = ["runt
 async-trait = "0.1.58"
 
 sqlx = { version = "0.7.2", features = [ "mysql", "runtime-tokio", "tls-rustls", "chrono" ] }
-my-workspace-hack = { version = "0.1", path = "../../../../my-workspace-hack" }
+my-workspace-hack = { version = "0.1", path = "../../../my-workspace-hack" }
 
 [dev-dependencies]
 mockall = "0.11.3"

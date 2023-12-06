@@ -89,6 +89,6 @@ members = [
   "crates/vendor/limitation",
   "crates/vendor/newrelic-telemetry-sdk-rust",
 
-  # Vendored code
-  "my-workspace-hack",
+  # cargo-hakari workspace hack (compilation speedup hack)
+  "crates/my-workspace-hack",
 ]
