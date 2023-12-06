@@ -104,7 +104,7 @@ pin-project-lite = "0.2.9" # NB: For middleware/futures upgrade
 sqlx = { version = "0.7.2", features = [ "mysql", "runtime-tokio", "tls-rustls", "chrono" ] }
 
 # Redis Database
-limitation = "0.1.1" # Redis rate limiter
+limitation = { path = "../../../vendor/limitation" }
 r2d2_redis = "0.14.0"
 
 # Elasticsearch
