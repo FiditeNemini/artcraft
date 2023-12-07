@@ -24,6 +24,8 @@ pub enum WeightsType {
     Tacotron2,
     #[serde(rename = "loRA")]
     LoRA,
+    #[serde(rename = "vall-e")]
+    VallE,
 }
 
 
@@ -37,6 +39,7 @@ impl WeightsType {
             Self::SoVitsSvc => "so_vits_svc",
             Self::Tacotron2 => "tt2",
             Self::LoRA => "loRA",
+            Self::VallE => "vall-e",
         }
     }
 
@@ -49,6 +52,7 @@ impl WeightsType {
             "so_vits_svc" => Ok(Self::SoVitsSvc),
             "tt2" => Ok(Self::Tacotron2),
             "loRA" => Ok(Self::LoRA),
+            "vall-e" => Ok(Self::VallE),
             _ => Err(format!("invalid value: {:?}", value)),
         }
     }
@@ -62,6 +66,7 @@ impl WeightsType {
             Self::SoVitsSvc,
             Self::Tacotron2,
             Self::LoRA,
+            Self::VallE
         ])
     }
 }
@@ -83,6 +88,7 @@ mod tests {
         assert_eq!(WeightsType::SoVitsSvc.to_str(), "so_vits_svc");
         assert_eq!(WeightsType::Tacotron2.to_str(), "tt2");
         assert_eq!(WeightsType::LoRA.to_str(), "loRA");
+        assert_eq!(WeightsType::VallE.to_str(), "vall-e");
     }
 
     #[test]
@@ -94,6 +100,7 @@ mod tests {
         assert_eq!(WeightsType::from_str("so_vits_svc").unwrap(), WeightsType::SoVitsSvc);
         assert_eq!(WeightsType::from_str("tt2").unwrap(), WeightsType::Tacotron2);
         assert_eq!(WeightsType::from_str("loRA").unwrap(), WeightsType::LoRA);
+        assert_eq!(WeightsType::from_str("vall-e").unwrap(), WeightsType::VallE);
         assert!(WeightsType::from_str("invalid").is_err());
     }
 
@@ -108,5 +115,6 @@ mod tests {
         assert!(variants.contains(&WeightsType::SoVitsSvc));
         assert!(variants.contains(&WeightsType::Tacotron2));
         assert!(variants.contains(&WeightsType::LoRA));
+        assert!(variants.contains(&WeightsType::VallE));
     }
 }

@@ -83,7 +83,6 @@ impl UserDetailsLight {
 }
 
 
-
 #[derive(Clone, Serialize,ToSchema)]
 pub struct DefaultAvatarInfo {
   pub image_index: u8,
