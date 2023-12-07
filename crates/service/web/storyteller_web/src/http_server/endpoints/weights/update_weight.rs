@@ -147,8 +147,8 @@ pub async fn update_weight_handler(
         description_markdown: request.description_markdown.as_deref(),
         description_rendered_html: request.description_rendered_html.as_deref(),
         creator_set_visibility: request.visibility.as_ref(),
-        weight_type: request.weight_type.as_deref().map(|s| s.to_string()),
-        weight_category: request.weight_category.as_deref().map(|s| s.to_string()),
+        weights_type: request.weight_type.as_deref().map(|s| s.to_string()),
+        weights_category: request.weight_category.as_deref().map(|s| s.to_string()),
     }).await;
 
     match query_result {

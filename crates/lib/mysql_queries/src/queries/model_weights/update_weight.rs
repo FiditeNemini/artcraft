@@ -12,8 +12,8 @@ pub struct UpdateWeightArgs<'a> {
     pub description_markdown: Option<&'a str>,
     pub description_rendered_html: Option<&'a str>,
     pub creator_set_visibility: Option<&'a Visibility>,
-    pub weight_type: Option<String>,
-    pub weight_category: Option<String>,
+    pub weights_type: Option<String>,
+    pub weights_category: Option<String>,
     pub mysql_pool: &'a MySqlPool,
 }
 
