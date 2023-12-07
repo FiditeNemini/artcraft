@@ -1,0 +1,31 @@
+{
+  "core": {
+    "heading": "最新职位"
+  },
+  "face_animator": {
+    "ATTEMPT_FAILED": "脸部动画尝试失败",
+    "COMPLETE_FAILURE": "脸部动画失败。",
+    "COMPLETE_SUCCESS": "脸部动画完成",
+    "PENDING": "待处理的脸部动画",
+    "STARTED": "脸部动画正在进行中",
+    "UNKNOWN": "动画状态未知",
+    "heading": "脸部动画师职位"
+  },
+  "subtitles": {
+    "ATTEMPT_FAILED": "尝试 {{attemptCount}} 失败了，再试一次。",
+    "COMPLETE_FAILURE": "请再试一次",
+    "COMPLETE_SUCCESS": "查看结果",
+    "PENDING": "添加到队列",
+    "STARTED": "请稍等",
+    "UNKNOWN": "请稍候或重试"
+  },
+  "voice_designer": {
+    "ATTEMPT_FAILED": "面部动画尝试失败",
+    "COMPLETE_FAILURE": "脸部动画失败。",
+    "COMPLETE_SUCCESS": "脸部动画完成",
+    "PENDING": "语音设计师待定",
+    "STARTED": "语音设计正在进行中",
+    "UNKNOWN": "语音设计师状态未知",
+    "heading": "语音设计师职位"
+  }
+}

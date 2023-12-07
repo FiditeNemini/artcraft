@@ -1,88 +1,21 @@
-import React, { useEffect, useState } from 'react';
-// import { a } from '@react-spring/web';
-import {
-  GetPendingTtsJobCount, GetPendingTtsJobCountIsOk, GetPendingTtsJobCountSuccessResponse 
-} from "@storyteller/components/src/api/tts/GetPendingTtsJobCount";
-import { FrontendInferenceJobType } from "@storyteller/components/src/jobs/InferenceJob";
+import React from 'react';
+import { FrontendInferenceJobType, InferenceJob } from "@storyteller/components/src/jobs/InferenceJob";
 // import { springs } from "resources";
-import { useInferenceJobs } from "hooks";
-import { Button } from 'components/common';
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faChevronRight, faHourglass1, faRemove, faTrophy, faWarning } from "@fortawesome/free-solid-svg-icons";
-
-const DEFAULT_QUEUE_REFRESH_INTERVAL_MILLIS = 15000;
+import JobItem from './JobItem';
+import { useInferenceJobs, useLocalize } from "hooks";
+import "./InferenceJobsList.scss";
 
 interface JobsListProps{
   jobType: FrontendInferenceJobType,
   onSelect?: (e:any) => any,
-  statusTxt: any,
-  t: any,
 }
 
-export default function InferenceJobsList({ jobType, onSelect, statusTxt, t }: JobsListProps) {
-  const { inferenceJobs = [] } = useInferenceJobs(jobType);
+export default function InferenceJobsList({ jobType, onSelect }: JobsListProps) {
+  const { inferenceJobs = [], jobStatusDescription } = useInferenceJobs(jobType);
+  const { t } = useLocalize("InferenceJobs");
 
-  const [pending, pendingSet] = useState<GetPendingTtsJobCountSuccessResponse>({
-    success: true,
-    pending_job_count: 0,
-    cache_time: new Date(0), // NB: Epoch is used for vector clock's initial state
-    refresh_interval_millis: DEFAULT_QUEUE_REFRESH_INTERVAL_MILLIS,
-  });
-  const statusIcons = [faHourglass1,faHourglass1,faWarning,faRemove,faTrophy];
-  // const statusTxt = (which: number, config = {}) => ["animationPending","animationInProgress","animationFailed","animationDead","animationSuccess"].map((str,i) => t(`status.${str}`,config))[which];
-
-  const processFail = (fail = "") => {
-    switch (fail) {
-      case "face_not_detected": return "Face not detected, try another picture";
-      default: return "Uknown failure";
-    }
-  };
-
-  useEffect(() => {
-    const fetch = async () => {
-      const response = await GetPendingTtsJobCount();
-      if (GetPendingTtsJobCountIsOk(response)) {
-        if (
-          response.cache_time.getTime() > pending.cache_time.getTime()
-        ) {
-          pendingSet(response);
-        }
-      }
-    };
-    // TODO: We're having an outage and need to lower this.
-    //const interval = setInterval(async () => fetch(), 15000);
-    const refreshInterval = Math.max(
-      DEFAULT_QUEUE_REFRESH_INTERVAL_MILLIS,
-      pending.refresh_interval_millis
-    );
-    const interval = setInterval(async () => fetch(), refreshInterval);
-    fetch();
-    return () => clearInterval(interval);
-  }, [pending]);
-
-    return inferenceJobs.length ? <div {...{ className: "face-animator-jobs panel" }}>
-      <h5>{ t("headings.yourJobs") }</h5>
-      { inferenceJobs.map((job: any, key: number) => {
-      return <div {...{ className: "panel face-animator-job", key }}>
-        <FontAwesomeIcon {...{ className: `job-status-icon job-status-${job.statusIndex}`, icon: statusIcons[job.statusIndex] }}/>
-        <div {...{ className: "job-details" }}>
-          <h4>
-            { statusTxt(job.statusIndex,{ attemptCount: job.attemptCount || "" }) }
-          </h4>
-          <span>
-            { job.maybeFailureCategory ? `${ processFail(job.maybeFailureCategory) }` : "" }
-          </span>
-        </div>
-        {
-          job.maybeResultToken ?  <Button {...{
-              href: `media/${job.maybeResultToken}`,
-              icon: faChevronRight,
-              iconFlip: true,
-              label: t("inputs.viewResult"),
-              onClick: onSelect
-            }} />: null
-          }
-      </div>
-     }).reverse()}
-    </div> : null;
+  return inferenceJobs.length ? <div {...{ className: "face-animator-jobs panel" }}>
+    <h5>{ t("core.heading") }</h5>
+    { inferenceJobs.map((job: InferenceJob, key: number) => <JobItem {...{ jobStatusDescription, jobType, key, onSelect, t, ...job }} />).reverse() }
+  </div> : null;
 };

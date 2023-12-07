@@ -19,10 +19,8 @@ import {
   // EnqueueFaceAnimationIsSuccess,
   // EnqueueFaceAnimationRequest,
 } from "@storyteller/components/src/api/face_animation/EnqueueFaceAnimation";
+import FaceAnimatorSubViews from "./sub_views";
 import FaceAnimatorTitle from "./FaceAnimatorTitle";
-import FaceAnimatorInput from "./FaceAnimatorInput";
-import FaceAnimatorWorking from "./FaceAnimatorWorking";
-import FaceAnimatorSuccess from "./FaceAnimatorSuccess";
 import InferenceJobsList from "components/layout/InferenceJobsList";
 import { FaceAnimatorCore } from "./FaceAnimatorTypes";
 import { BasicVideo } from "components/common";
@@ -135,13 +133,18 @@ export default function FaceAnimator({ enqueueInferenceJob,  sessionSubscription
     leave: { opacity: 0, position: "absolute" },
   });
 
-  const statusTxt = (which: number, config = {}) => ["animationPending","animationInProgress","animationFailed","animationDead","animationSuccess"].map((str,i) => t(`status.${str}`,config))[which];
+  const failures = (fail = "") => {
+    switch (fail) {
+      case "face_not_detected": return "Face not detected, try another picture";
+      default: return "Uknown failure";
+    }
+  };
 
   return <div {...{ className: "container-panel pt-4" }}>
     <div {...{ className: "panel face-animator-main" }}>
       <FaceAnimatorTitle {...headerProps} />
       {transitions((style, i) => {
-        const Page = [FaceAnimatorInput,  FaceAnimatorWorking,  FaceAnimatorSuccess ][page];
+        const Page = FaceAnimatorSubViews[page];
         return Page ? <Page
             {...{
               audioProps,
@@ -168,10 +171,9 @@ export default function FaceAnimator({ enqueueInferenceJob,  sessionSubscription
       })}
     </div>
     <InferenceJobsList {...{
-      t,
+      failures,
       onSelect: () => Analytics.voiceConversionClickDownload(),
       jobType: FrontendInferenceJobType.FaceAnimation,
-      statusTxt
     }}/>
     <div {...{ className: "face-animator-mobile-sample" }}>
       <BasicVideo {...{ src: "/videos/face-animator-instruction-en.mp4" }} />

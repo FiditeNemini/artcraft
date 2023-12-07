@@ -1,0 +1,31 @@
+{
+  "core": {
+    "heading": "Ultimos trabajos"
+  },
+  "face_animator": {
+    "ATTEMPT_FAILED": "Error al intentar animar la cara",
+    "COMPLETE_FAILURE": "Error en la animación de la cara.",
+    "COMPLETE_SUCCESS": "Animación facial completa",
+    "PENDING": "Animación de cara pendiente",
+    "STARTED": "Animación facial en progreso",
+    "UNKNOWN": "Estado de la animación desconocido",
+    "heading": "Trabajos de animador facial"
+  },
+  "subtitles": {
+    "ATTEMPT_FAILED": "intento {{attemptCount}} falló, intentándolo de nuevo.",
+    "COMPLETE_FAILURE": "Inténtalo de nuevo",
+    "COMPLETE_SUCCESS": "Ver resultado",
+    "PENDING": "Agregar a la cola",
+    "STARTED": "Espere por favor",
+    "UNKNOWN": "Espere o intente nuevamente"
+  },
+  "voice_designer": {
+    "ATTEMPT_FAILED": "Error al intentar animar la cara",
+    "COMPLETE_FAILURE": "Error en la animación de la cara.",
+    "COMPLETE_SUCCESS": "Animación facial completa",
+    "PENDING": "Diseñador de voz pendiente",
+    "STARTED": "Diseñador de voz en progreso",
+    "UNKNOWN": "Estado del diseñador de voz desconocido",
+    "heading": "Empleos de Diseñador de voz"
+  }
+}

@@ -1,0 +1,31 @@
+{
+  "core": {
+    "heading": "最新の求人"
+  },
+  "face_animator": {
+    "ATTEMPT_FAILED": "顔アニメーションの試行が失敗しました",
+    "COMPLETE_FAILURE": "顔のアニメーションが失敗しました。",
+    "COMPLETE_SUCCESS": "顔のアニメーションが完了しました",
+    "PENDING": "保留中の顔のアニメーション",
+    "STARTED": "顔のアニメーションが進行中",
+    "UNKNOWN": "アニメーションステータス不明",
+    "heading": "フェイスアニメーターの仕事"
+  },
+  "subtitles": {
+    "ATTEMPT_FAILED": "試みる {{attemptCount}} 失敗しました。再試行してください。",
+    "COMPLETE_FAILURE": "もう一度試してください",
+    "COMPLETE_SUCCESS": "結果を見る",
+    "PENDING": "キューに追加中",
+    "STARTED": "お待ちください",
+    "UNKNOWN": "しばらく待つか、もう一度試してください"
+  },
+  "voice_designer": {
+    "ATTEMPT_FAILED": "顔アニメーションの試行が失敗しました",
+    "COMPLETE_FAILURE": "顔のアニメーションが失敗しました。",
+    "COMPLETE_SUCCESS": "顔のアニメーションが完了しました",
+    "PENDING": "ボイスデザイナー保留中",
+    "STARTED": "ボイスデザイナー進行中",
+    "UNKNOWN": "ボイスデザイナーのステータスは不明",
+    "heading": "ボイスデザイナーの仕事"
+  }
+}

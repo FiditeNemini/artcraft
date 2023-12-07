@@ -1,0 +1,31 @@
+{
+  "core": {
+    "heading": "Ultimi lavori"
+  },
+  "face_animator": {
+    "ATTEMPT_FAILED": "Tentativo di animazione del volto non riuscito",
+    "COMPLETE_FAILURE": "Animazione del volto non riuscita.",
+    "COMPLETE_SUCCESS": "Animazione del volto completata",
+    "PENDING": "Animazione del volto in attesa",
+    "STARTED": "Animazione del volto in corso",
+    "UNKNOWN": "Stato dell'animazione sconosciuto",
+    "heading": "Lavori di animatore di volti"
+  },
+  "subtitles": {
+    "ATTEMPT_FAILED": "Tentativo {{attemptCount}} fallito, riprovando.",
+    "COMPLETE_FAILURE": "Per favore riprova",
+    "COMPLETE_SUCCESS": "Visualizza risultato",
+    "PENDING": "Aggiunta alla coda",
+    "STARTED": "attendere prego",
+    "UNKNOWN": "Attendi o riprova"
+  },
+  "voice_designer": {
+    "ATTEMPT_FAILED": "Tentativo di animazione del volto non riuscito",
+    "COMPLETE_FAILURE": "Animazione del volto non riuscita.",
+    "COMPLETE_SUCCESS": "Animazione del volto completata",
+    "PENDING": "Voice Designer in attesa",
+    "STARTED": "Designer vocale in corso",
+    "UNKNOWN": "Stato del Voice Designer sconosciuto",
+    "heading": "Lavori di progettista vocale"
+  }
+}

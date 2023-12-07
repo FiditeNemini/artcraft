@@ -1,0 +1,31 @@
+{
+  "core": {
+    "heading": "Derniers emplois"
+  },
+  "face_animator": {
+    "ATTEMPT_FAILED": "Échec de la tentative d'animation du visage",
+    "COMPLETE_FAILURE": "Échec de l'animation du visage.",
+    "COMPLETE_SUCCESS": "Animation du visage terminée",
+    "PENDING": "Animation de visage en attente",
+    "STARTED": "Animation du visage en cours",
+    "UNKNOWN": "Statut de l'animation inconnu",
+    "heading": "Emplois d'animateur de visage"
+  },
+  "subtitles": {
+    "ATTEMPT_FAILED": "Tentative {{attemptCount}} échoué, j'ai réessayé.",
+    "COMPLETE_FAILURE": "Veuillez réessayer",
+    "COMPLETE_SUCCESS": "Voir résultat",
+    "PENDING": "Ajout à la file d'attente",
+    "STARTED": "S'il vous plaît, attendez",
+    "UNKNOWN": "Veuillez patienter ou réessayer"
+  },
+  "voice_designer": {
+    "ATTEMPT_FAILED": "Échec de la tentative d'animation du visage",
+    "COMPLETE_FAILURE": "Échec de l'animation du visage.",
+    "COMPLETE_SUCCESS": "Animation du visage terminée",
+    "PENDING": "Concepteur de voix en attente",
+    "STARTED": "Concepteur de voix en cours",
+    "UNKNOWN": "Statut de Voice Designer inconnu",
+    "heading": "Emplois de concepteur de voix"
+  }
+}

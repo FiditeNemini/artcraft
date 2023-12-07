@@ -1,12 +1,6 @@
 import React, { useState } from "react";
 import { Redirect, useHistory, useLocation } from "react-router-dom";
-import {
-  faPenToSquare,
-  faPlus,
-  faRightToBracket,
-  faStar,
-  faWaveform,
-} from "@fortawesome/pro-solid-svg-icons";
+import { faPenToSquare, faPlus, faRightToBracket, faStar, faWaveform } from "@fortawesome/pro-solid-svg-icons";
 import InferenceJobsList from "components/layout/InferenceJobsList";
 import { useLocalize } from "hooks";
 import Panel from "components/common/Panel";
@@ -149,14 +143,12 @@ function VoiceDesignerMainPage() {
     };
   });
 
-  const statusTxt = (status: number, config: any) =>
-    [
-      "Voice pending...",
-      "Voice in progress",
-      "Voice failed",
-      "Voice dead",
-      "Voice created successfully",
-    ][status];
+  const failures = (fail = "") => {
+    switch (fail) {
+      // case "face_not_detected": return "Face not detected, try another picture"; // voice designer can have failure states too!
+      default: return "Uknown failure";
+    }
+  };
 
   const createVoiceButton = {
     label: `Create new voice`,
@@ -192,9 +184,9 @@ function VoiceDesignerMainPage() {
     <>
       <InferenceJobsList
         {...{
+          failures,
           jobType: FrontendInferenceJobType.VoiceDesignerCreateVoice,
-          t,
-          statusTxt,
+          t
         }}
       />
       <Panel mb={true}>
