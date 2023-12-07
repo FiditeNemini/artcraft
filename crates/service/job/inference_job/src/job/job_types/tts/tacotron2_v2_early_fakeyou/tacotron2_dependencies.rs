@@ -20,6 +20,8 @@ pub struct Tacotron2Dependencies {
 
   /// Dependencies that are for the sidecar version of TT2
   pub sidecar: SidecarDeps,
+
+  pub upload_as_media_file: bool,
 }
 
 pub struct SidecarDeps {
@@ -71,7 +73,8 @@ impl Tacotron2Dependencies {
         health_check_client,
         health_check_state: HealthCheckState::new(),
         virtual_lfu_cache,
-      }
+      },
+      upload_as_media_file: easyenv::get_env_bool_or_default("TT2_AS_MEDIA_FILES", false),
     })
   }
 }

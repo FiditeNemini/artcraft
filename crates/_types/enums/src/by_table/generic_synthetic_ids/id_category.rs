@@ -21,6 +21,11 @@ pub enum IdCategory {
   #[serde(rename = "lipsync_animation")]
   LipsyncAnimationResult,
 
+  /// Results from tacotron2
+  /// Applies for RVC and SVC
+  #[serde(rename = "tts_result")]
+  TtsResult,
+
   /// Results from voice conversion (which may live in the media_files table)
   /// Applies for RVC and SVC
   #[serde(rename = "voice_conversion")]
@@ -52,6 +57,7 @@ impl IdCategory {
     match self {
       Self::MediaFile => "media_file",
       Self::LipsyncAnimationResult => "lipsync_animation",
+      Self::TtsResult => "tts_result",
       Self::VoiceConversionResult => "voice_conversion",
       Self::ZeroShotVoiceDataset => "zs_dataset",
       Self::ZeroShotVoiceEmbedding => "zs_voice",
@@ -64,6 +70,7 @@ impl IdCategory {
     match value {
       "media_file" => Ok(Self::MediaFile),
       "lipsync_animation" => Ok(Self::LipsyncAnimationResult),
+      "tts_result" => Ok(Self::TtsResult),
       "voice_conversion" => Ok(Self::VoiceConversionResult),
       "zs_dataset" => Ok(Self::ZeroShotVoiceDataset),
       "zs_voice" => Ok(Self::ZeroShotVoiceEmbedding),
@@ -79,6 +86,7 @@ impl IdCategory {
     BTreeSet::from([
       Self::MediaFile,
       Self::LipsyncAnimationResult,
+      Self::TtsResult,
       Self::VoiceConversionResult,
       Self::ZeroShotTtsResult,
       Self::ZeroShotVoiceDataset,
@@ -100,6 +108,7 @@ mod tests {
   fn test_serialization() {
     assert_serialization(IdCategory::MediaFile, "media_file");
     assert_serialization(IdCategory::LipsyncAnimationResult, "lipsync_animation");
+    assert_serialization(IdCategory::TtsResult, "tts_result");
     assert_serialization(IdCategory::VoiceConversionResult, "voice_conversion");
     assert_serialization(IdCategory::ZeroShotVoiceDataset, "zs_dataset");
     assert_serialization(IdCategory::ZeroShotVoiceEmbedding, "zs_voice");
@@ -111,6 +120,7 @@ mod tests {
     fn to_str() {
       assert_eq!(IdCategory::MediaFile.to_str(), "media_file");
       assert_eq!(IdCategory::LipsyncAnimationResult.to_str(), "lipsync_animation");
+      assert_eq!(IdCategory::TtsResult.to_str(), "tts_result");
       assert_eq!(IdCategory::VoiceConversionResult.to_str(), "voice_conversion");
       assert_eq!(IdCategory::ZeroShotVoiceDataset.to_str(), "zs_dataset");
       assert_eq!(IdCategory::ZeroShotVoiceEmbedding.to_str(), "zs_voice");
@@ -122,6 +132,7 @@ mod tests {
     fn from_str() {
       assert_eq!(IdCategory::from_str("media_file").unwrap(), IdCategory::MediaFile);
       assert_eq!(IdCategory::from_str("lipsync_animation").unwrap(), IdCategory::LipsyncAnimationResult);
+      assert_eq!(IdCategory::from_str("tts_result").unwrap(), IdCategory::TtsResult);
       assert_eq!(IdCategory::from_str("voice_conversion").unwrap(), IdCategory::VoiceConversionResult);
       assert_eq!(IdCategory::from_str("zs_dataset").unwrap(), IdCategory::ZeroShotVoiceDataset);
       assert_eq!(IdCategory::from_str("zs_voice").unwrap(), IdCategory::ZeroShotVoiceEmbedding);
@@ -133,9 +144,10 @@ mod tests {
     fn all_variants() {
       // Static check
       let mut variants = IdCategory::all_variants();
-      assert_eq!(variants.len(), 7);
+      assert_eq!(variants.len(), 8);
       assert_eq!(variants.pop_first(), Some(IdCategory::MediaFile));
       assert_eq!(variants.pop_first(), Some(IdCategory::LipsyncAnimationResult));
+      assert_eq!(variants.pop_first(), Some(IdCategory::TtsResult));
       assert_eq!(variants.pop_first(), Some(IdCategory::VoiceConversionResult));
       assert_eq!(variants.pop_first(), Some(IdCategory::ZeroShotTtsResult));
       assert_eq!(variants.pop_first(), Some(IdCategory::ZeroShotVoiceDataset));
