@@ -108,12 +108,12 @@ impl ResponseError for ListWeightError {
     get,
     path = "/list/",
     responses(
-        (status = 200, description = "List Weights", body = ListAvailibleWeightsSuccessResponse),
+        (status = 200, description = "List Weights", body = ListAvailableWeightsSuccessResponse),
         (status = 401, description = "Not authorized", body = ListWeightError),
         (status = 500, description = "Server error", body = ListWeightError),
     ),
     params(
-        ("request" = ListAvailibleWeightsQuery, description = "Payload for Request"),
+        ("request" = ListAvailableWeightsQuery, description = "Payload for Request"),
     )
 )]
 pub async fn list_available_weights_handler(
