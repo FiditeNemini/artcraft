@@ -1,7 +1,7 @@
 
 use crate::http_server::endpoints::voice_designer::inference::enqueue_tts_request::*;
 
-use crate::http_server::endpoints::weights::list_availible_weights::*;
+use crate::http_server::endpoints::weights::list_available_weights::*;
 use crate::http_server::web_utils::response_success_helpers::*;
 use crate::http_server::endpoints::weights::delete_weight::*;
 use crate::http_server::endpoints::weights::get_weight::*;
@@ -20,7 +20,7 @@ use utoipa::OpenApi;
 
 #[derive(OpenApi)]
 #[openapi(paths(crate::http_server::endpoints::voice_designer::inference::enqueue_tts_request::enqueue_tts_request,
-    crate::http_server::endpoints::weights::list_availible_weights::list_availible_weights_handler,
+    crate::http_server::endpoints::weights::list_available_weights::list_available_weights_handler,
     crate::http_server::endpoints::weights::delete_weight::delete_weight_handler,
     crate::http_server::endpoints::weights::update_weight::update_weight_handler,
     crate::http_server::endpoints::weights::get_weight::get_weight_handler,
@@ -36,8 +36,8 @@ use utoipa::OpenApi;
     GetWeightPathInfo,GetWeightResponse,GetWeightError,
     UpdateWeightRequest,UpdateWeightRequest,UpdateWeightPathInfo,UpdateWeightRequest,UpdateWeightError,
     DeleteWeightPathInfo,DeleteWeightRequest,DeleteWeightError,DeleteWeightRequest,DeleteWeightError,
-    ListWeightError,ListWeightsByPathInfo,ModelWeightForList,ListWeightError,
-    ListAvailibleWeightsQuery,ListAvailibleWeightsSuccessResponse,ListWeightsByPathInfo,ModelWeightForList,
+    ListWeightError,ModelWeightForList,ListWeightError, 
+    ListAvailableWeightsQuery,ListAvailableWeightsSuccessResponse,ModelWeightForList,
     )))]
 pub struct ApiDoc;
 

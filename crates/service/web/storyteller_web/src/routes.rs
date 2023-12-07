@@ -155,7 +155,7 @@ use crate::http_server::endpoints::w2l::set_w2l_template_mod_approval::set_w2l_t
 use crate::http_server::endpoints::weights::get_weight::get_weight_handler;
 use crate::http_server::endpoints::weights::delete_weight::delete_weight_handler;
 use crate::http_server::endpoints::weights::update_weight::update_weight_handler;
-use crate::http_server::endpoints::weights::list_availible_weights::list_availible_weights_handler;
+use crate::http_server::endpoints::weights::list_available_weights::list_available_weights_handler;
 use crate::http_server::endpoints::weights::list_weights_by_user::list_weights_by_user_handler;
 
 
@@ -1266,8 +1266,8 @@ fn add_weights_routes<T, B>(app: App<T>) -> App<T>
             )
             .route("/by_user/{username}", web::get().to(list_weights_by_user_handler))
             .route(
-                "/by_user_category_and_type/{username}/{weights_category}/{weights_type}",
-                web::get().to(list_availible_weights_handler)
+                "/list",
+                web::get().to(list_available_weights_handler)
             )
     )
 }

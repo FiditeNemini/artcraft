@@ -48,7 +48,6 @@ static ALLOWED_MIME_TYPES : Lazy<HashSet<&'static str>> = Lazy::new(|| {
 //   mut multipart_payload: Multipart,
 // ) -> Result<HttpResponse, UploadError> {
 
- 
 
 //   let weight_upload_token = response.to_model_token();
 
@@ -82,7 +81,6 @@ static ALLOWED_MIME_TYPES : Lazy<HashSet<&'static str>> = Lazy::new(|| {
 //     }
 //   }
 // }
-
 
 //   let token = create_weight(CreateModelWeightsArgs {
 //     token: &ModelWeightToken::generate(),

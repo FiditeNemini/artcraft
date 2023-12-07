@@ -83,7 +83,6 @@ impl ResponseError for GetWeightError {
         (status = 500, description = "Server error", body = GetWeightError),
     ),
     params(
-        ("request" = UpdateWeightRequest, description = "Payload for Request"),
         ("path" = GetWeightPathInfo, description = "Path for Request")
     )
   )]
