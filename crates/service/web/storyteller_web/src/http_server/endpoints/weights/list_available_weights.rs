@@ -17,7 +17,7 @@ use enums::by_table::model_weights::{
 use tokens::tokens::users::UserToken;
 use tokens::tokens::model_weights::ModelWeightToken;
 
-use crate::http_server::common_responses::user_details_lite::UserDetailsLight;
+use crate::http_server::common_responses::user_details_lite::{UserDetailsLight,DefaultAvatarInfo};
 use crate::server_state::ServerState;
 
 use utoipa::ToSchema;

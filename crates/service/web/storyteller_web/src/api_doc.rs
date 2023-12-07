@@ -6,6 +6,8 @@ use crate::http_server::web_utils::response_success_helpers::*;
 use crate::http_server::endpoints::weights::delete_weight::*;
 use crate::http_server::endpoints::weights::get_weight::*;
 use crate::http_server::endpoints::weights::update_weight::*;
+use crate::http_server::endpoints::weights::list_weights_by_user::*;
+use crate::http_server::common_responses::user_details_lite::{DefaultAvatarInfo, UserDetailsLight};
 use enums::by_table::model_weights::{
     weights_types::WeightsType,
     weights_category::WeightsCategory,
@@ -40,7 +42,8 @@ use utoipa::OpenApi;
     DeleteWeightPathInfo,DeleteWeightRequest,DeleteWeightError,DeleteWeightRequest,DeleteWeightError,
     ListWeightError,ModelWeightForList,ListWeightError, 
     ListAvailableWeightsQuery,ListAvailableWeightsSuccessResponse,ModelWeightForList,
-    ListWeightsByUserError,ListWeightsByUserSuccessResponse,ListWeightsByUserPathInfo,Weight
+    ListWeightsByUserError,ListWeightsByUserSuccessResponse,ListWeightsByUserPathInfo,Weight,
+    UserDetailsLight,DefaultAvatarInfo
     )))]
 pub struct ApiDoc;
 
