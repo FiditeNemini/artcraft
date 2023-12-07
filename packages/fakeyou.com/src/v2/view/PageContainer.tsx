@@ -98,6 +98,7 @@ import { PasswordResetVerificationPage } from "./pages/password_reset/PasswordRe
 import { NewProfilePage } from "./pages/profile/profile_view/NewProfilePage";
 import { ProfilePage } from "./pages/profile/profile_view/ProfilePage";
 import { ModerationJobControlPage } from "./pages/moderation/job_control/ModerationJobControlPage";
+import WeightsPage from "./pages/weights/WeightsPage";
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -354,6 +355,19 @@ class PageContainer extends React.Component<
 
             <Route path="/media/:token">
               <MediaPage sessionWrapper={this.props.sessionWrapper} />
+            </Route>
+
+            <Route path="/weight/:token">
+              <WeightsPage
+                sessionWrapper={this.props.sessionWrapper}
+                sessionSubscriptionsWrapper={
+                  this.props.sessionSubscriptionsWrapper
+                }
+                inferenceJobs={this.props.inferenceJobs}
+                enqueueInferenceJob={this.props.enqueueInferenceJob}
+                inferenceJobsByCategory={this.props.inferenceJobsByCategory}
+                ttsInferenceJobs={this.props.ttsInferenceJobs}
+              />
             </Route>
 
             <Route path="/dev-tts">
@@ -628,7 +642,8 @@ class PageContainer extends React.Component<
               <FaceAnimator
                 {...{
                   enqueueInferenceJob: this.props.enqueueInferenceJob,
-                  sessionSubscriptionsWrapper: this.props.sessionSubscriptionsWrapper,
+                  sessionSubscriptionsWrapper:
+                    this.props.sessionSubscriptionsWrapper,
                   inferenceJobs: this.props.inferenceJobs,
                   inferenceJobsByCategory: this.props.inferenceJobsByCategory,
                 }}

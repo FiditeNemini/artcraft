@@ -67,7 +67,6 @@ const SplitPanel: React.FC<PanelProps> & {
   return (
     <div className={panelClassName}>
       {header}
-      {divider && <hr className="m-0" />}
       {body}
       {divider && <hr className="m-0" />}
       {footer}
