@@ -106,7 +106,7 @@ impl ResponseError for ListWeightError {
 
 #[utoipa::path(
     get,
-    path = "/v1/weights/list/",
+    path = "/v1/weights/list",
     responses(
         (status = 200, description = "List Weights", body = ListAvailableWeightsSuccessResponse),
         (status = 401, description = "Not authorized", body = ListWeightError),
@@ -139,6 +139,8 @@ pub async fn list_available_weights_handler(
             return Err(ListWeightError::NotAuthorized);
         }
     };
+    let page_size: u16 = 10;
+    let page_index : u16 = 0;
 
     let limit = query.page_size;
 

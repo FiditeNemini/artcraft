@@ -14,8 +14,9 @@ use tokens::tokens::model_weights::ModelWeightToken;
 
 use crate::http_server::common_responses::user_details_lite::UserDetailsLight;
 use crate::server_state::ServerState;
+use utoipa::ToSchema;
 
-#[derive(Serialize, Clone)]
+#[derive(Serialize, Clone,ToSchema)]
 pub struct Weight {
   weight_token: ModelWeightToken,
   title: String,
@@ -41,18 +42,18 @@ pub struct Weight {
 }
 
 
-#[derive(Serialize)]
+#[derive(Serialize,ToSchema)]
 pub struct ListWeightsByUserSuccessResponse {
   pub success: bool,
   pub weights: Vec<Weight>,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize,ToSchema)]
 pub struct ListWeightsByUserPathInfo {
   username: String,
 }
 
-#[derive(Debug)]
+#[derive(Debug,ToSchema)]
 pub enum ListWeightsByUserError {
   NotAuthorized,
   ServerError,
@@ -73,6 +74,18 @@ impl ResponseError for ListWeightsByUserError {
   }
 }
 
+#[utoipa::path(
+  get,
+  path = "/v1/weights/by_user/{username}",
+  responses(
+      (status = 200, description = "List Weights by user", body = ListWeightsByUserSuccessResponse),
+      (status = 401, description = "Not authorized", body = ListWeightsByUserError),
+      (status = 500, description = "Server error", body = ListWeightsByUserError),
+  ),
+  params(
+      ("path" = ListWeightsByUserPathInfo, description = "Payload for Request"),
+  )
+)]
 pub async fn list_weights_by_user_handler(
   http_request: HttpRequest,
   path: Path<ListWeightsByUserPathInfo>,
