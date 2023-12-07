@@ -21,4 +21,4 @@ web_scrapers = { path = "../../lib/web_scrapers" }
 # External
 clap = "2.34.0" # TODO: This is really out of date, but has conflicts when updated
 tokio = { version = "1.6.0", features = ["macros"] }
-my-workspace-hack = { version = "0.1", path = "../../../my-workspace-hack" }
+my-workspace-hack = { version = "0.1", path = "../../my-workspace-hack" }

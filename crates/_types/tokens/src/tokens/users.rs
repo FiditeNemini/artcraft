@@ -6,7 +6,7 @@ use serde::Serialize;
 use crate::prefixes::TokenPrefix;
 use utoipa::ToSchema;
 /// The primary key for users.
-#[derive(Clone, PartialEq, Eq, sqlx::Type, Debug, Serialize, Deserialize,ToSchema)]
+#[derive(Clone, PartialEq, Eq, sqlx::Type, Debug, Serialize, Deserialize, Default,ToSchema)]
 #[sqlx(transparent)]
 pub struct UserToken(pub String);
 

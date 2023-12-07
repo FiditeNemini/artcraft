@@ -27,4 +27,4 @@ serde_json = "1.0.108"
 
 # TODO: Get rid of in favor of std::time
 time = "0.3.30"
-my-workspace-hack = { version = "0.1", path = "../../../my-workspace-hack" }
+my-workspace-hack = { version = "0.1", path = "../../my-workspace-hack" }

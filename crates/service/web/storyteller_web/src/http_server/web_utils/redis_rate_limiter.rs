@@ -67,6 +67,7 @@ impl RedisRateLimiter {
       Err(err) => match err {
         Error::Client(_) => Ok(()), // NB: Fail open for failure to connect to Redis
         Error::Time(_) => Ok(()), // NB: Fail open for key parsing
+        Error::ChronoTime(_) => Ok(()), // NB: Fail open for key parsing
         Error::LimitExceeded(_) => Err(RateLimiterError::RateLimitExceededError),
       },
     }

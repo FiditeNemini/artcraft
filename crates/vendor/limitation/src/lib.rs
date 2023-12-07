@@ -133,6 +133,7 @@ use std::error;
 use std::fmt;
 use std::ops::Add;
 use std::time::Duration;
+use time;
 
 /// The default limit of requests in a period
 const DEFAULT_LIMIT: usize = 5000;
@@ -321,6 +322,8 @@ pub enum Error {
     LimitExceeded(Status),
     /// A time conversion failed.
     Time(time::OutOfRangeError),
+    /// A time conversion failed (Chrono).
+    ChronoTime(chrono::OutOfRangeError),
 }
 
 impl fmt::Display for Error {
@@ -329,6 +332,7 @@ impl fmt::Display for Error {
             Error::Client(ref err) => write!(f, "client error ({})", err),
             Error::LimitExceeded(ref status) => write!(f, "rate limit exceeded ({:?})", status),
             Error::Time(ref err) => write!(f, "time conversion error ({})", err),
+            Error::ChronoTime(ref err) => write!(f, "time conversion error ({})", err),
         }
     }
 }
@@ -339,6 +343,7 @@ impl error::Error for Error {
             Error::Client(ref err) => err.source(),
             Error::LimitExceeded(_) => None,
             Error::Time(ref err) => err.source(),
+            Error::ChronoTime(ref err) => err.source(),
         }
     }
 }
@@ -355,6 +360,12 @@ impl From<time::OutOfRangeError> for Error {
     }
 }
 
+impl From<chrono::OutOfRangeError> for Error {
+    fn from(err: chrono::OutOfRangeError) -> Self {
+        Error::ChronoTime(err)
+    }
+}
+
 /// Builds a `Status`.
 fn build_status(count: usize, limit: usize, reset_epoch_utc: usize) -> Status {
     let remaining = if count >= limit { 0 } else { limit - count };
@@ -367,7 +378,7 @@ fn build_status(count: usize, limit: usize, reset_epoch_utc: usize) -> Status {
 }
 
 /// Calculates a timestamp for "now plus a duration".
-fn epoch_utc_plus(duration: Duration) -> Result<usize, time::OutOfRangeError> {
+fn epoch_utc_plus(duration: Duration) -> Result<usize, chrono::OutOfRangeError> {
     Ok(chrono::Utc::now()
         .add(chrono::Duration::from_std(duration)?)
         .round_subsecs(0)
