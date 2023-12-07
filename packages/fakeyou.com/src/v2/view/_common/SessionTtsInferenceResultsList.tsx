@@ -123,7 +123,15 @@ function SessionTtsInferenceResultList(props: Props) {
       let audioLink = new BucketConfig().getGcsUrl(
         job.maybeResultPublicBucketMediaPath
       );
-      let ttsPermalink = `/tts/result/${job.maybeResultToken}`;
+
+      // NB(bt,2023-12-07): We're migrating TTS results from the "tts_results" table (token
+      // prefix "TR:") to the "media_files" table (token prefix "m_")
+      let ttsPermalink;
+      if ((job.maybeResultToken || "").startsWith("m_")) {
+        ttsPermalink = `/media/${job.maybeResultToken}`;
+      } else {
+        ttsPermalink = `/tts/result/${job.maybeResultToken}`;
+      }
 
       let wavesurfers = <SessionTtsAudioPlayer filename={audioLink} />;
 
@@ -229,7 +237,14 @@ function SessionTtsInferenceResultList(props: Props) {
       let audioLink = new BucketConfig().getGcsUrl(
         job.maybePublicBucketWavAudioPath
       );
-      let ttsPermalink = `/tts/result/${job.maybeResultToken}`;
+      // NB(bt,2023-12-07): We're migrating TTS results from the "tts_results" table (token
+      // prefix "TR:") to the "media_files" table (token prefix "m_")
+      let ttsPermalink;
+      if ((job.maybeResultToken || "").startsWith("m_")) {
+        ttsPermalink = `/media/${job.maybeResultToken}`;
+      } else {
+        ttsPermalink = `/tts/result/${job.maybeResultToken}`;
+      }
 
       let wavesurfers = <SessionTtsAudioPlayer filename={audioLink} />;
 
