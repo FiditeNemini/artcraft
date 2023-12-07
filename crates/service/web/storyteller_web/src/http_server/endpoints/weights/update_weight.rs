@@ -74,7 +74,7 @@ impl fmt::Display for UpdateWeightError {
 // =============== Handler ===============
 #[utoipa::path(
     post,
-    path = "/weight/{weight_token}",
+    path = "/v1/weights/weight/{weight_token}",
     responses(
         (status = 200, description = "Success Update", body = SimpleGenericJsonSuccess),
         (status = 400, description = "Bad input", body = UpdateWeightError),

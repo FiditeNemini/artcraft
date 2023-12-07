@@ -106,7 +106,7 @@ impl ResponseError for ListWeightError {
 
 #[utoipa::path(
     get,
-    path = "/list/",
+    path = "/v1/weights/list/",
     responses(
         (status = 200, description = "List Weights", body = ListAvailableWeightsSuccessResponse),
         (status = 401, description = "Not authorized", body = ListWeightError),

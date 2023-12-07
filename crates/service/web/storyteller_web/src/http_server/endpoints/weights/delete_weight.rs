@@ -76,7 +76,7 @@ impl fmt::Display for DeleteWeightError {
 
 #[utoipa::path(
   delete,
-  path = "/weight/{weight_token}",
+  path = "/v1/weights/weight/{weight_token}",
   responses(
       (status = 200, description = "Success Delete", body = SimpleGenericJsonSuccess),
       (status = 400, description = "Bad input", body = DeleteWeightError),

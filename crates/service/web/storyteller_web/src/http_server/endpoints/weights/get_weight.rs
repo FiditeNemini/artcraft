@@ -75,7 +75,7 @@ impl ResponseError for GetWeightError {
 }
 #[utoipa::path(
     get,
-    path = "/weight/{weight_token}",
+    path = "/v1/weights/weight/{weight_token}",
     responses(
         (status = 200, description = "Success Update", body = GetWeightResponse),
         (status = 400, description = "Bad input", body = GetWeightError),
