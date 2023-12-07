@@ -30,8 +30,6 @@ import { TtsInferenceJob } from "@storyteller/components/src/jobs/TtsInferenceJo
 import TextArea from "components/common/TextArea";
 import Badge from "components/common/Badge";
 import FavoriteButton from "components/common/FavoriteButton";
-import { RatingButtons } from "v2/view/_common/ratings/RatingButtons";
-import RatingStars from "components/common/RatingStars";
 import LikeButton from "components/common/LikeButton";
 
 interface WeightProps {
