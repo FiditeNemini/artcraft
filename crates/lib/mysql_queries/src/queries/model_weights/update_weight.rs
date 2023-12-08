@@ -16,7 +16,7 @@ pub struct UpdateWeightArgs<'a> {
 }
 
 pub async fn update_weights(args: UpdateWeightArgs<'_>) -> AnyhowResult<()> {
-    let mut transaction = args.mysql_pool.begin().await?;
+    let transaction = args.mysql_pool.begin().await?;
 
     let query_result = sqlx
         ::query!(
