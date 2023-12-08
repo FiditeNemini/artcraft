@@ -19,7 +19,7 @@ use tokens::tokens::users::UserToken;
 use crate::job::job_loop::job_success_result::{JobSuccessResult, ResultEntity};
 use crate::job::job_loop::process_single_job_error::ProcessSingleJobError;
 use crate::job::job_types::lipsync::sad_talker::categorize_error::categorize_error;
-use crate::job::job_types::lipsync::sad_talker::download_audio_file::download_audio_file;
+use crate::job::job_types::lipsync::sad_talker::download_audio_file::{download_audio_file, DownloadAudioFileArgs};
 use crate::job::job_types::lipsync::sad_talker::download_image_file::download_image_file;
 use crate::job::job_types::lipsync::sad_talker::resize_image::resize_image;
 use crate::job::job_types::lipsync::sad_talker::sad_talker_inference_command::InferenceArgs;
@@ -97,15 +97,15 @@ pub async fn process_job(args: SadTalkerProcessJobArgs<'_>) -> Result<JobSuccess
  
   // ==================== QUERY AND DOWNLOAD FILES ==================== //
 
-  let audio_path = download_audio_file(
-    &job_args.audio_source,
-    &args.job_dependencies.buckets.public_bucket_client,
-    &mut job_progress_reporter,
+  let audio_path = download_audio_file(DownloadAudioFileArgs {
+    audio_source: &job_args.audio_source,
+    public_bucket_client: &args.job_dependencies.buckets.public_bucket_client,
+    job_progress_reporter: &mut job_progress_reporter,
     job,
-    &args.job_dependencies.fs.scoped_temp_dir_creator_for_work,
-    &work_temp_dir,
-    &deps.db.mysql_pool
-  ).await?;
+    temp_dir_creator: &args.job_dependencies.fs.scoped_temp_dir_creator_for_work,
+    work_temp_dir: &work_temp_dir,
+    mysql_pool: &deps.db.mysql_pool
+  }).await?;
 
   info!("Audio file: {:?}", audio_path.filesystem_path);
 
