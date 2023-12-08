@@ -17,6 +17,9 @@ path = "src/lib.rs"
 enums = { path = "../../_types/enums" }
 errors = { path = "../../lib/errors" }
 
+# Workspace hack (faster compile times)
+my-workspace-hack = { version = "0.1", path = "../../my-workspace-hack" }
+
 # External
 bytes = "1.3"
 chrono = { version = "0.4.22", features = ["serde"] }
@@ -35,7 +38,6 @@ reqwest = { version = "0.11", features = ["json"] } # HTTP Client
 # Scraping
 rss = "2.0.2"
 scraper = "0.17.1"
-my-workspace-hack = { version = "0.1", path = "../../my-workspace-hack" }
 
 [dev-dependencies]
 # None yet

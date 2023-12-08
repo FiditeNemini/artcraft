@@ -19,11 +19,13 @@ easyenv = { path = "../easyenv" }
 errors = { path = "../errors" }
 server_environment = { path = "../server_environment" }
 
+# Workspace hack (faster compile times)
+my-workspace-hack = { version = "0.1", path = "../../my-workspace-hack" }
+
 # External
 dotenv = "0.15.0"
 hostname = "0.3.1"
 log = "0.4.14"
-my-workspace-hack = { version = "0.1", path = "../../my-workspace-hack" }
 
 [dev-dependencies]
 # None yet

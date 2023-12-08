@@ -17,6 +17,9 @@ path = "src/lib.rs"
 # Internal
 errors = { path = "../../lib/errors" }
 
+# Workspace hack (faster compile times)
+my-workspace-hack = { version = "0.1", path = "../../my-workspace-hack" }
+
 # Actix
 actix-http = "3.4.0"
 actix-rt = "2.9.0"
@@ -34,7 +37,6 @@ futures-util = "0.3.29"
 # Serialization
 serde = "1.0.125"
 serde_json = "1.0.108"
-my-workspace-hack = { version = "0.1", path = "../../my-workspace-hack" }
 
 [dev-dependencies]
 # None yet

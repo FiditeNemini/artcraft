@@ -13,6 +13,13 @@ name = "tokens"
 path = "src/lib.rs"
 
 [dependencies]
+
+# Internal
+# (none)
+
+# Workspace hack (faster compile times)
+my-workspace-hack = { version = "0.1", path = "../../my-workspace-hack" }
+
 # Serialization
 serde = "1.0.125"
 serde_derive = "1.0.125"
@@ -22,7 +29,6 @@ rand = "0.8.5"
 
 sqlx = { version = "0.7.2", features = [ "mysql", "runtime-tokio", "tls-rustls", "chrono" ] }
 sqlx-core = { version = "0.7.2" }
-my-workspace-hack = { version = "0.1", path = "../../my-workspace-hack" }
 
 utoipa = { version = "4", features = ["chrono","actix_extras"] }
 

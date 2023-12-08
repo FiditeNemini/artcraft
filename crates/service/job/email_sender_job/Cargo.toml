@@ -41,6 +41,9 @@ testing = { path = "../../../lib/testing" }
 tokens = { path = "../../../_types/tokens" }
 tts_common = { path = "../../../lib/tts_common" }
 
+# Workspace hack (faster compile times)
+my-workspace-hack = { version = "0.1", path = "../../../my-workspace-hack" }
+
 # Vendored code
 # newrelic-telemetry = { path = "../../../vendor/newrelic-telemetry-sdk-rust" }
 
@@ -82,4 +85,3 @@ serde_json = "1.0.108"
 # The initial round of stabilizations for the async/await language feature in Rust 1.39 did not
 # include support for async fn in traits.
 async-trait = "0.1.58"
-my-workspace-hack = { version = "0.1", path = "../../../my-workspace-hack" }

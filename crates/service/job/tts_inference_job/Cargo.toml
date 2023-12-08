@@ -27,6 +27,9 @@ memory_caching = { path = "../../../lib/caching/memory_caching" }
 mysql_queries = { path = "../../../lib/mysql_queries" }
 tts_common = { path = "../../../lib/tts_common" }
 
+# Workspace hack (faster compile times)
+my-workspace-hack = { version = "0.1", path = "../../../my-workspace-hack" }
+
 # Vendored code
 newrelic-telemetry = { path = "../../../vendor/newrelic-telemetry-sdk-rust" }
 
@@ -58,4 +61,3 @@ hyper = { version = "0.14.24" }
 serde = "1.0.125"
 serde_derive = "1.0.125"
 serde_json = "1.0.108"
-my-workspace-hack = { version = "0.1", path = "../../../my-workspace-hack" }
