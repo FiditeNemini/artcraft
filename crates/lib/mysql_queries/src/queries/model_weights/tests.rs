@@ -1,38 +1,32 @@
 #[cfg(test)]
 mod tests {
-    use std::result;
-
     use anyhow::Ok;
-    use chrono::offset;
-    use enums::by_table::model_weights::{ weights_types, weights_category };
-    use sqlx::{ MySqlPool, Acquire };
     use rand::Rng;
-
-    use tokio;
     use serial_test::serial;
-    use container_common::anyhow_result::AnyhowResult;
+    use sqlx::MySqlPool;
     use sqlx::mysql::MySqlPoolOptions;
-    use config::shared_constants::{ DEFAULT_MYSQL_CONNECTION_STRING };
+    use tokio;
+
+    use config::shared_constants::DEFAULT_MYSQL_CONNECTION_STRING;
+    use container_common::anyhow_result::AnyhowResult;
     // common tests
     use enums::by_table::model_weights::{
-        weights_types::WeightsType,
         weights_category::WeightsCategory,
+        weights_types::WeightsType,
     };
     use enums::common::visibility::Visibility;
-    use tokens::tokens::{ users::UserToken, model_weights::ModelWeightToken };
+    use tokens::tokens::{model_weights::ModelWeightToken, users::UserToken};
 
-    use crate::queries::model_weights::create_weight::CreateModelWeightsArgs;
     use crate::queries::model_weights::create_weight::create_weight;
-    use crate::queries::model_weights::get_weight::get_weight_by_token;
-
+    use crate::queries::model_weights::create_weight::CreateModelWeightsArgs;
     use crate::queries::model_weights::delete_weights::{
-        delete_weights_as_user,
         delete_weights_as_mod,
+        delete_weights_as_user,
         undelete_weights_as_mod,
         undelete_weights_as_user,
     };
+    use crate::queries::model_weights::get_weight::get_weight_by_token;
     use crate::queries::model_weights::list_weights_by_user::list_weights_by_creator_username;
-
     use crate::queries::model_weights::list_weights_query_builder::ListWeightsQueryBuilder;
     use crate::queries::users::user::get_user_token_by_username::get_user_token_by_username;
 
