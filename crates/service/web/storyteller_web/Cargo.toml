@@ -162,7 +162,9 @@ pulldown-cmark = "0.9.3"
 # The initial round of stabilizations for the async/await language feature in Rust 1.39 did not
 # include support for async fn in traits.
 async-trait = "0.1.58"
-utoipa = { version = "4", features = ["actix_extras"] }
+
+my-workspace-hack = { version = "0.1", path = "../../../../my-workspace-hack" }
+utoipa = { version = "4", features = ["chrono","actix_extras"] }
 utoipa-swagger-ui = { version = "5", features = ["actix-web"] }
 
 [build-dependencies]

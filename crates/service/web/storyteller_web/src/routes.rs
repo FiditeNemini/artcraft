@@ -152,6 +152,13 @@ use crate::http_server::endpoints::w2l::list_user_w2l_templates::list_user_w2l_t
 use crate::http_server::endpoints::w2l::list_w2l_templates::list_w2l_templates_handler;
 use crate::http_server::endpoints::w2l::set_w2l_template_mod_approval::set_w2l_template_mod_approval_handler;
 
+use crate::http_server::endpoints::weights::get_weight::get_weight_handler;
+use crate::http_server::endpoints::weights::delete_weight::delete_weight_handler;
+use crate::http_server::endpoints::weights::update_weight::update_weight_handler;
+use crate::http_server::endpoints::weights::list_available_weights::list_available_weights_handler;
+use crate::http_server::endpoints::weights::list_weights_by_user::list_weights_by_user_handler;
+
+
 pub fn add_routes<T, B> (app: App<T>, server_environment: ServerEnvironment) -> App<T>
   where
       B: MessageBody,
@@ -184,6 +191,9 @@ pub fn add_routes<T, B> (app: App<T>, server_environment: ServerEnvironment) -> 
   app = add_subscription_routes(app); /* /v1/subscriptions/... */
   app = add_voice_designer_routes(app); /* /v1/voice_designer */
 
+  if server_environment == ServerEnvironment::Development {
+     app = add_weights_routes(app); /* /v1/stubs/... */
+  }
   // ==================== Comments ====================
 
   let mut app = RouteBuilder::from_app(app)
@@ -1231,3 +1241,33 @@ fn add_voice_designer_routes<T,B> (app:App<T>)-> App<T>
       )
 }
 
+// ==================== Weights ROUTES ====================
+fn add_weights_routes<T, B>(app: App<T>) -> App<T>
+    where
+        B: MessageBody,
+        T: ServiceFactory<
+            ServiceRequest,
+            Config = (),
+            Response = ServiceResponse<B>,
+            Error = Error,
+            InitError = ()
+        >
+{
+    app.service(
+        web
+            ::scope("/v1/weights")
+            //.route("/upload", web::post().to(upload_weights_handler))
+            .service(
+                web
+                    ::resource("/weight/{weight_token}")
+                    .route(web::get().to(get_weight_handler))
+                    .route(web::post().to(update_weight_handler))
+                    .route(web::delete().to(delete_weight_handler))
+            )
+            .route("/by_user/{username}", web::get().to(list_weights_by_user_handler))
+            .route(
+                "/list",
+                web::get().to(list_available_weights_handler)
+            )
+    )
+}

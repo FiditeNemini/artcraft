@@ -2215,6 +2215,7 @@ dependencies = [
  "sqlx-mysql",
  "strum",
  "toml",
+ "utoipa",
 ]
 
 [[package]]

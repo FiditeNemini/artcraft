@@ -2,9 +2,9 @@ use tokens::tokens::users::UserToken;
 
 use crate::user_avatars::default_avatar_color_from_username::default_avatar_color_from_username;
 use crate::user_avatars::default_avatar_from_username::default_avatar_from_username;
-
+use utoipa::ToSchema;
 /// Everything we need to refer to a user on the public web interface.
-#[derive(Clone, Serialize)]
+#[derive(Clone, Serialize,ToSchema)]
 pub struct UserDetailsLight {
   /// The token for the user
   pub user_token: UserToken,
@@ -82,7 +82,8 @@ impl UserDetailsLight {
   }
 }
 
-#[derive(Clone, Serialize)]
+
+#[derive(Clone, Serialize,ToSchema)]
 pub struct DefaultAvatarInfo {
   pub image_index: u8,
   pub color_index: u8,

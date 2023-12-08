@@ -133,13 +133,13 @@ impl ListWeightsQueryBuilder {
         self
     }
 
-    pub fn weights_type(mut self, weights_type: WeightsType) -> Self {
-        self.weights_type = Some(weights_type);
+    pub fn weights_type(mut self, weights_type: Option<WeightsType>) -> Self {
+        self.weights_type = weights_type;
         self
     }
 
-    pub fn weights_category(mut self, weights_category: WeightsCategory) -> Self {
-        self.weights_category = Some(weights_category);
+    pub fn weights_category(mut self, weights_category: Option<WeightsCategory>) -> Self {
+        self.weights_category = weights_category;
         self
     }
 
@@ -505,7 +505,7 @@ mod tests {
 
     #[test]
     fn predicates_scoped_to_weights_type() {
-        let query_builder = ListWeightsQueryBuilder::new().weights_type(WeightsType::RvcV2);
+        let query_builder = ListWeightsQueryBuilder::new().weights_type(Some(WeightsType::RvcV2));
         assert_eq!(
             &query_builder.build_predicates(),
             " WHERE model_weights.weights_type = ? \
@@ -520,7 +520,7 @@ mod tests {
     #[test]
     fn predicates_scoped_to_weights_category() {
         let query_builder = ListWeightsQueryBuilder::new().weights_category(
-            WeightsCategory::VoiceConversion
+            Some(WeightsCategory::VoiceConversion)
         );
         println!("Query HERE! {}", &query_builder.build_predicates());
         assert_eq!(

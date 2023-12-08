@@ -56,7 +56,6 @@ pub async fn main() -> AnyhowResult<()> {
   seed_voice_conversion(&pool).await?;
 
   seed_weights(&pool).await?;
-  
 
   seed_tts_tacotron2(&pool, maybe_bucket_clients.as_ref()).await?;
 
