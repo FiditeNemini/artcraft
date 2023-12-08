@@ -109,7 +109,7 @@ export default function InferenceJobsList({ filter, onSelect, statusTxt, t, infe
         </div>
         {
           job.maybeResultToken ?  <Button {...{
-              href: `media/${job.maybeResultToken}`,
+              href: `/media/${job.maybeResultToken}`,
               icon: faChevronRight,
               iconFlip: true,
               label: t("inputs.viewResult"),
