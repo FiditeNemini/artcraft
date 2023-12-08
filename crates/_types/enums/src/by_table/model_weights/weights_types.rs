@@ -7,7 +7,7 @@ use strum::EnumIter;
 use utoipa::ToSchema;
 
 #[cfg_attr(test, derive(EnumIter, EnumCount))]
-#[derive(Clone, Copy, Eq, PartialEq, Hash, Ord, PartialOrd, Deserialize, Serialize,ToSchema)]
+#[derive(Clone, Copy, Eq, PartialEq, Hash, Ord, PartialOrd, Deserialize, Serialize, ToSchema)]
 pub enum WeightsType {
     #[serde(rename = "hifigan_tt2")]
     HifiganTacotron2,
@@ -106,7 +106,7 @@ mod tests {
     #[test]
     fn test_all_variants() {
         let variants = WeightsType::all_variants();
-        assert_eq!(variants.len(), 7);
+        assert_eq!(variants.len(), 8);
         assert!(variants.contains(&WeightsType::HifiganTacotron2));
         assert!(variants.contains(&WeightsType::RvcV2));
         assert!(variants.contains(&WeightsType::StableDiffusion15));

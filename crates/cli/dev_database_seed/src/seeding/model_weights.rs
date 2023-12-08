@@ -1,22 +1,20 @@
 use std::vec;
 
-use buckets::public::media_files::original_file;
 use log::info;
+use sqlx::{MySql, Pool};
 
-use tokens::tokens::users::UserToken;
-use sqlx::{ MySql, Pool };
 use enums::by_table::model_weights::{
-    weights_types::{WeightsType, self},
-    weights_category::{WeightsCategory, self},
+    weights_category::WeightsCategory,
+    weights_types::WeightsType,
 };
-use errors::{ anyhow, AnyhowResult };
+use enums::common::visibility::Visibility;
+use errors::{anyhow, AnyhowResult};
+use mysql_queries::queries::model_weights::create_weight::{create_weight, CreateModelWeightsArgs};
+use mysql_queries::queries::users::user::get_user_token_by_username::get_user_token_by_username;
+use tokens::tokens::model_weights::ModelWeightToken;
+use tokens::tokens::users::UserToken;
 
 use crate::seeding::users::HANASHI_USERNAME;
-use mysql_queries::queries::model_weights::create_weight::{ create_weight, CreateModelWeightsArgs };
-use tokens::tokens::model_weights::ModelWeightToken;
-use enums::common::visibility::Visibility;
-
-use mysql_queries::queries::users::user::get_user_token_by_username::get_user_token_by_username;
 
 pub async fn seed_weights_for_paging(  mysql_pool: &Pool<MySql>,user_token: UserToken) -> AnyhowResult<()> {
     let sd1_5_markdown_description = r#"
@@ -326,8 +324,8 @@ let sd1_5_image_token = "https://image.civitai.com/xG1nkqKTMzGDvpLrqFT7WA/be7062
             let args = CreateModelWeightsArgs {
                 token: &model_weight_token, // replace with actual ModelWeightToken
                 weights_type: weights_types, // replace with actual WeightsType
-                weights_category: weights_category, // replace with actual WeightsCategory
-                title: title,
+                weights_category, // replace with actual WeightsCategory
+                title,
                 maybe_thumbnail_token: Some(thumbnail_token.to_string()),
                 description_markdown: description,
                 description_rendered_html: description_rendered_html.to_string(),
@@ -342,11 +340,11 @@ let sd1_5_image_token = "https://image.civitai.com/xG1nkqKTMzGDvpLrqFT7WA/be7062
                 private_bucket_hash: "bucket_hash1".to_string(),
                 maybe_private_bucket_prefix: Some(private_bucket_prefix),
                 maybe_private_bucket_extension: Some(private_bucket_extension),
-                cached_user_ratings_total_count: cached_user_ratings_total_count,
-                cached_user_ratings_positive_count: cached_user_ratings_positive_count,
-                cached_user_ratings_negative_count: cached_user_ratings_negative_count,
+                cached_user_ratings_total_count,
+                cached_user_ratings_positive_count,
+                cached_user_ratings_negative_count,
                 maybe_cached_user_ratings_ratio: Some(cached_user_ratings_ratio as f32),
-                version: version,
+                version,
                 mysql_pool: &mysql_pool, // replace with actual MySqlPool
             };
         
