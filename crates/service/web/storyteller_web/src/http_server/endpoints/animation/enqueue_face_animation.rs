@@ -37,7 +37,7 @@ const DEBUG_HEADER_NAME : &str = "enable-debug-mode";
 const ROUTING_TAG_HEADER_NAME : &str = "routing-tag";
 
 #[derive(Deserialize)]
-pub struct EnqueueLipsyncAnimationRequest {
+pub struct EnqueueFaceAnimationRequest {
   uuid_idempotency_token: String,
 
   audio_source: AudioSource,
@@ -117,35 +117,35 @@ pub struct ImageSource {
 }
 
 #[derive(Serialize)]
-pub struct EnqueueLipsyncAnimationSuccessResponse {
+pub struct EnqueueFaceAnimationSuccessResponse {
   pub success: bool,
   pub inference_job_token: InferenceJobToken,
 }
 
 #[derive(Debug)]
-pub enum EnqueueLipsyncAnimationError {
+pub enum EnqueueFaceAnimationError {
   BadInput(String),
   NotAuthorized,
   ServerError,
   RateLimited,
 }
 
-impl ResponseError for EnqueueLipsyncAnimationError {
+impl ResponseError for EnqueueFaceAnimationError {
   fn status_code(&self) -> StatusCode {
     match *self {
-      EnqueueLipsyncAnimationError::BadInput(_) => StatusCode::BAD_REQUEST,
-      EnqueueLipsyncAnimationError::NotAuthorized => StatusCode::UNAUTHORIZED,
-      EnqueueLipsyncAnimationError::ServerError => StatusCode::INTERNAL_SERVER_ERROR,
-      EnqueueLipsyncAnimationError::RateLimited => StatusCode::TOO_MANY_REQUESTS,
+      EnqueueFaceAnimationError::BadInput(_) => StatusCode::BAD_REQUEST,
+      EnqueueFaceAnimationError::NotAuthorized => StatusCode::UNAUTHORIZED,
+      EnqueueFaceAnimationError::ServerError => StatusCode::INTERNAL_SERVER_ERROR,
+      EnqueueFaceAnimationError::RateLimited => StatusCode::TOO_MANY_REQUESTS,
     }
   }
 
   fn error_response(&self) -> HttpResponse {
     let error_reason = match self {
-      EnqueueLipsyncAnimationError::BadInput(reason) => reason.to_string(),
-      EnqueueLipsyncAnimationError::NotAuthorized => "unauthorized".to_string(),
-      EnqueueLipsyncAnimationError::ServerError => "server error".to_string(),
-      EnqueueLipsyncAnimationError::RateLimited => "rate limited".to_string(),
+      EnqueueFaceAnimationError::BadInput(reason) => reason.to_string(),
+      EnqueueFaceAnimationError::NotAuthorized => "unauthorized".to_string(),
+      EnqueueFaceAnimationError::ServerError => "server error".to_string(),
+      EnqueueFaceAnimationError::RateLimited => "rate limited".to_string(),
     };
 
     to_simple_json_error(&error_reason, self.status_code())
@@ -153,16 +153,16 @@ impl ResponseError for EnqueueLipsyncAnimationError {
 }
 
 // NB: Not using derive_more::Display since Clion doesn't understand it.
-impl std::fmt::Display for EnqueueLipsyncAnimationError {
+impl std::fmt::Display for EnqueueFaceAnimationError {
   fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
     write!(f, "{:?}", self)
   }
 }
 
-pub async fn enqueue_lipsync_animation_handler(
+pub async fn enqueue_face_animation_handler(
   http_request: HttpRequest,
-  request: web::Json<EnqueueLipsyncAnimationRequest>,
-  server_state: web::Data<Arc<ServerState>>) -> Result<HttpResponse, EnqueueLipsyncAnimationError>
+  request: web::Json<EnqueueFaceAnimationRequest>,
+  server_state: web::Data<Arc<ServerState>>) -> Result<HttpResponse, EnqueueFaceAnimationError>
 {
   let mut maybe_user_token : Option<UserToken> = None;
 
@@ -171,7 +171,7 @@ pub async fn enqueue_lipsync_animation_handler(
       .await
       .map_err(|err| {
         warn!("MySql pool error: {:?}", err);
-        EnqueueLipsyncAnimationError::ServerError
+        EnqueueFaceAnimationError::ServerError
       })?;
 
   let maybe_avt_token = server_state.avt_cookie_manager.get_avt_token_from_request(&http_request);
@@ -184,7 +184,7 @@ pub async fn enqueue_lipsync_animation_handler(
       .await
       .map_err(|e| {
         warn!("Session checker error: {:?}", e);
-        EnqueueLipsyncAnimationError::ServerError
+        EnqueueFaceAnimationError::ServerError
       })?;
 
   if let Some(user_session) = maybe_user_session.as_ref() {
@@ -215,14 +215,14 @@ pub async fn enqueue_lipsync_animation_handler(
     None => &server_state.redis_rate_limiters.logged_out,
     Some(ref user) => {
       if user.role.is_banned {
-        return Err(EnqueueLipsyncAnimationError::NotAuthorized);
+        return Err(EnqueueFaceAnimationError::NotAuthorized);
       }
       &server_state.redis_rate_limiters.logged_in
     },
   };
 
   if let Err(_err) = rate_limiter.rate_limit_request(&http_request) {
-    return Err(EnqueueLipsyncAnimationError::RateLimited);
+    return Err(EnqueueFaceAnimationError::RateLimited);
   }
 
   // ==================== LOOK UP MODEL INFO ==================== //
@@ -239,7 +239,7 @@ pub async fn enqueue_lipsync_animation_handler(
     } else if let Some(ref token) = request.audio_source.maybe_voice_conversion_result_token {
       LipsyncAnimationAudioSource::voice_conversion_result_token(token.as_str())
     } else {
-      return Err(EnqueueLipsyncAnimationError::BadInput("audio source not fully specified".to_string()));
+      return Err(EnqueueFaceAnimationError::BadInput("audio source not fully specified".to_string()));
     }
   };
 
@@ -249,7 +249,7 @@ pub async fn enqueue_lipsync_animation_handler(
     } else if let Some(ref token) = request.image_source.maybe_media_upload_token {
       LipsyncAnimationImageSource::media_upload_token(token.as_str())
     } else {
-      return Err(EnqueueLipsyncAnimationError::BadInput("image source not fully specified".to_string()));
+      return Err(EnqueueFaceAnimationError::BadInput("image source not fully specified".to_string()));
     }
   };
 
@@ -329,7 +329,7 @@ pub async fn enqueue_lipsync_animation_handler(
     Ok((job_token, _id)) => job_token,
     Err(err) => {
       warn!("New generic inference job creation DB error: {:?}", err);
-      return Err(EnqueueLipsyncAnimationError::ServerError);
+      return Err(EnqueueFaceAnimationError::ServerError);
     }
   };
 
@@ -341,16 +341,16 @@ pub async fn enqueue_lipsync_animation_handler(
       .await
       .map_err(|e| {
         warn!("error publishing event: {:?}", e);
-        EnqueueLipsyncAnimationError::ServerError
+        EnqueueFaceAnimationError::ServerError
       })?;
 
-  let response: EnqueueLipsyncAnimationSuccessResponse = EnqueueLipsyncAnimationSuccessResponse {
+  let response: EnqueueFaceAnimationSuccessResponse = EnqueueFaceAnimationSuccessResponse {
     success: true,
     inference_job_token: job_token,
   };
 
   let body = serde_json::to_string(&response)
-      .map_err(|_e| EnqueueLipsyncAnimationError::ServerError)?;
+      .map_err(|_e| EnqueueFaceAnimationError::ServerError)?;
 
   Ok(HttpResponse::Ok()
       .content_type("application/json")

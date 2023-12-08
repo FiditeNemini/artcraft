@@ -1,1 +1,1 @@
-pub mod enqueue_lipsync_animation;
+pub mod enqueue_face_animation;
