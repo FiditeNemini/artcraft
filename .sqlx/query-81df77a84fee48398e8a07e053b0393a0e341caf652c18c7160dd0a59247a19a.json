@@ -1,0 +1,12 @@
+{
+  "db_name": "MySQL",
+  "query": "\n    UPDATE model_weights\n    SET\n        title = COALESCE(?, title),\n        description_markdown = COALESCE(?, description_markdown),\n        maybe_thumbnail_token = COALESCE(?, maybe_thumbnail_token),\n        description_rendered_html = COALESCE(?, description_rendered_html),\n        creator_set_visibility = COALESCE(?, creator_set_visibility),\n        version = version + 1\n    WHERE token = ?\n    ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 6
+    },
+    "nullable": []
+  },
+  "hash": "81df77a84fee48398e8a07e053b0393a0e341caf652c18c7160dd0a59247a19a"
+}
