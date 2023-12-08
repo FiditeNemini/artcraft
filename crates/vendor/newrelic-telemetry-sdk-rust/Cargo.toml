@@ -21,6 +21,8 @@ flate2 = { version = "1.0.16", optional = true }
 futures = { version = "0.3.1", optional = true }
 tokio = { version = "1.1.0", features = ["macros"], optional = true }
 uuid = { version = "0.8.1", features = ["v4"] }
+
+# Workspace hack (faster compile times)
 my-workspace-hack = { version = "0.1", path = "../../my-workspace-hack" }
 
 [dev-dependencies]
