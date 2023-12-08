@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { a, useSpring } from "@react-spring/web";
 import { Button, Check } from 'components/common';
 import { FrontendInferenceJobType, InferenceJob } from "@storyteller/components/src/jobs/InferenceJob";
@@ -32,7 +32,7 @@ const AniX = ({ checked = false }) => {
 }
 
 export default function JobItem({ maybeFailureCategory, maybeResultToken, onSelect, jobState, jobStatusDescription, jobType: inputType, t }: JobListItem) {
-  console.log("👅",jobState);
+
   const processFail = (fail = "") => {
     switch (fail) {
       case "face_not_detected": return "Face not detected, try another picture";
@@ -56,8 +56,6 @@ export default function JobItem({ maybeFailureCategory, maybeResultToken, onSele
       default: return 0;
     }
   }
-
-  const [yada,yadaSet] = useState(0);
   const dashes = [ // the arity (amount of numbers) must remain the same or react-spring will freakout
     "1 7 1 7 1 70", // UKNOWN / PENDING - 3x 1pt strokes with 7 point gaps, then a big 70pt gap
     "6 0 6 0 6 70", // STARTED / ATTEMPT_FAILED - 6pt strokes with 0pt gaps to appear as one, big gap
