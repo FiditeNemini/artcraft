@@ -1,4 +1,24 @@
 {
+  "FaceAnimation": {
+    "ATTEMPT_FAILED": "Gesichtsanimationsversuch fehlgeschlagen",
+    "COMPLETE_FAILURE": "Gesichtsanimation fehlgeschlagen.",
+    "COMPLETE_SUCCESS": "Gesichtsanimation abgeschlossen",
+    "DEAD": "Gesichtsanimation tot",
+    "PENDING": "Ausstehende Gesichtsanimation",
+    "STARTED": "Gesichtsanimation läuft",
+    "UNKNOWN": "Animationsstatus unbekannt",
+    "heading": "Jobs als Gesichtsanimator"
+  },
+  "VoiceDesignerCreateVoice": {
+    "ATTEMPT_FAILED": "Gesichtsanimationsversuch fehlgeschlagen",
+    "COMPLETE_FAILURE": "Gesichtsanimation fehlgeschlagen.",
+    "COMPLETE_SUCCESS": "Gesichtsanimation abgeschlossen",
+    "DEAD": "Voice Designer tot",
+    "PENDING": "Voice Designer Ausstehend",
+    "STARTED": "Voice Designer in Bearbeitung",
+    "UNKNOWN": "Voice Designer-Status unbekannt",
+    "heading": "Jobs als Sprachdesigner"
+  },
   "core": {
     "heading": "Neueste Jobs"
   },
@@ -15,6 +35,7 @@
     "ATTEMPT_FAILED": "Versuch {{attemptCount}} fehlgeschlagen, versuche es erneut.",
     "COMPLETE_FAILURE": "Bitte versuche es erneut",
     "COMPLETE_SUCCESS": "Zeige Ergebnis",
+    "DEAD": "Bitte versuche es erneut",
     "PENDING": "Zur Warteschlange hinzufügen",
     "STARTED": "Bitte warten",
     "UNKNOWN": "Bitte warten Sie oder versuchen Sie es erneut"
