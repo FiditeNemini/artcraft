@@ -14,7 +14,7 @@ path = "src/lib.rs"
 
 [dependencies]
 # External
-my-workspace-hack = { version = "0.1", path = "../../../my-workspace-hack" }
+my-workspace-hack = { version = "0.1", path = "../../my-workspace-hack" }
 
 [dev-dependencies]
 serial_test = "2.0.0"

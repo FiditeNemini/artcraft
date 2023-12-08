@@ -23,7 +23,6 @@ use crate::job::job_loop::process_single_job_error::ProcessSingleJobError;
 use crate::job::job_types::tts::vall_e_x::process_job::VALLEXProcessJobArgs;
 use crate::job::job_types::tts::vall_e_x::vall_e_x_inference_command::InferenceArgs;
 
-// Clearify what this is for ?
 const BUCKET_FILE_PREFIX: &str = "fakeyou_";
 const BUCKET_FILE_EXTENSION: &str = ".wav";
 const MIME_TYPE: &str = "audio/wav";
@@ -208,6 +207,7 @@ pub async fn process_inference_voice(
       .map_err(|e| ProcessSingleJobError::Other(e))?;
 
   // ==================== UPLOAD AUDIO TO BUCKET ====================
+
   info!("Calculating sha256...");
 
   let file_checksum = sha256_hash_file(&finished_file).map_err(|err| {

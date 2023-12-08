@@ -150,6 +150,7 @@ async fn legacy_lookup(job_token: &str, server_state: &ServerState)
         GetTtsInferenceStatusError::ServerError
       })?;
 
+  // TODO(bt,2023-05-21): Make async.
   let extra_status_key = RedisKeys::tts_inference_extra_status_info(&job_token);
   let maybe_extra_status_description : Option<String> = match redis.get(&extra_status_key) {
     Ok(Some(status)) => {

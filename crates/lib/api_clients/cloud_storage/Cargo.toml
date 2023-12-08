@@ -28,4 +28,4 @@ rust-s3 = { version = "0.33.0" }
 # Runtime
 # NB: We switched to Tokio from `async-std` for broader ecosystem support.
 tokio = { version = "1.6.0", features = ["macros"] }
-my-workspace-hack = { version = "0.1", path = "../../../../my-workspace-hack" }
+my-workspace-hack = { version = "0.1", path = "../../../my-workspace-hack" }

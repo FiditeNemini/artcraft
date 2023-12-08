@@ -18,7 +18,7 @@ path = "src/lib.rs"
 # (none)
 
 # External
-chrono = { version = "=0.4.22", features = ["serde"] }
+chrono = { version = "0.4.22", features = ["serde"] }
 
 # Serialization
 serde = "1.0.125"
@@ -26,7 +26,7 @@ serde_derive = "1.0.125"
 
 # MySql Database
 sqlx = { version = "0.7.2", features = [ "mysql", "runtime-tokio", "tls-rustls", "chrono" ] }
-my-workspace-hack = { version = "0.1", path = "../../../my-workspace-hack" }
+my-workspace-hack = { version = "0.1", path = "../../my-workspace-hack" }
 
 [dev-dependencies]
 # Test serialization

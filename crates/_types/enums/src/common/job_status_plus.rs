@@ -34,6 +34,12 @@ impl_mysql_enum_coders!(JobStatusPlus);
 
 // NB: We can derive `sqlx::Type` instead of using `impl_mysql_enum_coders`
 
+impl Default for JobStatusPlus {
+  fn default() -> Self {
+    Self::Pending
+  }
+}
+
 impl JobStatusPlus {
   pub fn to_str(&self) -> &'static str {
     match self {
@@ -85,6 +91,11 @@ mod tests {
 
   mod explicit_checks {
     use super::*;
+
+    #[test]
+    fn test_default() {
+      assert_eq!(JobStatusPlus::default(), JobStatusPlus::Pending);
+    }
 
     #[test]
     fn test_serialization() {

@@ -25,7 +25,7 @@ tokens = { path = "../../_types/tokens" }
 
 # External
 anyhow = "1.0.75"
-chrono = { version = "=0.4.22", features = ["serde"] }
+chrono = { version = "0.4.22", features = ["serde"] }
 dotenv = "0.15.0"
 log = "0.4.14"
 
@@ -44,5 +44,5 @@ tokio = { version = "1.6.0", features = ["full"] }
 rand = "0.8"
 sqlx = { version = "0.7.2", features = [ "mysql", "runtime-tokio", "tls-rustls", "chrono" ] }
 
-my-workspace-hack = { version = "0.1", path = "../../../my-workspace-hack" }
+my-workspace-hack = { version = "0.1", path = "../../my-workspace-hack" }
 
