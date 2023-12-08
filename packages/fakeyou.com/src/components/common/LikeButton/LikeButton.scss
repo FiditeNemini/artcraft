@@ -41,7 +41,7 @@
     background-color: rgba(#593a48, 0.9);
 
     &:hover {
-      background-color: darken(rgba(#593a48, 0.9), 2%);
+      background-color: lighten(rgba(#593a48, 0.9), 10%);
     }
   }
 
