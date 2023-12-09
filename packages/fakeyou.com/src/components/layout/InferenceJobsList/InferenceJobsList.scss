@@ -1,4 +1,19 @@
+@import "scss/colours.scss";
+
+a.face-animator-job {
+	&:hover {
+		background-color: $panel-inner;
+	}
+}
+
 .face-animator-job {
+	border-radius: .5rem;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: stretch;
+    margin-top: .5rem;
+    padding: .5rem;
+
 	svg {
 		// background-color: rgba(#ccc, .05);
 		margin-right: .5rem;
@@ -37,7 +52,17 @@
 		// stroke: #fff;
 	}
 
+	.job-details {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      // height: 100%;
+      width: min-content;
+
+    }
+
 	h6 { 
+		color: #fff;
 		line-height: 1rem;
 		height: 1rem;
 		margin-bottom: 0;

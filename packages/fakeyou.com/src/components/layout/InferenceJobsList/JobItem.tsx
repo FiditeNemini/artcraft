@@ -1,6 +1,8 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import { Link } from "react-router-dom";
 import { a, useSpring } from "@react-spring/web";
-import { Button, Check } from 'components/common';
+import { Check } from 'components/common';
+import { useInterval } from "hooks";
 import { FrontendInferenceJobType, InferenceJob } from "@storyteller/components/src/jobs/InferenceJob";
 import { JobState } from "@storyteller/components/src/jobs/JobStates";
 
@@ -31,7 +33,15 @@ const AniX = ({ checked = false }) => {
   </>;
 }
 
-export default function JobItem({ maybeFailureCategory, maybeResultToken, onSelect, jobState, jobStatusDescription, jobType: inputType, t }: JobListItem) {
+const OuterItem = ({ className, children, maybeResultToken, jobState}: { className?: string, children?: any, maybeResultToken?: any, jobState: number }) => jobState === 3 ?
+  <Link {...{ className, to: `media/${maybeResultToken}` }}>{ children }</Link> :
+  <div {...{ className }}>{ children }</div>;
+
+export default function JobItem({ maybeFailureCategory, maybeResultToken, onSelect, jobState: nah, jobStatusDescription, jobType: inputType, t }: JobListItem) {
+  const [jobState,jobStateSet] = useState(0);
+
+  const [hasBounced,hasBouncedSet] = useState(false);
+  useInterval({ interval: 3000, onTick: ({ index }: { index: number }) => { jobStateSet(index); if (!index) hasBouncedSet(false) } });
 
   const processFail = (fail = "") => {
     switch (fail) {
@@ -43,7 +53,6 @@ export default function JobItem({ maybeFailureCategory, maybeResultToken, onSele
   const jobStatus = jobStatusDescription(jobState);
 	const jobStatusClass = jobStatus.toLowerCase().replace("_","-");
   const circle = { cx: 18, cy: 18, r: 14, strokeWidth: 4 };
-
   const dashStatus = () => {
     switch (jobState) {
       case JobState.COMPLETE_SUCCESS:
@@ -55,42 +64,50 @@ export default function JobItem({ maybeFailureCategory, maybeResultToken, onSele
       case JobState.UNKNOWN:
       default: return 0;
     }
-  }
+  };
+  const isComplete = jobState === JobState.COMPLETE_SUCCESS;
+  const isProblemo = jobState === JobState.COMPLETE_FAILURE || jobState === JobState.DEAD;
   const dashes = [ // the arity (amount of numbers) must remain the same or react-spring will freakout
     "1 7 1 7 1 70", // UKNOWN / PENDING - 3x 1pt strokes with 7 point gaps, then a big 70pt gap
     "6 0 6 0 6 70", // STARTED / ATTEMPT_FAILED - 6pt strokes with 0pt gaps to appear as one, big gap
     "0 0 50 0 0 0" // COMPLETE_SUCCESS / COMPLETE_FAILURE / DEAD - One big 50pt stroke
   ];
-
+  const [bounce,bounceSet] = useState(false);
   const dashy = useSpring({
     config: { tension: 280, friction: 60 },
     opacity: [.5,1,1][dashStatus()],
     strokeDasharray: dashes[dashStatus()]
   });
+  const makeBounce = (amount = 0, delay = 0) => ({
+    delay,
+    config: { tension: 250, friction: 12 },
+    transform: `translate(${ bounce ? amount : 0 }px)`
+  });
+  const headingBounce = useSpring(makeBounce(8));
+  const subtitleBounce = useSpring(makeBounce(6,30));
+  const subtitle = maybeFailureCategory ?`${ processFail(maybeFailureCategory) }` : t(`subtitles.${jobStatus}`);
+  const className = `face-animator-job job-status-${jobStatusClass}`;
 
-  return <div {...{ className: `face-animator-job job-status-${jobStatusClass}` }}>
+  useEffect(() => {
+    if (!bounce && !hasBounced && isComplete) {
+      hasBouncedSet(true);
+      bounceSet(true);
+      setTimeout(() => bounceSet(false),250);
+    }
+  },[bounce, hasBounced, isComplete ]);
+
+  return <OuterItem {...{ className, maybeResultToken, jobState }}>
     <svg {...{ }}>
-      <circle {...{ ...circle, className: "work-indicator-circle-track",}} />
+      <circle {...{ ...circle, className: "work-indicator-circle-track" }} />
       <a.circle {...{ ...circle, className: "work-indicator-circle-marker", style: dashy }} />
-      <AniX checked={jobState === 4 || jobState === 6}/>
-      <Check checked={jobState === 3}/>
+      <AniX checked={isProblemo}/>
+      <Check checked={isComplete}/>
     </svg>
     <div {...{ className: "job-details" }}>
-      <h6>
+      <a.h6 {...{  style: headingBounce }}>
         { t(`${jobType}.${jobStatus}`) }
-      </h6>
-      <span>
-        { maybeFailureCategory ?`${ processFail(maybeFailureCategory) }` : t(`subtitles.${jobStatus}`) }
-      </span>
+      </a.h6>
+      <a.span {...{  style: subtitleBounce }}>{ isComplete ? subtitle + " >" : subtitle }</a.span>
     </div>
-    {
-      maybeResultToken ?  <Button {...{
-          href: `media/${maybeResultToken}`,
-          // icon: faChevronRight,
-          iconFlip: true,
-          // label: t("inputs.viewResult"),
-          onClick: onSelect
-        }} />: null
-      }
-  </div>;
+  </OuterItem>;
 };
