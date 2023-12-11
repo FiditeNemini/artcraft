@@ -44,11 +44,12 @@ function AccordionItem({
   );
   const contentRef = useRef<HTMLDivElement>(null);
 
+  // Update content height when content changes
   useEffect(() => {
-    if (contentRef.current) {
-      setContentHeight(isOpen ? contentRef.current.scrollHeight : 0);
+    if (isOpen && contentRef.current) {
+      setContentHeight(contentRef.current.scrollHeight);
     }
-  }, [isOpen]);
+  }, [children, isOpen]); // Dependency on children and isOpen
 
   const heightProps = useSpring({
     height: isOpen ? `${contentHeight}px` : "0px",
@@ -89,23 +90,21 @@ function AccordionItem({
 }
 
 function Accordion({ children }: AccordionProps) {
-  const [openItems, setOpenItems] = useState<string[]>([]);
+  // Extract titles of items that should be initially open
+  const defaultOpenTitles = React.Children.toArray(children)
+    .filter((child: any) => child.props.defaultOpen)
+    .map((child: any) => child.props.title);
+
+  // Initialize openItems with the titles of items that should be open
+  const [openItems, setOpenItems] = useState<string[]>(defaultOpenTitles);
 
   const toggleItem = (title: string) => {
     if (openItems.includes(title)) {
-      setOpenItems(openItems.filter((item) => item !== title));
+      setOpenItems(openItems.filter(item => item !== title));
     } else {
       setOpenItems([...openItems, title]);
     }
   };
-
-  // Initialize openItems based on defaultOpen props of AccordionItem children
-  useEffect(() => {
-    const defaultOpenItems = React.Children.toArray(children)
-      .filter((child: any) => child.props.defaultOpen)
-      .map((child: any) => child.props.title);
-    setOpenItems(defaultOpenItems);
-  }, [children]);
 
   return (
     <AccordionContext.Provider value={{ openItems, toggleItem }}>

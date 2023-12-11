@@ -34,6 +34,7 @@ import LikeButton from "components/common/LikeButton";
 import NonRouteTabs from "components/common/Tabs/NonRouteTabs";
 import { SessionVoiceConversionResultsList } from "v2/view/_common/SessionVoiceConversionResultsList";
 import SplitPanel from "components/common/SplitPanel";
+import VdInferencePanel from "./inference_panels/VdInferencePanel";
 // import PitchEstimateMethodComponent from "../vc/vc_model_list/components/PitchEstimateMethodComponent";
 // import PitchShiftComponent from "../vc/vc_model_list/components/PitchShiftComponent";
 // import { SessionVoiceConversionResultsList } from "v2/view/_common/SessionVoiceConversionResultsList";
@@ -73,8 +74,8 @@ export default function WeightsPage({
       title: "Harry Potter (Daniel Radcliffe)",
       created_at: new Date(),
       updated_at: new Date(),
-      weight_type: WeightType.TT2,
-      weight_category: WeightCategory.VC,
+      weight_type: WeightType.VALL_E,
+      weight_category: WeightCategory.ZS,
       maybe_creator_user: {
         user_token: "test",
         username: "test",
@@ -112,7 +113,7 @@ export default function WeightsPage({
           <Panel padding={true}>
             <form className="mb-4">
               <div className="d-flex flex-column gap-3">
-                <h4 className="fw-semibold">Use Voice</h4>
+                <h4 className="fw-semibold">Generate TTS</h4>
                 <TextArea
                   placeholder="Enter the text you want your character to say here..."
                   // value={textBuffer}
@@ -330,7 +331,7 @@ export default function WeightsPage({
         return (
           <SplitPanel>
             <SplitPanel.Header padding={true}>
-              <h4 className="fw-semibold mb-0">Use Voice</h4>
+              <h4 className="fw-semibold mb-0">Generate Voice Conversion</h4>
             </SplitPanel.Header>
 
             <SplitPanel.Body>
@@ -343,7 +344,7 @@ export default function WeightsPage({
             </SplitPanel.Body>
             <SplitPanel.Footer padding={true}>
               <Accordion>
-                <Accordion.Item title="Session VC Results" defaultOpen={false}>
+                <Accordion.Item title="Session V2V Results" defaultOpen={false}>
                   <SessionVoiceConversionResultsList
                     inferenceJobs={
                       inferenceJobsByCategory.get(
@@ -360,54 +361,19 @@ export default function WeightsPage({
 
       case WeightCategory.ZS:
         return (
-          //Since zero-shot has only tts for now, we can use the same thing as TTS
-          <Panel padding={true}>
-            <form className="mb-4">
-              <div className="d-flex flex-column gap-3">
-                <h4 className="fw-semibold">Use Voice</h4>
-                <TextArea
-                  placeholder="Enter the text you want your character to say here..."
-                  // value={textBuffer}
-                  // onChange={handleChangeText}
-                  rows={6}
-                />
-              </div>
-
-              <div className="d-flex gap-2 justify-content-end mt-3">
-                <Button
-                  icon={faDeleteLeft}
-                  label="Clear"
-                  variant="danger"
-                  // onClick={handleClearText}
-                />
-                <Button
-                  icon={faVolumeUp}
-                  label="Speak"
-                  // onClick={handleEnqueueTts}
-                  // isLoading={isEnqueuing}
-                />
-              </div>
-            </form>
-
-            <Accordion>
-              <Accordion.Item title="Session TTS Results" defaultOpen={false}>
-                <div>
-                  <SessionVoiceDesignerInferenceResultsList
-                    inferenceJobs={
-                      inferenceJobsByCategory.get(
-                        FrontendInferenceJobType.VoiceDesignerTts
-                      )!
-                    }
-                    ttsInferenceJobs={ttsInferenceJobs}
-                    sessionSubscriptionsWrapper={sessionSubscriptionsWrapper}
-                  />
-                </div>
-              </Accordion.Item>
-            </Accordion>
-          </Panel>
+          <div className="d-flex flex-column gap-3">
+            <VdInferencePanel
+              inferenceJobs={inferenceJobs}
+              sessionSubscriptionsWrapper={sessionSubscriptionsWrapper}
+              enqueueInferenceJob={enqueueInferenceJob}
+              inferenceJobsByCategory={inferenceJobsByCategory}
+              ttsInferenceJobs={ttsInferenceJobs}
+              voiceToken={weight.weight_token}
+            />
+          </div>
         );
       default:
-        return "No weight component found";
+        return null;
     }
   }
 
@@ -526,7 +492,7 @@ export default function WeightsPage({
     weightCategory: "",
   };
 
-  const ttsDetails = [
+  const voiceDetails = [
     { property: "Type", value: weightType },
     { property: "Category", value: weightCategory },
     {
@@ -537,32 +503,30 @@ export default function WeightsPage({
     { property: "Updated at", value: weight.updated_at.toString() },
   ];
 
-  const vcDetails = [
-    { property: "Type", value: weight.weight_type },
-    { property: "Created at", value: weight.created_at.toString() },
-    {
-      property: "Visibility",
-      value: weight.creator_set_visibility.toString(),
-    },
-  ];
-
   const imageDetails = [
-    { property: "Type", value: weight.weight_type },
-    { property: "Created at", value: weight.created_at.toString() },
+    { property: "Type", value: weightType },
+    { property: "Category", value: weightCategory },
     {
       property: "Visibility",
       value: weight.creator_set_visibility.toString(),
     },
+    { property: "Created at", value: weight.created_at.toString() },
+    { property: "Updated at", value: weight.updated_at.toString() },
+
+    //more to add for image/stable diffusion details
   ];
 
   let weightDetails = undefined;
 
   switch (weight.weight_category) {
     case WeightCategory.TTS:
-      weightDetails = <DataTable data={ttsDetails} />;
+      weightDetails = <DataTable data={voiceDetails} />;
       break;
     case WeightCategory.VC:
-      weightDetails = <DataTable data={vcDetails} />;
+      weightDetails = <DataTable data={voiceDetails} />;
+      break;
+    case WeightCategory.ZS:
+      weightDetails = <DataTable data={voiceDetails} />;
       break;
     case WeightCategory.SD:
       weightDetails = <DataTable data={imageDetails} />;
@@ -572,6 +536,7 @@ export default function WeightsPage({
 
   let modMediaDetails = undefined;
 
+  //dummy content
   const modDetails = [
     { property: "Model creator is banned", value: "good standing" },
     {
@@ -634,7 +599,7 @@ export default function WeightsPage({
                 <div>
                   <Badge label={weightType} color={weightTagColor} />
                 </div>
-                <p>Text to Speech</p>
+                <p>{weightCategory}</p>
               </div>
             </div>
           }
@@ -644,10 +609,12 @@ export default function WeightsPage({
           <div className="col-12 col-xl-8 d-flex flex-column gap-3">
             <div className="media-wrapper">{renderWeightComponent(weight)}</div>
 
-            <Panel padding={true}>
-              <h4 className="fw-semibold mb-3">Description</h4>
-              <p>{weight.description_markdown}</p>
-            </Panel>
+            {weight.description_markdown !== "" && (
+              <Panel padding={true}>
+                <h4 className="fw-semibold mb-3">Description</h4>
+                <p>{weight.description_markdown}</p>
+              </Panel>
+            )}
 
             <div className="panel p-3 py-4 p-md-4 d-none d-xl-block">
               <h4 className="fw-semibold mb-3">Comments</h4>
