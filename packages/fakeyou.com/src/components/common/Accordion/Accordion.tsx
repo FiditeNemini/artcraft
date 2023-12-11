@@ -39,17 +39,24 @@ function AccordionItem({
   ) as AccordionContextType;
   const isOpen = openItems.includes(title);
 
-  const [contentHeight, setContentHeight] = useState<number | undefined>(
-    isOpen ? undefined : 0
+  const [contentHeight, setContentHeight] = useState<number>(
+    defaultOpen ? 0 : 0
   );
   const contentRef = useRef<HTMLDivElement>(null);
 
-  // Update content height when content changes
   useEffect(() => {
+    // Update content height whenever the accordion item is opened or closed
+    if (contentRef.current) {
+      setContentHeight(isOpen ? contentRef.current.scrollHeight : 0);
+    }
+  }, [isOpen]);
+
+  useEffect(() => {
+    // Adjust height when the content changes, only if the item is open
     if (isOpen && contentRef.current) {
       setContentHeight(contentRef.current.scrollHeight);
     }
-  }, [children, isOpen]); // Dependency on children and isOpen
+  }, [children, isOpen]);
 
   const heightProps = useSpring({
     height: isOpen ? `${contentHeight}px` : "0px",
