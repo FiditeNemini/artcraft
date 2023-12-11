@@ -357,7 +357,7 @@ class PageContainer extends React.Component<
               <MediaPage sessionWrapper={this.props.sessionWrapper} />
             </Route>
 
-            <Route path="/weight/:token">
+            <Route path="/weight/:weight_token">
               <WeightsPage
                 sessionWrapper={this.props.sessionWrapper}
                 sessionSubscriptionsWrapper={
@@ -367,6 +367,7 @@ class PageContainer extends React.Component<
                 enqueueInferenceJob={this.props.enqueueInferenceJob}
                 inferenceJobsByCategory={this.props.inferenceJobsByCategory}
                 ttsInferenceJobs={this.props.ttsInferenceJobs}
+                enqueueTtsJob={this.props.enqueueTtsJob}
               />
             </Route>
 

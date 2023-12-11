@@ -31,7 +31,8 @@ const Footer: React.FC<FooterProps> = ({ children, padding }) => {
 // Panel Interface
 interface PanelProps {
   children: ReactNode;
-  divider?: boolean;
+  dividerHeader?: boolean;
+  dividerFooter?: boolean;
   clear?: boolean;
   className?: string;
 }
@@ -41,7 +42,7 @@ const SplitPanel: React.FC<PanelProps> & {
   Header: typeof Header;
   Body: typeof Body;
   Footer: typeof Footer;
-} = ({ children, divider, clear, className }) => {
+} = ({ children, dividerHeader, dividerFooter, clear, className }) => {
   let header: ReactNode, body: ReactNode, footer: ReactNode;
 
   const panelClassName = `${clear ? "panel-clear" : "panel"} ${
@@ -67,8 +68,9 @@ const SplitPanel: React.FC<PanelProps> & {
   return (
     <div className={panelClassName}>
       {header}
+      {dividerHeader && <hr className="m-0" />}
       {body}
-      {divider && <hr className="m-0" />}
+      {dividerFooter && <hr className="m-0" />}
       {footer}
     </div>
   );

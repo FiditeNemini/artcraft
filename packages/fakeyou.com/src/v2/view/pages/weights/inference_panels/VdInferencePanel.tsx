@@ -14,6 +14,7 @@ import useVoiceRequests from "../../voice_designer/useVoiceRequests";
 import { v4 as uuidv4 } from "uuid";
 import Accordion from "components/common/Accordion";
 import { SessionVoiceDesignerInferenceResultsList } from "v2/view/_common/SessionVoiceDesignerInferenceResultsList";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 interface VdInferencePanelProps {
   sessionSubscriptionsWrapper: SessionSubscriptionsWrapper;
@@ -76,7 +77,10 @@ export default function VdInferencePanel({
     <Panel padding={true}>
       <form>
         <div className="d-flex flex-column gap-3">
-          <h4 className="fw-semibold">Generate TTS</h4>
+          <h4 className="fw-semibold">
+            <FontAwesomeIcon icon={faVolumeUp} className="me-3" />
+            Generate TTS
+          </h4>
           <TextArea
             placeholder="Enter the text you want your character to say here..."
             value={textBuffer}

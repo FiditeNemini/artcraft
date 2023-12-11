@@ -7,12 +7,7 @@ import Panel from "components/common/Panel";
 import PageHeader from "components/layout/PageHeader";
 import Skeleton from "components/common/Skeleton";
 import Button from "components/common/Button";
-import {
-  faCircleExclamation,
-  faVolumeUp,
-  faDeleteLeft,
-  faShare,
-} from "@fortawesome/pro-solid-svg-icons";
+import { faCircleExclamation, faShare } from "@fortawesome/pro-solid-svg-icons";
 import Accordion from "components/common/Accordion";
 import DataTable from "components/common/DataTable";
 import { Gravatar } from "@storyteller/components/src/elements/Gravatar";
@@ -20,25 +15,18 @@ import useTimeAgo from "hooks/useTimeAgo";
 import { CommentComponent } from "v2/view/_common/comments/CommentComponent";
 import { WeightType } from "@storyteller/components/src/api/_common/enums/WeightType";
 import { WeightCategory } from "@storyteller/components/src/api/_common/enums/WeightCategory";
-import { SessionVoiceDesignerInferenceResultsList } from "v2/view/_common/SessionVoiceDesignerInferenceResultsList";
 import { SessionSubscriptionsWrapper } from "@storyteller/components/src/session/SessionSubscriptionsWrapper";
 import {
   FrontendInferenceJobType,
   InferenceJob,
 } from "@storyteller/components/src/jobs/InferenceJob";
 import { TtsInferenceJob } from "@storyteller/components/src/jobs/TtsInferenceJobs";
-import TextArea from "components/common/TextArea";
 import Badge from "components/common/Badge";
 import FavoriteButton from "components/common/FavoriteButton";
 import LikeButton from "components/common/LikeButton";
-import NonRouteTabs from "components/common/Tabs/NonRouteTabs";
-import { SessionVoiceConversionResultsList } from "v2/view/_common/SessionVoiceConversionResultsList";
-import SplitPanel from "components/common/SplitPanel";
 import VdInferencePanel from "./inference_panels/VdInferencePanel";
-// import PitchEstimateMethodComponent from "../vc/vc_model_list/components/PitchEstimateMethodComponent";
-// import PitchShiftComponent from "../vc/vc_model_list/components/PitchShiftComponent";
-// import { SessionVoiceConversionResultsList } from "v2/view/_common/SessionVoiceConversionResultsList";
-// import RecordComponent from "../vc/vc_model_list/components/RecordComponent";
+import VcInferencePanel from "./inference_panels/VcInferencePanel";
+import TtsInferencePanel from "./inference_panels/TtsInferencePanel";
 
 interface WeightProps {
   sessionWrapper: SessionWrapper;
@@ -50,6 +38,7 @@ interface WeightProps {
     frontendInferenceJobType: FrontendInferenceJobType
   ) => void;
   inferenceJobsByCategory: Map<FrontendInferenceJobType, Array<InferenceJob>>;
+  enqueueTtsJob: (jobToken: string) => void;
 }
 
 export default function WeightsPage({
@@ -58,24 +47,24 @@ export default function WeightsPage({
   inferenceJobs,
   ttsInferenceJobs,
   enqueueInferenceJob,
+  enqueueTtsJob,
   inferenceJobsByCategory,
 }: WeightProps) {
-  const { token } = useParams<{ token: string }>();
+  const { weight_token } = useParams<{ weight_token: string }>();
   const [weight, setWeight] = useState<Weight | undefined | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<boolean>(false);
-
   const timeUpdated = useTimeAgo(weight?.updated_at.toISOString() || "");
 
   const getWeight = useCallback(async (weightToken: string) => {
     // Dummy data
     const dummyData = {
-      weight_token: "1",
+      weight_token: "TM:xke15gz3v8pv",
       title: "Harry Potter (Daniel Radcliffe)",
       created_at: new Date(),
       updated_at: new Date(),
-      weight_type: WeightType.VALL_E,
-      weight_category: WeightCategory.ZS,
+      weight_type: WeightType.HIFIGAN_TT2,
+      weight_category: WeightCategory.TTS,
       maybe_creator_user: {
         user_token: "test",
         username: "test",
@@ -87,7 +76,8 @@ export default function WeightsPage({
         },
       },
       creator_set_visibility: "Public",
-      description_markdown: "This is a test description",
+      description_markdown:
+        "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
     };
 
     // Simulate an API call delay
@@ -103,274 +93,44 @@ export default function WeightsPage({
   }, []);
 
   useEffect(() => {
-    getWeight(token);
-  }, [token, getWeight]);
+    getWeight(weight_token);
+  }, [weight_token, getWeight]);
 
   function renderWeightComponent(weight: Weight) {
     switch (weight.weight_category) {
       case WeightCategory.TTS:
         return (
-          <Panel padding={true}>
-            <form className="mb-4">
-              <div className="d-flex flex-column gap-3">
-                <h4 className="fw-semibold">Generate TTS</h4>
-                <TextArea
-                  placeholder="Enter the text you want your character to say here..."
-                  // value={textBuffer}
-                  // onChange={handleChangeText}
-                  rows={6}
-                />
-              </div>
-
-              <div className="d-flex gap-2 justify-content-end mt-3">
-                <Button
-                  icon={faDeleteLeft}
-                  label="Clear"
-                  variant="danger"
-                  // onClick={handleClearText}
-                />
-                <Button
-                  icon={faVolumeUp}
-                  label="Speak"
-                  // onClick={handleEnqueueTts}
-                  // isLoading={isEnqueuing}
-                />
-              </div>
-            </form>
-
-            <Accordion>
-              <Accordion.Item title="Session TTS Results" defaultOpen={false}>
-                <div>
-                  <SessionVoiceDesignerInferenceResultsList
-                    inferenceJobs={
-                      inferenceJobsByCategory.get(
-                        FrontendInferenceJobType.VoiceDesignerTts
-                      )!
-                    }
-                    ttsInferenceJobs={ttsInferenceJobs}
-                    sessionSubscriptionsWrapper={sessionSubscriptionsWrapper}
-                  />
-                </div>
-              </Accordion.Item>
-            </Accordion>
-          </Panel>
+          <TtsInferencePanel
+            inferenceJobs={inferenceJobs}
+            sessionSubscriptionsWrapper={sessionSubscriptionsWrapper}
+            enqueueInferenceJob={enqueueInferenceJob}
+            inferenceJobsByCategory={inferenceJobsByCategory}
+            ttsInferenceJobs={ttsInferenceJobs}
+            enqueueTtsJob={enqueueTtsJob}
+            voiceToken={weight.weight_token}
+          />
         );
       case WeightCategory.VC:
-        const vcTabs = [
-          {
-            label: "Upload",
-            content: (
-              <div>
-                <div className="d-flex flex-column gap-4 h-100">
-                  <div>
-                    <label className="sub-title">Upload File</label>
-                    <div className="d-flex flex-column gap-3 upload-component">
-                      (Upload Component here)
-                      {/* <UploadComponent
-                  setMediaUploadToken={setMediaUploadToken}
-                  formIsCleared={formIsCleared}
-                  setFormIsCleared={setFormIsCleared}
-                  setCanConvert={setCanConvert}
-                  changeConvertIdempotencyToken={
-                    changeConvertIdempotencyToken
-                  }
-                /> */}
-                    </div>
-                  </div>
-
-                  <div>
-                    <label className="sub-title">Pitch Control</label>
-                    <div className="d-flex flex-column gap-3">
-                      <div>
-                        (Pitch Estimate Method Component here)
-                        {/* <PitchEstimateMethodComponent
-                    pitchMethod={maybeF0MethodOverride}
-                    onMethodChange={handlePitchMethodChange}
-                  /> */}
-                      </div>
-                      <div>
-                        (Pitch Shift Component here)
-                        {/* <PitchShiftComponent
-                    min={-36}
-                    max={36}
-                    step={1}
-                    value={semitones}
-                    onPitchChange={handlePitchChange}
-                  /> */}
-                      </div>
-                      <div className="form-check">
-                        (Auto F0 Checkbox here)
-                        {/* <input
-                    id="autoF0Checkbox"
-                    className="form-check-input"
-                    type="checkbox"
-                    checked={autoConvertF0}
-                    onChange={handleAutoF0Change}
-                  /> */}
-                        <label
-                          className="form-check-label"
-                          htmlFor="autoF0Checkbox"
-                        >
-                          Auto F0 (off for singing, on for speech)
-                        </label>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div>
-                    <label className="sub-title">Convert Audio</label>
-
-                    <div className="d-flex gap-3">
-                      (Convert Button here)
-                      {/* <Button
-                  className={speakButtonClass}
-                  onClick={handleVoiceConversion}
-                  type="submit"
-                  disabled={!enableConvertButton}
-                >
-                  <FontAwesomeIcon
-                    icon={faRightLeft}
-                    className="me-2"
-                  />
-                  Convert
-                </Button> */}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            ),
-            padding: true,
-          },
-          {
-            label: "Record",
-            content: (
-              <div>
-                <div className="d-flex flex-column gap-4 h-100">
-                  <div>
-                    <label className="sub-title">Record Audio</label>
-                    <div className="d-flex flex-column gap-3 upload-component">
-                      (Record Component here)
-                      {/* <RecordComponent
-                setMediaUploadToken={setMediaUploadToken}
-                formIsCleared={formIsCleared}
-                setFormIsCleared={setFormIsCleared}
-                setCanConvert={setCanConvert}
-                changeConvertIdempotencyToken={
-                  changeConvertIdempotencyToken
-                }
-              /> */}
-                    </div>
-                  </div>
-
-                  <div>
-                    <label className="sub-title">Pitch Control</label>
-                    <div className="d-flex flex-column gap-3">
-                      <div>
-                        (Pitch Estimate Method Component here)
-                        {/* <PitchEstimateMethodComponent
-                  pitchMethod={maybeF0MethodOverride}
-                  onMethodChange={handlePitchMethodChange}
-                /> */}
-                      </div>
-                      <div>
-                        (Pitch Shift Component here)
-                        {/* <PitchShiftComponent
-                  min={-36}
-                  max={36}
-                  step={1}
-                  value={semitones}
-                  onPitchChange={handlePitchChange}
-                /> */}
-                      </div>
-                      <div className="form-check">
-                        (Auto F0 Checkbox here)
-                        {/* <input
-                  id="autoF0CheckboxMic"
-                  className="form-check-input"
-                  type="checkbox"
-                  checked={autoConvertF0}
-                  onChange={handleAutoF0Change}
-                /> */}
-                        <label
-                          className="form-check-label"
-                          htmlFor="autoF0CheckboxMic"
-                        >
-                          Auto F0 (off for singing, on for speech)
-                        </label>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div>
-                    <label className="sub-title">Convert Audio</label>
-
-                    <div className="d-flex gap-3">
-                      (Convert Button here)
-                      {/* <Button
-                className={speakButtonClass}
-                onClick={handleVoiceConversion}
-                type="submit"
-                disabled={!enableConvertButton}
-              >
-                <FontAwesomeIcon
-                  icon={faRightLeft}
-                  className="me-2"
-                />
-                Convert
-                {convertLoading && <LoadingIcon />}
-              </Button> */}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            ),
-            padding: true,
-          },
-        ];
-
         return (
-          <SplitPanel>
-            <SplitPanel.Header padding={true}>
-              <h4 className="fw-semibold mb-0">Generate Voice Conversion</h4>
-            </SplitPanel.Header>
-
-            <SplitPanel.Body>
-              <form
-              // onSubmit={handleFormSubmit}
-              >
-                <hr className="m-0" />
-                <NonRouteTabs tabs={vcTabs} />
-              </form>
-            </SplitPanel.Body>
-            <SplitPanel.Footer padding={true}>
-              <Accordion>
-                <Accordion.Item title="Session V2V Results" defaultOpen={false}>
-                  <SessionVoiceConversionResultsList
-                    inferenceJobs={
-                      inferenceJobsByCategory.get(
-                        FrontendInferenceJobType.VoiceConversion
-                      )!
-                    }
-                    sessionSubscriptionsWrapper={sessionSubscriptionsWrapper}
-                  />
-                </Accordion.Item>
-              </Accordion>
-            </SplitPanel.Footer>
-          </SplitPanel>
+          <VcInferencePanel
+            sessionSubscriptionsWrapper={sessionSubscriptionsWrapper}
+            enqueueInferenceJob={enqueueInferenceJob}
+            inferenceJobs={inferenceJobs}
+            inferenceJobsByCategory={inferenceJobsByCategory}
+            voiceToken={weight.weight_token}
+          />
         );
 
       case WeightCategory.ZS:
         return (
-          <div className="d-flex flex-column gap-3">
-            <VdInferencePanel
-              inferenceJobs={inferenceJobs}
-              sessionSubscriptionsWrapper={sessionSubscriptionsWrapper}
-              enqueueInferenceJob={enqueueInferenceJob}
-              inferenceJobsByCategory={inferenceJobsByCategory}
-              ttsInferenceJobs={ttsInferenceJobs}
-              voiceToken={weight.weight_token}
-            />
-          </div>
+          <VdInferencePanel
+            inferenceJobs={inferenceJobs}
+            sessionSubscriptionsWrapper={sessionSubscriptionsWrapper}
+            enqueueInferenceJob={enqueueInferenceJob}
+            inferenceJobsByCategory={inferenceJobsByCategory}
+            ttsInferenceJobs={ttsInferenceJobs}
+            voiceToken={weight.weight_token}
+          />
         );
       default:
         return null;
@@ -451,7 +211,7 @@ export default function WeightsPage({
       weightTagColor: "ultramarine",
     },
     [WeightType.HIFIGAN_TT2]: {
-      weightType: "HiFi-GAN Tacontron 2",
+      weightType: "HiFi-GAN Tacotron 2",
       weightTagColor: "blue",
     },
     [WeightType.VALL_E]: { weightType: "VALL-E", weightTagColor: "purple" },
@@ -571,35 +331,38 @@ export default function WeightsPage({
     );
   };
 
+  const subtitleDivider = <span className="opacity-25 fs-5 fw-light">|</span>;
+
   return (
     <div>
       <Container type="panel" className="mb-5">
         <PageHeader
           title={
             <div className="d-flex gap-2 align-items-center flex-wrap">
-              <span>{weight.title}</span>
-
-              <div className="d-flex align-items-center gap-2 mb-1">
-                <LikeButton
-                  likeCount={1200}
-                  onToggle={handleBookmark}
-                  large={true}
-                />
-                <FavoriteButton
-                  favoriteCount={100}
-                  onToggle={handleBookmark}
-                  large={true}
-                />
-              </div>
+              <span className="mb-1">{weight.title}</span>
             </div>
           }
           subText={
             <div className="d-flex gap-3 flex-wrap align-items-center">
-              <div className="d-flex gap-2 align-items-center">
+              <div className="d-flex gap-2 align-items-center flex-wrap">
                 <div>
                   <Badge label={weightType} color={weightTagColor} />
                 </div>
+                {subtitleDivider}
                 <p>{weightCategory}</p>
+                {subtitleDivider}
+                <div className="d-flex align-items-center gap-2">
+                  <LikeButton
+                    likeCount={1200}
+                    onToggle={handleBookmark}
+                    large={true}
+                  />
+                  <FavoriteButton
+                    favoriteCount={100}
+                    onToggle={handleBookmark}
+                    large={true}
+                  />
+                </div>
               </div>
             </div>
           }
