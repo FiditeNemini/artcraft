@@ -78,19 +78,52 @@ export default function FaceAnimator({ enqueueInferenceJob,  sessionSubscription
     .then((responses) => {
     if ("upload_token" in responses.image) {
       indexSet(3); // set face animator API working page
-      return EnqueueFaceAnimation({
+
+      // NB(bt,2023-12-08): We currently still have "media_files" and "media_uploads" as distinct backend record 
+      // types (and APIs for each). One of our ongoing tasks is to phase out media_uploads entirely and make 
+      // everything a media_file. 
+      //
+      // Since the flow for this code is somewhat rigid, we're going to change the token type based on the token 
+      // structure. Ordinarily this should **NEVER** be done, but hopefully this migration state is short enough
+      // that we won't need to worry about multiple token formats for long. 
+      //
+      // Tokens starting with:
+      //
+      //  m_* => media file tokens
+      //  mu_* => media upload tokens
+      //
+      const audioIsMediaFile = responses.audio.upload_token.startsWith("m_");
+      const imageIsMediaFile = responses.image.upload_token.startsWith("m_");
+
+      let request : any = {
         uuid_idempotency_token: uuidv4(),
-        audio_source: {
-          maybe_media_upload_token: responses.audio.upload_token,
-        },
-        image_source: {
-          maybe_media_upload_token: responses.image.upload_token,
-        },
+        audio_source: undefined,
+        image_source: undefined,
+        //audio_source: {
+        //  maybe_media_upload_token: responses.audio.upload_token,
+        //},
+        //image_source: {
+        //  maybe_media_upload_token: responses.image.upload_token,
+        //},
         make_still: still,
         disable_face_enhancement: disableFaceEnhancement,
         remove_watermark: removeWatermark,
         dimensions: frameDimensions,
-      });
+      };
+
+      if (audioIsMediaFile) {
+        request.audio_source = { maybe_media_file_token: responses.audio.upload_token };
+      } else {
+        request.audio_source = { maybe_media_upload_token: responses.audio.upload_token };
+      }
+
+      if (imageIsMediaFile) {
+        request.image_source = { maybe_media_file_token: responses.image.upload_token };
+      } else {
+        request.image_source = { maybe_media_upload_token: responses.image.upload_token };
+      }
+
+      return EnqueueFaceAnimation(request);
     }
   })
   .then((res) => {
