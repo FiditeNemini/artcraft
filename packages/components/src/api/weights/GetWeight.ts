@@ -1,17 +1,18 @@
 // import MakeRequest from "../MakeRequest";
 import { UserDetailsLight } from "../_common/UserDetailsLight";
-import { WeightsCategory } from "../_common/enums/WeightsCategory";
-import { WeightsType } from "../_common/enums/WeightsType";
+import { WeightCategory } from "../_common/enums/WeightCategory";
+import { WeightType } from "../_common/enums/WeightType";
 
 export interface Weight {
   weight_token: string;
-  weights_type: WeightsType;
-  weights_category: WeightsCategory;
+  weight_type: WeightType;
+  weight_category: WeightCategory;
   maybe_creator_user: UserDetailsLight | null;
   creator_set_visibility: string;
   created_at: Date;
   updated_at: Date;
   title: string;
+  description_markdown: string;
 }
 
 // export interface GetMediaRequest {}

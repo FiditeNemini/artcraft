@@ -1,4 +1,4 @@
-export enum WeightsType {
+export enum WeightType {
   TT2 = "tt2",
   HIFIGAN_TT2 = "hifigan_tt2",
   RVCv2 = "rvc_v2",
@@ -6,4 +6,5 @@ export enum WeightsType {
   SDXL = "sdxl",
   SVC = "so_vits_svc",
   LORA = "loRA",
+  VALL_E = "vall_e",
 }

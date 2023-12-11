@@ -1,4 +1,4 @@
-export enum WeightsCategory {
+export enum WeightCategory {
   TTS = "text_to_speech",
   VOCODER = "vocoder",
   VC = "voice_conversion",

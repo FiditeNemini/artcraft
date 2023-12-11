@@ -18,8 +18,8 @@ import DataTable from "components/common/DataTable";
 import { Gravatar } from "@storyteller/components/src/elements/Gravatar";
 import useTimeAgo from "hooks/useTimeAgo";
 import { CommentComponent } from "v2/view/_common/comments/CommentComponent";
-import { WeightsType } from "@storyteller/components/src/api/_common/enums/WeightsType";
-import { WeightsCategory } from "@storyteller/components/src/api/_common/enums/WeightsCategory";
+import { WeightType } from "@storyteller/components/src/api/_common/enums/WeightType";
+import { WeightCategory } from "@storyteller/components/src/api/_common/enums/WeightCategory";
 import { SessionVoiceDesignerInferenceResultsList } from "v2/view/_common/SessionVoiceDesignerInferenceResultsList";
 import { SessionSubscriptionsWrapper } from "@storyteller/components/src/session/SessionSubscriptionsWrapper";
 import {
@@ -31,6 +31,13 @@ import TextArea from "components/common/TextArea";
 import Badge from "components/common/Badge";
 import FavoriteButton from "components/common/FavoriteButton";
 import LikeButton from "components/common/LikeButton";
+import NonRouteTabs from "components/common/Tabs/NonRouteTabs";
+import { SessionVoiceConversionResultsList } from "v2/view/_common/SessionVoiceConversionResultsList";
+import SplitPanel from "components/common/SplitPanel";
+// import PitchEstimateMethodComponent from "../vc/vc_model_list/components/PitchEstimateMethodComponent";
+// import PitchShiftComponent from "../vc/vc_model_list/components/PitchShiftComponent";
+// import { SessionVoiceConversionResultsList } from "v2/view/_common/SessionVoiceConversionResultsList";
+// import RecordComponent from "../vc/vc_model_list/components/RecordComponent";
 
 interface WeightProps {
   sessionWrapper: SessionWrapper;
@@ -66,8 +73,8 @@ export default function WeightsPage({
       title: "Harry Potter (Daniel Radcliffe)",
       created_at: new Date(),
       updated_at: new Date(),
-      weights_type: WeightsType.TT2,
-      weights_category: WeightsCategory.TTS,
+      weight_type: WeightType.TT2,
+      weight_category: WeightCategory.VC,
       maybe_creator_user: {
         user_token: "test",
         username: "test",
@@ -79,6 +86,7 @@ export default function WeightsPage({
         },
       },
       creator_set_visibility: "Public",
+      description_markdown: "This is a test description",
     };
 
     // Simulate an API call delay
@@ -98,13 +106,13 @@ export default function WeightsPage({
   }, [token, getWeight]);
 
   function renderWeightComponent(weight: Weight) {
-    switch (weight.weights_category) {
-      case WeightsCategory.TTS:
+    switch (weight.weight_category) {
+      case WeightCategory.TTS:
         return (
           <Panel padding={true}>
             <form className="mb-4">
               <div className="d-flex flex-column gap-3">
-                <h4 className="fw-semibold mb-0">Use Voice</h4>
+                <h4 className="fw-semibold">Use Voice</h4>
                 <TextArea
                   placeholder="Enter the text you want your character to say here..."
                   // value={textBuffer}
@@ -113,7 +121,7 @@ export default function WeightsPage({
                 />
               </div>
 
-              <div className="d-flex gap-3 justify-content-end mt-3">
+              <div className="d-flex gap-2 justify-content-end mt-3">
                 <Button
                   icon={faDeleteLeft}
                   label="Clear"
@@ -130,7 +138,7 @@ export default function WeightsPage({
             </form>
 
             <Accordion>
-              <Accordion.Item title="Session Results" defaultOpen={false}>
+              <Accordion.Item title="Session TTS Results" defaultOpen={false}>
                 <div>
                   <SessionVoiceDesignerInferenceResultsList
                     inferenceJobs={
@@ -146,35 +154,273 @@ export default function WeightsPage({
             </Accordion>
           </Panel>
         );
-      case WeightsCategory.VC:
-        return (
-          <>
-            <div className="panel panel-clear">
-              <div className="ratio ratio-16x9 video-bg panel-border rounded">
-                Video
+      case WeightCategory.VC:
+        const vcTabs = [
+          {
+            label: "Upload",
+            content: (
+              <div>
+                <div className="d-flex flex-column gap-4 h-100">
+                  <div>
+                    <label className="sub-title">Upload File</label>
+                    <div className="d-flex flex-column gap-3 upload-component">
+                      (Upload Component here)
+                      {/* <UploadComponent
+                  setMediaUploadToken={setMediaUploadToken}
+                  formIsCleared={formIsCleared}
+                  setFormIsCleared={setFormIsCleared}
+                  setCanConvert={setCanConvert}
+                  changeConvertIdempotencyToken={
+                    changeConvertIdempotencyToken
+                  }
+                /> */}
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="sub-title">Pitch Control</label>
+                    <div className="d-flex flex-column gap-3">
+                      <div>
+                        (Pitch Estimate Method Component here)
+                        {/* <PitchEstimateMethodComponent
+                    pitchMethod={maybeF0MethodOverride}
+                    onMethodChange={handlePitchMethodChange}
+                  /> */}
+                      </div>
+                      <div>
+                        (Pitch Shift Component here)
+                        {/* <PitchShiftComponent
+                    min={-36}
+                    max={36}
+                    step={1}
+                    value={semitones}
+                    onPitchChange={handlePitchChange}
+                  /> */}
+                      </div>
+                      <div className="form-check">
+                        (Auto F0 Checkbox here)
+                        {/* <input
+                    id="autoF0Checkbox"
+                    className="form-check-input"
+                    type="checkbox"
+                    checked={autoConvertF0}
+                    onChange={handleAutoF0Change}
+                  /> */}
+                        <label
+                          className="form-check-label"
+                          htmlFor="autoF0Checkbox"
+                        >
+                          Auto F0 (off for singing, on for speech)
+                        </label>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="sub-title">Convert Audio</label>
+
+                    <div className="d-flex gap-3">
+                      (Convert Button here)
+                      {/* <Button
+                  className={speakButtonClass}
+                  onClick={handleVoiceConversion}
+                  type="submit"
+                  disabled={!enableConvertButton}
+                >
+                  <FontAwesomeIcon
+                    icon={faRightLeft}
+                    className="me-2"
+                  />
+                  Convert
+                </Button> */}
+                    </div>
+                  </div>
+                </div>
               </div>
-            </div>
-          </>
+            ),
+            padding: true,
+          },
+          {
+            label: "Record",
+            content: (
+              <div>
+                <div className="d-flex flex-column gap-4 h-100">
+                  <div>
+                    <label className="sub-title">Record Audio</label>
+                    <div className="d-flex flex-column gap-3 upload-component">
+                      (Record Component here)
+                      {/* <RecordComponent
+                setMediaUploadToken={setMediaUploadToken}
+                formIsCleared={formIsCleared}
+                setFormIsCleared={setFormIsCleared}
+                setCanConvert={setCanConvert}
+                changeConvertIdempotencyToken={
+                  changeConvertIdempotencyToken
+                }
+              /> */}
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="sub-title">Pitch Control</label>
+                    <div className="d-flex flex-column gap-3">
+                      <div>
+                        (Pitch Estimate Method Component here)
+                        {/* <PitchEstimateMethodComponent
+                  pitchMethod={maybeF0MethodOverride}
+                  onMethodChange={handlePitchMethodChange}
+                /> */}
+                      </div>
+                      <div>
+                        (Pitch Shift Component here)
+                        {/* <PitchShiftComponent
+                  min={-36}
+                  max={36}
+                  step={1}
+                  value={semitones}
+                  onPitchChange={handlePitchChange}
+                /> */}
+                      </div>
+                      <div className="form-check">
+                        (Auto F0 Checkbox here)
+                        {/* <input
+                  id="autoF0CheckboxMic"
+                  className="form-check-input"
+                  type="checkbox"
+                  checked={autoConvertF0}
+                  onChange={handleAutoF0Change}
+                /> */}
+                        <label
+                          className="form-check-label"
+                          htmlFor="autoF0CheckboxMic"
+                        >
+                          Auto F0 (off for singing, on for speech)
+                        </label>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="sub-title">Convert Audio</label>
+
+                    <div className="d-flex gap-3">
+                      (Convert Button here)
+                      {/* <Button
+                className={speakButtonClass}
+                onClick={handleVoiceConversion}
+                type="submit"
+                disabled={!enableConvertButton}
+              >
+                <FontAwesomeIcon
+                  icon={faRightLeft}
+                  className="me-2"
+                />
+                Convert
+                {convertLoading && <LoadingIcon />}
+              </Button> */}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ),
+            padding: true,
+          },
+        ];
+
+        return (
+          <SplitPanel>
+            <SplitPanel.Header padding={true}>
+              <h4 className="fw-semibold mb-0">Use Voice</h4>
+            </SplitPanel.Header>
+
+            <SplitPanel.Body>
+              <form
+              // onSubmit={handleFormSubmit}
+              >
+                <hr className="m-0" />
+                <NonRouteTabs tabs={vcTabs} />
+              </form>
+            </SplitPanel.Body>
+            <SplitPanel.Footer padding={true}>
+              <Accordion>
+                <Accordion.Item title="Session VC Results" defaultOpen={false}>
+                  <SessionVoiceConversionResultsList
+                    inferenceJobs={
+                      inferenceJobsByCategory.get(
+                        FrontendInferenceJobType.VoiceConversion
+                      )!
+                    }
+                    sessionSubscriptionsWrapper={sessionSubscriptionsWrapper}
+                  />
+                </Accordion.Item>
+              </Accordion>
+            </SplitPanel.Footer>
+          </SplitPanel>
         );
 
-      case WeightsCategory.SD:
-        return <>Image</>;
+      case WeightCategory.ZS:
+        return (
+          //Since zero-shot has only tts for now, we can use the same thing as TTS
+          <Panel padding={true}>
+            <form className="mb-4">
+              <div className="d-flex flex-column gap-3">
+                <h4 className="fw-semibold">Use Voice</h4>
+                <TextArea
+                  placeholder="Enter the text you want your character to say here..."
+                  // value={textBuffer}
+                  // onChange={handleChangeText}
+                  rows={6}
+                />
+              </div>
+
+              <div className="d-flex gap-2 justify-content-end mt-3">
+                <Button
+                  icon={faDeleteLeft}
+                  label="Clear"
+                  variant="danger"
+                  // onClick={handleClearText}
+                />
+                <Button
+                  icon={faVolumeUp}
+                  label="Speak"
+                  // onClick={handleEnqueueTts}
+                  // isLoading={isEnqueuing}
+                />
+              </div>
+            </form>
+
+            <Accordion>
+              <Accordion.Item title="Session TTS Results" defaultOpen={false}>
+                <div>
+                  <SessionVoiceDesignerInferenceResultsList
+                    inferenceJobs={
+                      inferenceJobsByCategory.get(
+                        FrontendInferenceJobType.VoiceDesignerTts
+                      )!
+                    }
+                    ttsInferenceJobs={ttsInferenceJobs}
+                    sessionSubscriptionsWrapper={sessionSubscriptionsWrapper}
+                  />
+                </div>
+              </Accordion.Item>
+            </Accordion>
+          </Panel>
+        );
       default:
-        return <div>Unsupported media type</div>;
+        return "No weight component found";
     }
   }
 
+  //Loading state
   if (isLoading)
     return (
       <>
         <Container type="padded" className="pt-4 pt-lg-5">
           <div className="row g-4">
             <div className="col-12 col-xl-8">
-              <div className="panel p-3 py-4 p-md-4">
-                <h1 className="mb-0">
-                  <Skeleton />
-                </h1>
-              </div>
+              <h1 className="mb-0">
+                <Skeleton />
+              </h1>
 
               <div className="panel p-3 py-4 p-md-4 mt-4 d-none d-xl-block">
                 <h4 className="fw-semibold mb-3">
@@ -212,6 +458,7 @@ export default function WeightsPage({
       </>
     );
 
+  //Error state
   if (error || !weight)
     return (
       <Container type="panel">
@@ -219,6 +466,7 @@ export default function WeightsPage({
           titleIcon={faCircleExclamation}
           title="Media not found"
           subText="This media does not exist or is private."
+          panel={true}
           extension={
             <div className="d-flex">
               <Button label="Back to homepage" to="/" className="d-flex" />
@@ -228,9 +476,59 @@ export default function WeightsPage({
       </Container>
     );
 
-  const audioDetails = [
-    { property: "Type", value: weight.weights_type },
-    { property: "Category", value: weight.weights_category },
+  const weightTypeMap: Record<
+    WeightType,
+    { weightType: string; weightTagColor: string }
+  > = {
+    [WeightType.TT2]: {
+      weightType: "Tacotron 2",
+      weightTagColor: "ultramarine",
+    },
+    [WeightType.HIFIGAN_TT2]: {
+      weightType: "HiFi-GAN Tacontron 2",
+      weightTagColor: "blue",
+    },
+    [WeightType.VALL_E]: { weightType: "VALL-E", weightTagColor: "purple" },
+    [WeightType.LORA]: { weightType: "LoRA", weightTagColor: "pink" },
+    [WeightType.RVCv2]: {
+      weightType: "RVCv2",
+      weightTagColor: "orange",
+    },
+    [WeightType.SD_15]: {
+      weightType: "Stable Diffusion 1.5",
+      weightTagColor: "lime",
+    },
+    [WeightType.SDXL]: {
+      weightType: "Stable Diffusion XL",
+      weightTagColor: "green",
+    },
+    [WeightType.SVC]: {
+      weightType: "SVC",
+      weightTagColor: "aqua",
+    },
+  };
+
+  let { weightType, weightTagColor } = weightTypeMap[weight.weight_type] || {
+    weightType: "",
+    weightTagColor: "",
+  };
+
+  const weightCategoryMap: Record<WeightCategory, { weightCategory: string }> =
+    {
+      [WeightCategory.TTS]: { weightCategory: "Text to Speech" },
+      [WeightCategory.VC]: { weightCategory: "Voice to Voice" },
+      [WeightCategory.SD]: { weightCategory: "Stable Diffusion" },
+      [WeightCategory.ZS]: { weightCategory: "Voice Designer" },
+      [WeightCategory.VOCODER]: { weightCategory: "Vocoder" },
+    };
+
+  let { weightCategory } = weightCategoryMap[weight.weight_category] || {
+    weightCategory: "",
+  };
+
+  const ttsDetails = [
+    { property: "Type", value: weightType },
+    { property: "Category", value: weightCategory },
     {
       property: "Visibility",
       value: weight.creator_set_visibility.toString(),
@@ -239,8 +537,8 @@ export default function WeightsPage({
     { property: "Updated at", value: weight.updated_at.toString() },
   ];
 
-  const videoDetails = [
-    { property: "Type", value: weight.weights_type },
+  const vcDetails = [
+    { property: "Type", value: weight.weight_type },
     { property: "Created at", value: weight.created_at.toString() },
     {
       property: "Visibility",
@@ -249,7 +547,7 @@ export default function WeightsPage({
   ];
 
   const imageDetails = [
-    { property: "Type", value: weight.weights_type },
+    { property: "Type", value: weight.weight_type },
     { property: "Created at", value: weight.created_at.toString() },
     {
       property: "Visibility",
@@ -259,14 +557,14 @@ export default function WeightsPage({
 
   let weightDetails = undefined;
 
-  switch (weight.weights_category) {
-    case WeightsCategory.TTS:
-      weightDetails = <DataTable data={audioDetails} />;
+  switch (weight.weight_category) {
+    case WeightCategory.TTS:
+      weightDetails = <DataTable data={ttsDetails} />;
       break;
-    case WeightsCategory.VC:
-      weightDetails = <DataTable data={videoDetails} />;
+    case WeightCategory.VC:
+      weightDetails = <DataTable data={vcDetails} />;
       break;
-    case WeightsCategory.SD:
+    case WeightCategory.SD:
       weightDetails = <DataTable data={imageDetails} />;
       break;
     default:
@@ -302,11 +600,6 @@ export default function WeightsPage({
     );
   }
 
-  let weightType = "";
-  if (weight.weights_type === WeightsType.TT2) {
-    weightType = "Tacotron 2";
-  }
-
   const handleBookmark = async (data: any) => {
     console.log(
       `The item is now ${data.isLiked ? "Bookmarked" : "Not Bookmarked"}.`
@@ -319,7 +612,7 @@ export default function WeightsPage({
         <PageHeader
           title={
             <div className="d-flex gap-2 align-items-center flex-wrap">
-              <span className="mb-1">{weight.title}</span>
+              <span>{weight.title}</span>
 
               <div className="d-flex align-items-center gap-2 mb-1">
                 <LikeButton
@@ -339,7 +632,7 @@ export default function WeightsPage({
             <div className="d-flex gap-3 flex-wrap align-items-center">
               <div className="d-flex gap-2 align-items-center">
                 <div>
-                  <Badge label={weightType} color="ultramarine" />
+                  <Badge label={weightType} color={weightTagColor} />
                 </div>
                 <p>Text to Speech</p>
               </div>
@@ -353,19 +646,7 @@ export default function WeightsPage({
 
             <Panel padding={true}>
               <h4 className="fw-semibold mb-3">Description</h4>
-              <p>
-                The chair sat in the corner where it had been for over 25 years.
-                The only difference was there was someone actually sitting in
-                it. How long had it been since someone had done that? Ten years
-                or more he imagined. Yet there was no denying the presence in
-                the chair now.
-                <br />
-                <br />
-                The headache wouldn't go away. She's taken medicine but even
-                that didn't help. The monstrous throbbing in her head continued.
-                She had this happen to her only once before in her life and she
-                realized that only one thing could be happening.
-              </p>
+              <p>{weight.description_markdown}</p>
             </Panel>
 
             <div className="panel p-3 py-4 p-md-4 d-none d-xl-block">
