@@ -1,15 +1,17 @@
 import React, { useEffect, useState } from 'react';
-import { Link } from "react-router-dom";
 import { a, useSpring } from "@react-spring/web";
 import { Check } from 'components/common';
-import { useInterval } from "hooks";
 import { FrontendInferenceJobType, InferenceJob } from "@storyteller/components/src/jobs/InferenceJob";
 import { JobState } from "@storyteller/components/src/jobs/JobStates";
 
+// import { useInterval } from "hooks"; // for animation debugging
+
 interface JobListItem extends InferenceJob {
+  failures: (fail: string) => string,
   jobType: FrontendInferenceJobType,
   jobStatusDescription?: any,
-  onSelect?: any
+  onSelect?: any,
+  refSet?: any,
   t?: any
 }
 
@@ -33,22 +35,16 @@ const AniX = ({ checked = false }) => {
   </>;
 }
 
-const OuterItem = ({ className, children, maybeResultToken, jobState}: { className?: string, children?: any, maybeResultToken?: any, jobState: number }) => jobState === 3 ?
-  <Link {...{ className, to: `media/${maybeResultToken}` }}>{ children }</Link> :
-  <div {...{ className }}>{ children }</div>;
+const OuterItem = ({ className, children, isComplete, jobToken, maybeResultToken, onSelect = () => {}, refSet }: { className?: string, children?: any, jobToken: string, isComplete: boolean, maybeResultToken?: any, onSelect?: any, refSet?: any }) => isComplete ?
+  <a.a {...{ className, href: `/media/${maybeResultToken}`, id: `ijobitem-${ jobToken }`, onClick: () => onSelect(),  ref: refSet }}>{ children }</a.a> :
+  <a.div {...{ className, id: `ijobitem-${ jobToken }`, ref: refSet }}>{ children }</a.div>;
 
-export default function JobItem({ maybeFailureCategory, maybeResultToken, onSelect, jobState: nah, jobStatusDescription, jobType: inputType, t }: JobListItem) {
-  const [jobState,jobStateSet] = useState(0);
-
+export default function JobItem({ failures, maybeFailureCategory, maybeResultToken, onSelect, jobToken, jobState, jobStatusDescription, jobType: inputType, refSet, t, ...rest }: JobListItem) {
   const [hasBounced,hasBouncedSet] = useState(false);
-  useInterval({ interval: 3000, onTick: ({ index }: { index: number }) => { jobStateSet(index); if (!index) hasBouncedSet(false) } });
 
-  const processFail = (fail = "") => {
-    switch (fail) {
-      case "face_not_detected": return "Face not detected, try another picture";
-      default: return "Uknown failure";
-    }
-  };
+  // const [jobState,jobStateSet] = useState(0); // for animation debugging
+  // useInterval({ interval: 3000, onTick: ({ index }: { index: number }) => { jobStateSet(index); if (!index) hasBouncedSet(false) } });
+
   const jobType = FrontendInferenceJobType[inputType];
   const jobStatus = jobStatusDescription(jobState);
 	const jobStatusClass = jobStatus.toLowerCase().replace("_","-");
@@ -85,8 +81,9 @@ export default function JobItem({ maybeFailureCategory, maybeResultToken, onSele
   });
   const headingBounce = useSpring(makeBounce(8));
   const subtitleBounce = useSpring(makeBounce(6,30));
-  const subtitle = maybeFailureCategory ?`${ processFail(maybeFailureCategory) }` : t(`subtitles.${jobStatus}`);
+  const subtitle = maybeFailureCategory ?`${ failures(maybeFailureCategory) }` : t(`subtitles.${jobStatus}`);
   const className = `face-animator-job job-status-${jobStatusClass}`;
+
 
   useEffect(() => {
     if (!bounce && !hasBounced && isComplete) {
@@ -96,7 +93,7 @@ export default function JobItem({ maybeFailureCategory, maybeResultToken, onSele
     }
   },[bounce, hasBounced, isComplete ]);
 
-  return <OuterItem {...{ className, maybeResultToken, jobState }}>
+  return <OuterItem {...{ className, isComplete, jobToken, maybeResultToken, onSelect, refSet }}>
     <svg {...{ }}>
       <circle {...{ ...circle, className: "work-indicator-circle-track" }} />
       <a.circle {...{ ...circle, className: "work-indicator-circle-marker", style: dashy }} />
@@ -107,7 +104,7 @@ export default function JobItem({ maybeFailureCategory, maybeResultToken, onSele
       <a.h6 {...{  style: headingBounce }}>
         { t(`${jobType}.${jobStatus}`) }
       </a.h6>
-      <a.span {...{  style: subtitleBounce }}>{ isComplete ? subtitle + " >" : subtitle }</a.span>
+      <a.span {...{ style: subtitleBounce }}>{ isComplete ? subtitle + " >" : subtitle }</a.span>
     </div>
   </OuterItem>;
 };

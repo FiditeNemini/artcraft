@@ -23,5 +23,5 @@ export default function useInterval(props: any) {
     return () => clearInterval(ticker);
   },[]);
 
-  return things.current.index || 0;
+  return things.current;
 };
