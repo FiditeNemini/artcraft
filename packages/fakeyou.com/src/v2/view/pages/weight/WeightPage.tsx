@@ -41,7 +41,7 @@ interface WeightProps {
   enqueueTtsJob: (jobToken: string) => void;
 }
 
-export default function WeightsPage({
+export default function WeightPage({
   sessionWrapper,
   sessionSubscriptionsWrapper,
   inferenceJobs,
