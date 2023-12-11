@@ -2,15 +2,15 @@ use anyhow::anyhow;
 use chrono::{DateTime, Utc};
 use sqlx::{Executor, MySql};
 
-use enums::by_table::favorites::favorite_entity_type::FavoriteEntityType;
+use enums::by_table::user_bookmarks::user_bookmark_entity_type::UserBookmarkEntityType;
 use errors::AnyhowResult;
-use tokens::tokens::favorites::FavoriteToken;
+use tokens::tokens::user_bookmarks::UserBookmarkToken;
 use tokens::tokens::users::UserToken;
 
-pub struct Favorite {
-  pub token: FavoriteToken,
+pub struct UserBookmark {
+  pub token: UserBookmarkToken,
 
-  pub entity_type: FavoriteEntityType,
+  pub entity_type: UserBookmarkEntityType,
   pub entity_token: String,
 
   pub user_token: UserToken,
@@ -23,21 +23,21 @@ pub struct Favorite {
   pub maybe_deleted_at: Option<DateTime<Utc>>,
 }
 
-pub async fn get_favorite<'e, 'c, E>(
-  favorite_token: &'e FavoriteToken,
-  mysql_executor: E
+pub async fn get_user_bookmark<'e, 'c, E>(
+    user_bookmark_token: &'e UserBookmarkToken,
+    mysql_executor: E
 )
-  -> AnyhowResult<Option<Favorite>>
+    -> AnyhowResult<Option<UserBookmark>>
   where E: 'e + Executor<'c, Database = MySql>
 {
 
   let maybe_results = sqlx::query_as!(
-      RawFavorite,
+      RawUserBookmark,
         r#"
 SELECT
-    f.token as `token: tokens::tokens::favorites::FavoriteToken`,
+    f.token as `token: tokens::tokens::user_bookmarks::UserBookmarkToken`,
 
-    f.entity_type as `entity_type: enums::by_table::favorites::favorite_entity_type::FavoriteEntityType`,
+    f.entity_type as `entity_type: enums::by_table::user_bookmarks::user_bookmark_entity_type::UserBookmarkEntityType`,
     f.entity_token,
 
     f.user_token as `user_token: tokens::tokens::users::UserToken`,
@@ -50,29 +50,29 @@ SELECT
     f.deleted_at
 
 FROM
-    favorites AS f
+    user_bookmarks AS f
 JOIN users AS u
     ON f.user_token = u.token
 WHERE
     f.token = ?
         "#,
-      favorite_token
+      user_bookmark_token
     )
       .fetch_one(mysql_executor)
       .await;
 
   match maybe_results {
-    Ok(favorite) => Ok(Some(Favorite {
-      token: favorite.token,
-      entity_type: favorite.entity_type,
-      entity_token: favorite.entity_token,
-      user_token: favorite.user_token,
-      username: favorite.username,
-      user_display_name: favorite.user_display_name,
-      user_gravatar_hash: favorite.user_gravatar_hash,
-      created_at: favorite.created_at,
-      updated_at: favorite.updated_at,
-      maybe_deleted_at: favorite.deleted_at,
+    Ok(user_bookmark) => Ok(Some(UserBookmark {
+      token: user_bookmark.token,
+      entity_type: user_bookmark.entity_type,
+      entity_token: user_bookmark.entity_token,
+      user_token: user_bookmark.user_token,
+      username: user_bookmark.username,
+      user_display_name: user_bookmark.user_display_name,
+      user_gravatar_hash: user_bookmark.user_gravatar_hash,
+      created_at: user_bookmark.created_at,
+      updated_at: user_bookmark.updated_at,
+      maybe_deleted_at: user_bookmark.deleted_at,
     })),
     Err(err) => match err {
       sqlx::Error::RowNotFound => Ok(None),
@@ -81,10 +81,10 @@ WHERE
   }
 }
 
-pub struct RawFavorite {
-  pub token: FavoriteToken,
+pub struct RawUserBookmark {
+  pub token: UserBookmarkToken,
 
-  pub entity_type: FavoriteEntityType,
+  pub entity_type: UserBookmarkEntityType,
   pub entity_token: String,
 
   pub user_token: UserToken,

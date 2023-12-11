@@ -11,46 +11,46 @@ use actix_web::error::ResponseError;
 use actix_web::http::StatusCode;
 use log::warn;
 
-use enums::by_table::favorites::favorite_entity_type::FavoriteEntityType;
-use mysql_queries::queries::favorites::favorite_entity_token::FavoriteEntityToken;
-use mysql_queries::queries::favorites::create_favorite::{create_favorite, CreateFavoriteArgs};
-use tokens::tokens::favorites::FavoriteToken;
+use enums::by_table::user_bookmarks::user_bookmark_entity_type::UserBookmarkEntityType;
+use mysql_queries::queries::user_bookmarks::user_bookmark_entity_token::UserBookmarkEntityToken;
+use mysql_queries::queries::user_bookmarks::create_user_bookmark::{create_user_bookmark, CreateUserBookmarkArgs};
+use tokens::tokens::user_bookmarks::UserBookmarkToken;
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::server_state::ServerState;
 
 #[derive(Deserialize)]
-pub struct CreateFavoriteRequest {
+pub struct CreateUserBookmarkRequest {
   entity_token: String,
-  entity_type: FavoriteEntityType,
+  entity_type: UserBookmarkEntityType,
 }
 
 #[derive(Serialize)]
-pub struct CreateFavoriteSuccessResponse {
+pub struct CreateUserBookmarkSuccessResponse {
   pub success: bool,
-  pub favorite_token: FavoriteToken,
+  pub user_bookmark_token: UserBookmarkToken,
 }
 
 #[derive(Debug)]
-pub enum CreateFavoriteError {
+pub enum CreateUserBookmarkError {
   BadInput(String),
   NotAuthorized,
   ServerError,
 }
 
-impl ResponseError for CreateFavoriteError {
+impl ResponseError for CreateUserBookmarkError {
   fn status_code(&self) -> StatusCode {
     match *self {
-      CreateFavoriteError::BadInput(_) => StatusCode::BAD_REQUEST,
-      CreateFavoriteError::NotAuthorized => StatusCode::UNAUTHORIZED,
-      CreateFavoriteError::ServerError => StatusCode::INTERNAL_SERVER_ERROR,
+      CreateUserBookmarkError::BadInput(_) => StatusCode::BAD_REQUEST,
+      CreateUserBookmarkError::NotAuthorized => StatusCode::UNAUTHORIZED,
+      CreateUserBookmarkError::ServerError => StatusCode::INTERNAL_SERVER_ERROR,
     }
   }
 
   fn error_response(&self) -> HttpResponse {
     let error_reason = match self {
-      CreateFavoriteError::BadInput(reason) => reason.to_string(),
-      CreateFavoriteError::NotAuthorized => "unauthorized".to_string(),
-      CreateFavoriteError::ServerError => "server error".to_string(),
+      CreateUserBookmarkError::BadInput(reason) => reason.to_string(),
+      CreateUserBookmarkError::NotAuthorized => "unauthorized".to_string(),
+      CreateUserBookmarkError::ServerError => "server error".to_string(),
     };
 
     to_simple_json_error(&error_reason, self.status_code())
@@ -58,24 +58,24 @@ impl ResponseError for CreateFavoriteError {
 }
 
 // NB: Not using derive_more::Display since Clion doesn't understand it.
-impl fmt::Display for CreateFavoriteError {
+impl fmt::Display for CreateUserBookmarkError {
   fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
     write!(f, "{:?}", self)
   }
 }
 
-pub async fn create_favorite_handler(
+pub async fn create_user_bookmark_handler(
   http_request: HttpRequest,
-  request: web::Json<CreateFavoriteRequest>,
+  request: web::Json<CreateUserBookmarkRequest>,
   server_state: web::Data<Arc<ServerState>>,
-) -> Result<HttpResponse, CreateFavoriteError>
+) -> Result<HttpResponse, CreateUserBookmarkError>
 {
   let mut mysql_connection = server_state.mysql_pool
       .acquire()
       .await
       .map_err(|err| {
         warn!("MySql pool error: {:?}", err);
-        CreateFavoriteError::ServerError
+        CreateUserBookmarkError::ServerError
       })?;
 
   let maybe_user_session = server_state
@@ -84,42 +84,42 @@ pub async fn create_favorite_handler(
       .await
       .map_err(|e| {
         warn!("Session checker error: {:?}", e);
-        CreateFavoriteError::ServerError
+        CreateUserBookmarkError::ServerError
       })?;
 
   let user_session = match maybe_user_session {
     Some(session) => session,
     None => {
       warn!("not logged in");
-      return Err(CreateFavoriteError::NotAuthorized);
+      return Err(CreateUserBookmarkError::NotAuthorized);
     }
   };
 
-  let entity_token = FavoriteEntityToken::from_entity_type_and_token(
+  let entity_token = UserBookmarkEntityToken::from_entity_type_and_token(
     request.entity_type, &request.entity_token);
 
-  let query_result = create_favorite(CreateFavoriteArgs {
+  let query_result = create_user_bookmark(CreateUserBookmarkArgs {
     entity_token: &entity_token,
     user_token: &user_session.user_token_typed,
     mysql_executor: &mut *mysql_connection,
     phantom: Default::default(),
   }).await;
 
-  let favorite_token = match query_result {
+  let user_bookmark_token = match query_result {
     Ok(token) => token,
     Err(err) => {
-      warn!("error inserting favorite: {:?}", err);
-      return Err(CreateFavoriteError::ServerError);
+      warn!("error inserting user_bookmark: {:?}", err);
+      return Err(CreateUserBookmarkError::ServerError);
     }
   };
 
-  let response = CreateFavoriteSuccessResponse {
+  let response = CreateUserBookmarkSuccessResponse {
     success: true,
-    favorite_token,
+    user_bookmark_token,
   };
 
   let body = serde_json::to_string(&response)
-      .map_err(|_e| CreateFavoriteError::ServerError)?;
+      .map_err(|_e| CreateUserBookmarkError::ServerError)?;
 
   Ok(HttpResponse::Ok()
       .content_type("application/json")

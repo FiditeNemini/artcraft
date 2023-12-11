@@ -1,11 +1,11 @@
 {
   "db_name": "MySQL",
-  "query": "\nSELECT\n    f.token as `token: tokens::tokens::favorites::FavoriteToken`,\n    f.user_token as `user_token: tokens::tokens::users::UserToken`,\n    u.username,\n    u.display_name as user_display_name,\n    u.email_gravatar_hash as user_gravatar_hash,\n\n    f.created_at,\n    f.updated_at,\n    f.deleted_at\n\nFROM\n    favorites AS f\nJOIN users AS u\n    ON f.user_token = u.token\nWHERE\n    f.entity_type = ?\n    AND f.entity_token = ?\n    AND f.deleted_at IS NULL\nORDER BY f.id DESC\nLIMIT 50\n        ",
+  "query": "\nSELECT\n    f.token as `token: tokens::tokens::user_bookmarks::UserBookmarkToken`,\n    f.user_token as `user_token: tokens::tokens::users::UserToken`,\n    u.username,\n    u.display_name as user_display_name,\n    u.email_gravatar_hash as user_gravatar_hash,\n\n    f.created_at,\n    f.updated_at,\n    f.deleted_at\n\nFROM\n    user_bookmarks AS f\nJOIN users AS u\n    ON f.user_token = u.token\nWHERE\n    f.entity_type = ?\n    AND f.entity_token = ?\n    AND f.deleted_at IS NULL\nORDER BY f.id DESC\nLIMIT 50\n        ",
   "describe": {
     "columns": [
       {
         "ordinal": 0,
-        "name": "token: tokens::tokens::favorites::FavoriteToken",
+        "name": "token: tokens::tokens::user_bookmarks::UserBookmarkToken",
         "type_info": {
           "type": "VarString",
           "flags": "NOT_NULL | UNIQUE_KEY | BINARY | NO_DEFAULT_VALUE",
@@ -98,5 +98,5 @@
       true
     ]
   },
-  "hash": "99cff649bf75f5b05330e7db8536ecc832affbae7c9710e158099079609e5e16"
+  "hash": "1c1ef2195e81362d0eb023ede236c6fa65ede80d9efcaa4996694ce32c12cc0c"
 }
