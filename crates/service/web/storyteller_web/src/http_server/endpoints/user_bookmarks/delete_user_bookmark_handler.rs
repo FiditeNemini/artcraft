@@ -12,8 +12,8 @@ use actix_web::http::StatusCode;
 use actix_web::web::Path;
 use log::warn;
 
-use mysql_queries::queries::favorites::delete_favorite::delete_favorite;
-use tokens::tokens::favorites::FavoriteToken;
+use mysql_queries::queries::user_bookmarks::delete_user_bookmark::delete_user_bookmark;
+use tokens::tokens::user_bookmarks::UserBookmarkToken;
 
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::http_server::web_utils::response_success_helpers::simple_json_success;
@@ -21,40 +21,40 @@ use crate::server_state::ServerState;
 
 /// For the URL PathInfo
 #[derive(Deserialize)]
-pub struct DeleteFavoritePathInfo {
-  favorite_token: FavoriteToken,
+pub struct DeleteUserBookmarkPathInfo {
+  user_bookmark_token: UserBookmarkToken,
 }
 
 #[derive(Deserialize)]
-pub struct DeleteFavoriteRequest {
+pub struct DeleteUserBookmarkRequest {
   /// NB: this is only to disambiguate when a user is both a mod and an author.
   as_mod: Option<bool>,
 }
 
 #[derive(Debug)]
-pub enum DeleteFavoriteError {
+pub enum DeleteUserBookmarkError {
   BadInput(String),
   NotAuthorized,
   NotFound,
   ServerError,
 }
 
-impl ResponseError for DeleteFavoriteError {
+impl ResponseError for DeleteUserBookmarkError {
   fn status_code(&self) -> StatusCode {
     match *self {
-      DeleteFavoriteError::BadInput(_) => StatusCode::BAD_REQUEST,
-      DeleteFavoriteError::NotAuthorized => StatusCode::UNAUTHORIZED,
-      DeleteFavoriteError::NotFound => StatusCode::NOT_FOUND,
-      DeleteFavoriteError::ServerError => StatusCode::INTERNAL_SERVER_ERROR,
+      DeleteUserBookmarkError::BadInput(_) => StatusCode::BAD_REQUEST,
+      DeleteUserBookmarkError::NotAuthorized => StatusCode::UNAUTHORIZED,
+      DeleteUserBookmarkError::NotFound => StatusCode::NOT_FOUND,
+      DeleteUserBookmarkError::ServerError => StatusCode::INTERNAL_SERVER_ERROR,
     }
   }
 
   fn error_response(&self) -> HttpResponse {
     let error_reason = match self {
-      DeleteFavoriteError::BadInput(reason) => reason.to_string(),
-      DeleteFavoriteError::NotAuthorized => "unauthorized".to_string(),
-      DeleteFavoriteError::NotFound => "not found".to_string(),
-      DeleteFavoriteError::ServerError => "server error".to_string(),
+      DeleteUserBookmarkError::BadInput(reason) => reason.to_string(),
+      DeleteUserBookmarkError::NotAuthorized => "unauthorized".to_string(),
+      DeleteUserBookmarkError::NotFound => "not found".to_string(),
+      DeleteUserBookmarkError::ServerError => "server error".to_string(),
     };
 
     to_simple_json_error(&error_reason, self.status_code())
@@ -62,24 +62,24 @@ impl ResponseError for DeleteFavoriteError {
 }
 
 // NB: Not using derive_more::Display since Clion doesn't understand it.
-impl fmt::Display for DeleteFavoriteError {
+impl fmt::Display for DeleteUserBookmarkError {
   fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
     write!(f, "{:?}", self)
   }
 }
 
-pub async fn delete_favorite_handler(
+pub async fn delete_user_bookmark_handler(
   http_request: HttpRequest,
-  path: Path<DeleteFavoritePathInfo>,
-  _request: web::Json<DeleteFavoriteRequest>,
+  path: Path<DeleteUserBookmarkPathInfo>,
+  _request: web::Json<DeleteUserBookmarkRequest>,
   server_state: web::Data<Arc<ServerState>>
-) -> Result<HttpResponse, DeleteFavoriteError> {
+) -> Result<HttpResponse, DeleteUserBookmarkError> {
   let mut mysql_connection = server_state.mysql_pool
       .acquire()
       .await
       .map_err(|err| {
         warn!("MySql pool error: {:?}", err);
-        DeleteFavoriteError::ServerError
+        DeleteUserBookmarkError::ServerError
       })?;
 
   let maybe_user_session = server_state
@@ -88,18 +88,18 @@ pub async fn delete_favorite_handler(
       .await
       .map_err(|e| {
         warn!("Session checker error: {:?}", e);
-        DeleteFavoriteError::ServerError
+        DeleteUserBookmarkError::ServerError
       })?;
 
   let user_session = match maybe_user_session {
     Some(session) => session,
     None => {
-      return Err(DeleteFavoriteError::NotAuthorized);
+      return Err(DeleteUserBookmarkError::NotAuthorized);
     }
   };
 
-  let query_result = delete_favorite(
-    &path.favorite_token,
+  let query_result = delete_user_bookmark(
+    &path.user_bookmark_token,
     &user_session.user_token_typed,
     &mut *mysql_connection
   ).await;
@@ -108,7 +108,7 @@ pub async fn delete_favorite_handler(
     Ok(_) => {},
     Err(err) => {
       warn!("Update tts mod approval status DB error: {:?}", err);
-      return Err(DeleteFavoriteError::ServerError);
+      return Err(DeleteUserBookmarkError::ServerError);
     }
   };
 

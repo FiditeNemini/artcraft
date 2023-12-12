@@ -4,15 +4,15 @@ use anyhow::anyhow;
 use sqlx::{Executor, MySql};
 
 use errors::AnyhowResult;
-use tokens::tokens::favorites::FavoriteToken;
+use tokens::tokens::user_bookmarks::UserBookmarkToken;
 use tokens::tokens::users::UserToken;
 
-use crate::queries::favorites::favorite_entity_token::FavoriteEntityToken;
+use crate::queries::user_bookmarks::user_bookmark_entity_token::UserBookmarkEntityToken;
 
-pub struct CreateFavoriteArgs<'e, 'c, E>
+pub struct CreateUserBookmarkArgs<'e, 'c, E>
   where E: 'e + Executor<'c, Database = MySql>
 {
-  pub entity_token: &'e FavoriteEntityToken,
+  pub entity_token: &'e UserBookmarkEntityToken,
 
   pub user_token: &'e UserToken,
 
@@ -23,19 +23,19 @@ pub struct CreateFavoriteArgs<'e, 'c, E>
   pub phantom: PhantomData<&'c E>,
 }
 
-pub async fn create_favorite<'e, 'c : 'e, E>(
-    args: CreateFavoriteArgs<'e, 'c, E>,
+pub async fn create_user_bookmark<'e, 'c : 'e, E>(
+    args: CreateUserBookmarkArgs<'e, 'c, E>,
 )
-    -> AnyhowResult<FavoriteToken>
+    -> AnyhowResult<UserBookmarkToken>
   where E: 'e + Executor<'c, Database = MySql>
 {
 
-  let favorite_token = FavoriteToken::generate();
+  let user_bookmark_token = UserBookmarkToken::generate();
   let (entity_type, entity_token) = args.entity_token.get_composite_keys();
 
   let query_result = sqlx::query!(
         r#"
-INSERT INTO favorites
+INSERT INTO user_bookmarks
 SET
   token = ?,
   user_token = ?,
@@ -46,7 +46,7 @@ ON DUPLICATE KEY UPDATE
   deleted_at = NULL,
   version = version + 1
         "#,
-      &favorite_token,
+      &user_bookmark_token,
       args.user_token,
       entity_type,
       entity_token,
@@ -59,5 +59,5 @@ ON DUPLICATE KEY UPDATE
     Err(err) => return Err(anyhow!("Mysql error: {:?}", err)),
   };
 
-  Ok(favorite_token)
+  Ok(user_bookmark_token)
 }

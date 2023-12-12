@@ -8,7 +8,7 @@ use crate::prefixes::TokenPrefix;
 /// The primary key for Audit Logs.
 #[derive(Clone, PartialEq, Eq, PartialOrd, Ord, Hash, sqlx::Type, Debug, Serialize, Deserialize)]
 #[sqlx(transparent)]
-pub struct FavoriteToken(pub String);
+pub struct UserBookmarkToken(pub String);
 
-impl_string_token!(FavoriteToken);
-impl_crockford_generator!(FavoriteToken, 32usize, TokenPrefix::Favorite, CrockfordLower);
+impl_string_token!(UserBookmarkToken);
+impl_crockford_generator!(UserBookmarkToken, 32usize, TokenPrefix::UserBookmark, CrockfordLower);

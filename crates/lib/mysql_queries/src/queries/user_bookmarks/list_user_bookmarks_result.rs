@@ -1,18 +1,18 @@
 use chrono::{DateTime, Utc};
 
-use enums::by_table::favorites::favorite_entity_type::FavoriteEntityType;
+use enums::by_table::user_bookmarks::user_bookmark_entity_type::UserBookmarkEntityType;
 use enums::by_table::media_files::media_file_origin_category::MediaFileOriginCategory;
 use enums::by_table::media_files::media_file_type::MediaFileType;
-use tokens::tokens::favorites::FavoriteToken;
+use tokens::tokens::user_bookmarks::UserBookmarkToken;
 use tokens::tokens::users::UserToken;
 
-pub struct UserFavorite {
-  pub token: FavoriteToken,
+pub struct UserBookmark {
+  pub token: UserBookmarkToken,
 
-  pub entity_type: FavoriteEntityType,
+  pub entity_type: UserBookmarkEntityType,
   pub entity_token: String,
 
-  /// Something descriptive about the favorited entity.
+  /// Something descriptive about the bookmarked entity.
   /// This might be TTS text, a username, etc. It depends on the entity type.
   pub maybe_entity_descriptive_text: Option<String>,
 
@@ -26,10 +26,10 @@ pub struct UserFavorite {
   pub maybe_deleted_at: Option<DateTime<Utc>>,
 }
 
-pub struct RawUserFavoriteRecord {
-  pub (crate) token: FavoriteToken,
+pub struct RawUserBookmarkRecord {
+  pub (crate) token: UserBookmarkToken,
 
-  pub (crate) entity_type: FavoriteEntityType,
+  pub (crate) entity_type: UserBookmarkEntityType,
   pub (crate) entity_token: String,
 
   pub (crate) user_token: UserToken,
@@ -51,27 +51,27 @@ pub struct RawUserFavoriteRecord {
   pub (crate) maybe_descriptive_text_zs_voice_title: Option<String>,
 }
 
-impl RawUserFavoriteRecord {
-  pub fn into_public_type(self) -> UserFavorite {
-    UserFavorite {
+impl RawUserBookmarkRecord {
+  pub fn into_public_type(self) -> UserBookmark {
+    UserBookmark {
       token: self.token,
       entity_type: self.entity_type,
       entity_token: self.entity_token,
       maybe_entity_descriptive_text: match self.entity_type {
-        FavoriteEntityType::User => self.maybe_descriptive_text_user_display_name,
-        FavoriteEntityType::TtsModel => self.maybe_descriptive_text_tts_model_title,
-        FavoriteEntityType::TtsResult => self.maybe_descriptive_text_tts_result_inference_text,
-        FavoriteEntityType::W2lTemplate => None,
-        FavoriteEntityType::W2lResult => None,
+        UserBookmarkEntityType::User => self.maybe_descriptive_text_user_display_name,
+        UserBookmarkEntityType::TtsModel => self.maybe_descriptive_text_tts_model_title,
+        UserBookmarkEntityType::TtsResult => self.maybe_descriptive_text_tts_result_inference_text,
+        UserBookmarkEntityType::W2lTemplate => None,
+        UserBookmarkEntityType::W2lResult => None,
         // TODO(bt,2023-11-21): Summary text needs to be better enriched.
-        FavoriteEntityType::MediaFile => self.maybe_media_file_type
+        UserBookmarkEntityType::MediaFile => self.maybe_media_file_type
             .and_then(|media_file_type| match media_file_type {
               MediaFileType::Audio => Some("audio media file".to_string()),
               MediaFileType::Image => Some("image media file".to_string()),
               MediaFileType::Video => Some("video media file".to_string()),
             }),
-        FavoriteEntityType::VoiceConversionModel => self.maybe_descriptive_text_voice_conversion_model_title,
-        FavoriteEntityType::ZsVoice => self.maybe_descriptive_text_zs_voice_title,
+        UserBookmarkEntityType::VoiceConversionModel => self.maybe_descriptive_text_voice_conversion_model_title,
+        UserBookmarkEntityType::ZsVoice => self.maybe_descriptive_text_zs_voice_title,
       },
       user_token: self.user_token,
       username: self.username,

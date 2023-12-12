@@ -13,43 +13,43 @@ use actix_web::web::{Path, Query};
 use chrono::{DateTime, Utc};
 use log::warn;
 
-use enums::by_table::favorites::favorite_entity_type::FavoriteEntityType;
-use mysql_queries::queries::favorites::list_user_favorites::{list_user_favorites, list_user_favorites_by_entity_type};
-use tokens::tokens::favorites::FavoriteToken;
+use enums::by_table::user_bookmarks::user_bookmark_entity_type::UserBookmarkEntityType;
+use mysql_queries::queries::user_bookmarks::list_user_bookmarks::{list_user_bookmarks, list_user_user_bookmarks_by_entity_type};
+use tokens::tokens::user_bookmarks::UserBookmarkToken;
 
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::server_state::ServerState;
 
 #[derive(Deserialize)]
-pub struct ListFavoritesPathInfo {
+pub struct ListUserBookmarksPathInfo {
   username: String,
 }
 
 #[derive(Deserialize)]
-pub struct ListFavoritesQueryData {
-  maybe_scoped_entity_type: Option<FavoriteEntityType>,
+pub struct ListUserBookmarksQueryData {
+  maybe_scoped_entity_type: Option<UserBookmarkEntityType>,
 }
 
 #[derive(Serialize)]
-pub struct ListFavoritesSuccessResponse {
+pub struct ListUserBookmarksSuccessResponse {
   pub success: bool,
-  pub favorites: Vec<Favorite>,
+  pub user_bookmarks: Vec<UserBookmark>,
 }
 
 #[derive(Serialize)]
-pub struct Favorite {
-  pub token: FavoriteToken,
+pub struct UserBookmark {
+  pub token: UserBookmarkToken,
 
-  pub details: FavoriteDetails,
+  pub details: UserBookmarkDetails,
 
   pub created_at: DateTime<Utc>,
   pub updated_at: DateTime<Utc>,
 }
 
 #[derive(Serialize)]
-pub struct FavoriteDetails {
+pub struct UserBookmarkDetails {
   // TODO: This needs titles or some other summary metadata.
-  pub entity_type: FavoriteEntityType,
+  pub entity_type: UserBookmarkEntityType,
   pub entity_token: String,
 
   // TODO: Populate this for TTS
@@ -60,20 +60,20 @@ pub struct FavoriteDetails {
 }
 
 #[derive(Debug)]
-pub enum ListFavoritesError {
+pub enum ListUserBookmarksError {
   ServerError,
 }
 
-impl ResponseError for ListFavoritesError {
+impl ResponseError for ListUserBookmarksError {
   fn status_code(&self) -> StatusCode {
     match *self {
-      ListFavoritesError::ServerError=> StatusCode::INTERNAL_SERVER_ERROR,
+      ListUserBookmarksError::ServerError=> StatusCode::INTERNAL_SERVER_ERROR,
     }
   }
 
   fn error_response(&self) -> HttpResponse {
     let error_reason = match self {
-      ListFavoritesError::ServerError => "server error".to_string(),
+      ListUserBookmarksError::ServerError => "server error".to_string(),
     };
 
     to_simple_json_error(&error_reason, self.status_code())
@@ -81,56 +81,56 @@ impl ResponseError for ListFavoritesError {
 }
 
 // NB: Not using derive_more::Display since Clion doesn't understand it.
-impl fmt::Display for ListFavoritesError {
+impl fmt::Display for ListUserBookmarksError {
   fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
     write!(f, "{:?}", self)
   }
 }
 
-pub async fn list_favorites_for_user_handler(
+pub async fn list_user_bookmarks_for_user_handler(
   _http_request: HttpRequest,
-  path: Path<ListFavoritesPathInfo>,
-  query: Query<ListFavoritesQueryData>,
+  path: Path<ListUserBookmarksPathInfo>,
+  query: Query<ListUserBookmarksQueryData>,
   server_state: web::Data<Arc<ServerState>>
-) -> Result<HttpResponse, ListFavoritesError>
+) -> Result<HttpResponse, ListUserBookmarksError>
 {
 
   let query_results = match query.maybe_scoped_entity_type {
-    None => list_user_favorites(&path.username, &server_state.mysql_pool).await,
+    None => list_user_bookmarks(&path.username, &server_state.mysql_pool).await,
     Some(entity_type) =>
-      list_user_favorites_by_entity_type(&path.username, entity_type, &server_state.mysql_pool)
+      list_user_user_bookmarks_by_entity_type(&path.username, entity_type, &server_state.mysql_pool)
           .await,
   };
 
-  let favorites = match query_results {
+  let user_bookmarks = match query_results {
     Ok(results) => results,
     Err(e) => {
       warn!("Query error: {:?}", e);
-      return Err(ListFavoritesError::ServerError);
+      return Err(ListUserBookmarksError::ServerError);
     }
   };
 
-  let response = ListFavoritesSuccessResponse {
+  let response = ListUserBookmarksSuccessResponse {
     success: true,
-    favorites: favorites.into_iter()
-        .map(|favorite| Favorite {
-          token: favorite.token,
-          details: FavoriteDetails {
-            entity_type: favorite.entity_type,
-            entity_token: favorite.entity_token,
-            maybe_summary_text: favorite.maybe_entity_descriptive_text,
+    user_bookmarks: user_bookmarks.into_iter()
+        .map(|user_bookmark| UserBookmark {
+          token: user_bookmark.token,
+          details: UserBookmarkDetails {
+            entity_type: user_bookmark.entity_type,
+            entity_token: user_bookmark.entity_token,
+            maybe_summary_text: user_bookmark.maybe_entity_descriptive_text,
             // TODO(bt,2023-11-21): Thumbnails need proper support. We should build them as a
             //  first-class system before handling the backfill here.
             maybe_thumbnail_url: None,
           },
-          created_at: favorite.created_at,
-          updated_at: favorite.updated_at,
+          created_at: user_bookmark.created_at,
+          updated_at: user_bookmark.updated_at,
         })
         .collect(),
   };
 
   let body = serde_json::to_string(&response)
-      .map_err(|_e| ListFavoritesError::ServerError)?;
+      .map_err(|_e| ListUserBookmarksError::ServerError)?;
 
   Ok(HttpResponse::Ok()
       .content_type("application/json")

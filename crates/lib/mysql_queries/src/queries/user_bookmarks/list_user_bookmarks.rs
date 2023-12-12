@@ -2,24 +2,26 @@ use anyhow::anyhow;
 use log::warn;
 use sqlx::MySqlPool;
 
-use enums::by_table::favorites::favorite_entity_type::FavoriteEntityType;
+use enums::by_table::user_bookmarks::user_bookmark_entity_type::UserBookmarkEntityType;
 use errors::AnyhowResult;
+use crate::queries::user_bookmarks::list_user_bookmarks_result::UserBookmark;
+use crate::queries::user_bookmarks::list_user_bookmarks_result::RawUserBookmarkRecord;
+use tokens::tokens::user_bookmarks::UserBookmarkToken;
 
-use crate::queries::favorites::list_user_favorites_result::{RawUserFavoriteRecord, UserFavorite};
 
-pub async fn list_user_favorites(
+pub async fn list_user_bookmarks(
   username: &str,
   mysql_pool: &MySqlPool
-) -> AnyhowResult<Vec<UserFavorite>> {
+) -> AnyhowResult<Vec<UserBookmark>> {
 
   /// TODO(bt,2023-11-21): Maybe this query can use a switch
   ///  See: https://stackoverflow.com/questions/2761574/mysql-use-case-else-value-as-join-parameter
   let maybe_results= sqlx::query_as!(
-      RawUserFavoriteRecord,
+      RawUserBookmarkRecord,
         r#"
 SELECT
-    f.token as `token: tokens::tokens::favorites::FavoriteToken`,
-    f.entity_type as `entity_type: enums::by_table::favorites::favorite_entity_type::FavoriteEntityType`,
+    f.token as `token: tokens::tokens::user_bookmarks::UserBookmarkToken`,
+    f.entity_type as `entity_type: enums::by_table::user_bookmarks::user_bookmark_entity_type::UserBookmarkEntityType`,
     f.entity_token,
     f.user_token as `user_token: tokens::tokens::users::UserToken`,
     u.username,
@@ -39,7 +41,7 @@ SELECT
     zs_voices.title as maybe_descriptive_text_zs_voice_title
 
 FROM
-    favorites AS f
+    user_bookmarks AS f
 JOIN users AS u
     ON f.user_token = u.token
 
@@ -65,28 +67,28 @@ LIMIT 50
     Err(err) => match err {
       sqlx::Error::RowNotFound => Ok(Vec::new()),
       _ => {
-        warn!("list favorites db error: {:?}", err);
+        warn!("list user_bookmarks db error: {:?}", err);
         Err(anyhow!("error with query: {:?}", err))
       }
     },
     Ok(results) => Ok(results.into_iter()
-        .map(|favorite| favorite.into_public_type())
+        .map(|user_bookmark| user_bookmark.into_public_type())
         .collect()),
   }
 }
 
-pub async fn list_user_favorites_by_entity_type(
-  username: &str,
-  entity_type: FavoriteEntityType,
-  mysql_pool: &MySqlPool
-) -> AnyhowResult<Vec<UserFavorite>> {
+pub async fn list_user_user_bookmarks_by_entity_type(
+    username: &str,
+    entity_type: UserBookmarkEntityType,
+    mysql_pool: &MySqlPool
+) -> AnyhowResult<Vec<UserBookmark>> {
 
   let maybe_results= sqlx::query_as!(
-      RawUserFavoriteRecord,
+      RawUserBookmarkRecord,
         r#"
 SELECT
-    f.token as `token: tokens::tokens::favorites::FavoriteToken`,
-    f.entity_type as `entity_type: enums::by_table::favorites::favorite_entity_type::FavoriteEntityType`,
+    f.token as `token: tokens::tokens::user_bookmarks::UserBookmarkToken`,
+    f.entity_type as `entity_type: enums::by_table::user_bookmarks::user_bookmark_entity_type::UserBookmarkEntityType`,
     f.entity_token,
     f.user_token as `user_token: tokens::tokens::users::UserToken`,
     u.username,
@@ -106,7 +108,7 @@ SELECT
     zs_voices.title as maybe_descriptive_text_zs_voice_title
 
 FROM
-    favorites AS f
+    user_bookmarks AS f
 JOIN users AS u
     ON f.user_token = u.token
 
@@ -134,12 +136,12 @@ LIMIT 50
     Err(err) => match err {
       sqlx::Error::RowNotFound => Ok(Vec::new()),
       _ => {
-        warn!("list favorites db error: {:?}", err);
+        warn!("list user_bookmarks db error: {:?}", err);
         Err(anyhow!("error with query: {:?}", err))
       }
     },
     Ok(results) => Ok(results.into_iter()
-        .map(|favorite| favorite.into_public_type())
+        .map(|user_bookmark| user_bookmark.into_public_type())
         .collect()),
   }
 }

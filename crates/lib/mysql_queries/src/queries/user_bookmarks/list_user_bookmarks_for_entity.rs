@@ -4,13 +4,13 @@ use log::warn;
 use sqlx::MySqlPool;
 
 use errors::AnyhowResult;
-use tokens::tokens::favorites::FavoriteToken;
+use tokens::tokens::user_bookmarks::UserBookmarkToken;
 use tokens::tokens::users::UserToken;
 
-use crate::queries::favorites::favorite_entity_token::FavoriteEntityToken;
+use crate::queries::user_bookmarks::user_bookmark_entity_token::UserBookmarkEntityToken;
 
-pub struct Favorite {
-  pub token: FavoriteToken,
+pub struct UserBookmark {
+  pub token: UserBookmarkToken,
 
   pub user_token: UserToken,
   pub username: String,
@@ -22,18 +22,18 @@ pub struct Favorite {
   pub maybe_deleted_at: Option<DateTime<Utc>>,
 }
 
-pub async fn list_favorites_for_entity(
-  favorite_entity_token: FavoriteEntityToken,
+pub async fn list_user_bookmarks_for_entity(
+  user_bookmark_entity_token: UserBookmarkEntityToken,
   mysql_pool: &MySqlPool
-) -> AnyhowResult<Vec<Favorite>> {
+) -> AnyhowResult<Vec<UserBookmark>> {
 
-  let (entity_type, entity_token) = favorite_entity_token.get_composite_keys();
+  let (entity_type, entity_token) = user_bookmark_entity_token.get_composite_keys();
 
   let maybe_results= sqlx::query_as!(
-      RawFavoriteRecord,
+      RawUserBookmarkRecord,
         r#"
 SELECT
-    f.token as `token: tokens::tokens::favorites::FavoriteToken`,
+    f.token as `token: tokens::tokens::user_bookmarks::UserBookmarkToken`,
     f.user_token as `user_token: tokens::tokens::users::UserToken`,
     u.username,
     u.display_name as user_display_name,
@@ -44,7 +44,7 @@ SELECT
     f.deleted_at
 
 FROM
-    favorites AS f
+    user_bookmarks AS f
 JOIN users AS u
     ON f.user_token = u.token
 WHERE
@@ -64,18 +64,18 @@ LIMIT 50
     Err(err) => match err {
       sqlx::Error::RowNotFound => Ok(Vec::new()),
       _ => {
-        warn!("list favorites db error: {:?}", err);
+        warn!("list user_bookmarks db error: {:?}", err);
         Err(anyhow!("error with query: {:?}", err))
       }
     },
     Ok(results) => Ok(results.into_iter()
-        .map(|favorite| favorite.into_public_type())
+        .map(|user_bookmark| user_bookmark.into_public_type())
         .collect()),
   }
 }
 
-pub struct RawFavoriteRecord {
-  token: FavoriteToken,
+pub struct RawUserBookmarkRecord {
+  token: UserBookmarkToken,
 
   user_token: UserToken,
   username: String,
@@ -87,9 +87,9 @@ pub struct RawFavoriteRecord {
   deleted_at: Option<DateTime<Utc>>,
 }
 
-impl RawFavoriteRecord {
-  pub fn into_public_type(self) -> Favorite {
-    Favorite {
+impl RawUserBookmarkRecord {
+  pub fn into_public_type(self) -> UserBookmark {
+    UserBookmark {
       token: self.token,
       user_token: self.user_token,
       username: self.username,
