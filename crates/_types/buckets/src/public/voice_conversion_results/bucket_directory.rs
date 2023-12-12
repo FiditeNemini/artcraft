@@ -40,7 +40,7 @@ impl VoiceConversionResultDirectory {
 
 #[cfg(test)]
 mod tests {
-  use crate::public::voice_conversion_results::directory::VoiceConversionResultDirectory;
+  use crate::public::voice_conversion_results::bucket_directory::VoiceConversionResultDirectory;
 
   #[test]
   pub fn get_directory_path_str() {

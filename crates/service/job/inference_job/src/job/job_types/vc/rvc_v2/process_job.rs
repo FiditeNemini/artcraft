@@ -5,8 +5,8 @@ use std::time::Instant;
 use anyhow::anyhow;
 use log::{error, info, warn};
 
-use buckets::public::media_files::original_file::MediaFileBucketPath;
-use buckets::public::media_uploads::original_file::MediaUploadOriginalFilePath;
+use buckets::public::media_files::bucket_file_path::MediaFileBucketPath;
+use buckets::public::media_uploads::bucket_file_path::MediaUploadOriginalFilePath;
 use enums::by_table::generic_inference_jobs::inference_result_type::InferenceResultType;
 use filesys::check_file_exists::check_file_exists;
 use filesys::create_dir_all_if_missing::create_dir_all_if_missing;

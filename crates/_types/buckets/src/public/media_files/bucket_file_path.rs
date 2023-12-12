@@ -2,7 +2,7 @@ use std::path::PathBuf;
 
 use crockford::crockford_entropy_lower;
 
-use crate::public::media_files::directory::MediaFileBucketDirectory;
+use crate::public::media_files::bucket_directory::MediaFileBucketDirectory;
 use crate::public::public_path::PublicPath;
 
 const ORIGINAL_FILE_BASENAME : &str = "file.bin";
@@ -79,7 +79,7 @@ impl MediaFileBucketPath {
 mod tests {
   use std::path::PathBuf;
 
-  use crate::public::media_files::original_file::MediaFileBucketPath;
+  use crate::public::media_files::bucket_file_path::MediaFileBucketPath;
 
   mod with_prefix_and_extension {
     use super::*;

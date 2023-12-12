@@ -3,10 +3,9 @@ use std::path::PathBuf;
 use crockford::crockford_entropy_lower;
 
 use crate::private::private_path::PrivatePath;
-use crate::public::zs_voices::directory::{ModelCategory, ModelType, ZeroShotVoiceEmbeddingBucketDirectory};
+use crate::private::zs_voices::bucket_directory::{ModelCategory, ModelType, ZeroShotVoiceEmbeddingBucketDirectory};
 
 // TODO: Generate these from a macro.
-
 
 /// The original user upload file.
 /// It may have derivative files (down samples, crops, etc.) that live alongside it.
@@ -74,11 +73,9 @@ impl ZeroShotVoiceEmbeddingBucketPath {
 mod tests {
   use std::path::PathBuf;
 
-  use crate::public::media_files::original_file::MediaFileBucketPath;
-
   mod with_prefix_and_extension {
-    use crate::public::zs_voices::directory::ModelCategory;
-    use crate::public::zs_voices::file::{ModelType, ZeroShotVoiceEmbeddingBucketPath};
+    use crate::private::zs_voices::bucket_directory::ModelCategory;
+    use crate::private::zs_voices::bucket_file_path::{ModelType, ZeroShotVoiceEmbeddingBucketPath};
 
     #[test]
     pub fn generate_new_entropy() {
@@ -97,8 +94,8 @@ mod tests {
   }
 
   mod without_prefix_and_extension {
-    use crate::public::zs_voices::directory::ModelCategory;
-    use crate::public::zs_voices::file::{ModelType, ZeroShotVoiceEmbeddingBucketPath};
+    use crate::private::zs_voices::bucket_directory::ModelCategory;
+    use crate::private::zs_voices::bucket_file_path::{ModelType, ZeroShotVoiceEmbeddingBucketPath};
 
     use super::*;
 
@@ -135,7 +132,7 @@ mod tests {
     #[test]
     pub fn get_object_hash() {
       let hash = "abcdefghijk";
-      let file = MediaFileBucketPath::from_object_hash(hash, None, None);
+      let file = ZeroShotVoiceEmbeddingBucketPath::from_object_hash(hash, ModelCategory::Tts, ModelType::VallEx, 1);
       assert_eq!(file.get_object_hash(), hash);
     }
   }

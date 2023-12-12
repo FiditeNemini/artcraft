@@ -3,7 +3,7 @@ use std::path::PathBuf;
 use crockford::crockford_entropy_lower;
 
 use crate::public::public_path::PublicPath;
-use crate::public::voice_conversion_results::directory::VoiceConversionResultDirectory;
+use crate::public::voice_conversion_results::bucket_directory::VoiceConversionResultDirectory;
 
 const ORIGINAL_FILE_PREFIX : &str = "fakeyou_";
 const ORIGINAL_FILE_SUFFIX : &str = ".wav";
@@ -65,7 +65,7 @@ impl VoiceConversionResultOriginalFilePath {
 mod tests {
   use std::path::PathBuf;
 
-  use crate::public::voice_conversion_results::original_file::VoiceConversionResultOriginalFilePath;
+  use crate::public::voice_conversion_results::bucket_file_path::VoiceConversionResultOriginalFilePath;
 
   #[test]
   pub fn generate_new_entropy() {

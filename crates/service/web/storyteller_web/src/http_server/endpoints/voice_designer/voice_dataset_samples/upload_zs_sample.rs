@@ -6,7 +6,7 @@ use actix_web::{HttpRequest, HttpResponse, ResponseError, web};
 use hyper::StatusCode;
 use log::{error, info, warn};
 use once_cell::sync::Lazy;
-use buckets::public::media_files::original_file::MediaFileBucketPath;
+use buckets::public::media_files::bucket_file_path::MediaFileBucketPath;
 use enums::by_table::generic_inference_jobs::inference_input_source_token_type::InferenceInputSourceTokenType::MediaUpload;
 use enums::by_table::media_files::media_file_origin_category::MediaFileOriginCategory;
 use enums::by_table::media_uploads::media_upload_type::MediaUploadType;

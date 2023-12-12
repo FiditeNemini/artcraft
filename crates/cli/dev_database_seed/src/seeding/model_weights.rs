@@ -16,7 +16,7 @@ use tokens::tokens::users::UserToken;
 
 use crate::seeding::users::HANASHI_USERNAME;
 
-pub async fn seed_weights_for_paging(  mysql_pool: &Pool<MySql>,user_token: UserToken) -> AnyhowResult<()> {
+pub async fn seed_weights_for_paging(mysql_pool: &Pool<MySql>, user_token: UserToken) -> AnyhowResult<()> {
     let sd1_5_markdown_description = r#"
 # Dragonfruit AI Models Update and Workflow
 
@@ -81,9 +81,7 @@ pub async fn seed_weights_for_paging(  mysql_pool: &Pool<MySql>,user_token: User
 *Thank you for your continued support and feedback!*
 "#;
 
-let sd1_5_image_token = "https://image.civitai.com/xG1nkqKTMzGDvpLrqFT7WA/be706282-2978-42a0-aaa2-73881aad94e9/width=1024/00049-2287632957-1girl,face,curly%20hair,red%20hair,white%20background,.jpeg";
-
-    let user_token = user_token;
+    let sd1_5_image_token = "https://image.civitai.com/xG1nkqKTMzGDvpLrqFT7WA/be706282-2978-42a0-aaa2-73881aad94e9/width=1024/00049-2287632957-1girl,face,curly%20hair,red%20hair,white%20background,.jpeg";
 
     // create a loop that loops from 1 to 100
     for i in 1..=100 {
