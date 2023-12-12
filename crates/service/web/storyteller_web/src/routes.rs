@@ -206,6 +206,7 @@ pub fn add_routes<T, B> (app: App<T>, server_environment: ServerEnvironment) -> 
 
   let mut app = RouteBuilder::from_app(app)
       .add_post("/v1/animation/face_animation/create", enqueue_lipsync_animation_handler)
+      .add_post("/v1/animation/rerender/create", enqueue_rerender_animation_handler)
       .into_app();
 
   // ==================== "Generic" Inference ====================

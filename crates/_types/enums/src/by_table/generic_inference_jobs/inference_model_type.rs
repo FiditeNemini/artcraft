@@ -31,6 +31,8 @@ pub enum InferenceModelType {
   Vits,
   #[serde(rename = "vall_e_x")]
   VallEX,
+  #[serde(rename = "rerender_a_video")]
+  RerenderAVideo,
 }
 
 // TODO(bt, 2022-12-21): This desperately needs MySQL integration tests!

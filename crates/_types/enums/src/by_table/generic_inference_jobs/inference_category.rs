@@ -25,6 +25,9 @@ pub enum InferenceCategory {
 
   #[serde(rename = "voice_conversion")]
   VoiceConversion,
+
+  #[serde(rename = "rerender_a_video")]
+  RerenderAVideo,
 }
 
 // TODO(bt, 2022-12-21): This desperately needs MySQL integration tests!
@@ -38,6 +41,7 @@ impl InferenceCategory {
       Self::LipsyncAnimation => "lipsync_animation",
       Self::TextToSpeech => "text_to_speech",
       Self::VoiceConversion => "voice_conversion",
+      Self::RerenderAVideo => "rerender_a_video",
     }
   }
 
