@@ -27,6 +27,9 @@ import LikeButton from "components/common/LikeButton";
 import VdInferencePanel from "./inference_panels/VdInferencePanel";
 import VcInferencePanel from "./inference_panels/VcInferencePanel";
 import TtsInferencePanel from "./inference_panels/TtsInferencePanel";
+import Modal from "components/common/Modal";
+import SocialButton from "components/common/SocialButton";
+import Input from "components/common/Input";
 
 interface WeightProps {
   sessionWrapper: SessionWrapper;
@@ -55,6 +58,8 @@ export default function WeightPage({
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<boolean>(false);
   const timeUpdated = useTimeAgo(weight?.updated_at.toISOString() || "");
+  const [isShareModalOpen, setIsShareModalOpen] = useState(false);
+  const [buttonLabel, setButtonLabel] = useState("Copy");
 
   const getWeight = useCallback(async (weightToken: string) => {
     // Dummy data
@@ -333,6 +338,20 @@ export default function WeightPage({
 
   const subtitleDivider = <span className="opacity-25 fs-5 fw-light">|</span>;
 
+  const openShareModal = () => {
+    setIsShareModalOpen(true);
+  };
+
+  const closeShareModal = () => {
+    setIsShareModalOpen(false);
+  };
+
+  const handleCopyLink = () => {
+    navigator.clipboard.writeText("LINK");
+    setButtonLabel("Copied!");
+    setTimeout(() => setButtonLabel("Copy"), 1000);
+  };
+
   return (
     <div>
       <Container type="panel" className="mb-5">
@@ -396,6 +415,7 @@ export default function WeightPage({
                   icon={faShare}
                   label="Share"
                   className="flex-grow-1"
+                  onClick={openShareModal}
                 />
                 {/* Share and Create Buttons */}
 
@@ -471,6 +491,38 @@ export default function WeightPage({
           </Panel>
         </Container>
       </div>
+
+      {/* Share Modal */}
+      <Modal
+        show={isShareModalOpen}
+        handleClose={closeShareModal}
+        title="Share"
+        autoWidth={true}
+        content={
+          <div className="d-flex flex-column gap-4">
+            <div className="d-flex gap-3">
+              <SocialButton social="x" />
+              <SocialButton social="whatsapp" />
+              <SocialButton social="facebook" />
+              <SocialButton social="reddit" />
+              <SocialButton social="email" />
+            </div>
+            <div className="d-flex align-items-center position-relative">
+              <div className="w-100">
+                <Input type="text" value="link" readOnly />
+              </div>
+
+              <Button
+                label={buttonLabel}
+                onClick={handleCopyLink}
+                variant="primary"
+                small={true}
+                className="position-absolute end-0 me-1"
+              />
+            </div>
+          </div>
+        }
+      />
     </div>
   );
 }

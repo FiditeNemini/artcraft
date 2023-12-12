@@ -99,7 +99,6 @@ import { NewProfilePage } from "./pages/profile/profile_view/NewProfilePage";
 import { ProfilePage } from "./pages/profile/profile_view/ProfilePage";
 import { ModerationJobControlPage } from "./pages/moderation/job_control/ModerationJobControlPage";
 import WeightPage from "./pages/weight/WeightPage";
-import WeightEditPage from "./pages/weight/WeightEditPage";
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -358,9 +357,9 @@ class PageContainer extends React.Component<
               <MediaPage sessionWrapper={this.props.sessionWrapper} />
             </Route>
 
-            <Route path="/weight/:weight_token/edit">
+            {/* <Route path="/weight/:weight_token/edit">
               <WeightEditPage />
-            </Route>
+            </Route> */}
 
             <Route path="/weight/:weight_token">
               <WeightPage
