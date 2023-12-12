@@ -119,6 +119,7 @@ pub async fn main() -> AnyhowResult<()> {
 
   let (media_file_token, _id) = insert_media_file_from_cli_tool(InsertArgs {
     pool: &pool,
+    maybe_use_apriori_media_token: None,
     media_file_type,
     maybe_mime_type,
     file_size_bytes: 0, // TODO
