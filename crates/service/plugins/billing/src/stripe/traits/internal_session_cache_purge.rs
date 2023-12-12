@@ -1,4 +1,5 @@
 use actix_web::HttpRequest;
+use mockall::automock;
 
 /// Allows us to purge session caches that might keep stale premium plan/billing data around
 #[cfg_attr(test, automock)]

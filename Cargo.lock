@@ -6025,6 +6025,7 @@ dependencies = [
  "hex",
  "hmac 0.10.1",
  "hostname",
+ "http",
  "http_server_common",
  "hyper",
  "infer 0.5.0",

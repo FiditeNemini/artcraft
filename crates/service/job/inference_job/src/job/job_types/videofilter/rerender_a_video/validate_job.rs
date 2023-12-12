@@ -53,7 +53,7 @@ pub fn validate_job(job: &AvailableInferenceJob) -> Result<JobArgs, ProcessSingl
     }
   };
 
-  let sd_model = match &inference_args.sd_model {
+  let sd_model = match &inference_args.maybe_sd_model {
     Some(args) => args,
     None => {
       return Err(ProcessSingleJobError::from_anyhow_error(anyhow!("no sd model!")));

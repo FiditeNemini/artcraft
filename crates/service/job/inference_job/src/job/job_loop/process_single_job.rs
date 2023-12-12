@@ -182,6 +182,9 @@ async fn do_process_single_job(
     InferenceCategory::VoiceConversion => {
       process_single_vc_job(job_dependencies, job).await?
     }
+    InferenceCategory::RerenderAVideo => {
+      process_single_rerender_job(job_dependencies, job).await?
+    }
   };
 
   let maybe_entity_type = job_success_result.maybe_result_entity

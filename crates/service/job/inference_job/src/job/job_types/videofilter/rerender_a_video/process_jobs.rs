@@ -83,7 +83,7 @@ pub async fn process_job(args: RerenderProcessJobArgs<'_>) -> Result<JobSuccessR
         &deps.db.mysql_pool
     ).await?;
 
-    info!("Downloaded video file: {:?}", image_path.filesystem_path);
+    info!("Downloaded video file: {:?}", video_path.filesystem_path);
 
     // ==================== TRANSCODE MEDIA (IF NECESSARY) ==================== //
 

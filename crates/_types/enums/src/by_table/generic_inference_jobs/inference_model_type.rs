@@ -48,7 +48,8 @@ impl InferenceModelType {
       Self::SoVitsSvc => "so_vits_svc",
       Self::Tacotron2 => "tacotron2",
       Self::Vits => "vits",
-      Self::VallEX => "vall_e_x"
+      Self::VallEX => "vall_e_x",
+        Self::RerenderAVideo => "rerender_a_video",
     }
   }
 

@@ -239,6 +239,7 @@ pub async fn process_job(args: RvcV2ProcessJobArgs<'_>) -> Result<JobSuccessResu
         PolymorphicInferenceArgs::Tts { .. } => None,
         PolymorphicInferenceArgs::La(_) => None,
         PolymorphicInferenceArgs::Vc { override_f0_method, .. } => *override_f0_method,
+        PolymorphicInferenceArgs::Rr(_) => None,
       })
       .flatten();
 
@@ -247,6 +248,7 @@ pub async fn process_job(args: RvcV2ProcessJobArgs<'_>) -> Result<JobSuccessResu
         PolymorphicInferenceArgs::Tts { .. } => None,
         PolymorphicInferenceArgs::La(_) => None,
         PolymorphicInferenceArgs::Vc { transpose, .. } => *transpose,
+        PolymorphicInferenceArgs::Rr(_) => None,
       })
       .flatten();
 

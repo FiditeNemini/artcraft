@@ -32,5 +32,5 @@ pub struct RerenderArgs {
 
     #[serde(rename = "sd")]
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub sd_model: String,
+    pub maybe_sd_model: Option<String>,
 }

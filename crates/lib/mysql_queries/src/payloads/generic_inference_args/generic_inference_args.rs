@@ -3,7 +3,7 @@ use errors::AnyhowResult;
 
 use crate::payloads::generic_inference_args::lipsync_payload::LipsyncArgs;
 use crate::payloads::generic_inference_args::tts_payload::TTSArgs;
-use crate::payloads::generic_inference_args::videofilter_payload::VideofilterVideoSource;
+use crate::payloads::generic_inference_args::videofilter_payload::{RerenderArgs};
 
 
 /// Used to encode extra state for the `generic_inference_jobs` table.
