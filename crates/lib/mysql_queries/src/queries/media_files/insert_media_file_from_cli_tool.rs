@@ -14,6 +14,10 @@ use tokens::tokens::users::UserToken;
 pub struct InsertArgs<'a> {
   pub pool: &'a MySqlPool,
 
+  /// If supplied, use this media token rather than generating a new one.
+  /// This is good to support idempotency in development and testing.
+  pub maybe_use_apriori_media_token: Option<&'a MediaFileToken>,
+
   pub media_file_type: MediaFileType,
   pub maybe_mime_type: Option<&'a str>,
   pub file_size_bytes: u64,
@@ -35,7 +39,9 @@ pub async fn insert_media_file_from_cli_tool(
   args: InsertArgs<'_>
 ) -> AnyhowResult<(MediaFileToken, u64)>
 {
-  let media_file_token = MediaFileToken::generate();
+  let media_file_token = args.maybe_use_apriori_media_token
+      .map(|token| token.clone())
+      .unwrap_or_else(|| MediaFileToken::generate());
 
   let mut transaction = args.pool.begin().await?;
 

@@ -28,14 +28,6 @@ pub async fn seed_media_files(mysql_pool: &Pool<MySql>, maybe_bucket_clients: Op
   // NB: This is idempotent and will only install the media files once.
   // Delete the records if you want to re-seed.
   let media_files = [
-    // Images
-    (HANASHI_USER_TOKEN, "m_cn5t6ywm9k1ge9qzzxst5krc5tm08m", MediaFileType::Image, "media/images/face-animator-inputs/bill.jpg"),
-    (HANASHI_USER_TOKEN, "m_nf9xebrr8hd1bxkfy7src5k8nv2dzy", MediaFileType::Image, "media/images/face-animator-inputs/elon.jpg"),
-    (HANASHI_USER_TOKEN, "m_t17zh2r3ahs485b8m7c9q502cs6jqh", MediaFileType::Image, "media/images/face-animator-inputs/ernest.jpg"),
-    (HANASHI_USER_TOKEN, "m_vms09sby8tyw742y2s66a4w8f0w278", MediaFileType::Image, "media/images/face-animator-inputs/link.jpg"),
-    (HANASHI_USER_TOKEN, "m_s1z9krfzrscy92jgq3sxhpx1n4vxvc", MediaFileType::Image, "media/images/face-animator-inputs/ripley.jpg"),
-    (HANASHI_USER_TOKEN, "m_we7mnzbd76g4yn19dm6m53er0pjvew", MediaFileType::Image, "media/images/face-animator-inputs/san.png"),
-    (HANASHI_USER_TOKEN, "m_wahwz92nxxfg0x42dw9fdrhwq30yk0", MediaFileType::Image, "media/images/face-animator-inputs/zelda.jpg"),
     // Audio
     (HANASHI_USER_TOKEN, "m_21jxt406aattq2cna1xtgf5m4mjyyr", MediaFileType::Audio, "media/audio/voice-samples/biden.wav"),
     (HANASHI_USER_TOKEN, "m_cxzabpxf88h10rshqraksxbqmhs41h", MediaFileType::Audio, "media/audio/voice-samples/brandon1.wav"),
@@ -47,6 +39,27 @@ pub async fn seed_media_files(mysql_pool: &Pool<MySql>, maybe_bucket_clients: Op
     (HANASHI_USER_TOKEN, "m_rd1ey2jem8a37r3vna2h9mht6zevs5", MediaFileType::Audio, "media/audio/voice-samples/rick.wav"),
     (HANASHI_USER_TOKEN, "m_8n5epqfvs2vh60khap0s3ezem4epkc", MediaFileType::Audio, "media/audio/voice-samples/trump.wav"),
     (HANASHI_USER_TOKEN, "m_g6dpwcpq51e6kvmpbbkdvgxfan9k1k", MediaFileType::Audio, "media/audio/voice-samples/trump_tts.wav"),
+    // Images
+    (HANASHI_USER_TOKEN, "m_cn5t6ywm9k1ge9qzzxst5krc5tm08m", MediaFileType::Image, "media/image/face-animator-inputs/bill.jpg"),
+    (HANASHI_USER_TOKEN, "m_nf9xebrr8hd1bxkfy7src5k8nv2dzy", MediaFileType::Image, "media/image/face-animator-inputs/elon.jpg"),
+    (HANASHI_USER_TOKEN, "m_t17zh2r3ahs485b8m7c9q502cs6jqh", MediaFileType::Image, "media/image/face-animator-inputs/ernest.jpg"),
+    (HANASHI_USER_TOKEN, "m_vms09sby8tyw742y2s66a4w8f0w278", MediaFileType::Image, "media/image/face-animator-inputs/link.jpg"),
+    (HANASHI_USER_TOKEN, "m_s1z9krfzrscy92jgq3sxhpx1n4vxvc", MediaFileType::Image, "media/image/face-animator-inputs/ripley.jpg"),
+    (HANASHI_USER_TOKEN, "m_we7mnzbd76g4yn19dm6m53er0pjvew", MediaFileType::Image, "media/image/face-animator-inputs/san.png"),
+    (HANASHI_USER_TOKEN, "m_wahwz92nxxfg0x42dw9fdrhwq30yk0", MediaFileType::Image, "media/image/face-animator-inputs/zelda.jpg"),
+    // Video
+    (HANASHI_USER_TOKEN, "m_gedarcfdkxx3zv8zz2wmwsnc1r8jbp", MediaFileType::Video, "media/video/storyteller-studio-renders/girl-rotating-room.mp4"),
+    (HANASHI_USER_TOKEN, "m_3s74yyd4jwrjdp17yx1694n29jv5gr", MediaFileType::Video, "media/video/storyteller-studio-renders/hanashi-run.mp4"),
+    (HANASHI_USER_TOKEN, "m_p6d64gm1wawz25bmdahfded3366b9f", MediaFileType::Video, "media/video/storyteller-studio-renders/mocap-kiss.mp4"),
+    (HANASHI_USER_TOKEN, "m_szp2c77z6je965k44vc22xn9432a88", MediaFileType::Video, "media/video/storyteller-studio-renders/rotating-mocap-girl.mp4"),
+    (HANASHI_USER_TOKEN, "m_mdwspz81zymw9hvmb1d3jm830t25xe", MediaFileType::Video, "media/video/storyteller-studio-renders/rotating-mocap-m.mp4"),
+    (HANASHI_USER_TOKEN, "m_prcs6xkm8phs5y4a2dfwemwjy6n6z3", MediaFileType::Video, "media/video/storyteller-studio-renders/rotating-run-girl.mp4"),
+    (HANASHI_USER_TOKEN, "m_5j889dzw08vn9pbrscx1sncff43ekp", MediaFileType::Video, "media/video/storyteller-studio-renders/rotating-run-jww.mp4"),
+    (HANASHI_USER_TOKEN, "m_fwm2w6wbssez274ayz6x8ta0h1a9qp", MediaFileType::Video, "media/video/storyteller-studio-renders/rotating-run-pascal.mp4"),
+    (HANASHI_USER_TOKEN, "m_yqqkrt2srep6a35xg78114jn9epwg1", MediaFileType::Video, "media/video/storyteller-studio-renders/rotating-run-pop.mp4"),
+    (HANASHI_USER_TOKEN, "m_m4r043kez14pm6vaamsecpz8fafh7g", MediaFileType::Video, "media/video/video-style-transfer/man-explaining.mp4"),
+    (HANASHI_USER_TOKEN, "m_81gq3hygqvrahg6ncxbtcpjap4f9nv", MediaFileType::Video, "media/video/video-style-transfer/woman-gradient-background.mp4"),
+    (HANASHI_USER_TOKEN, "m_dp9ykj3yasjx69g2fx2bpd26wwjz0f", MediaFileType::Video, "media/video/video-style-transfer/woman-red-hair.mp4"),
   ];
 
   let seed_tool_data_root = get_seed_tool_data_root();
@@ -117,6 +130,7 @@ async fn seed_model(
 
   insert_media_file_from_cli_tool(InsertArgs {
     pool: &mysql_pool,
+    maybe_use_apriori_media_token: Some(media_file_token),
     media_file_type,
     maybe_mime_type,
     file_size_bytes,
