@@ -19,7 +19,9 @@ pub struct InsertArgs<'a> {
   pub file_size_bytes: u64,
   pub sha256_checksum: &'a str,
 
-  pub maybe_creator_user_token: Option<UserToken>,
+  pub maybe_origin_filename: Option<&'a str>,
+
+  pub maybe_creator_user_token: Option<&'a UserToken>,
   pub creator_set_visibility: Visibility,
 
   pub public_bucket_directory_hash: &'a str,
@@ -58,6 +60,8 @@ SET
   file_size_bytes = ?,
   checksum_sha2 = ?,
 
+  maybe_origin_filename = ?,
+
   public_bucket_directory_hash = ?,
   maybe_public_bucket_prefix = ?,
   maybe_public_bucket_extension = ?,
@@ -76,6 +80,8 @@ SET
       args.maybe_mime_type,
       args.file_size_bytes,
       args.sha256_checksum,
+
+      args.maybe_origin_filename,
 
       args.public_bucket_directory_hash,
       args.maybe_public_bucket_prefix,

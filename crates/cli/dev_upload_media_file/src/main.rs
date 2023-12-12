@@ -123,6 +123,7 @@ pub async fn main() -> AnyhowResult<()> {
     maybe_mime_type,
     file_size_bytes: 0, // TODO
     sha256_checksum: "", // TODO
+    maybe_origin_filename: None,
     maybe_creator_user_token: None,
     creator_set_visibility,
     public_bucket_directory_hash: public_upload_path.get_object_hash(),
