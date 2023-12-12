@@ -1,19 +1,13 @@
-use std::time::Duration;
-
 use anyhow::anyhow;
 use log::{error, info};
 
-use enums::by_table::voice_conversion_models::voice_conversion_model_type::VoiceConversionModelType;
 use mysql_queries::queries::generic_inference::job::list_available_generic_inference_jobs::AvailableInferenceJob;
 use mysql_queries::queries::media_uploads::get_media_upload_for_inference::get_media_upload_for_inference;
-use mysql_queries::queries::voice_conversion::inference::get_voice_conversion_model_for_inference::get_voice_conversion_model_for_inference;
 use tokens::tokens::media_uploads::MediaUploadToken;
 
 use crate::job::job_loop::job_success_result::JobSuccessResult;
 use crate::job::job_loop::process_single_job_error::ProcessSingleJobError;
-use crate::job::job_types::vc::{rvc_v2, so_vits_svc};
-use crate::job::job_types::vc::rvc_v2::process_job::RvcV2ProcessJobArgs;
-use crate::job::job_types::vc::so_vits_svc::process_job::SoVitsSvcProcessJobArgs;
+use crate::job::job_types::videofilter::rerender_a_video;
 use crate::job_dependencies::JobDependencies;
 
 pub async fn process_single_rr_job(job_dependencies: &JobDependencies, job: &AvailableInferenceJob) -> Result<JobSuccessResult, ProcessSingleJobError> {
@@ -47,17 +41,24 @@ pub async fn process_single_rr_job(job_dependencies: &JobDependencies, job: &Ava
 
 
 
-    let job_success_result = match vc_model.model_type {
-        VoiceConversionModelType::RvcV2 => {
-            rvc_v2::process_job::process_job(RvcV2ProcessJobArgs {
-                job_dependencies,
-                job,
-                vc_model: &vc_model,
-                media_upload_token: &media_upload_token,
-                media_upload: &media_upload,
-            }).await?
+    // let job_success_result = match vc_model.model_type {
+    //     VoiceConversionModelType::RvcV2 => {
+    //         rvc_v2::process_job::process_job(RvcV2ProcessJobArgs {
+    //             job_dependencies,
+    //             job,
+    //             vc_model: &vc_model,
+    //             media_upload_token: &media_upload_token,
+    //             media_upload: &media_upload,
+    //         }).await?
+    //     }
+    // };
+
+    let job_success_result = rerender_a_video::process_job::process_job(
+        rerender_a_video::process_job::RerenderProcessJobArgs {
+            job_dependencies,
+            job
         }
-    };
+    ).await?;
 
     Ok(job_success_result)
 }

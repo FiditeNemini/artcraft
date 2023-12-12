@@ -1,4 +1,4 @@
-mod process_jobs;
+pub(crate) mod process_job;
 mod validate_job;
 mod download_video_file;
 mod rerender_inference_command;

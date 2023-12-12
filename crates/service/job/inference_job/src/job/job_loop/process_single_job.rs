@@ -16,6 +16,7 @@ use crate::job::job_loop::process_single_job_success_case::ProcessSingleJobSucce
 use crate::job::job_types::lipsync::process_single_lipsync_job::process_single_lipsync_job;
 use crate::job::job_types::tts::process_single_tts_job::process_single_tts_job;
 use crate::job::job_types::vc::process_single_vc_job::process_single_vc_job;
+use crate::job::job_types::videofilter::process_single_vf_job::process_single_rr_job;
 use crate::job_dependencies::JobDependencies;
 
 pub async fn process_single_job(
@@ -183,7 +184,7 @@ async fn do_process_single_job(
       process_single_vc_job(job_dependencies, job).await?
     }
     InferenceCategory::RerenderAVideo => {
-      process_single_rerender_job(job_dependencies, job).await?
+      process_single_rr_job(job_dependencies, job).await?
     }
   };
 

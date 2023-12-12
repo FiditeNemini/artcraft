@@ -77,9 +77,9 @@ impl RerenderInferenceCommand {
         maybe_execution_timeout: Option<Duration>,
     ) -> Self {
         Self {
-            rerender_root_code_directory: rerender_root_code_directory.as_ref().to_path_buf(),
+            rerender_root_code_directory: rerender_root_code_directory.clone(),
             executable_or_command,
-            config_path: config_path.as_ref().to_path_buf(),
+            config_path: config_path.clone(),
             maybe_virtual_env_activation_command: maybe_virtual_env_activation_command.map(|s| s.to_string()),
             maybe_docker_options,
             maybe_execution_timeout,
@@ -92,6 +92,20 @@ impl RerenderInferenceCommand {
 
         let config_path = easyenv::get_env_pathbuf_required(
             "RERENDER_INFERENCE_CONFIG_PATH")?;
+
+        let executable_or_command = match easyenv::get_env_string_optional(
+            "RERENDER_INFERENCE_EXECUTABLE_OR_COMMAND") {
+            None => {
+                return Err(anyhow!("RERENDER_INFERENCE_EXECUTABLE_OR_COMMAND is required"));
+            }
+            Some(executable_or_command) => {
+                if executable_or_command.contains(" ") {
+                    ExecutableOrCommand::Command(executable_or_command)
+                } else {
+                    ExecutableOrCommand::Executable(PathBuf::from(executable_or_command))
+                }
+            }
+        };
 
         let maybe_virtual_env_activation_command = easyenv::get_env_string_optional(
             "RERENDER_INFERENCE_MAYBE_VENV_COMMAND");
@@ -192,7 +206,7 @@ impl RerenderInferenceCommand {
 
         let mut config = PopenConfig::default();
 
-        info!("stderr will be written to file: {:?}", args.stderr_output_file.as_ref());
+        info!("stderr will be written to file: {:?}", args.stderr_output_file.as_os_str());
 
         let stderr_file = File::create(&args.stderr_output_file)?;
         config.stderr = Redirection::File(stderr_file);
