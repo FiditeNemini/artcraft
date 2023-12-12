@@ -1,7 +1,7 @@
 import React from "react";
 import { animated } from "@react-spring/web";
 import { TempAudioPlayer, AudioBlobPreview, AudioInput, BasicVideo, Checkbox, ImageInput, SegmentButtons } from "components/common";
-import { FaceAnimatorSlide } from "./FaceAnimatorTypes";
+import { FaceAnimatorSlide } from "../FaceAnimatorTypes";
 
 export default function FaceAnimatorInput({ audioProps, imageProps, frameDimensions, frameDimensionsChange, disableFaceEnhancement, disableFaceEnhancementChange, preferPresetAudio,  preferPresetAudioSet,  presetAudio,  still, stillChange, toggle, style, t, removeWatermark, removeWatermarkChange, }: FaceAnimatorSlide) {
   return <animated.div {...{ className: "lipsync-editor row", style }}>

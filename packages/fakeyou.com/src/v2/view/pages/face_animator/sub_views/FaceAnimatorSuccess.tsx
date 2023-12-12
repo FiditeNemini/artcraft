@@ -1,6 +1,6 @@
 import React from 'react';
 import { a } from '@react-spring/web';
-import { FaceAnimatorSlide } from "./FaceAnimatorTypes";
+import { FaceAnimatorSlide } from "../FaceAnimatorTypes";
 
 export default function FaceAnimatorSuccess({ style, t }: FaceAnimatorSlide) {
   return <a.div {...{ className: "lipsync-success", style }}>

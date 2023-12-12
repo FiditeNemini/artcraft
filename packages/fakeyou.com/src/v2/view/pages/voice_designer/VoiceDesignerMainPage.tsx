@@ -1,12 +1,6 @@
 import React, { useState } from "react";
 import { Redirect, useHistory, useLocation } from "react-router-dom";
-import {
-  faPenToSquare,
-  faPlus,
-  faRightToBracket,
-  faStar,
-  faWaveform,
-} from "@fortawesome/pro-solid-svg-icons";
+import { faPenToSquare, faPlus, faRightToBracket, faStar, faWaveform } from "@fortawesome/pro-solid-svg-icons";
 import InferenceJobsList from "components/layout/InferenceJobsList";
 import { useLocalize } from "hooks";
 import Panel from "components/common/Panel";
@@ -20,22 +14,12 @@ import useVoiceRequests from "./useVoiceRequests";
 import { usePrefixedDocumentTitle } from "common/UsePrefixedDocumentTitle";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faMicrophone } from "@fortawesome/pro-solid-svg-icons";
-
-import {
-  FrontendInferenceJobType,
-  // InferenceJob,
-} from "@storyteller/components/src/jobs/InferenceJob";
-import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
-import { SessionSubscriptionsWrapper } from "@storyteller/components/src/session/SessionSubscriptionsWrapper";
+import { FrontendInferenceJobType } from "@storyteller/components/src/jobs/InferenceJob";
 import { useSession } from "hooks";
 
-interface Props {
-  sessionWrapper: SessionWrapper;
-  sessionSubscriptionsWrapper: SessionSubscriptionsWrapper;
-  inferenceJobsByCategory: any;
-}
+// interface Props {}
 
-function VoiceDesignerMainPage(props: Props) {
+function VoiceDesignerMainPage() {
   usePrefixedDocumentTitle("AI Voice Designer");
   const { pathname } = useLocation();
   const { t } = useLocalize("FaceAnimator");
@@ -44,9 +28,7 @@ function VoiceDesignerMainPage(props: Props) {
     requestVoices: true,
   });
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-  const view = ["/voice-designer/datasets", "/voice-designer/voices"].indexOf(
-    pathname
-  );
+  const view = ["/voice-designer/datasets", "/voice-designer/voices"].indexOf(pathname);
   const [deleteItem, setDeleteItem] = useState("");
   const [deleteType, setDeleteType] = useState("");
   const [deleteText, setDeleteText] = useState({
@@ -161,14 +143,12 @@ function VoiceDesignerMainPage(props: Props) {
     };
   });
 
-  const statusTxt = (status: number, config: any) =>
-    [
-      "Voice pending...",
-      "Voice in progress",
-      "Voice failed",
-      "Voice dead",
-      "Voice created successfully",
-    ][status];
+  const failures = (fail = "") => {
+    switch (fail) {
+      // case "face_not_detected": return "Face not detected, try another picture"; // voice designer can have failure states too!
+      default: return "Uknown failure";
+    }
+  };
 
   const createVoiceButton = {
     label: `Create new voice`,
@@ -204,11 +184,9 @@ function VoiceDesignerMainPage(props: Props) {
     <>
       <InferenceJobsList
         {...{
-          t,
-          inferenceJobs: props.inferenceJobsByCategory.get(
-            FrontendInferenceJobType.VoiceDesignerCreateVoice
-          ),
-          statusTxt,
+          failures,
+          jobType: FrontendInferenceJobType.VoiceDesignerCreateVoice,
+          t
         }}
       />
       <Panel mb={true}>

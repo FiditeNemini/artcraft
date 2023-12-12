@@ -2,7 +2,7 @@ import React from 'react';
 import { a, useTransition } from "@react-spring/web";
 import { Spinner } from "components/common";
 import { springs } from "resources";
-import { FaceAnimatorSlide } from "./FaceAnimatorTypes";
+import { FaceAnimatorSlide } from "../FaceAnimatorTypes";
 
 export default function FaceAnimatorWorking({ audioProps, imageProps, index, style, t }: FaceAnimatorSlide) {
   const workStatus = [

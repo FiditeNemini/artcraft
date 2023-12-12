@@ -1,0 +1,52 @@
+{
+  "FaceAnimation": {
+    "ATTEMPT_FAILED": "Upaya Animasi Wajah Gagal",
+    "COMPLETE_FAILURE": "Animasi Wajah Gagal.",
+    "COMPLETE_SUCCESS": "Animasi Wajah Lengkap",
+    "DEAD": "Animasi Wajah Mati",
+    "PENDING": "Animasi Wajah Tertunda",
+    "STARTED": "Animasi Wajah Sedang Berlangsung",
+    "UNKNOWN": "Status Animasi Tidak Diketahui",
+    "heading": "Pekerjaan Animator Wajah"
+  },
+  "VoiceDesignerCreateVoice": {
+    "ATTEMPT_FAILED": "Upaya Animasi Wajah Gagal",
+    "COMPLETE_FAILURE": "Animasi Wajah Gagal.",
+    "COMPLETE_SUCCESS": "Animasi Wajah Lengkap",
+    "DEAD": "Desainer Suara Mati",
+    "PENDING": "Desainer Suara Tertunda",
+    "STARTED": "Perancang Suara Sedang Berlangsung",
+    "UNKNOWN": "Status Perancang Suara Tidak Diketahui",
+    "heading": "Pekerjaan Desainer Suara"
+  },
+  "core": {
+    "heading": "Pekerjaan Terbaru"
+  },
+  "face_animator": {
+    "ATTEMPT_FAILED": "Upaya Animasi Wajah Gagal",
+    "COMPLETE_FAILURE": "Animasi Wajah Gagal.",
+    "COMPLETE_SUCCESS": "Animasi Wajah Lengkap",
+    "PENDING": "Animasi Wajah Tertunda",
+    "STARTED": "Animasi Wajah Sedang Berlangsung",
+    "UNKNOWN": "Status Animasi Tidak Diketahui",
+    "heading": "Pekerjaan Animator Wajah"
+  },
+  "subtitles": {
+    "ATTEMPT_FAILED": "Mencoba {{attemptCount}} gagal, coba lagi.",
+    "COMPLETE_FAILURE": "Silakan coba lagi",
+    "COMPLETE_SUCCESS": "Lihat hasil",
+    "DEAD": "Silakan coba lagi",
+    "PENDING": "Menambah antrian",
+    "STARTED": "Harap tunggu",
+    "UNKNOWN": "Harap tunggu atau coba lagi"
+  },
+  "voice_designer": {
+    "ATTEMPT_FAILED": "Upaya Animasi Wajah Gagal",
+    "COMPLETE_FAILURE": "Animasi Wajah Gagal.",
+    "COMPLETE_SUCCESS": "Animasi Wajah Lengkap",
+    "PENDING": "Desainer Suara Tertunda",
+    "STARTED": "Perancang Suara Sedang Berlangsung",
+    "UNKNOWN": "Status Perancang Suara Tidak Diketahui",
+    "heading": "Pekerjaan Desainer Suara"
+  }
+}
