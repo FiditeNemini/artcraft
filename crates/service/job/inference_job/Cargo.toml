@@ -41,9 +41,6 @@ tts_common = { path = "../../../lib/tts_common" }
 # Workspace hack (faster compile times)
 my-workspace-hack = { version = "0.1", path = "../../../my-workspace-hack" }
 
-# Vendored code
-newrelic-telemetry = { path = "../../../vendor/newrelic-telemetry-sdk-rust" }
-
 # External
 anyhow = "1.0.75"
 chrono = { version = "0.4.22", features = ["serde"] }
