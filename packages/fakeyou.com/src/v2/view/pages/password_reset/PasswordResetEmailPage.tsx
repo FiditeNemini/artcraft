@@ -11,6 +11,7 @@ import { faEnvelope } from "@fortawesome/pro-solid-svg-icons";
 import {
   RequestResetPassword, RequestResetPasswordIsSuccess,
 } from "@storyteller/components/src/api/user/RequestResetPassword";
+import { useSession } from "hooks";
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -18,15 +19,14 @@ interface Props {
 
 function PasswordResetEmailPage(props: Props) {
   let history = useHistory();
+  const { user } = useSession();
 
   usePrefixedDocumentTitle("Reset Password");
 
   const [emailOrUsername, setEmailOrUsername] = useState("");
   const [isSent, setIsSent] = useState(false);
 
-  if (props.sessionWrapper.isLoggedIn()) {
-    history.push("/");
-  }
+  if (!user) { history.push("/"); }
 
   const handleChange = (
     ev: React.FormEvent<HTMLInputElement>
@@ -35,9 +35,7 @@ function PasswordResetEmailPage(props: Props) {
     setEmailOrUsername(value);
   }
 
-  const handleSubmit = async (
-    ev: React.FormEvent<HTMLButtonElement>
-  ) : Promise<boolean> => {
+  const onSubmit = async ( ev: any ) : Promise<boolean> => {
     ev.preventDefault();
 
     const value = emailOrUsername.trim();
@@ -50,11 +48,11 @@ function PasswordResetEmailPage(props: Props) {
       username_or_email: value 
     };
 
-    const response = await RequestResetPassword(request);
-
-    if (RequestResetPasswordIsSuccess(response)) {
-      setIsSent(true);
-    }
+    RequestResetPassword(request).then((res: any) => {
+      if (RequestResetPasswordIsSuccess(res)) {
+        setIsSent(true);
+      }
+    });
 
     return false;
   }
@@ -84,20 +82,16 @@ function PasswordResetEmailPage(props: Props) {
         panel={false}
         showBackButton={true}
       />
-
       <Panel padding={true}>
-        <form>
-          <div className="d-flex flex-column gap-4">
-            <Input
-              label="Enter Email or Username"
-              icon={faEnvelope}
-              placeholder="Email address or username"
-              value={emailOrUsername}
-              onChange={handleChange}
-            />
-
-            <Button label="Reset Password" onClick={handleSubmit} />
-          </div>
+        <form {...{ className: "d-flex flex-column gap-4", onSubmit }}>
+          <Input
+            label="Enter Email or Username"
+            icon={faEnvelope}
+            placeholder="Email address or username"
+            value={emailOrUsername}
+            onChange={handleChange}
+          />
+          <Button {...{ label: "Reset Password", type: "submit" }} />
         </form>
       </Panel>
     </Container>
