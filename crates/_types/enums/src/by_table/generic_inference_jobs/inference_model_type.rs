@@ -94,6 +94,7 @@ mod tests {
     assert_serialization(InferenceModelType::Tacotron2, "tacotron2");
     assert_serialization(InferenceModelType::Vits, "vits");
     assert_serialization(InferenceModelType::VallEX, "vall_e_x");
+    assert_serialization(InferenceModelType::RerenderAVideo, "rerender_a_video");
   }
 
   #[test]
@@ -104,6 +105,7 @@ mod tests {
     assert_eq!(InferenceModelType::Tacotron2.to_str(), "tacotron2");
     assert_eq!(InferenceModelType::Vits.to_str(), "vits");
     assert_eq!(InferenceModelType::VallEX.to_str(), "vall_e_x");
+    assert_eq!(InferenceModelType::RerenderAVideo.to_str(), "rerender_a_video");
   }
 
   #[test]
@@ -114,19 +116,21 @@ mod tests {
     assert_eq!(InferenceModelType::from_str("tacotron2").unwrap(), InferenceModelType::Tacotron2);
     assert_eq!(InferenceModelType::from_str("vits").unwrap(), InferenceModelType::Vits);
     assert_eq!(InferenceModelType::from_str("vall_e_x").unwrap(), InferenceModelType::VallEX);
+    assert_eq!(InferenceModelType::from_str("rerender_a_video").unwrap(), InferenceModelType::RerenderAVideo);
   }
 
   #[test]
   fn all_variants() {
     // Static check
     let mut variants = InferenceModelType::all_variants();
-    assert_eq!(variants.len(), 6);
+    assert_eq!(variants.len(), 7);
     assert_eq!(variants.pop_first(), Some(InferenceModelType::RvcV2));
     assert_eq!(variants.pop_first(), Some(InferenceModelType::SadTalker));
     assert_eq!(variants.pop_first(), Some(InferenceModelType::SoVitsSvc));
     assert_eq!(variants.pop_first(), Some(InferenceModelType::Tacotron2));
     assert_eq!(variants.pop_first(), Some(InferenceModelType::Vits));
     assert_eq!(variants.pop_first(), Some(InferenceModelType::VallEX));
+    assert_eq!(variants.pop_first(), Some(InferenceModelType::RerenderAVideo));
     assert_eq!(variants.pop_first(), None);
 
     // Generated check
