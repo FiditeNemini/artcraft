@@ -507,6 +507,7 @@ export default function WeightPage({
         handleClose={closeShareModal}
         title="Share"
         autoWidth={true}
+        showButtons={false}
         content={
           <div className="d-flex flex-column gap-4">
             <div className="d-flex gap-3">

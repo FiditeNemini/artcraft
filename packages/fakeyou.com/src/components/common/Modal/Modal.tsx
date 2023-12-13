@@ -14,6 +14,7 @@ interface ModalProps {
   content: React.ReactNode;
   icon?: IconDefinition;
   autoWidth?: boolean;
+  showButtons?: boolean;
 }
 
 const Modal: React.FC<ModalProps> = ({
@@ -25,6 +26,7 @@ const Modal: React.FC<ModalProps> = ({
   content,
   icon,
   autoWidth,
+  showButtons = true,
 }) => {
   const fadeIn = useSpring({
     opacity: show ? 1 : 0,
@@ -87,25 +89,14 @@ const Modal: React.FC<ModalProps> = ({
               ></button>
             </div>
             <div className="modal-body">{content}</div>
-            {onCancel ||
-              (onConfirm && (
-                <div className="modal-footer">
-                  {onCancel && (
-                    <Button
-                      variant="secondary"
-                      label="Cancel"
-                      onClick={onCancel}
-                    />
-                  )}
-                  {onConfirm && (
-                    <Button
-                      variant="danger"
-                      label="Delete"
-                      onClick={onConfirm}
-                    />
-                  )}
-                </div>
-              ))}
+            {showButtons && (
+              <div className="modal-footer">
+                <Button variant="secondary" label="Cancel" onClick={onCancel} />
+                {onConfirm && (
+                  <Button variant="danger" label="Delete" onClick={onConfirm} />
+                )}
+              </div>
+            )}
           </div>
         </div>
       </div>
