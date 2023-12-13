@@ -77,12 +77,12 @@ export default function WeightPage({
       weight_category: WeightCategory.TTS,
       maybe_creator_user: {
         user_token: "test",
-        username: "test",
-        display_name: "Test",
+        username: "",
+        display_name: "",
         gravatar_hash: "test",
         default_avatar: {
-          image_index: 1,
-          color_index: 2,
+          image_index: 0,
+          color_index: 0,
         },
       },
       creator_set_visibility: "Public",
@@ -462,19 +462,24 @@ export default function WeightPage({
                     size={48}
                     username={weight.maybe_creator_user?.display_name}
                     avatarIndex={
-                      weight.maybe_creator_user?.default_avatar.image_index
+                      weight.maybe_creator_user?.default_avatar.image_index || 0
                     }
                     backgroundIndex={
-                      weight.maybe_creator_user?.default_avatar.color_index
+                      weight.maybe_creator_user?.default_avatar.color_index || 0
                     }
                   />
                   <div className="d-flex flex-column">
-                    <Link
-                      className="fw-medium"
-                      to={`/profile/${weight.maybe_creator_user?.display_name}`}
-                    >
-                      {weight.maybe_creator_user?.display_name}
-                    </Link>
+                    {weight.maybe_creator_user?.display_name ? (
+                      <Link
+                        className="fw-medium"
+                        to={`/profile/${weight.maybe_creator_user?.display_name}`}
+                      >
+                        {weight.maybe_creator_user?.display_name}
+                      </Link>
+                    ) : (
+                      <p className="fw-medium text-white">Anonymous</p>
+                    )}
+
                     <p className="fs-7">Updated: {timeUpdated}</p>
                   </div>
                 </div>
