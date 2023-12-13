@@ -242,7 +242,12 @@ pub async fn enqueue_infer_tts_handler(
 
   // ==================== RATE LIMIT ==================== //
 
+  // TODO(bt,2023-12-13): Unit test this!
   if !disable_rate_limiter {
+    // For AI live streamers
+    // https://www.notion.so/storytellerai/dd88609558a24196b4ddeeef6079da98
+    let mut is_ai_streamer = false;
+
     let mut rate_limiter = match maybe_user_session {
       None => &server_state.redis_rate_limiters.logged_out,
       Some(ref user) => {
@@ -250,6 +255,15 @@ pub async fn enqueue_infer_tts_handler(
           warn!("User is not authorized to use TTS model because they are banned.");
           return Err(InferTtsError::NotAuthorized);
         }
+
+        if server_state
+            .redis_rate_limiters
+            .api_ai_streamer_username_set
+            .username_is_in_set(&user.user.username)
+        {
+          is_ai_streamer = true;
+        }
+
         &server_state.redis_rate_limiters.logged_in
       },
     };
@@ -262,6 +276,11 @@ pub async fn enqueue_infer_tts_handler(
     // TODO: This is for VidVoice.ai and should be replaced with per-API consumer rate limiters
     if use_high_priority_rate_limiter {
       rate_limiter = &server_state.redis_rate_limiters.api_high_priority;
+    }
+
+    if is_ai_streamer {
+      info!("Using AI streamer rate limiter");
+      rate_limiter = &server_state.redis_rate_limiters.api_ai_streamers;
     }
 
     if let Err(_err) = rate_limiter.rate_limit_request(&http_request) {

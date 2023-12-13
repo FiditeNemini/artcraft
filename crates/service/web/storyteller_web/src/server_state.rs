@@ -20,6 +20,7 @@ use url_config::third_party_url_redirector::ThirdPartyUrlRedirector;
 use users_component::cookies::anonymous_visitor_tracking::avt_cookie_manager::AvtCookieManager;
 use users_component::cookies::session::session_cookie_manager::SessionCookieManager;
 use users_component::utils::session_checker::SessionChecker;
+use crate::configs::app_startup::username_set::UsernameSet;
 
 use crate::http_server::endpoints::categories::tts::list_fully_computed_assigned_tts_categories::list_fully_computed_assigned_tts_categories::ModelTokensByCategoryToken;
 use crate::http_server::endpoints::leaderboard::get_leaderboard::LeaderboardInfo;
@@ -139,6 +140,12 @@ pub struct RedisRateLimiters {
   /// of these or finds a better rate limit library that allows on-demand rate
   /// constructions)
   pub api_high_priority: RedisRateLimiter,
+
+  /// API rate limit for AI streamers
+  pub api_ai_streamers: RedisRateLimiter,
+
+  /// Usernames of AI streamers
+  pub api_ai_streamer_username_set: UsernameSet,
 
   /// A rate limiter for TTS and W2L uploads
   pub model_upload: RedisRateLimiter,
