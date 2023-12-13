@@ -314,7 +314,7 @@ function LandingPage(props: Props) {
               <div className="d-flex px-4 pt-4 align-items-start w-100">
                 <div className="flex-grow-1">
                   <div className="mb-1">
-                    <span className="badge-new d-inline-flex align-items-center mb-2 me-2">
+                    <span className="badge-beta d-inline-flex align-items-center mb-2 me-2">
                       <FontAwesomeIcon icon={faFlask} className="me-1" />
                       BETA
                     </span>
