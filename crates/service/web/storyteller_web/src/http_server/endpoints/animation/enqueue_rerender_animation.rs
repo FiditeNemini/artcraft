@@ -20,7 +20,6 @@ use mysql_queries::payloads::generic_inference_args::videofilter_payload::{Reren
 use mysql_queries::queries::generic_inference::web::insert_generic_inference_job::{insert_generic_inference_job, InsertGenericInferenceArgs};
 use tokens::tokens::generic_inference_jobs::InferenceJobToken;
 use tokens::tokens::media_files::MediaFileToken;
-use tokens::tokens::media_uploads::MediaUploadToken;
 use tokens::tokens::users::UserToken;
 
 use crate::configs::plans::get_correct_plan_for_session::get_correct_plan_for_session;
@@ -39,17 +38,12 @@ const ROUTING_TAG_HEADER_NAME : &str = "routing-tag";
 pub struct EnqueueRerenderAnimationRequest {
     uuid_idempotency_token: String,
 
-    video_source: VideoSource,
+    video_source: Option<MediaFileToken>,
     sd_model: String,
     creator_set_visibility: Option<Visibility>,
 }
 
 /// Treated as an enum. Only one of these may be set.
-#[derive(Deserialize)]
-pub struct VideoSource {
-    maybe_media_file_token: Option<MediaFileToken>,
-    maybe_media_upload_token: Option<MediaUploadToken>,
-}
 
 #[derive(Serialize)]
 pub struct EnqueueRerenderAnimationSuccessResponse {
@@ -165,10 +159,8 @@ pub async fn enqueue_rerender_animation_handler(
     // TODO(bt): CHECK DATABASE FOR TOKENS!
 
     let video_source: VideofilterVideoSource = {
-        if let Some(ref token) = request.video_source.maybe_media_file_token {
+        if let Some(ref token) = request.video_source {
             VideofilterVideoSource::media_file_token(token.as_str())
-        } else if let Some(ref token) = request.video_source.maybe_media_upload_token {
-            VideofilterVideoSource::media_upload_token(token.as_str())
         } else {
             return Err(EnqueueRerenderAnimationError::BadInput("video source not fully specified".to_string()));
         }

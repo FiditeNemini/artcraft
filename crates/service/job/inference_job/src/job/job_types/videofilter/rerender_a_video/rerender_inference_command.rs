@@ -40,7 +40,7 @@ pub struct RerenderInferenceCommand {
     executable_or_command: ExecutableOrCommand,
 
     /// Config file to use
-    config_path: PathBuf,
+    config_path: Option<PathBuf>,
 
     /// eg. `source python/bin/activate`
     maybe_virtual_env_activation_command: Option<String>,
@@ -68,30 +68,12 @@ pub struct InferenceArgs<'s, P: AsRef<Path>> {
 }
 
 impl RerenderInferenceCommand {
-    pub fn new<P: AsRef<Path>>(
-        rerender_root_code_directory: PathBuf,
-        executable_or_command: ExecutableOrCommand,
-        config_path: PathBuf,
-        maybe_virtual_env_activation_command: Option<String>,
-        maybe_docker_options: Option<DockerOptions>,
-        maybe_execution_timeout: Option<Duration>,
-    ) -> Self {
-        Self {
-            rerender_root_code_directory: rerender_root_code_directory.clone(),
-            executable_or_command,
-            config_path: config_path.clone(),
-            maybe_virtual_env_activation_command: maybe_virtual_env_activation_command.map(|s| s.to_string()),
-            maybe_docker_options,
-            maybe_execution_timeout,
-        }
-    }
-
     pub fn from_env() -> AnyhowResult<Self> {
         let rerender_root_code_directory = easyenv::get_env_pathbuf_required(
             "RERENDER_INFERENCE_ROOT_DIRECTORY")?;
 
-        let config_path = easyenv::get_env_pathbuf_required(
-            "RERENDER_INFERENCE_CONFIG_PATH")?;
+        let config_path = easyenv::get_env_pathbuf_optional(
+            "RERENDER_INFERENCE_CONFIG_PATH");
 
         let executable_or_command = match easyenv::get_env_string_optional(
             "RERENDER_INFERENCE_EXECUTABLE_OR_COMMAND") {

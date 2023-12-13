@@ -49,7 +49,7 @@ impl InferenceModelType {
       Self::Tacotron2 => "tacotron2",
       Self::Vits => "vits",
       Self::VallEX => "vall_e_x",
-        Self::RerenderAVideo => "rerender_a_video",
+      Self::RerenderAVideo => "rerender_a_video",
     }
   }
 
@@ -61,6 +61,7 @@ impl InferenceModelType {
       "tacotron2" => Ok(Self::Tacotron2),
       "vits" => Ok(Self::Vits),
       "vall_e_x" => Ok(Self::VallEX),
+      "rerender_a_video" => Ok(Self::RerenderAVideo),
       _ => Err(format!("invalid value: {:?}", value)),
     }
   }
@@ -74,7 +75,8 @@ impl InferenceModelType {
       InferenceModelType::SoVitsSvc,
       InferenceModelType::Tacotron2,
       InferenceModelType::Vits,
-      InferenceModelType::VallEX
+      InferenceModelType::VallEX,
+      InferenceModelType::RerenderAVideo
     ])
   }
 }
