@@ -8,3 +8,4 @@ pub mod insert_media_file_from_zero_shot_tts;
 pub mod list_media_files;
 pub mod list_media_files_for_user;
 pub mod update_media_file;
+pub mod insert_media_file_from_rerender;

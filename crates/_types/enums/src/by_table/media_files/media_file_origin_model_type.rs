@@ -30,6 +30,9 @@ pub enum MediaFileOriginModelType {
 
   #[serde(rename = "vall_e_x")]
   VallEX,
+
+  #[serde(rename = "rerender")]
+  Rerender,
 }
 
 // TODO(bt, 2022-12-21): This desperately needs MySQL integration tests!
@@ -45,7 +48,8 @@ impl MediaFileOriginModelType {
       Self::SadTalker => "sad_talker",
       Self::SoVitsSvc => "so_vits_svc",
       Self::Tacotron2 => "tacotron2",
-      Self::VallEX => "vall_e_x"
+      Self::VallEX => "vall_e_x",
+      Self::Rerender => "rerender",
     }
   }
 
@@ -56,6 +60,7 @@ impl MediaFileOriginModelType {
       "so_vits_svc" => Ok(Self::SoVitsSvc),
       "tacotron2" => Ok(Self::Tacotron2),
       "vall_e_x" => Ok(Self::VallEX),
+        "rerender" => Ok(Self::Rerender),
       _ => Err(format!("invalid value: {:?}", value)),
     }
   }

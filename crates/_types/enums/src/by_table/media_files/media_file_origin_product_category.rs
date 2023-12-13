@@ -38,6 +38,10 @@ pub enum MediaFileOriginProductCategory {
   /// Media files created by (or uploaded for) the Zero Shot voice product.
   #[serde(rename = "zs_voice")]
   ZeroShotVoice,
+
+  // Media files for Rerender
+  #[serde(rename = "rerender")]
+  Rerender,
 }
 
 // TODO(bt, 2022-12-21): This desperately needs MySQL integration tests!
@@ -54,6 +58,7 @@ impl MediaFileOriginProductCategory {
       Self::Unknown => "unknown",
       Self::VoiceConversion => "voice_conversion",
       Self::ZeroShotVoice => "zs_voice",
+      Self::Rerender => "rerender",
     }
   }
 
@@ -64,6 +69,7 @@ impl MediaFileOriginProductCategory {
       "unknown" => Ok(Self::Unknown),
       "voice_conversion" => Ok(Self::VoiceConversion),
       "zs_voice" => Ok(Self::ZeroShotVoice),
+      "rerender" => Ok(Self::Rerender),
       _ => Err(format!("invalid value: {:?}", value)),
     }
   }

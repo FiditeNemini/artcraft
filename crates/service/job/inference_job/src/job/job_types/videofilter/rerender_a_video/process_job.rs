@@ -1,8 +1,9 @@
 use std::fs::read_to_string;
 use std::time::Instant;
 
-use anyhow::anyhow;
+use anyhow::{anyhow, Error};
 use log::{error, info, warn};
+use serde::{Deserialize, Serialize};
 
 use buckets::public::media_files::original_file::MediaFileBucketPath;
 use enums::by_table::generic_inference_jobs::inference_result_type::InferenceResultType;
@@ -12,19 +13,16 @@ use filesys::safe_delete_temp_directory::safe_delete_temp_directory;
 use filesys::safe_delete_temp_file::safe_delete_temp_file;
 use hashing::sha256::sha256_hash_file::sha256_hash_file;
 use mimetypes::mimetype_for_file::get_mimetype_for_file;
+use mysql_queries::payloads::generic_inference_args::generic_inference_args::PolymorphicInferenceArgs::Rr;
 use mysql_queries::queries::generic_inference::job::list_available_generic_inference_jobs::AvailableInferenceJob;
-use mysql_queries::queries::media_files::insert_media_file_from_face_animation::{insert_media_file_from_face_animation, InsertArgs};
-use tokens::tokens::users::UserToken;
+use mysql_queries::queries::media_files::insert_media_file_from_rerender::{insert_media_file_from_rerender, InsertArgs};
 
 use crate::job::job_loop::job_success_result::{JobSuccessResult, ResultEntity};
 use crate::job::job_loop::process_single_job_error::ProcessSingleJobError;
-use crate::job::job_types::lipsync::sad_talker::categorize_error::categorize_error;
-// use crate::job::job_types::lipsync::sad_talker::categorize_error::categorize_error;
 use crate::job::job_types::videofilter::rerender_a_video::download_video_file::download_video_file;
 use crate::job::job_types::videofilter::rerender_a_video::rerender_inference_command::InferenceArgs;
 use crate::job::job_types::videofilter::rerender_a_video::validate_job::validate_job;
 use crate::job_dependencies::JobDependencies;
-use crate::util::common_commands::ffmpeg_logo_watermark_command;
 
 /// The maximum that either width or height can be
 const MAX_DIMENSION : u32 = 1500;
@@ -35,6 +33,7 @@ const BUCKET_FILE_EXTENSION: &str = ".mp4";
 pub struct RerenderProcessJobArgs<'a> {
     pub job_dependencies: &'a JobDependencies,
     pub job: &'a AvailableInferenceJob,
+    // pub media_file: MediaFile,
 }
 
 pub async fn process_job(args: RerenderProcessJobArgs<'_>) -> Result<JobSuccessResult, ProcessSingleJobError> {
@@ -88,43 +87,8 @@ pub async fn process_job(args: RerenderProcessJobArgs<'_>) -> Result<JobSuccessR
     // ==================== TRANSCODE MEDIA (IF NECESSARY) ==================== //
 
     let mut usable_video_path = video_path.filesystem_path.clone();
-    //
-    // if let Some((width, height)) = job_args.width.zip(job_args.height) {
-    //     info!("Requested image resize to {}x{} ...", width, height);
-    //
-    //     let mut width = width.min(MAX_DIMENSION);
-    //     let mut height = height.min(MAX_DIMENSION);
-    //
-    //     if job_args.enhancer.is_some() {
-    //         // The enhancer will double the size of the image, so we'll downsize the image by half
-    //         // if it's enabled.
-    //         width = width / 2;
-    //         height = height / 2;
-    //         info!("Enhancer will be doubling image size, so cutting frame size to {}x{}.", width, height)
-    //     }
-    //
-    //     info!("Resizing image to {}x{} ...", width, height);
-    //
-    //     let result = resize_image(
-    //         &image_path.filesystem_path,
-    //         &work_temp_dir,
-    //         width,
-    //         height
-    //     );
-    //
-    //     match result {
-    //         Err(err) => {
-    //             error!("Image resize failure: {:?}", err);
-    //             safe_delete_temp_file(&audio_path.filesystem_path);
-    //             safe_delete_temp_file(&image_path.filesystem_path);
-    //             safe_delete_temp_directory(&work_temp_dir);
-    //             return Err(ProcessSingleJobError::Other(anyhow!("image resize failure: {:?}", err)));
-    //         }
-    //         Ok(resized_image_path) => {
-    //             usable_image_path = resized_image_path;
-    //         }
-    //     }
-    // }
+
+    //TODO: re encode with ffmpeg
 
     info!("Used video file: {:?}", usable_video_path);
 
@@ -148,15 +112,43 @@ pub async fn process_job(args: RerenderProcessJobArgs<'_>) -> Result<JobSuccessR
         .map(|args| args.args.as_ref())
         .flatten();
 
-    // ==================== WRITE CONFIG TO DISK ==================== //
+    let poly_args = match maybe_args {
+        None => return Err(ProcessSingleJobError::Other(anyhow!("Rerender args not found"))),
+        Some(args) => args,
+    };
+
+    let rr_args = match poly_args {
+        Rr(args) => args,
+        _ => return Err(ProcessSingleJobError::Other(anyhow!("Rerender args not found"))),
+    };
+
+    let sd_model = rr_args.maybe_sd_model.as_ref().ok_or(ProcessSingleJobError::Other(anyhow!("SD model not found")))?;
+
+    // ============== CREATE AND WRITE CONFIG TO DISK  ============== //
+
+    // create seed if not exists
+    // let seed = rr_args.seed.unwrap_or_else(|| rand::random::<i64>());
+    let seed = rand::random::<i32>();
+
+    let config = RerenderConfig {
+        input: Some(usable_video_path.to_str().unwrap().to_string()),
+        output: Some(output_video_fs_path.to_str().unwrap().to_string()),
+        work_dir: Some(work_temp_dir.path().to_str().unwrap().to_string()),
+        sd_model: Some(sd_model.to_string()),
+        prompt: Some("1girl, anime style, red hair".to_string()),
+        a_prompt: Some("1girl, 3d, realistic, read hair".to_string()),
+        n_prompt: Some("Bad quality, low quality, photo, artifacts, watermark, signature, faceless".to_string()),
+        seed: Some(seed as i64),
+        ..RerenderConfig::new()
+    };
+
+    config.validate().map_err(|e| ProcessSingleJobError::Other(anyhow!(e)))?;
 
     let config_path = work_temp_dir.path().join("config.json");
-
-    // TODO
+    let config_json = serde_json::to_string(&config).unwrap();
+    std::fs::write(&config_path, config_json).unwrap();
 
     // ==================== RUN INFERENCE SCRIPT ==================== //
-
-    let workdir = work_temp_dir.path().to_path_buf();
     let stderr_output_file = work_temp_dir.path().join("stderr.txt");
     let inference_start_time = Instant::now();
 
@@ -174,7 +166,7 @@ pub async fn process_job(args: RerenderProcessJobArgs<'_>) -> Result<JobSuccessR
     if !command_exit_status.is_success() {
         error!("Inference failed: {:?}", command_exit_status);
 
-        let mut error = ProcessSingleJobError::Other(anyhow!("CommandExitStatus: {:?}", command_exit_status));
+        let error = ProcessSingleJobError::Other(anyhow!("CommandExitStatus: {:?}", command_exit_status));
 
         if let Ok(contents) = read_to_string(&stderr_output_file) {
             warn!("Captured stderr output: {}", contents);
@@ -205,7 +197,7 @@ pub async fn process_job(args: RerenderProcessJobArgs<'_>) -> Result<JobSuccessR
 
     // ==================== OPTIONAL WATERMARK ==================== //
 
-    let mut finished_file = output_video_fs_path.clone();
+    let finished_file = output_video_fs_path.clone();
 
     // ==================== CHECK ALL FILES EXIST AND GET METADATA ==================== //
 
@@ -231,7 +223,7 @@ pub async fn process_job(args: RerenderProcessJobArgs<'_>) -> Result<JobSuccessR
             ProcessSingleJobError::Other(anyhow!("Error hashing file: {:?}", err))
         })?;
 
-    // ==================== UPLOAD AUDIO TO BUCKET ==================== //
+    // ==================== UPLOAD VIDEO TO BUCKET ==================== //
 
     job_progress_reporter.log_status("uploading result")
         .map_err(|e| ProcessSingleJobError::Other(e))?;
@@ -266,9 +258,9 @@ pub async fn process_job(args: RerenderProcessJobArgs<'_>) -> Result<JobSuccessR
 
     // ==================== SAVE RECORDS ==================== //
 
-    info!("Saving SadTalker result (media_files table record) ...");
+    info!("Saving Rerender result (media_files table record) ...");
 
-    let (media_file_token, id) = insert_media_file_from_face_animation(InsertArgs {
+    let (media_file_token, id) = insert_media_file_from_rerender(InsertArgs {
         pool: &args.job_dependencies.db.mysql_pool,
         job: &job,
         maybe_mime_type: Some(&mimetype),
@@ -284,21 +276,7 @@ pub async fn process_job(args: RerenderProcessJobArgs<'_>) -> Result<JobSuccessR
         .await
         .map_err(|e| ProcessSingleJobError::Other(e))?;
 
-    info!("SadTalker Done.");
-
-    // TODO: Update upstream to be strongly typed
-    let maybe_user_token = job.maybe_creator_user_token.as_deref()
-        .map(|token| UserToken::new_from_str(token));
-
-    args.job_dependencies.clients.firehose_publisher.lipsync_animation_finished(
-        maybe_user_token.as_ref(),
-        &job.inference_job_token,
-        media_file_token.as_str())
-        .await
-        .map_err(|e| {
-            error!("error publishing event: {:?}", e);
-            ProcessSingleJobError::Other(anyhow!("error publishing event"))
-        })?;
+    info!("Rerender Done.");
 
     job_progress_reporter.log_status("done")
         .map_err(|e| ProcessSingleJobError::Other(e))?;
@@ -313,4 +291,119 @@ pub async fn process_job(args: RerenderProcessJobArgs<'_>) -> Result<JobSuccessR
         }),
         inference_duration,
     })
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct RerenderConfig {
+	#[serde(rename = "input")]
+	pub input: Option<String>,
+
+	#[serde(rename = "output")]
+	pub output: Option<String>,
+
+	#[serde(rename = "work_dir")]
+	pub work_dir: Option<String>,
+
+	#[serde(rename = "key_subdir")]
+	pub key_subdir: Option<String>,
+
+	#[serde(rename = "sd_model")]
+	pub sd_model: Option<String>,
+
+	#[serde(rename = "lora_path")]
+	pub lora_path: Option<String>,
+
+	#[serde(rename = "interval")]
+	pub interval: Option<i32>,
+
+	#[serde(rename = "prompt")]
+	pub prompt: Option<String>,
+
+	#[serde(rename = "a_prompt")]
+	pub a_prompt: Option<String>,
+
+	#[serde(rename = "n_prompt")]
+	pub n_prompt: Option<String>,
+
+	#[serde(rename = "x0_strength")]
+	pub x0_strength: Option<f32>,
+
+	#[serde(rename = "control_type")]
+	pub control_type: Option<String>,
+
+	#[serde(rename = "canny_low")]
+	pub canny_low: Option<i32>,
+
+	#[serde(rename = "canny_high")]
+	pub canny_high: Option<i32>,
+
+	#[serde(rename = "control_strength")]
+	pub control_strength: Option<f32>,
+
+	#[serde(rename = "seed")]
+	pub seed: Option<i64>,
+
+	#[serde(rename = "warp_period")]
+	pub warp_period: Option<Vec<f32>>,
+
+	#[serde(rename = "ada_period")]
+	pub ada_period: Option<Vec<f32>>,
+}
+
+impl RerenderConfig {
+    pub fn new() -> Self {
+        Self {
+            input: None,
+            output: None,
+            work_dir: None,
+            key_subdir: Some("keys".to_string()),
+            sd_model: None,
+            lora_path: None,
+            interval: Some(8),
+            prompt: None,
+            a_prompt: None,
+            n_prompt: None,
+            x0_strength: Some(0.95),
+            control_type: Some("canny".to_string()),
+            canny_low: Some(50),
+            canny_high: Some(100),
+            control_strength: Some(0.7),
+            seed: None,
+            warp_period: Some(vec![0., 0.1]),
+            ada_period: Some(vec![0.8, 1.]),
+        }
+    }
+
+    pub fn validate(&self) -> Result<(), Error> {
+        let fields = &[
+            (self.input.is_some(), "input"),
+            (self.output.is_some(), "output"),
+            (self.work_dir.is_some(), "work_dir"),
+            (self.key_subdir.is_some(), "key_subdir"),
+            (self.sd_model.is_some(), "sd_model"),
+            (self.interval.is_some(), "interval"),
+            (self.prompt.is_some(), "prompt"),
+            (self.a_prompt.is_some(), "a_prompt"),
+            (self.n_prompt.is_some(), "n_prompt"),
+            (self.x0_strength.is_some(), "x0_strength"),
+            (self.control_type.is_some(), "control_type"),
+            (self.canny_low.is_some(), "canny_low"),
+            (self.canny_high.is_some(), "canny_high"),
+            (self.control_strength.is_some(), "control_strength"),
+            (self.seed.is_some(), "seed"),
+            (self.warp_period.is_some(), "warp_period"),
+            (self.ada_period.is_some(), "ada_period"),
+        ];
+
+        let missing_fields: Vec<&str> = fields
+            .iter()
+            .filter_map(|(is_some, field_name)| if *is_some { None } else { Some(*field_name) })
+            .collect();
+
+        if missing_fields.is_empty() {
+            Ok(())
+        } else {
+            Err(anyhow!("Missing fields: {}", missing_fields.join(", ")))
+        }
+    }
 }

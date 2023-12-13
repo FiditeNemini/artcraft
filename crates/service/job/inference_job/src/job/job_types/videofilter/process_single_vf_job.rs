@@ -1,43 +1,56 @@
 use anyhow::anyhow;
-use log::{error, info};
+use log::info;
 
+use mysql_queries::payloads::generic_inference_args::generic_inference_args::PolymorphicInferenceArgs::Rr;
+use mysql_queries::payloads::generic_inference_args::videofilter_payload::VideofilterVideoSource;
 use mysql_queries::queries::generic_inference::job::list_available_generic_inference_jobs::AvailableInferenceJob;
-use mysql_queries::queries::media_uploads::get_media_upload_for_inference::get_media_upload_for_inference;
-use tokens::tokens::media_uploads::MediaUploadToken;
+use mysql_queries::queries::media_files::get_media_file::get_media_file;
+use tokens::tokens::media_files::MediaFileToken;
 
 use crate::job::job_loop::job_success_result::JobSuccessResult;
 use crate::job::job_loop::process_single_job_error::ProcessSingleJobError;
 use crate::job::job_types::videofilter::rerender_a_video;
+use crate::job::job_types::videofilter::rerender_a_video::process_job::RerenderProcessJobArgs;
 use crate::job_dependencies::JobDependencies;
 
 pub async fn process_single_rr_job(job_dependencies: &JobDependencies, job: &AvailableInferenceJob) -> Result<JobSuccessResult, ProcessSingleJobError> {
-    let maybe_media_upload_token = job.maybe_input_source_token
-        .as_deref()
-        .map(|token| MediaUploadToken::new_from_str(token));
+    // let maybe_inference_args = job.maybe_inference_args.as_ref().ok_or(ProcessSingleJobError::Other(anyhow!("Inference args not found")))?;
+    //
+    // let maybe_rerender_args = maybe_inference_args.args.as_ref().map(|args| match args {
+    //     Rr(args) => Some(args),
+    //     _ => None,
+    // }).flatten();
+    //
+    // let rerender_args = match maybe_rerender_args {
+    //     None => return Err(ProcessSingleJobError::Other(anyhow!("Rerender args not found"))),
+    //     Some(args) => args,
+    // };
+    //
+    // let videofilter_source = rerender_args.maybe_video_source.as_ref().ok_or(ProcessSingleJobError::Other(anyhow!("Video source not found")))?;
+    //
+    // let media_file_token = match videofilter_source {
+    //     VideofilterVideoSource::F(token) => token,
+    //     _ => return Err(ProcessSingleJobError::Other(anyhow!("Video source not found"))),
+    // };
+    //
+    // let media_file_token = MediaFileToken::new_from_str(media_file_token);
+    //
+    // info!("media_file_token: {:?}", media_file_token);
+    //
+    //
+    // let media_file = match media_file_result {
+    //     Ok(Some(result)) => result,
+    //     Ok(None) => {
+    //         return Err(ProcessSingleJobError::Other(anyhow!("Media file not found")));
+    //     }
+    //     Err(e) => {
+    //         return Err(ProcessSingleJobError::Other(anyhow!("Media file not found")));
+    //     }
+    // };
 
-    let media_upload_token = match maybe_media_upload_token {
-        None => return Err(ProcessSingleJobError::Other(anyhow!("no associated media upload for vc job: {:?}", job.inference_job_token))),
-        Some(token) => token,
-    };
-
-    let maybe_media_upload_result =
-        get_media_upload_for_inference(&media_upload_token, &job_dependencies.db.mysql_pool).await;
-
-    let media_upload = match maybe_media_upload_result {
-        Ok(Some(media_upload)) => media_upload,
-        Ok(None) => {
-            error!("no media upload record found for token: {:?}", media_upload_token);
-            return Err(ProcessSingleJobError::Other(anyhow!("no media upload record found for token: {:?}", media_upload_token)));
-        },
-        Err(err) => {
-            error!("error fetching media upload record from db: {:?}", err);
-            return Err(ProcessSingleJobError::Other(err));
-        },
-    };
-
-    info!("Source media upload file size (bytes): {}", &media_upload.original_file_size_bytes);
-    info!("Source media upload duration (millis): {}", &media_upload.original_duration_millis);
-    info!("Source media upload duration (seconds): {}", (media_upload.original_duration_millis as f32 / 1000.0));
+    // info!("Source media upload file size (bytes): {}", &media_upload.original_file_size_bytes);
+    // info!("Source media upload duration (millis): {}", &media_upload.original_duration_millis);
+    // info!("Source media upload duration (seconds): {}", (media_upload.original_duration_millis as f32 / 1000.0));
 
 
 
@@ -54,9 +67,10 @@ pub async fn process_single_rr_job(job_dependencies: &JobDependencies, job: &Ava
     // };
 
     let job_success_result = rerender_a_video::process_job::process_job(
-        rerender_a_video::process_job::RerenderProcessJobArgs {
+        RerenderProcessJobArgs {
             job_dependencies,
-            job
+            job,
+            // media_file
         }
     ).await?;
 

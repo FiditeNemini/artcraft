@@ -21,6 +21,10 @@ pub enum IdCategory {
   #[serde(rename = "lipsync_animation")]
   LipsyncAnimationResult,
 
+  // Results from rerender a video
+  #[serde(rename = "rerender")]
+  RerenderResult,
+
   /// Results from tacotron2
   /// Applies for RVC and SVC
   #[serde(rename = "tts_result")]
@@ -62,6 +66,7 @@ impl IdCategory {
       Self::ZeroShotVoiceDataset => "zs_dataset",
       Self::ZeroShotVoiceEmbedding => "zs_voice",
       Self::ZeroShotTtsResult => "zs_tts_result",
+      Self::RerenderResult => "rerender",
       Self::ModelWeights => "model_weights",
     }
   }
@@ -75,6 +80,7 @@ impl IdCategory {
       "zs_dataset" => Ok(Self::ZeroShotVoiceDataset),
       "zs_voice" => Ok(Self::ZeroShotVoiceEmbedding),
       "zs_tts_result" => Ok(Self::ZeroShotTtsResult),
+        "rerender" => Ok(Self::RerenderResult),
       "model_weights" => Ok(Self::ModelWeights),
       _ => Err(format!("invalid value: {:?}", value)),
     }
