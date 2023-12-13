@@ -7,7 +7,11 @@ import Panel from "components/common/Panel";
 import PageHeader from "components/layout/PageHeader";
 import Skeleton from "components/common/Skeleton";
 import Button from "components/common/Button";
-import { faCircleExclamation, faShare } from "@fortawesome/pro-solid-svg-icons";
+import {
+  faCircleExclamation,
+  faLink,
+  faShare,
+} from "@fortawesome/pro-solid-svg-icons";
 import Accordion from "components/common/Accordion";
 import DataTable from "components/common/DataTable";
 import { Gravatar } from "@storyteller/components/src/elements/Gravatar";
@@ -347,10 +351,15 @@ export default function WeightPage({
   };
 
   const handleCopyLink = () => {
-    navigator.clipboard.writeText("LINK");
+    navigator.clipboard.writeText(shareUrl);
     setButtonLabel("Copied!");
     setTimeout(() => setButtonLabel("Copy"), 1000);
   };
+
+  const shareUrl = `https://fakeyou.com/weight/${weight.weight_token}`;
+  const shareText = `Use FakeYou to generate speech as ${
+    weight.title || "your favorite characters"
+  }!`;
 
   return (
     <div>
@@ -501,23 +510,42 @@ export default function WeightPage({
         content={
           <div className="d-flex flex-column gap-4">
             <div className="d-flex gap-3">
-              <SocialButton social="x" />
-              <SocialButton social="whatsapp" />
-              <SocialButton social="facebook" />
-              <SocialButton social="reddit" />
-              <SocialButton social="email" />
+              <SocialButton
+                social="x"
+                shareUrl={shareUrl}
+                shareText={shareText}
+              />
+              <SocialButton
+                social="whatsapp"
+                shareUrl={shareUrl}
+                shareText={shareText}
+              />
+              <SocialButton
+                social="facebook"
+                shareUrl={shareUrl}
+                shareText={shareText}
+              />
+              <SocialButton
+                social="reddit"
+                shareUrl={shareUrl}
+                shareText={shareText}
+              />
+              <SocialButton
+                social="email"
+                shareUrl={shareUrl}
+                shareText={shareText}
+              />
             </div>
-            <div className="d-flex align-items-center position-relative">
-              <div className="w-100">
-                <Input type="text" value="link" readOnly />
+            <div className="d-flex gap-2">
+              <div className="flex-grow-1">
+                <Input type="text" value={shareUrl} readOnly />
               </div>
 
               <Button
+                icon={faLink}
                 label={buttonLabel}
                 onClick={handleCopyLink}
                 variant="primary"
-                small={true}
-                className="position-absolute end-0 me-1"
               />
             </div>
           </div>
