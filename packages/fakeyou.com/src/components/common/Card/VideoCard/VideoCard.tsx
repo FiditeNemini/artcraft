@@ -42,7 +42,7 @@ export default function VideoCard({ data, type }: VideoCardProps) {
             <div className="card-img-gradient" />
 
             <div className="d-flex align-items-center">
-              <div className="flex-grow-1">
+              <div className="d-flex flex-grow-1">
                 <Badge label="Video" color="purple" overlay={true} />
               </div>
             </div>
@@ -77,7 +77,7 @@ export default function VideoCard({ data, type }: VideoCardProps) {
             <div className="card-img-gradient" />
 
             <div className="d-flex align-items-center">
-              <div className="flex-grow-1">
+              <div className="d-flex flex-grow-1">
                 <Badge label="Video" color="purple" overlay={true} />
               </div>
             </div>

@@ -5,12 +5,14 @@ import { faHeart as faHeartOutline } from "@fortawesome/pro-regular-svg-icons";
 import Tippy from "@tippyjs/react";
 import "tippy.js/dist/tippy.css";
 import "./LikeButton.scss";
+import useShortenNumber from "hooks/useShortenNumber";
 
 interface LikeButtonProps {
   initialToggled?: boolean;
   onToggle: (toggled: boolean) => Promise<void>;
-  likeCount?: number;
+  likeCount: number;
   overlay?: boolean;
+  large?: boolean;
 }
 
 export default function LikeButton({
@@ -18,6 +20,7 @@ export default function LikeButton({
   onToggle,
   likeCount,
   overlay,
+  large,
 }: LikeButtonProps) {
   const [isToggled, setIsToggled] = useState(initialToggled);
   const [isLoading, setIsLoading] = useState(false);
@@ -38,6 +41,7 @@ export default function LikeButton({
   const buttonShadow = overlay ? "shadow" : "";
   const iconClass = isToggled ? "icon-toggled" : "icon-default";
   const toolTip = isToggled ? "Unlike" : "Like";
+  let likeCountShort = useShortenNumber(likeCount);
 
   return (
     <div className="d-flex gap-2" onClick={handleClick}>
@@ -53,13 +57,13 @@ export default function LikeButton({
         <button
           onClick={handleClick}
           disabled={isLoading}
-          className={`${buttonClass} ${buttonShadow}`}
+          className={`${buttonClass} ${buttonShadow} ${large ? "large" : ""}`}
         >
           <FontAwesomeIcon
             icon={isToggled ? faHeart : faHeartOutline}
             className={`${iconClass} me-2`}
           />
-          {likeCount && <p className="like-number">{likeCount}</p>}
+          {likeCount && <p className="like-number">{likeCountShort}</p>}
         </button>
       </Tippy>
     </div>

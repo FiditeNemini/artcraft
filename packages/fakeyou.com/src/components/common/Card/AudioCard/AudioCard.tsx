@@ -46,7 +46,7 @@ export default function AudioCard({ data, type }: AudioCardProps) {
         <>
           <div className="mb-3">
             <div className="d-flex align-items-center">
-              <div className="flex-grow-1">
+              <div className="d-flex flex-grow-1">
                 <Badge label="Audio" color="teal" />
               </div>
             </div>
@@ -71,7 +71,7 @@ export default function AudioCard({ data, type }: AudioCardProps) {
         <>
           <div>
             <div className="d-flex align-items-center">
-              <div className="flex-grow-1">
+              <div className="d-flex flex-grow-1">
                 <Badge label="RVC" color="orange" />
               </div>
               <div onClick={handleInnerClick}>

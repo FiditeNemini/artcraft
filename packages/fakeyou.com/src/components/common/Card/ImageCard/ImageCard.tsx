@@ -46,7 +46,7 @@ export default function ImageCard({ data, type }: ImageCardProps) {
             <div className="card-img-gradient" />
 
             <div className="d-flex align-items-center">
-              <div className="flex-grow-1">
+              <div className="d-flex flex-grow-1">
                 <Badge label="Image" color="ultramarine" overlay={true} />
               </div>
             </div>
@@ -78,7 +78,7 @@ export default function ImageCard({ data, type }: ImageCardProps) {
             <div className="card-img-gradient" />
 
             <div className="d-flex align-items-center">
-              <div className="flex-grow-1">
+              <div className="d-flex flex-grow-1">
                 <Badge label="LORA" color="pink" overlay={true} />
               </div>
               <div onClick={handleInnerClick}>

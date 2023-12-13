@@ -1,10 +1,9 @@
-import React, { useRef, useEffect } from "react";
+import React, { useEffect } from "react";
 import Button from "../Button";
-import { faTrashAlt } from "@fortawesome/pro-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useSpring, a } from "@react-spring/web";
-
-
+import { IconDefinition } from "@fortawesome/fontawesome-svg-core";
+import "./Modal.scss";
 
 interface ModalProps {
   show: boolean;
@@ -13,18 +12,46 @@ interface ModalProps {
   onConfirm?: (e: React.MouseEvent<HTMLElement>) => any;
   title: string;
   content: React.ReactNode;
+  icon?: IconDefinition;
+  autoWidth?: boolean;
+  showButtons?: boolean;
 }
 
-const Modal: React.FC<ModalProps> = ({ show, handleClose, onCancel: cancelEvent, onConfirm: confirmEvent, title, content }) => {
-  const modalRef = useRef<HTMLDivElement>(null);
-
+const Modal: React.FC<ModalProps> = ({
+  show,
+  handleClose,
+  onCancel: cancelEvent,
+  onConfirm: confirmEvent,
+  title,
+  content,
+  icon,
+  autoWidth,
+  showButtons = true,
+}) => {
   const fadeIn = useSpring({
     opacity: show ? 1 : 0,
-    config: { duration: 80, easing: (t) => t },
+    config: { duration: 80, easing: t => t },
     onRest: () => {
       if (!show) handleClose();
     },
   });
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      const modalContent = document.querySelector(".modal-content");
+      if (modalContent && !modalContent.contains(event.target as Node)) {
+        handleClose();
+      }
+    };
+
+    if (show) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [show, handleClose]);
 
   const onCancel = (e: React.MouseEvent<HTMLElement>) => {
     if (cancelEvent) cancelEvent(e);
@@ -36,40 +63,22 @@ const Modal: React.FC<ModalProps> = ({ show, handleClose, onCancel: cancelEvent,
     handleClose();
   };
 
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (
-        modalRef.current &&
-        !modalRef.current.contains(event.target as Node)
-      ) {
-        handleClose();
-      }
-    };
-
-    document.addEventListener("mousedown", handleClickOutside);
-
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, [handleClose]);
-
   if (!show) {
     return null;
   }
 
   return (
     <a.div style={fadeIn} className="modal-backdrop">
-      <div
-        ref={modalRef}
-        className="modal"
-        role="dialog"
-        style={{ display: "block" }}
-      >
-        <div className="modal-dialog modal-dialog-centered">
+      <div className="modal" role="dialog">
+        <div
+          className={`modal-dialog modal-dialog-centered ${
+            autoWidth && "modal-width-auto"
+          }`}
+        >
           <div className="modal-content">
             <div className="modal-header">
               <h5 className="modal-title">
-                <FontAwesomeIcon icon={faTrashAlt} className="me-3" />
+                {icon && <FontAwesomeIcon icon={icon} className="me-3" />}
                 {title}
               </h5>
               <button
@@ -80,14 +89,14 @@ const Modal: React.FC<ModalProps> = ({ show, handleClose, onCancel: cancelEvent,
               ></button>
             </div>
             <div className="modal-body">{content}</div>
-            <div className="modal-footer">
-              <Button
-                variant="secondary"
-                label="Cancel"
-                onClick={onCancel}
-              />
-              <Button variant="danger" label="Delete" onClick={onConfirm} />
-            </div>
+            {showButtons && (
+              <div className="modal-footer">
+                <Button variant="secondary" label="Cancel" onClick={onCancel} />
+                {onConfirm && (
+                  <Button variant="danger" label="Delete" onClick={onConfirm} />
+                )}
+              </div>
+            )}
           </div>
         </div>
       </div>

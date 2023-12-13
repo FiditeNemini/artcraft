@@ -3,6 +3,7 @@
 .like-button {
   display: flex;
   align-items: center;
+  justify-content: center;
   background-color: rgba(lighten($secondary, 5%), 0.9);
   color: inherit;
   border: none;
@@ -40,13 +41,17 @@
     background-color: rgba(#593a48, 0.9);
 
     &:hover {
-      background-color: darken(rgba(#593a48, 0.9), 2%);
+      background-color: lighten(rgba(#593a48, 0.9), 10%);
     }
+  }
+
+  &.large {
+    padding: 6px 10px;
   }
 }
 
 .like-button .icon-default {
-  color: $white;
+  color: $primary;
   opacity: 0.7;
   transition: 0.2s;
 }
@@ -61,9 +66,10 @@
 }
 
 .like-number {
+  color: $white;
   font-size: 14px;
   font-weight: 400 !important;
-  opacity: 0.8;
+  opacity: 0.9;
   transition: 0.2s;
 }
 
