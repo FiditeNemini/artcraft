@@ -12,7 +12,11 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { faDiscord, faTwitter } from "@fortawesome/free-brands-svg-icons";
 import { WebUrl } from "../../../../common/WebUrl";
-import { faFileArrowUp, faSparkles } from "@fortawesome/pro-solid-svg-icons";
+import {
+  faFileArrowUp,
+  faFlask,
+  faSparkles,
+} from "@fortawesome/pro-solid-svg-icons";
 import { PosthogClient } from "@storyteller/components/src/analytics/PosthogClient";
 import { FooterNav } from "v2/view/nav/FooterNav";
 import Alert from "components/common/Alert/Alert";
@@ -310,9 +314,9 @@ function LandingPage(props: Props) {
               <div className="d-flex px-4 pt-4 align-items-start w-100">
                 <div className="flex-grow-1">
                   <div className="mb-1">
-                    <span className="badge-new d-inline-flex align-items-center mb-2 me-2">
-                      <FontAwesomeIcon icon={faSparkles} className="me-1" />
-                      {t("productNewTag")}
+                    <span className="badge-beta d-inline-flex align-items-center mb-2 me-2">
+                      <FontAwesomeIcon icon={faFlask} className="me-1" />
+                      BETA
                     </span>
 
                     <h4 className="fw-bold text-white d-inline-flex align-items-center mb-0">
