@@ -42,6 +42,7 @@ mod tests {
   fn build_set() -> UsernameSet {
     UsernameSet::from_comma_separated("bob,john,ALICE, BoB,jOhn,  ,,,  , aLiCe, joHn, bob,Alice")
   }
+
   #[test]
   fn test_deduplication() {
     let set = build_set();
