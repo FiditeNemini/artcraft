@@ -91,6 +91,32 @@ pub fn configure_redis_rate_limiters(common_env: &CommonEnv) -> AnyhowResult<Red
     RedisRateLimiter::new(limiter, "model_upload", limiter_enabled)
   };
 
+  let file_upload_logged_out_redis_rate_limiter = {
+    let limiter_enabled = easyenv::get_env_bool_or_default("LIMITER_FILE_UPLOAD_LOGGED_OUT_ENABLED", true);
+    let limiter_max_requests = easyenv::get_env_num("LIMITER_FILE_UPLOAD_LOGGED_OUT_MAX_REQUESTS", 4)?;
+    let limiter_window_seconds = easyenv::get_env_num("LIMITER_FILE_UPLOAD_LOGGED_OUT_WINDOW_SECONDS", 30)?;
+
+    let limiter = Limiter::build(&common_env.redis_0_connection_string)
+        .limit(limiter_max_requests)
+        .period(Duration::from_secs(limiter_window_seconds))
+        .finish()?;
+
+    RedisRateLimiter::new(limiter, "file_upload_logged_out", limiter_enabled)
+  };
+
+  let file_upload_logged_in_redis_rate_limiter = {
+    let limiter_enabled = easyenv::get_env_bool_or_default("LIMITER_FILE_UPLOAD_LOGGED_IN_ENABLED", true);
+    let limiter_max_requests = easyenv::get_env_num("LIMITER_FILE_UPLOAD_LOGGED_IN_MAX_REQUESTS", 6)?;
+    let limiter_window_seconds = easyenv::get_env_num("LIMITER_FILE_UPLOAD_LOGGED_IN_WINDOW_SECONDS", 30)?;
+
+    let limiter = Limiter::build(&common_env.redis_0_connection_string)
+        .limit(limiter_max_requests)
+        .period(Duration::from_secs(limiter_window_seconds))
+        .finish()?;
+
+    RedisRateLimiter::new(limiter, "file_upload_logged_in", limiter_enabled)
+  };
+
   Ok(RedisRateLimiters {
     logged_out: logged_out_redis_rate_limiter,
     logged_in: logged_in_redis_rate_limiter,
@@ -98,5 +124,7 @@ pub fn configure_redis_rate_limiters(common_env: &CommonEnv) -> AnyhowResult<Red
     api_ai_streamers: api_ai_streamers_redis_rate_limiter,
     api_ai_streamer_username_set: ai_streamer_usernames,
     model_upload: model_upload_rate_limiter,
+    file_upload_logged_out: file_upload_logged_out_redis_rate_limiter,
+    file_upload_logged_in: file_upload_logged_in_redis_rate_limiter,
   })
 }

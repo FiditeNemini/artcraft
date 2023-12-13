@@ -149,6 +149,12 @@ pub struct RedisRateLimiters {
 
   /// A rate limiter for TTS and W2L uploads
   pub model_upload: RedisRateLimiter,
+
+  /// For uploading files for voice conversion, face animator, etc.
+  pub file_upload_logged_out: RedisRateLimiter,
+
+  /// For uploading files for voice conversion, face animator, etc.
+  pub file_upload_logged_in: RedisRateLimiter,
 }
 
 /// In-memory caches of several types.
