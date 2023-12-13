@@ -66,23 +66,22 @@ pub async fn handle_upload(
         UploadError::ServerError
       })?;
 
+  // ==================== BANNED USERS ==================== //
+
+  if let Some(ref user) = maybe_user_session {
+    if user.is_banned {
+      return Err(UploadError::NotAuthorized);
+    }
+  }
+
   // ==================== RATE LIMIT ==================== //
 
   let rate_limiter = match maybe_user_session {
-    None => &server_state.redis_rate_limiters.logged_out,
-    Some(ref user) => {
-      if user.is_banned {
-        return Err(UploadError::NotAuthorized);
-      }
-      &server_state.redis_rate_limiters.logged_in
-    },
+    None => &server_state.redis_rate_limiters.file_upload_logged_out,
+    Some(ref _session) => &server_state.redis_rate_limiters.file_upload_logged_in,
   };
 
   if let Err(_err) = rate_limiter.rate_limit_request(&http_request) {
-    return Err(UploadError::RateLimited);
-  }
-
-  if let Err(_err) = server_state.redis_rate_limiters.model_upload.rate_limit_request(&http_request) {
     return Err(UploadError::RateLimited);
   }
 
