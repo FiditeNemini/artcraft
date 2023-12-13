@@ -64,6 +64,7 @@ export default function WeightPage({
   const timeUpdated = useTimeAgo(weight?.updated_at.toISOString() || "");
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
   const [buttonLabel, setButtonLabel] = useState("Copy");
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
   const getWeight = useCallback(async (weightToken: string) => {
     // Dummy data
@@ -361,6 +362,14 @@ export default function WeightPage({
     weight.title || "your favorite characters"
   }!`;
 
+  const openDeleteModal = () => {
+    setIsDeleteModalOpen(true);
+  };
+
+  const closeDeleteModal = () => {
+    setIsDeleteModalOpen(false);
+  };
+
   return (
     <div>
       <Container type="panel" className="mb-5">
@@ -479,10 +488,24 @@ export default function WeightPage({
                 {modMediaDetails}
               </Accordion>
 
-              <div className="d-flex gap-2">
-                <Button full={true} variant="secondary" label="Edit Weight" />
-                <Button full={true} variant="danger" label="Delete Weight" />
-              </div>
+              {sessionWrapper.canEditTtsModelByUserToken(
+                weight.maybe_creator_user?.user_token
+              ) && (
+                <div className="d-flex gap-2">
+                  <Button
+                    full={true}
+                    variant="secondary"
+                    label="Edit Weight"
+                    to={`/weight/${weight_token}/edit`}
+                  />
+                  <Button
+                    full={true}
+                    variant="danger"
+                    label="Delete Weight"
+                    onClick={openDeleteModal}
+                  />
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -551,6 +574,14 @@ export default function WeightPage({
             </div>
           </div>
         }
+      />
+
+      {/* Delete Modal */}
+      <Modal
+        show={isDeleteModalOpen}
+        handleClose={closeDeleteModal}
+        title="Delete Weight"
+        content="Are you sure you want to delete this weight? This action cannot be undone."
       />
     </div>
   );
