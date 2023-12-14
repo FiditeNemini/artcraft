@@ -21,9 +21,9 @@ pub enum IdCategory {
   #[serde(rename = "lipsync_animation")]
   LipsyncAnimationResult,
 
-  // Results from rerender a video
-  #[serde(rename = "rerender")]
-  RerenderResult,
+  // Results from video filters
+  #[serde(rename = "video_filter")]
+  VideoFilterResult,
 
   /// Results from tacotron2
   /// Applies for RVC and SVC
@@ -66,7 +66,7 @@ impl IdCategory {
       Self::ZeroShotVoiceDataset => "zs_dataset",
       Self::ZeroShotVoiceEmbedding => "zs_voice",
       Self::ZeroShotTtsResult => "zs_tts_result",
-      Self::RerenderResult => "rerender",
+      Self::VideoFilterResult => "video_filter",
       Self::ModelWeights => "model_weights",
     }
   }
@@ -80,7 +80,7 @@ impl IdCategory {
       "zs_dataset" => Ok(Self::ZeroShotVoiceDataset),
       "zs_voice" => Ok(Self::ZeroShotVoiceEmbedding),
       "zs_tts_result" => Ok(Self::ZeroShotTtsResult),
-      "rerender" => Ok(Self::RerenderResult),
+      "video_filter" => Ok(Self::VideoFilterResult),
       "model_weights" => Ok(Self::ModelWeights),
       _ => Err(format!("invalid value: {:?}", value)),
     }
@@ -92,7 +92,7 @@ impl IdCategory {
     BTreeSet::from([
       Self::MediaFile,
       Self::LipsyncAnimationResult,
-      Self::RerenderResult,
+      Self::VideoFilterResult,
       Self::TtsResult,
       Self::VoiceConversionResult,
       Self::ZeroShotTtsResult,
@@ -115,7 +115,7 @@ mod tests {
   fn test_serialization() {
     assert_serialization(IdCategory::MediaFile, "media_file");
     assert_serialization(IdCategory::LipsyncAnimationResult, "lipsync_animation");
-    assert_serialization(IdCategory::RerenderResult, "rerender");
+    assert_serialization(IdCategory::VideoFilterResult, "video_filter");
     assert_serialization(IdCategory::TtsResult, "tts_result");
     assert_serialization(IdCategory::VoiceConversionResult, "voice_conversion");
     assert_serialization(IdCategory::ZeroShotVoiceDataset, "zs_dataset");
@@ -128,7 +128,7 @@ mod tests {
     fn to_str() {
       assert_eq!(IdCategory::MediaFile.to_str(), "media_file");
       assert_eq!(IdCategory::LipsyncAnimationResult.to_str(), "lipsync_animation");
-      assert_eq!(IdCategory::RerenderResult.to_str(), "rerender");
+      assert_eq!(IdCategory::VideoFilterResult.to_str(), "video_filter");
       assert_eq!(IdCategory::TtsResult.to_str(), "tts_result");
       assert_eq!(IdCategory::VoiceConversionResult.to_str(), "voice_conversion");
       assert_eq!(IdCategory::ZeroShotVoiceDataset.to_str(), "zs_dataset");
@@ -141,7 +141,7 @@ mod tests {
     fn from_str() {
       assert_eq!(IdCategory::from_str("media_file").unwrap(), IdCategory::MediaFile);
       assert_eq!(IdCategory::from_str("lipsync_animation").unwrap(), IdCategory::LipsyncAnimationResult);
-      assert_eq!(IdCategory::from_str("rerender").unwrap(), IdCategory::RerenderResult);
+      assert_eq!(IdCategory::from_str("video_filter").unwrap(), IdCategory::VideoFilterResult);
       assert_eq!(IdCategory::from_str("tts_result").unwrap(), IdCategory::TtsResult);
       assert_eq!(IdCategory::from_str("voice_conversion").unwrap(), IdCategory::VoiceConversionResult);
       assert_eq!(IdCategory::from_str("zs_dataset").unwrap(), IdCategory::ZeroShotVoiceDataset);
@@ -157,7 +157,7 @@ mod tests {
       assert_eq!(variants.len(), 9);
       assert_eq!(variants.pop_first(), Some(IdCategory::MediaFile));
       assert_eq!(variants.pop_first(), Some(IdCategory::LipsyncAnimationResult));
-      assert_eq!(variants.pop_first(), Some(IdCategory::RerenderResult));
+      assert_eq!(variants.pop_first(), Some(IdCategory::VideoFilterResult));
       assert_eq!(variants.pop_first(), Some(IdCategory::TtsResult));
       assert_eq!(variants.pop_first(), Some(IdCategory::VoiceConversionResult));
       assert_eq!(variants.pop_first(), Some(IdCategory::ZeroShotTtsResult));

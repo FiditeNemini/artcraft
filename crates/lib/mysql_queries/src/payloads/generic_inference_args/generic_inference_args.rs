@@ -37,9 +37,9 @@ pub enum InferenceCategoryAbbreviated {
   #[serde(alias = "voice_conversion")]
   VoiceConversion,
 
-  #[serde(rename = "rr")] // NB: DO NOT CHANGE. It could break live jobs. Renamed to be fewer bytes.
-  #[serde(alias = "rerender_a_video")]
-  RerenderAVideo,
+  #[serde(rename = "vf")] // NB: DO NOT CHANGE. It could break live jobs. Renamed to be fewer bytes.
+  #[serde(alias = "video_filter")]
+  VideoFilter,
 }
 
 #[derive(Serialize, Deserialize, Clone, Copy, Debug)]
@@ -112,7 +112,7 @@ impl InferenceCategoryAbbreviated {
       InferenceCategory::LipsyncAnimation => Self::LipsyncAnimation,
       InferenceCategory::TextToSpeech => Self::TextToSpeech,
       InferenceCategory::VoiceConversion => Self::VoiceConversion,
-      InferenceCategory::RerenderAVideo => Self::RerenderAVideo,
+      InferenceCategory::VideoFilter => Self::VideoFilter,
     }
   }
 
@@ -121,7 +121,7 @@ impl InferenceCategoryAbbreviated {
       Self::LipsyncAnimation => InferenceCategory::LipsyncAnimation,
       Self::TextToSpeech => InferenceCategory::TextToSpeech,
       Self::VoiceConversion => InferenceCategory::VoiceConversion,
-      Self::RerenderAVideo => InferenceCategory::RerenderAVideo,
+      Self::VideoFilter => InferenceCategory::VideoFilter,
     }
   }
 }
