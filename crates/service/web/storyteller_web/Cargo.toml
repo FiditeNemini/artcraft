@@ -52,6 +52,7 @@ user_input_common = { path = "../../../lib/user_input_common" }
 
 # Internal Components
 billing_component = { path = "../../plugins/billing" }
+user_traits_component = { path = "../../plugins/user_traits_component" }
 users_component = { path = "../../plugins/users" }
 
 # Workspace hack (faster compile times)
