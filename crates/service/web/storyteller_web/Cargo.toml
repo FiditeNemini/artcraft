@@ -140,7 +140,7 @@ jwt = "0.13.0"
 hyper = { version = "0.14.24" }
 
 # Money
-async-stripe = { version = "0.25.2", default-features = false, features = ["runtime-tokio-hyper", "connect", "billing", "checkout", "webhook-events"] }
+async-stripe = { version = "0.26.0", default-features = false, features = ["runtime-tokio-hyper", "connect", "billing", "checkout", "webhook-events"] }
 
 # Crypto
 bcrypt = "0.8" # password hashes
