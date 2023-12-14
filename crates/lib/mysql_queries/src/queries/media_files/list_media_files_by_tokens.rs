@@ -15,12 +15,13 @@ use tokens::tokens::users::UserToken;
 pub struct MediaFilesByTokensRecord {
   pub token: MediaFileToken,
 
+  pub media_type: MediaFileType,
+
   pub origin_category: MediaFileOriginCategory,
   pub origin_product_category: MediaFileOriginProductCategory,
   pub maybe_origin_model_type: Option<MediaFileOriginModelType>,
   pub maybe_origin_model_token: Option<String>,
 
-  pub media_type: MediaFileType,
   pub public_bucket_directory_hash: String,
   pub maybe_public_bucket_prefix: Option<String>,
   pub maybe_public_bucket_extension: Option<String>,
@@ -59,6 +60,7 @@ async fn get_raw_media_files_by_tokens(
     QueryBuilder::new(r#"
       SELECT
           m.token,
+          m.media_type,
 
           m.origin_category,
           m.origin_product_category,
@@ -70,7 +72,6 @@ async fn get_raw_media_files_by_tokens(
           users.display_name as maybe_creator_display_name,
           users.email_gravatar_hash as maybe_creator_email_gravatar_hash,
 
-          m.media_type,
           m.public_bucket_directory_hash,
           m.maybe_public_bucket_prefix,
           m.maybe_public_bucket_extension,
@@ -91,6 +92,7 @@ async fn get_raw_media_files_by_tokens(
     QueryBuilder::new(r#"
       SELECT
           m.token,
+          m.media_type,
 
           m.origin_category,
           m.origin_product_category,
@@ -102,7 +104,6 @@ async fn get_raw_media_files_by_tokens(
           users.display_name as maybe_creator_display_name,
           users.email_gravatar_hash as maybe_creator_email_gravatar_hash,
 
-          m.media_type,
           m.public_bucket_directory_hash,
           m.maybe_public_bucket_prefix,
           m.maybe_public_bucket_extension,
@@ -177,6 +178,8 @@ fn map_to_media_files(dataset:Vec<RawMediaFileJoinUser>) -> Vec<MediaFilesByToke
   pub struct RawMediaFileJoinUser {
     pub token: MediaFileToken,
 
+    pub media_type: MediaFileType,
+
     pub origin_category: MediaFileOriginCategory,
     pub origin_product_category: MediaFileOriginProductCategory,
     pub maybe_origin_model_type: Option<MediaFileOriginModelType>,
@@ -187,7 +190,6 @@ fn map_to_media_files(dataset:Vec<RawMediaFileJoinUser>) -> Vec<MediaFilesByToke
     pub maybe_creator_display_name: Option<String>,
     pub maybe_creator_email_gravatar_hash: Option<String>,
 
-    pub media_type: MediaFileType,
     pub public_bucket_directory_hash: String,
     pub maybe_public_bucket_prefix: Option<String>,
     pub maybe_public_bucket_extension: Option<String>,
@@ -212,6 +214,7 @@ impl FromRow<'_, MySqlRow> for RawMediaFileJoinUser {
   fn from_row(row: &MySqlRow) -> Result<Self, sqlx::Error> {
     Ok(Self {
       token: MediaFileToken::new(row.try_get("token")?),
+      media_type: MediaFileType::try_from_mysql_row(row, "media_type")?,
       origin_category: MediaFileOriginCategory::try_from_mysql_row(row, "origin_category")?,
       origin_product_category: MediaFileOriginProductCategory::try_from_mysql_row(row, "origin_product_category")?,
       maybe_origin_model_type: MediaFileOriginModelType::try_from_mysql_row_nullable(row, "maybe_origin_model_type")?,
@@ -221,7 +224,6 @@ impl FromRow<'_, MySqlRow> for RawMediaFileJoinUser {
       maybe_creator_username: row.try_get("maybe_creator_username")?,
       maybe_creator_display_name: row.try_get("maybe_creator_display_name")?,
       maybe_creator_email_gravatar_hash: row.try_get("maybe_creator_email_gravatar_hash")?,
-      media_type: MediaFileType::try_from_mysql_row(row, "media_type")?,
       public_bucket_directory_hash: row.try_get("public_bucket_directory_hash")?,
       maybe_public_bucket_prefix: row.try_get("maybe_public_bucket_prefix")?,
       maybe_public_bucket_extension: row.try_get("maybe_public_bucket_extension")?,
