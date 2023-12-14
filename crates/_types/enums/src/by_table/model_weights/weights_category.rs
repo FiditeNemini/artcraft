@@ -4,9 +4,10 @@ use std::collections::BTreeSet;
 use strum::EnumCount;
 #[cfg(test)]
 use strum::EnumIter;
+use utoipa::ToSchema;
 
 #[cfg_attr(test, derive(EnumIter, EnumCount))]
-#[derive(Clone, Copy, Eq, PartialEq, Hash, Ord, PartialOrd, Deserialize, Serialize)]
+#[derive(Clone, Copy, Eq, PartialEq, Hash, Ord, PartialOrd, Deserialize, Serialize, ToSchema)]
 pub enum WeightsCategory {
     #[serde(rename = "image_generation")]
     ImageGeneration,
@@ -49,7 +50,7 @@ impl WeightsCategory {
 }
 impl_enum_display_and_debug_using_to_str!(WeightsCategory);
 impl_mysql_enum_coders!(WeightsCategory);
-
+impl_mysql_from_row!(WeightsCategory);
 
 #[cfg(test)]
 mod tests {

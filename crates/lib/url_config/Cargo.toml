@@ -18,7 +18,9 @@ path = "src/lib.rs"
 http_server_common = { path = "../deprecated/http_server_common" }
 reusable_types = { path = "../../_types/reusable_types" }
 
+# Workspace hack (faster compile times)
+my-workspace-hack = { version = "0.1", path = "../../my-workspace-hack" }
+
 # External
 actix-web = "4.4.0"
 anyhow = "1.0.75"
-my-workspace-hack = { version = "0.1", path = "../../../my-workspace-hack" }

@@ -1,4 +1,5 @@
 use anyhow::anyhow;
+
 use chrono::{DateTime, Utc};
 use log::warn;
 use sqlx::{MySql, MySqlPool};
@@ -14,7 +15,7 @@ use tokens::tokens::users::UserToken;
 
 use crate::helpers::boolean_converters::i8_to_bool;
 
-#[derive(Debug)]
+#[derive(Debug, Default)]
 pub struct GenericInferenceJobStatus {
   pub job_token: InferenceJobToken,
 
@@ -40,7 +41,7 @@ pub struct GenericInferenceJobStatus {
 
 /// Details about the user's original inference request
 /// (We may want to present it in the "pending" UI.)
-#[derive(Debug)]
+#[derive(Debug, Default)]
 pub struct RequestDetails {
   pub inference_category: InferenceCategory,
   pub maybe_model_type: Option<String>, // TODO: Strongly type
@@ -52,7 +53,7 @@ pub struct RequestDetails {
 }
 
 /// Details about the generated result
-#[derive(Debug)]
+#[derive(Debug, Default)]
 pub struct ResultDetails {
   pub entity_type: String,
   pub entity_token: String,
@@ -71,7 +72,7 @@ pub struct ResultDetails {
 
 /// NB: DO NOT EXPOSE TO FRONTEND.
 /// This is used to gate access to job termination
-#[derive(Debug)]
+#[derive(Debug, Default)]
 pub struct UserDetails {
   pub maybe_creator_user_token: Option<UserToken>,
   pub maybe_creator_anonymous_visitor_token: Option<AnonymousVisitorTrackingToken>,
@@ -168,10 +169,16 @@ WHERE jobs.token = ?
     }
   };
 
+  Ok(Some(raw_record_to_public_result(record)))
+}
+
+/// Map the internal record type (since we query over several result tables)
+fn raw_record_to_public_result(record: RawGenericInferenceJobStatus) -> GenericInferenceJobStatus {
   let maybe_model_title = match record.inference_category {
     InferenceCategory::LipsyncAnimation => Some("lipsync animation"),
     InferenceCategory::TextToSpeech => record.maybe_tts_model_title.as_deref(),
     InferenceCategory::VoiceConversion => record.maybe_voice_conversion_model_title.as_deref(),
+    InferenceCategory::RerenderAVideo => Some("rerender animation"),
   };
 
   // NB: A bit of a hack. We store TTS results with a full path.
@@ -180,6 +187,7 @@ WHERE jobs.token = ?
     InferenceCategory::LipsyncAnimation => (true, record.maybe_media_file_public_bucket_directory_hash.as_deref()),
     InferenceCategory::TextToSpeech => (false, record.maybe_tts_public_bucket_path.as_deref()),
     InferenceCategory::VoiceConversion => (true, record.maybe_voice_conversion_public_bucket_hash.as_deref()),
+    InferenceCategory::RerenderAVideo => (true, record.maybe_media_file_public_bucket_directory_hash.as_deref()),
   };
 
   // NB: We've moved voice conversion out of their own table and into media_files
@@ -213,7 +221,7 @@ WHERE jobs.token = ?
             })
       });
 
-  Ok(Some(GenericInferenceJobStatus {
+  GenericInferenceJobStatus {
     job_token: record.job_token,
     status: record.status,
     attempt_count: record.attempt_count,
@@ -237,9 +245,10 @@ WHERE jobs.token = ?
     is_keepalive_required: i8_to_bool(record.is_keepalive_required),
     created_at: record.created_at,
     updated_at: record.updated_at,
-  }))
+  }
 }
 
+#[derive(Debug, Default)]
 struct RawGenericInferenceJobStatus {
   pub job_token: InferenceJobToken,
 
@@ -281,3 +290,60 @@ struct RawGenericInferenceJobStatus {
   pub maybe_successfully_completed_at: Option<DateTime<Utc>>,
 }
 
+#[cfg(test)]
+mod tests {
+  use enums::by_table::generic_inference_jobs::inference_category::InferenceCategory;
+  use crate::queries::generic_inference::web::get_inference_job_status::{raw_record_to_public_result, RawGenericInferenceJobStatus};
+
+  #[test]
+  fn text_to_speech_as_media_file() {
+    // NB(bt,2023-12-06): After tts migration to media files, these are the results the job system will return
+    let record = RawGenericInferenceJobStatus {
+      inference_category:  InferenceCategory::TextToSpeech,
+      maybe_result_entity_type: Some("media_file".to_string()), // NB: Media file record
+      maybe_result_entity_token: Some("m_00af018cy75pxytpb8wbdx9jqgtp0p".to_string()),
+      maybe_media_file_public_bucket_directory_hash: Some("3vb91yq71z5zne56saazn4qntt52yter".to_string()), // NB: Media file
+      maybe_media_file_public_bucket_prefix: Some("fakeyou_".to_string()),
+      maybe_media_file_public_bucket_extension: Some(".wav".to_string()),
+      maybe_tts_public_bucket_path: None, // NB: Not a tts_result!
+      ..Default::default()
+    };
+
+    let record = raw_record_to_public_result(record);
+
+    assert!(record.maybe_result_details.is_some());
+
+    let result_details = record.maybe_result_details.expect("should have result details");
+
+    assert_eq!(&result_details.entity_type, "media_file");
+    assert_eq!(&result_details.entity_token, "m_00af018cy75pxytpb8wbdx9jqgtp0p");
+    assert_eq!(&result_details.public_bucket_location_or_hash, "3vb91yq71z5zne56saazn4qntt52yter");
+    assert_eq!(result_details.public_bucket_location_is_hash, true);
+  }
+
+  #[test]
+  fn text_to_speech_as_tts_result() {
+    // NB(bt,2023-12-06): Prior to tts migration to media files, these are the results the job system will return
+    let record = RawGenericInferenceJobStatus {
+      inference_category:  InferenceCategory::TextToSpeech,
+      maybe_result_entity_type: Some("text_to_speech".to_string()), // NB: TTS record
+      maybe_result_entity_token: Some("TR:wefhbk4j3yc8d6zwembedbdw4ad4s".to_string()),
+      maybe_tts_public_bucket_path: Some("/tts_inference_output/c/5/8/vocodes_c58aeaef-84df-4478-9e7f-c64280a852e8.wav".to_string()), // NB: tts_result!
+      maybe_media_file_public_bucket_directory_hash: None, // NB: Not a media file!
+      maybe_media_file_public_bucket_prefix: None,
+      maybe_media_file_public_bucket_extension: None,
+      ..Default::default()
+    };
+
+    let record = raw_record_to_public_result(record);
+
+    assert!(record.maybe_result_details.is_some());
+
+    let result_details = record.maybe_result_details.expect("should have result details");
+
+    assert_eq!(&result_details.entity_type, "text_to_speech");
+    assert_eq!(&result_details.entity_token, "TR:wefhbk4j3yc8d6zwembedbdw4ad4s");
+    assert_eq!(&result_details.public_bucket_location_or_hash, "/tts_inference_output/c/5/8/vocodes_c58aeaef-84df-4478-9e7f-c64280a852e8.wav");
+    assert_eq!(result_details.public_bucket_location_is_hash, false);
+  }
+}

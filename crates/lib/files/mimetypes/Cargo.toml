@@ -14,9 +14,12 @@ name = "mimetypes"
 path = "src/lib.rs"
 
 [dependencies]
+# Workspace hack (faster compile times)
+my-workspace-hack = { version = "0.1", path = "../../../my-workspace-hack" }
+
 # External
 infer = "0.11" # Mimetype detection
-my-workspace-hack = { version = "0.1", path = "../../../../my-workspace-hack" }
+
 
 [dev-dependencies]
 # None yet

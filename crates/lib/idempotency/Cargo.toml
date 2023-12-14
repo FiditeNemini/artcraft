@@ -17,9 +17,11 @@ path = "src/lib.rs"
 # errors = { path = "../../lib/errors" }
 # (None yet)
 
+# Workspace hack (faster compile times)
+my-workspace-hack = { version = "0.1", path = "../../my-workspace-hack" }
+
 # External
 uuid = { version = "0.8.2", features = ["v4"] }
-my-workspace-hack = { version = "0.1", path = "../../../my-workspace-hack" }
 
 [dev-dependencies]
 # None yet

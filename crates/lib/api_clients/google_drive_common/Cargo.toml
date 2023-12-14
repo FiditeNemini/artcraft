@@ -18,9 +18,11 @@ path = "src/lib.rs"
 container_common = { path = "../../deprecated/container_common" }
 subprocess_common = { path = "../../subprocess_common" }
 
+# Workspace hack (faster compile times)
+my-workspace-hack = { version = "0.1", path = "../../../my-workspace-hack" }
+
 # External
 anyhow = "1.0.75"
 log = "0.4.14"
 tempdir = "0.3.7"
-my-workspace-hack = { version = "0.1", path = "../../../../my-workspace-hack" }
 

@@ -20,11 +20,15 @@ http_server_common = { path = "../../../lib/deprecated/http_server_common" }
 mysql_queries = { path = "../../../lib/mysql_queries" }
 reusable_types = { path = "../../../_types/reusable_types" }
 url_config = { path = "../../../lib/url_config" }
+user_traits_component = { path = "../user_traits_component" }
+
+# Workspace hack (faster compile times)
+my-workspace-hack = { version = "0.1", path = "../../../my-workspace-hack" }
 
 # External
 anyhow = "1.0.75"
 base64 = "0.21.0"
-chrono = { version = "=0.4.22", features = ["serde"] }
+chrono = { version = "0.4.22", features = ["serde"] }
 dotenv = "0.15.0"
 log = "0.4.14"
 once_cell = "1.18.0"
@@ -50,15 +54,10 @@ async-stripe = { version = "0.25.2", default-features = false, features = ["runt
 # include support for async fn in traits.
 async-trait = "0.1.58"
 
-# MySql Database
-# "offline" supports typesafe builds without a live database
-# "rustls" doesn't appear to work with IP addresses, per:
-# https://github.com/launchbadge/sqlx/issues/1095#issuecomment-798050828
 sqlx = { version = "0.7.2", features = [ "mysql", "runtime-tokio", "tls-rustls", "chrono" ] }
-my-workspace-hack = { version = "0.1", path = "../../../../my-workspace-hack" }
 
 [dev-dependencies]
 mockall = "0.11.3"
 
 # NB: Tokio version matches `async-stripe` transitive dep; features are for testing
-tokio = { version = "1.13.0", features = ["rt", "macros"] }
+tokio = { version = "1.34.0", features = ["rt", "macros"] }

@@ -15,9 +15,10 @@ use strum::EnumIter;
 /// See also: https://docs.rs/sqlx/0.4.0-beta.1/sqlx/trait.Type.html
 ///
 /// *DO NOT CHANGE VALUES WITHOUT A MIGRATION STRATEGY!*
-///
+
+use utoipa::ToSchema;
 #[cfg_attr(test, derive(EnumIter, EnumCount))]
-#[derive(Clone, Copy, Eq, PartialEq, Deserialize, Serialize, sqlx::Type)]
+#[derive(Clone, Copy, Eq, PartialEq, Deserialize, Serialize, sqlx::Type,ToSchema)]
 #[serde(rename_all = "lowercase")]
 #[sqlx(rename_all = "lowercase")]
 pub enum Visibility {
@@ -38,6 +39,7 @@ pub enum Visibility {
 
 
 impl_enum_display_and_debug_using_to_str!(Visibility);
+impl_mysql_from_row!(Visibility);
 
 // For reference, here's what the serde implementation might be if manually written.
 // This may be useful for designing composite types in the future:

@@ -27,6 +27,7 @@ members = [
   "crates/lib/bootstrap",
   "crates/lib/caching/memory_caching",
   "crates/lib/caching/redis_caching",
+  "crates/lib/collections",
   "crates/lib/concurrency",
   "crates/lib/cookies",
   "crates/lib/crockford",
@@ -82,11 +83,14 @@ members = [
   # Service Plugins: complete subsystems that can be plugged into services (users, billing, etc.)
   "crates/service/plugins/billing",
   "crates/service/plugins/inference_workloads",
+  "crates/service/plugins/user_traits_component",
   "crates/service/plugins/users",
 
   # Vendored code
-  "crates/vendor/newrelic-telemetry-sdk-rust",
+  "crates/vendor/limitation",
+  # NB(bt,2023-12-12): Newrelic keeps breaking with upgrades. Kill for now.
+  #"crates/vendor/newrelic-telemetry-sdk-rust", 
 
-  # Vendored code
-  "my-workspace-hack",
+  # cargo-hakari workspace hack (compilation speedup hack)
+  "crates/my-workspace-hack",
 ]

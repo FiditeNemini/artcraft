@@ -13,20 +13,26 @@ name = "tokens"
 path = "src/lib.rs"
 
 [dependencies]
+
+# Internal
+# (none)
+
+# Workspace hack (faster compile times)
+my-workspace-hack = { version = "0.1", path = "../../my-workspace-hack" }
+
 # Serialization
 serde = "1.0.125"
 serde_derive = "1.0.125"
 
 # Random
-rand = "0.8.3"
+rand = {  version = "0.8.5", features = ["std_rng"] }
 
-# MySql Database
-# "offline" supports typesafe builds without a live database
-# "rustls" doesn't appear to work with IP addresses, per:
-# https://github.com/launchbadge/sqlx/issues/1095#issuecomment-798050828
+once_cell = { version = "1.18.0", features = [] }
+
 sqlx = { version = "0.7.2", features = [ "mysql", "runtime-tokio", "tls-rustls", "chrono" ] }
 sqlx-core = { version = "0.7.2" }
-my-workspace-hack = { version = "0.1", path = "../../../my-workspace-hack" }
+
+utoipa = { version = "4", features = ["chrono","actix_extras"] }
 
 [dev-dependencies]
 

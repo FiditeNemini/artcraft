@@ -29,7 +29,9 @@ Web API Overview
         * `tts-inference-job` - (*deprecated*) Async TTS inference of Tacotron2 models only
         * `w2l-download-job` - (*deprecated*) Async download of videos and images
         * `w2l-inference-job` - (*deprecated*) Async W2L inference
-
+    * Documentation Server:
+        * `docs` - this will run a local swagger server with the endpoints that you have access to, http://127.0.0.1:8989/api-docs/openapi.json use this to port everything over to the post man.
+        
 ### PowerStream
 
 * [PowerStream](https://power.stream) (deprecated) is powered by the following applications:

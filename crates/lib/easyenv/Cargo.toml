@@ -16,11 +16,13 @@ path = "src/lib.rs"
 # Internal
 storyteller_root = { path = "../storyteller_root" }
 
+# Workspace hack (faster compile times)
+my-workspace-hack = { version = "0.1", path = "../../my-workspace-hack" }
+
 # External
 dotenv = "0.15.0"
-env_logger = "0.10.0"
+env_logger = "0.10.1"
 log = "0.4.14"
-my-workspace-hack = { version = "0.1", path = "../../../my-workspace-hack" }
 
 [dev-dependencies]
 # None yet

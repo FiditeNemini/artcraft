@@ -18,7 +18,9 @@ path = "src/lib.rs"
 # Consider the dependencies here wisely.
 # Ideally we have almost nothing as a dependency of this crate.
 anyhow = "1.0.75"
-my-workspace-hack = { version = "0.1", path = "../../../my-workspace-hack" }
+
+# Workspace hack (faster compile times)
+my-workspace-hack = { version = "0.1", path = "../../my-workspace-hack" }
 
 [dev-dependencies]
 # None yet

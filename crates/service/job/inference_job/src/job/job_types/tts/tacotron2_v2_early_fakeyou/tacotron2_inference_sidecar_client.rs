@@ -5,7 +5,7 @@ use hyper::{Body, Request};
 use hyper::client::Client;
 use log::info;
 
-use container_common::anyhow_result::AnyhowResult;
+use errors::AnyhowResult;
 use filesys::path_to_string::path_to_string;
 use mysql_queries::column_types::vocoder_type::VocoderType;
 
@@ -160,7 +160,16 @@ impl Tacotron2InferenceSidecarClient {
 
     let client = Client::new();
 
-    let _maybe_response = client.request(req).await?;
+    let response = client.request(req).await?;
+    let status = response.status();
+
+    info!("Response status: {} ({:?})", status, status.canonical_reason());
+
+    if status.is_server_error() {
+      return Err(anyhow!("sidecar server error: {} {:?}", status, status.canonical_reason()));
+    } else if status.is_client_error() {
+      return Err(anyhow!("sidecar client request error: {} {:?}", status, status.canonical_reason()));
+    }
 
     Ok(())
   }

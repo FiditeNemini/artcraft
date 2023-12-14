@@ -18,6 +18,9 @@ path = "src/lib.rs"
 container_common = { path = "../../deprecated/container_common" }
 easyenv = { path = "../../easyenv" }
 
+# Workspace hack (faster compile times)
+my-workspace-hack = { version = "0.1", path = "../../../my-workspace-hack" }
+
 # External
 anyhow = "1.0.75"
 once_cell = "1.18.0"
@@ -31,4 +34,3 @@ twitch_oauth2 = "0.6.0-rc.2"
 # Serialization
 serde = "1.0.125"
 serde_derive = "1.0.125"
-my-workspace-hack = { version = "0.1", path = "../../../../my-workspace-hack" }

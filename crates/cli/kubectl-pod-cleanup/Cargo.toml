@@ -18,12 +18,14 @@ config = { path = "../../lib/deprecated/config" }
 easyenv = { path = "../../lib/easyenv" }
 errors = { path = "../../lib/errors" }
 
+# Workspace hack (faster compile yytimes)
+my-workspace-hack = { version = "0.1", path = "../../my-workspace-hack" }
+
 # External
 log = "0.4.20"
 once_cell = "1.18.0"
-rand = "0.8.1"
+rand = "0.8.5"
 regex = "1.10.0"
-my-workspace-hack = { version = "0.1", path = "../../../my-workspace-hack" }
 
 # Async Runtime
 # NB: Not using Tokio here since everything is blocking so far.

@@ -5,9 +5,9 @@ use std::time::Instant;
 use anyhow::anyhow;
 use log::{error, info, warn};
 
-use buckets::public::media_files::original_file::MediaFileBucketPath;
-use buckets::public::zs_voices::directory::{ModelCategory, ModelType};
-use buckets::public::zs_voices::file::ZeroShotVoiceEmbeddingBucketPath;
+use buckets::private::zs_voices::bucket_directory::{ModelCategory, ModelType};
+use buckets::private::zs_voices::bucket_file_path::ZeroShotVoiceEmbeddingBucketPath;
+use buckets::public::media_files::bucket_file_path::MediaFileBucketPath;
 use cloud_storage::bucket_client::BucketClient;
 use cloud_storage::bucket_path_unifier::BucketPathUnifier;
 use enums::by_table::generic_inference_jobs::inference_result_type::InferenceResultType;
@@ -23,7 +23,6 @@ use crate::job::job_loop::process_single_job_error::ProcessSingleJobError;
 use crate::job::job_types::tts::vall_e_x::process_job::VALLEXProcessJobArgs;
 use crate::job::job_types::tts::vall_e_x::vall_e_x_inference_command::InferenceArgs;
 
-// Clearify what this is for ?
 const BUCKET_FILE_PREFIX: &str = "fakeyou_";
 const BUCKET_FILE_EXTENSION: &str = ".wav";
 const MIME_TYPE: &str = "audio/wav";
@@ -82,12 +81,12 @@ pub async fn process_inference_voice(
   for downloader in model_dependencies.downloaders.all_downloaders() {
     let result = downloader.download_if_not_on_filesystem(
       &args.job_dependencies.buckets.private_bucket_client,
-      &args.job_dependencies.fs.scoped_temp_dir_creator_for_downloads
+      &args.job_dependencies.fs.scoped_temp_dir_creator_for_short_lived_downloads
     ).await;
 
-    if let Err(e) = result {
-      error!("could not download: {:?}", e);
-      return Err(ProcessSingleJobError::from_anyhow_error(e));
+    if let Err(err) = result {
+      error!("could not download: {:?}", err);
+      return Err(err);
     }
   }
 
@@ -208,6 +207,7 @@ pub async fn process_inference_voice(
       .map_err(|e| ProcessSingleJobError::Other(e))?;
 
   // ==================== UPLOAD AUDIO TO BUCKET ====================
+
   info!("Calculating sha256...");
 
   let file_checksum = sha256_hash_file(&finished_file).map_err(|err| {

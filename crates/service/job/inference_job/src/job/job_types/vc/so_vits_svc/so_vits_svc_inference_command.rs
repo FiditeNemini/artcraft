@@ -1,15 +1,16 @@
 use std::collections::HashSet;
 use std::env;
 use std::ffi::OsString;
+use std::fs::File;
 use std::path::{Path, PathBuf};
 use std::time::Duration;
 
 use anyhow::anyhow;
 use log::info;
 use once_cell::sync::Lazy;
-use subprocess::{Popen, PopenConfig};
+use subprocess::{Popen, PopenConfig, Redirection};
 
-use container_common::anyhow_result::AnyhowResult;
+use errors::AnyhowResult;
 use filesys::path_to_string::path_to_string;
 use subprocess_common::docker_options::{DockerEnvVar, DockerFilesystemMount, DockerGpu, DockerOptions};
 
@@ -89,6 +90,8 @@ pub struct InferenceArgs<P: AsRef<Path>> {
 
   /// --output_path: output path of converting model to onnx (which we use to test validity)
   pub output_path: P,
+
+  pub stderr_output_file: P,
 
   /// --auto-predict-f0: turn on or off fundamental frequency auto prediction
   /// This sounds better when left off, but it defaults to *ON* if not specified.
@@ -365,6 +368,11 @@ impl SoVitsSvcInferenceCommand {
     }
 
     let mut config = PopenConfig::default();
+
+    info!("stderr will be written to file: {:?}", args.stderr_output_file.as_ref());
+
+    let stderr_file = File::create(&args.stderr_output_file)?;
+    config.stderr = Redirection::File(stderr_file);
 
     if !env_vars.is_empty() {
       config.env = Some(env_vars);

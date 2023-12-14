@@ -13,6 +13,10 @@ publish = false
 name = "storyteller-web"
 path = "src/main.rs"
 
+[[bin]]
+name = "docs"
+path = "src/api_doc_server.rs"
+
 [dependencies]
 
 # Internal
@@ -48,13 +52,16 @@ user_input_common = { path = "../../../lib/user_input_common" }
 
 # Internal Components
 billing_component = { path = "../../plugins/billing" }
+user_traits_component = { path = "../../plugins/user_traits_component" }
 users_component = { path = "../../plugins/users" }
 
+# Workspace hack (faster compile times)
+my-workspace-hack = { version = "0.1", path = "../../../my-workspace-hack" }
 
 # External
 anyhow = "1.0.75"
 base64 = "0.21.0"
-chrono = { version = "=0.4.22", features = ["serde"] }
+chrono = { version = "0.4.22", features = ["serde"] }
 derive_more = "0.99.17"
 dotenv = "0.15.0"
 hex = "0.4.3"
@@ -63,8 +70,9 @@ lazy_static = "1.4.0"
 lexical-sort = "0.3.1"
 log = "0.4.14"
 once_cell = "1.18.0"
-rand = "0.8.3"
+rand = "0.8.5"
 regex = "1.5.4"
+
 #symphonia = { version = "0.5.2", features = ["aac", "alac", "flac", "isomp4", "mkv", "mp3", "ogg", "opus", "vorbis", "wav"] }
 # Opus support still hasn't landed in Symphonia, so we have to use an older version (~0.5) off-master.
 # Opus is the browser's default (only) recording codec: https://blog.addpipe.com/audio-constraints-getusermedia/
@@ -88,7 +96,7 @@ native-tls = { version = "0.2.8", features = ["vendored"] }
 
 # Runtime
 # NB: We switched to Tokio from `async-std` for broader ecosystem support.
-tokio = { version = "1.6.0", features = ["macros"] }
+tokio = { version = "1.34.0", features = ["macros"] }
 
 # Futures
 futures = { version = "0.3.17", features = ["thread-pool"] } # feature for ThreadPool
@@ -97,14 +105,10 @@ futures_old_for_limiter = { package = "futures", version = "0.1.29" } # Older ve
 futures-core = "0.3.29" # NB: For middleware/futures upgrade
 pin-project-lite = "0.2.9" # NB: For middleware/futures upgrade
 
-# MySql Database
-# "offline" supports typesafe builds without a live database
-# "rustls" doesn't appear to work with IP addresses, per:
-# https://github.com/launchbadge/sqlx/issues/1095#issuecomment-798050828
 sqlx = { version = "0.7.2", features = [ "mysql", "runtime-tokio", "tls-rustls", "chrono" ] }
 
 # Redis Database
-limitation = "0.1.1" # Redis rate limiter
+limitation = { path = "../../../vendor/limitation" }
 r2d2_redis = "0.14.0"
 
 # Elasticsearch
@@ -159,7 +163,10 @@ pulldown-cmark = "0.9.3"
 # The initial round of stabilizations for the async/await language feature in Rust 1.39 did not
 # include support for async fn in traits.
 async-trait = "0.1.58"
-my-workspace-hack = { version = "0.1", path = "../../../../my-workspace-hack" }
+
+utoipa = { version = "4", features = ["chrono","actix_extras"] }
+utoipa-swagger-ui = { version = "5", features = ["actix-web"] }
+http = "0.2.11"
 
 [build-dependencies]
 # NB: Only using diesel for migrations support

@@ -14,12 +14,18 @@ use tokens::tokens::users::UserToken;
 pub struct InsertArgs<'a> {
   pub pool: &'a MySqlPool,
 
+  /// If supplied, use this media token rather than generating a new one.
+  /// This is good to support idempotency in development and testing.
+  pub maybe_use_apriori_media_token: Option<&'a MediaFileToken>,
+
   pub media_file_type: MediaFileType,
   pub maybe_mime_type: Option<&'a str>,
   pub file_size_bytes: u64,
   pub sha256_checksum: &'a str,
 
-  pub maybe_creator_user_token: Option<UserToken>,
+  pub maybe_origin_filename: Option<&'a str>,
+
+  pub maybe_creator_user_token: Option<&'a UserToken>,
   pub creator_set_visibility: Visibility,
 
   pub public_bucket_directory_hash: &'a str,
@@ -33,7 +39,9 @@ pub async fn insert_media_file_from_cli_tool(
   args: InsertArgs<'_>
 ) -> AnyhowResult<(MediaFileToken, u64)>
 {
-  let media_file_token = MediaFileToken::generate();
+  let media_file_token = args.maybe_use_apriori_media_token
+      .map(|token| token.clone())
+      .unwrap_or_else(|| MediaFileToken::generate());
 
   let mut transaction = args.pool.begin().await?;
 
@@ -58,6 +66,8 @@ SET
   file_size_bytes = ?,
   checksum_sha2 = ?,
 
+  maybe_origin_filename = ?,
+
   public_bucket_directory_hash = ?,
   maybe_public_bucket_prefix = ?,
   maybe_public_bucket_extension = ?,
@@ -76,6 +86,8 @@ SET
       args.maybe_mime_type,
       args.file_size_bytes,
       args.sha256_checksum,
+
+      args.maybe_origin_filename,
 
       args.public_bucket_directory_hash,
       args.maybe_public_bucket_prefix,

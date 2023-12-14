@@ -24,26 +24,24 @@ mysql_queries = { path = "../../../lib/mysql_queries" }
 reusable_types = { path = "../../../_types/reusable_types" }
 tokens = { path = "../../../_types/tokens" }
 
+# Workspace hack (faster compile times)
+my-workspace-hack = { version = "0.1", path = "../../../my-workspace-hack" }
+
 # External
 anyhow = "1.0.75"
-chrono = { version = "=0.4.22", features = ["serde"] }
+chrono = { version = "0.4.22", features = ["serde"] }
 dotenv = "0.15.0"
 hostname = "0.3.1"
 log = "0.4.14"
-rand = "0.8.3"
+rand = "0.8.5"
 
-# MySql Database
-# "offline" supports typesafe builds without a live database
-# "rustls" doesn't appear to work with IP addresses, per:
-# https://github.com/launchbadge/sqlx/issues/1095#issuecomment-798050828
 sqlx = { version = "0.7.2", features = [ "mysql", "runtime-tokio", "tls-rustls", "chrono" ] }
 
 # Runtime
 # NB: We switched to Tokio from `async-std` for broader ecosystem support.
-tokio = { version = "1.6.0", features = ["macros"] }
+tokio = { version = "1.34.0", features = ["macros"] }
 
 # Serialization
 serde = "1.0.125"
 serde_derive = "1.0.125"
 serde_json = "1.0.108"
-my-workspace-hack = { version = "0.1", path = "../../../../my-workspace-hack" }

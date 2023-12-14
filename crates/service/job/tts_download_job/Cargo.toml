@@ -20,24 +20,24 @@ config = { path = "../../../lib/deprecated/config" }
 container_common = { path = "../../../lib/deprecated/container_common" }
 easyenv = { path = "../../../lib/easyenv" }
 enums = { path = "../../../_types/enums" }
+filesys = { path = "../../../lib/files/filesys" }
 google_drive_common = { path = "../../../lib/api_clients/google_drive_common" }
 hashing = { path = "../../../lib/files/hashing" }
 jobs_common = { path = "../../../lib/jobs_common" }
 mysql_queries = { path = "../../../lib/mysql_queries" }
 
+# Workspace hack (faster compile times)
+my-workspace-hack = { version = "0.1", path = "../../../my-workspace-hack" }
+
 # External
 anyhow = "1.0.75"
-chrono = { version = "=0.4.22", features = ["serde"] }
+chrono = { version = "0.4.22", features = ["serde"] }
 dotenv = "0.15.0"
 hostname = "0.3.1"
 log = "0.4.14"
 subprocess = "0.2.9"
 tempdir = "0.3.7"
 
-# MySql Database
-# "offline" supports typesafe builds without a live database
-# "rustls" doesn't appear to work with IP addresses, per:
-# https://github.com/launchbadge/sqlx/issues/1095#issuecomment-798050828
 sqlx = { version = "0.7.2", features = [ "mysql", "runtime-tokio", "tls-rustls", "chrono" ] }
 
 # Redis
@@ -45,7 +45,7 @@ r2d2_redis = "0.14.0"
 
 # Runtime
 # NB: We switched to Tokio from `async-std` for broader ecosystem support.
-tokio = { version = "1.6.0", features = ["macros"] }
+tokio = { version = "1.34.0", features = ["macros"] }
 
 # NB: Hyper is just for HTTP client use in jobs. I'd use Actix client, but I need tokio runtime
 # NB: Furthermore, the Tokio runtime is old, so I have to use an older Hyper.
@@ -55,4 +55,3 @@ hyper = { version = "0.14.24" }
 serde = "1.0.125"
 serde_derive = "1.0.125"
 serde_json = "1.0.108"
-my-workspace-hack = { version = "0.1", path = "../../../../my-workspace-hack" }

@@ -2,7 +2,6 @@
 #![forbid(unused_mut)]
 #![forbid(unused_variables)]
 
-// TODO MOVE into own file.
 use std::fmt::Debug;
 use std::sync::Arc;
 
@@ -12,6 +11,7 @@ use actix_web::http::StatusCode;
 use log::warn;
 use serde::Deserialize;
 use serde::Serialize;
+use utoipa::ToSchema;
 
 use enums::by_table::generic_inference_jobs::inference_category::InferenceCategory;
 use enums::by_table::generic_inference_jobs::inference_model_type::InferenceModelType;
@@ -42,20 +42,21 @@ const DEBUG_HEADER_NAME: &str = "enable-debug-mode";
 /// This is useful for catching the live logs or intercepting the job.
 const ROUTING_TAG_HEADER_NAME: &str = "routing-tag";
 
-#[derive(Deserialize)]
+
+#[derive(Deserialize,ToSchema)]
 pub struct EnqueueTTSRequest {
     uuid_idempotency_token: String,
     text: String,
     voice_token: String,
 }
 
-#[derive(Serialize)]
+#[derive(Serialize,ToSchema)]
 pub struct EnqueueTTSRequestSuccessResponse {
     pub success: bool,
     pub inference_job_token: InferenceJobToken,
 }
 
-#[derive(Debug)]
+#[derive(Debug,ToSchema)]
 pub enum EnqueueTTSRequestError {
     BadInput(String),
     NotAuthorized,
@@ -95,13 +96,26 @@ impl std::fmt::Display for EnqueueTTSRequestError {
 // Reference enqueue_infer_tts_handler.rs for checks: rate limiting / user sessions
 // insert generic inference job.rs
 // Need to convert it to generic inference job.
+#[utoipa::path(
+    post,
+    path = "/inference/enqueue_tts/",
+    responses(
+        (status = 200, description = "Enqueue TTS generically", body = EnqueueTTSRequestSuccessResponse),
+        (status = 400, description = "Bad input", body = EnqueueTTSRequestError),
+        (status = 401, description = "Not authorized", body = EnqueueTTSRequestError),
+        (status = 429, description = "Rate limited", body = EnqueueTTSRequestError),
+        (status = 500, description = "Server error", body = EnqueueTTSRequestError)
+    ),
+    params(
+        ("request" = EnqueueTTSRequest, description = "Payload for TTS Request")
+    )
+)]
 pub async fn enqueue_tts_request(
     http_request: HttpRequest,
     request: web::Json<EnqueueTTSRequest>,
     server_state: web::Data<Arc<ServerState>>
 ) -> Result<HttpResponse, EnqueueTTSRequestError> {
-    println!("Received payload");
-
+    
     let mut maybe_user_token: Option<UserToken> = None;
 
     let mut mysql_connection = server_state.mysql_pool.acquire().await.map_err(|err| {
@@ -139,16 +153,19 @@ pub async fn enqueue_tts_request(
         |routing_tag| routing_tag.trim().to_string()
     );
 
+    // ==================== BANNED USERS ==================== //
+
+    if let Some(ref user) = maybe_user_session {
+        if user.role.is_banned {
+            return Err(EnqueueTTSRequestError::NotAuthorized);
+        }
+    }
+
     // ==================== RATE LIMIT ==================== //
 
     let rate_limiter = match maybe_user_session {
         None => &server_state.redis_rate_limiters.logged_out,
-        Some(ref user) => {
-            if user.role.is_banned {
-                return Err(EnqueueTTSRequestError::NotAuthorized);
-            }
-            &server_state.redis_rate_limiters.logged_in
-        }
+        Some(ref _user) => &server_state.redis_rate_limiters.logged_in,
     };
 
     if let Err(_err) = rate_limiter.rate_limit_request(&http_request) {
@@ -177,6 +194,7 @@ pub async fn enqueue_tts_request(
         maybe_input_source_token: None,
         maybe_input_source_token_type: None,
         maybe_raw_inference_text: Some(&request.text),
+        maybe_max_duration_seconds: None,
         maybe_inference_args: Some(GenericInferenceArgs {
             inference_category: Some(InferenceCategoryAbbreviated::TextToSpeech),
             args: Some(PolymorphicInferenceArgs::Tts(inference_args)),

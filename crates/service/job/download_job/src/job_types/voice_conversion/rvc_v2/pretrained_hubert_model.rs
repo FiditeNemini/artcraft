@@ -5,10 +5,10 @@ use log::info;
 use tempdir::TempDir;
 
 use cloud_storage::bucket_client::BucketClient;
-use container_common::filesystem::safe_delete_temp_directory::safe_delete_temp_directory;
 use errors::AnyhowResult;
 use filesys::create_dir_all_if_missing::create_dir_all_if_missing;
 use filesys::file_exists::file_exists;
+use filesys::safe_delete_temp_directory::safe_delete_temp_directory;
 
 #[derive(Clone)]
 pub struct PretrainedHubertModel {

@@ -18,3 +18,15 @@ update generic_inference_jobs
 set status = 'dead'
 where status IN ('pending', 'started', 'attempt_failed')
 and maybe_model_type IN ('sad_talker', 'so_vits_svc');
+
+-- Tacotron 2 TTS
+update generic_inference_jobs
+set status = 'dead'
+where status IN ('pending', 'started', 'attempt_failed')
+  and maybe_model_type IN ('tacotron2');
+
+-- Sad Talker Face Animation
+update generic_inference_jobs
+set status = 'dead'
+where status IN ('pending', 'started', 'attempt_failed')
+  and maybe_model_type IN ('sad_talker');

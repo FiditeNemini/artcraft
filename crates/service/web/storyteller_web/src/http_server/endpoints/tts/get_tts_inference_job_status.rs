@@ -8,7 +8,7 @@ use actix_web::web::Path;
 use chrono::{DateTime, Utc};
 use log::{error, log};
 use r2d2_redis::redis::{Commands, RedisResult};
-use buckets::public::media_files::original_file::MediaFileBucketPath;
+use buckets::public::media_files::bucket_file_path::MediaFileBucketPath;
 use mysql_queries::queries::generic_inference::web::get_inference_job_status::get_inference_job_status;
 
 use mysql_queries::queries::tts::tts_inference_jobs::get_tts_inference_job_status::get_tts_inference_job_status;
@@ -150,6 +150,7 @@ async fn legacy_lookup(job_token: &str, server_state: &ServerState)
         GetTtsInferenceStatusError::ServerError
       })?;
 
+  // TODO(bt,2023-05-21): Make async.
   let extra_status_key = RedisKeys::tts_inference_extra_status_info(&job_token);
   let maybe_extra_status_description : Option<String> = match redis.get(&extra_status_key) {
     Ok(Some(status)) => {

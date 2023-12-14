@@ -13,10 +13,11 @@ use strum::EnumIter;
 ///
 /// DO NOT CHANGE VALUES WITHOUT A MIGRATION STRATEGY.
 #[cfg_attr(test, derive(EnumIter, EnumCount))]
-#[derive(Clone, Copy, Eq, PartialEq, Hash, Ord, PartialOrd, Deserialize, Serialize)]
+#[derive(Clone, Copy, Eq, PartialEq, Hash, Ord, PartialOrd, Deserialize, Serialize, Default)]
 pub enum InferenceCategory {
   /// Eg. SadTalker and possibly Wav2Lip
   #[serde(rename = "lipsync_animation")]
+  #[default]
   LipsyncAnimation,
 
   #[serde(rename = "text_to_speech")]
@@ -24,6 +25,9 @@ pub enum InferenceCategory {
 
   #[serde(rename = "voice_conversion")]
   VoiceConversion,
+
+  #[serde(rename = "rerender_a_video")]
+  RerenderAVideo,
 }
 
 // TODO(bt, 2022-12-21): This desperately needs MySQL integration tests!
@@ -37,6 +41,7 @@ impl InferenceCategory {
       Self::LipsyncAnimation => "lipsync_animation",
       Self::TextToSpeech => "text_to_speech",
       Self::VoiceConversion => "voice_conversion",
+      Self::RerenderAVideo => "rerender_a_video",
     }
   }
 
@@ -45,6 +50,7 @@ impl InferenceCategory {
       "lipsync_animation" => Ok(Self::LipsyncAnimation),
       "text_to_speech" => Ok(Self::TextToSpeech),
       "voice_conversion" => Ok(Self::VoiceConversion),
+      "rerender_a_video" => Ok(Self::RerenderAVideo),
       _ => Err(format!("invalid value: {:?}", value)),
     }
   }
@@ -56,6 +62,7 @@ impl InferenceCategory {
       Self::LipsyncAnimation,
       Self::TextToSpeech,
       Self::VoiceConversion,
+      Self::RerenderAVideo,
     ])
   }
 }
@@ -70,6 +77,7 @@ mod tests {
     assert_serialization(InferenceCategory::LipsyncAnimation, "lipsync_animation");
     assert_serialization(InferenceCategory::TextToSpeech, "text_to_speech");
     assert_serialization(InferenceCategory::VoiceConversion, "voice_conversion");
+    assert_serialization(InferenceCategory::RerenderAVideo, "rerender_a_video");
   }
 
   #[test]
@@ -77,6 +85,7 @@ mod tests {
     assert_eq!(InferenceCategory::LipsyncAnimation.to_str(), "lipsync_animation");
     assert_eq!(InferenceCategory::TextToSpeech.to_str(), "text_to_speech");
     assert_eq!(InferenceCategory::VoiceConversion.to_str(), "voice_conversion");
+    assert_eq!(InferenceCategory::RerenderAVideo.to_str(), "rerender_a_video");
   }
 
   #[test]
@@ -84,16 +93,18 @@ mod tests {
     assert_eq!(InferenceCategory::from_str("lipsync_animation").unwrap(), InferenceCategory::LipsyncAnimation);
     assert_eq!(InferenceCategory::from_str("text_to_speech").unwrap(), InferenceCategory::TextToSpeech);
     assert_eq!(InferenceCategory::from_str("voice_conversion").unwrap(), InferenceCategory::VoiceConversion);
+    assert_eq!(InferenceCategory::from_str("rerender_a_video").unwrap(), InferenceCategory::RerenderAVideo);
   }
 
   #[test]
   fn all_variants() {
     // Static check
     let mut variants = InferenceCategory::all_variants();
-    assert_eq!(variants.len(), 3);
+    assert_eq!(variants.len(), 4);
     assert_eq!(variants.pop_first(), Some(InferenceCategory::LipsyncAnimation));
     assert_eq!(variants.pop_first(), Some(InferenceCategory::TextToSpeech));
     assert_eq!(variants.pop_first(), Some(InferenceCategory::VoiceConversion));
+    assert_eq!(variants.pop_first(), Some(InferenceCategory::RerenderAVideo));
     assert_eq!(variants.pop_first(), None);
 
     // Generated check

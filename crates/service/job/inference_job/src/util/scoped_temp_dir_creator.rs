@@ -15,6 +15,10 @@ impl ScopedTempDirCreator {
     }
   }
 
+  pub fn get_base_dir(&self) -> &Path {
+    &self.base_dir
+  }
+
   pub fn new_tempdir(&self, name: &str) -> std::io::Result<TempDir> {
     TempDir::new_in(&self.base_dir, name)
   }

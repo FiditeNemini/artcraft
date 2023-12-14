@@ -5,8 +5,9 @@ use serde::Serialize;
 
 use crate::prefixes::TokenPrefix;
 
+use utoipa::ToSchema;
 /// The primary key for the  "model_weights" table.
-#[derive(Clone, PartialEq, Eq, PartialOrd, Ord, Hash, sqlx::Type, Debug, Serialize, Deserialize)]
+#[derive(Clone, PartialEq, Eq, PartialOrd, Ord, Hash, sqlx::Type, Debug, Serialize, Deserialize,ToSchema)]
 #[sqlx(transparent)]
 pub struct ModelWeightToken(pub String);
 

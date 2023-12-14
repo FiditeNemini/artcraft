@@ -9,12 +9,12 @@ use chrono::{DateTime, Utc};
 use log::error;
 use r2d2_redis::redis::{Commands, RedisResult};
 
-use buckets::public::media_files::original_file::MediaFileBucketPath;
-use buckets::public::voice_conversion_results::original_file::VoiceConversionResultOriginalFilePath;
+use buckets::public::media_files::bucket_file_path::MediaFileBucketPath;
+use buckets::public::voice_conversion_results::bucket_file_path::VoiceConversionResultOriginalFilePath;
 use enums::by_table::generic_inference_jobs::frontend_failure_category::FrontendFailureCategory;
 use enums::by_table::generic_inference_jobs::inference_category::InferenceCategory;
 use enums::common::job_status_plus::JobStatusPlus;
-use mysql_queries::queries::generic_inference::web::get_inference_job_status::get_inference_job_status;
+use mysql_queries::queries::generic_inference::web::get_inference_job_status::{GenericInferenceJobStatus, get_inference_job_status};
 use redis_common::redis_keys::RedisKeys;
 use tokens::tokens::generic_inference_jobs::InferenceJobToken;
 use crate::http_server::responses::filter_model_name::maybe_filter_model_name;
@@ -140,12 +140,15 @@ pub async fn get_inference_job_status_handler(
   if path.token.as_str().trim() == "None" {
     // NB: A bunch of Python clients use our API and can fail in this manner.
     // This was a large traffic driver during the 2023-03-08 outage.
+    // Presumably it's this client: https://github.com/shards-7/fakeyou.py
     return Err(GetInferenceJobStatusError::NotFound);
   }
 
-  // NB: Lookup failure is Err(RowNotFound).
   // NB: Since this is publicly exposed, we don't query sensitive data.
-  let maybe_status = get_inference_job_status(&path.token, &server_state.mysql_pool).await;
+  let maybe_status = get_inference_job_status(
+    &path.token,
+    &server_state.mysql_pool
+  ).await;
 
   let record = match maybe_status {
     Ok(Some(record)) => record,
@@ -198,9 +201,32 @@ pub async fn get_inference_job_status_handler(
     };
   }
 
+  let record_for_response = record_to_payload(
+    record, maybe_extra_status_description);
+
+  let response = GetInferenceJobStatusSuccessResponse {
+    success: true,
+    state: record_for_response,
+  };
+
+  let body = serde_json::to_string(&response)
+      .map_err(|e| {
+        error!("error returning response: {:?}",  e);
+        GetInferenceJobStatusError::ServerError
+      })?;
+
+  Ok(HttpResponse::Ok()
+      .content_type("application/json")
+      .body(body))
+}
+
+fn record_to_payload(
+  record: GenericInferenceJobStatus,
+  maybe_extra_status_description: Option<String>,
+) -> InferenceJobStatusResponsePayload {
   let inference_category = record.request_details.inference_category.clone();
 
-  let record_for_response = InferenceJobStatusResponsePayload {
+  InferenceJobStatusResponsePayload {
     job_token: record.job_token,
     request: RequestDetailsResponse {
       inference_category: record.request_details.inference_category,
@@ -226,7 +252,15 @@ pub async fn get_inference_job_status_handler(
           MediaFileBucketPath::from_object_hash(
             &result_details.public_bucket_location_or_hash,
             result_details.maybe_media_file_public_bucket_prefix.as_deref(),
-          result_details.maybe_media_file_public_bucket_extension.as_deref())
+            result_details.maybe_media_file_public_bucket_extension.as_deref())
+              .get_full_object_path_str()
+              .to_string()
+        }
+        InferenceCategory::RerenderAVideo => {
+          MediaFileBucketPath::from_object_hash(
+            &result_details.public_bucket_location_or_hash,
+            result_details.maybe_media_file_public_bucket_prefix.as_deref(),
+            result_details.maybe_media_file_public_bucket_extension.as_deref())
               .get_full_object_path_str()
               .to_string()
         }
@@ -279,20 +313,80 @@ pub async fn get_inference_job_status_handler(
     }),
     created_at: record.created_at,
     updated_at: record.updated_at,
-  };
+  }
+}
 
-  let response = GetInferenceJobStatusSuccessResponse {
-    success: true,
-    state: record_for_response,
-  };
+#[cfg(test)]
+mod tests {
+  use enums::by_table::generic_inference_jobs::inference_category::InferenceCategory;
+  use enums::by_table::generic_inference_jobs::inference_model_type::InferenceModelType;
+  use mysql_queries::queries::generic_inference::web::get_inference_job_status::{GenericInferenceJobStatus, RequestDetails, ResultDetails};
+  use crate::http_server::endpoints::inference_job::get_inference_job_status::record_to_payload;
 
-  let body = serde_json::to_string(&response)
-      .map_err(|e| {
-        error!("error returning response: {:?}",  e);
-        GetInferenceJobStatusError::ServerError
-      })?;
+  #[test]
+  fn text_to_speech_as_media_file() {
+    let status = GenericInferenceJobStatus {
+      request_details: RequestDetails {
+        inference_category: InferenceCategory::TextToSpeech,
+        maybe_model_type: Some("tacotron2".to_string()),
+        ..Default::default()
+      },
+      maybe_result_details: Some(ResultDetails {
+        entity_type: "media_file".to_string(),
+        entity_token: "m_024pk3p3xrmeyk83chps90jeymnygk".to_string(),
+        public_bucket_location_or_hash: "tpk848b5s5zwhnwrph75jhyfyja3j42v".to_string(),
+        maybe_media_file_public_bucket_prefix: Some("fakeyou_".to_string()),
+        maybe_media_file_public_bucket_extension: Some(".wav".to_string()),
+        public_bucket_location_is_hash: true,
+        ..Default::default()
+      }),
+      ..Default::default()
+    };
 
-  Ok(HttpResponse::Ok()
-      .content_type("application/json")
-      .body(body))
+    let payload =
+        record_to_payload(status, None);
+
+    assert!(payload.maybe_result.is_some());
+
+    let result = payload.maybe_result.expect("should have result");
+
+    assert_eq!(
+      Some("/media/t/p/k/8/4/tpk848b5s5zwhnwrph75jhyfyja3j42v/fakeyou_tpk848b5s5zwhnwrph75jhyfyja3j42v.wav"),
+      result.maybe_public_bucket_media_path.as_deref()
+    );
+  }
+
+  #[test]
+  fn text_to_speech_as_tts_result() {
+    let status = GenericInferenceJobStatus {
+      request_details: RequestDetails {
+        inference_category: InferenceCategory::TextToSpeech,
+        maybe_model_type: Some("tacotron2".to_string()),
+        ..Default::default()
+      },
+      maybe_result_details: Some(ResultDetails {
+        entity_type: "text_to_speech".to_string(),
+        entity_token: "TR:qvgdvngw4y54t7rmfepwv8fd965eh".to_string(),
+        public_bucket_location_or_hash:
+          "/tts_inference_output/9/9/7/vocodes_997e710c-d733-406c-9b6e-5e1d0c471816.wav".to_string(),
+        maybe_media_file_public_bucket_prefix: None,
+        maybe_media_file_public_bucket_extension: None,
+        public_bucket_location_is_hash: false,
+        ..Default::default()
+      }),
+      ..Default::default()
+    };
+
+    let payload =
+        record_to_payload(status, None);
+
+    assert!(payload.maybe_result.is_some());
+
+    let result = payload.maybe_result.expect("should have result");
+
+    assert_eq!(
+      Some("/tts_inference_output/9/9/7/vocodes_997e710c-d733-406c-9b6e-5e1d0c471816.wav"),
+      result.maybe_public_bucket_media_path.as_deref(),
+    );
+  }
 }

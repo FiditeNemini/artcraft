@@ -4,9 +4,10 @@ use serde::Deserialize;
 use serde::Serialize;
 
 use crate::prefixes::TokenPrefix;
+use utoipa::ToSchema;
 
 /// The primary key for "generic" inference jobs.
-#[derive(Clone, PartialEq, Eq, sqlx::Type, Debug, Serialize, Deserialize)]
+#[derive(Clone, PartialEq, Eq, sqlx::Type, Debug, Serialize, Deserialize, Default, ToSchema)]
 #[sqlx(transparent)]
 pub struct InferenceJobToken(String);
 

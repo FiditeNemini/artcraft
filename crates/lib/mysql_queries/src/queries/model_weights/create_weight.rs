@@ -7,6 +7,7 @@ use enums::by_table::model_weights::{
 use log::warn;
 use enums::common::visibility::Visibility;
 use tokens::tokens::{ users::UserToken, model_weights::ModelWeightToken };
+
 pub struct CreateModelWeightsArgs<'a> {
     pub token: &'a ModelWeightToken,
     pub weights_type: WeightsType,
