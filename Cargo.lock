@@ -813,6 +813,7 @@ dependencies = [
  "tokio",
  "toml 0.5.11",
  "url_config",
+ "user_traits_component",
 ]
 
 [[package]]
@@ -5954,6 +5955,7 @@ dependencies = [
  "twitch_oauth2",
  "url_config",
  "user_input_common",
+ "user_traits_component",
  "users_component",
  "utoipa",
  "utoipa-swagger-ui",
@@ -7067,6 +7069,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "user_traits_component"
+version = "0.0.1"
+dependencies = [
+ "actix-web",
+ "errors",
+ "mockall",
+ "my-workspace-hack",
+]
+
+[[package]]
 name = "users_component"
 version = "0.0.1"
 dependencies = [
@@ -7109,6 +7121,7 @@ dependencies = [
  "tokens",
  "toml 0.5.11",
  "user_input_common",
+ "user_traits_component",
 ]
 
 [[package]]
