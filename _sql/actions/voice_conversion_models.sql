@@ -376,6 +376,15 @@ where token IN (
 );
 
 
+update voice_conversion_models
+set
+  mod_deleted_at = NOW(),
+  maybe_mod_comments = 'abuse'
+where token IN (
+  'vcm_qajyd528p8kw',
+  'vcm_f5pcdecmzcc5'
+);
+
 
 
 
