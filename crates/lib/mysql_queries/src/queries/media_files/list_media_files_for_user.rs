@@ -1,4 +1,5 @@
 use chrono::{DateTime, Utc};
+use log::warn;
 use sqlx::{FromRow, MySql, MySqlPool, QueryBuilder, Row};
 use sqlx::mysql::MySqlRow;
 
@@ -11,16 +12,15 @@ use enums::traits::mysql_from_row::MySqlFromRow;
 use errors::AnyhowResult;
 use tokens::tokens::media_files::MediaFileToken;
 
+
+
 pub struct MediaFileListPage {
   pub records: Vec<MediaFileListItem>,
 
   pub sort_ascending: bool,
 
-  /// ID of the first record.
-  pub first_id: Option<i64>,
-
-  /// ID of the last record.
-  pub last_id: Option<i64>,
+  pub current_page: usize,
+  pub total_page_count: usize,
 }
 
 pub struct MediaFileListItem {
@@ -51,9 +51,9 @@ pub enum ViewAs {
 
 pub struct ListMediaFileForUserArgs<'a> {
   pub username: &'a str,
-  pub limit: usize,
   pub maybe_filter_media_type: Option<MediaFileType>,
-  pub maybe_offset: Option<usize>,
+  pub page_size: usize,
+  pub page_index: usize,
   pub cursor_is_reversed: bool,
   pub view_as: ViewAs,
   pub mysql_pool: &'a MySqlPool,
@@ -61,25 +61,42 @@ pub struct ListMediaFileForUserArgs<'a> {
 
 pub async fn list_media_files_for_user(args: ListMediaFileForUserArgs<'_>) -> AnyhowResult<MediaFileListPage> {
 
+  /// Let's figure out how many results we could have returned total
+  let count_fields = select_total_count_field();
+  let mut count_query_builder = query_builder(
+    args.maybe_filter_media_type,
+    args.username,
+    false,
+    0,
+    0,
+    args.cursor_is_reversed,
+    args.view_as,
+    count_fields.as_str(),
+  );
+
+  let row_count_query = count_query_builder.build_query_scalar::<i64>();
+  let row_count_result = row_count_query.fetch_one(args.mysql_pool).await?;
+  /// Figure out limit start and end based on page size and indexes as requested
+  let limit_start = args.page_size * args.page_index;
+  let limit_end = limit_start + args.page_size;
+
+  /// Now fetch the actual results with all the fields
+  let result_fields = select_result_fields();
   let mut query = query_builder(
     args.maybe_filter_media_type,
     args.username,
-    args.limit,
-    args.maybe_offset,
+    true,
+    limit_start,
+    limit_end,
     args.cursor_is_reversed,
     args.view_as,
+    result_fields.as_str(),
   );
 
   let query = query.build_query_as::<MediaFileListItemInternal>();
-
   let results = query.fetch_all(args.mysql_pool).await?;
 
-  let first_id = results.first()
-      .map(|raw_result| raw_result.id);
-
-  let last_id = results.last()
-      .map(|raw_result| raw_result.id);
-
+  let number_of_pages = (row_count_result / args.page_size as i64) as usize;
   let results = results.into_iter()
       .map(|record| {
         MediaFileListItem {
@@ -102,43 +119,59 @@ pub async fn list_media_files_for_user(args: ListMediaFileForUserArgs<'_>) -> An
   Ok(MediaFileListPage {
     records: results,
     sort_ascending: !args.cursor_is_reversed,
-    first_id,
-    last_id,
+    current_page: args.page_index,
+    total_page_count: number_of_pages,
   })
+}
+
+
+fn select_result_fields() -> String {
+  r#"
+    m.id,
+    m.token,
+
+    m.origin_category,
+    m.origin_product_category,
+
+    m.maybe_origin_model_type,
+    m.maybe_origin_model_token,
+
+    m.media_type,
+
+    m.public_bucket_directory_hash,
+    m.maybe_public_bucket_prefix,
+    m.maybe_public_bucket_extension,
+
+    m.creator_set_visibility,
+    m.created_at,
+    m.updated_at
+  "#
+  .to_string()
+}
+
+fn select_total_count_field() -> String {
+  r#"
+    COUNT(m.id) AS total_count
+  "#
+  .to_string()
 }
 
 fn query_builder<'a>(
   maybe_filter_media_type: Option<MediaFileType>,
   username: &'a str,
-  limit: usize,
-  maybe_offset: Option<usize>,
+  enforce_limits: bool,
+  limit_start: usize,
+  limit_end: usize,
   cursor_is_reversed: bool,
   view_as: ViewAs,
+  select_fields: &'a str,
 ) -> QueryBuilder<'a, MySql> {
 
   // NB: Query cannot be statically checked by sqlx
   let mut query_builder: QueryBuilder<MySql> = QueryBuilder::new(
-    r#"
+    format!(r#"
 SELECT
-  m.id,
-  m.token,
-
-  m.origin_category,
-  m.origin_product_category,
-
-  m.maybe_origin_model_type,
-  m.maybe_origin_model_token,
-
-  m.media_type,
-
-  m.public_bucket_directory_hash,
-  m.maybe_public_bucket_prefix,
-  m.maybe_public_bucket_extension,
-
-  m.creator_set_visibility,
-  m.created_at,
-  m.updated_at
-
+     {select_fields}
 FROM media_files AS m
 LEFT OUTER JOIN users AS u
     ON m.maybe_creator_user_token = u.token
@@ -146,7 +179,7 @@ LEFT OUTER JOIN users AS u
 WHERE m.user_deleted_at IS NULL
   AND m.mod_deleted_at IS NULL
     "#
-  );
+  ));
 
   query_builder.push(" AND u.username = ");
   query_builder.push_bind(username);
@@ -171,21 +204,19 @@ WHERE m.user_deleted_at IS NULL
     }
   }
 
-  if let Some(offset) = maybe_offset {
-    if cursor_is_reversed {
-      query_builder.push(format!(" AND m.id < {offset} "));
-    } else {
-      query_builder.push(format!(" AND m.id > {offset} "));
-    }
-  }
-
   if cursor_is_reversed {
     query_builder.push(" ORDER BY m.id ASC ");
   } else {
     query_builder.push(" ORDER BY m.id DESC ");
   }
 
-  query_builder.push(format!(" LIMIT {limit} "));
+  if (enforce_limits) {
+    if cursor_is_reversed {
+      query_builder.push(format!(" LIMIT {limit_start}, {limit_end} "));
+    } else {
+      query_builder.push(format!(" LIMIT {limit_end}, {limit_start} "));
+    }
+  }
 
   query_builder
 }
