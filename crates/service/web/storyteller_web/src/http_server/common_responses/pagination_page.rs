@@ -8,10 +8,10 @@
 #[derive(Serialize)]
 pub struct PaginationPage {
   /// The current page number
-  pub current: u64,
+  pub current: usize,
 
   /// How many pages there are in total
-  pub total_page_count: u64,
+  pub total_page_count: usize,
 }
 
 #[cfg(test)]
