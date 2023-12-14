@@ -22,7 +22,6 @@ use mysql_queries::common_inputs::container_environment_arg::ContainerEnvironmen
 use mysql_queries::mediators::firehose_publisher::FirehosePublisher;
 use mysql_queries::queries::tts::tts_models::get_tts_model_for_inference_improved::TtsModelForInferenceRecord;
 use mysql_queries::queries::voice_conversion::inference::get_voice_conversion_model_for_inference::VoiceConversionModelForInference;
-use newrelic_telemetry::Client as NewRelicClient;
 
 use crate::job_specific_dependencies::JobSpecificDependencies;
 use crate::util::scoped_execution::ScopedExecution;
@@ -135,10 +134,6 @@ pub struct ClientDependencies {
   pub job_progress_reporter: Box<dyn JobProgressReporterBuilder>,
 
   pub firehose_publisher: FirehosePublisher,
-
-  pub newrelic_client: NewRelicClient,
-
-  pub newrelic_disabled: bool,
 }
 
 pub struct FileSystemDetails {

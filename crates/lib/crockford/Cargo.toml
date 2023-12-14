@@ -15,8 +15,14 @@ name = "crockford"
 path = "src/lib.rs"
 
 [dependencies]
-rand = "0.8.5"
+# Internal
+# (None yet)
+
+# Workspace hack (faster compile times)
 my-workspace-hack = { version = "0.1", path = "../../my-workspace-hack" }
+
+# External
+rand = "0.8.5"
 
 [dev-dependencies]
 # None yet

@@ -11,7 +11,7 @@ use users_component::default_routes::add_suggested_api_v1_account_creation_and_s
 use users_component::endpoints::edit_profile_handler::edit_profile_handler;
 use users_component::endpoints::get_profile_handler::get_profile_handler;
 
-use crate::http_server::endpoints::animation::enqueue_lipsync_animation::enqueue_lipsync_animation_handler;
+use crate::http_server::endpoints::animation::enqueue_face_animation::enqueue_face_animation_handler;
 use crate::http_server::endpoints::animation::enqueue_rerender_animation::enqueue_rerender_animation_handler;
 use crate::http_server::endpoints::api_tokens::create_api_token::create_api_token_handler;
 use crate::http_server::endpoints::api_tokens::delete_api_token::delete_api_token_handler;
@@ -29,11 +29,11 @@ use crate::http_server::endpoints::comments::list_comments_handler::list_comment
 use crate::http_server::endpoints::download_job::enqueue_generic_download::enqueue_generic_download_handler;
 use crate::http_server::endpoints::download_job::get_generic_upload_job_status::get_generic_download_job_status_handler;
 use crate::http_server::endpoints::events::list_events::list_events_handler;
-use crate::http_server::endpoints::favorites::create_favorite_handler::create_favorite_handler;
-use crate::http_server::endpoints::favorites::delete_favorite_handler::delete_favorite_handler;
-use crate::http_server::endpoints::favorites::list_favorites_for_entity_handler::list_favorites_for_entity_handler;
-use crate::http_server::endpoints::favorites::list_favorites_for_session_handler::list_favorites_for_session_handler;
-use crate::http_server::endpoints::favorites::list_favorites_for_user_handler::list_favorites_for_user_handler;
+use crate::http_server::endpoints::user_bookmarks::create_user_bookmark_handler::create_user_bookmark_handler;
+use crate::http_server::endpoints::user_bookmarks::delete_user_bookmark_handler::delete_user_bookmark_handler;
+use crate::http_server::endpoints::user_bookmarks::list_user_bookmarks_for_entity_handler::list_user_bookmarks_for_entity_handler;
+use crate::http_server::endpoints::user_bookmarks::list_user_bookmarks_for_session_handler::list_user_bookmarks_for_session_handler;
+use crate::http_server::endpoints::user_bookmarks::list_user_bookmarks_for_user_handler::list_user_bookmarks_for_user_handler;
 use crate::http_server::endpoints::flags::design_refresh_flag::disable_design_refresh_flag_handler::disable_design_refresh_flag_handler;
 use crate::http_server::endpoints::flags::design_refresh_flag::enable_design_refresh_flag_handler::enable_design_refresh_flag_handler;
 use crate::http_server::endpoints::inference_job::get_inference_job_status::get_inference_job_status_handler;
@@ -153,6 +153,13 @@ use crate::http_server::endpoints::w2l::list_user_w2l_templates::list_user_w2l_t
 use crate::http_server::endpoints::w2l::list_w2l_templates::list_w2l_templates_handler;
 use crate::http_server::endpoints::w2l::set_w2l_template_mod_approval::set_w2l_template_mod_approval_handler;
 
+use crate::http_server::endpoints::weights::get_weight::get_weight_handler;
+use crate::http_server::endpoints::weights::delete_weight::delete_weight_handler;
+use crate::http_server::endpoints::weights::update_weight::update_weight_handler;
+use crate::http_server::endpoints::weights::list_available_weights::list_available_weights_handler;
+use crate::http_server::endpoints::weights::list_weights_by_user::list_weights_by_user_handler;
+
+
 pub fn add_routes<T, B> (app: App<T>, server_environment: ServerEnvironment) -> App<T>
   where
       B: MessageBody,
@@ -185,6 +192,9 @@ pub fn add_routes<T, B> (app: App<T>, server_environment: ServerEnvironment) -> 
   app = add_subscription_routes(app); /* /v1/subscriptions/... */
   app = add_voice_designer_routes(app); /* /v1/voice_designer */
 
+  if server_environment == ServerEnvironment::Development {
+     app = add_weights_routes(app); /* /v1/stubs/... */
+  }
   // ==================== Comments ====================
 
   let mut app = RouteBuilder::from_app(app)
@@ -193,20 +203,20 @@ pub fn add_routes<T, B> (app: App<T>, server_environment: ServerEnvironment) -> 
       .add_post("/v1/comments/delete/{comment_token}", delete_comment_handler)
       .into_app();
 
-  // ==================== Favorites ====================
+  // ==================== User Bookmarks ====================
 
   let mut app = RouteBuilder::from_app(app)
-      .add_post("/v1/favorites/create", create_favorite_handler)
-      .add_post("/v1/favorites/delete/{favorite_token}", delete_favorite_handler)
-      .add_get("/v1/favorites/list/session", list_favorites_for_session_handler)
-      .add_get("/v1/favorites/list/user/{username}", list_favorites_for_user_handler)
-      .add_get("/v1/favorites/list/entity/{entity_type}/{entity_token}", list_favorites_for_entity_handler)
+      .add_post("/v1/user_bookmarks/create", create_user_bookmark_handler)
+      .add_post("/v1/user_bookmarks/delete/{user_bookmark_token}", delete_user_bookmark_handler)
+      .add_get("/v1/user_bookmarks/list/session", list_user_bookmarks_for_session_handler)
+      .add_get("/v1/user_bookmarks/list/user/{username}", list_user_bookmarks_for_user_handler)
+      .add_get("/v1/user_bookmarks/list/entity/{entity_type}/{entity_token}", list_user_bookmarks_for_entity_handler)
       .into_app();
 
   // ==================== Animations ====================
 
   let mut app = RouteBuilder::from_app(app)
-      .add_post("/v1/animation/face_animation/create", enqueue_lipsync_animation_handler)
+      .add_post("/v1/animation/face_animation/create", enqueue_face_animation_handler)
       .add_post("/v1/animation/rerender/create", enqueue_rerender_animation_handler)
       .into_app();
 
@@ -1233,3 +1243,33 @@ fn add_voice_designer_routes<T,B> (app:App<T>)-> App<T>
       )
 }
 
+// ==================== Weights ROUTES ====================
+fn add_weights_routes<T, B>(app: App<T>) -> App<T>
+    where
+        B: MessageBody,
+        T: ServiceFactory<
+            ServiceRequest,
+            Config = (),
+            Response = ServiceResponse<B>,
+            Error = Error,
+            InitError = ()
+        >
+{
+    app.service(
+        web
+            ::scope("/v1/weights")
+            //.route("/upload", web::post().to(upload_weights_handler))
+            .service(
+                web
+                    ::resource("/weight/{weight_token}")
+                    .route(web::get().to(get_weight_handler))
+                    .route(web::post().to(update_weight_handler))
+                    .route(web::delete().to(delete_weight_handler))
+            )
+            .route("/by_user/{username}", web::get().to(list_weights_by_user_handler))
+            .route(
+                "/list",
+                web::get().to(list_available_weights_handler)
+            )
+    )
+}

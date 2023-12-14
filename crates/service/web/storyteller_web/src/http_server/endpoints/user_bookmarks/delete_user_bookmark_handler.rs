@@ -1,0 +1,116 @@
+// NB: Incrementally getting rid of build warnings...
+#![forbid(unused_imports)]
+#![forbid(unused_mut)]
+#![forbid(unused_variables)]
+
+use std::fmt;
+use std::sync::Arc;
+
+use actix_web::{HttpRequest, HttpResponse, web};
+use actix_web::error::ResponseError;
+use actix_web::http::StatusCode;
+use actix_web::web::Path;
+use log::warn;
+
+use mysql_queries::queries::user_bookmarks::delete_user_bookmark::delete_user_bookmark;
+use tokens::tokens::user_bookmarks::UserBookmarkToken;
+
+use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
+use crate::http_server::web_utils::response_success_helpers::simple_json_success;
+use crate::server_state::ServerState;
+
+/// For the URL PathInfo
+#[derive(Deserialize)]
+pub struct DeleteUserBookmarkPathInfo {
+  user_bookmark_token: UserBookmarkToken,
+}
+
+#[derive(Deserialize)]
+pub struct DeleteUserBookmarkRequest {
+  /// NB: this is only to disambiguate when a user is both a mod and an author.
+  as_mod: Option<bool>,
+}
+
+#[derive(Debug)]
+pub enum DeleteUserBookmarkError {
+  BadInput(String),
+  NotAuthorized,
+  NotFound,
+  ServerError,
+}
+
+impl ResponseError for DeleteUserBookmarkError {
+  fn status_code(&self) -> StatusCode {
+    match *self {
+      DeleteUserBookmarkError::BadInput(_) => StatusCode::BAD_REQUEST,
+      DeleteUserBookmarkError::NotAuthorized => StatusCode::UNAUTHORIZED,
+      DeleteUserBookmarkError::NotFound => StatusCode::NOT_FOUND,
+      DeleteUserBookmarkError::ServerError => StatusCode::INTERNAL_SERVER_ERROR,
+    }
+  }
+
+  fn error_response(&self) -> HttpResponse {
+    let error_reason = match self {
+      DeleteUserBookmarkError::BadInput(reason) => reason.to_string(),
+      DeleteUserBookmarkError::NotAuthorized => "unauthorized".to_string(),
+      DeleteUserBookmarkError::NotFound => "not found".to_string(),
+      DeleteUserBookmarkError::ServerError => "server error".to_string(),
+    };
+
+    to_simple_json_error(&error_reason, self.status_code())
+  }
+}
+
+// NB: Not using derive_more::Display since Clion doesn't understand it.
+impl fmt::Display for DeleteUserBookmarkError {
+  fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+    write!(f, "{:?}", self)
+  }
+}
+
+pub async fn delete_user_bookmark_handler(
+  http_request: HttpRequest,
+  path: Path<DeleteUserBookmarkPathInfo>,
+  _request: web::Json<DeleteUserBookmarkRequest>,
+  server_state: web::Data<Arc<ServerState>>
+) -> Result<HttpResponse, DeleteUserBookmarkError> {
+  let mut mysql_connection = server_state.mysql_pool
+      .acquire()
+      .await
+      .map_err(|err| {
+        warn!("MySql pool error: {:?}", err);
+        DeleteUserBookmarkError::ServerError
+      })?;
+
+  let maybe_user_session = server_state
+      .session_checker
+      .maybe_get_user_session_from_connection(&http_request, &mut mysql_connection)
+      .await
+      .map_err(|e| {
+        warn!("Session checker error: {:?}", e);
+        DeleteUserBookmarkError::ServerError
+      })?;
+
+  let user_session = match maybe_user_session {
+    Some(session) => session,
+    None => {
+      return Err(DeleteUserBookmarkError::NotAuthorized);
+    }
+  };
+
+  let query_result = delete_user_bookmark(
+    &path.user_bookmark_token,
+    &user_session.user_token_typed,
+    &mut *mysql_connection
+  ).await;
+
+  match query_result {
+    Ok(_) => {},
+    Err(err) => {
+      warn!("Update tts mod approval status DB error: {:?}", err);
+      return Err(DeleteUserBookmarkError::ServerError);
+    }
+  };
+
+  Ok(simple_json_success())
+}

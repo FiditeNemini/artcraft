@@ -3,7 +3,7 @@ use std::time::Duration;
 use log::info;
 use sqlx::mysql::MySqlPoolOptions;
 
-use buckets::public::media_files::original_file::MediaFileBucketPath;
+use buckets::public::media_files::bucket_file_path::MediaFileBucketPath;
 use cloud_storage::bucket_client::BucketClient;
 use config::shared_constants::{DEFAULT_MYSQL_CONNECTION_STRING, DEFAULT_RUST_LOG};
 use enums::by_table::media_files::media_file_type::MediaFileType;
@@ -119,10 +119,12 @@ pub async fn main() -> AnyhowResult<()> {
 
   let (media_file_token, _id) = insert_media_file_from_cli_tool(InsertArgs {
     pool: &pool,
+    maybe_use_apriori_media_token: None,
     media_file_type,
     maybe_mime_type,
     file_size_bytes: 0, // TODO
     sha256_checksum: "", // TODO
+    maybe_origin_filename: None,
     maybe_creator_user_token: None,
     creator_set_visibility,
     public_bucket_directory_hash: public_upload_path.get_object_hash(),

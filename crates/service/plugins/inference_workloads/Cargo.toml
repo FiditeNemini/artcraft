@@ -14,5 +14,5 @@ path = "src/lib.rs"
 
 [dependencies]
 
-# External
+# Workspace hack (faster compile times)
 my-workspace-hack = { version = "0.1", path = "../../../my-workspace-hack" }

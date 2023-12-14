@@ -75,6 +75,7 @@ use crate::billing::internal_product_to_stripe_lookup_impl::InternalProductToStr
 use crate::billing::internal_session_cache_purge_impl::InternalSessionCachePurgeImpl;
 use crate::billing::stripe_internal_subscription_product_lookup_impl::StripeInternalSubscriptionProductLookupImpl;
 use crate::billing::stripe_internal_user_lookup_impl::StripeInternalUserLookupImpl;
+use crate::configs::app_startup::redis_rate_limiters::configure_redis_rate_limiters;
 use crate::configs::static_api_tokens::{StaticApiTokenConfig, StaticApiTokens, StaticApiTokenSet};
 use crate::http_server::middleware::pushback_filter_middleware::PushbackFilter;
 use crate::http_server::web_utils::redis_rate_limiter::RedisRateLimiter;
@@ -173,65 +174,6 @@ async fn main() -> AnyhowResult<()> {
     easyenv::get_env_num("REDIS_CACHE_TTL_SECONDS", 60)?,
   );
 
-  info!("Setting up Redis rate limiters...");
-
-  // Old env vars:
-  //
-  // "LIMITER_ENABLED"
-  // "LIMITER_MAX_REQUESTS"
-  // "LIMITER_WINDOW_SECONDS"
-  //
-  let logged_out_redis_rate_limiter = {
-    let limiter_enabled = easyenv::get_env_bool_or_default("LIMITER_LOGGED_OUT_ENABLED", true);
-    let limiter_max_requests = easyenv::get_env_num("LIMITER_LOGGED_OUT_MAX_REQUESTS", 3)?;
-    let limiter_window_seconds = easyenv::get_env_num("LIMITER_LOGGED_OUT_WINDOW_SECONDS", 10)?;
-
-    let limiter = Limiter::build(&common_env.redis_0_connection_string)
-        .limit(limiter_max_requests)
-        .period(Duration::from_secs(limiter_window_seconds))
-        .finish()?;
-
-    RedisRateLimiter::new(limiter, "logged_out", limiter_enabled)
-  };
-
-  let logged_in_redis_rate_limiter = {
-    let limiter_enabled = easyenv::get_env_bool_or_default("LIMITER_LOGGED_IN_ENABLED", true);
-    let limiter_max_requests = easyenv::get_env_num("LIMITER_LOGGED_IN_MAX_REQUESTS", 3)?;
-    let limiter_window_seconds = easyenv::get_env_num("LIMITER_LOGGED_IN_WINDOW_SECONDS", 10)?;
-
-    let limiter = Limiter::build(&common_env.redis_0_connection_string)
-        .limit(limiter_max_requests)
-        .period(Duration::from_secs(limiter_window_seconds))
-        .finish()?;
-
-    RedisRateLimiter::new(limiter, "logged_in", limiter_enabled)
-  };
-
-  let api_high_priority_redis_rate_limiter = {
-    let limiter_enabled = easyenv::get_env_bool_or_default("LIMITER_API_HIGH_PRIORITY_ENABLED", true);
-    let limiter_max_requests = easyenv::get_env_num("LIMITER_API_HIGH_PRIORITY_MAX_REQUESTS", 30)?;
-    let limiter_window_seconds = easyenv::get_env_num("LIMITER_API_HIGH_PRIORITY_WINDOW_SECONDS", 30)?;
-
-    let limiter = Limiter::build(&common_env.redis_0_connection_string)
-        .limit(limiter_max_requests)
-        .period(Duration::from_secs(limiter_window_seconds))
-        .finish()?;
-
-    RedisRateLimiter::new(limiter, "api_high_priority", limiter_enabled)
-  };
-
-  let model_upload_rate_limiter = {
-    let limiter_enabled = easyenv::get_env_bool_or_default("LIMITER_MODEL_UPLOAD_ENABLED", true);
-    let limiter_max_requests = easyenv::get_env_num("LIMITER_MODEL_UPLOAD_MAX_REQUESTS", 3)?;
-    let limiter_window_seconds = easyenv::get_env_num("LIMITER_MODEL_UPLOAD_WINDOW_SECONDS", 10)?;
-
-    let limiter = Limiter::build(&common_env.redis_0_connection_string)
-        .limit(limiter_max_requests)
-        .period(Duration::from_secs(limiter_window_seconds))
-        .finish()?;
-
-    RedisRateLimiter::new(limiter, "model_upload", limiter_enabled)
-  };
 
   info!("Connecting to elasticsearch...");
 
@@ -466,12 +408,7 @@ async fn main() -> AnyhowResult<()> {
     elasticsearch,
     redis_pool,
     redis_ttl_cache,
-    redis_rate_limiters: RedisRateLimiters {
-      logged_out: logged_out_redis_rate_limiter,
-      logged_in: logged_in_redis_rate_limiter,
-      api_high_priority: api_high_priority_redis_rate_limiter,
-      model_upload: model_upload_rate_limiter,
-    },
+    redis_rate_limiters: configure_redis_rate_limiters(&common_env)?,
     firehose_publisher,
     badge_granter,
     avt_cookie_manager,

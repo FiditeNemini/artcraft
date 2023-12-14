@@ -5,9 +5,9 @@ use std::time::Instant;
 use anyhow::anyhow;
 use log::{error, info, warn};
 
-use buckets::public::media_files::original_file::MediaFileBucketPath;
-use buckets::public::zs_voices::directory::{ModelCategory, ModelType};
-use buckets::public::zs_voices::file::ZeroShotVoiceEmbeddingBucketPath;
+use buckets::private::zs_voices::bucket_directory::{ModelCategory, ModelType};
+use buckets::private::zs_voices::bucket_file_path::ZeroShotVoiceEmbeddingBucketPath;
+use buckets::public::media_files::bucket_file_path::MediaFileBucketPath;
 use cloud_storage::bucket_client::BucketClient;
 use cloud_storage::bucket_path_unifier::BucketPathUnifier;
 use enums::by_table::generic_inference_jobs::inference_result_type::InferenceResultType;
@@ -61,16 +61,14 @@ pub async fn process_create_voice(
 
   let creator_ip_address = &job.creator_ip_address;
 
-  let creator_user_token: UserToken;
-
-  match &job.maybe_creator_user_token {
+  let creator_user_token = match &job.maybe_creator_user_token {
     Some(token) => {
-      creator_user_token = UserToken::new_from_str(token);
+      UserToken::new_from_str(token)
     },
     None => {
       return Err(ProcessSingleJobError::InvalidJob(anyhow!("Missing Creator User Token")));
     }
-  }
+  };
 
   // STEP 1. SETUP A TEMP DIRECTORY
   let work_temp_dir = format!("/tmp/temp_zeroshot_create_voice_{}", job.id.0);

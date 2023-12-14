@@ -205,17 +205,20 @@ pub async fn enqueue_voice_conversion_inference_handler(
       get_request_header_optional(&http_request, ROUTING_TAG_HEADER_NAME)
           .map(|routing_tag| routing_tag.trim().to_string());
 
+  // ==================== BANNED USERS ==================== //
+
+  if let Some(ref user) = maybe_user_session {
+    if user.role.is_banned {
+      return Err(EnqueueVoiceConversionInferenceError::NotAuthorized);
+    }
+  }
+
   // ==================== RATE LIMIT ==================== //
 
   if !disable_rate_limiter {
     let mut rate_limiter = match maybe_user_session {
       None => &server_state.redis_rate_limiters.logged_out,
-      Some(ref user) => {
-        if user.role.is_banned {
-          return Err(EnqueueVoiceConversionInferenceError::NotAuthorized);
-        }
-        &server_state.redis_rate_limiters.logged_in
-      },
+      Some(ref _session) => &server_state.redis_rate_limiters.logged_in
     };
 
     // TODO/TEMP

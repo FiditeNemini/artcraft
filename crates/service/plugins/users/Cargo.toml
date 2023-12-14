@@ -31,6 +31,9 @@ server_environment = { path = "../../../lib/server_environment" }
 tokens = { path = "../../../_types/tokens" }
 user_input_common = { path = "../../../lib/user_input_common" }
 
+# Workspace hack (faster compile times)
+my-workspace-hack = { version = "0.1", path = "../../../my-workspace-hack" }
+
 # External
 anyhow = "1.0.75"
 base64 = "0.21.0"
@@ -65,4 +68,3 @@ sqlx = { version = "0.7.2", features = [ "mysql", "runtime-tokio", "tls-rustls",
 r2d2_redis = "0.14.0"
 byteorder = "1.5.0"
 strum_macros = "0.25.3"
-my-workspace-hack = { version = "0.1", path = "../../../my-workspace-hack" }

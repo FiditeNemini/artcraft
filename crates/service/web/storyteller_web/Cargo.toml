@@ -95,7 +95,7 @@ native-tls = { version = "0.2.8", features = ["vendored"] }
 
 # Runtime
 # NB: We switched to Tokio from `async-std` for broader ecosystem support.
-tokio = { version = "1.6.0", features = ["macros"] }
+tokio = { version = "1.34.0", features = ["macros"] }
 
 # Futures
 futures = { version = "0.3.17", features = ["thread-pool"] } # feature for ThreadPool
@@ -162,7 +162,8 @@ pulldown-cmark = "0.9.3"
 # The initial round of stabilizations for the async/await language feature in Rust 1.39 did not
 # include support for async fn in traits.
 async-trait = "0.1.58"
-utoipa = { version = "4", features = ["actix_extras"] }
+
+utoipa = { version = "4", features = ["chrono","actix_extras"] }
 utoipa-swagger-ui = { version = "5", features = ["actix-web"] }
 http = "0.2.11"
 

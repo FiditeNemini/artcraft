@@ -9,37 +9,38 @@ pub struct UpdateWeightArgs<'a> {
     pub weight_token: &'a ModelWeightToken,
     pub title: Option<&'a str>,
     pub maybe_thumbnail_token: Option<&'a str>,
-    pub description_markdown: &'a str,
-    pub description_rendered_html: &'a str,
-    pub creator_set_visibility: &'a Visibility,
+    pub description_markdown: Option<&'a str>,
+    pub description_rendered_html: Option<&'a str>,
+    pub creator_set_visibility: Option<&'a Visibility>,
+    pub weights_type: Option<String>,
+    pub weights_category: Option<String>,
     pub mysql_pool: &'a MySqlPool,
 }
 
 pub async fn update_weights(args: UpdateWeightArgs<'_>) -> AnyhowResult<()> {
-    let mut transaction = args.mysql_pool.begin().await?;
+    let transaction = args.mysql_pool.begin().await?;
 
-    let query_result = sqlx
-        ::query!(
-            r#"
-        UPDATE model_weights
-        SET
-            title = ?,
-            description_markdown = ?,
-            maybe_thumbnail_token = ?,
-            description_rendered_html = ?,
-            creator_set_visibility = ?,
-            version = version + 1
-        WHERE token = ?
-        LIMIT 1
-        "#,
-            args.title,
-            args.description_markdown,
-            args.maybe_thumbnail_token,
-            args.description_rendered_html,
-            args.creator_set_visibility.to_str(),
-            args.weight_token.as_str()
-        )
-        .execute(args.mysql_pool).await;
+
+    let query_result = sqlx::query!(
+        r#"
+    UPDATE model_weights
+    SET
+        title = COALESCE(?, title),
+        description_markdown = COALESCE(?, description_markdown),
+        maybe_thumbnail_token = COALESCE(?, maybe_thumbnail_token),
+        description_rendered_html = COALESCE(?, description_rendered_html),
+        creator_set_visibility = COALESCE(?, creator_set_visibility),
+        version = version + 1
+    WHERE token = ?
+    "#,
+        args.title.as_deref(),
+        args.description_markdown.as_deref(),
+        args.maybe_thumbnail_token.as_deref(),
+        args.description_rendered_html.as_deref(),
+        args.creator_set_visibility.as_deref(),
+        args.weight_token.as_str()
+    )
+    .execute(args.mysql_pool).await;
 
     transaction.commit().await?;
 
@@ -53,6 +54,7 @@ pub async fn update_weights(args: UpdateWeightArgs<'_>) -> AnyhowResult<()> {
 
 #[cfg(test)]
 mod tests {
+
     // Template
     use sqlx::mysql::MySqlPoolOptions;
     use tokio;

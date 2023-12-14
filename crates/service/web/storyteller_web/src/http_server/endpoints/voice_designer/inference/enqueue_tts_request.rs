@@ -1,7 +1,6 @@
 #![forbid(unused_imports)]
 #![forbid(unused_mut)]
 #![forbid(unused_variables)]
-use utoipa::ToSchema;
 
 use std::fmt::Debug;
 use std::sync::Arc;
@@ -12,6 +11,7 @@ use actix_web::http::StatusCode;
 use log::warn;
 use serde::Deserialize;
 use serde::Serialize;
+use utoipa::ToSchema;
 
 use enums::by_table::generic_inference_jobs::inference_category::InferenceCategory;
 use enums::by_table::generic_inference_jobs::inference_model_type::InferenceModelType;
@@ -43,23 +43,20 @@ const DEBUG_HEADER_NAME: &str = "enable-debug-mode";
 const ROUTING_TAG_HEADER_NAME: &str = "routing-tag";
 
 
-#[derive(Deserialize)]
-#[derive(ToSchema)]
+#[derive(Deserialize,ToSchema)]
 pub struct EnqueueTTSRequest {
     uuid_idempotency_token: String,
     text: String,
     voice_token: String,
 }
 
-#[derive(Serialize)]
-#[derive(ToSchema)]
+#[derive(Serialize,ToSchema)]
 pub struct EnqueueTTSRequestSuccessResponse {
     pub success: bool,
     pub inference_job_token: InferenceJobToken,
 }
 
-#[derive(Debug)]
-#[derive(ToSchema)]
+#[derive(Debug,ToSchema)]
 pub enum EnqueueTTSRequestError {
     BadInput(String),
     NotAuthorized,
@@ -156,16 +153,19 @@ pub async fn enqueue_tts_request(
         |routing_tag| routing_tag.trim().to_string()
     );
 
+    // ==================== BANNED USERS ==================== //
+
+    if let Some(ref user) = maybe_user_session {
+        if user.role.is_banned {
+            return Err(EnqueueTTSRequestError::NotAuthorized);
+        }
+    }
+
     // ==================== RATE LIMIT ==================== //
 
     let rate_limiter = match maybe_user_session {
         None => &server_state.redis_rate_limiters.logged_out,
-        Some(ref user) => {
-            if user.role.is_banned {
-                return Err(EnqueueTTSRequestError::NotAuthorized);
-            }
-            &server_state.redis_rate_limiters.logged_in
-        }
+        Some(ref _user) => &server_state.redis_rate_limiters.logged_in,
     };
 
     if let Err(_err) = rate_limiter.rate_limit_request(&http_request) {

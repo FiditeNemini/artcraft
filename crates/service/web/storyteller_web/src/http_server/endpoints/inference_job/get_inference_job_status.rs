@@ -9,8 +9,8 @@ use chrono::{DateTime, Utc};
 use log::error;
 use r2d2_redis::redis::{Commands, RedisResult};
 
-use buckets::public::media_files::original_file::MediaFileBucketPath;
-use buckets::public::voice_conversion_results::original_file::VoiceConversionResultOriginalFilePath;
+use buckets::public::media_files::bucket_file_path::MediaFileBucketPath;
+use buckets::public::voice_conversion_results::bucket_file_path::VoiceConversionResultOriginalFilePath;
 use enums::by_table::generic_inference_jobs::frontend_failure_category::FrontendFailureCategory;
 use enums::by_table::generic_inference_jobs::inference_category::InferenceCategory;
 use enums::common::job_status_plus::JobStatusPlus;

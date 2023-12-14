@@ -18,6 +18,9 @@ path = "src/lib.rs"
 container_common = { path = "../deprecated/container_common" }
 user_input_common = { path = "../user_input_common" }
 
+# Workspace hack (faster compile times)
+my-workspace-hack = { version = "0.1", path = "../../my-workspace-hack" }
+
 # External
 anyhow = "1.0.75"
 chrono = { version = "0.4.22", features = ["serde"] }
@@ -29,4 +32,3 @@ unicode-segmentation = "1.10.1"
 # Serialization
 serde = "1.0.125"
 serde_derive = "1.0.125"
-my-workspace-hack = { version = "0.1", path = "../../my-workspace-hack" }

@@ -45,8 +45,6 @@ use mysql_queries::queries::tts::tts_inference_jobs::list_available_tts_inferenc
 use mysql_queries::queries::tts::tts_inference_jobs::mark_tts_inference_job_failure::mark_tts_inference_job_failure;
 use mysql_queries::queries::tts::tts_inference_jobs::mark_tts_inference_job_permanently_dead::mark_tts_inference_job_permanently_dead;
 use mysql_queries::queries::tts::tts_models::get_tts_model_for_inference::{get_tts_model_for_inference, TtsModelForInferenceError, TtsModelForInferenceRecord};
-use newrelic_telemetry::ClientBuilder;
-use newrelic_telemetry::Span;
 
 use crate::caching::cache_miss_strategizer::CacheMissStrategizer;
 use crate::caching::cache_miss_strategizer::CacheMissStrategy;
@@ -253,12 +251,6 @@ async fn main() -> AnyhowResult<()> {
     easyenv::get_env_num("TTS_MODEL_RECORD_CACHE_MILLIS", 300_000)?, // Five minutes
   );
 
-  let license_key = easyenv::get_env_string_required("NEWRELIC_API_KEY")?;
-
-  let newrelic_disabled = easyenv::get_env_bool_or_default("IS_NEWRELIC_DISABLED", false);
-
-  let newrelic_client = ClientBuilder::new(&license_key).build().unwrap();
-
   let maybe_minimum_priority = easyenv::get_env_string_optional("MAYBE_MINIMUM_PRIORITY")
       .map(|priority_string| {
         priority_string.parse::<u8>()
@@ -301,8 +293,6 @@ async fn main() -> AnyhowResult<()> {
       tts_sidecar_health_check_client,
     },
     job_stats: JobStats::new(),
-    newrelic_client,
-    newrelic_disabled,
     worker_details: JobWorkerDetails {
       is_on_prem,
       worker_hostname: server_hostname.clone(),
@@ -343,8 +333,6 @@ async fn main_loop(job_args: JobArgs) {
   let mut error_timeout_millis = START_TIMEOUT_MILLIS;
 
   let mut noop_logger = NoOpLogger::new(job_args.no_op_logger_millis as i64);
-
-  let mut span_batch = Vec::new();
 
   let mut sort_by_priority = true;
   let mut sort_by_priority_count = 0;
@@ -411,23 +399,11 @@ async fn main_loop(job_args: JobArgs) {
       needs_health_check_at_start = false;
     }
 
-    let mut spans = match batch_result {
-      Ok(spans) => spans,
-      Err(e) => {
-        warn!("Error running job batch: {:?}", e);
-        std::thread::sleep(Duration::from_millis(error_timeout_millis));
-        error_timeout_millis += INCREASE_TIMEOUT_MILLIS;
-        continue;
-      }
-    };
-
-    if !job_args.newrelic_disabled {
-      span_batch.append(&mut spans);
-
-      if span_batch.len() > 50 {
-        let spans_to_send = span_batch.split_off(0).into();
-        job_args.newrelic_client.send_spans(spans_to_send).await;
-      }
+    if let Err(e) = batch_result {
+      warn!("Error running job batch: {:?}", e);
+      std::thread::sleep(Duration::from_millis(error_timeout_millis));
+      error_timeout_millis += INCREASE_TIMEOUT_MILLIS;
+      continue;
     }
 
     error_timeout_millis = START_TIMEOUT_MILLIS; // reset
@@ -441,15 +417,13 @@ async fn process_jobs(
   inferencer: &JobArgs,
   jobs: Vec<AvailableTtsInferenceJob>,
   needs_health_check_at_start: bool,
-) -> AnyhowResult<Vec<Span>> {
+) -> AnyhowResult<()> {
 
   if needs_health_check_at_start {
     maybe_block_on_sidecar_health_check(&inferencer.http_clients.tts_sidecar_health_check_client).await;
   }
 
   let mut maybe_sidecar_health_issue = false;
-
-  let mut batch_spans = Vec::new();
 
   for job in jobs.into_iter() {
     let model_state_result = ModelState::query_model_and_check_filesystem(
@@ -555,44 +529,38 @@ async fn process_jobs(
     }
 
     let result = process_single_job(inferencer, &job, &model_state.model_record).await;
-    match result {
-      Ok((span1, span2)) => {
-        batch_spans.push(span1);
-        batch_spans.push(span2);
-      },
-      Err(e) => {
-        warn!("Failure to process job: {:?}", e);
+    if let Err(e) = result {
+      warn!("Failure to process job: {:?}", e);
 
-        record_failure_and_maybe_slow_down(&inferencer.job_stats);
+      record_failure_and_maybe_slow_down(&inferencer.job_stats);
 
-        maybe_sidecar_health_issue = true;
+      maybe_sidecar_health_issue = true;
 
-        let failure_reason = "failure processing job";
-        let internal_debugging_failure_reason = format!("job error: {:?}", e);
+      let failure_reason = "failure processing job";
+      let internal_debugging_failure_reason = format!("job error: {:?}", e);
 
-        let _r = mark_tts_inference_job_failure(
-          &inferencer.mysql_pool,
-          &job,
-          failure_reason,
-          &internal_debugging_failure_reason,
-          inferencer.job_max_attempts,
-          &inferencer.get_worker_name(),
-        ).await;
+      let _r = mark_tts_inference_job_failure(
+        &inferencer.mysql_pool,
+        &job,
+        failure_reason,
+        &internal_debugging_failure_reason,
+        inferencer.job_max_attempts,
+        &inferencer.get_worker_name(),
+      ).await;
 
-        match e {
-          ProcessSingleJobError::Other(_) => {} // No-op
-          ProcessSingleJobError::FilesystemFull => {
-            // TODO: Refactor - we should stop processing all of these jobs as we'll lose out
-            //  on this entire batch by attempting to clear the filesystem. This should be handled
-            //  in the calling code.
-            delete_tts_synthesizers_from_cache(&inferencer.semi_persistent_cache)?;
-          }
+      match e {
+        ProcessSingleJobError::Other(_) => {} // No-op
+        ProcessSingleJobError::FilesystemFull => {
+          // TODO: Refactor - we should stop processing all of these jobs as we'll lose out
+          //  on this entire batch by attempting to clear the filesystem. This should be handled
+          //  in the calling code.
+          delete_tts_synthesizers_from_cache(&inferencer.semi_persistent_cache)?;
         }
       }
     }
   }
 
-  Ok(batch_spans)
+  Ok(())
 }
 
 fn record_failure_and_maybe_slow_down(job_stats: &JobStats) {
