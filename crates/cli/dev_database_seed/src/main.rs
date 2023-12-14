@@ -7,7 +7,8 @@ use errors::AnyhowResult;
 
 use crate::bucket_clients::get_bucket_clients;
 use crate::cli_args::parse_cli_args;
-use crate::seeding::model_weights::seed_weights;
+use crate::seeding::model_weights::seed_weights; // V1
+use crate::seeding::seed_model_weights::seed_weights_files; // V2 v3 will come later on when everything is more conslidated and clear.
 use crate::seeding::seed_media_files::seed_media_files;
 use crate::seeding::tts_tacotron2::seed_tts_tacotron2;
 use crate::seeding::users::seed_user_accounts;
@@ -60,6 +61,9 @@ pub async fn main() -> AnyhowResult<()> {
   seed_weights(&pool).await?;
 
   seed_tts_tacotron2(&pool, maybe_bucket_clients.as_ref()).await?;
+  
+  // should seed the weights with a few files for hanashi
+  seed_weights_files(&pool, maybe_bucket_clients.as_ref()).await?;
 
   info!("Done!");
   Ok(())
