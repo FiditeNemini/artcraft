@@ -122,7 +122,6 @@ pub async fn list_featured_weights_handler(
     };
   }
 
-  // generate parse a response
   let response = ListFeaturedWeightsSuccessResponse {
     success: true,
     weights: weights.into_iter()

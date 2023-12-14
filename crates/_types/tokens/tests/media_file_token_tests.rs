@@ -22,6 +22,30 @@ mod interface {
   }
 
   #[test]
+  fn generate_for_testing_and_dev_seeding_never_use_in_production_seriously_1() {
+    MediaFileToken::reset_rng_for_testing_and_dev_seeding_never_use_in_production_seriously();
+    assert_eq!(MediaFileToken::generate_for_testing_and_dev_seeding_never_use_in_production_seriously().as_str(), "m_q8sz47gmfw2zx02snrbz88ns9m16ab");
+    assert_eq!(MediaFileToken::generate_for_testing_and_dev_seeding_never_use_in_production_seriously().as_str(), "m_ma1xetxrwbh39vg639a9zrq8b9wk6h");
+    assert_eq!(MediaFileToken::generate_for_testing_and_dev_seeding_never_use_in_production_seriously().as_str(), "m_4tswec8z27wnm01njypx4vmfhgj41e");
+  }
+
+  #[test]
+  fn generate_for_testing_and_dev_seeding_never_use_in_production_seriously_2() {
+    MediaFileToken::reset_rng_for_testing_and_dev_seeding_never_use_in_production_seriously();
+    assert_eq!(MediaFileToken::generate_for_testing_and_dev_seeding_never_use_in_production_seriously().as_str(), "m_q8sz47gmfw2zx02snrbz88ns9m16ab");
+    assert_eq!(MediaFileToken::generate_for_testing_and_dev_seeding_never_use_in_production_seriously().as_str(), "m_ma1xetxrwbh39vg639a9zrq8b9wk6h");
+    assert_eq!(MediaFileToken::generate_for_testing_and_dev_seeding_never_use_in_production_seriously().as_str(), "m_4tswec8z27wnm01njypx4vmfhgj41e");
+  }
+
+  #[test]
+  fn generate_for_testing_and_dev_seeding_never_use_in_production_seriously_3() {
+    MediaFileToken::reset_rng_for_testing_and_dev_seeding_never_use_in_production_seriously();
+    assert_eq!(MediaFileToken::generate_for_testing_and_dev_seeding_never_use_in_production_seriously().as_str(), "m_q8sz47gmfw2zx02snrbz88ns9m16ab");
+    assert_eq!(MediaFileToken::generate_for_testing_and_dev_seeding_never_use_in_production_seriously().as_str(), "m_ma1xetxrwbh39vg639a9zrq8b9wk6h");
+    assert_eq!(MediaFileToken::generate_for_testing_and_dev_seeding_never_use_in_production_seriously().as_str(), "m_4tswec8z27wnm01njypx4vmfhgj41e");
+  }
+
+  #[test]
   fn new() {
     let token = MediaFileToken::new("m_foo".to_string());
     assert_eq!(token, MediaFileToken("m_foo".to_string()));

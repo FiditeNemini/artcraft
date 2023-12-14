@@ -6442,6 +6442,7 @@ name = "tokens"
 version = "0.0.1"
 dependencies = [
  "my-workspace-hack",
+ "once_cell",
  "rand 0.8.5",
  "serde",
  "serde_derive",
