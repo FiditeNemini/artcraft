@@ -1751,6 +1751,7 @@ dependencies = [
  "mimetypes",
  "my-workspace-hack",
  "mysql_queries",
+ "rand 0.8.5",
  "sqlx",
  "storyteller_root",
  "tokens",
