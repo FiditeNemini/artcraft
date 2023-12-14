@@ -1,5 +1,4 @@
 use chrono::{DateTime, Utc};
-use log::warn;
 use sqlx::{FromRow, MySql, MySqlPool, QueryBuilder, Row};
 use sqlx::mysql::MySqlRow;
 
@@ -11,8 +10,6 @@ use enums::common::visibility::Visibility;
 use enums::traits::mysql_from_row::MySqlFromRow;
 use errors::AnyhowResult;
 use tokens::tokens::media_files::MediaFileToken;
-
-
 
 pub struct MediaFileListPage {
   pub records: Vec<MediaFileListItem>,
@@ -210,7 +207,7 @@ WHERE m.user_deleted_at IS NULL
     query_builder.push(" ORDER BY m.id DESC ");
   }
 
-  if (enforce_limits) {
+  if enforce_limits {
     if cursor_is_reversed {
       query_builder.push(format!(" LIMIT {limit_start}, {limit_end} "));
     } else {

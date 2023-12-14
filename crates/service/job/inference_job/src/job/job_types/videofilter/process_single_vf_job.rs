@@ -1,11 +1,4 @@
-use anyhow::anyhow;
-use log::info;
-
-use mysql_queries::payloads::generic_inference_args::generic_inference_args::PolymorphicInferenceArgs::Rr;
-use mysql_queries::payloads::generic_inference_args::videofilter_payload::VideofilterVideoSource;
 use mysql_queries::queries::generic_inference::job::list_available_generic_inference_jobs::AvailableInferenceJob;
-use mysql_queries::queries::media_files::get_media_file::get_media_file;
-use tokens::tokens::media_files::MediaFileToken;
 
 use crate::job::job_loop::job_success_result::JobSuccessResult;
 use crate::job::job_loop::process_single_job_error::ProcessSingleJobError;

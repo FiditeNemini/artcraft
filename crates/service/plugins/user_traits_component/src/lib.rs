@@ -12,7 +12,7 @@
 #![forbid(unreachable_patterns)]
 #![forbid(unused_imports)]
 #![forbid(unused_mut)]
-#![forbid(unused_variables)]
+#![allow(unused_variables)] // NB: issue with automock
 
 // Always allow
 #![allow(dead_code)]

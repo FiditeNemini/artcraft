@@ -1,6 +1,6 @@
 use clap::Parser;
 
-use errors::{anyhow, AnyhowResult};
+use errors::AnyhowResult;
 use web_scrapers::scrape_supported_webpage::scrape_supported_webpage;
 
 #[derive(Parser, Debug)]

@@ -123,8 +123,8 @@ pub async fn seed_weights_files(
 
         let create_model_weights_args = CreateModelWeightsArgs {
             token: &model_weight_token,
-            weights_type: weights_type, // Assuming weights_type is defined elsewhere
-            weights_category: weights_category, // Assuming weights_category is defined elsewhere
+            weights_type, // Assuming weights_type is defined elsewhere
+            weights_category, // Assuming weights_category is defined elsewhere
             title: title.to_string(),
             maybe_thumbnail_token: Some(thumbnail_token),
             description_markdown: description.to_string(),
@@ -140,11 +140,11 @@ pub async fn seed_weights_files(
             private_bucket_hash: public_bucket_hash,
             maybe_private_bucket_prefix: Some(public_bucket_prefix.to_string()),
             maybe_private_bucket_extension: Some(public_bucket_extension.to_string()),
-            cached_user_ratings_total_count: cached_user_ratings_total_count,
-            cached_user_ratings_positive_count: cached_user_ratings_positive_count,
-            cached_user_ratings_negative_count: cached_user_ratings_negative_count,
+            cached_user_ratings_total_count,
+            cached_user_ratings_positive_count,
+            cached_user_ratings_negative_count,
             maybe_cached_user_ratings_ratio: Some(cached_user_ratings_ratio),
-            version: version,
+            version,
             mysql_pool: &mysql_pool, // Assuming mysql_pool is defined elsewhere
         };
 
