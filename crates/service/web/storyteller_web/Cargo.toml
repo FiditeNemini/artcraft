@@ -165,6 +165,7 @@ async-trait = "0.1.58"
 
 utoipa = { version = "4", features = ["chrono","actix_extras"] }
 utoipa-swagger-ui = { version = "5", features = ["actix-web"] }
+http = "0.2.11"
 
 [build-dependencies]
 # NB: Only using diesel for migrations support

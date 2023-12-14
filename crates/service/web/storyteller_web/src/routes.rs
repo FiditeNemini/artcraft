@@ -12,6 +12,7 @@ use users_component::endpoints::edit_profile_handler::edit_profile_handler;
 use users_component::endpoints::get_profile_handler::get_profile_handler;
 
 use crate::http_server::endpoints::animation::enqueue_face_animation::enqueue_face_animation_handler;
+use crate::http_server::endpoints::animation::enqueue_rerender_animation::enqueue_rerender_animation_handler;
 use crate::http_server::endpoints::api_tokens::create_api_token::create_api_token_handler;
 use crate::http_server::endpoints::api_tokens::delete_api_token::delete_api_token_handler;
 use crate::http_server::endpoints::api_tokens::edit_api_token::edit_api_token_handler;
@@ -216,6 +217,7 @@ pub fn add_routes<T, B> (app: App<T>, server_environment: ServerEnvironment) -> 
 
   let mut app = RouteBuilder::from_app(app)
       .add_post("/v1/animation/face_animation/create", enqueue_face_animation_handler)
+      .add_post("/v1/animation/rerender/create", enqueue_rerender_animation_handler)
       .into_app();
 
   // ==================== "Generic" Inference ====================
