@@ -2068,7 +2068,6 @@ dependencies = [
  "bootstrap",
  "buckets",
  "chrono",
- "clap",
  "cloud_storage",
  "concurrency",
  "config",
@@ -6707,7 +6706,6 @@ version = "0.0.1"
 dependencies = [
  "anyhow",
  "chrono",
- "clap",
  "cloud_storage",
  "collections",
  "config",

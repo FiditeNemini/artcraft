@@ -18,7 +18,6 @@
 use std::path::PathBuf;
 use std::time::Duration;
 
-use clap::{App, Arg};
 use log::{error, info, warn};
 use r2d2_redis::r2d2;
 use r2d2_redis::RedisConnectionManager;
@@ -93,15 +92,6 @@ async fn main() -> AnyhowResult<()> {
   // This file should only contain *development* secrets, never production.
   let _ = dotenv::from_filename(".env-secrets").ok();
 
-  let matches = App::new("tts-inference-job")
-      .arg(Arg::with_name("sidecar_hostname")
-          .long("sidecar_hostname")
-          .value_name("HOSTNAME")
-          .help("Hostname for the TTS inference sidecar")
-          .takes_value(true)
-          .required(false))
-      .get_matches();
-
   info!("Obtaining worker hostname...");
 
   let server_hostname = hostname::get()
@@ -150,12 +140,8 @@ async fn main() -> AnyhowResult<()> {
     Some(bucket_timeout),
   )?;
 
-  let mut sidecar_hostname =
+  let sidecar_hostname =
       easyenv::get_env_string_required(ENV_TTS_INFERENCE_SIDECAR_HOSTNAME)?;
-
-  if let Some(hostname) = matches.value_of("sidecar_hostname") {
-    sidecar_hostname = hostname.to_string();
-  }
 
   info!("Sidecar hostname: {:?}", sidecar_hostname);
 
