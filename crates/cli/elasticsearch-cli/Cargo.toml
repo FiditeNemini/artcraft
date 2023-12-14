@@ -29,7 +29,7 @@ my-workspace-hack = { version = "0.1", path = "../../my-workspace-hack" }
 
 # External
 log = "0.4.14"
-clap = "2.34.0" # TODO: This is really out of date, but has conflicts when updated
+clap = "4.4.8" # TODO: This is really out of date, but has conflicts when updated
 strum = { version = "0.25", features = ["derive"] }
 
 # Runtime
