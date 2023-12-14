@@ -1,41 +1,40 @@
 use std::path::Path;
 
-use log::{ info, warn };
-use sqlx::{ MySql, Pool };
+use log::{info, warn};
+use rand::Rng;
+use sqlx::{MySql, Pool};
 
-use buckets::{ public::{ media_files::bucket_file_path::MediaFileBucketPath, self }, private };
-
+use buckets::public::media_files::bucket_file_path::MediaFileBucketPath;
+use enums::{
+    by_table::model_weights::{weights_category::WeightsCategory, weights_types::WeightsType},
+    common::visibility::Visibility,
+};
+use errors::AnyhowResult;
 use filesys::file_read_bytes::file_read_bytes;
 use filesys::file_size::file_size;
 use filesys::path_to_string::path_to_string;
 use hashing::sha256::sha256_hash_file::sha256_hash_file;
 use mimetypes::mimetype_for_bytes::get_mimetype_for_bytes;
-use mimetypes::mimetype_for_file::get_mimetype_for_file;
-
-use storyteller_root::get_seed_tool_data_root;
-use tokens::tokens::users::UserToken;
-use crate::bucket_clients::BucketClients;
-use crate::seeding::users::HANASHI_USER_TOKEN;
-
-use enums::{
-    by_table::model_weights::{ weights_category::WeightsCategory, weights_types::WeightsType },
-    common::visibility::Visibility,
-};
-
-use rand::Rng;
-use errors::{ anyhow, AnyhowResult };
 use mysql_queries::queries::model_weights::create_weight::{
     create_weight,
-    CreateModelWeightsArgs,
-    self,
+    CreateModelWeightsArgs
+    ,
 };
+use storyteller_root::get_seed_tool_data_root;
 use tokens::tokens::model_weights::ModelWeightToken;
+use tokens::tokens::users::UserToken;
+
+use crate::bucket_clients::BucketClients;
+use crate::seeding::users::HANASHI_USER_TOKEN;
 
 pub async fn seed_weights_files(
     mysql_pool: &Pool<MySql>,
     maybe_bucket_clients: Option<&BucketClients>
 ) -> AnyhowResult<()> {
     info!("Seeding weights files...");
+
+    // NB: Stable token generation.
+    ModelWeightToken::reset_rng_for_testing_and_dev_seeding_never_use_in_production_seriously(123);
 
     let seeded_weights = [
         (
@@ -87,9 +86,8 @@ pub async fn seed_weights_files(
         let mut rng = rand::thread_rng();
         let n: u32 = rng.gen();
 
-        let model_weight_token = ModelWeightToken(format!("{}", n)); // random token
-        let model_weight_token = model_weight_token;
-        
+        let model_weight_token = ModelWeightToken::generate_for_testing_and_dev_seeding_never_use_in_production_seriously();
+
         let title = model_name;
         let description = "This is a description";
         let description_rendered_html = "This is a description rendered html";

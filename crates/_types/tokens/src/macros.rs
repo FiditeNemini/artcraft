@@ -63,9 +63,9 @@ macro_rules! impl_crockford_generator {
       /// Constructor for a new token to be used **DETERMINISTICALLY** in tests and seeding.
       /// This will not use a real RNG, so do not use in production code!
       /// Once called, it will output the same random numbers in sequence.
-      pub fn reset_rng_for_testing_and_dev_seeding_never_use_in_production_seriously() {
+      pub fn reset_rng_for_testing_and_dev_seeding_never_use_in_production_seriously(state: u64) {
         let deterministic = crate::deterministic_rng::DeterministicRng::get_instance().expect("tests should not fail due to mutex");
-        deterministic.reset_rng();
+        deterministic.reset_rng(state);
       }
 
       /// Constructor for a new token to be used **DETERMINISTICALLY** in tests and seeding.

@@ -27,11 +27,11 @@ impl DeterministicRng {
   }
 
   /// Reset the deterministic RNG's seed.
-  pub fn reset_rng(&self) {
+  pub fn reset_rng(&self, state: u64) {
     match self.rng.write() {
       Err(err) => panic!(format!("test panic due to rng failure {err}")),
       Ok(mut lock) => {
-        *lock = StdRng::seed_from_u64(0);
+        *lock = StdRng::seed_from_u64(state);
       }
     }
   }
