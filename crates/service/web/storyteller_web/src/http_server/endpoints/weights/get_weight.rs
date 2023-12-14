@@ -109,12 +109,12 @@ pub async fn get_weight_handler(
         }
     };
 
-    let weight_token = path.weight_token.clone();
+    let weight_token = ModelWeightToken::new_from_str(&path.weight_token);
     let creator_user_token = user_session.user_token.clone();
     let is_mod = user_session.can_ban_users;
 
     let weight_lookup_result = get_weight_by_token(
-        &ModelWeightToken::new(weight_token.clone()),
+        &weight_token,
         is_mod,
         &server_state.mysql_pool,
     ).await;
