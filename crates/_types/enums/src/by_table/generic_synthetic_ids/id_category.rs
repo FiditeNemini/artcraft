@@ -80,7 +80,7 @@ impl IdCategory {
       "zs_dataset" => Ok(Self::ZeroShotVoiceDataset),
       "zs_voice" => Ok(Self::ZeroShotVoiceEmbedding),
       "zs_tts_result" => Ok(Self::ZeroShotTtsResult),
-        "rerender" => Ok(Self::RerenderResult),
+      "rerender" => Ok(Self::RerenderResult),
       "model_weights" => Ok(Self::ModelWeights),
       _ => Err(format!("invalid value: {:?}", value)),
     }
@@ -92,6 +92,7 @@ impl IdCategory {
     BTreeSet::from([
       Self::MediaFile,
       Self::LipsyncAnimationResult,
+      Self::RerenderResult,
       Self::TtsResult,
       Self::VoiceConversionResult,
       Self::ZeroShotTtsResult,
@@ -114,6 +115,7 @@ mod tests {
   fn test_serialization() {
     assert_serialization(IdCategory::MediaFile, "media_file");
     assert_serialization(IdCategory::LipsyncAnimationResult, "lipsync_animation");
+    assert_serialization(IdCategory::RerenderResult, "rerender");
     assert_serialization(IdCategory::TtsResult, "tts_result");
     assert_serialization(IdCategory::VoiceConversionResult, "voice_conversion");
     assert_serialization(IdCategory::ZeroShotVoiceDataset, "zs_dataset");
@@ -126,6 +128,7 @@ mod tests {
     fn to_str() {
       assert_eq!(IdCategory::MediaFile.to_str(), "media_file");
       assert_eq!(IdCategory::LipsyncAnimationResult.to_str(), "lipsync_animation");
+      assert_eq!(IdCategory::RerenderResult.to_str(), "rerender");
       assert_eq!(IdCategory::TtsResult.to_str(), "tts_result");
       assert_eq!(IdCategory::VoiceConversionResult.to_str(), "voice_conversion");
       assert_eq!(IdCategory::ZeroShotVoiceDataset.to_str(), "zs_dataset");
@@ -138,6 +141,7 @@ mod tests {
     fn from_str() {
       assert_eq!(IdCategory::from_str("media_file").unwrap(), IdCategory::MediaFile);
       assert_eq!(IdCategory::from_str("lipsync_animation").unwrap(), IdCategory::LipsyncAnimationResult);
+      assert_eq!(IdCategory::from_str("rerender").unwrap(), IdCategory::RerenderResult);
       assert_eq!(IdCategory::from_str("tts_result").unwrap(), IdCategory::TtsResult);
       assert_eq!(IdCategory::from_str("voice_conversion").unwrap(), IdCategory::VoiceConversionResult);
       assert_eq!(IdCategory::from_str("zs_dataset").unwrap(), IdCategory::ZeroShotVoiceDataset);
@@ -150,9 +154,10 @@ mod tests {
     fn all_variants() {
       // Static check
       let mut variants = IdCategory::all_variants();
-      assert_eq!(variants.len(), 8);
+      assert_eq!(variants.len(), 9);
       assert_eq!(variants.pop_first(), Some(IdCategory::MediaFile));
       assert_eq!(variants.pop_first(), Some(IdCategory::LipsyncAnimationResult));
+      assert_eq!(variants.pop_first(), Some(IdCategory::RerenderResult));
       assert_eq!(variants.pop_first(), Some(IdCategory::TtsResult));
       assert_eq!(variants.pop_first(), Some(IdCategory::VoiceConversionResult));
       assert_eq!(variants.pop_first(), Some(IdCategory::ZeroShotTtsResult));

@@ -80,6 +80,7 @@ impl MediaFileOriginProductCategory {
     BTreeSet::from([
       Self::FaceAnimator,
       Self::TextToSpeech,
+      Self::Rerender,
       Self::Unknown,
       Self::VoiceConversion,
       Self::ZeroShotVoice,
@@ -102,6 +103,7 @@ mod tests {
       assert_serialization(MediaFileOriginProductCategory::Unknown, "unknown");
       assert_serialization(MediaFileOriginProductCategory::VoiceConversion, "voice_conversion");
       assert_serialization(MediaFileOriginProductCategory::ZeroShotVoice, "zs_voice");
+      assert_serialization(MediaFileOriginProductCategory::Rerender, "rerender")
     }
 
     #[test]
@@ -111,6 +113,7 @@ mod tests {
       assert_eq!(MediaFileOriginProductCategory::Unknown.to_str(), "unknown");
       assert_eq!(MediaFileOriginProductCategory::VoiceConversion.to_str(), "voice_conversion");
       assert_eq!(MediaFileOriginProductCategory::ZeroShotVoice.to_str(), "zs_voice");
+      assert_eq!(MediaFileOriginProductCategory::Rerender.to_str(), "rerender");
     }
 
     #[test]
@@ -120,17 +123,19 @@ mod tests {
       assert_eq!(MediaFileOriginProductCategory::from_str("unknown").unwrap(), MediaFileOriginProductCategory::Unknown);
       assert_eq!(MediaFileOriginProductCategory::from_str("voice_conversion").unwrap(), MediaFileOriginProductCategory::VoiceConversion);
       assert_eq!(MediaFileOriginProductCategory::from_str("zs_voice").unwrap(), MediaFileOriginProductCategory::ZeroShotVoice);
+      assert_eq!(MediaFileOriginProductCategory::from_str("rerender").unwrap(), MediaFileOriginProductCategory::Rerender);
     }
 
     #[test]
     fn all_variants() {
       let mut variants = MediaFileOriginProductCategory::all_variants();
-      assert_eq!(variants.len(), 5);
+      assert_eq!(variants.len(), 6);
       assert_eq!(variants.pop_first(), Some(MediaFileOriginProductCategory::FaceAnimator));
       assert_eq!(variants.pop_first(), Some(MediaFileOriginProductCategory::TextToSpeech));
       assert_eq!(variants.pop_first(), Some(MediaFileOriginProductCategory::Unknown));
       assert_eq!(variants.pop_first(), Some(MediaFileOriginProductCategory::VoiceConversion));
       assert_eq!(variants.pop_first(), Some(MediaFileOriginProductCategory::ZeroShotVoice));
+      assert_eq!(variants.pop_first(), Some(MediaFileOriginProductCategory::Rerender));
       assert_eq!(variants.pop_first(), None);
     }
   }
