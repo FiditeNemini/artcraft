@@ -12,9 +12,19 @@ use actix_web::http::StatusCode;
 use log::warn;
 
 use enums::by_table::user_bookmarks::user_bookmark_entity_type::UserBookmarkEntityType;
-use mysql_queries::queries::user_bookmarks::user_bookmark_entity_token::UserBookmarkEntityToken;
 use mysql_queries::queries::user_bookmarks::create_user_bookmark::{create_user_bookmark, CreateUserBookmarkArgs};
+use mysql_queries::queries::user_bookmarks::user_bookmark_entity_token::UserBookmarkEntityToken;
+use tokens::tokens::media_files::MediaFileToken;
+use tokens::tokens::model_weights::ModelWeightToken;
+use tokens::tokens::tts_models::TtsModelToken;
+use tokens::tokens::tts_results::TtsResultToken;
 use tokens::tokens::user_bookmarks::UserBookmarkToken;
+use tokens::tokens::users::UserToken;
+use tokens::tokens::voice_conversion_models::VoiceConversionModelToken;
+use tokens::tokens::w2l_results::W2lResultToken;
+use tokens::tokens::w2l_templates::W2lTemplateToken;
+use tokens::tokens::zs_voices::ZsVoiceToken;
+
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::server_state::ServerState;
 
@@ -70,6 +80,28 @@ pub async fn create_user_bookmark_handler(
   server_state: web::Data<Arc<ServerState>>,
 ) -> Result<HttpResponse, CreateUserBookmarkError>
 {
+  // NB(bt,2023-12-14): Kasisnu found that we're getting entity type mismatches in production. Apart from
+  // querying the database for entity existence, this is the next best way to prevent incorrect comment
+  // attachment. This is a bit of a bad process, though, since the token types are supposed to be opaque.
+  let token = request.entity_token.as_str();
+  let token_prefix_matches = match request.entity_type {
+    // NB: Users had an older prefix (U:) that got replaced with the new prefix (user_)
+    UserBookmarkEntityType::User => token.starts_with(UserToken::token_prefix()) || token.starts_with("U:"),
+    UserBookmarkEntityType::MediaFile => token.starts_with(MediaFileToken::token_prefix()),
+    UserBookmarkEntityType::ModelWeight => token.starts_with(ModelWeightToken::token_prefix()),
+    UserBookmarkEntityType::TtsModel => token.starts_with(TtsModelToken::token_prefix()),
+    UserBookmarkEntityType::TtsResult => token.starts_with(TtsResultToken::token_prefix()),
+    UserBookmarkEntityType::W2lTemplate => token.starts_with(W2lTemplateToken::token_prefix()),
+    UserBookmarkEntityType::W2lResult => token.starts_with(W2lResultToken::token_prefix()),
+    UserBookmarkEntityType::VoiceConversionModel => token.starts_with(VoiceConversionModelToken::token_prefix()),
+    UserBookmarkEntityType::ZsVoice => token.starts_with(ZsVoiceToken::token_prefix()),
+  };
+
+  if !token_prefix_matches {
+    warn!("invalid token prefix: {:?} for {:?}", request.entity_token, request.entity_type);
+    return Err(CreateUserBookmarkError::BadInput("invalid token prefix".to_string()));
+  }
+
   let mut mysql_connection = server_state.mysql_pool
       .acquire()
       .await

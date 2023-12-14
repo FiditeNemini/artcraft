@@ -1,5 +1,6 @@
 use enums::by_table::user_bookmarks::user_bookmark_entity_type::UserBookmarkEntityType;
 use tokens::tokens::media_files::MediaFileToken;
+use tokens::tokens::model_weights::ModelWeightToken;
 use tokens::tokens::tts_models::TtsModelToken;
 use tokens::tokens::tts_results::TtsResultToken;
 use tokens::tokens::users::UserToken;
@@ -10,6 +11,7 @@ use tokens::tokens::zs_voices::ZsVoiceToken;
 
 pub enum UserBookmarkEntityToken {
   User(UserToken),
+  ModelWeight(ModelWeightToken),
   TtsModel(TtsModelToken),
   TtsResult(TtsResultToken),
   W2lTemplate(W2lTemplateToken),
@@ -23,6 +25,7 @@ impl UserBookmarkEntityToken {
   pub fn from_entity_type_and_token(entity_type: UserBookmarkEntityType, token: &str) -> Self {
     match entity_type {
       UserBookmarkEntityType::User => Self::User(UserToken::new_from_str(token)),
+      UserBookmarkEntityType::ModelWeight => Self::ModelWeight(ModelWeightToken::new_from_str(token)),
       UserBookmarkEntityType::TtsModel => Self::TtsModel(TtsModelToken::new_from_str(token)),
       UserBookmarkEntityType::TtsResult => Self::TtsResult(TtsResultToken::new_from_str(token)),
       UserBookmarkEntityType::W2lTemplate => Self::W2lTemplate(W2lTemplateToken::new_from_str(token)),
@@ -36,6 +39,7 @@ impl UserBookmarkEntityToken {
   pub fn get_composite_keys(&self) -> (UserBookmarkEntityType, &str) {
     match self {
       UserBookmarkEntityToken::User(user_token) => (UserBookmarkEntityType::User, user_token.as_str()),
+      UserBookmarkEntityToken::ModelWeight(model_weight_token) => (UserBookmarkEntityType::ModelWeight, model_weight_token.as_str()),
       UserBookmarkEntityToken::TtsModel(tts_model_token) => (UserBookmarkEntityType::TtsModel, tts_model_token.as_str()),
       UserBookmarkEntityToken::TtsResult(tts_result_token) => (UserBookmarkEntityType::TtsResult, tts_result_token.as_str()),
       UserBookmarkEntityToken::W2lTemplate(w2l_template_token) => (UserBookmarkEntityType::W2lTemplate, w2l_template_token.as_str()),
