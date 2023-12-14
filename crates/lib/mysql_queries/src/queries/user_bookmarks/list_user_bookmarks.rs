@@ -33,6 +33,7 @@ SELECT
     media_files.media_type as `maybe_media_file_type: enums::by_table::media_files::media_file_type::MediaFileType`,
     media_files.origin_product_category as `maybe_media_file_origin_category: enums::by_table::media_files::media_file_origin_category::MediaFileOriginCategory`,
 
+    model_weights.title as maybe_descriptive_text_model_weight_title,
     tts_models.title as maybe_descriptive_text_tts_model_title,
     tts_results.raw_inference_text as maybe_descriptive_text_tts_result_inference_text,
     users.display_name as maybe_descriptive_text_user_display_name,
@@ -44,6 +45,7 @@ FROM
 JOIN users AS u
     ON f.user_token = u.token
 
+LEFT OUTER JOIN model_weights ON model_weights.token = f.entity_token
 LEFT OUTER JOIN media_files ON media_files.token = f.entity_token
 LEFT OUTER JOIN tts_models ON tts_models.token = f.entity_token
 LEFT OUTER JOIN tts_results ON tts_results.token = f.entity_token
@@ -100,6 +102,7 @@ SELECT
     media_files.media_type as `maybe_media_file_type: enums::by_table::media_files::media_file_type::MediaFileType`,
     media_files.origin_product_category as `maybe_media_file_origin_category: enums::by_table::media_files::media_file_origin_category::MediaFileOriginCategory`,
 
+    model_weights.title as maybe_descriptive_text_model_weight_title,
     tts_models.title as maybe_descriptive_text_tts_model_title,
     tts_results.raw_inference_text as maybe_descriptive_text_tts_result_inference_text,
     users.display_name as maybe_descriptive_text_user_display_name,
@@ -111,6 +114,7 @@ FROM
 JOIN users AS u
     ON f.user_token = u.token
 
+LEFT OUTER JOIN model_weights ON model_weights.token = f.entity_token
 LEFT OUTER JOIN media_files ON media_files.token = f.entity_token
 LEFT OUTER JOIN tts_models ON tts_models.token = f.entity_token
 LEFT OUTER JOIN tts_results ON tts_results.token = f.entity_token
