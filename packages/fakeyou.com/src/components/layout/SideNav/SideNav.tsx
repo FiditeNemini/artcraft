@@ -14,7 +14,7 @@ import {
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Button from "components/common/Button/Button";
 import React, { useEffect, useState } from "react";
-import { Link, NavLink, useHistory, useRouteMatch } from "react-router-dom";
+import { NavLink, useHistory } from "react-router-dom";
 import {
   GetQueueStats,
   GetQueueStatsIsOk,
@@ -39,9 +39,9 @@ export default function SideNav(props: SideNavProps) {
   const { t } = useLocalize("SideNav");
   let history = useHistory();
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
-  const fakeYouFrontendEnv =  FakeYouFrontendEnvironment.getInstance();
+  const fakeYouFrontendEnv = FakeYouFrontendEnvironment.getInstance();
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const isDevelopmentEnv = fakeYouFrontendEnv.isDevelopment()
+  const isDevelopmentEnv = fakeYouFrontendEnv.isDevelopment();
   const handleNavLinkClick = () => {
     const wrapper = document.getElementById("wrapper");
 
@@ -73,11 +73,6 @@ export default function SideNav(props: SideNavProps) {
     };
   }, []);
 
-  const matchHome = useRouteMatch({
-    path: "/",
-    exact: true,
-  });
-
   useEffect(() => {
     // Update window width on resize
     const handleResize = () => {
@@ -92,19 +87,17 @@ export default function SideNav(props: SideNavProps) {
     };
   }, []);
 
-  const shouldShowSidebar = windowWidth >= 992 && matchHome;
+  const shouldShowSidebar = windowWidth >= 992;
 
   useEffect(() => {
-    const wrapper = document.getElementById("wrapper");
+    const contentWrapper = document.getElementById("page-content-wrapper");
 
     if (windowWidth >= 992) {
-      if (matchHome) {
-        wrapper?.classList.add("no-padding");
-      } else {
-        wrapper?.classList.remove("no-padding");
-      }
+      contentWrapper?.classList.remove("no-padding");
+    } else {
+      contentWrapper?.classList.add("no-padding");
     }
-  }, [matchHome, windowWidth]);
+  }, [windowWidth]);
 
   const [queueStats, setQueueStats] = useState<GetQueueStatsSuccessResponse>({
     success: true,
@@ -228,29 +221,16 @@ export default function SideNav(props: SideNavProps) {
   // NB(bt,2023-11-28): These are representative of tacotron2 jobs handled by two queueing systems:
   // The legacy queue (tts-inference-job) and the modern queue (inference-job). We'll add both totals
   // while we migrate off of the legacy system, then eventually kill the legacy statistic.
-  const ttsQueuedCount = queueStats.legacy_tts.pending_job_count + queueStats.inference.by_queue.pending_tacotron2_jobs;
+  const ttsQueuedCount =
+    queueStats.legacy_tts.pending_job_count +
+    queueStats.inference.by_queue.pending_tacotron2_jobs;
 
   return (
     <div
       id="sidebar-wrapper"
-      className={`sidebar ${shouldShowSidebar ? "" : "visible"}`}
+      className={`sidebar ${shouldShowSidebar ? "visible" : ""}`}
     >
       <ul className="sidebar-nav">
-        <div className="sidebar-brand">
-          <Link to="/" onClick={handleNavLinkClick}>
-            <img
-              src="/fakeyou/FakeYou-Logo.png"
-              alt="FakeYou: Cartoon and Celebrity Text to Speech"
-              height="36"
-            />
-          </Link>
-        </div>
-        <div className="sidebar-buttons d-flex gap-2 mt-4">
-          {userOrLoginButton}
-          {signupOrLogOutButton}
-        </div>
-        <hr className="my-4" />
-
         <li className="sidebar-heading">{t("speechTitle")}</li>
         <li>
           <NavLink
@@ -291,7 +271,7 @@ export default function SideNav(props: SideNavProps) {
             {"Voice Designer"}
           </NavLink>
         </li>
-        <hr className="mb-4 mt-3" />
+        <hr className="mb-3 mt-3" />
         <li className="sidebar-heading">{t("videoTitle")}</li>
         <li>
           <NavLink
@@ -307,7 +287,7 @@ export default function SideNav(props: SideNavProps) {
           </NavLink>
         </li>
 
-        <hr className="mb-4 mt-3" />
+        <hr className="mb-3 mt-3" />
         <li className="sidebar-heading">{t("communityTitle")}</li>
         <li>
           <NavLink
@@ -361,14 +341,11 @@ export default function SideNav(props: SideNavProps) {
             {t("infoPricing")}
           </NavLink>
         </li>
-        <hr className="mb-4 mt-3" />
+        <hr className="mb-3 mt-3" />
         <li className="sidebar-heading">{t("queueTitle")}</li>
         <li className="ps-4 fs-7 mb-5">
           <div>
-            {t("queueTts")}:{" "}
-            <span className="text-red">
-              {ttsQueuedCount}
-            </span>
+            {t("queueTts")}: <span className="text-red">{ttsQueuedCount}</span>
           </div>
           <div>
             {t("queueRvc")}:{" "}

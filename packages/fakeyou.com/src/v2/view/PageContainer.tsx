@@ -84,9 +84,9 @@ import { GenerateSpeechPage } from "./pages/generate_speech/GenerateSpeechPage";
 import VcModelViewPage from "./pages/vc/vc_model_view/VcModelViewPage";
 import VcModelEditPage from "./pages/vc/vc_model_edit/VcModelEditPage";
 import VcModelDeletePage from "./pages/vc/vc_model_delete/VcModelDeletePage";
+import TopNav from "components/layout/TopNav/TopNav";
 import SideNav from "components/layout/SideNav/SideNav";
 import MobileMenu from "components/layout/MobileMenu/MobileMenu";
-import { TopNav } from "./nav/TopNav";
 import TtsModelSearchPage from "./pages/tts/tts_model_search/TtsModelSearchPage";
 import MediaPage from "./pages/media/MediaPage";
 import { VoiceDesignerFormPage } from "./pages/voice_designer/VoiceDesignerFormPage";
@@ -208,13 +208,11 @@ class PageContainer extends React.Component<
   logout = () => {};
 
   public render() {
-    const { location } = this.props;
-
-    const shouldRenderNavs = location.pathname === "/";
-
     return (
       <div id="wrapper" className="no-padding">
         <div id="overlay"></div>
+
+        <TopNav />
         <SideNav
           sessionWrapper={this.props.sessionWrapper}
           logoutHandler={this.logout}
@@ -223,17 +221,6 @@ class PageContainer extends React.Component<
             this.props.querySessionSubscriptionsAction
           }
         />
-
-        {shouldRenderNavs && (
-          <TopNav
-            logoutHandler={this.logout}
-            sessionWrapper={this.props.sessionWrapper}
-            querySessionCallback={this.props.querySessionAction}
-            querySessionSubscriptionsCallback={
-              this.props.querySessionSubscriptionsAction
-            }
-          />
-        )}
 
         <div id="page-content-wrapper">
           <MobileMenu sessionWrapper={this.props.sessionWrapper} />
