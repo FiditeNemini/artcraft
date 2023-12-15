@@ -2,7 +2,7 @@
 -- noinspection SqlNoDataSourceInspectionForFile
 -- noinspection SqlResolveForFile
 
-CREATE TABLE model_weights_samples (
+CREATE TABLE model_weights_preview_samples (
   -- Not used for anything except replication.
   id BIGINT(20) NOT NULL AUTO_INCREMENT,
 
