@@ -53,6 +53,14 @@ CREATE TABLE users (
 
   -- ========== DISPLAY / PROFILE ==========
 
+  -- The "avatar" image is a media file of type image that serves as a
+  -- small avatar or profile picture icon.
+  maybe_avatar_media_file_token VARCHAR(32) DEFAULT NULL,
+
+  -- The "cover" image is a media file of type image that covers the
+  -- top of the page.
+  maybe_cover_media_file_token VARCHAR(32) DEFAULT NULL,
+
   -- Gravatar image hashes are precomputed.
   email_gravatar_hash CHAR(32) NOT NULL,
 
