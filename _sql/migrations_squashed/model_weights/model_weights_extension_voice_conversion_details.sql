@@ -3,7 +3,7 @@
 -- noinspection SqlResolveForFile
 
 -- Every type of fine tuned model that users can upload.
-CREATE TABLE model_weights_vocoder_details (
+CREATE TABLE model_weights_extension_voice_conversion_details (
   -- Not used for anything except replication.
   id BIGINT(20) NOT NULL AUTO_INCREMENT,
 
@@ -13,10 +13,22 @@ CREATE TABLE model_weights_vocoder_details (
   model_weights_token VARCHAR(32) NOT NULL,
 
 
-  -- ========== VOCODER MODEL METADATA ==========
+  -- ========== VOICE CONVERSION MODEL METADATA ==========
 
-  -- Whether the vocoder is recommended for use
-  -- vocoder_is_staff_recommended BOOLEAN NOT NULL DEFAULT FALSE,
+  -- The full IETF BCP47 language tag (eg. en, en-US, es-419, ja-JP, pt, etc.)
+  -- (Not that it matters apart from categorization, since voice conversion is universal.)
+  ietf_language_tag VARCHAR(64) NOT NULL DEFAULT 'en',
+
+  -- The IETF BCP47 language tag's primary language subtag (eg. "es-419" becomes "es")
+  -- (Not that it matters apart from categorization, since voice conversion is universal.)
+  ietf_primary_language_subtag VARCHAR(12) NOT NULL DEFAULT 'en',
+
+  -- RVC (v2) specific - whether the model has an index file associated with it
+  -- These files improve the quality of the results.
+  has_index_file BOOLEAN NOT NULL DEFAULT FALSE,
+
+  -- Pitch algorithm to use by default
+  default_pitch_algorithm VARCHAR(64) DEFAULT NULL,
 
 
   -- ========== VECTOR CLOCK ==========

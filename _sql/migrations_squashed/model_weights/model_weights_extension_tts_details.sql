@@ -3,7 +3,7 @@
 -- noinspection SqlResolveForFile
 
 -- Extra metadata on tts models
-CREATE TABLE model_weights_tts_details (
+CREATE TABLE model_weights_extension_tts_details (
   -- Not used for anything except replication.
   id BIGINT(20) NOT NULL AUTO_INCREMENT,
 

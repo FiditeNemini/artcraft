@@ -3,7 +3,7 @@
 -- noinspection SqlResolveForFile
 
 -- Every type of fine tuned model that users can upload.
-CREATE TABLE model_weights_image_generation_details (
+CREATE TABLE model_weights_extension_image_generation_details (
   -- Not used for anything except replication.
   id BIGINT(20) NOT NULL AUTO_INCREMENT,
 
