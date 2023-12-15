@@ -3,26 +3,44 @@ import Container from "components/common/Container";
 import Tabs from "components/common/Tabs";
 import PageHeader from "components/layout/PageHeader";
 import React from "react";
+import {
+  faFire,
+  faLayerGroup,
+  faPhotoFilmMusic,
+} from "@fortawesome/pro-solid-svg-icons";
+import FeaturedTab from "./tabs/FeaturedTab";
+import WeightsTab from "./tabs/WeightsTab";
+import MediaTab from "./tabs/MediaTab";
+import { Redirect, useLocation } from "react-router-dom";
 
 interface ExplorePageProps {}
 
 export default function ExplorePage(props: ExplorePageProps) {
+  const { pathname } = useLocation();
+
+  if (pathname === `/explore` || pathname === `/explore/`) {
+    return <Redirect to={`/explore/featured`} />;
+  }
+
   const tabs = [
     {
-      label: "Home",
-      content: <div>Featured cards here</div>,
-      to: "/explore/home",
+      label: "Featured",
+      icon: faFire,
+      content: <FeaturedTab />,
+      to: "/explore/featured",
       padding: true,
     },
     {
       label: "Weights",
-      content: <div>Weights card list</div>,
+      icon: faLayerGroup,
+      content: <WeightsTab />,
       to: "/explore/weights",
       padding: true,
     },
     {
       label: "Media",
-      content: <div>Media card list</div>,
+      icon: faPhotoFilmMusic,
+      content: <MediaTab />,
       to: "/explore/media",
       padding: true,
     },
@@ -31,7 +49,8 @@ export default function ExplorePage(props: ExplorePageProps) {
   return (
     <Container type="panel">
       <PageHeader title="Explore" subText="View community created content" />
-      <Panel>
+
+      <Panel mb={true}>
         <Tabs tabs={tabs} />
       </Panel>
     </Container>

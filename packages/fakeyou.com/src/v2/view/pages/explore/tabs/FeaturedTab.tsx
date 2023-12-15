@@ -1,0 +1,86 @@
+import React, { useRef, useState } from "react";
+import MasonryGrid from "components/common/MasonryGrid/MasonryGrid";
+import mockWeightsData from "./mockWeightsData";
+import AudioCard from "components/common/Card/AudioCard";
+import SkeletonCard from "components/common/Card/SkeletonCard";
+import { Link } from "react-router-dom";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faChevronRight } from "@fortawesome/pro-solid-svg-icons";
+import ImageCard from "components/common/Card/ImageCard";
+
+export default function FeaturedTab() {
+  const gridContainerRef = useRef<HTMLDivElement | null>(null);
+  const [data] = useState(mockWeightsData);
+  const [isLoading] = useState(false);
+
+  return (
+    <div className="d-flex flex-column gap-4">
+      <div>
+        <div className="d-flex align-items-center mb-3">
+          <h3 className="fw-semibold mb-0 flex-grow-1">
+            Featured Voice Weights
+          </h3>
+          <Link to="/explore/weights">
+            View all
+            <FontAwesomeIcon icon={faChevronRight} className="ms-2" />
+          </Link>
+        </div>
+
+        {isLoading ? (
+          <div className="row gx-3 gy-3">
+            {Array.from({ length: 6 }).map((_, index) => (
+              <SkeletonCard key={index} />
+            ))}
+          </div>
+        ) : (
+          <MasonryGrid
+            gridRef={gridContainerRef}
+            onLayoutComplete={() => console.log("Layout complete!")}
+          >
+            {data.map((data, index) => {
+              let card = <AudioCard key={index} data={data} type="weights" />;
+              return (
+                <div key={index} className="col-12 col-sm-6 col-xl-4 grid-item">
+                  {card}
+                </div>
+              );
+            })}
+          </MasonryGrid>
+        )}
+      </div>
+      <div>
+        <div className="d-flex align-items-center mb-3">
+          <h3 className="fw-semibold mb-0 flex-grow-1">
+            Featured Image Weights
+          </h3>
+          <Link to="/explore/weights">
+            View all
+            <FontAwesomeIcon icon={faChevronRight} className="ms-2" />
+          </Link>
+        </div>
+
+        {isLoading ? (
+          <div className="row gx-3 gy-3">
+            {Array.from({ length: 6 }).map((_, index) => (
+              <SkeletonCard key={index} />
+            ))}
+          </div>
+        ) : (
+          <MasonryGrid
+            gridRef={gridContainerRef}
+            onLayoutComplete={() => console.log("Layout complete!")}
+          >
+            {data.map((data, index) => {
+              let card = <ImageCard key={index} data={data} type="weights" />;
+              return (
+                <div key={index} className="col-12 col-sm-6 col-xl-4 grid-item">
+                  {card}
+                </div>
+              );
+            })}
+          </MasonryGrid>
+        )}
+      </div>
+    </div>
+  );
+}
