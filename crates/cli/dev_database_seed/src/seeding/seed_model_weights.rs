@@ -1,8 +1,10 @@
 use std::path::Path;
 
-use log::{info, warn};
-use rand::Rng;
-use sqlx::{MySql, Pool};
+use log::{ info, warn };
+use sqlx::{ MySql, Pool };
+
+use buckets::{ public::{ media_files::bucket_file_path::MediaFileBucketPath, self, weight_files::bucket_file_path::WeightFileBucketPath }, private };
+
 
 use buckets::public::media_files::bucket_file_path::MediaFileBucketPath;
 use enums::{
@@ -211,7 +213,7 @@ async fn seed_file_to_bucket(
         .map(|extension| extension.to_str())
         .flatten();
     // we should just have this be file bucket path and then we can use a file descriptor to turn it into a specific type of path
-    let bucket_location = MediaFileBucketPath::generate_new(
+    let bucket_location = WeightFileBucketPath::generate_new(
         maybe_bucket_prefix,
         maybe_bucket_extension
     );
@@ -223,7 +225,7 @@ async fn seed_file_to_bucket(
     let bytes = file_read_bytes(weight_file_path)?;
     let mimetype = get_mimetype_for_bytes(&bytes).unwrap_or("application/octet-stream");
 
-    info!("Uploading weights file to bucket path: {:?}", bucket_path);
+    info!("Copy this line here! Uploading weights file to bucket path: {:?}", bucket_path);
 
     let _r = bucket_clients.public.upload_file_with_content_type(
         &bucket_path,
