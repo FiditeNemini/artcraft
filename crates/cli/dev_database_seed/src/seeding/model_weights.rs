@@ -132,7 +132,7 @@ pub async fn seed_weights_for_paging(mysql_pool: &Pool<MySql>, user_token: UserT
                 - Gawr Gura MOS 4
                 "#;
 
-                model_weight_token = ModelWeightToken(format!("{}", i));
+                model_weight_token = ModelWeightToken::generate_for_testing_and_dev_seeding_never_use_in_production_seriously();
                 title = format!("Gawr Gura: {}", i);
                 description = format!("Description Number {} The special edition offers significantly better quality with fewer issues. It's the model as initially envisioned.", i);
                 description_rendered_html = rvc_markdown_description;
@@ -155,7 +155,7 @@ pub async fn seed_weights_for_paging(mysql_pool: &Pool<MySql>, user_token: UserT
             },
             21..=40 =>{
                 // TTS
-                model_weight_token = ModelWeightToken(format!("{}", i));
+                model_weight_token = ModelWeightToken::generate_for_testing_and_dev_seeding_never_use_in_production_seriously();
                 title = format!("dragonfruitGTv1: {}", i);
                 
                 description = format!("Description Number {}:", i);
@@ -187,7 +187,7 @@ pub async fn seed_weights_for_paging(mysql_pool: &Pool<MySql>, user_token: UserT
             },
             41..=60 => {
                 // SD 1.5
-                model_weight_token = ModelWeightToken(format!("{}", i));
+                model_weight_token = ModelWeightToken::generate_for_testing_and_dev_seeding_never_use_in_production_seriously();
                 title = format!("dragonfruitGTv1: {}", i);
                 
                 description = format!("Description Number {}:", i);
@@ -232,7 +232,7 @@ pub async fn seed_weights_for_paging(mysql_pool: &Pool<MySql>, user_token: UserT
                 "#;
                 let sdxl_image_token = "https://image.civitai.com/xG1nkqKTMzGDvpLrqFT7WA/be706282-2978-42a0-aaa2-73881aad94e9/width=1024/00049-2287632957-1girl,face,curly%20hair,red%20hair,white%20background,.jpeg";
 
-                model_weight_token = ModelWeightToken(format!("{}", i));
+                model_weight_token = ModelWeightToken::generate_for_testing_and_dev_seeding_never_use_in_production_seriously();
                 title = format!("SDXL_Niji_Special Edition: {}", i);
                 description = format!("Description Number {}:", i);
 
@@ -263,7 +263,7 @@ pub async fn seed_weights_for_paging(mysql_pool: &Pool<MySql>, user_token: UserT
                 "#;
 
                 let lora_image_token = "https://image.civitai.com/xG1nkqKTMzGDvpLrqFT7WA/123645df-dee2-4239-863a-76a150b09c32/width=1024/00000-2171948503.jpeg";
-                model_weight_token = ModelWeightToken(format!("{}", i));
+                model_weight_token = ModelWeightToken::generate_for_testing_and_dev_seeding_never_use_in_production_seriously();
                 title = format!("Gawr Gura LoRA: {}", i);
                 
                 description = format!("Description Number {}:", i);
@@ -295,7 +295,7 @@ pub async fn seed_weights_for_paging(mysql_pool: &Pool<MySql>, user_token: UserT
                 - Gawr Gura MOS 4
                 "#;
 
-                model_weight_token = ModelWeightToken(format!("{}", i));
+                model_weight_token = ModelWeightToken::generate_for_testing_and_dev_seeding_never_use_in_production_seriously();
                 title = format!("Gawr Gura: {}", i);
                 description = format!("Description Number {} The special edition offers significantly better quality with fewer issues. It's the model as initially envisioned.", i);
                 description_rendered_html = rvc_markdown_description;
@@ -356,11 +356,13 @@ pub async fn seed_weights_for_user_token(
 ) -> AnyhowResult<()> {
     info!("Seeding weights...");
 
-    let model_weight_token1 = ModelWeightToken("11".to_string());
-    let model_weight_token2 = ModelWeightToken("22".to_string());
-    let model_weight_token3 = ModelWeightToken("33".to_string());
-    let model_weight_token4 = ModelWeightToken("44".to_string());
-    let model_weight_token5 = ModelWeightToken("55".to_string());
+    ModelWeightToken::reset_rng_for_testing_and_dev_seeding_never_use_in_production_seriously(54321);
+
+    let model_weight_token1 = ModelWeightToken::generate_for_testing_and_dev_seeding_never_use_in_production_seriously();
+    let model_weight_token2 = ModelWeightToken::generate_for_testing_and_dev_seeding_never_use_in_production_seriously();
+    let model_weight_token3 = ModelWeightToken::generate_for_testing_and_dev_seeding_never_use_in_production_seriously();
+    let model_weight_token4 = ModelWeightToken::generate_for_testing_and_dev_seeding_never_use_in_production_seriously();
+    let model_weight_token5 = ModelWeightToken::generate_for_testing_and_dev_seeding_never_use_in_production_seriously();
 
     let model_weights_args = vec![
         CreateModelWeightsArgs {
@@ -503,20 +505,20 @@ pub async fn seed_weights_for_user_token(
 
 
 pub async fn original_seed_weights(mysql_pool: &Pool<MySql>,user_token: UserToken) -> AnyhowResult<()> {
-    let model_weight_token1 = ModelWeightToken("1".to_string());
-    let creator_token1 = UserToken("creatorToken1".to_string());
+    let model_weight_token1 = ModelWeightToken::generate_for_testing_and_dev_seeding_never_use_in_production_seriously();
+    let creator_token1 = UserToken::generate_for_testing_and_dev_seeding_never_use_in_production_seriously();
 
-    let model_weight_token2 = ModelWeightToken("2".to_string());
-    let creator_token2 = UserToken("creatorToken2".to_string());
+    let model_weight_token2 = ModelWeightToken::generate_for_testing_and_dev_seeding_never_use_in_production_seriously();
+    let creator_token2 = UserToken::generate_for_testing_and_dev_seeding_never_use_in_production_seriously();
 
-    let model_weight_token3 = ModelWeightToken("3".to_string());
-    let creator_token3 = UserToken("creatorToken3".to_string());
+    let model_weight_token3 = ModelWeightToken::generate_for_testing_and_dev_seeding_never_use_in_production_seriously();
+    let creator_token3 = UserToken::generate_for_testing_and_dev_seeding_never_use_in_production_seriously();
 
-    let model_weight_token4 = ModelWeightToken("4".to_string());
-    let creator_token4 = UserToken("creatorToken4".to_string());
+    let model_weight_token4 = ModelWeightToken::generate_for_testing_and_dev_seeding_never_use_in_production_seriously();
+    let creator_token4 = UserToken::generate_for_testing_and_dev_seeding_never_use_in_production_seriously();
 
-    let model_weight_token5 = ModelWeightToken("5".to_string());
-    let creator_token5 = UserToken("creatorToken5".to_string());
+    let model_weight_token5 = ModelWeightToken::generate_for_testing_and_dev_seeding_never_use_in_production_seriously();
+    let creator_token5 = UserToken::generate_for_testing_and_dev_seeding_never_use_in_production_seriously();
 
     let model_weights_args = vec![
         CreateModelWeightsArgs {

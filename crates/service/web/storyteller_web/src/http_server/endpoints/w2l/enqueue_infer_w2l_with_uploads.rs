@@ -102,16 +102,19 @@ pub async fn enqueue_infer_w2l_with_uploads(
       InferW2lWithUploadError::ServerError
     })?;
 
+  // ==================== BANNED USERS ==================== //
+
+  if let Some(ref user) = maybe_session {
+    if user.is_banned {
+      return Err(InferW2lWithUploadError::NotAuthorized);
+    }
+  }
+
   // ==================== RATE LIMIT ==================== //
 
   let rate_limiter = match maybe_session {
     None => &server_state.redis_rate_limiters.logged_out,
-    Some(ref user) => {
-      if user.is_banned {
-        return Err(InferW2lWithUploadError::NotAuthorized);
-      }
-      &server_state.redis_rate_limiters.logged_in
-    },
+    Some(ref _user) => &server_state.redis_rate_limiters.logged_in,
   };
 
   if let Err(_err) = rate_limiter.rate_limit_request(&http_request) {

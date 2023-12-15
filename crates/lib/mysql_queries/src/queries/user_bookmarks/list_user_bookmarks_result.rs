@@ -44,6 +44,7 @@ pub struct RawUserBookmarkRecord {
   pub (crate) maybe_media_file_type: Option<MediaFileType>,
   pub (crate) maybe_media_file_origin_category: Option<MediaFileOriginCategory>,
 
+  pub (crate) maybe_descriptive_text_model_weight_title: Option<String>,
   pub (crate) maybe_descriptive_text_tts_model_title: Option<String>,
   pub (crate) maybe_descriptive_text_tts_result_inference_text: Option<String>,
   pub (crate) maybe_descriptive_text_user_display_name: Option<String>,
@@ -59,6 +60,7 @@ impl RawUserBookmarkRecord {
       entity_token: self.entity_token,
       maybe_entity_descriptive_text: match self.entity_type {
         UserBookmarkEntityType::User => self.maybe_descriptive_text_user_display_name,
+        UserBookmarkEntityType::ModelWeight => self.maybe_descriptive_text_model_weight_title,
         UserBookmarkEntityType::TtsModel => self.maybe_descriptive_text_tts_model_title,
         UserBookmarkEntityType::TtsResult => self.maybe_descriptive_text_tts_result_inference_text,
         UserBookmarkEntityType::W2lTemplate => None,

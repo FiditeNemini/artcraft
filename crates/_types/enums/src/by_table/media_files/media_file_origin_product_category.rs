@@ -38,6 +38,10 @@ pub enum MediaFileOriginProductCategory {
   /// Media files created by (or uploaded for) the Zero Shot voice product.
   #[serde(rename = "zs_voice")]
   ZeroShotVoice,
+
+  // Media files for Rerender
+  #[serde(rename = "rerender")]
+  Rerender,
 }
 
 // TODO(bt, 2022-12-21): This desperately needs MySQL integration tests!
@@ -54,6 +58,7 @@ impl MediaFileOriginProductCategory {
       Self::Unknown => "unknown",
       Self::VoiceConversion => "voice_conversion",
       Self::ZeroShotVoice => "zs_voice",
+      Self::Rerender => "rerender",
     }
   }
 
@@ -64,6 +69,7 @@ impl MediaFileOriginProductCategory {
       "unknown" => Ok(Self::Unknown),
       "voice_conversion" => Ok(Self::VoiceConversion),
       "zs_voice" => Ok(Self::ZeroShotVoice),
+      "rerender" => Ok(Self::Rerender),
       _ => Err(format!("invalid value: {:?}", value)),
     }
   }
@@ -74,6 +80,7 @@ impl MediaFileOriginProductCategory {
     BTreeSet::from([
       Self::FaceAnimator,
       Self::TextToSpeech,
+      Self::Rerender,
       Self::Unknown,
       Self::VoiceConversion,
       Self::ZeroShotVoice,
@@ -96,6 +103,7 @@ mod tests {
       assert_serialization(MediaFileOriginProductCategory::Unknown, "unknown");
       assert_serialization(MediaFileOriginProductCategory::VoiceConversion, "voice_conversion");
       assert_serialization(MediaFileOriginProductCategory::ZeroShotVoice, "zs_voice");
+      assert_serialization(MediaFileOriginProductCategory::Rerender, "rerender")
     }
 
     #[test]
@@ -105,6 +113,7 @@ mod tests {
       assert_eq!(MediaFileOriginProductCategory::Unknown.to_str(), "unknown");
       assert_eq!(MediaFileOriginProductCategory::VoiceConversion.to_str(), "voice_conversion");
       assert_eq!(MediaFileOriginProductCategory::ZeroShotVoice.to_str(), "zs_voice");
+      assert_eq!(MediaFileOriginProductCategory::Rerender.to_str(), "rerender");
     }
 
     #[test]
@@ -114,17 +123,19 @@ mod tests {
       assert_eq!(MediaFileOriginProductCategory::from_str("unknown").unwrap(), MediaFileOriginProductCategory::Unknown);
       assert_eq!(MediaFileOriginProductCategory::from_str("voice_conversion").unwrap(), MediaFileOriginProductCategory::VoiceConversion);
       assert_eq!(MediaFileOriginProductCategory::from_str("zs_voice").unwrap(), MediaFileOriginProductCategory::ZeroShotVoice);
+      assert_eq!(MediaFileOriginProductCategory::from_str("rerender").unwrap(), MediaFileOriginProductCategory::Rerender);
     }
 
     #[test]
     fn all_variants() {
       let mut variants = MediaFileOriginProductCategory::all_variants();
-      assert_eq!(variants.len(), 5);
+      assert_eq!(variants.len(), 6);
       assert_eq!(variants.pop_first(), Some(MediaFileOriginProductCategory::FaceAnimator));
       assert_eq!(variants.pop_first(), Some(MediaFileOriginProductCategory::TextToSpeech));
       assert_eq!(variants.pop_first(), Some(MediaFileOriginProductCategory::Unknown));
       assert_eq!(variants.pop_first(), Some(MediaFileOriginProductCategory::VoiceConversion));
       assert_eq!(variants.pop_first(), Some(MediaFileOriginProductCategory::ZeroShotVoice));
+      assert_eq!(variants.pop_first(), Some(MediaFileOriginProductCategory::Rerender));
       assert_eq!(variants.pop_first(), None);
     }
   }
