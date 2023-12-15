@@ -170,7 +170,9 @@ CREATE TABLE users (
   UNIQUE KEY (token),
   UNIQUE KEY (username),
   UNIQUE KEY (email_address),
-  KEY fk_user_role_slug (user_role_slug)
+  KEY fk_user_role_slug (user_role_slug),
+  KEY fk_maybe_avatar_media_file_token (maybe_avatar_media_file_token),
+  KEY fk_maybe_cover_media_file_token (maybe_cover_media_file_token)
 
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;
 

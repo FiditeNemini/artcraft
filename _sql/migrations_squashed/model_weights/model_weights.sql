@@ -188,14 +188,13 @@ CREATE TABLE model_weights (
 
   -- INDICES --
   PRIMARY KEY (id),
-  UNIQUE KEY (token)
+  UNIQUE KEY (token),
 
-  -- TODO (this set should be good to go):
-  -- KEY index_weights_type (weights_type),
-  -- KEY index_weights_category (weights_category),
-  -- KEY fk_creator_user_token (creator_user_token),
-  -- KEY index_creator_set_visibility (creator_set_visibility),
-  -- KEY fk_maybe_avatar_media_file_token (maybe_avatar_media_file_token),
-  -- KEY fk_maybe_cover_media_file_token (maybe_cover_media_file_token)
+  KEY index_weights_type (weights_type),
+  KEY index_weights_category (weights_category),
+  KEY fk_creator_user_token (creator_user_token),
+  KEY index_creator_set_visibility (creator_set_visibility),
+  KEY fk_maybe_avatar_media_file_token (maybe_avatar_media_file_token),
+  KEY fk_maybe_cover_media_file_token (maybe_cover_media_file_token)
 
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;
